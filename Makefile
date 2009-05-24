@@ -1,5 +1,5 @@
 PACKAGE = gmusicbrowser
-VERSION = 1.0.1
+VERSION = 1.1.0
 
 
 prefix		= usr
@@ -26,28 +26,28 @@ install: all
 	mkdir -p "$(datadir)/gmusicbrowser/"
 	mkdir -p "$(docdir)"
 	mkdir -p "$(mandir)/man1/"
-	install -m 644 $(DOCS) "$(docdir)"
-	install -m 644 gmusicbrowser.man "$(mandir)/man1/gmusicbrowser.1"
-	install -d "$(datadir)/gmusicbrowser/pix/"
-	install -d "$(datadir)/gmusicbrowser/pix/gnome-classic/"
-	install -d "$(datadir)/gmusicbrowser/pix/tango/"
-	install -d "$(datadir)/gmusicbrowser/plugins/"
-	install -Dm 755 gmusicbrowser.pl "$(bindir)/gmusicbrowser"
-	install -m 755 iceserver.pl      "$(datadir)/gmusicbrowser/iceserver.pl"
-	install -m 644 *.pm layouts      "$(datadir)/gmusicbrowser/"
-	install -m 644 plugins/*.pm      "$(datadir)/gmusicbrowser/plugins/"
-	install -m 644 pix/*.png         "$(datadir)/gmusicbrowser/pix/"
-	install -m 644 pix/gnome-classic/*    "$(datadir)/gmusicbrowser/pix/gnome-classic/"
-	install -m 644 pix/tango/*            "$(datadir)/gmusicbrowser/pix/tango/"
-	install -Dm 644 gmusicbrowser.desktop "$(datadir)/applications/gmusicbrowser.desktop"
-	install -Dm 644 gmusicbrowser.menu    "$(menudir)/gmusicbrowser"
-	install -Dm 644 pix/gmusicbrowser32x32.png "$(iconsdir)/gmusicbrowser.png"
-	install -Dm 644 pix/gmusicbrowser.png      "$(liconsdir)/gmusicbrowser.png"
-	install -Dm 644 pix/trayicon.png           "$(miconsdir)/gmusicbrowser.png"
+	install -pm 644 $(DOCS) "$(docdir)"
+	install -pm 644 gmusicbrowser.man "$(mandir)/man1/gmusicbrowser.1"
+	install -pd "$(datadir)/gmusicbrowser/pix/"
+	install -pd "$(datadir)/gmusicbrowser/pix/gnome-classic/"
+	install -pd "$(datadir)/gmusicbrowser/pix/tango/"
+	install -pd "$(datadir)/gmusicbrowser/plugins/"
+	install -pDm 755 gmusicbrowser.pl "$(bindir)/gmusicbrowser"
+	install -pm 755 iceserver.pl      "$(datadir)/gmusicbrowser/iceserver.pl"
+	install -pm 644 *.pm layouts      "$(datadir)/gmusicbrowser/"
+	install -pm 644 plugins/*.pm      "$(datadir)/gmusicbrowser/plugins/"
+	install -pm 644 pix/*.png         "$(datadir)/gmusicbrowser/pix/"
+	install -pm 644 pix/gnome-classic/*    "$(datadir)/gmusicbrowser/pix/gnome-classic/"
+	install -pm 644 pix/tango/*            "$(datadir)/gmusicbrowser/pix/tango/"
+	install -pDm 644 gmusicbrowser.desktop "$(datadir)/applications/gmusicbrowser.desktop"
+	install -pDm 644 gmusicbrowser.menu    "$(menudir)/gmusicbrowser"
+	install -pDm 644 pix/gmusicbrowser32x32.png "$(iconsdir)/gmusicbrowser.png"
+	install -pDm 644 pix/gmusicbrowser.png      "$(liconsdir)/gmusicbrowser.png"
+	install -pDm 644 pix/trayicon.png           "$(miconsdir)/gmusicbrowser.png"
 	for lang in $(LINGUAS) ; \
 	do \
-		install -d "$(localedir)/$$lang/LC_MESSAGES/"; \
-		install -m 644 locale/$$lang/LC_MESSAGES/gmusicbrowser.mo	"$(localedir)/$$lang/LC_MESSAGES/"; \
+		install -pd "$(localedir)/$$lang/LC_MESSAGES/"; \
+		install -pm 644 locale/$$lang/LC_MESSAGES/gmusicbrowser.mo	"$(localedir)/$$lang/LC_MESSAGES/"; \
 	done
 
 postinstall:

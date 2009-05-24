@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -61,13 +61,7 @@ sub Changed
 	return unless @cmd;
 	$_=::ReplaceFields($ID,$_) for @cmd;
 	if ($::Options{OPT.'SENDSTDINPUT'})
-	{	my $ref=$::Songs[$ID];
-		my $string=	'Title='.	$ref->[::SONG_TITLE]."\n"
-				.'Artist='.	$ref->[::SONG_ARTIST]."\n"
-				.'Album='.	$ref->[::SONG_ALBUM]."\n"
-				.'Length='.	$ref->[::SONG_LENGTH]."\n"
-				.'Year='.	$ref->[::SONG_DATE]."\n"
-		;
+	{	my $string=::ReplaceFields($ID,"Title=%t\nArtist=%a\nAlbum=%l\nLength=%m\nYear=%y\n");
 		open my$out,'|-',@cmd;
 		print $out $string;
 		close $out;
@@ -78,21 +72,3 @@ sub Changed
 }
 
 1 #the file must return true
-
-# song properties :
-# SONG_UFILE	SONG_UPATH	SONG_MODIF
-# SONG_LENGTH	SONG_SIZE	SONG_BITRATE
-# SONG_FORMAT	SONG_CHANNELS	SONG_SAMPRATE
-# SONG_TITLE	SONG_ARTIST	SONG_ALBUM
-# SONG_DISC	SONG_TRACK	SONG_DATE
-# SONG_VERSION	SONG_GENRE	SONG_COMMENT
-# SONG_AUTHOR
-# SONG_ADDED	SONG_LASTPLAY	SONG_NBPLAY
-# SONG_RATING	SONG_LABELS
-# SONG_FILE	SONG_PATH
-#
-# SONG_GENRE & SONG_LABELS are "\x00" separated lists
-#
-# filename of album cover is in $::Album{ $::Songs[$::SongID][::SONG_ALBUM] }[::AAPIXLIST]
-#  (may be an mp3 file, '0' means "no cover and don't auto-set cover")
-# if you change the album cover, you should call : ::HasChanged('AAPicture',$album); where $album is the album name

@@ -1,8 +1,8 @@
 Name: gmusicbrowser
 Summary: Jukebox for large collections of mp3/ogg/flac/mpc files
-Version: 1.0.1
+Version: 1.1.0
 Release: 1
-License: GPLv3
+License: GPL
 Group: Sound
 URL: http://gmusicbrowser.sourceforge.net/
 Source0: http://squentin.free.fr/gmusicbrowser/%{name}-%{version}.tar.gz
@@ -11,7 +11,7 @@ Packager: Quentin Sculo <squentin@free.fr>
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch: noarch
 Requires: perl >= 5.8, gtk2 >= 2.6.0, perl-Gtk2, perl-Gtk2-TrayIcon, perl(Locale::gettext) >= 1.04, perl-GStreamer
-Requires(hint): mpg321, vorbis-tools, flac123, alsa-utils, perl-Gtk2-MozEmbed, perl-Net-DBus, gstreamer0.10-lame, gstreamer0.10-plugins-ugly, gstreamer0.10-plugins-bad, perl-Gtk2-WebKit
+Requires(hint): mpg321, vorbis-tools, flac123, alsa-utils, perl-Gtk2-MozEmbed, perl-Net-DBus, gstreamer0.10-lame, gstreamer0.10-plugins-ugly, gstreamer0.10-plugins-bad
 AutoReq: no
 AutoProv: no
 
@@ -61,8 +61,6 @@ rm -rf %{buildroot}
 #%doc AUTHORS COPYING README NEWS layout_doc.html
 
 %changelog
-* Mon Nov 24 2008 Quentin Sculo <squentin@free.fr> 1.0.1-1
-- added perl-Gtk2-WebKit in Requires(hint)
 * Sat Jul 26 2008 Quentin Sculo <squentin@free.fr> 1.0-1
 - changed the url to http://gmusicbrowser.sourceforge.net/ as it's more likely to stay valid in the future
 - escape macro in changelog

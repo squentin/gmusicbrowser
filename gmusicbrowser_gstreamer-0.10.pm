@@ -45,7 +45,7 @@ BEGIN
 	jackaudio	=> { name => "jack", option => 'server' },
 #	alsaspdif	=> { option => 'card' },
   );
-  %Plugins=(	mp3	=> 'mad',	ogg => 'vorbisdec',	ape => 'ffdec_ape',
+  %Plugins=(	mp3	=> 'mad',	ogg => 'vorbisdec',	oga => 'vorbisdec',	ape => 'ffdec_ape',
 		flac	=> 'flacdec',	mpc => 'musepackdec',	wv => 'wavpackdec',
 	);
   my $error;
@@ -66,7 +66,7 @@ BEGIN
   if ($error) {warn "$error -> gstreamer output won't be available.\n"}
   if ($GST_ok)
   {	$::Options{gst_sink}||= (grep ($reg->lookup_feature($_.'sink'), qw/autoaudio gconfaudio alsa esd pulse oss/),'alsa')[0]; #find a default sink
-	if (my $feat=$reg->lookup_feature('equalizer-10bands')) { $GST_EQ_ok=1; }
+	if ($reg->lookup_feature('equalizer-10bands')) { $GST_EQ_ok=1; }
 	else {warn "gstreamer plugin 'equalizer-10bands' not found -> equalizer not available\n";}
 	if ($reg->lookup_feature('rglimiter') && $reg->lookup_feature('rgvolume')) { $GST_RG_ok=1; }
 	else {warn "gstreamer plugins 'rglimiter' and/or 'rgvolume' not found -> replaygain not available\n";}
@@ -153,7 +153,7 @@ sub SetVolume
 	elsif	($set eq 'unmute')	{ $Volume=$Mute; $Mute=0;	}
 	elsif	($set=~m/^\+(\d+)$/)	{ $Volume+=$1; }
 	elsif	($set=~m/^-(\d+)$/)	{ $Volume-=$1; }
-	elsif	($set=~m/^(\d+)$/)	{ $Volume =$1; }
+	elsif	($set=~m/(\d+)/)	{ $Volume =$1; }
 	$Volume=0   if $Volume<0;
 	$Volume=100 if $Volume>100;
 	$PlayBin->set(volume => $Volume/100); #or /10 ?
@@ -404,25 +404,25 @@ sub RG_set_options
 }
 sub RGA_ReplayGainAnalyse_byAlbum
 {	my $IDs=$_[0];
-	::SortList($IDs,::SONG_ALBUM);
-	my @list; my @album; my $album0;
+	::SortList($IDs,'album');
+	my @list; my @album; my $aid0;
 	for my $ID (@$IDs)
-	{	my $album= $::Songs[$ID][::SONG_ALBUM];
-		if (defined $album0)
-		{	if ($album0 eq $album) {push @album,$ID;next}
+	{	my $aid= Songs::Get($ID,'album');
+		if (defined $aid0)
+		{	if ($aid0 eq $aid) {push @album,$ID;next}
 			else
 			{	push @list, (@album>1 ? [@album] : $album[0]);
-				$album0=undef; @album=undef;
+				$aid0=undef; @album=undef;
 			}
 		}
-		if ($album=~m/^<Unknown>/) {push @list,$ID}
-		else {$album0=$album; @album=($ID)}
+		if (AA::HasName('album',$aid)) {push @list,$ID}
+		else {$aid0=$aid; @album=($ID)}
 	}
-	if (defined $album0) { push @list, (@album>1 ? [@album] : $album[0]); }
+	if (defined $aid0) { push @list, (@album>1 ? [@album] : $album[0]); }
 	RGA_ReplayGainAnalyse(\@list);
 }
 sub RGA_ReplayGainAnalyse
-{	my $IDs=$_[0];
+{	my @IDs= ::uniq(@{ $_[0] });
 	unless ($RGA_pipeline)
 	{	$RGA_pipeline=GStreamer::Pipeline->new('RGA_pipeline');
 		my $audiobin=GStreamer::Bin->new('RGA_audiobin');
@@ -449,12 +449,11 @@ sub RGA_ReplayGainAnalyse
 		$bus->signal_connect('message::eos' => \&RGA_process_next);
 		#FIXME check errors
 	}
-	#FIXME remove duplicates in @$IDs;
-	push @{$RGA_pipeline->{queue}},@$IDs;
-	my $nb=@$IDs; #warn "@$IDs";
-	$nb+=@$_-1 for grep ref, @$IDs; #count tracks in album lists
-	$RGA_pipeline->{total}+=$nb; #warn "$RGA_pipeline->{total}==$nb;\n";
-	RGA_process_next() if $RGA_pipeline->{total}==$nb;
+	push @{$RGA_pipeline->{queue}},@IDs;
+	my $nb=@IDs; #warn "@IDs";
+	$nb+=@$_-1 for grep ref, @IDs; #count tracks in album lists
+	::Progress('replaygain', add=>$nb, abortcb=>\&RGA_stop, title=>_"Replaygain analysis");
+	RGA_process_next() unless $::Progress{replaygain}{current}; #FIXME maybe check if $RGA_pipeline is running instead
 }
 sub RGA_newpad_cb
 {	my ($decodebin,$pad)=@_;
@@ -466,8 +465,9 @@ sub RGA_newpad_cb
 	$pad->link($audiopad);
 }
 sub RGA_process_next
-{	return unless $RGA_pipeline;
-	$RGA_pipeline->{done}++;
+{	::Progress('replaygain', inc=>1) if $_[0]; #called from callback => one file has been scanned => increment
+	unless ($RGA_pipeline) { ::Progress('replaygain', abort=>1); return; }
+
 	my $rganalysis=$RGA_pipeline->get_by_name('rganalysis');
 	my $ID;
 	if (my $list=$RGA_pipeline->{albumIDs})
@@ -486,7 +486,7 @@ sub RGA_process_next
 			$ID=$list->[0];
 			$RGA_pipeline->{album_i}=0;
 		}
-		my $f= $::Songs[$ID][::SONG_PATH].::SLASH.$::Songs[$ID][::SONG_FILE];
+		my $f= Songs::GetFullFilename($ID);
 		$RGA_pipeline->{ID}=$ID;
 		warn "analysing [$ID] $f\n";
 		$RGA_pipeline->get_by_name('filesrc')->set(location => $f);#set(uri => $f);
@@ -497,7 +497,6 @@ sub RGA_process_next
 	{	$RGA_pipeline->set_state('null');
 		$RGA_pipeline=undef;
 	}
-	::HasChanged('GST_RGAnalysis');
 	1;
 }
 sub RGA_bus_message_tag
@@ -505,8 +504,9 @@ sub RGA_bus_message_tag
 	my $tags=$msg->tag_list;
 	#for my $key (sort keys %$tags) {warn "key=$key => $tags->{$key}\n"}
 	#FIXME should check if the message comes from the rganalysis element, but not supported by the bindings yet, instead check if any non replaygain tags => will re-write replaygain tags _before_ analysis for files without other tags
+	#return if GStreamer->VERSION >=.10 && $msg->src == $RGA_pipeline->get_by_name('rganalysis'); FIXME with Gstreamer 0.10 : $message->src should work, not tested yet !!!! TESTME
 	return unless exists $tags->{'replaygain-track-gain'};
-	return if grep !m/^replaygain-/, keys %$tags;
+	return if grep !m/^replaygain-/, keys %$tags; #if other tags than replaygain => doesn't come from the rganalysis element
 
 	my $cID=$RGA_pipeline->{ID};
 	if ($::debug)
@@ -518,23 +518,32 @@ sub RGA_bus_message_tag
 	{	$RGA_pipeline->{album_tosave}{ $cID }= [@$tags{'replaygain-track-gain','replaygain-track-peak'}];
 		if (exists $tags->{'replaygain-album-gain'} && !$RGA_pipeline->get_by_name('rganalysis')->get('num-tracks'))
 		{	#album done
-			for my $ID (@{$RGA_pipeline->{albumIDs}})
-			{	@$tags{'replaygain-track-gain','replaygain-track-peak'}= @{$RGA_pipeline->{album_tosave}{$ID}};
-				::setlocale(::LC_NUMERIC, 'C');
-				my @modif= map [$_,0,"$tags->{$_}[0]"], qw/replaygain-reference-level replaygain-track-gain replaygain-track-peak replaygain-album-gain replaygain-album-peak/;
-				::setlocale(::LC_NUMERIC, '');
-				SimpleTagWriting::set($ID, \@modif, \&RGA_write_error);
-				last unless $RGA_pipeline; #in case RGA has been aborted after an error writing a tag
+			my $IDs= $RGA_pipeline->{albumIDs};
+			my $gainpeak= $RGA_pipeline->{album_tosave};
+			for my $ID (@$IDs)
+			{	@$tags{'replaygain-track-gain','replaygain-track-peak'}= @{$gainpeak->{$ID}};
+				RGA_write($ID,$tags,1);
 			}
 		}
 	}
 	else
-	{	::setlocale(::LC_NUMERIC, 'C');
-		my @modif= map [$_,0,"$tags->{$_}[0]"], qw/replaygain-reference-level replaygain-track-gain replaygain-track-peak/;
-		::setlocale(::LC_NUMERIC, '');
-		SimpleTagWriting::set( $cID, \@modif, \&RGA_write_error);
+	{	RGA_write($cID,$tags,0);
 	}
 	1;
+}
+sub RGA_write
+{	my ($ID,$tags,$albumtag)=@_;
+	my @keys=qw/replaygain-reference-level replaygain-track-gain replaygain-track-peak/;
+	push @keys, qw/replaygain-album-gain replaygain-album-peak/ if $albumtag;
+	::setlocale(::LC_NUMERIC, 'C');
+	my @modif;
+	for my $key (@keys)
+	{	my $field=$key;
+		$field=~tr/-/_/; # convert replaygain-track-gain to replaygain_track_gain ...
+		push @modif, $field, "$tags->{$key}[0]";#string-ify them with C locale to make sure it's correct
+	}
+	::setlocale(::LC_NUMERIC, '');
+	FileTag::Write($ID, \@modif, \&RGA_write_error);
 }
 sub RGA_write_error
 {	my $err=_"Error writing replaygain tags :\n".shift;
@@ -546,20 +555,17 @@ sub RGA_write_error
 sub RGA_stop
 {	$RGA_pipeline->set_state('null');
 	$RGA_pipeline=undef;
-	::HasChanged('GST_RGAnalysis');
+	::Progress('replaygain', abort=>1);
 }
 sub RGA_PrefBox
 {	my $sg1=shift;
 	my $check=::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain",undef,_"Normalize volume (the files must have replaygain tags)");
 	$sg1->add_widget($check);
 	#my $start=Gtk2::Button->new(_ "Start ReplayGain analysis");
-	my $stop =Gtk2::Button->new(_"Abort ReplayGain analysis");
 	my $opt  =Gtk2::Button->new(_"ReplayGain options");
-	my $progress=Gtk2::ProgressBar->new;
 	$opt->signal_connect(clicked => sub
 		{	if ($RG_dialog) {$RG_dialog->present;return}
-			$RG_dialog= Gtk2::Dialog->new (_"ReplayGain options", undef, [],
-				'gtk-close' => 'close');
+			$RG_dialog= Gtk2::Dialog->new (_"ReplayGain options", undef, [], 'gtk-close' => 'close');
 			$RG_dialog->signal_connect(destroy => sub {$RG_dialog=undef});
 			$RG_dialog->signal_connect(response =>sub {$_[0]->destroy;$RG_dialog=undef});
 			my $update=sub { RG_set_options(); };
@@ -577,32 +583,17 @@ sub RGA_PrefBox
 	#$start->signal_connect(clicked => sub
 	#	{	my @list; my %done;
 	#		for my $ID (@::Library)
-	#		{	my $album=$::Songs[$ID][::SONG_ALBUM];
-	#			my $l=$::Album{$album}[::AALIST];
-	#			if (@$l>1 && $album!~m/^<Unknown>/)
-	#			{ push @list,[@$l] unless exists $done{$album}; $done{$album}=undef; }
+	#		{	my $albumid=Songs::Get_gid($ID,'album');
+	#			my $l=AA::GetIDs('album',$albumid);
+	#			if (@$l>1 && Songs::Gid_to_get('album',$album) ne '')
+	#			{ push @list,[@$l] unless exists $done{$album}; $done{$aid}=undef; }
 	#			else { push @list,$ID; }
 	#		}
 	#		RGA_ReplayGainAnalyse(\@list);
 	#	});
 	#$start->signal_connect(clicked => sub { RGA_ReplayGainAnalyse(\@::Library) });
-	$stop->signal_connect( clicked => \&RGA_stop);
 	#$start->set_sensitive(0) unless $GST_RGA_ok;
-	my $box=::Hpack($check,$opt,'_',$progress,$stop);
-	$_->set_no_show_all(1) for $stop,$progress;
-	my $update=sub
-		{	my $progress=$_[0];
-			if ($RGA_pipeline)
-			{	$stop->show; $progress->show;
-				my $max=$RGA_pipeline->{total};
-				my $done=$RGA_pipeline->{done};
-				$progress->set_fraction( $done/$max );
-				$progress->set_text( "$done / $max" );
-			}
-			else { $stop->hide; $progress->hide; }
-		};
-	::Watch($progress,'GST_RGAnalysis',$update);
-	&$update($progress);
+	my $box=::Hpack($check,$opt);
 	$box->set_sensitive(0) unless $GST_RG_ok;
 	return $box;
 }
@@ -615,7 +606,7 @@ sub AdvancedOptions
 	for my $s (sort grep $Sinks{$_}{ok} && $Sinks{$_}{option}, keys %Sinks)
 	{	my $label= $Sinks{$s}{name}||$s;
 		for my $opt (sort split / /,$Sinks{$s}{option})
-		{	my $hbox=::NewPrefEntry("gst_$s".'_'.$opt, "$s $opt : ", sub { $self->{modif}=1 },$sg1,$sg2);
+		{	my $hbox=::NewPrefEntry("gst_${s}_$opt", "$s $opt : ", cb => sub { $self->{modif}=1 }, sizeg1 => $sg1, sizeg2 => $sg2);
 			$vbox->pack_start($hbox,::FALSE,::FALSE,2);
 		}
 	}

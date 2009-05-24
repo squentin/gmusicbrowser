@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -37,23 +37,18 @@ sub RunCommand
 
 dbus_method('CurrentSong', [], [['dict', 'string', 'string']]);
 sub CurrentSong
-{	#my $self=$_[0];
+{	my $self=$_[0];
 	return {} unless defined $::SongID;
-	my %h=	(	title	=> ::SONG_TITLE,
-			album	=> ::SONG_ALBUM,
-			artist	=> ::SONG_ARTIST,
-			'length'=> ::SONG_LENGTH,
-			track	=> ::SONG_TRACK,
-			disc	=> ::SONG_DISC,
-		);
-	$_=$::Songs[$::SongID][$_] for values %h;
+	my %h;
+	$h{$_}=Songs::Get($::SongID,$_) for qw/title album artist length track disc/;
 	#warn "$h{title}\n";
 	return \%h;
 }
 
 dbus_method('GetPosition', [], ['double']);
 sub GetPosition
-{	return $::PlayTime || 0;
+{	my $self=$_[0];
+	return $::PlayTime || 0;
 }
 
 dbus_method('Playing', [], ['bool']);
@@ -64,35 +59,34 @@ sub Playing
 dbus_method('Set', [['struct', 'string', 'string', 'string']], ['bool']);
 sub Set
 {	my ($self,$array)=@_;
-	::SetTagValue(@$array); #return false on error, true if ok
+	Songs::SetTagValue(@$array); #return false on error, true if ok
 }
 dbus_method('Get', [['struct', 'string', 'string']], ['string']);
 sub Get
 {	my ($self,$array)=@_;
-	::GetTagValue(@$array);
+	Songs::GetTagValue(@$array);
 }
 dbus_method('GetLibrary', [], [['array', 'uint32']]);
 sub GetLibrary
 {	\@::Library;
 }
 
-dbus_method('GetAlbumCover', ['string'], ['string']);
+dbus_method('GetAlbumCover', ['uint32'], ['string']);
 sub GetAlbumCover
-{	my ($self,$album)=@_;
-	my $ref=$::Album{$album};
-	return undef unless $ref && $ref->[::AAPIXLIST];
-	return $ref->[::AAPIXLIST];
+{	my ($self,$ID)=@_;
+	my $file=Songs::Get($ID,'album_picture');
+	return $file;
 }
-dbus_method('GetAlbumCoverData', ['string'], [['array', 'byte']]);
+
+#slow, not a good idea
+dbus_method('GetAlbumCoverData', ['uint32'], [['array', 'byte']]);
 sub GetAlbumCoverData
-{	my ($self,$album)=@_;
-	my $ref=$::Album{$album};
-	return undef unless $ref && $ref->[::AAPIXLIST];
-	my $file=$ref->[::AAPIXLIST];
-	return undef unless -r $file;
+{	my ($self,$ID)=@_;
+	my $file=GetAlbumCover($self,$ID);
+	return undef unless $file && -r $file;
 	my $data;
-	if ($file=~m/\.mp3/i)
-	{	$data=ReadTag::PixFromMP3($file);
+	if ($file=~m/\.(?:mp3|flac)$/i)
+	{	$data=ReadTag::PixFromMusicFile($file);
 	}
 	else
 	{	open my$fh,'<',$file; binmode $fh;

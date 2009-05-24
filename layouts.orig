@@ -1,33 +1,4 @@
-[Lists, Library & Context]
-Type=G
-Default		= Window size=1120x820 FPane0 page=genre FPane1 page=artist FPane2 page=album,albumpsize=32,albuminfo=1 VPRight 200_550
-MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem
-MBlist 		= HistItem LSortItem PlayItem
-HBmenu		= _MBmenu
-HBButtons1	= Prev Stop Play Next 5-Vol -Pref -Playlist(toggle)
-HBButtons3	= 5Sort 5Filter 5Queue 5Pos -Stars
-HBTime		= LabelTime Length _TimeBar
-HBTitle		= Filler0 _Title
-HBArtist	= LockArtist _Artist
-HBAlbum		= LockAlbum _Album -Date
-VBText		= HBButtons1 2HBTitle 2HBArtist 2HBAlbum HBTime
-HBText_Cover	= _VBText 5-Cover
-VBplayer	= HBButtons3 HBText_Cover
-VBLeft		= VBplayer 5_TabbedLists(group=1,songtree=1)
-HPfp1		= FPane1(nb=2,hide=1) FPane2(nb=3,hide=1)
-HPfp0	 	= FPane0(nb=1,hide=1) HPfp1
-HBSongList	= FBox -FLock -PlayFilter -Refresh -ResetFilter -MBlist
-VBSongList	= HBSongList _SongList
-VPRight		= HPfp0 _VBSongList
-TBRight		= _"Library" VPRight _"Context" Context
-HPBottom	= VBLeft _TBRight
-VBmain		= HBmenu 5_HPBottom Progress
-HSize0		= Filler0 LockArtist LockAlbum
-VolumeScroll	= VBplayer
-ExtraWidgets	= button HBButtons1(pack=-,relief=none)
-
-
-[Small player]
+[default player layout]
 Type=G
 Default	= Window sticky=1
 HBButtons	= Vol Prev Stop Play Next Playlist Pref Quit
@@ -43,7 +14,7 @@ HSize0		= Filler0 LockArtist LockAlbum Sort
 VolumeScroll	= HBmain
 ExtraWidgets	= button HBButtons(relief=none,pos=7)
 
-[with queue] based on Small player
+[with queue] based on default player layout
 VBmain2		= HBmain 5_VBQueue
 VBQueue		= _QueueList(group=1,hidewidget=VBQueue,hideif=empty,shrinkonhide=v) HBQueueButtons
 HBQueueButtons	= EditListButtons(group=1) 4QueueActions
@@ -56,13 +27,13 @@ HBmain	= Playlist Pref Play Next 5_ABTitle
 ABTitle = (xalign=0,yscale=0) Title_by(minsize=20)
 VolumeScroll	= HBmain
 
-[full] based on Small player
+[full] based on default player layout
 Type=T
 HBButtons =
 VBmain		= HBIndic _VBText -HBTime
 HBmain		= _VBmain 2Filler1 -Cover(forceratio=1)
 
-[full with buttons] based on Small player
+[full with buttons] based on default player layout
 Type=T
 HBmain		= _VBmain 2Filler1 -Cover(forceratio=1)
 
@@ -148,7 +119,6 @@ HBArtist	= LockArtist _Artist
 HBAlbum		= LockAlbum _Album -Date
 VBright		= 2HBTitle 2HBArtist 2HBAlbum
 VBmain		= HBupper 5_HPfp_list_src
-#VBmain		= HBupper 5_HPfp_list_src HBStatus
 HPfp_list_src	= VBfpane3 _VPfp_list
 VBfpane3	= _FPane3(nb=1,hide=1,pages=savedtree) ProgressV
 VPfp_list	= HPfp0 _VBlist
@@ -157,17 +127,16 @@ VPlists		= _SongList QueueList(group=2)
 HBstatus	= SimpleSearch MBlist Refresh ResetFilter PlayFilter -Total
 HPfp0		= FPane0(nb=2,hide=1,pages=genre) HPfp1
 HPfp1		= FPane1(nb=3,hide=1,pages=artist) FPane2(nb=4,hide=1,pages=album)
-#HBStatus	= Total _Progress
 MBlist		= HistItem LSortItem PlayItem
 HSize0		= Filler0 LockArtist LockAlbum
 VSize1		= 50 VolSlider
 VolumeScroll	= HBupper
 
-[with search] based on Small player
+[with search] based on default player layout
 VBmain2		= HBmain 2HBsearch _SongList(hideif=nofilter)
 HBsearch	= FBox ResetFilter PlayFilter
 
-[with playlist] based on Small player
+[with playlist] based on default player layout
 Type=G
 VBmain2		= HBmain 2HBsearch _SongList(playlist)
 HBsearch	= FBox ResetFilter
@@ -205,7 +174,7 @@ HBButtons	= EditListButtons 4QueueActions
 [EditList]
 Title=List Edit
 Default		= Window size=500x300
-VBmain		= 3_SongList(mode=editlist,activate=playlist) EditListButtons
+VBmain		= 3_SongList(activate=playlist) EditListButtons
 
 [Context]
 Type=C
@@ -262,26 +231,26 @@ VBmain		= HBupper 5_HPbrowser
 HSize0		= Filler0 LockArtist LockAlbum
 VolumeScroll	= HBupper
 
-[with playlist & context] based on Small player
+[with playlist & context] based on default player layout
 Default		= Window size=820x500
 VBleft		= HBmain 4_SongList(playlist)
 HPmain		= VBleft _Context
 
-[with tabbedlists] based on Small player
+[with tabbedlists] based on default player layout
 Default		= Window size=820x500
 VBglobal	= HBmain 4_TabbedLists
 #VBglobal	= HBmain 4_HPLists
 #HPLists	= HPfpanes _TabbedLists
 #HPfpanes	= FPane1(nb=1,hide=1) FPane2(nb=2,hide=1)
 
-[Search & Queue] based on Small player
+[Search & Queue] based on default player layout
 Default		= Window size=760x540
 VBright		= HBmain 5_QueueList HBQueueButtons
 HBQueueButtons	= EditListButtons QueueActions
 HPmain		= _TBaa VBright
 TBaa		= _"Artist" AASearch0(aa=artist) _"Album" AASearch1(aa=album) _"Song" SongSearch _"Context" Context
 
-[Search & Playlist] based on Small player
+[Search & Playlist] based on default player layout
 Default		= Window size=760x540
 VBright		= HBmain 5_SongList(playlist)
 HPmain		= _TBaa VBright
@@ -316,7 +285,7 @@ HSize0		= Filler0 LockArtist LockAlbum
 VolumeScroll	= VBplayer
 ExtraWidgets	= button HBButtons1(pack=-,relief=none)
 
-[with context] based on Small player
+[with context] based on default player layout
 VBmain2		= HBmain HSeparator _Context
 
 [left-side filter panes] based on Browser
@@ -477,7 +446,7 @@ title = Small album picture
 sort = album:i
 width = 20
 hreq = 20
-album  : aapic(picsize=$_h,aa='album')
+album  : aapic(picsize=$_h,aa='album',aakey=$albumid)
 
 {Column ratingpic}
 title = Rating
@@ -498,39 +467,39 @@ title2:	text(markup='<b><big>'.pesc($artist).'</big></b>',pad=2,x=-title2:w)
 #title2:	text(markup='by <b><big>'.pesc($artist).'</big></b>',pad=2,x=title:w)
 #title:	text(markup='<b><big>'.pesc($album).'</big></b> ',pad=2)
 title:	text(markup='<b><big>'.pesc($album).'</big></b> ' . if($year,'<small>('.pesc($year).')</small>'),pad=2,w=min($_w-title2:wr-10,title:wr+2*title:xpad))
-pic:	+aapic(y=title:h+title:y+4,picsize=picsize,ypad=2,aa='album')
+pic:	+aapic(y=title:h+title:y+4,picsize=picsize,ypad=2,aakey=$albumid,aa='album')
 picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 
-#{Group artistalbum_test_DELME}
-#title=album and artist  test_DELME
-#head=title:h
-#vcollapse=head
-#vmin=pic:y+pic:h+2
-#left=pic:w+2
-#title2:	text(markup='<b><big>'.pesc($artist).'</big></b>',pad=2,x=-title2:w)
-##title2:	text(markup='by <b><big>'.pesc($artist).'</big></b>',pad=2,x=title:w)
-##title:	text(markup='<b><big>'.pesc($album).'</big></b> ',pad=2)
-#title:	text(markup='<b><big>'.pesc($album).'</big></b> ' . if($year,'<small>('.pesc($year).')</small>'),pad=2,w=min($_w-title2:wr-10,title:wr+2*title:xpad))
-##debug:	text(text=title:w,y=20)
-#pic:	+aapic(y=title:h+title:y+4,picsize=picsize,ypad=2,aa='album')
-#pic2:	+aapic(y=pic:h+pic:y+4,picsize=picsize,ypad=2,aa='album',aanb=1)
-#pic3:	+aapic(y=pic2:h+pic2:y+4,picsize=picsize,ypad=2,aa='album',aanb=2)
-#picsize : OptionNumber(default=100,min=20,max=1000,step=10)
+{Group artistalbum_test_DELME}
+title=album and artist  test_DELME
+head=title:h
+vcollapse=head
+vmin=pic:y+pic:h+2
+left=pic:w+2
+title2:	text(markup='<b><big>'.pesc($artist).'</big></b>',pad=2,x=-title2:w)
+#title2:	text(markup='by <b><big>'.pesc($artist).'</big></b>',pad=2,x=title:w)
+#title:	text(markup='<b><big>'.pesc($album).'</big></b> ',pad=2)
+title:	text(markup='<b><big>'.pesc($album).'</big></b> ' . if($year,'<small>('.pesc($year).')</small>'),pad=2,w=min($_w-title2:wr-10,title:wr+2*title:xpad))
+#debug:	text(text=title:w,y=20)
+pic:	+aapic(y=title:h+title:y+4,picsize=picsize,ypad=2,aakey=$albumid,aa='album')
+pic2:	+aapic(y=pic:h+pic:y+4,picsize=picsize,ypad=2,aakey=$albumid,aa='album',aanb=1)
+pic3:	+aapic(y=pic2:h+pic2:y+4,picsize=picsize,ypad=2,aakey=$albumid,aa='album',aanb=2)
+picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 
-#{Group artistalbum_test2_DELME}
-#title=album and artist  test2_DELME
-#head=title:h
-##vcollapse=head
-#vmin=picsize+title:h+title:y+4
-#left=picsize+2
-#title2:	text(markup='<b><big>'.pesc($artist).'</big></b>',pad=2,x=-title2:w)
-##title2:	text(markup='by <b><big>'.pesc($artist).'</big></b>',pad=2,x=title:w)
-##title:	text(markup='<b><big>'.pesc($album).'</big></b> ',pad=2)
-#title:	text(markup='<b><big>'.pesc($album).'</big></b> ' . if($year,'<small>('.pesc($year).')</small>'),pad=2)
-#pic:	+aapic(y=title:h+title:y+4,picsize=picsize/min(3,size($albumid)),ypad=2,aa='album')
-#pic2:	+aapic(y=pic:h+pic:y+4,picsize=picsize/min(3,size($albumid)),ypad=2,aa='album',aanb=1)
-#pic3:	+aapic(y=pic2:h+pic2:y+4,picsize=picsize/min(3,size($albumid)),ypad=2,aa='album',aanb=2)
-#picsize : OptionNumber(default=100,min=20,max=1000,step=10)
+{Group artistalbum_test2_DELME}
+title=album and artist  test2_DELME
+head=title:h
+vcollapse=head
+vmin=picsize+title:h+title:y+4
+left=picsize+2
+title2:	text(markup='<b><big>'.pesc($artist).'</big></b>',pad=2,x=-title2:w)
+#title2:	text(markup='by <b><big>'.pesc($artist).'</big></b>',pad=2,x=title:w)
+#title:	text(markup='<b><big>'.pesc($album).'</big></b> ',pad=2)
+title:	text(markup='<b><big>'.pesc($album).'</big></b> ' . if($year,'<small>('.pesc($year).')</small>'),pad=2)
+pic:	+aapic(y=title:h+title:y+4,picsize=picsize/min(3,size($albumid)),ypad=2,aakey=$albumid,aa='album')
+pic2:	+aapic(y=pic:h+pic:y+4,picsize=picsize/min(3,size($albumid)),ypad=2,aakey=$albumid,aa='album',aanb=1)
+pic3:	+aapic(y=pic2:h+pic2:y+4,picsize=picsize/min(3,size($albumid)),ypad=2,aakey=$albumid,aa='album',aanb=2)
+picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 
 
 
@@ -546,4 +515,3 @@ Title		= Equalizer
 [Progress]
 VBmain		= _ProgressV(lastclose=1)
 Title		= Progress
-

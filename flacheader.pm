@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -9,9 +9,9 @@
 package Tag::Flac;
 use strict;
 use warnings;
+use Encode qw(decode encode);
 our @ISA=('Tag::OGG');
 
-use bytes;
 use constant
 { STREAMINFO	=> 0,
   PADDING	=> 1,
@@ -92,12 +92,12 @@ sub write_file
 		if ($type!=VORBIS_COMMENT && $type!=PADDING)
 		{	$buffer&=0x7fffffff;	#set Last-metadata-block flag to 0
 			$towrite.=pack 'N',$buffer;
-			unless (read($fh,$towrite,$size,bytes::length($towrite))==$size)
+			unless (read($fh,$towrite,$size,length($towrite))==$size)
 			 { warn "flac: Premature end of file\n"; return undef; }
 		}
 		else {$padding+=$size+4; seek $fh,$size,1; }
 	}
-	$padding -= 4 + bytes::length $$newcom_packref;
+	$padding-=4+length $$newcom_packref;
 	my $header=VORBIS_COMMENT;
 	my $inplace=($padding==0 || ($padding>3 && $padding<8192) );
 	#if ($inplace && $padding<4)
@@ -107,7 +107,7 @@ sub write_file
 	{	$padding=$inplace? $padding-4 : 256;
 		$padding=pack "Nx$padding",((0x80+PADDING)<<24)+$padding;
 	}
-	$header=pack 'N',($header<<24) + bytes::length $$newcom_packref;
+	$header=pack 'N',($header<<24)+length $$newcom_packref;
 	if ($inplace)
 	{	$self->_close;
 		$fh=$self->_openw or return undef;
@@ -166,29 +166,28 @@ sub _ReadInfo
 
 sub _ReadPicture
 {	my $packref=$_[0];
+	my $ret;
 	eval
 	{	my ($type,$mime,$desc,undef,undef,undef,undef,$data)
-			=unpack 'V V/a V/a VVV V/a',$$packref;
-		return [$mime,$type,$desc,$data];
+			=unpack 'N N/a N/a NNNN N/a',$$packref;
+		$ret=[$mime,$type,$desc,$data];
 	};
-	warn "invalid picture block - skipped\n";
-	return undef;
+	if ($@) { warn "invalid picture block - skipped\n"; }
+	return $ret;
 }
 
 sub _UnpackComments
 {	my ($self,$packref)=@_;
-	my ($vstring,@c);
-	eval { ($vstring,@c)=unpack 'V/a V/(V/a)',$$packref; };
+	my ($vstring,@comlist)=	eval { unpack 'V/a V/(V/a)',$$packref; };
 	if ($@) { warn "Comments corrupted\n"; return undef; }
 	$self->{vorbis_string}=$vstring;
 	my %comments;
-	for (@c)
-	{	unless (s/^([^=]+)=//) { warn "comment invalid - skipped\n"; next; }
-		my $key=lc$1;
-		my $val=Encode::decode('utf-8', $_);
-		#print "$key = $val\n";
-		push @{ $comments{$key} },$val;
-		my $nb=@{ $comments{$key} }-1;
+	for my $kv (@comlist)
+	{	unless ($kv=~m/^([^=]+)=(.*)$/s) { warn "comment invalid - skipped\n"; next; }
+		my $key=$1;
+		my $val=decode('utf-8', $2);
+		#warn "$key = $val\n";
+		push @{ $comments{lc$key} },$val;
 		push @{$self->{CommentsOrder}}, $key;
 	}
 	return \%comments;
@@ -198,13 +197,15 @@ sub _PackComments
 	my @comments;
 	my %count;
 	for my $key ( @{$self->{CommentsOrder}} )
-	{	my $nb=$count{$key}++ || 0;
-		my $val=$self->{comments}{$key}[$nb];
+	{	my $nb=$count{lc$key}++ || 0;
+		my $val=$self->{comments}{lc$key}[$nb];
 		next unless defined $val;
-		push @comments, $key.'='.$val;
+		$key=encode('ascii',$key);
+		$key=~tr/\x20-\x7D/?/c; $key=~tr/=/?/; #replace characters that are not allowed by '?'
+		push @comments,$key.'='.encode('utf8',$val);
 	}
-	my $packet=pack 'V/a* V (V/a*)*',$self->{vorbis_string},scalar @comments,@comments;
-	#$packet.="\x01"; #framing_flag #gstreamer doesn't like it and not needed in flac files anyway
+	my $packet=pack 'V/a* V (V/a*)*',$self->{vorbis_string},scalar @comments, @comments;
+	#$packet.="\x01"; #framing_flag #gstreamer doesn't like it and not needed anyway
 	return \$packet;
 }
 

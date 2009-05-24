@@ -22,7 +22,7 @@ while (my $arg=shift)
 $title||=$file;
 my $mime='audio/x-unknown';  #FIXME
 if	($file=~m/mp3$/i) { $mime='audio/mpeg'; }
-elsif	($file=~m/ogg$/i) { $mime='application/ogg'; }
+elsif	($file=~m/ogg$|oga$/i) { $mime='application/ogg'; }
 elsif	($file=~m/flac$/i) { $mime='audio/x-flac'; }
 elsif	($file=~m/mpc$/i) { $mime='audio/x-musepack'; }
 

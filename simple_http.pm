@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2008 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ sub get_with_cb
 	$self->{params}=\%params;
 	my ($callback,$url,$post)=@params{qw/cb url post/};
 	if ($params{cache} && defined $Cache{$url})
-		{ warn "cached result\n" if $::debug;&$callback( @{$Cache{$url}} ); return undef; }
+		{ warn "cached result\n" if $::debug; $callback->( @{$Cache{$url}} ); return undef; }
 
 	warn "simple_http : fetching $url\n" if $::debug;
 
@@ -66,7 +66,7 @@ sub get_with_cb
 	if (defined $error)
 	{	$error="Cannot connect to server $host:$port : $error" if $host;
 		warn "$error\n";
-		&$callback();
+		$callback->();
 		return undef;
 	}
 	$self->{watch}=Glib::IO->add_watch(fileno($socket),['out','hup'],\&connecting_cb,$self);
@@ -130,18 +130,18 @@ sub receiving_cb
 	if ($result=~m#^HTTP/1\.\d+ 200 OK#)
 	{	#warn "ok $url\n$callback\n";
 		if ($self->{params}{cache} && defined $response && length($response)<$::Options{Simplehttp_CacheSize})
-		{	$CacheSize+=length($response);
+		{	$CacheSize+= length $response;
 			$Cache{$url}=[$response,$headers{'Content-Type'}];
 			push @Cachedurl,$url;
 			while ($CacheSize>$::Options{Simplehttp_CacheSize})
 			{	my $old=pop @Cachedurl;
-				$CacheSize-=length($Cache{$old}[0]);
+				$CacheSize-= length $Cache{$old}[0];
 				delete $Cache{$old};
 			}
 		}
-		&$callback($response,$headers{'Content-Type'},$self->{params}{url});
+		$callback->($response,$headers{'Content-Type'},$self->{params}{url});
 	}
-	elsif ($result=~m#^HTTP/1\.\d+ 30[12]#) #redirection
+	elsif ($result=~m#^HTTP/1\.\d+ 30[12]# && $headers{Location}) #redirection
 	{	my $url=$headers{Location};
 		unless ($url=~m#^http://#)
 		{	my $base=$self->{params}{url};
@@ -154,7 +154,7 @@ sub receiving_cb
 	}
 	else
 	{	warn "Error fetching $url : $result\n";
-		&$callback();
+		$callback->();
 	}
 	return 0;
 }

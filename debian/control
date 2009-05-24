@@ -1,0 +1,20 @@
+Source: gmusicbrowser
+Section: sound
+Priority: optional
+Maintainer: Quentin Sculo <squentin@free.fr>
+Homepage: http://gmusicbrowser.sourceforge.net/
+Build-Depends: debhelper (>= 5.0.0)
+Standards-Version: 3.7.3
+
+Package: gmusicbrowser
+Architecture: all
+Depends: perl, libgtk2-perl, libgtk2.0-0 (>= 2.6)
+Recommends: liblocale-gettext-perl (>= 1.04), libnet-dbus-perl, libgtk2-trayicon-perl, libgstreamer-perl
+Suggests: mplayer, mpg321, vorbis-tools, flac123, alsa-utils, libgtk2-mozembed-perl
+Description: jukebox for large collections of mp3/ogg/flac/mpc files
+ Uses GStreamer, mpg321/ogg123/flac123 or mplayer for playback. It has easy
+ access to related songs (same artist/album/title), supports multiple genres
+ per song, ratings, and customizable labels. The windows layouts are completely
+ cusomizable, it uses dynamic filters with unlimited nesting of conditions,
+ has a powerful mass-tagging dialog ...
+

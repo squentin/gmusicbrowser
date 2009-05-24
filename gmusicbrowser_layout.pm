@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2008 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -21,16 +21,16 @@ use constant
 };
 
 my @MenuQueue=
-(	{label => _"Queue album",	code => sub { ::EnqueueAlbum($_[0]{ID}); } },
-	{label => _"Queue artist",	code => sub { ::EnqueueArtist($_[0]{ID});} },
+(	{label => _"Queue album",	code => sub { ::EnqueueSame('album',$_[0]{ID}); } },
+	{label => _"Queue artist",	code => sub { ::EnqueueSame('artist',$_[0]{ID});} },  # or use field 'artists' or 'first_artist' ?
 	{label => _"Normal mode",	code => sub {&::EnqueueAction('')},		radio => sub {!$::QueueAction} },
 	{label => _"Auto fill queue",	code => sub {&::EnqueueAction('autofill')},	radio => sub {$::QueueAction eq 'autofill'} },
 	{label => _"Wait when queue empty",	code => sub {&::EnqueueAction('wait')}, radio => sub {$::QueueAction eq 'wait'} },
 	{label => _"Stop when queue empty",	code => sub {&::EnqueueAction('stop')}, radio => sub {$::QueueAction eq 'stop'} },
 	{label => _"Quit when queue empty",	code => sub {&::EnqueueAction('quit')}, radio => sub {$::QueueAction eq 'quit'} },
 	{label => _"Turn off computer when queue empty",	code => sub {&::EnqueueAction('turnoff')}, radio => sub {$::QueueAction eq 'turnoff'}, test => sub { $::Options{Shutdown_cmd}; } },
-	{label => _"Clear queue",	code => \&::ClearQueue,		test => sub{@::Queue}},
-	{label => _"Shuffle queue",	code => \&::ShuffleQueue,	test => sub{@::Queue}},
+	{label => _"Clear queue",	code => \&::ClearQueue,		test => sub{@$::Queue}},
+	{label => _"Shuffle queue",	code => \&::ShuffleQueue,	test => sub{@$::Queue}},
 	{label => _"Edit...",		code => \&::EditQueue},
 );
 
@@ -77,7 +77,7 @@ my %objects=
 	},
 	Playlist =>
 	{	class	=> 'Layout::Button',
-		oldopt1 => ['toggle'],
+		oldopt1 => 'toggle',
 		stock	=> 'gmb-playlist',
 		tip	=> _"Open Browser window",
 		activate=> sub {::Playlist($_[0]{opt1})},
@@ -85,7 +85,7 @@ my %objects=
 	},
 	BContext =>
 	{	class	=> 'Layout::Button',
-		oldopt1 => ['toggle'],
+		oldopt1 => 'toggle',
 		stock	=> 'gtk-info',
 		tip	=> _"Open Context window",
 		activate=> sub {::ContextWindow($_[0]{opt1})},
@@ -110,32 +110,32 @@ my %objects=
 	{	class	=> 'Layout::Button',
 		nobutton=> undef,
 		size	=> SIZE_FLAGS,
-		state	=> sub { ($::TogLock && $::TogLock==::SONG_ARTIST)? 'on' : 'off' },
+		state	=> sub { ($::TogLock && $::TogLock eq 'first_artist')? 'on' : 'off' },
 		stock	=> { on => 'gmb-lock', off => ['','gmb-locklight'] },
-		tip	=> _"Lock On Artist",
-		click1	=> sub {::ToggleLock(::SONG_ARTIST);},
+		tip	=> _"Lock on Artist",
+		click1	=> sub {::ToggleLock('first_artist');},
 		event	=> 'Lock',
 	},
 	LockAlbum =>
 	{	class	=> 'Layout::Button',
 		nobutton=> undef,
 		size	=> SIZE_FLAGS,
-		state	=> sub { ($::TogLock && $::TogLock==::SONG_ALBUM)? 'on' : 'off' },
+		state	=> sub { ($::TogLock && $::TogLock eq 'album')? 'on' : 'off' },
 		stock	=> { on => 'gmb-lock', off => ['','gmb-locklight'] },
-		tip	=> _"Lock On Album",
-		click1	=> sub {::ToggleLock(::SONG_ALBUM);},
+		tip	=> _"Lock on Album",
+		click1	=> sub {::ToggleLock('album');},
 		event	=> 'Lock',
 	},
 	Sort =>
 	{	class	=> 'Layout::Button',
 		nobutton=> undef,
 		size	=> SIZE_FLAGS,
-		state	=> sub { my $s=$::Options{'Sort'};($s=~/^r/)? 'random' : ($s eq 's')? 'shuffle' : 'sorted'; },
+		state	=> sub { my $s=$::Options{'Sort'};($s=~m/^random:/)? 'random' : ($s eq 'shuffle')? 'shuffle' : 'sorted'; },
 		stock	=> { random => 'gmb-random', shuffle => 'gmb-shuffle', sorted => 'gtk-sort-ascending' },
 		tip	=> sub { _("Play order :\n").::ExplainSort($::Options{Sort}); },
 		click1	=> \&::ToggleSort,
 		click3	=> \&SortMenu,
-		event	=> [qw/Sort SavedWRandoms SavedSorts/],
+		event	=> 'Sort SavedWRandoms SavedSorts',
 	},
 	Filter =>
 	{	class	=> 'Layout::Button',
@@ -151,13 +151,13 @@ my %objects=
 			},
 		click1	=> \&RemoveFilter,
 		click3	=> \&FilterMenu,
-		event	=> [qw/Filter SavedFilters/],
+		event	=> 'Filter SavedFilters',
 	},
 	Queue =>
 	{	class	=> 'Layout::Button',
 		nobutton=> undef,
 		size	=> SIZE_FLAGS,
-		state	=> sub  { @::Queue?	 'queue' :
+		state	=> sub  { @$::Queue?	 'queue' :
 				  $::QueueAction? $::QueueAction :
 						 'noqueue'
 				},
@@ -165,12 +165,12 @@ my %objects=
 				 $_[0] eq 'noqueue'?	['','gmb-queue'] :
 							$::QActions{$_[0]}[1] ;
 				},
-		tip	=> sub { ::CalcListLength(\@::Queue,'queue')
+		tip	=> sub { ::CalcListLength($::Queue,'queue')
 				.($::QueueAction? "\n". ::__x( _"then {action}", action => $::QActions{$::QueueAction}[2] ) : '');
 				},
 		click1	=> \&::ClearQueue,
 		click3	=> sub {::PopupContextMenu(\@MenuQueue,{ID=>$::SongID});},
-		event	=> 'Queue',
+		event	=> 'Queue QueueAction',
 		dragdest=> [::DRAG_ID,sub {shift;shift;::Enqueue(@_);}],
 	},
 	Vol =>
@@ -179,72 +179,88 @@ my %objects=
 		state	=> sub { ::GetMute() ? 'm' : ::GetVol() },
 		stock	=> sub { 'gmb-vol'.( $_[0] eq 'm' ? 'm' : int(($_[0]-1)/100*$::NBVolIcons) );  },
 		tip	=> sub { _("Volume : ").::GetVol().'%' },
-		click1	=> sub { ::PopupVol() },
+		click1 => sub { ::PopupLayout('Volume'); },
 		click3	=> sub { ::ChangeVol('mute') },
 		event	=> 'Vol',
 	},
+	Button =>
+	{	class	=> 'Layout::Button',
+	},
+	Label =>
+	{	class	=> 'Layout::Label',
+		oldopt1 => sub { 'text',$_[0] },
+		default_group => 'Play',
+	},
 	Pos =>
 	{	class	=> 'Layout::Label',
+		default_group => 'Play',
 		initsize=> ::__("%d song in queue","%d songs in queue",99999), #longest string that will be displayed
-		click1	=> sub { ::ChooseSongs(undef,::GetNeighbourSongs(5)) unless $::RandomMode || @::Queue; },
-		update	=> sub  { my $t=(@::ListPlay==0)?	'':
-					@::Queue	?	::__("%d song in queue","%d songs in queue",scalar@::Queue):
-					$::RandomMode	?	::__("%d song","%d songs",scalar@::ListPlay):
-								($::Position+1).'/'.@::ListPlay;
+		click1	=> sub { ::ChooseSongs(undef,::GetNeighbourSongs(5)) unless $::RandomMode || @$::Queue; },
+		update	=> sub  { my $t=(@$::ListPlay==0)	?	'':
+					 @$::Queue		?	::__("%d song in queue","%d songs in queue", scalar @$::Queue):
+					!defined $::Position	?	::__("%d song","%d songs",scalar @$::ListPlay):
+									($::Position+1).'/'.@$::ListPlay;
 				  $_[0]->set_markup( '<small>'.$t.'</small>' );
 				},
-		event	=> [qw/Pos Queue Sort/],
+		event	=> 'Pos Queue',
 	},
 	Title =>
 	{	class	=> 'Layout::Label',
+		default_group => 'Play',
 		minsize	=> 20,
 		markup	=> '<b><big>%S</big></b>%V',
 		markup_empty => '<b><big>&lt;'._("Playlist Empty").'&gt;</big></b>',
 		click1	=> \&::ChooseSongsFromA_current,
-		click3	=> sub {::PopupContextMenu(\@::SongCMenu,{mode=> 'P', self=> $_[0], IDs => [$::SongID]}) if defined $::SongID;},
-		dragsrc => [::DRAG_ID,sub {$::SongID}],
+		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupContextMenu(\@::SongCMenu,{mode=> 'P', self=> $_[0], IDs => [$ID]}) if defined $ID;},
+		dragsrc => [::DRAG_ID,\&DragCurrentSong],
 		dragdest=> [::DRAG_ID,sub {::Select(song => $_[2]);}],
-		cursor	=> 'hand2',
 	},
+		cursor	=> 'hand2',
 	Title_by =>
 	{	class	=> 'Layout::Label',
+		default_group => 'Play',
 		minsize	=> 20,
 		markup	=> ::__x(_"{song} by {artist}",song => "<b><big>%S</big></b>%V", artist => "<b>%a</b>"),
 		markup_empty => '<b><big>&lt;'._("Playlist Empty").'&gt;</big></b>',
 		click1	=> \&::ChooseSongsFromA_current,
-		click3	=> sub {::PopupContextMenu(\@::SongCMenu,{mode=> 'P', self=> $_[0], IDs => [$::SongID]}) if defined $::SongID;},
-		dragsrc => [::DRAG_ID,sub {$::SongID}],
+		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupContextMenu(\@::SongCMenu,{mode=> 'P', self=> $_[0], IDs => [$ID]}) if defined $ID;},
+		dragsrc => [::DRAG_ID,\&DragCurrentSong],
 		cursor	=> 'hand2',
 	},
 	Artist =>
 	{	class	=> 'Layout::Label',
+		default_group => 'Play',
 		minsize	=> 20,
 		markup	=> '<b>%a</b>',
-		click1	=> sub { ::PopupAA(::SONG_ARTIST) if defined $::SongID; },
-		click3	=> sub { ::ArtistContextMenu($::Songs[$::SongID][::SONG_ARTIST],{self =>$_[0], ID=>$::SongID, mode => 'P'}) if defined $::SongID; },
-		dragsrc => [::DRAG_ARTIST,sub {$::Songs[$::SongID][::SONG_ARTIST]}],
+		click1	=> sub { ::PopupAA('artists'); },
+		click3	=> sub { my $ID=::GetSelID($_[0]); ::ArtistContextMenu( Songs::Get_gid($ID,'artists'),{self =>$_[0], ID=>$ID, mode => 'P'}) if defined $ID; },
+		dragsrc => [::DRAG_ARTIST,\&DragCurrentArtist],
 		cursor	=> 'hand2',
 	},
 	Album =>
 	{	class	=> 'Layout::Label',
+		default_group => 'Play',
 		minsize	=> 20,
 		markup	=> '<b>%l</b>',
-		click1	=> sub { ::PopupAA(::SONG_ALBUM,$::Songs[$::SongID][::SONG_ARTIST]) if defined $::SongID; },
-		click3	=> sub { ::PopupContextMenu(\@::cMenuAA,{self =>$_[0], col=>::SONG_ALBUM, ID=>$::SongID, key=>$::Songs[$::SongID][::SONG_ALBUM], mode => 'P'}) if defined $::SongID; },
-		dragsrc => [::DRAG_ALBUM,sub {$::Songs[$::SongID][::SONG_ALBUM]}],
+		click1	=> sub { my $ID=::GetSelID($_[0]); ::PopupAA( 'album', from=> Songs::Get_gid($ID,'artists')) if defined $ID; },
+		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupAAContextMenu({self =>$_[0], field=>'album', ID=>$ID, gid=>Songs::Get_gid($ID,'album'), mode => 'P'}) if defined $ID; },
+		dragsrc => [::DRAG_ALBUM,\&DragCurrentAlbum],
 		cursor	=> 'hand2',
 	},
 	Date =>
 	{	class	=> 'Layout::Label',
+		default_group => 'Play',
 		markup	=> ' %y',
 		markup_empty=> '',
 	},
 	Comment =>
 	{	class	=> 'Layout::Label',
+		default_group => 'Play',
 		markup	=> '%C',
 	},
 	Length =>
 	{	class	=> 'Layout::Label',
+		default_group => 'Play',
 		initsize=>	::__x( _" of {length}", 'length' => "XX:XX"),
 		markup	=>	::__x( _" of {length}", 'length' => "%m" ),
 		markup_empty=>	::__x( _" of {length}", 'length' => "0:00" ),
@@ -252,91 +268,139 @@ my %objects=
 	},
 	LabelTime =>
 	{	class	=> 'Layout::Label',
+		default_group => 'Play',
 		xalign	=> 1,
 		options => 'remaining',
 		initsize=> '-XX:XX',
 #		font	=> 'Monospace',
 		event	=> 'Time',
-		click1 => sub { $_[0]{remaining}=!$_[0]{remaining}; &{ $_[0]{'ref'}{update} }; },
+		click1 => sub { $_[0]{remaining}=!$_[0]{remaining}; $_[0]{'ref'}{update}->(); },
 		update	=> sub { $_[0]->set_label( ::TimeString($_[0]{remaining}) ) unless $_[0]{busy}; },
 	},
 	Scale =>
-	{	class	=> 'Layout::TimeSlider',
+	{	class	=> 'Layout::Bar::Scale',
+		default_group => 'Play',
 		event	=> 'Time',
-		update	=> sub { $_[0]{adj}->set_value($::PlayTime || 0) unless $_[0]{pressed}; },
-		fields	=> ::SONG_LENGTH,
-		schange	=> sub {	my $l=(defined $_[1])? $::Songs[$_[1]][::SONG_LENGTH] : 0;
-					$_[0]{adj}->upper($l);
-					$_[0]{adj}->set_value($::PlayTime || 0) unless $_[0]{pressed}; #same as update, because the update happen before the schange on widget creation #FIXME
-				},
+		update	=> sub { $_[0]->set_val($::PlayTime); },
+		fields	=> 'length',
+		schange	=> sub { $_[0]->set_max( defined $_[1] ? Songs::Get($_[1],'length') : 0); },
+		set	=> sub { ::SkipTo($_[1]) },
+		scroll	=> sub { $_[1] ? ::Forward(undef,10) : ::Rewind (undef,10) },
+		set_preview => \&Layout::Bar::update_preview_Time,
+	},
+	TimeBar =>
+	{	class	=> 'Layout::Bar',
+		default_group => 'Play',
+		event	=> 'Time',
+		update	=> sub { $_[0]->set_val($::PlayTime); },
+		fields	=> 'length',
+		schange	=> sub { $_[0]->set_max( defined $_[1] ? Songs::Get($_[1],'length') : 0); },
+		set	=> sub { ::SkipTo($_[1]) },
+		scroll	=> sub { $_[1] ? ::Forward(undef,10) : ::Rewind (undef,10) },
+		set_preview => \&Layout::Bar::update_preview_Time,
+	},
+	VolBar =>
+	{	class	=> 'Layout::Bar',
+		orientation => 'left-to-right',
+		event	=> 'Vol',
+		update	=> sub { $_[0]->set_val( ::GetVol() ); },
+		set	=> sub { ::UpdateVol($_[1]) },
+		scroll	=> sub { ::ChangeVol($_[1] ? 'up' : 'down') },
+		max	=> 100,
+	},
+	VolSlider =>
+	{	class	=> 'Layout::Bar::Scale',
+		orientation => 'bottom-to-top',
+		event	=> 'Vol',
+		update	=> sub { $_[0]->set_val( ::GetVol() ); },
+		set	=> sub { ::UpdateVol($_[1]) },
+		scroll	=> sub { ::ChangeVol($_[1] ? 'up' : 'down') },
+		max	=> 100,
+	},
+	LabelVol =>
+	{	class	=> 'Layout::Label',
+		initsize=> '000',
+		event	=> 'Vol',
+		update	=> sub { $_[0]->set_label(sprintf("%d",::GetVol())); },
 	},
 	Stars =>
-	{	New	=> sub	{ Stars->new(0,sub {	return unless defined $::SongID;
-							$::Songs[$::SongID][::SONG_RATING]=$_[1];
-							::SongChanged($::SongID,::SONG_RATING);
+	{	New	=> sub	{ Stars->new(0,sub {	my $ID=::GetSelID($_[0]);
+							return unless defined $ID;
+							Songs::Set($ID, rating => $_[1])
 						  });
 				},
-		fields	=> ::SONG_RATING,
-		schange	=> sub	{ my $r=(defined $_[1])? $::Songs[$_[1]][::SONG_RATING] : 0; $_[0]->set($r); },
+		default_group => 'Play',
+		fields	=> 'rating',
+		schange	=> sub	{ my $r=(defined $_[1])? Songs::Get($_[1],'rating') : 0; $_[0]->set($r); },
 	},
 	Cover =>
 	{	class	=> 'Layout::AAPicture',
+		default_group => 'Play',
 		aa	=> 'album',
-		oldopt1 => ['maxsize'],
-		schange	=> sub { my $key=(defined $_[1])? $::Songs[$_[1]][::SONG_ALBUM] : '' ;$_[0]->set($key); },
+		oldopt1 => 'maxsize',
+		schange	=> sub { my $key=(defined $_[1])? Songs::Get_gid($_[1],'album') : undef ; $_[0]->set($key); },
 		click1	=> \&::ChooseSongsFromA_current,
-		event	=> 'AAPicture',
+		event	=> 'Picture_album',
 		update	=> \&Layout::AAPicture::Changed,
 		#size	=> 60,
 		noinit	=> 1,
-		dragsrc => [::DRAG_ALBUM,sub {$::Songs[$::SongID][::SONG_ALBUM]}],
-		fields	=> ::SONG_ALBUM,
+		dragsrc => [::DRAG_ALBUM,\&DragCurrentAlbum],
+		fields	=> 'album',
 	},
 	ArtistPic =>
 	{	class	=> 'Layout::AAPicture',
+		default_group => 'Play',
 		aa	=> 'artist',
-		oldopt1 => ['maxsize'],
-		schange	=> sub { my $key=(defined $_[1])? $::Songs[$_[1]][::SONG_ARTIST] : '' ;$_[0]->set($key); },
-		click1	=> sub { ::PopupAA(::SONG_ARTIST) if defined $::SongID; },
-		event	=> 'AAPicture',
+		oldopt1 => 'maxsize',
+		schange	=> sub { my $key=(defined $_[1])? Songs::Get_gid($_[1],'artists') : undef ;$_[0]->set($key); },
+		click1	=> sub { ::PopupAA('artist'); },
+		event	=> 'Picture_artist',
 		update	=> \&Layout::AAPicture::Changed,
 		noinit	=> 1,
-		dragsrc => [::DRAG_ARTIST,sub {$::Songs[$::SongID][::SONG_ARTIST]}],
-		fields	=> ::SONG_ARTIST,
+		dragsrc => [::DRAG_ARTIST,\&DragCurrentArtist],
+		fields	=> 'artist',
+	},
+	LabelsIcons =>
+	{	New	=> sub { Gtk2::Table->new(1,1); },
+		default_group => 'Play',
+		fields	=> 'label',
+		schange	=> \&UpdateLabelsIcon,
+		update	=> \&UpdateLabelsIcon,
+		event	=> 'Icons',
+		tip	=> '%L',
 	},
 	Filler =>
 	{	New	=> sub { Gtk2::HBox->new; },
 	},
 	SongList =>
 	{	New	=> sub { $_[0]{type}||='B';SongList->new($_[0],$_[1]); },
-		oldopt1 => ['mode'],			 #for version <0.9475
-		oldopt2 => [qw/sort cols colwidth/],
+		oldopt1 => 'mode',			 #for version <0.9475
+		oldopt2 => 'sort cols colwidth',
 	},
 	SongTree =>
 	{	New	=> sub { $_[0]{type}||='B';SongTree->new($_[0],$_[1]); },
 	},
 	AABox	=>
-	{	New	=> sub { AABox->new($_[0]); },
+	{	class	=> 'GMB::AABox',
 		oldopt1	=> sub { 'aa='.( $_[0] ? 'artist' : 'album' ) } #for version <0.9479
 	},
 	FPane	=>
-	{	New	=> sub { FilterPane->new($_[0],$_[1]); },
-		#class	=> 'FilterPane',
+	{	class	=> 'FilterPane',
 		oldopt1	=> sub
 			{	my ($nb,$hide,@pages)=split ',',$_[0];
 				return (nb => ++$nb,hide => $hide,pages=>join('|',@pages));
 			},
 	},
 	Total	=>
-	{	New	=> sub {LabelTotal->new($_[0])},
-		oldopt1 => ['mode'],
+	{	class	=> 'LabelTotal',
+		oldopt1 => 'mode',
 	},
 	FBox	=>
-	{	New	=> sub { Browser::makeFilterBox(); },
+	{	New => \&Browser::makeFilterBox,
 		dragdest => [::DRAG_FILTER,sub { ::SetFilter($_[0],$_[2]);}],
 	},
 	FLock	=>	{ New => \&Browser::makeLockToggle,},
-	HistItem =>	{ New => \&Browser::make_history_menuitem,
+	HistItem =>	{ New => sub { Gtk2::MenuItem->new(_"Recent Filters"); },
 			  setmenu => \&Browser::make_history_menu,
 			},
 	PlayItem =>	{ New => sub { Gtk2::MenuItem->new(_"Playing"); },
@@ -361,11 +425,6 @@ my %objects=
 			},
 	SeparatorMenuItem=>
 			{ New => sub { Gtk2::SeparatorMenuItem->new },
-			},
-	Label =>	{	class	=> 'Layout::Label',
-				oldopt1 => sub { 'text',$_[0] },
-			},
-	Button =>	{	class	=> 'Layout::Button',
 			},
 	Refresh =>
 	{	class	=> 'Layout::Button',
@@ -395,18 +454,12 @@ my %objects=
 		tip	=> _"Reset filter",
 		activate=> sub { ::SetFilter($_[0],undef); },
 	},
-	VolSlider =>
-	{	New	=> \&::makeVolSlider,
-		oldopt1	=> [qw/hide horizontal/],
-		event	=> 'Vol',
-		update	=> sub { $_[0]->get_adjustment->set_value(::GetVol()); },
-	},
 	QueueList =>
-	{	New	=> sub {$_[0]{type}='Q';my $sl=SongList->new($_[0],$_[1]); $sl->SetList(); return $sl; }
+	{	New	=> sub { $_[0]{type}='Q'; return SongList->new($_[0],$_[1],$::Queue); }
 	},
 	Context =>
 	{	class	=> 'GMB::Context',
-		oldopt1 => ['followselection'],
+		default_group => 'Play',
 	},
 	TogButton =>
 	{	class	=> 'Layout::TogButton',
@@ -427,29 +480,21 @@ my %objects=
 	{	class	=> 'Layout::Button',
 		stock	=> 'gmb-random', #FIXME
 		tip	=> _"Choose Random Album",
-		activate=> sub { my @al; for my $key (keys %::Album) { push @al,$key } my $r=int rand(@al); my $key=$al[$r]; my $list=$::Album{$key}[::AALIST]; if (my $ac=$_[0]{opt1}{action}) { ::DoActionForList($ac,$list); } else { my $ID=::FindFirstInListPlay($list); ::Select( song => $ID)}; },
-		click3	=> sub { my @list; my @al; for my $key (keys %::Album) { push @al,$key } my $nb=5; while ($nb--) { my $r=int rand(@al); push @list, splice(@al,$r,1); last unless @al; } ::PopupAA(::SONG_ALBUM,\@list,undef, ::__x( _"{album}\n<small>by</small> {artist}", album => "%a", artist => "%b"));  },
+		activate=> sub { my $al=AA::GetAAList('album'); my $r=int rand(@$al); my $key=$al->[$r]; my $list=AA::GetIDs('album',$key); if (my $ac=$_[0]{opt1}{action}) { ::DoActionForList($ac,$list); } else { my $ID=::FindFirstInListPlay($list); ::Select( song => $ID)}; },
+		click3	=> sub { my @list; my $al=AA::GetAAList('album'); my $nb=5; while ($nb--) { my $r=int rand(@$al); push @list, splice(@$al,$r,1); last unless @$al; } ::PopupAA('album', list=>\@list, format=> ::__x( _"{album}\n<small>by</small> {artist}", album => "%a", artist => "%b"));  },
 	},
 	AASearch =>
-	{	New	=> sub { AASearch->new($_[0]); },
+	{	class	=> 'AASearch',
 	},
 	SongSearch =>
-	{	New	=> sub { SongSearch->new($_[0]); },
+	{	class	=> 'SongSearch',
 	},
 	SimpleSearch =>
-	{	New	=> sub { SimpleSearch->new($_[0],$_[1]); },
-		dragdest => [::DRAG_FILTER,sub { ::SetFilter($_[0],$_[2]);}],
-	},
-	LabelsIcons =>
-	{	New	=> sub { Gtk2::Table->new(1,1); },
-		fields	=> ::SONG_LABELS,
-		schange	=> \&UpdateLabelsIcon,
-		update	=> \&UpdateLabelsIcon,
-		event	=> 'Icons',
-		tip	=> '%L',
+	{	class	=> 'SimpleSearch',
+		dragdest=> [::DRAG_FILTER,sub { ::SetFilter($_[0],$_[2]);}],
 	},
 	TabbedLists =>
-	{	New	=> sub {TabbedLists->new($_[0],$_[1])},
+	{	class	=> 'TabbedLists',
 	},
 	Visuals		=>
 	{	New	=> sub {my $darea=Gtk2::DrawingArea->new; $darea->set_size_request(200,50); return $darea unless $::Packs{Play_GST} && $::Packs{Play_GST}{visuals}; Play_GST::add_visuals($darea); my $eb=Gtk2::EventBox->new; $eb->add($darea); return $eb},
@@ -463,10 +508,10 @@ my %objects=
 		event	=> 'connections',
 	},
 	EditListButtons	=>
-	{	New	=> sub { EditListButtons->new($_[0]) },
+	{	class	=> 'EditListButtons',
 	},
 	QueueActions	=>
-	{	New	=> sub { QueueActions->new },
+	{	class	=> 'QueueActions',
 	},
 	OpenQueue	=>
 	{	class	=> 'Layout::Button',
@@ -484,7 +529,7 @@ my %objects=
 	Repeat	=>
 	{	New => sub { Gtk2::CheckButton->new(_"Repeat"); },
 		activate=> sub { ::SetRepeat($_[0]->get_active); },
-		event	=> ['Repeat','Sort'],
+		event	=> 'Repeat Sort',
 		update	=> sub { if ($_[0]->get_active xor $::Options{Repeat}) { $_[0]->set_active($::Options{Repeat});} $_[0]->set_sensitive(!$::RandomMode); },
 	},
 	AddLabelEntry =>
@@ -492,17 +537,25 @@ my %objects=
 	},
 	PlayOrderCombo =>
 	{	New => \&PlayOrderComboNew,
-		event => [qw/Sort SavedWRandoms SavedSorts/],
+		event => 'Sort SavedWRandoms SavedSorts',
 		update	=> \&PlayOrderComboUpdate,
+	},
+	Progress =>
+	{	class => 'Layout::Progress',
+		compact=>1,
+	},
+	ProgressV =>
+	{	class => 'Layout::Progress',
+		vertical=>1,
 	},
 	Equalizer =>
 	{	New => \&Layout::Equalizer::new,
 		event => 'Equalizer',
 		update => \&Layout::Equalizer::update,
 	},
-	RadioList =>
-	{	New => sub {GMB::RadioList->new},
-	},
+#	RadioList =>
+#	{	class => 'GMB::RadioList',
+#	},
 );
 
 our %Layouts;
@@ -511,26 +564,44 @@ sub get_layout_list
 {	my $type=$_[0];
 	my @list=keys %Layouts;
 	@list=grep defined $Layouts{$_}{Type} && $Layouts{$_}{Type}=~m/$type/, @list if $type;
-	return { map { $_ => _ ($Layouts{$_}{Name} || $_) } @list };  #use name instead of id if it exists, and translate
+	#return { map { $_ => _ ($Layouts{$_}{Name} || $_) } @list };  #use name instead of id if it exists, and translate
+	my %cat;
+	my @tree;
+	for my $id (@list)
+	{	my $name2=$id;
+		my $cat= $Layouts{$id}{Category} || ($name2=~s#(.+)/## && $1);
+		my $name= $Layouts{$id}{Name} || $name2;
+		my $array= $cat ?  ($cat{$cat}||=[]) : \@tree;
+		push @$array, $id, _( $name );
+	}
+	push @tree, $cat{$_},_( $_ ) for keys %cat;
+	return \@tree;
 }
 
 sub InitLayouts
 {	undef %Layouts;
-	my @files=$::DATADIR.::SLASH.'layouts';
-	my $path=$::HomeDir.'layouts';
-	if (-f $path) { push @files,$path; }
-	elsif (-d $path)
-	{	opendir my($d),$path;
-		push @files, map $path.::SLASH.$_,sort grep m/\.layout$/, readdir $d;
-		closedir $d;
-	}
+	my @files= ::FileList( qr/\.layout$|(?:$::QSLASH)layouts$/o,	$::DATADIR.::SLASH.'layouts',
+									$::HomeDir.'layouts',
+									$::CmdLine{searchpath} );
 	ReadLayoutFile($_) for @files;
 	die "No layouts file found.\n" unless keys %Layouts;
+
+	if ($::CmdLine{layoutlist})
+	{	print "Available layouts : ((type) id\t: name)\n";
+		my ($max)= sort {$b<=>$a} map length, keys %Layouts;
+		for my $id (sort keys %Layouts)
+		{	my $name= $Layouts{$id}{Name} || $id;
+			my $type= $Layouts{$id}{Type} || '';
+			$type="($type)" if $type;
+			printf "%-4s %-${max}s : %s\n",$type,$id,$name;
+		}
+		exit;
+	}
 }
 
 sub ReadLayoutFile
 {	my $file=shift;
-	no warnings;#warn $file;
+	#no warnings;#warn $file;
 	return unless -f $file && -r $file;
 	open my$fh,"<:utf8",$file;
 	my $first;
@@ -592,57 +663,46 @@ sub ParseSongTreeSkin
 	{	my ($key,$e,$string)= m#^(\w+)\s*([=:])\s*(.*)$#;
 		next unless defined $key;
 		if ($e eq '=') {$ref->{$key}=$string unless $key eq 'elems' || $key eq 'options'}
-		else
-		{	if ($string=~m#^Option(\w*)\((.+)\)$#)
-			{	my $type=$1;
-				my $opt=::ParseOptions($2);
-				$opt->{type}=$type;
-				$ref->{options}{$key}=$opt;
-			}
-			else { push @{$ref->{elems}}, $key.'='.$string; }
+		elsif ($string=~m#^Option(\w*)\((.+)\)$#)
+		{	my $type=$1;
+			my $opt=::ParseOptions($2);
+			$opt->{type}=$type;
+			$ref->{options}{$key}=$opt;
 		}
+		else { push @{$ref->{elems}}, $key.'='.$string; }
 	}
 }
 
-sub SaveOptions
+sub SaveOptions		#Save options for this layout by collecting options of its widgets
 {	my ($self,@states)=@_;
 	#warn "saving ".$self->{layout}." layout options\n";
 
 	for my $key (keys %{ $self->{widgets} })
 	{	my $w=$self->{widgets}{$key};
-		my $sub=$w->{SaveOptions};
-		if ($sub)
-		{	$sub=&$sub($w) if ref $sub;
+		my $opt=$w->{SaveOptions};
+		if ($opt)
+		{	$opt=$opt->($w) if ref $opt;
 		}
-		elsif ( my $opts=$w->{'ref'}{options} )
-		{	$sub=undef;
-			$sub->{$_}=$w->{$_} for grep defined $w->{$_}, split / /,$opts;
+		elsif ( my $optkeys=$w->{'ref'}{options} )
+		{	$opt= { map { $_=>$w->{$_} } grep defined $w->{$_}, split / /,$optkeys };
 		}
-		$sub=join ',',map $_.'='.$sub->{$_}, keys %$sub   if ref $sub;
-		push @states,$key,$sub if defined $sub && $sub=~m#\S#;
+		if (ref $opt)	#array or hash => to string
+		{	$opt=+{@$opt} if ref $opt eq 'ARRAY';
+			$opt=join ',',map $_.'='.$opt->{$_}, sort keys %$opt;
+		}
+		push @states,$key,$opt if defined $opt && $opt=~m#\S#;
 	}
-	warn "Options of $self->{layout} =@states\n" if $::debug;
+	warn "Options of $self->{layout} = @states\n" if $::debug;
 	return $::Options{'Layout_'.$self->{layout}}=join ' ',@states;
 }
 
 sub Pack
-{	my ($self,$layout,$opt)=@_;
-	$self->{watcher}=::AddWatcher();
-	$self->signal_connect(destroy => sub { ::RemoveWatcher($self->{watcher}); });
+{	my ($self,$layout,$opt2)=@_;
 	$self->{layout}=$layout;
-	unless (ref $opt)
-	{	my $options= $opt|| $::Options{'Layout_'.$layout} || $Layouts{$layout}{Default} ||'';
-		my @optlist=split /\s+/,$options;
-		my $wopt;
-		$wopt=shift @optlist if @optlist%2;	#old format (v<0.9573)
-		$opt= {@optlist};
-		$opt->{Window}||=$wopt||'';
-	}
-	$self->SetWindowOptions($opt->{Window}) if $self->isa('Layout::Window'); #FIXME find a cleaner way
+	$self->set_name($layout);
 
 	my $boxes=$Layouts{$layout};
 	$self->{KeyBindings}=::make_keybindingshash($boxes->{KeyBindings}) if $boxes->{KeyBindings};
-	$self->{towatch}={};
 	my $widgets=$self->{widgets}={};
 
 	for (qw/SkinPath SkinFile DefaultFont Window/)
@@ -667,11 +727,12 @@ sub Pack
 		if ($line=~m#^\(#)
 		{	$opt1=::ExtractNameAndOptions($line);
 			$line=~s#^\s+##;
-			$opt1=~s#^\(##; $opt1=~s#\)$##;
+			$opt1=~s#^\(##; $opt1=~s/\)$//;
 			$opt1= ::ParseOptions($opt1);
 		}
-		my $box=$widgets->{$key}= &{ $type->{New} }( $opt1,$opt->{$key} );
+		my $box=$widgets->{$key}= $type->{New}( $opt1,$opt2->{$key} );
 		$box->set_border_width($opt1->{border}) if $opt1 && exists $opt1->{border} && $box->isa('Gtk2::Container');
+		$box->set_name($key);
 		push @boxlist,$key,$line;
 	}
 	#pack boxes
@@ -681,19 +742,19 @@ sub Pack
 		my $type=substr $key,0,2;
 		$type=$Layout::Boxes::Boxes{$type};
 		my $box=$widgets->{$key};
-		my @names= $type->{Parse}?	&{ $type->{Parse} }( $box, $line )
+		my @names= $type->{Parse}?	$type->{Parse}( $box, $line )
 					 :	::ExtractNameAndOptions($line,$type->{Prefix});
 		for my $name (@names)
 		{	my @packoptions;
 			($name,@packoptions)=@$name if ref $name;
-			my $extra;
-			$extra=$1 if $name=~s/\((.*)\)$//; #remove (...) and put it in $extra
-			my $wg=$widgets->{$name} ||= $self->NewObject($name,$extra,$opt->{$name});
+			my $opt1;
+			$opt1=$1 if $name=~s/\((.*)\)$//; #remove (...) and put it in $extra
+			my $wg=$widgets->{$name} ||= $self->NewObject($name,$opt1,$opt2->{$name});
 			unless ($wg) { delete $widgets->{$name}; next; }
 			if ($wg->parent) {warn "layout error: $name already has a parent -> can't put it in $key\n"; next;}
 
-			$self->{'songlist'.$wg->{group}}=$wg if $wg->isa('SongList') || $wg->isa('SongTree');
-			&{ $type->{Pack} }( $box,$wg,@packoptions );
+			#$self->{'songlist'.$wg->{group}}=$wg if $wg->isa('SongList') || $wg->isa('SongTree');
+			$type->{Pack}( $box,$wg,@packoptions );
 		}
 	}
 
@@ -741,57 +802,6 @@ sub Pack
 		}
 	}
 
-	if (my $skin=$boxes->{Skin})
-	{{	my ($file,$crop,$resize)=split /:/,$skin;
-		#$self->set_decorated(0);
-		$self->{pixbuf}=Skin::_load_skinfile($file,$crop,$self->{layout_options});
-		last unless $self->{pixbuf};
-		$self->{resizeparam}=$resize;
-		$self->{skinsize}='0x0';
-		$self->signal_connect(style_set => sub {warn "style set : @_" if $::debug;$_[0]->set_style($_[2]);} ,$self->get_style); #FIXME find the cause of these signals, seems related to stock icons
-		$self->signal_connect(configure_event => \&resize_skin_cb);
-		#Gtk2::Gdk::Window->set_debug_updates(1);
-		#$self->queue_draw;
-		my $rc_style= Gtk2::RcStyle->new;
-		#$rc_style->bg_pixmap_name($_,'<parent>') for qw/normal selected prelight insensitive active/;
-		$rc_style->bg_pixmap_name('normal','<parent>');
-		my @children=($self->child);
-		while (my $widget=shift @children)
-		{	push @children, $widget->get_children if $widget->isa('Gtk2::Container');
-			$widget->modify_style($rc_style) unless $widget->no_window;
-		}
-		$self->set_app_paintable(1);
-	}}
-
-	::HasChanged('SelectedID_'.$self->{group},$::SongID,$self->{group}) if defined $::SongID; #FIXME should be done for every new group
-	if (keys %{$self->{towatch}})
-	{	::Watch($self,SongID=>\&Layout::UpdateSongID);
-		$self->UpdateSongID;
-	}
-}
-
-sub resize_skin_cb	#FIXME needs to add a delay to better deal with a burst of resize events
-{	my ($self,$event)=@_;
-	my ($w,$h)=($event->width,$event->height);
-	return 0 if $w.'x'.$h eq $self->{skinsize};
-#	::IdleDo('0_resize_back_skin'.$self,1000,sub {
-#Glib::Timeout->add(80,sub {
-#	warn 1; my $self=$_[0];my ($w,$h)=$self->window->get_size;
-	my $pb=Skin::_resize($self->{pixbuf},$self->{resizeparam},$w,$h);
-	return 0 unless $pb;
-	#my ($pixmap,$mask)=$pb->render_pixmap_and_mask(1); #leaks X memory for Gtk2 <1.146 or <1.153
-	my $mask=Gtk2::Gdk::Bitmap->create_from_data($self->window,'',$w,$h);
-	$pb->render_threshold_alpha($mask,0,0,0,0,-1,-1,1);
-	$self->shape_combine_mask($mask,0,0);
-	my $pixmap=Gtk2::Gdk::Pixmap->new($self->window,$w,$h,-1);
-	$pb->render_to_drawable($pixmap, Gtk2::Gdk::GC->new($self->window), 0,0,0,0,-1,-1,'none',0,0);
-	$self->window->set_back_pixmap($pixmap,0);
-	$self->{skinsize}=$w.'x'.$h;
-	$self->queue_draw;
-#0;
-#	},$self) if $self->{skinsize};
-#$self->{skinsize}='';
-	return 0;
 }
 
 sub Parse_opt1_2
@@ -799,8 +809,8 @@ sub Parse_opt1_2
 	my %opt;
 	if (defined $opt)
 	{	if ($oldopt && $opt!~m/=/)
-		{	if (ref $oldopt eq 'CODE') { %opt= &$oldopt($opt); }
-			else { @opt{@$oldopt}=split ',',$opt; }
+		{	if (ref $oldopt) { %opt= $oldopt->($opt); }
+			else { @opt{split / /,$oldopt}=split ',',$opt; }
 		}
 		else
 		{	#%opt= $opt=~m/(\w+)=([^,]*)(?:,|$)/g;
@@ -821,20 +831,22 @@ sub NewObject
 	#warn $name;
 	$opt1=Parse_opt1_2($opt1,$ref->{oldopt1});
 	$opt2=Parse_opt1_2($opt2,$ref->{oldopt2});
-	my $group= $import || $self->{group};
-	$opt1->{group}=  (defined $opt1->{group}) ?  $group.'_'.$opt1->{group} : $group;
-	my $widget= ($ref->{class})
-		? $ref->{class}->new($ref,$opt1,$opt2, $self->{layout_options})
-		: &{ $ref->{New} }($opt1,$opt2);
+	my $group= $opt1->{group} || $ref->{default_group} || '';
+	$group= $self->{group}."_$group" unless $group=~m/^[A-Z]/;	#group local to window unless it begins with uppercase
+	$opt1->{group}=$group;
+	my $widget= $ref->{class}
+		? $ref->{class}->new($opt1,$opt2,$ref, $self->{layout_options})
+		: $ref->{New}($opt1,$opt2);
 	if ($ref->{options})
 	{	for my $key (split / /,$ref->{options})
 		{	$widget->{$key}= (exists $opt2->{$key}) ?
 					$opt2->{$key} : $opt1->{$key};
 		}
 	}
-	$widget->{group}=$opt1->{group};
+	$widget->{group}=$group;
 	$widget->{'ref'}=$ref;
 	$widget->{name}=$namefull;
+	$widget->set_name($name);
 
 	$widget->{actions}{$_}=$ref->{$_}  for grep m/^click/, keys %$ref;
 	$widget->{actions}{$_}=$opt1->{$_} for grep m/^click/, keys %$opt1;
@@ -847,11 +859,12 @@ sub NewObject
 	{	$widget->signal_connect(realize => sub { $_[0]->window->set_cursor(Gtk2::Gdk::Cursor->new($_[1])); },$cursor);
 	}
 
+	my %towatch;
 	my $tip= $ref->{tip};
 	$tip= $opt1->{tip} if exists $opt1->{tip} && (!$tip || !ref $tip);
 	if ( defined $tip && !ref $tip)
 	{	my @fields=::UsedFields($tip);
-		$self->{towatch}{$_}=undef for @fields;
+		$towatch{$_}=undef for @fields;
 		if (@fields) { $widget->{tip}=$tip; }
 		else
 		{	$tip=~s#\\n#\n#g;
@@ -860,18 +873,19 @@ sub NewObject
 	}
 	if ($opt1->{hover_layout}) { $widget->{$_}=$opt1->{$_} for qw/hover_layout hover_delay/; Layout::Window::Popup::set_hover($widget); }
 	if (my $f=$ref->{fields})
-	{	my @f=(ref $f)? @$f : $f;
-		$self->{towatch}{$_}=undef for @f;
+	{	$towatch{$_}=undef for split / /,$f;
 	}
 	if ($widget->{markup})
-	{	$self->{towatch}{$_}=undef for ::UsedFields($widget->{markup});
+	{	$towatch{$_}=undef for ::UsedFields($widget->{markup});
+	}
+	if ($ref->{schange} || (keys %towatch))
+	{	::WatchSelID($widget,\&UpdateSongID,\%towatch);
+		UpdateSongID($widget,$::SongID);
 	}
 	if ($ref->{event})
 	{	my $sub=$ref->{update} || \&UpdateObject;
-		my @e=($ref->{event});
-		@e=@{$e[0]} if ref $e[0];
-		::Watch($widget,$_,$sub ) for @e;
-		&$sub($widget) unless $ref->{noinit};
+		::Watch($widget,$_,$sub ) for split / /,$ref->{event};
+		$sub->($widget) unless $ref->{noinit};
 	}
 	::set_drag($widget,source => $ref->{dragsrc}, dest => $ref->{dragdest});
 	return $widget;
@@ -910,23 +924,9 @@ sub Button_activate_cb
 }
 
 sub UpdateSongID
-{	my $self=shift;
-	my $ID=$::SongID;
-	if (defined $ID)
-	{ ::ChangeWatcher($self->{watcher},[$ID],[keys %{$self->{towatch}}],sub { $self->UpdateSongID } );
-	}
-	else
-	{ ::ChangeWatcher($self->{watcher});
-	}
-
-	if (my $title=$self->{TitleString})
-	{	$title= defined $ID	? ::ReplaceFields($ID,$title)
-					: '<'._("Playlist Empty").'>';
-		$self->set_title($title);
-	}
-
-	for my $w (values %{ $self->{widgets} })
-	{	&{ $w->{ref}{schange} }($w,$ID) if $w->{ref} && $w->{ref}{schange};
+{	my ($widget,$ID)=@_;
+	for my $w ($widget)
+	{	$w->{ref}{schange}($w,$ID) if $w->{ref} && $w->{ref}{schange};
 		if ($w->{markup})
 		{	if (defined $ID) { $w->set_markup(::ReplaceFieldsAndEsc( $ID,$w->{markup} )); }
 			elsif ($w->{markup_empty}) { $w->set_markup($w->{markup_empty}); }
@@ -937,7 +937,6 @@ sub UpdateSongID
 			$::Tooltips->set_tip($w,$tip);
 		}
 	}
-	#$self->resize(1,1);
 }
 
 #sub SetSort
@@ -1032,6 +1031,11 @@ sub KeyPressed
 	{	$cmd= $::GlobalBoundKeys{$key};
 	}
 	return 0 unless $cmd;
+	if ($self->isa('Gtk2::Window'))	#try to find the focused widget (gmb widget, not gtk one), so that the cmd can act on it
+	{	my $widget=$self->get_focus;
+		while ($widget) {last if exists $widget->{group}; $widget=$widget->parent}
+		$self=$widget if $widget;
+	}
 	::run_command($self,$cmd);
 	return 1;
 }
@@ -1060,7 +1064,6 @@ sub SetFocusOn
 		$widget->grab_focus;
 	}
 }
-
 sub TurnPagesToWidget #change the current page of all parent notebook so that widget is on it
 {	my $parent=$_[0];
 	while (1)
@@ -1115,24 +1118,24 @@ sub PlayOrderComboUpdate
 	$store->clear;
 	my $check=$::Options{Sort};
 	my $found; my $iter;
-	for my $name (sort keys %::SavedWRandoms)
-	{	my $sort=$::SavedWRandoms{$name};
+	for my $name (sort keys %{$::Options{SavedWRandoms}})
+	{	my $sort=$::Options{SavedWRandoms}{$name};
 		$store->set(($iter=$store->append), 0,$name, 1,$sort, 2,'gmb-random');
 		$found=$iter if $sort eq $check;
 	}
-	if (!$found && $check=~m/^r/)
+	if (!$found && $check=~m/^random:/)
 	{	$store->set($iter=$store->append, 0, _"unnamed random mode", 1,$check,2,'gmb-random');
 		$found=$iter;
 	}
 	$store->set($store->append, 0, _"Edit random modes ...", 1,'EDIT R');
-	$store->set($iter=$store->append, 0, _"Shuffle", 1,'s',2,'gmb-shuffle');
-	$found=$iter if 's' eq $check;
+	$store->set($iter=$store->append, 0, _"Shuffle", 1,'shuffle',2,'gmb-shuffle');
+	$found=$iter if 'shuffle' eq $check;
 	if (defined $::ListMode)
 	{	$store->set($iter=$store->append, 0, _"list order", 1,'',2,'gmb-list');
 		$found=$iter if '' eq $check;
 	}
-	for my $name (sort keys %::SavedSorts)
-	{	my $sort=$::SavedSorts{$name};
+	for my $name (sort keys %{$::Options{SavedSorts}})
+	{	my $sort=$::Options{SavedSorts}{$name};
 		$store->set($iter=$store->append, 0, $name, 1,$sort,2,'gtk-sort-ascending');
 		$found=$iter if $sort eq $check;
 	}
@@ -1165,17 +1168,17 @@ sub SortMenu
 
 	my $submenu= Gtk2::Menu->new;
 	my $sitem = Gtk2::MenuItem->new(_"Weighted Random");
-	for my $name (sort keys %::SavedWRandoms)
-	{	&$append($submenu,$name, $::SavedWRandoms{$name} );
+	for my $name (sort keys %{$::Options{SavedWRandoms}})
+	{	$append->($submenu,$name, $::Options{SavedWRandoms}{$name} );
 	}
-	my $editcheck=(!$found && $check=~m/^r/);
-	&$append($submenu,_"Edit ...", undef, $editcheck, sub
+	my $editcheck=(!$found && $check=~m/^random:/);
+	$append->($submenu,_"Edit ...", undef, $editcheck, sub
 		{	::EditWeightedRandom(undef,$::Options{Sort},undef, \&::Select_sort);
 		});
 	$sitem->set_submenu($submenu);
 	$menu->prepend($sitem);
 
-	&$append($menu,_"Shuffle",'s',undef,\&::Shuffle);
+	$append->($menu,_"Shuffle",'shuffle',undef,\&::Shuffle);
 
 	{ my $item=Gtk2::CheckMenuItem->new(_"Repeat");
 	  $item->set_active($::Options{Repeat});
@@ -1186,11 +1189,11 @@ sub SortMenu
 
 	$menu->append(Gtk2::SeparatorMenuItem->new); #separator between random and non-random modes
 
-	&$append($menu,_"list order", '' ) if defined $::ListMode;
-	for my $name (sort keys %::SavedSorts)
-	{	&$append($menu,$name, $::SavedSorts{$name} );
+	$append->($menu,_"list order", '' ) if defined $::ListMode;
+	for my $name (sort keys %{$::Options{SavedSorts}})
+	{	$append->($menu,$name, $::Options{SavedSorts}{$name} );
 	}
-	&$append($menu,_"Edit...",undef,!$found,sub
+	$append->($menu,_"Edit...",undef,!$found,sub
 		{	::EditSortOrder(undef,$::Options{Sort},undef, \&::Select_sort );
 		});
 	$menu->show_all;
@@ -1205,9 +1208,9 @@ sub FilterMenu
 	$check=$::SelectedFilter->{string} if $::SelectedFilter;
 	my $menu = Gtk2::Menu->new;
 	my $item_callback=sub { ::Select(filter => $_[1]); };
-	for my $list (sort keys %::SavedFilters)
+	for my $list (sort keys %{$::Options{SavedFilters}})
 	{	next if $list eq 'Playlist';
-		my $filt=$::SavedFilters{$list}->{string};
+		my $filt=$::Options{SavedFilters}{$list}->{string};
 		my $text=$list; $text=~s/^_//;
 		my $item = Gtk2::CheckMenuItem->new($text);
 		$item->set_draw_as_radio(1);
@@ -1222,10 +1225,10 @@ sub FilterMenu
 		{ ::EditFilter(undef,$::SelectedFilter,undef, sub {::Select(filter => $_[0])});
 		});
 	$menu->append($item);
-	if (keys %::SavedLists)
+	if (my @SavedLists=::GetListOfSavedLists())
 	{	my $submenu=Gtk2::Menu->new;
 		my $list_cb=sub { ::Select( 'sort' => '', staticlist => $_[1] ) };
-		for my $list (keys %::SavedLists)
+		for my $list (@SavedLists)
 		{	my $item = Gtk2::CheckMenuItem->new($list);
 			$item->set_draw_as_radio(1);
 			$item->set_active(1) if defined $::ListMode && $list eq $::ListMode;
@@ -1267,7 +1270,7 @@ sub NewMenuBar
 		for my $item ($_[0]->get_children)
 		{	my $ref=$item->{'ref'};
 			next unless $ref->{setmenu};
-			my $submenu=&{$ref->{setmenu}}($item);
+			my $submenu= $ref->{setmenu}($item);
 			$item->set_submenu($submenu);
 			$submenu->show_all;
 		};
@@ -1284,10 +1287,8 @@ sub UpdateLabelsIcon
 	return unless defined $::SongID;
 	my $row=0; my $col=0;
 	my $count=0;
-	no warnings 'uninitialized';
-	for my $stock ( sort split /\x00/,$::Songs[$::SongID][::SONG_LABELS] )
-	{	next unless Gtk2::IconFactory->lookup_default('label-'.$stock);
-		my $img=Gtk2::Image->new_from_stock('label-'.$stock,'menu');
+	for my $stock ( Songs::Get_icon_list('label',$::SongID) )
+	{	my $img=Gtk2::Image->new_from_stock($stock,'menu');
 		$count++;
 		$table->attach($img,$col,$col+1,$row,$row+1,'shrink','shrink',1,1);
 		if (++$row>=1) {$row=0; $col++}
@@ -1297,28 +1298,25 @@ sub UpdateLabelsIcon
 
 sub AddLabelEntry	#create entry to add a label to the current song
 {	my $entry=Gtk2::Entry->new;
+	$::Tooltips->set_tip($entry,_"Adds labels to the current song");
 	$entry->signal_connect(activate => sub
 	 {	my $label= $_[0]->get_text;
 		return unless defined $::SongID & defined $label;
 		$_[0]->set_text('');
 		::SetLabels([$::SongID],[$label],[]);
 	 });
-	my $store=Gtk2::ListStore->new('Glib::String','Glib::String');
-	my $completion=Gtk2::EntryCompletion->new;
-	my $cell=Gtk2::CellRendererPixbuf->new;
-	$completion->pack_start($cell,0);
-	$completion->add_attribute($cell,'stock-id',1);
-	$completion->set_text_column(0);
-	$completion->set_model($store);
-	$entry->set_completion($completion);
-	my $fillsub=sub
-	 {	my $store=$_[0]->get_completion->get_model;
-		$store->clear;
-		$store->set($store->append,0,$_,1,'label-'.$_) for sort { ::NFKD(uc$a) cmp ::NFKD(uc$b) } keys %::Labels;
-	 };
-	&$fillsub($entry);
-	::Watch( $entry, LabelList =>$fillsub);
+	GMB::ListStore::Field::setcompletion($entry,'label');
 	return $entry;
+}
+
+sub DragCurrentSong
+{	::DRAG_ID,$::SongID;
+}
+sub DragCurrentArtist
+{	::DRAG_ARTIST,@{Songs::Get_gid($::SongID,'artists')};
+}
+sub DragCurrentAlbum
+{	::DRAG_ALBUM,Songs::Get_gid($::SongID,'album');
 }
 
 ####################################
@@ -1331,9 +1329,11 @@ use base 'Gtk2::Window';
 my $WindowCounter=0;	#used to give an unique group id to windows
 
 sub new
-{	my ($class,$layout,$wintype,$options)=@_;
+{	my ($class,$layout,$wintype,$options,$fallback)=@_;
+	$fallback||='Small player';
 	$wintype||='toplevel';
 	my $self=bless Gtk2::Window->new($wintype), $class;
+	$self->set_role($layout);
 	$self->{options}=$options;
 	$self->{group}='w'.$WindowCounter++;
 	::Watch($self,Save=>\&SaveOptions);
@@ -1364,17 +1364,29 @@ sub new
 #			::TRUE;
 #		}
 #		);
-	unless (exists $Layouts{$layout})
-	{	warn "Layout $layout not found, reverting to default\n";
-		$layout='default player layout'; #FIXME if not a player window
+	unless (exists $Layout::Layouts{$layout})
+	{	warn "Layout '$layout' not found, using '$fallback' instead\n";
+		$layout=$fallback; #FIXME if not a player window
+		$Layout::Layouts{$layout} ||= { VBmain=>'Label(text="Error : fallback layout not found")' };	#create an error layout if fallback not found
 	}
-	$self->Pack($layout);
+	my $opt2;
+	{	my $options= $::Options{'Layout_'.$layout} || $Layout::Layouts{$layout}{Default} || '';
+		my @optlist=split /\s+/,$options;
+		my $wopt;
+		$wopt=shift @optlist if @optlist%2;	#old format (v<0.9573)
+		$opt2= {@optlist};
+		$opt2->{Window}||=$wopt||'';
+	}
+	$self->Pack($layout,$opt2);
+	$self->SetWindowOptions($opt2->{Window});
+	if (my $skin=$Layout::Layouts{$layout}{Skin}) { $self->set_background_skin($skin) }
 	#if (my $songlist=::GetSonglist($self))	#FIXME should be done for every new group
 	#{	::SetFilter($self,undef,0) unless $songlist->{type}=~m/[QL]/;
 	#	$songlist->FollowSong;
 	#}
 	$self->init;
 	::HasChanged('HiddenWidgets');
+	#$self->set_opacity($self->{opacity}) if exists $self->{opacity} && $self->{opacity}!=1;
 	return $self;
 }
 sub init
@@ -1398,6 +1410,57 @@ sub init
 	$self->parse_geometry( delete $::CmdLine{geometry} ) if $::CmdLine{geometry};
 }
 
+sub set_background_skin
+{	my ($self,$skin)=@_;
+	my ($file,$crop,$resize)=split /:/,$skin;
+	#$self->set_decorated(0);
+	$self->{pixbuf}=Skin::_load_skinfile($file,$crop,$self->{layout_options});
+	return unless $self->{pixbuf};
+	$self->{resizeparam}=$resize;
+	$self->{skinsize}='0x0';
+	$self->signal_connect(style_set => sub {warn "style set : @_" if $::debug;$_[0]->set_style($_[2]);} ,$self->get_style); #FIXME find the cause of these signals, seems related to stock icons
+	$self->signal_connect(configure_event => \&resize_skin_cb);
+	#Gtk2::Gdk::Window->set_debug_updates(1);
+	#$self->queue_draw;
+	my $rc_style= Gtk2::RcStyle->new;
+	#$rc_style->bg_pixmap_name($_,'<parent>') for qw/normal selected prelight insensitive active/;
+	$rc_style->bg_pixmap_name('normal','<parent>');
+	my @children=($self->child);
+	while (my $widget=shift @children)
+	{	push @children, $widget->get_children if $widget->isa('Gtk2::Container');
+		$widget->modify_style($rc_style) unless $widget->no_window;
+	}
+	$self->set_app_paintable(1);
+}
+sub resize_skin_cb	#FIXME needs to add a delay to better deal with a burst of resize events
+{	my ($self,$event)=@_;
+	my ($w,$h)=($event->width,$event->height);
+	return 0 if $w.'x'.$h eq $self->{skinsize};
+#	::IdleDo('0_resize_back_skin'.$self,1000,sub {
+#Glib::Timeout->add(80,sub {
+#	warn 1; my $self=$_[0];my ($w,$h)=$self->window->get_size;
+	my $pb=Skin::_resize($self->{pixbuf},$self->{resizeparam},$w,$h);
+	return 0 unless $pb;
+	#my ($pixmap,$mask)=$pb->render_pixmap_and_mask(1); #leaks X memory for Gtk2 <1.146 or <1.153
+	my $mask=Gtk2::Gdk::Bitmap->create_from_data($self->window,'',$w,$h);
+	$pb->render_threshold_alpha($mask,0,0,0,0,-1,-1,1);
+	$self->shape_combine_mask($mask,0,0);
+	my $pixmap=Gtk2::Gdk::Pixmap->new($self->window,$w,$h,-1);
+	$pb->render_to_drawable($pixmap, Gtk2::Gdk::GC->new($self->window), 0,0,0,0,-1,-1,'none',0,0);
+	$self->window->set_back_pixmap($pixmap,0);
+	$self->{skinsize}=$w.'x'.$h;
+	$self->queue_draw;
+#0;
+#	},$self) if $self->{skinsize};
+#$self->{skinsize}='';
+	return 0;
+}
+
+sub layout_name
+{	my $self=shift;
+	my $id=$self->{layout};
+	return $Layout::Layouts{$id}{Name} || $id;
+}
 sub close_window
 {	my $self=shift;
 	$self->SaveOptions;
@@ -1421,6 +1484,8 @@ sub SaveWindowOptions
 		$wstate{ontop}=1 if $self->{ontop};
 		$wstate{below}=1 if $self->{below};
 		$wstate{nodecoration}=1 unless $self->get_decorated;
+		$wstate{skippager}=1 if $self->get_skip_pager_hint;
+		$wstate{skiptaskbar}=1 if $self->get_skip_taskbar_hint;
 	}
 	my $hidden=$self->{hidden};
 	if ($hidden && keys %$hidden)
@@ -1430,11 +1495,12 @@ sub SaveWindowOptions
 }
 sub SetWindowOptions
 {	my ($self,$wopt)=@_;
-	my ($x,$y,$w,$h,$sticky)=(-1,-1);
+	my $layouthash= $Layout::Layouts{ $self->{layout} };
+	my ($x,$y,$width,$height,$sticky)=(-1,-1);
 	if ($wopt=~m/=/)
 	{	my %wstate= $wopt=~m/(\w+)=([^,]*)(?:,|$)/g;
 		if ($self->{options} && $self->{options}=~m/UseDefaultState/)
-		{	my %h= split /\s+/, ($Layouts{$self->{layout}}{Default}||'');
+		{	my %h= split /\s+/, ($layouthash->{Default}||'');
 			$wopt= $h{Window}||'';
 			#replace options by default
 			my @state= ($wopt=~m/(\w+)=([^,]*)(?:,|$)/g);
@@ -1442,34 +1508,50 @@ sub SetWindowOptions
 			%wstate= @state;
 		}
 		($x,$y)=split 'x',$wstate{pos}  if $wstate{pos};
-		($w,$h)=split 'x',$wstate{size} if $wstate{size};
+		($width,$height)=split 'x',$wstate{size} if $wstate{size};
 		$sticky=1 if $wstate{sticky};
-		$self->fullscreen, $w=$h=undef if $wstate{fullscreen};
+		$self->fullscreen, $width=$height=undef if $wstate{fullscreen};
 		$self->set_keep_above(1) if $wstate{ontop};
 		$self->set_keep_below(1) if $wstate{below};
 		$self->set_decorated(0)  if $wstate{nodecoration};
+		$self->set_skip_pager_hint(1) if $wstate{skippager};
+		$self->set_skip_taskbar_hint(1) if $wstate{skiptaskbar};
+		#$self->{opacity}=$wstate{opacity} if defined $wstate{opacity};
 		$self->{hidden}={ $wstate{hidden}=~m/(\w+)(?::?(\d+x\d+))?/g } if $wstate{hidden};
 	}
 	else	#old format (v<0.9568)
 	{	my @wopt=split /,/,$wopt;
 		unshift @wopt,-1,-1 if @wopt<5;
-		($x,$y,$w,$h,$sticky)=@wopt;
+		($x,$y,$width,$height,$sticky)=@wopt;
 	}
-	if ($w) { $self->resize($w,$h); }
+	if ($width) { $self->resize($width,$height); }
 	else { $self->{natural_size}=1; $self->signal_connect('map' => sub {delete $_[0]->{natural_size}}); }
 	$self->stick if $sticky;
-	my $layout=$self->{layout};
-	$self->set_gravity($Layouts{$layout}{gravity}) if $Layouts{$layout}{gravity};
+	$self->set_gravity($layouthash->{gravity}) if $layouthash->{gravity};
 	if (my $scrn=Gtk2::Gdk::Screen->get_default)
 	 {$x=-1 if $x>$scrn->get_width || $y>$scrn->get_height}
 	if ($x>-1 && $y>-1)
 	{ $self->move($x,$y);
 	  $self->{x}=$x; $self->{y}=$y;	#move before show_all rarely works, so save pos to set it later
 	}
-	my $title=$Layouts{$layout}{Title} || _"%S by %a";
+	my $title=$layouthash->{Title} || _"%S by %a";
 	$title=~s/^"(.*)"$/$1/;
-	if (my @l=::UsedFields($title)) { $self->{TitleString}=$title; $self->{towatch}{$_}=undef for @l; }
+	if (my @l=::UsedFields($title))
+	{	$self->{TitleString}=$title;
+		my %fields; $fields{$_}=undef for @l;
+		::Watch($self,'SongID',\&UpdateWindowTitle,\%fields);
+		$self->UpdateWindowTitle();
+	}
 	else { $self->set_title($title) }
+}
+sub UpdateWindowTitle
+{	my $self=shift;
+	my $ID=$::SongID;
+	if (my $title=$self->{TitleString})
+	{	$title= defined $ID	? ::ReplaceFields($ID,$title)
+					: '<'._("Playlist Empty").'>';
+		$self->set_title($title);
+	}
 }
 
 package Layout::Window::Popup;
@@ -1480,7 +1562,7 @@ BEGIN {push @ISA,'Layout','Layout::Window';}
 sub new
 {	my ($class,$layout,$widget)=@_;
 	$layout||=$::Options{LayoutT};
-	my $self=Layout::Window::new($class,$layout,'popup','UseDefaultState');
+	my $self=Layout::Window::new($class,$layout,'popup','UseDefaultState','info');	#'info' is the fallback layout
 
 	if ($widget)
 	{	$self->{popped_from}=$widget;
@@ -1490,7 +1572,8 @@ sub new
 		$self->signal_connect(enter_notify_event => \&CancelDestroy);
 	}
 	else	{ $self->set_position('mouse'); }
-	$self->show;#warn "show\n";
+	$self->show;
+	#$self->set_opacity($self->{opacity}) if exists $self->{opacity} && $self->{opacity}!=1;
 
 	return $self;
 }
@@ -1556,19 +1639,98 @@ sub CancelDestroy
 	if (my $t=delete $self->{destroy_timeout}) { Glib::Source->remove($t); }
 }
 sub StartDestroy
-{	my $self=shift;#warn "StartDestroy $self\n";
+{	my $self=shift;
 	return 0 if !$self || $self->{destroy_timeout};
 	$self->{destroy_timeout}=Glib::Timeout->add( 300,\&DestroyNow,$self);
-	#warn "StartDestroy ok\n";
 	0;
 }
 sub DestroyNow
-{	my $self=shift;#warn "DestroyNow $self\n";
+{	my $self=shift;
 	$self->CancelDestroy;
 	$self->destroy;
 	0;
 }
 
+=needsCairo
+package Layout::Window::OSD;	#TEST not used yet 	#Layout::Window::OSD->new()
+use Gtk2;
+our @ISA;
+BEGIN {push @ISA,'Layout','Layout::Window';}
+
+sub new
+{	my ($class,$layout)=@_;
+	$layout||=$::Options{LayoutT};
+	my $self=Layout::Window::new($class,$layout,'popup','UseDefaultState');
+	$self->move( position($self) );
+	$self->show;
+	Glib::Timeout->add( 5000,sub {$self->destroy;0} );
+	return $self;
+}
+sub init
+{	my $self=$_[0];
+	if (1)
+	{	my @children=($self);
+		while (my $widget=shift @children)
+		{	push @children, $widget->get_children if $widget->isa('Gtk2::Container');
+			unless ($widget->no_window)
+			{	$widget->set_colormap($widget->get_screen->get_rgba_colormap);
+				$widget->set_app_paintable(1);
+				$widget->signal_connect(expose_event => \&transparent_expose_cb);
+			}
+		}
+	}
+	if (0)	#failed attempt at making it input-invisible
+	{	my @children=($self);
+		while (my $widget=shift @children)
+		{	push @children, $widget->get_children if $widget->isa('Gtk2::Container');
+			unless ($widget->no_window)
+			{	$widget->realize;
+				$widget->window->set_events(['exposure-mask']);
+			}
+		}
+	}
+
+	$self->child->show_all;		#needed to get the true size of the window
+	$self->child->realize;		#
+	if (1)	#make the window input-invisible
+	{	$self->realize;
+		my $mask=Gtk2::Gdk::Bitmap->create_from_data(undef,'',1,1);
+		$self->input_shape_combine_mask($mask,0,0);
+	}
+}
+sub transparent_expose_cb
+{	my ($w,$event)=@_;
+	use Cairo;
+	my $cr=Gtk2::Gdk::Cairo::Context->create($event->window);
+	$cr->set_operator('source');
+	$cr->set_source_rgba(0, 0, 0, 0);
+	$cr->rectangle($event->area);
+	$cr->fill;
+	return 0; #send expose to children
+}
+
+sub position	#FIXME improve
+{	my ($win)=@_;
+	my $h=$win->size_request->height;		# height of window to position
+	my $w=$win->size_request->width;		# width of window to position
+	my $screen=$win->get_screen;
+	my $monitor=$screen->get_monitor_at_window($win->window);
+	my ($xmin,$ymin,$monitorwidth,$monitorheight)=$screen->get_monitor_geometry($monitor)->values;
+	my $xmax=$xmin + $monitorwidth;
+	my $ymax=$ymin + $monitorheight;
+	my $x=$xmin + $monitorwidth/2;
+	my $y=$ymin + $monitorheight;
+
+	my $ycenter=0;
+	if ($x+$w/2 < $xmax && $x-$w/2 >$xmin){ $x-=int($w/2); }	# centered
+	elsif ($x+$w > $xmax)	{ $x=$xmax-$w; $x=$xmin if $x<$xmin }	# right side
+	else				{ $x=$xmin; }				# left side
+	if ($ycenter && $y+$h/2 < $ymax && $y-$h/2 >$ymin){ $y-=int($h/2) }	# y center
+	elsif ($y+$h > $ymax)  { $y-=$h; $y=$ymin if $y<$ymin }	# display above the widget
+	#else			   { $y+=0; }				# display below the widget
+	return $x,$y;
+}
+=cut
 
 package Layout::Boxes;
 use Gtk2;
@@ -1588,12 +1750,12 @@ our %Boxes=
 	},
 	HP	=>
 	{	New	=> sub { PanedNew('Gtk2::HPaned',$_[1]); },
-		Prefix	=> qr/(_)?/,
+		Prefix	=> qr/([_+]*)/,
 		Pack	=> \&PanedPack,
 	},
 	VP	=>
 	{	New	=> sub { PanedNew('Gtk2::VPaned',$_[1]); },
-		Prefix	=> qr/(_)?/,
+		Prefix	=> qr/([_+]*)/,
 		Pack	=> \&PanedPack,
 	},
 	TB	=>	#tabbed
@@ -1630,6 +1792,10 @@ our %Boxes=
 	{	New	=> sub { my @def=(.5,.5,1,1); my @opt=@{$_[0]}{qw/xalign yalign xscale yscale/}; for my $i (0..3) {$opt[$i]=$def[$i] unless defined $opt[$i]}; Gtk2::Alignment->new(@opt);},
 		Pack	=> \&SimpleAdd,
 	},
+	WB	=>
+	{	New	=> sub { Gtk2::EventBox->new; },
+		Pack	=> \&SimpleAdd,
+	},
 );
 
 sub SimpleAdd
@@ -1641,6 +1807,7 @@ sub NewTB
 	my $nb=Gtk2::Notebook->new;
 	$nb->set_scrollable(::TRUE);
 	$nb->popup_enable;
+	#$nb->signal_connect( button_press_event => sub {return !::IsEventInNotebookTabs(@_);});
 	if ($opt1->{tabpos}) {$nb->set_tab_pos($opt1->{tabpos});}
 	if ($opt2 && $opt2=~m/page=(\d+)/) { $nb->{SetPage}=$1; }
 	$nb->{SaveOptions}=sub { 'page='.$_[0]->get_current_page };
@@ -1667,9 +1834,11 @@ sub SBoxPack
 }
 
 sub PanedPack
-{	my ($paned,$wg,$expand)=@_;
-	if (!$paned->child1)	{$paned->pack1($wg,$expand,::TRUE);}
-	elsif (!$paned->child2)	{$paned->pack2($wg,$expand,::TRUE);}
+{	my ($paned,$wg,$opt)=@_;
+	my $expand= $opt=~m/_/;
+	my $shrink= $opt!~m/\+/;
+	if	(!$paned->child1)	{$paned->pack1($wg,$expand,$shrink);}
+	elsif	(!$paned->child2)	{$paned->pack2($wg,$expand,$shrink);}
 	else {warn "layout error : trying to pack more than 2 widgets in a paned container\n"}
 }
 
@@ -1728,6 +1897,7 @@ sub size_allocate
 	{	my ($x,$y)=$self->child_get_property($child,qw/x y/);
 		if (my $ref=$child->{SFixed_dynamic_pos})
 		{	my ($x2,$y2)=@$ref;
+			$x=~m/\./ and $x*=$w;
 			$x2=~m/\./ and $x2=int($x2*$w);
 			$y2=~m/\./ and $y2=int($y2*$h);
 			$x2=~m/^-/ and $x2+=$w;
@@ -1751,7 +1921,7 @@ use Gtk2;
 use base 'Gtk2::Button';
 
 sub new
-{	my ($class,$ref,$opt1,undef,$layout_options)=@_;
+{	my ($class,$opt1,undef,$ref,$layout_options)=@_;
 	my $self = bless Gtk2::Button->new, $class;
 	$self->{opt1}=$opt1;
 	my $isbutton= !exists $ref->{nobutton};
@@ -1795,7 +1965,7 @@ sub UpdateStock
 	my $stock=$self->{stock};
 	if (my $state=$self->{state})
 	{	$state=&$state;
-		$stock = (ref $stock eq 'CODE')? &$stock($state) : $stock->{$state};
+		$stock = (ref $stock eq 'CODE')? $stock->($state) : $stock->{$state};
 	}
 	if (ref $stock)
 	{	$stock= $stock->[ $index || 0 ];
@@ -1820,7 +1990,7 @@ use constant
 use base 'Gtk2::EventBox';
 
 sub new
-{	my ($class,$ref,$opt1,undef,$layout_options)=@_;
+{	my ($class,$opt1,undef,$ref,$layout_options)=@_;
 	my $self = bless Gtk2::EventBox->new, $class;
 	my $label=Gtk2::Label->new;
 	my $xalign= exists $opt1->{xalign} ? $opt1->{xalign} : $ref->{xalign} || 0;
@@ -1847,6 +2017,7 @@ sub new
 			$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 			($minsize)=$lay->get_pixel_size;
 		}
+		$self->{expand_max}=1 if $opt1->{expand_max};
 		$self->set_size_request($minsize,-1);
 		$label->signal_connect(expose_event => \&expose_cb);
 		$self->signal_connect(enter_notify_event => \&enter_leave_cb, INCR());
@@ -1874,12 +2045,15 @@ sub set_markup
 sub checksize	#extend the requested size so that the string fit in initsize mode (in case the initsize string is not wide enough)
 {	my $self=$_[0];
 	if ($self->{resize})
-	{	my $label=$_[0]->child;
+	{	my $label=$self->child;
 		my ($w,$h)=$label->get_layout->get_pixel_size;
 		my ($w0,$h0)=$label->get_size_request;
 		$w=0 if $w0>$w;
 		$h=0 if $h0>$h;
 		$label->set_size_request($w||$w0,$h||$h0) if $w || $h;
+	}
+	elsif ($self->{expand_max})
+	{	$self->{expand_max}= ($self->child->get_layout->get_pixel_size)[0]||1;
 	}
 }
 
@@ -1926,60 +2100,108 @@ sub Scroll
 	return $self->{scrolltimeout};
 }
 
-package Layout::TimeSlider;
+package Layout::Bar;
 use Gtk2;
-
-use base 'Gtk2::HScale';
+use base 'Gtk2::ProgressBar';
 
 sub new
-{	my ($class,$ref,$opt1,undef,$layout_options)=@_;
-	my $adj=Gtk2::Adjustment->new(0, 0, 100, 1, 10, 0);
-	my $self = bless Gtk2::HScale->new($adj), $class;
-	$self->set_draw_value(::FALSE);
-	$self=Layout::TimeSlider::skin->new($opt1,$adj,$layout_options) if $opt1->{skin};
-	$self->{adj}=$adj;
-	$self->signal_connect(button_press_event => \&button_press_cb);
-	$self->signal_connect(button_release_event => \&button_release_cb);
+{	my ($class,$opt1,undef,$ref,$layout_options)=@_;
+	my $self=bless Gtk2::ProgressBar->new, $class;
+	$self->{left}=$self->{right}=0;
+	$self->{max}= $ref->{max} || 1;
+	my $orientation= $ref->{orientation} || 'left-to-right';
+	$orientation= 'left-to-right' if $opt1->{horizontal};
+	$orientation= 'bottom-to-top' if $opt1->{vertical};
+	$self->set_orientation($orientation);
+	$self=Layout::Bar::skin->new($opt1,$orientation,$layout_options) if $opt1->{skin};
+	$self->add_events([qw/pointer-motion-mask button-press-mask button-release-mask scroll-mask/]);
+	$self->signal_connect(button_press_event	=> \&button_press_cb);
+	$self->signal_connect(button_release_event	=> \&button_release_cb);
+	$self->signal_connect(scroll_event		=> \&scroll_cb);
+	$self->{scroll}=$ref->{scroll};
+	$self->{set}=$ref->{set};
+	$self->{set_preview}=$ref->{set_preview};
+	$self->{vertical}= $orientation eq 'bottom-to-top';
 	return $self;
 }
-
-sub TimeLabel
-{	my $h=::get_layout_widget($_[0])->{widgets};
-	map $h->{$_}, grep m/^LabelTime\d*$/, keys %$h;
+sub set_val
+{	$_[0]{now}=$_[1];
+	$_[0]->update;
 }
-
+sub set_max
+{	$_[0]{max}=$_[1];
+	$_[0]->update;
+}
+sub update
+{	my $self=$_[0];
+	return if $self->{pressed};
+	my $f= ($self->{now}||0) / ($self->{max}||1);
+	$f=0 if $f<0; $f=1 if $f>1;
+	$self->set_fraction($f);
+}
 sub button_press_cb
-{	my $self=$_[0];
-	$self->{pressed}= $self->{adj}->signal_connect(value_changed  => \&value_changed_cb,$self);
-	my $label=$self->TimeLabel;
-	$_->{busy}=1 for $self->TimeLabel;
-	0;
-}
+{	my ($self,$event)=@_;
+	$self->{pressed}||=$self->signal_connect(motion_notify_event => \&button_press_cb);
+	my ($x,$w)= $self->{vertical} ?	($event->y, $self->allocation->height):
+					($event->x, $self->allocation->width) ;
+	$w=1 if $w<1;
+	$w-= $self->{left} +$self->{right};
+	$x-= $self->{left};
+	my $f=$x/$w;
+	$f=0 if $f<0; $f=1 if $f>1;
+	$f=1-$f if $self->{vertical};
+	$self->set_fraction($f);
 
+	my $s= $f*$self->{max};
+	$self->{newpos}=$s;
+	my $sub= $self->{set_preview} || $self->{set};
+	$sub->($self,$s);
+	1;
+}
 sub button_release_cb
-{	my $self=$_[0];
-	return unless $self->{pressed};
-	$self->{adj}->signal_handler_disconnect( $self->{pressed} );
-	$self->{pressed}=0;
-	$_->{busy}=0 for $self->TimeLabel;
-	::SkipTo( $self->{adj}->get_value );
-	0;
+{	my ($self,$event)=@_;
+	return 0 unless $self->{pressed};
+	$self->signal_handler_disconnect(delete $self->{pressed});
+	if ($self->{set_preview})
+	{	$self->{set_preview}->($self, undef);
+		$self->{set}->( $self, $self->{newpos} );
+	}
+	#$self->update;
+	1;
 }
 
-sub value_changed_cb
-{	my ($adj,$self)=@_;
-	my $s=$adj->get_value;
-	my $format=($::Songs[$::SongID][::SONG_LENGTH]<600)? '%01d:%02d' : '%02d:%02d';
-	$_->set_label( sprintf $format,int($s/60),$s%60 ) for $self->TimeLabel;
+sub update_preview_Time
+{	my ($self,$value)=@_;
+
+	my $h=::get_layout_widget($self)->{widgets};
+	my @labels= map $h->{$_}, grep m/^LabelTime\d*$/, keys %$h; #get list of LabelTime in the layouts
+
+	my $preview= defined $value ? 1 : 0;
+	my $format=( $self->{max} <600 )? '%01d:%02d' : '%02d:%02d';
+	for my $label (@labels)
+	{	$label->{busy}=$preview;
+		$label->set_label( sprintf $format,int($value/60),$value%60 ) if $preview;
+	}
 }
 
-package Layout::TimeSlider::skin;
+sub scroll_cb
+{	my ($self,$event)=@_;
+	my $d= $event->direction;
+	if	($d eq 'down'	|| $d eq 'right')	{ $d=1 }
+	elsif	($d eq 'up'	|| $d eq 'left' )	{ $d=0 }
+	else	{ return 0 }
+	$d= !$d if $self->{vertical};
+	$self->{scroll}->($self,$d);
+	return 1;
+}
+
+package Layout::Bar::skin;
 use Gtk2;
-our @ISA=('Layout::TimeSlider');
+our @ISA=('Layout::Bar');
 use base 'Gtk2::EventBox';
 
 sub new
-{	my ($class,$opt1,$adj,$layout_options)=@_;
+{	my ($class,$opt1,$orientation,$layout_options)=@_; #FIXME $orientation is ignored for now
 	my $self=bless Gtk2::EventBox->new,$class;
 	my $hskin=$self->{handle_skin}=Skin->new($opt1->{handle_skin},undef,$layout_options);
 	my $bskin=$self->{back_skin}=  Skin->new($opt1->{skin},undef,$layout_options);
@@ -1993,12 +2215,13 @@ sub new
 	$self->{top}=   $top  ||= 0;
 	$self->{bottom}=$bottom||=0;
 	$self->set_size_request($left+$right+$hskin->{minwidth},$top+$bottom+$hskin->{minheight});
-	$adj->signal_connect(value_changed  => sub {$self->queue_draw}); #FIXME region could be optimized
-	$self->signal_connect(destroy => sub {delete $_[0]{adj}}); #to prevent adj from leaking (reference loop)
 	$self->signal_connect(expose_event=> \&expose_cb);
-	$self->signal_connect(button_press_event => \&button_press_cb);
-	$self->signal_connect(button_release_event => \&button_release_cb);
 	return $self;
+}
+
+sub set_fraction
+{	$_[0]{fraction}=$_[1];
+	$_[0]->queue_draw;
 }
 
 sub expose_cb
@@ -2007,25 +2230,67 @@ sub expose_cb
 	my $minw=$self->{handle_skin}{minwidth};
 	my ($w,$h)=($self->allocation->values)[2,3];
 	$w-= $self->{right}+$self->{left};
-	my $x= $self->{left} + $w *($self->{adj}->get_value / $self->{adj}->upper);
+	my $x= $self->{left} + $w *$self->{fraction};
 	$x-= $minw/2;
 	Skin::draw($self,$event,$self->{handle_skin},int($x),$self->{top},$minw,$h-$self->{top}-$self->{bottom});
 	1;
 }
 
+package Layout::Bar::Scale;
+use Gtk2;
+use base 'Gtk2::Scale';
+
+sub new
+{	my ($class,$opt1,undef,$ref)=@_;
+	my $scale= $ref->{orientation} || 'left-to-right';
+	$scale= 'left-to-right' if $opt1->{horizontal};
+	$scale= 'bottom-to-top' if $opt1->{vertical};
+	$scale= $scale eq 'left-to-right' ? 'Gtk2::HScale' : 'Gtk2::VScale';
+	my $max= $ref->{max} || 1;
+	my $self = bless $scale->new_with_range(0,$max,$max/10), $class;
+	$self->set_inverted(1) if $scale eq 'Gtk2::VScale';
+	$self->{vertical}= $scale eq 'Gtk2::VScale';
+	$self->set_draw_value(0);
+	$self->signal_connect(button_press_event => \&button_press_cb);
+	$self->signal_connect(button_release_event => \&button_release_cb);
+	$self->signal_connect(scroll_event	=> \&Layout::Bar::scroll_cb);
+	$self->{scroll}=$ref->{scroll};
+	$self->{set}=$ref->{set};
+	$self->{set_preview}=$ref->{set_preview};
+	return $self;
+}
+sub set_val
+{	$_[0]->set_value($_[1] || 0) unless $_[0]{pressed};
+}
+sub set_max
+{	$_[0]->{max}=$_[1];
+	$_[0]->get_adjustment->upper($_[1]);
+}
+
 sub button_press_cb
-{	my ($self,$event)=@_;
-	$self->{motion_cb}||=$self->signal_connect(motion_notify_event => \&button_press_cb);
-	my $w=$self->allocation->width - $self->{right} - $self->{left};
-	my $x= $event->x - $self->{left}; #warn $x/$w*$self->{adj}->upper;
-	$self->{adj}->set_value($x/$w*$self->{adj}->upper) unless $x<0 || $x>$w;
-	#::SkipTo($x/$w*$self->{adj}->upper) unless $x<0 || $x>$w;
+{	my $self=$_[0];
+	$self->{pressed}= $self->signal_connect(value_changed  => \&value_changed_cb);
 	0;
 }
+
 sub button_release_cb
-{	my ($self,$event)=@_;
-	$self->signal_handler_disconnect(delete $self->{motion_cb}) if $self->{motion_cb};
+{	my $self=$_[0];
+	return 0 unless $self->{pressed};
+	$self->signal_handler_disconnect( delete $self->{pressed} );
+	if ($self->{set_preview})
+	{	$self->{set_preview}->($self, undef);
+		$self->{set}->( $self, $self->{newpos} );
+	}
 	0;
+}
+
+sub value_changed_cb
+{	my $self=$_[0];
+	my $s=$self->get_value;
+	$self->{newpos}=$s;
+	my $sub= $self->{set_preview} || $self->{set};
+	$sub->($self,$s);
+	1;
 }
 
 package Layout::AAPicture;
@@ -2034,7 +2299,7 @@ use Gtk2;
 use base 'Gtk2::EventBox';
 
 sub new
-{	my ($class,$ref,$opt1)=@_;
+{	my ($class,$opt1)=@_;
 	my $self = bless Gtk2::EventBox->new, $class;
 	#$minsize||=$ref->{size};
 	my $minsize=$opt1->{minsize};
@@ -2050,28 +2315,26 @@ sub new
 	$self->signal_connect(expose_event => \&expose_cb);
 	$self->signal_connect(destroy => sub {delete $::ToDo{'8_LoadImg'.$_[0]}});
 	$self->set_size_request($minsize,$minsize) if $minsize;
+	$self->{key}=[];
 	return $self;
 }
 
 sub Changed
 {	my ($self,$key)=@_;
-	return unless $self->{keys};
-	return unless grep $_ eq $key, @{$self->{keys}};
+	return unless grep $_ eq $key, @{$self->{key}};
 	$self->set(delete $self->{key});
 }
 
 sub set
 {	my ($self,$key)=@_;
-	return if defined $self->{key} && $self->{key} eq $key;
+	$key=[] unless defined $key;
+	$key=[$key] unless ref $key;
+	return if $self->{key} && join("\x1D", @$key) eq join("\x1D", @{$self->{key}});
 	$self->{key}=$key;
-	my ($href,@keys)= $self->{ref}{aa} eq 'artist' ?
-				(\%::Artist,split(/$::re_artist/o,$key)) :
-				(\%::Album,$key);
-	$self->{keys}=\@keys;
+	my $col=$self->{ref}{aa};
 	my @files;
-	for my $k (@keys)
-	{	next unless $href->{$k};
-		my $f=$href->{$k}[::AAPIXLIST];
+	for my $k (@$key)
+	{	my $f=AAPicture::GetPicture($col,$k);
 		push @files, $f if $f;
 	}
 	$self->{pixbuf}=undef;
@@ -2156,7 +2419,7 @@ use Gtk2;
 
 use base 'Gtk2::ToggleButton';
 sub new
-{	my ($class,$ref,$opt1,$opt2)=@_;
+{	my ($class,$opt1,$opt2)=@_;
 	my $self = bless Gtk2::ToggleButton->new, $class;
 	my ($icon,$label);
 	$label=Gtk2::Label->new($opt1->{label}) if defined $opt1->{label};
@@ -2218,6 +2481,14 @@ sub new
 	return $self;
 }
 
+sub get_player_window
+{	my $menu=$_[0]->parent;
+	while (ref $menu eq 'Gtk2::Menu')
+	{	$menu=$menu->get_attach_widget->parent;
+	}
+	return ::get_layout_widget($menu);
+}
+
 package GMB::Context;
 use Gtk2;
 our %Contexts;
@@ -2225,15 +2496,14 @@ our %Contexts;
 use base 'Gtk2::VBox';
 
 sub new
-{	my ($class,$ref,$opt1,$opt2)=@_;
+{	my ($class,$opt1,$opt2)=@_;
 	my $self = bless Gtk2::VBox->new, $class;
 	$self->{notebook}=Gtk2::Notebook->new;
 	$self->{notebook}->set_scrollable(::TRUE);
 	$self->{notebook}->popup_enable;
 
 	$self->{group}=$opt1->{group};
-	$self->{followselection}=1 if $opt1->{followselection};
-	my $check= $self->{followselection} ? _"Follow selected song" : _"Follow playing song";
+	my $check= defined $self->{group} ? _"Follow selected song" : _"Follow playing song";
 	$check=Gtk2::CheckButton->new($check);
 	$self->{follow}= $opt2->{follow};
 	for my $key (grep m/__/,keys %$opt2)
@@ -2241,7 +2511,7 @@ sub new
 		$self->{children_opt}{$child}{$opt}= $opt2->{$key};
 	}
 	$check->set_active( $self->{follow} );
-	$check->signal_connect(toggled => sub { $self->{follow}=$_[0]->get_active; $self->SongChanged($self->GetID) if $self->{follow}; });
+	$check->signal_connect(toggled => sub { $self->{follow}=$_[0]->get_active; $self->SongChanged(::GetSelID($self)) if $self->{follow}; });
 	::set_drag($check, dest => [::DRAG_ID,sub
 		{	my ($check,$type,@IDs)=@_;
 			$self->SongChanged($IDs[0],1);
@@ -2252,9 +2522,8 @@ sub new
 	for my $c (keys %Contexts)
 	{	$self->Append($c);
 	}
-	::Watch($self,SongID=>\&PlayingSongChanged);
+	::WatchSelID($self,\&SongChanged);
 	::Watch($self,Context=>\&Changed);
-	::Watch($self,'SelectedID_'.$self->{group},\&SelSongChanged);
 	$self->{SaveOptions}=\&SaveOptions;
 
 	$self->{ID}=$::SongID;
@@ -2301,18 +2570,6 @@ sub Changed
 	}
 }
 
-sub GetID
-{	$_[0]{followselection} ? ::get_layout_widget($_[0])->{SelID} : $::SongID;
-}
-
-sub PlayingSongChanged
-{	$_[0]->SongChanged($::SongID) unless $_[0]{followselection};
-}
-
-sub SelSongChanged
-{	&SongChanged if $_[0]{followselection};
-}
-
 sub SongChanged
 {	my ($self,$ID,$force)=@_;
 	return unless $self->{follow} || $force;
@@ -2334,7 +2591,7 @@ sub Append
 		$w->signal_connect(map => sub { $_[0]->SongChanged($self->{ID}) });
 		$self->{notebook}->append_page($w, Gtk2::Label->new($w->title) );
 		$self->{notebook}->set_tab_reorderable($w,::TRUE);
-		#$w->SongChanged( $self->GetID );
+		#$w->SongChanged( ::GetSelID($self) );
 	}
 }
 
@@ -2368,11 +2625,11 @@ sub PackWidget
 	my ($type,$packsub,$opt)=@{$container->{ExtraWidgets_param}};
 	my ($wsub,$wtype)=@{$Widgets{$id}};
 	return unless $type eq $wtype;
-	my $widget=&$wsub(::get_layout_widget($container));
+	my $widget=$wsub->(::get_layout_widget($container));
 	return unless $widget;
 	$widget->show_all;
 	$widget->{ExtraWidgets_id}=$id;
-	&$packsub($container,$widget,$opt->{pack}||'');
+	$packsub->($container,$widget,$opt->{pack}||'');
 	if ($widget->isa('Gtk2::Button'))
 	{	$widget->set_relief($opt->{relief}) if $opt->{relief};
 	}
@@ -2392,6 +2649,163 @@ sub Changed
 			 { $container->remove($w); $w->destroy; }
 		}
 	}
+}
+
+
+
+package Stars;
+use Gtk2;
+use base 'Gtk2::EventBox';
+
+my (@pixbufs,$width);
+use constant NBSTARS => 5;
+
+INIT
+{	@pixbufs=map Gtk2::Gdk::Pixbuf->new_from_file(::PIXPATH.'stars'.$_.'.png'), 0..NBSTARS;
+	$width=$pixbufs[0]->get_width/NBSTARS;
+}
+
+sub new
+{	my ($class,$nb,$sub) = @_;
+	my $self = bless Gtk2::EventBox->new, $class;
+	$self->{callback}=$sub;
+	my $image=$self->{image}=Gtk2::Image->new;
+	$self->add($image);
+	$self->set($nb);
+	$self->signal_connect(button_press_event => \&click);
+	return $self;
+}
+
+sub callback
+{	my ($self,$value)=@_;
+	if (my $sub=$self->{callback}) {$sub->($self,$value);}
+	else {$self->set($value)}
+}
+sub set
+{	my ($self,$nb)=@_;
+	$self->{nb}=$nb;
+	$nb=$::Options{DefaultRating} if !defined $nb || $nb eq '';
+	$::Tooltips->set_tip($self,_("song rating")." : $nb %");
+	$self->{image}->set_from_pixbuf( get_pixbuf($nb) );
+}
+sub get { shift->{nb}; }
+
+sub click
+{	my ($self,$event)=@_;
+	&popup if $event->button == 3;
+	my ($x)=$event->coords;
+	my $nb=1+int($x/$width);
+	$nb*=100/NBSTARS;
+	$self->callback($nb);
+	return 1;
+}
+
+sub popup
+{	(my $self,$::LEvent)=@_;
+	my $menu=Gtk2::Menu->new;
+	my $set=$self->{nb}; $set='' unless defined $set;
+	my $sub=sub { $self->callback($_[1]); };
+	for my $nb (0,10,20,30,40,50,60,70,80,90,100,'')
+	{	my $item=Gtk2::CheckMenuItem->new( ($nb eq '' ? _"default" : $nb) );
+		$item->set_draw_as_radio(1);
+		$item->set_active(1) if $set eq $nb;
+		$item->signal_connect(activate => $sub, $nb);
+		$menu->append($item);
+	}
+	$menu->show_all;
+	$menu->popup(undef, undef, \&::menupos, undef, $::LEvent->button, $::LEvent->time);
+}
+
+sub createmenu
+{	my $IDs=$_[0]{IDs};
+	my %set;
+	$set{$_}++ for Songs::Map('rating',$IDs);
+	my $set= (keys %set ==1) ? each %set : 'undef';
+	my $cb=sub	{	Songs::Set($IDs,rating => $_[1]);
+			};
+	my $menu=Gtk2::Menu->new;
+	for my $nb ('',0..NBSTARS)
+	{	my $item=Gtk2::CheckMenuItem->new;
+		my ($child,$rating)= $nb eq ''	? (Gtk2::Label->new(_"default"),'')
+						: (Gtk2::Image->new_from_pixbuf($pixbufs[$nb]),$nb*100/NBSTARS);
+		$item->add($child);
+		$item->set_draw_as_radio(1);
+		$item->set_active(1) if $set eq $rating;
+		$item->signal_connect(activate => $cb, $rating);
+		$menu->append($item);
+	}
+	return $menu;
+}
+
+sub get_pixbuf
+{	my $r=$_[0]; my $def=$_[1];
+	if (!defined $r || $r eq '')
+	{	return undef unless $def;
+		$r=$::Options{DefaultRating};
+	}
+	$r=sprintf '%d',$r*NBSTARS/100;
+	return $pixbufs[$r];
+}
+
+
+
+package Layout::Progress;
+sub new
+{	my ($class,$opt1,$opt2,$ref)=@_;
+	my $vert= exists $opt1->{vertical} ? $opt1->{vertical} : $ref->{vertical};
+	my $self= $vert ? Gtk2::VBox->new : Gtk2::HBox->new;
+	::Watch($self,Progress=>\&update);
+	update($self,$_,$::Progress{$_}) for keys %::Progress;
+	$self->{lastclose}=$opt1->{lastclose};
+	$self->{compact}= exists $opt1->{compact} ? $opt1->{compact} : $ref->{compact};
+	return $self;
+}
+sub new_pid
+{	my ($self,$prop)=@_;
+	my $hbox=Gtk2::HBox->new(0,2);
+	my $vbox=Gtk2::VBox->new;
+	my $label;
+	my $bar=Gtk2::ProgressBar->new;
+	unless ($self->{compact})
+	{	$label=Gtk2::Label->new;
+		$label->set_alignment(0,.5);
+		$vbox->pack_start($label,0,0,2);
+	}
+	$hbox->pack_start($bar,1,1,2);
+	$vbox->pack_start($hbox,0,0,2);
+	$self->pack_start($vbox,1,1,2);
+	if (my $sub=$prop->{abortcb})
+	{	my $hint= $prop->{aborthint} || _"Abort";
+		my $abort= ::NewIconButton('gtk-stop',undef,$sub,'none',$hint);
+		$hbox->pack_end($abort,0,0,0);
+	}
+	$vbox->show_all;
+	return [$vbox,$bar,$label];
+}
+sub update
+{	my ($self,$pid,$prop)=@_;
+	unless ($prop)	#task finished => remove widgets
+	{	my $widgets= delete $self->{pids}{$pid};
+		$self->remove( $widgets->[0] ) if $widgets;
+		if ($self->{lastclose} && !($self->get_children)) { $self->get_toplevel->close_window; }
+		return;
+	}
+	my $widgets= $self->{pids}{$pid} ||= new_pid($self,$prop);
+	my (undef,$bar,$label)=@$widgets;
+	my $title=$prop->{title};
+	my $details=$prop->{details};
+	my $bartext=$prop->{bartext};
+	if ($self->{compact})
+	{	$bartext=$title.' ... '.$bartext;
+		$::Tooltips->set_tip( $bar, $details ) if $details;
+	}
+	else
+	{	my $markup= '<b>'.::PangoEsc($title).'</b>';
+		$markup.= "\n".::PangoEsc($details) if $details;
+		$label->set_markup( $markup )
+	}
+	$bar->set_fraction( $prop->{fraction} );
+	$bar->set_text( $bartext )	if defined $bartext;
 }
 
 package Layout::Equalizer;
@@ -2462,6 +2876,7 @@ sub update
 	}
 }
 
+# SVBox and SHBox are Gtk2::VBox and Gtk2::HBox with a smarter size_allocate function : the normal boxes divide the extra space equally among children with the expand mode. With these boxes the extra space can be allocated to children up to a ratio of their other dimension (expand_to_ratio), or according to a weight (expand_weight)
 package SVBox;
 use Gtk2;
 use Glib::Object::Subclass
@@ -2488,7 +2903,7 @@ sub size_allocate
 	my $border=$self->get_border_width;
 	$x+=$border;  $bwidth-=$border*2;
 	$y+=$border; $bheight-=$border*2;
-	my $total_xreq=0; my @ratios; my $ecount=0;
+	my $total_xreq=0; my @emax; my $ecount=0;
 	my $spacing=$self->get_spacing;
 	my @children;
 	for my $child ($self->get_children)
@@ -2497,24 +2912,25 @@ sub size_allocate
 		my ($expand,$fill,$pad,$type)=	($Gtk2::VERSION<1.163 || $Gtk2::VERSION==1.170) ?	 #work around memory leak in query_child_packing (gnome bug #498334)
 			@{$child->{SBOX_packoptions}} : $self->query_child_packing($child);
 		$total_xreq+=$pad*2+$xreq;
-		my $ref=[$child,$expand,$fill,$pad,$type,$xreq];
-		if ($type eq 'end')	{unshift @children,$ref} #to keep the same order as a HBox
-		else			{push @children,$ref}
 		my $eweight= $child->{expand_weight} || 1;
-		if (my $r=$child->{expand_to_ratio}) { push @ratios,[$r,$eweight,$xreq]; $ecount+=$eweight; }
-		elsif ($expand) {$ecount+=$eweight}
+		my $max;
+		my @attrib;
+		if (my $r=$child->{expand_to_ratio})	{$max=$r*$bheight}
+		else					{$max=$child->{expand_max}}
+		if	($max)		{ $max-=$xreq; if ($max>0) {push @emax,[$max*$eweight,$max,$eweight,\@attrib]; $ecount+=$eweight;$expand=$eweight;} else {$expand=0} }
+		elsif	($expand)	{$ecount+=$eweight;$expand=$eweight;}
+		@attrib=($child,$expand,$fill,$pad,$type,$xreq);
+		if ($type eq 'end')	{unshift @children,\@attrib} #to keep the same order as a HBox
+		else			{push @children,\@attrib}
 	}
 	$total_xreq+=$#children*$spacing if @children;
 	my $xend=$x+$bwidth;
-	my $wshare; my $wrest; my @ratios_w; my $only_etr;
+	my $wshare; my $wrest; my $only_etr;
 	if ($total_xreq<$bwidth && $ecount)
 	{	my $w=$bwidth-$total_xreq;
-		while (my $ref=shift @ratios)
-		{	my ($r,$eweight,$xreq)=@$ref;
-			$r=$r*$bheight-$xreq;
-			$r=0 if $r<0;
-			if ($r < $w/$ecount*$eweight) {$w-=$r;push @ratios_w,$r; $ecount-=$eweight; next}
-			else { push @ratios_w,undef; }
+		for my $emax (sort { $a->[0] <=> $b->[0] } @emax)
+		{	my (undef,$max,$eweight,$attrib)=@$emax;
+			if ($max < $w/$ecount*$eweight) {$w-=$max; push @$attrib,$max; $ecount-=$eweight;}
 		}
 		if ($ecount) {$wshare=$w/$ecount}
 		elsif ($w) #all expands were expand_to_ratio and satisfied and space left -> share between those which are packed with expand
@@ -2531,17 +2947,10 @@ sub size_allocate
 	{	$homogeneous=($bwidth-($#children*$spacing))/@children;
 	}
 	for my $ref (@children)
-	{	my ($child,$expand,$fill,$pad,$type,$ww)=@$ref;
+	{	my ($child,$expand,$fill,$pad,$type,$ww,$maxedout)=@$ref;
 		my $wwf= $ww;
-		my $eweight= $child->{expand_weight} || 1;
-		my $r=$child->{expand_to_ratio};
-		if ($r)
-		{	$r=shift @ratios_w;
-			$wwf+=$r if $r;
-			if ($only_etr) {$eweight=1}
-			else {$expand=!defined $r}
-		}
-		$wwf+=$wshare*$eweight if $expand && $wshare;
+		if ($maxedout)	{ $wwf+=$maxedout; }
+		elsif ($wshare)	{ $wwf+=$wshare*$expand; }
 		$wwf=$homogeneous-$pad*2 if $homogeneous;
 		$ww=$wwf if $fill;
 		my $wx;

@@ -41,7 +41,7 @@ sub supported_formats
 	unless (keys %supported)
 	{for (qx($mplayer -msglevel all=4 -ac help))
 	 {	if	(m/^(?:mad|ffmp3)\W.*working/){$supported{mp3}=undef}
-		elsif	(m/^vorbis.*working/)	{$supported{ogg}=undef}
+		elsif	(m/^vorbis.*working/)	{$supported{ogg}=$supported{oga}=undef}
 		elsif	(m/^musepack.*working/)	{$supported{mpc}=undef}
 		elsif	(m/^ffflac.*working/)	{$supported{flac}=undef}
 		elsif	(m/^ffwavpack.*working/){$supported{wv}=undef}
@@ -135,8 +135,8 @@ sub Stop
 	{	print $CMDfh "quit\n";
 		warn "killing $ChildPID\n" if $::debug;
 		#close $OUTPUTfh;
-		#kill 15,$ChildPID;
-		kill 2,$ChildPID;
+		#kill TERM=>$ChildPID;
+		kill INT=>$ChildPID;
 		Glib::Timeout->add( 200,\&_Kill_timeout ) unless @pidToKill;
 		push @pidToKill,$ChildPID;
 		undef $ChildPID;
@@ -146,7 +146,7 @@ sub _Kill_timeout	#make sure old children are dead
 {	@pidToKill=grep kill(0,$_), @pidToKill;
 	if (@pidToKill)
 	{ warn "killing -9 @pidToKill\n" if $::debug;
-	  kill 9,@pidToKill;
+	  kill KILL=>@pidToKill;
 	  undef @pidToKill;
 	}
 	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
@@ -159,7 +159,7 @@ sub error
 
 sub AdvancedOptions
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $hbox0=::NewPrefEntry('mplayeroptions','mplayer options :');
+	my $hbox0=::NewPrefEntry('mplayeroptions',_"mplayer options :");
 	$vbox->pack_start($hbox0,::FALSE,::FALSE,2);
 	my $hbox=Play_amixer->make_option_widget;
 	$vbox->pack_start($hbox,::FALSE,::FALSE,2);

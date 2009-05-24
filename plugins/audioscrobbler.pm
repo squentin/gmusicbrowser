@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -20,9 +20,11 @@ use constant
 	OPT => 'PLUGIN_AUDIOSCROBBLER_',#used to identify the plugin's options
 	SAVEFILE => 'audioscrobbler.queue', #file used to save unsent data
 };
-use Time::Local 'timegm'; #only to read queue from old version
+use POSIX 'mktime'; #only to read queue from old version
 use Digest::MD5 'md5_hex';
 require 'simple_http.pm';
+
+our $ignore_current_song;
 
 my $self=bless {},__PACKAGE__;
 my ($currentsong,$timecount,$songsubmitted);
@@ -56,8 +58,8 @@ sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	my $entry1=::NewPrefEntry(OPT.'USER',_"username :",\&userpass_changed,$sg1,$sg2);
-	my $entry2=::NewPrefEntry(OPT.'PASS',_"password :",\&userpass_changed,$sg1,$sg2,1);
+	my $entry1=::NewPrefEntry(OPT.'USER',_"username :", cb => \&userpass_changed, sizeg1 => $sg1,sizeg2=>$sg2);
+	my $entry2=::NewPrefEntry(OPT.'PASS',_"password :", cb => \&userpass_changed, sizeg1 => $sg1,sizeg2=>$sg2, hide => 1);
 	my $label2=Gtk2::Button->new(_"(see http://www.last.fm)");
 	$label2->set_relief('none');
 	$label2->signal_connect(clicked => sub
@@ -66,7 +68,10 @@ sub prefbox
 			$url.="/user/$user/" if defined $user && $user ne '';
 			::openurl($url);
 		});
-	$vbox->pack_start($_,::FALSE,::FALSE,0) for $label2,$entry1,$entry2;
+	my $ignore=Gtk2::CheckButton->new(_"Don't submit current song");
+	$ignore->signal_connect(toggled=>sub { return if $_[0]->{busy}; $ignore_current_song=$_[0]->get_active; ::HasChanged('Lastfm_ignore_current'); });
+	::Watch($ignore,Lastfm_ignore_current => sub { $_[0]->{busy}=1; $_[0]->set_active($ignore_current_song);delete $_[0]->{busy}; } );
+	$vbox->pack_start($_,::FALSE,::FALSE,0) for $label2,$entry1,$entry2,$ignore;
 	$vbox->add( ::LogView($Log) );
 	return $vbox;
 }
@@ -80,22 +85,21 @@ sub SongChanged
 	return if defined $currentsong && $currentsong==$::SongID;
 	$currentsong=$::SongID;
 	$songsubmitted=$timecount=0;
+	if ($ignore_current_song) {$ignore_current_song=undef; ::HasChanged('Lastfm_ignore_current');}
 	#FIXME submit nowplaying
 }
 
 sub Played
-{	my $ID=$::PlayingID;
+{	return if $ignore_current_song;
+	my $ID=$::PlayingID;
 	my $diff=($::PlayTime||0)-($::StartedAt||0);
 	return unless $diff>0;
 	$timecount+=$diff;
-	my $length=$::Songs[$ID][::SONG_LENGTH];
+	my $length= Songs::Get($ID,'length');
 	if (!$songsubmitted && $length>=30 && ($timecount >= 240 || $timecount >= $length/2) )
 	{	$songsubmitted=1;
-		my ($title,$artist,$album,$track)
-			=@{$::Songs[$ID]}[::SONG_TITLE,::SONG_ARTIST,::SONG_ALBUM,::SONG_TRACK];
-		return if $title eq '';
-		return if $artist eq '<Unknown>';
-		$album='' if $album=~m/^<Unknown>/;
+		my ($title,$artist,$album,$track)= Songs::Get($ID,qw/title artist album track/);
+		return if $title eq '' || $artist eq '';
 		::IdleDo("9_".__PACKAGE__,10000,\&Save) if @ToSubmit>$unsent_saved;
 		push @ToSubmit,[ $artist,$title,$album,'',$length,$::StartTime,$track,'P' ];
 		Sleep();
@@ -147,7 +151,7 @@ sub Submit
 	my $i=0;
 	while (my $aref=$ToSubmit[$i])
 	{	my @data= map { defined $_ ? ::url_escapeall($_) : "" } @$aref;
-		$post.=sprintf "&a[$i]=%s&t[$i]=%s&b[$i]=%s&m[$i]=%s&l[$i]=%s&i[$i]=%s&n[$i]=%s&o[$i]=%s&r[$i]=", @data;
+		$post.=sprintf "&a[$i]=%s&t[$i]=%s&b[$i]=%s&m[$i]=%s&l[$i]=%s&i[$i]=%s&n[$i]=%s&o[$i]=%s&r[$i]=",@data;
 		$i++;
 		last if $i==50; #don't submit more than 50 songs at a time
 	}
@@ -227,7 +231,7 @@ sub Load 	#read unsent data
 		my @data=split "\x1D",$line;
 		if (@data==6) # for previous version
 		{	my ($year,$mon,$mday,$hour,$min,$sec)= $data[5]=~m/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)/;
-			$data[5]=timegm($sec,$min,$hour,$mday,--$mon,$year);
+			$data[5]=mktime($sec,$min,$hour,$mday,--$mon,$year);
 			push @data,'','P';
 		}
 		push @ToSubmit,\@data if @data==8;

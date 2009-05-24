@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2008 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -375,7 +375,7 @@ sub _openw
 	until (open $fh,$m,$file)
 	{	my $err="Error opening '$file' for writing :\n$!";
 		warn $err."\n";
-		return undef unless $self->{errorsub} && &{ $self->{errorsub} }($err) eq 'yes';
+		return undef unless $self->{errorsub} && $self->{errorsub}($err) eq 'yes';
 	}
 	binmode $fh;
 	$self->{fileHandle} = $fh unless $tmp;
@@ -971,7 +971,7 @@ sub new_from_file
 	# $49 44 33 yy yy xx zz zz zz zz
 	# Where yy is less than $FF, xx is the 'flags' byte and zz is less than  $80
 	if ($v1>4) {warn "Unsupported version ID3v2.$v1.$v2 -> skipped\n"; return undef;}
-	$tag{version}="$v1.$v2";
+	$tag{version}= $v1 . ($v2 ? ".$v2" : '');
 	$tag{size}=10+($size=_decodesyncsafe($size));
 	my $footorhead;
 	if	($id eq '3DI')
@@ -1198,7 +1198,7 @@ sub new_from_file
 			#warn "-- $frame -- $t ".($debug_pos-length($rawf))." bytes\n";	#DEBUG
 			redo if ($joker &&  $t ne 'e' && length($rawf)>0);
 		}
-		&{ $Special{$frame} }(\@data,$v1) if $Special{$frame};
+		$Special{$frame}(\@data,$v1) if $Special{$frame};
 		#print " @data\n"; #DEBUG
 		if ($joker && $tag{frames}{$frame}[1])
 		{	delete $tag{frames}{$frame}[1];

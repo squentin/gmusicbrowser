@@ -1,9 +1,10 @@
-# Copyright (C) 2005-2008 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
+
 
 =gmbplugin WebContext
 Web context
@@ -56,7 +57,10 @@ sub net_startstop_cb
 	$self->{BStop}->set_sensitive( $loading );
 	$self->{BBack}->set_sensitive( $embed->can_go_back );
 	$self->{BNext}->set_sensitive( $embed->can_go_forward );
+	my $cursor= $loading ? Gtk2::Gdk::Cursor->new('watch') : undef;
+	$embed->window->set_cursor($cursor) if $embed->window;
 	my $uri=$embed->get_location;
+	$self->{Entry}->set_text($uri) if $loading;
 	$uri= $uri=~m#^https?://# ? 1 : 0 ;
 	$self->{BOpen}->set_sensitive($uri);
 }
@@ -119,7 +123,10 @@ sub net_startstop_cb
 	$self->{BStop}->set_sensitive( $loading );
 	$self->{BBack}->set_sensitive( $embed->can_go_back );
 	$self->{BNext}->set_sensitive( $embed->can_go_forward );
+	my $cursor= $loading ? Gtk2::Gdk::Cursor->new('watch') : undef;
+	$embed->window->set_cursor($cursor) if $embed->window;
 	my $uri=$frame->get_uri;
+	$self->{Entry}->set_text($uri) if $loading;
 	$uri= $uri=~m#^https?://# ? 1 : 0 ;
 	$self->{BOpen}->set_sensitive($uri);
 }
@@ -211,12 +218,13 @@ sub update_Context_hash
 
 sub new
 {	my ($class)=@_;
-	my $self = bless Gtk2::VBox->new, $class;
+	my $self = bless Gtk2::VBox->new(0,0), $class;
 	my $hbox = Gtk2::HBox->new;
 	my $status=$self->{status}=Gtk2::Statusbar->new;
 	$status->{id}=$status->get_context_id('link');
 	($self->{embed},my $container)= $self->new_embed;
 	$container||=$self->{embed};
+	my $entry=$self->{Entry}=Gtk2::Entry->new;
 	my $back= $self->{BBack}=Gtk2::ToolButton->new_from_stock('gtk-go-back');
 	my $next= $self->{BNext}=Gtk2::ToolButton->new_from_stock('gtk-go-forward');
 	my $stop= $self->{BStop}=Gtk2::ToolButton->new_from_stock('gtk-stop');
@@ -226,10 +234,14 @@ sub new
 	#::set_drag($open,source=>[::DRAG_FILE,sub {$embed->get_location;}]);
 	$self->{$_}->set_sensitive(0) for qw/BBack BNext BStop BOpen/;
 	$hbox->pack_start($_,::FALSE,::FALSE,4) for grep defined, $back,$next,$stop,$open,$self->addtoolbar;
+	$hbox->pack_start($entry,::TRUE,::TRUE,4);
 	$self->pack_start($hbox,::FALSE,::FALSE,1);
 	$self->add( $container );
-	$self->pack_end($status,::FALSE,::FALSE,1) if $::Options{OPT.'StatusBar'};
+	$self->pack_end($status,::FALSE,::FALSE,1);
+	#$entry->set_no_show_all( ! $::Options{OPT.'URIentry'});
+	$status->set_no_show_all( ! $::Options{OPT.'StatusBar'});
 	$self->show_all;
+	$entry->signal_connect(activate => sub { ::find_ancestor($_[0],__PACKAGE__)->load_url($_[0]->get_text); });
 	$back->signal_connect(clicked => sub { ::find_ancestor($_[0],__PACKAGE__)->go_back });
 	$next->signal_connect(clicked => sub { ::find_ancestor($_[0],__PACKAGE__)->go_forward });
 	$stop->signal_connect(clicked => sub { ::find_ancestor($_[0],__PACKAGE__)->stop_load });
@@ -265,6 +277,7 @@ sub prefbox
 
 sub load_url
 {	my ($self,$url,$post)=@_;
+	$url='http://'.$url unless $url=~m#^\w+://#;# || $url=~m#^about:#;
 	$self->{url}=$url;
 	$self->{post}=$post;
 	if ($post)
@@ -282,6 +295,10 @@ sub link_message
 
 sub set_stripped_wiki { GMB::Plugin::WebContext::MozEmbed::set_stripped_wiki( $::Options{OPT.'StrippedWiki'} ); } #FIXME
 
+
+#################################################################################
+
+
 package GMB::Plugin::WebContext::Lyrics;
 our @ISA=('GMB::Plugin::WebContext');
 
@@ -297,7 +314,9 @@ my %sites=
 	google  => ['google','http://www.google.com/search?q="%a"+"%s"'],
 	googlemusic  => ['google music','http://www.google.com/musicsearch?q="%a"+"%s"'],
 	lyriki  => ['lyriki','http://lyriki.com/index.php?title=%a:%s'],
-	lyricwiki => ['lyricwiki','http://lyricwiki.org/%a:%s'],
+	#lyricwiki => ['lyricwiki','http://lyricwiki.org/%a:%s'],
+	lyricwiki => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%s&fmt=html'],
+	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a'],
 );
 
 ::SetDefaultOptions(OPT, LyricSite => 'google');
@@ -309,7 +328,7 @@ sub addtoolbar
 	 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 		$self->SongChanged($self->{ID},1);
 	 };
-	my $combo=::NewPrefCombo( OPT.'LyricSite', \%h, undef, $cb);
+	my $combo=::NewPrefCombo( OPT.'LyricSite', \%h, cb => $cb, toolitem => _"Lyrics source");
 	return $combo;
 }
 
@@ -318,12 +337,8 @@ sub SongChanged
 	return unless defined $ID;
 	return if defined $self->{ID} && $ID==$self->{ID} && !$force;
 	$self->{ID}=$ID;
-	my $ref=$::Songs[$ID];
-	my $title=$ref->[::SONG_TITLE];
-	return if !defined $title || $title eq '';
-	my $artist=$ref->[::SONG_ARTIST];
-	$artist=::url_escapeall($artist);
-	$title= ::url_escapeall($title);
+	my ($title,$artist)= map ::url_escapeall($_), Songs::Get($ID,qw/title artist/);
+	return if $title eq '';
 	my (undef,$url,$post)=@{$sites{$::Options{OPT.'LyricSite'}}};
 	for ($url,$post) { next unless defined $_; s/%a/$artist/; s/%s/$title/; }
 	::IdleDo('8_mozlyrics'.$self,1000,sub {$self->load_url($url,$post)});
@@ -359,7 +374,7 @@ sub addtoolbar
 	 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 		$self->SongChanged($self->{ID},1);
 	 };
-	my $combo=::NewPrefCombo( OPT.'WikiLocale', \%locales, undef, $cb);
+	my $combo=::NewPrefCombo( OPT.'WikiLocale', \%locales, cb => $cb, toolitem => _"Wikipedia Locale");
 	return $combo;
 }
 
@@ -367,10 +382,9 @@ sub SongChanged
 {	my ($self,$ID,$force)=@_;
 	return unless defined $ID;
 	$self->{ID}=$ID;
-	my $artist=$::Songs[$ID][::SONG_ARTIST];
-	return if !defined $artist || $artist eq '' || $artist eq '<Unknown>';
+	my $artist=Songs::Get($ID,'first_artist'); #FIXME add a way to choose artist ?
+	return if $artist eq '';
 	return if defined $self->{Artist} && $artist eq $self->{Artist} && !$force;
-	($artist)=split /$::re_artist/o,$artist; #FIXME add a way to choose artist ?
 	$self->{Artist}=$artist;
 	$artist=::url_escapeall($artist);
 	my $url='http://'.$::Options{OPT.'WikiLocale'}.'.wikipedia.org/wiki/'.$artist;
@@ -390,7 +404,7 @@ sub wikiload	#not used for now
 			if (!$_[0] || $_[0]=~m/No page with that title exists/)
 			{	Simple_http::get_with_cb(cb => $cb, url => $url);
 			}
-			else { $self->{url}.='_(band)'; goto $cb }
+			else { $self->{url}.='_(band)'; &$cb }
 		},url => $url.'_(band)');
 }
 
@@ -411,16 +425,15 @@ use constant
 
 sub addtoolbar
 {	#my $self=$_[0];
-	#my $combo=Gtk2::ComboBox->new_text;
-	#return $combo;
+	return ();
 }
 
 sub SongChanged
 {	my ($self,$ID,$force)=@_;
 	return unless defined $ID;
 	$self->{ID}=$ID;
-	my $artist=$::Songs[$ID][::SONG_ARTIST];
-	return if !defined $artist || $artist eq '' || $artist eq '<Unknown>';
+	my $artist=Songs::Get($ID,'artist');
+	return if !defined $artist || $artist eq '';
 	return if defined $self->{Artist} && $artist eq $self->{Artist} && !$force;
 	$self->{Artist}=$artist;
 	$artist=~s/ /+/g;

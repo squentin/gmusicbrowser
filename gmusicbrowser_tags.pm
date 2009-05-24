@@ -17,179 +17,256 @@ use strict;
 use warnings;
 
 
-package ReadTag;
+package FileTag;
 
 our %FORMATS;
-my (%TAGKEYS,%LYRICS3KEYS,%APEKEYS);
 
 INIT
 {
- %FORMATS=
- (	mp3	=> ['Tag::MP3',	'mp3 l{layer}v{versionid}',	[qw/ID3v2 APE lyrics3v2 ID3v1/],],
-	ogg	=> ['Tag::OGG', 'ogg v{version}',		['vorbis'],],
-	flac	=> ['Tag::Flac','flac',				['vorbis'],],
-	mpc	=> ['Tag::MPC',	'mpc v{version}',		[qw/APE ID3v2 lyrics3v2 ID3v1/],],
-	ape	=> ['Tag::APEfile','ape v{version}',		[qw/APE ID3v2 lyrics3v2 ID3v1/],],
-	wv	=> ['Tag::WVfile','wv v{version}',		[qw/APE ID3v1/],],
+ %FORMATS=	    # module		format string			tags to look for (order is important)
+ (	mp3	=> ['Tag::MP3',		'mp3 l{layer}v{versionid}',	'ID3v2 APE lyrics3v2 ID3v1',],
+	oga	=> ['Tag::OGG',		'vorbis v{version}',		'vorbis',],
+	flac	=> ['Tag::Flac',	'flac',				'vorbis',],
+	mpc	=> ['Tag::MPC',		'mpc v{version}',		'APE ID3v2 lyrics3v2 ID3v1',],
+	ape	=> ['Tag::APEfile',	'ape v{version}',		'APE ID3v2 lyrics3v2 ID3v1',],
+	wv	=> ['Tag::WVfile',	'wv v{version}',		'APE ID3v1',],
 );
 #$FORMATS{wvc}=$FORMATS{wv};
-
- %TAGKEYS=
- (TIT2 => ::SONG_TITLE,		title		=> ::SONG_TITLE,
-  TPE1 => ::SONG_ARTIST,	artist		=> ::SONG_ARTIST,
-  TALB => ::SONG_ALBUM,		album		=> ::SONG_ALBUM,
-  TRCK => ::SONG_TRACK,		tracknumber	=> ::SONG_TRACK,
-  TYER => ::SONG_DATE,		year		=> ::SONG_DATE,
-  TDRC => ::SONG_DATE,		date		=> ::SONG_DATE,
-  COMM => ::SONG_COMMENT,	description	=> ::SONG_COMMENT,
-  comments => ::SONG_COMMENT,	comment		=> ::SONG_COMMENT,
-  TCON => ::SONG_GENRE,		genre		=> ::SONG_GENRE,
-  TPOS => ::SONG_DISC,		discnumber	=> ::SONG_DISC,
-  TIT3 => ::SONG_VERSION,	version		=> ::SONG_VERSION,
-  TOPE => ::SONG_AUTHOR,	author		=> ::SONG_AUTHOR,
- );
-
- %APEKEYS= #http://www.ikol.dk/~jan/musepack/klemm/www.personal.uni-jena.de/~pfk/mpp/sv8/apetag.html
- ( Title => ::SONG_TITLE,	Artist=> ::SONG_ARTIST,		Album => ::SONG_ALBUM,
-   Track => ::SONG_TRACK,	Comment=>::SONG_COMMENT,	Genre => ::SONG_GENRE,
-   Year  => ::SONG_DATE,	'Record Date'=> ::SONG_DATE,
- );
-
- %LYRICS3KEYS=	#http://www.id3.org/lyrics3200.html
- ( ETT => ::SONG_TITLE,		EAR => ::SONG_ARTIST,		EAL => ::SONG_ALBUM,
-   INF => ::SONG_COMMENT,	AUT => ::SONG_AUTHOR,
- );
-
+$FORMATS{ogg}=$FORMATS{oga};
 }
 
 sub Read
-{	my ($aref,$file,$findlength)=@_;
+{	my ($file,$findlength)=@_;
 	#$file=Glib->filename_from_unicode($file);
 	return undef unless $file=~m/\.([^.]+)$/;
 	my $format=$FORMATS{lc $1};
 	return undef unless $format;
-	my $filetag= eval { $format->[0]->new($file,$findlength); }; #filelength==1 -> may return estimated length (mp3 only)
+	my ($package,$formatstring,$plist)=@$format;
+	my $filetag= eval { $package->new($file,$findlength); }; #filelength==1 -> may return estimated length (mp3 only)
 	unless ($filetag) { warn $@ if $@; warn "can't read tags for $file\n"; return undef;}
 
-	my @tag;
-	my $formatstring=$format->[1];
-	for my $t (@{$format->[2]})
-	{if ($t eq 'vorbis')
-	 {	for my $key ($filetag->listkeys)
-		{	if ( defined (my $n=$TAGKEYS{lc $key}) )
-			{	my @vals=$filetag->keyvalues($key);
-				push @{ $tag[$n] },@vals;
-			}
-		}
-	 }
-	 elsif ($t eq 'ID3v1' && $filetag->{ID3v1})
-	 {	my @id3v1=@{ $filetag->{ID3v1} };
-		#warn "*$_*\n" for @id3v1;
-		$id3v1[5]='' unless $id3v1[5];	# for ::SONG_TRACK, to ignore '0'
-		for (::SONG_TITLE,::SONG_ARTIST,::SONG_ALBUM,::SONG_DATE,::SONG_COMMENT,::SONG_TRACK,::SONG_GENRE)
-		  { push @{$tag[$_]},shift @id3v1; }
-	 }
-	 elsif ($t eq 'ID3v2')
-	 {	my @id3v2s;
-		push @id3v2s,$filetag->{ID3v2} if $filetag->{ID3v2};
-		push @id3v2s,@{ $filetag->{ID3v2s} } if $filetag->{ID3v2s};
-		for my $ID3v2 ( @id3v2s )
-		{	for my $fname (qw/TIT2 TPE1 TALB TDRC TYER TRCK TPOS TIT3 COMM/)
-			{	next unless exists $ID3v2->{frames}{$fname};
-				my $i=($fname eq 'COMM')? 2 : 0;
-				push @{ $tag[$TAGKEYS{$fname}] },$$_[$i] for @{ $ID3v2->{frames}{$fname} };
-				#warn "/$$_[$i]/\n" for @{ $ID3v2->{$fname} };
-			}
-			if (exists $ID3v2->{frames}{TCON}) { push @{ $tag[$TAGKEYS{TCON}] },@$_ for @{ $ID3v2->{frames}{TCON} }; }
-		}
-	 }
-	 elsif ($t eq 'APE' && $filetag->{APE})
-	 {	while (my ($k,$v)=each %{ $filetag->{APE}{item} })
-		{	push @{$tag[ $APEKEYS{$k} ]},@$v if exists $APEKEYS{$k};
-		}
-	 }
-	 elsif ($t eq 'lyrics3v2' && $filetag->{lyrics3v2})
-	 {	while (my ($k,$v)=each %{ $filetag->{lyrics3v2}{fields} })
-			{	push @{$tag[ $LYRICS3KEYS{$k} ]},$v if exists $LYRICS3KEYS{$k};
-			}
-	 }
-	}
+	my @taglist;
+	my %values;	#results will be put in %values
 	my $estimated;
-	if (my $info=$filetag->{info})
+	if (my $info=$filetag->{info})	#audio properties
 	{	$estimated=$info->{estimated};
-		if ( exists $info->{seconds}
-		     && ( !$estimated || ($findlength && !$$aref[::SONG_LENGTH]) )
-		   )	#don't replace existing values for length and bitrate by estimated values (for mp3)
-		{	$$aref[::SONG_LENGTH]= sprintf '%.0f',$info->{seconds};
-			my $bitrate=$info->{bitrate} || $info->{bitrate_nominal};	#FIXME
-			$$aref[::SONG_BITRATE]=sprintf '%.0f',$bitrate/1000;
-		}
+		if ($info->{estimated} && $findlength!=1) { delete $info->{seconds}; delete $info->{bitrate}; }
 		$formatstring=~s/{(\w+)}/$info->{$1}/g;
-		$$aref[::SONG_FORMAT]=$formatstring;
-		$$aref[::SONG_CHANNELS]=$info->{channels};
-		$$aref[::SONG_SAMPRATE]=$info->{rate};
+		$values{filetype}=$formatstring;
+		for my $f (grep $Songs::Def{$_}{audioinfo}, @Songs::Fields)
+		{	for my $key (split /\|/,$Songs::Def{$f}{audioinfo})
+			{	my $v=$info->{$key};
+				if (defined $v) {$values{$f}=$v; last}
+			}
+		}
 	}
-	SetTags($aref,\@tag);
+	for my $tag (split / /,$plist)
+	{	if ($tag eq 'vorbis')
+		{	push @taglist, vorbis => $filetag->{comments};
+		}
+		elsif ($tag eq 'ID3v1' && $filetag->{ID3v1})
+		{	push @taglist, id3v1 => { map( ($_ => $filetag->{ID3v1}[$_]), 0..6) }; #transform it into a hash
+		}
+		elsif ($tag eq 'ID3v2' && $filetag->{ID3v2})
+	 	{	push @taglist, id3v2 => $filetag->{ID3v2}{frames};
+			if ($filetag->{ID3v2s})
+			{	push @taglist, id3v2 => $_->{frames} for @{ $filetag->{ID3v2s} };
+			}
+		}
+		elsif ($tag eq 'APE' && $filetag->{APE})
+		{	push @taglist, ape => $filetag->{APE}{item};
+		}
+		elsif ($tag eq 'lyrics3v2' && $filetag->{lyrics3v2})
+		{	my $h=$filetag->{lyrics3v2}{fields};
+			push @taglist, lyrics3 => { map { $_ => $h->{$_} }  keys %$h };
+		}
+	}
+	for my $field (grep $Songs::Def{$_}{flags}=~m/r/, @Songs::Fields)
+	{	for (my $i=0; $i<$#taglist; $i+=2)
+		{	my $id=$taglist[$i]; #$id is type of tag : id3v1 id3v2 ape vorbis lyrics3
+			my $h=$taglist[$i+1];
+			my $value;
+			if (defined(my $keys=$Songs::Def{$field}{$id})) #generic cases
+			{	my $joinwith= $Songs::Def{$field}{join_with};
+				my $join= $Songs::Def{$field}{flags}=~m/l/ || defined $joinwith;
+				for my $key (split /\|/,$keys)
+				{	$key=~s/\*$//;	#remove ';*', only used for writing tags
+					($key,my @extra)= split /;/,$key,-1;  #-1 to keep empty trailing fields
+					my $v=$h->{$key};
+					next unless defined $v;
+					$v=[$v] unless ref $v;
+					if (@extra && ref $v->[0]) #for id3v2 multi fields (COMM for example)
+					{	my @vals=
+						     map{ my $v_ok; my $notok;
+							  for my $j (0..$#extra)
+							  {	my $p=$extra[$j];
+								my $vj=$_->[$j];
+								if ($p eq '%v') { $v_ok=$vj; }
+								elsif ($p ne '' && $p ne $vj) {$notok=1;last}
+							  }
+							  $notok ? () : ($v_ok);
+							} @$v;
+						$v=\@vals;
+					}
+					elsif (ref $v->[0])	#for id3v2, even single values are a one-element list
+					{	$v= [map @$_, @$v];
+					}
+					if (my $sub= $Songs::Def{$field}{preset} ) #not used
+						{ @$v= map $sub->($_), @$v; next unless @$v; }
+					if ($join)		{ push @$value, @$v; }
+					else			{ $value= $v->[0]; last; }
+				}
+				if (defined $joinwith && $value) { $value=join $joinwith,@$value; }
+			}
+			elsif (my $sub=$Songs::Def{$field}{"$id:read"}) #special cases with custom function
+			{	$values{$field}= $sub->($h);
+				# OR just $sub->($h); ????
+				# last ??? depend on return value ???
+				last;
+			}
+			if (defined $value) { $values{$field}=$value; last }
+		}
+	}
 
-	return ($estimated? 2 : 1);
+	return \%values,$estimated;
 }
 
-sub SetTags
-{	my ($aref,$tags)=($_[0],$_[1]);
-	for my $n (@::TAGSREADFROMTAGS)
-	{	$$aref[$n]=undef;
-		my $tag=$tags->[$n];
-		next unless $tag;
-		s/\s+$// for @$tag;
-		tr/\x1D\x00//d for @$tag;
-		if ($n==::SONG_GENRE)
-		{	my %genres;
-			$genres{ucfirst $_}=undef for grep $_ ne '', @$tag;
-			$$aref[$n]=join("\x00",sort keys %genres)."\x00";
-			next;
+sub Write
+{	my ($ID,$modif,$errorsub)=@_; warn "Tag::Write($ID,[@$modif],$errorsub)\n";
+	$modif= do { my @m; while (@$modif) { my $f=shift @$modif; my $v=shift @$modif; push @m,[$f,(ref $v ? @$v : $v )]; } \@m }; #FIXME PHASE1 TEMP
+	my $file= Songs::GetFullFilename($ID);
+
+	my ($format)= $file=~m/\.([^.]*)$/;
+	return undef unless $format and $format=$FileTag::FORMATS{lc$format};
+	my $tag= $format->[0]->new($file);
+	unless ($tag) {warn "can't read tags for $file\n";return undef;}
+
+	my ($maintag)=split / /,$format->[2],2;
+	if ($maintag eq 'ID3v2' || $tag->{ID3v1})
+	{	my $id3v1 = $tag->{ID3v1} || $tag->new_ID3v1;
+		for my $aref (@$modif)
+		{	my ($field,$val)=@$aref;
+			my $i=$Songs::Def{$field}{id3v1};
+			next unless defined $i;
+			$id3v1->[$i]= $val;	# $val is a arrayref for genres
 		}
-		if ($n==::SONG_COMMENT)
-		{	my %h;
-			$$aref[$n]=join ' ',			 #FIXME join with \n ?
-				grep !($_ eq '' || $h{$_}++), @$tag; #remove duplicated or empty comments
-			next;
-		}
-		my $val;
-		for (@$tag)
-		{	if ($n==::SONG_TRACK)
-			  { s#(\d+)/\d+#$1#; $val=sprintf '%02d',$_ if m/^\d+$/; }
-			elsif ($n==::SONG_DATE) { $val=$1 if m/(\d{4})/;  }
-			#else { $val=$_ if defined $_; }
-			else { $val=$_; }
-			last if defined $val;
-		}
-		$$aref[$n]=$val;
 	}
-	unless ($$aref[::SONG_ALBUM])
-	{	$$aref[::SONG_ALBUM]='<Unknown>';
-		$$aref[::SONG_ALBUM].=' ('.$$aref[::SONG_ARTIST].')' if $$aref[::SONG_ARTIST];
+	if ($maintag eq 'ID3v2' || $tag->{ID3v2})
+	{	my $id3v2 = $tag->{ID3v2} || $tag->new_ID3v2;
+		my ($ver)= $id3v2->{version}=~m/^(\d+)/;
+		my @todo;
+		for my $aref (@$modif)
+		{	my ($field,@vals)=@$aref;
+			if (my $sub=  $Songs::Def{$field}{'id3v2.'.$ver.':write'} || $Songs::Def{$field}{'id3v2:write'})
+			{	push @todo, $sub->(@vals);
+			}
+			elsif (my $keys= $Songs::Def{$field}{'id3v2.'.$ver} || $Songs::Def{$field}{id3v2})
+			{	my @keys= split /\|/,$keys;
+				push @todo, $_ => undef for @keys;
+				push @todo, $keys[0] => \@vals;
+			}
+		}
+		while (@todo)
+		{	my $key= shift @todo;
+			my $val= shift @todo;
+			($key,my @extra)=split /;/,$key,-1; #-1 to keep empty trailing fields #COMM;;;%v => key="COMM" and @extra=("","")
+			my $can_be_list= $key=~s/\*$//;
+			if ($val)
+			{	if (@extra)
+				{	for my $v (@$val)
+					{	my @parts=map {$_ eq '%v' ? $v : $_} @extra;
+						$id3v2->insert($key, @parts);
+					}
+				}
+				elsif ($can_be_list)
+				{	warn "\$id3v2->insert($key, @$val)";
+					$id3v2->insert($key, @$val);
+				}
+				else { $id3v2->insert($key,$_) for reverse @$val; }
+			}
+			else
+			{	if (@extra)
+				{	my $ref=$id3v2->{frames}{$key};
+					next unless $ref;
+					for my $i (0..$#$ref)
+					{	my $keep;
+						for my $j (0..$#extra)
+						{	next unless $extra[$j] eq '%v' || $extra[$j] eq '';
+							$keep=1 if $extra[$j] ne $ref->[$i][$j];
+						}
+						$id3v2->remove_all($key,$i) unless $keep;
+					}
+				}
+				else { $id3v2->remove_all($key) }
+			}
+		}
 	}
-	$$aref[::SONG_ARTIST]='<Unknown>' unless $$aref[::SONG_ARTIST];
+	if ($maintag eq 'vorbis')
+	{	my @todo;
+		for my $aref (@$modif)
+		{	my ($field,@vals)=@$aref;
+			if (my $sub=$Songs::Def{$field}{'vorbis:write'})
+			{	push @todo, $sub->(@vals);
+			}
+			elsif (my $keys=$Songs::Def{$field}{vorbis})
+			{	my @keys= split /\|/,$keys;
+				push @todo, $_ => undef for @keys;
+				push @todo, $keys[0] => \@vals;
+			}
+		}
+		while (@todo)
+		{	my $key= shift @todo;
+			my $val= shift @todo;
+			if ($val)		{ $tag->insert($key,$_) for reverse @$val}
+			else			{ $tag->remove_all($key) }
+		}
+	}
+	if ($maintag eq 'APE' || $tag->{APE})
+	{	my @todo;
+		for my $aref (@$modif)
+		{	my ($field,@vals)=@$aref;
+			if (my $sub=$Songs::Def{$field}{'ape:write'})
+			{	push @todo, $sub->(@vals);
+			}
+			elsif (my $keys=$Songs::Def{$field}{ape})
+			{	my @keys= split /\|/,$keys;
+				push @todo, $_ => undef for @keys;
+				push @todo, $keys[0] => \@vals;
+			}
+		}
+		my $ape = $tag->{APE} || $tag->new_APE;
+		while (@todo)
+		{	my $key= shift @todo;
+			my $val= shift @todo;
+			if ($val)		{ $tag->insert($key,$_) for reverse @$val}
+			else			{ $ape->remove_all($key) }
+		}
+	}
+	$tag->{errorsub}=$errorsub;
+	$tag->write_file unless $::CmdLine{ro}  || $::CmdLine{rotags};
+	return 1;
 }
 
-sub FindTrueMP3Length
-{	my $file=Glib->filename_from_unicode(shift);
-	my $mp3=Tag::MP3->new($file,2);	#the 2 force return true length only
-	unless ($mp3 && $mp3->{info}) {warn "can't find length for $file, probably invalid file.\n";return undef;}
-	my $s= sprintf '%.0f',$mp3->{info}{seconds};
-	my $br=sprintf '%.0f',$mp3->{info}{bitrate};
-	return ($s,$br);
-}
-
-sub PixFromMP3
+sub PixFromMusicFile
 {	my $file=$_[0];
 	#$file=Glib->filename_from_unicode($file);
 	return undef unless -r $file;
-	my $mp3=Tag::MP3->new($file,0);
-	unless ($mp3) {warn "can't read tags for $file\n";return undef;}
-	unless ($mp3->{ID3v2} && $mp3->{ID3v2}{frames}{APIC})
-		{warn "no picture found in $file\n";return undef;}
-	my $pix=$mp3->{ID3v2}{frames}{APIC};
+	my $pix;
+	if ($file=~m/\.mp3$/i)
+	{	my $tag=Tag::MP3->new($file,0);
+		unless ($tag) {warn "can't read tags for $file\n";return undef;}
+		unless ($tag->{ID3v2} && $tag->{ID3v2}{frames}{APIC})
+			{warn "no picture found in $file\n";return undef;}
+		$pix=$tag->{ID3v2}{frames}{APIC};
+	}
+	elsif ($file=~m/\.flac$/i)
+	{	my $tag=Tag::Flac->new($file);
+		unless ($tag) {warn "can't read tags for $file\n";return undef;}
+		unless ($tag->{pictures})
+			{warn "no picture found in $file\n";return undef;}
+		$pix=$tag->{pictures};
+	}
+	else { return undef }
 	my $nb=0;
 	#if (@$pix>1) {$nb=}	#FIXME if more than one picture in tag, use $pix->[$nb][1] to choose
 	return $pix->[$nb][3];
@@ -197,7 +274,7 @@ sub PixFromMP3
 
 sub GetLyrics
 {	my $ID=$_[0];
-	my $file=$::Songs[$ID][::SONG_PATH].::SLASH.$::Songs[$ID][::SONG_FILE];
+	my $file= Songs::GetFullFilename($ID);
 	return undef unless -r $file;
 
 	my ($format)= $file=~m/\.([^.]*)$/;
@@ -206,8 +283,8 @@ sub GetLyrics
 	unless ($tag) {warn "can't read tags for $file\n";return undef;}
 
 	my $lyrics;
-	for my $t (@{$format->[2]})
-	{	if ($t eq 'vorbis' && $tag->{comments}{lyrics}) #FIXME lYriCs
+	for my $t (split / /, $format->[2])
+	{	if ($t eq 'vorbis' && $tag->{comments}{lyrics})
 		{	$lyrics=$tag->{comments}{lyrics}[0];
 		}
 		elsif ($t eq 'APE' && $tag->{item}{Lyrics})
@@ -231,7 +308,7 @@ sub GetLyrics
 sub WriteLyrics
 {	return if $::CmdLine{ro} || $::CmdLine{rotags};
 	my ($ID,$lyrics)=@_;
-	my $file=$::Songs[$ID][::SONG_PATH].::SLASH.$::Songs[$ID][::SONG_FILE];
+	my $file= Songs::GetFullFilename($ID);
 	return undef unless -r $file;
 
 	my ($format)= $file=~m/\.([^.]*)$/;
@@ -239,18 +316,19 @@ sub WriteLyrics
 	my $tag= $format->[0]->new($file);
 	unless ($tag) {warn "can't read tags for $file\n";return undef;}
 
-	if ($format->[2][0] eq 'vorbis')
+	my ($t)=split / /,$format->[2],2;
+	if ($t eq 'vorbis')
 	{	if (exists $tag->{comments}{lyrics})
 			{ $tag->edit('lyrics',0,$lyrics); }
 		else	{ $tag->add('lyrics',$lyrics); }
 	}
-	elsif ($format->[2][0] eq 'APE')
+	elsif ($t eq 'APE')
 	{	my $ape = $tag->{APE} || $tag->new_APE;
 		if (exists $ape->{item}{lyrics})
 			{ $ape->edit('Lyrics',0,$lyrics); }
 		else	{ $ape->add('Lyrics',$lyrics); }
 	}
-	elsif ($format->[2][0] eq 'ID3v2')
+	elsif ($t eq 'ID3v2')
 	{	my $id3v2 = $tag->{ID3v2} || $tag->new_ID3v2;
 		if ($tag->{ID3v2}{frames}{USLT})
 		{	my $nb=0; #FIXME
@@ -269,15 +347,14 @@ use constant
 {	TRUE  => 1, FALSE => 0,
 };
 
-my @FORMATS; my %WIDTH;
+our @FORMATS;
+our @Tools;
 INIT
 {
- %WIDTH=
- (	::SONG_TRACK,4,
-	::SONG_DISC, 4,
-	::SONG_DATE, 6,
+ @Tools=
+ (	{ label=> _"Capitalize",		for_all => sub { ucfirst lc $_[1]; }, },
+	{ label=>_"Capitalize each words",	for_all => sub { join ' ',map ucfirst lc, split / /,$_[1]; }, },
  );
-
  @FORMATS=
  (	['%a - %l - %n - %t',	qr/(.+) - (.+) - (\d+) - (.+)$/],
 	['%a_-_%l_-_%n_-_%t',	qr/(.+)_-_(.+)_-_(\d+)_-_(.+)$/],
@@ -314,15 +391,24 @@ INIT
 	['%n',			qr/^(\d+)$/],
 	['%a - %t',		qr/(\D.+) - (.+)$/],
 	['%n - %a,%t',		qr/(\d+) - (.+?),(.+)$/],
+	#['TEST : %a %n %t',qr/(.+)(?: *|_)\W(?: *|_)(\d+)(?: *|_)\W(?: *|_)(.+)/],
+	#['TEST : %n %t',qr/(\d+)(?: *|_)\W(?: *|_)(.+)/],
  );
-
+# my %swap=(a => 'l', l => 'a',);
+# my @tmp;
+# for my $ref (@FORMATS)
+# {	my ($f,$re)=@$ref;
+#	push @tmp,$ref;
+#	if ($f=~s/%([al])/%$swap{$1}/g) { push @tmp,[$f,$re] }
+# }
+# @FORMATS=@tmp;
 }
 
 use base 'Gtk2::VBox';
 sub new
-{	my ($class,$window,@IDs) = @_; #FIXME remove duplicates in @IDs
+{	my ($class,@IDs) = @_;
+	@IDs= ::uniq(@IDs);
 	my $self = bless Gtk2::VBox->new, $class;
-	$self->{window}=$window;
 
 	my $table=Gtk2::Table->new (6, 2, FALSE);
 	my $row=0;
@@ -331,11 +417,12 @@ sub new
 	$self->{pf_frames}={};
 	$self->{IDs}=\@IDs;
 
-	{	my %h; $h{$::Songs[$_][::SONG_UPATH]}=undef for @IDs;
+	{	my $nb=my @folders= Songs::UniqList('path',\@IDs);
+		my $common= ::find_common_parent_folder(@folders);
 		my $text= ::__("%d file in {folder}","%d files in {folder}",scalar@IDs);
-		my $folder=(keys %h==1) ? '<small>'.::PangoEsc( $::Songs[$IDs[0]][::SONG_UPATH] ).'</small>'
-					: ::__("one folder","different folders",scalar(keys %h));
-		$text= ::__x($text,folder => $folder);
+		my $folder=($nb==1) ?	$common	: ::__("one folder","different folders",$nb);
+		$folder.= "\n". ::__x("(common parent folder : {common})",common=>$common) if $nb>1 && length($common)>5;
+		$text= ::__x($text,folder => '<small>'.::PangoEsc($folder).'</small>');
 		my $labelfile = Gtk2::Label->new;
 		$labelfile->set_markup($text);
 		$labelfile->set_selectable(TRUE);
@@ -343,31 +430,14 @@ sub new
 		$self->pack_start($labelfile, FALSE, TRUE, 2);
 	}
 
-	no warnings 'uninitialized';
-	for my $field (::SONG_ARTIST,::SONG_ALBUM,::SONG_DISC,::SONG_DATE,::SONG_COMMENT,::SONG_GENRE)
-	{	my $check=Gtk2::CheckButton->new($::TagProp[$field][0]);
-		my $combo=Gtk2::Combo->new;
-		my %value;
-		if ($field==::SONG_GENRE)
-		{	$value{$_}++ for map split(/\x00/, $::Songs[$_][::SONG_GENRE]), @IDs;
-			$combo=EntryList->new(undef,'g');
-			$combo->addvalues( grep($value{$_}==@IDs, keys %value) );
-			$frames{$field}=$combo;
-		}
-		else
-		{	$value{ $::Songs[$_][$field] }++ for @IDs;	#check undef
-			if ($field==::SONG_ARTIST) { delete $value{'<Unknown>'}; }
-			elsif ($field==::SONG_ALBUM) {delete $value{$_} for grep m/^<Unknown>/, keys %value; }
-			@_=sort { $value{$b} <=> $value{$a} } keys %value;	#sort values by their frequency
-			if	($field==::SONG_ARTIST)	{push @_,sort keys %::Artist}
-			#elsif	($field==::SONG_ALBUM)	{push @_,sort keys %::Album} #maybe not a good idea
-			$combo->set_case_sensitive(TRUE);
-			$combo->set_popdown_strings(@_);
-			$combo->entry->set_text('') unless ( $value{$_[0]} > @IDs/3 );
-			$frames{$field}=$combo->entry;
-		}
-		$combo->set_sensitive(FALSE);
-		$check->{combo}=$combo;
+	for my $field ( Songs::EditFields('many') )
+	{	my $check=Gtk2::CheckButton->new(Songs::FieldName($field));
+		my $widget=Songs::EditWidget($field,'many',\@IDs);
+		next unless $widget;
+		$frames{$field}=$widget;	#FIXME	rename ($frames and {combo})and maybe 
+		$check->{combo}=$widget;	#	remove one
+		$widget->set_sensitive(FALSE);
+
 		$check->signal_connect( toggled => sub
 			{  my $check=$_[0];
 			   my $active=$check->get_active;
@@ -375,8 +445,8 @@ sub new
 			   $check->{addchk}->set_sensitive($active) if exists $check->{addchk};
 			});
 		$table->attach($check,0,1,$row,$row+1,'fill','shrink',1,1);
-		$table->attach($combo,1,2,$row,$row+1,['fill','expand'],'shrink',1,1);
-		if ($field==::SONG_COMMENT || $field==::SONG_GENRE)
+		$table->attach($widget,1,2,$row,$row+1,['fill','expand'],'shrink',1,1);
+		if ($field eq 'comment') #FIXME PHASE1 FIXME PHASE1 FIXME PHASE1 FIXME PHASE1
 		{	my $chk=Gtk2::CheckButton->new(_"Remove existing");
 			$self->{add}{$field}=1;
 			$chk->signal_connect( toggled => sub
@@ -394,30 +464,29 @@ sub new
 #short circuit if a LOT of songs : don't add file-specific tags, building the GUI would be too long anyway
 return $self if @IDs>1000;
 #######################################################
-	::SortList(\@IDs,join(' ',::SONG_UPATH,::SONG_DISC,::SONG_TRACK,::SONG_UFILE));
+	::SortList(\@IDs,'path album disc track file');
 	#edition of file-specific tags (track title)
-	my $perfile_table=Gtk2::Table->new( scalar(@IDs), 6, FALSE);
+	my $perfile_table=Gtk2::Table->new( scalar(@IDs), 10, FALSE);
 	$self->{perfile_table}=$perfile_table;
 	$row=0;
-	for my $ID (@IDs)
-	{	$row++;
-		my $label=Gtk2::Label->new($::Songs[$ID][::SONG_UFILE]);
-		$label->set_selectable(TRUE);
-		$label->set_alignment(0,0.5);	#left-aligned
-		$perfile_table->attach($label,7,8,$row,$row+1,'fill','shrink',1,1); #filename
-	}
-	$self->add_column(::SONG_TRACK);
-	$self->add_column(::SONG_TITLE);
+	$self->add_column('track');
+	$self->add_column('title');
 
+	my $lastcol=1;	#for the filename column
 	my $BSelFields=Gtk2::Button->new(_"Select fields");
 	{	my $menu=Gtk2::Menu->new;
 		my $menu_cb=sub {$self->add_column($_[1])};
-		for my $f (::SONG_DISC,::SONG_TRACK,::SONG_TITLE,::SONG_ARTIST,::SONG_ALBUM,::SONG_DATE,::SONG_COMMENT)
-		{	my $item=Gtk2::CheckMenuItem->new($::TagProp[$f][0]);
-			$item->set_active(1) if $self->{'pfcheck'.$f};
+		for my $f ( Songs::EditFields('per_id') )
+		{	my $item=Gtk2::CheckMenuItem->new( Songs::FieldName($f) );
+			$item->set_active(1) if $self->{'pfcheck_'.$f};
 			$item->signal_connect(activate => $menu_cb,$f);
 			$menu->append($item);
+			$lastcol++;
 		}
+		#$menu->append(Gtk2::SeparatorMenuItem->new);
+		#my $item=Gtk2::CheckMenuItem->new(_"Select files");
+		#$item->signal_connect(activate => sub { $self->add_selectfile_column });
+		#$menu->append($item);
 		$menu->show_all;
 		$BSelFields->signal_connect( button_press_event => sub
 			{	$::LEvent=$_[1];
@@ -427,15 +496,23 @@ return $self if @IDs>1000;
 		#$perfile_table->attach($menubar,7,8,0,1,'fill','shrink',1,1);
 	}
 
+	#add filename column
+	$perfile_table->attach( Gtk2::Label->new(Songs::FieldName('file')) ,$lastcol,$lastcol+1,$row,$row+1,'fill','shrink',1,1);
+	for my $ID (@IDs)
+	{	$row++;
+		my $label=Gtk2::Label->new( Songs::Display($ID,'file') );
+		$label->set_selectable(TRUE);
+		$label->set_alignment(0,0.5);	#left-aligned
+		$perfile_table->attach($label,$lastcol,$lastcol+1,$row,$row+1,'fill','shrink',1,1); #filename
+	}
+
 	my $Btools=Gtk2::Button->new('tools');
 	{	my $menu=Gtk2::Menu->new;
 		my $menu_cb=sub {$self->tool($_[1])};
-		for my $ref
-		(	[_"Capitalize",sub { ucfirst $_[1]; }],
-		)
-		{	my $item=Gtk2::MenuItem->new($ref->[0]);
-			$item->signal_connect(activate => $menu_cb,$ref->[1]);
-			$menu->append($item);
+		for my $ref (@Tools)	#currently only able to transform all entrys with the for_all function
+		{	my $item=Gtk2::MenuItem->new($ref->{label});
+			$item->signal_connect(activate => $menu_cb,$ref->{for_all});
+			$menu->append($item) if $ref->{for_all};
 		}
 		$menu->show_all;
 		$Btools->signal_connect( button_press_event => sub
@@ -444,23 +521,28 @@ return $self if @IDs>1000;
 			});
 	}
 
+	my $BClear=::NewIconButton('gtk-clear',undef,
+		sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->tool(sub {''}) },
+		undef,_"Clear selected fields");
+
 	my $sw = Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('automatic', 'automatic');
 	$sw->add_with_viewport($perfile_table);
 	$self->pack_start($sw, TRUE, TRUE, 4);
+
 ########################################################### Autofill
 	my $Bautofill=Gtk2::OptionMenu->new;
 	my $menu=Gtk2::Menu->new;
 	$menu->append(Gtk2::MenuItem->new(_"Auto fill based on filenames ..."));
-	my @files=map $::Songs[$_][::SONG_UFILE], @IDs;
+	my @files= Songs::Map('file',\@IDs); #FIXME or use Songs::Display ?
 	s/\.[^.]*$//i for @files;
 	my $found;
 	for my $i (0..$#FORMATS)
 	{	next if @files/2>(grep m/$FORMATS[$i][1]/, @files);
 		my $formatname=$FORMATS[$i][0];
-		$formatname=~s/%([taldnyCV%])/$::ReplaceFields{$1}[1]/g;
-		my $item=Gtk2::MenuItem->new($formatname);
+		$formatname=~s/%([taldnyCV%])/Songs::FieldName($::ReplaceFields{$1})/ge;
+		my $item=Gtk2::MenuItem->new_with_label($formatname);
 		$item->{'index'}=$i;
 		$item->signal_connect(activate => \&autofill_cb,$self);
 		$menu->append($item);
@@ -470,7 +552,7 @@ return $self if @IDs>1000;
 	my $checkOBlank=Gtk2::CheckButton->new(_"Auto fill only blank fields");
 	$self->{AFOBlank}=$checkOBlank;
 	my $hbox=Gtk2::HBox->new;
-	$hbox->pack_start($_, FALSE, FALSE, 0) for $BSelFields,Gtk2::VSeparator->new,$Bautofill,$checkOBlank; #$Btools,
+	$hbox->pack_start($_, FALSE, FALSE, 0) for $BSelFields,Gtk2::VSeparator->new,$Bautofill,$BClear,$checkOBlank,$Btools,
 	$self->pack_start($hbox, FALSE, FALSE, 4);
 ###########################################################
 	return $self;
@@ -478,48 +560,84 @@ return $self if @IDs>1000;
 
 sub add_column
 {	my ($self,$field)=@_;
-	if ($self->{'pfcheck'.$field})	#if already created -> toggle show/hide
-	{	my @w=( $self->{'pfcheck'.$field}, @{ $self->{pf_frames}{$field} } );
+	if ($self->{'pfcheck_'.$field})	#if already created -> toggle show/hide
+	{	my @w=( $self->{'pfcheck_'.$field}, @{ $self->{pf_frames}{$field} } );
 		if ($w[0]->visible)	{ $_->hide for @w; }
 		else			{ $_->show for @w; }
 		return;
 	}
 	my $table=$self->{perfile_table};
-	my $col=$table->{col}++;
+	my $col=++$table->{col};
 	my $row=0;
-	my $check=Gtk2::CheckButton->new($::TagProp[$field][0]);
-	$self->{'pfcheck'.$field}=$check;
-	$table->attach($check,$col,$col+1,$row,$row+1,'fill','shrink',1,1);
-	$check->show;
-	my @entrys;
+	my $check=Gtk2::CheckButton->new( Songs::FieldName($field) );
+	my @entries;
+	$self->{'pfcheck_'.$field}=$check;
+	$self->{pf_frames}{$field}=\@entries;
 	for my $ID ( @{$self->{IDs}} )
 	{	$row++;
-		my $ent=Gtk2::Entry->new;
-		my $v=$::Songs[$ID][$field];
-		$v=undef if $v && ($field==::SONG_ARTIST && $v eq '<Unknown>')
-				|| ($field==::SONG_ALBUM && $v=~m/^<Unknown>/);
-		$ent->set_text($v) if defined $v;
-		$ent->set_sensitive(FALSE);
-		$ent->signal_connect(focus_in_event=> \&scroll_to_entry);
-		my $p=['fill','expand'];
-		if (exists $WIDTH{$field})
-		{	$ent->set_width_chars( $WIDTH{$field} );
-			$p='fill';
-		}
-		$table->attach($ent,$col,$col+1,$row,$row+1,$p,'shrink',1,1);
-		$ent->show;
-		push @entrys,$ent;
+		my $widget=Songs::EditWidget($field,'per_id',$ID);
+		next unless $widget;
+		$widget->set_sensitive(FALSE);
+		$widget->signal_connect(focus_in_event=> \&scroll_to_entry);
+		my $p= $widget->{noexpand} ? 'fill' : ['fill','expand'];
+		$table->attach($widget,$col,$col+1,$row,$row+1,$p,'shrink',1,1);
+		$widget->show_all;
+		push @entries,$widget;
 	}
 	$check->signal_connect( toggled => sub
 		{  my $active=$_[0]->get_active;
-		   $_->set_sensitive($active) for @entrys;
+		   $_->set_sensitive($active) for @entries;
 		});
-	$self->{pf_frames}{$field}=\@entrys;
+	if ($field eq 'track' && 1)	#good idea ? make entries a bit large :(
+	{	#$_->set_alignment(1) for @entries;
+		my $increment=sub
+		 {	my $i=1;
+			for my $e (@entries)
+			{	my $here=$e->get_text;
+				if ($here && $here=~m/^\d+$/) { $i=$here; } else { $e->set_text($i) }
+				$i++;
+			}
+		 };
+		my $button=::NewIconButton('gtk-go-down',undef,$increment,'none',_"Auto-increment track numbers");
+		$button->set_border_width(0);
+		$button->set_size_request();
+		$check->signal_connect( toggled => sub { $button->set_sensitive($_[0]->get_active) });
+		$button->set_sensitive(FALSE);
+		my $hbox=Gtk2::HBox->new(0,0);
+		$hbox->pack_start($_,0,0,0) for $check,$button;
+		$check=$hbox;
+		#$check= ::Hpack($check,$button);
+	}
+	$check->show_all;
+	$table->attach($check,$col,$col+1,0,1,'fill','shrink',1,1);
+}
+sub add_selectfile_column
+{	my $self=$_[0];
+	if (my $l=$self->{'filetoggles'})	#if already created -> toggle show/hide
+	{	if ($l->[0]->visible)	{ $_->hide for @$l; }
+		else			{ $_->show for @$l; }
+		return;
+	}
+	my @toggles;
+	$self->{'filetoggles'}=\@toggles;
+	my $table=$self->{perfile_table};
+	my $row=0; my $col=0; my $i=0;
+	for my $ID ( @{$self->{IDs}} )
+	{	$row++;
+		my $check=Gtk2::CheckButton->new;
+		$check->set_active(1);
+		$check->signal_connect( toggled => sub { my ($check,$i)=@_; my $self=::find_ancestor($check,__PACKAGE__); my $active=$check->get_active; $self->{pf_frames}{$_}[$i]->set_sensitive($active) for keys %{ $self->{pf_frames} } },$i);
+		#$widget->signal_connect(focus_in_event=> \&scroll_to_entry);
+		$table->attach($check,$col,$col+1,$row,$row+1,'fill','shrink',1,1);
+		$check->show_all; warn $check;
+		push @toggles,$check;
+		$i++;
+	}
 }
 
 sub scroll_to_entry
 {	my $ent=$_[0];
-	if (my $sw=::find_ancestor($ent,'Gtk2::ScrolledWindow'))
+	if (my $sw=::find_ancestor($ent,'Gtk2::Viewport'))
 	{	my ($x,$y,$w,$h)=$ent->window->get_geometry;
 		$sw->get_hadjustment->clamp_page($x,$x+$w);
 		$sw->get_vadjustment->clamp_page($y,$y+$h);
@@ -530,14 +648,15 @@ sub scroll_to_entry
 sub autofill_cb
 {	my ($menuitem,$self)=@_;
 	my ($format,$pattern)=@{ $FORMATS[$menuitem->{'index'}] };
-	my @fields= map $::ReplaceFields{$_}[2][0], grep $_ ne '%', $format=~m/%([taldnyCV%])/g;
+	my @fields= map $::ReplaceFields{$_}, grep $_ ne '%', $format=~m/%([taldnyCV%])/g;
 	my $OBlank=$self->{AFOBlank}->get_active;
 	my @vals;
 	for my $ID (@{$self->{IDs}})
-	{	my $file=$::Songs[$ID][::SONG_UFILE];
-		$file=~s/\.[^.]*$//i;
+	{	my $file= Songs::Get($ID,'file');
+		$file=~s/\.[^.]*$//;
 		my @v=($file=~m/$pattern/);
-		s/^ +//,s/ +$// for @v;
+		s/_/ /g for @v;		#should it be an option ?
+		s/^\s+//, s/\s+$// for @v;
 		@v=('')x scalar(@fields) unless @v;
 		my $n=0;
 		push @{$vals[$n++]},$_ for @v;
@@ -552,9 +671,9 @@ sub autofill_cb
 			$entry->set_text(keys %h);
 		}
 		else
-		{	my $entrys=$self->{pf_frames}{$f};
-			next unless $entrys;
-			for my $e (@$entrys)
+		{	my $entries=$self->{pf_frames}{$f};
+			next unless $entries;
+			for my $e (@$entries)
 			{ my $v=shift @$varray;
 			  next if $OBlank && $e->get_text ne '';
 			  $e->set_text($v) if $e->is_sensitive && $v ne '';
@@ -565,78 +684,333 @@ sub autofill_cb
 
 sub tool
 {	my ($self,$sub)=@_;
-	my $OBlank=$self->{AFOBlank}->get_active;
+	#my $OBlank=$self->{AFOBlank}->get_active;
+	#$OBlank=0 if $ignoreOB;
 	my $IDs=$self->{IDs};
-	while (my($f,$wdgt)=each %{$self->{frames}})
-	{	next if $f==::SONG_GENRE;
-		my $v=$wdgt->get_text;
-		next if !$wdgt->is_sensitive || $OBlank && $v ne '';
-		$v=&$sub($f,$v);
-		$wdgt->set_text($v) if defined $v;
+	for my $wdgt ( values %{$self->{frames}}, map @$_, values %{$self->{pf_frames}} )
+	{	next unless $wdgt->is_sensitive && $wdgt->can('tool');
+		$wdgt->tool($sub);
 	}
-	while (my($f,$entrys)=each %{$self->{pf_frames}})
-	{	for my $e (@$entrys)
-		{	my $v=$e->get_text;
-			next if !$e->is_sensitive || $OBlank && $v ne '';
-			$v=&$sub($f,$v);
-			$e->set_text($v) if defined $v;
-		}
-	}
+	#for my $entries (values %{$self->{pf_frames}})
+	#{	next unless $entries->[0]->is_sensitive && $entries->[0]->can('tool');
+	#	for my $e (@$entries)
+	#	{	$wdgt->tool($sub);
+	#	}
+	#}
 }
 
 sub save
-{	no warnings 'uninitialized';
-	my ($self,$finishsub)=@_;
+{	my ($self,$finishsub)=@_;
 	my $IDs=$self->{IDs};
-	my %set;
+	my (%default,@modif);
 	while ( my ($f,$wdgt)=each %{$self->{frames}} )
 	{	next unless $wdgt->is_sensitive;
-		$set{$f}=($f==::SONG_GENRE)? [$wdgt->return_value] : $wdgt->get_text;
-		warn "$::TagProp[$f][0]=$set{$f}\n" if $::debug;
+		if ($wdgt->can('return_setunset'))
+		{	my ($set,$unset)=$wdgt->return_setunset;
+			push @modif,"+$f",$set if @$set;
+			push @modif,"-$f",$unset if @$unset;
+		}
+		else
+		{	my $v=$wdgt->get_text;
+			$default{$f}=$v;
+			push @modif, $f,$v;
+		}
 	}
 	while ( my ($f,$wdgt)=each %{$self->{pf_frames}} )
-	{	next unless $$wdgt[0]->is_sensitive;
-		my $default;
-		if (exists $set{$f})	#if both per_file and one_for_all_files
-		{	$default=$set{$f};
-			$set{$f}={};
-		}
+	{	next unless $wdgt->[0]->is_sensitive;
+		my @vals;
 		for my $ID (@$IDs)
-		{  my $v=(shift @$wdgt)->get_text;
-		   $v=$default if defined $default && $v eq '';
-		   $v='' if $v eq $::Songs[$ID][$f];	#don't write if not modified
-		   $set{$f}{$ID}=$v;			#won't be written if eq ''
+		{	my $v=(shift @$wdgt)->get_text;
+			$v=$default{$f} if $v eq '' && exists $default{$f};
+			push @vals,$v;
 		}
+		push @modif, '@'.$f,\@vals;
 	}
+	unless (@modif) { $finishsub->(); return}
 
 	$self->set_sensitive(FALSE);
 	my $progressbar = Gtk2::ProgressBar->new;
 	$self->pack_start($progressbar, FALSE, TRUE, 0);
 	$progressbar->show_all;
-	my $IDcount=0;
-	my $errorsub=sub
-	{	my $err=shift;
-		my $abort;
-		$abort=_"Abort mass-tagging" if (@$IDs-$IDcount)>1;
-		my $ret=::Retry_Dialog($err,$self->{window},$abort);
-		$self->{abort}=1 if $ret eq 'abort';
-		return $ret;
-	};
-	unless (keys %set) { &$finishsub(); return}
-	Glib::Idle->add( sub	#FIXME without a closure would be cleaner
-	 {	my $ID=$IDs->[$IDcount];
-		my @modif;
-		while (my ($field,$val)=each %set)
-		{	if (ref $val eq 'HASH') { $val=$$val{$ID}; next if $val eq ''; }
-			push @modif,[$field,$self->{add}{$field},$val];
-		}
-		SimpleTagWriting::set($ID,\@modif,$errorsub) if @modif;
-		::IdleCheck($ID);
-		$progressbar->set_fraction(++$IDcount/@$IDs);
-		return 1 unless $self->{abort} || $IDcount>$#$IDs;
-		&$finishsub();
-		return 0;  #remove idle
-	 });
+	Songs::Set($IDs,\@modif, progress=>$progressbar, callback_finish=>$finishsub, window=> $self->get_toplevel);
+}
+
+package GMB::TagEdit::EntryString;
+use Gtk2;
+use base 'Gtk2::Entry';
+
+sub new
+{	my ($class,$field,$ID,$width) = @_;
+	my $self = bless Gtk2::Entry->new, $class;
+	$self->{field}=$field;
+	my $val=Songs::Get($ID,$field);
+	$self->set_text($val);
+	if ($width) { $self->set_width_chars($width); $self->{noexpand}=1; }
+	return $self;
+}
+
+sub tool
+{	my ($self,$sub)=@_;
+	my $val= $sub->($self->{field},$self->get_text);
+	$self->set_text($val) if defined $val;
+}
+
+package GMB::TagEdit::EntryNumber;
+use Gtk2;
+use base 'Gtk2::SpinButton';
+
+sub new
+{	my ($class,$field,$ID,$max,$digits) = @_;
+	$max||=10000000;
+	$digits||=0;
+	my $adj=Gtk2::Adjustment->new(0,0,$max,1,10,0);
+	my $self = bless Gtk2::SpinButton->new($adj,10,$digits), $class;
+	$self->{noexpand}=1;
+	$self->{field}=$field;
+	my $val=Songs::Get($ID,$field);
+	$self->set_value($val);
+	return $self;
+}
+sub get_text
+{	$_[0]->get_value;
+}
+
+package GMB::TagEdit::Combo;
+use Gtk2;
+use base 'Gtk2::Combo';
+
+sub new
+{	my ($class,$field,$IDs,$listall) = @_;
+	my $self = bless Gtk2::Combo->new, $class;
+	$self->{field}=$field;
+	GMB::ListStore::Field::setcompletion($self->entry,$field) if $listall;
+
+	if (ref $IDs)
+	{	my $values= Songs::BuildHash($field,$IDs);
+		my @l=sort { $values->{$b} <=> $values->{$a} } keys %$values; #sort values by their frequency
+		my $first=$l[0];
+		@l= @{ Songs::Gid_to_Get($field,\@l) };
+		if ($listall) { push @l, @{Songs::ListAll($field)}; }
+		$self->set_case_sensitive(1);
+		$self->set_popdown_strings(@l);
+		$self->set_text('') unless ( $values->{$first} > @$IDs/3 );
+	}
+	else
+	{	my $val=Songs::Get($IDs,$field);
+		$self->set_text($val);
+	}
+
+	return $self;
+}
+
+sub set_text
+{	$_[0]->entry->set_text($_[1]);
+}
+sub get_text
+{	$_[0]->entry->get_text;
+}
+sub tool
+{	&GMB::TagEdit::EntryString::tool;
+}
+
+
+package GMB::TagEdit::EntryRating;
+use Gtk2;
+use base 'Gtk2::HBox';
+
+sub new
+{	my ($class,$field,$IDs) = @_;
+	my $self = bless Gtk2::HBox->new, $class;
+	$self->{field}=$field;
+
+	my $init;
+	if (ref $IDs)
+	{	my $h= Songs::BuildHash($field,$IDs);
+		$init=(sort { $h->{$b} <=> $h->{$a} } keys %$h)[0];
+	}
+	else {	$init=Songs::Get($IDs,$field);	}
+
+	my $adj=Gtk2::Adjustment->new(0,0,100,10,20,0);
+	my $spin=Gtk2::SpinButton->new($adj,10,0);
+	my $check=Gtk2::CheckButton->new(_"use default");
+	my $stars=Stars->new($init,\&update_cb);
+
+	$self->pack_start($_,0,0,0) for $stars,$spin,$check;
+	$self->{stars}=$stars;
+	$self->{check}=$check;
+	$self->{adj}=$adj;
+
+	$self->update_cb($init);
+	#$self->{modif}=0;
+	$adj->signal_connect(value_changed => sub{ $self->update_cb($_[0]->get_value) });
+	$check->signal_connect(toggled	   => sub{ update_cb($_[0], ($_[0]->get_active ? '' : $::Options{DefaultRating}) ) });
+
+	return $self;
+}
+
+sub update_cb
+{	my ($widget,$v)=@_;
+	my $self=::find_ancestor($widget,__PACKAGE__);
+	return if $self->{busy};
+	$self->{busy}=1;
+	$v='' unless defined $v && $v ne '' && $v!=255;
+	#$self->{modif}=1;
+	$self->{value}=$v;
+	$self->{check}->set_active($v eq '');
+	$self->{stars}->set($v);
+	$v=$::Options{DefaultRating} if $v eq '';
+	$self->{adj}->set_value($v);
+	$self->{busy}=0;
+}
+
+sub get_text
+{	$_[0]->{value};
+}
+
+package GMB::TagEdit::FlagList;
+use Gtk2;
+use base 'Gtk2::HBox';
+
+sub new
+{	my ($class,$field,$ID) = @_;
+	my $self = bless Gtk2::HBox->new(0,0), $class;
+	$self->{field}=$field;
+	$self->{ID}=$ID;
+	my $label=$self->{label}=Gtk2::Label->new;
+	$label->set_ellipsize('end');
+	my $button= Gtk2::Button->new;
+	my $entry= Gtk2::Entry->new;
+	#$entry->set_width_chars(1);
+	$button->add($label);
+	$self->pack_start($button,1,1,0);
+	$self->pack_start($entry,0,0,0);
+	$button->signal_connect( button_press_event => \&popup_menu_cb); #FIXME make it popup for keyboard activation too
+	$entry->signal_connect( activate => \&entry_activate_cb );
+	GMB::ListStore::Field::setcompletion($entry,$field);
+
+	$self->{selected}{$_}=1 for Songs::Get_list($ID,$field);
+	delete $self->{selected}{''};
+	$self->update;
+	return $self;
+}
+
+sub entry_activate_cb
+{	my $entry=$_[0];
+	my $self=::find_ancestor($entry,__PACKAGE__);
+	my $text=$entry->get_text;
+	return if $text eq '';
+	$self->{selected}{ $text }=1;
+	$self->update;
+	$entry->set_text('');
+}
+
+sub popup_menu_cb
+{	my ($widget,$event)=@_;
+	my $self=::find_ancestor($widget,__PACKAGE__);
+	$::LEvent=$event;
+	my $menu=Gtk2::Menu->new;
+	my $cb= sub { $self->{selected}{ $_[1] }^=1; $self->update; };
+	my @keys= sort {::superlc($a) cmp ::superlc($b)} keys %{$self->{selected}};
+	return unless @keys;
+	for my $key (@keys)
+	{	my $item=Gtk2::CheckMenuItem->new_with_label($key);
+		$item->set_active(1) if $self->{selected}{$key};
+		$item->signal_connect(toggled => $cb,$key);
+		$menu->append($item);
+	}
+	$menu->show_all;
+	$menu->popup(undef,undef,\&::menupos,undef,$::LEvent->button,$::LEvent->time);
+}
+
+sub update
+{	my $self=$_[0];
+	my $text=join ', ', sort { ::superlc($a) cmp ::superlc($b) } grep $self->{selected}{$_}, keys %{$self->{selected}};
+	$self->{label}->set_text($text);
+	$::Tooltips->set_tip($self->{label}->parent,$text);
+}
+
+sub get_text
+{	my $self=$_[0];
+	my $h=$self->{selected};
+	return [grep $h->{$_}, keys %$h];
+}
+
+package GMB::TagEdit::EntryMassList;	#for mass-editing fields with multiple values
+use Gtk2;
+use base 'Gtk2::HBox';
+
+sub new
+{	my ($class,$field,$IDs) = @_;
+	my $self = bless Gtk2::HBox->new, $class;
+	my $vbox=Gtk2::VBox->new;
+	my $addbut=::NewIconButton('gtk-add',_"Add");
+	my $combo=Gtk2::ComboBoxEntry->new_text;
+	$combo->append_text($_) for @{ Songs::ListAll($field) };
+	my $entry=$combo->child;
+	$entry->set_text('');
+	$vbox->pack_start($_,::FALSE,::FALSE,0) for $combo,$addbut;
+	my $store=Gtk2::ListStore->new('Glib::String','Glib::Boolean','Glib::Boolean');
+	my $treeview=Gtk2::TreeView->new($store);
+	 my $sw=Gtk2::ScrolledWindow->new;
+	 $sw->set_shadow_type('etched-in');
+	 $sw->set_policy('never','automatic');
+	 $sw->add($treeview);
+	 $sw->set_size_request(-1, 4*$entry->size_request->height );
+	$self->pack_start($_,::TRUE,::TRUE,0) for $sw,$vbox;
+
+	for my $ref ([1,_"set"],[2,_"unset"])
+	{	my ($col,$title)=@$ref;
+		my $renderer=Gtk2::CellRendererToggle->new;
+		$renderer->{column}=$col;
+		$renderer->signal_connect(toggled => \&toggled_cb, $store);
+		my $tvcolumn=Gtk2::TreeViewColumn->new_with_attributes($title, $renderer, active=>$col);
+		$treeview->append_column($tvcolumn);
+	}
+	my $column=Gtk2::TreeViewColumn->new_with_attributes('', Gtk2::CellRendererText->new,text=>0);
+	$treeview->append_column($column);
+	#$treeview->set_headers_visible(0);
+	$entry->signal_connect( activate => \&add_entry_text_cb);
+	$addbut->signal_connect( clicked => \&add_entry_text_cb);
+
+	my $valueshash= Songs::BuildHash($field,$IDs);
+	$store->set($store->append,0=> Songs::Gid_to_Get($field,$_),1,0,2,0)  for sort keys %$valueshash;
+
+	$self->{entry}=$entry;
+	$self->{store}=$store;
+	return $self;
+}
+
+sub add_entry_text_cb
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $entry=$self->{entry};
+	my $text=$entry->get_text;
+	return if $text eq '';
+	my $store=$self->{store};
+	$store->set($store->append,0=>$text,1,1,2,0);
+	$entry->set_text('');
+}
+
+sub toggled_cb
+{	my ($cell,$path_str,$store)=@_;
+	my $column=$cell->{column};
+	my $iter=$store->get_iter_from_string($path_str);
+	my $state=$store->get($iter,$column);
+	$store->set($iter,$column, $state^1);
+	$store->set($iter,($column==1 ? 2 : 1), 0) if !$state;
+}
+
+sub return_setunset
+{	my $self=$_[0];
+	my (@set,@unset);
+	my $store=$self->{store};
+	my $iter=$store->get_iter_first;
+	while ($iter)
+	{	my ($value,$set,$unset)=$store->get($iter,0,1,2);
+		push @set,$value   if $set;
+		push @unset,$value if $unset;
+		$iter=$store->iter_next($iter);
+	}
+	return \@set,\@unset;
 }
 
 package EditTagSimple;
@@ -657,23 +1031,8 @@ sub new
 	$labelfile->set_line_wrap(TRUE);
 
 	my $table=Gtk2::Table->new (6, 2, FALSE);
-	my $row=0;
-	no warnings 'uninitialized';
-	for my $field (::SONG_TITLE,::SONG_ARTIST,::SONG_ALBUM,::SONG_TRACK,::SONG_DISC,::SONG_DATE,::SONG_COMMENT,::SONG_GENRE)
-	{	my $label=Gtk2::Label->new($::TagProp[$field][0]);
-		my $entry=($field==::SONG_GENRE)? EntryList->new(undef,'g') : Gtk2::Entry->new;
-		#$combo->set_case_sensitive(TRUE);
-		#if	($field==::SONG_ARTIST)	{ $combo->set_popdown_strings(sort keys %::Artist); }
-		#elsif	($field==::SONG_ALBUM)	{ $combo->set_popdown_strings(sort keys %::Album); }
-		my $v=$::Songs[$ID][$field];
-		$v=undef if $v && ($field==::SONG_ARTIST && $v eq '<Unknown>')
-				|| ($field==::SONG_ALBUM && $v=~m/^<Unknown>/);
-		$entry->set_text($v) if defined $v;
-		$table->attach($label,0,1,$row,$row+1,'fill','shrink',1,1);
-		$table->attach($entry,1,2,$row,$row+1,['fill','expand'],'shrink',1,1);
-		$row++;
-		$self->{fields}{$field}=$entry;
-	}
+	$self->{table}=$table;
+	$self->fill;
 
 	my $advanced=Gtk2::Button->new(_"Advanced Tag Editing".' ...');
 	$advanced->signal_connect( clicked => \&advanced_cb );
@@ -683,6 +1042,27 @@ sub new
 	$self->pack_end($advanced, FALSE, FALSE, 2);
 
 	return $self;
+}
+
+sub fill
+{	my $self=$_[0];
+	my $table=$self->{table};
+	my $ID=$self->{ID};
+	my $row=0;
+	for my $field ( Songs::EditFields('single') )
+	{	$row++;
+		if (my $w=$self->{fields}{$field})	#refresh the fields
+			{ $table->remove($w); }
+		else #first time
+		{	my $label=Gtk2::Label->new( Songs::FieldName($field) );
+			$table->attach($label,0,1,$row,$row+1,'fill','shrink',1,1);
+		}
+		my $widget=Songs::EditWidget($field,'single',$ID);
+		next unless $widget;
+		$table->attach($widget,1,2,$row,$row+1,['fill','expand'],'shrink',1,1);
+		$self->{fields}{$field}=$widget;
+	}
+	$table->show_all;
 }
 
 sub advanced_cb
@@ -700,19 +1080,15 @@ sub advanced_cb
 	$dialog->show_all;
 	$self->{window}->set_sensitive(0);
 	$dialog->signal_connect( response => sub
-	{ my ($dialog,$response)=@_;
-	  if ($response eq 'ok')
-	  {	$edittag->save;
-		::SongCheck($ID);
-		no warnings 'uninitialized';
-		#refresh the fields
-		for my $field (::SONG_TITLE,::SONG_ARTIST,::SONG_ALBUM,::SONG_TRACK,::SONG_DISC,::SONG_DATE,::SONG_COMMENT,::SONG_GENRE)
-		{	$self->{fields}{$field}->set_text( $::Songs[$ID][$field] );
+	 {	my ($dialog,$response)=@_;
+		if ($response eq 'ok')
+		{	$edittag->save;
+			Songs::ReReadFile($ID);
+			$self->fill;
 		}
-	  }
 		$self->{window}->set_sensitive(1);
 		$dialog->destroy;
-	});
+	 });
 }
 
 sub save
@@ -721,138 +1097,13 @@ sub save
 	my $errorsub=sub {::Retry_Dialog($_[0],$self->{window});};
 	my @modif;
 	while (my ($field,$entry)=each %{$self->{fields}})
-	{	if ($field==::SONG_GENRE)
-		{	my @vals=$entry->return_value;
-			next unless $entry->{changed};
-			push @modif,[$field,0,\@vals];
-		}
-		else
-		{	my $val=$entry->get_text;
-			my $old=$::Songs[$ID][$field];
-			$old='' unless defined $old;
-			next if $val eq $old;
-			push @modif,[$field,0,$val];
-		}
+	{	push @modif,$field,$entry->get_text;
 	}
-	SimpleTagWriting::set($ID,\@modif,$errorsub) if @modif;
+	Songs::Set($ID,\@modif,error=>$errorsub) if @modif;
 }
 
-package SimpleTagWriting;
-use constant
-{	K_VORBIS => 0, K_ID3V2 => 1, K_APE => 2, K_ID3V1 => 3,
-};
-my %TAGCODE;
-INIT
-{
- %TAGCODE=
-(::SONG_ARTIST, [qw/artist TPE1 Artist 1/],
- ::SONG_ALBUM,	[qw/album TALB Album 2/],
- ::SONG_DATE,	[qw/date TYER Year 3/],
- ::SONG_COMMENT,[[qw/description comment comments/],qw/COMM-- Comment 4/],
- ::SONG_GENRE,	[qw/genre TCON Genre 6/],
- ::SONG_DISC,	[qw/discnumber TPOS discnumber/],
- ::SONG_VERSION,[qw/version TIT3 Subtitle/],
- ::SONG_TITLE,	[qw/title TIT2 Title 0/],
- ::SONG_TRACK,	[qw/tracknumber TRCK Track 5/],
- 'replaygain-track-gain' => [qw/replaygain_track_gain TXXX-replaygain_track_gain replaygain_track_gain/],
- 'replaygain-track-peak' => [qw/replaygain_track_peak TXXX-replaygain_track_peak replaygain_track_peak/],
- 'replaygain-album-gain' => [qw/replaygain_album_gain TXXX-replaygain_album_gain replaygain_album_gain/],
- 'replaygain-album-peak' => [qw/replaygain_album_peak TXXX-replaygain_album_peak replaygain_album_peak/],
- 'replaygain-reference-level' => [qw/replaygain_reference_level TXXX-reference_level replaygain_reference_level/],
-);
-}
 
-sub set
-{	my ($ID,$modif,$errorsub) = @_;
-
-	if ($::Options{TAG_nowrite_mode}) #no-write mode
-	{	my $song=$::Songs[$ID];
-		my @newtag;
-		for my $n (@::TAGSREADFROMTAGS)
-		{	my $v=$song->[$n];
-			$newtag[$n]=  $n==::SONG_GENRE
-					? [ split /\x00/,$v ]
-					: [defined $v ? $v : ()];
-		}
-		my @changed; my $aa;
-		for my $aref (@$modif)
-		{	my ($field,$add,@vals)=@$aref;
-			next unless $field=~m/^\d+$/; #ignore fields that are not in @::Songs
-			@vals=@{$vals[0]} if ref $vals[0];
-			$newtag[$field]=[] unless $add;
-			push @{$newtag[$field]}, @vals;
-			push @changed,$field;
-			$aa=1 if $field==::SONG_ALBUM || $field==::SONG_ARTIST || $field==::SONG_DATE;# ||$field==::SONG_LENGTH;
-		}
-		my @old=@$song;
-		ReadTag::SetTags($song,\@newtag);
-		if ($aa) { ::RemoveAA($ID,\@old); ::AddAA($ID); }
-		::SongChanged($ID, @changed );
-		return 1;
-	}
-
-	my $file=$::Songs[$ID][::SONG_PATH].::SLASH.$::Songs[$ID][::SONG_FILE];
-
-	my ($format)= $file=~m/\.([^.]*)$/;
-	return undef unless $format and $format=$ReadTag::FORMATS{lc$format};
-	my $tag= $format->[0]->new($file);
-	unless ($tag) {warn "can't read tags for $file\n";return undef;}
-
-	my $maintag=$format->[2][0];
-	if ($maintag eq 'ID3v2' || $tag->{ID3v1})
-	{	my $id3v1 = $tag->{ID3v1} || $tag->new_ID3v1;
-		for my $aref (@$modif)
-		{	my ($field,$add,@vals)=@$aref;
-			my $i=$TAGCODE{$field}[K_ID3V1];
-			$id3v1->[$i]=$vals[0] if defined $i;
-		}
-	}
-	if ($maintag eq 'ID3v2' || $tag->{ID3v2})
-	{	my $id3v2 = $tag->{ID3v2} || $tag->new_ID3v2;
-		for my $aref (@$modif)
-		{	my ($field,$add,@vals)=@$aref;
-			my ($key,@extra)=split /-/,$TAGCODE{$field}[K_ID3V2],-1; #-1 to keep empty trailing fields #COMM-- => key="COMM" and @extra=("","")
-			@vals=@{$vals[0]} if ref $vals[0];
-			unshift @vals,@extra;
-			unless ($add)
-			{	if (my $subkey=$extra[0]) #for TXXX fields with a non-null description => remove only those with same description
-				{	my $frames= $id3v2->{frames}{$key};
-					if ($frames) { $id3v2->remove($key,$_) for grep $frames->[$_] && $frames->[$_][0] eq $subkey, 0..$#$frames; }
-				}
-				else { $id3v2->remove_all($key) unless $add; }
-			}
-			next if $field eq ::SONG_GENRE && !@vals;
-			$id3v2->insert($key,@vals);
-			if ($field eq ::SONG_DATE && $id3v2->{version}==4 && $vals[0]=~m/^\d{4}$/) { $id3v2->remove_all('TDRC'); $id3v2->insert('TDRC',$vals[0]); } #special-case: write a TDRC field for id3v2.4 in addition to TYER  #FIXME only support the yyyy format, could try to convert the date to yyyy-MM-ddTHH:mm:ss format
-		}
-	}
-	if ($maintag eq 'vorbis')
-	{	for my $aref (@$modif)
-		{	my ($field,$add,@vals)=@$aref;
-			@vals=@{$vals[0]} if ref $vals[0];
-			my $key=$TAGCODE{$field}[K_VORBIS];
-			if (ref $key)
-			{	unless ($add) {$tag->remove_all($_) for @$key};
-				$key=$key->[0];
-			}
-			$tag->remove_all($key) unless $add;
-			$tag->insert($key,$_) for reverse @vals;
-		}
-	}
-	if ($maintag eq 'APE' || $tag->{APE})
-	{	my $ape = $tag->{APE} || $tag->new_APE;
-		for my $aref (@$modif)
-		{	my ($field,$add,@vals)=@$aref;
-			my $key=$TAGCODE{$field}[K_APE];
-			@vals=@{$vals[0]} if ref $vals[0];
-			$ape->remove_all($key) unless $add;
-			$ape->insert($key,$_) for reverse @vals;
-		}
-	}
-	$tag->{errorsub}=$errorsub;
-	$tag->write_file unless $::CmdLine{ro}  || $::CmdLine{rotags};
-	return 1;
-}
+############################## Advanced tag editing ##############################
 
 package EditTag;
 use Gtk2;
@@ -861,7 +1112,7 @@ use base 'Gtk2::VBox';
 
 sub new
 {	my ($class,$window,$ID) = @_;
-	my $file=$::Songs[$ID][::SONG_PATH].::SLASH.$::Songs[$ID][::SONG_FILE];
+	my $file= Songs::GetFullFilename($ID);
 	return undef unless $file;
 	my $self = bless Gtk2::VBox->new, $class;
 	$self->{window}=$window;
@@ -874,13 +1125,13 @@ sub new
 	$self->{filename}=$file;
 
 	my ($format)= $file=~m/\.([^.]*)$/;
-	return undef unless $format and $format=$ReadTag::FORMATS{lc$format};
+	return undef unless $format and $format=$FileTag::FORMATS{lc$format};
 	$self->{filetag}=my $filetag= $format->[0]->new($file);
 	unless ($filetag) {warn "can't read tags for $file\n";return undef;}
 
 	my @boxes; $self->{boxes}=\@boxes;
 	my @tags;
-	for my $t (@{$format->[2]})
+	for my $t (split / /,$format->[2])
 	{	if ($t eq 'vorbis')		{push @tags,$filetag;}
 		elsif ($t eq 'APE')
 		{	if ($filetag->{APE})	{ push @tags,$filetag->{APE}; }
@@ -1015,8 +1266,8 @@ INIT
 			namesub => sub { 'id3v2.'.$_[0]{version} },
 			types	=> $id3v2_types,
 		},
-	OGG =>	{	addlist => [qw/comments genre discnumber author/,''],
-			default => [qw/title artist album tracknumber date comments genre/],
+	OGG =>	{	addlist => [qw/description genre discnumber author/,''],
+			default => [qw/title artist album tracknumber date description genre/],
 			fillsub => sub { $_[0]{comments} },
 			name	=> 'vorbis comment',
 			types	=> $vorbis_types,
@@ -1057,7 +1308,7 @@ sub new
 	unless ($tagprop{$tagtype}) {warn "unknown tag '$tagtype'\n"; return undef;}
 	$tagtype=$tagprop{$tagtype};
 	my $self=bless Gtk2::VBox->new,$class;
-	my $name=$tagtype->{name} || &{ $tagtype->{namesub} }($tag);
+	my $name=$tagtype->{name} || $tagtype->{namesub}($tag);
 	$self->{title}=$name;
 	$self->{tag}=$tag;
 	$self->{tagtype}=$tagtype;
@@ -1095,7 +1346,7 @@ sub new
 			$self->addrow($fname);
 		});
 	}
-	my $toadd=&{ $tagtype->{fillsub} }($tag);
+	my $toadd= $tagtype->{fillsub}($tag);
 	for (@{$tagtype->{default}})
 	{	$toadd->{$_}=undef unless defined $toadd->{$_};
 	}
@@ -1125,7 +1376,7 @@ sub addrow
 	my ($widget,@Todel);
 	my $tagtype=$self->{tagtype};
 	my $type;
-	$type=&{ $tagtype->{typesub} }($self->{tag},$fname,$nb) if $tagtype->{typesub};
+	$type= $tagtype->{typesub}($self->{tag},$fname,$nb) if $tagtype->{typesub};
 	$type||='t';
 	my $name=$tagtype->{types}{($tagtype->{lckeys}? lc$fname : $fname)}[TAGNAME]||$fname;
 	if (length($type)>1)	#frame with sub-frames (id3v2)
@@ -1156,7 +1407,7 @@ sub addrow
 	$delbut->signal_connect( clicked => sub
 		{ $widget->{deleted}=1;
 		  $table->remove($_) for $_[0],@Todel;
-		  &{ $table->{ondelete} }($widget) if $table->{ondelete};
+		  $table->{ondelete}($widget) if $table->{ondelete};
 		});
 
 	push @{ $table->{widgets} }, $widget;
@@ -1324,12 +1575,12 @@ sub new
 	my $self = bless Gtk2::SpinButton->new(
 		Gtk2::Adjustment->new ($init||0, 0, $max||10000000, 1, 10, 1) ,10,0  )
 		, $class;
-	$self->{init}=$self->get_adjustment->get_value;
+	$self->{init}=$self->get_value;
 	return $self;
 }
 sub return_value
 {	my $self=shift;
-	my $value=$self->get_adjustment->get_value;
+	my $value=$self->get_value;
 	$self->{changed}=1 if $value ne $self->{init};
 	return $value;
 }
@@ -1392,10 +1643,10 @@ sub new
 	 $sw->set_shadow_type('etched-in');
 	 $sw->set_policy('never','automatic');
 	 $sw->add($treeview);
-	 $sw->set_size_request(-1, 3*$entry->size_request->height ); #FIXME find a better way to get ~3 rows visible
+	 $sw->set_size_request(-1, 3*$entry->size_request->height );
 	$self->pack_start($_,::TRUE,::TRUE,0) for $sw,$vbox;
 
-	my $column=Gtk2::TreeViewColumn->new_with_attributes('', Gtk2::CellRendererText->new,'text',0);
+	my $column=Gtk2::TreeViewColumn->new_with_attributes('', Gtk2::CellRendererText->new,text=>0);
 	$treeview->append_column($column);
 	$treeview->set_headers_visible(0);
 	$rmbut->set_sensitive(0);
@@ -1452,8 +1703,8 @@ sub set_text
 {	my $self=shift;
 	$self->{init}=undef;
 	$self->{hlist}={};
-	$_[0]='' unless defined $_[0];
-	$self->addvalues( split(/\x00/,$_[0]) );
+	my $ref= ref $_[0] ? $_[0] : [split /\x00/,$_[0]];
+	$self->addvalues(@$ref);
 }
 
 package EntryMulti;	#for id3v2 frames containing multiple fields
@@ -1614,9 +1865,7 @@ sub view
 	$sw->add($textview);
 	$dialog->vbox->add($sw);
 	$dialog->show_all;
-	$dialog->signal_connect( response => sub
-		{	$_[0]->destroy;
-		});
+	$dialog->signal_connect( response => sub { $_[0]->destroy; });
 }
 
 package EntryCover;

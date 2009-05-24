@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2008 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -13,7 +13,6 @@ package Tag::OGG;
 use strict;
 use warnings;
 use Encode qw(decode encode);
-use bytes;
 
 use constant
 { PACKET_INFO	 => 1,
@@ -22,8 +21,16 @@ use constant
 };
 
 my @crc_lookup;
+my $digestcrc;
 INIT
-{ @crc_lookup=
+{ eval
+  {	require Digest::CRC;
+	$digestcrc=Digest::CRC->new(width=>32, init=>0, xorout=>0, poly=>0x04C11DB7, refin=>0, refout=>0);
+	warn "oggheader.pm : using Digest::CRC\n" if $::debug;
+  };
+  if ($@)
+  { warn "oggheader.pm : Digest::CRC not found, using slow pure-perl replacement.\n" if $::debug;
+    @crc_lookup=
  (0x00000000,0x04c11db7,0x09823b6e,0x0d4326d9,
   0x130476dc,0x17c56b6b,0x1a864db2,0x1e475005,
   0x2608edb8,0x22c9f00f,0x2f8ad6d6,0x2b4bcb61,
@@ -88,7 +95,7 @@ INIT
   0x9abc8bd5,0x9e7d9662,0x933eb0bb,0x97ffad0c,
   0xafb010b1,0xab710d06,0xa6322bdf,0xa2f33668,
   0xbcb4666d,0xb8757bda,0xb5365d03,0xb1f740b4
- );
+ );}
 }
 
 #hash fields :
@@ -133,7 +140,7 @@ sub new
 	#calulate length
 	last unless $self->{info}{rate};# && $self->{end};
 	my @granule=unpack 'C*',$self->{granule};
-	my $l=pop @granule;
+	my $l=0;
 	$l=$l*256+$_ for reverse @granule;
 	$self->{info}{seconds}=my$s=$l/$self->{info}{rate};
 	$self->{info}{mmss}=sprintf '%d:%02d',$s/60,$s%60;
@@ -166,7 +173,7 @@ sub _openw
 	until (open $fh,$m,$file)
 	{	my $err="Error opening '$file' for writing :\n$!";
 		warn $err."\n";
-		return undef unless $self->{errorsub} && &{ $self->{errorsub} }($err) eq 'yes';
+		return undef unless $self->{errorsub} && $self->{errorsub}($err) eq 'yes';
 	}
 	binmode $fh;
 	unless ($tmp)
@@ -330,25 +337,24 @@ sub _ReadComments
 {	my $self=$_[0];
 	if ( my $packref= _read_packet($self,PACKET_COMMENT) )
 	{	$self->{commentpack_size}=length $$packref;
-		my ($vendor,@comlist)=eval { unpack 'x7 V/a V/(V/a)',$$packref; };
+		my ($vstring,@comlist)=eval { unpack 'x7 V/a V/(V/a)',$$packref; };
 		if ($@) { warn "Comments corrupted\n"; return undef; }
 		# Comments vendor strings I have found
 		# 'Xiph.Org libVorbis I 20030909' : 1.0.1
 		# 'Xiph.Org libVorbis I 20020717' : 1.0 release of libvorbis
 		# 'Xiphophorus libVorbis I 200xxxxx' : 1.0_beta1 to 1.0_rc3
 		# 'AO; aoTuV b3 [20041120] (based on Xiph.Org's libVorbis)'
-		$self->{vorbis_string}=$vendor;
-		unless ($vendor=~m/^Xiph.* libVorbis I (\d{8})/)
-		 { warn "unknown comments vendor string : $vendor\n"; }#return undef; }
+		$self->{vorbis_string}=$vstring;
+		if ($::debug && $vstring!~m/^Xiph.* libVorbis I (\d{8})/)
+		 { warn "unknown comments vendor string : $vstring\n"; }
 		#warn "comment version $1\n";
 		my %comments;
 		for my $kv (@comlist)
 		{	unless ($kv=~m/^([^=]+)=(.*)$/s) { warn "comment invalid - skipped\n"; next; }
-			my $key=lc$1;
+			my $key=$1;
 			my $val=decode('utf-8', $2);
 			#warn "$key = $val\n";
-			push @{ $comments{$key} },$val;
-			my $nb=@{ $comments{$key} }-1;
+			push @{ $comments{lc$key} },$val;
 			push @{$self->{CommentsOrder}}, $key;
 		}
 		return \%comments;
@@ -363,12 +369,14 @@ sub _PackComments
 	my @comments;
 	my %count;
 	for my $key ( @{$self->{CommentsOrder}} )
-	{	my $nb=$count{$key}++ || 0;
-		my $val=$self->{comments}{$key}[$nb];
+	{	my $nb=$count{lc$key}++ || 0;
+		my $val=$self->{comments}{lc$key}[$nb];
 		next unless defined $val;
-		push @comments,$key.'='.$val;
+		$key=encode('ascii',$key);
+		$key=~tr/\x20-\x7D/?/c; $key=~tr/=/?/; #replace characters that are not allowed by '?'
+		push @comments,$key.'='.encode('utf8',$val);
 	}
-	my $packet=pack 'Ca6 V/a* V (V/a*)*',PACKET_COMMENT,'vorbis',$self->{vorbis_string},scalar @comments,@comments;
+	my $packet=pack 'Ca6 V/a* V (V/a*)*',PACKET_COMMENT,'vorbis',$self->{vorbis_string},scalar @comments, @comments;
 	$packet.="\x01"; #framing_flag
 	return \$packet;
 }
@@ -386,8 +394,8 @@ sub add
 {	my $self=shift;
 	if (@_%2) {warn 'invalid call to add comments, args must be pairs of $key,$val'."\n"; return undef;}
 	while (@_)
-	{	my $key=lc shift; my $val=shift;
-		push @{ $self->{comments}{$key} },$val;
+	{	my $key=shift; my $val=shift;
+		push @{ $self->{comments}{lc$key} },$val;
 		push @{$self->{CommentsOrder}}, $key;
 	}
 	return 1;
@@ -396,8 +404,8 @@ sub insert	#same as add but put it first (of its kind)
 {	my $self=shift;
 	if (@_%2) {warn 'invalid call to insert comments, args must be pairs of $key,$val'."\n"; return undef;}
 	while (@_)
-	{	my $key=lc shift; my $val=shift;
-		unshift @{ $self->{comments}{$key} },$val;
+	{	my $key=shift; my $val=shift;
+		unshift @{ $self->{comments}{lc$key} },$val;
 		push @{$self->{CommentsOrder}}, $key;
 	}
 	return 1;
@@ -426,10 +434,9 @@ sub clear_comments	# Untested
 {	my $self=shift;
 	if (@_)
 	{	for my $key (@_)
-		{	$key=lc$key;
-			return undef unless exists $self->{comments}{$key};
-			delete $self->{comments}{$key};
-			@{$self->{CommentsOrder}}=grep $_ ne $key, @{$self->{CommentsOrder}};
+		{	return undef unless exists $self->{comments}{lc$key};
+			delete $self->{comments}{lc$key};
+			@{$self->{CommentsOrder}}=grep lc$_ ne $key, @{$self->{CommentsOrder}};
 		}
 	}
 	else
@@ -438,14 +445,15 @@ sub clear_comments	# Untested
 	}
 	return 1;
 }
-sub listkeys	#former comment_tags
+sub listkeys
 {	my $self=shift;
 	return keys %{ $self->{comments} };
 }
-sub keyvalues	#former comment
+sub keyvalues
 {	my ($self,$key)=@_;
-	return undef unless exists $self->{comments}{$key};
-	return @{ $self->{comments}{$key} };
+	my $values=$self->{comments}{lc$key};
+	return undef unless $values;
+	return @$values;
 }
 sub info
 {	my $self=shift;
@@ -515,16 +523,19 @@ sub _read_page_header
 	return 1;
 }
 
-sub _recompute_page_crc		# __SLOW__ in perl
+sub _recompute_page_crc
 { my $pageref=$_[0];
 
   #warn 'old crc : ',unpack('V',substr($$pageref,22,4)),"\n";
   substr $$pageref,22,4,"\x00\x00\x00\x00";
   my $crc=0;
-  # $crc=($crc<<8)^vec($crc_lookup, ($crc>>24)^vec($$pageref,$_,8) ,32); # a bit slower
-  #$crc=($crc<<8)^$crc_lookup[ ($crc>>24)^vec($$pageref,$_,8) ] #doesn't work if perl use 64bits
-  $crc=(($crc<<8)&0xffffffff)^$crc_lookup[ ($crc>>24)^vec($$pageref,$_,8) ]
+  if ($digestcrc) { $digestcrc->add($$pageref); $crc=$digestcrc->digest; }
+  else			# pure-perl : SLOW
+  {	 #$crc=($crc<<8)^vec($crc_lookup, ($crc>>24)^vec($$pageref,$_,8) ,32); # a bit slower
+	 #$crc=($crc<<8)^$crc_lookup[ ($crc>>24)^vec($$pageref,$_,8) ] #doesn't work if perl use 64bits
+	 $crc=(($crc<<8)&0xffffffff)^$crc_lookup[ ($crc>>24)^vec($$pageref,$_,8) ]
   	for (0 .. length($$pageref)-1);
+  }
   #warn "new crc : $crc\n";
   substr $$pageref,22,4,pack('V',$crc);
 }

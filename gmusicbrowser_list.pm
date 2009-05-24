@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2008 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -13,12 +13,16 @@ use Gtk2 ;
 
 use constant { TRUE  => 1, FALSE => 0, };
 
-our @MenuPlaying=		# sub parameters : @_= (menuitem)
+our @MenuPlaying=
 (	{ label => _"Follow playing song",	code => sub { $_[0]{songlist}->FollowSong if $_[0]{songlist}->{TogFollow}^=1; }, check => sub { $_[0]{songlist}->{TogFollow} }, },
-	{ label => _"Filter on playing Album",	code => sub { ::SetFilter($_[0]{songlist}, ::SONG_ALBUM. 'e'.$::Songs[$::SongID][::SONG_ALBUM] ) if defined $::SongID; }},
-	{ label => _"Filter on playing Artist",	code => sub { ::SetFilter($_[0]{songlist}, ::SONG_ARTIST.'~'.$::Songs[$::SongID][::SONG_ARTIST]) if defined $::SongID; }},
-	{ label => _"Filter on playing Song",	code => sub { ::SetFilter($_[0]{songlist}, ::SONG_TITLE. '~'.$::Songs[$::SongID][::SONG_TITLE] ) if defined $::SongID; }},
+	{ label => _"Filter on playing Album",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('album',$::SongID) )	if defined $::SongID; }},
+	{ label => _"Filter on playing Artist",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('artists',$::SongID) )if defined $::SongID; }},
+	{ label => _"Filter on playing Song",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('title',$::SongID) )	if defined $::SongID; }},
 	{ label => _"use the playing Filter",	code => sub { ::SetFilter($_[0]{songlist}, $::PlayFilter ); }, test => sub {::GetSonglist($_[0]{songlist})->{mode} ne 'playlist'}}, #FIXME	if queue use queue, if $ListMode use list
+	{ label => _"Recent albums",		submenu => sub { my $sl=$_[0]{songlist};my @gid= ::uniq( Songs::Map_to_gid('album',$::Recent) ); $#gid=19 if $#gid>19; my $m=::PopupAA('album',nosort=>1,nominor=>1,widget => $_[0]{self}, list=>\@gid, cb=>sub { ::SetFilter($sl, Songs::MakeFilterFromGID('album',$_[1]) ); }); return $m; } },
+	{ label => _"Recent artists",		submenu => sub { my $sl=$_[0]{songlist};my @gid= ::uniq( Songs::Map_to_gid('artist',$::Recent) ); $#gid=19 if $#gid>19; my $m=::PopupAA('artists',nosort=>1,nominor=>1,widget => $_[0]{self}, list=>\@gid, cb=>sub { ::SetFilter($sl, Songs::MakeFilterFromGID('artists',$_[1]) ); }); return $m; } },
+	{ label => _"Recent songs",		submenu => sub { my @ids=@$::Recent; $#ids=19 if $#ids>19; return [map { $_,Songs::Display($_,'title') } @ids]; },
+	  submenu_ordered_hash => 1,submenu_reverse=>1,		code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('title',$_[1]) ); }, },
 );
 
 sub makeFilterBox
@@ -28,7 +32,7 @@ sub makeFilterBox
 			::SetFilter($box,$filt);
 		},
 	  undef,
-	  FilterBox::filter2posval(::SONG_TITLE.'s')
+	  FilterBox::filter2posval('title:s:')
 	);
 	$FilterWdgt->addtomainmenu(_"edit ..." => sub
 		{	::EditFilter($box,::GetFilter($box),undef,sub {::SetFilter($box,$_[0]) if defined $_[0]});
@@ -62,7 +66,7 @@ sub makeLockToggle
 	::set_drag($toggle, dest => [::DRAG_FILTER,sub {::SetFilter($_[0],$_[2],0);}]);
 	::WatchFilter($toggle,$opt1->{group},sub
 		{	my ($self,undef,$group)=@_;
-			my $filter=$::Filters_nb{$group}[0];
+			my $filter=$::Filters{$group}[0+1]; #filter for level 0
 			my $empty=Filter::is_empty($filter);
 			$self->{busy}=1;
 			$self->set_active(!$empty);
@@ -74,7 +78,7 @@ sub makeLockToggle
 }
 
 sub make_playing_menu
-{	my $menu= ::PopupContextMenu(\@MenuPlaying, { songlist => ::GetSonglist($_[0]) });
+{	my $menu= ::PopupContextMenu(\@MenuPlaying, { self => $_[0], songlist => ::GetSonglist($_[0]) });
 	return $menu;
 }
 
@@ -83,8 +87,8 @@ sub make_sort_menu
 	my $songlist=$selfitem->isa('SongList') || $selfitem->isa('SongTree') ? $selfitem : ::GetSonglist($selfitem);
 	my $menu=Gtk2::Menu->new;
 	my $menusub=sub { $songlist->Sort($_[1]) };
-	for my $name (sort keys %::SavedSorts)
-	{   my $sort=$::SavedSorts{$name};
+	for my $name (sort keys %{$::Options{SavedSorts}})
+	{   my $sort=$::Options{SavedSorts}{$name};
 	    my $item = Gtk2::CheckMenuItem->new($name);
 	    $item->set_draw_as_radio(1);
 	    $item->set_active(1) if $songlist->{sort} eq $sort;
@@ -101,22 +105,6 @@ sub make_sort_menu
 	return $menu;
 }
 
-sub make_history_menuitem
-{	my $opt1=$_[0];
-	my $self=Gtk2::MenuItem->new(_"Recent Filters");
-	$self->{recent}=[ map Filter->new($_),split /\x00/,$::Options{RecentFilters}||'' ];
-	$self->{SaveOptions}=sub { $::Options{RecentFilters}=join "\x00",map $_->{string},@{ $_[0]->{recent} }; return undef; };
-	::WatchFilter($self,$opt1->{group},sub
-	 {	my ($self,$filter)=@_;
-		my $recent=$self->{recent};
-		my $string=$filter->{string};
-		my @recent=($filter,grep $_->{string} ne $string,@$recent);
-		pop @recent if @recent>20;
-		$self->{recent}=\@recent;
-	 });
-	return $self;
-}
-
 sub make_history_menu
 {	my $selfitem=$_[0];
 	my $menu=Gtk2::Menu->new;
@@ -125,7 +113,7 @@ sub make_history_menu
 	 { my $f=($_[0]{middle})? Filter->newadd(FALSE, ::GetFilter($selfitem,1),$_[1]) : $_[1];
 	   ::SetFilter($selfitem,$f);
 	 };
-	for my $f (@{ $selfitem->{recent} })
+	for my $f (@{ $::Options{RecentFilters} })
 	{	my $item = Gtk2::MenuItem->new( $f->explain );
 		$item->signal_connect(activate => $menusub,$f);
 		$item->signal_connect(button_release_event => $mclicksub,$f);
@@ -140,10 +128,12 @@ use Gtk2;
 use base 'Gtk2::Button';
 
 our %Modes=
-(	list	 => [_"Listed songs",	\&Set_list],
-	library	 => [_"Library",	\&Set_library],
-	selected => [_"Selected songs",	\&Set_selected],
+(	list	 => {label=> _"Listed songs",	setup => \&list_Set,	update=>\&list_Update,		delay=> 1000,	},
+	filter	 => {label=> _"Filter",		setup => \&filter_Set,	update=>\&filter_Update,	delay=> 1500,	},
+	library	 => {label=> _"Library",	setup => \&library_Set,	update=>\&library_Update,	delay=> 4000,	},
+	selected => {label=> _"Selected songs", setup => \&selected_Set,update=>\&selected_Update,	delay=> 500,	},
 );
+
 
 sub new
 {	my ($class,$opt1) = @_;
@@ -156,7 +146,7 @@ sub new
 	$self->add(Gtk2::Label->new);
 	$self->signal_connect( destroy => \&Remove);
 	$self->signal_connect( button_press_event => \&button_press_event_cb);
-	$self->{watch}=::AddWatcher();
+	::Watch($self, SongsChanged	=> \&SongsChanged_cb);
 	$self->Set_mode($mode);
 	return $self;
 }
@@ -164,34 +154,26 @@ sub new
 sub Set_mode
 {	my ($self,$mode)=@_;
 	$self->Remove;
-	my $updatedo=&{ $Modes{$mode}[1] }($self);
-	::IdleDo('9_Total'.$self,10,$updatedo,$self);
-	$self->{SaveOptions}=$mode;
+	$self->{mode}=$self->{SaveOptions}=$mode;
+	$Modes{ $self->{mode} }{setup}->($self);
+	$self->QueueUpdateFast;
 }
 
 sub Remove
 {	my $self=shift;
 	delete $::ToDo{'9_Total'.$self};
-	::RemoveWatcher($self->{watch});
 	::UnWatchFilter($self,$self->{group});
 	::UnWatch($self,'Selection_'.$self->{group});
-}
-
-sub Update_text
-{	my ($self,$text,$array)=@_;
-	$text.= ::CalcListLength($array,$self->{format});
-	$text= ::PangoEsc($text);
-	$text= '<span size="'.$self->{size}.'">'.$text.'</span>' if $self->{size};
-	$self->child->set_markup($text);
+	::UnWatch($self,$_) for qw/SongArray SongsAdded SongsRemoved/;
 }
 
 sub button_press_event_cb
 {	(my $self,$::LEvent)=@_;
 	my $menu=Gtk2::Menu->new;
-	for my $mode (sort {$Modes{$a}[0] cmp $Modes{$b}[0]} keys %Modes)
-	{	my $item = Gtk2::CheckMenuItem->new( $Modes{$mode}[0] );
+	for my $mode (sort {$Modes{$a}{label} cmp $Modes{$b}{label}} keys %Modes)
+	{	my $item = Gtk2::CheckMenuItem->new( $Modes{$mode}{label} );
 		$item->set_draw_as_radio(1);
-		$item->set_active($mode eq $self->{SaveOptions});
+		$item->set_active($mode eq $self->{mode});
 		$item->signal_connect( activate => sub { $self->Set_mode($mode) } );
 		$menu->append($item);
 	 }
@@ -199,56 +181,101 @@ sub button_press_event_cb
 	$menu->popup(undef, undef, \&::menupos, undef, $::LEvent->button, $::LEvent->time);
 }
 
-sub Set_list
-{	my $self=shift;
-	::WatchFilter($self,$self->{group},\&Queue_list);
-	return \&Update_list;
+sub QueueUpdateFast
+{	my ($self,$fast)=@_;
+	$self->{needupdate}=2;
+	::IdleDo('9_Total'.$self, 10, \&Update, $self);
 }
-sub Queue_list
-{	my $self=shift;
-	::IdleDo('9_Total'.$self, 1000,\&Update_list,$self);
+sub QueueUpdateSlow
+{	my ($self,$fast)=@_;
+	return if $self->{needupdate};
+	$self->{needupdate}=1;
+	my $maxdelay= $Modes{ $self->{mode} }{delay};
+	::IdleDo('9_Total'.$self, $maxdelay, \&Update, $self);
 }
-sub Update_list
+sub Update
 {	my $self=shift;
-	my $songlist=::GetSonglist($self);
-	return unless $songlist;
-	my $array=$songlist->{array};
-	$self->Update_text(_("Listed : "),$array);
-	$::Tooltips->set_tip( $self, ::GetFilter($self)->explain );
-	my $sub=sub {$self->Queue_list};
-	::ChangeWatcher( $self->{watch}, $array, [::SONG_LENGTH,::SONG_SIZE], $sub, $sub);
+	delete $::ToDo{'9_Total'.$self};
+	my ($text,$array,$tip)= $Modes{ $self->{mode} }{update}->($self);
+	$text.= ::CalcListLength($array,$self->{format});
+	$text= ::PangoEsc($text);
+	$text= '<span size="'.$self->{size}.'">'.$text.'</span>' if $self->{size};
+	$self->child->set_markup($text);
+	$::Tooltips->set_tip($self, $tip);
+	$self->{needupdate}=0;
 }
 
-sub Set_selected
+sub SongsChanged_cb
+{	my ($self,$IDs,$fields)=@_;
+	return if $self->{needupdate};
+	my $needupdate= $fields && (grep $_ eq 'length' || $_ eq 'size', @$fields);
+	if (!$needupdate && $self->{mode} eq 'filter')
+	{	my $filter=::GetFilter($self);
+		$needupdate=$filter->changes_may_affect($IDs,$fields);
+	}
+	#if in list mode, could check : return if $IDs && !$songarray->AreIn($IDs)
+	$self->QueueUpdateSlow if $needupdate;
+}
+
+### filter functions
+sub filter_Set
 {	my $self=shift;
-	::Watch($self,'Selection_'.$self->{group},\&Queue_selected);
+	::WatchFilter($self,$self->{group},	\&QueueUpdateFast);
+	::Watch($self, SongsAdded	=>	\&SongsChanged_cb);
+	::Watch($self, SongsRemoved	=>	\&SongsChanged_cb);
+}
+sub filter_Update
+{	my $self=shift;
+	my $filter=::GetFilter($self);
+	my $array=$filter->filter;
+	return _("Filter : "), $array, $filter->explain;
+}
+
+### list functions
+sub list_Set
+{	my $self=shift;
+	::Watch($self, SongArray	=>\&list_SongArray_changed);
+}
+sub list_SongArray_changed
+{	my ($self,$array,$action)=@_;
+	return if $self->{needupdate};
+	my $songlist=::GetSonglist($self) || return;
+	my $array0=$songlist->{array};
+	return unless $array0==$array;
+	return if grep $action eq $_, qw/mode sort move up down/;
+	$self->QueueUpdateFast;
+}
+sub list_Update
+{	my $self=shift;
+	my $songlist=::GetSonglist($self) || return;
+	my $array=$songlist->{array};
+	return _("Listed : "), $array,  ::__('%d song','%d songs',scalar@$array)
+}
+
+### selected functions
+sub selected_Set
+{	my $self=shift;
+	::Watch($self,'Selection_'.$self->{group}, \&QueueUpdateFast);
 	return \&Update_selected;
 }
-sub Queue_selected
-{	my $self=shift;
-	::IdleDo('9_Total'.$self, 500,\&Update_selected,$self);
-}
-sub Update_selected
+sub selected_Update
 {	my $self=shift;
 	my $songlist=::GetSonglist($self);
 	return unless $songlist;
-	my $array=$songlist->{array};
 	my @list=$songlist->GetSelectedIDs;
-	$self->Update_text(_('Selected : '),\@list);
-	$::Tooltips->set_tip( $self, ::__('%d song selected','%d songs selected',scalar@list) );
-	::ChangeWatcher( $self->{watch}, \@list, [::SONG_LENGTH,::SONG_SIZE], sub {$self->Queue_selected} );
+	return _('Selected : '), \@list,  ::__('%d song selected','%d songs selected',scalar@list);
 }
 
-sub Set_library
+### library functions
+sub library_Set
 {	my $self=shift;
-	my $sub= sub { ::IdleDo('9_Total'.$self, 4000,\&Update_library,$self); };
-	::ChangeWatcher( $self->{watch},undef, [::SONG_LENGTH,::SONG_SIZE],$sub,$sub,$sub);
+	::Watch($self, SongsAdded	=>\&QueueUpdateSlow);
+	::Watch($self, SongsRemoved	=>\&QueueUpdateSlow);
 	return \&Update_library;
 }
-sub Update_library
-{	my $self=shift;
-	$self->Update_text(_('Library : '),\@::Library);
-	$::Tooltips->set_tip( $self, ::__('%d song in the library','%d songs in the library',scalar@::Library) );
+sub library_Update
+{	my $tip= ::__('%d song in the library','%d songs in the library',scalar@$::Library);
+	return _('Library : '), $::Library, $tip;
 }
 
 package TabbedLists;
@@ -256,7 +283,7 @@ use Gtk2;
 use base 'Gtk2::Notebook';
 
 my %PagesTypes=
-(	L => {New => \&newlist,		stockicon => 'gmb-list',	WatchID=>1, save => sub {$_[0]{listname}} },
+(	L => {New => \&newlist,		stockicon => 'gmb-list',	WatchID=>1, save => sub {$_[0]{tabbed_listname}} },
 	B => {New => \&newfilter,	stockicon => 'gmb-filter',	WatchID=>1 },
 	Q => {New => \&newqueue,	stockicon => 'gmb-queue',	WatchID=>1 },
 	P => {New => \&Layout::Page::new,	save=> sub {$_[0]{layout}}, stringopt =>1,WatchID=>1 },
@@ -271,10 +298,10 @@ our @MenuTabbedL=
 	{ label => _"Open Playlist", code => sub { $_[0]{self}->newtab('A'); }, stockicon => 'gtk-media-play',
 		test => sub { !grep $_->{tabbed_page_type} eq 'A', $_[0]{self}->get_children } },
 	{ label => _"Open existing list", code => sub { $_[0]{self}->newtab(L=>$_[1]); },
-		submenu => sub { my %h; $h{$_->{listname}}=1 for grep $_->{tabbed_page_type} eq 'L', $_[0]{self}->get_children; return [grep !$h{$_}, keys %::SavedLists]; } },
+		submenu => sub { my %h; $h{$_->{tabbed_listname}}=1 for grep $_->{tabbed_page_type} eq 'L', $_[0]{self}->get_children; return [grep !$h{$_}, ::GetListOfSavedLists()]; } },
 	{ label => _"Open page layout", code => sub { $_[0]{self}->newtab(P=>$_[1]); },
-		submenu => sub { Layout::get_layout_list('P') } },
-	{ label => _"Delete list", code => sub { ::SaveList($_[0]{page}{listname},undef); },
+		submenu => sub { Layout::get_layout_list('P') }, submenu_tree=>1, },
+	{ label => _"Delete list", code => sub { ::SaveList($_[0]{page}{tabbed_listname},undef); },
 		test => sub {$_[0]{pagetype} eq 'L'} },
 	{ label => _"Rename", code => \&rename_current_tab,
 		test => sub {$_[0]{pagetype} eq 'L'} },
@@ -285,11 +312,14 @@ sub new
 {	my ($class,$opt1,$opt2)=@_;
 	my $self = bless Gtk2::Notebook->new, $class;
 	$self->set_scrollable(1);
+	$self->set_tab_hborder(0);
+	$self->set_tab_vborder(0);
 	$self->{SaveOptions}=\&SaveOptions;
 	$self->{group}=$opt1->{group};
 	$self->signal_connect(switch_page => \&SwitchedPage);
 	$self->signal_connect(button_press_event => \&button_press_event_cb);
 	$self->{tabcount}=0;
+	$self->{SLpackage}= $opt1->{songtree} ? 'SongTree' : $opt1->{songlist} ? 'SongList' : 'SongList';
 	if ($opt2 && keys %$opt2)
 	{	for my $n (sort {$a<=>$b} grep s/^page(\d+)$/$1/, keys %$opt2)
 		{	my @args=split /\|/,$opt2->{'page'.$n};
@@ -314,7 +344,7 @@ sub new
 			{	$page->{tabbed_listname}=$newname;
 				$page->{tabbed_page_label}->set_text($newname);
 			}
-			elsif (!exists $::SavedLists{$name})
+			elsif (!exists $::Options{SavedLists}{$name})
 			{	$self->close_tab($page);
 			}
 		}
@@ -327,9 +357,10 @@ sub new
 sub button_press_event_cb
 {	my ($self,$event)=@_;
 	return 0 if $event->button != 3;
+	return 0 unless ::IsEventInNotebookTabs($self,$event); #to make right-click on tab arrows work
 	my $pagenb=$self->get_current_page;
 	my $page=$self->get_nth_page($pagenb);
-	my $listname= $page? $page->{listname} : undef;
+	my $listname= $page? $page->{tabbed_listname} : undef;
 	$::LEvent=$event;
 	::PopupContextMenu(\@MenuTabbedL, { self=>$self, list=>$listname, pagenb=>$pagenb, page=>$page, pagetype=>$page->{tabbed_page_type} } );
 	return 1;
@@ -337,36 +368,35 @@ sub button_press_event_cb
 
 sub newlist
 {	my ($self,$group,$name,$opt2)=@_;
-	my $page=SongList->new({type=>'L',activate=>'playlist',group=>$group},$opt2);
 	unless (defined $name)
 	{	$name='list000';
-		$name++ while $::SavedLists{$name};
+		$name++ while $::Options{SavedLists}{$name};
 	}
-	::SaveList($name,[]) unless $::SavedLists{$name};
-	$page->SetList($name);
+	::SaveList($name,[]) unless $::Options{SavedLists}{$name};
+	my $songarray= $::Options{SavedLists}{$name};
+	my $page=$self->{SLpackage}->new({type=>'L',activate=>'playlist',group=>$group},$opt2, $songarray);
 	$page->{tabbed_listname}=$name;
 	return $page,$name;
 }
 sub newfilter
 {	my ($self,$group,$name,$opt2)=@_;
-	my $page=SongList->new({type=>'B',activate=>'play',group=>$group},$opt2);
+	my $page=$self->{SLpackage}->new({type=>'B',activate=>'play',group=>$group},$opt2);
 	unless (defined $name)
 	{	$name='filter000';
-		$name++ while $::SavedFilters{$name};
+		$name++ while $::Options{SavedFilters}{$name};
 		::SaveFilter($name,undef);
 	}
-	$page->SetFilter(Filter->new(::SONG_TITLE.'slove'));# just a test filter
+	$page->SetFilter(Filter->new('title:slove'));# just a test filter #TEST
 	return $page,$name;
 }
 sub newqueue
 {	my ($self,$group,undef,$opt2)=@_;
-	my $page=SongList->new({type=>'Q',activate=>'play',group=>$group},$opt2);
-	$page->SetList();
+	my $page=$self->{SLpackage}->new({type=>'Q',activate=>'play',group=>$group},$opt2, $::Queue);
 	return $page,_"Queue";
 }
 sub newplaylist
 {	my ($self,$group,undef,$opt2)=@_;
-	my $page=SongList->new({type=>'B',group=>$group,mode=>'playlist'},$opt2);
+	my $page= $self->{SLpackage}->new({type=>'A',group=>$group,mode=>'playlist'},$opt2);
 	return $page,_"Playlist";
 }
 
@@ -385,7 +415,7 @@ sub newtab
 			$opt2=\%opt2;
 		}
 	}
-	my ($page,$name)=&{$ref->{New}} ($self,$group,$extra,$opt2);
+	my ($page,$name)= $ref->{New}($self,$group,$extra,$opt2);
 	$page->{tabbed_page_type}=$type;
 	::Watch($self,'SelectedID_'.$group,\&UpdateSelectedID) if $ref->{WatchID};
 	$page->{tabbed_page_label}=my $label=Gtk2::Label->new($name);
@@ -398,10 +428,7 @@ sub newtab
 	$close->can_focus(0);
 	$close->signal_connect(clicked => sub {my $self=::find_ancestor($_[0],__PACKAGE__); $self->close_tab($page);});
 	$close->add(Gtk2::Image->new_from_stock('gtk-close','menu'));
-	my $req=$close->child->requisition; $close->set_size_request(Gtk2::IconSize->lookup('menu'));
-	my $rcstyle=Gtk2::RcStyle->new;
-	$rcstyle->ythickness(0);
-	$close->modify_style($rcstyle);
+	$close->set_size_request(Gtk2::IconSize->lookup('menu'));
 	$close->set_border_width(0);
 
 	my $tab=::Hpack('4',$icon,'2_', $label,$close);
@@ -416,7 +443,7 @@ sub close_tab
 {	my ($self,$page)=@_;
 	my $type=$page->{tabbed_page_type};
 	if ($type=~m/^[ALQ]$/ && $page->{SaveOptions})
-	{	my $opt=&{ $page->{SaveOptions} }($page);
+	{	my $opt= $page->{SaveOptions}($page);
 		$opt=join ',',map $_.'='.$opt->{$_}, keys %$opt;
 		$self->{default}{$type}= ::url_escapeall( $opt );
 	}
@@ -432,7 +459,7 @@ sub rename_current_tab
 	my $entry=Gtk2::Entry->new;
 	$entry->set_has_frame(0);
 	$entry->set_inner_border(undef) if *Gtk2::Entry::set_inner_border{CODE}; #Gtk2->CHECK_VERSION(2,10,0);
-	$entry->set_text( $page->{listname} );
+	$entry->set_text( $page->{tabbed_listname} );
 	$entry->set_size_request( 20+$label->allocation->width ,-1);
 	$_->hide for grep !$_->isa('Gtk2::Image'), $tab->get_children;
 	$tab->pack_start($entry,::FALSE,::FALSE,2);
@@ -441,7 +468,7 @@ sub rename_current_tab
 	$entry->signal_connect(key_press_event => sub #abort if escape
 		{	my ($entry,$event)=@_;
 			return 0 unless Gtk2::Gdk->keyval_name( $event->keyval ) eq 'Escape';
-			$entry->set_text($page->{listname});
+			$entry->set_text($page->{tabbed_listname});
 			$entry->set_sensitive(0);  #trigger the focus-out event
 			1;
 		});
@@ -451,8 +478,8 @@ sub rename_current_tab
 		my $new=$entry->get_text;
 		$tab->remove($entry);
 		$_->show for $tab->get_children;
-		if ($new ne '' && !exists $::SavedLists{$new})
-		{	::SaveList($page->{listname},undef,$new);
+		if ($new ne '' && !exists $::Options{SavedLists}{$new})
+		{	::SaveList($page->{tabbed_listname},undef,$new);
 		}
 		0;
 	 });
@@ -460,22 +487,17 @@ sub rename_current_tab
 
 sub SwitchedPage
 {	my ($self,undef,$pagenb)=@_;
-	my $page=$self->get_nth_page($pagenb);
-	my $group=$page->{group};
-#	if (my $layw=::get_layout_widget($self)) #should be done on init too
-#	{	$page=undef unless $page->isa('SongList') || $page->isa('SongTree');
-#		$layw->{'songlist'.$self->{group}}=$page;
-#	}
+	my $group=$self->get_nth_page($pagenb)->{group};
 	$self->{active_group}=$group;
 	my $ID=$self->{selectedID}{$group};
-	::HasChanged('SelectedID_'.$self->{group},$ID,$self->{group}) if defined $ID;
+	::HasChangedSelID($self->{group},$ID);
 }
 
 sub UpdateSelectedID
 {	my ($self,$ID,$group)=@_;
 	$self->{selectedID}{$group}=$ID;
 	return unless $self->{active_group} eq $group;
-	::HasChanged('SelectedID_'.$self->{group},$ID,$self->{group}) if defined $ID;
+	::HasChangedSelID($self->{group},$ID);
 }
 
 sub SaveOptions
@@ -486,9 +508,9 @@ sub SaveOptions
 	{	my $type=$page->{tabbed_page_type};
 		my $sub=$PagesTypes{$type}{save};
 		my @args=($type);
-		push @args, ($sub ? &$sub($page) :'');
+		push @args, ($sub ? $sub->($page) :'');
 		if ($page->{SaveOptions})
-		{	my $opt= &{ $page->{SaveOptions} }($page);
+		{	my $opt= $page->{SaveOptions}($page);
 			unless ($PagesTypes{$type}{stringopt})
 			{ $opt=join ',',map $_.'='.$opt->{$_}, keys %$opt; }
 			push @args,$opt;
@@ -510,6 +532,7 @@ push @ISA,'Layout';
 sub new
 {	my (undef,$group,$layout,$opt2)=@_;
 	my $self=bless Gtk2::Frame->new, 'Layout::Page';
+	$self->set_name($layout);
 	$self->set_shadow_type('etched-in');
 	$self->{SaveOptions}=\&Layout::SaveOptions;
 	$self->{group}=$group;
@@ -532,10 +555,10 @@ sub new
 	$self->{group}=$opt1->{group};
 	$self->{brm}=	::NewIconButton('gtk-remove',	($opt1->{small} ? '' : _"Remove"),sub {::GetSonglist($self)->RemoveSelected});
 	$self->{bclear}=::NewIconButton('gtk-clear',	($opt1->{small} ? '' : _"Clear"),sub {::GetSonglist($self)->Empty} );
-	$self->{bup}=	::NewIconButton('gtk-go-up',		undef,	sub {::GetSonglist($self)->MoveOne(1)});
-	$self->{bdown}=	::NewIconButton('gtk-go-down',		undef,	sub {::GetSonglist($self)->MoveOne(0)});
-	$self->{btop}=	::NewIconButton('gtk-goto-top',		undef,	sub {::GetSonglist($self)->MoveMax(1)});
-	$self->{bbot}=	::NewIconButton('gtk-goto-bottom',	undef,	sub {::GetSonglist($self)->MoveMax(0)});
+	$self->{bup}=	::NewIconButton('gtk-go-up',		undef,	sub {::GetSonglist($self)->MoveUpDown(1)});
+	$self->{bdown}=	::NewIconButton('gtk-go-down',		undef,	sub {::GetSonglist($self)->MoveUpDown(0)});
+	$self->{btop}=	::NewIconButton('gtk-goto-top',		undef,	sub {::GetSonglist($self)->MoveUpDown(1,1)});
+	$self->{bbot}=	::NewIconButton('gtk-goto-bottom',	undef,	sub {::GetSonglist($self)->MoveUpDown(0,1)});
 
 	$::Tooltips->set_tip($self->{brm},_"Remove selected songs");
 	$::Tooltips->set_tip($self->{bclear},_"Remove all songs");
@@ -544,31 +567,33 @@ sub new
 	$self->pack_start($self->{$_},FALSE,FALSE,2) for qw/btop bup bdown bbot brm bclear/;
 
 	::Watch($self,'Selection_'.$self->{group}, \&SelectionChanged);
-	::Watch($self,'List_'.$self->{group}, \&ListChanged);
+	::Watch($self,SongArray=> \&ListChanged);
 
 	return $self;
 }
 
 sub ListChanged
 {	my ($self,$array)=@_;
+	my $watchedarray=::GetSonglist($self);
+	return if !$watchedarray || $watchedarray!=$array;
 	$self->{bclear}->set_sensitive(scalar @$array);
 }
 
 sub SelectionChanged
 {	my ($self)=@_;
+	my $rows;
 	my $songlist=::GetSonglist($self);
-	my @rows;
 	if ($songlist)
-	{	@rows=map $_->to_string, $songlist->child->get_selection->get_selected_rows; #FIXME support SongTree
+	{	$rows=$songlist->GetSelectedRows;
 	}
-	if (@rows)
+	if ($rows && @$rows)
 	{	$self->{brm}->set_sensitive(1);
 		my $i=0;
-		$i++ while $i<@rows && $rows[$i]==$i;
-		$self->{$_}->set_sensitive($i!=@rows) for qw/btop bup/;
-		$i=$#rows;
+		$i++ while $i<@$rows && $rows->[$i]==$i;
+		$self->{$_}->set_sensitive($i!=@$rows) for qw/btop bup/;
+		$i=$#$rows;
 		my $array=$songlist->{array};
-		$i-- while $i>-1 && $rows[$i]==$#$array-$#rows+$i;
+		$i-- while $i>-1 && $rows->[$i]==$#$array-$#$rows+$i;
 		$self->{$_}->set_sensitive($i!=-1) for qw/bbot bdown/;
 	}
 	else
@@ -611,13 +636,13 @@ sub new
 	$self->{eventcombo}->add($combo);
 	$self->{spin}=::NewPrefSpinButton('MaxAutoFill',sub
 		{	return if $self->{busy};
-			::HasChanged('Queue','action');
+			::HasChanged('QueueAction');
 		},1,0,1,50,1,5);
 	$self->{spin}->set_no_show_all(1);
 
 	$self->pack_start($self->{$_},FALSE,FALSE,2) for qw/eventcombo spin/;
 
-	::Watch($self, Queue => \&Update);
+	::Watch($self, QueueAction => \&Update);
 	$self->Update;
 	return $self;
 }
@@ -634,6 +659,166 @@ sub Update
 	delete $self->{busy};
 }
 
+package SongList::Common;	#common functions for SongList and SongTree
+our %Register;
+our $EditList;	#list that will be used in 'editlist' mode, used only for editing a list in a separate window
+
+sub CommonInit
+{	my ($self,$opt1,$opt2,$songarray)=@_;
+
+	$self->{$_}=$opt1->{$_} for qw/mode group/,grep m/^activate\d?$/, keys %$opt1;
+	$self->{mode}||='';
+	$self->{type}=	$self->{mode} eq 'playlist' ? 'A' :
+			$self->{mode} eq 'editlist' ? 'L' :
+			$opt1->{type} || 'B';
+	$self->{TogFollow}=1 if $opt2->{follow};
+
+	::WatchFilter($self,$self->{group}, \&SetFilter ) if $self->{type}!~m/[QL]/;
+	$self->{need_init}=1;
+	$self->signal_connect(show => sub
+		{	my $self=$_[0];
+			return 0 unless delete $self->{need_init};
+			if ($self->{type}=~m/[QLA]/)
+			{	$self->SongArray_changed_cb($self->{array},'replace');
+			}
+			else { ::SetFilter($self,undef,0) unless $self->{filter}; }
+			$self->FollowSong unless $self->{type}=~m/[QL]/;
+			0;
+		});
+
+	$self->{sort}= $opt2->{sort} || 'path|album:i|disc|track|file';
+	$self->{sort}=~tr/|/ /;
+	for my $key (keys %$opt2)
+	{	next unless $key=~m/^cw_(.*)$/;
+		$self->{colwidth}{$1}=$opt2->{$key};
+	}
+	$self->{hideif}=	$opt1->{hideif} || '';
+	$self->{hidewidget}=	$opt1->{hidewidget};
+	$self->{shrinkonhide}=	$opt1->{shrinkonhide};
+
+	if ($self->{type} eq 'A')
+	{	#$songarray= SongArray->new_copy($::ListPlay);
+		$self->{array}=$songarray=$::ListPlay;
+		$self->{sort}= $::RandomMode ? $::Options{Sort_LastOrdered} : $::Options{Sort};
+		#$self->{filter}=$::PlayFilter;
+		$self->{ignoreSetFilter}=1;
+		::SetFilter($self,$::PlayFilter,0);
+		$self->{ignoreSetFilter}=0;
+	}
+	elsif ($self->{type} eq 'L')
+	{	$songarray||= $EditList;
+	}
+	$self->{array}= $songarray || SongArray->new;
+
+	$Register{ $self->{group} }=$self;
+	::weaken($Register{ $self->{group} });	#or use a destroy cb ?
+}
+
+sub Sort
+{	my ($self,$sort)=@_;
+	$self->{array}->Sort($sort);
+}
+sub SetFilter
+{	my ($self,$filter)=@_;	::red($self->{type},' ',($self->{filter} || 'no'), ' ',$filter);::callstack();
+	my $list;
+	if ($self->{hideif} eq 'nofilter')
+	{	$self->Hide($filter->is_empty);
+		return if $filter->is_empty;
+	}
+	$self->{filter}=$filter;
+	return if $self->{ignoreSetFilter};
+
+	$list=$filter->filter;
+	Songs::SortList( $list, $self->{sort} ) if exists $self->{sort};
+	$self->{array}->Replace($list,filter=>$filter);
+}
+sub Empty
+{	my $self=shift;
+	$self->{array}->Replace;
+}
+
+sub GetSelectedIDs
+{	my $self=shift;
+	my $rows=$self->GetSelectedRows;
+	my $array=$self->{array};
+	return map $array->[$_], @$rows;
+}
+sub PlaySelected ##
+{	my $self=$_[0];
+	my @IDs=$self->GetSelectedIDs;
+	::Select(song=>'first',play=>1,staticlist => \@IDs ) if @IDs;
+}
+sub EnqueueSelected##
+{	my $self=$_[0];
+	my @IDs=$self->GetSelectedIDs;
+	::Enqueue(@IDs) if @IDs;
+}
+sub RemoveSelected
+{	my $self=shift;
+	my $songarray=$self->{array};
+	$songarray->Remove($self->GetSelectedRows);
+}
+
+sub MoveUpDown
+{	my ($self,$up,$max)=@_;
+	my $songarray=$self->{array};
+	my $rows=$self->GetSelectedRows;
+	if ($max)
+	{	if ($up){ $songarray->Top($rows); }
+		else	{ $songarray->Bottom($rows); }
+		$self->Scroll_to_TopEnd(!$up);
+	}
+	else
+	{	if ($up){ $songarray->Up($rows) }
+		else	{ $songarray->Down($rows) }
+	}
+}
+
+sub Hide
+{	my ($self,$hide)=@_;
+	my $name=$self->{hidewidget} || $self->{name};
+	my $toplevel=::get_layout_widget($self);
+	unless ($toplevel)
+	{	$self->{need_hide}=$name if $hide;
+		return;
+	}
+	if ($hide)	{ $toplevel->Hide($name,$self->{shrinkonhide}) }
+	else		{ $toplevel->Show($name,$self->{shrinkonhide}) }
+}
+
+sub Activate
+{	my ($self,$row,$button)=@_;
+	my $songarray=$self->{array};
+	my $ID=$songarray->[$row];
+	my $activate=$self->{'activate'.$button} || $self->{activate};
+	$activate||=	$songarray==$::Queue	? 'remove_and_play' :
+			$button==2		? 'queue' :
+			$self->{type} eq 'L'	? 'playlist' :
+			'play';
+	my $aftercmd;
+	$aftercmd=$1 if $activate=~s/&(.*)$//;
+	if	($activate eq 'remove_and_play')
+	{	$songarray->Remove([$row]);
+		::Select(song=>$ID,play=>1);
+	}
+	elsif	($activate eq 'queue')	{ ::Enqueue($ID); }
+	elsif	($activate eq 'playlist')
+	{	if ($self->{filter})
+		{	::Select( filter=>$self->{filter}, song=>$ID, play=>1);
+		}
+		elsif ($self->{type} eq 'L')
+		{	::Select( staticlist=>[@$songarray], position=>$row, play=>1);
+		}
+		else {$activate='play'}
+	}
+	elsif	($activate eq 'addplay' || $activate eq 'insertplay'){ ::DoActionForList($activate,[$ID]); }
+	if	($activate eq 'play')
+	{	if ($self->{type} eq 'A')	{ ::Select(position=>$row,play=>1); }
+		else				{ ::Select(song=>$ID,play=>1); }
+	}
+	::run_command($self,$aftercmd) if $aftercmd;
+}
+
 package SongList;
 use Glib qw(TRUE FALSE);
 use Gtk2;
@@ -641,103 +826,83 @@ use Gtk2::Pango; #for PANGO_WEIGHT_BOLD, PANGO_WEIGHT_NORMAL
 
 use base 'Gtk2::ScrolledWindow';
 
+our @ISA;
 our %SLC_Prop;
 INIT
-{ no warnings 'uninitialized';
+{ unshift @ISA, 'SongList::Common';
   %SLC_Prop=
   (	#PlaycountBG => #TEST
-#	{	value => sub { $_[1][2][::SONG_NBPLAY] ? 'grey' : '#ffffff'; },
+#	{	value => sub { Songs::Get($_[2],'playcount') ? 'grey' : '#ffffff'; },
 #		attrib => 'cell-background',	type => 'Glib::String',
+#		#can't be updated via a event key, so not updated on its own for now, but will be updated if a playcount row is present
 #	},
+	# italicrow & boldrow are special 'playrow', can't be updated via a event key, a redraw is made when SongID changed if $self->{playrow}
 	italicrow =>
-	{	value => sub {$_[0]{boldrow}==$_[1][1] ? 'italic' : 'normal'},
+	{	value => sub {defined $::SongID && $_[2]==$::SongID ? 'italic' : 'normal'},
 		attrib => 'style',	type => 'Gtk2::Pango::Style',
 	},
 	boldrow =>
-	{	value => sub {$_[0]{boldrow}==$_[1][1] ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL},
+	{	value => sub {defined $::SongID && $_[2]==$::SongID ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL},
 		attrib => 'weight',	type => 'Glib::Uint',
 	},
+
 	titleaa =>
 	{	menu => _('Title - Artist - Album'), title => _('Song'),
-		value => sub { my $ID=$_[0]{array}[ $_[1][1] ]; return ::ReplaceFieldsAndEsc($ID,"<b>%t</b>\n<small><i>%a</i> - %l</small>"); },
-		attrib => 'markup', type => 'Glib::String', depend => [::SONG_TITLE,::SONG_ARTIST,::SONG_ALBUM],
-		sort => ::SONG_TITLE,	noncomp => ['boldrow'],		width => 200,
-	},
-	titleorfile =>
-	{	title => _('Title or filename'),
-		value => sub { my $ID=$_[0]{array}[ $_[1][1] ]; return ::ReplaceFields($ID,"%S"); },
-		attrib => 'text', type => 'Glib::String', depend => [::SONG_TITLE,::SONG_FILE],
-		sort => ::SONG_TITLE,	width => 200,
+		value => sub { ::ReplaceFieldsAndEsc($_[2],"<b>%t</b>\n<small><i>%a</i> - %l</small>"); },
+		attrib => 'markup', type => 'Glib::String', depend => 'title artist album',
+		sort => 'title:i',	noncomp => 'boldrow',		width => 200,
 	},
 	playandqueue =>
 	{	menu => _('Playing & Queue'),		title => '',	width => 20,
-		value => sub { my $ID=$_[0]{array}[ $_[1][1] ]; ::Get_PPSQ_Icon($ID,$_[0]{boldrow}!=$_[1][1]); },
+		value => sub { ::Get_PPSQ_Icon($_[2]); },
 		class => 'Gtk2::CellRendererPixbuf',	attrib => 'stock-id',
-		type => 'Glib::String',			noncomp =>['boldrow','italicrow'],
-		event => [qw/Playing Queue SongID/],
+		type => 'Glib::String',			noncomp => 'boldrow italicrow',
+		event => 'Playing Queue SongID',
 	},
 	icolabel =>
-	{	menu => _("Labels' Icons"),	title => '',		value => sub { $_[1][2][::SONG_LABELS]; },
-		class => 'CellRendererIconList',attrib => 'iconlist',	type => 'Glib::Scalar',
-		depend => [::SONG_LABELS],	sort => ::SONG_LABELS,	noncomp => ['boldrow','italicrow'],
+	{	menu => _("Labels' Icons"),	title => '',		value => sub { $_[2] },
+		class => 'CellRendererIconList',attrib => 'ID',	type => 'Glib::Uint',
+		depend => 'label',	sort => 'label:i',	noncomp => 'boldrow italicrow',
 		event => 'Icons', 		width => 50,
+		init => {field => 'label'},
 	},
 	albumpic =>
 	{	title => _("Album picture"),	width => 100,
-		value => sub
-		{	my $array=$_[0]{array};
-			my $key=$_[1][2][::SONG_ALBUM];
-			my $row=my $r1=my $r2=$_[1][1];
-			$r1-- while $r1>0	 && $::Songs[$array->[$r1-1]][::SONG_ALBUM] eq $key;
-			$r2++ while $r2<$#$array && $::Songs[$array->[$r2+1]][::SONG_ALBUM] eq $key;
-			return [$r1,$r2,$row,$key];
-		},
+		value => sub { CellRendererSongsAA::get_value('album',$_[0]{array},$_[1]); },
 		class => 'CellRendererSongsAA',	attrib => 'ref',	type => 'Glib::Scalar',
-		depend => [::SONG_ALBUM],	sort => ::SONG_ALBUM,	noncomp => ['boldrow','italicrow'],
-		init => {aa => ::SONG_ALBUM},
-		event => 'AAPicture',
+		depend => 'album',	sort => 'album:i',	noncomp => 'boldrow italicrow',
+		init => {aa => 'album'},
+		event => 'Picture_album',
 	},
 	artistpic =>
 	{	title => _("Artist picture"),
-		value => sub
-		{	my $array=$_[0]{array};
-			my $key=$_[1][2][::SONG_ARTIST];
-			($key)= split $::re_artist, $key;
-			my $row=my $r1=my $r2=$_[1][1];
-			$r1-- while $r1>0	 && (split $::re_artist,$::Songs[$array->[$r1-1]][::SONG_ARTIST])[0] eq $key;
-			$r2++ while $r2<$#$array && (split $::re_artist,$::Songs[$array->[$r2+1]][::SONG_ARTIST])[0] eq $key;
-			return [$r1,$r2,$row,$key];
-		},
+		value => sub { CellRendererSongsAA::get_value('first_artist',$_[0]{array},$_[1]); },
 		class => 'CellRendererSongsAA',	attrib => 'ref',	type => 'Glib::Scalar',
-		depend => [::SONG_ARTIST],	sort => ::SONG_ARTIST,	noncomp => ['boldrow','italicrow'],
-		init => {aa => ::SONG_ARTIST, markup => '<b>%a</b>'},	event => 'AAPicture',
+		depend => 'artist',	sort => 'artist:i',	noncomp => 'boldrow italicrow',
+		init => {aa => 'first_artist', markup => '<b>%a</b>'},	event => 'Picture_artist',
 	},
 	stars	=>
-	{	title => _("Rating"),
-		menu => _("Rating (picture)"),
-		value => sub { Stars::get_pixbuf( $_[1][2][::SONG_RATING] ); },
-		class => 'Gtk2::CellRendererPixbuf',	attrib => 'pixbuf',
-		type => 'Gtk2::Gdk::Pixbuf',		noncomp =>['boldrow','italicrow'],
-		depend => [::SONG_RATING],		sort => ::SONG_RATING,
+	{	title	=> _("Rating"),			menu	=> _("Rating (picture)"),
+		value	=> sub { Stars::get_pixbuf( Songs::Get($_[2],'rating') ); }, #FIXME use Songs::Picture to get pixbuf
+		class	=> 'Gtk2::CellRendererPixbuf',	attrib	=> 'pixbuf',
+		type	=> 'Gtk2::Gdk::Pixbuf',		noncomp	=> 'boldrow italicrow',
+		depend	=> 'rating',			sort	=> 'rating',
 	},
   );
   %{$SLC_Prop{albumpicinfo}}=%{$SLC_Prop{albumpic}};
   $SLC_Prop{albumpicinfo}{title}=_"Album picture & info";
-  $SLC_Prop{albumpicinfo}{init}={aa => ::SONG_ALBUM, markup => "<b>%a</b>%Y\n<small>%s <small>%l</small></small>"};
+  $SLC_Prop{albumpicinfo}{init}={aa => 'album', markup => "<b>%a</b>%Y\n<small>%s <small>%l</small></small>"};
 
-  for my $n (grep $::TagProp[$_], 0..$#::TagProp)
-  {	my ($title,$id,$t,$width)=@{$::TagProp[$n]};
-	next unless defined $title;
-	my $sub=($t eq 'd')? eval 'sub{my $v=$_[1][2]['.$n.']; $v ? scalar localtime $v : "'._('never').'"}'	:
-		($t eq 'l')? eval 'sub{my $v=$_[1][2]['.$n.'];sprintf "%d:%02d",$v/60,$v%60}'	:
-		($t eq 'f')? eval 'sub{join ", ",split(/\x00/,$_[1][2]['.$n.'])}'		:
-			     eval 'sub{$_[1][2]['.$n.']}';
-	$SLC_Prop{$id}=	{	title => $title,	value => $sub,	attrib => 'text',
-				type => 'Glib::String',	depend => [$n],	sort => $n,	width => $width,
-			};
-   }
+  for my $key (Songs::ColumnsKeys())
+  {	$SLC_Prop{$key}=
+	{	title	=> Songs::FieldName($key),	value	=> sub { Songs::Display($_[2],$key)},
+		type	=> 'Glib::String',		attrib	=> 'text',
+		sort	=> Songs::SortField($key),	width	=> Songs::FieldWidth($key),
+		depend	=> join(' ',Songs::Depends($key)),
+	};
+  }
 
-   $SLC_Prop{'length'}{init}{xalign}=1; #right-align length #maybe should be done to all number columns ?
+  $SLC_Prop{'length'}{init}{xalign}=1; #right-align length #maybe should be done to all number columns ?
 
 }
 
@@ -760,53 +925,44 @@ our @ColumnMenu=
 );
 
 sub new
-{	my ($class,$opt1,$opt2) = @_;
-	$opt2->{sort}=join('_',::SONG_UPATH,::SONG_ALBUM,::SONG_DISC,::SONG_TRACK,::SONG_UFILE) unless defined $opt2->{sort};
-	$opt2->{cols}='playandqueue_title_artist_album_date_length_track_ufile_lastplay_playcount_rating' unless defined $opt2->{cols};
-	my $array=[];
-	#my $store=SongStore->new(array => $array);
-	my $store=SongStore->new; $store->{array}=$array; #small work-around for bug in Glib<1.105 when used with perl 5.8.8
+{	my ($class,$opt1,$opt2,$songarray) = @_;
+
 	my $self = bless Gtk2::ScrolledWindow->new, $class;
 	$self->set_shadow_type('etched-in');
 	$self->set_policy('automatic','automatic');
 	::set_biscrolling($self);
+	if (exists $opt2->{colwidth}) {delete $opt2->{$_} for qw/colwidth cols sort/}#old version <0.9584 => reset
+	$self->CommonInit($opt1,$opt2,$songarray);
+
+	my $cols=$opt2->{cols};
+	if (exists $opt2->{cw_ufile}) # old versions <1.1
+	{	$cols=~tr/_/|/;
+		$cols=~s/ufile/file/;
+		$cols=~s/upath/path/;
+		$cols=~s/date/year/;
+		$cols=~s/nbplay/playcount/;#for version<0.9607 #DELME
+		delete $opt2->{$_} for qw/sort cw_date cw_ufile cw_upath cw_nbplay/;
+	}
+	$cols||='playandqueue|title|artist|album|year|length|track|file|lastplay|playcount|rating';
+
+	my $store=SongStore->new; $store->{array}=$self->{array}; $store->{size}=@{$self->{array}};
 	my $tv=Gtk2::TreeView->new($store);
 	$self->add($tv);
-	if ($opt2->{colwidth} || $opt2->{cols}=~m/^\d/) #for option format version <0.9584
-	{	my @old_id=qw/ufile upath modif length size bitrate filetype channels samprate title artist album disc track date version genre comment author added lastplay playcount rating label boldrow titleaa playandqueue icolabel/;
-		my @s=split /_/, $opt2->{colwidth}||'';
-		$self->{colwidth}{$old_id[$_]}=$s[$_] for 0..$#s;
-		$opt2->{cols}=~s/(\d+)/$old_id[$1]/g;
-	}
-	for my $key (keys %$opt2)
-	{	next unless $key=~m/^cw_(.*)$/;
-		$self->{colwidth}{$1}=$opt2->{$key};
-	}
-	$self->{sort}=$opt2->{sort};
-	$self->{sort}=~tr/_/ /;
-	$self->{TogFollow}=1 if $opt2->{follow};
-	$self->{array}=$array;
 	$self->{store}=$store;
-	$self->{IDsToAdd}=[];
-	$self->{$_}=$opt1->{$_} for qw/type group/,grep m/^activate\d?$/, keys %$opt1;
 	$self->{songypad}= $opt1->{songypad} if exists $opt1->{songypad};
-	$self->{mode}= $opt1->{mode} || '';
 	$self->{playrow}= defined $opt1->{playrow} ? $opt1->{playrow} : 'boldrow';
 
 	::set_drag($tv,
-	source=>[::DRAG_ID,sub { my $tv=$_[0]; $tv->parent->GetSelectedIDs; }],
-	dest =>	[::DRAG_ID,::DRAG_FILE,\&drag_received_cb],
-	motion => \&drag_motion_cb,
+	 source	=>[::DRAG_ID,sub { my $tv=$_[0]; return ::DRAG_ID,$tv->parent->GetSelectedIDs; }],
+	 dest	=>[::DRAG_ID,::DRAG_FILE,\&drag_received_cb],
+	 motion	=> \&drag_motion_cb,
 		);
 	$tv->signal_connect(drag_data_delete => sub { $_[0]->signal_stop_emission_by_name('drag_data_delete'); }); #ignored
 
 	$tv->set_rules_hint(TRUE);
-	$tv->get_selection->set_mode('multiple');
 	$tv->set_headers_clickable(TRUE);
 	$tv->set_headers_visible(FALSE) if $opt1->{headers} && $opt1->{headers} eq 'off';
 	$tv->set('fixed-height-mode' => TRUE);
-	#$self->{searchcol}=::SONG_TITLE;
-	#$tv->set_search_column( $self->{searchcol} );
 	$tv->set_enable_search(!$opt1->{no_typeahead});
 	$tv->set_search_equal_func(\&SongStore::search_equal_func);
 	$tv->signal_connect(key_release_event => sub
@@ -820,50 +976,27 @@ sub new
 	MultiTreeView::init($tv,__PACKAGE__);
 	$tv->signal_connect(cursor_changed	=> \&cursor_changed_cb);
 	$tv->signal_connect(row_activated	=> \&row_activated_cb);
-	$tv->get_selection->signal_connect(changed => \&sel_changed_cb);
+	#$tv->get_selection->signal_connect(changed => \&sel_changed_cb);
+	$tv->get_selection->signal_connect(changed => sub { ::IdleDo('1_Changed'.$_[0],10,\&sel_changed_cb,$_[0]); }); #delay it, because it can be called A LOT when, for example, removing 10000 selected rows
+	$tv->get_selection->set_mode('multiple');
 
-	$self->AddColumn($_) for split '_',$opt2->{cols};
+	if (my $tip=$opt1->{rowtip} and *Gtk2::Widget::set_has_tooltip{CODE})  # since gtk+ 2.12, Gtk2 1.160
+	{	$tv->set_has_tooltip(1);
+		$tip= "<b><big>%t</big></b>\\nby <b>%a</b>\\nfrom <b>%l</b>" if $tip eq '1';
+		$self->{rowtip}= $tip;
+		$tv->signal_connect(query_tooltip=> \&query_tooltip_cb);
+	}
 
-	$self->{watcher}||=::AddWatcher();
-	$self->signal_connect(destroy => \&removewatchers);
-	::Watch($self,'SongID',\&UpdateSelID);
-	::WatchFilter($self,$opt1->{group}, \&SetFilter ) unless $self->{type} && $self->{type} eq 'Q' || $self->{type} eq 'L'; #FIXME clean this mess
+	$self->AddColumn($_) for split /\|/,$cols;
+	$self->AddColumn('title') unless $tv->get_columns; #make sure there is at least one column
+
+	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
+	::Watch($self,	SongsChanged	=> \&SongsChanged_cb);
+	::Watch($self,	SongID		=> \&UpdateSelID);
 	$self->{SaveOptions}=\&SaveOptions;
 	$self->{DefaultFocus}=$tv;
-	if ($self->{mode} eq 'playlist')
-	{	$self->{OnChange}=\&PlaylistUpdate;
-		::Watch($self,Filter=> \&SetPlaylistFilter);
-		::Watch($self,Sort  => \&SetPlaylistSort);
-		$self->{sort}= $::Options{Sort}=~m/^r/ ? $::Options{AltSort} : $::Options{Sort};
-	}
-	#elsif ($self->{mode} eq 'noall') { $tv->show_all; $self->set_no_show_all(1); }
-	$self->{hideif}=$opt1->{hideif} || '';
-	$self->{hidewidget}=$opt1->{hidewidget};
-	$self->{shrinkonhide}=$opt1->{shrinkonhide};
 
-	if ($self->{mode} eq 'playlist') # FIXME a real mess between group filter init and playlist synchro :(
-	{	$self->{from_playlist}=1;
-		::SetFilter($self,undef,1);
-		$self->{from_playlist}=undef;
-		@{ $self->{array} }=@::ListPlay;
-	}
-
-	$self->{need_init}=1;
-	$self->signal_connect(show => sub
-		{	my $self=$_[0];
-			return 0 unless delete $self->{need_init};
-			unless ($self->{type} && $self->{type} eq 'Q' || $self->{type} eq 'L')
-			{	::SetFilter($self,undef,0) unless $self->{filter};
-				$self->FollowSong;
-			}
-			0;
-		});
 	return $self;
-}
-
-sub removewatchers
-{	my $self=shift;
-	::RemoveWatcher( $self->{watcher} );
 }
 
 sub SaveOptions
@@ -871,10 +1004,10 @@ sub SaveOptions
 	my %opt;
 	my $tv=$self->child;
 	my $sort=$self->{'sort'};
-	$sort=~tr/ /_/;
+	$sort=~tr/ /|/;
 	$opt{sort}=$sort;
 	#save displayed cols
-	$opt{cols}=join '_',(map $_->{colid},$tv->get_columns);
+	$opt{cols}=join '|',(map $_->{colid},$tv->get_columns);
 	#save their width
 	$opt{ 'cw_'.$_ }=$self->{colwidth}{$_} for keys %{$self->{colwidth}};
 	$opt{ 'cw_'.$_->{colid} }=$_->get_width for $tv->get_columns;
@@ -884,7 +1017,6 @@ sub SaveOptions
 
 sub AddColumn
 {	my ($self,$colid,$pos)=@_;
-	$colid='playcount' if $colid eq 'nbplay'; #for version<0.9607 #DELME
 	my $prop=$SLC_Prop{$colid};
 	unless ($prop) {warn "Ignoring unknown column $colid\n"; return undef}
 	my $renderer=	( $prop->{class} || 'Gtk2::CellRendererText' )->new;
@@ -895,11 +1027,12 @@ sub AddColumn
 	my $colnb=SongStore::get_column_number($colid);
 	my $attrib=$prop->{attrib};
 	my @attributes=($prop->{title},$renderer,$attrib,$colnb);
-	my $playrow=$self->{playrow};
-	if (my $ref=$prop->{noncomp}) { $playrow=undef if (grep $_ eq $playrow,@$ref); }
-	push @attributes,$SLC_Prop{$playrow}{attrib},SongStore::get_column_number($playrow) if $playrow;
-#	$playrow='PlaycountBG'; #TEST
-#	push @attributes,$SLC_Prop{$playrow}{attrib},SongStore::get_column_number($playrow); #TEST
+	if (my $playrow=$self->{playrow})
+	{	if (my $noncomp=$prop->{noncomp}) { $playrow=undef if (grep $_ eq $playrow, split / /,$noncomp); }
+		push @attributes,$SLC_Prop{$playrow}{attrib},SongStore::get_column_number($playrow) if $playrow;
+		#$playrow='PlaycountBG'; #TEST
+		#push @attributes,$SLC_Prop{$playrow}{attrib},SongStore::get_column_number($playrow); #TEST
+	}
 	my $column = Gtk2::TreeViewColumn->new_with_attributes(@attributes);
 
 	#$renderer->set_fixed_height_from_font(1);
@@ -932,8 +1065,7 @@ sub AddColumn
 		  1;
 		};
 	if (my $event=$prop->{event})
-	{	$event=[$event] unless ref $event;
-		::Watch($label,$_,sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->queue_draw if $self; }) for @$event; # could queue_draw only column
+	{	::Watch($label,$_,sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->queue_draw if $self; }) for split / /,$event; # could queue_draw only column
 	}
 	my $button=$label->get_ancestor('Gtk2::Button'); #column button
 	$button->signal_connect(button_press_event => $button_press_sub,$colid) if $button;
@@ -943,15 +1075,14 @@ sub AddColumn
 sub UpdateSortIndicator
 {	my $self=$_[0];
 	my $tv=$self->child;
-	return if $self->{no_sort_indicator};
-	my $s=$self->{sort};
 	$_->set_sort_indicator(FALSE) for grep $_->get_sort_indicator, $tv->get_columns;
-	if ($s=~m/^(-)?([0-9]+)$/)
+	return if $self->{no_sort_indicator};
+	if ($self->{sort}=~m/^(-)?([^ ]+)$/)
 	{	my $order=($1)? 'descending' : 'ascending';
-		my @cols=grep defined($SLC_Prop{$_->{colid}}{sort}) && $SLC_Prop{$_->{colid}}{sort}==$2, $tv->get_columns;
+		my @cols=grep( ($SLC_Prop{$_->{colid}}{sort}||'') eq $2, $tv->get_columns);
 		for my $col (@cols)
-		{ $col->set_sort_indicator(TRUE);
-		  $col->set_sort_order($order);
+		{	$col->set_sort_indicator(TRUE);
+			$col->set_sort_order($order);
 		}
 	}
 }
@@ -979,76 +1110,55 @@ sub ToggleColumn
 	$self->AddColumn($colid,$position) if defined $position;
 	$self->AddColumn('title') unless $tv->get_columns; #if removed the last column
 	$self->{cols_to_watch}=undef; #to force update list of columns to watch
-	$self->UpdateWatcher;
 }
 
-sub UpdateWatcher
-{	my $self=$_[0];
-	my $tv=$self->child;
-	my $cols=$self->{cols_to_watch}||=[ map @{ $SLC_Prop{ $_->{colid} }{depend} || [] }, $tv->get_columns ];
-	::ChangeWatcher
-	(	$self->{watcher},
-		$self->{array},
-		$cols,
-		sub{$self->UpdateID(@_)},
-		sub{$self->RemoveID(@_)},
-		 #keep list up to date with the filter in playlist mode
-		($self->{mode} eq 'playlist' ? sub {$self->QueueIDsToAdd(@_)} : undef ),
-		($self->{mode} eq 'playlist' && !$::ListMode ? $self->{filter} : undef )
-	);
+sub query_tooltip_cb
+{	my ($tv, $x, $y, $keyb, $tooltip)=@_;
+	return 0 if $keyb;
+	my ($path, $column)=$tv->get_path_at_pos($x,$y);
+	return 0 unless $path;
+	my ($row)=$path->get_indices;
+	my $self=::find_ancestor($tv,__PACKAGE__);
+	my $ID=$self->{array}[$row];
+	my $markup= ::ReplaceFieldsAndEsc($ID,$self->{rowtip});
+	$tooltip->set_markup($markup);
+	#$tv->set_tooltip_row($tooltip,$path); # => no tip displayed ! ?
+	1;
 }
 
 sub PopupContextMenu
 {	my ($self,$tv,$event)=@_;
+	return unless @{$self->{array}}; #no context menu for empty lists
 	my @IDs=$self->GetSelectedIDs;
 	$::LEvent=$event;
 	my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $self->{array});
-	::PopupContextMenu(\@::SongCMenu,\%args ) if @{$self->{array}};
+	::PopupContextMenu(\@::SongCMenu,\%args );
 }
 
-sub GetSelectedIDs
-{	my $self=$_[0];
-	my @rows=$self->child->get_selection->get_selected_rows;
-	my @IDs=map $self->{array}[$_->to_string], @rows;
-	return @IDs;
-}
-
-sub PlaySelected
-{	my $self=$_[0];
-	my @IDs=$self->GetSelectedIDs;
-	::Select(song=>'first',play=>1,staticlist => \@IDs ) if @IDs;
-}
-sub EnqueueSelected
-{	my $self=$_[0];
-	my @IDs=$self->GetSelectedIDs;
-	::Enqueue(@IDs) if @IDs;
+sub GetSelectedRows
+{	my $self=shift;
+	return [map $_->to_string, $self->child->get_selection->get_selected_rows];
 }
 
 sub drag_received_cb
 {	my ($tv,$type,$dest,@IDs)=@_;
 	$tv->signal_stop_emission_by_name('drag_data_received'); #override the default 'drag_data_received' handler on GtkTreeView
-	if ($type==::DRAG_FILE) #convert filenames to IDs
-	{	$::Options{test}=$IDs[0];
-		@IDs=map @$_,grep ref,map ::ScanFolder(::decode_url($_)), grep s#^file://##, @IDs;
-		return unless @IDs;
-	}
 	my $self=$tv->parent;
+	my $songarray=$self->{array};
 	my (undef,$path,$pos)=@$dest;
 	my $row=$path? ($path->get_indices)[0] : scalar@{$self->{array}};
 	$row++ if $path && $pos && $pos eq 'after';
-	my $store=$tv->get_model;
+
 	if ($tv->{drag_is_source})
-	{	for my $oldrow (reverse map $_->to_string, $tv->get_selection->get_selected_rows)
-		{	$store->rowremove($oldrow);
-			$row-- if $row>$oldrow;
-		}
+	{	$songarray->Move($row,$self->GetSelectedRows);
+		return;
 	}
-	my @newpaths;
-	$store->rowinsert($row,@IDs);
-	if ($tv->{drag_is_source})
-	{	$tv->get_selection->select_range( Gtk2::TreePath->new($row), Gtk2::TreePath->new($row+@IDs-1) );
+
+	if ($type==::DRAG_FILE) #convert filenames to IDs
+	{	@IDs=map ::FolderToIDs(::decode_url($_)), grep s#^file://##, @IDs;
+		return unless @IDs;
 	}
-	$self->OnChange;
+	$songarray->Insert($row,\@IDs);
 }
 
 sub drag_motion_cb
@@ -1088,74 +1198,167 @@ sub cursor_changed_cb
 	return unless defined $row;
 	my $self=$tv->parent;
 	my $ID=$self->{array}[$row];
-	::HasChanged('SelectedID_'.$self->{group},$ID,$self->{group});
+	::HasChangedSelID($self->{group},$ID);
 }
 
 sub row_activated_cb
 {	my ($tv,$path,$column)=@_;
 	my $self=$tv->parent;
-	::SongListActivate($self,$path->to_string,1);
+	$self->Activate($path->to_string,1);
 }
 
-sub PlaylistUpdate
-{	my $self=$_[0];
-	return unless $self->{mode} eq 'playlist';
-	return if $self->{from_playlist};
-	$self->{from_playlist}=1;
-	::Select(song=>'trykeep', staticlist=>$self->{array} );
-	$self->{from_playlist}=undef;
-}
-
-sub SetFilter
-{	my ($self,$filter)=@_;
-	my $list;
-	if ($self->{hideif} eq 'nofilter')
-	{	$self->Hide($filter->is_empty);
-		return if $filter->is_empty;
-	}
-	if ($self->{mode} eq 'playlist')
-	{	if ($self->{from_playlist})	{ $filter=$::PlayFilter || Filter->new; $list=\@::ListPlay; }
-		else				{ ::Select( filter=>::GetFilter($self) ); return; }
-	}
-	$self->{filter}=$filter;
-	$self->{IDsToAdd}=[];
-	$self->update_begin;
-	@{ $self->{array} }= defined $list ? @$list : @{ $filter->filter };
-	if ($list) { $self->OnChange; } #doesn't need to be sorted but needs to call OnChange which is otherwise called at the end of SortList
-	else { ::SortList( $self->{array}, $self->{sort} ); }
-	$self->update_end;
-}
-
-sub update_begin
-{	$_[0]->child->set_model(undef);
-}
-sub update_end
+sub ResetModel
 {	my $self=$_[0];
 	my $tv=$self->child;
+	$tv->set_model(undef);
+	$self->{store}{size}=@{$self->{array}};
 	$tv->set_model($self->{store});
-#	$tv->set_search_column($self->{searchcol}); #setting model to undef reset search_column => re-set it
-#	$tv->scroll_to_cell(Gtk2::TreePath->new(0)) if @{$self->{array}}>0;
-	# test about a "Modification of a read-only value attempted" error
-	my $row=$_[1] || 0;
-	$row=Gtk2::TreePath->new($row) unless ref $row;
-	$tv->scroll_to_cell($row,undef,::TRUE,0,0) if @{$self->{array}}>0;
-#
+	$self->UpdateSortIndicator;
+	$self->Scroll_to_TopEnd();
 	$self->UpdateSelID;
-	$self->UpdateWatcher;
+}
+
+sub Scroll_to_TopEnd
+{	my ($self,$end)=@_;
+	my $songarray=$self->{array};
+	return unless @$songarray;
+	my $row= $end ? $#$songarray : 0;
+	$row=Gtk2::TreePath->new($row);
+	$self->child->scroll_to_cell($row,undef,::TRUE,0,0);
 }
 
 sub UpdateSelID
 {	my $self=$_[0];
-	$self->{store}->updateboldrow;
+	$self->queue_draw if defined $self->{playrow};
 	$self->FollowSong if $self->{TogFollow};
+}
+
+sub SongsChanged_cb
+{	my ($self,$IDs,$fields)=@_;
+	my $usedfields= $self->{cols_to_watch}||= do
+	 {	my $tv=$self->child;
+		my %h;
+		for my $col ($tv->get_columns)
+		{	if (my $d= $SLC_Prop{ $col->{colid} }{depend})
+			{	$h{$_}=undef for split / /,$d;
+			}
+		}
+		[keys %h];
+	 };
+	return unless ::OneInCommon($fields,$usedfields);
+	if ($IDs)
+	{	my $changed=$self->{array}->AreIn($IDs);
+		return unless @$changed;
+		#call UpdateID(@$changed) ? update individual rows or just redraw everything ?
+	}
+	$self->child->queue_draw;
+}
+
+sub SongArray_changed_cb
+{	my ($self,$array,$action,@extra)=@_;
+	#if ($self->{mode} eq 'playlist' && $array==$::ListPlay)
+	#{	$self->{array}->Mirror($array,$action,@extra);
+	#}
+	return unless $self->{array}==$array;
+	warn "SongArray_changed $action,@extra\n";
+	my $tv=$self->child;
+	my $store=$tv->get_model;
+	my $treesel=$tv->get_selection;
+	my @selected=map $_->to_string, $treesel->get_selected_rows;
+	my $updateselection;
+	if ($action eq 'sort')
+	{	my ($sort,$oldarray)=@extra;
+		$self->{'sort'}=$sort;
+		my @order;
+		$order[ $array->[$_] ]=$_ for reverse 0..$#$array; #reverse so that in case of duplicates ID, $order[$ID] is the first row with this $ID
+		my @IDs= map $oldarray->[$_], @selected;
+		@selected= map $order[$_]++, @IDs; # $order->[$ID]++ so that in case of duplicates ID, the next row (with same $ID) are used
+		$self->ResetModel;
+		#$self->UpdateSortIndicator; #not needed : already called by $self->ResetModel
+		$updateselection=1;
+	}
+	elsif ($action eq 'update')	#should only happen when in filter mode, so no duplicates IDs
+	{	my $oldarray=$extra[0];
+		my @selectedID;
+		$selectedID[$oldarray->[$_]]=1 for @selected;
+		@selected=grep $selectedID[$array->[$_]], 0..$#$array;
+		#my $vpos= $self->get_vadjustment->value;
+		#my $hpos= $self->get_hadjustment->value;
+		$self->ResetModel;
+		#$self->get_vadjustment->value($vpos);
+		#$self->get_hadjustment->value($hpos);
+		#FIXME PHASE1 try to restore position
+		$updateselection=1;
+	}
+	elsif ($action eq 'insert')
+	{	my ($destrow,$IDs)=@extra;
+		#$_>=$destrow and $_+=@$IDs for @selected; #not needed as the treemodel will update the selection
+		$store->rowinsert($destrow,scalar @$IDs);
+	}
+	elsif ($action eq 'move')
+	{	my (undef,$rows,$destrow)=@extra;
+		my $i= my $j= my $delta=0;
+		if (@selected)
+		{ for my $row (0..$selected[-1])
+		  {	if ($row==$destrow+$delta) {$delta-=@$rows}
+			if ($i<=$#$rows && $row==$rows->[$i]) #row moved
+			{	if ($selected[$j]==$rows->[$i]) { $selected[$j]=$destrow+$i; $j++; } #row moved and selected
+				$delta++; $i++;
+			}
+			elsif ($row==$selected[$j])	#row selected
+			{ $selected[$j]-=$delta; $j++; }
+		  }
+		  $updateselection=1;
+		}
+		$self->queue_draw;
+		#$store->rowremove($rows);
+		#$store->rowinsert($destrow,scalar @$rows);
+	}
+	elsif ($action eq 'up')
+	{	my $rows=$extra[0];
+		my $i=0;
+		for my $row (@$rows)
+		{	$i++ while $i<=$#selected && $selected[$i]<$row-1;
+			last if $i>$#selected;
+			if	($selected[$i]==$row-1)	{ $selected[$i]++ unless $i<=$#selected && $selected[$i+1]==$row;$updateselection=1; }
+			elsif	($selected[$i]==$row)	{ $selected[$i]--;$updateselection=1; $i++ }
+		}
+		$self->queue_draw;
+	}
+	elsif ($action eq 'down')
+	{	my $rows=$extra[0];
+		my $i=$#selected;
+		for my $row (reverse @$rows)
+		{	$i-- while $i>=0 && $selected[$i]>$row+1;
+			last if $i<0;
+			if	($selected[$i]==$row+1)	{ $selected[$i]-- unless $i>=0 && $selected[$i-1]==$row;$updateselection=1; }
+			elsif	($selected[$i]==$row)	{ $selected[$i]++;$updateselection=1; $i-- }
+		}
+		$self->queue_draw;
+	}
+	elsif ($action eq 'remove')
+	{	my $rows=$extra[0];
+		$store->rowremove($rows);
+	}
+	elsif ($action eq 'mode') {} #the list itself hasn't changed
+	else #'replace' or unknown action
+	{	$self->ResetModel;		#FIXME if replace : check if a filter is in $extra[0]
+		#$treesel->unselect_all;
+	}
+	$self->SetSelection(\@selected) if $updateselection;
+	$self->Hide(!scalar @$array) if $self->{hideif} eq 'empty';
 }
 
 sub FollowSong
 {	my $self=$_[0];
 	my $tv=$self->child;
 	#$tv->get_selection->unselect_all;
-	my $rowplaying=$tv->get_model->{boldrow};
-	if ($rowplaying>-1)
+	my $songarray=$self->{array};
+	return unless defined $::SongID;
+	my $rowplaying;
+	if ($self->{mode} eq 'playlist') { $rowplaying=$::Position; } #$::Position may be undef even if song is in list (random mode), in that case fallback to the usual case below
+	$rowplaying= ::first { $songarray->[$_]==$::SongID } 0..$#$songarray unless defined $rowplaying && $rowplaying>=0;
+	if (defined $rowplaying)
 	{	my $path=Gtk2::TreePath->new($rowplaying);
 		my $visible;
 		my $win = $tv->get_bin_window;
@@ -1172,185 +1375,9 @@ sub FollowSong
 		$tv->set_cursor($path);
 	}
 	elsif (defined $::SongID)	#Set the song ID even if the song isn't in the list
-	{ ::HasChanged('SelectedID_'.$self->{group},$::SongID,$self->{group}); }
+	{ ::HasChangedSelID($self->{group},$::SongID); }
 }
 
-sub Sort
-{	my ($self,$sort)=@_;
-	if ($self->{mode} eq 'playlist' && !$self->{from_playlist})
-	{	::Select('sort'=>$sort);return;
-	}
-	warn "Reordering... ($sort) \n" if $::debug;
-	my $tv=$self->child;
-	my $treesel=$tv->get_selection;
-	$self->{sort}=$sort;
-	my $array=$self->{array};
-	my @selected=map $array->[ $_->to_string ], $treesel->get_selected_rows;
-	#@selected now contains selected IDs
-	$treesel->unselect_all;
-	$self->update_begin;
-	if ($self->{IDsToAdd}) {push @$array,@{$self->{IDsToAdd}}; $self->{IDsToAdd}=[];}
-	::SortList($array,$sort);
-	$self->update_end;
-	my @order;
-	#restore selection
-	$order[ $$array[$_] ]=$_ for 0..$#$array;
-	#$order[$ID] contains the new row number of $ID
-	$treesel->select_path( Gtk2::TreePath->new($order[$_]) ) for @selected;
-	warn "Reordering...done\n" if $::debug;
-	$self->UpdateSortIndicator;
-	$self->OnChange;
-}
-
-sub OnChange	#the list in the treeview has changed
-{	my $self=$_[0];
-	if ($self->{mode} eq 'list')
-	{	$self->{listbusy}=1;
-		my $name=$self->{listname};
-		my $listref=defined $name ? $::SavedLists{$name} : \@::Queue;
-		@$listref=@{ $self->{array} };
-
-		if (defined $name)	{ ::HasChanged('SavedLists',$name); }
-		else			{ ::HasChanged('Queue'); }
-
-		delete $self->{listbusy};
-	}
-	my $array=$self->{array};
-	$self->Hide(!scalar @$array) if $self->{hideif} eq 'empty';
-	::HasChanged('List_'.$self->{group},$array);
-	&{ $self->{OnChange} }($self) if $self->{OnChange};
-}
-sub UpdateList	# update the list when the watched list has changed
-{	my ($self,$type,@extra)=@_;
-	return if $self->{listbusy};
-	my $listref;
-	my $name=$self->{listname};
-	if (defined $name)
-	{	return unless defined $type && $name eq $type;
-		$type=$extra[0];
-		if ($type && $type eq 'renamedto') { $self->SetList($extra[1],1); return; }
-		elsif ($type && $type eq 'remove') {return}
-		$listref=$::SavedLists{$name};
-	}
-	else {$listref=\@::Queue}
-	my $array=$self->{array};
-	$type||='';
-	my $store=$self->child->get_model;
-	if ($type eq 'shift')
-	{	$store->rowremove(0);
-		$self->UpdateWatcher;
-	}
-	elsif ($type eq 'push')
-	{	my $row=@$array;
-		$store->rowinsert($row,@$listref[$row..$#$listref]);
-		$self->UpdateWatcher;
-	}
-	elsif ($type eq 'action') {}#FIXME should be a different watcher
-	else
-	{	$self->update_begin;
-		@$array=@$listref;
-		$self->update_end;
-	}
-	$self->OnChange;
-}
-
-sub Hide
-{	my ($self,$hide)=@_;
-	my $name=$self->{hidewidget} || $self->{name};
-	my $toplevel=::get_layout_widget($self);
-	unless ($toplevel)
-	{	$self->{need_hide}=$name if $hide;
-		return;
-	}
-	if ($hide)	{ $toplevel->Hide($name,$self->{shrinkonhide}) }
-	else		{ $toplevel->Show($name,$self->{shrinkonhide}) }
-}
-
-sub SetList
-{	my ($self,$name,$noupdate)=@_;
-	$self->{mode}='list';
-	$self->{type}= defined $name ? 'L' : 'Q';
-	$self->{listname}=$name;
-	$self->UpdateList($name) unless $noupdate;
-	::Watch($self,(defined $name ? 'SavedLists' : 'Queue'),\&UpdateList);
-	#$self->get_toplevel->set_title( _("Editing list : ").$name ) if $self->{changetitle};
-}
-
-sub SetType
-{	my ($self,$type,$extra,$noupdate)=@_;
-
-	::UnWatch($self,$_) for qw/SavedLists Queue/;
-	delete $self->{listname};
-
-	$self->{type}=$type;
-	if ($type eq 'L')
-	{	$self->{mode}='list';
-		$self->{listname}=$extra;
-		$self->UpdateList($extra) unless $noupdate;
-		::Watch($self,'SavedLists',\&UpdateList);
-		#$self->get_toplevel->set_title( _("Editing list : ").$name ) if $self->{changetitle};
-	}
-	elsif ($type eq 'Q')
-	{	$self->{mode}='list';
-		$self->UpdateList() unless $noupdate;
-		::Watch($self,'Queue',\&UpdateList);
-	}
-	elsif ($type eq 'B')
-	{
-	}
-}
-
-sub MoveOne
-{	my ($self,$up)=@_;
-	my $listref=$self->{array};
-	my $selection=$self->child->get_selection;
-	my @rows=map $_->to_string, $selection->get_selected_rows;
-	my @newsel;
-	#my ($path)=$self->child->get_visible_range;
-	#$self->update_begin;
-	while (@rows)
-	{	my $cur=my $last=my $first=shift @rows;
-		$cur=$last=shift @rows while @rows && $rows[0]==$cur+1;
-		if ($up)
-		{	if ($first==0) { push @newsel,$first..$last; next; }
-			splice @$listref,$last,0,splice(@$listref,$first-1,1);
-			push @newsel,($first-1)..($last-1);
-		}
-		else
-		{	if ($last==$#$listref) { push @newsel,$first..$last; next; }
-			splice @$listref,$first,0,splice(@$listref,$last+1,1);
-			push @newsel,($first+1)..($last+1);
-		}
-	}
-	#$self->update_end($path);
-	my ($first,$last)=$self->child->get_visible_range;
-	$self->child->get_model->rowchanged($_) for $first->to_string .. $last->to_string;
-	$self->SetSelection(\@newsel);
-	$self->OnChange;
-}
-sub MoveMax
-{	my ($self,$top)=@_;
-	my $listref=$self->{array};
-	my $selection=$self->child->get_selection;
-	my @newsel;
-	my @rows=reverse map $_->to_string, $selection->get_selected_rows;
-	return unless @rows;
-	#@rows=sort {$b <=> $a } @rows; #if get_selection return unsorted row number
-	my @IDs;
-	$self->update_begin;
-	unshift @IDs,splice @$listref,$_,1 for @rows;
-	if ($top)
-	{	unshift @$listref,@IDs;
-		@newsel=0..(@rows-1);
-	}
-	else #bottom
-	{	push @$listref,@IDs;
-		@newsel=(@$listref-@rows)..$#$listref;
-	}
-	$self->update_end( ($top? 0 : $#$listref) );
-	$self->SetSelection(\@newsel);
-	$self->OnChange;
-}
 sub SetSelection
 {	my ($self,$select)=@_;
 	my $treesel=$self->child->get_selection;
@@ -1358,88 +1385,22 @@ sub SetSelection
 	$treesel->select_path( Gtk2::TreePath->new($_) ) for @$select;
 }
 
-sub Empty
-{	my $self=shift;
-	$self->update_begin;
-	@{ $self->{array} }=();
-	$self->update_end;
-	$self->OnChange;
-}
-
-sub RemoveSelected
-{	my $self=shift;
-	my $tv=$self->child;
-	my $store=$tv->get_model;
-	my @rows=sort {$b <=> $a} map $_->to_string, $tv->get_selection->get_selected_rows;
-	$tv->get_selection->unselect_all;
-	$store->rowremove($_) for @rows;
-	$self->OnChange;
-}
-
-sub RemoveID
-{	my $self=$_[0];
-	my $store=$self->child->get_model;
-	my $array=$self->{array};
-	my %toremove;
-	$toremove{$_}=undef for @_;
-	warn "remove ID @_\n" if $::debug;
-	my $row=@$array;
-	while ($row-->0)
-	{ my $ID=$$array[$row];
-	  next unless exists $toremove{$ID};
-	  $store->rowremove($row);
-	  #delete $toremove{$ID};
-	  #last unless (keys %toremove);
-	}
-	my $toadd=$self->{IDsToAdd};
-	if (@$toadd && keys %toremove)
-	{ @$toadd=grep !exists $toremove{$_},@$toadd; }
-}
-sub UpdateID
-{	my $self=$_[0];
-	my $array=$self->{array};
-	my $store=$self->child->get_model;
-	my %updated;
-	warn "update ID @_\n" if $::debug;
-	$updated{$_}=undef for @_;
-	my $row=@$array;
-	while ($row-->0)	#FIXME maybe only check displayed rows
-	{ my $ID=$$array[$row];
-	  next unless exists $updated{$ID};
-	  $store->rowchanged($row);
-	  #delete $updated{$ID};
-	  #last unless (keys %updated);
-	}
-}
-
-sub AddQueuedIDs
-{	my $self=$_[0];
-	return unless @{$self->{IDsToAdd}};
-	$self->{from_playlist}=1;
-	$self->Sort($self->{'sort'});
-	$self->{from_playlist}=undef;
-}
-
-sub QueueIDsToAdd	#FIXME IDs are not re-checked by watcher until they are actually added, could be no longer matching the filter
-{	my $self=shift;
-	push @{$self->{IDsToAdd}},@_;
-	::IdleDo('7_SongListAdd_'.$self,1500,\&AddQueuedIDs,$self)
-}
-
-# methods for playlist mode
-sub SetPlaylistSort
-{	my $self=$_[0];
-	$self->{from_playlist}=1;
-	my $sort= $::Options{Sort}=~m/^r/ ? $::Options{AltSort} : $::Options{Sort};
-	$self->Sort($sort) if $sort ne $self->{sort};;
-	$self->{from_playlist}=undef;
-}
-sub SetPlaylistFilter
-{	my $self=$_[0];
-	$self->{from_playlist}=1;
-	$self->SetFilter;
-	$self->{from_playlist}=undef;
-}
+#sub UpdateID	#DELME ? update individual rows or just redraw everything ?
+#{	my $self=$_[0];
+#	my $array=$self->{array};
+#	my $store=$self->child->get_model;
+#	my %updated;
+#	warn "update ID @_\n" if $::debug;
+#	$updated{$_}=undef for @_;
+#	my $row=@$array;
+#	while ($row-->0)	#FIXME maybe only check displayed rows
+#	{ my $ID=$$array[$row];
+#	  next unless exists $updated{$ID};
+#	  $store->rowchanged($row);
+#	  #delete $updated{$ID};
+#	  #last unless (keys %updated);
+#	}
+#}
 
 ################################################################################
 package SongStore;
@@ -1451,12 +1412,6 @@ my (%Columns,@Value,@Type);
 use Glib::Object::Subclass
 	Glib::Object::,
 	interfaces => [Gtk2::TreeModel::],
-	properties => [ Glib::ParamSpec->scalar
-			('array',		 #name
-			 'array',		 #nickname
-			 'arrayref',		 #blurb
-			 [qw/readable writable/] #flags
-			)],
 	;
 
 sub get_column_number
@@ -1471,20 +1426,19 @@ sub get_column_number
 }
 
 sub INIT_INSTANCE {
-	my $self = shift;
-	# Random int to check whether an iter belongs to our model
-	$self->{stamp} = sprintf '%d', rand (1<<31);
-	$self->{boldrow}=-1;
+	my $self = $_[0];
+	# int to check whether an iter belongs to our model
+	$self->{stamp} = $self+0;#sprintf '%d', rand (1<<31);
 }
-sub FINALIZE_INSTANCE
-{	#my $self = shift;
-	# free all records and free all memory used by the list
-}
+#sub FINALIZE_INSTANCE
+#{	#my $self = $_[0];
+#	# free all records and free all memory used by the list
+#}
 sub GET_FLAGS { [qw/list-only iters-persist/] }
 sub GET_N_COLUMNS { $#Value }
 sub GET_COLUMN_TYPE { $Type[ $_[1] ]; }
 sub GET_ITER
-{	my ($self, $path) = @_; #warn "GET_ITER\n";
+{	my $self=$_[0]; my $path=$_[1];
 	die "no path" unless $path;
 
 	# we do not allow children
@@ -1492,17 +1446,14 @@ sub GET_ITER
 #	my $depth   = $path->get_depth;
 #	die "depth != 1" unless $depth == 1;
 
-#	my @indices = $path->get_indices;
-#	my $n = $indices[0]; # the n-th top level row
-#	my $n=($path->get_indices)[0];
 	my $n=$path->get_indices;	#return only one value because it's a list
-	return undef if $n >= @{$self->{array}} || $n < 0;
+	#warn "GET_ITER $n\n";
+	return undef if $n >= $self->{size} || $n < 0;
 
 	#my $ID = $self->{array}[$n];
 	#die "no ID" unless defined $ID;
 	#return iter :
-	#return [ $self->{stamp}, $n, undef, undef ];
-	return [ $self->{stamp}, $n, $::Songs[ $self->{array}[$n] ] , undef ];
+	return [ $self->{stamp}, $n, $self->{array} , undef ];
 }
 
 sub GET_PATH
@@ -1515,115 +1466,78 @@ sub GET_PATH
 }
 
 sub GET_VALUE
-{	goto &{ $Value[$_[2]] };
-#	my ($self, $iter, $column) = ($_[0],$_[1],$_[2]); #warn "GET_VALUE\n";
-#	#die "bad iter" unless $iter;
-#	return  ( ($self->{boldrow} == $iter->[1])
-#		  ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL
-#		) if $column==::SONGLAST+1;
-#	#return undef if $column > ::SONGLAST;
-#	my $val=$iter->[2][$column];
-#
-#	my $t=$Type[$column];
-#	#use POSIX qw(strftime); $now_string = strftime '%d-%m-%y %H:%M', localtime;
-#	return  (!$t	  )? $val					:
-#		($t eq 'd')? ($val ? scalar localtime $val : 'never')	:
-#		($t eq 'l')? (sprintf '%d:%02d',$val/60,$val%60)	:
-#		($t eq 'f')? (join ', ',split(/\x00/,$val))		:
-#			     $val;
-#	#return $ref->[$column];
+{	my $row=$_[1][1];	#warn "GET_VALUE\n";
+	$Value[$_[2]]( $_[0], $row, $_[1][2][$row]  ); #args : self, row, ID
 }
 
 sub ITER_NEXT
-{	my $self=$_[0];		#warn "GET_NEXT\n";#my ($self, $iter) = @_;
+{	#my ($self, $iter) = @_;
+	my $self=$_[0];
 #	return undef unless $_[1];
 	my $n=$_[1]->[1]; #$iter->[1]
-	return undef unless ++$n < @{$self->{array}};
-	return [ $self->{stamp}, $n, $::Songs[ $self->{array}[$n] ], undef ];
+	#warn "GET_NEXT $n\n";
+	return undef unless ++$n < $self->{size};
+	return [ $self->{stamp}, $n, $self->{array}, undef ];
 }
 
 sub ITER_CHILDREN
 {	my ($self, $parent) = @_; #warn "GET_CHILDREN\n";
 	# this is a list, nodes have no children
 	return undef if $parent;
-
 	# parent == NULL is a special case; we need to return the first top-level row
 	# No rows => no first row
-	return undef unless @{ $self->{array} };
-
+	return undef unless $self->{size};
 	# Set iter to first item in list
-	return [ $self->{stamp}, 0, $::Songs[ $self->{array}[0] ],undef ];
-	#return [ $self->{stamp}, 0, undef, undef ];
+	return [ $self->{stamp}, 0, $self->{array}, undef ];
 }
 sub ITER_HAS_CHILD { FALSE }
 sub ITER_N_CHILDREN
 {	my ($self, $iter) = @_; #warn "ITER_N_CHILDREN\n";
 	# special case: if iter == NULL, return number of top-level rows
-	return ( $iter? 0 : scalar @{$self->{array}} );
+	return ( $iter? 0 : $self->{size} );
 }
-sub ITER_NTH_CHILD {
-	my ($self, $parent, $n) = @_; #warn "ITER_NTH_CHILD\n";
+sub ITER_NTH_CHILD
+{	#my ($self, $parent, $n) = @_; #warn "ITER_NTH_CHILD\n";
 	# a list has only top-level rows
-	return undef if $parent;
+	return undef if $_[1]; #$parent;
+	my $self=$_[0]; my $n=$_[2];
 	# special case: if parent == NULL, set iter to n-th top-level row
-	return undef if $n >= @{$self->{array}};
+	return undef if $n >= $self->{size};
 
-	#my $ID = $self->{array}[$n];
-	#die "no record" unless defined $ID;
-	#return [ $self->{stamp}, $n, undef, undef ];
-	return [ $self->{stamp}, $n,  $::Songs[ $self->{array}[$n] ] , undef ];
+	return [ $self->{stamp}, $n, $self->{array}, undef ];
 }
 sub ITER_PARENT { FALSE }
 
 sub search_equal_func
-{	my ($self,$col,$string,$iter)=@_;
-	$iter= $iter->to_arrayref($self->{stamp});
-	#my $r; for (::SONG_TITLE,::SONG_ALBUM,::SONG_ARTIST) { $r=index uc$iter->[2][$_], uc$string; last if $r==0 } return $r;
-	index uc$iter->[2][::SONG_TITLE], uc$string;
+{	#my ($self,$col,$string,$iter)=@_;
+	my $iter= $_[3]->to_arrayref($_[0]{stamp});
+	my $ID= $iter->[2][ $iter->[1] ];
+	my $string=uc $_[2];
+	#my $r; for (qw/title album artist/) { $r=index uc(Songs::Display($ID,$_)), $string; last if $r==0 } return $r;
+	index uc(Songs::Display($ID,'title')), $string;
 }
 
 sub rowremove
-{	my ($self,$row)=($_[0],$_[1]);
-	splice @{$self->{array}}, $row ,1;
-	if    ($self->{boldrow}>$row)  { $self->{boldrow}-- }
-	elsif ($self->{boldrow}==$row) { $self->{boldrow}=-1}
-	$self->row_deleted( Gtk2::TreePath->new($row) );
+{	my ($self,$rows)=@_;
+	for my $row (reverse @$rows)
+	{	$self->row_deleted( Gtk2::TreePath->new($row) );
+		$self->{size}--;
+	}
 }
 sub rowinsert
-{	my ($self,$row,@IDs)=@_;
-	splice @{ $self->{array} }, $row, 0, @IDs;
-	$self->{boldrow}+=@IDs if $self->{boldrow}>=$row;
-	for (@IDs)
-	{	$self->{boldrow}=$row if $self->{boldrow}==-1 && defined $::SongID && $_==$::SongID;
+{	my ($self,$row,$number)=@_;
+	for (1..$number)
+	{	$self->{size}++;
 		$self->row_inserted( Gtk2::TreePath->new($row), $self->get_iter_from_string($row) );
 		$row++;
 	}
 }
-sub rowchanged
-{	my ($self,$row)=($_[0],$_[1]);
-	my $iter=$self->get_iter_from_string($row);
-	return unless $iter;
-	$self->row_changed( $self->get_path($iter), $iter);
-}
-
-sub updateboldrow
-{	my $self=$_[0];
-	my $array=$self->{array};
-	if ($self->{boldrow}!=-1)
-	{	my $row=$self->{boldrow};
-		$self->{boldrow}=-1;
-		$self->rowchanged($row);
-	}
-	if (defined $::SongID)
-	{ for my $row (0..$#$array)		#search row of currently playing
-	  { if ($::SongID==$$array[$row])	#add bold to currently playing
-	    {	$self->{boldrow}=$row;
-		$self->rowchanged($row);
-		last;
-	    }
-	  }
-	}
-}
+#sub rowchanged	#not used anymore
+#{	my $self=$_[0]; my $row=$_[1];
+#	my $iter=$self->get_iter_from_string($row);
+#	return unless $iter;
+#	$self->row_changed( $self->get_path($iter), $iter);
+#}
 
 package MultiTreeView;
 #for common functions needed to support correct multi-rows drag and drop in treeviews
@@ -1647,8 +1561,9 @@ sub button_press_cb
 	my $but=$event->button;
 	my $sel=$tv->get_selection;
 	if ($but==2 && $event->type eq '2button-press') { $self->enqueue_current; return 1; }
+	my $ctrl_shift=  $event->get_state * ['shift-mask', 'control-mask'];
 	if ($but==1) # do not clear multi-row selection if button press on a selected row (to allow dragging selected rows)
-	{{	 last if $event->get_state * ['shift-mask', 'control-mask']; #don't interfere with default if control or shift is pressed
+	{{	 last if $ctrl_shift; #don't interfere with default if control or shift is pressed
 		 last unless $sel->count_selected_rows  > 1;
 		 my $path=$tv->get_path_at_pos($event->get_coords);
 		 last unless $path && $sel->path_is_selected($path);
@@ -1656,10 +1571,9 @@ sub button_press_cb
 		 return 1;
 	}}
 	if ($but==3)
-	{	my $add= $event->get_state * ['shift-mask', 'control-mask'];
-		my $path=$tv->get_path_at_pos($event->get_coords);
+	{	my $path=$tv->get_path_at_pos($event->get_coords);
 		if ($path && !$sel->path_is_selected($path))
-		{	$sel->unselect_all unless $add;
+		{	$sel->unselect_all unless $ctrl_shift;
 			#$sel->select_path($path);
 			$tv->set_cursor($path);
 		}
@@ -1688,25 +1602,16 @@ use base 'Gtk2::VBox';
 use constant { TRUE  => 1, FALSE => 0, };
 
 our %Pages=
-(	filter	=> [SavedTree		=> 'F',			0b001, _"Filter"],
-	list	=> [SavedTree		=> 'L',			0b001, _"List"],
-	savedtree=>[SavedTree		=> 'FL',		0b001, _"Saved"],
-	artist	=> [FilterList		=> ::SONG_ARTIST,	0b111],
-	album	=> [FilterList		=> ::SONG_ALBUM,	0b110],
-	added	=> [FilterList		=> ::SONG_ADDED,	0b110],
-	modif	=> [FilterList		=> ::SONG_MODIF,	0b110],
-	lastplay=> [FilterList		=> ::SONG_LASTPLAY,	0b110],
-	genre	=> [FilterList		=> ::SONG_GENRE,	0b111],
-	date	=> [FilterList		=> ::SONG_DATE,		0b110],
-	label	=> [FilterList		=> ::SONG_LABELS,	0b111],
-	rating	=> [FilterList		=> ::SONG_RATING,	0b110],
-	folder	=> [FolderList		=> ::SONG_UPATH,	0b010],
-	filesys	=> [Filesystem		=> '',			0b000, _"Filesystem"],
+(	filter	=> [SavedTree		=> 'F',			'i', _"Filter"	],
+	list	=> [SavedTree		=> 'L',			'i', _"List"	],
+	savedtree=>[SavedTree		=> 'FL',		'i', _"Saved"	],
+	folder	=> [FolderList		=> 'path',		'n', _"Folder"	],
+	filesys	=> [Filesystem		=> '',			'',_"Filesystem"],
 );
 
 my @picsize_menu=
 (	_("no pictures")	=>  0,
-	_("automatic size")	=>'a',
+	_("automatic size")	=> -1,
 	_("small size")		=> 16,
 	_("medium size")	=> 32,
 	_("big size")		=> 64,
@@ -1719,36 +1624,47 @@ my @mpicsize_menu=
 );
 
 my %sort_menu=
-(	year	=> _("year"),
-	year2	=> _("year (highest)"),
-	alpha	=> _("alphabetical"),
-	songs	=> _("number of songs in filter"),
+(	year => _("year"),
+	year2=> _("year (highest)"),
+	alpha=> _("alphabetical"),
+	songs=> _("number of songs in filter"),
 	'length'=> _("length of songs"),
 );
-
-my %timespan_menu=
-(	year 	=> _("year"),
-	month	=> _("month"),
-	day	=> _("day"),
+our @MenuPageOptions;
+my @MenuSubGroup=
+(	{ label => sub {_"Set subgroup".' '.$_[0]{depth}},	submenu => sub { return {0 => _"None",map {$_=>Songs::FieldName($_)} Songs::FilterListFields()}; },
+		submenu_reverse => 1,	code => sub { $_[0]{self}->SetField($_[1],$_[0]{depth}) },	check => sub {$_[0]{self}{field}[$_[0]{depth}]},
+	},
+	{ label => sub {_"Options for subgroup".' '.$_[0]{depth}},	submenu => \@MenuPageOptions,
+	  test  => sub { $_[0]{depth} <= $_[0]{self}{depth} },
+	},
 );
 
-our @MenuPageOptions=
-(	{ label => _"show pictures",	code => sub { my $self=$_[0]{self}; $self->{picsize}=$_[1]; $self->Fill('optchanged'); },	test => sub {$_[0]{self}{mode} eq 'list'},
-	  submenu => \@picsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{picsize}}, istrue => 'aa' },
-	{ label => _"show info",	code => sub { my $self=$_[0]{self}; $self->{showinfo}^=1; $self->Fill('optchanged'); },
-	  check => sub {$_[0]{self}{showinfo}}, istrue => 'aa', test => sub {$_[0]{self}{mode} eq 'list'}, },
-	{ label => _"picture size",	code => sub { my $self=$_[0]{self}; $self->{mpicsize}=$_[1]; $self->Fill('optchanged'); },	test => sub {$_[0]{self}{mode} eq 'mosaic'},
+@MenuPageOptions=
+(	{ label => _"show pictures",	code => sub { my $self=$_[0]{self}; $self->{picsize}[$_[0]{depth}]=$_[1]; $self->Fill('optchanged'); },	mode => 'LS',
+	  submenu => \@picsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{picsize}[$_[0]{depth}]},
+		test => sub { Songs::FilterListProp($_[0]{subfield},'picture'); }, },
+	{ label => _"show info",	code => sub { my $self=$_[0]{self}; $self->{markup}[$_[0]{depth}]^=1; $self->Fill('optchanged'); },
+	  check => sub { $_[0]{self}{markup}[$_[0]{depth}]}, istrue => 'aa', mode => 'LS', },
+	{ label => _"show all row",	code => sub { my $self=$_[0]{self}; $self->{noall}^=1; $self->Fill('optchanged'); },
+	  check => sub { !$_[0]{self}{noall} }, mode => 'LS', },
+	{ label => _"picture size",	code => sub { my $self=$_[0]{self}; $self->{mpicsize}=$_[1]; $self->Fill('optchanged'); },
+	  mode => 'M',
 	  submenu => \@mpicsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{mpicsize}}, istrue => 'aa' },
 	{ label => _"sort by",		code => sub { my $self=$_[0]{self}; $self->{sort}=$_[1]; $self->Fill('optchanged'); },
 	  check => sub {$_[0]{self}{sort}}, istrue => 'aa', submenu => \%sort_menu, submenu_reverse => 1 },
-	{ label => _"Group by",		code => sub { my $self=$_[0]{self}; $self->{timespan}=$_[1]; $self->Fill('rehash'); },
-	  check => sub {$_[0]{self}{timespan}}, submenu => \%timespan_menu, submenu_reverse => 1,
-	  test => sub { my $c=$_[0]{col}; $c==::SONG_ADDED || $c==::SONG_LASTPLAY || $c==::SONG_MODIF },
+	{ label => _"group by",
+	  code	=> sub { my $self=$_[0]{self}; my $d=$_[0]{depth}; $self->{type}[$d]=$self->{field}[$d].'.'.$_[1]; $self->Fill('rehash'); },
+	  check => sub { my $n=$_[0]{self}{type}[$_[0]{depth}]; $n=~s#^[^.]+\.##; $n },
+	  submenu=>sub { Songs::LookupCode( $_[0]{subfield}, 'subtypes_menu' ); }, submenu_reverse => 1,
+	  #test => sub { $FilterList::Field{ $_[0]{self}{field}[$_[0]{depth}] }{types}; },
+	},
+	{ repeat => sub { map [\@MenuSubGroup, depth=>$_, mode => 'S', subfield => $_[0]{self}{field}[$_], ], 1..$_[0]{self}{depth}+1; },	mode => 'L',
 	},
 	{ label => _"cloud mode",	code => sub { my $self=$_[0]{self}; $self->set_mode(($self->{mode} eq 'cloud' ? 'list' : 'cloud'),1); },
-	  check => sub {$_[0]{self}{mode} eq 'cloud'}, },
+	  check => sub {$_[0]{mode} eq 'C'},	notmode => 'S', },
 	{ label => _"mosaic mode",	code => sub { my $self=$_[0]{self}; $self->set_mode(($self->{mode} eq 'mosaic' ? 'list' : 'mosaic'),1);},
-	  check => sub {$_[0]{self}{mode} eq 'mosaic'}, istrue => 'aa' },
+	  check => sub {$_[0]{mode} eq 'M'}, istrue => 'aa',	notmode => 'S', },
 );
 
 our @cMenu=
@@ -1765,6 +1681,10 @@ our @cMenu=
 		code => sub {my $fp=$_[0]{filterpane}; ::SetFilter( $_[0]{self}, $_[0]{filter}, 1, $fp->{group} ); },
 		test => sub {my $fp=$_[0]{filterpane}; $fp->{nb}>1 && $_[0]{filter};}
 	},
+	#songs submenu :
+	{	label => sub { my $IDs=$_[0]{filter}->filter; ::__("%d Song","%d Songs",scalar @$IDs); },
+		submenu => sub { ::PopupContextMenu(\@::SongCMenu, { mode => '', IDs=>$_[0]{filter}->filter }); },
+	},
 	{ label=> _"Rename folder", code => sub { ::AskRenameFolder($_[0]{utf8pathlist}[0]); }, onlyone => 'utf8pathlist',	test => sub {!$::CmdLine{ro}}, },
 	{ label=> _"Open folder", code => sub { ::openfolder($_[0]{utf8pathlist}[0]); }, onlyone => 'utf8pathlist', },
 	#{ label=> _"move folder", code => sub { ::MoveFolder($_[0]{utf8pathlist}[0]); }, onlyone => 'utf8pathlist',	test => sub {!$::CmdLine{ro}}, },
@@ -1772,190 +1692,293 @@ our @cMenu=
 		notempty => 'utf8pathlist' },
 	{ label=> _"Check for updated/removed songs", code => sub { ::IdleCheck(  @{ $_[0]{filter}->filter } ); },
 		isdefined => 'filter', stockicon => 'gtk-refresh', istrue => 'utf8pathlist' }, #doesn't really need utf8pathlist, but makes less sense for non-folder pages
-	{ label=> _"Set Picture", code => sub { my $key=$_[0]{keylist}[0]; ::ChooseAAPicture(undef,$_[0]{col},$key); }, stockicon => 'gmb-picture', onlyone=> 'keylist', istrue => 'aa' },
+	{ label=> _"Set Picture", code => sub { my $gid=$_[0]{gidlist}[0]; ::ChooseAAPicture(undef,$_[0]{field},$gid); }, stockicon => 'gmb-picture', onlyone=> 'gidlist', test => sub { Songs::FilterListProp($_[0]{field},'picture'); }, },
 #	{ separator=>1 },
-	{ label => _"Options", submenu => \@MenuPageOptions, stock => 'gtk-preferences', isdefined => 'col' },
+	{ label => _"Options", submenu => \@MenuPageOptions, stock => 'gtk-preferences', isdefined => 'field' },
 	{ label => _"Show buttons",	code => sub { my $fp=$_[0]{filterpane}; $fp->{hidebb}^=1; if ($fp->{hidebb}) {$fp->{bottom_buttons}->hide} else {$fp->{bottom_buttons}->show} },
 	  check => sub {!$_[0]{filterpane}{hidebb};} },
 );
 
 sub new
-{   my ($class,$opt1,$opt2)=@_;
-    my $self = bless Gtk2::VBox->new(FALSE, 6), $class;
-    $self->{SaveOptions}=\&SaveOptions;
-    my $pages= $opt1->{pages} || 'savedtree|artist|album|genre|date|label|folder|added|lastplay|rating';
-    $pages=$opt2->{pages} if $opt2->{pages} && length($opt2->{pages})==length($pages);
-    my @pids=split /\|/, $pages;
-    my $nb=$opt1->{nb};
-    $nb=1 unless defined $nb;
-    $self->{nb}=$nb;
-    my $group=$self->{group}=$opt1->{group};
-    $self->{min}=$opt2->{min}||1;
+{	my ($class,$opt1,$opt2)=@_;
+	my $self = bless Gtk2::VBox->new(FALSE, 6), $class;
+	$self->{SaveOptions}=\&SaveOptions; #warn "\n\n$opt1->{pages}\n\n";
+	my $pages= $opt2->{pages} || $opt1->{pages} || 'savedtree|artist|album|genre|date|label|folder|added|lastplay';
+	my @pids=split /\|/, $pages;
+	my $nb=$opt1->{nb};
+	$nb=1 unless defined $nb;
+	$self->{nb}=$nb;
+	my $group=$self->{group}=$opt1->{group};
+	$self->{min}=$opt2->{min}||1;
+	$self->{child_opt1}{$_}=$opt1->{$_} for qw/group no_typeahead searchbox activate/; #opt1 options passed to children
 
-    my $spin=Gtk2::SpinButton->new( Gtk2::Adjustment->new($self->{min}, 1, 9999, 1, 10, 0) ,10,0  );
-    $spin->signal_connect( value_changed => sub { $self->update($_[0]->get_value); } );
-    my $ResetB=::NewIconButton('gtk-clear',undef,sub { ::SetFilter($_[0],undef,$nb,$group); });
-    $ResetB->set_sensitive(0);
-    my $InterB=Gtk2::ToggleButton->new;
-    my $InterBL=Gtk2::Label->new;
-    $InterBL->set_markup('<b>&amp;</b>');  #bold '&'
-    $InterB->add($InterBL);
-    my $InvertB=Gtk2::ToggleButton->new;
-    my $optB=Gtk2::Button->new;
-    $InvertB->add(Gtk2::Image->new_from_stock('gmb-invert','menu'));
-    $optB->add(Gtk2::Image->new_from_stock('gtk-preferences','menu'));
-    $InvertB->signal_connect( toggled => sub {$self->{invert}=$_[0]->get_active;} );
-    $InterB->signal_connect(  toggled => sub {$self->{inter} =$_[0]->get_active;} );
-    $optB->signal_connect( button_press_event => \&PopupOpt );
-    $optB->set_relief('none');
-    my $hbox = Gtk2::HBox->new (FALSE, 6);
-    $hbox->pack_start($_, FALSE, FALSE, 0) for $spin, $ResetB, $InvertB, $InterB, $optB;
-    $::Tooltips->set_tip($ResetB, (	$nb==1? _"reset primary filter"  :
-					$nb==2?	_"reset secondary filter":
-						::__x(_"reset filter {nb}",nb =>$nb)
-				  ) );
-    $::Tooltips->set_tip($InterB, _"toggle Intersection mode");
-    $::Tooltips->set_tip($InvertB,_"toggle Invert mode");
-    $::Tooltips->set_tip($spin,   _"minimum number of songs"); #FIXME
-    $::Tooltips->set_tip($optB,   _"options");
+	my $spin=Gtk2::SpinButton->new( Gtk2::Adjustment->new($self->{min}, 1, 9999, 1, 10, 0) ,10,0  );
+	$spin->signal_connect( value_changed => sub { $self->update_children($_[0]->get_value); } );
+	my $ResetB=::NewIconButton('gtk-clear',undef,sub { ::SetFilter($_[0],undef,$nb,$group); });
+	$ResetB->set_sensitive(0);
+	my $InterB=Gtk2::ToggleButton->new;
+	my $InterBL=Gtk2::Label->new;
+	$InterBL->set_markup('<b>&amp;</b>');  #bold '&'
+	$InterB->add($InterBL);
+	my $InvertB=Gtk2::ToggleButton->new;
+	my $optB=Gtk2::Button->new;
+	$InvertB->add(Gtk2::Image->new_from_stock('gmb-invert','menu'));
+	$optB->add(Gtk2::Image->new_from_stock('gtk-preferences','menu'));
+	$InvertB->signal_connect( toggled => sub {$self->{invert}=$_[0]->get_active;} );
+	$InterB->signal_connect(  toggled => sub {$self->{inter} =$_[0]->get_active;} );
+	$optB->signal_connect( button_press_event => \&PopupOpt );
+	$optB->set_relief('none');
+	my $hbox = Gtk2::HBox->new (FALSE, 6);
+	$hbox->pack_start($_, FALSE, FALSE, 0) for $spin, $ResetB, $InvertB, $InterB, $optB;
+	$::Tooltips->set_tip($ResetB,	  (	$nb==1? _"reset primary filter"  :
+						$nb==2?	_"reset secondary filter":
+							::__x(_"reset filter {nb}",nb =>$nb)
+					  ) );
+	$::Tooltips->set_tip($InterB, _"toggle Intersection mode");
+	$::Tooltips->set_tip($InvertB,_"toggle Invert mode");
+	$::Tooltips->set_tip($spin,   _"minimum number of songs"); #FIXME
+	$::Tooltips->set_tip($optB,   _"options");
 
-    my $notebook = Gtk2::Notebook->new;
-    $notebook->set_scrollable(TRUE);
-    $notebook->popup_enable;
-    $notebook->set_show_tabs(FALSE) if @pids==1;
+	my $notebook = Gtk2::Notebook->new;
+	$notebook->set_scrollable(TRUE);
+	#$notebook->popup_enable;
+	$notebook->set_show_tabs(FALSE) if @pids==1;
+	$self->{notebook}=$notebook;
 
-    my $setpage=0;
-    my @fieldlist;
-    for my $pid (@pids)
-    {	next unless $Pages{$pid};
-	my ($package,$col,undef,$label)=@{ $Pages{$pid} };
-	my $page=$package->new($col,$opt1,$opt2,$pid);
-	$page->{pid}=$pid;
-	if ($col=~m/^\d+$/)
-	{	$self->{$col}=$page;
-		push @fieldlist,$col;
-		$label=$::TagProp[$col][0];
+	my $setpage;
+	for my $pid (@pids)
+	{	my $n=$self->AppendPage($pid,$opt2);
+	    if ($opt2->{page} && $opt2->{page} eq $pid) { $setpage=$n }
 	}
-	$notebook->append_page( $page, Gtk2::Label->new($label) );
-	$notebook->set_tab_reorderable($page,TRUE);
-	if ($opt2->{page} && $opt2->{page} eq $pid) { $setpage=$notebook->get_n_pages-1 }
-    }
-    $self->{fieldlist}=\@fieldlist;
 
-    $self->pack_end($hbox, FALSE, FALSE, 0);
-    $notebook->show_all; #needed to set page in this sub
+	$self->pack_end($hbox, FALSE, FALSE, 0);
+	$notebook->show_all; #needed to set page in this sub
 
-    $hbox->show_all;
-    $_->set_no_show_all(1) for $spin,$InterB,$optB;
-    $hbox->set_no_show_all(1);
-    $self->{bottom_buttons}=$hbox;
-    $notebook->signal_connect(switch_page => sub
-	{	my $p=$_[0]->get_nth_page($_[2]);
-		$self->{page}=$p->{pid};
-		my $mask=$Pages{$p->{pid}}[2];
-		if	($mask & 0b100)	{$optB->show}
+	$hbox->show_all;
+	$_->set_no_show_all(1) for $hbox,$spin,$InterB,$optB;
+	$self->{bottom_buttons}=$hbox;
+	$notebook->signal_connect( button_press_event => \&button_press_event_cb);
+	$notebook->signal_connect( switch_page => sub
+	 {	my $p=$_[0]->get_nth_page($_[2]);
+		my $self=::find_ancestor($_[0],__PACKAGE__);
+		my $pid= $self->{page}= $p->{pid};
+		my $mask=	$Pages{$pid} ? 				$Pages{$pid}[2] :
+				Songs::FilterListProp($pid,'multi') ?	'oni' : 'on';
+		if	($mask=~m/o/)	{$optB->show}
 		else			{$optB->hide}
-		if	($mask & 0b010)	{$spin->show}
+		if	($mask=~m/n/)	{$spin->show}
 		else			{$spin->hide}
-		if	($mask & 0b001)	{$InterB->show}
+		if	($mask=~m/i/)	{$InterB->show}
 		else			{$InterB->hide}
-	});
+	 });
 
-    $notebook->set_current_page( $setpage );
+	$self->add($notebook);
+	$notebook->set_current_page( $setpage||0 );
 
-    $opt2->{hidebb}=$opt1->{hide} unless exists $opt2->{hidebb};
-    $self->{hidebb}=$opt2->{hidebb}||0;
-    $hbox->hide if $self->{hidebb};
-    $self->add($notebook);
-    $self->{resetbutton}=$ResetB;
-    $self->{notebook}=$notebook;
-    $self->{watcher}=::AddWatcher();
-    $self->signal_connect(destroy => \&removewatchers);
-    ::WatchFilter($self,$opt1->{group},\&updatefilter);
-    return $self;
+	$opt2->{hidebb}=$opt1->{hide} unless exists $opt2->{hidebb};
+	$self->{hidebb}=$opt2->{hidebb}||0;
+	$hbox->hide if $self->{hidebb};
+	$self->{resetbutton}=$ResetB;
+	::Watch($self, SongsChanged=> \&SongsChanged_cb);
+	::Watch($self, SongsAdded  => \&SongsAdded_cb);
+	::Watch($self, SongsRemoved=> \&SongsRemoved_cb);
+	$self->signal_connect(destroy => \&cleanup);
+	::WatchFilter($self,$opt1->{group},\&updatefilter);
+	return $self;
 }
 
 sub SaveOptions
 {	my $self=shift;
-	my %opt;
-	$opt{hidebb}=$self->{hidebb};
-	$opt{page}=$self->{page};
-	$opt{min}=$self->{min};
-	$opt{pages}=join '|', map $_->{pid}, $self->{notebook}->get_children;
-	for my $col (::SONG_ARTIST,::SONG_ALBUM,::SONG_GENRE,::SONG_DATE,::SONG_LABELS)
-	{	my $page=$self->{$col};
-		next unless $page;
-		my $pid=$page->{pid};
-		if (my $c=$page->{mode})
-		{	$opt{$pid.'mode'}=$c if $c ne 'list'; #cloud or mosaic mode
+	my @opt=
+	(	hidebb	=> $self->{hidebb},
+		min	=> $self->{min},
+		page	=> $self->{page},
+		pages	=> (join '|', map $_->{pid}, $self->{notebook}->get_children),
+	);
+	for my $page ($self->{notebook}->get_children)
+	{	push @opt, $page->SaveOptions if $page->isa('FilterList');
+	}
+	return \@opt;
+}
+
+sub AppendPage
+{	my ($self,$pid,$opt2)=@_;
+	my ($package,$col,$label);
+	if ($Pages{$pid})
+	{	($package,$col,undef,$label)=@{ $Pages{$pid} };
+	}
+	elsif ( grep $_ eq $pid, Songs::FilterListFields() )
+	{	$package='FilterList';
+		$col=$pid;
+		$label=Songs::FieldName($col);
+	}
+	else {return}
+	$opt2||={};
+	my $page=$package->new($col,$self->{child_opt1},$opt2,$pid); #create new page
+	$page->{pid}=$pid;
+	if ($package eq 'FilterList' || $package eq 'FolderList')
+	{	$page->{Depend_on_field}=$col;
+	}
+	my $notebook=$self->{notebook};
+	my $n=$notebook->append_page( $page, Gtk2::Label->new($label) );
+	$n=$notebook->get_n_pages-1; # $notebook->append_page doesn't returns the page number before Gtk2-Perl 1.080
+	$notebook->set_tab_reorderable($page,TRUE);
+	$page->show_all;
+	return $n;
+}
+sub RemovePage_cb
+{	my $self=$_[1];
+	my $nb=$self->{notebook};
+	my $n=$nb->get_current_page;
+	my $page=$nb->get_nth_page($n);
+	my $pid=$page->{pid};
+	my $col;
+	if ($Pages{$pid}) { $col=$Pages{$pid}[1] if $Pages{$pid}[0] eq 'FolderList'; }
+	else { $col=$pid; }
+	$nb->remove_page($n);
+}
+
+sub button_press_event_cb
+{	my ($nb,$event)=@_;
+	return 0 if $event->button != 3;
+	return 0 unless ::IsEventInNotebookTabs($nb,$event);  #to make right-click on tab arrows work
+	$::LEvent=$event;
+	my $self=::find_ancestor($nb,__PACKAGE__);
+	my $menu=Gtk2::Menu->new;
+	my $cb=sub { $nb->set_current_page($_[1]); };
+	my %pages;
+	$pages{$_}= $Pages{$_}[3] for keys %Pages;
+	$pages{$_}= Songs::FieldName($_) for Songs::FilterListFields;
+	for my $page ($nb->get_children)
+	{	my $pid=$page->{pid};
+		my $name=delete $pages{$pid};
+		my $item=Gtk2::MenuItem->new($name);
+		$item->signal_connect(activate=>$cb,$nb->page_num($page));
+		$menu->append($item);
+	}
+	$menu->append(Gtk2::SeparatorMenuItem->new);
+
+	if (keys %pages)
+	{	my $new=Gtk2::ImageMenuItem->new(_"add tab");
+		$new->set_image( Gtk2::Image->new_from_stock('gtk-add','menu') );
+		my $submenu=Gtk2::Menu->new;
+		for my $pid (sort {$pages{$a} cmp $pages{$b}} keys %pages)
+		{	my $item=Gtk2::MenuItem->new($pages{$pid});
+			$item->signal_connect(activate=> sub { my $n=$self->AppendPage($pid); $self->{notebook}->set_current_page($n) });
+			$submenu->append($item);
 		}
-		if ($col==::SONG_ARTIST || $col==::SONG_ALBUM)
-		{	$opt{$pid.'psize'}=$page->{picsize};
-			$opt{$pid.'info'}=$page->{showinfo};
-			$opt{$pid.'sort'}=$page->{'sort'};
-			$opt{$pid.'mpsize'}=$page->{mpicsize};
-		}
-		elsif ($col==::SONG_ADDED || $col==::SONG_MODIF || $col==::SONG_LASTPLAY)
-		{	$opt{$pid.'timespan'}=$page->{timespan};
+		$menu->append($new);
+		$new->set_submenu($submenu);
+	}
+	if ($nb->get_n_pages>1)
+	{	my $item=Gtk2::ImageMenuItem->new(_"remove this tab");
+		$item->set_image( Gtk2::Image->new_from_stock('gtk-remove','menu') );
+		$item->signal_connect(activate=> \&RemovePage_cb,$self);
+		$menu->append($item);
+	}
+	#::PopupContextMenu(\@MenuTabbedL, { self=>$self, list=>$listname, pagenb=>$pagenb, page=>$page, pagetype=>$page->{tabbed_page_type} } );
+	$menu->show_all;
+	$menu->popup(undef, undef, undef, undef, $::LEvent->button, $::LEvent->time);
+	return 1;
+}
+
+sub SongsAdded_cb
+{	my ($self,$IDs)=@_;
+	return if $self->{needupdate};
+	if ( $self->{filter}->added_are_in($IDs) )
+	{	$self->{needupdate}=1;
+		::IdleDo('9_FPfull'.$self,5000,\&updatefilter,$self);
+	}
+}
+
+sub SongsChanged_cb
+{	my ($self,$IDs,$fields)=@_;
+	return if $self->{needupdate};
+	if ( $self->{filter}->changes_may_affect($IDs,$fields) )
+	{	$self->{needupdate}=1;
+		::IdleDo('9_FPfull'.$self,5000,\&updatefilter,$self);
+	}
+	else
+	{	for my $page ( $self->get_field_pages )
+		{	next unless $page->{valid} && $page->{hash};
+			my @depends= Songs::Depends( $page->{Depend_on_field} );
+			next unless ::OneInCommon(\@depends,$fields);
+			$page->{valid}=0;
+			$page->{hash}=undef;
+			::IdleDo('9_FP'.$self,1000,\&refresh_current_page,$self) if $page->mapped;
 		}
 	}
-	return \%opt;
+}
+sub SongsRemoved_cb
+{	my ($self,$IDs)=@_;
+	return if $self->{needupdate};
+	my $list=$self->{list};
+	my $changed=1;
+	if ($list!=$::Library)					#CHECKME use $::Library or a copy ?
+	{	my $isin='';
+		vec($isin,$_,1)=1 for @$IDs;
+		my $before=@$list;
+		@$list=grep !vec($isin,$_,1), @$list;
+		$changed=0 if $before==@$list;
+	}
+	$self->invalidate_children if $changed;
 }
 
 sub updatefilter
 {	my ($self,undef,undef,$nb)=@_;
+	delete $::ToDo{'9_FPfull'.$self};
+	my $force=delete $self->{needupdate};
+
 	my $group=$self->{group};
 	my $mynb=$self->{nb};
 	return if $nb && $nb> $mynb;
 	warn "Filtering list for FilterPane$mynb\n" if $::debug;
-	my $currentf=$::Filters_nb{$group}[$mynb];
+	my $currentf=$::Filters{$group}[$mynb+1];
 	$self->{resetbutton}->set_sensitive( !Filter::is_empty($currentf) );
-	my $filt=Filter->newadd(TRUE, map($::Filters_nb{$group}[$_],0..($mynb-1)) );
-	return if $self->{list} && Filter::are_equal($filt,$self->{filter});
+	my $filt=Filter->newadd(TRUE, map($::Filters{$group}[$_+1],0..($mynb-1)) );
+	return if !$force && $self->{list} && Filter::are_equal($filt,$self->{filter});
 	$self->{filter}=$filt;
 
-	my $lref=$filt->is_empty ? \@::Library
+	my $lref=$filt->is_empty ? $::Library			#CHECKME use $::Library or a copy ?
 				 : $filt->filter;
 	$self->{list}=$lref;
 
 	#warn "filter :".$filt->{string}.($filt->{source}?  " with source" : '')." songs=".scalar(@$lref)."\n";
-	my $updatesub=sub { ::IdleDo('9_FP'.$self,1000,\&update,$self); };
-	my $addsub=sub { push @$lref,@_; &$updatesub; };
-	my $rmsub=sub { my %h; $h{$_}=undef for @_; @$lref=grep !exists $h{$_},@$lref; &$updatesub; };
-	my $refiltersub=sub { ::IdleDo('9_FPfull'.$self,5000,\&updatefilter,$self); };
-	delete $::ToDo{'9_FP'.$self};
-	delete $::ToDo{'9_FPfull'.$self};
-	if ($lref == \@::Library)
-	{	$lref=undef;
-		$addsub=$rmsub= $updatesub;	#don't need and MUSTN'T update @$lref
+	$self->invalidate_children;
+}
+
+sub invalidate_children
+{	my $self=shift;
+	for my $page ( $self->get_field_pages )
+	{	$page->{valid}=0;
+		$page->{hash}=undef;
 	}
-	::ChangeWatcher( $self->{watcher},$lref,
-		$self->{fieldlist},
-		$updatesub,$rmsub,$addsub,$filt,$refiltersub );
-	$self->update;
+	::IdleDo('9_FP'.$self,1000,\&refresh_current_page,$self);
 }
-
-sub update
-{  my ($self,$min)=@_;
-   if ($min) { $self->{min}=$min; }
-   if (!$self->{list} || $::ToDo{'9_FPfull'.$self}) { $self->updatefilter; return; }
-   warn "Updating FilterPane".$self->{nb}."\n" if $::debug;
-   if (!$min || $::ToDo{'9_FP'.$self})
-   {	$self->{$_}{hash}=undef for @{ $self->{fieldlist} };
+sub update_children
+{	my ($self,$min)=@_;
+	$self->{min}=$min;
+	if (!$self->{list} || $self->{needupdate}) { $self->updatefilter; return; }
+	warn "Updating FilterPane".$self->{nb}."\n" if $::debug;
+	for my $page ( $self->get_field_pages )
+	{	$page->{valid}=0;		# set dirty flag for this page
+	}
+	$self->refresh_current_page;
+}
+sub refresh_current_page
+{	my $self=shift;
 	delete $::ToDo{'9_FP'.$self};
-   }
-   for my $col (@{ $self->{fieldlist} })
-   {	my $page=$self->{$col};
-	$page->{valid}=0;		# set dirty flag for this col
-	$page->Fill if $page->mapped;	# update now if col displayed
-   }
+	my ($current)=grep $_->mapped, $self->get_field_pages;
+	if ($current) { $current->Fill }	# update now if page is displayed
+}
+sub get_field_pages
+{	grep $_->{Depend_on_field}, $_[0]->{notebook}->get_children;
 }
 
-sub removewatchers
+sub cleanup
 {	my $self=shift;
 	delete $::ToDo{'9_FP'.$self};
 	delete $::ToDo{'9_FPfull'.$self};
-	::RemoveWatcher( $self->{watcher} );
 }
 
 sub PopupContextMenu
@@ -1973,8 +1996,9 @@ sub PopupOpt
 	$::LEvent=$event;
 	my $nb=$self->{notebook};
 	my $page=$nb->get_nth_page( $nb->get_current_page );
-	my $aa= ($page->{col}==::SONG_ARTIST || $page->{col}==::SONG_ALBUM);
-	::PopupContextMenu(\@MenuPageOptions, { self=>$page, aa=>$aa, col => $page->{col}} );
+	my $mainfield=Songs::MainField($page->{col});
+	my $aa= ($mainfield eq 'artist' || $mainfield eq 'album') ? $mainfield : undef; #FIXME
+	::PopupContextMenu(\@MenuPageOptions, { self=>$page, aa=>$aa, col => $page->{col}, usemenupos => 1,} );
 	return 1;
 }
 
@@ -1982,73 +2006,44 @@ package FilterList;
 use Gtk2;
 use base 'Gtk2::VBox';
 
-our %TimeSpan=
-(	year => [ '%Y', '%Y',
-			sub { ::mktime(0,0,0,1,0,$_[0]-1900) },
-			sub { return 0 unless $_[0]; my $y= (localtime($_[0]))[5]; return ::mktime(0,0,0,1,0,$y+1)-1; },
-		],
-	month=> [ '%Y%m', '%b %Y',
-			sub { my ($y,$m)= $_[0]=~m/^(\d{4})(\d\d)$/; return ::mktime(0,0,0,1,$m-1,$y-1900); },
-			sub { return 0 unless $_[0]; my ($m,$y)= (localtime($_[0]))[4,5]; $m++; if ($m==12) {$m=0;$y++} return ::mktime(0,0,0,1,$m,$y)-1; },
-		],
-	day  => [ '%Y%m%d', '%x',
-			sub { my ($y,$m,$d)= $_[0]=~m/^(\d{4})(\d\d)(\d\d)$/; return ::mktime(0,0,0,$d,$m-1,$y-1900); },
-			sub { return 0 unless $_[0]; my ($d,$m,$y)= (localtime($_[0]))[3,4,5]; return ::mktime(59,59,23,$d,$m,$y); },
-		],
-);
-
-our @hashsub;
-{ no warnings 'uninitialized';
-  $hashsub[::SONG_RATING]= sub { my $lref=$_[0]; my %h; $h{ $::Songs[$_][::SONG_RATING] }++  for @$lref; return \%h };
-  $hashsub[::SONG_DATE]= sub { my $lref=$_[0]; my %h; $h{ $::Songs[$_][::SONG_DATE] }++  for @$lref; return \%h };
-  $hashsub[::SONG_ALBUM]=sub { my $lref=$_[0]; my %h; $h{ $::Songs[$_][::SONG_ALBUM] }++ for @$lref; return \%h };
-  $hashsub[::SONG_ARTIST]=sub{ my $lref=$_[0]; my %h; $h{$_}++ for map split(/$::re_artist/o,$::Songs[$_][::SONG_ARTIST]),@$lref; return \%h };
-  $hashsub[::SONG_GENRE]=sub { my $lref=$_[0]; my %h; $h{$_}++ for map split(/\x00/, $::Songs[$_][::SONG_GENRE]), @$lref; return \%h };
-  $hashsub[::SONG_LABELS]=sub { my $lref=$_[0]; my %h; $h{$_}++ for map split(/\x00/, $::Songs[$_][::SONG_LABELS]), @$lref; return \%h };
-  $hashsub[::SONG_ADDED]=sub { my $lref=$_[0]; my ($f,undef,$sub)=@{$TimeSpan{$_[1]}}; my %h; $h{ ::strftime($f,localtime($::Songs[$_][::SONG_ADDED])) }++  for @$lref; %h= map {&$sub($_),$h{$_}} keys %h; return \%h };
-  $hashsub[::SONG_MODIF]=sub { my $lref=$_[0]; my ($f,undef,$sub)=@{$TimeSpan{$_[1]}}; my %h; $h{ ::strftime($f,localtime($::Songs[$_][::SONG_MODIF])) }++  for @$lref; %h= map {&$sub($_),$h{$_}} keys %h; return \%h };
-  $hashsub[::SONG_LASTPLAY]=sub { my $lref=$_[0]; my ($f,undef,$sub)=@{$TimeSpan{$_[1]}}; my %h; $h{ ::strftime($f,localtime($::Songs[$_][::SONG_LASTPLAY]||0)) }++  for @$lref; %h= map {&$sub($_),$h{$_}} keys %h; my $zero=&$sub(::strftime($f,localtime(0))); $h{0}=delete $h{$zero} if exists $h{$zero}; return \%h };
-  #$hashsub[::SONG_ARTIST]=sub { my $t=times;my $lref=$_[0]; my %h; $h{ $::Songs[$_][::SONG_ARTIST] }++  for @$lref;while (my($key,$v)=each %h) {my @k=split /$::re_artist/o,$key; if (@k>1) {$h{$_}+=$v for @k;delete $h{$key};}; }; warn (times-$t);return \%h };
-  #$hashsub[::SONG_GENRE]=sub { my $t=times;my $lref=$_[0]; my %h; $h{ $::Songs[$_][::SONG_GENRE] }++  for @$lref;while (my($key,$v)=each %h) {my @k=split /\x00/,$key; if (@k>1) {$h{$_}+=$v for @k;delete $h{$key};}; }; warn (times-$t);return \%h };
-}
-
-my @colcmd;
-$colcmd[::SONG_DATE]	='e';
-$colcmd[::SONG_ALBUM]	='e';
-$colcmd[::SONG_ARTIST]	='~';
-$colcmd[::SONG_GENRE]	='f';
-$colcmd[::SONG_LABELS]	='f';
-$colcmd[::SONG_ADDED]	='b';
-$colcmd[::SONG_MODIF]	='b';
-$colcmd[::SONG_LASTPLAY]='b';
-$colcmd[::SONG_RATING]='e';
-
 sub new
-{	my ($class,$col,$opt1,$opt2,$pid)=@_;
+{	my ($class,$field,$opt1,$opt2,$pid)=@_;
 	my $self = bless Gtk2::VBox->new, $class;
-	$self->{col}=$col;
+	$self->{field}[0]=$field;
 	$self->{no_typeahead}=$opt1->{no_typeahead};
 
-	if ($col==::SONG_ARTIST || $col==::SONG_ALBUM)
-	{	::Watch($self,AAPicture => \&AAPicture_Changed);
-		$self->{picsize}=	$opt2->{$pid.'psize'}|| 0;
-		$self->{showinfo}=	$opt2->{$pid.'info'} || 0;
-		$self->{sort}=		$opt2->{$pid.'sort'} || 'alpha';
-		$self->{mpicsize}=	$opt2->{$pid.'mpsize'}|| 64;
+	my $mode=	$opt2->{'mode_'.$pid} || 'list';
+	$self->{depth} =$opt2->{'depth_'.$pid}|| 0;
+	$self->{'sort'}=$opt2->{'sort_'.$pid} || 'default';
+	$self->{noall}=	$opt2->{'noall_'.$pid} || 0;
+	$self->{type}=		[split /\|/, $opt2->{'type_'.	$pid}||''];
+	$self->{markup}=	[split /\|/, $opt2->{'lmarkup_'.$pid}||''];
+	$self->{picsize}=	[split /\|/, $opt2->{'lpicsize_'.$pid}||0];
+	$self->{icons}= Songs::FilterListProp($field,'icon') ? [(Gtk2::IconSize->lookup('menu'))[0]] : [0];
+	$self->{type}[0] ||= $field.'.'.(Songs::FilterListProp($field,'type')||''); $self->{type}[0]=~s/\.$//;	#FIXME
+	if (Songs::FilterListProp($field,'picture'))
+	{	$self->{mpicsize}=	$opt2->{'mpicsize_'.$pid}|| 64;
 	}
-	elsif ($col==::SONG_ADDED || $col==::SONG_LASTPLAY || $col==::SONG_MODIF)
-	{	$self->{timespan}=	$opt2->{$pid.'timespan'}|| 'year';
-		$self->{sort}='numeric';
+	::Watch($self, Picture_artist => \&AAPicture_Changed);	#FIXME PHASE1
+	::Watch($self, Picture_album => \&AAPicture_Changed);	#FIXME PHASE1
+
+	for my $d (1..$self->{depth})
+	{	$self->{type}[$d] =~ m#^([^.]+)#;
+		$self->{field}[$d]=$1;
 	}
-	elsif ($col==::SONG_RATING) { $self->{sort}='numeric'; }
 
 	#search box
-	if ($col != ::SONG_DATE && $opt1->{searchbox} && $col!=::SONG_ADDED && $col!=::SONG_MODIF && $col!=::SONG_LASTPLAY && $col!=::SONG_RATING)
+	if ($opt1->{searchbox} && Songs::FilterListProp($field,'search'))
 	{	$self->pack_start( make_searchbox() ,::FALSE,::FALSE,1);
 	}
 	::Watch($self,'SearchText_'.$opt1->{group},\&set_text_search);
 
-	$self->{colcmd}=$col.$colcmd[$col];
+	#interactive search box
+	$self->{isearchbox}=GMB::ISearchBox->new($opt2,$field,'nolabel',$pid);
+	$self->pack_end( $self->{isearchbox} ,::FALSE,::FALSE,1);
+	$self->signal_connect(key_press_event => \&key_press_cb); #only used for isearchbox
+
+
 	$self->signal_connect(map => \&Fill);
 
 	my $sub=\&play_current;
@@ -2058,11 +2053,39 @@ sub new
 	}
 	$self->{activate}=$sub;
 
-	my $mode= $opt2->{$pid.'mode'} || 'list';
-	$mode='cloud' if $opt2->{$pid.'cloud'}; #old option
 	$self->set_mode($mode);
-
 	return $self;
+}
+
+sub SaveOptions
+{	my $self=$_[0];
+	my $pid=$self->{pid};
+	my %opt;
+	$opt{'mpicsize_'.$pid}=$self->{mpicsize} if exists $self->{mpicsize};
+	$opt{'lpicsize_'.$pid}=	join '|', @{$self->{picsize}}	if $self->{picsize};
+	$opt{'lmarkup_'. $pid}=	join '|', @{$self->{markup}}	if $self->{markup};
+	$opt{'type_'.$pid}=	join '|', @{$self->{type}}	if $self->{type};
+	$opt{'depth_'.$pid}=$self->{depth};
+	$opt{'mode_'.$pid}= $self->{mode};
+	$opt{'sort_'.$pid}= $self->{'sort'};
+	$opt{'noall_'.$pid}= $self->{'noall'};
+	return %opt, $self->{isearchbox}->SaveOptions;
+}
+
+sub SetField
+{	my ($self,$field,$depth)=@_;
+	$self->{field}[$depth]=$field;
+	my $type=Songs::FilterListProp($field,'type');
+	$self->{type}[$depth]= $type ? $field.'.'.$type : $field;
+	$self->{picsize}[$depth]||=0;
+	$self->{markup}[$depth]||=0;
+	$self->{icons}[$depth]||= Songs::FilterListProp($field,'icon') ? (Gtk2::IconSize->lookup('menu'))[0] : 0;
+
+	my $i=0;
+	$i++ while $self->{field}[$i];
+	$self->{depth}=$i-1;
+
+	$self->Fill('optchanged');
 }
 
 sub set_mode
@@ -2076,10 +2099,9 @@ sub set_mode
 				$self->create_list;
 	$self->{view}=$view;
 	$child->{is_a_view}=1;
+	$view->signal_connect(focus_in_event	=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->{isearchbox}->hide; 0; });	#hide isearchbox when focus goes to the view
 
-	my $drag_type=	$self->{col}==::SONG_ARTIST ? ::DRAG_ARTIST :
-			$self->{col}==::SONG_ALBUM  ? ::DRAG_ALBUM  :
-			::DRAG_FILTER;
+	my $drag_type=	Songs::FilterListProp( $self->{field}[0], 'drag') || ::DRAG_FILTER;
 	::set_drag( $view, source => [$drag_type,\&drag_cb]);
 	MultiTreeView::init($view,__PACKAGE__) if $mode eq 'list'; #should be in create_list but must be done after set_drag
 
@@ -2092,34 +2114,33 @@ sub set_mode
 sub create_list
 {	my $self=$_[0];
 	$self->{mode}='list';
+	my $field=$self->{field}[0];
 	my $sw=Gtk2::ScrolledWindow->new;
 #	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('automatic','automatic');
 	::set_biscrolling($sw);
 
-	my $store=Gtk2::ListStore->new('Glib::String');
+	my $store=Gtk2::TreeStore->new('Glib::UInt');
 	my $treeview=Gtk2::TreeView->new($store);
 	$sw->add($treeview);
 	$treeview->set_headers_visible(::FALSE);
-	$treeview->set_enable_search(!$self->{no_typeahead});
+	$treeview->set_search_column(-1);	#disable gtk interactive search, use my own instead
+	$treeview->set_enable_search(::FALSE);
 	#$treeview->set('fixed-height-mode' => ::TRUE);	#only if fixed-size column
-	my $col=$self->{col};
-	my $column=Gtk2::TreeViewColumn->new;
-	if ($col==::SONG_LABELS)
-	{	my $renderer0=Gtk2::CellRendererPixbuf->new;
-		$column->pack_start($renderer0,0);
-		$column->set_cell_data_func($renderer0, sub { my (undef,$cell,$store,$iter)=@_; my $label=$store->get($iter,0); $cell->set('stock-id','label-'.$label) });
-	}
-	my $renderer=	($col==::SONG_ARTIST || $col==::SONG_ALBUM)
-			? CellRendererAA->new
-			: Gtk2::CellRendererText->new;
-	$column->pack_start($renderer,1);
-	if ($col==::SONG_ADDED || $col==::SONG_LASTPLAY || $col==::SONG_MODIF)
-	{	$column->set_cell_data_func($renderer, sub { my ($column,$cell,$store,$iter)=@_; my $time=$store->get($iter,0); $cell->set(text=> $time ? ::strftime($TimeSpan{$self->{timespan}}[1],localtime($time)) : _"never" ) });
-	}
-	elsif ($col==::SONG_RATING) { $column->set_cell_data_func($renderer, sub { my ($column,$cell,$store,$iter)=@_; my $val=$store->get($iter,0); $cell->set(text=> $val eq '' ? _"default" : $val ) }); }
-	else {$column->add_attribute($renderer, text => 0);}
+	my $renderer= CellRendererGID->new;
+	my $column=Gtk2::TreeViewColumn->new_with_attributes('',$renderer);
+
+	$renderer->set(prop => [@$self{qw/type markup picsize icons/}]);	#=> $renderer->get('prop')->[0] contains $self->{type} (which is a array ref)
+	#$column->add_attribute($renderer, gid => 0);
+	$column->set_cell_data_func($renderer, sub
+		{	my (undef,$cell,$store,$iter)=@_;
+			my $gid=$store->get($iter,0);
+			my $depth=$store->iter_depth($iter);
+			$cell->set( gid=>$gid, depth=>$depth);# 'is-expander'=> $depth < $store->{depth});
+		});
 	$treeview->append_column($column);
+	$treeview->signal_connect(row_expanded  => \&row_expanded_cb);
+	#$treeview->signal_connect(row_collapsed => sub { my $store=$_[0]->get_model;my $iter=$_[1]; while (my $iter=$store->iter_nth_child($iter,1)) { $store->remove($iter) } });
 
 	my $selection=$treeview->get_selection;
 	$selection->set_mode('multiple');
@@ -2127,9 +2148,9 @@ sub create_list
 
 	$treeview->signal_connect( row_activated => sub
 		{	my $self=::find_ancestor($_[0],__PACKAGE__);
-			goto $self->{activate};
+			&{$self->{activate}};
 		});
-	return ($sw,$treeview);
+	return $sw,$treeview;
 }
 
 sub create_cloud
@@ -2137,17 +2158,10 @@ sub create_cloud
 	$self->{mode}='cloud';
 	my $sw=Gtk2::ScrolledWindow->new;
 	$sw->set_policy('never','automatic');
-	my $sub;
-	my $col=$self->{col};
-	if ($col==::SONG_ADDED || $col==::SONG_LASTPLAY || $col==::SONG_MODIF)
-	{	$sub= sub { my $time=$_[0]; $time ? ::strftime($TimeSpan{$self->{timespan}}[1],localtime($time)) : _"never"; };
-	}
-	elsif ($col==::SONG_RATING)
-	{	$sub= sub { my $val=$_[0]; $val eq '' ? _"default" : $val; };
-	}
-	my $cloud= Cloud->new(\&child_selection_changed_cb,\&get_fill_data,$self->{activate},\&enqueue_current,\&PopupContextMenu,$sub);
+	my $sub=Songs::DisplayFromGID_sub($self->{type}[0]);
+	my $cloud= GMB::Cloud->new(\&child_selection_changed_cb,\&get_fill_data,$self->{activate},\&enqueue_current,\&PopupContextMenu,$sub);
 	$sw->add_with_viewport($cloud);
-	return ($sw,$cloud);
+	return $sw,$cloud;
 }
 sub create_mosaic
 {	my $self=$_[0];
@@ -2155,20 +2169,25 @@ sub create_mosaic
 	my $hbox=Gtk2::HBox->new(0,0);
 	my $vscroll=Gtk2::VScrollbar->new;
 	$hbox->pack_end($vscroll,0,0,0);
-	my $mosaic= Mosaic->new(\&child_selection_changed_cb,\&get_fill_data,$self->{activate},\&enqueue_current,\&PopupContextMenu,$self->{col},$vscroll);
+	my $mosaic= GMB::Mosaic->new(\&child_selection_changed_cb,\&get_fill_data,$self->{activate},\&enqueue_current,\&PopupContextMenu,$self->{type}[0],$vscroll);
 	$hbox->add($mosaic);
-	return ($hbox,$mosaic);
+	return $hbox,$mosaic;
 }
 
-sub drag_cb
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
-	if ($self->{col}==::SONG_ARTIST || $self->{col}==::SONG_ALBUM)
-	{	return @{$self->get_selected};
+sub get_cursor_row
+{	my $self=$_[0];
+	if ($self->{mode} eq 'list')
+	{	my ($path)=$self->{view}->get_cursor;
+		return $path->to_string;
 	}
-	else
-	{	my $filter=$self->get_selected_filters;
-		return ($filter? $filter->{string} : undef);
+	else { return $self->{view}->get_cursor_row; }
+}
+sub set_cursor_to_row
+{	my ($self,$row)=@_;
+	if ($self->{mode} eq 'list')
+	{	$self->{view}->set_cursor(Gtk2::TreePath->new_from_indices($row));
 	}
+	else { $self->{view}->set_cursor_to_row($row); }
 }
 
 sub make_searchbox
@@ -2223,71 +2242,133 @@ sub child_selection_changed_cb
 
 sub get_selected_filters
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
-	my $vals=$self->get_selected;
-	return undef unless @$vals;
-	my $col=$self->{col};
-	if ($col==::SONG_ADDED || $col==::SONG_MODIF || $col==::SONG_LASTPLAY)
-	{	my $sub=$TimeSpan{$self->{timespan}}[3];
-		@$vals=map $self->{colcmd}.$_.' '.&$sub($_) , @$vals;
+	my @filters;
+	my $types=$self->{type};
+	if ($self->{mode} eq 'list')
+	{	my $store=$self->{view}->get_model;
+		my $sel=$self->{view}->get_selection;
+		my @rows=$sel->get_selected_rows;
+		for my $path (@rows)
+		{	my $iter=$store->get_iter($path);
+			if ($store->get_value($iter,0)==-1 || $store->get_value($iter,0)==2**32-1) { return Filter->new; } ############ use GID_ALL
+			my @parents= $iter;
+			unshift @parents,$iter while $iter=$store->iter_parent($iter);
+			next if grep $sel->iter_is_selected($parents[$_]), 0..$#parents-1;#skip if one parent is selected
+			my @f=map Songs::MakeFilterFromGID( $types->[$_], $store->get_value($parents[$_],0)), 0..$#parents;
+			push @filters,Filter->newadd(1, @f);
+		}
 	}
-	else {	@$vals=map $self->{colcmd}.$_ , @$vals; }
+	else
+	{	my $vals=$self->get_selected;
+		@filters=map Songs::MakeFilterFromGID($types->[0],$_), @$vals;
+	}
+	return undef unless @filters;
+	my $field=$self->{field}[0];
 	my $filterpane=::find_ancestor($self,'FilterPane');
-	my $i=$filterpane->{inter} && $col!=::SONG_ALBUM && $col!=::SONG_DATE && $col!=::SONG_ADDED && $col!=::SONG_MODIF && $col!=::SONG_LASTPLAY && $col!=::SONG_RATING;
-	my $filter=Filter->newadd($i,@$vals);
+	my $i= $filterpane->{inter} && Songs::FilterListProp($field,'multi');
+	my $filter=Filter->newadd($i,@filters);
 	$filter->invert if $filterpane->{invert};
 	return $filter;
 }
-sub get_selected
+sub get_selected	#not called for list => only called for cloud or mosaic
+{	return [$_[0]->{view}->get_selected];
+}
+
+sub get_selected_list
 {	my $self=$_[0];
+	my $field=$self->{field}[0];
 	my @vals;
-	if ($self->{mode} eq 'list')
-	{	my $store=$self->{view}->get_model;
-		my @rows=$self->{view}->get_selection->get_selected_rows;
-		@vals=map $store->get_value($store->get_iter($_),0) , @rows;
+	if ($self->{mode} eq 'list') #only returns selected rows if they are all at the same depth
+	{{	my $store=$self->{view}->get_model;
+		my @iters=map $store->get_iter($_), $self->{view}->get_selection->get_selected_rows;
+		last unless @iters;
+		my $depth=$store->iter_depth($iters[0]);
+		last if grep $depth != $store->iter_depth($_), @iters;
+		@vals=map $store->get_value($_,0) , @iters;
+		$field=$self->{field}[$depth];
+	}}
+	else { @vals=$self->{view}->get_selected }
+	return $field,\@vals;
+}
+
+sub drag_cb
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $field=$self->{field}[0];
+	if (my $drag=Songs::FilterListProp($field,'drag'))	#return artist or album gids
+	{	if ($self->{mode} eq 'list')
+		{	my $store=$self->{view}->get_model;
+			my @rows=$self->{view}->get_selection->get_selected_rows;
+			unless (grep $_->get_depth>1, @rows)
+			{	my @gids=map $store->get_value($store->get_iter($_),0), @rows;
+				warn "dnd : gids=@gids\n";
+				if (grep $_==2**32-1, @gids) {return ::DRAG_FILTER,'';}	#there is an "all-row"  #use GID_ALL
+				return $drag,@gids;
+			}
+			#else : rows of depth>0 selected => fallback to get_selected_filters
+		}
 	}
-	else
-	{	@vals=$self->{view}->get_selected;
+	my $filter=$self->get_selected_filters;
+	return ($filter? (::DRAG_FILTER,$filter->{string}) : undef);
+}
+
+sub row_expanded_cb
+{	my ($treeview,$piter,$path)=@_;
+	my $self=::find_ancestor($treeview,__PACKAGE__);
+	my $filterpane=::find_ancestor($self,'FilterPane');
+	my $store=$treeview->get_model;
+	my $depth=$store->iter_depth($piter);
+	my @filters;
+	for (my $iter=$piter; $iter; $iter=$store->iter_parent($iter) )
+	{	push @filters, Songs::MakeFilterFromGID($self->{type}[$store->iter_depth($iter)], $store->get($iter,0));
 	}
-	return \@vals;
+	my $list=$filterpane->{list};
+	$list= Filter->newadd(1,@filters)->filter($list);
+	my $type=$self->{type}[$depth+1];
+	my $h=Songs::BuildHash($type,$list,'gid');
+	#my $children=AA::SortKeys($type,[keys %$h],'default');
+	my $children=[keys %$h];
+	Songs::sort_gid_by_name($type,$children);
+	for my $i (0..$#$children)
+	{	my $iter= $store->iter_nth_child($piter,$i) || $store->append($piter);
+		$store->set($iter,0,$children->[$i]);
+	}
+	while (my $iter=$store->iter_nth_child($piter,$#$children+1)) { $store->remove($iter) }
+
+	if ($depth<$self->{depth}-1)	#make sure every child has a child if $depth not the deepest
+	{	for (my $iter=$store->iter_children($piter); $iter; $iter=$store->iter_next($iter) )
+		{	$store->append($iter) unless $store->iter_children($iter);
+		}
+	}
 }
 
 sub get_fill_data
 {	my ($child,$opt)=@_;
 	my $self=::find_ancestor($child,__PACKAGE__);
 	my $filterpane=::find_ancestor($self,'FilterPane');
-	my $col=$self->{col};
+	my $type=$self->{type}[0];
 	$self->{hash}=undef if $opt && $opt eq 'rehash';
-	my $href= $self->{hash} ||= &{ $hashsub[$col] }($filterpane->{list},$self->{timespan});
+	my $href= $self->{hash} ||= Songs::BuildHash($type,$filterpane->{list},'gid');
 	$self->{valid}=1;
+	$self->{all_count}= keys %$href;	#used to display how many artists/album/... there is in this filter
 	my $min=$filterpane->{min};
 	my $search=$self->{search};
-	my @l=grep $$href{$_} >= $min, keys %$href;
-	@l=grep m/\Q$search\E/i, @l  if defined $search && $search ne '';
-	if (!$self->{sort} || $self->{sort} eq 'alpha')
-	{	#@l=sort {lc$a cmp lc$b}
-		@l=sort {::NFKD(lc$a) cmp ::NFKD(lc$b)}
-		   sort {$a cmp $b} @l;#the case-sensitive sort is used to speed up the following utf8 case-insensitive sort
+	my @list;
+	if ($min>1)
+	{	@list=grep $$href{$_} >= $min, keys %$href;
 	}
-	elsif ($self->{sort} eq 'numeric') { no warnings; @l=sort {$a <=> $b} @l; }
-	elsif ($self->{sort} eq 'length')
-	{	my $aa= $col==::SONG_ARTIST ? \%::Artist : \%::Album;
-		no warnings 'uninitialized';
-		@l=sort { $aa->{$a}[::AALENGTH] <=> $aa->{$b}[::AALENGTH] || ::NFKD(lc$a) cmp ::NFKD(lc$b) } @l;
+	else { @list=keys %$href; }
+	if (defined $search && $search ne '')
+	{	my $displaysub=Songs::DisplayFromGID_sub($type);
+		@list=grep $displaysub->($_)=~m/\Q$search\E/i, @list;	#FIXME optimize ?
 	}
-	elsif ($self->{sort} eq 'year')
-	{	my $aa= $col==::SONG_ARTIST ? \%::Artist : \%::Album;
-		no warnings 'uninitialized';
-		@l=sort { $aa->{$a}[::AAYEAR] cmp $aa->{$b}[::AAYEAR] || ::NFKD(lc$a) cmp ::NFKD(lc$b) } @l;
-	}
-	elsif ($self->{sort} eq 'year2') #use highest year
-	{	my $aa= $col==::SONG_ARTIST ? \%::Artist : \%::Album;
-		no warnings 'uninitialized';
-		@l=sort { substr($aa->{$a}[::AAYEAR],-4,4) cmp substr($aa->{$b}[::AAYEAR],-4,4) || ::NFKD(lc$a) cmp ::NFKD(lc$b) } @l;
-	}
-	elsif ($self->{sort} eq 'songs') #number of songs in filter
-	{	@l=sort { $href->{$a} <=> $href->{$b} || ::NFKD(lc$a) cmp ::NFKD(lc$b) } @l;
-	}
-	return \@l,$href;
+	AA::SortKeys($type,\@list,$self->{'sort'});
+
+	my $beforeremoving0=@list;
+	@list= grep $_!=0, @list;
+	unshift @list,0 if $beforeremoving0!=@list;	#could be better
+
+	$self->{array}=\@list; #used for interactive search
+	return \@list,$href;
 }
 
 sub Fill
@@ -2297,13 +2378,23 @@ sub Fill
 	return if $self->{valid} && !$opt;
 	if ($self->{mode} eq 'list')
 	{	my $treeview=$self->{view};
+		$treeview->set('show-expanders', ($self->{depth}>0) ) if Gtk2->CHECK_VERSION(2,12,0);
 		my $store=$treeview->get_model;
+		my $col=$self->{col};
+		my ($renderer)=($treeview->get_columns)[0]->get_cell_renderers;
+		$renderer->reset;
 		$self->{busy}=1;
 		$store->clear;	#FIXME keep selection ?   FIXME at least when opt is true (ie showinfo or picsize changed)
-		my $col=$self->{col};
-		(($treeview->get_columns)[0]->get_cell_renderers)[0]->reset if ($col==::SONG_ARTIST || $col==::SONG_ALBUM);
 		my ($list)=$self->get_fill_data($opt);
-		$store->set($store->append,0,$_) for @$list;
+		$renderer->set('all_count', $self->{all_count});
+		$self->{array_offset}= $self->{noall} ? 0 : 1;	#row number difference between store and $list, needed by interactive search
+		$store->set($store->append(undef),0,-1) unless $self->{noall}; ############  use GID_ALL
+		$store->set($store->append(undef),0,$_) for @$list;
+		if ($self->{field}[1])
+		{	for (my $iter=$store->get_iter_first; $iter; $iter=$store->iter_next($iter))
+			{	$store->append($iter);
+			}
+		}
 		$self->{busy}=undef;
 	}
 	else
@@ -2324,12 +2415,27 @@ sub enqueue_current
 sub PopupContextMenu
 {	my ($self,undef,$event)=@_;
 	$self=::find_ancestor($self,__PACKAGE__);
-	my $keylist=$self->get_selected;
-	my $col=$self->{col};
-	my $aa= $col==::SONG_ARTIST ? 'artist':
-		$col==::SONG_ALBUM  ? 'album' :
-		undef;
-	FilterPane::PopupContextMenu($self,$event,{ self=> $self, filter => $self->get_selected_filters, col => $col, aa => $aa, keylist =>$keylist });
+	my ($field,$gidlist)=$self->get_selected_list;
+	my $mainfield=Songs::MainField($field);
+	my $aa= ($mainfield eq 'artist' || $mainfield eq 'album') ? $mainfield : undef; #FIXME
+	my $mode= uc(substr $self->{mode},0,1); # C => cloud, M => mosaic, L => list
+	FilterPane::PopupContextMenu($self,$event,{ self=> $self, filter => $self->get_selected_filters, field => $field, aa => $aa, gidlist =>$gidlist, mode => $mode, subfield => $field, depth =>0 });
+}
+
+sub key_press_cb
+{	my ($self,$event)=@_;
+	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
+	my $unicode=Gtk2::Gdk->keyval_to_unicode($event->keyval); # 0 if not a character
+	my $state=$event->get_state;
+	my $ctrl= $state * ['control-mask'];
+	my $shift=$state * ['shift-mask'];
+	if	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }	#ctrl-f : search
+	elsif	(lc$key eq 'g' && $ctrl) { $self->{isearchbox}->search($shift ? -1 : 1);}	#ctrl-g : next/prev match
+	elsif	(!$self->{no_typeahead} && $unicode && !($state * [qw/control-mask mod1-mask mod4-mask/]))
+	{	$self->{isearchbox}->begin( chr $unicode );	#begin typeahead search
+	}
+	else	{return 0}
+	return 1;
 }
 
 package FolderList;
@@ -2352,7 +2458,7 @@ sub new
 	$treeview->signal_connect(row_collapsed => \&row_expanded_changed_cb);
 	$treeview->{expanded}={};
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
-		( $::TagProp[$col][0],Gtk2::CellRendererText->new,'text',0)
+		( Songs::FieldName($col),Gtk2::CellRendererText->new,'text',0)
 		);
 
 	$self->add($treeview);
@@ -2367,7 +2473,7 @@ sub new
 	    {	my @paths=_get_path_selection( $_[0] );
 		return undef unless @paths;
 		my $filter=_MakeFolderFilter(@paths);
-		return ($filter? $filter->{string} : undef);
+		return ::DRAG_FILTER,($filter? $filter->{string} : undef);
 	    }]);
 	MultiTreeView::init($treeview,__PACKAGE__);
 	return $self;
@@ -2380,9 +2486,9 @@ sub Fill
 	my $treeview=$self->{treeview};
 	my $filterpane=::find_ancestor($self,'FilterPane');
 	my $href=$self->{hash}||= do
-		{ my %h; $h{ $::Songs[$_][::SONG_UPATH] }++ for @{ $filterpane->{list} };
+		{ my $h= Songs::BuildHash('path',$filterpane->{list});
 		  my @hier;
-		  while (my ($f,$n)=each %h)
+		  while (my ($f,$n)=each %$h)
 		  {	my $ref=\@hier;
 			$ref=$ref->[1]{$_}||=[] and $ref->[0]+=$n   for split /$::QSLASH/o,$f;
 		  }
@@ -2456,7 +2562,7 @@ sub selection_changed_cb
 sub _MakeFolderFilter
 {	my @paths=@_; #in utf8
 	s#\\#\\\\#g for @paths;
-	return Filter->newadd(::FALSE,map( ::SONG_UPATH.'i'.$_, @paths ));
+	return Filter->newadd(::FALSE,map( 'path:i:'.$_, @paths ));
 }
 
 sub enqueue_current
@@ -2479,7 +2585,7 @@ sub _get_path_selection
 	return @paths;
 }
 sub _treepath_to_foldername
-{	my ($store,$tp)=($_[0],$_[1]);
+{	my $store=$_[0]; my $tp=$_[1];
 	my @folders;
 	my $iter=$store->get_iter($tp);
 	while ($iter)
@@ -2508,7 +2614,7 @@ sub new
 	#$treeview->set('fixed-height-mode' => ::TRUE);	#only if fixed-size column
 	$treeview->signal_connect(row_expanded  => \&row_expanded_changed_cb);
 	$treeview->signal_connect(row_collapsed => \&row_expanded_changed_cb);
-	$treeview->{expanded}={};
+	#$treeview->{expanded}={}; #not used
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
 		( '',Gtk2::CellRendererText->new,'text',0)
 		);
@@ -2525,7 +2631,7 @@ sub new
 	    {	my @paths=_get_path_selection( $_[0] );
 		return undef unless @paths;
 		my $filter=_MakeFolderFilter(@paths);
-		return ($filter? $filter->{string} : undef);
+		return ::DRAG_FILTER,($filter? $filter->{string} : undef);
 	    }]);
 	MultiTreeView::init($treeview,__PACKAGE__);
 	return $self;
@@ -2544,7 +2650,7 @@ sub Fill
 	$self->refresh_path($store->get_path($iter));
 	$treeview->expand_to_path($store->get_path($iter));
 	 #expand to home dir
-	for my $folder (split /$::QSLASH/,Glib::get_home_dir)
+	for my $folder (split /$::QSLASH/o,Glib::get_home_dir)
 	{	next if $folder eq '';
 		$iter=$store->iter_children($iter);
 		while ($iter)
@@ -2620,8 +2726,8 @@ sub _MakeFolderFilter
 {	my @paths=@_; #in utf8
 	#s#\\#\\\\#g for @paths;
 	my @list;
-	push @list, @{ ::ScanFolder($_) } for @paths;
-	my $filter= Filter->new('',\@list);
+	push @list, ::FolderToIDs($_) for @paths;
+	my $filter= Filter->new('',\@list); #FIXME use a filter on path rather than a list ?
 	return $filter;
 }
 
@@ -2645,7 +2751,7 @@ sub _get_path_selection
 	return @paths;
 }
 sub _treepath_to_foldername
-{	my ($store,$tp)=($_[0],$_[1]);
+{	my $store=$_[0]; my $tp=$_[1];
 	my @folders;
 	my $iter=$store->get_iter($tp);
 	while ($iter)
@@ -2684,8 +2790,8 @@ INIT
   );
 
   %Modes=
-  (	F => [_"Saved filters",	'sfilter',	'SavedFilters',	\&UpdateSavedFilters,	'gmb-filter'	],
-	L => [_"Saved lists",	'slist',	'SavedLists',	\&UpdateSavedLists,	'gmb-list'	],
+  (	F => [_"Saved filters",	'sfilter',	'SavedFilters',	\&UpdateSavedFilters,	'gmb-filter'	,\&::SaveFilter, 'filter000'],
+	L => [_"Saved lists",	'slist',	'SavedLists',	\&UpdateSavedLists,	'gmb-list'	,\&::SaveList, 'list000'],
 	P => [_"Playing",	'play',		undef,		\&UpdatePlayingFilters,	'gtk-media-play'	],
   );
 }
@@ -2702,16 +2808,16 @@ sub new
 	my $column=Gtk2::TreeViewColumn->new;
 	$column->pack_start($renderer0,0);
 	$column->pack_start($renderer1,1);
-	$column->add_attribute($renderer0, 'stock-id' => 2);
-	$column->add_attribute($renderer1, text => 0);
-	$column->add_attribute($renderer1, editable => 4);
+	$column->add_attribute($renderer0, 'stock-id'	=> 2);
+	$column->add_attribute($renderer1, text		=> 0);
+	$column->add_attribute($renderer1, editable	=> 4);
 	$treeview->append_column($column);
 
 	::set_drag($treeview, source =>
 		[::DRAG_FILTER,sub
 		 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 			my $filter=$self->get_selected_filters;
-			return ($filter? $filter->{string} : undef);
+			return ::DRAG_FILTER,($filter? $filter->{string} : undef);
 		 }],
 		 dest =>
 		[::DRAG_FILTER,::DRAG_ID,sub	#targets are modified in drag_motion callback
@@ -2721,8 +2827,7 @@ sub new
 			my ($name,$rowtype)=$store->get_value( $store->get_iter($path) );
 			if ($type == ::DRAG_ID)
 			{	if ($rowtype eq 'slist')
-				{	push @{$::SavedLists{$name}},@data;
-					::HasChanged('SavedLists',$name,'push');
+				{	$::Options{SavedLists}{$name}->Push(@data);
 				}
 				else
 				{	$self->CreateNewFL('L',\@data);
@@ -2757,7 +2862,7 @@ sub new
 			$self->{$id}=$n++; #path of the root for this id
 		}
 		::Watch($self,$watchid,$sub) if $watchid;
-		&$sub($self);
+		$sub->($self);
 	}
 	$treeview->expand_all;
 
@@ -2774,9 +2879,9 @@ sub UpdatePlayingFilters
 		$iter=$store->get_iter($path);
 	}
 	my @list=(	playfilter	=> _"Playing Filter",
-			artist		=> _"Playing Artist",
-			album		=> _"Playing Album",
-			title		=> _"Playing Title",
+			'f=artists'	=> _"Playing Artist",
+			'f=album'	=> _"Playing Album",
+			'f=title'	=> _"Playing Title",
 		 );
 	while (@list)
 	{	my $id=shift @list;
@@ -2787,14 +2892,14 @@ sub UpdatePlayingFilters
 }
 
 sub UpdateSavedFilters
-{	$_[0]->fill_savednames('sfilter',\%::SavedFilters);
+{	$_[0]->fill_savednames('sfilter','SavedFilters');
 }
 sub UpdateSavedLists
 {	return if $_[2] && $_[2] eq 'push';
-	$_[0]->fill_savednames('slist',\%::SavedLists);
+	$_[0]->fill_savednames('slist','SavedLists');
 }
 sub fill_savednames
-{	my ($self,$type,$href)=@_;
+{	my ($self,$type,$hkey)=@_;
 	$self->{busy}=1;
 	my $treeview=$self->{treeview};
 	my $store=$treeview->get_model;
@@ -2809,7 +2914,7 @@ sub fill_savednames
 	while (my $child=$store->iter_children($iter))
 	{	$store->remove($child);
 	}
-	$store->set($store->append($iter),0,$_,1,$type,4,TRUE) for sort keys %$href;
+	$store->set($store->append($iter),0,$_,1,$type,4,TRUE) for sort keys %{$::Options{$hkey}}; #FIXME use case and accent insensitive sort #should use GetListOfSavedLists() for SavedLists
 	$treeview->expand_to_path($path) if $expanded;
 	$self->{busy}=undef;
 }
@@ -2886,18 +2991,17 @@ sub name_edited_cb
 	my ($name,$type)=$store->get($iter,0,1);
 	my $sub= $type eq 'sfilter' ? \&::SaveFilter : \&::SaveList;
 	#$self->{busy}=1;
-	&$sub($name,undef,$newname);
+	$sub->($name,undef,$newname);
 	#$self->{busy}=undef;
 	#$store->set($iter, 0, $newname);
 }
 
 sub CreateNewFL
 {	my ($self,$mode,$data)=@_;
-	my ($type,$name,$savesub,$hash)= ($mode eq 'F') ? ('sfilter','filter000',\&::SaveFilter,\%::SavedFilters)
-							: ('slist','list000',\&::SaveList,\%::SavedLists);
-	while ($hash->{$name}) {$name++}
-	return if $hash->{$name};
-	&$savesub($name,$data);
+	my ($type,$hkey,$savesub,$name)= @{$Modes{$mode}}[1,2,5,6];
+	while ($::Options{$hkey}{$name}) {$name++}
+	return if $::Options{$hkey}{$name};
+	$savesub->($name,$data);
 
 	my $treeview=$self->{treeview};
 	my $store=$treeview->get_model;
@@ -2929,14 +3033,14 @@ sub sel_changed_cb
 }
 
 sub get_selected_filters
-{	my $self=shift;
+{	my $self=$_[0];
 	my $store=$self->{store};
 	my @filters;
 	for my $path ($self->{treeview}->get_selection->get_selected_rows)
 	{	my ($name,$type,undef,$extra)=$store->get_value($store->get_iter($path));
 		next unless $type;
-		if ($type eq 'sfilter') {push @filters,$::SavedFilters{$name};}
-		elsif ($type eq 'slist'){push @filters,'l'.$name;}
+		if ($type eq 'sfilter') {push @filters,$::Options{SavedFilters}{$name};}
+		elsif ($type eq 'slist'){push @filters,':l:'.$name;}
 		elsif ($type eq 'play') {push @filters,_getplayfilter($extra);}
 	}
 	return undef unless @filters;
@@ -2950,48 +3054,43 @@ sub _getplayfilter
 {	my $extra=$_[0];
 	my $filter;
 	if ($extra eq 'playfilter')	{ $filter=$::PlayFilter }
-	elsif (defined $::SongID)
-	{ if ($extra eq 'title')	{ $filter= ::SONG_TITLE. '~'.$::Songs[$::SongID][::SONG_TITLE]; }
-	  elsif ($extra eq 'artist')	{ $filter= ::SONG_ARTIST. '~'.$::Songs[$::SongID][::SONG_ARTIST]; }
-	  elsif ($extra eq 'album')	{ $filter= ::SONG_ALBUM. 'e'.$::Songs[$::SongID][::SONG_ALBUM]; }
+	elsif (defined $::SongID && $extra=~s/^f=//)
+	{ $filter= Songs::MakeFilterFromID($extra,$::SongID);
 	}
-	$filter= Filter->new($filter) unless ref $filter;
 	return $filter;
 }
 
-package AABox;
+package GMB::AABox;
 use Gtk2;
 use base 'Gtk2::EventBox';
 
-use constant { TRUE  => 1, FALSE => 0, };
-
 sub new
 {	my ($class,$opt1)= @_;
-	my $self = bless Gtk2::EventBox->new, $class;
-	my $col= $opt1->{aa} eq 'artist' ? ::SONG_ARTIST : ::SONG_ALBUM;
-	$self->{Col}=$col;
+	my $self=bless Gtk2::EventBox->new, $class;
+	my $aa=$opt1->{aa}||'';
+	$aa='artists' if $aa eq 'artist';
+	$aa= 'album' unless $aa eq 'artists';		#FIXME PHASE1 change artist to artists
+	$self->{aa}=$aa;
 	$self->{filternb}= defined $opt1->{filternb} ? $opt1->{filternb} : 1;
 	$self->{group}=$opt1->{group};
 	$self->{nopic}=1 if $opt1->{nopic};
-	my $hbox = Gtk2::HBox->new (FALSE, 6);
+	my $hbox= Gtk2::HBox->new;
 	$self->add($hbox);
-	($self->{AAref},$self->{fcmd})= $col==::SONG_ARTIST ? (\%::Artist,$col.'~') : (\%::Album,$col.'e');
-	$self->{Sel}='';
-	$self->{SelID}=-1;
-	my $vbox = Gtk2::VBox->new(FALSE, 0);
+	$self->{Sel}=$self->{SelID}=undef;
+	my $vbox=Gtk2::VBox->new(::FALSE, 0);
 	for my $name (qw/Ltitle Lstats/)
 	{	my $l=Gtk2::Label->new('');
 		$self->{$name}=$l;
 		$l->set_justify('center');
 		if ($name eq 'Ltitle')
-		{	$l->set_line_wrap(TRUE);$l->set_ellipsize('end'); #FIXME find a better way to deal with long titles
+		{	$l->set_line_wrap(1);$l->set_ellipsize('end'); #FIXME find a better way to deal with long titles
 			my $b=Gtk2::Button->new;
 			$b->set_relief('none');
 			$b->signal_connect(button_press_event => \&AABox_button_press_cb);
 			$b->add($l);
 			$l=$b;
 		}
-		$vbox->pack_start($l, FALSE,FALSE, 2);
+		$vbox->pack_start($l, ::FALSE,::FALSE, 2);
 	}
 
 	my $pixbox=Gtk2::EventBox->new;
@@ -3001,64 +3100,48 @@ sub new
 	$pixbox->add($img);
 	$pixbox->signal_connect(button_press_event => \&::pixbox_button_press_cb,1); # 1 : mouse button 1
 
-	my $buttonbox=Gtk2::VBox->new(FALSE, 4);
-	my $Bfilter=::NewIconButton('gmb-filter',undef,sub { $self->filter },'none');
-	$::Tooltips->set_tip($Bfilter, ($col==::SONG_ARTIST ? _"Filter on this artist" : _"Filter on this album") );
+	my $buttonbox=Gtk2::VBox->new;
+	my $Bfilter=::NewIconButton('gmb-filter',undef,sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->filter },'none');
 	my $Bplay=::NewIconButton('gtk-media-play',undef,sub
 		{	my $self=::find_ancestor($_[0],__PACKAGE__);
-			return if $self->{SelID}==-1;
-			::Select(filter=> $self->{fcmd}.$self->{Sel}, song=>'first',play=>1);
+			return unless defined $self->{SelID};
+			my $filter=Songs::MakeFilterFromGID($self->{aa},$self->{Sel});
+			::Select(filter=> $filter, song=>'first',play=>1);
 		},'none');
 	$Bplay->signal_connect(button_press_event => sub	#enqueue with middle-click
 		{	my $self=::find_ancestor($_[0],__PACKAGE__);
 			return 0 if $_[1]->button !=2;
-			if ($self->{SelID}!=-1) { ::EnqueueFilter( Filter->new($self->{fcmd}.$self->{Sel})); }
+			my $filter= Songs::MakeFilterFromGID($self->{aa},$self->{Sel});
+			if (defined $self->{SelID}) { ::EnqueueFilter($filter); }
 			1;
 		});
-	$::Tooltips->set_tip($Bplay, ($col==::SONG_ARTIST ? _"Play all songs from this artist" : _"Play all songs from this album") );
-	$buttonbox->pack_start($_, FALSE, FALSE, 0) for ($Bfilter,$Bplay);
+	$::Tooltips->set_tip($Bfilter, ($aa eq 'artist' ? _"Filter on this artist" : _"Filter on this album") );
+	$::Tooltips->set_tip($Bplay, ($aa eq 'artist' ? _"Play all songs from this artist" : _"Play all songs from this album") );
+	$buttonbox->pack_start($_, ::FALSE, ::FALSE, 0) for $Bfilter,$Bplay;
 
-	$hbox->pack_start($pixbox, FALSE, TRUE, 0);
-	$hbox->pack_start($vbox, TRUE, TRUE, 0);
-	$hbox->pack_start($buttonbox, FALSE, FALSE, 0);
+	$hbox->pack_start($pixbox, ::FALSE, ::TRUE, 0);
+	$hbox->pack_start($vbox, ::TRUE, ::TRUE, 0);
+	$hbox->pack_start($buttonbox, ::FALSE, ::FALSE, 0);
 
-	if ($col==::SONG_ARTIST)
+	if ($aa eq 'artists')
 	{	$self->{'index'}=0;
 		$self->signal_connect(scroll_event => \&AABox_scroll_event_cb);
 		my $BAlblist=::NewIconButton('gmb-playlist',undef,undef,'none');
 		$BAlblist->signal_connect(button_press_event => \&AlbumListButton_press_cb,$self);
 		$::Tooltips->set_tip($BAlblist,_"Choose Album From this Artist");
-		$buttonbox->pack_start($BAlblist, FALSE, FALSE, 0);
+		$buttonbox->pack_start($BAlblist, ::FALSE, ::FALSE, 0);
 	}
-	#else
-	#{	#my $BAlblist=::NewIconButton('gmb-playlist',undef,undef,'none');
-		#$buttonbox->pack_start($BAlblist, FALSE, FALSE, 0);
-		#$BAlblist->signal_connect ('clicked' => sub
-		#{	$self->{list}^=1;
-		#	$self->update();
-		#});
-		#my $store=Gtk2::ListStore->new('Glib::String');
-		#my $treeview=Gtk2::TreeView->new($store);
-		#$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
-		#( 'albums from artist',Gtk2::CellRendererText->new,'text',0)
-		#);
-		#my $sw = Gtk2::ScrolledWindow->new;
-		#$sw->set_shadow_type ('etched-in');
-		#$sw->set_policy ('automatic', 'automatic');
-		#$sw->add($treeview);
-	#}
 
+	my $drgsrc=$aa eq 'album' ? ::DRAG_ALBUM : ::DRAG_ARTIST;
 	::set_drag($self, source =>
-	 [($col==::SONG_ARTIST ? ::DRAG_ARTIST : ::DRAG_ALBUM), sub { $_[0]{Sel}; } ],
+	 [$drgsrc, sub { $drgsrc,$_[0]{Sel}; } ],
 	 dest => [::DRAG_ID,::DRAG_FILE,sub
 	 {	my ($self,$type,@values)=@_;
 		if ($type==::DRAG_FILE)
-		{	my $key=$self->{Sel};
-			my $AAref=$self->{AAref};
+		{	return unless defined $self->{Sel};
 			my $file=$values[0];
 			if ($file=~s#^file://##)
-			{	$AAref->{$key}[::AAPIXLIST]=::decode_url($file);
-				::HasChanged(AAPicture => $key);
+			{	AAPicture::SetPicture($self->{aa},$self->{Sel},::decode_url($file));
 			}
 			#else #FIXME download http link, ask filename
 		}
@@ -3068,104 +3151,102 @@ sub new
 	 }]);
 
 	$self->signal_connect(button_press_event => \&AABox_button_press_cb);
-	::Watch($self,AAPicture=>\&AAPicture_Changed);
+	::Watch($self,"Picture_".($aa eq 'album' ? 'album' : 'artist') =>\&AAPicture_Changed);
 	::Watch($self,'SelectedID_'.$self->{group},\&id_set);
-	$self->{watcher_list}=::AddWatcher();
-	$self->{watcher_id}=::AddWatcher();
+	::Watch($self, SongsChanged=> \&SongsChanged_or_added_cb);
+	::Watch($self, SongsAdded  => \&SongsChanged_or_added_cb);
+	::Watch($self, SongsRemoved=> \&SongsRemoved_cb);
 	$self->signal_connect(destroy => \&remove);
 	return $self;
 }
 sub remove
-{	my $self=shift;
+{	my $self=$_[0];
 	delete $::ToDo{'9_AABox'.$self};
-	::RemoveWatcher($self->{watcher_id});
-	::RemoveWatcher($self->{watcher_list});
 }
 
 sub AAPicture_Changed
 {	my ($self,$key)=@_;
-	$self->pic_set( $self->{AAref}{ $self->{Sel} }[::AAPIXLIST] ) if $key eq $self->{Sel};
+	return unless defined $self->{Sel};
+	return unless $key eq $self->{Sel};
+	$self->pic_set( AAPicture::GetPicture($self->{aa},$self->{Sel}) );
 }
 
 sub update_id
-{	my $self=shift;
+{	my $self=$_[0];
 	my $ID=$self->{SelID};
-	$self->{SelID}=-1;
-	$self->{Sel}='';
+	$self->{SelID}=$self->{Sel}=undef;
 	$self->id_set($ID);
 }
 
 sub clear
-{	my $self=shift;
-	$self->{SelID}=-1;
-	$self->{Sel}='';
+{	my $self=$_[0];
+	$self->{SelID}=$self->{Sel}=undef;
 	$self->pic_set(undef);
 	$self->{$_}->set_text('') for qw/Ltitle Lstats/;
-	::ChangeWatcher($self->{watcher_id});
-	::ChangeWatcher($self->{watcher_list});
 	delete $::ToDo{'9_AABox'.$self};
 }
 
 sub id_set
 {	my ($self,$ID)=@_;
-	return if $self->{SelID}==$ID;
+	return if defined $self->{SelID} && $self->{SelID}==$ID;
 	$self->{SelID}=$ID;
-	::ChangeWatcher($self->{watcher_id},[$ID],$self->{Col},
-		sub {$self->update_id}, sub {$self->clear;} );
-	my $key=$::Songs[$ID][ $self->{Col} ];
-	if ( $self->{Col}==::SONG_ARTIST )
-	{	my @l=split /$::re_artist/o,$::Songs[$ID][::SONG_ARTIST];
-		$self->{'index'}%=@l;
-		$key=$l[$self->{'index'}];
+	my $key= Songs::Get_gid($ID,$self->{aa});
+	if ( $self->{aa} eq 'artists' ) #$key is an array ref
+	{	$self->{'index'}%= @$key;
+		$key= $key->[ $self->{'index'} ];
 	}
-	$self->update($key) unless $key eq $self->{Sel};
+	$self->update($key) unless defined $self->{Sel} && $key == $self->{Sel};
 }
 
 sub update
 {	my ($self,$key)=@_;
-	#return if $self->{Sel} eq $key;
+	#return if $self->{Sel} == $key;
 	if (defined $key) { $self->{Sel}=$key; }
 	else		  { $key=$self->{Sel}; }
-	my $col=$self->{Col};
-	my $AAref=$self->{AAref}{$key};
-	#FIXME check if undef ??
-	my $Listref=$AAref->[::AALIST];
-	#set picture
-	$self->pic_set($AAref->[::AAPIXLIST]);
-	#set labels
-	$self->{Ltitle}->set_markup( ::ReplaceAAFields($key,"<big><b>%a</b></big>",$col,1) );
-	$self->{Lstats}->set_markup( ::ReplaceAAFields($key,"%s\n%X\n<small>%L\n%y</small>",$col,1) );
+	my $aa=$self->{aa};
+	$self->pic_set( AAPicture::GetPicture($aa,$key) );
+	$self->{Ltitle}->set_markup( AA::ReplaceFields($key,"<big><b>%a</b></big>",$aa,1) );
+	$self->{Lstats}->set_markup( AA::ReplaceFields($key,"%s\n%X\n<small>%L\n%y</small>",$aa,1) );
 
 	delete $::ToDo{'9_AABox'.$self};
-	my $updatesub=sub
-	{	::IdleDo('9_AABox'.$self,1000,\&update,$self);
-		::ChangeWatcher($self->{watcher_list}); #inactivate watcher
-	};
-	::ChangeWatcher($self->{watcher_list},$Listref,
-		[::SONG_ALBUM,::SONG_ARTIST,::SONG_LENGTH,::SONG_SIZE,::SONG_DATE],
-		$updatesub,$updatesub,$updatesub);
+	$self->{needupdate}=0;
+}
+
+sub SongsChanged_or_added_cb
+{	my ($self,$IDs,$fields)=@_;	#fields is undef if SongsAdded
+	return if $self->{needupdate};
+	# could check if is in list or in filter, is it worth it ?
+	return if $fields && !::OneInCommon($fields,[qw/artist album length size year/]);
+	$self->{needupdate}=1;
+	::IdleDo('9_AABox'.$self,1000,\&update,$self);
+}
+sub SongsRemoved_cb
+{	my ($self,$IDs)=@_;
+	return if $self->{needupdate};
+	$self->{needupdate}=1;
+	::IdleDo('9_AABox'.$self,1000,\&update,$self);
 }
 
 sub filter
-{	my $self=shift;
-	return if $self->{SelID}==-1;
-	::SetFilter( $self, $self->{fcmd}.$self->{Sel}, $self->{filternb}, $self->{group} );
+{	my $self=$_[0];
+	return unless defined $self->{Sel};
+	::SetFilter( $self, Songs::MakeFilterFromGID($self->{aa},$self->{Sel}), $self->{filternb}, $self->{group} );
 }
 
 sub pic_set
 {	my ($self,$file)=@_;
 	return if $self->{nopic};
 	my $img=$self->{img};
-	::ScaleImageFromFile( $img, $img->{size}, $file );
+	::IdleDo('3_AABscaleimage'.$img,200,\&::ScaleImageFromFile,$img, $img->{size}, $file);
 }
 
 sub size_allocate_cb
 {	my ($img,$alloc)=@_;
 	my $h=$alloc->height;
 	$h=200 if $h>200;		#FIXME use a relative max value (to what?)
-	return if abs($img->{size}-$h)<6;
+	return unless abs($img->{size}-$h);
 	$img->{size}=$h;
-	::ScaleImage( $img, $img->{size} );
+	::IdleDo('3_AABscaleimage'.$img,200,\&::ScaleImage,$img, $h);
 }
 
 sub AABox_button_press_cb			#popup menu
@@ -3173,28 +3254,28 @@ sub AABox_button_press_cb			#popup menu
 	my $self=::find_ancestor($widget,__PACKAGE__);
 	return 0 unless $self;
 	return 0 if $self == $widget && $event->button != 3;
-	return if $self->{SelID}==-1;
+	return unless defined $self->{SelID};
 	$::LEvent=$event;
-	::PopupContextMenu(\@::cMenuAA,{self=>$self, col=>$self->{Col}, key=>$self->{Sel}, ID=>$self->{SelID}, filternb => $self->{filternb}, mode => 'B'});
+	::PopupAAContextMenu({self=>$self, field=>$self->{aa}, gid=>$self->{Sel}, ID=>$self->{SelID}, filternb => $self->{filternb}, mode => 'B'});
 	return 1;
 }
 
 sub AABox_scroll_event_cb
 {	my ($self,$event)=@_;
-	my @l=split /$::re_artist/o,$::Songs[$self->{SelID}][::SONG_ARTIST];
-	return 0 unless @l>1;
+	my $l= Songs::Get_gid($self->{SelID},'artists');
+	return 0 unless @$l>1;
 	$self->{'index'}+=($event->direction eq 'up')? 1 : -1;
-	$self->{'index'}%=@l;
-	$self->update( $l[$self->{'index'}] );
+	$self->{'index'}%=@$l;
+	$self->update( $l->[$self->{'index'}] );
 	1;
 }
 
 sub AlbumListButton_press_cb
 {	(undef,$::LEvent,my $self)=@_;
-	return if $self->{Sel} eq '';
-	::PopupAA(::SONG_ALBUM,$self->{Sel},sub
+	return unless defined $self->{Sel};
+	::PopupAA('album', from => $self->{Sel}, cb=>sub
 		{	my $key=$_[1];
-			::SetFilter( $self, ::SONG_ALBUM.'e'.$key, $self->{filternb}, $self->{group} );
+			::SetFilter( $self, 'album:~:'.$key, $self->{filternb}, $self->{group} );
 		});
 	1;
 }
@@ -3202,15 +3283,15 @@ sub AlbumListButton_press_cb
 package SimpleSearch;
 use base 'Gtk2::HBox';
 
-our @SelectorMenu=
-(	[_"Search Title, Artist and Album", ::SONG_TITLE.'s_'.::SONG_ARTIST.'s_'.::SONG_ALBUM.'s' ],
-	[_"Search Title, Artist, Album, Comment, Label and Genre", ::SONG_TITLE.'s_'.::SONG_ARTIST.'s_'.::SONG_ALBUM.'s_'.::SONG_COMMENT.'s_'.::SONG_LABELS.'s_'.::SONG_GENRE.'s' ],
-	[_"Search Title",	::SONG_TITLE.'s'],
-	[_"Search Artist",	::SONG_ARTIST.'s'],
-	[_"Search Album",	::SONG_ALBUM.'s'],
-	[_"Search Comment",	::SONG_COMMENT.'s'],
-	[_"Search Label",	::SONG_LABELS.'s'],
-	[_"Search Genre",	::SONG_GENRE.'s'],
+our @SelectorMenu= #the first one is the default
+(	[_"Search Title, Artist and Album", 'title:s:|artist:s:|album:s:' ],
+	[_"Search Title, Artist, Album, Comment, Label and Genre", 'title:s:|artist:s:|album:s:|comment:s:|label:s:|genre:s:' ],
+	[_"Search Title",	'title:s:'],
+	[_"Search Artist",	'artist:s:'],
+	[_"Search Album",	'album:s:'],
+	[_"Search Comment",	'comment:s:'],
+	[_"Search Label",	'label:s:'],
+	[_"Search Genre",	'genre:s:'],
 );
 
 sub new
@@ -3218,7 +3299,7 @@ sub new
 	my $self= bless Gtk2::HBox->new(0,0), $class;
 	my $nb=$opt1->{nb};
 	my $entry=$self->{entry}=Gtk2::Entry->new;
-	$self->{fields}= $opt2->{fields} || ::SONG_TITLE.'s_'.::SONG_ARTIST.'s_'.::SONG_ALBUM.'s';
+	$self->{fields}= $opt2->{fields} || $SelectorMenu[0][1];
 	$self->{wordsplit}=$opt2->{wordsplit}||0;
 	$self->{nb}=defined $nb ? $nb : 1;
 	$self->{group}=$opt1->{group};
@@ -3318,7 +3399,7 @@ sub Filter
 	{	my @strings= $self->{wordsplit}? (split / +/,$text) : ($text);
 		my @filters;
 		for my $string (@strings)
-		{	push @filters,Filter->newadd( ::FALSE,map $_.$string, split /_/,$self->{fields} );
+		{	push @filters,Filter->newadd( ::FALSE,map $_.$string, split /\|/,$self->{fields} );
 		}
 		$filter=Filter->newadd( ::TRUE,@filters );
 	}
@@ -3333,7 +3414,9 @@ sub Filter
 sub EntryChanged_cb
 {	my $entry=$_[0];
 	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
-	$entry->{changed_timeout}= Glib::Timeout->add(1000,\&Filter,$entry);
+	my $timeout=1000;							#FIXME make it an option
+	#my $l= length($entry->get_text); my $timeout= $l>2 ? 10 : 1000;	#FIXME and/or make it depends on text length
+	$entry->{changed_timeout}= Glib::Timeout->add($timeout,\&Filter,$entry);
 }
 
 package SongSearch;
@@ -3344,7 +3427,7 @@ sub new
 	my $self= bless Gtk2::VBox->new, $class;
 	my $activate= $opt1->{activate} || 'queue';
 	$self->{songlist}=
-	my $songlist=SongList->new({type=>'S',headers=>'off',activate=>$activate,'sort'=>::SONG_TITLE,cols=>'titleaa', group=>"$self"});
+	my $songlist=SongList->new({type=>'S',headers=>'off',activate=>$activate,'sort'=>'title',cols=>'titleaa', group=>"$self"});
 	my $hbox1=Gtk2::HBox->new;
 	my $entry=Gtk2::Entry->new;
 	$entry->signal_connect(changed => \&EntryChanged_cb,0);
@@ -3371,7 +3454,7 @@ sub EntryChanged_cb
 	my $text=$entry->get_text;
 	my $self=::find_ancestor($entry,__PACKAGE__);
 	if (!$force && 2>length $text) { $self->{songlist}->Empty }
-	else { $self->{songlist}->SetFilter( Filter->new(::SONG_TITLE.'s'.$text) ); }
+	else { $self->{songlist}->SetFilter( Filter->new('title:s:'.$text) ); }
 }
 
 package AASearch;
@@ -3394,17 +3477,21 @@ sub new
 	my $sub=\&Enqueue;
 	$sub=\&AddToPlaylist if $opt1->{activate} && $opt1->{activate} eq 'addplay';
 	$treeview->signal_connect( row_activated => $sub);
-	my $col=$self->{col}= ($opt1->{aa} && $opt1->{aa} eq 'artist' ? ::SONG_ARTIST : ::SONG_ALBUM );
+	my $col='artist';
+	$col='album' if $opt1->{aa} && $opt1->{aa} eq 'album';
+	$self->{col}=$col;
 	$self->{picsize}=32; $self->{showinfo}=1;
 
-	::set_drag($treeview, source => [($col==::SONG_ALBUM ? ::DRAG_ALBUM : ::DRAG_ARTIST),
+	my $drgsrc=$col eq 'album' ? ::DRAG_ALBUM : ::DRAG_ARTIST;
+	::set_drag($treeview, source =>
+	    [ $drgsrc,
 	    sub
 	    {	my $treeview=$_[0];
 		my @rows=$treeview->get_selection->get_selected_rows;
-		return map $store->get_value($store->get_iter($_),0) , @rows;
+		return $drgsrc,map $store->get_value($store->get_iter($_),0) , @rows;
 	    }]);
 
-	$self->{cmd}= $col==::SONG_ARTIST ? '~' : 'e';
+	$self->{cmd}= $col eq 'artist' ? ':~:' : ':e:';
 	my $hbox1=Gtk2::HBox->new;
 	my $entry=Gtk2::Entry->new;
 	$entry->signal_connect(changed => \&EntryChanged_cb,0);
@@ -3441,13 +3528,13 @@ sub EntryChanged_cb
 {	my ($entry,$force)=@_;
 	my $text=$entry->get_text;
 	my $self= ::find_ancestor($entry,__PACKAGE__);
-	my $ref= $self->{col}==::SONG_ARTIST ? \%::Artist : \%::Album;
 	my $store=$self->{treeview}->get_model;
 	(($self->{treeview}->get_columns)[0]->get_cell_renderers)[0]->reset;
 	$store->clear;
 	return if !$force && 2>length $text;
-	my $re=qr/\Q$text\E/i;
-	$store->set($store->append,0,$_) for sort {lc$a cmp lc$b} grep m/$re/, keys %$ref;
+	my $list= AA::GrepKeys($self->{col}, $text);
+	AA::SortKeys($self->{col},$list,'alpha');
+	$store->set($store->append,0,$_) for @$list;
 }
 
 sub Enqueue
@@ -3468,49 +3555,45 @@ sub AddToPlaylist
 package CellRendererIconList;
 use Glib::Object::Subclass
 	'Gtk2::CellRenderer',
-	properties => [ Glib::ParamSpec->scalar
-			('iconlist',		 #name
-			 'iconlist',		 #nickname
-			 '\x00-separated list of stock-id', #blurb
-			 [qw/readable writable/] #flags
-			)];
+	properties =>	[ Glib::ParamSpec->ulong('ID','ID','Song ID',0,2**32-1,0,[qw/readable writable/]),
+			  Glib::ParamSpec->string('field','field','field id', 'label',[qw/readable writable/]),
+			];
 
 use constant PAD => 2;
 
 sub GET_SIZE
 {	my ($cell, $widget, $cell_area) = @_;
-	my $list=$cell->get('iconlist');
-	return (0,0,0,0) unless defined $list;
-	my $nb=@{[ split /\x00/,$list ]};
-	#my ($w,$h)=Gtk2::IconSize->lookup( $cell->get('stock-size') );
-	my ($w,$h)=Gtk2::IconSize->lookup('menu');
-	return (0,0, $nb*($w+PAD)+$cell->get('xpad')*2, $h+$cell->get('ypad')*2);
+	return (0,0,0,0);
+#	my $list=$cell->get('iconlist');
+#	return (0,0,0,0) unless defined $list;
+#	my $nb=@$list;
+#	#my ($w,$h)=Gtk2::IconSize->lookup( $cell->get('stock-size') );
+#	my ($w,$h)=Gtk2::IconSize->lookup('menu');
+#	return (0,0, $nb*($w+PAD)+$cell->get('xpad')*2, $h+$cell->get('ypad')*2);
 }
 
 sub RENDER
 {	my ($cell, $window, $widget, $background_area, $cell_area, $expose_area, $flags) = @_;
-	my $list=$cell->get('iconlist');
-	return unless defined $list;
+	my ($field,$ID)=$cell->get(qw/field ID/);
+	my @list=Songs::Get_icon_list($field,$ID);
+	return unless @list;
 	#my $size=$cell->get('stock-size');
 	my $size='menu';
-	my $state;
-	if ($flags & 'selected')
-	{	$state = $widget->has_focus ? 'selected' : 'active';
-	}
-	else
-	{	$state = $widget->state eq 'insensitive' ? 'insensitive' : 'normal';
-	}
+	my @pb=map $widget->render_icon($_, $size), sort @list;
+	return unless @pb;
+	my $state= ($flags & 'selected') ?
+		( $widget->has_focus			? 'selected'	: 'active'):
+		( $widget->state eq 'insensitive'	? 'insensitive'	: 'normal');
+
 	my ($w,$h)=Gtk2::IconSize->lookup($size);
 	my $room=PAD + $cell_area->height-2*$cell->get('ypad');
-	my $nb=int( ($room) / ($h+PAD) );
+	my $nb=int( $room / ($h+PAD) );
 	my $x=$cell_area->x+$cell->get('xpad');
 	my $y=$cell_area->y+$cell->get('ypad');
 	$y+=int( $cell->get('yalign') * ($room-($h+PAD)*$nb) ) if $nb>0;
 	my $row=0; my $ystart=$y;
-	for my $stock ( sort split /\x00/,$list )
-	{	my $pb=$widget->render_icon('label-'.$stock, $size );
-		next unless $pb;
-		$window->draw_pixbuf( $widget->style->fg_gc($state), $pb,0,0,
+	for my $pb (@pb)
+	{	$window->draw_pixbuf( $widget->style->fg_gc($state), $pb,0,0,
 				$x,$y,-1,-1,'none',0,0);
 		$row++;
 		if ($row<$nb)	{ $y+=PAD+$h; }
@@ -3518,23 +3601,32 @@ sub RENDER
 	}
 }
 
-package CellRendererAA;
-use Glib::Object::Subclass 'Gtk2::CellRendererText';
+package CellRendererGID;
+use Glib::Object::Subclass 'Gtk2::CellRenderer',
+properties => [ Glib::ParamSpec->long('gid', 'gid', 'group id', -2, 2**31-1, -1, [qw/readable writable/]),
+		Glib::ParamSpec->scalar('prop', 'prop', '[[field],[markup],[picsize]]', [qw/readable writable/]),
+		#Glib::ParamSpec->char('depth', 'depth', 'depth', 0, 20, 0, [qw/readable writable/]),
+		Glib::ParamSpec->int('depth', 'depth', 'depth', 0, 20, 0, [qw/readable writable/]),
+		Glib::ParamSpec->long('all_count', 'all_count', 'all_count', 0, 2**31-1, 0, [qw/readable writable/]),
+		];
+use constant { PAD => 2, XPAD => 2, YPAD => 2,		P_FIELD => 0, P_MARKUP =>1, P_PSIZE=>2, P_ICON =>3, };
 
-use constant PAD => 2;
-
+#sub INIT_INSTANCE
+#{	#$_[0]->set(xpad=>2,ypad=>2); #Gtk2::CellRendererText has these padding values as default
+#}
 sub makelayout
 {	my ($cell,$widget)=@_;
-	my $text=$cell->get('text');
+	my ($prop,$gid,$depth)=$cell->get(qw/prop gid depth/);
 	my $layout=Gtk2::Pango::Layout->new( $widget->create_pango_context );
-	if (my $format=$widget->parent->parent->{showinfo})
-	{	my $col= $widget->parent->parent->{col};
-		$format="<b>%a</b>%Y\n<small>%s <small>%l</small></small>" if $format eq '1';
-		$text=::ReplaceAAFields( $text,$format,$col,::TRUE );
-		$layout->set_markup($text);
-		#$text.="\n".@{$ref->[::AALIST]}.' songs '.$s;
+	my $field=$prop->[P_FIELD][$depth];
+	my $markup=$prop->[P_MARKUP][$depth];
+	$markup= $markup ? "<b>%a</b>%Y\n<small>%s <small>%l</small></small>" : "%a"; #FIXME
+	if ($gid==-1)	############ use GID_ALL
+	{	$markup= sprintf "<b>%s (%d)</b>", ::PangoEsc( Songs::Field_All_string($field) ), $cell->get('all_count');
 	}
-	else { $layout->set_text($text); }
+	#elsif ($gid==0) {  }
+	else { $markup=AA::ReplaceFields( $gid,$markup,$field,::TRUE ); }
+	$layout->set_markup($markup);
 	return $layout;
 }
 
@@ -3542,42 +3634,42 @@ sub GET_SIZE
 {	my ($cell, $widget, $cell_area) = @_;
 	my $layout=$cell->makelayout($widget);
 	my ($w,$h)=$layout->get_pixel_size;
-	my $s=$widget->parent->parent->{picsize};
-	if ($s eq 'a')	{$s=$h}
+	my ($prop,$depth)=$cell->get('prop','depth');
+	my $s= $prop->[P_PSIZE][$depth] || $prop->[P_ICON][$depth];
+	if ($s == -1)	{$s=$h}
 	elsif ($h<$s)	{$h=$s}
-	return (0,0,$w+$s+PAD+$cell->get('xpad')*2,$h+$cell->get('ypad')*2);
+	return (0,0,$w+$s+PAD+XPAD*2,$h+YPAD*2);
 }
 
 sub RENDER
 {	my ($cell, $window, $widget, $background_area, $cell_area, $expose_area, $flags) = @_;
-	my $s=$widget->parent->parent->{picsize};
-	my $x=$cell_area->x+$cell->get('xpad');
-	my $y=$cell_area->y+$cell->get('ypad');
-	my $text=$cell->get('text');
+	my $x=$cell_area->x+XPAD;
+	my $y=$cell_area->y+YPAD;
+	my ($prop,$gid,$depth)=$cell->get(qw/prop gid depth/);
+	my $iconfield= $prop->[P_ICON][$depth];
+	my $psize= $iconfield ? (Gtk2::IconSize->lookup('menu'))[0] : $prop->[P_PSIZE][$depth];
 	my $layout=$cell->makelayout($widget);
 	my ($w,$h)=$layout->get_pixel_size;
-	$s=$h if $s eq 'a';
-	$w+=PAD+$s;
+	$psize=$h if $psize == -1;
+	$w+=PAD+$psize;
 	my $offy=0;
-	if ($s>$h)
-	{	$offy+=int( $cell->get('yalign')*($s-$h) );
-		$h=$s;
+	if ($psize>$h)
+	{	$offy+=int( $cell->get('yalign')*($psize-$h) );
+		$h=$psize;
 	}
 
-	my $state;
-	if ($flags & 'selected')
-	{	$state = $widget->has_focus ? 'selected' : 'active';
-	}
-	else
-	{	$state = $widget->state eq 'insensitive' ? 'insensitive' : 'normal';
-	}
-	{	last unless $s;
-		my $col=$widget->parent->parent->{col};
-		my $pixbuf= AAPicture::pixbuf($col,$text,$s);
+	my $state= ($flags & 'selected') ?
+		( $widget->has_focus			? 'selected'	: 'active'):
+		( $widget->state eq 'insensitive'	? 'insensitive'	: 'normal');
+
+	if ($psize && $gid!=-1)
+	{	my $field=$prop->[P_FIELD][$depth];
+		my $pixbuf=	$iconfield	? $widget->render_icon(Songs::Picture($gid,$field,'icon'),'menu')||undef: #FIXME could be better
+						AAPicture::pixbuf($field,$gid,$psize);
 		if ($pixbuf) #pic cached -> draw now
 		{	my $offy=int(($h-$pixbuf->get_height)/2);#center pic
-			my $offx=int(($s-$pixbuf->get_width )/2);
-			$window->draw_pixbuf( Gtk2::Gdk::GC->new($window), $pixbuf,0,0,
+			my $offx=int(($psize-$pixbuf->get_width)/2);
+			$window->draw_pixbuf( $widget->style->black_gc, $pixbuf,0,0,
 				$x+$offx, $y+$offy,-1,-1,'none',0,0);
 		}
 		elsif (defined $pixbuf) #pic exists but not cached -> load and draw in idle
@@ -3585,11 +3677,23 @@ sub RENDER
 			$cell->{idle}||=Glib::Idle->add(\&idle,$cell);
 			$cell->{widget}||=$widget;
 			$cell->{window}||=$window;
-			$cell->{queue}{$ty}=[$tx,$ty,$text,$s,$h];
+			$cell->{queue}{$ty}=[$tx,$ty,$gid,$psize,$h,\$field];
 		}
 	}
+
+	# draw text
 	$widget-> get_style-> paint_layout($window, $state, 1,
-		$cell_area, $widget, undef, $x+$s+PAD, $y+$offy, $layout);
+		$cell_area, $widget, undef, $x+$psize+PAD, $y+$offy, $layout);
+
+	my $field=$prop->[P_FIELD][$depth];
+	$field=~s/\..*//;
+	my $starfield= $Songs::Def{$field}{starfield}; #FIXME shouldn't use Songs::Def directly
+	if ($gid!=-1 && $starfield)
+	{	if (my $pb= Songs::Picture($gid,$starfield,'pixbuf'))
+		{	# FIXME center verticaly or resize ?
+			$window->draw_pixbuf( $widget->style->black_gc, $pb,0,0, $x+XPAD+$w, $y+$offy,-1,-1,'none',0,0);
+		}
+	}
 }
 
 sub reset
@@ -3616,19 +3720,18 @@ sub idle
 }
 
 sub _drawpix
-{	my ($widget,$window,$ctx,$cty,$text,$s,$h)=@_;
+{	my ($widget,$window,$ctx,$cty,$gid,$psize,$h,$fieldref)=@_;
 	my ($vx,$vy,$vw,$vh)=$widget->get_visible_rect->values;
-	#warn "   $text\n";
-	return if $vx > $ctx+$s || $vy > $cty+$h || $vx+$vw < $ctx || $vy+$vh < $cty; #no longer visible
-	#warn "DO $text\n";
+	#warn "   $gid\n";
+	return if $vx > $ctx+$psize || $vy > $cty+$h || $vx+$vw < $ctx || $vy+$vh < $cty; #no longer visible
+	#warn "DO $gid\n";
 	my ($x,$y)=$widget->tree_to_widget_coords($ctx,$cty);
-	my $col=$widget->parent->parent->{col};
-	my $pixbuf= AAPicture::pixbuf($col,$text, $s,1);
+	my $pixbuf= AAPicture::pixbuf($$fieldref,$gid, $psize,1);
 	return unless $pixbuf;
 
 	my $offy=int( ($h-$pixbuf->get_height)/2 );#center pic
-	my $offx=int( ($s-$pixbuf->get_width )/2 );
-	$window->draw_pixbuf( Gtk2::Gdk::GC->new($window), $pixbuf,0,0,
+	my $offx=int( ($psize-$pixbuf->get_width )/2 );
+	$window->draw_pixbuf( $widget->style->black_gc, $pixbuf,0,0,
 		$x+$offx, $y+$offy, -1,-1,'none',0,0);
 }
 
@@ -3637,10 +3740,10 @@ use Glib::Object::Subclass 'Gtk2::CellRenderer',
 properties => [ Glib::ParamSpec->scalar
 			('ref',		 #name
 			 'ref',		 #nickname
-			 'array : [r1,r2,row,key]', #blurb
+			 'array : [r1,r2,row,gid]', #blurb
 			 [qw/readable writable/] #flags
 			),
-		Glib::ParamSpec->int('aa','aa','use album or artist column', 0, ::SONGLAST, ::SONG_ALBUM, [qw/readable writable/]),
+		Glib::ParamSpec->string('aa','aa','use album or artist column', 'album', [qw/readable writable/]),
 		Glib::ParamSpec->string('markup','markup','show info', '', [qw/readable writable/]),
 		];
 
@@ -3651,8 +3754,8 @@ sub GET_SIZE { (0,0,-1,-1) }
 
 sub RENDER
 {	my ($cell, $window, $widget, $background_area, $cell_area, $expose_area, $flags) = @_;
-	my ($r1,$r2,$row,$key)=@{ $cell->get('ref') };
-	my $col= $cell->get('aa');
+	my ($r1,$r2,$row,$gid)=@{ $cell->get('ref') };	#come from CellRendererSongsAA::get_value : first_row, last_row, this_row, gid
+	my $field= $cell->get('aa');
 	my $format=$cell->get('markup');
 	my @format= $format ? (split /\n/,$format) : ();
 	$format=$format[$row-$r1];
@@ -3661,7 +3764,7 @@ sub RENDER
 		my $gc= $widget->get_style->base_gc('normal');
 		$window->draw_rectangle($gc, 1, $background_area->values);# if $r1 != $r2;
 		my $layout=Gtk2::Pango::Layout->new( $widget->create_pango_context );
-		my $markup=::ReplaceAAFields( $key,$format,$col,::TRUE );
+		my $markup=AA::ReplaceFields( $gid,$format,$field,::TRUE );
 		$layout->set_markup($markup);
 		$gc= $widget->get_style->text_gc('normal');
 		$gc->set_clip_rectangle($cell_area);
@@ -3673,7 +3776,7 @@ sub RENDER
 
 	my $gc= $widget->get_style->base_gc('normal');
 	$window->draw_rectangle($gc, 1, $background_area->values);
-	my($x, $y, $width, $height)= $background_area->values;# warn "$row $x, $y, $width, $height\n";
+	my($x, $y, $width, $height)= $background_area->values; #warn "$row $x, $y, $width, $height\n";
 	$y-=$height*($row-$r1 - @format);
 	$height*=1+$r2-$r1 - @format;
 #	my $ypad=$cell->get('ypad') + $background_area->height - $cell_area->height;
@@ -3684,14 +3787,14 @@ sub RENDER
 	my $s= $height > $width ? $width : $height;
 	$s=200 if $s>200;
 
-	if ( my $pixbuf= AAPicture::pixbuf($col,$key,$s) )
+	if ( my $pixbuf= AAPicture::pixbuf($field,$gid,$s) )
 	{	my $gc=Gtk2::Gdk::GC->new($window);
 		$gc->set_clip_rectangle($background_area);
 		$window->draw_pixbuf( $gc, $pixbuf,0,0,	$x,$y, -1,-1,'none',0,0);
 	}
 	elsif (defined $pixbuf)
-	{	my ($tx,$ty)=$widget->widget_to_tree_coords($x,$y);
-		$cell->{queue}{$r1}=[$tx,$ty,$key,$s,$col];
+	{	my ($tx,$ty)=$widget->widget_to_tree_coords($x,$y);#warn "$tx,$ty <= ($x,$y)\n";
+		$cell->{queue}{$r1}=[$tx,$ty,$gid,$s,$field];
 		$cell->{idle}||=Glib::Idle->add(\&idle,$cell);
 		$cell->{widget}||=$widget;
 		$cell->{window}||=$window;
@@ -3722,18 +3825,27 @@ sub idle
 }
 
 sub _drawpix
-{	my ($widget,$window,$ctx,$cty,$key,$s,$col)=@_; #warn "$ctx,$cty,$key,$s\n";
+{	my ($widget,$window,$ctx,$cty,$gid,$s,$col)=@_; #warn "$ctx,$cty,$gid,$s\n";
 	my ($vx,$vy,$vw,$vh)=$widget->get_visible_rect->values;
-	#warn "   $key\n";
+	#warn "   $gid\n";
 	return if $vx > $ctx+$s || $vy > $cty+$s || $vx+$vw < $ctx || $vy+$vh < $cty; #no longer visible
-	#warn "DO $key\n";
-	my ($x,$y)=$widget->tree_to_widget_coords($ctx,$cty);
-	my $pixbuf= AAPicture::pixbuf($col,$key, $s,1);
+	#warn "DO $gid\n";
+	my ($x,$y)=$widget->tree_to_widget_coords($ctx,$cty);#warn "$ctx,$cty => ($x,$y)\n";
+	my $pixbuf= AAPicture::pixbuf($col,$gid, $s,1);
 	return unless $pixbuf;
 	$window->draw_pixbuf( Gtk2::Gdk::GC->new($window), $pixbuf,0,0, $x,$y,-1,-1,'none',0,0);
 }
 
-package Cloud;
+sub get_value
+{	my ($field,$array,$row)=@_;
+	my $r1=my $r2=$row;
+	my $gid=Songs::Get_gid($array->[$row],$field);
+	$r1-- while $r1>0	 && Songs::Get_gid($array->[$r1-1],$field) == $gid; #find first row with this gid
+	$r2++ while $r2<$#$array && Songs::Get_gid($array->[$r2+1],$field) == $gid; #find last row with this gid
+	return [$r1,$r2,$row,$gid];
+}
+
+package GMB::Cloud;
 use Gtk2;
 use base 'Gtk2::DrawingArea';
 
@@ -3760,6 +3872,7 @@ sub new
 	$self->{queuesub}=$queuesub;
 	$self->{menupopupsub}=$menupopupsub;
 	$self->{displaykeysub}=$displaykeysub;
+	$self->{selected}={};
 	return $self;
 }
 
@@ -3773,8 +3886,8 @@ sub reset_selection
 }
 
 sub Fill	#FIXME should be called when signals ::style-set and ::direction-changed are received because I keep layout objects
-{	my ($self,$opt)=@_;
-	my ($list,$href)= &{ $self->{get_fill_data_sub} }($self,$opt);
+{	my ($self)=@_;
+	my ($list,$href)= $self->{get_fill_data_sub}($self);
 	my $window=$self->window;
 	my ($width,$height)=$window->get_size;
 
@@ -3803,15 +3916,14 @@ sub Fill	#FIXME should be called when signals ::style-set and ::direction-change
 	if ($min==$max) {$max++;$min--;}
 	my ($x,$y)=(XPAD,YPAD); my ($hmax,$bmax)=(0,0);
 	my $displaykeysub=$self->{displaykeysub};
-	my $inverse;
-	$inverse=1 if $self->get_direction eq 'rtl';
+	my $inverse= ($self->get_direction eq 'rtl');
 	::setlocale(::LC_NUMERIC,'C'); #for the sprintf in the loop
 	for my $key (@$list)
 	{	my $layout=Gtk2::Pango::Layout->new( $self->create_pango_context );
 		my $value=sprintf '%.1f',MINSCALE+(MAXSCALE-MINSCALE())*($href->{$key}-$min)/($max-$min);
 		#$layout->set_text($key);
 		#$layout->get_attributes->insert( Gtk2::Pango::AttrScale->new($value) ); #need recent Gtk2
-		my $text= $displaykeysub ? &$displaykeysub($key) : $key;
+		my $text= $displaykeysub ? $displaykeysub->($key) : $key;
 		$layout->set_markup('<span size="'.(10240*$value).'">'.::PangoEsc($text).'</span>');
 		my ($w,$h)=$layout->get_pixel_size;
 		my $bl= $self->{baselines}{$h}||= $layout->get_iter->get_baseline / Gtk2::Pango->scale; #cache not needed for $Gtk2::VERSION>1.161
@@ -3849,6 +3961,7 @@ sub focus_change
 	return unless keys %$sel;
 	#FIXME could redraw only selected keys
 	$self->queue_draw;
+	0;
 }
 
 sub expose_cb
@@ -3859,8 +3972,8 @@ sub expose_cb
 	my $style=$self->get_style;
 	#my ($width,$height)=$window->get_size;
 	#warn "expose_cb : $width,$height\n";
-	my $state= $self->state eq 'insensitive' ? 'insensitive' : 'normal';
-	my $sstate= $self->has_focus ? 'selected' : 'active';
+	my $state= 	$self->state eq 'insensitive'	? 'insensitive'	: 'normal';
+	my $sstate= 	$self->has_focus		? 'selected'	: 'active';
 	my $gc= $style->text_gc($state);
 	my $bgc= $style->base_gc($state);
 	my $sgc= $style->text_gc($sstate);
@@ -3907,7 +4020,7 @@ sub button_press_cb
 	$self->grab_focus;
 	my $but=$event->button;
 	if ($but==1 && $event->type eq '2button-press')
-	{	&{ $self->{activatesub} }($self);
+	{	$self->{activatesub}($self);
 		return 1;
 	}
 	if ($but==1)
@@ -3919,7 +4032,7 @@ sub button_press_cb
 		return 0;
 	}
 	if ($but==2 && $event->type eq '2button-press')
-	{	&{ $self->{queuesub} }($self);
+	{	$self->{queuesub}($self);
 		return 1;
 	}
 	if ($but==3)
@@ -3927,7 +4040,7 @@ sub button_press_cb
 		if (defined $key && !exists $self->{selected}{$key})
 		{	$self->key_selected($event,$i,$j);
 		}
-		&{ $self->{menupopupsub} }($self,undef,$event);
+		$self->{menupopupsub}($self,undef,$event);
 		return 1;
 	}
 	1;
@@ -3945,15 +4058,41 @@ sub drag_begin_cb
 {	$_[0]->{pressed}=undef;
 }
 
+sub get_cursor_row
+{	my $self=$_[0];
+	return 0 unless $self->{lastclick};
+	my ($ci,$cj)=@{$self->{lastclick}};
+	my $row=0;
+	my $lines=$self->{lines};
+	for (my $i=0; $i<=$#$lines; $i+=3)
+	{	my $line=$lines->[$i+2];
+		for (my $j=0; $j<=$#$line; $j+=5)
+		{	return $row if $i==$ci && $j==$cj;
+			$row++;
+		}
+	}
+	return 0;
+}
+sub set_cursor_to_row
+{	my ($self,$row)=@_;
+	my $lines=$self->{lines};
+	for (my $i=0; $i<=$#$lines; $i+=3)
+	{	my $line=$lines->[$i+2];
+		for (my $j=0; $j<=$#$line; $j+=5)
+		{	unless ($row--) { $self->key_selected(undef,$i,$j); return }
+		}
+	}
+}
 
 sub key_selected
 {	my ($self,$event,$i,$j)=@_;
 	$self->scroll_to_index($i,$j);
 	my $key=$self->{lines}[$i+2][$j+4];
-	unless ($event->get_state >= ['control-mask'])
-	{	$self->{selected}={};
+	my $selected=$self->{selected};
+	unless ($event && $event->get_state >= ['control-mask'])
+	{	%$selected=();
 	}
-	if ($event->get_state >= ['shift-mask'] && $self->{lastclick})
+	if ($event && $event->get_state >= ['shift-mask'] && $self->{lastclick})
 	{	my $start=$self->{startgrow}||=$self->{lastclick};
 		my ($i2,$j2)=@$start;
 		my ($i1,$j1)=($i,$j);
@@ -3965,25 +4104,25 @@ sub key_selected
 			my $jmax= $i1==$i2 ? $j2 : $#$line;
 			while ($j1 <= $jmax)
 			{	my $key=$line->[$j1+4];
-				$self->{selected}{$key}=undef;
+				$selected->{$key}=undef;
 				$j1+=5;
 			}
 			$j1=0;
 			$i1+=3;
 		}
 	}
-	elsif (exists $self->{selected}{$key})
-	{	delete $self->{selected}{$key};
+	elsif (exists $selected->{$key})
+	{	delete $selected->{$key};
 		delete $self->{startgrow};
 	}
 	else
-	{	$self->{selected}{$key}=undef;
+	{	$selected->{$key}=undef;
 		delete $self->{startgrow};
 	}
 	$self->{lastclick}=[$i,$j];
 
 	$self->queue_draw;
-	&{ $self->{selectsub} }($self);
+	$self->{selectsub}($self);
 }
 
 sub coord_to_index
@@ -4014,7 +4153,7 @@ sub key_press_cb
 {	my ($self,$event)=@_;
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
 	if ( $key eq 'space' || $key eq 'Return' )
-	{	&{ $self->{activatesub} }($self);
+	{	$self->{activatesub}($self);
 		return 1;
 	}
 	my ($i,$j)=(0,0);
@@ -4047,7 +4186,7 @@ sub key_press_cb
 	return 1;
 }
 
-package Mosaic;
+package GMB::Mosaic;
 use Gtk2;
 use base 'Gtk2::DrawingArea';
 
@@ -4061,24 +4200,26 @@ sub new
 	$self->can_focus(::TRUE);
 	$self->add_events(['pointer-motion-mask','leave-notify-mask']);
 	$self->{vscroll}=$vscroll;
-	$vscroll->get_adjustment->signal_connect(value_changed => sub {$self->queue_draw});
+	$vscroll->get_adjustment->signal_connect(value_changed => \&scroll,$self);
 	$self->signal_connect(scroll_event	=> \&scroll_event_cb);
 	$self->signal_connect(expose_event	=> \&expose_cb);
 	$self->signal_connect(focus_out_event	=> \&focus_change);
 	$self->signal_connect(focus_in_event	=> \&focus_change);
 	$self->signal_connect(configure_event	=> \&configure_cb);
-	$self->signal_connect(drag_begin	=> \&Cloud::drag_begin_cb);
-	$self->signal_connect(button_press_event=> \&Cloud::button_press_cb);
-	$self->signal_connect(button_release_event=> \&Cloud::button_release_cb);
+	$self->signal_connect(drag_begin	=> \&GMB::Cloud::drag_begin_cb);
+	$self->signal_connect(button_press_event=> \&GMB::Cloud::button_press_cb);
+	$self->signal_connect(button_release_event=> \&GMB::Cloud::button_release_cb);
 	$self->signal_connect(key_press_event	=> \&key_press_cb);
-	$self->signal_connect(motion_notify_event=> \&start_tooltip);
-	$self->signal_connect(leave_notify_event=> \&abort_tooltip);
+	$self->signal_connect(motion_notify_event=> \&start_tooltip);	#FIXME	use set_has_tooltip and
+	$self->signal_connect(leave_notify_event=> \&abort_tooltip);	#	query_tooltip instead (requires gtk+ 2.12, Gtk2 1.160)
 	$self->{selectsub}=$selectsub;
 	$self->{get_fill_data_sub}=$getdatasub;
 	$self->{activatesub}=$activatesub;
 	$self->{queuesub}=$queuesub;
 	$self->{menupopupsub}=$menupopupsub;
 	$self->{col}=$col;
+	$self->{lastdy}=0;
+
 	return $self;
 }
 
@@ -4094,7 +4235,7 @@ sub reset_selection
 sub Fill
 {	my ($self,$samelist)=@_;
 	my $list=$self->{list};
-	($list)= &{ $self->{get_fill_data_sub} }($self) unless $samelist;
+	($list)= $self->{get_fill_data_sub}($self) unless $samelist;
 	my $window=$self->window;
 	my ($width,$height)=$window->get_size;
 
@@ -4149,9 +4290,16 @@ sub scroll_event_cb
 	my $value= $adj->value + $dir* ($pageinc? $adj->page_increment : $adj->step_increment);
 	$value=$max if $value>$max;
 	$value=0 if $value<0;
-	#FIXME copy part that is still visible and queue_draw only what has changed
 	$adj->set_value($value);
 	1;
+}
+sub scroll
+{	my ($adj,$self)=@_;
+	my $new=int $adj->value;
+	my $old=$self->{lastdy};
+	return if $new==$old;
+	$self->{lastdy}=$new;
+	$self->window->scroll(0,$old-$new); #copy still valid parts and queue_draw new parts
 }
 
 sub show_tooltip
@@ -4167,7 +4315,7 @@ sub show_tooltip
 	#$win->{key}=$key;
 	#$win->set_border_width(3);
 	my $label=Gtk2::Label->new;
-	$label->set_markup(::ReplaceAAFields($key,"<b>%a</b>%Y\n<small>%s <small>%l</small></small>",$self->{col},1));
+	$label->set_markup(AA::ReplaceFields($key,"<b>%a</b>%Y\n<small>%s <small>%l</small></small>",$self->{col},1));
 	my $request=$label->size_request;
 	my ($x,$y,$w,$h)=$self->index_to_rect($i,$j);
 	my ($rx,$ry)=$self->window->get_origin;
@@ -4210,7 +4358,7 @@ sub abort_tooltip
 	0;
 }
 
-sub configure_cb
+sub configure_cb		## FIXME I think it redraws everything even when it's not needed
 {	my ($self,$event)=@_;
 	return unless $self->{width};
 	$self->{viewwindowsize}=[$event->width,$event->height];
@@ -4227,16 +4375,16 @@ sub expose_cb
 {	my ($self,$event)=@_;
 	my ($exp_x1,$exp_y1,$exp_x2,$exp_y2)=$event->area->values;
 	$exp_x2+=$exp_x1; $exp_y2+=$exp_y1;
-	my $dy=$self->{vscroll}->get_adjustment->value;
-	$self->start_tooltip if exists $self->{lastdy} && $self->{lastdy}!=$dy;
+	my $dy=int $self->{vscroll}->get_adjustment->value;
+	$self->start_tooltip if $self->{lastdy}!=$dy;
 	$self->{lastdy}=$dy;
 	my $window=$self->window;
 	my $col=$self->{col};
 	my $style=$self->get_style;
 	#my ($width,$height)=$window->get_size;
 	#warn "expose_cb : $width,$height\n";
-	my $state= $self->state eq 'insensitive' ? 'insensitive' : 'normal';
-	my $sstate=$self->has_focus ? 'selected' : 'active';
+	my $state= 	$self->state eq 'insensitive'	? 'insensitive'	: 'normal';
+	my $sstate= 	$self->has_focus		? 'selected'	: 'active';
 	#my $gc= $style->text_gc($state);
 	my $bgc= $style->base_gc($state);
 	#my $sgc= $style->text_gc($sstate);
@@ -4283,7 +4431,8 @@ sub expose_cb
 			else
 			{	my $layout=Gtk2::Pango::Layout->new( $self->create_pango_context );
 				#$layout->set_text($key);
-				$layout->set_markup('<small>'.::PangoEsc($key).'</small>');
+				#$layout->set_markup('<small>'.::PangoEsc($key).'</small>');
+				$layout->set_markup(AA::ReplaceFields($key,"<small>%a</small>",$self->{col},1));
 				$layout->set_wrap('word-char');
 				$layout->set_width($hsize * Gtk2::Pango->scale);
 				$layout->set_height($vsize * Gtk2::Pango->scale);
@@ -4298,15 +4447,13 @@ sub expose_cb
 
 sub focus_change
 {	my $self=$_[0];
-	my $sel=$self->{selected};
-	return unless keys %$sel;
-	#FIXME could redraw only selected keys
-	$self->queue_draw;
+	$self->redraw_keys($self->{selected});
+	0;
 }
 
 sub coord_to_index
 {	my ($self,$x,$y)=@_;
-	$y+=$self->{vscroll}->get_adjustment->value;
+	$y+=int $self->{vscroll}->get_adjustment->value;
 	my ($nw,$nh,$nwlast)=@{$self->{dim}};
 	my $i=int($x/($self->{hsize}+2*XPAD));
 	return undef if $i>=$nw;
@@ -4320,8 +4467,28 @@ sub index_to_rect
 {	my ($self,$i,$j)=@_;
 	my $x=$i*($self->{hsize}+2*XPAD)+XPAD;
 	my $y=$j*($self->{vsize}+2*YPAD)+YPAD;
-	$y-=$self->{vscroll}->get_adjustment->value;
+	$y-=int $self->{vscroll}->get_adjustment->value;
 	return $x,$y,$self->{hsize},$self->{vsize};
+}
+
+sub redraw_keys
+{	my ($self,$keyhash)=@_;
+	return unless keys %$keyhash;
+	my $hsize2=$self->{hsize}+2*XPAD;
+	my $vsize2=$self->{vsize}+2*YPAD;
+	my $y=int $self->{vscroll}->get_adjustment->value;
+	my ($nw,$nh,$nwlast)=@{$self->{dim}};
+	my $height= $self->{viewwindowsize}[1];
+	my $j1=int($y/($self->{vsize}+2*YPAD));
+	my $j2=int(($y+$height)/($self->{vsize}+2*YPAD));
+	for my $j ($j1..$j2)
+	{	for my $i (0..$nw-1)
+		{	my $key=$self->{list}[$i+$j*$nw];
+			next unless defined $key;
+			next unless exists $keyhash->{$key};
+			$self->queue_draw_area($i*$hsize2,$j*$vsize2-$y,$hsize2,$vsize2);
+		}
+	}
 }
 
 sub key_selected
@@ -4331,27 +4498,44 @@ sub key_selected
 	my $list=$self->{list};
 	my $pos=$i+$j*$nw;
 	my $key=$list->[$pos];
-	unless ($event->get_state >= ['control-mask'])
-	{	$self->{selected}={};
+	my $selected=$self->{selected};
+	my %changed;
+	$changed{$_}=1 for keys %$selected;
+	unless ($event && $event->get_state >= ['control-mask'])
+	{	%$selected=();
 	}
-	if ($event->get_state >= ['shift-mask'] && defined $self->{lastclick})
+	if ($event && $event->get_state >= ['shift-mask'] && defined $self->{lastclick})
 	{	$self->{startgrow}=$self->{lastclick} unless defined $self->{startgrow};
 		my $i1=$self->{startgrow};
 		my $i2=$pos;
 		($i1,$i2)=($i2,$i1) if $i1>$i2;
-		$self->{selected}{ $list->[$_] }=undef for $i1..$i2;
+		$selected->{ $list->[$_] }=undef for $i1..$i2;
 	}
-	elsif (exists $self->{selected}{$key})
-	{	delete $self->{selected}{$key};
+	elsif (exists $selected->{$key})
+	{	delete $selected->{$key};
 		delete $self->{startgrow};
 	}
 	else
-	{	$self->{selected}{$key}=undef;
+	{	$selected->{$key}=undef;
 		delete $self->{startgrow};
 	}
 	$self->{lastclick}=$pos;
-	$self->queue_draw;
-	&{ $self->{selectsub} }($self);
+	$changed{$_}-- for keys %$selected;
+	$changed{$_} or delete $changed{$_} for keys %changed;
+	$self->redraw_keys(\%changed);
+	$self->{selectsub}($self);
+}
+
+sub get_cursor_row
+{	my $self=$_[0];
+	return $self->{lastclick}||0;
+}
+sub set_cursor_to_row
+{	my ($self,$row)=@_;
+	my ($nw,$nh,$nwlast)=@{$self->{dim}};
+	my $i=$row % $nw;
+	my $j=int($row/$nw);
+	$self->key_selected(undef,$i,$j);
 }
 
 sub scroll_to_row
@@ -4365,7 +4549,7 @@ sub key_press_cb
 {	my ($self,$event)=@_;
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
 	if ( $key eq 'space' || $key eq 'Return' )
-	{	&{ $self->{activatesub} }($self);
+	{	$self->{activatesub}($self);
 		return 1;
 	}
 	my $pos=0;
@@ -4417,11 +4601,177 @@ sub idle
 sub _drawpix
 {	my ($self,$window,$x,$y,$key,$s)=@_;
 	my $vadj=$self->{vscroll}->get_adjustment;
-	my $dy=$vadj->get_value;
+	my $dy=int $vadj->get_value;
 	my $page=$vadj->page_size;
 	return if $dy > $y+$s || $dy+$page < $y; #no longer visible
 #warn " drawing $key\n";
 	AAPicture::draw($window,$x,$y-$dy,$self->{col},$key, $s,1);
+}
+
+package GMB::ISearchBox;	#interactive search box (search as you type)
+use Gtk2;
+use base 'Gtk2::HBox';
+
+our %OptCodes=
+(	casesens => 'i',	onlybegin => 'b',	onlyword => 'w',
+);
+our @OptionsMenu=
+(	{ label => _"Case-sensitive",	code => sub { $_[0]{self}{casesens}^=1; $_[0]{self}->changed; },	check => sub { $_[0]{self}{casesens}; }, },
+	{ label => _"Begin with",	code => sub { $_[0]{self}{onlybegin}^=1; $_[0]{self}{onlyword}=0; $_[0]{self}->changed;},	check => sub { $_[0]{self}{onlybegin}; }, },
+	{ label => _"Words that begin with",	code => sub { $_[0]{self}{onlyword}^=1;$_[0]{self}{onlybegin}=0; $_[0]{self}->changed;},		check => sub { $_[0]{self}{onlyword}; }, },
+	{ label => _"Fields",		submenu => sub { return {map { $_=>Songs::FieldName($_) } Songs::StringFields}; }, submenu_reverse => 1,
+	  check => sub { $_[0]{self}{fields}; },	test => sub { !$_[0]{type} },
+	  code => sub { my $toggle=$_[1]; my $l=$_[0]{self}{fields}; my $n=@$l; @$l=grep $toggle ne $_, @$l; push @$l,$toggle if @$l==$n; @$l=('title') unless @$l; $_[0]{self}->changed; }, #toggle selected field
+	},
+);
+
+sub new					##currently the returned widget must be put in ->{isearchbox} of a parent widget, and this parent must have the array to search in ->{array} and have the methods get_cursor_row and set_cursor_to_row. And also select_by_filter for SongList/SongTree
+{	my ($class,$opt2,$type,$nolabel,$optsuffix)=@_;
+	my $self=bless Gtk2::HBox->new(0,0), $class;
+	$self->{type}=$type;
+
+	#restore options
+	$self->{optsuffix}=$optsuffix||='';
+	my $opt= $opt2->{"isearch_$optsuffix"} || '';
+	for my $key (keys %OptCodes)
+	{	$self->{$key}=1 if index($opt, $OptCodes{$key}) !=-1;
+	}
+	unless ($type) { $self->{fields}= [split /\|/, ($opt2->{"isearchfields_$optsuffix"} || 'title')]; }
+
+	$self->{entry}=my $entry=Gtk2::Entry->new;
+	$entry->signal_connect( changed => \&changed );
+	my $select=::NewIconButton('gtk-index',	undef, \&select,'none',_"Select matches");
+	my $next=::NewIconButton('gtk-go-down',	($nolabel ? undef : _"Next"),	 \&button_cb,'none');
+	my $prev=::NewIconButton('gtk-go-up',	($nolabel ? undef : _"Previous"),\&button_cb,'none');
+	$prev->{is_previous}=1;
+	my $label=Gtk2::Label->new(_"Find :");
+	my $options=Gtk2::Button->new;
+	$options->add(Gtk2::Image->new_from_stock('gtk-preferences','menu'));
+	$options->signal_connect( button_press_event => \&PopupOpt );
+	$options->set_relief('none');
+	$::Tooltips->set_tip($options,   _"options");
+
+	$self->pack_start($label,0,0,2) unless $nolabel;
+	$self->add($entry);
+	#$_->set_focus_on_click(0) for $prev,$next,$options;
+	$self->pack_start($_,0,0,0) for $prev,$next;
+	$self->pack_start($select,0,0,0) unless $self->{type};
+	$self->pack_end($options,0,0,0);
+	$self->show_all;
+	$self->set_no_show_all(1);
+	$self->hide;
+
+	return $self;
+}
+
+sub SaveOptions
+{	my $self=$_[0];
+	my $s=$self->{optsuffix};
+	my $opt=join '', map $OptCodes{$_}, grep $self->{$_}, sort keys %OptCodes;
+	my @opt= ("isearch_$s" => $opt);
+	unless ($self->{type}) { push @opt, "isearchfields_$s", join '|',$self->{fields}; }
+	return @opt;
+}
+
+sub set_colors
+{	my ($self,$mode)=@_;	#mode : -1 not found, 0 : neutral, 1 : found
+	my $entry=$self->{entry};
+	if ($mode<1)
+	{	$entry->modify_base('normal', undef );
+		$entry->modify_text('normal', undef );
+	}
+	else
+	{	$entry->modify_base('normal', $entry->style->bg('selected') );
+		$entry->modify_text('normal', $entry->style->text('selected') );
+	}
+
+}
+
+sub begin
+{	my ($self,$text)=@_;
+	$self->show;
+	my $entry=$self->{entry};
+	$entry->grab_focus;
+	if (defined $text)
+	{	$entry->set_text($text);
+		$entry->set_position(-1);
+	}
+	else {	$self->set_colors(0); }
+}
+
+sub changed
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $entry=$self->{entry};
+	my $text=$entry->get_text;
+	if ($text eq '')
+	{	$self->{searchsub}=undef;
+		$self->set_colors(0);
+		return;
+	}
+	$text=::superlc($text) unless $self->{casesens};
+	my $re= $self->{onlybegin} ? '^' : $self->{onlyword} ? '\b' : '';
+	$re.= quotemeta $text;
+	my $type= $self->{type};
+	if (!$type)	#search song IDs
+	{	my $fields= $self->{fields};
+		my $filter= $self->{casesens} ? ':m:' : ':mi:';
+		$filter.=$re;
+		$filter=Filter->newadd(::FALSE,map $_.$filter, @$fields);
+		my $code=$filter->singlesong_code();
+		$self->{filter}=$filter;
+		$self->{searchsub}= eval 'sub { my $array=$_[0]; my $rows=$_[1]; for my $row (@$rows) { local $_=$array->[$row]; return $row if '.$code.'; } return undef; }';
+		#$self->{searchsub}= eval "sub { local \$_=\$_[0]; return $code }";
+	}
+	else	# #search gid of type $type
+	{	my $action= $self->{casesens} ? 'gid_search' : 'gid_isearch';
+		my $code= Songs::Code($type,$action, GID => '$array->[$row]', RE => $re);
+		$self->{searchsub}= eval 'sub { my $array=$_[0]; my $rows=$_[1]; for my $row (@$rows) { return $row if '.$code.'; } return undef; }';
+	}
+	if ($@) { warn "Error compiling search code : $@\n"; $self->{searchsub}=undef; }
+	$self->search(0);
+}
+
+sub select
+{	my $widget=$_[0];
+	my $self=::find_ancestor($widget,__PACKAGE__);
+	my $parent=$self;
+	$parent=$parent->parent until $parent->{isearchbox};	#FIXME could be better, maybe pass a package name to new and use ::find_ancestor($self,$self->{targetpackage});
+	$parent->select_by_filter($self->{filter}) if $self->{filter};
+	
+}
+sub button_cb
+{	my $widget=$_[0];
+	my $self=::find_ancestor($widget,__PACKAGE__);
+	my $dir= $widget->{is_previous} ? -1 : 1;
+	$self->search($dir);
+}
+sub search
+{	my ($self,$direction)=@_;
+	my $search=$self->{searchsub};
+	return unless $search;
+	my $parent=$self;
+	$parent=$parent->parent until $parent->{isearchbox};	#FIXME could be better, maybe pass a package name to new and use ::find_ancestor($self,$self->{targetpackage});
+	my $array= $parent->{array}; 				#FIXME could be better
+	my $offset=$parent->{array_offset}||0;
+	my $start= $parent->get_cursor_row;
+	$start-= $offset;
+	my @rows= ($start..$#$array, 0..$start-1);
+	shift @rows if $direction;
+	@rows=reverse @rows if $direction<0;
+	my $found=$search->($array,\@rows);
+	if (defined $found)
+	{	$parent->set_cursor_to_row($found+$offset);
+		$self->set_colors(1);
+	}
+	else {	$self->set_colors(-1); }
+}
+
+sub PopupOpt
+{	my ($widget,$event)=@_;
+	my $self=::find_ancestor($widget,__PACKAGE__);
+	$::LEvent=$event;
+	::PopupContextMenu(\@OptionsMenu, { self=>$self, usemenupos => 1,} );
+	return 1;
 }
 
 package SongTree::ViewVBox;
@@ -4435,7 +4785,7 @@ Gtk2::VBox::,
 			param_types   => [Gtk2::Adjustment::,Gtk2::Adjustment::],
 		},
 	},
-	#properties => [	Glib::ParamSpec->object ('hadjustment','hadj','', Gtk2::Adjustment::, [qw/readable writable construct/] ),
+	#properties => [Glib::ParamSpec->object ('hadjustment','hadj','', Gtk2::Adjustment::, [qw/readable writable construct/] ),
 	#		Glib::ParamSpec->object ('vadjustment','vadj','', Gtk2::Adjustment::, [qw/readable writable construct/] )],
 	;
 
@@ -4443,23 +4793,20 @@ Gtk2::VBox::,
 package SongTree;
 use Gtk2;
 use base 'Gtk2::HBox';
-
-use constant
-{	XPAD => 2,	YPAD => 2,
-	BRANCH_VALUE => 0, BRANCH_EXP => 1, BRANCH_START => 2, BRANCH_END => 3, BRANCH_HEIGHT => 4, BRANCH_CHILD => 5,
-};
-
+our @ISA;
 our %STC;
 INIT
-{ for my $n (grep $::TagProp[$_], 0..$#::TagProp)
-  {	my ($title,$id,$t,$width)=@{$::TagProp[$n]};
-	next unless defined $title;
-	$STC{$id}=	{	title => $title,
-				sort => $n,	width => $width,
-				#elems=> ['text=text(text=$'.$id.')'],
-				elems=> ['text=text(markup=playmarkup(pesc($'.$id.')))'],
-				songbl=>'text',	hreq => 'text:h',
-			};
+{ unshift @ISA, 'SongList::Common';
+  for my $key (Songs::ColumnsKeys())
+  {	$STC{$key}=
+	{	title	=> Songs::FieldName($key),
+		sort	=> Songs::SortField($key),
+		width	=> Songs::FieldWidth($key),
+		#elems	=> ['text=text(text=$'.$id.')'],
+		elems	=> ['text=text(markup=playmarkup(pesc($'.$key.')))'],
+		songbl	=>'text',
+		hreq	=> 'text:h',
+	};
   }
 }
 
@@ -4472,25 +4819,17 @@ our %GroupSkin;
 #		   },
 # );
 
-our %Groupings; #defined in main, should the hash be in main ?
-
-our %GroupBy=
-(	artist	=> [_"artist",	::SONG_ARTIST],
-	album	=> [_"album",	::SONG_ALBUM],
-	year	=> [_"year",	::SONG_DATE],
-	folder	=> [_"folder",	::SONG_UPATH],
-	disc	=> [_"disc",	::SONG_DISC],
-);
-
 sub new
-{	my ($class,$opt1,$opt2)=@_;
+{	my ($class,$opt1,$opt2,$songarray)=@_;
 	my $self = bless Gtk2::HBox->new(0,0), $class;
 	#my $self = bless Gtk2::Frame->new, $class;
 	#$self->set_shadow_type('etched-in');
 	#my $frame=Gtk2::Frame->new;# $frame->set_shadow_type('etched-in');
 
-	$self->{songxpad}= exists $opt1->{songxpad} ? $opt1->{songxpad} : 4;
-	$self->{songypad}= exists $opt1->{songypad} ? $opt1->{songypad} : 4;
+	$self->{headclick}=  $opt1->{headclick}||'collapse'; #  'select'
+	$self->{songxpad}= exists $opt1->{songxpad} ? $opt1->{songxpad} : 4;	# default space between columns
+	$self->{songypad}= exists $opt1->{songypad} ? $opt1->{songypad} : 4;	# default space between rows
+	# FIXME could try to get SongTree style GtkTreeView::horizontal-separator and others as default values
 
 	#create widgets used to draw the songtree as a treeview, would be nice to do without but it's not possible currently
 	$self->{stylewidget}=Gtk2::TreeView->new;
@@ -4505,11 +4844,14 @@ sub new
 		#$button->remove($button->child); #don't need the child
 	}
 
+	$self->{isearchbox}=GMB::ISearchBox->new($opt2);
 	my $view=$self->{view}=Gtk2::DrawingArea->new;
 	my $sw=Gtk2::ScrolledWindow->new;
 	$sw->set_policy('automatic','automatic');
 	$sw->set_shadow_type('etched-in');
 	::set_biscrolling($sw);
+	$self->CommonInit($opt1,$opt2,$songarray);
+
 	my $vbox=SongTree::ViewVBox->new;
 	$sw->add($vbox);
 	$self->add($sw);
@@ -4517,6 +4859,7 @@ sub new
 	$self->{vadj}=$sw->get_vadjustment;
 	$self->{hadj}=$sw->get_hadjustment;
 	$vbox->pack_start($self->{headers},0,0,0) if $self->{headers};
+	$vbox->pack_end($self->{isearchbox},0,0,0);
 	$vbox->add($view);
 	$view->can_focus(::TRUE);
 	$self->{DefaultFocus}=$view;
@@ -4525,96 +4868,74 @@ sub new
 	$self->signal_connect(key_press_event	=> \&key_press_cb);
 	$self->signal_connect(destroy		=> \&destroy_cb);
 	$view->signal_connect(expose_event	=> \&expose_cb);
-	$view->signal_connect(focus_out_event	=> \&focus_change);
+	$view->signal_connect(focus_in_event	=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->{isearchbox}->hide; 0; });
 	$view->signal_connect(focus_in_event	=> \&focus_change);
+	$view->signal_connect(focus_out_event	=> \&focus_change);
 	$view->signal_connect(configure_event	=> \&configure_cb);
 	$view->signal_connect(drag_begin	=> \&drag_begin_cb);
 	$view->signal_connect(drag_leave	=> \&drag_leave_cb);
 	$view->signal_connect(button_press_event=> \&button_press_cb);
 	$view->signal_connect(button_release_event=> \&button_release_cb);
 
-	$self->{need_init}=1; #last initialization is done in the first configure_event
+	if (my $tip=$opt1->{rowtip} and *Gtk2::Widget::set_has_tooltip{CODE})  # requires gtk+ 2.12, Gtk2 1.160
+	{	$view->set_has_tooltip(1);
+		$tip= "<b><big>%t</big></b>\\nby <b>%a</b>\\nfrom <b>%l</b>" if $tip eq '1';
+		$self->{rowtip}= $tip;
+		$view->signal_connect(query_tooltip=> \&query_tooltip_cb);
+	}
 
-	$self->{$_}=$opt1->{$_} for grep m/^activate\d?$/, keys %$opt1;
-	$self->{mode}= $opt1->{mode} || '';
-	$self->{type}='B';
-	::WatchFilter($self,$opt1->{group}, \&SetFilter );
-	::Watch($self,'SongID',\&UpdateSelID);
-	$self->{watcher1}=::AddWatcher();
-	$self->{watcher2}=::AddWatcher();
+	$self->{no_typeahead}= $opt1->{no_typeahead};
+	::Watch($self,	SongID		=> \&UpdateSelID);
+	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
+	::Watch($self,	SongsChanged	=> \&SongsChanged_cb);
 
 	::set_drag($view,
-	 source=>[::DRAG_ID,sub { my $view=$_[0]; my $self=::find_ancestor($view,__PACKAGE__); $self->GetSelectedIDs; }],
+	 source=>[::DRAG_ID,sub { my $view=$_[0]; my $self=::find_ancestor($view,__PACKAGE__); return ::DRAG_ID,$self->GetSelectedIDs; }],
 	 dest => [::DRAG_ID,::DRAG_FILE,\&drag_received_cb],
 	 motion=>\&drag_motion_cb,
 		);
 
-	$self->{grouping}= $opt2->{grouping} || 'album|pic';
-	$opt2->{cols}||='playandqueue_title_artist_album_date_length_track_ufile_lastplay_playcount_rating';
-	$opt2->{sort}=join('_',::SONG_UPATH,::SONG_ALBUM,::SONG_DISC,::SONG_TRACK,::SONG_UFILE) unless defined $opt2->{sort};
-	$self->{sort}=$opt2->{sort};
-	$self->{sort}=~tr/_/ /;
-	$self->{TogFollow}=1 if $opt2->{follow};
+	$self->{grouping}= $opt2->{grouping};
+	#$self->{grouping}='album|pic' unless defined $self->{grouping}; #FIXME PHASE1 : grouping key for folder was folder, now path
+	$self->{grouping}= ($self->{type}=~m/[QLA]/ ? '' : 'album|pic') unless defined $self->{grouping}; #FIXME PHASE1 : grouping key for folder was folder, now path
+	my $cols=$opt2->{cols};
+#	if (exists $opt2->{cw_ufile}) # old versions <1.1 #doesn't work :( #FIXME PHASE1
+#	{	$cols=~tr/_/|/;
+#		$cols=~s/ufile/file/;
+#		$cols=~s/upath/path/;
+#		$cols=~s/date/year/;
+#		delete $opt2->{$_} for qw/sort cw_date cw_ufile cw_upath/;
+#	}
+	$cols||='playandqueue|title|artist|album|year|length|track|file|lastplay|playcount|rating';
 
-	for my $key (keys %$opt2)
-	{	next unless $key=~m/^cw_(.*)$/;
-		$self->{colwidth}{$1}=$opt2->{$key};
-	}
-	$self->AddColumn($_) for split '_',$opt2->{cols};
+	$self->AddColumn($_) for split /\|/,$cols;
+	unless ($self->{cells}) { $self->AddColumn('title'); } #to ensure there is at least 1 column
 	$self->{SaveOptions}=\&SaveOptions;
+
+	$self->{selected}='';
+	$self->{lastclick}=$self->{startgrow}=-1;
+	$self->set_head_columns;
 	return $self;
 }
 
 sub destroy_cb
 {	my $self=$_[0];
-	::RemoveWatcher($self->{watcher1});
-	::RemoveWatcher($self->{watcher2});
 	delete $self->{$_} for keys %$self;#it's important to delete $self->{queue} to destroy references cycles, better delete all keys to be sure
 }
 
 sub SaveOptions
 {	my $self=shift;
-	my %opt;
+	my %opt=($self->{isearchbox}->SaveOptions);
 	my $sort=$self->{sort};
-	$sort=~tr/ /_/;
+	$sort=~tr/ /|/;
 	$opt{sort}=$sort;
-	$opt{cols}=	join '_', map $_->{colid}, @{$self->{cells}};
+	$opt{cols}=	join '|', map $_->{colid}, @{$self->{cells}};
 	$opt{grouping}=	"'".$self->{grouping}."'";
 	#save cols width
 	$opt{ 'cw_'.$_ }=$self->{colwidth}{$_} for sort keys %{$self->{colwidth}};
 	$opt{follow}=1 if $self->{TogFollow};
 	#warn "$_ $opt{$_}\n" for sort keys %opt;
 	return \%opt;
-}
-
-sub UpdateWatcher
-{	my $self=$_[0];
-	my %watchcol;
-	for my $cell (@{$self->{cells}},@{$self->{headcells}})
-	{	my $wc=$cell->{watchcol};
-		next unless defined $wc;
-		if (ref $wc)	{$watchcol{$_}=undef for @$wc}
-		else		{$watchcol{$wc}=undef}
-	}
-
-	::ChangeWatcher
-	(	$self->{watcher1},
-		$self->{array},
-		[keys %watchcol],
-		sub{$self->{view}->queue_draw},
-		sub{$self->RemoveID(\@_)},
-		undef,
-		undef,
-	);
-	::ChangeWatcher
-	(	$self->{watcher2},
-		$self->{array},
-		[grep defined, map $_->{col}, @{$self->{headcells}}],
-		sub{$self->rowchanged(\@_)},
-		undef,
-		undef,
-		undef,
-	);
 }
 
 sub AddColumn
@@ -4642,39 +4963,40 @@ sub update_columns
 	delete $self->{events_to_watch};
 	my $baseline=0;
 	my $vsizesong=$self->{vsizesong};
-	$vsizesong=GMB::Cell::init_songs($self,$self->{cells}) if $self->{cols_changed};
+	$vsizesong=GMB::Cell::init_songs($self,$self->{cells},$self->{songxpad},$self->{songypad}) if $self->{cols_changed};
 	$self->{cols_changed}=undef;
+	my %fields_to_watch;
 	for my $cell (@{ $self->{cells} })
 	{	my $colid=$cell->{colid};
 		$cell->{width}= $self->{colwidth}{$colid} || $STC{$colid}{width} unless exists $cell->{width};
 		delete $cell->{last};
-		my $watch=$cell->{event};
-		if (defined $watch) { $watch=[$watch] unless ref $watch; $self->{events_to_watch}{$_}=undef for @$watch; }
+		if (my $watch=$cell->{event})	{ $self->{events_to_watch}{$_}=undef for @$watch; }
+		if (my $fields=$cell->{watchfields}) { $fields_to_watch{$_}=undef for @$fields; }
 		$songswidth+=$cell->{width};
 	}
 	$self->{cells}[-1]{last}=1; #this column gets the extra width
 	$self->{songswidth}=$songswidth;
-	if (!$self->{vsizesong} || $self->{vsizesong}!=$vsizesong)
+	if (!$self->{vsizesong} || $self->{vsizesong}!=$vsizesong)	#if height of rows has changed
 	{	$self->{vsizesong}=$vsizesong;
 		#warn "new vsizesong : $vsizesong\n";
 		$savedpos=$self->coord_to_path(0,int($self->{vadj}->page_size/2)) unless $nosavepos;
-		$self->update_height_of_path if $self->{ready};
+		$self->compute_height if $self->{ready};
 	}
 	my $w= $songswidth;
 	for my $cell (reverse @{$self->{headcells}} )
 	{	$w+= $cell->{left} + $cell->{right};
 		$cell->{width}=$w;
-		my $watch=$cell->{event};
-		if (defined $watch) { $watch=[$watch] unless ref $watch; $self->{events_to_watch}{$_}=undef for @$watch; }
+		if (my $watch=$cell->{event}) { $self->{events_to_watch}{$_}=undef for @$watch; }
+		if (my $fields=$cell->{watchfields}) { $fields_to_watch{$_}=undef for @$fields; }
 	}
 	$self->{viewsize}[0]= $w;
 
+	$self->{fields_to_watch2}=[keys %fields_to_watch];	#FIXME could call Songs::Depends only once now rather than multiple times for each column in GMB::Expression::parse ????
 	if (my $ew=$self->{events_to_watch}) {::Watch($self->{view},$_,sub {$_[0]->queue_draw;}) for keys %$ew;}
 
 	$self->updateextrawidth(0);
 	$self->scroll_to_row($savedpos->{hirow}||0,1) if $savedpos;
 	$self->update_scrollbar;
-	$self->UpdateWatcher;
 	delete $self->{queue};
 	$self->{view}->queue_draw;
 	$self->{headers}->update if $self->{headers};
@@ -4683,19 +5005,18 @@ sub set_head_columns
 {	my ($self,$grouping)=@_;
 	$grouping=$self->{grouping} unless defined $grouping;
 	$self->{grouping}=$grouping;
-	my @cols= $grouping=~m#([^|]+\|[^|]+)(?:\||$)#g; #split into "word|word"
+	my @cols= $grouping=~m#([^|]+\|[^|]+)(?:\||$)#g; #split into pairs : "word|word"
 	my $savedpos= $self->coord_to_path(0,int($self->{vadj}->page_size/2)) if $self->{ready}; #save vertical pos
 	$self->{headcells}=[];
 	$self->{colgroup}=[];
 	$self->{songxoffset}=0;
 	$self->{songxright}=0;
-	$self->{cols2_to_watch}={};
 	my $depth=0;
 	if (@cols)
 	{ for my $colskin (@cols)
 	  {	my ($col,$skin)=split /\|/,$colskin;
 		next unless $col;
-		my $cell= GMB::Cell->new_group( $self,$depth,$col,$GroupBy{$col}[1],$skin );
+		my $cell= GMB::Cell->new_group( $self,$depth,$col,$skin );
 		#$cell->{skin}=$skin;
 		$cell->{x}=$self->{songxoffset};
 		$self->{songxoffset}+=$cell->{left};
@@ -4705,155 +5026,112 @@ sub set_head_columns
 		push @{$self->{headcells}}, $cell;
 		$depth++;
 	  }
-	  $self->{listmode}=undef;
 	}
 	else
-	{	$self->{headcells}[0]{$_}=0 for qw/left right x head tail/;
-		$self->{listmode}=1;
+	{	$self->{headcells}[0]{$_}=0 for qw/left right x head tail vmin/;
 	}
+	$self->{fields_to_watch1}=[Songs::Depends(@cols)];
 
 	$self->update_columns(1);
-	$self->BuildTree;
+	$self->BuildTree unless $self->{need_init};
 	$self->scroll_to_row($savedpos->{hirow}||0,1) if $savedpos;
 }
 
-sub GetSelectedIDs
+sub GetSelectedRows
 {	my $self=$_[0];
-	my $list=$self->{array};
-	my $selected=$self->{selected};
-	return map $list->[$_], grep $selected->[$_], 0..$#$selected;
+	my $songarray=$self->{array};
+	return [grep vec($self->{selected},$_,1), 0..$#$songarray];
 }
 
 sub focus_change
 {	my $view=$_[0];
 	#my $sel=$self->{selected};
 	#return unless keys %$sel;
-	#FIXME could redraw only selected keys
+	#FIXME could redraw only selected rows
 	$view->queue_draw;
+	1;
 }
 
-sub Sort
-{	my ($self,$sort)=@_;
-	$self->{sort}=$sort;
-	::SortList($self->{array},$sort);
-	$self->BuildTree;
-	$self->{headers}->update if $self->{headers}; #to update sort indicator
-}
-
-sub buildexpstate	#FIXME find a better way to do this
-{	my $self=$_[0]; my $time=times;
-	my @exp; my $depth=0;
-	my @children=@{ $self->{root} };
-	while (@children)
-	{	my @todo=@children;
-		@children=();
-		for my $current (@todo)
-		{	my $exp= $current->[BRANCH_EXP];
-			$exp[$depth][$_]=$exp for $current->[BRANCH_START] .. $current->[BRANCH_END];
-			push @children, @{$current->[BRANCH_CHILD]} if $current->[BRANCH_CHILD];
+sub buildexpstate
+{	my $self=$_[0];
+#my $time=times;	#DEBUG
+	my @exp;
+	my $maxdepth=$#{ $self->{headcells} };
+	for my $depth (0..$maxdepth)
+	{	my $string='';
+		my $expanded= $self->{TREE}{expanded}[$depth];
+		my $lastrows= $self->{TREE}{lastrows}[$depth];
+		my $firstrow=-1;
+		for my $i (1..$#$lastrows)
+		{	my $lastrow=$lastrows->[$i];
+			$string.= $expanded->[$i]x($lastrow-$firstrow);
+			$firstrow=$lastrow;
 		}
-		$depth++;
+		push @exp,$string;#warn $string;
 	}
-	#for (0..20) { warn "row $_ : ".$exp[0][$_].' '.$exp[1][$_]."\n" } warn "\n";
-	#warn 'buildexpstate '.(times-$time)."s\n";
+	$self->{new_expand_state}=\@exp;
+#warn 'buildexpstate '.(times-$time)."s\n";	#DEBUG
 	return \@exp;
 }
 
-sub SetFilter
-{	my ($self,$filter)=@_;
-	$self->{filter}=$filter;
-	$self->{array}= [@{ $filter->filter }];
-	::SortList($self->{array},$self->{sort}) if exists $self->{sort};
-	$self->BuildTree;
-	$self->{vadj}->set_value(0);
-	$self->FollowSong if $self->{TogFollow};
-}
-
 sub BuildTree
-{	my $self=$_[0]; #my $time=times;
-	my $expstate=delete $self->{expstate};
+{	my $self=shift;
+#my $time=times;
+	my $expstate=delete $self->{new_expand_state};
 	my $list=$self->{array};
 	return unless $list;
 
 	my $colgroup=$self->{colgroup};
 	delete $self->{queue};
-	$self->{selected}=[];
-	$self->{root}=[];
-	$self->{startgrow}=$self->{lastclick}=undef;
 
 	my $vsizesong=$self->{vsizesong};
 
-	my $height=0;
-	if (@$list==0)
-	{
-	}
-	elsif (!$self->{listmode}) # tree
-	{ my $maxdepth=$#$colgroup;
-	  #warn "Building Tree\n";
-
-	  my $root=[undef,1,0,$#$list];
-	  my $parents=[$root];
-	  my @toupdate;
-	  my $defaultexp=1;
-	  for my $depth (0..$maxdepth)
-	  {	my $col=$GroupBy{ $colgroup->[$depth] }[1];
-		my $toupdate=$toupdate[$depth]=[];
-		my @next;
-		for my $branch (@$parents)
-		{	my @child;
-			my (undef,$exp,$start,$end)=@$branch;
-#FIXME			$exp=0 if # $expstate && !$expstate->[$d][$i];
-			push(@child,[$::Songs[$list->[$start]][$col],$defaultexp,$start,$_-1]), $start=$_ for (grep $::Songs[$list->[$_]][$col] ne $::Songs[$list->[$_-1]][$col], $start+1..$end),$end+1;
-			$branch->[BRANCH_CHILD]=\@child;
-			push @next, @child;
-			if ($exp)
-			{	push @$toupdate,@child; }
-#			else { $branch->[BRANCH_HEIGHT]=$vcollapse[$depth]; }
+	my $maxdepth=$#$colgroup;
+ #warn "Building Tree\n";
+	my $defaultexp=1;
+	$self->{TREE}{lastrows}=$self->{TREE}{expanded}=undef;
+	for my $depth (0..$maxdepth)
+	{	my $col= $colgroup->[$depth];
+		#my $func= Songs::GroupSub($col);
+		my $lastrows_parent= $depth==0 ? [-1,$#$list] : $self->{TREE}{lastrows}[$depth-1];
+		my ($lastrows,$lastchild)= @$list ? Songs::GroupSub($col)->($list,$lastrows_parent) : ([-1],[0]);
+		#my @lastrows;my @lastchild;
+		#my $firstrow=0;
+		#for my $lastrow (@$lastrows_parent)
+		#{	push @lastrows, map $_-1, @{ $func->($list,$firstrow,$lastrow) } if $lastrow-$firstrow>1;
+		#	push @lastrows, $lastrow;
+		#	push @lastchild, $#lastrows;
+		#	$firstrow=$lastrow+1;
+		#}
+		#$self->{TREE}{lastrows}[$depth]=\@lastrows;
+		#$self->{TREE}{lastchild}[$depth-1]=\@lastchild if $depth>=1;
+		$self->{TREE}{lastrows}[$depth]=$lastrows;
+		$self->{TREE}{lastchild}[$depth-1]=$lastchild if $depth>=1;
+		my $exp;
+		if (!$expstate) { $exp=[($defaultexp)x@$lastrows]; }
+		else
+		{	$exp=shift @$expstate;
+			$exp= [0,map substr($exp,$lastrows->[$_]+1,1), 0..$#$lastrows-1];
 		}
-		$parents=\@next;
-		$depth++;
-	  }
+		$self->{TREE}{expanded}[$depth]=$exp;
+	}
+	$self->{TREE}{expanded}[0]||=[0,1];
+	$self->{TREE}{lastrows}[0]||=[-1,$#$list];
 #warn 'BuildTree 1st part '.(times-$time)."s\n";
-	  for my $depth (reverse 0..$#toupdate)
-	  {	my $cell= $self->{headcells}[$depth];
-		my $headtail= $cell->{head}+$cell->{tail};
-		my $vcollapse= $cell->{vcollapse};
-		my $vmin= $cell->{vmin};
-		for my $branch (@{$toupdate[$depth]})
-		{	my @child;
-			my (undef,$exp,$start,$end,undef,$child)=@$branch;
-			my $h;
-			$branch->[BRANCH_EXP]=$exp=$expstate->[$depth][$start] if  $expstate;
-			if ($exp)
-			{	if ($child) { $h+=$_->[BRANCH_HEIGHT] for @$child; }
-				else {$h=$vsizesong*($end-$start+1);}
-				$h+= $headtail;
-				$h=$vmin if $h<$vmin;
-			}
-			else {$h=$vcollapse;}
-			$branch->[BRANCH_HEIGHT]=$h;
-		}
-	  }
-	  $self->{root}=$root=$root->[BRANCH_CHILD];
-	  $height+=$_->[BRANCH_HEIGHT] for @$root;
-	}
-	else # list
-	{	$height= @$list*$vsizesong;
-		$self->{root}=[['',1,0,$#$list,$height]];  #depends on BRANCH_ values
-	}
-	  #----------------------------------
-	$self->{viewsize}[1]= $height;
-	$self->update_scrollbar;
-	$self->{view}->queue_draw;
-	$self->{ready}=1;#warn 'BuildTree total '.(times-$time)."s\n";
+	$self->compute_height;
+	#$self->{viewsize}[1]= $height;
+	#$self->update_scrollbar;
+	#$self->{view}->queue_draw;
+	$self->{ready}=1;
+#warn 'BuildTree total '.(times-$time)."s\n";
 }
 
 sub update_scrollbar
 {	my $self=$_[0];
 	for my $i (0,1)
-	{	my $adj= $self->{ (qw/hadj vadj/)[$i] };
-		my $pagesize=$self->{viewwindowsize}[$i]||0;
-		my $upper=$self->{viewsize}[$i]||0;
+	{	my $adj=	$self->{ (qw/hadj vadj/)[$i] };
+		my $pagesize=	$self->{viewwindowsize}[$i] ||0;
+		my $upper=	$self->{viewsize}[$i] ||0;
 		$adj->page_size($pagesize);
 		$adj->upper($upper);
 		$adj->step_increment($pagesize*.125);
@@ -4864,21 +5142,15 @@ sub update_scrollbar
 }
 sub has_scrolled
 {	my ($self,$adj)=@_;
-	#FIXME copy part that is still visible and queue_draw only what has changed, will need to clean up $self->{action_rectangles}
 	delete $self->{queue};
 	delete $self->{action_rectangles};
-	$self->{view}->queue_draw;
+	$self->{view}->queue_draw;# FIXME replace by something like $self->{view}->window->scroll($xold-$xnew,$yold-$ynew); (must be integers), will need to clean up $self->{action_rectangles}
 }
 
 sub configure_cb
 {	my ($view,$event)=@_;
 	my $self=::find_ancestor($view,__PACKAGE__);
 	$self->{viewwindowsize}=[$event->width,$event->height];
-	if (delete $self->{need_init})
-	{	$self->set_head_columns();
-		::SetFilter($self,undef,0);	#FIXME
-		$self->FollowSong;
-	}
 	$self->updateextrawidth;
 	$self->update_scrollbar;
 	1;
@@ -4894,6 +5166,130 @@ sub updateextrawidth
 	$self->{extra}=$extra;
 }
 
+sub SongsChanged_cb
+{	my ($self,$IDs,$fields)=@_;
+	return if $IDs && !@{ $self->{array}->AreIn($IDs) };	#ignore changes to songs not in the list
+	if ( ::OneInCommon($fields,$self->{fields_to_watch1}) )	#changes include a field use to group songs => rebuild
+	{	$self->buildexpstate;	#save expanded state for each song
+		$self->BuildTree;
+	}
+	elsif ( ::OneInCommon($fields,$self->{fields_to_watch2}) )
+	{	$self->{view}->queue_draw;	#could redraw only affected visible rows, but probably not worth it => so just redraw everything
+	}
+}
+
+sub SongArray_changed_cb
+{	my ($self,$songarray,$action,@extra)=@_;
+	#if ($self->{mode} eq 'playlist' && $songarray==$::ListPlay)
+	#{	$self->{array}->Mirror($songarray,$action,@extra);
+	#}
+	return unless $self->{array}==$songarray;
+	#warn "SongArray_changed $action,@extra\n";
+	my $reset;
+	my $selected=\$self->{selected};
+	if ($action eq 'sort')
+	{	my ($sort,$oldarray)=@extra;
+		$self->{'sort'}=$sort;
+		my @selected=grep vec($$selected,$_,1), 0..$#$songarray;
+		my @order;
+		$order[ $songarray->[$_] ]=$_ for reverse 0..$#$songarray; #reverse so that in case of duplicates ID, $order[$ID] is the first row with this $ID
+		my @IDs= map $oldarray->[$_], @selected;
+		@selected= map $order[$_]++, @IDs; # $order->[$ID]++ so that in case of duplicates ID, the next row (with same $ID) are used
+		$self->{headers}->update if $self->{headers}; #to update sort indicator
+		$$selected=''; vec($$selected,$_,1)=1 for @selected;
+		$self->{new_expand_state}=0;
+		$self->{lastclick}=$self->{startgrow}=-1;
+		#center on a song ?
+	}
+	elsif ($action eq 'update')	#should only happen when in filter mode, so no duplicates IDs
+	{	my $oldarray=$extra[0];
+		#my @selected;
+		#$selected[$oldarray->[$_]]=vec($$selected,$_,1) for 0..$#$oldarray;
+		$$selected=''; #vec($$selected,$_,1)=1 for grep $selected[$_], 0..$#$songarray; #FIXME PHASE1 save/restore selection
+		$self->{new_expand_state}=0; #FIXME PHASE1 save expanded state
+		$self->{lastclick}=$self->{startgrow}=-1;
+	}
+	elsif ($action eq 'insert')
+	{	my ($destrow,$IDs)=@extra;
+		vec($$selected,$#$songarray,1)||=0;	#make sure $$selected has a value for every row
+		my $string=unpack 'b*',$$selected;
+		substr($string,$destrow,0,'0'x@$IDs);
+		$$selected=pack 'b*',$string;
+		my $exp=$self->buildexpstate;
+		substr($_,$destrow,0,'1'x@$IDs) for @$exp;
+		$_>=$destrow and $_+=@$IDs for $self->{lastclick}, $self->{startgrow};
+	}
+	elsif ($action eq 'move')
+	{	my (undef,$rows,$destrow)=@extra;
+		vec($$selected,$#$songarray,1)||=0;
+		my $string=unpack 'b*',$$selected;
+		for my $s ($string,@{ $self->buildexpstate })
+		{	my $toinsert='';
+			$toinsert.=substr($s,$_,1,'') for reverse @$rows;
+			substr($s,$destrow,0,reverse $toinsert);
+		}
+		$$selected=pack 'b*',$string;
+	}
+	elsif ($action eq 'up')
+	{	my $rows=$extra[0];
+		for my $row (@$rows)
+		{	   ( vec($$selected,$row-1,1),	vec($$selected,$row,1)	 )
+			 = ( vec($$selected,$row,1),	vec($$selected,$row-1,1) );
+			$self->{lastclick}-- if $self->{lastclick}==$row;
+			$self->{startgrow}-- if $self->{startgrow}==$row;
+		}
+		for my $exp (@{ $self->buildexpstate })
+		{	 (substr($exp,$_-1,1),	substr($exp,$_,1)  )
+			=(substr($exp,$_,1),	substr($exp,$_-1,1)) for @$rows
+		}
+	}
+	elsif ($action eq 'down')
+	{	my $rows=$extra[0];
+		for my $row (reverse @$rows)
+		{	   ( vec($$selected,$row+1,1),	vec($$selected,$row,1)	 )
+			 = ( vec($$selected,$row,1),	vec($$selected,$row+1,1) );
+			$self->{lastclick}++ if $self->{lastclick}==$row;
+			$self->{startgrow}++ if $self->{startgrow}==$row;
+		}
+		for my $exp (@{ $self->buildexpstate })
+		{	 (substr($exp,$_+1,1),	substr($exp,$_,1)  )
+			=(substr($exp,$_,1),	substr($exp,$_+1,1)) for reverse @$rows
+		}
+	}
+	elsif ($action eq 'remove')
+	{	if (@$songarray)
+		{	my $rows=$extra[0];
+			vec($$selected,$#$songarray,1)||=0;
+			my $string=unpack 'b*',$$selected;
+			for my $s ($string,@{ $self->buildexpstate })
+			{	substr($s,$_,1,'') for reverse @$rows;
+			}
+			$$selected=pack 'b*',$string;
+			for my $refrow ($self->{lastclick},$self->{startgrow})
+			{	$refrow >= $_ and $refrow-- for reverse @$rows;
+			}
+		}
+		else {$self->{lastclick}=$self->{startgrow}=-1;$$selected='';}
+	}
+	elsif ($action eq 'mode') {return} #the list itself hasn't changed
+	else #'replace' or unknown action
+	{	#FIXME if replace : check if a filter is in $extra[0]
+		$self->{selected}=''; #clear selection
+		$self->{lastclick}=$self->{startgrow}=-1;
+		if ($action eq 'replace')
+		{	$self->{new_expand_state}=0;
+			$reset=1;
+		}
+	}
+	$self->BuildTree;
+	if ($reset)
+	{	$self->{vadj}->set_value(0);
+		$self->FollowSong if $self->{TogFollow};
+	}
+	::HasChanged('Selection_'.$self->{group});
+	$self->Hide(!scalar @$songarray) if $self->{hideif} eq 'empty';
+}
+
 sub scroll_event_cb
 {	my ($self,$event,$pageinc)=@_;
 	my $dir= ref $event ? $event->direction : $event;
@@ -4907,29 +5303,38 @@ sub scroll_event_cb
 	my $max= $adj->upper - $adj->page_size;
 	my $value= $adj->value + $dir* ($pageinc? $adj->page_increment : $adj->step_increment);
 	$value=$max if $value>$max;
-	$value=0 if $value<0;
+	$value=0    if $value<0;
 	$adj->set_value($value);
 	1;
 }
 sub key_press_cb
 {	my ($self,$event)=@_;
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
-
-	my $row=0;
-	$row=$self->{lastclick} if $self->{lastclick};
+	my $unicode=Gtk2::Gdk->keyval_to_unicode($event->keyval); # 0 if not a character
+	my $state=$event->get_state;
+	my $ctrl= $state * ['control-mask'];
+	my $shift=$state * ['shift-mask'];
+	my $row= $self->{lastclick};
+	$row=0 if $row<0;
 	my $list=$self->{array};
-	if (	$key eq 'space'
-	    ||	$key eq 'Return') { ::SongListActivate($self,$row,1); }
-	elsif	($key eq 'Up')		{$row-- if $row>0;	$self->song_selected($event,$row); }
-	elsif	($key eq 'Down')	{$row++ if $row<$#$list;$self->song_selected($event,$row); }
-	elsif	($key eq 'Home')	{$self->song_selected($event,0); }
-	elsif	($key eq 'End')		{$self->song_selected($event,$#$list); }
+	if	($key eq 'space' || $key eq 'Return')
+					{ $self->Activate($row,1); }
+	elsif	($key eq 'Up')		{ $row-- if $row>0;	 $self->song_selected($event,$row); }
+	elsif	($key eq 'Down')	{ $row++ if $row<$#$list;$self->song_selected($event,$row); }
+	elsif	($key eq 'Home')	{ $self->song_selected($event,0); }
+	elsif	($key eq 'End')		{ $self->song_selected($event,$#$list); }
 	elsif	($key eq 'Left')	{ $self->scroll_event_cb('left'); }
 	elsif	($key eq 'Right')	{ $self->scroll_event_cb('right'); }
 	elsif	($key eq 'Page_Up')	{ $self->scroll_event_cb('up',1); }
 	elsif	($key eq 'Page_Down')	{ $self->scroll_event_cb('down',1); }
-	elsif	($key eq 'a' && $event->get_state >= ['control-mask']) { $self->{selected}=[(1)x@{$self->{array}}]; $self->{view}->queue_draw;}
-	else {return 0}
+	elsif	(lc$key eq 'a' && $ctrl)							#ctrl-a : select-all
+		{ vec($self->{selected},$_,1)=1 for 0..$#$list; $self->UpdateSelection;}
+	elsif	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }			#ctrl-f : search
+	elsif	(lc$key eq 'g' && $ctrl) { $self->{isearchbox}->search($shift ? -1 : 1);}	#ctrl-g : next/prev match
+	elsif	(!$self->{no_typeahead} && $unicode && !($state * [qw/control-mask mod1-mask mod4-mask/]))
+	{	$self->{isearchbox}->begin( chr $unicode );	#begin typeahead search
+	}
+	else	{return 0}
 	return 1;
 }
 
@@ -4943,77 +5348,97 @@ sub expose_cb
 	#my $style=Gtk2::Rc->get_style_by_paths($self->{stylewidget}->get_settings, '.GtkTreeView', '.GtkTreeView','Gtk2::TreeView');
 	#$style=$style->attach($window);
 	my $style=$self->get_style;
-	my $state= $self->state eq 'insensitive' ? 'insensitive' : 'normal';
+	my $nstate= $self->state eq 'insensitive' ? 'insensitive' : 'normal';
 	#my $sstate=$view->has_focus ? 'selected' : 'active';
 	my $sstate='selected';	#Treeview uses only state= normal, insensitive or selected
 	$self->{stylewidget}->has_focus($view->has_focus); #themes engine check if the widget has focus
-	my $selected=$self->{selected};
-	my $branch=$self->{root};
-	my $list=$self->{array};
-	my @songcells=@{ $self->{cells} };
-	my @headcells=@{ $self->{headcells} };
-	my $vsizesong=$self->{vsizesong};
+	my $selected=	\$self->{selected};
+	my $list=	$self->{array};
+	my $songcells=	$self->{cells};
+	my $headcells=	$self->{headcells};
+	my $vsizesong=	$self->{vsizesong};
 	#$window->draw_rectangle($style->base_gc($state), 1, $expose->values);
-	my $gc=$style->base_gc($state);
+	my $gc=$style->base_gc($nstate);
 	$window->draw_rectangle($gc, 1, $expose->values);
+	if (0)#if ($self->{background_picture}='/home/squentin/src/trygtk/Gmusicbrowser_head/pix/gmb-queue.png')#TEST REMOVE PATH PHASE1
+	{	my $pixbuf= $self->{background_pixbuf};
+		if (!$pixbuf || $self->{background_pixbuf_size} ne join('x',$window->get_size))
+		{	$pixbuf=Gtk2::Gdk::Pixbuf->new_from_file($self->{background_picture});#FIXME cache it
+			warn "reloading with size $self->{background_pixbuf_size}\n";
+			$pixbuf=Skin::_resize($pixbuf,'ratio',$window->get_size);
+			$pixbuf->saturate_and_pixelate($pixbuf,.5,1);
+			$self->{background_pixbuf_size}= join 'x', $window->get_size;
+			$self->{background_pixbuf}= $pixbuf;
+		}
+		my ($x,$y,$width,$height) = $expose->values;
+		$width=	$pixbuf->get_width-$x	if $width+$x >$pixbuf->get_width;
+		$height=$pixbuf->get_height-$y	if $height+$y>$pixbuf->get_height;
+		$window->draw_pixbuf($gc,$pixbuf, $x,$y, $x,$y, $width,$height, 'none',0,0) if $width>0 && $height>0;
+	}
 	return 1 unless $list && @$list;
 
 	my $xadj=int $self->{hadj}->value;
 	my $yadj=int $self->{vadj}->value;
-	my (@parents,@path,@yend);
-	my ($depth,$i)=(0,0);
+	my @next;
+	my ($depth,$i)=(0,1);
 	my ($x,$y)=(0-$xadj, 0-$yadj);
-	my $songxpad=$self->{songxpad};
-	my $songypad=$self->{songypad};
 	my $songs_x= $x+$self->{songxoffset};
 	my $songs_width=$self->{songswidth};
 
 	my $maxy=$self->{viewsize}[1]-$yadj;
 	$exp_y2=$maxy if $exp_y2>$maxy; #don't try to draw past the end
 
+	my $heights= $self->{TREE}{height};
+	my $max=$#{$heights->[$depth]};
+	my $maxdepth=$#$heights;
 	while ($y<=$exp_y2)
-	{	my $current=$branch->[$i];
-		my $bh=$current->[BRANCH_HEIGHT];  #warn "i=$i/$#$branch y=$y bh=$bh current : @$current\n";
+	{	if ($i>$max)
+		{	last unless $depth;
+			$depth--;
+			($y,$i,$max)=splice @next,-3;
+			next;
+		}
+		my $bh= $heights->[$depth][$i];
 		my $yend=$y+$bh;
+
 		if ($yend>$exp_y1)
-		{ #warn "entering ".$current->[0]." (bh=$bh) y=$y\n";
-		  my $cell=$headcells[$depth];
+		{ my $cell=$headcells->[$depth];
+		  my $expanded=$self->{TREE}{expanded}[$depth][$i];
 		  if ($cell->{head} || $cell->{left} || $cell->{right})
 		  {  my $clip=$expose->intersect( Gtk2::Gdk::Rectangle->new( $x+$cell->{x},$y,$cell->{width},$bh) );
 		     if ($clip)
-		     {	my ($key,$expanded,$start,$end)=@$current; #depends on BRANCH_ constants
+		     {	my $start= $self->{TREE}{lastrows}[$depth][$i-1]+1;
+			my $end=   $self->{TREE}{lastrows}[$depth][$i];
 			my %arg=
 			(	self	=> $cell,	widget	=> $self,	style	=> $style,
-				window	=> $window,	clip	=> $clip,	state	=> $state,
+				window	=> $window,	clip	=> $clip,	state	=> $nstate,
 				depth	=> $depth,	expanded=> $expanded,
 				vx	=> $xadj+$x+$cell->{x},		vy	=> $yadj+$y,
 				x	=> $x+$cell->{x},		y	=> $y,
 				w	=> $cell->{width},		h	=> $bh,
-				grouptype => $cell->{grouptype},	groupkey=> $key,
-				groupsongs=> [@{$self->{array}}[$start..$end]],
+				grouptype => $cell->{grouptype},
+				groupsongs=> [@$list[$start..$end]],
 			);
-			my $q=&{$cell->{draw}}(\%arg);
+			my $q= $cell->{draw}(\%arg);
 			my $qid=$depth.'g'.($yadj+$y);
 			delete $self->{queue}{$qid};
 			$self->{queue}{$qid}=$q if $q;
 		      }
 		  }
-		  $y+= $current->[BRANCH_EXP] ? $cell->{head} : $cell->{vcollapse};
-		  if ($current->[BRANCH_EXP]) #expanded
-		  { if (my $child=$current->[BRANCH_CHILD])
-		    {	push @parents,$branch; #warn "i=$i new branch : $child, parent=@parents\n";
-			$branch=$child;
-			push @path,$i;
-			push @yend,$yend;
+		  if ($expanded)
+		  { $y+=$cell->{head};
+		    last if $y>$exp_y2;
+		    if ($depth<$maxdepth)
+		    {	push @next, $yend,$i+1,$max;
+			$max=$self->{TREE}{lastchild}[$depth][$i];
+			$i=  $self->{TREE}{lastchild}[$depth][$i-1]+1;
 			$depth++;
-			$i=0;
 			next;
 		    }
 		    else #songs
-		    {	my $first=$current->[BRANCH_START];
-			my $last= $current->[BRANCH_END];
+		    {	my $first= $self->{TREE}{lastrows}[$depth][$i-1]+1;
+			my $last=  $self->{TREE}{lastrows}[$depth][$i];
 			my $h=($last-$first+1)*$vsizesong;
-			last if $y>$exp_y2;
 			if ($y+$h>$exp_y1)
 			{ my $skip=0;
 			  $last-= int(-.5+($y+$h-$exp_y2)/$vsizesong) if $y+$h>$exp_y2;
@@ -5025,13 +5450,13 @@ sub expose_cb
 			  my $odd=$skip%2;
 			  for my $row ($first..$last)
 			  {	my $ID=$list->[$row];
-				my $state= $selected->[$row] ? $sstate : $state;
+				my $state= vec($$selected,$row,1) ? $sstate : $nstate;
 				my $detail= $odd? 'cell_odd_ruled' : 'cell_even_ruled';
 				#detail can have these suffixes (in order) : _ruled _sorted _start|_last|_middle
 				$style->paint_flat_box( $window,$state,'none',$expose,$self->{stylewidget},$detail,
 							$songs_x,$y,$songs_width,$vsizesong );
 				my $x=$songs_x;
-				for my $cell (@songcells)
+				for my $cell (@$songcells)
 				{ my $width=$cell->{width};
 				  $width+=$self->{extra} if $cell->{last};
 				  my $clip=$expose->intersect( Gtk2::Gdk::Rectangle->new($x,$y,$width,$vsizesong) );
@@ -5039,13 +5464,13 @@ sub expose_cb
 				  {	my %arg=
 					(state	=> $state,	self	=> $cell,	widget	=> $self,
 					 style	=> $style,	window	=> $window,	clip	=> $clip,
-					 ID	=> $ID,		song	=> $::Songs[$ID],
+					 ID	=> $ID,		firstrow=> $first,	lastrow => $last, row=>$row,
 					 vx	=> $xadj+$x,	vy	=> $yadj+$y,
 					 x	=> $x,		y	=> $y,
 					 w	=> $width,	h	=> $vsizesong,
 					 odd	=> $odd,
 					);
-					my $q=&{$cell->{draw}}(\%arg);
+					my $q= $cell->{draw}(\%arg);
 					my $qid=$x.'s'.$y;
 					delete $self->{queue}{$qid};
 					$self->{queue}{$qid}=$q if $q;
@@ -5068,21 +5493,10 @@ sub expose_cb
 		  }
 		}
 		$y=$yend; #end of branch
-		while ($i>=$#$branch)
-		{	# warn "end branch=$branch i=$i\n";
-			$depth--;
-			$branch=pop @parents;
-			last unless $branch;
-			$i=pop @path;
-			#$y+=$headcells[$depth]{tail};
-			$y=pop @yend;
-			# warn " -> branch=$branch i=$i\n";
-		}
-		last unless $branch;
 		$i++;
 	}
-	if (!$self->{idle} && $self->{queue})
-	{	$self->{idle}||=Glib::Idle->add(\&expose_queue,$self);
+	if ($self->{queue})
+	{	$self->{idle} ||= Glib::Idle->add(\&expose_queue,$self);
 	}
 	#warn 'expose : '.(times-$time)."s\n";
 	1;
@@ -5115,40 +5529,49 @@ sub coord_to_path
 	$y+=int($self->{vadj}->value);
 	return undef unless @{$self->{array}};
 	my $vsizesong= $self->{vsizesong};
-	my (@parents,@path,@yend);
-	my ($depth,$i)=(0,0);
+	my (@next,@path);
+	my ($depth,$i)=(0,1);
 	my ($hirow,$area,$row);
-	my $branch=$self->{root};
-	my $current;
+	my $heights= $self->{TREE}{height};
+	my $max=$#{$heights->[$depth]};
+	my $maxdepth=$#$heights;
 	############# find vertical position
-	while ($branch)
-	{	$current=$branch->[$i];  #warn "i=$i/$#$branch y=$y current : $current->[0]\n";
-		last unless $current;
-		my $bh=$current->[BRANCH_HEIGHT];
+	while (1)
+	{	if ($i>$max)
+		{	last unless $depth;
+			$depth--;
+			($y,$i,$max)=splice @next,-3;
+			pop @path;
+			if ($y<0)
+			{	$area='tail';
+				$hirow= $self->{TREE}{lastrows}[$depth][$i]+1;
+				last;
+			}
+			next;
+		}
+		my $bh= $heights->[$depth][$i];
 		my $yend=$y-$bh;
 		if ($y>=0 && $yend<0)
-		{ if ($current->[BRANCH_EXP]) #expanded
+		{ if ($self->{TREE}{expanded}[$depth][$i]) #expanded
 		  {	my $head= $self->{headcells}[$depth]{head};
 			if ($y-$head<=0) #head
 			{	my $after= $y > $head/2;
-				$hirow= $current->[BRANCH_START];
+				$hirow= $self->{TREE}{lastrows}[$depth][$i-1]+1;
 				$area='head';
 				last;
 			}
 			$y-=$head;
-			if (my $child=$current->[BRANCH_CHILD])
-		  	{	push @parents,$branch; #warn "i=$i new branch : $child, parent=@parents\n";
+			if ($depth<$maxdepth)
+		  	{	push @next, $yend,$i+1,$max;
 				push @path,$i;
-				push @yend,$yend;
+				$max=$self->{TREE}{lastchild}[$depth][$i];
+				$i=  $self->{TREE}{lastchild}[$depth][$i-1]+1;
 				$depth++;
-				$branch=$child;
-				$i=0;
-				my $cell=$self->{headcells}[$depth];
-				redo;
+				next;
 			}
 			else #songs
-		  	{	my $first=$current->[BRANCH_START];
-				my $last= $current->[BRANCH_END];
+		  	{	my $first= $self->{TREE}{lastrows}[$depth][$i-1]+1;
+				my $last=  $self->{TREE}{lastrows}[$depth][$i];
 				my $h=($last-$first+1)*$vsizesong;
 				if ($y-$h<=0)
 				{	$row= int( $y/$vsizesong );
@@ -5159,39 +5582,26 @@ sub coord_to_path
 					last;
 				}
 			}
-			$hirow= $current->[BRANCH_END]+1;
+			$hirow= $self->{TREE}{lastrows}[$depth][$i]+1;
 			$area='tail';
 			last;
 		  }
 		  else #collapsed group
 		  {	my $after= $y > $bh/2;
-			$hirow=$after ? $current->[BRANCH_START] : $current->[BRANCH_END]+1;
+			my $i2= $after ? $i-1 : $i;
+			$hirow= $self->{TREE}{lastrows}[$depth][$i2]+1;
 			$area='collapsed';
 			last;
 		  }
 		}
 		$y=$yend;
-		while ($i>=$#$branch)
-		{	#warn "end branch=$branch depth=$depth i=$i \@yend=@yend\n";
-			$depth--;
-			$branch=pop @parents;
-			last unless $branch;
-			$y=pop @yend; #warn "y=$y\n";
-			$i=pop @path;
-			my $cell=$self->{headcells}[$depth];
-			if ($y<0)
-			{	my $current=$branch->[$i];
-				$area='tail';
-				$hirow= $current->[BRANCH_END]+1;
-				last;
-			}
-		}
 		$i++;
 	}
 	unless (@path)
 	{	$area||='end'; #empty space at the end
 	}
 	return undef unless $area;
+	my $depth0=$depth;
 
 	############# find horizontal position
 	push @path,$i;
@@ -5231,8 +5641,8 @@ sub coord_to_path
 		$#path=$depth;
 	}
 	return	{	path	=> \@path,
-			start	=> $current->[BRANCH_START],
-			end	=> $current->[BRANCH_END],
+			start	=> $self->{TREE}{lastrows}[$depth0][$i-1]+1,
+			end	=> $self->{TREE}{lastrows}[$depth0][$i],
 			depth	=> $depth,
 			row	=> $row,
 			hirow	=> $hirow,
@@ -5241,147 +5651,84 @@ sub coord_to_path
 			x	=> $x2,
 			y	=> $y,
 			col	=> $col,
+			branch	=> $i,
 		};
 }
 
-sub row_to_path #used only by row_to_branch which is not used
-{	my ($self,$row)=@_;
-	my $branch=$self->{root};
-	my $i=0; my @path;
-
-	{	my $current=$branch->[$i];
-		if ($current->[BRANCH_START] >$row && $current->[BRANCH_END] <$row)
-		{	if (my $child=$current->[BRANCH_CHILD])
-			{	$branch=$child;
-				push @path,$i;
-				$i=0;
-				redo;
-			}
-			return \@path;
-		}
-	}
-	return undef;
-}
 sub row_to_y
 {	my ($self,$row)=@_;
-	my $branch=$self->{root};
 	my $y=0;
 	my $depth=0;
-
-	{	my $i=0;
-		while ($branch->[$i][BRANCH_END]<$row)
-		{	$y+=$branch->[$i][BRANCH_HEIGHT];
-			$i++;
-			return 0 if $i > $#$branch;
-		}
-		$y+= $self->{headcells}[$depth]{head};
-		return $y unless $branch->[$i][BRANCH_EXP];
-		my $child=$branch->[$i][BRANCH_CHILD];
-		unless ($child)
-		{	my $first=$branch->[$i][BRANCH_START];
+	my $i=1;
+	my $maxdepth= $#{ $self->{TREE}{lastrows} };
+	my $lastrows= $self->{TREE}{lastrows}[$depth];
+	my $heights= $self->{TREE}{height}[$depth];
+	while ($i<=$#$lastrows)
+	{	if ($row>$lastrows->[$i-1] && $row<=$lastrows->[$i])
+		{	return $y unless $self->{TREE}{expanded}[$depth][$i];
+			$y+= $self->{headcells}[$depth]{head};
+			if ($depth<$maxdepth)
+			{	$i=$self->{TREE}{lastchild}[$depth][$i-1]+1;
+				$depth++;
+				$lastrows= $self->{TREE}{lastrows}[$depth];
+				$heights= $self->{TREE}{height}[$depth];
+				next;
+			}
+			my $first= $self->{TREE}{lastrows}[$depth][$i-1]+1;
 			$y+= $self->{vsizesong}*($row-$first);
 			return $y;
 		}
-		$branch=$child;
-		$depth++;
-		redo;
+		$y+=$heights->[$i];
+		$i++;
 	}
+	return 0;
 }
-sub update_row
+sub row_to_rect
 {	my ($self,$row)=@_;
 	my $y=$self->row_to_y($row);
 	return unless defined $y;
 	my $x= $self->{songxoffset} - int($self->{hadj}->value);
 	$y-= $self->{vadj}->value;
-	$self->{view}->queue_draw_area($x, $y, $self->{songswidth}, $self->{vsizesong});
+	return Gtk2::Gdk::Rectangle->new($x, $y, $self->{songswidth}, $self->{vsizesong});
 }
+sub update_row
+{	my ($self,$row)=@_;
+	my $rect=$self->row_to_rect($row);
+	my $gdkwin= $self->{view}->window;
+	$gdkwin->invalidate_rect($rect,0) if $rect && $gdkwin;
+}
+#sub update_row
+#{	my ($self,$row)=@_;
+#	my $y=$self->row_to_y($row);
+#	return unless defined $y;
+#	my $x= $self->{songxoffset} - int($self->{hadj}->value);
+#	$y-= $self->{vadj}->value;
+#	$self->{view}->queue_draw_area($x, $y, $self->{songswidth}, $self->{vsizesong});
+#}
 
-sub MoveOne #FIXME implement
-{
-}
-sub MoveMax #FIXME implement
-{
-}
-sub RemoveSelected
-{	my $self=shift;
-	my $selected=$self->{selected};
-	my @rows=grep $selected->[$_], 0..$#$selected;
-	$self->rowremove(\@rows);
-}
 
-sub rowinsert
-{	my ($self,$row,$IDs)=@_;
-	my $list=$self->{array};
-	if (!$self->{listmode})
-	{	$self->{expstate}||=$self->buildexpstate;
-		my $rowref=$row;
-		$rowref++;
-		$rowref=$#$list if $rowref > $#$list;
-		splice @$list, $row, 0, @$IDs;
-		for my $exp (@{ $self->{expstate} })
-		{	splice @$exp,$row,0, ($exp->[$rowref])x@$IDs;
-		}
-	}
-	else { splice @$list, $row, 0, @$IDs; }
-	splice @{ $self->{selected} }, $row, 0, (undef)x@$IDs   if @{ $self->{selected} } > $row;
-	$self->{lastclick}+=@$IDs if defined $self->{lastclick} && $self->{lastclick} > $row;
-	delete $self->{startgrow};
-	$self->BuildTree;
-}
-sub RemoveID
-{	my ($self,$IDs)=@_;
-	my %h;
-	$h{$_}=undef for @$IDs;
-	my $array=$self->{array};
-	my @list;
-	for my $i (0..$#$array)
-	{	push @list,$i if exists $h{$array->[$i]};
-	}
-	$self->rowremove(\@list) if @list;
-}
-sub rowremove
-{	my ($self,$rows,$norebuildtree)=@_;
-	@$rows= sort {$b <=> $a} @$rows;
-	if (!$self->{listmode})
-	{	$self->{expstate}=$self->buildexpstate;
-		for my $expd (@{ $self->{expstate} })
-		{	splice @$expd, $_, 1 for @$rows;
-		}
-	}
-	for my $row (@$rows)
-	{	splice @{ $self->{array} }, $row, 1;
-		splice @{ $self->{selected} }, $row, 1;
-		$self->{lastclick}-- if defined $self->{lastclick} && $self->{lastclick} > $row;
-	}
-	delete $self->{startgrow};
-	return if $norebuildtree;
-	$self->BuildTree;
-}
-sub rowchanged
-{	my $self=$_[0]; #my ($self,@rows)=@_;
-	if (!$self->{listmode})
-	{	$self->{expstate}=$self->buildexpstate;
-	}
-	$self->BuildTree;
+sub Scroll_to_TopEnd
+{	my ($self,$up)=@_;
+	my $adj=$self->{vadj};
+	if ($up)	{ $adj->set_value(0); }
+	else		{ $adj->set_value($adj->upper); }
 }
 
 sub drag_received_cb
 {	my ($view,$type,$dest,@IDs)=@_;
 	if ($type==::DRAG_FILE) #convert filenames to IDs
-	{	@IDs=map @$_,grep ref,map ::ScanFolder(::decode_url($_)), grep s#^file://##, @IDs;
+	{	@IDs=map ::FolderToIDs(::decode_url($_)), grep s#^file://##, @IDs;
 		return unless @IDs;
 	}
 	my $self=::find_ancestor($view,__PACKAGE__);
 	my (undef,$row)=@$dest;
 	return unless defined $row; #FIXME
-#warn "dropped, insert before row $row, song : ".$::Songs[$self->{array}[$row]][::SONG_TITLE]."\n";
-	my $selected=$self->{selected};
+#warn "dropped, insert before row $row, song : ".Songs::Display($self->{array}[$row],'title')."\n";
+	my $songarray=$self->{array};
 	if ($view->{drag_is_source})
-	{	my @rows=reverse grep $selected->[$_], 0..$#$selected;
-		$_<$row && $row-- for @rows;
-		$self->rowremove(\@rows,1); # 1 as 2nd argument to delay update of the tree, the rowinsert will do it
+	{	$songarray->Move($row,$self->GetSelectedRows);
 	}
-	$self->rowinsert($row,\@IDs);
+	else { $songarray->Insert($row,\@IDs); }
 }
 sub drag_motion_cb
 {	my ($view,$context,$x,$y,$time)=@_;
@@ -5426,101 +5773,65 @@ sub drag_leave_cb
 	$self->update_row($row) if defined $row;
 }
 
-sub path_to_branch
-{	my ($self,$path)=@_;
-	my @path=@$path;
-	my $branch=$self->{root};
-	$branch=$branch->[shift @path][BRANCH_CHILD] while @path>1;
-	return $branch->[$path[0]];
-}
-
-sub row_to_branch #not used
-{	my ($self,$row)=@_;
-	my $path=$self->row_to_path($row);
-	return $self->path_to_branch($path);
-}
-
 sub expand_colapse
-{	my ($self,$path)=@_;
-	my $branch=$self->path_to_branch($path);
-	$branch->[BRANCH_EXP]^=1;
-	$self->update_height_of_path($path);
+{	my ($self,$depth,$i)=@_;
+	$self->{TREE}{expanded}[$depth][$i]^=1;
+	$self->compute_height;	# FIXME could compute only ($depth,$i)
 }
 
-sub update_height_of_path
-{	my ($self,$updatepath)=@_;
+sub compute_height
+{	my ($self)=@_;
 	delete $self->{queue};
-	my $root=$self->{root};
-	my @toupdate;
-	my ($depth,$i)=(0,0); my @parents; my $oldheight;
-	if ($updatepath)
-	{	my @path=@$updatepath;
-		while (@path>1)
-		{	my $i=shift @path;
-			if ($root->[$i][BRANCH_HEIGHT]<=$self->{headcells}[$depth]{vmin}) {@path=($i);last}
-			push @toupdate, $root->[$i];
-			$root=$root->[$i][BRANCH_CHILD];
-			$depth++;
-		}
-		$i=shift @path;
-		$oldheight=$root->[$i][BRANCH_HEIGHT];
-	}
-	else { $oldheight=$self->{viewsize}[1]; push @parents,undef; } #update whole tree
-
-	my $branch=$root;
-	my @headcells=@{ $self->{headcells} };
-	my $y=0; my @path; my @y;
-
-	while ($branch)
-	{	my $current=$branch->[$i];# warn "@$current\n";
-		my $ystart=$y;
-		if ($current->[BRANCH_EXP]) #expanded
-		{	$y+=$headcells[$depth]{head}; #warn "+head y=$y\n";
-			if (my $child=$current->[BRANCH_CHILD])
-			{	push @parents,$branch;
-				push @y, $ystart;
-				$branch=$child;
-				push @path,$i;
-				$depth++;
-				$i=0;
-				redo;
+	$self->{TREE}{height}=[];
+	my $vsizesong=$self->{vsizesong};
+	my $headcells=$self->{headcells};
+	my $maxdepth=$#$headcells;
+	for my $depth (reverse 0..$maxdepth)
+	{	my $headcell=$headcells->[$depth];
+		my $vmin=$headcell->{vmin};
+		my $headtail= $headcell->{head} + $headcell->{tail};
+		my $vcollapsed=$headcell->{vcollapse};
+		my $expanded=	$self->{TREE}{expanded}[$depth];
+		my $height=	$self->{TREE}{height}[$depth]=[0];
+		if ($depth==$maxdepth)
+		{	my $lastrows=$self->{TREE}{lastrows}[$depth];
+			my $firstrow=-1;
+			for my $i (1..$#$lastrows)
+			{	my $lastrow=$lastrows->[$i];
+				my $h;
+				if ($expanded->[$i])
+				{	$h= $headtail+ $vsizesong * ($lastrow-$firstrow);
+					$h=$vmin if $h<$vmin;
+				}
+				else { $h=$vcollapsed }
+				$height->[$i]=$h;
+				$firstrow=$lastrow;
 			}
-			my $first=$current->[BRANCH_START];
-			my $last= $current->[BRANCH_END];
-			$y+= ($last-$first+1)*$self->{vsizesong};  #warn "+songs y=$y\n";
-			$y+=$headcells[$depth]{tail};  #warn "+tail y=$y\n";
-			if ($y-$ystart < $headcells[$depth]{vmin}) { $y= $headcells[$depth]{vmin}+$ystart }
 		}
 		else
-		{	$y+=$headcells[$depth]{vcollapse};  #warn "+vcollapse y=$y\n";
+		{	my $lastchild=	$self->{TREE}{lastchild}[$depth];
+			my $hchildren=	$self->{TREE}{height}[$depth+1];
+			my $firstchild=1;
+			for my $i (1..$#$lastchild)
+			{	my $lastchild=$lastchild->[$i];
+				my $h;
+				if ($expanded->[$i])
+				{	$h= $headtail;
+					$h+= $hchildren->[$_] for $firstchild..$lastchild;
+					$h=$vmin if $h<$vmin;
+				}
+				else { $h=$vcollapsed }
+				$height->[$i]=$h;
+				$firstchild=$lastchild+1;
+			}
 		}
-		$branch->[$i][BRANCH_HEIGHT]=$y-$ystart;
-		last unless @parents;
-		while ($i>=$#$branch)
-		{	$depth--;
-			$branch=pop @parents;
-			last unless $branch;
-			$y+=$headcells[$depth]{tail}; #warn "+tail depth=$depth\n";
-			$i=pop @path;
-			my $ystart=pop @y;
-			####		warn "old : ".$branch->[$i][BRANCH_HEIGHT]." new : ".($y-$ystart)."\n";
-			if ($y-$ystart < $headcells[$depth]{vmin}) { $y= $headcells[$depth]{vmin}+$ystart }
-			$branch->[$i][BRANCH_HEIGHT]=$y-$ystart;
-		}
-		last unless @parents;
-		$i++;
 	}
-	#update parents
-	$depth=@toupdate;
-	my $diff= $y-$oldheight; #warn "y=$y old=$oldheight diff=$diff depth=$depth\n";
-	while ($depth)
-	{	$depth--;
-		my $parent=pop @toupdate;
-		my $old=$parent->[BRANCH_HEIGHT];
-		if ($old+$diff < $headcells[$depth]{vmin}) { $diff= $headcells[$depth]{vmin}-$old; } #warn " depth=$depth new diff=$diff\n"
-		$parent->[BRANCH_HEIGHT]+= $diff;
-	}
-	$self->{viewsize}[1]+= $diff;
+
+	my $height0=$self->{TREE}{height}[0];
+	my $h=0;
+	$h+=$_ for @$height0;
+	$self->{viewsize}[1]= $h;
+#warn "total height=$h";
 
 	$self->update_scrollbar;
 	$self->{view}->queue_draw;
@@ -5535,7 +5846,7 @@ sub button_press_cb
 	my $row=$answer->{row};
 	my $depth=$answer->{depth};
 	return 0 unless @{$self->{array}}; #empty list
-	if (my $ref=$self->{action_rectangles} && 0) #TESTING
+	if ((my $ref=$self->{action_rectangles}) && 0) #TESTING
 	{	my $x= $event->x + int($self->{hadj}->value);
 		my $y= $event->y + int($self->{vadj}->value);
 		my $found;
@@ -5548,11 +5859,11 @@ sub button_press_cb
 	}
 	if ($but!=3 && $event->type eq '2button-press')
 	{	return 0 unless defined $row;
-		::SongListActivate($self,$row,$but);
+		$self->Activate($row,$but);
 		return 1;
 	}
 	if ($but==3)
-	{	if (!defined $depth && !$self->{selected}[$row])
+	{	if (!defined $depth && !vec($self->{selected},$row,1))
 		{	$self->song_selected($event,$row);
 		}
 		my @IDs=$self->GetSelectedIDs;
@@ -5566,12 +5877,13 @@ sub button_press_cb
 	else# ($but==1)
 	{	return 0 unless $answer;
 		if (defined $depth && $answer->{area} eq 'head' || $answer->{area} eq 'collapsed')
-		{	#$self->song_selected($event,$answer->{start},$answer->{end});
-			$self->expand_colapse($answer->{path});
+		{	if ($answer->{area} eq 'head' && $self->{headclick} eq 'select')
+			 { $self->song_selected($event,$answer->{start},$answer->{end}); }
+			else { $self->expand_colapse($depth,$answer->{branch}); }
 			return 1;
 		}
 		if (defined $row)
-		{	if ( $event->get_state * ['shift-mask', 'control-mask'] || !$self->{selected}[$row] )
+		{	if ( $event->get_state * ['shift-mask', 'control-mask'] || !vec($self->{selected},$row,1) )
 				{ $self->song_selected($event,$row); }
 			else	{ $view->{pressed}=1; }
 		}
@@ -5619,48 +5931,91 @@ sub FollowSong
 	return unless defined $::SongID;
 	my $array=$self->{array};
 	return unless $array;
-	for my $i (0..$#$array)
-	{	next unless $array->[$i] == $::SongID;
-		$self->{selected}=[];
-		$self->{selected}[$i]=1;
-		$self->scroll_to_row($i,1,1);
+	if ($array->IsIn($::SongID))
+	{	my $row= ::first { $array->[$_]==$::SongID } 0..$#$array;
+		$self->set_cursor_to_row($row);
 	}
-	::HasChanged('SelectedID_'.$self->{group},$::SongID,$self->{group});
+	::HasChangedSelID($self->{group},$::SongID);
+}
+
+sub get_cursor_row
+{	my $self=$_[0];
+	my $row=$self->{lastclick};
+	if ($row<0)
+	{	my $path=$self->coord_to_path(0,0);
+		$row= ref $path ? $path->{row} : 0 ;
+	}
+	return $row;
+}
+
+sub set_cursor_to_row
+{	my ($self,$row)=@_;
+	$self->song_selected(undef,$row,undef,'noscroll');
+	$self->scroll_to_row($row,1,1);
 }
 
 sub song_selected
-{	my ($self,$event,$idx1,$idx2)=@_;
+{	my ($self,$event,$idx1,$idx2,$noscroll)=@_;
 	return if $idx1<0 || $idx1 >= @{$self->{array}};
 	$idx2=$idx1 unless defined $idx2;
-	$self->scroll_to_row($idx1);
-	::HasChanged('SelectedID_'.$self->{group},$self->{array}[$idx1],$self->{group});
-	unless ($event->get_state >= ['control-mask'])
-	{	$self->{selected}=[];
+	$self->scroll_to_row($idx1) unless $noscroll;
+	::HasChangedSelID($self->{group},$self->{array}[$idx1]);
+	unless ($event && $event->get_state >= ['control-mask'])
+	{	$self->{selected}='';
 	}
-	if ($event->get_state >= ['shift-mask'] && defined $self->{lastclick})
-	{	$self->{startgrow}=$self->{lastclick} unless defined $self->{startgrow};
+	if ($event && $event->get_state >= ['shift-mask'] && $self->{lastclick}>=0)
+	{	$self->{startgrow}=$self->{lastclick} unless $self->{startgrow}>=0;
 		my $i1=$self->{startgrow};
 		my $i2=$idx1;
 		if ($i1>$i2)	{ ($i1,$i2)=($i2,$i1) }
 		else		{ $i2=$idx2 }
-		$self->{selected}[$_]=1 for $i1..$i2;
+		vec($self->{selected},$_,1)=1 for $i1..$i2;
 	}
-	elsif (!grep !$self->{selected}[$_], $idx1..$idx2)
-	{	delete $self->{selected}[$_] for  $idx1..$idx2;
-		delete $self->{startgrow};
+	elsif (!grep !vec($self->{selected},$_,1), $idx1..$idx2)
+	{	vec($self->{selected},$_,1)=0 for  $idx1..$idx2;
+		$self->{startgrow}=-1;
 	}
-	#elsif ($self->{selected}[$idx])
-	#{	delete $self->{selected}[$idx];
-	#	delete $self->{startgrow};
+	#elsif (vec($self->{selected},$idx,1))
+	#{	vec($self->{selected},$idx,1)=0
+	#	$self->{startgrow}=-1;
 	#}
 	else
-	{	$self->{selected}[$_]=1 for $idx1..$idx2;
-		delete $self->{startgrow};
+	{	vec($self->{selected},$_,1)=1 for $idx1..$idx2;
+		$self->{startgrow}=-1;
 	}
 	$self->{lastclick}=$idx1;
-	::HasChanged('Selection_'.$self->{group});
+	$self->UpdateSelection;
+}
+sub select_by_filter
+{	my ($self,$filter)=@_;
+	my $array=$self->{array};
+	my $IDs= $filter->filter($array);
+	my %h; $h{$_}=undef for @$IDs;
+	$self->{selected}=''; #clear selection
+	vec($self->{selected},$_,1)=1 for grep exists $h{$array->[$_]}, 0..$#$array;
+	$self->{startgrow}=$self->{lastclick}=-1;
+	$self->UpdateSelection;
+}
 
-	$self->queue_draw;
+sub UpdateSelection
+{	my $self=shift;
+	::HasChanged('Selection_'.$self->{group});
+	$self->{view}->queue_draw;
+}
+
+sub query_tooltip_cb
+{	my ($view, $x, $y, $keyb, $tooltip)=@_;
+	return 0 if $keyb;
+	my $self=::find_ancestor($view,__PACKAGE__);
+	my $path=$self->coord_to_path($x,$y);
+	my $row=$path->{row};
+	return 0 unless defined $row;
+	my $ID=$self->{array}[$row];
+	my $markup= ::ReplaceFieldsAndEsc($ID,$self->{rowtip});
+	$tooltip->set_markup($markup);
+	my $rect=$self->row_to_rect($row);
+	$tooltip->set_tip_area($rect) if $rect;
+	1;
 }
 
 package SongTree::Headers;
@@ -5671,7 +6026,7 @@ use constant TREE_VIEW_DRAG_WIDTH => 6;
 our @ColumnMenu=
 (	{ label => _"_Sort by",		submenu => sub { Browser::make_sort_menu($_[0]{songtree}); }
 	},
-	{ label => _"Set grouping",	submenu => \%SongTree::Groupings,
+	{ label => _"Set grouping",	submenu => sub {$::Options{SavedSTGroupings}},
 	  code => sub { $_[0]{songtree}->set_head_columns($_[1]); },
 	},
 	{ label => _"Edit grouping ...",	code => sub { my $songtree=$_[0]{songtree}; ::EditSTGroupings($songtree,$songtree->{grouping},undef,sub{ $songtree->set_head_columns($_[0]) if defined $_[0]; }); },
@@ -5720,14 +6075,14 @@ sub button_press_cb #begin resize
 }
 sub button_release_cb #end resize
 {	my $self=$_[0];
-	if ($self->{resizecol})
-	{	Gtk2->grab_remove($self);
-		my $songtree=::find_ancestor($self,'SongTree');
-		my $cell= $songtree->{cells}[ $self->{resizecol}[1]->{cellnb} ];
-		$songtree->{colwidth}{$cell->{colid}}= $cell->{width}; #set width as default for this colid
-		delete $self->{resizecol};
-		_update_dragwin($_) for $self->child->get_children;
-	}
+	return 0 unless $self->{resizecol};
+	Gtk2->grab_remove($self);
+	my $songtree=::find_ancestor($self,'SongTree');
+	my $cell= $songtree->{cells}[ $self->{resizecol}[1]->{cellnb} ];
+	$songtree->{colwidth}{$cell->{colid}}= $cell->{width}; #set width as default for this colid
+	delete $self->{resizecol};
+	_update_dragwin($_) for $self->child->get_children;
+	1;
 }
 sub motion_notify_cb	#resize column
 {	my ($self,$event)=@_;
@@ -5773,8 +6128,8 @@ sub update
 		$hbox->pack_end($button,0,0,0);
 		$button->{insertpos}=@{$songtree->{cells}};
 	}
-	my $invsort=my $sort=$songtree->{sort};
-	$invsort='-'.$invsort unless $invsort=~s/^-//; #FIXME support complex sort
+	my $sort=$songtree->{sort};
+	my $invsort= join ' ', map { s/^-// && $_ || '-'.$_ } split / /,$sort;
 	my $i=0;
 	for my $cell (@{$songtree->{cells}})
 	{	my $button=Gtk2::Button->new;
@@ -5819,7 +6174,7 @@ sub update
 sub clicked_cb
 {	my $button=$_[0];
 	my $songtree=::find_ancestor($button,'SongTree');
-	my $sort= $button->{colid} ? $button->{sort} : join ' ',map $SongTree::GroupBy{$_->{col}}[1], @{$songtree->{headcells}};
+	my $sort= $button->{colid} ? $button->{sort} : join ' ',map Songs::SortGroup($_), @{$songtree->{colgroup}};
 	return unless defined $sort;
 	$sort='-'.$sort if $sort eq $songtree->{sort};
 	$songtree->Sort($sort);
@@ -5870,10 +6225,11 @@ sub _create_dragwin
 }
 sub _destroy_dragwin
 {	my $button=$_[0];
-	warn "destroying $button->{dragwin}\n" if $button->{dragwin};
-	$button->{dragwin}->set_user_data(0) if $button->{dragwin}; #FIXME
-	$button->{dragwin}->destroy if $button->{dragwin};
-	$button->{dragwin}=undef;
+	my $dragwin=delete $button->{dragwin};
+	return unless $dragwin;
+	warn "destroying $dragwin\n" if $::debug;
+	$dragwin->set_user_data(0); #needed ?
+	$dragwin->destroy;
 }
 sub _update_dragwin
 {	my ($button)=@_;
@@ -5924,11 +6280,11 @@ our %GraphElem=
 		  },
 	aapic	=>{ functions =>
 		    [	['aapic_size','pixbuf wr hr = aap'],
-		    	['aapic_cached','aap queue = picsize aa aakey aanb hide'],
+		    	['aapic_cached','aap queue = picsize aa ids aanb hide'],
 			 $drawpix,$padandalignx,$padandaligny,
 		    ],
 		    defaults =>
-		    	'x=0,y=0,w=___picsize+2*___xpad,h=___picsize+2*___ypad,xpad=xpad,ypad=ypad,xalign=.5,yalign=.5,aanb=0,aa=$_grouptype,aakey=$_groupkey,picsize=min(___w+2*___xpad,___h+2*___ypad)',
+		    	'x=0,y=0,w=___picsize+2*___xpad,h=___picsize+2*___ypad,xpad=xpad,ypad=ypad,xalign=.5,yalign=.5,aanb=0,aa=$_grouptype,ids=$ids,picsize=min(___w+2*___xpad,___h+2*___ypad)',
 		    optional =>
 		    [	$optpad,
 		    ],
@@ -5995,32 +6351,32 @@ our %GraphElem=
 sub new_songcol
 {	my ($class,$colid,$width)=@_;
 	my $sort= $SongTree::STC{$colid}{sort};
-	$sort=~s#([a-z]+)#$::TagIndex{$1}#ig if defined $sort;
 	my $self=bless {colid => $colid, width => $width, 'sort' => $sort }, $class;
 	return $self;
 }
 
 sub init_songs
-{	my ($widget,$cells)=@_;
+{	my ($widget,$cells,$xpad,$ypad)=@_;
 	my $initcontext={ widget => $widget, init=>1, };
-	my $constant={ xpad=>$widget->{songxpad}, ypad=>$widget->{songypad}, playmarkup=>'weight="bold"' };
+	my $constant={ xpad=>$xpad, ypad=>$ypad, playmarkup=> 'weight="bold"' };	#FIXME should be quoted : q('weight="bold"')
 	my @blh; my @y_refs;
 	my @Deps;
 	for my $cell (@$cells)
 	{	my $colid=$cell->{colid};
+		my $def= $SongTree::STC{$colid} || {};
 		my (@draw,@elems);
-		for my $part (@{ $SongTree::STC{$colid}{elems} })
+		for my $part (@{ $def->{elems} })
 		{	my ($eid,$elem,$opt)= $part=~m/^(\w+)=(\w+)\s*\((.*)\)$/;
 			next unless $elem;
 			push @elems,[$eid.':',$elem,$opt];
 			push @draw,$eid;
 		}
-		my $h =$SongTree::STC{$colid}{hreq};
-		my $bl=$SongTree::STC{$colid}{songbl};
+		my $h = $def->{hreq};
+		my $bl= $def->{songbl};
 		push @elems, ['',undef,"hreq=$h"] if $h;
 		my ($dep,$update)=createdep(\@elems,'song',$constant);
 		$cell->{event}= [keys %{$update->{event}}] if $update->{event};
-		$cell->{watchcol}=[keys %{$update->{col}}] if $update->{col};
+		$cell->{watchfields}=[keys %{$update->{col}}] if $update->{col};
 		$cell->{draw}=\@draw;
 
 		m/^(\w+:)init_(\w+)$/ and ($dep->{$_},$dep->{$1.$2})=($dep->{$1.$2},$dep->{$_}) for keys %$dep; #exchange init_* keys with normal keys
@@ -6053,7 +6409,7 @@ sub init_songs
 }
 
 sub new_group
-{	my ($class,$widget,$depth,$grouptype,$colnb,$skin)=@_;
+{	my ($class,$widget,$depth,$grouptype,$skin)=@_;
 	my $constant={ xpad=>0, ypad=>0, };
 	if ($skin=~s#\((.*)\)$##) #skin options
 	{	my $opt=::ParseOptions($1);
@@ -6066,12 +6422,10 @@ sub new_group
 	if (my $ref0=$SongTree::GroupSkin{$skin}{options})
 	{	for my $key (keys %$ref0) { $constant->{$key}="'".$ref0->{$key}{default}."'" unless exists $constant->{$key} }
 	}
-	my $def=$SongTree::GroupSkin{$skin}||'';
+	my $def=$SongTree::GroupSkin{$skin} || {};
 	my $self=bless
-		{	col	=> $colnb,
-			grouptype=> $grouptype,
+		{	grouptype=> $grouptype,
 			depth	=> $depth,
-		#	watchcol=> $colnb,
 		}, $class;
 	my @elems;
 	my @draw; my %hide;
@@ -6086,7 +6440,7 @@ sub new_group
 	push @elems, ['',undef,join ',',@init];
 	my ($dep,$update)=createdep(\@elems,'group',$constant);
 	$self->{event}=[keys %{$update->{event}}] if $update->{event};
-	$self->{watchcol}=[keys %{$update->{col}}] if $update->{col};
+	$self->{watchfields}=[keys %{$update->{col}}] if $update->{col};
 	for my $key (keys %hide)
 	{	my $hide;
 		$hide='!' if $hide{$key};
@@ -6095,7 +6449,7 @@ sub new_group
 		$dep->{$key}[0]= $hide;
 	}
 
-	my $initcontext={groupkey  =>'', widget => $widget, expanded =>1, init=>1, depth => $depth, grouptype =>$grouptype};
+	my $initcontext={widget => $widget, expanded =>1, init=>1, depth => $depth, grouptype =>$grouptype};
 	$dep->{init}=[undef,qw/head tail left right vmin/];
 	m/^(\w+:)init_(\w+)$/ and ($dep->{$_},$dep->{$1.$2})=($dep->{$1.$2},$dep->{$_}) for keys %$dep; #exchange init_* keys with normal keys
 	my $var=GMB::Expression::Make($dep,'init',$initcontext);
@@ -6349,18 +6703,17 @@ sub pad_and_align
 }
 
 sub aapic_cached
-{	my ($arg,$picsize,$aa,$aakey,$aanb,$hide)=@_;
+{	my ($arg,$picsize,$aa,$ids,$aanb,$hide)=@_;
 	return undef,0 if $hide;
 	#$aa||=$arg->{grouptype};
-	#$aakey||=$arg->{groupkey};
 	#$now=1 if $param->{notdelayed};
-	if ($aa) { $aa= $aa eq 'artist' ? ::SONG_ARTIST : $aa eq 'album' ? ::SONG_ALBUM : undef; }
-	return undef,0 unless $aa;
-	if ($aa==::SONG_ARTIST) {$aakey=(split /$::re_artist/o,$aakey)[ $aanb ];}
-	my $pixbuf=AAPicture::pixbuf($aa,$aakey,$picsize);
-	my ($aap,$queue)=	$pixbuf		? ($pixbuf,undef) :
-				defined $pixbuf ? ([$aa,$aakey,$picsize],1) :
-				(undef,undef);
+	my $gid;
+	if (ref $ids) { $gid= (::uniq( Songs::Map_to_gid($aa,$ids)))[$aanb]; }
+	elsif (!$aanb){ $gid= Songs::Get_gid($ids,$aa); }
+	my $pixbuf= defined $gid ? AAPicture::pixbuf($aa,$gid,$picsize) : undef;
+	my ($aap,$queue)=	$pixbuf		?	($pixbuf,undef) :
+				defined $pixbuf ?	([$aa,$gid,$picsize],1) :
+							(undef,undef);
 	return $aap,$queue;
 }
 sub aapic_size
@@ -6437,7 +6790,7 @@ sub epack
 	return $x,@x;
 }
 
-package EditSTGroupings;
+package GMB::Edit::STGroupings;
 use Gtk2;
 use base 'Gtk2::VBox';
 
@@ -6493,7 +6846,7 @@ sub AddRow
 	my ($type,$skin)=split /\|/,$string;
 	my $opt;
 	if ($skin=~s/\((.*)\)$//) { $opt=::ParseOptions($1) }
-	my $typelist=TextCombo->new({map {$_ => $SongTree::GroupBy{$_}[0]} keys %SongTree::GroupBy}, $type );
+	my $typelist=TextCombo::Tree->new( Songs::ListGroupTypes(), $type );
 	my $skinlist=TextCombo->new({map {$_ => $SongTree::GroupSkin{$_}{title}||$_} keys %SongTree::GroupSkin}, $skin, \&skin_changed_cb );
 	my $button=::NewIconButton('gtk-remove',undef,sub
 		{ my $button=$_[0];
@@ -6541,7 +6894,7 @@ sub skin_changed_cb
 		my $v=$ref->{default};
 		$v=::decode_url($opt->{$key}) if $opt && exists $opt->{$key};
 		$v='' unless defined $v;
-		my $entry= &{$opt_types{$type}[0]}($v,$l,$ref);
+		my $entry= $opt_types{$type}[0]($v,$l,$ref);
 		my $x=0;
 		if ($opt_types{$type}[2])
 		{	$table->attach($label, 0, 1, $row, $row+1, ['expand','fill'], [], 2, 2);
@@ -6571,7 +6924,7 @@ sub Result
 		{	my @opt;
 			for my $key (sort keys %$h)
 			{	my $type=$SongTree::GroupSkin{$skin}{options}{$key}{type};
-				my $v= &{ $opt_types{$type}[1] }($h->{$key});
+				my $v= $opt_types{$type}[1]($h->{$key});
 				push @opt,$key.'='.::url_escapeall($v);
 			}
 			$group.='('.join(',',@opt).')';
@@ -6584,67 +6937,44 @@ sub Result
 package GMB::Expression;
 no warnings;
 
-our %alias=( 'if' => 'iff', pesc => '::PangoEsc', ratingpic => 'Stars::get_pixbuf');
+our %alias=( 'if' => 'iff', pesc => '::PangoEsc', ratingpic => 'Stars::get_pixbuf', min =>'::min', max =>'::max', sum =>'::sum',); #FIXME use Songs::Picture instead of Stars::get_pixbuf
 our %functions=
-(	formattime=> ['do { my ($f,$t,$z)=(',		'); !$t && defined $z ? $z : ::strftime($f,localtime($t)); }'],
-	sum	=>   ['do {my $sum; $sum+=$_ for ',	';$sum}'],
-	average	=>   ['do {my $sum; my @l=(',		'); $sum+=$_ for @l; @l ? $sum/@l : undef}'],
-	max	=>   ['do {my ($max,@l)=(',		'); $_>$max and $max=$_ for @l; $max}'],
-	min	=>   ['do {my ($min,@l)=(',		'); $_<$min and $min=$_ for @l; $min}'],
+(	formattime=> ['do {my ($f,$t,$z)=(',		'); !$t && defined $z ? $z : ::strftime($f,localtime($t)); }'],
+	#sum	=>   ['do {my $sum; $sum+=$_ for ',	';$sum}'],
+	average	=>   ['do {my $sum=::sum(',		'); @l ? $sum/@l : undef}'],
+	#max	=>   ['do {my ($max,@l)=(',		'); $_>$max and $max=$_ for @l; $max}'],
+	#min	=>   ['do {my ($min,@l)=(',		'); $_<$min and $min=$_ for @l; $min}'],
 	iff	=>   ['do {my ($cond,$res,@l)=(',	'); while (@l>1) {last if $cond; $cond=shift @l;$res=shift @l;} $cond ? $res : $l[0] }'],
+	size	=>   ['do {my ($l)=(',			'); ref $l ? scalar @$l : 1}'],
 	playmarkup=> \&playmarkup,
 );
-$functions{$_}=undef for qw/ucfirst uc lc chr ord not ::PangoEsc Stars::get_pixbuf index length substr join sprintf warn abs int rand/;
+$functions{$_}||=undef for qw/ucfirst uc lc chr ord not index length substr join sprintf warn abs int rand/, values %alias;
 our %vars2=
 (song=>
- {	title	=> ['$arg->{song}[::SONG_TITLE]',	::SONG_TITLE],
-	artist	=> ['$arg->{song}[::SONG_ARTIST]',	::SONG_ARTIST],
-	album	=> ['$arg->{song}[::SONG_ALBUM]',	::SONG_ALBUM],
-	date	=> ['$arg->{song}[::SONG_DATE]',	::SONG_DATE],
-	year	=> ['$arg->{song}[::SONG_DATE]',	::SONG_DATE],
-	track	=> ['$arg->{song}[::SONG_TRACK]',	::SONG_TRACK],
-	disc	=> ['$arg->{song}[::SONG_DISC]',	::SONG_DISC],
-	comment	=> ['$arg->{song}[::SONG_COMMENT]',	::SONG_COMMENT],
-	playcount=>['$arg->{song}[::SONG_NBPLAY]',	::SONG_NBPLAY],
-	skipcount=>['$arg->{song}[::SONG_NBSKIP]',	::SONG_NBSKIP],
-	ufile	=> ['$arg->{song}[::SONG_UFILE]',	::SONG_UFILE],
-	upath	=> ['$arg->{song}[::SONG_UPATH]',	::SONG_UPATH],
-	version	=> ['$arg->{song}[::SONG_VERSION]',	::SONG_VERSION],
-	rating	=> ['$arg->{song}[::SONG_RATING]',	::SONG_RATING],
-	channel	=> ['$arg->{song}[::SONG_CHANNELS]',	::SONG_CHANNELS],
-	samprate=> ['$arg->{song}[::SONG_SAMPRATE]',	::SONG_SAMPRATE],
-	bitrate	=> ['$arg->{song}[::SONG_BITRATE]',	::SONG_BITRATE],
-	filetype=> ['$arg->{song}[::SONG_FORMAT]',	::SONG_FORMAT],
-	size	=> ['$arg->{song}[::SONG_SIZE]',	::SONG_SIZE],
-	length_	=> ['$arg->{song}[::SONG_LENGTH]',	::SONG_LENGTH],
-	lastplay_=>['$arg->{song}[::SONG_LASTPLAY]',	::SONG_LASTPLAY],
-	lastskip_=>['$arg->{song}[::SONG_LASTSKIP]',	::SONG_LASTSKIP],
-	added_	=> ['$arg->{song}[::SONG_ADDED]',	::SONG_ADDED],
-	modif_	=> ['$arg->{song}[::SONG_MODIF]',	::SONG_MODIF],
-	genre	=> ['join(", ", split(/\\x00/, $arg->{song}[::SONG_GENRE]))',	::SONG_GENRE],
-	label	=> ['join(", ", split(/\\x00/, $arg->{song}[::SONG_LABELS]))',	::SONG_LABELS],
-	lastplay=> ['do { my $v=$arg->{song}[::SONG_LASTPLAY]; $v ? scalar localtime $v : "'.quotemeta(_("never")).'"}',::SONG_LASTPLAY],
-	lastskip=> ['do { my $v=$arg->{song}[::SONG_LASTSKIP]; $v ? scalar localtime $v : "'.quotemeta(_("never")).'"}',::SONG_LASTSKIP],
-	added	=> ['do { my $v=$arg->{song}[::SONG_ADDED]; $v ? scalar localtime $v : "'.quotemeta(_("never")).'"}',	::SONG_ADDED],
-	modif	=> ['do { my $v=$arg->{song}[::SONG_MODIF]; $v ? scalar localtime $v : "'.quotemeta(_("never")).'"}',	::SONG_MODIF],
-	'length'=> ['do { my $v=$arg->{song}[::SONG_LENGTH];sprintf "%d:%02d",$v/60,$v%60;}',		::SONG_LENGTH],
-	progress=> ['$arg->{ID}==$::SongID ? $::PlayTime/$arg->{song}[::SONG_LENGTH] : 0',	::SONG_LENGTH,[qw/SongID Time/]],
-	queued	=> ['do {my $i;my $f;for (@::Queue) {$i++; $f=$i,last if $arg->{ID}==$_};$f}',undef,'Queue'],
+ {	#ufile #REMOVED PHASE1 fix the doc
+	#upath #REMOVED PHASE1 fix the doc
+	progress=> ['$arg->{ID}==$::SongID ? $::PlayTime/Songs::Get($arg->{ID},"length") : 0',	'length','SongID Time'],
+	queued	=> ['do {my $i;my $f;for (@$::Queue) {$i++; $f=$i,last if $arg->{ID}==$_};$f}',undef,'Queue'],
 	playing => ['$arg->{ID}==$::SongID',		undef,'SongID'],
-	playicon=> ['::Get_PPSQ_Icon($arg->{ID})',	undef,[qw/Playing Queue SongID/]],
-	labelicons=>['[grep Gtk2::IconFactory->lookup_default($_),map \'label-\'.$_,split /\\x00/,$arg->{song}[::SONG_LABELS]]',::SONG_LABELS,'Icons'],
+	playicon=> ['::Get_PPSQ_Icon($arg->{ID})',	undef,'Playing Queue SongID'],
+	labelicons=>['[Songs::Get_icon_list("label",$arg->{ID})]', 'label','Icons'],
+	ids	=> ['$arg->{ID}'],
  },
  group=>
- {	year	=> ['groupyear($arg->{groupsongs})',	::SONG_DATE],
-	artist	=> ['groupartist($arg->{groupsongs})',	::SONG_ARTIST],
-	album	=> ['groupalbum($arg->{groupsongs})',	::SONG_ALBUM],
-	genres	=> ['groupgenres($arg->{groupsongs},::SONG_GENRE)',	::SONG_GENRE],
-	labels	=> ['groupgenres($arg->{groupsongs},::SONG_LABELS)',	::SONG_LABELS],
- 	title	=> ['$arg->{groupkey}'],
-	rating_avrg => ['do {my $sum; $sum+= $_ eq "" ?  $::Options{DefaultRating} : $_ for map $::Songs[$_][::SONG_RATING],@{$arg->{groupsongs}}; $sum/@{$arg->{groupsongs}}; }',::SONG_RATING], #FIXME round, int ?
-	'length' => ['do {my $v; $v+=$_ for map $::Songs[$_][::SONG_LENGTH],@{$arg->{groupsongs}}; sprintf "%d:%02d",$v/60,$v%60;}',::SONG_LENGTH],
+ {	ids	=> ['$arg->{groupsongs}'],
+	year	=> ['groupyear($arg->{groupsongs})',	'year'],
+	artist	=> ['groupartist($arg->{groupsongs})',	'artist'],
+	album	=> ['groupalbum($arg->{groupsongs})',	'album'],
+	artistid=> ['groupartistid($arg->{groupsongs})','artist'],
+	albumid	=> ['groupalbumid($arg->{groupsongs})',	'album'],
+	genres	=> ['groupgenres($arg->{groupsongs},genre)',	'genre'],
+	labels	=> ['groupgenres($arg->{groupsongs},label)',	'label'],
+	gid	=> ['Songs::Get_gid($arg->{groupsongs}[0],$arg->{grouptype})'],	#FIXME PHASE1
+	title	=> ['($arg->{groupsongs} ? Songs::Get_grouptitle($arg->{grouptype},$arg->{groupsongs}) : "")'], #FIXME should the init case ($arg->{groupsongs}==undef) be treated here ?
+	rating_avrg => ['do {my $sum; $sum+= $_ eq "" ?  $::Options{DefaultRating} : $_ for Songs::Map(rating=>$arg->{groupsongs}); $sum/@{$arg->{groupsongs}}; }', 'rating'], #FIXME round, int ?
+	'length' => ['do {my (undef,$v)=Songs::ListLength($arg->{groupsongs}); sprintf "%d:%02d",$v/60,$v%60;}', 'length'],
 	nbsongs	=> ['scalar @{$arg->{groupsongs}}'],
-	disc	=> ['groupdisc($arg->{groupsongs})',	::SONG_DISC],
+	disc	=> ['groupdisc($arg->{groupsongs})',	'disc'],
  }
 );
 
@@ -6707,7 +7037,7 @@ sub parse
 				if (exists $functions{$v})
 				{	$funcused{$v}++;
 					if (my $ref=$functions{$v})
-					{	$ref=&$ref($constant) if ref $ref eq 'CODE';
+					{	$ref=$ref->($constant) if ref $ref eq 'CODE';
 						$pre=$ref->[0];
 						$post=$ref->[1];
 						push @watch,[undef,$ref->[2],$ref->[3]] if @$ref>2;
@@ -6729,6 +7059,11 @@ sub parse
 					if ($ref)
 					{	push @watch,$ref;
 						$r.='('.$ref->[0].')';
+					}
+					elsif ($context eq 'song') #for normal fields
+					{	my $action= $v=~s/_$// ? 'get' : 'display';
+						push @watch,[undef,$v];
+						$r.='('.Songs::Code($v,$action, ID => '$arg->{ID}').')';
 					}
 					else {$r.= "'unknown var \\'$v\\''"};
 				}
@@ -6761,10 +7096,10 @@ sub parse
 	{ for my $ref (@watch)
 	  {	my (undef,$c,$e)=@$ref;
 		if (defined $c)
-		{	$update->{col}{$_}=undef for (ref $c ? @$c : $c);
+		{	$update->{col}{$_}=undef for Songs::Depends(split / /,$c);
 		}
 		if (defined $e)
-		{	$update->{event}{$_}=undef for (ref $e ? @$e : $e);
+		{	$update->{event}{$_}=undef for split / /,$e;;
 		}
 	  }
 	}
@@ -6862,10 +7197,11 @@ sub Make
 	$sub.='return \%var;'; warn "\nGMBMake : sub=\n".$sub."\n\n" if $::debug;
 	my $coderef=eval "sub {$sub}";
 	if ($@) {warn "\n";my $c=1; for (split "\n",$sub) {warn "$c $_\n";$c++};warn "** error : $@\n"; $coderef=sub {};}
-	elsif ($var) {&$coderef($var)}
+	elsif ($var) { $coderef->($var); }
 	else { return $coderef}
 }
 
+=unused
 sub average #not used
 {	my $sum;
 	$sum+=$_ for @_;
@@ -6891,27 +7227,40 @@ sub iff #not used
 	return $cond ? $_[0] : $_[1];
 }
 
+=cut
+
 sub groupyear
 {	my $songs=$_[0];
 	my %h;
-	my @y=sort { $a <=> $b } grep $_,map $::Songs[$_][::SONG_DATE], @$songs;
+	my @y=sort { $a <=> $b } grep $_,Songs::Map('year',$songs);
 	my $years='';
 	if (@y) {$years=$y[0]; $years.=' - '.$y[-1] if $y[-1]!=$years; }
 	return $years;
 }
+
+sub groupalbumid
+{	my $songs=$_[0];
+	my $l= Songs::UniqList('album',$songs);
+	return @$l==1 ? $l->[0] : $l;
+}
+sub groupartistid		##FIXME PHASE1 use artists instead ?
+{	my $songs=$_[0];
+	my $l= Songs::UniqList('artist',$songs);
+	return @$l==1 ? $l->[0] : $l;
+}
+
 sub groupalbum
 {	my $songs=$_[0];
-	my %h; $h{ $::Songs[$_][::SONG_ALBUM] }=undef for @$songs;
-	my $nb=keys %h;
-	return (keys %h)[0] if $nb==1;
-	return ::__("%d album","%d albums",$nb);
+	my $l= Songs::UniqList('album',$songs);
+	return Songs::Gid_to_Display('album',$l->[0]) if @$l==1;
+	return ::__("%d album","%d albums",scalar @$l);
 }
-sub groupartist
+sub groupartist	#FIXME optimize PHASE1
 {	my $songs=$_[0];
-	my %h; $h{ $::Songs[$_][::SONG_ARTIST] }=undef for @$songs;
-	my $nb=keys %h;
-	return (keys %h)[0] if $nb==1;
-	my @l=map split(/$::re_artist/o), keys %h;
+	my $h=Songs::BuildHash('artist',$songs);
+	my $nb=keys %$h;
+	return Songs::Gid_to_Display('artist',(keys %$h)[0]) if $nb==1;
+	my @l=map split(/$::re_artist/o), keys %$h;
 	my %h2; $h2{$_}++ for @l;
 	my @common;
 	for (@l) { if ($h2{$_}>=$nb) { push @common,$_; delete $h2{$_}; } }
@@ -6919,19 +7268,15 @@ sub groupartist
 }
 sub groupgenres
 {	my ($songs,$field,$common)=@_;
-	my %h;
-	for my $ID (@$songs)
-	{	$h{$_}++ for split /\x00/, $::Songs[$ID][$field];
-	}
-	delete $h{''};
-	return join ', ',sort ($common? grep($h{$_}==@$songs,keys %h) : keys %h);
+	my $h=Songs::BuildHash($field,$songs);
+	delete $h->{''};
+	return join ', ',sort ($common? grep($h->{$_}==@$songs,keys %$h) : keys %$h);
 }
 sub groupdisc
 {	my $songs=$_[0];
-	my %h;
-	$h{$_}++ for map $::Songs[$_][::SONG_DISC], @$songs;
-	delete $h{''};
-	if ((keys %h)==1 && (values %h)[0]==@$songs) {return (keys %h)[0]}
+	my $h=Songs::BuildHash('disc',$songs);
+	delete $h->{''};
+	if ((keys %$h)==1 && (values %$h)[0]==@$songs) {return (keys %$h)[0]}
 	else {return ''}
 }
 sub error
@@ -6944,7 +7289,7 @@ sub playmarkup
 }
 
 
-
+=toremove
 package GMB::RadioList;
 use base 'Gtk2::VBox';
 
@@ -6977,7 +7322,7 @@ sub new
 				my $path=($treeview->get_cursor)[0];
 				return 0 unless $path;
 				my $ID=$store->get($store->get_iter($path),0);
-				::SongRemove($ID);
+				::SongsRemove([$ID]);
 				$tv->parent->parent->Refresh;
 				return 1;
 			}
@@ -7040,5 +7385,6 @@ sub Refresh
 	$store->clear;
 	$store->set($store->append,0,$_) for @::Radio;
 }
+=cut
 
 1;

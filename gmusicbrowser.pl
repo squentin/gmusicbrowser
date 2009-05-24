@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (C) 2005-2008 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -30,13 +30,17 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  *Gtk2::Label::set_ellipsize=		sub {} unless *Gtk2::Label::set_ellipsize{CODE};	#for perl-Gtk2 version <1.080~1.083
  *Gtk2::Pango::Layout::set_height=	sub {} unless *Gtk2::Pango::Layout::set_height{CODE};	#for perl-Gtk2 version <1.180  pango <1.20
  my $set_clip_rectangle_orig=\&Gtk2::Gdk::GC::set_clip_rectangle;
- *Gtk2::Gdk::GC::set_clip_rectangle=sub { goto $set_clip_rectangle_orig if $_[1]; } if $Gtk2::VERSION <1.102; #work-around $rect can't be undef in old bindings versions
+ *Gtk2::Gdk::GC::set_clip_rectangle=sub { &$set_clip_rectangle_orig if $_[1]; } if $Gtk2::VERSION <1.102; #work-around $rect can't be undef in old bindings versions
 }
 use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES strftime mktime/;
+use List::Util qw/min max sum first/;
 use File::Copy;
-use Fcntl qw/O_NONBLOCK O_WRONLY O_RDWR/;
+use File::Spec::Functions qw/file_name_is_absolute catfile/;
+use Cwd 'abs_path';
+use Fcntl qw/O_NONBLOCK O_WRONLY O_RDWR SEEK_SET/;
 use Encode qw/_utf8_on _utf8_off/;
-use Unicode::Normalize 'NFKD'; #for accent-insensitive sort
+use Scalar::Util qw/blessed weaken/;
+use Unicode::Normalize 'NFKD'; #for accent-insensitive sort and search, only used via superlc()
 
 #use constant SLASH => ($^O  eq 'MSWin32')? '\\' : '/';
 use constant SLASH => '/'; #gtk file chooser use '/' in win32 and perl accepts both '/' and '\'
@@ -46,9 +50,9 @@ use FindBin;
 our $DATADIR;
 BEGIN
 { my @dirs=(	$FindBin::RealBin,
-		$FindBin::RealBin.SLASH.'..'.SLASH.'share'.SLASH.'gmusicbrowser' #FIXME add Glib::get_system_data_dirs to the list ?
+		join (SLASH,$FindBin::RealBin,'..','share','gmusicbrowser') #FIXME remove, all perl files will be in $FindBin::RealBin, gmusicbrowser.pl symlinked to /usr/bin/gmusibrowser
 	   );
-  ($DATADIR)=grep -e $_.SLASH.'gmusicbrowser_player.pm', @dirs;
+  ($DATADIR)=grep -e $_.SLASH.'gmusicbrowser_layout.pm', @dirs;
   die "Can't find folder containing data files, looked in @dirs\n" unless $DATADIR;
 }
 use lib $DATADIR;
@@ -57,34 +61,15 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.01',	#used for easy numeric comparison
- VERSIONSTRING => '1.0.1',
+ VERSION => '1.10',
+ VERSIONSTRING => '1.1.0',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
-
- #fields of @{$Songs[$ID]} :
- SONG_UFILE	=> 0,	SONG_UPATH	=> 1,	SONG_MODIF	=> 2,
- SONG_LENGTH	=> 3,	SONG_SIZE	=> 4,	SONG_BITRATE	=> 5,
- SONG_FORMAT	=> 6,	SONG_CHANNELS	=> 7,	SONG_SAMPRATE	=> 8,
- SONG_TITLE	=> 9,	SONG_ARTIST	=> 10,	SONG_ALBUM	=> 11,
- SONG_DISC	=> 12,	SONG_TRACK	=> 13,	SONG_DATE	=> 14,
- SONG_VERSION	=> 15,	SONG_GENRE	=> 16,	SONG_COMMENT	=> 17,
- SONG_AUTHOR	=> 18,
- SONG_ADDED	=> 19,	SONG_LASTPLAY	=> 20,	SONG_NBPLAY	=> 21,
- SONG_RATING	=> 22,	SONG_LABELS	=> 23,
- SONG_MISSINGSINCE => 24,
- SONG_LASTSKIP	=> 25,	SONG_NBSKIP	=> 26,
- SONGLASTSAVED	=> 26,
- SONG_FILE	=> 27,	SONG_PATH	=> 28,
- SONGLAST	=> 28,	# nb of last field
- # LYRICS ?
+# PERL510 => $^V ge 'v5.10',
 
  DRAG_STRING	=> 0, DRAG_USTRING	=> 1, DRAG_FILE		=> 2,
  DRAG_ID	=> 3, DRAG_ARTIST	=> 4, DRAG_ALBUM	=> 5,
  DRAG_FILTER	=> 6, DRAG_MARKUP	=> 7,
-
- #contents of @{$Artist{$artist}} and @{$Album{$album}} :
- AALIST => 0, AAXREF => 1, AALENGTH => 2, AAYEAR => 3, AAPIXLIST => 4,
 
 };
 
@@ -110,29 +95,27 @@ BEGIN
 }
 
 BEGIN{
+require 'gmusicbrowser_songs.pm';
 require 'gmusicbrowser_tags.pm';
-require 'gmusicbrowser_player.pm';
+require 'gmusicbrowser_layout.pm';
 require 'gmusicbrowser_list.pm';
 require 'simple_http.pm';
 }
 
 our $Gtk2TrayIcon;
 BEGIN
-{ if (grep -f $_."/Gtk2/TrayIcon.pm",@INC)  { require Gtk2::TrayIcon; $Gtk2TrayIcon=1; }
-  else { warn "Gtk2::TrayIcon not found -> tray icon won't be available\n"; }
+{ eval { require Gtk2::TrayIcon; $Gtk2TrayIcon=1; };
+  if ($@) { warn "Gtk2::TrayIcon not found -> tray icon won't be available\n"; }
 }
 
 
 our $debug;
 our %CmdLine;
-our (@Songs,@Shuffle);
-our (%Artist,%Album);
 our ($HomeDir,$SaveFile,$FIFOFile);
 
 our $QSLASH;	#quoted SLASH for use in regex
-sub file_name_is_absolute
-{	($^O ne 'MSWin32') ? $_[0]=~m#^$QSLASH#o : $_[0]=~m#^[a-z]:[/\\]#io;
-}
+#FIXME use :		use constant QSLASH => quotemeta SLASH;
+#  ???			and ${\QSLASH} instead of $QSLASH
 
 ########## cmdline
 BEGIN
@@ -151,13 +134,13 @@ BEGIN
   }
 
   $SaveFile=(-d $HomeDir)
-	?  $HomeDir.'tags'
-	: 'gmusicbrowser.tags';
+	?  $HomeDir.'gmbrc'
+	: abs_path('gmusicbrowser.tags');
   $FIFOFile=(-d $HomeDir && $^O ne 'MSWin32')
 	?  $HomeDir.'gmusicbrowser.fifo'
 	: undef;
 
-my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2008 Quentin Sculo
+my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2009 Quentin Sculo
 options :
 -c	: don't check for updated/deleted songs on startup
 -s	: don't scan folders for songs on startup
@@ -174,9 +157,12 @@ options :
 -F FIFO : use FIFO as named pipe to receive commans (instead of $FIFOFile)
 -nofifo : do not create/use named pipe $FIFOFile
 -debug	: print lots of mostly useless informations
--layout NAME		: use layout NAME for player window
--load FILE		: Load FILE as a plugin
+-layout NAME		: Use layout NAME for player window
++plugin NAME		: Enable plugin NAME
+-plugin NAME		: Disable plugin NAME
+-searchpath FOLDER	: Additional FOLDER to look for plugins and layouts
 -use-gnome-session 	: Use gnome libraries to save tags/settings on session logout
+
 
 Command options, all following arguments constitute CMD :
 -cmd CMD...		: launch gmusicbrowser if not already running, and execute command CMD
@@ -189,45 +175,49 @@ Options to change what is done with files/folders passed as arguments (done in r
 -enqueue		: Enqueue them
 -addplaylist		: Add them to the playlist
 -insertplaylist		: Insert them in the playlist after current song
+-add			: Add them to the library
 
 -tagedit FOLDER_OR_FILE ... : Edittag mode
--listcmd : list the available fifo commands and exit
+-listcmd	: list the available fifo commands and exit
+-listlayout	: list the available layouts and exit
 ";
   unshift @ARGV,'-tagedit' if $0=~m/tagedit/;
   $CmdLine{gst}=0;
   my @files; my $filescmd;
    while (defined (my $arg=shift))
-   {	if   ($arg eq '-c')	{$CmdLine{nocheck}=1}
-	elsif($arg eq '-s')	{$CmdLine{noscan}=1}
-	elsif($arg eq '-demo')	{$CmdLine{demo}=1}
-#	elsif($arg eq '-empty')	{$CmdLine{empty}=1}
-	elsif($arg eq '-play')	{$CmdLine{play}=1}
-	elsif($arg eq '-hide')	{$CmdLine{hide}=1}
-	elsif($arg eq '-server'){$CmdLine{server}=1}
-	elsif($arg eq '-nodbus'){$CmdLine{noDBus}=1}
-	elsif($arg eq '-nogst')	{$CmdLine{gst}=0}
-	elsif($arg eq '-gst')	{$CmdLine{gst}=1}
-	elsif($arg eq '-ro')	{$CmdLine{ro}=$CmdLine{rotags}=1}
-	elsif($arg eq '-rotags'){$CmdLine{rotags}=1}
-	elsif($arg eq '-port')	{$CmdLine{port}=shift if $ARGV[0]}
-	elsif($arg eq '-debug')	{$debug=1}
-	elsif($arg eq '-nofifo'){$FIFOFile=undef}
-	elsif($arg eq '-C')	{$SaveFile=shift if $ARGV[0]}
-	elsif($arg eq '-F')	{$FIFOFile=shift if $ARGV[0]}
-	elsif($arg eq '-layout'){$CmdLine{layout}=shift if $ARGV[0]}
-	elsif($arg eq '-load')	{ push @{$CmdLine{plugins}},shift if $ARGV[0]}
-	elsif($arg eq '-geometry'){$CmdLine{geometry}=shift if $ARGV[0]; }
-	elsif($arg eq '-use-gnome-session'){ $CmdLine{UseGnomeSession}=1; }
-	elsif($arg eq '-tagedit'){$CmdLine{tagedit}=1;last; }
-	elsif($arg eq '-listcmd'){$CmdLine{cmdlist}=1;last; }
-	elsif($arg eq '-cmd')   { RunRemoteCommand(@ARGV); $CmdLine{runcmd}="@ARGV"; last; }
-	elsif($arg eq '-remotecmd'){ RunRemoteCommand(@ARGV); exit; }
-	elsif($arg eq '-launch_or_cmd'){ RunRemoteCommand(@ARGV); last; }
+   {	if   ($arg eq '-c')		{$CmdLine{nocheck}=1}
+	elsif($arg eq '-s')		{$CmdLine{noscan}=1}
+	elsif($arg eq '-demo')		{$CmdLine{demo}=1}
+#	elsif($arg eq '-empty')		{$CmdLine{empty}=1}
+	elsif($arg eq '-play')		{$CmdLine{play}=1}
+	elsif($arg eq '-hide')		{$CmdLine{hide}=1}
+	elsif($arg eq '-server')	{$CmdLine{server}=1}
+	elsif($arg eq '-nodbus')	{$CmdLine{noDBus}=1}
+	elsif($arg eq '-nogst')		{$CmdLine{gst}=0}
+	elsif($arg eq '-gst')		{$CmdLine{gst}=1}
+	elsif($arg eq '-ro')		{$CmdLine{ro}=$CmdLine{rotags}=1}
+	elsif($arg eq '-rotags')	{$CmdLine{rotags}=1}
+	elsif($arg eq '-port')		{$CmdLine{port}=shift if $ARGV[0]}
+	elsif($arg eq '-debug')		{$debug=1}
+	elsif($arg eq '-nofifo')	{$FIFOFile=undef}
+	elsif($arg eq '-C')		{$SaveFile=abs_path(shift) if $ARGV[0]}
+	elsif($arg eq '-F')		{$FIFOFile=abs_path(shift) if $ARGV[0]}
+	elsif($arg eq '-layout')	{$CmdLine{layout}=shift if $ARGV[0]}
+	elsif($arg eq '-searchpath')	{ push @{ $CmdLine{searchpath} },shift if $ARGV[0]}
+	elsif($arg=~m/^([+-])plugin$/)	{ $CmdLine{plugins}{shift @ARGV}=($1 eq '+') if $ARGV[0]}
+	elsif($arg eq '-geometry')	{ $CmdLine{geometry}=shift if $ARGV[0]; }
+	elsif($arg eq '-tagedit')	{ $CmdLine{tagedit}=1;last; }
+	elsif($arg eq '-listcmd')	{ $CmdLine{cmdlist}=1;last; }
+	elsif($arg eq '-listlayout')	{ $CmdLine{layoutlist}=1;last; }
+	elsif($arg eq '-cmd')		{ RunRemoteCommand(@ARGV); $CmdLine{runcmd}="@ARGV"; last; }
+	elsif($arg eq '-remotecmd')	{ RunRemoteCommand(@ARGV); exit; }
+	elsif($arg eq '-launch_or_cmd')	{ RunRemoteCommand(@ARGV); last; }
 	elsif($arg eq '-add')		{ $filescmd='AddToLibrary'; }
 	elsif($arg eq '-playlist')	{ $filescmd='OpenFiles'; }
 	elsif($arg eq '-enqueue')	{ $filescmd='EnqueueFiles'; }
 	elsif($arg eq '-addplaylist')	{ $filescmd='AddFilesToPlaylist'; }
 	elsif($arg eq '-insertplaylist'){ $filescmd='InsertFilesInPlaylist'; }
+	elsif($arg eq '-use-gnome-session'){ $CmdLine{UseGnomeSession}=1; }
 	elsif($arg=~m#^http://# || -e $arg) { push @files,$arg }
 	else
 	{	warn "unknown option '$arg'\n" unless $arg=~/^--?h(elp)?$/;
@@ -236,10 +226,10 @@ Options to change what is done with files/folders passed as arguments (done in r
 	}
    }
   if (@files)
-  {	for (@files)
-	{ unless (m#^http://#)
-	  {	$_=$ENV{PWD}.SLASH.$_ unless file_name_is_absolute($_);
-		s/([^A-Za-z0-9])/sprintf('%%%02X', ord($1))/seg; #FIXME use url_escapeall, but not yet defined
+  {	for my $f (@files)
+	{ unless ($f=~m#^http://#)
+	  {	$f=abs_path($f);warn $f;
+		$f=~s/([^A-Za-z0-9])/sprintf('%%%02X', ord($1))/seg; #FIXME use url_escapeall, but not yet defined
 	  }
 	}
 	$filescmd ||= 'OpenFiles';
@@ -263,58 +253,11 @@ Options to change what is done with files/folders passed as arguments (done in r
 
 ##########
 
-our $ILLEGALCHAR=qr#[/:><\*\?\"\\]#;	# regex that matches characters that shouldn't be used in filenames
-our $ILLEGALCHARDIR=qr#[:><\*\?\"\\]#;	# regex that matches characters that shouldn't be used in pathnames
-$ILLEGALCHARDIR=qr#[/:><\*\?\"]#  if $^O eq 'MSWin32';
-
 #our $re_spaces_unlessinbrackets=qr/([^( ]+(?:\(.*?\))?)(?: +|$)/; #breaks "widget1(options with spaces) widget2" in "widget1(options with spaces)" and "widget2" #replaced by ExtractNameAndOptions
 
 our $re_artist; #regular expression used to split artist name into multiple artists, defined at init by the option ArtistSplit, may not be changed afterward because it is used with the /o option (faster)
 
 my ($browsercmd,$opendircmd);
-
-our %TagIndex;
-our @TagProp;	# TagProp[columnnumber]=[name,id,data_type,width]
-# data_type :	d : date in seconds since epoch (01-01-1970)
-#		s : string
-#		n : number
-#		l : length in seconds
-#		f : genres & labels (list of \x00 terminated strings)
-BEGIN #FIXME, shouldn't be a BEGIN block but needs to be executed before gmusibrowser_list.pm
-{ my @names=
-  (	ufile	=>	_"Filename"	, SONG_UFILE,	's',400,
-	upath	=>	_"Folder"	, SONG_UPATH,	's',200,
-	modif	=>	_"Modification"	, SONG_MODIF,	'd',160,
-	title	=>	_"Title"	, SONG_TITLE,	's',275,
-	artist	=>	_"Artist"	, SONG_ARTIST,	's',200,
-	date	=>	_"Date"		, SONG_DATE,	's',40,
-	album	=>	_"Album"	, SONG_ALBUM,	's',200,
-	comment	=>	_"Comment"	, SONG_COMMENT,	's',200,
-	track	=>	_"Track"	, SONG_TRACK,	'n',22,
-	genre	=>	_"Genres"	, SONG_GENRE,	'f',200,
-	length	=>	_"Length"	, SONG_LENGTH,	'l',50,
-	size	=>	_"Size"		, SONG_SIZE,	'n',80,
-	disc	=>	_"Disc"		, SONG_DISC,	'n',50,
-	version	=>	_"Version"	, SONG_VERSION,	's',150,
-	rating	=>	_"Rating"	, SONG_RATING,	'n',80,
-	added	=>	_"Added"	, SONG_ADDED,	'd',100,
-	lastplay=>	_"Last played"	, SONG_LASTPLAY,'d',100,
-	lastskip=>	_"Last skipped"	, SONG_LASTSKIP,'d',100,
-	playcount=>	_"Play count"	, SONG_NBPLAY,	'n',100,
-	skipcount=>	_"Skip count"	, SONG_NBSKIP,	'n',100,
-	label	=>	_"Labels"	, SONG_LABELS,	'f',100,
-	bitrate	=>	_"Bitrate"	, SONG_BITRATE,	'n',70,
-	filetype=>	_"Type"		, SONG_FORMAT,	's',80,
-	channel	=>	_"Channels"	, SONG_CHANNELS,'n',50,
-	samprate=>	_"Sampling Rate", SONG_SAMPRATE,'n',60,
-	author	=>	undef,		, SONG_AUTHOR,	's',100,
-    );
-    while (@names)
-    {	my ($id,$name,$n,$type,$colwidth)=splice @names,0,5;
-	$TagProp[$n]=[ $name,$id,$type,$colwidth ];
-	$TagIndex{$id}=$n;
-    }
-}
 
 our %QActions=		#icon		#short		#long description
 (	''	=> [ 0, 'gmb-empty',	_"normal",	_"normal play when queue empty"],
@@ -334,35 +277,36 @@ our @DRAGTYPES;
 	['STRING'],
 	['markup'],
 	[SongID =>
-		{ DRAG_FILE,	sub { map 'file://'.url_escape($Songs[$_][SONG_PATH].SLASH.$Songs[$_][SONG_FILE]), @_;},
-#		  DRAG_ARTIST,	sub { keys %{ &{$FilterList::hashsub[SONG_ARTIST]}(\@_) } },
-#		  DRAG_ALBUM,	sub { keys %{ &{$FilterList::hashsub[SONG_ALBUM]}(\@_) } },
-		  DRAG_ARTIST,	sub { my %h; $h{ $Songs[$_][SONG_ARTIST] }=undef for @_; sort keys %h; },
-		  DRAG_ALBUM,	sub { my %h; $h{ $Songs[$_][SONG_ALBUM ] }=undef for @_; sort keys %h; },
-		  DRAG_USTRING,	sub { (@_==1)? $Songs[$_[0]][SONG_TITLE] : __("%d song","%d songs",scalar@_) },
+		{ DRAG_FILE,	sub { Songs::Map('uri',\@_); },
+		  DRAG_ARTIST,	sub { @{Songs::UniqList('artist',\@_,1)}; },
+		  DRAG_ALBUM,	sub { @{Songs::UniqList('album',\@_,1)}; },
+		  DRAG_USTRING,	sub { (@_==1)? Songs::Display($_[0],'title') : __("%d song","%d songs",scalar@_) },
 		  DRAG_STRING,	undef, #will use DRAG_USTRING
-		  DRAG_FILTER,	sub {Filter->newadd(FALSE,map SONG_TITLE.'~'.$Songs[$_][SONG_TITLE],@_)->{string}},
-		  DRAG_MARKUP,	sub { (@_==1)	? ReplaceFieldsAndEsc($_[0],_"<b>%t</b>\n<small><small>by</small> %a\n<small>from</small> %l</small>")
-						: __x(	_("{songs} by {artists}") . "\n<small>{length}</small>",
-							songs => __("%d song","%d songs",scalar@_),
-							artists => do {my %h; $h{$Songs[$_][SONG_ARTIST]}=undef for @_; (keys %h ==1)? ::PangoEsc($Songs[$_[0]][SONG_ARTIST]) : __("%d artist","%d artists",scalar(keys %h)) },
-							'length' => CalcListLength(\@_,'length')
-							)},
+		  DRAG_FILTER,	sub {Filter->newadd(FALSE,map 'title:~:'.Songs::Get($_,'title'),@_)->{string}},
+		  DRAG_MARKUP,	sub {	return ReplaceFieldsAndEsc($_[0],_"<b>%t</b>\n<small><small>by</small> %a\n<small>from</small> %l</small>") if @_==1;
+					my $nba=@{Songs::UniqList2('artist',\@_)};
+			  		my $artists= ($nba==1)? Songs::DisplayEsc($_[0],'artist') : __("%d artist","%d artists",$nba);
+			  		__x(	_("{songs} by {artists}") . "\n<small>{length}</small>",
+						songs => __("%d song","%d songs",scalar@_),
+						artists => $artists,
+						'length' => CalcListLength(\@_,'length')
+					)},
 		}],
-	[Artist => {	DRAG_USTRING,	sub { (@_<10)? join("\n",@_) : __("%d artist","%d artists",scalar@_) },
+	[Artist => {	DRAG_USTRING,	sub { (@_<10)? join("\n",@{Songs::Gid_to_Display('artist',\@_)}) : __("%d artist","%d artists",scalar@_) },
 		  	DRAG_STRING,	undef, #will use DRAG_USTRING
-			DRAG_FILTER,	sub {   Filter->newadd(FALSE,map SONG_ARTIST.'~'.$_,@_)->{string} },
-			DRAG_ID,	sub { my $l=Filter->newadd(FALSE,map SONG_ARTIST.'~'.$_,@_)->filter; SortList($l); @$l; },
+			DRAG_FILTER,	sub {   Filter->newadd(FALSE,map Songs::MakeFilterFromGID('artists',$_),@_)->{string} },
+			DRAG_ID,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('artists',$_),@_)->filter; SortList($l); @$l; },
 		}],
-	[Album  => {	DRAG_USTRING,	sub { (@_<10)? join("\n",@_) : __("%d album","%d albums",scalar@_) },
+	[Album  => {	DRAG_USTRING,	sub { (@_<10)? join("\n",@{Songs::Gid_to_Display('album',\@_)}) : __("%d album","%d albums",scalar@_) },
 		  	DRAG_STRING,	undef, #will use DRAG_USTRING
-			DRAG_FILTER,	sub {   Filter->newadd(FALSE,map SONG_ALBUM.'e'.$_,@_)->{string} },
-			DRAG_ID,	sub { my $l=Filter->newadd(FALSE,map SONG_ALBUM.'e'.$_,@_)->filter; SortList($l); @$l; },
+			DRAG_FILTER,	sub {   Filter->newadd(FALSE,map Songs::MakeFilterFromGID('album',$_),@_)->{string} },
+			DRAG_ID,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('album',$_),@_)->filter; SortList($l); @$l; },
 		}],
 	[Filter =>
 		{	DRAG_USTRING,	sub {Filter->new($_[0])->explain},
 		  	DRAG_STRING,	undef, #will use DRAG_USTRING
 			DRAG_ID,	sub { my $l=Filter->new($_[0])->filter; SortList($l); @$l; },
+			#DRAG_FILE,	sub { my $l=Filter->new($_[0])->filter; Songs::Map('uri',$l); }, #good idea ?
 		}
 	],
 );
@@ -370,7 +314,7 @@ our %DRAGTYPES;
 $DRAGTYPES{$DRAGTYPES[$_][0]}=$_ for DRAG_FILE,DRAG_USTRING,DRAG_STRING,DRAG_ID,DRAG_ARTIST,DRAG_ALBUM,DRAG_FILTER,DRAG_MARKUP;
 
 our @submenuRemove=
-(	{ label => _"Remove from list",	code => sub { $_[0]{self}->RemoveSelected; }, mode => 'BLQ'},
+(	{ label => sub {$_[0]{self}{mode} eq 'Q' ? _"Remove from queue" : _"Remove from list"},	code => sub { $_[0]{self}->RemoveSelected; }, mode => 'BLQ'},
 #(	{ label => _"Remove from list',	code => sub { $_[0]{self}->RemoveID(@{ $_[0]{IDs} }); }, mode => 'B'},
 	{ label => _"Remove from library",	code => sub { SongsRemove($_[0]{IDs}); }, },
 	{ label => _"Remove from disk",		code => sub { DeleteFiles($_[0]{IDs}); },	test => sub {!$CmdLine{ro}},	stockicon => 'gtk-delete' },
@@ -380,9 +324,9 @@ our @SongCMenu=
 (	{ label => _"Song Properties",	code => sub { DialogSongProp (@{ $_[0]{IDs} }); },	onlyone => 'IDs', stockicon => 'gtk-edit' },
 	{ label => _"Songs Properties",	code => sub { DialogSongsProp(@{ $_[0]{IDs} }); },	onlymany=> 'IDs', stockicon => 'gtk-edit' },
 	{ label => _"Play Only Selected",code => sub { Select(song => 'first', play => 1, staticlist => $_[0]{IDs} ); },
-		onlymany => 'IDs',	stockicon => 'gtk-media-play'},
+		onlymany => 'IDs', 	stockicon => 'gtk-media-play'},
 	{ label => _"Play Only Displayed",code => sub { Select(song => 'first', play => 1, staticlist => \@{$_[0]{listIDs}} ); },
-		test => sub { @{$_[0]{IDs}}<2 },	onlymany => 'listIDs',	stockicon => 'gtk-media-play' },
+		test => sub { @{$_[0]{IDs}}<2 }, notmode => 'A',	onlymany => 'listIDs',	stockicon => 'gtk-media-play' },
 	{ label => _"Enqueue Selected",	code => sub { Enqueue(@{ $_[0]{IDs} }); },
 		notempty => 'IDs', notmode => 'QP', stockicon => 'gmb-queue' },
 	{ label => _"Enqueue Displayed",	code => sub { Enqueue(@{ $_[0]{listIDs} }); },
@@ -390,9 +334,9 @@ our @SongCMenu=
 	{ label => _"Add to list",	submenu => \&AddToListMenu,	notempty => 'IDs' },
 	{ label => _"Edit Labels",	submenu => \&LabelEditMenu,	notempty => 'IDs' },
 	{ label => _"Edit Rating",	submenu => \&Stars::createmenu,	notempty => 'IDs' },
-	{ label => _"Find songs with the same names", code => sub { SearchSame(SONG_TITLE,$_[0]) },	mode => 'B',	notempty => 'IDs' },
-	{ label => _"Find songs with same artists", code => sub { SearchSame(SONG_ARTIST,$_[0]) },	mode => 'B',	notempty => 'IDs' },
-	{ label => _"Find songs in same albums", code => sub { SearchSame(SONG_ALBUM,$_[0]) },	mode => 'B',	notempty => 'IDs' },
+	{ label => _"Find songs with the same names",	code => sub { SearchSame('title',$_[0]) },	mode => 'B',	notempty => 'IDs' },
+	{ label => _"Find songs with same artists",	code => sub { SearchSame('artists',$_[0])},	mode => 'B',	notempty => 'IDs' },
+	{ label => _"Find songs in same albums",	code => sub { SearchSame('album',$_[0]) },	mode => 'B',	notempty => 'IDs' },
 	{ label => _"Rename file",	code => sub { DialogRename(	@{ $_[0]{IDs} }); },	onlyone => 'IDs',	test => sub {!$CmdLine{ro}}, },
 	{ label => _"Mass Rename",	code => sub { DialogMassRename(	@{ $_[0]{IDs} }); },	onlymany=> 'IDs',	test => sub {!$CmdLine{ro}}, },
 	{ label => _"Copy",	code => sub { CopyMoveFilesDialog($_[0]{IDs},TRUE); },
@@ -406,36 +350,45 @@ our @SongCMenu=
 	{ label => _"Same Title",     submenu => sub { ChooseSongsTitle(	$_[0]{IDs}[0] ); },	mode => 'P' },
 	{ label => _"Edit Lyrics",	code => sub { EditLyrics(	$_[0]{IDs}[0] ); },	mode => 'P' },
 	{ label => _"Lookup in google",	code => sub { Google(		$_[0]{IDs}[0] ); },	mode => 'P' },
-	{ label => _"Open containing folder",	code => sub { openfolder( $Songs[ $_[0]{IDs}[0] ][SONG_PATH] ); },	onlyone => 'IDs' },
+	{ label => _"Open containing folder",	code => sub { openfolder( Songs::Get( $_[0]{IDs}[0], 'path') ); },	onlyone => 'IDs' },
 );
 our @cMenuAA=
-(	{ label => _"Lock",	code => sub { ToggleLock($_[0]{col}); }, check => sub {defined $::TogLock && $::TogLock==$_[0]{col}}, mode => 'P' },
-	{ label => _"Lookup in AMG",	code => sub { ::AMGLookup( $_[0]{col},$_[0]{key} ); }, },
-	{ label => _"Filter",		code => \&filterAA,	stockicon => 'gmb-filter', mode => 'P' },
+(	{ label => _"Lock",	code => sub { ToggleLock($_[0]{field}); }, check => sub { $::TogLock && $::TogLock eq $_[0]{field}}, mode => 'P' },
+	{ label => _"Lookup in AMG",	code => sub { AMGLookup( $_[0]{mainfield}, $_[0]{aaname} ); },
+	  test => sub { $_[0]{mainfield} =~m/^album$|^artist$|^title$/; },
+	},
+	{ label => _"Filter",		code => sub { Select(filter => Songs::MakeFilterFromGID($_[0]{field},$_[0]{gid})); },	stockicon => 'gmb-filter', mode => 'P' },
 	{ label => \&SongsSubMenuTitle,		submenu => \&SongsSubMenu, },
 	{ label => sub {$_[0]{mode} eq 'P' ? _"Display Songs" : _"Filter"},	code => \&FilterOnAA,
 		test => sub { GetSonglist( $_[0]{self} ) }, },
-	{ label => _"Set Picture",	code => sub { ChooseAAPicture($_[0]{ID},$_[0]{col},$_[0]{key}); },
+	{ label => _"Set Picture",	code => sub { ChooseAAPicture($_[0]{ID},$_[0]{mainfield},$_[0]{gid}); },
 		stockicon => 'gmb-picture' },
 );
 
+
+#a few inactive debug functions
+sub red {}
+sub blue {}
+sub callstack {}
+
 sub url_escapeall
-{	local $_=$_[0];
-	_utf8_off($_); # or "use bytes" ?
-	s#([^A-Za-z0-9])#sprintf('%%%02X', ord($1))#seg;
-	return $_;
+{	my $s=$_[0];
+	_utf8_off($s); # or "use bytes" ?
+	$s=~s#([^A-Za-z0-9])#sprintf('%%%02X', ord($1))#seg;
+	return $s;
 }
 sub url_escape
-{	local $_=$_[0];
-	_utf8_off($_);
-	s#([^/\$_.+!*'(),A-Za-z0-9-])#sprintf('%%%02X',ord($1))#seg;
-	return $_;
+{	my $s=$_[0];
+	_utf8_off($s);
+	$s=~s#([^/\$_.+!*'(),A-Za-z0-9-])#sprintf('%%%02X',ord($1))#seg;
+	return $s;
 }
 sub decode_url
-{	local $_=$_[0];
-	_utf8_off($_);
-	s#%([0-9A-F]{2})#chr(hex $1)#ieg;
-	return $_;
+{	my $s=$_[0];
+	return undef unless defined $s;
+	_utf8_off($s);
+	$s=~s#%([0-9A-F]{2})#chr(hex $1)#ieg;
+	return $s;
 }
 
 my %htmlelem= #FIXME maybe should use a module with a complete list
@@ -456,6 +409,59 @@ sub PangoEsc	# escape special chars for pango ( & < > ) #replaced by Glib::Marku
 	s/&/&amp;/g; s/</&lt;/g; s/>/&gt;/g;
 	s/"/&quot;/g; s/'/&apos;/g; # doesn't seem to be needed
 	return $_;
+}
+
+sub CleanupFileName
+{	local $_=$_[0];
+	s#[[:cntrl:]/:><\*\?\"\\]##g;
+	s#^[- ]+##g;
+	s/ +$//g;
+	return $_;
+}
+sub CleanupDirName
+{	local $_=$_[0];
+	if ($^O eq 'MSWin32')	{ s#[[:cntrl:]/:><\*\?\"]##g; }
+	else			{ s#[[:cntrl:]:><\*\?\"\\]##g; }
+	s#^[- ]+##g;
+	s/ +$//g;
+	return $_;
+}
+
+sub uniq
+{	my %h;
+	map { $h{$_}++ == 0 ? $_ : () } @_;
+}
+
+sub superlc	##lowercase, normalize and remove accents/diacritics #not sure how good it is
+{	my $s=NFKD($_[0]);
+	$s=~s/\pM//og;	#remove Marks (see perlunicode)
+	$s=Unicode::Normalize::compose($s); #probably better to recompose #is it worth it ?
+	return lc $s;
+}
+
+sub OneInCommon	#true if at least one string common to both list
+{	my ($l1,$l2)=@_;
+	($l1,$l2)=($l2,$l1) if @$l1>@$l2;
+	return 0 if @$l1==0;
+	if (@$l1==1) { my $s=$l1->[0]; return defined first {$_ eq $s} @$l2 }
+	my %h;
+	$h{$_}=undef for @$l1;
+	return 1 if defined first { exists $h{$_} } @$l2;
+	return 0;
+}
+
+sub find_common_parent_folder
+{	my @folders= uniq(@_);
+	my $folder=$folders[0];
+	my $nb=@folders;
+	return $folder if $nb==1;
+	$folder=~s/$QSLASH+$//o;
+	until ($nb==grep m/^$folder(?:$QSLASH|$)/, @folders)
+	{	$folder='' unless $folder=~m/$QSLASH/o;	#for win32 drives
+		last unless $folder=~s/$QSLASH[^$QSLASH]+$//o;
+	}
+	$folder.=SLASH unless $folder=~m/$QSLASH/o;
+	return $folder;
 }
 
 sub ExtractNameAndOptions
@@ -513,67 +519,32 @@ sub ParseOptions
 	return \%opt;
 }
 
-our %ReplaceFields=		# for each field : [sub returning the formated value, field name, depends on these fields]
-(	'%' => [sub {'%'},'%'],
-	t => [sub { $Songs[$_[0]][SONG_TITLE]	}, $TagProp[SONG_TITLE][0],	[SONG_TITLE]],
-	a => [sub { $Songs[$_[0]][SONG_ARTIST]	}, $TagProp[SONG_ARTIST][0],	[SONG_ARTIST]],
-	l => [sub { $Songs[$_[0]][SONG_ALBUM]	}, $TagProp[SONG_ALBUM][0],	[SONG_ALBUM]],
-	d => [sub { $Songs[$_[0]][SONG_DISC]	}, $TagProp[SONG_DISC][0],	[SONG_DISC]],
-	n => [sub { $Songs[$_[0]][SONG_TRACK]	}, $TagProp[SONG_TRACK][0],	[SONG_TRACK]],
-	y => [sub { $Songs[$_[0]][SONG_DATE]	}, $TagProp[SONG_DATE][0],	[SONG_DATE]],
-	C => [sub { $Songs[$_[0]][SONG_COMMENT]	}, $TagProp[SONG_COMMENT][0],	[SONG_COMMENT]],
-	p => [sub { $Songs[$_[0]][SONG_NBPLAY]||0},$TagProp[SONG_NBPLAY][0],	[SONG_NBPLAY]],
-	P => [sub { my $v=$Songs[$_[0]][SONG_LASTPLAY]; $v ? scalar localtime $v : _('never')},$TagProp[SONG_LASTPLAY][0],	[SONG_LASTPLAY]],
-	k => [sub { $Songs[$_[0]][SONG_NBSKIP]||0},$TagProp[SONG_NBSKIP][0],	[SONG_NBSKIP]],
-	K => [sub { my $v=$Songs[$_[0]][SONG_LASTSKIP]; $v ? scalar localtime $v : _('never')},$TagProp[SONG_LASTSKIP][0],	[SONG_LASTSKIP]],
-	m => [sub { my $v=$Songs[$_[0]][SONG_LENGTH];sprintf "%d:%02d",$v/60,$v%60;}, $TagProp[SONG_LENGTH][0],	[SONG_LENGTH]],
-	g => [sub { join ', ',split /\x00/,$Songs[$_[0]][SONG_GENRE]||'' }, $TagProp[SONG_GENRE][0], [SONG_GENRE]],
-	L => [sub { join ', ',split /\x00/,$Songs[$_[0]][SONG_LABELS]||'' },$TagProp[SONG_LABELS][0],[SONG_LABELS]],
-	o => [sub { my$s=$Songs[$_[0]][SONG_UFILE]; $s=~s/\.[^\.]+$//; $s; },_"old filename",[SONG_UFILE]],
-	f => [sub { $Songs[$_[0]][SONG_PATH].SLASH.$Songs[$_[0]][SONG_FILE]; }, _"File",[SONG_PATH,SONG_FILE]],
-	u => [sub { $Songs[$_[0]][SONG_UPATH].SLASH.$Songs[$_[0]][SONG_UFILE]; }, _"File",[SONG_UPATH,SONG_UFILE]],
-	S => [sub { my $s=$Songs[$_[0]][SONG_TITLE]; $s=$Songs[$_[0]][SONG_UFILE] if !defined $s || $s eq ''; $s;},undef,[SONG_TITLE,SONG_UFILE]],
-	V => [sub { my $v=$Songs[$_[0]][SONG_VERSION]; return (!defined $v || $v eq '') ? '' : " ($v)" },undef,[SONG_VERSION]],
-	c => [sub { my $alb=$Songs[$_[0]][SONG_ALBUM]; $alb=$Album{$alb}[AAPIXLIST]; $alb='' unless $alb; return $alb; }, _"Cover",[SONG_ALBUM]],
-	Y => [sub { my $alb=$Songs[$_[0]][SONG_ALBUM]; return $Album{$alb}[AAYEAR]; }, _"Album year(s)",[SONG_DATE,SONG_ALBUM]],	#FIXME depends on SONG_DATE from all songs of SONG_ALBUM
-	A => [sub #guess album artist
-	{	my $alb=$Songs[$_[0]][SONG_ALBUM];
-		my %h; $h{ $Songs[$_][SONG_ARTIST] }=undef for @{$Album{$alb}[AALIST]};
-		my $nb=keys %h;
-		return $Songs[$_[0]][SONG_ARTIST] if $nb==1;
-		my @l=map split(/$re_artist/o), keys %h;
-		my %h2; $h2{$_}++ for @l;
-		my @common;
-		for (@l) { if ($h2{$_}>=$nb) { push @common,$_; delete $h2{$_}; } }
-		return @common ? join ' & ',@common : _"Various artists";
-	},
-		_"Album artist",[SONG_ARTIST,SONG_ALBUM]],	#FIXME depends on SONG_ARTIST from all songs of SONG_ALBUM
-);
+our %ReplaceFields; #used in gmusicbrowser_tags for auto-fill FIXME PHASE1
+	#o => 'basefilename', maybe should be usage specific (=>only for renaming)
 
 sub UsedFields
 {	my $s=$_[0];
-	return map @{ $ReplaceFields{$_}[2] || [] }, $s=~m/%([YACSVumtalydnfcopPkKgL%])/g;
+	my @f=map $ReplaceFields{$_}, $s=~m/%([a-zA-Z])/g;
+	push @f, $s=~m#\$([a-zA-Z]\w*)#g;
+	return Songs::Depends(@f);
 }
 sub ReplaceFields
-{	my ($ID,$s)=($_[0],$_[1]);
-	no warnings 'uninitialized';
-	$s=~s#\\n#\n#g;
-	$s=~s/%([YACSVumtalydnfcopPkKgL%])/&{$ReplaceFields{$1}[0]}($ID)/ge;
-	return $s;
+{	my ($ID,$string,$esc)=@_;
+	my $display= $esc ? \&Songs::DisplayEsc : \&Songs::Display;
+	$string=~s#\\n#\n#g;
+	$string=~s/%([a-zA-Z%])/$ReplaceFields{$1} ? '$'.$ReplaceFields{$1} : $1/ge;
+	$string=~s#\$([a-zA-Z\$]\w*)#$1 eq '$' ? '$' : $display->($ID,$1)#ge;
+	return $string;
 }
 sub ReplaceFieldsAndEsc
-{	my ($ID,$s)=($_[0],$_[1]);
-	no warnings 'uninitialized';
-	$s=~s#\\n#\n#g;
-	$s=~s/%([YACSVumtalydnfcopPkKgL%])/PangoEsc(&{$ReplaceFields{$1}[0]}($ID))/ge;
-	return $s;
+{	ReplaceFields($_[0],$_[1],1);
 }
 sub MakeReplaceTable
 {	my $fields=$_[0];
 	my $table=Gtk2::Table->new (4, 2, FALSE);
 	my $row=0; my $col=0;
 	for my $tag (split //,$fields)
-	{	for my $text ( '%'.$tag, $ReplaceFields{$tag}[1] )
+	{	for my $text ( '%'.$tag, Songs::FieldName($ReplaceFields{$tag}) )
 		{	my $l=Gtk2::Label->new($text);
 			$table->attach($l,$col++,$col,$row,$row+1,'fill','shrink',4,1);
 			$l->set_alignment(0,.5);
@@ -587,30 +558,8 @@ sub MakeReplaceTable
 }
 sub MakeReplaceText
 {	my $fields=$_[0];
-	my $text=join "\n",map '%'.$_.' : '.$ReplaceFields{$_}[1], split //,$fields;
+	my $text=join "\n",map '%'.$_.' : '.Songs::FieldName($ReplaceFields{$_}), split //,$fields;
 	return $text;
-}
-
-our %ReplaceAAFields=
-(	'%'	=>	sub {'%'},
-	a	=>	sub { $_[0] },
-	l	=>	sub { my $l=$_[1]->[AALENGTH]; $l=__x( ($l>=3600 ? _"{hours}h{min}m{sec}s" : _"{min}m{sec}s"), hours => (int $l/3600), min => ($l>=3600 ? sprintf('%02d',$l/60%60) : $l/60%60), sec => sprintf('%02d',$l%60)); },
-	L	=>	sub { CalcListLength( $_[1]->[AALIST],'length' ); },
-	y	=>	sub { $_[1]->[AAYEAR] || ''; },
-	Y	=>	sub { my $y=$_[1]->[AAYEAR]; return $y? " ($y)" : '' },
-	s	=>	sub { __('%d song','%d songs',$_[1]->[AALIST] ? scalar@{$_[1]->[AALIST]} : 0) },
-	x	=>	sub { my $nb=keys %{$_[1]->[::AAXREF]}; return $_[2]==SONG_ARTIST ? __("%d Album","%d Albums",$nb) : __("%d Artist","%d Artists",$nb);  },
-	X	=>	sub { my $nb=keys %{$_[1]->[::AAXREF]}; return $_[2]==SONG_ARTIST ? __("%d Album","%d Albums",$nb) : $nb>1 ? __("%d Artist","%d Artists",$nb) : '';  },
-	b	=>	sub { my %h; $h{ $Songs[$_][::SONG_ARTIST] }=undef for @{$_[1]->[AALIST]}; return keys(%h)==1 ? (keys(%h))[0] : __("%d artist","%d artists", scalar keys(%h));  },
-);
-sub ReplaceAAFields
-{	my ($aa,$format,$col,$esc)=@_;
-	my $ref= $col == SONG_ARTIST ? \%Artist : \%Album;
-	$ref=$ref->{$aa};
-	return '' unless ref $ref;
-	if($esc){ $format=~s/%([alLyYsxXb%r])/PangoEsc(&{$ReplaceAAFields{$1}}($aa,$ref,$col))/ge; }
-	else	{ $format=~s/%([alLyYsxXb%r])/&{$ReplaceAAFields{$1}}($aa,$ref,$col)/ge; }
-	return $format;
 }
 
 our %DATEUNITS=
@@ -629,62 +578,58 @@ our %SIZEUNITS=
 );
 sub ConvertTime	# convert date pattern into nb of seconds
 {	my $pat=$_[0];
-	my ($d1,$d2)=$pat=~m/^(\S+)\s?(.*)$/;
-	for ($d1,$d2)
-	{	if (m/^\d+$/) {}
-		elsif (m/^(\d\d\d\d)-(\d\d?)-(\d\d?)/) { $_=mktime(0,0,0,$3,$2-1,$1-1900); }
-		elsif (m/^(\d+\.?\d*)([smhdwMy])$/){ $_=time-$1*$DATEUNITS{$2}[0];   }
-	}
-	return ( (defined $d2 && $d2 ne '')?  join(' ',sort { $a <=> $b } $d1,$d2) : $d1 );
+	if ($pat=~m/(\d\d\d\d)-(\d\d?)-(\d\d?)/) { $pat=mktime(0,0,0,$3,$2-1,$1-1900); }
+	elsif ($pat=~m/^(\d+\.?\d*)([smhdwMy])$/){ $pat=time-$1*$DATEUNITS{$2}[0];   }
+	return $pat;
+}
+sub ConvertSize
+{	my $pat=$_[0];
+	if ($pat=~m/^(\d+)([bkm])$/) { $pat=$1*$::SIZEUNITS{$2}[0] }
+	return $pat;
 }
 
 
 #---------------------------------------------------------------
-our @TAGSREADFROMTAGS=(SONG_TITLE,SONG_ARTIST,SONG_DATE,SONG_ALBUM,SONG_COMMENT,SONG_TRACK,SONG_GENRE,SONG_DISC,SONG_VERSION);
-our @TAGSELECTION=(SONG_TITLE,SONG_ARTIST,SONG_ALBUM,SONG_DATE,SONG_TRACK,SONG_DISC,SONG_VERSION,SONG_GENRE,SONG_RATING,SONG_LABELS,SONG_NBPLAY,SONG_LASTPLAY,SONG_NBSKIP,SONG_LASTSKIP,SONG_ADDED,SONG_MODIF,SONG_COMMENT,SONG_UFILE,SONG_UPATH,SONG_LENGTH,SONG_SIZE,SONG_BITRATE,SONG_FORMAT,SONG_CHANNELS,SONG_SAMPRATE);
-my @SAVEDFIELDS=(0..SONGLASTSAVED); $SAVEDFIELDS[SONG_UFILE]=SONG_FILE; $SAVEDFIELDS[SONG_UPATH]=SONG_PATH;
-my $DAYNB=int(time/86400)-12417;#number of days since 01 jan 2004
+our $DAYNB=int(time/86400)-12417;#number of days since 01 jan 2004
 
-our (@LibraryPath,@Library,$PlaySource,@Radio);
+our (@LibraryPath,$Library,$PlaySource);#,@Radio);
 our (%GlobalBoundKeys,%CustomBoundKeys);
-#our (@Songs,@Shuffle);
-#our (%Artist,%Album);
 our %Labels;
-my (%GetIDFromFile,%MissingSTAAT,$MissingCount);
-my @STAAT=(SONG_SIZE,SONG_TITLE,SONG_ALBUM,SONG_ARTIST,SONG_TRACK); #Fields used to check if same song
-our %SavedFilters; our ($SelectedFilter,$PlayFilter); our (%Filters,%Filters_nb,%FilterWatchers);
-our (%SavedSorts,%SavedWRandoms);
-our %SavedLists; my $SavedListsWatcher;
-our @ListPlay;
+
+our ($SelectedFilter,$PlayFilter); our (%Filters,%FilterWatchers,%Related_FilterWatchers); our %SelID;
+#our %SavedFilters;our (%SavedSorts,%SavedWRandoms);our %SavedLists;
+my $SavedListsWatcher;
+our $ListPlay;
 our ($TogPlay,$TogLock);
-my $VolInc=10;
 our ($RandomMode,$SortFields,$ListMode);
-our ($SongID,@Recent,$RecentPos,@Queue); our $QueueAction=''; our $Position=0;
+our ($SongID,$Recent,$RecentPos,$Queue); our $QueueAction=''; our ($Position,$ChangedID,$ChangedPos);
 our ($MainWindow,$BrowserWindow,$ContextWindow,$FullscreenWindow); my $OptionsDialog;
 our $QueueWindow; my $TrayIcon;
-my %Editing;
+my %Editing; #used to keep track of opened song properties dialog and lyrics dialog
 our $PlayTime;
 our ($StartTime,$StartedAt,$PlayingID,$PlayedPartial); my $About_to_NextSong;
 our $CurrentDir=$ENV{PWD};
+#$ENV{PULSE_PROP_media.role}='music'; # pulseaudio hint. could set other pulseaudio properties, FIXME doesn't seem to reach pulseaudio
 
 our $LEvent;
 our (%ToDo,%TimeOut);
-my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos SongID Playing SavedWRandoms SavedSorts SavedFilters SavedLists AAPicture Icons ExtraWidgets Context connections
+my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos SongID Playing SavedWRandoms SavedSorts SavedFilters SavedLists Icons ExtraWidgets Context connections
 # also used for SearchText_ SelectedID_ followed by group id
+# Picture_#mainfield#
 
-my $SFWatch=0;
-my @SongsWatchers=($SFWatch);
-my (@Watched,@WatchedFilt);
-$Watched[$_]=[] for 0..SONGLAST;
-$WatchedFilt[$_]=[] for 0..SONGLAST;
-my ($IdleLoop,@ToCheck,@ToScan,%FollowedDirs,@ToAdd,@LengthEstimated,$CoverCandidates,%ToUpdateYAr,%ToUpdateYAl);
-my ($ProgressWin,$ProgressNBSongs,$ProgressNBFolders);
+my $Q_watcher={};
+Watch($Q_watcher, SongArray	=> \&SongArray_changed);
+my (%Watched,%WatchedFilt);
+my ($IdleLoop,@ToCheck,@ToReRead,@ToAdd_Files,@ToAdd_IDsBuffer,@ToScan,%FollowedDirs,$CoverCandidates);
+our ($LengthEstimated);
+our %Progress; my $ProgressWindowComing;
+my $Lengthcheck_max=0; my ($ScanProgress_cb,$CheckProgress_cb,$ProgressNBSongs,$ProgressNBFolders);
 my %Plugins;
 my $ScanRegex;
 
 #Default values
 our %Options=
-(	Layout		=> 'default player layout',
+(	Layout		=> 'Lists, Library & Context',
 	LayoutT		=> 'info',
 	LayoutB		=> 'Browser',
 	LayoutF		=> 'default fullscreen',
@@ -692,8 +637,9 @@ our %Options=
 	IconTheme	=> '',
 	MaxAutoFill	=> 5,
 	Repeat		=> 1,
-	Sort		=> 's',		#default sort order
-	AltSort		=> SONG_UPATH.' '.SONG_UFILE,
+	Sort		=> 'shuffle',		#default sort order
+	Sort_LastOrdered=> 'path file',
+	Sort_LastSR	=> 'shuffle',
 	WSRename	=> '300 180',
 	WSMassRename	=> '650 550',
 	WSMassTag	=> '520 560',
@@ -707,11 +653,11 @@ our %Options=
 	StartScan	=> 0,	#scan @LibraryPath on startup for new songs
 	#Path		=> '',	#contains join "\x1D",@LibraryPath
 	Labels => join("\x1D",_("favorite"),_("bootleg"),_("broken"),_("bonus tracks"),_("interview"),_("another example")),
-	FilenameSchema	=> join("\x1D",'%a - %l - %n - %t','%l - %n - %t','%n-%t','%d%n-%t'),
-	FolderSchema	=> join("\x1D",'%A/%l','%A','%A/%Y-%l','%A - %l'),
+	FilenameSchema	=> ['%a - %l - %n - %t','%l - %n - %t','%n-%t','%d%n-%t'],
+	FolderSchema	=> ['%A/%l','%A','%A/%Y-%l','%A - %l'],
 	PlayedPercent	=> .85,	#percent of a song played to increase play count
 	DefaultRating	=> 50,
-	Device		=> 'default',
+#	Device		=> 'default',
 #	amixerSMC	=> 'PCM',
 #	gst_sink	=> 'alsa',
 	gst_volume	=> 100,
@@ -724,17 +670,43 @@ our %Options=
 	Icecast_port	=> '8000',
 	UseTray		=> 1,
 	CloseToTray	=> 0,
-	ShowTipOnSongChange => 0,
-	TrayTipTimeLength => 3000, #in ms
+	ShowTipOnSongChange	=> 0,
+	TrayTipTimeLength	=> 3000, #in ms
 	TAG_use_latin1_if_possible => 1,
-	TAG_no_desync	=> 1,
-	TAG_keep_id3v2_ver  => 0,
-	'TAG_write_id3v2.4' => 0,
-	TAG_id3v1_encoding => 'iso-8859-1',
-	TAG_auto_check_current => 1,
-	Simplehttp_CacheSize => 200*1024,
-	CustomKeyBindings => '',
-	ArtistSplit	=> ' & |, ',
+	TAG_no_desync		=> 1,
+	TAG_keep_id3v2_ver	=> 0,
+	'TAG_write_id3v2.4'	=> 0,
+	TAG_id3v1_encoding	=> 'iso-8859-1',
+	TAG_auto_check_current	=> 1,
+	Simplehttp_CacheSize	=> 200*1024,
+	CustomKeyBindings	=> {},
+	ArtistSplit		=> ' & |, |;',
+	VolumeStep		=> 10,
+
+	SavedSTGroupings=>
+	{	_"None"			=> '',
+		_"Artist & album"	=> 'artist|simple|album|pic',
+		_"Album with picture"	=> 'album|pic',
+		_"Album"		=> 'album|simple',
+		_"Folder"		=> 'folder|artistalbum',
+	},
+	SavedWRandoms=>
+	{	_"by rating"	=> 'random:1r0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1',
+		_"by play count"=> 'random:-1n5',
+		_"by lastplay"	=> 'random:1l10',
+		_"by added"	=> 'random:-1a50',
+		_"by lastplay & play count"	=> 'random:1l10'."\x1D".'-1n5',
+		_"by lastplay & bootleg"	=> 'random:1l10'."\x1D".'-.5fbootleg',
+	},
+	SavedSorts=>
+	{	  _"Path,File"	=> 'path file',
+		_"Date"		=> 'year',
+		_"Title"	=> 'title',
+		_"Last played"	=> 'lastplay',
+		_"Artist,Album,Disc,Track"	=> 'artist album disc track',
+		_"Artist,Date,Album,Disc,Track"	=> 'artist year album disc track',
+		_"Path,Album,Disc,Track,File"	=> 'path album disc track file',
+	},
 );
 
 our $GlobalKeyBindings='Insert OpenSearch c-q EnqueueSelected p PlayPause c OpenContext q OpenQueue ca-f ToggleFullscreenLayout';
@@ -742,8 +714,8 @@ our $GlobalKeyBindings='Insert OpenSearch c-q EnqueueSelected p PlayPause c Open
 
 
 sub make_keybindingshash
-{	my $string=$_[0];
-	my @list= ExtractNameAndOptions($string);
+{	my $keybindings=$_[0];
+	my @list= ref $keybindings ? %$keybindings : ExtractNameAndOptions($keybindings);
 	my %h;
 	while (@list>1)
 	{	my $key=shift @list;
@@ -765,7 +737,7 @@ sub keybinding_longname
 	return $name.'-'.$key;
 }
 
-our $NBVolIcons; my $TrayIconFile;
+our ($NBVolIcons,$NBQueueIcons); my $TrayIconFile;
 my $icon_factory;
 
 sub LoadIcons
@@ -789,14 +761,14 @@ sub LoadIcons
 		for my $file (grep m/\.(?:png|svg)$/ && -f $dir.SLASH.$_, readdir $dh)
 		{	my $name='plugin-'.$file;
 			$name=~s/\.[^.]+$//;
-			$icons{$name}=$dir.SLASH.$file;
+			$icons{$name}= $dir.SLASH.$file;
 		}
 		closedir $dh;
 	}
 
 	my @dirs=($HomeDir.'icons');
 	if (my $theme=$Options{IconTheme})
-	{	my $dir=$HomeDir.'icons'.SLASH.$theme;
+	{	my $dir= $HomeDir.SLASH.'icons'.SLASH.$theme;
 		$dir=PIXPATH.$theme unless -d $dir;
 		unshift @dirs,$dir;
 	}
@@ -808,7 +780,7 @@ sub LoadIcons
 		{	my $name=$file;
 			$name=~s/\.[^.]+$//;
 			$name=Encode::decode('utf8',::decode_url($name));
-			$icons{$name}=$dir.SLASH.$file;
+			$icons{$name}= $dir.SLASH.$file;
 		}
 		closedir $dh;
 	}
@@ -819,6 +791,8 @@ sub LoadIcons
 
 	$NBVolIcons=0;
 	$NBVolIcons++ while $icons{'gmb-vol'.$NBVolIcons};
+	$NBQueueIcons=0;
+	$NBQueueIcons++ while $icons{'gmb-queue'.$NBQueueIcons};
 
 	$icon_factory->remove_default if $icon_factory;
 	$icon_factory=Gtk2::IconFactory->new;
@@ -831,7 +805,7 @@ sub LoadIcons
 			#keyval   => $Gtk2::Gdk::Keysyms{L},
 			#translation_domain => 'gtk2-perl-example',
 		if (exists $StockLabel{$stock_id}) { $h{label}=$StockLabel{$stock_id}; }
-		Gtk2::Stock->add(\%h) unless Gtk2::Stock->lookup($stock_id);
+		Gtk2::Stock->add (\%h) unless Gtk2::Stock->lookup($stock_id);
 		my $icon_set= eval {Gtk2::IconSet->new_from_pixbuf( Gtk2::Gdk::Pixbuf->new_from_file($file) )};
 		warn $@ if $@;
 		next unless $icon_set;
@@ -854,47 +828,11 @@ sub GetIconThemesList
 
 ##########
 
-sub FindID
-{	local $_=$_[0];
-	if (m/\D/)
-	{	s/($QSLASH)$QSLASH+/$1/og;
-		if (s/$QSLASH([^$QSLASH]+)$//o && $GetIDFromFile{$_})
-		{	return $GetIDFromFile{$_}{$1};
-		}
-		return undef;
-	}
-	$_=undef unless defined && $Songs[$_];
-	return $_;
-}
-sub GetTagValue
-{	my ($ID,$field)=@_;
-	warn "GetTagValue : $ID,$field\n" if $debug;
-	my $fieldnb=$TagIndex{$field};
-	unless (defined $fieldnb) { warn "GetTagValue : invalid field\n"; return undef }
-	$ID=FindID($ID);
-	unless (defined $ID) { warn "GetTagValue : song not found\n"; return undef }
-	my $value=$Songs[$ID][$fieldnb];
-	if ($TagProp[$fieldnb][2] eq 'f') {$value=~s/\00/\t/g}
-	return $value;
-}
-sub SetTagValue
-{	my ($ID,$field,$value)=@_;
-	warn "SetTagValue : $ID,$field,$value\n" if $debug;
-	my $fieldnb=$TagIndex{$field}; #FIXME some fields should not be editable
-	unless (defined $fieldnb) { warn "SetTagValue : invalid field\n"; return FALSE }
-	$ID=FindID($ID);
-	unless (defined $ID) { warn "SetTagValue : song not found\n"; return FALSE }
-	if ($TagProp[$fieldnb][2]=~m/[ndl]/) {return FALSE unless $value=~m/^\d+$/}
-	elsif ($TagProp[$fieldnb][2] eq 'f') {$value=~s/\t/\x00/g}
-	$Songs[$ID][$fieldnb]=$value;
-	SongChanged($ID,$fieldnb);
-	return TRUE;
-}
-
-
 our %Command=		#contains sub,description,argument_tip, argument_regex or code returning a widget, or '0' to hide it from the GUI edit dialog
 (	NextSongInPlaylist=> [\&NextSongInPlaylist,		_"Next Song In Playlist"],
 	PrevSongInPlaylist=> [\&PrevSongInPlaylist,		_"Previous Song In Playlist"],
+	NextAlbum	=> [sub {NextDiff('album')},		_"Next Album",],
+	NextArtist	=> [sub {NextDiff('artist_first')},	_"Next Artist",],
 	NextSong	=> [\&NextSong,				_"Next Song"],
 	PrevSong	=> [\&PrevSong,				_"Previous Song"],
 	PlayPause	=> [\&PlayPause,			_"Play/Pause"],
@@ -907,42 +845,46 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	OpenSearch	=> [sub { Layout::Window->new($Options{LayoutS}); },	_"Open Search window"],
 	OpenContext	=> [sub { Layout::Window->new('Context');},	_"Open Context window"],
 	OpenCustom	=> [sub { Layout::Window->new($_[1]); },	_"Open Custom window",_"Name of layout", sub { TextCombo->new( Layout::get_layout_list() ); }],
-	PopupCustom	=> [sub { PopupLayout($_[1],$_[0]); },		_"Popup Custom window",_"Name of layout", sub { TextCombo->new( Layout::get_layout_list() ); }],
+	PopupCustom	=> [sub { PopupLayout($_[1],$_[0]); },		_"Popup Custom window",_"Name of layout", sub { TextCombo::Tree->new( Layout::get_layout_list() ); }],
 	CloseWindow	=> [sub { $_[0]->get_toplevel->close_window if $_[0];}, _"Close Window"],
-	SetPlayerLayout => [sub { $Options{Layout}=$_[1]; set_layout(); },_"Set player window layout",_"Name of layout", sub {  TextCombo->new( Layout::get_layout_list('G') ); }, ],
+	SetPlayerLayout => [sub { SetOption(Layout=>$_[1]); set_layout(); },_"Set player window layout",_"Name of layout", sub {  TextCombo::Tree->new( Layout::get_layout_list('G') ); }, ],
 	OpenPref	=> [\&PrefDialog,			_"Open Preference window"],
 	OpenSongProp	=> [sub { DialogSongProp($SongID) if defined $SongID }, _"Edit Current Song Properties"],
+	EditSelectedSongsProperties => [sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; DialogSongsProp(@IDs) if @IDs; },		_"Edit selected song properties"],
 	ShowHide	=> [\&ShowHide,				_"Show/Hide"],
 	Quit		=> [\&Quit,				_"Quit"],
 	Save		=> [\&SaveTags,				_"Save Tags/Options"],
 	ChangeDisplay	=> [\&ChangeDisplay,			_"Change Display",_"Display (:1 or host:0 for example)",qr/:\d/],
 	GoToCurrentSong => [\&Layout::GoToCurrentSong,		_"Select current song"],
+	DeleteSelected	=> [sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; DeleteFiles(\@IDs); },		_"Delete Selected Songs"],
 	EnqueueSelected => [\&Layout::EnqueueSelected,		_"Enqueue Selected Songs"],
-	EnqueueArtist	=> [sub {EnqueueArtist($SongID)},	_"Enqueue Songs from Current Artist"],
-	EnqueueAlbum	=> [sub {EnqueueAlbum($SongID)},	_"Enqueue Songs from Current Album"],
-	EnqueueAction	=> [sub {EnqueueAction($_[1])},		_"Enqueue Action", _"Queue mode" ,sub { TextCombo->new({map {$_ => $QActions{$_}[2]} sort keys %QActions}) }],
+	EnqueueArtist	=> [sub {EnqueueSame('artist',$SongID)},_"Enqueue Songs from Current Artist"], # or use field 'artists' or 'first_artist' ?
+	EnqueueAlbum	=> [sub {EnqueueSame('album',$SongID)},	_"Enqueue Songs from Current Album"],
+	EnqueueAction	=> [sub {EnqueueAction($_[1])},		_"Enqueue Action", _"Queue mode" ,sub { TextCombo::Tree->new({map {$_ => $QActions{$_}[2]} sort keys %QActions}) }],
 	ClearQueue	=> [\&::ClearQueue,			_"Clear queue"],
 	IncVolume	=> [sub {ChangeVol('up')},		_"Increase Volume"],
 	DecVolume	=> [sub {ChangeVol('down')},		_"Decrease Volume"],
 	TogMute		=> [sub {ChangeVol('mute')},		_"Mute/Unmute"],
-	RunSysCmd	=> [\&run_system_cmd,			_"Run system command",_"Shell command",qr/./],
+	RunSysCmd	=> [\&run_system_cmd,			_"Run system command",_"Shell command\n(some variables such as %f (current song filename) or %F (list of selected songs filenames) are available)",qr/./],
 	RunPerlCode	=> [sub {eval $_[1]},			_"Run perl code",_"perl code",qr/./],
-	TogArtistLock	=> [sub {ToggleLock(SONG_ARTIST)},	_"Toggle Artist Lock"],
-	TogAlbumLock	=> [sub {ToggleLock(SONG_ALBUM)},	_"Toggle Album Lock"],
-	SetSongRating	=> [sub {return unless defined $SongID && $_[1]=~m/^\d*$/; $Songs[$SongID][SONG_RATING]=$_[1]; SongChanged($SongID,SONG_RATING); },				_"Set Current Song Rating", _"Rating between 0 and 100, or empty for default", qr/^\d*$/],
-	ToggleFullscreen=> 	[\&Layout::ToggleFullscreen,	_"Toggle fullscreen mode"],
-	ToggleFullscreenLayout=>[\&ToggleFullscreenLayout,	_"Toggle the fullscreen layout"],
-	OpenFiles	=> [sub { DoActionForList('playlist',Url_to_IDs($_[1])); }, _"Play a list of files/folders", _"url-encoded list of files/folders",0],
-	AddFilesToPlaylist=> [sub { DoActionForList('addplay',Url_to_IDs($_[1])); }, _"Add a list of files/folders to the playlist", _"url-encoded list of files/folders",0],
-	InsertFilesInPlaylist=> [sub { DoActionForList('insertplay',Url_to_IDs($_[1])); }, _"Insert a list of files/folders at the start of the playlist", _"url-encoded list of files/folders",0],
-	EnqueueFiles	=> [sub { DoActionForList('queue',Url_to_IDs($_[1])); }, _"Enqueue a list of files/folders", _"url-encoded list of files/folders",0],
-	AddToLibrary	=> [sub { AddToLibrary(split / /,$_[1]); }, _"Add files/folders to library", _"url-encoded list of files/folders",0],
+	TogArtistLock	=> [sub {ToggleLock('first_artist')},	_"Toggle Artist Lock"],
+	TogAlbumLock	=> [sub {ToggleLock('album')},		_"Toggle Album Lock"],
+	SetSongRating	=> [sub {return unless defined $SongID && $_[1]=~m/^\d*$/; Songs::Set($SongID, rating=> $_[1]); },	_"Set Current Song Rating", _"Rating between 0 and 100, or empty for default", qr/^\d*$/],
+	ToggleFullscreen=> [\&Layout::ToggleFullscreen,		_"Toggle fullscreen mode"],
+	ToggleFullscreenLayout=> [\&ToggleFullscreenLayout, _"Toggle the fullscreen layout"],
+	OpenFiles	=> [\&OpenFiles, _"Play a list of files", _"url-encoded list of files",0],
+#FIXME PHASE1 implement these :
+#	AddFilesToPlaylist=> [sub { DoActionForList('addplay',Url_to_IDs($_[1])); }, _"Add a list of files/folders to the playlist", _"url-encoded list of files/folders",0],
+#	InsertFilesInPlaylist=> [sub { DoActionForList('insertplay',Url_to_IDs($_[1])); }, _"Insert a list of files/folders at the start of the playlist", _"url-encoded list of files/folders",0],
+#	EnqueueFiles	=> [sub { DoActionForList('queue',Url_to_IDs($_[1])); }, _"Enqueue a list of files/folders", _"url-encoded list of files/folders",0],
+#	AddToLibrary	=> [sub { AddToLibrary(split / /,$_[1]); }, _"Add files/folders to library", _"url-encoded list of files/folders",0],
 	SetFocusOn	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->SetFocusOn($name) if $w;},_"Set focus on a layout widget", _"Widget name",0],
 	ShowHideWidget	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->ShowHide(split / +/,$name,2) if $w;},_"Show/Hide layout widget(s)", _"|-separated list of widget names",0],
 	PopupTrayTip	=> [sub {ShowTraytip($_[1])}, _"Popup Traytip",_"Number of milliseconds",qr/^\d*$/ ],
-	SetSongLabel	=> [sub{ ToggleLabel($_[1],$::SongID,1); }, _"Add a label to the current song", _"Label",qr/./],
-	UnsetSongLabel	=> [sub{ ToggleLabel($_[1],$::SongID,0); }, _"Remove a label from the current song", _"Label",qr/./],
+	SetSongLabel	=> [sub{ Songs::Set($SongID,'+label' => $_[1]); }, _"Add a label to the current song", _"Label",qr/./],
+	UnsetSongLabel	=> [sub{ Songs::Set($SongID,'-label' => $_[1]); }, _"Remove a label from the current song", _"Label",qr/./],
 	ToggleSongLabel	=> [sub{ ToggleLabel($_[1],$::SongID); }, _"Toggle a label of the current song", _"Label",qr/./],
+	PlayListed	=> [sub{ my $songlist=GetSonglist($_[0]) or return; Select(song => 'first', play => 1, staticlist => $songlist->{array} ); }, _"Play listed songs"],
 );
 
 sub run_command
@@ -950,7 +892,8 @@ sub run_command
 	$cmd="$1($2)" if $cmd=~m/^(\w+) (.*)/;
 	($cmd, my$arg)= $cmd=~m/^(\w+)(?:\((.*)\))?$/;
 	warn "executing $cmd($arg) (with self=$self)" if $::debug;
-	$Command{$cmd}[0]->($self,$arg) if $Command{$cmd};
+	if (my $ref=$Command{$cmd})	{ $ref->[0]->($self,$arg); }
+	else { warn "Unknown command '$cmd' => can't execute '$cmd($arg)'\n" }
 }
 
 sub run_system_cmd
@@ -961,7 +904,7 @@ sub run_system_cmd
 	return unless @cmd;
 	if ($syscmd=~m/%F/)
 	{	my @files;
-		if ($_[0] and my $songlist=GetSonglist($_[0])) { @files=map $Songs[$_][SONG_PATH].SLASH.$Songs[$_][SONG_FILE], $songlist->GetSelectedIDs; }
+		if ($_[0] and my $songlist=GetSonglist($_[0])) { @files=map Songs::GetFullFilename($_), $songlist->GetSelectedIDs; }
 		unless (@files) { warn "Not executing '$syscmd' because no song is selected in the current window\n"; return }
 		@cmd=map { $_ ne '%F' ? $_ : @files } @cmd ;
 	}
@@ -983,10 +926,11 @@ sub forksystem
 
 if ($CmdLine{cmdlist})
 {	print "Available commands (for fifo or layouts) :\n";
+	my ($max)= sort {$b<=>$a} map length, keys %Command;
 	for my $cmd (sort keys %Command)
-	{	my $print="$cmd : $Command{$cmd}[1]";
-		$print.="  (argument : $Command{$cmd}[2])" if $Command{$cmd}[2];
-		print "$print\n"
+	{	my $tip=$Command{$cmd}[2] || '';
+		if ($tip) { $tip=~s/\n.*//s; $tip=" (argument : $tip)"; }
+		printf "%-${max}s : %s %s\n", $cmd, $Command{$cmd}[1], $tip;
 	}
 	exit;
 }
@@ -1034,8 +978,12 @@ eval {require 'gmusicbrowser_gstreamer-0.10.pm';} || warn $@;
 require 'gmusicbrowser_server.pm';
 for my $p (qw/Play_Server Play_GST Play_123 Play_mplayer Play_GST_server/) { $Packs{$p}=$p->init; }
 
+LoadPlugins();
+ReadSavedTags();
 
-&ReadSavedTags;
+%CustomBoundKeys= %{ make_keybindingshash($Options{CustomKeyBindings}) };
+AddFullscreenButton() if $Options{AddFullscreenButton}; #should be made more generic
+
 $Options{version}=VERSION;
 LoadIcons();
 
@@ -1056,19 +1004,13 @@ $Options{Icecast_port}=$CmdLine{port} if $CmdLine{port};
 
 #$ListMode=[] if $CmdLine{empty};
 
-Select(	filter => ($SelectedFilter ? $SelectedFilter : ''),
-	'sort' => $Options{Sort},
-	song => (defined $SongID ? 'keep' : 'first'),
-	play => ( ($CmdLine{play} && !$PlayTime)? 1 : undef),
-	staticlist => $ListMode
-      );
+$ListPlay=SongArray::PlayList->init;
+Play() if $CmdLine{play} && !$PlayTime;
+
 #SkipTo($PlayTime) if $PlayTime; #gstreamer (how I use it) needs the mainloop running to skip, so this is done after the main window is created
 
 Layout::InitLayouts;
-LoadPlugins();
-for my $p (keys %Plugins)
-{	ActivatePlugin($p,'startup') if $Options{'PLUGIN_'.$p};
-}
+ActivatePlugin($_,'startup') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 
 our $Tooltips=Gtk2::Tooltips->new;
 $MainWindow=Layout::Window->new($CmdLine{layout}||$Options{Layout});
@@ -1085,11 +1027,9 @@ exit;
 
 sub Edittag_mode
 {	my @dirs=@_;
-	#make path absolute
-	file_name_is_absolute($_) or $_=$CurrentDir.SLASH.$_ for @dirs;
-	$re_artist=qr/$/;
+	$_=abs_path($_) for @dirs;
 	IdleScan(@dirs);
-	IdleDo('9_SkipLength',undef,sub {undef @LengthEstimated});
+	IdleDo('9_SkipLength',undef,sub {@$LengthEstimated=()});
 	Gtk2->main_iteration while Gtk2->events_pending;
 
 	my $dialog = Gtk2::Dialog->new( _"Editing tags", undef,'modal',
@@ -1098,16 +1038,16 @@ sub Edittag_mode
 	$dialog->signal_connect(destroy => sub {exit});
 	$dialog->set_default_size(500, 600);
 	my $edittag;
-	if (@Library==1)
-	{	$edittag=EditTagSimple->new($dialog,$Library[0]);
+	if (@$Library==1)
+	{	$edittag=EditTagSimple->new($dialog,$Library->[0]);
 		$dialog->signal_connect( response => sub
 		 {	my ($dialog,$response)=@_;
 			$edittag->save if $response eq 'ok';
 			exit;
 		 });
 	}
-	elsif (@Library>1)
-	{	$edittag=MassTag->new($dialog,@Library);
+	elsif (@$Library>1)
+	{	$edittag=MassTag->new(@$Library);
 		$dialog->signal_connect( response => sub
 		 {	my ($dialog,$response)=@_;
 			if ($response eq 'ok') { $edittag->save( sub {exit} ); }
@@ -1149,15 +1089,17 @@ sub find_ancestor
 {	my ($widget,$class)=@_;
 	until ( $widget->isa($class) )
 	{	$widget= $widget->isa('Gtk2::Menu')? $widget->get_attach_widget : $widget->parent;
-		last unless $widget;
+		#warn "Can't find ancestor $class of widget $_[0]\n" unless $widget;
+		return undef unless $widget;
 	}
 	return $widget;
 }
-sub Hpack
-{	my @list=@_;
+
+sub HVpack
+{	my ($vertical,@list)=@_;
 	my $pad=2;
 	my $end=FALSE;
-	my $hbox=Gtk2::HBox->new;
+	my $hbox= $vertical ? Gtk2::VBox->new : Gtk2::HBox->new;
 	while (@list)
 	{	my $w=shift @list;
 		next unless defined $w;
@@ -1170,43 +1112,37 @@ sub Hpack
 			next unless $w;
 		}
 		if (ref $w eq 'ARRAY')
-		{	$w=Vpack(@$w);
+		{	$w=HVpack(!$vertical,@$w);
 		}
 		if ($end)	{$hbox->pack_end  ($w,$exp,$exp,$pad);}
 		else		{$hbox->pack_start($w,$exp,$exp,$pad);}
 	}
 	return $hbox;
 }
-sub Vpack
-{	my @list=@_;
-	my $pad=2;
-	my $end=FALSE;
-	my $vbox=Gtk2::VBox->new;
-	while (@list)
-	{	my $w=shift @list;
-		next unless defined $w;
-		my $exp=FALSE;
-		unless (ref $w)
-		{	$exp=$w=~m/_/;
-			$end=1 if $w=~m/-/;
-			$pad=$1 if $w=~m/(\d+)/;
-			$w=shift @list;
-			next unless $w;
-		}
-		if (ref $w eq 'ARRAY')
-		{	$w=Hpack(@$w);
-		}
-		if ($end)	{$vbox->pack_end  ($w,$exp,$exp,$pad);}
-		else		{$vbox->pack_start($w,$exp,$exp,$pad);}
-	}
-	return $vbox;
+
+sub Hpack { HVpack(0,@_); }
+sub Vpack { HVpack(1,@_); }
+
+sub IsEventInNotebookTabs
+{	my ($nb,$event)=@_;
+	my (@rects)= map $_->allocation, grep $_->mapped, map $nb->get_tab_label($_), $nb->get_children;
+	my ($bw,$bh)=$nb->get('tab-hborder','tab-vborder');
+	my $x1=min(map $_->x,@rects)-$bw;
+	my $y1=min(map $_->y,@rects)-$bh;
+	my $x2=max(map $_->x+$_->width,@rects)+$bw;
+	my $y2=max(map $_->y+$_->height,@rects)+$bh;
+	my ($x,$y)=$event->window->get_position;
+	$x+=$event->x;
+	$y+=$event->y;
+	#warn "$x1,$y1,$x2,$y2  $x,$y";
+	return ($x1<$x && $x2>$x && $y1<$y && $y2>$y);
 }
 
-sub GetGenresList
-{	no warnings 'uninitialized';
-	my %h;
-	$h{$_}=undef for map split(/\x00/, $::Songs[$_][::SONG_GENRE]), @::Library;
-	return [sort keys %h];
+sub GetGenresList	#FIXME inline it or rename it
+{	return Songs::ListAll('genre');
+}
+sub SortedLabels	#FIXME inline it or rename it
+{	return Songs::ListAll('label');
 }
 
 sub TurnOff
@@ -1236,7 +1172,7 @@ sub Quit
 	$turnoff=1 if $_[0] && $_[0] eq 'turnoff';
 	$Options{SavedPlayTime}= $PlayTime||0 if $Options{RememberPlayTime};
 	&Stop if defined $TogPlay;
-	@ToScan=@ToAdd=();
+	@ToScan=@ToAdd_Files=();
 	SaveTags();
 	unlink $FIFOFile if defined $FIFOFile;
 	Gtk2->main_quit;
@@ -1250,7 +1186,7 @@ sub CmdFromFIFO
 		$cmd="$1($2)" if $cmd=~m/^(\w+) (.*)/;
 		($cmd, my$arg)= $cmd=~m/^(\w+)(?:\((.*)\))?$/;
 		#if ($cmd eq 'Print') {print $fifofh "Told to print : $arg\n";return}
-		if (exists $Command{$cmd}) { Glib::Timeout->add(0, sub {&{$Command{$cmd}[0]}($_[0],$arg); 0;},GetActiveWindow()); warn "fifo:received $cmd\n" if $debug; }
+		if (exists $Command{$cmd}) { Glib::Timeout->add(0, sub { $Command{$cmd}[0]($_[0],$arg); 0;},GetActiveWindow()); warn "fifo:received $cmd\n" if $debug; }
 		else {warn "fifo:received unknown command : '$cmd'\n"}
 	}
 	if (1) #FIXME replace 1 by gtk+ version check once the gtk+ bug is fixed (http://bugzilla.gnome.org/show_bug.cgi?id=321053)
@@ -1272,18 +1208,22 @@ sub GetActiveWindow
 	return undef;
 }
 
-sub LoadPlugins
-{	my @list;
-	for my $dirname ($DATADIR.SLASH.'plugins', $HomeDir.'plugins')
-	{	next unless -d $dirname;
-		opendir my($dir),$dirname;
-		while (my $file=readdir $dir)
-		{	next unless $file=~m/\.p[lm]$/;
-			push @list,$dirname.SLASH.$file;
-		}
+sub FileList
+{	my ($re,@search)=@_;
+	my @found;
+	@search=grep defined, @search;
+	@search=map ref() ? @$_ : $_, @search;
+	for my $search (@search)
+	{	if (-f $search) { push @found,$search if $search=~$re; next; }
+		next unless -d $search;
+		opendir my($dir),$search;
+		push @found, map $search.SLASH.$_,sort grep m/$re/, readdir $dir;
 		close $dir;
 	}
-	push @list,@{$CmdLine{plugins}} if $CmdLine{plugins};
+	return grep -f, @found;
+}
+sub LoadPlugins
+{	my @list= FileList( qr/\.p[lm]$/, $DATADIR.SLASH.'plugins', $HomeDir.'plugins', $CmdLine{searchpath} );
 
 	my %loaded; $loaded{$_}= $_->{file} for grep $_->{loaded}, values %Plugins;
 	for my $file (grep !$loaded{$_}, @list)
@@ -1321,17 +1261,30 @@ sub LoadPlugins
 		warn "No plugin found in $file, maybe it uses an old format\n" unless $found;
 	}
 }
+sub PluginsInit
+{	my $p=delete $CmdLine{plugins};
+	$Options{'PLUGIN_'.$_}=$p->{$_} for keys %$p;
+	ActivatePlugin($_,'init') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
+}
 sub ActivatePlugin
 {	my ($plugin,$startup)=@_;
 	my $ref=$Plugins{$plugin};
 	if ( $ref->{loaded} || do $ref->{file} )
 	{	$ref->{loaded}=1;
 		my $package='GMB::Plugin::'.$plugin;
-		$package->Start($startup);
-		warn "loaded plugin $plugin : OK\n" if $debug;
+		if ($startup && $startup eq 'init')
+		{	if ($package->can('Init'))
+			{	$package->Init if $package->can('Init');
+				warn "Plugin $plugin initialized.\n" if $debug;
+			}
+		}
+		else
+		{	$package->Start($startup) if $package->can('Start');
+			warn "Plugin $plugin activated.\n" if $debug;
+		}
 		$Options{'PLUGIN_'.$plugin}=1;
 	}
-	else
+	elsif (!$startup || $startup eq 'init')
 	{	warn "plugin $ref->{file} failed : $@\n";
 		$ref->{error}=$@;
 	}
@@ -1340,7 +1293,9 @@ sub DeactivatePlugin
 {	my $plugin=$_[0];
 	my $package='GMB::Plugin::'.$plugin;
 	delete $Options{'PLUGIN_'.$plugin};
-	$package->Stop if $Plugins{$plugin}{loaded};
+	return unless $Plugins{$plugin}{loaded};
+	warn "Plugin $plugin De-activated.\n" if $debug;
+	$package->Stop if $package->can('Stop');
 }
 
 sub ChangeVol
@@ -1351,8 +1306,8 @@ sub ChangeVol
 	else
 	{	$cmd=(ref $_[0])? $_[1]->direction : $_[0];
 		if	($Play_package->GetMute)	{$cmd='unmute'}
-		elsif	($cmd eq 'up')	{$cmd="+$VolInc"}
-		elsif	($cmd eq 'down'){$cmd="-$VolInc"}
+		elsif	($cmd eq 'up')	{$cmd="+$Options{VolumeStep}"}
+		elsif	($cmd eq 'down'){$cmd="-$Options{VolumeStep}"}
 	}
 	warn "volume $cmd ...\n" if $debug;
 	UpdateVol($cmd);
@@ -1369,251 +1324,256 @@ sub GetMute
 {	$Play_package->GetMute;
 }
 
-sub makeVolSlider
-{	my $opt1=$_[0];
-	my $vol=$Play_package->GetVolume;
-	my $adj=Gtk2::Adjustment->new($vol, 0, 100, 1, 10, 0);
-	my $slider=$opt1->{horizontal}? 'Gtk2::HScale' : 'Gtk2::VScale';
-	$slider=$slider->new($adj);
-	$slider->set_draw_value(FALSE) if $opt1->{hide};
-	$slider->set_digits(0);
-	$slider->set_inverted(TRUE) unless $opt1->{horizontal};
-	$slider->signal_connect(value_changed => sub { UpdateVol($_[0]->get_value); 1; });
-	return $slider
-}
-
-sub PopupVol
-{	if ($Play_package->GetVolume <0) { ErrorMessage($Play_package->GetVolumeError); return }
-	my $slider=makeVolSlider();
-	$slider->set_size_request(-1, 100);
-	my $popup=Gtk2::Window->new('popup');
-	$popup->signal_connect(leave_notify_event => sub { $popup->destroy if $_[1]->detail ne 'inferior';0; });
-	my $frame=Gtk2::Frame->new;
-	my $vbox=Gtk2::VBox->new;
-	$popup->add($frame);
-	$frame->add($vbox);
-	$vbox->add($slider);
-	$frame->set_shadow_type('out');
-	$vbox->set_border_width(5);
-	#$popup->set_modal(TRUE);
-	$popup->set_position('mouse');
-	$popup->show_all;
-	return 0;
-}
-
 sub FirstTime
-{ %SavedSorts=
-  (	_"Path,File"	=> SONG_UPATH.' '.SONG_UFILE,
-	_"Date"		=> SONG_DATE,
-	_"Title"	=> SONG_TITLE,
-	_"Last played"	=> SONG_LASTPLAY,
-	_"Artist,Album,Disc,Track"	=> join(' ',SONG_ARTIST,SONG_ALBUM,SONG_DISC,SONG_TRACK),
-	_"Artist,Date,Album,Disc,Track"	=> join(' ',SONG_ARTIST,SONG_DATE,SONG_ALBUM,SONG_DISC,SONG_TRACK),
-	_"Path,Album,Disc,Track,File"	=> join(' ',SONG_UPATH,SONG_ALBUM,SONG_DISC,SONG_TRACK,SONG_UFILE),
-  );
+{	#Default filters
+	$Options{SavedFilters}=
+	{	_"never played"		=> 'playcount:<:1',
+		_"50 Most Played"	=> 'playcount:h:50',
+		_"50 Last Played"	=> 'lastplay:h:50',
+		_"50 Last Added"	=> 'added:h:50',
+		_"Played Today"		=> 'lastplay:>:1d',
+		_"Added Today"		=> 'added:>:1d',
+		_"played>4"		=> 'playcount:>:4',
+		_"not bootleg"		=> '-label:~:bootleg',
+	};
+	$_=Filter->new($_) for values %{ $Options{SavedFilters} };
 
-  %SavedWRandoms=
-  (	_"by rating"	=> 'r1r0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1',
-	_"by play count"=> 'r-1n5',
-	_"by lastplay"	=> 'r1l10',
-	_"by added"	=> 'r-1a50',
-	_"by lastplay & play count"	=> 'r1l10'."\x1D".'-1n5',
-	_"by lastplay & bootleg"	=> 'r1l10'."\x1D".'-.5fbootleg',
-  );
-
-  #Default filters
-  %SavedFilters=
-  (	_"never played"		=> SONG_NBPLAY.'<1',
-	_"50 Most Played"	=> SONG_NBPLAY.'h50',
-	_"50 Last Played"	=> SONG_LASTPLAY.'h50',
-	_"50 Last Added"	=> SONG_ADDED.'h50',
-	_"Played Today"		=> SONG_LASTPLAY.'>1d',
-	_"Added Today"		=> SONG_ADDED.'>1d',
-	_"played>4"		=> SONG_NBPLAY.'>4',
-	_"not bootleg"		=> '-'.SONG_LABELS.'fbootleg',
-  );
-
-  %SongTree::Groupings= #FIXME
-  (	_"None"			=> '',
-	_"Artist & album"	=> 'artist|simple|album|pic',
-	_"Album with picture"	=> 'album|pic',
-	_"Album"		=> 'album|simple',
-	_"Folder"		=> 'folder|artistalbum',
-  );
-
-  if (-r $DATADIR.SLASH.'gmbrc')
-  {	open SAVETAG,'<:utf8', $DATADIR.SLASH.'gmbrc';
-	while (my $line=<SAVETAG>)
-	{	chomp $line;
-		$Options{$1}=$2 if $line=~m/^\s*([^#=][^=]*?)\s*=\s*(.+)\s*$/;
+	if (-r $DATADIR.SLASH.'gmbrc')
+	{	open my($fh),'<:utf8', $DATADIR.SLASH.'gmbrc';
+		while (my $line=<$fh>)
+		{	chomp $line;
+			$Options{$1}=$2 if $line=~m/^\s*([^#=][^=]*?)\s*=\s*(.+)\s*$/;
+		}
+		close $fh;
 	}
-	close SAVETAG;
-  }
 
-  $_=Filter->new($_) for values %SavedFilters;
-  $Labels{$_}=undef for split "\x1D",$Options{Labels};
-  $re_artist=qr/ & |, /;
+	$Labels{$_}=undef for split "\x1D",$Options{Labels};
+	$re_artist=qr/ & |, /;
+	PluginsInit();
 }
 
 
-sub ReadSavedTags	#load tags _and_ settings
-{	if (-d $SaveFile) {$SaveFile.=SLASH.'tags'}
-	unless (-r $SaveFile)
-	{	FirstTime(); return;
-	}
-	setlocale(LC_NUMERIC, 'C');
-	warn "Reading saved tags in $SaveFile ...\n";
-	open SAVETAG,'<:utf8',$SaveFile;
-	while (<SAVETAG>)
+
+sub ReadOldSavedTags
+{	my $fh=$_[0];
+	while (<$fh>)
 	{	chomp; last if $_ eq '';
 		$Options{$1}=$2 if m/^([^=]+)=(.*)$/;
 	}
 	my $oldversion=delete $Options{version} || VERSION;
-	if ($oldversion<0.9464) {delete $Options{$_} for qw/BrowserTotalMode FilterPane0Page FilterPane0min FilterPane1Page FilterPane1min LCols LSort PlayerWinPos SCols Sticky WSBrowser WSEditQueue paned StickyFilters/} #cleanup old options
+	if ($oldversion<0.9464) {delete $Options{$_} for qw/BrowserTotalMode FilterPane0Page FilterPane0min FilterPane1Page FilterPane1min LCols LSort PlayerWinPos SCols Sticky WSBrowser WSEditQueue paned StickyFilters/;} #cleanup old options
+	$Options{'123options_mpg321'}=delete $Options{'123options_mp3'};
+	$Options{'123options_ogg123'}=delete $Options{'123options_ogg'};
+	$Options{'123options_flac123'}=delete $Options{'123options_flac'};
+	delete $Options{$_} for qw/Device 123options_mp3 123options_ogg 123options_flac test/; #cleanup old options
+	delete $Options{$_} for qw/SavedSongID SavedPlayTime Lock SavedSort/; #don't bother supporting upgrade for these
+	$Options{CustomKeyBindings}= { ExtractNameAndOptions($Options{CustomKeyBindings}) };
 	if ($oldversion<0.9540)
 	{	$Options{Layout}='default player layout' if $Options{Layout} eq 'default';
 		$Options{'Layout_default player layout'}=delete $Options{Layout_default};
 	}
-	if ($oldversion<=1.0)
-	{	for my $key (grep m/^PLUGIN_MozEmbed/,keys %Options)
-		{	my $old=$key;
-			$key=~s/^PLUGIN_MozEmbed/PLUGIN_WebContext/;
-			$Options{$key}=delete $Options{$old};
-		}
-	}
-	#@Library=();
-	$Options{ArtistSplit}||=' & |, ';
+	delete $Options{$_} for grep m/^PLUGIN_MozEmbed/,keys %Options; #for versions <=1.0
+	delete $Options{RecentFilters};	#don't bother upgrading them
+	$Options{FilenameSchema}=	[split /\x1D/,$Options{FilenameSchema}];
+	$Options{FolderSchema}=		[split /\x1D/,$Options{FolderSchema}];
+	$Options{LibraryPath}= delete $Options{Path};
+	$Options{ArtistSplit}||=' & |, |;';
 	$re_artist=qr/$Options{ArtistSplit}/;
-	my $ID=my $oldID=-1; my @newIDs;
-	no warnings 'utf8'; # to prevent 'utf8 "\xE9" does not map to Unicode' type warnings about SONG_PATH and SONG_FILE which are stored as they are on the filesystem #FIXME find a better way to read lines containing both utf8 and unknown encoding
-	while (<SAVETAG>)
+
+	PluginsInit();
+
+	my $oldID=-1;
+	no warnings 'utf8'; # to prevent 'utf8 "\xE9" does not map to Unicode' type warnings about path and file which are stored as they are on the filesystem #FIXME find a better way to read lines containing both utf8 and unknown encoding
+	my ($loadsong)=Songs::MakeLoadSub({},split / /,$Songs::OLD_FIELDS);
+	my (%IDforAlbum,%IDforArtist);
+	my @newIDs; SongArray::start_init();
+	my @missing;
+	while (<$fh>)
 	{	chomp; last if $_ eq '';
 		$oldID++;
 		next if $_ eq ' ';	#deleted entry
 		s#\\([n\\])#$1 eq "n" ? "\n" : "\\"#ge unless $oldversion<0.9603;
-		my @song=split "\x1D";
-		unless ($song[SONG_UPATH] && ($song[SONG_UFILE] || $song[SONG_UPATH]=~m#^http://#) && $song[SONG_ADDED])
-		{	warn "skipping invalid song entry : @song\n";
-			next;
+		my @song=split "\x1D",$_,-1;
+
+		#FIXME PHASE1 do some checks
+		#unless ($song[SONG_UPATH] && ($song[SONG_UFILE] || $song[SONG_UPATH]=~m#^http://#) && $song[SONG_ADDED])
+		#{	warn "skipping invalid song entry : @song\n";
+		#	next;
+		#}
+		my $album=$song[11]; my $artist=$song[10];
+		$song[10]=~s/^<Unknown>$//;	#10=SONG_ARTIST
+		$song[11]=~s/^<Unknown>.*//;	#11=SONG_ALBUM
+		$song[12]=~s#/.*$##; 		##12=SONG_DISC
+		#$song[13]=~s#/.*$##; 		##13=SONG_TRACK
+		for ($song[0],$song[1]) { _utf8_off($_); $_=url_escape($_) } # file and path
+		my $ID= $newIDs[$oldID]= $loadsong->(@song);
+		$IDforAlbum{$album}=$IDforArtist{$artist}=$ID;
+
+		if (my $m=$song[24]) #FIXME PHASE1		#24=SONG_MISSINGSINCE
+		{	if ($m=~m/^\d+$/) { push @missing,$ID;next}
+			$song[24]=undef;
+			if ($m eq 'l') {push @$LengthEstimated,$ID}
+			elsif ($m eq 'R') {next}#push @Radio,$ID;next}
 		}
-		$ID++;
-		push @Songs,\@song;
-		$newIDs[$oldID]=$ID;
-		$song[SONG_PATH]=$song[SONG_UPATH];
-		$song[SONG_FILE]=$song[SONG_UFILE];
-		_utf8_off($song[SONG_PATH]);
-		_utf8_off($song[SONG_FILE]);
-		$song[SONG_UPATH]=filename_to_utf8displayname($song[SONG_PATH]);
-		$song[SONG_UFILE]=filename_to_utf8displayname($song[SONG_FILE]);
-		$GetIDFromFile{ $song[SONG_PATH] }{ $song[SONG_FILE] }=$ID;
-		if (my $m=$song[SONG_MISSINGSINCE])
-		{	if ($m=~m/^\d+$/) {AddMissing($ID);next}
-			elsif ($m eq 'l') {push @LengthEstimated,$ID}
-			elsif ($m eq 'r') {push @ToCheck,$ID}
-			elsif ($m eq 'R') {push @Radio,$ID;next}
-		}
-		elsif (!$song[SONG_MODIF]) { push @ToAdd,$ID;next; }
-		push @Library,$ID;
-		#warn $song[SONG_PATH].SLASH.$song[SONG_FILE].' not found' unless -f $song[SONG_PATH].SLASH.$song[SONG_FILE];
-		AddAA($ID); #Fill %Artist and %Album
+		#elsif (!$song[2]) { push @ToAdd,$ID;next; } #FIXME PHASE1
+		elsif (!$song[2]) { next; }	#2=SONG_MODIF
+
+		push @$Library,$ID;
+		#AA::Add($ID); #Fill %AA::Artist and %AA::Album
 	}
-	if ($oldversion<0.9581)	#fix duplicated entries caused by a trailing slash in the folder name after a move
-	{	for my $ID (@Library)
-		{	my $ref=$Songs[$ID];
-			next unless $ref->[SONG_PATH]=~m/$QSLASH$/o;
-			my $path=$ref->[SONG_PATH];
-			my $file=$ref->[SONG_FILE];
-			my $cpath=$path; $cpath=~s/$QSLASH+$//o;
-			my $dupID=$GetIDFromFile{ $cpath }{ $file };
-			if (defined $dupID)
-			{	if ($Songs[$dupID][SONG_MISSINGSINCE] && $Songs[$dupID][SONG_MISSINGSINCE]=~m/^\d+$/)
-				{	RemoveMissing($dupID);
-					$Songs[$dupID]=undef;
-				}
-				else
-				{	RemoveAA($ID,$Songs[$ID]);
-					delete $GetIDFromFile{$path}{$file};
-					$Songs[$ID]=undef;
-					next;
-				}
-			}
-			$ref->[SONG_PATH]=$cpath;
-			$ref->[SONG_UPATH]=filename_to_utf8displayname($cpath);
-			$GetIDFromFile{$cpath}{$file}=delete $GetIDFromFile{$path}{$file};
-		}
-		@Library= grep $Songs[$_], @Library;
-		for my $p (keys %GetIDFromFile) { delete $GetIDFromFile{$p} unless keys %{ $GetIDFromFile{$p} }; }
-		for (@newIDs) { $newIDs[$_]=undef unless $Songs[ $newIDs[$_] ]; }
-	}
-	while (<SAVETAG>)
+	Songs::AddMissing(\@missing) if @missing;
+	while (<$fh>)
 	{	chomp; last if $_ eq '';
 		my ($key,$p)=split "\x1D";
 		next if $p eq '';
 		_utf8_off($p);
-		$Artist{$key}[AAPIXLIST]=$p if exists $Artist{$key};
+		my $ID=$IDforArtist{$key};
+		next unless defined $ID;
+		my $gid=Songs::Get_gid($ID,'artist');
+		Songs::Picture($gid,'artist_picture','set',$p);
 	}
-	while (<SAVETAG>)
+	while (<$fh>)
 	{	chomp; last if $_ eq '';
 		my ($key,$p)=split "\x1D";
 		next if $p eq '';
 		_utf8_off($p);
-		#warn $p.' not found' unless -f $p;
-		$Album{$key}[AAPIXLIST]=$p if exists $Album{$key};
+		my $ID=$IDforAlbum{$key};
+		next unless defined $ID;
+		my $gid=Songs::Get_gid($ID,'album');
+		Songs::Picture($gid,'album_picture','set',$p);
 	}
-	%SavedFilters=();
-	%SavedSorts=();
-	%SavedWRandoms=();
-	%SavedLists=();
-	%SongTree::Groupings=();
-	while (<SAVETAG>)
-	{	chomp;# last if $_ eq '';
+	$Options{$_}={} for qw/SavedFilters SavedSorts SavedWRandoms SavedLists SavedSTGroupings/;
+	while (<$fh>)
+	{	chomp;
 		my ($key,$val)=split "\x1D",$_,2;
 		$key=~s/^(.)//;
 		if ($1 eq 'F')
-		{	$SavedFilters{$key}=Filter->new($val);
+		{	$val=~s/(?:^|\x1D)-?(\d+)?(\D)/(defined $1? Songs::FieldUpgrade($1) : '').":$2:"/ge;
+			$Options{SavedFilters}{$key}=Filter->new($val);
 		}
 		elsif ($1 eq 'S')
-		{	$SavedSorts{$key}=$val;
+		{	$Options{SavedSorts}{$key}=$val;
 		}
 		elsif ($1 eq 'R')
-		{	$SavedWRandoms{$key}=$val;
+		{	$Options{SavedWRandoms}{$key}=$val;
 		}
 		elsif ($1 eq 'L')
-		{	$SavedLists{$key}=[grep defined,map $newIDs[$_],split / /,$val];
+		{	$Options{SavedLists}{$key}= SongArray->new_from_string($val);
 		}
 		elsif ($1 eq 'G')
-		{	$SongTree::Groupings{$key}=$val;
+		{	$Options{SavedSTGroupings}{$key}=$val;
 		}
 	}
-	close SAVETAG;
 
-	@Recent= grep defined,map $newIDs[$_],split / /,delete $Options{RecentIDs} if exists $Options{RecentIDs};
 	if (my $f=delete $Options{LastPlayFilter})
-	{	if ($Options{RememberPlayFilter} && $f=~s/^(filter|savedlist|list) //)
-		{	if ($1 eq 'filter') {$SelectedFilter=Filter->new($f)}
-			elsif ($1 eq 'savedlist') {$ListMode=$f}
-			elsif ($1 eq 'list') {$ListMode=[grep defined,map $newIDs[$_],split / /,$f]}
+	{	if ($f=~s/^(filter|savedlist|list) //)
+		{	$Options{LastPlayFilter}=
+			$1 eq 'filter' ?	Filter->new($f) :
+			$1 eq 'savedlist' ?	$f		:
+			$1 eq 'list' ?		SongArray->new_from_string($f):
+			undef;
 		}
 	}
+	$Options{Labels}=delete $Options{Flags} if $oldversion<=0.9571;
+	s/^r/random:/ || s/([0-9s]+)(i?)/($1 eq 's' ? 'shuffle' : Songs::FieldUpgrade($1)).($2 ? ':i' : '')/ge
+		for values %{$Options{SavedSorts}},values %{$Options{SavedWRandoms}},$Options{Sort},$Options{AltSort};
+	$Options{Sort_LastOrdered}=$Options{Sort_LastSR}= delete $Options{AltSort};
+	if ($Options{Sort}=~m/random|shuffle/) { $Options{Sort_LastSR}=$Options{Sort} } else { $Options{Sort_LastOrdered}=$Options{Sort}||'path file'; }
+
+	$Options{SongArray_Recent}= SongArray->new_from_string(delete $Options{RecentIDs});
+	#FIXME PHASE1   Missing ?
+	SongArray::updateIDs(\@newIDs);
+	SongArray->new($Library);	#done after SongArray::updateIDs because doesn't use old IDs
+	$Options{SongArray_Estimated}=SongArray->new($LengthEstimated);
+}
+
+sub ReadSavedTags	#load tags _and_ settings
+{	if (-d $SaveFile) {$SaveFile.=SLASH.'gmbrc'}
+	unless (-r $SaveFile)
+	{	FirstTime();
+		Post_ReadSavedTags();
+		return;
+	}
+	setlocale(LC_NUMERIC, 'C');  # so that '.' is used as a decimal separator when converting numbers into strings
+	warn "Reading saved tags in $SaveFile ...\n";
+	open my($fh),'<:utf8',$SaveFile;
+
+	# read first line to determine if old version, old version starts with a letter, new with blank or # (for comments) or [ (section name)
+	my $firstline=<$fh>;
+	seek $fh,0,SEEK_SET;
+	if ($firstline=~m/^\w/) { ReadOldSavedTags($fh); }
+	else
+	{	my %lines;
+		my $section;
+		no warnings 'utf8'; # to prevent 'utf8 "\xE9" does not map to Unicode' type warnings about path and file which are stored as they are on the filesystem #FIXME find a better way to read lines containing both utf8 and unknown encoding
+		while (<$fh>)
+		{	if (m/^\[([^]]+)\]/) {$section=$1; next}
+			next unless $section;
+			chomp;
+			next unless length;
+			push @{$lines{$section}},$_;
+		}
+		close $fh;
+		# FIXME do someting clever if no [Options]
+		ReadRefFromLines($lines{Options},\%Options);
+		my $oldversion=delete $Options{version} || VERSION;
+		$Options{ArtistSplit}||=' & |, |;';
+		$re_artist=qr/$Options{ArtistSplit}/;
+
+		PluginsInit();
+
+		my $songs=$lines{Songs};
+		my $fields=shift @$songs;
+		my ($loadsong,$extra_sub)=Songs::MakeLoadSub(\%lines,split / /,$fields);
+		my @newIDs; SongArray::start_init();
+		while (my $line=shift @$songs)
+		{	my ($oldID,@vals)= split "\x1D", $line,-1;
+			s#\\x([0-9a-fA-F]{2})#chr hex $1#g for @vals;
+			$newIDs[$oldID]= $loadsong->(@vals);
+		}
+		#load fields properties, like album pictures ...
+		for my $extra (keys %$extra_sub)
+		{	my $lines=$lines{$extra};
+			next unless $lines;
+			shift @$lines;	#my @properties=split / /, shift @$lines;
+			my $sub=$extra_sub->{$extra};
+			while (my $line=shift @$lines)
+			{	my ($key,@vals)= split "\x1D", $line,-1;
+				s#\\x([0-9a-fA-F]{2})#chr hex $1#g for @vals;
+				$sub->($key,@vals);
+			}
+		}
+		SongArray::updateIDs(\@newIDs);
+		my $filter=Filter->new('missing:e:0');
+		$Library= SongArray->new( $filter->filter([1..$Songs::LastID]) );
+	}
+
+	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};
+	@$Queue=() unless $Options{RememberQueue};
 	if ($Options{RememberPlayFilter})
 	{	$TogLock=$Options{Lock};
 	}
-	if ($Options{RememberPlaySong} && exists $Options{SavedSongID})
-	 { $SongID=$newIDs[delete $Options{SavedSongID}]; }
+	if ($Options{RememberPlaySong} && $Options{SavedSongID})
+	 { $SongID= (delete $Options{SavedSongID})->[0]; }
 	if ($Options{RememberPlaySong} && $Options{RememberPlayTime}) { $PlayTime=delete $Options{SavedPlayTime}; }
-	_utf8_off($Options{Path});
-	$Options{Path}||='';
-	@LibraryPath=	split "\x1D",$Options{Path};
-	s/\x00+$// for @LibraryPath; #FIXME ugly fix for paths ending with special char and not encoded in utf8, some \x00 are added when read with :utf8
-	$Options{Labels}=delete $Options{Flags} if $oldversion<=0.9571;
-	$Labels{$_}=undef for split "\x1D",$Options{Labels};
-	%CustomBoundKeys=%{ make_keybindingshash($Options{CustomKeyBindings}) };
+	_utf8_off($Options{LibraryPath});
+	$Options{LibraryPath}||='';
+	@LibraryPath=	split "\x1D",$Options{LibraryPath};
+	s/\x00+$// for @LibraryPath; #FIXME ugly fix for paths ending with special char and not encoded in utf8, some \x00 are added when read with :utf8, (caused by the extraction by regex from a string flagged utf8)
+	$Labels{$_}=undef for split "\x1D",$Options{Labels}; #FIXME
+	#&launchIdleLoop;
+
 	setlocale(LC_NUMERIC, '');
-	&launchIdleLoop unless defined $IdleLoop;
-	UpdateAAYear();
-	AddFullscreenButton() if $Options{AddFullscreenButton};
 	warn "Reading saved tags in $SaveFile ... done\n";
+	Post_ReadSavedTags();
 }
+sub Post_ReadSavedTags
+{	$Library||= SongArray->new;
+	$Recent= $Options{SongArray_Recent}	||= SongArray->new;
+	$Queue=  $Options{SongArray_Queue}	||= SongArray->new;
+	$LengthEstimated=  $Options{SongArray_Estimated}	||= SongArray->new;
+}
+
 sub SaveTags	#save tags _and_ settings
 {	HasChanged('Save');
 	warn "Writing tags in $SaveFile ...\n";
@@ -1621,17 +1581,12 @@ sub SaveTags	#save tags _and_ settings
 	my $savedir=$SaveFile;
 	$savedir=~s/([^$QSLASH]+)$//o;
 	my $savefilename=$1;
-	mkdir $savedir if $savedir ne '' && !-d $savedir;
+	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
 	$Options{Lock}= $TogLock || '';
-	if ($ListMode)	{ $Options{LastPlayFilter}=ref $ListMode? 'list '.join(' ',@$ListMode)
-								: 'savedlist '.$ListMode;
-			}
-	elsif ($SelectedFilter) { $Options{LastPlayFilter}='filter '.$SelectedFilter->{string}; }
-	$Options{Labels}=join "\x1D",sort keys %Labels;
+	$Options{Labels}=join "\x1D",@{SortedLabels()};
 	$Options{Path}  =join "\x1D",@LibraryPath;
 	_utf8_on($Options{Path});
-	$Options{RecentIDs}=join ' ',@Recent;
-	$Options{SavedSongID}=$SongID if $Options{RememberPlaySong} && defined $SongID;
+	$Options{SavedSongID}= SongArray->new([$SongID]) if $Options{RememberPlaySong} && defined $SongID;
 
 	$Options{SavedOn}= time;
 
@@ -1645,90 +1600,56 @@ sub SaveTags	#save tags _and_ settings
 	for my $key (grep m/^Layout_/, keys %Options) #cleanup options for layout that haven't been seen for a while
 	{	$key=~s/^Layout_//;
 		my $key2='LayoutLastSeen_'.$key;
-		if (exists $Layout::Layouts{$key}) { delete $Options{$key2}; }
-		elsif (!$Options{$key2})	{ $Options{$key2}=$DAYNB; }
-		elsif ($Options{$key2}<$tooold)	{ delete $Options{$_} for $key,$key2; }
+		if 	(exists $Layout::Layouts{$key})	{ delete $Options{$key2}; }
+		elsif	(!$Options{$key2})		{ $Options{$key2}=$DAYNB; }
+		elsif	($Options{$key2}<$tooold)	{ delete $Options{$_} for $key,$key2; }
 	}
 
 	my $error;
-	open SAVETAG,'>:utf8',$SaveFile.'.new' or warn "Error opening '$SaveFile.new' for writing : $!";
-	for my $key (sort keys %Options)
-	{	print SAVETAG $key.'='.$Options{$key}."\n"  or $error++;
+	open my($fh),'>:raw',$SaveFile.'.new' or warn "Error opening '$SaveFile.new' for writing : $!";
+	my $optionslines=SaveRefToLines(\%Options);
+	print $fh "[Options]\n$$optionslines\n"  or $error||=$!;
+
+	my ($savesub,$fields,$extrasub,$extra_subfields)=Songs::MakeSaveSub();
+	print $fh "[Songs]\n@$fields\n"  or $error||=$!;
+	for my $ID (@{ Songs::AllFilter('missing:<:'.($tooold||1)) })
+	{	use bytes; #mixing utf8 and non-utf8 strings !!
+		my @vals=$savesub->($ID);
+		s#([\x1D\n\t\\])#sprintf "\\x%02x",ord $1#eg for @vals;
+		my $line= join "\x1D", $ID, @vals;
+		print $fh $line."\n"  or $error||=$!;
 	}
-	print SAVETAG "\n"  or $error++;
-	no warnings 'uninitialized';
-	for my $song (@Songs)
-	{	if (!$song || ($$song[SONG_MISSINGSINCE] && ($$song[SONG_MISSINGSINCE]=~m/^\d/ && $$song[SONG_MISSINGSINCE]<$tooold) || $$song[SONG_MISSINGSINCE]=~m/T/ ))
-		{ print SAVETAG " \n"  or $error++;next; }
-		_utf8_on($$song[SONG_PATH]);
-		_utf8_on($$song[SONG_FILE]);
-		my $line=join "\x1D",@$song[@SAVEDFIELDS];
-		_utf8_off($$song[SONG_PATH]); #FIXME ugly
-		_utf8_off($$song[SONG_FILE]); #FIXME
-		$line=~s#\\#\\\\#g; $line=~s#\n#\\n#g;
-		if ($line eq '') {warn "trying to save empty Song entry" if $debug;next}
-		print SAVETAG $line."\n"  or $error++;
+	#save fields properties, like album pictures ...
+	for my $field (sort keys %$extrasub)
+	{	print $fh "\n[$field]\n$extra_subfields->{$field}\n"  or $error++;
+		my $h= $extrasub->{$field}->();
+		for my $key (sort keys %$h)
+		{	use bytes; #mixing utf8 and non-utf8 strings !! # needed ? #CHECKME
+			my $vals= $h->{$key};
+			s#([\x1D\n\t\\])#sprintf "\\x%02x",ord $1#eg for @$vals;
+			my $line= join "\x1D", $key, @$vals;
+			print $fh $line."\n"  or $error||=$!;
+		}
 	}
-	print SAVETAG "\n"  or $error++;
-	while ( my ($a,$ref)=each %Artist )
-	{	my $p=$ref->[AAPIXLIST];
-		next unless defined $p;
-		_utf8_on($p);
-		next unless @$ref[AALIST];
-		print SAVETAG join("\x1D",$a,$p)."\n"  or $error++;
-	}
-	print SAVETAG "\n"  or $error++;
-	while ( my ($a,$ref)=each %Album )
-	{	my $p=$ref->[AAPIXLIST];
-		next unless defined $p;
-		_utf8_on($p);
-		next unless @$ref[AALIST];
-		print SAVETAG join("\x1D",$a,$p)."\n"  or $error++;
-	}
-	use warnings 'uninitialized';
-	print SAVETAG "\n"  or $error++;
-	for my $name (sort keys %SavedFilters)
-	{	my $val=$SavedFilters{$name}; next unless defined $val;
-		print SAVETAG "F$name\x1D".$val->{string}."\n"  or $error++;
-	}
-	for my $name (sort keys %SavedSorts)
-	{	my $val=$SavedSorts{$name}; next unless defined $val;
-		print SAVETAG "S$name\x1D$val\n"  or $error++;
-	}
-	for my $name (sort keys %SavedWRandoms)
-	{	my $val=$SavedWRandoms{$name}; next unless defined $val;
-		print SAVETAG "R$name\x1D$val\n"  or $error++;
-	}
-	for my $name (sort keys %SavedLists)
-	{	my $val=$SavedLists{$name}; next unless defined $val;
-		print SAVETAG "L$name\x1D".join(' ',@$val)."\n"  or $error++;
-	}
-	for my $name (sort keys %SongTree::Groupings)
-	{	my $val=$SongTree::Groupings{$name}; next unless defined $val;
-		print SAVETAG "G$name\x1D$val\n"  or $error++;
-	}
-	close SAVETAG  or $error++;
+	close $fh  or $error||=$!;
 	setlocale(LC_NUMERIC, '');
 	if ($error)
 	{	rename $SaveFile.'.new',$SaveFile.'.error';
-		warn "Writing tags in $SaveFile ... error\n";
+		warn "Writing tags in $SaveFile ... error : $error\n";
 		return;
 	}
-	if (-e $SaveFile)
+	if (-e $SaveFile) #keep some old files as backup
 	{	{	last unless -e $SaveFile.'.bak';
 			last unless (open my $file,'<',$SaveFile.'.bak');
 			local $_; my $date;
 			while (<$file>) { if (m/^SavedOn=(\d+)/) {$date=$1;last} last unless m/=/}
 			close $file;
 			last unless $date;
-			last unless $date>20100000; #for version 0.9623, used a different SavedOn format #DELME
 			my ($day,$month,$year)=(localtime($date))[3,4,5];
 			$date= sprintf '%04d%02d%02d',$year+1900,$month+1,$day;
 			last if -e $SaveFile.'.bak.'.$date;
 			rename $SaveFile.'.bak', $SaveFile.'.bak.'.$date;
-			opendir my($dh), $savedir;
-			my @files=sort grep m/^\Q$savefilename\E\.bak\.\d{8}$/, readdir $dh;
-			closedir $dh;
+			my @files=FileList(qr/^\Q$savefilename\E\.bak\.\d{8}$/, $savedir);
 			last unless @files>5;
 			splice @files,-5;	#keep the 5 newest versions
 			unlink $savedir.SLASH.$_ for @files;
@@ -1739,8 +1660,134 @@ sub SaveTags	#save tags _and_ settings
 	warn "Writing tags in $SaveFile ... done\n";
 }
 
+sub ReadRefFromLines	# convert a string written by SaveRefToLines to a hash/array # can only read a small subset of YAML
+{	my ($lines,$return)=@_;
+	my @todo;
+	my ($ident,$ref)=(0,$return);
+	my $parentval;
+	for my $line (@$lines)
+	{	next if $line=~m/^\s*#/;
+		my ($d,$array,$key,$val)= $line=~m/^(\s*)(?:(-)|(?:(\S*|"[^"]*")\s*:))\s+(.*)$/;
+		$d= length $d;
+		if ($parentval)
+		{	next unless $d>=$ident;
+			push @todo, $ref,$ident;
+			$ident=$d;
+			$ref=$$parentval= $array ? [] : {};
+			$parentval=undef;
+		}
+		elsif ($ident-$d)
+		{	next unless $ident>$d;
+			while ($ident>$d) { $ident=pop @todo; $ref=pop @todo; }
+		}
+		if (!$array && $key=~s/^"//) { $key=~s/"$//; $key=~s#\\x([0-9a-fA-F]{2})#chr hex $1#ge; }
+		$val=~s/\s+$//;
+		if ($val eq '')
+		{	$parentval= $array ? \$ref->[@$ref] : \$ref->{$key};
+		}
+		else
+		{	my $class;
+			if ($val=~m/^!/)
+			{	($class,$val)= $val=~m/^!([^ !]+)\s+(.*)$/;
+				unless ($class) { warn "Unsupported value : '$val'\n"; next }
+			}
+			if ($val eq '~') {$val=undef}
+			elsif ($val=~m/^'(.*)'$/) {$val=$1; $val=~s/''/'/g; }
+			elsif ($val=~m/^"(.*)"$/)
+			{	$val=$1;
+				$val=~s/\\"/"/g;
+				$val=~s#\\x([0-9a-fA-F]{2})#chr hex $1#ge;
+			}
+			elsif ($val eq '[]') {$val=[];}
+			elsif ($val eq '{}') {$val={};}
+			if ($class)	{ $val= $class->new_from_string($val); }
+			if ($array)	{ push @$ref,$val; }
+			else		{ $ref->{$key}=$val; }
+		}
+	}
+	return @todo ? $todo[0] : $ref;
+}
+
+
+sub SaveRefToLines	#convert hash/array into a YAML string readable by ReadRefFromLines
+{	my $ref=$_[0];
+	my (@todo,$keylist);
+	my $lines='';
+	my $pre='';
+	my $depth=0;
+	if (ref $ref eq 'ARRAY'){ $keylist=0; }
+	else			{ $keylist=[sort keys %$ref]; }
+	while (1)
+	{	my ($val,$next,$up);
+		if (ref $ref eq 'ARRAY')
+		{	if ($keylist<@$ref)
+			{	$val=$ref->[$keylist++];
+				$lines.= $pre.'- ';
+				$next=$val if ref $val;
+			}
+			else {$up=1}
+		}
+		else #HASH
+		{	if (@$keylist)
+			{	my $key=shift @$keylist;
+				$val=$ref->{$key};
+				if ($key eq '') {$key='""'}
+				elsif ($key=~m/[\x00-\x1f\n:# ]/ || $key=~m#^\W#)
+				{	$key=~s/([\x00-\x1f\n"\\])/sprintf "\\x%02x",ord $1/ge;
+					$key=qq/"$key"/;
+				}
+				$lines.= $pre.$key.': ';
+				$next=$val if ref $val;
+			}
+			else {$up=1}
+		}
+		if ($next)
+		{	if (ref $next ne 'ARRAY' && ref $next ne 'HASH')
+			{	$val=$next->save_to_string;
+				$lines.= '!'.ref($next).' ';
+			}
+			else
+			{	if (ref $next eq 'ARRAY' && !@$next)		{ $lines.="[]\n";next; }
+				elsif (ref $next eq 'HASH' && !keys(%$next))	{ $lines.="{}\n";next; }
+				$lines.="\n";
+				$depth++;
+				$pre='  'x$depth;
+				unshift @todo,$ref,$keylist;
+				$ref=$next;
+				if (ref $ref eq 'ARRAY'){ $keylist=0; }
+				else			{ $keylist=[sort keys %$ref]; }
+				next;
+			}
+		}
+		elsif ($up)
+		{	if ($depth)
+			{	$depth--;
+				$pre='  'x$depth;
+				$ref=shift @todo;
+				$keylist=shift @todo;
+				next;
+			}
+			else {last}
+		}
+		if (!defined $val) {$val='~'}
+		elsif ($val eq '') {$val="''"}
+		elsif ($val=~m/[\x00-\x1f\n:#]/ || $val=~m#^'#)
+		{	$val=~s/([\x00-\x1f\n"\\])/sprintf "\\x%02x",ord $1/ge;
+			$val=qq/"$val"/;
+		}
+		elsif ($val=~m/^\W/ || $val=~m/\s$/)
+		{	$val=~s/'/''/g;
+			$val="'$val'";
+		}
+		$lines.= $val."\n";
+	}
+	return \$lines;
+}
+
 sub SetWSize
 {	my ($win,$wkey)=@_;
+	$win->set_role($wkey);
+	$win->set_name($wkey);
 	$wkey='WS'.$wkey;
 	$win->resize(split ' ',$Options{$wkey},2) if $Options{$wkey};
 	$win->signal_connect(unrealize => sub
@@ -1805,8 +1852,7 @@ sub Play
 	$StartedAt=$sec||0;
 	$StartTime=time;
 	$PlayingID=$SongID;
-	my $f=$Songs[$SongID][SONG_PATH].SLASH.$Songs[$SongID][SONG_FILE];
-	$Play_package->Play($f,$sec);
+	$Play_package->Play( Songs::GetFullFilename($SongID), $sec);
 	$TogPlay=1;
 	UpdateTime(0);
 	HasChanged('Playing');
@@ -1838,7 +1884,7 @@ sub ErrorPlay
 }
 
 sub end_of_file_faketime
-{	UpdateTime($Songs[$SongID][SONG_LENGTH]);
+{	UpdateTime( Songs::Get($SongID,'length') );
 	end_of_file();
 }
 
@@ -1881,10 +1927,11 @@ sub UpdateTime
 sub TimeString
 {	return '--:--' unless defined $PlayTime;
 	my $time=$PlayTime;
-	my $f=($Songs[$SongID][SONG_LENGTH]<600)? '%01d:%02d' : '%02d:%02d';
+	my $l=Songs::Get($SongID,'length');
+	my $f=($l<600)? '%01d:%02d' : '%02d:%02d';
 	if ($_[0])
 	{	$f='-'.$f;
-		$time= $Songs[$SongID][SONG_LENGTH]-$time;
+		$time= $l-$time;
 	}
 	return sprintf $f,$time/60,$time%60;
 }
@@ -1901,142 +1948,146 @@ sub Played
 	undef $PlayingID;
 	warn "Played : $ID $StartTime $StartedAt $PlayTime\n" if $debug;
 	#add song to recently played list
-	unless (@Recent && $Recent[0]==$ID)
-	{	unshift @Recent,$ID;
-		pop @Recent if @Recent>80;
+	unless (@$Recent && $Recent->[0]==$ID)
+	{	$Recent->Unshift([$ID]);	#FIXME make sure it's not too slow, put in a idle ?
+		$Recent->Pop if @$Recent>80;	#
 	}
 
 	return unless defined $PlayTime;
-	$PlayedPartial= $PlayTime-$StartedAt < $Options{PlayedPercent}*$Songs[$ID][SONG_LENGTH];
+	$PlayedPartial=$PlayTime-$StartedAt < $Options{PlayedPercent} * Songs::Get($ID,'length');
 	if ($PlayedPartial) #FIXME maybe only count as a skip if played less than ~20% ?
-	{	$Songs[$ID][SONG_NBSKIP]++;
-		$Songs[$ID][SONG_LASTSKIP]=$StartTime;
-		SongChanged($ID,SONG_NBPLAY,SONG_LASTSKIP);
+	{	my $nb= 1+Songs::Get($ID,'skipcount');
+		Songs::Set($ID, skipcount=> $nb, lastskip=> $StartTime);
 	}
 	else
-	{	$Songs[$ID][SONG_NBPLAY]++;
-		$Songs[$ID][SONG_LASTPLAY]=$StartTime;
-		SongChanged($ID,SONG_NBPLAY,SONG_LASTPLAY);
+	{	my $nb= 1+Songs::Get($ID,'playcount');
+		Songs::Set($ID, playcount=> $nb, lastplay=> $StartTime);
 	}
 }
 
-sub Get_PPSQ_Icon
-{	my ($ID,$not)=($_[0],$_[1]);
+sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, or undef if none applies
+{	my $ID=$_[0];
+	my $playlist_row=$_[1]; # facultative
+	my $currentsong=defined $playlist_row ?
+				defined $Position && $Position==$playlist_row :
+				defined $SongID && $ID==$SongID ;
 	return
-	 defined $::SongID && !$not && $ID==$::SongID ?
-	 (	$::TogPlay		? 'gtk-media-play' :
-		defined $::TogPlay	? 'gtk-media-pause':
+	 $currentsong ?
+	 (	$TogPlay		? 'gtk-media-play' :
+		defined $TogPlay	? 'gtk-media-pause':
 		'gtk-media-stop'
 	 ) :
-	 (@::Queue && grep $ID==$_, @::Queue) ? 'gmb-queue' : undef;
+	 @$Queue && $Queue->IsIn($ID) ?
+	 do{	my $n;
+		if ($NBQueueIcons)
+		{	my $max= $#$Queue; $max=$NBQueueIcons if $NBQueueIcons < $max;
+			$n= first { $Queue->[$_]==$ID } 0..$max;
+		}
+		$n ? "gmb-queue$n" : 'gmb-queue';
+	 } : undef;
 }
 
 sub ClearQueue
-{	@Queue=();
+{	$Queue->Replace();
 	$QueueAction='';
-	HasChanged('Queue');
+	HasChanged('QueueAction');
 }
 sub ShuffleQueue
 {	my @rand;
-	push @rand,rand for 0..$#Queue;
-	@Queue=map $Queue[$_], sort { $rand[$a] <=> $rand[$b] } 0..$#Queue;
-	HasChanged('Queue');
+	push @rand,rand for 0..$#$Queue;
+	$Queue->Replace([map $Queue->[$_], sort { $rand[$a] <=> $rand[$b] } 0..$#$Queue]);
 }
 
-sub EnqueueAlbum
-{	my $key=$Songs[shift][SONG_ALBUM];
-	Enqueue( @{$Album{$key}[AALIST]} );
-}
-sub EnqueueArtist
-{	my @l=split /$re_artist/o, $Songs[shift][SONG_ARTIST];
-	my %h; $h{$_}=undef for map @{$Artist{$_}[AALIST]}, @l;
-	Enqueue( keys %h );
+sub EnqueueSame
+{	my ($field,$ID)=@_;
+	my $filter=Songs::MakeFilterFromID($field,$ID);
+	EnqueueFilter($filter);
 }
 sub EnqueueFilter
 {	my $l=$_[0]->filter;
+	SortList($l) if @$l>1;
 	Enqueue(@$l);
 }
 sub Enqueue
 {	my @l=@_;
 	SortList(\@l) if @l>1;
 	@l=grep $_!=$SongID, @l  if @l>1 && defined $SongID;
-	push @Queue,@l;
+	$Queue->Push(\@l);
 	# ToggleLock($TogLock) if $TogLock;	#unset lock
-	HasChanged(Queue=>'push');
-	IdleDo('1_QAuto',10,\&QWaitAutoPlay) if $QueueAction eq 'wait' && !$TogPlay;
 }
 sub ReplaceQueue
-{	@Queue=();
-	HasChanged('Queue');
+{	$Queue->Replace();
 	&Enqueue; #keep @_
-}
-sub QWaitAutoPlay
-{	return if $TogPlay || !@Queue;
-	Select(song => (shift @Queue), play=>1);
-	HasChanged(Queue => 'shift');
 }
 sub EnqueueAction
 {	$QueueAction=shift;
-	if ($QueueAction eq 'autofill')	{ Watch({},'Queue',sub { IdleDo('1_QAuto',10,\&QAutoFill,$_[0]); }); }
-	HasChanged(Queue=>'action');
+	if ($QueueAction eq 'autofill')	{ QAutoFill(); }
+	HasChanged('QueueAction');
 }
 sub QAutoFill
-{	my $hash=shift;
-	if ($hash && ($QueueAction ne 'autofill')) { UnWatch($hash,'Queue'); return }
-	my $nb=$Options{MaxAutoFill}-@Queue;
+{	return unless $QueueAction eq 'autofill';
+	my $nb=$Options{MaxAutoFill}-@$Queue;
 	return unless $nb>0;
-	my $mode=$RandomMode? $Options{Sort} : 'r';
-	my $r=Random->new($mode);
-	$r->MakeRandomList(\@ListPlay);
-	my @IDs=$r->Draw($nb,\@Queue);
+	# FIXME shuffle list if !$RandomMode instead of using Random ?
+	my $random= $RandomMode ||  Random->new('random:',$ListPlay);
+	my @IDs=$random->Draw($nb,$Queue);
 	return unless @IDs;
-	push @Queue,@IDs;
-	HasChanged(Queue=>'push');
+	$Queue->Push(\@IDs);
+}
+sub QWaitAutoPlay
+{	return unless $QueueAction eq 'wait';
+	return if $TogPlay || !@$Queue;
+	Select(song => ($Queue->Shift), play=>1);
 }
 
 sub GetNeighbourSongs
 {	my $nb=shift;
 	UpdateSort() if $ToDo{'8_updatesort'};
-	my $begin=$Position-$nb;
-	my $end=$Position+$nb;
+	my $pos=$Position||0;
+	my $begin=$pos-$nb;
+	my $end=$pos+$nb;
 	$begin=0 if $begin<0;
-	$end=$#ListPlay if $end>$#ListPlay;
-	return @ListPlay[$begin..$end];
+	$end=$#$ListPlay if $end>$#$ListPlay;
+	return @$ListPlay[$begin..$end];
 }
 
 sub PrevSongInPlaylist
 {	UpdateSort() if $ToDo{'8_updatesort'};
-	if ($Position==0)
+	my $pos=$Position;
+	if (!defined $pos) { $pos=0; if ($RandomMode) {} }	#FIXME PHASE1 in case random
+	if ($pos==0)
 	{	return unless $Options{Repeat};
-		$Position=$#ListPlay;
+		$pos=$#$ListPlay;
 	}
-	else { $Position-- }
-	UpdateSongID();
+	else { $pos--; }
+	SetPosition($pos);
 }
 sub NextSongInPlaylist
 {	UpdateSort() if $ToDo{'8_updatesort'};
-	if ($Position==$#ListPlay)
+	my $pos=$Position;
+	if (!defined $pos) { $pos=0;  if ($RandomMode) {} }	#FIXME PHASE1 in case random
+	if ($pos==$#$ListPlay)
 	{	return unless $Options{Repeat};
-		$Position=0;
+		$pos=0;
 	}
-	else { $Position++ }
-	UpdateSongID();
+	else { $pos++ }
+	SetPosition($pos);
 }
 
 sub GetNextSongs
 {	my $nb=shift||1;
 	my $list=($nb>1)? 1 : 0;
 	my @IDs;
-	{ if (@Queue)
-	  {	unless ($list) { my $ID=shift @Queue; HasChanged('Queue','shift'); return $ID; }
+	{ if (@$Queue)
+	  {	unless ($list) { my $ID=$Queue->Shift; return $ID; }
 		push @IDs,_"Queue";
-		if ($nb>@Queue) { push @IDs,@Queue; $nb-=@Queue; }
-		else { push @IDs,@Queue[0..$nb-1]; last; }
+		if ($nb>@$Queue) { push @IDs,@$Queue; $nb-=@$Queue; }
+		else { push @IDs,@$Queue[0..$nb-1]; last; }
 	  }
 	  if ($QueueAction)
 	  {	push @IDs, $list ? $QActions{$QueueAction}[2] : $QueueAction;
 		unless ($list || $QueueAction eq 'wait')
-		 { $QueueAction=''; HasChanged('Queue','action'); }
+		 { $QueueAction=''; HasChanged('QueueAction'); }
 		last;
 	  }
 	  if ($RandomMode)
@@ -2044,20 +2095,20 @@ sub GetNextSongs
 		push @IDs,$RandomMode->Draw($nb,(defined $SongID? [$SongID] : undef));
 		last;
 	  }
-	  return undef unless @ListPlay;
+	  return undef unless @$ListPlay;
 	  UpdateSort() if $ToDo{'8_updatesort'};
 	  my $pos;
-	  $pos=FindPositionSong( $IDs[-1] ) if @IDs;
-	  $pos=$Position unless defined $pos;
+	  $pos=FindPositionSong( $IDs[-1],$ListPlay ) if @IDs;
+	  $pos=$Position||0 unless defined $pos;
 	  push @IDs,_"next" if $list;
 	  while ($nb)
-	  {	if ( $pos+$nb > $#ListPlay )
-		{	push @IDs,@ListPlay[$pos+1..$#ListPlay];
+	  {	if ( $pos+$nb > $#$ListPlay )
+		{	push @IDs,@$ListPlay[$pos+1..$#$ListPlay];
 			last unless $Options{Repeat}; #FIXME repeatlock modes
-			$nb-=$#ListPlay-$pos;
+			$nb-=$#$ListPlay-$pos;
 			$pos=-1;
 		}
-		else { push @IDs,@ListPlay[$pos+1..$pos+$nb]; last; }
+		else { push @IDs,@$ListPlay[$pos+1..$pos+$nb]; last; }
 	  }
 	}
 	return $list ? @IDs : $IDs[0];
@@ -2068,17 +2119,17 @@ sub GetPrevSongs
 	my $list=($nb>1)? 1 : 0;
 	my @IDs;
 	push @IDs,_"Recently played" if $list;
-	if ($nb>@Recent) { push @IDs,@Recent; }
-	else { push @IDs,@Recent[0..$nb-1]; }
+	if ($nb>@$Recent) { push @IDs,@$Recent; }
+	else { push @IDs,@$Recent[0..$nb-1]; }
 	return $list ? @IDs : $IDs[0];
 }
 
 sub PrevSong
 {	#my $ID=GetPrevSongs();
-	return if @Recent==0;
+	return if @$Recent==0;
 	$RecentPos||=0;
-	if ($SongID==$Recent[$RecentPos]) {$RecentPos++}
-	my $ID=$Recent[$RecentPos];
+	if ($SongID==$Recent->[$RecentPos]) {$RecentPos++}
+	my $ID=$Recent->[$RecentPos];
 	return unless defined $ID;
 	$RecentPos++;
 	Select(song => $ID);
@@ -2091,8 +2142,50 @@ sub NextSong
 	if ($ID eq 'stop') { Stop(); return; }
 	if ($ID eq 'quit') { Quit(); }
 	if ($ID eq 'turnoff') { Stop(); TurnOff(); return; }
-	if ( $Position<$#ListPlay && $ListPlay[$Position+1]==$ID ) { $Position++; UpdateSongID(); }
+	my $pos=$Position; $pos=-2 unless defined $pos;
+	if ( $pos<$#$ListPlay && $ListPlay->[$pos+1]==$ID ) { SetPosition($pos+1); }
 	else { Select(song => $ID); }
+}
+sub NextDiff	#go to next song whose $field value is different than current's
+{	my $field=$_[0];
+	if (!defined $SongID) { NextSong(); return}
+	my $filter= Songs::MakeFilterFromID($field,$SongID)->invert;
+	if (@$Queue)
+	{	my $list=$filter->filter($Queue);
+		if (@$list)
+		{	my $ID=$list->[0];
+			my $row=first { $Queue->[$_]==$ID } 0..$#$Queue;
+			$Queue->Remove([0..$row]);
+			Select(song => $ID);
+			return
+		}
+		else { $Queue->Replace(); } #empty queue if not matching song in it
+	}
+	# look at $QueueAction ? #FIXME
+	my $playlist=$ListPlay;
+	my $position=$Position||0;
+	if ($TogLock && $TogLock eq $field)	 #remove lock on a different field if not found ?
+	{	$playlist=$SelectedFilter->filter;
+		SortList($playlist,$Options{Sort}) unless $RandomMode;
+		$position=FindPositionSong($SongID,$playlist);
+	}
+	my $list;
+	if ($RandomMode) { $list= $filter->filter($playlist); warn scalar @$playlist; }
+	else
+	{	my @rows=$position..$#$playlist;
+		push @rows, 0..$position-1 if $Options{Repeat};
+		@$list=map $playlist->[$_], @rows;
+		$list=$filter->filter($list);
+	}
+	if (@$list)	#there is at least one matching  song
+	{	my $ID;
+		if ($RandomMode)
+		{	($ID)=Random->OneTimeDraw($RandomMode,$list,1);
+		}
+		else	{ $ID=$list->[0]; }
+		Select(song => $ID);
+	}
+	else	{ Stop(); }	#no matching song found in playlist => Stop (or do nothing ?)
 }
 
 sub UpdateLock
@@ -2102,7 +2195,7 @@ sub UpdateLock
 
 sub ToggleLock
 {	my ($col,$set)=@_;
-	if ($set || !$TogLock || $TogLock!=$col)
+	if ($set || !$TogLock || $TogLock ne $col)
 	{	$TogLock=$col;
 		#&ClearQueue;
 	}
@@ -2116,355 +2209,137 @@ sub SetRepeat
 	::HasChanged('Repeat');
 }
 
-sub ToggleSort
-{	Select('sort' => $Options{AltSort});
-}
-
-sub SongListActivate
-{	my ($self,$row,$button)=@_; #self is SongList or SongTree
-	my $ID=$self->{array}[$row];
-	my $activate=$self->{'activate'.$button} || $self->{activate};
-	$activate='queue' if $button==2 && !$activate;
-	$activate= ($self->{mode} eq 'list' ? (defined $self->{listname} ? 'playlist' : 'play_and_unqueue' ) : 'play') unless $activate;
-	my $aftercmd;
-	$aftercmd=$1 if $activate=~s/&(.*)$//;
-	if	($activate eq 'play_and_unqueue')
-	{	splice @Queue,$row,1;
-		HasChanged('Queue');
-		$activate='play';
-	}
-	#if	($activate eq 'play')	{ Select(song=>$ID,play=>1,source=>$self->{filter}{source}); }
-	if	($activate eq 'play')	{ Select(song=>$ID,play=>1); }
-	elsif	($activate eq 'queue')	{ Enqueue($ID); }
-	elsif	($activate eq 'playlist')
-	{	if ($self->{listname})	{ Select(song=>$ID,play=>1,staticlist=>$self->{listname}); } #FIXME specify position in case the list contains ID multiple times
-		elsif ($self->{filter})	{ Select(filter=>$self->{filter},song=>$ID,play=>1); }
-		else { Select(song=>$ID,play=>1); } #FIXME check if it can happen and if it's the correct thing to do in this case
-	}
-	elsif	($activate eq 'addplay' || $activate eq 'insertplay'){ DoActionForList($activate,[$ID]); }
-	run_command($self,$aftercmd) if $aftercmd;
-}
-
 sub DoActionForList
 {	my ($action,$list)=@_;
 	$action||='playlist';
 	my @list=@$list;
-	return unless @list;
-	SortList(\@list) if @list>1 && $action!~/queue/; #Enqueue will sort it
-	if ($action eq 'playlist') { Select( song=>'trykeep', staticlist => \@list ); }
-	elsif ($action eq 'addplay') { $list=[@::ListPlay,@list]; Select( song=>'trykeep', staticlist => $list ); }
-	elsif ($action eq 'insertplay')
-	{	my $pos=defined $Position? $Position : -1;
-		$list=[@ListPlay[0..$pos],@list,@ListPlay[$pos+1..$#ListPlay]];
-		Select( song=>'trykeep', staticlist => $list );
+	if	($action eq 'queue')		{ Enqueue(@list) }
+	elsif	($action eq 'replacequeue')	{ ReplaceQueue(@list) }
+	else
+	{SortList(\@list) if @list>1; #Enqueue will sort it
+	 if	($action eq 'playlist')		{ $ListPlay->Replace(\@list); }
+	 elsif	($action eq 'addplay')		{ $ListPlay->Push(\@list); }
+	 elsif	($action eq 'insertplay')	{ $ListPlay->InsertAtPosition(\@list); }
 	}
-	elsif ($action eq 'queue') { Enqueue(@list) }
-	elsif ($action eq 'replacequeue') { ReplaceQueue(@list) }
 }
 
+sub SongArray_changed
+{	my (undef,$songarray,$action,@extra)=@_;
+	if ($songarray==$Queue)
+	{	HasChanged('Queue',$action,@extra);
+		if	($QueueAction eq 'wait')	{ IdleDo('1_QAuto',10,\&QWaitAutoPlay) if @$Queue && !$TogPlay; }
+		elsif	($QueueAction eq 'autofill')	{ IdleDo('1_QAuto',10,\&QAutoFill); }
+	}
+}
+
+sub ToggleSort
+{	my $s= ($RandomMode || $Options{Sort}=~m/shuffle/) ? $Options{Sort_LastOrdered} : $Options{Sort_LastSR};
+	Select('sort' => $s);
+}
 sub Select_sort {Select('sort' => $_[0])}
+#CHECKME if everything works with sort="",     with source	with empty Library  with !defined $SongID	implement row=> or pos=>
 sub Select	#Set filter, sort order, selected song, playing state, staticlist, source
-{	if (@_%2 || !$_[0]) {@_=(filter=>$_[0],'sort'=>$_[1],song=>$_[2],play=>$_[3],staticlist=>$_[4])} #for old plugins
-	my %args=@_; #keys can be : filter sort song play staticlist source
-	warn "Select : @_\n" if $debug;
-	my ($filt,$sort,$song)=@args{qw/filter sort song/};
-	if ($args{source})			{ $PlaySource=$args{source} }
-	elsif (defined $song && $song=~m/^\d+$/){ $PlaySource=\@Library }
+{	my %args=@_;
+::callstack(@_);
+	my ($filter,$sort,$song,$staticlist,$pos)=@args{qw/filter sort song staticlist position/};
 	$TogPlay=1 if $args{play};
-	if ($args{staticlist})
-	{ $filt=undef;
-	  $ListMode=$args{staticlist};
-	  if (!$SavedListsWatcher && !ref $ListMode)	#FIXME should be done in $SFWatch
-	  { Watch($SavedListsWatcher={},'SavedLists',sub
-		{ return unless $_[1] eq $ListMode;
-		  if ($_[2] && $_[2] eq 'push') { my $l=$SavedLists{$ListMode};AddSongToPlaylist($$l[-1]); }
-		  else { Select(staticlist => $ListMode); }
-		});
-	  }
-	  @ListPlay=@{ ref $ListMode ? $ListMode : $SavedLists{$ListMode} || [] };
-	  $SelectedFilter=undef;
-	  HasChanged('Filter');
+	$SongID=undef if $song && $song eq 'first';
+	$song=undef if $song && $song=~m/\D/;
+	if ($sort) { $ListPlay->Sort($sort) }
+	elsif (defined $filter) { $filter= Filter->new($filter) unless ref $filter; $ListPlay->SetFilter($filter) }
+	elsif ($staticlist)
+	{	if (defined $pos) { $Position=$pos; $SongID=$staticlist->[$pos]; $ChangedID=$ChangedPos=1; }
+		$ListPlay->Replace($staticlist);
 	}
-	elsif (defined $filt)
-	{	UnWatch($SavedListsWatcher,'SavedLists') if $SavedListsWatcher;
-		$ListMode=$SavedListsWatcher=undef;
-		if (!defined $sort)
-		{	if    ($Options{Sort}    eq '')	{$sort=$Options{SavedSort}}
-			elsif ($Options{AltSort} eq '') {$Options{AltSort}=$Options{SavedSort}}
-		}
-	}
-	if (defined $sort)
-	{	my $old=$Options{Sort};
-		$Options{Sort}=$sort;
-		if ($sort eq '')
-		{	if ($old=~m/[sr]/) {$Options{SavedSort}=$Options{AltSort}}
-			elsif ($old ne '') {$Options{SavedSort}=$old}
-		}
-		if ($sort=~m/^[sr]/ xor $old=~m/^[sr]/)
-		{ $Options{AltSort}=$old; }	#save sort mode for quick toggle random/non-random
-		if ($sort!~m/^r/)
-		{	$RandomMode=undef;
-			$SortFields=[map /^-?([0-9]+)/,split / /,$sort];
-		}
+	elsif (defined $song) { $ListPlay->SetID($song) }
+	elsif (defined $pos) { warn $pos;SetPosition($pos) }
+}
+
+sub SetPosition
+{	$Position=shift;
+	#check within bounds ?
+	$SongID=$ListPlay->[$Position];
+	$ChangedPos=$ChangedID=1;
+	UpdateCurrentSong();
+}
+sub UpdateCurrentSong
+{	#my $force=shift;
+	if ($ChangedID)
+	{	HasChanged('SongID',$SongID);
+		ShowTraytip($Options{TrayTipTimeLength}) if $TrayIcon && $Options{ShowTipOnSongChange} && !$FullscreenWindow;
+		if (!defined $SongID || $RandomMode) { $Position=undef; }
 		else
-		{	$RandomMode=Random->new($sort);
-			$SortFields=$RandomMode->fields;
-		}
-		$sort=1;
-	}
-	#starting here, $sort TRUE means "resort needed", $sort defined means "has been resorted"
-	if    (!defined $song)		{ $song='trykeep';		}
-	elsif ( $song=~m/^\d+$/ )	{ $SongID=$song; $song='keep';	}
-	if (defined $filt)
-	{	$filt=Filter->new($filt) unless ref $filt eq 'Filter';
-		$SelectedFilter=$filt;
-		@ListPlay=@{ $filt->filter };
-		$sort=1;
-		delete $ToDo{'8_updatefilter'};
-	}
-	elsif ($::ToDo{'8_updatesort'}) { $sort=1;delete $ToDo{'8_updatesort'}; }
-	if ( $song eq 'keep' && !defined FindPositionSong($SongID) )
-	{	if (grep $SongID==$_,@$PlaySource)
-		{	$filt=$SelectedFilter=Filter->new;
-			$sort=1; $ListMode=undef;
-			warn "reset filter\n" if $debug;
-			@ListPlay=@$PlaySource;
-		}
-		else
-		{	DoActionForList('addplay',[$SongID]);
-			return;
-		}
-	}
-	elsif ( $song eq 'trykeep' && !defined FindPositionSong($SongID) )
-	{	$song='first';
-		if ($TogLock)	# try to
-		{	my $pat=$Songs[$SongID][$TogLock];
-			($SongID)=grep $Songs[$_][$TogLock] eq $pat, @ListPlay;
-			$song='' if defined $SongID;
-		}
-	}
-	if ($song eq 'first') #select the first song in the list according to sort order
-	{	if ($RandomMode) { $RandomMode->MakeRandomList(\@ListPlay); ($SongID)=$RandomMode->Draw(1); }
-		else { SortList(\@ListPlay); $SongID=$ListPlay[0]; } #$song='keep';
-		$sort=0;
-	}
-	if ($TogLock && defined $SongID)
-	{	my $pat=$Songs[$SongID][$TogLock];
-		@ListPlay=grep $Songs[$_][$TogLock] eq $pat, @ListPlay;
-		#@ListPlay=$FilterSubs{'~'}($TogLock,$Songs[$SongID][$TogLock],\@ListPlay);
-		#$sort=1	# grep conserve order -> shouldn't be needed
-		$PlayFilter=$filt=Filter->newadd( TRUE,$SelectedFilter, $TogLock.'e'.$Songs[$SongID][$TogLock] ) unless defined $ListMode;
-	}
-	else {$PlayFilter=$SelectedFilter}
-	if ($sort)
-	{	delete $ToDo{'8_updatesort'};
-		if ($RandomMode) { $RandomMode->MakeRandomList(\@ListPlay); }
-		else		 { SortList(\@ListPlay); }
-	}
-	$Position=FindPositionSong($SongID);
-	if (defined $sort) { HasChanged('Sort');	}
-	if (defined $filt) { HasChanged('Filter');	}
-	ChangeWatcher($SFWatch, \@ListPlay, $SortFields,
-		sub {	if ($RandomMode) { $RandomMode->UpdateIDs(@_); }
-			elsif (!$ToDo{'8_updatesort'}) {IdleDo('8_updatesort',5*@ListPlay,\&UpdateSort);}
-		    }, #re-sort
-		\&RemoveSongFromPlaylist,	#remove song
-		\&AddSongToPlaylist,		#add song
-		$PlayFilter,
-		sub { IdleDo('7_updatefilter',9000,\&UpdatePlayFilter); }, #re-filter
-		);
-	&UpdateSongID;
-}
-
-sub AddSongToPlaylist
-{	push @ListPlay,@_;
-	if (@ListPlay==@_) {$Position=0;&UpdateSongID;}
-	if ($RandomMode) { $RandomMode->AddIDs(@_); IdleDo('8_updatesort',1000,sub {HasChanged('Pos','add');}); }
-	elsif (!$ToDo{'8_updatesort'}) { IdleDo('8_updatesort',5*@ListPlay,\&UpdateSort); }
-}
-sub RemoveSongFromPlaylist
-{	if ($RandomMode) { $RandomMode->RmIDs(@_); }
-	my %h;
-	$h{$_}=undef for @_;
-	my $iscurrentsong= exists $h{$SongID};
-	#@ListPlay=grep !exists $h{$_}, @ListPlay;
-	my $i=@ListPlay;
-	while ($i--)
-	{	if (exists $h{ $ListPlay[$i] })
-		{	splice @ListPlay,$i,1;
-			$Position-- if $Position >= $i;
-			#delete $h{ $ListPlay[$i] };
-			#last unless keys %h;
-		}
-	}
-	if (@ListPlay==0) { UpdateSongID(); }
-	elsif ($iscurrentsong)
-	{	#$Position=0 if $Position==-1;
-		NextSong();
-	}
-	else { HasChanged('Pos','remove'); }
-}
-
-sub UpdateSort
-{	delete $ToDo{'8_updatesort'};
-	SortList(\@ListPlay);
-	$Position=FindPositionSong($SongID);
-	HasChanged('Pos','re-sort');
-}
-
-sub UpdatePlayFilter
-{	my $m=(defined $SongID)? 'keep':'first';
-	Select( filter => $SelectedFilter, song => $m );
-}
-
-sub Shuffle
-{	if ($Options{Sort} eq 's')
-	{	@Shuffle=();
-		push @Shuffle,rand for 0..$#Songs;	#re-randomize @Shuffle
-	}
-	Select('sort' => 's'); #sort according to @Shuffle
-}
-
-sub SortList	#sort @$listref according to $sort
-{	#my $time=times; #DEBUG
-	my ($listref,$sort)=@_;
-	($sort,$listref)=@_ if !ref $listref; #DELME for version <0.9496
-	$sort=$Options{Sort} unless defined $sort;
-	my $func; my $insensitive;
-	if ($sort=~m/^r/)
-	{	my $r=Random->new($sort);
-		$r->MakeRandomList($listref);
-		@$listref=$r->Draw;
-	}
-	elsif ($sort ne '')		# generate custom sort function
-	{  if ($sort=~m/s/) { push @Shuffle,rand for (@Shuffle..$#Songs); }
-	   my @expr;
-	   for my $col ( split / +/,$sort )
-	   {	my ($a,$b)=( $col=~s/^-// )? ('b','a') : ('a','b');
-		my $i= $col=~s/i$//; #case-insensitive
-		my ($pre,$post,$op);
-		if ($col eq 's') { $pre='$Shuffle[$'; $post=']'; $op='<=>'; }
-		else
-		{ $post="][$col]";
-		  my $type=$TagProp[$col][2];
-		  if	($type eq 's')	  { $pre='$Songs[$'; $op='cmp'; }
-		  elsif ($type=~m/[ndl]/) { $pre='$Songs[$'; $op='<=>'; }
-		  #elsif ($type eq 'f')	  { $pre='join " ",sort split /\x00/,$Songs[$';   $op='cmp'; }
-		  elsif ($type eq 'f')	  { $pre='$Songs[$'; $op='cmp'; }	#FIXME multiple labels/genres should be sorted
-		  else	{ warn "Don't know how to sort $col\n"; next; }
-		  if ($i)
-		  {	$pre='lc'.$pre; $insensitive++;
-			if ($Options{Diacritic_sort})
-			{	$pre='NFKD('.$pre; $post.=')';
+		{	IdleCheck($SongID) if $Options{TAG_auto_check_current};
+			if (!defined $Position || $ListPlay->[$Position]!=$SongID)
+			{	my $start=$Position;
+				$start=-1 unless defined $start;
+				$Position=undef;
+				for my $i ($start+1..$#$ListPlay, 0..$start-1) {$Position=$i if $ListPlay->[$i]==$SongID}
 			}
-		  }
 		}
-		push @expr, $pre.$a.$post.' '.$op.' '.$pre.$b.$post;
-		#example:  $Songs[$ a ][$col]  <=>   $Songs[$ b ][$col]
-	   }
-	   warn "sort function for '$sort' :\n".'sub {'.join(' || ',@expr).'}'."\n" if $debug;
-	   $func=eval 'no warnings;sub {' . join(' || ',@expr) . '}';
-	   warn $@ if $@;
+		# FIXME if (defined $RecentPos && (!defined $SongID || $SongID!=$Recent->[$RecentPos-1])) { $RecentPos=undef }
+		$ChangedPos=1;
 	}
-	if ($insensitive) { my $sort0=$sort; $sort0=~s/i//g; SortList($listref,$sort0); } #do a case-sensitive sort first (faster)
-	@$listref=sort $func @$listref if $func;
-	#$time=times-$time; warn "sort ($sort) : $time s\n"; #DEBUG
-}
-
-sub ExplainSort
-{	my $sort=$_[0];
-	if ($sort eq '') {return 'no order'}
-	elsif ($sort=~m/^r/)
-	{	for my $name (keys %SavedWRandoms)
-		{	return "Weighted Random $name." if $SavedWRandoms{$name} eq $sort;
-		}
-		return _"unnamed random mode"; #describe ?
+	if ($ChangedPos)
+	{	HasChanged('Pos','song');
 	}
-	my @text;
-	for (split / /,$sort)
-	{	my $field=s/^-// ? '-' : '';
-		my $i=s/i$//;
-		$field.=($_ eq 's')? _("Shuffle") : $TagProp[$_][0];
-		$field.=_"(case insensitive)" if $i;
-		push @text,$field;
-	}
-	return join ', ',@text;
-}
-
-sub ReReadTags
-{	$Songs[$_][SONG_MISSINGSINCE] ||='r' for @_;
-	&IdleCheck; #keep @_
-}
-sub IdleCheck
-{	if (@_) { push @ToCheck,@_; }
-	else	{ unshift @ToCheck,@Library; }
-	&launchIdleLoop unless defined $IdleLoop;
-}
-sub IdleScan
-{	@_=@LibraryPath unless @_;
-	push @ToScan,@_;
-	CreateProgressWindow() if @ToScan && !$ProgressWin;
-	&launchIdleLoop unless defined $IdleLoop;
-}
-
-sub IdleDo
-{	my $task_id=shift;
-	my $timeout=shift;
-	$ToDo{$task_id}=\@_;
-	if ($timeout && !defined $TimeOut{$task_id})
-	{ $TimeOut{$task_id}=Glib::Timeout->add($timeout,\&DoTask,$task_id); }
-	&launchIdleLoop unless defined $IdleLoop;
-}
-sub DoTask
-{	my $task_id=shift;
-	delete $TimeOut{$task_id};
-	my $aref=delete $ToDo{$task_id};
-	if ($aref)
-	{ my $sub=shift @$aref;
-	  &$sub(@$aref);
-	}
-	0;
-}
-
-sub launchIdleLoop
-{	$IdleLoop=Glib::Idle->add(\&IdleLoop);
-}
-
-sub IdleLoop
-{	if    (@ToCheck){ SongCheck(pop @ToCheck); }
-	elsif (@ToAdd)  { SongAdd(); }
-	elsif ($CoverCandidates) {CheckCover();}
-	elsif (@ToScan) { ScanFolder(); }
-	elsif (%ToDo)	{ DoTask( (sort keys %ToDo)[0] ); }
-	elsif (@LengthEstimated) { SongCheck(shift(@LengthEstimated)); } #to replace estimated length/bitrate by real one(for mp3s without VBR header)
-	else
-	{	warn "IdleLoop End\n" if $debug;
-		undef $IdleLoop;
-	}
-	return $IdleLoop;
-}
-
-sub UpdateSongID
-{	warn "pos : $Position\n" if $debug;
-	if (@ListPlay==0) { $Position=$SongID=undef; Stop(); }
-	else
-	{	$SongID=$ListPlay[$Position];
-		IdleCheck($SongID) if $Options{TAG_auto_check_current};
-	}
-	if ($RecentPos && $SongID!=$Recent[$RecentPos-1]) { $RecentPos=undef }
-	HasChanged('SongID');
-	HasChanged('Pos','song');
-	ShowTraytip($Options{TrayTipTimeLength}) if $TrayIcon && $Options{ShowTipOnSongChange} && !$FullscreenWindow;
-	if ( defined $SongID && !(defined $PlayingID && $PlayingID==$SongID) )
+	#   Stop(); if  !defined $SongID ???????
+	#if	($forceplay)			{Play()}
+	if	($ChangedID)
 	{	if	($TogPlay)		{Play()}
 		elsif	(defined $TogPlay)	{Stop()}
 	}
+	$ChangedID=$ChangedPos=0;
 }
 
-sub FindPositionSong
-{	my $ID=shift;
+#sub UpdateSongID			#CHECKME use -1 instead of undef for Position ???
+#{	my ($type,$ID,$force)=@_;
+#::callstack(@_);
+#	if ($type eq 'position')
+#	{	if ($ID!=$Position || $force) { $ChangedPos=1; $Position=$ID; }
+#		$ID=$ListPlay->[$ID];
+#	}
+#	if (!defined $ID)
+#	{	$ChangedID=$ChangedPos=1;
+#		$Position=$SongID=undef;
+#		Stop();
+#	}
+#	elsif (!defined $SongID || $ID!=$SongID)
+#	{	$ChangedID=1; $SongID=$ID;
+#		IdleCheck($SongID) if $Options{TAG_auto_check_current};
+#		if (defined $RecentPos && (!defined $SongID || $SongID!=$Recent->[$RecentPos-1])) { $RecentPos=undef }
+#	}
+#	if ($RandomMode) { $Position=undef; $ChangedPos=1; }
+#	elsif ($type ne 'position' && (!defined $Position || $ListPlay->[$Position]!=$SongID))
+#	{	my $start=$Position;
+#		$Position=undef;
+#		for my $i ($start+1..$#$ListPlay, 0..$start-1) {$Position=$i if $ListPlay->[$i]==$SongID}
+#		$ChangedPos=1;
+#	}
+#	if ($ChangedID)
+#	{	HasChanged('SongID',$SongID);
+#		ShowTraytip($Options{TrayTipTimeLength}) if $TrayIcon && $Options{ShowTipOnSongChange} && !$FullscreenWindow;
+#	}
+#	if ($ChangedPos)
+#	{	HasChanged('Pos','song');
+#	}
+#	if ( $force || $ChangedID )
+#	{	if	($TogPlay)		{Play()}
+#		elsif	(defined $TogPlay)	{Stop()}
+#	}
+#	$ChangedID=$ChangedPos=0;
+#}
+
+sub IDIsInList
+{	my ($list,$ID)=@_;
+	return $list->IsIn($ID) unless ref $list eq 'ARRAY';
+	($list->[$_]==$ID) and return 1 for 0..$#$list;
+	return 0;
+}
+sub FindPositionSong	#DELME
+{	my ($ID,$list)=@_;
 	return undef unless defined $ID;
-	for (0..$#ListPlay) {return $_ if $ListPlay[$_]==$ID}
+	for my $i (0..$#$list) {return $i if $list->[$i]==$ID}
 	return undef;	#not found
 }
 sub FindFirstInListPlay		#Choose a song in @$lref based on sort order, if possible in the current playlist. In sorted order, choose a song after current song
@@ -2473,12 +2348,10 @@ sub FindFirstInListPlay		#Choose a song in @$lref based on sort order, if possib
 	my $ID;
 	my %h;
 	$h{$_}=undef for @$lref;
-	my @l=grep exists $h{$_}, @ListPlay;
-	if ($sort=~m/^r/)
+	my @l=grep exists $h{$_}, @$ListPlay;
+	if ($sort=~m/^random:/)
 	{	$lref=\@l if @l;
-		my $r=Random->new($sort);
-		$r->MakeRandomList($lref);
-		($ID)=$r->Draw(1);
+		($ID)=Random->OneTimeDraw($sort,$lref,1);
 		$ID=$lref->[ int(rand(scalar@$lref)) ] unless defined $ID;
 	}
 	else
@@ -2492,6 +2365,114 @@ sub FindFirstInListPlay		#Choose a song in @$lref based on sort order, if possib
 		$ID=$l[0] unless defined $ID;
 	}
 	return $ID;
+}
+
+sub Shuffle
+{	Songs::ReShuffle() if $Options{Sort} eq 'shuffle';
+	Select('sort' => 'shuffle');
+}
+
+sub SortList	#sort @$listref according to $sort
+{	my $time=times; #DEBUG
+	warn "deprecated SortList @_\n"; #PHASE1 DELME
+	my ($listref,$sort)=@_;
+	$sort||=$Options{Sort};
+	my $func; my $insensitive;
+	if ($sort=~m/^random:/)
+	{	@$listref=Random->OneTimeDraw($sort,$listref);
+	}
+	elsif ($sort ne '')		# generate custom sort function
+	{	Songs::SortList($listref,$sort);
+	}
+	$time=times-$time; warn "sort ($sort) : $time s\n"; #DEBUG
+}
+
+sub ExplainSort
+{	my $sort=$_[0];
+	if ($sort eq '') {return 'no order'}
+	elsif ($sort=~m/^random:/)
+	{	for my $name (keys %{$Options{SavedWRandoms}})
+		{	return "Weighted Random $name." if $Options{SavedWRandoms}{$name} eq $sort;
+		}
+		return _"unnamed random mode"; #describe ?
+	}
+	my @text;
+	for my $f (split / /,$sort)
+	{	my $field= $f=~s/^-// ? '-' : '';
+		my $i= $f=~s/:i$//;
+		$field.= Songs::FieldName($f);
+		$field.=_"(case insensitive)" if $i;
+		push @text,$field;
+	}
+	return join ', ',@text;
+}
+
+sub ReReadTags
+{	if (@_) { push @ToReRead,@_; }
+	else	{ unshift @ToReRead,@$Library; }
+	&launchIdleLoop;
+}
+sub IdleCheck
+{	if (@_) { push @ToCheck,@_; }
+	else	{ unshift @ToCheck,@$Library; }
+	&launchIdleLoop;
+}
+sub IdleScan
+{	@_=@LibraryPath unless @_;
+	push @ToScan,@_;
+	&launchIdleLoop;
+}
+
+sub IdleDo
+{	my $task_id=shift;
+	my $timeout=shift;
+	$ToDo{$task_id}=\@_;
+	$TimeOut{$task_id}||=Glib::Timeout->add($timeout,\&DoTask,$task_id) if $timeout;
+	&launchIdleLoop unless defined $IdleLoop;
+}
+sub DoTask
+{	my $task_id=shift;
+	delete $TimeOut{$task_id};
+	my $aref=delete $ToDo{$task_id};
+	if ($aref)
+	{ my $sub=shift @$aref;
+	  $sub->(@$aref);
+	}
+	0;
+}
+
+sub launchIdleLoop
+{	$IdleLoop||=Glib::Idle->add(\&IdleLoop);
+}
+
+sub IdleLoop
+{	if (@ToCheck)
+	{	unless ($CheckProgress_cb)
+		{	Glib::Timeout->add(500, \&CheckProgress_cb,0);
+			CheckProgress_cb(1);
+		}
+		Songs::ReReadFile(pop @ToCheck);
+	}
+	elsif (@ToReRead){Songs::ReReadFile(pop(@ToReRead),1); }	#FIXME should show progress
+	elsif (@ToAdd_Files)  { SongAdd(shift @ToAdd_Files); }
+#	elsif ($CoverCandidates) {CheckCover();}	#FIXME PHASE1
+	elsif (@ToAdd_IDsBuffer>1000)	{ SongAdd_Real() }
+	elsif (@ToScan) { $ProgressNBFolders++; ScanFolder(shift @ToScan); }
+	elsif (@ToAdd_IDsBuffer)	{ SongAdd_Real() }
+	elsif (%ToDo)	{ DoTask( (sort keys %ToDo)[0] ); }
+	elsif (@$LengthEstimated)	 #to replace estimated length/bitrate by real one(for mp3s without VBR header)
+	{	$Lengthcheck_max=@$LengthEstimated if @$LengthEstimated > $Lengthcheck_max;
+		Songs::ReReadFile(shift(@$LengthEstimated),2);
+		$Lengthcheck_max=0 unless @$LengthEstimated;
+	}
+	else
+	{	$ProgressNBFolders=$ProgressNBSongs=0;
+		undef $Songs::IDFromFile;
+
+		warn "IdleLoop End\n" if $debug;
+		undef $IdleLoop;
+	}
+	return $IdleLoop;
 }
 
 sub Playlist
@@ -2554,70 +2535,70 @@ sub EditQueue
 
 sub WEditList
 {	my $name=$_[0];
-	my $window=Layout::Window->new('EditList',undef,'UseDefaultState,KeepSize');
-	$window->{widgets}{SongList}->SetList($name);
+	my ($window)=grep exists $_->{editing_listname} && $_->{editing_listname} eq $name, Gtk2::Window->list_toplevels;
+	if ($window) { $window->present; return; }
+	SaveList($name,[]) unless $Options{SavedLists}{$name}; #create new list if doesn't exists
+	$SongList::Common::EditList=$Options{SavedLists}{$name}; #list that will be used by SongList/SongTree in 'editlist' mode
+	$window=Layout::Window->new('EditList',undef,'UseDefaultState,KeepSize');
+	$SongList::Common::EditList=undef;
+	$window->{editing_listname}=$name;
 	Watch($window, SavedLists => sub	#close window if the list is deleted, update title if renamed
-		{	my ($window,$name,$info)=@_;
+		{	my ($window,$name,$info,$newname)=@_;
+			return if $window->{editing_listname} ne $name;
 			return unless $info;
 			my $songlist=$window->{widgets}{SongList};
-			if ($info eq 'renamedto') { $window->set_title( _("Editing list : ").$songlist->{listname} ); return } #assumes the songlist received the rename event first
-			return unless $songlist->{type} eq 'L' && $songlist->{listname} eq $name;
-			$window->close_window if $info eq 'remove';
+			if ($info eq 'renamedto')
+			{	$window->set_title( _("Editing list : ").$newname );
+				$window->{editing_listname}=$newname;
+			}
+			elsif ($info eq 'remove')
+			{	$window->close_window
+			}
 		});
 	$window->set_title( _("Editing list : ").$name );
 }
 
 sub CalcListLength	#if $return, return formated string (0h00m00s)
 {	my ($listref,$return)=@_;
-	my $size=0; my $sec=0;
-	for my $ID (@$listref)
-	{	my $ref=$Songs[$ID];
-		next unless $ref;
-		$size+=$$ref[SONG_SIZE];
-		#next unless $$_[SONG_LENGTH];
-		$sec+=$$ref[SONG_LENGTH];
-	}
+	my ($size,$sec)=Songs::ListLength($listref);
 	warn 'ListLength: '.scalar @$listref." Songs, $sec sec, $size bytes\n" if $debug;
-	if ($return)	#return formated string (0h00m00s)
-	{  $size=sprintf '%.0f',$size/1048576; #1024*1024
-	   my $m=int($sec/60); $sec=sprintf '%02d',$sec%60;
-	   my $h=int($m/60);     $m=sprintf '%02d',$m%60;
-	   my $nb=@$listref;
-	   my @values=(hours => $h, min =>$m, sec =>$sec, size => $size);
-	   if ($return eq 'long')
-	   {	my $format= $h? _"{hours} hours {min} min {sec} s ({size} M)" : _"{min} min {sec} s ({size} M)";
+	$size=sprintf '%.0f',$size/1024/1024;
+	my $m=int($sec/60); $sec=sprintf '%02d',$sec%60;
+	my $h=int($m/60);     $m=sprintf '%02d',$m%60;
+	my $nb=@$listref;
+	my @values=(hours => $h, min =>$m, sec =>$sec, size => $size);
+	if ($return eq 'long')
+	{	my $format= $h? _"{hours} hours {min} min {sec} s ({size} M)" : _"{min} min {sec} s ({size} M)";
 		return __("%d Song","%d Songs",$nb) .', '. __x($format, @values);
-	   }
-	   elsif ($return eq 'short')
-	   {	my $format= $h? _"{hours}h {min}m {sec}s ({size}M)" : _"{min}m {sec}s ({size}M)";
-		return __("%d Song","%d Songs",$nb) .', '. __x($format, @values);
-	   }
-	   elsif ($return eq 'queue')
-	   {	$h=($h)? $h.'h ' : '';
+	}
+	elsif ($return eq 'short')
+	{	my $format= $h? _"{hours}h {min}m {sec}s ({size}M)" : _"{min}m {sec}s ({size}M)";
+		return __("%d Song","%d Songs",$nb) .', '.__x($format, @values);
+	}
+	elsif ($return eq 'queue')
+	{	$h=($h)? $h.'h ' : '';
 		return _"Queue empty" if $nb==0;
 		my $format= $h? _"{hours}h{min}m{sec}s" : _"{min}m{sec}s";
 		return __("%d song in queue","%d songs in queue",$nb) .' ('. __x($format, @values) . ')';
-	   }
-	   else
-	   {	my $format= $h? _"{hours}h {min}m {sec}s ({size}M)" : _"{min}m {sec}s ({size}M)";
-		return __x($format, @values);
-	   }
 	}
-	else { return ($sec,$size); } #return numbers
+	else
+	{	my $format= $h? _"{hours}h {min}m {sec}s ({size}M)" : _"{min}m {sec}s ({size}M)";
+		return __x($format, @values);
+	}
 }
 
 # http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=%s    artist search
 # http://www.allmusic.com/cg/amg.dll?p=amg&opt1=2&sql=%s    album search
 sub AMGLookup
 {	my ($col,$key)=@_;
-	my $opt1=	$col==SONG_ARTIST ? 1 :
-			$col==SONG_ALBUM  ? 2 : 3;
+	my $opt1=	$col eq 'artist' ? 1 :
+			$col eq 'album'  ? 2 :
+			$col eq 'title'	 ? 3 : 0;
+	return unless $opt1;
 	my $url='http://www.allmusic.com/cg/amg.dll?p=amg&opt1='.$opt1.'&sql=';
-	$key=~s/ /|/g;
-	$key=~s/([][\\@;?\/\$&="'<>~:#+,`])/sprintf '%%%x',ord$1/ge;
-	if ($^O eq 'MSWin32') {system 'start',$url.$key;return}
-	$url=quotemeta $url.$key;
-	openurl($url);
+	$key=superlc($key);	#can't figure how to pass accents, removing them works better
+	$key=url_escape($key);
+	openurl($url.$key);
 }
 
 sub Google
@@ -2625,23 +2606,18 @@ sub Google
 	my $lang='';
 	$lang="hl=$1&" if setlocale(LC_MESSAGES)=~m/^([a-z]{2})(?:_|$)/;
 	my $url='http://google.com/search?'.$lang."q=";
-	my @q;
-	push @q,$Songs[$ID][$_] for SONG_TITLE,SONG_ARTIST,SONG_ALBUM;
-	$q[1]='' if $q[1] eq '<Unknown>';
-	$q[2]='' if $q[2]=~m/^<Unknown>/;
-	@q=grep $_ ne '', @q;
-	s/([][\\@;?\/\$&="'<>~: #+,`])/sprintf '%%%x',ord$1/ge for @q;
-	if ($^O eq 'MSWin32') {system 'start',$url.join('+',@q);return}
-	$url=quotemeta $url.join('+',@q);
+	my @q=grep $_ ne '', Songs::Get($ID,qw/title_or_file artist album/);
+	$url.=url_escape(join('+',@q));
 	openurl($url);
 }
 sub openurl
 {	my $url=$_[0];
-	if ($^O eq 'MSWin32') { system "start $url"; return }
+	if ($^O eq 'MSWin32') { system "start $url"; return }#FIXME quote the url
 	else
 	{	$browsercmd||=findcmd($Options{OpenUrl},qw/xdg-open gnome-open firefox epiphany konqueror galeon/);
 		unless ($browsercmd) { ErrorMessage(_"No web browser found."); return }
 	}
+	$url=quotemeta $url;
 	system "$browsercmd $url &"; #FIXME if xdg-open is used, don't launch with "&" and check error code
 }
 sub openfolder
@@ -2664,55 +2640,56 @@ sub findcmd
 
 sub ChooseAAPicture
 {	my ($ID,$col,$key)=@_;
-	my $AAref=($col==SONG_ARTIST)? \%Artist : \%Album;
-	my $file;
-	if (defined $ID) { $file=$::Songs[$ID][SONG_PATH]; }
-	else { my %h; $h{$_}++ for map $::Songs[$_][SONG_PATH],@{ $AAref->{$key}[AALIST] }; ($file)=sort { $h{$b} <=> $h{$a} } keys %h; }	#FIXME should try to find common parent folder
-	$file=ChoosePix($file,_"Choose picture for ".$key,$AAref->{$key}[AAPIXLIST]);
-	return unless defined $file;
-	$AAref->{$key}[AAPIXLIST]=$file;
-	HasChanged('AAPicture',$key);
+	my $path;
+	if (defined $ID) { $path=Songs::Get($ID,'path'); }
+	else
+	{	my $h=Songs::BuildHash('path', AA::GetIDs($col,$key));
+		my $min=int(.1*max(values %$h)); #ignore rare folders
+		$path= ::find_common_parent_folder( grep $h->{$_}>$min,keys %$h );
+		($path)=sort { $h->{$b} <=> $h->{$a} } keys %$h if length $path<5;#take most common if too differents
+	}
+	my $title= sprintf(_"Choose picture for '%s'",Songs::Gid_to_Display($col,$key));
+	my $file=ChoosePix($path,$title, AAPicture::GetPicture($col,$key));
+	AAPicture::SetPicture($col,$key,$file) if defined $file;
 }
 
 sub ChooseSongsTitle		#Songs with the same title
 {	my $ID=$_[0];
-	my $title=$Songs[$ID][SONG_TITLE];
-	return 0 if $title eq '';
-	my @list=@{ Filter->new(SONG_TITLE.'~'.$Songs[$ID][SONG_TITLE])->filter; };
-	return 0 if @list<2 || @list>100;	#probably a problem if it finds >100 matching songs, and making a menu with a huge number of items is slow
-	@list=grep $_!=$ID,@list;
-	SortList(\@list,SONG_ARTIST.'i '.SONG_ALBUM.'i');
+	my $filter=Songs::MakeFilterFromID('title',$ID);
+	my $list= $filter->filter;
+	return 0 if @$list<2 || @$list>100;	#probably a problem if it finds >100 matching songs, and making a menu with a huge number of items is slow
+	my @list=grep $_!=$ID,@$list;
+	SortList(\@list,'artist:i album:i');
 	return ChooseSongs( __x( _"by {artist} from {album}", artist => "<b>%a</b>", album => "%l") ,@list);
 }
 
 sub ChooseSongsFromA_current
 {	return unless defined $SongID;
-	return if $Songs[$SongID][SONG_MISSINGSINCE] && $Songs[$SongID][SONG_MISSINGSINCE]=~m/R/;
-	my $album= $Songs[$SongID][SONG_ALBUM];
-	ChooseSongsFromA($album);
+	my $aid=Songs::Get_gid($SongID,'album');
+	ChooseSongsFromA($aid);
 }
-sub ChooseSongsFromA
+sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>100-200 ?)
 {	my $album=$_[0];
-	return unless defined $album || exists $Album{ $album };
-	my $list=$Album{ $album }[AALIST];
-	SortList($list,SONG_DISC.' '.SONG_TRACK.' '.SONG_UFILE);
-	if ($Songs[$list->[0]][SONG_DISC])
+	return unless defined $album;
+	my $list= AA::GetIDs(album=>$album);
+	SortList($list,'disc track file');
+	if (Songs::Get($list->[0],'disc'))
 	{	my $disc=''; my @list2;
 		for my $ID (@$list)
-		{	my $d=$Songs[$ID][SONG_DISC];
+		{	my $d=Songs::Get($ID,'disc');
 			if ($d && $d ne $disc) {push @list2,__x(_"disc {disc}",disc =>$d); $disc=$d;}
 			push @list2,$ID;
 		}
 		$list=\@list2;
 	}
-	my $menu = ChooseSongs('%n %t', @$list);
+	my $menu = ChooseSongs('%n %S', @$list);
 	$menu->show_all;
 	if (1)
 	{	my $h=$menu->size_request->height;
 		my $picsize=$menu->size_request->width/$menu->{nbcols};
 		$picsize=200 if $picsize<200;
 		$picsize=$h if $picsize>$h;
-		if ( my $img=NewScaledImageFromFile($Album{ $album }[AAPIXLIST],$picsize) )
+		if ( my $img=NewScaledImageFromFile( AAPicture::GetPicture(album=>$album) ,$picsize) )
 		{	my $item=Gtk2::MenuItem->new;
 			$item->add($img);
 			my $col=$menu->{nbcols};
@@ -2723,7 +2700,7 @@ sub ChooseSongsFromA
 	elsif (0) #TEST not used
 	{	my $picsize=$menu->size_request->height;
 		$picsize=220 if $picsize>220;
-		if ( my $img=NewScaledImageFromFile($Album{ $album }[AAPIXLIST],$picsize) )
+		if ( my $img=NewScaledImageFromFile( AAPicture::GetPicture(album=>$album) ,$picsize) )
 		{	my $item=Gtk2::MenuItem->new;
 			$item->add($img);
 			my $col=$menu->{nbcols};
@@ -2735,7 +2712,7 @@ sub ChooseSongsFromA
 		#		$item->signal_connect(size_allocate => sub  {my ($self,$alloc)=@_;warn $alloc->width;return if $self->{busy};$self->{busy}=1;my $w=$self->get_toplevel;$w->set_size_request($w->size_request->width-$alloc->width+$picsize+20,-1);$alloc->width($picsize+20);$self->size_allocate($alloc);});
 		}
 	}
-	elsif ( my $pixbuf=PixBufFromFile($Album{ $album }[AAPIXLIST]) ) #TEST not used
+	elsif ( my $pixbuf=PixBufFromFile(AAPicture::GetPicture(album=>$album)) ) #TEST not used
 	{
 	 my $request=$menu->size_request;
 	 my $rwidth=$request->width;
@@ -2794,13 +2771,13 @@ sub ChooseSongs
 	 { if	($_[1]->button == 2) { $_[0]{middle}=1 }
 	   elsif($_[1]->button == 3)
 	   {	$LEvent=$_[1];
-		my $submenu=PopupContextMenu(\@SongCMenu,{IDs=> [$_[2]]});
+		my $submenu=PopupContextMenu(\@SongCMenu,{mode => '', IDs=> [$_[2]]});
 		$submenu->show_all;
 		$_[0]->set_submenu($submenu);
 		#$submenu->signal_connect( selection_done => sub {$menu->popdown});
 		#$submenu->show_all;
 		#$submenu->popup(undef,undef,undef,undef,$LEvent->button,$LEvent->time);
-		return 1;
+		return 0; #return 0 so that the item receive the click and popup the submenu
 	   }
 	   return 0;
 	 };
@@ -2820,7 +2797,7 @@ sub ChooseSongs
 		$item->set_image(Gtk2::Image->new_from_stock($icon, 'menu')) if $icon;
 		$item->signal_connect(activate => $activate_callback, $ID);
 		$item->signal_connect(button_press_event => $click_callback, $ID);
-		#set_drag($item, source => [::DRAG_ID,sub {$ID}]);
+		#set_drag($item, source => [::DRAG_ID,sub {::DRAG_ID,$ID}]);
 	    }
 	    else	# "title" items
 	    {	$item=Gtk2::MenuItem->new;
@@ -2849,24 +2826,27 @@ sub menupos	# function to position popupmenu below clicked widget
 }
 
 sub PopupAA
-{	my ($col,$key,$callback,$format)=@_;
-	return undef unless @Library;
+{	my ($col,%args)=@_;
+	my ($list,$from,$callback,$format,$widget,$nosort,$nominor)=@args{qw/list from cb format widget nosort nominor/};
+	return undef unless @$Library;
 	$format||="%a";
-	my $href=($col==SONG_ARTIST)? \%Artist : \%Album;
 
-####make list of albums/artists
+#### make list of albums/artists
 	my @keys;
-	if (defined $key)
-	{	if (ref $key) {@keys=@$key;}
-		elsif ($col==SONG_ALBUM)
+	if (defined $list) { @keys=@$list; }
+	elsif (defined $from)
+	{	if ($col eq 'album')
 		{ my %alb;
-		  for my $artist (split /$re_artist/o,$key)
-		  {	push @{$alb{$_}},$artist for keys %{ $Artist{$artist}[AAXREF] };  }
-		  #{	$alb{$_}=undef for keys %{ $Artist{$artist}[AAXREF] };  }
+		  $from=[$from] unless ref $from;
+		  for my $artist (@$from)
+		  {	warn $_ for @{ AA::GetXRef(artist=>$artist) };  }
+		  for my $artist (@$from)
+		  {	push @{$alb{$_}},$artist for @{ AA::GetXRef(artist=>$artist) };  }
+		  #{	$alb{$_}=undef for @{ AA::GetXRef(artist=>$artist) };  }
 		  #@keys=keys %alb;
 		  my %art_keys;
 		  while (my($album,$list)=each %alb)
-		  {	my $artist=join ' & ',@$list;
+		  {	my $artist=join ' & ',map Songs::Gid_to_Display('artist',$_), @$list; #FIXME PHASE1
 			push @{$art_keys{$artist}},$album;
 		  }
 		  if (1==keys %art_keys)
@@ -2876,7 +2856,7 @@ sub PopupAA
 		  {	my $menu=Gtk2::Menu->new;
 			for my $artist (keys %art_keys)
 			{	my $item=Gtk2::MenuItem->new($artist);
-				$item->set_submenu(PopupAA(SONG_ALBUM,$art_keys{$artist}));
+				$item->set_submenu(PopupAA('album', list=> $art_keys{$artist}));
 				$menu->append($item);
 			}
 			$menu->show_all;
@@ -2886,9 +2866,9 @@ sub PopupAA
 		  }
 		}
 		else
-		{ @keys=keys %{$Album{$key}[AAXREF]}; }
+		{ @keys= @{ AA::GetXRef(album=>$from) }; }
 	}
-	else { @keys=grep $href->{$_} && $href->{$_}[AALIST], keys %$href; }
+	else { @keys=@{ AA::GetAAList($col) }; }
 
 #### callbacks
 	my $rmbcallback;
@@ -2896,33 +2876,33 @@ sub PopupAA
 	{  $callback=sub		#jump to first song
 	   {	return if $_[0]->get_submenu;
 		my $key=$_[1];
-		my $ID=FindFirstInListPlay( $href->{$key}[AALIST] );
+		my $ID=FindFirstInListPlay( AA::GetIDs($col,$key) );
 		Select(song => $ID);
 	   };
-	   $rmbcallback=($col==SONG_ARTIST)?
-		sub	#Arists rmb cb
-		{	(my$item,$LEvent,my$key)=@_;
-			return 0 unless $LEvent->button==3;
-			my $submenu=PopupAA(SONG_ALBUM,$key);
-			$item->set_submenu($submenu);
-			0;
-		}:
+	   $rmbcallback=($col eq 'album')?
 		sub	#Albums rmb cb
 		{	(my$item,$LEvent,my$key)=@_;
 			return 0 unless $LEvent->button==3;
 			my $submenu=ChooseSongsFromA($key);
 			$item->set_submenu($submenu);
+			0; #return 0 so that the item receive the click and popup the submenu
+		}:
+		sub	#Arists rmb cb
+		{	(my$item,$LEvent,my$key)=@_;
+			return 0 unless $LEvent->button==3;
+			my $submenu=PopupAA('album', from=>$key);
+			$item->set_submenu($submenu);
 			0;
 		};
 	}
 
-
-	my $max=($LEvent->get_screen->get_height)*.8;
+	my $screen= $widget ? $widget->get_screen : $LEvent->get_screen;
+	my $max=($screen->get_height)*.8;
 	#my $minsize=Gtk2::ImageMenuItem->new('')->size_request->height;
 	my @todo;	#hold images not yet loaded because not cached
 
 	my $createAAMenu=sub
-	{	my ($start,$end,$keys)=@_;
+	{	my ($start,$end,$names,$keys)=@_;
 		my $nb=$end-$start+1;
 		my $size=32;	$size=64 if 64*$nb < $max;
 		my $row=0; my $rows=($nb<21)? 1 : ($nb<50)? 2 : 3; $rows=int($nb/$rows); my $colnb=0;
@@ -2935,14 +2915,14 @@ sub PopupAA
 			my $label=Gtk2::Label->new;
 			$label->set_line_wrap(TRUE);
 			$label->set_alignment(0,.5);
-			$label->set_markup( ReplaceAAFields($key,$format,$col,1) );
-			#$label->set_markup( ReplaceAAFields($key,"<b>%a</b>%Y\n<small>%s <small>%l</small></small>",$col,1) );
+			$label->set_markup( AA::ReplaceFields($key,$format,$col,1) );
+			#$label->set_markup( AA::ReplaceFields($key,"<b>%a</b>%Y\n<small>%s <small>%l</small></small>",$col,1) );
 			$item->add($label);
 			$item->signal_connect(activate => $callback,$key);
 			$item->signal_connect(button_press_event => $rmbcallback,$key) if $rmbcallback;
 			#$menu->append($item);
 			$menu->attach($item, $colnb, $colnb+1, $row, $row+1); if (++$row>$rows) {$row=0;$colnb++;}
-			if (my $f=$$href{$key}[AAPIXLIST])
+			if (my $f=AAPicture::GetPicture($col,$key))
 			{	my $img=AAPicture::newimg($col,$key,$size,\@todo);
 				$item->set_image($img);
 				#push @todo,$item,$f,$size;
@@ -2951,21 +2931,24 @@ sub PopupAA
 		return $menu;
 	}; #end of createAAMenu
 
-	my $min= ($col==SONG_ARTIST)? $Options{ArtistMenu_min} : $Options{AlbumMenu_min};
+	my $min= ($col eq 'album')? $Options{AlbumMenu_min} : $Options{ArtistMenu_min};
+	$min=0 if $nominor;
 	my @keys_minor;
 	if ($min)
-	{	@keys= grep { @{$href->{$_}[AALIST]}>$min or push @keys_minor,$_ and 0 } @keys;
+	{	@keys= grep {  @{ AA::GetAAList($col,$_) }>$min or push @keys_minor,$_ and 0 } @keys;
 		if (!@keys) {@keys=@keys_minor; undef @keys_minor;}
 	}
 
-	@keys=sort { NFKD(uc$a) cmp NFKD(uc$b) } @keys;
+	Songs::sort_gid_by_name($col,\@keys) unless $nosort;
+	my @names=@{Songs::Gid_to_Display($col,\@keys)}; #convert @keys to list of names
 
-	my $menu=Breakdown_List(\@keys,5,20,35,$createAAMenu);
+	my $menu=Breakdown_List(\@names,5,20,35,$createAAMenu,\@keys);
 	return undef unless $menu;
 	if (@keys_minor)
-	{	@keys_minor=sort { NFKD(uc$a) cmp NFKD(uc$b) } @keys_minor;
+	{	Songs::sort_gid_by_name($col,\@keys_minor) unless $nosort;
+		my @names=@{Songs::Gid_to_Display($col,\@keys)};
 		my $item=Gtk2::MenuItem->new('minor'); #FIXME
-		my $submenu=Breakdown_List(\@keys_minor,5,20,35,$createAAMenu);
+		my $submenu=Breakdown_List(\@names,5,20,35,$createAAMenu,\@keys_minor);
 		$item->set_submenu($submenu);
 		$menu->append($item);
 	}
@@ -2986,9 +2969,9 @@ sub PopupAA
 }
 
 sub Breakdown_List
-{	my ($keys,$min,$opt,$max,$makemenu)=@_;
+{	my ($keys,$min,$opt,$max,$makemenu,$gids)=@_;
 
-	if ($#$keys<=$max) { return $makemenu ? &$makemenu(0,$#$keys,$keys) : [0,$#$keys] }
+	if ($#$keys<=$max) { return $makemenu ? &$makemenu(0,$#$keys,$keys,$gids) : [0,$#$keys] }
 
 	my @bounds;
 	for my $start (0..$#$keys)
@@ -3095,12 +3078,12 @@ sub Breakdown_List
 			$c1=ucfirst$c1; $c2=ucfirst$c2;
 			$c1.='-'.$c2 if $c2 ne $c1;
 			my $item=Gtk2::MenuItem->new($c1);
-			my $submenu= &$makemenu($start,$end,$keys);
+			my $submenu= &$makemenu($start,$end,$keys,$gids);
 			$item->set_submenu($submenu);
 			$menu->append($item);
 		}
 	}
-	elsif (@menus==1) { $menu= &$makemenu(0,$#$keys,$keys); }
+	elsif (@menus==1) { $menu= &$makemenu(0,$#$keys,$keys,$gids); }
 	else {return undef}
 
 	return $menu;
@@ -3118,7 +3101,7 @@ sub PixLoader_callback
 	}
 }
 sub LoadPixData
-{	my ($pixdata,$size)=($_[0],$_[1]);
+{	my $pixdata=$_[0]; my $size=$_[1];
 	my $loader=Gtk2::Gdk::PixbufLoader->new;
 	$loader->signal_connect(size_prepared => \&::PixLoader_callback,$size) if $size;
 	eval { $loader->write($pixdata); };
@@ -3129,20 +3112,20 @@ sub LoadPixData
 }
 
 sub PixBufFromFile
-{	my ($file,$size)=($_[0],$_[1]);
+{	my $file=$_[0]; my $size=$_[1];
 	return unless $file;
 	unless (-r $file) {warn "$file not found\n" unless $_[1]; return undef;}
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;
 	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
-	if ($file=~m/\.mp3/i)
-	{	my $data=ReadTag::PixFromMP3($file);
+	if ($file=~m/\.(?:mp3|flac)$/i)
+	{	my $data=FileTag::PixFromMusicFile($file);
 		eval { $loader->write($data) } if defined $data;
 	}
 	else	#eval{Gtk2::Gdk::Pixbuf->new_from_file(filename_to_unicode($file))};
 		# work around Gtk2::Gdk::Pixbuf->new_from_file which wants utf8 filename
 	{	open my$fh,'<',$file; binmode $fh;
-		my $buf; eval {$loader->write($buf) while read $fh,$buf,1024*50;};
+		my $buf; eval {$loader->write($buf) while read $fh,$buf,1024*64;};
 		close $fh;
 	}
 	eval {$loader->close;};
@@ -3201,34 +3184,32 @@ sub pixbox_button_press_cb	# zoom picture when clicked
 	1;
 }
 
-sub PopupContextMenu
-{	my ($mref,$args)=@_;
+sub PopupContextMenu	#FIXME rename to BuildContextMenu or BuildMenu
+{	my ($mref,$args,$appendtomenu)=@_;
 	my $menu_callback=sub
 		 {	my $sub=$_[1];
-			&$sub( $args );
+			$sub->( $args );
 		 };
-	my $mode=$args->{mode} || '^$';
-	$mode=qr/$mode/;
-	my $count;
-	my $menu=Gtk2::Menu->new;
+	my $menu= $appendtomenu || Gtk2::Menu->new;
 	for my $m (@$mref)
 	{	next if $m->{ignore};
+		next if $m->{mode}	&& index($m->{mode},	$args->{mode})==-1;
+		next if $m->{notmode}	&& index($m->{notmode},	$args->{mode})!=-1;
 		next if $m->{isdefined}	&& !defined $args->{ $m->{isdefined} };
-		next if $m->{istrue}	&& !$args->{ $m->{istrue} };
-		next if $m->{mode}	&& $m->{mode}	!~m/$mode/;
-		next if $m->{notmode}	&& $m->{notmode}=~m/$mode/;;
+		#next if $m->{notdefined}&& defined $args->{ $m->{notdefined} };
+		next if $m->{istrue}	&&   !$args->{ $m->{istrue} };
+		#next if $m->{notstrue}	&&    $args->{ $m->{nottrue} };
 		next if $m->{empty}	&& (  $args->{ $m->{empty} }	&& @{ $args->{ $m->{empty}   } }!=0 );
 		next if $m->{notempty}	&& ( !$args->{ $m->{notempty} }	|| @{ $args->{ $m->{notempty}} }==0 );
 		next if $m->{onlyone}	&& ( !$args->{ $m->{onlyone}  }	|| @{ $args->{ $m->{onlyone} } }!=1 );
 		next if $m->{onlymany}	&& ( !$args->{ $m->{onlymany} }	|| @{ $args->{ $m->{onlymany}} }<2  );
-		next if $m->{test}	&& !&{ $m->{test} }($args);
+		next if $m->{test}	&& !$m->{test}($args);
 
 		my $label=$m->{label};
 		$label=&$label($args) if ref $label;
 		my $item;
-		if (!defined $label)
-		{	next unless $m->{separator};
-			$item=Gtk2::SeparatorMenuItem->new;
+		if ($m->{separator})
+		{	$item=Gtk2::SeparatorMenuItem->new;
 		}
 		elsif ($m->{stockicon})
 		{	$item=Gtk2::ImageMenuItem->new($label);
@@ -3237,39 +3218,64 @@ sub PopupContextMenu
 		elsif ( ($m->{check} || $m->{radio}) && !$m->{submenu})
 		{	$item=Gtk2::CheckMenuItem->new($label);
 			my $func= $m->{check} || $m->{radio};
-			$item->set_active(1) if &$func($args);
+			$item->set_active(1) if $func->($args);
 			$item->set_draw_as_radio(1) if $m->{radio};
 		}
+		elsif ( my $include=$m->{include} ) #append items made by $include
+		{	$include= $include->($args) if ref $include eq 'CODE';
+			if (ref $include eq 'ARRAY') { PopupContextMenu($include,$args,$menu); }
+			next;
+		}
+		elsif ( my $repeat=$m->{repeat} )
+		{	my @menus= $repeat->($args);
+			for my $submenu (@menus)
+			{	my ($menuarray,@extra)=@$submenu;
+				PopupContextMenu($menuarray,{%$args,@extra},$menu);
+			}
+			next;
+		}
 		else	{ $item=Gtk2::MenuItem->new($label); }
+
+		if (my $i=$m->{sensitive}) { $item->set_sensitive(0) unless $i->($args) }
+
 		if (my $submenu=$m->{submenu})
-		{	$submenu=&$submenu($args) if ref $submenu eq 'CODE';
+		{	$submenu=$submenu->($args) if ref $submenu eq 'CODE';
 			if ($m->{code}) #list submenu
 			{	my (@labels,@values);
-				if ($m->{submenu_ordered_hash})
-				{	my $i=0; while ($i<$#$submenu)
-					{push @labels,$submenu->[$i++];push @values,$submenu->[$i++]; }
+				if ($m->{submenu_ordered_hash} || $m->{submenu_tree})
+				{	my $i=0;
+					while ($i<$#$submenu)
+					 { push @labels,$submenu->[$i++];push @values,$submenu->[$i++]; }
 				}
 				elsif (ref $submenu eq 'ARRAY')	{@labels=@values=@$submenu}
-				elsif ($m->{submenu_reverse})	{@values=keys %$submenu; @labels=values %$submenu;}
 				else				{@labels=keys %$submenu; @values=values %$submenu;}
+				my $reverse= $m->{submenu_tree} || $m->{submenu_reverse};
+				if ($reverse) { my @t=@values; @values=@labels; @labels=@t; }
 				my @order= 0..$#labels;
-				@order=sort {lc$labels[$a] cmp lc$labels[$b]} @order if ref $submenu eq 'HASH';
+				@order=sort {superlc($labels[$a]) cmp superlc($labels[$b])} @order if ref $submenu eq 'HASH' || $m->{submenu_tree};
 
 				$submenu=Gtk2::Menu->new;
 				my $smenu_callback=sub
 				 {	my $sub=$_[1];
-					&$sub( $args, $_[0]{selected} );
+					$sub->( $args, $_[0]{selected} );
 				 };
 				my $check;
-				$check=&{ $m->{check} }($args) if $m->{check};
+				$check= $m->{check}($args) if $m->{check};
 				for my $i (@order)
 				{	my $label=$labels[$i];
 					my $value=$values[$i];
+					if (ref $value && $m->{submenu_tree})
+					{	PopupContextMenu([{%$m,label=>$label,submenu=>$value}],$args,$submenu);
+						next;
+					}
 					my $item=Gtk2::MenuItem->new($label);
 					if (defined $check)
 					{	$item=Gtk2::CheckMenuItem->new($label);
-						$item->set_draw_as_radio(1);
-						$item->set_active(1) if $check eq $value;
+						if (ref $check)	{ $item->set_active(1) if grep $_ eq $value, @$check; }
+						else
+						{	$item->set_draw_as_radio(1);
+							$item->set_active(1) if $check eq $value;
+						}
 					}
 					$item->{selected}= $value;
 					$submenu->append($item);
@@ -3284,34 +3290,32 @@ sub PopupContextMenu
 		else
 		{	$item->signal_connect (activate => $menu_callback, $m->{code} );
 		}
-		$count++;
 		$menu->append($item);
 	}
+	return if $appendtomenu;
 	if (defined wantarray) {return $menu}
-	return unless $count;
+	return unless $menu->get_children;
 	$menu->show_all;
-	$menu->popup(undef,undef,undef,undef,$LEvent->button,$LEvent->time);
+	my $posfunction= $args->{usemenupos} ? \&menupos : undef;
+	$menu->popup(undef,undef,$posfunction,undef,$LEvent->button,$LEvent->time);
 }
 
 sub set_drag
 {	my ($widget,%params)=@_;
 	if (my $dragsrc=$params{source})
-	{	my $n=$dragsrc->[0];
-		$widget->drag_source_set(
-			['button1-mask'],['copy','move'],
-			map [ $DRAGTYPES[$_][0], [] , $_ ], $n,
-				keys %{$DRAGTYPES[$n][1]} );
-		$widget->{dragsrc}=$dragsrc;
+	{	( my $type, $widget->{dragsrc} )= @$dragsrc;
+		$widget->drag_source_set( ['button1-mask'],['copy','move'],
+			map [ $DRAGTYPES[$_][0], [] , $_ ], $type,
+				keys %{$DRAGTYPES[$type][1]} );
 		$widget->signal_connect(drag_data_get => \&drag_data_get_cb);
 		$widget->signal_connect(drag_begin => \&drag_begin_cb);
 		$widget->signal_connect(drag_end => \&drag_end_cb);
 	}
 	if (my $dragdest=$params{dest})
-	{	$widget->drag_dest_set(
-			'all',['copy','move'],
-			map [ $DRAGTYPES[$_][0], ($_==DRAG_ID ? 'same-app' : []) , $_ ],
-				@$dragdest[0..$#$dragdest-1] );
-		$widget->{dragdest}=$dragdest->[-1];
+	{	my @types=@$dragdest;
+		$widget->{dragdest}= pop @types;
+		$widget->drag_dest_set(	'all',['copy','move'],
+			map [ $DRAGTYPES[$_][0], ($_==DRAG_ID ? 'same-app' : []) , $_ ], @types );
 		$widget->signal_connect(drag_data_received => \&drag_data_received_cb);
 		$widget->signal_connect(drag_leave => \&drag_leave_cb);
 		$widget->signal_connect(drag_motion => $params{motion}) if $params{motion}; $widget->{drag_motion_cb}=$params{motion};
@@ -3322,10 +3326,11 @@ sub drag_begin_cb	#create drag icon
 {	my ($self,$context)=@_;# warn "drag_begin_cb @_";
 	$self->signal_stop_emission_by_name('drag_begin');
 	$self->{drag_is_source}=1;
-	my ($srcinfo,$sub)=@{ $self->{dragsrc} };
-	my @values=&$sub($self);
+	my $sub= $self->{dragsrc};
+	my ($srcinfo,@values)=&$sub($self);
 	unless (@values) { $context->abort($context->start_time); return; } #FIXME no data -> should abort the drag
 	$context->{data}=\@values;
+	$context->{srcinfo}=$srcinfo;
 	my $plaintext;
 	{	$sub=$DRAGTYPES[$srcinfo][1]{&DRAG_MARKUP};
 		last if $sub;
@@ -3362,25 +3367,25 @@ sub drag_leave_cb
 
 sub drag_data_get_cb
 {	my ($self,$context,$data,$destinfo,$time)=@_; #warn "drag_data_get_cb @_";
-	my ($srcinfo,$sub)=@{ $self->{dragsrc} };
+	#my $sub= $self->{dragsrc};
 	return unless $context->{data};
-	my @values=@{ $context->{data} };#my @values=&$sub($self); return unless @values;
+	my @values=@{ $context->{data} };#my @values=$sub->($self); return unless @values;
+	my $srcinfo=$context->{srcinfo};
 	if ($destinfo != $srcinfo)
 	{	my $convsub=$DRAGTYPES[$srcinfo][1]{$destinfo};
 		if ($destinfo==DRAG_STRING) { my $sub=$DRAGTYPES[$srcinfo][1]{DRAG_USTRING()}; $convsub||=sub { map Encode::encode('iso-8859-1',$_), &$sub }; } #not sure of the encoding I should use, it's for app that don't accept 'text/plain;charset=UTF-8', only found/tested with gnome-terminal
-		@values=$convsub?  &$convsub(@values)  :  ();
+		@values=$convsub?  $convsub->(@values)  :  ();
 	}
 	$data->set($data->target,8, join("\x0d\x0a",@values) ) if @values;
 }
 sub drag_data_received_cb
 {	my ($self,$context,$x,$y,$data,$info,$time)=@_;# warn "drag_data_received_cb @_";
-	my $sub=$self->{dragdest};
-	my $ret=my$del=0;
+	my $ret=my $del=0;
 	if ($data->length >=0 && $data->format==8)
 	{	my @values=split "\x0d\x0a",$data->data;
 		_utf8_on($_) for @values;
 		unshift @values,$context->{dest} if $context->{dest} && $context->{dest}[0]==$self;
-		$sub->($self, $::DRAGTYPES{$data->target->name} , @values);
+		$self->{dragdest} ($self, $::DRAGTYPES{$data->target->name} , @values);
 		$ret=1;#$del=1;
 	}
 	$context->finish($ret,$del,$time);
@@ -3403,7 +3408,7 @@ sub drag_scrolling_cb
 	{	my ($align,$path)=($s<0)? (.1, $self->get_path_at_pos(0,0))
 					: (.9, $self->get_path_at_pos(0,$self->get_visible_rect->height));
 		$self->scroll_to_cell($path,undef,::TRUE,$align) if $path;
-		$self->{drag_motion_cb}->($self,$self->{context}, ($self->window->get_pointer)[1,2], 0 ) if $self->{drag_motion_cb};
+		$self->{drag_motion_cb}( $self,$self->{context}, ($self->window->get_pointer)[1,2], 0 ) if $self->{drag_motion_cb};
 		return 1;
 	}
 	else
@@ -3429,7 +3434,7 @@ sub CreateDir
 {	my ($path,$win,$abortmsg)=@_;
 	my $current='';
 	for my $dir (split /$QSLASH/o,$path)
-	{	$dir=~s/$ILLEGALCHAR//g;
+	{	$dir= CleanupFileName($dir);
 		next if $dir eq '' || $dir eq '.';
 		$current.=SLASH.$dir;
 		next if -d $current;
@@ -3446,7 +3451,7 @@ sub CopyMoveFilesDialog
 {	my ($IDs,$copy)=@_;
 	my $msg=$copy	?	_"Choose directory to copy files to"
 			:	_"Choose directory to move files to";
-	my $newdir=ChooseDir($msg,$Songs[$IDs->[0]][SONG_PATH].SLASH);
+	my $newdir=ChooseDir($msg, Songs::Get($IDs->[0],'path').SLASH);
 	CopyMoveFiles($IDs,$copy,$newdir) if defined $newdir;
 }
 
@@ -3483,9 +3488,7 @@ COPYNEXTID:for my $ID (@$IDs)
 		Gtk2->main_iteration while Gtk2->events_pending;
 		$done++;
 		$abortmsg=undef if $done==@$IDs;
-		my $aref=$Songs[$ID];
-		my $oldfile=$$aref[SONG_FILE];
-		my $olddir= $$aref[SONG_PATH];
+		my ($olddir,$oldfile)= Songs::Get($ID, qw/path file/);
 		my $old=$olddir.SLASH.$oldfile;
 		my $newfile=$oldfile;
 		my $newdir=defined $basedir? $basedir : $olddir.SLASH;
@@ -3510,27 +3513,17 @@ COPYNEXTID:for my $ID (@$IDs)
 			$owrite_all=$ow if $ow=~m/all$/;
 			next if $ow=~m/^no/;
 		}
-		until (&$sub($old,$new))
+		until ($sub->($old,$new))
 		{	my $res=Retry_Dialog("$errormsg :\n'$old'\n -> '$new'\n$!",$win,$abortmsg);
 			last COPYNEXTID if $res eq 'abort';
 			last unless $res eq 'yes';
 		}
 		unless ($copy)
-		{	my @diff;
-			$newdir=~s/$QSLASH+$//o;
-			if ($$aref[SONG_PATH] ne $newdir)
-			{	$$aref[SONG_PATH]=$newdir;
-				$$aref[SONG_UPATH]=filename_to_utf8displayname($newdir);
-				@diff=(SONG_PATH,SONG_UPATH);
-			}
-			if ($$aref[SONG_FILE] ne $newfile)
-			{	$$aref[SONG_FILE]=$newfile;
-				$$aref[SONG_UFILE]=filename_to_utf8displayname($newfile);
-				push @diff,SONG_FILE,SONG_UFILE;
-			}
-			SongChanged($ID,@diff);
-			$GetIDFromFile{$newdir}{$newfile} = delete $GetIDFromFile{$olddir}{$oldfile};
-			delete $GetIDFromFile{$olddir} unless keys %{ $GetIDFromFile{$olddir} };
+		{	$newdir=~s/$QSLASH+$//o;
+			my @modif;
+			push @modif, path => $newdir  if $olddir ne $newdir;
+			push @modif, file => $newfile if $oldfile ne $newfile;
+			Songs::Set($ID, @modif);
 		}
 		last if $cancel;
 	}
@@ -3538,11 +3531,12 @@ COPYNEXTID:for my $ID (@$IDs)
 }
 
 sub ChooseDir
-{	my ($msg,$path,$extrawidget,$multiple) = @_;
+{	my ($msg,$path,$extrawidget,$remember_key,$multiple) = @_;
 	my $dialog=Gtk2::FileChooserDialog->new($msg,undef,'select-folder',
 					'gtk-ok' => 'ok',
 					'gtk-cancel' => 'none',
 					);
+	if ($remember_key) { $path= decode_url($Options{$remember_key}); }
 	_utf8_on($path) if $path; #FIXME not sure if it's the right thing to do
 	$dialog->set_current_folder($path) if $path;
 	$dialog->set_extra_widget($extrawidget) if $extrawidget;
@@ -3550,12 +3544,13 @@ sub ChooseDir
 
 	my @paths;
 	if ($dialog->run eq 'ok')
-	{   @paths=$dialog->get_filenames;
-	    eval { $_=filename_from_unicode($_); } for @paths;
-	    _utf8_off($_) for @paths; # folder names that failed filename_from_unicode still have their uft8 flag on
-	    @paths= grep -d, @paths;
+	{	@paths=$dialog->get_filenames;
+		eval { $_=filename_from_unicode($_); } for @paths;
+		_utf8_off($_) for @paths;# folder names that failed filename_from_unicode still have their uft8 flag on
+		@paths= grep -d, @paths;
 	}
 	else {@paths=()}
+	if ($remember_key) { $Options{$remember_key}= url_escape($dialog->get_current_folder); }
 	$dialog->destroy;
 	return @paths if $multiple;
 	return $paths[0];
@@ -3575,28 +3570,25 @@ sub ChooseDir
 #}
 
 sub ChoosePix
-{	my ($path,$text,$file)=@_;
+{	my ($path,$text,$file,$remember_key)=@_;
 	$text||=_"Choose Picture";
 	my $dialog=Gtk2::FileChooserDialog->new($text,undef,'open',
 					_"no picture" => 'reject',
 					'gtk-ok' => 'ok',
 					'gtk-cancel' => 'none');
 
-	my $filter = Gtk2::FileFilter->new;
-	#$filter->add_mime_type('image/'.$_) for qw/jpeg gif png bmp/;
-	$filter->add_mime_type('image/*');
-	$filter->add_pattern('*.mp3');
-	$filter->set_name(_"Pictures & mp3 files");
-	$dialog->add_filter($filter);
-	$filter = Gtk2::FileFilter->new;
-	$filter->add_mime_type('image/*');
-	$filter->set_name(_"Pictures files");
-	$dialog->add_filter($filter);
-	$filter = Gtk2::FileFilter->new;
-	#$filter->add_mime_type('*');
-	$filter->add_pattern('*');
-	$filter->set_name(_"All files");
-	$dialog->add_filter($filter);
+	for my $aref
+	(	[_"Pictures, mp3 & flac files",'image/*','*.mp3 *.flac'],
+		[_"Pictures files",'image/*'],
+		[_"All files",undef,'*'],
+	)
+	{	my $filter= Gtk2::FileFilter->new;
+		#$filter->add_mime_type('image/'.$_) for qw/jpeg gif png bmp/;
+		if ($aref->[1])	{ $filter->add_mime_type($_)	for split / /,$aref->[1]; }
+		if ($aref->[2])	{ $filter->add_pattern($_)	for split / /,$aref->[2]; }
+		$filter->set_name($aref->[0]);
+		$dialog->add_filter($filter);
+	}
 
 	my $preview=Gtk2::VBox->new;
 	my $label=Gtk2::Label->new;
@@ -3614,17 +3606,21 @@ sub ChoosePix
 			$file=$dialog->get_filename if $@; #for some reason get_preview_filename doesn't work with bad utf8 whereas get_filename works. don't know if there is any difference
 		  }
 		  return unless $file;
-		  eval{ $file=filename_from_unicode($file); };
+		  unless (-f $file) #not sure it's needed - test with broken filenames on other OS
+		  {	eval{ $file=filename_from_unicode($file); };
+		  	_utf8_off($file); #shouldn't be needed :(
+		  }
 		  ScaleImageFromFile($image,150,$file);
 		  my $p=$image->{pixbuf};
 		  if ($p) { $label->set_text($p->get_width.' x '.$p->get_height); }
 		  #else { $label->set_text('no picture'); }
 		  $dialog->set_preview_widget_active($p);
 		};
-	$dialog->signal_connect(selection_changed => $update_preview);
+	$dialog->signal_connect(update_preview => $update_preview);
 
 	$preview->show_all;
-	if ($file && -f $file)	{ $dialog->set_filename($file); &$update_preview($dialog,$file); }
+	if ($remember_key) { $path= decode_url($Options{$remember_key}); }
+	if ($file && -f $file)	{ $dialog->set_filename($file); $update_preview->($dialog,$file); }
 	#elif ($path)		{ $dialog->set_current_folder($path); }
 	elsif ($path)		{ $dialog->set_filename($path.SLASH.'*.jpg'); }
 
@@ -3637,6 +3633,7 @@ sub ChoosePix
 	}
 	elsif ($response eq 'reject') {$ret='0'}
 	else {$ret=undef}
+	if ($remember_key) { $Options{$remember_key}= url_escape($dialog->get_current_folder); }
 	$dialog->destroy;
 	return $ret;
 }
@@ -3765,12 +3762,12 @@ sub ErrorMessage
 sub EditLyrics
 {	my $ID=$_[0];
 	if (exists $Editing{'L'.$ID}) { $Editing{'L'.$ID}->present; return; }
-	my $lyrics=ReadTag::GetLyrics($ID);
+	my $lyrics=FileTag::GetLyrics($ID);
 	$lyrics='' unless defined $lyrics;
 	$Editing{'L'.$ID}=
-	  EditLyricsDialog(undef,$lyrics,_("Lyrics for ").$Songs[$ID][SONG_UPATH].SLASH.$Songs[$ID][SONG_UFILE],sub
+	  EditLyricsDialog(undef,$lyrics,_("Lyrics for ").Songs::Display($ID,'fullfilename'),sub
 	   {	delete $Editing{'L'.$ID};
-		ReadTag::WriteLyrics($ID,$_[0]) if defined $_[0];
+		FileTag::WriteLyrics($ID,$_[0]) if defined $_[0];
 	   });
 }
 
@@ -3798,7 +3795,7 @@ sub EditLyricsDialog
 			my $lyrics;
 			$lyrics=$buffer->get_text( $buffer->get_bounds, 1) if $response eq 'ok';
 			$dialog->destroy;
-			&$sub($lyrics) if $sub;
+			$sub->($lyrics) if $sub;
 		},$sub);
 	return $dialog;
 }
@@ -3806,7 +3803,8 @@ sub EditLyricsDialog
 sub DeleteFiles
 {	return if $CmdLine{ro};
 	my $IDs=$_[0];
-	my $text=(@$IDs==1)? "'".$Songs[$IDs->[0]][SONG_UFILE]."'" : __("%d file","%d files",scalar @$IDs);
+	return unless @$IDs;
+	my $text=(@$IDs==1)? "'".Songs::Display($IDs->[0],'file')."'" : __("%d file","%d files",scalar @$IDs);
 	my $dialog = Gtk2::MessageDialog->new
 		( undef,
 		  'modal',
@@ -3818,7 +3816,7 @@ sub DeleteFiles
 	{ my $abortmsg;
 	  $abortmsg=_"Abort" if @$IDs>1;
 	  for my $ID (@$IDs)
-	  {	my $f=$Songs[$ID][SONG_PATH].SLASH.$Songs[$ID][SONG_FILE];
+	  {	my $f= Songs::GetFullFilename($ID);
 		unless (unlink $f)
 		{	my $res=::Retry_Dialog(__x(_("Failed to delete '{file}' :\n{error}"), file => $f, error => $!),undef,$abortmsg);
 			redo if $res eq 'yes';
@@ -3832,38 +3830,53 @@ sub DeleteFiles
 
 sub filenamefromformat
 {	my ($ID,$format,$ext)=@_;
-	my $s=ReplaceFields( $ID, $format );
-	$s=~s/$ILLEGALCHAR//g;
-	$s=~s/ +$//;
-	$s.=( $Songs[$ID][SONG_UFILE]=~m/(\.[^\.]+$)/ )[0] if $ext; #add extension
+	my $s= CleanupFileName( ReplaceFields($ID,$format) );
+	$s.=( Songs::Get($ID,'file')=~m/(\.[^\.]+$)/ )[0] if $ext; #add extension
 	return $s;
 }
 sub pathfromformat
-{	my ($ID,$format,$basefolder)=@_;
-	#my $s=ReplaceFields( $ID, $format );
-	my $s=	join ::SLASH,	map { $_=ReplaceFields( $ID, $_ ); s/$QSLASH+//go; $_ }	split /$QSLASH+/o, $format;
-	$s=~s/$ILLEGALCHARDIR//go;
-	$s.=SLASH;
-	$s=~s#$QSLASH\.\.?$QSLASH#::SLASH#goe;
-	$s=$basefolder.SLASH.$s if $basefolder;
-	$s=~s#$QSLASH{2,}#::SLASH#goe;
-	$s=~s/ +$//;
-	return $s;
+{	my ($ID,$format,$basefolder,$icase)=@_;
+	my $path= $basefolder ? $basefolder.SLASH : '';
+	for my $f0 (split /$QSLASH+/o,$format)
+	{	my $f= CleanupFileName( ReplaceFields($ID,$f0) );
+		if ($f0 ne $f)
+		{	$f=~s/^\.\.?$//;
+			$f=ICasePathFile($path,$f) if $icase;
+		}
+		$path.=$f.SLASH;
+	}
+	return $path;
 }
 sub pathfilefromformat
-{	my ($ID,$format,$ext)=@_;
-	$format=~s#^~($QSLASH)#$ENV{HOME}$1#;
-	return undef unless $format=~m#^$QSLASH# && $format=~s#$QSLASH([^$QSLASH]+)$##;
-	my $file=$1;
+{	my ($ID,$format,$ext,$icase)=@_;
+	$format=~s#^~($QSLASH)#$ENV{HOME}$1#o;
+	$format=~s#$QSLASH+\.?$QSLASH+#SLASH#goe;
+	return undef unless $format=~m#^$QSLASH#o;
+	my ($path,$file)= $format=~m/^(.*)$QSLASH([^$QSLASH]+)$/o;
+	return undef unless $file;
+	$path=pathfromformat($ID,$path,undef,$icase);
 	$file=filenamefromformat($ID,$file,$ext);
-	my $path=pathfromformat($ID,$format);
-	return wantarray ? ($path,$file) : $path.::SLASH.$file;
+	$file=ICasePathFile($path,$file) if $icase;
+	return wantarray ? ($path,$file) : $path.$file;
+}
+sub ICasePathFile	#tries to find an existing file/folder with different case
+{	my ($path,$folder)=@_;
+	return $folder unless -e $path;
+	unless (-e $path.$folder)
+	{	opendir my($d),$path;
+		my @files=readdir $d;
+		closedir $d;
+		my $lc=lc$folder;	#or superlc ?
+		my ($found)=grep $lc eq lc, @files;
+		$folder=$found if defined $found;
+	}
+	return $folder;
 }
 
 sub DialogMassRename
 {	return if $CmdLine{ro};
-	my @IDs=do {my %h; grep !$h{$_}++, @_ }; #remove duplicates IDs in @_ => @IDs
-	::SortList(\@IDs,::SONG_UPATH.' '.::SONG_UFILE);
+	my @IDs= uniq(@_); #remove duplicates IDs in @_ => @IDs
+	::SortList(\@IDs,'path album disc track file');
 	my $dialog = Gtk2::Dialog->new
 			(_"Mass Renaming", undef,
 			 [qw/destroy-with-parent/],
@@ -3874,17 +3887,28 @@ sub DialogMassRename
 	$dialog->set_default_response('ok');
 	SetWSize($dialog,'MassRename');
 	my $table=MakeReplaceTable('talydnAYo');
-	my $combo=Gtk2::ComboBoxEntry->new_text;
+	my $combo=	NewPrefComboText('FilenameSchema');
+	my $comboFolder=NewPrefComboText('FolderSchema');
 	$combo->child->set_activates_default(TRUE);
-	my $comboFolder=Gtk2::ComboBoxEntry->new_text;
 	my $folders=0;
 	###
 	my $notebook=Gtk2::Notebook->new;
 	my $store=Gtk2::ListStore->new('Glib::String');
 	my $treeview1=Gtk2::TreeView->new($store);
 	my $treeview2=Gtk2::TreeView->new($store);
-	my $func1=sub { my (undef,$cell,$store,$iter)= @_; my $ID=$store->get($iter,0); my $t=$Songs[$ID][SONG_UFILE]; $cell->set(text=> ($folders? $Songs[$ID][SONG_UPATH].SLASH.$t : $t)); };
-	my $func2=sub { my (undef,$cell,$store,$iter)= @_; my $ID=$store->get($iter,0); my $t=filenamefromformat($ID,$combo->child->get_text,1); if ($folders) {$t=pathfromformat($ID,$comboFolder->child->get_text, $Options{BaseFolder}).$t; } $cell->set(text=>$t) };
+	my $func1=sub
+	  {	my (undef,$cell,$store,$iter)= @_;
+		my $ID=$store->get($iter,0);
+		my $text= $folders ? Songs::Display($ID,'fullfilename') : Songs::Display($ID,'file');
+		$cell->set(text=>$text);
+	  };
+	my $func2=sub
+	  {	my (undef,$cell,$store,$iter)=@_;
+		my $ID=$store->get($iter,0);
+		my $text=filenamefromformat($ID,$combo->get_active_text,1);
+		if ($folders) {$text=pathfromformat($ID,$comboFolder->get_active_text, $Options{BaseFolder}).$text; }
+		$cell->set(text=>$text);
+	  };
 	for ( [$treeview1,_"Old name",$func1], [$treeview2,_"New name",$func2] )
 	{	my ($tv,$title,$func)=@$_;
 		$tv->set_headers_visible(FALSE);
@@ -3911,18 +3935,12 @@ sub DialogMassRename
 	$store->set( $store->append,0, $_ ) for @IDs;
 
 	my $refresh=sub { $treeview2->queue_draw; };
+	$combo->signal_connect(changed => $refresh);
+	$comboFolder->signal_connect(changed => $refresh);
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	my $entrybase=NewPrefFileEntry('BaseFolder',_("Base Folder :"),'folder', $refresh,undef,$sg1,$sg2);
+	my $entrybase=NewPrefFileEntry('BaseFolder',_("Base Folder :"), folder =>1, cb => $refresh, sizeg1=>$sg1,sizeg2=>$sg2, history_key=>'BaseFolder_history');
 	my $labelfolder=Gtk2::Label->new(_"Folder pattern :");
-
-	$combo->signal_connect(changed => $refresh);
-	$combo->append_text($_) for split "\x1D",$Options{FilenameSchema};
-	$combo->set_active(0);
-
-	$comboFolder->signal_connect(changed => $refresh);
-	$comboFolder->append_text($_) for split "\x1D",$Options{FolderSchema};
-	$comboFolder->set_active(0);
 
 	my $title=Gtk2::Label->new(_"Rename/move files based on these fields :");
 	#my $checkfile=	Gtk2::CheckButton->new(_"Rename files using this pattern :");
@@ -3952,24 +3970,17 @@ sub DialogMassRename
 	$dialog->signal_connect( response => sub
 	 {	my ($dialog,$response)=@_;
 		if ($response eq 'ok')
-		{ my $format=$combo->child->get_text;
-			#save filename schema
-		  my @list= grep $_ ne $format,split "\x1D",$Options{FilenameSchema};
-		  $#list=10 if $#list>10;
-		  $Options{FilenameSchema}=join "\x1D",$format,@list;
-			#
+		{ my $format=$combo->get_active_text;
+		  PrefSaveHistory(FilenameSchema=>$format,10);
 		  if ($folders)
 		  {	my $base= $Options{BaseFolder};
 			unless ( defined $base ) { ErrorMessage(_("You must specify a base folder"),$dialog); return }
+			PrefSaveHistory(BaseFolder_history=>$base,10);
 			until ( -d $base ) { last unless $base=~s/$QSLASH[^$QSLASH]*$//o && $base=~m/$QSLASH/o;  }
 			unless ( -w $base ) { ErrorMessage(__x(_("Can't write in base folder '{folder}'."), folder => $Options{BaseFolder}),$dialog); return }
 			$dialog->set_sensitive(FALSE);
-			my $folderformat=$comboFolder->child->get_text;
-			 #save foldername schema
-			my @list= grep $_ ne $folderformat,split "\x1D",$Options{FolderSchema};
-			$#list=10 if $#list>10;
-			$Options{FolderSchema}=join "\x1D",$folderformat,@list;
-			 #
+			my $folderformat=$comboFolder->get_active_text;
+			PrefSaveHistory(FolderSchema=>$folderformat,10);
 			CopyMoveFiles(\@IDs,FALSE,$Options{BaseFolder},$folderformat,$format);
 		  }
 		  elsif ($format)
@@ -3983,10 +3994,8 @@ sub DialogMassRename
 
 sub RenameFile
 {	my ($ID,$newutf8,$window,$abortmsg)=@_;
-	$newutf8=~s/$ILLEGALCHAR//g;
-	my $new=filename_from_unicode($newutf8);
-	my $old=$Songs[$ID][SONG_FILE];
-	my $dir=$Songs[$ID][SONG_PATH];
+	my $new=filename_from_unicode(CleanupFileName($newutf8));
+	my ($dir,$old)= Songs::Get($ID,qw/path file/);
 	{	last if $new eq '';
 		last if $old eq $new;
 		if (-f $dir.SLASH.$new)
@@ -3995,15 +4004,12 @@ sub RenameFile
 			redo;
 		}
 		elsif (!rename $dir.SLASH.$old, $dir.SLASH.$new)
-		{	my $res=Retry_Dialog( __x( _"Renaming {oldname}\nto {newname}\nfailed : {error}", oldname => $Songs[$ID][SONG_UFILE], newname => $newutf8, error => $!),$window,$abortmsg);
+		{	my $res=Retry_Dialog( __x( _"Renaming {oldname}\nto {newname}\nfailed : {error}", oldname => Songs::Display($ID,'file'), newname => $newutf8, error => $!),$window,$abortmsg);
 			return $res unless $res eq 'yes';
 			redo;
 		}
 	}
-	$Songs[$ID][SONG_FILE]=$new;
-	$Songs[$ID][SONG_UFILE]=$newutf8;
-	$GetIDFromFile{$dir}{$new}=delete $GetIDFromFile{$dir}{$old};
-	SongChanged($ID,SONG_UFILE,SONG_FILE);
+	Songs::Set($ID, file=> $new);
 	return 1;
 }
 
@@ -4016,11 +4022,12 @@ sub DialogRename
 	$dialog->set_default_response ('ok');
 	my $table=Gtk2::Table->new(4,2);
 	my $row=0;
-	for my $col (SONG_TITLE,SONG_ARTIST,SONG_ALBUM,SONG_DISC,SONG_TRACK)
-	{	next if ($col==SONG_DISC || $col==SONG_TRACK) && !$Songs[$ID][$col];
+	for my $col (qw/title artist album disc track/)
+	{	my $val=Songs::Display($ID,$col);
+		next if ($col eq 'disc' || $col eq 'track') && !$val;
 		my $lab1=Gtk2::Label->new;
-		my $lab2=Gtk2::Label->new($Songs[$ID][$col]);
-		$lab1->set_markup('<b>'.$TagProp[$col][0].' :</b>');
+		my $lab2=Gtk2::Label->new($val);
+		$lab1->set_markup('<b>'.PangoEsc(Songs::FieldName($col)).' :</b>');
 		$lab1->set_padding(5,0);
 		$lab1->set_alignment(1,.5);
 		$lab2->set_alignment(0,.5);
@@ -4032,7 +4039,7 @@ sub DialogRename
 	}
 	my $entry=Gtk2::Entry->new;
 	$entry->set_activates_default(TRUE);
-	$entry->set_text($Songs[$ID][SONG_UFILE]);
+	$entry->set_text(Songs::Display($ID,'file'));
 	$dialog->vbox->add($table);
 	$dialog->vbox->add($entry);
 	SetWSize($dialog,'Rename');
@@ -4048,12 +4055,16 @@ sub DialogRename
 	 });
 }
 
-sub AddToListMenu
-{	return undef unless keys %SavedLists;
-	my $IDs=$_[0]{IDs};
-	my $menusub=sub {my $key=$_[1]; push @{$SavedLists{$key}},@$IDs; HasChanged('SavedLists',$key,'push'); };
+sub GetListOfSavedLists
+{	return sort { superlc($a) cmp superlc($b) } keys %{$Options{SavedLists}};
+}
 
-	my @keys=sort { NFKD(uc$a) cmp NFKD(uc$b) } keys %SavedLists;
+sub AddToListMenu
+{	my @keys=GetListOfSavedLists();
+	return undef unless @keys;
+	my $IDs=$_[0]{IDs};
+	my $menusub=sub {my $key=$_[1]; $Options{SavedLists}{$key}->Push($IDs); };
+
 	my $makemenu=sub
 	{	my ($start,$end,$keys)=@_;
 		my $menu=Gtk2::Menu->new;
@@ -4070,25 +4081,34 @@ sub AddToListMenu
 }
 
 sub LabelEditMenu
-{	return undef unless keys %Labels;
-	my $IDs=$_[0]{IDs};
+{	my $IDs=$_[0]{IDs};
+	my $field='label';
+	my ($hash)=Songs::BuildHash($field,$IDs,'name');
+	$_=	$_==0	  ? 0 :
+		$_==@$IDs ? 1 :
+		2
+	 for values %$hash;
 	my $menusub_toggled=sub
 	 {	my $f=$_[1];
 		if ($_[0]->get_active)	{ SetLabels($IDs,[$f],undef); }
 		else			{ SetLabels($IDs,undef,[$f]); }
 	 };
-	my @keys=sort { NFKD(uc$a) cmp NFKD(uc$b) } keys %Labels;
+	MakeFlagToggleMenu($field,$hash,$menusub_toggled);
+}
+
+sub MakeFlagToggleMenu	#FIXME special case for no @keys, maybe a menu with a greyed-out item "no #none#"
+{	my ($field,$hash,$callback)=@_;
+	my @keys= @{Songs::ListAll($field)};
 	my $makemenu=sub
-	{	no warnings 'uninitialized';
-		my ($start,$end,$keys)=@_;
+	{	my ($start,$end,$keys)=@_;
 		my $menu=Gtk2::Menu->new;
 		for my $i ($start..$end)
-		{	my $f=$keys->[$i];
-			my $item=Gtk2::CheckMenuItem->new_with_label($f);
-			my $state=grep $Songs[$_][SONG_LABELS]=~m/(?:^|\x00)\Q$f\E(?:$|\x00)/ , @$IDs;
-			if ($state==@$IDs){ $item->set_active($state==@$IDs); }
-			elsif ($state>0)  { $item->set_inconsistent(1); }
-			$item->signal_connect(toggled => $menusub_toggled,$f);
+		{	my $key=$keys->[$i];
+			my $item=Gtk2::CheckMenuItem->new_with_label($key);
+			my $state= $hash->{$key}||0;
+			if ($state==1){ $item->set_active(1); }
+			elsif ($state==2)  { $item->set_inconsistent(1); }
+			$item->signal_connect(toggled => $callback,$key);
 			$menu->append($item);
 		}
 		return $menu;
@@ -4097,49 +4117,46 @@ sub LabelEditMenu
 	return $menu;
 }
 
-sub filterAA
-{	my ($col,$key)=@{$_[0]}{qw/col key/};
-	my $cmd=($col==SONG_ARTIST)? '~' : 'e';
-	Select(filter => $col.$cmd.$key);
+sub PopupAAContextMenu
+{	my $args=$_[0];
+	$args->{mainfield}= Songs::MainField($args->{field});
+	$args->{aaname}= Songs::Gid_to_Get($args->{field},$args->{gid});
+	PopupContextMenu(\@cMenuAA, $args);
 }
+
 sub FilterOnAA
-{	my ($widget,$col,$key,$filternb)=@{$_[0]}{qw/self col key filternb/};
+{	my ($widget,$field,$gid,$filternb)=@{$_[0]}{qw/self field gid filternb/};
 	$filternb=1 unless defined $filternb;
-	my $cmd=($col==SONG_ARTIST)? '~' : 'e';
-	::SetFilter($widget,$col.$cmd.$key,$filternb);
+	::SetFilter($widget, Songs::MakeFilterFromGID($field,$gid), $filternb);
 }
 sub SearchSame
-{	my $col=$_[0];
+{	my $field=$_[0];
 	my ($widget,$IDs,$filternb)=@{$_[1]}{qw/self IDs filternb/};
 	$filternb=1 unless defined $filternb;
-	my $cmd= ($col==SONG_TITLE || $col==SONG_ARTIST)? '~' : 'e';
-	my $filter=Filter->newadd(FALSE,map($col.$cmd.$Songs[$_][$col], @$IDs));
+	my $filter=Filter->newadd(FALSE, map Songs::MakeFilterFromID($field,$_), @$IDs);
 	::SetFilter($widget,$filter,$filternb);
 }
 
 sub SongsSubMenuTitle
-{	my $aaref= ($_[0]{col}==SONG_ARTIST)? \%Artist : \%Album;
-	return undef unless $aaref->{$_[0]{key}};
-	my $nb=@{ $aaref->{$_[0]{key}}[AALIST] };
+{	my $nb=@{ AA::GetIDs($_[0]{field},$_[0]{gid}) };
+	return undef if $nb==0;
 	return __("%d Song","%d Songs",$nb);
 }
 sub SongsSubMenu
 {	my %args=%{$_[0]};
 	$args{mode}='S';
-	my $aaref= ($args{col}==SONG_ARTIST)? \%Artist : \%Album;
-	$args{IDs}=\@{ $aaref->{$args{key}}[AALIST] };
+	$args{IDs}=\@{ AA::GetIDs($args{field},$args{gid}) };
 	return PopupContextMenu(\@SongCMenu,\%args);
 }
 
 sub ArtistContextMenu
-{	my ($artist,$params)=@_;
-	$params->{col}=SONG_ARTIST;
-	my @l=split /$re_artist/o,$artist;
-	if (@l==1) { PopupContextMenu(\@cMenuAA,{%$params,key=>$artist}); return; }
+{	my ($artists,$params)=@_;
+	$params->{field}='artists';
+	if (@$artists==1) { PopupAAContextMenu({%$params,gid=>$artists->[0]}); return; }
 	my $menu = Gtk2::Menu->new;
-	for my $ar (@l)
+	for my $ar (@$artists)
 	{	my $item=Gtk2::MenuItem->new($ar);
-		my $submenu=::PopupContextMenu(\@cMenuAA,{%$params,key=>$ar});
+		my $submenu= PopupAAContextMenu({%$params,gid=>$ar});
 		$item->set_submenu($submenu);
 		$menu->append($item);
 	}
@@ -4147,6 +4164,7 @@ sub ArtistContextMenu
 	$menu->popup(undef,undef,undef,undef,$LEvent->button,$LEvent->time);
 }
 
+=deprecated
 sub EditLabels
 {	my @IDs=@_;
 	my $vbox=Gtk2::VBox->new;
@@ -4154,11 +4172,10 @@ sub EditLabels
 	my %checks;
 	my $changed;
 	my $row=0; my $col=0;
-	no warnings 'uninitialized';
 	my $addlabel=sub
 	 {	my $label=$_[0];
 		my $check=Gtk2::CheckButton->new_with_label($label);
-		my $state=grep $Songs[$_][SONG_LABELS]=~m/(?:^|\x00)\Q$label\E(?:$|\x00)/ , @IDs;
+		my $state= @{ Filter->new( 'label:~:'.$label )->filter(\@IDs)};
 		if ($state==@IDs) { $check->set_active(1); }
 		elsif ($state>0)  { $check->set_inconsistent(1); }
 		$check->signal_connect( toggled => sub	{  $_[0]->set_inconsistent(0); $changed=1 });
@@ -4167,9 +4184,7 @@ sub EditLabels
 		$table->attach($check,$col,$col+1,$row,$row+1,['fill','expand'],'shrink',1,1);
 		$col++;
 	 };
-	for my $label (sort { NFKD(uc$a) cmp NFKD(uc$b) } keys %Labels)
-	{	&$addlabel($label);
-	}
+	$addlabel->($_) for @{SortedLabels()};
 	my $sw=Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('automatic','automatic');
@@ -4181,7 +4196,7 @@ sub EditLabels
 		$entry->grab_focus;
 		return unless $label;
 		$entry->set_text('');
-		&$addlabel($label) unless exists $checks{$label};
+		$addlabel->($label) unless exists $checks{$label};
 		$checks{$label}->set_active(1);
 		$checks{$label}->show_all;
 	 };
@@ -4202,6 +4217,7 @@ sub EditLabels
 	};
 	return $vbox;
 }
+=cut
 
 sub DialogSongsProp
 {	my @IDs=@_;
@@ -4211,15 +4227,16 @@ sub DialogSongsProp
 				'gtk-cancel' => 'none');
 	$dialog->set_default_response ('ok');
 	my $notebook = Gtk2::Notebook->new;
-	$notebook->set_tab_border(4);
-	$dialog->vbox->add($notebook);
+	#$notebook->set_tab_border(4);
+	#$dialog->vbox->add($notebook);
 
-	my $edittag=MassTag->new($dialog,@IDs);
-	my $editlabels=EditLabels(@IDs);
-	my $rating=SongRating(@IDs);
-	$notebook->append_page( $edittag ,	Gtk2::Label->new(_"Tag"));
-	$notebook->append_page( $editlabels,	Gtk2::Label->new(_"Labels"));
-	$notebook->append_page( $rating,	Gtk2::Label->new(_"Rating"));
+	my $edittag=MassTag->new(@IDs);
+	$dialog->vbox->add($edittag);
+	#my $editlabels=EditLabels(@IDs);
+	#my $rating=SongRating(@IDs);
+	#$notebook->append_page( $edittag ,	Gtk2::Label->new(_"Tag"));
+	#$notebook->append_page( $editlabels,	Gtk2::Label->new(_"Labels"));
+	#$notebook->append_page( $rating,	Gtk2::Label->new(_"Rating"));
 
 	SetWSize($dialog,'MassTag');
 	$dialog->show_all;
@@ -4229,9 +4246,9 @@ sub DialogSongsProp
 			my ($dialog,$response)=@_;
 			if ($response eq 'ok')
 			{ $dialog->action_area->set_sensitive(FALSE);
-			  &{ $editlabels->{save} };
-			  &{ $rating->{save} }($rating);
-			  $edittag->save( sub {$dialog->destroy;} ); #the closure will be called when tagging finished #FIXME not clean
+			  #$editlabels->{save}();
+			  #$rating->{save}($rating);
+			  $edittag->save( sub {$dialog->destroy;} ); #the closure will be called when tagging finished #FIXME not very nice
 			}
 			else { $dialog->destroy; }
 			#delete $Editing{$ID};
@@ -4251,12 +4268,12 @@ sub DialogSongProp
 	$dialog->vbox->add($notebook);
 
 	my $edittag=EditTagSimple->new($dialog,$ID);
-	my $editlabels=EditLabels($ID);
-	my $rating=SongRating($ID);
+	#my $editlabels=EditLabels($ID);
+	#my $rating=SongRating($ID);
 	my $songinfo=SongInfo($ID);
 	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Tag"));
-	$notebook->append_page( $editlabels,	Gtk2::Label->new(_"Labels"));
-	$notebook->append_page( $rating,	Gtk2::Label->new(_"Rating"));
+	#$notebook->append_page( $editlabels,	Gtk2::Label->new(_"Labels"));
+	#$notebook->append_page( $rating,	Gtk2::Label->new(_"Rating"));
 	$notebook->append_page( $songinfo,	Gtk2::Label->new(_"Info"));
 
 	SetWSize($dialog,'SongInfo');
@@ -4267,8 +4284,8 @@ sub DialogSongProp
 		my ($dialog,$response)=@_;
 		$songinfo->destroy;
 		if ($response eq 'ok')
-		{	&{ $editlabels->{save} };
-			&{ $rating->{save} }($rating);
+		{	#$editlabels->{save}();
+			#$rating->{save}($rating);
 			$edittag->save;
 			IdleCheck($ID);
 		}
@@ -4280,11 +4297,14 @@ sub DialogSongProp
 sub SongInfo
 {	my $ID = shift;
 	my $table=Gtk2::Table->new(8,2);
+	$table->{ID}=$ID;
 	my $row=0;
-	for my $col (@TAGSELECTION)
+	my @fields=Songs::InfoFields;
+	for my $col (@fields)
 	{	my $lab1=Gtk2::Label->new;
 		my $lab2=$table->{$col}=Gtk2::Label->new;
-		$lab1->set_markup('<b>'.$TagProp[$col][0].' :</b>');
+		#$lab1->set_markup('<b>'.PangoEsc(Songs::FieldName($col)).' :</b>');
+		$lab1->set_text( Songs::FieldName($col).' :');
 		$lab1->set_padding(5,0);
 		$lab1->set_alignment(1,.5);
 		$lab2->set_alignment(0,.5);
@@ -4295,388 +4315,69 @@ sub SongInfo
 		$row++;
 	}
 	my $fillsub=sub
-	{ for my $col (@TAGSELECTION)
-	  {	my $t=$TagProp[$col][2];
-		my $val=$Songs[$ID][$col];
-		if    ($t eq 'd') { $val=$val ? scalar localtime $val : 'never' }
-		elsif ($t eq 'l') { $val=sprintf '%d:%02d',$val/60,$val%60 }
-		elsif ($t eq 'f') { $val='' unless defined $val; $val=~s/\x00$//;$val=~s/\x00/, /g; }
-		$table->{$col}->set_text($val);
-	  }
-	};
-	my $watcher=AddWatcher([$ID],\@TAGSELECTION,$fillsub);
-	$table->signal_connect( destroy => sub {RemoveWatcher($watcher);} );
-	&$fillsub();
+	 {	my ($table,$IDs,$fields)=@_;
+		my $ID=$table->{ID};
+		return if $IDs && !(grep $_==$ID, @$IDs);
+		#$table->{$_}->set_text(Songs::Display($ID,$_)) for @$fields;
+		$table->{$_}->set_markup('<b>'.Songs::DisplayEsc($ID,$_).'</b>') for grep $table->{$_}, @$fields;
+	 };
+	Watch($table, SongsChanged=> $fillsub);
+	$fillsub->($table,undef,\@fields);
 	return $table;
 }
 
-sub SongRating
-{	my @IDs=@_;
-	no warnings 'uninitialized';
-	my %h; $h{ $Songs[$_][SONG_RATING] }++ for @IDs;
-	my $val=(sort { $h{$b} <=> $h{$a} } keys %h)[0];
-
-	my $updatesub=sub
-	{	my ($self,$v)=@_;
-		$self=$self->parent until $self->{stars};
-		return if $self->{busy};
-		$self->{busy}=1;
-		$v='' unless defined $v;
-		$self->{modif}=1 if exists $self->{val};
-		$self->{val}=$v;
-		$self->{check}->set_active($v eq '');
-		$self->{stars}->set($v);
-		$v=$Options{DefaultRating} if $v eq '';
-		$self->{adj}->set_value($v);
-		$self->{busy}=0;
-	};
-	my $adj=Gtk2::Adjustment->new(0,0,100,10,20,0);
-	my $spin=Gtk2::SpinButton->new($adj,10,0);
-	my $check=Gtk2::CheckButton->new(_"use default");
-	my $stars=Stars->new($val,$updatesub);
-
-	my $self=Vpack( $check,[$spin,$stars] );
-	$self->{IDs}=\@IDs;
-	$self->{stars}=$stars;
-	$self->{check}=$check;
-	$self->{adj}=$adj;
-
-	&$updatesub($self,$val);
-	$adj->signal_connect(value_changed => sub{ &$updatesub($self,$_[0]->get_value) });
-	$check->signal_connect(toggled	   => sub{ &$updatesub($_[0], ($_[0]->get_active ? '' : $Options{DefaultRating}) ) });
-
-	$self->{save}=sub
-	{	my $self=$_[0];
-		return unless $self->{modif}; #do nothing if rating not modified
-		my $val=$self->{val};
-		$Songs[$_][SONG_RATING]=$val for @{$self->{IDs}};
-		SongsChanged(SONG_RATING,$self->{IDs});
-	};
-
-	return $self;
-}
-
-sub UpdateDefaultRating
-{	my @l=grep $Songs[$_] && (!defined $Songs[$_][SONG_RATING] || $Songs[$_][SONG_RATING] eq ''), 0..$#Songs;
-	SongsChanged(SONG_RATING,\@l);
-}
-
-sub AddWatcher
-{	my $n=1;
-	$n++ while defined $SongsWatchers[$n];
-	if (@_) { ChangeWatcher($n,@_); }
-	else { $SongsWatchers[$n]=0; }
-	return $n;
-}
-sub ChangeWatcher
-{	warn "ChangeWatcher @_\n" if $debug;
-	my $n=shift;
-	#Remove watcher if it exist
-	for my $aref (grep defined,@Watched,@WatchedFilt)
-	{	@$aref=grep $_!=$n,@$aref;
-	}
-	unless (@_) { $SongsWatchers[$n]=0; return; }
-	my ($listref,$cols,$update,$remove,$add,$filter,$fqueue)=@_;
-	#Add watcher with new properties
-	push @{$Watched[$_]},$n for ( ref$cols ? @$cols : $cols );
-	if ($filter)
-	{	my ($greponly,@fields)=$filter->info;
-		push @{ $WatchedFilt[$_] },$n for @fields;
-		warn "filter fields : '@fields'\n" if $debug;
-		$fqueue=undef if $greponly;
-		$filter=undef if $filter->is_empty;
-	}
-	$SongsWatchers[$n]=[$listref,$update,$remove,$add,$filter,$fqueue];
-}
-sub RemoveWatcher
-{	warn "RemoveWatcher @_\n" if $debug;
-	my $n=$_[0];
-	ChangeWatcher($n);
-	delete $SongsWatchers[$n];
-}
-
-# old watchers notes :
-	#watchers:
-	#	one field			#labels/dir lists, filterpane, queue
-	#	few/many fields			#AABox, Random, listview, add/removeAA, skin
-	#
-	#	incremental sub with old value	#removeAA, AABox, labels/dir lists, filterpane
-	#	incremental sub			#addAA, listview
-	#	big sub	(with sort)		#SF
-	#	short sub multi-IDs		#queue
-	#
-	#	all IDs				#random, add/removeAA, filterpane
-	#	list of IDs with filter		#listview, AABox, SF, filterpane
-	#	list of IDs			#queue
-	#	one ID				#skin, (listview->AAbox) ??
-	#changes:
-	#	one field, all IDs		#remove label
-	#	one field, many IDs		#rename file/folder, edit labels/rating
-	#	few/many fields, few/one IDs	#checksong, played
-	#	all fields, few/one IDs		#add/delete/remove song
-	#-------------------------------------------------------------------------------------
-	#listref :	undef : all
-	#		ref : [@IDs]
-	#filter :	undef : none/don't watch
-	#		defined : extract cols to watch
-	#			  extract cmd -> determine incremental/not
-	#cols :		[@cols]
-	#$sub_chg,$sub_rmv,$sub_add : undef -> don't care
-	#				incremental / not
-	#
-	#
-	#
-sub SongsChanged	# ($field,@IDs)
+sub SongsChanged
 {	warn "SongsChanged @_\n" if $debug;
-	my ($col,$IDs)=@_;
+	my ($IDs,$fields)=@_;
 	$Filter::CachedList=undef;
-	if ($TogLock && $TogLock==$col && grep($SongID==$_,@$IDs)) {&UpdateLock}	#update lock
-	my @wake;
-	$wake[$_]=1 for @{$Watched[$col]};
-	$wake[$_]|=2 for @{$WatchedFilt[$col]};
-
-	for my $n (grep $wake[$_],0..$#wake)
-	{	my %ID;
-		$ID{$_}=0 for @$IDs;
-		my ($listref,$update,$remove,$add,$filter,$fqueue)=@{ $SongsWatchers[$n] };
-		if ($fqueue && $wake[$n]&2) {&$fqueue(keys %ID); next; }
-		if ($listref)
-		{	for (@$listref) { $ID{$_}=1 if exists $ID{$_}; }
-		}
-		else { $_=1 for values %ID; }		#$listref is undef -> every song is in the list
-		if ($wake[$n]==1) { &$update( grep $ID{$_},keys %ID ); next }
-		$ID{$_}|=2 for @{ &{$filter->{'sub'}}([keys %ID]) };
-		my @f;
-		while (my($ID,$f)=each %ID) { push @{$f[ $f ]},$ID; }
-		&$update( @{$f[3]} ) if $f[3] && $wake[$n]&1 && $update;
-		&$remove( @{$f[1]} ) if $f[1] && $remove;
-		&$add   ( @{$f[2]} ) if $f[2] && $add;
+	if (defined $SongID && (grep $SongID==$_,@$IDs))
+	{	&UpdateLock if $TogLock && OneInCommon([Songs::Depends($TogLock)],$fields);	#update lock
+		HasChanged('SongID',$SongID);
 	}
-}
-sub SongChanged		# ($ID,@fields)
-{	warn "SongChanged @_\n" if $debug;# my $time=times;		#DEBUG
-	$Filter::CachedList=undef;
-	my $ID=shift;
-	if (defined $SongID && $ID==$SongID && $TogLock && grep($TogLock==$_,@_)) {&UpdateLock}	#update lock
-	my @wake; #warn "@$_" for @Watched;
-	$wake[$_]=1 for map @{$Watched[$_]},@_;
-	$wake[$_]|=2 for map @{$WatchedFilt[$_]},@_;
-	for my $n (grep $wake[$_],0..$#wake)
-	{	#warn "SongChanged $n $wake[$n] @{$SongsWatchers[$n]}\n";
-		my ($listref,$update,$remove,$add,$filter,$fqueue)=@{ $SongsWatchers[$n] };
-		if ($fqueue && $wake[$n]&2) {&$fqueue($ID) if $fqueue; warn "$n -> queue\n" if $debug; next; }
-		my $found=0;
-		if ($listref)
-		{	for (@$listref) {next unless $_==$ID;$found=1;last}
-		}
-		else {$found=1;}		#$listref is undef -> every song is in the list
-		if ($wake[$n]==1) {&$update($ID) if $found && $update; warn "$n -> update\n" if ($found && $debug);next;}
-		$found|=2 if @{ &{$filter->{'sub'}}([$ID]) }>0;
-		if    ($found==3) { &$update($ID) if $wake[$n]&1 && $update; warn "$n -> update\n" if $debug; }
-		elsif ($found==1) { &$remove($ID) if $remove; warn "$n -> remove\n" if $debug; }
-		elsif ($found==2) { &$add($ID)    if $add; warn "$n -> add\n" if $debug; }
+	for my $group (keys %SelID)
+	{	HasChangedSelID($group,$SelID{$group}) if grep $SelID{$group}==$_, @$IDs;
 	}
-	#$time=times-$time; warn "song changed : $time s\n" if $debug;	#DEBUG
+	HasChanged(SongsChanged=>$IDs,$fields);
+	GMB::ListStore::Field::changed(@$fields);
 }
 sub SongAdd		#only called from IdleLoop
-{	#my $time=times;		#DEBUG
-	$Filter::CachedList=undef;
-	my $ID=shift @ToAdd;
-	my $aref=$Songs[$ID];
-	RemoveMissing($ID) if $$aref[SONG_MISSINGSINCE] && $$aref[SONG_MISSINGSINCE]=~m/^\d/;
-	my $file=$$aref[SONG_PATH].SLASH.$$aref[SONG_FILE];
-	my ($size,$timestamp)=(stat $file)[7,9];
-	unless ($$aref[SONG_MODIF] && $$aref[SONG_MODIF]==$timestamp && $$aref[SONG_LENGTH])
-		#don't read tag if song already known and not modified
-	{	my $checkmissing= !$$aref[SONG_MODIF] && $MissingCount;
-		$$aref[SONG_MODIF]=$timestamp;
-		$$aref[SONG_SIZE]=$size;
-		warn "Reading Tag for [$ID] $file\n";
-		my $read_result=ReadTag::Read($aref,$file,1);
-		unless ($read_result) {$Songs[$ID]=undef;return}
-		if ($checkmissing && CheckMissing($aref) && $$aref[SONG_LENGTH]) #check if new song is a missing song
-		 {$read_result=1} #No need to check length if found missing song because the length was copied from old record
-		if ($read_result==2) { push @LengthEstimated,$ID; $Songs[$ID][SONG_MISSINGSINCE]='l'; }
-	}
-	push @Library,$ID;
-	AddAA($ID);
-	for my $watcher (@SongsWatchers)
-	{	next unless $watcher;
-		my ($listref,undef,undef,$add,$filter,$fqueue)=@$watcher;
-		next unless $add;
-		#my @ret=@{ &{$filter->{'sub'}}([$ID]) } if $filter;	#DEBUG
-		#warn "Addind $ID (".$::Songs[$ID][::SONG_ALBUM].") ".($filter->explain)." [@ret] =".scalar(@ret) if $filter;	#DEBUG
-		if ($filter)
-		{	if ($fqueue) { &$fqueue($ID); next; }
-			elsif ( @{ &{$filter->{'sub'}}([$ID]) }==0 ) {next}
-		}
-		warn "$watcher -> add\n" if $debug;
-		&$add($ID);
-	}
+{	my $ID=Songs::New($_[0]);
+	return unless defined $ID;
+	push @ToAdd_IDsBuffer,$ID;
 	$ProgressNBSongs++;
-	#$time=times-$time; warn "song add : $time s\n" if $debug;	#DEBUG
+	#IdleDo('0_AddIDs',30000,\&SongAdd_Real);
+}
+sub SongAdd_Real
+{	return unless @ToAdd_IDsBuffer;
+	my @IDs=@ToAdd_IDsBuffer; #FIXME remove IDs already in Library	#FIXME check against master filter ?
+	@ToAdd_IDsBuffer=();
+	$Filter::CachedList=undef;
+	AA::IDs_Changed();
+	$Library->Push(\@IDs);
+	HasChanged(SongsAdded=>\@IDs);
 }
 sub SongsRemove
 {	my $IDs=$_[0];
 	$Filter::CachedList=undef;
-	my %ID;
-	$ID{$_}=undef for @$IDs;
-	for my $watcher (@SongsWatchers)
-	{	next unless $watcher;
-		my ($listref,undef,$remove,undef,$filter)=@$watcher;
-		next unless $remove;
-		if ($listref)
-		{	&$remove( grep(exists $ID{$_},@$listref) );
-		}
-		else { &$remove(@$IDs); }	#$listref is undef -> every song is in the list
-	}
-	for my $ID (@$IDs) { RemoveAA($ID, $Songs[$ID] ) }
-	my $qsize=@Queue;
-	@$_=grep !exists $ID{$_},@$_ for \@Library,\@Queue,\@Recent,values %SavedLists;
-	HasChanged('Queue') if $qsize!=@Queue;
-	$RecentPos-- while $RecentPos && $Recent[$RecentPos-1]!=$SongID; #update RecentPos if needed
+	for my $ID (@$IDs, map("L$_", @$IDs)) { $::Editing{$ID}->destroy if exists $::Editing{$ID};}
+	AA::IDs_Changed();
+	SongArray::RemoveIDsFromAll($IDs);
+	$RecentPos-- while $RecentPos && $Recent->[$RecentPos-1]!=$SongID; #update RecentPos if needed
 
-	for my $ID (@$IDs)
-	{ AddMissing($ID,1);
-	}
-}
-sub SongRemove
-{	#my $time=times;		#DEBUG
-	$Filter::CachedList=undef;
-	my $ID=shift;
-	for my $watcher (@SongsWatchers)
-	{	next unless $watcher;
-		my ($listref,undef,$remove,undef,$filter)=@$watcher;	#remove unused
-		next unless $remove;
-		my $found;
-		if ($listref)
-		{	for (@$listref) {next unless $_==$ID;$found=1;last}
-			next unless $found;
-		}
-		&$remove($ID);
-	}
-	RemoveAA($ID, $Songs[$ID] );
-	my $qsize=@Queue;
-	@$_=grep $ID!=$_, @$_ for \@Library,\@Queue,\@Recent,values %SavedLists;
-	HasChanged('Queue') if $qsize!=@Queue;
-	$RecentPos-- while $RecentPos && $Recent[$RecentPos-1]!=$SongID; #update RecentPos if needed
-
-	AddMissing($ID,1);
-	#$Songs[$ID]=undef;
-	#$time=times-$time; warn "song remove : $time s\n" if $debug;	#DEBUG
-}
-sub SongCheck
-{	return if $CmdLine{demo};
-	my ($ID,$forcefullscan)=@_;
-	my $aref=$Songs[$ID];
-	return 0 unless $aref;
-	return 1 if $aref->[SONG_PATH]=~m#^http://#;
-	$forcefullscan=2 if $aref->[SONG_MISSINGSINCE];
-	my $file=$$aref[SONG_PATH].SLASH.$$aref[SONG_FILE];
-	if (-r $file)
-	{	my ($size,$timestamp)=(stat $file)[7,9];
-		return 1 if !$forcefullscan && $$aref[SONG_MODIF]==$timestamp;
-		my $checklength=$forcefullscan || ( $$aref[SONG_SIZE]!=$size );
-		my @old=@$aref;
-		$$aref[SONG_MODIF]=$timestamp;
-		$$aref[SONG_SIZE]=$size;
-		warn "Reading Tag for [$ID] $file\n";
-		my $read_result=ReadTag::Read($aref,$file,$checklength);
-		if ($aref->[SONG_MISSINGSINCE] && $aref->[SONG_MISSINGSINCE]=~m/^\d/) {$aref->[SONG_MISSINGSINCE]=$DAYNB;return 1} #for songs not in library
-		elsif ($checklength && $read_result==2) { push @LengthEstimated,$ID; $aref->[SONG_MISSINGSINCE]='l'; }
-		else {$aref->[SONG_MISSINGSINCE]=undef}
-		no warnings 'uninitialized';
-		my @changed=grep $$aref[$_] ne $old[$_],0..SONGLAST;
-		for my $field (@changed)
-		{	next unless $field==SONG_ALBUM || $field==SONG_ARTIST || $field==SONG_LENGTH || $field==SONG_DATE;
-			RemoveAA($ID,\@old);
-			AddAA($ID);
-			last;
-		}
-		SongChanged($ID, @changed );
-		return 1;
-	}
-	else	#file not found/readable
-	{	warn "can't read file '$file'\n";
-
-		for ($ID,"L$ID") { $Editing{$_}->destroy if exists $Editing{$_};}
-		SongRemove($ID);
-		#$Songs[$ID]=undef;
-		#delete $GetIDFromFile{$file};
-		#AddMissing($ID,1);
-		return 0;
-	}
+	HasChanged(SongsRemoved=>$IDs);
+	Songs::AddMissing($IDs);
 }
 
-sub AddAA
-{	my $ID=$_[0];
-	my ($album,$artist,$l,$y)=@{ $Songs[$ID] }[SONG_ALBUM,SONG_ARTIST,SONG_LENGTH,SONG_DATE];
-	#warn "adding $ID to $album $artist\n" if $debug;
-	push @{$Album{$album}[AALIST]},$ID;
-	for my $art (split /$re_artist/o,$artist)
-	{	push @{$Artist{$art}[AALIST]},$ID;
-		$Artist{$art}[AALENGTH]+=$l;
-		$Artist{$art}[AAXREF]{$album}++;
-		$Album{$album}[AAXREF]{$art}++;
-		$ToUpdateYAr{$art}=undef if $y;
-	}
-	$Album{$album}[AALENGTH]+=$l;
-	if ($y)
-	{	$ToUpdateYAl{$album}=undef;
-		::IdleDo('2_UAAYear',500, \&UpdateAAYear);
-	}
-	#if (!$Album{$album}[AAPIXLIST] && $Album{$album}[AAPIXLIST] ne '0')
-	#{	my $f=$Songs[$ID][SONG_PATH].SLASH.'cover.jpg';
-	#	if (-r $f)
-	#	{ $Album{$album}[AAPIXLIST]=$f; HasChanged('AAPicture',$album); }
-	#}
-}
-
-sub RemoveAA
-{	my ($ID,$oldref)=($_[0],$_[1]);
-	my ($album,$artist,$l,$y)=@$oldref[SONG_ALBUM,SONG_ARTIST,SONG_LENGTH,SONG_DATE];
-	warn "removing $ID from $album $artist\n" if $debug;
-	my @listrefs=( \@{$Album{$album}[AALIST]} );
-	$Album{$album}[AALENGTH]-=$l;
-	for my $art (split /$re_artist/o,$artist)
-	{	$Artist{$art}[AALENGTH]-=$l;
-		push @listrefs,\@{$Artist{$art}[AALIST]};
-		unless (--$Artist{$art}[AAXREF]{$album}) {delete $Artist{$art}[AAXREF]{$album};}
-		unless (--$Album{$album}[AAXREF]{$art})  {delete $Album{$album}[AAXREF]{$art};}
-		$ToUpdateYAr{$art}=undef if $y;
-	}
-	if ($y)
-	{	$ToUpdateYAl{$album}=undef;
-		::IdleDo('2_UAAYear',500, \&UpdateAAYear);
-	}
-	for my $l (@listrefs) { @$l=grep $_!=$ID,@$l; }
-}
-
-sub UpdateAAYear
-{	for my $refs ([\%Artist,\%ToUpdateYAr],[\%Album,\%ToUpdateYAl])
-	{	my ($href,$lref)=@$refs;
-		for my $aa (keys %$lref)
-		{	my @y=sort { $a <=> $b } grep $_,map $Songs[$_][SONG_DATE], @{ $href->{$aa}[AALIST] };
-			my $year='';
-			if (@y)
-			{	$year=$y[0];
-				my $max=pop @y;
-				$year.=' - '.$max if $year!=$max; #add last year if !=
-			}
-			$href->{$aa}[AAYEAR]=$year;
-		}
-		%$lref=();
-	}
-}
-
-sub AddMissing
+#FIXME check completely replaced then remove
+=toremove
+sub AddMissing #FIXME check completely replaced then remove
 {	my $ID=$_[0];
 	if ($_[1]) { my $ref=\$Songs[$ID][SONG_MISSINGSINCE]; if ($$ref && $$ref eq 'l') {$Songs[$ID][SONG_LENGTH]=''} $$ref=$DAYNB; }
 	my $staat=join "\x1D", grep defined, map $Songs[$ID][$_],@STAAT;
 	push @{ $MissingSTAAT{$staat} },$ID;
 	$MissingCount++;
 }
-sub RemoveMissing
+sub RemoveMissing #FIXME check completely replaced then remove
 {	my $ID=$_[0];
 	my $staat=join "\x1D", grep defined, map $Songs[$ID][$_],@STAAT;
 	my $aref=$MissingSTAAT{$staat};
@@ -4686,7 +4387,7 @@ sub RemoveMissing
 	$Songs[$ID][SONG_MISSINGSINCE]=undef;
 	$MissingCount--;
 }
-sub CheckMissing
+sub CheckMissing #FIXME check completely replaced then remove
 {	my $songref=$_[0];
 	my $staat=join "\x1D", grep defined, map $songref->[$_],@STAAT;
 	my $IDs=$MissingSTAAT{$staat};
@@ -4737,35 +4438,166 @@ sub AddRadio
 	}
 	return $ID;
 }
+=cut
 
-sub Url_to_IDs
+sub OpenFiles
 {	my @IDs;
-	for my $f (split / /,$_[0])
-	{	if ($f=~m#^http://#) { push @IDs,AddRadio($f,1); }
+	for my $f (split / /,$_[1])
+	{	if ($f=~m#^http://#) { }#push @IDs,AddRadio($f,1); }
 		else
 		{	$f=decode_url($f);
 			my $l=ScanFolder($f);
 			push @IDs, @$l if ref $l;
 		}
 	}
-	return \@IDs;
+	Select(song=>'first',play=>1,staticlist => \@IDs) if @IDs;
 }
 
-sub AddToLibrary
-{	my @list=map decode_url($_), @_;
-	IdleScan(@list);
+sub FolderToIDs
+{	my @dirs=@_;
+	$_=~s#^file://## for @dirs;
+	my @files;
+	MakeScanRegex() unless $ScanRegex;
+	for my $dir (@dirs)
+	{	if (-d $dir)
+		{	opendir my($DIRH),$dir or warn "Can't read folder $dir : $!\n";
+			push @files, map $dir.SLASH.$_, grep !m#^\.# && -f && m/$ScanRegex/, readdir $DIRH;
+			closedir $DIRH;
+		}
+		elsif (-f $dir) { push @files,$dir; }
+	}
+	my @IDs;
+	for my $file (@files)
+	{	my $ID=Songs::FindID($file);# check if missing => check if modified
+		unless (defined $ID)
+		{	$ID=Songs::New($file);
+		}
+		push @IDs,$ID if defined $ID;
+	}
+	#my @IDs=grep defined map FindID($dir.SLASH.$_), @files;
+	return @IDs;
+}
+
+sub MakeScanRegex#FIXME
+{	my @list= $Options{ScanPlayOnly}? ($PlayNext_package||$Play_package)->supported_formats
+					: qw/mp3 ogg oga flac mpc ape wv/; #FIXME find a better way,  wvc
+	my $s=join '|',@list;
+	$ScanRegex=qr/\.(?:$s)$/i;
 }
 
 sub ScanFolder
+{	warn "ScanFolder(@_)\n";
+	my $dir=$_[0];
+	$dir=~s#^file://##;
+	MakeScanRegex() unless $ScanRegex;
+	Songs::Build_IDFromFile() unless $Songs::IDFromFile;
+	$ScanProgress_cb ||= Glib::Timeout->add(500,\&ScanProgress_cb);
+	my @files;
+	if (-d $dir)
+	{	opendir my($DIRH),$dir or warn "Can't read folder $dir : $!\n";
+		@files=readdir $DIRH;
+		closedir $DIRH;
+	}
+	elsif (-f $dir && $dir=~s/$QSLASH([^$QSLASH]+)$//o)
+	{	@files=($1);
+	}
+	#my @toadd;
+	for my $file (@files)
+	{	next if $file=~m#^\.#;		# skip . .. and hidden files/folders
+		my $path_file=$dir.SLASH.$file;
+		#if (-d $path_file) { push @ToScan,$path_file; next; }
+		if (-d $path_file)
+		{	#next if $notrecursive;
+			if (-l $path_file)
+			{	my $real=readlink $path_file;
+				next if exists $FollowedDirs{$real};
+				$FollowedDirs{$real}=undef;
+			}
+			else
+			{	next if exists $FollowedDirs{$path_file};
+				$FollowedDirs{$path_file}=undef;
+			}
+			push @ToScan,$path_file;
+			next;
+		}
+		#if ($file=~m/\.(?:jpeg|jpg|png|gif)$/i) { push @pictures,$file; next; }
+		next unless $file=~$ScanRegex;
+		#my $ID=Songs::FindID($path_file);
+		my $ID=$Songs::IDFromFile->{$dir}{$file};
+		if (defined $ID)
+		{	next unless Songs::Get($ID,'missing');
+			Songs::Set($ID,missing => 0);
+			push @ToReRead,$ID;	#or @ToCheck ? 
+			push @ToAdd_IDsBuffer,$ID;
+		}
+		else
+		{	#$ID=Songs::New($path_file);
+			push @ToAdd_Files, $path_file;
+		}
+	}
+	unless (@ToScan)
+	{	AbortScan();
+	}
+}
+
+sub CheckProgress_cb
+{	my $init=$_[0];
+	if (@ToCheck)
+ 	{	$CheckProgress_cb=@ToCheck if @ToCheck> ($CheckProgress_cb||0);
+		my $max=$CheckProgress_cb;
+ 		my $checked=$max-@ToCheck;
+		::Progress('check',	title	=> _"Checking songs",
+					aborthint=>_"Stop checking",
+					bartext	=> "$checked / $max",
+					current	=> $checked, end=> $max,
+					abortcb	=> sub { @ToCheck=(); },
+			) unless $init;
+		return 1;
+ 	}
+	else
+	{	::Progress('check', abort=>1);
+		return $CheckProgress_cb=0;
+	}
+}
+sub AbortScan
+{	@ToScan=(); undef %FollowedDirs;
+}
+sub ScanProgress_cb
+{	my ($title,$details,$bartext,$current,$total,$abortcb);
+	if (@ToScan || @ToAdd_Files)
+	{	$title=_"Scanning";
+		$details=__("%d song added","%d songs added", $ProgressNBSongs);
+		$bartext= __("%d folder","%d folders", $ProgressNBFolders);
+		$current=$ProgressNBFolders;
+		$total=@ToScan + $ProgressNBFolders;
+		$abortcb= \&AbortScan;
+	}
+	elsif (@$LengthEstimated)
+	{	$title=_"Checking length/bitrate";
+		$details= _"for files without a VBR header";
+		$current=$Lengthcheck_max-@$LengthEstimated;
+		$total=$Lengthcheck_max;
+		$bartext="$current / $total";
+	}
+	else
+	{	::Progress('scan', abort=>1);
+		return $ScanProgress_cb=0;
+	}
+	Progress('scan', title => $title, details=>$details, current=>$current, end=>$total, abortcb=>$abortcb, aborthint=> _"Stop scanning", bartext=>$bartext );
+	return 1;
+}
+
+#FIXME check completely replaced then remove
+=toremove
+sub ScanFolder_old
 {	my $notlibrary=$_[0];
 	my $dir= $notlibrary || shift @ToScan;
-	$dir=~s#^file://##; $dir=~s/$QSLASH+$//o;
 	warn "Scanning $dir\n" if $debug;
 	$ProgressNBFolders++ unless $notlibrary;
 	my @pictures;
 	unless ($ScanRegex)
 	{	my @list= $Options{ScanPlayOnly}? ($PlayNext_package||$Play_package)->supported_formats
-						: qw/mp3 ogg flac mpc ape wv/; #FIXME find a better way,  wvc
+						: qw/mp3 ogg oga flac mpc ape wv/; #FIXME find a better way,  wvc
 		my $s=join '|',@list;
 		$ScanRegex=qr/\.(?:$s)$/i;
 	}
@@ -4775,7 +4607,7 @@ sub ScanFolder
 		@files=readdir $DIRH;
 		closedir $DIRH;
 	}
-	elsif (-f $dir && $dir=~s/$QSLASH([^$QSLASH]+)$//)
+	elsif (-f $dir && $dir=~s/$QSLASH([^$QSLASH]+)$//o)
 	{	@files=($1);
 	}
 	my $utf8dir=filename_to_utf8displayname($dir);
@@ -4821,10 +4653,11 @@ sub ScanFolder
 		@toadd= grep SongCheck($_), @toadd;
 		return \@toadd;
 	}
-	push @ToAdd,@toadd;
+	push @ToAdd_Files,@toadd;
 	undef %FollowedDirs unless @ToScan;
 	$CoverCandidates=[$dir,\@pictures] if @pictures;
 }
+
 sub CheckCover
 {	my ($dir,$pictures)=@$CoverCandidates; $CoverCandidates=undef;
 	return unless exists $GetIDFromFile{$dir};
@@ -4838,7 +4671,7 @@ sub CheckCover
 		return if !defined $alb2 || $alb2 ne $alb;
 	}
 	#FIXME could check if all the songs of the album are in this dir
-	my $cover=$Album{$alb}[AAPIXLIST];
+	my $cover=AAPicture::GetPicture(album=>$alb);
 	return if $cover || (defined $cover && $cover eq '0');
 
 	my $match=$alb; $match=~s/[^0-9A-Za-z]+/ /g; $match=~tr/A-Z/a-z/;
@@ -4861,21 +4694,21 @@ sub CheckCover
 		$hiscore=$score; $best=$file;
 	}
 	return unless $best;
-	$Album{$alb}[AAPIXLIST]=$dir.SLASH.$best;
+	AAPicture::SetPicture(album=>$alb, $dir.SLASH.$best);
 	warn "found cover for $alb : $best)\n" if $debug;
-	HasChanged('AAPicture',$alb);
 }
+=cut
 
 sub AboutDialog
 {	my $dialog=Gtk2::AboutDialog->new;
 	$dialog->set_version(VERSIONSTRING);
-	$dialog->set_copyright("Copyright © 2005-2008 Quentin Sculo");
+	$dialog->set_copyright("Copyright © 2005-2009 Quentin Sculo");
 	#$dialog->set_comments();
 	$dialog->set_license("Released under the GNU General Public Licence version 3\n(http://www.gnu.org/copyleft/gpl.html)");
 	$dialog->set_website('http://gmusicbrowser.sourceforge.net/');
 	$dialog->set_authors('Quentin Sculo <squentin@free.fr>');
-	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\n tray icon for the tango theme by Piotr");
-	$dialog->set_translator_credits("French : Quentin Sculo\nHungarian : Zsombor\nSpanish : Martintxo and Juanjo\nGerman : vlad <donvla\@users.sourceforge.net> & staubi <staubi\@linuxmail.org>\nPolish : tizzilzol team");
+	$dialog->set_artists('tango icon theme : Jean-Philippe Guillemin');
+	$dialog->set_translator_credits("French : Quentin Sculo and Jonathan Fretin\nHungarian : Zsombor\nSpanish : Martintxo and Juanjo\nGerman : vlad <donvla\@users.sourceforge.net> & staubi <staubi\@linuxmail.org>\nPolish : tizzilzol team\nSwedish : Olle Sandgren");
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
 }
@@ -4891,7 +4724,7 @@ sub PrefDialog
 
 	my $notebook = Gtk2::Notebook->new;
 	$notebook->append_page( PrefLibrary()	,Gtk2::Label->new(_"Library"));
-	$notebook->append_page( PrefLabels()	,Gtk2::Label->new(_"Labels"));
+	#$notebook->append_page( PrefLabels()	,Gtk2::Label->new(_"Labels"));
 	$notebook->append_page( PrefAudio()	,Gtk2::Label->new(_"Audio"));
 	$notebook->append_page( PrefLayouts()	,Gtk2::Label->new(_"Layouts"));
 	$notebook->append_page( PrefMisc()	,Gtk2::Label->new(_"Misc."));
@@ -4928,9 +4761,9 @@ sub PrefKeys
 
 	my $refresh_sub=sub
 	 {	$store->clear;
-		my %list= ExtractNameAndOptions($Options{CustomKeyBindings});
-		for my $key (sort keys %list)
-		{	my ($cmd,$arg)=  $list{$key}=~m/^(\w+)(?:\((.*)\))?$/;
+		my $list= $Options{CustomKeyBindings};
+		for my $key (sort keys %$list)
+		{	my ($cmd,$arg)=  $list->{$key}=~m/^(\w+)(?:\((.*)\))?$/;
 			$cmd=$Command{$cmd}[1];
 			$cmd.="($arg)" if defined $arg;
 			my $longkey=keybinding_longname($key);
@@ -4978,7 +4811,7 @@ sub PrefKeys
 		$entry_extra->remove($child) if $child;
 		if ($Command{$cmd}[2])
 		{	$Tooltips->set_tip($entry_extra,$Command{$cmd}[2]);
-			$child= (ref $Command{$cmd}[3] eq 'CODE')? &{ $Command{$cmd}[3] }  : Gtk2::Entry->new;
+			$child= (ref $Command{$cmd}[3] eq 'CODE')?	$Command{$cmd}[3]()  : Gtk2::Entry->new;
 			$child->signal_connect(changed => $refresh_sensitive);
 			$entry_extra->add( $child );
 			$vsg->add_widget($child);
@@ -5000,17 +4833,13 @@ sub PrefKeys
 		{	my $extra= (ref $child eq 'Gtk2::Entry')? $child->get_text : $child->get_value;
 			$cmd.="($extra)" if $extra ne '';
 		}
-		my %list= ExtractNameAndOptions($Options{CustomKeyBindings});
-		$list{$key}=$cmd;
-		$Options{CustomKeyBindings}=join ' ',%list;
+		$Options{CustomKeyBindings}{$key}=$cmd;
 		&$refresh_sub;
 	 });
 	my $butrm=  ::NewIconButton('gtk-remove',_"Remove",sub
 	 {	my $iter=$treeview->get_selection->get_selected;
 		my $key=$store->get($iter,2);
-		my %list= ExtractNameAndOptions($Options{CustomKeyBindings});
-		delete $list{$key};
-		$Options{CustomKeyBindings}=join ' ',%list;
+		delete $Options{CustomKeyBindings}{$key};
 		&$refresh_sub;
 	 });
 
@@ -5044,13 +4873,12 @@ sub PrefKeys
 
 sub PrefPlugins
 {	LoadPlugins();
-	my $vbox=Gtk2::VBox->new;
-	unless (keys %Plugins) {my $label=Gtk2::Label->new(_"no plugins found"); $vbox->add($label);return $vbox}
+	my $hbox=Gtk2::HBox->new;
+	unless (keys %Plugins) {my $label=Gtk2::Label->new(_"no plugins found"); $hbox->add($label);return $hbox}
 	my $store=Gtk2::ListStore->new('Glib::String','Glib::String','Glib::Boolean');
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->set_headers_visible(FALSE);
 	my $renderer = Gtk2::CellRendererToggle->new;
-	my $hbox=Gtk2::HBox->new;
 	my $rightbox=Gtk2::VBox->new;
 	my $plugtitle=Gtk2::Label->new;
 	my $plugdesc=Gtk2::Label->new;
@@ -5122,8 +4950,7 @@ sub PrefPlugins
 	$rightbox->pack_start($plugtitle,FALSE,FALSE,2);
 	$rightbox->pack_start($plugdesc,FALSE,FALSE,2);
 	$hbox->add($rightbox);
-	$vbox->add($hbox);
-	return $vbox;
+	return $hbox;
 }
 sub LogView
 {	my $store=shift;
@@ -5164,13 +4991,13 @@ sub PrefAudio
 
 	#123
 	my $vbox_123=Gtk2::VBox->new (FALSE, 2);
-	my $hbox1=NewPrefCombo(Device => [qw/default oss alsa esd arts sun/],_"output device :",undef,$sg1,$sg2);
+	#my $hbox1=NewPrefCombo(Device => [qw/default oss alsa esd arts sun/], text => _"output device :", sizeg1=>$sg1,sizeg2=> $sg2);
 	my $adv1=PrefAudio_makeadv('Play_123','123');
-	$vbox_123->pack_start($_,FALSE,FALSE,2) for $radio_123,$hbox1,$adv1;
+	$vbox_123->pack_start($_,FALSE,FALSE,2) for $radio_123,$adv1;
 
 	#gstreamer
 	my $vbox_gst=Gtk2::VBox->new (FALSE, 2);
-	my $hbox2=NewPrefCombo(gst_sink => Play_GST->supported_sinks,_"output device :",undef,$sg1,$sg2);
+	my $hbox2=NewPrefCombo(gst_sink => Play_GST->supported_sinks, text => _"output device :", sizeg1=>$sg1, sizeg2=> $sg2);
 	my $EQbut=Gtk2::Button->new(_"Open Equalizer");
 	$EQbut->signal_connect(clicked => sub {Layout::Window->new('Equalizer');});
 	my $EQcheck=NewPrefCheckButton(gst_use_equalizer => _"Use Equalizer", sub { HasChanged('Equalizer'); });
@@ -5248,7 +5075,7 @@ sub PrefMisc
 
 	#Default rating
 	my $DefRating=NewPrefSpinButton('DefaultRating',sub
-		{ IdleDo('0_DefaultRating',500,\&UpdateDefaultRating);
+		{ IdleDo('0_DefaultRating',500,\&Songs::UpdateDefaultRating);
 		},10,0,0,100,10,20,_"Default rating :");
 
 	my $checkR1=NewPrefCheckButton(RememberPlayFilter => _"Remember last Filter/Playlist between sessions");
@@ -5268,15 +5095,16 @@ sub PrefMisc
 	#Diacritic_sort
 	my $diasort=NewPrefCheckButton(Diacritic_sort => _"Diacritic sort",undef,_"Makes case insensitive sort puts accented letters right after their unaccented version.\n(Significantly slower)");
 	#shutdown
-	my $shutentry=NewPrefEntry(Shutdown_cmd => _"Shutdown command :",undef,undef,undef,undef,_"Command used when\n'turn off computer when queue empty'\nis selected");
+	my $shutentry=NewPrefEntry(Shutdown_cmd => _"Shutdown command :", tip => _"Command used when\n'turn off computer when queue empty'\nis selected");
 	#artist splitting
 	my %split=
-	(	' & |, '	=> _"' & ' and ', '",
+	(	' & |, |;'	=> _"' & ' and ', ' and ';'",
 		' & '		=> "' & '",
 		' \\+ '		=> "' + '",
+		'; *'		=> "';'",
 		'$'		=> _"no splitting",
 	);
-	my $asplit=NewPrefCombo(ArtistSplit => \%split,_"Split artist names on (needs restart) :");
+	my $asplit=NewPrefCombo(ArtistSplit => \%split, text => _"Split artist names on (needs restart) :");
 
 
 	#packing
@@ -5301,17 +5129,17 @@ sub PrefLayouts
 	#layouts
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	my $layoutT=NewPrefCombo(LayoutT=> Layout::get_layout_list('T'),_"Tray tip window layout :",undef,$sg1,$sg2);
-	my $layout =NewPrefCombo(Layout => Layout::get_layout_list('G'),_"Player window layout :",\&set_layout,$sg1,$sg2);
-	my $layoutB=NewPrefCombo(LayoutB=> Layout::get_layout_list('B'),_"Browser window layout :",undef,$sg1,$sg2);
-	my $layoutF=NewPrefCombo(LayoutF=> Layout::get_layout_list('F'),_"Full screen layout :",undef,$sg1,$sg2);
-	my $layoutS=NewPrefCombo(LayoutS=> Layout::get_layout_list('S'),_"Search window layout :",undef,$sg1,$sg2);
+	my $layoutT=NewPrefCombo(LayoutT=> Layout::get_layout_list('T'), text => _"Tray tip window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
+	my $layout =NewPrefCombo(Layout => Layout::get_layout_list('G'), text =>_"Player window layout :", 	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => \&set_layout);
+	my $layoutB=NewPrefCombo(LayoutB=> Layout::get_layout_list('B'), text =>_"Browser window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
+	my $layoutF=NewPrefCombo(LayoutF=> Layout::get_layout_list('F'), text =>_"Full screen layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
+	my $layoutS=NewPrefCombo(LayoutS=> Layout::get_layout_list('S'), text =>_"Search window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
 
 	#fullscreen button
 	my $fullbutton=NewPrefCheckButton(AddFullscreenButton => _"Add a fullscreen button",\&AddFullscreenButton,_"Add a fullscreen button to layouts that can accept extra buttons");
 
 
-	my $icotheme=NewPrefCombo(IconTheme=> GetIconThemesList(),_"Icon theme :", \&LoadIcons,$sg1,$sg2);
+	my $icotheme=NewPrefCombo(IconTheme=> GetIconThemesList(), text =>_"Icon theme :", sizeg1=>$sg1,sizeg2=>$sg2, cb => \&LoadIcons);
 
 	#packing
 	$vbox->pack_start($_,FALSE,FALSE,1) for $layout,$layoutB,$layoutT,$layoutF,$layoutS,$checkT1,$fullbutton,$icotheme;
@@ -5339,7 +5167,7 @@ sub PrefTags
 	my $checklatin1=NewPrefCheckButton(TAG_use_latin1_if_possible => _"Use latin1 encoding if possible in id3v2 tags",undef,_"the default is utf16 for ID3v2.3 and utf8 for ID3v2.4");
 	my $check_unsync=NewPrefCheckButton(TAG_no_desync => _"Do not unsynchronise id3v2 tags",undef,_"itunes doesn't support unsynchronised tags last time I checked, mostly affect tags with pictures");
 	my @Encodings=grep $_ ne 'null', Encode->encodings(':all');
-	my $id3v1encoding=NewPrefCombo(TAG_id3v1_encoding => \@Encodings,_"Encoding used for id3v1 tags :");
+	my $id3v1encoding=NewPrefCombo(TAG_id3v1_encoding => \@Encodings, text => _"Encoding used for id3v1 tags :");
 	my $nowrite=NewPrefCheckButton('TAG_nowrite_mode',_"Do not write the tags",undef,_"Will not write the tags except with the advanced tag editing dialog. The changes will be kept in the library instead.\nWarning, the changes for a song will be lost if the tag is re-read.");
 	my $autocheck=NewPrefCheckButton('TAG_auto_check_current',_"Auto-check current song for modification",undef,_"Automatically check if the file for the current song has changed. And remove songs not found from the library.");
 
@@ -5367,7 +5195,7 @@ sub AskRenameFolder
 		my $new=$entry->get_text;
 		last if $new eq '';
 		last if $old eq $new;
-		last if $new=~m/$QSLASH/;	#FIXME allow moving folder
+		last if $new=~m/$QSLASH/o;	#FIXME allow moving folder
 		$old=filename_from_unicode($parent.$old.SLASH);
 		$new=filename_from_unicode($parent.$new.SLASH);
 		-d $new and ErrorMessage(__x(_"{folder} already exists",folder=>$new)) and last; #FIXME use an error dialog
@@ -5394,33 +5222,21 @@ sub MoveFolder #FIXME implement
 
 sub UpdateFolderNames
 {	my ($oldpath,$newpath)=@_;
-	my @renamed;
-	$oldpath=qr/^\Q$oldpath\E/;
-	for my $ID (0..$#Songs)
-	{	my $aref=$Songs[$ID];
-		next unless defined $aref;
-		my $old=$$aref[SONG_PATH];
-		my $new=$old.SLASH;
-		#_utf8_off($new);
-		next unless $new=~s/$oldpath/$newpath/;
-		my $file=$$aref[SONG_FILE];
-		chop $new; #remove SLASH
-		#_utf8_on($new);
-		$GetIDFromFile{$new}{$file}=delete $GetIDFromFile{$old}{$file};
-		delete $GetIDFromFile{$old} unless keys %{ $GetIDFromFile{$old} };
-		$$aref[SONG_PATH]=$new;
-		$$aref[SONG_UPATH]=filename_to_utf8displayname($new);
-		push @renamed,$ID;
-	}
+	s/$QSLASH+$//o for $oldpath,$newpath;
+	my $pattern= "^\Q$oldpath\E(?:".SLASH.'|$)';
+	my $renamed=Songs::FilterAll('path:m:'.$pattern);
+	return unless @$renamed;
 
-	#rename pic files in %Artist %Album
-	for my $ref (values %Artist, values %Album)
-	{	#_utf8_off($$ref[AAPIXLIST]);
-		$$ref[AAPIXLIST]=~s/$oldpath/$newpath/ if exists $$ref[AAPIXLIST];
-		#_utf8_on($$ref[AAPIXLIST]);
+	$pattern=qr/^\Q$oldpath\E/;
+	my @newpath;
+	for my $ID (@$renamed)
+	{	my $path= Songs::Get($ID,'path');
+		$path=~s/$pattern/$newpath/;	#CHECKME check if works with broken filenames
+		push @newpath,$path;
 	}
-	SongsChanged(SONG_PATH,\@renamed);
-	SongsChanged(SONG_UPATH,\@renamed);
+	Songs::Set($renamed,'@path'=>\@newpath);
+
+	AAPicture::UpdatePixPath($oldpath,$newpath);
 }
 
 sub PrefLibrary
@@ -5434,13 +5250,7 @@ sub PrefLibrary
 	::set_drag($treeview, dest => [::DRAG_FILE,sub
 		{	my ($treeview,$type,@list)=@_;
 			@list=map ::decode_url($_), grep s#^file://##, @list;
-			for my $dir (grep -d, @list)
-			{	next if (grep $dir eq $_,@LibraryPath);
-				$dir=~s/$QSLASH$//o unless $dir eq SLASH || $dir=~m/^\w:.$/;
-				$store->set($treeview->get_model->append,0,filename_to_utf8displayname($dir));
-				push @LibraryPath,$dir;
-				IdleScan($dir);
-			}
+			AddToLibraryPath($treeview->get_model,@list);
 		}]);
 
 	my $addbut=NewIconButton('gtk-add',_"Add folder");
@@ -5454,15 +5264,8 @@ sub PrefLibrary
 	$rmdbut->set_sensitive(FALSE);
 
 	$addbut->signal_connect( clicked => sub
-	{	my @dirs=ChooseDir(_"Choose folder to add",$CurrentDir.SLASH,undef,1);
-		return unless @dirs;
-		for my $dir (@dirs)
-		{	next if (grep $dir eq $_,@LibraryPath);
-			$dir=~s/$QSLASH$//o unless $dir eq SLASH || $dir=~m/^\w:.$/;
-			$store->set($store->append,0,filename_to_utf8displayname($dir));
-			push @LibraryPath,$dir;
-			IdleScan($dir);
-		}
+	{	my @dirs=ChooseDir(_"Choose folder to add",undef,undef,'LastFolder_Add',1);
+		AddToLibraryPath($store,@dirs);
 	});
 	$rmdbut->signal_connect( clicked => sub
 	{	my $iter=$selection->get_selected;
@@ -5492,8 +5295,8 @@ sub PrefLibrary
 
 	my $reorg=Gtk2::Button->new(_"Reorganize files and folders");
 	$reorg->signal_connect( clicked => sub
-	{	return unless @Library;
-		DialogMassRename(@Library);
+	{	return unless @$Library;
+		DialogMassRename(@$Library);
 	});
 
 	my $vbox=Vpack( 1,$label,
@@ -5502,35 +5305,41 @@ sub PrefLibrary
 			$table );
 	return $vbox;
 }
+sub AddToLibraryPath
+{	my ($store,@dirs)=@_;
+	for my $dir (grep -d, @dirs) #FIXME support files drag and drop
+	{	$dir=~s/$QSLASH$//o unless $dir eq SLASH || $dir=~m/^\w:.$/;
+		IdleScan($dir);
+		next if (grep $dir eq $_,@LibraryPath);
+		$store->set($store->append,0,filename_to_utf8displayname($dir)) if $store;
+		push @LibraryPath,$dir;
+	}
+}
 
-sub ToggleLabel
+sub ToggleLabel #maybe do the toggle in SetLabels #FIXME
 {	my ($label,$ID,$on)=@_;
 	return unless defined $ID && defined $label;
 	my $add=[]; my $rm=[];
 	unless (defined $on)
-	{	$on= $::Songs[$ID][::SONG_LABELS]!~m/(?:^|\x00)\Q$label\E(?:$|\x00)/; #on=1 if not set
+	{	$on= !Songs::IsSet($ID,label => $label);
 	}
 	if ($on) { $add=[$label] }
 	else	 { $rm =[$label] }
 	SetLabels([$ID],$add,$rm);
 }
 
-sub SetLabels
+sub SetLabels	#FIXME move to Songs::
 {	my ($IDs,$toadd,$torm)=@_;
-	my $nb=keys %Labels;
-	$Labels{$_}=undef for @$toadd;
-	HasChanged('LabelList') if (keys %Labels)-$nb;
-	no warnings;
-	for my $ID (@$IDs)
-	{	my %h;
-		$h{$_}=undef for @$toadd,split /\x00/,$Songs[$ID][SONG_LABELS];
-		delete $h{$_} for @$torm;
-		$Songs[$ID][SONG_LABELS]=join "\x00",sort keys %h;
-	}
-	SongsChanged(SONG_LABELS,$IDs);
+	my @args;
+	push @args,'+label',$toadd if $toadd && @$toadd;
+	push @args,'-label',$torm if $torm  && @$torm;
+	Songs::Set($IDs,@args);
+	#my $nb=keys %Labels;
+	#$Labels{$_}=undef for @$toadd;
+	#HasChanged('LabelList') if (keys %Labels)-$nb;	#FIXME PHASE1 move that into $Def{label}
 }
 
-sub PrefLabels
+sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 {	my $vbox=Gtk2::VBox->new(FALSE,2);
 	my $store=Gtk2::ListStore->new('Glib::String','Glib::Int','Glib::String');
 	my $treeview=Gtk2::TreeView->new($store);
@@ -5548,9 +5357,8 @@ sub PrefLabels
 		#FIXME maybe should rename the icon file if it exist
 		HasChanged('LabelList');
 		return unless $nb;
-		my $pat=qr/(?:^|\x00)\Q$old\E(?:$|\x00)/;
-		my @l=grep $Songs[$_][SONG_LABELS]=~m/$pat/, 0..$#Songs;
-		SetLabels(\@l,[$new],[$old]);
+		my $l= Songs::AllFilter( 'label:~:'.$old );
+		SetLabels($l,[$new],[$old]);
 	    });
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
 		( '',Gtk2::CellRendererPixbuf->new,'stock-id',2)
@@ -5567,25 +5375,22 @@ sub PrefLabels
 	my $fillsub=sub
 	    {	delete $ToDo{'9_Labels'};
 		$store->clear;
-		my %set; no warnings;
-		for my $ref (@Songs)
-		{	$set{$_}++ for split /\x00/,$$ref[SONG_LABELS];
-		}
-		for my $f (sort keys %Labels)
-		{	$store->set($store->append, 0,$f, 1,$set{$f}||0, 2,'label-'.$f);
+		my $set=Songs::BuildHash('label');
+		for my $f (@{SortedLabels()})
+		{	$store->set($store->append, 0,$f, 1,$set->{$f}||0, 2,'label-'.$f);
 		}
 	    };
-	my $watcher;
+	#my $watcher;
 	$vbox->signal_connect(realize => sub
 		{  #warn "realize @_\n" if $debug;
 		   my $sub=sub { IdleDo('9_Labels',3000,$fillsub); };
-		   $watcher=AddWatcher(undef,SONG_LABELS,$sub);
+		   #$watcher=AddWatcher(undef,'label',$sub);
 		   &$fillsub;
 		 });
 	$vbox->signal_connect(unrealize => sub
 		{  #warn "unrealize @_\n" if $debug;
 		   delete $ToDo{'9_Labels'};
-		   RemoveWatcher($watcher);
+		   #RemoveWatcher($watcher);
 		});
 
 	my $delbut=NewIconButton('gtk-remove',_"Remove label",sub
@@ -5603,9 +5408,8 @@ sub PrefLabels
 					);
 				$dialog->show_all;
 				if ($dialog->run ne 'ok') {$dialog->destroy;return;}
-				my $pat=qr/(?:^|\x00)\Q$label\E(?:$|\x00)/;
-				my @l=grep $Songs[$_][SONG_LABELS]=~m/$pat/, 0..$#Songs;
-				SetLabels(\@l,undef,[$label]);
+				my $l= Songs::AllFilter( 'label:~:'.$label );
+				SetLabels($l,undef,[$label]);
 				$dialog->destroy;
 			}
 			$store->remove($iter);
@@ -5616,12 +5420,12 @@ sub PrefLabels
 			$store->set($iter,0,'',1,0);
 			$treeview->set_cursor($store->get_path($iter), $treeview->get_column(1), TRUE);
 		});
-	my $iconbut=NewIconButton('gmb-picture',_"Set icon",sub
+	my $iconbut=NewIconButton('gmb-picture',_"Set icon",sub #FIXME add a way to create a colored square icon
 		{	my ($row)=$treeview->get_selection->get_selected_rows;
 			return unless defined $row;
 			my $iter=$store->get_iter($row);
 			my ($label)=$store->get_value($iter);
-			my $file=ChoosePix($CurrentDir.SLASH,__x("Choose icon for label {label}",label => $label));
+			my $file=ChoosePix($CurrentDir.SLASH,__x("Choose icon for label {label}",label => $label),undef,'LastFolder_Icon');
 			return unless defined $file;
 			my $dir=$::HomeDir.'icons';
 			unless (-d $dir)
@@ -5666,6 +5470,12 @@ sub PrefLabels
 	return $vbox;
 }
 
+sub SetOption
+{	my ($key,$value)=@_;
+	$Options{$key}=$value;
+	#HasChanged(option => $key); #maybe in the future
+}
+
 sub NewPrefRadio
 {	my ($key,$sub,@text_val)=@_;
 	my $init=$Options{$key};
@@ -5674,7 +5484,7 @@ sub NewPrefRadio
 		{	return unless $_[0]->get_active;
 			my $val=$_[1];
 			$val=&$val if ref $val;
-			$Options{$key}=$val;
+			SetOption($key,$val);
 			&$sub if $sub;
 		};
 	my $radio; my @radios;
@@ -5688,53 +5498,105 @@ sub NewPrefRadio
 	return @radios;
 }
 sub NewPrefCheckButton
-{	my ($key,$text,$sub,$tip,$widget)=@_;
+{	my ($key,$text,$sub,$tip,$widget,$toolitem,$horizontal,$sizeg)=@_;
 	my $check=Gtk2::CheckButton->new($text);
+	$sizeg->add_widget($check) if $sizeg;
 	$check->set_active(1) if $Options{$key};
 	$check->signal_connect( toggled => sub
-	{	$Options{ $_[1] }=($_[0]->get_active)? 1 : 0;
+	{	my $val=($_[0]->get_active)? 1 : 0;
+		SetOption($_[1],$val);
 		$_[0]{albox}->set_sensitive( $_[0]->get_active )  if $_[0]{albox};
 		&$sub if $sub;
 	},$key);
 	$Tooltips->set_tip($check,$tip) if defined $tip;
+	my $return=$check;
 	if ($widget)
-	{	my $albox=Gtk2::Alignment->new(0,0,1,1);
-		$albox->set_padding(0,0,15,0);
-		$albox->add($widget);
-		$albox->set_sensitive(0) unless $Options{$key};
-		$check->{albox}=$albox;
-		$check=Vpack($check,$albox);
+	{	if ($horizontal)
+		{	$return=Hpack($check,$widget);
+		}
+		else
+		{	$check->{albox}=my $albox=Gtk2::Alignment->new(0,0,1,1);
+			$albox->set_padding(0,0,15,0);
+			$albox->add($widget);
+			$widget=$albox;
+			$return=Vpack($check,$albox);
+		}
+		$check->{child}=$widget;
+		$widget->set_sensitive(0) unless $Options{$key};
 	}
-	return $check;
+	elsif ($toolitem)
+	{	my $titem=Gtk2::ToolItem->new;
+		$titem->add($check);
+		my $item=Gtk2::CheckMenuItem->new($text);
+		$titem->set_proxy_menu_item($key,$item);
+		$item->signal_connect(toggled => sub
+		{	return if $_[0]->{busy};
+			$check->set_active($_[0]->get_active);
+		});
+		$check->signal_connect( toggled => sub
+		{	$item->{busy}=1;
+			$item->set_active($_[0]->get_active);
+			delete $item->{busy};
+		});
+		return $titem;
+	}
+	return $return;
 }
 sub NewPrefEntry
-{	my ($key,$text,$sub,$sizeg1,$sizeg2,$hide,$tip)=@_;
-	my $label=Gtk2::Label->new($text);
-	my $entry=Gtk2::Entry->new;
-	my $hbox=Gtk2::HBox->new;
-	$hbox->pack_start($label,FALSE,FALSE,2);
-	$hbox->pack_start($entry,0,FALSE,2);
-	$sizeg1->add_widget($label) if $sizeg1;
-	$sizeg2->add_widget($entry) if $sizeg2;
-#	$label->set_alignment(0,.5);
+{	my ($key,$text,%opt)=@_;
+	my ($cb,$sg1,$sg2,$tip,$hide)=@opt{qw/cb sizeg1 sizeg2 tip hide/};
+	my $widget=my $entry=Gtk2::Entry->new;
+	if (defined $text)
+	{	$widget=Gtk2::HBox->new;
+		my $label=Gtk2::Label->new($text);
+		#	$label->set_alignment(0,.5);
+		$widget->pack_start($label,FALSE,FALSE,2);
+		$widget->pack_start($entry,0,FALSE,2);
+		$sg1->add_widget($label) if $sg1;
+	}
+	$sg2->add_widget($entry) if $sg2;
 
 	$Tooltips->set_tip($entry, $tip) if defined $tip;
 	$entry->set_visibility(0) if $hide;
 	$entry->set_text($Options{$key}) if defined $Options{$key};
 	$entry->signal_connect( changed => sub
-	{	$Options{ $_[1] }=$_[0]->get_text;
-		&$sub if $sub;
+	{	SetOption($_[1], $_[0]->get_text);
+		&$cb if $cb;
 	},$key);
-	return $hbox;
+	return $widget;
 }
+
+sub NewPrefComboText	#warning : unlike other NewPref function, this one is much simpler and doesn't automatically set $Options{$key}, $Options{$key} must contains an array (history) of values, use PrefSaveHistory to update it
+{	my ($key)=@_;
+	my $combo=Gtk2::ComboBoxEntry->new_text;
+	my $hist= $Options{$key} || [];
+	$combo->append_text($_) for @$hist;
+	$combo->set_active(0);
+	return $combo;
+}
+sub PrefSaveHistory	#to be used with NewPrefComboText and NewPrefFileEntry
+{	my ($key,$newvalue,$max)=@_;
+	$max||=10;
+	my $hist= $Options{$key} || [];
+	@$hist= ($newvalue, grep $_ ne $newvalue, @$hist);
+	$#$hist=$max if $#$hist>$max;
+}
+
 sub NewPrefFileEntry
-{	my ($key,$text,$folder,$sub,$tip,$sg1,$sg2)=@_;
+{	my ($key,$text,%opt)=@_;
+	my ($folder,$sg1,$sg2,$tip,$cb,$key_history)=@opt{qw/folder sizeg1 sizeg2 tip cb history_key/};
 	my $label=Gtk2::Label->new($text);
-	my $entry=Gtk2::Entry->new;
+	my $widget=my $entry=Gtk2::Entry->new;
+	if ($key_history)
+	{	$widget=Gtk2::ComboBoxEntry->new_text;
+		$entry=$widget->child;
+		my $hist= $Options{$key_history} || [];
+		$widget->append_text($_) for @$hist;
+	}
 	my $button=NewIconButton('gtk-open');
 	my $hbox=Gtk2::HBox->new;
 	my $hbox2=Gtk2::HBox->new(FALSE,0);
-	$hbox2->pack_start($entry,TRUE,TRUE,0);
+	$hbox2->pack_start($widget,TRUE,TRUE,0);
 	$hbox2->pack_start($button,FALSE,FALSE,0);
 	$hbox->pack_start($_,FALSE,FALSE,2)  for $label,$hbox2;
 	$label->set_alignment(0,.5);
@@ -5748,26 +5610,28 @@ sub NewPrefFileEntry
 	my $busy;
 	$entry->signal_connect( changed => sub
 	{	return if $busy;
-		$Options{ $_[1] }=filename_from_unicode( $_[0]->get_text );
-		&$sub if $sub;
-	},$key);
+		SetOption( $key, filename_from_unicode( $_[0]->get_text ));
+		&$cb if $cb;
+	});
 	$button->signal_connect( clicked => sub
 	{	my $file= $folder? ChooseDir($text,$Options{$key}) : undef;
 		return unless $file;
-		$Options{$key}=$file;
+		# could simply $entry->set_text(), but wouldn't work with filenames with broken encoding
+		SetOption( $key, $file);
 		$busy=1; $entry->set_text(filename_to_utf8displayname($file)); $busy=undef;
-		&$sub if $sub;
+		&$cb if $cb;
 	});
 	return $hbox;
 }
 sub NewPrefSpinButton
-{	my ($key,$sub,$climb_rate,$digits,$min,$max,$stepinc,$pageinc,$text1,$text2,$sg1,$sg2,$tip)=@_;
+{	my ($key,$sub,$climb_rate,$digits,$min,$max,$stepinc,$pageinc,$text1,$text2,$sg1,$sg2,$tip,$wrap)=@_;
 	$text1=Gtk2::Label->new($text1) if defined $text1;
 	$text2=Gtk2::Label->new($text2) if defined $text2;
-	my $adj=Gtk2::Adjustment->new($Options{$key},$min,$max,$stepinc,$pageinc,0);
+	my $adj=Gtk2::Adjustment->new($Options{$key}||=0,$min,$max,$stepinc,$pageinc,0);
 	my $spin=Gtk2::SpinButton->new($adj,$climb_rate,$digits);
+	$spin->set_wrap(1) if $wrap;
 	$adj->signal_connect(value_changed => sub
-	 {	$::Options{ $_[1] }=$_[0]->get_value;
+	 {	SetOption( $_[1], $_[0]->get_value);
 		&$sub if $sub;
 	 },$key);
 	$Tooltips->set_tip($spin, $tip) if defined $tip;
@@ -5782,35 +5646,28 @@ sub NewPrefSpinButton
 }
 
 sub NewPrefCombo
-{	my ($key,$list,$text,$sub,$sizeg1,$sizeg2)=@_;
-	my $combo=Gtk2::ComboBox->new_text;
-	my $names=$list;
-	if (ref $list eq 'HASH')
-	{	my $h=$list;
-		$list=[]; $names=[];
-		for my $key (sort {uc($h->{$a}) cmp uc($h->{$b})} keys %$h)
-		{	push @$list,$key;
-			push @$names,$h->{$key}
-		}
+{	my ($key,$list,%opt)=@_;
+	my ($text,$cb0,$sg1,$sg2,$toolitem,$tree)=@opt{qw/text cb sizeg1 sizeg2 toolitem tree/};
+	my $cb=sub
+		{	SetOption($key,$_[0]->get_value);
+			&$cb0 if $cb0;
+		};
+	my $class= $tree ? 'TextCombo::Tree' : 'TextCombo';
+	my $combo= $class->new( $list, $Options{$key}, $cb );
+	my $widget=$combo;
+	if (defined $text)
+	{	my $label=Gtk2::Label->new($text);
+		my $hbox=Gtk2::HBox->new;
+		$hbox->pack_start($_,FALSE,FALSE,2) for $label,$combo;
+		$sg1->add_widget($label) if $sg1;
+		$sg2->add_widget($combo) if $sg2;
+		$label->set_alignment(0,.5);
+		$widget=$hbox;
 	}
-	my $found;
-	for my $i (0..$#$list)
-	{	$combo->append_text( $names->[$i] );
-		$found=$i if defined $Options{$key} && $list->[$i] eq $Options{$key};
+	if (defined $toolitem)
+	{	$widget= $combo->make_toolitem($toolitem,$key,$widget);
 	}
-	$combo->set_active($found) if defined $found;
-	$combo->signal_connect(changed => sub
-		{	$Options{$key}= $list->[ $_[0]->get_active ];
-			&$sub if $sub;
-		});
-	return $combo unless defined $text;
-	my $label=Gtk2::Label->new($text);
-	my $hbox=Gtk2::HBox->new;
-	$hbox->pack_start($_,FALSE,FALSE,2) for $label,$combo;
-	$sizeg1->add_widget($label) if $sizeg1;
-	$sizeg2->add_widget($combo) if $sizeg2;
-	$label->set_alignment(0,.5);
-	return $hbox;
+	return $widget;
 }
 
 sub NewIconButton
@@ -5823,8 +5680,7 @@ sub NewIconButton
 	my $widget=Gtk2::Image->new_from_stock($icon,'menu');
 	if ($text)
 	{	my $box=Gtk2::HBox->new(FALSE, 4);
-		$box->pack_start($_, FALSE, FALSE, 2)
-			for $widget,Gtk2::Label->new($text);
+		$box->pack_start($_, FALSE, FALSE, 2)	for $widget,Gtk2::Label->new($text);
 		$widget=$box;
 	}
 	$but->add($widget);
@@ -5835,59 +5691,41 @@ sub NewIconButton
 
 sub EditWeightedRandom
 {	my ($widget,$sort,$name,$sub)=@_;
-	my $dialog=EditSFR->new($widget,'WRandom',$sort,$name);
+	my $dialog=GMB::Edit->new($widget,'WRandom',$sort,$name);
 	return $dialog->Result($sub);
 }
 sub EditSortOrder
 {	my ($widget,$sort,$name,$sub)=@_;
-	my $dialog=EditSFR->new($widget,'Sort',$sort,$name);
+	my $dialog=GMB::Edit->new($widget,'Sort',$sort,$name);
 	return $dialog->Result($sub);
 }
 sub EditFilter
 {	my ($widget,$filter,$name,$sub)=@_;
-	my $dialog=EditSFR->new($widget,'Filter',$filter,$name);
+	my $dialog=GMB::Edit->new($widget,'Filter',$filter,$name);
 	$sub||='' unless wantarray;#FIXME
 	return $dialog->Result($sub);
 }
 sub EditSTGroupings
 {	my ($widget,$filter,$name,$sub)=@_;
-	my $dialog=EditSFR->new($widget,'STGroupings',$filter,$name);
+	my $dialog=GMB::Edit->new($widget,'STGroupings',$filter,$name);
 	return $dialog->Result($sub);
 }
 
-sub SaveWRandom
-{	my ($name,$val,$newname)=@_;
-	if (defined $newname)	{$SavedWRandoms{$newname}=delete $SavedWRandoms{$name};}
-	elsif (defined $val)	{$SavedWRandoms{$name}=$val;}
-	else			{delete $SavedWRandoms{$name};}
-	HasChanged('SavedWRandoms');
+sub SaveSFRG
+{	my ($key,$name,$val,$newname)=@_;
+	my $saved=$Options{$key};
+	if (defined $newname)	{$saved->{$newname}=delete $saved->{$name};}
+	elsif (defined $val)	{$saved->{$name}=$val;}
+	else			{delete $saved->{$name};}
+	HasChanged($key);
 }
-sub SaveSort
-{	my ($name,$val,$newname)=@_;
-	if (defined $newname)	{$SavedSorts{$newname}=delete $SavedSorts{$name};}
-	elsif (defined $val)	{$SavedSorts{$name}=$val;}
-	else			{delete $SavedSorts{$name};}
-	HasChanged('SavedSorts');
-}
-sub SaveFilter
-{	my ($name,$val,$newname)=@_;
-	if (defined $newname)	{$SavedFilters{$newname}=delete $SavedFilters{$name};}
-	elsif (defined $val)	{$SavedFilters{$name}=$val;}
-	else			{delete $SavedFilters{$name};}
-	HasChanged('SavedFilters');
-}
-sub SaveSTGroupings
-{	my ($name,$val,$newname)=@_;
-	if (defined $newname)	{$SongTree::Groupings{$newname}=delete $SongTree::Groupings{$name};}
-	elsif (defined $val)	{$SongTree::Groupings{$name}=$val;}
-	else			{delete $SongTree::Groupings{$name};}
-	HasChanged('SavedSTGroupings');
-}
+sub SaveFilter		{ SaveSFRG('SavedFilters',@_);	}
 sub SaveList
 {	my ($name,$val,$newname)=@_;
-	if (defined $newname)	{$SavedLists{$newname}=delete $SavedLists{$name}; HasChanged('SavedLists',$name,'renamedto',$newname); $name=$newname; }
-	elsif (defined $val)	{$SavedLists{$name}=$val;}
-	else			{delete $SavedLists{$name}; HasChanged('SavedLists',$name,'remove'); return}
+	my $saved=$Options{SavedLists};
+	if (defined $newname)	{$saved->{$newname}=delete $saved->{$name}; HasChanged('SavedLists',$name,'renamedto',$newname); $name=$newname; }
+	elsif (defined $val)	{$saved->{$name}= SongArray->new($val);}
+	else			{delete $saved->{$name}; HasChanged('SavedLists',$name,'remove'); return}
 	HasChanged('SavedLists',$name);
 }
 
@@ -5895,6 +5733,9 @@ sub Watch
 {	my ($object,$key,$sub)=@_;
 	warn "watch $key $object\n" if $debug;
 	push @{$EventWatchers{$key}},$object;
+	if ($object->{'WatchUpdate_'.$key})
+	{	warn "Warning : Object $object is already watching event $key => previous watch replaced\n";
+	}
 	$object->{'WatchUpdate_'.$key}=$sub;
 	$object->signal_connect(destroy => \&UnWatch,$key) unless ref $object eq 'HASH' || !$object->isa('Gtk2::Object');
 }
@@ -5910,133 +5751,136 @@ sub HasChanged
 	return unless $EventWatchers{$key};
 	my @list=@{$EventWatchers{$key}};
 	warn "HasChanged $key -> updating @list\n" if $debug;
-	for my $r ( @list ) { my $sub=$r->{'WatchUpdate_'.$key}; &$sub($r,@args) if $sub; };
+	for my $r ( @list ) { my $sub=$r->{'WatchUpdate_'.$key}; $sub->($r,@args) if $sub; };
+}
+
+sub GetSelID
+{	my $group= ref $_[0] ? $_[0]{group} : $_[0];
+	return $group ne 'Play' ? $SelID{$group} : $SongID;
+}
+sub WatchSelID
+{	my ($object,$sub,$fields)=@_; #fields are ignored for now
+	my $key= $object->{group} ne 'Play' ? 'SelectedID_'.$object->{group} : 'SongID';
+	Watch($object,$key,$sub);
+}
+sub UnWatchSelID
+{	my $object=$_[0];
+	my $key= $object->{group} ne 'Play' ? 'SelectedID_'.$object->{group} : 'SongID';
+	UnWatch($object,$key);
+}
+sub HasChangedSelID
+{	my ($group,$ID)=@_;
+	if (defined $ID){ $SelID{$group}=$ID; }
+	else		{ delete $SelID{$group}; }
+	for my $group0 (keys %Related_FilterWatchers)
+	{	next unless $group0=~m/^$group:(.+)$/;
+		my $filter= Songs::MakeFilterFromID($1,$ID);
+		SetFilter(undef,$filter,1,$group0);
+	}
+	HasChanged('SelectedID_'.$group,$ID,$group);
 }
 
 sub SetFilter
-{	my ($object,$filter,$nb,$group)=@_;
-	$nb=1 unless defined $nb;
-	$filter=Filter->new($filter) unless defined $filter && ref $filter eq 'Filter';
+{	my ($object,$filter,$level,$group)=@_;
+	$level=1 unless defined $level;
 	$group=$object->{group} unless defined $group;
 	$group=get_layout_widget($object)->{group} unless defined $group;
-	$Filters_nb{$group}[$nb]=$filter;
-	$Filters_nb{$group}[$_]=undef for ($nb+1)..9;
-	$Filters{$group}=Filter->newadd(TRUE, map($Filters_nb{$group}[$_],0..9) );
-	for my $r ( @{$FilterWatchers{$group}} ) { &{$r->{'UpdateFilter_'.$group}}($r,$Filters{$group},$group,$nb) };
+	my $filters= $Filters{$group}||=[];	# $filters->[0] is the sum filter, $filters->[$n+1] is filter for level $n
+	$filter=Filter->new($filter) unless defined $filter && ref $filter eq 'Filter';
+	$filters->[$level+1]=$filter;	#set filter for level $level
+	$#$filters=$level+1;		#set higher level filters to undef by truncating the array
+	$filters->[0]= Filter->newadd(TRUE, map($filters->[$_], 1..$#$filters) ); #sum filter
+	AddToFilterHistory( $filters->[0] );
+	for my $r ( @{$FilterWatchers{$group}} ) { $r->{'UpdateFilter_'.$group}($r,$Filters{$group}[0],$group,$level) };
 }
 sub RefreshFilters
 {	my ($object,$group)=@_;
 	$group=$object->{group} unless defined $group;
 	$group=get_layout_widget($object)->{group} unless defined $group;
-	for my $r ( @{$FilterWatchers{$group}} ) { &{$r->{'UpdateFilter_'.$group}}($r,$Filters{$group},$group) };
+	for my $r ( @{$FilterWatchers{$group}} ) { $r->{'UpdateFilter_'.$group}($r,$Filters{$group}[0],$group) };
+}
+sub AddToFilterHistory
+{	my $filter=$_[0];
+	my $recent=$::Options{RecentFilters}||=[];
+	my $string=$filter->{string};
+	@$recent=($filter, grep $_->{string} ne $string, @$recent);
+	pop @$recent if @$recent>20;
 }
 sub GetFilter
 {	my ($object,$nb)=@_;
 	my $group=$object->{group};
 	$group=get_layout_widget($object)->{group} unless defined $group;
-	return defined $nb ? $Filters_nb{$group}[$nb] : $Filters{$group};
+	return defined $nb ? $Filters{$group}[$nb+1] : $Filters{$group}[0];
 }
 sub GetSonglist
 {	my $object=$_[0];
 	my $layw=get_layout_widget($object);
 	my $group=$object->{group};
-	$group=$layw->{group} unless defined $group;
-	return $layw->{'songlist'.$group};
+	$group=$layw->{group} if !defined $group && $layw;
+	return $SongList::Common::Register{$group};
 }
 sub WatchFilter
 {	my ($object,$group,$sub)=@_;
 	warn "watch filter $group $object\n" if $debug;
 	push @{$FilterWatchers{$group}},$object;
 	$object->{'UpdateFilter_'.$group}=$sub;
+	if ($group=~m/:(.+)$/)
+	{	$Related_FilterWatchers{$group}++;
+		#$Filters{$group}[0]||=$Filters{$group}[1+1]||= Filter->none;#FIXME implement a "none" filter
+		$Filters{$group}[0]||=$Filters{$group}[1+1]||=Filter->new;
+	}
+	else
+	{	IdleDo('1_init_filter'.$group,0,sub {SetFilter($object,undef,0) unless $Filters{$group}[0]; });
+	}
 	$object->signal_connect(destroy => \&UnWatchFilter,$group) unless ref $object eq 'HASH' || !$object->isa('Glib::Object');
-	IdleDo('1_init_filter'.$group,0,sub {SetFilter($object,undef,0) unless $Filters{$group}; });
 }
 sub UnWatchFilter
 {	my ($object,$group)=@_;
 	warn "unwatch filter $group $object\n" if $debug;
+	if ($group=~m/:(.+)$/)
+	{	unless (--$Related_FilterWatchers{$group})
+		{	delete $Related_FilterWatchers{$group};
+		}
+	}
 	delete $object->{'UpdateFilter'.$group};
 	my $ref=$FilterWatchers{$group};
 	@$ref=grep $_ ne $object, @$ref;
 	unless (@$ref)
-	{	delete $_->{$group} for \%Filters,\%Filters_nb,\%FilterWatchers;
+	{	delete $_->{$group} for \%Filters,\%FilterWatchers;
 	}
 }
 
-sub CreateProgressWindow
-{	$ProgressWin = Gtk2::Window->new('toplevel');
-	#$ProgressWin->set_title(PROGRAM_NAME);
-	$ProgressWin->set_border_width(3);
+sub Progress
+{	my $pid=shift;
+	my $self= {@_};
+	if (!defined $pid)	#new one
+	{	$pid="$self";
+		$Progress{$pid}=$self;
+	}
+	elsif (!$Progress{$pid})
+	{	$Progress{$pid}=$self;
+		$self->{end}+=delete $self->{add} if $self->{add};
+	}
+	else		#update existing
+	{	$Progress{$pid}{$_}=$self->{$_} for keys %$self;
+		$self= $Progress{$pid};
+	}
+	$self->{current}++ if delete $self->{inc};
+	$self->{fraction}= ($self->{current}||=0) / ($self->{end}||1);
 
-	$ProgressNBSongs=$ProgressNBFolders=0;
-	my $lengthcheck_max=0;
-
-	my $check_max=0;
-	my $Checklabel=Gtk2::Label->new(_"Checking existing songs ...");
-	my $CheckProgress=Gtk2::ProgressBar->new;
-	my $Checkstop=NewIconButton('gtk-stop',_"Stop checking",sub { @ToCheck=(); });
-	my $CheckVB=Vpack($Checklabel,$CheckProgress,$Checkstop);
-	$CheckVB->set_no_show_all(1);
-
-	my $label1=Gtk2::Label->new(_"Scanning ...");
-	my $label2=Gtk2::Label->new;
-	my $label3=Gtk2::Label->new;
-	my $Bstop=NewIconButton('gtk-stop',_"Stop scanning",sub { @ToScan=();undef %FollowedDirs; });
-	my $progressbar=Gtk2::ProgressBar->new;
-	my $handle=Glib::Timeout->add(500,sub
-		{	if (@ToCheck>1)
-			{	unless ($check_max)
-				{	$CheckVB->set_no_show_all(0);
-					$CheckVB->show_all;
-				}
-				$check_max=@ToCheck if @ToCheck>$check_max;
-				my $checked=$check_max-@ToCheck;
-				$CheckProgress->set_fraction( $checked/$check_max );
-				$CheckProgress->set_text( "$checked / $check_max" );
-			}
-			elsif ($check_max) { $CheckVB->hide; $check_max=0; $ProgressWin->resize(1,1); }
-
-			my $fraction;
-			if (@ToScan || @ToAdd || @LengthEstimated)
-			{	$label2->set_label( __("Scanned %d folder, ","Scanned %d folders, ", $ProgressNBFolders)
-							.__("%d song added.","%d songs added.", $ProgressNBSongs)  );
-			}
-			if (@ToScan || @ToAdd)
-			{	$label3->set_label( __("%d folder left","%d folders left", scalar@ToScan) );
-				#$progressbar->set_text(@ToScan.' folders '.@ToAdd.' songs');
-				$fraction=@ToScan + $ProgressNBFolders;
-				$fraction=$fraction?	$ProgressNBFolders/$fraction : 1;
-				#$progressbar->pulse;
-				if ($lengthcheck_max)
-				{	$Bstop->show;
-					$lengthcheck_max=0;
-				}
-			}
-			elsif (@LengthEstimated)
-			{	if (@LengthEstimated > $lengthcheck_max)
-				{	$lengthcheck_max=@LengthEstimated;
-					$Bstop->hide;
-					$label3->set_label( __("Checking length/bitrate of %d mp3 file without VBR header...", "Checking length/bitrate of %d mp3 files without VBR header...", $lengthcheck_max)  );
-				}
-				$fraction=($lengthcheck_max-@LengthEstimated)/$lengthcheck_max;
-			}
-			else
-			{	$ProgressWin->destroy;
-				undef $ProgressWin;
-				return 0;
-			}
-			$progressbar->set_fraction($fraction);
-			return 1;
-		});
-	$ProgressWin->signal_connect (delete_event => sub
-		{	Glib::Source->remove($handle);
-			$ProgressWin->destroy;
-			$ProgressWin=undef;
-		});
-
-	my $vbox = Gtk2::VBox->new(FALSE, 2);
-	$ProgressWin->add($vbox);
-	$vbox->pack_start($_, FALSE, TRUE, 3) for $CheckVB,$label1,$label2,$label3,$progressbar,$Bstop;
-	$ProgressWin->show_all;
+	if (my $w=$self->{widget}) { $w->set_fraction( $self->{fraction} ); }
+	delete $Progress{$pid} if $self->{abort} or $self->{current}==$self->{end}; # finished
+	HasChanged(Progress =>$pid,$Progress{$pid});
+	if ( $Progress{$pid} && !$self->{widget} && (!$EventWatchers{Progress} || @{$EventWatchers{Progress}}==0))	#if no widget => create progress window
+	{	#create the progress window only after a short timeout to ignore short jobs
+		$ProgressWindowComing ||= Glib::Timeout->add(1000,
+		    sub {	my $still_progress = grep !$Progress{$_}{widget}, keys %Progress;
+				my $still_no_widget= !$EventWatchers{Progress} || @{$EventWatchers{Progress}}==0;
+				Layout::Window->new('Progress') if $still_progress && $still_no_widget;
+				return $ProgressWindowComing=0;
+			});
+	}
+	return $pid;
 }
 
 sub PresentWindow
@@ -6103,10 +5947,10 @@ sub TrayMenuPopup
 	{ label=> _"Stop", code => \&Stop,	stockicon => 'gtk-media-stop' },
 	{ label=> _"Next", code => \&NextSong,	stockicon => 'gtk-media-next' },
 	{ label=> _"Recently played", submenu => sub { my $m=::ChooseSongs(undef,::GetPrevSongs(5)); }, stockicon => 'gtk-media-previous' },
-	{ label=> sub {$TogLock && $TogLock==SONG_ARTIST? _"Unlock Artist" : _"Lock Artist"}, code => sub {ToggleLock(SONG_ARTIST);} },
-	{ label=> sub {$TogLock && $TogLock==SONG_ALBUM? _"Unlock Album" : _"Lock Album"}, code => sub {ToggleLock(SONG_ALBUM);} },
-	{ label=> _"Windows",	code => \&PresentWindow,
-		submenu => sub { scalar {map {_( $_->{layout} ),$_} grep exists $_->{layout}, Gtk2::Window->list_toplevels}; }, },
+	{ label=> sub {$TogLock && $TogLock eq 'first_artist'? _"Unlock Artist" : _"Lock Artist"},	code => sub {ToggleLock('first_artist');} },
+	{ label=> sub {$TogLock && $TogLock eq 'album' ? _"Unlock Album"  : _"Lock Album"},	code => sub {ToggleLock('album');} },
+	{ label=> _"Windows",	code => \&PresentWindow,	submenu_ordered_hash =>1,
+		submenu => sub {  [map { $_->layout_name => $_ } grep $_->isa('Layout::Window'), Gtk2::Window->list_toplevels];  }, },
 	{ label=> sub { IsWindowVisible($MainWindow) ? _"Hide": _"Show"}, code => \&ShowHide },
 	{ label=> _"Fullscreen",	code => \&::ToggleFullscreenLayout,	stockicon => 'gtk-fullscreen' },
 	{ label=> _"Settings",		code => \&PrefDialog,	stockicon => 'gtk-preferences' },
@@ -6144,16 +5988,17 @@ sub windowpos	# function to position window next to clicked widget ($event can b
 	}
 	my $ycenter=0;
 	if ($x+$dx/2+$w/2 < $xmax && $x+$dx/2-$w/2 >$xmin){ $x-=int($w/2-$dx/2); }	# centered
-	elsif ($x+$dx+$w > $xmax)	{ $x=$xmax-$w; $x=$xmin if $x<$xmin }	# right side
+	elsif ($x+$dx+$w > $xmax)	{ $x=max($xmax-$w,$xmin) }		# right side
 	else				{ $x=$xmin; }				# left side
 	if ($ycenter && $y+$h/2 < $ymax && $y-$h/2 >$ymin){ $y-=int($h/2) }	# y center
-	elsif ($dy+$y+$h > $ymax)  { $y-=$h; $y=$ymin if $y<$ymin }	# display above the widget
-	else			   { $y+=$dy; }				# display below the widget
+	elsif ($dy+$y+$h > $ymax)	{ $y=max($y-$h,$ymin) }			# display above the widget
+	else				{ $y+=$dy; }				# display below the widget
 	return $x,$y;
 }
 
 #sub UpdateTrayTip #not used
-#{	$Tooltips->set_tip($_[0], __x( _"{song}\nby {artist}\nfrom {album}", song => $Songs[$SongID][SONG_TITLE], artist => $Songs[$SongID][SONG_ARTIST], album => $Songs[$SongID][SONG_ALBUM]) );
+#{	my ($song,$artist,$album)=Songs::Display($SongID,qw/title artist album/);
+	#$Tooltips->set_tip($_[0], __x( _"{song}\nby {artist}\nfrom {album}", song => $song, artist => $artist, album => $album) );
 #}
 
 sub IsWindowVisible
@@ -6178,6 +6023,7 @@ sub ShowHide
 			#warn "hiding($x,$y)\n";
 			$win->{saved_position}=[$x,$y];
 			$win->iconify;
+			$win->{skip_taskbar_hint}=1 if $win->get_skip_taskbar_hint;
 			$win->set_skip_taskbar_hint(TRUE);
 			$win->hide;
 		}
@@ -6201,13 +6047,14 @@ sub ShowHide
 			$win->show;
 			$win->move($x,$y);
 			$win->deiconify if $win->{iconified};
-			$win->set_skip_taskbar_hint(FALSE);
+			$win->set_skip_taskbar_hint(FALSE) unless delete $win->{skip_taskbar_hint};
+			#$win->set_opacity($win->{opacity}) if exists $win->{opacity} && $win->{opacity}!=1; #need to re-set it, is it a gtk bug, metacity bug ?
 		}
 		$MainWindow->present;
 	}
 }
 
-package EditSFR;
+package GMB::Edit;
 use Gtk2;
 use base 'Gtk2::Dialog';
 
@@ -6215,14 +6062,14 @@ my %refs;
 
 INIT
 { %refs=
-  (	Filter	=> [_"Filter edition",	\%::SavedFilters,	'SavedFilters',	\&::SaveFilter,	_"saved filters",
-	  _"name of the new filter",	_"save filter as",	_"delete selected filter"	],
-	Sort	=> [_"Sort mode edition",  \%::SavedSorts,		'SavedSorts',	\&::SaveSort,	_"saved sort modes",
-	  _"name of the new sort mode",	_"save sort mode as",	_"delete selected sort mode"	],
-	WRandom	=> [_"Random mode edition",\%::SavedWRandoms,	'SavedWRandoms',\&::SaveWRandom,_"saved random modes",
-	  _"name of the new random mode", _"save random mode as", _"delete selected random mode"],
-	STGroupings => [_"SongTree groupings edition",\%SongTree::Groupings,	'SavedSTGroupings',\&::SaveSTGroupings,_"saved groupings",
-	  _"name of the new grouping", _"save grouping as", _"delete selected grouping"],
+  (	Filter	=> [	_"Filter edition",		'SavedFilters',		_"saved filters",
+			_"name of the new filter",	_"save filter as",	_"delete selected filter"	],
+	Sort	=> [	_"Sort mode edition",		'SavedSorts',		_"saved sort modes",
+			_"name of the new sort mode",	_"save sort mode as",	_"delete selected sort mode"	],
+	WRandom	=> [	_"Random mode edition",		'SavedWRandoms',	_"saved random modes",
+			_"name of the new random mode", _"save random mode as", _"delete selected random mode"],
+	STGroupings => [_"SongTree groupings edition", 'SavedSTGroupings',	_"saved groupings",
+			_"name of the new grouping",	_"save grouping as",	_"delete selected grouping"],
   );
 }
 
@@ -6245,8 +6092,9 @@ sub new
 	$self->set_default_response('ok');
 	$self->set_border_width(3);
 
-	@$self{qw/hash update save/}=@$typedata[1,2,3];
-	::Watch($self,$self->{update},\&Fill);
+	$self->{key}=$typedata->[1];
+	$self->{hash}=$::Options{$self->{key}};
+	::Watch($self,$self->{key},\&Fill);
 
 	if (defined $name)
 	{	if ($name eq '')
@@ -6264,7 +6112,7 @@ sub new
 	$renderer->signal_connect(edited => \&name_edited_cb,$self);
 	$renderer->set(editable => 1);
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
-		( $typedata->[4],$renderer,'text',0)
+		( $typedata->[2],$renderer,'text',0)
 		);
 	my $sw=Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type ('etched-in');
@@ -6274,7 +6122,7 @@ sub new
 		{	my $sel=$_[0]->count_selected_rows;
 			$butrm->set_sensitive($sel);
 		});
-	$butrm->set_sensitive(::FALSE);
+	$butrm->set_sensitive(0);
 	$butrm->signal_connect(clicked => \&Remove_cb,$self);
 	my $butsave=::NewIconButton('gtk-save');
 	my $NameEntry=Gtk2::Entry->new;
@@ -6283,15 +6131,15 @@ sub new
 	$NameEntry->signal_connect(activate => sub {$self->Save});
 	$butsave->set_sensitive(0);
 	$NameEntry->set_text($name) if defined $name;
-	$::Tooltips->set_tip($NameEntry,$typedata->[5] );
-	$::Tooltips->set_tip($butsave,	$typedata->[6] );
-	$::Tooltips->set_tip($butrm,	$typedata->[7]);
+	$::Tooltips->set_tip($NameEntry,$typedata->[3] );
+	$::Tooltips->set_tip($butsave,	$typedata->[4] );
+	$::Tooltips->set_tip($butrm,	$typedata->[5]);
 
 	$self->{entry}=$NameEntry;
 	$self->{store}=$store;
 	$self->{treeview}=$treeview;
 	$self->Fill;
-	my $package='Edit'.$type;
+	my $package='GMB::Edit::'.$type;
 	my $editobject=$package->new($self,$init);
 	$sw->add($treeview);
 	$self->vbox->add( ::Hpack( [[0,$NameEntry,$butsave],'_',$sw,$butrm], '_',$editobject) );
@@ -6313,7 +6161,7 @@ sub name_edited_cb
 	my $iter=$store->get_iter( Gtk2::TreePath->new($path_string) );
 	my $name=$store->get($iter,0);
 	#$self->{busy}=1;
-	&{ $self->{save} }($name,undef,$newname);
+	::SaveSFRG($self->{key}, $name, undef,$newname);
 	#$self->{busy}=undef;
 	#$store->set($iter, 0, $newname);
 }
@@ -6323,7 +6171,7 @@ sub Remove_cb
 	my $path=($self->{treeview}->get_cursor)[0]||return;
 	my $store=$self->{store};
 	my $name=$store->get( $store->get_iter($path) ,0);
-	&{ $self->{save} }($name,undef);
+	::SaveSFRG($self->{key}, $name, undef);
 }
 
 sub Save
@@ -6331,7 +6179,7 @@ sub Save
 	my $name=$self->{entry}->get_text;
 	return unless $name;
 	my $result=$self->{editobject}->Result;
-	&{ $self->{save} }($name, $result);
+	::SaveSFRG($self->{key}, $name, $result);
 }
 
 sub Fill
@@ -6361,8 +6209,9 @@ sub Result
 			if ($ans eq 'ok' || $ans eq 'apply')
 			{	my $result=$self->{editobject}->Result;
 				$self->{save_name}=$self->{save_name_entry}->get_text if $self->{save_name_entry};
-				&{ $self->{save} }($self->{save_name}, $result) if $ans eq 'ok' && defined $self->{save_name} && $self->{save_name} ne '';
-				&$sub($result) if $sub;
+				::SaveSFRG($self->{key}, $self->{save_name}, $result)
+					 if $ans eq 'ok' && defined $self->{save_name} && $self->{save_name} ne '';
+				$sub->($result) if $sub;
 				return if $ans eq 'apply';
 			}
 			$self->destroy;
@@ -6378,7 +6227,7 @@ sub Result
 }
 
 
-package EditFilter;
+package GMB::Edit::Filter;
 use Gtk2;
 use base 'Gtk2::VBox';
 use constant
@@ -6408,8 +6257,8 @@ sub new
 	$butadd2->signal_connect(clicked => \&Add_cb,$self);
 	$butrm->signal_connect(  clicked => \&Rm_cb, $self);
 	$butrm->set_sensitive(FALSE);
-	$butadd->{filter}=::SONG_TITLE.'s';
-	$butadd2->{filter}="(\x1D".::SONG_TITLE."s\x1D)";
+	$butadd->{filter}='title:s:';
+	$butadd2->{filter}="(\x1Dtitle:s:\x1D)";
 
 	$treeview->get_selection->signal_connect( changed => sub
 		{	my $sel=$_[0]->count_selected_rows;
@@ -6431,7 +6280,7 @@ sub new
 		{	my $treeview=$_[0];
 			my $self=::find_ancestor($treeview,__PACKAGE__);
 			my $f=$self->Result( ($treeview->get_cursor)[0] );
-			return $f->{string} if $f;
+			return (::DRAG_FILTER,($f->{string}||undef));
 		}],
 	dest =>	[::DRAG_FILTER,sub
 		{	my ($treeview,$type,$dest,$filter)=@_;
@@ -6452,7 +6301,7 @@ sub new
 			}
 		}],
 	motion => sub
-		{	my ($treeview,$context,$x,$y,$time)=@_; #warn "drag_motion_cb @_";
+		{	my ($treeview,$context,$x,$y,$time)=@_;# warn "drag_motion_cb @_";
 			my $store=$treeview->get_model;
 			my ($path,$pos)=$treeview->get_dest_row_at_pos($x,$y);
 			$path||=Gtk2::TreePath->new_first;
@@ -6510,7 +6359,7 @@ sub Remove_path
 	my $oldpath=$store->get_path($iter);
 	$store->remove($iter);
 	# recreate a default entry if no more entry :
-	$self->Set(::SONG_TITLE.'s') unless $store->get_iter_first;
+	$self->Set('title:s:') unless $store->get_iter_first;
 	return $oldpath;
 }
 
@@ -6566,7 +6415,7 @@ sub Set
 
 	my $iter;
 	if ($startpath)
-	{	$iter=$store->get_iter($startpath); #warn "set filter $filter at path=".$startpath->to_string;
+	{	$iter=$store->get_iter($startpath);
 		my $parent=$store->iter_parent($iter);
 		if (!$parent && !$store->iter_has_child($iter)) #add a root
 		{	$parent=$store->prepend(undef);
@@ -6616,7 +6465,7 @@ sub Set
 		}
 	}
 	unless ($store->get_iter_first)	#default filter if no/invalid filter
-	{	my ($pos,@vals)=FilterBox::filter2posval(::SONG_TITLE.'s');
+	{	my ($pos,@vals)=FilterBox::filter2posval('title:s:');
 		$store->set($store->append(undef), C_NAME,FilterBox::posval2desc($pos,@vals),	C_POS,$pos, C_VAL1,$vals[0], C_VAL2,$vals[1]);
 	}
 
@@ -6656,13 +6505,13 @@ sub Result
 	return Filter->new($filter);
 }
 
-package EditSort;
+package GMB::Edit::Sort;
 use Gtk2;
 use base 'Gtk2::VBox';
-use constant { TRUE  => 1, FALSE => 0, STOCK_SENSITIVE => 'gmb-case_sensitive', STOCK_INSENSITIVE => 'gmb-case_insensitive', };
+use constant { TRUE  => 1, FALSE => 0, SENSITIVE => 1, INSENSITIVE => 2, };
 sub new
 {	my ($class,$dialog,$init) = @_;
-	$init=undef if $init=~m/^[rs]/;
+	$init=undef if $init=~m/^random:|^shuffle/;
 	my $self = bless Gtk2::VBox->new, $class;
 
 	$self->{store1}=	my $store1=Gtk2::ListStore->new(('Glib::String')x2);
@@ -6696,15 +6545,15 @@ sub new
 	my $table=Gtk2::Table->new (2, 4, FALSE);
 	my $col=0;
 	for ([_"Available",$treeview1,$butadd],[_"Sort order",$treeview2,$butrm,$butclear])
-	{	my ($text,$tv,@buts)=@$_;
+	{	my ($label,$tv,@buts)=@$_;
 		my $lab=Gtk2::Label->new;
-		$lab->set_markup("<b>$text</b>");
+		$lab->set_markup('<b>'.::PangoEsc($label).'</b>');
 		$tv->set_headers_visible(FALSE);
-		$tv->append_column( Gtk2::TreeViewColumn->new_with_attributes($text,Gtk2::CellRendererText->new,'text',1) );
+		$tv->append_column( Gtk2::TreeViewColumn->new_with_attributes($label,Gtk2::CellRendererText->new,'text',1) );
 		my $sw = Gtk2::ScrolledWindow->new;
 		$sw->set_shadow_type('etched-in');
 		$sw->set_policy('never','automatic');
-		$sw->set_size_request(-1,200);
+		$sw->set_size_request(30,200);
 		$sw->add($tv);
 		my $row=0;
 		$table->attach($lab,$col,$col+1,$row++,$row,'fill','shrink',1,1);
@@ -6712,10 +6561,34 @@ sub new
 		$table->attach($_,$col,$col+1,$row++,$row,'expand','shrink',1,1) for @buts;
 		$col++;
 	}
-	$treeview2->append_column
-		( Gtk2::TreeViewColumn->new_with_attributes
-		  ('Case',Gtk2::CellRendererPixbuf->new,'stock-id',3)
-		);
+	#my $case_column= Gtk2::TreeViewColumn->new_with_attributes('Case',Gtk2::CellRendererPixbuf->new,'stock-id',3);
+	my $caserenderer=Gtk2::CellRendererPixbuf->new;
+	my $case_column= Gtk2::TreeViewColumn->new_with_attributes('Case',$caserenderer);
+	$treeview2->append_column($case_column);
+	$case_column->set_cell_data_func($caserenderer,	sub
+	 {	my ($column,$cell,$store2,$iter)=@_;
+		my $i=$store2->get_value($iter,3);
+		my $stock= !$i ? undef : $i==SENSITIVE ? 'gmb-case_sensitive' : 'gmb-case_insensitive';
+		$cell->set(stock_id => $stock);
+	 });
+	if (*Gtk2::Widget::set_has_tooltip{CODE}) # since gtk+ 2.12, Gtk2 1.160
+	{	$treeview2->set_has_tooltip(1);
+		$treeview2->signal_connect(query_tooltip=> sub
+		 {	my ($treeview2, $x, $y, $keyb, $tooltip)=@_;
+			return 0 if $keyb;
+			my ($path, $column)=$treeview2->get_path_at_pos($x,$y);
+			return 0 unless $path && $column && $column==$case_column;
+			my $store2=$treeview2->get_model;
+			my $iter=$store2->get_iter($path);
+			return 0 unless $iter;
+			my $i=$store2->get_value($iter,3);
+			return 0 unless $i;
+			my $tip= $i==SENSITIVE ? _"Case sensitive" : _"Case insensitive";
+			$tooltip->set_text($tip);
+			1;
+		 });
+
+	}
 
 	my $vbox=Gtk2::VBox->new (FALSE, 4);
 	$vbox->pack_start($_,FALSE,TRUE,1) for $butup,$butdown;
@@ -6733,22 +6606,21 @@ sub Set
 	$store2->clear;
 	$self->{nb2}=0;	#nb of rows in $store2;
 	my %cols;
-	for my $n (split ' ',$list)
-	{   my $o=($n=~s/^-//)? 'gtk-sort-descending' : 'gtk-sort-ascending';
-	    my $i=($n=~s/i$//)? STOCK_INSENSITIVE : STOCK_SENSITIVE;
-	    $i='' unless $TagProp[$n][2] eq 's';
-	    my $text=($n eq 's')? _"Shuffle" : $TagProp[$n][0];
-	    $store2->set($store2->append,0,$n,1,$text,2,$o,3,$i);
+	for my $f (split / /,$list)
+	{   my $o=($f=~s/^-//)? 'gtk-sort-descending' : 'gtk-sort-ascending';
+	    my $i=($f=~s/:i$//)? INSENSITIVE : SENSITIVE;
+	    $i=0 unless Songs::SortICase($f);
+	    my $text= Songs::FieldName($f);
+	    $store2->set($store2->append,0,$f,1,$text,2,$o,3,$i);
 	    $self->{nb2}++;
-	    $cols{$n}=1;
+	    $cols{$f}=1;
 	}
 
 	my $store1=$self->{store1};
 	$store1->clear;
-	$store1->set($store1->append,0,'s',1,_"Shuffle");
-	for my $n (grep $TagProp[$_][0] && $TagProp[$_][2]=~m/[dnsl]/, 0..$#TagProp)
-	{   next if $cols{$n};
-	    $store1->set($store1->append,0,$n,1,$TagProp[$n][0]);
+	for my $f (sort { Songs::FieldName($a) cmp Songs::FieldName($b) } Songs::SortKeys())
+	{   next if $cols{$f};
+	    $store1->set($store1->append,0,$f,1,Songs::FieldName($f));
 	}
 	$self->Buttons_update;
 }
@@ -6767,7 +6639,7 @@ sub cursor_changed2_cb
 	elsif ($col eq $treeview2->get_column(2))
 	{	my $i=$store2->get_value($iter,3);
 		return unless $i;
-		$i=($i eq STOCK_SENSITIVE)? STOCK_INSENSITIVE : STOCK_SENSITIVE;
+		$i= $i==1? INSENSITIVE : SENSITIVE;
 		$store2->set($iter,3,$i);
 	}
 }
@@ -6779,10 +6651,10 @@ sub Add_selected
 	my $store2=$self->{store2};
 	my $iter=$store1->get_iter($path);
 	return unless $iter;
-	my ($n,$v)=$store1->get_value($iter,0,1);
+	my ($f,$v)=$store1->get_value($iter,0,1);
 	$store1->remove($iter);
-	my $i=($n=~m/^\d+$/ && $TagProp[$n][2] eq 's')? STOCK_SENSITIVE : '';
-	$store2->set($store2->append,0,$n,1,$v,2,'gtk-sort-ascending',3,$i);
+	my $i=( Songs::SortICase($f) )? INSENSITIVE : 0;	#default to case-insensitive
+	$store2->set($store2->append,0,$f,1,$v,2,'gtk-sort-ascending',3,$i);
 	$self->{nb2}++;
 	$self->Buttons_update;
 }
@@ -6792,10 +6664,10 @@ sub Del_selected
 	my $store1=$self->{store1};
 	my $store2=$self->{store2};
 	my $iter=$store2->get_iter($path);
-	my ($n,$v)=$store2->get_value($iter,0,1);
+	my ($f,$v)=$store2->get_value($iter,0,1);
 	$store2->remove($iter);
 	$self->{nb2}--;
-	$store1->set($store1->append,0,$n,1,$v);	#FIXME should be inserted in correct order
+	$store1->set($store1->append,0,$f,1,$v);	#FIXME should be inserted in correct order
 	$self->Buttons_update;
 }
 sub Move_Selected
@@ -6811,7 +6683,7 @@ sub Move_Selected
 	my $row=$path->to_string;
 	if ($up) {$row--} else {$row++}
 	my $iter2=$store2->get_iter_from_string($row)||return;
-	$store2->swap ($iter,$iter2);
+	$store2->swap($iter,$iter2);
 	$self->Buttons_update;
 };
 
@@ -6835,16 +6707,16 @@ sub Result
 	my $order='';
 	my $iter=$store->get_iter_first;
 	while ($iter)
-	{	my ($n,$o,$i)=$store->get($iter,0,2,3);
+	{	my ($f,$o,$i)=$store->get($iter,0,2,3);
 		$order.='-' if $o eq 'gtk-sort-descending';
-		$order.=$n;
-		$order.='i' if $i && $i eq STOCK_INSENSITIVE;
+		$order.=$f;
+		$order.=':i' if $i==INSENSITIVE;
 		$order.=' ' if $iter=$store->iter_next($iter);
 	}
 	return $order;
 }
 
-package EditWRandom;
+package GMB::Edit::WRandom;
 use Gtk2;
 use base 'Gtk2::VBox';
 use constant
@@ -6853,9 +6725,6 @@ use constant
   COLWIDTH	=> 15,
   HHEIGHT	=> 100,
   HWIDTH	=> 20*15,
-
-  SCORE_FIELDS	=> 0, SCORE_DESCR	=> 1, SCORE_UNIT	=> 2,
-  SCORE_ROUND	=> 3, SCORE_DEFAULT	=> 4, SCORE_VALUE	=> 5,
 };
 sub new
 {	my ($class,$dialog,$init) = @_;
@@ -6867,38 +6736,38 @@ sub new
 	$sw->add_with_viewport($table);
 	$self->add($sw);
 
-	my $addlist=TextCombo->new({map {$_ => $Random::ScoreTypes{$_}[SCORE_DESCR]} keys %Random::ScoreTypes}, (keys %Random::ScoreTypes)[0] );
+	my $addlist=TextCombo->new({map {$_ => $Random::ScoreTypes{$_}{desc}} keys %Random::ScoreTypes}, (keys %Random::ScoreTypes)[0] );
 	my $addbut=::NewIconButton('gtk-add',_"Add");
 	my $addhbox=Gtk2::HBox->new(FALSE, 8);
 	$addhbox->pack_start($_,FALSE,FALSE,0) for Gtk2::Label->new(_"Add rule : "), $addlist, $addbut;
 
-	my $histogram=Gtk2::Image->new;
-	my $eventbox=Gtk2::EventBox->new;
+	my $histogram=Gtk2::DrawingArea->new;
 	my $histoframe=Gtk2::Frame->new;
 	my $histoAl=Gtk2::Alignment->new(.5,.5,0,0);
-	$eventbox->add($histogram);
-	$histoframe->add($eventbox);
+	$histoframe->add($histogram);
 	$histoAl->add($histoframe);
 
 	my $LabEx=$self->{example_label}=Gtk2::Label->new;
 	$self->pack_start($_,FALSE,FALSE,2) for $addhbox,$histoAl,$LabEx;
 
-	$::Tooltips->set_tip($eventbox,'');
-	$eventbox->signal_connect(enter_notify_event => sub
+	$histogram->size(HWIDTH,HHEIGHT);
+	$histogram->signal_connect(expose_event => \&histogram_expose_cb);
+	$::Tooltips->set_tip($histogram,'');
+	$histogram->add_events([qw/enter-notify-mask leave-notify-mask/]);
+	$histogram->signal_connect(enter_notify_event => sub
 		{	$_[0]{timeout}=Glib::Timeout->add(500,\&UpdateTip_timeout,$histogram);0;
 		});
-	$eventbox->signal_connect(leave_notify_event => sub { Glib::Source->remove( $_[0]{timeout} );0; });
+	$histogram->signal_connect(leave_notify_event => sub { Glib::Source->remove( $_[0]{timeout} );0; });
 
 	$addbut->signal_connect( clicked => sub
 		{	my $type=$addlist->get_value;
-			$self->AddRow( $Random::ScoreTypes{$type}[SCORE_DEFAULT] );
+			$self->AddRow( $Random::ScoreTypes{$type}{default} );
 		});
-	::Watch($self,'SongID',\&UpdateID);
-	::Watch($self,'Filter',\&UpdateFilter);
-	$self->{watcher}=::AddWatcher();
-	$self->signal_connect( destroy => \&RemoveWatchers );
+	::Watch($self,	SongID		=>\&UpdateID);
+	::Watch($self,	SongsChanged	=>\&SongsChanged_cb);
+	::Watch($self,	SongArray	=>\&SongArray_cb);
+	$self->signal_connect( destroy => \&cleanup );
 
-	$histogram->{eventbox}=$eventbox;
 	$self->{histogram}=$histogram;
 	$self->{table}=$table;
 	$self->Set($init);
@@ -6906,17 +6775,14 @@ sub new
 	return $self;
 }
 
-sub RemoveWatchers
+sub cleanup	#FIXME find a simpler way to do it
 {	my $self=shift;
-	return unless defined $self->{watcher};
 	delete $ToDo{'2_WRandom'.$self};
-	::RemoveWatcher($self->{watcher});
-	$self->{watcher}=undef;
 }
 
 sub Set
-{	my ($self,$sort)=@_;
-	$sort=~s/^r//;
+{	my ($self,$sort)=@_; warn $sort;
+	$sort=~s/^random://;
 	my $table=$self->{table};
 	$table->remove($_) for $table->get_children;
 	$self->{frames}=[];
@@ -6926,32 +6792,53 @@ sub Set
 }
 
 sub Redraw
-{	my $self=shift;
+{	my ($self,$queue)=@_;
+	if ($queue) { ::IdleDo('2_WRandom'.$self,500,\&Redraw, $self); return }
+	delete $::ToDo{'2_WRandom'.$self};
 	my $histogram=$self->{histogram};
 	$histogram->{col}=undef;
-	my $r=Random->new( $self->get_string );
-	my ($tab)=($histogram->{tab},$self->{sum})=$r->MakeTab(NBCOLS);
-	my $pixmap=Gtk2::Gdk::Pixmap->new ($histogram->window,HWIDTH,HHEIGHT,-1);
-	$pixmap->draw_rectangle ($histogram->style->bg_gc($histogram->state),TRUE,0,0,HWIDTH,HHEIGHT);
-	my $max=(sort { $b <=> $a } @$tab)[0] ||10;
-	my $gc = $histogram->style->fg_gc($histogram->state);
-	for my $x (0..NBCOLS-1)
-	{	my $y=int(HHEIGHT*( $$tab[$x]||0 )/$max);
-		warn "$x : $y\n" if $debug;
-		$pixmap->draw_rectangle($gc,TRUE,COLWIDTH*$x,HHEIGHT-$y,COLWIDTH,$y);
-	}
-	$histogram->set_from_pixmap ($pixmap,undef);
-	$histogram->show_all;
+	my $r=$self->get_random;
+	my ($tab)= ($histogram->{tab},$self->{sum})= $r->MakeTab(NBCOLS);
+	$histogram->{max}= (sort { $b <=> $a } @$tab)[0] ||0;
+	$histogram->queue_draw;
 
-	my $sub=sub { ::IdleDo('2_WRandom'.$self,500,\&Redraw, $self); };
-	::ChangeWatcher( $self->{watcher}, undef, $r->fields, $sub, $sub, $sub, $PlayFilter, $sub);
+	$self->{depend_fields}=$r->fields;
 	$self->UpdateID; #update examples
 
 	0;
 }
+sub SongsChanged_cb
+{	my ($self,$IDs,$fields)=@_;
+	return if $::ToDo{'2_WRandom'.$self};
+	return unless ::OneInCommon($fields,$self->{depend_fields});
+	return if $IDs && !@{ $ListPlay->AreIn($IDs) };
+	$self->Redraw(1);
+}
+sub SongArray_cb
+{	my ($self,$array,$action)=@_;
+	return if $::ToDo{'2_WRandom'.$self};
+	return unless $array==$ListPlay;
+	return if grep $action eq $_, qw/mode sort move up down/;
+	$self->Redraw(1);
+}
+
+sub histogram_expose_cb
+{	my ($histogram,$event)=@_;
+	my $max= $histogram->{max};
+	return 0 unless $max;
+	#my $gc = $histogram->style->fg_gc($histogram->state);
+	my @param=($histogram->window, 'selected', 'out', $event->area, $histogram, undef);
+	for my $x (0..NBCOLS-1)
+	{	my $y=int(HHEIGHT* ($histogram->{tab}[$x]||0)/$max );
+		#$histogram->window->draw_rectangle($gc,TRUE,COLWIDTH*$x,HHEIGHT-$y,COLWIDTH,$y);
+		$histogram->style->paint_box(@param, COLWIDTH*$x,HHEIGHT-$y,COLWIDTH,$y);
+		#warn "histogram : $x $y\n";
+	}
+	1;
+}
 
 sub UpdateTip_timeout
-{	my $histogram=shift;
+{	my $histogram=$_[0];
 	my ($x,$y)=$histogram->get_pointer;#warn "$x,$y\n";
 	return 0 if $x<0;
 	my $col=int($x/COLWIDTH);
@@ -6961,7 +6848,7 @@ sub UpdateTip_timeout
 	my $range=sprintf '%.2f - %.2f',$col/NBCOLS,($col+1)/NBCOLS;
 	#my $sum=$histogram->get_ancestor('Gtk2::VBox')->{sum};
 	#my $prob='between '.join ' and ',map $_? '1 chance in '.sprintf('%.0f',$sum/$_) : 'no chance', $col/NBCOLS,($col+1)/NBCOLS;
-	$::Tooltips->set_tip($histogram->{eventbox}, "$range : ".::__('%d song','%d songs',$nb) );
+	$::Tooltips->set_tip($histogram, "$range : ".::__('%d song','%d songs',$nb) );
 	1;
 }
 
@@ -6972,19 +6859,19 @@ sub AddRow
 	my $deleted;
 	my ($inverse,$weight,$type,$extra)=$params=~m/^(-?)([0-9.]+)([a-zA-Z])(.*)$/;
 	return unless $type;
-	my $frame=Gtk2::Frame->new( $Random::ScoreTypes{$type}[SCORE_DESCR] );
+	my $frame=Gtk2::Frame->new( $Random::ScoreTypes{$type}{desc} );
 	$frame->{type}=$type;
 	push @{$self->{frames}},$frame;
 	$frame->{params}=$params;
 	my $exlabel=$frame->{label}=Gtk2::Label->new;
-	$frame->{unit}=$Random::ScoreTypes{$type}[SCORE_UNIT];
-	$frame->{round}=$Random::ScoreTypes{$type}[SCORE_ROUND];
+	$frame->{unit}=$Random::ScoreTypes{$type}{unit};
+	$frame->{round}=$Random::ScoreTypes{$type}{round};
 	my $button=::NewIconButton('gtk-remove',undef,sub
 		{ my $button=$_[0];
 		  my $self=::find_ancestor($button,__PACKAGE__);
 		  $frame->{params}=undef;
 		  $_->parent->remove($_) for $button,$frame;
-		  ::IdleDo('2_WRandom'.$self,500,\&Redraw, $self);
+		  $self->Redraw(1);
 		},'none');
 	$::Tooltips->set_tip($button,_"Remove this rule");
 	$table->attach($button,0,1,$row,$row+1,'shrink','shrink',1,1);
@@ -7001,14 +6888,16 @@ sub AddRow
 	my $check_tip;
 	if ($type eq 'f')
 	{	$check_tip=_"ON less probable if label is set\nOFF more probable if label is set";
-		my $labellist=TextCombo->new([sort keys %Labels],$extra,\&update_frame_cb);
+		#my $labellist=TextCombo->new(::SortedLabels(),$extra,\&update_frame_cb);
+		my $labellist= GMB::ListStore::Field::Combo->new('label',$extra,\&update_frame_cb);
 		$extrasub=sub { $labellist->get_value; };
 		#$extrasub=sub {'Bootleg' };
 		$hbox->pack_start($labellist, FALSE, FALSE, 1);
 	}
 	elsif ($type eq 'g')
 	{	$check_tip=_"ON less probable if genre is set\nOFF more probable if genre is set";
-		my $genrelist=TextCombo->new( ::GetGenresList ,$extra,\&update_frame_cb);
+		#my $genrelist=TextCombo->new( ::GetGenresList ,$extra,\&update_frame_cb);
+		my $genrelist= GMB::ListStore::Field::Combo->new('genre',$extra,\&update_frame_cb);
 		$extrasub=sub { $genrelist->get_value; };
 		$hbox->pack_start($genrelist, FALSE, FALSE, 1);
 	}
@@ -7043,7 +6932,7 @@ sub AddRow
 		my $spin=Gtk2::SpinButton->new($adj, 5, 1);
 		$hbox->pack_start($_, FALSE, FALSE, 0)
 		  for	Gtk2::Label->new(_"half-life : "),$spin,
-			Gtk2::Label->new($frame->{unit});
+			Gtk2::Label->new( $frame->{unit}||'' );
 		$extrasub=sub { $adj->get_value; };
 		$spin->signal_connect( value_changed => \&update_frame_cb );
 	}
@@ -7070,12 +6959,12 @@ sub update_frame_cb
 	my $inverse=$frame->{check}->get_active;
 	my $weight=$frame->{adj}->get_value;
 	::setlocale(::LC_NUMERIC, 'C');
-	my $extra=&{$frame->{extrasub}};
+	my $extra= $frame->{extrasub}();
 	$frame->{params}=($inverse? '-' : '').$weight.$frame->{type}.$extra;
 	::setlocale(::LC_NUMERIC, '');
 	_frame_example($frame);
 	my $self=::find_ancestor($frame,__PACKAGE__);
-	::IdleDo('2_WRandom'.$self,500, \&Redraw, $self);
+	$self->Redraw(1);
 }
 
 sub _frame_example
@@ -7090,7 +6979,7 @@ sub UpdateID
 	for my $frame (@{$self->{frames}})
 	{	_frame_example($frame);
 	}
-	my $r=Random->new( $self->get_string );
+	my $r= $self->get_random;
 	return unless defined $::SongID;
 	my $s=$r->CalcScore($::SongID);
 	my $v=sprintf '%.3f', $s;
@@ -7103,123 +6992,27 @@ sub UpdateID
 	$self->{example_label}->set_markup( '<small><i>'.::__x( _"example (selected song) : {score}  ({chances})", score =>$v, chances => $prob). "</i></small>" );
 }
 
-sub UpdateFilter
-{	my $self=shift;
-	::IdleDo('2_WRandom'.$self,500,\&Redraw, $self);
-}
-
 sub get_string
 {	join "\x1D",grep defined,map $_->{params}, @{$_[0]{frames}};
+}
+sub get_random
+{	my $self=shift;
+	my $string=$self->get_string;
+	#return Random->new( $string );
+	return $self->{randommode} if $self->{randommode} && $self->{randommode}{string} eq $string;
+	return $self->{randommode}=Random->new( $string );
 }
 
 sub Result
 {	my $self=shift;
-	my $sort='r'.$self->get_string;
+	my $sort='random:'.$self->get_string;
 	$sort=undef if $sort eq 'r';
 	return $sort;
-}
-
-package Stars;
-use Gtk2;
-use base 'Gtk2::EventBox';
-
-my (@pixbufs,$width);
-use constant NBSTARS => 5;
-
-INIT
-{	@pixbufs=map Gtk2::Gdk::Pixbuf->new_from_file(::PIXPATH.'stars'.$_.'.png'), 0..NBSTARS;
-	$width=$pixbufs[0]->get_width/NBSTARS;
-}
-
-sub new
-{	my ($class,$nb,$sub) = @_;
-	my $self = bless Gtk2::EventBox->new, $class;
-	$self->{callback}=$sub;
-	my $image=$self->{image}=Gtk2::Image->new;
-	$self->add($image);
-	$self->set($nb);
-	$self->signal_connect(button_press_event => \&click);
-	return $self;
-}
-
-sub callback
-{	my ($self,$value)=@_;
-	if (my $sub=$self->{callback}) {&$sub($self,$value);}
-	else {$self->set($value)}
-}
-sub set
-{	my ($self,$nb)=@_;
-	$self->{nb}=$nb;
-	$nb=$Options{DefaultRating} if !defined $nb || $nb eq '';
-	$::Tooltips->set_tip($self,_("song rating")." : $nb %");
-	$self->{image}->set_from_pixbuf( get_pixbuf($nb) );
-}
-sub get { shift->{nb}; }
-
-sub click
-{	my ($self,$event)=@_;
-	goto \&popup if $event->button == 3;
-	my ($x)=$event->coords;
-	my $nb=1+int($x/$width);
-	$nb*=100/NBSTARS;
-	$self->callback($nb);
-	return 1;
-}
-
-sub popup
-{	(my $self,$::LEvent)=@_;
-	my $menu=Gtk2::Menu->new;
-	my $set=$self->{nb}; $set='' unless defined $set;
-	my $sub=sub { $self->callback($_[1]); };
-	for my $nb (0,10,20,30,40,50,60,70,80,90,100,'')
-	{	my $item=Gtk2::CheckMenuItem->new( ($nb eq '' ? _"default" : $nb) );
-		$item->set_draw_as_radio(1);
-		$item->set_active(1) if $set eq $nb;
-		$item->signal_connect(activate => $sub, $nb);
-		$menu->append($item);
-	}
-	$menu->show_all;
-	$menu->popup(undef, undef, \&::menupos, undef, $::LEvent->button, $::LEvent->time);
-}
-
-sub createmenu
-{	my $IDs=$_[0]{IDs};
-	my %set;
-	no warnings 'uninitialized';
-	$set{$::Songs[$_][::SONG_RATING]}++ for @$IDs;
-	my $set= (keys %set ==1) ? each %set : 'undef';
-	my $cb=sub	{	$::Songs[$_][::SONG_RATING]=$_[1] for @$IDs;
-				::SongsChanged(::SONG_RATING,$IDs);
-			};
-	my $menu=Gtk2::Menu->new;
-	for my $nb ('',0..NBSTARS)
-	{	my $item=Gtk2::CheckMenuItem->new;
-		my ($child,$rating)= $nb eq ''	? (Gtk2::Label->new(_"default"),'')
-						: (Gtk2::Image->new_from_pixbuf($pixbufs[$nb]),$nb*100/NBSTARS);
-		$item->add($child);
-		$item->set_draw_as_radio(1);
-		$item->set_active(1) if $set eq $rating;
-		$item->signal_connect(activate => $cb, $rating);
-		$menu->append($item);
-	}
-	return $menu;
-}
-
-sub get_pixbuf
-{	my ($r,$def)=($_[0],$_[1]);
-	if (!defined $r || $r eq '')
-	{	return undef unless $def;
-		$r=$::Options{DefaultRating};
-	}
-	$r=sprintf '%d',$r*NBSTARS/100;
-	return $pixbufs[$r];
 }
 
 package FilterBox;
 use Gtk2;
 use base 'Gtk2::HBox';
-use strict;
-use warnings;
 
 my (@FLIST,%TYPEREGEX,%ENTRYTYPE);
 my %PosRe;
@@ -7247,223 +7040,223 @@ INIT
   );
   @FLIST=
   (	_"Title",
-	[	_"contains %s",		::SONG_TITLE.'s%s',
-		_"doesn't contain %s",	'-'.::SONG_TITLE.'s%s',
-		_"is %s",		::SONG_TITLE.'~%s',
-		_"is not %s",		'-'.::SONG_TITLE.'~%s',
-		_"match regexp %r",	::SONG_TITLE.'m%r',
-		_"doesn't match regexp %r",'-'.::SONG_TITLE.'m%r',
+	[	_"contains %s",		 'title:s:%s',
+		_"doesn't contain %s",	'-title:s:%s',
+		_"is %s",		 'title:~:%s',
+		_"is not %s",		'-title:~:%s',
+		_"match regexp %r",	 'title:m:%r',
+		_"doesn't match regexp %r",'-title:m:%r',
 	],
 	_"Artist",
-	[	_"contains %s",		::SONG_ARTIST.'s%s',
-		_"doesn't contain %s",	'-'.::SONG_ARTIST.'s%s',
-		_"is %s",		::SONG_ARTIST.'~%s',
-		_"is not %s",		'-'.::SONG_ARTIST.'~%s',
-		_"match regexp %r",	::SONG_ARTIST.'m%r',
-		_"doesn't match regexp %r",'-'.::SONG_ARTIST.'m%r',
+	[	_"contains %s",		 'artist:s:%s',
+		_"doesn't contain %s",	'-artist:s:%s',
+		_"is %s",		 'artist:~:%s',
+		_"is not %s",		'-artist:~:%s',
+		_"match regexp %r",	 'artist:m:%r',
+		_"doesn't match regexp %r",'-artist:m:%r',
 	],
 	_"Album",
-	[	_"contains %s",		::SONG_ALBUM.'s%s',
-		_"doesn't contain %s",	'-'.::SONG_ALBUM.'s%s',
-		_"is %s",		::SONG_ALBUM.'e%s',
-		_"is not %s",		'-'.::SONG_ALBUM.'e%s',
-		_"match regexp %r",	::SONG_ALBUM.'m%r',
-		_"doesn't match regexp %r",'-'.::SONG_ALBUM.'m%r',
+	[	_"contains %s",		 'album:s:%s',
+		_"doesn't contain %s",	'-album:s:%s',
+		_"is %s",		 'album:e:%s',
+		_"is not %s",		'-album:e:%s',
+		_"match regexp %r",	 'album:m:%r',
+		_"doesn't match regexp %r",'-album:m:%r',
 	],
 	_"Year",
-	[	_"is %n",	::SONG_DATE.'e%n',
-		_"isn't %n",	'-'.::SONG_DATE.'e%n',
-		_"is before %n",::SONG_DATE.'<%n',
-		_"is after %n",	::SONG_DATE.'>%n',
+	[	_"is %n",	'year:e:%n',
+		_"isn't %n",	'-year:e:%n',
+		_"is before %n",'year:<:%n',
+		_"is after %n",	'year:>:%n',
 	],
 	_"Track",
-	[	_"is %n",		::SONG_TRACK.'e%n',
-		_"is not %n",		'-'.::SONG_TRACK.'e%n',
-		_"is more than %n",	::SONG_TRACK.'>%n',
-		_"is less than %n",	::SONG_TRACK.'<%n',
+	[	_"is %n",		'track:e:%n',
+		_"is not %n",		'-track:e:%n',
+		_"is more than %n",	'track:>:%n',
+		_"is less than %n",	'track:<:%n',
 	],
 	_"Disc",
-	[	_"is %n",		::SONG_DISC.'e%n',
-		_"is not %n",		'-'.::SONG_DISC.'e%n',
-		_"is more than %n",	::SONG_DISC.'>%n',
-		_"is less than %n",	::SONG_DISC.'<%n',
+	[	_"is %n",		'disc:e:%n',
+		_"is not %n",		'-disc:e:%n',
+		_"is more than %n",	'disc:>:%n',
+		_"is less than %n",	'disc:<:%n',
 	],
 	_"Rating",
-	[	_"is %n( %)",		::SONG_RATING.'e%n',
-		_"is not %n( %)",	'-'.::SONG_RATING.'e%n',
-		_"is more than %n( %)",	::SONG_RATING.'>%n',
-		_"is less than %n( %)",	::SONG_RATING.'<%n',
-		_"is between %n( and )%n( %)",::SONG_RATING.'b%n %n',
+	[	_"is %n( %)",		'rating:e:%n',
+		_"is not %n( %)",	'-rating:e:%n',
+		_"is more than %n( %)",	'rating:>:%n',
+		_"is less than %n( %)",	'rating:<:%n',
+		_"is between %n( and )%n( %)",'rating:b:%n %n',
 	],
 	_"Length",
-	[	_"is more than %n( s)",		::SONG_LENGTH.'>%n',
-		_"is less than %n( s)",		::SONG_LENGTH.'<%n',
-		_"is between %n( and )%n( s)",	::SONG_LENGTH.'b%n %n',
+	[	_"is more than %n( s)",		'length:>:%n',
+		_"is less than %n( s)",		'length:<:%n',
+		_"is between %n( and )%n( s)",	'length:b:%n %n',
 	],
 	_"Size",
-	[	_"is more than %b",		::SONG_SIZE.'>%b',
-		_"is less than %b",		::SONG_SIZE.'<%b',
-		_"is between %b( and )%b",	::SONG_SIZE.'b%b %b',
+	[	_"is more than %b",		'size:>:%b',
+		_"is less than %b",		'size:<:%b',
+		_"is between %b( and )%b",	'size:b:%b %b',
 	],
 	_"played",
-	[	_"more than %n( times)",	::SONG_NBPLAY.'>%n',
-		_"less than %n( times)",	::SONG_NBPLAY.'<%n',
-		_"exactly %n( times)",		::SONG_NBPLAY.'e%n',
-		_"exactly not %n( times)",	'-'.::SONG_NBPLAY.'e%n',
-		_"between %n( and )%n",		::SONG_NBPLAY.'b%n %n',
+	[	_"more than %n( times)",	'playcount:>:%n',
+		_"less than %n( times)",	'playcount:<:%n',
+		_"exactly %n( times)",		'playcount:e:%n',
+		_"exactly not %n( times)",	'-playcount:e:%n',
+		_"between %n( and )%n",		'playcount:b:%n %n',
 	],
 	_"skipped",
-	[	_"more than %n( times)",	::SONG_NBSKIP.'>%n',
-		_"less than %n( times)",	::SONG_NBSKIP.'<%n',
-		_"exactly %n( times)",		::SONG_NBSKIP.'e%n',
-		_"exactly not %n( times)",	'-'.::SONG_NBSKIP.'e%n',
-		_"between %n( and )%n",		::SONG_NBSKIP.'b%n %n',
+	[	_"more than %n( times)",	'skipcount:>:%n',
+		_"less than %n( times)",	'skipcount:<:%n',
+		_"exactly %n( times)",		'skipcount:e:%n',
+		_"exactly not %n( times)",	'-skipcount:e:%n',
+		_"between %n( and )%n",		'skipcount:b:%n %n',
 	],
 	_"last played",
-	[	_"less than %a( ago)",	::SONG_LASTPLAY.'>%a',
-		_"more than %a( ago)",	::SONG_LASTPLAY.'<%a',
-		_"before %d",		::SONG_LASTPLAY.'<%d',
-		_"after %d",		::SONG_LASTPLAY.'>%d',
-		_"between %d( and )%d",	::SONG_LASTPLAY.'b%d %d',
-		#_"on %d",		::SONG_LASTPLAY.'o%d',
+	[	_"less than %a( ago)",	'lastplay:>:%a',
+		_"more than %a( ago)",	'lastplay:<:%a',
+		_"before %d",		'lastplay:<:%d',
+		_"after %d",		'lastplay:>:%d',
+		_"between %d( and )%d",	'lastplay:b:%d %d',
+		#_"on %d",		'lastplay:o:%d',
 	],
 	_"last skipped",
-	[	_"less than %a( ago)",	::SONG_LASTSKIP.'>%a',
-		_"more than %a( ago)",	::SONG_LASTSKIP.'<%a',
-		_"before %d",		::SONG_LASTSKIP.'<%d',
-		_"after %d",		::SONG_LASTSKIP.'>%d',
-		_"between %d( and )%d",	::SONG_LASTSKIP.'b%d %d',
-		#_"on %d",		::SONG_LASTSKIP.'o%d',
+	[	_"less than %a( ago)",	'lastskip:>:%a',
+		_"more than %a( ago)",	'lastskip:<:%a',
+		_"before %d",		'lastskip:<:%d',
+		_"after %d",		'lastskip:>:%d',
+		_"between %d( and )%d",	'lastskip:b:%d %d',
+		#_"on %d",		'lastskip:o:%d',
 	],
 	_"modified",
-	[	_"less than %a( ago)",	::SONG_MODIF.'>%a',
-		_"more than %a( ago)",	::SONG_MODIF.'<%a',
-		_"before %d",		::SONG_MODIF.'<%d',
-		_"after %d",		::SONG_MODIF.'>%d',
-		_"between %d( and )%d",	::SONG_MODIF.'b%d %d',
-		#_"on %d",		::SONG_MODIF.'o%d',
+	[	_"less than %a( ago)",	'modif:>:%a',
+		_"more than %a( ago)",	'modif:<:%a',
+		_"before %d",		'modif:<:%d',
+		_"after %d",		'modif:>:%d',
+		_"between %d( and )%d",	'modif:b:%d %d',
+		#_"on %d",		'modif:o:%d',
 	],
 	_"added",
-	[	_"less than %a( ago)",	::SONG_ADDED.'>%a',
-		_"more than %a( ago)",	::SONG_ADDED.'<%a',
-		_"before %d",		::SONG_ADDED.'<%d',
-		_"after %d",		::SONG_ADDED.'>%d',
-		_"between %d( and )%d",	::SONG_ADDED.'b%d %d',
-		#_"on %d",		::SONG_ADDED.'o%d',
+	[	_"less than %a( ago)",	'added:>:%a',
+		_"more than %a( ago)",	'added:<:%a',
+		_"before %d",		'added:<:%d',
+		_"after %d",		'added:>:%d',
+		_"between %d( and )%d",	'added:b:%d %d',
+		#_"on %d",		'added:o:%d',
 	],
 	_"The [most/less]",
-	[	_"%n most played",	::SONG_NBPLAY.'h%n',
-		_"%n less played",	::SONG_NBPLAY.'t%n',
-		_"%n last played",	::SONG_LASTPLAY.'h%n',
-		_"%n not played for the longest time",	::SONG_LASTPLAY.'t%n', #FIXME description
-		_"%n most skipped",	::SONG_NBSKIP.'h%n',
-		_"%n less skipped",	::SONG_NBSKIP.'t%n',
-		_"%n last skipped",	::SONG_LASTSKIP.'h%n',
-		_"%n not skipped for the longest time",	::SONG_LASTSKIP.'t%n',
-		_"%n longest",		::SONG_LENGTH.'h%n',
-		_"%n shortest",		::SONG_LENGTH.'t%n',
-		_"%n last added",	::SONG_ADDED.'h%n',
-		_"%n first added",	::SONG_ADDED.'t%n',
+	[	_"%n most played",	'playcount:h:%n',
+		_"%n less played",	'playcount:t:%n',
+		_"%n last played",	'lastplay:h:%n',
+		_"%n not played for the longest time",	'lastplay:t:%n', #FIXME description
+		_"%n most skipped",	'skipcount:h:%n',
+		_"%n less skipped",	'skipcount:t:%n',
+		_"%n last skipped",	'lastskip:h:%n',
+		_"%n not skipped for the longest time",	'lastskip:t:%n',
+		_"%n longest",		'length:h:%n',
+		_"%n shortest",		'length:t:%n',
+		_"%n last added",	'added:h:%n',
+		_"%n first added",	'added:t:%n',
 		_"All but the [most/less]%n",
-		[	_"most played",		'-'.::SONG_NBPLAY.'h%n',
-			_"less played",		'-'.::SONG_NBPLAY.'t%n',
-			_"last played",		'-'.::SONG_LASTPLAY.'h%n',
-			_"not played for the longest time",	'-'.::SONG_LASTPLAY.'t%n',
-			_"most skipped",	'-'.::SONG_NBSKIP.'h%n',
-			_"less skipped",	'-'.::SONG_NBSKIP.'t%n',
-			_"last skipped",	'-'.::SONG_LASTSKIP.'h%n',
-			_"not skipped for the longest time",	'-'.::SONG_LASTSKIP.'t%n',
-			_"longest",		'-'.::SONG_LENGTH.'h%n',
-			_"shortest",		'-'.::SONG_LENGTH.'t%n',
-			_"last added",		'-'.::SONG_ADDED.'h%n',
-			_"first added",		'-'.::SONG_ADDED.'t%n',
+		[	_"most played",		'-playcount:h:%n',
+			_"less played",		'-playcount:t:%n',
+			_"last played",		'-lastplay:h:%n',
+			_"not played for the longest time",	'-lastplay:t:%n',
+			_"most skipped",	'-skipcount:h:%n',
+			_"less skipped",	'-skipcount:t:%n',
+			_"last skipped",	'-lastskip:h:%n',
+			_"not skipped for the longest time",	'-lastskip:t:%n',
+			_"longest",		'-length:h:%n',
+			_"shortest",		'-length:t:%n',
+			_"last added",		'-added:h:%n',
+			_"first added",		'-added:t:%n',
 		],
 	],
 	_"Genre",
-	[	_"is %g",		::SONG_GENRE.'f%s',
-		_"isn't %g",		'-'.::SONG_GENRE.'f%s',
-		_"contains %s",		::SONG_GENRE.'s%s',
-		_"doesn't contain %s",	'-'.::SONG_GENRE.'s%s',
-		_"(: )none",		::SONG_GENRE.'e',
-		_"(: )has one",		'-'.::SONG_GENRE.'e',
+	[	_"is %g",		'genre:~:%s',
+		_"isn't %g",		'-genre:~:%s',
+		_"contains %s",		'genre:s:%s',
+		_"doesn't contain %s",	'-genre:s:%s',
+		_"(: )none",		'genre:e:',
+		_"(: )has one",		'-genre:e:',
 	],
 	_"Label",
-	[	_"%f is set",		::SONG_LABELS.'f%s',
-		_"%f isn't set",	'-'.::SONG_LABELS.'f%s',
-		_"contains %s",		::SONG_LABELS.'s%s',
-		_"doesn't contain %s",	'-'.::SONG_LABELS.'s%s',
-		_"(: )none",		::SONG_LABELS.'e',
-		_"(: )has one",		'-'.::SONG_LABELS.'e',
+	[	_"%f is set",		 'label:~:%s',
+		_"%f isn't set",	'-label:~:%s',
+		_"contains %s",		 'label:s:%s',
+		_"doesn't contain %s",	'-label:s:%s',
+		_"(: )none",		'label:e:',
+		_"(: )has one",		'-label:e:',
 	],
 	_"Filename",
-	[	_"contains %s",		::SONG_UFILE.'s%s',
-		_"doesn't contain %s",	'-'.::SONG_UFILE.'s%s',
-		_"is %s",		::SONG_UFILE.'e%s',
-		_"is not %s",		'-'.::SONG_UFILE.'e%s',
-		_"match regexp %r",	::SONG_UFILE.'m%r',
-		_"doesn't match regexp %r",'-'.::SONG_UFILE.'m%r',
+	[	_"contains %s",		 'file:s:%s',
+		_"doesn't contain %s",	'-file:s:%s',
+		_"is %s",		 'file:e:%s',
+		_"is not %s",		'-file:e:%s',
+		_"match regexp %r",		 'file:m:%r',
+		_"doesn't match regexp %r",	'-file:m:%r',
 	],
 	_"Folder",
-	[	_"contains %s",		::SONG_UPATH.'s%s',
-		_"doesn't contain %s",	'-'.::SONG_UPATH.'s%s',
-		_"is %s",		::SONG_UPATH.'e%s',
-		_"is not %s",		'-'.::SONG_UPATH.'e%s',
-		_"is in %s",		::SONG_UPATH.'i%s',
-		_"is not in %s",	'-'.::SONG_UPATH.'i%s',
-		_"match regexp %r",	::SONG_UPATH.'m%r',
-		_"doesn't match regexp %r",'-'.::SONG_UPATH.'m%r',
+	[	_"contains %s",		 'path:s:%s',
+		_"doesn't contain %s",	'-path:s:%s',
+		_"is %s",		 'path:e:%s',
+		_"is not %s",		'-path:e:%s',
+		_"is in %s",		 'path:i:%s',
+		_"is not in %s",	'-path:i:%s',
+		_"match regexp %r",		 'path:m:%r',
+		_"doesn't match regexp %r",	'-path:m:%r',
 	],
 	_"Comment",
-	[	_"contains %s",		::SONG_COMMENT.'s%s',
-		_"doesn't contain %s",	'-'.::SONG_COMMENT.'s%s',
-		_"is %s",		::SONG_COMMENT.'e%s',
-		_"is not %s",		'-'.::SONG_COMMENT.'e%s',
-		_"match regexp %r",	::SONG_COMMENT.'m%r',
-		_"doesn't match regexp %r",'-'.::SONG_COMMENT.'m%r',
+	[	_"contains %s",		 'comment:s:%s',
+		_"doesn't contain %s",	'-comment:s:%s',
+		_"is %s",		 'comment:e:%s',
+		_"is not %s",		'-comment:e:%s',
+		_"match regexp %r",		 'comment:m:%r',
+		_"doesn't match regexp %r",	'-comment:m:%r',
 	],
 	_"Version",
-	[	_"contains %s",		::SONG_VERSION.'s%s',
-		_"doesn't contain %s",	'-'.::SONG_VERSION.'s%s',
-		_"is %s",		::SONG_VERSION.'e%s',
-		_"is not %s",		'-'.::SONG_VERSION.'e%s',
-		_"match regexp %r",	::SONG_VERSION.'m%r',
-		_"doesn't match regexp %r",'-'.::SONG_VERSION.'m%r',
+	[	_"contains %s",		 'version:s:%s',
+		_"doesn't contain %s",	'-version:s:%s',
+		_"is %s",		 'version:e:%s',
+		_"is not %s",		'-version:e:%s',
+		_"match regexp %r",		 'version:m:%r',
+		_"doesn't match regexp %r",	'-version:m:%r',
 	],
-	_"is in list %l",	'l%l',
-	_"is not in list %l",	'-l%l',
+	_"is in list %l",	 ':l:%l',
+	_"is not in list %l",	'-:l:%l',
 	_"file format",
 	[	_"is",
-		[	_"a mp3 file",	::SONG_FORMAT.'m^mp3',
-			_"an ogg file",	::SONG_FORMAT.'m^ogg',
-			_"a flac file",	::SONG_FORMAT.'m^flac',
-			_"a musepack file",::SONG_FORMAT.'m^mpc',
-			_"a wavepack file",::SONG_FORMAT.'m^wv',
-			_"an ape file",	::SONG_FORMAT.'m^ape',
-			_"mono",	::SONG_CHANNELS.'e1',
-			_"stereo",	::SONG_CHANNELS.'e2',
+		[	_"a mp3 file",		'filetype:m:^mp3',
+			_"an ogg file",		'filetype:m:^ogg',
+			_"a flac file",		'filetype:m:^flac',
+			_"a musepack file",	'filetype:m:^mpc',
+			_"a wavepack file",	'filetype:m:^wv',
+			_"an ape file",		'filetype:m:^ape',
+			_"mono",		'filetype:e:1',
+			_"stereo",		'filetype:e:2',
 		],
 		_"is not",
-		[	_"a mp3 file",	'-'.::SONG_FORMAT.'m^mp3',
-			_"an ogg file",	'-'.::SONG_FORMAT.'m^ogg',
-			_"a flac file",	'-'.::SONG_FORMAT.'m^flac',
-			_"a musepack file",'-'.::SONG_FORMAT.'m^mpc',
-			_"a wavepack file",'-'.::SONG_FORMAT.'m^wv',
-			_"an ape file",	'-'.::SONG_FORMAT.'m^ape',
-			_"mono",	'-'.::SONG_CHANNELS.'e1',
-			_"stereo",	'-'.::SONG_CHANNELS.'e2',
+		[	_"a mp3 file",		'-filetype:m:^mp3',
+			_"an ogg file",		'-filetype:m:^ogg',
+			_"a flac file",		'-filetype:m:^flac',
+			_"a musepack file",	'-filetype:m:^mpc',
+			_"a wavepack file",	'-filetype:m:^wv',
+			_"an ape file",		'-filetype:m:^ape',
+			_"mono",		'-filetype:e:1',
+			_"stereo",		'-filetype:e:2',
 		],
 		_"bitrate",
-		[	_"is %n(kbps)",		::SONG_BITRATE.'e%n',
-			_"isn't %n(kbps)",	'-'.::SONG_BITRATE.'e%n',
-			_"is more than %n(kbps)",::SONG_BITRATE.'>%n',
-			_"is less than %n(kbps)",::SONG_BITRATE.'<%n',
+		[	_"is %n(kbps)",		 'bitrate:e:%n',
+			_"isn't %n(kbps)",	'-bitrate:e:%n',
+			_"is more than %n(kbps)",'bitrate:>:%n',
+			_"is less than %n(kbps)",'bitrate:<:%n',
 		],
 		_"sampling rate",
-		[	_"is %n(Hz)",		::SONG_SAMPRATE.'e%n',
-			_"isn't %n(Hz)",	'-'.::SONG_SAMPRATE.'e%n',
-			_"is more than %n(Hz)",	::SONG_SAMPRATE.'>%n',
-			_"is less than %n(Hz)",	::SONG_SAMPRATE.'<%n',
-			_"is not 44.1kHz",	'-'.::SONG_SAMPRATE.'e44100',
+		[	_"is %n(Hz)",		 'samprate:e:%n',
+			_"isn't %n(Hz)",	'-samprate:e:%n',
+			_"is more than %n(Hz)",	 'samprate:>:%n',
+			_"is less than %n(Hz)",	 'samprate:<:%n',
+			_"is not 44.1kHz",	'-samprate:e:44100',
 		],
 	],
   );
@@ -7478,7 +7271,7 @@ INIT
 	  }
 	  else	#put in %PosRe a regex to find the value(s) and pos
 	  {	my $f=$ref->[$i+1];
-		my ($colcmd,$val)=$f=~m/^(-?\d*[A-Za-z<>!~])(.*)$/;
+		my ($colcmd,$val)=$f=~m/^(-?\w*:[A-Za-z<>!~]:)(.*)$/;
 		$val=~s/(\W)/\\$1/g;
 		$val=~s/\\%([a-z])/'('.$TYPEREGEX{$1}.')'/ge;
 		push @{ $PosRe{$colcmd} }, [qr/^$val$/, $pos.$i.' '];
@@ -7488,9 +7281,16 @@ INIT
 }
 
 sub new
-{	my ($class,$activatesub,$changesub,$pos,@vals)=@_;
+{	my ($class,$activatesub,$changesub,$pos,@vals)=@_;#$init,$ao)=@_;
 	my $self = bless Gtk2::HBox->new, $class;
+#	$self->{init}=shift @$init;
+#	$self->{ao}=$ao;
+#	$self->{more}=$init;
+#	my $menu=$self->make_submenu(\@FLIST);
+#	Selected_cb($self->{item},$self);
 
+	#$self->makemenus;
+#	my ($pos,@vals)=filter2posval(shift @$init);
 	$self->Set($pos,@vals);
 	$self->{activatesub}=$activatesub;
 	$self->{changesub}=$changesub;
@@ -7504,7 +7304,7 @@ sub addtomainmenu
 
 sub filter2posval
 {	my $f=shift;
-	my ($colcmd,$val)=$f=~m/^(-?\d*[A-Za-z<>!~])(.*)$/;
+	my ($colcmd,$val)=$f=~m/^(-?\w*:[A-Za-z<>!~]:)(.*)$/;
 	my $aref=$PosRe{$colcmd};
 	for my $aref (@{ $PosRe{$colcmd} })
 	{	my ($re,$pos)=@$aref;
@@ -7655,18 +7455,16 @@ sub button_press_cb
 sub changed
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	return unless $self->{changesub};
-	&{ $self->{changesub} } ( $self->Get );
+	$self->{changesub}( $self->Get );
 }
 sub activate
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	return unless $self->{activatesub};
-	&{ $self->{activatesub} } ( $self->Get );
+	$self->{activatesub}( $self->Get );
 }
 
 
 package FilterEntryString;
-use strict;
-use warnings;
 use Gtk2;
 use base 'Gtk2::Entry';
 
@@ -7740,8 +7538,8 @@ sub popup_calendar
 			$self->set_label($self->{date});
 			$popup->destroy;
 			$self->{popup}=undef;
-			&{$self->{changesub}}($self) if $self->{changesub};
-			&{$self->{activatesub}}($self) if $self->{activatesub};
+			$self->{changesub}($self) if $self->{changesub};
+			$self->{activatesub}($self) if $self->{activatesub};
 		});
 	my $frame=Gtk2::Frame->new;
 	$frame->add($cal);
@@ -7813,16 +7611,16 @@ sub Get
 }
 #sub Set { $_[0]->get_adjustment->set_value($_[1]) if $_[1]=~m/^\d+$/; }
 
-package FilterEntryCombo;
+package FilterEntryCombo;		#FIXME use GMB::ListStore::Field::Combo for genre/label
 use Gtk2;
 use base 'Gtk2::OptionMenu';
 
 my %getlist;
 INIT
 {%getlist=
- (	l => sub {[keys %SavedLists]},
+ (	l => sub {[::GetListOfSavedLists()]},
 	g => \&::GetGenresList,
-	f => sub {[keys %Labels]},
+	f => \&::SortedLabels,
  );
 }
 
@@ -7836,7 +7634,7 @@ sub new
 			#&$activatesub if $activatesub;
 		});
 	my %hash; my $n=0;
-	my $list=&{$getlist{$type}};
+	my $list= $getlist{$type}();
 	for my $f (sort @$list)
 	{	$hash{$f}=$n;
 		my $item=Gtk2::MenuItem->new;
@@ -7859,722 +7657,42 @@ sub Set
 	$self->{val}=$val;
 }
 
-package Filter;
-
-my %GrepSubs;
-my %NGrepSubs;
-
-my $CachedString; our $CachedList;
-
-INIT
-{
-  %GrepSubs=
-  ( m => sub	#regex
-	{ my ($n,$pat,$inv)=@_;
-	  $pat=~s#"#\\"#g;
-	  $pat=~s#^((?:.*[^\\])?(?:\\\\)*\\)$#$1\\#g; #escape trailing '\' in impair number
-	  $inv=$inv ? '!' : '=';
-	  return '$::Songs[$_]'."[$n]$inv~m\"$pat\"";
-	},
-    i => sub	#is in folder or sub-folders
-	{ my ($n,$pat,$inv)=@_;
-	  $inv=$inv ? '!' : '=';
-	  return '$::Songs[$_]'."[$n]$inv~m/^\Q$pat\E".'(?:\\'.::SLASH.'|$)/';
-	},
-#  w => sub	# word
-#	{ my ($n,$pat)=@_;
-#	  $pat=quotemeta $pat;
-#	  return '$::Songs[$_]['.$n.']=~m/\b'.$pat.'\b/';
-#	},
-  f => sub	# label is set
-	{ my ($n,$pat,$inv)=@_;
-	  $pat=quotemeta $pat;
-	  $inv=$inv ? '!' : '=';
-	  return '$::Songs[$_]['.$n.']'.$inv.'~m/(?:^|\x00)'.$pat.'(?:$|\x00)/';
-	},
-  s => sub	# substring
-	{ my ($n,$pat,$inv)=@_;
-	  $pat=lc quotemeta$pat;
-	  $inv=$inv ? '=' : '!';
-	  return "index (lc\$::Songs[\$_][$n],\"$pat\")$inv=-1";
-	},
-  e => sub	# equal
-	{ my ($n,$pat,$inv)=@_; $pat=quotemeta $pat;
-	  $inv=$inv ? 'ne' : 'eq';
-	  return '$::Songs[$_]['.$n."] $inv \"$pat\"";
-	},
-  '~' => sub	    #smart equal
-	{ my ($n,$pat,$inv)=@_;
-	  $pat=quotemeta $pat;
-	  $inv=$inv ? '!' : '=';
-	  if ($n==::SONG_TITLE)
-	  { #$pat=~s/[eéèê]/[eéèê]/g;	#FIXME, probably too slow anyway
-	    #$pat=~s/[aà]/[aà]/g;
-	    #$pat=~s/[oöô]/[oöô]/g;
-	    $pat=~s#\\'# ?. ?#g;		#for 's == is ...
-	    $pat=~s#\Bing\b#in[g']#g;
-	    $pat=~s#\\ is\b#(?:'s|\\ is)#ig;
-	    $pat=~s#\\ (?:and|\\&|et)\\ #\\ (?:and|\\&|et)\\ #ig;
-	    $pat=~s#\\[-,.]#.?#g;
-	    $pat=~s# ?\\\?# ?\\?#g;
-	    return '' if $pat eq '';
-	    $pat='m#(?:^|/) *'.$pat.' *(?:[/\(\[]|$)#i';
-	  }
-	  elsif ($n==::SONG_ARTIST)
-	  {	$pat='m/(?:^|$::re_artist)'.$pat.'(?:$::re_artist|$)/o';
-	  }
-	  else { $pat='m/^'.$pat.'$/i'; }	#FIXME use index() ?
-	  return '$::Songs[$_]['.$n.']'.$inv.'~'.$pat;
-	},
-  '<' => sub
-	{ my ($n,$pat,$inv)=@_;
-	  $inv=$inv ? '>=' : '<';
-	  if ($TagProp[$n][2] eq 'd') { $pat=::ConvertTime($pat); }
-	  elsif ($n==::SONG_SIZE && $pat=~m/^(\d+)([bkm])$/) { $pat=$1*$::SIZEUNITS{$2}[0] }
-	  return '$::Songs[$_]['.$n.'] '.$inv.' '.$pat;
-	},
-  '>' => sub
-	{ my ($n,$pat,$inv)=@_;
-	  $inv=$inv ? '<=' : '>';
-	  if ($TagProp[$n][2] eq 'd') { $pat=::ConvertTime($pat); }
-	  elsif ($n==::SONG_SIZE && $pat=~m/^(\d+)([bkm])$/) { $pat=$1*$::SIZEUNITS{$2}[0] }
-	  return '$::Songs[$_]['.$n.'] '.$inv.' '.$pat;
-	},
-  b => sub
-	{ my ($n,$pat,$inv)=@_;
-	  my $inv1=$inv ? '<' : '>=';
-	  my $inv2=$inv ? '>' : '<=';
-	  my $inv3=$inv ? '||' : '&&';
-	  if ($TagProp[$n][2] eq 'd') { $pat=::ConvertTime($pat); }
-	  elsif ($n==::SONG_SIZE && $pat=~m/^(\d+)([bkm]) (\d+)([bkm])$/) { $pat=$1*$::SIZEUNITS{$2}[0].' '.$3*$::SIZEUNITS{$4}[0] }
-	  my ($start,$end)= $pat=~m/(\d+)\D+(\d+)/;
-	  return '$::Songs[$_]['.$n.'] '.$inv1.' '.$start.' '.$inv3.' $::Songs[$_]['.$n.'] '.$inv2.' '.$end;
-	},
-  c => sub {$_[1]}, #used for optimizations
-  );
-  %NGrepSubs=
-  (	t => sub
-	     {	my ($n,$pat,$lref,$assign,$inv)=@_;
-		$inv=$inv ? "$pat..(($pat>@\$tmp)? 0 : \$#\$tmp)"
-			  :    "0..(($pat>@\$tmp)? \$#\$tmp : ".($pat-1).')';
-		return "\$tmp=$lref;::SortList(\$tmp,$n);$assign @\$tmp[$inv];";
-	     },
-	h => sub
-	     {	my ($n,$pat,$lref,$assign,$inv)=@_;
-		$inv=$inv ? "$pat..(($pat>@\$tmp)? 0 : \$#\$tmp)"
-			  :    "0..(($pat>@\$tmp)? \$#\$tmp : ".($pat-1).')';
-		return "\$tmp=$lref;::SortList(\$tmp,-$n);$assign @\$tmp[$inv];";
-	     },
-	a => sub #should probably use 'e' for albums and '~' for artists
-	     {	my ($n,$pat,$lref,$assign,$inv)=@_;
-		$inv=$inv ? '!' : '';
-		my $r;
-		if    ($n==::SONG_ARTIST){ $r='$::Artist'; }
-		elsif ($n==::SONG_ALBUM) { $r='$::Album'; }
-		$pat=~s#'#\\'#g;
-		return '$tmp={}; $$tmp{$_}=undef for @{'.$r."{\"\Q$pat\E\"}[".::AALIST.']};'
-			.$assign.'grep '.$inv.'exists $$tmp{$_},@{'.$lref.'};';
-	     },
-	l => sub	#is in a saved lists
-	     {	my ($n,$pat,$lref,$assign,$inv)=@_;
-		$inv=$inv ? '!' : '';
-		return '$tmp={}; $$tmp{$_}=undef for @{$::SavedLists{"'."\Q$pat\E".'"}};'
-			.$assign.'grep '.$inv.'exists $$tmp{$_},@{'.$lref.'};';
-	     },
-  );
-}
-
-#Filter object contains :
-# - string :	string notation of the filter
-# - sub    :	ref to a sub which takes a ref to an array of IDs as argument and returns a ref to the filtered array
-# - greponly :	set to 1 if the sub dosn't need to filter the whole list each times -> ID can be tested individualy
-# - fields :	ref to a list of the columns used by the filter
-
-sub new
-{	my ($class,$string,$source) = @_;
-	my $self=bless {}, $class;
-	if	(!defined $string)	  {$string='';}
-	elsif	($string=~m/^-?[0-9]+~/) { ($string)=_smart_simplify($string); }
-	$self->{string}=$string;
-	$self->{source}=$source;
-	return $self;
-}
-
-sub newadd
-{	my ($class,$and,@filters)=@_;
-	my $self=bless {}, $class;
-	my %sel;
-
-	my ($ao,$re)=$and? ( '&', qr/^\(\&\x1D(.*)\)\x1D$/)
-			 : ( '|', qr/^\(\|\x1D(.*)\)\x1D$/);
-	my @strings;
-	for my $f (@filters)
-	{	$f='' unless defined $f;
-		$self->{source} ||= $f->{source} if ref $f;
-		my $string=(ref $f)? $f->{string} : $f;
-		unless ($string)
-		{	next if $and;			# all and ... = ...
-			return $self->{string}='';	# all or  ... = all
-		}
-		if ($string=~s/$re/$1/)			# a & (b & c) => a & b & c
-		{	my $d=0; my $str='';
-			for (split /\x1D/,$string)
-			{	if    (m/^\(/)	{$d++}
-				elsif (m/^\)/)	{$d--}
-				elsif (!$d)	{push @strings,$_;next}
-				$str.=$_."\x1D";
-				unless ($d) {push @strings,$str; $str='';}
-			}
-		}
-		else
-		{	push @strings,( ($string=~m/^-?[0-9]+~/)
-					? _smart_simplify($string,!$and)
-					: $string
-				      );
-		}
-	}
-	my %exist;
-	my $sum=''; my $count=0;
-	for my $s (@strings)
-	{	$s.="\x1D" unless $s=~m/\x1D$/;
-		next if $exist{$s}++;		#remove duplicate filters
-		$sum.=$s; $count++;
-	}
-	$sum="($ao\x1D$sum)\x1D" if $count>1;
-
-	$self->{string}=$sum;
-	warn "Filter->newadd=".$self->{string}."\n" if $::debug;
-	return $self;
-}
-
-sub are_equal #FIXME could try harder
-{	my ($f1,$f2)=($_[0],$_[1]);
-	($f1,my$s1)=defined $f1 ? ref $f1 ? ($f1->{string},$f1->{source}) : $f1 : '';
-	($f2,my$s2)=defined $f2 ? ref $f2 ? ($f2->{string},$f2->{source}) : $f2 : '';
-	return ($f1 eq $f2) && ((!$s1 && !$s2) || $s1 eq $s2);
-}
-
-sub _smart_simplify
-{	(local $_,my $returnlist)=($_[0],$_[1]);
-	return $_ unless s/^(-)?([0-9]+)~//;
-	my $inv=$1||''; my $col=$2;
-	my @pats;
-	if ($col==::SONG_TITLE)	# for medleys (songs separated by '/')
-	{   s#(?<=.) *[\(\[].*##;	#remove '(...' unless '(' is at the begining of the string
-	    @pats=grep m/\S/, split / *\/+ */,$_;
-	}
-	elsif ($col==::SONG_ARTIST) # for multiple artists (separated by '&' or ',')
-	{   @pats=split /$::re_artist/o,$_;
-	}
-	else {@pats=($_)}
-	if ($returnlist || @pats==1)
-	{	return map $inv.$col.'~'.$_ , @pats;
-	}
-	else
-	{	return "(|\x1D".join('',map($inv.$col.'~'.$_."\x1D", @pats)).")\x1D";
-	}
-}
-
-sub invert
-{	my $self=shift;
-	$self->{'sub'}=undef;
-	warn 'before invert : '.$self->{string} if $::debug;
-	my @filter=split /\x1D/,$self->{string};
-	for (@filter)
-	{	s/^\(\&$/(|/ && next;
-		s/^\(\|$/(&/ && next;
-		next if $_ eq ')';
-		$_='-'.$_ unless s/^-//;
-	}
-	$self->{string}=join "\x1D",@filter;
-	warn 'after invert  : '.$self->{string} if $::debug;
-}
-
-sub filter
-{	my $self=shift;
-	#my $time=times;								#DEBUG
-	my $sub=$self->{'sub'} || $self->makesub;
-	my $listref= $self->{source} || \@Library;
-	if ($CachedList && $CachedString eq $self->{string} && !$self->{source}) {return $CachedList} #else {warn "not cached : ".$self->{string}."\n"}
-	my $r=&$sub($listref);
-	#$time=times-$time; warn "filter $time s ( ".$self->{string}." )\n" if $debug;	#DEBUG
-	if ($listref == \@Library) { $CachedString=$self->{string}; $CachedList=$r }
-	return $r;
-}
-
-sub info
-{	my $self=shift;
-	$self->makesub unless $self->{'sub'};
-	return $self->{greponly},@{ $self->{fields} };
-}
-
-sub makesub
-{	my $self=shift;
-	my $filter=$self->{string};
-	warn "makesub filter=$filter\n" if $::debug;
-	$self->{fields}=[];
-	if ($filter eq '') { return $self->{'sub'}=sub {$_[0]}; }
-	#$filter="(\x1D$filter)\x1D" if $filter=~m/^[|&]/;
-	my @filter=split /\x1D/,$filter;
-	#warn "$_\n" for @filter;
-
-	###########	# optimization for some special cases
-	my @hashes;
-	if (@filter>4)
-	{ my $d=0; my (@or,@val,@ilist);
-	    for my $i (0..$#filter)
-	    {	local $_=$filter[$i];
-		if    (m/^\(/)	  { $d++; $or[$d]=($_ eq '(|')? 1 : 0; }
-		elsif ($_ eq ')')
-		{	my $vd=delete $val[$d];
-			my $ilist=delete $ilist[$d];
-			while (my ($icc,$h)=each %$vd)
-			{	next unless (keys %$h)>2;
-				my ($inv,$col,$cmd)=$icc=~m/^(-?)(\d+)([ef~])$/;
-				next if $cmd eq '~' && $col!=::SONG_ARTIST;
-				my $l=$ilist->{$icc};
-				my $first=$l->[0]; my $last=$l->[-1];
-				if ( $last-$first==$#$l
-					&& $filter[$first-1] && $filter[$first-1]=~m/^\(/
-					&& $filter[$last+1] eq ')'
-				   )
-				 {push @$l,$first-1,$last+1}
-				$filter[$_]=undef for @$l;
-				push @hashes,$h;
-				my $code;
-				if ($cmd eq 'e')
-				{ $code=($inv ? '!':'').'exists $hashes['.$#hashes.']{$Songs[$_]['.$col.']}'; }
-				elsif ($cmd eq 'f' || $cmd eq '~')
-				{ my $sep=($cmd eq '~')? '$::re_artist' : '\x00';
-				  $code='do { my $r;exists($hashes['.$#hashes.']{$_}) and $r=1 and last for split /'.$sep.'/,$Songs[$_]['.$col.'];'.$inv.'$r;}';
-				}
-				$filter[$first]=$col.'c'.$code;
-			}
-			$d--;
-		}
-		elsif (($or[$d] && m/^(\d+[ef~])(.*)$/) || (!$or[$d]&& m/^(-\d+[ef~])(.*)$/))
-		{ $val[$d]{$1}{$2}=undef; push @{$ilist[$d]{$1}},$i; }
-	    }
-	    @filter=grep defined,@filter if @hashes; #warn "$_\n" for @filter;
-	}
-	###########
-
-	my $func;
-	if ( ! grep m/^-?\d*[tThHaAlL]/, @filter)
-	{	############################### grep filter
-		$self->{greponly}=1;
-		$func='';
-		my $op=' && ';
-		my @ops;
-		my $first=1;
-		for (@filter)
-		{  if (m/^\(/)
-		   {	$func.=$op unless $first;
-			$func.='(';
-			push @ops,$op;
-			$op=($_ eq '(|')? ' || ' : ' && ';
-			$first=1;
-		   }
-		   elsif ($_ eq ')') { $func.=')'; $op=pop @ops; }
-		   else
-		   {	my ($inv,$col,$cmd,$pat)=m/^(-?)(\d*)([A-Za-z<>!~])(.*)$/;
-			push @{ $self->{fields} },$col unless $col eq '';
-			$func.=$op unless $first;
-			$func.=&{$GrepSubs{$cmd}}($col,$pat,$inv);
-			$first=0;
-		   }
-		}
-		$func='[ grep {'.$func.'} @{$_[0]} ];';
-	}
-	else
-	{	############################### non-grep filter
-	  { my $d=0; my $c=0;
-	    for (@filter)
-	    {	if    (m/^\(/)	  {$d++}
-		elsif ($_ eq ')') {$d--}
-		elsif ($d==0)	  {$c++}
-	    }
-	    @filter=('(',@filter,')') if $c;
-	  }
-	  my $d=0;
-	  $func='my @hash; my @list=($_[0]); my $tmp;';
-	  my @out=('@{$_[0]}'); my @in; my @outref;
-	  my $listref='$_[0]';
-	  for my $f (@filter)
-	  {	if ($f=~m/^[\(\)]/)
-		{	if ($f ne ')') #$f begins with '('
-			{  $d++;
-			   $func.='@{$list['.$d.']}=@{$list['.($d-1).']};';
-			   if ($f eq '(|')
-			   {	$func.=		    '$hash['.$d.']={};';
-				$out[$d]=    'keys %{$hash['.$d.']}';
-				$outref[$d]='[keys %{$hash['.$d.']}]';
-				$in[$d]=	    '$hash['.$d.']{$_}=undef for ';
-			   }
-			   else	# $f eq '(&' or '('
-			   {	$outref[$d]='$list['.$d.']';
-				$out[$d]= '@{$list['.$d.']}';
-				$in[$d]=  '@{$list['.$d.']}=';
-			   }
-			   $listref='$list['.$d.']';
-			}
-			else # $f eq ')'
-			{	$d--; if ($d<0) { warn "invalid filter\n"; return undef; }
-				$func.=($d==0)	? 'return '.$outref[1].';'
-						:   $in[$d].$out[$d+1].';';
-			}
-		}
-		else
-		{	my ($inv,$col,$cmd,$pat)=$f=~m/^(-?)(\d*)([A-Za-z<>!~])(.*)$/;
-			push @{ $self->{fields} },$col unless $col eq '';
-			unless ($cmd) { warn "Invalid filter : $col $cmd $pat\n"; next; }
-			$func.= (exists $GrepSubs{$cmd})
-				? $in[$d].'grep '.&{$GrepSubs{$cmd}}($col,$pat,$inv).',@{'.$listref.'};'
-				: &{$NGrepSubs{$cmd}}($col,$pat,$listref,$in[$d],$inv);
-		}
-	  }
-	}
-	warn "filter=$filter \$sub=eval sub{ $func }\n" if $::debug;
-	my $sub=eval "no warnings; sub {$func}";
-	if ($@) { warn "filter error : $@"; $sub=sub {$_[0]}; }; #return empty filter if compilation error
-	return $self->{'sub'}=$sub;
-}
-
-sub is_empty
-{	my $f=$_[0];
-	return 1 unless defined $f;
-	return if $f->{source}; #FIXME
-	$f=$f->{string} if ref $f;
-	return ($f eq '');
-}
-
-sub explain	# return a string describing the filter
-{	my $self=shift;
-	return $self->{desc} if $self->{desc};
-	my $filter=$self->{string};
-	return _"All" if $filter eq '';
-	my $text=''; my $depth=0;
-	for my $f (split /\x1D/,$filter)
-	{   if ($f=~m/^\(/)		# '(|' or '(&'
-	    {	$text.=' 'x$depth++;
-		$text.=($f eq '(|')? _"Any of :" : _"All of :";
-		$text.="\n";
-	    }
-	    elsif ($f eq ')') { $depth--; }
-	    else
-	    {   next if $f eq '';
-		my ($pos,@vals)=FilterBox::filter2posval($f);
-		next unless $pos;
-		$text.='  'x$depth;
-		$text.=FilterBox::posval2desc($pos,@vals)."\n";
-	    }
-	}
-	chomp $text;	#remove last "\n"
-	return $self->{desc}=$text;
-}
-
-package Random;
-
-use constant
-{ SCORE_FIELDS	=> 0, SCORE_DESCR	=> 1, SCORE_UNIT	=> 2,
-  SCORE_ROUND	=> 3, SCORE_DEFAULT	=> 4, SCORE_VALUE	=> 5,
-};
-our %ScoreTypes;
-
-
-INIT
-{
-  %ScoreTypes=
- (	f => [::SONG_LABELS,_"Label is set", '','%s','.5f',sub {'($ref->['.::SONG_LABELS.']=~m/(?:^|\x00)\Q'.$_[0].'\E(?:$|\x00)/)? 1 : 0'}],
-	g => [::SONG_GENRE,_"Genre is set",'','%s','.5g',  sub {'($ref->['.::SONG_GENRE.']=~m/(?:^|\x00)\Q'.$_[0].'\E(?:$|\x00)/)? 1 : 0'}],
-	l => [::SONG_LASTPLAY,_"Number of days since last played",_"days",'%.1f','-1l10',
-		'do { my $t=(time-( $ref->['.::SONG_LASTPLAY.'] ||0 ))/86400; ($t<0)? 0 : $t}'],
-		#'(time-( $ref->['.::SONG_LASTPLAY.'] ||0 ))/86400'
-	L => [::SONG_LASTSKIP,_"Number of days since last skipped",_"days",'%.1f','1L10',
-		'do { my $t=(time-( $ref->['.::SONG_LASTSKIP.'] ||0 ))/86400; ($t<0)? 0 : $t}'],
-	a => [::SONG_ADDED,_"Number of days since added",_"days",'%.1f','1a50',
-		'do { my $t=(time-( $ref->['.::SONG_ADDED.'] ||0 ))/86400; ($t<0)? 0 : $t}'],
-	n => [::SONG_NBPLAY,_"Number of times played",_"times",'%d','1n5',
-		'($ref->['.::SONG_NBPLAY.'] ||0)'],
-	N => [::SONG_NBSKIP,_"Number of times skipped",_"times",'%d','-1N5',
-		'($ref->['.::SONG_NBSKIP.'] ||0)'],
-	r => [::SONG_RATING,_"Rating",'%%','%d','1r0_.1_.2_.3_.4_.5_.6_.7_.8_.9_1',
-		'do {my $v=$ref->['.::SONG_RATING.']; (defined $v && $v ne "")? $v : $Options{DefaultRating} }'
-	     ],
- );
-}
-
-sub new
-{	my ($class,$string)=@_;
-	my $self=bless {}, $class;
-	$string=~s/^r//;
-	$self->{string}=$string;
-	return $self;
-}
-
-sub fields
-{	my $self=shift;
-	my %fields;
-	for my $s ( split /\x1D/, $self->{string} )
-	{	my ($type)=$s=~m/^-?[0-9.]+([a-zA-Z])/;
-		next unless $type;
-		$fields{ $ScoreTypes{$type}[SCORE_FIELDS] }=undef;
-	}
-	return [keys %fields];
-}
-
-sub make
-{	my $self=shift;
-	return $self->{score} if $self->{score};
-	my @scores;
-	::setlocale(::LC_NUMERIC, 'C');
-	for my $s ( split /\x1D/, $self->{string} )
-	{	my ($inverse,$weight,$type,$extra)=$s=~m/^(-?)([0-9.]+)([a-zA-Z])(.*)/;
-		next unless $type;
-		my $score=$ScoreTypes{$type}[SCORE_VALUE];
-		if ($type eq 'f' || $type eq 'g')
-		{	$score=&$score($extra);
-		}
-		elsif ($type eq 'r')
-		{	my @l=split /,/,$extra;
-			next unless @l==11;
-			$score='('.$extra.')[int('.$score.'/10)]';
-		}
-		else
-		{	$inverse=!$inverse;
-			if (my $halflife=$extra)
-			{	my $lambda=log(2)/$halflife;
-				$score="exp(-$lambda*$score)";
-			}
-			else {$score='0';}
-		}
-		$inverse=($inverse)? '1-':'';
-		$score=(1-$weight).'+'.$weight.'*('.$inverse.$score.')';
-		push @scores,$score;
-	}
-	unless (@scores) { @scores=(1); }
-	$self->{score}='('.join(')*(',@scores).')';
-	::setlocale(::LC_NUMERIC, '');
-	return $self->{score}
-}
-
-sub MakeRandomList
-{	my ($self,$lref)=@_;
-	$self->{lref}=$lref;
-	if ($self->{AddToList})
-	{	${ $self->{Sum} }=0;
-		@{ $self->{Slist} }=();
-	}
-	else
-	{	my $Sum=0; my @Score;
-		$self->{Sum}=\$Sum;
-		$self->{Slist}=\@Score;
-		my $score=$self->make;
-		my $func='no warnings;sub { for my $ID (@{$_[0]}) { my $ref=$::Songs[$ID]; $Sum+=$Score[$ID]='.$score.';} }';
-		$func=eval $func;
-		if ($@) { warn "Error in eval '$func' :\n$@"; $Sum+=@{$_[0]}; $Score[$_]=1 for @{$_[0]}; }
-		$self->{AddToList}=$func;
-		$self->{RmFromList}=sub { for my $ID (@{$_[0]}) { $Sum-=$Score[$ID]; $Score[$ID]=undef; } };
-	}
-	&{$self->{AddToList}}($lref);
-}
-sub AddIDs
-{	my $self=shift;
-	&{ $self->{AddToList} }(\@_);
-}
-sub RmIDs
-{	my $self=shift;
-	&{ $self->{RmFromList} }(\@_);
-}
-sub UpdateIDs
-{	my $self=shift;
-	&{ $self->{RmFromList} }(\@_);
-	&{ $self->{AddToList} }(\@_);
-}
-sub Draw_old	#FIXME too slow if drawing a LOT of songs
-{	my ($self,$nb,$no_list)=@_;
-	$no_list||=[];
-	my $sum=${ $self->{Sum} };
-	my @scores=@{ $self->{Slist} };
-	my $lref=$self->{lref};
-	unless ($nb)
-	{	if (defined $nb) {return ()}
-		else { $nb=@$lref; }
-	}
-	#@$no_list may contains duplicates IDs -> hash,
-	#and IDs may not be in @$lref -> check if $scores[$ID] defined to know if in @$lref
-	{ my %no;
-	  for (grep defined $scores[$_],@$no_list)
-		{$sum-=$scores[$_];$scores[$_]=0;$no{$_}=undef;}
-	  my $nb_no=keys %no;
-	  $nb=@$lref-$nb_no if $nb>@$lref-$nb_no;
-	}
-	my @drawn;
-	NEXTDRAW:while ($nb>0)
-	{	last unless $sum>0;
-		my $r=rand $sum;
-		($r-=$scores[$_])>0 or do { $nb--; push @drawn,$_;$sum-=$scores[$_];$scores[$_]=0; next NEXTDRAW; } for @$lref;
-#		for my $i (@$lref)
-#		{	next if ($r-=$scores[$i])>0;
-#			$nb--;
-#			push @drawn,$i;
-#			$sum-=$scores[$i];
-#			$scores[$i]=0;
-#			next NEXTDRAW;
-#		}
-		last;
-	}
-
-	if ($nb)	#if still need more -> select at random (no weights) FIXME too complex
-	{	my %drawn; $drawn{$_}=undef for @drawn,@$no_list;
-		my @undrawn=grep !exists $drawn{$_},@$lref;
-		my @rand; push @rand,rand for @undrawn;
-		push @drawn,map( $undrawn[$_], (sort { $rand[$a] <=> $rand[$b] } 0..$#undrawn)[0..$nb-1] );
-	}
-	return @drawn;
-}
-
-sub Draw
-{	my ($self,$nb,$no_list)=@_;
-	$no_list||=[];
-	my $sum=${ $self->{Sum} };
-	my @scores=@{ $self->{Slist} };
-	my $lref=$self->{lref};
-	unless ($nb)
-	{	if (defined $nb) {return ()}
-		else { $nb=@$lref; }
-	}
-	#@$no_list may contains duplicates IDs -> hash,
-	#and IDs may not be in @$lref -> check if $scores[$ID] defined to know if in @$lref
-	{ my %no;
-	  for (grep defined $scores[$_],@$no_list)
-		{$sum-=$scores[$_];$scores[$_]=0;$no{$_}=undef;}
-	  my $nb_no=keys %no;
-	  $nb=@$lref-$nb_no if $nb>@$lref-$nb_no;
-	}
-	my @drawn;
-	my $time=times;
-	my (@chunknb,@chunksum);
-	if ($nb>1)
-	{	my $chunk=0; my $count;
-		my $size=int(@$lref/60); $size=15 if $size<15;
-		for my $id (@$lref)
-		{	$chunksum[$chunk]+=$scores[$id];
-			$chunknb[$chunk]++;
-			$count||=$size;
-			$chunk++ unless --$count;
-		}
-	}
-	else { $chunksum[0]=$sum; $chunknb[0]=@$lref; }
-	warn "\@chunknb=@chunknb\n" if $::debug;
-	warn "\@chunksum=@chunksum\n" if $::debug;
-	NEXTDRAW:while ($nb>0)
-	{	last unless $sum>0;
-		my $r=rand $sum; my $savedr=$r;
-		my $chunk=0;
-		my $start=0;
-		until ($chunksum[$chunk]>$r)
-		{	$start+=$chunknb[$chunk];
-			$r-=$chunksum[$chunk++];
-			#warn "no more chunks : savedr=$savedr r=$r chunk=$chunk" if $chunk>$#chunksum;
-			last NEXTDRAW if $chunk>$#chunksum;#FIXME rounding error
-		}
-		for my $i ($start..$start+$chunknb[$chunk]-1)
-		{	next if ($r-=$scores[$lref->[$i]])>0;
-			$nb--;
-			my $id=$lref->[$i];
-			push @drawn,$id;
-			$sum-=$scores[$id];
-			$chunksum[$chunk]-=$scores[$id];
-			$scores[$id]=0;
-			next NEXTDRAW;
-		}
-		#warn $r; warn $nb;
-		last;
-	}
-	warn "drawing took ".(times-$time)." s\n" if $::debug;
-
-	if ($nb)	#if still need more -> select at random (no weights) FIXME too complex
-	{	my %drawn; $drawn{$_}=undef for @drawn,@$no_list;
-		my @undrawn=grep !exists $drawn{$_},@$lref;
-		my @rand; push @rand,rand for @undrawn;
-		push @drawn,map( $undrawn[$_], (sort { $rand[$a] <=> $rand[$b] } 0..$#undrawn)[0..$nb-1] );
-	}
-	return @drawn;
-}
-
-sub MakeTab
-{	my ($self,$nbcols)=@_;
-	my $score=$self->make;
-	my $func='no warnings;my $sum;my @tab=(0)x'.$nbcols.'; for my $ID (@::ListPlay) { my $ref=$::Songs[$ID]; $sum+=my $s='.$score.'; $tab[int(.5+'.($nbcols-1).'*$s)]++;}; return \@tab,$sum;';
-	my ($tab,$sum)=eval $func;
-	if ($@)
-	{	warn "Error in eval '$func' :\n$@";
-		$tab=[(0)x$nbcols]; $sum=@::ListPlay;
-	}
-	return $tab,$sum;
-}
-
-sub CalcScore
-{	my ($self,$ID)=@_;
-	my $score=$self->make;
-	eval 'no warnings; my $ref=$::Songs[$ID]; '.$score;
-}
-
-sub MakeExample
-{	my ($class,$string,$ID)=@_;
-	::setlocale(::LC_NUMERIC, 'C');
-	my ($inverse,$weight,$type,$extra)=$string=~m/^(-?)([0-9.]+)([a-zA-Z])(.*)/;
-	return 'error' unless $type;
-	my $round=$ScoreTypes{$type}[SCORE_ROUND];
-	my $unit= $ScoreTypes{$type}[SCORE_UNIT];
-	my $value=$ScoreTypes{$type}[SCORE_VALUE];
-	my $score;
-	if ($type eq 'f' || $type eq 'g')
-	{	$score=&$value($extra);
-		$value="($score)? '"._("true")."' : '"._("false")."'";
-	}
-	elsif ($type eq 'r')
-	{	my @l=split /,/,$extra;
-		return 'error' unless @l==11;
-		$score='('.$extra.')[int('.$value.'/10)]';
-	}
-	else
-	{	$inverse=!$inverse;
-		if (my $halflife=$extra)
-		{	my $lambda=log(2)/$halflife;
-			$score="exp(-$lambda*$value)";
-		}
-		else {$score='0';}
-	}
-	$inverse=($inverse)? '1-':'';
-	$score=(1-$weight).'+'.$weight.'*('.$inverse.$score.')';
-	::setlocale(::LC_NUMERIC, '');
-	my $func='no warnings;my $ref=$::Songs[$ID]; return (('.$value.'),('.$score.'));';
-	my ($v,$s)=eval $func;
-	return 'error' if $@;
-	return sprintf("$round $unit -> %.2f",$v,$s);
-}
-
-
 package AAPicture;
 
 my %Cache;
 my $watcher;
+our @ArraysOfFiles;	#array of filenames that needs updating in case a folder is renamed
+my %Field_id;
 
 INIT
 {	$watcher={};
-	::Watch($watcher, AAPicture => \&AAPicture_Changed);
+	::Watch($watcher, Picture_artist => \&AAPicture_Changed);	#FIXME PHASE1
+	::Watch($watcher, Picture_album => \&AAPicture_Changed);	#FIXME PHASE1
+}
+
+sub GetPicture
+{	my ($field,$key)=@_;
+	return Songs::Picture($key,$field,'get');
+}
+sub SetPicture
+{	my ($field,$key,$file)=@_;
+	Songs::Picture($key,$field,'set',$file);
+}
+sub UpdatePixPath
+{	my ($oldpath,$newpath)=@_;
+	m/$::QSLASH$/o or $_.=::SLASH for $oldpath,$newpath; #make sure the path ends with SLASH
+	$oldpath=qr/^\Q$oldpath\E/;
+	s/$oldpath/$newpath/ for grep $_, map @$_, @ArraysOfFiles;
 }
 
 sub newimg
-{	my ($col,$key,$size,$todoref)=@_;
-	my $p= pixbuf($col,$key,$size, ($todoref ? 0 : 1));
+{	my ($field,$key,$size,$todoref)=@_;
+	my $p= pixbuf($field,$key,$size, ($todoref ? 0 : 1));
 	return Gtk2::Image->new_from_pixbuf($p) if $p;
 
 	my $img=Gtk2::Image->new;
 	push @$todoref,$img;
-	$img->{params}=[$col,$key,$size];
+	$img->{params}=[$field,$key,$size];
 	$img->set_size_request($size,$size);
 	return $img;
 }
@@ -8585,27 +7703,25 @@ sub setimg
 }
 
 sub pixbuf
-{	my ($col,$key,$size,$now)=@_;
-	my ($href,$aa)= $col==::SONG_ARTIST ? (\%::Artist,'a') : (\%::Album,'b');
-	my $file= $href->{$key}[::AAPIXLIST];
+{	my ($field,$key,$size,$now)=@_;
+	my $fid= $Field_id{$field} ||= Songs::Code($field,'pic_cache_id|field');
+	my $file= GetPicture($field,$key);
 	#unless ($file)
 	#{	return undef unless $::Options{use_default_aapic};
 	#	$file=$::Options{default_aapic};
 		return undef unless $file;
 	#}
-	$key=$size.$aa.$key;
-	if (exists $Cache{$key})
-	{	my $p=$Cache{$key};
-		$p->{lastuse}=time;
-		return $p;
-	}
-	return 0 unless $now;
-	return load($file,$size,$key);
+	$key=$size.$fid.':'.$key;
+	my $p=$Cache{$key};
+	return 0 unless $p || $now;
+	$p||=load($file,$size,$key);
+	$p->{lastuse}=time if $p;
+	return $p;
 }
 
 sub draw
-{	my ($window,$x,$y,$col,$key,$size,$now,$gc)=@_;
-	my $pixbuf=pixbuf($col,$key,$size,$now);
+{	my ($window,$x,$y,$field,$key,$size,$now,$gc)=@_;
+	my $pixbuf=pixbuf($field,$key,$size,$now);
 	if ($pixbuf)
 	{	my $offy=int(($size-$pixbuf->get_height)/2);#center pic
 		my $offx=int(($size-$pixbuf->get_width )/2);
@@ -8626,7 +7742,6 @@ sub load
 #	elsif ($ratio<1) {$pw=int($ph*$ratio);}
 #	$Cache{$key}=$pixbuf=$pixbuf->scale_simple($pw, $ph, 'bilinear');
 	$Cache{$key}=$pixbuf;
-	$pixbuf->{lastuse}=time;
 	::IdleDo('9_AAPicPurge',undef,\&purge) if keys %Cache >120;
 	return $pixbuf;
 }
@@ -8638,7 +7753,7 @@ sub purge
 
 sub AAPicture_Changed
 {	my $key=$_[1];
-	my $re=qr/^\d+[ab]\Q$key\E/;
+	my $re=qr/^\d+\w+:\Q$key\E/;
 	delete $Cache{$_} for grep m/$re/, keys %Cache;
 }
 
@@ -8658,36 +7773,131 @@ sub load_file #use the same cache as the AAPictures, #FIXME create a different p
 	return $pixbuf;
 }
 
-package TextCombo;
 
+package TextCombo;
 use base 'Gtk2::ComboBox';
 
 sub new
 {	my ($class,$list,$init,$sub) = @_;
-	my $self = bless Gtk2::ComboBox->new_text, $class;
+	my $self= bless Gtk2::ComboBox->new, $class;
+	$self->build_store($list);
+	my $renderer=Gtk2::CellRendererText->new;
+	$self->pack_start($renderer,::TRUE);
+	$self->add_attribute($renderer, text => 0);
+	$self->set_value($init);
+	$self->set_value(undef) unless $self->get_active_iter; #in case $init was not found
+	$self->signal_connect( changed => $sub ) if $sub;
+	return $self;
+}
+
+sub build_store
+{	my ($self,$list)=@_;
+	my $store= Gtk2::ListStore->new('Glib::String','Glib::String');
 	my $names=$list;
 	if (ref $list eq 'HASH')
 	{	my $h=$list;
 		$list=[]; $names=[];
-		for my $key (sort {uc($h->{$a}) cmp uc($h->{$b})} keys %$h)
+		for my $key (sort {::superlc($h->{$a}) cmp ::superlc($h->{$b})} keys %$h)
 		{	push @$list,$key;
 			push @$names,$h->{$key}
 		}
 	}
 	my $found;
 	for my $i (0..$#$list)
-	{	$self->append_text( $names->[$i] );
-		$found=$i if defined $init && $list->[$i] eq $init;
+	{	my $iter= $store->append;
+		$store->set($iter, 0,$names->[$i], 1,$list->[$i]);
 	}
-	$found=0 unless defined $found;
-	$self->set_active($found);
-	$self->{list}=$list;
-	$self->signal_connect( changed => $sub ) if $sub;
-	return $self;
+	$self->set_model($store);
+	return $store;
 }
 
+sub set_value
+{	my ($self,$value)=@_;
+	my $store=$self->get_model;
+	$store->foreach( sub
+	 {	my ($store,$path,$iter)=@_;
+		return 0 if $store->iter_has_child($iter);
+		if (!defined $value || ($store->get($iter,1) eq $value))
+		{	$self->set_active_iter($iter); return 1;
+		}
+		return 0;
+	 });
+}
+#sub set_value
+#{	my ($self,$value)=@_;
+#	my $store=$self->get_model;
+#	my $iter=$store->get_iter_first;
+#	while ($iter)
+#	{	$self->set_active_iter($iter) if $store->get($iter,1) eq $value;
+#		$iter=$store->iter_next($iter);
+#	}
+#}
 sub get_value
 {	my $self=shift;
-	return $self->{list}[ $self->get_active ];
+	my $iter=$self->get_active_iter;
+	return $iter ? $self->get_model->get($iter,1) : undef;
+}
+sub make_toolitem
+{	my ($self,$desc,$menu_item_id,$widget)=@_;	#$self should be contained in $widget (or $widget=undef)
+	$widget||=$self;
+	$menu_item_id||="$self";
+	my $titem=Gtk2::ToolItem->new;
+	$titem->add($widget);
+	$titem->set_tooltip($::Tooltips,$desc,'');
+	my $item=Gtk2::MenuItem->new($desc);
+	my $menu=Gtk2::Menu->new;
+	$item->set_submenu($menu);
+	$titem->set_proxy_menu_item($menu_item_id,$item);
+	my $radioi;
+	my $store=$self->get_model;
+	my $iter=$self->get_active_iter;
+	while ($iter)
+	{	my ($name,$val)=$store->get($iter,0,1);
+		$radioi=Gtk2::RadioMenuItem->new($radioi,$name);
+		$radioi->{value}=$val;
+		$menu->append($radioi);
+		$radioi->signal_connect(activate => sub
+			{	return if $_[0]->parent->{busy};
+				$self->set_value( $_[0]{value} );
+			});
+		$iter=$store->iter_next($iter);
+	}
+	$self->signal_connect(changed => sub
+	{	$menu->{busy}=1;
+		my $value= $self->get_value;
+		for my $item ($menu->get_children)
+		{	$item->set_active( $item->{value} eq $value );
+		}
+		delete $menu->{busy};
+	});
+	return $titem;
 }
 
+package TextCombo::Tree;
+use base 'Gtk2::ComboBox';
+our @ISA;
+BEGIN {unshift @ISA,'TextCombo';}
+
+sub build_store
+{	my ($self,$list)=@_;			#$list is a list of label,value pairs, where value can be a sublist
+	my $store= Gtk2::TreeStore->new('Glib::String','Glib::String');
+	my @todo=(undef,$list);
+	while (@todo)
+	{	my $parent=shift @todo;
+		my $list= shift @todo;
+		for my $i (sort {::superlc($list->[$a]) cmp ::superlc($list->[$b])} map 1+$_*2, 0..int($#$list/2))
+		{	my $iter= $store->append($parent);
+			my $key=$list->[$i-1];
+			my $name=$list->[$i];
+			if (ref $key) { push @todo,$iter,$key; $key=''; }
+			$store->set($iter, 0,$name, 1,$key);
+		}
+	}
+	$self->set_model($store);
+	return $store;
+}
+
+sub make_toolitem
+{	warn "TextCombo::Tree : make_toolitem not implemented\n";	#FIXME not needed for now, but could be in the future
+	return undef;
+}

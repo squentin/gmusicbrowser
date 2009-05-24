@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -36,7 +36,7 @@ my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 	#googlemusic =>	['google music','http://www.google.com/musicsearch?q="%a"+"%s"'],
 	lyriki	=>	['lyriki','http://lyriki.com/index.php?title=%a:%s',undef,
 		sub { my $no= $_[0]=~m/<div class="noarticletext">/s; $_[0]=~s/^.*<!--\s*start content\s*-->(.*?)<!--\s*end content\s*-->.*$/$1/s && !$no; }],
-	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/plugin/?title=%s&artist=%a',undef,
+	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a',undef,
 			sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
 	lyricssongs =>	['lyrics-songs','http://www.lyrics-songs.com/winamp.php?musica=%s&artista=%a',undef,
 			sub { $_[0]=~s#<img src='p_bg2.gif'[^/]*/>##si; return 0 }], #remove image, return always 0 as lyrics-songs sometimes guess when the song is not found
@@ -59,7 +59,6 @@ sub new
 {	my ($class,$widget_options)=@_;
 	my $self = bless Gtk2::VBox->new(0,0), $class;
 	$self->{widget_options}=$widget_options;
-	my $toolbar=Gtk2::HBox->new;
 	my $textview=Gtk2::TextView->new;
 	$textview->signal_connect(button_release_event	=> \&button_release_cb);
 	$textview->signal_connect(motion_notify_event 	=> \&update_cursor_cb);
@@ -74,26 +73,28 @@ sub new
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('automatic','automatic');
 	$sw->add($textview);
-	my $bsave=::NewIconButton('gtk-save',_"Save",\&Save_text,'none');
-	$::Tooltips->set_tip($bsave,_"Save lyrics");
-	$self->{buffer}->signal_connect(modified_changed => sub {$bsave->set_sensitive($_[0]->get_modified);} );
-	my $backb=::NewIconButton('gtk-go-back',undef,sub
-		{	my $self=::find_ancestor($_[0],__PACKAGE__);
-			my $url=pop @{$self->{history}};
-			$_[0]->set_sensitive(0) unless @{$self->{history}};
-			$self->{lastokurl}=undef;
-			$self->load_url($url) if $url;
-		},'none',_"Previous page");
-	my $breload=::NewIconButton('gtk-refresh',_"Refresh",sub
-		{	my $self=::find_ancestor($_[0],__PACKAGE__);
-			my $ID=delete $self->{ID};
-			$self->SongChanged($ID,1);
-		},'none');
-	my $source=::NewPrefCombo( OPT.'LyricSite', {map {$_=>$sites{$_}[0]} keys %sites} , undef, \&SetSource);
-	my $zoom=::NewPrefSpinButton( OPT.'FontSize', sub {SetFont($textview)},1,0,4,50,1,5);
-	$::Tooltips->set_tip($zoom, _"Font size");
-	my $scroll=::NewPrefCheckButton( OPT.'AutoScroll', _"Auto-scroll",\&SetAutoScroll,_"Scroll with the song");
-	$toolbar->pack_start($_,0,0,2) for $backb,$bsave,$breload,$zoom,$scroll,$source;
+	my $toolbar=Gtk2::Toolbar->new;
+	for my $aref
+	(	[backb => 'gtk-go-back',\&Back_cb,	_"Previous page"],
+		[saveb => 'gtk-save',	\&Save_text,	_"Save",	_"Save lyrics"],
+		[undef, 'gtk-refresh',	\&Refresh_cb,	_"Refresh"],
+	)
+	{	my ($key,$stock,$cb,$label,$tip)=@$aref;
+		my $item=Gtk2::ToolButton->new_from_stock($stock);
+		$item->set_label($label);
+		$item->signal_connect(clicked => $cb);
+		$item->set_tooltip($::Tooltips,$tip,'') if $tip;
+		$toolbar->insert($item,-1);
+		$self->{$key}=$item if $key;
+	}
+	$self->{saveb}->set_is_important(1);
+	my $zoom=Gtk2::ToolItem->new;
+	$zoom->add( ::NewPrefSpinButton( OPT.'FontSize', sub {SetFont($textview)},1,0,4,50,1,5) );
+	$zoom->set_tooltip($::Tooltips,_"Font size",'');
+	my $source=::NewPrefCombo( OPT.'LyricSite', {map {$_=>$sites{$_}[0]} keys %sites} ,cb => \&SetSource, toolitem=> _"Lyrics source");
+	my $scroll=::NewPrefCheckButton( OPT.'AutoScroll', _"Auto-scroll",\&SetAutoScroll,_"Scroll with the song",undef,1);
+	$toolbar->insert($_,-1) for $zoom,$scroll,$source;
+
 	$self->pack_start($toolbar,0,0,0);
 	$self->add($sw);
 	$self->show_all;
@@ -102,8 +103,8 @@ sub new
 	$self->{toolbar}=$toolbar;
 	$self->signal_connect(destroy => \&destroy_event_cb);
 
-	$backb->set_sensitive(0);
-	$self->{backb}=$backb;
+	$self->{buffer}->signal_connect(modified_changed => sub {$_[1]->set_sensitive($_[0]->get_modified);}, $self->{saveb});
+	$self->{backb}->set_sensitive(0);
 	SetFont($textview);
 	$self->SetAutoScroll;
 
@@ -147,6 +148,19 @@ sub SetSource
 	$self->SongChanged($self->{ID},1);
 }
 
+sub Back_cb
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $url=pop @{$self->{history}};
+	$_[0]->set_sensitive(0) unless @{$self->{history}};
+	$self->{lastokurl}=undef;
+	$self->load_url($url) if $url;
+}
+sub Refresh_cb
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $ID=delete $self->{ID};
+	$self->SongChanged($ID,1);
+}
+
 sub SongChanged
 {	my ($self,$ID,$force)=@_;
 	return unless defined $ID;
@@ -155,17 +169,14 @@ sub SongChanged
 	$self->{time}=undef;
 
 	if (!$force)
-	{	my $file=::pathfilefromformat( $self->{ID}, $::Options{OPT.'PathFile'} );
+	{	my $file=::pathfilefromformat( $self->{ID}, $::Options{OPT.'PathFile'}, undef,1 );
 		if ($file && -r $file)
 		{	::IdleDo('8_lyrics'.$self,1000,\&load_file,$self,$file);
 			return
 		}
 	}
 
-	my $ref=$::Songs[$ID];
-	my $title=$ref->[::SONG_TITLE];
-	my $artist=$ref->[::SONG_ARTIST];
-	$_=::url_escapeall($_) for $title,$artist;
+	my ($title,$artist)= map ::url_escapeall($_), Songs::Get($ID,qw/title artist/);
 	my (undef,$url,$post,$check)=@{$sites{$::Options{OPT.'LyricSite'}}};
 	for ($url,$post) { next unless defined $_; s/%a/$artist/; s/%s/$title/; }
 	#$self->load_url($url,$post);
@@ -182,7 +193,7 @@ sub TimeChanged		#scroll the text
 	return if $adj->get_value > $adj->upper - $adj->page_size;
 	my $delta=$::PlayTime - ($self->{time} || 0);
 	return if $delta <1;
-	my $inc=$delta / $::Songs[$::SongID][::SONG_LENGTH];
+	my $inc=$delta / Songs::Get($::SongID,'length');
 	$self->{time}=$::PlayTime;
 	$adj->set_value($adj->get_value+$inc*$range);
 }
@@ -241,7 +252,7 @@ sub loaded #_very_ crude html to gtktextview renderer
 {	my ($self,$data,$type,$url)=@_;
 	delete $self->{waiting};
 	my $buffer=$self->{buffer};
-	unless ($data) { $data=_("Loading failed.").' <a href="'.$self->{url}.'">'._("retry").'</a>'; $type="text/html"; }
+	unless ($data) { $data=_("Loading failed.").qq( <a href="$self->{url}">)._("retry").'</a>'; $type="text/html"; }
 	$self->{url}=$url if $url; #for redirections
 	$buffer->delete($buffer->get_bounds);
 	my $encoding;
@@ -260,7 +271,7 @@ sub loaded #_very_ crude html to gtktextview renderer
 	$data=Encode::decode($encoding,$data) if $encoding;
 
 	my $oklyrics;
-	$oklyrics=&{$self->{check}}($data) if $self->{check};
+	$oklyrics= $self->{check}($data) if $self->{check};
 #print "$data\n";
 	if ($self->{lastokurl})
 	{	my $history=$self->{history}||=[];
@@ -454,7 +465,7 @@ sub url_at_coords
 	{	next unless $tag->{url};
 		if ($tag->{url}=~m/^#(\d+)?/) { $self->scrollto($1) if defined $1; last }
 		my $url= $self->full_url( $tag->{url} );
-		if ($url=~m#^http://www\.lyrc\.com\.ar/en/add/add\.php\?#) {::openurl( quotemeta($url) ); return}	#lyrc specific
+		if ($url=~m#^http://www\.lyrc\.com\.ar/en/add/add\.php\?#) {::openurl($url); return}	#lyrc specific
 		return $url;
 	}
 }
@@ -505,7 +516,7 @@ sub load_file
         $buffer->set_text($text);
 
 	#make the title and artist bigger and bold
-	my ($title,$artist)=@{ $::Songs[$self->{ID}] }[::SONG_TITLE,::SONG_ARTIST];
+	my ($title,$artist)= Songs::Get($self->{ID},qw/title artist/);
 	$title='' if $title!~m/\w\w/;
 	for ($title,$artist)
 	{	if (m/\w\w/) {s#\W+#\\W*#g}
@@ -526,7 +537,7 @@ sub Save_text
 	my $buffer=$self->{buffer};
 	my $text= $buffer->get_text($buffer->get_bounds, ::FALSE);
 	my $format=$::Options{OPT.'PathFile'};
-	my ($path,$file)=::pathfilefromformat( $self->{ID}, $format );
+	my ($path,$file)=::pathfilefromformat( $self->{ID}, $format, undef,1 );
 	my $res=::CreateDir($path,$win);
 	return unless $res eq 'ok';
 	unless ($file) {::ErrorMessage(_("Error: invalid filename pattern")." : $format",$win); return}
@@ -534,6 +545,7 @@ sub Save_text
 	{	print $fh $text;
 		close $fh;
 		$buffer->set_modified(0);
+		warn "Saved lyrics in ".$path.::SLASH.$file."\n" if $::debug;
 	}
 	else {::ErrorMessage(::__x(_("Error saving lyrics in '{file}' :\n{error}"), file => $file, error => $!),$win);}
 }

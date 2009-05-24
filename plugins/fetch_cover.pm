@@ -38,39 +38,34 @@ my %Sites=
  },
 );
 
-my %menuentry=
-(	label => _"Search for a picture on internet",	#label of the menu entry
-	code => sub {Fetch($_[0]{ID},'album')},		#when menu entry selected
-	test => sub {$_[0]{col}==::SONG_ALBUM},		#the menu entry is displayed if returns true
+my %menuitem=
+(	label => _"Search for a picture on internet",					#label of the menu item
+	code => sub { Fetch($_[0]{field},$_[0]{gid},$_[0]{ID}); },			#when menu item selected
+	test => sub {$_[0]{mainfield} eq 'album' || $_[0]{mainfield} eq 'artist'},	#the menu item is displayed if returns true
 );
-my %menuentry2=
-(	label => _"Search for a picture on internet",
-	code => sub {Fetch($_[0]{ID},'artist',$_[0]{key})},
-	test => sub {$_[0]{col}==::SONG_ARTIST},
-);
-my %fpaneentry=
+my %fpane_menuitem=
 (	label=> _"Search for a picture on internet",
-	code => sub { my $aa=$_[0]{aa}; my $key=$_[0]{keylist}[0]; my $ID=($aa eq 'artist' ? \%::Artist : \%::Album)->{$key}[::AALIST][0]; $key=undef if $aa eq 'album'; Fetch($ID,$aa,$key) if defined $ID; },
-	onlyone=> 'keylist',	#menu entry is hidden if more than one album/artist is selected
-	istrue => 'aa',		#menu entry is hidden for non artist/album (aa) FPanes
+	code => sub { Fetch($_[0]{field},$_[0]{gidlist}[0]); },
+	onlyone=> 'gidlist',	#menu item is hidden if more than one album/artist is selected
+	istrue => 'aa',		#menu item is hidden for non artist/album (aa) FPanes
 );
 
 ::SetDefaultOptions(OPT, USEFILE => 1, COVERFILE => 'cover', PictureSite_artist => 'googlei', PictureSite_album => 'googlei');
 
 sub Start
-{	push @::cMenuAA,\%menuentry,\%menuentry2;
-	push @FilterPane::cMenu, \%fpaneentry;
+{	push @::cMenuAA,\%menuitem;
+	push @FilterPane::cMenu, \%fpane_menuitem;
 }
 sub Stop
-{	@::cMenuAA=  grep $_!=\%menuentry && $_!=\%menuentry2, @::SongCMenu;
-	@FilterPane::cMenu= grep $_!=\%fpaneentry, @FilterPane::cMenu;
+{	@::cMenuAA=  grep $_!=\%menuitem, @::SongCMenu;
+	@FilterPane::cMenu= grep $_!=\%fpane_menuitem, @FilterPane::cMenu;
 }
 
 sub prefbox
 {	my $check1=::NewPrefCheckButton(OPT.'ASK',_"Ask confirmation only if file already exists");
 	my $check2=::NewPrefCheckButton(OPT.'UNIQUE',_"Find a unique filename if file already exists");
-	my $entry1=::NewPrefEntry(OPT.'COVERPATH','');
-	my $entry2=::NewPrefEntry(OPT.'COVERFILE','');
+	my $entry1=::NewPrefEntry(OPT.'COVERPATH');
+	my $entry2=::NewPrefEntry(OPT.'COVERFILE');
 	my ($radio1a,$radio1b)=::NewPrefRadio(OPT.'USEPATH',undef,_"use song folder",0,_"use :",1);
 	my ($radio2a,$radio2b)=::NewPrefRadio(OPT.'USEFILE',undef,_"use album name",0,_"use :",1);
 	my $frame1=Gtk2::Frame->new(_"default folder");
@@ -83,11 +78,17 @@ sub prefbox
 }
 
 sub Fetch
-{	my ($ID,$aa,$artist)=@_;
+{	my ($field,$gid,$ID)=@_;
+	unless (defined $ID)
+	{	my $list= AA::GetIDs($field,$gid);
+		$ID=$list->[0];
+		return unless defined $ID;
+	}
+	my $mainfield=Songs::MainField($field);	#'artist' or 'album'
 	my $self=bless Gtk2::Window->new;
 	$self->set_border_width(4);
 	my $Bsearch=::NewIconButton('gtk-find',_"Search");
-	my $Bcur=Gtk2::Button->new($aa eq 'artist' ? _"Search for current artist" : _"Search for current album");
+	my $Bcur=Gtk2::Button->new($mainfield eq 'artist' ? _"Search for current artist" : _"Search for current album");
 	::set_drag($Bcur, dest =>	[::DRAG_ID, sub { $_[0]->get_toplevel->SearchID($_[2]); }], );
 	my $Bclose=Gtk2::Button->new_from_stock('gtk-close');
 	my @entry;
@@ -95,7 +96,7 @@ sub Fetch
 	$::Tooltips->set_tip($self->{searchentry_s},_"Keywords");
 	$::Tooltips->set_tip($self->{searchentry_a},_"Artist");
 	$::Tooltips->set_tip($self->{searchentry_l},_"Album");
-	my $source=::NewPrefCombo( OPT.'PictureSite_'.$aa, {map {$_=>$Sites{$aa}{$_}[0]} keys %{$Sites{$aa}}} , undef, \&combo_changed_cb);
+	my $source=::NewPrefCombo( OPT.'PictureSite_'.$mainfield, {map {$_=>$Sites{$mainfield}{$_}[0]} keys %{$Sites{$mainfield}}} , cb => \&combo_changed_cb);
 	#$self->{Bnext}=	my $Bnext=::NewIconButton('gtk-go-forward',"More");
 	$self->{Bnext}=		my $Bnext=Gtk2::Button->new(_"More results");
 	$self->{Bstop}=		my $Bstop=Gtk2::Button->new_from_stock('gtk-stop');
@@ -123,21 +124,22 @@ sub Fetch
 	my $size= $::Options{OPT.'winsize'} || RES_PER_LINE*PREVIEW_SIZE.' '.RES_LINES*PREVIEW_SIZE;
 	$self->resize(split ' ',$size,2);
 
-	$self->{aa}=$aa;
-	$self->{site}=$::Options{OPT.'PictureSite_'.$aa};
-	$self->SearchID($ID,$aa,$artist);
+	$self->{mainfield}=$mainfield;
+	$self->{field}=$field;
+	$self->{site}=$::Options{OPT.'PictureSite_'.$mainfield};
+	$self->SearchID($ID);
 	$self->UpdateSite;
 }
 
 sub combo_changed_cb
 {	my $self=$_[0]->get_toplevel;
-	$self->{site}=$::Options{OPT.'PictureSite_'.$self->{aa}};
+	$self->{site}=$::Options{OPT.'PictureSite_'.$self->{mainfield}};
 	$self->UpdateSite;
 	$self->NewSearch;
 }
 sub UpdateSite
 {	my $self=$_[0];
-	my $url=$Sites{$self->{aa}}{$self->{site}}[1];
+	my $url=$Sites{$self->{mainfield}}{$self->{site}}[1];
 	for my $l (qw/s a l/)
 	{	my $entry=$self->{"searchentry_$l"};
 		if ($url=~m/\%$l/)	{$entry->show}
@@ -146,41 +148,31 @@ sub UpdateSite
 }
 
 sub SearchID
-{	my ($self,$ID,$aa,$artist)=@_;
+{	my ($self,$ID)=@_;
 	$self=::find_ancestor($_[0],__PACKAGE__);
 
-	unless (defined $artist)
-	{	$artist=$::Songs[$ID][::SONG_ARTIST];
-		$artist= (split /$::re_artist/o,$artist)[0];
+	$self->{gid}= Songs::Get_gid($ID,$self->{field});
+	$self->{dir}= Songs::Get($ID,'path');
+	my $search=my $name= Songs::Get($ID,$self->{field});
+	$search="\"$search\"" unless $search eq '';
+	my $albumname='';
+	my $artistname='';
+	if ($self->{mainfield} eq 'album')
+	{	$albumname=$name;
+		$artistname= Songs::Get($ID,'album_artist');
+		$search.=" \"$artistname\"" unless $search eq '' || $artistname eq '';
 	}
-	$artist='' if $artist eq '<Unknown>';
-	$self->{dir}=$::Songs[$ID][::SONG_PATH];
-	my $search='';
-	my $album='';
-	$aa||=$self->{aa}||'album';
-	if ($aa eq 'artist')
-	{	$self->{artist}=$artist;
-		delete $self->{album};
-		$search="\"$artist\"" unless $artist eq '';
-	}
-	else
-	{	$album=$::Songs[$ID][::SONG_ALBUM];
-		$album='' if $album=~m/^<Unknown>/;
-		$self->{album}=$album;
-		delete $self->{artist};
-		$search="\"$album\"" if $album ne '';
-		$search.=" \"$artist\"" unless $search eq '' || $artist eq '';
-	}
-	$self->set_title(_("Searching for a picture of : ").(defined $self->{album} ? $self->{album} : $self->{artist}));
+	else { $artistname=$name }
+	$self->set_title(_("Searching for a picture of : ").$name);
 	$self->{searchentry_s}->set_text($search);
-	$self->{searchentry_a}->set_text($artist);
-	$self->{searchentry_l}->set_text($album);
+	$self->{searchentry_a}->set_text($artistname);
+	$self->{searchentry_l}->set_text($albumname);
 	$self->NewSearch;
 }
 
 sub NewSearch
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
-	my $url=$Sites{$self->{aa}}{$self->{site}}[1];
+	my $url=$Sites{$self->{mainfield}}{$self->{site}}[1];
 	my %letter;
 	for my $l (qw/s a l/)
 	{	next unless $url=~m/\%$l/;
@@ -205,7 +197,7 @@ sub InitPage
 {	my $self=$_[0];
 	$self->abort;
 	$self->{loaded}=0;
-	$self->{Bnext}->set_sensitive(1);
+	$self->{Bnext}->set_sensitive(0);
 	$self->{Bstop}->set_sensitive(1);
 	$self->{progress}->set_fraction(0);
 	$self->{progress}->show;
@@ -288,18 +280,22 @@ sub parse_sloth
 sub parse_googlei
 {	my $result=$_[0];
 	my @list;
-	while ($result=~m#dyn\.Img\(("[^"]*"(?:,"[^"]*")*)[^)]*\);#g) #parse google image results
-	{	my @fields= $1=~m#"([^"]*)",?#g;
-		my $url=$fields[3];
-		my $desc=$fields[6]; $desc=~s#\\x([0-9a-f]{2})#chr(hex $1)#gie; $desc=~s#</?b>##g;
-		$desc=Encode::decode('cp1252',$desc); #FIXME not sure of the encoding
-		$desc=::decode_html($desc);
-		my $preview='http://images.google.com/images?q=tbn:'.$fields[2].$url;
-		push @list, {url => $url, previewurl =>$preview, desc => $desc };
+	if ($result=~m#dyn.setResults\([^)](.*)\)#)	#parse google image results #assumes no unencoded ')' in the array of results
+	{	my @matches=split /\],\["/,$1;	#not very reliable
+		for my $m (@matches)
+		{	my @fields=split /["\]],["\[]/,$m;
+			my $url=$fields[3];
+			my $desc=$fields[6]; $desc=~s#\\x([0-9a-f]{2})#chr(hex $1)#gie; $desc=~s#</?b>##g;
+			$desc=Encode::decode('cp1252',$desc); #FIXME not sure of the encoding
+			$desc=::decode_html($desc);
+			my $preview='http://images.google.com/images?q=tbn:'.$fields[2].$url;
+			push @list, {url => $url, previewurl =>$preview, desc => $desc };
+		}
 	}
 	my $nexturl;
-	if ($result=~m#Result[^<]*Page:.*<a href="(/images\?q=[^>"]*)">.*?Next</a></table>#) #could be better
-	{	$nexturl='http://images.google.com'.$1; #warn $1;
+	if ($result=~m#<a href="(/images\?[^>"]*)"><img src="nav_next#)
+	{	$nexturl='http://images.google.com'.$1;
+		$nexturl=~s#&amp;#&#g;
 	}
 	return \@list,$nexturl;
 }
@@ -308,12 +304,13 @@ sub searchresults_cb
 {	my ($self,$result)=@_;
 	$self->{waiting}=undef;
 	unless (defined $result) { stop($self,_"connection failed."); return; }
-	my $parse= $Sites{$self->{aa}}{$self->{site}}[2];
-	my ($list,$nexturl)=&$parse($result);
+	my $parse= $Sites{$self->{mainfield}}{$self->{site}}[2];
+	my ($list,$nexturl)=$parse->($result);
+	$self->{nexturl}=$nexturl;
 	#$table->set_size_request(110*5,110*int(1+@list/5));
 	push @{$self->{results}}, @$list;
-	my $more= @{$self->{results}} + ($nexturl ? 1 : 0) - ($self->{page}+1) * RES_PER_PAGE;
-	$self->{Bnext}->set_sensitive( $more>0 );
+	my $more= @{$self->{results}} - ($self->{page}+1) * RES_PER_PAGE;
+	$self->{Bnext}->set_sensitive( $more>0 || $nexturl );
 	unless (@{$self->{results}}) { stop($self,_"no matches found, you might want to remove some search terms."); return; }
 	::IdleDo('8_FetchCovers'.$self,100,\&get_next,$self);
 }
@@ -422,28 +419,25 @@ sub get_next
 sub set_cover
 {	my $button=$_[0];
 	my $self=::find_ancestor($button,__PACKAGE__);
-	my ($aa,$text,$href);
-	if (defined $self->{album})
-	{	$aa=$self->{album};
-		$text=::__x(_"Use this picture as cover for album '{album}'", album => $aa);
-		$href=$::Album{$aa};
+	my $field=$self->{field};
+	my $gid=  $self->{gid};
+	my $name= Songs::Gid_to_Get($field,$gid);
+	my $text;
+	if ($self->{mainfield} eq 'album')
+	{	$text=::__x(_"Use this picture as cover for album '{album}'", album => $name);
 	}
 	else
-	{	$aa=$self->{artist};
-		$text=::__x(_"Use this picture for artist '{artist}'", artist => $aa);
-		$href=$::Artist{$aa};
+	{	$text=::__x(_"Use this picture for artist '{artist}'", artist => $name);
 	}
 	my $check=Gtk2::CheckButton->new( $text );
 	$check->set_active(1);
 	my $default_file=	$::Options{OPT.'USEFILE'} ?
-			$::Options{OPT.'COVERFILE'} : $aa;
+				$::Options{OPT.'COVERFILE'} : $name;
 	$default_file=~s/\.(?:jpe?g|png|gif)$//;
 	$default_file.='.'.$button->{ext};
-	$default_file=~s/$::ILLEGALCHAR//g;
-	$default_file=::filename_from_unicode($default_file);
+	$default_file=::filename_from_unicode(::CleanupFileName($default_file));
 	my $default_dir=$::Options{OPT.'COVERPATH'} || '';
-	$default_dir=::filename_from_unicode($default_dir);
-	$default_dir=~s/$::ILLEGALCHARDIR//g;
+	$default_dir=::filename_from_unicode(::CleanupDirName($default_dir));
 	$default_dir=$self->{dir} unless $::Options{OPT.'USEPATH'} && -d $default_dir;
 	if ($::Options{OPT.'UNIQUE'})
 	{	while (-e $default_dir.::SLASH.$default_file) #find a unique name
@@ -464,8 +458,7 @@ sub set_cover
 	print $fh $button->{pixdata};
 	close $fh;
 	return unless $check->get_active;
-	$href->[::AAPIXLIST]=$file;
-	::HasChanged('AAPicture',$aa);
+	AAPicture::SetPicture($field,$gid,$file);
 }
 
 1
