@@ -4880,7 +4880,7 @@ sub AboutDialog
 	$dialog->set_website('http://gmusicbrowser.sourceforge.net/');
 	$dialog->set_authors('Quentin Sculo <squentin@free.fr>');
 	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\n tray icon for the tango theme by Piotr");
-	$dialog->set_translator_credits("French : Quentin Sculo\nHungarian : Zsombor\nSpanish : Martintxo and Juanjo\nGerman : vlad <donvla\@users.sourceforge.net> & staubi <staubi\@linuxmail.org>\nPolish : tizzilzol team");
+	$dialog->set_translator_credits("French : Quentin Sculo and Jonathan Fretin\nHungarian : Zsombor\nSpanish : Martintxo and Juanjo\nGerman : vlad <donvla\@users.sourceforge.net> & staubi <staubi\@linuxmail.org>\nPolish : tizzilzol team\nSwedish : Olle Sandgren\nChinese : jk");
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
 }
