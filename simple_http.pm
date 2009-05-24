@@ -141,7 +141,7 @@ sub receiving_cb
 		}
 		&$callback($response,$headers{'Content-Type'},$self->{params}{url});
 	}
-	elsif ($result=~m#^HTTP/1\.\d+ 30[12]#) #redirection
+	elsif ($result=~m#^HTTP/1\.\d+ 30[12]# && $headers{Location}) #redirection
 	{	my $url=$headers{Location};
 		unless ($url=~m#^http://#)
 		{	my $base=$self->{params}{url};

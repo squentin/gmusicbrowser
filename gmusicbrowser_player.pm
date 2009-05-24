@@ -671,6 +671,7 @@ sub Pack
 			$opt1= ::ParseOptions($opt1);
 		}
 		my $box=$widgets->{$key}= &{ $type->{New} }( $opt1,$opt->{$key} );
+		$box->set_name($key);	#TEST_gtkrc
 		$box->set_border_width($opt1->{border}) if $opt1 && exists $opt1->{border} && $box->isa('Gtk2::Container');
 		push @boxlist,$key,$line;
 	}
@@ -835,6 +836,7 @@ sub NewObject
 	$widget->{group}=$opt1->{group};
 	$widget->{'ref'}=$ref;
 	$widget->{name}=$namefull;
+	$widget->set_name($namefull);	#TEST_gtkrc  or $name ?
 
 	$widget->{actions}{$_}=$ref->{$_}  for grep m/^click/, keys %$ref;
 	$widget->{actions}{$_}=$opt1->{$_} for grep m/^click/, keys %$opt1;
@@ -1032,6 +1034,11 @@ sub KeyPressed
 	{	$cmd= $::GlobalBoundKeys{$key};
 	}
 	return 0 unless $cmd;
+	if ($self->isa('Gtk2::Window'))	#try to find the focused widget (gmb widget, not gtk one), so that the cmd can act on it
+	{	my $widget=$self->get_focus;
+		while ($widget) {last if exists $widget->{group}; $widget=$widget->parent}
+		$self=$widget if $widget;
+	}
 	::run_command($self,$cmd);
 	return 1;
 }
@@ -1334,6 +1341,7 @@ sub new
 {	my ($class,$layout,$wintype,$options)=@_;
 	$wintype||='toplevel';
 	my $self=bless Gtk2::Window->new($wintype), $class;
+	$self->set_name($layout);	#TEST_gtkrc
 	$self->{options}=$options;
 	$self->{group}='w'.$WindowCounter++;
 	::Watch($self,Save=>\&SaveOptions);
@@ -1628,6 +1636,10 @@ our %Boxes=
 	},
 	AB	=>
 	{	New	=> sub { my @def=(.5,.5,1,1); my @opt=@{$_[0]}{qw/xalign yalign xscale yscale/}; for my $i (0..3) {$opt[$i]=$def[$i] unless defined $opt[$i]}; Gtk2::Alignment->new(@opt);},
+		Pack	=> \&SimpleAdd,
+	},
+	WB	=>
+	{	New	=> sub { Gtk2::EventBox->new; },
 		Pack	=> \&SimpleAdd,
 	},
 );

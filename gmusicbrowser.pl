@@ -189,6 +189,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 -enqueue		: Enqueue them
 -addplaylist		: Add them to the playlist
 -insertplaylist		: Insert them in the playlist after current song
+-add			: Add them to the library
 
 -tagedit FOLDER_OR_FILE ... : Edittag mode
 -listcmd : list the available fifo commands and exit
@@ -544,7 +545,7 @@ our %ReplaceFields=		# for each field : [sub returning the formated value, field
 		my @l=map split(/$re_artist/o), keys %h;
 		my %h2; $h2{$_}++ for @l;
 		my @common;
-		for (@l) { if ($h2{$_}>=$nb) { push @common,$_; delete $h2{$_}; } }
+		for (@l) { if ($h2{$_}>=$nb) { push @common,$_; $h2{$_}=0; } }
 		return @common ? join ' & ',@common : _"Various artists";
 	},
 		_"Album artist",[SONG_ARTIST,SONG_ALBUM]],	#FIXME depends on SONG_ARTIST from all songs of SONG_ALBUM
@@ -672,8 +673,8 @@ our (%ToDo,%TimeOut);
 my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos SongID Playing SavedWRandoms SavedSorts SavedFilters SavedLists AAPicture Icons ExtraWidgets Context connections
 # also used for SearchText_ SelectedID_ followed by group id
 
-my $SFWatch=0;
-my @SongsWatchers=($SFWatch);
+my @SongsWatchers;
+my $SFWatch=AddWatcher();
 my (@Watched,@WatchedFilt);
 $Watched[$_]=[] for 0..SONGLAST;
 $WatchedFilt[$_]=[] for 0..SONGLAST;
@@ -912,12 +913,14 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	SetPlayerLayout => [sub { $Options{Layout}=$_[1]; set_layout(); },_"Set player window layout",_"Name of layout", sub {  TextCombo->new( Layout::get_layout_list('G') ); }, ],
 	OpenPref	=> [\&PrefDialog,			_"Open Preference window"],
 	OpenSongProp	=> [sub { DialogSongProp($SongID) if defined $SongID }, _"Edit Current Song Properties"],
+	EditSelectedSongsProperties => [sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; DialogSongsProp(@IDs) if @IDs; },		_"Edit selected song properties"],
 	ShowHide	=> [\&ShowHide,				_"Show/Hide"],
 	Quit		=> [\&Quit,				_"Quit"],
 	Save		=> [\&SaveTags,				_"Save Tags/Options"],
 	ChangeDisplay	=> [\&ChangeDisplay,			_"Change Display",_"Display (:1 or host:0 for example)",qr/:\d/],
 	GoToCurrentSong => [\&Layout::GoToCurrentSong,		_"Select current song"],
 	EnqueueSelected => [\&Layout::EnqueueSelected,		_"Enqueue Selected Songs"],
+	DeleteSelected => [sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; DeleteFiles(\@IDs); },		_"Delete Selected Songs"],
 	EnqueueArtist	=> [sub {EnqueueArtist($SongID)},	_"Enqueue Songs from Current Artist"],
 	EnqueueAlbum	=> [sub {EnqueueAlbum($SongID)},	_"Enqueue Songs from Current Album"],
 	EnqueueAction	=> [sub {EnqueueAction($_[1])},		_"Enqueue Action", _"Queue mode" ,sub { TextCombo->new({map {$_ => $QActions{$_}[2]} sort keys %QActions}) }],
@@ -2220,7 +2223,7 @@ sub Select	#Set filter, sort order, selected song, playing state, staticlist, so
 		$SelectedFilter=$filt;
 		@ListPlay=@{ $filt->filter };
 		$sort=1;
-		delete $ToDo{'8_updatefilter'};
+		delete $ToDo{'7_updatefilter'};
 	}
 	elsif ($::ToDo{'8_updatesort'}) { $sort=1;delete $ToDo{'8_updatesort'}; }
 	if ( $song eq 'keep' && !defined FindPositionSong($SongID) )
@@ -2705,7 +2708,7 @@ sub ChooseSongsFromA
 		}
 		$list=\@list2;
 	}
-	my $menu = ChooseSongs('%n %t', @$list);
+	my $menu = ChooseSongs('%n %S', @$list);
 	$menu->show_all;
 	if (1)
 	{	my $h=$menu->size_request->height;
@@ -3807,6 +3810,7 @@ sub EditLyricsDialog
 sub DeleteFiles
 {	return if $CmdLine{ro};
 	my $IDs=$_[0];
+	return unless @$IDs;
 	my $text=(@$IDs==1)? "'".$Songs[$IDs->[0]][SONG_UFILE]."'" : __("%d file","%d files",scalar @$IDs);
 	my $dialog = Gtk2::MessageDialog->new
 		( undef,
@@ -3853,8 +3857,8 @@ sub pathfromformat
 }
 sub pathfilefromformat
 {	my ($ID,$format,$ext)=@_;
-	$format=~s#^~($QSLASH)#$ENV{HOME}$1#;
-	return undef unless $format=~m#^$QSLASH# && $format=~s#$QSLASH([^$QSLASH]+)$##;
+	$format=~s#^~($QSLASH)#$ENV{HOME}$1#o;
+	return undef unless $format=~m#^$QSLASH#o && $format=~s#$QSLASH([^$QSLASH]+)$##o;
 	my $file=$1;
 	$file=filenamefromformat($ID,$file,$ext);
 	my $path=pathfromformat($ID,$format);
@@ -4363,7 +4367,7 @@ sub UpdateDefaultRating
 }
 
 sub AddWatcher
-{	my $n=1;
+{	my $n=0;
 	$n++ while defined $SongsWatchers[$n];
 	if (@_) { ChangeWatcher($n,@_); }
 	else { $SongsWatchers[$n]=0; }
@@ -5689,24 +5693,32 @@ sub NewPrefRadio
 	return @radios;
 }
 sub NewPrefCheckButton
-{	my ($key,$text,$sub,$tip,$widget)=@_;
+{	my ($key,$text,$sub,$tip,$widget,undef,$horizontal,$sizeg)=@_;
 	my $check=Gtk2::CheckButton->new($text);
 	$check->set_active(1) if $Options{$key};
+	$sizeg->add_widget($check) if $sizeg;
 	$check->signal_connect( toggled => sub
 	{	$Options{ $_[1] }=($_[0]->get_active)? 1 : 0;
-		$_[0]{albox}->set_sensitive( $_[0]->get_active )  if $_[0]{albox};
+		$_[0]{child}->set_sensitive( $_[0]->get_active )  if $_[0]{child};
 		&$sub if $sub;
 	},$key);
 	$Tooltips->set_tip($check,$tip) if defined $tip;
+	my $return=$check;
 	if ($widget)
-	{	my $albox=Gtk2::Alignment->new(0,0,1,1);
-		$albox->set_padding(0,0,15,0);
-		$albox->add($widget);
-		$albox->set_sensitive(0) unless $Options{$key};
-		$check->{albox}=$albox;
-		$check=Vpack($check,$albox);
+	{	if ($horizontal)
+		{	$return=Hpack($check,$widget);
+		}
+		else
+		{	my $albox=Gtk2::Alignment->new(0,0,1,1);
+			$albox->set_padding(0,0,15,0);
+			$albox->add($widget);
+			$widget=$albox;
+			$return=Vpack($check,$albox);
+		}
+		$check->{child}=$widget;
+		$widget->set_sensitive(0) unless $Options{$key};
 	}
-	return $check;
+	return $return;
 }
 sub NewPrefEntry
 {	my ($key,$text,$sub,$sizeg1,$sizeg2,$hide,$tip)=@_;
@@ -5762,11 +5774,12 @@ sub NewPrefFileEntry
 	return $hbox;
 }
 sub NewPrefSpinButton
-{	my ($key,$sub,$climb_rate,$digits,$min,$max,$stepinc,$pageinc,$text1,$text2,$sg1,$sg2,$tip)=@_;
+{	my ($key,$sub,$climb_rate,$digits,$min,$max,$stepinc,$pageinc,$text1,$text2,$sg1,$sg2,$tip,$wrap)=@_;
 	$text1=Gtk2::Label->new($text1) if defined $text1;
 	$text2=Gtk2::Label->new($text2) if defined $text2;
-	my $adj=Gtk2::Adjustment->new($Options{$key},$min,$max,$stepinc,$pageinc,0);
+	my $adj=Gtk2::Adjustment->new($Options{$key}||=0,$min,$max,$stepinc,$pageinc,0);
 	my $spin=Gtk2::SpinButton->new($adj,$climb_rate,$digits);
+	$spin->set_wrap(1) if $wrap;
 	$adj->signal_connect(value_changed => sub
 	 {	$::Options{ $_[1] }=$_[0]->get_value;
 		&$sub if $sub;

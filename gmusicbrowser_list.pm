@@ -4445,8 +4445,7 @@ use Gtk2;
 use base 'Gtk2::HBox';
 
 use constant
-{	XPAD => 2,	YPAD => 2,
-	BRANCH_VALUE => 0, BRANCH_EXP => 1, BRANCH_START => 2, BRANCH_END => 3, BRANCH_HEIGHT => 4, BRANCH_CHILD => 5,
+{	BRANCH_VALUE => 0, BRANCH_EXP => 1, BRANCH_START => 2, BRANCH_END => 3, BRANCH_HEIGHT => 4, BRANCH_CHILD => 5,
 };
 
 our %STC;
@@ -4495,6 +4494,7 @@ sub new
 	#create widgets used to draw the songtree as a treeview, would be nice to do without but it's not possible currently
 	$self->{stylewidget}=Gtk2::TreeView->new;
 	$self->{stylewparent}=Gtk2::VBox->new; $self->{stylewparent}->add($self->{stylewidget}); #some style engines (gtk-qt) call ->parent on the parent => Gtk-CRITICAL messages if stylewidget doesn't have a parent. And needs to hold a reference to it or bad things happen
+	#$self->{stylewidget}->set_name('SongTree');
 	for my $i (1,2,3)
 	{	my $column=Gtk2::TreeViewColumn->new;
 		my $label=Gtk2::Label->new;
@@ -6066,7 +6066,7 @@ sub new_group
 	if (my $ref0=$SongTree::GroupSkin{$skin}{options})
 	{	for my $key (keys %$ref0) { $constant->{$key}="'".$ref0->{$key}{default}."'" unless exists $constant->{$key} }
 	}
-	my $def=$SongTree::GroupSkin{$skin}||'';
+	my $def=$SongTree::GroupSkin{$skin} || {};
 	my $self=bless
 		{	col	=> $colnb,
 			grouptype=> $grouptype,

@@ -471,7 +471,7 @@ return $self if @IDs>1000;
 	{	next if @files/2>(grep m/$FORMATS[$i][1]/, @files);
 		my $formatname=$FORMATS[$i][0];
 		$formatname=~s/%([taldnyCV%])/$::ReplaceFields{$1}[1]/g;
-		my $item=Gtk2::MenuItem->new($formatname);
+		my $item=Gtk2::MenuItem->new_with_label($formatname);
 		$item->{'index'}=$i;
 		$item->signal_connect(activate => \&autofill_cb,$self);
 		$menu->append($item);

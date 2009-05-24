@@ -265,6 +265,7 @@ sub prefbox
 
 sub load_url
 {	my ($self,$url,$post)=@_;
+	$url='http://'.$url unless $url=~m#^\w+://#;# || $url=~m#^about:#;
 	$self->{url}=$url;
 	$self->{post}=$post;
 	if ($post)
@@ -297,7 +298,9 @@ my %sites=
 	google  => ['google','http://www.google.com/search?q="%a"+"%s"'],
 	googlemusic  => ['google music','http://www.google.com/musicsearch?q="%a"+"%s"'],
 	lyriki  => ['lyriki','http://lyriki.com/index.php?title=%a:%s'],
-	lyricwiki => ['lyricwiki','http://lyricwiki.org/%a:%s'],
+	#lyricwiki => ['lyricwiki','http://lyricwiki.org/%a:%s'],
+	lyricwiki => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%s&fmt=html'],
+	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a'],
 );
 
 ::SetDefaultOptions(OPT, LyricSite => 'google');
