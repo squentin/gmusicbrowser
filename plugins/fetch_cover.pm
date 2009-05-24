@@ -205,7 +205,7 @@ sub InitPage
 {	my $self=$_[0];
 	$self->abort;
 	$self->{loaded}=0;
-	$self->{Bnext}->set_sensitive(1);
+	$self->{Bnext}->set_sensitive(0);
 	$self->{Bstop}->set_sensitive(1);
 	$self->{progress}->set_fraction(0);
 	$self->{progress}->show;
@@ -288,18 +288,22 @@ sub parse_sloth
 sub parse_googlei
 {	my $result=$_[0];
 	my @list;
-	while ($result=~m#dyn\.Img\(("[^"]*"(?:,"[^"]*")*)[^)]*\);#g) #parse google image results
-	{	my @fields= $1=~m#"([^"]*)",?#g;
-		my $url=$fields[3];
-		my $desc=$fields[6]; $desc=~s#\\x([0-9a-f]{2})#chr(hex $1)#gie; $desc=~s#</?b>##g;
-		$desc=Encode::decode('cp1252',$desc); #FIXME not sure of the encoding
-		$desc=::decode_html($desc);
-		my $preview='http://images.google.com/images?q=tbn:'.$fields[2].$url;
-		push @list, {url => $url, previewurl =>$preview, desc => $desc };
+	if ($result=~m#dyn.setResults\([^)](.*)\)#)	#parse google image results #assumes no unencoded ')' in the array of results
+	{	my @matches=split /\],\["/,$1;	#not very reliable
+		for my $m (@matches)
+		{	my @fields=split /["\]],["\[]/,$m;
+			my $url=$fields[3];
+			my $desc=$fields[6]; $desc=~s#\\x([0-9a-f]{2})#chr(hex $1)#gie; $desc=~s#</?b>##g;
+			$desc=Encode::decode('cp1252',$desc); #FIXME not sure of the encoding
+			$desc=::decode_html($desc);
+			my $preview='http://images.google.com/images?q=tbn:'.$fields[2].$url;
+			push @list, {url => $url, previewurl =>$preview, desc => $desc };
+		}
 	}
 	my $nexturl;
-	if ($result=~m#Result[^<]*Page:.*<a href="(/images\?q=[^>"]*)">.*?Next</a></table>#) #could be better
-	{	$nexturl='http://images.google.com'.$1; #warn $1;
+	if ($result=~m#<a href="(/images\?[^>"]*)"><img src="nav_next#)
+	{	$nexturl='http://images.google.com'.$1;
+		$nexturl=~s#&amp;#&#g;
 	}
 	return \@list,$nexturl;
 }
@@ -309,11 +313,12 @@ sub searchresults_cb
 	$self->{waiting}=undef;
 	unless (defined $result) { stop($self,_"connection failed."); return; }
 	my $parse= $Sites{$self->{aa}}{$self->{site}}[2];
-	my ($list,$nexturl)=&$parse($result);
+	my ($list,$nexturl)=$parse->($result);
+	$self->{nexturl}=$nexturl;
 	#$table->set_size_request(110*5,110*int(1+@list/5));
 	push @{$self->{results}}, @$list;
-	my $more= @{$self->{results}} + ($nexturl ? 1 : 0) - ($self->{page}+1) * RES_PER_PAGE;
-	$self->{Bnext}->set_sensitive( $more>0 );
+	my $more= @{$self->{results}} - ($self->{page}+1) * RES_PER_PAGE;
+	$self->{Bnext}->set_sensitive( $more>0 || $nexturl );
 	unless (@{$self->{results}}) { stop($self,_"no matches found, you might want to remove some search terms."); return; }
 	::IdleDo('8_FetchCovers'.$self,100,\&get_next,$self);
 }
