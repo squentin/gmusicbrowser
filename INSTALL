@@ -1,0 +1,17 @@
+You can run it without installation by simply running :
+ /PATH_TO/WHERE/YOU_UNTARRED_THE_TAR.GZ/gmusicbrowser.pl
+(gmusicbrowser.pl will first look for its files in . and then in ../share/gmusicbrowser relative to where it resides)
+
+RPM based distro
+================
+rpm -bb gmusicbrowser.spec
+rpm -i gmusicbrowser.rpm
+
+DEB based distro
+================
+sudo ./debian/rules binary
+sudo dpkg -i ../gmusicbrowser.deb
+
+other
+=====
+make install

@@ -1,0 +1,481 @@
+v1.0
+- Fixed division by zero error when reading flac files with unknown length, but their length will be 0 for now
+- Fixed wraping of artist/album names for artists/albums with no picture in mosaic mode
+- In "run system command" command, added the variable %F, replaced by the list of selected files in the current window
+- Fixed the VolSlider in vertical mode, so that the max value is at the top
+- Changed the namespace used by the DBus interface
+- lyrics plugin : fixed searching lyrics with "exotic" characters (coded by more than one byte in utf8)
+- Fixed the "last played" and "last skipped" columns in the SongTree
+- Added EnqueueArtist and EnqueueAlbum commands
+- When Adding more than one song to the queue, the current song won't be added (let me know if you want an option to disable this)
+- updated find_cover plugin
+- updated spanish translations (by Juanjo)
+
+v0.964
+fixes :
+- fixed gnome multimedia keys plugin to work with gnome 2.22
+- updated the "picture finder" plugin to work with current google image pages
+- fixed the "remove existing" option for comments in mass-tagging dialog
+- fixed behaviour of the previous button
+- some fixes to the equalizer support
+- fixed small bug with random modes and labels/genres : a rule for a label/genre abcd would match any label/genre containing abcd
+- fixed small bug with filters and multiple artist separator : a filter matching many artists (>=5) used the old hard-coded artist-separator ' ?& ?' : "artist is a or b or c or d or e" wouldn't match a song with artist 'a, x & y' and would match 'a & z', ignoring the setting for artist-separator
+- get the year from TDRC fields of id3v2.4 tags if present
+- the columns' width of the SongList can now be reduced beyond their title's width
+- fixed the 'between' filter
+- fixed date edition in the filter edition dialog
+- improved the way the TogButton and MenuItem (with the togglewidget option) update its toggled state, it's now much simpler and should be always right
+- fixed drawing problems of the lyrics in some conditions (caused by other parts of the code setting the clip of the style's GCs)
+- fixed bitrate info for mpc files
+
+small improvements :
+- improved the horizontal scrollbars behavior (in SongList, SongTree and FPanes) : the mouse wheel will scroll vertically instead of horizontally when the slider is pressed (inspired by galeon). And vice-versa for the vertical scrollbars.
+- smoother title/artist/album name scrolling (scroll 1 pixel at a time instead of 5)
+- added option to stop screensaver when in fullscreen and playing (using xdg-screensaver).
+- added filters for "no genres" and "no labels"
+- added a confirmation dialog with timeout before quitting and lauching the turn-off command
+- added a widget option to change the mouse cursor when it hovers over it (eg : cursor=hand2)
+- the mouse cursor now change into a hand when it hovers over the current title/album/artist
+- added a clear button to the SimpleSearch widget and put its button inside the entry frame
+- the tango icon theme now use a nice tray icon made by Piotr.
+- added a 'view' menu to the itunes-like layout
+- added the 'added', 'modif' and 'lastplay' tab to the FPane. They have 3 grouping mode : year, month and day. And they can be displayed in cloud mode. Currently 'modif' is not used by default, but can be specified in the layout. (In the next version, it will be possible to add/remove tabs with a right-click menu)
+
+v0.963
+fixes :
+- fixed gstreamer disabled with gstreamer >=0.10.16
+- fixed layout size problems with the Cover widget for first use of a layout and popup layouts (fix #1890969)
+- Total widget : the 'selected' mode now works with the SongTree
+- fetch_cover plugin : updated the last.fm artist picture search
+- fixed folders in ~/.gmusicbrowser/icons/ not recognized as icons themes
+- fixed small bug preventing creation of new labels in the settings dialog when the list is full
+- added a small work-around for a memory-leak bug in gtk2-perl (bug #498334), which could consumes several MB after a few hours of playing. The memory-leak bug is fixed in Gtk2 >=1.163 (stable branch) and >=1.171 (unstable branch)
+- fixed bug with tabbedlists and lists with non-latin characters
+- fixed dropping files with non-latin characters not working
+- fixed icons for labels with special characters
+
+improvements :
+- added support for the gstreamer equalizer plugin. The equalizer can be added in a layout with the widget Equalizer, or opened in a new window in the audio settings tab.
+- added support for the gstreamer replaygain plugin. It can scan songs to add replaygain tags. Note that currently the replaygain values can't be seen from within gmusicbrowser (apart from the advanced tag editing dialog). In particular, this means you can't tell which songs have been scanned and which ones haven't. This will be fixed in the future.
+- added last "last skip" and "skip count" properties to songs
+- The layout used by the search dialog (used by the OpenSearch command) can now be selected
+- improved tags/settings file backup system
+- use xdg-open (with a few fallbacks) instead of gnome-open to open web pages in a browser
+- added an "open containing folder" menu entry in the song context menu (only when one song is selected for now)
+- now use ~/.config/gmusicbrowser/ by default (can be changed with the $XDG_CONFIG_HOME environment variable) as defined by the XDG Base Directory Specification. If it doesn't exist and the old ~/.gmusicbrowser/ exist, it used instead for backward compatibility.
+- added a Get and Set method to the DBus interface
+- added an "export songs data to a .csv file" function to the export plugin
+- added an advanced options dialog for gstreamer
+- use the "music" profile when using the gconfaudio gstreamer sink (now called "use gnome settings")
+- improved the trayicon show/hide function (simple click on trayicon), it should now work better with some window managers
+- experimental "popup" function (like the TrayIcon "tip") : a layout can be popped-up via the PopupCustom(ALayoutName) command or via the hover_layout=ALayoutName widget option (with the hover_delay widget option setting the delay in ms, 1000ms by default or if set to 0). The popped-up window disappear when the mouse exit the window.
+- fixed queue modes in the queue menu to use radio buttons
+- added a Name property for layouts, it sets the name displayed in the settings dialog (use the layout id by default).
+
+v0.962
+fixes :
+- fixed bug that would submit the wrong song to last.fm, when a song had played enough to be submitted (more than half or 4min) but, before the end, was replaced by another song
+- fixed bug with saved lists named with spaces or special character
+- fixed bug with tabbedlists widget when trying to restore opened tabs if the saved list no longer exist
+- fixed the way the Cover/AlbumPic size widget is allocated in H/VBox when no other widget in expand mode is packed in the H/VBox, if the Cover/AlbumPic will use all the space (->centered) if in expand mode (with '_')
+- fixed queue-icon not appearing next to queued songs
+- fixed possible crash (at least when exiting) after closing a playlist tab in a tabbedlist
+- fixed seeking with mpg321 in some rare mp3 (not 44100 Hz and/or not layer3 version1) (thanks to Stefan)
+- fixed tray popup position for dual-screen configurations (thanks to TheFlyingPengwyn)
+- fixed : label icons cannot be set if the ~/.gmusicbrowser/icons/ doesn't exist
+- fixed "go to/follow playing song" not working in some cases, and stopped it from flickering (by Stefan)
+- fixed : cover was auto-set even when "no picture" had been chosen
+
+plugins fixes:
+- mozembed plugin : fixed special letters in artist for last.fm
+- fixed fetch_cover "more results" button not working with current google pages
+
+improvements:
+- changed the plugin system. Now no code in a plugin is loaded until it is activated. Consequences : No memory used by not used plugins. No error messages on startup from not activated plugins. All plugins are listed. errors are displayed in the dialog. All plugins were updated.
+- added option to disable/change the way artist names are split
+- traytip doesn't popup when in fullscreen mode
+- files to play can be specified on the command line, uses existing session if already running, note that playing files not in the library is still experimental
+- added the "set as primary filter" option in non-primary filter panes context menu
+- added rating submenu in song context menu
+- added support for icon themes, includes a gnome-classic and a tango (by Jean-Philippe Guillemin) theme. The tango icons could use some improvements, in particular a random icon distinct from shuffle.
+- added the option -use-gnome-session to use gnome libraries so that gmusicbrowser save its settings on logout (use about 2MB on my system :( requires gnome perl bindings, barely tested)
+- the new gmbrc file can be modified by packager to set some default options such as activate some plugins...
+- rename dialog : now remember 10 last patterns used for filename and folder
+- added a split words option to the SimpleSearch widget
+- changed the tag reading priority : put id3v1 last (after APE tags)
+- added these columns to the SongList : "album picture & info", "artist picture", and "rating (picture)"
+- bottom buttons in FPanes are now "toggable"
+- added other sorting options for artist and album FPanes
+- added a few commands : PopupTrayTip ShowHideWidget SetSongLabel UnsetSongLabel ToggleSongLabel
+- added an option to only save song properties in the library, not in the file (barely tested)
+- added an option to disable automatic check for modification of the current song
+- added support for .ape files, it of course requires support by mplayer (very recent, didn't test) or gstreamer (probably not yet supported)
+- added support for .wv files, mplayer and gstreamer have plugins for it. Although not all files in the wavepack test suite played properly, I think commonly used files should work.
+
+plugins improvements:
+- the picture_finder/fetch_cover plugin now display picture size under the thumbnail
+- added multiple sources for the picture_finder/fetch_cover plugin
+- added multiple sources for the lyrics plugin
+- added an option to the lyrics plugin to auto-save found lyrics, it only auto-save for automatically loaded pages with some sources that have a check to determine if the right lyric is found. Also it won't save pages when the lyrics page is not visible, because they are not loaded. That might not be the expected behavior.
+- mozembed plugin : added a test to detect the segmentation fault problem
+
+new layouts widgets:
+- added AddLabelEntry widget, to easily add labels to current song
+- added widget PlayOrderCombo, the option reqwidth (default to 100, -1 to let it grow, but it can be much to wide) set the requested width, it's best to pack it with the expand option
+- added the SongTree widget, it is a replacement for the SongList widget. Some things are still not implemented : drag and dropping columns, playlist, queue or static list mode, moving songs using the EditListButtons widget (arrows button) and type-ahead search. It is very configurable, see the wiki (http://squentin.free.fr/gmusicbrowser/dokuwiki/doku.php?id=customization:songtree) for some documentation.
+
+layouts options:
+- labels widget now accept xalign and yalign options, and scrollable labels are now verticaly centered (yalign=.5) by default as they should have been
+- added the songypad option to SongList to change the default padding between rows, and the activateX option where X is a number to specify the action when the mouse button X is double-clicked. These options also work for the SongTree widget.
+- added layout option "DefaultFocus" to set which widget gets the initial focus, will probably only work with simple widgets, SongList, SongTree and SimpleSearch for now
+- added the SetFocusOn command, to set focus on a layout widget, same restrictions as for DefaultFocus
+- added the option activate to the SimpleSearch widget, to set a command to run after enter is pressed
+- the activate option of the SongList/SongTree can be followed by a command like this : activate=play&CloseWindow
+- added the option no_typeahead to SongList and FPane. If true disable automatic searching when a letter/digit is pressed and the SongList/Fpane has focus. The search function can still be called using the "start-interactive-search" gtk key binding (crtl-f on my system).
+
+license :
+- changed the licence to the GPL version 3
+- the COPYING file now contains the full text of the licence, and cleaned-up/added licence header to most of the perl files.
+- added licence header to all code files
+
+translations :
+- updated german translation (by Tino)
+- added polish translation (by tizzilzol team)
+
+
+v0.960
+fixes:
+-APE tags are now correctly read and written in utf8
+-some fixes to id3 tags v2.4 reading and writing
+-now strips trailing null characters and spaces from tag information, this fixes some problems with tags created with some software that add a null character at the end of strings
+-fixed small utf8 bug in drag and drop and in the search cover plugin
+-fixed lots of small bugs
+
+improvements:
+-improved the cloud view (cursor keys, double click, context menu)
+-added a 'mosaic' mode to artist and album filter panels
+-last.fm plugin : unsent data are now saved between sessions
+-the last.fm plugin now use the 1.2 protocol
+-improved the fetch cover plugin
+-sort orders can now be case-insensitive
+-added an option that makes the case-insensitive sort place accented letters right after its unaccented version instead of somewhere after 'z', it is significantly slower than the usual case-insensitive sort (the artist/album/... list always use this sort regardless of this option since there is much less artist/album/genre/... than songs)
+-lyrics plugin : ctrl-wheel can be used to change the font size
+-auto-scroll for the lyrics plugin, activable in the right-click menu for now
+-added a very simple rip plugin to launch a cd-ripping program
+-improved the SimpleSearch widget
+-pages options for FPane (artist/album/genre/label/year lists) are available in right-click menu
+-jump to current song options in songlist right-click menu on a column header
+-new plugin : gnome_mmkeys, requires gnome 2.18 and Net::DBus
+-improved the TabbedLists widget
+-shared context menu system for all filter panel pages
+-splitted the "Misc." preference tab into "Misc." and "Layouts"
+-added support for playing files not in the library, by drag and drop or using the new Filesystem Fpane page (experimental, not well integrated yet)
+-added a new experimental column in the songlist : album picture, the name could be better as it also display album info
+-added skin support for the window background, buttons and the (badly named) Scale widget
+
+included layouts:
+-removed some ugly and/or not very interesting layouts ('with comments','with menu','light','with smaller cover','without cover')
+-added the layout 'with tabbedlists'
+
+layouts widgets:
+-added a ArtistPic widget, same as 'Cover' but for artist, can display multiple artists with the option 'multiple' which can be set to v (vertical) or h (horizontal)
+-added a "Fullscreen" widget to switch to/from fullscreen
+-added the FR (Frame) container, the shadow type (none, in, out, etched-in, etched-out) can be set with the 'shadow' option
+-added a ScrolledWindow container (SB)
+-added a Alignment container (AB) syntax : "ABox = (xalign=0,yscale=.5) widget" options are xalign, yalign, xscale, yscale, see http://developer.gnome.org/doc/API/2.0/gtk/GtkAlignment.html
+
+layouts syntax and options:
+-the Total widget now accept the size and format option, format can be "long" (default) or "short", size can be among others (http://developer.gnome.org/doc/API/2.0/pango/PangoMarkupFormat.html) : 'xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large'.
+-changed the way the scrolling labels (artist, album and title) are implemented, as a result the empty padding around them is smaller. Added 2 pixels padding in the layouts to compensate.
+-buttons widget (Play,Stop,...) and indicators widgets (Filter,Queue,Sort,...) are now handled the same way, the default (button or not) can be changed with button=0 or button=1, relief can be changed for buttons by using the option relief=none(default), half or normal. The size option can be set to menu, small-toolbar, large-toolbar, button, dialog, dnd (the actual size depends on gtk settings)
+-added fullscreen/ontop/below properties to layout poperties
+-the 'Cover' widget size finally behaves as I wanted from the start, to implement this the H/VBox of the layouts now use a custom size-allocation function. Also added a 'minsize' option, as well as a boolean 'forceratio' option for when used in the tray tip.
+-improved parsing of layouts: lines can be broken in multiple lines by ending them with a backslash, matching parenthesis can be included in widget options, parenthesis can be escaped with a backslash, option values can be quoted between " or ' can include "," and a " or ' can be escaped with a backslash. For example these should now work : widget(opt=()) widget(opt=\)) widget(opt="string1,string2") widget(opt="\"string1,string2\"") widget(opt='"string1","string2"')
+-Changed syntax of the SM (submenu) container, now all container options are set this way : "HBcontainer = (option1=value1,opt2=value2) ...". All container accept a border option to set border width, SM, EB and FR accept a label option to set the label.
+-greatly improved the FB (fixed) container : An optional size request can follow the position ie : x,y,w,h to specify the width/height the widget will request (0 to leave it as by default). x,y,w,h can be relative to the width/height of the container by preceding the number with '.', x,y can be relative to the right/bottom border by prefixing it with '-'.
+-layouts can now specify where extra widgets can be added, only the rip plugin use it for now. The syntax is : "ExtraWidgets = widget_type container", widget_type is used to specify what type of widget should go in this container, for example the rip plugin add a widget of type 'button'. Types like 'tab' or 'menuitem' will be used in the future.
+-the action when a widget is clicked can be redefined to a custom command by using the option 'click' followed by the button number eg: Play(click2=OpenSongProp) will open song properties dialog when ckicked with the middle mouse button. Buttons also accept the "activate" option.
+
+
+v0.958
+-some important internal changes in the songlist and widgets options
+-Flags are now called Labels
+-artist name are now splitted into multiple artists on ', ' or ' & '
+-improved the way picture files are chosen as the album cover when scanning
+-internet connections are now fully asynchronous
+-added ability to connect through a proxy
+-fixed the fetch_cover plugin to work with the new google images pages
+-use gstreamer by default for new user if available
+-added mplayer support
+-the mass-rename dialog can now also move files to folders according to their tags
+-added a cloud mode to the artist/album/date/genre/labels filterpanes (click on the settings icon at the bottom to activate it)
+-added a gstreamer icecast server option, MUCH better than the non-gstreamer icecast server
+-added an option to delay the display of the traytip when the mouse is over the tray icon
+-added a button to choose an icon for a label in the settings dialog
+-clicking on the playing time label now switch between elapsed and remaining mode
+-fixed song progress not working with ogg123 and spanish locale (and maybe other locales)
+-fixed trayicon not reappearing after a gnome-panel crash
+-added some DBus support for controlling gmusicbrowser though third-party apps
+-the "pos" (badly named) widget's width is now constant, so clicking on a lock or adding a song to the queue won't make everything move in some layouts
+-added a 'TabbedLists' widget (right-click on the tabs to add/remove lists), only for static list and queue for now, not used in included layouts
+-added a "LabelsIcons" layout widget that displays icons for currently playing labels for which an icon is defined in ~/.gmusicbrowser/icons/
+-added a visualisation widget (named 'Visuals'), only works with gstreamer, requires the GStreamer::Interfaces perl module and some visualisation gstreamer plugins. Unfortunately it crashes a lot on my new x86_64 system, it may be more stable on a 32 bit system. Not used in included layouts
+-added a Fixed container : where widgets can be positioned at fixed coordinates
+-labels in layouts can now be scrollable by using the option minsize=value, value is a number of 'X' characters or a number of pixel if followed by 'p'
+-added a lastfm context page in the mozembed plugin
+-lyrics plugin : removed the warnings from lyrc.com.ar pages by ignoring text between <noscript>
+-"export" plugin now add menu entries to artist/album/date/genre/label filterpanes
+-"export" plugin : the exported files can be renamed and placed in folders according to their tags
+-"export" plugin : added an option to execute a custom command, could be used with Podtool or gnupod to copy songs to an ipod (untested)
+-added the SetSongRating command to set rating of the current song
+-Key bindings can now use the windows key
+-added a -hide command line option to minimize to tray on startup
+-the "-ro" command-line option now prevent modifying/renaming/deleting song files, the old behavior of only preventing song tag modification is now with the option "-rotags"
+-added support for ape files, but I noticed neither gstreamer nor mplayer supports it for now :(, so they won't be added to the library
+-made a few forgotten strings translatable
+-added partial hungarian translation (by Zsombor)
+-added partial spanish translation (by Martintxo)
+-added partial german translation (by vlad)
+
+v0.955
+-fixed the layout of the fetch_cover plugin options
+-Added support for flac files with id3v2 tags, the id3v2 tag is currently ignored
+-fixed error when context area is displayed and follow playing song is checked, but no context plugin is activated
+-added support for translations (french translation included)
+-changed many things in the artist/album list menu
+-added '-tagedit' command-line option to just edit tags of files passed as arguments
+-modified queue icon
+-Added options to disable wikipedia or lyrics tab in the mozembed plugin
+-renamed layout 'default' to 'default player layout'
+-layout files are now read in utf8
+-added -listcmd command-line option to list the available commands (used for remote control via fifo or in layouts)
+-replaced "ChooseAlbum" control by a "Choose" control
+-small changes to some layouts
+
+v0.953
+-removed (for now) keyboard shorcuts in menu bars, as it caused crash with dynamically generated menus
+-added customisable keyboard commands, layout can defines their own
+-check if the playbin plugin from gst-plugins-base is available on startup
+-fixed scan hanging when a compressed id3v2 frame is found, and the Compress::Zlib module is not found
+-added a 'checking songs' part to the scan progress dialog
+-small fixes for compressed frames in id3v2.4 tags
+-mozembed plugin: can now choose locale in wikipedia (among the most common ones), and can turn off the removal of header, footer and left column in wikipedia pages
+-added options to remember playing song and position
+-added NextSongInPlaylist and PrevSongInPlaylist commands
+-fixed 'use latin1 on id3v2 if possible' option (on by default) not working with most exotic characters
+-fixed tray tip position
+-fixed rating applied even if not modified when editing songs properties
+-added search box in artist/album/genre/flags filter panes (not by default for now, activated by adding the option searchbox=1 to the FPanes in a layout)
+-fixed a drag and drop bug
+-should handle symlinked folders better when scanning
+-cleaned up right-click menu on column headers in songlists
+-fixed bug in ogg crc calculation resulting in unplayable file on system where perl use 64bits (editing corrupted files with this fix will fix them)
+
+
+v0.951
+-fixed 'autofill Queue mode' can't be turned off once turned on (#1438087)
+-fixed total display not working in "selected" mode
+-fixed artist/album year(s) not updated if only the year has changed
+-fixed control/shift-click on a selection clearing the selection in the songlist
+-in 'now playing' plugin, %t,%a,... is now replaced by title,artist...
+-added a 'find a unique filename' option to the fetch_cover plugin
+-added a 'SimpleSearch' widget
+-songs from an artist/album/filter drag-and-drop are now sorted according to playing sort order
+- ~/.gmusicbrowser/layouts can now be a folder -> *.layout files inside are read as layouts files (sorted alphabetically)
+-the title of a layout window can now be dynamic with %t,%a,%l,...
+-added a new layout "Queue, Library & Context" (by vlaaad)
+-added a bpos=none option to the queuelist to remove its toolbar
+-renamed icon files using a gmb-* format
+- ~/.gmusicbrowser/icons/*.png files are now loaded as icons, if they use an existing icon name (gtk-* for stock gtk icons, gmb-* for gmusicbrowser-specifc icons) they replace it
+-added a 'QueueFilter' widget
+-added a context menu in Artist/Album/Genres/Date/Flags FPanes, only contains "Play" and "Enqueue" for now
+-new flags can now be created directly in song properties dialog
+-fixed masstagging bug with ape tags
+-fetch_cover plugin : right-click zoom now use the full picture instead of the 100x100 thumbnail
+-added a new column in songlist that display an icon for each set flags which has an icon. To define an icon for a flag named 'name', place a file named 'flag-name.png' in ~/.gmusicbrowser/icons/
+-fixed some bugs with flags
+-added an option to select the encoding used when reading/writing id3v1 tags
+-improved multi-rows dragging in filterpanes (don't need to keep shift or ctrl pressed)
+-double middle-click in artist/album/date/genres/flags/folders filterpanes enqueue the filter
+-double click in artist/album/date/genres/flags filterpanes play the filter
+-some changes to the edit filter dialog when creating/editing a filter via the saved filter pane (to fix the 'ok' button doing nothing in those case)
+-when masstagging, the songs are updated as they are changed (previously, they were updated once the mass-tagging was finished)
+-added a 'shuffle queue' item in the queue menu
+-added a resetfilter button in some layouts
+
+v0.949
+-fetch_cover plugin : fixed picture saved with no or incorrect extension
+-more filenames are now recognised for auto-setting album cover
+-fixed the hide option in the QueueList/EditList layout element
+-enabled the hide option in the "with browser & queue" layout
+-fixed state of the player layout not saved when switching to another layout
+-small changes in the plugin system, requires small modifications to old plugins
+-added a context window/'layout element'
+-the lyrics plugin has been changed to use 'context'
+-made the old 'with bigger cover' layout the 'default', the old 'default' is now 'with smaller cover'
+-added the mozembed plugin, provides lyrics and wikipedia context
+-added small work-around bug in Glib<1.105 when used with perl 5.8.8
+-added layout 'with playlist & context' to show off the new context 'element' in layouts
+-nicer drag image when dragging a song
+-added a 'toggle button' element for layouts, which can show/hide other layout elements
+-added a tabbed element container for layouts
+-columns 'playing' and 'Title - Artist - Album' are now available in songlists
+-added options to show picture and/or info in artist/album lists and to sort them by year
+-added a layout button that brings a dialog to search for an artist/album
+-fixed removing multiple songs from queue/list not working properly
+-fixed autofill queue mode not working when removing songs from queue
+-added new layouts "Search & Queue" and "Search & Playlist"
+-fixed a number of bugs with the Songlist when in playlist mode, notably when recieving songs via drag and drop
+-added an advanced options dialog for '123' output
+
+v0.947
+-fixed removed songs reapearing in the next session
+-improved fifo gtk+ bug work-around so that it hopefully always works
+-added Forward and Rewind fifo commands
+-added support for gstreamer 0.10, requires GStreamer 0.05(without playing time) or more(playing time fixed in CVS)
+-fixed dropping songs on a saved list in the 'Saved' filterpanel
+-fixed ogg123 using alsa device instead of alsa09
+-added an 'edit list' window, to edit saved list in the 'saved' filterpanel
+-fixed some small drag and drop bugs
+-now detect availaible sinks in gstreamer (among oss,esd,artsd,alsa)
+
+v0.946
+-fixed bug when trying to delete songs (causing creation of a huge number of empty song entries and failing to delete anything)
+-fixed bug in copy/move songs using a number as destination folder
+-fixed gmusicbrowser using 100% cpu after first command received by fifo, by closing and re-opening fifo everytime to work around gtk+ bug
+-fixed annoying bug with the lyrics plugin that would create a empty window without borders when activated
+-added layout 'with bigger cover'
+-added option to keep filter/playlist between sessions
+-added an overwrite confirmation dialog to copy/move operations
+
+v0.945
+-fixed clear_filter button inactive for filter panels
+-added progress window to copy/move operations
+-merged the 'saved' and 'lists' filterpanels into one
+-added drag and drop in lots of places
+-The way contextual menus are created has been rewritten to be more powerful and easier to use by plugins
+-some improvements to fetchcover plugin
+-cover display in player window is now delayed, this makes song skipping faster
+-now use the recent gtk FileChooser dialog everywhere, and fixed some broken filenames issues with it
+-modified the queue editor to be useable in layouts
+-added a 'with queue' and a 'with browser & queue' player layout
+-the queue edit window is now just another layout, and so remembers window size, position, the displayed columns and their width
+-added a title property to layouts, to set the window title, static-only for now
+-added a very simple lyrics plugin
+-fixed rare bug with autofill queue mode and queue edit window, leading to missing song in edit queue window
+-fixed rare rounding bug leading to endless loop, when enqueuing several songs in random mode
+
+v0.942
+-small speed-ups, and big speedups for filters like is_in_list_of_albums/genres/artists/flags
+-some changes to advanced tag editing
+-improved support for APE tags
+-support for musepack files (needs gstreamer for playback)
+-better error handling for mpg321/ogg123/flac123
+-added error dialogs for move/copy/rename/delete files
+-added right-click menu to rating widget (stars)
+-new plugin : fetchcover (using google image) (needs more work)
+-added man page
+-added ChangeDisplay DISPLAY command (with gmusicbrowser.fifo) to migrate to display DISPLAY
+-now remembers the selected audio engine
+
+v0.940
+-fixed bug that caused songs which path/filenames contains non-ascii chars to be re-added to the library when scanning for new songs, these duplicated entries will be removed on startup when upgrading
+-the folder filter-panel now remember expanded nodes when refreshed
+-new experimental 'playlist' mode for the songlist, used in the new 'Playlist' & 'with playlist' alternate layout, in this mode the songlist filter is synchronized with the playlist filter
+-fixed a few minor bugs
+
+v0.939
+-fixed a major bug in 0.938, that was preventing gmusicbrowser from quitting (and saving tags/options) when asked to after having opened and closed some windows (random editing dialog and alternate layouts in particular)
+-broken filenames are now accepted (not much tested)
+
+v0.938
+-fixed problems with filenames encodings on some systems -> the new save file will not be compatible with previous versions
+-some fixes to folder filter-panel
+-new layout option to select on which parts of the window the scroll-wheel change the volume
+-added plugin system (experimental)
+-added audioscrobbler/last.fm plugin (password saved as clear text in save file for now)
+-added now_playing plugin
+-added 'Save' command with ~/.gmusicbrowser/gmusicbrowser.fifo to save tags/options immediately
+-the name of the saved sort/random/filter can now be edited in their edit window
+
+v0.936
+-added a folder filter-panel
+-preference dialog : removed most of the Library tab (mostly superseded by folder filter-panel)
+-fixed mass-renaming dialog not appearing from songlist context menu
+-added disk(%d) and year(%y) to mass-renaming dialog
+-added disk field to optional per-file fields in mass-tagging dialog
+-fixed comment field not read for ogg/flac files
+-improved static-list support
+-can play only selected songs (using a static list)
+-in queue edit window : sorting the list now sorts the queue
+
+v0.935
+-added .flac files support (flac files with ID3 tags not supported for now)
+-added rudimentary external control using ~/.gmusicbrowser/gmusicbrowser.fifo (supported commands : NextSong PrevSong PlayPause Stop Browser ShowHide Quit)
+-the probability of the current song being chosen is now shown in the weighted random dialog
+-fixed id3v1 tag written in utf8
+-fixed bug preventing custom list sorting
+-small fixes to filter editing menu
+
+v0.934
+-fixed "remove from library" in the songlist context menu
+-made rpm
+
+v0.933
+-now use mpg321/ogg123 by default if found because of stability problems with gstreamer
+-The queue edit window is back and much improved
+-if a cover.jpg file is found during scan, it is used as album cover if all songs in the folder have the same album name and no cover as been defined for this album
+-in Artist/Album menu (obtained from left-click on album/artist name on the small window), right click on an album display a submenu with song from the album, and right click on an artist display the list of album(s) by this artist
+-Fix bug preventing the deletion of files
+-Don't use saved window position if position is out of screen
+-small bug fixes
+
+v0.932
+fixed advanced tag editing : file not written if only id3v1 were modified
+Songlists scroll to current song on window creation (as before v0.930)
+double middle-click on a song in the songlist enqueue the song
+tray tip window now stays up as long as the mouse stays inside
+tray tip window hidden while the tray menu is up
+added an option to show tray tip on song change
+
+v0.931
+fixed context menu on the title of the playing song
+
+v0.930
+The player, browser and traytip window now all use the same layout engine,
+as a consequence the player window can now include a browser.
+(though interaction between player and browser elements is lacking)
+Layouts definitions are now in and the 'layouts' file, and additional layouts
+are loaded from ~/.gmusicbrowser/layouts
+Note that the syntax and features of the layouts are still experimental and
+may change in the future.
+Included a few new layouts('itunes-like','with search',...), mostly as examples
+of what is possible for now as they need polishing
+
+-default player window layout now displays the album cover
+-the default rating can now be changed
+-window position is now saved
+-can run without the Gtk2::TrayIcon module
+-added a repeat option in sort menu (ignored in weighted random mode)
+-addded context menu on playing artist/album name
+
+a number of bugs were fixed, most notably :
+-fixed custom pattern in mass-renaming dialog
+-fixed using the time slider in pause/stop mode
+-fixed flickering with the tray tip
+the queue edit window is closed for repairs
+
+v0.925
+added a trayicon
+
+v0.924
+bug fix for 0.923, for locales that don't use '.' as a decimal separator : play count was increased even if played for only 1 second
+
+v0.923
+small bug fixes for genre editing.
+minor improvements in alternate small window layouts.
+
+v0.922
+Improved scanning process
+now the length checking of mp3 without VBR header is done in the background,
+after the initial scan

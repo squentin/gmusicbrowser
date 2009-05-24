@@ -1,0 +1,173 @@
+.TH "gmusicbrowser" "1" "Feb 24, 2008" "gmusicbrowser" ""
+.SH "NAME"
+gmusicbrowser \- Jukebox for large collections of audio files
+
+.SH "SYNOPSIS"
+.B gmusicbrowser
+.RI
+[\-c]
+[\-s]
+[\-demo]
+[\-ro]
+[\-rotags]
+[\-play]
+[\-nodbus]
+[\-gst|\-nogst]
+[\-server]
+[\-port N]
+[\-C FILE]
+[\-F FIFO|\-nofifo]
+[\-debug]
+[\-layout NAME]
+[\-load FILE]
+[\-use\-gnome\-session]
+[\-cmd|\-launch_or_cmd CMD...]
+.br
+
+.B gmusicbrowser
+.RI
+\-listcmd
+
+.B gmusicbrowser
+.RI
+\-remotecmd CMD...
+
+.B gmusicbrowser
+.RI
+\-tagedit FOLDER_OR_FILE ...
+
+.SH "DESCRIPTION"
+This manual page explains the
+.B gmusicbrowser
+program.
+.PP
+\fBgmusicbrowser\fP can play and manage your songs, currently supports mp3, ogg, flac, mpc file formats.
+see http://gmusicbrowser.sourceforge.net/ for more informations.
+.SH "OPTIONS"
+.B
+.TP
+\fB\-c\fR
+don't check for updated/deleted songs on startup
+.TP
+\fB\-s\fR
+don't scan folders for songs on startup
+.TP
+\fB\-demo\fR
+don't check if current song has been updated/deleted
+.TP
+\fB\-ro\fR
+prevent modifying/renaming/deleting song files
+.TP
+\fB\-rotags\fR
+prevent modifying tags of music files
+.TP
+\fB\-play\fR
+start playing on startup
+.TP
+\fB\-gst\fR
+use gstreamer
+.TP
+\fB\-nogst\fR
+do not use gstreamer
+.TP
+\fB\-nodbus\fR
+do not use DBus
+.TP
+\fB\-server\fR
+send playing song to connected icecast client
+.TP
+\fB\-port N\fR
+listen for connection on port N in icecast server mode
+.TP
+\fB\-C FILE\fR
+use FILE as configuration file (instead of ~/.gmusicbroser/tags)
+.TP
+\fB\-F FIFO\fR
+use FIFO as named pipe to receive commans (instead of ~/.gmusicbroser/gmusicbrowser.fifo)
+.TP
+\fB\-nofifo\fR
+do not use/create named pipe $FIFOFile
+.TP
+\fB\-debug\fR
+print lots of useless informations
+.TP
+\fB\-layout NAME\fR
+use layout NAME for player window
+.TP
+\fB\-load FILE\fR
+Load FILE as a plugin
+.TP
+\fB\-use\-gnome\-session\fR
+Use gnome libraries to save tags/settings on session logout (needs the Gnome2 perl module).
+.TP
+\fB\-cmd CMD...\fR
+launch gmusicbrowser if not already running, and execute command CMD.
+.TP
+\fB\-remotecmd CMD...\fR
+execute command CMD in a running gmusicbrowser
+.TP
+\fB\-launch_or_cmd CMD...\fR
+launch gmusicbrowser if not already running OR execute command CMD in a running gmusicbrowser
+.TP
+\fB\-listcmd\fR
+list the available fifo commands and exit
+.TP
+\fB\-tagedit FOLDER_OR_FILE ...\fR
+Load songs in FOLDER_OR_FILE and display a dialog to edit their tags.
+
+.SH FILES
+.TP
+\fI~/.gmusicbrowser/tags\fP
+contains songs tags and program options
+.TP
+\fI/usr/share/gmusicbrowser/plugins/\fP, \fI~/.gmusicbrowser/plugins/\fP
+files with extention .pm in these folders are loaded as plugins on startup
+.TP
+\fI/usr/share/gmusicbrowser/layouts\fP, \fI~/.gmusicbrowser/layouts\fP
+contains layouts definitions
+.TP
+\fI~/.gmusicbrowser/gmusicbrowser.fifo\fP
+can be used to send commands to a running gmusicbrowser,
+eg : echo CMD >~/.gmusicbrowser/gmusicbrowser.fifo where CMD is (run "gmusicbrowser \-listcmd" for an up-to-date list of commands) :
+.TP
+\fBNextSong\fR
+Skip current song
+.TP
+\fBPrevSong\fR
+choose previously played song
+.TP
+\fBPlayPause\fR
+toggle Play/Pause mode
+.TP
+\fBStop\fR
+stop playing
+.TP
+\fBRewind\fR SEC
+rewind SEC seconds
+.TP
+\fBForward\fR SEC
+forward SEC seconds
+.TP
+\fBBrowser\fR
+open browser window
+.TP
+\fBShowHide\fR
+hide/show gmusicbrowser windows
+.TP
+\fBQuit\fR
+quit gmusicbrowser
+.TP
+\fBSave\fR
+immediately save settings/song tags in ~/.gmusicbrowser/tags
+.TP
+\fBChangeDisplay\fR DISPLAY
+migrate the program to display DISPLAY (example : ":1")
+
+.SH "SEE ALSO"
+http://squentin.free.fr/gmusicbrowser/gmusicbrowser.html,
+
+.SH "BUGS"
+If you wish to report a bug please use the reportbug(1) command.
+
+.SH "AUTHOR"
+Copyright (c) 2005-2008 Quentin Sculo <squentin@free.fr>

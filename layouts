@@ -1,0 +1,483 @@
+[default player layout]
+Type=G
+Default	= Window sticky=1
+HBButtons	= Vol Prev Stop Play Next Playlist Pref Quit
+HBIndic		= Sort 10Filter Queue 10Pos -Stars
+HBTitle		= Filler0 _Title LabelsIcons
+HBArtist	= LockArtist _Artist
+HBAlbum		= LockAlbum _Album -Date
+HBTime		= LabelTime Length _Scale
+VBmain		= HBButtons HBIndic _VBText -HBTime
+VBText		= 2HBTitle 2HBArtist 2HBAlbum
+HBmain		= _VBmain 2Filler1 -Cover
+HSize0		= Filler0 LockArtist LockAlbum Sort
+VolumeScroll	= HBmain
+ExtraWidgets	= button HBButtons(relief=none,pos=7)
+
+[with queue] based on default player layout
+VBmain2		= HBmain 5_VBQueue
+VBQueue		= _QueueList(group=1,hidewidget=VBQueue,hideif=empty,shrinkonhide=v) HBQueueButtons
+HBQueueButtons	= EditListButtons(group=1) 4QueueActions
+HBButtons	= Vol Prev Stop Play Next Choose Playlist Pref Quit
+
+[minimal]
+Type=G
+Default	= Window sticky=1
+HBmain	= Playlist Pref Play Next 5_ABTitle
+ABTitle = (xalign=0,yscale=0) Title_by(minsize=20)
+VolumeScroll	= HBmain
+
+[full] based on default player layout
+Type=T
+HBButtons =
+VBmain		= HBIndic _VBText -HBTime
+HBmain		= _VBmain 2Filler1 -Cover(forceratio=1)
+
+[full with buttons] based on default player layout
+Type=T
+HBmain		= _VBmain 2Filler1 -Cover(forceratio=1)
+
+[info]
+Type=T
+HBAlbum		= _Album -Date
+VBText		= Title(30) Artist HBAlbum
+HBmain		= _VBText 2Filler1 -Cover(forceratio=1)
+VolumeScroll	= HBmain
+
+[with browser]
+Type=G
+Default		= Window size=1120x820 HPbig 780 HPfp 164 VPlistAA 575 FPane0 page=artist FPane1 page=album
+HBIndic		= MBmenu Sort 10Filter Queue 10Pos
+MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem
+VBleft		= HBIndic HBButtons
+HBButtons	= Vol Prev Stop Play Next LabelTime Length 5_Scale
+HBupper		= VBleft _VBright 5-Cover
+HBTitle		= Filler0 _Title -Stars
+HBArtist	= LockArtist _Artist
+HBAlbum		= LockAlbum _Album -Date
+VBright		= 2HBTitle 2HBArtist 2HBAlbum
+VBmain		= HBupper 5HBstatus 5_HPbig
+HBstatus	= FBox 10MBlist ResetFilter Refresh PlayFilter FLock -Total
+MBlist		= HistItem LSortItem PlayItem
+HPbig		= _VPlistAA HPfp
+HPfp		= FPane0(nb=1) FPane1(nb=2)
+VPlistAA	= _SongList HBAA
+HBAA		= _AABox1(aa=artist) _AABox0(aa=album)
+HSize0		= Filler0 LockArtist LockAlbum
+VolumeScroll	= HBupper
+
+[with browser (SongTree)] based on with browser
+VPlistAA	= _SongTree HBAA
+
+[Browser]
+Type=B
+Default		= Window size=1120x820 HPfp 180 HPbig 780 VPlistAA 645 FPane0 page=artist FPane1 page=album
+VBmain		= HBstatus 5_HPbig
+HBstatus	= FBox 10MBlist ResetFilter Refresh PlayFilter FLock -Total
+MBlist		= HistItem LSortItem PlayItem
+HPbig		= _VPlistAA HPfp
+HPfp		= FPane0(nb=1) FPane1(nb=2)
+VPlistAA	= _SongList HBAA
+HBAA		= _AABox1(aa=artist) _AABox0(aa=album)
+
+
+[Smaller browser]
+Type=B
+Default		= Window size=1120x820 HPfp 180 HPbig 780 VPlistAA 645 FPane0 page=artist FPane1 page=album
+VBmain		= HBstatus 5_HPbig
+HBstatus	= FBox 10MBlist ResetFilter Refresh PlayFilter FLock
+MBlist		= HistItem LSortItem PlayItem
+HPbig		= _VPlistAA HPfp
+HPfp		= FPane0(nb=1) FPane1(nb=2)
+VBleft		= Total _SongList
+VPlistAA	= _VBleft HBAA
+HBAA		= _AABox1(aa=artist) _AABox0(aa=album)
+
+
+[Browser with SongTree] based on Browser
+VPlistAA	= _SongTree HBAA
+
+[3 Filter panes] based on Browser
+Type=B
+Default		= Window size=1120x820 HPfp1 126 HPbig 748 HPfp2 126 VPlistAA 656 FPane0 page=savedtree FPane1 page=artist FPane2 page=album
+HPfp		= _FPane0(nb=1) HPfp2
+HPfp2		= _FPane1(nb=2) FPane2(nb=3)
+
+[itunes-like]
+Type=G
+Default		= Window size=1120x820,hidden=QueueList VPfp_list 120 HPfp0 300 HPfp_list_src 175
+HBIndic		= MBmenu Sort 10Filter Queue 10Pos
+MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem SMView
+SMView		= (label=_"View") MenuItem0(togglewidget=FPane0,label=_"Genres pane")  MenuItem1(togglewidget=HPfp0,label=_"Categories pane") MenuItem2(togglewidget=FPane3,label=_"Left pane") MenuItem3(togglewidget=QueueList,label=_"Queue")
+VBleft		= HBIndic _HBButtons
+HBButtons	= Prev Play Next LabelTime Length _Scale
+HBupper		= VBleft 5_VBright -VBVol 5-Cover
+VBVol		= Vol _VolSlider(1,0)
+HBTitle		= Filler0 _Title -Stars
+HBArtist	= LockArtist _Artist
+HBAlbum		= LockAlbum _Album -Date
+VBright		= 2HBTitle 2HBArtist 2HBAlbum
+VBmain		= HBupper 5_HPfp_list_src
+HPfp_list_src	= FPane3(nb=1,hide=1,pages=savedtree) _VPfp_list
+VPfp_list	= HPfp0 _VBlist
+VBlist		= HBstatus _VPlists
+VPlists		= _SongList QueueList(group=2)
+HBstatus	= SimpleSearch MBlist Refresh ResetFilter PlayFilter -Total
+HPfp0		= FPane0(nb=2,hide=1,pages=genre) HPfp1
+HPfp1		= FPane1(nb=3,hide=1,pages=artist) FPane2(nb=4,hide=1,pages=album)
+MBlist		= HistItem LSortItem PlayItem
+HSize0		= Filler0 LockArtist LockAlbum
+VSize1		= 50 VolSlider
+VolumeScroll	= HBupper
+
+[with search] based on default player layout
+VBmain2		= HBmain 2HBsearch _SongList(hideif=nofilter)
+HBsearch	= FBox ResetFilter PlayFilter
+
+[with playlist] based on default player layout
+Type=G
+VBmain2		= HBmain 2HBsearch _SongList(playlist)
+HBsearch	= FBox ResetFilter
+
+[Search]
+Type=S
+Default		= Window size=320x540
+Title		= _"Search"
+TBmain		= _"Artist" AASearch0(aa=artist,buttons=1) _"Album" AASearch1(aa=album,buttons=1) _"Song" SongSearch(activate=play,buttons=1)
+DefaultFocus	= TBmain
+
+[Quick Search]
+Type=S
+Title		= _"Search"
+Default		= Window size=620x540
+VBmain		= SimpleSearch(activate=SetFocusOn(SongList)) _SongList(activate=play&CloseWindow)
+DefaultFocus	= SimpleSearch
+KeyBindings	= Escape CloseWindow
+
+[Quick Search with SongTree]
+Type=S
+Title		= _"Search"
+Default		= Window size=620x540
+VBmain		= SimpleSearch(activate=SetFocusOn(SongTree)) _SongTree(activate=play&CloseWindow)
+DefaultFocus	= SimpleSearch
+KeyBindings	= Escape CloseWindow
+
+[Queue]
+Type=Q
+Title=Queue Edit
+Default		= Window size=500x300
+VBmain		= 3_QueueList(activate=play) HBButtons
+HBButtons	= EditListButtons 4QueueActions
+
+[EditList]
+Title=List Edit
+Default		= Window size=500x300
+VBmain		= 3_SongList(activate=playlist) EditListButtons
+
+[Context]
+Type=C
+Title=Context
+Default		= Window size=500x300
+VBmain		= _Context
+
+[Playlist]
+Type=G
+Default		= Window size=1120x820 HPfp0 180 HPfp_list 780 FPane0 page=artist FPane1 page=album
+HBIndic		= MBmenu Sort 10Filter Queue 10Pos
+MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem HistItem PlayItem
+VBleft		= HBIndic _HBButtons
+HBButtons	= Prev Play Next LabelTime Length _Scale
+HBupper		= VBleft 5Cover 5_VBright -VBVol
+VBVol		= Vol _VolSlider(1,0)
+HBTitle		= Filler0 _Title -Stars
+HBArtist	= LockArtist _Artist
+HBAlbum		= LockAlbum _Album -Date
+VBright		= 2_HBTitle 2_HBArtist 2_HBAlbum
+VBmain		= HBupper 5_HPfp_list
+HPfp_list	= _SongList(playlist) HPfp0
+HPfp0		= FPane0(nb=1) FPane1(nb=2)
+HSize0		= Filler0 LockArtist LockAlbum
+VSize1		= 50 VolSlider
+VolumeScroll	= HBupper
+
+[with browser & queue] based on with browser
+Default		= Window size=1120x820 HPbig 780 HPfp 164 VPlistAA 575 FPane0 page=artist FPane1 page=album VPBrowserQueue 570
+HPbig		= _VPBrowserQueue HPfp
+VPBrowserQueue	= _VPlistAA VBQueue
+VBQueue		= _QueueList(group=1,hidewidget=VBQueue,hideif=empty) HBQueueButtons
+HBQueueButtons	= EditListButtons(group=1) 4QueueActions
+
+[quodlibet-like]
+Type=G
+Default		= Window size=700x600,sticky=1 HPbrowser 160_600 FPane0 artistinfo=1,albumpsize=32,albuminfo=1
+MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem
+HBButtons1	= Prev Play Next
+HBButtons2	= Playlist Pref Quit
+VBButtons	= HBButtons1 HBButtons2
+HBTitle		= Filler0 _Title -Stars
+HBArtist	= LockArtist _Artist
+HBAlbum		= LockAlbum _Album -Date
+HBTime		= LabelTime Length _Scale
+VBText		= 2HBTitle 2HBArtist 2HBAlbum
+HBleft		= VBButtons 5_VBText
+HBmenu		= MBmenu 5Sort 5Filter 5Queue 5Pos
+VBleft2		= HBmenu HBleft 3HBTime
+VBVol		= Vol _VolSlider(1,0)
+HBupper		= _VBleft2 -VBVol 5-Cover
+HPbrowser	= FPane0(nb=1) _SongList
+VBmain		= HBupper 5_HPbrowser
+HSize0		= Filler0 LockArtist LockAlbum
+VolumeScroll	= HBupper
+
+[with playlist & context] based on default player layout
+Default		= Window size=820x500
+VBleft		= HBmain 4_SongList(playlist)
+HPmain		= VBleft _Context
+
+[with tabbedlists] based on default player layout
+Default		= Window size=820x500
+VBglobal	= HBmain 4_TabbedLists
+#VBglobal	= HBmain 4_HPLists
+#HPLists	= HPfpanes _TabbedLists
+#HPfpanes	= FPane1(nb=1,hide=1) FPane2(nb=2,hide=1)
+
+[Search & Queue] based on default player layout
+Default		= Window size=760x540
+VBright		= HBmain 5_QueueList HBQueueButtons
+HBQueueButtons	= EditListButtons QueueActions
+HPmain		= _TBaa VBright
+TBaa		= _"Artist" AASearch0(aa=artist) _"Album" AASearch1(aa=album) _"Song" SongSearch _"Context" Context
+
+[Search & Playlist] based on default player layout
+Default		= Window size=760x540
+VBright		= HBmain 5_SongList(playlist)
+HPmain		= _TBaa VBright
+TBaa		= _"Artist" AASearch0(aa=artist,activate=addplay) _"Album" AASearch1(aa=album,activate=addplay) _"Song" SongSearch(activate=play) _"Context" Context
+
+[Queue, Library & Context]
+Type=G
+Default		= Window size=1120x820 FPane0 page=genre FPane1 page=artist FPane2 page=album,albumpsize=32,albuminfo=1 QueueList cols=track_titleaa_length_nbplay_rating VPRight 200_550
+MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem
+MBlist 		= HistItem LSortItem PlayItem
+HBmenu		= _MBmenu
+HBButtons1	= Prev Stop Play Next 5-Vol -Pref -Playlist(toggle)
+HBButtons3	= 5Sort 5Filter 5Queue 5Pos -Stars
+HBTime		= LabelTime Length _Scale
+HBTitle		= Filler0 _Title
+HBArtist	= LockArtist _Artist
+HBAlbum		= LockAlbum _Album -Date
+VBText		= HBButtons1 2HBTitle 2HBArtist 2HBAlbum HBTime
+HBText_Cover	= _VBText 5-Cover
+VBplayer	= HBButtons3 HBText_Cover
+VBLeft		= VBplayer 5_QueueList(group=1) HBQueueButtons
+HBQueueButtons	= EditListButtons(group=1,small=1) 4QueueActions
+HPfp1		= FPane1(nb=2,hide=1) FPane2(nb=3,hide=1)
+HPfp0	 	= FPane0(nb=1,hide=1) HPfp1
+HBSongList	= FBox -FLock -PlayFilter -Refresh -ResetFilter -MBlist
+VBSongList	= HBSongList _SongList
+VPRight		= HPfp0 _VBSongList
+TBRight		= _"Library" VPRight _"Context" Context
+HPBottom	= VBLeft _TBRight
+VBmain		= HBmenu 5_HPBottom
+HSize0		= Filler0 LockArtist LockAlbum
+VolumeScroll	= VBplayer
+ExtraWidgets	= button HBButtons1(pack=-,relief=none)
+
+[with context] based on default player layout
+VBmain2		= HBmain HSeparator _Context
+
+[left-side filter panes] based on Browser
+Default		= Window size=1120x820 HPfp 180 HPbig 360 VPlistAA 645 FPane0 page=artist FPane1 page=album
+VBmain		= HBstatus 5_HPbig
+HBstatus	= FBox 10MBlist ResetFilter Refresh PlayFilter FLock -Total
+MBlist		= HistItem LSortItem PlayItem
+HPbig		= HPfp _VPlistAA
+HPfp		= FPane0(nb=1) FPane1(nb=2)
+VPlistAA	= _SongList HBAA
+HBAA		= _AABox1(aa=artist) _AABox0(aa=album)
+
+[default fullscreen]
+Type=F
+Default		= Window fullscreen=1,sticky=0
+HBPics		= _ArtistPic(maxsize=0) _Cover(maxsize=0)
+HBButtons1	= Prev(size=dialog) Next(size=dialog)
+HBButtons2	= Stop(size=dialog) Play(size=dialog)
+VBButtons	= (border=20) _HBButtons1 _HBButtons2
+VBVol		= Vol(size=dialog) _VolSlider
+HBLower		= VBButtons _VBText 20VBVol
+HBIndic		= 10Sort(size='large_toolbar') 10Filter(size='large_toolbar') Queue(size='large_toolbar') 10Pos -Stars
+HBTitle		= Filler0 _Title
+HBArtist	= LockArtist(size='large_toolbar') _Artist
+HBAlbum		= LockAlbum(size='large_toolbar') _Album -Date
+HBTime		= LabelTime Length _Scale
+VBmain		= (border=20) _HBPics FBLower
+FBLower		= .1,0,.8,0 HBLower
+VBText		= HBIndic 2HBTitle 2HBArtist 2HBAlbum -HBTime
+VolumeScroll	= VBmain
+HSize0		= Filler0 LockArtist LockAlbum
+DefaultFont	= 20
+KeyBindings	= Escape CloseWindow
+
+[Playlist, Library & Context]
+Type=G
+Default         = Window size=1120x820 SongList2 cols=playandqueue_track_titleaa_length_nbplay_rating VPRight 200_550
+VBLeft          = VBplayer 5_SongList2(mode=playlist,group=1) EditListButtons(group=1,small=1)
+HBButtons1	= Vol Prev Stop Play Next
+VBSongList	= HBSongList _SongList(activate=addplay)
+MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem
+MBlist 		= HistItem LSortItem PlayItem
+HBmenu		= _MBmenu
+HBButtons3	= 5Sort 5Filter 5Queue 5Pos -Stars
+HBTime		= LabelTime Length _Scale
+HBTitle		= Filler0 _Title
+HBArtist	= LockArtist _Artist
+HBAlbum		= LockAlbum _Album -Date
+VBText		= HBButtons1 2HBTitle 2HBArtist 2HBAlbum HBTime
+HBText_Cover	= _VBText 5-Cover
+VBplayer	= HBButtons3 HBText_Cover
+HPfp1		= FPane1(nb=2,hide=1) FPane2(nb=3,hide=1)
+HPfp0	 	= FPane0(nb=1,hide=1) HPfp1
+HBSongList	= FBox -FLock -PlayFilter -Refresh -ResetFilter -MBlist
+VPRight		= HPfp0 _VBSongList
+TBRight		= _"Library" VPRight _"Context" Context
+HPBottom	= VBLeft _TBRight
+VBmain		= HBmenu 5_HPBottom
+HSize0		= Filler0 LockArtist LockAlbum
+VolumeScroll	= VBplayer
+ExtraWidgets	= button HBButtons1(relief=none)
+
+[Fullscreen simple]
+Type=F
+Default		= Window fullscreen=1,sticky=0
+HBPics		= _ArtistPic(maxsize=0) _Cover(maxsize=0)
+HBButtons1	= Prev(size=dialog) Next(size=dialog)
+HBButtons2	= Stop(size=dialog) Play(size=dialog)
+VBButtons	= _HBButtons1 _HBButtons2
+HBLower		= VBButtons _VBText
+HBTitle		= Filler0 _Title
+HBArtist	= LockArtist(size='large_toolbar') _Artist
+HBAlbum		= LockAlbum(size='large_toolbar') _Album -Date
+HBTime		= LabelTime Length _Scale
+VBmain		= (border=20) _HBPics FBLower
+FBLower		= .1,0,.8,0 HBLower
+VBText		= 2HBTitle 2HBArtist 2HBAlbum -HBTime
+VolumeScroll	= VBmain
+HSize0		= Filler0 LockArtist LockAlbum
+DefaultFont	= 20
+KeyBindings	= Escape CloseWindow
+
+
+#SongTree Group & Columns definitions
+#####################################
+
+{Group pic}
+title= with picture
+head=title:h
+vcollapse=head
+vmin=pic:y+pic:h+2
+left=pic:w+2
+#title:	text(markup='<b><big>'.pesc($title).'</big></b>',pad=2)
+title:	text(pad=2, markup='<span font_desc="'.myfont.'">'.pesc($title).\
+		if(showyear && $year,' <small>('.pesc($year).')</small>').'</span>',\
+		init_markup='<span font_desc="'.myfont.'"> </span>',)
+pic:	+aapic(y=title:h+title:y+4,picsize=picsize,ypad=2)
+
+picsize : OptionNumber(default=100,min=20,max=1000,step=10)
+showyear : OptionBoolean(default=1,name='show year')
+myfont : OptionFont(default='Arial Bold 18',name='font')
+
+{Group simple}
+title= Simple title
+head=title:h
+left=4
+vcollapse=head
+title: text(markup='<b><big>'.pesc($title).'</big></b>',pad=4)
+
+{Group artistalbumside}
+title=album and artist on the left side
+vmin= pic:y + pic:h +2
+left=width
+title:	text(markup='<b><big>'.pesc($album).'\n'.pesc($artist).'</big></b>',pad=2,w=left)
+pic:	aapic(y=title:y + title:h +2, picsize=min(picsize,width), pad=2)
+width:	OptionNumber(default=200,min=20,max=1000,step=10)
+picsize : OptionNumber(default=100,min=20,max=1000,step=10)
+
+{Column testtitleandprogress}
+title=title & progress
+sort=album title
+width=200
+songbl=text
+hreq=text:h
+progress: pbar( fill=$progress, hide=!$playing,y=1,h=-2)
+text: text(markup=playmarkup(pesc($title)))
+
+{Column playandqueue}
+menutitle = Playing & Queue
+width = 20
+ico:	icon(pad=2,icon=$playicon)
+
+{Column icolabel}
+menutitle= Labels' Icons
+sort = label
+width = 50
+ico : icon(pad=2,icon=$labelicons)
+
+{Column titleaa}
+menutitle = Title - Artist - Album
+title = Song
+hreq=text:h
+width=200
+sort= title
+text : text(markup='<b>'.pesc($title).'</b>\n<small><i>'.pesc($artist).'</i> - '.pesc($album).'</small>',pad=2)
+
+{Column titleandicon}
+title = title & icon
+sort = title
+width = 200
+songbl= text
+hreq = text:h
+text : text(pad=2,markup=playmarkup(pesc($title)),w=-icolabel:w)
+icolabel : icon(pad=2,x=text:w,icon=$labelicons)
+
+{Column tiltefile}
+title = title or filename
+sort = title
+width = 200
+songbl = text
+hreq = text:h
+text : text(text=(if($title ne '', $title, $ufile)))
+
+{Column albumminipic}
+title = Small album picture
+sort = album
+width = 20
+hreq = 20
+album  : aapic(picsize=$_h,aa='album',aakey=$album)
+
+{Column ratingpic}
+title = Rating
+menutitle = Rating (picture)
+sort = rating
+width=100
+#hreq = pic:h
+#pic : picture(file=ratingpic($rating),init_file=ratingpic(0))
+pic : picture(file=ratingpic($rating),h=$_h,w=$_w,resize='ratio',init_file=ratingpic(0))
+
+{Group artistalbum}
+title=album and artist
+head=title:h
+vcollapse=head
+vmin=pic:y+pic:h+2
+left=pic:w+2
+title2:	text(markup='<b><big>'.pesc($artist).'</big></b>',pad=2,x=-title2:w)
+#title2:	text(markup='by <b><big>'.pesc($artist).'</big></b>',pad=2,x=title:w)
+#title:	text(markup='<b><big>'.pesc($album).'</big></b> ',pad=2)
+title:	text(markup='<b><big>'.pesc($album).'</big></b> ' . if($year,'<small>('.pesc($year).')</small>'),pad=2)
+pic:	+aapic(y=title:h+title:y+4,picsize=picsize,ypad=2,aakey=$album,aa='album')
+picsize : OptionNumber(default=100,min=20,max=1000,step=10)
+
+
+[Equalizer]
+Default		= Window size=300x160
+VBmain		= _Equalizer
+Title		= Equalizer

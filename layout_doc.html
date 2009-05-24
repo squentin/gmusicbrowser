@@ -1,0 +1,415 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>gmusicbrowser - layout documentation</title>
+  <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="icons/favicon.ico" type="image/x-icon">
+
+<style>
+p.code
+{	border-style : solid;
+	border-width : thin;
+	background-color: #eee;
+	padding : 0 .5em 0 .5em;
+}
+code
+{	color: #000;
+	background-color: #eee;
+	padding : 0 .5em 0 .5em;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="content">
+<h2>gmusicbrowser - layout documentation</h2>
+<i>(the syntax is evolving, but I try to support backward compatibility)</i><br>
+Updated on 08-07-2008 : added the forgotten Button widget, and the stock option that can be used by buttons widget<br>
+Updated on 06-07-2008 : added the forgotten markup option for labels widget, and the %-letters section<br>
+Updated on 06-05-2008 for gmusicbrowser v0.964<br>
+<br>
+Gmusicbrowser's interface is defined by layouts.<br>
+Layouts are found in 2 places:
+<ul>
+<li>the default layouts installed with gmusicbrowser are in /usr/share/gmusicbrowser/layouts when installed</li>
+<li>custom layouts can be added by placing them in ~/.config/gmusicbrowser/layouts (or ~/.gmusicbrowser/layouts if you have started using gmusicbrowser before v0.963), which can be either a file or a folder containing multiple .layout files (read in alphabetical order)</li>
+</ul>
+
+layout file format :<br>
+<p class=code><code><br>
+[layout id]<br>
+key1 = value<br>
+key2 = value<br>
+...<br>
+</code></p>
+<i>As of version 0.962, layouts file can contain group and column definition for the SongTree widget. See the <a href="http://squentin.free.fr/gmusicbrowser/dokuwiki/doku.php?id=customization:songtree">SongTree documentation</a> for details.</i><br>
+<br>
+long lines can be be splitted in multiple lines by ending them with a backslash<br>
+<br>
+<i>Very</i> simple example, with 3 buttons (settings, play/pause, and open browser window) and the current song title  :<br>
+<p class=code><code><br>
+[very simple]<br>
+Type = G<br>
+HBox = Pref Play Playlist _Title<br>
+</code></p>
+Type=G (G for generic) is used to make it appear in the player layouts list in the settings dialog. The _ before Title is used to make the Title use all the available space in the horizontal box (HBox) it is packed in.<br>
+<br>
+Look in the layout file for more examples.<br>
+<br>
+Keys define either containers or properties.<br>
+Keys are unique for a layout, duplicate key definitions replace the previous one.<br>
+There are currently 6 properties keys (Type, Name, Default, Title, KeyBindings, ExtraWidgets) which I'll describe later.<br>
+If the name of the key begins with one of : HB,VB,HP,VP,MB,EB,TB the key is the name of a container that will contain widgets (also called layout elements or controls) or other containers<br>
+For containers the value is a list of widgets and containers, separated by a space, preceded by optional packing options, the widget names can be followed by a number(to have multiple widgets of the same name) and its options between parentheses<br>
+<br>
+There must be one, and only one, container which has no parent, this container will be put in the layout window.<br>
+<br>
+
+<h3>Normal containers</h3>
+Containers options can be specified in parenthesis before the child widgets list, example : <code>HBname = (option1=value1,option2=value2) widget1 widget2</code>, all containers accept the option border, that specify the amount of padding around the container.
+<dl>
+<dt><b>HB/VB</b> : Horizontal/Vertical Boxes (based on <a href=http://developer.gnome.org/doc/API/2.0/gtk/GtkBox.html>GtkBox</a>)</dt><dd>
+	optional packing options are : (they must be in this order)
+	<ul>
+	<li>number&nbsp;&nbsp;: padding (in pixels)</li>
+	<li>_&nbsp;&nbsp;: expand (the widget will use all remaining space in the container)</li>
+	<li>-&nbsp;&nbsp;: right aligned</li>
+	</ul>
+	example : <code>HBname = 2_-widget1(opt1=val,opt2=val) -widget2 2container3</code><br>
+	Cover and ArtistPic widgets are treated specially, they ignore the expand mode, and expand until they reach a square size. example : in a HBox which has a height of 30, a Cover widget will use available space to expand if it has a width less than 30.<br>
+</dd>
+<dt><b>HP/VP</b> : Horizontal/Vertical Panes (based on <a href=http://developer.gnome.org/doc/API/2.0/gtk/GtkPaned.html>GtkPaned</a>)</dt><dd>
+	Same as HB/VB but they contain only 2 widgets<br>
+	And they only have one packing options : _ : expand<br>
+</dd>
+<dt><b>TB</b> : Notebook (based on <a href=http://developer.gnome.org/doc/API/2.0/gtk/GtkNotebook.html>GtkNotebook</a>)</dt><dd>
+	each widget is in a tab, no packing options but the syntax is a bit different, each widget is preceded by the tab title<br>
+	the title can have spaces by using quotes<br>
+	example : <code>TBname = title1 widget1(options) "title with spaces" widget2(options) title3 container3</code>
+</dd>
+<dt><b>EB</b> : Expander (based on <a href=http://developer.gnome.org/doc/API/2.0/gtk/GtkExpander.html>GtkExpander</a>)</dt><dd>
+	contains only one widget/container which can be showed/hidden<br>
+	option : label : text for the optional widget
+	syntax : <code>FBname = (label="optional label") widget1</code><br>
+	or : <code>FBname = widget1</code><br>
+</dd>
+<dt><b>FB</b> : Fixed (based on <a href=http://developer.gnome.org/doc/API/2.0/gtk/GtkFixed.html>GtkFixed</a>)</dt><dd>
+	Each widget is positionned at precise coordinates<br>
+	syntax : <code>FBname = x1,y1 widget1 x2,y2,w2,h2 widget2 ...</code><br>
+	The widget is positioned at the x,y coordinate.<br>An optional width and height can follow the coordinates, to specify how much space the widget should use. An height or width of 0 means leave it as default.<br>x,y,w,h can be relative to the width/height of the container by preceding the number with '.'<br>x,y can be relative to the right/bottom border by prefixing it with '-'.
+</dd>
+<dt><b>MB</b> : Menus</dt><dd>They can contain only MenuItem widgets or SM containers, no packing options</dd>
+<dt><b>SM</b> : Submenu</dt><dd>
+	They can contain only MenuItem widgets or SM containers, no packing options, label is set with the label container option
+</dd>
+<dt><b>FR</b> : Frame (based on <a href=http://developer.gnome.org/doc/API/2.0/gtk/GtkFrame.html>GtkFrame</a>)</dt><dd>
+	Draw a border around its child, with an optional label.<br>
+	<table>
+	<tr><td>shadow</td>	<td>none, in, out, etched-in (default), etched-out</td></tr>
+	<tr><td>label</td>	<td>text of the label</td></tr>
+	</table>
+</dd>
+<dt><b>SB</b> : Scrolled window (based on <a href=http://developer.gnome.org/doc/API/2.0/gtk/GtkScrolledWindow.html>GtkScrolledWindow</a>)</dt><dd>
+	Adds scrollbars to its child.<br>
+</dd>
+<dt><b>AB</b> : Alignment (based on <a href=http://developer.gnome.org/doc/API/2.0/gtk/GtkAlignment.html>GtkAlignment</a>)</dt><dd>
+	Controls the alignment and size of its child<br>
+	options :
+	<table>
+	<tr><td>xalign</td>	<td>Horizontal position of child in available space, value between 0(left) and 1(right), default to .5 (center)</td></tr>
+	<tr><td>yalign</td>	<td>Vertical position of child in available space, value between 0(top) and 1(bottom), default to .5 (center)</td></tr>
+	<tr><td>xscale</td>	<td>If available horizontal space is bigger than needed for the child, how much of it to use for the child. 0.0 means none, 1.0 means all (default :1)</td></tr>
+	<tr><td>yscale</td>	<td>If available vertical space is bigger than needed for the child, how much of it to use for the child. 0.0 means none, 1.0 means all (default :1)</td></tr>
+	</table>
+</dd>
+</dl>
+
+<h3>Special containers</h3>
+There is also 2 special containers, widgets in these containers must belong to a normal container, and as the widget is defined elsewhere, widgets options can not be set here.<br>
+<dl>
+<dt><b>HSize/VSize</b> : Size groups (see <a href=http://developer.gnome.org/doc/API/2.0/gtk/GtkSizeGroup.html>GtkSizeGroup</a>)</dt><dd>Force all widgets to have the same Horizontal/Vertical size, if the list of widgets begin with a number, the first widget Horizontal/Vertical size will be set to this number (in pixels)<br>
+	example : <code>HSize0 = 20 widget1 widget2</code> or <code>HSize1 = widget1 widget2</code>
+</dd>
+<dt><b>VolumeScroll</b> :</dt><dd>A unique virtual container (must be the exact name), for all widgets inside, the scroll wheel will modify the volume (unless the scroll event is intercepted, like in a scrollable list)
+</dd>
+</dl>
+
+<h3>Properties keys</h3>
+<dl>
+<dt><b>Title</b> :</dt><dd>Set a title for the window instead of the default : songtitle by artist ('%S by %a') (see <a href="#songvar">%-letters</a>)<br>
+	<code>Title = gmusicbrowser playing %S by %a from %l</code>
+	</dd>
+<dt><b>Type</b>	:</dt><dd>A String of letters defining the type(s) of a layout, possible types : B(Browser window), T(Tray window), G(Generic or player window), F(Fullscreen), S(Search), P(Page for use in TabbedLists <i>experimental</i>)</dd>
+<dt><b>Name</b> :</dt><dd>Set the name of the layout displayed in the settings dialog. The default name is the layout id. Contrary to the layout id, the Name can be changed without losing the layout's saved settings (window size, ...)<br>
+	</dd>
+<dt><b>Default</b> :</dt><dd>Default options used when the layout has no saved state, contains a space-separated list of keys and values, by pair,<br><code>widget_or_container_name widget_or_container_variable_options</code><br>
+	There is a special key : Window, for the window properties : pos, size (format is numberxnumber for pos and size), sticky, ontop, below, fullscreen (0 or 1 for these)<br>
+	  example :<br>
+	  <code>Default = Window size=1120x820,sticky=0 HPbig 780 FPane0 page=artist</code>
+	  </dd>
+<dt><b>KeyBindings</b> :</dt><dd>Pairs of keys and action, example :<br>
+	<code>KeyBindings = Insert OpenSearch c-q EnqueueSelected c-Insert OpenCustom(a layout id)</code><br>
+	key names are as shown in the key binding tab in the settings dialog
+	action names can be found by running gmusicbrowser with command-line option -listcmd</dd>
+<dt><b>DefaultFocus</b> :</dt><dd>name of a widget in the layout<br>
+	set which widget gets the initial focus in the window, will probably only work with very simple widgets and with SongList, SongTree and SimpleSearch for now (let me now if you'd like more)</dd>
+<dt><b>ExtraWidgets</b> : Allows the addition of extra widgets to the layout (by options or plugin), for each widget types (only button exist now, I expect to add tab or menuitem in the future) a container can be specified where widgets of this type will be added.<br>syntax : <code>ExraWidgets = button container(option1=value1,option2=value)</code><br>the option pack contains packing options as defined above for the container (for example '_' for expand in HBoxes). When the container is a HBox/VBox, the option pos=number can be used to specify at which position the widgets will be inserted. If the added widget s a button, the option relief can be used to specify the button's relief (none, half or normal)</dt><dd></dd>
+</dl>
+<br><br>
+A layout can be derived from a previously defined layout by adding " based on " followed the name of the reference layout :<br>
+<code>[layout id] based on another layout id</code><br>
+In this case the layout starts with all the key definitions of the other layout<br>
+each key can be re-defined or deleted (if nothing follow the '=')<br>
+<br>
+<br>
+<h3>Widgets list</h3>
+Most widget options are optional, '' means any other value =&gt; default behaviour<br>
+All widgets options are use this format : <code>key1=val1,key2=val2,...</code>, some still accept the old format <code>val1,val2,...</code> for backward compatibility<br>
+The widgets are listed with this format :<br>
+<table><tr><td>WidgetName</td>	<td>Widget Description</td></tr>
+<tr><td></td><td><table>
+	<tr><td>optionkey1</td>	<td>option description and/or possible values</td></tr>
+	<tr><td>optionkey2</td>	<td>...</td></tr>
+</table></td></tr></table>
+<br>
+<br>
+<h4>widgets related to playing song</h4>
+<table>
+<tr><td>Album</td>	<td>Currently playing Album</td></tr>
+<tr><td>Artist</td>	<td>Currently playing Artist</td></tr>
+<tr><td>Comment</td>	<td>Comment of currently playing song</td></tr>
+<tr><td>Cover</td>	<td>Album cover of currently playing song
+<tr><td></td><td><table>
+	<tr><td>forceratio</td>	<td>1 or 0, if 1 always request a square size, useful for tray tip windows as they can't be resized</td></tr>
+	<tr><td>minsize</td>	<td>minimum size</td></tr>
+	<tr><td>maxsize</td>	<td>maximum size (default is 500)</td></tr>
+	</table></td></tr>
+<tr><td>ArtistPic</td>	<td>Artist picture of currently playing song. Same options as Cover. With multiple artists, displays only one picture unless the option multiple was given, which can be set to v (vertical) or h (horizontal)</td></tr>
+<tr><td>Date</td>	<td>Year of currently playing song</td></tr>
+<tr><td>LabelTime</td>	<td>Position of currently playing song</td></tr>
+<tr><td>Length</td>	<td>Length of currently playing song</td></tr>
+<tr><td>LockAlbum</td>	<td>Album lock</td></tr>
+<tr><td>LockArtist</td>	<td>Artist lock</td></tr>
+<tr><td>Pos</td>	<td>Position of currently playing song in the playlist</td></tr>
+<tr><td>Title</td>	<td>Currently playing Title</td></tr>
+<tr><td>Title_by</td>	<td>Currently playing Title and Artist</td></tr>
+<tr><td>Scale</td>	<td>Playing position slider</td></tr>
+<tr><td>Stars</td>	<td>Currently playing Rating</td></tr>
+<tr><td>LabelsIcons</td><td>Icons for currently playing labels for which an icon is defined in ~/.config/gmusicbrowser/icons/ (by a .png or .svg named "label-" followed by the label name.)</td></tr>
+<tr><td>Visuals</td>	<td>Eye candy, only with gstreamer</td></tr>
+</table>
+<h5>Options common to the label widgets</h5>
+The label widgets include : Album, Artist, Comment, Date, Length, LabelTime, Pos, Title, Title_by and Label<br>
+<ul>
+<li>'font' : can e used to change the font, the value is passed to the function <a href="http://developer.gnome.org/doc/API/2.0/pango/pango-Fonts.html#pango-font-description-from-string">pango_font_description_from_string</a>.</li>
+<li>'minsize' : if set (it is set by default for Album, Artist, Comment, Title, Title_by), the label will request a minimum width (it can have more if packed with the expand option in a container), if the width is not enough to display the text, the text will scroll on mouseover. The value of the minsize option is the width it will request : the unit is in pixels if followed by a 'p' or in the width of the 'X' character if it is only a number</li>
+<li>'markup' : can be used to re-define the text displayed, you can use <a href="#songvar">%-letters</a> (like %t, %a, ...) for current-song dependent text, and <a href=http://library.gnome.org/devel/pango/unstable/PangoMarkupFormat.html">pango markup</a> (like &lt;b&gt;...&lt;/b&gt;)for formatting.</li>
+<li>'xalign' : horizontal alignement as a value between 0 (left) and 1 (right), .5 being center</li>
+<li>'yalign' : vertical alignement as a value between 0 (up) and 1 (bottom), .5 being center</li>
+</ul>
+
+<h4>player buttons widgets</h4>
+<table>
+<tr><td>Next</td>	<td>Next button</td></tr>
+<tr><td>Play</td>	<td>Play/Pause button</td></tr>
+<tr><td>Prev</td>	<td>Previous button</td></tr>
+<tr><td>Stop</td>	<td>Stop button</td></tr>
+<tr><td>Quit</td>	<td>Quit button</td></tr>
+
+<tr><td>BContext</td>	<td>Button to open context window</td></tr>
+<tr><td>Playlist</td>	<td>Button to open Browser window</td></tr>
+<tr><td>Pref</td>	<td>Button to open Settings window</td></tr>
+<tr><td>ChooseAlbum</td><td>Open a window to select an album</td></tr>
+<tr><td>OpenQueue</td>	<td>Open a queue window</td></tr>
+<tr><td>Fullscreen</td>	<td>Button to switch to/from fullscreen mode</td></tr>
+<tr><td>ChooseRandAlbum</td><td>Button to select an album at random, option "action" can be playlist, addplay, insertplay, queue or replacequeue</td></tr>
+</table>
+<br>
+The BContext, Playlist and OpenQueue buttons accept the option 'toggle', if true (=1) the button will close the opened window if it is already opened<br>
+All buttons can be changed to an indicator(no button border, smaller) with the option button=0<br>
+Relief can be changed for buttons by using the option relief=none (default), half or normal.<br>
+Size of buttons and indicators can be set to menu, small-toolbar, large-toolbar, button, dialog, dnd (the actual size depends on gtk settings)<br>
+
+
+<h4>player indicators widgets</h4>
+<table>
+<tr><td>Filter</td>	<td>Playing filter indicator</td></tr>
+<tr><td>Queue</td>	<td>Queue indicator</td></tr>
+<tr><td>Sort</td>	<td>Sort mode indicator</td></tr>
+<tr><td>Vol</td>	<td>Volume indicator</td></tr>
+<tr><td>VolSlider</td>	<td>Volume slider</td></tr>
+	<tr><td></td><td><table>
+	<tr><td>hide</td>	<td>hide the value if true (=1)</td></tr>
+	<tr><td>horizontal</td>	<td>vertical slider if true (=1)</td></tr>
+	</table></td></tr>
+</table>
+All indicators can be changed to buttons with the option button=1.<br>
+Size can be changed same as buttons, see above.<br>
+<br>
+A lot of widgets, in particular labels, indicators and buttons can use the option click1 (or click2 ...) to (re)define the action executed when the widget is clicked with mouse button 1 (or 2 ...). Example : <code>click2=OpenSongProp</code>, bouttons widget also accept the option activate to (re)define the action executed when the button is activated with a mouse click or keyboard<br>
+Also, a lot of widgets, in particular labels, indicators and buttons, can use the option tip, to define a tooltip for the widget. The tip can contains <a href="#songvar">%-letters</a> to display informations on the current song.<br>
+Another common option is cursor, to to change the mouse cursor when it hovers over it (eg : cursor=hand2). See <a href="http://gtk2-perl.sourceforge.net/doc/pod/Gtk2/Gdk/Cursor.html#enum_Gtk2_Gdk_Cursor">this page</a> for a list of cursor names.<br><br>
+
+A lot of widgets can also use the hover_layout=ALayoutName option, it causes a window using the ALayoutName layout to popup when the mouse hover on the widget (for more than 1000ms, or the value set by the hover_delay option, use 1000ms if set to 0). The popped-up window disappear when the mouse exit the window.<br>(This feature is still a bit experimental)<br>
+Simple example of the hover_layout option to popup a big cover when the mouse hover on a Cover widget,
+by defining the Cover widget with this option : <code>Cover(hover_layout=CoverPopup)</code><br>
+where CoverPopup is the the layout :
+<p class=code>
+<code>
+[CoverPopup]<br>
+VBmain= Cover(minsize=800,maxsize=800,click1=CloseWindow)<br>
+</code></p>
+To make the layout popup when the Cover widget is clicked rather than hovered, use this option : <code>Cover(click1=PopupCustom(CoverPopup))</code>
+<br>
+<h4>misc. widgets</h4>
+<table>
+<tr><td>AASearch</td></tr>
+	<tr><td></td><td><table>
+	<tr><td>aa</td>	<td>artist or album</td></tr>
+	<tr><td>activate</td>	<td>addplay or ''</td></tr>
+	</table></td></tr>
+<tr><td>Connections</td><td>List the active connections when in gstreamer-server mode (very rough for now, will be improved some day)</td></tr>
+<tr><td>Context</td>	<td>Context view</td></tr>
+	<tr><td></td><td><table>
+	<tr><td>followselection</td>	<td>follow songlist selection rather than playing song if true (=1)</td></tr>
+	</table></td></tr>
+<tr><td>EditList</td>	<td>(special)</td></tr>
+<tr><td>Filler</td>	<td>empty widget, for use with H/VSize</td></tr>
+<tr><td>Button</td>	<td>custom button (other buttons can use these options too)</td></tr>
+	<tr><td></td><td><table>
+	<tr><td>label</td>	<td>text</td></tr>
+	<tr><td>stock</td>	<td>icon name, see /usr/share/gmusicbrowser/pix/ or <a href=http://developer.gnome.org/doc/API/2.0/gtk/gtk-Stock-Items.html>Gtk2 Stock-Items</a> or ~/.config/gmusicbrowser/icons/ (without filename extension)</td></tr>
+	</table></td></tr>
+<tr><td>Label</td>	<td>custom label (other labels can use these options too)</td></tr>
+	<tr><td></td><td><table>
+	<tr><td>text</td>	<td>label text</td></tr>
+	<tr><td>markup</td>	<td>text than can include <a href="#songvar">%-letters</a> and <a href=http://library.gnome.org/devel/pango/unstable/PangoMarkupFormat.html">pango markup</a></td></tr>
+	</table></td></tr>
+<tr><td>QueueActions</td><td>combobox to change the queued action</td></tr>
+<tr><td>SongSearch</td></tr>
+<tr><td>TogButton</td>	<td>Show/Hide other widget(s)</td></tr>
+<tr><td></td><td><table>
+	<tr><td>icon</td>	<td>icon name, see /usr/share/gmusicbrowser/pix/ or <a href=http://developer.gnome.org/doc/API/2.0/gtk/gtk-Stock-Items.html>Gtk2 Stock-Items</a> or ~/.config/gmusicbrowser/icons/ (without filename extension)</td></tr>
+	<tr><td>label</td>	<td>button text</td></tr>
+	<tr><td>widget</td>	<td>list of widgets/containers separated by '|'</td></tr>
+	<tr><td>resize</td>	<td>String of 'h','v' or '_', one by hidden widget : shrink the window vertically (v) or horizontally (h) when each widget is hidden </td></tr>
+	</table></td></tr>
+<tr><td>HSeparator</td>	<td>Horizontal separator</td></tr>
+<tr><td>VSeparator</td>	<td>Vertical separator</td></tr>
+<tr><td>AddLabelEntry</td>	<td>Entry to add labels to the current song</td></tr>
+<tr><td>PlayOrderCombo</td>	<td>Combo box to change play order, the option reqwidth set the requested width, it defaults to 100, -1 to let it grow, but it can grow much to wide, so it's best to set a minimum width and pack it with the expand option</td></tr>
+<tr><td>Equalizer</td>	<td>Equalizer, only active with gstreamer.</td></tr>
+</table>
+
+<h4>Songlist widgets</h4>
+When there is more than one SongList/TabbedLists/QueueList in a layout, they must each but one be assigned a group number though the group option. The one without a group number will be the default with which other widgets interact with<br>
+All the other widgets which interact with a SongList/TabbedLists/QueueList accept the option 'group' to specify which one they interact with, it is only needed when the layout contain more than one SongList/TabbedLists/QueueList.<br>
+<br>
+<table>
+<tr><td>QueueList</td>	<td>Display queue (and edit it), accept the same options as SongList</td></tr>
+<tr><td>SongList</td></tr>
+	<tr><td></td><td><table>
+	<tr><td>hideif</td>	<td>'nofilter', 'empty', or ''. Conditions that will make the songlist hide itself or the widgets specified by hidewidget</td></tr>
+	<tr><td>hidewidget</td>	<td>List of widgets separated with '|'. When the hide conditions are met, these widgets will be hidden, by default the songlist is hidden</td></tr>
+	<tr><td>shrinkonhide</td>	<td>String of 'h','v' or '_', one by hidden widget : shrink vertically (v) or horizontally (h) the window when hidden. When multiple widgets are hidden, a direction or no direction (_) can be specified for each widget by using a string of h/v/_</td></tr>
+	<tr><td>mode</td>	<td>playlist or '' : in playlist mode, the songlist and the playlist are synchronized</td></tr>
+	<tr><td>activate</td>	<td>play, queue, playlist, addplay or insertplay. Action when double-clicking on a song : play now, enqueue, set this list as the playlist and play this song, add to playlist, insert in playlist after current position. The action can  be followed by a command like this : activate=play&amp;CloseWindow</td></tr>
+	<tr><td>activateX</td>	<td>where X is a mouse button number, defines the action used when the button X is double-clicked</td></tr>
+	<tr><td>headers</td>	<td>off or ''</td></tr>
+	<tr><td>songypad</td>	<td>change the default number of pixels between rows</td></tr>
+	<tr><td>no_typeahead</td>	<td>if true(=1) disable automatic searching when a letter/digit is pressed and the SongList has focus</td></tr>
+	</table></td></tr>
+<tr><td>TabbedLists</td>	<td>Songlists in tabs, can contain playlist, static lists and the queue. Experimental feature : layouts of type 'P' can be opened in TabbedLists (use the layout property key 'stockicon' to set the tab icon)</td></tr>
+<tr><td>SongTree</td>	<td>Very customizable Songlist replacement. Some things are still not implemented : drag and dropping columns, playlist, queue or static list mode, moving songs using the EditListButtons widget (arrows button) and type-ahead search. See this <a href="http://squentin.free.fr/gmusicbrowser/dokuwiki/doku.php?id=customization:songtree">wiki page</a> for some documentation. These options works : activate activateX headers songxpad songypad</td></tr>
+</table>
+
+<h4>widgets related to songlists</h4>
+(filter# is a number between 0-9, 0 is meant for FLock, when a filter is set all filters with a higher number are reset)<br>
+All these widgets accept the option 'group' to specify which SongList/TabbedLists/QueueList they interact with, it is only needed when the layout contain more than one SongList/TabbedLists/QueueList.<br>
+<br>
+<table>
+<tr><td>AABox</td>	<td>Artist or Album box (name, picture and stats of selected album/artist)</td></tr>
+	<tr><td></td><td><table>
+	<tr><td>aa</td>	<td>artist or album</td></tr>
+	</table></td></tr>
+<tr><td>EditListButtons</td>	<td>buttons to remove/move the selected song(s) in the songlist and clear the list</td></tr>
+	<tr><td></td><td><table>
+	<tr><td>small :</td>	<td>if true(=1) hide the label of the remove and clear buttons</td></tr>
+	</table></td></tr>
+<tr><td>FBox</td>	<td>advanced search box (set filter#1)</td></tr>
+<tr><td>FLock</td>	<td>Lock/unlock : current songlist filter is put in filter#0</td></tr>
+<tr><td>FPane</td>	<td>Filter pane</td></tr>
+	<tr><td></td><td><table>
+	<tr><td>nb</td>		<td>filter#, filter number to set, the artist/album/genre/date/label/folder pages only show the artist/... for songs matching all filters with a lower number </td></tr>
+	<tr><td>hide</td>	<td>hide bottom buttons if true(=1)</td></tr>
+	<tr><td>pages</td>	<td>list of pages separated by '|', among filter,list,savedtree,artist,album,genre,date,label,folder,filesys,lastplay,added,modif,rating. Default pages are savedtree artist album genre date label folder added lastplay rating</td></tr>
+	<tr><td>activate</td>	<td>play or queue or addplay</td></tr>
+	<tr><td>searchbox</td>	<td>if true(=1) add a search box to artist/album,genre,label pages</td></tr>
+	<tr><td>no_typeahead</td>	<td>if true(=1) disable automatic searching when a letter/digit is pressed and the FPane has focus</td></tr>
+	</table></td></tr>
+<tr><td>PlayFilter</td>	<td>Button to Play current songlist filter</td></tr>
+<tr><td>QueueFilter</td>	<td>Button to Enqueue current songlist filter</td></tr>
+<tr><td>Refresh</td>	<td>Refilter songlist</td></tr>
+<tr><td>ResetFilter</td>	<td>Reset songlist filter</td></tr>
+<tr><td>SimpleSearch</td>	<td>simple search entry, search title/album/artist (set filter#1), the selector icon can be disabled with the option noselector=1. The option activate can be used to set a command to run after enter is pressed.</td></tr>
+<tr><td>Total</td>		<td>Total number/length/size of selected/filter/library</td></tr>
+	<tr><td></td><td><table>
+				<tr><td>size</td>	<td>change text size, value can be xx-small, x-small, small, medium, large, x-large, xx-large, or see <a href="http://developer.gnome.org/doc/API/2.0/pango/PangoMarkupFormat.html">this page</a></td></tr>
+	<tr><td>format</td>	<td>short or long (default)</td></tr>
+	</table></td></tr>
+</table>
+
+
+<h4>MenuItem widgets (can only be put in a MB/SM)</h4>
+<table>
+<tr><td>HistItem</td>	<td>Filter history (set filter#1)</td></tr>
+<tr><td>LSortItem</td>	<td>Sort order for songlist</td></tr>
+<tr><td>MainMenuItem</td><td>main menu</td></tr>
+<tr><td>MenuItem</td>	<td>Custom menu item</td></tr>
+	<tr><td></td><td><table>
+	<tr><td>label</td>	<td>text</td></tr>
+	<tr><td>icon</td>	<td>name of the icon (same as above)</td></tr>
+	<tr><td>command</td>	<td>gmusicbrowser command to execute</td></tr>
+	<tr><td>togglewidget</td><td>list of widgets/containers separated by '|'</td></tr>
+	<tr><td>resize</td><td>only with the togglewidget option, see the resize option of the TogButton</td></tr>
+	</table></td></tr>
+<tr><td>PFilterItem</td><td>playing filter menu</td></tr>
+<tr><td>PSortItem</td>	<td>playing sort order</td></tr>
+<tr><td>PlayItem</td>	<td>choose a Filter based on playing title/artist/album/filter (set filter#1) and follow playing songlist option</td></tr>
+<tr><td>QueueItem</td>	<td>queue menu</td></tr>
+<tr><td>SeparatorMenuItem</td>	<td>separator</td></tr>
+</table>
+
+<h3><a id="songvar">%-letters</a></h3>
+Some options accept %-letters variables that are replaced by a field/property of the currently playing song.<br>
+For example in "%t by %a", %t is replaced by the song title and %a by the artist name.<br>
+<i>Note that %c and %f are not meant to be used for displaying</i><br>
+<table>
+<tr><td>t</td>	<td>title</td></tr>
+<tr><td>a</td>	<td>artist</td></tr>
+<tr><td>l</td>	<td>album</td></tr>
+<tr><td>d</td>	<td>disc</td></tr>
+<tr><td>n</td>	<td>track</td></tr>
+<tr><td>y</td>	<td>year</td></tr>
+<tr><td>C</td>	<td>comment</td></tr>
+<tr><td>p</td>	<td>play count</td></tr>
+<tr><td>P</td>	<td>last play</td></tr>
+<tr><td>k</td>	<td>skip count</td></tr>
+<tr><td>K</td>	<td>last skip</td></tr>
+<tr><td>g</td>	<td>genres</td></tr>
+<tr><td>L</td>	<td>labels</td></tr>
+<tr><td>m</td>	<td>length</td></tr>
+<tr><td>S</td>	<td>title or filename if no title</td></tr>
+<tr><td>f</td>	<td>filename (with path) (raw filename, may not display correctly)</td></tr>
+<tr><td>u</td>	<td>filename (with path) (in utf8, used for display, might not be convertible back to the real filename)</td></tr>
+<tr><td>c</td>	<td>cover file</td></tr>
+<tr><td>Y</td>	<td>album year(s)</td></tr>
+<tr><td>A</td>	<td>album artist or main artist or various (determined automatically from all the songs of the album, doesn't use an album_artist tag)</td></tr>
+</table>
+
+</ul>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Set default options for the first time gmusicbrowser is launched
+# lines starting with a "#" are comments
+
+# default audio backend :
+#AudioOut = Play_mplayer
+#AudioOut = Play_123
+
+# activate some plugins, use "PLUGIN_" followed by the PID
+# of the plugin found at the top of the plugin file :
+#PLUGIN_LYRICS = 1
+#PLUGIN_FETCHCOVER = 1
+
+# default player layout
+#Layout = default player layout
+# default browser layout
+#LayoutB = Browser with SongTree
+
+# for more possible values, look at the top of ~/.gmusicbrowser/tags

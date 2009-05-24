@@ -1,0 +1,757 @@
+# Copyright (C) 2005-2007 Quentin Sculo <squentin@free.fr>
+#
+# This file is part of Gmusicbrowser.
+# Gmusicbrowser is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3, as
+# published by the Free Software Foundation
+
+package Play_GST;
+use strict;
+use warnings;
+
+my ($GST_ok,$GST_visuals_ok,$GST_EQ_ok,$GST_RG_ok,$GST_RGA_ok);
+my ($PlayBin,$Sink);
+my ($WatchTag,$Skip);
+my ($Mute,$Volume);
+my (%Plugins,%Sinks);
+my ($VSink,$visual_window);
+
+my $RGA_pipeline; my $RG_dialog;
+my $RGA_songmenu=
+{ label => _"Replaygain analysis",	notempty => 'IDs', notmode => 'P', test => sub {$GST_RGA_ok && $::Options{gst_rg_songmenu}; },
+ submenu =>
+ [	{ label => _"Scan this file",	code => sub { RGA_ReplayGainAnalyse ($_[0]{IDs}); },		onlyone => 'IDs', },
+	{ label => _"Scan per-file track gain",	code => sub { RGA_ReplayGainAnalyse ($_[0]{IDs}); },	onlymany => 'IDs', },
+	{ label => _"Scan using tag-defined album",	code => sub { RGA_ReplayGainAnalyse_byAlbum ($_[0]{IDs}); },	onlymany => 'IDs',  },
+	{ label => _"Scan as an album",	code => sub { RGA_ReplayGainAnalyse([ $_[0]{IDs} ]); },		onlymany=> 'IDs',  },
+ ],
+};
+push @::SongCMenu,$RGA_songmenu;
+
+my $reg_keep; #work-around to keep the register from being finalized in gstreamer<0.10.4 (see http://bugzilla.gnome.org/show_bug.cgi?id=324818)
+
+
+BEGIN
+{ %Sinks=
+  (	autoaudio	=> { name => _"auto detect", },
+	oss		=> { option => 'device' },
+	esd		=> { option => 'host'},
+	alsa		=> { option => 'device'},
+	artsd		=> {},
+	sdlaudio	=> {},
+	gconfaudio	=> { name => _"use gnome settings"},
+	halaudio	=> { name => "HAL device", option=>'udi'},
+	pulse		=> { option=>'server device'},
+	jackaudio	=> { name => "jack", option => 'server' },
+#	alsaspdif	=> { option => 'card' },
+  );
+  %Plugins=(	mp3	=> 'mad',	ogg => 'vorbisdec',	ape => 'ffdec_ape',
+		flac	=> 'flacdec',	mpc => 'musepackdec',	wv => 'wavpackdec',
+	);
+  my $error;
+  my $reg;
+  if (grep -f $_.'/GStreamer.pm',@INC)
+  {	eval {require GStreamer};
+	$error="Needs GStreamer version >= 0.05\n" if !$@ && GStreamer->VERSION<.05;
+	if (!$@ && !$error && GStreamer->init_check)
+	{	GStreamer->init;
+		$reg=GStreamer::Registry->get_default;
+		$reg_keep=$reg if GStreamer->CHECK_VERSION(0,10,4);
+		if ( $reg->lookup_feature('playbin') ) { $GST_ok=1; }
+		else { $error="gstreamer plugin 'playbin' not found\nYou need to install at least gst-plugins-base\n"; }
+	}
+	else { $error=$@? $@ : "Can't initialize GStreamer.\n"; }
+  }
+  else {$error="GStreamer.pm not found\n";}
+  if ($error) {warn "$error -> gstreamer output won't be available.\n"}
+  if ($GST_ok)
+  {	$::Options{gst_sink}||= (grep ($reg->lookup_feature($_.'sink'), qw/autoaudio gconfaudio alsa esd pulse oss/),'alsa')[0]; #find a default sink
+	if (my $feat=$reg->lookup_feature('equalizer-10bands')) { $GST_EQ_ok=1; }
+	else {warn "gstreamer plugin 'equalizer-10bands' not found -> equalizer not available\n";}
+	if ($reg->lookup_feature('rglimiter') && $reg->lookup_feature('rgvolume')) { $GST_RG_ok=1; }
+	else {warn "gstreamer plugins 'rglimiter' and/or 'rgvolume' not found -> replaygain not available\n";}
+	if ($reg->lookup_feature('rganalysis')) { $GST_RGA_ok=1; }
+	else {warn "gstreamer plugins 'rganalysis' not found -> replaygain analysis not available\n";}
+	$GST_visuals_ok=1;
+	eval {require GStreamer::Interfaces};
+	if ($@) {warn "GStreamer::Interfaces perl module not found -> visuals not available\n"; $GST_visuals_ok=0;}
+	unless ($reg->lookup_feature('ximagesink'))
+	{	warn "gstreamer plugin 'ximagesink' not found -> visuals not available\n"; $GST_visuals_ok=0;
+	}
+  }
+
+}
+
+sub supported_formats
+{	return '' unless $GST_ok;
+	my $reg=GStreamer::Registry->get_default;
+	return grep $reg->lookup_feature($Plugins{$_}), keys %Plugins;
+}
+sub supported_sinks
+{	return {} unless $GST_ok;
+	my $reg=GStreamer::Registry->get_default;
+	$Sinks{$_}{ok}= ! !$reg->lookup_feature($_.'sink') for keys %Sinks;
+	#$::Options{gst_sink}='autoaudio' unless $Sinks{$::Options{gst_sink}};
+	return {map { $_ => $Sinks{$_}{name}||$_ } grep $Sinks{$_}{ok}, keys %Sinks};
+}
+
+sub init
+{	return undef unless $GST_ok;
+	$Volume= $::Options{gst_volume};
+	createPlayBin();
+	return bless { EQ=>$GST_EQ_ok, visuals => $GST_visuals_ok },__PACKAGE__;
+}
+
+sub createPlayBin
+{	if ($PlayBin) { $PlayBin->get_bus->remove_signal_watch; }
+	$PlayBin=GStreamer::ElementFactory->make(playbin => 'playbin');
+	my $bus=$PlayBin->get_bus;
+	$bus->add_signal_watch;
+#	$bus->signal_connect('message' => \&bus_message);
+	$bus->signal_connect('message::eos' => \&bus_message_end);
+	$bus->signal_connect('message::error' => \&bus_message_end,1);
+	$bus->signal_connect('message::state-changed' => \&bus_message_state_changed);
+	if ($visual_window) { create_visuals() }
+}
+
+#sub bus_message
+#{	my $msg=$_[1];
+#	warn 'bus: message='.$msg->type."\n" if $::debug;
+#	SkipTo(undef,$Skip) if $Skip && $msg->type & 'state_changed';
+#	return unless $msg->type & ['eos','error'];
+#	if ($Sink->get_name eq 'server') #FIXME
+#	{ $Sink->set_locked_state(1); $PlayBin->set_state('null'); $Sink->set_locked_state(0); }
+#	else { $PlayBin->set_state('null'); }
+#	if ($msg->type & 'error')	{ ::ErrorPlay($msg->error); }
+#	else				{ ::end_of_file(); }
+#}
+
+sub bus_message_end
+{	my ($msg,$error)=($_[1],$_[2]);
+	#error msg if $error is true, else eos
+	if ($Sink->get_name eq 'server') #FIXME
+	{ $Sink->set_locked_state(1); $PlayBin->set_state('null'); $Sink->set_locked_state(0); }
+	else { $PlayBin->set_state('null'); }
+	if ($error)	{ ::ErrorPlay($msg->error); }
+	else		{ ::end_of_file(); }
+}
+
+sub bus_message_state_changed
+{	SkipTo(undef,$Skip) if $Skip;
+}
+
+sub Close
+{	$Sink=undef;
+}
+
+sub GetVolume	{$Volume}
+sub GetMute	{$Mute}
+sub SetVolume
+{	shift;
+	my $set=shift;
+	if	($set eq 'mute')	{ $Mute=$Volume; $Volume=0;	}
+	elsif	($set eq 'unmute')	{ $Volume=$Mute; $Mute=0;	}
+	elsif	($set=~m/^\+(\d+)$/)	{ $Volume+=$1; }
+	elsif	($set=~m/^-(\d+)$/)	{ $Volume-=$1; }
+	elsif	($set=~m/^(\d+)$/)	{ $Volume =$1; }
+	$Volume=0   if $Volume<0;
+	$Volume=100 if $Volume>100;
+	$PlayBin->set(volume => $Volume/100); #or /10 ?
+	::HasChanged('Vol');
+	$::Options{gst_volume}=$Volume;
+}
+
+sub SkipTo
+{	shift;
+	$Skip=shift;
+	my ($result,$state,$pending)=$PlayBin->get_state(0);
+	return if $result eq 'async'; #when song hasn't started yet, needs to wait until it has started before skipping
+	$PlayBin->seek(1,'time','flush','set', $Skip*1_000_000_000,'none',0);
+	$Skip=undef;
+}
+
+sub Pause
+{	$PlayBin->set_state('paused');
+}
+sub Resume
+{	$PlayBin->set_state('playing');
+}
+
+sub check_sink
+{	$Sink->get_name eq $::Options{gst_sink};
+}
+sub make_sink
+{	my $sinkname=$::Options{gst_sink};
+	my $sink=GStreamer::ElementFactory->make($sinkname.'sink' => $sinkname);
+	return undef unless $sink;
+	$sink->set(profile => 'music') if $::Options{gst_sink} eq 'gconfaudio';
+	if (my $opts=$Sinks{$sinkname}{option})
+	{	for my $opt (split / /, $opts)
+		{	my $val=$::Options{'gst_'.$sinkname.'_'.$opt};
+			next unless defined $val && $val ne '';
+			$sink->set($opt => $val);
+		}
+	}
+	return $sink;
+}
+
+sub Play
+{	(my($package,$file),$Skip)=@_;
+	#$PlayBin->set_state('ready');#&Stop;
+	#my ($ext)=$file=~m/\.([^.]*)$/; warn $ext;
+	#::ErrorPlay('not supported') and return undef  unless $Plugins{$ext};
+	my $keep= $Sink && $package->check_sink;
+	my $useEQ= $GST_EQ_ok && $::Options{gst_use_equalizer};
+	my $useRG= $GST_RG_ok && $::Options{gst_use_replaygain};
+	$keep=0 if $Sink->{EQ} xor $useEQ;
+	$keep=0 if $Sink->{RG} xor $useRG;
+	$keep=0 if $package->{modif}; #advanced options changed
+	unless ($keep)
+	{	createPlayBin();
+		warn "Creating new gstreamer sink\n" if $::debug;
+		delete $package->{modif};
+		$Sink=$package->make_sink;
+		unless ($Sink) { ::ErrorPlay( ::__x(_"Can't create sink '{sink}'", sink => $::Options{gst_sink}) );return }
+
+		my @elems;
+		$Sink->{EQ}=$useEQ;
+		if ($useEQ)
+		{	my $equalizer=GStreamer::ElementFactory->make('equalizer-10bands' => 'equalizer');
+			my @val= split /:/, $::Options{gst_equalizer};
+			$equalizer->set( 'band'.$_ => $val[$_]) for 0..9;
+			push @elems,$equalizer;
+		}
+		$Sink->{RG}=$useRG;
+		if ($useRG)
+		{	my ($rgv,$rgl,$ac,$ar)=	map GStreamer::ElementFactory->make($_=>$_),
+					qw/rgvolume rglimiter audioconvert audioresample/;
+			RG_set_options($rgv,$rgl);
+			push @elems, $rgv,$rgl,$ac,$ar;
+		}
+		if (@elems)
+		{	my $sink0=GStreamer::Bin->new('sink0');
+			push @elems,$Sink;
+			$sink0->add(@elems);
+			my $first=shift @elems;
+			$first->link(@elems);
+			$sink0->add_pad( GStreamer::GhostPad->new('sink', $first->get_pad('sink') ));
+			$PlayBin->set('audio-sink' => $sink0);
+		}
+		else {$PlayBin->set('audio-sink' => $Sink);}
+	}
+	$PlayBin->set(volume => $Volume/100); #or /10 ?
+
+	if ($visual_window)
+	{	$VSink->set_xwindow_id($visual_window->window->XID);
+	}
+	warn "playing $file\n";
+	my $f=$file;
+	if ($f!~m#^([a-z]+)://#)
+	{	$f=~s#([^A-Za-z0-9- /\.])#sprintf('%%%02X', ord($1))#seg;
+		$f='file://'.$f;
+	}
+	$PlayBin -> set(uri => $f);
+	$PlayBin -> set_state('playing');
+	$WatchTag=Glib::Timeout->add(500,\&_UpdateTime) unless $WatchTag;
+}
+
+sub set_equalizer
+{	my (undef,$band,$val)=@_;
+	my $equalizer=$PlayBin->get_by_name('equalizer');
+	$equalizer->set( 'band'.$band => $val) if $equalizer;
+	my @vals= split /:/, $::Options{gst_equalizer};
+	$vals[$band]=$val;
+	::setlocale(::LC_NUMERIC, 'C');
+	$::Options{gst_equalizer}=join ':',@vals;
+	::setlocale(::LC_NUMERIC, '');
+}
+sub EQ_Get_Range
+{	my ($min,$max)=(-1,1);
+	{	my $equalizer=$PlayBin->get_by_name('equalizer')
+		 || GStreamer::ElementFactory->make('equalizer-10bands' => 'equalizer');
+		last unless $equalizer;
+		my $prop= $equalizer->find_property('band0');
+		last unless $prop;
+		$min=$prop->get_minimum;
+		$max=$prop->get_maximum;
+	}
+	my $unit= ($max==1 && $min==-1) ? '' : 'dB';
+	return ($min,$max,$unit);
+}
+sub EQ_Get_Hz
+{	my $i=$_[1];
+	my $equalizer=$PlayBin->get_by_name('equalizer')
+	 || GStreamer::ElementFactory->make('equalizer-10bands' => 'equalizer');
+	return undef unless $equalizer;
+	my $hz= $equalizer->find_property('band'.$i)->get_nick;
+	if ($hz=~m/^(\d+)\s*(k?)Hz/)
+	{	$hz=$1; $hz*=1000 if $2;
+		$hz= $hz>=1000 ? sprintf '%.1fkHz',$hz/1000 :
+				 sprintf '%dHz',$hz ;
+	}
+	return $hz;
+}
+
+sub create_visuals
+{	unless ($VSink)
+	{	$VSink=GStreamer::ElementFactory->make(ximagesink => 'ximagesink');
+		return unless $VSink;
+		$VSink->set_xwindow_id($visual_window->window->XID);
+	}
+	$PlayBin->set('video-sink' => $VSink) if $PlayBin;
+	set_visual();
+}
+sub add_visuals
+{	remove_visuals() if $visual_window;
+	$visual_window=shift;
+	$visual_window->signal_connect(unrealize => \&remove_visuals);
+	$visual_window->signal_connect(configure_event => sub {$VSink->expose if $VSink});
+	$visual_window->signal_connect(expose_event => sub
+		{	if ($VSink) { $VSink->expose; }
+			else { create_visuals() }
+			1;
+		});
+}
+sub remove_visuals
+{	$VSink->set_xwindow_id(0) if $VSink;
+	$PlayBin->set('video-sink' => undef) if $PlayBin;
+	$PlayBin->set('vis-plugin' => undef) if $PlayBin;
+	$visual_window=$VSink=undef;
+}
+sub set_visual
+{	my $visual= shift || $::Options{gst_visual};
+	my @l=list_visuals();
+	return unless @l;
+	$visual=undef if $visual && !(grep $_ eq $visual, @l);
+	$visual||=$l[0];
+	if ($visual eq '+') #choose next visual in the list
+	{	$visual=$::Options{gst_visual} || $l[0];
+		my $i=0;
+		for my $v (@l)
+		{	last if $v eq $visual;
+			$i++
+		}
+		$i++; $i=0 if $i>$#l;
+		$visual=$l[$i];
+	}
+	warn "visual=$visual\n" if $::debug;
+	$::Options{gst_visual}=$visual;
+	$visual=GStreamer::ElementFactory->make($visual => 'visual');
+	$PlayBin->set('vis-plugin' => $visual) if $PlayBin;
+	$VSink->expose;
+}
+
+sub list_visuals
+{	my @visuals;
+	my $reg=GStreamer::Registry->get_default;
+	for my $plugin ($reg->get_plugin_list)
+	{	#warn $plugin;
+		for my $elem ($reg->get_feature_list_by_plugin($plugin->get_name))
+		{	#warn $elem;
+			if ($elem->isa('GStreamer::ElementFactory'))
+			{	my $klass=$elem->get_klass;
+				next unless $klass eq 'Visualization';
+				#warn $elem->get_name."\n";
+				#warn $elem->get_longname."\n";
+				#warn $elem->get_description."\n";
+				#warn $elem->get_element_type."\n";
+				#warn "$klass\n";
+				#warn "\n";
+				push @visuals,$elem->get_name;
+			}
+		}
+	}
+	return @visuals;
+}
+
+sub _UpdateTime
+{	my ($result,$state,$pending)=$PlayBin->get_state(0);
+	warn "state: $result,$state,$pending\n" if $::debug;
+	return 1 if $result eq 'async';
+	if ($state ne 'playing' && $state ne 'paused')
+	{	return 1 if $pending eq 'playing' || $pending eq 'paused';
+		::ResetTime() unless $::Play_package ne 'Play_GST';
+		$WatchTag=undef;
+		return 0;
+	}
+	my $query=GStreamer::Query::Position->new('time');
+	if ($PlayBin->query($query))
+	{	my (undef, $position)=$query->position;
+		::UpdateTime( $position/1_000_000_000 );
+	}
+	return 1;
+}
+
+sub Stop
+{	#if ($_[1]) { $Sink->set_locked_state(1); $PlayBin->set_state('null'); $Sink->set_locked_state(0);return; }
+	#if ($_[1]) { $PlayBin->set_state('ready'); return;}
+	#my ($result,$state,$pending)=$PlayBin->get_state(0);
+	#warn "stop: state: $result,$state,$pending\n";
+	#return if $state eq 'null' and $pending eq 'void-pending';
+	$PlayBin->set_state('null');
+}
+
+sub RG_set_options
+{	my ($rgv,$rgl)=@_;
+	$rgv||=$PlayBin->get_by_name('rgvolume');
+	$rgl||=$PlayBin->get_by_name('rglimiter');
+	return unless $rgv && $rgl;
+	$rgl->set(enabled => 0) if $::Options{gst_rg_nolimiter};
+	$rgv->set('album-mode' => 1) if $::Options{gst_rg_albummode};
+	$rgv->set('pre-amp' => $::Options{gst_rg_preamp}||0);
+	$rgv->set('fallback-gain' => $::Options{gst_rg_fallback}||0);
+	#$rgv->set(headroom => $::Options{gst_rg_headroom}||0);
+}
+sub RGA_ReplayGainAnalyse_byAlbum
+{	my $IDs=$_[0];
+	::SortList($IDs,::SONG_ALBUM);
+	my @list; my @album; my $album0;
+	for my $ID (@$IDs)
+	{	my $album= $::Songs[$ID][::SONG_ALBUM];
+		if (defined $album0)
+		{	if ($album0 eq $album) {push @album,$ID;next}
+			else
+			{	push @list, (@album>1 ? [@album] : $album[0]);
+				$album0=undef; @album=undef;
+			}
+		}
+		if ($album=~m/^<Unknown>/) {push @list,$ID}
+		else {$album0=$album; @album=($ID)}
+	}
+	if (defined $album0) { push @list, (@album>1 ? [@album] : $album[0]); }
+	RGA_ReplayGainAnalyse(\@list);
+}
+sub RGA_ReplayGainAnalyse
+{	my $IDs=$_[0];
+	unless ($RGA_pipeline)
+	{	$RGA_pipeline=GStreamer::Pipeline->new('RGA_pipeline');
+		my $audiobin=GStreamer::Bin->new('RGA_audiobin');
+		#my @elems= qw/filesrc decodebin audioconvert audioresample rganalysis fakesink/;
+		my ($src,$decodebin,$ac,$ar,$rganalysis,$fakesink)=
+			map GStreamer::ElementFactory->make($_ => $_),
+			qw/filesrc decodebin audioconvert audioresample rganalysis fakesink/;
+		$audiobin->add($ac,$ar,$rganalysis,$fakesink);
+		$ac->link($ar,$rganalysis,$fakesink);
+		my $audiopad=$ac->get_pad('sink');
+		$audiobin->add_pad(GStreamer::GhostPad ->new('sink', $audiopad));
+		$RGA_pipeline->add($src,$decodebin,$audiobin);
+		$src->link($decodebin);
+		$decodebin->signal_connect(new_decoded_pad => \&RGA_newpad_cb);
+
+		#@elems= map GStreamer::ElementFactory->make($_ => $_), @elems;
+		#$RGA_pipeline->add(@elems);
+		#my $first=shift @elems;
+		#$first->link(@elems);
+		my $bus=$RGA_pipeline->get_bus;
+		$bus->add_signal_watch;
+		$bus->signal_connect('message::error' => sub { warn "ReplayGain analysis error : ".$_[1]->error."\n"; }); #FIXME
+		$bus->signal_connect('message::tag' => \&RGA_bus_message_tag);
+		$bus->signal_connect('message::eos' => \&RGA_process_next);
+		#FIXME check errors
+	}
+	#FIXME remove duplicates in @$IDs;
+	push @{$RGA_pipeline->{queue}},@$IDs;
+	my $nb=@$IDs; warn "@$IDs";
+	$nb+=@$_-1 for grep ref, @$IDs; #count tracks in album lists
+	$RGA_pipeline->{total}+=$nb; warn "$RGA_pipeline->{total}==$nb;\n";
+	RGA_process_next() if $RGA_pipeline->{total}==$nb;
+}
+sub RGA_newpad_cb
+{	my ($decodebin,$pad)=@_;
+	my $audiopad = $RGA_pipeline->get_by_name('RGA_audiobin')->get_pad('sink');
+	return if $audiopad->is_linked;
+	# check media type
+	my $str= $pad->get_caps->get_structure(0)->{name};
+	return unless $str=~m/audio/;
+	$pad->link($audiopad);
+}
+sub RGA_process_next
+{	return unless $RGA_pipeline;
+	$RGA_pipeline->{done}++;
+	my $rganalysis=$RGA_pipeline->get_by_name('rganalysis');
+	my $ID;
+	if (my $list=$RGA_pipeline->{albumIDs})
+	{	my $i= ++$RGA_pipeline->{album_i};
+		my $left= @$list -$i;
+		$rganalysis->set('num-tracks' => $left);
+		if ($left) {$ID=$list->[$i]; $rganalysis->set_locked_state(1); }
+		else { delete $RGA_pipeline->{$_} for qw/album_i albumIDs album_tosave/; }
+	}
+	$RGA_pipeline->set_state('ready');
+	unless (defined $ID) { $ID=shift @{$RGA_pipeline->{queue}}; };
+	if (defined $ID)
+	{	if (ref $ID) #album mode
+		{	my $list=$RGA_pipeline->{albumIDs}=$ID;
+			$rganalysis->set('num-tracks' => scalar @$list);
+			$ID=$list->[0];
+			$RGA_pipeline->{album_i}=0;
+		}
+		my $f= $::Songs[$ID][::SONG_PATH].::SLASH.$::Songs[$ID][::SONG_FILE];
+		$RGA_pipeline->{ID}=$ID;
+		warn "analysing [$ID] $f\n";
+		$RGA_pipeline->get_by_name('filesrc')->set(location => $f);#set(uri => $f);
+		$rganalysis->set_locked_state(0);
+		$RGA_pipeline->set_state('playing');
+	}
+	else
+	{	$RGA_pipeline->set_state('null');
+		$RGA_pipeline=undef;
+	}
+	::HasChanged('GST_RGAnalysis');
+	1;
+}
+sub RGA_bus_message_tag
+{	my $msg=$_[1];
+	my $tags=$msg->tag_list;
+	#for my $key (sort keys %$tags) {warn "key=$key => $tags->{$key}\n"}
+	#FIXME should check if the message comes from the rganalysis element, but not supported by the bindings yet, instead check if any non replaygain tags => will re-write replaygain tags _before_ analysis for files without other tags
+	return unless exists $tags->{'replaygain-track-gain'};
+	return if grep !m/^replaygain-/, keys %$tags;
+
+	my $cID=$RGA_pipeline->{ID};
+	if ($::debug)
+	{	warn "done for ID=$cID\n";
+		warn "done for album IDs=".join(' ',@{$RGA_pipeline->{albumIDs}})."\n" if $RGA_pipeline->{albumIDs} && $RGA_pipeline->get_by_name('rganalysis')->get('num-tracks');
+		warn " $_ : @{$tags->{$_}}\n" for keys %$tags;
+	}
+	if ($RGA_pipeline->{albumIDs})
+	{	$RGA_pipeline->{album_tosave}{ $cID }= [@$tags{'replaygain-track-gain','replaygain-track-peak'}];
+		if (exists $tags->{'replaygain-album-gain'} && !$RGA_pipeline->get_by_name('rganalysis')->get('num-tracks'))
+		{	#album done
+			for my $ID (@{$RGA_pipeline->{albumIDs}})
+			{	@$tags{'replaygain-track-gain','replaygain-track-peak'}= @{$RGA_pipeline->{album_tosave}{$ID}};
+				my @modif= map [$_,0,$tags->{$_}[0]], qw/replaygain-reference-level replaygain-track-gain replaygain-track-peak replaygain-album-gain replaygain-album-peak/;
+				SimpleTagWriting::set($ID, \@modif, \&RGA_write_error);
+				last unless $RGA_pipeline; #in case RGA has been aborted after an error writing a tag
+			}
+		}
+	}
+	else
+	{	my @modif= map [$_,0,$tags->{$_}[0]], qw/replaygain-reference-level replaygain-track-gain replaygain-track-peak/;
+		SimpleTagWriting::set( $cID, \@modif, \&RGA_write_error);
+	}
+	1;
+}
+sub RGA_write_error
+{	my $err=_"Error writing replaygain tags :\n".shift;
+	my $abort=_"Abort ReplayGain analysis";
+	my $ret=::Retry_Dialog($err,undef,$abort);
+	if ($ret eq 'abort') {RGA_stop()}
+	return $ret;
+}
+sub RGA_stop
+{	$RGA_pipeline->set_state('null');
+	$RGA_pipeline=undef;
+	::HasChanged('GST_RGAnalysis');
+}
+sub RGA_PrefBox
+{	my $sg1=shift;
+	my $check=::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain",undef,_"Normalize volume (the files must have replaygain tags)");
+	$sg1->add_widget($check);
+	#my $start=Gtk2::Button->new(_ "Start ReplayGain analysis");
+	my $stop =Gtk2::Button->new(_"Abort ReplayGain analysis");
+	my $opt  =Gtk2::Button->new(_"ReplayGain options");
+	my $progress=Gtk2::ProgressBar->new;
+	$opt->signal_connect(clicked => sub
+		{	if ($RG_dialog) {$RG_dialog->present;return}
+			$RG_dialog= Gtk2::Dialog->new (_"ReplayGain options", undef, [],
+				'gtk-close' => 'close');
+			$RG_dialog->signal_connect(destroy => sub {$RG_dialog=undef});
+			$RG_dialog->signal_connect(response =>sub {$_[0]->destroy;$RG_dialog=undef});
+			my $update=sub { RG_set_options(); };
+			my $songmenu=::NewPrefCheckButton(gst_rg_songmenu => _"Show replaygain submenu");
+			my $albummode=::NewPrefCheckButton(gst_rg_albummode => _"Album mode",$update,_"Use album normalization instead of track normalization");
+			my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter",$update,_"Used for clipping prevention");
+			my $sg1=Gtk2::SizeGroup->new('horizontal');
+			my $sg2=Gtk2::SizeGroup->new('horizontal');
+			my $preamp=::NewPrefSpinButton(gst_rg_preamp => $update, .1,1,-60,60,.1,1,_"pre-amp",'dB',$sg1,$sg2,_"Extra gain");
+			my $fallback=::NewPrefSpinButton(gst_rg_fallback => $update, .1,1,-60,60,.1,1,_"fallback-gain",'dB',$sg1,$sg2,_"Gain for songs missing replaygain tags");
+			$RG_dialog->vbox->pack_start($_,0,0,2) for $albummode,$preamp,$fallback,$nolimiter,$songmenu;
+			$RG_dialog->show_all;
+
+		});
+	#$start->signal_connect(clicked => sub
+	#	{	my @list; my %done;
+	#		for my $ID (@::Library)
+	#		{	my $album=$::Songs[$ID][::SONG_ALBUM];
+	#			my $l=$::Album{$album}[::AALIST];
+	#			if (@$l>1 && $album!~m/^<Unknown>/)
+	#			{ push @list,[@$l] unless exists $done{$album}; $done{$album}=undef; }
+	#			else { push @list,$ID; }
+	#		}
+	#		RGA_ReplayGainAnalyse(\@list);
+	#	});
+	#$start->signal_connect(clicked => sub { RGA_ReplayGainAnalyse(\@::Library) });
+	$stop->signal_connect( clicked => \&RGA_stop);
+	#$start->set_sensitive(0) unless $GST_RGA_ok;
+	my $box=::Hpack($check,$opt,'_',$progress,$stop);
+	$_->set_no_show_all(1) for $stop,$progress;
+	my $update=sub
+		{	my $progress=$_[0];
+			if ($RGA_pipeline)
+			{	$stop->show; $progress->show;
+				my $max=$RGA_pipeline->{total};
+				my $done=$RGA_pipeline->{done};
+				$progress->set_fraction( $done/$max );
+				$progress->set_text( "$done / $max" );
+			}
+			else { $stop->hide; $progress->hide; }
+		};
+	::Watch($progress,'GST_RGAnalysis',$update);
+	&$update($progress);
+	$box->set_sensitive(0) unless $GST_RG_ok;
+	return $box;
+}
+
+sub AdvancedOptions
+{	my $self=$_[0];
+	my $vbox=Gtk2::VBox->new(::FALSE, 2);
+	my $sg1=Gtk2::SizeGroup->new('horizontal');
+	my $sg2=Gtk2::SizeGroup->new('horizontal');
+	for my $s (sort grep $Sinks{$_}{ok} && $Sinks{$_}{option}, keys %Sinks)
+	{	my $label= $Sinks{$s}{name}||$s;
+		for my $opt (sort split / /,$Sinks{$s}{option})
+		{	my $hbox=::NewPrefEntry("gst_$s".'_'.$opt, "$s $opt : ", sub { $self->{modif}=1 },$sg1,$sg2);
+			$vbox->pack_start($hbox,::FALSE,::FALSE,2);
+		}
+	}
+	return $vbox;
+}
+
+
+package Play_GST_server;
+use Socket;
+use constant { EOL => "\015\012" };
+our @ISA=('Play_GST');
+
+our %sockets;
+my ($stream,$Server);
+
+sub init
+{	return undef unless $GST_ok;
+	my $ok=1;
+	my $reg=GStreamer::Registry->get_default;
+	for my $feature (qw/multifdsink lame audioresample audioconvert/)
+	{	next if $reg->lookup_feature($feature);
+		$ok=0;
+		warn "gstreamer plugin '$feature' not found -> gstreamer-server mode not available\n";
+	}
+	return unless $ok;
+	return bless { EQ=>$GST_EQ_ok },__PACKAGE__;
+}
+
+sub Close
+{	close $Server if $Server;
+	$Server=undef;
+}
+
+sub Stop
+{	unless ($_[1])
+	{	for (keys %sockets)
+		{	$sockets{$_}[1]=0; $stream->signal_emit(remove => $_);
+		}
+	}
+	if ($_[1]) { $Sink->set_locked_state(1); $PlayBin->set_state('null'); $Sink->set_locked_state(0);return; }
+	else
+	{	$PlayBin->set_state('null');
+	}
+}
+#was in Play()	#for (keys %sockets) {warn "socket $_ : ".$sockets{$_}[1];;$stream->signal_emit(add => $_ ) if $sockets{$_}[1];}
+
+sub check_sink
+{	$Sink->get_name eq 'server';
+}
+sub make_sink
+{	#return $Sink if $Sink && $Sink->get_name eq 'server';
+	my $sink=GStreamer::Bin->new('server');
+#	my ($aconv,$audioresamp,$vorbisenc,$oggmux,$stream)=
+	(my ($aconv,$audioresamp,$lame),$stream)=
+		GStreamer::ElementFactory -> make
+		(	audioconvert => 'audioconvert',
+			audioresample => 'audioresample',
+			#vorbisenc => 'vorbisenc',
+			#oggmux => 'oggmux',
+			lame => 'lame',
+			multifdsink => 'multifdsink',
+		);
+	#$sink->add($aconv,$audioresamp,$vorbisenc,$oggmux,$stream);
+	$sink->add($aconv,$audioresamp,$lame,$stream);
+	$aconv->link($audioresamp,$lame,$stream);
+	#$aconv->link($audioresamp,$vorbisenc,$oggmux,$stream);
+	$sink->add_pad( GStreamer::GhostPad->new('sink', $aconv->get_pad('sink') ));
+	$stream->set('recover-policy'=>'keyframe');
+	#$stream->signal_connect($_ => sub {warn "@_"},$_) for 'client-removed', 'client_added', 'client-fd-removed';
+	#$stream->signal_connect('client-fd-removed' => sub { Glib::Idle->add(sub {close $sockets{$_[0]}[0]; delete $sockets{$_[0]}},$_[1]); });
+	$stream->signal_connect('client-fd-removed' => sub { close $sockets{$_[1]}[0]; delete $sockets{$_[1]}; ::HasChanged('connections'); }); #FIXME not in main thread, so should be in a Glib::Idle, but doesn't work so ... ?
+	#$stream->signal_connect('client-fd-removed' => sub { warn "@_ ";Glib::Idle->add(sub {warn $_[0];warn "-- $_ ".$sockets{$_} for keys %sockets;unless ($sockets{$_[0]}[1]) { close $sockets{$_[0]}[0] ;warn "closing $_[0]"; delete $sockets{$_[0]};0;} }, $_[1]) });
+	return undef unless Listen();
+	return $sink;
+}
+
+sub Listen
+{	my $proto = getprotobyname('tcp');
+	my $port=$::Options{Icecast_port};
+	my $noerror;
+	{	last unless socket($Server, PF_INET, SOCK_STREAM, $proto);
+		last unless setsockopt($Server, SOL_SOCKET, SO_REUSEADDR,pack('l', 1));
+		last unless bind($Server, sockaddr_in($port, INADDR_ANY));
+		last unless listen($Server,SOMAXCONN);
+		$noerror=1;
+	}
+	unless ($noerror)
+	{	::ErrorPlay("icecast server error : $!");
+		return undef;
+	}
+	Glib::IO->add_watch(fileno($Server),'in', \&Connection);
+	warn "icecast server listening on port $port\n";
+	::HasChanged('connections');
+	return 1;
+}
+
+sub Connection
+{	my $Client;
+	return 0 unless $Server;
+	my $paddr = accept($Client,$Server);
+	return 1 unless $paddr;
+	my($port2,$iaddr) = sockaddr_in($paddr);
+	warn 'Connection from ',inet_ntoa($iaddr), " at port $port2\n";
+	#warn "fileno=".fileno($Client);
+	my $request=<$Client>;warn $request;
+	while (<$Client>)
+	{	warn $_;
+		last if $_ eq EOL;
+	}
+	if ($request=~m#^GET /command\?cmd=(.*?) HTTP/1\.\d\015\012$#)
+	{	my $cmd=::decode_url($1);
+		my $content;
+		if (0) #FIXME add password and disable dangerous commands (RunSysCmd, RunPerlCode and ChangeDisplay)
+		{	::run_command(undef,$cmd);
+			$content='Command sent.';
+		}
+		else {$content='Unauthorized.'}
+		my $answer=
+		'HTTP/1.0 200 OK'.EOL.
+		'Content-Length: '.length($content).EOL.
+		EOL.$content;
+		send $Client,$answer.EOL,0;
+		close $Client;
+		return 1;	#keep listening
+	}
+	my $answer=
+	'HTTP/1.0 200 OK'.EOL.
+	'Server: iceserver/0.2'.EOL.
+	"Content-Type: audio/mpeg".EOL.
+	"x-audiocast-name: gmusicbrowser stream".EOL.
+	'x-audiocast-public: 0'.EOL;
+	send $Client,$answer.EOL,0;
+	#warn $answer;
+	my $fileno=fileno($Client);
+	$sockets{$fileno}=[$Client,1,gethostbyaddr($iaddr,AF_INET)];
+	Glib::IO->add_watch(fileno($Client),'hup',sub {warn "Connection closed"; $sockets{fileno($Client)}[1]=0; ::HasChanged('connections'); $stream->signal_emit(remove => fileno$Client);return 0; }); #FIXME never called
+	$stream->signal_emit(add => fileno$Client);
+	::HasChanged('connections');
+	return 1;	#keep listening
+}
+
+
+1;
