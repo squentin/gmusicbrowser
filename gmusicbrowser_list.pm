@@ -1646,7 +1646,7 @@ my @MenuSubGroup=
 		test => sub { Songs::FilterListProp($_[0]{subfield},'picture'); }, },
 	{ label => _"show info",	code => sub { my $self=$_[0]{self}; $self->{markup}[$_[0]{depth}]^=1; $self->Fill('optchanged'); },
 	  check => sub { $_[0]{self}{markup}[$_[0]{depth}]}, istrue => 'aa', mode => 'LS', },
-	{ label => _"show all row",	code => sub { my $self=$_[0]{self}; $self->{noall}^=1; $self->Fill('optchanged'); },
+	{ label => _"show the 'All' row",	code => sub { my $self=$_[0]{self}; $self->{noall}^=1; $self->Fill('optchanged'); },
 	  check => sub { !$_[0]{self}{noall} }, mode => 'LS', },
 	{ label => _"picture size",	code => sub { my $self=$_[0]{self}; $self->{mpicsize}=$_[1]; $self->Fill('optchanged'); },
 	  mode => 'M',
@@ -2005,6 +2005,8 @@ sub PopupOpt
 package FilterList;
 use Gtk2;
 use base 'Gtk2::VBox';
+use constant { GID_ALL => 65535, GID_TYPE => 'Glib::UInt' };
+#use constant { GID_ALL => 2**32-1, GID_TYPE => 'Glib::ULong' };	#to suuport more than 65534 artist/albums/...
 
 sub new
 {	my ($class,$field,$opt1,$opt2,$pid)=@_;
@@ -2120,7 +2122,7 @@ sub create_list
 	$sw->set_policy('automatic','automatic');
 	::set_biscrolling($sw);
 
-	my $store=Gtk2::TreeStore->new('Glib::UInt');
+	my $store=Gtk2::TreeStore->new(GID_TYPE);
 	my $treeview=Gtk2::TreeView->new($store);
 	$sw->add($treeview);
 	$treeview->set_headers_visible(::FALSE);
@@ -2250,7 +2252,7 @@ sub get_selected_filters
 		my @rows=$sel->get_selected_rows;
 		for my $path (@rows)
 		{	my $iter=$store->get_iter($path);
-			if ($store->get_value($iter,0)==-1 || $store->get_value($iter,0)==2**32-1) { return Filter->new; } ############ use GID_ALL
+			if ($store->get_value($iter,0)==GID_ALL) { return Filter->new; }
 			my @parents= $iter;
 			unshift @parents,$iter while $iter=$store->iter_parent($iter);
 			next if grep $sel->iter_is_selected($parents[$_]), 0..$#parents-1;#skip if one parent is selected
@@ -2301,7 +2303,7 @@ sub drag_cb
 			unless (grep $_->get_depth>1, @rows)
 			{	my @gids=map $store->get_value($store->get_iter($_),0), @rows;
 				warn "dnd : gids=@gids\n";
-				if (grep $_==2**32-1, @gids) {return ::DRAG_FILTER,'';}	#there is an "all-row"  #use GID_ALL
+				if (grep $_==GID_ALL, @gids) {return ::DRAG_FILTER,'';}	#there is an "all-row"
 				return $drag,@gids;
 			}
 			#else : rows of depth>0 selected => fallback to get_selected_filters
@@ -2388,7 +2390,7 @@ sub Fill
 		my ($list)=$self->get_fill_data($opt);
 		$renderer->set('all_count', $self->{all_count});
 		$self->{array_offset}= $self->{noall} ? 0 : 1;	#row number difference between store and $list, needed by interactive search
-		$store->set($store->append(undef),0,-1) unless $self->{noall}; ############  use GID_ALL
+		$store->set($store->append(undef),0,GID_ALL) unless $self->{noall};
 		$store->set($store->append(undef),0,$_) for @$list;
 		if ($self->{field}[1])
 		{	for (my $iter=$store->get_iter_first; $iter; $iter=$store->iter_next($iter))
@@ -3555,8 +3557,8 @@ sub AddToPlaylist
 package CellRendererIconList;
 use Glib::Object::Subclass
 	'Gtk2::CellRenderer',
-	properties =>	[ Glib::ParamSpec->ulong('ID','ID','Song ID',0,2**32-1,0,[qw/readable writable/]),
-			  Glib::ParamSpec->string('field','field','field id', 'label',[qw/readable writable/]),
+	properties =>	[ Glib::ParamSpec->ulong('ID','ID','Song ID',		0,2**32-1,0,	[qw/readable writable/]),
+			  Glib::ParamSpec->string('field','field','field id',	'label',	[qw/readable writable/]),
 			];
 
 use constant PAD => 2;
@@ -3603,11 +3605,10 @@ sub RENDER
 
 package CellRendererGID;
 use Glib::Object::Subclass 'Gtk2::CellRenderer',
-properties => [ Glib::ParamSpec->long('gid', 'gid', 'group id', -2, 2**31-1, -1, [qw/readable writable/]),
-		Glib::ParamSpec->scalar('prop', 'prop', '[[field],[markup],[picsize]]', [qw/readable writable/]),
-		#Glib::ParamSpec->char('depth', 'depth', 'depth', 0, 20, 0, [qw/readable writable/]),
-		Glib::ParamSpec->int('depth', 'depth', 'depth', 0, 20, 0, [qw/readable writable/]),
-		Glib::ParamSpec->long('all_count', 'all_count', 'all_count', 0, 2**31-1, 0, [qw/readable writable/]),
+properties => [ Glib::ParamSpec->ulong('gid', 'gid', 'group id',		0, 2**32-1, 0,	[qw/readable writable/]),
+		Glib::ParamSpec->ulong('all_count', 'all_count', 'all_count',	0, 2**32-1, 0,	[qw/readable writable/]),
+		Glib::ParamSpec->scalar('prop', 'prop', '[[field],[markup],[picsize]]',		[qw/readable writable/]),
+		Glib::ParamSpec->int('depth', 'depth', 'depth',			0, 20, 0,	[qw/readable writable/]),
 		];
 use constant { PAD => 2, XPAD => 2, YPAD => 2,		P_FIELD => 0, P_MARKUP =>1, P_PSIZE=>2, P_ICON =>3, };
 
@@ -3621,7 +3622,7 @@ sub makelayout
 	my $field=$prop->[P_FIELD][$depth];
 	my $markup=$prop->[P_MARKUP][$depth];
 	$markup= $markup ? "<b>%a</b>%Y\n<small>%s <small>%l</small></small>" : "%a"; #FIXME
-	if ($gid==-1)	############ use GID_ALL
+	if ($gid==FilterList::GID_ALL)
 	{	$markup= sprintf "<b>%s (%d)</b>", ::PangoEsc( Songs::Field_All_string($field) ), $cell->get('all_count');
 	}
 	#elsif ($gid==0) {  }
