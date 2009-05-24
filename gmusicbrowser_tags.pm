@@ -419,7 +419,7 @@ sub new
 	{	my $nb=my @folders= Songs::UniqList('path',\@IDs);
 		my $common= ::find_common_parent_folder(@folders);
 		my $text= ::__("%d file in {folder}","%d files in {folder}",scalar@IDs);
-		my $folder=($nb==1) ?	$common	: ::__("one folder","different folders",$nb);
+		my $folder=($nb==1) ?	$common	: _"different folders";
 		$folder.= "\n". ::__x("(common parent folder : {common})",common=>$common) if $nb>1 && length($common)>5;
 		$text= ::__x($text,folder => '<small>'.::PangoEsc($folder).'</small>');
 		my $labelfile = Gtk2::Label->new;
@@ -1844,13 +1844,10 @@ sub view
 	my $text;
 	my $offset=0;
 	while (my $b=substr $self->{value},$offset,16)
-	{	$text.=sprintf '%08x  ',$offset;
-		my $l=length $b;
-		$text.=sprintf '%02x 'x$l,map(ord,split //,$b);
-		$text.='   'x(16-$l);
+	{	$text.=sprintf "%08x  %-48s", $offset, join ' ',unpack '(H2)*',$b;
+		$offset+=length $b;
 		$b=~s/[^[:print:]]/./g;	#replace non-printable with '.'
 		$text.="   $b\n";
-		$offset+=$l;
 	}
 	my $textview=Gtk2::TextView->new;
 	my $buffer=$textview->get_buffer;

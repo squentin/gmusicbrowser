@@ -511,6 +511,7 @@ our %timespan_menu=
 	editwidth => 6,
 	edit_order=> 50,	edit_many=>1,	letter => 'y',
 	can_group=>1,
+	FilterList => {},
  },
  track =>
  {	name	=> _"Track",	width => 40,	flags => 'garwesc',

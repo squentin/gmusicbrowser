@@ -1683,7 +1683,7 @@ our @cMenu=
 	},
 	#songs submenu :
 	{	label => sub { my $IDs=$_[0]{filter}->filter; ::__("%d Song","%d Songs",scalar @$IDs); },
-		submenu => sub { ::PopupContextMenu(\@::SongCMenu, { mode => '', IDs=>$_[0]{filter}->filter }); },
+		submenu => sub { ::PopupContextMenu(\@::SongCMenu, { mode => 'F', IDs=>$_[0]{filter}->filter }); },
 	},
 	{ label=> _"Rename folder", code => sub { ::AskRenameFolder($_[0]{utf8pathlist}[0]); }, onlyone => 'utf8pathlist',	test => sub {!$::CmdLine{ro}}, },
 	{ label=> _"Open folder", code => sub { ::openfolder($_[0]{utf8pathlist}[0]); }, onlyone => 'utf8pathlist', },
@@ -2013,6 +2013,7 @@ sub new
 	my $self = bless Gtk2::VBox->new, $class;
 	$self->{field}[0]=$field;
 	$self->{no_typeahead}=$opt1->{no_typeahead};
+	$self->{rules_hint}=$opt1->{rules_hint};
 
 	my $mode=	$opt2->{'mode_'.$pid} || 'list';
 	$self->{depth} =$opt2->{'depth_'.$pid}|| 0;
@@ -2124,6 +2125,7 @@ sub create_list
 
 	my $store=Gtk2::TreeStore->new(GID_TYPE);
 	my $treeview=Gtk2::TreeView->new($store);
+	$treeview->set_rules_hint(1) if $self->{rules_hint};
 	$sw->add($treeview);
 	$treeview->set_headers_visible(::FALSE);
 	$treeview->set_search_column(-1);	#disable gtk interactive search, use my own instead
@@ -3744,8 +3746,8 @@ properties => [ Glib::ParamSpec->scalar
 			 'array : [r1,r2,row,gid]', #blurb
 			 [qw/readable writable/] #flags
 			),
-		Glib::ParamSpec->string('aa','aa','use album or artist column', 'album', [qw/readable writable/]),
-		Glib::ParamSpec->string('markup','markup','show info', '', [qw/readable writable/]),
+		Glib::ParamSpec->string('aa','aa','use album or artist column', 'album',[qw/readable writable/]),
+		Glib::ParamSpec->string('markup','markup','show info', '',		[qw/readable writable/]),
 		];
 
 use constant PAD => 2;

@@ -319,7 +319,7 @@ our @submenuRemove=
 	{ label => _"Remove from library",	code => sub { SongsRemove($_[0]{IDs}); }, },
 	{ label => _"Remove from disk",		code => sub { DeleteFiles($_[0]{IDs}); },	test => sub {!$CmdLine{ro}},	stockicon => 'gtk-delete' },
 );
-#modes : S:Search, B:Browser, Q:Queue, L:List, P:Playing song in the player window
+#modes : S:Search, B:Browser, Q:Queue, L:List, P:Playing song in the player window, F:Filter Panels (submenu "x songs")
 our @SongCMenu=
 (	{ label => _"Song Properties",	code => sub { DialogSongProp (@{ $_[0]{IDs} }); },	onlyone => 'IDs', stockicon => 'gtk-edit' },
 	{ label => _"Songs Properties",	code => sub { DialogSongsProp(@{ $_[0]{IDs} }); },	onlymany=> 'IDs', stockicon => 'gtk-edit' },
@@ -2835,8 +2835,6 @@ sub PopupAA
 	{	if ($col eq 'album')
 		{ my %alb;
 		  $from=[$from] unless ref $from;
-		  for my $artist (@$from)
-		  {	warn $_ for @{ AA::GetXRef(artist=>$artist) };  }
 		  for my $artist (@$from)
 		  {	push @{$alb{$_}},$artist for @{ AA::GetXRef(artist=>$artist) };  }
 		  #{	$alb{$_}=undef for @{ AA::GetXRef(artist=>$artist) };  }

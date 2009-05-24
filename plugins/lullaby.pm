@@ -47,7 +47,7 @@ sub prefbox
 	my @hours;
 	for my $wd (0..6)
 	{	my $min=::NewPrefSpinButton(OPT."day${wd}m",\&update_alarm,0,0,0,59,1,5,undef,undef,undef,undef,undef,1);
-		my $hour=:NewPrefSpinButton(OPT."day${wd}h",\&update_alarm,0,0,0,23,1,4,undef,undef,undef,undef,undef,1);
+		my $hour=::NewPrefSpinButton(OPT."day${wd}h",\&update_alarm,0,0,0,23,1,4,undef,undef,undef,undef,undef,1);
 		my $timeentry=::Hpack($hour,Gtk2::Label->new(':'),$min);
 		my $check=::NewPrefCheckButton(OPT."day$wd",$dayname[$wd],\&update_alarm,undef,$timeentry,undef,1,$sg);
 		push @hours,$check;
