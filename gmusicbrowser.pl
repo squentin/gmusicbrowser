@@ -3135,8 +3135,8 @@ sub PixBufFromFile
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;
 	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
-	if ($file=~m/\.mp3/i)
-	{	my $data=ReadTag::PixFromMP3($file);
+	if ($file=~m/\.(?:mp3|flac)$/i)
+	{	my $data=ReadTag::PixFromMusicFile($file);
 		eval { $loader->write($data) } if defined $data;
 	}
 	else	#eval{Gtk2::Gdk::Pixbuf->new_from_file(filename_to_unicode($file))};
@@ -3586,7 +3586,8 @@ sub ChoosePix
 	#$filter->add_mime_type('image/'.$_) for qw/jpeg gif png bmp/;
 	$filter->add_mime_type('image/*');
 	$filter->add_pattern('*.mp3');
-	$filter->set_name(_"Pictures & mp3 files");
+	$filter->add_pattern('*.flac');
+	$filter->set_name(_"Pictures, mp3 & flac files");
 	$dialog->add_filter($filter);
 	$filter = Gtk2::FileFilter->new;
 	$filter->add_mime_type('image/*');

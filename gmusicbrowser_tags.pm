@@ -181,15 +181,26 @@ sub FindTrueMP3Length
 	return ($s,$br);
 }
 
-sub PixFromMP3
+sub PixFromMusicFile
 {	my $file=$_[0];
 	#$file=Glib->filename_from_unicode($file);
 	return undef unless -r $file;
-	my $mp3=Tag::MP3->new($file,0);
-	unless ($mp3) {warn "can't read tags for $file\n";return undef;}
-	unless ($mp3->{ID3v2} && $mp3->{ID3v2}{frames}{APIC})
-		{warn "no picture found in $file\n";return undef;}
-	my $pix=$mp3->{ID3v2}{frames}{APIC};
+	my $pix;
+	if ($file=~m/\.mp3$/i)
+	{	my $tag=Tag::MP3->new($file,0);
+		unless ($tag) {warn "can't read tags for $file\n";return undef;}
+		unless ($tag->{ID3v2} && $tag->{ID3v2}{frames}{APIC})
+			{warn "no picture found in $file\n";return undef;}
+		$pix=$tag->{ID3v2}{frames}{APIC};
+	}
+	elsif ($file=~m/\.flac$/i)
+	{	my $tag=Tag::Flac->new($file);
+		unless ($tag) {warn "can't read tags for $file\n";return undef;}
+		unless ($tag->{pictures})
+			{warn "no picture found in $file\n";return undef;}
+		$pix=$tag->{pictures};
+	}
+	else { return undef }
 	my $nb=0;
 	#if (@$pix>1) {$nb=}	#FIXME if more than one picture in tag, use $pix->[$nb][1] to choose
 	return $pix->[$nb][3];

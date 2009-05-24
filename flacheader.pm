@@ -166,13 +166,14 @@ sub _ReadInfo
 
 sub _ReadPicture
 {	my $packref=$_[0];
+	my $ret;
 	eval
 	{	my ($type,$mime,$desc,undef,undef,undef,undef,$data)
-			=unpack 'V V/a V/a VVV V/a',$$packref;
-		return [$mime,$type,$desc,$data];
+			=unpack 'N N/a N/a NNNN N/a',$$packref;
+		$ret=[$mime,$type,$desc,$data];
 	};
-	warn "invalid picture block - skipped\n";
-	return undef;
+	if ($@) { warn "invalid picture block - skipped\n"; }
+	return $ret;
 }
 
 sub _UnpackComments

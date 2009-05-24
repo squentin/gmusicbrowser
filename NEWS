@@ -1,3 +1,5 @@
+- added support for reading pictures in flac files
+
 v1.0.1
 - Fixed bug when writing flac tags with non-ascii characters with perl 5.10, that can damage the file
 - Fixed searching for artist pictures on last.fm

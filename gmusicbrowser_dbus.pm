@@ -91,8 +91,8 @@ sub GetAlbumCoverData
 	my $file=$ref->[::AAPIXLIST];
 	return undef unless -r $file;
 	my $data;
-	if ($file=~m/\.mp3/i)
-	{	$data=ReadTag::PixFromMP3($file);
+	if ($file=~m/\.(?:mp3|flac)$/i)
+	{	my $data=ReadTag::PixFromMusicFile($file);
 	}
 	else
 	{	open my$fh,'<',$file; binmode $fh;
