@@ -1,5 +1,5 @@
 PACKAGE = gmusicbrowser
-VERSION = 1.1.1
+VERSION = $(shell grep "^ *VERSIONSTRING" gmusicbrowser.pl |head -n 1 |grep -Eo [.0-9]+)
 
 
 prefix		= usr
@@ -15,11 +15,26 @@ liconsdir	= $(iconsdir)/large
 miconsdir	= $(iconsdir)/mini
 
 DOCS=AUTHORS COPYING README NEWS INSTALL layout_doc.html
-LINGUAS=`/bin/ls locale`
+LINGUAS=$(shell for l in po/*po; do basename $$l .po; done)
 
-all:
+all: locale
 clean:
+	rm -rf dist/
 distclean: clean
+	rm -rf locale/
+
+po/gmusicbrowser.pot : gmusicbrowser.pl *.pm plugins/*.pm layouts
+	perl po/create_pot.pl --quiet
+
+po/%.po : po/gmusicbrowser.pot
+	msgmerge -s -U -N $@ po/gmusicbrowser.pot
+
+locale/%/LC_MESSAGES/gmusicbrowser.mo : po/%.po po/gmusicbrowser.pot
+	mkdir -p locale/$*/LC_MESSAGES/
+	msgfmt -c -o $@ $<
+
+locale: $(foreach l,$(LINGUAS),locale/$l/LC_MESSAGES/gmusicbrowser.mo)
+
 
 install: all
 	mkdir -p "$(bindir)"
@@ -64,3 +79,15 @@ uninstall:
 postuninstall:
 	#clean_menus
 	update-menus
+
+prepackage : all
+	perl -pi -e 's!Version:.*!Version: '$(VERSION)'!' gmusicbrowser.spec
+	mkdir -p dist/
+
+dist: prepackage
+	tar -czf dist/$(PACKAGE)-$(VERSION).tar.gz . --transform=s/^[.]/$(PACKAGE)-$(VERSION)/ --exclude=\*~ --exclude=.\*swp --exclude=./dist && echo wrote dist/$(PACKAGE)-$(VERSION).tar.gz
+
+# release : same as dist, but exclude debian/ folder
+release: prepackage
+	tar -czf dist/$(PACKAGE)-$(VERSION).tar.gz . --transform=s/^[.]/$(PACKAGE)-$(VERSION)/ --exclude=\*~ --exclude=.\*swp --exclude=./dist --exclude=./debian && echo wrote dist/$(PACKAGE)-$(VERSION).tar.gz
+

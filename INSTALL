@@ -1,17 +1,58 @@
-You can run it without installation by simply running :
+First, check your distribution's repository to see if there is an up-to-date package.
+
+You can run gmusicbrowser without installation by simply running decompressing the .tar.gz and running gmusicbrowser.pl, either with a relative path :
+ ./gmusicbrowser.pl
+or gmusicbrowser-VERSION/gmusicbrowser.pl
+or with an absolute path :
  /PATH_TO/WHERE/YOU_UNTARRED_THE_TAR.GZ/gmusicbrowser.pl
 (gmusicbrowser.pl will first look for its files in . and then in ../share/gmusicbrowser relative to where it resides)
 
+
 RPM based distro
 ================
-rpm -bb gmusicbrowser.spec
-rpm -i gmusicbrowser.rpm
+You can build a rpm from the .tar.gz :
+ rpmbuild -tb gmusicbrowser-VERSION.tar.gz
 
 DEB based distro
 ================
-sudo ./debian/rules binary
-sudo dpkg -i ../gmusicbrowser.deb
+untar gmusicbrowser-VERSION.tar.gz :
+ tar xvf gmusicbrowser-VERSION.tar.gz
+change to the main folder :
+ cd gmusicbrowser-VERSION/
+If you have the debian/ folder, you should be able to build a deb by running :
+ dpkg-buildpackage
+from the main gmusicbrowser folder
 
-other
-=====
+Any distribution
+================
 make install
+
+
+
+Dependencies
+==============
+You might want/need to install (from your favorite distribution repository) :
+
+    * to use mpg321/ogg123/flac123
+          o mpg321 to play mp3 files
+          o ogg123 to play ogg and flac files (found in a package names vorbis-tools)
+          o flac123 to play flac files (deprecated)
+          o amixer to control the volume (found in a package named alsa-utils)
+    * to use gstreamer-0.10
+          o gstreamer perl bindings >0.06 (package named libgstreamer-perl or perl-GStreamer)
+          o gstreamer library and gstreamer-plugins-base
+          o gstreamer-plugins-ugly to play mp3 files
+          o gstreamer-plugins-bad to play mpc files
+          o gstreamer-plugins-good to play flac files
+          o note that some codec may be packaged by themselves in some distribution, with names like gstreamer0.10-flac or gstreamer0.10-musepack
+          o some additional gstreamer plugins may also be required, depending on which output you want to use, like oss, alsa, pulseaudio, esd.
+    * to use mplayer
+	  o mplayer
+    * to have a tray icon
+          o gtk2-trayicon perl bindings (package named libgtk2-trayicon-perl or perl-Gtk2-TrayIcon)
+    * to consult wikipedia pages and search google for lyrics, one of :
+          o gtk2-mozembed perl bindings (package named libgtk2-mozembed-perl or perl-Gtk2-MozEmbed) (see this page)
+          o gtk2-webkit perl bindings (package named perl-Gtk2-WebKit)
+    * to control gmusicbrowser through DBus or use the included gnome multimedia keys plugin (for gnome >= 2.18)
+          o DBus perl bindings (package named libnet-dbus-perl or perl-Net-DBus)
+
