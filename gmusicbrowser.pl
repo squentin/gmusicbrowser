@@ -61,8 +61,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.10',
- VERSIONSTRING => '1.1.0',
+ VERSION => '1.1001',
+ VERSIONSTRING => '1.1.1',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
@@ -1606,15 +1606,14 @@ sub SaveTags	#save tags _and_ settings
 	}
 
 	my $error;
-	open my($fh),'>:raw',$SaveFile.'.new' or warn "Error opening '$SaveFile.new' for writing : $!";
+	open my($fh),'>:utf8',$SaveFile.'.new' or warn "Error opening '$SaveFile.new' for writing : $!";
 	my $optionslines=SaveRefToLines(\%Options);
 	print $fh "[Options]\n$$optionslines\n"  or $error||=$!;
 
 	my ($savesub,$fields,$extrasub,$extra_subfields)=Songs::MakeSaveSub();
 	print $fh "[Songs]\n@$fields\n"  or $error||=$!;
 	for my $ID (@{ Songs::AllFilter('missing:<:'.($tooold||1)) })
-	{	use bytes; #mixing utf8 and non-utf8 strings !!
-		my @vals=$savesub->($ID);
+	{	my @vals=$savesub->($ID);
 		s#([\x1D\n\t\\])#sprintf "\\x%02x",ord $1#eg for @vals;
 		my $line= join "\x1D", $ID, @vals;
 		print $fh $line."\n"  or $error||=$!;
@@ -1624,8 +1623,7 @@ sub SaveTags	#save tags _and_ settings
 	{	print $fh "\n[$field]\n$extra_subfields->{$field}\n"  or $error++;
 		my $h= $extrasub->{$field}->();
 		for my $key (sort keys %$h)
-		{	use bytes; #mixing utf8 and non-utf8 strings !! # needed ? #CHECKME
-			my $vals= $h->{$key};
+		{	my $vals= $h->{$key};
 			s#([\x1D\n\t\\])#sprintf "\\x%02x",ord $1#eg for @$vals;
 			my $line= join "\x1D", $key, @$vals;
 			print $fh $line."\n"  or $error||=$!;

@@ -1,6 +1,6 @@
 Name: gmusicbrowser
 Summary: Jukebox for large collections of mp3/ogg/flac/mpc files
-Version: 1.1.0
+Version: 1.1.1
 Release: 1
 License: GPL
 Group: Sound
