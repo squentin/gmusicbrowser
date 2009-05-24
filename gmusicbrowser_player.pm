@@ -1863,6 +1863,7 @@ sub new
 		$label->signal_connect(expose_event => \&expose_cb);
 		$self->signal_connect(enter_notify_event => \&enter_leave_cb, INCR());
 		$self->signal_connect(leave_notify_event => \&enter_leave_cb,-INCR());
+		$self->{expand_max}=1 if $opt1->{expand_max};
 	}
 	elsif (defined $ref->{initsize})
 	{	#$label->set_size_request($label->create_pango_layout( $ref->{initsize} )->get_pixel_size);
@@ -1886,12 +1887,15 @@ sub set_markup
 sub checksize	#extend the requested size so that the string fit in initsize mode (in case the initsize string is not wide enough)
 {	my $self=$_[0];
 	if ($self->{resize})
-	{	my $label=$_[0]->child;
+	{	my $label=$self->child;
 		my ($w,$h)=$label->get_layout->get_pixel_size;
 		my ($w0,$h0)=$label->get_size_request;
 		$w=0 if $w0>$w;
 		$h=0 if $h0>$h;
 		$label->set_size_request($w||$w0,$h||$h0) if $w || $h;
+	}
+	elsif ($self->{expand_max})
+	{	$self->{expand_max}= ($self->child->get_layout->get_pixel_size)[0]||1;
 	}
 }
 
@@ -2500,7 +2504,7 @@ sub size_allocate
 	my $border=$self->get_border_width;
 	$x+=$border;  $bwidth-=$border*2;
 	$y+=$border; $bheight-=$border*2;
-	my $total_xreq=0; my @ratios; my $ecount=0;
+	my $total_xreq=0; my @emax; my $ecount=0;
 	my $spacing=$self->get_spacing;
 	my @children;
 	for my $child ($self->get_children)
@@ -2509,24 +2513,25 @@ sub size_allocate
 		my ($expand,$fill,$pad,$type)=	($Gtk2::VERSION<1.163 || $Gtk2::VERSION==1.170) ?	 #work around memory leak in query_child_packing (gnome bug #498334)
 			@{$child->{SBOX_packoptions}} : $self->query_child_packing($child);
 		$total_xreq+=$pad*2+$xreq;
-		my $ref=[$child,$expand,$fill,$pad,$type,$xreq];
-		if ($type eq 'end')	{unshift @children,$ref} #to keep the same order as a HBox
-		else			{push @children,$ref}
 		my $eweight= $child->{expand_weight} || 1;
-		if (my $r=$child->{expand_to_ratio}) { push @ratios,[$r,$eweight,$xreq]; $ecount+=$eweight; }
-		elsif ($expand) {$ecount+=$eweight}
+		my $max;
+		my @attrib;
+		if (my $r=$child->{expand_to_ratio})	{$max=$r*$bheight}
+		else					{$max=$child->{expand_max}}
+		if	($max)		{ $max-=$xreq; if ($max>0) {push @emax,[$max*$eweight,$max,$eweight,\@attrib]; $ecount+=$eweight;$expand=$eweight;} else {$expand=0} }
+		elsif	($expand)	{$ecount+=$eweight;$expand=$eweight;}
+		@attrib=($child,$expand,$fill,$pad,$type,$xreq);
+		if ($type eq 'end')	{unshift @children,\@attrib} #to keep the same order as a HBox
+		else			{push @children,\@attrib}
 	}
 	$total_xreq+=$#children*$spacing if @children;
 	my $xend=$x+$bwidth;
-	my $wshare; my $wrest; my @ratios_w; my $only_etr;
+	my $wshare; my $wrest; my $only_etr;
 	if ($total_xreq<$bwidth && $ecount)
 	{	my $w=$bwidth-$total_xreq;
-		while (my $ref=shift @ratios)
-		{	my ($r,$eweight,$xreq)=@$ref;
-			$r=$r*$bheight-$xreq;
-			$r=0 if $r<0;
-			if ($r < $w/$ecount*$eweight) {$w-=$r;push @ratios_w,$r; $ecount-=$eweight; next}
-			else { push @ratios_w,undef; }
+		for my $emax (sort { $a->[0] <=> $b->[0] } @emax)
+		{	my (undef,$max,$eweight,$attrib)=@$emax;
+			if ($max < $w/$ecount*$eweight) {$w-=$max; push @$attrib,$max; $ecount-=$eweight;}
 		}
 		if ($ecount) {$wshare=$w/$ecount}
 		elsif ($w) #all expands were expand_to_ratio and satisfied and space left -> share between those which are packed with expand
@@ -2543,17 +2548,10 @@ sub size_allocate
 	{	$homogeneous=($bwidth-($#children*$spacing))/@children;
 	}
 	for my $ref (@children)
-	{	my ($child,$expand,$fill,$pad,$type,$ww)=@$ref;
+	{	my ($child,$expand,$fill,$pad,$type,$ww,$maxedout)=@$ref;
 		my $wwf= $ww;
-		my $eweight= $child->{expand_weight} || 1;
-		my $r=$child->{expand_to_ratio};
-		if ($r)
-		{	$r=shift @ratios_w;
-			$wwf+=$r if $r;
-			if ($only_etr) {$eweight=1}
-			else {$expand=!defined $r}
-		}
-		$wwf+=$wshare*$eweight if $expand && $wshare;
+		if ($maxedout)	{ $wwf+=$maxedout; }
+		elsif ($wshare)	{ $wwf+=$wshare*$expand; }
 		$wwf=$homogeneous-$pad*2 if $homogeneous;
 		$ww=$wwf if $fill;
 		my $wx;
