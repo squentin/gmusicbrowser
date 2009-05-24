@@ -10,6 +10,7 @@ use warnings;
 
 my ($ChildPID,$WatchTag,$fh,@pidToKill);
 my $cmd=$::DATADIR.::SLASH.'iceserver.pl';
+$::PlayPacks{Play_Server}=1; #register the package
 
 sub init
 {	if (-e $cmd) {return bless {},__PACKAGE__}

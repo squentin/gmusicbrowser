@@ -20,6 +20,7 @@ my $CMDfh;
 my (%supported,$mplayer);
 
 our @ISA=('Play_amixer'); #use amixer for volume
+$::PlayPacks{Play_mplayer}=1; #register the package
 
 sub init
 {	Play_amixer::init();

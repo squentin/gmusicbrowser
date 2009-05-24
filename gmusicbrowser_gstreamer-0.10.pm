@@ -27,6 +27,7 @@ my $RGA_songmenu=
  ],
 };
 push @::SongCMenu,$RGA_songmenu;
+$::PlayPacks{Play_GST}=1; #register the package
 
 my $reg_keep; #work-around to keep the register from being finalized in gstreamer<0.10.4 (see http://bugzilla.gnome.org/show_bug.cgi?id=324818)
 

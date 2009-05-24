@@ -45,6 +45,7 @@ our %Commands=
 our %Supported;
 
 our @ISA=('Play_amixer'); #use amixer for volume
+$::PlayPacks{Play_123}=1; #register the package
 
 sub init
 {	Play_amixer::init();

@@ -970,14 +970,12 @@ if ($CmdLine{UseGnomeSession})
 }
 
 #-------------INIT-------------
-our ($Play_package,%Packs); my $PlayNext_package;
+our ($Play_package,%PlayPacks); my $PlayNext_package;
 our %Alias_ext=(ogg=> 'oga');	#define alternate file extentions (ie: .ogg files treated as .oga files)
-require 'gmusicbrowser_mplayer.pm';
-require 'gmusicbrowser_123.pm';
-eval {require 'gmusicbrowser_gstreamer-0.10.pm';} || warn $@;
-#require 'gmusicbrowser_win32.pm';
-require 'gmusicbrowser_server.pm';
-for my $p (qw/Play_Server Play_GST Play_123 Play_mplayer Play_GST_server/) { $Packs{$p}=$p->init; }
+for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_gstreamer-0.10.pm gmusicbrowser_server.pm/)
+{	eval { require $file } || warn $@;	#each file sets $::PlayPacks{PACKAGENAME} to 1 for each of its included playback packages
+}
+$PlayPacks{$_}= $_->init for keys %PlayPacks;
 
 LoadPlugins();
 ReadSavedTags();
@@ -992,12 +990,12 @@ $Play_package=$Options{AudioOut};
 $Play_package= $Options{use_GST_for_server} ? 'Play_GST_server' : 'Play_Server' if $CmdLine{server};
 $Play_package='Play_GST' if $CmdLine{gst};
 for my $p ($Play_package, qw/Play_GST Play_123 Play_mplayer Play_Server/)
-{	next unless $p && $Packs{$p};
+{	next unless $p && $PlayPacks{$p};
 	$Options{AudioOut}||=$p;
 	$Play_package=$p;
 	last;
 }
-$Play_package=$Packs{$Play_package};
+$Play_package=$PlayPacks{$Play_package};
 
 IdleCheck() if $Options{StartCheck} && !$CmdLine{nocheck};
 IdleScan()  if $Options{StartScan}  && !$CmdLine{noscan};
@@ -4981,13 +4979,13 @@ sub PrefAudio
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
 	my ($radio_gst,$radio_123,$radio_mp,$radio_ice)=NewPrefRadio('AudioOut', sub
 		{	my $p=$Options{AudioOut};
-			return if $Packs{$p}==$Play_package;
-			$PlayNext_package=$Packs{$p};
+			return if $PlayPacks{$p}==$Play_package;
+			$PlayNext_package=$PlayPacks{$p};
 			SwitchPlayPackage() unless defined $PlayTime;
 			$ScanRegex=undef;
 		},
 		gstreamer		=> 'Play_GST',
-		'mpg321/ogg123/flac123' => 'Play_123',
+		'mpg123/ogg123/...' => 'Play_123',
 		mplayer			=> 'Play_mplayer',
 		_"icecast server"	=> sub {$Options{use_GST_for_server}? 'Play_GST_server' : 'Play_Server'},
 		);
@@ -5000,20 +4998,28 @@ sub PrefAudio
 
 	#gstreamer
 	my $vbox_gst=Gtk2::VBox->new (FALSE, 2);
-	my $hbox2=NewPrefCombo(gst_sink => Play_GST->supported_sinks, text => _"output device :", sizeg1=>$sg1, sizeg2=> $sg2);
-	my $EQbut=Gtk2::Button->new(_"Open Equalizer");
-	$EQbut->signal_connect(clicked => sub {Layout::Window->new('Equalizer');});
-	my $EQcheck=NewPrefCheckButton(gst_use_equalizer => _"Use Equalizer", sub { HasChanged('Equalizer'); });
-	$sg1->add_widget($EQcheck);
-	my $EQbox=Hpack($EQcheck,$EQbut);
-	$EQbox->set_sensitive(0) unless $Packs{Play_GST} && $Packs{Play_GST}{EQ};
-	my $RGbox=Play_GST::RGA_PrefBox($sg1);
-	my $adv2=PrefAudio_makeadv('Play_GST','gstreamer');
-	$vbox_gst->pack_start($_,FALSE,FALSE,2) for $radio_gst,$hbox2,$EQbox,$RGbox,$adv2;
+	if (exists $PlayPacks{Play_GST})
+	{	my $hbox2=NewPrefCombo(gst_sink => Play_GST->supported_sinks, text => _"output device :", sizeg1=>$sg1, sizeg2=> $sg2);
+		my $EQbut=Gtk2::Button->new(_"Open Equalizer");
+		$EQbut->signal_connect(clicked => sub {Layout::Window->new('Equalizer');});
+		my $EQcheck=NewPrefCheckButton(gst_use_equalizer => _"Use Equalizer", sub { HasChanged('Equalizer'); });
+		$sg1->add_widget($EQcheck);
+		my $EQbox=Hpack($EQcheck,$EQbut);
+		$EQbox->set_sensitive(0) unless $PlayPacks{Play_GST} && $PlayPacks{Play_GST}{EQ};
+		my $RGbox=Play_GST::RGA_PrefBox($sg1);
+		my $adv2=PrefAudio_makeadv('Play_GST','gstreamer');
+		my $albox=Gtk2::Alignment->new(0,0,1,1);
+		$albox->set_padding(0,0,15,0);
+		$albox->add(Vpack($hbox2,$EQbox,$RGbox,$adv2));
+		$vbox_gst->pack_start($_,FALSE,FALSE,2) for $radio_gst,$albox;
+	}
+	else
+	{	$vbox_gst->pack_start($_,FALSE,FALSE,2) for $radio_gst,Gtk2::Label->new(_"GStreamer module not loaded.");
+	}
 
 	#icecast
 	my $vbox_ice=Gtk2::VBox->new(FALSE, 2);
-	$Options{use_GST_for_server}=0 unless $Packs{Play_GST_server};
+	$Options{use_GST_for_server}=0 unless $PlayPacks{Play_GST_server};
 	my $usegst=NewPrefCheckButton(use_GST_for_server => _"Use gstreamer",sub {$radio_gst->signal_emit('toggled');},_"without gstreamer : one stream per file, one connection at a time\nwith gstreamer : one continuous stream, multiple connection possible");
 	my $hbox3=NewPrefEntry('Icecast_port',_"port :");
 	my $albox=Gtk2::Alignment->new(0,0,1,1);
@@ -5026,11 +5032,11 @@ sub PrefAudio
 	my $adv4=PrefAudio_makeadv('Play_mplayer','mplayer');
 	$vbox_mp->pack_start($_,FALSE,FALSE,2) for $radio_mp,$adv4;
 
-	$vbox_123->set_sensitive($Packs{Play_123});
-	$vbox_gst->set_sensitive($Packs{Play_GST});
-	$vbox_ice->set_sensitive($Packs{Play_Server});
-	$vbox_mp ->set_sensitive($Packs{Play_mplayer});
-	$usegst->set_sensitive($Packs{Play_GST_server});
+	$vbox_123->set_sensitive($PlayPacks{Play_123});
+	$vbox_gst->set_sensitive($PlayPacks{Play_GST});
+	$vbox_ice->set_sensitive($PlayPacks{Play_Server});
+	$vbox_mp ->set_sensitive($PlayPacks{Play_mplayer});
+	$usegst->set_sensitive($PlayPacks{Play_GST_server});
 
 	$vbox->pack_start($_,FALSE,FALSE,2) for
 		$vbox_gst, Gtk2::HSeparator->new,
@@ -5042,7 +5048,7 @@ sub PrefAudio
 }
 sub PrefAudio_makeadv
 {	my ($package,$name)=@_;
-	$package=$Packs{$package};
+	$package=$PlayPacks{$package};
 	my $hbox=Gtk2::HBox->new(FALSE, 2);
 	if (1)
 	{	my $label=Gtk2::Label->new;
