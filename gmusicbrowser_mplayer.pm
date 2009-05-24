@@ -41,12 +41,11 @@ sub supported_formats
 	unless (keys %supported)
 	{for (qx($mplayer -msglevel all=4 -ac help))
 	 {	if	(m/^(?:mad|ffmp3)\W.*working/){$supported{mp3}=undef}
-		elsif	(m/^vorbis.*working/)	{$supported{ogg}=$supported{oga}=undef}
+		elsif	(m/^vorbis.*working/)	{$supported{oga}=undef}
 		elsif	(m/^musepack.*working/)	{$supported{mpc}=undef}
 		elsif	(m/^ffflac.*working/)	{$supported{flac}=undef}
 		elsif	(m/^ffwavpack.*working/){$supported{wv}=undef}
-		elsif	(m/^ffape\W/)		{$supported{ape}=undef}
-		#elsif	(m/^ffape.*working/){$supported{ape}=undef} #check
+		elsif	(m/^ffape.*working/)	{$supported{ape}=undef}
 	 }
 	}
 	return keys %supported;

@@ -971,6 +971,7 @@ if ($CmdLine{UseGnomeSession})
 
 #-------------INIT-------------
 our ($Play_package,%Packs); my $PlayNext_package;
+our %Alias_ext=(ogg=> 'oga');	#define alternate file extentions (ie: .ogg files treated as .oga files)
 require 'gmusicbrowser_mplayer.pm';
 require 'gmusicbrowser_123.pm';
 eval {require 'gmusicbrowser_gstreamer-0.10.pm';} || warn $@;
@@ -4476,10 +4477,14 @@ sub FolderToIDs
 	return @IDs;
 }
 
-sub MakeScanRegex#FIXME
-{	my @list= $Options{ScanPlayOnly}? ($PlayNext_package||$Play_package)->supported_formats
-					: qw/mp3 ogg oga flac mpc ape wv/; #FIXME find a better way,  wvc
-	my $s=join '|',@list;
+sub MakeScanRegex	#FIXME
+{	my $s;
+	if ($Options{ScanPlayOnly})
+	{	my %ext; $ext{$_}=1 for ($PlayNext_package||$Play_package)->supported_formats;
+		$ext{$_}=1 for grep $ext{$Alias_ext{$_}}, keys %Alias_ext;
+		$s=join '|',keys %ext;
+	}
+	else { $s='mp3|ogg|oga|flac|mpc|ape|wv'; } #FIXME find a better way
 	$ScanRegex=qr/\.(?:$s)$/i;
 }
 
@@ -5042,7 +5047,11 @@ sub PrefAudio_makeadv
 	if (1)
 	{	my $label=Gtk2::Label->new;
 		$label->signal_connect(realize => sub	#delay finding supported formats because mplayer is slow
-			{	my $list=join ' ',sort $package->supported_formats;
+			{	my @ext;
+				for my $e ($package->supported_formats)
+				{	push @ext, join '/', $e, sort grep $::Alias_ext{$_} eq $e,keys %::Alias_ext;
+				}
+				my $list=join ' ',sort @ext;
 				$_[0]->set_markup('<small>'._("supports : ").$list.'</small>') if $list;
 			}) if $package;
 		$hbox->pack_start($label,TRUE,TRUE,4);

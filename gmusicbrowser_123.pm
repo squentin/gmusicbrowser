@@ -21,7 +21,7 @@ my ($CMDfh,$RemoteMode);
 my $alsa09;
 our %Commands=
 (	mpg321	=> {type => 'mp3', devices => 'oss alsa esd arts sun',	cmdline => \&mpg321_cmdline, },
-	ogg123	=> {type => 'ogg oga flac', devices => 'pulse alsa arts esd oss', cmdline => \&ogg123_cmdline,
+	ogg123	=> {type => 'oga flac', devices => 'pulse alsa arts esd oss', cmdline => \&ogg123_cmdline,
 			priority=> 1, #makes it higher priority than flac123
 		   }, #FIXME could check if flac codec is available
 	mpg123	=>
@@ -63,6 +63,7 @@ sub init
 		if ($priority && (grep $priority eq $_, @$cmds)) { $Supported{$ext}=$priority; }
 		else { $Supported{$ext}=$cmds->[0]; }
 	}
+	$Supported{$_}=$Supported{$::Alias_ext{$_}} for grep $Supported{$::Alias_ext{$_}}, keys %::Alias_ext;
 	my @missing= grep !$Supported{$_}, qw/mp3 ogg oga flac/;
 	if (@missing)
 	{	warn "These commands were not found : ".join(', ',@notfound)."\n";
@@ -268,8 +269,9 @@ sub AdvancedOptions
 	my %ext; my %extgroup;
 	$ext{$_}=undef for map split(/ /,$Commands{$_}{type}), keys %Commands;
 	my @ext=sort keys %ext;
+	for my $e (@ext) { $ext{$e}= join '/', $e, sort grep $::Alias_ext{$_} eq $e,keys %::Alias_ext; }
 	my $i=my $j=0;
-	$table->attach_defaults(Gtk2::Label->new($_), $i++,$i,$j,$j+1) for (_"Command", _"Output", _"Options",map " $_ ", @ext);
+	$table->attach_defaults(Gtk2::Label->new($_), $i++,$i,$j,$j+1) for (_"Command", _"Output", _"Options",map " $ext{$_} ", @ext);
 	for my $cmd (sort keys %Commands)
 	{	$i=0; $j++;
 		my $devs= $Commands{$cmd}{devices};
@@ -284,11 +286,12 @@ sub AdvancedOptions
 		for my $ext (@ext)
 		{	if (exists $cando{$ext})
 			{	my $w=Gtk2::RadioButton->new($extgroup{$ext});
+				$::Tooltips->set_tip($w, ::__x(_"Use {command} to play {ext} files",command=>$cmd, ext=>$ext{$ext}) );
 				$extgroup{$ext}||=$w;
 				$table->attach_defaults($w, $i,$i+1,$j,$j+1);
 				push @widgets,$w;
 				$w->set_active(1) if $cmd eq ($Supported{$ext} || '');
-				$w->signal_connect(toggled => sub { return unless $_[0]->get_active; $Supported{$ext}=$::Options{'123priority_'.$ext}=$cmd;  });
+				$w->signal_connect(toggled => sub { return unless $_[0]->get_active; $Supported{$ext}=$::Options{'123priority_'.$ext}=$cmd; $Supported{$_}=$Supported{$ext} for grep $::Alias_ext{$_} eq $ext, keys %::Alias_ext; });
 			}
 			$i++;
 		}

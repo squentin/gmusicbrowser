@@ -45,7 +45,7 @@ BEGIN
 	jackaudio	=> { name => "jack", option => 'server' },
 #	alsaspdif	=> { option => 'card' },
   );
-  %Plugins=(	mp3	=> 'mad',	ogg => 'vorbisdec',	oga => 'vorbisdec',	ape => 'ffdec_ape',
+  %Plugins=(	mp3	=> 'mad',	oga => 'vorbisdec',	ape => 'ffdec_ape',
 		flac	=> 'flacdec',	mpc => 'musepackdec',	wv => 'wavpackdec',
 	);
   my $error;

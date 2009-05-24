@@ -31,8 +31,7 @@ INIT
 	ape	=> ['Tag::APEfile',	'ape v{version}',		'APE ID3v2 lyrics3v2 ID3v1',],
 	wv	=> ['Tag::WVfile',	'wv v{version}',		'APE ID3v1',],
 );
-#$FORMATS{wvc}=$FORMATS{wv};
-$FORMATS{ogg}=$FORMATS{oga};
+ $FORMATS{$_}=$FORMATS{ $::Alias_ext{$_} } for keys %::Alias_ext;
 }
 
 sub Read
