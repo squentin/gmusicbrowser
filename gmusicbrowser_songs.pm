@@ -420,6 +420,7 @@ our %timespan_menu=
 	id3v1	=> 0,		id3v2	=> 'TIT2',	vorbis	=> 'title',	ape	=> 'Title',	lyrics3	=> 'ETT',
 	'filter:~' => '#_iname# .=~. m"(?:^|/) *#VAL# *(?:[/\(\[]|$)"',		'filter_prep:~'=> \&Filter::SmartTitleRegEx,
 	'filter_simplify:~' => \&Filter::SmartTitleSimplify,
+	makefilter_fromID => '"title:~:" . #get#',
 	edit_order=> 10, letter => 't',
  },
  artist =>
@@ -646,7 +647,12 @@ our %timespan_menu=
  album_years	=> { name => _"Album year(s)", get => 'AA::Get("year:range","album",#album->get_gid#)',	type=> 'virtual',	depend => 'album year',	flags => 'g', letter => 'Y', }, #depends on years from other songs too
  uri		=> { get => '"file://".::url_escape(#path->get# .::SLASH. #file->get#)',	type=> 'virtual',	depend => 'file path',	flags => 'g', },
  fullfilename_raw => { get => '#fullfilename->get#', type=> 'virtual',	flags => 'g',	depend => 'file path',	letter => 'f', },
- fullfilename	=> { get => '#path->get# .::SLASH. #file->get#',	display => '#path->display# .::SLASH. #file->display#',	type=> 'virtual',	flags => 'g',	depend => 'file path',	letter => 'u', },
+ fullfilename	=> {	get	=> '#path->get# .::SLASH. #file->get#',
+	 		display => '#path->display# .::SLASH. #file->display#',
+			makefilter_fromID => '"fullfilename:e:" . ::url_escape(#get#)',
+			type	=> 'virtual',	flags => 'g',	depend => 'file path',	letter => 'u',
+			'filter:e'	=> '#ID# == #VAL#',	'filter_prep:e'=> sub { FindID(::decode_url($_[0])); },
+		   },
  basefilename	=> { get => 'do {my $s=#file->display#; $s=~s/\.[^\.]+$//; $s;}',	type=> 'virtual',	depend => 'file',	flags => 'g', },
  #fileextension => ?
  title_or_file	=> {get => '(#title->get# eq "" ? #file->display# : #title->get#)',	type=> 'virtual',	flags => 'g', depend => 'file title', letter => 'S',},	#why letter S ? :)
@@ -1266,11 +1272,15 @@ warn "MakeFilterFromGID => ".($sub->($gid));
 }
 sub MakeFilterFromID	#should support most fields, FIXME check if works for year/artists/labels/genres/...
 {	my ($field,$ID)=@_;
-	#FIXME PHASE1
-	if ($field eq 'title') { return Filter->new('title:~:'.Get($ID,$field)); } #FIXME check if title eq '' ?
-	my $gid=Get_gid($ID,$field);
-	if (ref $gid) { return Filter->newadd(::FALSE,map MakeFilterFromGID($field,$_), @$gid) }
-	return MakeFilterFromGID($field,$gid);
+	if (my $code=Code($field, 'makefilter_fromID', ID => '$_[0]'))		#FIXME optimize : don't call this every time, for example check for a flag that would indicate that this field has a gid
+	{	my $sub=$FuncCache{'makefilter_fromID '.$field} ||= Compile('makefilter_fromID '.$field, "sub {$code}"); #FIXME if method doesn't exist
+		return Filter->new( $sub->($ID) );
+	}
+	else
+	{	my $gid=Get_gid($ID,$field);
+		if (ref $gid) { return Filter->newadd(::FALSE,map MakeFilterFromGID($field,$_), @$gid) }
+		return MakeFilterFromGID($field,$gid);
+	}
 }
 
 sub Gid_to_Get		#convert a gid from a Get_gid to a what Get would return
