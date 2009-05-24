@@ -1,3 +1,16 @@
+v1.0.1
+- Fixed bug when writing flac tags with non-ascii characters with perl 5.10, that can damage the file
+- Fixed searching for artist pictures on last.fm
+- Fixed replaygain tags not wrote correctly (only one of the 5 fields was written, and with the locale's decimal separator, rather than ".")
+- use Net::DBus::GLib when available rather the hack to connect Net::DBus to the Glib mainloop
+- Fixed some resizing problems with the FB container
+- Renamed the mozembed plugin to webcontext, it can now use either Gtk2::MozEmbed or Gtk2::WebKit
+- added -add command-line option to add files/folders to the library
+- added -playlist, -enqueue, -addplaylist, and -insertplaylist command-line options
+- updated translations : spanish (jjgomera), polish (tizzilzol team)
+- added an oxygen icon theme (Zeltak & pete)
+
+
 v1.0
 - Fixed division by zero error when reading flac files with unknown length, but their length will be 0 for now
 - Fixed wraping of artist/album names for artists/albums with no picture in mosaic mode

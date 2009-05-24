@@ -451,9 +451,9 @@ sub RGA_ReplayGainAnalyse
 	}
 	#FIXME remove duplicates in @$IDs;
 	push @{$RGA_pipeline->{queue}},@$IDs;
-	my $nb=@$IDs; warn "@$IDs";
+	my $nb=@$IDs; #warn "@$IDs";
 	$nb+=@$_-1 for grep ref, @$IDs; #count tracks in album lists
-	$RGA_pipeline->{total}+=$nb; warn "$RGA_pipeline->{total}==$nb;\n";
+	$RGA_pipeline->{total}+=$nb; #warn "$RGA_pipeline->{total}==$nb;\n";
 	RGA_process_next() if $RGA_pipeline->{total}==$nb;
 }
 sub RGA_newpad_cb
@@ -520,14 +520,18 @@ sub RGA_bus_message_tag
 		{	#album done
 			for my $ID (@{$RGA_pipeline->{albumIDs}})
 			{	@$tags{'replaygain-track-gain','replaygain-track-peak'}= @{$RGA_pipeline->{album_tosave}{$ID}};
-				my @modif= map [$_,0,$tags->{$_}[0]], qw/replaygain-reference-level replaygain-track-gain replaygain-track-peak replaygain-album-gain replaygain-album-peak/;
+				::setlocale(::LC_NUMERIC, 'C');
+				my @modif= map [$_,0,"$tags->{$_}[0]"], qw/replaygain-reference-level replaygain-track-gain replaygain-track-peak replaygain-album-gain replaygain-album-peak/;
+				::setlocale(::LC_NUMERIC, '');
 				SimpleTagWriting::set($ID, \@modif, \&RGA_write_error);
 				last unless $RGA_pipeline; #in case RGA has been aborted after an error writing a tag
 			}
 		}
 	}
 	else
-	{	my @modif= map [$_,0,$tags->{$_}[0]], qw/replaygain-reference-level replaygain-track-gain replaygain-track-peak/;
+	{	::setlocale(::LC_NUMERIC, 'C');
+		my @modif= map [$_,0,"$tags->{$_}[0]"], qw/replaygain-reference-level replaygain-track-gain replaygain-track-peak/;
+		::setlocale(::LC_NUMERIC, '');
 		SimpleTagWriting::set( $cID, \@modif, \&RGA_write_error);
 	}
 	1;

@@ -1614,7 +1614,7 @@ our %Boxes=
 		Pack	=> \&SimpleAdd,
 	},
 	FB	=>
-	{	New	=> sub { my $self=Gtk2::Fixed->new; $self->signal_connect(size_allocate=>\&Fixed_size_allocate_cb); $self->{size}=''; return $self; },
+	{	New	=> sub { SFixed->new; },
 		Prefix	=> qr/^(-?\.?\d+,-?\.?\d+(?:,\.?\d+,\.?\d+)?),?\s+/, # "5,4 " or "-5,.4,5,.2 "
 		Pack	=> \&Fixed_pack,
 	},
@@ -1698,10 +1698,10 @@ sub Paned_size_cb
 sub Fixed_pack
 {	my ($self,$wg,$opt)=@_;
 	if (my ($x,$y,$w,$h)= $opt=~m/^(-?\.?\d+),(-?\.?\d+)(?:,(\.?\d+),(\.?\d+))?/)
-	{	if ($1=~m/[-.]/ || $2=~m/[-.]/) { push @{$self->{dynamic_pos}},[$wg,$x,$y]; $self->put($wg,0,0);}
-		else {$self->put($wg,$x,$y);}
+	{	if ($1=~m/[-.]/ || $2=~m/[-.]/) { $wg->{SFixed_dynamic_pos}=[$x,$y]; $self->put($wg,0,0);}
+		else {$self->put($wg,$x,$y); }
 		if ($w||$h)
-		{	if ($w=~m/\./ || $h=~m/\./) { push @{$self->{dynamic_size}},[$wg,$w,$h]; }
+		{	if ($w=~m/\./ || $h=~m/\./) { $wg->{SFixed_dynamic_size}=[$w,$h]; }
 			else
 			{	my ($w2,$h2)=$wg->get_size_request;
 				$wg->set_size_request($w||$w2,$h||$h2);
@@ -1711,27 +1711,38 @@ sub Fixed_pack
 	else { warn "Invalid position '$opt' for widget $wg\n" }
 }
 
-sub Fixed_size_allocate_cb
+package SFixed;
+use Gtk2;
+use Glib::Object::Subclass
+	Gtk2::Fixed::,
+	signals =>
+	{	size_allocate => \&size_allocate,
+	};
+sub size_allocate
 {	my ($self,$alloc)=@_;
-	return unless $self->{dynamic_pos} || $self->{dynamic_size};
-	my ($w,$h)=($alloc->values)[2,3];
-	return if $self->{size} eq $w.'x'.$h;
-	$self->{size}=$w.'x'.$h;
-	for my $ref (@{$self->{dynamic_pos}})
-	{	my ($wg,$x,$y)=@$ref;
-		$x=~m/\./ and $x*=$w;
-		$y=~m/\./ and $y*=$h;
-		$x=~m/^-/ and $x+=$w;
-		$y=~m/^-/ and $y+=$h;
-		$self->move($wg,$x,$y);
-	}
-	for my $ref (@{$self->{dynamic_size}})
-	{	my ($wg,$ww,$wh)=@$ref;
-		$ww=~m/\./ and $ww*=$w;
-		$wh=~m/\./ and $wh*=$h;
-		my ($ww2,$wh2)=$wg->get_size_request;
-		$ww||=$ww2; $wh||=$wh2;
-		$wg->set_size_request($ww,$wh);
+	my ($ox,$oy,$w,$h)=$alloc->values;
+	my $border=$self->get_border_width;
+	$ox+=$border; $w-=$border*2;
+	$oy+=$border; $h-=$border*2;
+	for my $child ($self->get_children)
+	{	my ($x,$y)=$self->child_get_property($child,qw/x y/);
+		if (my $ref=$child->{SFixed_dynamic_pos})
+		{	my ($x2,$y2)=@$ref;
+			$x2=~m/\./ and $x2=int($x2*$w);
+			$y2=~m/\./ and $y2=int($y2*$h);
+			$x2=~m/^-/ and $x2+=$w;
+			$y2=~m/^-/ and $y2+=$h;
+			if ($x2!=$x || $y2!=$y) { $self->move($child,$x=$x2,$y=$y2); }
+		}
+		my ($ww,$wh);
+		if (my $ref=$child->{SFixed_dynamic_size})
+		{	($ww,$wh)=@$ref;
+			$ww=~m/\./ and $ww*=$w;
+			$wh=~m/\./ and $wh*=$h;
+		}
+		$ww||=$child->size_request->width;
+		$wh||=$child->size_request->height;
+		$child->size_allocate(Gtk2::Gdk::Rectangle->new($ox+$x, $oy+$y, $ww,$wh));
 	}
 }
 

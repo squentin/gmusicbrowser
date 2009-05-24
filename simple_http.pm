@@ -84,7 +84,7 @@ sub connecting_cb
 	if ($failed)
 	{	warn "Cannot connect to server $host:$port\n";
 		close $socket;
-		&{ $self->{params}{cb} }();
+		$self->{params}{cb}();
 		return 0;
 	}
 

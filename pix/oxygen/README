@@ -1,0 +1,26 @@
+This is a mashup of Zeltak's Oxygen set for Gmusicbrowser, rounded out with some KDE Oxygen system icons to give the theme a little more of an "integrated" look when running on KDE4. Nothing in here is original work of mine, it's all either from Zeltak or the Oxygen team. I think it's complete, if you notice anything missing, please let me know.
+
+INSTALLATION
+*ACHTUNG!* These paths are valid in Ubuntu 8.04, if you're running something else check the paths first!
+---
+tar -xfvz GMB_Oxy_Mashup.tar.gz
+cd GMB_Oxy_Mashup
+cp GMB_Oxy_Mashup_v0.02/ -t ~/.config/gmusicbrowser/icons/
+sudo cp GMB_Oxy_Mashup_Stars/* -t /usr/share/gmusicbrowser/pix/
+
+THANKS TO
+---
+*Quentin Sculo for this tremendous program, and for always taking time for a n00b's questions. --> http://squentin.free.fr/gmusicbrowser/gmusicbrowser.html
+
+*Zeltak for the great work on the "original" Oxygen set for Gmusicbrowser, and gracious permission to build on that work, without which this would be one half of a half-assed icon set :) --> http://squentin.free.fr/gmusicbrowser/contrib/GMB_Oxygen_v9.zip
+
+*David Vignoni and the Oxygen team for raising the bar. --> http://www.oxygen-icons.org/?page_id=16
+
+*Kid Rock for the soundtrack. --> http://www.kidrock.com/
+
+*...AND VIEWERS LIKE YOU!
+
+
+
+Enjoy!
+p.daniels <carl1086@mrs.umn.edu>

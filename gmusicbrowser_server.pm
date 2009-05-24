@@ -69,6 +69,7 @@ sub SkipTo	{}
 
 sub SetVolume	{}
 sub GetVolume	{-1}
+sub GetVolumeError { _"Can't change the volume in non-gstreamer iceserver mode" }
 sub GetMute	{0}
 
 1;

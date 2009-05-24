@@ -11,6 +11,7 @@ use strict;
 use warnings;
 our @ISA=('Tag::OGG');
 
+use bytes;
 use constant
 { STREAMINFO	=> 0,
   PADDING	=> 1,
@@ -74,7 +75,7 @@ sub new
 
 }
 
-sub write_file	# experimental
+sub write_file
 {	my $self=shift;
 	local $_;
 	my ($INfh,$OUTfh);
@@ -91,12 +92,12 @@ sub write_file	# experimental
 		if ($type!=VORBIS_COMMENT && $type!=PADDING)
 		{	$buffer&=0x7fffffff;	#set Last-metadata-block flag to 0
 			$towrite.=pack 'N',$buffer;
-			unless (read($fh,$towrite,$size,length($towrite))==$size)
+			unless (read($fh,$towrite,$size,bytes::length($towrite))==$size)
 			 { warn "flac: Premature end of file\n"; return undef; }
 		}
 		else {$padding+=$size+4; seek $fh,$size,1; }
 	}
-	$padding-=4+length $$newcom_packref;
+	$padding -= 4 + bytes::length $$newcom_packref;
 	my $header=VORBIS_COMMENT;
 	my $inplace=($padding==0 || ($padding>3 && $padding<8192) );
 	#if ($inplace && $padding<4)
@@ -106,7 +107,7 @@ sub write_file	# experimental
 	{	$padding=$inplace? $padding-4 : 256;
 		$padding=pack "Nx$padding",((0x80+PADDING)<<24)+$padding;
 	}
-	$header=pack 'N',($header<<24)+length $$newcom_packref;
+	$header=pack 'N',($header<<24) + bytes::length $$newcom_packref;
 	if ($inplace)
 	{	$self->_close;
 		$fh=$self->_openw or return undef;
@@ -200,10 +201,10 @@ sub _PackComments
 	{	my $nb=$count{$key}++ || 0;
 		my $val=$self->{comments}{$key}[$nb];
 		next unless defined $val;
-		push @comments,$key.'='.$val;
+		push @comments, $key.'='.$val;
 	}
 	my $packet=pack 'V/a* V (V/a*)*',$self->{vorbis_string},scalar @comments,@comments;
-	#$packet.="\x01"; #framing_flag #gstreamer doesn't like it and not needed anyway
+	#$packet.="\x01"; #framing_flag #gstreamer doesn't like it and not needed in flac files anyway
 	return \$packet;
 }
 

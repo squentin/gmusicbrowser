@@ -1792,7 +1792,7 @@ sub new
     my $group=$self->{group}=$opt1->{group};
     $self->{min}=$opt2->{min}||1;
 
-    my $spin=Gtk2::SpinButton->new( Gtk2::Adjustment->new($self->{min}, 1, 9999, 1, 10, 1) ,10,0  );
+    my $spin=Gtk2::SpinButton->new( Gtk2::Adjustment->new($self->{min}, 1, 9999, 1, 10, 0) ,10,0  );
     $spin->signal_connect( value_changed => sub { $self->update($_[0]->get_value); } );
     my $ResetB=::NewIconButton('gtk-clear',undef,sub { ::SetFilter($_[0],undef,$nb,$group); });
     $ResetB->set_sensitive(0);
@@ -1937,9 +1937,9 @@ sub updatefilter
 
 sub update
 {  my ($self,$min)=@_;
+   if ($min) { $self->{min}=$min; }
    if (!$self->{list} || $::ToDo{'9_FPfull'.$self}) { $self->updatefilter; return; }
    warn "Updating FilterPane".$self->{nb}."\n" if $::debug;
-   if ($min) { $self->{min}=$min; }
    if (!$min || $::ToDo{'9_FP'.$self})
    {	$self->{$_}{hash}=undef for @{ $self->{fieldlist} };
 	delete $::ToDo{'9_FP'.$self};
@@ -4766,6 +4766,7 @@ sub SetFilter
 	::SortList($self->{array},$self->{sort}) if exists $self->{sort};
 	$self->BuildTree;
 	$self->{vadj}->set_value(0);
+	$self->FollowSong if $self->{TogFollow};
 }
 
 sub BuildTree
@@ -6210,6 +6211,7 @@ sub layout_draw
 	$y+=$arg->{y};
 	my $clip= Gtk2::Gdk::Rectangle->new($x,$y,$w,$h)->intersect($arg->{clip});
 	return unless $clip;
+	$layout->set_width($w * Gtk2::Pango->scale); $layout->set_ellipsize('end'); #ellipsize
 	$arg->{style}->paint_layout($arg->{window},$arg->{state},1,$clip,$arg->{widget}{stylewidget},'cellrenderertext',$x,$y,$layout);
 #	my $gc=$arg->{style}->text_gc($arg->{state});
 #	$gc->set_clip_rectangle($clip);
@@ -6646,7 +6648,7 @@ our %vars2=
  }
 );
 
-my %PCompl=( '{','}',  '(',')',  '[',']' , '"', =>0, '"'=>0,  );
+my %PCompl=( '{','}',  '(',')',  '[',']' , '"', =>0, "'"=>0,  );
 
 sub split_options #doesn't work the same as ParseOptions : count parens and don't remove quotes #FIXME find a way to merge them ?
 {	(local $_,my $prefix)=@_;

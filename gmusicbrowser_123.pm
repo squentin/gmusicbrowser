@@ -220,7 +220,7 @@ sub AdvancedOptions
 }
 
 package Play_amixer;
-my ($mixer,$Mute,$Volume);
+my ($mixer,$Mute,$Volume,$VolumeError);
 
 sub init
 {	return if $Volume;
@@ -237,7 +237,29 @@ sub init
 
 }
 
-sub GetVolume	{ if ($Volume==-2) {$Volume=-1;SetVolume();}; $Volume; }
+sub GetVolume
+{	if ($Volume==-2)
+	{	$Volume=-1;
+		{	last unless $mixer;
+			my @list=get_amixer_SMC_list();;
+			my %h; $h{$_}=1 for @list;
+			my $c=\$::Options{amixerSMC};
+			if ($$c) { SetVolume(); last if $Volume>=0 || $h{$$c}; $$c=''; }
+			if	($h{PCM})	{$$c='PCM'}
+			elsif	($h{Master})	{$$c='Master'}
+			else	{ warn "Don't know what mixer to choose among : @list\n"; }
+		}
+		SetVolume();
+
+	}
+	return $Volume;
+}
+sub GetVolumeError
+{	!$mixer ? _"Can't change the volume. Needs amixer (packaged in alsa-utils) to change volume when using this audio backend." :
+	!$::Options{amixerSMC} ? _"You must choose a mixer control in the advanced options" :
+	_"Error running amixer";
+
+}
 sub GetMute	{$Mute}
 sub SetVolume
 {	shift;

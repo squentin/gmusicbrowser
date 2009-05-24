@@ -394,7 +394,7 @@ sub new
 #short circuit if a LOT of songs : don't add file-specific tags, building the GUI would be too long anyway
 return $self if @IDs>1000;
 #######################################################
-	::SortList(\@IDs,::SONG_UPATH.' '.::SONG_UFILE);
+	::SortList(\@IDs,join(' ',::SONG_UPATH,::SONG_DISC,::SONG_TRACK,::SONG_UFILE));
 	#edition of file-specific tags (track title)
 	my $perfile_table=Gtk2::Table->new( scalar(@IDs), 6, FALSE);
 	$self->{perfile_table}=$perfile_table;
@@ -814,7 +814,13 @@ sub set
 			my ($key,@extra)=split /-/,$TAGCODE{$field}[K_ID3V2],-1; #-1 to keep empty trailing fields #COMM-- => key="COMM" and @extra=("","")
 			@vals=@{$vals[0]} if ref $vals[0];
 			unshift @vals,@extra;
-			$id3v2->remove_all($key) unless $add;
+			unless ($add)
+			{	if (my $subkey=$extra[0]) #for TXXX fields with a non-null description => remove only those with same description
+				{	my $frames= $id3v2->{frames}{$key};
+					if ($frames) { $id3v2->remove($key,$_) for grep $frames->[$_] && $frames->[$_][0] eq $subkey, 0..$#$frames; }
+				}
+				else { $id3v2->remove_all($key) unless $add; }
+			}
 			next if $field eq ::SONG_GENRE && !@vals;
 			$id3v2->insert($key,@vals);
 			if ($field eq ::SONG_DATE && $id3v2->{version}==4 && $vals[0]=~m/^\d{4}$/) { $id3v2->remove_all('TDRC'); $id3v2->insert('TDRC',$vals[0]); } #special-case: write a TDRC field for id3v2.4 in addition to TYER  #FIXME only support the yyyy format, could try to convert the date to yyyy-MM-ddTHH:mm:ss format

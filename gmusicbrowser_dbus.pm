@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-package GMBDBusObject;
+package GMB::DBus::Object;
 
 use base 'Net::DBus::Object';
 use Net::DBus::Exporter 'org.gmusicbrowser';
@@ -116,17 +116,31 @@ package GMB::DBus;
 
 use Net::DBus;
 use Net::DBus::Service;
-use Net::DBus::Reactor;
+
+my $not_glib_dbus;
+my $bus;
+eval { require Net::DBus::GLib; $bus=Net::DBus::GLib->session; };
+unless ($bus)
+{	#warn "Net::DBus::GLib not found (not very important)\n";
+	$not_glib_dbus=1;
+	$bus= Net::DBus->session;
+}
 
 Glib::Idle->add(\&init); #initialize once the main gmb init is finished
 
 sub init
-{	my $bus = Net::DBus->session;
-	my $service = $bus->export_service('org.gmusicbrowser');
-	my $object = GMBDBusObject->new($service);
+{	#my $bus = Net::DBus->session;
+	my $service= $bus->export_service('org.gmusicbrowser');
+	my $object = GMB::DBus::Object->new($service);
+	DBus_mainloop_hack() if $not_glib_dbus;
+	0; #called in an idle, return 0 to run only once
+}
 
+sub DBus_mainloop_hack
+{	# use Net::DBus internals to connect it to the Glib mainloop, though unlikely, it may break with future version of Net::DBus
+	use Net::DBus::Reactor;
 	my $reactor=Net::DBus::Reactor->main;
-	# use Net::DBus internals to connect it to the Glib mainloop, though unlikely, it may break with future version of Net::DBus
+
 	for my $ref (['in','read'],['out','write'], ['err','exception'])
 	{	my ($type1,$type2)=@$ref;
 		for my $fd (keys %{$reactor->{fds}{$type2}})
@@ -140,7 +154,11 @@ sub init
 		}
 	}
 
-	0; #called in an idle, return 0 to run only once
+	# run the dbus mainloop once so that events already pending are processed
+	# needed if events already waiting when gmb is starting
+		my $timeout=$reactor->add_timeout(1, Net::DBus::Callback->new( method => sub {} ));
+		Net::DBus::Reactor->main->step;
+		$reactor->remove_timeout($timeout);
 }
 
 1;

@@ -57,7 +57,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.0',
+ VERSION => '1.01',	#used for easy numeric comparison
+ VERSIONSTRING => '1.0.1',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 
@@ -156,7 +157,7 @@ BEGIN
 	?  $HomeDir.'gmusicbrowser.fifo'
 	: undef;
 
-my $help=PROGRAM_NAME.' v'.VERSION." (c)2005-2008 Quentin Sculo
+my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2008 Quentin Sculo
 options :
 -c	: don't check for updated/deleted songs on startup
 -s	: don't scan folders for songs on startup
@@ -176,17 +177,25 @@ options :
 -layout NAME		: use layout NAME for player window
 -load FILE		: Load FILE as a plugin
 -use-gnome-session 	: Use gnome libraries to save tags/settings on session logout
+
+Command options, all following arguments constitute CMD :
 -cmd CMD...		: launch gmusicbrowser if not already running, and execute command CMD
 -remotecmd CMD...	: execute command CMD in a running gmusicbrowser
 -launch_or_cmd CMD...	: launch gmusicbrowser if not already running OR execute command CMD in a running gmusicbrowser
 (-cmd, -remotecmd and -launch_or_cmd must be the last option, all following arguments are put in CMD)
+
+Options to change what is done with files/folders passed as arguments (done in running gmusicbrowser if there is one) :
+-playlist		: Set them as playlist (default)
+-enqueue		: Enqueue them
+-addplaylist		: Add them to the playlist
+-insertplaylist		: Insert them in the playlist after current song
 
 -tagedit FOLDER_OR_FILE ... : Edittag mode
 -listcmd : list the available fifo commands and exit
 ";
   unshift @ARGV,'-tagedit' if $0=~m/tagedit/;
   $CmdLine{gst}=0;
-  my @files;
+  my @files; my $filescmd;
    while (defined (my $arg=shift))
    {	if   ($arg eq '-c')	{$CmdLine{nocheck}=1}
 	elsif($arg eq '-s')	{$CmdLine{noscan}=1}
@@ -214,7 +223,12 @@ options :
 	elsif($arg eq '-cmd')   { RunRemoteCommand(@ARGV); $CmdLine{runcmd}="@ARGV"; last; }
 	elsif($arg eq '-remotecmd'){ RunRemoteCommand(@ARGV); exit; }
 	elsif($arg eq '-launch_or_cmd'){ RunRemoteCommand(@ARGV); last; }
-	elsif(-e $arg || $arg=~m#http://#) { push @files,$arg }
+	elsif($arg eq '-add')		{ $filescmd='AddToLibrary'; }
+	elsif($arg eq '-playlist')	{ $filescmd='OpenFiles'; }
+	elsif($arg eq '-enqueue')	{ $filescmd='EnqueueFiles'; }
+	elsif($arg eq '-addplaylist')	{ $filescmd='AddFilesToPlaylist'; }
+	elsif($arg eq '-insertplaylist'){ $filescmd='InsertFilesInPlaylist'; }
+	elsif($arg=~m#^http://# || -e $arg) { push @files,$arg }
 	else
 	{	warn "unknown option '$arg'\n" unless $arg=~/^--?h(elp)?$/;
 		print $help;
@@ -228,7 +242,8 @@ options :
 		s/([^A-Za-z0-9])/sprintf('%%%02X', ord($1))/seg; #FIXME use url_escapeall, but not yet defined
 	  }
 	}
-	my $cmd="OpenFiles(@files)";
+	$filescmd ||= 'OpenFiles';
+	my $cmd="$filescmd(@files)";
 	RunRemoteCommand($cmd);
 	$CmdLine{runcmd}=$cmd;
   }
@@ -453,7 +468,7 @@ sub ExtractNameAndOptions
 		if ($prefixre)
 		{	$prefix=$1 if s/^$prefixre//;
 		}
-		m/[^( ]*/g; #name in "name(options...)"
+		m/[^(\s]*/g; #name in "name(options...)"
 		my $depth=0;
 		$depth=1 if m#\G\(#gc;
 		while ($depth)
@@ -620,7 +635,7 @@ sub ConvertTime	# convert date pattern into nb of seconds
 		elsif (m/^(\d\d\d\d)-(\d\d?)-(\d\d?)/) { $_=mktime(0,0,0,$3,$2-1,$1-1900); }
 		elsif (m/^(\d+\.?\d*)([smhdwMy])$/){ $_=time-$1*$DATEUNITS{$2}[0];   }
 	}
-	return (defined $d2?  join(' ',sort { $a <=> $b } $d1,$d2) : $d1 );
+	return ( (defined $d2 && $d2 ne '')?  join(' ',sort { $a <=> $b } $d1,$d2) : $d1 );
 }
 
 
@@ -697,7 +712,7 @@ our %Options=
 	PlayedPercent	=> .85,	#percent of a song played to increase play count
 	DefaultRating	=> 50,
 	Device		=> 'default',
-	amixerSMC	=> 'PCM',
+#	amixerSMC	=> 'PCM',
 #	gst_sink	=> 'alsa',
 	gst_volume	=> 100,
 	gst_use_equalizer=>0,
@@ -915,9 +930,13 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	TogArtistLock	=> [sub {ToggleLock(SONG_ARTIST)},	_"Toggle Artist Lock"],
 	TogAlbumLock	=> [sub {ToggleLock(SONG_ALBUM)},	_"Toggle Album Lock"],
 	SetSongRating	=> [sub {return unless defined $SongID && $_[1]=~m/^\d*$/; $Songs[$SongID][SONG_RATING]=$_[1]; SongChanged($SongID,SONG_RATING); },				_"Set Current Song Rating", _"Rating between 0 and 100, or empty for default", qr/^\d*$/],
-	ToggleFullscreen=> [\&Layout::ToggleFullscreen,		_"Toggle fullscreen mode"],
-	ToggleFullscreenLayout=> [\&ToggleFullscreenLayout, _"Toggle the fullscreen layout"],
-	OpenFiles	=> [\&OpenFiles, _"Play a list of files", _"url-encoded list of files",0],
+	ToggleFullscreen=> 	[\&Layout::ToggleFullscreen,	_"Toggle fullscreen mode"],
+	ToggleFullscreenLayout=>[\&ToggleFullscreenLayout,	_"Toggle the fullscreen layout"],
+	OpenFiles	=> [sub { DoActionForList('playlist',Url_to_IDs($_[1])); }, _"Play a list of files/folders", _"url-encoded list of files/folders",0],
+	AddFilesToPlaylist=> [sub { DoActionForList('addplay',Url_to_IDs($_[1])); }, _"Add a list of files/folders to the playlist", _"url-encoded list of files/folders",0],
+	InsertFilesInPlaylist=> [sub { DoActionForList('insertplay',Url_to_IDs($_[1])); }, _"Insert a list of files/folders at the start of the playlist", _"url-encoded list of files/folders",0],
+	EnqueueFiles	=> [sub { DoActionForList('queue',Url_to_IDs($_[1])); }, _"Enqueue a list of files/folders", _"url-encoded list of files/folders",0],
+	AddToLibrary	=> [sub { AddToLibrary(split / /,$_[1]); }, _"Add files/folders to library", _"url-encoded list of files/folders",0],
 	SetFocusOn	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->SetFocusOn($name) if $w;},_"Set focus on a layout widget", _"Widget name",0],
 	ShowHideWidget	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->ShowHide(split / +/,$name,2) if $w;},_"Show/Hide layout widget(s)", _"|-separated list of widget names",0],
 	PopupTrayTip	=> [sub {ShowTraytip($_[1])}, _"Popup Traytip",_"Number of milliseconds",qr/^\d*$/ ],
@@ -1068,6 +1087,7 @@ sub Edittag_mode
 {	my @dirs=@_;
 	#make path absolute
 	file_name_is_absolute($_) or $_=$CurrentDir.SLASH.$_ for @dirs;
+	$re_artist=qr/$/;
 	IdleScan(@dirs);
 	IdleDo('9_SkipLength',undef,sub {undef @LengthEstimated});
 	Gtk2->main_iteration while Gtk2->events_pending;
@@ -1363,7 +1383,7 @@ sub makeVolSlider
 }
 
 sub PopupVol
-{	if ($Play_package->GetVolume <0) { ErrorMessage(_"Can't set the volume, that's probably because amixer (packaged in alsa-utils) is not installed."); return }
+{	if ($Play_package->GetVolume <0) { ErrorMessage($Play_package->GetVolumeError); return }
 	my $slider=makeVolSlider();
 	$slider->set_size_request(-1, 100);
 	my $popup=Gtk2::Window->new('popup');
@@ -1453,6 +1473,13 @@ sub ReadSavedTags	#load tags _and_ settings
 	if ($oldversion<0.9540)
 	{	$Options{Layout}='default player layout' if $Options{Layout} eq 'default';
 		$Options{'Layout_default player layout'}=delete $Options{Layout_default};
+	}
+	if ($oldversion<=1.0)
+	{	for my $key (grep m/^PLUGIN_MozEmbed/,keys %Options)
+		{	my $old=$key;
+			$key=~s/^PLUGIN_MozEmbed/PLUGIN_WebContext/;
+			$Options{$key}=delete $Options{$old};
+		}
 	}
 	#@Library=();
 	$Options{ArtistSplit}||=' & |, ';
@@ -2122,6 +2149,7 @@ sub DoActionForList
 {	my ($action,$list)=@_;
 	$action||='playlist';
 	my @list=@$list;
+	return unless @list;
 	SortList(\@list) if @list>1 && $action!~/queue/; #Enqueue will sort it
 	if ($action eq 'playlist') { Select( song=>'trykeep', staticlist => \@list ); }
 	elsif ($action eq 'addplay') { $list=[@::ListPlay,@list]; Select( song=>'trykeep', staticlist => $list ); }
@@ -3321,7 +3349,7 @@ sub drag_begin_cb	#create drag icon
 	$pixmap->draw_layout(   $style->text_gc('normal'), $PAD, $PAD, $layout);
 	$context->set_icon_pixmap($pixmap->get_colormap,$pixmap,undef,$w/2,$h);
 	######
-	&{$self->{drag_begin_cb}}($self,$context) if $self->{drag_begin_cb};
+	$self->{drag_begin_cb}($self,$context) if $self->{drag_begin_cb};
 }
 sub drag_end_cb
 {	shift->{drag_is_source}=undef;
@@ -3352,7 +3380,7 @@ sub drag_data_received_cb
 	{	my @values=split "\x0d\x0a",$data->data;
 		_utf8_on($_) for @values;
 		unshift @values,$context->{dest} if $context->{dest} && $context->{dest}[0]==$self;
-		&$sub($self, $::DRAGTYPES{$data->target->name} , @values);
+		$sub->($self, $::DRAGTYPES{$data->target->name} , @values);
 		$ret=1;#$del=1;
 	}
 	$context->finish($ret,$del,$time);
@@ -3375,7 +3403,7 @@ sub drag_scrolling_cb
 	{	my ($align,$path)=($s<0)? (.1, $self->get_path_at_pos(0,0))
 					: (.9, $self->get_path_at_pos(0,$self->get_visible_rect->height));
 		$self->scroll_to_cell($path,undef,::TRUE,$align) if $path;
-		&{ $self->{drag_motion_cb} } ($self,$self->{context}, ($self->window->get_pointer)[1,2], 0 ) if $self->{drag_motion_cb};
+		$self->{drag_motion_cb}->($self,$self->{context}, ($self->window->get_pointer)[1,2], 0 ) if $self->{drag_motion_cb};
 		return 1;
 	}
 	else
@@ -3524,6 +3552,7 @@ sub ChooseDir
 	if ($dialog->run eq 'ok')
 	{   @paths=$dialog->get_filenames;
 	    eval { $_=filename_from_unicode($_); } for @paths;
+	    _utf8_off($_) for @paths; # folder names that failed filename_from_unicode still have their uft8 flag on
 	    @paths= grep -d, @paths;
 	}
 	else {@paths=()}
@@ -4709,23 +4738,28 @@ sub AddRadio
 	return $ID;
 }
 
-sub OpenFiles
+sub Url_to_IDs
 {	my @IDs;
-	for my $f (split / /,$_[1])
+	for my $f (split / /,$_[0])
 	{	if ($f=~m#^http://#) { push @IDs,AddRadio($f,1); }
 		else
 		{	$f=decode_url($f);
-			$f=~s#^file://##;
 			my $l=ScanFolder($f);
 			push @IDs, @$l if ref $l;
 		}
 	}
-	Select(song=>'first',play=>1,staticlist => \@IDs) if @IDs;
+	return \@IDs;
+}
+
+sub AddToLibrary
+{	my @list=map decode_url($_), @_;
+	IdleScan(@list);
 }
 
 sub ScanFolder
 {	my $notlibrary=$_[0];
 	my $dir= $notlibrary || shift @ToScan;
+	$dir=~s#^file://##; $dir=~s/$QSLASH+$//o;
 	warn "Scanning $dir\n" if $debug;
 	$ProgressNBFolders++ unless $notlibrary;
 	my @pictures;
@@ -4834,7 +4868,7 @@ sub CheckCover
 
 sub AboutDialog
 {	my $dialog=Gtk2::AboutDialog->new;
-	$dialog->set_version(VERSION);
+	$dialog->set_version(VERSIONSTRING);
 	$dialog->set_copyright("Copyright © 2005-2008 Quentin Sculo");
 	#$dialog->set_comments();
 	$dialog->set_license("Released under the GNU General Public Licence version 3\n(http://www.gnu.org/copyleft/gpl.html)");
@@ -5981,8 +6015,7 @@ sub CreateProgressWindow
 			{	if (@LengthEstimated > $lengthcheck_max)
 				{	$lengthcheck_max=@LengthEstimated;
 					$Bstop->hide;
-					$label3->set_label( __( "Checking length/bitrate of %d mp3 file without VBR header...",
-								"Checking length/bitrate of %d mp3 files without VBR header...", $lengthcheck_max)  );
+					$label3->set_label( __("Checking length/bitrate of %d mp3 file without VBR header...", "Checking length/bitrate of %d mp3 files without VBR header...", $lengthcheck_max)  );
 				}
 				$fraction=($lengthcheck_max-@LengthEstimated)/$lengthcheck_max;
 			}
@@ -6419,7 +6452,7 @@ sub new
 			}
 		}],
 	motion => sub
-		{	my ($treeview,$context,$x,$y,$time)=@_;# warn "drag_motion_cb @_";
+		{	my ($treeview,$context,$x,$y,$time)=@_; #warn "drag_motion_cb @_";
 			my $store=$treeview->get_model;
 			my ($path,$pos)=$treeview->get_dest_row_at_pos($x,$y);
 			$path||=Gtk2::TreePath->new_first;
@@ -6533,7 +6566,7 @@ sub Set
 
 	my $iter;
 	if ($startpath)
-	{	$iter=$store->get_iter($startpath);
+	{	$iter=$store->get_iter($startpath); #warn "set filter $filter at path=".$startpath->to_string;
 		my $parent=$store->iter_parent($iter);
 		if (!$parent && !$store->iter_has_child($iter)) #add a root
 		{	$parent=$store->prepend(undef);
@@ -7654,7 +7687,7 @@ use base 'Gtk2::SpinButton';
 
 sub new
 {	my ($class,$activatesub,$changesub,$init) = @_;
-	my $self = bless Gtk2::SpinButton->new( Gtk2::Adjustment->new($init||0, 0, 99999, 1, 10, 1) ,10,0  ), $class;
+	my $self = bless Gtk2::SpinButton->new( Gtk2::Adjustment->new($init||0, 0, 99999, 1, 10, 0) ,10,0  ), $class;
 	$self->set_numeric(::TRUE);
 	$self->signal_connect(value_changed => $changesub) if $changesub;
 	$self->signal_connect(activate => $activatesub) if $activatesub;
@@ -7748,7 +7781,7 @@ sub new
 	($val,$unit)=($init=~m/^(.*)([$valid])$/) if $init;
 	$val=1 unless defined $val;
 	$unit=$defunit unless defined $unit;
-	my $spin=Gtk2::SpinButton->new( Gtk2::Adjustment->new($val||0, 0, $max, 1, 10, 1) ,10,0  );
+	my $spin=Gtk2::SpinButton->new( Gtk2::Adjustment->new($val||0, 0, $max, 1, 10, 0) ,10,0  );
 	$spin->set_numeric(::TRUE);
 	my $combo=Gtk2::OptionMenu->new;
 	$self->pack_start($spin, ::FALSE,::FALSE, 0);

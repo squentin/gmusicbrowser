@@ -93,8 +93,8 @@ Containers options can be specified in parenthesis before the child widgets list
 <dt><b>EB</b> : Expander (based on <a href=http://developer.gnome.org/doc/API/2.0/gtk/GtkExpander.html>GtkExpander</a>)</dt><dd>
 	contains only one widget/container which can be showed/hidden<br>
 	option : label : text for the optional widget
-	syntax : <code>FBname = (label="optional label") widget1</code><br>
-	or : <code>FBname = widget1</code><br>
+	syntax : <code>EBname = (label="optional label") widget1</code><br>
+	or : <code>EBname = widget1</code><br>
 </dd>
 <dt><b>FB</b> : Fixed (based on <a href=http://developer.gnome.org/doc/API/2.0/gtk/GtkFixed.html>GtkFixed</a>)</dt><dd>
 	Each widget is positionned at precise coordinates<br>
@@ -249,7 +249,7 @@ Size of buttons and indicators can be set to menu, small-toolbar, large-toolbar,
 All indicators can be changed to buttons with the option button=1.<br>
 Size can be changed same as buttons, see above.<br>
 <br>
-A lot of widgets, in particular labels, indicators and buttons can use the option click1 (or click2 ...) to (re)define the action executed when the widget is clicked with mouse button 1 (or 2 ...). Example : <code>click2=OpenSongProp</code>, bouttons widget also accept the option activate to (re)define the action executed when the button is activated with a mouse click or keyboard<br>
+A lot of widgets, in particular labels, indicators and buttons can use the option click1 (or click2 ...) to (re)define the action executed when the widget is clicked with mouse button 1 (or 2 ...). Example : <code>click2=OpenSongProp</code>, buttons widget also accept the option activate to (re)define the action executed when the button is activated with a mouse click or keyboard<br>
 Also, a lot of widgets, in particular labels, indicators and buttons, can use the option tip, to define a tooltip for the widget. The tip can contains <a href="#songvar">%-letters</a> to display informations on the current song.<br>
 Another common option is cursor, to to change the mouse cursor when it hovers over it (eg : cursor=hand2). See <a href="http://gtk2-perl.sourceforge.net/doc/pod/Gtk2/Gdk/Cursor.html#enum_Gtk2_Gdk_Cursor">this page</a> for a list of cursor names.<br><br>
 
