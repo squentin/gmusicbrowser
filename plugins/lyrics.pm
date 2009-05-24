@@ -36,7 +36,7 @@ my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 	#googlemusic =>	['google music','http://www.google.com/musicsearch?q="%a"+"%s"'],
 	lyriki	=>	['lyriki','http://lyriki.com/index.php?title=%a:%s',undef,
 		sub { my $no= $_[0]=~m/<div class="noarticletext">/s; $_[0]=~s/^.*<!--\s*start content\s*-->(.*?)<!--\s*end content\s*-->.*$/$1/s && !$no; }],
-	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/plugin/?title=%s&artist=%a',undef,
+	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a',undef,
 			sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
 	lyricssongs =>	['lyrics-songs','http://www.lyrics-songs.com/winamp.php?musica=%s&artista=%a',undef,
 			sub { $_[0]=~s#<img src='p_bg2.gif'[^/]*/>##si; return 0 }], #remove image, return always 0 as lyrics-songs sometimes guess when the song is not found
