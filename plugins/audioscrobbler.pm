@@ -26,7 +26,7 @@ require 'simple_http.pm';
 
 my $self=bless {},__PACKAGE__;
 my ($currentsong,$timecount,$songsubmitted);
-my @ToSubmit; my $unsent_saved=0;
+my @ToSubmit; my $NowPlaying; my $unsent_saved=0;
 my $interval=5; my ($timeout,$waiting);
 my ($HandshakeOK,$submiturl,$nowplayingurl,$sessionid);
 my ($Serrors,$Stop);
@@ -80,7 +80,16 @@ sub SongChanged
 	return if defined $currentsong && $currentsong==$::SongID;
 	$currentsong=$::SongID;
 	$songsubmitted=$timecount=0;
-	#FIXME submit nowplaying
+	$NowPlaying=undef;
+
+	my ($title,$artist,$album,$track,$length)
+			=@{$::Songs[$::SongID]}[::SONG_TITLE,::SONG_ARTIST,::SONG_ALBUM,::SONG_TRACK,::SONG_LENGTH];
+	return if $title eq '';
+	return if $artist eq '<Unknown>';
+	$album='' if $album=~m/^<Unknown>/;
+
+	$NowPlaying= [ $artist, $title, $album, $length, $track, '' ];
+	Sleep();
 }
 
 sub Played
@@ -142,27 +151,41 @@ sub response_cb
 }
 
 sub Submit
-{	return unless @ToSubmit;
-	my $post="s=$sessionid";
+{	my $post="s=$sessionid";
 	my $i=0;
-	while (my $aref=$ToSubmit[$i])
-	{	my @data= map { defined $_ ? ::url_escapeall($_) : "" } @$aref;
-		$post.=sprintf "&a[$i]=%s&t[$i]=%s&b[$i]=%s&m[$i]=%s&l[$i]=%s&i[$i]=%s&n[$i]=%s&o[$i]=%s&r[$i]=", @data;
-		$i++;
-		last if $i==50; #don't submit more than 50 songs at a time
+	my $url;
+	if (@ToSubmit)
+	{	while (my $aref=$ToSubmit[$i])
+		{	my @data= map { defined $_ ? ::url_escapeall($_) : "" } @$aref;
+			$post.=sprintf "&a[$i]=%s&t[$i]=%s&b[$i]=%s&m[$i]=%s&l[$i]=%s&i[$i]=%s&n[$i]=%s&o[$i]=%s&r[$i]=", @data;
+			$i++;
+			last if $i==50; #don't submit more than 50 songs at a time
+		}
+		$url=$submiturl;
+		return unless $i;
 	}
-	return unless $i;
+	elsif ($NowPlaying)
+	{	my @data= map { defined $_ ? ::url_escapeall($_) : "" } @$NowPlaying;
+		$post.= sprintf "&a=%s&t=%s&b=%s&l=%s&n=%s&m=%s", @data;
+		$url=$nowplayingurl;
+	}
+	else {return}
 	my $response_cb=sub
 	{	my ($response,@lines)=@_;
 		my $error;
 		if	(!defined $response) {$error=_"connection failed"; $Serrors++}
 		elsif	($response eq 'OK')
 		{	$Serrors=0;
-			Log( _("Submit OK") . ' ('.
-			  ($i>1 ? ::__("%d song","%d songs",$i)
-				: ::__x( _"{song} by {artist}", song=> $ToSubmit[0][1], artist => $ToSubmit[0][0]) ) . ')' );
-			splice @ToSubmit,0,$i;
-			::IdleDo("9_".__PACKAGE__,10000,\&Save) if $unsent_saved;
+			if ($i)
+			{	Log( _("Submit OK") . ' ('.
+				      ($i>1 ?	  ::__("%d song","%d songs",$i)
+						: ::__x( _"{song} by {artist}", song=> $ToSubmit[0][1], artist => $ToSubmit[0][0]) ) . ')' );
+				splice @ToSubmit,0,$i;
+				::IdleDo("9_".__PACKAGE__,10000,\&Save) if $unsent_saved;
+			}
+			elsif ($NowPlaying)
+			{	$NowPlaying=undef;
+			}
 		}
 		elsif	($response eq 'BADSESSION')
 		{	$error=_"Bad session";
@@ -182,14 +205,14 @@ sub Submit
 	};
 
 	warn "submitting: $post\n" if $::debug;
-	Send($response_cb,$submiturl,$post);
+	Send($response_cb,$url,$post);
 }
 
 sub Sleep
 {	#warn "Sleep\n";
 	return unless $self->{on};
 	return if $Stop || $waiting || $timeout;
-	$timeout=Glib::Timeout->add(1000*$interval,\&Awake) if @ToSubmit;
+	$timeout=Glib::Timeout->add(1000*$interval,\&Awake) if @ToSubmit || $NowPlaying;
 	#warn "Sleeping $interval seconds\n" if $timeout;
 }
 sub Awake
