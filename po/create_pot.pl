@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+my $verbose=1;
+m/-q|--quiet/ and $verbose=0 for @ARGV;
 use FindBin;
 my $path=$FindBin::Bin;
 $path=~s#/[^/]*/?$##; #up one dir
@@ -12,7 +14,8 @@ my %msgid_p;
 my $version;
 
 while (my $file=shift @files)
-{warn "reading $file\n";
+{
+ warn "reading $file\n" if $verbose;
  open my$fh,$file  or die $!;
  $file=~s#^$path/##;
  while (<$fh>)
@@ -72,5 +75,5 @@ for my $msg (sort keys %msgid_p)
 
 close $fh;
 
-warn "wrote gmusicbrowser.pot\n";
-warn "to update fr.po, run :  msgmerge -s -U fr.po gmusicbrowser.pot\n";
+warn "wrote gmusicbrowser.pot\n" if $verbose;
+warn "to update fr.po, run :  msgmerge -s -U fr.po gmusicbrowser.pot\n" if $verbose;
