@@ -2006,7 +2006,7 @@ package FilterList;
 use Gtk2;
 use base 'Gtk2::VBox';
 use constant { GID_ALL => 65535, GID_TYPE => 'Glib::UInt' };
-#use constant { GID_ALL => 2**32-1, GID_TYPE => 'Glib::ULong' };	#to suuport more than 65534 artist/albums/...
+#use constant { GID_ALL => 2**32-1, GID_TYPE => 'Glib::ULong' };	#to suport more than 65534 artist/albums/...
 
 sub new
 {	my ($class,$field,$opt1,$opt2,$pid)=@_;

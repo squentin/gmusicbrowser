@@ -104,7 +104,7 @@ INIT
 # serial	serial number (binary 4 bytes)
 # seg_table	segmentation table of last read page
 # granule	granule of last read page
-# info		-> hash containing : version channels rate bitrate_upper bitrate_nominal bitrate_lower seconds mmss
+# info		-> hash containing : version channels rate bitrate_upper bitrate_nominal bitrate_lower seconds
 # comments	-> hash of arrays
 # CommentsOrder -> list of keys
 # commentpack_size
@@ -117,7 +117,6 @@ sub new
 {   my ($class,$file)=@_;
     my $self=bless {}, $class;
 
-    local $_;
     # check that the file exists and is readable
     unless ( -e $file && -r $file )
     {	warn "File '$file' does not exist or cannot be read.\n";
@@ -143,7 +142,7 @@ sub new
 	my $l=0;
 	$l=$l*256+$_ for reverse @granule;
 	$self->{info}{seconds}=my$s=$l/$self->{info}{rate};
-	$self->{info}{mmss}=sprintf '%d:%02d',$s/60,$s%60;
+	#$self->{info}{mmss}=sprintf '%d:%02d',$s/60,$s%60;
 	#warn "length : ".$self->{info}{mmss}."\n";
     }
 
@@ -189,9 +188,8 @@ sub _close
 	close delete($self->{fileHandle});
 }
 
-sub write_file	# experimental
+sub write_file
 {	my $self=shift;
-	local $_;
 	my $newcom_packref=_PackComments($self);
 	#warn "old size $self->{commentpack_size}, need : ".length($$newcom_packref)."\n";
 	if ( $self->{commentpack_size} >= length $$newcom_packref)
@@ -320,11 +318,8 @@ sub _ReadInfo
 	# 8) [blocksize_1] = 2 exponent (read 4 bits as unsigned integer)
 	# 9) [framing_flag] = read one bit
 	if ( my $packref=_read_packet($self,PACKET_INFO) )
-	{	@_=unpack 'x7 VCV V3 C',$$packref;
-		my %info;
-		#print "info : ".join(' ',@_)."\n";
-		$info{$_}=shift @_
-			for (qw/version channels rate bitrate_upper bitrate_nominal bitrate_lower/);
+	{	my %info;
+		@info{qw/version channels rate bitrate_upper bitrate_nominal bitrate_lower/}= unpack 'x7 VCV V3 C',$$packref;
 		return \%info;
 	}
 	else
