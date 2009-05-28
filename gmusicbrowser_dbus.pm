@@ -102,6 +102,14 @@ sub GetAlbumCoverData
 	return [map ord,split //, $data];
 }
 
+dbus_method(CopyFields => [['struct', 'string', 'string']], ['bool']);
+#copy stats fields from one song to another
+#1st arg : filename of ID of source, 2nd arg filename or ID of dest, both must be in the library
+sub CopyFields
+{	my ($self,$array)=@_;
+	::CopyFields(@$array);
+}
+
 dbus_signal('SongChanged', ['uint32']);
 my $lasttime;
 sub SongChanged

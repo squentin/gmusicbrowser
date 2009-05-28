@@ -3540,6 +3540,19 @@ COPYNEXTID:for my $ID (@$IDs)
 	$win->destroy;
 }
 
+sub CopyFields
+{	my ($srcfile,$dstfile)=@_;
+	my $IDsrc=FindID($srcfile);
+	my $IDdst=FindID($dstfile);
+	unless (defined $IDsrc) { warn "CopyFields : can't find $srcfile in the library\n";return 1 }
+	unless (defined $IDdst) { warn "CopyFields : can't find $dstfile in the library\n";return 2 }
+	warn "Copying stats from $srcfile to $dstfile\n" if $::debug;
+	my @fields=(SONG_ADDED,SONG_LASTPLAY,SONG_NBPLAY,SONG_LASTSKIP,SONG_NBSKIP,SONG_RATING,SONG_LABELS);
+	$Songs[$IDdst][$_]=$Songs[$IDsrc][$_] for @fields;
+	SongChanged($IDdst,@fields);
+	return 0;
+}
+
 sub ChooseDir
 {	my ($msg,$path,$extrawidget,$multiple) = @_;
 	my $dialog=Gtk2::FileChooserDialog->new($msg,undef,'select-folder',
