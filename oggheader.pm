@@ -536,12 +536,15 @@ sub _skip_to_last_page
 	seek $fh,-10000,2;
 	read $fh,my$buf,10000;
 	my $sn=$self->{serial};
+	my $granule;
 	while ($buf=~m/OggS\x00(.)(.{8})(.{4})/gs)
 	{	#@_=unpack "a4CC a8 VVVC",$1;
-		next unless vec $1,2,1;	#last page of logical bitstream
 		next unless $sn eq $3;	#check serial number
+		$granule=$2 unless $2 eq "\xff\xff\xff\xff\xff\xff\xff\xff"; #granule==-1 => no packets finish on this page
+		next unless vec $1,2,1;	#last page of logical bitstream
+		last unless defined $granule;
 		# found last page -> save granule
-		$self->{granule}=$2;
+		$self->{granule}=$granule;
 		return 1;
 	}
 	#didn't find last page
