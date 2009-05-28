@@ -93,6 +93,8 @@ BEGIN
 	}
  }
 }
+our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
+INIT {%Alias_ext=(ogg=> 'oga');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
 
 BEGIN{
 require 'gmusicbrowser_songs.pm';
@@ -971,7 +973,6 @@ if ($CmdLine{UseGnomeSession})
 
 #-------------INIT-------------
 our ($Play_package,%PlayPacks); my $PlayNext_package;
-our %Alias_ext=(ogg=> 'oga');	#define alternate file extentions (ie: .ogg files treated as .oga files)
 for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_gstreamer-0.10.pm gmusicbrowser_server.pm/)
 {	eval { require $file } || warn $@;	#each file sets $::PlayPacks{PACKAGENAME} to 1 for each of its included playback packages
 }
