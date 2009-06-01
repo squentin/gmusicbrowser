@@ -12,6 +12,7 @@ BEGIN
   require 'mpcheader.pm';
   require 'apeheader.pm';
   require 'wvheader.pm';
+  require 'm4aheader.pm';
 }
 use strict;
 use warnings;
@@ -30,6 +31,7 @@ INIT
 	mpc	=> ['Tag::MPC',		'mpc v{version}',		'APE ID3v2 lyrics3v2 ID3v1',],
 	ape	=> ['Tag::APEfile',	'ape v{version}',		'APE ID3v2 lyrics3v2 ID3v1',],
 	wv	=> ['Tag::WVfile',	'wv v{version}',		'APE ID3v1',],
+	m4a	=> ['Tag::M4A',		'mp4 {traktype}',		'ilst',],
 );
  $FORMATS{$_}=$FORMATS{ $::Alias_ext{$_} } for keys %::Alias_ext;
 }
@@ -62,6 +64,9 @@ sub Read
 	for my $tag (split / /,$plist)
 	{	if ($tag eq 'vorbis')
 		{	push @taglist, vorbis => $filetag->{comments};
+		}
+		elsif ($tag eq 'ilst')
+		{	push @taglist, ilst => $filetag->{ilst};
 		}
 		elsif ($tag eq 'ID3v1' && $filetag->{ID3v1})
 		{	push @taglist, id3v1 => { map( ($_ => $filetag->{ID3v1}[$_]), 0..6) }; #transform it into a hash
@@ -220,6 +225,26 @@ sub Write
 			else			{ $tag->remove_all($key) }
 		}
 	}
+	if ($maintag eq 'ilst')
+	{	my @todo;
+		for my $aref (@$modif)
+		{	my ($field,@vals)=@$aref;
+			if (my $sub=$Songs::Def{$field}{'ilst:write'})
+			{	push @todo, $sub->(@vals);
+			}
+			elsif (my $keys=$Songs::Def{$field}{ilst})
+			{	my @keys= split /\|/,$keys;
+				push @todo, $_ => undef for @keys;
+				push @todo, $keys[0] => \@vals;
+			}
+		}
+		while (@todo)
+		{	my $key= shift @todo;
+			my $val= shift @todo;
+			if ($val)		{ $tag->insert($key,$_) for reverse @$val}
+			else			{ $tag->remove_all($key) }
+		}
+	}
 	if ($maintag eq 'APE' || $tag->{APE})
 	{	my @todo;
 		for my $aref (@$modif)
@@ -246,29 +271,34 @@ sub Write
 	return 1;
 }
 
-sub PixFromMusicFile
+sub PixFromMusicFile		#FIXME support %::Alias_ext
 {	my $file=$_[0];
 	#$file=Glib->filename_from_unicode($file);
 	return undef unless -r $file;
 	my $pix;
+	my $apic=1;
 	if ($file=~m/\.mp3$/i)
 	{	my $tag=Tag::MP3->new($file,0);
 		unless ($tag) {warn "can't read tags for $file\n";return undef;}
-		unless ($tag->{ID3v2} && $tag->{ID3v2}{frames}{APIC})
-			{warn "no picture found in $file\n";return undef;}
-		$pix=$tag->{ID3v2}{frames}{APIC};
+		$pix=$tag->{ID3v2}{frames}{APIC} if $tag->{ID3v2} && $tag->{ID3v2}{frames};
 	}
 	elsif ($file=~m/\.flac$/i)
 	{	my $tag=Tag::Flac->new($file);
 		unless ($tag) {warn "can't read tags for $file\n";return undef;}
-		unless ($tag->{pictures})
-			{warn "no picture found in $file\n";return undef;}
-		$pix=$tag->{pictures};
+		$pix=$tag->{pictures}
+	}
+	elsif ($file=~m/\.m4a$/i)
+	{	my $tag=Tag::M4A->new($file);
+		unless ($tag) {warn "can't read tags for $file\n";return undef;}
+		$pix=$tag->{ilst}{covr} if $tag->{ilst};
+		$apic=0;	#not in APIC (id3v2) format
 	}
 	else { return undef }
-	my $nb=0;
-	#if (@$pix>1) {$nb=}	#FIXME if more than one picture in tag, use $pix->[$nb][1] to choose
-	return $pix->[$nb][3];
+	unless ($pix && @$pix)	{warn "no picture found in $file\n";return undef;}
+	my $nb;
+	#if (!defined $nb && $apic && @$pix>1) {$nb=}	#FIXME if more than one picture in tag, use $pix->[$nb][1] to choose
+	$nb=0 if !defined $nb || $nb>$#$pix;
+	return $apic ? $pix->[$nb][3] : $pix->[$nb];
 }
 
 sub GetLyrics
@@ -972,7 +1002,7 @@ sub new
 	$addbut->signal_connect( clicked => \&add_entry_text_cb);
 
 	my $valueshash= Songs::BuildHash($field,$IDs);
-	$store->set($store->append,0=> Songs::Gid_to_Get($field,$_),1,0,2,0)  for sort keys %$valueshash;
+	$store->set($store->append,0=> Songs::Gid_to_Get($field,$_),1,0,2,0)  for sort keys %$valueshash; #FIXME check that fields use a gid, not the case for comments (yet ?)
 
 	$self->{entry}=$entry;
 	$self->{store}=$store;
@@ -1131,7 +1161,7 @@ sub new
 	my @boxes; $self->{boxes}=\@boxes;
 	my @tags;
 	for my $t (split / /,$format->[2])
-	{	if ($t eq 'vorbis')		{push @tags,$filetag;}
+	{	if ($t eq 'vorbis' || $t eq 'ilst')	{push @tags,$filetag;}
 		elsif ($t eq 'APE')
 		{	if ($filetag->{APE})	{ push @tags,$filetag->{APE}; }
 			elsif (!@tags)		{ push @tags,$filetag->new_APE; }
@@ -1255,7 +1285,25 @@ INIT
 	EAR => [_"Artist",3],
 	ETT => [_"Title",1],
   };
-
+  my $ilst_types=
+  {	"\xA9nam" => [_"Title",1],
+	"\xA9ART" => [_"Artist",3],
+	"\xA9alb" => [_"Album",4],
+	"\xA9day" => [_"Year",8],
+	"\xA9cmt" => [_"Comment",12,'M'],
+	"\xA9gen" => [_"Genre",10],
+	"\xA9wrt" => [_"Author",14],
+	"\xA9lyr" => [_"Lyrics",50],
+	"\xA9too" => [_"Encoder",51],
+	'----'	  => [_"Custom",52,'ttt'],
+	trkn	  => [_"Track",6],
+	disk	  => [_"Disc #",7],
+	aART	  => [_"Album artist",9],
+	covr	  => [_"Picture",20,'p'],
+	cpil	  => [_"Compilation",19,'f'],
+	# pgap => gapless album
+	# pcst => podcast
+  };
 
  %tagprop=
  (	ID3v2 =>{	addlist => [qw/COMM TPOS TIT3 TCON TXXX TOPE WOAR WXXX USLT APIC POPM PCNT GEOB/],
@@ -1285,6 +1333,13 @@ INIT
 			name	=> 'lyrics3v2 tag',
 			types	=> $lyrics3v2_types,
 		},
+	M4A =>	{	addlist => ["\xA9cmt","\xA9wrt",qw/disk aART cpil ----/],
+			default => ["\xA9nam","\xA9ART","\xA9alb",'trkn',"\xA9day","\xA9cmt","\xA9gen"],
+			fillsub => sub { $_[0]{ilst} },
+			typesub => \&Tag::M4A::get_fieldtypes,
+			name => 'ilst',
+			types	=> $ilst_types,
+		},
  );
  $tagprop{Flac}=$tagprop{OGG};
 
@@ -1295,8 +1350,11 @@ INIT
 	#l => ['EntrySimple'],	#3 letters language #unused, found only in multi-fields frames
 	c => ['EntryNumber'],	#counter
 	C => ['EntryNumber',255], #1 byte integer (0-255)
+	n => ['EntryNumber',65535],
 	b => ['EntryBinary'],	#binary
 	u => ['EntryBinary'],	#unknown -> binary
+	f => ['EntryBoolean'],
+	p => ['EntryCover'],
  );
 
 }
@@ -1374,13 +1432,25 @@ sub addrow
 	my $row=$table->{row}++;
 	my ($widget,@Todel);
 	my $tagtype=$self->{tagtype};
-	my $type;
-	$type= $tagtype->{typesub}($self->{tag},$fname,$nb) if $tagtype->{typesub};
+	my $typesref=$tagtype->{types}{($tagtype->{lckeys}? lc$fname : $fname)};
+
+	my ($name,$type,$realfname);
+	if ($typesref)
+	{	$type= $typesref->[TAGTYPE];
+		$name=$typesref->[TAGNAME];
+	}
+	if ($tagtype->{typesub})
+	{	(my ($type0,$name0,$realval),$realfname)= $tagtype->{typesub}($self->{tag},$fname,$nb);
+		$type||=$type0;
+		$name||=$name0;
+		$value=$realval if defined $realval;
+	}
+	$name||=$fname;
 	$type||='t';
-	my $name=$tagtype->{types}{($tagtype->{lckeys}? lc$fname : $fname)}[TAGNAME]||$fname;
+
 	if (length($type)>1)	#frame with sub-frames (id3v2)
 	{	$value||=[];
-		$widget=EntryMulti->new($value,$fname,$name,$type);
+		$widget=EntryMulti->new($value,$fname,$name,$type,$realfname);
 		$table->attach($widget,1,3,$row,$row+1,['fill','expand'],'shrink',1,1);
 	}
 	else	#simple case : 1 label -> 1 value
@@ -1524,6 +1594,8 @@ use base 'Gtk2::ScrolledWindow';
 sub new
 {	my ($class,$init) = @_;
 	my $self = bless Gtk2::ScrolledWindow->new, $class;
+	 $self->set_shadow_type('etched-in');
+	 $self->set_policy('automatic','automatic');
 	$self->add( $self->{textview}=Gtk2::TextView->new );
 	$self->set_text($init);
 	$self->{init}=$self->get_text;
@@ -1584,6 +1656,23 @@ sub return_value
 	return $value;
 }
 
+package EntryBoolean;
+use Gtk2;
+use base 'Gtk2::CheckButton';
+
+sub new
+{	my ($class,$init) = @_;
+	my $self = bless Gtk2::CheckButton->new, $class;
+	$self->set_active(1) if $init;
+	$self->{init}=$init;
+	return $self;
+}
+sub return_value
+{	my $self=shift;
+	my $value=$self->get_active;
+	$self->{changed}=1 if ($value xor $self->{init});
+	return $value;
+}
 package EntryCombo;
 use Gtk2;
 use base 'Gtk2::ComboBox';
@@ -1758,19 +1847,21 @@ INIT
 			],
 		TLAN => [	['',0,0,1,'EntryList','l']
 			],
+		'----' =>
+			[	['',2,0,2],
+				[_"Application",0,1,2],
+				[_"Name",1,1,2],
+			],
 	);
 }
 use base 'Gtk2::Frame';
 
 sub new
-{	my ($class,$values,$fname,$name,$type) = @_;
+{	my ($class,$values,$fname,$name,$type,$realfname) = @_;
 	my $self = bless Gtk2::Frame->new($name), $class;
 	my $table=Gtk2::Table->new(1, 4, 0);
 	$self->add($table);
-	my $prop=(exists $SUBTAGPROP{$fname})? $SUBTAGPROP{$fname} :
-		#($fname=~m/^T/)	     ? $SUBTAGPROP{TXXX}   :
-		#($fname=~m/^W/)	     ? $SUBTAGPROP{WXXX}   :
-						undef;
+	my $prop=$SUBTAGPROP{$realfname || $fname};
 	my $row=0;
 	my $subtag=0;
 	for my $t (split //,$type)
@@ -1778,7 +1869,7 @@ sub new
 		my $val=$$values[$subtag]; $val='' unless defined $val;
 		my ($name,$frow,$cols,$cole,$widget,$param)=
 		($prop) ? @{ $prop->[$subtag] }
-			: ('unknown',$row++,1,5,undef,undef);
+			: (_"unknown",$row++,1,5,undef,undef);
 		unless ($widget)
 		{	($widget,$param)=@{ $DataType{$t} };
 		}
@@ -1971,9 +2062,9 @@ sub update_mime
 
 sub _identify_pictype	#used only if $Gtk2::VERSION < 1.092
 {	$_[0]=~m/^\xff\xd8\xff\xe0..JFIF\x00/s && return ('jpg','image/jpeg');
-	$_[0]=~m/^\x89PNG\x0D\x0A\x1A\x0A/s && return ('png','image/png');
-	$_[0]=~m/^GIF8[79]a/s && return ('gif','image/gif');
-	$_[0]=~m/^BM/s && return ('bmp','image/bmp');
+	$_[0]=~m/^\x89PNG\x0D\x0A\x1A\x0A/ && return ('png','image/png');
+	$_[0]=~m/^GIF8[79]a/ && return ('gif','image/gif');
+	$_[0]=~m/^BM/ && return ('bmp','image/bmp');
 	return ('','');
 }
 

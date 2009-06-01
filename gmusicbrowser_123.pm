@@ -65,10 +65,10 @@ sub init
 		else { $Supported{$ext}=$cmds->[0]; }
 	}
 	$Supported{$_}=$Supported{$::Alias_ext{$_}} for grep $Supported{$::Alias_ext{$_}}, keys %::Alias_ext;
-	my @missing= grep !$Supported{$_}, qw/mp3 ogg oga flac/;
+	my @missing= grep !$Supported{$_}, qw/mp3 oga flac/;
 	if (@missing)
 	{	warn "These commands were not found : ".join(', ',@notfound)."\n";
-		warn " => these file types won't be played by the 123 output : ".join(', ',@missing)."\n";
+		warn " => these file types won't be played by the 123 output : ".join(', ',@missing)."\n"; #FIXME include aliases
 	}
 
 	return unless $foundone;

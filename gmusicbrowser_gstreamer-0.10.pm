@@ -48,6 +48,7 @@ BEGIN
   );
   %Plugins=(	mp3	=> 'mad',	oga => 'vorbisdec',	ape => 'ffdec_ape',
 		flac	=> 'flacdec',	mpc => 'musepackdec',	wv => 'wavpackdec',
+		m4a	=> 'faad',
 	);
   my $error;
   my $reg;

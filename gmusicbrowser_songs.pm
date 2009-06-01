@@ -417,7 +417,7 @@ our %timespan_menu=
  },
  title	=>
  {	name	=> _"Title",	width	=> 270,		flags	=> 'garwesci',	type => 'istring',
-	id3v1	=> 0,		id3v2	=> 'TIT2',	vorbis	=> 'title',	ape	=> 'Title',	lyrics3	=> 'ETT',
+	id3v1	=> 0,		id3v2	=> 'TIT2',	vorbis	=> 'title',	ape	=> 'Title',	lyrics3	=> 'ETT', ilst => "\xA9nam",
 	'filter:~' => '#_iname# .=~. m"(?:^|/) *#VAL# *(?:[/\(\[]|$)"',		'filter_prep:~'=> \&Filter::SmartTitleRegEx,
 	'filter_simplify:~' => \&Filter::SmartTitleSimplify,
 	makefilter_fromID => '"title:~:" . #get#',
@@ -426,7 +426,7 @@ our %timespan_menu=
  artist =>
  {	name => _"Artist",	width => 200,	flags => 'garwesci',
 	type => 'artist',
-	id3v1	=> 1,		id3v2	=> 'TPE1',	vorbis	=> 'artist',	ape	=> 'Artist',	lyrics3	=> 'EAR',
+	id3v1	=> 1,		id3v2	=> 'TPE1',	vorbis	=> 'artist',	ape	=> 'Artist',	lyrics3	=> 'EAR', ilst => "\xA9ART",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	all_count=> _"All artists",
 	picture_field => 'artist_picture',
@@ -451,7 +451,7 @@ our %timespan_menu=
  },
  album =>
  {	name => _"Album",	width => 200,	flags => 'garwesci',	type => 'album',
-	id3v1	=> 2,		id3v2	=> 'TALB',	vorbis	=> 'album',	ape	=> 'Album',	lyrics3	=> 'EAL',
+	id3v1	=> 2,		id3v2	=> 'TALB',	vorbis	=> 'album',	ape	=> 'Album',	lyrics3	=> 'EAL', ilst => "\xA9alb",
 	depend	=> 'artist album_artist', #because albums with no names get the name : <Unknown> (artist)
 	all_count=> _"All albums",
 	FilterList => {search=>1,drag=>::DRAG_ALBUM},
@@ -489,7 +489,7 @@ our %timespan_menu=
  },
  album_artist_raw =>
  {	name => _"Album artist",width => 200,	flags => 'garwesci',	type => 'artist',#type => 'fewstring',
-				id3v2	=> 'TPE2',	vorbis	=> 'album_artist',	ape	=> 'Album_artist', #FIXME check what are the standard names for this tag
+				id3v2	=> 'TPE2',	vorbis	=> 'album_artist',	ape	=> 'Album_artist',  ilst => "aART",#FIXME check what are the standard names for this tag
 	#FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
 	edit_order=> 35,	edit_many=>1,	edit_listall => 1,
@@ -506,7 +506,7 @@ our %timespan_menu=
  year =>
  {	name	=> _"Year",	width => 40,	flags => 'garwesc',	type => 'integer',	bits => 16, edit_max=>3000,
 	check	=> '#VAL#= #VAL# =~m/(\d\d\d\d)/ ? $1 : 0;',
-	id3v1	=> 3,		id3v2 => 'TDRC|TYER', 'id3v2.3'=> 'TYER',	'id3v2.4'=> 'TDRC',	vorbis	=> 'date|year',	ape	=> 'Record Date|Year',
+	id3v1	=> 3,		id3v2 => 'TDRC|TYER', 'id3v2.3'=> 'TYER',	'id3v2.4'=> 'TDRC',	vorbis	=> 'date|year',	ape	=> 'Record Date|Year', ilst => "\xA9day",
 	gid_to_display	=> '#GID# ? #GID# : _"None"',
 	'stats:range'	=> '#HVAL#{#_#}=undef;  ---- delete #HVAL#{0}; #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} keys %{#HVAL#})[0,-1]; !defined $m0 ? "" : $m0==$m1 ? $m0 : "$m0 - $m1"}',
 	editwidth => 6,
@@ -516,13 +516,13 @@ our %timespan_menu=
  },
  track =>
  {	name	=> _"Track",	width => 40,	flags => 'garwesc',
-	id3v1	=> 5,		id3v2	=> 'TRCK',	vorbis	=> 'tracknumber',	ape	=> 'Track',
+	id3v1	=> 5,		id3v2	=> 'TRCK',	vorbis	=> 'tracknumber',	ape	=> 'Track', ilst => "trkn",
 	type => 'integer',	displayformat => '%02d', bits => 8, edit_max => 255,
 	editwidth => 4,		letter => 'n',
  },
  disc =>
  {	name	=> _"Disc",	width => 40,	flags => 'garwesc',	type => 'integer',	bits => 8, edit_max => 255,
-				id3v2	=> 'TPOS',	vorbis	=> 'discnumber',	ape	=> 'discnumber',
+				id3v2	=> 'TPOS',	vorbis	=> 'discnumber',	ape	=> 'discnumber', ilst => "disc",
 	editwidth => 4,
 	edit_order=> 40,	edit_many=>1,	letter => 'd',
 	can_group=>1,
@@ -530,7 +530,7 @@ our %timespan_menu=
  genre	=>
  {	name		=> _"Genres",	width => 180,	flags => 'garwescil',
 	 #is_set	=> '(__GENRE__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
-	id3v1	=> 6,		id3v2	=> 'TCON*',	vorbis	=> 'genre',	ape	=> 'Genre',
+	id3v1	=> 6,		id3v2	=> 'TCON*',	vorbis	=> 'genre',	ape	=> 'Genre', ilst => "\xA9gen",
 	type		=> 'flags',
 	none		=> quotemeta _"No genre",
 	all_count	=> _"All genres",
@@ -550,7 +550,7 @@ our %timespan_menu=
  },
  comment=>
  {	name	=> _"Comment",	width => 200,	flags => 'garwesci',		type => 'string',
-	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3	=> 'INF',	join_with => " ",
+	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3	=> 'INF', ilst => "\xA9cmt",	join_with => " ",
 	edit_order=> 60,	edit_many=>1,	letter => 'C',
  },
  rating	=>
@@ -582,7 +582,7 @@ our %timespan_menu=
  },
  author	=>
  {	name	=> _"Author",	width	=> 100,		flags => 'garwesci',	type => 'fewstring',
-	id3v2	=> 'TOPE',	vorbis	=> 'author',	lyrics3	=> 'AUT',	#ape => ''#?? FIXME
+	id3v2	=> 'TOPE',	vorbis	=> 'author',	lyrics3	=> 'AUT',	ilst => "\xA9wrt",	#ape => ''#?? FIXME
 	_disabled=>1,
  },
  version=>
@@ -668,6 +668,7 @@ our %timespan_menu=
 			#'id3v2:read'	=> sub { [keys %{$_[0]}] },
 			'vorbis:read'	=> sub { [map "vorbis_$_",keys %{$_[0]}] },
 			'ape:read'	=> sub { [map "ape_$_",   keys %{$_[0]}] },
+			'ilst:read'	=> sub { [map "ilst_$_",  keys %{$_[0]}] },
 			FilterList => {search=>1,none=>1},
 			none		=> quotemeta "No tags",	#not translated because made for debugging
 			#_disabled=>1,

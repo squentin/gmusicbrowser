@@ -94,7 +94,7 @@ BEGIN
  }
 }
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
-INIT {%Alias_ext=(ogg=> 'oga');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
+INIT {%Alias_ext=(ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
 
 BEGIN{
 require 'gmusicbrowser_songs.pm';
@@ -3114,7 +3114,7 @@ sub PixBufFromFile
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;
 	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
-	if ($file=~m/\.(?:mp3|flac)$/i)
+	if ($file=~m/\.(?:mp3|flac|m4a|m4b)$/i)
 	{	my $data=FileTag::PixFromMusicFile($file);
 		eval { $loader->write($data) } if defined $data;
 	}
@@ -3574,7 +3574,7 @@ sub ChoosePix
 					'gtk-cancel' => 'none');
 
 	for my $aref
-	(	[_"Pictures, mp3 & flac files",'image/*','*.mp3 *.flac'],
+	(	[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b' ],
 		[_"Pictures files",'image/*'],
 		[_"All files",undef,'*'],
 	)
@@ -4293,6 +4293,10 @@ sub DialogSongProp
 sub SongInfo
 {	my $ID = shift;
 	my $table=Gtk2::Table->new(8,2);
+	my $sw=Gtk2::ScrolledWindow->new;
+	 $sw->set_shadow_type('etched-in');
+	 $sw->set_policy('automatic','automatic');
+	 $sw->add_with_viewport($table);
 	$table->{ID}=$ID;
 	my $row=0;
 	my @fields=Songs::InfoFields;
@@ -4319,7 +4323,7 @@ sub SongInfo
 	 };
 	Watch($table, SongsChanged=> $fillsub);
 	$fillsub->($table,undef,\@fields);
-	return $table;
+	return $sw;
 }
 
 sub SongsChanged
@@ -4481,7 +4485,7 @@ sub MakeScanRegex	#FIXME
 		$ext{$_}=1 for grep $ext{$Alias_ext{$_}}, keys %Alias_ext;
 		$s=join '|',keys %ext;
 	}
-	else { $s='mp3|ogg|oga|flac|mpc|ape|wv'; } #FIXME find a better way
+	else { $s='mp3|ogg|oga|flac|mpc|ape|wv|m4a|m4b'; } #FIXME find a better way
 	$ScanRegex=qr/\.(?:$s)$/i;
 }
 
@@ -5053,7 +5057,7 @@ sub PrefAudio_makeadv
 	{	my $label=Gtk2::Label->new;
 		$label->signal_connect(realize => sub	#delay finding supported formats because mplayer is slow
 			{	my @ext;
-				for my $e ($package->supported_formats)
+				for my $e (grep !$::Alias_ext{$_}, $package->supported_formats)
 				{	push @ext, join '/', $e, sort grep $::Alias_ext{$_} eq $e,keys %::Alias_ext;
 				}
 				my $list=join ' ',sort @ext;

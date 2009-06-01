@@ -18,7 +18,7 @@ sub init
 }
 
 sub supported_formats
-{ qw/flac mp3 mpc ogg oga wv ape/;
+{ qw/flac mp3 mpc oga wv ape m4a/;
 }
 
 sub Close {}
