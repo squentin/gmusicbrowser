@@ -15,7 +15,7 @@ use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 #$SIG{CHLD} = 'IGNORE';  # to make sure there are no zombies #cause crash after displaying a file dialog and then runnning an external command with mandriva's gtk2
 #$SIG{CHLD} = sub { while (waitpid(-1, WNOHANG)>0) {} };
 
-my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill);
+my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill,$Kill9);
 my $CMDfh;
 my (%supported,$mplayer);
 
@@ -56,7 +56,7 @@ sub Play
 {	(undef,$file,my$sec)=@_;
 	&Stop if $ChildPID;
 	#if ($ChildPID) { print $CMDfh "loadfile $file\n"; print $CMDfh "seek $sec 2\n" if $sec; return}
-	@cmd_and_args=($mplayer,qw/-slave -vo null/);
+	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null/);
 	#push @cmd_and_args,$device_option,$device unless $device eq 'default';
 	push @cmd_and_args,split / /,$::Options{mplayeroptions} if $::Options{mplayeroptions};
 	push @cmd_and_args,'-ss',$sec if $sec;
@@ -133,24 +133,23 @@ sub Stop
 	}
 	if ($ChildPID)
 	{	print $CMDfh "quit\n";
-		warn "killing $ChildPID\n" if $::debug;
 		#close $OUTPUTfh;
-		#kill 15,$ChildPID;
-		kill 2,$ChildPID;
-		Glib::Timeout->add( 200,\&_Kill_timeout ) unless @pidToKill;
+		Glib::Timeout->add( 100,\&_Kill_timeout ) unless @pidToKill;
+		$Kill9=0;	#_Kill_timeout will first try INT, then KILL
 		push @pidToKill,$ChildPID;
 		undef $ChildPID;
 	}
 }
 sub _Kill_timeout	#make sure old children are dead
-{	@pidToKill=grep kill(0,$_), @pidToKill;
+{	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
+	@pidToKill=grep kill(0,$_), @pidToKill; #checks to see which ones are still there
 	if (@pidToKill)
-	{ warn "killing -9 @pidToKill\n" if $::debug;
-	  kill 9,@pidToKill;
-	  undef @pidToKill;
+	{	warn "Sending ".($Kill9 ? 'KILL' : 'INT')." signal to @pidToKill\n" if $::debug;
+		if ($Kill9)	{kill KILL=>@pidToKill;}
+		else		{kill INT=>@pidToKill;}
+		$Kill9=1;	#use KILL if they are still there next time
 	}
-	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
-	return 0;
+	return @pidToKill;	#removes the timeout if no more @pidToKill
 }
 
 sub error
