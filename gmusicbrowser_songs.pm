@@ -610,26 +610,26 @@ our %timespan_menu=
  {	name	=> _"Track gain",	width => 60,	flags => 'grwsca',
 	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
 	displayformat	=> '%.2f dB',
-	id3v2	=> 'TXXX;replaygain_track_gain;%v',	vorbis	=> 'replaygain_track_gain',	ape	=> 'replaygain_track_gain',
+	id3v2	=> 'TXXX;replaygain_track_gain;%v',	vorbis	=> 'replaygain_track_gain',	ape	=> 'replaygain_track_gain', ilst => '----replaygain_track_gain',
  },
  replaygain_track_peak=>
  {	name	=> _"Track peak",	width => 60,	flags => 'grwsca',
-	id3v2	=> 'TXXX;replaygain_track_peak;%v',	vorbis	=> 'replaygain_track_peak',	ape	=> 'replaygain_track_peak',
+	id3v2	=> 'TXXX;replaygain_track_peak;%v',	vorbis	=> 'replaygain_track_peak',	ape	=> 'replaygain_track_peak', ilst => '----replaygain_track_peak',
 	type	=> 'float',
  },
  replaygain_album_gain=>
  {	name	=> _"Album gain",	width => 60,	flags => 'grwsca',
-	id3v2	=> 'TXXX;replaygain_album_gain;%v',	vorbis	=> 'replaygain_album_gain',	ape	=> 'replaygain_album_gain',
+	id3v2	=> 'TXXX;replaygain_album_gain;%v',	vorbis	=> 'replaygain_album_gain',	ape	=> 'replaygain_album_gain', ilst => '----replaygain_album_gain',
 	displayformat	=> '%.2f dB',
 	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
  },
  replaygain_album_peak=>
  {	name	=> _"Album peak",	width => 60,	flags => 'grwsca',
-	id3v2	=> 'TXXX;replaygain_album_peak;%v',	vorbis	=> 'replaygain_album_peak',	ape	=> 'replaygain_album_peak',
+	id3v2	=> 'TXXX;replaygain_album_peak;%v',	vorbis	=> 'replaygain_album_peak',	ape	=> 'replaygain_album_peak', ilst => '----replaygain_album_peak',
 	type	=> 'float',
  },
 # replaygain_reference_level=>
-# {	id3v2	=> 'TXXX;replaygain_reference_level;%v',vorbis	=> 'replaygain_reference_level',ape	=> 'replaygain_reference_level',
+# {	id3v2	=> 'TXXX;replaygain_reference_level;%v',vorbis	=> 'replaygain_reference_level',ape	=> 'replaygain_reference_level', ilst => '----replaygain_reference_level',
 # },
  #mp3gain : APE tags,	peak : float 	: 0.787193
  #			gain float dB 	: -1.240000 dB

@@ -87,7 +87,7 @@ sub Read
 	}
 	for my $field (grep $Songs::Def{$_}{flags}=~m/r/, @Songs::Fields)
 	{	for (my $i=0; $i<$#taglist; $i+=2)
-		{	my $id=$taglist[$i]; #$id is type of tag : id3v1 id3v2 ape vorbis lyrics3
+		{	my $id=$taglist[$i]; #$id is type of tag : id3v1 id3v2 ape vorbis lyrics3 ilst
 			my $h=$taglist[$i+1];
 			my $value;
 			if (defined(my $keys=$Songs::Def{$field}{$id})) #generic cases
@@ -96,7 +96,8 @@ sub Read
 				for my $key (split /\|/,$keys)
 				{	$key=~s/\*$//;	#remove ';*', only used for writing tags
 					($key,my @extra)= split /;/,$key,-1;  #-1 to keep empty trailing fields
-					my $v=$h->{$key};
+					my $v=	$key=~m/^----/ ? [map $h->{$_}, grep m/^[^ ]*\Q$key\E$/, keys %$h] : #for freeform ilst fields
+						$h->{$key}; #normal case
 					next unless defined $v;
 					$v=[$v] unless ref $v;
 					if (@extra && ref $v->[0]) #for id3v2 multi fields (COMM for example)
@@ -235,6 +236,7 @@ sub Write
 			elsif (my $keys=$Songs::Def{$field}{ilst})
 			{	my @keys= split /\|/,$keys;
 				push @todo, $_ => undef for @keys;
+				$keys[0]=~s/^----/com.apple.iTunes----/;
 				push @todo, $keys[0] => \@vals;
 			}
 		}
