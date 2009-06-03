@@ -442,17 +442,20 @@ sub new
 	my $self = bless Gtk2::VBox->new, $class;
 
 	my $table=Gtk2::Table->new (6, 2, FALSE);
-	my $row=0;
+	my $row1=my $row2=0;
 	my %frames;
 	$self->{frames}=\%frames;
 	$self->{pf_frames}={};
 	$self->{IDs}=\@IDs;
 
-	{	my $nb=my @folders= Songs::UniqList('path',\@IDs);
-		my $common= ::find_common_parent_folder(@folders);
+	{	my $folders= Songs::UniqList('path',\@IDs);
+		my $folder=$folders->[0];
+		if (@$folders>1)
+		{	my $common= ::find_common_parent_folder(@$folders);
+			$folder=_"different folders";
+			$folder.= "\n". ::__x("(common parent folder : {common})",common=>$common) if length($common)>5;
+		}
 		my $text= ::__("%d file in {folder}","%d files in {folder}",scalar@IDs);
-		my $folder=($nb==1) ?	$common	: _"different folders";
-		$folder.= "\n". ::__x("(common parent folder : {common})",common=>$common) if $nb>1 && length($common)>5;
 		$text= ::__x($text,folder => '<small>'.::PangoEsc($folder).'</small>');
 		my $labelfile = Gtk2::Label->new;
 		$labelfile->set_markup($text);
@@ -465,7 +468,7 @@ sub new
 	{	my $check=Gtk2::CheckButton->new(Songs::FieldName($field));
 		my $widget=Songs::EditWidget($field,'many',\@IDs);
 		next unless $widget;
-		$frames{$field}=$widget;	#FIXME	rename ($frames and {combo})and maybe 
+		$frames{$field}=$widget;	#FIXME	rename ($frames and {combo})and maybe
 		$check->{combo}=$widget;	#	remove one
 		$widget->set_sensitive(FALSE);
 
@@ -475,8 +478,9 @@ sub new
 			   $check->{combo}->set_sensitive($active);
 			   $check->{addchk}->set_sensitive($active) if exists $check->{addchk};
 			});
-		$table->attach($check,0,1,$row,$row+1,'fill','shrink',1,1);
-		$table->attach($widget,1,2,$row,$row+1,['fill','expand'],'shrink',1,1);
+		my ($row,$col)= $widget->{noexpand} ? ($row2++,3) : ($row1++,0);
+		$table->attach($check,$col++,$col,$row,$row+1,'fill','shrink',3,1);
+		$table->attach($widget,$col++,$col,$row,$row+1,['fill','expand'],'shrink',3,1);
 		if ($field eq 'comment') #FIXME PHASE1 FIXME PHASE1 FIXME PHASE1 FIXME PHASE1
 		{	my $chk=Gtk2::CheckButton->new(_"Remove existing");
 			$self->{add}{$field}=1;
@@ -488,7 +492,6 @@ sub new
 			$check->{addchk}=$chk;
 			$chk->set_sensitive(FALSE);
 		}
-		$row++;
 	}
 
 	$self->pack_start($table, FALSE, TRUE, 2);
@@ -499,7 +502,7 @@ return $self if @IDs>1000;
 	#edition of file-specific tags (track title)
 	my $perfile_table=Gtk2::Table->new( scalar(@IDs), 10, FALSE);
 	$self->{perfile_table}=$perfile_table;
-	$row=0;
+	my $row=0;
 	$self->add_column('track');
 	$self->add_column('title');
 
@@ -805,6 +808,22 @@ sub new
 sub get_text
 {	$_[0]->get_value;
 }
+package GMB::TagEdit::EntryBoolean;
+use Gtk2;
+use base 'Gtk2::CheckButton';
+
+sub new
+{	my ($class,$field,$ID) = @_;
+	my $self = bless Gtk2::CheckButton->new, $class;
+	$self->{noexpand}=1;
+	$self->{field}=$field;
+	my $val=Songs::Get($ID,$field);
+	$self->set_active($val);
+	return $self;
+}
+sub get_text
+{	$_[0]->get_active;
+}
 
 package GMB::TagEdit::Combo;
 use Gtk2;
@@ -1079,18 +1098,18 @@ sub fill
 {	my $self=$_[0];
 	my $table=$self->{table};
 	my $ID=$self->{ID};
-	my $row=0;
+	my $row1=my $row2=0;
 	for my $field ( Songs::EditFields('single') )
-	{	$row++;
+	{	my $widget=Songs::EditWidget($field,'single',$ID);
+		next unless $widget;
+		my ($row,$col)= $widget->{noexpand} ? ($row2++,2) : ($row1++,0);
 		if (my $w=$self->{fields}{$field})	#refresh the fields
 			{ $table->remove($w); }
 		else #first time
 		{	my $label=Gtk2::Label->new( Songs::FieldName($field) );
-			$table->attach($label,0,1,$row,$row+1,'fill','shrink',1,1);
+			$table->attach($label,$col,$col+1,$row,$row+1,'fill','shrink',1,1);
 		}
-		my $widget=Songs::EditWidget($field,'single',$ID);
-		next unless $widget;
-		$table->attach($widget,1,2,$row,$row+1,['fill','expand'],'shrink',1,1);
+		$table->attach($widget,$col+1,$col+2,$row,$row+1,['fill','expand'],'shrink',1,1);
 		$self->{fields}{$field}=$widget;
 	}
 	$table->show_all;
@@ -1248,6 +1267,7 @@ INIT
 	TPUB => [_"Label/Publisher"],
 	TRDA => [_"Recording Dates"],
 	TSRC => ["ISRC"],
+	TCMP => [_"Compilation",60,'f'],
   };
   my $vorbis_types=
   {	title		=> [_"Title",1],

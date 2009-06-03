@@ -152,15 +152,20 @@ our %timespan_menu=
 		pic_cache_id	=> 'b',
 		_empty		=> 'vec(__#mainfield#_empty,#_#,1)',
 		unknown		=> '_("<Unknown>")." "',
-		init		=> '____=""; __#mainfield#_gid{"\\x00"."1"}=1; __#mainfield#_empty=""; vec(__#mainfield#_empty,1,1)=1; #_iname#[1]=::superlc( #_name#[1]=_("<Unknown>") );',
-		findgid		=> 'do{	my $name=#VAL#; my $sgid= $name ."\\x00". ($name eq "" ? #artist->get# : #album_artist_raw->get#);
+		init		=> '____=""; __#mainfield#_gid{"\\x00"}=1; __#mainfield#_empty=""; vec(__#mainfield#_empty,1,1)=1; #_iname#[1]=::superlc( #_name#[1]=_("<Unknown>") );',
+		findgid		=> 'do{	my $name=#VAL#; my $sgid= $name ."\\x00". ($name eq "" ?	"artist=".#artist->get# :	do {my $a=#album_artist_raw->get#; $a ne "" ?	"album_artist=$a" :	#compilation->get# ?	"compilation=1" : ""}	);
 					__#mainfield#_gid{$sgid}||= do {my $n=@#_name#; if ($name eq "") {vec(__#mainfield#_empty,$n,1)=1; $name=#unknown#.#artist->get#; } push @#_name#,$name; #newval#; $n; }
 				    };',
+		#possible sgid : album."\x00".	""				if no album name and no artist
+		#				"artist=".artist		if no album name
+		#				"album_artist"=album_artist	if non-empty album_artist
+		#				"compilation=1"			if empty album_artist, compilation flag set
+		#				""
 		set		=> '#_#= #findgid#;',
 		#newval		=> 'push @#_iname#, ::superlc( #_name#[-1] );',
 		get		=> '(#_empty# ? "" : #_name#[#_#])',
 		gid_to_get	=> '(vec(__#mainfield#_empty,#GID#,1) ? "" : #_name#[#GID#])',
-		sgid_to_gid	=> 'do {my $s=#VAL#; __#mainfield#_gid{$s}||= do { my $n=@#_name#; if ($s=~s/^\x00//) { $s= #unknown#.$s; vec(__#mainfield#_empty,$n,1)=1;}  push @#_name#,$s; #newval#; $n }}',
+		sgid_to_gid	=> 'do {my $s=#VAL#; __#mainfield#_gid{$s}||= do { my $n=@#_name#; if ($s=~s/\x00(\w+)=(.*)$// && $s eq "" && $1 eq "artist") { $s= #unknown#.$2; vec(__#mainfield#_empty,$n,1)=1;} push @#_name#,$s; #newval#; $n }}',
 		#gid_to_sgid	=> 'vec(__#mainfield#_empty,#GID#,1) ? "\\x00".substr(#_name#[#GID#],length(#unknown#)) : #_name#[#GID#]',
 		gid_to_sgid	=> '::first {$__#mainfield#_gid{$_}==#GID#} keys %__#mainfield#_gid;', #slower but more simple and reliable
 		makefilter	=> '"#field#:~:" . #gid_to_sgid#',
@@ -383,9 +388,10 @@ our %timespan_menu=
 		gid_to_display => '(#GID# ? ::strftime("%x",localtime(#GID#)) : _"never")',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($d,$m,$y)= (localtime(#GID#))[3,4,5]; ::mktime(0,0,0,$d+1,$m,$y)-1})',
 	},
-	boolean	=> #not used for now
+	boolean	=>
 	{	parent	=> 'integer',	bits => 1,
-		display	=> '(#_# ? 1 : 0)',
+		display	=> "(#_# ? '#yes#' : '#no#')",	yes => _"Yes",	no => "",
+		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryBoolean->new(@_); },
 	},
 	shuffle=>
 	{	#shuffle	=> 'vec(____,$_,32)=rand(256**4) for FIRSTID..$LastID',
@@ -488,20 +494,33 @@ our %timespan_menu=
 	fileprefix	=> ::PIXPATH.'stars',
  },
  album_artist_raw =>
- {	name => _"Album artist",width => 200,	flags => 'garwesci',	type => 'artist',#type => 'fewstring',
-				id3v2	=> 'TPE2',	vorbis	=> 'album_artist',	ape	=> 'Album_artist',  ilst => "aART",#FIXME check what are the standard names for this tag
+ {	name => _"Album artist",width => 200,	flags => 'garwesci',	type => 'artist',
+	id3v2	=> 'TPE2',	vorbis	=> 'album_artist',	ape	=> 'Album_artist',  ilst => "aART",
 	#FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
 	edit_order=> 35,	edit_many=>1,	edit_listall => 1,
 	#can_group=>1,
  },
  album_artist =>
- {	name => _"Album artist",width => 200,	flags => 'gc',	type => 'artist',#type => 'fewstring',
+ {	name => _"Album artist",width => 200,	flags => 'gc',	type => 'artist',
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
 	_ => 'do {my $n=vec(__album_artist_raw__,#ID#,#bits#); $n==1 ? vec(__artist__,#ID#,#bits#) : $n}',
 	can_group=>1,
 	letter => 'A',
+ },
+ compilation =>
+ {	name	=> _"Compilation", width => 20, flags => 'garwesc',	type => 'boolean',
+	id3v2 => 'TCMP',	vorbis	=> 'compilation',	ape => 'Compilation',	ilst => 'cpil',
+	edit_many=>1,
+	#_disabled=>1,	#not tested
+ },
+ grouping =>
+ {	name	=> _"Grouping",	width => 100,	flags => 'garwesci',	type => 'fewstring',
+	FilterList => {search=>1},
+	can_group=>1,
+	edit_order=> 55,	edit_many=>1,
+	id3v2 => 'TIT1',	vorbis	=> 'grouping',	ape	=> 'Grouping', ilst => "\xA9grp",
  },
  year =>
  {	name	=> _"Year",	width => 40,	flags => 'garwesc',	type => 'integer',	bits => 16, edit_max=>3000,
@@ -518,7 +537,7 @@ our %timespan_menu=
  {	name	=> _"Track",	width => 40,	flags => 'garwesc',
 	id3v1	=> 5,		id3v2	=> 'TRCK',	vorbis	=> 'tracknumber',	ape	=> 'Track', ilst => "trkn",
 	type => 'integer',	displayformat => '%02d', bits => 8, edit_max => 255,
-	editwidth => 4,		letter => 'n',
+	edit_order=> 20,	editwidth => 4,		letter => 'n',
  },
  disc =>
  {	name	=> _"Disc",	width => 40,	flags => 'garwesc',	type => 'integer',	bits => 8, edit_max => 255,
@@ -526,6 +545,11 @@ our %timespan_menu=
 	editwidth => 4,
 	edit_order=> 40,	edit_many=>1,	letter => 'd',
 	can_group=>1,
+ },
+ discname =>
+ {	name	=> _"Disc name",	width	=> 100,		flags => 'garwesci',	type => 'fewstring',
+	id3v2	=> 'TSST',	vorbis	=> 'discsubtitle',	ape => 'DiscSubtitle',	ilst=> '----DISCSUBTITLE',
+	_disabled=>1,
  },
  genre	=>
  {	name		=> _"Genres",	width => 180,	flags => 'garwescil',
@@ -580,14 +604,21 @@ our %timespan_menu=
  skipcount	=>
  {	name	=> _"Skip count",	width => 50,	flags => 'gaesc',	type => 'integer',	letter => 'k',
  },
- author	=>
- {	name	=> _"Author",	width	=> 100,		flags => 'garwesci',	type => 'fewstring',
-	id3v2	=> 'TOPE',	vorbis	=> 'author',	lyrics3	=> 'AUT',	ilst => "\xA9wrt",	#ape => ''#?? FIXME
+ composer =>
+ {	name	=> _"Composer",		width	=> 100,		flags => 'garwesci',	type => 'artist',
+	id3v2	=> 'TCOM',	vorbis	=> 'composer',		ape => 'Composer',	ilst => "\xA9wrt",
+	FilterList => {search=>1},
 	_disabled=>1,
  },
- version=>
+ author	=>
+ {	name	=> _"Author",	width	=> 100,		flags => 'garwesci',	type => 'artist',
+	id3v2	=> 'TOPE',	vorbis	=> 'author',	lyrics3	=> 'AUT',	#ape => 'Author'#?? FIXME
+	FilterList => {search=>1},
+	_disabled=>1,
+ },
+ version=> #subtitle ?
  {	name	=> _"Version",	width	=> 150,		flags => 'garwesci',	type => 'string',
-	id3v2	=> 'TIT3',	vorbis	=> 'version',				ape => 'Subtitle',
+	id3v2	=> 'TIT3',	vorbis	=> 'version|subtitle',			ape => 'Subtitle',	ilst=> '----SUBTITLE',
  },
  channel=>
  {	name	=> _"Channels",		width => 50,	flags => 'gasc',	type => 'integer',	bits => 4,	audioinfo => 'channels', },	# are 4 bits needed ? 1bit+1 could be enough ?

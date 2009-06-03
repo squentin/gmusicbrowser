@@ -918,6 +918,12 @@ SIGN =>	'u',
 SEEK =>	'u',
 ASPI =>	'u',
 
+#iTunes frames
+TCMP => 'eT',	#compilation flag
+TSO2 => 'eT',	#Album Artist Sort
+TSOC => 'eT',	#Composer Sort
+
+
 #unconverted id3v2
 #XCRM => 'ttb',#CRM
 );
@@ -1001,7 +1007,7 @@ sub new_from_file
 	{	return undef if $v1==2;	#means compressed tag -> ignore
 		warn "extended header\n" if $::debug;
 		my $extsize=substr $rawtag,0,4,'';
-		$extsize=($v1==4)? _decodesyncsafe($extsize)
+		$extsize=($v1==4)? _decodesyncsafe($extsize)-4
 				 : unpack 'N',$extsize;
 		my $extheader=substr $rawtag,0,$extsize,'';
 		if ($v1==3)
@@ -1052,22 +1058,21 @@ sub new_from_file
 			$fsize=($v1==4 && !($broken24&1))	? _decodesyncsafe($fsize)
 								: unpack 'N',$fsize;
 		}
-		my ($error,$erroraction);
+		my $error;
 		unless ($frame=~m/^[A-Z0-9]+$/)		# check if valid frameID
 		{	if ($frame=~m/^[A-Za-z0-9 ]+$/)
 			{	warn "Invalid frameID '$frame' (lowercase and/or space)\n";
 			}
 			else
 			{	$error="Invalid frameID found";
-				$erroraction="skipping rest of tag";
 			}
 		}
-		if (length($rawtag) < $fsize+$pos)	#end of tag
+		if (!$error && length($rawtag) < $fsize+$pos)	#end of tag
 		{	$error="End of tag reached prematurely while reading frame $frame";
-			$erroraction="ignoring";
 		}
 		if ($error)
-		{	if ($v1!=4) { warn "$error -> $erroraction\n";last }
+		{	my $erroraction="skipping rest of tag";
+			if ($v1!=4) { warn "$error -> $erroraction\n";last }
 			if ($broken24<3)
 			{	$broken24++;
 				warn "$error, trying broken id3v2.4 mode$broken24\n";
@@ -1384,8 +1389,8 @@ sub _encodesyncsafe
 	return join('',@result);
 }
 sub _decodesyncsafe
-{	(my $int,@_)=unpack 'C*',$_[0];
-	$int=($int<<7)+$_ for @_;
+{	my ($int,@bytes)=unpack 'C*',$_[0];
+	$int=($int<<7)+$_ for @bytes;
 	return $int;
 }
 
