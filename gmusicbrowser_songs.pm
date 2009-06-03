@@ -46,7 +46,7 @@ our %timespan_menu=
 		init		=> '___name[0]="#none#"; ___iname[0]=::superlc(___name[0]);',
 		default		=> '""',
 		check		=> ';',
-		get_list	=> 'my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : ();',
+		#get_list	=> 'my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : ();',
 		get_gid		=> 'my $v=#_#; ref $v ? $v : [$v]',
 		gid_to_get	=> '(#GID# ? ___name[#GID#] : "")',
 		gid_to_display	=> '___name[#GID#]',
@@ -94,7 +94,7 @@ our %timespan_menu=
 		's_sort:gid'	=> '__#mainfield#_name[#GID#]',
 		'si_sort:gid'	=> '__#mainfield#_iname[#GID#]',
 		#display	=> '##mainfield#->display#',
-		get_list	=> 'split /$::re_artist/o, ##mainfield#->get#', #use artist field directly, maybe do this for all of artists ?
+		#get_list	=> 'split /$::re_artist/o, ##mainfield#->get#', #use artist field directly, maybe do this for all of artists ?
 		gid_to_get	=> '(#GID#!=1 ? __#mainfield#_name[#GID#] : "")', # or just '__#mainfield#_name[#GID#]' ?
 		gid_to_display	=> '__#mainfield#_name[#GID#]',
 		update	=> 'my @list= split /$::re_artist/o, ##mainfield#->get#;
@@ -565,11 +565,13 @@ our %timespan_menu=
  {	name		=> _"Labels",	width => 180,	flags => 'gaescil',
 	 #is_set	=> '(__LABEL__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
 	type		=> 'flags',
-	icon		=> sub { "label-".$_[0]; }, #FIXME
-	icon_for_gid	=> '"label-".#gid_to_get#',
+	iconprefix	=> 'label-',
+	icon		=> sub { $Def{label}{iconprefix}.url_escape($_[0]); },
+	icon_for_gid	=> '"#iconprefix#".#gid_to_get#',
 	all_count	=> _"All labels",
 	none		=> quotemeta _"No label",
 	FilterList	=> {search=>1,icon=>1},
+	icon_edit_string=> _"Choose icon for label {name}",
 	edit_order=> 80,	edit_many=>1,	letter => 'L',
  },
  comment=>
@@ -1274,15 +1276,16 @@ sub Get_gid
 	($Get_gid{$field}||= Makesub($field, 'get_gid', ID => '$_[0]') ) ->($ID);
 #	$Get_gid{$field}->($ID);
 }
-sub Get_list	#rarely used, keep ?
-{	my ($ID,$field)=@_;
-	#FIXME check field can have multiple values
-	my $func= $FuncCache{'getlist '.$field} ||= Makesub($field, 'get_list', ID => '$_[0]');
-	$func->($ID);
-}
+#sub Get_list	#rarely used, keep ?
+#{	my ($ID,$field)=@_;
+#	#FIXME check field can have multiple values
+#	my $func= $FuncCache{'getlist '.$field} ||= Makesub($field, 'get_list', ID => '$_[0]');
+#	$func->($ID);
+#}
 sub Get_icon_list
 {	my ($field,$ID)=@_;
-	return grep Gtk2::IconFactory->lookup_default($_), map $Songs::Def{$field}{icon}($_), Songs::Get_list($ID,$field);
+	my $func= $FuncCache{"icon_list $field"} ||= Compile("icon_list $field", MakeCode($field,'sub {grep Gtk2::IconFactory->lookup_default($_), map #icon_for_gid#, @{#get_gid#}; }',ID=>'$_[0]', GID=>'$_'));	#FIXME simplify the code-making process
+	return $func->($ID);
 }
 sub Gid_to_Display	#convert a gid from a Get_gid to a displayable value
 {	my ($field,$gid)=@_; #warn "Gid_to_Display(@_)\n";
@@ -1438,6 +1441,29 @@ sub DateString
 #	for (@l) { if ($h2{$_}>=$nb) { push @common,$_; delete $h2{$_}; } }
 #	return @common ? join(' & ',@common) : _"Various artists";
 #}
+
+sub ChooseIcon	 #FIXME add a way to create a colored square/circle/... icon
+{	my ($field,$gid)=@_;
+	my $string= ::__x( $Def{$field}{icon_edit_string}, name=> Gid_to_Get($field,$gid) );
+	my $file=::ChoosePix($::CurrentDir.::SLASH, $string, undef,'LastFolder_Icon');
+	return unless defined $file;
+	my $dir=$::HomeDir.'icons';
+	return if ::CreateDir($dir) ne 'ok';
+	my $destfile= $dir. ::SLASH. Picture($gid,$field,'icon');
+	unlink $destfile.'.svg',$destfile.'.png';
+	if ($file eq '0') {}	#unset icon
+	elsif ($file=~m/\.svg/i)
+	{	$destfile.='.svg';
+		::copy($file,$destfile.'.svg');
+	}
+	else
+	{	$destfile.='.png';
+		my $pixbuf=::PixBufFromFile($file,48);
+		return unless $pixbuf;
+		$pixbuf->save($destfile,'png');
+	}
+	::LoadIcons();
+}
 
 sub FilterListFields
 {	grep $Def{$_}{FilterList}, @Fields;

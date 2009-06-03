@@ -5436,44 +5436,20 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 			$store->set($iter,0,'',1,0);
 			$treeview->set_cursor($store->get_path($iter), $treeview->get_column(1), TRUE);
 		});
-	my $iconbut=NewIconButton('gmb-picture',_"Set icon",sub #FIXME add a way to create a colored square icon
-		{	my ($row)=$treeview->get_selection->get_selected_rows;
-			return unless defined $row;
-			my $iter=$store->get_iter($row);
-			my ($label)=$store->get_value($iter);
-			my $file=ChoosePix($CurrentDir.SLASH,__x("Choose icon for label {label}",label => $label),undef,'LastFolder_Icon');
-			return unless defined $file;
-			my $dir=$::HomeDir.'icons';
-			unless (-d $dir)
-			{	warn "Creating $dir\n";
-				unless (mkdir $dir)
-				{ ErrorMessage(__x(_"Error creating {folder} :\n{error}",folder=>$dir,error=>$!));
-				  return;
-				}
-			}
-			my $destfile=$::HomeDir.'icons'.SLASH.'label-'.url_escape($label);
-			unlink $destfile.'.svg',$destfile.'.png';
-			if ($file eq '0') {}	#unset icon
-			elsif ($file=~m/\.svg/i)
-			{	$destfile.='.svg';
-				copy($file,$destfile.'.svg');
-			}
-			else
-			{	$destfile.='.png';
-				my $pixbuf=PixBufFromFile($file,48);
-				return unless $pixbuf;
-				$pixbuf->save($destfile,'png');
-			}
-			LoadIcons();
-			$treeview->queue_draw;
-		});
+#	my $iconbut=NewIconButton('gmb-picture',_"Set icon",sub
+#		{	my ($row)=$treeview->get_selection->get_selected_rows;
+#			return unless defined $row;
+#			my $iter=$store->get_iter($row);
+#			my ($label)=$store->get_value($iter);
+#			Songs::ChooseIcon('label',$gid); 		#needs gid
+#		});
 
 	$delbut->set_sensitive(FALSE);
-	$iconbut->set_sensitive(FALSE);
+	#$iconbut->set_sensitive(FALSE);
 	$treeview->get_selection->signal_connect( changed => sub
 		{	my $s=$_[0]->count_selected_rows;
 			$delbut->set_sensitive($s);
-			$iconbut->set_sensitive($s);
+			#$iconbut->set_sensitive($s);
 		});
 
 	my $sw=Gtk2::ScrolledWindow->new;
@@ -5481,7 +5457,7 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 	$sw->set_policy('never','automatic');
 	$sw->add($treeview);
 	$vbox->add($sw);
-	$vbox->pack_start( Hpack($addbut,$delbut,$iconbut) ,FALSE,FALSE,2);
+	$vbox->pack_start( Hpack($addbut,$delbut) ,FALSE,FALSE,2); #,$iconbut
 
 	return $vbox;
 }

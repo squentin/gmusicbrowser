@@ -1692,7 +1692,14 @@ our @cMenu=
 		notempty => 'utf8pathlist' },
 	{ label=> _"Check for updated/removed songs", code => sub { ::IdleCheck(  @{ $_[0]{filter}->filter } ); },
 		isdefined => 'filter', stockicon => 'gtk-refresh', istrue => 'utf8pathlist' }, #doesn't really need utf8pathlist, but makes less sense for non-folder pages
-	{ label=> _"Set Picture", code => sub { my $gid=$_[0]{gidlist}[0]; ::ChooseAAPicture(undef,$_[0]{field},$gid); }, stockicon => 'gmb-picture', onlyone=> 'gidlist', test => sub { Songs::FilterListProp($_[0]{field},'picture'); }, },
+	{ label=> _"Set Picture",	stockicon => 'gmb-picture',
+		code => sub { my $gid=$_[0]{gidlist}[0]; ::ChooseAAPicture(undef,$_[0]{field},$gid); },
+		onlyone=> 'gidlist',	test => sub { Songs::FilterListProp($_[0]{field},'picture') && $_[0]{gidlist}[0]>0; },
+	},
+	{ label=> _"Set icon",		stockicon => 'gmb-picture',
+		code => sub { my $gid=$_[0]{gidlist}[0]; Songs::ChooseIcon($_[0]{field},$gid); },
+		onlyone=> 'gidlist',	test => sub { Songs::FilterListProp($_[0]{field},'icon') && $_[0]{gidlist}[0]>0; },
+	},
 #	{ separator=>1 },
 	{ label => _"Options", submenu => \@MenuPageOptions, stock => 'gtk-preferences', isdefined => 'field' },
 	{ label => _"Show buttons",	code => sub { my $fp=$_[0]{filterpane}; $fp->{hidebb}^=1; if ($fp->{hidebb}) {$fp->{bottom_buttons}->hide} else {$fp->{bottom_buttons}->show} },
@@ -2420,10 +2427,12 @@ sub PopupContextMenu
 {	my ($self,undef,$event)=@_;
 	$self=::find_ancestor($self,__PACKAGE__);
 	my ($field,$gidlist)=$self->get_selected_list;
+	my $gidall;
+	if (grep GID_ALL==$_, @$gidlist) { $gidlist=[]; $gidall=1; }
 	my $mainfield=Songs::MainField($field);
 	my $aa= ($mainfield eq 'artist' || $mainfield eq 'album') ? $mainfield : undef; #FIXME
 	my $mode= uc(substr $self->{mode},0,1); # C => cloud, M => mosaic, L => list
-	FilterPane::PopupContextMenu($self,$event,{ self=> $self, filter => $self->get_selected_filters, field => $field, aa => $aa, gidlist =>$gidlist, mode => $mode, subfield => $field, depth =>0 });
+	FilterPane::PopupContextMenu($self,$event,{ self=> $self, filter => $self->get_selected_filters, field => $field, aa => $aa, gidlist =>$gidlist, gidall => $gidall, mode => $mode, subfield => $field, depth =>0 });
 }
 
 sub key_press_cb
@@ -3665,7 +3674,7 @@ sub RENDER
 		( $widget->has_focus			? 'selected'	: 'active'):
 		( $widget->state eq 'insensitive'	? 'insensitive'	: 'normal');
 
-	if ($psize && $gid!=-1)
+	if ($psize && $gid!=FilterList::GID_ALL)
 	{	my $field=$prop->[P_FIELD][$depth];
 		my $pixbuf=	$iconfield	? $widget->render_icon(Songs::Picture($gid,$field,'icon'),'menu')||undef: #FIXME could be better
 						AAPicture::pixbuf($field,$gid,$psize);
@@ -3691,7 +3700,7 @@ sub RENDER
 	my $field=$prop->[P_FIELD][$depth];
 	$field=~s/\..*//;
 	my $starfield= $Songs::Def{$field}{starfield}; #FIXME shouldn't use Songs::Def directly
-	if ($gid!=-1 && $starfield)
+	if ($gid!=FilterList::GID_ALL && $starfield)
 	{	if (my $pb= Songs::Picture($gid,$starfield,'pixbuf'))
 		{	# FIXME center verticaly or resize ?
 			$window->draw_pixbuf( $widget->style->black_gc, $pb,0,0, $x+XPAD+$w, $y+$offy,-1,-1,'none',0,0);
