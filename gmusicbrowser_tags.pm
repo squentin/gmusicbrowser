@@ -453,7 +453,7 @@ sub new
 		if (@$folders>1)
 		{	my $common= ::find_common_parent_folder(@$folders);
 			$folder=_"different folders";
-			$folder.= "\n". ::__x("(common parent folder : {common})",common=>$common) if length($common)>5;
+			$folder.= "\n". ::__x(_"(common parent folder : {common})",common=>$common) if length($common)>5;
 		}
 		my $text= ::__("%d file in {folder}","%d files in {folder}",scalar@IDs);
 		$text= ::__x($text,folder => '<small>'.::PangoEsc($folder).'</small>');

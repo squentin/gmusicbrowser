@@ -46,7 +46,7 @@ our %timespan_menu=
 		init		=> '___name[0]="#none#"; ___iname[0]=::superlc(___name[0]);',
 		default		=> '""',
 		check		=> ';',
-		#get_list	=> 'my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : ();',
+		get_list	=> 'my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : ();',
 		get_gid		=> 'my $v=#_#; ref $v ? $v : [$v]',
 		gid_to_get	=> '(#GID# ? ___name[#GID#] : "")',
 		gid_to_display	=> '___name[#GID#]',
@@ -94,7 +94,7 @@ our %timespan_menu=
 		's_sort:gid'	=> '__#mainfield#_name[#GID#]',
 		'si_sort:gid'	=> '__#mainfield#_iname[#GID#]',
 		#display	=> '##mainfield#->display#',
-		#get_list	=> 'split /$::re_artist/o, ##mainfield#->get#', #use artist field directly, maybe do this for all of artists ?
+		get_list	=> 'split /$::re_artist/o, ##mainfield#->get#', #use artist field directly, maybe do this for all of artists ?
 		gid_to_get	=> '(#GID#!=1 ? __#mainfield#_name[#GID#] : "")', # or just '__#mainfield#_name[#GID#]' ?
 		gid_to_display	=> '__#mainfield#_name[#GID#]',
 		update	=> 'my @list= split /$::re_artist/o, ##mainfield#->get#;
@@ -566,7 +566,7 @@ our %timespan_menu=
 	 #is_set	=> '(__LABEL__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
 	type		=> 'flags',
 	iconprefix	=> 'label-',
-	icon		=> sub { $Def{label}{iconprefix}.url_escape($_[0]); },
+	icon		=> sub { $Def{label}{iconprefix}.::url_escape($_[0]); },
 	icon_for_gid	=> '"#iconprefix#".#gid_to_get#',
 	all_count	=> _"All labels",
 	none		=> quotemeta _"No label",
@@ -1276,12 +1276,12 @@ sub Get_gid
 	($Get_gid{$field}||= Makesub($field, 'get_gid', ID => '$_[0]') ) ->($ID);
 #	$Get_gid{$field}->($ID);
 }
-#sub Get_list	#rarely used, keep ?
-#{	my ($ID,$field)=@_;
-#	#FIXME check field can have multiple values
-#	my $func= $FuncCache{'getlist '.$field} ||= Makesub($field, 'get_list', ID => '$_[0]');
-#	$func->($ID);
-#}
+sub Get_list	#rarely used, keep ?
+{	my ($ID,$field)=@_;
+	#FIXME check field can have multiple values
+	my $func= $FuncCache{'getlist '.$field} ||= Makesub($field, 'get_list', ID => '$_[0]');
+	$func->($ID);
+}
 sub Get_icon_list
 {	my ($field,$ID)=@_;
 	my $func= $FuncCache{"icon_list $field"} ||= Compile("icon_list $field", MakeCode($field,'sub {grep Gtk2::IconFactory->lookup_default($_), map #icon_for_gid#, @{#get_gid#}; }',ID=>'$_[0]', GID=>'$_'));	#FIXME simplify the code-making process
