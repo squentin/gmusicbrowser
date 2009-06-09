@@ -15,6 +15,7 @@ my ($WatchTag,$Skip);
 my ($Mute,$Volume);
 my (%Plugins,%Sinks);
 my ($VSink,$visual_window);
+my $AlreadyNextSong;
 
 my $RGA_pipeline; my $RG_dialog;
 my $RGA_songmenu=
@@ -100,19 +101,21 @@ sub supported_sinks
 sub init
 {	return undef unless $GST_ok;
 	$Volume= $::Options{gst_volume};
-	createPlayBin();
+	#createPlayBin();
 	return bless { EQ=>$GST_EQ_ok, visuals => $GST_visuals_ok },__PACKAGE__;
 }
 
 sub createPlayBin
 {	if ($PlayBin) { $PlayBin->get_bus->remove_signal_watch; }
-	$PlayBin=GStreamer::ElementFactory->make(playbin => 'playbin');
+	my $pb= $::Options{gst_gapless} ? 'playbin2' : 'playbin';
+	$PlayBin=GStreamer::ElementFactory->make($pb => 'playbin'); #FIXME only the first one used works
 	my $bus=$PlayBin->get_bus;
 	$bus->add_signal_watch;
 #	$bus->signal_connect('message' => \&bus_message);
 	$bus->signal_connect('message::eos' => \&bus_message_end);
 	$bus->signal_connect('message::error' => \&bus_message_end,1);
 	$bus->signal_connect('message::state-changed' => \&bus_message_state_changed);
+	$PlayBin->signal_connect(about_to_finish => \&about_to_finish) if $::Options{gst_gapless};
 	if ($visual_window) { create_visuals() }
 }
 
@@ -158,7 +161,7 @@ sub SetVolume
 	elsif	($set=~m/(\d+)/)	{ $Volume =$1; }
 	$Volume=0   if $Volume<0;
 	$Volume=100 if $Volume>100;
-	$PlayBin->set(volume => $Volume/100); #or /10 ?
+	$PlayBin->set(volume => $Volume/100) if $PlayBin; #or /10 ?
 	::HasChanged('Vol');
 	$::Options{gst_volume}=$Volume;
 }
@@ -197,8 +200,17 @@ sub make_sink
 	return $sink;
 }
 
+sub about_to_finish	#GAPLESS
+{	#warn "-------about_to_finish  $::NextFileToPlay\n";
+	return unless $::NextFileToPlay;
+	set_file($::NextFileToPlay);
+	$AlreadyNextSong=$::NextFileToPlay;
+	$::NextFileToPlay=0;
+}
+
 sub Play
 {	(my($package,$file),$Skip)=@_;
+	#warn "------play $file\n";
 	#$PlayBin->set_state('ready');#&Stop;
 	#my ($ext)=$file=~m/\.([^.]*)$/; warn $ext;
 	#::ErrorPlay('not supported') and return undef  unless $Plugins{$ext};
@@ -208,7 +220,14 @@ sub Play
 	$keep=0 if $Sink->{EQ} xor $useEQ;
 	$keep=0 if $Sink->{RG} xor $useRG;
 	$keep=0 if $package->{modif}; #advanced options changed
-	unless ($keep)
+	if ($AlreadyNextSong && $AlreadyNextSong eq $file && $keep && !$Skip)
+	{	$AlreadyNextSong=undef;
+		return;
+	}
+	if ($keep)
+	{	$package->Stop(1);
+	}
+	else
 	{	createPlayBin();
 		warn "Creating new gstreamer sink\n" if $::debug;
 		delete $package->{modif};
@@ -247,14 +266,17 @@ sub Play
 	{	$VSink->set_xwindow_id($visual_window->window->XID);
 	}
 	warn "playing $file\n";
-	my $f=$file;
+	set_file($file);
+	$PlayBin -> set_state('playing');
+	$WatchTag=Glib::Timeout->add(500,\&_UpdateTime) unless $WatchTag;
+}
+sub set_file
+{	my $f=shift;
 	if ($f!~m#^([a-z]+)://#)
 	{	$f=~s#([^A-Za-z0-9- /\.])#sprintf('%%%02X', ord($1))#seg;
 		$f='file://'.$f;
 	}
 	$PlayBin -> set(uri => $f);
-	$PlayBin -> set_state('playing');
-	$WatchTag=Glib::Timeout->add(500,\&_UpdateTime) unless $WatchTag;
 }
 
 sub set_equalizer
@@ -368,6 +390,7 @@ sub list_visuals
 
 sub _UpdateTime
 {	my ($result,$state,$pending)=$PlayBin->get_state(0);
+	if ($AlreadyNextSong) { warn "UpdateTime: gapless change to next song\n" if $::debug; ::end_of_file_faketime(); return 1; }
 	warn "state: $result,$state,$pending\n" if $::debug;
 	return 1 if $result eq 'async';
 	if ($state ne 'playing' && $state ne 'paused')
@@ -391,6 +414,7 @@ sub Stop
 	#warn "stop: state: $result,$state,$pending\n";
 	#return if $state eq 'null' and $pending eq 'void-pending';
 	$PlayBin->set_state('null');
+	#warn "--stop\n";
 }
 
 sub RG_set_options
@@ -603,6 +627,8 @@ sub RGA_PrefBox
 sub AdvancedOptions
 {	my $self=$_[0];
 	my $vbox=Gtk2::VBox->new(::FALSE, 2);
+	my $gapless= ::NewPrefCheckButton(gst_gapless => _"enable gapless (experimental)", sub { $self->{modif}=1 });
+	$vbox->pack_start($gapless,::FALSE,::FALSE,2);
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
 	for my $s (sort grep $Sinks{$_}{ok} && $Sinks{$_}{option}, keys %Sinks)

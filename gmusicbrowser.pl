@@ -604,12 +604,13 @@ my $SavedListsWatcher;
 our $ListPlay;
 our ($TogPlay,$TogLock);
 our ($RandomMode,$SortFields,$ListMode);
-our ($SongID,$Recent,$RecentPos,$Queue); our $QueueAction=''; our ($Position,$ChangedID,$ChangedPos);
+our ($SongID,$Recent,$RecentPos,$Queue); our $QueueAction='';
+our ($Position,$ChangedID,$ChangedPos,@NextSongs,$NextFileToPlay);
 our ($MainWindow,$BrowserWindow,$ContextWindow,$FullscreenWindow); my $OptionsDialog;
 our $QueueWindow; my $TrayIcon;
 my %Editing; #used to keep track of opened song properties dialog and lyrics dialog
 our $PlayTime;
-our ($StartTime,$StartedAt,$PlayingID,$PlayedPartial); my $About_to_NextSong;
+our ($StartTime,$StartedAt,$PlayingID,$PlayedPartial);
 our $CurrentDir=$ENV{PWD};
 #$ENV{PULSE_PROP_media.role}='music'; # pulseaudio hint. could set other pulseaudio properties, FIXME doesn't seem to reach pulseaudio
 
@@ -619,8 +620,6 @@ my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos SongID Pl
 # also used for SearchText_ SelectedID_ followed by group id
 # Picture_#mainfield#
 
-my $Q_watcher={};
-Watch($Q_watcher, SongArray	=> \&SongArray_changed);
 my (%Watched,%WatchedFilt);
 my ($IdleLoop,@ToCheck,@ToReRead,@ToAdd_Files,@ToAdd_IDsBuffer,@ToScan,%FollowedDirs,$CoverCandidates);
 our ($LengthEstimated);
@@ -972,6 +971,13 @@ if ($CmdLine{UseGnomeSession})
 }
 
 #-------------INIT-------------
+
+{	my $mainWatch={};
+	Watch($mainWatch, SongArray	=> \&SongArray_changed);
+	my $NextWatch={};
+	Watch($NextWatch, $_	=> \&QueueUpdateNextSongs) for qw/Playlist Queue Sort Pos QueueAction/;
+}
+
 our ($Play_package,%PlayPacks); my $PlayNext_package;
 for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_gstreamer-0.10.pm gmusicbrowser_server.pm/)
 {	eval { require $file } || warn $@;	#each file sets $::PlayPacks{PACKAGENAME} to 1 for each of its included playback packages
@@ -1816,9 +1822,7 @@ sub SkipTo
 		$TogPlay=1;
 		HasChanged('Playing');
 	}
-	else
-	{	Play($sec);
-	}
+	else	{ Play($sec); }
 }
 
 sub PlayPause
@@ -1842,11 +1846,7 @@ sub Play
 {	return unless defined $SongID;
 	my $sec=shift;
 	$sec=undef unless $sec && !ref $sec;
-	if (defined $PlayingID)
-	{	if ($PlayNext_package) {Stop();}
-		else { $Play_package->Stop(1); }
-		&Played;
-	}
+	&Played if defined $PlayingID;
 	$StartedAt=$sec||0;
 	$StartTime=time;
 	$PlayingID=$SongID;
@@ -1888,10 +1888,7 @@ sub end_of_file_faketime
 
 sub end_of_file
 {	SwitchPlayPackage() if $PlayNext_package;
-	$About_to_NextSong=1;
 	&Played;
-	return unless $About_to_NextSong;	#with a playfilter based on playcount, the NextSong can happen in &Played
-	$About_to_NextSong=undef;
 	ResetTime();
 	&NextSong;
 }
@@ -2112,6 +2109,21 @@ sub GetNextSongs
 	return $list ? @IDs : $IDs[0];
 }
 
+sub PrepNextSongs
+{	if ($RandomMode) { @NextSongs=(); }
+	else
+	{	@NextSongs= grep /^\d+$/, GetNextSongs(5); # FIXME GetNextSongs needs some changes to return only IDs, and in the GetNextSongs(1) case
+	}
+	my $nextID=$NextSongs[0];
+	$NextFileToPlay= defined $nextID ? Songs::GetFullFilename($nextID) : undef;
+	warn "Next file to play : $::NextFileToPlay\n" if $::debug;
+	::HasChanged('NextSongs');
+}
+sub QueueUpdateNextSongs
+{	IdleDo('2_PrepNextSongs',100,\&PrepNextSongs);
+	$NextFileToPlay=undef; @NextSongs=();
+}
+
 sub GetPrevSongs
 {	my $nb=shift||1;
 	my $list=($nb>1)? 1 : 0;
@@ -2133,8 +2145,7 @@ sub PrevSong
 	Select(song => $ID);
 }
 sub NextSong
-{	$About_to_NextSong=undef;
-	my $ID=GetNextSongs();
+{	my $ID=GetNextSongs();
 	if (!defined $ID)  { Stop(); return; }
 	if ($ID eq 'wait') { Stop(); return; }
 	if ($ID eq 'stop') { Stop(); return; }
@@ -2227,6 +2238,9 @@ sub SongArray_changed
 	{	HasChanged('Queue',$action,@extra);
 		if	($QueueAction eq 'wait')	{ IdleDo('1_QAuto',10,\&QWaitAutoPlay) if @$Queue && !$TogPlay; }
 		elsif	($QueueAction eq 'autofill')	{ IdleDo('1_QAuto',10,\&QAutoFill); }
+	}
+	elsif ($songarray==$ListPlay)
+	{	HasChanged('Playlist',$action,@extra);
 	}
 }
 
@@ -5748,16 +5762,20 @@ sub HasChanged
 
 sub GetSelID
 {	my $group= ref $_[0] ? $_[0]{group} : $_[0];
-	return $group ne 'Play' ? $SelID{$group} : $SongID;
+	return	$group=~m/Next(\d)?/ ? $NextSongs[($1 ? $1-1 : 0)] :
+		$group ne 'Play' ? $SelID{$group} :
+		$SongID;
 }
 sub WatchSelID
 {	my ($object,$sub,$fields)=@_; #fields are ignored for now
-	my $key= $object->{group} ne 'Play' ? 'SelectedID_'.$object->{group} : 'SongID';
+	my $group=$object->{group};
+	my $key= $group=~m/Next\d?/ ? 'NextSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'SongID';
 	Watch($object,$key,$sub);
 }
 sub UnWatchSelID
 {	my $object=$_[0];
-	my $key= $object->{group} ne 'Play' ? 'SelectedID_'.$object->{group} : 'SongID';
+	my $group=$object->{group};
+	my $key= $group=~m/Next\d?/ ? 'NextSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'SongID';
 	UnWatch($object,$key);
 }
 sub HasChangedSelID
