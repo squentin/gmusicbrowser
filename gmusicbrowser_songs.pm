@@ -567,7 +567,7 @@ our %timespan_menu=
 	type		=> 'flags',
 	iconprefix	=> 'label-',
 	icon		=> sub { $Def{label}{iconprefix}.::url_escape($_[0]); },
-	icon_for_gid	=> '"#iconprefix#".#gid_to_get#',
+	icon_for_gid	=> '"#iconprefix#".::url_escape(#gid_to_get#)',
 	all_count	=> _"All labels",
 	none		=> quotemeta _"No label",
 	FilterList	=> {search=>1,icon=>1},
