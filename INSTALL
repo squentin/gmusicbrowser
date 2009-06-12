@@ -21,7 +21,7 @@ change to the main folder :
  cd gmusicbrowser-VERSION/
 If you have the debian/ folder, you should be able to build a deb by running :
  dpkg-buildpackage
-from the main gmusicbrowser folder
+from the main gmusicbrowser folder (it requires the debhelper package)
 
 Any distribution
 ================
