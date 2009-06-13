@@ -477,6 +477,35 @@ pic:	+aapic(y=title:h+title:y+4,picsize=picsize,ypad=2,aakey=$album,aa='album')
 picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 
 
+[Tabbed Lists, Library & Context]
+Type=G
+Default		= Window size=1120x820 FPane0 page=genre FPane1 page=artist FPane2 page=album,albumpsize=32,albuminfo=1 VPRight 200_550
+MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem
+MBlist 		= HistItem LSortItem PlayItem
+HBmenu		= _MBmenu
+HBButtons1	= Prev Stop Play Next 5-Vol -Pref -Playlist(toggle)
+HBButtons3	= 5Sort 5Filter 5Queue 5Pos -Stars
+HBTime		= LabelTime Length _Scale
+HBTitle		= Filler0 _Title
+HBArtist	= LockArtist _Artist
+HBAlbum		= LockAlbum _Album -Date
+VBText		= HBButtons1 2HBTitle 2HBArtist 2HBAlbum HBTime
+HBText_Cover	= _VBText 5-Cover
+VBplayer	= HBButtons3 HBText_Cover
+VBLeft		= VBplayer 5_TabbedLists(group=1)
+HPfp1		= FPane1(nb=2,hide=1) FPane2(nb=3,hide=1)
+HPfp0	 	= FPane0(nb=1,hide=1) HPfp1
+HBSongList	= SimpleSearch -FLock -PlayFilter -Refresh -ResetFilter -MBlist
+VBSongList	= HBSongList _SongList
+VPRight		= HPfp0 _VBSongList
+TBRight		= _"Library" VPRight _"Context" Context
+HPBottom	= VBLeft _TBRight
+VBmain		= HBmenu 5_HPBottom
+HSize0		= Filler0 LockArtist LockAlbum
+VolumeScroll	= VBplayer
+ExtraWidgets	= button HBButtons1(pack=-,relief=none)
+
+
 [Equalizer]
 Default		= Window size=300x160
 VBmain		= _Equalizer
