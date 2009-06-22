@@ -892,18 +892,6 @@ INIT
   %{$SLC_Prop{albumpicinfo}}=%{$SLC_Prop{albumpic}};
   $SLC_Prop{albumpicinfo}{title}=_"Album picture & info";
   $SLC_Prop{albumpicinfo}{init}={aa => 'album', markup => "<b>%a</b>%Y\n<small>%s <small>%l</small></small>"};
-
-  for my $key (Songs::ColumnsKeys())
-  {	$SLC_Prop{$key}=
-	{	title	=> Songs::FieldName($key),	value	=> sub { Songs::Display($_[2],$key)},
-		type	=> 'Glib::String',		attrib	=> 'text',
-		sort	=> Songs::SortField($key),	width	=> Songs::FieldWidth($key),
-		depend	=> join(' ',Songs::Depends($key)),
-	};
-  }
-
-  $SLC_Prop{'length'}{init}{xalign}=1; #right-align length #maybe should be done to all number columns ?
-
 }
 
 our @ColumnMenu=
@@ -923,6 +911,19 @@ our @ColumnMenu=
 	},
 	{ label => _"Go to playing song",	code => sub { $_[0]{self}->FollowSong; }, },
 );
+
+sub init_textcolumns	#FIXME support calling it multiple times => remove columns for removed fields, update added columns ?
+{
+	for my $key (Songs::ColumnsKeys())
+	{	$SLC_Prop{$key}=
+		{	title	=> Songs::FieldName($key),	value	=> sub { Songs::Display($_[2],$key)},
+			type	=> 'Glib::String',		attrib	=> 'text',
+			sort	=> Songs::SortField($key),	width	=> Songs::FieldWidth($key),
+			depend	=> join(' ',Songs::Depends($key)),
+		};
+		$SLC_Prop{$key}{init}{xalign}=1 if Songs::ColumnAlign($key);
+	}
+}
 
 sub new
 {	my ($class,$opt1,$opt2,$songarray) = @_;
@@ -1699,6 +1700,10 @@ our @cMenu=
 	{ label=> _"Set icon",		stockicon => 'gmb-picture',
 		code => sub { my $gid=$_[0]{gidlist}[0]; Songs::ChooseIcon($_[0]{field},$gid); },
 		onlyone=> 'gidlist',	test => sub { Songs::FilterListProp($_[0]{field},'icon') && $_[0]{gidlist}[0]>0; },
+	},
+	{ label=> _"Remove label",	stockicon => 'gtk-remove',
+		code => sub { my $gid=$_[0]{gidlist}[0]; ::RemoveLabel($_[0]{field},$gid); },
+		onlyone=> 'gidlist',	test => sub { $_[0]{field} eq 'label' },	#FIXME ? label specific
 	},
 #	{ separator=>1 },
 	{ label => _"Options", submenu => \@MenuPageOptions, stock => 'gtk-preferences', isdefined => 'field' },
@@ -4807,15 +4812,17 @@ use Gtk2;
 use base 'Gtk2::HBox';
 our @ISA;
 our %STC;
-INIT
-{ unshift @ISA, 'SongList::Common';
-  for my $key (Songs::ColumnsKeys())
-  {	$STC{$key}=
+INIT { unshift @ISA, 'SongList::Common'; }
+
+sub init_textcolumns	#FIXME support calling it multiple times => remove columns for removed fields, update added columns ?
+{ for my $key (Songs::ColumnsKeys())
+  {	my $align= Songs::ColumnAlign($key) ? ',x=-text:w' : '';	#right-align if Songs::ColumnAlign($key)
+	$STC{$key}=
 	{	title	=> Songs::FieldName($key),
 		sort	=> Songs::SortField($key),
 		width	=> Songs::FieldWidth($key),
 		#elems	=> ['text=text(text=$'.$id.')'],
-		elems	=> ['text=text(markup=playmarkup(pesc($'.$key.')))'],
+		elems	=> ['text=text(markup=playmarkup(pesc($'.$key."))$align)"],
 		songbl	=>'text',
 		hreq	=> 'text:h',
 	};

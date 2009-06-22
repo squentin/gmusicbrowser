@@ -601,7 +601,6 @@ our $DAYNB=int(time/86400)-12417;#number of days since 01 jan 2004
 
 our (@LibraryPath,$Library,$PlaySource);#,@Radio);
 our (%GlobalBoundKeys,%CustomBoundKeys);
-our %Labels;
 
 our ($SelectedFilter,$PlayFilter); our (%Filters,%FilterWatchers,%Related_FilterWatchers); our %SelID;
 #our %SavedFilters;our (%SavedSorts,%SavedWRandoms);our %SavedLists;
@@ -658,7 +657,7 @@ our %Options=
 	StartCheck	=> 0,	#check if songs have changed on startup
 	StartScan	=> 0,	#scan @LibraryPath on startup for new songs
 	#Path		=> '',	#contains join "\x1D",@LibraryPath
-	Labels => join("\x1D",_("favorite"),_("bootleg"),_("broken"),_("bonus tracks"),_("interview"),_("another example")),
+	Labels		=> [_("favorite"),_("bootleg"),_("broken"),_("bonus tracks"),_("interview"),_("another example")],
 	FilenameSchema	=> ['%a - %l - %n - %t','%l - %n - %t','%n-%t','%d%n-%t'],
 	FolderSchema	=> ['%A/%l','%A','%A/%Y-%l','%A - %l'],
 	PlayedPercent	=> .85,	#percent of a song played to increase play count
@@ -1358,9 +1357,8 @@ sub FirstTime
 		close $fh;
 	}
 
-	$Labels{$_}=undef for split "\x1D",$Options{Labels};
 	$re_artist=qr/ & |, /;
-	PluginsInit();
+	Post_Options_init();
 }
 
 
@@ -1388,10 +1386,11 @@ sub ReadOldSavedTags
 	$Options{FilenameSchema}=	[split /\x1D/,$Options{FilenameSchema}];
 	$Options{FolderSchema}=		[split /\x1D/,$Options{FolderSchema}];
 	$Options{LibraryPath}= delete $Options{Path};
+	$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2
 	$Options{ArtistSplit}||=' & |, |;';
 	$re_artist=qr/$Options{ArtistSplit}/;
 
-	PluginsInit();
+	Post_Options_init();
 
 	my $oldID=-1;
 	no warnings 'utf8'; # to prevent 'utf8 "\xE9" does not map to Unicode' type warnings about path and file which are stored as they are on the filesystem #FIXME find a better way to read lines containing both utf8 and unknown encoding
@@ -1530,8 +1529,9 @@ sub ReadSavedTags	#load tags _and_ settings
 		my $oldversion=delete $Options{version} || VERSION;
 		$Options{ArtistSplit}||=' & |, |;';
 		$re_artist=qr/$Options{ArtistSplit}/;
+		$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2
 
-		PluginsInit();
+		Post_Options_init();
 
 		my $songs=$lines{Songs};
 		my $fields=shift @$songs;
@@ -1571,12 +1571,15 @@ sub ReadSavedTags	#load tags _and_ settings
 	$Options{LibraryPath}||='';
 	@LibraryPath=	split "\x1D",$Options{LibraryPath};
 	s/\x00+$// for @LibraryPath; #FIXME ugly fix for paths ending with special char and not encoded in utf8, some \x00 are added when read with :utf8, (caused by the extraction by regex from a string flagged utf8)
-	$Labels{$_}=undef for split "\x1D",$Options{Labels}; #FIXME
 	#&launchIdleLoop;
 
 	setlocale(LC_NUMERIC, '');
 	warn "Reading saved tags in $SaveFile ... done\n";
 	Post_ReadSavedTags();
+}
+sub Post_Options_init
+{	PluginsInit();
+	Songs::UpdateFuncs();
 }
 sub Post_ReadSavedTags
 {	$Library||= SongArray->new;
@@ -1594,7 +1597,6 @@ sub SaveTags	#save tags _and_ settings
 	my $savefilename=$1;
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
 	$Options{Lock}= $TogLock || '';
-	$Options{Labels}=join "\x1D",@{SortedLabels()};
 	$Options{Path}  =join "\x1D",@LibraryPath;
 	_utf8_on($Options{Path});
 	$Options{SavedSongID}= SongArray->new([$SongID]) if $Options{RememberPlaySong} && defined $SongID;
@@ -5374,6 +5376,27 @@ sub SetLabels	#FIXME move to Songs::
 	#HasChanged('LabelList') if (keys %Labels)-$nb;	#FIXME PHASE1 move that into $Def{label}
 }
 
+sub RemoveLabel		#FIXME ? label specific
+{	my ($field,$gid)=@_;
+	my $label= Songs::Gid_to_Display($field,$gid);
+	#my $IDlist= Songs::AllFilter( MakeFilterFromGID('label',$gid) );
+	my $IDlist= Songs::MakeFilterFromGID($field,$gid)->filter;
+	if (my $nb=@$IDlist)
+	{	my $dialog = Gtk2::MessageDialog->new
+			( undef, #FIXME
+			  [qw/modal destroy-with-parent/],
+			  'warning','ok-cancel',
+			  __("This label is set for %d song.","This label is set for %d songs.",$nb)."\n".
+			  __x(_"Are you sure you want to delete the '{label}' label ?", label => $label)
+			);
+		$dialog->show_all;
+		if ($dialog->run ne 'ok') {$dialog->destroy;return;}
+		$dialog->destroy;
+		SetLabels($IDlist,undef,[$label]);
+	}
+	@{$Options{Labels}}= grep $_ ne $label, @{$Options{Labels}};
+}
+
 sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 {	my $vbox=Gtk2::VBox->new(FALSE,2);
 	my $store=Gtk2::ListStore->new('Glib::String','Glib::Int','Glib::String');
@@ -5383,12 +5406,12 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 	$renderer->signal_connect(edited => sub
 	    {	my ($cell,$pathstr,$new)=@_;
 		$new=~s/\x00//g;
-		return if ($new eq '') || exists $Labels{$new};
+		return if ($new eq '') || exists $::Labels{$new};
 		my $iter=$store->get_iter_from_string($pathstr);
 		my ($old,$nb)=$store->get_value($iter);
 		return if $new eq $old;
 		$store->set($iter,0,$new,2,'label-'.$new);
-		$Labels{$new}=delete $Labels{$old};
+		$::Labels{$new}=delete $::Labels{$old};
 		#FIXME maybe should rename the icon file if it exist
 		HasChanged('LabelList');
 		return unless $nb;
@@ -5448,7 +5471,7 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 				$dialog->destroy;
 			}
 			$store->remove($iter);
-			delete $Labels{$label};
+			@{$Options{Labels}}= grep $_ ne $label, @{$Options{Labels}};
 		});
 	my $addbut=NewIconButton('gtk-add',_"Add label",sub
 		{	my $iter=$store->append;

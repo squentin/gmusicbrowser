@@ -43,7 +43,8 @@ our %timespan_menu=
 	},
 	flags	=>
 	{	_		=> '____[#ID#]',
-		init		=> '___name[0]="#none#"; ___iname[0]=::superlc(___name[0]);',
+		init		=> '___name[0]="#none#"; ___iname[0]=::superlc(___name[0]); #sgid_to_gid(VAL=$_)# for #init_namearray#',
+		init_namearray	=> '()',
 		default		=> '""',
 		check		=> ';',
 		get_list	=> 'my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : ();',
@@ -222,7 +223,7 @@ our %timespan_menu=
 		init		=> '@__#mainfield#_picture=(); push @AAPicture::ArraysOfFiles, \@__#mainfield#_picture;',
 		default		=> '$::Options{Default_picture}{#mainfield#}',
 		get_for_gid	=> '#_# || #default#;',
-		pixbuf_for_gid	=> 'my $file= #get__from_gid#; ::PixBufFromFile($file);',#FIXME use a cache
+		pixbuf_for_gid	=> 'my $file= #get_for_gid#; ::PixBufFromFile($file);',#FIXME use a cache
 		set_for_gid	=> '::_utf8_off(#VAL#); #_#= #VAL# eq "" ? undef : #VAL#; ::HasChanged("Picture_#mainfield#",#GID#);',
 		load_extra	=> 'if (#VAL# ne "") { #_#= ::decode_url(#VAL#); }',
 		save_extra	=> 'do { my $v=#_#; defined $v ? ::url_escape($v) : ""; }',
@@ -555,7 +556,7 @@ our %timespan_menu=
  {	name		=> _"Genres",	width => 180,	flags => 'garwescil',
 	 #is_set	=> '(__GENRE__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
 	id3v1	=> 6,		id3v2	=> 'TCON*',	vorbis	=> 'genre',	ape	=> 'Genre', ilst => "\xA9gen",
-	type		=> 'flags',
+	type		=> 'flags',		#init_namearray => '@Tag::MP3::Genres',
 	none		=> quotemeta _"No genre",
 	all_count	=> _"All genres",
 	FilterList	=> {search=>1},
@@ -564,9 +565,9 @@ our %timespan_menu=
  label	=>
  {	name		=> _"Labels",	width => 180,	flags => 'gaescil',
 	 #is_set	=> '(__LABEL__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
-	type		=> 'flags',
+	type		=> 'flags',		init_namearray	=> '@{$::Options{Labels}}',
 	iconprefix	=> 'label-',
-	icon		=> sub { $Def{label}{iconprefix}.::url_escape($_[0]); },
+	icon		=> sub { $Def{label}{iconprefix}.::url_escape($_[0]); }, #FIXME use icon_for_gid
 	icon_for_gid	=> '"#iconprefix#".::url_escape(#gid_to_get#)',
 	all_count	=> _"All labels",
 	none		=> quotemeta _"No label",
@@ -637,6 +638,7 @@ our %timespan_menu=
 	audioinfo => 'seconds',		check	=> '#VAL#= sprintf "%.0f",#VAL#;',
 	FilterList => {type=>'div.60',},
 	letter => 'm',
+	rightalign=>1,	#right-align in SongTree and SongList #maybe should be done to all number columns ?
  },
 
  replaygain_track_gain=>
@@ -741,9 +743,6 @@ sub FieldUpgrade	#for versions <1.1
 my (%Get,%Display,$DIFFsub,$NEWsub,$LENGTHsub,%UPDATEsub,$SETsub); my (%Get_gid,%Gid_to_display,%Gid_to_get);
 use constant FIRSTID => 1;
 our $LastID=FIRSTID-1;
-INIT
-{	UpdateFuncs();
-}
 
 sub Macro
 {	local $_=shift;
@@ -988,7 +987,10 @@ warn "\@Fields=@Fields"; $Def{$_}{flags}||='' for @Fields;	#DELME
 	}
 	%::ReplaceFields= map { $Def{$_}{letter} => $_ } grep $Def{$_}{letter}, @Fields;
 
+	#FIXME use a HasChanged event
 	GMB::ListStore::Field::changed();
+	SongList::init_textcolumns();
+	SongTree::init_textcolumns();
 }
 
 sub MakeLoadSub
@@ -1476,6 +1478,10 @@ sub FilterListProp
 }
 sub ColumnsKeys
 {	grep $Def{$_}{flags}=~m/c/, @Fields;
+}
+sub ColumnAlign
+{	return 0 unless $Def{$_[0]};
+	return $Def{$_[0]}{rightalign};
 }
 sub InfoFields		#used for song info dialog, currently same fields as ColumnsKeys
 {	sort { ::superlc($Def{$a}{name}) cmp ::superlc($Def{$b}{name}) } grep $Def{$_}{flags}=~m/c/, @Fields;
