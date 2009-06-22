@@ -131,7 +131,12 @@ BEGIN
 	}
 	else
 	{	warn "Creating folder $HomeDir\n";
-		mkdir $HomeDir or warn "Error creating $HomeDir : $!\n";
+		my $current='';
+		for my $dir (split /$QSLASH/o,$HomeDir)
+		{	$current.=SLASH.$dir;
+			next if -d $current;
+			die "Can't create folder $HomeDir : $!\n" unless mkdir $current;
+		}
 	}
   }
 
@@ -1863,7 +1868,7 @@ sub ErrorPlay
 	return if $Options{IgnorePlayError} && !$critical;
 	my $dialog = Gtk2::MessageDialog->new
 		( undef, [qw/modal destroy-with-parent/],
-		  'error','close',
+		  'error','close','%s',
 		  $error
 		);
 	if ($critical)
@@ -3719,7 +3724,7 @@ sub OverwriteDialog
 	my $dialog = Gtk2::MessageDialog->new
 	( $window,
 	  [qw/modal destroy-with-parent/],
-	  'warning','yes-no',
+	  'warning','yes-no','%s',
 	  __x( _"'{file}' exists. Overwrite ?", file => filename_to_utf8displayname($file) )
 	);
 	if ($multiple)
@@ -3742,7 +3747,7 @@ sub Retry_Dialog	#returns 'yes' 'no' or 'abort'
 	my $dialog = Gtk2::MessageDialog->new
 	( $window,
 	  [qw/modal destroy-with-parent/],
-	  'error','yes-no',
+	  'error','yes-no','%s',
 	  "$err\n "._("retry ?")
 	);
 	$dialog->add_button($abortmsg, '1') if $abortmsg;
@@ -3761,7 +3766,7 @@ sub ErrorMessage
 	my $dialog = Gtk2::MessageDialog->new
 	( $window,
 	  [qw/modal destroy-with-parent/],
-	  'error','close',
+	  'error','close','%s',
 	  $err
 	);
 	$dialog->show_all;
@@ -3818,7 +3823,7 @@ sub DeleteFiles
 	my $dialog = Gtk2::MessageDialog->new
 		( undef,
 		  'modal',
-		  'warning','ok-cancel',
+		  'warning','ok-cancel','%s',
 		  __x(_("About to delete {files}\nAre you sure ?"), files => $text)
 		);
 	$dialog->show_all;
@@ -5432,7 +5437,7 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 			{	my $dialog = Gtk2::MessageDialog->new
 					( undef, #FIXME
 					  [qw/modal destroy-with-parent/],
-					  'warning','ok-cancel',
+					  'warning','ok-cancel','%s',
 					  __("This label is set for %d song.","This label is set for %d songs.",$nb)."\n".
 					  __x("Are you sure you want to delete the '{label}' label ?", label => $label)
 					);

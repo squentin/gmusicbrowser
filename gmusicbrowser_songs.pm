@@ -581,7 +581,7 @@ our %timespan_menu=
  },
  rating	=>
  {	name	=> _"Rating",		width => 80,	flags => 'gaesc',	type => 'rating',
-	FilterList => {type=>'year', },
+	FilterList => {},
 	starfield => 'rating_picture',
 	edit_order=> 90,	edit_many=>1,
  },
@@ -801,7 +801,7 @@ sub LookupCode
 			#if ($c) {warn " found $key for field $field\n"}
 		}
 		if ($c && !ref $c)
-		{	1 while $c=~s/#([_0-9a-z:~.]+)#/(grep $_,map $_->{$1}, @hashlist)[0]/ge;
+		{	1 while $c=~s/#([_0-9a-z:~.]+)#/(grep defined,map $_->{$1}, @hashlist)[0]/ge;
 #			$c=~s/#(\w+)->([_0-9a-z:~.]+)(?:\((\w+)=([^)]+)\))?#/LookupCode($1,$2,($3 ? [$3 => $4] : ()))/ge;
 			$c=~s/#(?:(\w+)->)?([_0-9a-z:~.]+)(?:\((\w+)=([^)]+)\))?#/LookupCode($1||$field_opt,$2,($3 ? [$3 => $4] : ()))/ge;
 			$c=~s#___#__${field}_#g;
