@@ -74,6 +74,8 @@ our %timespan_menu=
 		'filter_prephash:~' => 'return { map { #sgid_to_gid(VAL=$_)#, undef } keys %{#HREF#} }',
 		'filter:h~'	=> '.!!. do {my $v=#_#; $v ? ref $v ? grep(exists $hash#VAL#->{$_+0}, @$v) : (exists $hash#VAL#->{#_#+0}) : 0}',
 		'filter:ecount'	=> '#VAL# .==. do {my $v=#_#; $v ? ref $v ? scalar(@$v) : 1 : 0}',
+		#FIXME for filters s,m,mi,h~,  using a list of matching names in ___inames/___names could be better (using a bitstring)
+		'filter:s'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___iname[$_], "#VAL#") .!=. -1 ,@$v) : (index(___iname[$v], "#VAL#") .!=. -1); }', 'filter_prep:s'	=> sub {quotemeta ::superlc($_[0])},
 		'filter:m'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___name[$_] .=~. m"#VAL#" ,@$v) : ___name[$v] .=~. m"#VAL#"; }',		'filter_prep:m' => \&Filter::QuoteRegEx,
 		'filter:mi'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___name[$_] .=~. m"#VAL#"i ,@$v) : ___name[$v] .=~. m"#VAL#"i; }',		'filter_prep:mi' => \&Filter::QuoteRegEx,
 		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
