@@ -3381,7 +3381,7 @@ sub SaveOptions
 sub PopupSelectorMenu
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $menu=Gtk2::Menu->new;
-	my $cb=sub { $self->{fields}=$_[1]; };
+	my $cb=sub { $self->{fields}=$_[1]; $self->{last_filter}=undef; };
 	for my $ref (@SelectorMenu)
 	{	my ($label,$fields)=@$ref;
 		my $item=Gtk2::CheckMenuItem->new($label);
@@ -3394,6 +3394,7 @@ sub PopupSelectorMenu
 	$item1->set_active(1) if $self->{wordsplit};
 	$item1->signal_connect(activate => sub
 		{	$self->{wordsplit}=$_[0]->get_active;
+			$self->{last_filter}=undef;
 		});
 	$menu->append($item1);
 	my $item2=Gtk2::MenuItem->new(_"Advanced Search ...");
@@ -3410,7 +3411,8 @@ sub Filter
 {	my $entry=$_[0];
 	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
 	my $self=::find_ancestor($entry,__PACKAGE__);
-	my $text=$entry->get_text;
+	my $last_string= $self->{last_string} || '';
+	my $text= $self->{last_string}= $entry->get_text;
 	my $filter;
 	if ($text ne '')
 	{	my @strings= $self->{wordsplit}? (split / +/,$text) : ($text);
@@ -3419,9 +3421,11 @@ sub Filter
 		{	push @filters,Filter->newadd( ::FALSE,map $_.$string, split /\|/,$self->{fields} );
 		}
 		$filter=Filter->newadd( ::TRUE,@filters );
+		$filter->set_parent($self->{last_filter}) if length $last_string && index($text,$last_string)>=0; #optimization : indicate that this filter will only match songs that match $self->{last_filter}
 	}
 	else {$filter=Filter->new}
 	::SetFilter($self,$filter,$self->{nb});
+	$self->{last_filter}=$filter;
 	if ($self->{searchfb})
 	{	::HasChanged('SearchText_'.$self->{group},$text);
 	}
@@ -3431,8 +3435,8 @@ sub Filter
 sub EntryChanged_cb
 {	my $entry=$_[0];
 	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
-	my $timeout=1000;							#FIXME make it an option
-	#my $l= length($entry->get_text); my $timeout= $l>2 ? 10 : 1000;	#FIXME and/or make it depends on text length
+	#my $timeout=1000;							#FIXME make it an option
+	my $l= length($entry->get_text); my $timeout= $l>2 ? 10 : 1000;	#FIXME and/or make it depends on text length
 	$entry->{changed_timeout}= Glib::Timeout->add($timeout,\&Filter,$entry);
 }
 

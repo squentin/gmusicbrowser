@@ -2612,6 +2612,7 @@ sub newadd
 	my ($ao,$re)=$and? ( '&', qr/^\(\&\x1D(.*)\)\x1D$/)
 			 : ( '|', qr/^\(\|\x1D(.*)\)\x1D$/);
 	my @strings;
+	my @supersets;
 	for my $f (@filters)
 	{	$f='' unless defined $f;
 		$self->{source} ||= $f->{source} if ref $f;
@@ -2637,6 +2638,10 @@ sub newadd
 					: $string
 				      );
 		}
+		if ($and)
+		{	push @supersets, $string;
+			push @supersets, @{$f->{superset_filters}} if ref $f && $f->{superset_filters};
+		}
 	}
 
 	@strings=_between_simplify($and,@strings);
@@ -2652,7 +2657,13 @@ sub newadd
 
 	$self->{string}=$sum;
 	warn "Filter->newadd=".$self->{string}."\n" if $::debug;
+	$self->{superset_filters}= \@supersets unless $sum=~m#(?:^|\x1D)-?\w*:[th]:#;	#don't use superset optimization for head/tail filters, as they are not commutative
 	return $self;
+}
+
+sub set_parent	#indicate that this filter will only match songs that match $superset_filter, used for optimization when the result of $superset_filter is cached
+{	my ($self,$superset_filter)=@_;
+	$self->{superset_filters}=[ $superset_filter->{string} ] unless $superset_filter->{string} eq $self->{string};
 }
 
 sub _between_simplify #not tested enough
@@ -2758,10 +2769,16 @@ sub filter
 	#my $time=times;								#DEBUG
 	$listref||= $self->{source} || $::Library;
 	my $sub=$self->{'sub'} || $self->makesub;
-	if ($CachedList && $CachedString eq $self->{string} && !$self->{source}) {return $CachedList} #else {warn "not cached : ".$self->{string}."\n"}
+	my $on_library= ($listref == $::Library && !$self->{source});
+	if ($CachedList && $on_library)
+	{	if ($CachedString eq $self->{string}) {return $CachedList}
+		elsif ($self->{superset_filters} && grep $_ eq $CachedString, @{$self->{superset_filters}})
+		{	$listref=$CachedList;
+		}
+	}
 	my $r=$sub->($listref);
 	#$time=times-$time; warn "filter $time s ( ".$self->{string}." )\n" if $debug;	#DEBUG
-	if ($listref == $::Library) { $CachedString=$self->{string}; $CachedList=$r }
+	if ($on_library) { $CachedString=$self->{string}; $CachedList=$r }
 	return $r;
 }
 
