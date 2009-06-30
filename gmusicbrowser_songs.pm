@@ -2552,7 +2552,7 @@ sub get_value { $_[0]{value}; }
 package Filter;
 
 my %NGrepSubs;
-my $CachedString; our $CachedList;
+my @CachedStrings; our $CachedList;
 our (%InvOp,$OpRe);
 INIT
 {
@@ -2771,14 +2771,24 @@ sub filter
 	my $sub=$self->{'sub'} || $self->makesub;
 	my $on_library= ($listref == $::Library && !$self->{source});
 	if ($CachedList && $on_library)
-	{	if ($CachedString eq $self->{string}) {return $CachedList}
-		elsif ($self->{superset_filters} && grep $_ eq $CachedString, @{$self->{superset_filters}})
-		{	$listref=$CachedList;
+	{	return [unpack 'L*',$CachedList->{$self->{string}}] if $CachedList->{$self->{string}};
+		#warn "no exact cache for filter\n";
+		if ($self->{superset_filters})
+		{	my @supersets= grep defined, map $CachedList->{$_}, @{$self->{superset_filters}};
+			if (@supersets)
+			{	#warn "found supersets : ".join(',', map length $_,@supersets)."\n";
+				#warn " from : ".join(',', grep $CachedList->{$_}, @{$self->{superset_filters}})."\n";
+				$listref= [unpack 'L*',(sort { length $a <=> length $b } @supersets)[0] ];	#take the smaller set, could find the intersection instead
+			}
 		}
 	}
 	my $r=$sub->($listref);
 	#$time=times-$time; warn "filter $time s ( ".$self->{string}." )\n" if $debug;	#DEBUG
-	if ($on_library) { $CachedString=$self->{string}; $CachedList=$r }
+	if ($on_library)
+	{	$CachedList->{$self->{string}}= pack 'L*',@$r;
+		push @CachedStrings,$self->{string};
+		delete $CachedList->{shift @CachedStrings} if @CachedStrings>5;	#keep 5 results max	#FIXME : keep recently used results
+	}
 	return $r;
 }
 
