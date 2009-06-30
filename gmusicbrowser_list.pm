@@ -3378,10 +3378,17 @@ sub SaveOptions
 	return { fields => $self->{fields}, wordsplit => $self->{wordsplit} };
 }
 
+sub ChangeOption
+{	my ($self,$key,$value)=@_;
+	$self->{$key}=$value;
+	$self->{last_filter}=undef;
+	Filter($self->{entry});
+}
+
 sub PopupSelectorMenu
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $menu=Gtk2::Menu->new;
-	my $cb=sub { $self->{fields}=$_[1]; $self->{last_filter}=undef; };
+	my $cb=sub { $self->ChangeOption( fields => $_[1]); };
 	for my $ref (@SelectorMenu)
 	{	my ($label,$fields)=@$ref;
 		my $item=Gtk2::CheckMenuItem->new($label);
@@ -3393,8 +3400,7 @@ sub PopupSelectorMenu
 	my $item1=Gtk2::CheckMenuItem->new(_"Split on words");
 	$item1->set_active(1) if $self->{wordsplit};
 	$item1->signal_connect(activate => sub
-		{	$self->{wordsplit}=$_[0]->get_active;
-			$self->{last_filter}=undef;
+		{	$self->ChangeOption( wordsplit => $_[0]->get_active);
 		});
 	$menu->append($item1);
 	my $item2=Gtk2::MenuItem->new(_"Advanced Search ...");
