@@ -267,9 +267,9 @@ sub SetVolume
 	return unless $mixer;
 	my $cmd=$mixer;
 	if ($inc)	{ if ($inc=~m/^([+-])?(\d+)$/) { $inc=$2.'%'.($1||''); }
-			  $cmd.=' set '.$::Options{amixerSMC}.' '.$inc;
+			  $cmd.=" set '$::Options{amixerSMC}' $inc";
 			}
-	else		{ $cmd.=' get '.$::Options{amixerSMC};	}
+	else		{ $cmd.=" get '$::Options{amixerSMC}'";	}
 	warn "volume command : $cmd\n" if $::debug;
 	my $oldvol=$Volume;
 	my $oldm=$Mute;
