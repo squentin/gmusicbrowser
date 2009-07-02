@@ -2247,6 +2247,7 @@ sub SongArray_changed
 		if	($QueueAction eq 'wait')	{ IdleDo('1_QAuto',10,\&QWaitAutoPlay) if @$Queue && !$TogPlay; }
 		elsif	($QueueAction eq 'autofill')	{ IdleDo('1_QAuto',10,\&QAutoFill); }
 	}
+	elsif ($songarray==$Recent) { IdleDo('2_RecentSongs',750,\&HasChanged,'RecentSongs'); }
 	elsif ($songarray==$ListPlay)
 	{	HasChanged('Playlist',$action,@extra);
 	}
@@ -2683,11 +2684,6 @@ sub ChooseSongsTitle		#Songs with the same title
 	return ChooseSongs( __x( _"by {artist} from {album}", artist => "<b>%a</b>", album => "%l") ,@list);
 }
 
-sub ChooseSongsFromA_current
-{	return unless defined $SongID;
-	my $aid=Songs::Get_gid($SongID,'album');
-	ChooseSongsFromA($aid);
-}
 sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>100-200 ?)
 {	my $album=$_[0];
 	return unless defined $album;
@@ -5791,20 +5787,22 @@ sub HasChanged
 
 sub GetSelID
 {	my $group= ref $_[0] ? $_[0]{group} : $_[0];
-	return	$group=~m/Next(\d)?/ ? $NextSongs[($1 ? $1-1 : 0)] :
-		$group ne 'Play' ? $SelID{$group} :
+	return	$group=~m/^Next(\d)?$/		? $NextSongs[($1||0)] :
+		$group=~m/^Recent(\d)?$/	? $Recent->[($1||0)] :
+		$group ne 'Play'		? $SelID{$group} :
 		$SongID;
 }
 sub WatchSelID
 {	my ($object,$sub,$fields)=@_; #fields are ignored for now
 	my $group=$object->{group};
-	my $key= $group=~m/Next\d?/ ? 'NextSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'SongID';
+	my $key= $group=~m/^Next\d?$/ ? 'NextSongs' : $group=~m/^Recent\d?$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'SongID';
+	if ($group=~m/^(?:Recent|Next)\d?$/) { my $orig=$sub; $sub=sub { $orig->( $_[0],GetSelID($_[0]) ); }; } #so that $sub gets the ID as argument in the same way as other cases (SelectedID_ and SongID)
 	Watch($object,$key,$sub);
 }
 sub UnWatchSelID
 {	my $object=$_[0];
 	my $group=$object->{group};
-	my $key= $group=~m/Next\d?/ ? 'NextSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'SongID';
+	my $key= $group=~m/^Next\d?$/ ? 'NextSongs' : $group=~m/^Recent\d?$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'SongID';
 	UnWatch($object,$key);
 }
 sub HasChangedSelID

@@ -210,7 +210,7 @@ my %objects=
 		minsize	=> 20,
 		markup	=> '<b><big>%S</big></b>%V',
 		markup_empty => '<b><big>&lt;'._("Playlist Empty").'&gt;</big></b>',
-		click1	=> \&::ChooseSongsFromA_current,
+		click1	=> \&PopupSongsFromAlbum,
 		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupContextMenu(\@::SongCMenu,{mode=> 'P', self=> $_[0], IDs => [$ID]}) if defined $ID;},
 		dragsrc => [::DRAG_ID,\&DragCurrentSong],
 		dragdest=> [::DRAG_ID,sub {::Select(song => $_[2]);}],
@@ -222,7 +222,7 @@ my %objects=
 		minsize	=> 20,
 		markup	=> ::__x(_"{song} by {artist}",song => "<b><big>%S</big></b>%V", artist => "<b>%a</b>"),
 		markup_empty => '<b><big>&lt;'._("Playlist Empty").'&gt;</big></b>',
-		click1	=> \&::ChooseSongsFromA_current,
+		click1	=> \&PopupSongsFromAlbum,
 		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupContextMenu(\@::SongCMenu,{mode=> 'P', self=> $_[0], IDs => [$ID]}) if defined $ID;},
 		dragsrc => [::DRAG_ID,\&DragCurrentSong],
 		cursor	=> 'hand2',
@@ -339,7 +339,7 @@ my %objects=
 		aa	=> 'album',
 		oldopt1 => 'maxsize',
 		schange	=> sub { my $key=(defined $_[1])? Songs::Get_gid($_[1],'album') : undef ; $_[0]->set($key); },
-		click1	=> \&::ChooseSongsFromA_current,
+		click1	=> \&PopupSongsFromAlbum,
 		event	=> 'Picture_album',
 		update	=> \&Layout::AAPicture::Changed,
 		#size	=> 60,
@@ -880,7 +880,7 @@ sub NewObject
 	}
 	if ($ref->{schange} || (keys %towatch))
 	{	::WatchSelID($widget,\&UpdateSongID,\%towatch);
-		UpdateSongID($widget,$::SongID);
+		UpdateSongID($widget,::GetSelID($widget));
 	}
 	if ($ref->{event})
 	{	my $sub=$ref->{update} || \&UpdateObject;
@@ -1317,6 +1317,13 @@ sub DragCurrentArtist
 }
 sub DragCurrentAlbum
 {	::DRAG_ALBUM,Songs::Get_gid($::SongID,'album');
+}
+
+sub PopupSongsFromAlbum
+{	my $ID=::GetSelID($_[0]);
+	return unless defined $ID;
+	my $aid=Songs::Get_gid($ID,'album');
+	::ChooseSongsFromA($aid);
 }
 
 ####################################
