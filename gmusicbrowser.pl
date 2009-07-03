@@ -2206,7 +2206,8 @@ sub NextDiff	#go to next song whose $field value is different than current's
 }
 
 sub UpdateLock
-{	if (defined $ListMode) { Select(staticlist => $ListMode); }
+{	$Position=undef;
+	if (defined $ListMode) { Select(staticlist => $ListMode); }
 	else { Select(filter => $SelectedFilter); }
 }
 
