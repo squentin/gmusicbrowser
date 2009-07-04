@@ -535,6 +535,11 @@ my %objects=
 	AddLabelEntry =>
 	{	New => \&AddLabelEntry,
 	},
+	LabelToggleButtons =>
+	{	class => 'Layout::LabelToggleButtons',
+		default_group => 'Play',
+		schange	=> \&Layout::LabelToggleButtons::update_song,
+	},
 	PlayOrderCombo =>
 	{	New => \&PlayOrderComboNew,
 		event => 'Sort SavedWRandoms SavedSorts',
@@ -2494,6 +2499,65 @@ sub get_player_window
 	{	$menu=$menu->get_attach_widget->parent;
 	}
 	return ::get_layout_widget($menu);
+}
+
+package Layout::LabelToggleButtons;
+use base 'Gtk2::ScrolledWindow';
+sub new
+{	my ($class,$opt1,$opt2)=@_;
+	my $self= bless Gtk2::ScrolledWindow->new, $class;
+	$self->set_shadow_type('etched-in');
+	$self->set_policy('automatic','automatic');
+	$self->{table}=Gtk2::Table->new(1,1,::TRUE);
+	$self->add_with_viewport($self->{table});
+	my $field=$self->{field}= $opt1->{field} || 'label'; #FIXME check if correct type
+	#::WatchSelID($self,\&update_song,[$field]);
+	::Watch($self,"newgids_$field",\&update_labels);
+	$self->signal_connect( size_allocate => sub { ::IdleDo( "resize_$self",1000, \&update_columns,$_[0] ); });
+	return $self;
+}
+sub update_labels
+{	my $self=shift;
+	my %checks; $self->{checks}=\%checks;
+	for my $label ( @{Songs::ListAll($self->{field})} )
+	{	my $check= $checks{$label}= Gtk2::CheckButton->new_with_label($label);
+		$check->signal_connect(toggled => sub { my $self=::find_ancestor($_[0],__PACKAGE__); return if $self->{busy}; my $field= ($_[0]->get_active ? '+' : '-').$self->{field}; Songs::Set($::SongID,$field,[$_[1]]); },$label);
+	}
+	$self->{width}=0;
+	$self->update_columns;
+	$self->update_song;
+}
+sub update_columns
+{	my $self=shift;
+	my $width=$self->child->allocation->width;
+	return unless $width;
+	return if $self->{width} && $width == $self->{width};
+	$self->{width}=$width;
+	my $table=$self->{table};
+	$table->remove($_) for $table->get_children;
+	$table->resize(1,1);
+	my $checks=$self->{checks};
+	my $maxwidth=::max( 10,map 4+$_->size_request->width, values %$checks );
+	my $maxcol= int( $width / $maxwidth)||1;
+	my $col=my $row=0;
+	for my $widget (grep defined, map $checks->{$_}, @{Songs::ListAll($self->{field})})
+	{	$table->attach($widget,$col,$col+1,$row,$row+1,['fill','expand'],'shrink',1,1);
+		if (++$col==$maxcol) {$col=0; $row++;}
+	}
+	$table->show_all;
+}
+
+sub update_song
+{	my $self=shift;
+	$self->{busy}=1;
+	$self->{table}->set_sensitive(defined $::SongID);
+	my $checks=$self->{checks};
+	for my $label (keys %$checks)
+	{	my $check=$checks->{$label};
+		my $on= defined $::SongID ? Songs::IsSet($::SongID,$self->{field}, $label) : 0;
+		$check->set_active($on);
+	}
+	$self->{busy}=0;
 }
 
 package GMB::Context;

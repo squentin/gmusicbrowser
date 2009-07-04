@@ -5369,9 +5369,6 @@ sub SetLabels	#FIXME move to Songs::
 	push @args,'+label',$toadd if $toadd && @$toadd;
 	push @args,'-label',$torm if $torm  && @$torm;
 	Songs::Set($IDs,@args);
-	#my $nb=keys %Labels;
-	#$Labels{$_}=undef for @$toadd;
-	#HasChanged('LabelList') if (keys %Labels)-$nb;	#FIXME PHASE1 move that into $Def{label}
 }
 
 sub RemoveLabel		#FIXME ? label specific
@@ -5411,7 +5408,6 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 		$store->set($iter,0,$new,2,'label-'.$new);
 		$::Labels{$new}=delete $::Labels{$old};
 		#FIXME maybe should rename the icon file if it exist
-		HasChanged('LabelList');
 		return unless $nb;
 		my $l= Songs::AllFilter( 'label:~:'.$old );
 		SetLabels($l,[$new],[$old]);

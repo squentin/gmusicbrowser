@@ -54,7 +54,7 @@ our %timespan_menu=
 		's_sort:gid'	=> '___name[#GID#]',
 		'si_sort:gid'	=> '___iname[#GID#]',
 		get		=> 'do {my $v=#_#; !$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v];}',
-		newval		=> 'push @___iname, ::superlc(___name[-1]);',
+		newval		=> 'push @___iname, ::superlc(___name[-1]); ::IdleDo("newgids_#field#",1000,sub {  ___new=0; ::HasChanged("newgids_#field#"); }) unless ___new++;',
 		sgid_to_gid	=> '___gid{#VAL#}||= do { my $i=push(@___name, #VAL#); #newval#; $i-1; }',
 		set => '{my $v=#VAL#;
 			my @list= sort (ref $v ? @$v : split /\\x00/,$v);
