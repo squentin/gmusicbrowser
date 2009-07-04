@@ -989,8 +989,8 @@ warn "\@Fields=@Fields"; $Def{$_}{flags}||='' for @Fields;	#DELME
 	}
 	%::ReplaceFields= map { $Def{$_}{letter} => $_ } grep $Def{$_}{letter}, @Fields;
 
-	#FIXME use a HasChanged event
-	GMB::ListStore::Field::changed();
+	::HasChanged('fields_reset');
+	#FIXME connect them to 'fields_reset' event :
 	SongList::init_textcolumns();
 	SongTree::init_textcolumns();
 }
@@ -1097,7 +1097,7 @@ sub ReReadFile
 		my ($size2,$modif2)=(stat $file)[7,9];
 		my $checklength= ($size1!=$size2 || ($force && $force==2)) ? 2 : 0;
 		return 1 unless $checklength || $force || $modif1!=$modif2;
-		my ($values,$estimated)=FileTag::Read($file,$checklength); #FIXME ignore $estimated ?
+		my ($values,$estimated)=FileTag::Read($file,$checklength);
 		my @changed=$DIFFsub->($ID,$values);
 		return unless @changed;warn "Changed fields : @changed";
 		############SetDB($ID,map( ($_,$values->{$_}), @changed)); DELME
@@ -1111,14 +1111,12 @@ sub ReReadFile
 	}
 }
 
-sub Set
+sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,field=>newval,...);  ID can be an arrayref
 {	warn "Songs::Set(@_) called from : ".join(':',caller)."\n";
 	my ($IDs,$modif,%opt);
-	if (ref $_[1]) { ($IDs,$modif,%opt)=@_ }
-	else { ($IDs,@$modif)=@_ }
-#FIXME args
-	#my ($IDs,$modif,%opt)=@_;
-	$IDs=[$IDs] unless ref $IDs; #FIXME
+	if (ref $_[1])	{ ($IDs,$modif,%opt)=@_ }
+	else		{ ($IDs,@$modif)=@_ }
+	$IDs=[$IDs] unless ref $IDs;
 	my %values;
 	while (@$modif)
 	{	my $f=shift @$modif;
@@ -1174,7 +1172,7 @@ sub Set
 
 sub Changed
 {	my $changed=$_[0]; my $IDs=$_[1]; 		warn "Songs::Changed : IDs=@$IDs fields=".join(' ',keys %$changed)."\n";
-	$IDFromFile=undef if $IDFromFile && $changed->{file} || $changed->{path};
+	$IDFromFile=undef if $IDFromFile && exists $changed->{file} || exists $changed->{path};
 	AA::Fields_Changed(keys %$changed) if grep $AA::GHash_Depend{$_}, keys %$changed;
 	my @needupdate;
 	for my $f (keys %$changed)
@@ -2455,6 +2453,7 @@ sub new
 	$ExistingStores{$field}= $self;
 	::weaken $ExistingStores{$field};
 	::IdleDo("9_ListStore_$field",500,\&update,$field);
+	::Watch($self,fields_reset=>\&changed);
 	return $self;
 }
 
@@ -2478,8 +2477,7 @@ sub setcompletion
 sub changed
 {	@_= keys %ExistingStores unless @_;
 	for my $field (@_)
-	{	my $field=$_[0];
-		next unless $ExistingStores{$field};
+	{	next unless $ExistingStores{$field};
 		::IdleDo("9_ListStore_$field",5000,\&update,$field);
 	}
 }
