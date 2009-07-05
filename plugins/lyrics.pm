@@ -527,9 +527,9 @@ sub Save_text
 	my $text= $buffer->get_text($buffer->get_bounds, ::FALSE);
 	my $format=$::Options{OPT.'PathFile'};
 	my ($path,$file)=::pathfilefromformat( $self->{ID}, $format );
+	unless ($path && $file) {::ErrorMessage(_("Error: invalid filename pattern")." : $format",$win); return}
 	my $res=::CreateDir($path,$win);
 	return unless $res eq 'ok';
-	unless ($file) {::ErrorMessage(_("Error: invalid filename pattern")." : $format",$win); return}
 	if (open my$fh,'>:utf8',$path.::SLASH.$file)
 	{	print $fh $text;
 		close $fh;
