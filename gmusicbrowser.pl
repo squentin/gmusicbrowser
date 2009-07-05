@@ -3996,16 +3996,13 @@ sub DialogMassRename
 	 {	my ($dialog,$response)=@_;
 		if ($response eq 'ok')
 		{ my $format=$combo->get_active_text;
-		  PrefSaveHistory(FilenameSchema=>$format,10);
 		  if ($folders)
 		  {	my $base= $Options{BaseFolder};
 			unless ( defined $base ) { ErrorMessage(_("You must specify a base folder"),$dialog); return }
-			PrefSaveHistory(BaseFolder_history=>$base,10);
 			until ( -d $base ) { last unless $base=~s/$QSLASH[^$QSLASH]*$//o && $base=~m/$QSLASH/o;  }
 			unless ( -w $base ) { ErrorMessage(__x(_("Can't write in base folder '{folder}'."), folder => $Options{BaseFolder}),$dialog); return }
 			$dialog->set_sensitive(FALSE);
 			my $folderformat=$comboFolder->get_active_text;
-			PrefSaveHistory(FolderSchema=>$folderformat,10);
 			CopyMoveFiles(\@IDs,FALSE,$Options{BaseFolder},$folderformat,$format);
 		  }
 		  elsif ($format)
@@ -5604,18 +5601,19 @@ sub NewPrefEntry
 	return $widget;
 }
 
-sub NewPrefComboText	#warning : unlike other NewPref function, this one is much simpler and doesn't automatically set $Options{$key}, $Options{$key} must contains an array (history) of values, use PrefSaveHistory to update it
+sub NewPrefComboText
 {	my ($key)=@_;
 	my $combo=Gtk2::ComboBoxEntry->new_text;
 	my $hist= $Options{$key} || [];
 	$combo->append_text($_) for @$hist;
 	$combo->set_active(0);
+	$combo->signal_connect( destroy => sub { PrefSaveHistory($key,$_[0]->get_active_text); } );
 	return $combo;
 }
 sub PrefSaveHistory	#to be used with NewPrefComboText and NewPrefFileEntry
 {	my ($key,$newvalue,$max)=@_;
 	$max||=10;
-	my $hist= $Options{$key} || [];
+	my $hist= $Options{$key} ||= [];
 	@$hist= ($newvalue, grep $_ ne $newvalue, @$hist);
 	$#$hist=$max if $#$hist>$max;
 }
@@ -5659,6 +5657,7 @@ sub NewPrefFileEntry
 		$busy=1; $entry->set_text(filename_to_utf8displayname($file)); $busy=undef;
 		&$cb if $cb;
 	});
+	$entry->signal_connect( destroy => sub { PrefSaveHistory($key_history,$_[0]->get_text); } ) if $key_history;
 	return $hbox;
 }
 sub NewPrefSpinButton
