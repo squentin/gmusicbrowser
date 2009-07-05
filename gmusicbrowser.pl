@@ -530,6 +530,7 @@ our %ReplaceFields=		# for each field : [sub returning the formated value, field
 	m => [sub { my $v=$Songs[$_[0]][SONG_LENGTH];sprintf "%d:%02d",$v/60,$v%60;}, $TagProp[SONG_LENGTH][0],	[SONG_LENGTH]],
 	g => [sub { join ', ',split /\x00/,$Songs[$_[0]][SONG_GENRE]||'' }, $TagProp[SONG_GENRE][0], [SONG_GENRE]],
 	L => [sub { join ', ',split /\x00/,$Songs[$_[0]][SONG_LABELS]||'' },$TagProp[SONG_LABELS][0],[SONG_LABELS]],
+	F => [sub { $Songs[$_[0]][SONG_PATH]; }, _"Folder",[SONG_PATH]],
 	o => [sub { my$s=$Songs[$_[0]][SONG_UFILE]; $s=~s/\.[^\.]+$//; $s; },_"old filename",[SONG_UFILE]],
 	f => [sub { $Songs[$_[0]][SONG_PATH].SLASH.$Songs[$_[0]][SONG_FILE]; }, _"File",[SONG_PATH,SONG_FILE]],
 	u => [sub { $Songs[$_[0]][SONG_UPATH].SLASH.$Songs[$_[0]][SONG_UFILE]; }, _"File",[SONG_UPATH,SONG_UFILE]],
@@ -553,20 +554,20 @@ our %ReplaceFields=		# for each field : [sub returning the formated value, field
 
 sub UsedFields
 {	my $s=$_[0];
-	return map @{ $ReplaceFields{$_}[2] || [] }, $s=~m/%([YACSVumtalydnfcopPkKgL%])/g;
+	return map @{ $ReplaceFields{$_}[2] || [] }, $s=~m/%([YACSVumtalydnfFcopPkKgL%])/g;
 }
 sub ReplaceFields
 {	my ($ID,$s)=($_[0],$_[1]);
 	no warnings 'uninitialized';
 	$s=~s#\\n#\n#g;
-	$s=~s/%([YACSVumtalydnfcopPkKgL%])/&{$ReplaceFields{$1}[0]}($ID)/ge;
+	$s=~s/%([YACSVumtalydnfFcopPkKgL%])/&{$ReplaceFields{$1}[0]}($ID)/ge;
 	return $s;
 }
 sub ReplaceFieldsAndEsc
 {	my ($ID,$s)=($_[0],$_[1]);
 	no warnings 'uninitialized';
 	$s=~s#\\n#\n#g;
-	$s=~s/%([YACSVumtalydnfcopPkKgL%])/PangoEsc(&{$ReplaceFields{$1}[0]}($ID))/ge;
+	$s=~s/%([YACSVumtalydnfFcopPkKgL%])/PangoEsc(&{$ReplaceFields{$1}[0]}($ID))/ge;
 	return $s;
 }
 sub MakeReplaceTable
@@ -3859,8 +3860,8 @@ sub filenamefromformat
 sub pathfromformat
 {	my ($ID,$format,$basefolder)=@_;
 	#my $s=ReplaceFields( $ID, $format );
-	my $s=	join ::SLASH,	map { $_=ReplaceFields( $ID, $_ ); s/$QSLASH+//go; $_ }	split /$QSLASH+/o, $format;
-	$s=~s/$ILLEGALCHARDIR//go;
+	my $s=	join ::SLASH,	map { my $noclean= $_ eq '%F'; $_=ReplaceFields( $ID, $_ ); s/$QSLASH//go, s/$ILLEGALCHARDIR//go unless $noclean; $_ }	split /$QSLASH+/o, $format;
+	#$s=~s/$ILLEGALCHARDIR//go;
 	$s.=SLASH;
 	$s=~s#$QSLASH\.\.?$QSLASH#::SLASH#goe;
 	$s=$basefolder.SLASH.$s if $basefolder;
@@ -3871,7 +3872,8 @@ sub pathfromformat
 sub pathfilefromformat
 {	my ($ID,$format,$ext)=@_;
 	$format=~s#^~($QSLASH)#$ENV{HOME}$1#o;
-	return undef unless $format=~m#^$QSLASH#o && $format=~s#$QSLASH([^$QSLASH]+)$##o;
+	return undef unless $format=~s#$QSLASH([^$QSLASH]+)$##o;
+	#return undef unless $format=~m#^$QSLASH#o && $format=~s#$QSLASH([^$QSLASH]+)$##o;
 	my $file=$1;
 	$file=filenamefromformat($ID,$file,$ext);
 	my $path=pathfromformat($ID,$format);
