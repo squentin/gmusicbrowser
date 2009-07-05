@@ -866,6 +866,7 @@ sub UpdateFuncs
 {	undef %FuncCache;
 	delete $Def{$_}{_depended_on_by}, delete $Def{$_}{_properties} for keys %Def;
 	@Fields=();
+	%Get=%Display=();	#FIXME probably more need reset
 
 	my %done;
 	my %_depended_on_by; my %_properties;
@@ -893,17 +894,6 @@ warn "\@Fields=@Fields"; $Def{$_}{flags}||='' for @Fields;	#DELME
 			$code.= (Code($f,'init')||'').";\n";
 		}
 		Compile(init=>$code);
-	}
-	for my $f ( grep $Def{$_}{flags}=~m/g/, @Fields)
-	{	my $get= Code($f, 'get', ID => '$_[0]');
-		$get="local *__ANON__ ='getsub for $f'; $get" if $::debug;
-		$Get{$f}= Compile("Get_$f"=>"sub {$get}");
-		my $display= Code($f, 'display', ID => '$_[0]');
-		if ($display && $display ne $get)
-		{	$Display{$f}= Compile("Display_$f"=>"sub {$display}");
-		}
-		else { $Display{$f}=$Get{$f}; }
-		#FIXME rewrite in a clever way
 	}
 	for my $f (@Fields)
 	{	if (my $code=Code($f, 'update', ID => '$ID'))
@@ -1354,27 +1344,48 @@ sub Get_all_gids	#FIXME add option to filter out walues eq ''
 sub Get		# ($ID,@fields)		#FIXME PHASE1 check if function exist for fields
 {	#warn "Songs::Get(@_) called from : ".join(':',caller)."\n";
 	my $ID=shift;
-	return wantarray ? map ($Get{$_}($ID), @_) : $Get{$_[0]}($ID);
+	return wantarray ? map (($Get{$_}||CompileGet($_))->($ID), @_) : ($Get{$_[0]}||CompileGet($_[0]))->($ID);
 }
 sub Display	# ($ID,@fields)
 {	#warn "Songs::Display(@_) called from : ".join(':',caller)."\n";
 	my $ID=shift;
-	return wantarray ? map ($Display{$_}($ID), @_) : $Display{$_[0]}($ID);
+	return wantarray ? map ( ($Display{$_}||CompileDisp($_))->($ID), @_) : ($Display{$_[0]}||CompileDisp($_[0]))->($ID);
 }
 sub DisplayEsc	# ($ID,$field)
-{	return ::PangoEsc( $Display{$_[1]}($_[0]) );
+{	return ::PangoEsc( ($Display{$_[1]}||CompileDisp($_[1]))->($_[0]) );
+}
+sub CompileGet
+{	my ($field,$disp)=@_;
+	unless ($Def{$field}{flags}=~m/g/)
+	{	return $Display{$field}=$Get{$field}=sub { warn "Songs::Get or Songs::Display : Invalid field '$field'\n" };
+	}
+	my $get= Code($field, 'get', ID => '$_[0]');
+	$get="local *__ANON__ ='getsub for $field'; $get" if $::debug;
+	$Get{$field}= Compile("Get_$field"=>"sub {$get}");
+	my $display= Code($field, 'display', ID => '$_[0]');
+	if ($display && $display ne $get)
+	{	$Display{$field}= Compile("Display_$field"=>"sub {$display}");
+	}
+	else { $Display{$field}=$Get{$field}; }
+	return $Get{$field};
+}
+sub CompileDisp
+{	my $field=shift;
+	CompileGet($field);
+	return $Display{$field};
 }
 
 sub Map
 {	my ($field,$IDs)=@_; #warn "Songs::Map(@_) called from : ".join(':',caller)."\n";
-	return map $Get{$field}($_), @$IDs;
+	my $f= $Get{$field}||CompileGet($field);
+	return map $f->($_), @$IDs;
 }
 sub Map_to_gid
 {	my ($field,$IDs)=@_;
 	return map Get_gid($_,$field), @$IDs;
 }
 
-sub GetFullFilename { $Get{fullfilename}($_[0]) }
+sub GetFullFilename { Get($_[0],'fullfilename') }
 #sub GetURI
 #{	return map 'file://'.::url_escape($_), GetFullFilename(@_);
 #}
@@ -1622,10 +1633,10 @@ sub Depends
 sub GetTagValue #rename ?
 {	my ($ID,$field)=@_;
 	warn "GetTagValue : $ID,$field\n" if $::debug;
-	unless (exists $Get{$field}) { warn "GetTagValue : invalid field\n"; return undef }
+	unless ($Def{$field}{flags}=~m/g/) { warn "GetTagValue : invalid field '$field'\n"; return undef }
 	$ID=FindID($ID);
 	unless (defined $ID) { warn "GetTagValue : song not found\n"; return undef }
-	return $Get{$field}->($ID);
+	return Get($ID,$field);
 }
 sub SetTagValue #rename ?
 {	my ($ID,$field,$value)=@_;
