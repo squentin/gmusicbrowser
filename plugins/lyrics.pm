@@ -125,11 +125,20 @@ sub cancel
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save lyrics in :");
+	my $preview= Label::Preview->new(\&filename_preview, 'SongID Option',undef,1);
+	#$preview->set_alignment(0,.5);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds",undef,_"only works with some lyrics source and when the lyrics tab is displayed");
 	my $Bopen=Gtk2::Button->new(_"open context window");
 	$Bopen->signal_connect(clicked => sub { ::ContextWindow; });
-	$vbox->pack_start($_,::FALSE,::FALSE,1) for $entry,$autosave,$Bopen;
+	$vbox->pack_start($_,::FALSE,::FALSE,1) for $entry,$preview,$autosave,$Bopen;
 	return $vbox;
+}
+
+sub filename_preview
+{	return '' unless defined $::SongID;
+	my $t=::pathfilefromformat( $::SongID, $::Options{OPT.'PathFile'}, undef,1);
+	$t= $t ? ::PangoEsc(_"example : ".$t) : "<i>".::PangoEsc(_"invalid pattern")."</i>";
+	return '<small>'.$t.'</small>';
 }
 
 sub SetAutoScroll

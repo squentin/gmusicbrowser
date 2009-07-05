@@ -5511,7 +5511,7 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 sub SetOption
 {	my ($key,$value)=@_;
 	$Options{$key}=$value;
-	#HasChanged(option => $key); #maybe in the future
+	HasChanged(Option => $key);
 }
 
 sub NewPrefRadio
@@ -7945,3 +7945,26 @@ sub make_toolitem
 {	warn "TextCombo::Tree : make_toolitem not implemented\n";	#FIXME not needed for now, but could be in the future
 	return undef;
 }
+
+package Label::Preview;
+use base 'Gtk2::Label';
+
+sub new
+{	my ($class,$update,$event,$entry,$use_markup)=@_;
+	my $self= bless Gtk2::Label->new, $class;
+	$self->{entry}=$entry;
+	$self->{update}=$update;
+	$self->{use_markup}=$use_markup;
+	#$entry->signal_connect( changed => sub { $self->update });
+	$entry->signal_connect_swapped( changed => \&update, $self) if $entry;
+	if ($event) { ::Watch($self, $_ => \&update) for split / /,$event; }
+	$self->update;
+	return $self;
+}
+sub update
+{	my $self=shift;
+	my $arg= $self->{entry} ? $self->{entry}->get_text : undef;
+	my $text=$self->{update}->($arg);
+	$self->{use_markup} ? $self->set_markup($text) : $self->set_text($text);
+}
+
