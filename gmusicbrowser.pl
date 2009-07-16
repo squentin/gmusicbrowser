@@ -60,8 +60,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1001',
- VERSIONSTRING => '1.1.1',
+ VERSION => '1.10011',
+ VERSIONSTRING => '1.1.1.1',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
@@ -1433,7 +1433,7 @@ sub ReadOldSavedTags
 		$song[11]=~s/^<Unknown>.*//;	#11=SONG_ALBUM
 		$song[12]=~s#/.*$##; 		##12=SONG_DISC
 		#$song[13]=~s#/.*$##; 		##13=SONG_TRACK
-		for ($song[0],$song[1]) { _utf8_off($_); $_=url_escape($_) } # file and path
+		for ($song[0],$song[1]) { _utf8_off($_); $_=Songs::filename_escape($_) } # file and path
 		my $ID= $newIDs[$oldID]= $loadsong->(@song);
 		$IDforAlbum{$album}=$IDforArtist{$artist}=$ID;
 
@@ -1548,16 +1548,17 @@ sub ReadSavedTags	#load tags _and_ settings
 		my $oldversion=delete $Options{version} || VERSION;
 		$Options{ArtistSplit}||=' & |, |;';
 		$re_artist=qr/$Options{ArtistSplit}/;
-		$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2
+		$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2  #DELME in v1.1.3/4
 
 		Post_Options_init();
 
+		if ($oldversion<1.1002) { for my $k (qw/Songs artist album/) {$lines{$k}[0]=~s/ /\t/g; s/\x1D/\t/g for @{$lines{$k}}; }}	#for version <1.1.2  #DELME in v1.1.3/4
 		my $songs=$lines{Songs};
 		my $fields=shift @$songs;
-		my ($loadsong,$extra_sub)=Songs::MakeLoadSub(\%lines,split / /,$fields);
+		my ($loadsong,$extra_sub)=Songs::MakeLoadSub(\%lines,split /\t/,$fields);
 		my @newIDs; SongArray::start_init();
 		while (my $line=shift @$songs)
-		{	my ($oldID,@vals)= split "\x1D", $line,-1;
+		{	my ($oldID,@vals)= split /\t/, $line,-1;
 			s#\\x([0-9a-fA-F]{2})#chr hex $1#eg for @vals;
 			$newIDs[$oldID]= $loadsong->(@vals);
 		}
@@ -1568,7 +1569,7 @@ sub ReadSavedTags	#load tags _and_ settings
 			shift @$lines;	#my @properties=split / /, shift @$lines;
 			my $sub=$extra_sub->{$extra};
 			while (my $line=shift @$lines)
-			{	my ($key,@vals)= split "\x1D", $line,-1;
+			{	my ($key,@vals)= split /\t/, $line,-1;
 				s#\\x([0-9a-fA-F]{2})#chr hex $1#eg for @vals;
 				$sub->($key,@vals);
 			}
@@ -1641,11 +1642,11 @@ sub SaveTags	#save tags _and_ settings
 	print $fh "[Options]\n$$optionslines\n"  or $error||=$!;
 
 	my ($savesub,$fields,$extrasub,$extra_subfields)=Songs::MakeSaveSub();
-	print $fh "[Songs]\n@$fields\n"  or $error||=$!;
+	print $fh "[Songs]\n".join("\t",@$fields)."\n"  or $error||=$!;
 	for my $ID (@{ Songs::AllFilter('missing:<:'.($tooold||1)) })
 	{	my @vals=$savesub->($ID);
-		s#([\x1D\n\t\\])#sprintf "\\x%02x",ord $1#eg for @vals;
-		my $line= join "\x1D", $ID, @vals;
+		s#([\x00-\x1F\\])#sprintf "\\x%02x",ord $1#eg for @vals;
+		my $line= join "\t", $ID, @vals;
 		print $fh $line."\n"  or $error||=$!;
 	}
 	#save fields properties, like album pictures ...
@@ -1654,9 +1655,10 @@ sub SaveTags	#save tags _and_ settings
 		my $h= $extrasub->{$field}->();
 		for my $key (sort keys %$h)
 		{	my $vals= $h->{$key};
-			s#([\x1D\n\t\\])#sprintf "\\x%02x",ord $1#eg for @$vals;
-			my $line= join "\x1D", $key, @$vals;
-			print $fh $line."\n"  or $error||=$!;
+			s#([\x00-\x1F\\])#sprintf "\\x%02x",ord $1#eg for @$vals;
+			my $line= join "\t", @$vals;
+			next if $line=~m/^\t*$/;
+			print $fh "$key\t$line\n"  or $error||=$!;
 		}
 	}
 	close $fh  or $error||=$!;

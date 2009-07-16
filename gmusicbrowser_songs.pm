@@ -211,7 +211,7 @@ our %timespan_menu=
 	{	parent	=> 'string',
 		check	=> ';',	#override string's check because not needed and filename may not be utf8
 		get	=> '::decode_url(#_#)',
-		set	=> '#_#=::url_escape(#VAL#);',
+		set	=> '#_#=filename_escape(#VAL#);',
 		display	=> '::filename_to_utf8displayname(#get#)',
 		hash_to_display => '::filename_to_utf8displayname(::decode_url(#VAL#))', #only used by FolderList::
 		load	=> '#_#=#VAL#',
@@ -232,7 +232,7 @@ our %timespan_menu=
 		pixbuf_for_gid	=> 'my $file= #get_for_gid#; ::PixBufFromFile($file);',#FIXME use a cache
 		set_for_gid	=> '::_utf8_off(#VAL#); #_#= #VAL# eq "" ? undef : #VAL#; ::HasChanged("Picture_#mainfield#",#GID#);',
 		load_extra	=> 'if (#VAL# ne "") { #_#= ::decode_url(#VAL#); }',
-		save_extra	=> 'do { my $v=#_#; defined $v ? ::url_escape($v) : ""; }',
+		save_extra	=> 'do { my $v=#_#; defined $v ? filename_escape($v) : ""; }',
 		get		=> '__#mainfield#_picture[ #mainfield->get_gid# ]',
 	},
 	_stars =>	#FIXME not used everywhere
@@ -752,6 +752,13 @@ my (%Get,%Display,$DIFFsub,$NEWsub,$LENGTHsub,%UPDATEsub,$SETsub); my (%Get_gid,
 use constant FIRSTID => 1;
 our $LastID=FIRSTID-1;
 
+sub filename_escape	#same as ::url_escape but escape different characters
+{	my $s=$_[0];
+	::_utf8_off($s);
+	$s=~s#([^/_.+'(),A-Za-z0-9- ])#sprintf('%%%02X',ord($1))#seg;
+	return $s;
+}
+
 sub Macro
 {	local $_=shift;
 	my %h=@_;
@@ -1025,7 +1032,7 @@ sub MakeLoadSub
 		if ($load_extra && $extradata->{$mainfield} && !$extra_sub{$mainfield})
 		{	my $code= 'my $gid='.$load_extra.";\n";
 			my $i=1;
-			for my $subfield (split / /,$extradata->{$mainfield}[0])
+			for my $subfield (split /\t/,$extradata->{$mainfield}[0])
 			{	my $c=LookupCode($subfield,'load_extra',[GID=>'$gid',VAL=>"\$_[$i]"]);;
 				$code.= "\t$c;\n" if $c;
 				$i++;
