@@ -834,7 +834,7 @@ sub FilterCode
 	unless (ref $convert) { $convert=~s/#PAT#/\$_[0]/g; $convert=eval "sub {$convert}"; }
 	$code=~s/#ID#/\$_/g;
 	if ($inv)	{$code=~s#$Filter::OpRe#$Filter::InvOp{$1}#go}
-	else		{$code=~s#$Filter::OpRe#$1#go}
+	else		{$code=~s#$Filter::OpRe#$1 eq '!!' ? '' : $1#ego}
 	if ($code=~m/#VAL1#/) { my ($p1,$p2)=map $convert->($_), split / /,$pat; $code=~s/#VAL1#/$p1/g; $code=~s/#VAL2#/$p2/g; }
 	else { my $p=$convert->($pat,$field); $code=~s/#VAL#/$p/g; }
 	return $code;

@@ -616,7 +616,7 @@ sub ReadLayoutFile
 		while (local $_=<$fh>)
 	 	{	s#^\s+##;
 			next if m/^#/;
-			chomp; s#\s+$##;
+			s#\s*[\n\r]+$##;
 			if (s#\\$##) {$longline.=$_;next}
 			next if $_ eq '';
 			if ($longline) {$_=$longline.$_;undef $longline;}

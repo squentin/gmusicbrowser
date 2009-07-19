@@ -1239,14 +1239,14 @@ sub LoadPlugins
 	for my $file (grep !$loaded{$_}, @list)
 	{	warn "Reading plugin $file\n" if $::debug;
 		my ($found,$id);
-		open my$fh,'<',$file;
+		open my$fh,'<',$file or do {warn "error opening $file : $!\n";next};
 		while (my $line=<$fh>)
 		{	if ($line=~m/^=gmbplugin (\D\w+)/)
 			{	my $id=$1;
 				my @lines;
 				while ($line=<$fh>)
 				{	last if $line=~m/^=cut/;
-					chomp $line;
+					$line=~s/[\n\r]+$//;
 					$line=_($line) if $line;
 					push @lines,$line;
 				}
@@ -1265,7 +1265,7 @@ sub LoadPlugins
 				};
 				last;
 			}
-			elsif ($line=~m/^\s*[^#\n]/) {last}
+			elsif ($line=~m/^\s*[^#\n\r]/) {last}
 		}
 		close $fh;
 		warn "No plugin found in $file, maybe it uses an old format\n" unless $found;
@@ -1540,7 +1540,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		my @newIDs; SongArray::start_init();
 		while (my $line=shift @$songs)
 		{	my ($oldID,@vals)= split "\x1D", $line,-1;
-			s#\\x([0-9a-fA-F]{2})#chr hex $1#g for @vals;
+			s#\\x([0-9a-fA-F]{2})#chr hex $1#eg for @vals;
 			$newIDs[$oldID]= $loadsong->(@vals);
 		}
 		#load fields properties, like album pictures ...
@@ -1551,7 +1551,7 @@ sub ReadSavedTags	#load tags _and_ settings
 			my $sub=$extra_sub->{$extra};
 			while (my $line=shift @$lines)
 			{	my ($key,@vals)= split "\x1D", $line,-1;
-				s#\\x([0-9a-fA-F]{2})#chr hex $1#g for @vals;
+				s#\\x([0-9a-fA-F]{2})#chr hex $1#eg for @vals;
 				$sub->($key,@vals);
 			}
 		}
@@ -1657,8 +1657,7 @@ sub SaveTags	#save tags _and_ settings
 			while (<$file>) { if (m/^SavedOn=(\d+)/) {$date=$1;last} last unless m/=/}
 			close $file;
 			last unless $date;
-			my ($day,$month,$year)=(localtime($date))[3,4,5];
-			$date= sprintf '%04d%02d%02d',$year+1900,$month+1,$day;
+			$date=strftime('%Y%m%d',localtime($date));
 			last if -e $SaveFile.'.bak.'.$date;
 			rename $SaveFile.'.bak', $SaveFile.'.bak.'.$date;
 			my @files=FileList(qr/^\Q$savefilename\E\.bak\.\d{8}$/, $savedir);

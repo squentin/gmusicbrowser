@@ -5040,10 +5040,12 @@ sub set_head_columns
 	$self->{songxoffset}=0;
 	$self->{songxright}=0;
 	my $depth=0;
+	my @fields;
 	if (@cols)
 	{ for my $colskin (@cols)
 	  {	my ($col,$skin)=split /\|/,$colskin;
 		next unless $col;
+		push @fields,$col;
 		my $cell= GMB::Cell->new_group( $self,$depth,$col,$skin );
 		#$cell->{skin}=$skin;
 		$cell->{x}=$self->{songxoffset};
@@ -5058,7 +5060,7 @@ sub set_head_columns
 	else
 	{	$self->{headcells}[0]{$_}=0 for qw/left right x head tail vmin/;
 	}
-	$self->{fields_to_watch1}=[Songs::Depends(@cols)];
+	$self->{fields_to_watch1}=[Songs::Depends(@fields)];
 
 	$self->update_columns(1);
 	$self->BuildTree unless $self->{need_init};
@@ -5197,7 +5199,7 @@ sub updateextrawidth
 sub SongsChanged_cb
 {	my ($self,$IDs,$fields)=@_;
 	return if $IDs && !@{ $self->{array}->AreIn($IDs) };	#ignore changes to songs not in the list
-	if ( ::OneInCommon($fields,$self->{fields_to_watch1}) )	#changes include a field use to group songs => rebuild
+	if ( ::OneInCommon($fields,$self->{fields_to_watch1}) )	#changes include a field used to group songs => rebuild
 	{	$self->buildexpstate;	#save expanded state for each song
 		$self->BuildTree;
 	}
