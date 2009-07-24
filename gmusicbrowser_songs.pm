@@ -233,7 +233,7 @@ our %timespan_menu=
 		set_for_gid	=> '::_utf8_off(#VAL#); #_#= #VAL# eq "" ? undef : #VAL#; ::HasChanged("Picture_#mainfield#",#GID#);',
 		load_extra	=> 'if (#VAL# ne "") { #_#= ::decode_url(#VAL#); }',
 		save_extra	=> 'do { my $v=#_#; defined $v ? filename_escape($v) : ""; }',
-		get		=> '__#mainfield#_picture[ #mainfield->get_gid# ]',
+		get		=> '__#mainfield#_picture[ ##mainfield#->get_gid# ]',
 	},
 	_stars =>	#FIXME not used everywhere
 	{	_		=> 'sprintf("%d",#GID# * #nbpictures# /100)',
@@ -479,7 +479,7 @@ our %timespan_menu=
  },
  album_picture =>
  {	name		=> _"Album picture",
-	flags		=> '',		#FIXME
+	flags		=> 'g',		#FIXME
 	depend		=> 'album',
 	property_of	=> 'album',
 	mainfield	=> 'album',
@@ -488,7 +488,7 @@ our %timespan_menu=
  },
  artist_picture =>
  {	name		=> _"Artist picture",
-	flags		=> '',		#FIXME
+	flags		=> 'g',		#FIXME
 	depend		=> 'artist',
 	property_of	=> 'artist',
 	mainfield	=> 'artist',
