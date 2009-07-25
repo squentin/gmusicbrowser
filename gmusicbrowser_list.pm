@@ -3301,14 +3301,20 @@ package SimpleSearch;
 use base 'Gtk2::HBox';
 
 our @SelectorMenu= #the first one is the default
-(	[_"Search Title, Artist and Album", 'title:s:|artist:s:|album:s:' ],
-	[_"Search Title, Artist, Album, Comment, Label and Genre", 'title:s:|artist:s:|album:s:|comment:s:|label:s:|genre:s:' ],
-	[_"Search Title",	'title:s:'],
-	[_"Search Artist",	'artist:s:'],
-	[_"Search Album",	'album:s:'],
-	[_"Search Comment",	'comment:s:'],
-	[_"Search Label",	'label:s:'],
-	[_"Search Genre",	'genre:s:'],
+(	[_"Search Title, Artist and Album", 'title|artist|album' ],
+	[_"Search Title, Artist, Album, Comment, Label and Genre", 'title|artist|album|comment|label|genre' ],
+	[_"Search Title",	'title'],
+	[_"Search Artist",	'artist'],
+	[_"Search Album",	'album'],
+	[_"Search Comment",	'comment'],
+	[_"Search Label",	'label'],
+	[_"Search Genre",	'genre'],
+);
+
+our %Options=
+(	casesens	=> _"Case sensitive",
+	literal		=> _"Literal search",
+	regexp		=> _"Regular expression",
 );
 
 sub new
@@ -3317,7 +3323,7 @@ sub new
 	my $nb=$opt1->{nb};
 	my $entry=$self->{entry}=Gtk2::Entry->new;
 	$self->{fields}= $opt2->{fields} || $SelectorMenu[0][1];
-	$self->{wordsplit}=$opt2->{wordsplit}||0;
+	$self->{$_}=$opt2->{$_}||0 for keys %Options;
 	$self->{nb}=defined $nb ? $nb : 1;
 	$self->{group}=$opt1->{group};
 	$self->{searchfb}=$opt1->{searchfb};
@@ -3359,7 +3365,7 @@ sub new
 			{	my ($self,$event)=@_;
 				my $entry=$self->{entry};
 				if ($entry->state eq 'normal')
-				{	my $s= $self->{filtered};
+				{	my $s= $self->{filtered} && !$entry->is_focus;
 					$entry->modify_base('normal', ($s? $entry->style->bg('selected') : undef) );
 					$entry->modify_text('normal', ($s? $entry->style->text('selected') : undef) );
 				}
@@ -3375,7 +3381,9 @@ sub new
 }
 sub SaveOptions
 {	my $self=$_[0];
-	return { fields => $self->{fields}, wordsplit => $self->{wordsplit} };
+	my %opt=(fields => $self->{fields});
+	$opt{$_}=1 for grep $self->{$_}, keys %Options;
+	return \%opt;
 }
 
 sub ChangeOption
@@ -3397,12 +3405,15 @@ sub PopupSelectorMenu
 		$item->signal_connect(activate => $cb,$fields);
 		$menu->append($item);
 	}
-	my $item1=Gtk2::CheckMenuItem->new(_"Split on words");
-	$item1->set_active(1) if $self->{wordsplit};
-	$item1->signal_connect(activate => sub
-		{	$self->ChangeOption( wordsplit => $_[0]->get_active);
-		});
-	$menu->append($item1);
+	$menu->append(Gtk2::SeparatorMenuItem->new);
+	for my $key (sort { $Options{$a} cmp $Options{$b} } keys %Options)
+	{	my $item=Gtk2::CheckMenuItem->new($Options{$key});
+		$item->set_active(1) if $self->{$key};
+		$item->signal_connect(activate => sub
+			{	$self->ChangeOption( $_[1] => $_[0]->get_active);
+			},$key);
+		$menu->append($item);
+	}
 	my $item2=Gtk2::MenuItem->new(_"Advanced Search ...");
 	$item2->signal_connect(activate => sub
 		{	::EditFilter($self,::GetFilter($self),undef,sub {::SetFilter($self,$_[0]) if defined $_[0]});
@@ -3417,23 +3428,98 @@ sub Filter
 {	my $entry=$_[0];
 	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
 	my $self=::find_ancestor($entry,__PACKAGE__);
-	my $last_string= $self->{last_string} || '';
-	my $text= $self->{last_string}= $entry->get_text;
+	my ($last_filter,$last_eq,@last_substr)= @{ delete $self->{last_filter} || [] };
+	my $search0=my $search= $entry->get_text;
 	my $filter;
-	if ($text ne '')
-	{	my @strings= $self->{wordsplit}? (split / +/,$text) : ($text);
-		my @filters;
-		for my $string (@strings)
-		{	push @filters,Filter->newadd( ::FALSE,map $_.$string, split /\|/,$self->{fields} );
+
+	my (@filters,@or);
+	my ($now_eq,@now_substr);
+	while (length $search)
+	{	my $op= $self->{regexp} ? 'mi' : 's';
+		my $not=0;
+		my $fields=$self->{fields};
+		my @words;
+		if ($self->{literal})
+		{	push @words,$search;
+			$search='';
 		}
-		$filter=Filter->newadd( ::TRUE,@filters );
-		$filter->set_parent($self->{last_filter}) if length $last_string && index($text,$last_string)>=0; #optimization : indicate that this filter will only match songs that match $self->{last_filter}
+		else
+		{	$search=~s/^\s+//;
+			if ($search=~s#^(?:\||OR)\s+##) { push @or, scalar @filters;next; }
+			$not=1 if $search=~s/^[-!]//;
+			$search=~s/^\\(?=[-!O|])//;
+			if ($search=~s#^([A-Za-z]\w*(?:\|[A-Za-z]\w*)*)?([:<>=~])##)
+			{	my $o= $2 eq ':' ? 's' : $2 eq '~' ? 'mi' : $2 eq '=' ? 'e' : $2; #FIXME use a hash ?
+				my $f= $1 || $fields;
+				if (Songs::CanDoFilter($o,split /\|/, $f))
+				{	$fields=$f;
+					$op=$o;
+				}
+				else {$search=$1.$2.$search;}
+			}
+			{	if ($search=~s#^(['"])(.+?)(?<!\\)\1((?<!\\)\||\s+|$)##)
+				{	push @words,$2;
+					redo if $3 eq '|';
+				}
+				elsif ($search=~s#^(\S.*?)((?<!\\)\||(?<!\\)\s+|$)##)
+				{	push @words,$1;
+					redo if $2 eq '|';
+				}
+			}
+			unless (@words) {push @filters,undef;next}
+			#warn "$_:$words[$_].\n" for 0..$#words;
+			s#\\([ "'|])#$1#g for @words;
+		}
+
+		my $and= $not ? 1 : 0;
+		$not= $not ? '-' : '';
+		my @f;
+		for my $s (@words)
+		{	my $op=$op;
+			# for number fields, check if $string is a range :
+			if ($op eq 'e' && $s=~m/\.\.|^[^-]+\s*-[^-]*$/ && Songs::CanDoFilter('b',split /\|/, $fields))
+			{	$s=~m/(\d+\w*\s*)?(?:\.\.|-)(\s*\d+\w*)?/;
+				if (defined $1 && defined $2)		{ $op='b'; $s="$1 $2"; }
+				elsif (!defined $1 && defined $2)	{ $op='>'; $not=!$not; $s=$2; }
+				elsif (!defined $2 && defined $1)	{ $op='<'; $not=!$not; $s=$1; }
+				$not= $not ? '-' : '';
+			}
+			if ($self->{casesens})
+			{	if ($op eq 's') {$op='S'} elsif ($op eq 'mi') {$op='m'}
+			}
+			push @f,Filter->newadd( $and,map "$not$_:$op:$s", split /\|/,$fields );
+			#@now_substr and $now_eq are for filter comparison->optimization
+			if ($op eq 's')
+			{	push @now_substr,$s;
+				$s='';
+			}
+			$now_eq.="$not$and$fields:$op:$s\x00";
+		}
+		push @filters, Filter->newadd(::FALSE,@f);
+		$now_eq="or(@or)".$now_eq."\x00";
+		while (@or)
+		{	my $first=my $last=pop @or;
+			$first=pop @or while @or && $or[-1]==$first-1;
+			$first-- if $first>0;
+			$last-- if $last>$#filters;
+			splice @filters,$first,1+$last-$first, Filter->newadd(::FALSE,@filters[$first..$last]) if $last>$first;
+		}
+		@filters=grep defined, @filters;
+
+		if (@filters)
+		{	$filter=Filter->newadd( ::TRUE,@filters );
+			if ($last_eq && !$self->{regexp} && $last_eq eq $now_eq && !grep index($now_substr[$_],$last_substr[$_])==-1, 0..$#now_substr )
+			{	#optimization : indicate that this filter will only match songs that match $last_filter
+				$filter->set_parent($last_filter);
+				#warn "----optimization : base results on previous filter results (if cached)\n";
+			}
+			$self->{last_filter}=[$filter,$now_eq,@now_substr];
+		}
 	}
-	else {$filter=Filter->new}
+	$filter||=Filter->new;
 	::SetFilter($self,$filter,$self->{nb});
-	$self->{last_filter}=$filter;
 	if ($self->{searchfb})
-	{	::HasChanged('SearchText_'.$self->{group},$text);
+	{	::HasChanged('SearchText_'.$self->{group},$search0); #FIXME
 	}
 	$self->{filtered}= 1 && !$filter->is_empty; #used to set the background color
 }
@@ -3441,8 +3527,8 @@ sub Filter
 sub EntryChanged_cb
 {	my $entry=$_[0];
 	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
-	#my $timeout=1000;							#FIXME make it an option
-	my $l= length($entry->get_text); my $timeout= $l>2 ? 10 : 1000;	#FIXME and/or make it depends on text length
+	my $l= length($entry->get_text);
+	my $timeout= $l>2 ? 100 : 1000;
 	$entry->{changed_timeout}= Glib::Timeout->add($timeout,\&Filter,$entry);
 }
 

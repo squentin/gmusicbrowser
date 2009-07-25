@@ -830,6 +830,10 @@ sub MakeCode		#keep ?
 	$code=~s/#[\w\|.]+#/shift @codes/ge;
 	return $code;
 }
+sub CanDoFilter		#returns true if all @fields can do $op
+{	my ($op,@fields)=@_;
+	return !grep !LookupCode($_,'filter:'.$op), @fields;
+}
 sub FilterCode
 {	my ($field,$cmd,$pat,$inv)=@_;
 	my ($code,$convert)=LookupCode($field, 'filter:'.$cmd, 'filter_prep:'.$cmd.'|filter_prep');
