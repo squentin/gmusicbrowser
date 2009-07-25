@@ -56,12 +56,13 @@ sub Changed
 	return if $lasttime && $::StartTime==$lasttime; #if song hasn't really changed
 	$lasttime=$::StartTime;
 	my $ID=$::SongID;
-	return unless defined $::Options{OPT.'CMD'};
-	my @cmd=split / /, $::Options{OPT.'CMD'};
+	my $cmd= $::Options{OPT.'CMD'};
+	return unless defined $cmd;
+	my @cmd= ::split_with_quotes($cmd);
 	return unless @cmd;
 	$_=::ReplaceFields($ID,$_) for @cmd;
 	if ($::Options{OPT.'SENDSTDINPUT'})
-	{	my $string=::ReplaceFields($ID,"Title=%t\nArtist=%a\nAlbum=%l\nLength=%m\nYear=%y\n");
+	{	my $string=::ReplaceFields($ID,"Title=%t\nArtist=%a\nAlbum=%l\nLength=%m\nYear=%y\nTrack=%n\n");
 		open my$out,'|-',@cmd;
 		print $out $string;
 		close $out;

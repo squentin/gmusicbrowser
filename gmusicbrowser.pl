@@ -901,11 +901,21 @@ sub run_command
 	else { warn "Unknown command '$cmd' => can't execute '$cmd($arg)'\n" }
 }
 
+sub split_with_quotes
+{	local $_=shift;
+	s#\\(.)#$1 eq '"' ? "\\34" : $1 eq "'" ? "\\39" : $1 eq ' ' ? "\\32" : "\\92".$1#ge;
+	my @w= m/([^"'\s]+|"[^"]+"|'[^']+')/g;
+	for (@w) #remove quotes and put back unused backslashes
+	{	if    (s/^"//) {s/"$//; s#\\39#\\92'#g; s#\\32#\\92 #g;}
+		elsif (s/^'//) {s/'$//; s#\\34#\\92"#g; s#\\32#\\92 #g;}
+	}
+	s#\\(\d\d)#chr $1#ge for @w;
+	return @w;
+}
+
 sub run_system_cmd
 {	my $syscmd=$_[1];
-	#my @cmd=split / /,$syscmd;
-	#system @cmd;
-	my @cmd=grep defined, $syscmd=~m/(?:(?:"(.*[^\\])")|([^ ]*[^ \\]))(?: |$)/g;
+	my @cmd= split_with_quotes($syscmd);
 	return unless @cmd;
 	if ($syscmd=~m/%F/)
 	{	my @files;
