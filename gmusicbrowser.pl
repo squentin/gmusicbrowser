@@ -586,7 +586,8 @@ our %SIZEUNITS=
 sub ConvertTime	# convert date pattern into nb of seconds
 {	my $pat=$_[0];
 	if ($pat=~m/(\d\d\d\d)-(\d\d?)-(\d\d?)/) { $pat=mktime(0,0,0,$3,$2-1,$1-1900); }
-	elsif ($pat=~m/^(\d+\.?\d*)([smhdwMy])$/){ $pat=time-$1*$DATEUNITS{$2}[0];   }
+	elsif ($pat=~m/(\d+(?:\.\d+)?)\s*([smhdwMy])/){ $pat=time-$1*$DATEUNITS{$2}[0];   }
+	else {$pat=~m/(\d+)/; $pat=$1||0}
 	return $pat;
 }
 sub ConvertSize
