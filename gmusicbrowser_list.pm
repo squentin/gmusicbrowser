@@ -5582,6 +5582,10 @@ sub button_press_cb
 			$self->expand_colapse($answer->{path});
 			return 1;
 		}
+		elsif (defined $depth && $answer->{harea} eq 'left')
+		{	$self->song_selected($event,$answer->{start},$answer->{end});
+			return 0;
+		}
 		if (defined $row)
 		{	if ( $event->get_state * ['shift-mask', 'control-mask'] || !$self->{selected}[$row] )
 				{ $self->song_selected($event,$row); }
