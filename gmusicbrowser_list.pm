@@ -3919,16 +3919,15 @@ sub Fill	#FIXME should be called when signals ::style-set and ::direction-change
 
 	if ($width<2 && !$self->{delayed}) {$self->{delayed}=1;::IdleDo('2_resizecloud'.$self,100,\&Fill,$self);return}
 	delete $self->{delayed};
-
-	#warn "Fill : $width,$height\n";
 	delete $::ToDo{'2_resizecloud'.$self};
+
 	unless (keys %$href)
 	{	$self->set_size_request(-1,-1);
 		$self->queue_draw;
 		$self->{lines}=[];
 		return;
 	}
-	$self->{width}=$width;#warn "$self : filling with width=$width\n";
+	$self->{width}=$width;
 	my $lastkey;
 	if ($self->{lastclick})
 	{	my ($i,$j)=@{ delete $self->{lastclick} };
@@ -3974,11 +3973,9 @@ sub Fill	#FIXME should be called when signals ::style-set and ::direction-change
 }
 
 sub configure_cb
-{	my ($self,$event)=@_;#warn "$self : resized to width=".$event->width."\n";
-	#warn "configure_cb : ".$event->width."\n";
+{	my ($self,$event)=@_;
 	return if !$self->{width} || $self->{width} eq $event->width;
-	#$self->Fill;
-	::IdleDo('2_resizecloud'.$self,100,\&Fill,$self);
+	::IdleDo('2_resizecloud'.$self,500,\&Fill,$self);
 }
 
 sub focus_change
@@ -4260,16 +4257,15 @@ sub reset_selection
 
 sub Fill
 {	my ($self,$samelist)=@_;
-	my $list=$self->{list};
-	($list)= $self->{get_fill_data_sub}($self) unless $samelist && $samelist eq 'samelist';
 	my $window=$self->window;
 	my ($width,$height)=$window->get_size;
-
-	if ($width<2 && !$self->{delayed}) {$self->{delayed}=1;::IdleDo('2_resizecloud'.$self,100,\&Fill,$self);return}
+	if ($width<2 && !$self->{delayed}) { $self->{delayed}=1; ::IdleDo('2_resizemosaic'.$self,100,\&Fill,$self);return}
 	delete $self->{delayed};
+	delete $::ToDo{'2_resizemosaic'.$self};
+	$self->{width}=$width;
 
-	delete $::ToDo{'2_resizecloud'.$self};
-	$self->{width}=$width;#warn "$self : filling with width=$width\n";
+	my $list=$self->{list};
+	($list)= $self->{get_fill_data_sub}($self) unless $samelist && $samelist eq 'samelist';
 
 	my $mpsize=$self->parent->parent->{mpicsize}||64;
 	$self->{picsize}=$mpsize;
@@ -4394,7 +4390,7 @@ sub configure_cb		## FIXME I think it redraws everything even when it's not need
 		return;
 	}
 	$self->reset;
-	$self->Fill('samelist');
+	::IdleDo('2_resizecloud'.$self,100,\&Fill,$self,'samelist');
 }
 
 sub expose_cb
