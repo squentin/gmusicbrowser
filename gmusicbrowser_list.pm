@@ -4094,7 +4094,7 @@ sub reset_selection
 sub Fill
 {	my ($self,$samelist)=@_;
 	my $list=$self->{list};
-	($list)= &{ $self->{get_fill_data_sub} }($self) unless $samelist;
+	($list)= &{ $self->{get_fill_data_sub} }($self) unless $samelist && $samelist eq 'samelist';
 	my $window=$self->window;
 	my ($width,$height)=$window->get_size;
 
@@ -4220,7 +4220,7 @@ sub configure_cb
 		return;
 	}
 	$self->reset;
-	$self->Fill(1);
+	$self->Fill('samelist');
 }
 
 sub expose_cb
