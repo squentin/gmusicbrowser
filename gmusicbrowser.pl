@@ -531,16 +531,15 @@ our %ReplaceFields; #used in gmusicbrowser_tags for auto-fill FIXME PHASE1
 
 sub UsedFields
 {	my $s=$_[0];
-	my @f=map $ReplaceFields{$_}, $s=~m/%([a-zA-Z])/g;
+	my @f=map $ReplaceFields{$_}, $s=~m/(%[a-zA-Z])/g;
 	push @f, $s=~m#\$([a-zA-Z]\w*)#g;
 	return Songs::Depends(@f);
 }
 sub ReplaceFields
 {	my ($ID,$string,$esc)=@_;
-	my $display= $esc ? \&Songs::DisplayEsc : \&Songs::Display;
+	my $display= $esc ? ref $esc ? sub { $esc->(Songs::Display(@_)) } : \&Songs::DisplayEsc : \&Songs::Display;
 	$string=~s#\\n#\n#g;
-	$string=~s/%([a-zA-Z%])/$ReplaceFields{$1} ? '$'.$ReplaceFields{$1} : $1/ge;
-	$string=~s#\$([a-zA-Z\$]\w*)#$1 eq '$' ? '$' : $display->($ID,$1)#ge;
+	$string=~s#([%\$]){2}|(%[a-zA-Z]|\$[a-zA-Z\$]\w*)#$1 ? $1 : do {my $f=$ReplaceFields{$2}; $f ? $display->($ID,$f) : $2} #ge;
 	return $string;
 }
 sub ReplaceFieldsAndEsc
@@ -550,8 +549,8 @@ sub MakeReplaceTable
 {	my $fields=$_[0];
 	my $table=Gtk2::Table->new (4, 2, FALSE);
 	my $row=0; my $col=0;
-	for my $tag (split //,$fields)
-	{	for my $text ( '%'.$tag, Songs::FieldName($ReplaceFields{$tag}) )
+	for my $tag (map '%'.$_, split //,$fields)
+	{	for my $text ( $tag, Songs::FieldName($ReplaceFields{$tag}) )
 		{	my $l=Gtk2::Label->new($text);
 			$table->attach($l,$col++,$col,$row,$row+1,'fill','shrink',4,1);
 			$l->set_alignment(0,.5);
@@ -565,7 +564,7 @@ sub MakeReplaceTable
 }
 sub MakeReplaceText
 {	my $fields=$_[0];
-	my $text=join "\n",map '%'.$_.' : '.Songs::FieldName($ReplaceFields{$_}), split //,$fields;
+	my $text=join "\n",map '%'.$_.' : '.Songs::FieldName($ReplaceFields{'%'.$_}), split //,$fields;
 	return $text;
 }
 

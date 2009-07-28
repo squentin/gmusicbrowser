@@ -575,7 +575,7 @@ return $self if @IDs>1000;
 	for my $i (0..$#FORMATS)
 	{	next if @files/2>(grep m/$FORMATS[$i][1]/, @files);
 		my $formatname=$FORMATS[$i][0];
-		$formatname=~s/%([taldnyCV%])/Songs::FieldName($::ReplaceFields{$1})/ge;
+		$formatname=~s/(%[taldnyCV%])/Songs::FieldName($::ReplaceFields{$1})/ge;
 		my $item=Gtk2::MenuItem->new_with_label($formatname);
 		$item->{'index'}=$i;
 		$item->signal_connect(activate => \&autofill_cb,$self);
@@ -682,7 +682,7 @@ sub scroll_to_entry
 sub autofill_cb
 {	my ($menuitem,$self)=@_;
 	my ($format,$pattern)=@{ $FORMATS[$menuitem->{'index'}] };
-	my @fields= map $::ReplaceFields{$_}, grep $_ ne '%', $format=~m/%([taldnyCV%])/g;
+	my @fields= map $::ReplaceFields{$_}, $format=~m/(%[taldnyCV])/g;
 	my $OBlank=$self->{AFOBlank}->get_active;
 	my @vals;
 	for my $ID (@{$self->{IDs}})

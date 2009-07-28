@@ -985,7 +985,8 @@ warn "\@Fields=@Fields"; $Def{$_}{flags}||='' for @Fields;	#DELME
 		. '} return ($size,$sec)';
 		$LENGTHsub= Compile(Length =>"sub {$code}");
 	}
-	%::ReplaceFields= map { $Def{$_}{letter} => $_ } grep $Def{$_}{letter}, @Fields;
+	%::ReplaceFields= map { '%'.$Def{$_}{letter} => $_ } grep $Def{$_}{letter}, @Fields;
+	$::ReplaceFields{'$'.$_}=$_ for grep $Def{$_}{flags}=~m/g/, @Fields;
 
 	::HasChanged('fields_reset');
 	#FIXME connect them to 'fields_reset' event :
