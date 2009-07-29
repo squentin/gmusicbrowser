@@ -5904,9 +5904,13 @@ sub button_press_cb
 	{	return 0 unless $answer;
 		if (defined $depth && $answer->{area} eq 'head' || $answer->{area} eq 'collapsed')
 		{	if ($answer->{area} eq 'head' && $self->{headclick} eq 'select')
-			 { $self->song_selected($event,$answer->{start},$answer->{end}); }
+			 { $self->song_selected($event,$answer->{start},$answer->{end}); return 0}
 			else { $self->expand_colapse($depth,$answer->{branch}); }
 			return 1;
+		}
+		elsif (defined $depth && $answer->{harea} eq 'left' || $answer->{harea} eq 'right')
+		{       $self->song_selected($event,$answer->{start},$answer->{end});
+		        return 0;
 		}
 		if (defined $row)
 		{	if ( $event->get_state * ['shift-mask', 'control-mask'] || !vec($self->{selected},$row,1) )
