@@ -35,8 +35,7 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
 use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES strftime mktime/;
 use List::Util qw/min max sum first/;
 use File::Copy;
-use File::Spec::Functions qw/file_name_is_absolute catfile/;
-use Cwd 'abs_path';
+use File::Spec::Functions qw/file_name_is_absolute catfile rel2abs/;
 use Fcntl qw/O_NONBLOCK O_WRONLY O_RDWR SEEK_SET/;
 use Encode qw/_utf8_on _utf8_off/;
 use Scalar::Util qw/blessed weaken/;
@@ -142,7 +141,7 @@ BEGIN
 
   $SaveFile=(-d $HomeDir)
 	?  $HomeDir.'gmbrc'
-	: abs_path('gmusicbrowser.tags');
+	: rel2abs('gmusicbrowser.tags');
   $FIFOFile=(-d $HomeDir && $^O ne 'MSWin32')
 	?  $HomeDir.'gmusicbrowser.fifo'
 	: undef;
@@ -207,8 +206,8 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-port')		{$CmdLine{port}=shift if $ARGV[0]}
 	elsif($arg eq '-debug')		{$debug=1}
 	elsif($arg eq '-nofifo')	{$FIFOFile=undef}
-	elsif($arg eq '-C')		{$SaveFile=abs_path(shift) if $ARGV[0]}
-	elsif($arg eq '-F')		{$FIFOFile=abs_path(shift) if $ARGV[0]}
+	elsif($arg eq '-C')		{$SaveFile=rel2abs(shift) if $ARGV[0]}
+	elsif($arg eq '-F')		{$FIFOFile=rel2abs(shift) if $ARGV[0]}
 	elsif($arg eq '-layout')	{$CmdLine{layout}=shift if $ARGV[0]}
 	elsif($arg eq '-searchpath')	{ push @{ $CmdLine{searchpath} },shift if $ARGV[0]}
 	elsif($arg=~m/^([+-])plugin$/)	{ $CmdLine{plugins}{shift @ARGV}=($1 eq '+') if $ARGV[0]}
@@ -235,7 +234,7 @@ Options to change what is done with files/folders passed as arguments (done in r
   if (@files)
   {	for my $f (@files)
 	{ unless ($f=~m#^http://#)
-	  {	$f=abs_path($f);warn $f;
+	  {	$f=rel2abs($f);
 		$f=~s/([^A-Za-z0-9])/sprintf('%%%02X', ord($1))/seg; #FIXME use url_escapeall, but not yet defined
 	  }
 	}
@@ -599,7 +598,7 @@ sub ConvertSize
 #---------------------------------------------------------------
 our $DAYNB=int(time/86400)-12417;#number of days since 01 jan 2004
 
-our (@LibraryPath,$Library,$PlaySource);#,@Radio);
+our ($Library,$PlaySource);#,@Radio);
 our (%GlobalBoundKeys,%CustomBoundKeys);
 
 our ($SelectedFilter,$PlayFilter); our (%Filters,%FilterWatchers,%Related_FilterWatchers); our %SelID;
@@ -656,7 +655,6 @@ our %Options=
 	Sessions	=> '',
 	StartCheck	=> 0,	#check if songs have changed on startup
 	StartScan	=> 0,	#scan @LibraryPath on startup for new songs
-	#Path		=> '',	#contains join "\x1D",@LibraryPath
 	Labels		=> [_("favorite"),_("bootleg"),_("broken"),_("bonus tracks"),_("interview"),_("another example")],
 	FilenameSchema	=> ['%a - %l - %n - %t','%l - %n - %t','%n-%t','%d%n-%t'],
 	FolderSchema	=> ['%A/%l','%A','%A/%Y-%l','%A - %l'],
@@ -893,7 +891,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 #	AddFilesToPlaylist=> [sub { DoActionForList('addplay',Url_to_IDs($_[1])); }, _"Add a list of files/folders to the playlist", _"url-encoded list of files/folders",0],
 #	InsertFilesInPlaylist=> [sub { DoActionForList('insertplay',Url_to_IDs($_[1])); }, _"Insert a list of files/folders at the start of the playlist", _"url-encoded list of files/folders",0],
 #	EnqueueFiles	=> [sub { DoActionForList('queue',Url_to_IDs($_[1])); }, _"Enqueue a list of files/folders", _"url-encoded list of files/folders",0],
-#	AddToLibrary	=> [sub { AddToLibrary(split / /,$_[1]); }, _"Add files/folders to library", _"url-encoded list of files/folders",0],
+	AddToLibrary	=> [sub { AddToLibraryPath(split / /,$_[1]); }, _"Add files/folders to library", _"url-encoded list of files/folders",0],
 	SetFocusOn	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->SetFocusOn($name) if $w;},_"Set focus on a layout widget", _"Widget name",0],
 	ShowHideWidget	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->ShowHide(split / +/,$name,2) if $w;},_"Show/Hide layout widget(s)", _"|-separated list of widget names",0],
 	PopupTrayTip	=> [sub {ShowTraytip($_[1])}, _"Popup Traytip",_"Number of milliseconds",qr/^\d*$/ ],
@@ -1058,7 +1056,7 @@ exit;
 
 sub Edittag_mode
 {	my @dirs=@_;
-	$_=abs_path($_) for @dirs;
+	$_=rel2abs($_) for @dirs;
 	IdleScan(@dirs);
 	IdleDo('9_SkipLength',undef,sub {@$LengthEstimated=()});
 	Gtk2->main_iteration while Gtk2->events_pending;
@@ -1589,10 +1587,8 @@ sub ReadSavedTags	#load tags _and_ settings
 	if ($Options{RememberPlaySong} && $Options{SavedSongID})
 	 { $SongID= (delete $Options{SavedSongID})->[0]; }
 	if ($Options{RememberPlaySong} && $Options{RememberPlayTime}) { $PlayTime=delete $Options{SavedPlayTime}; }
-	_utf8_off($Options{LibraryPath});
-	$Options{LibraryPath}||='';
-	@LibraryPath=	split "\x1D",$Options{LibraryPath};
-	s/\x00+$// for @LibraryPath; #FIXME ugly fix for paths ending with special char and not encoded in utf8, some \x00 are added when read with :utf8, (caused by the extraction by regex from a string flagged utf8)
+	$Options{LibraryPath}||=[];
+	$Options{LibraryPath}= [ map url_escape($_), split "\x1D", $Options{LibraryPath}] unless ref $Options{LibraryPath}; #for versions <=1.1.1
 	#&launchIdleLoop;
 
 	setlocale(LC_NUMERIC, '');
@@ -1608,6 +1604,7 @@ sub Post_ReadSavedTags
 	$Recent= $Options{SongArray_Recent}	||= SongArray->new;
 	$Queue=  $Options{SongArray_Queue}	||= SongArray->new;
 	$LengthEstimated=  $Options{SongArray_Estimated}	||= SongArray->new;
+	$Options{LibraryPath}||=[];
 }
 
 sub SaveTags	#save tags _and_ settings
@@ -1619,8 +1616,6 @@ sub SaveTags	#save tags _and_ settings
 	my $savefilename=$1;
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
 	$Options{Lock}= $TogLock || '';
-	$Options{Path}  =join "\x1D",@LibraryPath;
-	_utf8_on($Options{Path});
 	$Options{SavedSongID}= SongArray->new([$SongID]) if $Options{RememberPlaySong} && defined $SongID;
 
 	$Options{SavedOn}= time;
@@ -2460,7 +2455,7 @@ sub IdleCheck
 	&launchIdleLoop;
 }
 sub IdleScan
-{	@_=@LibraryPath unless @_;
+{	@_=map decode_url($_), @{$Options{LibraryPath}} unless @_;
 	push @ToScan,@_;
 	&launchIdleLoop;
 }
@@ -5292,17 +5287,23 @@ sub UpdateFolderNames
 }
 
 sub PrefLibrary
-{	my $store=Gtk2::ListStore->new('Glib::String');
+{	my $store=Gtk2::ListStore->new('Glib::String','Glib::String');
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->set_headers_visible(FALSE);
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
-		( _"Folders to search for new songs",Gtk2::CellRendererText->new,'text',0)
+		( _"Folders to search for new songs",Gtk2::CellRendererText->new,'text',1)
 		);
-	$store->set($store->append,0,filename_to_utf8displayname($_)) for @LibraryPath;
+	my $refresh=sub
+	{	my ($store,$changed_key)=@_;
+		return if $changed_key && $changed_key ne 'LibraryPath';
+		$store->clear;
+		$store->set($store->append,0,$_,1,filename_to_utf8displayname(decode_url($_))) for sort @{$Options{LibraryPath}};
+	};
+	$refresh->($store);
+	Watch($store, options => $refresh);
 	::set_drag($treeview, dest => [::DRAG_FILE,sub
 		{	my ($treeview,$type,@list)=@_;
-			@list=map ::decode_url($_), grep s#^file://##, @list;
-			AddToLibraryPath($treeview->get_model,@list);
+			AddToLibraryPath(@list);
 		}]);
 
 	my $addbut=NewIconButton('gtk-add',_"Add folder");
@@ -5317,14 +5318,15 @@ sub PrefLibrary
 
 	$addbut->signal_connect( clicked => sub
 	{	my @dirs=ChooseDir(_"Choose folder to add",undef,undef,'LastFolder_Add',1);
-		AddToLibraryPath($store,@dirs);
+		@dirs=map url_escape($_), @dirs;
+		AddToLibraryPath(@dirs);
 	});
 	$rmdbut->signal_connect( clicked => sub
 	{	my $iter=$selection->get_selected;
 		return unless defined $iter;
-		my $i=$store->get_path($iter)->to_string;
-		$store->remove($iter);
-		splice @LibraryPath,$i,1;
+		my $s= $store->get($iter,0);
+		@{$Options{LibraryPath}}=grep $_ ne $s, @{$Options{LibraryPath}};
+		HasChanged(options=>'LibraryPath');
 	});
 
 	my $sw = Gtk2::ScrolledWindow->new;
@@ -5358,14 +5360,20 @@ sub PrefLibrary
 	return $vbox;
 }
 sub AddToLibraryPath
-{	my ($store,@dirs)=@_;
-	for my $dir (grep -d, @dirs) #FIXME support files drag and drop
+{	my @dirs=@_;
+	s#^file://## for @dirs;
+	@dirs= grep !m#^\w+://#, @dirs;
+	my $changed;
+	for my $dir (@dirs)
 	{	$dir=~s/$QSLASH$//o unless $dir eq SLASH || $dir=~m/^\w:.$/;
-		IdleScan($dir);
-		next if (grep $dir eq $_,@LibraryPath);
-		$store->set($store->append,0,filename_to_utf8displayname($dir)) if $store;
-		push @LibraryPath,$dir;
+		my $d=decode_url($dir);
+		if (!-d $d) { ScanFolder($d); next }
+		IdleScan($d);
+		next if (grep $dir eq $_,@{$Options{LibraryPath}});
+		push @{$Options{LibraryPath}},$dir;
+		$changed=1;
 	}
+	HasChanged(options=>'LibraryPath') if $changed;
 }
 
 sub ToggleLabel #maybe do the toggle in SetLabels #FIXME
