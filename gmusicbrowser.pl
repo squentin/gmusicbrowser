@@ -1693,8 +1693,8 @@ sub ReadRefFromLines	# convert a string written by SaveRefToLines to a hash/arra
 	my ($ident,$ref)=(0,$return);
 	my $parentval;
 	for my $line (@$lines)
-	{	next if $line=~m/^\s*#/;
-		my ($d,$array,$key,$val)= $line=~m/^(\s*)(?:(-)|(?:(\S*|"[^"]*")\s*:))\s+(.*)$/;
+	{	next if $line=~m/^\s*(?:#|$)/;	#skip comment or empty line
+		my ($d,$array,$key,$val)= $line=~m/^(\s*)(?:(-)|(?:(\S*|"[^"]*")\s*:))\s*(.*)$/;
 		$d= length $d;
 		if ($parentval)
 		{	next unless $d>=$ident;
@@ -1749,7 +1749,7 @@ sub SaveRefToLines	#convert hash/array into a YAML string readable by ReadRefFro
 		if (ref $ref eq 'ARRAY')
 		{	if ($keylist<@$ref)
 			{	$val=$ref->[$keylist++];
-				$lines.= $pre.'- ';
+				$lines.= $pre.'-';
 				$next=$val if ref $val;
 			}
 			else {$up=1}
@@ -1763,7 +1763,7 @@ sub SaveRefToLines	#convert hash/array into a YAML string readable by ReadRefFro
 				{	$key=~s/([\x00-\x1f\n"\\])/sprintf "\\x%02x",ord $1/ge;
 					$key=qq/"$key"/;
 				}
-				$lines.= $pre.$key.': ';
+				$lines.= $pre.$key.':';
 				$next=$val if ref $val;
 			}
 			else {$up=1}
@@ -1771,11 +1771,11 @@ sub SaveRefToLines	#convert hash/array into a YAML string readable by ReadRefFro
 		if ($next)
 		{	if (ref $next ne 'ARRAY' && ref $next ne 'HASH')
 			{	$val=$next->save_to_string;
-				$lines.= '!'.ref($next).' ';
+				$lines.= ' !'.ref($next).' ';
 			}
 			else
-			{	if (ref $next eq 'ARRAY' && !@$next)		{ $lines.="[]\n";next; }
-				elsif (ref $next eq 'HASH' && !keys(%$next))	{ $lines.="{}\n";next; }
+			{	if (ref $next eq 'ARRAY' && !@$next)		{ $lines.=" []\n";next; }
+				elsif (ref $next eq 'HASH' && !keys(%$next))	{ $lines.=" {}\n";next; }
 				$lines.="\n";
 				$depth++;
 				$pre='  'x$depth;
@@ -1802,11 +1802,11 @@ sub SaveRefToLines	#convert hash/array into a YAML string readable by ReadRefFro
 		{	$val=~s/([\x00-\x1f\n"\\])/sprintf "\\x%02x",ord $1/ge;
 			$val=qq/"$val"/;
 		}
-		elsif ($val=~m/^\W/ || $val=~m/\s$/)
+		elsif ($val=~m/^\W/ || $val=~m/\s$/ || $val=~m/^true$|^false$|^null$/i)
 		{	$val=~s/'/''/g;
 			$val="'$val'";
 		}
-		$lines.= $val."\n";
+		$lines.= ' '.$val."\n";
 	}
 	return \$lines;
 }
