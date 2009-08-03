@@ -5824,6 +5824,7 @@ sub HasChanged
 
 sub GetSelID
 {	my $group= ref $_[0] ? $_[0]{group} : $_[0];
+	$group=~s/:\w+$//;
 	return	$group=~m/^Next(\d)?$/		? $NextSongs[($1||0)] :
 		$group=~m/^Recent(\d)?$/	? $Recent->[($1||0)] :
 		$group ne 'Play'		? $SelID{$group} :
@@ -5832,6 +5833,7 @@ sub GetSelID
 sub WatchSelID
 {	my ($object,$sub,$fields)=@_; #fields are ignored for now
 	my $group=$object->{group};
+	$group=~s/:\w+$//;
 	my $key= $group=~m/^Next\d?$/ ? 'NextSongs' : $group=~m/^Recent\d?$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'SongID';
 	if ($group=~m/^(?:Recent|Next)\d?$/) { my $orig=$sub; $sub=sub { $orig->( $_[0],GetSelID($_[0]) ); }; } #so that $sub gets the ID as argument in the same way as other cases (SelectedID_ and SongID)
 	Watch($object,$key,$sub);
@@ -5839,11 +5841,13 @@ sub WatchSelID
 sub UnWatchSelID
 {	my $object=$_[0];
 	my $group=$object->{group};
+	$group=~s/:\w+$//;
 	my $key= $group=~m/^Next\d?$/ ? 'NextSongs' : $group=~m/^Recent\d?$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'SongID';
 	UnWatch($object,$key);
 }
 sub HasChangedSelID
 {	my ($group,$ID)=@_;
+	return if $group=~m/:\w+$/;
 	if (defined $ID){ $SelID{$group}=$ID; }
 	else		{ delete $SelID{$group}; }
 	for my $group0 (keys %Related_FilterWatchers)
@@ -5898,7 +5902,7 @@ sub WatchFilter
 	warn "watch filter $group $object\n" if $debug;
 	push @{$FilterWatchers{$group}},$object;
 	$object->{'UpdateFilter_'.$group}=$sub;
-	if ($group=~m/:(.+)$/)
+	if ($group=~m/:\w+$/)
 	{	$Related_FilterWatchers{$group}++;
 		#$Filters{$group}[0]||=$Filters{$group}[1+1]||= Filter->none;#FIXME implement a "none" filter
 		$Filters{$group}[0]||=$Filters{$group}[1+1]||=Filter->new;
@@ -5911,7 +5915,7 @@ sub WatchFilter
 sub UnWatchFilter
 {	my ($object,$group)=@_;
 	warn "unwatch filter $group $object\n" if $debug;
-	if ($group=~m/:(.+)$/)
+	if ($group=~m/:\w+$/)
 	{	unless (--$Related_FilterWatchers{$group})
 		{	delete $Related_FilterWatchers{$group};
 		}
