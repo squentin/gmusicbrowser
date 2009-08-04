@@ -745,6 +745,11 @@ sub keybinding_longname
 our ($NBVolIcons,$NBQueueIcons); my $TrayIconFile;
 my $icon_factory;
 
+my %IconsFallbacks=
+(	'gmb-queue-window' => 'gmb-queue',
+	'gmb-random-album' => 'gmb-random',
+);
+
 sub LoadIcons
 {	my %icons;
 	unless (Gtk2::Stock->lookup('gtk-fullscreen'))	#for gtk version 2.6
@@ -802,17 +807,23 @@ sub LoadIcons
 	$icon_factory->remove_default if $icon_factory;
 	$icon_factory=Gtk2::IconFactory->new;
 	$icon_factory->add_default;
-	while (my ($stock_id,$file)=each %icons)
-	{	next unless $file;
-		my %h= ( stock_id => $stock_id );
+	for my $stock_id (keys %icons,keys %IconsFallbacks)
+	{	my %h= ( stock_id => $stock_id );
 			#label    => $$ref[1],
 			#modifier => [],
 			#keyval   => $Gtk2::Gdk::Keysyms{L},
 			#translation_domain => 'gtk2-perl-example',
 		if (exists $StockLabel{$stock_id}) { $h{label}=$StockLabel{$stock_id}; }
-		Gtk2::Stock->add (\%h) unless Gtk2::Stock->lookup($stock_id);
-		my $icon_set= eval {Gtk2::IconSet->new_from_pixbuf( Gtk2::Gdk::Pixbuf->new_from_file($file) )};
-		warn $@ if $@;
+		Gtk2::Stock->add(\%h) unless Gtk2::Stock->lookup($stock_id);
+
+		my $icon_set;
+		if (my $file=$icons{$stock_id})
+		{	$icon_set= eval {Gtk2::IconSet->new_from_pixbuf( Gtk2::Gdk::Pixbuf->new_from_file($file) )};
+			warn $@ if $@;
+		}
+		elsif (my $fallback=$IconsFallbacks{$stock_id})
+		{	$icon_set=$icon_factory->lookup($fallback);
+		}
 		next unless $icon_set;
 		$icon_factory->add($stock_id,$icon_set);
 	}

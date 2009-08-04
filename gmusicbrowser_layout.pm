@@ -478,7 +478,7 @@ my %objects=
 	},
 	ChooseRandAlbum =>
 	{	class	=> 'Layout::Button',
-		stock	=> 'gmb-random', #FIXME
+		stock	=> 'gmb-random-album',
 		tip	=> _"Choose Random Album",
 		activate=> sub { my $al=AA::GetAAList('album'); my $r=int rand(@$al); my $key=$al->[$r]; my $list=AA::GetIDs('album',$key); if (my $ac=$_[0]{opt1}{action}) { ::DoActionForList($ac,$list); } else { my $ID=::FindFirstInListPlay($list); ::Select( song => $ID)}; },
 		click3	=> sub { my @list; my $al=AA::GetAAList('album'); my $nb=5; while ($nb--) { my $r=int rand(@$al); push @list, splice(@$al,$r,1); last unless @$al; } ::PopupAA('album', list=>\@list, format=> ::__x( _"{album}\n<small>by</small> {artist}", album => "%a", artist => "%b"));  },
@@ -515,7 +515,7 @@ my %objects=
 	},
 	OpenQueue	=>
 	{	class	=> 'Layout::Button',
-		stock	=> 'gmb-queue',
+		stock	=> 'gmb-queue-window',
 		tip	=> _"Open Queue window",
 		activate=> sub {::EditQueue($_[0]{opt1})},
 	},
