@@ -1341,8 +1341,9 @@ sub Gid_to_Get		#convert a gid from a Get_gid to a what Get would return
 #	@$gids=sort $func @$gids;
 #}
 sub sort_gid_by_name
-{	my ($field,$gids,$h,$pre)=@_;#warn 'sort_gid_by_name : sub {my $l=$_[0]; my $h=$_[1]; @$l=sort { '.($HSort{$pre}||'').' '.SortCode($field,undef,1,1).' } @$l}';
-	my $func= $FuncCache{'sortgid '.($pre||'').$field} ||= eval 'sub {my $l=$_[0]; my $h=$_[1]; @$l=sort { '.($pre ? $HSort{$pre} : '').' '.SortCode($field,undef,1,1).' } @$l}';
+{	my ($field,$gids,$h,$pre,$mode)=@_;
+	$mode||='';
+	my $func= $FuncCache{"sortgid $field $mode"} ||= eval 'sub {my $l=$_[0]; my $h=$_[1]; @$l=sort { '.($pre ? $HSort{$pre} : '').' '.SortCode($field,undef,1,1).' } @$l}';
 	$func->($gids,$h);
 }
 sub Get_all_gids	#FIXME add option to filter out walues eq ''
@@ -1851,7 +1852,7 @@ sub SortKeys
 	{	$h= GetHash('year:range',$field);
 		$pre='year2';	#sort using the 4 last characters
 	}
-	Songs::sort_gid_by_name($field,$list,$h,$pre);
+	Songs::sort_gid_by_name($field,$list,$h,$pre,$mode);
 	@$list=reverse @$list if $invert;
 	return $list;
 }
