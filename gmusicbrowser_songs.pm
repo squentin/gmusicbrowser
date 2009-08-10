@@ -210,10 +210,12 @@ our %timespan_menu=
 	filename=>
 	{	parent	=> 'string',
 		check	=> ';',	#override string's check because not needed and filename may not be utf8
-		set	=> '#_#=#VAL#; ::_utf8_off(#_#);',
-		display	=> '::filename_to_utf8displayname(#_#)',
-		load	=> '#_#=::decode_url(#VAL#)',
-		save	=> '::url_escape(#_#)',
+		get	=> '::decode_url(#_#)',
+		set	=> '#_#=::url_escape(#VAL#);',
+		display	=> '::filename_to_utf8displayname(#get#)',
+		hash_to_display => '::filename_to_utf8displayname(::decode_url(#VAL#))', #only used by FolderList::
+		load	=> '#_#=#VAL#',
+		save	=> '#_#',
 	},
 # 	picture =>
 #	{	get_picture	=> '__#mainfield#_picture[#GID#] || $::Options{Default_picture_#mainfield#};',
@@ -1290,15 +1292,17 @@ sub Get_icon_list
 }
 sub Gid_to_Display	#convert a gid from a Get_gid to a displayable value
 {	my ($field,$gid)=@_; #warn "Gid_to_Display(@_)\n";
-	my $sub= $Gid_to_display{$field}||= Makesub($field, 'gid_to_display', GID => '$_[0]');
+	my $sub= $Gid_to_display{$field} || DisplayFromGID_sub($field);
 	if (ref $gid) { return [map $sub->($_), @$gid] }
 	return $sub->($gid);
 }
 sub DisplayFromGID_sub
 {	my $field=$_[0];	warn "DisplayFromGID_sub(@_)\n";
-	my $code=Code($field, 'gid_to_display', GID => '$_[0]');
-	return eval "sub {$code}";
-	#return $Gid_to_display{$field};
+	return $Gid_to_display{$field}||= Makesub($field, 'gid_to_display', GID => '$_[0]');
+}
+sub DisplayFromHash_sub	 #not a good name, very specific, only used for $field=path currently
+{	my $field=$_[0];
+	return $FuncCache{"DisplayFromHash_sub $field"}||= Makesub($field, 'hash_to_display', VAL => '$_[0]');
 }
 sub MakeFilterFromGID
 {	my ($field,$gid)=@_; #warn "MakeFilterFromGID:@_\n";#warn Code($field, 'makefilter', GID => '$_[0]');

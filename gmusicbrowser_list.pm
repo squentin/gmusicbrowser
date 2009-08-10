@@ -2475,10 +2475,15 @@ sub new
 	$treeview->signal_connect(row_expanded  => \&row_expanded_changed_cb);
 	$treeview->signal_connect(row_collapsed => \&row_expanded_changed_cb);
 	$treeview->{expanded}={};
-	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
-		( Songs::FieldName($col),Gtk2::CellRendererText->new,'text',0)
-		);
-
+	my $renderer= Gtk2::CellRendererText->new;
+	my $displayfunc= Songs::DisplayFromHash_sub('path');
+	my $column=Gtk2::TreeViewColumn->new_with_attributes(Songs::FieldName($col),$renderer);
+	$column->set_cell_data_func($renderer, sub
+		{	my (undef,$cell,$store,$iter)=@_;
+			my $folder=$store->get($iter,0);
+			$cell->set( text=> $displayfunc->($folder));
+		});
+	$treeview->append_column($column);
 	$self->add($treeview);
 	$self->{treeview}=$treeview;
 
