@@ -513,7 +513,7 @@ sub _CountFrames		#find and count each frames
 	my @size=map int($_*$m)-4, @{ $bitrates[ $info->{version2} ][ $info->{layer}-1 ] };
 	# -4 to substract 4 bytes header
 	$size[0]=$size[15]=0; #for free (0) or reserved (15) bitrate -> skip frame header and look for next
-my $count=1000;
+my $count=100;
 	#search for each frame
 	while (read $fh,$_,4)
 	{	if (substr($_,0,2) eq $byte1_2)
@@ -527,7 +527,7 @@ my $count=1000;
 			seek $fh,(($_ & 0b10)?	$size[ $_>>4 ]+$pad:
 						$size[ $_>>4 ]		),1;
 			$frames++;
-			unless ($count--) { $count=1000; Gtk2->main_iteration while Gtk2->events_pending; }
+			unless ($count--) { $count=100; Gtk2->main_iteration while Gtk2->events_pending; }
 		}
 		else #skip
 		{	#@_=unpack "B8B8",$byte1_2; warn "@_ ".tell($fh)."\n";	#DEBUG
