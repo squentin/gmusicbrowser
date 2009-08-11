@@ -2004,15 +2004,17 @@ sub PopupContextMenu
 	::PopupContextMenu($menu, $hash);
 }
 
-sub PopupOpt
+sub PopupOpt	#Only for FilterList #FIXME should be moved in FilterList::, and/or use a common function with FilterList::PopupContextMenu
 {	my ($but,$event)=@_;
 	my $self=::find_ancestor($but,__PACKAGE__);
 	$::LEvent=$event;
 	my $nb=$self->{notebook};
 	my $page=$nb->get_nth_page( $nb->get_current_page );
-	my $mainfield=Songs::MainField($page->{col});
+	my $field=$page->{field}[0];
+	my $mainfield=Songs::MainField($field);
 	my $aa= ($mainfield eq 'artist' || $mainfield eq 'album') ? $mainfield : undef; #FIXME
-	::PopupContextMenu(\@MenuPageOptions, { self=>$page, aa=>$aa, col => $page->{col}, usemenupos => 1,} );
+	my $mode= uc(substr $page->{mode},0,1); # C => cloud, M => mosaic, L => list
+	::PopupContextMenu(\@MenuPageOptions, { self=>$page, aa=>$aa, field => $field, mode => $mode, subfield => $field, depth =>0, usemenupos => 1,} );
 	return 1;
 }
 
