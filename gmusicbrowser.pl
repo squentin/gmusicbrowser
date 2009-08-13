@@ -5744,7 +5744,7 @@ sub NewPrefEntry
 	$hbox->pack_start($entry,0,FALSE,2);
 	$sizeg1->add_widget($label) if $sizeg1;
 	$sizeg2->add_widget($entry) if $sizeg2;
-#	$label->set_alignment(0,.5);
+	$label->set_alignment(0,.5);
 
 	$Tooltips->set_tip($entry, $tip) if defined $tip;
 	$entry->set_visibility(0) if $hide;
