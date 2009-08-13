@@ -5038,9 +5038,10 @@ sub PrefAudio
 		$EQbut->signal_connect(clicked => sub {Layout::Window->new('Equalizer');});
 		my $EQcheck=NewPrefCheckButton(gst_use_equalizer => _"Use Equalizer", sub { HasChanged('Equalizer'); });
 		$sg1->add_widget($EQcheck);
+		$sg2->add_widget($EQbut);
 		my $EQbox=Hpack($EQcheck,$EQbut);
 		$EQbox->set_sensitive(0) unless $PlayPacks{Play_GST} && $PlayPacks{Play_GST}{EQ};
-		my $RGbox=Play_GST::RGA_PrefBox($sg1);
+		my $RGbox=Play_GST::RGA_PrefBox($sg1,$sg2);
 		my $adv2=PrefAudio_makeadv('Play_GST','gstreamer');
 		my $albox=Gtk2::Alignment->new(0,0,1,1);
 		$albox->set_padding(0,0,15,0);
@@ -5080,10 +5081,11 @@ sub PrefAudio
 		NewPrefCheckButton(IgnorePlayError => _"Ignore playback errors",undef,_"Skip to next song if an error occurs");
 	return $vbox;
 }
+
 sub PrefAudio_makeadv
 {	my ($package,$name)=@_;
 	$package=$PlayPacks{$package};
-	my $hbox=Gtk2::HBox->new(FALSE, 2);
+	my $hbox=Gtk2::HBox->new(TRUE, 2);
 	if (1)
 	{	my $label=Gtk2::Label->new;
 		$label->signal_connect(realize => sub	#delay finding supported formats because mplayer is slow
@@ -5602,7 +5604,7 @@ sub NewPrefEntry
 	if (defined $text)
 	{	$widget=Gtk2::HBox->new;
 		my $label=Gtk2::Label->new($text);
-		#	$label->set_alignment(0,.5);
+		$label->set_alignment(0,.5);
 		$widget->pack_start($label,FALSE,FALSE,2);
 		$widget->pack_start($entry,0,FALSE,2);
 		$sg1->add_widget($label) if $sg1;

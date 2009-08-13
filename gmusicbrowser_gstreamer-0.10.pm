@@ -584,11 +584,12 @@ sub RGA_stop
 	::Progress('replaygain', abort=>1);
 }
 sub RGA_PrefBox
-{	my $sg1=shift;
+{	my ($sg1,$sg2)=@_;
 	my $check=::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain",undef,_"Normalize volume (the files must have replaygain tags)");
 	$sg1->add_widget($check);
 	#my $start=Gtk2::Button->new(_ "Start ReplayGain analysis");
 	my $opt  =Gtk2::Button->new(_"ReplayGain options");
+	$sg2->add_widget($opt);
 	$opt->signal_connect(clicked => sub
 		{	if ($RG_dialog) {$RG_dialog->present;return}
 			$RG_dialog= Gtk2::Dialog->new (_"ReplayGain options", undef, [], 'gtk-close' => 'close');
