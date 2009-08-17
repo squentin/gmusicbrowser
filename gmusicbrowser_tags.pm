@@ -511,7 +511,7 @@ return $self if @IDs>1000;
 	{	my $menu=Gtk2::Menu->new;
 		my $menu_cb=sub {$self->add_column($_[1])};
 		for my $f ( Songs::EditFields('per_id') )
-		{	my $item=Gtk2::CheckMenuItem->new( Songs::FieldName($f) );
+		{	my $item=Gtk2::CheckMenuItem->new_with_label( Songs::FieldName($f) );
 			$item->set_active(1) if $self->{'pfcheck_'.$f};
 			$item->signal_connect(activate => $menu_cb,$f);
 			$menu->append($item);

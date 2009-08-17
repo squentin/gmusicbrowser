@@ -2885,7 +2885,7 @@ sub PopupAA
 		  else	#multiple artists -> create a submenu for each artist
 		  {	my $menu=Gtk2::Menu->new;
 			for my $artist (keys %art_keys)
-			{	my $item=Gtk2::MenuItem->new($artist);
+			{	my $item=Gtk2::MenuItem->new_with_label($artist);
 				$item->set_submenu(PopupAA('album', list=> $art_keys{$artist}));
 				$menu->append($item);
 			}
@@ -3107,7 +3107,7 @@ sub Breakdown_List
 		{	my ($start,$end,$c1,$c2)=@$ref;
 			$c1=ucfirst$c1; $c2=ucfirst$c2;
 			$c1.='-'.$c2 if $c2 ne $c1;
-			my $item=Gtk2::MenuItem->new($c1);
+			my $item=Gtk2::MenuItem->new_with_label($c1);
 			my $submenu= &$makemenu($start,$end,$keys,$gids);
 			$item->set_submenu($submenu);
 			$menu->append($item);
@@ -3298,9 +3298,9 @@ sub PopupContextMenu	#FIXME rename to BuildContextMenu or BuildMenu
 					{	PopupContextMenu([{%$m,label=>$label,submenu=>$value}],$args,$submenu);
 						next;
 					}
-					my $item=Gtk2::MenuItem->new($label);
+					my $item=Gtk2::MenuItem->new_with_label($label);
 					if (defined $check)
-					{	$item=Gtk2::CheckMenuItem->new($label);
+					{	$item=Gtk2::CheckMenuItem->new_with_label($label);
 						if (ref $check)	{ $item->set_active(1) if grep $_ eq $value, @$check; }
 						else
 						{	$item->set_draw_as_radio(1);
@@ -4097,7 +4097,7 @@ sub AddToListMenu
 		my $menu=Gtk2::Menu->new;
 		for my $i ($start..$end)
 		{	my $l=$keys->[$i];
-			my $item=Gtk2::MenuItem->new($l);
+			my $item=Gtk2::MenuItem->new_with_label($l);
 			$item->signal_connect(activate => $menusub,$l);
 			$menu->append($item);
 		}
@@ -4182,7 +4182,7 @@ sub ArtistContextMenu
 	if (@$artists==1) { PopupAAContextMenu({%$params,gid=>$artists->[0]}); return; }
 	my $menu = Gtk2::Menu->new;
 	for my $ar (@$artists)
-	{	my $item=Gtk2::MenuItem->new($ar);
+	{	my $item=Gtk2::MenuItem->new_with_label($ar);
 		my $submenu= PopupAAContextMenu({%$params,gid=>$ar});
 		$item->set_submenu($submenu);
 		$menu->append($item);
@@ -7711,8 +7711,7 @@ sub new
 	my $list= $getlist{$type}();
 	for my $f (sort @$list)
 	{	$hash{$f}=$n;
-		my $item=Gtk2::MenuItem->new;
-		$item->add(Gtk2::Label->new($f));
+		my $item=Gtk2::MenuItem->new_with_label($f);
 		$item->{val}=$f;
 		$menuCombo->append($item);
 		$n++;
@@ -7917,7 +7916,7 @@ sub make_toolitem
 	my $titem=Gtk2::ToolItem->new;
 	$titem->add($widget);
 	$titem->set_tooltip($::Tooltips,$desc,'');
-	my $item=Gtk2::MenuItem->new($desc);
+	my $item=Gtk2::MenuItem->new_with_label($desc);
 	my $menu=Gtk2::Menu->new;
 	$item->set_submenu($menu);
 	$titem->set_proxy_menu_item($menu_item_id,$item);
@@ -7926,7 +7925,7 @@ sub make_toolitem
 	my $iter=$self->get_active_iter;
 	while ($iter)
 	{	my ($name,$val)=$store->get($iter,0,1);
-		$radioi=Gtk2::RadioMenuItem->new($radioi,$name);
+		$radioi=Gtk2::RadioMenuItem->new_with_label($radioi,$name);
 		$radioi->{value}=$val;
 		$menu->append($radioi);
 		$radioi->signal_connect(activate => sub

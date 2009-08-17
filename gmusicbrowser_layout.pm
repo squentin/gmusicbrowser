@@ -1163,7 +1163,7 @@ sub SortMenu
 	 {	my ($menu,$name,$sort,$true,$cb)=@_;
 		$cb||=$callback;
 		$true=($sort eq $check) unless defined $true;
-		my $item = Gtk2::CheckMenuItem->new($name);
+		my $item = Gtk2::CheckMenuItem->new_with_label($name);
 		$item->set_draw_as_radio(1);
 		$item->set_active($found=1) if $true;
 		$item->signal_connect (activate => $cb, $sort );
@@ -1217,7 +1217,7 @@ sub FilterMenu
 	{	next if $list eq 'Playlist';
 		my $filt=$::Options{SavedFilters}{$list}->{string};
 		my $text=$list; $text=~s/^_//;
-		my $item = Gtk2::CheckMenuItem->new($text);
+		my $item = Gtk2::CheckMenuItem->new_with_label($text);
 		$item->set_draw_as_radio(1);
 		$item->set_active(1) if defined $check && $filt eq $check;
 		$item->signal_connect ( activate =>  $item_callback ,$filt );
@@ -1234,7 +1234,7 @@ sub FilterMenu
 	{	my $submenu=Gtk2::Menu->new;
 		my $list_cb=sub { ::Select( 'sort' => '', staticlist => $_[1] ) };
 		for my $list (@SavedLists)
-		{	my $item = Gtk2::CheckMenuItem->new($list);
+		{	my $item = Gtk2::CheckMenuItem->new_with_label($list);
 			$item->set_draw_as_radio(1);
 			$item->set_active(1) if defined $::ListMode && $list eq $::ListMode;
 			$item->signal_connect( activate =>  $list_cb, $list );
@@ -1257,7 +1257,7 @@ sub VisualsMenu
 	my @l=Play_GST::list_visuals();
 	my $current=$::Options{gst_visual}||$l[0];
 	for my $v (@l)
-	{	my $item=Gtk2::CheckMenuItem->new($v);
+	{	my $item=Gtk2::CheckMenuItem->new_with_label($v);
 		$item->set_draw_as_radio(1);
 		$item->set_active(1) if $current eq $v;
 		$item->signal_connect (activate => $cb,$v);

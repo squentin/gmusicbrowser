@@ -89,7 +89,7 @@ sub make_sort_menu
 	my $menusub=sub { $songlist->Sort($_[1]) };
 	for my $name (sort keys %{$::Options{SavedSorts}})
 	{   my $sort=$::Options{SavedSorts}{$name};
-	    my $item = Gtk2::CheckMenuItem->new($name);
+	    my $item = Gtk2::CheckMenuItem->new_with_label($name);
 	    $item->set_draw_as_radio(1);
 	    $item->set_active(1) if $songlist->{sort} eq $sort;
 	    $item->signal_connect (activate => $menusub,$sort );
@@ -114,7 +114,7 @@ sub make_history_menu
 	   ::SetFilter($selfitem,$f);
 	 };
 	for my $f (@{ $::Options{RecentFilters} })
-	{	my $item = Gtk2::MenuItem->new( $f->explain );
+	{	my $item = Gtk2::MenuItem->new_with_label( $f->explain );
 		$item->signal_connect(activate => $menusub,$f);
 		$item->signal_connect(button_release_event => $mclicksub,$f);
 		$menu->append($item);
@@ -1866,7 +1866,7 @@ sub button_press_event_cb
 	for my $page ($nb->get_children)
 	{	my $pid=$page->{pid};
 		my $name=delete $pages{$pid};
-		my $item=Gtk2::MenuItem->new($name);
+		my $item=Gtk2::MenuItem->new_with_label($name);
 		$item->signal_connect(activate=>$cb,$nb->page_num($page));
 		$menu->append($item);
 	}
@@ -1877,7 +1877,7 @@ sub button_press_event_cb
 		$new->set_image( Gtk2::Image->new_from_stock('gtk-add','menu') );
 		my $submenu=Gtk2::Menu->new;
 		for my $pid (sort {$pages{$a} cmp $pages{$b}} keys %pages)
-		{	my $item=Gtk2::MenuItem->new($pages{$pid});
+		{	my $item=Gtk2::MenuItem->new_with_label($pages{$pid});
 			$item->signal_connect(activate=> sub { my $n=$self->AppendPage($pid); $self->{notebook}->set_current_page($n) });
 			$submenu->append($item);
 		}
