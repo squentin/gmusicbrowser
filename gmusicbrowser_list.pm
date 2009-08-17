@@ -182,12 +182,12 @@ sub button_press_event_cb
 }
 
 sub QueueUpdateFast
-{	my ($self,$fast)=@_;
+{	my $self=shift;
 	$self->{needupdate}=2;
 	::IdleDo('9_Total'.$self, 10, \&Update, $self);
 }
 sub QueueUpdateSlow
-{	my ($self,$fast)=@_;
+{	my $self=shift;
 	return if $self->{needupdate};
 	$self->{needupdate}=1;
 	my $maxdelay= $Modes{ $self->{mode} }{delay};
