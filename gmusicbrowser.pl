@@ -5553,9 +5553,10 @@ sub NewPrefRadio
 }
 sub NewPrefCheckButton
 {	my ($key,$text,$sub,$tip,$widget,$toolitem,$horizontal,$sizeg)=@_;
+	my $init= $Options{$key};
 	my $check=Gtk2::CheckButton->new($text);
 	$sizeg->add_widget($check) if $sizeg;
-	$check->set_active(1) if $Options{$key};
+	$check->set_active(1) if $init;
 	$check->signal_connect( toggled => sub
 	{	my $val=($_[0]->get_active)? 1 : 0;
 		SetOption($_[1],$val);
@@ -5576,19 +5577,21 @@ sub NewPrefCheckButton
 			$return=Vpack($check,$albox);
 		}
 		$check->{child}=$widget;
-		$widget->set_sensitive(0) unless $Options{$key};
+		$widget->set_sensitive(0) unless $init;
 	}
 	elsif ($toolitem)
 	{	my $titem=Gtk2::ToolItem->new;
 		$titem->add($check);
 		my $item=Gtk2::CheckMenuItem->new($text);
+		$item->set_active(1) if $init;
 		$titem->set_proxy_menu_item($key,$item);
 		$item->signal_connect(toggled => sub
 		{	return if $_[0]->{busy};
 			$check->set_active($_[0]->get_active);
 		});
 		$check->signal_connect( toggled => sub
-		{	$item->{busy}=1;
+		{	my $item=$_[0]->parent->retrieve_proxy_menu_item;
+			$item->{busy}=1;
 			$item->set_active($_[0]->get_active);
 			delete $item->{busy};
 		});
