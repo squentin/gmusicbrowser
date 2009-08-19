@@ -1298,6 +1298,7 @@ sub ActivatePlugin
 	my $ref=$Plugins{$plugin};
 	if ( $ref->{loaded} || do $ref->{file} )
 	{	$ref->{loaded}=1;
+		delete $ref->{error};
 		my $package='GMB::Plugin::'.$plugin;
 		if ($startup && $startup eq 'init')
 		{	if ($package->can('Init'))
