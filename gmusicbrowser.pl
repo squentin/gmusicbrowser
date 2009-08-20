@@ -5869,13 +5869,13 @@ sub SetFilter
 	$#$filters=$level+1;		#set higher level filters to undef by truncating the array
 	$filters->[0]= Filter->newadd(TRUE, map($filters->[$_], 1..$#$filters) ); #sum filter
 	AddToFilterHistory( $filters->[0] );
-	for my $r ( @{$FilterWatchers{$group}} ) { $r->{'UpdateFilter_'.$group}($r,$Filters{$group}[0],$group,$level) };
+	for my $r ( @{$FilterWatchers{$group}} ) { $r->{'UpdateFilter_'.$group}($r,$Filters{$group}[0],$level,$group) };
 }
 sub RefreshFilters
 {	my ($object,$group)=@_;
 	$group=$object->{group} unless defined $group;
 	$group=get_layout_widget($object)->{group} unless defined $group;
-	for my $r ( @{$FilterWatchers{$group}} ) { $r->{'UpdateFilter_'.$group}($r,$Filters{$group}[0],$group) };
+	for my $r ( @{$FilterWatchers{$group}} ) { $r->{'UpdateFilter_'.$group}($r,$Filters{$group}[0],undef,$group) };
 }
 sub AddToFilterHistory
 {	my $filter=$_[0];

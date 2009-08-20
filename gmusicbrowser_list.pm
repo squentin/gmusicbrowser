@@ -65,7 +65,7 @@ sub makeLockToggle
 		});
 	::set_drag($toggle, dest => [::DRAG_FILTER,sub {::SetFilter($_[0],$_[2],0);}]);
 	::WatchFilter($toggle,$opt1->{group},sub
-		{	my ($self,undef,$group)=@_;
+		{	my ($self,undef,undef,$group)=@_;
 			my $filter=$::Filters{$group}[0+1]; #filter for level 0
 			my $empty=Filter::is_empty($filter);
 			$self->{busy}=1;
@@ -1939,7 +1939,7 @@ sub SongsRemoved_cb
 }
 
 sub updatefilter
-{	my ($self,undef,undef,$nb)=@_;
+{	my ($self,undef,$nb)=@_;
 	delete $::ToDo{'9_FPfull'.$self};
 	my $force=delete $self->{needupdate};
 
