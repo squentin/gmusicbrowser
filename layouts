@@ -176,7 +176,7 @@ HBsearch	= FBox ResetFilter
 Type=S
 Default		= Window size=320x540
 Title		= _"Search"
-TBmain		= _"Artist" AASearch0(aa=artist,buttons=1) _"Album" AASearch1(aa=album,buttons=1) _"Song" SongSearch(activate=play,buttons=1)
+TBmain		= _"Artist" AASearch0(aa=artists,buttons=1) _"Album" AASearch1(aa=album,buttons=1) _"Song" SongSearch(activate=play,buttons=1)
 DefaultFocus	= TBmain
 
 [Quick Search]

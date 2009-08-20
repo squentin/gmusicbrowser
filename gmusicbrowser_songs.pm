@@ -1828,9 +1828,10 @@ sub GetIDs
 
 sub GrepKeys
 {	my ($field,$string,$list)=@_;
-	my $re= $field eq 'artist' ? qr/\Q$string\E/i : qr/^[^\x00]*\Q$string\E/i;
+	my $re=qr/\Q$string\E/i;
 	$list||=GetAAList($field);
-	my @l=grep m/$re/, @$list;
+	my $displaysub=Songs::DisplayFromGID_sub($field);
+	my @l=grep $displaysub->($_)=~m/$re/i, @$list;	#FIXME optimize ?
 	return \@l;
 }
 

@@ -2375,8 +2375,7 @@ sub get_fill_data
 	}
 	else { @list=keys %$href; }
 	if (defined $search && $search ne '')
-	{	my $displaysub=Songs::DisplayFromGID_sub($type);
-		@list=grep $displaysub->($_)=~m/\Q$search\E/i, @list;	#FIXME optimize ?
+	{	@list= @{ AA::GrepKeys($type,$search,\@list) };
 	}
 	AA::SortKeys($type,\@list,$self->{'sort'});
 
@@ -3582,31 +3581,34 @@ sub new
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('automatic','automatic');
 	::set_biscrolling($sw);
-	my $store=Gtk2::ListStore->new('Glib::String');
-	$self->{treeview}=
-	 my $treeview=Gtk2::TreeView->new($store);
+	my $store=Gtk2::ListStore->new(FilterList::GID_TYPE);
+	my $treeview= $self->{treeview}= Gtk2::TreeView->new($store);
 	$treeview->set_headers_visible(::FALSE);
-	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
-		( '', CellRendererAA->new, 'text',0)
-		);
+	my $renderer= CellRendererGID->new;
+	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes('', $renderer, gid=>0) );
 	my $sub=\&Enqueue;
 	$sub=\&AddToPlaylist if $opt1->{activate} && $opt1->{activate} eq 'addplay';
 	$treeview->signal_connect( row_activated => $sub);
-	my $col='artist';
-	$col='album' if $opt1->{aa} && $opt1->{aa} eq 'album';
-	$self->{col}=$col;
-	$self->{picsize}=32; $self->{showinfo}=1;
 
-	my $drgsrc=$col eq 'album' ? ::DRAG_ALBUM : ::DRAG_ARTIST;
+	$self->{field}= $opt1->{aa} || 'artists';
+	$renderer->set(prop => [[$self->{field}],[1],[32],[0]], depth => 0);  # (field markup=1 picsize=32 icons=0)
+	$self->{drag_type}= Songs::FilterListProp( $self->{field}, 'drag') || ::DRAG_FILTER;
 	::set_drag($treeview, source =>
-	    [ $drgsrc,
+	    [ $self->{drag_type},
 	    sub
-	    {	my $treeview=$_[0];
+	    {	my $self=::find_ancestor($_[0],__PACKAGE__);
 		my @rows=$treeview->get_selection->get_selected_rows;
-		return $drgsrc,map $store->get_value($store->get_iter($_),0) , @rows;
+		my @gids=map $store->get_value($store->get_iter($_),0) , @rows;
+		if ($self->{drag_type} != ::DRAG_FILTER)	#return artist or album gids
+		{	return $self->{drag_type},@gids;
+		}
+		else
+		{	my @f=map Songs::MakeFilterFromGID( $self->{field}, $_ ), @gids;
+			my $filter= Filter->newadd(::FALSE, @f);
+			return ($filter? (::DRAG_FILTER,$filter->{string}) : undef);
+		}
 	    }]);
 
-	$self->{cmd}= $col eq 'artist' ? ':~:' : ':e:';
 	my $hbox1=Gtk2::HBox->new;
 	my $entry=Gtk2::Entry->new;
 	$entry->signal_connect(changed => \&EntryChanged_cb,0);
@@ -3635,8 +3637,8 @@ sub GetFilter
 	my $path=($treeview->get_cursor)[0];
 	return undef unless $path;
 	my $store=$treeview->get_model;
-	my $aa=$store->get( $store->get_iter($path) );
-	return Filter->new( $self->{col}.$self->{cmd}.$aa );
+	my $gid=$store->get_value( $store->get_iter($path),0 );
+	return Songs::MakeFilterFromGID( $self->{field}, $gid );
 }
 
 sub EntryChanged_cb
@@ -3647,8 +3649,8 @@ sub EntryChanged_cb
 	(($self->{treeview}->get_columns)[0]->get_cell_renderers)[0]->reset;
 	$store->clear;
 	return if !$force && 2>length $text;
-	my $list= AA::GrepKeys($self->{col}, $text);
-	AA::SortKeys($self->{col},$list,'alpha');
+	my $list= AA::GrepKeys($self->{field}, $text);
+	AA::SortKeys($self->{field},$list,'alpha');
 	$store->set($store->append,0,$_) for @$list;
 }
 
