@@ -214,8 +214,8 @@ my %objects=
 		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupContextMenu(\@::SongCMenu,{mode=> 'P', self=> $_[0], IDs => [$ID]}) if defined $ID;},
 		dragsrc => [::DRAG_ID,\&DragCurrentSong],
 		dragdest=> [::DRAG_ID,sub {::Select(song => $_[2]);}],
-	},
 		cursor	=> 'hand2',
+	},
 	Title_by =>
 	{	class	=> 'Layout::Label',
 		default_group => 'Play',
