@@ -2068,10 +2068,9 @@ sub init
 	else					{ $::ListPlay->Replace($last); }
 	 ::red(listmode=>$::ListMode);
 
-	my $watcher={};
-	::Watch($watcher, SongsChanged	=> \&SongsChanged_cb);
-	::Watch($watcher, SongsAdded	=> \&SongsAdded_cb);
-	::Watch($watcher, SongArray	=> \&SongArray_changed_cb);
+	::Watch(undef, SongsChanged	=> \&SongsChanged_cb);
+	::Watch(undef, SongsAdded	=> \&SongsAdded_cb);
+	::Watch(undef, SongArray	=> \&SongArray_changed_cb);
 	return $::ListPlay;
 }
 

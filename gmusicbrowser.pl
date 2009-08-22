@@ -995,10 +995,8 @@ if ($CmdLine{UseGnomeSession})
 
 #-------------INIT-------------
 
-{	my $mainWatch={};
-	Watch($mainWatch, SongArray	=> \&SongArray_changed);
-	my $NextWatch={};
-	Watch($NextWatch, $_	=> \&QueueUpdateNextSongs) for qw/Playlist Queue Sort Pos QueueAction/;
+{	Watch(undef, SongArray	=> \&SongArray_changed);
+	Watch(undef, $_	=> \&QueueUpdateNextSongs) for qw/Playlist Queue Sort Pos QueueAction/;
 }
 
 our ($Play_package,%PlayPacks); my $PlayNext_package;
@@ -5789,19 +5787,24 @@ sub SaveList
 
 sub Watch
 {	my ($object,$key,$sub)=@_;
+	unless ($object) { push @{$EventWatchers{$key}},$sub; return } #for permanent watch
 	warn "watch $key $object\n" if $debug;
-	push @{$EventWatchers{$key}},$object;
 	if ($object->{'WatchUpdate_'.$key})
 	{	warn "Warning : Object $object is already watching event $key => previous watch replaced\n";
 	}
+	else { push @{$EventWatchers{$key}},$object; weaken($EventWatchers{$key}[-1]); }
 	$object->{'WatchUpdate_'.$key}=$sub;
 	$object->signal_connect(destroy => \&UnWatch,$key) unless ref $object eq 'HASH' || !$object->isa('Gtk2::Object');
 }
 sub UnWatch
 {	my ($object,$key)=@_;
 	warn "unwatch $key $object\n" if $debug;
-	@{$EventWatchers{$key}}=grep $_ ne $object, @{$EventWatchers{$key}};
+	@{$EventWatchers{$key}}=grep defined && $_ != $object, @{$EventWatchers{$key}};
 	delete $object->{'WatchUpdate_'.$key};
+}
+sub UnWatch_all #for when destructing non-Gtk2::Object
+{	my $object=shift;
+	UnWatch($object,$_) for map m/^WatchUpdate_(.+)/, keys %$object;
 }
 
 sub HasChanged
@@ -5809,7 +5812,10 @@ sub HasChanged
 	return unless $EventWatchers{$key};
 	my @list=@{$EventWatchers{$key}};
 	warn "HasChanged $key -> updating @list\n" if $debug;
-	for my $r ( @list ) { my $sub=$r->{'WatchUpdate_'.$key}; $sub->($r,@args) if $sub; };
+	for my $r ( @list )
+	{	my ($sub,$o)= ref $r eq 'CODE' ? ($r) : ($r->{'WatchUpdate_'.$key},$r);
+		$sub->($o,@args) if $sub;
+	};
 }
 
 sub GetSelID
@@ -7729,9 +7735,8 @@ our @ArraysOfFiles;	#array of filenames that needs updating in case a folder is 
 my %Field_id;
 
 INIT
-{	$watcher={};
-	::Watch($watcher, Picture_artist => \&AAPicture_Changed);	#FIXME PHASE1
-	::Watch($watcher, Picture_album => \&AAPicture_Changed);	#FIXME PHASE1
+{	::Watch(undef, Picture_artist => \&AAPicture_Changed);	#FIXME PHASE1
+	::Watch(undef, Picture_album  => \&AAPicture_Changed);	#FIXME PHASE1
 }
 
 sub GetPicture
