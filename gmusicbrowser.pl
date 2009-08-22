@@ -644,14 +644,16 @@ our %Options=
 	Sort		=> 'shuffle',		#default sort order
 	Sort_LastOrdered=> 'path file',
 	Sort_LastSR	=> 'shuffle',
-	WSRename	=> '300 180',
-	WSMassRename	=> '650 550',
-	WSMassTag	=> '520 560',
-	WSAdvTag	=> '538 503',
-	WSSongInfo	=> '420 482',
-	WSEditSort	=> '600 320',
-	WSEditFilter	=> '600 260',
-	WSEditWRandom	=> '600 450',
+	WindowSizes	=>
+	{	Rename		=> '300x180',
+		MassRename	=> '650x550',
+		MassTag		=> '520x560',
+		AdvTag		=> '538x503',
+		SongInfo	=> '420x482',
+		EditSort	=> '600x320',
+		EditFilter	=> '600x260',
+		EditWRandom	=> '600x450',
+	},
 	Sessions	=> '',
 	StartCheck	=> 0,	#check if songs have changed on startup
 	StartScan	=> 0,	#scan @LibraryPath on startup for new songs
@@ -1398,6 +1400,7 @@ sub ReadOldSavedTags
 	delete $Options{$_} for grep m/^PLUGIN_MozEmbed/,keys %Options; #for versions <=1.0
 	delete $Options{$_} for grep m/^PLUGIN_WebContext_Disable/,keys %Options;
 	delete $Options{$_} for grep m/^Layout(?:LastSeen)?_/, keys %Options;
+	$Options{WindowSizes}{$_}= join 'x',split / /,delete $Options{"WS$_"} for map m/^WS(.*)/, keys %Options;
 	delete $Options{RecentFilters};	#don't bother upgrading them
 	$Options{FilenameSchema}=	[split /\x1D/,$Options{FilenameSchema}];
 	$Options{FolderSchema}=		[split /\x1D/,$Options{FolderSchema}];
@@ -1547,6 +1550,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		$re_artist=qr/$Options{ArtistSplit}/;
 		$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2  #DELME in v1.1.3/4
 		if ($oldversion<1.1003) { delete $Options{$_} for grep m/^Layout(?:LastSeen)?_/, keys %Options }	#for version <1.1.2  #DELME in v1.1.3/4
+		if ($oldversion<1.1003) { $Options{WindowSizes}{$_}= join 'x',split / /,delete $Options{"WS$_"} for map m/^WS(.*)/, keys %Options; }	#for version <1.1.2  #DELME in v1.1.3/4
 
 		Post_Options_init();
 
@@ -1814,10 +1818,10 @@ sub SetWSize
 {	my ($win,$wkey)=@_;
 	$win->set_role($wkey);
 	$win->set_name($wkey);
-	$wkey='WS'.$wkey;
-	$win->resize(split ' ',$Options{$wkey},2) if $Options{$wkey};
+	my $prevsize= $Options{WindowSizes}{$wkey};
+	$win->resize(split 'x',$prevsize,2) if $prevsize;
 	$win->signal_connect(unrealize => sub
-		{ $::Options{$_[1]}=join ' ',$_[0]->get_size; }
+		{ $Options{WindowSizes}{$_[1]}=join 'x',$_[0]->get_size; }
 		,$wkey);
 }
 
