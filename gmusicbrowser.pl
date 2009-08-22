@@ -1576,6 +1576,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		}
 		SongArray::updateIDs(\@newIDs);
 		my $filter=Filter->new('missing:e:0');
+		$Library=[];	#dummy array to avoid a warning when filtering in the next line
 		$Library= SongArray->new( $filter->filter([1..$Songs::LastID]) );
 	}
 
@@ -2113,7 +2114,7 @@ sub GetNextSongs
 		push @IDs,$RandomMode->Draw($nb,(defined $SongID? [$SongID] : undef));
 		last;
 	  }
-	  return undef unless @$ListPlay;
+	  return unless @$ListPlay;
 	  UpdateSort() if $ToDo{'8_updatesort'};
 	  my $pos;
 	  $pos=FindPositionSong( $IDs[-1],$ListPlay ) if @IDs;

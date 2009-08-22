@@ -1165,7 +1165,8 @@ sub drag_received_cb
 sub drag_motion_cb
 {	my ($tv,$context,$x,$y,$time)=@_;# warn "drag_motion_cb @_";
 	::drag_checkscrolling($tv,$context,$y);
-	my ($path,$pos)=$tv->get_dest_row_at_pos($x,$y);	#FIXME sometimes : "Gtk-CRITICAL **: gtk_tree_view_get_dest_row_at_pos: assertion `drag_x >= 0' failed"
+	return if $x<0 || $y<0;
+	my ($path,$pos)=$tv->get_dest_row_at_pos($x,$y);
 	if ($path)
 	{	$pos= ($pos=~m/after$/)? 'after' : 'before';
 	}
@@ -1683,8 +1684,9 @@ our @cMenu=
 		test => sub {my $fp=$_[0]{filterpane}; $fp->{nb}>1 && $_[0]{filter};}
 	},
 	#songs submenu :
-	{	label => sub { my $IDs=$_[0]{filter}->filter; ::__("%d Song","%d Songs",scalar @$IDs); },
+	{	label	=> sub { my $IDs=$_[0]{filter}->filter; ::__("%d Song","%d Songs",scalar @$IDs); },
 		submenu => sub { ::PopupContextMenu(\@::SongCMenu, { mode => 'F', IDs=>$_[0]{filter}->filter }); },
+		isdefined => 'filter',
 	},
 	{ label=> _"Rename folder", code => sub { ::AskRenameFolder($_[0]{utf8pathlist}[0]); }, onlyone => 'utf8pathlist',	test => sub {!$::CmdLine{ro}}, },
 	{ label=> _"Open folder", code => sub { ::openfolder($_[0]{utf8pathlist}[0]); }, onlyone => 'utf8pathlist', },
