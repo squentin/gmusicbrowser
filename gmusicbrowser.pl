@@ -1367,11 +1367,12 @@ sub FirstTime
 
 	if (-r $DATADIR.SLASH.'gmbrc')
 	{	open my($fh),'<:utf8', $DATADIR.SLASH.'gmbrc';
-		while (my $line=<$fh>)
-		{	chomp $line;
-			$Options{$1}=$2 if $line=~m/^\s*([^#=][^=]*?)\s*=\s*(.+)\s*$/;
-		}
+		my @lines=<$fh>;
 		close $fh;
+		chomp @lines;
+		my $opt={};
+		ReadRefFromLines(\@lines,$opt);
+		%Options= ( %Options, %$opt );
 	}
 
 	$re_artist=qr/ & |, /;
