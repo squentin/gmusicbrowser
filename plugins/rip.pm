@@ -27,11 +27,19 @@ my %Programs= #id => [name,cmd]
 	custom => [_"custom"],
 );
 
+my %button_definition=
+(	class	=> 'Layout::Button',
+	stock	=> 'plugin-rip',
+	tip	=> _"Launch ripping program",
+	activate=> \&Launch,
+	autoadd_type	=> 'button main',
+);
+
 sub Start
-{	ExtraWidgets::AddWidget(OPT.'button','button',\&CreateButton);
+{	Layout::RegisterWidget(PluginRip=>\%button_definition);
 }
 sub Stop
-{	ExtraWidgets::RemoveWidget(OPT.'button');
+{	Layout::RegisterWidget('PluginRip');
 }
 
 sub prefbox
@@ -49,11 +57,6 @@ sub prefbox
 	$entry->set_sensitive( $::Options{OPT.'program'} eq 'custom' );
 	$vbox->pack_start($_,::FALSE,::FALSE,2) for $combo,$entry;
 	return $vbox;
-}
-
-sub CreateButton
-{	my $button=::NewIconButton('plugin-rip',undef,\&Launch);
-	return $button;
 }
 
 sub Launch

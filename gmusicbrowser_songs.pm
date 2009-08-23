@@ -1948,11 +1948,11 @@ sub save_to_string
 {	return join ' ',map sprintf("%d",$_), @{$_[0]};	#use sprintf so that the numbers are not stringified => use more memory
 }
 
-sub GetName  #not used for now, remove ?
+sub GetName
 {	my $self=$_[0];
 	my $sl=$::Options{SavedLists};
 	my ($name)= grep $sl->{$_}==$self, keys %$sl;
-	return $name;	#might be undef or a special name (starts with \x00)
+	return $name;	#might be undef
 }
 
 sub RemoveIDsFromAll		#could probably be improved

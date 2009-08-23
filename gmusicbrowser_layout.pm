@@ -43,7 +43,7 @@ my @MainMenu=
 	{label => _"Quit",		code => \&::Quit,	stockicon => 'gtk-quit' },
 );
 
-my %objects=
+our %Widgets=
 (	Prev =>
 	{	class	=> 'Layout::Button',
 		#size	=> SIZE_BUTTONS,
@@ -78,17 +78,19 @@ my %objects=
 	Playlist =>
 	{	class	=> 'Layout::Button',
 		oldopt1 => 'toggle',
+		options => 'toggle',
 		stock	=> 'gmb-playlist',
 		tip	=> _"Open Browser window",
-		activate=> sub {::Playlist($_[0]{opt1})},
+		activate=> sub {::Playlist($_[0]{toggle})},
 		click3	=> sub {Layout::Window->new($::Options{LayoutB});},
 	},
 	BContext =>
 	{	class	=> 'Layout::Button',
 		oldopt1 => 'toggle',
+		options => 'toggle',
 		stock	=> 'gtk-info',
 		tip	=> _"Open Context window",
-		activate=> sub {::ContextWindow($_[0]{opt1})},
+		activate=> sub {::ContextWindow($_[0]{toggle})},
 		click3	=> sub {Layout::Window->new('Context');},
 	},
 	Pref =>
@@ -108,27 +110,27 @@ my %objects=
 	},
 	LockArtist =>
 	{	class	=> 'Layout::Button',
-		nobutton=> undef,
+		button	=> 0,
 		size	=> SIZE_FLAGS,
 		state	=> sub { ($::TogLock && $::TogLock eq 'first_artist')? 'on' : 'off' },
-		stock	=> { on => 'gmb-lock', off => ['','gmb-locklight'] },
+		stock	=> { on => 'gmb-lock', off => '. gmb-locklight' },
 		tip	=> _"Lock on Artist",
 		click1	=> sub {::ToggleLock('first_artist');},
 		event	=> 'Lock',
 	},
 	LockAlbum =>
 	{	class	=> 'Layout::Button',
-		nobutton=> undef,
+		button	=> 0,
 		size	=> SIZE_FLAGS,
 		state	=> sub { ($::TogLock && $::TogLock eq 'album')? 'on' : 'off' },
-		stock	=> { on => 'gmb-lock', off => ['','gmb-locklight'] },
+		stock	=> { on => 'gmb-lock', off => '. gmb-locklight' },
 		tip	=> _"Lock on Album",
 		click1	=> sub {::ToggleLock('album');},
 		event	=> 'Lock',
 	},
 	Sort =>
 	{	class	=> 'Layout::Button',
-		nobutton=> undef,
+		button	=> 0,
 		size	=> SIZE_FLAGS,
 		state	=> sub { my $s=$::Options{'Sort'};($s=~m/^random:/)? 'random' : ($s eq 'shuffle')? 'shuffle' : 'sorted'; },
 		stock	=> { random => 'gmb-random', shuffle => 'gmb-shuffle', sorted => 'gtk-sort-ascending' },
@@ -139,7 +141,7 @@ my %objects=
 	},
 	Filter =>
 	{	class	=> 'Layout::Button',
-		nobutton=> undef,
+		button	=> 0,
 		size	=> SIZE_FLAGS,
 		state	=> sub { defined $::ListMode ? 'list'
 			: $::SelectedFilter->is_empty ? 'library' : 'filter'; },
@@ -155,14 +157,14 @@ my %objects=
 	},
 	Queue =>
 	{	class	=> 'Layout::Button',
-		nobutton=> undef,
+		button	=> 0,
 		size	=> SIZE_FLAGS,
 		state	=> sub  { @$::Queue?	 'queue' :
 				  $::QueueAction? $::QueueAction :
 						 'noqueue'
 				},
 		stock	=> sub  {$_[0] eq 'queue'  ?	'gmb-queue' :
-				 $_[0] eq 'noqueue'?	['','gmb-queue'] :
+				 $_[0] eq 'noqueue'?	'. gmb-queue' :
 							$::QActions{$_[0]}[1] ;
 				},
 		tip	=> sub { ::CalcListLength($::Queue,'queue')
@@ -175,7 +177,7 @@ my %objects=
 	},
 	Vol =>
 	{	class	=> 'Layout::Button',
-		nobutton=> undef,
+		button	=> 0,
 		state	=> sub { ::GetMute() ? 'm' : ::GetVol() },
 		stock	=> sub { 'gmb-vol'.( $_[0] eq 'm' ? 'm' : int(($_[0]-1)/100*$::NBVolIcons) );  },
 		tip	=> sub { _("Volume : ").::GetVol().'%' },
@@ -189,11 +191,11 @@ my %objects=
 	Label =>
 	{	class	=> 'Layout::Label',
 		oldopt1 => sub { 'text',$_[0] },
-		default_group => 'Play',
+		group	=> 'Play',
 	},
 	Pos =>
 	{	class	=> 'Layout::Label',
-		default_group => 'Play',
+		group	=> 'Play',
 		initsize=> ::__("%d song in queue","%d songs in queue",99999), #longest string that will be displayed
 		click1	=> sub { ::ChooseSongs(undef,::GetNeighbourSongs(5)) unless $::RandomMode || @$::Queue; },
 		update	=> sub  { my $t=(@$::ListPlay==0)	?	'':
@@ -206,7 +208,7 @@ my %objects=
 	},
 	Title =>
 	{	class	=> 'Layout::Label',
-		default_group => 'Play',
+		group	=> 'Play',
 		minsize	=> 20,
 		markup	=> '<b><big>%S</big></b>%V',
 		markup_empty => '<b><big>&lt;'._("Playlist Empty").'&gt;</big></b>',
@@ -218,7 +220,7 @@ my %objects=
 	},
 	Title_by =>
 	{	class	=> 'Layout::Label',
-		default_group => 'Play',
+		group	=> 'Play',
 		minsize	=> 20,
 		markup	=> ::__x(_"{song} by {artist}",song => "<b><big>%S</big></b>%V", artist => "<b>%a</b>"),
 		markup_empty => '<b><big>&lt;'._("Playlist Empty").'&gt;</big></b>',
@@ -229,7 +231,7 @@ my %objects=
 	},
 	Artist =>
 	{	class	=> 'Layout::Label',
-		default_group => 'Play',
+		group	=> 'Play',
 		minsize	=> 20,
 		markup	=> '<b>%a</b>',
 		click1	=> sub { ::PopupAA('artists'); },
@@ -239,7 +241,7 @@ my %objects=
 	},
 	Album =>
 	{	class	=> 'Layout::Label',
-		default_group => 'Play',
+		group	=> 'Play',
 		minsize	=> 20,
 		markup	=> '<b>%l</b>',
 		click1	=> sub { my $ID=::GetSelID($_[0]); ::PopupAA( 'album', from=> Songs::Get_gid($ID,'artists')) if defined $ID; },
@@ -249,18 +251,18 @@ my %objects=
 	},
 	Date =>
 	{	class	=> 'Layout::Label',
-		default_group => 'Play',
+		group	=> 'Play',
 		markup	=> ' %y',
 		markup_empty=> '',
 	},
 	Comment =>
 	{	class	=> 'Layout::Label',
-		default_group => 'Play',
+		group	=> 'Play',
 		markup	=> '%C',
 	},
 	Length =>
 	{	class	=> 'Layout::Label',
-		default_group => 'Play',
+		group	=> 'Play',
 		initsize=>	::__x( _" of {length}", 'length' => "XX:XX"),
 		markup	=>	::__x( _" of {length}", 'length' => "%m" ),
 		markup_empty=>	::__x( _" of {length}", 'length' => "0:00" ),
@@ -268,18 +270,18 @@ my %objects=
 	},
 	LabelTime =>
 	{	class	=> 'Layout::Label',
-		default_group => 'Play',
+		group	=> 'Play',
 		xalign	=> 1,
-		options => 'remaining',
+		saveoptions => 'remaining',
 		initsize=> '-XX:XX',
 #		font	=> 'Monospace',
 		event	=> 'Time',
-		click1 => sub { $_[0]{remaining}=!$_[0]{remaining}; $_[0]{'ref'}{update}->(); },
+		click1	=> sub { $_[0]{remaining}=!$_[0]{remaining}; $_[0]{update}->($_[0]); },
 		update	=> sub { $_[0]->set_label( ::TimeString($_[0]{remaining}) ) unless $_[0]{busy}; },
 	},
 	Scale =>
 	{	class	=> 'Layout::Bar::Scale',
-		default_group => 'Play',
+		group	=> 'Play',
 		event	=> 'Time',
 		update	=> sub { $_[0]->set_val($::PlayTime); },
 		fields	=> 'length',
@@ -290,7 +292,7 @@ my %objects=
 	},
 	TimeBar =>
 	{	class	=> 'Layout::Bar',
-		default_group => 'Play',
+		group	=> 'Play',
 		event	=> 'Time',
 		update	=> sub { $_[0]->set_val($::PlayTime); },
 		fields	=> 'length',
@@ -329,13 +331,13 @@ my %objects=
 							Songs::Set($ID, rating => $_[1])
 						  });
 				},
-		default_group => 'Play',
+		group	=> 'Play',
 		fields	=> 'rating',
 		schange	=> sub	{ my $r=(defined $_[1])? Songs::Get($_[1],'rating') : 0; $_[0]->set($r); },
 	},
 	Cover =>
 	{	class	=> 'Layout::AAPicture',
-		default_group => 'Play',
+		group	=> 'Play',
 		aa	=> 'album',
 		oldopt1 => 'maxsize',
 		schange	=> sub { my $key=(defined $_[1])? Songs::Get_gid($_[1],'album') : undef ; $_[0]->set($key); },
@@ -349,7 +351,7 @@ my %objects=
 	},
 	ArtistPic =>
 	{	class	=> 'Layout::AAPicture',
-		default_group => 'Play',
+		group	=> 'Play',
 		aa	=> 'artist',
 		oldopt1 => 'maxsize',
 		schange	=> sub { my $key=(defined $_[1])? Songs::Get_gid($_[1],'artists') : undef ;$_[0]->set($key); },
@@ -362,7 +364,7 @@ my %objects=
 	},
 	LabelsIcons =>
 	{	New	=> sub { Gtk2::Table->new(1,1); },
-		default_group => 'Play',
+		group	=> 'Play',
 		fields	=> 'label',
 		schange	=> \&UpdateLabelsIcon,
 		update	=> \&UpdateLabelsIcon,
@@ -372,17 +374,53 @@ my %objects=
 	Filler =>
 	{	New	=> sub { Gtk2::HBox->new; },
 	},
+	QueueList =>
+	{	New	=> sub { $_[0]{type}='Q'; SongList::Common->new($_[0]); },
+		tabtitle=> _"Queue",
+		tabicon	=> 'gmb-queue',
+		issonglist=>1,
+	},
+	PlayList =>
+	{	New	=> sub { $_[0]{type}='A'; SongList::Common->new($_[0]); },
+		tabtitle=> _"Playlist",
+		tabicon	=> 'gtk-media-play',
+		issonglist=>1,
+	},
 	SongList =>
-	{	New	=> sub { $_[0]{type}||='B';SongList->new($_[0],$_[1]); },
-		oldopt1 => 'mode',			 #for version <0.9475
-		oldopt2 => 'sort cols colwidth',
+	{	New	=> sub { SongList->new($_[0]); },
+		oldopt1 => 'mode',
+		issonglist=>1,
 	},
 	SongTree =>
-	{	New	=> sub { $_[0]{type}||='B';SongTree->new($_[0],$_[1]); },
+	{	New	=> sub { SongTree->new($_[0]); },
+		issonglist=>1,
+	},
+	EditList =>
+	{	New 	=> sub { $_[0]{type}='L'; SongList->new($_[0]); },
+		tabtitle=> \&SongList::Common::MakeTitleLabel,
+		tabrename=>\&SongList::Common::RenameTitleLabel,
+		tabicon	=> 'gmb-list',
+		issonglist=>1,
+	},
+	TabbedLists =>
+	{	class	=> 'Layout::NoteBook',
+		EndInit => \&Layout::NoteBook::EndInit,
+		default_child => 'PlayList',
+		#these options will be passed to songlist/songtree children :
+		options_for_list => 'songlist songtree sort songxpad songypad no_typeahead cols grouping',
+	},
+	Context =>
+	{	class	=> 'Layout::NoteBook',
+		EndInit => \&Layout::NoteBook::EndInit,
+		group	=> 'Play',
+		typesubmenu=> 'C',
+		match	=> 'context page',
+		#these options will be passed to context children :
+		options_for_context => 'group',
 	},
 	AABox	=>
 	{	class	=> 'GMB::AABox',
-		oldopt1	=> sub { 'aa='.( $_[0] ? 'artist' : 'album' ) } #for version <0.9479
+		oldopt1	=> sub { 'aa='.( $_[0] ? 'artist' : 'album' ) },
 	},
 	FPane	=>
 	{	class	=> 'FilterPane',
@@ -394,37 +432,45 @@ my %objects=
 	Total	=>
 	{	class	=> 'LabelTotal',
 		oldopt1 => 'mode',
+		saveoptions=> 'mode',
 	},
 	FBox	=>
 	{	New => \&Browser::makeFilterBox,
 		dragdest => [::DRAG_FILTER,sub { ::SetFilter($_[0],$_[2]);}],
 	},
-	FLock	=>	{ New => \&Browser::makeLockToggle,},
-	HistItem =>	{ New => sub { Gtk2::MenuItem->new(_"Recent Filters"); },
-			  setmenu => \&Browser::make_history_menu,
+	FLock	=>	{ New		=> \&Browser::makeLockToggle,},
+	HistItem =>	{ New		=> \&Layout::MenuItem::new,
+			  label		=> _"Recent Filters",
+			  setmenu	=> \&Browser::make_history_menu,
 			},
-	PlayItem =>	{ New => sub { Gtk2::MenuItem->new(_"Playing"); },
-			  setmenu => \&Browser::make_playing_menu,
+	PlayItem =>	{ New		=> \&Layout::MenuItem::new,
+			  label		=> _"Playing",
+			  setmenu	=> \&Browser::make_playing_menu,
 			},
-	LSortItem =>	{ New => sub { Gtk2::MenuItem->new(_"Sort"); },
-			  setmenu => \&Browser::make_sort_menu,
+	LSortItem =>	{ New		=> \&Layout::MenuItem::new,
+			  label		=> _"Sort",
+			  setmenu	=> \&Browser::make_sort_menu,
 			},
-	PSortItem =>	{ New => sub { Gtk2::MenuItem->new(_"Play order"); },
-			  setmenu => sub {SortMenu();},
+	PSortItem =>	{ New		=> \&Layout::MenuItem::new,
+			  label		=> _"Play order",
+			  setmenu	=> sub {SortMenu();},
 			},
-	PFilterItem =>	{ New => sub { Gtk2::MenuItem->new(_"Playlist filter"); },
-			  setmenu => sub {FilterMenu();},
+	PFilterItem =>	{ New		=> \&Layout::MenuItem::new,
+			  label		=> _"Playlist filter",
+			  setmenu	=> sub {FilterMenu();},
 			},
-	QueueItem =>	{ New => sub { Gtk2::MenuItem->new(_"Queue"); },
-			  setmenu => sub{ my $m=::PopupContextMenu(\@MenuQueue,{ID=>$::SongID}); },
+	QueueItem =>	{ New		=> \&Layout::MenuItem::new,
+			  label		=> _"Queue",
+			  setmenu	=> sub{ my $m=::PopupContextMenu(\@MenuQueue,{ID=>$::SongID}); },
 			},
-	MainMenuItem =>	{ New => sub { Gtk2::MenuItem->new(_"Main"); },
-			  setmenu => sub{ my $m=::PopupContextMenu(\@MainMenu); },
+	MainMenuItem =>	{ New		=> \&Layout::MenuItem::new,
+			  label		=> _"Main",
+			  setmenu	=> sub{ my $m=::PopupContextMenu(\@MainMenu); },
 			},
-	MenuItem =>	{ New => \&Layout::MenuItem::new,
+	MenuItem =>	{ New		=> \&Layout::MenuItem::new,
 			},
 	SeparatorMenuItem=>
-			{ New => sub { Gtk2::SeparatorMenuItem->new },
+			{ New		=> sub { Gtk2::SeparatorMenuItem->new },
 			},
 	Refresh =>
 	{	class	=> 'Layout::Button',
@@ -454,13 +500,6 @@ my %objects=
 		tip	=> _"Reset filter",
 		activate=> sub { ::SetFilter($_[0],undef); },
 	},
-	QueueList =>
-	{	New	=> sub { $_[0]{type}='Q'; return SongList->new($_[0],$_[1],$::Queue); }
-	},
-	Context =>
-	{	class	=> 'GMB::Context',
-		default_group => 'Play',
-	},
 	TogButton =>
 	{	class	=> 'Layout::TogButton',
 	},
@@ -480,7 +519,8 @@ my %objects=
 	{	class	=> 'Layout::Button',
 		stock	=> 'gmb-random-album',
 		tip	=> _"Choose Random Album",
-		activate=> sub { my $al=AA::GetAAList('album'); my $r=int rand(@$al); my $key=$al->[$r]; my $list=AA::GetIDs('album',$key); if (my $ac=$_[0]{opt1}{action}) { ::DoActionForList($ac,$list); } else { my $ID=::FindFirstInListPlay($list); ::Select( song => $ID)}; },
+		options => 'action',
+		activate=> sub { my $al=AA::GetAAList('album'); my $r=int rand(@$al); my $key=$al->[$r]; my $list=AA::GetIDs('album',$key); if (my $ac=$_[0]{action}) { ::DoActionForList($ac,$list); } else { my $ID=::FindFirstInListPlay($list); ::Select( song => $ID)}; },
 		click3	=> sub { my @list; my $al=AA::GetAAList('album'); my $nb=5; while ($nb--) { my $r=int rand(@$al); push @list, splice(@$al,$r,1); last unless @$al; } ::PopupAA('album', list=>\@list, format=> ::__x( _"{album}\n<small>by</small> {artist}", album => "%a", artist => "%b"));  },
 	},
 	AASearch =>
@@ -492,9 +532,6 @@ my %objects=
 	SimpleSearch =>
 	{	class	=> 'SimpleSearch',
 		dragdest=> [::DRAG_FILTER,sub { ::SetFilter($_[0],$_[2]);}],
-	},
-	TabbedLists =>
-	{	class	=> 'TabbedLists',
 	},
 	Visuals		=>
 	{	New	=> sub {my $darea=Gtk2::DrawingArea->new; $darea->set_size_request(200,50); return $darea unless $::Packs{Play_GST} && $::Packs{Play_GST}{visuals}; Play_GST::add_visuals($darea); my $eb=Gtk2::EventBox->new; $eb->add($darea); return $eb},
@@ -517,7 +554,8 @@ my %objects=
 	{	class	=> 'Layout::Button',
 		stock	=> 'gmb-queue-window',
 		tip	=> _"Open Queue window",
-		activate=> sub {::EditQueue($_[0]{opt1})},
+		options => 'toggle',
+		activate=> sub {::EditQueue($_[0]{toggle})},
 	},
 	Fullscreen	=>
 	{	class	=> 'Layout::Button',
@@ -525,6 +563,8 @@ my %objects=
 		tip	=> _"Toggle fullscreen mode",
 		activate=> \&::ToggleFullscreenLayout,
 		#activate=> \&ToggleFullscreen,
+		autoadd_type	=> 'button main',
+		autoadd_option	=> 'AddFullscreenButton',
 	},
 	Repeat	=>
 	{	New => sub { Gtk2::CheckButton->new(_"Repeat"); },
@@ -536,14 +576,15 @@ my %objects=
 	{	New => \&AddLabelEntry,
 	},
 	LabelToggleButtons =>
-	{	class => 'Layout::LabelToggleButtons',
-		default_group => 'Play',
+	{	class	=> 'Layout::LabelToggleButtons',
+		group	=> 'Play',
 		schange	=> \&Layout::LabelToggleButtons::update_song,
 	},
 	PlayOrderCombo =>
-	{	New => \&PlayOrderComboNew,
-		event => 'Sort SavedWRandoms SavedSorts',
+	{	New	=> \&PlayOrderComboNew,
+		event	=> 'Sort SavedWRandoms SavedSorts',
 		update	=> \&PlayOrderComboUpdate,
+		reqwidth=> 100,
 	},
 	Progress =>
 	{	class => 'Layout::Progress',
@@ -678,64 +719,113 @@ sub ParseSongTreeSkin
 	}
 }
 
-sub SaveOptions		#Save options for this layout by collecting options of its widgets
-{	my ($self,@states)=@_;
-	#warn "saving ".$self->{layout}." layout options\n";
-
-	for my $key (keys %{ $self->{widgets} })
-	{	my $w=$self->{widgets}{$key};
-		my $opt=$w->{SaveOptions};
-		if ($opt)
-		{	$opt=$opt->($w) if ref $opt;
+sub GetDefaultLayoutOptions
+{	my $layout=$_[0];
+	my %default;
+	my $options= $Layout::Layouts{$layout}{Default} || '';
+	if ($options=~m/^\w+\(/) #new format (v1.1.2)
+	{	for my $nameopt (::ExtractNameAndOptions($options))
+		{	$default{$1}=$2 if $nameopt=~m/^(\w+)\((.+)\)$/;
 		}
-		elsif ( my $optkeys=$w->{'ref'}{options} )
-		{	$opt= { map { $_=>$w->{$_} } grep defined $w->{$_}, split / /,$optkeys };
-		}
-		if (ref $opt)	#array or hash => to string
-		{	$opt=+{@$opt} if ref $opt eq 'ARRAY';
-			$opt=join ',',map $_.'='.$opt->{$_}, sort keys %$opt;
-		}
-		push @states,$key,$opt if defined $opt && $opt=~m#\S#;
 	}
-	warn "Options of $self->{layout} = @states\n" if $::debug;
-	return $::Options{'Layout_'.$self->{layout}}=join ' ',@states;
+	else	# old format (version <1.1.2)
+	{	#warn "Old options format not supported for layout $layout => ignored\n";
+		#$opt2={};
+		my @optlist=split /\s+/,$options;
+		unshift @optlist,'Window' if @optlist%2;	#very old format (v<0.9573)
+		%default= @optlist;
+	}
+	$_=::ParseOptions($_) for values %default;
+	return \%default;
 }
 
-sub Pack
+sub SaveWidgetOptions		#Save options for this layout by collecting options of its widgets
+{	my @widgets=@_;
+	my %states;
+	for my $widget (@widgets)
+	{	my $key=$widget->{name};
+		return unless $key;
+		my $opt;
+		if (my $sub=$widget->{SaveOptions})
+		{	my @opt=$sub->($widget);
+			$opt= @opt>1 ? {@opt} : $opt[0];
+		}
+		if (my $keys=$widget->{options_to_save})
+		{	$opt->{$_}=$widget->{$_} for grep defined $widget->{$_}, split / /,$keys;
+		}
+		next unless $opt;
+		if (!ref $opt) { warn "invalid options returned from $key\n";next }
+		$opt=+{@$opt} if ref $opt eq 'ARRAY';
+		next unless keys %$opt;
+		$states{$key}=$opt;
+	}
+	if ($::debug)
+	{	warn "Saving widget options :' :\n";
+		for my $key (sort keys %states)
+		{	warn "  $key:\n";
+			warn "    $_ = $states{$key}{$_}\n" for sort keys %{$states{$key}};
+		}
+	}
+	return \%states;
+}
+
+sub InitLayout
 {	my ($self,$layout,$opt2)=@_;
 	$self->{layout}=$layout;
 	$self->set_name($layout);
 
 	my $boxes=$Layouts{$layout};
 	$self->{KeyBindings}=::make_keybindingshash($boxes->{KeyBindings}) if $boxes->{KeyBindings};
-	my $widgets=$self->{widgets}={};
-
+	$self->{widgets}={};
+	$self->{global_options}{default_group}=$self->{group};
 	for (qw/SkinPath SkinFile DefaultFont Window/)
-	{	$self->{layout_options}{$_}=$boxes->{$_} if exists $boxes->{$_};
+	{	$self->{global_options}{$_}=$boxes->{$_} if exists $boxes->{$_};
 	}
 	my $border_width=2; #default border width
-	if (my $wopt=$self->{layout_options}{Window})
+	if (my $wopt=$self->{global_options}{Window})
 	{	$border_width=$1 if $wopt=~m/\bborderwidth=(\d+)\b/;
 		$self->set_skip_pager_hint(1) && $self->set_skip_taskbar_hint(1) if $wopt=~m/\bskip=1\b/;
 	}
 	$self->set_border_width($border_width);
 
+	my $mainwidget= $self->CreateWidgets($boxes,$opt2);
+	return unless $mainwidget;
+	$self->add($mainwidget);
+
+	if (my $name=$boxes->{DefaultFocus})
+	{	$self->SetFocusOn($name);
+	}
+}
+
+sub CreateWidgets
+{	my ($self,$boxes,$opt2)=@_;
+	if ($self->{layoutdepth} && $self->{layoutdepth}>10) { warn "Too many imbricated layouts\n"; return }
+	$self->{layoutdepth}++;
+	my $widgets=$self->{widgets};
 
 	# create boxes
 	my @boxlist;
+	my $defaultgroup= $self->{global_options}{default_group};
 	for my $key (keys %$boxes)
-	{	my $type=substr $key,0,2;
+	{	my $fullname=$key;
+		my $type=substr $key,0,2;
 		$type=$Layout::Boxes::Boxes{$type};
 		next unless $type;
 		my $line=$boxes->{$key};
-		my $opt1;
+		my $opt1={};
 		if ($line=~m#^\(#)
 		{	$opt1=::ExtractNameAndOptions($line);
 			$line=~s#^\s+##;
 			$opt1=~s#^\(##; $opt1=~s/\)$//;
 			$opt1= ::ParseOptions($opt1);
 		}
-		my $box=$widgets->{$key}= $type->{New}( $opt1,$opt2->{$key} );
+		my $opt2=$opt2->{$key} || {};
+		%$opt1= (group=>'',%$opt1,%$opt2);
+		my $group=$opt1->{group};
+		$opt1->{group}= $defaultgroup.(length $group ? "-$group" : '') unless $group=~m/^[A-Z]/;
+		my $box=$widgets->{$key}= $type->{New}( $opt1 );
+		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle/;
+		$box->{name}=$fullname;
 		$box->set_border_width($opt1->{border}) if $opt1 && exists $opt1->{border} && $box->isa('Gtk2::Container');
 		$box->set_name($key);
 		push @boxlist,$key,$line;
@@ -747,20 +837,33 @@ sub Pack
 		my $type=substr $key,0,2;
 		$type=$Layout::Boxes::Boxes{$type};
 		my $box=$widgets->{$key};
-		my @names= $type->{Parse}?	$type->{Parse}( $box, $line )
-					 :	::ExtractNameAndOptions($line,$type->{Prefix});
+		my @names= ::ExtractNameAndOptions($line,$type->{Prefix});
 		for my $name (@names)
-		{	my @packoptions;
-			($name,@packoptions)=@$name if ref $name;
+		{	my $packoptions;
+			($name,$packoptions)=@$name if ref $name;
 			my $opt1;
-			$opt1=$1 if $name=~s/\((.*)\)$//; #remove (...) and put it in $extra
-			my $wg=$widgets->{$name} ||= $self->NewObject($name,$opt1,$opt2->{$name});
-			unless ($wg) { delete $widgets->{$name}; next; }
-			if ($wg->parent) {warn "layout error: $name already has a parent -> can't put it in $key\n"; next;}
-
-			#$self->{'songlist'.$wg->{group}}=$wg if $wg->isa('SongList') || $wg->isa('SongTree');
-			$type->{Pack}( $box,$wg,@packoptions );
+			$opt1=$1 if $name=~s/\((.*)\)$//; #remove (...) and put it in $opt1
+			my $widget= $widgets->{$name};
+			my $placeholder;
+			if (!$widget)	#create widget if doesn't exist yet (only boxes have already been created)
+			{	$widget= NewWidget($name,$opt1,$opt2->{$name},$self->{global_options});
+				if ($widget) { $self->{widgets}{$name}=$widget; }
+				else
+				{	$placeholder={name => $name, opt2=>$opt2->{$name}, };
+				}
+			};
+			if ($widget)
+			{	if ($widget->parent) {warn "layout error: $name already has a parent -> can't put it in $key\n"; next;}
+				$type->{Pack}( $box,$widget,$packoptions );
+			}
+			elsif ($placeholder)
+			{	$placeholder->{opt1}=$opt1;
+				$placeholder->{defaultgroup}=$defaultgroup;
+				$placeholder=Layout::PlaceHolder->new( $type,$box,$placeholder,$packoptions);
+				$self->{PlaceHolders}{$name}=$placeholder if $placeholder;
+			}
 		}
+		$type->{EndInit}($box) if $type->{EndInit};
 	}
 
 	for my $key (grep m/^[HV]Size/, keys %$boxes)
@@ -784,32 +887,14 @@ sub Pack
 	}
 	$self->signal_connect_after(key_press_event => \&KeyPressed);
 
-	my @noparentboxes=grep m/^(?:[HVM][BP]|[ETFS]B|FR|AB)/ && !$widgets->{$_}->parent, keys %$boxes;
-	if	(@noparentboxes==0) {warn "layout empty\n" if $::debug; return;}
+	$self->{layoutdepth}--;
+	my @noparentboxes=grep m/^(?:[HV][BP]|[AMETNFSW]B|FR)/ && !$widgets->{$_}->parent, keys %$boxes;
+	if	(@noparentboxes==0) {warn "layout empty\n"; return;}
 	elsif	(@noparentboxes!=1) {warn "layout error: (@noparentboxes) have no parent -> can't find toplevel box\n"}
-	$self->add( $widgets->{ $noparentboxes[0] } );
-
-	if (my $name=$boxes->{DefaultFocus})
-	{	$self->SetFocusOn($name);
-	}
-
-	if (my $line=$boxes->{ExtraWidgets})
-	{	my @l=split /\s+/,$line;
-		while (@l>1)
-		{	my $type=shift @l;
-			my $key=shift @l;
-			my $opt;
-			$opt=::ParseOptions($1) if $key=~s#\((.*)\)$##;
-			my $packsub=$Layout::Boxes::Boxes{substr $key,0,2}{Pack};
-			my $box=$widgets->{$key};
-			next unless $box;
-			ExtraWidgets::SetupContainer($box,$type,$packsub,$opt);
-		}
-	}
-
+	return $widgets->{ $noparentboxes[0] };
 }
 
-sub Parse_opt1_2
+sub Parse_opt1
 {	my ($opt,$oldopt)=@_;
 	my %opt;
 	if (defined $opt)
@@ -825,58 +910,60 @@ sub Parse_opt1_2
 	return \%opt;
 }
 
-sub NewObject
-{	my ($self,$name,$opt1,$opt2)=@_;
+sub NewWidget
+{	my ($name,$opt1,$opt2,$global_opt)=@_;
 	my $namefull=$name;
 	$name=~s/\d+$//;
-	my $import;
-	#$import=$1 if $name=~s/^(\w+):://;
-	my $ref=$objects{$name};
-	unless ($ref) { warn "layout error : unknown object '$name'\n"; return undef; }
-	#warn $name;
-	$opt1=Parse_opt1_2($opt1,$ref->{oldopt1});
-	$opt2=Parse_opt1_2($opt2,$ref->{oldopt2});
-	my $group= $opt1->{group} || $ref->{default_group} || '';
-	$group= $self->{group}."_$group" unless $group=~m/^[A-Z]/;	#group local to window unless it begins with uppercase
-	$opt1->{group}=$group;
-	my $widget= $ref->{class}
-		? $ref->{class}->new($opt1,$opt2,$ref, $self->{layout_options})
-		: $ref->{New}($opt1,$opt2);
-	if ($ref->{options})
-	{	for my $key (split / /,$ref->{options})
-		{	$widget->{$key}= (exists $opt2->{$key}) ?
-					$opt2->{$key} : $opt1->{$key};
-		}
+	my $ref;
+	$global_opt ||={};
+	if ($name=~m/^@(.+)$/)
+	{	$ref= {	class => 'Layout::Embedded', };
+		$global_opt={ %$global_opt, layout=>$1 };
 	}
-	$widget->{group}=$group;
-	$widget->{'ref'}=$ref;
+	else { $ref=$Widgets{$name} }
+	unless ($ref) { return undef; }
+	$opt1=Parse_opt1($opt1,$ref->{oldopt1}) unless ref $opt1;
+	$opt2||={};
+	my %options= (group=>'', %$ref, %$opt1, %$opt2, name=>$namefull, %$global_opt);
+	my $group= $options{group};		#FIXME make undef group means parent's group ?
+	my $defaultgroup= $options{default_group} || 'default_group';
+	$options{group}= $defaultgroup.(length $group ? "-$group" : '') unless $group=~m/^[A-Z]/;	#group local to window unless it begins with uppercase
+	my $widget= $ref->{class}
+		? $ref->{class}->new(\%options,$ref)
+		: $ref->{New}(\%options);
+	return unless $widget;
+	$widget->{$_}= $options{$_} for 'group',split / /, ($ref->{options} || '');
+	$widget->{$_}=$options{$_} for grep exists $options{$_}, qw/tabtitle tabicon tabrename/;
+	$widget->{options_to_save}=$ref->{saveoptions} if $ref->{saveoptions};
+
 	$widget->{name}=$namefull;
 	$widget->set_name($name);
 
-	$widget->{actions}{$_}=$ref->{$_}  for grep m/^click/, keys %$ref;
-	$widget->{actions}{$_}=$opt1->{$_} for grep m/^click/, keys %$opt1;
+	$widget->{actions}{$_}=$options{$_}  for grep m/^click\d+/, keys %options;
 	$widget->signal_connect(button_press_event => \&Button_press_cb) if $widget->{actions};
-	if ($widget->isa('Gtk2::Button') and my $activate= ($opt1->{activate} || $ref->{activate}))
-	{	$widget->{actions}{activate}=$activate;
+	if ($widget->isa('Gtk2::Button') and $options{activate})
+	{	$widget->{actions}{activate}=$options{activate};
 		$widget->signal_connect(clicked => \&Button_activate_cb);
 	}
-	if (my $cursor= ($opt1->{cursor}||$ref->{cursor}))
+	if (my $cursor=$options{cursor})
 	{	$widget->signal_connect(realize => sub { $_[0]->window->set_cursor(Gtk2::Gdk::Cursor->new($_[1])); },$cursor);
 	}
 
 	my %towatch;
-	my $tip= $ref->{tip};
-	$tip= $opt1->{tip} if exists $opt1->{tip} && (!$tip || !ref $tip);
-	if ( defined $tip && !ref $tip)
-	{	my @fields=::UsedFields($tip);
+	my $tip= $options{tip};
+	if ( defined $tip)
+	{  if (!ref $tip)
+	   {	my @fields=::UsedFields($tip);
 		$towatch{$_}=undef for @fields;
 		if (@fields) { $widget->{tip}=$tip; }
 		else
 		{	$tip=~s#\\n#\n#g;
 			$::Tooltips->set_tip( $widget, $tip );
 		}
+	   }
+	   else { $widget->{tip}=$tip; }
 	}
-	if ($opt1->{hover_layout}) { $widget->{$_}=$opt1->{$_} for qw/hover_layout hover_delay/; Layout::Window::Popup::set_hover($widget); }
+	if ($options{hover_layout}) { $widget->{$_}=$options{$_} for qw/hover_layout hover_delay/; Layout::Window::Popup::set_hover($widget); }
 	if (my $f=$ref->{fields})
 	{	$towatch{$_}=undef for split / /,$f;
 	}
@@ -884,7 +971,8 @@ sub NewObject
 	{	$towatch{$_}=undef for ::UsedFields($widget->{markup});
 	}
 	if ($ref->{schange} || (keys %towatch))
-	{	::WatchSelID($widget,\&UpdateSongID,\%towatch);
+	{	$widget->{schange}=$ref->{schange} if $ref->{schange};
+		::WatchSelID($widget,\&UpdateSongID,\%towatch);
 		UpdateSongID($widget,::GetSelID($widget));
 	}
 	if ($ref->{event})
@@ -893,13 +981,31 @@ sub NewObject
 		$sub->($widget) unless $ref->{noinit};
 	}
 	::set_drag($widget,source => $ref->{dragsrc}, dest => $ref->{dragdest});
+	$ref->{EndInit}($widget) if $ref->{EndInit};
 	return $widget;
+}
+
+sub RegisterWidget
+{	my ($name,$hash)=@_;
+	my $action;
+	if ($hash)
+	{	if ($Widgets{$name} && $Widgets{$name}!=$hash) { warn "Widget $name already registered\n"; return }
+		$Widgets{$name}=$hash;
+		::HasChanged(Widgets=>'new',$name);
+	}
+	else
+	{	::HasChanged(Widgets=>'remove',$name);
+		delete $Widgets{$name};
+	}
+}
+sub WidgetChangedAutoAdd
+{	my $name=shift;
+	::HasChanged(Widgets=>'option',$name) if $Widgets{$name};
 }
 
 sub UpdateObject
 {	my $widget=$_[0];
-	my $ref=$widget->{'ref'};
-	if ( my $tip=$ref->{tip} )
+	if ( my $tip=$widget->{tip} )
 	{	$tip=&$tip if ref $tip;
 		$::Tooltips->set_tip($widget,$tip);
 	}
@@ -931,10 +1037,10 @@ sub Button_activate_cb
 sub UpdateSongID
 {	my ($widget,$ID)=@_;
 	for my $w ($widget)
-	{	$w->{ref}{schange}($w,$ID) if $w->{ref} && $w->{ref}{schange};
+	{	$w->{schange}($w,$ID) if $w->{schange};
 		if ($w->{markup})
 		{	if (defined $ID) { $w->set_markup(::ReplaceFieldsAndEsc( $ID,$w->{markup} )); }
-			elsif ($w->{markup_empty}) { $w->set_markup($w->{markup_empty}); }
+			elsif (defined $w->{markup_empty}) { $w->set_markup($w->{markup_empty}); }
 			else { $w->set_markup(''); }
 		}
 		if ($w->{tip})
@@ -1087,10 +1193,10 @@ sub RemoveFilter
 }
 
 sub PlayOrderComboNew
-{	my $opt1=$_[0];
+{	my $opt=$_[0];
 	my $store=Gtk2::ListStore->new(('Glib::String')x3);
 	my $combo=Gtk2::ComboBox->new($store);
-	$combo->set_size_request($opt1->{reqwidth}||100,-1);
+	$combo->set_size_request($opt->{reqwidth},-1);
 	my $cell=Gtk2::CellRendererPixbuf->new;
 	$combo->pack_start($cell,0);
 	$combo->add_attribute($cell,stock_id => 2);
@@ -1273,9 +1379,8 @@ sub NewMenuBar
 	 {	return 0 if $_[0]{busy};
 		$_[0]{busy}=1;
 		for my $item ($_[0]->get_children)
-		{	my $ref=$item->{'ref'};
-			next unless $ref->{setmenu};
-			my $submenu= $ref->{setmenu}($item);
+		{	next unless $item->{setmenu};
+			my $submenu= $item->{setmenu}($item);
 			$item->set_submenu($submenu);
 			$submenu->show_all;
 		};
@@ -1332,22 +1437,23 @@ sub PopupSongsFromAlbum
 }
 
 ####################################
+
 package Layout::Window;
 use Gtk2;
 our @ISA;
 BEGIN {push @ISA,'Layout';}
 use base 'Gtk2::Window';
 
-my $WindowCounter=0;	#used to give an unique group id to windows
-
 sub new
-{	my ($class,$layout,$wintype,$options,$fallback)=@_;
-	$fallback||='Small player';
-	$wintype||='toplevel';
+{	my ($class,$layout,%options)=@_;
+	my $fallback=delete $options{fallback} || 'Lists, Library & Context';
+	my $wintype= delete $options{wintype} || 'toplevel';
 	my $self=bless Gtk2::Window->new($wintype), $class;
 	$self->set_role($layout);
-	$self->{options}=$options;
-	$self->{group}='w'.$WindowCounter++;
+	$self->{options}=\%options;
+	$self->{name}='Window';
+	$self->{SaveOptions}=\&SaveWindowOptions;
+	$self->{group}= ucfirst($self);
 	::Watch($self,Save=>\&SaveOptions);
 	$self->set_title(::PROGRAM_NAME);
 	#$self->signal_connect (show => \&show_cb);
@@ -1381,21 +1487,11 @@ sub new
 		$layout=$fallback; #FIXME if not a player window
 		$Layout::Layouts{$layout} ||= { VBmain=>'Label(text="Error : fallback layout not found")' };	#create an error layout if fallback not found
 	}
-	my $opt2;
-	{	my $options= $::Options{'Layout_'.$layout} || $Layout::Layouts{$layout}{Default} || '';
-		my @optlist=split /\s+/,$options;
-		my $wopt;
-		$wopt=shift @optlist if @optlist%2;	#old format (v<0.9573)
-		$opt2= {@optlist};
-		$opt2->{Window}||=$wopt||'';
-	}
-	$self->Pack($layout,$opt2);
+	my $opt2=$::Options{Layouts}{$layout};
+	$opt2||= Layout::GetDefaultLayoutOptions($layout);
+	$self->InitLayout($layout,$opt2);
 	$self->SetWindowOptions($opt2->{Window});
 	if (my $skin=$Layout::Layouts{$layout}{Skin}) { $self->set_background_skin($skin) }
-	#if (my $songlist=::GetSonglist($self))	#FIXME should be done for every new group
-	#{	::SetFilter($self,undef,0) unless $songlist->{type}=~m/[QL]/;
-	#	$songlist->FollowSong;
-	#}
 	$self->init;
 	::HasChanged('HiddenWidgets');
 	#$self->set_opacity($self->{opacity}) if exists $self->{opacity} && $self->{opacity}!=1;
@@ -1426,7 +1522,7 @@ sub set_background_skin
 {	my ($self,$skin)=@_;
 	my ($file,$crop,$resize)=split /:/,$skin;
 	#$self->set_decorated(0);
-	$self->{pixbuf}=Skin::_load_skinfile($file,$crop,$self->{layout_options});
+	$self->{pixbuf}=Skin::_load_skinfile($file,$crop,$self->{global_options});
 	return unless $self->{pixbuf};
 	$self->{resizeparam}=$resize;
 	$self->{skinsize}='0x0';
@@ -1482,63 +1578,60 @@ sub close_window
 }
 
 sub SaveOptions
-{	my $self=$_[0];
-	Layout::SaveOptions($self, $self->SaveWindowOptions );
+{	my $self=shift;
+	my $opt=Layout::SaveWidgetOptions($self,values %{ $self->{widgets} }, values %{ $self->{PlaceHolders} });
+	$::Options{Layouts}{$self->{layout}} = $opt;
 }
 sub SaveWindowOptions
 {	my $self=$_[0];
 	my %wstate;
 	$wstate{size}=join 'x',$self->get_size;
-	#unless ($self->{options} && $self->{options} eq 'DoNotSaveState')
-	{	$wstate{pos}=join 'x',$self->get_position;
-		$wstate{sticky}=1 if $self->{sticky};
+	#unless ($self->{options}{DoNotSaveState})
+	{	$wstate{sticky}=1 if $self->{sticky};
 		$wstate{fullscreen}=1 if $self->{fullscreen};
 		$wstate{ontop}=1 if $self->{ontop};
 		$wstate{below}=1 if $self->{below};
 		$wstate{nodecoration}=1 unless $self->get_decorated;
 		$wstate{skippager}=1 if $self->get_skip_pager_hint;
-		$wstate{skiptaskbar}=1 if $self->get_skip_taskbar_hint;
+		if ($self->{saved_position})
+		{	$wstate{pos}=$self->{saved_position};
+			$wstate{skiptaskbar}=1 if $self->{skip_taskbar_hint};
+		}
+		else
+		{	$wstate{pos}=join 'x',$self->get_position;
+			$wstate{skiptaskbar}=1 if $self->get_skip_taskbar_hint;
+		}
 	}
 	my $hidden=$self->{hidden};
 	if ($hidden && keys %$hidden)
 	{	$wstate{hidden}=join ':', %$hidden;
 	}
-	return Window=> (join ',',map $_.'='.$wstate{$_}, keys %wstate);
+	return \%wstate;
 }
 sub SetWindowOptions
 {	my ($self,$wopt)=@_;
 	my $layouthash= $Layout::Layouts{ $self->{layout} };
-	my ($x,$y,$width,$height,$sticky)=(-1,-1);
-	if ($wopt=~m/=/)
-	{	my %wstate= $wopt=~m/(\w+)=([^,]*)(?:,|$)/g;
-		if ($self->{options} && $self->{options}=~m/UseDefaultState/)
-		{	my %h= split /\s+/, ($layouthash->{Default}||'');
-			$wopt= $h{Window}||'';
-			#replace options by default
-			my @state= ($wopt=~m/(\w+)=([^,]*)(?:,|$)/g);
-			push @state, size=>$wstate{size} if $self->{options}=~m/KeepSize/;
-			%wstate= @state;
+	my ($x,$y,$width,$height)=(-1,-1);
+	if ($wopt)
+	{	if ($self->{options}{UseDefaultState})
+		{	my $default= Layout::GetDefaultLayoutOptions($self->{layout});
+			$default->{size}=$wopt->{size} if $self->{options}{KeepSize};
+			$wopt= $default; #replace options by default
 		}
-		($x,$y)=split 'x',$wstate{pos}  if $wstate{pos};
-		($width,$height)=split 'x',$wstate{size} if $wstate{size};
-		$sticky=1 if $wstate{sticky};
-		$self->fullscreen, $width=$height=undef if $wstate{fullscreen};
-		$self->set_keep_above(1) if $wstate{ontop};
-		$self->set_keep_below(1) if $wstate{below};
-		$self->set_decorated(0)  if $wstate{nodecoration};
-		$self->set_skip_pager_hint(1) if $wstate{skippager};
-		$self->set_skip_taskbar_hint(1) if $wstate{skiptaskbar};
-		#$self->{opacity}=$wstate{opacity} if defined $wstate{opacity};
-		$self->{hidden}={ $wstate{hidden}=~m/(\w+)(?::?(\d+x\d+))?/g } if $wstate{hidden};
-	}
-	else	#old format (v<0.9568)
-	{	my @wopt=split /,/,$wopt;
-		unshift @wopt,-1,-1 if @wopt<5;
-		($x,$y,$width,$height,$sticky)=@wopt;
+		($x,$y)=split 'x',$wopt->{pos}  if $wopt->{pos};
+		($width,$height)=split 'x',$wopt->{size} if $wopt->{size};
+		$self->stick if $wopt->{sticky};
+		$self->fullscreen, $width=$height=undef if $wopt->{fullscreen};
+		$self->set_keep_above(1) if $wopt->{ontop};
+		$self->set_keep_below(1) if $wopt->{below};
+		$self->set_decorated(0)  if $wopt->{nodecoration};
+		$self->set_skip_pager_hint(1) if $wopt->{skippager};
+		$self->set_skip_taskbar_hint(1) if $wopt->{skiptaskbar};
+		#$self->{opacity}=$wopt->{opacity} if defined $wopt->{opacity};
+		$self->{hidden}={ $wopt->{hidden}=~m/(\w+)(?::?(\d+x\d+))?/g } if $wopt->{hidden};
 	}
 	if ($width) { $self->resize($width,$height); }
 	else { $self->{natural_size}=1; $self->signal_connect('map' => sub {delete $_[0]->{natural_size}}); }
-	$self->stick if $sticky;
 	$self->set_gravity($layouthash->{gravity}) if $layouthash->{gravity};
 	if (my $scrn=Gtk2::Gdk::Screen->get_default)
 	 {$x=-1 if $x>$scrn->get_width || $y>$scrn->get_height}
@@ -1574,7 +1667,7 @@ BEGIN {push @ISA,'Layout','Layout::Window';}
 sub new
 {	my ($class,$layout,$widget)=@_;
 	$layout||=$::Options{LayoutT};
-	my $self=Layout::Window::new($class,$layout,'popup','UseDefaultState','info');	#'info' is the fallback layout
+	my $self=Layout::Window::new($class,$layout, wintype=>'popup',UseDefaultState=>1,fallback=>'info');	#'info' is the fallback layout
 
 	if ($widget)
 	{	$self->{popped_from}=$widget;
@@ -1672,7 +1765,7 @@ BEGIN {push @ISA,'Layout','Layout::Window';}
 sub new
 {	my ($class,$layout)=@_;
 	$layout||=$::Options{LayoutT};
-	my $self=Layout::Window::new($class,$layout,'popup','UseDefaultState');
+	my $self=Layout::Window::new($class,$layout,wintype=>'popup',UseDefaultState=>1);
 	$self->move( position($self) );
 	$self->show;
 	Glib::Timeout->add( 5000,sub {$self->destroy;0} );
@@ -1744,6 +1837,39 @@ sub position	#FIXME improve
 }
 =cut
 
+
+package Layout::Embedded;
+use base 'Gtk2::Frame';
+our @ISA;
+push @ISA,'Layout';
+
+sub new
+{	my ($class,$opt)=@_;
+	my $layout=$opt->{layout};
+	return undef unless $Layout::Layouts{$layout};
+	my $self=bless Gtk2::Frame->new, $class;
+	$self->set_shadow_type('none');
+	$self->{SaveOptions}=\&SaveEmbeddedOptions;
+	$self->{group}=$opt->{group};
+	my %children_opt;
+	for my $child_key (grep m#./.#, keys %$opt)
+	{	my ($child,$key)=split "/",$child_key,2;
+		$children_opt{$child}{$key}= $opt->{$child_key};
+	}
+	%children_opt=( %children_opt, %{$opt->{children_opt}} ) if $opt->{children_opt};
+	$self->InitLayout($layout,\%children_opt);
+	$self->{tabicon}=  $self->{tabicon}  || $Layout::Layouts{$layout}{stockicon};
+	$self->{tabtitle}= $self->{tabtitle} || $Layout::Layouts{$layout}{title} || $layout;
+	$self->show_all;
+	return $self;
+}
+
+sub SaveEmbeddedOptions
+{	my $self=shift;
+	my $opt=Layout::SaveWidgetOptions(values %{ $self->{widgets} }, values %{ $self->{PlaceHolders} });
+	return children_opt => $opt;
+}
+
 package Layout::Boxes;
 use Gtk2;
 
@@ -1761,19 +1887,24 @@ our %Boxes=
 		Pack	=> \&SBoxPack,
 	},
 	HP	=>
-	{	New	=> sub { PanedNew('Gtk2::HPaned',$_[1]); },
+	{	New	=> sub { PanedNew('Gtk2::HPaned',$_[0]); },
 		Prefix	=> qr/([_+]*)/,
 		Pack	=> \&PanedPack,
 	},
 	VP	=>
-	{	New	=> sub { PanedNew('Gtk2::VPaned',$_[1]); },
+	{	New	=> sub { PanedNew('Gtk2::VPaned',$_[0]); },
 		Prefix	=> qr/([_+]*)/,
 		Pack	=> \&PanedPack,
 	},
-	TB	=>	#tabbed
+	TB	=>	#tabbed	#deprecated
 	{	New	=> \&NewTB,
 		Prefix	=> qr/((?:"[^"]*[^\\]")|[^ ]*)\s+/,
 		Pack	=> \&PackTB,
+	},
+	NB	=>	#tabbed 2
+	{	New	=> sub { Layout::NoteBook->new(@_); },
+		Pack	=> \&Layout::NoteBook::Pack,
+		EndInit	=> \&Layout::NoteBook::EndInit,
 	},
 	MB	=>
 	{	New	=> \&Layout::NewMenuBar,
@@ -1784,7 +1915,7 @@ our %Boxes=
 		Pack	=> sub { $_[0]->get_submenu->append($_[1]); },
 	},
 	EB	=>
-	{	New	=> sub { my $self=Gtk2::Expander->new($_[0]{label}); $self->set_expanded($_[0]); $self->{SaveOptions}=sub { $_[0]->get_expanded; }; return $self; },
+	{	New	=> sub { my $self=Gtk2::Expander->new($_[0]{label}); $self->set_expanded($_[0]{expand}); $self->{SaveOptions}=sub { expand=>$_[0]->get_expanded; }; return $self; },
 		Pack	=> \&SimpleAdd,
 	},
 	FB	=>
@@ -1801,7 +1932,7 @@ our %Boxes=
 		Pack	=> sub { $_[0]->add_with_viewport($_[1]); },
 	},
 	AB	=>
-	{	New	=> sub { my @def=(.5,.5,1,1); my @opt=@{$_[0]}{qw/xalign yalign xscale yscale/}; for my $i (0..3) {$opt[$i]=$def[$i] unless defined $opt[$i]}; Gtk2::Alignment->new(@opt);},
+	{	New	=> sub { my %opt=(xalign=>.5, yalign=>.5, xscale=>1, yscale=>1, %{$_[0]}); Gtk2::Alignment->new(@opt{qw/xalign yalign xscale yscale/});},
 		Pack	=> \&SimpleAdd,
 	},
 	WB	=>
@@ -1815,14 +1946,14 @@ sub SimpleAdd
 }
 
 sub NewTB
-{	my ($opt1,$opt2)=@_;
+{	my ($opt)=@_;
 	my $nb=Gtk2::Notebook->new;
 	$nb->set_scrollable(::TRUE);
 	$nb->popup_enable;
 	#$nb->signal_connect( button_press_event => sub {return !::IsEventInNotebookTabs(@_);});
-	if ($opt1->{tabpos}) {$nb->set_tab_pos($opt1->{tabpos});}
-	if ($opt2 && $opt2=~m/page=(\d+)/) { $nb->{SetPage}=$1; }
-	$nb->{SaveOptions}=sub { 'page='.$_[0]->get_current_page };
+	if (my $p=$opt->{tabpos})	{ $nb->set_tab_pos($p); }
+	if (my $p=$opt->{page})		{ $nb->{SetPage}=$p; }
+	$nb->{SaveOptions}=sub { page => $_[0]->get_current_page };
 	return $nb;
 }
 sub PackTB
@@ -1856,24 +1987,26 @@ sub PanedPack
 
 sub PanedNew
 {	my ($class,$opt)=@_;
-	my $pane=$class->new;
-	($pane->{pos1},$pane->{pos2})=split /_/,$opt if $opt;
-	$pane->set_position($pane->{pos1}) if defined $pane->{pos1};
-	$pane->{SaveOptions}=sub { $_[0]{pos1}.'_'.$_[0]{pos2} };
-	$pane->signal_connect(size_allocate => \&Paned_size_cb ); #needed to correctly behave when a child is hidden
-	return $pane;
+	my $self=$class->new;
+	($self->{size1},$self->{size2})= split /-|_/, $opt->{size} if defined $opt->{size};
+	$self->set_position($self->{size1}) if defined $self->{size1};
+	$self->{SaveOptions}=sub { size => $_[0]{size1} .'-'. $_[0]{size2} };
+	$self->signal_connect(size_allocate => \&Paned_size_cb ); #needed to correctly behave when a child is hidden
+	return $self;
 }
 
 sub Paned_size_cb
 {	my ($self,$alloc)=@_;
 	$alloc=$self->isa('Gtk2::VPaned')? $alloc->height : $alloc->width;
-	if (defined $self->{pos1} && defined $self->{pos2} && $alloc != ($self->{pos1} + $self->{pos2}))
-	{	if    ($self->child1_resize && !$self->child2_resize)	{ $self->{pos1}=$alloc-$self->{pos2}; }
-		elsif ($self->child2_resize && !$self->child1_resize)	{ $self->{pos2}=$alloc-$self->{pos1}; }
-		else { my $diff=($alloc-$self->{pos1}-$self->{pos2}); $self->{pos1}+=$diff/2; $self->{pos2}+=$diff/2; }
-		$self->set_position( $self->{pos1} );
+	my $size1=$self->{size1};
+	my $size2=$self->{size2};
+	if (defined $size1 && defined $size2 && $alloc != ($size1 + $size2))
+	{	if    ($self->child1_resize && !$self->child2_resize)	{ $self->{size1}=$alloc-$size2; }
+		elsif ($self->child2_resize && !$self->child1_resize)	{ $self->{size2}=$alloc-$size1; }
+		else { my $diff= $alloc-$size1-$size2; $self->{size1}+=$diff/2; $self->{size2}+=$diff/2; }
+		$self->set_position( $self->{size1} );
 	}
-	else { $self->{pos1}=$self->get_position; $self->{pos2}=$alloc-$self->{pos1}; }
+	else { my $size1=$self->get_position; $self->{size1}=$size1; $self->{size2}=$alloc-$size1; }
 }
 
 sub Fixed_pack
@@ -1928,30 +2061,497 @@ sub size_allocate
 	}
 }
 
+package Layout::NoteBook;
+use Gtk2;
+use base 'Gtk2::Notebook';
+
+our @contextmenu=
+(	{ label => _"New list",		code => sub { $_[0]{self}->newtab('EditList',1,{songarray=>''}); },	type=> 'L', stockicon => 'gtk-add', },
+	{ label => _"Open Queue",	code => sub { $_[0]{self}->newtab('QueueList',1); },			type=> 'L', stockicon => 'gmb-queue',
+		test => sub { !grep $_->{name} eq 'QueueList', $_[0]{self}->get_children } },
+	{ label => _"Open Playlist",	code => sub { $_[0]{self}->newtab('PlayList',1); },			type=> 'L', stockicon => 'gtk-media-play',
+		test => sub { !grep $_->{name} eq 'PlayList', $_[0]{self}->get_children } },
+	{ label => _"Open existing list", code => sub { $_[0]{self}->newtab('EditList',1, {songarray=>$_[1]}); },	type=> 'L',
+		submenu => sub { my %h; $h{ $_->{array}->GetName }=1 for grep $_->{name}=~m/^EditList\d*$/, $_[0]{self}->get_children; return [grep !$h{$_}, ::GetListOfSavedLists()]; } },
+	{ label => _"Open page layout", code => sub { $_[0]{self}->newtab('@'.$_[1]); },		type=> 'P',
+		submenu => sub { Layout::get_layout_list('P') }, submenu_tree=>1, },
+	{ label => _"Open context page", code => sub { $_[0]{self}->newtab('@'.$_[1]); },		type=> 'C',
+		submenu => sub { $_[0]{self}->make_widget_list('context page'); },	submenu_reverse=>1,
+		code	=> sub { $_[0]{self}->newtab($_[1],1); },
+	},
+	{ label => _"Delete list", code => sub { $_[0]{page}->DeleteList; },	cat=> 'L',	test => sub { $_[0]{page}{name}=~m/^EditList\d*$/; } },
+	{ label => _"Rename",	code => \&pagerename_cb,				istrue => 'rename',},
+	{ label => _"Close",	code => sub { $_[0]{self}->close_tab($_[0]{page},1); },	istrue => 'close',	stockicon=> 'gtk-close',},
+);
+
+sub new
+{	my ($class,$opt)=@_;
+	my $self= bless Gtk2::Notebook->new, $class;
+	$self->set_scrollable(1);
+	$self->set_tab_hborder(0);
+	$self->set_tab_vborder(0);
+	$opt->{typesubmenu}='LPC' unless exists $opt->{typesubmenu};
+	$self->{$_}=$opt->{$_} for qw/group default_child match pages page typesubmenu/;
+	for my $class (qw/list context page/)	# option begining with list_ / context_ / page_ will be passed to children of this class
+	{	my @opt1;
+		if (my $optkeys=$opt->{'options_for_'.$class})	#no need for a prefix for these options
+		{	push @opt1, $_=> $opt->{$_} for grep exists $opt->{$_}, split / /,$optkeys;
+		}
+		push @opt1, $_=> $opt->{$class.'_'.$_} for map m/^${class}_(.+)/, keys %$opt;
+		$self->{children_opt1}{$class}={ @opt1 };
+	}
+	$self->signal_connect(switch_page => \&SwitchedPage);
+	$self->signal_connect(button_press_event => \&button_press_event_cb);
+	::Watch($self, SavedLists=> \&SavedLists_changed);
+	::Watch($self, Widgets => \&Widgets_changed_cb) if $self->{match};
+	$self->{groupcount}=0;
+	if (my $p=$opt->{tabpos})	{ $self->set_tab_pos($p); }
+	$self->{SaveOptions}=\&SaveOptions;
+	$self->{widgets}={};
+	$self->{widgets_opt}= $opt->{page_opt} ||={};
+	if (my $bl=$opt->{blacklist})
+	{	$self->{blacklist}{$_}=undef for split / +/, $bl;
+	}
+	return $self;
+}
+sub SaveOptions
+{	my $self=shift;
+	my $i= $self->get_current_page;
+	my @children= $self->get_children;
+	my @dyn_widgets=values %{ $self->{widgets} };
+	my @pages;
+	for my $child (@children)
+	{	my $name=$child->{name};
+		$name='+'.$name if grep $_==$child, @dyn_widgets;
+		push @pages,$name;
+	}
+	my @opt=
+	(	page	=> $pages[$i],
+		pages	=> join(' ',@pages),
+		page_opt=> Layout::SaveWidgetOptions( @dyn_widgets ),
+	);
+	if (my $bl=$self->{blacklist})
+	{	push @opt, blacklist=>join (' ',sort keys %$bl) if keys %$bl;
+	}
+	return @opt;
+}
+
+sub EndInit
+{	my $self=shift;
+	my %pagewidget;
+	$pagewidget{ $_->{name} }=$_ for $self->get_children;
+	if (my $pages=delete $self->{pages})
+	{	my @pagelist=split / +/,$pages;
+		$pagewidget{"+$_"}=$self->newtab($_) for map m/^\+(.+)$/, @pagelist;	#recreate dynamic pages (page name begin with +)
+		my $i=0;
+		$self->reorder_child($_,$i++) for grep $_, map $pagewidget{$_}, @pagelist;	#reorder pages to the saved order
+	}
+	if (my $name=delete $self->{page})	#restore selected tab
+	{	if (my $page= $pagewidget{$name})
+		{	$page->show;	 #needed to set as current page
+			$self->set_current_page( $self->page_num($page) );
+		}
+	}
+	$self->Widgets_changed_cb('init') if $self->{match};
+	$self->insert_default_page unless $self->get_children;
+}
+
+sub newtab
+{	my ($self,$name,$setpage,$opt2)=@_;
+	my $wtype= $name; $wtype=~s/\d+$//;
+	$wtype= $Layout::Widgets{$wtype} || {};
+	my $wclass= $wtype->{issonglist} ? 'list' : $name=~m/^@/ ? 'page' : 'context';
+	my $group=$self->{group};
+	$group= ucfirst($self).'-'.$self->{groupcount}++ if $wclass eq 'list'; # give songlist/songtree their own group
+	if ($opt2)	#new widget => use a new name not already used
+	{	my $n=0;
+		$n++ while $self->{widgets}{$name.$n} || $self->{widgets_opt}{$name.$n};
+		$name.=$n;
+	}
+	else { $opt2= $self->{widgets_opt}{$name}; }
+	return if $self->{widgets}{$name};
+
+	my $opt1= $self->{children_opt1}{$wclass} || {};
+	my $widget= Layout::NewWidget($name,$opt1,$opt2, {default_group=>$group});
+	return unless $widget;
+	$self->{widgets}{$name}=$widget;
+	$widget->{tabcanclose}=1;
+	delete $self->{blacklist}{$name};
+	$self->Pack($widget, $setpage);
+	$widget->show_all;
+	return $widget;
+}
+
+sub Pack
+{	my ($self,$wg,$setpage)=@_;
+	if (delete $self->{chooser_mode}) { $self->remove($_) for $self->get_children; }
+	my $label= $wg->{tabtitle};
+	$label=$wg->{name} unless defined $label; #FIXME ? what to do if no tabtitle given
+	$label= $label->($wg) if ref $label && ref $label eq 'CODE';
+	$label=Gtk2::Label->new($label) unless ref $label;
+	::weaken( $wg->{tab_page_label}=$label ) if $wg->{tabrename};
+
+	my $icon= $wg->{tabicon};
+	$icon=Gtk2::Image->new_from_stock($icon,'menu') if defined $icon;
+	my $close;
+	if ($wg->{tabcanclose})
+	{	$close=Gtk2::Button->new;
+		$close->set_relief('none');
+		$close->can_focus(0);
+		::weaken( $close->{page}=$wg );
+		$close->signal_connect(clicked => sub {my $page=$_[0]{page}; my $self=$page->parent; $self->close_tab($page,1);});
+		$close->add(Gtk2::Image->new_from_stock('gtk-close','menu'));
+		$close->set_size_request(Gtk2::IconSize->lookup('menu'));
+		$close->set_border_width(0);
+	}
+	my $tab=::Hpack('4',$icon,'2_', $label,$close);
+	$tab->set_spacing(0); #FIXME should be doable with a Hpack option
+	$self->append_page($wg,$tab);
+	$self->set_tab_reorderable($wg,1);
+	$tab->show_all;
+	$self->show_all;
+
+	$self->set_current_page( $self->get_n_pages-1 ) if $setpage; #set current page to the new page
+}
+
+sub insert_default_page
+{	my $self=shift;
+	return if $self->get_children;
+	$self->newtab( $self->{default_child} ) if $self->{default_child};
+	::IdleDo('5_create_chooser_page',500, \&create_chooser_page, $self) if !$self->get_children && $self->{match};
+}
+
+sub close_tab
+{	my ($self,$page,$manual)=@_;
+	my $name=$page->{name};
+	delete $self->{widgets}{$name};
+	if ($manual && $self->{match} && $Layout::Widgets{$name} && $Layout::Widgets{$name}{autoadd_type}) { $self->{blacklist}{$name}=undef }
+	my $opt=$self->{widgets_opt};
+	%$opt= ( %$opt, $name => Layout::SaveWidgetOptions($page) );
+	$self->remove($page);
+	$self->insert_default_page unless $self->get_children;
+}
+
+sub SavedLists_changed	#remove EditList tab if corresponding list has been deleted
+{	my ($self,$name,$action)=@_;
+	return unless $action && $action eq 'remove';
+	my @remove=grep $_->{name}=~m/^EditList\d*$/ && !defined $_->{array}->GetName, $self->get_children;
+	$self->close_tab($_) for @remove;
+}
+
+sub button_press_event_cb
+{	my ($self,$event)=@_;
+	return 0 if $event->button != 3;
+	return 0 unless ::IsEventInNotebookTabs($self,$event); #to make right-click on tab arrows work
+	my $pagenb=$self->get_current_page;
+	my $page=$self->get_nth_page($pagenb);
+	#my $listname= $page? $page->{tabbed_listname} : undef;
+	$::LEvent=$event;
+	my @menu;
+	my @opt=
+	(	self=> $self, page=> $page,	type => $self->{typesubmenu},
+		'close'=> $page->{tabcanclose}, 'rename' => $page->{tabrename},
+	);
+	push @menu, @contextmenu;
+	if (1 && !$self->{chooser_mode})
+	{	push @menu, { separator=>1 };
+		for my $page ($self->get_children)	#append page list to menu
+		{	my $label= $page->{tab_page_label} ? $page->{tab_page_label}->get_text : $page->{tabtitle};
+			my $icon= $page->{tabicon};
+			my $i= $self->page_num($page);
+			my $cb= sub { $_[0]{self}->set_current_page($i); };
+			push @menu, {label=>$label, stockicon=>$icon, code=> $cb, };
+		}
+	}
+
+	::PopupContextMenu(\@menu, { @opt } );
+	return 1;
+}
+
+sub pagerename_cb
+{	my $page=$_[0]{page};
+	my $tab=$_[0]{self}->get_tab_label($page);
+	my $renamesub=$_[0]{'rename'};
+	my $label=$page->{tab_page_label};
+	my $entry=Gtk2::Entry->new;
+	$entry->set_has_frame(0);
+	$entry->set_inner_border(undef) if *Gtk2::Entry::set_inner_border{CODE}; #Gtk2->CHECK_VERSION(2,10,0);
+	$entry->set_text( $label->get_text );
+	$entry->set_size_request( 20+$label->allocation->width ,-1);
+	$_->hide for grep !$_->isa('Gtk2::Image'), $tab->get_children;
+	$tab->pack_start($entry,::FALSE,::FALSE,2);
+	$entry->grab_focus;
+	$entry->show_all;
+	$entry->signal_connect(key_press_event => sub #abort if escape
+		{	my ($entry,$event)=@_;
+			return 0 unless Gtk2::Gdk->keyval_name( $event->keyval ) eq 'Escape';
+			$entry->set_text('');
+			$entry->set_sensitive(0);  #trigger the focus-out event
+			1;
+		});
+	$entry->signal_connect(activate => sub {$_[0]->set_sensitive(0)}); #trigger the focus-out event
+	$entry->signal_connect(focus_out_event => sub
+	 {	my $entry=$_[0];
+		my $new=$entry->get_text;
+		$tab->remove($entry);
+		$_->show for $tab->get_children;
+		if ($new ne '')				#user has entered new name -> do the renaming
+		{	$renamesub->($label,$new);
+		}
+		0;
+	 });
+}
+
+sub create_chooser_page
+{	my $self=shift;
+	return if $self->get_children && !$self->{chooser_mode};
+	$self->remove($_) for $self->get_children;	#remove a previous version of this page
+	my $list= $self->make_widget_list;
+	return unless keys %$list;
+	$self->{chooser_mode}=1;
+	my $cb=sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->newtab($_[1]); };
+	my $bbox=Gtk2::VButtonBox->new;
+	$bbox->set_layout('start');
+	for my $name (sort { $list->{$a} cmp $list->{$b} } keys %$list)
+	{	my $button=Gtk2::Button->new($list->{$name});
+		$button->signal_connect(clicked=> $cb,$name);
+		$bbox->add($button);
+	}
+	$bbox->show_all;
+	$bbox->{name}='';
+	$self->append_page($bbox,_"Choose page to open");
+}
+
+sub make_widget_list
+{	my ($self,$match,@names)=@_;
+	$match ||= $self->{match};
+	return unless $match;
+	my @match=	$match=~m/(?<!-)(\w+)/g;	#words not preceded by -
+	my @matchnot=	$match=~m/-(\w+)/g;		#words preceded by -
+	my $wdef=\%Layout::Widgets;
+	@names= @names?  grep $wdef->{$_}, @names : keys %$wdef;
+	@names=grep $wdef->{$_}{autoadd_type}, @names;
+	my %ok;
+	for my $name (@names)
+	{	next if grep $name eq $_->{name}, $self->get_children;	#or use $self->{widgets}{$name} ?
+		my $autoadd=$wdef->{$name}{autoadd_type};
+		my %h; $h{$_}=1 for split / +/,$autoadd;
+		next if grep !$h{$_}, @match;
+		next if grep  $h{$_}, @matchnot;
+		$ok{$name}=$wdef->{$name}{tabtitle};
+	}
+	return \%ok;
+}
+sub Widgets_changed_cb		#new or removed widgets => check if a widget should be added or removed
+{	my ($self,$changetype,@widgets)=@_;
+	@widgets=grep $Layout::Widgets{$_}{autoadd_type}, keys %Layout::Widgets unless @widgets;
+	my $match=$self->{match};
+	for my $name (@widgets)
+	{	my $ref=$Layout::Widgets{$name};
+		my $add= $changetype ne 'remove' ? 1 : 0;
+		if (my $autoadd= $ref->{autoadd_type})
+		{	next unless $autoadd;
+			#every words in $match must be in $autoadd, except for words starting with - that must not
+			my %h; $h{$_}=1 for split / +/,$autoadd;
+			next if grep !$h{$_}, $match=~m/(?<!-)(\w+)/g;
+			next if grep  $h{$_}, $match=~m/-(\w+)/g;
+		}
+		if (my $opt=$ref->{autoadd_option}) { $add=$::Options{$opt} }
+		my @already= grep $name eq $_->{name}, $self->get_children;
+		if ($add)
+		{	next if exists $self->{blacklist}{$name};
+			$self->newtab($name,0,undef,1) unless @already;
+		}
+		else
+		{	$self->close_tab($_) for @already;
+		}
+	}
+	::IdleDo('5_create_chooser_page',500, \&create_chooser_page, $self) if !$self->get_children || $self->{chooser_mode};
+}
+
+sub SwitchedPage
+{	my ($self,undef,$pagenb)=@_;
+	delete $self->{DefaultFocus};
+	if (defined(my $group=delete $self->{active_group}))
+	{	::UnWatch($self,'SelectedID_'.$group);
+	}
+	my $page=$self->get_nth_page($pagenb);
+	$self->{DefaultFocus}=$page;
+	my $metagroup= $self->{group};
+	return if !$page->{group} || $page->{group} eq $metagroup;
+	my $group= $self->{active_group}= $page->{group};
+	my $ID= ::GetSelID($group);
+	::HasChangedSelID($metagroup,$ID) if defined $ID;
+	# FIXME can't use WatchSelID, should special-case special groups : Play Recent\d *Next\d* ...
+	::Watch($self,'SelectedID_'.$group, sub { my ($self,$ID)=@_; ::HasChangedSelID($self->{group},$ID) if defined $ID; });
+	# FIXME add other group signals :
+	#::HasChanged('Selection_'.$self->{group});
+	#::Watch($self,'Selection_'.$group, sub { ::HasChanged('Selection_'.$_[0]->{group}); });
+	#
+	# ::WatchFilter($self,$group, ...
+	#
+	# FIXME make it so that LabelTotal can work with this metagroup
+	# ::HasChanged('SongArray'...
+}
+
+package Layout::PlaceHolder;
+
+our %PlaceHolders=
+(	#ContextPages =>
+	#{	event_Widgets => \&Widgets_changed_cb,
+	#	match => 'context page',
+	#	init => sub { $_[0]->Widgets_changed_cb('init'); },
+	#},
+	ExtraButtons =>
+	{	event_Widgets => \&Widgets_changed_cb,
+		match => 'button main',
+		init => sub { $_[0]->Widgets_changed_cb('init'); },
+	},
+);
+
+
+sub new
+{	my ($class,$boxfunc,$box,$ph,$packoptions)=@_;
+	my $name= $ph->{name};
+	$name=~s/\d+$//;
+	my $type= $PlaceHolders{$name};
+	unless ($type)
+	{	return Layout::PlaceHolder::Single->new($boxfunc,$box,$ph,$packoptions);
+	}
+	bless $ph,$class;
+	::weaken( $ph->{boxwidget}=$box );
+	$ph->{widgets}={};
+
+	$ph->{$_}||=$type->{$_} for qw/match/;
+	$ph->{SaveOptions}=\&SaveOptions;
+	$ph->{widgets_opt}=delete $ph->{opt2}{widgets_opt};
+	for my $event (grep m/^event_/, keys %$type)
+	{	my $cb= $type->{$event};
+		$event=~s/^event_//;
+		::Watch($ph, $event, $cb);
+	}
+
+	$ph->{packsub}=		$boxfunc->{Pack};
+	$ph->{packoptions}=	$packoptions;
+
+	if (my $init=$type->{init}) { $init->($ph) }	#used to create children at creation time for some placeholders
+	return $ph;
+}
+sub DESTROY
+{	::UnWatch_all($_[0]);
+}
+
+sub SaveOptions
+{	my $self=shift;
+	my $opt= Layout::SaveWidgetOptions(values %{$self->{widgets}});
+	return unless keys %$opt;
+	return widgets_opt => $opt;
+
+}
+
+sub AddWidget
+{	my ($ph,$name)=@_;
+	return if $ph->{widgets}{$name};
+	my $widget= Layout::NewWidget($name,$ph->{opt1},$ph->{widgets_opt}{$name}, { default_group => $ph->{group} });
+	return unless $widget;
+	$ph->{widgets}{$name}= $widget;
+	$ph->{packsub}->($ph->{boxwidget},$widget, $ph->{packoptions});
+	$widget->show_all;
+	return $widget;
+}
+sub RemoveWidget
+{	my ($ph,$name)=@_;
+	$name=$name->{name} if ref $name;
+	my $widget= delete $ph->{widgets}{$name};
+	return unless $widget;
+	my $opt=$ph->{widgets_opt}||={};
+	%$opt= ( %$opt, %{ Layout::SaveWidgetOptions($widget) } );
+	$ph->{boxwidget}->remove($widget);
+}
+
+sub Widgets_changed_cb		#new or removed widgets => check if a widget should be added or removed
+{	my ($ph,$changetype,@widgets)=@_;
+	@widgets=sort grep $Layout::Widgets{$_}{autoadd_type}, keys %Layout::Widgets unless @widgets;
+	my $match=$ph->{match};
+	for my $name (@widgets)
+	{	my $ref=$Layout::Widgets{$name};
+		my $add= $changetype ne 'remove' ? 1 : 0;
+		if (my $autoadd= $ref->{autoadd_type})
+		{	next unless $autoadd;
+			#every words in $match must be in $autoadd, except for words starting with - that must not
+			my %h; $h{$_}=1 for split / +/,$autoadd;
+			next if grep !$h{$_}, $match=~m/(?<!-)(\w+)/g;
+			next if grep  $h{$_}, $match=~m/-(\w+)/g;
+		}
+		if (my $opt=$ref->{autoadd_option}) { $add=$::Options{$opt} }
+		if ($add)
+		{	my $widget= $ph->AddWidget($name);
+		}
+		else
+		{	$ph->RemoveWidget($name);
+		}
+	}
+}
+
+sub Options_changed
+{	my ($ph,$option)=@_;
+	return unless exists $ph->{watchoptions}{$option};
+	$ph->Widgets_changed_cb('optchanged');
+}
+
+package Layout::PlaceHolder::Single;
+sub new
+{	my ($class,$boxfunc,$box,$ph,$packoptions)=@_;
+	bless $ph,$class;
+	::weaken( $ph->{boxwidget}=$box );
+	$ph->{SaveOptions}=\&SaveOptions;
+	::Watch($ph, Widgets => \&Widgets_changed_cb);
+	$ph->{packsub}=		$boxfunc->{Pack};
+	$ph->{packoptions}=	$packoptions;
+	return $ph;
+}
+sub DESTROY
+{	::UnWatch_all(shift);
+}
+
+sub Widgets_changed_cb
+{	my ($ph,$changetype,@widgets)=@_;
+	my $name=$ph->{name};
+	$name=~s/\d+$//;
+	return unless grep $name eq $_, @widgets;
+	if ($changetype eq 'new' && !$ph->{widget})
+	{	my $widget= Layout::NewWidget($ph->{name},$ph->{opt1},$ph->{opt2}, { default_group => $ph->{group} });
+		return unless $widget;
+		$ph->{widget}= $widget;
+		$ph->{packsub}->($ph->{boxwidget},$widget, $ph->{packoptions});
+		$widget->show_all;
+	}
+	elsif ($changetype eq 'remove' && $ph->{widget})
+	{	my $widget= delete $ph->{widget};
+		$ph->{opt2}= Layout::SaveWidgetOptions($widget);
+		$ph->{boxwidget}->remove($widget);
+	}
+}
+
 package Layout::Button;
 use Gtk2;
 use base 'Gtk2::Button';
 
+our @default_options= (button=>1, relief=>'none', size=> Layout::SIZE_BUTTONS );
+
 sub new
-{	my ($class,$opt1,undef,$ref,$layout_options)=@_;
+{	my ($class,$opt,$ref)=@_;
+	%$opt=( @default_options, %$opt );
 	my $self = bless Gtk2::Button->new, $class;
-	$self->{opt1}=$opt1;
-	my $isbutton= !exists $ref->{nobutton};
-	$isbutton= $opt1->{button} if exists $opt1->{button};
-	if ($isbutton)
-	{	$self->set_relief( $opt1->{relief} || $ref->{relief} || 'none');
-	}
-	my $stock=$ref->{stock};
-	if ($opt1->{stock} && !$ref->{state}) #FIXME support states
-	{	$stock=[split /\s+/,$opt1->{stock}];
-		$stock=$stock->[0] unless @$stock>1;
-	}
-	if ($opt1->{skin})
-	{	my $skin=Skin->new($opt1->{skin},$self,$layout_options);
+	my $isbutton= $opt->{button};
+	$self->set_relief($opt->{relief}) if $isbutton;
+	my $stock= $ref->{'state'} ? $ref->{stock} : $opt->{stock}; 	#FIXME support states ?
+	if ($opt->{skin})
+	{	my $skin=Skin->new($opt->{skin},$self,$opt);
 		$self->signal_connect(expose_event => \&Skin::draw,$skin);
 		$self->set_app_paintable(1); #needed ?
 		$self->{skin}=1;
-		if (0 && $opt1->{shape}) #mess up button-press cb
+		if (0 && $opt->{shape}) #mess up button-press cb
 		{	$self->{shape}=1;
 			my $ebox=Gtk2::EventBox->new;
 			$ebox->add($self);
@@ -1962,13 +2562,13 @@ sub new
 	{	$self=bless Gtk2::EventBox->new, $class unless $isbutton;
 		$self->{stock}=$stock;
 		$self->{state}=$ref->{state} if $ref->{state};
-		$self->{size}= $opt1->{size} || $ref->{size} || Layout::SIZE_BUTTONS;
+		$self->{size}= $opt->{size};
 		my $img=Gtk2::Image->new;
 		$img->set_size_request(Gtk2::IconSize->lookup($self->{size})); #so that it always request the same size, even when no icon
 		$self->add($img);
 		$self->UpdateStock;
 	}
-	else { $self->set_label($ref->{label}||$opt1->{label}); }
+	else { $self->set_label($opt->{label}); }
 	return $self;
 }
 
@@ -1979,8 +2579,9 @@ sub UpdateStock
 	{	$state=&$state;
 		$stock = (ref $stock eq 'CODE')? $stock->($state) : $stock->{$state};
 	}
-	if (ref $stock)
-	{	$stock= $stock->[ $index || 0 ];
+	if ($stock=~m/ /)
+	{	$stock= (split /\s+/,$stock)[ $index || 0 ];
+		$stock='' if $stock eq '.'; #needed ?
 		unless (exists $self->{hasenterleavecb})
 		{	$self->{hasenterleavecb}=undef;
 			$self->signal_connect(enter_notify_event => \&UpdateStock,1);
@@ -2001,43 +2602,42 @@ use constant
 
 use base 'Gtk2::EventBox';
 
+our @default_options= ( xalign=>0, yalign=>.5, );
+
 sub new
-{	my ($class,$opt1,undef,$ref,$layout_options)=@_;
+{	my ($class,$opt,$ref)=@_;
+	%$opt=( @default_options, %$opt );
 	my $self = bless Gtk2::EventBox->new, $class;
 	my $label=Gtk2::Label->new;
-	my $xalign= exists $opt1->{xalign} ? $opt1->{xalign} : $ref->{xalign} || 0;
-	my $yalign= exists $opt1->{yalign} ? $opt1->{yalign} : .5;
-	$label->set_alignment($xalign,$yalign);
+	$label->set_alignment($opt->{xalign},$opt->{yalign});
 
-	my $markup= $opt1->{markup};
-	$markup= $ref->{markup} unless defined $markup;
-	$self->{markup}=$markup if defined $markup;
-	$markup= $opt1->{markup_empty};
-	$markup= $ref->{markup_empty} unless defined $markup;
-	$self->{markup_empty}=$markup if defined $markup;
+	for (qw/markup markup_empty update/)		#$self->{update} is only used by LabelTime
+	{	$self->{$_}=$opt->{$_} if exists $opt->{$_};
+	}
 
-	my $font= $opt1->{font} || $layout_options->{DefaultFont} || $ref->{font};
+	my $font= $opt->{font} || $opt->{DefaultFont} || $ref->{font};
 	$label->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
-	$label->set_text($opt1->{text}) if exists $opt1->{text};
+	$label->set_markup($opt->{markup}) if exists $opt->{markup};
+	$label->set_text($opt->{text}) if exists $opt->{text};
 	$self->add($label);
 #$self->signal_connect(enter_notify_event => sub {$_[0]->set_markup('<u>'.$_[0]->child->get_label.'</u>')});
 #$self->signal_connect(leave_notify_event => sub {my $m=$_[0]->child->get_label; $m=~s#^<u>##;$m=~s#</u>$##; $_[0]->set_markup($m)});
-	my $minsize= $opt1->{minsize} || $ref->{minsize};
+	my $minsize= $opt->{minsize};
 	if ($minsize && $minsize=~m/^\d+p?$/)
 	{	unless ($minsize=~s/p$//)
 		{	my $lay=$label->create_pango_layout( 'X' x $minsize );
 			$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 			($minsize)=$lay->get_pixel_size;
 		}
-		$self->{expand_max}=1 if $opt1->{expand_max};
+		$self->{expand_max}=1 if $opt->{expand_max};
 		$self->set_size_request($minsize,-1);
 		$label->signal_connect(expose_event => \&expose_cb);
 		$self->signal_connect(enter_notify_event => \&enter_leave_cb, INCR());
 		$self->signal_connect(leave_notify_event => \&enter_leave_cb,-INCR());
 	}
-	elsif (defined $ref->{initsize})
-	{	#$label->set_size_request($label->create_pango_layout( $ref->{initsize} )->get_pixel_size);
-		my $lay=$label->create_pango_layout( $ref->{initsize} );
+	elsif (defined $opt->{initsize})
+	{	#$label->set_size_request($label->create_pango_layout( $opt->{initsize} )->get_pixel_size);
+		my $lay=$label->create_pango_layout( $opt->{initsize} );
 		$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 		$label->set_size_request($lay->get_pixel_size);
 		$self->{resize}=1;
@@ -2117,15 +2717,13 @@ use Gtk2;
 use base 'Gtk2::ProgressBar';
 
 sub new
-{	my ($class,$opt1,undef,$ref,$layout_options)=@_;
+{	my ($class,$opt,$ref)=@_;
 	my $self=bless Gtk2::ProgressBar->new, $class;
 	$self->{left}=$self->{right}=0;
 	$self->{max}= $ref->{max} || 1;
-	my $orientation= $ref->{orientation} || 'left-to-right';
-	$orientation= 'left-to-right' if $opt1->{horizontal};
-	$orientation= 'bottom-to-top' if $opt1->{vertical};
+	my $orientation= $opt->{vertical} ? 'bottom-to-top' : $opt->{horizontal} ? 'left-to-right' : $opt->{orientation} || 'left-to-right';
 	$self->set_orientation($orientation);
-	$self=Layout::Bar::skin->new($opt1,$orientation,$layout_options) if $opt1->{skin};
+	$self=Layout::Bar::skin->new($opt,$orientation) if $opt->{skin};
 	$self->add_events([qw/pointer-motion-mask button-press-mask button-release-mask scroll-mask/]);
 	$self->signal_connect(button_press_event	=> \&button_press_cb);
 	$self->signal_connect(button_release_event	=> \&button_release_cb);
@@ -2213,10 +2811,10 @@ our @ISA=('Layout::Bar');
 use base 'Gtk2::EventBox';
 
 sub new
-{	my ($class,$opt1,$orientation,$layout_options)=@_; #FIXME $orientation is ignored for now
+{	my ($class,$opt,$orientation)=@_; #FIXME $orientation is ignored for now
 	my $self=bless Gtk2::EventBox->new,$class;
-	my $hskin=$self->{handle_skin}=Skin->new($opt1->{handle_skin},undef,$layout_options);
-	my $bskin=$self->{back_skin}=  Skin->new($opt1->{skin},undef,$layout_options);
+	my $hskin=$self->{handle_skin}=Skin->new($opt->{handle_skin},undef,$opt);
+	my $bskin=$self->{back_skin}=  Skin->new($opt->{skin},undef,$opt);
 	my $resize=$bskin->{resize};
 	my ($left)= $resize=~m/l[es](\d+)/;
 	my ($right)=$resize=~m/r[es](\d+)/;
@@ -2253,10 +2851,10 @@ use Gtk2;
 use base 'Gtk2::Scale';
 
 sub new
-{	my ($class,$opt1,undef,$ref)=@_;
-	my $scale= $ref->{orientation} || 'left-to-right';
-	$scale= 'left-to-right' if $opt1->{horizontal};
-	$scale= 'bottom-to-top' if $opt1->{vertical};
+{	my ($class,$opt,$ref)=@_;
+	my $scale= $opt->{orientation} || 'left-to-right';
+	$scale= 'left-to-right' if $opt->{horizontal};
+	$scale= 'bottom-to-top' if $opt->{vertical};
 	$scale= $scale eq 'left-to-right' ? 'Gtk2::HScale' : 'Gtk2::VScale';
 	my $max= $ref->{max} || 1;
 	my $self = bless $scale->new_with_range(0,$max,$max/10), $class;
@@ -2266,9 +2864,7 @@ sub new
 	$self->signal_connect(button_press_event => \&button_press_cb);
 	$self->signal_connect(button_release_event => \&button_release_cb);
 	$self->signal_connect(scroll_event	=> \&Layout::Bar::scroll_cb);
-	$self->{scroll}=$ref->{scroll};
-	$self->{set}=$ref->{set};
-	$self->{set_preview}=$ref->{set_preview};
+	$self->{$_}=$ref->{$_} for qw/scroll set set_preview/;
 	return $self;
 }
 sub set_val
@@ -2311,14 +2907,15 @@ use Gtk2;
 use base 'Gtk2::EventBox';
 
 sub new
-{	my ($class,$opt1)=@_;
+{	my ($class,$opt)=@_;
 	my $self = bless Gtk2::EventBox->new, $class;
 	#$minsize||=$ref->{size};
-	my $minsize=$opt1->{minsize};
-	$self->{maxsize}=$opt1->{maxsize};
+	$self->{aa}=$opt->{aa};
+	my $minsize=$opt->{minsize};
+	$self->{maxsize}=$opt->{maxsize};
 	$self->{maxsize}=500 unless defined $self->{maxsize};
-	$self->{multiple}=$opt1->{multiple};
-	if ($opt1->{forceratio}) { $self->{forceratio}=1; } #not sure it's still needed with the natural_size mode
+	$self->{multiple}=$opt->{multiple};
+	if ($opt->{forceratio}) { $self->{forceratio}=1; } #not sure it's still needed with the natural_size mode
 	else
 	{	$self->{expand_to_ratio}=1;
 		$self->{expand_weight}=10;
@@ -2343,7 +2940,7 @@ sub set
 	$key=[$key] unless ref $key;
 	return if $self->{key} && join("\x1D", @$key) eq join("\x1D", @{$self->{key}});
 	$self->{key}=$key;
-	my $col=$self->{ref}{aa};
+	my $col=$self->{aa};
 	my @files;
 	for my $k (@$key)
 	{	my $f=AAPicture::GetPicture($col,$k);
@@ -2431,17 +3028,17 @@ use Gtk2;
 
 use base 'Gtk2::ToggleButton';
 sub new
-{	my ($class,$opt1,$opt2)=@_;
+{	my ($class,$opt)=@_;
 	my $self = bless Gtk2::ToggleButton->new, $class;
 	my ($icon,$label);
-	$label=Gtk2::Label->new($opt1->{label}) if defined $opt1->{label};
-	$icon=Gtk2::Image->new_from_stock($opt1->{icon},'menu') if $opt1->{icon};
+	$label=Gtk2::Label->new($opt->{label}) if defined $opt->{label};
+	$icon=Gtk2::Image->new_from_stock($opt->{icon},'menu') if $opt->{icon};
 	my $child= ($label && $icon) ?	::Hpack($icon,$label) :
 					$icon || $label;
 	$self->add($child) if $child;
-	#$self->{gravity}=$opt1{gravity};
-	$self->{widget}=$opt1->{widget};
-	$self->{resize}=$opt1->{resize};
+	#$self->{gravity}=$opt->{gravity};
+	$self->{widget}=$opt->{widget};
+	$self->{resize}=$opt->{resize};
 	$self->signal_connect( toggled => \&toggled_cb );
 	::Watch($self,'HiddenWidgets',\&UpdateToggleState);
 
@@ -2472,22 +3069,25 @@ package Layout::MenuItem;
 use Gtk2;
 
 sub new
-{	my ($opt1,$opt2)=@_;
+{	my $opt=shift;
 	my $self;
-	my $label=$opt1->{label};
-	if ($opt1->{togglewidget})	{ $self=Gtk2::CheckMenuItem->new($label); }
-	elsif ($opt1->{icon})		{ $self=Gtk2::ImageMenuItem->new($label);
-					  $self->set_image( Gtk2::Image->new_from_stock($opt1->{icon}, 'menu'));
+	my $label=$opt->{label};
+	if ($opt->{togglewidget})	{ $self=Gtk2::CheckMenuItem->new($label); }
+	elsif ($opt->{icon})		{ $self=Gtk2::ImageMenuItem->new($label);
+					  $self->set_image( Gtk2::Image->new_from_stock($opt->{icon}, 'menu'));
 				  	}
 	else				{ $self=Gtk2::MenuItem->new($label); }
-	if ($opt1->{togglewidget})
-	{	$self->{widget}=$opt1->{togglewidget};
-		$self->{resize}=$opt1->{resize};
+	if ($opt->{setmenu})
+	{	$self->{setmenu}=$opt->{setmenu};
+	}
+	if ($opt->{togglewidget})
+	{	$self->{widget}=$opt->{togglewidget};
+		$self->{resize}=$opt->{resize};
 		$self->signal_connect( toggled => \&Layout::TogButton::toggled_cb );
 		::Watch($self,'HiddenWidgets',\&Layout::TogButton::UpdateToggleState);
 	}
-	if ($opt1->{command})
-	{	$self->signal_connect(activate => \&::run_command,$opt1->{command});
+	if ($opt->{command})
+	{	$self->signal_connect(activate => \&::run_command,$opt->{command});
 	}
 
 	return $self;
@@ -2504,13 +3104,13 @@ sub get_player_window
 package Layout::LabelToggleButtons;
 use base 'Gtk2::ScrolledWindow';
 sub new
-{	my ($class,$opt1,$opt2)=@_;
+{	my ($class,$opt)=@_;
 	my $self= bless Gtk2::ScrolledWindow->new, $class;
 	$self->set_shadow_type('etched-in');
 	$self->set_policy('automatic','automatic');
 	$self->{table}=Gtk2::Table->new(1,1,::TRUE);
 	$self->add_with_viewport($self->{table});
-	my $field=$self->{field}= $opt1->{field} || 'label'; #FIXME check if correct type
+	my $field=$self->{field}= $opt->{field} || 'label'; #FIXME check if correct type
 	#::WatchSelID($self,\&update_song,[$field]);
 	::Watch($self,"newgids_$field",\&update_labels);
 	$self->signal_connect( size_allocate => sub { ::IdleDo( "resize_$self",1000, \&update_columns,$_[0] ); });
@@ -2561,168 +3161,27 @@ sub update_song
 }
 
 package GMB::Context;
-use Gtk2;
-our %Contexts;
 
-use base 'Gtk2::VBox';
-
-sub new
-{	my ($class,$opt1,$opt2)=@_;
-	my $self = bless Gtk2::VBox->new, $class;
-	$self->{notebook}=Gtk2::Notebook->new;
-	$self->{notebook}->set_scrollable(::TRUE);
-	$self->{notebook}->popup_enable;
-
-	$self->{group}=$opt1->{group};
-	my $check= defined $self->{group} ? _"Follow selected song" : _"Follow playing song";
-	$check=Gtk2::CheckButton->new($check);
-	$self->{follow}= $opt2->{follow};
-	for my $key (grep m/__/,keys %$opt2)
-	{	my ($child,$opt)=split /__/,$key,2;
-		$self->{children_opt}{$child}{$opt}= $opt2->{$key};
-	}
-	$check->set_active( $self->{follow} );
-	$check->signal_connect(toggled => sub { $self->{follow}=$_[0]->get_active; $self->SongChanged(::GetSelID($self)) if $self->{follow}; });
-	::set_drag($check, dest => [::DRAG_ID,sub
-		{	my ($check,$type,@IDs)=@_;
+sub new_follow_toolitem
+{	my $self=shift;
+	my $follow=Gtk2::ToggleToolButton->new_from_stock('gtk-jump-to');
+	$follow->set_active($self->{follow});
+	my $follow_text= $self->{group} eq 'Play' ? _"Follow playing song" : _"Follow selected song";
+	$follow->set_label($follow_text);
+	$follow->set_tooltip($::Tooltips,$follow_text,'');
+	$follow->signal_connect(clicked => \&ToggleFollow);
+	::set_drag($follow, dest => [::DRAG_ID,sub
+		{	my ($follow,$type,@IDs)=@_;
+			my $self=::find_ancestor($_[0],'GMB::Context');
 			$self->SongChanged($IDs[0],1);
 		}]);
-
-	$self->pack_start($check,::FALSE,::FALSE,1);
-	$self->add( $self->{notebook} );
-	for my $c (keys %Contexts)
-	{	$self->Append($c);
-	}
-	::WatchSelID($self,\&SongChanged);
-	::Watch($self,Context=>\&Changed);
-	$self->{SaveOptions}=\&SaveOptions;
-
-	$self->{ID}=$::SongID;
-	#$self->SongChanged($::SongID);
-
-	return $self;
+	return $follow;
 }
-
-sub AddPackage
-{	my ($package,$key)=@_;
-	$Contexts{$key}=$package;
-	::HasChanged('Context','add',$key);
+sub ToggleFollow
+{	my $self=::find_ancestor($_[0],'GMB::Context');
+	$self->{follow}^=1;
+	$self->SongChanged( ::GetSelID($self) ) if $self->{follow};
 }
-sub RemovePackage
-{	my $key=$_[0];
-	::HasChanged('Context','remove',$key);
-	delete $Contexts{$key};
-}
-
-sub SaveOptions
-{	my $self=$_[0];
-	my %opt;
-	$opt{follow}=1 if $self->{follow};
-	for my $w ($self->{notebook}->get_children)
-	{	$self->{children_opt}{ $w->{context_key} }= $w->{widget_options};
-	}
-	my $ref=$self->{children_opt}||{};
-	for my $child (keys %$ref)
-	{	next unless $ref->{$child};
-		$opt{$child.'__'.$_}= $ref->{$child}{$_} for keys %{$ref->{$child}};
-	}
-	return \%opt;
-}
-
-sub Changed
-{	my ($self,$action,$key)=@_;
-	my $notebook=$self->{notebook};
-	if ($action eq 'add') { $self->Append($key); }
-	elsif ($action eq 'remove')
-	{	for my $w ($notebook->get_children)
-		{	if ($w->{context_key} eq $key)
-			 { $notebook->remove($w); $self->{children_opt}{$key}=$w->{widget_options}; $w->destroy; }
-		}
-	}
-}
-
-sub SongChanged
-{	my ($self,$ID,$force)=@_;
-	return unless $self->{follow} || $force;
-	$self->{ID}=$ID;
-	my $nb=$self->{notebook};
-	my $page=$nb->get_nth_page( $nb->get_current_page );
-	return unless $page;
-	$page->SongChanged($ID) if $page->mapped;
-	#for my $w ($self->{notebook}->get_children)
-	#{	$w->SongChanged($ID);
-	#}
-}
-
-sub Append
-{	my ($self,$key)=@_;
-	my @widgets=$Contexts{$key}->new( $self->{children_opt}{$key} );
-	for my $w (@widgets)
-	{	$w->{context_key}=$key;
-		$w->signal_connect(map => sub { $_[0]->SongChanged($self->{ID}) });
-		$self->{notebook}->append_page($w, Gtk2::Label->new($w->title) );
-		$self->{notebook}->set_tab_reorderable($w,::TRUE);
-		#$w->SongChanged( ::GetSelID($self) );
-	}
-}
-
-package ExtraWidgets;
-my %Widgets;
-
-sub SetupContainer
-{	my ($container,$type,$packsub,$options)=@_;
-	::Watch($container,'ExtraWidgets',\&Changed);
-	$container->{ExtraWidgets_param}=[$type,$packsub,$options];
-	for my $id (keys %Widgets)
-	{	PackWidget($container,$id);
-	}
-}
-
-sub AddWidget
-{	my ($id,$type,$sub)=@_;
-	if ($Widgets{$id})
-	 { warn "ExtraWidget '$id' already exists\n";return }
-	$Widgets{$id}=[$sub,$type];
-	::HasChanged(ExtraWidgets => 'add', $id);
-}
-sub RemoveWidget
-{	my $id=$_[0];
-	delete $Widgets{$id};
-	::HasChanged(ExtraWidgets => 'remove', $id);
-}
-
-sub PackWidget
-{	my ($container,$id)=@_;
-	my ($type,$packsub,$opt)=@{$container->{ExtraWidgets_param}};
-	my ($wsub,$wtype)=@{$Widgets{$id}};
-	return unless $type eq $wtype;
-	my $widget=$wsub->(::get_layout_widget($container));
-	return unless $widget;
-	$widget->show_all;
-	$widget->{ExtraWidgets_id}=$id;
-	$packsub->($container,$widget,$opt->{pack}||'');
-	if ($widget->isa('Gtk2::Button'))
-	{	$widget->set_relief($opt->{relief}) if $opt->{relief};
-	}
-	if ($container->isa('Gtk2::Box'))
-	{	$container->reorder_child($widget,$opt->{pos}) if $opt->{pos};
-	}
-}
-
-sub Changed
-{	my ($container,$action,$id)=@_;
-	if ($action eq 'add')
-	{	PackWidget($container,$id);
-	}
-	elsif ($action eq 'remove')
-	{	for my $w ($container->get_children)
-		{	if ($w->{ExtraWidgets_id} && $w->{ExtraWidgets_id} eq $id)
-			 { $container->remove($w); $w->destroy; }
-		}
-	}
-}
-
-
 
 package Stars;
 use Gtk2;
@@ -2822,13 +3281,12 @@ sub get_pixbuf
 
 package Layout::Progress;
 sub new
-{	my ($class,$opt1,$opt2,$ref)=@_;
-	my $vert= exists $opt1->{vertical} ? $opt1->{vertical} : $ref->{vertical};
-	my $self= $vert ? Gtk2::VBox->new : Gtk2::HBox->new;
+{	my ($class,$opt,$ref)=@_;
+	my $self= $opt->{vertical} ? Gtk2::VBox->new : Gtk2::HBox->new;
 	::Watch($self,Progress=>\&update);
 	update($self,$_,$::Progress{$_}) for keys %::Progress;
-	$self->{lastclose}=$opt1->{lastclose};
-	$self->{compact}= exists $opt1->{compact} ? $opt1->{compact} : $ref->{compact};
+	$self->{lastclose}=$opt->{lastclose};
+	$self->{compact}= $opt->{compact};
 	return $self;
 }
 sub new_pid
@@ -2881,7 +3339,7 @@ sub update
 
 package Layout::Equalizer;
 sub new
-{	my $opt1=$_[0];
+{	my $opt=$_[0];
 	my $self=Gtk2::HBox->new(1,0); #homogenous
 	for my $i (0..9)
 	{	my $adj=Gtk2::Adjustment->new(0, -1, 1, .05, .1,0);
@@ -2891,7 +3349,7 @@ sub new
 		$self->{'adj'.$i}=$adj;
 		$adj->signal_connect(value_changed =>
 		sub { $::Play_package->set_equalizer($_[1],$_[0]->get_value) unless $_[0]{busy}; ::HasChanged('Equalizer','value') },$i);
-		$self->{labels}= $opt1->{labels} || 'x-small';
+		$self->{labels}= $opt->{labels} || 'x-small';
 		$self->{labels}=undef if $self->{labels} eq 'none';
 		if ($self->{labels})
 		{	my $vbox=Gtk2::VBox->new;
@@ -3041,7 +3499,7 @@ package Skin;
 use Gtk2;
 
 sub new
-{	my ($class,$string,$widget,$layout_options)=@_;
+{	my ($class,$string,$widget,$options)=@_;
 	my $self=bless {},$class;
 	($self->{file},$self->{crop},$self->{resize},my$states1,my$states2)=split /:/,$string;
 	my %states;
@@ -3053,7 +3511,7 @@ sub new
 	{	$states{$s.$_}=$n++ for split '_',$states1;
 	}
 	$self->{states}=\%states;
-	$self->{layout_options}=$layout_options;
+	$self->{skin_options}{$_}=$options->{$_} for qw/SkinPath SkinFile/;
 	my $pb=$self->makepixbuf($states2[0].'normal');
 	return undef unless $pb;
 	$self->{minwidth}=my $w=$pb->get_width;
@@ -3070,7 +3528,7 @@ sub draw
 		$x=$y=0 unless $widget->no_window; #x and y are relative to the parent window, so are only useful if the widget use the parent window
 	}
 	my $state1=$widget->state;
-	my $state2=$widget->{ref}{state};
+	my $state2=$widget->{state};
 	my $state='normal';
 	if (my $states=$self->{states})
 	{	my @l= ($state1,'normal');
@@ -3138,7 +3596,7 @@ sub _load_skinfile
 
 sub makepixbuf
 {	my ($self,$state,$w,$h)=@_;
-	my $pb=_load_skinfile($self->{file},$self->{crop},$self->{layout_options});
+	my $pb=_load_skinfile($self->{file},$self->{crop},$self->{skin_options});
 	return undef unless $pb;
 	if (my $states=$self->{states})
 	{	my $w= $pb->get_width / keys %$states;

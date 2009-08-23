@@ -149,13 +149,53 @@ sub set_stripped_wiki {}	#FIXME use print version of the wikipedia page instead 
 
 package GMB::Plugin::WebContext;
 require 'simple_http.pm';
+our @ISA;
+BEGIN {push @ISA,'GMB::Context';}
 use base 'Gtk2::VBox';
 use constant
 {	OPT => 'PLUGIN_WebContext_',
 };
-our @ISA;
-#push @ISA, 'GMB::Plugin::WebContext::'.$Backend;
 
+
+our %Widgets=
+(	PluginWebLyrics =>
+	{	class		=> 'GMB::Plugin::WebContext::Lyrics',
+		tabicon		=> 'gmb-lyrics',		# no icon by that name by default
+		tabtitle	=> _"Lyrics",
+		schange		=> \&Update,
+		group		=> 'Play',
+		autoadd_type	=> 'context page lyrics html',
+		saveoptions	=> 'follow urientry statusbar',
+	},
+	PluginWikipedia =>
+	{	class		=> 'GMB::Plugin::WebContext::Wikipedia',
+		tabtitle	=> _"Wikipedia",
+		schange		=> \&Update,
+		group		=> 'Play',
+		autoadd_type	=> 'context page wikipedia html',
+		saveoptions	=> 'follow urientry statusbar',
+	},
+	PluginLastfm =>
+	{	class		=> 'GMB::Plugin::WebContext::Lastfm',
+		tabtitle	=> "Last.fm",
+		schange		=> \&Update,
+		group		=> 'Play',
+		autoadd_type	=> 'context page lastfm html',
+		saveoptions	=> 'follow urientry statusbar',
+	},
+);
+
+our @default_options= (follow=>1, urientry=>1, statusbar=>0, );
+our @contextmenu=
+(	{	label=> _"Show/hide URI entry",
+		check => sub { $_[0]{self}{urientry} },
+		code => sub { my $w=$_[0]{self}{Entry}; if ($_[0]{self}{urientry}^=1) { $w->set_no_show_all(0); $w->show_all; } else { $w->hide; }  },
+	},
+	{	label=> _"Show/hide status bar",
+		check => sub { $_[0]{self}{statusbar} },
+		code => sub { my $w=$_[0]{self}{Status}; if ($_[0]{self}{statusbar}^=1) { $w->set_no_show_all(0); $w->show_all; } else { $w->hide; }  },
+	},
+);
 
 my $active;
 ::SetDefaultOptions(OPT, StrippedWiki => 1);
@@ -189,38 +229,22 @@ sub UpdateBackend
 
 sub Start
 {	$active=1;
-	update_Context_hash();
+	Layout::RegisterWidget($_ => $Widgets{$_}) for keys %Widgets;
 	&set_stripped_wiki;
 }
 sub Stop
 {	$active=0;
-	update_Context_hash();
-}
-
-sub update_Context_hash
-{	for my $ref
-		(	['DisableLyrics','MozLyrics','GMB::Plugin::WebContext::Lyrics'],
-			['DisableWiki','MozWikipedia','GMB::Plugin::WebContext::Wikipedia'],
-			['DisableLastfm','MozLastfm','GMB::Plugin::WebContext::Lastfm'],
-		)
-	{	my ($option,$key,$package)=@$ref;
-		my $on= !$::Options{OPT.$option} && $active;
-		if (exists $GMB::Context::Contexts{$key})
-		{	if (!$on)
-			{	GMB::Context::RemovePackage($key);
-			}
-		}
-		elsif ($on && ($OKMoz || $OKWebKit))
-		{	GMB::Context::AddPackage($package,$key);
-		}
-	}
+	Layout::RegisterWidget($_ => undef) for keys %Widgets;
 }
 
 sub new
-{	my ($class)=@_;
+{	my ($class,$opt)=@_;
 	my $self = bless Gtk2::VBox->new(0,0), $class;
-	my $hbox = Gtk2::HBox->new;
-	my $status=$self->{status}=Gtk2::Statusbar->new;
+	%$opt=( @default_options, %$opt );
+	$self->{$_}=$opt->{$_} for qw/follow group urientry statusbar/;
+
+	my $toolbar=Gtk2::Toolbar->new;
+	my $status=$self->{Status}=Gtk2::Statusbar->new;
 	$status->{id}=$status->get_context_id('link');
 	($self->{embed},my $container)= $self->new_embed;
 	$container||=$self->{embed};
@@ -228,24 +252,32 @@ sub new
 	my $back= $self->{BBack}=Gtk2::ToolButton->new_from_stock('gtk-go-back');
 	my $next= $self->{BNext}=Gtk2::ToolButton->new_from_stock('gtk-go-forward');
 	my $stop= $self->{BStop}=Gtk2::ToolButton->new_from_stock('gtk-stop');
-	my $open= $self->{BOpen}=Gtk2::ToolButton->new_from_stock('gtk-jump-to');
+	my $open= $self->{BOpen}=Gtk2::ToolButton->new_from_stock('gtk-open');
 	$open->set_tooltip($::Tooltips,_"Open this page in the web browser",'');
 	#$open->set_use_drag_window(1);
 	#::set_drag($open,source=>[::DRAG_FILE,sub {$embed->get_location;}]);
 	$self->{$_}->set_sensitive(0) for qw/BBack BNext BStop BOpen/;
-	$hbox->pack_start($_,::FALSE,::FALSE,4) for grep defined, $back,$next,$stop,$open,$self->addtoolbar;
-	$hbox->pack_start($entry,::TRUE,::TRUE,4);
-	$self->pack_start($hbox,::FALSE,::FALSE,1);
+
+	my $entryitem=Gtk2::ToolItem->new;
+	$entryitem->add($entry);
+	$entryitem->set_expand(1);
+
+	# create follow toggle button, function from GMB::Context
+	my $follow=$self->new_follow_toolitem;
+
+	$toolbar->insert($_,-1)  for $back,$next,$stop,$follow,$open,$entryitem,$self->addtoolbar;
+	$self->pack_start($toolbar,::FALSE,::FALSE,1);
 	$self->add( $container );
 	$self->pack_end($status,::FALSE,::FALSE,1);
-	#$entry->set_no_show_all( ! $::Options{OPT.'URIentry'});
-	$status->set_no_show_all( ! $::Options{OPT.'StatusBar'});
-	$self->show_all;
+	$entry->set_no_show_all(!$self->{urientry});
+	$status->set_no_show_all(!$self->{statusbar});
+	$self->signal_connect(map => \&Update);
 	$entry->signal_connect(activate => sub { ::find_ancestor($_[0],__PACKAGE__)->load_url($_[0]->get_text); });
 	$back->signal_connect(clicked => sub { ::find_ancestor($_[0],__PACKAGE__)->go_back });
 	$next->signal_connect(clicked => sub { ::find_ancestor($_[0],__PACKAGE__)->go_forward });
 	$stop->signal_connect(clicked => sub { ::find_ancestor($_[0],__PACKAGE__)->stop_load });
 	$open->signal_connect(clicked => sub { my $url=::find_ancestor($_[0],__PACKAGE__)->get_location; ::openurl($url) if $url=~m#^https?://# });
+	$toolbar->signal_connect('popup-context-menu' => \&popup_toolbar_menu );
 	return $self;
 }
 
@@ -267,10 +299,7 @@ sub prefbox
 	$radio_wk->set_sensitive($OKWebKit);
 	$radio_moz->set_sensitive($OKMoz);
 	$check->set_sensitive($::Options{OPT.'Backend'} eq 'MozEmbed');
-	my $check1=::NewPrefCheckButton(OPT.'DisableWiki',_"Disable wikipedia context tab",\&update_Context_hash);
-	my $check2=::NewPrefCheckButton(OPT.'DisableLyrics',_"Disable Lyrics context tab",\&update_Context_hash);
-	my $check3=::NewPrefCheckButton(OPT.'DisableLastfm',_"Disable Last.fm context tab",\&update_Context_hash);
-	$vbox->pack_start($_,::FALSE,::FALSE,1) for $radio_wk,$radio_moz,Gtk2::VSeparator->new,$check1,$check2,$check3,$check,$Bopen;
+	$vbox->pack_start($_,::FALSE,::FALSE,1) for $radio_wk,$radio_moz,Gtk2::VSeparator->new,$check,$Bopen;
 	$vbox->set_sensitive( $OKMoz || $OKWebKit );
 	return $vbox;
 }
@@ -288,13 +317,24 @@ sub load_url
 sub link_message
 {	my ($self,$msg)=@_;
 	$msg='' unless defined $msg;
-	my $statusbar=$self->{status};
+	my $statusbar=$self->{Status};
 	$statusbar->pop( $statusbar->{id} );
 	$statusbar->push( $statusbar->{id}, $msg );
 }
 
 sub set_stripped_wiki { GMB::Plugin::WebContext::MozEmbed::set_stripped_wiki( $::Options{OPT.'StrippedWiki'} ); } #FIXME
 
+sub popup_toolbar_menu
+{	my ($toolbar,$x,$y,$button)=@_;
+	my $args= { self=> ::find_ancestor($toolbar,__PACKAGE__), };
+	my $menu=::PopupContextMenu(\@contextmenu,$args);
+	$menu->show_all;
+	$menu->popup(undef,undef,sub {$x,$y},undef,$button,0);
+}
+
+sub Update
+{	$_[0]->SongChanged( ::GetSelID($_[0]) )  if $_[0]->mapped;
+}
 
 #################################################################################
 
@@ -303,8 +343,7 @@ package GMB::Plugin::WebContext::Lyrics;
 our @ISA=('GMB::Plugin::WebContext');
 
 use constant
-{	title => _"Lyrics",
-	OPT => GMB::Plugin::WebContext::OPT,  #FIXME
+{	OPT => GMB::Plugin::WebContext::OPT,  #FIXME
 };
 
 my %sites=
@@ -348,8 +387,7 @@ package GMB::Plugin::WebContext::Wikipedia;
 our @ISA=('GMB::Plugin::WebContext');
 
 use constant
-{	title => _"Wikipedia",
-	OPT => GMB::Plugin::WebContext::OPT,  #FIXME
+{	OPT => GMB::Plugin::WebContext::OPT,  #FIXME
 };
 
 my %locales=
@@ -417,11 +455,6 @@ sub wikifilter	#not used for now
 
 package GMB::Plugin::WebContext::Lastfm;
 our @ISA=('GMB::Plugin::WebContext');
-
-use constant
-{	title => "Last.fm",
-#	OPT => GMB::Plugin::WebContext::OPT,  #FIXME
-};
 
 sub addtoolbar
 {	#my $self=$_[0];

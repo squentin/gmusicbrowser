@@ -14,7 +14,7 @@ use Gtk2 ;
 use constant { TRUE  => 1, FALSE => 0, };
 
 our @MenuPlaying=
-(	{ label => _"Follow playing song",	code => sub { $_[0]{songlist}->FollowSong if $_[0]{songlist}->{TogFollow}^=1; }, check => sub { $_[0]{songlist}->{TogFollow} }, },
+(	{ label => _"Follow playing song",	code => sub { $_[0]{songlist}->FollowSong if $_[0]{songlist}->{follow}^=1; }, check => sub { $_[0]{songlist}->{follow} }, },
 	{ label => _"Filter on playing Album",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('album',$::SongID) )	if defined $::SongID; }},
 	{ label => _"Filter on playing Artist",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('artists',$::SongID) )if defined $::SongID; }},
 	{ label => _"Filter on playing Song",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('title',$::SongID) )	if defined $::SongID; }},
@@ -45,7 +45,7 @@ sub makeFilterBox
 }
 
 sub makeLockToggle
-{	my $opt1=$_[0];
+{	my $opt=$_[0];
 	my $toggle=Gtk2::ToggleButton->new;
 	$toggle->add(Gtk2::Image->new_from_stock('gmb-lock','menu'));
 	#$toggle->set_active(1) if $self->{Filter0};
@@ -64,7 +64,7 @@ sub makeLockToggle
 			1;
 		});
 	::set_drag($toggle, dest => [::DRAG_FILTER,sub {::SetFilter($_[0],$_[2],0);}]);
-	::WatchFilter($toggle,$opt1->{group},sub
+	::WatchFilter($toggle,$opt->{group},sub
 		{	my ($self,undef,undef,$group)=@_;
 			my $filter=$::Filters{$group}[0+1]; #filter for level 0
 			my $empty=Filter::is_empty($filter);
@@ -136,13 +136,13 @@ our %Modes=
 
 
 sub new
-{	my ($class,$opt1) = @_;
+{	my ($class,$opt) = @_;
 	my $self = bless Gtk2::Button->new, $class;
 	$self->set_relief('none');
-	my $mode=$opt1->{mode} || 'list';
-	$self->{size}=$opt1->{size};
-	$self->{format}= ($opt1->{format} && $opt1->{format} eq 'short') ? 'short' : 'long';
-	$self->{group}=$opt1->{group};
+	my $mode=$opt->{mode} || 'list';
+	$self->{size}=$opt->{size};
+	$self->{format}= ($opt->{format} && $opt->{format} eq 'short') ? 'short' : 'long';
+	$self->{group}=$opt->{group};
 	$self->add(Gtk2::Label->new);
 	$self->signal_connect( destroy => \&Remove);
 	$self->signal_connect( button_press_event => \&button_press_event_cb);
@@ -154,7 +154,7 @@ sub new
 sub Set_mode
 {	my ($self,$mode)=@_;
 	$self->Remove;
-	$self->{mode}=$self->{SaveOptions}=$mode;
+	$self->{mode}=$mode;
 	$Modes{ $self->{mode} }{setup}->($self);
 	$self->QueueUpdateFast;
 }
@@ -278,270 +278,6 @@ sub library_Update
 	return _('Library : '), $::Library, $tip;
 }
 
-package TabbedLists;
-use Gtk2;
-use base 'Gtk2::Notebook';
-
-my %PagesTypes=
-(	L => {New => \&newlist,		stockicon => 'gmb-list',	WatchID=>1, save => sub {$_[0]{tabbed_listname}} },
-	B => {New => \&newfilter,	stockicon => 'gmb-filter',	WatchID=>1 },
-	Q => {New => \&newqueue,	stockicon => 'gmb-queue',	WatchID=>1 },
-	P => {New => \&Layout::Page::new,	save=> sub {$_[0]{layout}}, stringopt =>1,WatchID=>1 },
-	A => {New => \&newplaylist,	stockicon => 'gtk-media-play',	WatchID=>1 },
-);
-
-our @MenuTabbedL=
-(	{ label => _"New list",	  code => sub { $_[0]{self}->newtab('L'); }, stockicon => 'gtk-add', },
-	#{ label => _"New filter", code => sub { $_[0]{self}->newtab('B'); }, stockicon => 'gtk-add', },
-	{ label => _"Open Queue", code => sub { $_[0]{self}->newtab('Q'); }, stockicon => 'gmb-queue',
-		test => sub { !grep $_->{tabbed_page_type} eq 'Q', $_[0]{self}->get_children } },
-	{ label => _"Open Playlist", code => sub { $_[0]{self}->newtab('A'); }, stockicon => 'gtk-media-play',
-		test => sub { !grep $_->{tabbed_page_type} eq 'A', $_[0]{self}->get_children } },
-	{ label => _"Open existing list", code => sub { $_[0]{self}->newtab(L=>$_[1]); },
-		submenu => sub { my %h; $h{$_->{tabbed_listname}}=1 for grep $_->{tabbed_page_type} eq 'L', $_[0]{self}->get_children; return [grep !$h{$_}, ::GetListOfSavedLists()]; } },
-	{ label => _"Open page layout", code => sub { $_[0]{self}->newtab(P=>$_[1]); },
-		submenu => sub { Layout::get_layout_list('P') }, submenu_tree=>1, },
-	{ label => _"Delete list", code => sub { ::SaveList($_[0]{page}{tabbed_listname},undef); },
-		test => sub {$_[0]{pagetype} eq 'L'} },
-	{ label => _"Rename", code => \&rename_current_tab,
-		test => sub {$_[0]{pagetype} eq 'L'} },
-	{ label => _"Close",	code => sub { $_[0]{self}->close_tab($_[0]{page}); }, },
-);
-
-sub new
-{	my ($class,$opt1,$opt2)=@_;
-	my $self = bless Gtk2::Notebook->new, $class;
-	$self->set_scrollable(1);
-	$self->set_tab_hborder(0);
-	$self->set_tab_vborder(0);
-	$self->{SaveOptions}=\&SaveOptions;
-	$self->{group}=$opt1->{group};
-	$self->signal_connect(switch_page => \&SwitchedPage);
-	$self->signal_connect(button_press_event => \&button_press_event_cb);
-	$self->{tabcount}=0;
-	$self->{SLpackage}= $opt1->{songtree} ? 'SongTree' : $opt1->{songlist} ? 'SongList' : 'SongList';
-	if ($opt2 && keys %$opt2)
-	{	for my $n (sort {$a<=>$b} grep s/^page(\d+)$/$1/, keys %$opt2)
-		{	my @args=split /\|/,$opt2->{'page'.$n};
-			my ($type,$extra,$opt)=map Encode::decode('utf8',::decode_url($_)), @args;
-			unless ($PagesTypes{$type}{stringopt})
-			{	my %opt2= $opt=~m/(\w+)=([^,]*)(?:,|$)/g;
-				$opt=\%opt2;
-			}
-			$self->newtab($type,$extra,$opt);
-		}
-		for my $key (keys %$opt2)
-		{	$self->{default}{$1}=$opt2->{$key} if $key=~m/^([ALQ])default$/;
-		}
-		$self->set_current_page($opt2->{currentpage});
-	}
-
-	::Watch($self, SavedLists => sub
-	 {	my ($self,$name,$type,$newname)=@_;
-		for my $page (grep $_->{tabbed_page_type} eq 'L', $self->get_children)
-		{	next if $name ne $page->{tabbed_listname};
-			if ($type && $type eq 'renamedto')
-			{	$page->{tabbed_listname}=$newname;
-				$page->{tabbed_page_label}->set_text($newname);
-			}
-			elsif (!exists $::Options{SavedLists}{$name})
-			{	$self->close_tab($page);
-			}
-		}
-	 });
-
-	$self->newtab('A') unless $self->{tabcount};
-	return $self;
-}
-
-sub button_press_event_cb
-{	my ($self,$event)=@_;
-	return 0 if $event->button != 3;
-	return 0 unless ::IsEventInNotebookTabs($self,$event); #to make right-click on tab arrows work
-	my $pagenb=$self->get_current_page;
-	my $page=$self->get_nth_page($pagenb);
-	my $listname= $page? $page->{tabbed_listname} : undef;
-	$::LEvent=$event;
-	::PopupContextMenu(\@MenuTabbedL, { self=>$self, list=>$listname, pagenb=>$pagenb, page=>$page, pagetype=>$page->{tabbed_page_type} } );
-	return 1;
-}
-
-sub newlist
-{	my ($self,$group,$name,$opt2)=@_;
-	unless (defined $name)
-	{	$name='list000';
-		$name++ while $::Options{SavedLists}{$name};
-	}
-	::SaveList($name,[]) unless $::Options{SavedLists}{$name};
-	my $songarray= $::Options{SavedLists}{$name};
-	my $page=$self->{SLpackage}->new({type=>'L',activate=>'playlist',group=>$group},$opt2, $songarray);
-	$page->{tabbed_listname}=$name;
-	return $page,$name;
-}
-sub newfilter
-{	my ($self,$group,$name,$opt2)=@_;
-	my $page=$self->{SLpackage}->new({type=>'B',activate=>'play',group=>$group},$opt2);
-	unless (defined $name)
-	{	$name='filter000';
-		$name++ while $::Options{SavedFilters}{$name};
-		::SaveFilter($name,undef);
-	}
-	$page->SetFilter(Filter->new('title:slove'));# just a test filter #TEST
-	return $page,$name;
-}
-sub newqueue
-{	my ($self,$group,undef,$opt2)=@_;
-	my $page=$self->{SLpackage}->new({type=>'Q',activate=>'play',group=>$group},$opt2, $::Queue);
-	return $page,_"Queue";
-}
-sub newplaylist
-{	my ($self,$group,undef,$opt2)=@_;
-	my $page= $self->{SLpackage}->new({type=>'A',group=>$group,mode=>'playlist'},$opt2);
-	return $page,_"Playlist";
-}
-
-sub newtab
-{	my ($self,$type,$extra,$opt2)=@_;
-	my $ref=$PagesTypes{$type};
-	my $group=$self.'_'.$self->{tabcount}++;
-	if (!$opt2 && $type=~m/^[ALQ]$/)
-	{	if ($self->get_children)
-		{	my $page=$self->get_nth_page($self->get_current_page);
-			$opt2=$page->SaveOptions if $page && $page->{tabbed_page_type} eq $type;
-		}
-		if (!$opt2 &&  $self->{default}{$type})
-		{	$opt2=::decode_url($self->{default}{$type});
-			my %opt2= $opt2=~m/(\w+)=([^,]*)(?:,|$)/g;
-			$opt2=\%opt2;
-		}
-	}
-	my ($page,$name)= $ref->{New}($self,$group,$extra,$opt2);
-	$page->{tabbed_page_type}=$type;
-	::Watch($self,'SelectedID_'.$group,\&UpdateSelectedID) if $ref->{WatchID};
-	$page->{tabbed_page_label}=my $label=Gtk2::Label->new($name);
-	my $icon= $ref->{stockicon}||$page->{stockicon};
-	$icon=Gtk2::Image->new_from_stock($icon,'menu') if defined $icon;
-
-	#small close button
-	my $close=Gtk2::Button->new;
-	$close->set_relief('none');
-	$close->can_focus(0);
-	$close->signal_connect(clicked => sub {my $self=::find_ancestor($_[0],__PACKAGE__); $self->close_tab($page);});
-	$close->add(Gtk2::Image->new_from_stock('gtk-close','menu'));
-	$close->set_size_request(Gtk2::IconSize->lookup('menu'));
-	$close->set_border_width(0);
-
-	my $tab=::Hpack('4',$icon,'2_', $label,$close);
-	$tab->set_spacing(0); #FIXME Hpack options should be enough
-	$self->append_page($page,$tab);
-	$self->set_tab_reorderable($page,::TRUE);
-	$tab->show_all;
-	$self->show_all;
-	$self->set_current_page($self->get_n_pages-1);
-}
-sub close_tab
-{	my ($self,$page)=@_;
-	my $type=$page->{tabbed_page_type};
-	if ($type=~m/^[ALQ]$/ && $page->{SaveOptions})
-	{	my $opt= $page->{SaveOptions}($page);
-		$opt=join ',',map $_.'='.$opt->{$_}, keys %$opt;
-		$self->{default}{$type}= ::url_escapeall( $opt );
-	}
-	$self->remove($page);
-	$page->destroy;
-	$self->newtab('A') unless $self->get_children;
-}
-
-sub rename_current_tab
-{	my $page=$_[0]{page};
-	my $tab=$_[0]{self}->get_tab_label($page);
-	my $label=$page->{tabbed_page_label};
-	my $entry=Gtk2::Entry->new;
-	$entry->set_has_frame(0);
-	$entry->set_inner_border(undef) if *Gtk2::Entry::set_inner_border{CODE}; #Gtk2->CHECK_VERSION(2,10,0);
-	$entry->set_text( $page->{tabbed_listname} );
-	$entry->set_size_request( 20+$label->allocation->width ,-1);
-	$_->hide for grep !$_->isa('Gtk2::Image'), $tab->get_children;
-	$tab->pack_start($entry,::FALSE,::FALSE,2);
-	$entry->grab_focus;
-	$entry->show_all;
-	$entry->signal_connect(key_press_event => sub #abort if escape
-		{	my ($entry,$event)=@_;
-			return 0 unless Gtk2::Gdk->keyval_name( $event->keyval ) eq 'Escape';
-			$entry->set_text($page->{tabbed_listname});
-			$entry->set_sensitive(0);  #trigger the focus-out event
-			1;
-		});
-	$entry->signal_connect(activate => sub {$_[0]->set_sensitive(0)}); #trigger the focus-out event
-	$entry->signal_connect(focus_out_event => sub
-	 {	my $entry=$_[0];
-		my $new=$entry->get_text;
-		$tab->remove($entry);
-		$_->show for $tab->get_children;
-		if ($new ne '' && !exists $::Options{SavedLists}{$new})
-		{	::SaveList($page->{tabbed_listname},undef,$new);
-		}
-		0;
-	 });
-}
-
-sub SwitchedPage
-{	my ($self,undef,$pagenb)=@_;
-	my $group=$self->get_nth_page($pagenb)->{group};
-	$self->{active_group}=$group;
-	my $ID=$self->{selectedID}{$group};
-	::HasChangedSelID($self->{group},$ID);
-}
-
-sub UpdateSelectedID
-{	my ($self,$ID,$group)=@_;
-	$self->{selectedID}{$group}=$ID;
-	return unless $self->{active_group} eq $group;
-	::HasChangedSelID($self->{group},$ID);
-}
-
-sub SaveOptions
-{	my $self=$_[0];
-	my $count=0;
-	my %opt;
-	for my $page ($self->get_children)
-	{	my $type=$page->{tabbed_page_type};
-		my $sub=$PagesTypes{$type}{save};
-		my @args=($type);
-		push @args, ($sub ? $sub->($page) :'');
-		if ($page->{SaveOptions})
-		{	my $opt= $page->{SaveOptions}($page);
-			unless ($PagesTypes{$type}{stringopt})
-			{ $opt=join ',',map $_.'='.$opt->{$_}, keys %$opt; }
-			push @args,$opt;
-		}
-		$opt{ 'page'.($count++) }=join '|',map ::url_escapeall($_),@args;
-	}
-	if ($self->{default})
-	{	$opt{$_.'default'}=$self->{default}{$_} for keys %{$self->{default}};
-	}
-	$opt{currentpage}=$self->get_current_page;
-	return \%opt;
-}
-
-package Layout::Page;
-use base 'Gtk2::Frame';
-our @ISA;
-push @ISA,'Layout';
-
-sub new
-{	my (undef,$group,$layout,$opt2)=@_;
-	my $self=bless Gtk2::Frame->new, 'Layout::Page';
-	$self->set_name($layout);
-	$self->set_shadow_type('etched-in');
-	$self->{SaveOptions}=\&Layout::SaveOptions;
-	$self->{group}=$group;
-	$self->Pack($layout,$opt2);
-	$self->{stockicon}=$Layout::Layouts{$layout}{stockicon};
-	$self->show_all;
-
-	return $self,$layout;
-}
 
 package EditListButtons;
 use Glib qw(TRUE FALSE);
@@ -550,11 +286,11 @@ use Gtk2;
 use base 'Gtk2::HBox';
 
 sub new
-{	my ($class,$opt1)=@_;
+{	my ($class,$opt)=@_;
 	my $self=bless Gtk2::HBox->new, $class;
-	$self->{group}=$opt1->{group};
-	$self->{brm}=	::NewIconButton('gtk-remove',	($opt1->{small} ? '' : _"Remove"),sub {::GetSonglist($self)->RemoveSelected});
-	$self->{bclear}=::NewIconButton('gtk-clear',	($opt1->{small} ? '' : _"Clear"),sub {::GetSonglist($self)->Empty} );
+	$self->{group}=$opt->{group};
+	$self->{brm}=	::NewIconButton('gtk-remove',	($opt->{small} ? '' : _"Remove"),sub {::GetSonglist($self)->RemoveSelected});
+	$self->{bclear}=::NewIconButton('gtk-clear',	($opt->{small} ? '' : _"Clear"),sub {::GetSonglist($self)->Empty} );
 	$self->{bup}=	::NewIconButton('gtk-go-up',		undef,	sub {::GetSonglist($self)->MoveUpDown(1)});
 	$self->{bdown}=	::NewIconButton('gtk-go-down',		undef,	sub {::GetSonglist($self)->MoveUpDown(0)});
 	$self->{btop}=	::NewIconButton('gtk-goto-top',		undef,	sub {::GetSonglist($self)->MoveUpDown(1,1)});
@@ -563,7 +299,7 @@ sub new
 	$::Tooltips->set_tip($self->{brm},_"Remove selected songs");
 	$::Tooltips->set_tip($self->{bclear},_"Remove all songs");
 
-	if ($opt1->{relief}) { $self->{$_}->set_relief($opt1->{relief}) for qw/brm bclear bup bdown btop bbot/; }
+	if (my $r=$opt->{relief}) { $self->{$_}->set_relief($r) for qw/brm bclear bup bdown btop bbot/; }
 	$self->pack_start($self->{$_},FALSE,FALSE,2) for qw/btop bup bdown bbot brm bclear/;
 
 	::Watch($self,'Selection_'.$self->{group}, \&SelectionChanged);
@@ -663,17 +399,36 @@ package SongList::Common;	#common functions for SongList and SongTree
 our %Register;
 our $EditList;	#list that will be used in 'editlist' mode, used only for editing a list in a separate window
 
+our @DefaultOptions=
+(	'sort'	=> 'path album:i disc track file',
+	hideif	=> '',
+	colwidth=> '',
+);
+
+sub new
+{	my $opt=$_[1];
+	my $package= $opt->{songtree} ? 'SongTree' : $opt->{songlist} ? 'SongList' : 'SongList';
+	$package->new($opt);
+}
+
 sub CommonInit
-{	my ($self,$opt1,$opt2,$songarray)=@_;
+{	my ($self,$opt)=@_;
 
-	$self->{$_}=$opt1->{$_} for qw/mode group/,grep m/^activate\d?$/, keys %$opt1;
+	%$opt=( @DefaultOptions, %$opt );
+	$self->{$_}=$opt->{$_} for qw/mode group follow sort hideif hidewidget shrinkonhide/,grep(m/^activate\d?$/, keys %$opt);
 	$self->{mode}||='';
-	$self->{type}=	$self->{mode} eq 'playlist' ? 'A' :
-			$self->{mode} eq 'editlist' ? 'L' :
-			$opt1->{type} || 'B';
-	$self->{TogFollow}=1 if $opt2->{follow};
+	my $type= $self->{type}=
+				$self->{mode} eq 'playlist' ? 'A' :
+				$self->{mode} eq 'editlist' ? 'L' :
+				$opt->{type} || 'B';
+	$self->{mode}='playlist' if $type eq 'A';
+	 #default double-click action :
+	$self->{activate} ||=	$type eq 'L' ? 'playlist' :
+				$type eq 'Q' ? 'remove_and_play' :
+				'play';
+	$self->{activate2}||='queue' unless $type eq 'Q'; #default to 'queue' songs when double middle-click
 
-	::WatchFilter($self,$self->{group}, \&SetFilter ) if $self->{type}!~m/[QL]/;
+	::WatchFilter($self,$self->{group}, \&SetFilter ) if $type!~m/[QL]/;
 	$self->{need_init}=1;
 	$self->signal_connect(show => sub
 		{	my $self=$_[0];
@@ -686,17 +441,10 @@ sub CommonInit
 			0;
 		});
 
-	$self->{sort}= $opt2->{sort} || 'path|album:i|disc|track|file';
-	$self->{sort}=~tr/|/ /;
-	for my $key (keys %$opt2)
-	{	next unless $key=~m/^cw_(.*)$/;
-		$self->{colwidth}{$1}=$opt2->{$key};
-	}
-	$self->{hideif}=	$opt1->{hideif} || '';
-	$self->{hidewidget}=	$opt1->{hidewidget};
-	$self->{shrinkonhide}=	$opt1->{shrinkonhide};
+	$self->{colwidth}= { split / +/, $opt->{colwidth} };
 
-	if ($self->{type} eq 'A')
+	my $songarray=$opt->{songarray};
+	if ($type eq 'A')
 	{	#$songarray= SongArray->new_copy($::ListPlay);
 		$self->{array}=$songarray=$::ListPlay;
 		$self->{sort}= $::RandomMode ? $::Options{Sort_LastOrdered} : $::Options{Sort};
@@ -705,13 +453,30 @@ sub CommonInit
 		::SetFilter($self,$::PlayFilter,0);
 		$self->{ignoreSetFilter}=0;
 	}
-	elsif ($self->{type} eq 'L')
-	{	$songarray||= $EditList;
+	elsif ($type eq 'L')
+	{	if (defined $EditList) { $songarray=$EditList; $EditList=undef; } #special case for editing a list via ::WEditList
+		unless (defined $songarray && $songarray ne '')	#create a new list if none specified
+		{	$songarray='list000';
+			$songarray++ while $::Options{SavedLists}{$songarray};
+		}
+	}
+	elsif ($type eq 'Q') { $songarray=$::Queue; }
+
+	if ($songarray && !ref $songarray)	#if not a ref, treat it as the name of a saved list
+	{	::SaveList($songarray,[]) unless $::Options{SavedLists}{$songarray}; #create new list if doesn't exists
+		$songarray=$::Options{SavedLists}{$songarray};
 	}
 	$self->{array}= $songarray || SongArray->new;
 
 	$Register{ $self->{group} }=$self;
 	::weaken($Register{ $self->{group} });	#or use a destroy cb ?
+}
+sub CommonSave
+{	my $self=shift;
+	my @opt= ( 'sort' => $self->{'sort'} );
+	push @opt,follow=>1 if $self->{follow};
+	if ($self->{type} eq 'L' && defined(my $n= $self->{array}->GetName)) { push @opt, type=>'L', songarray=> $n; }
+	return @opt;
 }
 
 sub Sort
@@ -791,10 +556,6 @@ sub Activate
 	my $songarray=$self->{array};
 	my $ID=$songarray->[$row];
 	my $activate=$self->{'activate'.$button} || $self->{activate};
-	$activate||=	$songarray==$::Queue	? 'remove_and_play' :
-			$button==2		? 'queue' :
-			$self->{type} eq 'L'	? 'playlist' :
-			'play';
 	my $aftercmd;
 	$aftercmd=$1 if $activate=~s/&(.*)$//;
 	if	($activate eq 'remove_and_play')
@@ -817,6 +578,37 @@ sub Activate
 		else				{ ::Select(song=>$ID,play=>1); }
 	}
 	::run_command($self,$aftercmd) if $aftercmd;
+}
+
+# functions for SavedLists, ie type=L
+sub MakeTitleLabel
+{	my $self=shift;
+	my $name=$self->{array}->GetName;
+	my $label=Gtk2::Label->new($name);
+	::weaken( $label->{songlist}=$self );
+	::Watch($label,SavedLists=> \&UpdateTitleLabel);
+	return $label;
+}
+sub UpdateTitleLabel
+{	my ($label,$list,$action,$newname)=@_;
+	return unless $action && $action eq 'renamedto';
+	my $self=$label->{songlist};
+	my $old=$label->get_text;
+	my $new=$self->{array}->GetName;
+	return if $old eq $new;
+	$label->set_text($new);
+}
+sub RenameTitleLabel
+{	my ($label,$newname)=@_;
+	my $self=$label->{songlist};
+	my $oldname=$self->{array}->GetName;
+	return if $newname eq '' || exists $::Options{SavedLists}{$newname};
+	::SaveList($oldname,$self->{array},$newname);
+}
+sub DeleteList
+{	my $self=shift;
+	my $name=$self->{array}->GetName;
+	::SaveList($name,undef) if defined $name;
 }
 
 package SongList;
@@ -906,10 +698,17 @@ our @ColumnMenu=
 	{ label => sub { _('_Remove this column').' ('. ($SLC_Prop{$_[0]{pos}}{menu} || $SLC_Prop{$_[0]{pos}}{title}).')' },
 	  code	=> sub { $_[0]{self}->ToggleColumn($_[0]{pos},$_[0]{pos}); },	stockicon => 'gtk-remove'
 	},
-	{ label => _"Follow playing song",	code => sub { $_[0]{self}->FollowSong if $_[0]{self}{TogFollow}^=1; },
-	  check => sub { $_[0]{self}{TogFollow} }
+	{ label => _"Follow playing song",	code => sub { $_[0]{self}->FollowSong if $_[0]{self}{follow}^=1; },
+	  check => sub { $_[0]{self}{follow} }
 	},
 	{ label => _"Go to playing song",	code => sub { $_[0]{self}->FollowSong; }, },
+);
+
+our @DefaultOptions=
+(	cols		=> 'playandqueue title artist album year length track file lastplay playcount rating',
+	playrow 	=> 'boldrow',
+	headers 	=> 'on',
+	no_typeahead	=> 0,
 );
 
 sub init_textcolumns	#FIXME support calling it multiple times => remove columns for removed fields, update added columns ?
@@ -926,32 +725,21 @@ sub init_textcolumns	#FIXME support calling it multiple times => remove columns 
 }
 
 sub new
-{	my ($class,$opt1,$opt2,$songarray) = @_;
+{	my ($class,$opt) = @_;
 
 	my $self = bless Gtk2::ScrolledWindow->new, $class;
 	$self->set_shadow_type('etched-in');
 	$self->set_policy('automatic','automatic');
 	::set_biscrolling($self);
-	if (exists $opt2->{colwidth}) {delete $opt2->{$_} for qw/colwidth cols sort/}#old version <0.9584 => reset
-	$self->CommonInit($opt1,$opt2,$songarray);
 
-	my $cols=$opt2->{cols};
-	if (exists $opt2->{cw_ufile}) # old versions <1.1
-	{	$cols=~tr/_/|/;
-		$cols=~s/ufile/file/;
-		$cols=~s/upath/path/;
-		$cols=~s/date/year/;
-		$cols=~s/nbplay/playcount/;#for version<0.9607 #DELME
-		delete $opt2->{$_} for qw/sort cw_date cw_ufile cw_upath cw_nbplay/;
-	}
-	$cols||='playandqueue|title|artist|album|year|length|track|file|lastplay|playcount|rating';
+	%$opt=( @DefaultOptions, %$opt );
+	$self->CommonInit($opt);
+	$self->{$_}=$opt->{$_} for qw/songypad playrow/;
 
 	my $store=SongStore->new; $store->{array}=$self->{array}; $store->{size}=@{$self->{array}};
 	my $tv=Gtk2::TreeView->new($store);
 	$self->add($tv);
 	$self->{store}=$store;
-	$self->{songypad}= $opt1->{songypad} if exists $opt1->{songypad};
-	$self->{playrow}= defined $opt1->{playrow} ? $opt1->{playrow} : 'boldrow';
 
 	::set_drag($tv,
 	 source	=>[::DRAG_ID,sub { my $tv=$_[0]; return ::DRAG_ID,$tv->parent->GetSelectedIDs; }],
@@ -962,9 +750,9 @@ sub new
 
 	$tv->set_rules_hint(TRUE);
 	$tv->set_headers_clickable(TRUE);
-	$tv->set_headers_visible(FALSE) if $opt1->{headers} && $opt1->{headers} eq 'off';
+	$tv->set_headers_visible(FALSE) if $opt->{headers} eq 'off';
 	$tv->set('fixed-height-mode' => TRUE);
-	$tv->set_enable_search(!$opt1->{no_typeahead});
+	$tv->set_enable_search(!$opt->{no_typeahead});
 	$tv->set_search_equal_func(\&SongStore::search_equal_func);
 	$tv->signal_connect(key_release_event => sub
 		{	my ($tv,$event)=@_;
@@ -981,14 +769,14 @@ sub new
 	$tv->get_selection->signal_connect(changed => sub { ::IdleDo('1_Changed'.$_[0],10,\&sel_changed_cb,$_[0]); }); #delay it, because it can be called A LOT when, for example, removing 10000 selected rows
 	$tv->get_selection->set_mode('multiple');
 
-	if (my $tip=$opt1->{rowtip} and *Gtk2::Widget::set_has_tooltip{CODE})  # since gtk+ 2.12, Gtk2 1.160
+	if (my $tip=$opt->{rowtip} and *Gtk2::Widget::set_has_tooltip{CODE})  # since gtk+ 2.12, Gtk2 1.160
 	{	$tv->set_has_tooltip(1);
 		$tip= "<b><big>%t</big></b>\\nby <b>%a</b>\\nfrom <b>%l</b>" if $tip eq '1';
 		$self->{rowtip}= $tip;
 		$tv->signal_connect(query_tooltip=> \&query_tooltip_cb);
 	}
 
-	$self->AddColumn($_) for split /\|/,$cols;
+	$self->AddColumn($_) for split / +/,$opt->{cols};
 	$self->AddColumn('title') unless $tv->get_columns; #make sure there is at least one column
 
 	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
@@ -1002,17 +790,15 @@ sub new
 
 sub SaveOptions
 {	my $self=shift;
-	my %opt;
+	my %opt= ( $self->CommonSave );
 	my $tv=$self->child;
-	my $sort=$self->{'sort'};
-	$sort=~tr/ /|/;
-	$opt{sort}=$sort;
 	#save displayed cols
-	$opt{cols}=join '|',(map $_->{colid},$tv->get_columns);
+	$opt{cols}=join ' ',(map $_->{colid},$tv->get_columns);
 	#save their width
-	$opt{ 'cw_'.$_ }=$self->{colwidth}{$_} for keys %{$self->{colwidth}};
-	$opt{ 'cw_'.$_->{colid} }=$_->get_width for $tv->get_columns;
-	$opt{follow}=1 if $self->{TogFollow};
+	my %width;
+	$width{$_}=$self->{colwidth}{$_} for keys %{$self->{colwidth}};
+	$width{ $_->{colid} }=$_->get_width for $tv->get_columns;
+	$opt{colwidth}= join ' ',map "$_ $width{$_}", sort keys %width;
 	return \%opt;
 }
 
@@ -1024,7 +810,7 @@ sub AddColumn
 	if (my $init=$prop->{init})
 	{	$renderer->set($_ => $init->{$_}) for keys %$init;
 	}
-	$renderer->set(ypad => $self->{songypad}) if exists $self->{songypad};
+	$renderer->set(ypad => $self->{songypad}) if defined $self->{songypad};
 	my $colnb=SongStore::get_column_number($colid);
 	my $attrib=$prop->{attrib};
 	my @attributes=($prop->{title},$renderer,$attrib,$colnb);
@@ -1232,7 +1018,7 @@ sub Scroll_to_TopEnd
 sub UpdateSelID
 {	my $self=$_[0];
 	$self->queue_draw if defined $self->{playrow};
-	$self->FollowSong if $self->{TogFollow};
+	$self->FollowSong if $self->{follow};
 }
 
 sub SongsChanged_cb
@@ -1713,18 +1499,23 @@ our @cMenu=
 	  check => sub {!$_[0]{filterpane}{hidebb};} },
 );
 
+our @DefaultOptions=
+(	pages	=> 'savedtree|artist|album|genre|date|label|folder|added|lastplay',
+	nb	=> 1,	# filter level
+	min	=> 1,	# filter out entries with less than $min songs
+	hidebb	=> 0,	# hide button box
+);
+
 sub new
-{	my ($class,$opt1,$opt2)=@_;
+{	my ($class,$opt)=@_;
 	my $self = bless Gtk2::VBox->new(FALSE, 6), $class;
-	$self->{SaveOptions}=\&SaveOptions; #warn "\n\n$opt1->{pages}\n\n";
-	my $pages= $opt2->{pages} || $opt1->{pages} || 'savedtree|artist|album|genre|date|label|folder|added|lastplay';
-	my @pids=split /\|/, $pages;
-	my $nb=$opt1->{nb};
-	$nb=1 unless defined $nb;
-	$self->{nb}=$nb;
-	my $group=$self->{group}=$opt1->{group};
-	$self->{min}=$opt2->{min}||1;
-	$self->{child_opt1}{$_}=$opt1->{$_} for qw/group no_typeahead searchbox activate/; #opt1 options passed to children
+	$self->{SaveOptions}=\&SaveOptions;
+	%$opt=( @DefaultOptions, %$opt );
+	my @pids=split /\|/, $opt->{pages};
+	$self->{$_}=$opt->{$_} for qw/nb group min/;
+	$self->{main_opt}{$_}=$opt->{$_} for qw/group no_typeahead searchbox activate/; #options passed to children
+	my $nb=$self->{nb};
+	my $group=$self->{group};
 
 	my $spin=Gtk2::SpinButton->new( Gtk2::Adjustment->new($self->{min}, 1, 9999, 1, 10, 0) ,10,0  );
 	$spin->signal_connect( value_changed => sub { $self->update_children($_[0]->get_value); } );
@@ -1750,7 +1541,7 @@ sub new
 					  ) );
 	$::Tooltips->set_tip($InterB, _"toggle Intersection mode");
 	$::Tooltips->set_tip($InvertB,_"toggle Invert mode");
-	$::Tooltips->set_tip($spin,   _"minimum number of songs"); #FIXME
+	$::Tooltips->set_tip($spin,   _"only show entries with at least n songs"); #FIXME
 	$::Tooltips->set_tip($optB,   _"options");
 
 	my $notebook = Gtk2::Notebook->new;
@@ -1761,8 +1552,8 @@ sub new
 
 	my $setpage;
 	for my $pid (@pids)
-	{	my $n=$self->AppendPage($pid,$opt2);
-	    if ($opt2->{page} && $opt2->{page} eq $pid) { $setpage=$n }
+	{	my $n=$self->AppendPage($pid,$opt->{'page_'.$pid});
+		if ($opt->{page} && $opt->{page} eq $pid) { $setpage=$n }
 	}
 
 	$self->pack_end($hbox, FALSE, FALSE, 0);
@@ -1789,15 +1580,14 @@ sub new
 	$self->add($notebook);
 	$notebook->set_current_page( $setpage||0 );
 
-	$opt2->{hidebb}=$opt1->{hide} unless exists $opt2->{hidebb};
-	$self->{hidebb}=$opt2->{hidebb}||0;
+	$self->{hidebb}=$opt->{hidebb};
 	$hbox->hide if $self->{hidebb};
 	$self->{resetbutton}=$ResetB;
 	::Watch($self, SongsChanged=> \&SongsChanged_cb);
 	::Watch($self, SongsAdded  => \&SongsAdded_cb);
 	::Watch($self, SongsRemoved=> \&SongsRemoved_cb);
 	$self->signal_connect(destroy => \&cleanup);
-	::WatchFilter($self,$opt1->{group},\&updatefilter);
+	::WatchFilter($self,$opt->{group},\&updatefilter);
 	return $self;
 }
 
@@ -1809,14 +1599,15 @@ sub SaveOptions
 		page	=> $self->{page},
 		pages	=> (join '|', map $_->{pid}, $self->{notebook}->get_children),
 	);
-	for my $page ($self->{notebook}->get_children)
-	{	push @opt, $page->SaveOptions if $page->isa('FilterList');
+	for my $page (grep $_->isa('FilterList'), $self->{notebook}->get_children)
+	{	my %pageopt=$page->SaveOptions;
+		push @opt, 'page_'.$page->{pid}, { %pageopt } if keys %pageopt;
 	}
 	return \@opt;
 }
 
 sub AppendPage
-{	my ($self,$pid,$opt2)=@_;
+{	my ($self,$pid,$opt)=@_;
 	my ($package,$col,$label);
 	if ($Pages{$pid})
 	{	($package,$col,undef,$label)=@{ $Pages{$pid} };
@@ -1827,8 +1618,9 @@ sub AppendPage
 		$label=Songs::FieldName($col);
 	}
 	else {return}
-	$opt2||={};
-	my $page=$package->new($col,$self->{child_opt1},$opt2,$pid); #create new page
+	$opt||={};
+	my %opt=( %{$self->{main_opt}}, %$opt);
+	my $page=$package->new($col,\%opt); #create new page
 	$page->{pid}=$pid;
 	if ($package eq 'FilterList' || $package eq 'FolderList')
 	{	$page->{Depend_on_field}=$col;
@@ -2024,24 +1816,22 @@ use base 'Gtk2::VBox';
 use constant { GID_ALL => 2**32-1, GID_TYPE => 'Glib::ULong' };
 
 sub new
-{	my ($class,$field,$opt1,$opt2,$pid)=@_;
+{	my ($class,$field,$opt)=@_;
 	my $self = bless Gtk2::VBox->new, $class;
 	$self->{field}[0]=$field;
-	$self->{no_typeahead}=$opt1->{no_typeahead};
-	$self->{rules_hint}=$opt1->{rules_hint};
+	$self->{no_typeahead}=$opt->{no_typeahead};
+	$self->{rules_hint}=$opt->{rules_hint};
 
-	my $mode=	$opt2->{'mode_'.$pid} || 'list';
-	$self->{depth} =$opt2->{'depth_'.$pid}|| 0;
-	$self->{'sort'}=$opt2->{'sort_'.$pid} || 'default';
-	$self->{noall}=	$opt2->{'noall_'.$pid} || 0;
-	$self->{type}=		[split /\|/, $opt2->{'type_'.	$pid}||''];
-	$self->{markup}=	[split /\|/, $opt2->{'lmarkup_'.$pid}||''];
-	$self->{picsize}=	[split /\|/, $opt2->{'lpicsize_'.$pid}||0];
+	my $mode=	$opt->{mode} || 'list';
+	$self->{depth} =$opt->{depth}|| 0;
+	$self->{'sort'}=$opt->{'sort'} || 'default';
+	$self->{noall}=	$opt->{noall} || 0;
+	$self->{type}=		[split /\|/, $opt->{type}||''];
+	$self->{markup}=	[split /\|/, $opt->{lmarkup}||''];
+	$self->{picsize}=	[split /\|/, $opt->{lpicsize}||0];
 	$self->{icons}= Songs::FilterListProp($field,'icon') ? [(Gtk2::IconSize->lookup('menu'))[0]] : [0];
 	$self->{type}[0] ||= $field.'.'.(Songs::FilterListProp($field,'type')||''); $self->{type}[0]=~s/\.$//;	#FIXME
-	if (Songs::FilterListProp($field,'picture'))
-	{	$self->{mpicsize}=	$opt2->{'mpicsize_'.$pid}|| 64;
-	}
+	$self->{mpicsize}= $opt->{mpicsize} if exists $opt->{mpicsize};
 	::Watch($self, Picture_artist => \&AAPicture_Changed);	#FIXME PHASE1
 	::Watch($self, Picture_album => \&AAPicture_Changed);	#FIXME PHASE1
 
@@ -2051,13 +1841,13 @@ sub new
 	}
 
 	#search box
-	if ($opt1->{searchbox} && Songs::FilterListProp($field,'search'))
+	if ($opt->{searchbox} && Songs::FilterListProp($field,'search'))
 	{	$self->pack_start( make_searchbox() ,::FALSE,::FALSE,1);
 	}
-	::Watch($self,'SearchText_'.$opt1->{group},\&set_text_search);
+	::Watch($self,'SearchText_'.$opt->{group},\&set_text_search);
 
 	#interactive search box
-	$self->{isearchbox}=GMB::ISearchBox->new($opt2,$field,'nolabel',$pid);
+	$self->{isearchbox}=GMB::ISearchBox->new($opt,$field,'nolabel');
 	$self->pack_end( $self->{isearchbox} ,::FALSE,::FALSE,1);
 	$self->signal_connect(key_press_event => \&key_press_cb); #only used for isearchbox
 
@@ -2065,9 +1855,9 @@ sub new
 	$self->signal_connect(map => \&Fill);
 
 	my $sub=\&play_current;
-	if ($opt1->{activate})
-	{	$sub=\&enqueue_current	if $opt1->{activate} eq 'queue';
-		$sub=\&add_current	if $opt1->{activate} eq 'addplay';
+	if ($opt->{activate})
+	{	$sub=\&enqueue_current	if $opt->{activate} eq 'queue';
+		$sub=\&add_current	if $opt->{activate} eq 'addplay';
 	}
 	$self->{activate}=$sub;
 
@@ -2077,16 +1867,17 @@ sub new
 
 sub SaveOptions
 {	my $self=$_[0];
-	my $pid=$self->{pid};
 	my %opt;
-	$opt{'mpicsize_'.$pid}=$self->{mpicsize} if exists $self->{mpicsize};
-	$opt{'lpicsize_'.$pid}=	join '|', @{$self->{picsize}}	if $self->{picsize};
-	$opt{'lmarkup_'. $pid}=	join '|', @{$self->{markup}}	if $self->{markup};
-	$opt{'type_'.$pid}=	join '|', @{$self->{type}}	if $self->{type};
-	$opt{'depth_'.$pid}=$self->{depth};
-	$opt{'mode_'.$pid}= $self->{mode};
-	$opt{'sort_'.$pid}= $self->{'sort'};
-	$opt{'noall_'.$pid}= $self->{'noall'};
+	$opt{lpicsize}	= join '|', @{$self->{picsize}};
+	$opt{lmarkup}	= join '|', @{$self->{markup}};
+	$opt{type}	= join '|', @{$self->{type}};
+	$opt{depth}	= $self->{depth} if $self->{depth};
+	$opt{mode}	= $self->{mode}  if $self->{mode} ne 'list';
+	$opt{'sort'}	= $self->{'sort'} if $self->{'sort'} ne 'default';
+	$opt{noall}	= $self->{noall};
+	$opt{mpicsize}	= $self->{mpicsize};
+	for (keys %opt) { delete $opt{$_} unless $opt{$_}; }	#remove unneeded options (0 or "")
+	delete $opt{type} if $opt{type} eq $self->{pid};	#remove unneeded type options
 	return %opt, $self->{isearchbox}->SaveOptions;
 }
 
@@ -2185,6 +1976,7 @@ sub create_cloud
 sub create_mosaic
 {	my $self=$_[0];
 	$self->{mode}='mosaic';
+	$self->{mpicsize}||=64;
 	my $hbox=Gtk2::HBox->new(0,0);
 	my $vscroll=Gtk2::VScrollbar->new;
 	$hbox->pack_end($vscroll,0,0,0);
@@ -2463,7 +2255,7 @@ use Gtk2;
 use base 'Gtk2::ScrolledWindow';
 
 sub new
-{	my ($class,$col,$opt1,$opt2)=@_;
+{	my ($class,$col,$opt)=@_;
 	my $self = bless Gtk2::ScrolledWindow->new, $class;
 	$self->set_shadow_type ('etched-in');
 	$self->set_policy ('automatic', 'automatic');
@@ -2472,7 +2264,7 @@ sub new
 	my $store=Gtk2::TreeStore->new('Glib::String');
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->set_headers_visible(::FALSE);
-	$treeview->set_enable_search(!$opt1->{no_typeahead});
+	$treeview->set_enable_search(!$opt->{no_typeahead});
 	#$treeview->set('fixed-height-mode' => ::TRUE);	#only if fixed-size column
 	$treeview->signal_connect(row_expanded  => \&row_expanded_changed_cb);
 	$treeview->signal_connect(row_collapsed => \&row_expanded_changed_cb);
@@ -2626,7 +2418,7 @@ use Gtk2;
 use base 'Gtk2::ScrolledWindow';
 
 sub new
-{	my ($class,$col,$opt1,$opt2)=@_;
+{	my ($class,$col,$opt)=@_;
 	my $self = bless Gtk2::ScrolledWindow->new, $class;
 	$self->set_shadow_type ('etched-in');
 	$self->set_policy ('automatic', 'automatic');
@@ -2635,7 +2427,7 @@ sub new
 	my $store=Gtk2::TreeStore->new('Glib::String');
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->set_headers_visible(::FALSE);
-	$treeview->set_enable_search(!$opt1->{no_typeahead});
+	$treeview->set_enable_search(!$opt->{no_typeahead});
 	#$treeview->set('fixed-height-mode' => ::TRUE);	#only if fixed-size column
 	$treeview->signal_connect(row_expanded  => \&row_expanded_changed_cb);
 	$treeview->signal_connect(row_collapsed => \&row_expanded_changed_cb);
@@ -3089,16 +2881,23 @@ package GMB::AABox;
 use Gtk2;
 use base 'Gtk2::EventBox';
 
+our @DefaultOptions=
+(	aa	=> 'album',
+	filternb=> 1,
+	#nopic	=> 0,
+);
+
 sub new
-{	my ($class,$opt1)= @_;
+{	my ($class,$opt)= @_;
 	my $self=bless Gtk2::EventBox->new, $class;
-	my $aa=$opt1->{aa}||'';
+	%$opt=( @DefaultOptions, %$opt );
+	my $aa=$opt->{aa};
 	$aa='artists' if $aa eq 'artist';
 	$aa= 'album' unless $aa eq 'artists';		#FIXME PHASE1 change artist to artists
 	$self->{aa}=$aa;
-	$self->{filternb}= defined $opt1->{filternb} ? $opt1->{filternb} : 1;
-	$self->{group}=$opt1->{group};
-	$self->{nopic}=1 if $opt1->{nopic};
+	$self->{filternb}=$opt->{filternb};
+	$self->{group}=$opt->{group};
+	$self->{nopic}=1 if $opt->{nopic};
 	my $hbox= Gtk2::HBox->new;
 	$self->add($hbox);
 	$self->{Sel}=$self->{SelID}=undef;
@@ -3324,24 +3123,23 @@ our %Options=
 	literal		=> _"Literal search",
 	regexp		=> _"Regular expression",
 );
+our @DefaultOptions=
+(	nb	=> 1,
+	fields	=> $SelectorMenu[0][1],
+);
 
 sub new
-{	my ($class,$opt1,$opt2)=@_;
+{	my ($class,$opt)=@_;
 	my $self= bless Gtk2::HBox->new(0,0), $class;
-	my $nb=$opt1->{nb};
+	%$opt=( @DefaultOptions, %$opt );
+	$self->{$_}=$opt->{$_} for qw/nb fields group searchfb/,keys %Options;
 	my $entry=$self->{entry}=Gtk2::Entry->new;
-	$self->{fields}= $opt2->{fields} || $SelectorMenu[0][1];
-	$self->{$_}=$opt2->{$_}||0 for keys %Options;
-	$self->{nb}=defined $nb ? $nb : 1;
-	$self->{group}=$opt1->{group};
-	$self->{searchfb}=$opt1->{searchfb};
-	#$self->{activate}=$opt1->{activate};
 	$self->{SaveOptions}=\&SaveOptions;
 	$self->{DefaultFocus}=$entry;
 	$entry->signal_connect(changed => \&EntryChanged_cb);
 	$entry->signal_connect(activate => \&Filter);
-	$entry->signal_connect_after(activate => sub {::run_command($_[0],$opt1->{activate});}) if $opt1->{activate};
-	unless ($opt1->{noselector})
+	$entry->signal_connect_after(activate => sub {::run_command($_[0],$opt->{activate});}) if $opt->{activate};
+	unless ($opt->{noselector})
 	{	for my $aref (	['gtk-find'=> \&PopupSelectorMenu,0],
 				['gtk-clear',sub {my $e=$_[0]->parent->{entry}; $e->set_text(''); Filter($e); },1]
 			     )
@@ -3544,9 +3342,9 @@ package SongSearch;
 use base 'Gtk2::VBox';
 
 sub new
-{	my ($class,$opt1)=@_;
+{	my ($class,$opt)=@_;
 	my $self= bless Gtk2::VBox->new, $class;
-	my $activate= $opt1->{activate} || 'queue';
+	my $activate= $opt->{activate} || 'queue';
 	$self->{songlist}=
 	my $songlist=SongList->new({type=>'S',headers=>'off',activate=>$activate,'sort'=>'title',cols=>'titleaa', group=>"$self"});
 	my $hbox1=Gtk2::HBox->new;
@@ -3557,7 +3355,7 @@ sub new
 	$hbox1->pack_start($entry, ::TRUE,::TRUE,2);
 	$self->pack_start($hbox1, ::FALSE,::FALSE,2);
 	$self->add($songlist);
-	if ($opt1->{buttons})
+	if ($opt->{buttons})
 	{	my $hbox2=Gtk2::HBox->new;
 		my $Bqueue=::NewIconButton('gmb-queue',		_"Enqueue",	sub { $songlist->EnqueueSelected; });
 		my $Bplay= ::NewIconButton('gtk-media-play',	_"Play",	sub { $songlist->PlaySelected; });
@@ -3582,7 +3380,7 @@ package AASearch;
 use base 'Gtk2::VBox';
 
 sub new
-{	my ($class,$opt1)=@_;
+{	my ($class,$opt)=@_;
 	my $self= bless Gtk2::VBox->new, $class;
 	my $sw=Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');
@@ -3594,10 +3392,10 @@ sub new
 	my $renderer= CellRendererGID->new;
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes('', $renderer, gid=>0) );
 	my $sub=\&Enqueue;
-	$sub=\&AddToPlaylist if $opt1->{activate} && $opt1->{activate} eq 'addplay';
+	$sub=\&AddToPlaylist if $opt->{activate} && $opt->{activate} eq 'addplay';
 	$treeview->signal_connect( row_activated => $sub);
 
-	$self->{field}= $opt1->{aa} || 'artists';
+	$self->{field}= $opt->{aa} || 'artists';
 	$renderer->set(prop => [[$self->{field}],[1],[32],[0]], depth => 0);  # (field markup=1 picsize=32 icons=0)
 	$self->{drag_type}= Songs::FilterListProp( $self->{field}, 'drag') || ::DRAG_FILTER;
 	::set_drag($treeview, source =>
@@ -3625,7 +3423,7 @@ sub new
 	$sw->add($treeview);
 	$self->pack_start($hbox1, ::FALSE,::FALSE,2);
 	$self->add($sw);
-	if ($opt1->{buttons})
+	if ($opt->{buttons})
 	{	my $hbox2=Gtk2::HBox->new;
 		my $Bqueue=::NewIconButton('gmb-queue',     _"Enqueue",	\&Enqueue);
 		my $Bplay= ::NewIconButton('gtk-media-play',_"Play",	\&Play);
@@ -4745,17 +4543,16 @@ our @OptionsMenu=
 );
 
 sub new					##currently the returned widget must be put in ->{isearchbox} of a parent widget, and this parent must have the array to search in ->{array} and have the methods get_cursor_row and set_cursor_to_row. And also select_by_filter for SongList/SongTree
-{	my ($class,$opt2,$type,$nolabel,$optsuffix)=@_;
+{	my ($class,$opt,$type,$nolabel)=@_;
 	my $self=bless Gtk2::HBox->new(0,0), $class;
 	$self->{type}=$type;
 
 	#restore options
-	$self->{optsuffix}=$optsuffix||='';
-	my $opt= $opt2->{"isearch_$optsuffix"} || '';
+	my $optcodes= $opt->{isearch} || '';
 	for my $key (keys %OptCodes)
-	{	$self->{$key}=1 if index($opt, $OptCodes{$key}) !=-1;
+	{	$self->{$key}=1 if index($optcodes, $OptCodes{$key}) !=-1;
 	}
-	unless ($type) { $self->{fields}= [split /\|/, ($opt2->{"isearchfields_$optsuffix"} || 'title')]; }
+	unless ($type) { $self->{fields}= [split /\|/, ($opt->{isearchfields} || 'title')]; }
 
 	$self->{entry}=my $entry=Gtk2::Entry->new;
 	$entry->signal_connect( changed => \&changed );
@@ -4785,10 +4582,10 @@ sub new					##currently the returned widget must be put in ->{isearchbox} of a p
 
 sub SaveOptions
 {	my $self=$_[0];
-	my $s=$self->{optsuffix};
 	my $opt=join '', map $OptCodes{$_}, grep $self->{$_}, sort keys %OptCodes;
-	my @opt= ("isearch_$s" => $opt);
-	unless ($self->{type}) { push @opt, "isearchfields_$s", join '|',$self->{fields}; }
+	my @opt;
+	push @opt, isearch => $opt if $opt ne '';
+	unless ($self->{type}) { push @opt, isearchfields => join '|',@{$self->{fields}}; }
 	return @opt;
 }
 
@@ -4940,17 +4737,25 @@ our %GroupSkin;
 #		   },
 # );
 
+our @DefaultOptions=
+(	headclick	=> 'collapse', #  'select'
+	# FIXME could try to get SongTree style GtkTreeView::horizontal-separator and others as default values
+	songxpad	=> 4,	# space between columns
+	songypad	=> 4,	# space between rows
+	headers		=> 'on',
+	no_typeahead	=> 0,
+	cols		=> 'playandqueue title artist album year length track file lastplay playcount rating',
+);
+
 sub new
-{	my ($class,$opt1,$opt2,$songarray)=@_;
+{	my ($class,$opt)=@_;
 	my $self = bless Gtk2::HBox->new(0,0), $class;
 	#my $self = bless Gtk2::Frame->new, $class;
 	#$self->set_shadow_type('etched-in');
 	#my $frame=Gtk2::Frame->new;# $frame->set_shadow_type('etched-in');
 
-	$self->{headclick}=  $opt1->{headclick}||'collapse'; #  'select'
-	$self->{songxpad}= exists $opt1->{songxpad} ? $opt1->{songxpad} : 4;	# default space between columns
-	$self->{songypad}= exists $opt1->{songypad} ? $opt1->{songypad} : 4;	# default space between rows
-	# FIXME could try to get SongTree style GtkTreeView::horizontal-separator and others as default values
+	%$opt=( @DefaultOptions, %$opt );
+	$self->{$_}=$opt->{$_} for qw/headclick songxpad songypad no_typeahead grouping/;
 
 	#create widgets used to draw the songtree as a treeview, would be nice to do without but it's not possible currently
 	$self->{stylewidget}=Gtk2::TreeView->new;
@@ -4965,18 +4770,18 @@ sub new
 		#$button->remove($button->child); #don't need the child
 	}
 
-	$self->{isearchbox}=GMB::ISearchBox->new($opt2);
+	$self->{isearchbox}=GMB::ISearchBox->new($opt);
 	my $view=$self->{view}=Gtk2::DrawingArea->new;
 	my $sw=Gtk2::ScrolledWindow->new;
 	$sw->set_policy('automatic','automatic');
 	$sw->set_shadow_type('etched-in');
 	::set_biscrolling($sw);
-	$self->CommonInit($opt1,$opt2,$songarray);
+	$self->CommonInit($opt);
 
 	my $vbox=SongTree::ViewVBox->new;
 	$sw->add($vbox);
 	$self->add($sw);
-	$self->{headers}=SongTree::Headers->new($sw->get_hadjustment) unless $opt1->{headers} && $opt1->{headers} eq 'off';
+	$self->{headers}=SongTree::Headers->new($sw->get_hadjustment) unless $opt->{headers} eq 'off';
 	$self->{vadj}=$sw->get_vadjustment;
 	$self->{hadj}=$sw->get_hadjustment;
 	$vbox->pack_start($self->{headers},0,0,0) if $self->{headers};
@@ -4998,14 +4803,13 @@ sub new
 	$view->signal_connect(button_press_event=> \&button_press_cb);
 	$view->signal_connect(button_release_event=> \&button_release_cb);
 
-	if (my $tip=$opt1->{rowtip} and *Gtk2::Widget::set_has_tooltip{CODE})  # requires gtk+ 2.12, Gtk2 1.160
+	if (my $tip=$opt->{rowtip} and *Gtk2::Widget::set_has_tooltip{CODE})  # requires gtk+ 2.12, Gtk2 1.160
 	{	$view->set_has_tooltip(1);
 		$tip= "<b><big>%t</big></b>\\nby <b>%a</b>\\nfrom <b>%l</b>" if $tip eq '1';
 		$self->{rowtip}= $tip;
 		$view->signal_connect(query_tooltip=> \&query_tooltip_cb);
 	}
 
-	$self->{no_typeahead}= $opt1->{no_typeahead};
 	::Watch($self,	SongID		=> \&UpdateSelID);
 	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
 	::Watch($self,	SongsChanged	=> \&SongsChanged_cb);
@@ -5016,20 +4820,10 @@ sub new
 	 motion=>\&drag_motion_cb,
 		);
 
-	$self->{grouping}= $opt2->{grouping};
 	#$self->{grouping}='album|pic' unless defined $self->{grouping}; #FIXME PHASE1 : grouping key for folder was folder, now path
 	$self->{grouping}= ($self->{type}=~m/[QLA]/ ? '' : 'album|pic') unless defined $self->{grouping}; #FIXME PHASE1 : grouping key for folder was folder, now path
-	my $cols=$opt2->{cols};
-#	if (exists $opt2->{cw_ufile}) # old versions <1.1 #doesn't work :( #FIXME PHASE1
-#	{	$cols=~tr/_/|/;
-#		$cols=~s/ufile/file/;
-#		$cols=~s/upath/path/;
-#		$cols=~s/date/year/;
-#		delete $opt2->{$_} for qw/sort cw_date cw_ufile cw_upath/;
-#	}
-	$cols||='playandqueue|title|artist|album|year|length|track|file|lastplay|playcount|rating';
 
-	$self->AddColumn($_) for split /\|/,$cols;
+	$self->AddColumn($_) for split / +/,$opt->{cols};
 	unless ($self->{cells}) { $self->AddColumn('title'); } #to ensure there is at least 1 column
 	$self->{SaveOptions}=\&SaveOptions;
 
@@ -5046,15 +4840,11 @@ sub destroy_cb
 
 sub SaveOptions
 {	my $self=shift;
-	my %opt=($self->{isearchbox}->SaveOptions);
-	my $sort=$self->{sort};
-	$sort=~tr/ /|/;
-	$opt{sort}=$sort;
-	$opt{cols}=	join '|', map $_->{colid}, @{$self->{cells}};
-	$opt{grouping}=	"'".$self->{grouping}."'";
+	my %opt=( $self->CommonSave, $self->{isearchbox}->SaveOptions );
+	$opt{$_}=$self->{$_} for qw/grouping/;
+	$opt{cols}=	join ' ', map $_->{colid}, @{$self->{cells}};
 	#save cols width
-	$opt{ 'cw_'.$_ }=$self->{colwidth}{$_} for sort keys %{$self->{colwidth}};
-	$opt{follow}=1 if $self->{TogFollow};
+	$opt{colwidth}= join ' ',map $_.' '.$self->{colwidth}{$_}, sort keys %{$self->{colwidth}};
 	#warn "$_ $opt{$_}\n" for sort keys %opt;
 	return \%opt;
 }
@@ -5407,7 +5197,7 @@ sub SongArray_changed_cb
 	$self->BuildTree;
 	if ($reset)
 	{	$self->{vadj}->set_value(0);
-		$self->FollowSong if $self->{TogFollow};
+		$self->FollowSong if $self->{follow};
 	}
 	::HasChanged('Selection_'.$self->{group});
 	$self->Hide(!scalar @$songarray) if $self->{hideif} eq 'empty';
@@ -6006,8 +5796,8 @@ sub button_press_cb
 			return 1;
 		}
 		elsif (defined $depth && $answer->{harea} eq 'left' || $answer->{harea} eq 'right')
-		{       $self->song_selected($event,$answer->{start},$answer->{end});
-		        return 0;
+		{	$self->song_selected($event,$answer->{start},$answer->{end});
+			return 0;
 		}
 		if (defined $row)
 		{	if ( $event->get_state * ['shift-mask', 'control-mask'] || !vec($self->{selected},$row,1) )
@@ -6051,7 +5841,7 @@ sub scroll_to_row #FIXME simplify
 
 sub UpdateSelID
 {	my $self=$_[0];
-	$self->FollowSong if $self->{TogFollow};
+	$self->FollowSong if $self->{follow};
 }
 sub FollowSong
 {	my $self=$_[0];
@@ -6168,8 +5958,8 @@ our @ColumnMenu=
 	{ label=> sub { _('_Remove this column').' ('.($SongTree::STC{$_[0]{colid}}{menutitle}||$SongTree::STC{$_[0]{colid}}{title}).')' },
 	  code => sub { $_[0]{songtree}->remove_column($_[0]{cellnb}) },	stockicon => 'gtk-remove', isdefined => 'colid',
 	},
-	{ label => _"Follow playing song",	code => sub { $_[0]{songtree}->FollowSong if $_[0]{songtree}{TogFollow}^=1; },
-	  check => sub { $_[0]{songtree}{TogFollow} }
+	{ label => _"Follow playing song",	code => sub { $_[0]{songtree}->FollowSong if $_[0]{songtree}{follow}^=1; },
+	  check => sub { $_[0]{songtree}{follow} }
 	},
 	{ label => _"Go to playing song",	code => sub { $_[0]{songtree}->FollowSong; }, },
 );

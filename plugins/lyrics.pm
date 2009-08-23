@@ -15,10 +15,11 @@ package GMB::Plugin::LYRICS;
 use strict;
 use warnings;
 require 'simple_http.pm';
+our @ISA;
+BEGIN {push @ISA,'GMB::Context';}
 use base 'Gtk2::VBox';
 use constant
 {	OPT	=> 'PLUGIN_LYRICS_', # MUST begin by PLUGIN_ followed by the plugin ID / package name
-	title	=> _"Lyrics",
 };
 
 ::SetDefaultOptions(OPT, FontSize => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyrc');
@@ -46,20 +47,31 @@ my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 	#azlyrics => [ azlyrics => 'http://search.azlyrics.com/cgi-bin/azseek.cgi?q="%a"+"%s"'],
 );
 
-
+my $lyricswidget=
+{	class		=> __PACKAGE__,
+	tabicon		=> 'gmb-lyrics',		# no icon by that name by default
+	tabtitle	=> _"Lyrics",
+	saveoptions	=> 'HideToolbar FontSize follow',
+	schange		=> \&SongChanged,
+	group		=> 'Play',
+	autoadd_type	=> 'context page lyrics text',
+};
 
 sub Start
-{	GMB::Context::AddPackage(__PACKAGE__,'Lyrics');
+{	Layout::RegisterWidget(PluginLyrics => $lyricswidget);
 }
 sub Stop
-{	GMB::Context::RemovePackage('Lyrics');
+{	Layout::RegisterWidget(PluginLyrics => undef);
 }
 
 sub new
-{	my ($class,$widget_options)=@_;
+{	my ($class,$options)=@_;
 	my $self = bless Gtk2::VBox->new(0,0), $class;
-	$self->{widget_options}=$widget_options;
+	$options->{follow}=1 if not exists $options->{follow};
+	$self->{$_}=$options->{$_} for qw/HideToolbar follow group/;
+
 	my $textview=Gtk2::TextView->new;
+	$self->signal_connect(map => sub { $_[0]->SongChanged( ::GetSelID($_[0]) ); });
 	$textview->signal_connect(button_release_event	=> \&button_release_cb);
 	$textview->signal_connect(motion_notify_event 	=> \&update_cursor_cb);
 	$textview->signal_connect(visibility_notify_event=>\&update_cursor_cb);
@@ -74,6 +86,7 @@ sub new
 	$sw->set_policy('automatic','automatic');
 	$sw->add($textview);
 	my $toolbar=Gtk2::Toolbar->new;
+	$toolbar->signal_connect("popup-context-menu" => sub {warn "@_" });
 	for my $aref
 	(	[backb => 'gtk-go-back',\&Back_cb,	_"Previous page"],
 		[saveb => 'gtk-save',	\&Save_text,	_"Save",	_"Save lyrics"],
@@ -88,18 +101,23 @@ sub new
 		$self->{$key}=$item if $key;
 	}
 	$self->{saveb}->set_is_important(1);
+
+	# create follow toggle button, function from GMB::Context
+	my $follow=$self->new_follow_toolitem;
+
+	$self->{FontSize}= $options->{FontSize} || $::Options{OPT.'FontSize'};
+	my $adj=Gtk2::Adjustment->new($self->{FontSize},4,50,1,5,0);
+	$adj->signal_connect(value_changed=> sub { SetFont($textview,$_[0]->get_value) });
 	my $zoom=Gtk2::ToolItem->new;
-	$zoom->add( ::NewPrefSpinButton( OPT.'FontSize', sub {SetFont($textview)},1,0,4,50,1,5) );
+	$zoom->add( Gtk2::SpinButton->new($adj,1,0) );
 	$zoom->set_tooltip($::Tooltips,_"Font size",'');
 	my $source=::NewPrefCombo( OPT.'LyricSite', {map {$_=>$sites{$_}[0]} keys %sites} ,cb => \&SetSource, toolitem=> _"Lyrics source");
 	my $scroll=::NewPrefCheckButton( OPT.'AutoScroll', _"Auto-scroll",\&SetAutoScroll,_"Scroll with the song",undef,1);
-	$toolbar->insert($_,-1) for $zoom,$scroll,$source;
+	$toolbar->insert($_,-1) for $follow,$zoom,$scroll,$source;
 
 	$self->pack_start($toolbar,0,0,0);
 	$self->add($sw);
-	$self->show_all;
-	$toolbar->set_no_show_all(1);
-	$toolbar->hide if $self->{widget_options}{HideToolbar};
+	$toolbar->set_no_show_all($self->{HideToolbar});
 	$self->{toolbar}=$toolbar;
 	$self->signal_connect(destroy => \&destroy_event_cb);
 
@@ -148,8 +166,10 @@ sub SetAutoScroll
 	else	{ ::UnWatch($self,'Time'); };
 }
 sub SetFont
-{	my $textview=$_[0];
-	$textview->modify_font(Gtk2::Pango::FontDescription->from_string($::Options{OPT.'FontSize'}));
+{	my ($textview,$size)=@_;
+	my $self=::find_ancestor($textview,__PACKAGE__);
+	$::Options{OPT.'FontSize'}=$self->{FontSize}=$size if $size;
+	$textview->modify_font(Gtk2::Pango::FontDescription->from_string( $self->{FontSize} ));
 }
 
 sub SetSource
@@ -172,8 +192,9 @@ sub Refresh_cb
 
 sub SongChanged
 {	my ($self,$ID,$force)=@_;
+	return unless $self->mapped;
 	return unless defined $ID;
-	return if defined $self->{ID} && $ID==$self->{ID} && !$force;
+	return if defined $self->{ID} && !$force && ( $ID==$self->{ID} || !$self->{follow} );
 	$self->{ID}=$ID;
 	$self->{time}=undef;
 
@@ -220,11 +241,12 @@ sub populate_popup_cb
 		},$self);
 
 	my $item1=Gtk2::CheckMenuItem->new(_"Hide toolbar");
-	$item1->set_active(1) if $self->{widget_options}{HideToolbar};
+	$item1->set_active(1) if $self->{HideToolbar};
 	$item1->signal_connect(toggled => sub
 		{	my $self=$_[1];
-			if ($self->{widget_options}{HideToolbar}^=1)	{$self->{toolbar}->hide}
-			else						{$self->{toolbar}->show}
+			my $toolbar=$self->{toolbar};
+			if ($self->{HideToolbar}^=1)	{$toolbar->hide}
+			else				{$toolbar->set_no_show_all(0); $toolbar->show_all}
 		},$self);
 	$menu->append($_) for Gtk2::SeparatorMenuItem->new, $item0,$item1;
 
@@ -449,11 +471,12 @@ sub load_pixbuf
 sub scroll_cb	#zoom with ctrl-wheel
 {	my ($textview,$event) = @_;
 	return 0 unless $event->state >= 'control-mask';
-	my $size=\$::Options{OPT.'FontSize'};
-	$$size+= $event->direction eq 'up' ? 1 : -1;
-	$$size=4 if $$size<4;
-	$$size=50 if $$size>50;
-	SetFont($textview);
+	my $self=::find_ancestor($textview,__PACKAGE__);
+	my $size=$self->{FontSize};
+	$size+= $event->direction eq 'up' ? 1 : -1;
+	$size=4 if $size<4;
+	$size=50 if $size>50;
+	SetFont($textview,$size);
 	return 1;
 }
 

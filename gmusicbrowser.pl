@@ -60,8 +60,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.10011',
- VERSIONSTRING => '1.1.1.1',
+ VERSION => '1.10012',
+ VERSIONSTRING => '1.1.1.2',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
@@ -619,7 +619,7 @@ our $CurrentDir=$ENV{PWD};
 
 our $LEvent;
 our (%ToDo,%TimeOut);
-my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos SongID Playing SavedWRandoms SavedSorts SavedFilters SavedLists Icons ExtraWidgets Context connections
+my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos SongID Playing SavedWRandoms SavedSorts SavedFilters SavedLists Icons Widgets connections
 # also used for SearchText_ SelectedID_ followed by group id
 # Picture_#mainfield#
 
@@ -1009,7 +1009,6 @@ LoadPlugins();
 ReadSavedTags();
 
 %CustomBoundKeys= %{ make_keybindingshash($Options{CustomKeyBindings}) };
-AddFullscreenButton() if $Options{AddFullscreenButton}; #should be made more generic
 
 $Options{version}=VERSION;
 LoadIcons();
@@ -1395,11 +1394,9 @@ sub ReadOldSavedTags
 	delete $Options{$_} for qw/Device 123options_mp3 123options_ogg 123options_flac test/; #cleanup old options
 	delete $Options{$_} for qw/SavedSongID SavedPlayTime Lock SavedSort/; #don't bother supporting upgrade for these
 	$Options{CustomKeyBindings}= { ExtractNameAndOptions($Options{CustomKeyBindings}) };
-	if ($oldversion<0.9540)
-	{	$Options{Layout}='default player layout' if $Options{Layout} eq 'default';
-		$Options{'Layout_default player layout'}=delete $Options{Layout_default};
-	}
 	delete $Options{$_} for grep m/^PLUGIN_MozEmbed/,keys %Options; #for versions <=1.0
+	delete $Options{$_} for grep m/^PLUGIN_WebContext_Disable/,keys %Options;
+	delete $Options{$_} for grep m/^Layout(?:LastSeen)?_/, keys %Options;
 	delete $Options{RecentFilters};	#don't bother upgrading them
 	$Options{FilenameSchema}=	[split /\x1D/,$Options{FilenameSchema}];
 	$Options{FolderSchema}=		[split /\x1D/,$Options{FolderSchema}];
@@ -1534,7 +1531,6 @@ sub ReadSavedTags	#load tags _and_ settings
 	else
 	{	my %lines;
 		my $section;
-		no warnings 'utf8'; # to prevent 'utf8 "\xE9" does not map to Unicode' type warnings about path and file which are stored as they are on the filesystem #FIXME find a better way to read lines containing both utf8 and unknown encoding
 		while (<$fh>)
 		{	if (m/^\[([^]]+)\]/) {$section=$1; next}
 			next unless $section;
@@ -1549,6 +1545,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		$Options{ArtistSplit}||=' & |, |;';
 		$re_artist=qr/$Options{ArtistSplit}/;
 		$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2  #DELME in v1.1.3/4
+		if ($oldversion<1.1003) { delete $Options{$_} for grep m/^Layout(?:LastSeen)?_/, keys %Options }	#for version <1.1.2  #DELME in v1.1.3/4
 
 		Post_Options_init();
 
@@ -1628,12 +1625,11 @@ sub SaveTags	#save tags _and_ settings
 		$tooold=pop @sessions if @sessions>20;
 		$Options{Sessions}=join ' ',@sessions;
 	}
-	for my $key (grep m/^Layout_/, keys %Options) #cleanup options for layout that haven't been seen for a while
-	{	$key=~s/^Layout_//;
-		my $key2='LayoutLastSeen_'.$key;
-		if 	(exists $Layout::Layouts{$key})	{ delete $Options{$key2}; }
-		elsif	(!$Options{$key2})		{ $Options{$key2}=$DAYNB; }
-		elsif	($Options{$key2}<$tooold)	{ delete $Options{$_} for $key,$key2; }
+	for my $key (keys %{$Options{Layouts}}) #cleanup options for layout that haven't been seen for a while
+	{	my $lastseen=$Options{LayoutsLastSeen}||={};
+		if 	(exists $Layout::Layouts{$key})	{ delete $lastseen->{$key}; }
+		elsif	(!$lastseen->{$key})		{ $lastseen->{$key}=$DAYNB; }
+		elsif	($lastseen->{$key}<$tooold)	{ delete $_->{$key} for $Options{Layout},$lastseen; }
 	}
 
 	my $error;
@@ -2576,9 +2572,8 @@ sub WEditList
 {	my $name=$_[0];
 	my ($window)=grep exists $_->{editing_listname} && $_->{editing_listname} eq $name, Gtk2::Window->list_toplevels;
 	if ($window) { $window->present; return; }
-	SaveList($name,[]) unless $Options{SavedLists}{$name}; #create new list if doesn't exists
-	$SongList::Common::EditList=$Options{SavedLists}{$name}; #list that will be used by SongList/SongTree in 'editlist' mode
-	$window=Layout::Window->new('EditList',undef,'UseDefaultState,KeepSize');
+	$SongList::Common::EditList=$name; #list that will be used by SongList/SongTree in 'editlist' mode
+	$window=Layout::Window->new('EditList',UseDefaultState=>1,KeepSize=>1);
 	$SongList::Common::EditList=undef;
 	$window->{editing_listname}=$name;
 	Watch($window, SavedLists => sub	#close window if the list is deleted, update title if renamed
@@ -3218,13 +3213,10 @@ sub pixbox_button_press_cb	# zoom picture when clicked
 
 sub PopupContextMenu	#FIXME rename to BuildContextMenu or BuildMenu
 {	my ($mref,$args,$appendtomenu)=@_;
-	my $menu_callback=sub
-		 {	my $sub=$_[1];
-			$sub->( $args );
-		 };
 	my $menu= $appendtomenu || Gtk2::Menu->new;
 	for my $m (@$mref)
 	{	next if $m->{ignore};
+		next if $m->{type}	&& index($args->{type},	$m->{type})==-1;
 		next if $m->{mode}	&& index($m->{mode},	$args->{mode})==-1;
 		next if $m->{notmode}	&& index($m->{notmode},	$args->{mode})!=-1;
 		next if $m->{isdefined}	&& !defined $args->{ $m->{isdefined} };
@@ -3237,8 +3229,10 @@ sub PopupContextMenu	#FIXME rename to BuildContextMenu or BuildMenu
 		next if $m->{onlymany}	&& ( !$args->{ $m->{onlymany} }	|| @{ $args->{ $m->{onlymany}} }<2  );
 		next if $m->{test}	&& !$m->{test}($args);
 
+		if (my $mod=$m->{change_input}) { $args={ %$args, @$mod };next } #modify $args for next menu entries
+
 		my $label=$m->{label};
-		$label=&$label($args) if ref $label;
+		$label=$label->($args) if ref $label;
 		my $item;
 		if ($m->{separator})
 		{	$item=Gtk2::SeparatorMenuItem->new;
@@ -3320,7 +3314,7 @@ sub PopupContextMenu	#FIXME rename to BuildContextMenu or BuildMenu
 			$item->set_submenu($submenu);
 		}
 		else
-		{	$item->signal_connect (activate => $menu_callback, $m->{code} );
+		{	$item->signal_connect (activate => sub { $m->{code}->($args); });
 		}
 		$menu->append($item);
 	}
@@ -5187,7 +5181,7 @@ sub PrefLayouts
 	my $layoutS=NewPrefCombo(LayoutS=> Layout::get_layout_list('S'), text =>_"Search window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
 
 	#fullscreen button
-	my $fullbutton=NewPrefCheckButton(AddFullscreenButton => _"Add a fullscreen button",\&AddFullscreenButton,_"Add a fullscreen button to layouts that can accept extra buttons");
+	my $fullbutton=NewPrefCheckButton(AddFullscreenButton => _"Add a fullscreen button", sub { Layout::WidgetChangedAutoAdd('Fullscreen'); },_"Add a fullscreen button to layouts that can accept extra buttons");
 
 
 	my $icotheme=NewPrefCombo(IconTheme=> GetIconThemesList(), text =>_"Icon theme :", sizeg1=>$sg1,sizeg2=>$sg2, cb => \&LoadIcons);
@@ -5195,11 +5189,6 @@ sub PrefLayouts
 	#packing
 	$vbox->pack_start($_,FALSE,FALSE,1) for $layout,$layoutB,$layoutT,$layoutF,$layoutS,$checkT1,$fullbutton,$icotheme;
 	return $vbox;
-}
-
-sub AddFullscreenButton #FIXME put this sub somewhere else
-{	if ($Options{AddFullscreenButton}) {ExtraWidgets::AddWidget('fullscreen_button','button',sub{$_[0]->NewObject('Fullscreen')});}
-	else { ExtraWidgets::RemoveWidget('fullscreen_button'); }
 }
 
 sub set_layout
@@ -5966,7 +5955,7 @@ sub Progress
 sub PresentWindow
 {	my $win=$_[1];
 	$win->present;
-	$win->set_skip_taskbar_hint(FALSE);
+	$win->set_skip_taskbar_hint(FALSE) unless $win->{skip_taskbar_hint};
 }
 
 sub PopupLayout
@@ -6099,11 +6088,9 @@ sub ShowHide
 		#warn "hiding\n";
 		for my $win ($MainWindow,$BrowserWindow,$ContextWindow)
 		{	next unless $win;
-			my ($x,$y)=$win->get_position;
-			#warn "hiding($x,$y)\n";
-			$win->{saved_position}=[$x,$y];
+			$win->{saved_position}=join 'x',$win->get_position;
 			$win->iconify;
-			$win->{skip_taskbar_hint}=1 if $win->get_skip_taskbar_hint;
+			$win->{skip_taskbar_hint}=$win->get_skip_taskbar_hint;
 			$win->set_skip_taskbar_hint(TRUE);
 			$win->hide;
 		}
@@ -6116,7 +6103,7 @@ sub ShowHide
 		my $scrh=$screen->get_height;
 		for my $win ($ContextWindow,$BrowserWindow,$MainWindow)
 		{	next unless $win;
-			my ($x,$y)= $win->{saved_position} ? @{delete $win->{saved_position}} : $win->get_position;
+			my ($x,$y)= $win->{saved_position} ? split('x', delete $win->{saved_position}) : $win->get_position;
 			my ($w,$h)= $win->get_size;
 			#warn "move($x,$y)\n";
 			if ($x+$w<0 || $y+$h<0 || $x>$scrw || $y>$scrh)
