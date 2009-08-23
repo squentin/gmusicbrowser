@@ -1410,6 +1410,12 @@ my @mpicsize_menu=
 	_("big size")		=> 96,
 	_("huge size")		=> 128,
 );
+my @cloudstats_menu=
+(	_("number of songs")	=> 'count',
+	_("rating average")	=> 'rating:average',
+	_("play count average")	=> 'playcount:average',
+	_("skip count average")	=> 'skipcount:average',
+),
 
 my %sort_menu=
 (	year => _("year"),
@@ -1439,6 +1445,17 @@ my @MenuSubGroup=
 	{ label => _"picture size",	code => sub { my $self=$_[0]{self}; $self->{mpicsize}=$_[1]; $self->Fill('optchanged'); },
 	  mode => 'M',
 	  submenu => \@mpicsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{mpicsize}}, istrue => 'aa' },
+
+	{ label => _"font size depends on",	code => sub { my $self=$_[0]{self}; $self->{cloud_stat}=$_[1]; $self->Fill('optchanged'); },
+	  mode => 'C',
+	  submenu => \@cloudstats_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{cloud_stat}}, },
+	{ label => _"minimun font size", code => sub { my $self=$_[0]{self}; $self->{cloud_min}=$_[1]; $self->Fill('optchanged'); },
+	  mode => 'C',
+	  submenu => sub { [2..::min(20,$_[0]{self}{cloud_max}-1)] },  check => sub {$_[0]{self}{cloud_min}}, },
+	{ label => _"maximum font size", code => sub { my $self=$_[0]{self}; $self->{cloud_max}=$_[1]; $self->Fill('optchanged'); },
+	  mode => 'C',
+	  submenu => sub { [::max(10,$_[0]{self}{cloud_min}+1)..40] },  check => sub {$_[0]{self}{cloud_max}}, },
+
 	{ label => _"sort by",		code => sub { my $self=$_[0]{self}; $self->{sort}=$_[1]; $self->Fill('optchanged'); },
 	  check => sub {$_[0]{self}{sort}}, istrue => 'aa', submenu => \%sort_menu, submenu_reverse => 1 },
 	{ label => _"group by",
@@ -1815,6 +1832,20 @@ use Gtk2;
 use base 'Gtk2::VBox';
 use constant { GID_ALL => 2**32-1, GID_TYPE => 'Glib::ULong' };
 
+our %defaults=
+(	mode	=> 'list',
+	type	=> '',
+	lmarkup	=> '',
+	lpicsize=> 0,
+	'sort'	=> 'default',
+	depth	=> 0,
+	noall	=> 0,
+	mpicsize=> 64,
+	cloud_min=> 5,
+	cloud_max=> 20,
+	cloud_stat=> 'count',
+);
+
 sub new
 {	my ($class,$field,$opt)=@_;
 	my $self = bless Gtk2::VBox->new, $class;
@@ -1822,16 +1853,12 @@ sub new
 	$self->{no_typeahead}=$opt->{no_typeahead};
 	$self->{rules_hint}=$opt->{rules_hint};
 
-	my $mode=	$opt->{mode} || 'list';
-	$self->{depth} =$opt->{depth}|| 0;
-	$self->{'sort'}=$opt->{'sort'} || 'default';
-	$self->{noall}=	$opt->{noall} || 0;
-	$self->{type}=		[split /\|/, $opt->{type}||''];
-	$self->{markup}=	[split /\|/, $opt->{lmarkup}||''];
-	$self->{picsize}=	[split /\|/, $opt->{lpicsize}||0];
+	$opt= { %defaults, %$opt };
+	$self->{$_} = $opt->{$_} for qw/mode noall sort depth mpicsize cloud_min cloud_max cloud_stat/;
+	$self->{$_} = [ split /\|/, $opt->{$_} ] for qw/type lmarkup lpicsize/;
+
 	$self->{icons}= Songs::FilterListProp($field,'icon') ? [(Gtk2::IconSize->lookup('menu'))[0]] : [0];
 	$self->{type}[0] ||= $field.'.'.(Songs::FilterListProp($field,'type')||''); $self->{type}[0]=~s/\.$//;	#FIXME
-	$self->{mpicsize}= $opt->{mpicsize} if exists $opt->{mpicsize};
 	::Watch($self, Picture_artist => \&AAPicture_Changed);	#FIXME PHASE1
 	::Watch($self, Picture_album => \&AAPicture_Changed);	#FIXME PHASE1
 
@@ -1861,23 +1888,17 @@ sub new
 	}
 	$self->{activate}=$sub;
 
-	$self->set_mode($mode);
+	$self->set_mode($self->{mode});
 	return $self;
 }
 
 sub SaveOptions
 {	my $self=$_[0];
 	my %opt;
-	$opt{lpicsize}	= join '|', @{$self->{picsize}};
-	$opt{lmarkup}	= join '|', @{$self->{markup}};
-	$opt{type}	= join '|', @{$self->{type}};
-	$opt{depth}	= $self->{depth} if $self->{depth};
-	$opt{mode}	= $self->{mode}  if $self->{mode} ne 'list';
-	$opt{'sort'}	= $self->{'sort'} if $self->{'sort'} ne 'default';
-	$opt{noall}	= $self->{noall};
-	$opt{mpicsize}	= $self->{mpicsize};
-	for (keys %opt) { delete $opt{$_} unless $opt{$_}; }	#remove unneeded options (0 or "")
-	delete $opt{type} if $opt{type} eq $self->{pid};	#remove unneeded type options
+	$opt{$_} = join '|', @{$self->{$_}} for qw/type lmarkup lpicsize/;
+	$opt{$_} = $self->{$_} for qw/mode noall sort depth mpicsize cloud_min cloud_max cloud_stat/;
+	for (keys %opt) { delete $opt{$_} if $opt{$_} eq $defaults{$_}; }	#remove options equal to default value
+	delete $opt{type} if $opt{type} eq $self->{pid};			#remove unneeded type options
 	return %opt, $self->{isearchbox}->SaveOptions;
 }
 
@@ -1886,8 +1907,8 @@ sub SetField
 	$self->{field}[$depth]=$field;
 	my $type=Songs::FilterListProp($field,'type');
 	$self->{type}[$depth]= $type ? $field.'.'.$type : $field;
-	$self->{picsize}[$depth]||=0;
-	$self->{markup}[$depth]||=0;
+	$self->{lpicsize}[$depth]||=0;
+	$self->{lmarkup}[$depth]||=0;
 	$self->{icons}[$depth]||= Songs::FilterListProp($field,'icon') ? (Gtk2::IconSize->lookup('menu'))[0] : 0;
 
 	my $i=0;
@@ -1940,7 +1961,7 @@ sub create_list
 	my $renderer= CellRendererGID->new;
 	my $column=Gtk2::TreeViewColumn->new_with_attributes('',$renderer);
 
-	$renderer->set(prop => [@$self{qw/type markup picsize icons/}]);	#=> $renderer->get('prop')->[0] contains $self->{type} (which is a array ref)
+	$renderer->set(prop => [@$self{qw/type lmarkup lpicsize icons/}]);	#=> $renderer->get('prop')->[0] contains $self->{type} (which is a array ref)
 	#$column->add_attribute($renderer, gid => 0);
 	$column->set_cell_data_func($renderer, sub
 		{	my (undef,$cell,$store,$iter)=@_;
@@ -2178,6 +2199,11 @@ sub get_fill_data
 	unshift @list,0 if $beforeremoving0!=@list;	#could be better
 
 	$self->{array}=\@list; #used for interactive search
+
+	if ($self->{mode} eq 'cloud' && $self->{cloud_stat} ne 'count')	#FIXME update cloud when used fields change
+	{	$href=Songs::BuildHash($type,$filterpane->{list},'gid',$self->{cloud_stat});
+	}
+
 	return \@list,$href;
 }
 
@@ -3772,7 +3798,6 @@ use base 'Gtk2::DrawingArea';
 
 use constant
 {	XPAD => 2,	YPAD => 2,
-	MINSCALE => .5,	MAXSCALE => 2,
 };
 
 sub new
@@ -3822,6 +3847,12 @@ sub Fill	#FIXME should be called when signals ::style-set and ::direction-change
 		$self->{lines}=[];
 		return;
 	}
+	my $filterlist= ::find_ancestor($self,'FilterList');	#FIXME should get its options another way (to keep GMB::Cloud generic)
+	my $scalemin= ($filterlist->{cloud_min}||5) /10;
+	my $scalemax= ($filterlist->{cloud_max}||20) /10;
+	warn "Cloud : scalemin=$scalemin scalemax=$scalemax\n" if $::debug;
+	$scalemax=$scalemin+.5 if $scalemin>=$scalemax;
+	$scalemax-=$scalemin;
 	$self->{width}=$width;
 	my $lastkey;
 	if ($self->{lastclick})
@@ -3831,8 +3862,9 @@ sub Fill	#FIXME should be called when signals ::style-set and ::direction-change
 	my @lines;
 	$self->{lines}=\@lines;
 	my $line=[];
-	my ($min,$max)=(1,1);
-	for (values %$href) {$max=$_ if $max<$_}
+	my ($min,$max)=(0,1);
+	#for (values %$href) {$max=$_ if $max<$_}
+	for (map $href->{$_}, @$list) {$max=$_ if $max<$_}
 	if ($min==$max) {$max++;$min--;}
 	my ($x,$y)=(XPAD,YPAD); my ($hmax,$bmax)=(0,0);
 	my $displaykeysub=$self->{displaykeysub};
@@ -3840,7 +3872,7 @@ sub Fill	#FIXME should be called when signals ::style-set and ::direction-change
 	::setlocale(::LC_NUMERIC,'C'); #for the sprintf in the loop
 	for my $key (@$list)
 	{	my $layout=Gtk2::Pango::Layout->new( $self->create_pango_context );
-		my $value=sprintf '%.1f',MINSCALE+(MAXSCALE-MINSCALE())*($href->{$key}-$min)/($max-$min);
+		my $value=sprintf '%.1f', $scalemin + $scalemax*($href->{$key}-$min)/($max-$min);
 		#$layout->set_text($key);
 		#$layout->get_attributes->insert( Gtk2::Pango::AttrScale->new($value) ); #need recent Gtk2
 		my $text= $displaykeysub ? $displaykeysub->($key) : $key;
@@ -4162,7 +4194,8 @@ sub Fill
 	my $list=$self->{list};
 	($list)= $self->{get_fill_data_sub}($self) unless $samelist && $samelist eq 'samelist';
 
-	my $mpsize=$self->parent->parent->{mpicsize}||64;
+	my $filterlist= ::find_ancestor($self,'FilterList');	#FIXME should get its options another way
+	my $mpsize=$filterlist->{mpicsize}||64;
 	$self->{picsize}=$mpsize;
 	$self->{hsize}=$mpsize;
 	$self->{vsize}=$mpsize;
