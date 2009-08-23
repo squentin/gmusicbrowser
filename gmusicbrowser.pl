@@ -1673,7 +1673,7 @@ sub SaveTags	#save tags _and_ settings
 	{	{	last unless -e $SaveFile.'.bak';
 			last unless (open my $file,'<',$SaveFile.'.bak');
 			local $_; my $date;
-			while (<$file>) { if (m/^SavedOn=(\d+)/) {$date=$1;last} last unless m/=/}
+			while (<$file>) { if (m/^SavedOn:\s*(\d+)/) {$date=$1;last} last if m/^\[(?!Options])/}
 			close $file;
 			last unless $date;
 			$date=strftime('%Y%m%d',localtime($date));
