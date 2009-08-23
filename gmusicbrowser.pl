@@ -1476,7 +1476,7 @@ sub ReadOldSavedTags
 		my ($key,$val)=split "\x1D",$_,2;
 		$key=~s/^(.)//;
 		if ($1 eq 'F')
-		{	$val=~s/(?:^|\x1D)-?\K(\d+)?(\D)/(defined $1? Songs::FieldUpgrade($1) : '').":$1:"/ge;
+		{	$val=~s/(?:^|\x1D)-?\K(\d+)?(\D)/(defined $1? Songs::FieldUpgrade($1) : '').":$2:"/ge;
 			$val=~s/(?:^|\x1D)-?(?:label|genre)\K:e:(?=\x1D|$)/:ecount:0/g;
 			$Options{SavedFilters}{$key}=Filter->new($val);
 		}
