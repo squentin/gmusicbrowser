@@ -18,11 +18,11 @@ use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill,$Kill9);
 my $CMDfh;
 my (%supported,$mplayer);
-
-our @ISA=('Play_amixer'); #use amixer for volume
+my ($Mute,$Volume);
 
 sub init
-{	Play_amixer::init();
+{	$Volume=100;
+	$Mute=0;
 
 	$mplayer=undef;
 	for my $path (split /:/, $ENV{PATH})
@@ -56,7 +56,7 @@ sub Play
 {	(undef,$file,my$sec)=@_;
 	&Stop if $ChildPID;
 	#if ($ChildPID) { print $CMDfh "loadfile $file\n"; print $CMDfh "seek $sec 2\n" if $sec; return}
-	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null/);
+	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -softvol/,'-volume',$Volume);
 	#push @cmd_and_args,$device_option,$device unless $device eq 'default';
 	push @cmd_and_args,split / /,$::Options{mplayeroptions} if $::Options{mplayeroptions};
 	push @cmd_and_args,'-ss',$sec if $sec;
@@ -160,9 +160,24 @@ sub AdvancedOptions
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $hbox0=::NewPrefEntry('mplayeroptions','mplayer options :');
 	$vbox->pack_start($hbox0,::FALSE,::FALSE,2);
-	my $hbox=Play_amixer->make_option_widget;
-	$vbox->pack_start($hbox,::FALSE,::FALSE,2);
 	return $vbox;
+}
+
+# Volume functions
+sub GetVolume	{$Volume}
+sub GetMute	{$Mute}
+sub SetVolume
+{	shift;
+	my $set=shift;
+	if	($set eq 'mute')	{ $Mute=$Volume; $Volume=0;	}
+	elsif	($set eq 'unmute')	{ $Volume=$Mute; $Mute=0;	}
+	elsif	($set=~m/^\+(\d+)$/)	{ $Volume+=$1; }
+	elsif	($set=~m/^-(\d+)$/)	{ $Volume-=$1; }
+	elsif	($set=~m/(\d+)/)	{ $Volume =$1; }
+	$Volume=0   if $Volume<0;
+	$Volume=100 if $Volume>100;
+	print $CMDfh "volume $Volume 1\n" if $ChildPID;
+	::HasChanged('Vol');
 }
 
 #sub sendcmd {print $CMDfh "$_[0]\n";} #DEBUG #Play_mplayer::sendcmd('volume 0')
