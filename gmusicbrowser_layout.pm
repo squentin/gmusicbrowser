@@ -532,8 +532,6 @@ our %Widgets=
 	SimpleSearch =>
 	{	class	=> 'SimpleSearch',
 		dragdest=> [::DRAG_FILTER,sub { ::SetFilter($_[0],$_[2]);}],
-		#expand_max=>300,	#will expand up to this number of pixels when packed in a HB
-		#width_chars=>20,	#will request at least the width corresponding to this number of characters
 	},
 	Visuals		=>
 	{	New	=> sub {my $darea=Gtk2::DrawingArea->new; $darea->set_size_request(200,50); return $darea unless $::Packs{Play_GST} && $::Packs{Play_GST}{visuals}; Play_GST::add_visuals($darea); my $eb=Gtk2::EventBox->new; $eb->add($darea); return $eb},
@@ -935,11 +933,18 @@ sub NewWidget
 		: $ref->{New}(\%options);
 	return unless $widget;
 	$widget->{$_}= $options{$_} for 'group',split / /, ($ref->{options} || '');
-	$widget->{$_}=$options{$_} for grep exists $options{$_}, qw/tabtitle tabicon tabrename/;
+	$widget->{$_}=$options{$_} for grep exists $options{$_}, qw/tabtitle tabicon tabrename maxwidth maxheight/;
 	$widget->{options_to_save}=$ref->{saveoptions} if $ref->{saveoptions};
 
 	$widget->{name}=$namefull;
 	$widget->set_name($name);
+
+	if ($options{minwidth} or $options{minheight})
+	{	my ($minwidth,$minheight)=$widget->get_size_request;
+		$minwidth=  $options{minwidth}  || $minwidth;
+		$minheight= $options{minheight} || $minheight;
+		$widget->set_size_request($minwidth,$minheight);
+	}
 
 	$widget->{actions}{$_}=$options{$_}  for grep m/^click\d+/, keys %options;
 	$widget->signal_connect(button_press_event => \&Button_press_cb) if $widget->{actions};
@@ -2631,7 +2636,7 @@ sub new
 			$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 			($minsize)=$lay->get_pixel_size;
 		}
-		$self->{expand_max}=1 if $opt->{expand_max};
+		$self->{maxwidth}=1 if $opt->{expand_max};
 		$self->set_size_request($minsize,-1);
 		$label->signal_connect(expose_event => \&expose_cb);
 		$self->signal_connect(enter_notify_event => \&enter_leave_cb, INCR());
@@ -2666,8 +2671,8 @@ sub checksize	#extend the requested size so that the string fit in initsize mode
 		$h=0 if $h0>$h;
 		$label->set_size_request($w||$w0,$h||$h0) if $w || $h;
 	}
-	elsif ($self->{expand_max})
-	{	$self->{expand_max}= ($self->child->get_layout->get_pixel_size)[0]||1;
+	elsif ($self->{maxwidth})
+	{	$self->{maxwidth}= ($self->child->get_layout->get_pixel_size)[0]||1;
 	}
 }
 
@@ -3426,6 +3431,7 @@ use Glib::Object::Subclass
 sub size_allocate
 {	my ($self,$alloc)=@_;
 	my $vertical= $self->isa('Gtk2::VBox');
+	my $max_key= $vertical ? 'maxheight' : 'maxwidth';
 	my ($x,$y,$bwidth,$bheight)=$alloc->values;
 	my $olda=$self->allocation;
 	 $olda->x($x); $olda->y($y);
@@ -3447,7 +3453,7 @@ sub size_allocate
 		my $max;
 		my @attrib;
 		if (my $r=$child->{expand_to_ratio})	{$max=$r*$bheight}
-		else					{$max=$child->{expand_max}}
+		else					{$max=$child->{$max_key}}
 		if	($max)		{ $max-=$xreq; if ($max>0) {push @emax,[$max*$eweight,$max,$eweight,\@attrib]; $ecount+=$eweight;$expand=$eweight;} else {$expand=0} }
 		elsif	($expand)	{$ecount+=$eweight;$expand=$eweight;}
 		@attrib=($child,$expand,$fill,$pad,$type,$xreq);
