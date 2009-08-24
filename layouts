@@ -16,7 +16,7 @@ VBplayer	= HBButtons3 HBText_Cover
 VBLeft		= VBplayer 5_TabbedLists(group=1)
 HPfp1		= FPane1(nb=2,hidebb=1) FPane2(nb=3,hidebb=1)
 HPfp0	 	= FPane0(nb=1,hidebb=1) HPfp1
-HBSongList	= SimpleSearch -FLock -PlayFilter -Refresh -ResetFilter -MBlist
+HBSongList	= SimpleSearch(expand_max=250) -FLock -PlayFilter -Refresh -ResetFilter -MBlist
 VBSongList	= HBSongList _SongList
 VPRight		= HPfp0 _VBSongList
 TBRight		= _"Library" VPRight _"Context" Context

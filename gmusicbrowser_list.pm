@@ -3158,10 +3158,11 @@ sub new
 {	my ($class,$opt)=@_;
 	my $self= bless Gtk2::HBox->new(0,0), $class;
 	%$opt=( @DefaultOptions, %$opt );
-	$self->{$_}=$opt->{$_} for qw/nb fields group searchfb/,keys %Options;
+	$self->{$_}=$opt->{$_} for qw/nb fields group searchfb expand_max/,keys %Options;
 	my $entry=$self->{entry}=Gtk2::Entry->new;
 	$self->{SaveOptions}=\&SaveOptions;
 	$self->{DefaultFocus}=$entry;
+	$entry->set_width_chars($opt->{width_chars}) if $opt->{width_chars};
 	$entry->signal_connect(changed => \&EntryChanged_cb);
 	$entry->signal_connect(activate => \&Filter);
 	$entry->signal_connect_after(activate => sub {::run_command($_[0],$opt->{activate});}) if $opt->{activate};

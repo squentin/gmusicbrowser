@@ -532,6 +532,8 @@ our %Widgets=
 	SimpleSearch =>
 	{	class	=> 'SimpleSearch',
 		dragdest=> [::DRAG_FILTER,sub { ::SetFilter($_[0],$_[2]);}],
+		#expand_max=>300,	#will expand up to this number of pixels when packed in a HB
+		#width_chars=>20,	#will request at least the width corresponding to this number of characters
 	},
 	Visuals		=>
 	{	New	=> sub {my $darea=Gtk2::DrawingArea->new; $darea->set_size_request(200,50); return $darea unless $::Packs{Play_GST} && $::Packs{Play_GST}{visuals}; Play_GST::add_visuals($darea); my $eb=Gtk2::EventBox->new; $eb->add($darea); return $eb},
