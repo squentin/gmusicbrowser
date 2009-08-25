@@ -207,6 +207,11 @@ our %timespan_menu=
 		si_sort	=> '#_iname#',
 		'filter:s'	=> 'index( #_iname#,"#VAL#") .!=. -1',	'filter_prep:s'	=> sub { quotemeta ::superlc($_[0])},
 	},
+	text =>	#multi-lines string
+	{	parent			=> 'string',
+		'editwidget:single'	=> sub { GMB::TagEdit::EntryText->new(@_); },
+		'editwidget:many'	=> sub { GMB::TagEdit::EntryText->new(@_); },
+	},
 	filename=>
 	{	parent	=> 'string',
 		check	=> ';',	#override string's check because not needed and filename may not be utf8
@@ -598,8 +603,8 @@ our %timespan_menu=
 	edit_order=> 80,	edit_many=>1,	letter => 'L',
  },
  comment=>
- {	name	=> _"Comment",	width => 200,	flags => 'garwesci',		type => 'string',
-	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3	=> 'INF', ilst => "\xA9cmt",	join_with => " ",
+ {	name	=> _"Comment",	width => 200,	flags => 'garwesci',		type => 'text',
+	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3	=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
 	edit_order=> 60,	edit_many=>1,	letter => 'C',
  },
  rating	=>
@@ -1145,8 +1150,9 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 		my $val=shift @$modif;
 		my $multi;
 		if ($f=~s/^([-+])//) { $multi=$1 }
-		if (!$Def{$f} && !($f=~m/^@(.*)$/ && $Def{$1}))	{ warn "Songs::Set : Invalid field $f\n";next }
-		my $flags=$Def{$f}{flags};
+		my $def= $f=~m/^@(.*)$/ ? $Def{$1} : $Def{$f};
+		if (!$def)	{ warn "Songs::Set : Invalid field $f\n";next }
+		my $flags=$def->{flags};
 		#unless ($flags=~m/e/) { warn "Songs::Set : Field $f cannot be edited\n"; next }
 		#if (my $sub=$Def{$f}{check}))
 		# { my $res=$sub->($val); unless ($res) {warn "Songs::Set : Invalid value '$v' for field $f\n"; next} }

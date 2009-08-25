@@ -198,7 +198,7 @@ sub Write
 					for my $i (0..$#$ref)
 					{	my $keep;
 						for my $j (0..$#extra)
-						{	next unless $extra[$j] eq '%v' || $extra[$j] eq '';
+						{	next if $extra[$j] eq '%v' || $extra[$j] eq '';
 							$keep=1 if $extra[$j] ne $ref->[$i][$j];
 						}
 						$id3v2->remove_all($key,$i) unless $keep;
@@ -385,8 +385,8 @@ our @Tools;
 INIT
 {
  @Tools=
- (	{ label=> _"Capitalize",		for_all => sub { ucfirst lc $_[1]; }, },
-	{ label=>_"Capitalize each words",	for_all => sub { join ' ',map ucfirst lc, split / /,$_[1]; }, },
+ (	{ label=> _"Capitalize",		for_all => sub { ucfirst lc $_[0]; }, },
+	{ label=>_"Capitalize each words",	for_all => sub { join ' ',map ucfirst lc, split / /,$_[0]; }, },
  );
  @FORMATS=
  (	['%a - %l - %n - %t',	qr/(.+) - (.+) - (\d+) - (.+)$/],
@@ -478,22 +478,10 @@ sub new
 			{  my $check=$_[0];
 			   my $active=$check->get_active;
 			   $check->{combo}->set_sensitive($active);
-			   $check->{addchk}->set_sensitive($active) if exists $check->{addchk};
 			});
-		my ($row,$col)= $widget->{noexpand} ? ($row2++,3) : ($row1++,0);
+		my ($row,$col)= $widget->{noexpand} ? ($row2++,2) : ($row1++,0);
 		$table->attach($check,$col++,$col,$row,$row+1,'fill','shrink',3,1);
 		$table->attach($widget,$col++,$col,$row,$row+1,['fill','expand'],'shrink',3,1);
-		if ($field eq 'comment') #FIXME PHASE1 FIXME PHASE1 FIXME PHASE1 FIXME PHASE1
-		{	my $chk=Gtk2::CheckButton->new(_"Remove existing");
-			$self->{add}{$field}=1;
-			$chk->signal_connect( toggled => sub
-				{	my $self=::find_ancestor($_[0],__PACKAGE__);
-					$self->{add}{$field}=!($_[0]->get_active);
-				});
-			$table->attach($chk,2,3,$row,$row+1,'fill','shrink',1,1);
-			$check->{addchk}=$chk;
-			$chk->set_sensitive(FALSE);
-		}
 	}
 
 	$self->pack_start($table, FALSE, TRUE, 2);
@@ -749,6 +737,7 @@ sub save
 		else
 		{	my $v=$wdgt->get_text;
 			$default{$f}=$v;
+			$f='@'.$f if ref $v;
 			push @modif, $f,$v;
 		}
 	}
@@ -778,7 +767,7 @@ use base 'Gtk2::Entry';
 sub new
 {	my ($class,$field,$ID,$width) = @_;
 	my $self = bless Gtk2::Entry->new, $class;
-	$self->{field}=$field;
+	#$self->{field}=$field;
 	my $val=Songs::Get($ID,$field);
 	$self->set_text($val);
 	if ($width) { $self->set_width_chars($width); $self->{noexpand}=1; }
@@ -787,8 +776,60 @@ sub new
 
 sub tool
 {	my ($self,$sub)=@_;
-	my $val= $sub->($self->{field},$self->get_text);
+	my $val= $sub->($self->get_text);
 	$self->set_text($val) if defined $val;
+}
+
+package GMB::TagEdit::EntryText;
+use Gtk2;
+use base 'Gtk2::VBox';
+
+sub new
+{	my ($class,$field,$IDs) = @_;
+	my $self = bless Gtk2::VBox->new, $class;
+	my $sw = Gtk2::ScrolledWindow->new;
+	 $sw->set_shadow_type('etched-in');
+	 $sw->set_policy('automatic','automatic');
+	$sw->add( $self->{textview}=Gtk2::TextView->new );
+	$self->add($sw);
+	my $val;
+	if (ref $IDs)
+	{	my $values= Songs::BuildHash($field,$IDs);
+		my @l=sort { $values->{$b} <=> $values->{$a} } keys %$values; #sort values by their frequency
+		$val=$l[0];
+		$self->{IDs}=$IDs;
+		$self->{field}=$field;
+		$self->{append}=my $append=Gtk2::CheckButton->new(_"Append (only if not already present)");
+		$self->pack_end($append,0,0,0);
+	}
+	else { $val=Songs::Get($IDs,$field); }
+	$self->set_text($val);
+	return $self;
+}
+sub set_text
+{	my $self=shift;
+	$self->{textview}->get_buffer->set_text(shift);
+}
+sub get_text
+{	my $self=shift;
+	my $buffer=$self->{textview}->get_buffer;
+	my $text=$buffer->get_text( $buffer->get_bounds, 1);
+	if ($self->{append} && $self->{append}->get_active)	#append
+	{	my @orig= Songs::Map($self->{field},$self->{IDs});
+		for my $orig (@orig)
+		{	next if $text eq '';
+			if ($orig eq '') { $orig=$text; }
+			else
+			{	next if index("$orig\n","$text\n")!=-1;		#don't append if the line(s) already exists
+				$orig.="\n".$text;
+			}
+		}
+		return \@orig;
+	}
+	return $text;
+}
+sub tool
+{	&GMB::TagEdit::EntryString::tool;
 }
 
 package GMB::TagEdit::EntryNumber;
@@ -802,7 +843,7 @@ sub new
 	my $adj=Gtk2::Adjustment->new(0,0,$max,1,10,0);
 	my $self = bless Gtk2::SpinButton->new($adj,10,$digits), $class;
 	$self->{noexpand}=1;
-	$self->{field}=$field;
+	#$self->{field}=$field;
 	my $val=Songs::Get($ID,$field);
 	$self->set_value($val);
 	return $self;
@@ -810,6 +851,15 @@ sub new
 sub get_text
 {	$_[0]->get_value;
 }
+sub set_text
+{	my $v=$_[1];
+	$v=0 unless $v=~m/^\d+$/;
+	$_[0]->set_value($v);
+}
+sub tool
+{	&GMB::TagEdit::EntryString::tool;
+}
+
 package GMB::TagEdit::EntryBoolean;
 use Gtk2;
 use base 'Gtk2::CheckButton';
@@ -818,7 +868,7 @@ sub new
 {	my ($class,$field,$ID) = @_;
 	my $self = bless Gtk2::CheckButton->new, $class;
 	$self->{noexpand}=1;
-	$self->{field}=$field;
+	#$self->{field}=$field;
 	my $val=Songs::Get($ID,$field);
 	$self->set_active($val);
 	return $self;
@@ -834,7 +884,7 @@ use base 'Gtk2::Combo';
 sub new
 {	my ($class,$field,$IDs,$listall) = @_;
 	my $self = bless Gtk2::Combo->new, $class;
-	$self->{field}=$field;
+	#$self->{field}=$field;
 	GMB::ListStore::Field::setcompletion($self->entry,$field) if $listall;
 
 	if (ref $IDs)
@@ -873,7 +923,7 @@ use base 'Gtk2::HBox';
 sub new
 {	my ($class,$field,$IDs) = @_;
 	my $self = bless Gtk2::HBox->new, $class;
-	$self->{field}=$field;
+	#$self->{field}=$field;
 
 	my $init;
 	if (ref $IDs)
@@ -926,7 +976,7 @@ use base 'Gtk2::HBox';
 sub new
 {	my ($class,$field,$ID) = @_;
 	my $self = bless Gtk2::HBox->new(0,0), $class;
-	$self->{field}=$field;
+	#$self->{field}=$field;
 	$self->{ID}=$ID;
 	my $label=$self->{label}=Gtk2::Label->new;
 	$label->set_ellipsize('end');
@@ -993,7 +1043,7 @@ use base 'Gtk2::HBox';
 
 sub new
 {	my ($class,$field,$IDs) = @_;
-	my $self = bless Gtk2::HBox->new, $class;
+	my $self = bless Gtk2::HBox->new(1,1), $class;
 	my $vbox=Gtk2::VBox->new;
 	my $addbut=::NewIconButton('gtk-add',_"Add");
 	my $combo=Gtk2::ComboBoxEntry->new_text;
