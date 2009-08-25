@@ -932,7 +932,7 @@ sub new
 	$label->set_ellipsize('end');
 	my $button= Gtk2::Button->new;
 	my $entry= Gtk2::Entry->new;
-	#$entry->set_width_chars(1);
+	$entry->set_width_chars(12);
 	$button->add($label);
 	$self->pack_start($button,1,1,0);
 	$self->pack_start($entry,0,0,0);
@@ -1109,9 +1109,9 @@ sub fill
 			{ $table->remove($w); }
 		else #first time
 		{	my $label=Gtk2::Label->new( Songs::FieldName($field) );
-			$table->attach($label,$col,$col+1,$row,$row+1,'fill','shrink',1,1);
+			$table->attach($label,$col,$col+1,$row,$row+1,'fill','shrink',2,2);
 		}
-		$table->attach($widget,$col+1,$col+2,$row,$row+1,['fill','expand'],'shrink',1,1);
+		$table->attach($widget,$col+1,$col+2,$row,$row+1,['fill','expand'],'shrink',2,2);
 		$self->{fields}{$field}=$widget;
 	}
 	$table->show_all;
