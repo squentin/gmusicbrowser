@@ -5150,10 +5150,22 @@ sub SongArray_changed_cb
 	}
 	elsif ($action eq 'update')	#should only happen when in filter mode, so no duplicates IDs
 	{	my $oldarray=$extra[0];
-		#my @selected;
-		#$selected[$oldarray->[$_]]=vec($$selected,$_,1) for 0..$#$oldarray;
-		$$selected=''; #vec($$selected,$_,1)=1 for grep $selected[$_], 0..$#$songarray; #FIXME PHASE1 save/restore selection
-		$self->{new_expand_state}=0; #FIXME PHASE1 save expanded state
+		# translate selection to new order :
+		my @selected;
+		$selected[$oldarray->[$_]]=vec($$selected,$_,1) for 0..$#$oldarray;
+		$$selected='';
+		vec($$selected,$_,1)=1 for grep $selected[$songarray->[$_]], 0..$#$songarray;
+
+		#translate expstate to new order :
+		my @newexp;
+		for my $string (@{ $self->buildexpstate })
+		{	my @exp;
+			$exp[$oldarray->[$_]]=substr($string,$_,1) for 0..$#$oldarray;
+			my $new='';
+			$new.= defined($_) ? $_ : 1 for map $exp[$_], @$songarray;
+			push @newexp, $new;
+		}
+		$self->{new_expand_state}=\@newexp;
 		$self->{lastclick}=$self->{startgrow}=-1;
 	}
 	elsif ($action eq 'insert')
