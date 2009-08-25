@@ -92,6 +92,7 @@ sub Read
 			my $value;
 			if (defined(my $keys=$Songs::Def{$field}{$id})) #generic cases
 			{	my $joinwith= $Songs::Def{$field}{join_with};
+				my $split=$Songs::Def{$field}{read_split};
 				my $join= $Songs::Def{$field}{flags}=~m/l/ || defined $joinwith;
 				for my $key (split /\|/,$keys)
 				{	$key=~s/\*$//;	#remove ';*', only used for writing tags
@@ -122,6 +123,7 @@ sub Read
 					else			{ $value= $v->[0]; last; }
 				}
 				if (defined $joinwith && $value) { $value=join $joinwith,@$value; }
+				elsif (defined $split)	 { $value=[ map split($split,$_), @$value ]; }
 			}
 			elsif (my $sub=$Songs::Def{$field}{"$id:read"}) #special cases with custom function
 			{	$values{$field}= $sub->($h);
