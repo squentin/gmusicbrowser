@@ -1070,12 +1070,12 @@ sub SongArray_changed_cb
 		my @selectedID;
 		$selectedID[$oldarray->[$_]]=1 for @selected;
 		@selected=grep $selectedID[$array->[$_]], 0..$#$array;
-		#my $vpos= $self->get_vadjustment->value;
-		#my $hpos= $self->get_hadjustment->value;
-		$self->ResetModel;
-		#$self->get_vadjustment->value($vpos);
-		#$self->get_hadjustment->value($hpos);
-		#FIXME PHASE1 try to restore position
+		# lie to the model, just tell it that some rows were removed/inserted and refresh
+		# if it cause a problem, just use $self->ResetModel; instead
+		my $diff= @$array - @$oldarray;
+		if	($diff>0) { $store->rowinsert(scalar @$oldarray,$diff); }
+		elsif	($diff<0) { $store->rowremove(-$diff); }
+		$self->queue_draw;
 		$updateselection=1;
 	}
 	elsif ($action eq 'insert')
