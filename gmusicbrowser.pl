@@ -525,20 +525,30 @@ sub ParseOptions
 	return \%opt;
 }
 
+sub ReplaceExpr { my $expr=shift; $expr=~s#\\}#}#g; warn "FIXME : ReplaceExpr($expr)"; return ''; } #FIXME
+sub ReplaceExprUsedFields {} #FIXME
+
 our %ReplaceFields; #used in gmusicbrowser_tags for auto-fill FIXME PHASE1
 	#o => 'basefilename', maybe should be usage specific (=>only for renaming)
 
 sub UsedFields
 {	my $s=$_[0];
-	my @f=map $ReplaceFields{$_}, $s=~m/(%[a-zA-Z])/g;
+	my @f= grep defined, map $ReplaceFields{$_}, $s=~m/(%[a-zA-Z])/g;
 	push @f, $s=~m#\$([a-zA-Z]\w*)#g;
+	push @f, ReplaceExprUsedFields($_) for $s=~m#\${(.*?(?<!\\))}#g;
 	return Songs::Depends(@f);
 }
 sub ReplaceFields
-{	my ($ID,$string,$esc)=@_;
+{	my ($ID,$string,$esc,$special)=@_;
+	$special||={};
 	my $display= $esc ? ref $esc ? sub { $esc->(Songs::Display(@_)) } : \&Songs::DisplayEsc : \&Songs::Display;
 	$string=~s#\\n#\n#g;
-	$string=~s#([%\$]){2}|(%[a-zA-Z]|\$[a-zA-Z\$]\w*)#$1 ? $1 : do {my $f=$ReplaceFields{$2}; $f ? $display->($ID,$f) : $2} #ge;
+	$string=~s#([%\$]){2}|(%[a-zA-Z]|\$[a-zA-Z\$]\w*)|\${(.*?(?<!\\))}#
+		$1			? $1 :
+		defined $3		? ReplaceExpr($3) :
+		exists $special->{$2}	? do {my $s=$special->{$2}; ref $s ? $s->($ID,$2) : $s} :
+		do {my $f=$ReplaceFields{$2}; $f ? $display->($ID,$f) : $2}
+		#ge;
 	return $string;
 }
 sub ReplaceFieldsAndEsc
