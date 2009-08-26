@@ -2726,6 +2726,10 @@ use base 'Gtk2::ProgressBar';
 sub new
 {	my ($class,$opt,$ref)=@_;
 	my $self=bless Gtk2::ProgressBar->new, $class;
+	if ($opt->{text})
+	{	$self->{text}=$opt->{text};
+		$self->set_ellipsize( $opt->{ellipsize}||'end' );
+	}
 	$self->{left}=$self->{right}=0;
 	$self->{max}= $ref->{max} || 1;
 	my $orientation= $opt->{vertical} ? 'bottom-to-top' : $opt->{horizontal} ? 'left-to-right' : $opt->{orientation} || 'left-to-right';
@@ -2755,6 +2759,21 @@ sub update
 	my $f= ($self->{now}||0) / ($self->{max}||1);
 	$f=0 if $f<0; $f=1 if $f>1;
 	$self->set_fraction($f);
+	if (my $text=$self->{text})
+	{	my $format=( $self->{max} <600 )? '%01d:%02d' : '%02d:%02d';
+		my $now=$self->{now}||0;
+		my $max=$self->{max}||0;
+		my $left=$max-$now;
+		$_=sprintf($format,int($_/60),$_%60) for $now,$max,$left;
+		my %special=
+		(	'$percent'	=> sprintf('%d',$f*100),
+			'$current'	=> $now,
+			'$left'		=> $left,
+			'$total'	=> $max,
+		);
+		$text=::ReplaceFields( $::SongID,$text,0,\%special );
+		$self->set_text($text);
+	}
 }
 sub button_press_cb
 {	my ($self,$event)=@_;
