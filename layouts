@@ -62,6 +62,7 @@ HBmain		= _VBmain 2Filler1 -Cover(forceratio=1)
 
 [full with buttons] based on Small player
 Type=T
+Window= borderwidth=5
 HBmain		= _VBmain 2Filler1 -Cover(forceratio=1)
 
 [info]
@@ -70,6 +71,12 @@ HBAlbum		= _Album -Date
 VBText		= Title(30) Artist HBAlbum
 HBmain		= _VBText 2Filler1 -Cover(forceratio=1)
 VolumeScroll	= HBmain
+
+[minimaltip]
+Type=T
+Window= borderwidth=0
+HBmain	= Play(size=menu) Next(size=menu) 2_TimeBar(text="%t by %a",minwidth=240) Cover
+Name= "Minimal tip"
 
 [with browser]
 Type=G
