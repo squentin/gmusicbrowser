@@ -1698,8 +1698,8 @@ sub init
 	$self->add($frame);
 	$frame->add($child);
 	$frame->set_shadow_type('out');
+	$child->set_border_width($self->get_border_width);
 	$self->set_border_width(0);
-	$child->set_border_width(5);
 
 		##$self->set_type_hint('tooltip'); #TEST
 		##$self->set_type_hint('notification'); #TEST
