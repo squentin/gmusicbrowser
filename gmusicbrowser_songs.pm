@@ -1596,7 +1596,7 @@ sub FindFirst		#FIXME add a few fields (like 'disc track path file') to all sort
 		{	my ($inv,$field,$i)= $s=~m/^(-)?(\w+)(:i)?$/;
 			next unless $field;
 			unless ($Def{$field}) { warn "Songs::SortList : Invalid field $field\n"; next }
-			unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $_[0]\n"; next }
+			unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $field\n"; next }
 			push @code, SortCode($field,$inv,$i);
 		}
 		return unless @code;
@@ -1618,7 +1618,7 @@ sub SortList		#FIXME add a few fields (like 'disc track path file') to all sort 
 		{	my ($inv,$field,$i)= $s=~m/^(-)?(\w+)(:i)?$/;
 			next unless $field;
 			unless ($Def{$field}) { warn "Songs::SortList : Invalid field $field\n"; next }
-			unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $_[0]\n"; next }
+			unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $field\n"; next }
 			push @code, SortCode($field,$inv,$i);
 		}
 		return unless @code;

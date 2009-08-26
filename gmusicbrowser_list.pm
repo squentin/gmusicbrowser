@@ -4854,8 +4854,8 @@ sub new
 	 motion=>\&drag_motion_cb,
 		);
 
-	#$self->{grouping}='album|pic' unless defined $self->{grouping}; #FIXME PHASE1 : grouping key for folder was folder, now path
-	$self->{grouping}= ($self->{type}=~m/[QLA]/ ? '' : 'album|pic') unless defined $self->{grouping}; #FIXME PHASE1 : grouping key for folder was folder, now path
+	#$self->{grouping}='album|pic' unless defined $self->{grouping};
+	$self->{grouping}= ($self->{type}=~m/[QLA]/ ? '' : 'album|pic') unless defined $self->{grouping};
 
 	$self->AddColumn($_) for split / +/,$opt->{cols};
 	unless ($self->{cells}) { $self->AddColumn('title'); } #to ensure there is at least 1 column
@@ -5319,7 +5319,7 @@ sub expose_cb
 	#$window->draw_rectangle($style->base_gc($state), 1, $expose->values);
 	my $gc=$style->base_gc($nstate);
 	$window->draw_rectangle($gc, 1, $expose->values);
-	if (0)#if ($self->{background_picture}='/home/squentin/src/trygtk/Gmusicbrowser_head/pix/gmb-queue.png')#TEST REMOVE PATH PHASE1
+	if (0)#if ($self->{background_picture}=PIXPATH.'gmb-queue.png')#TEST REMOVE PHASE1
 	{	my $pixbuf= $self->{background_pixbuf};
 		if (!$pixbuf || $self->{background_pixbuf_size} ne join('x',$window->get_size))
 		{	$pixbuf=Gtk2::Gdk::Pixbuf->new_from_file($self->{background_picture});#FIXME cache it
