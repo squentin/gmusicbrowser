@@ -1725,6 +1725,10 @@ my %sort_menu=
 	songs	=> _("number of songs in filter"),
 	'length'=> _("length of songs"),
 );
+my %sort_menu_album=
+(	%sort_menu,
+	artist => _("artist")
+);
 
 my %timespan_menu=
 (	year 	=> _("year"),
@@ -1740,7 +1744,7 @@ our @MenuPageOptions=
 	{ label => _"picture size",	code => sub { my $self=$_[0]{self}; $self->{mpicsize}=$_[1]; $self->Fill('optchanged'); },	test => sub {$_[0]{self}{mode} eq 'mosaic'},
 	  submenu => \@mpicsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{mpicsize}}, istrue => 'aa' },
 	{ label => _"sort by",		code => sub { my $self=$_[0]{self}; $self->{sort}=$_[1]; $self->Fill('optchanged'); },
-	  check => sub {$_[0]{self}{sort}}, istrue => 'aa', submenu => \%sort_menu, submenu_reverse => 1 },
+	  check => sub {$_[0]{self}{sort}}, istrue => 'aa', submenu => sub { $_[0]{col}==::SONG_ALBUM ? \%sort_menu_album : \%sort_menu; }, submenu_reverse => 1 },
 	{ label => _"Group by",		code => sub { my $self=$_[0]{self}; $self->{timespan}=$_[1]; $self->Fill('rehash'); },
 	  check => sub {$_[0]{self}{timespan}}, submenu => \%timespan_menu, submenu_reverse => 1,
 	  test => sub { my $c=$_[0]{col}; $c==::SONG_ADDED || $c==::SONG_LASTPLAY || $c==::SONG_MODIF },
@@ -2283,6 +2287,14 @@ sub get_fill_data
 	{	my $aa= $col==::SONG_ARTIST ? \%::Artist : \%::Album;
 		no warnings 'uninitialized';
 		@l=sort { substr($aa->{$a}[::AAYEAR],-4,4) cmp substr($aa->{$b}[::AAYEAR],-4,4) || ::NFKD(lc$a) cmp ::NFKD(lc$b) } @l;
+	}
+	elsif ($self->{sort} eq 'artist') #only for albums
+	{	my %aartist;
+		for my $alb (@l)
+		{	my $h= $::Album{$alb}[::AAXREF];
+			$aartist{$alb}= ::NFKD(lc( (sort { $h->{$b} <=> $h->{$a} } keys %$h)[0] ));
+		}
+		@l=sort { $aartist{$a} cmp $aartist{$b} || ::NFKD(lc$a) cmp ::NFKD(lc$b) } @l;
 	}
 	elsif ($self->{sort} eq 'songs') #number of songs in filter
 	{	@l=sort { $href->{$a} <=> $href->{$b} || ::NFKD(lc$a) cmp ::NFKD(lc$b) } @l;
