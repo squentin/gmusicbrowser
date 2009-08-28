@@ -413,7 +413,7 @@ sub Stop
 	#my ($result,$state,$pending)=$PlayBin->get_state(0);
 	#warn "stop: state: $result,$state,$pending\n";
 	#return if $state eq 'null' and $pending eq 'void-pending';
-	$PlayBin->set_state('null');
+	$PlayBin->set_state('null') if $PlayBin;
 	#warn "--stop\n";
 }
 
