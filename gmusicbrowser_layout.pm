@@ -1638,7 +1638,6 @@ sub SetWindowOptions
 		$self->{hidden}={ $wopt->{hidden}=~m/(\w+)(?::?(\d+x\d+))?/g } if $wopt->{hidden};
 	}
 	if ($width) { $self->resize($width,$height); }
-	else { $self->{natural_size}=1; $self->signal_connect('map' => sub {delete $_[0]->{natural_size}}); }
 	$self->set_gravity($layouthash->{gravity}) if $layouthash->{gravity};
 	if (my $scrn=Gtk2::Gdk::Screen->get_default)
 	 {$x=-1 if $x>$scrn->get_width || $y>$scrn->get_height}
@@ -2951,6 +2950,7 @@ sub new
 	$self->signal_connect(destroy => sub {delete $::ToDo{'8_LoadImg'.$_[0]}});
 	$self->set_size_request($minsize,$minsize) if $minsize;
 	$self->{key}=[];
+	$self->{natural_size}=1;
 	return $self;
 }
 
@@ -2990,21 +2990,21 @@ sub set
 	 },$self,@files);
 	}
 	else
-	{	$self->hide unless $self->get_toplevel->{natural_size};
+	{	$self->hide unless $self->{natural_size};
 	}
 	$self->signal_connect('map'=>sub #undo the temporary settings set in size_allocate_cb for the natural_size mode #FIXME should be simpler
-	{	$self=$_[0];
+	{	my $self=$_[0];
 		delete $self->{size} unless $self->{pixbuf} || $::ToDo{'8_LoadImg'.$self};
 		$self->set_size_request(-1,-1) unless $self->{forceratio};
 		$self->queue_resize;
-	}) if $self->get_toplevel->{natural_size};
+	}) if $self->{natural_size};
 }
 
 sub size_allocate_cb
 {	my ($self,$alloc)=@_;
 	my $max=$self->{maxsize};
 	my $w=$alloc->width; my $h=$alloc->height;
-	if ($self->get_toplevel->{natural_size})#set temporary settings for natural_size mode #FIXME should be simpler
+	if (delete $self->{natural_size})#set temporary settings for natural_size mode #FIXME should be simpler
 	{	my $s= $w<$h ? $h : $w;
 		$self->set_size_request($s,$s) if !defined $self->{size} || $s!=$self->{size};
 		$self->{size}=$s;
