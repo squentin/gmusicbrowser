@@ -1554,6 +1554,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		}
 		close $fh;
 		# FIXME do someting clever if no [Options]
+		SongArray::start_init(); #every SongArray read in Options will be updated to new IDs by SongArray::updateIDs later
 		ReadRefFromLines($lines{Options},\%Options);
 		my $oldversion=delete $Options{version} || VERSION;
 		$Options{ArtistSplit}||=' & |, |;';
@@ -1568,7 +1569,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		my $songs=$lines{Songs};
 		my $fields=shift @$songs;
 		my ($loadsong,$extra_sub)=Songs::MakeLoadSub(\%lines,split /\t/,$fields);
-		my @newIDs; SongArray::start_init();
+		my @newIDs;
 		while (my $line=shift @$songs)
 		{	my ($oldID,@vals)= split /\t/, $line,-1;
 			s#\\x([0-9a-fA-F]{2})#chr hex $1#eg for @vals;
