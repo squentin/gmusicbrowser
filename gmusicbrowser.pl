@@ -266,7 +266,7 @@ our $re_artist; #regular expression used to split artist name into multiple arti
 my ($browsercmd,$opendircmd);
 
 our %QActions=		#icon		#short		#long description
-(	''	=> [ 0, 'gmb-empty',	_"normal",	_"normal play when queue empty"],
+(	''	=> [ 0, undef,		_"normal",	_"normal play when queue empty"],
 	autofill=> [ 1, 'gtk-refresh',	_"autofill",	_"autofill queue" ],
 	'wait'	=> [ 2, 'gmb-wait',	_"wait for more",_"wait for more when queue empty"],
 	stop	=> [ 3, 'gtk-media-stop',_"stop",	_"stop when queue empty"],

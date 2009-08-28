@@ -1365,7 +1365,7 @@ sub Get_all_gids	#FIXME add option to filter out walues eq ''
 	return UniqList($field,$::Library,1); #FIXME use ___name directly
 }
 
-sub Get		# ($ID,@fields)		#FIXME PHASE1 check if function exist for fields
+sub Get		# ($ID,@fields)
 {	#warn "Songs::Get(@_) called from : ".join(':',caller)."\n";
 	my $ID=shift;
 	return wantarray ? map (($Get{$_}||CompileGet($_))->($ID), @_) : ($Get{$_[0]}||CompileGet($_[0]))->($ID);
@@ -1900,9 +1900,8 @@ my %Presence;
 
 sub DESTROY
 {	my $self=$_[0];
-	warn "SongArray DESTROY\n";
 	@list_of_SongArray= grep defined, @list_of_SongArray;
-	::weaken($_) for @list_of_SongArray; warn @list_of_SongArray." songarrays left\n";
+	::weaken($_) for @list_of_SongArray;
 	delete $Presence{$self};
 }
 sub new
