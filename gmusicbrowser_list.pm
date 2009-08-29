@@ -942,7 +942,7 @@ sub drag_received_cb
 	}
 
 	if ($type==::DRAG_FILE) #convert filenames to IDs
-	{	@IDs=map ::FolderToIDs(::decode_url($_)), grep s#^file://##, @IDs;
+	{	@IDs=::FolderToIDs(0,map ::decode_url($_), @IDs);
 		return unless @IDs;
 	}
 	$songarray->Insert($row,\@IDs);
@@ -2290,18 +2290,19 @@ sub new
 	my $store=Gtk2::TreeStore->new('Glib::String');
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->set_headers_visible(::FALSE);
+	$treeview->set_search_equal_func(\&search_equal_func);
 	$treeview->set_enable_search(!$opt->{no_typeahead});
 	#$treeview->set('fixed-height-mode' => ::TRUE);	#only if fixed-size column
 	$treeview->signal_connect(row_expanded  => \&row_expanded_changed_cb);
 	$treeview->signal_connect(row_collapsed => \&row_expanded_changed_cb);
 	$treeview->{expanded}={};
 	my $renderer= Gtk2::CellRendererText->new;
-	my $displayfunc= Songs::DisplayFromHash_sub('path');
+	$store->{displayfunc}= Songs::DisplayFromHash_sub('path');
 	my $column=Gtk2::TreeViewColumn->new_with_attributes(Songs::FieldName($col),$renderer);
 	$column->set_cell_data_func($renderer, sub
 		{	my (undef,$cell,$store,$iter)=@_;
-			my $folder=$store->get($iter,0);
-			$cell->set( text=> $displayfunc->($folder));
+			my $folder=::decode_url($store->get($iter,0));
+			$cell->set( text=> $store->{displayfunc}->($folder));
 		});
 	$treeview->append_column($column);
 	$self->add($treeview);
@@ -2320,6 +2321,15 @@ sub new
 	    }]);
 	MultiTreeView::init($treeview,__PACKAGE__);
 	return $self;
+}
+
+sub search_equal_func
+{	#my ($store,$col,$string,$iter)=@_;
+	my $store=$_[0];
+	my $folder= $store->{displayfunc}( ::decode_url($store->get($_[3],0)) );
+	#use ::superlc instead of uc ?
+	my $string=uc $_[2];
+	index uc($folder), $string;
 }
 
 sub Fill
@@ -2354,7 +2364,7 @@ sub Fill
 	push @toadd,$href->{$_},$_,undef  for sort grep $href->{$_}[0]>=$min, keys %$href;
 	while (my ($ref,$name,$iter)=splice @toadd,0,3)
 	{	my $iter=$store->append($iter);
-		$store->set($iter,0,$name);
+		$store->set($iter,0, Songs::filename_escape($name));
 		push @toexpand,$store->get_path($iter) if $ref->[2];
 		if ($ref->[1]) #sub-folders
 		{ push @toadd, $ref->[1]{$_},$_,$iter  for sort grep $ref->[1]{$_}[0]>=$min, keys %{$ref->[1]}; }
@@ -2432,7 +2442,7 @@ sub _treepath_to_foldername
 	my @folders;
 	my $iter=$store->get_iter($tp);
 	while ($iter)
-	{	unshift @folders, $store->get_value($iter,0);
+	{	unshift @folders, ::decode_url($store->get_value($iter,0));
 		$iter=$store->iter_parent($iter);
 	}
 	$folders[0]='' if $folders[0] eq ::SLASH;
@@ -2566,10 +2576,8 @@ sub selection_changed_cb
 }
 
 sub _MakeFolderFilter
-{	my @paths=@_; #in utf8
-	#s#\\#\\\\#g for @paths;
-	my @list;
-	push @list, ::FolderToIDs($_) for @paths;
+{	my @paths=@_; #in utf8 ?
+	my @list= ::FolderToIDs(0,@paths);
 	my $filter= Filter->new('',\@list); #FIXME use a filter on path rather than a list ?
 	return $filter;
 }
@@ -5676,7 +5684,7 @@ sub Scroll_to_TopEnd
 sub drag_received_cb
 {	my ($view,$type,$dest,@IDs)=@_;
 	if ($type==::DRAG_FILE) #convert filenames to IDs
-	{	@IDs=map ::FolderToIDs(::decode_url($_)), grep s#^file://##, @IDs;
+	{	@IDs=::FolderToIDs(0,map ::decode_url($_), @IDs);
 		return unless @IDs;
 	}
 	my $self=::find_ancestor($view,__PACKAGE__);

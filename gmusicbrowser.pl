@@ -899,10 +899,9 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	ToggleFullscreen=> [\&Layout::ToggleFullscreen,		_"Toggle fullscreen mode"],
 	ToggleFullscreenLayout=> [\&ToggleFullscreenLayout, _"Toggle the fullscreen layout"],
 	OpenFiles	=> [\&OpenFiles, _"Play a list of files", _"url-encoded list of files",0],
-#FIXME PHASE1 implement these :
-#	AddFilesToPlaylist=> [sub { DoActionForList('addplay',Url_to_IDs($_[1])); }, _"Add a list of files/folders to the playlist", _"url-encoded list of files/folders",0],
-#	InsertFilesInPlaylist=> [sub { DoActionForList('insertplay',Url_to_IDs($_[1])); }, _"Insert a list of files/folders at the start of the playlist", _"url-encoded list of files/folders",0],
-#	EnqueueFiles	=> [sub { DoActionForList('queue',Url_to_IDs($_[1])); }, _"Enqueue a list of files/folders", _"url-encoded list of files/folders",0],
+	AddFilesToPlaylist=> [sub { DoActionForList('addplay',Uris_to_IDs($_[1])); }, _"Add a list of files/folders to the playlist", _"url-encoded list of files/folders",0],
+	InsertFilesInPlaylist=> [sub { DoActionForList('insertplay',Uris_to_IDs($_[1])); }, _"Insert a list of files/folders at the start of the playlist", _"url-encoded list of files/folders",0],
+	EnqueueFiles	=> [sub { DoActionForList('queue',Uris_to_IDs($_[1])); }, _"Enqueue a list of files/folders", _"url-encoded list of files/folders",0],
 	AddToLibrary	=> [sub { AddToLibraryPath(split / /,$_[1]); }, _"Add files/folders to library", _"url-encoded list of files/folders",0],
 	SetFocusOn	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->SetFocusOn($name) if $w;},_"Set focus on a layout widget", _"Widget name",0],
 	ShowHideWidget	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->ShowHide(split / +/,$name,2) if $w;},_"Show/Hide layout widget(s)", _"|-separated list of widget names",0],
@@ -4496,15 +4495,26 @@ sub OpenFiles
 	Select(song=>'first',play=>1,staticlist => \@IDs) if @IDs;
 }
 
+sub Uris_to_IDs
+{	my @urls=split / +/,$_[0];
+	$_=decode_url($_) for @urls;
+	my @IDs=FolderToIDs(1,@urls);
+	return \@IDs;
+}
+
 sub FolderToIDs
-{	my @dirs=@_;
-	$_=~s#^file://## for @dirs;
+{	my ($recurse,@dirs)=@_;
+	s#^file://## for @dirs;
+	s/$QSLASH$//o for @dirs;
+	s/$QSLASH{2,}/$QSLASH/go for @dirs;
 	my @files;
 	MakeScanRegex() unless $ScanRegex;
-	for my $dir (@dirs)
+	while (defined(my $dir=shift @dirs))
 	{	if (-d $dir)
 		{	opendir my($DIRH),$dir or warn "Can't read folder $dir : $!\n";
-			push @files, map $dir.SLASH.$_, grep !m#^\.# && -f && m/$ScanRegex/, readdir $DIRH;
+			my @list= map $dir.SLASH.$_, grep !m#^\.#, readdir $DIRH;
+			push @files, grep -f && m/$ScanRegex/, @list;
+			push @dirs, grep -d, @list   if $recurse;
 			closedir $DIRH;
 		}
 		elsif (-f $dir) { push @files,$dir; }

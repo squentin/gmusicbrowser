@@ -210,12 +210,12 @@ our %timespan_menu=
 	filename=>
 	{	parent	=> 'string',
 		check	=> ';',	#override string's check because not needed and filename may not be utf8
-		get	=> '::decode_url(#_#)',
-		set	=> '#_#=filename_escape(#VAL#);',
+		get	=> '#_#',
+		set	=> '#_#=#VAL#; ::_utf8_off(#_#);',
 		display	=> '::filename_to_utf8displayname(#get#)',
-		hash_to_display => '::filename_to_utf8displayname(::decode_url(#VAL#))', #only used by FolderList::
-		load	=> '#_#=#VAL#',
-		save	=> '#_#',
+		hash_to_display => '::filename_to_utf8displayname(#VAL#)', #only used by FolderList::
+		load	=> '#_#=::decode_url(#VAL#)',
+		save	=> 'filename_escape(#_#)',
 	},
 # 	picture =>
 #	{	get_picture	=> '__#mainfield#_picture[#GID#] || $::Options{Default_picture_#mainfield#};',
@@ -695,9 +695,9 @@ our %timespan_menu=
  fullfilename_raw => { get => '#fullfilename->get#', type=> 'virtual',	flags => 'g',	depend => 'file path',	letter => 'f', },
  fullfilename	=> {	get	=> '#path->get# .::SLASH. #file->get#',
 	 		display => '#path->display# .::SLASH. #file->display#',
-			makefilter_fromID => '"fullfilename:e:" . ::url_escape(#get#)',
+			makefilter_fromID => '"fullfilename:e:" . #get#',
 			type	=> 'virtual',	flags => 'g',	depend => 'file path',	letter => 'u',
-			'filter:e'	=> '#ID# == #VAL#',	'filter_prep:e'=> sub { FindID(::decode_url($_[0])); },
+			'filter:e'	=> '#ID# == #VAL#',	'filter_prep:e'=> sub { FindID($_[0]); },
 		   },
  basefilename	=> { get => 'do {my $s=#file->display#; $s=~s/\.[^\.]+$//; $s;}',	type=> 'virtual',	depend => 'file',	flags => 'g', },
  #fileextension => ?
@@ -1454,7 +1454,7 @@ sub FindID
 		}
 		return undef;
 	}
-	$f=undef unless defined;
+	$f=undef if $f>$LastID;
 	return $f;
 }
 
