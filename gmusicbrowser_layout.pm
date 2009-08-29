@@ -108,6 +108,16 @@ our %Widgets=
 		activate=> \&::Quit,
 		click3	=> sub {&::EnqueueAction('quit')},
 	},
+	LockSong =>
+	{	class	=> 'Layout::Button',
+		button	=> 0,
+		size	=> SIZE_FLAGS,
+		state	=> sub { ($::TogLock && $::TogLock eq 'fullfilename')? 'on' : 'off' },
+		stock	=> { on => 'gmb-lock', off => '. gmb-locklight' },
+		tip	=> _"Lock on song",
+		click1	=> sub {::ToggleLock('fullfilename');},
+		event	=> 'Lock',
+	},
 	LockArtist =>
 	{	class	=> 'Layout::Button',
 		button	=> 0,
@@ -204,7 +214,7 @@ our %Widgets=
 									($::Position+1).'/'.@$::ListPlay;
 				  $_[0]->set_markup( '<small>'.$t.'</small>' );
 				},
-		event	=> 'Pos Queue',
+		event	=> 'Pos Queue Filter',
 	},
 	Title =>
 	{	class	=> 'Layout::Label',

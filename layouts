@@ -7,7 +7,7 @@ HBmenu		= _MBmenu
 HBButtons1	= Prev Stop Play Next ExtraButtons 5-Vol -Pref -Playlist(toggle)
 HBButtons3	= 5Sort 5Filter 5Queue 5Pos -Stars
 HBTime		= LabelTime Length _TimeBar
-HBTitle		= Filler0 _Title
+HBTitle		= LockSong _Title
 HBArtist	= LockArtist _Artist
 HBAlbum		= LockAlbum _Album -Date
 VBText		= HBButtons1 2HBTitle 2HBArtist 2HBAlbum HBTime
@@ -22,7 +22,6 @@ VPRight		= HPfp0 _VBSongList
 TBRight		= _"Library" VPRight _"Context" Context
 HPmain		= VBLeft _TBRight
 VBmain		= HBmenu 5_HPmain Progress
-HSize0		= Filler0 LockArtist LockAlbum
 VolumeScroll	= VBplayer
 
 
