@@ -401,6 +401,7 @@ our %timespan_menu=
 	},
 	boolean	=>
 	{	parent	=> 'integer',	bits => 1,
+		check	=> '#VAL#= #VAL# ? 1 : 0;',
 		display	=> "(#_# ? '#yes#' : '#no#')",	yes => _"Yes",	no => "",
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryBoolean->new(@_); },
 	},
@@ -519,6 +520,16 @@ our %timespan_menu=
 	_ => 'do {my $n=vec(__album_artist_raw__,#ID#,#bits#); $n==1 ? vec(__artist__,#ID#,#bits#) : $n}',
 	can_group=>1,
 	letter => 'A',
+ },
+ haspicture =>
+ {	name	=> _"Embedded picture", width => 20, flags => 'garwsc',	type => 'boolean',
+	id3v2 => 'APIC;;;;%v',	ilst => 'covr',		#or just id3v2 => 'APIC', ?
+	_disabled=>1,
+ },
+ haslyrics =>
+ {	name	=> _"Embedded lyrics", width => 20, flags => 'garwsc',	type => 'boolean',
+	id3v2 => 'USLT;;;%v',	vorbis	=> 'lyrics',	ape => 'Lyrics', #TESTME
+	_disabled=>1,
  },
  compilation =>
  {	name	=> _"Compilation", width => 20, flags => 'garwesc',	type => 'boolean',
