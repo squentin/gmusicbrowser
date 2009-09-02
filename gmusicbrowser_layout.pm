@@ -3259,7 +3259,7 @@ sub get { shift->{nb}; }
 
 sub click
 {	my ($self,$event)=@_;
-	&popup if $event->button == 3;
+	if ($event->button == 3) { $self->popup($event); return 1 }
 	my ($x)=$event->coords;
 	my $nb=1+int($x/$width);
 	$nb*=100/NBSTARS;
