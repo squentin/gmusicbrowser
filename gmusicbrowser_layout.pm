@@ -35,7 +35,8 @@ my @MenuQueue=
 );
 
 my @MainMenu=
-(	{label => _"Settings",		code => \&::PrefDialog,	stockicon => 'gtk-preferences' },
+(	{label => _"Add files or folders",code => sub {::ChooseAddPath(0)},	stockicon => 'gtk-add' },
+	{label => _"Settings",		code => \&::PrefDialog,	stockicon => 'gtk-preferences' },
 	{label => _"Open Browser",	code => \&::Playlist,	stockicon => 'gmb-playlist' },
 	{label => _"Open Context window",code => \&::ContextWindow, stockicon => 'gtk-info'},
 	{label => _"Switch to fullscreen mode",code => \&::ToggleFullscreenLayout, stockicon => 'gtk-fullscreen'},

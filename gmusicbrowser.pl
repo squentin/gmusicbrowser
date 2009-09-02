@@ -903,7 +903,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	AddFilesToPlaylist=> [sub { DoActionForList('addplay',Uris_to_IDs($_[1])); }, _"Add a list of files/folders to the playlist", _"url-encoded list of files/folders",0],
 	InsertFilesInPlaylist=> [sub { DoActionForList('insertplay',Uris_to_IDs($_[1])); }, _"Insert a list of files/folders at the start of the playlist", _"url-encoded list of files/folders",0],
 	EnqueueFiles	=> [sub { DoActionForList('queue',Uris_to_IDs($_[1])); }, _"Enqueue a list of files/folders", _"url-encoded list of files/folders",0],
-	AddToLibrary	=> [sub { AddToLibraryPath(split / /,$_[1]); }, _"Add files/folders to library", _"url-encoded list of files/folders",0],
+	AddToLibrary	=> [sub { AddPath(1,split / /,$_[1]); }, _"Add files/folders to library", _"url-encoded list of files/folders",0],
 	SetFocusOn	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->SetFocusOn($name) if $w;},_"Set focus on a layout widget", _"Widget name",0],
 	ShowHideWidget	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->ShowHide(split / +/,$name,2) if $w;},_"Show/Hide layout widget(s)", _"|-separated list of widget names",0],
 	PopupTrayTip	=> [sub {ShowTraytip($_[1])}, _"Popup Traytip",_"Number of milliseconds",qr/^\d*$/ ],
@@ -5324,10 +5324,10 @@ sub PrefLibrary
 	Watch($store, options => $refresh);
 	::set_drag($treeview, dest => [::DRAG_FILE,sub
 		{	my ($treeview,$type,@list)=@_;
-			AddToLibraryPath(@list);
+			AddPath(1,@list);
 		}]);
 
-	my $addbut=NewIconButton('gtk-add',_"Add folder");
+	my $addbut=NewIconButton('gtk-add',_"Add folder", sub { ChooseAddPath(1); });
 	my $rmdbut=NewIconButton('gtk-remove',_"Remove");
 
 	my $selection=$treeview->get_selection;
@@ -5336,12 +5336,6 @@ sub PrefLibrary
 			$rmdbut->set_sensitive($sel);
 		});
 	$rmdbut->set_sensitive(FALSE);
-
-	$addbut->signal_connect( clicked => sub
-	{	my @dirs=ChooseDir(_"Choose folder to add",undef,undef,'LastFolder_Add',1);
-		@dirs=map url_escape($_), @dirs;
-		AddToLibraryPath(@dirs);
-	});
 	$rmdbut->signal_connect( clicked => sub
 	{	my $iter=$selection->get_selected;
 		return unless defined $iter;
@@ -5380,8 +5374,14 @@ sub PrefLibrary
 			$table );
 	return $vbox;
 }
-sub AddToLibraryPath
-{	my @dirs=@_;
+sub ChooseAddPath
+{	my $addtolibrary=shift;
+	my @dirs=ChooseDir(_"Choose folder to add",undef,undef,'LastFolder_Add',1);
+	@dirs=map url_escape($_), @dirs;
+	AddPath($addtolibrary,@dirs);
+}
+sub AddPath
+{	my ($addtolibrary,@dirs)=@_;
 	s#^file://## for @dirs;
 	@dirs= grep !m#^\w+://#, @dirs;
 	my $changed;
@@ -5390,6 +5390,7 @@ sub AddToLibraryPath
 		my $d=decode_url($dir);
 		if (!-d $d) { ScanFolder($d); next }
 		IdleScan($d);
+		next unless $addtolibrary;
 		next if (grep $dir eq $_,@{$Options{LibraryPath}});
 		push @{$Options{LibraryPath}},$dir;
 		$changed=1;
