@@ -1307,7 +1307,7 @@ sub SortMenu
 	$sitem->set_submenu($submenu);
 	$menu->prepend($sitem);
 
-	$append->($menu,_"Shuffle",'shuffle',undef,\&::Shuffle);
+	$append->($menu,_"Shuffle",'shuffle');
 
 	{ my $item=Gtk2::CheckMenuItem->new(_"Repeat");
 	  $item->set_active($::Options{Repeat});

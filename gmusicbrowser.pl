@@ -721,6 +721,8 @@ our %Options=
 		_"Artist,Album,Disc,Track"	=> 'artist album disc track',
 		_"Artist,Date,Album,Disc,Track"	=> 'artist year album disc track',
 		_"Path,Album,Disc,Track,File"	=> 'path album disc track file',
+		_"Shuffled albums"		=> 'album_shuffle disc track file',
+		_"Shuffled albums, shuffled tracks"		=> 'album_shuffle shuffle',
 	},
 );
 

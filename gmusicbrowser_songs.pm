@@ -286,6 +286,7 @@ our %timespan_menu=
 		'stats:gid'	=> '#HVAL#{#_#}=undef;  ----  #HVAL#=[keys %{#HVAL#}];',
 		listall		=> '2..@#_name#-1',
 		parent		=> 'generic',
+		maxgid		=> '@#_name#-1',
 		#gsummary	=> 'my $gids=Songs::UniqList(#field#,#IDs#); @$gids==1 ? #gid_to_display(GID=$gids->[0])# : #names(count=scalar @$gids)#;',
 	},
 	number	=>
@@ -411,10 +412,10 @@ our %timespan_menu=
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryBoolean->new(@_); },
 	},
 	shuffle=>
-	{	#shuffle	=> 'vec(____,$_,32)=rand(256**4) for FIRSTID..$LastID',
-		n_sort		=> 'vec(____,#ID#,32)',
-		update		=> 'vec(____,#ID#,32)=rand(256**4)',	#FIXME
-		init		=> '____="";',
+	{	n_sort		=> 'Songs::update_shuffle($Songs::LastID) ---- vec($Songs::SHUFFLE,#ID#,32)',
+	},
+	gidshuffle=>
+	{	n_sort		=> 'Songs::update_shuffle(##mainfield#->maxgid#) ----  vec($Songs::SHUFFLE,##mainfield#->get_gid#,32)',
 	},
 );
 %Def=		#flags : Read Write Editable Sortable Column caseInsensitive sAve List Gettable
@@ -722,8 +723,8 @@ our %timespan_menu=
  missing	=> { flags => 'gan', type => 'integer', bits => 32, }, #FIXME store it using a 8-bit relative number to $::DAYNB
  missingkey	=> { get => 'join "\\x1D",'.map("#$_->get#",join(',',@MissingKeyFields)), depend => "@MissingKeyFields",	type=> 'virtual', },	#used to check if same song
 
- shuffle	=> { name => _"Shuffle", type => 'shuffle', flags => 's', depend => 'added', },
- album_shuffle	=> { name => _"Album shuffle", type => 'shuffle', flags => 's',		n_sort	=> 'vec(__shuffle__,#album->get_gid#,32)',  },	#	n_sort	=> 	'#shuffle->n_sort(ID=#album->get_gid#)#'  ??
+ shuffle	=> { name => _"Shuffle",	type => 'shuffle',	flags => 's', },
+ album_shuffle	=> { name => _"Album shuffle",	type => 'gidshuffle',	flags => 's',	mainfield=>'album'	  },
  filetags	=>	# debug field : list of the id3v2 frames / vorbis comments
  		{	name	=> "filetags", width => 180,	flags => 'grascil', type	=> 'flags',
 			"id3v2:read"	=> sub { my $h=$_[0]; my %res; for my $key (keys %$h) { my $v=$h->{$key}; if ($key=~m/^TXXX$|^COMM$|^WXXX$/) { my $i= $key eq 'COMM' ? 1 : 0; $res{"$key;$_->[$i]"}=undef for @$v; } else { $res{$key}=undef; } } ; return [keys %res]; },
@@ -884,10 +885,13 @@ sub SortCode
 		if (!$insensitive)	{ $code=$scode}
 		else			{ $code= $sicode || "::superlc($scode)"; }
 	}
+	my $init='';
+	$init=$1 if $code=~s/^(.+) +---- +//;
 	my $code2=$code;
 	$code =~s/#(?:GID|ID)#/\$a/g;
 	$code2=~s/#(?:GID|ID)#/\$b/g;
-	return $inv ? "$code2 $op $code" : "$code $op $code2";
+	$code= $inv ? "$code2 $op $code" : "$code $op $code2";
+	return $init,$code;
 }
 
 sub Compile		#currently return value of the code must be a scalar
@@ -1289,9 +1293,9 @@ sub ListAll
 {	my $field=$_[0];
 	my $func= $FuncCache{'listall '.$field} ||=
 		do	{	if ( my $c=Code($field, 'listall') )
-				{	my $sort=SortCode($field,0,1,1);
+				{	my ($initsort,$sort)=SortCode($field,0,1,1);
 					my $gid2get=Code($field, 'gid_to_get', GID => '$_');
-					eval "sub {[map( $gid2get, sort {$sort} $c)]}";
+					eval "sub { $initsort; [map( $gid2get, sort {$sort} $c)]}";
 				}
 				else {1}
 			};
@@ -1366,15 +1370,14 @@ sub Gid_to_Get		#convert a gid from a Get_gid to a what Get would return
 #	my $sub= $FuncCache{'s_to_g:'.$field}||= Makesub($field, 'sgid_to_gid', VAL => '$_[0]');
 #	return $sub;
 #}
-#sub sort_gid_by_name
-#{	my ($field,$gids)=@_;
-#	my $func= $FuncCache{'sortgid '.$field} ||= eval 'sub { '.SortCode($field,undef,1,1).' }';
-#	@$gids=sort $func @$gids;
-#}
 sub sort_gid_by_name
 {	my ($field,$gids,$h,$pre,$mode)=@_;
 	$mode||='';
-	my $func= $FuncCache{"sortgid $field $mode"} ||= eval 'sub {my $l=$_[0]; my $h=$_[1]; @$l=sort { '.($pre ? $HSort{$pre} : '').' '.SortCode($field,undef,1,1).' } @$l}';
+	my $func= $FuncCache{"sortgid $field $mode"} ||= do
+		{	my ($initsort,$sort)= SortCode($field,undef,1,1);
+			$pre= $pre ? $HSort{$pre} : '';
+			eval 'sub {my $l=$_[0]; my $h=$_[1]; '.$initsort.'; @$l=sort { '."$pre $sort".' } @$l}';
+		};
 	$func->($gids,$h);
 }
 sub Get_all_gids	#FIXME add option to filter out walues eq ''
@@ -1609,17 +1612,20 @@ sub FindFirst		#FIXME add a few fields (like 'disc track path file') to all sort
 	my $func= $FuncCache{"FindFirst $sort"} ||=
 	 do {	#my $insensitive;
 		my @code;
+		my $init='';
 		for my $s (split / /,$sort)
 		{	my ($inv,$field,$i)= $s=~m/^(-)?(\w+)(:i)?$/;
 			next unless $field;
 			unless ($Def{$field}) { warn "Songs::SortList : Invalid field $field\n"; next }
 			unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $field\n"; next }
-			push @code, SortCode($field,$inv,$i);
+			my ($sortinit,$sortcode)= SortCode($field,$inv,$i);
+			push @code, $sortcode;
+			$init.= $sortinit."; " if $sortinit;
 		}
 		return unless @code;
 		#if ($insensitive) { my $sort0=$sort; $sort0=~s/:i//g; SortList($listref,$sort0); } #do a case-sensitive sort first (faster)
 		#warn "sort function for '$sort' :\n".'sub {'.join(' || ',@code).'}'."\n" if $::debug;
-		my $code= 'sub {my $l=$_[0];$a=$l->[0]; for $b (@$l) { $a=$b if (' . join(' || ',@code) . ')>0; } return $a;}';
+		my $code= 'sub {my $l=$_[0];$a=$l->[0]; '.$init.'for $b (@$l) { $a=$b if (' . join(' || ',@code) . ')>0; } return $a;}';
 		Compile("FindFirst $sort", $code);
 	    };
 	return $func->($listref);
@@ -1631,20 +1637,23 @@ sub SortList		#FIXME add a few fields (like 'disc track path file') to all sort 
 	my $func= $FuncCache{"sort $sort"} ||=
 	 do {	#my $insensitive;
 		my @code;
+		my $init='';
 		for my $s (split / /,$sort)
 		{	my ($inv,$field,$i)= $s=~m/^(-)?(\w+)(:i)?$/;
 			next unless $field;
 			unless ($Def{$field}) { warn "Songs::SortList : Invalid field $field\n"; next }
 			unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $field\n"; next }
-			push @code, SortCode($field,$inv,$i);
+			my ($sortinit,$sortcode)= SortCode($field,$inv,$i);
+			push @code, $sortcode;
+			$init.= $sortinit."; " if $sortinit;
 		}
 		return unless @code;
 		#if ($insensitive) { my $sort0=$sort; $sort0=~s/:i//g; SortList($listref,$sort0); } #do a case-sensitive sort first (faster)
 		#warn "sort function for '$sort' :\n".'sub {'.join(' || ',@code).'}'."\n" if $::debug;
-		my $code= 'sub {' . join(' || ',@code) . '}';
+		my $code= 'sub { my $list=shift; ' .$init. '@$list= sort {'. join(' || ',@code) . '} @$list; }';
 		Compile("sort $sort", $code);
 	    };
-	@$listref=sort $func @$listref if $func;
+	$func->($listref) if $func;
 	$time=times-$time; warn "sort ($sort) : $time s\n"; #DEBUG
 }
 sub SortDepends
@@ -1653,9 +1662,16 @@ sub SortDepends
 	return [Depends(@f)];
 }
 sub ReShuffle
-{	my @shuffle;
-	push @shuffle, rand(256**4) for 0..$LastID;
-	$Songs::Songs_shuffle=pack 'L*',@shuffle; #FIXME should be eval'ed code
+{	$Songs::SHUFFLE='';
+}
+sub update_shuffle
+{	my $max=shift;
+	my $length= defined $Songs::SHUFFLE ? length($Songs::SHUFFLE) : 0;
+	my $needed= $max+1 - $length/4;
+	if ($needed>0)
+	{	my @append;
+		$Songs::SHUFFLE.= pack 'L*', map rand(256**4), 1..$needed;
+	}
 }
 
 sub Depends
@@ -2108,6 +2124,7 @@ sub init
 sub Sort
 {	my ($self,$sort)=@_;
 	my $old=$::Options{Sort};
+	if ($old eq $sort && $sort=~m/shuffle/) { Songs::ReShuffle(); }
 	if ($::RandomMode || $old=~m/shuffle/)	{ $::Options{Sort_LastSR}=$old; }		# save sort mode for
 	elsif ($old ne '')			{ $::Options{Sort_LastOrdered}=$old; }		# quick toggle random/non-random
 	$::RandomMode= $sort=~m/^random:/ ? Random->new($sort,$self) : undef;
@@ -2614,15 +2631,13 @@ INIT
 	     {	my ($field,$pat,$lref,$assign,$inv)=@_;
 		$inv=$inv ? "$pat..(($pat>@\$tmp)? 0 : \$#\$tmp)"
 			  :    "0..(($pat>@\$tmp)? \$#\$tmp : ".($pat-1).')';
-		return "\$tmp=$lref; @\$tmp= sort {".Songs::SortCode($field,0)."} @\$tmp; $assign @\$tmp[$inv];";
-		#return "\$tmp=$lref;Songs::SortList(\$tmp,$field);$assign @\$tmp[$inv];";
+		return "\$tmp=$lref; Songs::SortList(\$tmp, '".Songs::SortField($field)."' ); $assign @\$tmp[$inv];";
 	     },
 	h => sub
 	     {	my ($field,$pat,$lref,$assign,$inv)=@_;
 		$inv=$inv ? "$pat..(($pat>@\$tmp)? 0 : \$#\$tmp)"
 			  :    "0..(($pat>@\$tmp)? \$#\$tmp : ".($pat-1).')';
-		return "\$tmp=$lref; @\$tmp= sort {".Songs::SortCode($field,1)."} @\$tmp; $assign @\$tmp[$inv];";
-		#return "\$tmp=$lref;Songs::SortList(\$tmp,-$field);$assign @\$tmp[$inv];";
+		return "\$tmp=$lref; Songs::SortList(\$tmp, '".'-'.Songs::SortField($field)."' ); $assign @\$tmp[$inv];";
 	     },
 	l => sub	#is in a saved lists
 	     {	my ($n,$pat,$lref,$assign,$inv)=@_;
