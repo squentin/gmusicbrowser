@@ -150,12 +150,15 @@ sub Write
 
 	my ($maintag)=split / /,$format->[2],2;
 	if ($maintag eq 'ID3v2' || $tag->{ID3v1})
-	{	my $id3v1 = $tag->{ID3v1} || $tag->new_ID3v1;
-		for my $aref (@$modif)
-		{	my ($field,$val)=@$aref;
-			my $i=$Songs::Def{$field}{id3v1};
-			next unless defined $i;
-			$id3v1->[$i]= $val;	# $val is a arrayref for genres
+	{	my $id3v1 = $tag->{ID3v1};
+		$id3v1||=$tag->new_ID3v1 unless $::Options{TAG_id3v1_noautocreate};
+		if ($id3v1)
+		{	for my $aref (@$modif)
+			{	my ($field,$val)=@$aref;
+				my $i=$Songs::Def{$field}{id3v1};
+				next unless defined $i;
+				$id3v1->[$i]= $val;	# $val is a arrayref for genres
+			}
 		}
 	}
 	if ($maintag eq 'ID3v2' || $tag->{ID3v2})

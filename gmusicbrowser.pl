@@ -5237,8 +5237,9 @@ sub PrefTags
 	my $id3v1encoding=NewPrefCombo(TAG_id3v1_encoding => \@Encodings, text => _"Encoding used for id3v1 tags :");
 	my $nowrite=NewPrefCheckButton('TAG_nowrite_mode',_"Do not write the tags",undef,_"Will not write the tags except with the advanced tag editing dialog. The changes will be kept in the library instead.\nWarning, the changes for a song will be lost if the tag is re-read.");
 	my $autocheck=NewPrefCheckButton('TAG_auto_check_current',_"Auto-check current song for modification",undef,_"Automatically check if the file for the current song has changed. And remove songs not found from the library.");
+	my $noid3v1=NewPrefCheckButton('TAG_id3v1_noautocreate',_"Do not create an id3v1 tag in mp3 files",undef,_"Only affect mp3 files that do not already have an id3v1 tag");
 
-	$vbox->pack_start($_,FALSE,FALSE,1) for $warning,$checkv4,$checklatin1,$check_unsync,$id3v1encoding,$nowrite,$autocheck;
+	$vbox->pack_start($_,FALSE,FALSE,1) for $warning,$checkv4,$checklatin1,$check_unsync,$id3v1encoding,$noid3v1,$nowrite,$autocheck;
 	return $vbox;
 }
 
