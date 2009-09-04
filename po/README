@@ -1,0 +1,33 @@
+* to edit existing translations :
+  - create the gmusicbrowser.pot file :
+	./create_pot.pl
+  - merge with existing translations :
+	msgmerge -s -U $LANGUAGE.po gmusicbrowser.pot
+    where $LANGUAGE is your language code
+    add the -N option to prevent guesses (marked as fuzzy)
+  - edit $LANGUAGE.po
+
+
+* to create a translation for a new language :
+  - create the gmusicbrowser.pot file :
+	./create_pot.pl
+  - rename gmusicbrowser.pot to $LANGUAGE.po
+  - edit the headers of $LANGUAGE.po
+
+
+* to test your translations :
+  - generate the .mo file :
+	msgfmt -c -o gmusicbrowser.mo $LANGUAGE.po
+  - put gmusicbrowser.mo either in /usr/share/locale/$LANGUAGE/LC_MESSAGES for installed version
+    or in locale/$LANGUAGE/LC_MESSAGES/ for non-installed version
+
+
+* check for latest translations first in the git repository :
+ http://gmusicbrowser.git.sourceforge.net/git/gitweb.cgi?p=gmusicbrowser/gmusicbrowser;a=tree;f=po
+or
+ http://github.com/squentin/gmusicbrowser/tree/master/po/
+
+
+* to send me translations, mail the $LANGUAGE.po to squentin@free.fr
+  And tell me what name and (optionally) email I should credit the translation (both in git and in the about box).
+  Don't hesitate to ask me if you have any questions.
