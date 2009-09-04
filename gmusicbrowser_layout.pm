@@ -311,6 +311,7 @@ our %Widgets=
 		set	=> sub { ::SkipTo($_[1]) },
 		scroll	=> sub { $_[1] ? ::Forward(undef,10) : ::Rewind (undef,10) },
 		set_preview => \&Layout::Bar::update_preview_Time,
+		cursor	=> 'hand2',
 	},
 	VolBar =>
 	{	class	=> 'Layout::Bar',
@@ -320,6 +321,7 @@ our %Widgets=
 		set	=> sub { ::UpdateVol($_[1]) },
 		scroll	=> sub { ::ChangeVol($_[1] ? 'up' : 'down') },
 		max	=> 100,
+		cursor	=> 'hand2',
 	},
 	VolSlider =>
 	{	class	=> 'Layout::Bar::Scale',
@@ -345,6 +347,7 @@ our %Widgets=
 		group	=> 'Play',
 		fields	=> 'rating',
 		schange	=> sub	{ my $r=(defined $_[1])? Songs::Get($_[1],'rating') : 0; $_[0]->set($r); },
+		cursor	=> 'hand2',
 	},
 	Cover =>
 	{	class	=> 'Layout::AAPicture',
