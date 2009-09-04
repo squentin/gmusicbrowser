@@ -4635,6 +4635,7 @@ sub ScanProgress_cb
 	elsif (@$LengthEstimated)
 	{	$title=_"Checking length/bitrate";
 		$details= _"for files without a VBR header";
+		$Lengthcheck_max=@$LengthEstimated if @$LengthEstimated > $Lengthcheck_max;
 		$current=$Lengthcheck_max-@$LengthEstimated;
 		$total=$Lengthcheck_max;
 		$bartext="$current / $total";

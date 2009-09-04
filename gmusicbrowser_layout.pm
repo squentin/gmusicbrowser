@@ -3362,7 +3362,7 @@ sub update
 	my $details=$prop->{details};
 	my $bartext=$prop->{bartext};
 	if ($self->{compact})
-	{	$bartext=$title.' ... '.$bartext;
+	{	$bartext=$title.' ... '.(defined $bartext ? $bartext : '');
 		$::Tooltips->set_tip( $bar, $details ) if $details;
 	}
 	else
