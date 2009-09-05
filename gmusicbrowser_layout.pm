@@ -1664,7 +1664,7 @@ sub SetWindowOptions
 	if (my @l=::UsedFields($title))
 	{	$self->{TitleString}=$title;
 		my %fields; $fields{$_}=undef for @l;
-		::Watch($self,'SongID',\&UpdateWindowTitle,\%fields);
+		::Watch($self,'CurSong',\&UpdateWindowTitle,\%fields);
 		$self->UpdateWindowTitle();
 	}
 	else { $self->set_title($title) }

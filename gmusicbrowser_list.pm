@@ -628,7 +628,7 @@ INIT
 #		attrib => 'cell-background',	type => 'Glib::String',
 #		#can't be updated via a event key, so not updated on its own for now, but will be updated if a playcount row is present
 #	},
-	# italicrow & boldrow are special 'playrow', can't be updated via a event key, a redraw is made when SongID changed if $self->{playrow}
+	# italicrow & boldrow are special 'playrow', can't be updated via a event key, a redraw is made when CurSong changed if $self->{playrow}
 	italicrow =>
 	{	value => sub {defined $::SongID && $_[2]==$::SongID ? 'italic' : 'normal'},
 		attrib => 'style',	type => 'Gtk2::Pango::Style',
@@ -649,7 +649,7 @@ INIT
 		value => sub { ::Get_PPSQ_Icon($_[2]); },
 		class => 'Gtk2::CellRendererPixbuf',	attrib => 'stock-id',
 		type => 'Glib::String',			noncomp => 'boldrow italicrow',
-		event => 'Playing Queue SongID',
+		event => 'Playing Queue CurSong',
 	},
 	icolabel =>
 	{	menu => _("Labels' Icons"),	title => '',		value => sub { $_[2] },
@@ -781,7 +781,7 @@ sub new
 
 	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
 	::Watch($self,	SongsChanged	=> \&SongsChanged_cb);
-	::Watch($self,	SongID		=> \&UpdateSelID);
+	::Watch($self,	CurSong		=> \&CurSongChanged);
 	$self->{SaveOptions}=\&SaveOptions;
 	$self->{DefaultFocus}=$tv;
 
@@ -1003,7 +1003,7 @@ sub ResetModel
 	$tv->set_model($self->{store});
 	$self->UpdateSortIndicator;
 	$self->Scroll_to_TopEnd();
-	$self->UpdateSelID;
+	$self->CurSongChanged;
 }
 
 sub Scroll_to_TopEnd
@@ -1015,7 +1015,7 @@ sub Scroll_to_TopEnd
 	$self->child->scroll_to_cell($row,undef,::TRUE,0,0);
 }
 
-sub UpdateSelID
+sub CurSongChanged
 {	my $self=$_[0];
 	$self->queue_draw if defined $self->{playrow};
 	$self->FollowSong if $self->{follow};
@@ -4852,7 +4852,7 @@ sub new
 		$view->signal_connect(query_tooltip=> \&query_tooltip_cb);
 	}
 
-	::Watch($self,	SongID		=> \&UpdateSelID);
+	::Watch($self,	CurSong		=> \&CurSongChanged);
 	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
 	::Watch($self,	SongsChanged	=> \&SongsChanged_cb);
 
@@ -5893,7 +5893,7 @@ sub scroll_to_row #FIXME simplify
 	$vadj->clamp_page($y1,$y2+2);
 }
 
-sub UpdateSelID
+sub CurSongChanged
 {	my $self=$_[0];
 	$self->FollowSong if $self->{follow};
 }
@@ -6924,10 +6924,10 @@ our %vars2=
 (song=>
  {	#ufile #REMOVED PHASE1 fix the doc
 	#upath #REMOVED PHASE1 fix the doc
-	progress=> ['$arg->{ID}==$::SongID ? $::PlayTime/Songs::Get($arg->{ID},"length") : 0',	'length','SongID Time'],
+	progress=> ['$arg->{ID}==$::SongID ? $::PlayTime/Songs::Get($arg->{ID},"length") : 0',	'length','CurSong Time'],
 	queued	=> ['do {my $i;my $f;for (@$::Queue) {$i++; $f=$i,last if $arg->{ID}==$_};$f}',undef,'Queue'],
-	playing => ['$arg->{ID}==$::SongID',		undef,'SongID'],
-	playicon=> ['::Get_PPSQ_Icon($arg->{ID})',	undef,'Playing Queue SongID'],
+	playing => ['$arg->{ID}==$::SongID',		undef,'CurSong'],
+	playicon=> ['::Get_PPSQ_Icon($arg->{ID})',	undef,'Playing Queue CurSong'],
 	labelicons=>['[Songs::Get_icon_list("label",$arg->{ID})]', 'label','Icons'],
 	ids	=> ['$arg->{ID}'],
  },
@@ -7256,7 +7256,7 @@ sub error
 
 sub playmarkup
 {	my $constant=$_[0];
-	return ['do { my $markup=',	'; $arg->{ID}==$::SongID ? \'<span '.$constant->{playmarkup}.'>\'.$markup."</span>" : $markup }',undef,'SongID'];
+	return ['do { my $markup=',	'; $arg->{ID}==$::SongID ? \'<span '.$constant->{playmarkup}.'>\'.$markup."</span>" : $markup }',undef,'CurSong'];
 }
 
 
@@ -7279,7 +7279,7 @@ sub new
 	$self->add($sw);
 	$sw->add($treeview);
 	::Watch($self,RadioList=>\&Refresh);
-	::Watch($self,SongID=> sub {$_[0]->queue_draw});
+	::Watch($self,CurSong=> sub {$_[0]->queue_draw});
 	$treeview->signal_connect( row_activated => sub
 		{	my ($tv,$path,$column)=@_;
 			my $store=$tv->get_model;

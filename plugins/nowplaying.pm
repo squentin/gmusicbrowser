@@ -30,16 +30,13 @@ use constant
 {	OPT	=> 'PLUGIN_NOWPLAYING_',
 };
 my $handle;
-my $lasttime;
 
 sub Start
 {	$handle={};	#the handle to the Watch function must be a hash ref, if it is a Gtk2::Widget, UnWatch will be called when the widget is destroyed
-	::Watch($handle,'SongID',\&Changed);
-	::Watch($handle,'Playing',\&Changed);
+	::Watch($handle,'PlayingSong',\&Changed);
 }
 sub Stop
-{	::UnWatch($handle,'SongID');
-	::UnWatch($handle,'Playing');
+{	::UnWatch($handle,'PlayingSong');
 }
 
 sub prefbox
@@ -52,10 +49,7 @@ sub prefbox
 }
 
 sub Changed
-{	return unless defined $::SongID && $::TogPlay;
-	return if $lasttime && $::StartTime==$lasttime; #if song hasn't really changed
-	$lasttime=$::StartTime;
-	my $ID=$::SongID;
+{	my $ID=$::SongID;
 	my $cmd= $::Options{OPT.'CMD'};
 	return unless defined $cmd;
 	my @cmd= ::split_with_quotes($cmd);

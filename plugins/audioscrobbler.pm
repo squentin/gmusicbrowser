@@ -27,7 +27,7 @@ require 'simple_http.pm';
 our $ignore_current_song;
 
 my $self=bless {},__PACKAGE__;
-my ($currentsong,$timecount,$songsubmitted);
+my ($timecount,$songsubmitted);
 my @ToSubmit; my $NowPlaying; my $unsent_saved=0;
 my $interval=5; my ($timeout,$waiting);
 my ($HandshakeOK,$submiturl,$nowplayingurl,$sessionid);
@@ -36,8 +36,7 @@ my $Log=Gtk2::ListStore->new('Glib::String');
 Load();
 
 sub Start
-{	::Watch($self,SongID => \&SongChanged);
-	::Watch($self,Playing=> \&SongChanged);
+{	::Watch($self,PlayingSong=> \&SongChanged);
 	::Watch($self,Played => \&Played);
 	::Watch($self,Save   => \&Save);
 	$self->{on}=1;
@@ -48,7 +47,7 @@ sub Start
 sub Stop
 {	$waiting->abort if $waiting;
 	$waiting=undef;
-	::UnWatch($self,$_) for qw/SongID Playing Played Save/;
+	::UnWatch($self,$_) for qw/PlayingSong Played Save/;
 	$self->{on}=undef;
 	$interval=5;
 	#@ToSubmit=();
@@ -81,10 +80,7 @@ sub userpass_changed
 }
 
 sub SongChanged
-{	return unless defined $::SongID && $::TogPlay;
-	return if defined $currentsong && $currentsong==$::SongID;
-	$currentsong=$::SongID;
-	$songsubmitted=$timecount=0;
+{	$songsubmitted=$timecount=0;
 	if ($ignore_current_song) {$ignore_current_song=undef; ::HasChanged('Lastfm_ignore_current');}
 	$NowPlaying=undef;
 

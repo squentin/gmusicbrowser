@@ -629,7 +629,7 @@ our $CurrentDir=$ENV{PWD};
 
 our $LEvent;
 our (%ToDo,%TimeOut);
-my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos SongID Playing SavedWRandoms SavedSorts SavedFilters SavedLists Icons Widgets connections
+my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos CurSong Playing SavedWRandoms SavedSorts SavedFilters SavedLists Icons Widgets connections
 # also used for SearchText_ SelectedID_ followed by group id
 # Picture_#mainfield#
 
@@ -1011,6 +1011,7 @@ if ($CmdLine{UseGnomeSession})
 
 {	Watch(undef, SongArray	=> \&SongArray_changed);
 	Watch(undef, $_	=> \&QueueUpdateNextSongs) for qw/Playlist Queue Sort Pos QueueAction/;
+	Watch(undef, $_ => sub { return unless defined $SongID && $TogPlay; HasChanged('PlayingSong'); }) for qw/CurSongID Playing/;
 }
 
 our ($Play_package,%PlayPacks); my $PlayNext_package;
@@ -2318,7 +2319,8 @@ sub SetPosition
 sub UpdateCurrentSong
 {	#my $force=shift;
 	if ($ChangedID)
-	{	HasChanged('SongID',$SongID);
+	{	HasChanged('CurSongID',$SongID);
+		HasChanged('CurSong',$SongID);
 		ShowTraytip($Options{TrayTipTimeLength}) if $TrayIcon && $Options{ShowTipOnSongChange} && !$FullscreenWindow;
 		if (!defined $SongID || $RandomMode) { $Position=undef; }
 		else
@@ -2370,7 +2372,7 @@ sub UpdateCurrentSong
 #		$ChangedPos=1;
 #	}
 #	if ($ChangedID)
-#	{	HasChanged('SongID',$SongID);
+#	{	HasChanged('CurSong',$SongID);
 #		ShowTraytip($Options{TrayTipTimeLength}) if $TrayIcon && $Options{ShowTipOnSongChange} && !$FullscreenWindow;
 #	}
 #	if ($ChangedPos)
@@ -4377,7 +4379,7 @@ sub SongsChanged
 	$Filter::CachedList=undef;
 	if (defined $SongID && (grep $SongID==$_,@$IDs))
 	{	&UpdateLock if $TogLock && OneInCommon([Songs::Depends($TogLock)],$fields);	#update lock
-		HasChanged('SongID',$SongID);
+		HasChanged('CurSong',$SongID);
 	}
 	for my $group (keys %SelID)
 	{	HasChangedSelID($group,$SelID{$group}) if grep $SelID{$group}==$_, @$IDs;
@@ -5857,15 +5859,15 @@ sub WatchSelID
 {	my ($object,$sub,$fields)=@_; #fields are ignored for now
 	my $group=$object->{group};
 	$group=~s/:\w+$//;
-	my $key= $group=~m/^Next\d?$/ ? 'NextSongs' : $group=~m/^Recent\d?$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'SongID';
-	if ($group=~m/^(?:Recent|Next)\d?$/) { my $orig=$sub; $sub=sub { $orig->( $_[0],GetSelID($_[0]) ); }; } #so that $sub gets the ID as argument in the same way as other cases (SelectedID_ and SongID)
+	my $key= $group=~m/^Next\d?$/ ? 'NextSongs' : $group=~m/^Recent\d?$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'CurSong';
+	if ($group=~m/^(?:Recent|Next)\d?$/) { my $orig=$sub; $sub=sub { $orig->( $_[0],GetSelID($_[0]) ); }; } #so that $sub gets the ID as argument in the same way as other cases (SelectedID_ and CurSong)
 	Watch($object,$key,$sub);
 }
 sub UnWatchSelID
 {	my $object=$_[0];
 	my $group=$object->{group};
 	$group=~s/:\w+$//;
-	my $key= $group=~m/^Next\d?$/ ? 'NextSongs' : $group=~m/^Recent\d?$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'SongID';
+	my $key= $group=~m/^Next\d?$/ ? 'NextSongs' : $group=~m/^Recent\d?$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'CurSong';
 	UnWatch($object,$key);
 }
 sub HasChangedSelID
@@ -6034,7 +6036,7 @@ sub CreateTrayIcon
 	Layout::Window::Popup::set_hover($eventbox);
 
 	$TrayIcon->show_all;
-	#Watch($eventbox,'SongID', \&UpdateTrayTip);
+	#Watch($eventbox,'CurSong', \&UpdateTrayTip);
 	#&UpdateTrayTip($eventbox);
 }
 sub SetTrayTipDelay
@@ -6862,7 +6864,7 @@ sub new
 		{	my $type=$addlist->get_value;
 			$self->AddRow( $Random::ScoreTypes{$type}{default} );
 		});
-	::Watch($self,	SongID		=>\&UpdateID);
+	::Watch($self,	CurSong		=>\&UpdateID);
 	::Watch($self,	SongsChanged	=>\&SongsChanged_cb);
 	::Watch($self,	SongArray	=>\&SongArray_cb);
 	$self->signal_connect( destroy => \&cleanup );

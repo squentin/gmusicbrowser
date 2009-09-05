@@ -23,15 +23,13 @@ use Gtk2::Notify -init, ::PROGRAM_NAME;
 ::SetDefaultOptions(OPT, title => "%t", text => _"<i>by</i> %a\\n<i>from</i> %l", picsize => 50, timeout=>5);
 
 my $notify;
-my $lasttime;
 
 sub Start
 {	$notify=Gtk2::Notify->new('');
 	#$notify->set_urgency('low');
 	#$notify->set_category('music'); #is there a standard category for that ?
 	set_actions();
-	::Watch($notify,'SongID',\&Changed);
-	::Watch($notify,'Playing',\&Changed);
+	::Watch($notify,'PlayingSong',\&Changed);
 }
 sub Stop
 {	$notify->destroy;
@@ -54,10 +52,7 @@ sub prefbox
 }
 
 sub Changed
-{	return unless defined $::SongID && $::TogPlay;
-	return if $lasttime && $::StartTime==$lasttime; #if song hasn't really changed
-	$lasttime=$::StartTime;
-	return if $::Options{OPT.'onlywhenhidden'} && ::IsWindowVisible($::MainWindow);
+{	return if $::Options{OPT.'onlywhenhidden'} && ::IsWindowVisible($::MainWindow);
 	my $ID=$::SongID;
 	my $title=$::Options{OPT.'title'};
 	my $text= $::Options{OPT.'text'};

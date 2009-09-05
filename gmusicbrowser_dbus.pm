@@ -19,8 +19,9 @@ sub new
 	bless $self, $class;
 
 	Glib::Idle->add(
-		sub {	::Watch($self,SongID => \&SongChanged);
-			::Watch($self,Playing =>\&SongChanged);
+		sub {	::Watch($self,CurSong => \&SongFieldsChanged);
+			::Watch($self,CurSongID =>\&SongChanged);
+			::Watch($self,PlayingSong =>\&PlayingSongChanged);
 			#::Watch($self,Save => \&GMB::DBus::Quit);
 			0;
 		});
@@ -96,14 +97,17 @@ sub GetAlbumCoverData
 	return [map ord,split //, $data];
 }
 
-dbus_signal('SongChanged', ['uint32']);
-my $lasttime;
+dbus_signal(SongFieldsChanged => ['uint32']);
+sub SongFieldsChanged
+{	$_[0]->emit_signal(SongFieldsChanged => $::SongID);
+}
+dbus_signal(SongChanged => ['uint32']);
 sub SongChanged
-{	my $self=$_[0];
-	return unless defined $::SongID && $::TogPlay;
-	return if $lasttime && $::StartTime==$lasttime; #if song hasn't really changed
-	$lasttime=$::StartTime;
-	$self->emit_signal(SongChanged => $::SongID);
+{	$_[0]->emit_signal(SongChanged => $::SongID);
+}
+dbus_signal(PlayingSongChanged => ['uint32']);
+sub PlayingSongChanged
+{	$_[0]->emit_signal(PlayingSongChanged => $::SongID);
 }
 
 package GMB::DBus;
