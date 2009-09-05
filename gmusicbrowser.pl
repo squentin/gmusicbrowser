@@ -1703,7 +1703,7 @@ sub SaveTags	#save tags _and_ settings
 			my @files=FileList(qr/^\Q$savefilename\E\.bak\.\d{8}$/, $savedir);
 			last unless @files>5;
 			splice @files,-5;	#keep the 5 newest versions
-			unlink $savedir.SLASH.$_ for @files;
+			unlink $_ for @files;
 		}
 		rename $SaveFile,$SaveFile.'.bak';
 	}
