@@ -308,6 +308,7 @@ our %timespan_menu=
 		hash		=> '#_#+0',
 		display		=> '(#_# ? sprintf("#displayformat#", #_# ) : "")',	#replace 0 with ""
 		gid_to_display	=> '#GID#',
+		get_gid		=> '#_#+0',
 		makefilter	=> '"#field#:e:#GID#"',
 		default		=> '0+0',	#not 0 because it needs to be true :(
 		filter_prep	=>  sub { $_[0]=~m/(\d+(?:\.\d+)?)/; return $1 || 0},
@@ -318,6 +319,7 @@ our %timespan_menu=
 		#makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".(#GID# * #ARG0#)." ".((#GID#+1) * #ARG0#))',
 		makefilter	=> '"#field#:b:".(#GID# * #ARG0#)." ".((#GID#+1) * #ARG0#)',
 		gid_to_display	=> '#GID# * #ARG0#',
+		get_gid		=> 'int(#_#/#ARG0#)',
 	},
 	fewnumber =>
 	{	_		=> '___value[vec(____,#ID#,#bits#)]',
