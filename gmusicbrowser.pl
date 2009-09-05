@@ -1012,6 +1012,9 @@ if ($CmdLine{UseGnomeSession})
 {	Watch(undef, SongArray	=> \&SongArray_changed);
 	Watch(undef, $_	=> \&QueueUpdateNextSongs) for qw/Playlist Queue Sort Pos QueueAction/;
 	Watch(undef, $_ => sub { return unless defined $SongID && $TogPlay; HasChanged('PlayingSong'); }) for qw/CurSongID Playing/;
+	Watch(undef,RecentSongs	=> sub { UpdateRelatedFilter('Recent'); });
+	Watch(undef,NextSongs	=> sub { UpdateRelatedFilter('Next'); });
+	Watch(undef,CurSong	=> sub { UpdateRelatedFilter('Play'); });
 }
 
 our ($Play_package,%PlayPacks); my $PlayNext_package;
@@ -5850,8 +5853,8 @@ sub HasChanged
 sub GetSelID
 {	my $group= ref $_[0] ? $_[0]{group} : $_[0];
 	$group=~s/:\w+$//;
-	return	$group=~m/^Next(\d)?$/		? $NextSongs[($1||0)] :
-		$group=~m/^Recent(\d)?$/	? $Recent->[($1||0)] :
+	return	$group=~m/^Next(\d*)$/		? $NextSongs[($1||0)] :
+		$group=~m/^Recent(\d*)$/	? $Recent->[($1||0)] :
 		$group ne 'Play'		? $SelID{$group} :
 		$SongID;
 }
@@ -5859,28 +5862,33 @@ sub WatchSelID
 {	my ($object,$sub,$fields)=@_; #fields are ignored for now
 	my $group=$object->{group};
 	$group=~s/:\w+$//;
-	my $key= $group=~m/^Next\d?$/ ? 'NextSongs' : $group=~m/^Recent\d?$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'CurSong';
-	if ($group=~m/^(?:Recent|Next)\d?$/) { my $orig=$sub; $sub=sub { $orig->( $_[0],GetSelID($_[0]) ); }; } #so that $sub gets the ID as argument in the same way as other cases (SelectedID_ and CurSong)
+	my $key= $group=~m/^Next\d*$/ ? 'NextSongs' : $group=~m/^Recent\d*$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'CurSong';
+	if ($group=~m/^(?:Recent|Next)\d*$/) { my $orig=$sub; $sub=sub { $orig->( $_[0],GetSelID($_[0]) ); }; } #so that $sub gets the ID as argument in the same way as other cases (SelectedID_ and CurSong)
 	Watch($object,$key,$sub);
 }
 sub UnWatchSelID
 {	my $object=$_[0];
 	my $group=$object->{group};
 	$group=~s/:\w+$//;
-	my $key= $group=~m/^Next\d?$/ ? 'NextSongs' : $group=~m/^Recent\d?$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'CurSong';
+	my $key= $group=~m/^Next\d*$/ ? 'NextSongs' : $group=~m/^Recent\d*$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'CurSong';
 	UnWatch($object,$key);
 }
 sub HasChangedSelID
 {	my ($group,$ID)=@_;
-	return if $group=~m/:\w+$/;
+	return if $group=~m/:/;
 	if (defined $ID){ $SelID{$group}=$ID; }
 	else		{ delete $SelID{$group}; }
+	UpdateRelatedFilter($group);
+	HasChanged('SelectedID_'.$group,$ID,$group);
+}
+sub UpdateRelatedFilter
+{	my $group=shift;
+	my $re= $group=~m/^(?:Next|Recent)\d*$/ ? qr/^\Q$group\E\d*:(.+)/ : qr/^\Q$group\E:(.+)/;
 	for my $group0 (keys %Related_FilterWatchers)
-	{	next unless $group0=~m/^$group:(.+)$/;
-		my $filter= Songs::MakeFilterFromID($1,$ID);
+	{	next unless $group0=~m/$re/;
+		my $filter= Songs::MakeFilterFromID($1,GetSelID($group));
 		SetFilter(undef,$filter,1,$group0);
 	}
-	HasChanged('SelectedID_'.$group,$ID,$group);
 }
 
 sub SetFilter
@@ -5922,25 +5930,33 @@ sub GetSonglist
 	$group=$layw->{group} if !defined $group && $layw;
 	return $SongList::Common::Register{$group};
 }
+sub InitFilter
+{	my $group=shift;
+	$group=$group->{group} if ref $group;
+	return if $Filters{$group}[0];
+	my $filter;
+	if ($group=~m/^(.+?):([\w.:]+)$/)
+	{	$filter= Songs::MakeFilterFromID($2,GetSelID($1));
+	}
+	SetFilter(undef,$filter,1,$group);
+}
 sub WatchFilter
 {	my ($object,$group,$sub)=@_;
 	warn "watch filter $group $object\n" if $debug;
 	push @{$FilterWatchers{$group}},$object;
 	$object->{'UpdateFilter_'.$group}=$sub;
-	if ($group=~m/:\w+$/)
+	if ($group=~m/.+?:[\w.:]+/)
 	{	$Related_FilterWatchers{$group}++;
 		#$Filters{$group}[0]||=$Filters{$group}[1+1]||= Filter->none;#FIXME implement a "none" filter
-		$Filters{$group}[0]||=$Filters{$group}[1+1]||=Filter->new;
+		#$Filters{$group}[0]||=$Filters{$group}[1+1]||=Filter->new;
 	}
-	else
-	{	IdleDo('1_init_filter'.$group,0,sub {SetFilter($object,undef,0) unless $Filters{$group}[0]; });
-	}
+	IdleDo('1_init_filter'.$group,0, \&InitFilter, $group);
 	$object->signal_connect(destroy => \&UnWatchFilter,$group) unless ref $object eq 'HASH' || !$object->isa('Glib::Object');
 }
 sub UnWatchFilter
 {	my ($object,$group)=@_;
 	warn "unwatch filter $group $object\n" if $debug;
-	if ($group=~m/:\w+$/)
+	if ($group=~m/.+?:[\w.:]+/)
 	{	unless (--$Related_FilterWatchers{$group})
 		{	delete $Related_FilterWatchers{$group};
 		}

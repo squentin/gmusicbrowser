@@ -436,7 +436,7 @@ sub CommonInit
 			if ($self->{type}=~m/[QLA]/)
 			{	$self->SongArray_changed_cb($self->{array},'replace');
 			}
-			else { ::SetFilter($self,undef,0) unless $self->{filter}; }
+			else { ::InitFilter($self); }
 			$self->FollowSong unless $self->{type}=~m/[QL]/;
 			0;
 		});
