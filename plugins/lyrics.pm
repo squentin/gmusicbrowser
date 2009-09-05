@@ -98,7 +98,7 @@ sub new
 		$item->signal_connect(clicked => $cb);
 		$item->set_tooltip($::Tooltips,$tip,'') if $tip;
 		$toolbar->insert($item,-1);
-		$self->{$key}=$item if $key;
+		::weaken( $self->{$key}=$item ) if $key;
 	}
 	$self->{saveb}->set_is_important(1);
 
