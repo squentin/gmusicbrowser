@@ -141,7 +141,7 @@ BEGIN
 
   $SaveFile=(-d $HomeDir)
 	?  $HomeDir.'gmbrc'
-	: rel2abs('gmusicbrowser.tags');
+	: rel2abs('gmbrc');
   $FIFOFile=(-d $HomeDir && $^O ne 'MSWin32')
 	?  $HomeDir.'gmusicbrowser.fifo'
 	: undef;
@@ -206,7 +206,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-port')		{$CmdLine{port}=shift if $ARGV[0]}
 	elsif($arg eq '-debug')		{$debug=1}
 	elsif($arg eq '-nofifo')	{$FIFOFile=undef}
-	elsif($arg eq '-C')		{$SaveFile=rel2abs(shift) if $ARGV[0]}
+	elsif($arg eq '-C')		{$CmdLine{savefile}=1; $SaveFile=rel2abs(shift) if $ARGV[0]}
 	elsif($arg eq '-F')		{$FIFOFile=rel2abs(shift) if $ARGV[0]}
 	elsif($arg eq '-layout')	{$CmdLine{layout}=shift if $ARGV[0]}
 	elsif($arg eq '-searchpath')	{ push @{ $CmdLine{searchpath} },shift if $ARGV[0]}
@@ -1383,8 +1383,8 @@ sub FirstTime
 	};
 	$_=Filter->new($_) for values %{ $Options{SavedFilters} };
 
-	if (-r $DATADIR.SLASH.'gmbrc')
-	{	open my($fh),'<:utf8', $DATADIR.SLASH.'gmbrc';
+	if (-r $DATADIR.SLASH.'gmbrc.default')
+	{	open my($fh),'<:utf8', $DATADIR.SLASH.'gmbrc.default';
 		my @lines=<$fh>;
 		close $fh;
 		chomp @lines;
@@ -1535,14 +1535,18 @@ sub ReadOldSavedTags
 
 sub ReadSavedTags	#load tags _and_ settings
 {	if (-d $SaveFile) {$SaveFile.=SLASH.'gmbrc'}
-	unless (-r $SaveFile)
+	my $LoadFile=$SaveFile;
+	if (!-e $LoadFile && !$CmdLine{savefile} && -r $HomeDir.'tags')
+	{	$LoadFile=$HomeDir.'tags';	#import from v1.0.x
+	}
+	unless (-r $LoadFile)
 	{	FirstTime();
 		Post_ReadSavedTags();
 		return;
 	}
 	setlocale(LC_NUMERIC, 'C');  # so that '.' is used as a decimal separator when converting numbers into strings
-	warn "Reading saved tags in $SaveFile ...\n";
-	open my($fh),'<:utf8',$SaveFile;
+	warn "Reading saved tags in $LoadFile ...\n";
+	open my($fh),'<:utf8',$LoadFile;
 
 	# read first line to determine if old version, old version starts with a letter, new with blank or # (for comments) or [ (section name)
 	my $firstline=<$fh>;
@@ -1612,7 +1616,7 @@ sub ReadSavedTags	#load tags _and_ settings
 	#&launchIdleLoop;
 
 	setlocale(LC_NUMERIC, '');
-	warn "Reading saved tags in $SaveFile ... done\n";
+	warn "Reading saved tags in $LoadFile ... done\n";
 	Post_ReadSavedTags();
 }
 sub Post_Options_init
