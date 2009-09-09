@@ -2304,7 +2304,6 @@ sub Select	#Set filter, sort order, selected song, playing state, staticlist, so
 {	my %args=@_;
 ::callstack(@_);
 	my ($filter,$sort,$song,$staticlist,$pos)=@args{qw/filter sort song staticlist position/};
-	$TogPlay=1 if $args{play};
 	$SongID=undef if $song && $song eq 'first';
 	$song=undef if $song && $song=~m/\D/;
 	if ($sort) { $ListPlay->Sort($sort) }
@@ -2315,6 +2314,7 @@ sub Select	#Set filter, sort order, selected song, playing state, staticlist, so
 	}
 	elsif (defined $song) { $ListPlay->SetID($song) }
 	elsif (defined $pos) { warn $pos;SetPosition($pos) }
+	Play() if $args{play} && !$TogPlay;
 }
 
 sub SetPosition
