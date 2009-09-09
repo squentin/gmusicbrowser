@@ -41,7 +41,7 @@ sub Start
 	::Watch($self,Save   => \&Save);
 	$self->{on}=1;
 	Sleep();
-	SongChanged();
+	SongChanged() if $::TogPlay;
 	$Serrors=$Stop=undef;
 }
 sub Stop
