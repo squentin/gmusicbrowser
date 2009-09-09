@@ -1605,6 +1605,7 @@ sub new
 	::Watch($self, SongsRemoved=> \&SongsRemoved_cb);
 	$self->signal_connect(destroy => \&cleanup);
 	::WatchFilter($self,$opt->{group},\&updatefilter);
+	::IdleDo('9_FPfull'.$self,100,\&updatefilter,$self);
 	return $self;
 }
 
