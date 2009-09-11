@@ -2186,6 +2186,7 @@ sub Insert
 }
 sub Remove
 {	my ($self,$rows)=@_;
+	$self->_staticfy;
 	$self->SUPER::Remove($rows);
 	if (@$self==0) { $::Position=$::SongID=undef; _updateID(undef); return; }
 	if (defined $::Position)
