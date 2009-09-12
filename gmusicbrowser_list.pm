@@ -3027,7 +3027,7 @@ sub AAPicture_Changed
 {	my ($self,$key)=@_;
 	return unless defined $self->{Sel};
 	return unless $key eq $self->{Sel};
-	$self->pic_set( AAPicture::GetPicture($self->{aa},$self->{Sel}) );
+	$self->pic_update;
 }
 
 sub update_id
@@ -3040,7 +3040,7 @@ sub update_id
 sub clear
 {	my $self=$_[0];
 	$self->{SelID}=$self->{Sel}=undef;
-	$self->pic_set(undef);
+	$self->pic_update;
 	$self->{$_}->set_text('') for qw/Ltitle Lstats/;
 	delete $::ToDo{'9_AABox'.$self};
 }
@@ -3063,7 +3063,7 @@ sub update
 	if (defined $key) { $self->{Sel}=$key; }
 	else		  { $key=$self->{Sel}; }
 	my $aa=$self->{aa};
-	$self->pic_set( AAPicture::GetPicture($aa,$key) );
+	$self->pic_update;
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($key,"<big><b>%a</b></big>",$aa,1) );
 	$self->{Lstats}->set_markup( AA::ReplaceFields($key,"%s\n%X\n<small>%L\n%y</small>",$aa,1) );
 
@@ -3092,11 +3092,12 @@ sub filter
 	::SetFilter( $self, Songs::MakeFilterFromGID($self->{aa},$self->{Sel}), $self->{filternb}, $self->{group} );
 }
 
-sub pic_set
-{	my ($self,$file)=@_;
+sub pic_update
+{	my $self=shift;
 	return if $self->{nopic};
 	my $img=$self->{img};
-	::IdleDo('3_AABscaleimage'.$img,200,\&::ScaleImageFromFile,$img, $img->{size}, $file);
+	delete $img->{pixbuf};
+	::IdleDo('3_AABscaleimage'.$img,200,\&setpic,$img);
 }
 
 sub size_allocate_cb
@@ -3105,7 +3106,19 @@ sub size_allocate_cb
 	$h=200 if $h>200;		#FIXME use a relative max value (to what?)
 	return unless abs($img->{size}-$h);
 	$img->{size}=$h;
-	::IdleDo('3_AABscaleimage'.$img,200,\&::ScaleImage,$img, $h);
+	::IdleDo('3_AABscaleimage'.$img,200,\&setpic,$img);
+}
+sub setpic
+{	my $img=shift;
+	if ($img->{pixbuf}) { ::ScaleImage($img,$img->{size}) }
+	else
+	{	my $self= ::find_ancestor($img,__PACKAGE__);
+		my $file;
+		$file= AAPicture::GetPicture($self->{aa},$self->{Sel}) if defined $self->{Sel};
+		if ($file)
+		 { ::ScaleImageFromFile($img, $img->{size}, $file) }
+		else { $img->set_from_pixbuf(undef); }
+	}
 }
 
 sub AABox_button_press_cb			#popup menu
