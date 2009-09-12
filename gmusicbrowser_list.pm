@@ -3011,7 +3011,7 @@ sub new
 
 	$self->signal_connect(button_press_event => \&AABox_button_press_cb);
 	::Watch($self,"Picture_".($aa eq 'album' ? 'album' : 'artist') =>\&AAPicture_Changed);
-	::Watch($self,'SelectedID_'.$self->{group},\&id_set);
+	::WatchSelID($self,\&id_set);
 	::Watch($self, SongsChanged=> \&SongsChanged_or_added_cb);
 	::Watch($self, SongsAdded  => \&SongsChanged_or_added_cb);
 	::Watch($self, SongsRemoved=> \&SongsRemoved_cb);

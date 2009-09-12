@@ -1474,7 +1474,7 @@ sub new
 	$self->{options}=\%options;
 	$self->{name}='Window';
 	$self->{SaveOptions}=\&SaveWindowOptions;
-	$self->{group}= ucfirst($self);
+	$self->{group}= 'Global('.::refaddr($self).')';
 	::Watch($self,Save=>\&SaveOptions);
 	$self->set_title(::PROGRAM_NAME);
 	#$self->signal_connect (show => \&show_cb);
@@ -2182,7 +2182,7 @@ sub newtab
 	$wtype= $Layout::Widgets{$wtype} || {};
 	my $wclass= $wtype->{issonglist} ? 'list' : $name=~m/^@/ ? 'page' : 'context';
 	my $group=$self->{group};
-	$group= ucfirst($self).'-'.$self->{groupcount}++ if $wclass eq 'list'; # give songlist/songtree their own group
+	$group= 'Global('.::refaddr($self).'-'.$self->{groupcount}++.')' if $wclass eq 'list'; # give songlist/songtree their own group
 	if ($opt2)	#new widget => use a new name not already used
 	{	my $n=0;
 		$n++ while $self->{widgets}{$name.$n} || $self->{widgets_opt}{$name.$n};

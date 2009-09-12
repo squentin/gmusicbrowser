@@ -38,7 +38,7 @@ use File::Copy;
 use File::Spec::Functions qw/file_name_is_absolute catfile rel2abs/;
 use Fcntl qw/O_NONBLOCK O_WRONLY O_RDWR SEEK_SET/;
 use Encode qw/_utf8_on _utf8_off/;
-use Scalar::Util qw/blessed weaken/;
+use Scalar::Util qw/blessed weaken refaddr/;
 use Unicode::Normalize 'NFKD'; #for accent-insensitive sort and search, only used via superlc()
 
 #use constant SLASH => ($^O  eq 'MSWin32')? '\\' : '/';
@@ -5857,7 +5857,7 @@ sub HasChanged
 
 sub GetSelID
 {	my $group= ref $_[0] ? $_[0]{group} : $_[0];
-	$group=~s/:\w+$//;
+	$group=~s/:[\w.]+$//;
 	return	$group=~m/^Next(\d*)$/		? $NextSongs[($1||0)] :
 		$group=~m/^Recent(\d*)$/	? $Recent->[($1||0)] :
 		$group ne 'Play'		? $SelID{$group} :
@@ -5866,7 +5866,7 @@ sub GetSelID
 sub WatchSelID
 {	my ($object,$sub,$fields)=@_; #fields are ignored for now
 	my $group=$object->{group};
-	$group=~s/:\w+$//;
+	$group=~s/:[\w.]+$//;
 	my $key= $group=~m/^Next\d*$/ ? 'NextSongs' : $group=~m/^Recent\d*$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'CurSong';
 	if ($group=~m/^(?:Recent|Next)\d*$/) { my $orig=$sub; $sub=sub { $orig->( $_[0],GetSelID($_[0]) ); }; } #so that $sub gets the ID as argument in the same way as other cases (SelectedID_ and CurSong)
 	Watch($object,$key,$sub);
@@ -5874,7 +5874,7 @@ sub WatchSelID
 sub UnWatchSelID
 {	my $object=$_[0];
 	my $group=$object->{group};
-	$group=~s/:\w+$//;
+	$group=~s/:[\w.]+$//;
 	my $key= $group=~m/^Next\d*$/ ? 'NextSongs' : $group=~m/^Recent\d*$/ ? 'RecentSongs' : $group ne 'Play' ? 'SelectedID_'.$group : 'CurSong';
 	UnWatch($object,$key);
 }
@@ -5940,7 +5940,7 @@ sub InitFilter
 	$group=$group->{group} if ref $group;
 	return if $Filters{$group}[0];
 	my $filter;
-	if ($group=~m/^(.+?):([\w.:]+)$/)
+	if ($group=~m/(.+):([\w.]+)$/)
 	{	$filter= Songs::MakeFilterFromID($2,GetSelID($1));
 	}
 	SetFilter(undef,$filter,1,$group);
@@ -5950,7 +5950,7 @@ sub WatchFilter
 	warn "watch filter $group $object\n" if $debug;
 	push @{$FilterWatchers{$group}},$object;
 	$object->{'UpdateFilter_'.$group}=$sub;
-	if ($group=~m/.+?:[\w.:]+/)
+	if ($group=~m/:[\w.]+$/)
 	{	$Related_FilterWatchers{$group}++;
 		#$Filters{$group}[0]||=$Filters{$group}[1+1]||= Filter->none;#FIXME implement a "none" filter
 		#$Filters{$group}[0]||=$Filters{$group}[1+1]||=Filter->new;
@@ -5961,7 +5961,7 @@ sub WatchFilter
 sub UnWatchFilter
 {	my ($object,$group)=@_;
 	warn "unwatch filter $group $object\n" if $debug;
-	if ($group=~m/.+?:[\w.:]+/)
+	if ($group=~m/:[\w.]+$/)
 	{	unless (--$Related_FilterWatchers{$group})
 		{	delete $Related_FilterWatchers{$group};
 		}
