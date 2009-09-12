@@ -59,6 +59,7 @@ sub Play
 	&Stop if $ChildPID;
 	#if ($ChildPID) { print $CMDfh "loadfile $file\n"; print $CMDfh "seek $sec 2\n" if $sec; return}
 	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -softvol/,'-volume',$Volume);
+	warn "@cmd_and_args\n" if $::debug;
 	#push @cmd_and_args,$device_option,$device unless $device eq 'default';
 	push @cmd_and_args,split / /,$::Options{mplayeroptions} if $::Options{mplayeroptions};
 	push @cmd_and_args,'-ss',$sec if $sec;
@@ -108,7 +109,7 @@ sub _remotemsg
 	if ($line=~m/^A:\s*(\d+).\d /)
 	{	::UpdateTime( $1 );
 	}
-	else {warn "mplayer:".$line."\n" if $::debug}
+	elsif ($::debug) {warn "mplayer:$_\n" for @line,$line}
 	return 1;
 }
 
