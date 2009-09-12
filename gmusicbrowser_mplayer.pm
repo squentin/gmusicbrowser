@@ -58,7 +58,8 @@ sub Play
 {	(undef,$file,my$sec)=@_;
 	&Stop if $ChildPID;
 	#if ($ChildPID) { print $CMDfh "loadfile $file\n"; print $CMDfh "seek $sec 2\n" if $sec; return}
-	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -softvol/,'-volume',$Volume);
+	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -softvol/);
+	#push @cmd_and_args, '-volume',$Volume; # -volume option is too recent (31-10-2008)
 	warn "@cmd_and_args\n" if $::debug;
 	#push @cmd_and_args,$device_option,$device unless $device eq 'default';
 	push @cmd_and_args,split / /,$::Options{mplayeroptions} if $::Options{mplayeroptions};
@@ -81,6 +82,7 @@ sub Play
 	elsif (!defined $ChildPID) { warn "fork failed\n" } #FIXME never happens
 	close $wfh; close $rfh;
 	$CMDfh->autoflush(1);
+	print $CMDfh "volume $Volume 1\n"; #set the initial volume here instead of using the too recent -volume option
 	#print $CMDfh "LOAD $file\n";
 	#SkipTo(undef,$sec) if $sec;
 
