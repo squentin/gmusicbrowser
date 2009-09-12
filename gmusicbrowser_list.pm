@@ -1435,8 +1435,8 @@ my @MenuSubGroup=
 );
 
 @MenuPageOptions=
-(	{ label => _"show pictures",	code => sub { my $self=$_[0]{self}; $self->{picsize}[$_[0]{depth}]=$_[1]; $self->Fill('optchanged'); },	mode => 'LS',
-	  submenu => \@picsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{picsize}[$_[0]{depth}]},
+(	{ label => _"show pictures",	code => sub { my $self=$_[0]{self}; $self->{lpicsize}[$_[0]{depth}]=$_[1]; $self->Fill('optchanged'); },	mode => 'LS',
+	  submenu => \@picsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{lpicsize}[$_[0]{depth}]},
 		test => sub { Songs::FilterListProp($_[0]{subfield},'picture'); }, },
 	{ label => _"show info",	code => sub { my $self=$_[0]{self}; $self->{lmarkup}[$_[0]{depth}]^=1; $self->Fill('optchanged'); },
 	  check => sub { $_[0]{self}{lmarkup}[$_[0]{depth}]}, istrue => 'aa', mode => 'LS', },
@@ -2221,7 +2221,7 @@ sub Fill
 		my ($renderer)=($treeview->get_columns)[0]->get_cell_renderers;
 		$renderer->reset;
 		$self->{busy}=1;
-		$store->clear;	#FIXME keep selection ?   FIXME at least when opt is true (ie showinfo or picsize changed)
+		$store->clear;	#FIXME keep selection ?   FIXME at least when opt is true (ie lmarkup or lpicsize changed)
 		my ($list)=$self->get_fill_data($opt);
 		$renderer->set('all_count', $self->{all_count});
 		$self->{array_offset}= $self->{noall} ? 0 : 1;	#row number difference between store and $list, needed by interactive search
