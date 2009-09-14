@@ -2112,10 +2112,9 @@ sub init
 	$::RandomMode= $sort=~m/^random:/ ? Random->new($sort,$::ListPlay) : undef;
 	$::SortFields= $::RandomMode ? $::RandomMode->fields : Songs::SortDepends($sort);
 
-	my $last=$::Options{LastPlayFilter} || Filter->new; ::red(listmode=>$::ListMode);
-	if (ref $last && $last->isa('Filter'))	{ $::ListPlay->SetFilter($last); }
+	my $last=$::Options{LastPlayFilter} || Filter->new;
+	if (ref $last && ref $last eq 'Filter')	{ $::ListPlay->SetFilter($last); }
 	else					{ $::ListPlay->Replace($last); }
-	 ::red(listmode=>$::ListMode);
 
 	::Watch(undef, SongsChanged	=> \&SongsChanged_cb);
 	::Watch(undef, SongsAdded	=> \&SongsAdded_cb);
@@ -2146,23 +2145,21 @@ sub Replace
 	delete $::ToDo{'7_refilter_playlist'};
 	delete $::ToDo{'8_resort_playlist'};
 	$newlist=SongArray->new unless defined $newlist;
-	$::Options{LastPlayFilter}=$newlist;
-	$newlist= SongArray->new_copy($newlist) if ref $newlist && ref $newlist ne 'SongArray';
 	unless (ref $newlist)
 	{	::SaveList($newlist,[]) unless $::Options{SavedLists}{$newlist};
 		$newlist= $::Options{SavedLists}{$newlist};
 	}
-	$::SelectedFilter=$::PlayFilter=undef;
-	$::ListMode= $newlist;
-	 ::red(listmode=>$::ListMode);::callstack();
+	$newlist= SongArray->new_copy($newlist);
 	my $ID=$::SongID;
 	$ID=undef if defined $ID && !$newlist->IsIn($ID);
 	if (!defined $ID)
 	{	$ID= $self->_FindFirst($newlist);
 	}
-	$self->_updatelock($ID) if $::TogLock && defined $ID;
-	@$self=@$::ListMode;
+	$::Options{LastPlayFilter}=$::ListMode=SongArray->new_copy($newlist);
+	$newlist=$self->_updatelock($ID,$newlist) if $::TogLock && defined $ID;
+	@$self=@$newlist;
 	delete $Presence{$self};
+	$::SelectedFilter=$::PlayFilter=undef;
 	if ($::RandomMode)	{ $::RandomMode->Invalidate; ::red("Invalidate $self ".@$self) }
 	else			{ $::SortFields=[]; $::Options{Sort}=''; ::HasChanged('Sort'); }
 	::HasChanged('Filter');
@@ -2173,6 +2170,7 @@ sub Insert
 {	my ($self,$destrow,$IDs)=@_;
 	$self->_staticfy;
 	$self->SUPER::Insert($destrow,$IDs);
+	$::Options{LastPlayFilter}=$::ListMode=SongArray->new_copy($self);
 	if (defined $::Position && $::Position>=$destrow)
 	{	$::Position+=@$IDs;
 		::red("position error after insert") if $self->[$::Position] != $::SongID; #DEBUG
@@ -2188,6 +2186,7 @@ sub Remove
 {	my ($self,$rows)=@_;
 	$self->_staticfy;
 	$self->SUPER::Remove($rows);
+	$::Options{LastPlayFilter}=$::ListMode=SongArray->new_copy($self);
 	if (@$self==0) { $::Position=$::SongID=undef; _updateID(undef); return; }
 	if (defined $::Position)
 	{	my $pos=$::Position;
@@ -2210,6 +2209,7 @@ sub Up
 {	my ($self,$rows)=@_;
 	$self->_staticfy;
 	$rows=$self->SUPER::Up($rows);
+	$::Options{LastPlayFilter}=$::ListMode=SongArray->new_copy($self);
 	return unless $rows;
 	if (defined $::Position)
 	{	my $pos= $::Position;
@@ -2224,6 +2224,7 @@ sub Down
 {	my ($self,$rows)=@_;
 	$self->_staticfy;
 	$rows=$self->SUPER::Down($rows);
+	$::Options{LastPlayFilter}=$::ListMode=SongArray->new_copy($self);
 	return unless $rows;
 	if (defined $::Position)
 	{	my $pos= $::Position;
@@ -2238,6 +2239,7 @@ sub Move
 {	my ($self,$destrow,$rows)=@_;
 	$self->_staticfy;
 	$rows=$self->SUPER::Move($destrow,$rows);
+	$::Options{LastPlayFilter}=$::ListMode=SongArray->new_copy($self);
 	if (defined $::Position)
 	{	my $pos=$::Position;
 		my @rows=sort { $a <=> $b } @$rows;
@@ -2251,7 +2253,7 @@ sub Move
 	}
 }
 
-#watchers callbacks		#FIXME add a watcher for $::ListMode
+#watchers callbacks
 sub SongsAdded_cb
 {	my (undef,$IDs)=@_;
 	return if $::ListMode;
@@ -2277,7 +2279,7 @@ if (!$fields || grep(!defined, @$fields)) { ::callstack(@_,'fields=>',@$fields) 
 }
 sub SongArray_changed_cb
 {	my (undef,$songarray,$action,@extra)=@_;
-	return unless $::ListMode && $songarray==$::ListMode;
+	#return unless $::ListMode && $songarray==$::ListMode;
 #	my $sameorder= $::Options{Sort} eq '';
 #	if	($action eq 'sort')	{ $::ListPlay->Sort('') if $sameorder; }
 #	#elsif	($action eq 'insert')	{ $::ListPlay->Insert(@extra); }
@@ -2340,13 +2342,19 @@ sub UpdateSort
 	::HasChanged('SongArray',$self,'sort',$::Options{Sort},\@old) unless $::RandomMode;
 	_updateID($::SongID);
 }
+sub UpdateLock
+{	my $self=shift;
+	$::Position=undef;
+	if (defined $::ListMode) { $self->Replace($::ListMode); }
+	else { $self->SetFilter($::SelectedFilter); }
+}
 
 sub InsertAtPosition
 {	my ($self,$IDs)=@_;
 	my $pos=defined $::Position? $::Position+1 : 0;
 	$self->Insert($pos,$IDs);
 }
-sub Add
+sub Add		#only called in filter mode
 {	my ($self,$IDs)=@_;
 	::red("CHECKME ListPLay->Add($self,$IDs)");
 	$self->SUPER::Push($IDs);
@@ -2367,17 +2375,14 @@ sub SetID
 	{	::UpdateCurrentSong();
 		return
 	}
-	elsif ($::TogLock && defined $ID && @$self)
+	if ($::TogLock && defined $ID && @$self)
 	{	my $newlist=$self->_list_without_lock;
-		if (::IDIsInList($newlist,$ID))
-		{	$self->_updatelock($ID,$newlist);
-			$self->_sort($newlist);
-			::HasChanged('SongArray',$self,'replace', filter=> $::PlayFilter);
-			::UpdateCurrentSong();
+		if (::IDIsInList($newlist,$ID))		# is in list without lock -> reset lock
+		{	$self->UpdateLock;
 			return;
 		}
 	}
-	$self->SetFilter;
+	$self->SetFilter;	#reset filter
 }
 
 #private functions
@@ -2398,7 +2403,7 @@ sub _filter
 	my $newlist=$filter->filter;
 	if (!defined $ID)
 	{	$ID= $self->_FindFirst($newlist);
-		$self->_updatelock($ID) if $::TogLock && defined $ID;
+		$newlist=$self->_updatelock($ID,$newlist) if $::TogLock && defined $ID;
 	}
 	$self->_sort($newlist);
 	@$self=@$newlist;
@@ -2413,7 +2418,14 @@ sub _sort
 	if ($::RandomMode)	{ $::RandomMode->Invalidate; }
 	elsif ($::Options{Sort}){ Songs::SortList($list,$::Options{Sort}); }
 	elsif ($::ListMode)
-	{	@$self=@$::ListMode;
+	{	if ($::TogLock && $::PlayFilter)
+		{	my $newlist=$::PlayFilter->filter($list);
+			@$self=@$newlist;
+			delete $Presence{$self};
+		}
+		else
+		{	@$self=@$::ListMode;
+		}
 	}
 }
 sub _FindFirst
@@ -2430,22 +2442,20 @@ sub _FindFirst
 }
 sub _list_without_lock
 {	my $self=shift;
-	return [@$::ListMode] if $::ListMode;
-	return $::SelectedFilter->filter;
+	return $::ListMode ? $::ListMode : $::SelectedFilter->filter;
 }
 sub _updatelock
-{	my ($self,$ID,$list)=@_;
+{	my ($self,$ID,$newlist)=@_;
 	$ID=$::SongID unless defined $ID;
-	$list||= $self->_list_without_lock;
 	my $lockfilter=Filter->newlock($::TogLock,$ID);
 	$::PlayFilter= $::ListMode ? $lockfilter : Filter->newadd(1,$::SelectedFilter,$lockfilter);
+	return $lockfilter->filter($newlist);
 }
 sub _staticfy
 {	my $self=shift;
 	delete $::ToDo{'7_refilter_playlist'};
 	delete $::ToDo{'8_resort_playlist'};
 	return unless $::TogLock || $::PlayFilter;
-	$::ListMode=SongArray->new_copy($self);
 	::HasChanged('SongArray',$self,'mode');
 	if ($::TogLock)		{ $::TogLock=undef;	::HasChanged('Lock');	}
 	if ($::PlayFilter)	{ $::PlayFilter=undef;	::HasChanged('Filter');	}

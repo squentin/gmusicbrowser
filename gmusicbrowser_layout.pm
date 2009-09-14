@@ -158,8 +158,7 @@ our %Widgets=
 			: $::SelectedFilter->is_empty ? 'library' : 'filter'; },
 		stock	=> { list => 'gmb-list', library => 'gmb-library', filter => 'gmb-filter' },
 		tip	=> sub
-			{ defined $::ListMode	? ref $::ListMode	? _"unnamed static list"
-									: $::ListMode.' list'
+			{ defined $::ListMode	? _"static list"
 						: _("Playlist filter :\n").$::SelectedFilter->explain;
 			},
 		click1	=> \&RemoveFilter,

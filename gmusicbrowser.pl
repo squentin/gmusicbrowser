@@ -2249,12 +2249,6 @@ sub NextDiff	#go to next song whose $field value is different than current's
 	else	{ Stop(); }	#no matching song found in playlist => Stop (or do nothing ?)
 }
 
-sub UpdateLock
-{	$Position=undef;
-	if (defined $ListMode) { Select(staticlist => $ListMode); }
-	else { Select(filter => $SelectedFilter); }
-}
-
 sub ToggleLock
 {	my ($col,$set)=@_;
 	if ($set || !$TogLock || $TogLock ne $col)
@@ -2262,7 +2256,7 @@ sub ToggleLock
 		#&ClearQueue;
 	}
 	else {undef $TogLock}
-	&UpdateLock;
+	$ListPlay->UpdateLock;
 	HasChanged('Lock');
 }
 
@@ -2310,7 +2304,7 @@ sub Select	#Set filter, sort order, selected song, playing state, staticlist, so
 	my ($filter,$sort,$song,$staticlist,$pos)=@args{qw/filter sort song staticlist position/};
 	$SongID=undef if $song && $song eq 'first';
 	$song=undef if $song && $song=~m/\D/;
-	if ($sort) { $ListPlay->Sort($sort) }
+	if (defined $sort) { $ListPlay->Sort($sort) }
 	elsif (defined $filter) { $filter= Filter->new($filter) unless ref $filter; $ListPlay->SetFilter($filter) }
 	elsif ($staticlist)
 	{	if (defined $pos) { $Position=$pos; $SongID=$staticlist->[$pos]; $ChangedID=$ChangedPos=1; }
@@ -4389,8 +4383,8 @@ sub SongsChanged
 {	warn "SongsChanged @_\n" if $debug;
 	my ($IDs,$fields)=@_;
 	$Filter::CachedList=undef;
-	if (defined $SongID && (grep $SongID==$_,@$IDs))
-	{	&UpdateLock if $TogLock && OneInCommon([Songs::Depends($TogLock)],$fields);	#update lock
+	if (defined $SongID && (grep $SongID==$_,@$IDs)) # if current song is part of the changed songs
+	{	$ListPlay->UpdateLock if $TogLock && OneInCommon([Songs::Depends($TogLock)],$fields);
 		HasChanged('CurSong',$SongID);
 	}
 	for my $group (keys %SelID)
