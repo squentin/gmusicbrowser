@@ -44,13 +44,10 @@ our %Commands=
 );
 our %Supported;
 
-our @ISA=('Play_amixer'); #use amixer for volume
 $::PlayPacks{Play_123}=1; #register the package
 
 sub init
-{	Play_amixer::init();
-
-	my @notfound; my $foundone;
+{	my @notfound; my $foundone;
 	for my $cmd (sort {($Commands{$b}{priority}||0) <=> ($Commands{$a}{priority}||0)} keys %Commands)
 	{	my ($found)= grep -x, map $_.::SLASH.$cmd, split /:/, $ENV{PATH};
 		for my $ext (split / /,$Commands{$cmd}{type}) { push @{$Supported{$ext}},$cmd if $found; }
@@ -75,7 +72,9 @@ sub init
 	return bless {},__PACKAGE__;
 }
 
-sub Close {}
+sub VolInit
+{	return Play_amixer::init(); #use amixer for volume
+}
 
 sub supported_formats
 {	return grep $Supported{$_}, keys %Supported;
@@ -309,8 +308,7 @@ package Play_amixer;
 my ($mixer,$Mute,$Volume);
 
 sub init
-{	return if $Volume;
-	$Mute=0;
+{	$Mute||=0;
 	for my $path (split /:/, $ENV{PATH})
 	{	if (-x $path.::SLASH.'amixer') {$mixer=$path.::SLASH.'amixer';last;}
 	}
@@ -320,7 +318,7 @@ sub init
 		#Glib::Timeout->add(5000,\&SetVolume);
 #	}
 	unless ($mixer) {warn "amixer not found, won't be able to get/set volume through the 123 or mplayer output.\n"}
-
+	return bless {},__PACKAGE__;
 }
 
 sub init_volume
@@ -375,7 +373,8 @@ sub make_option_widget
 }
 
 sub get_amixer_SMC_list
-{	return () unless $mixer;
+{	init() unless $mixer;
+	return () unless $mixer;
 	init_volume() unless defined $Volume;
 	my (@list,$SMC);
 	open VOL,'-|',$mixer;

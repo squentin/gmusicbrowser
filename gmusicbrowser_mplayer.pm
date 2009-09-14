@@ -19,6 +19,7 @@ my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill,$Kil
 my $CMDfh;
 my (%supported,$mplayer);
 my ($Mute,$Volume);
+my $SoftVolume;
 
 $::PlayPacks{Play_mplayer}=1; #register the package
 
@@ -36,8 +37,6 @@ sub init
 	return bless {},__PACKAGE__;
 }
 
-sub Close {}
-
 sub supported_formats
 {	return () unless $mplayer;
 	unless (keys %supported)
@@ -54,12 +53,19 @@ sub supported_formats
 	return keys %supported;
 }
 
+sub VolInit
+{	# check if support -volume option
+	$SoftVolume= !system($mplayer,qw/-really-quiet -volume 100/) unless defined $SoftVolume;
+	return undef if $SoftVolume;	#use methods from this package
+	return Play_amixer::init();	#use methods from Play_amixer
+}
+
 sub Play
 {	(undef,$file,my$sec)=@_;
 	&Stop if $ChildPID;
 	#if ($ChildPID) { print $CMDfh "loadfile $file\n"; print $CMDfh "seek $sec 2\n" if $sec; return}
-	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -softvol/);
-	#push @cmd_and_args, '-volume',$Volume; # -volume option is too recent (31-10-2008)
+	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -nolirc/);
+	push @cmd_and_args, qw/-softvol -volume/,$Volume if $SoftVolume;
 	warn "@cmd_and_args\n" if $::debug;
 	#push @cmd_and_args,$device_option,$device unless $device eq 'default';
 	push @cmd_and_args,split / /,$::Options{mplayeroptions} if $::Options{mplayeroptions};
@@ -82,7 +88,6 @@ sub Play
 	elsif (!defined $ChildPID) { warn "fork failed\n" } #FIXME never happens
 	close $wfh; close $rfh;
 	$CMDfh->autoflush(1);
-	print $CMDfh "volume $Volume 1\n"; #set the initial volume here instead of using the too recent -volume option
 	#print $CMDfh "LOAD $file\n";
 	#SkipTo(undef,$sec) if $sec;
 
@@ -165,6 +170,8 @@ sub AdvancedOptions
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $hbox0=::NewPrefEntry('mplayeroptions',_"mplayer options :");
 	$vbox->pack_start($hbox0,::FALSE,::FALSE,2);
+	VolInit() unless defined $SoftVolume;
+	$vbox->pack_start(Play_amixer::make_option_widget(),::FALSE,::FALSE,2) unless $SoftVolume;
 	return $vbox;
 }
 

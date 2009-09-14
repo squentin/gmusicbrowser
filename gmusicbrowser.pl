@@ -1016,7 +1016,7 @@ if ($CmdLine{UseGnomeSession})
 	Watch(undef,CurSong	=> sub { UpdateRelatedFilter('Play'); });
 }
 
-our ($Play_package,%PlayPacks); my $PlayNext_package;
+our ($Play_package,%PlayPacks); my ($PlayNext_package,$Vol_package);
 for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_gstreamer-0.10.pm gmusicbrowser_server.pm/)
 {	eval { require $file } || warn $@;	#each file sets $::PlayPacks{PACKAGENAME} to 1 for each of its included playback packages
 }
@@ -1030,16 +1030,18 @@ ReadSavedTags();
 $Options{version}=VERSION;
 LoadIcons();
 
-$Play_package=$Options{AudioOut};
-$Play_package= $Options{use_GST_for_server} ? 'Play_GST_server' : 'Play_Server' if $CmdLine{server};
-$Play_package='Play_GST' if $CmdLine{gst};
-for my $p ($Play_package, qw/Play_GST Play_123 Play_mplayer Play_Server/)
-{	next unless $p && $PlayPacks{$p};
-	$Options{AudioOut}||=$p;
-	$Play_package=$p;
-	last;
+{	my $pp=$Options{AudioOut};
+	$pp= $Options{use_GST_for_server} ? 'Play_GST_server' : 'Play_Server' if $CmdLine{server};
+	$pp='Play_GST' if $CmdLine{gst};
+	for my $p ($Play_package, qw/Play_GST Play_123 Play_mplayer Play_GST_server Play_Server/)
+	{	next unless $p && $PlayPacks{$p};
+		$pp=$p;
+		last;
+	}
+	$Options{AudioOut}||=$pp;
+	$PlayNext_package=$PlayPacks{$pp};
+	SwitchPlayPackage();
 }
-$Play_package=$PlayPacks{$Play_package};
 
 IdleCheck() if $Options{StartCheck} && !$CmdLine{nocheck};
 IdleScan()  if $Options{StartScan}  && !$CmdLine{noscan};
@@ -1345,11 +1347,11 @@ sub DeactivatePlugin
 sub ChangeVol
 {	my $cmd;
 	if ($_[0] eq 'mute')
-	{	$cmd=$Play_package->GetMute? 'unmute':'mute' ;
+	{	$cmd=$Vol_package->GetMute? 'unmute':'mute' ;
 	}
 	else
 	{	$cmd=(ref $_[0])? $_[1]->direction : $_[0];
-		if	($Play_package->GetMute)	{$cmd='unmute'}
+		if	($Vol_package->GetMute)	{$cmd='unmute'}
 		elsif	($cmd eq 'up')	{$cmd="+$Options{VolumeStep}"}
 		elsif	($cmd eq 'down'){$cmd="-$Options{VolumeStep}"}
 	}
@@ -1359,13 +1361,13 @@ sub ChangeVol
 }
 
 sub UpdateVol
-{	$Play_package->SetVolume($_[0]);
+{	$Vol_package->SetVolume($_[0]);
 }
 sub GetVol
-{	$Play_package->GetVolume;
+{	$Vol_package->GetVolume;
 }
 sub GetMute
-{	$Play_package->GetMute;
+{	$Vol_package->GetMute;
 }
 
 sub FirstTime
@@ -1952,10 +1954,12 @@ sub Stop
 }
 
 sub SwitchPlayPackage
-{	$Play_package->Close;
+{	$Play_package->Close if $Play_package && $Play_package->can('Close');
 	$Play_package=$PlayNext_package;
-	#$Play_package->reinit; #FIXME
 	$PlayNext_package=undef;
+	$Play_package->Open if $Play_package->can('Open');
+	$Vol_package=$Play_package;
+	$Vol_package=$Play_package->VolInit||$Play_package if $Play_package->can('VolInit');
 	HasChanged('AudioBackend');
 	HasChanged('Equalizer','package');
 	HasChanged('Vol');

@@ -395,7 +395,7 @@ sub _UpdateTime
 	return 1 if $result eq 'async';
 	if ($state ne 'playing' && $state ne 'paused')
 	{	return 1 if $pending eq 'playing' || $pending eq 'paused';
-		::ResetTime() unless $::Play_package ne 'Play_GST';
+		::ResetTime() unless 'Play_GST' ne ref $::Play_package;
 		$WatchTag=undef;
 		return 0;
 	}
