@@ -334,7 +334,7 @@ HBAA		= _AABox1(aa=artist) _AABox0(aa=album)
 
 [default fullscreen]
 Type=F
-Default		= Window(fullscreen=1,sticky=0)
+Window		= fullscreen=1,sticky=0
 HBPics		= _ArtistPic(maxsize=0) _Cover(maxsize=0)
 HBButtons1	= Prev(size=dialog) Next(size=dialog)
 HBButtons2	= Stop(size=dialog) Play(size=dialog)
@@ -383,7 +383,7 @@ VolumeScroll	= VBplayer
 
 [Fullscreen simple]
 Type=F
-Default		= Window(fullscreen=1,sticky=0)
+Window		= fullscreen=1,sticky=0
 HBPics		= _ArtistPic(maxsize=0) _Cover(maxsize=0)
 HBButtons1	= Prev(size=dialog) Next(size=dialog)
 HBButtons2	= Stop(size=dialog) Play(size=dialog)

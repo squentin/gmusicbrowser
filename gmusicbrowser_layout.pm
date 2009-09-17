@@ -37,7 +37,7 @@ my @MenuQueue=
 my @MainMenu=
 (	{label => _"Add files or folders",code => sub {::ChooseAddPath(0)},	stockicon => 'gtk-add' },
 	{label => _"Settings",		code => \&::PrefDialog,	stockicon => 'gtk-preferences' },
-	{label => _"Open Browser",	code => \&::Playlist,	stockicon => 'gmb-playlist' },
+	{label => _"Open Browser",	code => \&::OpenBrowser,stockicon => 'gmb-playlist' },
 	{label => _"Open Context window",code => \&::ContextWindow, stockicon => 'gtk-info'},
 	{label => _"Switch to fullscreen mode",code => \&::ToggleFullscreenLayout, stockicon => 'gtk-fullscreen'},
 	{label => _"About",		code => \&::AboutDialog,stockicon => 'gtk-about' },
@@ -82,8 +82,8 @@ our %Widgets=
 		options => 'toggle',
 		stock	=> 'gmb-playlist',
 		tip	=> _"Open Browser window",
-		activate=> sub {::Playlist($_[0]{toggle})},
-		click3	=> sub {Layout::Window->new($::Options{LayoutB});},
+		activate=> sub { ::OpenSpecialWindow('Browser',$_[0]{toggle}); },
+		click3	=> sub { ::OpenSpecialWindow('Browser'); },
 	},
 	BContext =>
 	{	class	=> 'Layout::Button',
@@ -91,15 +91,22 @@ our %Widgets=
 		options => 'toggle',
 		stock	=> 'gtk-info',
 		tip	=> _"Open Context window",
-		activate=> sub {::ContextWindow($_[0]{toggle})},
-		click3	=> sub {Layout::Window->new('Context');},
+		activate=> sub { ::OpenSpecialWindow('Context',$_[0]{toggle}); },
+		click3	=> sub { ::OpenSpecialWindow('Context'); },
+	},
+	OpenQueue	=>
+	{	class	=> 'Layout::Button',
+		stock	=> 'gmb-queue-window',
+		tip	=> _"Open Queue window",
+		options => 'toggle',
+		activate=> sub { ::OpenSpecialWindow('Queue',$_[0]{toggle}); },
 	},
 	Pref =>
 	{	class	=> 'Layout::Button',
 		stock	=> 'gtk-preferences',
 		tip	=> _"Edit Settings",
 		activate=> \&::PrefDialog,
-		click3	=> sub {Layout::Window->new($::Options{Layout});},
+		click3	=> sub {Layout::Window->new($::Options{Layout});}, #mostly for debugging purpose
 		click2	=> \&::AboutDialog,
 	},
 	Quit =>
@@ -563,13 +570,6 @@ our %Widgets=
 	QueueActions	=>
 	{	class	=> 'QueueActions',
 	},
-	OpenQueue	=>
-	{	class	=> 'Layout::Button',
-		stock	=> 'gmb-queue-window',
-		tip	=> _"Open Queue window",
-		options => 'toggle',
-		activate=> sub {::EditQueue($_[0]{toggle})},
-	},
 	Fullscreen	=>
 	{	class	=> 'Layout::Button',
 		stock	=> 'gtk-fullscreen',
@@ -791,15 +791,9 @@ sub InitLayout
 	$self->{KeyBindings}=::make_keybindingshash($boxes->{KeyBindings}) if $boxes->{KeyBindings};
 	$self->{widgets}={};
 	$self->{global_options}{default_group}=$self->{group};
-	for (qw/SkinPath SkinFile DefaultFont Window/)
+	for (qw/SkinPath SkinFile DefaultFont/)
 	{	$self->{global_options}{$_}=$boxes->{$_} if exists $boxes->{$_};
 	}
-	my $border_width=2; #default border width
-	if (my $wopt=$self->{global_options}{Window})
-	{	$border_width=$1 if $wopt=~m/\bborderwidth=(\d+)\b/;
-		$self->set_skip_pager_hint(1) && $self->set_skip_taskbar_hint(1) if $wopt=~m/\bskip=1\b/;
-	}
-	$self->set_border_width($border_width);
 
 	my $mainwidget= $self->CreateWidgets($boxes,$opt2);
 	return unless $mainwidget;
@@ -1467,8 +1461,37 @@ use base 'Gtk2::Window';
 sub new
 {	my ($class,$layout,%options)=@_;
 	my $fallback=delete $options{fallback} || 'Lists, Library & Context';
+	my $opt0={};
+	if (my $opt= $layout=~m/^[^(]+\(.*=/)
+	{	($layout,$opt0)= $layout=~m/^([^(]+)\((.*)\)$/; #separate layout id and options
+		$opt0= ::ParseOptions($opt0);
+	}
+	unless (exists $Layout::Layouts{$layout})
+	{	warn "Layout '$layout' not found, using '$fallback' instead\n";
+		$layout=$fallback; #FIXME if not a player window
+		$Layout::Layouts{$layout} ||= { VBmain=>'Label(text="Error : fallback layout not found")' };	#create an error layout if fallback not found
+	}
+	my $opt2=$::Options{Layouts}{$layout};
+	$opt2||= Layout::GetDefaultLayoutOptions($layout);
+	my $opt1=::ParseOptions( $Layout::Layouts{$layout}{Window}||'' );
+	%options= ( borderwidth=>2, %$opt1, %{$opt2->{Window}||{}}, %options, %$opt0 );
+	#warn "window options (layout=$layout) :\n";warn " $_ => $options{$_}\n" for sort keys %options;
+
+	my $uniqueid= $options{uniqueid} || 'layout='.$layout;
+		# ifexist=toggle  => if a window with same uniqueid exist it will be closed
+		# ifexist=present => if a window with same uniqueid exist it presented
+	if (my $mode=$options{ifexist})
+	{	my ($window)=grep $_->isa('Layout::Window') && $_->{uniqueid} eq $uniqueid, Gtk2::Window->list_toplevels;
+		if ($window)
+		{	if    ($mode eq 'toggle'  && !$window->{quitonclose})	{ $window->close_window; return }
+			elsif ($mode eq 'replace' && !$window->{quitonclose})	{ $window->close_window; }
+			elsif ($mode eq 'present')			 	{ $window->present; return }
+		}
+	}
+
 	my $wintype= delete $options{wintype} || 'toplevel';
 	my $self=bless Gtk2::Window->new($wintype), $class;
+	$self->{uniqueid}= $uniqueid;
 	$self->set_role($layout);
 	$self->{options}=\%options;
 	$self->{name}='Window';
@@ -1502,41 +1525,193 @@ sub new
 #			::TRUE;
 #		}
 #		);
-	unless (exists $Layout::Layouts{$layout})
-	{	warn "Layout '$layout' not found, using '$fallback' instead\n";
-		$layout=$fallback; #FIXME if not a player window
-		$Layout::Layouts{$layout} ||= { VBmain=>'Label(text="Error : fallback layout not found")' };	#create an error layout if fallback not found
-	}
-	my $opt2=$::Options{Layouts}{$layout};
-	$opt2||= Layout::GetDefaultLayoutOptions($layout);
 	$self->InitLayout($layout,$opt2);
-	$self->SetWindowOptions($opt2->{Window});
+	$self->SetWindowOptions(\%options);
 	if (my $skin=$Layout::Layouts{$layout}{Skin}) { $self->set_background_skin($skin) }
 	$self->init;
 	::HasChanged('HiddenWidgets');
 	#$self->set_opacity($self->{opacity}) if exists $self->{opacity} && $self->{opacity}!=1;
 	return $self;
 }
+
 sub init
 {	my $self=$_[0];
-	#$self->set_position();#doesn't work before show, at least with sawfish
-	$self->move($self->{x},$self->{y}) if defined $self->{x};
-		my @hidden;
+	if ($self->{options}{transparent})
+	{	eval { require Cairo unless $::useCairo; $::useCairo=1; };
+		if ($::useCairo)
+		{	make_transparent($self);
+		}
+		else { warn "Error : can't load the Cairo perl module => can't make the window transparent\n" }
+	}
+	$self->child->show_all;		#needed to get the true size of the window
+	$self->child->realize;		#
+	{	my @hidden;
 		@hidden=keys %{ $self->{hidden} } if $self->{hidden};
 		my $widgets=$self->{widgets};
 		push @hidden,$widgets->{$_}{need_hide} for grep $widgets->{$_}{need_hide}, keys %$widgets;
 		@hidden=map $widgets->{$_}, @hidden;
-		$_->show_all for @hidden;
 		$_->hide for @hidden;
-		@hidden=grep !$_->get_no_show_all, @hidden;
-		$_->set_no_show_all(1) for @hidden;
-		$self->show_all;
-		$_->set_no_show_all(0) for @hidden;
-#	if (my $h=$self->{hidden}) #restore hidden states
-#	 { $self->{widgets}{$_}->hide for keys %$h; }
-	$self->move($self->{x},$self->{y}) if defined $self->{x};
+	}
+	#$self->set_position();#doesn't work before show, at least with sawfish
+	$self->Resize if $self->{size};
+	my ($x,$y)= $self->Position;
+	$self->move($x,$y) if defined $x;
+	$self->show;
+	$self->move($x,$y) if defined $x;
 	$self->parse_geometry( delete $::CmdLine{geometry} ) if $::CmdLine{geometry};
+	if ($self->{options}{insensitive})
+	{	my $mask=Gtk2::Gdk::Bitmap->create_from_data(undef,'',1,1);
+		$self->input_shape_combine_mask($mask,0,0);
+	}
 }
+
+sub layout_name
+{	my $self=shift;
+	my $id=$self->{layout};
+	return $Layout::Layouts{$id}{Name} || $id;
+}
+sub close_window
+{	my $self=shift;
+	$self->SaveOptions;
+	unless ($self->{quitonclose}) { $_->destroy for values %{$self->{widgets}}; $self->destroy; return }
+	if ($::Options{UseTray} && $::Options{CloseToTray}) { &::ShowHide; return 1}
+	else { &::Quit }
+}
+
+sub SaveOptions
+{	my $self=shift;
+	my $opt=Layout::SaveWidgetOptions($self,values %{ $self->{widgets} }, values %{ $self->{PlaceHolders} });
+	$::Options{Layouts}{$self->{layout}} = $opt;
+}
+sub SaveWindowOptions
+{	my $self=$_[0];
+	my %wstate;
+	$wstate{size}=join 'x',$self->get_size;
+	#unless ($self->{options}{DoNotSaveState})
+	{	$wstate{sticky}=1 if $self->{sticky};
+		$wstate{fullscreen}=1 if $self->{fullscreen};
+		$wstate{ontop}=1 if $self->{ontop};
+		$wstate{below}=1 if $self->{below};
+		$wstate{nodecoration}=1 unless $self->get_decorated;
+		$wstate{skippager}=1 if $self->get_skip_pager_hint;
+		if ($self->{saved_position})
+		{	$wstate{pos}=$self->{saved_position};
+			$wstate{skiptaskbar}=1 if $self->{skip_taskbar_hint};
+		}
+		else
+		{	$wstate{pos}=join 'x',$self->get_position;
+			$wstate{skiptaskbar}=1 if $self->get_skip_taskbar_hint;
+		}
+	}
+	my $hidden=$self->{hidden};
+	if ($hidden && keys %$hidden)
+	{	$wstate{hidden}=join ':', %$hidden;
+	}
+	return \%wstate;
+}
+sub SetWindowOptions
+{	my ($self,$opt)=@_;
+	my $layouthash= $Layout::Layouts{ $self->{layout} };
+	if	($opt->{fullscreen})	{ $self->fullscreen; }
+	else
+	{	$self->{size}=$opt->{size};
+		#window position in format numberxnumber  number can be a % of screen size
+		$self->{pos}=$opt->{pos};
+	}
+	$self->stick if $opt->{sticky};
+	$self->set_keep_above(1) if $opt->{ontop};
+	$self->set_keep_below(1) if $opt->{below};
+	$self->set_decorated(0)  if $opt->{nodecoration};
+	$self->set_skip_pager_hint(1) if $opt->{skippager};
+	$self->set_skip_taskbar_hint(1) if $opt->{skiptaskbar};
+	#$self->{opacity}=$opt->{opacity} if defined $opt->{opacity};
+	$self->{hidden}={ $opt->{hidden}=~m/(\w+)(?::?(\d+x\d+))?/g } if $opt->{hidden};
+
+	$self->set_border_width($self->{options}{borderwidth});
+	$self->set_gravity($layouthash->{gravity}) if $layouthash->{gravity};
+	my $title=$layouthash->{Title} || _"%S by %a";
+	$title=~s/^"(.*)"$/$1/;
+	if (my @l=::UsedFields($title))
+	{	$self->{TitleString}=$title;
+		my %fields; $fields{$_}=undef for @l;
+		::Watch($self,'CurSong',\&UpdateWindowTitle,\%fields);
+		$self->UpdateWindowTitle();
+	}
+	else { $self->set_title($title) }
+}
+sub UpdateWindowTitle
+{	my $self=shift;
+	my $ID=$::SongID;
+	if (my $title=$self->{TitleString})
+	{	$title= defined $ID	? ::ReplaceFields($ID,$title)
+					: '<'._("Playlist Empty").'>';
+		$self->set_title($title);
+	}
+}
+
+sub Resize
+{	my $self=shift;
+	my ($w,$h)= split 'x',delete $self->{size};
+	return unless defined $h;
+	my $screen=$self->get_screen;
+	my $monitor=$screen->get_monitor_at_window($self->window);
+	my (undef,undef,$monitorwidth,$monitorheight)=$screen->get_monitor_geometry($monitor)->values;
+	$w= $1*$monitorwidth/100 if $w=~m/(\d+)%/;
+	$h= $1*$monitorwidth/100 if $h=~m/(\d+)%/;
+	$w=1 if $w<1;
+	$h=1 if $h<1;
+	$self->resize($w,$h);
+}
+
+sub Position
+{	my $self=shift;
+	my $pos=delete $self->{pos};
+	return unless $pos;		#format : 100x100    50%x100%   -100x-100   500-100% x 500-50%
+	my ($x,$xalign,$y,$yalign)= $pos=~m/([+-]?\d+%?)(?:([+-]\d+)%)?\s*x\s*([+-]?\d+%?)(?:([+-]\d+)%)?/;
+	my $h=$self->size_request->height;		# height of window to position
+	my $w=$self->size_request->width;		# width of window to position
+	my $screen=$self->get_screen;
+	my $monitor=$screen->get_monitor_at_window($self->window);
+	my ($xmin,$ymin,$monitorwidth,$monitorheight)=$screen->get_monitor_geometry($monitor)->values;
+	$xalign= $x=~m/%/ ? 50 : 0   unless defined $xalign;
+	$yalign= $y=~m/%/ ? 50 : 0   unless defined $yalign;
+	$x= $monitorwidth*$1/100 if $x=~m/(-?\d+)%/;
+	$y= $monitorheight*$1/100 if $y=~m/(-?\d+)%/;
+	$x= $monitorwidth-$x if $x<0;
+	$y= $monitorheight-$y if $y<0;
+	$x-= $xalign*$w/100;
+	$y-= $yalign*$h/100;
+	$x=0 if $x<0; $x=$monitorwidth if $x>$monitorwidth;
+	$y=0 if $y<0; $y=$monitorheight if $y>$monitorheight;
+	$x+=$xmin;
+	$y+=$ymin;
+	return $x,$y;
+}
+
+sub make_transparent
+{	my @children=($_[0]);
+	while (my $widget=shift @children)
+	{	push @children, $widget->get_children if $widget->isa('Gtk2::Container');
+		unless ($widget->no_window)
+		{	$widget->set_colormap($widget->get_screen->get_rgba_colormap);
+			$widget->set_app_paintable(1);
+			$widget->signal_connect(expose_event => \&transparent_expose_cb);
+		}
+		if ($widget->isa('Gtk2::container'))
+		{	$widget->signal_connect(add => sub { make_transparent($_[1]); } );
+		}
+	}
+}
+sub transparent_expose_cb #use Cairo
+{	my ($w,$event)=@_;
+	my $cr=Gtk2::Gdk::Cairo::Context->create($event->window);
+	$cr->set_operator('source');
+	$cr->set_source_rgba(0, 0, 0, 0);
+	$cr->rectangle($event->area);
+	$cr->fill;
+	return 0; #send expose to children
+}
+
 
 sub set_background_skin
 {	my ($self,$skin)=@_;
@@ -1584,100 +1759,6 @@ sub resize_skin_cb	#FIXME needs to add a delay to better deal with a burst of re
 	return 0;
 }
 
-sub layout_name
-{	my $self=shift;
-	my $id=$self->{layout};
-	return $Layout::Layouts{$id}{Name} || $id;
-}
-sub close_window
-{	my $self=shift;
-	$self->SaveOptions;
-	unless ($self == $::MainWindow) { $_->destroy for values %{$self->{widgets}}; $self->destroy; return }
-	if ($::Options{UseTray} && $::Options{CloseToTray}) { &::ShowHide; return 1}
-	else { &::Quit }
-}
-
-sub SaveOptions
-{	my $self=shift;
-	my $opt=Layout::SaveWidgetOptions($self,values %{ $self->{widgets} }, values %{ $self->{PlaceHolders} });
-	$::Options{Layouts}{$self->{layout}} = $opt;
-}
-sub SaveWindowOptions
-{	my $self=$_[0];
-	my %wstate;
-	$wstate{size}=join 'x',$self->get_size;
-	#unless ($self->{options}{DoNotSaveState})
-	{	$wstate{sticky}=1 if $self->{sticky};
-		$wstate{fullscreen}=1 if $self->{fullscreen};
-		$wstate{ontop}=1 if $self->{ontop};
-		$wstate{below}=1 if $self->{below};
-		$wstate{nodecoration}=1 unless $self->get_decorated;
-		$wstate{skippager}=1 if $self->get_skip_pager_hint;
-		if ($self->{saved_position})
-		{	$wstate{pos}=$self->{saved_position};
-			$wstate{skiptaskbar}=1 if $self->{skip_taskbar_hint};
-		}
-		else
-		{	$wstate{pos}=join 'x',$self->get_position;
-			$wstate{skiptaskbar}=1 if $self->get_skip_taskbar_hint;
-		}
-	}
-	my $hidden=$self->{hidden};
-	if ($hidden && keys %$hidden)
-	{	$wstate{hidden}=join ':', %$hidden;
-	}
-	return \%wstate;
-}
-sub SetWindowOptions
-{	my ($self,$wopt)=@_;
-	my $layouthash= $Layout::Layouts{ $self->{layout} };
-	my ($x,$y,$width,$height)=(-1,-1);
-	if ($wopt)
-	{	if ($self->{options}{UseDefaultState})
-		{	my $default= Layout::GetDefaultLayoutOptions($self->{layout});
-			$default->{size}=$wopt->{size} if $self->{options}{KeepSize};
-			$wopt= $default; #replace options by default
-		}
-		($x,$y)=split 'x',$wopt->{pos}  if $wopt->{pos};
-		($width,$height)=split 'x',$wopt->{size} if $wopt->{size};
-		$self->stick if $wopt->{sticky};
-		$self->fullscreen, $width=$height=undef if $wopt->{fullscreen};
-		$self->set_keep_above(1) if $wopt->{ontop};
-		$self->set_keep_below(1) if $wopt->{below};
-		$self->set_decorated(0)  if $wopt->{nodecoration};
-		$self->set_skip_pager_hint(1) if $wopt->{skippager};
-		$self->set_skip_taskbar_hint(1) if $wopt->{skiptaskbar};
-		#$self->{opacity}=$wopt->{opacity} if defined $wopt->{opacity};
-		$self->{hidden}={ $wopt->{hidden}=~m/(\w+)(?::?(\d+x\d+))?/g } if $wopt->{hidden};
-	}
-	if ($width) { $self->resize($width,$height); }
-	$self->set_gravity($layouthash->{gravity}) if $layouthash->{gravity};
-	if (my $scrn=Gtk2::Gdk::Screen->get_default)
-	 {$x=-1 if $x>$scrn->get_width || $y>$scrn->get_height}
-	if ($x>-1 && $y>-1)
-	{ $self->move($x,$y);
-	  $self->{x}=$x; $self->{y}=$y;	#move before show_all rarely works, so save pos to set it later
-	}
-	my $title=$layouthash->{Title} || _"%S by %a";
-	$title=~s/^"(.*)"$/$1/;
-	if (my @l=::UsedFields($title))
-	{	$self->{TitleString}=$title;
-		my %fields; $fields{$_}=undef for @l;
-		::Watch($self,'CurSong',\&UpdateWindowTitle,\%fields);
-		$self->UpdateWindowTitle();
-	}
-	else { $self->set_title($title) }
-}
-sub UpdateWindowTitle
-{	my $self=shift;
-	my $ID=$::SongID;
-	if (my $title=$self->{TitleString})
-	{	$title= defined $ID	? ::ReplaceFields($ID,$title)
-					: '<'._("Playlist Empty").'>';
-		$self->set_title($title);
-	}
-}
-
 package Layout::Window::Popup;
 use Gtk2;
 our @ISA;
@@ -1686,13 +1767,13 @@ BEGIN {push @ISA,'Layout','Layout::Window';}
 sub new
 {	my ($class,$layout,$widget)=@_;
 	$layout||=$::Options{LayoutT};
-	my $self=Layout::Window::new($class,$layout, wintype=>'popup',UseDefaultState=>1,fallback=>'info');	#'info' is the fallback layout
+	my $self=Layout::Window::new($class,$layout, wintype=>'popup', 'pos'=>undef, size=>undef, fallback=>'full with buttons', popped_from=>$widget);
 
 	if ($widget)
-	{	$self->{popped_from}=$widget;
+	{	::weaken( $widget->{PoppedUpWindow}=$self );
 		$self->set_screen($widget->get_screen);
 		#$self->set_transient_for($widget->get_toplevel);
-		$self->move( ::windowpos($self,$widget) );
+		#$self->move( ::windowpos($self,$widget) );
 		$self->signal_connect(enter_notify_event => \&CancelDestroy);
 	}
 	else	{ $self->set_position('mouse'); }
@@ -1712,20 +1793,25 @@ sub init
 	$frame->set_shadow_type('out');
 	$child->set_border_width($self->get_border_width);
 	$self->set_border_width(0);
-
 		##$self->set_type_hint('tooltip'); #TEST
 		##$self->set_type_hint('notification'); #TEST
 		#$self->set_focus_on_map(0);
 		#$self->set_accept_focus(0); #?
-	$self->child->show_all;		#needed to get the true size of the window
-	$self->child->realize;		#
 	$self->signal_connect(leave_notify_event => sub
 		{ $_[0]->StartDestroy if $_[1]->detail ne 'inferior';0; });
+	$self->SUPER::init;
+}
+
+sub Position
+{	my $self=shift;
+	if ( my $widget= delete $self->{options}{popped_from})
+	{	return ::windowpos($self,$widget);
+	}
 }
 
 sub Popup
 {	my ($widget,$addtimeout)=@_;
-	my $self= find_window($widget);
+	my $self= $widget->{PoppedUpWindow};
 	$addtimeout=0 if $self && !$self->{destroy_timeout}; #don't add timeout if there wasn't already one
 	$self ||= Layout::Window::Popup->new($widget->{hover_layout},$widget);
 	return 0 unless $self;
@@ -1738,7 +1824,7 @@ sub set_hover
 {	my $widget=$_[0];
 	#$widget->add_events([qw/enter-notify-mask leave-notify-mask/]);
 	$widget->signal_connect(enter_notify_event =>
-	    sub	{ if (!find_window($widget))
+	    sub	{ if (!$widget->{PoppedUpWindow})
 		  {	my $delay=$widget->{hover_delay}||1000;
 			$widget->{hover_timeout}||= Glib::Timeout->add($delay,\&Popup,$widget);
 		  }
@@ -1747,16 +1833,11 @@ sub set_hover
 		});
 	$widget->signal_connect(leave_notify_event => \&CancelPopup );
 }
-sub find_window
-{	my $widget=shift;
-	my ($self)=grep $_->{popped_from} && $_->{popped_from}==$widget, Gtk2::Window->list_toplevels;
-	return $self;
-}
 
 sub CancelPopup
 {	my $widget=shift;
-	if (my $t=delete $widget->{hover_timeout}) { Glib::Source->remove($t); }
-	if (my $self=find_window($widget)) { $self->StartDestroy }
+	if (my $t=delete $widget->{hover_timeout})	{ Glib::Source->remove($t); }
+	if (my $self=$widget->{PoppedUpWindow})		{ $self->StartDestroy }
 }
 sub CancelDestroy
 {	my $self=shift;
@@ -1774,88 +1855,6 @@ sub DestroyNow
 	$self->destroy;
 	0;
 }
-
-=needsCairo
-package Layout::Window::OSD;	#TEST not used yet 	#Layout::Window::OSD->new()
-use Gtk2;
-our @ISA;
-BEGIN {push @ISA,'Layout','Layout::Window';}
-
-sub new
-{	my ($class,$layout)=@_;
-	$layout||=$::Options{LayoutT};
-	my $self=Layout::Window::new($class,$layout,wintype=>'popup',UseDefaultState=>1);
-	$self->move( position($self) );
-	$self->show;
-	Glib::Timeout->add( 5000,sub {$self->destroy;0} );
-	return $self;
-}
-sub init
-{	my $self=$_[0];
-	if (1)
-	{	my @children=($self);
-		while (my $widget=shift @children)
-		{	push @children, $widget->get_children if $widget->isa('Gtk2::Container');
-			unless ($widget->no_window)
-			{	$widget->set_colormap($widget->get_screen->get_rgba_colormap);
-				$widget->set_app_paintable(1);
-				$widget->signal_connect(expose_event => \&transparent_expose_cb);
-			}
-		}
-	}
-	if (0)	#failed attempt at making it input-invisible
-	{	my @children=($self);
-		while (my $widget=shift @children)
-		{	push @children, $widget->get_children if $widget->isa('Gtk2::Container');
-			unless ($widget->no_window)
-			{	$widget->realize;
-				$widget->window->set_events(['exposure-mask']);
-			}
-		}
-	}
-
-	$self->child->show_all;		#needed to get the true size of the window
-	$self->child->realize;		#
-	if (1)	#make the window input-invisible
-	{	$self->realize;
-		my $mask=Gtk2::Gdk::Bitmap->create_from_data(undef,'',1,1);
-		$self->input_shape_combine_mask($mask,0,0);
-	}
-}
-sub transparent_expose_cb
-{	my ($w,$event)=@_;
-	use Cairo;
-	my $cr=Gtk2::Gdk::Cairo::Context->create($event->window);
-	$cr->set_operator('source');
-	$cr->set_source_rgba(0, 0, 0, 0);
-	$cr->rectangle($event->area);
-	$cr->fill;
-	return 0; #send expose to children
-}
-
-sub position	#FIXME improve
-{	my ($win)=@_;
-	my $h=$win->size_request->height;		# height of window to position
-	my $w=$win->size_request->width;		# width of window to position
-	my $screen=$win->get_screen;
-	my $monitor=$screen->get_monitor_at_window($win->window);
-	my ($xmin,$ymin,$monitorwidth,$monitorheight)=$screen->get_monitor_geometry($monitor)->values;
-	my $xmax=$xmin + $monitorwidth;
-	my $ymax=$ymin + $monitorheight;
-	my $x=$xmin + $monitorwidth/2;
-	my $y=$ymin + $monitorheight;
-
-	my $ycenter=0;
-	if ($x+$w/2 < $xmax && $x-$w/2 >$xmin){ $x-=int($w/2); }	# centered
-	elsif ($x+$w > $xmax)	{ $x=$xmax-$w; $x=$xmin if $x<$xmin }	# right side
-	else				{ $x=$xmin; }				# left side
-	if ($ycenter && $y+$h/2 < $ymax && $y-$h/2 >$ymin){ $y-=int($h/2) }	# y center
-	elsif ($y+$h > $ymax)  { $y-=$h; $y=$ymin if $y<$ymin }	# display above the widget
-	#else			   { $y+=0; }				# display below the widget
-	return $x,$y;
-}
-=cut
-
 
 package Layout::Embedded;
 use base 'Gtk2::Frame';

@@ -618,8 +618,8 @@ our ($TogPlay,$TogLock);
 our ($RandomMode,$SortFields,$ListMode);
 our ($SongID,$Recent,$RecentPos,$Queue); our $QueueAction='';
 our ($Position,$ChangedID,$ChangedPos,@NextSongs,$NextFileToPlay);
-our ($MainWindow,$BrowserWindow,$ContextWindow,$FullscreenWindow); my $OptionsDialog;
-our $QueueWindow; my $TrayIcon;
+our ($MainWindow,$FullscreenWindow); my $OptionsDialog;
+my $TrayIcon;
 my %Editing; #used to keep track of opened song properties dialog and lyrics dialog
 our $PlayTime;
 our ($StartTime,$StartedAt,$PlayingID,$PlayedPartial);
@@ -867,14 +867,14 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	Rewind		=> [\&Rewind,				_"Rewind",_"Number of seconds",qr/^\d+$/],
 	Seek		=> [sub {SkipTo($_[1])},		_"Seek",_"Number of seconds",qr/^\d+$/],
 	Stop		=> [\&Stop,				_"Stop"],
-	Browser		=> [\&Playlist,				_"Open Browser"],
+	Browser		=> [\&OpenBrowser,			_"Open Browser"],
 	OpenQueue	=> [\&EditQueue,			_"Open Queue window"],
-	OpenSearch	=> [sub { Layout::Window->new($Options{LayoutS}); },	_"Open Search window"],
-	OpenContext	=> [sub { Layout::Window->new('Context');},	_"Open Context window"],
+	OpenSearch	=> [sub { Layout::Window->new($Options{LayoutS}, uniqueid=>'Search'); },	_"Open Search window"],
+	OpenContext	=> [\&ContextWindow,			_"Open Context window"],
 	OpenCustom	=> [sub { Layout::Window->new($_[1]); },	_"Open Custom window",_"Name of layout", sub { TextCombo->new( Layout::get_layout_list() ); }],
 	PopupCustom	=> [sub { PopupLayout($_[1],$_[0]); },		_"Popup Custom window",_"Name of layout", sub { TextCombo::Tree->new( Layout::get_layout_list() ); }],
 	CloseWindow	=> [sub { $_[0]->get_toplevel->close_window if $_[0];}, _"Close Window"],
-	SetPlayerLayout => [sub { SetOption(Layout=>$_[1]); set_layout(); },_"Set player window layout",_"Name of layout", sub {  TextCombo::Tree->new( Layout::get_layout_list('G') ); }, ],
+	SetPlayerLayout => [sub { SetOption(Layout=>$_[1]); CreateMainWindow(); },_"Set player window layout",_"Name of layout", sub {  TextCombo::Tree->new( Layout::get_layout_list('G') ); }, ],
 	OpenPref	=> [\&PrefDialog,			_"Open Preference window"],
 	OpenSongProp	=> [sub { DialogSongProp($SongID) if defined $SongID }, _"Edit Current Song Properties"],
 	EditSelectedSongsProperties => [sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; DialogSongsProp(@IDs) if @IDs; },		_"Edit selected song properties"],
@@ -1058,7 +1058,7 @@ Layout::InitLayouts;
 ActivatePlugin($_,'startup') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 
 our $Tooltips=Gtk2::Tooltips->new;
-$MainWindow=Layout::Window->new($CmdLine{layout}||$Options{Layout});
+CreateMainWindow( $CmdLine{layout}||$Options{Layout} );
 &ShowHide if $CmdLine{hide};
 SkipTo($PlayTime) if $PlayTime; #done only now because of gstreamer
 
@@ -2536,32 +2536,28 @@ sub IdleLoop
 	return $IdleLoop;
 }
 
-sub Playlist
-{	if ($BrowserWindow)
-	{	if ($_[0]{toggle})	{$BrowserWindow->close_window}
-		else			{$BrowserWindow->present}
-	}
-	else
-	{	$BrowserWindow=Layout::Window->new($Options{LayoutB});
-		$BrowserWindow->signal_connect(destroy => sub { $BrowserWindow=undef; });
-	}
+sub OpenBrowser
+{	OpenSpecialWindow('Browser');
 }
 sub ContextWindow
-{	if ($ContextWindow)
-	{	if ($_[0]{toggle})	{$ContextWindow->close_window}
-		else			{$ContextWindow->present}
-	}
-	else
-	{	$ContextWindow=Layout::Window->new('Context');
-		$ContextWindow->signal_connect(destroy => sub { $ContextWindow=undef; });
-	}
+{	OpenSpecialWindow('Context');
 }
+sub EditQueue
+{	OpenSpecialWindow('Queue');
+}
+sub OpenSpecialWindow
+{	my ($type,$toggle)=@_;
+	my $layout= $type eq 'Browser' ? $Options{LayoutB} : $type;
+	my $ifexist= $toggle ? 'toggle' : 'present';
+	Layout::Window->new($layout, ifexist => $ifexist, uniqueid=>$type);
+}
+
 sub ToggleFullscreenLayout
 {	if ($FullscreenWindow)
 	{	$FullscreenWindow->close_window;
 	}
 	else
-	{	$FullscreenWindow=Layout::Window->new($Options{LayoutF},undef,'UseDefaultState');
+	{	$FullscreenWindow=Layout::Window->new($Options{LayoutF},fullscreen=>1);
 		$FullscreenWindow->signal_connect(destroy => sub { $FullscreenWindow=undef; });
 		if ($Options{StopScreensaver} && findcmd('xdg-screensaver'))
 		{	my $h={ XID => $FullscreenWindow->window->XID};
@@ -2583,23 +2579,12 @@ sub ToggleFullscreenLayout
 	}
 }
 
-sub EditQueue
-{	if ($QueueWindow)
-	{	if ($_[0]{toggle})	{$QueueWindow->close_window}
-		else			{$QueueWindow->present}
-	}
-	else
-	{	$QueueWindow=Layout::Window->new('Queue');
-		$QueueWindow->signal_connect(destroy => sub { $QueueWindow=undef; });
-	}
-}
-
 sub WEditList
 {	my $name=$_[0];
 	my ($window)=grep exists $_->{editing_listname} && $_->{editing_listname} eq $name, Gtk2::Window->list_toplevels;
 	if ($window) { $window->present; return; }
 	$SongList::Common::EditList=$name; #list that will be used by SongList/SongTree in 'editlist' mode
-	$window=Layout::Window->new('EditList',UseDefaultState=>1,KeepSize=>1);
+	$window=Layout::Window->new('EditList', 'pos'=>undef);
 	$SongList::Common::EditList=undef;
 	$window->{editing_listname}=$name;
 	Watch($window, SavedLists => sub	#close window if the list is deleted, update title if renamed
@@ -5069,7 +5054,7 @@ sub PrefAudio
 	if (exists $PlayPacks{Play_GST})
 	{	my $hbox2=NewPrefCombo(gst_sink => Play_GST->supported_sinks, text => _"output device :", sizeg1=>$sg1, sizeg2=> $sg2);
 		my $EQbut=Gtk2::Button->new(_"Open Equalizer");
-		$EQbut->signal_connect(clicked => sub {Layout::Window->new('Equalizer');});
+		$EQbut->signal_connect(clicked => sub { OpenSpecialWindow('Equalizer'); });
 		my $EQcheck=NewPrefCheckButton(gst_use_equalizer => _"Use Equalizer", sub { HasChanged('Equalizer'); });
 		$sg1->add_widget($EQcheck);
 		$sg2->add_widget($EQbut);
@@ -5213,7 +5198,7 @@ sub PrefLayouts
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
 	my $layoutT=NewPrefCombo(LayoutT=> Layout::get_layout_list('T'), text => _"Tray tip window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
-	my $layout =NewPrefCombo(Layout => Layout::get_layout_list('G'), text =>_"Player window layout :", 	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => \&set_layout);
+	my $layout =NewPrefCombo(Layout => Layout::get_layout_list('G'), text =>_"Player window layout :", 	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => sub {CreateMainWindow();}, );
 	my $layoutB=NewPrefCombo(LayoutB=> Layout::get_layout_list('B'), text =>_"Browser window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
 	my $layoutF=NewPrefCombo(LayoutF=> Layout::get_layout_list('F'), text =>_"Full screen layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
 	my $layoutS=NewPrefCombo(LayoutS=> Layout::get_layout_list('S'), text =>_"Search window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
@@ -5229,11 +5214,12 @@ sub PrefLayouts
 	return $vbox;
 }
 
-sub set_layout
-{	my $old=$MainWindow;
-	$old->SaveOptions;
-	$MainWindow=Layout::Window->new( $Options{Layout} );
-	$old->destroy;
+sub CreateMainWindow
+{	my $layout=shift;
+	$layout=$Options{Layout} unless defined $layout;
+	$MainWindow->{quitonclose}=0 if $MainWindow;
+	$MainWindow=Layout::Window->new( $layout, uniqueid=> 'MainWindow', ifexist => 'replace');
+	$MainWindow->{quitonclose}=1;
 }
 
 sub PrefTags
@@ -6013,7 +5999,7 @@ sub PresentWindow
 
 sub PopupLayout
 {	my ($layout,$widget)=@_;
-	return if $widget && Layout::Window::Popup::find_window($widget);
+	return if $widget && $widget->{PoppedUpWindow};
 	my $popup=Layout::Window::Popup->new($layout,$widget);
 }
 
@@ -6078,7 +6064,7 @@ sub TrayMenuPopup
 	{ label=> _"Settings",		code => \&PrefDialog,	stockicon => 'gtk-preferences' },
 	{ label=> _"Quit",		code => \&Quit,		stockicon => 'gtk-quit' },
  );
-	my $traytip=Layout::Window::Popup::find_window($TrayIcon->child,$_[0]);
+	my $traytip=$TrayIcon->child->{PoppedUpWindow};
 	$traytip->DestroyNow if $traytip;
 	$TrayIcon->{NoTrayTip}=1;
 	my $m=PopupContextMenu(\@TrayMenu,{});
@@ -6136,10 +6122,11 @@ sub IsWindowVisible
 	return $visible;
 }
 sub ShowHide
-{	if ( IsWindowVisible($MainWindow) )
+{	my (@windows)=grep $_->isa('Layout::Window') && $_->{showhide} && $_!=$MainWindow, Gtk2::Window->list_toplevels;
+	if ( IsWindowVisible($MainWindow) )
 	{	#hide
 		#warn "hiding\n";
-		for my $win ($MainWindow,$BrowserWindow,$ContextWindow)
+		for my $win ($MainWindow,@windows)
 		{	next unless $win;
 			$win->{saved_position}=join 'x',$win->get_position;
 			$win->iconify;
@@ -6154,7 +6141,7 @@ sub ShowHide
 		my $screen=Gtk2::Gdk::Screen->get_default;
 		my $scrw=$screen->get_width;
 		my $scrh=$screen->get_height;
-		for my $win ($ContextWindow,$BrowserWindow,$MainWindow)
+		for my $win (@windows,$MainWindow)
 		{	next unless $win;
 			my ($x,$y)= $win->{saved_position} ? split('x', delete $win->{saved_position}) : $win->get_position;
 			my ($w,$h)= $win->get_size;
