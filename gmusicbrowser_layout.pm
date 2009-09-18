@@ -2523,7 +2523,6 @@ sub new
 {	my ($class,$boxfunc,$box,$ph,$packoptions)=@_;
 	bless $ph,$class;
 	::weaken( $ph->{boxwidget}=$box );
-	$ph->{SaveOptions}=\&SaveOptions;
 	::Watch($ph, Widgets => \&Widgets_changed_cb);
 	$ph->{packsub}=		$boxfunc->{Pack};
 	$ph->{packoptions}=	$packoptions;
@@ -2542,6 +2541,7 @@ sub Widgets_changed_cb
 	{	my $widget= Layout::NewWidget($ph->{name},$ph->{opt1},$ph->{opt2}, { default_group => $ph->{group} });
 		return unless $widget;
 		$ph->{widget}= $widget;
+		$ph->{SaveOptions}=\&SaveOptions;
 		$ph->{packsub}->($ph->{boxwidget},$widget, $ph->{packoptions});
 		$widget->show_all;
 	}
@@ -2549,7 +2549,13 @@ sub Widgets_changed_cb
 	{	my $widget= delete $ph->{widget};
 		$ph->{opt2}= Layout::SaveWidgetOptions($widget);
 		$ph->{boxwidget}->remove($widget);
+		delete $ph->{SaveOptions};
 	}
+}
+
+sub SaveOptions
+{	my $ph=shift;
+	Layout::SaveWidgetOptions($ph->{widget});
 }
 
 package Layout::Button;
