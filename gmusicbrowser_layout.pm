@@ -1790,7 +1790,8 @@ sub init
 	my $frame=Gtk2::Frame->new;
 	$self->add($frame);
 	$frame->add($child);
-	$frame->set_shadow_type('out');
+	my $shadow= $self->{options}{transparent} ? 'none' : 'out';
+	$frame->set_shadow_type($shadow);
 	$child->set_border_width($self->get_border_width);
 	$self->set_border_width(0);
 		##$self->set_type_hint('tooltip'); #TEST
