@@ -2178,6 +2178,7 @@ sub EndInit
 
 sub newtab
 {	my ($self,$name,$setpage,$opt2)=@_;
+	$self->SaveOptions if $setpage;	#used to save default options of SongTree/SongList before creating a new one
 	my $wtype= $name; $wtype=~s/\d+$//;
 	$wtype= $Layout::Widgets{$wtype} || {};
 	my $wclass= $wtype->{issonglist} ? 'list' : $name=~m/^@/ ? 'page' : 'context';

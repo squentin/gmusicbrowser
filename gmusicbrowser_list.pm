@@ -470,13 +470,22 @@ sub CommonInit
 
 	$Register{ $self->{group} }=$self;
 	::weaken($Register{ $self->{group} });	#or use a destroy cb ?
+
+	$self->{SaveOptions}=\&CommonSave;
 }
 sub CommonSave
 {	my $self=shift;
-	my @opt= ( 'sort' => $self->{'sort'} );
-	push @opt,follow=>1 if $self->{follow};
-	if ($self->{type} eq 'L' && defined(my $n= $self->{array}->GetName)) { push @opt, type=>'L', songarray=> $n; }
-	return @opt;
+	my $opt= $self->SaveOptions;
+	$opt->{'sort'}= $self->{'sort'};
+	$opt->{follow}=1 if $self->{follow};
+
+	#save options as default for new SongTree/SongList of same type
+	my $name= $self->isa('SongTree') ? 'songtree_' : 'songlist_';
+	$name= $name.$self->{name}; $name=~s/\d+$//;
+	$::Options{"DefaultOptions_$name"}={%$opt};
+
+	if ($self->{type} eq 'L' && defined(my $n= $self->{array}->GetName)) { $opt->{type}='L'; $opt->{songarray}=$n; }
+	return $opt;
 }
 
 sub Sort
@@ -732,7 +741,11 @@ sub new
 	$self->set_policy('automatic','automatic');
 	::set_biscrolling($self);
 
-	%$opt=( @DefaultOptions, %$opt );
+	#use default options for this songlist type
+	my $name= 'songlist_'.$opt->{name}; $name=~s/\d+$//;
+	my $default= $::Options{"DefaultOptions_$name"} || {};
+
+	%$opt=( @DefaultOptions, %$default, %$opt );
 	$self->CommonInit($opt);
 	$self->{$_}=$opt->{$_} for qw/songypad playrow/;
 
@@ -782,7 +795,6 @@ sub new
 	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
 	::Watch($self,	SongsChanged	=> \&SongsChanged_cb);
 	::Watch($self,	CurSong		=> \&CurSongChanged);
-	$self->{SaveOptions}=\&SaveOptions;
 	$self->{DefaultFocus}=$tv;
 
 	return $self;
@@ -790,7 +802,7 @@ sub new
 
 sub SaveOptions
 {	my $self=shift;
-	my %opt= ( $self->CommonSave );
+	my %opt;
 	my $tv=$self->child;
 	#save displayed cols
 	$opt{cols}=join ' ',(map $_->{colid},$tv->get_columns);
@@ -4810,7 +4822,11 @@ sub new
 	#$self->set_shadow_type('etched-in');
 	#my $frame=Gtk2::Frame->new;# $frame->set_shadow_type('etched-in');
 
-	%$opt=( @DefaultOptions, %$opt );
+	#use default options for this songlist type
+	my $name= 'songtree_'.$opt->{name}; $name=~s/\d+$//;
+	my $default= $::Options{"DefaultOptions_$name"} || {};
+
+	%$opt=( @DefaultOptions, %$default, %$opt );
 	$self->{$_}=$opt->{$_} for qw/headclick songxpad songypad no_typeahead grouping/;
 
 	#create widgets used to draw the songtree as a treeview, would be nice to do without but it's not possible currently
@@ -4881,7 +4897,6 @@ sub new
 
 	$self->AddColumn($_) for split / +/,$opt->{cols};
 	unless ($self->{cells}) { $self->AddColumn('title'); } #to ensure there is at least 1 column
-	$self->{SaveOptions}=\&SaveOptions;
 
 	$self->{selected}='';
 	$self->{lastclick}=$self->{startgrow}=-1;
@@ -4896,7 +4911,7 @@ sub destroy_cb
 
 sub SaveOptions
 {	my $self=shift;
-	my %opt=( $self->CommonSave, $self->{isearchbox}->SaveOptions );
+	my %opt=( $self->{isearchbox}->SaveOptions );
 	$opt{$_}=$self->{$_} for qw/grouping/;
 	$opt{cols}=	join ' ', map $_->{colid}, @{$self->{cells}};
 	#save cols width
