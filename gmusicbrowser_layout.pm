@@ -2952,6 +2952,7 @@ use base 'Gtk2::EventBox';
 sub new
 {	my ($class,$opt)=@_;
 	my $self = bless Gtk2::EventBox->new, $class;
+	$self->set_visible_window(0);
 	#$minsize||=$ref->{size};
 	$self->{aa}=$opt->{aa};
 	my $minsize=$opt->{minsize};
@@ -3044,8 +3045,7 @@ sub size_allocate_cb
 
 sub expose_cb
 {	my ($self,$event)=@_;
-	my ($x,$y)=(0,0);
-	my ($ww,$wh)=$self->window->get_size;
+	my ($x,$y,$ww,$wh)=$self->allocation->values;
 	my $pixbuf= $self->{pixbuf};
 	return 1 unless $pixbuf;
 	my $multiple= @$pixbuf>1 ? $self->{multiple} : undef;
