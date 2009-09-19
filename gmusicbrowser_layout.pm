@@ -416,7 +416,7 @@ our %Widgets=
 		issonglist=>1,
 	},
 	EditList =>
-	{	New 	=> sub { $_[0]{type}='L'; SongList->new($_[0]); },
+	{	New 	=> sub { $_[0]{type}='L'; SongList::Common->new($_[0]); },
 		tabtitle=> \&SongList::Common::MakeTitleLabel,
 		tabrename=>\&SongList::Common::RenameTitleLabel,
 		tabicon	=> 'gmb-list',
