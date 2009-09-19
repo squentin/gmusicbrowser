@@ -549,3 +549,7 @@ Title		= Equalizer
 VBmain		= _ProgressV(lastclose=1)
 Title		= Progress
 
+[Karaoke]
+Type= K
+VBmain= PluginKaraoke
+Window= pos=50%x100%,size=80%x1,insensitive=1,nodecoration=1,ontop=1
