@@ -1681,8 +1681,8 @@ sub Position
 	$y= $monitorheight-$y if $y<0;
 	$x-= $xalign*$w/100;
 	$y-= $yalign*$h/100;
-	$x=0 if $x<0; $x=$monitorwidth if $x>$monitorwidth;
-	$y=0 if $y<0; $y=$monitorheight if $y>$monitorheight;
+	$x=0 if $x<0; $x=$monitorwidth -$w if $x+$w>$monitorwidth;
+	$y=0 if $y<0; $y=$monitorheight-$h if $y+$h>$monitorheight;
 	$x+=$xmin;
 	$y+=$ymin;
 	return $x,$y;
@@ -1807,6 +1807,7 @@ sub Position
 	if ( my $widget= delete $self->{options}{popped_from})
 	{	return ::windowpos($self,$widget);
 	}
+	$self->SUPER::Position;
 }
 
 sub Popup
