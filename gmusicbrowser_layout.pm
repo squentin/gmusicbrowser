@@ -2247,7 +2247,8 @@ sub close_tab
 	delete $self->{widgets}{$name};
 	if ($manual && $self->{match} && $Layout::Widgets{$name} && $Layout::Widgets{$name}{autoadd_type}) { $self->{blacklist}{$name}=undef }
 	my $opt=$self->{widgets_opt};
-	%$opt= ( %$opt, $name => Layout::SaveWidgetOptions($page) );
+	my $pageopt= Layout::SaveWidgetOptions($page);
+	%$opt= ( %$opt, %$pageopt );
 	$self->remove($page);
 	$self->insert_default_page unless $self->get_children;
 }
