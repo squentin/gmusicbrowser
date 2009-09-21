@@ -1628,8 +1628,8 @@ sub SetWindowOptions
 	$self->{hidden}={ $opt->{hidden}=~m/(\w+)(?::?(\d+x\d+))?/g } if $opt->{hidden};
 
 	$self->set_border_width($self->{options}{borderwidth});
-	$self->set_gravity($layouthash->{gravity}) if $layouthash->{gravity};
-	my $title=$layouthash->{Title} || _"%S by %a";
+	$self->set_gravity($opt->{gravity}) if $opt->{gravity};
+	my $title= $layouthash->{Title} || $opt->{title} || _"%S by %a";
 	$title=~s/^"(.*)"$/$1/;
 	if (my @l=::UsedFields($title))
 	{	$self->{TitleString}=$title;
