@@ -2754,6 +2754,8 @@ sub new
 	if ($opt->{text})
 	{	$self->{text}=$opt->{text};
 		$self->set_ellipsize( $opt->{ellipsize}||'end' );
+		my $font= $opt->{font} || $opt->{DefaultFont};
+		$self->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 	}
 	$self->{left}=$self->{right}=0;
 	$self->{max}= $ref->{max} || 1;
