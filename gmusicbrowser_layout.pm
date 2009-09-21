@@ -953,7 +953,7 @@ sub NewWidget
 		$widget->set_size_request($minwidth,$minheight);
 	}
 
-	$widget->{actions}{$_}=$options{$_}  for grep m/^click\d+/, keys %options;
+	$widget->{actions}{$_}=$options{$_}  for grep m/^click\d*/, keys %options;
 	$widget->signal_connect(button_press_event => \&Button_press_cb) if $widget->{actions};
 	if ($widget->isa('Gtk2::Button') and $options{activate})
 	{	$widget->{actions}{activate}=$options{activate};
@@ -1033,7 +1033,7 @@ sub Button_press_cb
 	my $key='click'.$::LEvent->button;
 	my $sub=$actions->{$key};
 	return 0 if !$sub && $actions->{activate};
-	$sub||=$actions->{click1};
+	$sub||= $actions->{click} || $actions->{click1};
 	return 0 unless $sub;
 	if (ref $sub)	{&$sub}
 	else		{ ::run_command($self,$sub) }
@@ -2587,7 +2587,11 @@ sub new
 		}
 	}
 	elsif ($stock)
-	{	$self=bless Gtk2::EventBox->new, $class unless $isbutton;
+	{	unless ($isbutton)
+		{	$self=bless Gtk2::EventBox->new, $class; #ugly but simple solution
+			my $activate=delete $opt->{activate};
+			$opt->{click} ||= $activate;
+		}
 		$self->{stock}=$stock;
 		$self->{state}=$ref->{state} if $ref->{state};
 		$self->{size}= $opt->{size};
