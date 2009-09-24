@@ -2655,6 +2655,10 @@ sub new
 #$self->signal_connect(enter_notify_event => sub {$_[0]->set_markup('<u>'.$_[0]->child->get_label.'</u>')});
 #$self->signal_connect(leave_notify_event => sub {my $m=$_[0]->child->get_label; $m=~s#^<u>##;$m=~s#</u>$##; $_[0]->set_markup($m)});
 	my $minsize= $opt->{minsize};
+	if (my $el=$opt->{ellipsize})
+	{	$label->set_ellipsize($el);
+		$minsize=undef;
+	}
 	if ($minsize && $minsize=~m/^\d+p?$/)
 	{	unless ($minsize=~s/p$//)
 		{	my $lay=$label->create_pango_layout( 'X' x $minsize );
