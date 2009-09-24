@@ -86,7 +86,6 @@ sub new
 	$sw->set_policy('automatic','automatic');
 	$sw->add($textview);
 	my $toolbar=Gtk2::Toolbar->new;
-	$toolbar->signal_connect("popup-context-menu" => sub {warn "@_" });
 	for my $aref
 	(	[backb => 'gtk-go-back',\&Back_cb,	_"Previous page"],
 		[saveb => 'gtk-save',	\&Save_text,	_"Save",	_"Save lyrics"],
