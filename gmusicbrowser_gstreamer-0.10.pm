@@ -319,11 +319,9 @@ sub remove_visuals
 	$visual_window=$VSink=undef;
 }
 sub set_visual
-{	my $visual= shift || $::Options{gst_visual};
+{	my $visual= shift || $::Options{gst_visual} || '';
 	my @l=list_visuals();
 	return unless @l;
-	$visual=undef if $visual && !(grep $_ eq $visual, @l);
-	$visual||=$l[0];
 	if ($visual eq '+') #choose next visual in the list
 	{	$visual=$::Options{gst_visual} || $l[0];
 		my $i=0;
@@ -334,6 +332,10 @@ sub set_visual
 		$i++; $i=0 if $i>$#l;
 		$visual=$l[$i];
 	}
+	elsif (!(grep $_ eq $visual, @l)) # if visual not found in list
+	{	$visual=undef;
+	}
+	$visual||=$l[0];
 	warn "visual=$visual\n" if $::debug;
 	$::Options{gst_visual}=$visual;
 	$visual=GStreamer::ElementFactory->make($visual => 'visual');
