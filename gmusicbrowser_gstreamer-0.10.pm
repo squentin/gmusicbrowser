@@ -109,6 +109,7 @@ sub createPlayBin
 {	if ($PlayBin) { $PlayBin->get_bus->remove_signal_watch; }
 	my $pb= $::Options{gst_gapless} ? 'playbin2' : 'playbin';
 	$PlayBin=GStreamer::ElementFactory->make($pb => 'playbin'); #FIXME only the first one used works
+	$PlayBin->set('flags' => [qw/audio soft-volume/]) if $::Options{gst_gapless};
 	my $bus=$PlayBin->get_bus;
 	$bus->add_signal_watch;
 #	$bus->signal_connect('message' => \&bus_message);
@@ -323,6 +324,7 @@ sub create_visuals
 		$VSink->set_xwindow_id($visual_window->window->XID);
 	}
 	$PlayBin->set('video-sink' => $VSink) if $PlayBin;
+	$PlayBin->set('flags' => [qw/audio vis soft-volume/]) if $PlayBin && $::Options{gst_gapless};
 	set_visual();
 }
 sub add_visuals
@@ -338,6 +340,7 @@ sub add_visuals
 }
 sub remove_visuals
 {	$VSink->set_xwindow_id(0) if $VSink;
+	$PlayBin->set('flags' => [qw/audio soft-volume/]) if $PlayBin && $::Options{gst_gapless};
 	$PlayBin->set('video-sink' => undef) if $PlayBin;
 	$PlayBin->set('vis-plugin' => undef) if $PlayBin;
 	$visual_window=$VSink=undef;
