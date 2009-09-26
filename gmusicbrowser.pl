@@ -1901,9 +1901,10 @@ sub Play
 	$StartTime=time;
 	$PlayingID=$SongID;
 	$Play_package->Play( Songs::GetFullFilename($SongID), $sec);
+	my $wasplaying=$TogPlay;
 	$TogPlay=1;
 	UpdateTime(0);
-	HasChanged('Playing');
+	HasChanged('Playing') unless $wasplaying;
 }
 
 sub ErrorPlay
