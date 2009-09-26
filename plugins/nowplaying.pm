@@ -33,19 +33,44 @@ my $handle;
 
 sub Start
 {	$handle={};	#the handle to the Watch function must be a hash ref, if it is a Gtk2::Widget, UnWatch will be called when the widget is destroyed
-	::Watch($handle,'PlayingSong',\&Changed);
+	::Watch($handle, PlayingSong	=> \&Changed);
+	::Watch($handle, Playing	=> \&PlayStop);
 }
 sub Stop
 {	::UnWatch($handle,'PlayingSong');
+	::UnWatch($handle,'Playing');
 }
 
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $entry=::NewPrefEntry(OPT.'CMD',_"command :");
+	my $sg1=Gtk2::SizeGroup->new('horizontal');
+	my $entry=::NewPrefEntry(OPT.'CMD',_"Command when playing song changed :",	expand=>1,sizeg1=>$sg1);
+	my $entry2=::NewPrefEntry(OPT.'StoppedCMD',_"Command when stopped :",		expand=>1,sizeg1=>$sg1);
+	my $preview= Label::Preview->new(\&command_preview, 'CurSong Option',undef,1);
 	my $check=::NewPrefCheckButton(OPT.'SENDSTDINPUT',_"Send Title/Artist/Album in standard input");
 	my $replacetable=::MakeReplaceTable('talydnfc');
-	$vbox->pack_start($_,::FALSE,::FALSE,2) for $replacetable,$entry,$check;
+	$vbox->pack_start($_,::FALSE,::FALSE,2) for $replacetable,$entry,$preview,$entry2,$check;
 	return $vbox;
+}
+
+sub command_preview
+{	my $ID=$::SongID;
+	my $cmd= $::Options{OPT.'CMD'};
+	return '' unless defined $ID && defined $cmd;
+	my @cmd= ::split_with_quotes($cmd);
+	return '' unless @cmd;
+	$_= ::PangoEsc( ::ReplaceFields($ID,$_) ) for @cmd;
+	splice @cmd,$_,0, "\n".'<i>' . ::PangoEsc(::__x(_"argument {n} :",n=>$_)) . '</i>'   for reverse 1..$#cmd;
+	unshift @cmd, '<i>' . ::PangoEsc(_"command :") . '</i>';
+	my $t= join(' ',@cmd);
+	return '<small>'.$t.'</small>';
+}
+
+sub PlayStop
+{	return if defined $::TogPlay;	#TogPlay is undef when Stopped, 0 when Paused, 1 when Playing
+	my $cmd=$::Options{OPT.'StoppedCMD'};
+	return unless $cmd;
+	::forksystem(::split_with_quotes($cmd));
 }
 
 sub Changed

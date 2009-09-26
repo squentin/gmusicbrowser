@@ -5619,14 +5619,14 @@ sub NewPrefCheckButton
 }
 sub NewPrefEntry
 {	my ($key,$text,%opt)=@_;
-	my ($cb,$sg1,$sg2,$tip,$hide)=@opt{qw/cb sizeg1 sizeg2 tip hide/};
+	my ($cb,$sg1,$sg2,$tip,$hide,$expand)=@opt{qw/cb sizeg1 sizeg2 tip hide expand/};
 	my $widget=my $entry=Gtk2::Entry->new;
 	if (defined $text)
 	{	$widget=Gtk2::HBox->new;
 		my $label=Gtk2::Label->new($text);
 		$label->set_alignment(0,.5);
 		$widget->pack_start($label,FALSE,FALSE,2);
-		$widget->pack_start($entry,0,FALSE,2);
+		$widget->pack_start($entry,$expand,$expand,2);
 		$sg1->add_widget($label) if $sg1;
 	}
 	$sg2->add_widget($entry) if $sg2;
