@@ -554,7 +554,7 @@ our %Widgets=
 		dragdest=> [::DRAG_FILTER,sub { ::SetFilter($_[0],$_[2]);}],
 	},
 	Visuals		=>
-	{	New	=> sub {my $darea=Gtk2::DrawingArea->new; $darea->set_size_request(200,50); return $darea unless $::Packs{Play_GST} && $::Packs{Play_GST}{visuals}; Play_GST::add_visuals($darea); my $eb=Gtk2::EventBox->new; $eb->add($darea); return $eb},
+	{	New	=> sub {my $darea=Gtk2::DrawingArea->new; $darea->set_size_request(200,50); return $darea unless $::PlayPacks{Play_GST} && $::PlayPacks{Play_GST}{visuals}; Play_GST::add_visuals($darea); my $eb=Gtk2::EventBox->new; $eb->add($darea); return $eb},
 		click1	=> sub {Play_GST::set_visual('+');}, #select next visual
 		click2	=> \&ToggleFullscreen, #FIXME use a fullscreen layout instead,
 		click3	=> \&VisualsMenu,
