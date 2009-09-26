@@ -1572,7 +1572,7 @@ sub ListGroupTypes
 		my $name=FieldName($field);
 		my $types=LookupCode($field,'subtypes_menu');
 		if ($types)
-		{	$val=[map( ("$field.$_"=> "$name ($types->{$_})"), keys %$types)];
+		{	$val=[map( (qq($field.$_) => "$name ($types->{$_})"), keys %$types)];
 		}
 		push @ret, $val,$name;
 	}
