@@ -41,9 +41,16 @@ sub CurrentSong
 {	my $self=$_[0];
 	return {} unless defined $::SongID;
 	my %h;
-	$h{$_}=Songs::Get($::SongID,$_) for qw/title album artist length track disc/;
+	$h{$_}=Songs::Get($::SongID,$_) for qw/title album artist length track disc album_artist file path uri album_picture/;
 	#warn "$h{title}\n";
 	return \%h;
+}
+dbus_method('CurrentSongFields', [['array', 'string']], [['array', 'string']]);
+sub CurrentSongFields
+{	my ($self,$fields)=@_;
+	return [] unless defined $::SongID;
+	my @ret= Songs::Get($::SongID,@$fields);
+	return \@ret;
 }
 
 dbus_method('GetPosition', [], ['double']);
