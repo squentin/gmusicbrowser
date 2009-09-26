@@ -11,7 +11,7 @@ Packager: Quentin Sculo <squentin@free.fr>
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch: noarch
 Requires: perl >= 5.8, gtk2 >= 2.6.0, perl-Gtk2, perl-Gtk2-TrayIcon, perl(Locale::gettext) >= 1.04, perl-GStreamer
-Requires(hint): mpg123, vorbis-tools, alsa-utils, perl-Gtk2-WebKit, perl-Gtk2-MozEmbed, perl-Net-DBus, gstreamer0.10-lame, gstreamer0.10-plugins-ugly, gstreamer0.10-plugins-bad, perl-Digest-CRC, perl-Cairo
+Requires(hint): mpg123, vorbis-tools, alsa-utils, perl-Gtk2-WebKit, perl-Gtk2-MozEmbed, perl-Net-DBus, gstreamer0.10-lame, gstreamer0.10-plugins-ugly, gstreamer0.10-plugins-bad, perl-Digest-CRC, perl-Cairo, perl-Gnome2-Wnck, perl-GStreamer-Interfaces, perl-Gtk2-Notify
 AutoReq: no
 AutoProv: no
 
