@@ -702,11 +702,12 @@ sub ParseLayout
 	}
 	else {return}
 	for (@$lines)
-	{	s#_\"([^"]+)"#'"'._($1).'"'#ge;	#translation, escaping the " so it is not picked up as a translatable string
+	{	s#_\"([^"]+)"#my $tr=$1; $tr=~y/"/'/; qq/"$tr"/#ge;	#translation, escaping the " so it is not picked up as a translatable string. Replace any " in translations because they would cause trouble
 		next unless m/^(\w+)\s*=\s*(.*)$/;
 		if ($2 eq '') {delete $Layouts{$name}{$1};next}
 		$Layouts{$name}{$1}= $2;
 	}
+	$Layouts{$name}{Name}=~s/^"(.*)"$/$1/ if $Layouts{$name}{Name};	#remove quotes from layout name
 }
 
 sub ParseSongTreeSkin

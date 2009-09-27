@@ -18,6 +18,7 @@ while (my $file=shift @files)
  warn "reading $file\n" if $verbose;
  open my$fh,$file  or die $!;
  $file=~s#^$path/##;
+ my ($layout_id,$layout_loc);
  while (<$fh>)
  {	if (!$version && m/VERSION *=> '([0-9]\.[0-9]+)'/) {$version=$1}
 
@@ -37,11 +38,17 @@ while (my $file=shift @files)
 			$msgid{$_}.=" $file:$.";
 		}
 	}
-	if ($file eq 'layouts')
-	{	if (m/^\[([^]]+)\]/)		{ $msgid{$1}.=" $file:$."; }
+	if ($file eq 'layouts') #id of layouts is used as default layout name => may need translation
+	{	if (m/^\[([^]]+)\]/)
+		{	$msgid{ $layout_id }.= $layout_loc if defined $layout_id;
+			$layout_id=$1;
+			$layout_loc=" $file:$.";
+		}
+		elsif (m/^\s*Name\s*=/) { $layout_id=undef } #layout has a name => no need to translate the id
 	}
  }
  close $fh;
+ $msgid{ $layout_id }.= $layout_loc if defined $layout_id; #for last layout
 }
 
 $version||="VERSION";
