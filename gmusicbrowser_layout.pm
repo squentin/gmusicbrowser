@@ -2356,8 +2356,8 @@ sub make_widget_list
 {	my ($self,$match,@names)=@_;
 	$match ||= $self->{match};
 	return unless $match;
-	my @match=	$match=~m/(?<!-)(\w+)/g;	#words not preceded by -
-	my @matchnot=	$match=~m/-(\w+)/g;		#words preceded by -
+	my @match=	$match=~m/(?<!-)\b(\w+)\b/g;	#words not preceded by -
+	my @matchnot=	$match=~m/-(\w+)\b/g;		#words preceded by -
 	my $wdef=\%Layout::Widgets;
 	@names= @names?  grep $wdef->{$_}, @names : keys %$wdef;
 	@names=grep $wdef->{$_}{autoadd_type}, @names;
@@ -2383,8 +2383,8 @@ sub Widgets_changed_cb		#new or removed widgets => check if a widget should be a
 		{	next unless $autoadd;
 			#every words in $match must be in $autoadd, except for words starting with - that must not
 			my %h; $h{$_}=1 for split / +/,$autoadd;
-			next if grep !$h{$_}, $match=~m/(?<!-)(\w+)/g;
-			next if grep  $h{$_}, $match=~m/-(\w+)/g;
+			next if grep !$h{$_}, $match=~m/(?<!-)\b(\w+)\b/g;
+			next if grep  $h{$_}, $match=~m/-(\w+)\b/g;
 		}
 		if (my $opt=$ref->{autoadd_option}) { $add=$::Options{$opt} }
 		my @already= grep $name eq $_->{name}, $self->get_children;
@@ -2510,8 +2510,8 @@ sub Widgets_changed_cb		#new or removed widgets => check if a widget should be a
 		{	next unless $autoadd;
 			#every words in $match must be in $autoadd, except for words starting with - that must not
 			my %h; $h{$_}=1 for split / +/,$autoadd;
-			next if grep !$h{$_}, $match=~m/(?<!-)(\w+)/g;
-			next if grep  $h{$_}, $match=~m/-(\w+)/g;
+			next if grep !$h{$_}, $match=~m/(?<!-)\b(\w+)\b/g;
+			next if grep  $h{$_}, $match=~m/-(\w+)\b/g;
 		}
 		if (my $opt=$ref->{autoadd_option}) { $add=$::Options{$opt} }
 		if ($add)
