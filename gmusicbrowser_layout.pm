@@ -2105,14 +2105,21 @@ our @contextmenu=
 	{ label => _"Close",	code => sub { $_[0]{self}->close_tab($_[0]{page},1); },	istrue => 'close',	stockicon=> 'gtk-close',},
 );
 
+our @DefaultOptions=
+(	closebuttons	=> 1,
+	tablist		=> 1,
+);
+
 sub new
 {	my ($class,$opt)=@_;
 	my $self= bless Gtk2::Notebook->new, $class;
+	%$opt=( @DefaultOptions, %$opt );
 	$self->set_scrollable(1);
 	$self->set_tab_hborder(0);
 	$self->set_tab_vborder(0);
+	$self->set_tab_pos($opt->{tabpos}) if $opt->{tabpos};
 	$opt->{typesubmenu}='LPC' unless exists $opt->{typesubmenu};
-	$self->{$_}=$opt->{$_} for qw/group default_child match pages page typesubmenu/;
+	$self->{$_}=$opt->{$_} for qw/group default_child match pages page typesubmenu closebuttons tablist/;
 	for my $class (qw/list context page/)	# option begining with list_ / context_ / page_ will be passed to children of this class
 	{	my @opt1;
 		if (my $optkeys=$opt->{'options_for_'.$class})	#no need for a prefix for these options
@@ -2216,7 +2223,7 @@ sub Pack
 	my $icon= $wg->{tabicon};
 	$icon=Gtk2::Image->new_from_stock($icon,'menu') if defined $icon;
 	my $close;
-	if ($wg->{tabcanclose})
+	if ($wg->{tabcanclose} && $self->{closebuttons})
 	{	$close=Gtk2::Button->new;
 		$close->set_relief('none');
 		$close->can_focus(0);
@@ -2276,7 +2283,7 @@ sub button_press_event_cb
 		'close'=> $page->{tabcanclose}, 'rename' => $page->{tabrename},
 	);
 	push @menu, @contextmenu;
-	if (1 && !$self->{chooser_mode})
+	if ($self->{tablist} && !$self->{chooser_mode})
 	{	push @menu, { separator=>1 };
 		for my $page ($self->get_children)	#append page list to menu
 		{	my $label= $page->{tab_page_label} ? $page->{tab_page_label}->get_text : $page->{tabtitle};
