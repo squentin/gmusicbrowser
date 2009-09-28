@@ -291,7 +291,8 @@ sub set_equalizer
 	::setlocale(::LC_NUMERIC, '');
 }
 sub EQ_Get_Range
-{	my ($min,$max)=(-1,1);
+{	createPlayBin() unless $PlayBin;
+	my ($min,$max)=(-1,1);
 	{	my $equalizer=$PlayBin->get_by_name('equalizer')
 		 || GStreamer::ElementFactory->make('equalizer-10bands' => 'equalizer');
 		last unless $equalizer;
@@ -305,6 +306,7 @@ sub EQ_Get_Range
 }
 sub EQ_Get_Hz
 {	my $i=$_[1];
+	createPlayBin() unless $PlayBin;
 	my $equalizer=$PlayBin->get_by_name('equalizer')
 	 || GStreamer::ElementFactory->make('equalizer-10bands' => 'equalizer');
 	return undef unless $equalizer;
