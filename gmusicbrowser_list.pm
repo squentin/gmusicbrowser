@@ -1139,6 +1139,7 @@ sub SongArray_changed_cb
 	elsif ($action eq 'remove')
 	{	my $rows=$extra[0];
 		$store->rowremove($rows);
+		$self->ResetModel if @$array==0; #don't know why, but when the list is not empty and adding/removing columns that result in a different row height; after removing all the rows, and then inserting a row, the row height is reset to the previous height. Doing a reset model when the list is empty solves this. 
 	}
 	elsif ($action eq 'mode') {} #the list itself hasn't changed
 	else #'replace' or unknown action
