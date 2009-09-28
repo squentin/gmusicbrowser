@@ -45,8 +45,11 @@ sub CurrentSong
 			'length'=> ::SONG_LENGTH,
 			track	=> ::SONG_TRACK,
 			disc	=> ::SONG_DISC,
+			path	=> ::SONG_PATH,
+			file	=> ::SONG_FILE,
 		);
 	$_=$::Songs[$::SongID][$_] for values %h;
+	$h{album_picture}= $::Album{ $h{album} }[::AAPIXLIST] || '';
 	#warn "$h{title}\n";
 	return \%h;
 }
