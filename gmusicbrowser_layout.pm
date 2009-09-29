@@ -1531,7 +1531,7 @@ sub new
 	if (my $skin=$Layout::Layouts{$layout}{Skin}) { $self->set_background_skin($skin) }
 	$self->init;
 	::HasChanged('HiddenWidgets');
-	#$self->set_opacity($self->{opacity}) if exists $self->{opacity} && $self->{opacity}!=1;
+	$self->set_opacity($self->{opacity}) if exists $self->{opacity} && $self->{opacity}!=1;
 	return $self;
 }
 
@@ -1625,7 +1625,7 @@ sub SetWindowOptions
 	$self->set_decorated(0)  if $opt->{nodecoration};
 	$self->set_skip_pager_hint(1) if $opt->{skippager};
 	$self->set_skip_taskbar_hint(1) if $opt->{skiptaskbar};
-	#$self->{opacity}=$opt->{opacity} if defined $opt->{opacity};
+	$self->{opacity}=$opt->{opacity} if defined $opt->{opacity};
 	$self->{hidden}={ $opt->{hidden}=~m/(\w+)(?::?(\d+x\d+))?/g } if $opt->{hidden};
 
 	$self->set_border_width($self->{options}{borderwidth});
@@ -1779,7 +1779,6 @@ sub new
 	}
 	else	{ $self->set_position('mouse'); }
 	$self->show;
-	#$self->set_opacity($self->{opacity}) if exists $self->{opacity} && $self->{opacity}!=1;
 
 	return $self;
 }
