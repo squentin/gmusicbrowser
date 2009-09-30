@@ -161,7 +161,8 @@ sub DBus_mainloop_hack
 		for my $fd (keys %{$reactor->{fds}{$type2}})
 		{	#warn "$fd $type2";
 			Glib::IO->add_watch($fd,$type1,
-			sub{	$reactor->{fds}{$type2}{$fd}{callback}->invoke;
+			sub{	my $cb=$reactor->{fds}{$type2}{$fd}{callback};
+				$cb->invoke if $cb;
 				$_->invoke for $reactor->_dispatch_hook;
 				1;
 			   }) if $reactor->{fds}{$type2}{$fd}{enabled};
