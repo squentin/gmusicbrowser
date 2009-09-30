@@ -92,7 +92,7 @@ sub window_changed
 {	my $screen=shift;
 	my $active=$screen->get_active_window;
 	return if !$active && $ActiveWindow && $ActiveWindow->is_visible_on_workspace($screen->get_active_workspace);
-	if ($ActiveWindow)
+	if ($ActiveWindow && $ActiveWindow->{handle})
 	{	$ActiveWindow->signal_handler_disconnect( $ActiveWindow->{handle} );
 	}
 	$ActiveWindow=$active;
