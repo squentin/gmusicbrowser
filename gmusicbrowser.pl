@@ -1595,6 +1595,8 @@ sub ReadSavedTags	#load tags _and_ settings
 		$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2  #DELME in v1.1.3/4
 		if ($oldversion<1.1003) { delete $Options{$_} for grep m/^Layout(?:LastSeen)?_/, keys %Options }	#for version <1.1.2  #DELME in v1.1.3/4
 		if ($oldversion<1.1003) { $Options{WindowSizes}{$_}= join 'x',split / /,delete $Options{"WS$_"} for map m/^WS(.*)/, keys %Options; }	#for version <1.1.2  #DELME in v1.1.3/4
+		if ($oldversion<0.1004) {delete $Options{$_} for qw/Diacritic_sort/;} #cleanup old options
+
 
 		Post_Options_init();
 
@@ -5342,8 +5344,6 @@ sub PrefMisc
 	#xdg-screensaver
 	my $screensaver=NewPrefCheckButton(StopScreensaver => _"Disable screensaver when fullscreen and playing",undef,_"requires xdg-screensaver");
 	$screensaver->set_sensitive(0) unless findcmd('xdg-screensaver');
-	#Diacritic_sort
-	my $diasort=NewPrefCheckButton(Diacritic_sort => _"Diacritic sort",undef,_"Makes case insensitive sort puts accented letters right after their unaccented version.\n(Significantly slower)");
 	#shutdown
 	my $shutentry=NewPrefEntry(Shutdown_cmd => _"Shutdown command :", tip => _"Command used when\n'turn off computer when queue empty'\nis selected");
 	#artist splitting
@@ -5377,7 +5377,7 @@ sub PrefMisc
 	my $datebox= Hpack(0,$datealign,$preview);
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$diasort,$asplit,$datebox,$screensaver,$shutentry;
+	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry;
 	return $vbox;
 }
 
