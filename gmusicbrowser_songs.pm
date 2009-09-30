@@ -1689,6 +1689,19 @@ sub Depends
 	return keys %h;
 }
 
+sub CopyFields			#copy values from one song to another
+{	my ($srcfile,$dstfile,@fields)=@_;
+	my $IDsrc=FindID($srcfile);
+	my $IDdst=FindID($dstfile);
+	unless (defined $IDsrc) { warn "CopyFields : can't find $srcfile in the library\n";return 1 }
+	unless (defined $IDdst) { warn "CopyFields : can't find $dstfile in the library\n";return 2 }
+	#FIXME could check fields
+	warn "Copying fields '@fields' from '$srcfile' to '$dstfile'\n" if $::debug;
+	my @vals=Get($IDsrc,@fields);
+	Set($IDdst, map { $fields[$_]=>$vals[$_] } 0..$#fields);
+	return 0;
+
+}
 sub GetTagValue #rename ?
 {	my ($ID,$field)=@_;
 	warn "GetTagValue : $ID,$field\n" if $::debug;

@@ -104,6 +104,16 @@ sub GetAlbumCoverData
 	return [map ord,split //, $data];
 }
 
+dbus_method(CopyFields => [['array', 'string']], ['bool']);
+#copy fields from one song to another
+#1st arg : filename of ID of source, 2nd arg filename or ID of dest, both must be in the library,
+#following args are list of fields, example : added, lastplay, playcount, lastskip, skipcount, rating, label
+sub CopyFields
+{	my ($self,$array)=@_;
+	#my ($file1,$file2,@fields)=@$array;
+	Songs::CopyFields(@$array);	#returns true on error
+}
+
 dbus_signal(SongFieldsChanged => ['uint32']);
 sub SongFieldsChanged
 {	$_[0]->emit_signal(SongFieldsChanged => $::SongID);
