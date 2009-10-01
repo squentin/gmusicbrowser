@@ -198,7 +198,7 @@ our %Widgets=
 		state	=> sub { ::GetMute() ? 'm' : ::GetVol() },
 		stock	=> sub { 'gmb-vol'.( $_[0] eq 'm' ? 'm' : int(($_[0]-1)/100*$::NBVolIcons) );  },
 		tip	=> sub { _("Volume : ").::GetVol().'%' },
-		click1 => sub { ::PopupLayout('Volume'); },
+		click1 => sub { ::PopupLayout('Volume',$_[0]); },
 		click3	=> sub { ::ChangeVol('mute') },
 		event	=> 'Vol',
 	},
