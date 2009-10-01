@@ -26,7 +26,7 @@ my $notify;
 my $lasttime;
 
 sub Start
-{	$notify=Gtk2::Notify->new('');
+{	$notify=Gtk2::Notify->new('empty','empty');
 	#$notify->set_urgency('low');
 	#$notify->set_category('music'); #is there a standard category for that ?
 	set_actions();
