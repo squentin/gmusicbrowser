@@ -1,0 +1,63 @@
+gmusicbrowser (1.0.1) intrepid; urgency=low
+
+  * new version
+
+ -- Quentin Sculo <squentin@free.fr>  Mon, 24 Nov 2008 01:13:00 +0200
+
+gmusicbrowser (1.0) hardy; urgency=low
+
+  * new version
+
+ -- Quentin Sculo <squentin@free.fr>  Sat, 26 Jun 2008 17:07:00 +0200
+
+gmusicbrowser (0.964) hardy; urgency=low
+
+  * new version
+
+ -- Quentin Sculo <squentin@free.fr>  Fri, 02 May 2008 15:39:00 +0200
+
+gmusicbrowser (0.963) gutsy; urgency=low
+
+  * new version
+  * lots of changes
+
+ -- Quentin Sculo <squentin@free.fr>  Sun, 02 Mar 2008 17:33:20 +0200
+
+gmusicbrowser (0.962) gutsy; urgency=low
+
+  * new version
+  * set maintainer to Quentin Sculo
+  * moved libgtk2-trayicon-perl from Suggests to Depends
+
+ -- Quentin Sculo <squentin@free.fr>  Sun, 28 Oct 2007 02:00:00 +0200
+
+gmusicbrowser (0.958-0ubuntu1) gutsy; urgency=low
+
+  * Packaged for Ubuntu based on upstream's debian dir (Fixes LP #120213)
+  * debian/control:
+    - Add build-depends on debhelper and imagemagick
+    - Add standards-version
+    - Set maintainer to Ubuntu MOTU Developers
+    - Remove full stop from description
+  * debian/copyright:
+    - Updated to reflect the debianization based on upstream's packaging
+    - Added more required information
+  * debian/rules:
+    - Removed unused extra rules
+    - Install menu file to correct path
+    - Convert menu icon to xpm
+    - Removed various other cruft
+  * debian/compat:
+    - Bumped to 5
+  * debian/README.Debian-source:
+    - Added to explain repackaging
+  * debian/postinst:
+    - Turned into stub for debhelper
+  * debian/postrm:
+    - Added as stub for debhelper
+  * debian/gmusicbrowser.menu:
+    - Added (copied from source and sanitised)
+  * debian/dirs:
+    - Added to create usr/share/pixmaps
+
+ -- Andy Price <andy@andrewprice.me.uk>  Sat, 23 Jun 2007 21:37:50 +0100
