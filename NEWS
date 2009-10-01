@@ -1,4 +1,18 @@
+v1.0.2
+- updated fetch_cover and lyrics plugins
+- updated translations : de fr
+- new translation : zh_CN
 - added support for reading pictures in flac files
+- add "Now Playing" support for last.fm
+- new plugin : notify
+- new layout : 'Tabbed Lists, Library & Context'
+- add support for using ogg123 to play flac files
+- improved the Makefile
+- Implement "CopyFields" DBus function
+- fix accumulation of mplayer processes if -cache option enabled by using -nocache option
+- fix to support amixer controls with spaces in their name
+- other small fixes
+
 
 v1.0.1
 - Fixed bug when writing flac tags with non-ascii characters with perl 5.10, that could damage the file

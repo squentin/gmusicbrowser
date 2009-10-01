@@ -1,6 +1,6 @@
 Name: gmusicbrowser
 Summary: Jukebox for large collections of mp3/ogg/flac/mpc files
-Version: 1.0.1
+Version: 1.0.2
 Release: 1
 License: GPLv3
 Group: Sound
@@ -61,6 +61,8 @@ rm -rf %{buildroot}
 #%doc AUTHORS COPYING README NEWS layout_doc.html
 
 %changelog
+* Fri Oct 02 2009 Quentin Sculo <squentin@free.fr> 1.0.2-1
+- added perl-GStreamer-Interfaces, perl-Gtk2-Notify in Requires(hint)
 * Mon Nov 24 2008 Quentin Sculo <squentin@free.fr> 1.0.1-1
 - added perl-Gtk2-WebKit in Requires(hint)
 * Sat Jul 26 2008 Quentin Sculo <squentin@free.fr> 1.0-1
