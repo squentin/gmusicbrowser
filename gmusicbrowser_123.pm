@@ -20,7 +20,7 @@ my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill);
 my ($CMDfh,$RemoteMode);
 my %cmds;
 my $alsa09;
-my %cmdname=(mp3 => 'mpg321', ogg => 'ogg123', flac => 'flac123');
+my %cmdname=(mp3 => 'mpg321', ogg => 'ogg123', flac => 'flac123|ogg123');
 
 our @ISA=('Play_amixer'); #use amixer for volume
 
@@ -28,14 +28,16 @@ sub init
 {	Play_amixer::init();
 
 	for my $ext (keys %cmdname)
-	{	my $cmd=$cmdname{$ext};
-		for my $path (split /:/, $ENV{PATH})
-		{	if (-x $path.::SLASH.$cmd)
-			 {$cmds{$ext}=$path.::SLASH.$cmd;last;}
+	{	my $cmds=$cmdname{$ext};
+		for my $cmd (split /\|/,$cmds)
+		{	for my $path (split /:/, $ENV{PATH})
+			{	if (-x $path.::SLASH.$cmd)
+				 {$cmds{$ext}=$path.::SLASH.$cmd;last;}
+			}
+			last if $cmds{$ext};
 		}
-		unless ($cmds{$ext}) { warn "$cmd not found. $ext files won't be played through the 123 output.\n"; }
+		unless ($cmds{$ext}) { $cmds=~s/\|/ or /g; warn "$cmds not found => $ext files won't be played through the 123 output.\n"; }
 	}
-
 	return unless keys %cmds;
 	return bless {},__PACKAGE__;
 }
@@ -55,8 +57,9 @@ sub Play
 	my $device=$::Options{Device};
 	my ($type)= $file=~m/\.([^.]*)$/;
 	$type=lc$type;
-	if	($type eq 'mp3' && $cmds{mp3})
-	{	@cmd_and_args=($cmds{mp3},'-b','2048','-v'); $device_option='-o';
+	my $cmd=$cmds{$type}||'';
+	if	($cmd=~m/mpg321/)
+	{	@cmd_and_args=($cmd,'-b','2048','-v'); $device_option='-o';
 		if ($sec)
 		{	my $samperframe=1152;
 			$samperframe=  $1==1 ? 384 : $2==2 ? 576 : 1152  if $::Songs[$::PlayingID][::SONG_FORMAT]=~m/mp3 l(\d)v(\d)/;
@@ -64,15 +67,15 @@ sub Play
 			$sec=sprintf '%.0f',$sec*$framepersec;
 		}
 	}
-	elsif	($type eq 'ogg' && $cmds{ogg})
-	{	@cmd_and_args=($cmds{ogg},'-b','2048'); $device_option='-d';
+	elsif	($cmd=~m/ogg123/)
+	{	@cmd_and_args=($cmd,'-b','2048'); $device_option='-d';
 		$device=~s/^alsa/alsa09/ if (defined $alsa09 ? $alsa09 : $alsa09=qx($cmds{ogg})=~m/alsa09/); #check if ogg123 calls alsa "alsa09" or "alsa"
 	}
-	elsif	($type eq 'flac' && $cmds{flac})
-	{	@cmd_and_args=($cmds{flac},'-R'); $device_option='-d';
+	elsif	($cmd=~m/flac123/)
+	{	@cmd_and_args=($cmd,'-R'); $device_option='-d';
 		$RemoteMode=1;
 	}
-	unless (@cmd_and_args) { my $hint=''; $hint="\n\n".::__x(_"{command} is needed to play this file.",command => $cmdname{$type}) if $cmdname{$type}; ::ErrorPlay( ::__x(_"Don't know how to play {file}", file => $file).$hint ); return undef; }
+	else { my $hint=''; $hint="\n\n".::__x(_"{command} is needed to play this file.",command => $cmdname{$type}) if $cmdname{$type}; ::ErrorPlay( ::__x(_"Don't know how to play {file}", file => $file).$hint ); return undef; }
 	push @cmd_and_args,$device_option,$device unless $device eq 'default';
 	push @cmd_and_args,split / /,$::Options{'123options_'.$type} if $::Options{'123options_'.$type};
 	unless ($RemoteMode)
