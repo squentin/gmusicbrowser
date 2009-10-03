@@ -40,9 +40,9 @@ sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	my $replacetext=::MakeReplaceText('talydnf');
+	my $replacetext=::MakeReplaceText('talydngLf');
 	my $entry1=::NewPrefEntry(OPT.'title',_"Title :", tip => $replacetext, sg1=> $sg1, sg2=>$sg2);
-	my $entry2=::NewPrefEntry(OPT.'text',_"Text :", tip => $replacetext."\n\n"._("You can use some markup, eg : <b>bold</b>"), sg1=> $sg1, sg2=>$sg2);
+	my $entry2=::NewPrefEntry(OPT.'text',_"Text :", tip => $replacetext."\n\n"._("You can use some markup, eg : <b>bold</b>\nNote that the markup may be ignored by the notification daemon"), sg1=> $sg1, sg2=>$sg2);
 	my $size=::NewPrefSpinButton(OPT.'picsize',undef,10,0,0,1000,10,40,_"Picture size :",undef,$sg1);
 	my $timeout=::NewPrefSpinButton(OPT.'timeout',undef,10,1,0,9999,2,5,_"Timeout :",_"seconds",$sg1);
 	my $actions=::NewPrefCheckButton(OPT.'actions',_"Display stop/next actions",\&set_actions);
