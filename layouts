@@ -558,7 +558,7 @@ Window= pos=50%x100%,size=80%x1,insensitive=1,nodecoration=1,ontop=1
 [O_play]
 Type= O
 Name= _"Play button"
-HBmain	= Play(size=menu,button=0)
+HBmain	= Play(size=menu,button=0,tip="%t by %a",group=Play)
 
 [O_stop_play_next]
 Type= O
