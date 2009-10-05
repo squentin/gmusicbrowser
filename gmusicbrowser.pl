@@ -1720,7 +1720,7 @@ sub ReadRefFromLines	# convert a string written by SaveRefToLines to a hash/arra
 	my $parentval;
 	for my $line (@$lines)
 	{	next if $line=~m/^\s*(?:#|$)/;	#skip comment or empty line
-		my ($d,$array,$key,$val)= $line=~m/^(\s*)(?:(-)|(?:(\S*|"[^"]*")\s*:))\s*(.*)$/;
+		my ($d,$array,$key,$val)= $line=~m/^(\s*)(?:(-)|(?:("[^"]*"|\S*)\s*:))\s*(.*)$/;
 		$d= length $d;
 		if ($parentval)
 		{	next unless $d>=$ident;
