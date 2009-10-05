@@ -970,13 +970,13 @@ sub NewWidget
 	{  if (!ref $tip)
 	   {	my @fields=::UsedFields($tip);
 		$towatch{$_}=undef for @fields;
-		if (@fields) { $widget->{tip}=$tip; }
+		if (@fields) { $widget->{song_tip}=$tip; }
 		else
 		{	$tip=~s#\\n#\n#g;
 			$::Tooltips->set_tip( $widget, $tip );
 		}
 	   }
-	   else { $widget->{tip}=$tip; }
+	   else { $widget->{state_tip}=$tip; }
 	}
 	if ($options{hover_layout}) { $widget->{$_}=$options{$_} for qw/hover_layout hover_delay/; Layout::Window::Popup::set_hover($widget); }
 	if (my $f=$ref->{fields})
@@ -1020,8 +1020,8 @@ sub WidgetChangedAutoAdd
 
 sub UpdateObject
 {	my $widget=$_[0];
-	if ( my $tip=$widget->{tip} )
-	{	$tip=&$tip if ref $tip;
+	if ( my $tip=$widget->{state_tip} )
+	{	$tip= $tip->() if ref $tip;
 		$::Tooltips->set_tip($widget,$tip);
 	}
 	if ($widget->{skin}) {$widget->queue_draw}
@@ -1058,8 +1058,8 @@ sub UpdateSongID
 			elsif (defined $w->{markup_empty}) { $w->set_markup($w->{markup_empty}); }
 			else { $w->set_markup(''); }
 		}
-		if ($w->{tip})
-		{	my $tip= defined $ID ? ::ReplaceFields($ID,$w->{tip}) : '';
+		if ($w->{song_tip})
+		{	my $tip= defined $ID ? ::ReplaceFields($ID,$w->{song_tip}) : '';
 			$::Tooltips->set_tip($w,$tip);
 		}
 	}
