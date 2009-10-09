@@ -6,9 +6,9 @@
 # published by the Free Software Foundation
 
 =gmbplugin Export
-Export
-Export plugin
-Adds menu entries to song contextual menu
+name	Export
+title	Export plugin
+desc	Adds menu entries to song contextual menu
 =cut
 
 package GMB::Plugin::Export;

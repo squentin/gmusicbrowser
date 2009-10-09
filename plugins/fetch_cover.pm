@@ -6,9 +6,9 @@
 # published by the Free Software Foundation
 
 =gmbplugin FETCHCOVER
-Picture finder
-Picture finder plugin
-Adds a menu entry to artist/album context menu, allowing to search the picture/cover in google and save it.
+name	Picture finder
+title	Picture finder plugin
+desc	Adds a menu entry to artist/album context menu, allowing to search the picture/cover in google and save it.
 =cut
 
 package GMB::Plugin::FETCHCOVER;

@@ -6,8 +6,9 @@
 # published by the Free Software Foundation
 
 =gmbplugin LULLABY
-Lullaby
-Lullaby plugin, to fade-out volume before stopping
+name	Lullaby
+title	Lullaby plugin
+desc	Allow for scheduling fade-out and stop
 =cut
 
 #TODO :

@@ -6,9 +6,9 @@
 # published by the Free Software Foundation
 
 =gmbplugin NOTIFY
-Notify
-Notify plugin
-Notify you of the playing song with libnotify
+name	Notify
+title	Notify plugin
+desc	Notify you of the playing song with the system's notification popups
 =cut
 
 package GMB::Plugin::NOTIFY;

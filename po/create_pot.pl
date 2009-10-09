@@ -34,8 +34,7 @@ while (my $file=shift @files)
 	if (m/^=gmbplugin \D\w+/)
 	{	while (<$fh>)
 		{	last if m/^=cut/;
-			chomp;
-			$msgid{$_}.=" $file:$.";
+			$msgid{$1}.= " $file:$." if m/^\s*(?:name|title|desc)\s+(.+)/;
 		}
 	}
 	if ($file eq 'layouts') #id of layouts is used as default layout name => may need translation

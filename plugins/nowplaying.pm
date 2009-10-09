@@ -8,14 +8,14 @@
 # the plugin file must have the following block before the first non-comment line,
 # it must be of the format :
 # =gmbplugin PID
-# short name
-# long name, the short name is used if empty
-# description, may be multiple lines
+# name	short name
+# title	long name, the short name is used if empty
+# desc	description, may be multiple lines
 # =cut
 =gmbplugin NOWPLAYING
-Now playing
-NowPlaying plugin
-run a command when playing a song
+name	Now playing
+title	NowPlaying plugin
+desc	run a command when playing a song
 =cut
 
 # the plugin package must be named GMB::Plugin::PID (replace PID), and must have these sub :

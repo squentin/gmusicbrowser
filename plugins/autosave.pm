@@ -6,8 +6,8 @@
 # published by the Free Software Foundation
 
 =gmbplugin AUTOSAVE
-Autosave
-Autosave plugin
+name	Autosave
+title	Autosave plugin
 =cut
 
 

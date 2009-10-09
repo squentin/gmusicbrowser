@@ -6,9 +6,9 @@
 # published by the Free Software Foundation
 
 =gmbplugin Karaoke
-Karaoke
-Karaoke plugin
-Display synchronized lyrics of the current song
+name	Karaoke
+title	Karaoke plugin
+desc	Display synchronized lyrics of the current song
 =cut
 
 package GMB::Plugin::Karaoke;

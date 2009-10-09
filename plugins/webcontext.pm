@@ -7,9 +7,9 @@
 
 
 =gmbplugin WebContext
-Web context
-Web context plugin
-Provides context views using MozEmbed or WebKit
+name	Web context
+title	Web context plugin
+desc	Provides context views using MozEmbed or WebKit
 =cut
 
 my ($OKMoz,$OKWebKit,$CrashMoz);

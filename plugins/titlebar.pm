@@ -6,9 +6,9 @@
 # published by the Free Software Foundation
 
 =gmbplugin TitleBar
-Titlebar
-Titlebar overlay plugin
-Display a special layout in or around the titlebar of the focused window
+name	Titlebar
+title	Titlebar overlay plugin
+desc	Display a special layout in or around the titlebar of the focused window
 =cut
 
 package GMB::Plugin::TitleBar;

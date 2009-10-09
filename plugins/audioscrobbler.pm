@@ -6,9 +6,9 @@
 # published by the Free Software Foundation
 
 =gmbplugin AUDIOSCROBBLER
-last.fm
-last.fm plugin
-Submit played songs to last.fm
+name	last.fm
+title	last.fm plugin
+desc	Submit played songs to last.fm
 =cut
 
 

@@ -6,9 +6,9 @@
 # published by the Free Software Foundation
 
 =gmbplugin RIP
-Rip
-Rip plugin
-Add a button to rip a CD
+name	Rip
+title	Rip plugin
+desc	Add a button to rip a CD
 =cut
 
 package GMB::Plugin::RIP;

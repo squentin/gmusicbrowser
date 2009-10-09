@@ -1278,29 +1278,30 @@ sub LoadPlugins
 		while (my $line=<$fh>)
 		{	if ($line=~m/^=gmbplugin (\D\w+)/)
 			{	my $id=$1;
-				my @lines;
+				my %plug= (version=>0,desc=>'',);
 				while ($line=<$fh>)
 				{	last if $line=~m/^=cut/;
-					$line=~s/[\n\r]+$//;
-					$line=_($line) if $line;
-					push @lines,$line;
+					my ($key,$val)= $line=~m/^\s*(\w+)\s+(.+)/;
+					next unless $key;
+					if ($key eq 'desc')
+					{	$plug{desc} .= _($val)."\n";
+					}
+					else { $plug{$key}=$val; }
 				}
-				next unless @lines>1;
-				my $name=shift @lines;
-				my $longname=shift @lines;
-				my $desc=join "\n",@lines;
+				last unless $plug{name};
+				chomp $plug{desc};
+				$plug{file}=$file;
+				$plug{version}=$1+($2||0)/100+($3||0)/10000 if $plug{version}=~m#(\d+)(?:\.(\d+)(?:\.(\d+)))#;
+				$plug{$_}=_($plug{$_}) for grep $plug{$_}, qw/name title/;
 				$found++;
-				last if $Plugins{$id};
-				warn "found plugin $id ($name)\n" if $::debug;
-				$Plugins{$id}=
-				{	file	=> $file,
-					name	=> $name,
-					longname=> $longname,
-					desc	=> $desc,
-				};
+				if ($Plugins{$id})
+				{	last if $Plugins{$id}{loaded} || $Plugins{$id}{version}>=$plug{version};
+				}
+				warn "found plugin $id ($plug{name})\n" if $::debug;
+				$Plugins{$id}=\%plug;
 				last;
 			}
-			elsif ($line=~m/^\s*[^#\n\r]/) {last}
+			elsif ($line=~m/^\s*[^#\n\r]/) {last} #read until first non-empty and non-comment line
 		}
 		close $fh;
 		warn "No plugin found in $file, maybe it uses an old format\n" unless $found;
@@ -4945,7 +4946,7 @@ sub PrefPlugins
 	 {	return unless $plugin;
 		my $pref=$Plugins{$plugin};
 		if ($plug_box && $plug_box->parent) { $plug_box->parent->remove($plug_box); }
-		my $title='<b>'.PangoEsc( $pref->{longname}||$pref->{name} ).'</b>';
+		my $title='<b>'.PangoEsc( $pref->{title}||$pref->{name} ).'</b>';
 		$plugtitle->set_markup($title);
 		$plugdesc->set_text( $pref->{desc} );
 		if (my $error=$pref->{error})

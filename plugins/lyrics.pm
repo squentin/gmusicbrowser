@@ -6,9 +6,9 @@
 # published by the Free Software Foundation
 
 =gmbplugin LYRICS
-Lyrics
-Lyrics plugin
-Display lyrics of the current song using lyrc.com.ar
+name	Lyrics
+title	Lyrics plugin
+desc	Search and display lyrics
 =cut
 
 package GMB::Plugin::LYRICS;
