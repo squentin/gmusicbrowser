@@ -808,7 +808,8 @@ sub LoadIcons
 
 	$TrayIconFile=delete $icons{trayicon} || PIXPATH.'trayicon.png';
 	$TrayIcon->child->child->set_from_file($TrayIconFile) if $TrayIcon;
-	Gtk2::Window->set_default_icon_from_file( delete $icons{gmusicbrowser} || PIXPATH.'gmusicbrowser.png' );
+	eval { Gtk2::Window->set_default_icon_from_file( delete $icons{gmusicbrowser} || PIXPATH.'gmusicbrowser.png' ); };
+	warn $@ if $@;
 
 	$NBVolIcons=0;
 	$NBVolIcons++ while $icons{'gmb-vol'.$NBVolIcons};
