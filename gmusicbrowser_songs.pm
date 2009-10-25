@@ -517,7 +517,7 @@ our %timespan_menu=
  },
  album_artist_raw =>
  {	name => _"Album artist",width => 200,	flags => 'garwesci',	type => 'artist',
-	id3v2	=> 'TPE2',	vorbis	=> 'album_artist|albumartist',	ape	=> 'Album_artist',  ilst => "aART",
+	id3v2	=> 'TPE2',	vorbis	=> 'albumartist|album_artist',	ape	=> 'Album Artist|Album_artist',  ilst => "aART",
 	#FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
 	edit_order=> 35,	edit_many=>1,	edit_listall => 1,
