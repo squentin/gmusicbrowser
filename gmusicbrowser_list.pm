@@ -827,7 +827,7 @@ sub AddColumn
 	unless ($prop) {warn "Ignoring unknown column $colid\n"; return undef}
 	my $renderer=	( $prop->{class} || 'Gtk2::CellRendererText' )->new;
 	if (my $init=$prop->{init})
-	{	$renderer->set($_ => $init->{$_}) for keys %$init;
+	{	$renderer->set(%$init);
 	}
 	$renderer->set(ypad => $self->{songypad}) if defined $self->{songypad};
 	my $colnb=SongStore::get_column_number($colid);
