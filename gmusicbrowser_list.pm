@@ -647,6 +647,13 @@ INIT
 		attrib => 'weight',	type => 'Glib::Uint',
 	},
 
+	right_aligned_folder=>
+	{	menu	=> _"Folder (right-aligned)", title => _"Folder",
+		value	=> sub { Songs::Display($_[2],'path'); },
+		attrib	=> 'text', type => 'Glib::String', depend => 'path',
+		sort	=> 'path',	width => 200,
+		init	=> { ellipsize=>'start', },
+	},
 	titleaa =>
 	{	menu => _('Title - Artist - Album'), title => _('Song'),
 		value => sub { ::ReplaceFieldsAndEsc($_[2],"<b>%t</b>\n<small><i>%a</i> - %l</small>"); },
