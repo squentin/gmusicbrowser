@@ -587,3 +587,20 @@ Name= _"Insensitive title-artist (right-aligned)"
 HBmain	= _Title_by(font=7,ellipsize=end,xalign=1)
 Window = insensitive=1,size=250x1
 
+
+#type P layouts : pages that can be added to a TabbedLists
+[same_album]
+Type= P
+Name=Same album
+VBmain = _SongTree(group=Play:album)
+
+[same_artist]
+Type= P
+Name=Same artist
+VBmain = _SongTree(group=Play:first_artist)
+
+[same_year]
+Type= P
+Name=Same year
+VBmain = _SongTree(group=Play:year)
+
