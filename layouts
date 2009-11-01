@@ -490,6 +490,15 @@ width=100
 #pic : picture(file=ratingpic($rating),init_file=ratingpic(0))
 pic : picture(file=ratingpic($rating),h=$_h,w=$_w,resize='ratio',init_file=ratingpic(0))
 
+{Column right_aligned_folder}
+menutitle = Folder (right-aligned)
+title = Folder
+hreq=text:h
+width=200
+sort= path
+songbl= text
+text : text(markup= pesc($path), x=-text:w)
+
 {Group artistalbum}
 title=album and artist
 head=title:h
@@ -603,4 +612,5 @@ VBmain = _SongTree(group=Play:first_artist)
 Type= P
 Name=Same year
 VBmain = _SongTree(group=Play:year)
+
 
