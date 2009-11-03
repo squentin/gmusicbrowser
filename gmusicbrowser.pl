@@ -3498,7 +3498,6 @@ sub CopyMoveFilesDialog
 #$fnformat=$1 if $dirformat=~s/$QSLASH([^$QSLASH]*%\w[^$QSLASH]*)//o;
 sub CopyMoveFiles
 {	my ($IDs,$copy,$basedir,$dirformat,$fnformat)=@_;
-	#return unless defined $basedir || defined $dirformat;
 	return if !$copy && $CmdLine{ro};
 	my ($sub,$errormsg,$abortmsg)=  $copy	?	(\&copy,_"Copy failed",_"abort copy")
 						:	(\&move,_"Move failed",_"abort move") ;
@@ -3530,8 +3529,9 @@ COPYNEXTID:for my $ID (@$IDs)
 		my ($olddir,$oldfile)= Songs::Get($ID, qw/path file/);
 		my $old=$olddir.SLASH.$oldfile;
 		my $newfile=$oldfile;
-		my $newdir=defined $basedir? $basedir : $olddir.SLASH;
-		if ($dirformat)
+		my $newdir= $olddir.SLASH;
+		$dirformat='' unless defined $dirformat;
+		if ($basedir || $dirformat ne '')
 		{	$newdir=pathfromformat($ID,$dirformat,$basedir);
 			my $res=CreateDir($newdir,$win, $abortmsg );
 			last if $res eq 'abort';
