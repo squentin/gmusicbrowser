@@ -3499,7 +3499,6 @@ sub CopyMoveFilesDialog
 sub CopyMoveFiles
 {	my ($IDs,$copy,$basedir,$dirformat,$fnformat)=@_;
 	#return unless defined $basedir || defined $dirformat;
-	$basedir.=SLASH if defined $basedir && $basedir!~m/$QSLASH$/o;
 	return if !$copy && $CmdLine{ro};
 	my ($sub,$errormsg,$abortmsg)=  $copy	?	(\&copy,_"Copy failed",_"abort copy")
 						:	(\&move,_"Move failed",_"abort move") ;
@@ -3885,6 +3884,7 @@ sub pathfromformat
 		}
 		$path.=$f.SLASH;
 	}
+	$path=~s/$QSLASH+/SLASH/oge;	#remove all repeated slashes
 	return $path;
 }
 sub pathfilefromformat
