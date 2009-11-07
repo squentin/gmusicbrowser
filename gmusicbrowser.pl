@@ -1054,11 +1054,11 @@ $ListPlay=SongArray::PlayList->init;
 Play() if $CmdLine{play} && !$PlayTime;
 
 #SkipTo($PlayTime) if $PlayTime; #gstreamer (how I use it) needs the mainloop running to skip, so this is done after the main window is created
+our $Tooltips=Gtk2::Tooltips->new;
 
 Layout::InitLayouts;
 ActivatePlugin($_,'startup') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 
-our $Tooltips=Gtk2::Tooltips->new;
 CreateMainWindow( $CmdLine{layout}||$Options{Layout} );
 &ShowHide if $CmdLine{hide};
 SkipTo($PlayTime) if $PlayTime; #done only now because of gstreamer
