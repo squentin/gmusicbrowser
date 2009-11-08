@@ -124,6 +124,8 @@ our %timespan_menu=
 		'filter_prephash:~' => '##mainfield#->filter_prephash:~#',
 		'filter_simplify:~' => sub { split /$::re_artist/o,$_[0] },
 		'filter:h~'	=> '(ref #_# ?  (grep .!!. exists $hash#VAL#->{$_+0}, @#_#) : (.!!. exists $hash#VAL#->{#_#+0}))',
+		gid_search	=> '__#mainfield#_name[#GID#] =~ m/#RE#/',
+		gid_isearch	=> '__#mainfield#_iname[#GID#] =~ m/#RE#/',
 		makefilter	=> '"#field#:~:".##mainfield#->gid_to_sgid#',
 		#group		=> '#_# !=',
 		stats		=> 'do {my $v=#_#; #HVAL#{__#mainfield#_name[$_]}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[keys %{#HVAL#}];',
