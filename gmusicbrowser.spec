@@ -4,8 +4,8 @@ Version: 1.1.1
 Release: 1
 License: GPL
 Group: Sound
-URL: http://gmusicbrowser.sourceforge.net/
-Source0: http://squentin.free.fr/gmusicbrowser/%{name}-%{version}.tar.gz
+URL: http://gmusicbrowser.org/
+Source0: http://gmusicbrowser.org/download/%{name}-%{version}.tar.gz
 #Source0: %{name}-%{version}.tar.gz
 Packager: Quentin Sculo <squentin@free.fr>
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root
