@@ -31,7 +31,7 @@ po/%.po : po/gmusicbrowser.pot
 
 locale/%/LC_MESSAGES/gmusicbrowser.mo : po/%.po po/gmusicbrowser.pot
 	mkdir -p locale/$*/LC_MESSAGES/
-	msgfmt -c -o $@ $<
+	msgfmt --statistics -c -o $@ $<
 
 locale: $(foreach l,$(LINGUAS),locale/$l/LC_MESSAGES/gmusicbrowser.mo)
 
