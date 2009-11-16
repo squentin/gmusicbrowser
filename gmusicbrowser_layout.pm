@@ -1153,7 +1153,7 @@ sub KeyPressed
 	elsif ($self->{KeyBindings} && exists $self->{KeyBindings}{$key} )
 	{	$cmd= $self->{KeyBindings}{$key};
 	}
-	if ( exists $::GlobalBoundKeys{$key} )
+	elsif ( exists $::GlobalBoundKeys{$key} )
 	{	$cmd= $::GlobalBoundKeys{$key};
 	}
 	return 0 unless $cmd;
