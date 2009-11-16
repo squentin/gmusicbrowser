@@ -7287,16 +7287,16 @@ INIT
 		_"isn't %g",		'-genre:~:%s',
 		_"contains %s",		'genre:s:%s',
 		_"doesn't contain %s",	'-genre:s:%s',
-		_"(: )none",		'genre:e:',
-		_"(: )has one",		'-genre:e:',
+		_"(: )none",		'genre:ecount:0',
+		_"(: )has one",		'-genre:ecount:0',
 	],
 	_"Label",
 	[	_"%f is set",		 'label:~:%s',
 		_"%f isn't set",	'-label:~:%s',
 		_"contains %s",		 'label:s:%s',
 		_"doesn't contain %s",	'-label:s:%s',
-		_"(: )none",		'label:e:',
-		_"(: )has one",		'-label:e:',
+		_"(: )none",		'label:ecount:0',
+		_"(: )has one",		'-label:ecount:0',
 	],
 	_"Filename",
 	[	_"contains %s",		 'file:s:%s',
@@ -7381,7 +7381,7 @@ INIT
 	  }
 	  else	#put in %PosRe a regex to find the value(s) and pos
 	  {	my $f=$ref->[$i+1];
-		my ($colcmd,$val)=$f=~m/^(-?\w*:[A-Za-z<>!~]:)(.*)$/;
+		my ($colcmd,$val)=$f=~m/^(-?\w*:[A-Za-z<>!~]\w*:)(.*)$/;
 		$val=~s/(\W)/\\$1/g;
 		$val=~s/\\%([a-z])/'('.$TYPEREGEX{$1}.')'/ge;
 		push @{ $PosRe{$colcmd} }, [qr/^$val$/, $pos.$i.' '];
@@ -7414,7 +7414,7 @@ sub addtomainmenu
 
 sub filter2posval
 {	my $f=shift;
-	my ($colcmd,$val)=$f=~m/^(-?\w*:[A-Za-z<>!~]:)(.*)$/;
+	my ($colcmd,$val)=$f=~m/^(-?\w*:[A-Za-z<>!~]\w*:)(.*)$/;
 	my $aref=$PosRe{$colcmd};
 	for my $aref (@{ $PosRe{$colcmd} })
 	{	my ($re,$pos)=@$aref;
