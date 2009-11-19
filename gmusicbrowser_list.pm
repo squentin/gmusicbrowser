@@ -4862,6 +4862,7 @@ sub new
 	$sw->add($vbox);
 	$self->add($sw);
 	$self->{headers}=SongTree::Headers->new($sw->get_hadjustment) unless $opt->{headers} eq 'off';
+	::weaken($self->{headers}) if $self->{headers}; # prevent references cycles, probably due to the Gdk::Window created to resize columns with mouse #cause 'Gdk-WARNING **: losing last reference to undestroyed window' when quitting with a songtree in mainwindow #FIXME I would prefer to weaken a ref that go from child to parent, but I haven't found one that fix the problem
 	$self->{vadj}=$sw->get_vadjustment;
 	$self->{hadj}=$sw->get_hadjustment;
 	$vbox->pack_start($self->{headers},0,0,0) if $self->{headers};
