@@ -2228,7 +2228,7 @@ sub Pack
 		$close->can_focus(0);
 		::weaken( $close->{page}=$wg );
 		$close->signal_connect(clicked => sub {my $page=$_[0]{page}; my $self=$page->parent; $self->close_tab($page,1);});
-		$close->add(Gtk2::Image->new_from_stock('gtk-close','menu'));
+		$close->add(Gtk2::Image->new_from_file(::PIXPATH.'smallclosetab.png'));
 		$close->set_size_request(Gtk2::IconSize->lookup('menu'));
 		$close->set_border_width(0);
 	}
