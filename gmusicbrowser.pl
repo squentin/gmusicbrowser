@@ -898,6 +898,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	TogArtistLock	=> [sub {ToggleLock('first_artist')},	_"Toggle Artist Lock"],
 	TogAlbumLock	=> [sub {ToggleLock('album')},		_"Toggle Album Lock"],
 	TogSongLock	=> [sub {ToggleLock('fullfilename')},	_"Toggle Song Lock"],
+	ToggleRandom	=> [\&ToggleSort, _"Toggle between Random/Shuffle and Ordered"],
 	SetSongRating	=> [sub {return unless defined $SongID && $_[1]=~m/^\d*$/; Songs::Set($SongID, rating=> $_[1]); },	_"Set Current Song Rating", _"Rating between 0 and 100, or empty for default", qr/^\d*$/],
 	ToggleFullscreen=> [\&Layout::ToggleFullscreen,		_"Toggle fullscreen mode"],
 	ToggleFullscreenLayout=> [\&ToggleFullscreenLayout, _"Toggle the fullscreen layout"],
