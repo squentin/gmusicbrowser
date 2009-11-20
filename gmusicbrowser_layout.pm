@@ -1183,6 +1183,10 @@ sub GoToCurrentSong
 
 sub SetFocusOn
 {	my ($self,$name)=@_;
+	while ($name=~s#^([^/]+)/##)	# if name contains slashes, divide it into parent and child, where parent can be an Embedded layout or a TabbedLists/Context/NB
+	{	$self=$self->{widgets}{$1};
+		return unless $self;
+	}
 	my $widget=$self->{widgets}{$name};
 	if ($widget)
 	{	$widget=$widget->{DefaultFocus} while $widget->{DefaultFocus};
