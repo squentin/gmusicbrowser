@@ -1353,7 +1353,7 @@ sub FilterMenu
 	$menu->append($item);
 	if (my @SavedLists=::GetListOfSavedLists())
 	{	my $submenu=Gtk2::Menu->new;
-		my $list_cb=sub { ::Select( 'sort' => '', staticlist => $_[1] ) };
+		my $list_cb=sub { ::Select( staticlist => $_[1] ) };
 		for my $list (@SavedLists)
 		{	my $item = Gtk2::CheckMenuItem->new_with_label($list);
 			$item->set_draw_as_radio(1);
