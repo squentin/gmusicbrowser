@@ -2179,7 +2179,9 @@ sub Replace
 	else			{ $::SortFields=[]; $::Options{Sort}=''; ::HasChanged('Sort'); }
 	::HasChanged('Filter');
 	::HasChanged('SongArray',$self,'replace');
-	::UpdateCurrentSong(ID=>$ID);
+	$::ChangedID=1 if !defined $::SongID || $::SongID!=$ID;
+	$::SongID=$ID;
+	::UpdateCurrentSong();
 }
 sub Insert
 {	my ($self,$destrow,$IDs)=@_;
