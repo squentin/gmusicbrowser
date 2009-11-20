@@ -1093,7 +1093,7 @@ sub SongArray_changed_cb
 		# if it cause a problem, just use $self->ResetModel; instead
 		my $diff= @$array - @$oldarray;
 		if	($diff>0) { $store->rowinsert(scalar @$oldarray,$diff); }
-		elsif	($diff<0) { $store->rowremove(-$diff); }
+		elsif	($diff<0) { $store->rowremove($#$array+1..$#$oldarray); }
 		$self->queue_draw;
 		$updateselection=1;
 	}
