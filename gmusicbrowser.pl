@@ -2332,21 +2332,19 @@ sub UpdateCurrentSong
 	{	HasChanged('CurSongID',$SongID);
 		HasChanged('CurSong',$SongID);
 		ShowTraytip($Options{TrayTipTimeLength}) if $TrayIcon && $Options{ShowTipOnSongChange} && !$FullscreenWindow;
-		if (!defined $SongID || $RandomMode) { $Position=undef; }
-		else
-		{	IdleCheck($SongID) if $Options{TAG_auto_check_current};
-			if (!defined $Position || $ListPlay->[$Position]!=$SongID)
-			{	my $start=$Position;
-				$start=-1 unless defined $start;
-				$Position=undef;
-				for my $i ($start+1..$#$ListPlay, 0..$start-1) {$Position=$i if $ListPlay->[$i]==$SongID}
-			}
-		}
-		# FIXME if (defined $RecentPos && (!defined $SongID || $SongID!=$Recent->[$RecentPos-1])) { $RecentPos=undef }
+		IdleCheck($SongID) if defined $SongID && $Options{TAG_auto_check_current};
+		if (defined $RecentPos && (!defined $SongID || $SongID!=$Recent->[$RecentPos-1])) { $RecentPos=undef }
 		$ChangedPos=1;
 	}
 	if ($ChangedPos)
-	{	HasChanged('Pos','song');
+	{	if (!defined $SongID || $RandomMode) { $Position=undef; }
+		elsif (!defined $Position || $ListPlay->[$Position]!=$SongID)
+		{	my $start=$Position;
+			$start=-1 unless defined $start;
+			$Position=undef;
+			for my $i ($start+1..$#$ListPlay, 0..$start-1) {$Position=$i if $ListPlay->[$i]==$SongID}
+		}
+		HasChanged('Pos','song');
 	}
 	#   Stop(); if  !defined $SongID ???????
 	#if	($forceplay)			{Play()}

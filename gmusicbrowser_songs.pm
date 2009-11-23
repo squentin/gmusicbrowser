@@ -2362,6 +2362,7 @@ sub UpdateSort
 sub UpdateLock
 {	my $self=shift;
 	$::Position=undef;
+	$::ChangedPos=1;
 	if (defined $::ListMode) { $self->Replace($::ListMode); }
 	else { $self->SetFilter($::SelectedFilter); }
 }
