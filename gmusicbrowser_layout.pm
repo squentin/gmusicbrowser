@@ -2262,6 +2262,7 @@ sub close_tab
 	my $pageopt= Layout::SaveWidgetOptions($page);
 	%$opt= ( %$opt, %$pageopt );
 	$self->remove($page);
+	delete $self->{DefaultFocus} if $self->{DefaultFocus} && $self->{DefaultFocus}==$page;
 	$self->insert_default_page unless $self->get_children;
 }
 
@@ -2409,7 +2410,7 @@ sub SwitchedPage
 	{	::UnWatch($self,'SelectedID_'.$group);
 	}
 	my $page=$self->get_nth_page($pagenb);
-	$self->{DefaultFocus}=$page;
+	::weaken( $self->{DefaultFocus}=$page );
 	my $metagroup= $self->{group};
 	return if !$page->{group} || $page->{group} eq $metagroup;
 	my $group= $self->{active_group}= $page->{group};
