@@ -2120,7 +2120,10 @@ sub new
 	$self->set_scrollable(1);
 	$self->set_tab_hborder(0);
 	$self->set_tab_vborder(0);
-	$self->set_tab_pos($opt->{tabpos}) if $opt->{tabpos};
+	if (my $tabpos=$opt->{tabpos})
+	{	($tabpos,$self->{angle})= $tabpos=~m/^(left|right|top|bottom)?(90|180|270)?/;
+		$self->set_tab_pos($tabpos) if $tabpos;
+	}
 	$opt->{typesubmenu}='LPC' unless exists $opt->{typesubmenu};
 	$self->{$_}=$opt->{$_} for qw/group default_child match pages page typesubmenu closebuttons tablist/;
 	for my $class (qw/list context page/)	# option begining with list_ / context_ / page_ will be passed to children of this class
@@ -2136,7 +2139,6 @@ sub new
 	::Watch($self, SavedLists=> \&SavedLists_changed);
 	::Watch($self, Widgets => \&Widgets_changed_cb) if $self->{match};
 	$self->{groupcount}=0;
-	if (my $p=$opt->{tabpos})	{ $self->set_tab_pos($p); }
 	$self->{SaveOptions}=\&SaveOptions;
 	$self->{widgets}={};
 	$self->{widgets_opt}= $opt->{page_opt} ||={};
@@ -2217,10 +2219,12 @@ sub newtab
 sub Pack
 {	my ($self,$wg,$setpage)=@_;
 	if (delete $self->{chooser_mode}) { $self->remove($_) for $self->get_children; }
+	my $angle= $self->{angle} || 0;
 	my $label= $wg->{tabtitle};
 	$label=$wg->{name} unless defined $label; #FIXME ? what to do if no tabtitle given
 	$label= $label->($wg) if ref $label && ref $label eq 'CODE';
 	$label=Gtk2::Label->new($label) unless ref $label;
+	$label->set_angle($angle) if $angle;
 	::weaken( $wg->{tab_page_label}=$label ) if $wg->{tabrename};
 
 	my $icon= $wg->{tabicon};
@@ -2236,8 +2240,13 @@ sub Pack
 		$close->set_size_request(Gtk2::IconSize->lookup('menu'));
 		$close->set_border_width(0);
 	}
-	my $tab=::Hpack('4',$icon,'2_', $label,$close);
-	$tab->set_spacing(0); #FIXME should be doable with a Hpack option
+	my $tab= $angle%180 ? Gtk2::VBox->new(0,0) : Gtk2::HBox->new(0,0);
+	my @icons= $angle%180 ? ($close,0,$icon,4) : ($icon,4,$close,0);
+	my ($i,$pad)=splice @icons,0,2;
+	$tab->pack_start($i,0,0,$pad) if $i;
+	$tab->pack_start($label,1,1,2);
+	($i,$pad)=splice @icons,0,2;
+	$tab->pack_start($i,0,0,$pad) if $i;
 	$self->append_page($wg,$tab);
 	$self->set_tab_reorderable($wg,1);
 	$tab->show_all;
