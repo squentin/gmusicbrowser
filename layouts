@@ -13,7 +13,7 @@ HBAlbum		= LockAlbum _Album -Date
 VBText		= HBButtons1 2HBTitle 2HBArtist 2HBAlbum HBTime
 HBText_Cover	= _VBText 5-Cover
 VBplayer	= HBButtons3 HBText_Cover
-VBLeft		= VBplayer 5_TabbedLists(group=1)
+VBLeft		= 5VBplayer _TabbedLists(group=1)
 HPfp1		= FPane1(nb=2,hidebb=1) FPane2(nb=3,hidebb=1)
 HPfp0	 	= FPane0(nb=1,hidebb=1) HPfp1
 HBSongList	= SimpleSearch(maxwidth=250) -FLock -PlayFilter -Refresh -ResetFilter -MBlist
@@ -21,7 +21,7 @@ VBSongList	= HBSongList _SongList
 VPRight		= HPfp0 _VBSongList
 TBRight		= _"Library" VPRight _"Context" Context
 HPmain		= VBLeft _TBRight
-VBmain		= HBmenu 5_HPmain Progress
+VBmain		= HBmenu _HPmain Progress
 VolumeScroll	= VBplayer
 
 
