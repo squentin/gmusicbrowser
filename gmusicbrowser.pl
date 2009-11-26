@@ -7121,7 +7121,7 @@ sub UpdateID
 	}
 	my $r=Random->new( $self->get_string );
 	return unless defined $::SongID;
-	my $s=$r->CalcScore($::SongID);
+	my $s= $r->CalcScore($::SongID) || 0;
 	my $v=sprintf '%.3f', $s;
 	my $prob;
 	if ($s)
@@ -8400,9 +8400,9 @@ sub MakeRandomList
 		$self->{Slist}=\@Score;
 		my $score=$self->make;
 		my $func='no warnings;sub { for my $ID (@{$_[0]}) { my $ref=$::Songs[$ID]; $Sum+=$Score[$ID]='.$score.';} }';
-		$func=eval $func;
-		if ($@) { warn "Error in eval '$func' :\n$@"; $Sum+=@{$_[0]}; $Score[$_]=1 for @{$_[0]}; }
-		$self->{AddToList}=$func;
+		my $sub=eval $func;
+		if ($@) { warn "Error in eval '$func' :\n$@"; }
+		$self->{AddToList}= $sub || sub { $Sum+=@{$_[0]}; $Score[$_]=1 for @{$_[0]}; };
 		$self->{RmFromList}=sub { for my $ID (@{$_[0]}) { $Sum-=$Score[$ID]; $Score[$ID]=undef; } };
 	}
 	&{$self->{AddToList}}($lref);
