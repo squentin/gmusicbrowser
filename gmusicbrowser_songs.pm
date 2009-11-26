@@ -425,7 +425,7 @@ our %timespan_menu=
 %Def=		#flags : Read Write Editable Sortable Column caseInsensitive sAve List Gettable
 (file	=>
  {	name	=> _"Filename",	width => 400, flags => 'gasc_',	type => 'filename',
-	'stats:filetoid' => '#HVAL#{ #file->get# }=#ID#',	letter => 'o',
+	'stats:filetoid' => '#HVAL#{ #file->get# }=#ID#',
  },
  path	=>
  {	name	=> _"Folder",	width => 200, flags => 'gasc_',	type => 'filename',
@@ -720,8 +720,12 @@ our %timespan_menu=
 			type	=> 'virtual',	flags => 'g',	depend => 'file path',	letter => 'u',
 			'filter:e'	=> '#ID# == #VAL#',	'filter_prep:e'=> sub { FindID($_[0]); },
 		   },
- basefilename	=> { get => 'do {my $s=#file->display#; $s=~s/\.[^\.]+$//; $s;}',	type=> 'virtual',	depend => 'file',	flags => 'g', },
- #fileextension => ?
+ barefilename	=> {	name => _"filename without extension",	type=> 'virtual',	flags => 'g',	letter => 'o',
+			get => 'do {my $s=#file->display#; $s=~s/\.[^\.]+$//; $s;}',	depend => 'file',
+		   },
+ extension =>	   {	name => _"filename extension",		type=> 'virtual',	flags => 'g',
+			get => 'do {my $s=#file->display#; $s=~s#^.*\.##; $s;}',	depend => 'file',
+		   },
  title_or_file	=> {get => '(#title->get# eq "" ? #file->display# : #title->get#)',	type=> 'virtual',	flags => 'g', depend => 'file title', letter => 'S',},	#why letter S ? :)
 
  missing	=> { flags => 'gan', type => 'integer', bits => 32, }, #FIXME store it using a 8-bit relative number to $::DAYNB
