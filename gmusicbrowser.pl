@@ -8314,8 +8314,8 @@ our %ScoreTypes;
 INIT
 {
   %ScoreTypes=
- (	f => [::SONG_LABELS,_"Label is set", '','%s','.5f',sub {'($ref->['.::SONG_LABELS.']=~m/(?:^|\x00)\Q'.$_[0].'\E(?:$|\x00)/)? 1 : 0'}],
-	g => [::SONG_GENRE,_"Genre is set",'','%s','.5g',  sub {'($ref->['.::SONG_GENRE.']=~m/(?:^|\x00)\Q'.$_[0].'\E(?:$|\x00)/)? 1 : 0'}],
+ (	f => [::SONG_LABELS,_"Label is set", '','%s','.5f',sub {'($ref->['.::SONG_LABELS.']=~m/(?:^|\x00)'.quotemeta($_[0]).'(?:$|\x00)/)? 1 : 0'}],
+	g => [::SONG_GENRE,_"Genre is set",'','%s','.5g',  sub {'($ref->['.::SONG_GENRE.']=~m/(?:^|\x00)'.quotemeta($_[0]).'(?:$|\x00)/)? 1 : 0'}],
 	l => [::SONG_LASTPLAY,_"Number of days since last played",_"days",'%.1f','-1l10',
 		'do { my $t=(time-( $ref->['.::SONG_LASTPLAY.'] ||0 ))/86400; ($t<0)? 0 : $t}'],
 		#'(time-( $ref->['.::SONG_LASTPLAY.'] ||0 ))/86400'
