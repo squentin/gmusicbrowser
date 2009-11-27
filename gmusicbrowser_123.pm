@@ -123,7 +123,6 @@ sub Play
 	my ($type)= $file=~m/\.([^.]*)$/;
 	$type=lc$type;
 	my $cmd=$Supported{$type};
-	$RemoteMode=$Commands{$cmd}{remote};
 	if ($cmd)
 	{	my @extra= split / /, $::Options{'123options_'.$cmd}||'';
 		my $out= $::Options{'123device_'.$cmd};
@@ -137,6 +136,7 @@ sub Play
 		::ErrorPlay( ::__x(_"Don't know how to play {file}", file => $file).$hint );
 		return undef;
 	}
+	$RemoteMode=$Commands{$cmd}{remote};
 
 	#################################################
 	#$ChildPID=open3(my $fh, $OUTPUTfh, $OUTPUTfh, @cmd_and_args, $file);
