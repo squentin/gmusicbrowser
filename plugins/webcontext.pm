@@ -347,17 +347,16 @@ use constant
 };
 
 my %sites=
-(	#lyrc => ['lyrc','http://lyrc.com.ar/en/tema1en.php','artist=%a&songname=%s'],
-	lyrc => ['lyrc','http://lyrc.com.ar/en/tema1en.php?artist=%a&songname=%s'],
+(	lyrc => ['lyrc','http://lyrc.com.ar/en/tema1en.php?artist=%a&songname=%s'],
 	#leoslyrics => ['leolyrics','http://api.leoslyrics.com/api_search.php?artist=%a&songtitle=%s'],
 	google  => ['google','http://www.google.com/search?q="%a"+"%s"'],
-	googlemusic  => ['google music','http://www.google.com/musicsearch?q="%a"+"%s"'],
 	lyriki  => ['lyriki','http://lyriki.com/index.php?title=%a:%s'],
-	#lyricwiki => ['lyricwiki','http://lyricwiki.org/%a:%s'],
-	lyricwiki => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%s&fmt=html'],
+	lyricwiki => [lyricwiki => 'http://lyrics.wikia.com/%a:%s'],
 	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a'],
+	lyricscom => [ 'lyrics.com' => 'http://www.lyrics.com/search.php?keyword=%s+%a&what=all' ],
 );
 
+$::Options{OPT.'LyricSite'}=undef if !exists $sites{$::Options{OPT.'LyricSite'}};
 ::SetDefaultOptions(OPT, LyricSite => 'google');
 
 sub addtoolbar

@@ -22,8 +22,6 @@ use constant
 {	OPT	=> 'PLUGIN_LYRICS_', # MUST begin by PLUGIN_ followed by the plugin ID / package name
 };
 
-::SetDefaultOptions(OPT, FontSize => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyrc');
-
 my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics can be saved
 (	#lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php','artist=%a&songname=%s'],
 	lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php?artist=%a&songname=%s',undef,sub
@@ -34,18 +32,22 @@ my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 		}],
 	#leoslyrics =>	['leolyrics','http://api.leoslyrics.com/api_search.php?artist=%a&songtitle=%s'],
 	#google	=>	['google','http://www.google.com/search?q="%a"+"%s"'],
-	#googlemusic =>	['google music','http://www.google.com/musicsearch?q="%a"+"%s"'],
 	lyriki	=>	['lyriki','http://lyriki.com/index.php?title=%a:%s',undef,
 		sub { my $no= $_[0]=~m/<div class="noarticletext">/s; $_[0]=~s/^.*<!--\s*start content\s*-->(.*?)<!--\s*end content\s*-->.*$/$1/s && !$no; }],
 	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a',undef,
 			sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
 	lyricssongs =>	['lyrics-songs','http://www.lyrics-songs.com/winamp.php?musica=%s&artista=%a',undef,
 			sub { $_[0]=~s#<img src='p_bg2.gif'[^/]*/>##si; return 0 }], #remove image, return always 0 as lyrics-songs sometimes guess when the song is not found
-	#lyricwiki =>	[lyricwiki => 'http://lyricwiki.org/%a:%s'], # s#<div id="lyric">(.+?)</div>#$1#
-	lyricwikiapi => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%s&fmt=html',undef,
-		sub { $_[0]!~m#<pre>\W*Not found\W*</pre>#s }],
+	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%s',undef,sub { $_[0]=~s!.*lyricbox.*?((?:&\#\d+;|<br ?/>){5,}).*!$1!s; return !!$1 }],
+	#lyricwikiapi => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%s&fmt=html',undef,
+	#	sub { $_[0]!~m#<pre>\W*Not found\W*</pre>#s }],
 	#azlyrics => [ azlyrics => 'http://search.azlyrics.com/cgi-bin/azseek.cgi?q="%a"+"%s"'],
+	#Lyricsfly ?
 );
+
+$::Options{OPT.'LyricSite'}=undef if !exists $sites{$::Options{OPT.'LyricSite'}};
+::SetDefaultOptions(OPT, FontSize => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyricsplugin');
+
 
 my $lyricswidget=
 {	class		=> __PACKAGE__,
