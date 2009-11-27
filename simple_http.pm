@@ -126,12 +126,14 @@ sub receiving_cb
 	{	warn "0|$_\n" for $result,split /$EOL/o,$headers;
 	}
 	$headers.=EOL;
-	my %headers=($headers=~m/([^:]*): (.*?)$EOL/og);
+	my %headers;
+	$headers{lc $1}=$2 while $headers=~m/([^:]*): (.*?)$EOL/og;
 	if ($result=~m#^HTTP/1\.\d+ 200 OK#)
 	{	#warn "ok $url\n$callback\n";
+		my $type=$headers{'content-type'};
 		if ($self->{params}{cache} && defined $response && length($response)<$::Options{Simplehttp_CacheSize})
 		{	$CacheSize+= length $response;
-			$Cache{$url}=[$response,$headers{'Content-Type'}];
+			$Cache{$url}=[$response,$type];
 			push @Cachedurl,$url;
 			while ($CacheSize>$::Options{Simplehttp_CacheSize})
 			{	my $old=pop @Cachedurl;
@@ -139,10 +141,10 @@ sub receiving_cb
 				delete $Cache{$old};
 			}
 		}
-		$callback->($response,$headers{'Content-Type'},$self->{params}{url});
+		$callback->($response,$type,$self->{params}{url});
 	}
-	elsif ($result=~m#^HTTP/1\.\d+ 30[12]# && $headers{Location}) #redirection
-	{	my $url=$headers{Location};
+	elsif ($result=~m#^HTTP/1\.\d+ 30[12]# && $headers{location}) #redirection
+	{	my $url=$headers{location};
 		unless ($url=~m#^http://#)
 		{	my $base=$self->{params}{url};
 			if ($url=~m#^/#){$base=~s#^(?:http://)?([^/]+).*$#$1#;}
