@@ -989,8 +989,9 @@ sub drag_motion_cb
 sub enqueue_current
 {	my $self=shift;
 	my $tv=$self->child;
-	my $row=($tv->get_cursor)[0]->to_string;
-	my $ID=$self->{array}[$row];
+	my ($path)= $tv->get_cursor;
+	return unless $path;
+	my $ID=$self->{array}[ $path->to_string ];
 	::Enqueue($ID);
 }
 
@@ -1001,10 +1002,10 @@ sub sel_changed_cb
 }
 sub cursor_changed_cb
 {	my $tv=$_[0];
-	my $row=($tv->get_cursor)[0]->to_string;
-	return unless defined $row;
+	my ($path)= $tv->get_cursor;
+	return unless $path;
 	my $self=$tv->parent;
-	my $ID=$self->{array}[$row];
+	my $ID=$self->{array}[ $path->to_string ];
 	::HasChangedSelID($self->{group},$ID);
 }
 
@@ -2031,7 +2032,7 @@ sub get_cursor_row
 {	my $self=$_[0];
 	if ($self->{mode} eq 'list')
 	{	my ($path)=$self->{view}->get_cursor;
-		return $path->to_string;
+		return $path ? $path->to_string : undef;
 	}
 	else { return $self->{view}->get_cursor_row; }
 }
