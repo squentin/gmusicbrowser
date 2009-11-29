@@ -2689,7 +2689,7 @@ INIT
 
 sub new_from_string		#same as ->new, but don't try to _smart_simplify, as it shouldn't be needed, and require fields to be initialized
 {	my ($class,$string) = @_;
-	my $self=bless {}, $class;
+	my $self=bless {string=>$string}, $class;
 	return $self;
 }
 sub save_to_string { $_[0]->{string}; }
