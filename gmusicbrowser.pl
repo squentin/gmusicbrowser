@@ -3147,7 +3147,7 @@ sub LoadPixData
 	eval { $loader->write($pixdata); };
 	eval { $loader->close; } unless $@;
 	$loader=undef if $@;
-	warn "$@\n" if $debug;
+	warn "$@\n" if $@ && $debug;
 	return $loader;
 }
 
