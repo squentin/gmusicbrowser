@@ -1,4 +1,4 @@
-.TH "gmusicbrowser" "1" "Feb 24, 2008" "gmusicbrowser" ""
+.TH "gmusicbrowser" "1" "Nov 29, 2009" "gmusicbrowser" ""
 .SH "NAME"
 gmusicbrowser \- Jukebox for large collections of audio files
 
@@ -46,10 +46,10 @@ see http://gmusicbrowser.sourceforge.net/ for more informations.
 .SH "OPTIONS"
 .B
 .TP
-\fB\-c\fR
+\fB\-c\fR, \fB\-nocheck\fR
 don't check for updated/deleted songs on startup
 .TP
-\fB\-s\fR
+\fB\-s\fR, \fB\-noscan\fR
 don't scan folders for songs on startup
 .TP
 \fB\-demo\fR
@@ -79,10 +79,10 @@ send playing song to connected icecast client
 \fB\-port N\fR
 listen for connection on port N in icecast server mode
 .TP
-\fB\-C FILE\fR
+\fB\-C FILE\fR, \fB\-cfg FILE\fR
 use FILE as configuration file (instead of ~/.gmusicbroser/tags)
 .TP
-\fB\-F FIFO\fR
+\fB\-F FIFO\fR, \fB\-fifo FIFO\fR
 use FIFO as named pipe to receive commans (instead of ~/.gmusicbroser/gmusicbrowser.fifo)
 .TP
 \fB\-nofifo\fR
@@ -91,11 +91,8 @@ do not use/create named pipe $FIFOFile
 \fB\-debug\fR
 print lots of useless informations
 .TP
-\fB\-layout NAME\fR
+\fB\-l NAME\fR, \fB\-layout NAME\fR
 use layout NAME for player window
-.TP
-\fB\-load FILE\fR
-Load FILE as a plugin
 .TP
 \fB\-use\-gnome\-session\fR
 Use gnome libraries to save tags/settings on session logout (needs the Gnome2 perl module).
@@ -170,4 +167,4 @@ http://gmusicbrowser.org/,
 If you wish to report a bug please use the reportbug(1) command.
 
 .SH "AUTHOR"
-Copyright (c) 2005-2008 Quentin Sculo <squentin@free.fr>
+Copyright (c) 2005-2009 Quentin Sculo <squentin@free.fr>

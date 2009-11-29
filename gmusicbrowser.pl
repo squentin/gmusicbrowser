@@ -148,8 +148,8 @@ BEGIN
 
 my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2009 Quentin Sculo
 options :
--c	: don't check for updated/deleted songs on startup
--s	: don't scan folders for songs on startup
+-nocheck: don't check for updated/deleted songs on startup
+-noscan	: don't scan folders for songs on startup
 -demo	: don't check if current song has been updated/deleted
 -ro	: prevent modifying/renaming/deleting song files
 -rotags	: prevent modifying tags of music files
@@ -159,11 +159,11 @@ options :
 -nogst  : do not use gstreamer
 -server	: send playing song to connected icecast clent
 -port N : listen for connection on port N in icecast server mode
--C FILE	: use FILE as configuration file (instead of $SaveFile)
--F FIFO : use FIFO as named pipe to receive commans (instead of $FIFOFile)
--nofifo : do not create/use named pipe $FIFOFile
 -debug	: print lots of mostly useless informations
--layout NAME		: Use layout NAME for player window
+-nofifo : do not create/use named pipe $FIFOFile
+-C FILE, -cfg FILE	: use FILE as configuration file (instead of $SaveFile)
+-F FIFO, -fifo FILE	: use FIFO as named pipe to receive commans (instead of $FIFOFile)
+-l NAME, -layout NAME	: Use layout NAME for player window
 +plugin NAME		: Enable plugin NAME
 -plugin NAME		: Disable plugin NAME
 -searchpath FOLDER	: Additional FOLDER to look for plugins and layouts
@@ -191,8 +191,8 @@ Options to change what is done with files/folders passed as arguments (done in r
   $CmdLine{gst}=0;
   my @files; my $filescmd;
    while (defined (my $arg=shift))
-   {	if   ($arg eq '-c')		{$CmdLine{nocheck}=1}
-	elsif($arg eq '-s')		{$CmdLine{noscan}=1}
+   {	if   ($arg eq '-c' || $arg eq '-nocheck')	{$CmdLine{nocheck}=1}
+	elsif($arg eq '-s' || $arg eq '-noscan')	{$CmdLine{noscan}=1}
 	elsif($arg eq '-demo')		{$CmdLine{demo}=1}
 #	elsif($arg eq '-empty')		{$CmdLine{empty}=1}
 	elsif($arg eq '-play')		{$CmdLine{play}=1}
@@ -206,9 +206,9 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-port')		{$CmdLine{port}=shift if $ARGV[0]}
 	elsif($arg eq '-debug')		{$debug=1}
 	elsif($arg eq '-nofifo')	{$FIFOFile=undef}
-	elsif($arg eq '-C')		{$CmdLine{savefile}=1; $SaveFile=rel2abs(shift) if $ARGV[0]}
-	elsif($arg eq '-F')		{$FIFOFile=rel2abs(shift) if $ARGV[0]}
-	elsif($arg eq '-layout')	{$CmdLine{layout}=shift if $ARGV[0]}
+	elsif($arg eq '-C' || $arg eq '-cfg')		{$CmdLine{savefile}=1; $SaveFile=rel2abs(shift) if $ARGV[0]}
+	elsif($arg eq '-F' || $arg eq '-fifo')		{$FIFOFile=rel2abs(shift) if $ARGV[0]}
+	elsif($arg eq '-l' || $arg eq '-layout')	{$CmdLine{layout}=shift if $ARGV[0]}
 	elsif($arg eq '-searchpath')	{ push @{ $CmdLine{searchpath} },shift if $ARGV[0]}
 	elsif($arg=~m/^([+-])plugin$/)	{ $CmdLine{plugins}{shift @ARGV}=($1 eq '+') if $ARGV[0]}
 	elsif($arg eq '-geometry')	{ $CmdLine{geometry}=shift if $ARGV[0]; }
