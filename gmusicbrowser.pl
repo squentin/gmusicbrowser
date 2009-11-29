@@ -1035,7 +1035,7 @@ LoadIcons();
 {	my $pp=$Options{AudioOut};
 	$pp= $Options{use_GST_for_server} ? 'Play_GST_server' : 'Play_Server' if $CmdLine{server};
 	$pp='Play_GST' if $CmdLine{gst};
-	for my $p ($Play_package, qw/Play_GST Play_123 Play_mplayer Play_GST_server Play_Server/)
+	for my $p ($pp, qw/Play_GST Play_123 Play_mplayer Play_GST_server Play_Server/)
 	{	next unless $p && $PlayPacks{$p};
 		$pp=$p;
 		last;
