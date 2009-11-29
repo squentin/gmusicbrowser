@@ -1217,7 +1217,7 @@ sub TurnOff
 sub Quit
 {	my $turnoff;
 	$turnoff=1 if $_[0] && $_[0] eq 'turnoff';
-	$Options{SavedPlayTime}= $PlayTime||0 if $Options{RememberPlayTime};
+	$Options{SavedPlayTime}= $PlayTime if $Options{RememberPlayTime};
 	&Stop if defined $TogPlay;
 	@ToScan=@ToAdd_Files=();
 	SaveTags();
