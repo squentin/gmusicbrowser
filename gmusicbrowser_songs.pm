@@ -2687,14 +2687,17 @@ INIT
 # - greponly :	set to 1 if the sub dosn't need to filter the whole list each times -> ID can be tested individualy
 # - fields :	ref to a list of the columns used by the filter
 
-sub new_from_string { &new }
+sub new_from_string		#same as ->new, but don't try to _smart_simplify, as it shouldn't be needed, and require fields to be initialized
+{	my ($class,$string) = @_;
+	my $self=bless {}, $class;
+	return $self;
+}
 sub save_to_string { $_[0]->{string}; }
 
 sub new
 {	my ($class,$string,$source) = @_;
 	my $self=bless {}, $class;
 	if	(!defined $string)	  {$string='';}
-	elsif ($string=~m/^(-)?(\d+)(\D)(.*)$/) { my $o=$string; $string=($1||'').Songs::FieldUpgrade($2).':'.($3 eq 'f' ? '~' : $3).':'.$4; warn "Old filter $o FIXME => $string\n" } #PHASE1
 	elsif	($string=~m/^-?\w+:~:/) { ($string)=_smart_simplify($string); }
 	$self->{string}=$string;
 	$self->{source}=$source;
