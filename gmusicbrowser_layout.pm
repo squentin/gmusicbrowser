@@ -1504,6 +1504,12 @@ sub new
 	$self->{group}= 'Global('.::refaddr($self).')';
 	::Watch($self,Save=>\&SaveOptions);
 	$self->set_title(::PROGRAM_NAME);
+
+	if ($options{dragtomove})
+	{	$self->add_events(['button-press-mask']);
+		$self->signal_connect_after(button_press_event => sub { my $event=$_[1]; $_[0]->begin_move_drag($event->button, $event->x_root, $event->y_root, $event->time); 1;  });
+	}
+
 	#$self->signal_connect (show => \&show_cb);
 	$self->signal_connect (window_state_event => sub
 	 {	my $self=$_[0];
