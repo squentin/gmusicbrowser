@@ -840,14 +840,20 @@ use Gtk2;
 use base 'Gtk2::SpinButton';
 
 sub new
-{	my ($class,$field,$ID,$max,$digits) = @_;
+{	my ($class,$field,$IDs,$max,$digits) = @_;
 	$max||=10000000;
 	$digits||=0;
 	my $adj=Gtk2::Adjustment->new(0,0,$max,1,10,0);
 	my $self = bless Gtk2::SpinButton->new($adj,10,$digits), $class;
 	$self->{noexpand}=1;
 	#$self->{field}=$field;
-	my $val=Songs::Get($ID,$field);
+	my $val;
+	if (ref $IDs)
+	{	my $values= Songs::BuildHash($field,$IDs);
+		my @l=sort { $values->{$b} <=> $values->{$a} } keys %$values; #sort values by their frequency
+		$val=$l[0]; #take the most common value
+	}
+	else { $val=Songs::Get($IDs,$field); }
 	$self->set_value($val);
 	return $self;
 }
@@ -868,11 +874,17 @@ use Gtk2;
 use base 'Gtk2::CheckButton';
 
 sub new
-{	my ($class,$field,$ID) = @_;
+{	my ($class,$field,$IDs) = @_;
 	my $self = bless Gtk2::CheckButton->new, $class;
 	$self->{noexpand}=1;
 	#$self->{field}=$field;
-	my $val=Songs::Get($ID,$field);
+	my $val;
+	if (ref $IDs)
+	{	my $values= Songs::BuildHash($field,$IDs);
+		my @l=sort { $values->{$b} <=> $values->{$a} } keys %$values; #sort values by their frequency
+		$val=$l[0]; #take the most common value
+	}
+	else { $val=Songs::Get($IDs,$field); }
 	$self->set_active($val);
 	return $self;
 }
