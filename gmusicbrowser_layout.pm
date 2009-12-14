@@ -2740,7 +2740,7 @@ sub enter_leave_cb
 	0;
 }
 sub expose_cb #only for scrollable labels
-{	my ($label,$event)=@_; #FIXME redraw only $event->area when possible ie : background is not a pixmap or label has not scrolled
+{	my ($label,$event)=@_;
 	my $layout=$label->get_layout;
 	my ($lw,$lh)=$layout->get_pixel_size;
 	return 1 unless $lw; #empty string -> nothing to draw
@@ -2751,11 +2751,7 @@ sub expose_cb #only for scrollable labels
 	$yoffset+=$ypad; $ah-=2*$ypad; $ah=0 if $ah<0;
 	$xoffset+=($aw-$lw)*$xalign if $aw>$lw;
 	$yoffset+=($ah-$lh)*$yalign if $ah>$lh;
-	my $gc=$label->get_style->text_gc($label->state);
-	my $pixmap=Gtk2::Gdk::Pixmap->new($label->window, $lw,$lh, -1);
-	$pixmap->draw_drawable($gc, $label->window, $xoffset,$yoffset, $label->{dx},0,$aw,$ah);
-	$pixmap->draw_layout($gc, 0,0, $layout);
-	$label->window->draw_drawable($gc, $pixmap,$label->{dx},0, $xoffset,$yoffset,$aw,$ah);
+	$label->get_style->paint_layout($label->window, $label->state, ::FALSE, $event->area, $label, 'label', $xoffset-$label->{dx}, $yoffset, $layout);
 	1;
 }
 
