@@ -2393,7 +2393,8 @@ sub make_widget_list
 }
 sub Widgets_changed_cb		#new or removed widgets => check if a widget should be added or removed
 {	my ($self,$changetype,@widgets)=@_;
-	@widgets=grep $Layout::Widgets{$_}{autoadd_type}, keys %Layout::Widgets unless @widgets;
+	@widgets=keys %Layout::Widgets unless @widgets;
+	@widgets=sort grep $Layout::Widgets{$_}{autoadd_type}, @widgets;
 	my $match=$self->{match};
 	for my $name (@widgets)
 	{	my $ref=$Layout::Widgets{$name};
@@ -2520,7 +2521,8 @@ sub RemoveWidget
 
 sub Widgets_changed_cb		#new or removed widgets => check if a widget should be added or removed
 {	my ($ph,$changetype,@widgets)=@_;
-	@widgets=sort grep $Layout::Widgets{$_}{autoadd_type}, keys %Layout::Widgets unless @widgets;
+	@widgets=keys %Layout::Widgets unless @widgets;
+	@widgets=sort grep $Layout::Widgets{$_}{autoadd_type}, @widgets;
 	my $match=$ph->{match};
 	for my $name (@widgets)
 	{	my $ref=$Layout::Widgets{$name};
