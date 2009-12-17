@@ -165,17 +165,24 @@ sub ParseAtomTree
 			pop @psize;
 		}
 		my ($length,$name)=unpack 'NA4',$buffer;
-		if ($length==1) { warn "atom '$name' has a size >4GB, unsupported => can't read file\n";return } # $length==1 means 64-bit length follow
-		#FIXME if length==0 : open-ended, extends to the end of the file
-		elsif ($length<8) { warn "error atom '$name' has an invalid size of $length bytes";return }
-#warn join('.',@parents,$name)."\n";#warn "left:@left\n";
+		my $datalength=$length-8;
 		my $offset=tell($fh)-8;
+		if ($length==1)	# $length==1 means 64-bit length follow
+		{	read($fh,$buffer,8);
+			my ($length1,$length2)=unpack 'NN',$buffer;
+			if ($length1>0) { warn "atom '$name' has a size >4GB, unsupported => can't read file\n"; return }
+			$length=$length2;
+			$datalength=$length-16;
+		}
+		#FIXME if length==0 : open-ended, extends to the end of the file
+		elsif ($datalength<0) { warn "error atom '$name' has an invalid size of $datalength bytes";return }
+#warn join('.',@parents,$name)."\n";#warn "left:@left\n";
 		push @toplevels, $name,$offset,$length,$stco=[] unless @parents;
 		$left[-1]-=$length if @left;
 		my $isparent= $IsParent{$name};
 		$isparent=0 if @parents && $parents[-1] eq 'ilst';  #0 but defined : children of ilst are parents
 		if (defined $isparent)
-		{	push @left,$length-8;
+		{	push @left,$datalength;
 			push @parents,$name;
 			push @poffset,$offset;
 			push @psize,$length;
@@ -191,7 +198,7 @@ sub ParseAtomTree
 		}
 		elsif (@parents>1 && $parents[-2] eq 'ilst') #in moov.udta.meta.ilst.XXXX
 		{	my $key=$parents[-1];
-			read($fh,my($data),$length-8);
+			read($fh,my($data),$datalength);
 			if ($key eq '----') #freeform tag
 			{	unless ($otherkey) { push @$ilst_data, $key,$otherkey={}; }
 				$otherkey->{$name}=$data;
@@ -201,7 +208,7 @@ sub ParseAtomTree
 			}
 		}
 		elsif ($name eq 'mvhd')
-		{	read($fh,$buffer,$length-8);
+		{	read($fh,$buffer,$datalength);
 			my ($version,$timescale,$duration)=unpack 'Cx3x4x4NN',$buffer;
 			if ($version==1)
 			{	($timescale,$duration,my $duration2)=unpack 'x4x8x8NNN',$buffer;
@@ -210,7 +217,7 @@ sub ParseAtomTree
 			else { $info{seconds}= $duration/$timescale; }
 		}
 		elsif ($name eq 'stsd')
-		{	read($fh,$buffer,$length-8);
+		{	read($fh,$buffer,$datalength);
 			my ($type,$channels,$bitspersample,$samplerate)=unpack 'x4x4x4A4x16nnx2N',$buffer;
 			if ($type eq 'mp4a' && !$info{traktype}) #ignore if not mp4a, and only read the first one if more than one (can it happen ?)
 			{	$info{channels}=$channels;
@@ -225,9 +232,9 @@ sub ParseAtomTree
 		{	warn "Compressed moov atom found, unsupported"; return;
 		}
 		else
-		{	if    ($name eq 'mdat')	{ $info{audiodatasize}+=$length-8; }
+		{	if    ($name eq 'mdat')	{ $info{audiodatasize}+=$datalength; }
 			elsif ($name=~m/^stco|^co64|^tfhd/) { push @$stco,$name,$offset-$poffset[0]; $self->{nofullrewrite}=1 unless $name eq 'stco'; }
-			unless (seek $fh,$length-8,1) { warn $!; return undef }
+			unless (seek $fh,$datalength,1) { warn $!; return undef }
 		}
 	}
 	$self->{toplevels}=\@toplevels;
@@ -317,6 +324,10 @@ sub write_file
 	my $free_after_moov=0;
 	if (8==read $fh,my($buffer),8)
 	{	my ($length,$name)=unpack 'NA4',$buffer;
+		if ($length==1 && 8==read($fh,$buffer,8))	# $length==1 means 64-bit length follow
+		{	my ($length1,$length2)=unpack 'NN',$buffer;
+			if ($length1==0 && $length2>=16) { $length=$length2; }
+		}
 		$free_after_moov=$length if $name eq 'free' && $length>=8;
 	}
 	$self->_close;
@@ -325,10 +336,15 @@ sub write_file
 	#look if ilst's parent has a 'free' child right after ilst
 	if ($poffset->[-1]-$moov_offset+$psize->[-1] > $ilst_offset+$oldsize)
 	{	my ($length,$name)=unpack 'NA4', substr $moov,$ilst_offset+$oldsize,8;
+		if ($length==1)	# $length==1 means 64-bit length follow
+		{	my ($length1,$length2)=unpack 'NN', substr $moov,$ilst_offset+$oldsize+8,8;
+			if ($length1==0 && $length2>=16) { $length=$length2; }
+		}
 		$oldsize+=$length if $name eq 'free' && $length>=8;
 	}
 	my $free=$oldsize - length $newilst;  #warn "  free1=$free\n";
-	if ($free==0 || ($free>=8 && ($free<2048 || $self->{nofullrewrite})))
+	if ($free>=2**32) { warn "file too big, size>4GB are not supported\n"; return 0; }
+	elsif ($free==0 || ($free>=8 && ($free<2048 || $self->{nofullrewrite})))
 	{	warn "in place editing1.\n";
 		$newilst.= pack('NA4',$free,'free') . "\x00"x ($free-8) if $free;
 		$fh=$self->_openw or return 0;
