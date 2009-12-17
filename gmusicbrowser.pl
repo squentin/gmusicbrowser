@@ -2471,7 +2471,9 @@ sub ExplainSort
 }
 
 sub ReReadTags
-{	if (@_) { push @ToReRead,@_; }
+{	my ($state)= Gtk2::Gdk::Device->get_core_pointer->get_state(Gtk2::Gdk::Screen->get_default->get_root_window); #haven't found a simpler way to get current modifier state (shift, ctrl, alt, ...)
+	if ( @_ && $state >= ['shift-mask'] ) { $LengthEstimated->Push(\@_); }
+	elsif (@_) { push @ToReRead,@_; }
 	else	{ unshift @ToReRead,@$Library; }
 	&launchIdleLoop;
 }
@@ -2525,7 +2527,7 @@ sub IdleLoop
 	elsif (%ToDo)	{ DoTask( (sort keys %ToDo)[0] ); }
 	elsif (@$LengthEstimated)	 #to replace estimated length/bitrate by real one(for mp3s without VBR header)
 	{	$Lengthcheck_max=@$LengthEstimated if @$LengthEstimated > $Lengthcheck_max;
-		Songs::ReReadFile(shift(@$LengthEstimated),2);
+		Songs::ReReadFile( $LengthEstimated->Shift, 2);
 		$Lengthcheck_max=0 unless @$LengthEstimated;
 	}
 	else
