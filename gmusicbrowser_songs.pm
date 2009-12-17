@@ -433,12 +433,12 @@ our %timespan_menu=
 	can_group=>1,
  },
  modif	=>
- {	name	=> _"Modification",	width => 160,	flags => 'gasc_',	type => 'date',
+ {	name	=> _"Modification",	width => 160,	flags => 'garsc_',	type => 'date',
 	FilterList => {type=>'year',},
 	can_group=>1,
  },
  size	=>
- {	name => _"Size",	width => 80,	flags => 'gasc_',		#32bits => 4G max
+ {	name => _"Size",	width => 80,	flags => 'garsc_',		#32bits => 4G max
 	type => 'integer',
 	display	=> 'sprintf("%.1fM", #_#/1024/1024)',
 	filter_prep	=> \&::ConvertSize,
@@ -656,17 +656,17 @@ our %timespan_menu=
 	id3v2	=> 'TIT3',	vorbis	=> 'version|subtitle',			ape => 'Subtitle',	ilst=> '----SUBTITLE',
  },
  channel=>
- {	name	=> _"Channels",		width => 50,	flags => 'gasc',	type => 'integer',	bits => 4,	audioinfo => 'channels', },	# are 4 bits needed ? 1bit+1 could be enough ?
+ {	name	=> _"Channels",		width => 50,	flags => 'garsc',	type => 'integer',	bits => 4,	audioinfo => 'channels', },	# are 4 bits needed ? 1bit+1 could be enough ?
  bitrate=>
- {	name	=> _"Bitrate",		width => 70,	flags => 'gasc_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;' },
+ {	name	=> _"Bitrate",		width => 70,	flags => 'garsc_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;' },
  #samprate=>
  #{	name	=> _"Sampling Rate",	width => 60,	flags => 'gasc',	type => 'integer',	bits => 16,	audioinfo => 'rate', },
  samprate=>
- {	name	=> _"Sampling Rate",	width => 60,	flags => 'gasc',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate', },
+ {	name	=> _"Sampling Rate",	width => 60,	flags => 'garsc',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate', },
  filetype=>
- {	name	=> _"Type",		width => 80,	flags => 'gasc',	type => 'fewstring',	bits => 8, }, #could probably fit in 4bit
+ {	name	=> _"Type",		width => 80,	flags => 'garsc',	type => 'fewstring',	bits => 8, }, #could probably fit in 4bit
  'length'=>
- {	name	=> _"Length",		width => 50,	flags => 'gasc_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
+ {	name	=> _"Length",		width => 50,	flags => 'garsc_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
 	audioinfo => 'seconds',		check	=> '#VAL#= sprintf "%.0f",#VAL#;',
 	FilterList => {type=>'div.60',},
 	letter => 'm',
