@@ -221,10 +221,10 @@ sub ParseAtomTree
 			my ($type,$channels,$bitspersample,$samplerate)=unpack 'x4x4x4A4x16nnx2N',$buffer;
 			if ($type eq 'mp4a' && !$info{traktype}) #ignore if not mp4a, and only read the first one if more than one (can it happen ?)
 			{	$info{channels}=$channels;
-				$info{samplerate}=$samplerate;
+				$info{rate}=$samplerate;
 				$info{bitspersample}=$bitspersample;
 				#warn "channel=$channels bitspersample=$bitspersample samplerate=$samplerate\n";
-				$info{bitrate}=unpack 'N',$1 if $buffer=~m/.{36}esds.{4}\x03(?:\x80\x80\x80)?.{4}\x04(?:\x80\x80\x80)?.{10}(.{4})/s;
+				$info{bitrate}=unpack 'N',$1 if $buffer=~m/^.{48}esds.{4}\x03(?:\x80\x80\x80)?.{4}\x04(?:\x80\x80\x80)?.{10}(.{4})/s;
 				$info{traktype}=$type;
 			}
 		}
@@ -237,8 +237,10 @@ sub ParseAtomTree
 			unless (seek $fh,$datalength,1) { warn $!; return undef }
 		}
 	}
+	if (!$info{audiodatasize}) { warn "Error reading m4a file : no mdat atom found\n"; return }
 	$self->{toplevels}=\@toplevels;
 	$info{bitrate_calculated}= 8*$info{audiodatasize}/$info{seconds};
+	$info{bitrate}||=$info{bitrate_calculated};
 	$self->{info}=\%info;
 
 	#warn "$_ => $info{$_}\n" for sort keys %info;
