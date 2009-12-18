@@ -2017,7 +2017,7 @@ sub RemoveIDsFromAll		#could probably be improved
 	vec($isin,$_,1)=1 for @$IDs_toremove;
 	for my $self (grep defined, @list_of_SongArray)
 	{	my @rows=grep vec($isin,$self->[$_],1), 0..$#$self;
-		$self->Remove(\@rows) if @rows;
+		$self->Remove(\@rows,'removeIDsfromall') if @rows;
 	}
 }
 
@@ -2202,11 +2202,14 @@ sub Insert
 	#set Position if playlist was empty ??
 }
 sub Remove
-{	my ($self,$rows)=@_;
-	$self->_staticfy;
+{	my ($self,$rows,$fromlibrary)=@_;
+	$self->_staticfy unless $fromlibrary;	#do not staticfy list for songs removed from library
 	$self->SUPER::Remove($rows);
-	$::Options{LastPlayFilter}=$::ListMode=SongArray->new_copy($self);
+	$::Options{LastPlayFilter}=$::ListMode=SongArray->new_copy($self)  unless $fromlibrary;
 	if (@$self==0) { $::Position=$::SongID=undef; _updateID(undef); return; }
+	if ($::RandomMode)
+	{	$::RandomMode->RmIDs;
+	}
 	if (defined $::Position)
 	{	my $pos=$::Position;
 		my @rows=sort { $a <=> $b } @$rows;
@@ -2218,9 +2221,6 @@ sub Remove
 		$pos=0 if $pos<0;
 		$::Position=$pos;
 		$self->Next if $IDchanged;
-	}
-	if ($::RandomMode)
-	{	$::RandomMode->RmIDs;
 	}
 	::HasChanged('Pos');
 }
@@ -2351,6 +2351,7 @@ sub UpdateFilter
 	{	::HasChanged('Filter');
 		::HasChanged('SongArray',$self,'replace', filter=> $::PlayFilter);
 	}
+	$::ChangedPos=1;
 	_updateID($newID);
 }
 sub UpdateSort
