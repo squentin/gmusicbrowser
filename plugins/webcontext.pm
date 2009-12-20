@@ -10,6 +10,7 @@
 name	Web context
 title	Web context plugin
 desc	Provides context views using MozEmbed or WebKit
+desc	wikipedia, lyrics, and custom webpages
 =cut
 
 my ($OKMoz,$OKWebKit,$CrashMoz);
@@ -162,6 +163,15 @@ use constant
 {	OPT => 'PLUGIN_WebContext_',
 };
 
+our %Predefined =
+(	google  => { tabtitle => 'google',	baseurl => 'http://www.google.com/search?q="%a"+"%t"', },
+	amgartist=>{ tabtitle => 'amg artist',	baseurl => 'http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=%a', },
+	amgalbum=> { tabtitle => 'amg album',	baseurl => 'http://www.allmusic.com/cg/amg.dll?p=amg&opt1=2&sql=%l', },
+	lastfm	=> { tabtitle => 'last.fm',	baseurl => 'http://www.last.fm/music/%a', },
+	discogs	=> { tabtitle => 'discogs',	baseurl => 'http://www.discogs.com/artist/%a', },
+	youtube	=> { tabtitle => 'youtube',	baseurl => 'http://www.youtube.com/results?search_query="%a"', },
+	pollstar=> { tabtitle => 'pollstar',	baseurl => 'http://www.pollstar.com/eventSearch.aspx?SearchBy=%a', },
+);
 
 our %Widgets=
 (	PluginWebLyrics =>
@@ -182,12 +192,11 @@ our %Widgets=
 		autoadd_type	=> 'context page wikipedia html',
 		saveoptions	=> 'follow urientry statusbar',
 	},
-	PluginLastfm =>
-	{	class		=> 'GMB::Plugin::WebContext::Lastfm',
-		tabtitle	=> "Last.fm",
+	PluginWebCustom =>
+	{	class		=> 'GMB::Plugin::WebContext::Custom',
+		tabtitle	=> _"Untitled",
 		schange		=> \&Update,
 		group		=> 'Play',
-		autoadd_type	=> 'context page lastfm html',
 		saveoptions	=> 'follow urientry statusbar',
 	},
 );
@@ -205,8 +214,10 @@ our @contextmenu=
 );
 
 my $active;
-::SetDefaultOptions(OPT, StrippedWiki => 1);
+::SetDefaultOptions(OPT, StrippedWiki => 1, Custom => { map {$_=>{ %{$Predefined{$_}} } } qw/lastfm amgartist youtube/ });
 UpdateBackend();
+UpdateCustom($_) for sort keys %{ $::Options{OPT.'Custom'} };
+
 
 sub UpdateBackend
 {	my $backend= $::Options{OPT.'Backend'} || '';
@@ -244,11 +255,42 @@ sub Stop
 	Layout::RegisterWidget($_ => undef) for keys %Widgets;
 }
 
+sub UpdateCustom
+{	my ($id,$hash)=@_;
+	if (!defined $id) # new custom page
+	{	return unless $hash;
+		$id= $hash->{tabtitle}||'' unless defined $id;
+		$id=~tr/a-zA-Z0-9//cd;
+		$id='custom' if $id eq '';
+		$id=~s/(?<=\D)(\d*)$/($1||1)+1/e while $Widgets{'PluginWebCustom_'.$id.'_'}; #find a new name
+	}
+	elsif ($active) { Layout::RegisterWidget('PluginWebCustom_'.$id.'_' => undef); }
+	if ($hash)	# edit existing custom page
+	{	$::Options{OPT.'Custom'}{$id}{$_}= $hash->{$_} for keys %$hash;
+	}
+	$hash=$::Options{OPT.'Custom'}{$id};
+	return unless $hash;
+	my %widget= ( %{ $Widgets{PluginWebCustom} }, autoadd_type => 'context page custom html', %$hash );	#base the widget on the PluginWebCustom widget
+	$widget{tabtitle}||= _"Untitled";
+
+	my $name='PluginWebCustom_'.$id.'_';	#'_' is appended because gmb widget names cannot end with numbers
+	$Widgets{$name}= \%widget;
+	if ($active) { Layout::RegisterWidget($name => $Widgets{$name}); }
+	return $id;
+}
+sub RemoveCustom
+{	my $id=shift;
+	delete $::Options{OPT.'Custom'}{$id};
+	my $name='PluginWebCustom_'.$id.'_';
+	delete $Widgets{$name};
+	Layout::RegisterWidget($name => undef);
+}
+
 sub new
 {	my ($class,$opt)=@_;
 	my $self = bless Gtk2::VBox->new(0,0), $class;
 	%$opt=( @default_options, %$opt );
-	$self->{$_}=$opt->{$_} for qw/follow group urientry statusbar/;
+	$self->{$_}=$opt->{$_} for qw/follow group urientry statusbar baseurl/;
 
 	my $toolbar=Gtk2::Toolbar->new;
 	my $status=$self->{Status}=Gtk2::Statusbar->new;
@@ -288,6 +330,10 @@ sub new
 	return $self;
 }
 
+sub addtoolbar #default method, overridden by packages that add extra items to the toolbar
+{	return ();
+}
+
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	#my $combo=::NewPrefCombo(OPT.'Site',[sort keys %sites],'site : ',sub {$ID=undef;&Changed;});
@@ -307,6 +353,7 @@ sub prefbox
 	$radio_moz->set_sensitive($OKMoz);
 	$check->set_sensitive($::Options{OPT.'Backend'} eq 'MozEmbed');
 	$vbox->pack_start($_,::FALSE,::FALSE,1) for $radio_wk,$radio_moz,Gtk2::VSeparator->new,$check,$Bopen;
+	$vbox->pack_start( GMB::Plugin::WebContext::Custom::Edition->new, ::TRUE,::TRUE,8 );
 	$vbox->set_sensitive( $OKMoz || $OKWebKit );
 	return $vbox;
 }
@@ -459,26 +506,211 @@ sub wikifilter	#not used for now
 	$self->loaded($data,$type);
 }
 
-package GMB::Plugin::WebContext::Lastfm;
+package GMB::Plugin::WebContext::Custom;
 our @ISA=('GMB::Plugin::WebContext');
-
-sub addtoolbar
-{	#my $self=$_[0];
-	return ();
-}
 
 sub SongChanged
 {	my ($self,$ID,$force)=@_;
 	return unless defined $ID;
 	$self->{ID}=$ID;
-	my $artist=Songs::Get($ID,'artist');
-	return if !defined $artist || $artist eq '';
-	return if defined $self->{Artist} && $artist eq $self->{Artist} && !$force;
-	$self->{Artist}=$artist;
-	$artist=~s/ /+/g;
-	$artist=::url_escapeall($artist);
-	my $url='http://www.last.fm/music/'.$artist;
-	::IdleDo('8_mozlastfm'.$self,1000,sub {$self->load_url($url)});
+	my $url= $self->{baseurl};
+	unless ($url) { warn "no baseurl defined for custom webcontext $self->{name}\n"; return }
+	$url= ::ReplaceFields($ID,$url, \&::url_escapeall);
+	return if $self->{url} && $url eq  $self->{url} && !$force;
+	warn "loading $url\n";
+	::IdleDo('8_mozcustom'.$self,1000,sub {$self->load_url($url)});
+}
+
+
+package GMB::Plugin::WebContext::Custom::Edition;
+use Gtk2;
+use base 'Gtk2::VBox';
+
+my $CustomPages= $::Options{GMB::Plugin::WebContext::OPT.'Custom'};
+
+sub new
+{	my $class=shift;
+	my $self=bless Gtk2::VBox->new, $class;
+	my $store=Gtk2::ListStore->new('Glib::String','Glib::String');
+	my $treeview=Gtk2::TreeView->new($store);
+	my $renderer=Gtk2::CellRendererText->new;
+	$renderer->set(editable => 1);
+	$renderer->signal_connect_swapped(edited => \&rename_cb,$store);
+	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes( '', $renderer, text => 1 ));
+	$treeview->set_headers_visible(::FALSE);
+	$treeview->get_selection->signal_connect(changed => \&selchanged_cb);
+	my $sw=Gtk2::ScrolledWindow->new;
+	$sw->set_shadow_type('etched-in');
+	$sw->set_policy('automatic','automatic');
+	$sw->add($treeview);
+	my $hbox=Gtk2::HBox->new;
+	my $editbox=Gtk2::VBox->new;
+	$self->{editbox}=$editbox;
+	$self->{store}=$store;
+	$self->{treeview}=$treeview;
+	$hbox->pack_start($sw,::FALSE,::FALSE,2);
+	$hbox->add($editbox);
+	my $label=Gtk2::Label->new;
+	$label->set_markup_with_format('<b>%s</b>',_"Custom context pages :");
+	$label->set_alignment(0,.5);
+	$self->pack_start($label,::FALSE,::FALSE,2);
+	$self->add($hbox);
+
+	#buttons
+	my $new=   ::NewIconButton('gtk-new',	_"New");
+	my $save=  ::NewIconButton('gtk-save',	_"Save");
+	my $remove=::NewIconButton('gtk-remove',_"Remove");
+	my $preset=::NewIconButton('gtk-add',	_"Pre-set");
+	$preset->child->add(Gtk2::Arrow->new('down','none'));
+	$new	->signal_connect( clicked=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->fill_editbox; });
+	$save	->signal_connect( clicked=> \&save_cb);
+	$remove	->signal_connect( clicked=> \&remove_cb);
+	$preset ->signal_connect(button_press_event=>\&preset_menu_cb);
+	my $bbox=Gtk2::HButtonBox->new;
+	$bbox->set_layout('start');
+	$bbox->add($_) for $remove, $new, $preset, $save;
+	$self->pack_end($bbox,::FALSE,::FALSE,0);
+	$self->{button_save}=$save;
+	$self->{button_remove}=$remove;
+
+	my $sg=Gtk2::SizeGroup->new('horizontal');
+	$sg->add_widget($_) for $sw, $remove, $new, $preset, $save;
+
+	fill_list($self->{store});
+	$self->fill_editbox;
+	return $self;
+}
+sub fill_list
+{	my $store=shift;
+	$store->clear;
+	for my $id ( ::sorted_keys($CustomPages,'tabtitle') )
+	{	$store->set($store->append, 0,$id, 1,$CustomPages->{$id}{tabtitle});
+	}
+}
+sub fill_editbox		#if $id => fill entries with existing properties, if $hash => fill entries with content of hash, if neither => empty entries
+{	my ($self,$id,$hash)=@_;
+	my $editbox= $self->{editbox};
+	$editbox->remove($_) for $editbox->get_children;
+	$self->{button_save}  ->set_sensitive(defined $hash);
+	$self->{button_remove}->set_sensitive(defined $id);
+	$editbox->{entry_title}= my $entry_title=Gtk2::Entry->new;
+	$editbox->{entry_url}=   my $entry_url=  Gtk2::Entry->new;
+	$editbox->{id}=$id;
+	my $preview=Label::Preview->new
+	(	entry	=> $entry_url,	format => ::MarkupFormat('<small>%s</small>', _"example : %s"),
+		event	=> 'CurSong',
+		preview	=> sub { my $url=shift; defined $::SongID && $url ? ::ReplaceFields($::SongID,$url, \&::url_escapeall) : undef  },
+	);
+	$preview->set_selectable(1);
+	$preview->set_line_wrap(1);
+	$hash= $CustomPages->{$id} if defined $id;
+	if ($hash)
+	{	$hash ||= $CustomPages->{$id};
+		$entry_title->set_text($hash->{tabtitle});
+		$entry_url  ->set_text($hash->{baseurl});
+	}
+	my $sg=Gtk2::SizeGroup->new('horizontal');
+	my $label_title=Gtk2::Label->new(_"Title");
+	my $label_url=Gtk2::Label->new(_"url");
+	$sg->add_widget($_) for $label_title, $label_url;
+	my $box= ::Vpack( [$label_title,'_',$entry_title], [$label_url,'_',$entry_url], $preview );
+
+
+	$_->signal_connect(changed=> \&entry_changed_cb) for $entry_title, $entry_url;
+	$entry_title->signal_connect(changed=> \&update_selection);
+	$editbox->pack_start($box,::FALSE,::FALSE,2);
+	$editbox->show_all;
+}
+
+sub entry_changed_cb
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+	my $editbox= $self->{editbox};
+	$self->{button_save}->set_sensitive( $editbox->{entry_title}->get_text ne '' && $editbox->{entry_url}->get_text ne '' );
+}
+
+sub update_selection
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $editbox= $self->{editbox};
+	my $title= $editbox->{entry_title}->get_text;
+	my $newid;
+	for my $id (keys %$CustomPages)
+	{	next unless $CustomPages->{$id}{tabtitle} eq $title;
+		$newid=$id;
+		last;
+	}
+	$editbox->{id}=$newid;
+	my $treesel=$self->{treeview}->get_selection;
+	$self->{button_remove}->set_sensitive(defined $newid);
+	$editbox->{busy}=1;
+	$treesel->unselect_all;
+	if (defined $newid)	#select current id
+	{	my $store=$self->{store};
+		my $iter=$store->get_iter_first;
+		while ($iter)
+		{	if ( $store->get($iter,0) eq $newid )
+			{	$treesel->select_iter($iter);
+				last;
+			}
+			$iter=$store->iter_next($iter);
+		}
+	}
+	$editbox->{busy}=0;
+}
+
+sub selchanged_cb
+{	my $treesel=shift;
+	my $treeview=$treesel->get_tree_view;
+	my $self=::find_ancestor($treeview,__PACKAGE__);
+	return if $self->{editbox}{busy};
+	my $iter=$treesel->get_selected;
+	my $id;
+	$id=$treeview->get_model->get($iter,0) if $iter;
+	$self->fill_editbox($id);
+}
+
+sub rename_cb
+{	my ($store, $path_string, $newvalue) = @_;
+	my $iter=$store->get_iter_from_string($path_string);
+	my $id=$store->get($iter,0);
+	return if $newvalue eq '';
+	return if $CustomPages->{$id}{tabtitle} eq $newvalue;
+	GMB::Plugin::WebContext::UpdateCustom($id=> {tabtitle=>$newvalue});
+	fill_list($store);
+}
+sub remove_cb
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $editbox= $self->{editbox};
+	my $id=$editbox->{id};
+	return unless defined $id;
+	GMB::Plugin::WebContext::RemoveCustom($id);
+	fill_list($self->{store});
+}
+sub save_cb
+{	my $button=shift;
+	$button->set_sensitive(0);
+	my $self=::find_ancestor($button,__PACKAGE__);
+	my $editbox= $self->{editbox};
+	my $hash= { tabtitle=> $editbox->{entry_title}->get_text, baseurl=> $editbox->{entry_url}->get_text, };
+	my $id=$editbox->{id};
+	GMB::Plugin::WebContext::UpdateCustom($id => $hash); # if $id is undef, create a new page, else edit existing one
+	$editbox->{busy}=1;
+	fill_list($self->{store});
+	$editbox->{busy}=0;
+	$self->update_selection;
+}
+sub preset_menu_cb
+{	my ($button,$event)=@_;
+	my $self=::find_ancestor($button,__PACKAGE__);
+	my $menu=Gtk2::Menu->new;
+	my $predef= \%GMB::Plugin::WebContext::Predefined;
+	my $menu_cb= sub { my $preid=$_[1]; $self->fill_editbox(undef,$predef->{$preid}); $self->update_selection; };
+	for my $preid ( ::sorted_keys($predef,'tabtitle') )
+	{	my $item=Gtk2::MenuItem->new( $predef->{$preid}{tabtitle} );
+		$item->signal_connect(activate => $menu_cb,$preid);
+		$menu->append($item);
+	}
+	$menu->show_all;
+	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
 }
 
 
