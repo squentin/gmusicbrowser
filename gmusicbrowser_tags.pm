@@ -516,8 +516,8 @@ return $self if @IDs>1000;
 		#$menu->append($item);
 		$menu->show_all;
 		$BSelFields->signal_connect( button_press_event => sub
-			{	$::LEvent=$_[1];
-				$menu->popup(undef,undef,\&::menupos,undef,$::LEvent->button, $::LEvent->time);
+			{	my $event=$_[1];
+				$menu->popup(undef,undef,\&::menupos,undef,$event->button, $event->time);
 			});
 		#$self->pack_start($menubar, FALSE, FALSE, 2);
 		#$perfile_table->attach($menubar,7,8,0,1,'fill','shrink',1,1);
@@ -543,8 +543,8 @@ return $self if @IDs>1000;
 		}
 		$menu->show_all;
 		$Btools->signal_connect( button_press_event => sub
-			{	$::LEvent=$_[1];
-				$menu->popup(undef,undef,\&::menupos,undef,$::LEvent->button, $::LEvent->time);
+			{	my $event=$_[1];
+				$menu->popup(undef,undef,\&::menupos,undef,$event->button, $event->time);
 			});
 	}
 
@@ -1024,7 +1024,6 @@ sub entry_activate_cb
 sub popup_menu_cb
 {	my ($widget,$event)=@_;
 	my $self=::find_ancestor($widget,__PACKAGE__);
-	$::LEvent=$event;
 	my $menu=Gtk2::Menu->new;
 	my $cb= sub { $self->{selected}{ $_[1] }^=1; $self->update; };
 	my @keys= sort {::superlc($a) cmp ::superlc($b)} keys %{$self->{selected}};
@@ -1036,7 +1035,7 @@ sub popup_menu_cb
 		$menu->append($item);
 	}
 	$menu->show_all;
-	$menu->popup(undef,undef,\&::menupos,undef,$::LEvent->button,$::LEvent->time);
+	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
 }
 
 sub update

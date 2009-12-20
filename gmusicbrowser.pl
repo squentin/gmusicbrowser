@@ -626,7 +626,6 @@ our ($StartTime,$StartedAt,$PlayingID,$PlayedPartial);
 our $CurrentDir=$ENV{PWD};
 #$ENV{PULSE_PROP_media.role}='music'; # pulseaudio hint. could set other pulseaudio properties, FIXME doesn't seem to reach pulseaudio
 
-our $LEvent;
 our (%ToDo,%TimeOut);
 my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos CurSong Playing SavedWRandoms SavedSorts SavedFilters SavedLists Icons Widgets connections
 # also used for SearchText_ SelectedID_ followed by group id
@@ -2471,8 +2470,8 @@ sub ExplainSort
 }
 
 sub ReReadTags
-{	my ($state)= Gtk2::Gdk::Device->get_core_pointer->get_state(Gtk2::Gdk::Screen->get_default->get_root_window); #haven't found a simpler way to get current modifier state (shift, ctrl, alt, ...)
-	if ( @_ && $state >= ['shift-mask'] ) { $LengthEstimated->Push(\@_); }
+{	my $state=Gtk2->get_current_event_state;
+	if ( @_ && $state && $state >= ['shift-mask'] ) { $LengthEstimated->Push(\@_); }
 	elsif (@_) { push @ToReRead,@_; }
 	else	{ unshift @ToReRead,@$Library; }
 	&launchIdleLoop;
@@ -2799,7 +2798,8 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		});
 	}
 	if (defined wantarray)	{return $menu}
-	$menu->popup(undef,undef,\&menupos,undef,$LEvent->button,$LEvent->time);
+	my $event=Gtk2->get_current_event;
+	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
 }
 
 sub ChooseSongs
@@ -2812,15 +2812,15 @@ sub ChooseSongs
 		else { Select(song => $_[1]); }
 	 };
 	my $click_callback=sub
-	 { if	($_[1]->button == 2) { $_[0]{middle}=1 }
-	   elsif($_[1]->button == 3)
-	   {	$LEvent=$_[1];
-		my $submenu=PopupContextMenu(\@SongCMenu,{mode => '', IDs=> [$_[2]]});
+	 { my ($mitem,$event)=@_;
+	   if	($event->button == 2) { $mitem->{middle}=1 }
+	   elsif($event->button == 3)
+	   {	my $submenu=PopupContextMenu(\@SongCMenu,{mode => '', IDs=> [$_[2]]});
 		$submenu->show_all;
 		$_[0]->set_submenu($submenu);
 		#$submenu->signal_connect( selection_done => sub {$menu->popdown});
 		#$submenu->show_all;
-		#$submenu->popup(undef,undef,undef,undef,$LEvent->button,$LEvent->time);
+		#$submenu->popup(undef,undef,undef,undef,$event->button,$event->time);
 		return 0; #return 0 so that the item receive the click and popup the submenu
 	   }
 	   return 0;
@@ -2854,16 +2854,17 @@ sub ChooseSongs
 	    $menu->attach($item, $col, $col+1, $row, $row+1); if (++$row>$rows) {$row=0;$col++;}
 	}
 	if (defined wantarray)	{return $menu}
-	my $ev=$LEvent;
+	my $event=Gtk2->get_current_event;
 	$menu->show_all;
-	$menu->popup(undef,undef,\&menupos,undef,$ev->button,$ev->time);
+	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
 }
 
 sub menupos	# function to position popupmenu below clicked widget
-{	my $h=$_[0]->size_request->height;		# height of menu to position
-	my $ymax=$LEvent->get_screen->get_height;	# height of the screen
-	my ($x,$y)=$LEvent->window->get_origin;		# position of the clicked widget on the screen
-	my $dy=($LEvent->window->get_size)[1];	# height of the clicked widget
+{	my $event=Gtk2->get_current_event;
+	my $h=$_[0]->size_request->height;		# height of menu to position
+	my $ymax=$event->get_screen->get_height;	# height of the screen
+	my ($x,$y)=$event->window->get_origin;		# position of the clicked widget on the screen
+	my $dy=($event->window->get_size)[1];	# height of the clicked widget
 	if ($dy+$y+$h > $ymax)  { $y-=$h; $y=0 if $y<0 }	# display above the widget
 	else			{ $y+=$dy; }			# display below the widget
 	return $x,$y;
@@ -2874,6 +2875,7 @@ sub PopupAA
 	my ($list,$from,$callback,$format,$widget,$nosort,$nominor)=@args{qw/list from cb format widget nosort nominor/};
 	return undef unless @$Library;
 	$format||="%a";
+	my $event=Gtk2->get_current_event;
 
 #### make list of albums/artists
 	my @keys;
@@ -2903,7 +2905,7 @@ sub PopupAA
 			}
 			$menu->show_all;
 			if (defined wantarray) {return $menu}
-			$menu->popup(undef,undef,\&menupos,undef,$LEvent->button,$LEvent->time);
+			$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
 			return;
 		  }
 		}
@@ -2923,22 +2925,22 @@ sub PopupAA
 	   };
 	   $rmbcallback=($col eq 'album')?
 		sub	#Albums rmb cb
-		{	(my$item,$LEvent,my$key)=@_;
-			return 0 unless $LEvent->button==3;
+		{	my ($item,$event,$key)=@_;
+			return 0 unless $event->button==3;
 			my $submenu=ChooseSongsFromA($key);
 			$item->set_submenu($submenu);
 			0; #return 0 so that the item receive the click and popup the submenu
 		}:
 		sub	#Arists rmb cb
-		{	(my$item,$LEvent,my$key)=@_;
-			return 0 unless $LEvent->button==3;
+		{	my ($item,$event,$key)=@_;
+			return 0 unless $event->button==3;
 			my $submenu=PopupAA('album', from=>$key);
 			$item->set_submenu($submenu);
 			0;
 		};
 	}
 
-	my $screen= $widget ? $widget->get_screen : $LEvent->get_screen;
+	my $screen= $widget ? $widget->get_screen : $event->get_screen;
 	my $max=($screen->get_height)*.8;
 	#my $minsize=Gtk2::ImageMenuItem->new('')->size_request->height;
 	my @todo;	#hold images not yet loaded because not cached
@@ -3007,7 +3009,7 @@ sub PopupAA
 	}
 
 	if (defined wantarray) {return $menu}
-	$menu->popup(undef,undef,\&menupos,undef,$LEvent->button,$LEvent->time);
+	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
 }
 
 sub Breakdown_List
@@ -3338,7 +3340,8 @@ sub PopupContextMenu	#FIXME rename to BuildContextMenu or BuildMenu
 	return unless $menu->get_children;
 	$menu->show_all;
 	my $posfunction= $args->{usemenupos} ? \&menupos : undef;
-	$menu->popup(undef,undef,$posfunction,undef,$LEvent->button,$LEvent->time);
+	my $event=Gtk2->get_current_event;
+	$menu->popup(undef,undef,$posfunction,undef,$event->button,$event->time);
 }
 
 sub set_drag
@@ -4199,7 +4202,8 @@ sub ArtistContextMenu
 		$menu->append($item);
 	}
 	$menu->show_all;
-	$menu->popup(undef,undef,undef,undef,$LEvent->button,$LEvent->time);
+	my $event=Gtk2->get_current_event;
+	$menu->popup(undef,undef,undef,undef,$event->button,$event->time);
 }
 
 =deprecated
@@ -6034,8 +6038,7 @@ sub CreateTrayIcon
 	$TrayIcon->add($eventbox);
 	$eventbox->signal_connect(scroll_event => \&::ChangeVol);
 	$eventbox->signal_connect(button_press_event => sub
-		{	$LEvent=$_[1];
-			my $b=$LEvent->button;
+		{	my $b=$_[1]->button;
 			if	($b==3) { &TrayMenuPopup }
 			elsif	($b==2) { &PlayPause}
 			else		{ &ShowHide }
@@ -6074,7 +6077,8 @@ sub TrayMenuPopup
 	my $m=PopupContextMenu(\@TrayMenu,{});
 	$m->signal_connect( selection_done => sub {$TrayIcon->{NoTrayTip}=undef});
 	$m->show_all;
-	$m->popup(undef,undef,\&::menupos,undef,$LEvent->button,$LEvent->time);
+	my $event=Gtk2->get_current_event;
+	$m->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
 }
 sub ShowTraytip
 {	return 0 if !$TrayIcon || $TrayIcon->{NoTrayTip};
@@ -7555,12 +7559,11 @@ sub Set
 }
 
 sub button_press_cb
-{	my ($button,$ev,$menu)=@_;
+{	my ($button,$event,$menu)=@_;
 	my $self=::find_ancestor($button,__PACKAGE__);
 	$menu=$self->makemenu($menu);
-	$::LEvent=$ev;
 	$menu->show_all;
-	$menu->popup(undef, undef, \&::menupos, undef, $ev->button, $ev->time);
+	$menu->popup(undef, undef, \&::menupos, undef, $event->button, $event->time);
 }
 
 sub changed

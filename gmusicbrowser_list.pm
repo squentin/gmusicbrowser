@@ -168,7 +168,7 @@ sub Remove
 }
 
 sub button_press_event_cb
-{	(my $self,$::LEvent)=@_;
+{	my ($self,$event)=@_;
 	my $menu=Gtk2::Menu->new;
 	for my $mode (sort {$Modes{$a}{label} cmp $Modes{$b}{label}} keys %Modes)
 	{	my $item = Gtk2::CheckMenuItem->new( $Modes{$mode}{label} );
@@ -178,7 +178,7 @@ sub button_press_event_cb
 		$menu->append($item);
 	 }
 	$menu->show_all;
-	$menu->popup(undef, undef, \&::menupos, undef, $::LEvent->button, $::LEvent->time);
+	$menu->popup(undef, undef, \&::menupos, undef, $event->button, $event->time);
 }
 
 sub QueueUpdateFast
@@ -864,8 +864,8 @@ sub AddColumn
 	$column->set_widget($label);
 	$label->show;
 	my $button_press_sub=sub
-		{ $::LEvent=$_[1];
-		  return 0 unless $::LEvent->button == 3;
+		{ my $event=$_[1];
+		  return 0 unless $event->button == 3;
 		  my $self=::find_ancestor($_[0],__PACKAGE__);
 		  $self->SelectColumns($_[2]);	# $_[2]=$colid
 		  1;
@@ -936,7 +936,6 @@ sub PopupContextMenu
 {	my ($self,$tv,$event)=@_;
 	return unless @{$self->{array}}; #no context menu for empty lists
 	my @IDs=$self->GetSelectedIDs;
-	$::LEvent=$event;
 	my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $self->{array});
 	::PopupContextMenu(\@::SongCMenu,\%args );
 }
@@ -1687,7 +1686,6 @@ sub button_press_event_cb
 {	my ($nb,$event)=@_;
 	return 0 if $event->button != 3;
 	return 0 unless ::IsEventInNotebookTabs($nb,$event);  #to make right-click on tab arrows work
-	$::LEvent=$event;
 	my $self=::find_ancestor($nb,__PACKAGE__);
 	my $menu=Gtk2::Menu->new;
 	my $cb=sub { $nb->set_current_page($_[1]); };
@@ -1723,7 +1721,7 @@ sub button_press_event_cb
 	}
 	#::PopupContextMenu(\@MenuTabbedL, { self=>$self, list=>$listname, pagenb=>$pagenb, page=>$page, pagetype=>$page->{tabbed_page_type} } );
 	$menu->show_all;
-	$menu->popup(undef, undef, undef, undef, $::LEvent->button, $::LEvent->time);
+	$menu->popup(undef, undef, undef, undef, $event->button, $event->time);
 	return 1;
 }
 
@@ -1828,7 +1826,6 @@ sub cleanup
 
 sub PopupContextMenu
 {	my ($page,$event,$hash,$menu)=@_;
-	$::LEvent=$event;
 	my $self=::find_ancestor($page,__PACKAGE__);
 	$hash->{filterpane}=$self;
 	$menu||=\@cMenu;
@@ -1838,7 +1835,6 @@ sub PopupContextMenu
 sub PopupOpt	#Only for FilterList #FIXME should be moved in FilterList::, and/or use a common function with FilterList::PopupContextMenu
 {	my ($but,$event)=@_;
 	my $self=::find_ancestor($but,__PACKAGE__);
-	$::LEvent=$event;
 	my $nb=$self->{notebook};
 	my $page=$nb->get_nth_page( $nb->get_current_page );
 	my $field=$page->{field}[0];
@@ -3007,7 +3003,7 @@ sub new
 	{	$self->{'index'}=0;
 		$self->signal_connect(scroll_event => \&AABox_scroll_event_cb);
 		my $BAlblist=::NewIconButton('gmb-playlist',undef,undef,'none');
-		$BAlblist->signal_connect(button_press_event => \&AlbumListButton_press_cb,$self);
+		$BAlblist->signal_connect(button_press_event => \&AlbumListButton_press_cb);
 		$::Tooltips->set_tip($BAlblist,_"Choose Album From this Artist");
 		$buttonbox->pack_start($BAlblist, ::FALSE, ::FALSE, 0);
 	}
@@ -3148,7 +3144,6 @@ sub AABox_button_press_cb			#popup menu
 	return 0 unless $self;
 	return 0 if $self == $widget && $event->button != 3;
 	return unless defined $self->{SelID};
-	$::LEvent=$event;
 	::PopupAAContextMenu({self=>$self, field=>$self->{aa}, gid=>$self->{Sel}, ID=>$self->{SelID}, filternb => $self->{filternb}, mode => 'B'});
 	return 1;
 }
@@ -3164,7 +3159,8 @@ sub AABox_scroll_event_cb
 }
 
 sub AlbumListButton_press_cb
-{	(undef,$::LEvent,my $self)=@_;
+{	my ($widget,$event)=@_;
+	my $self=::find_ancestor($widget,__PACKAGE__);
 	return unless defined $self->{Sel};
 	::PopupAA('album', from => $self->{Sel}, cb=>sub
 		{	my $key=$_[1];
@@ -3296,8 +3292,8 @@ sub PopupSelectorMenu
 		});
 	$menu->append($item2);
 	$menu->show_all;
-	$::LEvent=Gtk2->get_current_event;
-	$menu->popup(undef,undef,\&::menupos,undef,$::LEvent->button,$::LEvent->time);
+	my $event=Gtk2->get_current_event;
+	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
 }
 
 sub Filter
@@ -4762,7 +4758,6 @@ sub search
 sub PopupOpt
 {	my ($widget,$event)=@_;
 	my $self=::find_ancestor($widget,__PACKAGE__);
-	$::LEvent=$event;
 	::PopupContextMenu(\@OptionsMenu, { self=>$self, usemenupos => 1,} );
 	return 1;
 }
@@ -5873,7 +5868,6 @@ sub button_press_cb
 		}
 		my @IDs=$self->GetSelectedIDs;
 		my $list= $self->{array};
-		$::LEvent=$event;
 		my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $list);
 		::PopupContextMenu(\@::SongCMenu,\%args ) if @$list;
 
@@ -6195,7 +6189,6 @@ sub popup_col_menu
 	my $self= ::find_ancestor($button,__PACKAGE__);
 	my $songtree= ::find_ancestor($self,'SongTree');
 	my $insertpos= exists $button->{cellnb} ? $button->{cellnb}+1 : $button->{insertpos};
-	$::LEvent=$event;
 	::PopupContextMenu(\@ColumnMenu, { self => $self, colid => $button->{colid}, cellnb =>$button->{cellnb}, insertpos =>$insertpos, songtree => $songtree });
 	return 1;
 }

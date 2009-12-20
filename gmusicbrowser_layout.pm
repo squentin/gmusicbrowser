@@ -1029,9 +1029,9 @@ sub UpdateObject
 }
 
 sub Button_press_cb
-{	(my $self,$::LEvent)=@_;
+{	my ($self,$event)=@_;
 	my $actions=$self->{actions};
-	my $key='click'.$::LEvent->button;
+	my $key='click'.$event->button;
 	my $sub=$actions->{$key};
 	return 0 if !$sub && $actions->{activate};
 	$sub||= $actions->{click} || $actions->{click1};
@@ -1328,7 +1328,8 @@ sub SortMenu
 		});
 	$menu->show_all;
 	return $menu if $return;
-	$menu->popup(undef,undef,\&::menupos,undef,$::LEvent->button,$::LEvent->time);
+	my $event=Gtk2->get_current_event;
+	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
 }
 
 sub FilterMenu
@@ -1373,7 +1374,8 @@ sub FilterMenu
 	}
 	$menu->show_all;
 	return $menu if $return;
-	$menu->popup(undef,undef,\&::menupos,undef,$::LEvent->button,$::LEvent->time);
+	my $event=Gtk2->get_current_event;
+	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
 }
 
 sub VisualsMenu
@@ -1389,7 +1391,8 @@ sub VisualsMenu
 		$menu->append($item);
 	}
 	$menu->show_all;
-	$menu->popup(undef,undef,\&::menupos,undef,$::LEvent->button,$::LEvent->time);
+	my $event=Gtk2->get_current_event;
+	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
 }
 
 sub NewMenuBar
@@ -2295,7 +2298,6 @@ sub button_press_event_cb
 	my $pagenb=$self->get_current_page;
 	my $page=$self->get_nth_page($pagenb);
 	#my $listname= $page? $page->{tabbed_listname} : undef;
-	$::LEvent=$event;
 	my @menu;
 	my @opt=
 	(	self=> $self, page=> $page,	type => $self->{typesubmenu},
@@ -3314,7 +3316,7 @@ sub click
 }
 
 sub popup
-{	(my $self,$::LEvent)=@_;
+{	my ($self,$event)=@_;
 	my $menu=Gtk2::Menu->new;
 	my $set=$self->{nb}; $set='' unless defined $set;
 	my $sub=sub { $self->callback($_[1]); };
@@ -3326,7 +3328,7 @@ sub popup
 		$menu->append($item);
 	}
 	$menu->show_all;
-	$menu->popup(undef, undef, \&::menupos, undef, $::LEvent->button, $::LEvent->time);
+	$menu->popup(undef, undef, \&::menupos, undef, $event->button, $event->time);
 }
 
 sub createmenu
