@@ -699,6 +699,7 @@ our %Options=
 	CustomKeyBindings	=> {},
 	ArtistSplit		=> ' & |, |;',
 	VolumeStep		=> 10,
+	DateFormat_history	=> ['%c 604800 %A %X 86400 Today %X 60 now'],
 
 	SavedSTGroupings=>
 	{	_"None"			=> '',
@@ -5307,9 +5308,28 @@ sub PrefMisc
 	);
 	my $asplit=NewPrefCombo(ArtistSplit => \%split, text => _"Split artist names on (needs restart) :");
 
+	my $dateex= mktime(5,4,3,2,0,(localtime)[5]);
+	my $datetip= join "\n", _"use standard strftime variables",	_"examples :",
+			map( sprintf("%s : %s",$_,strftime($_,localtime($dateex))), split(/ *\| */,"%a %b %d %H:%M:%S %Y | %A %B %I:%M:%S %p %Y | %d/%m/%y %H:%M | %X %x | %F %r | %c | %s") ),
+			'',
+			_"Additionally this format can be used :\n default number1 format1 number2 format2 ...\n dates more recent than number1 seconds will use format1, ...";
+	my $datefmt=NewPrefEntry(DateFormat => _"Date format :", tip => $datetip, history=> 'DateFormat_history');
+	#%c 604800 %A %X 86400 Today %X
+	my $preview= Label::Preview->new
+	(	event => 'Option', format=> '<small><i>'.::PangoEsc(_"example : %s").'</i></small>',
+		preview =>
+		# sub { Songs::DateString(localtime $dateex)}
+		sub {	my @sec= ($dateex,map time-$_, ($::Options{DateFormat}||'')=~m/(\d+) +/g);
+			join "\n", '', map Songs::DateString($_), @sec;
+		    }
+	);
+	#my $datebox= Hpack(0,$datefmt,$preview);
+	my $datealign=Gtk2::Alignment->new(0,.5,0,0);
+	$datealign->add($datefmt);
+	my $datebox= Hpack(0,$datealign,$preview);
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$DefRating,$ProxyCheck,$diasort,$asplit,$screensaver,$shutentry;
+	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$DefRating,$ProxyCheck,$diasort,$asplit,$datebox,$screensaver,$shutentry;
 	return $vbox;
 }
 

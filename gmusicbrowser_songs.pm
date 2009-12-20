@@ -1492,7 +1492,18 @@ sub UpdateDefaultRating
 }
 
 sub DateString
-{	$_[0] ? scalar localtime $_[0] : _('never');
+{	my $time=shift;
+	my ($fmt,@formats)= split /(\d+) +/, $::Options{DateFormat}||"%c";
+	unless ($time)
+	{	return _"never";
+	}
+	my $diff=time-$time;
+	while (@formats)
+	{	my $max=shift @formats;
+		last if $diff>$max;
+		$fmt=shift @formats;
+	}
+	::strftime($fmt,localtime $time);
 }
 
 #sub Album_Artist #guess album artist
