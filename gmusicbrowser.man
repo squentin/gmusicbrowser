@@ -5,8 +5,8 @@ gmusicbrowser \- Jukebox for large collections of audio files
 .SH "SYNOPSIS"
 .B gmusicbrowser
 .RI
-[\-c]
-[\-s]
+[\-nocheck]
+[\-noscan]
 [\-demo]
 [\-ro]
 [\-rotags]
@@ -15,11 +15,12 @@ gmusicbrowser \- Jukebox for large collections of audio files
 [\-gst|\-nogst]
 [\-server]
 [\-port N]
-[\-C FILE]
-[\-F FIFO|\-nofifo]
+[\-cfg FILE]
+[\-fifo FIFO|\-nofifo]
 [\-debug]
 [\-layout NAME]
-[\-load FILE]
+[\-plugin NAME]
+[\-searchpath FOLDER]
 [\-use\-gnome\-session]
 [\-cmd|\-launch_or_cmd CMD...]
 .br
@@ -93,6 +94,15 @@ print lots of useless informations
 .TP
 \fB\-l NAME\fR, \fB\-layout NAME\fR
 use layout NAME for player window
+.TP
+\fB\-plugin NAME\fR
+deactivate plugin identified by NAME
+.TP
+\fB\+plugin NAME\fR
+activate plugin identified by NAME
+.TP
+\fB\-searchpath FOLDER\fR
+add FOLDER to the list of folders searched for plugins and layouts
 .TP
 \fB\-use\-gnome\-session\fR
 Use gnome libraries to save tags/settings on session logout (needs the Gnome2 perl module).
