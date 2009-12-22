@@ -887,7 +887,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	EnqueueSelected => [\&Layout::EnqueueSelected,		_"Enqueue Selected Songs"],
 	EnqueueArtist	=> [sub {EnqueueSame('artist',$SongID)},_"Enqueue Songs from Current Artist"], # or use field 'artists' or 'first_artist' ?
 	EnqueueAlbum	=> [sub {EnqueueSame('album',$SongID)},	_"Enqueue Songs from Current Album"],
-	EnqueueAction	=> [sub {EnqueueAction($_[1])},		_"Enqueue Action", _"Queue mode" ,sub { TextCombo::Tree->new({map {$_ => $QActions{$_}[2]} sort keys %QActions}) }],
+	EnqueueAction	=> [sub {EnqueueAction($_[1])},		_"Enqueue Action", _"Queue mode" ,sub { TextCombo->new({map {$_ => $QActions{$_}[2]} sort keys %QActions}) }],
 	ClearQueue	=> [\&::ClearQueue,			_"Clear queue"],
 	IncVolume	=> [sub {ChangeVol('up')},		_"Increase Volume"],
 	DecVolume	=> [sub {ChangeVol('down')},		_"Decrease Volume"],
