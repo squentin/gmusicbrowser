@@ -3574,11 +3574,15 @@ COPYNEXTID:for my $ID (@$IDs)
 }
 
 sub ChooseDir
-{	my ($msg,$path,$extrawidget,$remember_key,$multiple) = @_;
-	my $dialog=Gtk2::FileChooserDialog->new($msg,undef,'select-folder',
-					'gtk-ok' => 'ok',
-					'gtk-cancel' => 'none',
-					);
+{	my ($msg,$path,$extrawidget,$remember_key,$multiple,$allowfiles) = @_;
+	my $mode= $allowfiles ? 'open' : 'select-folder';
+	my $dialog=Gtk2::FileChooserDialog->new($msg,undef,$mode);
+	my $okbutton=$dialog->add_button('gtk-ok' => 'ok');
+	$dialog->add_button('gtk-cancel' => 'none');
+
+	# there is no mode in Gtk2::FileChooserDialog that let you select both files or folders (Bug #136294), so have to work-around by connecting to the ok button and forcing the end of $dialog->run with a $dialog->hide (the dialog will be destroyed after)
+	$okbutton->signal_connect(clicked=> sub { $_[0]->{ok}=1; $dialog->hide; }) if $allowfiles;
+
 	if ($remember_key) { $path= decode_url($Options{$remember_key}); }
 	_utf8_on($path) if $path; #FIXME not sure if it's the right thing to do
 	$dialog->set_current_folder($path) if $path;
@@ -3586,11 +3590,11 @@ sub ChooseDir
 	$dialog->set_select_multiple(1) if $multiple;
 
 	my @paths;
-	if ($dialog->run eq 'ok')
+	if ($dialog->run eq 'ok' || $okbutton->{ok})
 	{	@paths=$dialog->get_filenames;
 		eval { $_=filename_from_unicode($_); } for @paths;
 		_utf8_off($_) for @paths;# folder names that failed filename_from_unicode still have their uft8 flag on
-		@paths= grep -d, @paths;
+		@paths= grep -d, @paths unless $allowfiles;
 	}
 	else {@paths=()}
 	if ($remember_key) { $Options{$remember_key}= url_escape($dialog->get_current_folder); }
@@ -3598,6 +3602,7 @@ sub ChooseDir
 	return @paths if $multiple;
 	return $paths[0];
 }
+
 #sub ChooseDir_old
 #{	my ($msg,$path) = @_;
 #	my $DirSelector=Gtk2::FileSelection->new($msg);
@@ -5380,8 +5385,8 @@ sub PrefLibrary
 	return $vbox;
 }
 sub ChooseAddPath
-{	my $addtolibrary=shift;
-	my @dirs=ChooseDir(_"Choose folder to add",undef,undef,'LastFolder_Add',1);
+{	my ($addtolibrary,$allowfiles)=@_;
+	my @dirs=ChooseDir(_"Choose folder to add",undef,undef,'LastFolder_Add',1,$allowfiles);
 	@dirs=map url_escape($_), @dirs;
 	AddPath($addtolibrary,@dirs);
 }
