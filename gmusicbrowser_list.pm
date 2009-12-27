@@ -256,7 +256,6 @@ sub list_Update
 sub selected_Set
 {	my $self=shift;
 	::Watch($self,'Selection_'.$self->{group}, \&QueueUpdateFast);
-	return \&Update_selected;
 }
 sub selected_Update
 {	my $self=shift;
@@ -271,7 +270,6 @@ sub library_Set
 {	my $self=shift;
 	::Watch($self, SongsAdded	=>\&QueueUpdateSlow);
 	::Watch($self, SongsRemoved	=>\&QueueUpdateSlow);
-	return \&Update_library;
 }
 sub library_Update
 {	my $tip= ::__('%d song in the library','%d songs in the library',scalar@$::Library);
