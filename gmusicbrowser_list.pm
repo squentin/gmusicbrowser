@@ -446,10 +446,8 @@ sub CommonInit
 	{	#$songarray= SongArray->new_copy($::ListPlay);
 		$self->{array}=$songarray=$::ListPlay;
 		$self->{sort}= $::RandomMode ? $::Options{Sort_LastOrdered} : $::Options{Sort};
-		#$self->{filter}=$::PlayFilter;
-		$self->{ignoreSetFilter}=1;
-		::SetFilter($self,$::PlayFilter,0);
-		$self->{ignoreSetFilter}=0;
+		$self->UpdatePlayListFilter;
+		::Watch($self,Filter=>  \&UpdatePlayListFilter);
 	}
 	elsif ($type eq 'L')
 	{	if (defined $EditList) { $songarray=$EditList; $EditList=undef; } #special case for editing a list via ::WEditList
@@ -470,6 +468,12 @@ sub CommonInit
 	::weaken($Register{ $self->{group} });	#or use a destroy cb ?
 
 	$self->{SaveOptions}=\&CommonSave;
+}
+sub UpdatePlayListFilter
+{	my $self=shift;
+	$self->{ignoreSetFilter}=1;
+	::SetFilter($self,$::PlayFilter,0);
+	$self->{ignoreSetFilter}=0;
 }
 sub CommonSave
 {	my $self=shift;
