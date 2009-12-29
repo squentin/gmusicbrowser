@@ -1886,7 +1886,7 @@ sub SaveOptions
 	$opt{page}=$self->{page};
 	$opt{min}=$self->{min};
 	$opt{pages}=join '|', map $_->{pid}, $self->{notebook}->get_children;
-	for my $col (::SONG_ARTIST,::SONG_ALBUM,::SONG_GENRE,::SONG_DATE,::SONG_LABELS)
+	for my $col (::SONG_ARTIST,::SONG_ALBUM,::SONG_GENRE,::SONG_DATE,::SONG_LABELS,::SONG_ADDED,::SONG_MODIF,::SONG_LASTPLAY,::SONG_RATING)
 	{	my $page=$self->{$col};
 		next unless $page;
 		my $pid=$page->{pid};
