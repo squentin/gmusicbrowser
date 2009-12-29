@@ -1457,28 +1457,28 @@ my @MenuSubGroup=
 );
 
 @MenuPageOptions=
-(	{ label => _"show pictures",	code => sub { my $self=$_[0]{self}; $self->{lpicsize}[$_[0]{depth}]=$_[1]; $self->Fill('optchanged'); },	mode => 'LS',
+(	{ label => _"show pictures",	code => sub { my $self=$_[0]{self}; $self->{lpicsize}[$_[0]{depth}]=$_[1]; $self->SetOption; },	mode => 'LS',
 	  submenu => \@picsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{lpicsize}[$_[0]{depth}]},
 		test => sub { Songs::FilterListProp($_[0]{subfield},'picture'); }, },
-	{ label => _"show info",	code => sub { my $self=$_[0]{self}; $self->{lmarkup}[$_[0]{depth}]^=1; $self->Fill('optchanged'); },
+	{ label => _"show info",	code => sub { my $self=$_[0]{self}; $self->{lmarkup}[$_[0]{depth}]^=1; $self->SetOption; },
 	  check => sub { $_[0]{self}{lmarkup}[$_[0]{depth}]}, istrue => 'aa', mode => 'LS', },
-	{ label => _"show the 'All' row",	code => sub { my $self=$_[0]{self}; $self->{noall}^=1; $self->Fill('optchanged'); },
+	{ label => _"show the 'All' row",	code => sub { my $self=$_[0]{self}; $self->{noall}^=1; $self->SetOption; },
 	  check => sub { !$_[0]{self}{noall} }, mode => 'LS', },
-	{ label => _"picture size",	code => sub { my $self=$_[0]{self}; $self->{mpicsize}=$_[1]; $self->Fill('optchanged'); },
+	{ label => _"picture size",	code => sub { $_[0]{self}->SetOption(mpicsize=>$_[1]);  },
 	  mode => 'M',
 	  submenu => \@mpicsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{mpicsize}}, istrue => 'aa' },
 
-	{ label => _"font size depends on",	code => sub { my $self=$_[0]{self}; $self->{cloud_stat}=$_[1]; $self->Fill('optchanged'); },
+	{ label => _"font size depends on",	code => sub { $_[0]{self}->SetOption(cloud_stat=>$_[1]); },
 	  mode => 'C',
 	  submenu => \@cloudstats_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{cloud_stat}}, },
-	{ label => _"minimun font size", code => sub { my $self=$_[0]{self}; $self->{cloud_min}=$_[1]; $self->Fill('optchanged'); },
+	{ label => _"minimun font size", code => sub { $_[0]{self}->SetOption(cloud_min=>$_[1]); },
 	  mode => 'C',
 	  submenu => sub { [2..::min(20,$_[0]{self}{cloud_max}-1)] },  check => sub {$_[0]{self}{cloud_min}}, },
-	{ label => _"maximum font size", code => sub { my $self=$_[0]{self}; $self->{cloud_max}=$_[1]; $self->Fill('optchanged'); },
+	{ label => _"maximum font size", code => sub { $_[0]{self}->SetOption(cloud_max=>$_[1]); },
 	  mode => 'C',
 	  submenu => sub { [::max(10,$_[0]{self}{cloud_min}+1)..40] },  check => sub {$_[0]{self}{cloud_max}}, },
 
-	{ label => _"sort by",		code => sub { my $self=$_[0]{self}; $self->{sort}=$_[1]; $self->Fill('optchanged'); },
+	{ label => _"sort by",		code => sub { $_[0]{self}->SetOption('sort'=>$_[1]); },
 	  check => sub {$_[0]{self}{sort}}, istrue => 'aa', submenu => \%sort_menu, submenu_reverse => 1 },
 	{ label => _"group by",
 	  code	=> sub { my $self=$_[0]{self}; my $d=$_[0]{depth}; $self->{type}[$d]=$self->{field}[$d].'.'.$_[1]; $self->Fill('rehash'); },
@@ -1935,6 +1935,12 @@ sub SetField
 	$i++ while $self->{field}[$i];
 	$self->{depth}=$i-1;
 
+	$self->Fill('optchanged');
+}
+
+sub SetOption
+{	my ($self,$key,$value)=@_;
+	$self->{$key}=$value if $key;
 	$self->Fill('optchanged');
 }
 
