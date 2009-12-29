@@ -46,7 +46,7 @@ sub prefbox
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $entry=::NewPrefEntry(OPT.'CMD',_"Command when playing song changed :",	expand=>1,sizeg1=>$sg1);
 	my $entry2=::NewPrefEntry(OPT.'StoppedCMD',_"Command when stopped :",		expand=>1,sizeg1=>$sg1);
-	my $preview= Label::Preview->new(\&command_preview, 'CurSong Option',undef,1);
+	my $preview= Label::Preview->new(preview => \&command_preview, event => 'CurSong Option', noescape=>1);
 	my $check=::NewPrefCheckButton(OPT.'SENDSTDINPUT',_"Send Title/Artist/Album in standard input");
 	my $replacetable=::MakeReplaceTable('talydnfc');
 	$vbox->pack_start($_,::FALSE,::FALSE,2) for $replacetable,$entry,$preview,$entry2,$check;

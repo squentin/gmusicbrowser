@@ -8154,12 +8154,10 @@ package Label::Preview;
 use base 'Gtk2::Label';
 
 sub new
-{	my ($class,$update,$event,$entry,$use_markup)=@_;
+{	my ($class,%args)=@_;
 	my $self= bless Gtk2::Label->new, $class;
-	$self->{entry}=$entry;
-	$self->{update}=$update;
-	$self->{use_markup}=$use_markup;
-	#$entry->signal_connect( changed => sub { $self->update });
+	$self->{$_}=$args{$_} for qw/entry preview format empty noescape/;
+	my ($event,$entry)=@args{qw/event entry/};
 	$entry->signal_connect_swapped( changed => \&update, $self) if $entry;
 	if ($event) { ::Watch($self, $_ => \&update) for split / /,$event; }
 	$self->update;
@@ -8168,7 +8166,16 @@ sub new
 sub update
 {	my $self=shift;
 	my $arg= $self->{entry} ? $self->{entry}->get_text : undef;
-	my $text=$self->{update}->($arg);
-	$self->{use_markup} ? $self->set_markup($text) : $self->set_text($text);
+	my $text=$self->{preview}->($arg);
+	if (defined $text)
+	{	my $f= $self->{format} || '%s';
+		$text= ::PangoEsc($text) unless $self->{noescape};
+		$text=sprintf $f, $text;
+	}
+	else
+	{	$text= $self->{empty};
+		$text='' unless defined $text;
+	}
+	$self->set_markup($text);
 }
 
