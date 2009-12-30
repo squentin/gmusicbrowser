@@ -219,7 +219,7 @@ our %Widgets=
 					 @$::Queue		?	::__("%d song in queue","%d songs in queue", scalar @$::Queue):
 					!defined $::Position	?	::__("%d song","%d songs",scalar @$::ListPlay):
 									($::Position+1).'/'.@$::ListPlay;
-				  $_[0]->set_markup( '<small>'.$t.'</small>' );
+				  $_[0]->set_markup_with_format( '<small>%s</small>', $t );
 				},
 		event	=> 'Pos Queue Filter',
 	},
@@ -1054,9 +1054,10 @@ sub UpdateSongID
 	for my $w ($widget)
 	{	$w->{schange}($w,$ID) if $w->{schange};
 		if ($w->{markup})
-		{	if (defined $ID) { $w->set_markup(::ReplaceFieldsAndEsc( $ID,$w->{markup} )); }
-			elsif (defined $w->{markup_empty}) { $w->set_markup($w->{markup_empty}); }
-			else { $w->set_markup(''); }
+		{	my $markup=	defined $ID			? ::ReplaceFieldsAndEsc( $ID,$w->{markup} ) :
+					defined $w->{markup_empty}	? $w->{markup_empty} :
+					'';
+			$w->set_markup($markup);
 		}
 		if ($w->{song_tip})
 		{	my $tip= defined $ID ? ::ReplaceFields($ID,$w->{song_tip}) : '';
@@ -2721,6 +2722,10 @@ sub set_markup
 {	my $label=$_[0]->child; $label->set_markup($_[1]); $label->{dx}=0;
 	$_[0]->checksize;
 }
+sub set_markup_with_format
+{	my $self=shift;
+	$self->set_markup(::MarkupFormat(@_));
+}
 sub checksize	#extend the requested size so that the string fit in initsize mode (in case the initsize string is not wide enough)
 {	my $self=$_[0];
 	if ($self->{resize})
@@ -3414,9 +3419,9 @@ sub update
 		$::Tooltips->set_tip( $bar, $details ) if $details;
 	}
 	else
-	{	my $markup= '<b>'.::PangoEsc($title).'</b>';
-		$markup.= "\n".::PangoEsc($details) if $details;
-		$label->set_markup( $markup )
+	{	my $format= '<b>%s</b>';
+		$format.= "\n%s" if $details;
+		$label->set_markup_with_format( $format, $title, $details );
 	}
 	$bar->set_fraction( $prop->{fraction} );
 	$bar->set_text( $bartext )	if defined $bartext;
@@ -3464,8 +3469,8 @@ sub update
 		for my $i (0..9)
 		{	if ($self->{labels})
 			{	my $val='-';
-				$val=::PangoEsc($::Play_package->EQ_Get_Hz($i)||'?') if $::Play_package->{EQ};
-				$self->{'Hzlabel'.$i}->set_markup(qq(<span size="$self->{labels}">$val</span>));
+				$val= $::Play_package->EQ_Get_Hz($i)||'?' if $::Play_package->{EQ};
+				$self->{'Hzlabel'.$i}->set_markup_with_format(qq(<span size="%s">%s</span>), $self->{labels},$val);
 			}
 			my $adj=$self->{'adj'.$i};
 			$adj->{busy}=1;
@@ -3485,8 +3490,7 @@ sub update
 		$adj->set_value($val);
 		delete $adj->{busy};
 		next unless $self->{labels};
-		$val=sprintf('%.1f',$val).$self->{unit};
-		$self->{'Valuelabel'.$i}->set_markup(qq(<span size="$self->{labels}">$val</span>)) if $self->{labels};
+		$self->{'Valuelabel'.$i}->set_markup_with_format(qq(<span size="%s">%.1f%s</span>), $self->{labels},$val,$self->{unit});
 	}
 }
 

@@ -198,9 +198,8 @@ sub Update
 	delete $::ToDo{'9_Total'.$self};
 	my ($text,$array,$tip)= $Modes{ $self->{mode} }{update}->($self);
 	$text.= ::CalcListLength($array,$self->{format});
-	$text= ::PangoEsc($text);
-	$text= '<span size="'.$self->{size}.'">'.$text.'</span>' if $self->{size};
-	$self->child->set_markup($text);
+	my $format= $self->{size} ? '<span size="'.$self->{size}.'">%s</span>' : '%s';
+	$self->child->set_markup_with_format($format,$text);
 	$::Tooltips->set_tip($self, $tip);
 	$self->{needupdate}=0;
 }
@@ -3617,7 +3616,7 @@ sub makelayout
 	my $markup=$prop->[P_MARKUP][$depth];
 	$markup= $markup ? "<b>%a</b>%Y\n<small>%s <small>%l</small></small>" : "%a"; #FIXME
 	if ($gid==FilterList::GID_ALL)
-	{	$markup= sprintf "<b>%s (%d)</b>", ::PangoEsc( Songs::Field_All_string($field) ), $cell->get('all_count');
+	{	$markup= ::MarkupFormat("<b>%s (%d)</b>", Songs::Field_All_string($field), $cell->get('all_count') );
 	}
 	#elsif ($gid==0) {  }
 	else { $markup=AA::ReplaceFields( $gid,$markup,$field,::TRUE ); }

@@ -461,7 +461,7 @@ sub new
 			$folder.= "\n". ::__x(_"(common parent folder : {common})",common=>$common) if length($common)>5;
 		}
 		my $text= ::__("%d file in {folder}","%d files in {folder}",scalar@IDs);
-		$text= ::__x($text,folder => '<small>'.::PangoEsc($folder).'</small>');
+		$text= ::__x($text, folder => ::MarkupFormat('<small>%s</small>',$folder) );
 		my $labelfile = Gtk2::Label->new;
 		$labelfile->set_markup($text);
 		$labelfile->set_selectable(TRUE);

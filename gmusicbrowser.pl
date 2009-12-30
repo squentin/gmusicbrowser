@@ -415,6 +415,14 @@ sub PangoEsc	# escape special chars for pango ( & < > ) #replaced by Glib::Marku
 	s/"/&quot;/g; s/'/&apos;/g; # doesn't seem to be needed
 	return $_;
 }
+sub MarkupFormat
+{	my $format=shift;
+	sprintf $format, map PangoEsc($_), @_;
+}
+sub Gtk2::Label::set_markup_with_format
+{	my $label=shift;
+	$label->set_markup( MarkupFormat(@_) );
+}
 
 sub CleanupFileName
 {	local $_=$_[0];
@@ -2850,7 +2858,7 @@ sub ChooseSongs
 	    }
 	    else	# "title" items
 	    {	$item=Gtk2::MenuItem->new;
-		$label->set_markup("<b>".PangoEsc($ID)."</b>");
+		$label->set_markup_with_format("<b>%s</b>",$ID);
 		$item->can_focus(0);
 		$item->signal_connect(enter_notify_event=> sub {1});
 	    }
@@ -4120,7 +4128,7 @@ sub DialogRename
 		next if ($col eq 'disc' || $col eq 'track') && !$val;
 		my $lab1=Gtk2::Label->new;
 		my $lab2=Gtk2::Label->new($val);
-		$lab1->set_markup('<b>'.PangoEsc(Songs::FieldName($col)).' :</b>');
+		$lab1->set_markup_with_format("<b>%s :</b>", Songs::FieldName($col));
 		$lab1->set_padding(5,0);
 		$lab1->set_alignment(1,.5);
 		$lab2->set_alignment(0,.5);
@@ -4403,7 +4411,7 @@ sub SongInfo
 	for my $col (@fields)
 	{	my $lab1=Gtk2::Label->new;
 		my $lab2=$table->{$col}=Gtk2::Label->new;
-		#$lab1->set_markup('<b>'.PangoEsc(Songs::FieldName($col)).' :</b>');
+		#$lab1->set_markup_with_format("<b>%s :</b>", Songs::FieldName($col));
 		$lab1->set_text( Songs::FieldName($col).' :');
 		$lab1->set_padding(5,0);
 		$lab1->set_alignment(1,.5);
@@ -5079,14 +5087,14 @@ sub PrefPlugins
 	 {	return unless $plugin;
 		my $pref=$Plugins{$plugin};
 		if ($plug_box && $plug_box->parent) { $plug_box->parent->remove($plug_box); }
-		my $title='<b>'.PangoEsc( $pref->{title}||$pref->{name} ).'</b>';
+		my $title= MarkupFormat('<b>%s</b>', $pref->{title}||$pref->{name} );
 		$plugtitle->set_markup($title);
 		$plugdesc->set_text( $pref->{desc} );
 		if (my $error=$pref->{error})
 		{	$plug_box=Gtk2::Label->new;
 			$error=PangoEsc($error);
 			$error=~s#(\(\@INC contains: .*)#<small>$1</small>#s;
-			$plug_box->set_markup('<b>'._("Error :")."</b>\n$error");
+			$plug_box->set_markup( MarkupFormat("<b>%s</b>\n", _("Error :")) .$error);
 			$plug_box->set_line_wrap(1);
 			$plug_box->set_selectable(1);
 		}
@@ -5247,13 +5255,13 @@ sub PrefAudio_makeadv
 				{	push @ext, join '/', $e, sort grep $::Alias_ext{$_} eq $e,keys %::Alias_ext;
 				}
 				my $list=join ' ',sort @ext;
-				$_[0]->set_markup('<small>'._("supports : ").$list.'</small>') if $list;
+				$_[0]->set_markup_with_format('<small>%s</small>', _("supports : ").$list) if $list;
 			}) if $package;
 		$hbox->pack_start($label,TRUE,TRUE,4);
 	}
 	if (1)
 	{	my $label=Gtk2::Label->new;
-		$label->set_markup('<small>'._('advanced options').'</small>');
+		$label->set_markup_with_format('<small>%s</small>', _"advanced options");
 		my $but=Gtk2::Button->new;
 		$but->add($label);
 		$but->set_relief('none');
@@ -5316,7 +5324,7 @@ sub PrefMisc
 	my $datefmt=NewPrefEntry(DateFormat => _"Date format :", tip => $datetip, history=> 'DateFormat_history');
 	#%c 604800 %A %X 86400 Today %X
 	my $preview= Label::Preview->new
-	(	event => 'Option', format=> '<small><i>'.::PangoEsc(_"example : %s").'</i></small>',
+	(	event => 'Option', format=> MarkupFormat('<small><i>%s</i></small>', _"example : %s"),
 		preview =>
 		# sub { Songs::DateString(localtime $dateex)}
 		sub {	my @sec= ($dateex,map time-$_, ($::Options{DateFormat}||'')=~m/(\d+) +/g);
@@ -5378,7 +5386,7 @@ sub CreateMainWindow
 sub PrefTags
 {	my $vbox=Gtk2::VBox->new (FALSE, 2);
 	my $warning=Gtk2::Label->new;
-	$warning->set_markup('<b>'.PangoEsc(_"Warning : these are advanced options, don't change them unless you know what you are doing.").'</b>');
+	$warning->set_markup_with_format('<b>%s</b>', _"Warning : these are advanced options, don't change them unless you know what you are doing.");
 	$warning->set_line_wrap(1);
 	my $checkv4=NewPrefCheckButton('TAG_write_id3v2.4',_"Write ID3v2.4 tags",undef,_"Use ID3v2.4 instead of ID3v2.3, ID3v2.3 are probably better supported by other softwares");
 	my $checklatin1=NewPrefCheckButton(TAG_use_latin1_if_possible => _"Use latin1 encoding if possible in id3v2 tags",undef,_"the default is utf16 for ID3v2.3 and utf8 for ID3v2.4");
@@ -6818,7 +6826,7 @@ sub new
 	for ([_"Available",$treeview1,$butadd],[_"Sort order",$treeview2,$butrm,$butclear])
 	{	my ($label,$tv,@buts)=@$_;
 		my $lab=Gtk2::Label->new;
-		$lab->set_markup('<b>'.::PangoEsc($label).'</b>');
+		$lab->set_markup_with_format('<b>%s</b>',$label);
 		$tv->set_headers_visible(FALSE);
 		$tv->append_column( Gtk2::TreeViewColumn->new_with_attributes($label,Gtk2::CellRendererText->new,'text',1) );
 		my $sw = Gtk2::ScrolledWindow->new;
@@ -7242,7 +7250,7 @@ sub _frame_example
 {	my $frame=shift;
 	my $p=$frame->{params};
 	return unless $p;
-	$frame->{label}->set_markup( '<small><i>'._("ex : ").::PangoEsc(Random->MakeExample($p,$::SongID)).'</i></small>' ) if defined $::SongID;
+	$frame->{label}->set_markup_with_format( '<small><i>%s %s</i></small>', _("ex :"), Random->MakeExample($p,$::SongID)) if defined $::SongID;
 }
 
 sub UpdateID
@@ -7260,7 +7268,7 @@ sub UpdateID
 	  $prob= ::__x( _"1 chance in {probability}", probability => sprintf($prob>=10? '%.0f' : '%.1f', $prob) );
 	}
 	else {$prob=_"0 chance"}
-	$self->{example_label}->set_markup( '<small><i>'.::__x( _"example (selected song) : {score}  ({chances})", score =>$v, chances => $prob). "</i></small>" );
+	$self->{example_label}->set_markup_with_format( '<small><i>%s</i></small>', ::__x( _"example (selected song) : {score}  ({chances})", score =>$v, chances => $prob) );
 }
 
 sub get_string

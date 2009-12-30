@@ -60,8 +60,8 @@ sub command_preview
 	my @cmd= ::split_with_quotes($cmd);
 	return '' unless @cmd;
 	$_= ::PangoEsc( ::ReplaceFields($ID,$_) ) for @cmd;
-	splice @cmd,$_,0, "\n".'<i>' . ::PangoEsc(::__x(_"argument {n} :",n=>$_)) . '</i>'   for reverse 1..$#cmd;
-	unshift @cmd, '<i>' . ::PangoEsc(_"command :") . '</i>';
+	splice @cmd,$_,0, ::MarkupFormat("\n<i>%s</i>", ::__x(_"argument {n} :",n=>$_))   for reverse 1..$#cmd;
+	unshift @cmd, ::MarkupFormat('<i>%s</i>', _"command :");
 	my $t= join(' ',@cmd);
 	return '<small>'.$t.'</small>';
 }
