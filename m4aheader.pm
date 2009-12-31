@@ -426,8 +426,8 @@ sub _UpdateStco
 	while (@$stco)
 	{	my ($atom,$offset)=splice @$stco,0,2;
 		if ($atom eq 'stco')
-		{	my $nb=unpack 'N',substr $$chunckdataref,$offset+12;
-			my @offsets=unpack 'N*',substr $$chunckdataref,$offset+16,$nb;
+		{	my $nb=unpack 'N',substr $$chunckdataref,$offset+12; #number of 4-bytes offset
+			my @offsets=unpack 'N*',substr $$chunckdataref,$offset+16,$nb*4;
 			$_ = $_ > $change_position ? $_+$delta : $_ for @offsets;
 			substr $$chunckdataref,$offset+16, 4*@offsets, pack 'N*',@offsets;
 		}
