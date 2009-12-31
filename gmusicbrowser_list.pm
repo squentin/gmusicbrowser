@@ -197,7 +197,8 @@ sub Update
 {	my $self=shift;
 	delete $::ToDo{'9_Total'.$self};
 	my ($text,$array,$tip)= $Modes{ $self->{mode} }{update}->($self);
-	$text.= ::CalcListLength($array,$self->{format});
+	if (!$array)	{ $tip=$text=_"error"; }
+	else		{ $text.= ::CalcListLength($array,$self->{format}); }
 	my $format= $self->{size} ? '<span size="'.$self->{size}.'">%s</span>' : '%s';
 	$self->child->set_markup_with_format($format,$text);
 	$::Tooltips->set_tip($self, $tip);
@@ -248,7 +249,7 @@ sub list_Update
 {	my $self=shift;
 	my $songlist=::GetSonglist($self) || return;
 	my $array=$songlist->{array};
-	return _("Listed : "), $array,  ::__('%d song','%d songs',scalar@$array)
+	return _("Listed : "), $array,  ::__('%d song','%d songs',scalar@$array);
 }
 
 ### selected functions
