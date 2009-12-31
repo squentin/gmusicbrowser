@@ -45,7 +45,7 @@ my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 	#Lyricsfly ?
 );
 
-$::Options{OPT.'LyricSite'}=undef if !exists $sites{$::Options{OPT.'LyricSite'}};
+if (my $site=$::Options{OPT.'LyricSite'}) { delete $::Options{OPT.'LyricSite'} unless exists $sites{$site} } #reset selected site if no longer defined
 ::SetDefaultOptions(OPT, FontSize => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyricsplugin');
 
 
