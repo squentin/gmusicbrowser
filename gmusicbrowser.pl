@@ -1621,7 +1621,11 @@ sub ReadSavedTags	#load tags _and_ settings
 	}
 
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};
-	@$Queue=() unless $Options{RememberQueue};
+	$Options{SongArray_Queue}=undef unless $Options{RememberQueue};
+	if ($Options{RememberQueue})
+	{	$QueueAction=delete $Options{QueueAction};
+		IdleDo('1_QAuto',10,\&EnqueueAction,$QueueAction) if $QueueAction;
+	}
 	if ($Options{RememberPlayFilter})
 	{	$TogLock=$Options{Lock};
 	}
@@ -1658,6 +1662,7 @@ sub SaveTags	#save tags _and_ settings
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
 	$Options{Lock}= $TogLock || '';
 	$Options{SavedSongID}= SongArray->new([$SongID]) if $Options{RememberPlaySong} && defined $SongID;
+	$Options{QueueAction}=$QueueAction if $QueueAction eq 'autofill' || $QueueAction eq 'wait';
 
 	$Options{SavedOn}= time;
 
@@ -5291,6 +5296,7 @@ sub PrefMisc
 	my $checkR1=NewPrefCheckButton(RememberPlayFilter => _"Remember last Filter/Playlist between sessions");
 	my $checkR3=NewPrefCheckButton( RememberPlayTime  => _"Remember playing position between sessions");
 	my $checkR2=NewPrefCheckButton( RememberPlaySong  => _"Remember playing song between sessions",undef,undef,$checkR3);
+	my $checkR4=NewPrefCheckButton( RememberQueue  => _"Remember queue between sessions");
 
 	#Proxy
 	my $ProxyCheck=NewPrefCheckButton(Simplehttp_Proxy => _"Connect through a proxy",undef,undef,
@@ -5337,7 +5343,7 @@ sub PrefMisc
 	my $datebox= Hpack(0,$datealign,$preview);
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$DefRating,$ProxyCheck,$diasort,$asplit,$datebox,$screensaver,$shutentry;
+	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$diasort,$asplit,$datebox,$screensaver,$shutentry;
 	return $vbox;
 }
 
