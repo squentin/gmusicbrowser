@@ -2752,8 +2752,7 @@ sub UpdatePlayingFilters
 	my $treeview=$self->{treeview};
 	my $store=$treeview->get_model;
 	if (defined $self->{play})
-	{	$path=Gtk2::TreePath->new( $self->{play} );
-		$iter=$store->get_iter($path);
+	{	$iter=$store->get_iter_from_string($self->{play});
 	}
 	my @list=(	playfilter	=> _"Playing Filter",
 			'f=artists'	=> _"Playing Artist",
@@ -2864,7 +2863,7 @@ sub row_activated_cb
 sub name_edited_cb
 {	my ($cell, $path_string, $newname,$self) = @_;
 	my $store=$self->{store};
-	my $iter=$store->get_iter( Gtk2::TreePath->new($path_string) );
+	my $iter=$store->get_iter_from_string($path_string);
 	my ($name,$type)=$store->get($iter,0,1);
 	my $sub= $type eq 'sfilter' ? \&::SaveFilter : \&::SaveList;
 	#$self->{busy}=1;
@@ -2884,8 +2883,7 @@ sub CreateNewFL
 	my $store=$treeview->get_model;
 	my $iter;
 	if (defined $self->{$type})
-	{	my $path=Gtk2::TreePath->new( $self->{$type} );
-		$iter=$store->get_iter($path);
+	{	$iter=$store->get_iter_from_string( $self->{$type} );
 	}
 	$iter=$store->iter_children($iter);
 	while ($iter)

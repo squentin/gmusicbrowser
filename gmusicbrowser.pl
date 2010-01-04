@@ -4983,9 +4983,8 @@ sub PrefPlugins
 	 };
 
 	$renderer->signal_connect(toggled => sub
-	 {	#my ($cell, $path_str) = @_;
-		my $path = Gtk2::TreePath->new($_[1]);
-		my $iter = $store->get_iter($path);
+	 {	my ($cell, $path_string)=@_;
+		my $iter=$store->get_iter_from_string($path_string);
 		my $plugin=$store->get($iter, 0);
 		my $key='PLUGIN_'.$plugin;
 		if ($Options{$key})	{DeactivatePlugin($plugin)}
@@ -6278,7 +6277,7 @@ sub new
 sub name_edited_cb
 {	my ($cell, $path_string, $newname,$self) = @_;
 	my $store=$self->{store};
-	my $iter=$store->get_iter( Gtk2::TreePath->new($path_string) );
+	my $iter=$store->get_iter_from_string($path_string);
 	my $name=$store->get($iter,0);
 	#$self->{busy}=1;
 	::SaveSFRG($self->{key}, $name, undef,$newname);
