@@ -3921,6 +3921,17 @@ sub ICasePathFile	#tries to find an existing file/folder with different case
 	}
 	return $folder;
 }
+sub CaseSensFile	#find case-sensitive filename from a case-insensitive filename
+{	my $file0=shift;
+	return $file0 if -e $file0;
+	my $file='';
+	for my $f (split /$QSLASH+/o,$file0)
+	{	$f=ICasePathFile( $file||SLASH, $f);
+		$file.=$f.SLASH;
+	}
+	chop $file; #remove last SLASH
+	return $file;
+}
 
 sub DialogMassRename
 {	return if $CmdLine{ro};
