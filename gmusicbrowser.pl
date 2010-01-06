@@ -3617,6 +3617,37 @@ sub ChooseDir
 #	return $path;
 #}
 
+sub ChooseFiles
+{	my ($text,$remember_key,@patterns)=@_;
+	$text||=_"Choose files";
+	my $dialog=Gtk2::FileChooserDialog->new($text,undef,'open',
+					'gtk-ok' => 'ok',
+					'gtk-cancel' => 'none');
+	$dialog->set_select_multiple(1);
+	for my $aref (@patterns)
+	{	my $filter= Gtk2::FileFilter->new;
+		if ($aref->[1])	{ $filter->add_mime_type($_)	for split / /,$aref->[1]; }
+		if ($aref->[2])	{ $filter->add_pattern($_)	for split / /,$aref->[2]; }
+		$filter->set_name($aref->[0]);
+		$dialog->add_filter($filter);
+	}
+	if ($remember_key)
+	{	my $path= decode_url($Options{$remember_key});
+		$dialog->set_current_folder($path);
+	}
+
+	my $response=$dialog->run;
+	my @files;
+	if ($response eq 'ok')
+	{	@files=$dialog->get_filenames;
+		eval { $_=filename_from_unicode($_); } for @files;
+		_utf8_off($_) for @files;# filenames that failed filename_from_unicode still have their uft8 flag on
+	}
+	if ($remember_key) { $Options{$remember_key}= url_escape($dialog->get_current_folder); }
+	$dialog->destroy;
+	return @files;
+}
+
 sub ChoosePix
 {	my ($path,$text,$file,$remember_key)=@_;
 	$text||=_"Choose Picture";
