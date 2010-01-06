@@ -4532,6 +4532,67 @@ sub AddRadio
 	return $ID;
 }
 =cut
+our %playlist_file_parsers;
+INIT
+{%playlist_file_parsers=
+ (	m3u => \&m3u_to_files,
+	pls => \&pls_to_files,
+ );
+}
+sub m3u_to_files
+{	my $content=shift;
+	my @files= grep m#\S# && !m/^\s*#/, split /[\n\r]+/, $content;
+	s#^\s*## for @files;
+	return @files;
+}
+sub pls_to_files
+{	my $content=shift;
+	my @files= grep m/^File\d+=/, split /[\n\r]+/, $content;
+	s#^File\d+=\s*## for @files;
+	return @files;
+}
+
+sub Parse_playlist_file	#return filenames from playlist files (.m3u, .pls, ...)
+{	my $pl_file=shift;
+	my ($basedir,$name,$ext)= $pl_file=~m/^(.*?)([^$QSLASH]+?)\.([^.]*)$/;
+	my $sub= $playlist_file_parsers{lc $ext};
+	if (!$sub) { warn "Unsupported playlist format '$name.$ext'\n" }
+	open my($fh),'<',$pl_file  or do {warn "Error reading $pl_file : $!"; return};
+	my $content = do { local( $/ ) ; <$fh> } ;
+	close $fh;
+	my @files=$sub->($content);
+	my @list;
+	for my $file (@files)
+	{	if ($file=~s#^file://##) { $file=decode_url($file); }
+		elsif ($file=~m#^http://#) {next} #ignored for now
+		push @list, CaseSensFile( rel2abs($file,$basedir) );
+	}
+	return @list;
+}
+
+sub Import_playlist_file	#create saved lists from playlist files (.m3u, .pls, ...)
+{	my $pl_file=shift;
+	warn "Importing $pl_file\n";
+	my @files=Parse_playlist_file($pl_file);
+	my @list;
+	for my $file (@files)
+	{	my $ID=Songs::FindID($file);
+		unless (defined $ID) {$ID=Songs::New($file); }
+		unless (defined $ID) {warn "Can't add file $file\n"; next}
+		#unless (defined $ID) {warn "Can't find file $file in the library\n"; next}
+		push @list,$ID;
+	}
+	unless (@list) { warn "No file from '$pl_file' found in the library\n"; return }
+	my ($name)= $pl_file=~m/([^$QSLASH]+?)\.[^.]*$/;
+	$name= _"imported list" unless $name=~m/\S/;
+	$name=~s/(?<=\D)(\d*)$/($1||1)+1/e while $Options{SavedLists}{$name}; #find a new name
+	SaveList($name,\@list);
+}
+sub Choose_and_import_playlist_files
+{	my $pattern=join ' ',map "*.$_", sort keys %playlist_file_parsers;
+	my @files=ChooseFiles(_"Choose playlist files to import", 'LastFolder_playlists', [_"Playlist files",undef,$pattern ]);
+	Import_playlist_file($_) for @files;
+}
 
 sub OpenFiles
 {	my @IDs;
@@ -4568,7 +4629,13 @@ sub FolderToIDs
 			push @dirs, grep -d, @list   if $recurse;
 			closedir $DIRH;
 		}
-		elsif (-f $dir) { push @files,$dir; }
+		elsif (-f $dir)
+		{	$dir=~m/\.([^.]*)$/;
+			if ($dir=~m/$ScanRegex/) { push @files,$dir; }
+			elsif ($dir=~m/\.([^.]*)$/ && $playlist_file_parsers{lc $1}) #playlist files (.m3u, .pls, ...)
+			{	push @files, Parse_playlist_file($dir);
+			}
+		}
 	}
 	my @IDs;
 	for my $file (@files)
