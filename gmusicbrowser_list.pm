@@ -2661,7 +2661,7 @@ INIT
 	{ label => _"Edit list",	code => sub { ::WEditList( $_[0]{names}[0] ); },
 		mode => 'L',	onlyone => 'names' },
 	{ label => _"Remove list",	code => sub { ::SaveList($_[0]{names}[0],undef); },
-		stockicon => 'gtk-remove',	mode => 'L' },
+		stockicon => 'gtk-remove',	mode => 'L', onlyone => 'names', },
 	{ label => _"Rename",	code => sub { my $tv=$_[0]{self}{treeview}; $tv->set_cursor($_[0]{treepaths}[0],$tv->get_column(0),TRUE); },
 		notempty => 'names',	onlyone => 'treepaths' },
 	{ label => _"Import list",	code => sub { ::Choose_and_import_playlist_files(); }, mode => 'L', },
@@ -2814,9 +2814,10 @@ sub PopupContextMenu
 	{	my ($mode)=($args{mode})=keys %sel;
 		$args{mode}=	$mode eq 'sfilter'	? 'F' :
 				$mode eq 'slist'	? 'L' :
-				undef;
+				'';
 		$args{names}=$sel{$mode};
 	}
+	else { $args{mode}=''; }
 	my $songlist=::GetSonglist($self);
 	$args{songlist}=$songlist if $songlist;
 	FilterPane::PopupContextMenu($self,$event,\%args, [@cMenu,{ separator=>1 },@FilterPane::cMenu] );
