@@ -2520,9 +2520,9 @@ sub IdleLoop
 	elsif (@ToReRead){Songs::ReReadFile(pop(@ToReRead),1); }	#FIXME should show progress
 	elsif (@ToAdd_Files)  { SongAdd(shift @ToAdd_Files); }
 #	elsif ($CoverCandidates) {CheckCover();}	#FIXME PHASE1
-	elsif (@ToAdd_IDsBuffer>1000)	{ SongAdd_Real() }
+	elsif (@ToAdd_IDsBuffer>1000)	{ SongAdd_now() }
 	elsif (@ToScan) { $ProgressNBFolders++; ScanFolder(shift @ToScan); }
-	elsif (@ToAdd_IDsBuffer)	{ SongAdd_Real() }
+	elsif (@ToAdd_IDsBuffer)	{ SongAdd_now() }
 	elsif (%ToDo)	{ DoTask( (sort keys %ToDo)[0] ); }
 	elsif (@$LengthEstimated)	 #to replace estimated length/bitrate by real one(for mp3s without VBR header)
 	{	$Lengthcheck_max=@$LengthEstimated if @$LengthEstimated > $Lengthcheck_max;
@@ -4438,10 +4438,11 @@ sub SongAdd		#only called from IdleLoop
 	return unless defined $ID;
 	push @ToAdd_IDsBuffer,$ID;
 	$ProgressNBSongs++;
-	#IdleDo('0_AddIDs',30000,\&SongAdd_Real);
+	#IdleDo('0_AddIDs',30000,\&SongAdd_now);
 }
-sub SongAdd_Real
-{	return unless @ToAdd_IDsBuffer;
+sub SongAdd_now
+{	push @ToAdd_IDsBuffer,@_;
+	return unless @ToAdd_IDsBuffer;
 	my @IDs=@ToAdd_IDsBuffer; #FIXME remove IDs already in Library	#FIXME check against master filter ?
 	@ToAdd_IDsBuffer=();
 	$Filter::CachedList=undef;
@@ -4574,14 +4575,18 @@ sub Import_playlist_file	#create saved lists from playlist files (.m3u, .pls, ..
 {	my $pl_file=shift;
 	warn "Importing $pl_file\n";
 	my @files=Parse_playlist_file($pl_file);
-	my @list;
+	my @list; my @toadd;
 	for my $file (@files)
 	{	my $ID=Songs::FindID($file);
-		unless (defined $ID) {$ID=Songs::New($file); }
+		unless (defined $ID)
+		{	$ID=Songs::New($file);
+			push @toadd,$ID if defined $ID;
+		}
 		unless (defined $ID) {warn "Can't add file $file\n"; next}
 		#unless (defined $ID) {warn "Can't find file $file in the library\n"; next}
 		push @list,$ID;
 	}
+	SongAdd_now(@toadd) if @toadd; #add IDs to the Library if needed
 	unless (@list) { warn "No file from '$pl_file' found in the library\n"; return }
 	my ($name)= $pl_file=~m/([^$QSLASH]+?)\.[^.]*$/;
 	$name= _"imported list" unless $name=~m/\S/;
@@ -4610,12 +4615,12 @@ sub OpenFiles
 sub Uris_to_IDs
 {	my @urls=split / +/,$_[0];
 	$_=decode_url($_) for @urls;
-	my @IDs=FolderToIDs(1,@urls);
+	my @IDs=FolderToIDs(1,1,@urls);
 	return \@IDs;
 }
 
 sub FolderToIDs
-{	my ($recurse,@dirs)=@_;
+{	my ($add,$recurse,@dirs)=@_;
 	s#^file://## for @dirs;
 	s/$QSLASH$//o for @dirs;
 	s/$QSLASH{2,}/$QSLASH/go for @dirs;
@@ -4637,15 +4642,16 @@ sub FolderToIDs
 			}
 		}
 	}
-	my @IDs;
+	my @IDs; my @toadd;
 	for my $file (@files)
 	{	my $ID=Songs::FindID($file);# check if missing => check if modified
 		unless (defined $ID)
 		{	$ID=Songs::New($file);
+			push @toadd,$ID if defined $ID;
 		}
 		push @IDs,$ID if defined $ID;
 	}
-	#my @IDs=grep defined map FindID($dir.SLASH.$_), @files;
+	SongAdd_now(@toadd) if $add && @toadd; #add IDs to the Library if needed
 	return @IDs;
 }
 

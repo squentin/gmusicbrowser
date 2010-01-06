@@ -962,7 +962,7 @@ sub drag_received_cb
 	}
 
 	if ($type==::DRAG_FILE) #convert filenames to IDs
-	{	@IDs=::FolderToIDs(0,map ::decode_url($_), @IDs);
+	{	@IDs=::FolderToIDs(1,0,map ::decode_url($_), @IDs);
 		return unless @IDs;
 	}
 	$songarray->Insert($row,\@IDs);
@@ -2603,7 +2603,7 @@ sub selection_changed_cb
 
 sub _MakeFolderFilter
 {	my @paths=@_; #in utf8 ?
-	my @list= ::FolderToIDs(0,@paths);
+	my @list= ::FolderToIDs(0,0,@paths);
 	my $filter= Filter->new('',\@list); #FIXME use a filter on path rather than a list ?
 	return $filter;
 }
@@ -5724,7 +5724,7 @@ sub Scroll_to_TopEnd
 sub drag_received_cb
 {	my ($view,$type,$dest,@IDs)=@_;
 	if ($type==::DRAG_FILE) #convert filenames to IDs
-	{	@IDs=::FolderToIDs(0,map ::decode_url($_), @IDs);
+	{	@IDs=::FolderToIDs(1,0,map ::decode_url($_), @IDs);
 		return unless @IDs;
 	}
 	my $self=::find_ancestor($view,__PACKAGE__);
