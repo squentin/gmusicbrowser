@@ -533,7 +533,7 @@ return $self if @IDs>1000;
 		$perfile_table->attach($label,$lastcol,$lastcol+1,$row,$row+1,'fill','shrink',1,1); #filename
 	}
 
-	my $Btools=Gtk2::Button->new('tools');
+	my $Btools=Gtk2::Button->new(_"tools");
 	{	my $menu=Gtk2::Menu->new;
 		my $menu_cb=sub {$self->tool($_[1])};
 		for my $ref (@Tools)	#currently only able to transform all entrys with the for_all function
