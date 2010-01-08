@@ -4125,11 +4125,13 @@ sub DialogRename
 		$table->attach_defaults($lab2,1,2,$row,$row+1);
 		$row++;
 	}
+	my ($name,$ext)= Songs::Display($ID,'barefilename','extension');
 	my $entry=Gtk2::Entry->new;
 	$entry->set_activates_default(TRUE);
-	$entry->set_text(Songs::Display($ID,'file'));
+	$entry->set_text($name);
+	my $label_ext=Gtk2::Label->new('.'.$ext);
 	$dialog->vbox->add($table);
-	$dialog->vbox->add($entry);
+	$dialog->vbox->add(Hpack('_',$entry,0,$label_ext));
 	SetWSize($dialog,'Rename');
 
 	$dialog->show_all;
@@ -4137,7 +4139,7 @@ sub DialogRename
 	 {	my ($dialog,$response)=@_;
 		if ($response eq 'ok')
 		{	my $name=$entry->get_text;
-			RenameFile($ID,$name,$dialog) if $name;
+			RenameFile($ID,"$name.$ext",$dialog) if $name=~m/\S/;
 		}
 		$dialog->destroy;
 	 });
