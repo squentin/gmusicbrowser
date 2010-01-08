@@ -42,6 +42,7 @@ sub new_embed
 	$embed->signal_connect(link_message => \&link_message_cb);
 	$embed->signal_connect(net_stop => \&net_startstop_cb,0);
 	$embed->signal_connect(net_start => \&net_startstop_cb,1);
+	$embed->signal_connect(open_uri => \&about_to_load_cb); #called before loading a new uri, must return false
 	return $embed;
 }
 
@@ -59,10 +60,15 @@ sub net_startstop_cb
 	$self->{BNext}->set_sensitive( $embed->can_go_forward );
 	my $cursor= $loading ? Gtk2::Gdk::Cursor->new('watch') : undef;
 	$embed->window->set_cursor($cursor) if $embed->window;
-	my $uri=$embed->get_location;
-	$self->{Entry}->set_text($uri) if $loading;
-	$uri= $uri=~m#^https?://# ? 1 : 0 ;
-	$self->{BOpen}->set_sensitive($uri);
+}
+
+sub about_to_load_cb	#called before loading a new uri,
+{	my ($embed,$uri)=@_;
+	my $self=::find_ancestor($embed,__PACKAGE__);
+	$self->{Entry}->set_text($uri);		#update location entry
+	my $http= $uri=~m#^https?://# ? 1 : 0 ;
+	$self->{BOpen}->set_sensitive($http);
+	0;	#must return false, else won't be loaded
 }
 
 sub loaded
