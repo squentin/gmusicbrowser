@@ -29,6 +29,13 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  *Gtk2::AboutDialog::set_url_hook=	sub {} unless *Gtk2::AboutDialog::set_url_hook{CODE};	#for perl-Gtk2 version <1.080~1.083
  *Gtk2::Label::set_ellipsize=		sub {} unless *Gtk2::Label::set_ellipsize{CODE};	#for perl-Gtk2 version <1.080~1.083
  *Gtk2::Pango::Layout::set_height=	sub {} unless *Gtk2::Pango::Layout::set_height{CODE};	#for perl-Gtk2 version <1.180  pango <1.20
+ unless (*Gtk2::Widget::set_tooltip_text{CODE})		#for Gtk2 version <2.12
+ {	my $Tooltips=Gtk2::Tooltips->new;
+	*Gtk2::Widget::set_tooltip_text= sub { $Tooltips->set_tip($_[0],$_[1]); };
+	*Gtk2::Widget::set_tooltip_markup= sub { my $markup=$_[1]; $markup=~s/<[^>]*>//g; ;$Tooltips->set_tip($_[0],$markup); }; #remove markup
+	*Gtk2::ToolItem::set_tooltip_text= sub { $_[0]->set_tooltip($Tooltips,$_[1],''); };
+	*Gtk2::ToolItem::set_tooltip_markup= sub { my $markup=$_[1]; $markup=~s/<[^>]*>//g; $_[0]->set_tooltip($Tooltips,$markup,''); };
+ }
  my $set_clip_rectangle_orig=\&Gtk2::Gdk::GC::set_clip_rectangle;
  *Gtk2::Gdk::GC::set_clip_rectangle=sub { &$set_clip_rectangle_orig if $_[1]; } if $Gtk2::VERSION <1.102; #work-around $rect can't be undef in old bindings versions
 }
@@ -1067,7 +1074,6 @@ $ListPlay=SongArray::PlayList->init;
 Play() if $CmdLine{play} && !$PlayTime;
 
 #SkipTo($PlayTime) if $PlayTime; #gstreamer (how I use it) needs the mainloop running to skip, so this is done after the main window is created
-our $Tooltips=Gtk2::Tooltips->new;
 
 Layout::InitLayouts;
 ActivatePlugin($_,'startup') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
@@ -4977,7 +4983,7 @@ sub PrefKeys
 	my $refresh_sensitive;
 	my $key_entry=Gtk2::Entry->new;
 	$key_entry->{key}='';
-	$Tooltips->set_tip($key_entry,_"Press a key or a key combination");
+	$key_entry->set_tooltip_text(_"Press a key or a key combination");
 	$key_entry->set_editable(FALSE);
 	$key_entry->signal_connect(key_press_event => sub
 	 {	my ($entry,$event)=@_;
@@ -5012,7 +5018,7 @@ sub PrefKeys
 		my $child=$entry_extra->child;
 		$entry_extra->remove($child) if $child;
 		if ($Command{$cmd}[2])
-		{	$Tooltips->set_tip($entry_extra,$Command{$cmd}[2]);
+		{	$entry_extra->set_tooltip_text($Command{$cmd}[2]);
 			$child= (ref $Command{$cmd}[3] eq 'CODE')?	$Command{$cmd}[3]()  : Gtk2::Entry->new;
 			$child->signal_connect(changed => $refresh_sensitive);
 			$entry_extra->add( $child );
@@ -5748,7 +5754,7 @@ sub NewPrefCheckButton
 		$_[0]{albox}->set_sensitive( $_[0]->get_active )  if $_[0]{albox};
 		&$sub if $sub;
 	},$key);
-	$Tooltips->set_tip($check,$tip) if defined $tip;
+	$check->set_tooltip_text($tip) if defined $tip;
 	my $return=$check;
 	if ($widget)
 	{	if ($horizontal)
@@ -5798,7 +5804,7 @@ sub NewPrefEntry
 	else { $widget=$entry=Gtk2::Entry->new; }
 
 	$sg2->add_widget($widget) if $sg2;
-	$Tooltips->set_tip($widget, $tip) if defined $tip;
+	$widget->set_tooltip_text($tip) if defined $tip;
 
 	if (defined $text)
 	{	my $box=Gtk2::HBox->new;
@@ -5858,7 +5864,7 @@ sub NewPrefFileEntry
 	if ($sg1) { $sg1->add_widget($label); $label->set_alignment(0,.5); }
 	if ($sg2) { $sg2->add_widget($hbox2); }
 
-	$Tooltips->set_tip($entry, $tip) if defined $tip;
+	$entry->set_tooltip_text($tip) if defined $tip;
 	$entry->set_text(filename_to_utf8displayname($Options{$key})) if defined $Options{$key};
 
 	my $busy;
@@ -5889,7 +5895,7 @@ sub NewPrefSpinButton
 	 {	SetOption( $_[1], $_[0]->get_value);
 		&$sub if $sub;
 	 },$key);
-	$Tooltips->set_tip($spin, $tip) if defined $tip;
+	$spin->set_tooltip_text($tip) if defined $tip;
 	if ($sg1 && $text1) { $sg1->add_widget($text1); $text1->set_alignment(0,.5); }
 	if ($sg2) { $sg2->add_widget($spin); }
 	if ($text1 or $text2)
@@ -5940,7 +5946,7 @@ sub NewIconButton
 	}
 	$but->add($widget);
 	$but->signal_connect(clicked => $coderef) if $coderef;
-	$Tooltips->set_tip($but,$tip) if defined $tip;
+	$but->set_tooltip_text($tip) if defined $tip;
 	return $but;
 }
 
@@ -6284,7 +6290,7 @@ sub windowpos	# function to position window next to clicked widget ($event can b
 
 #sub UpdateTrayTip #not used
 #{	my ($song,$artist,$album)=Songs::Display($SongID,qw/title artist album/);
-	#$Tooltips->set_tip($_[0], __x( _"{song}\nby {artist}\nfrom {album}", song => $song, artist => $artist, album => $album) );
+	#$_[0]->set_tooltip_text( __x( _"{song}\nby {artist}\nfrom {album}", song => $song, artist => $artist, album => $album) );
 #}
 
 sub IsWindowVisible
@@ -6416,9 +6422,9 @@ sub new
 	$NameEntry->signal_connect(activate => sub {$self->Save});
 	$butsave->set_sensitive(0);
 	$NameEntry->set_text($name) if defined $name;
-	$::Tooltips->set_tip($NameEntry,$typedata->[3] );
-	$::Tooltips->set_tip($butsave,	$typedata->[4] );
-	$::Tooltips->set_tip($butrm,	$typedata->[5]);
+	$NameEntry->set_tooltip_text($typedata->[3]);
+	$butsave  ->set_tooltip_text($typedata->[4]);
+	$butrm    ->set_tooltip_text($typedata->[5]);
 
 	$self->{entry}=$NameEntry;
 	$self->{store}=$store;
@@ -7037,7 +7043,7 @@ sub new
 
 	$histogram->size(HWIDTH,HHEIGHT);
 	$histogram->signal_connect(expose_event => \&histogram_expose_cb);
-	$::Tooltips->set_tip($histogram,'');
+	$histogram->set_tooltip_text('');
 	$histogram->add_events([qw/enter-notify-mask leave-notify-mask/]);
 	$histogram->signal_connect(enter_notify_event => sub
 		{	$_[0]{timeout}=Glib::Timeout->add(500,\&UpdateTip_timeout,$histogram);0;
@@ -7133,7 +7139,7 @@ sub UpdateTip_timeout
 	my $range=sprintf '%.2f - %.2f',$col/NBCOLS,($col+1)/NBCOLS;
 	#my $sum=$histogram->get_ancestor('Gtk2::VBox')->{sum};
 	#my $prob='between '.join ' and ',map $_? '1 chance in '.sprintf('%.0f',$sum/$_) : 'no chance', $col/NBCOLS,($col+1)/NBCOLS;
-	$::Tooltips->set_tip($histogram, "$range : ".::__('%d song','%d songs',$nb) );
+	$histogram->set_tooltip_text( "$range : ".::__('%d song','%d songs',$nb) );
 	1;
 }
 
@@ -7158,7 +7164,7 @@ sub AddRow
 		  $_->parent->remove($_) for $button,$frame;
 		  $self->Redraw(1);
 		},'none');
-	$::Tooltips->set_tip($button,_"Remove this rule");
+	$button->set_tooltip_text(_"Remove this rule");
 	$table->attach($button,0,1,$row,$row+1,'shrink','shrink',1,1);
 	$table->attach($frame,1,2,$row,$row+1,['fill','expand'],'shrink',2,4);
 	$frame->{adj}=my $adj=Gtk2::Adjustment->new ($weight, 0, 1, .01, .05, 0);
@@ -7222,7 +7228,7 @@ sub AddRow
 		$spin->signal_connect( value_changed => \&update_frame_cb );
 	}
 	$frame->{extrasub}=$extrasub;
-	$::Tooltips->set_tip($check,$check_tip);
+	$check->set_tooltip_text($check_tip);
 	$frame->add( ::Vpack(
 			'1',[	$check,
 				Gtk2::VSeparator->new,
@@ -8125,7 +8131,7 @@ sub make_toolitem
 	$menu_item_id||="$self";
 	my $titem=Gtk2::ToolItem->new;
 	$titem->add($widget);
-	$titem->set_tooltip($::Tooltips,$desc,'');
+	$titem->set_tooltip_text($desc);
 	my $item=Gtk2::MenuItem->new_with_label($desc);
 	my $menu=Gtk2::Menu->new;
 	$item->set_submenu($menu);

@@ -1042,7 +1042,7 @@ sub update
 {	my $self=$_[0];
 	my $text=join ', ', sort { ::superlc($a) cmp ::superlc($b) } grep $self->{selected}{$_}, keys %{$self->{selected}};
 	$self->{label}->set_text($text);
-	$::Tooltips->set_tip($self->{label}->parent,$text);
+	$self->{label}->parent->set_tooltip_text($text);
 }
 
 sub get_text

@@ -38,7 +38,7 @@ sub makeFilterBox
 		{	::EditFilter($box,::GetFilter($box),undef,sub {::SetFilter($box,$_[0]) if defined $_[0]});
 		});
 	my $okbutton=::NewIconButton('gtk-apply',undef,sub {$FilterWdgt->activate},'none');
-	$::Tooltips->set_tip($okbutton,_"apply filter");
+	$okbutton->set_tooltip_text(_"apply filter");
 	$box->pack_start($FilterWdgt, FALSE, FALSE, 0);
 	$box->pack_start($okbutton, FALSE, FALSE, 0);
 	return $box;
@@ -72,7 +72,7 @@ sub makeLockToggle
 			$self->set_active(!$empty);
 			$self->{busy}=0;
 			my $desc=($empty? _("No locked filter") : _("Locked on :\n").$filter->explain);
-			$::Tooltips->set_tip($self ,$desc);
+			$self->set_tooltip_text($desc);
 		});
 	return $toggle;
 }
@@ -201,7 +201,7 @@ sub Update
 	else		{ $text.= ::CalcListLength($array,$self->{format}); }
 	my $format= $self->{size} ? '<span size="'.$self->{size}.'">%s</span>' : '%s';
 	$self->child->set_markup_with_format($format,$text);
-	$::Tooltips->set_tip($self, $tip);
+	$self->set_tooltip_text($tip);
 	$self->{needupdate}=0;
 }
 
@@ -294,8 +294,8 @@ sub new
 	$self->{btop}=	::NewIconButton('gtk-goto-top',		undef,	sub {::GetSonglist($self)->MoveUpDown(1,1)});
 	$self->{bbot}=	::NewIconButton('gtk-goto-bottom',	undef,	sub {::GetSonglist($self)->MoveUpDown(0,1)});
 
-	$::Tooltips->set_tip($self->{brm},_"Remove selected songs");
-	$::Tooltips->set_tip($self->{bclear},_"Remove all songs");
+	$self->{brm}->set_tooltip_text(_"Remove selected songs");
+	$self->{bclear}->set_tooltip_text(_"Remove all songs");
 
 	if (my $r=$opt->{relief}) { $self->{$_}->set_relief($r) for qw/brm bclear bup bdown btop bbot/; }
 	$self->pack_start($self->{$_},FALSE,FALSE,2) for qw/btop bup bdown bbot brm bclear/;
@@ -386,7 +386,7 @@ sub Update
 	$self->{busy}=1;
 	my $action=$::QueueAction;
 	$self->{queuecombo}->set_active( $::QActions{$action}[0] );
-	$::Tooltips->set_tip( $self->{eventcombo}, $::QActions{$action}[3] );
+	$self->{eventcombo}->set_tooltip_text( $::QActions{$action}[3] );
 	my $m=($action eq 'autofill')? 'show' : 'hide';
 	$self->{spin}->$m;
 	$self->{spin}->set_value($::Options{MaxAutoFill});
@@ -1574,14 +1574,14 @@ sub new
 	$optB->set_relief('none');
 	my $hbox = Gtk2::HBox->new (FALSE, 6);
 	$hbox->pack_start($_, FALSE, FALSE, 0) for $spin, $ResetB, $InvertB, $InterB, $optB;
-	$::Tooltips->set_tip($ResetB,	  (	$nb==1? _"reset primary filter"  :
+	$ResetB ->set_tooltip_text(	(	$nb==1? _"reset primary filter"  :
 						$nb==2?	_"reset secondary filter":
 							::__x(_"reset filter {nb}",nb =>$nb)
-					  ) );
-	$::Tooltips->set_tip($InterB, _"toggle Intersection mode");
-	$::Tooltips->set_tip($InvertB,_"toggle Invert mode");
-	$::Tooltips->set_tip($spin,   _"only show entries with at least n songs"); #FIXME
-	$::Tooltips->set_tip($optB,   _"options");
+					) );
+	$InterB ->set_tooltip_text(_"toggle Intersection mode");
+	$InvertB->set_tooltip_text(_"toggle Invert mode");
+	$spin   ->set_tooltip_text(_"only show entries with at least n songs"); #FIXME
+	$optB   ->set_tooltip_text(_"options");
 
 	my $notebook = Gtk2::Notebook->new;
 	$notebook->set_scrollable(TRUE);
@@ -2999,8 +2999,8 @@ sub new
 			if (defined $self->{SelID}) { ::EnqueueFilter($filter); }
 			1;
 		});
-	$::Tooltips->set_tip($Bfilter, ($aa eq 'artist' ? _"Filter on this artist" : _"Filter on this album") );
-	$::Tooltips->set_tip($Bplay, ($aa eq 'artist' ? _"Play all songs from this artist" : _"Play all songs from this album") );
+	$Bfilter->set_tooltip_text( ($aa eq 'artist' ? _"Filter on this artist" : _"Filter on this album") );
+	$Bplay  ->set_tooltip_text( ($aa eq 'artist' ? _"Play all songs from this artist" : _"Play all songs from this album") );
 	$buttonbox->pack_start($_, ::FALSE, ::FALSE, 0) for $Bfilter,$Bplay;
 
 	$hbox->pack_start($pixbox, ::FALSE, ::TRUE, 0);
@@ -3012,7 +3012,7 @@ sub new
 		$self->signal_connect(scroll_event => \&AABox_scroll_event_cb);
 		my $BAlblist=::NewIconButton('gmb-playlist',undef,undef,'none');
 		$BAlblist->signal_connect(button_press_event => \&AlbumListButton_press_cb);
-		$::Tooltips->set_tip($BAlblist,_"Choose Album From this Artist");
+		$BAlblist->set_tooltip_text(_"Choose Album From this Artist");
 		$buttonbox->pack_start($BAlblist, ::FALSE, ::FALSE, 0);
 	}
 
@@ -4646,7 +4646,7 @@ sub new					##currently the returned widget must be put in ->{isearchbox} of a p
 	$options->add(Gtk2::Image->new_from_stock('gtk-preferences','menu'));
 	$options->signal_connect( button_press_event => \&PopupOpt );
 	$options->set_relief('none');
-	$::Tooltips->set_tip($options,   _"options");
+	$options->set_tooltip_text(_"options");
 
 	$self->pack_start($label,0,0,2) unless $nolabel;
 	$self->add($entry);

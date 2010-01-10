@@ -286,7 +286,7 @@ sub AdvancedOptions
 		for my $ext (@ext)
 		{	if (exists $cando{$ext})
 			{	my $w=Gtk2::RadioButton->new($extgroup{$ext});
-				$::Tooltips->set_tip($w, ::__x(_"Use {command} to play {ext} files",command=>$cmd, ext=>$ext{$ext}) );
+				$w->set_tooltip_text( ::__x(_"Use {command} to play {ext} files",command=>$cmd, ext=>$ext{$ext}) );
 				$extgroup{$ext}||=$w;
 				$table->attach_defaults($w, $i,$i+1,$j,$j+1);
 				push @widgets,$w;

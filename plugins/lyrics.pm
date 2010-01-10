@@ -97,7 +97,7 @@ sub new
 		my $item=Gtk2::ToolButton->new_from_stock($stock);
 		$item->set_label($label);
 		$item->signal_connect(clicked => $cb);
-		$item->set_tooltip($::Tooltips,$tip,'') if $tip;
+		$item->set_tooltip_text($tip) if $tip;
 		$toolbar->insert($item,-1);
 		::weaken( $self->{$key}=$item ) if $key;
 	}
@@ -111,7 +111,7 @@ sub new
 	$adj->signal_connect(value_changed=> sub { SetFont($textview,$_[0]->get_value) });
 	my $zoom=Gtk2::ToolItem->new;
 	$zoom->add( Gtk2::SpinButton->new($adj,1,0) );
-	$zoom->set_tooltip($::Tooltips,_"Font size",'');
+	$zoom->set_tooltip_text(_"Font size");
 	my $source=::NewPrefCombo( OPT.'LyricSite', {map {$_=>$sites{$_}[0]} keys %sites} ,cb => \&SetSource, toolitem=> _"Lyrics source");
 	my $scroll=::NewPrefCheckButton( OPT.'AutoScroll', _"Auto-scroll",\&SetAutoScroll,_"Scroll with the song",undef,1);
 	$toolbar->insert($_,-1) for $follow,$zoom,$scroll,$source;

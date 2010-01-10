@@ -302,7 +302,7 @@ sub new
 	my $next= $self->{BNext}=Gtk2::ToolButton->new_from_stock('gtk-go-forward');
 	my $stop= $self->{BStop}=Gtk2::ToolButton->new_from_stock('gtk-stop');
 	my $open= $self->{BOpen}=Gtk2::ToolButton->new_from_stock('gtk-open');
-	$open->set_tooltip($::Tooltips,_"Open this page in the web browser",'');
+	$open->set_tooltip_text(_"Open this page in the web browser");
 	#$open->set_use_drag_window(1);
 	#::set_drag($open,source=>[::DRAG_FILE,sub {$embed->get_location;}]);
 	$self->{$_}->set_sensitive(0) for qw/BBack BNext BStop BOpen/;
@@ -347,8 +347,8 @@ sub prefbox
 		_"Use MozEmbed",	'MozEmbed');
 	my $label_wk= $OKWebKit ? '' : _"Not found";
 	my $label_moz= $OKMoz ? '' : $CrashMoz ? _"Found but not working" : _"Not found";
-	$::Tooltips->set_tip($radio_wk,$label_wk) if $label_wk;
-	$::Tooltips->set_tip($radio_moz,$label_moz) if $label_moz;
+	$radio_wk ->set_tooltip_text($label_wk)  if $label_wk;
+	$radio_moz->set_tooltip_text($label_moz) if $label_moz;
 	$radio_wk->set_sensitive($OKWebKit);
 	$radio_moz->set_sensitive($OKMoz);
 	$check->set_sensitive($::Options{OPT.'Backend'} eq 'MozEmbed');

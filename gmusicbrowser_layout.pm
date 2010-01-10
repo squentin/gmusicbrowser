@@ -973,7 +973,7 @@ sub NewWidget
 		if (@fields) { $widget->{song_tip}=$tip; }
 		else
 		{	$tip=~s#\\n#\n#g;
-			$::Tooltips->set_tip( $widget, $tip );
+			$widget->set_tooltip_text($tip);
 		}
 	   }
 	   else { $widget->{state_tip}=$tip; }
@@ -1022,7 +1022,7 @@ sub UpdateObject
 {	my $widget=$_[0];
 	if ( my $tip=$widget->{state_tip} )
 	{	$tip= $tip->() if ref $tip;
-		$::Tooltips->set_tip($widget,$tip);
+		$widget->set_tooltip_text($tip);
 	}
 	if ($widget->{skin}) {$widget->queue_draw}
 	elsif ($widget->{stock}) { $widget->UpdateStock }
@@ -1061,7 +1061,7 @@ sub UpdateSongID
 		}
 		if ($w->{song_tip})
 		{	my $tip= defined $ID ? ::ReplaceFields($ID,$w->{song_tip}) : '';
-			$::Tooltips->set_tip($w,$tip);
+			$w->set_tooltip_text($tip);
 		}
 	}
 }
@@ -1431,7 +1431,7 @@ sub UpdateLabelsIcon
 
 sub AddLabelEntry	#create entry to add a label to the current song
 {	my $entry=Gtk2::Entry->new;
-	$::Tooltips->set_tip($entry,_"Adds labels to the current song");
+	$entry->set_tooltip_text(_"Adds labels to the current song");
 	$entry->signal_connect(activate => sub
 	 {	my $label= $_[0]->get_text;
 		return unless defined $::SongID & defined $label;
@@ -3258,7 +3258,7 @@ sub new_follow_toolitem
 	$follow->set_active($self->{follow});
 	my $follow_text= $self->{group} eq 'Play' ? _"Follow playing song" : _"Follow selected song";
 	$follow->set_label($follow_text);
-	$follow->set_tooltip($::Tooltips,$follow_text,'');
+	$follow->set_tooltip_text($follow_text);
 	$follow->signal_connect(clicked => \&ToggleFollow);
 	::set_drag($follow, dest => [::DRAG_ID,sub
 		{	my ($follow,$type,@IDs)=@_;
@@ -3305,7 +3305,7 @@ sub set
 {	my ($self,$nb)=@_;
 	$self->{nb}=$nb;
 	$nb=$::Options{DefaultRating} if !defined $nb || $nb eq '';
-	$::Tooltips->set_tip($self,_("song rating")." : $nb %");
+	$self->set_tooltip_text(_("song rating")." : $nb %");
 	$self->{image}->set_from_pixbuf( get_pixbuf($nb) );
 }
 sub get { shift->{nb}; }
@@ -3416,7 +3416,7 @@ sub update
 	my $bartext=$prop->{bartext};
 	if ($self->{compact})
 	{	$bartext=$title.' ... '.(defined $bartext ? $bartext : '');
-		$::Tooltips->set_tip( $bar, $details ) if $details;
+		$bar->set_tooltip_text($details) if $details;
 	}
 	else
 	{	my $format= '<b>%s</b>';

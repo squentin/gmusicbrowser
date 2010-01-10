@@ -93,9 +93,9 @@ sub Fetch
 	my $Bclose=Gtk2::Button->new_from_stock('gtk-close');
 	my @entry;
 	push @entry, $self->{"searchentry_$_"}=Gtk2::Entry->new for qw/s a l/;
-	$::Tooltips->set_tip($self->{searchentry_s},_"Keywords");
-	$::Tooltips->set_tip($self->{searchentry_a},_"Artist");
-	$::Tooltips->set_tip($self->{searchentry_l},_"Album");
+	$self->{searchentry_s}->set_tooltip_text(_"Keywords");
+	$self->{searchentry_a}->set_tooltip_text(_"Artist");
+	$self->{searchentry_l}->set_tooltip_text(_"Album");
 	my $source=::NewPrefCombo( OPT.'PictureSite_'.$mainfield, {map {$_=>$Sites{$mainfield}{$_}[0]} keys %{$Sites{$mainfield}}} , cb => \&combo_changed_cb);
 	#$self->{Bnext}=	my $Bnext=::NewIconButton('gtk-go-forward',"More");
 	$self->{Bnext}=		my $Bnext=Gtk2::Button->new(_"More results");
@@ -393,7 +393,7 @@ sub get_next
 			my $tip='';
 			$tip=$result->{desc}."\n" if $result->{desc};
 			$tip.=$dim."\n".$result->{url};
-			$::Tooltips->set_tip($button,$tip);
+			$button->set_tooltip_text($tip);
 			$button->signal_connect(clicked => \&set_cover);
 			$button->signal_connect(button_press_event => \&::pixbox_button_press_cb,3); # 3 : mouse button 3
 			$button->set_relief('none');
