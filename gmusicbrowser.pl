@@ -5736,9 +5736,9 @@ sub NewPrefRadio
 	while (defined (my $text=shift @text_val))
 	{	my $val=shift @text_val;
 		push @radios, $radio=Gtk2::RadioButton->new($radio,$text);
-		$radio->signal_connect(toggled => $cb,$val);
 		$val=&$val if ref $val;
 		$radio->set_active(1) if $val eq $init;
+		$radio->signal_connect(toggled => $cb,$val);
 	}
 	return @radios;
 }
