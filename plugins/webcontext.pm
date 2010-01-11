@@ -95,7 +95,7 @@ sub set_stripped_wiki	#FIXME use print version of the wikipedia page instead ?
 .portlet {display: none !important;}
 #f-list {display: none !important;}
 #footer {display: none !important;}
-#content {margin: 0 0 0 0 !important; padding: 0 0 0 0 !important}
+#content {margin: 0 0 0 0 !important;}
 /* } */	";
 	}
 	open my $fh,'>',join(::SLASH,$::HomeDir,'mozilla_profile','chrome','userContent.css') or return;
