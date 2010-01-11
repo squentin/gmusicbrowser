@@ -149,7 +149,7 @@ sub go_back	{ $_[0]{embed}->go_back }
 sub go_forward	{ $_[0]{embed}->go_forward }
 sub stop_load	{ $_[0]{embed}->stop_loading }
 sub get_location{ $_[0]{embed}->get_focused_frame->get_uri }
-sub Open	{ $_[0]{embed}->open($_[1]); }
+sub Open	{ $_[0]{embed}->load_uri($_[1]); }
 
 sub set_stripped_wiki {}	#FIXME use print version of the wikipedia page instead ?
 # $::Options{OPT.'StrippedWiki'}
