@@ -2136,7 +2136,7 @@ sub new
 	}
 	$opt->{typesubmenu}='LPC' unless exists $opt->{typesubmenu};
 	$self->{$_}=$opt->{$_} for qw/group default_child match pages page typesubmenu closebuttons tablist/;
-	for my $class (qw/list context page/)	# option begining with list_ / context_ / page_ will be passed to children of this class
+	for my $class (qw/list context layout/)	# option begining with list_ / context_ / layout_ will be passed to children of this class
 	{	my @opt1;
 		if (my $optkeys=$opt->{'options_for_'.$class})	#no need for a prefix for these options
 		{	push @opt1, $_=> $opt->{$_} for grep exists $opt->{$_}, split / /,$optkeys;
@@ -2204,7 +2204,7 @@ sub newtab
 	$self->SaveOptions if $setpage;	#used to save default options of SongTree/SongList before creating a new one
 	my $wtype= $name; $wtype=~s/\d+$//;
 	$wtype= $Layout::Widgets{$wtype} || {};
-	my $wclass= $wtype->{issonglist} ? 'list' : $name=~m/^@/ ? 'page' : 'context';
+	my $wclass= $wtype->{issonglist} ? 'list' : $name=~m/^@/ ? 'layout' : 'context';
 	my $group=$self->{group};
 	$group= 'Global('.::refaddr($self).'-'.$self->{groupcount}++.')' if $wclass eq 'list'; # give songlist/songtree their own group
 	if ($opt2)	#new widget => use a new name not already used
