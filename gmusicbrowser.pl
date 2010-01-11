@@ -6005,6 +6005,7 @@ sub UnWatch
 {	my ($object,$key)=@_;
 	warn "unwatch $key $object\n" if $debug;
 	@{$EventWatchers{$key}}=grep defined && $_ != $object, @{$EventWatchers{$key}};
+	weaken($_) for @{$EventWatchers{$key}}; #re-weaken references (the grep above made them strong again)
 	delete $object->{'WatchUpdate_'.$key};
 }
 sub UnWatch_all #for when destructing non-Gtk2::Object
