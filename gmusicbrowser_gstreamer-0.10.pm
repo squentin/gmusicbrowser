@@ -658,6 +658,8 @@ our @ISA=('Play_GST');
 our %sockets;
 my ($stream,$Server);
 
+$::PlayPacks{Play_GST_server}=1; #register the package
+
 sub init
 {	return undef unless $GST_ok;
 	my $ok=1;
