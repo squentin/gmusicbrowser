@@ -1341,7 +1341,7 @@ sub ActivatePlugin
 		my $package='GMB::Plugin::'.$plugin;
 		if ($startup && $startup eq 'init')
 		{	if ($package->can('Init'))
-			{	$package->Init if $package->can('Init');
+			{	$package->Init;
 				warn "Plugin $plugin initialized.\n" if $debug;
 			}
 		}
