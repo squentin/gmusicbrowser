@@ -278,33 +278,34 @@ sub Write
 	return 1;
 }
 
-sub PixFromMusicFile		#FIXME support %::Alias_ext
-{	my $file=$_[0];
-	#$file=Glib->filename_from_unicode($file);
-	return undef unless -r $file;
+sub PixFromMusicFile
+{	my ($file,$nb)=@_;
+	return unless -r $file;
 	my $pix;
 	my $apic=1;
-	if ($file=~m/\.mp3$/i)
+	my ($ext)= $file=~m/\.([^.]+)$/;
+	$ext= $::Alias_ext{lc$ext} || lc$ext;
+	if ($ext eq 'mp3')
 	{	my $tag=Tag::MP3->new($file,0);
-		unless ($tag) {warn "can't read tags for $file\n";return undef;}
+		unless ($tag) {warn "can't read tags for $file\n";return;}
 		$pix=$tag->{ID3v2}{frames}{APIC} if $tag->{ID3v2} && $tag->{ID3v2}{frames};
 	}
-	elsif ($file=~m/\.flac$/i)
+	elsif ($ext eq 'flac')
 	{	my $tag=Tag::Flac->new($file);
-		unless ($tag) {warn "can't read tags for $file\n";return undef;}
+		unless ($tag) {warn "can't read tags for $file\n";return;}
 		$pix=$tag->{pictures}
 	}
-	elsif ($file=~m/\.m4a$/i)
+	elsif ($ext eq 'm4a')
 	{	my $tag=Tag::M4A->new($file);
-		unless ($tag) {warn "can't read tags for $file\n";return undef;}
+		unless ($tag) {warn "can't read tags for $file\n";return;}
 		$pix=$tag->{ilst}{covr} if $tag->{ilst};
 		$apic=0;	#not in APIC (id3v2) format
 	}
-	else { return undef }
-	unless ($pix && @$pix)	{warn "no picture found in $file\n";return undef;}
-	my $nb;
+	else { return }
+	unless ($pix && @$pix)	{warn "no picture found in $file\n";return;}
 	#if (!defined $nb && $apic && @$pix>1) {$nb=}	#FIXME if more than one picture in tag, use $pix->[$nb][1] to choose
 	$nb=0 if !defined $nb || $nb>$#$pix;
+	return $apic ? (map $pix->[$_][3],0..$#$pix) : @$pix if wantarray;
 	return $apic ? $pix->[$nb][3] : $pix->[$nb];
 }
 

@@ -3180,14 +3180,15 @@ sub LoadPixData
 }
 
 sub PixBufFromFile
-{	my $file=$_[0]; my $size=$_[1];
+{	my ($file,$size,$nowarn)=@_;
 	return unless $file;
-	unless (-r $file) {warn "$file not found\n" unless $_[1]; return undef;}
+	my $nb= $file=~s/:(\d+)$// ? $1 : undef;
+	unless (-r $file) {warn "$file not found\n" unless $nowarn; return undef;}
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;
 	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
 	if ($file=~m/\.(?:mp3|flac|m4a|m4b)$/i)
-	{	my $data=FileTag::PixFromMusicFile($file);
+	{	my $data=FileTag::PixFromMusicFile($file,$nb);
 		eval { $loader->write($data) } if defined $data;
 	}
 	else	#eval{Gtk2::Gdk::Pixbuf->new_from_file(filename_to_unicode($file))};
@@ -3217,7 +3218,7 @@ sub NewScaledImageFromFile
 
 sub ScaleImageFromFile
 {	my ($img,$w,$file,$nowarn)=@_;
-	$img->{pixbuf}=PixBufFromFile($file,$nowarn);
+	$img->{pixbuf}=PixBufFromFile($file,undef,$nowarn);
 	ScaleImage($img,$w);
 }
 
@@ -3699,9 +3700,29 @@ sub ChoosePix
 	my $eventbox=Gtk2::EventBox->new;
 	$eventbox->add($image);
 	$eventbox->signal_connect(button_press_event => \&pixbox_button_press_cb);
-	$preview->pack_start($_,FALSE,FALSE,2) for $eventbox,$label;
+	my $max=my $nb=0; my $lastfile;
+	my $prev= NewIconButton('gtk-go-back',   undef, sub { $_[0]->parent->parent->{set_pic}->(-1); });
+	my $next= NewIconButton('gtk-go-forward',undef, sub { $_[0]->parent->parent->{set_pic}->(1); });
+	my $more= Gtk2::HButtonBox->new;
+	$more->add($_) for $prev,$next;
+	$preview->pack_start($_,FALSE,FALSE,2) for $more,$eventbox,$label;
 	$dialog->set_preview_widget($preview);
 	#$dialog->set_use_preview_label(FALSE);
+	$preview->{set_pic}=sub
+		{ my $inc=shift;
+		  $nb+=$inc if $inc;
+		  $nb=0 if $nb<0 || $nb>=$max;
+		  my $file=$lastfile;
+		  $file.=":$nb" if $nb;
+		  ScaleImageFromFile($image,150,$file);
+		  my $p=$image->{pixbuf};
+		  if ($p) { $label->set_text($p->get_width.' x '.$p->get_height); }
+		  else { $label->set_text(''); }
+		  if ($max>1) {$more->show; } else {$more->hide;}
+		  $prev->set_sensitive($nb>0);
+		  $next->set_sensitive($nb<$max-1);
+		  $dialog->set_preview_widget_active($p || $nb);
+		};
 	my $update_preview=sub
 		{ my ($dialog,$file)=@_;
 		  unless ($file)
@@ -3713,16 +3734,22 @@ sub ChoosePix
 		  {	eval{ $file=filename_from_unicode($file); };
 		  	_utf8_off($file); #shouldn't be needed :(
 		  }
-		  ScaleImageFromFile($image,150,$file);
-		  my $p=$image->{pixbuf};
-		  if ($p) { $label->set_text($p->get_width.' x '.$p->get_height); }
-		  #else { $label->set_text('no picture'); }
-		  $dialog->set_preview_widget_active($p);
+		  $max=0;
+		  $nb=0 unless $lastfile && $lastfile eq $file;
+		  $lastfile=$file;
+		  if ($file=~m/\.(?:mp3|flac|m4a|m4b)$/i)
+		  {	my @pix= FileTag::PixFromMusicFile($file);
+			$max=@pix;
+		  }
+		  $preview->{set_pic}->();
 		};
 	$dialog->signal_connect(update_preview => $update_preview);
 
 	$preview->show_all;
+	$more->set_no_show_all(1);
+	$dialog->set_preview_widget_active(0);
 	if ($remember_key) { $path= decode_url($Options{$remember_key}); }
+	if ($file && $file=~s/:(\d+)$//) { $nb=$1; $lastfile=$file; }
 	if ($file && -f $file)	{ $dialog->set_filename($file); $update_preview->($dialog,$file); }
 	#elif ($path)		{ $dialog->set_current_folder($path); }
 	elsif ($path)		{ $dialog->set_filename($path.SLASH.'*.jpg'); }
@@ -3733,6 +3760,7 @@ sub ChoosePix
 	{	$ret=$dialog->get_filename;
 		eval { $ret=filename_from_unicode($ret); };
 		unless (-r $ret) { warn "can't read $ret\n"; $ret=undef; }
+		$ret.=":$nb" if $nb;
 	}
 	elsif ($response eq 'reject') {$ret='0'}
 	else {$ret=undef}
