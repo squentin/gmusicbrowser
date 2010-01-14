@@ -78,7 +78,7 @@ sub makeLockToggle
 }
 
 sub make_playing_menu
-{	my $menu= ::PopupContextMenu(\@MenuPlaying, { self => $_[0], songlist => ::GetSonglist($_[0]) });
+{	my $menu= ::BuildMenu(\@MenuPlaying, { self => $_[0], songlist => ::GetSonglist($_[0]) });
 	return $menu;
 }
 
@@ -1510,7 +1510,7 @@ our @cMenu=
 	},
 	#songs submenu :
 	{	label	=> sub { my $IDs=$_[0]{filter}->filter; ::__("%d Song","%d Songs",scalar @$IDs); },
-		submenu => sub { ::PopupContextMenu(\@::SongCMenu, { mode => 'F', IDs=>$_[0]{filter}->filter }); },
+		submenu => sub { ::BuildMenu(\@::SongCMenu, { mode => 'F', IDs=>$_[0]{filter}->filter }); },
 		isdefined => 'filter',
 	},
 	{ label=> _"Rename folder", code => sub { ::AskRenameFolder($_[0]{utf8pathlist}[0]); }, onlyone => 'utf8pathlist',	test => sub {!$::CmdLine{ro}}, },

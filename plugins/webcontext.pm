@@ -381,7 +381,7 @@ sub set_stripped_wiki { GMB::Plugin::WebContext::MozEmbed::set_stripped_wiki( $:
 sub popup_toolbar_menu
 {	my ($toolbar,$x,$y,$button)=@_;
 	my $args= { self=> ::find_ancestor($toolbar,__PACKAGE__), };
-	my $menu=::PopupContextMenu(\@contextmenu,$args);
+	my $menu=::BuildMenu(\@contextmenu,$args);
 	$menu->show_all;
 	$menu->popup(undef,undef,sub {$x,$y},undef,$button,0);
 }

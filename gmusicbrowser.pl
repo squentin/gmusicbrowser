@@ -2841,7 +2841,7 @@ sub ChooseSongs
 	 { my ($mitem,$event)=@_;
 	   if	($event->button == 2) { $mitem->{middle}=1 }
 	   elsif($event->button == 3)
-	   {	my $submenu=PopupContextMenu(\@SongCMenu,{mode => '', IDs=> [$_[2]]});
+	   {	my $submenu=BuildMenu(\@SongCMenu,{mode => '', IDs=> [$_[2]]});
 		$submenu->show_all;
 		$_[0]->set_submenu($submenu);
 		#$submenu->signal_connect( selection_done => sub {$menu->popdown});
@@ -3255,9 +3255,10 @@ sub pixbox_button_press_cb	# zoom picture when clicked
 	1;
 }
 
-sub PopupContextMenu	#FIXME rename to BuildContextMenu or BuildMenu
-{	my ($mref,$args,$appendtomenu)=@_;
-	my $menu= $appendtomenu || Gtk2::Menu->new;
+sub BuildMenu
+{	my ($mref,$args,$menu)=@_;
+	$args ||={};
+	$menu ||= Gtk2::Menu->new; #append to menu if menu given as agrument
 	for my $m (@$mref)
 	{	next if $m->{ignore};
 		next if $m->{type}	&& index($args->{type},	$m->{type})==-1;
@@ -3293,14 +3294,14 @@ sub PopupContextMenu	#FIXME rename to BuildContextMenu or BuildMenu
 		}
 		elsif ( my $include=$m->{include} ) #append items made by $include
 		{	$include= $include->($args) if ref $include eq 'CODE';
-			if (ref $include eq 'ARRAY') { PopupContextMenu($include,$args,$menu); }
+			if (ref $include eq 'ARRAY') { BuildMenu($include,$args,$menu); }
 			next;
 		}
 		elsif ( my $repeat=$m->{repeat} )
 		{	my @menus= $repeat->($args);
 			for my $submenu (@menus)
 			{	my ($menuarray,@extra)=@$submenu;
-				PopupContextMenu($menuarray,{%$args,@extra},$menu);
+				BuildMenu($menuarray,{%$args,@extra},$menu);
 			}
 			next;
 		}
@@ -3335,7 +3336,7 @@ sub PopupContextMenu	#FIXME rename to BuildContextMenu or BuildMenu
 				{	my $label=$labels[$i];
 					my $value=$values[$i];
 					if (ref $value && $m->{submenu_tree})
-					{	PopupContextMenu([{%$m,label=>$label,submenu=>$value}],$args,$submenu);
+					{	BuildMenu([{%$m,label=>$label,submenu=>$value}],$args,$submenu);
 						next;
 					}
 					my $item=Gtk2::MenuItem->new_with_label($label);
@@ -3353,7 +3354,7 @@ sub PopupContextMenu	#FIXME rename to BuildContextMenu or BuildMenu
 				}
 				$submenu=undef unless @order; #empty submenu
 			}
-			elsif (ref $submenu eq 'ARRAY') { $submenu=PopupContextMenu($submenu,$args); }
+			elsif (ref $submenu eq 'ARRAY') { $submenu=BuildMenu($submenu,$args); }
 			next unless $submenu;
 			$item->set_submenu($submenu);
 		}
@@ -3362,14 +3363,18 @@ sub PopupContextMenu	#FIXME rename to BuildContextMenu or BuildMenu
 		}
 		$menu->append($item);
 	}
-	return if $appendtomenu;
-	if (defined wantarray) {return $menu}
+	return $menu;
+}
+sub PopupContextMenu
+{	my $args=$_[1];
+	my $menu=BuildMenu(@_);
 	return unless $menu->get_children;
 	$menu->show_all;
-	my $posfunction= $args->{usemenupos} ? \&menupos : undef;
+	my $posfunction= $args && $args->{usemenupos} ? \&menupos : undef;
 	my $event=Gtk2->get_current_event;
 	$menu->popup(undef,undef,$posfunction,undef,$event->button,$event->time);
 }
+
 
 sub set_drag
 {	my ($widget,%params)=@_;
@@ -4290,7 +4295,7 @@ sub SongsSubMenu
 {	my %args=%{$_[0]};
 	$args{mode}='S';
 	$args{IDs}=\@{ AA::GetIDs($args{field},$args{gid}) };
-	return PopupContextMenu(\@SongCMenu,\%args);
+	BuildMenu(\@SongCMenu,\%args);
 }
 
 sub ArtistContextMenu
@@ -6279,11 +6284,9 @@ sub TrayMenuPopup
 	my $traytip=$TrayIcon->child->{PoppedUpWindow};
 	$traytip->DestroyNow if $traytip;
 	$TrayIcon->{NoTrayTip}=1;
-	my $m=PopupContextMenu(\@TrayMenu,{});
-	$m->signal_connect( selection_done => sub {$TrayIcon->{NoTrayTip}=undef});
-	$m->show_all;
-	my $event=Gtk2->get_current_event;
-	$m->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
+	my $menu=Gtk2::Menu->new;
+	$menu->signal_connect( selection_done => sub {$TrayIcon->{NoTrayTip}=undef});
+	PopupContextMenu(\@TrayMenu, {usemenupos=>1}, $menu);
 }
 sub ShowTraytip
 {	return 0 if !$TrayIcon || $TrayIcon->{NoTrayTip};
