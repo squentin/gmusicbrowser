@@ -248,7 +248,6 @@ sub Load 	#read unsent data
 		push @ToSubmit,\@data if @data==8;
 	}
 	close $fh;
-	unlink $::HomeDir.SAVEFILE;
 	Log(::__("Loaded %d unsent song from previous session","Loaded %d unsent songs from previous session", scalar @ToSubmit));
 }
 sub Save	#save unsent data to a file
