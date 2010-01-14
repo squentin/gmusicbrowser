@@ -20,7 +20,6 @@ use constant
 	OPT => 'PLUGIN_AUDIOSCROBBLER_',#used to identify the plugin's options
 	SAVEFILE => 'audioscrobbler.queue', #file used to save unsent data
 };
-use POSIX 'mktime'; #only to read queue from old version
 use Digest::MD5 'md5_hex';
 require 'simple_http.pm';
 
@@ -246,11 +245,6 @@ sub Load 	#read unsent data
 	while (my $line=<$fh>)
 	{	chomp $line;
 		my @data=split "\x1D",$line;
-		if (@data==6) # for previous version
-		{	my ($year,$mon,$mday,$hour,$min,$sec)= $data[5]=~m/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)/;
-			$data[5]=mktime($sec,$min,$hour,$mday,--$mon,$year);
-			push @data,'','P';
-		}
 		push @ToSubmit,\@data if @data==8;
 	}
 	close $fh;
