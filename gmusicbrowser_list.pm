@@ -1855,7 +1855,7 @@ use constant { GID_ALL => 2**32-1, GID_TYPE => 'Glib::ULong' };
 our %defaults=
 (	mode	=> 'list',
 	type	=> '',
-	lmarkup	=> '',
+	lmarkup	=> 0,
 	lpicsize=> 0,
 	'sort'	=> 'default',
 	depth	=> 0,
@@ -1869,7 +1869,6 @@ our %defaults=
 sub new
 {	my ($class,$field,$opt)=@_;
 	my $self = bless Gtk2::VBox->new, $class;
-	$self->{field}[0]=$field;
 	$self->{no_typeahead}=$opt->{no_typeahead};
 	$self->{rules_hint}=$opt->{rules_hint};
 
@@ -1877,14 +1876,14 @@ sub new
 	$self->{$_} = $opt->{$_} for qw/mode noall depth mpicsize cloud_min cloud_max cloud_stat/;
 	$self->{$_} = [ split /\|/, $opt->{$_} ] for qw/sort type lmarkup lpicsize/;
 
-	$self->{icons}= Songs::FilterListProp($field,'icon') ? [(Gtk2::IconSize->lookup('menu'))[0]] : [0];
 	$self->{type}[0] ||= $field.'.'.(Songs::FilterListProp($field,'type')||''); $self->{type}[0]=~s/\.$//;	#FIXME
 	::Watch($self, Picture_artist => \&AAPicture_Changed);	#FIXME PHASE1
 	::Watch($self, Picture_album => \&AAPicture_Changed);	#FIXME PHASE1
 
-	for my $d (1..$self->{depth})
-	{	$self->{type}[$d] =~ m#^([^.]+)#;
-		$self->{field}[$d]=$1;
+	for my $d (0..$self->{depth})
+	{	my ($field)= $self->{type}[$d] =~ m#^([^.]+)#;
+		$self->{field}[$d]=$field;
+		$self->{icons}[$d]= Songs::FilterListProp($field,'icon') ? (Gtk2::IconSize->lookup('menu'))[0] : 0;
 	}
 
 	#search box
