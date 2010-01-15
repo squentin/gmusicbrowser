@@ -1478,8 +1478,8 @@ my @MenuSubGroup=
 	  mode => 'C',
 	  submenu => sub { [::max(10,$_[0]{self}{cloud_min}+1)..40] },  check => sub {$_[0]{self}{cloud_max}}, },
 
-	{ label => _"sort by",		code => sub { $_[0]{self}->SetOption('sort'=>$_[1]); },
-	  check => sub {$_[0]{self}{sort}}, istrue => 'aa', submenu => \%sort_menu, submenu_reverse => 1 },
+	{ label => _"sort by",		code => sub { my $self=$_[0]{self}; $self->{'sort'}[$_[0]{depth}]=$_[1]; $self->SetOption; },
+	  check => sub {$_[0]{self}{sort}[$_[0]{depth}]}, submenu => \%sort_menu, submenu_reverse => 1 },
 	{ label => _"group by",
 	  code	=> sub { my $self=$_[0]{self}; my $d=$_[0]{depth}; $self->{type}[$d]=$self->{field}[$d].'.'.$_[1]; $self->Fill('rehash'); },
 	  check => sub { my $n=$_[0]{self}{type}[$_[0]{depth}]; $n=~s#^[^.]+\.##; $n },
@@ -1874,8 +1874,8 @@ sub new
 	$self->{rules_hint}=$opt->{rules_hint};
 
 	$opt= { %defaults, %$opt };
-	$self->{$_} = $opt->{$_} for qw/mode noall sort depth mpicsize cloud_min cloud_max cloud_stat/;
-	$self->{$_} = [ split /\|/, $opt->{$_} ] for qw/type lmarkup lpicsize/;
+	$self->{$_} = $opt->{$_} for qw/mode noall depth mpicsize cloud_min cloud_max cloud_stat/;
+	$self->{$_} = [ split /\|/, $opt->{$_} ] for qw/sort type lmarkup lpicsize/;
 
 	$self->{icons}= Songs::FilterListProp($field,'icon') ? [(Gtk2::IconSize->lookup('menu'))[0]] : [0];
 	$self->{type}[0] ||= $field.'.'.(Songs::FilterListProp($field,'type')||''); $self->{type}[0]=~s/\.$//;	#FIXME
@@ -1915,8 +1915,8 @@ sub new
 sub SaveOptions
 {	my $self=$_[0];
 	my %opt;
-	$opt{$_} = join '|', @{$self->{$_}} for qw/type lmarkup lpicsize/;
-	$opt{$_} = $self->{$_} for qw/mode noall sort depth mpicsize cloud_min cloud_max cloud_stat/;
+	$opt{$_} = join '|', @{$self->{$_}} for qw/type lmarkup lpicsize sort/;
+	$opt{$_} = $self->{$_} for qw/mode noall depth mpicsize cloud_min cloud_max cloud_stat/;
 	for (keys %opt) { delete $opt{$_} if $opt{$_} eq $defaults{$_}; }	#remove options equal to default value
 	delete $opt{type} if $opt{type} eq $self->{pid};			#remove unneeded type options
 	return %opt, $self->{isearchbox}->SaveOptions;
@@ -1929,6 +1929,7 @@ sub SetField
 	$self->{type}[$depth]= $type ? $field.'.'.$type : $field;
 	$self->{lpicsize}[$depth]||=0;
 	$self->{lmarkup}[$depth]||=0;
+	$self->{'sort'}[$depth]||='default';
 	$self->{icons}[$depth]||= Songs::FilterListProp($field,'icon') ? (Gtk2::IconSize->lookup('menu'))[0] : 0;
 
 	my $i=0;
@@ -2183,9 +2184,7 @@ sub row_expanded_cb
 	$list= Filter->newadd(1,@filters)->filter($list);
 	my $type=$self->{type}[$depth+1];
 	my $h=Songs::BuildHash($type,$list,'gid');
-	#my $children=AA::SortKeys($type,[keys %$h],'default');
-	my $children=[keys %$h];
-	Songs::sort_gid_by_name($type,$children);
+	my $children=AA::SortKeys($type,[keys %$h],$self->{'sort'}[$depth+1]);
 	for my $i (0..$#$children)
 	{	my $iter= $store->iter_nth_child($piter,$i) || $store->append($piter);
 		$store->set($iter,0,$children->[$i]);
@@ -2218,7 +2217,7 @@ sub get_fill_data
 	if (defined $search && $search ne '')
 	{	@list= @{ AA::GrepKeys($type,$search,\@list) };
 	}
-	AA::SortKeys($type,\@list,$self->{'sort'});
+	AA::SortKeys($type,\@list,$self->{'sort'}[0]);
 
 	my $beforeremoving0=@list;
 	@list= grep $_!=0, @list;
