@@ -377,6 +377,21 @@ our @cMenuAA=
 		stockicon => 'gmb-picture' },
 );
 
+our @TrayMenu=
+(	{ label=> _"Play", code => \&PlayPause,	test => sub {!defined $::TogPlay},	stockicon => 'gtk-media-play' },
+	{ label=> _"Pause",code => \&PlayPause,	test => sub {defined $::TogPlay},	stockicon => 'gtk-media-pause' },
+	{ label=> _"Stop", code => \&Stop,	stockicon => 'gtk-media-stop' },
+	{ label=> _"Next", code => \&NextSong,	stockicon => 'gtk-media-next' },
+	{ label=> _"Recently played", submenu => sub { my $m=ChooseSongs(undef,GetPrevSongs(5)); }, stockicon => 'gtk-media-previous' },
+	{ label=> sub {$::TogLock && $::TogLock eq 'first_artist'? _"Unlock Artist" : _"Lock Artist"},	code => sub {ToggleLock('first_artist');} },
+	{ label=> sub {$::TogLock && $::TogLock eq 'album' ? _"Unlock Album"  : _"Lock Album"},	code => sub {ToggleLock('album');} },
+	{ label=> _"Windows",	code => \&PresentWindow,	submenu_ordered_hash =>1,
+		submenu => sub {  [map { $_->layout_name => $_ } grep $_->isa('Layout::Window'), Gtk2::Window->list_toplevels];  }, },
+	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => \&ShowHide },
+	{ label=> _"Fullscreen",	code => \&ToggleFullscreenLayout,	stockicon => 'gtk-fullscreen' },
+	{ label=> _"Settings",		code => \&PrefDialog,	stockicon => 'gtk-preferences' },
+	{ label=> _"Quit",		code => \&Quit,		stockicon => 'gtk-quit' },
+);
 
 #a few inactive debug functions
 sub red {}
@@ -6266,22 +6281,7 @@ sub SetTrayTipDelay
 	$TrayIcon->child->{hover_delay}= $Options{TrayTipDelay} ? 900 : 1;
 }
 sub TrayMenuPopup
-{	my @TrayMenu=
- (	{ label=> _"Play", code => \&PlayPause,	test => sub {!defined $TogPlay},stockicon => 'gtk-media-play' },
-	{ label=> _"Pause",code => \&PlayPause,	test => sub {defined $TogPlay},	stockicon => 'gtk-media-pause' },
-	{ label=> _"Stop", code => \&Stop,	stockicon => 'gtk-media-stop' },
-	{ label=> _"Next", code => \&NextSong,	stockicon => 'gtk-media-next' },
-	{ label=> _"Recently played", submenu => sub { my $m=::ChooseSongs(undef,::GetPrevSongs(5)); }, stockicon => 'gtk-media-previous' },
-	{ label=> sub {$TogLock && $TogLock eq 'first_artist'? _"Unlock Artist" : _"Lock Artist"},	code => sub {ToggleLock('first_artist');} },
-	{ label=> sub {$TogLock && $TogLock eq 'album' ? _"Unlock Album"  : _"Lock Album"},	code => sub {ToggleLock('album');} },
-	{ label=> _"Windows",	code => \&PresentWindow,	submenu_ordered_hash =>1,
-		submenu => sub {  [map { $_->layout_name => $_ } grep $_->isa('Layout::Window'), Gtk2::Window->list_toplevels];  }, },
-	{ label=> sub { IsWindowVisible($MainWindow) ? _"Hide": _"Show"}, code => \&ShowHide },
-	{ label=> _"Fullscreen",	code => \&::ToggleFullscreenLayout,	stockicon => 'gtk-fullscreen' },
-	{ label=> _"Settings",		code => \&PrefDialog,	stockicon => 'gtk-preferences' },
-	{ label=> _"Quit",		code => \&Quit,		stockicon => 'gtk-quit' },
- );
-	my $traytip=$TrayIcon->child->{PoppedUpWindow};
+{	my $traytip=$TrayIcon->child->{PoppedUpWindow};
 	$traytip->DestroyNow if $traytip;
 	$TrayIcon->{NoTrayTip}=1;
 	my $menu=Gtk2::Menu->new;
