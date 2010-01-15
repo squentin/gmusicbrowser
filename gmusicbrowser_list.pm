@@ -2250,8 +2250,10 @@ sub Fill
 		$self->{array_offset}= $self->{noall} ? 0 : 1;	#row number difference between store and $list, needed by interactive search
 		$store->set($store->append(undef),0,GID_ALL) unless $self->{noall};
 		$store->set($store->append(undef),0,$_) for @$list;
-		if ($self->{field}[1])
-		{	for (my $iter=$store->get_iter_first; $iter; $iter=$store->iter_next($iter))
+		if ($self->{field}[1]) # add a chidren to every row
+		{	my $first=$store->get_iter_first;
+			$first=$store->iter_next($first) if $store->get($first,0)==GID_ALL; #skip "all" row
+			for (my $iter=$first; $iter; $iter=$store->iter_next($iter))
 			{	$store->append($iter);
 			}
 		}
