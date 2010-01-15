@@ -130,7 +130,7 @@ sub response_cb
 	if (defined $error)
 	{	unless ($Stop)
 		{	$interval*=2;
-			$interval=120*60 if $interval>120*60;
+			$interval=30*60 if $interval>30*60;
 			$interval=60 if $interval<60;
 			$error.=::__x(' ('._"retry in {seconds} s".')',seconds => $interval);
 		}
