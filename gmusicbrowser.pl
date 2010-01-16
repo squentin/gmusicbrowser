@@ -2700,22 +2700,19 @@ sub Google
 	openurl($url);
 }
 sub openurl
-{	my $url=$_[0];
-	if ($^O eq 'MSWin32') { system "start $url"; return }#FIXME quote the url
-	else
-	{	$browsercmd||=findcmd($Options{OpenUrl},qw/xdg-open gnome-open firefox epiphany konqueror galeon/);
-		unless ($browsercmd) { ErrorMessage(_"No web browser found."); return }
-	}
+{	my $url=shift;
+	if ($^O eq 'MSWin32') { system "start $url"; return }
+	$browsercmd||=findcmd($Options{OpenUrl},qw/xdg-open gnome-open firefox epiphany konqueror galeon/);
+	unless ($browsercmd) { ErrorMessage(_"No web browser found."); return }
 	$url=quotemeta $url;
 	system "$browsercmd $url &"; #FIXME if xdg-open is used, don't launch with "&" and check error code
 }
 sub openfolder
-{	my $dir=quotemeta $_[0];
-	if ($^O eq 'MSWin32') { system "start $dir"; return }
-	else
-	{	$opendircmd||=findcmd($Options{OpenFolder},qw/xdg-open gnome-open nautilus konqueror thunar/);
-		unless ($opendircmd) { ErrorMessage(_"No file browser found."); return }
-	}
+{	my $dir=shift;
+	if ($^O eq 'MSWin32') { system qq(start "$dir"); return } #FIXME if $dir contains "
+	$opendircmd||=findcmd($Options{OpenFolder},qw/xdg-open gnome-open nautilus konqueror thunar/);
+	unless ($opendircmd) { ErrorMessage(_"No file browser found."); return }
+	$dir=quotemeta $dir;
 	system "$opendircmd $dir &";
 }
 sub findcmd
