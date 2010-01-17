@@ -600,9 +600,9 @@ sub fill_editbox		#if $id => fill entries with existing properties, if $hash => 
 	(	entry	=> $entry_url,	format => ::MarkupFormat('<small>%s</small>', _"example : %s"),
 		event	=> 'CurSong',
 		preview	=> sub { my $url=shift; defined $::SongID && $url ? ::ReplaceFields($::SongID,$url, \&::url_escapeall) : undef  },
+		wrap=>1,
 	);
 	$preview->set_selectable(1);
-	$preview->set_line_wrap(1);
 	$hash= $CustomPages->{$id} if defined $id;
 	if ($hash)
 	{	$hash ||= $CustomPages->{$id};

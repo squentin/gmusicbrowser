@@ -40,7 +40,7 @@ sub Stop
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Pattern to find .lrc files :");
-	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1);
+	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1, wrap=>1);
 	my $showbutton= Gtk2::Button->new(_"Show/Hide lyrics line");
 	$showbutton->signal_connect(clicked=> sub { ::OpenSpecialWindow('Karaoke',1); });
 	$vbox->pack_start($_,::FALSE,::FALSE,1) for $entry,$preview,$showbutton;
