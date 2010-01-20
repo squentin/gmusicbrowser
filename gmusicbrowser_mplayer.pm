@@ -55,7 +55,7 @@ sub supported_formats
 
 sub VolInit
 {	# check if support -volume option
-	$SoftVolume= !system($mplayer,qw/-really-quiet -volume 100/) unless defined $SoftVolume;
+	$SoftVolume= !system($mplayer,qw/-really-quiet -softvol -volume 100/) unless defined $SoftVolume;
 	return undef if $SoftVolume;	#use methods from this package
 	return Play_amixer::init();	#use methods from Play_amixer
 }
