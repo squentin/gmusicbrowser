@@ -3982,17 +3982,27 @@ sub DeleteFiles
 sub filenamefromformat
 {	my ($ID,$format,$ext)=@_;
 	my $s= CleanupFileName( ReplaceFields($ID,$format) );
-	$s.=( Songs::Get($ID,'file')=~m/(\.[^\.]+$)/ )[0] if $ext; #add extension
+	if ($ext)
+	{	$s= Songs::Get($ID,'barefilename') if $s eq '';
+		$s.= '.'.Songs::Get($ID,'extension');  #add extension
+	}
+	elsif ($s=~m/^\.\w+$/)			#only extension -> base name on song's filename
+	{	$s= Songs::Get($ID,'barefilename').$s;
+	}
 	return $s;
 }
 sub pathfromformat
 {	my ($ID,$format,$basefolder,$icase)=@_;
+	$basefolder= Songs::Get($ID,'path') if !defined $basefolder && $format!~m#^~?$QSLASH#o; # use song's path as base for relative paths
 	my $path= $basefolder ? $basefolder.SLASH : '';
+	$path=~s#^~($QSLASH)#$ENV{HOME}$1#o;				# replace leading ~/ by homedir
+	$path=~s#$QSLASH+\.?$QSLASH+#SLASH#goe; 			# remove repeated slashes and /./
+	1 while $path=~s#$QSLASH[^$QSLASH]+$QSLASH\.\.$QSLASH#SLASH#oe;	# handle ..
 	for my $f0 (split /$QSLASH+/o,$format)
 	{	my $f= CleanupFileName( ReplaceFields($ID,$f0) );
+		next if $f=~m/^\.\.?$/;
 		if ($f0 ne $f)
-		{	$f=~s/^\.\.?$//;
-			$f=ICasePathFile($path,$f) if $icase;
+		{	$f=ICasePathFile($path,$f) if $icase;
 		}
 		$path.=$f.SLASH;
 	}
@@ -4001,14 +4011,14 @@ sub pathfromformat
 }
 sub pathfilefromformat
 {	my ($ID,$format,$ext,$icase)=@_;
-	$format=~s#^~($QSLASH)#$ENV{HOME}$1#o;
-	$format=~s#$QSLASH+\.?$QSLASH+#SLASH#goe;
-	return undef unless $format=~m#^$QSLASH#o;
-	my ($path,$file)= $format=~m/^(.*)$QSLASH([^$QSLASH]+)$/o;
-	return undef unless $file;
+	my ($path,$file)= $format=~m/^(?:(.*)$QSLASH)?([^$QSLASH]+)$/o;
+	#return undef unless $file;
+	$file='' unless defined $file;
+	$path='' unless defined $path;
 	$path=pathfromformat($ID,$path,undef,$icase);
 	$file=filenamefromformat($ID,$file,$ext);
 	$file=ICasePathFile($path,$file) if $icase;
+	return undef unless $file;
 	return wantarray ? ($path,$file) : $path.$file;
 }
 sub ICasePathFile	#tries to find an existing file/folder with different case
