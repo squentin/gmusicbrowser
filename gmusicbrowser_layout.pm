@@ -1681,12 +1681,17 @@ sub Resize
 sub Position
 {	my $self=shift;
 	my $pos=delete $self->{pos};
-	return unless $pos;		#format : 100x100    50%x100%   -100x-100   500-100% x 500-50%
-	my ($x,$xalign,$y,$yalign)= $pos=~m/([+-]?\d+%?)(?:([+-]\d+)%)?\s*x\s*([+-]?\d+%?)(?:([+-]\d+)%)?/;
+	return unless $pos;		#format : 100x100    50%x100%   -100x-100   500-100% x 500-50%  1@50%x100%
+	my ($monitor,$x,$xalign,$y,$yalign)= $pos=~m/(?:(\d+)@)?\s*([+-]?\d+%?)(?:([+-]\d+)%)?\s*x\s*([+-]?\d+%?)(?:([+-]\d+)%)?/;
 	my $h=$self->size_request->height;		# height of window to position
 	my $w=$self->size_request->width;		# width of window to position
 	my $screen=$self->get_screen;
-	my $monitor=$screen->get_monitor_at_window($self->window);
+	if (!defined($monitor) && $x!~m/[-%]/ && $y!~m/[-%]/)
+	{	$monitor=$screen->get_monitor_at_point($x,$y);
+	}
+	if (!defined $monitor)
+	{	$monitor=$screen->get_monitor_at_window($self->window);
+	}
 	my ($xmin,$ymin,$monitorwidth,$monitorheight)=$screen->get_monitor_geometry($monitor)->values;
 	$xalign= $x=~m/%/ ? 50 : 0   unless defined $xalign;
 	$yalign= $y=~m/%/ ? 50 : 0   unless defined $yalign;
