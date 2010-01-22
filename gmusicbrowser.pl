@@ -3993,8 +3993,9 @@ sub filenamefromformat
 }
 sub pathfromformat
 {	my ($ID,$format,$basefolder,$icase)=@_;
-	$basefolder= Songs::Get($ID,'path') if !defined $basefolder && $format!~m#^~?$QSLASH#o; # use song's path as base for relative paths
-	my $path= $basefolder ? $basefolder.SLASH : '';
+	my $path= defined $basefolder.SLASH ? $basefolder : '';
+	$path.=$1 if $format=~s#^([^$%]*$QSLASH)##;		# move constant part of format in path
+	$path= Songs::Get($ID,'path').SLASH.$path if $path!~m#^~?$QSLASH#o; # use song's path as base for relative paths
 	$path=~s#^~($QSLASH)#$ENV{HOME}$1#o;				# replace leading ~/ by homedir
 	$path=~s#$QSLASH+\.?$QSLASH+#SLASH#goe; 			# remove repeated slashes and /./
 	1 while $path=~s#$QSLASH[^$QSLASH]+$QSLASH\.\.$QSLASH#SLASH#oe;	# handle ..
