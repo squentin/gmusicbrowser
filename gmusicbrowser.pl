@@ -5808,7 +5808,7 @@ sub NewPrefCheckButton
 	$check->signal_connect( toggled => sub
 	{	my $val=($_[0]->get_active)? 1 : 0;
 		SetOption($_[1],$val);
-		$_[0]{albox}->set_sensitive( $_[0]->get_active )  if $_[0]{albox};
+		$_[0]{dependant_widget}->set_sensitive( $_[0]->get_active )  if $_[0]{dependant_widget};
 		&$sub if $sub;
 	},$key);
 	$check->set_tooltip_text($tip) if defined $tip;
@@ -5818,13 +5818,13 @@ sub NewPrefCheckButton
 		{	$return=Hpack($check,$widget);
 		}
 		else
-		{	$check->{albox}=my $albox=Gtk2::Alignment->new(0,0,1,1);
+		{	my $albox=Gtk2::Alignment->new(0,0,1,1);
 			$albox->set_padding(0,0,15,0);
 			$albox->add($widget);
 			$widget=$albox;
 			$return=Vpack($check,$albox);
 		}
-		$check->{child}=$widget;
+		::weaken( $check->{dependant_widget}=$widget );
 		$widget->set_sensitive(0) unless $init;
 	}
 	elsif ($toolitem)
