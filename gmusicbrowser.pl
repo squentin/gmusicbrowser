@@ -5354,9 +5354,9 @@ sub PrefMisc
 {	my $vbox=Gtk2::VBox->new (FALSE, 2);
 
 	#Default rating
-	my $DefRating=NewPrefSpinButton('DefaultRating',sub
+	my $DefRating=NewPrefSpinButton('DefaultRating',0,100, step=>10, page=>20, text1=>_"Default rating :", cb=> sub
 		{ IdleDo('0_DefaultRating',500,\&Songs::UpdateDefaultRating);
-		},10,0,0,100,10,20,_"Default rating :");
+		});
 
 	my $checkR1=NewPrefCheckButton(RememberPlayFilter => _"Remember last Filter/Playlist between sessions");
 	my $checkR3=NewPrefCheckButton( RememberPlayTime  => _"Remember playing position between sessions");
@@ -5414,7 +5414,7 @@ sub PrefLayouts
 {	my $vbox=Gtk2::VBox->new (FALSE, 2);
 
 	#Tray
-	my $traytiplength=NewPrefSpinButton('TrayTipTimeLength',undef,100,0,0,100000,100,1000,_"Display tray tip for",'ms');
+	my $traytiplength=NewPrefSpinButton('TrayTipTimeLength', 0,100000, step=>100, text1=>_"Display tray tip for", text2=>'ms');
 	my $checkT2=NewPrefCheckButton(CloseToTray => _"Close to tray");
 	my $checkT3=NewPrefCheckButton(ShowTipOnSongChange => _"Show tray tip on song change",undef,undef,$traytiplength);
 	my $checkT4=NewPrefCheckButton(TrayTipDelay => _"Delay tray tip popup on mouse over",\&SetTrayTipDelay);
@@ -5942,7 +5942,11 @@ sub NewPrefFileEntry
 	return $hbox;
 }
 sub NewPrefSpinButton
-{	my ($key,$sub,$climb_rate,$digits,$min,$max,$stepinc,$pageinc,$text1,$text2,$sg1,$sg2,$tip,$wrap)=@_;
+{	my ($key,$min,$max,%opt)=@_;
+	my ($text1,$text2,$sg1,$sg2,$tip,$sub,$climb_rate,$digits,$stepinc,$pageinc,$wrap)=@opt{qw/text1 text2 sizeg1 sizeg2 tip cb rate digits step page wrap/};
+	$pageinc||=$stepinc*10;
+	$climb_rate||=1;
+	$digits||=0;
 	$text1=Gtk2::Label->new($text1) if defined $text1;
 	$text2=Gtk2::Label->new($text2) if defined $text2;
 	my $adj=Gtk2::Adjustment->new($Options{$key}||=0,$min,$max,$stepinc,$pageinc,0);

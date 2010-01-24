@@ -41,14 +41,14 @@ sub Stop
 
 sub prefbox
 {	my $vbox=Gtk2::VBox->new;
-	my $spin=::NewPrefSpinButton(OPT.'timespan',undef,1,0,1,60*60*24,1,10,_"Fade-out in",_"seconds");
+	my $spin=::NewPrefSpinButton(OPT.'timespan', 1,60*60*24, step=>1, text1=>_"Fade-out in", text2=>_"seconds");
 	my $button=Gtk2::Button->new(_"Fade-out");
 	$button->signal_connect(clicked => \&start_fadeout);
 	my $sg=Gtk2::SizeGroup->new('horizontal');
 	my @hours;
 	for my $wd (0..6)
-	{	my $min=::NewPrefSpinButton(OPT."day${wd}m",\&update_alarm,0,0,0,59,1,5,undef,undef,undef,undef,undef,1);
-		my $hour=::NewPrefSpinButton(OPT."day${wd}h",\&update_alarm,0,0,0,23,1,4,undef,undef,undef,undef,undef,1);
+	{	my $min= ::NewPrefSpinButton(OPT."day${wd}m", 0,59, cb=>\&update_alarm, step=>1, page=>5, wrap=>1);
+		my $hour=::NewPrefSpinButton(OPT."day${wd}h", 0,23, cb=>\&update_alarm, step=>1, page=>4, wrap=>1);
 		my $timeentry=::Hpack($hour,Gtk2::Label->new(':'),$min);
 		my $check=::NewPrefCheckButton(OPT."day$wd",$dayname[$wd],\&update_alarm,undef,$timeentry,undef,1,$sg);
 		push @hours,$check;

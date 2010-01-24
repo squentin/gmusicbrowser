@@ -368,10 +368,10 @@ sub new
 		});
 	$self->{eventcombo}=Gtk2::EventBox->new;
 	$self->{eventcombo}->add($combo);
-	$self->{spin}=::NewPrefSpinButton('MaxAutoFill',sub
+	$self->{spin}=::NewPrefSpinButton('MaxAutoFill', 1,50, step=>1, page=>5, cb=>sub
 		{	return if $self->{busy};
 			::HasChanged('QueueAction');
-		},1,0,1,50,1,5);
+		});
 	$self->{spin}->set_no_show_all(1);
 
 	$self->pack_start($self->{$_},FALSE,FALSE,2) for qw/eventcombo spin/;

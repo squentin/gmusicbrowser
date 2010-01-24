@@ -48,8 +48,8 @@ sub prefbox
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
 	my $layout=::NewPrefCombo(OPT.'layout'=> Layout::get_layout_list('O'), cb=> \&init, text =>_"Overlay layout :",tree=>1, sizeg1=>$sg1,sizeg2=>$sg2);
 	my $refpoint=::NewPrefCombo(OPT.'refpoint'=> \%refpoints, cb=> \&move, text =>_"Reference point :", sizeg1=>$sg1,sizeg2=>$sg2);
-	my $offx=::NewPrefSpinButton(OPT.'offx',\&move, 2,0,-999,999,1,5, _"x offset :", undef, $sg1);
-	my $offy=::NewPrefSpinButton(OPT.'offy',\&move, 2,0,-999,999,1,5, _"y offset :", undef, $sg1);
+	my $offx=::NewPrefSpinButton(OPT.'offx', -999,999, cb=>\&move, step=>1, page=>5, text1=>_"x offset :", sizeg1=>$sg1);
+	my $offy=::NewPrefSpinButton(OPT.'offy', -999,999, cb=>\&move, step=>1, page=>5, text1=>_"y offset :", sizeg1=>$sg1);
 	my $notdialog=::NewPrefCheckButton(OPT.'notdialog',_"Don't add the overlay to dialogs", \&init);
 	$vbox->pack_start($_,::FALSE,::FALSE,2) for $layout,$refpoint,$offx,$offy,$notdialog;
 	return $vbox;
