@@ -2113,7 +2113,7 @@ sub ReplaceQueue
 }
 sub EnqueueAction
 {	$QueueAction=shift;
-	if ($QueueAction eq 'autofill')	{ QAutoFill(); }
+	if ($QueueAction eq 'autofill')	{ IdleDo('1_QAuto',10,\&QAutoFill); }
 	HasChanged('QueueAction');
 }
 sub QAutoFill

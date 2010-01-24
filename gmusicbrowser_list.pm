@@ -370,7 +370,7 @@ sub new
 	$self->{eventcombo}->add($combo);
 	$self->{spin}=::NewPrefSpinButton('MaxAutoFill', 1,50, step=>1, page=>5, cb=>sub
 		{	return if $self->{busy};
-			::HasChanged('QueueAction');
+			::QAutoFill();
 		});
 	$self->{spin}->set_no_show_all(1);
 
