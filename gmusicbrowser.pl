@@ -1057,10 +1057,11 @@ our ($Play_package,%PlayPacks); my ($PlayNext_package,$Vol_package);
 for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_gstreamer-0.10.pm gmusicbrowser_server.pm/)
 {	eval { require $file } || warn $@;	#each file sets $::PlayPacks{PACKAGENAME} to 1 for each of its included playback packages
 }
-$PlayPacks{$_}= $_->init for keys %PlayPacks;
 
 LoadPlugins();
 ReadSavedTags();
+
+$PlayPacks{$_}= $_->init for keys %PlayPacks;
 
 %CustomBoundKeys= %{ make_keybindingshash($Options{CustomKeyBindings}) };
 
