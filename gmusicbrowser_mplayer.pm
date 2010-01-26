@@ -18,16 +18,12 @@ use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill,$Kill9);
 my $CMDfh;
 my (%supported,$mplayer);
-my ($Mute,$Volume);
 my $SoftVolume;
 
 $::PlayPacks{Play_mplayer}=1; #register the package
 
 sub init
-{	$Volume=100;
-	$Mute=0;
-
-	$mplayer=undef;
+{	$mplayer=undef;
 	for my $path (split /:/, $ENV{PATH})
 	{	if (-x $path.::SLASH.'mplayer')
 		 {$mplayer=$path.::SLASH.'mplayer';last;}
@@ -65,7 +61,7 @@ sub Play
 	&Stop if $ChildPID;
 	#if ($ChildPID) { print $CMDfh "loadfile $file\n"; print $CMDfh "seek $sec 2\n" if $sec; return}
 	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -nolirc/);
-	push @cmd_and_args, qw/-softvol -volume/, cubicvolume($Volume) if $SoftVolume;
+	push @cmd_and_args, qw/-softvol -volume/, cubicvolume($::Volume) if $SoftVolume;
 	warn "@cmd_and_args\n" if $::debug;
 	#push @cmd_and_args,$device_option,$device unless $device eq 'default';
 	push @cmd_and_args,split / /,$::Options{mplayeroptions} if $::Options{mplayeroptions};
@@ -176,21 +172,23 @@ sub AdvancedOptions
 }
 
 # Volume functions
-sub GetVolume	{$Volume}
-sub GetMute	{$Mute}
+sub GetVolume	{$::Volume}
+sub GetMute	{$::Mute}
 sub SetVolume
 {	shift;
 	my $set=shift;
-	if	($set eq 'mute')	{ $Mute=$Volume; $Volume=0;	}
-	elsif	($set eq 'unmute')	{ $Volume=$Mute; $Mute=0;	}
-	elsif	($set=~m/^\+(\d+)$/)	{ $Volume+=$1; }
-	elsif	($set=~m/^-(\d+)$/)	{ $Volume-=$1; }
-	elsif	($set=~m/(\d+)/)	{ $Volume =$1; }
-	$Volume=0   if $Volume<0;
-	$Volume=100 if $Volume>100;
-	my $cubicvol= cubicvolume($Volume);	#use a cubic volume scale
+	if	($set eq 'mute')	{ $::Mute=$::Volume; $::Volume=0; }
+	elsif	($set eq 'unmute')	{ $::Volume=$::Mute; $::Mute=0;   }
+	elsif	($set=~m/^\+(\d+)$/)	{ $::Volume+=$1; }
+	elsif	($set=~m/^-(\d+)$/)	{ $::Volume-=$1; }
+	elsif	($set=~m/(\d+)/)	{ $::Volume =$1; }
+	$::Volume=0   if $::Volume<0;
+	$::Volume=100 if $::Volume>100;
+	my $cubicvol= cubicvolume($::Volume);	#use a cubic volume scale
 	print $CMDfh "volume $cubicvol 1\n" if $ChildPID;
 	::HasChanged('Vol');
+	$::Options{Volume}=$::Volume;
+	$::Options{Volume_mute}=$::Mute;
 }
 
 sub cubicvolume	#convert a linear volume to cubic volume scale
@@ -200,6 +198,7 @@ sub cubicvolume	#convert a linear volume to cubic volume scale
 	::setlocale(::LC_NUMERIC, 'C');
 	$vol="$vol";
 	::setlocale(::LC_NUMERIC, '');
+	return $vol;
 }
 
 #sub sendcmd {print $CMDfh "$_[0]\n";} #DEBUG #Play_mplayer::sendcmd('volume 0')

@@ -708,7 +708,6 @@ our %Options=
 #	Device		=> 'default',
 #	amixerSMC	=> 'PCM',
 #	gst_sink	=> 'alsa',
-	gst_volume	=> 100,
 	gst_use_equalizer=>0,
 	gst_equalizer	=> '0:0:0:0:0:0:0:0:0:0',
 	gst_rg_limiter	=> 1,
@@ -1060,6 +1059,11 @@ for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_gst
 
 LoadPlugins();
 ReadSavedTags();
+
+# global Volume and Mute are used only for gstreamer and mplayer in SoftVolume mode
+our $Volume= $Options{Volume};
+$Volume=100 unless defined $Volume;
+our $Mute= $Options{Volume_mute} || 0;
 
 $PlayPacks{$_}= $_->init for keys %PlayPacks;
 
@@ -1449,7 +1453,7 @@ sub ReadOldSavedTags
 	$Options{'123options_mpg321'}=delete $Options{'123options_mp3'};
 	$Options{'123options_ogg123'}=delete $Options{'123options_ogg'};
 	$Options{'123options_flac123'}=delete $Options{'123options_flac'};
-	delete $Options{$_} for qw/Device 123options_mp3 123options_ogg 123options_flac test/; #cleanup old options
+	delete $Options{$_} for qw/Device 123options_mp3 123options_ogg 123options_flac test Diacritic_sort gst_volume/; #cleanup old options
 	delete $Options{$_} for qw/SavedSongID SavedPlayTime Lock SavedSort/; #don't bother supporting upgrade for these
 	$Options{CustomKeyBindings}= { ExtractNameAndOptions($Options{CustomKeyBindings}) };
 	delete $Options{$_} for grep m/^PLUGIN_MozEmbed/,keys %Options; #for versions <=1.0
@@ -1612,7 +1616,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2  #DELME in v1.1.3/4
 		if ($oldversion<1.1003) { delete $Options{$_} for grep m/^Layout(?:LastSeen)?_/, keys %Options }	#for version <1.1.2  #DELME in v1.1.3/4
 		if ($oldversion<1.1003) { $Options{WindowSizes}{$_}= join 'x',split / /,delete $Options{"WS$_"} for map m/^WS(.*)/, keys %Options; }	#for version <1.1.2  #DELME in v1.1.3/4
-		if ($oldversion<0.1004) {delete $Options{$_} for qw/Diacritic_sort/;} #cleanup old options
+		if ($oldversion<0.1004) {delete $Options{$_} for qw/Diacritic_sort gst_volume/;} #cleanup old options
 
 
 		Post_Options_init();

@@ -12,7 +12,6 @@ use warnings;
 my ($GST_ok,$GST_visuals_ok,$GST_EQ_ok,$GST_RG_ok,$GST_RGA_ok);
 my ($PlayBin,$Sink);
 my ($WatchTag,$Skip);
-my ($Mute,$Volume);
 my (%Plugins,%Sinks);
 my ($VSink,$visual_window);
 my $AlreadyNextSong;
@@ -104,7 +103,6 @@ sub supported_sinks
 
 sub init
 {	return undef unless $GST_ok;
-	$Volume= $::Options{gst_volume};
 	#createPlayBin();
 	return bless { EQ=>$GST_EQ_ok, visuals => $GST_visuals_ok },__PACKAGE__;
 }
@@ -154,21 +152,22 @@ sub Close
 {	$Sink=undef;
 }
 
-sub GetVolume	{$Volume}
-sub GetMute	{$Mute}
+sub GetVolume	{$::Volume}
+sub GetMute	{$::Mute}
 sub SetVolume
 {	shift;
 	my $set=shift;
-	if	($set eq 'mute')	{ $Mute=$Volume; $Volume=0;	}
-	elsif	($set eq 'unmute')	{ $Volume=$Mute; $Mute=0;	}
-	elsif	($set=~m/^\+(\d+)$/)	{ $Volume+=$1; }
-	elsif	($set=~m/^-(\d+)$/)	{ $Volume-=$1; }
-	elsif	($set=~m/(\d+)/)	{ $Volume =$1; }
-	$Volume=0   if $Volume<0;
-	$Volume=100 if $Volume>100;
-	$PlayBin->set(volume => ($Volume/100)**3) if $PlayBin; 	#use a cubic volume scale
+	if	($set eq 'mute')	{ $::Mute=$::Volume; $::Volume=0;}
+	elsif	($set eq 'unmute')	{ $::Volume=$::Mute; $::Mute=0;  }
+	elsif	($set=~m/^\+(\d+)$/)	{ $::Volume+=$1; }
+	elsif	($set=~m/^-(\d+)$/)	{ $::Volume-=$1; }
+	elsif	($set=~m/(\d+)/)	{ $::Volume =$1; }
+	$::Volume=0   if $::Volume<0;
+	$::Volume=100 if $::Volume>100;
+	$PlayBin->set(volume => ($::Volume/100)**3) if $PlayBin; 	#use a cubic volume scale
 	::HasChanged('Vol');
-	$::Options{gst_volume}=$Volume;
+	$::Options{Volume}=$::Volume;
+	$::Options{Volume_mute}=$::Mute;
 }
 
 sub SkipTo
@@ -265,7 +264,7 @@ sub Play
 		}
 		else {$PlayBin->set('audio-sink' => $Sink);}
 	}
-	$PlayBin->set(volume => ($Volume/100)**3); 	#use a cubic volume scale
+	$PlayBin->set(volume => ($::Volume/100)**3); 	#use a cubic volume scale
 
 	if ($visual_window)
 	{	$VSink->set_xwindow_id($visual_window->window->XID);
