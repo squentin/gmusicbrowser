@@ -1036,10 +1036,12 @@ require 'gmusicbrowser_123.pm';
 eval {require 'gmusicbrowser_gstreamer-0.10.pm';} || warn $@;
 #require 'gmusicbrowser_win32.pm';
 require 'gmusicbrowser_server.pm';
+
+
+ReadSavedTags();
+
 for my $p (qw/Play_Server Play_GST Play_123 Play_mplayer Play_GST_server/) { $Packs{$p}=$p->init; }
 
-
-&ReadSavedTags;
 $Options{version}=VERSION;
 LoadIcons();
 
