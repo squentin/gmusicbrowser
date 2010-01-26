@@ -166,7 +166,7 @@ sub SetVolume
 	elsif	($set=~m/(\d+)/)	{ $Volume =$1; }
 	$Volume=0   if $Volume<0;
 	$Volume=100 if $Volume>100;
-	$PlayBin->set(volume => $Volume/100) if $PlayBin; #or /10 ?
+	$PlayBin->set(volume => ($Volume/100)**3) if $PlayBin; 	#use a cubic volume scale
 	::HasChanged('Vol');
 	$::Options{gst_volume}=$Volume;
 }
@@ -265,7 +265,7 @@ sub Play
 		}
 		else {$PlayBin->set('audio-sink' => $Sink);}
 	}
-	$PlayBin->set(volume => $Volume/100); #or /10 ?
+	$PlayBin->set(volume => ($Volume/100)**3); 	#use a cubic volume scale
 
 	if ($visual_window)
 	{	$VSink->set_xwindow_id($visual_window->window->XID);

@@ -65,7 +65,7 @@ sub Play
 	&Stop if $ChildPID;
 	#if ($ChildPID) { print $CMDfh "loadfile $file\n"; print $CMDfh "seek $sec 2\n" if $sec; return}
 	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -nolirc/);
-	push @cmd_and_args, qw/-softvol -volume/,$Volume if $SoftVolume;
+	push @cmd_and_args, qw/-softvol -volume/, cubicvolume($Volume) if $SoftVolume;
 	warn "@cmd_and_args\n" if $::debug;
 	#push @cmd_and_args,$device_option,$device unless $device eq 'default';
 	push @cmd_and_args,split / /,$::Options{mplayeroptions} if $::Options{mplayeroptions};
@@ -188,8 +188,18 @@ sub SetVolume
 	elsif	($set=~m/(\d+)/)	{ $Volume =$1; }
 	$Volume=0   if $Volume<0;
 	$Volume=100 if $Volume>100;
-	print $CMDfh "volume $Volume 1\n" if $ChildPID;
+	my $cubicvol= cubicvolume($Volume);	#use a cubic volume scale
+	print $CMDfh "volume $cubicvol 1\n" if $ChildPID;
 	::HasChanged('Vol');
+}
+
+sub cubicvolume	#convert a linear volume to cubic volume scale
+{	my $vol=$_[0];
+	$vol= 100*($vol/100)**3;
+	# will be sent to mplayer as string, make sure it use a dot as decimal separator
+	::setlocale(::LC_NUMERIC, 'C');
+	$vol="$vol";
+	::setlocale(::LC_NUMERIC, '');
 }
 
 #sub sendcmd {print $CMDfh "$_[0]\n";} #DEBUG #Play_mplayer::sendcmd('volume 0')
