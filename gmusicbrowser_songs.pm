@@ -2274,11 +2274,11 @@ sub Move
 	{	my $pos=$::Position;
 		my @rows=sort { $a <=> $b } @$rows;
 		for my $row (reverse @rows)
-		{	if	($pos==$row)			{$pos=$destrow}
-			elsif	($pos<$row && $destrow<$row)	{$pos++}
-			elsif	($pos>$row && $destrow>$row)	{$pos--}
+		{	if	($pos==$row)			{$pos=$destrow;}
+			elsif	($row>$pos && $destrow<$pos)	{$pos++;}
+			elsif	($row<$pos && $destrow>$pos)	{$pos--;}
 			$destrow++;
-		}
+		};
 		if ($::Position!=$pos) { $::Position=$pos; ::HasChanged('Pos'); }
 	}
 }
