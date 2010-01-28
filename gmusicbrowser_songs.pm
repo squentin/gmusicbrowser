@@ -2168,7 +2168,7 @@ sub Sort
 		$::Position||=0;
 	}
 	::HasChanged('Sort');
-	#::HasChanged('Pos');
+	::HasChanged('Pos');
 }
 sub Replace
 {	my ($self,$newlist)=@_;
