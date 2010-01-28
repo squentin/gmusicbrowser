@@ -5856,7 +5856,7 @@ sub NewPrefCheckButton
 }
 sub NewPrefEntry
 {	my ($key,$text,%opt)=@_;
-	my ($cb,$sg1,$sg2,$tip,$hide,$expand,$history)=@opt{qw/cb sizeg1 sizeg2 tip hide expand history/};
+	my ($cb,$sg1,$sg2,$tip,$hide,$expand,$history,$width)=@opt{qw/cb sizeg1 sizeg2 tip hide expand history width/};
 	my ($widget,$entry);
 	if ($history)
 	{	$widget=Gtk2::ComboBoxEntry->new_text;
@@ -5866,6 +5866,8 @@ sub NewPrefEntry
 		$widget->signal_connect( destroy => sub { PrefSaveHistory($history,$_[0]->get_active_text); } );
 	}
 	else { $widget=$entry=Gtk2::Entry->new; }
+
+	$entry->set_width_chars($width) if $width;
 
 	$sg2->add_widget($widget) if $sg2;
 	$widget->set_tooltip_text($tip) if defined $tip;

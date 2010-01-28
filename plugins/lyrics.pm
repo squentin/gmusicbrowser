@@ -143,7 +143,7 @@ sub cancel
 
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save lyrics in :");
+	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save lyrics in :", width=>30);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds",undef,_"only works with some lyrics source and when the lyrics tab is displayed");
 	my $Bopen=Gtk2::Button->new(_"open context window");
