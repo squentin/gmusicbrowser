@@ -1483,7 +1483,7 @@ sub new
 	my $opt2=$::Options{Layouts}{$layout};
 	$opt2||= Layout::GetDefaultLayoutOptions($layout);
 	my $opt1=::ParseOptions( $Layout::Layouts{$layout}{Window}||'' );
-	%options= ( borderwidth=>2, %$opt1, %{$opt2->{Window}||{}}, %options, %$opt0 );
+	%options= ( borderwidth=>0, %$opt1, %{$opt2->{Window}||{}}, %options, %$opt0 );
 	#warn "window options (layout=$layout) :\n";warn " $_ => $options{$_}\n" for sort keys %options;
 
 	my $uniqueid= $options{uniqueid} || 'layout='.$layout;
