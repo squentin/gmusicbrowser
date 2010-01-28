@@ -34,8 +34,7 @@ sub Start
 	::Watch($notify,'Playing',\&Changed);
 }
 sub Stop
-{	$notify->destroy;
-	$notify=undef;
+{	$notify=undef;
 }
 
 sub prefbox
