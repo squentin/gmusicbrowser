@@ -2999,8 +2999,8 @@ sub new
 			if (defined $self->{SelID}) { ::EnqueueFilter($filter); }
 			1;
 		});
-	$Bfilter->set_tooltip_text( ($aa eq 'artist' ? _"Filter on this artist" : _"Filter on this album") );
-	$Bplay  ->set_tooltip_text( ($aa eq 'artist' ? _"Play all songs from this artist" : _"Play all songs from this album") );
+	$Bfilter->set_tooltip_text( ($aa eq 'album' ? _"Filter on this album"		: _"Filter on this artist") );
+	$Bplay  ->set_tooltip_text( ($aa eq 'album' ? _"Play all songs from this album" : _"Play all songs from this artist") );
 	$buttonbox->pack_start($_, ::FALSE, ::FALSE, 0) for $Bfilter,$Bplay;
 
 	$hbox->pack_start($pixbox, ::FALSE, ::TRUE, 0);
