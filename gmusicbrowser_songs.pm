@@ -2487,10 +2487,12 @@ sub _staticfy
 {	my $self=shift;
 	delete $::ToDo{'7_refilter_playlist'};
 	delete $::ToDo{'8_resort_playlist'};
-	return unless $::TogLock || $::PlayFilter;
-	::HasChanged('SongArray',$self,'mode');
-	if ($::TogLock)		{ $::TogLock=undef;	::HasChanged('Lock');	}
-	if ($::PlayFilter)	{ $::PlayFilter=undef;	::HasChanged('Filter');	}
+	if ($::TogLock)		{ $::TogLock=undef; ::HasChanged('Lock'); }
+	unless ($::ListMode)
+	{	::IdleDo("1_FilterChanged", 10, sub { ::HasChanged('Filter'); });
+		::HasChanged('SongArray',$self,'mode');
+	}
+	$::PlayFilter=undef;
 	if (!$::RandomMode && $::Options{Sort})	{ $::SortFields=[]; $::Options{Sort}=''; ::HasChanged('Sort'); }
 }
 
