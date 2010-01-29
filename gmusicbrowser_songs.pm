@@ -2166,8 +2166,8 @@ sub Sort
 	{	$::Position= defined $::SongID ? ::FindPositionSong($::SongID,$self) : undef;
 		$::Position||=0;
 	}
-	::HasChanged('Sort');
-	::HasChanged('Pos');
+	::QHasChanged('Sort');
+	::QHasChanged('Pos');
 }
 sub Replace
 {	my ($self,$newlist)=@_;
@@ -2190,8 +2190,8 @@ sub Replace
 	delete $Presence{$self};
 	$::SelectedFilter=$::PlayFilter=undef;
 	if ($::RandomMode)	{ $::RandomMode->Invalidate; ::red("Invalidate $self ".@$self) }
-	else			{ $::SortFields=[]; $::Options{Sort}=''; ::HasChanged('Sort'); }
-	::HasChanged('Filter');
+	else			{ $::SortFields=[]; $::Options{Sort}=''; ::QHasChanged('Sort'); }
+	::QHasChanged('Filter');
 	::HasChanged('SongArray',$self,'replace');
 	_updateID($ID);
 }
@@ -2207,7 +2207,7 @@ sub Insert
 	elsif (@$self==@$IDs && !defined $::SongID)	#playlist was empty
 	{	$self->Next;
 	}
-	::HasChanged('Pos');
+	::QHasChanged('Pos');
 
 	#set Position if playlist was empty ??
 }
@@ -2232,7 +2232,7 @@ sub Remove
 		$::Position=$pos;
 		$self->Next if $IDchanged;
 	}
-	::HasChanged('Pos');
+	::QHasChanged('Pos');
 }
 sub Up
 {	my ($self,$rows)=@_;
@@ -2246,7 +2246,7 @@ sub Up
 		{	if	($row==$pos)	{$pos--}
 			elsif	($row==$pos+1)	{$pos++}
 		}
-		if ($::Position!=$pos) { $::Position=$pos; ::HasChanged('Pos'); }
+		if ($::Position!=$pos) { $::Position=$pos; ::QHasChanged('Pos'); }
 	}
 }
 sub Down
@@ -2261,7 +2261,7 @@ sub Down
 		{	if	($row==$pos)	{$pos++}
 			elsif	($row==$pos-1)	{$pos--}
 		}
-		if ($::Position!=$pos) { $::Position=$pos; ::HasChanged('Pos'); }
+		if ($::Position!=$pos) { $::Position=$pos; ::QHasChanged('Pos'); }
 	}
 }
 sub Move
@@ -2279,7 +2279,7 @@ sub Move
 			$delta++;
 		}
 		$pos+=$delta if $destrow<=$::Position;
-		if ($::Position!=$pos) { $::Position=$pos; ::HasChanged('Pos'); }
+		if ($::Position!=$pos) { $::Position=$pos; ::QHasChanged('Pos'); }
 	}
 }
 
@@ -2346,7 +2346,7 @@ sub SetFilter
 	$::Options{Sort}=$::Options{Sort_LastOrdered} unless $::Options{Sort};
 	$::Options{LastPlayFilter}= $::SelectedFilter= $filter || Filter->new;
 	my $newID=$self->_filter;
-	::HasChanged('Filter');
+	::QHasChanged('Filter');
 	::HasChanged('SongArray',$self,'replace', filter=> $::PlayFilter);
 	_updateID($newID);
 }
@@ -2359,7 +2359,7 @@ sub UpdateFilter
 	{	::HasChanged('SongArray',$self,'update',\@oldlist);
 	}
 	else	#filter may change because of the lock
-	{	::HasChanged('Filter');
+	{	::QHasChanged('Filter');
 		::HasChanged('SongArray',$self,'replace', filter=> $::PlayFilter);
 	}
 	$::ChangedPos=1;
@@ -2396,7 +2396,7 @@ sub Add		#only called in filter mode
 	elsif (my $s=$::Options{Sort})
 	{	$self->SUPER::Sort($s);
 	}
-	::HasChanged('Pos');
+	::QHasChanged('Pos');
 }
 
 sub SetID
@@ -2487,13 +2487,13 @@ sub _staticfy
 {	my $self=shift;
 	delete $::ToDo{'7_refilter_playlist'};
 	delete $::ToDo{'8_resort_playlist'};
-	if ($::TogLock)		{ $::TogLock=undef; ::HasChanged('Lock'); }
+	if ($::TogLock)		{ $::TogLock=undef; ::QHasChanged('Lock'); }
 	unless ($::ListMode)
-	{	::IdleDo("1_FilterChanged", 10, sub { ::HasChanged('Filter'); });
+	{	::QHasChanged('Filter');
 		::HasChanged('SongArray',$self,'mode');
 	}
 	$::PlayFilter=undef;
-	if (!$::RandomMode && $::Options{Sort})	{ $::SortFields=[]; $::Options{Sort}=''; ::HasChanged('Sort'); }
+	if (!$::RandomMode && $::Options{Sort})	{ $::SortFields=[]; $::Options{Sort}=''; ::QHasChanged('Sort'); }
 }
 
 #sub _updatepos

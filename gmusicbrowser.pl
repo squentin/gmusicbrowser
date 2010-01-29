@@ -1046,7 +1046,7 @@ if ($CmdLine{UseGnomeSession})
 
 {	Watch(undef, SongArray	=> \&SongArray_changed);
 	Watch(undef, $_	=> \&QueueUpdateNextSongs) for qw/Playlist Queue Sort Pos QueueAction/;
-	Watch(undef, $_ => sub { return unless defined $SongID && $TogPlay; HasChanged('PlayingSong'); }) for qw/CurSongID Playing/;
+	Watch(undef, $_ => sub { return unless defined $SongID && $TogPlay; QHasChanged('PlayingSong'); }) for qw/CurSongID Playing/;
 	Watch(undef,RecentSongs	=> sub { UpdateRelatedFilter('Recent'); });
 	Watch(undef,NextSongs	=> sub { UpdateRelatedFilter('Next'); });
 	Watch(undef,CurSong	=> sub { UpdateRelatedFilter('Play'); });
@@ -2375,8 +2375,8 @@ sub SetPosition
 sub UpdateCurrentSong
 {	#my $force=shift;
 	if ($ChangedID)
-	{	HasChanged('CurSongID',$SongID);
-		HasChanged('CurSong',$SongID);
+	{	QHasChanged('CurSongID',$SongID);
+		QHasChanged('CurSong',$SongID);
 		ShowTraytip($Options{TrayTipTimeLength}) if $TrayIcon && $Options{ShowTipOnSongChange} && !$FullscreenWindow;
 		IdleCheck($SongID) if defined $SongID && $Options{TAG_auto_check_current};
 		if (defined $RecentPos && (!defined $SongID || $SongID!=$Recent->[$RecentPos-1])) { $RecentPos=undef }
@@ -2390,7 +2390,7 @@ sub UpdateCurrentSong
 			$Position=undef;
 			for my $i ($start+1..$#$ListPlay, 0..$start-1) {$Position=$i if $ListPlay->[$i]==$SongID}
 		}
-		HasChanged('Pos','song');
+		QHasChanged('Pos','song');
 	}
 	#   Stop(); if  !defined $SongID ???????
 	#if	($forceplay)			{Play()}
@@ -6083,6 +6083,10 @@ sub UnWatch_all #for when destructing non-Gtk2::Object
 	UnWatch($object,$_) for map m/^WatchUpdate_(.+)/, keys %$object;
 }
 
+sub QHasChanged
+{	my ($key,@args)=@_;
+	IdleDo("1_HasChanged_$key",250,\&HasChanged,$key,@args);
+}
 sub HasChanged
 {	my ($key,@args)=@_;
 	return unless $EventWatchers{$key};
