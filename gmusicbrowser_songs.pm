@@ -2095,7 +2095,6 @@ sub Move
 	}
 	splice @$self,$dest_row,0,reverse @IDs;
 	::HasChanged('SongArray',$self,'move', $dest_row_orig,\@rows,$dest_row);
-	return \@rows;
 }
 sub Top
 {	my ($self,$rows)=@_;
@@ -2268,17 +2267,18 @@ sub Down
 sub Move
 {	my ($self,$destrow,$rows)=@_;
 	$self->_staticfy;
-	$rows=$self->SUPER::Move($destrow,$rows);
+	$self->SUPER::Move($destrow,$rows);
 	$::Options{LastPlayFilter}=$::ListMode=SongArray->new_copy($self);
 	if (defined $::Position)
 	{	my $pos=$::Position;
 		my @rows=sort { $a <=> $b } @$rows;
-		for my $row (reverse @rows)
-		{	if	($pos==$row)			{$pos=$destrow;}
-			elsif	($row>$pos && $destrow<$pos)	{$pos++;}
-			elsif	($row<$pos && $destrow>$pos)	{$pos--;}
-			$destrow++;
-		};
+		my $delta=0;
+		for my $row (@rows)
+		{	if	($row==$::Position)	{$pos=$destrow+$delta;$delta=0;last}
+			elsif	($row<$::Position)	{$pos--}
+			$delta++;
+		}
+		$pos+=$delta if $destrow<=$::Position;
 		if ($::Position!=$pos) { $::Position=$pos; ::HasChanged('Pos'); }
 	}
 }
