@@ -1046,7 +1046,7 @@ if ($CmdLine{UseGnomeSession})
 
 {	Watch(undef, SongArray	=> \&SongArray_changed);
 	Watch(undef, $_	=> \&QueueUpdateNextSongs) for qw/Playlist Queue Sort Pos QueueAction/;
-	Watch(undef, $_ => sub { return unless defined $SongID && $TogPlay; QHasChanged('PlayingSong'); }) for qw/CurSongID Playing/;
+	Watch(undef, $_ => sub { return unless defined $SongID && $TogPlay; HasChanged('PlayingSong'); }) for qw/CurSongID Playing/;
 	Watch(undef,RecentSongs	=> sub { UpdateRelatedFilter('Recent'); });
 	Watch(undef,NextSongs	=> sub { UpdateRelatedFilter('Next'); });
 	Watch(undef,CurSong	=> sub { UpdateRelatedFilter('Play'); });
