@@ -742,7 +742,7 @@ our %timespan_menu=
 			'ilst:read'	=> sub { [map "ilst_$_",  keys %{$_[0]}] },
 			FilterList => {search=>1,none=>1},
 			none		=> quotemeta "No tags",	#not translated because made for debugging
-			#_disabled=>1,
+			_disabled=>1,
 		},
 );
 
