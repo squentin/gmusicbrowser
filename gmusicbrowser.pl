@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2010 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -68,8 +68,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1003',
- VERSIONSTRING => '1.1.3',
+ VERSION => '1.1004',
+ VERSIONSTRING => '1.1.4',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
@@ -154,7 +154,7 @@ BEGIN
 	?  $HomeDir.'gmusicbrowser.fifo'
 	: undef;
 
-my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2009 Quentin Sculo
+my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2010 Quentin Sculo
 options :
 -nocheck: don't check for updated/deleted songs on startup
 -noscan	: don't scan folders for songs on startup
@@ -4974,7 +4974,7 @@ sub CheckCover
 sub AboutDialog
 {	my $dialog=Gtk2::AboutDialog->new;
 	$dialog->set_version(VERSIONSTRING);
-	$dialog->set_copyright("Copyright © 2005-2009 Quentin Sculo");
+	$dialog->set_copyright("Copyright © 2005-2010 Quentin Sculo");
 	#$dialog->set_comments();
 	$dialog->set_license("Released under the GNU General Public Licence version 3\n(http://www.gnu.org/copyleft/gpl.html)");
 	$dialog->set_website('http://gmusicbrowser.org');
