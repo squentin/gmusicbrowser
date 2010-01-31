@@ -2664,10 +2664,7 @@ sub UpdateStock
 package Layout::Label;
 use Gtk2;
 
-use constant
-{	SPEED	=> 20,	#timeout in ms
-	INCR	=> 1,	#scroll increment in pixel
-};
+use constant	INCR => 1;	#scroll increment in pixels
 
 use base 'Gtk2::EventBox';
 
@@ -2680,7 +2677,7 @@ sub new
 	my $label=Gtk2::Label->new;
 	$label->set_alignment($opt->{xalign},$opt->{yalign});
 
-	for (qw/markup markup_empty update/)		#$self->{update} is only used by LabelTime
+	for (qw/markup markup_empty update autoscroll interval/)	#$self->{update} is only used by LabelTime
 	{	$self->{$_}=$opt->{$_} if exists $opt->{$_};
 	}
 
@@ -2705,8 +2702,15 @@ sub new
 		$self->{maxwidth}=1 if $opt->{expand_max};
 		$self->set_size_request($minsize,-1);
 		$label->signal_connect(expose_event => \&expose_cb);
-		$self->signal_connect(enter_notify_event => \&enter_leave_cb, INCR());
-		$self->signal_connect(leave_notify_event => \&enter_leave_cb,-INCR());
+		if ($self->{autoscroll})
+		{	$self->{interval} ||=50;	# default to a scroll every 50ms
+			$self->signal_connect(size_allocate => \&restart_scrollcheck);
+		}
+		else	# scroll when mouse is over it
+		{	$self->{interval} ||=20;	# default to a scroll every 20ms
+			$self->signal_connect(enter_notify_event => \&enter_leave_cb, INCR());
+			$self->signal_connect(leave_notify_event => \&enter_leave_cb,-INCR());
+		}
 	}
 	elsif (defined $opt->{initsize})
 	{	#$label->set_size_request($label->create_pango_layout( $opt->{initsize} )->get_pixel_size);
@@ -2744,12 +2748,19 @@ sub checksize	#extend the requested size so that the string fit in initsize mode
 	elsif ($self->{maxwidth})
 	{	$self->{maxwidth}= ($self->child->get_layout->get_pixel_size)[0]||1;
 	}
+	$self->restart_scrollcheck if $self->{autoscroll};
+}
+
+sub restart_scrollcheck	#only used for autoscroll
+{	my $self=shift;
+	$self->{scroll_inc}||=INCR();
+	$self->{scrolltimeout} ||= Glib::Timeout->add($self->{interval}, \&Scroll,$self);
 }
 
 sub enter_leave_cb
 {	my ($self,$event,$inc)=@_;
 	#$self->set_state($inc>0 ? 'selected' : 'normal');
-	$self->{scrolltimeout}=Glib::Timeout->add(SPEED, \&Scroll,$self) unless $self->{scrolltimeout};
+	$self->{scrolltimeout}  ||= Glib::Timeout->add($self->{interval}, \&Scroll,$self);
 	$self->{scroll_inc}=$inc;
 	0;
 }
@@ -2781,7 +2792,14 @@ sub Scroll
 	$dx=0 if $dx<0 || $max<0;
 	$label->{dx}=$dx;
 	$label->parent->queue_draw;
-	$self->{scrolltimeout}=0 if ($max<0) or ($dx==0 && $self->{scroll_inc}<0) or ($dx==$max && $self->{scroll_inc}>0);
+	my $reached_max= ($max<0) || ($dx==0 && $self->{scroll_inc}<0) || ($dx==$max && $self->{scroll_inc}>0);
+	if ($self->{autoscroll})
+	{	$self->{scroll_inc}=-$self->{scroll_inc} if $reached_max;	# reverse scrolling
+		$self->{scrolltimeout}=$self->{scroll_inc}=0 if $max<0;		# no need for scrolling => stop checks
+	}
+	else
+	{	$self->{scrolltimeout}=0 if $reached_max;
+	}
 	return $self->{scrolltimeout};
 }
 
