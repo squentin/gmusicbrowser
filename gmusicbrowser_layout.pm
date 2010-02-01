@@ -1889,7 +1889,7 @@ sub new
 	%children_opt=( %children_opt, %{$opt->{children_opt}} ) if $opt->{children_opt};
 	$self->InitLayout($layout,\%children_opt);
 	$self->{tabicon}=  $self->{tabicon}  || $Layout::Layouts{$layout}{stockicon};
-	$self->{tabtitle}= $self->{tabtitle} || $Layout::Layouts{$layout}{title} || $layout;
+	$self->{tabtitle}= $self->{tabtitle} || $Layout::Layouts{$layout}{Name} || $layout;
 	$self->show_all;
 	return $self;
 }
