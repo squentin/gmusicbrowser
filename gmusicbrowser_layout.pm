@@ -1030,7 +1030,7 @@ sub WidgetChangedAutoAdd
 sub UpdateObject
 {	my $widget=$_[0];
 	if ( my $tip=$widget->{state_tip} )
-	{	$tip= $tip->() if ref $tip;
+	{	$tip= $tip->($widget) if ref $tip;
 		$widget->set_tooltip_text($tip);
 	}
 	if ($widget->{skin}) {$widget->queue_draw}
