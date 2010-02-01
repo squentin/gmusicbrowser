@@ -60,7 +60,7 @@ our %Widgets=
 		stock	=> 'gtk-media-stop',
 		tip	=> _"Stop",
 		activate=> \&::Stop,
-		click3	=> sub {&::EnqueueAction('stop')},
+		click3	=> 'EnqueueAction(stop)',
 	},
 	Play =>
 	{	class	=> 'Layout::Button',
@@ -118,7 +118,7 @@ our %Widgets=
 		stock	=> 'gtk-quit',
 		tip	=> _"Quit",
 		activate=> \&::Quit,
-		click3	=> sub {&::EnqueueAction('quit')},
+		click3	=> 'EnqueueAction(quit)',
 	},
 	LockSong =>
 	{	class	=> 'Layout::Button',
