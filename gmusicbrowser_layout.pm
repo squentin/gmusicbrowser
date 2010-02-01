@@ -238,14 +238,8 @@ our %Widgets=
 	},
 	Title_by =>
 	{	class	=> 'Layout::Label',
-		group	=> 'Play',
-		minsize	=> 20,
+		parent	=> 'Title',
 		markup	=> ::__x(_"{song} by {artist}",song => "<b><big>%S</big></b>%V", artist => "<b>%a</b>"),
-		markup_empty => '<b><big>&lt;'._("Playlist Empty").'&gt;</big></b>',
-		click1	=> \&PopupSongsFromAlbum,
-		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupContextMenu(\@::SongCMenu,{mode=> 'P', self=> $_[0], IDs => [$ID]}) if defined $ID;},
-		dragsrc => [::DRAG_ID,\&DragCurrentSong],
-		cursor	=> 'hand2',
 	},
 	Artist =>
 	{	class	=> 'Layout::Label',
@@ -297,17 +291,6 @@ our %Widgets=
 		click1	=> sub { $_[0]{remaining}=!$_[0]{remaining}; $_[0]{update}->($_[0]); },
 		update	=> sub { $_[0]->set_label( ::TimeString($_[0]{remaining}) ) unless $_[0]{busy}; },
 	},
-	Scale =>
-	{	class	=> 'Layout::Bar::Scale',
-		group	=> 'Play',
-		event	=> 'Time',
-		update	=> sub { $_[0]->set_val($::PlayTime); },
-		fields	=> 'length',
-		schange	=> sub { $_[0]->set_max( defined $_[1] ? Songs::Get($_[1],'length') : 0); },
-		set	=> sub { ::SkipTo($_[1]) },
-		scroll	=> sub { $_[1] ? ::Forward(undef,10) : ::Rewind (undef,10) },
-		set_preview => \&Layout::Bar::update_preview_Time,
-	},
 	TimeBar =>
 	{	class	=> 'Layout::Bar',
 		group	=> 'Play',
@@ -319,6 +302,11 @@ our %Widgets=
 		scroll	=> sub { $_[1] ? ::Forward(undef,10) : ::Rewind (undef,10) },
 		set_preview => \&Layout::Bar::update_preview_Time,
 		cursor	=> 'hand2',
+	},
+	Scale =>
+	{	class	=> 'Layout::Bar::Scale',
+		parent	=> 'TimeBar',
+		cursor	=> undef,
 	},
 	VolBar =>
 	{	class	=> 'Layout::Bar',
@@ -333,11 +321,8 @@ our %Widgets=
 	VolSlider =>
 	{	class	=> 'Layout::Bar::Scale',
 		orientation => 'bottom-to-top',
-		event	=> 'Vol',
-		update	=> sub { $_[0]->set_val( ::GetVol() ); },
-		set	=> sub { ::UpdateVol($_[1]) },
-		scroll	=> sub { ::ChangeVol($_[1] ? 'up' : 'down') },
-		max	=> 100,
+		parent	=> 'VolBar',
+		cursor	=> undef,
 	},
 	LabelVol =>
 	{	class	=> 'Layout::Label',
