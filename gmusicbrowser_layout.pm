@@ -51,7 +51,9 @@ our %Widgets=
 		stock	=> 'gtk-media-previous',
 		tip	=> _"Recently played songs",
 		activate=> \&::PrevSong,
-		click3	=> sub { ::ChooseSongs(undef,::GetPrevSongs(5)); },
+		options => 'nbsongs',
+		nbsongs	=> 10,
+		click3	=> sub { ::ChooseSongs(undef,::GetPrevSongs($_[0]{nbsongs})); },
 	},
 	Stop =>
 	{	class	=> 'Layout::Button',
@@ -74,7 +76,9 @@ our %Widgets=
 		stock	=> 'gtk-media-next',
 		tip	=> _"Next Song",
 		activate=> \&::NextSong,
-		click3	=> sub { ::ChooseSongs(undef,::GetNextSongs(5)); },
+		options => 'nbsongs',
+		nbsongs	=> 10,
+		click3	=> sub { ::ChooseSongs(undef,::GetNextSongs($_[0]{nbsongs})); },
 	},
 	Playlist =>
 	{	class	=> 'Layout::Button',
