@@ -600,7 +600,7 @@ Window = insensitive=1,size=250x1
 #type P layouts : pages that can be added to a TabbedLists
 [same_album]
 Type= P
-Name=Same album
+Name=Album
 VBmain = _SongTree(group=Play:album)
 
 [same_artist]
