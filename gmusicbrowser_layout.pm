@@ -778,8 +778,9 @@ sub InitLayout
 	$self->{KeyBindings}=::make_keybindingshash($boxes->{KeyBindings}) if $boxes->{KeyBindings};
 	$self->{widgets}={};
 	$self->{global_options}{default_group}=$self->{group};
-	for (qw/SkinPath SkinFile DefaultFont/)
-	{	$self->{global_options}{$_}=$boxes->{$_} if exists $boxes->{$_};
+	for (qw/SkinPath SkinFile DefaultFont DefaultFontColor/)
+	{	my $val= $self->{options}{$_} || $boxes->{$_};
+		$self->{global_options}{$_}=$val if defined $val;
 	}
 
 	my $mainwidget= $self->CreateWidgets($boxes,$opt2);
@@ -2674,6 +2675,7 @@ sub new
 
 	my $font= $opt->{font} || $opt->{DefaultFont} || $ref->{font};
 	$label->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
+	$label->modify_fg('normal', Gtk2::Gdk::Color->parse($opt->{DefaultFontColor}) ) if $opt->{DefaultFontColor};
 	$label->set_markup($opt->{markup}) if exists $opt->{markup};
 	$label->set_text($opt->{text}) if exists $opt->{text};
 	$self->add($label);
