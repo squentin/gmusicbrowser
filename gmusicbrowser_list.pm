@@ -1148,7 +1148,7 @@ sub SongArray_changed_cb
 	elsif ($action eq 'remove')
 	{	my $rows=$extra[0];
 		$store->rowremove($rows);
-		$self->ResetModel if @$array==0; #don't know why, but when the list is not empty and adding/removing columns that result in a different row height; after removing all the rows, and then inserting a row, the row height is reset to the previous height. Doing a reset model when the list is empty solves this. 
+		$self->ResetModel if @$array==0; #don't know why, but when the list is not empty and adding/removing columns that result in a different row height; after removing all the rows, and then inserting a row, the row height is reset to the previous height. Doing a reset model when the list is empty solves this.
 	}
 	elsif ($action eq 'mode') {} #the list itself hasn't changed
 	else #'replace' or unknown action
@@ -4734,7 +4734,6 @@ sub select
 	my $parent=$self;
 	$parent=$parent->parent until $parent->{isearchbox};	#FIXME could be better, maybe pass a package name to new and use ::find_ancestor($self,$self->{targetpackage});
 	$parent->select_by_filter($self->{filter}) if $self->{filter};
-	
 }
 sub button_cb
 {	my $widget=$_[0];

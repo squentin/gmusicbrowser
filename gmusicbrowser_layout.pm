@@ -919,7 +919,7 @@ sub NewWidget
 	while (my $p=$ref->{parent})	#inherit from parent
 	{	my $pref=$Widgets{$p};
 		$ref= { %$pref, %$ref };
-		delete $ref->{parent} if $ref->{parent} eq $p; 
+		delete $ref->{parent} if $ref->{parent} eq $p;
 	}
 	$opt1=Parse_opt1($opt1,$ref->{oldopt1}) unless ref $opt1;
 	$opt2||={};
