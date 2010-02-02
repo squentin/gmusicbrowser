@@ -596,6 +596,35 @@ Name= _"Insensitive title-artist (right-aligned)"
 HBmain	= _Title_by(ellipsize=end,xalign=1)
 Window = insensitive=1,size=250x1
 
+# type D layouts : for desktop widgets
+[D_insens_song_cover]
+Type= D
+Name= _"Insensitive, Song & Cover"
+Window = insensitive=1,transparent=1
+DefaultFontColor= white
+HBTitle		= _Title LabelsIcons
+HBArtist	= _Artist
+HBAlbum		= _Album -Date
+VBText		= 2HBTitle 2HBArtist 2HBAlbum
+VBmain		= VBText _Cover(maxsize=0,xalign=0,yalign=0)
+
+[D_buttons_song_cover]
+Type= D
+Name= _"Buttons, Song & Cover"
+Window =  transparent=1
+DefaultFontColor= white
+HBTitle		= _Title LabelsIcons
+HBArtist	= _Artist
+HBAlbum		= _Album -Date
+HBbuttons	= Prev Stop Play Next
+VBmain		= HBbuttons 2HBTitle 2HBArtist 2HBAlbum -Cover(forceratio=1,maxsize=0)
+
+[D_buttons]
+Type= D
+Name = _"Buttons"
+Window =  transparent=1
+HBbuttons =	Prev Stop Play Next
+
 
 #type P layouts : pages that can be added to a TabbedLists
 [same_album]
