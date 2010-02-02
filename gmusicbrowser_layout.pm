@@ -1468,7 +1468,8 @@ sub new
 		$opt0= ::ParseOptions($opt0);
 	}
 	unless (exists $Layout::Layouts{$layout})
-	{	warn "Layout '$layout' not found, using '$fallback' instead\n";
+	{	if ($fallback eq 'NONE') { warn "Layout '$layout' not found\n"; return undef; }
+		warn "Layout '$layout' not found, using '$fallback' instead\n";
 		$layout=$fallback; #FIXME if not a player window
 		$Layout::Layouts{$layout} ||= { VBmain=>'Label(text="Error : fallback layout not found")' };	#create an error layout if fallback not found
 	}
