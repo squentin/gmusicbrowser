@@ -2179,6 +2179,7 @@ sub Replace
 		$newlist= $::Options{SavedLists}{$newlist};
 	}
 	$newlist= SongArray->new_copy($newlist);
+	$::Position=undef;  $::ChangedPos=1;
 	my $ID=$::SongID;
 	$ID=undef if defined $ID && !$newlist->IsIn($ID);
 	if (!defined $ID)
@@ -2352,6 +2353,7 @@ sub SetFilter
 	$::Options{Sort}=$::Options{Sort_LastOrdered} unless $::Options{Sort};
 	$::Options{LastPlayFilter}= $::SelectedFilter= $filter || Filter->new;
 	my $newID=$self->_filter;
+	$::Position=undef;  $::ChangedPos=1;
 	::QHasChanged('Filter');
 	::HasChanged('SongArray',$self,'replace', filter=> $::PlayFilter);
 	_updateID($newID);
@@ -2368,7 +2370,7 @@ sub UpdateFilter
 	{	::QHasChanged('Filter');
 		::HasChanged('SongArray',$self,'replace', filter=> $::PlayFilter);
 	}
-	$::ChangedPos=1;
+	$::Position=undef;  $::ChangedPos=1;
 	_updateID($newID);
 }
 sub UpdateSort
@@ -2381,8 +2383,7 @@ sub UpdateSort
 }
 sub UpdateLock
 {	my $self=shift;
-	$::Position=undef;
-	$::ChangedPos=1;
+	$::Position=undef;  $::ChangedPos=1;
 	if (defined $::ListMode) { $self->Replace($::ListMode); }
 	else { $self->SetFilter($::SelectedFilter); }
 }

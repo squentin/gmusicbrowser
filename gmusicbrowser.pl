@@ -2197,7 +2197,7 @@ sub GetNextSongs
 	  UpdateSort() if $ToDo{'8_updatesort'};
 	  my $pos;
 	  $pos=FindPositionSong( $IDs[-1],$ListPlay ) if @IDs;
-	  $pos=$Position||0 unless defined $pos;
+	  $pos= defined $Position ? $Position : -1  unless defined $pos;
 	  push @IDs,_"next" if $list;
 	  while ($nb)
 	  {	if ( $pos+$nb > $#$ListPlay )
