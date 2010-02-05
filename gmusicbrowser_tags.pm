@@ -1733,7 +1733,7 @@ use base 'Gtk2::SpinButton';
 sub new
 {	my ($class,$init,$max) = @_;
 	my $self = bless Gtk2::SpinButton->new(
-		Gtk2::Adjustment->new ($init||0, 0, $max||10000000, 1, 10, 1) ,10,0  )
+		Gtk2::Adjustment->new ($init||0, 0, $max||10000000, 1, 10, 0) ,10,0  )
 		, $class;
 	$self->{init}=$self->get_value;
 	return $self;
