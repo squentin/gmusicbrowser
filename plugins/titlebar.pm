@@ -19,7 +19,7 @@ use constant
 {	OPT	=> 'PLUGIN_TITLEBAR_',
 };
 
-::SetDefaultOptions(OPT, offy=>4, offx=>24, refpoint=>'upper_left', layout=>'O_play');
+::SetDefaultOptions(OPT, offy=>4, offx=>24, refpoint=>'upper_left', layout=>'O_play', textcolor=>'white');
 
 my ($Screen,$Handle,$Popupwin,$ActiveWindow);
 
@@ -51,15 +51,21 @@ sub prefbox
 	my $offx=::NewPrefSpinButton(OPT.'offx', -999,999, cb=>\&move, step=>1, page=>5, text1=>_"x offset :", sizeg1=>$sg1);
 	my $offy=::NewPrefSpinButton(OPT.'offy', -999,999, cb=>\&move, step=>1, page=>5, text1=>_"y offset :", sizeg1=>$sg1);
 	my $notdialog=::NewPrefCheckButton(OPT.'notdialog',_"Don't add the overlay to dialogs", \&init);
-	$vbox->pack_start($_,::FALSE,::FALSE,2) for $layout,$refpoint,$offx,$offy,$notdialog;
+	my $textcolor= Gtk2::ColorButton->new( Gtk2::Gdk::Color->parse($::Options{OPT.'textcolor'}) );
+	$textcolor->signal_connect(color_set=>sub { $::Options{OPT.'textcolor'}=$_[0]->get_color->to_string; init(); });
+	my $set_textcolor= ::NewPrefCheckButton(OPT.'set_textcolor',_"Change default text color", \&init,undef,$textcolor,undef,1);
+	$vbox->pack_start($_,::FALSE,::FALSE,2) for $layout,$refpoint,$offx,$offy,$set_textcolor,$notdialog;
 	return $vbox;
 }
 
 sub init
-{	$Popupwin=Layout::Window->new
+{	my @moreoptions;
+	push @moreoptions, DefaultFontColor=> $::Options{OPT.'textcolor'}  if $::Options{OPT.'set_textcolor'};
+	$Popupwin=Layout::Window->new
 	(	$::Options{OPT.'layout'},	fallback=>'O_play',	title=>"gmusicbrowser_titlebar_overlay",
 		uniqueid=>'titlebar',		ifexist=>'replace',
 		wintype=>'popup',		transparent=>1,			ontop=>1,
+		@moreoptions,
 	);
 	window_changed($Screen);
 }
