@@ -730,6 +730,7 @@ our %Options=
 	ArtistSplit		=> ' & |, |;',
 	VolumeStep		=> 10,
 	DateFormat_history	=> ['%c 604800 %A %X 86400 Today %X 60 now'],
+	AlwaysInPlaylist	=> 1,
 
 	SavedSTGroupings=>
 	{	_"None"			=> '',
@@ -2253,8 +2254,8 @@ sub NextSong
 	if ($ID eq 'stop') { Stop(); return; }
 	if ($ID eq 'quit') { Quit(); }
 	if ($ID eq 'turnoff') { Stop(); TurnOff(); return; }
-	my $pos=$Position; $pos=-2 unless defined $pos;
-	if ( $pos<$#$ListPlay && $ListPlay->[$pos+1]==$ID ) { SetPosition($pos+1); }
+	my $pos=$Position;
+	if ( defined $pos && $pos<$#$ListPlay && $ListPlay->[$pos+1]==$ID ) { SetPosition($pos+1); }
 	else { Select(song => $ID); }
 }
 sub NextDiff	#go to next song whose $field value is different than current's
@@ -5411,9 +5412,10 @@ sub PrefMisc
 	my $datebox= Hpack(0,$datealign,$preview);
 
 	my $volstep= NewPrefSpinButton('VolumeStep',1,100, step=>1, text1=>_"Volume step :", tip=>_"Amount of volume changed by the mouse wheel");
+	my $always_in_pl=NewPrefCheckButton(AlwaysInPlaylist => _"Current song must always be in the playlist",undef,_"- When selecting a song, the playlist filter will be reset if the song is not in it\n- Skip to another song when removing the current song from the playlist");
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry,$volstep;
+	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry,$volstep,$always_in_pl;
 	return $vbox;
 }
 

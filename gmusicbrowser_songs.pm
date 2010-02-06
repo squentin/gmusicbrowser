@@ -2003,13 +2003,14 @@ sub build_presence
 }
 sub IsIn
 {	my ($self,$ID)=@_;
+	return undef unless defined $ID;
 	$self->build_presence unless $Presence{$self};
 	vec($Presence{$self},$ID,1);
 }
 sub AreIn
 {	my ($self,$IDs)=@_;
 	$self->build_presence unless $Presence{$self};
-	return [grep vec($Presence{$self},$_,1), @$IDs];
+	return [grep defined && vec($Presence{$self},$_,1), @$IDs];
 }
 sub save_to_string
 {	return join ' ',map sprintf("%d",$_), @{$_[0]};	#use sprintf so that the numbers are not stringified => use more memory
@@ -2164,7 +2165,6 @@ sub Sort
 	if ($::RandomMode || !@$self)	{ $::Position=undef }
 	else
 	{	$::Position= defined $::SongID ? ::FindPositionSong($::SongID,$self) : undef;
-		$::Position||=0;
 	}
 	::QHasChanged('Sort');
 	::QHasChanged('Pos');
@@ -2216,9 +2216,10 @@ sub Remove
 	$self->_staticfy unless $fromlibrary;	#do not staticfy list for songs removed from library
 	$self->SUPER::Remove($rows);
 	$::Options{LastPlayFilter}=$::ListMode=SongArray->new_copy($self)  unless $fromlibrary;
-	if (@$self==0) { $::Position=$::SongID=undef; _updateID(undef); return; }
+	if (@$self==0 && !$::Options{AlwaysInPlaylist}) { $::Position=$::SongID=undef; _updateID(undef); return; }
 	if ($::RandomMode)
 	{	$::RandomMode->RmIDs;
+		$self->Next if defined $::SongID && $::Options{AlwaysInPlaylist} && !$self->IsIn($::SongID); #skip to next song if current not in playlist
 	}
 	if (defined $::Position)
 	{	my $pos=$::Position;
@@ -2230,7 +2231,12 @@ sub Remove
 		}
 		$pos=0 if $pos<0;
 		$::Position=$pos;
-		$self->Next if $IDchanged;
+		if ($IDchanged)
+		{	if ($::Options{AlwaysInPlaylist})
+			{	$self->Next;  #skip to next song if current not in playlist
+			}
+			else { $::Position=undef; }
+		}
 	}
 	::QHasChanged('Pos');
 }
@@ -2414,7 +2420,12 @@ sub SetID
 			return;
 		}
 	}
-	$self->SetFilter;	#reset filter
+	if ($::Options{AlwaysInPlaylist})
+	{	$self->SetFilter;	#reset filter
+	}
+	else
+	{	::UpdateCurrentSong();
+	}
 }
 
 #private functions
