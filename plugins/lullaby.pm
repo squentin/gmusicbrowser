@@ -50,7 +50,7 @@ sub prefbox
 	{	my $min= ::NewPrefSpinButton(OPT."day${wd}m", 0,59, cb=>\&update_alarm, step=>1, page=>5, wrap=>1);
 		my $hour=::NewPrefSpinButton(OPT."day${wd}h", 0,23, cb=>\&update_alarm, step=>1, page=>4, wrap=>1);
 		my $timeentry=::Hpack($hour,Gtk2::Label->new(':'),$min);
-		my $check=::NewPrefCheckButton(OPT."day$wd",$dayname[$wd],\&update_alarm,undef,$timeentry,undef,1,$sg);
+		my $check=::NewPrefCheckButton(OPT."day$wd",$dayname[$wd], cb=>\&update_alarm, widget=>$timeentry, horizontal=>1, sizegroup=>$sg);
 		push @hours,$check;
 	}
 	$vbox->pack_start($_,::FALSE,::FALSE,2) for $spin,@hours,$button;

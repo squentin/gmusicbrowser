@@ -337,7 +337,7 @@ sub addtoolbar #default method, overridden by packages that add extra items to t
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	#my $combo=::NewPrefCombo(OPT.'Site',[sort keys %sites],'site : ',sub {$ID=undef;&Changed;});
-	my $check=::NewPrefCheckButton(OPT.'StrippedWiki',_"Strip wikipedia pages",\&set_stripped_wiki,_"Remove header, footer and left column from wikipedia pages");
+	my $check=::NewPrefCheckButton(OPT.'StrippedWiki',_"Strip wikipedia pages", cb=>\&set_stripped_wiki, tip=>_"Remove header, footer and left column from wikipedia pages");
 	my $Bopen=Gtk2::Button->new(_"open context window");
 	$Bopen->signal_connect(clicked => sub { ::ContextWindow; });
 	my ($radio_wk,$radio_moz)=

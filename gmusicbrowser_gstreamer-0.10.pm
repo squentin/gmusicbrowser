@@ -595,7 +595,7 @@ sub RGA_stop
 }
 sub RGA_PrefBox
 {	my ($sg1,$sg2)=@_;
-	my $check=::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain",undef,_"Normalize volume (the files must have replaygain tags)");
+	my $check=::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain", tip=>_"Normalize volume (the files must have replaygain tags)");
 	$sg1->add_widget($check);
 	#my $start=Gtk2::Button->new(_ "Start ReplayGain analysis");
 	my $opt  =Gtk2::Button->new(_"ReplayGain options");
@@ -607,8 +607,8 @@ sub RGA_PrefBox
 			$RG_dialog->signal_connect(response =>sub {$_[0]->destroy;$RG_dialog=undef});
 			my $update=sub { RG_set_options(); };
 			my $songmenu=::NewPrefCheckButton(gst_rg_songmenu => _"Show replaygain submenu");
-			my $albummode=::NewPrefCheckButton(gst_rg_albummode => _"Album mode",$update,_"Use album normalization instead of track normalization");
-			my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter",$update,_"Used for clipping prevention");
+			my $albummode=::NewPrefCheckButton(gst_rg_albummode => _"Album mode", cb=>$update, tip=>_"Use album normalization instead of track normalization");
+			my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter", cb=>$update, tip=>_"Used for clipping prevention");
 			my $sg1=Gtk2::SizeGroup->new('horizontal');
 			my $sg2=Gtk2::SizeGroup->new('horizontal');
 			my $preamp=	::NewPrefSpinButton('gst_rg_preamp',   -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, text2=> 'dB', sizeg1=>$sg1, sizeg2=>$sg2, text1=>_"pre-amp", tip=>_"Extra gain");
@@ -638,7 +638,7 @@ sub RGA_PrefBox
 sub AdvancedOptions
 {	my $self=$_[0];
 	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $gapless= ::NewPrefCheckButton(gst_gapless => _"enable gapless (experimental)", sub { $self->{modif}=1 });
+	my $gapless= ::NewPrefCheckButton(gst_gapless => _"enable gapless (experimental)", cb=>sub { $self->{modif}=1 });
 	$vbox->pack_start($gapless,::FALSE,::FALSE,2);
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');

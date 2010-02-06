@@ -50,10 +50,12 @@ sub prefbox
 	my $refpoint=::NewPrefCombo(OPT.'refpoint'=> \%refpoints, cb=> \&move, text =>_"Reference point :", sizeg1=>$sg1,sizeg2=>$sg2);
 	my $offx=::NewPrefSpinButton(OPT.'offx', -999,999, cb=>\&move, step=>1, page=>5, text1=>_"x offset :", sizeg1=>$sg1);
 	my $offy=::NewPrefSpinButton(OPT.'offy', -999,999, cb=>\&move, step=>1, page=>5, text1=>_"y offset :", sizeg1=>$sg1);
-	my $notdialog=::NewPrefCheckButton(OPT.'notdialog',_"Don't add the overlay to dialogs", \&init);
+	my $notdialog=::NewPrefCheckButton(OPT.'notdialog',_"Don't add the overlay to dialogs", cb=>\&init);
+
 	my $textcolor= Gtk2::ColorButton->new( Gtk2::Gdk::Color->parse($::Options{OPT.'textcolor'}) );
 	$textcolor->signal_connect(color_set=>sub { $::Options{OPT.'textcolor'}=$_[0]->get_color->to_string; init(); });
-	my $set_textcolor= ::NewPrefCheckButton(OPT.'set_textcolor',_"Change default text color", \&init,undef,$textcolor,undef,1);
+	my $set_textcolor= ::NewPrefCheckButton(OPT.'set_textcolor',_"Change default text color", cb=>\&init, widget=>$textcolor, horizontal=>1);
+
 	$vbox->pack_start($_,::FALSE,::FALSE,2) for $layout,$refpoint,$offx,$offy,$set_textcolor,$notdialog;
 	return $vbox;
 }

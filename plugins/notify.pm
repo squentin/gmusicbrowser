@@ -50,7 +50,7 @@ sub prefbox
 	my $body=   ::NewPrefEntry(OPT.'text', _"Body :",    sizeg1=> $sg1, sizeg2=>$sg2, width=>40, tip => $replacetext."\n\n"._("You can use some markup, eg :\n<b>bold</b> <i>italic</i> <u>underline</u>\nNote that the markup may be ignored by the notification daemon"),);
 	my $size=   ::NewPrefSpinButton(OPT.'picsize', 0,1000, step=>10, page=>40, text1=>_"Picture size :", sizeg1=>$sg1, tip=> _"Note that some notification daemons resize the displayed picture");
 	my $timeout=::NewPrefSpinButton(OPT.'timeout', 0,9999, step=>2,  page=>5,  text1=>_"Timeout :",      sizeg1=>$sg1, text2=>_"seconds", digits=>1);
-	my $actions=::NewPrefCheckButton(OPT.'actions',_"Display stop/next actions",\&set_actions);
+	my $actions=::NewPrefCheckButton(OPT.'actions',_"Display stop/next actions", cb=>\&set_actions);
 	$actions->set_sensitive($can_actions);
 	$actions->set_tooltip_text(_("Actions are not supported by current notification daemon").' : '.$Daemon_name) unless $can_actions;
 	$body->set_sensitive($can_body);

@@ -5273,7 +5273,7 @@ sub PrefAudio
 	{	my $hbox2=NewPrefCombo(gst_sink => Play_GST->supported_sinks, text => _"output device :", sizeg1=>$sg1, sizeg2=> $sg2);
 		my $EQbut=Gtk2::Button->new(_"Open Equalizer");
 		$EQbut->signal_connect(clicked => sub { OpenSpecialWindow('Equalizer'); });
-		my $EQcheck=NewPrefCheckButton(gst_use_equalizer => _"Use Equalizer", sub { HasChanged('Equalizer'); });
+		my $EQcheck=NewPrefCheckButton(gst_use_equalizer => _"Use Equalizer", cb=>sub { HasChanged('Equalizer'); });
 		$sg1->add_widget($EQcheck);
 		$sg2->add_widget($EQbut);
 		my $EQbox=Hpack($EQcheck,$EQbut);
@@ -5292,7 +5292,7 @@ sub PrefAudio
 	#icecast
 	my $vbox_ice=Gtk2::VBox->new(FALSE, 2);
 	$Options{use_GST_for_server}=0 unless $PlayPacks{Play_GST_server};
-	my $usegst=NewPrefCheckButton(use_GST_for_server => _"Use gstreamer",sub {$radio_gst->signal_emit('toggled');},_"without gstreamer : one stream per file, one connection at a time\nwith gstreamer : one continuous stream, multiple connection possible");
+	my $usegst=NewPrefCheckButton(use_GST_for_server => _"Use gstreamer",cb=>sub {$radio_gst->signal_emit('toggled');}, tip=>_"without gstreamer : one stream per file, one connection at a time\nwith gstreamer : one continuous stream, multiple connection possible");
 	my $hbox3=NewPrefEntry('Icecast_port',_"port :");
 	my $albox=Gtk2::Alignment->new(0,0,1,1);
 	$albox->set_padding(0,0,15,0);
@@ -5315,7 +5315,7 @@ sub PrefAudio
 		$vbox_123, Gtk2::HSeparator->new,
 		$vbox_mp,  Gtk2::HSeparator->new,
 		$vbox_ice, Gtk2::HSeparator->new,
-		NewPrefCheckButton(IgnorePlayError => _"Ignore playback errors",undef,_"Skip to next song if an error occurs");
+		NewPrefCheckButton(IgnorePlayError => _"Ignore playback errors", tip=>_"Skip to next song if an error occurs");
 	return $vbox;
 }
 
@@ -5366,18 +5366,18 @@ sub PrefMisc
 
 	my $checkR1=NewPrefCheckButton(RememberPlayFilter => _"Remember last Filter/Playlist between sessions");
 	my $checkR3=NewPrefCheckButton( RememberPlayTime  => _"Remember playing position between sessions");
-	my $checkR2=NewPrefCheckButton( RememberPlaySong  => _"Remember playing song between sessions",undef,undef,$checkR3);
+	my $checkR2=NewPrefCheckButton( RememberPlaySong  => _"Remember playing song between sessions", widget=> $checkR3);
 	my $checkR4=NewPrefCheckButton( RememberQueue  => _"Remember queue between sessions");
 
 	#Proxy
-	my $ProxyCheck=NewPrefCheckButton(Simplehttp_Proxy => _"Connect through a proxy",undef,undef,
-			Hpack(	NewPrefEntry(Simplehttp_ProxyHost => _"Proxy host :"),
+	my $ProxyCheck=NewPrefCheckButton(Simplehttp_Proxy => _"Connect through a proxy",
+		widget=>Hpack(	NewPrefEntry(Simplehttp_ProxyHost => _"Proxy host :"),
 				NewPrefEntry(Simplehttp_ProxyPort => _"port :"),
 			)
 		);
 
 	#xdg-screensaver
-	my $screensaver=NewPrefCheckButton(StopScreensaver => _"Disable screensaver when fullscreen and playing",undef,_"requires xdg-screensaver");
+	my $screensaver=NewPrefCheckButton(StopScreensaver => _"Disable screensaver when fullscreen and playing", tip=>_"requires xdg-screensaver");
 	$screensaver->set_sensitive(0) unless findcmd('xdg-screensaver');
 	#shutdown
 	my $shutentry=NewPrefEntry(Shutdown_cmd => _"Shutdown command :", tip => _"Command used when\n'turn off computer when queue empty'\nis selected");
@@ -5412,7 +5412,7 @@ sub PrefMisc
 	my $datebox= Hpack(0,$datealign,$preview);
 
 	my $volstep= NewPrefSpinButton('VolumeStep',1,100, step=>1, text1=>_"Volume step :", tip=>_"Amount of volume changed by the mouse wheel");
-	my $always_in_pl=NewPrefCheckButton(AlwaysInPlaylist => _"Current song must always be in the playlist",undef,_"- When selecting a song, the playlist filter will be reset if the song is not in it\n- Skip to another song when removing the current song from the playlist");
+	my $always_in_pl=NewPrefCheckButton(AlwaysInPlaylist => _"Current song must always be in the playlist", tip=> _"- When selecting a song, the playlist filter will be reset if the song is not in it\n- Skip to another song when removing the current song from the playlist");
 
 	#packing
 	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry,$volstep,$always_in_pl;
@@ -5425,11 +5425,11 @@ sub PrefLayouts
 	#Tray
 	my $traytiplength=NewPrefSpinButton('TrayTipTimeLength', 0,100000, step=>100, text1=>_"Display tray tip for", text2=>'ms');
 	my $checkT2=NewPrefCheckButton(CloseToTray => _"Close to tray");
-	my $checkT3=NewPrefCheckButton(ShowTipOnSongChange => _"Show tray tip on song change",undef,undef,$traytiplength);
-	my $checkT4=NewPrefCheckButton(TrayTipDelay => _"Delay tray tip popup on mouse over",\&SetTrayTipDelay);
+	my $checkT3=NewPrefCheckButton(ShowTipOnSongChange => _"Show tray tip on song change", widget=>$traytiplength);
+	my $checkT4=NewPrefCheckButton(TrayTipDelay => _"Delay tray tip popup on mouse over", cb=>\&SetTrayTipDelay);
 	my $checkT1=NewPrefCheckButton( UseTray => _"Show tray icon",
-					sub { &CreateTrayIcon; },undef,
-					Vpack($checkT2,$checkT4,$checkT3)
+					cb=> sub { &CreateTrayIcon; },
+					widget=> Vpack($checkT2,$checkT4,$checkT3)
 					);
 	$checkT1->set_sensitive($Gtk2TrayIcon);
 
@@ -5443,7 +5443,7 @@ sub PrefLayouts
 	my $layoutS=NewPrefCombo(LayoutS=> Layout::get_layout_list('S'), text =>_"Search window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
 
 	#fullscreen button
-	my $fullbutton=NewPrefCheckButton(AddFullscreenButton => _"Add a fullscreen button", sub { Layout::WidgetChangedAutoAdd('Fullscreen'); },_"Add a fullscreen button to layouts that can accept extra buttons");
+	my $fullbutton=NewPrefCheckButton(AddFullscreenButton => _"Add a fullscreen button", cb=>sub { Layout::WidgetChangedAutoAdd('Fullscreen'); }, tip=>_"Add a fullscreen button to layouts that can accept extra buttons");
 
 
 	my $icotheme=NewPrefCombo(IconTheme=> GetIconThemesList(), text =>_"Icon theme :", sizeg1=>$sg1,sizeg2=>$sg2, cb => \&LoadIcons);
@@ -5466,14 +5466,14 @@ sub PrefTags
 	my $warning=Gtk2::Label->new;
 	$warning->set_markup_with_format('<b>%s</b>', _"Warning : these are advanced options, don't change them unless you know what you are doing.");
 	$warning->set_line_wrap(1);
-	my $checkv4=NewPrefCheckButton('TAG_write_id3v2.4',_"Create ID3v2 tags as ID3v2.4",undef,_"Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are probably better supported by other softwares");
-	my $checklatin1=NewPrefCheckButton(TAG_use_latin1_if_possible => _"Use latin1 encoding if possible in id3v2 tags",undef,_"the default is utf16 for ID3v2.3 and utf8 for ID3v2.4");
-	my $check_unsync=NewPrefCheckButton(TAG_no_desync => _"Do not unsynchronise id3v2 tags",undef,_"itunes doesn't support unsynchronised tags last time I checked, mostly affect tags with pictures");
+	my $checkv4=NewPrefCheckButton('TAG_write_id3v2.4',_"Create ID3v2 tags as ID3v2.4", tip=>_"Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are probably better supported by other softwares");
+	my $checklatin1=NewPrefCheckButton(TAG_use_latin1_if_possible => _"Use latin1 encoding if possible in id3v2 tags", tip=>_"the default is utf16 for ID3v2.3 and utf8 for ID3v2.4");
+	my $check_unsync=NewPrefCheckButton(TAG_no_desync => _"Do not unsynchronise id3v2 tags", tip=>_"itunes doesn't support unsynchronised tags last time I checked, mostly affect tags with pictures");
 	my @Encodings=grep $_ ne 'null', Encode->encodings(':all');
 	my $id3v1encoding=NewPrefCombo(TAG_id3v1_encoding => \@Encodings, text => _"Encoding used for id3v1 tags :");
-	my $nowrite=NewPrefCheckButton('TAG_nowrite_mode',_"Do not write the tags",undef,_"Will not write the tags except with the advanced tag editing dialog. The changes will be kept in the library instead.\nWarning, the changes for a song will be lost if the tag is re-read.");
-	my $autocheck=NewPrefCheckButton('TAG_auto_check_current',_"Auto-check current song for modification",undef,_"Automatically check if the file for the current song has changed. And remove songs not found from the library.");
-	my $noid3v1=NewPrefCheckButton('TAG_id3v1_noautocreate',_"Do not create an id3v1 tag in mp3 files",undef,_"Only affect mp3 files that do not already have an id3v1 tag");
+	my $nowrite=NewPrefCheckButton(TAG_nowrite_mode => _"Do not write the tags", tip=>_"Will not write the tags except with the advanced tag editing dialog. The changes will be kept in the library instead.\nWarning, the changes for a song will be lost if the tag is re-read.");
+	my $autocheck=NewPrefCheckButton(TAG_auto_check_current=> _"Auto-check current song for modification", tip=>_"Automatically check if the file for the current song has changed. And remove songs not found from the library.");
+	my $noid3v1=NewPrefCheckButton(TAG_id3v1_noautocreate=> _"Do not create an id3v1 tag in mp3 files", tip=>_"Only affect mp3 files that do not already have an id3v1 tag");
 
 	$vbox->pack_start($_,FALSE,FALSE,1) for $warning,$checkv4,$checklatin1,$check_unsync,$id3v1encoding,$noid3v1,$nowrite,$autocheck;
 	return $vbox;
@@ -5585,7 +5585,7 @@ sub PrefLibrary
 	$sw->set_policy ('automatic', 'automatic');
 	$sw->add($treeview);
 
-	my $Cscanall=NewPrefCheckButton(ScanPlayOnly => _"Do not add songs that can't be played",sub {$ScanRegex=undef});
+	my $Cscanall=NewPrefCheckButton(ScanPlayOnly => _"Do not add songs that can't be played", cb=>sub {$ScanRegex=undef});
 	my $CScan=NewPrefCheckButton(StartScan => _"Search for new songs on startup");
 	my $CCheck=NewPrefCheckButton(StartCheck => _"Check for updated/deleted songs on startup");
 	my $BScan= NewIconButton('gtk-refresh',_"scan now", sub { IdleScan();	});
@@ -5809,7 +5809,8 @@ sub NewPrefRadio
 	return @radios;
 }
 sub NewPrefCheckButton
-{	my ($key,$text,$sub,$tip,$widget,$toolitem,$horizontal,$sizeg)=@_;
+{	my ($key,$text,%opt)=@_;
+	my ($sub,$tip,$widget,$horizontal,$sizeg,$toolitem)=@opt{qw/cb tip widget horizontal sizegroup toolitem/};
 	my $init= $Options{$key};
 	my $check=Gtk2::CheckButton->new($text);
 	$sizeg->add_widget($check) if $sizeg;

@@ -75,17 +75,17 @@ sub prefbox
 	my $entry1=::NewPrefFileEntry(OPT.'path',_"Player mounted on :",folder=>1, sizeg1=>$sg1,sizeg2=>$sg2);
 	my $entry2=::NewPrefEntry(OPT.'folderformat',_"Folder format :", sizeg1=>$sg1,sizeg2=>$sg2, tip =>_("These fields can be used :")."\n".::MakeReplaceText('talydnAY'));
 	my $entry3=::NewPrefEntry(OPT.'filenameformat',_"Filename format :", sizeg1=>$sg1,sizeg2=>$sg2, tip =>_("These fields can be used :")."\n".::MakeReplaceText('talydnAYo'));
-	my $check1=::NewPrefCheckButton(OPT.'topath',_"Copy to mounted portable player", \&updatemenu, undef, ::Vpack($entry1,$entry2,$entry3) );
+	my $check1=::NewPrefCheckButton(OPT.'topath',_"Copy to mounted portable player", cb=>\&updatemenu, widget=> ::Vpack($entry1,$entry2,$entry3) );
 
 	my $entry4=::NewPrefEntry(OPT.'tocmd_label',_"Menu entry name", sizeg1=> $sg1,sizeg2=>$sg2, tip => _("Name under which the command will appear in the menu"));
 	my $entry5=::NewPrefEntry(OPT.'tocmd_cmd',_"System command :", sizeg1=> $sg1,sizeg2=>$sg2,
 		tip =>  _("These fields can be used :")."\n".::MakeReplaceText('ftalydnAY')."\n".
 			_("In this case one command by file will be run\n\n".
 			'Or you can use the field $files which will be replaced by the list of files, and only one command will be run'));
-	my $check2=::NewPrefCheckButton(OPT.'tocmd',_"Execute custom command on selected files", \&updatemenu ,undef, ::Vpack($entry4,$entry5) );
+	my $check2=::NewPrefCheckButton(OPT.'tocmd',_"Execute custom command on selected files", cb=>\&updatemenu, widget=> ::Vpack($entry4,$entry5) );
 
-	my $check3=::NewPrefCheckButton(OPT.'tom3u',_"Export to .m3u file", \&updatemenu);
-	my $check4=::NewPrefCheckButton(OPT.'toCSV',_"Export song properties to a .csv file", \&updatemenu);
+	my $check3=::NewPrefCheckButton(OPT.'tom3u',_"Export to .m3u file", cb=>\&updatemenu);
+	my $check4=::NewPrefCheckButton(OPT.'toCSV',_"Export song properties to a .csv file", cb=>\&updatemenu);
 	$vbox->pack_start($_,::FALSE,::FALSE,2) for $check1,$check2,$check3,$check4;
 	return $vbox;
 }

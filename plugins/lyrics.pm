@@ -113,7 +113,7 @@ sub new
 	$zoom->add( Gtk2::SpinButton->new($adj,1,0) );
 	$zoom->set_tooltip_text(_"Font size");
 	my $source=::NewPrefCombo( OPT.'LyricSite', {map {$_=>$sites{$_}[0]} keys %sites} ,cb => \&SetSource, toolitem=> _"Lyrics source");
-	my $scroll=::NewPrefCheckButton( OPT.'AutoScroll', _"Auto-scroll",\&SetAutoScroll,_"Scroll with the song",undef,1);
+	my $scroll=::NewPrefCheckButton( OPT.'AutoScroll', _"Auto-scroll", cb=>\&SetAutoScroll, tip=>_"Scroll with the song", toolitem=>1);
 	$toolbar->insert($_,-1) for $follow,$zoom,$scroll,$source;
 
 	$self->pack_start($toolbar,0,0,0);
@@ -145,7 +145,7 @@ sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save lyrics in :", width=>30);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
-	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds",undef,_"only works with some lyrics source and when the lyrics tab is displayed");
+	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works with some lyrics source and when the lyrics tab is displayed");
 	my $Bopen=Gtk2::Button->new(_"open context window");
 	$Bopen->signal_connect(clicked => sub { ::ContextWindow; });
 	$vbox->pack_start($_,::FALSE,::FALSE,1) for $entry,$preview,$autosave,$Bopen;
