@@ -50,9 +50,9 @@ sub prefbox
 	my %list= map {$_,$Programs{$_}[0]} keys %Programs;
 	my $combo= ::NewPrefCombo
 	 (	OPT.'program', \%list,
-		_"Ripping software :",
-		sub { $entry->set_sensitive( $::Options{OPT.'program'} eq 'custom' ) },
-		$sg1,$sg2
+		text=> _"Ripping software :",
+		cb=> sub { $entry->set_sensitive( $::Options{OPT.'program'} eq 'custom' ) },
+		sizeg1=>$sg1, sizeg2=>$sg2
 	 );
 	$entry->set_sensitive( $::Options{OPT.'program'} eq 'custom' );
 	$vbox->pack_start($_,::FALSE,::FALSE,2) for $combo,$entry;
