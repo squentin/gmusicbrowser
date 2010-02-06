@@ -19,7 +19,7 @@ use constant
 {	OPT	=> 'PLUGIN_TITLEBAR_',
 };
 
-::SetDefaultOptions(OPT, offy=>4, offx=>24, refpoint=>'upper_left', layout=>'O_play', textcolor=>'white');
+::SetDefaultOptions(OPT, offy=>4, offx=>24, refpoint=>'upper_left', layout=>'O_play', textcolor=>'white', textfont=>'Sans 7', set_textfont=>1);
 
 my ($Screen,$Handle,$Popupwin,$ActiveWindow);
 
@@ -56,13 +56,18 @@ sub prefbox
 	$textcolor->signal_connect(color_set=>sub { $::Options{OPT.'textcolor'}=$_[0]->get_color->to_string; init(); });
 	my $set_textcolor= ::NewPrefCheckButton(OPT.'set_textcolor',_"Change default text color", cb=>\&init, widget=>$textcolor, horizontal=>1);
 
-	$vbox->pack_start($_,::FALSE,::FALSE,2) for $layout,$refpoint,$offx,$offy,$set_textcolor,$notdialog;
+	my $font= Gtk2::FontButton->new_with_font( $::Options{OPT.'textfont'} );
+	$font->signal_connect(font_set=>sub { $::Options{OPT.'textfont'}=$_[0]->get_font_name; init(); });
+	my $set_font= ::NewPrefCheckButton(OPT.'set_textfont',_"Change default text font and size", cb=>\&init, widget=>$font, horizontal=>1);
+
+	$vbox->pack_start($_,::FALSE,::FALSE,2) for $layout,$refpoint,$offx,$offy,$set_textcolor,$set_font,$notdialog;
 	return $vbox;
 }
 
 sub init
 {	my @moreoptions;
 	push @moreoptions, DefaultFontColor=> $::Options{OPT.'textcolor'}  if $::Options{OPT.'set_textcolor'};
+	push @moreoptions, DefaultFont=>      $::Options{OPT.'textfont'}   if $::Options{OPT.'set_textfont'};
 	$Popupwin=Layout::Window->new
 	(	$::Options{OPT.'layout'},	fallback=>'O_play',	title=>"gmusicbrowser_titlebar_overlay",
 		uniqueid=>'titlebar',		ifexist=>'replace',

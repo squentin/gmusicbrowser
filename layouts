@@ -577,23 +577,23 @@ HBmain	= Stop(size=menu,button=0) Play(size=menu,button=0) Next(size=menu,button
 [O_stop_play_next_timebar]
 Type= O
 Name= _"Stop, Play and Next buttons and Time"
-HBmain	= Stop(size=menu,button=0) Play(size=menu,button=0) TimeBar(minwidth=100,text=%t,font=7) Next(size=menu,button=0)
+HBmain	= Stop(size=menu,button=0) Play(size=menu,button=0) TimeBar(minwidth=100,text=%t) Next(size=menu,button=0)
 
 [O_stop_play_next_title_artist]
 Type= O
 Name= _"Stop, Play and Next buttons and Title/Artist"
-HBmain	= Stop(size=menu,button=0) Play(size=menu,button=0) Next(size=menu,button=0) _Title_by(minwidth=200,font=7)
+HBmain	= Stop(size=menu,button=0) Play(size=menu,button=0) Next(size=menu,button=0) _Title_by(minwidth=200)
 
 [O_title_artist_insens_left]
 Type= O
 Name= _"Insensitive title-artist (left-aligned)"
-HBmain	= _Title_by(font=7,ellipsize=end)
+HBmain	= _Title_by(ellipsize=end)
 Window = insensitive=1,size=250x1
 
 [O_title_artist_insens_right]
 Type= O
 Name= _"Insensitive title-artist (right-aligned)"
-HBmain	= _Title_by(font=7,ellipsize=end,xalign=1)
+HBmain	= _Title_by(ellipsize=end,xalign=1)
 Window = insensitive=1,size=250x1
 
 
