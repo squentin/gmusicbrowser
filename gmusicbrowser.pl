@@ -5466,7 +5466,7 @@ sub PrefTags
 	my $warning=Gtk2::Label->new;
 	$warning->set_markup_with_format('<b>%s</b>', _"Warning : these are advanced options, don't change them unless you know what you are doing.");
 	$warning->set_line_wrap(1);
-	my $checkv4=NewPrefCheckButton('TAG_write_id3v2.4',_"Write ID3v2.4 tags",undef,_"Use ID3v2.4 instead of ID3v2.3, ID3v2.3 are probably better supported by other softwares");
+	my $checkv4=NewPrefCheckButton('TAG_write_id3v2.4',_"Create ID3v2 tags as ID3v2.4",undef,_"Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are probably better supported by other softwares");
 	my $checklatin1=NewPrefCheckButton(TAG_use_latin1_if_possible => _"Use latin1 encoding if possible in id3v2 tags",undef,_"the default is utf16 for ID3v2.3 and utf8 for ID3v2.4");
 	my $check_unsync=NewPrefCheckButton(TAG_no_desync => _"Do not unsynchronise id3v2 tags",undef,_"itunes doesn't support unsynchronised tags last time I checked, mostly affect tags with pictures");
 	my @Encodings=grep $_ ne 'null', Encode->encodings(':all');
