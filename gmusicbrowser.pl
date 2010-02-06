@@ -1692,7 +1692,7 @@ sub SaveTags	#save tags _and_ settings
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
 	$Options{Lock}= $TogLock || '';
 	$Options{SavedSongID}= SongArray->new([$SongID]) if $Options{RememberPlaySong} && defined $SongID;
-	$Options{QueueAction}=$QueueAction if $QueueAction eq 'autofill' || $QueueAction eq 'wait';
+	$Options{QueueAction}=$QueueAction if $QueueAction && $QueueAction eq 'autofill' || $QueueAction eq 'wait';
 
 	$Options{SavedOn}= time;
 
