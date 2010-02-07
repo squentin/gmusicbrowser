@@ -7127,13 +7127,13 @@ sub new
 	return $self;
 }
 
-sub cleanup	#FIXME find a simpler way to do it
+sub cleanup
 {	my $self=shift;
-	delete $ToDo{'2_WRandom'.$self};
+	delete $self->{need_redraw};
 }
 
 sub Set
-{	my ($self,$sort)=@_; warn $sort;
+{	my ($self,$sort)=@_;
 	$sort=~s/^random://;
 	my $table=$self->{table};
 	$table->remove($_) for $table->get_children;
@@ -7145,8 +7145,19 @@ sub Set
 
 sub Redraw
 {	my ($self,$queue)=@_;
-	if ($queue) { ::IdleDo('2_WRandom'.$self,500,\&Redraw, $self); return }
-	delete $::ToDo{'2_WRandom'.$self};
+	if ($queue)
+	{	unless ($self->{need_redraw}++)
+		{	Glib::Timeout->add(300, sub
+			{	return 0 unless $self->{need_redraw}; # redraw not needed anymore
+				return $self->{need_redraw}=1 if  --$self->{need_redraw};
+				# draw now if no change since last timeout
+				$self->Redraw;
+				return 0;
+			});
+		}
+		return;
+	}
+	delete $self->{need_redraw};
 	my $histogram=$self->{histogram};
 	$histogram->{col}=undef;
 	my $r=$self->get_random;
@@ -7161,14 +7172,14 @@ sub Redraw
 }
 sub SongsChanged_cb
 {	my ($self,$IDs,$fields)=@_;
-	return if $::ToDo{'2_WRandom'.$self};
+	return if $self->{need_redraw};
 	return unless ::OneInCommon($fields,$self->{depend_fields});
 	return if $IDs && !@{ $ListPlay->AreIn($IDs) };
 	$self->Redraw(1);
 }
 sub SongArray_cb
 {	my ($self,$array,$action)=@_;
-	return if $::ToDo{'2_WRandom'.$self};
+	return if $self->{need_redraw};
 	return unless $array==$ListPlay;
 	return if grep $action eq $_, qw/mode sort move up down/;
 	$self->Redraw(1);
