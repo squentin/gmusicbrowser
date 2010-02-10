@@ -428,16 +428,15 @@ sub CommonInit
 
 	::WatchFilter($self,$self->{group}, \&SetFilter ) if $type!~m/[QL]/;
 	$self->{need_init}=1;
-	$self->signal_connect(show => sub
+	$self->signal_connect_after(show => sub
 		{	my $self=$_[0];
-			return 0 unless delete $self->{need_init};
+			return unless delete $self->{need_init};
 			if ($self->{type}=~m/[QLA]/)
 			{	$self->SongArray_changed_cb($self->{array},'replace');
 			}
 			else { ::InitFilter($self); }
-			$self->FollowSong unless $self->{type}=~m/[QL]/;
-			0;
 		});
+	$self->signal_connect_after('map' => sub { $_[0]->FollowSong }) unless $self->{type}=~m/[QL]/;
 
 	$self->{colwidth}= { split / +/, $opt->{colwidth} };
 
