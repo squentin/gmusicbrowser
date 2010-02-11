@@ -4725,8 +4725,7 @@ sub FolderToIDs
 			closedir $DIRH;
 		}
 		elsif (-f $dir)
-		{	$dir=~m/\.([^.]*)$/;
-			if ($dir=~m/$ScanRegex/) { push @files,$dir; }
+		{	if ($dir=~m/$ScanRegex/) { push @files,$dir; }
 			elsif ($dir=~m/\.([^.]*)$/ && $playlist_file_parsers{lc $1}) #playlist files (.m3u, .pls, ...)
 			{	push @files, Parse_playlist_file($dir);
 			}
