@@ -4718,11 +4718,13 @@ sub FolderToIDs
 	MakeScanRegex() unless $ScanRegex;
 	while (defined(my $dir=shift @dirs))
 	{	if (-d $dir)
-		{	opendir my($DIRH),$dir or warn "Can't read folder $dir : $!\n";
-			my @list= map $dir.SLASH.$_, grep !m#^\.#, readdir $DIRH;
-			push @files, grep -f && m/$ScanRegex/, @list;
-			push @dirs, grep -d, @list   if $recurse;
-			closedir $DIRH;
+		{	if (opendir my($DIRH),$dir)
+			{	my @list= map $dir.SLASH.$_, grep !m#^\.#, readdir $DIRH;
+				closedir $DIRH;
+				push @files, grep -f && m/$ScanRegex/, @list;
+				push @dirs, grep -d, @list   if $recurse;
+			}
+			else { warn "Can't open folder $dir : $!\n"; }
 		}
 		elsif (-f $dir)
 		{	if ($dir=~m/$ScanRegex/) { push @files,$dir; }
@@ -4764,9 +4766,11 @@ sub ScanFolder
 	$ScanProgress_cb ||= Glib::Timeout->add(500,\&ScanProgress_cb);
 	my @files;
 	if (-d $dir)
-	{	opendir my($DIRH),$dir or warn "Can't read folder $dir : $!\n";
-		@files=readdir $DIRH;
-		closedir $DIRH;
+	{	if (opendir my($DIRH),$dir)
+		{	@files=readdir $DIRH;
+			closedir $DIRH;
+		}
+		else { warn "Can't open folder $dir : $!\n"; return }
 	}
 	elsif (-f $dir && $dir=~s/$QSLASH([^$QSLASH]+)$//o)
 	{	@files=($1);
