@@ -5528,7 +5528,7 @@ sub UpdateFolderNames
 {	my ($oldpath,$newpath)=@_;
 	s/$QSLASH+$//o for $oldpath,$newpath;
 	my $pattern= "^\Q$oldpath\E(?:".SLASH.'|$)';
-	my $renamed=Songs::FilterAll('path:m:'.$pattern);
+	my $renamed=Songs::AllFilter('path:m:'.$pattern);
 	return unless @$renamed;
 
 	$pattern=qr/^\Q$oldpath\E/;
