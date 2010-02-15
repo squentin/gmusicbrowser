@@ -350,7 +350,6 @@ our %Widgets=
 		click1	=> \&PopupSongsFromAlbum,
 		event	=> 'Picture_album',
 		update	=> \&Layout::AAPicture::Changed,
-		#size	=> 60,
 		noinit	=> 1,
 		dragsrc => [::DRAG_ALBUM,\&DragCurrentAlbum],
 		fields	=> 'album',
@@ -3013,16 +3012,17 @@ use Gtk2;
 
 use base 'Gtk2::EventBox';
 
+our @default_options= (maxsize=>500, xalign=>.5, yalign=>.5);
+
 sub new
 {	my ($class,$opt)=@_;
+	%$opt=( @default_options, %$opt );
 	my $self = bless Gtk2::EventBox->new, $class;
 	$self->set_visible_window(0);
-	#$minsize||=$ref->{size};
 	$self->{aa}=$opt->{aa};
 	my $minsize=$opt->{minsize};
-	$self->{maxsize}=$opt->{maxsize};
-	$self->{maxsize}=500 unless defined $self->{maxsize};
-	$self->{multiple}=$opt->{multiple};
+	$self->{$_}=$opt->{$_} for qw/maxsize xalign yalign multiple/;
+
 	if ($opt->{forceratio}) { $self->{forceratio}=1; } #not sure it's still needed with the natural_size mode
 	else
 	{	$self->{expand_to_ratio}=1;
@@ -3120,8 +3120,8 @@ sub expose_cb
 	for my $pix (@$pixbuf)
 	{	my $w=$pix->get_width;
 		my $h=$pix->get_height;
-		my $dx= int ($ww-$w)/2;
-		my $dy= int ($wh-$h)/2;
+		my $dx= int ($ww-$w)*$self->{xalign};
+		my $dy= int ($wh-$h)*$self->{yalign};
 		my $gc=Gtk2::Gdk::GC->new($self->window);
 		$gc->set_clip_rectangle($event->area);
 		$self->window->draw_pixbuf($gc,$pix,0,0,$x+$dx,$y+$dy,-1,-1,'none',0,0);
