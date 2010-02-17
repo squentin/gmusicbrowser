@@ -1599,10 +1599,9 @@ sub ReadSavedTags	#load tags _and_ settings
 	if ($firstline=~m/^\w/) { ReadOldSavedTags($fh); }
 	else
 	{	my %lines;
-		my $section;
+		my $section='HEADER';
 		while (<$fh>)
 		{	if (m/^\[([^]]+)\]/) {$section=$1; next}
-			next unless $section;
 			chomp;
 			next unless length;
 			push @{$lines{$section}},$_;
