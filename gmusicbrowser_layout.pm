@@ -1495,6 +1495,7 @@ sub new
 	my $self=bless Gtk2::Window->new($wintype), $class;
 	$self->{uniqueid}= $uniqueid;
 	$self->set_role($layout);
+	$self->set_type_hint(delete $options{typehint}) if $options{typehint};
 	$self->{options}=\%options;
 	$self->{name}='Window';
 	$self->{SaveOptions}=\&SaveWindowOptions;
