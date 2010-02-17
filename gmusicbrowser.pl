@@ -4804,6 +4804,7 @@ sub ScanFolder
 		else
 		{	#$ID=Songs::New($path_file);
 			push @ToAdd_Files, $path_file;
+			&launchIdleLoop unless defined $IdleLoop;
 		}
 	}
 	unless (@ToScan)
