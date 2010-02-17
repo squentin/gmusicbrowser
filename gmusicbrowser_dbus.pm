@@ -76,7 +76,7 @@ sub Get
 }
 dbus_method('GetLibrary', [], [['array', 'uint32']]);
 sub GetLibrary
-{	\@::Library;
+{	$::Library;
 }
 
 dbus_method('GetAlbumCover', ['uint32'], ['string']);
