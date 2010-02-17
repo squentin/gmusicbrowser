@@ -2217,7 +2217,7 @@ sub Remove
 	$self->_staticfy unless $fromlibrary;	#do not staticfy list for songs removed from library
 	$self->SUPER::Remove($rows);
 	$::Options{LastPlayFilter}=$::ListMode=SongArray->new_copy($self)  unless $fromlibrary;
-	if (@$self==0 && !$::Options{AlwaysInPlaylist}) { $::Position=$::SongID=undef; _updateID(undef); return; }
+	if (@$self==0 && $::Options{AlwaysInPlaylist}) { $::Position=$::SongID=undef; _updateID(undef); return; }
 	if ($::RandomMode)
 	{	$::RandomMode->RmIDs;
 		$self->Next if defined $::SongID && $::Options{AlwaysInPlaylist} && !$self->IsIn($::SongID); #skip to next song if current not in playlist
