@@ -2935,8 +2935,8 @@ sub added_are_in		#called with $IDs of a SongsAdded event, return true if new so
 }
 sub changes_may_affect		#called with $IDs and $fields of a SongsChanged event, return true if the changes might require an update. Tries harder if a songarray is specified and a greponly filter
 {	my ($self,$IDs,$fields,$songarray)=@_;		#$songarray argument is optional, currently untested
-	return 0 unless grep exists $self->{fields}{$_}, @$fields;
 	$self->makesub unless $self->{'sub'};
+	return 0 unless grep exists $self->{fields}{$_}, @$fields;
 	if ($songarray && $self->{greponly})
 	{	my $before= $songarray->AreIn($IDs);
 		my $after=  $self->filter($IDs);
