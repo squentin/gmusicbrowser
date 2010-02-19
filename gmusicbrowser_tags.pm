@@ -204,7 +204,7 @@ sub Write
 						{	next if $extra[$j] eq '%v' || $extra[$j] eq '';
 							$keep=1 if $extra[$j] ne $ref->[$i][$j];
 						}
-						$id3v2->remove_all($key,$i) unless $keep;
+						$id3v2->remove($key,$i) unless $keep;
 					}
 				}
 				else { $id3v2->remove_all($key) }
