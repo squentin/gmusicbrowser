@@ -447,6 +447,7 @@ sub CommonInit
 		$self->{sort}= $::RandomMode ? $::Options{Sort_LastOrdered} : $::Options{Sort};
 		$self->UpdatePlayListFilter;
 		::Watch($self,Filter=>  \&UpdatePlayListFilter);
+		$self->{follow}=1 if $type eq 'A' && !defined $self->{follow}; #default to follow current song on new playlists
 	}
 	elsif ($type eq 'L')
 	{	if (defined $EditList) { $songarray=$EditList; $EditList=undef; } #special case for editing a list via ::WEditList
@@ -478,7 +479,7 @@ sub CommonSave
 {	my $self=shift;
 	my $opt= $self->SaveOptions;
 	$opt->{'sort'}= $self->{'sort'};
-	$opt->{follow}=1 if $self->{follow};
+	$opt->{follow}= ! !$self->{follow};
 
 	#save options as default for new SongTree/SongList of same type
 	my $name= $self->isa('SongTree') ? 'songtree_' : 'songlist_';
