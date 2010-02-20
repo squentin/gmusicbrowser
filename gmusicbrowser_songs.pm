@@ -3197,6 +3197,12 @@ INIT
 		value	=> 'added:daycount',
 		time_dependant =>1,
 	},
+	M =>
+	{	depend	=> 'modif',	desc	=> _"Number of days since modified",	unit	=> _"days",
+		round	=> '%.1f',	default=> '1M50',
+		value	=> 'modif:daycount',
+		time_dependant =>1,
+	},
 	n =>
 	{	depend	=> 'playcount',	desc	=> _"Number of times played",	unit	=> _"times",
 		round	=> '%d',	default=> '1n5',
