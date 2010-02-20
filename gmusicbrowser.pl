@@ -677,7 +677,7 @@ my $ScanRegex;
 #Default values
 our %Options=
 (	Layout		=> 'Lists, Library & Context',
-	LayoutT		=> 'info',
+	LayoutT		=> 'full with buttons',
 	LayoutB		=> 'Browser',
 	LayoutF		=> 'default fullscreen',
 	LayoutS		=> 'Search',
