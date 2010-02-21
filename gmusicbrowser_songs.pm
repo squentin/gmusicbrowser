@@ -1571,7 +1571,7 @@ sub Field_All_string
 }
 sub FieldName
 {	my $f=$_[0];
-	return $Def{$f} && exists $Def{$f}{name} ? $Def{$f}{name} : _"Unknown field ($f)";
+	return $Def{$f} && exists $Def{$f}{name} ? $Def{$f}{name} : ::__x(_"Unknown field ({field})",field=>$f);
 }
 sub MainField
 {	my $f=$_[0];

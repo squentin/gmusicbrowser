@@ -80,8 +80,8 @@ sub prefbox
 	my $entry4=::NewPrefEntry(OPT.'tocmd_label',_"Menu entry name", sizeg1=> $sg1,sizeg2=>$sg2, tip => _("Name under which the command will appear in the menu"));
 	my $entry5=::NewPrefEntry(OPT.'tocmd_cmd',_"System command :", sizeg1=> $sg1,sizeg2=>$sg2,
 		tip =>  _("These fields can be used :")."\n".::MakeReplaceText('ftalydnAY')."\n".
-			_("In this case one command by file will be run\n\n".
-			'Or you can use the field $files which will be replaced by the list of files, and only one command will be run'));
+			_("In this case one command by file will be run\n\n").
+			_('Or you can use the field $files which will be replaced by the list of files, and only one command will be run'));
 	my $check2=::NewPrefCheckButton(OPT.'tocmd',_"Execute custom command on selected files", cb=>\&updatemenu, widget=> ::Vpack($entry4,$entry5) );
 
 	my $check3=::NewPrefCheckButton(OPT.'tom3u',_"Export to .m3u file", cb=>\&updatemenu);
