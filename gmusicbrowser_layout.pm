@@ -1728,15 +1728,12 @@ sub transparent_expose_cb #use Cairo
 sub set_background_skin
 {	my ($self,$skin)=@_;
 	my ($file,$crop,$resize)=split /:/,$skin;
-	#$self->set_decorated(0);
 	$self->{pixbuf}=Skin::_load_skinfile($file,$crop,$self->{global_options});
 	return unless $self->{pixbuf};
 	$self->{resizeparam}=$resize;
 	$self->{skinsize}='0x0';
 	$self->signal_connect(style_set => sub {warn "style set : @_" if $::debug;$_[0]->set_style($_[2]);} ,$self->get_style); #FIXME find the cause of these signals, seems related to stock icons
-	$self->signal_connect(configure_event => \&resize_skin_cb);
-	#Gtk2::Gdk::Window->set_debug_updates(1);
-	#$self->queue_draw;
+	$self->signal_connect(size_allocate => \&resize_skin_cb);
 	my $rc_style= Gtk2::RcStyle->new;
 	#$rc_style->bg_pixmap_name($_,'<parent>') for qw/normal selected prelight insensitive active/;
 	$rc_style->bg_pixmap_name('normal','<parent>');
@@ -1748,27 +1745,24 @@ sub set_background_skin
 	$self->set_app_paintable(1);
 }
 sub resize_skin_cb	#FIXME needs to add a delay to better deal with a burst of resize events
-{	my ($self,$event)=@_;
-	my ($w,$h)=($event->width,$event->height);
-	return 0 if $w.'x'.$h eq $self->{skinsize};
-#	::IdleDo('0_resize_back_skin'.$self,1000,sub {
-#Glib::Timeout->add(80,sub {
-#	warn 1; my $self=$_[0];my ($w,$h)=$self->window->get_size;
+{	my ($self,$alloc)=@_;
+	my ($w,$h)=($alloc->width,$alloc->height);
+	return unless $self->realized;
+	return if $w.'x'.$h eq $self->{skinsize};
 	my $pb=Skin::_resize($self->{pixbuf},$self->{resizeparam},$w,$h);
-	return 0 unless $pb;
+	return unless $pb;
 	#my ($pixmap,$mask)=$pb->render_pixmap_and_mask(1); #leaks X memory for Gtk2 <1.146 or <1.153
-	my $mask=Gtk2::Gdk::Bitmap->create_from_data($self->window,'',$w,$h);
+	# create shape mask
+	my $mask=Gtk2::Gdk::Pixmap->new(undef,$w,$h,1);
 	$pb->render_threshold_alpha($mask,0,0,0,0,-1,-1,1);
 	$self->shape_combine_mask($mask,0,0);
+	# create pixmap background
 	my $pixmap=Gtk2::Gdk::Pixmap->new($self->window,$w,$h,-1);
 	$pb->render_to_drawable($pixmap, Gtk2::Gdk::GC->new($self->window), 0,0,0,0,-1,-1,'none',0,0);
 	$self->window->set_back_pixmap($pixmap,0);
 	$self->{skinsize}=$w.'x'.$h;
 	$self->queue_draw;
-#0;
-#	},$self) if $self->{skinsize};
-#$self->{skinsize}='';
-	return 0;
+	return
 }
 
 package Layout::Window::Popup;
@@ -3664,7 +3658,7 @@ sub draw
 	$style->paint_focus($widget->window, $state1, $event->area, $widget, undef, $x,$y,$pbw,$pbh) if $widget->has_focus;
 	if ($widget->{shape}) #not sure it's a good idea
 	{	#my (undef,$mask)=$pb->render_pixmap_and_mask(1); #leaks X memory for Gtk2 <1.146 or <1.153
-		my $mask=Gtk2::Gdk::Bitmap->create_from_data($widget->window,'',$pbw,$pbh);
+		my $mask=Gtk2::Gdk::Pixmap->new(undef,$pbw,$pbh,1);
 		$pb->render_threshold_alpha($mask,0,0,0,0,-1,-1,1);
 		$widget->parent->shape_combine_mask($mask,$x,$y);
 	}
