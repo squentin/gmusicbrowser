@@ -3100,7 +3100,7 @@ sub makesub_Ngrep	## non-grep filter
 		}
 		else
 		{	my $c=Songs::FilterCode($field,$cmd,$pat,$inv);
-			$func.= $in[$d].'grep '.$c . ',@{'.$listref.'};';
+			$func.= $in[$d].'grep( '.$c . ',@{'.$listref.'});';
 		}
 	    }
 	}
