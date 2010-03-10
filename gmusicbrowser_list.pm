@@ -3183,6 +3183,7 @@ use base 'Gtk2::HBox';
 our @SelectorMenu= #the first one is the default
 (	[_"Search Title, Artist and Album", 'title|artist|album' ],
 	[_"Search Title, Artist, Album, Comment, Label and Genre", 'title|artist|album|comment|label|genre' ],
+	[_"Search Title, Artist, Album, Comment, Label, Genre and Filename", 'title|artist|album|comment|label|genre|file' ],
 	[_"Search Title",	'title'],
 	[_"Search Artist",	'artist'],
 	[_"Search Album",	'album'],
