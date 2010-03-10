@@ -3329,49 +3329,7 @@ sub BuildMenu
 
 		if (my $submenu=$m->{submenu})
 		{	$submenu=$submenu->($args) if ref $submenu eq 'CODE';
-			if ($m->{code}) #list submenu
-			{	my (@labels,@values);
-				if ($m->{submenu_ordered_hash} || $m->{submenu_tree})
-				{	my $i=0;
-					while ($i<$#$submenu)
-					 { push @labels,$submenu->[$i++];push @values,$submenu->[$i++]; }
-				}
-				elsif (ref $submenu eq 'ARRAY')	{@labels=@values=@$submenu}
-				else				{@labels=keys %$submenu; @values=values %$submenu;}
-				my $reverse= $m->{submenu_tree} || $m->{submenu_reverse};
-				if ($reverse) { my @t=@values; @values=@labels; @labels=@t; }
-				my @order= 0..$#labels;
-				@order=sort {superlc($labels[$a]) cmp superlc($labels[$b])} @order if ref $submenu eq 'HASH' || $m->{submenu_tree};
-
-				$submenu=Gtk2::Menu->new;
-				my $smenu_callback=sub
-				 {	my $sub=$_[1];
-					$sub->( $args, $_[0]{selected} );
-				 };
-				my $check;
-				$check= $m->{check}($args) if $m->{check};
-				for my $i (@order)
-				{	my $label=$labels[$i];
-					my $value=$values[$i];
-					if (ref $value && $m->{submenu_tree})
-					{	BuildMenu([{%$m,label=>$label,submenu=>$value}],$args,$submenu);
-						next;
-					}
-					my $item=Gtk2::MenuItem->new_with_label($label);
-					if (defined $check)
-					{	$item=Gtk2::CheckMenuItem->new_with_label($label);
-						if (ref $check)	{ $item->set_active(1) if grep $_ eq $value, @$check; }
-						else
-						{	$item->set_draw_as_radio(1);
-							$item->set_active(1) if $check eq $value;
-						}
-					}
-					$item->{selected}= $value;
-					$submenu->append($item);
-					$item->signal_connect(activate => $smenu_callback, $m->{code} );
-				}
-				$submenu=undef unless @order; #empty submenu
-			}
+			if ($m->{code}) { $submenu=BuildChoiceMenu($submenu, %$m, args=>$args); }
 			elsif (ref $submenu eq 'ARRAY') { $submenu=BuildMenu($submenu,$args); }
 			next unless $submenu;
 			$item->set_submenu($submenu);
@@ -3393,6 +3351,57 @@ sub PopupContextMenu
 	$menu->popup(undef,undef,$posfunction,undef,$event->button,$event->time);
 }
 
+sub BuildChoiceMenu
+{	my ($choices,%options)=@_;
+	my $args= $options{args};
+	my $tree=		$options{submenu_tree}		|| $options{tree};
+	my $reverse=		$options{submenu_reverse}	|| $options{'reverse'}		|| $tree;
+	my $ordered_hash=	$options{submenu_ordered_hash}	|| $options{ordered_hash}	|| $tree;
+	my (@labels,@values);
+	if ($ordered_hash)
+	{	my $i=0;
+		while ($i<$#$choices)
+		 { push @labels,$choices->[$i++]; push @values,$choices->[$i++]; }
+	}
+	elsif (ref $choices eq 'ARRAY')	{@labels=@values=@$choices}
+	else				{@labels=keys %$choices; @values=values %$choices;}
+	if ($reverse) { my @t=@values; @values=@labels; @labels=@t; }
+	my @order= 0..$#labels;
+	@order=sort {superlc($labels[$a]) cmp superlc($labels[$b])} @order if ref $choices eq 'HASH' || $tree;
+
+	my $menu=Gtk2::Menu->new;
+	my $smenu_callback=sub
+	 {	my $sub=$_[1];
+		$sub->( $args, $_[0]{selected} );
+	 };
+	my $check;
+	$check= $options{check}($args) if $options{check};
+	for my $i (@order)
+	{	my $label=$labels[$i];
+		my $value=$values[$i];
+		my $item=Gtk2::MenuItem->new_with_label($label);
+		if (ref $value && $tree)
+		{	my $submenu= BuildChoiceMenu( $value, %options );
+			next unless $submenu;
+			$item->set_submenu($submenu);
+		}
+		else
+		{	if (defined $check)
+			{	$item=Gtk2::CheckMenuItem->new_with_label($label);
+				if (ref $check)	{ $item->set_active(1) if grep $_ eq $value, @$check; }
+				else
+				{	$item->set_draw_as_radio(1);
+					$item->set_active(1) if $check eq $value;
+				}
+			}
+			$item->{selected}= $value;
+			$item->signal_connect(activate => $smenu_callback, $options{code} );
+		}
+		$menu->append($item);
+	}
+	$menu=undef unless @order; #empty submenu
+	return $menu;
+}
 
 sub set_drag
 {	my ($widget,%params)=@_;
