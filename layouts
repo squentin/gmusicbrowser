@@ -1,7 +1,7 @@
 [Lists, Library & Context]
-Type=G
+Type=G+
 Default		= Window(size=1120x820) FPane0(page=genre) FPane1(page=artist) FPane2(page=album,albumpsize=32,albuminfo=1) VPRight(size=200-550) HPmain(size=400)
-MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem
+MBmenu		= MainMenuItem LayoutItem PSortItem PFilterItem QueueItem
 MBlist 		= HistItem LSortItem PlayItem
 HBmenu		= _MBmenu
 HBButtons1	= Prev Stop Play Next ExtraButtons 5-Vol -Pref -Playlist(toggle)
@@ -137,10 +137,10 @@ HPfp		= _FPane0(nb=1) HPfp2
 HPfp2		= _FPane1(nb=2) FPane2(nb=3)
 
 [itunes-like]
-Type=G
+Type=G+
 Default		= Window(size=1120x820,hidden=QueueList) VPfp_list(size=120) HPfp0(size=300) HPfp_list_src(size=175)
 HBIndic		= MBmenu Sort 10Filter Queue 10Pos
-MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem SMView
+MBmenu		= MainMenuItem LayoutItem PSortItem PFilterItem QueueItem SMView
 SMView		= (label=_"View") MenuItem0(togglewidget=FPane0,label=_"Genres pane")  MenuItem1(togglewidget=HPfp0,label=_"Categories pane") MenuItem2(togglewidget=FPane3,label=_"Left pane") MenuItem3(togglewidget=QueueList,label=_"Queue")
 VBleft		= HBIndic _HBButtons
 HBButtons	= Prev Play Next LabelTime Length _ABtime
@@ -218,10 +218,10 @@ Default		= Window(size=500x300)
 VBmain		= _Context
 
 [Playlist]
-Type=G
+Type=G+
 Default		= Window(size=1120x820) HPfp0(size=180) HPfp_list(size=780) FPane0(page=artist) FPane1(page=album)
 HBIndic		= MBmenu Sort 10Filter Queue 10Pos
-MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem HistItem PlayItem
+MBmenu		= MainMenuItem LayoutItem PSortItem PFilterItem QueueItem HistItem PlayItem
 VBleft		= HBIndic _HBButtons
 HBButtons	= Prev Play Next LabelTime Length _TimeBar
 HBupper		= VBleft 5Cover 5_VBright -VBVol
@@ -245,9 +245,9 @@ VBQueue		= _QueueList(group=1,hidewidget=VBQueue,hideif=empty) HBQueueButtons
 HBQueueButtons	= EditListButtons(group=1) 4QueueActions
 
 [quodlibet-like]
-Type=G
+Type=G+
 Default		= Window(size=700x600,sticky=1) HPbrowser(size=160-600) FPane0(artistinfo=1,albumpsize=32,albuminfo=1)
-MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem
+MBmenu		= MainMenuItem LayoutItem PSortItem PFilterItem QueueItem
 HBButtons1	= Prev Play Next
 HBButtons2	= Playlist Pref Quit
 VBButtons	= HBButtons1 HBButtons2
@@ -292,9 +292,9 @@ HPmain		= _TBaa VBright
 TBaa		= _"Artist" AASearch0(aa=artist,activate=addplay) _"Album" AASearch1(aa=album,activate=addplay) _"Song" SongSearch(activate=play) _"Context" Context
 
 [Queue, Library & Context]
-Type=G
+Type=G+
 Default		= Window(size=1120x820) FPane0(page=genre) FPane1(page=artist) FPane2(page=album,albumpsize=32,albuminfo=1) QueueList(cols=track titleaa length nbplay rating) VPRight(size=200-550)
-MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem
+MBmenu		= MainMenuItem LayoutItem PSortItem PFilterItem QueueItem
 MBlist 		= HistItem LSortItem PlayItem
 HBmenu		= _MBmenu
 HBButtons1	= Prev Stop Play Next ExtraButtons 5-Vol -Pref -Playlist(toggle)
@@ -355,12 +355,12 @@ DefaultFont	= 20
 KeyBindings	= Escape CloseWindow
 
 [Playlist, Library & Context]
-Type=G
+Type=G+
 Default         = Window(size=1120x820) SongList2(cols=playandqueue track titleaa length nbplay rating) VPRight(size=200-550)
 VBLeft          = VBplayer 5_SongList2(mode=playlist,group=1) EditListButtons(group=1,small=1)
 HBButtons1	= Vol Prev Stop Play Next ExtraButtons
 VBSongList	= HBSongList _SongList(activate=addplay)
-MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem
+MBmenu		= MainMenuItem LayoutItem PSortItem PFilterItem QueueItem
 MBlist 		= HistItem LSortItem PlayItem
 HBmenu		= _MBmenu
 HBButtons3	= 5Sort 5Filter 5Queue 5Pos -Stars
