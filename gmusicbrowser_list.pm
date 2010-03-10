@@ -1536,6 +1536,8 @@ our @cMenu=
 	{ label => _"Options", submenu => \@MenuPageOptions, stock => 'gtk-preferences', isdefined => 'field' },
 	{ label => _"Show buttons",	code => sub { my $fp=$_[0]{filterpane}; $fp->{hidebb}^=1; if ($fp->{hidebb}) {$fp->{bottom_buttons}->hide} else {$fp->{bottom_buttons}->show} },
 	  check => sub {!$_[0]{filterpane}{hidebb};} },
+	{ label => _"Show tabs",	code => sub { my $fp=$_[0]{filterpane}; $fp->{hidetabs}^=1; $fp->{notebook}->set_show_tabs( !$fp->{hidetabs} ); },
+	  check => sub {!$_[0]{filterpane}{hidetabs};} },
 );
 
 our @DefaultOptions=
@@ -1586,7 +1588,8 @@ sub new
 	my $notebook = Gtk2::Notebook->new;
 	$notebook->set_scrollable(TRUE);
 	#$notebook->popup_enable;
-	$notebook->set_show_tabs(FALSE) if @pids==1;
+	$self->{hidetabs}= (@pids==1) unless defined $self->{hidetabs};
+	$notebook->set_show_tabs( !$self->{hidetabs} );
 	$self->{notebook}=$notebook;
 
 	my $setpage;
