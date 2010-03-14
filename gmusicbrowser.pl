@@ -4308,7 +4308,7 @@ sub PopupAAContextMenu
 {	my $args=$_[0];
 	$args->{mainfield}= Songs::MainField($args->{field});
 	$args->{aaname}= Songs::Gid_to_Get($args->{field},$args->{gid});
-	PopupContextMenu(\@cMenuAA, $args);
+	defined wantarray ? BuildMenu(\@cMenuAA, $args) : PopupContextMenu(\@cMenuAA, $args);
 }
 
 sub FilterOnAA
@@ -4342,7 +4342,8 @@ sub ArtistContextMenu
 	if (@$artists==1) { PopupAAContextMenu({%$params,gid=>$artists->[0]}); return; }
 	my $menu = Gtk2::Menu->new;
 	for my $ar (@$artists)
-	{	my $item=Gtk2::MenuItem->new_with_label($ar);
+	{	my $name= Songs::Gid_to_Get('artists',$ar);
+		my $item=Gtk2::MenuItem->new_with_label($name);
 		my $submenu= PopupAAContextMenu({%$params,gid=>$ar});
 		$item->set_submenu($submenu);
 		$menu->append($item);
