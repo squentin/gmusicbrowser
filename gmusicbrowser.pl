@@ -3353,6 +3353,7 @@ sub PopupContextMenu
 
 sub BuildChoiceMenu
 {	my ($choices,%options)=@_;
+	my $menu= delete $options{menu} || Gtk2::Menu->new;	# append items to an existing menu or create a new menu
 	my $args= $options{args};
 	my $tree=		$options{submenu_tree}		|| $options{tree};
 	my $reverse=		$options{submenu_reverse}	|| $options{'reverse'}		|| $tree;
@@ -3369,7 +3370,6 @@ sub BuildChoiceMenu
 	my @order= 0..$#labels;
 	@order=sort {superlc($labels[$a]) cmp superlc($labels[$b])} @order if ref $choices eq 'HASH' || $tree;
 
-	my $menu=Gtk2::Menu->new;
 	my $smenu_callback=sub
 	 {	my $sub=$_[1];
 		$sub->( $args, $_[0]{selected} );
