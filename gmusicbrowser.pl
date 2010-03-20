@@ -2038,6 +2038,21 @@ sub ResetTime
         HasChanged('Time');
 }
 
+sub DockPointsFromSong
+{
+    # return unless defined $PlayingID;
+    my $ID=$_[0];
+    my $PointsToRemove = $_[1];
+    my $ExistingRating = Songs::Get($ID, 'rating');
+    if(($ExistingRating - $PointsToRemove) < 0)
+    {
+        warn "Yikes, can't rate this song below zero.";
+    } else {
+        warn "Rating down song by " . $PointsToRemove;
+        Songs::Set($ID, rating=>($ExistingRating - $PointsToRemove));
+    }
+}
+
 sub Played
 {       return unless defined $PlayingID;
         HasChanged('Played');
@@ -2055,7 +2070,16 @@ sub Played
         if ($PlayedPartial) #FIXME maybe only count as a skip if played less than ~20% ?
         {       my $nb= 1+Songs::Get($ID,'skipcount');
                 Songs::Set($ID, skipcount=> $nb, lastskip=> $StartTime);
-                Songs::Set($ID, rating=> Songs::Get($ID, 'rating') - 5);;
+                my $song_rating = Songs::Get($ID, 'rating');
+                if(!$song_rating) {
+                    Songs::Set($ID, rating=>50);
+                } else {
+                    if($song_rating < 15) {
+                        DockPointsFromSong($ID, 1);
+                    } else {
+                        DockPointsFromSong($ID, 5);
+                    }
+                }
         }
         else
         {       my $nb= 1+Songs::Get($ID,'playcount');
