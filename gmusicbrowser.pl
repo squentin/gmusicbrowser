@@ -2038,18 +2038,19 @@ sub ResetTime
         HasChanged('Time');
 }
 
-sub DockPointsFromSong
+sub AddRatingPointsToSong
 {
     # return unless defined $PlayingID;
     my $ID=$_[0];
     my $PointsToRemove = $_[1];
     my $ExistingRating = Songs::Get($ID, 'rating');
-    if(($ExistingRating - $PointsToRemove) < 0)
+    if(($ExistingRating + $PointsToRemove) > 100)
     {
-        warn "Yikes, can't rate this song below zero.";
+        warn "Yikes, can't rate this song above one hundred.";
+        Songs::Set($ID, rating=>100);
     } else {
-        warn "Rating down song by " . $PointsToRemove;
-        Songs::Set($ID, rating=>($ExistingRating - $PointsToRemove));
+        warn "Rating up song by " . $PointsToRemove;
+        Songs::Set($ID, rating=>($ExistingRating + $PointsToRemove));
     }
 }
 
@@ -2075,15 +2076,20 @@ sub Played
                     Songs::Set($ID, rating=>50);
                 } else {
                     if($song_rating < 15) {
-                        DockPointsFromSong($ID, 1);
+                        AddRatingPointsToSong($ID, -1);
                     } else {
-                        DockPointsFromSong($ID, 5);
+                        AddRatingPointsToSong($ID, -5);
                     }
                 }
         }
         else
         {       my $nb= 1+Songs::Get($ID,'playcount');
                 Songs::Set($ID, playcount=> $nb, lastplay=> $StartTime);
+                my $song_rating = Songs::Get($ID, 'rating');
+                if(!$song_rating) {
+                    Songs::Set($ID, rating=>50);
+                }
+                AddRatingPointsToSong($ID, 5);
         }
 }
 
