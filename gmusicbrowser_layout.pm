@@ -2651,7 +2651,7 @@ use base 'Gtk2::EventBox';
 our @default_options= ( xalign=>0, yalign=>.5, );
 
 sub new
-{	my ($class,$opt,$ref)=@_;
+{	my ($class,$opt)=@_;
 	%$opt=( @default_options, %$opt );
 	my $self = bless Gtk2::EventBox->new, $class;
 	my $label=Gtk2::Label->new;
@@ -2661,9 +2661,11 @@ sub new
 	{	$self->{$_}=$opt->{$_} if exists $opt->{$_};
 	}
 
-	my $font= $opt->{font} || $opt->{DefaultFont} || $ref->{font};
+	my $font= $opt->{font} || $opt->{DefaultFont};
 	$label->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
-	$label->modify_fg('normal', Gtk2::Gdk::Color->parse($opt->{DefaultFontColor}) ) if $opt->{DefaultFontColor};
+	if (my $color= $opt->{color} || $opt->{DefaultFontColor})
+	{	$label->modify_fg('normal', Gtk2::Gdk::Color->parse($color) );
+	}
 	$label->set_markup($opt->{markup}) if exists $opt->{markup};
 	$label->set_text($opt->{text}) if exists $opt->{text};
 	$self->add($label);
