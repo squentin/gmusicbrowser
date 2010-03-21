@@ -22,7 +22,7 @@ use constant {
     OPT => 'PLUGIN_EPICRATING_',#used to identify the plugin's options
 };
 
-::SetDefaultOptions(OPT, RatingOnSkip => -5, GracePeriod => 15, RatingOnSkipBeforeGrace => -1, RatingOnPlayed => 5);
+::SetDefaultOptions(OPT, RatingOnSkip => -5, GracePeriod => 15, RatingOnSkipBeforeGrace => -1, RatingOnPlayed => 5, SetDefaultRatingOnSkipped => 1, SetDefaultRatingOnPlayed => 1);
 
 my $self=bless {},__PACKAGE__;
 
@@ -48,8 +48,6 @@ sub Played {
         my $RatingOnSkipBeforeGrace = $::Options{OPT.'RatingOnSkipBeforeGrace'};
         my $RatingOnPlayed = $::Options{OPT.'RatingOnPlayed'};
 
-        warn "GracePeriod is $GracePeriod";
-
         if(!defined $::PlayTime) {
             warn "EpicRating's Played callback is missing PlayTime?!";
             return;
@@ -58,8 +56,11 @@ sub Played {
         if ($PlayedPartial)
         {
                 my $song_rating = Songs::Get($ID, 'rating');
-                if(!$song_rating) {
+                if(!$song_rating && $::Options{OPT."SetDefaultRatingOnSkipped"}) {
                     ::Songs::Set($ID, rating=>$DefaultRating);
+                } elsif(!$song_rating) {
+                    # user didn't have the setting on
+                    return;
                 } else {
                     if(($GracePeriod != 0) && ($::PlayTime < $GracePeriod)) {
                         AddRatingPointsToSong($ID, $RatingOnSkipBeforeGrace);
@@ -70,8 +71,11 @@ sub Played {
         }
         else {
                 my $song_rating = ::Songs::Get($ID, 'rating');
-                if(!$song_rating) {
+                if(!$song_rating && $::Options{OPT."SetDefaultRatingOnPlayed"}) {
                     ::Songs::Set($ID, rating=>$DefaultRating);
+                } elsif(!$song_rating) {
+                    # user didn't have the setting on
+                    return;
                 }
                 AddRatingPointsToSong($ID, $RatingOnPlayed);
         }
@@ -85,18 +89,6 @@ sub Stop {
     ::UnWatch($self, $_) for qw/Played/;
 }
 
-sub GracePeriodChanged {
-}
-
-sub RatingOnSkipChanged {
-}
-
-sub RatingOnSkipBeforeGraceChanged {
-}
-
-sub RatingOnPlayedChanged {
-}
-
 sub prefbox {
     # TODO validate good values?E!??!
     my $big_vbox= Gtk2::VBox->new(::FALSE, 2);
@@ -107,14 +99,18 @@ sub prefbox {
     # rating change on full play
     # if less than 15% in there somehow
 
-    my $grace_period_entry = ::NewPrefEntry(OPT."GracePeriod", _"Grace period before applying a different differential (if zero, grace period does not apply)", cb=>\&GracePeriodChanged, sizeg1 => $sg1,sizeg2=>$sg2);
-    my $rating_on_skip_entry = ::NewPrefEntry(OPT.'RatingOnSkip', _"Add to rating on skip:", cb =>\&RatingOnSkipChanged, sizeg1 => $sg1,sizeg2=>$sg2);
-    my $rating_on_skip_before_grace_entry = ::NewPrefEntry(OPT.'RatingOnSkipBeforeGrace', _"Add to rating on skip (before grace period):", cb=>\&RatingOnSkipBeforeGraceChanged, sizeg1 => $sg1,sizeg2=>$sg2);
+    my $grace_period_entry = ::NewPrefEntry(OPT."GracePeriod", _"Grace period before applying a different differential (if zero, grace period does not apply)", sizeg1 => $sg1,sizeg2=>$sg2);
+    my $rating_on_skip_entry = ::NewPrefEntry(OPT.'RatingOnSkip', _"Add to rating on skip:", sizeg1 => $sg1,sizeg2=>$sg2);
+    my $rating_on_skip_before_grace_entry = ::NewPrefEntry(OPT.'RatingOnSkipBeforeGrace', _"Add to rating on skip (before grace period):", sizeg1 => $sg1,sizeg2=>$sg2);
 
 
-    my $rating_on_played_entry = ::NewPrefEntry(OPT.'RatingOnPlayed', _"Add to rating on played completely:", cb =>\&RatingOnPlayedChanged, sizeg1 => $sg1,sizeg2=>$sg2);
+    my $rating_on_played_entry = ::NewPrefEntry(OPT.'RatingOnPlayed', _"Add to rating on played completely:", sizeg1 => $sg1,sizeg2=>$sg2);
 
-    $big_vbox->pack_start($_, ::FALSE, ::FALSE, 0) for $grace_period_entry, $rating_on_skip_entry, $rating_on_skip_before_grace_entry, $rating_on_played_entry;
+    my $set_default_rating_label = Gtk2::Label->new("Apply your default rating to files when they are first played (rating update will not work on files with default rating otherwise):");
+    my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped", _"... on skipped songs");
+    my $set_default_rating_played_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnPlayed", _"... on played songs");
+
+    $big_vbox->pack_start($_, ::FALSE, ::FALSE, 0) for $grace_period_entry, $rating_on_skip_entry, $rating_on_skip_before_grace_entry, $rating_on_played_entry, $set_default_rating_label, $set_default_rating_skip_check, $set_default_rating_played_check;
 
     $big_vbox->show_all();
     return $big_vbox;
