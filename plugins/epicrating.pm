@@ -1,6 +1,6 @@
-# Copyright (C) 2010 Andrew Clunis <andrew@orospakr.ca>
-#                    Daniel Rubin <dan@fracturedproject.net>
-#                    2005-2009 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2010      Andrew Clunis <andrew@orospakr.ca>
+#                         Daniel Rubin <dan@fracturedproject.net>
+#               2005-2009 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -10,7 +10,7 @@
 =gmbplugin EPICRATING
 name    EpicRating
 title   EpicRating plugin - massage ratings and other "enjoyment" metrics when stuff happens
-desc    Automatic rating updates on certain events, and statistical normalization of ratings.
+desc    Automatic heuristic rating updates on certain events, and statistical manipulation thereof.
 =cut
 
 package GMB::Plugin::EPICRATING;
@@ -99,6 +99,21 @@ sub prefbox {
     # rating change on full play
     # if less than 15% in there somehow
 
+    my $authors_hbox = Gtk2::HBox->new();
+    my $andrew_button = Gtk2::Button->new('Andrew Clunis <andrew@orospakr.ca>');
+    $andrew_button->set_relief('none');
+    $andrew_button->signal_connect(clicked => sub {
+        ::openurl('mailto:andrew@orospakr.ca');
+    });
+    my $and_label = Gtk2::Label->new(_"and");
+    my $dan_button = Gtk2::Button->new('Daniel Rubin <dan@fracturedproject.net>');
+    $dan_button->set_relief('none');
+    $dan_button->signal_connect(clicked => sub {
+        ::openurl('mailto:dan@fracturedproject.net');
+    });
+
+    $authors_hbox->add($_) for $andrew_button, $and_label, $dan_button;
+
     my $grace_period_entry = ::NewPrefEntry(OPT."GracePeriod", _"Grace period before applying a different differential (if zero, grace period does not apply)", sizeg1 => $sg1,sizeg2=>$sg2);
     my $rating_on_skip_entry = ::NewPrefEntry(OPT.'RatingOnSkip', _"Add to rating on skip:", sizeg1 => $sg1,sizeg2=>$sg2);
     my $rating_on_skip_before_grace_entry = ::NewPrefEntry(OPT.'RatingOnSkipBeforeGrace', _"Add to rating on skip (before grace period):", sizeg1 => $sg1,sizeg2=>$sg2);
@@ -110,7 +125,7 @@ sub prefbox {
     my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped", _"... on skipped songs");
     my $set_default_rating_played_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnPlayed", _"... on played songs");
 
-    $big_vbox->pack_start($_, ::FALSE, ::FALSE, 0) for $grace_period_entry, $rating_on_skip_entry, $rating_on_skip_before_grace_entry, $rating_on_played_entry, $set_default_rating_label, $set_default_rating_skip_check, $set_default_rating_played_check;
+    $big_vbox->pack_start($_, ::FALSE, ::FALSE, 0) for $authors_hbox, $grace_period_entry, $rating_on_skip_entry, $rating_on_skip_before_grace_entry, $rating_on_played_entry, $set_default_rating_label, $set_default_rating_skip_check, $set_default_rating_played_check;
 
     $big_vbox->show_all();
     return $big_vbox;
