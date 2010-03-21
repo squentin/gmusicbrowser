@@ -42,7 +42,7 @@ sub AddRatingPointsToSong {
 
 sub Played {
         my $ID=$::PlayingID;
-
+        my $DefaultRating = $::Options{"DefaultRating"};
         my $GracePeriod = $::Options{OPT.'GracePeriod'};
         my $RatingOnSkip = $::Options{OPT.'RatingOnSkip'};
         my $RatingOnSkipBeforeGrace = $::Options{OPT.'RatingOnSkipBeforeGrace'};
@@ -59,7 +59,7 @@ sub Played {
         {
                 my $song_rating = Songs::Get($ID, 'rating');
                 if(!$song_rating) {
-                    ::Songs::Set($ID, rating=>50);
+                    ::Songs::Set($ID, rating=>$DefaultRating);
                 } else {
                     if(($GracePeriod != 0) && ($::PlayTime < $GracePeriod)) {
                         AddRatingPointsToSong($ID, $RatingOnSkipBeforeGrace);
@@ -71,7 +71,7 @@ sub Played {
         else {
                 my $song_rating = ::Songs::Get($ID, 'rating');
                 if(!$song_rating) {
-                    ::Songs::Set($ID, rating=>50);
+                    ::Songs::Set($ID, rating=>$DefaultRating);
                 }
                 AddRatingPointsToSong($ID, $RatingOnPlayed);
         }
