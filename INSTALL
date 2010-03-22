@@ -13,6 +13,10 @@ RPM based distro
 You can build a rpm from the .tar.gz :
  rpmbuild -tb gmusicbrowser-VERSION.tar.gz
 
+note that some version of rpm do not support the "Requires(hint):" line in the .spec file, and treat it as a strict "Requires:" :(
+So you can just remove the line "Requires(hint):" from the spec file, and build the rpm again.
+(You can move some of the "Requires(hint):" to the "Requires:")
+
 DEB based distro
 ================
 untar gmusicbrowser-VERSION.tar.gz :
