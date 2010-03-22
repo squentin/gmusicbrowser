@@ -1,13 +1,10 @@
-# translation of fr.po to French
-# gmusicbrowser 0.964 <jfretin@gmail.com>, 2008.
-# Jonathan Fretin <jfretin@gmail.com>, 2008.
 msgid ""
 msgstr ""
-"Project-Id-Version: gmusicbrowser 0.964\n"
+"Project-Id-Version: gmusicbrowser 1.0.2\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
 "POT-Creation-Date: 2009-05-01 08:23+0200\n"
-"PO-Revision-Date: 2008-12-26 17:08+0100\n"
-"Last-Translator: Jonathan Fretin <jfretin@gmail.com>\n"
+"PO-Revision-Date: 2010-03-22 22:27+0100\n"
+"Last-Translator: Frédéric Urbain <fredurb1@free.fr>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
@@ -134,11 +131,11 @@ msgstr "%n dernières ajoutées"
 
 #: gmusicbrowser.pl:7374
 msgid "%n last played"
-msgstr "%n derniéres jouées"
+msgstr "%n dernières jouées"
 
 #: gmusicbrowser.pl:7378
 msgid "%n last skipped"
-msgstr "%n derniéres sautées"
+msgstr "%n dernières sautées"
 
 #: gmusicbrowser.pl:7373
 msgid "%n less played"
@@ -286,7 +283,7 @@ msgstr "Ajouter un bouton plein écran"
 #: gmusicbrowser.pl:5319
 msgid "Add a fullscreen button to layouts that can accept extra buttons"
 msgstr ""
-"Ajouter un bouton plein écran aux dispositions pouvant accepter des bouttons "
+"Ajouter un bouton plein écran aux dispositions pouvant accepter des boutons "
 "supplémentaires"
 
 #: gmusicbrowser_list.pm:6475
@@ -359,7 +356,7 @@ msgid ""
 "picture/cover in google and save it."
 msgstr ""
 "Ajoute une entrée dans le menu contextuel des artistes/albums, permettant de "
-"chercher une photo/pochette dans google et de la sauvegarder."
+"chercher une photo/pochette dans Google et de la sauvegarder."
 
 #: plugins/export.pm:11
 msgid "Adds menu entries to song contextual menu"
@@ -828,7 +825,7 @@ msgstr "Tri diacritique"
 
 #: plugins/webcontext.pm:271
 msgid "Disable Last.fm context tab"
-msgstr "Désactiver l'onglet last.fm"
+msgstr "Désactiver l'onglet Last.fm"
 
 #: plugins/webcontext.pm:270
 msgid "Disable Lyrics context tab"
@@ -841,7 +838,7 @@ msgstr ""
 
 #: plugins/webcontext.pm:269
 msgid "Disable wikipedia context tab"
-msgstr "Désactiver l'onglet wikipedia"
+msgstr "Désactiver l'onglet Wikipédia"
 
 #: gmusicbrowser.pl:298 gmusicbrowser.pl:7302
 msgid "Disc"
@@ -849,7 +846,7 @@ msgstr "Disque"
 
 #: gmusicbrowser_tags.pm:950 gmusicbrowser_tags.pm:986
 msgid "Disc #"
-msgstr "Disque no"
+msgstr "Disque n°"
 
 #: gmusicbrowser.pl:920
 msgid "Display (:1 or host:0 for example)"
@@ -941,7 +938,7 @@ msgstr "Modifier les modes aléatoires..."
 
 #: gmusicbrowser.pl:916
 msgid "Edit selected song properties"
-msgstr ""
+msgstr "Éditer les propriétés de la chanson sélectionnée"
 
 #: gmusicbrowser_player.pm:34 gmusicbrowser_player.pm:1200
 #: gmusicbrowser_player.pm:1226
@@ -1201,7 +1198,7 @@ msgstr "Trouvé mais non fonctionnel"
 
 #: plugins/lullaby.pm:26
 msgid "Friday"
-msgstr ""
+msgstr "Vendredi"
 
 #: gmusicbrowser.pl:5315
 msgid "Full screen layout :"
@@ -1315,7 +1312,7 @@ msgstr "Touches"
 
 #: plugins/fetch_cover.pm:95
 msgid "Keywords"
-msgstr "Mots clés"
+msgstr "Mots-clés"
 
 #: gmusicbrowser.pl:946 gmusicbrowser.pl:947 gmusicbrowser.pl:948
 #: gmusicbrowser.pl:5567 gmusicbrowser.pl:7407
@@ -1435,7 +1432,7 @@ msgstr "Rechercher dans AMG"
 
 #: gmusicbrowser.pl:409
 msgid "Lookup in google"
-msgstr "Rechercher avec google"
+msgstr "Rechercher avec Google"
 
 #: plugins/lullaby.pm:9
 msgid "Lullaby"
@@ -1513,7 +1510,7 @@ msgstr "Modification"
 
 #: plugins/lullaby.pm:26
 msgid "Monday"
-msgstr ""
+msgstr "Lundi"
 
 #: plugins/fetch_cover.pm:100
 msgid "More results"
@@ -1587,7 +1584,7 @@ msgstr "Aucun gestionnaire de fichier trouvé."
 
 #: gmusicbrowser_list.pm:70
 msgid "No locked filter"
-msgstr "Pas de filtre vérouillé"
+msgstr "Pas de filtre verrouillé"
 
 #: gmusicbrowser.pl:2646
 msgid "No web browser found."
@@ -2121,7 +2118,7 @@ msgstr "Retirer de la liste"
 msgid "Remove header, footer and left column from wikipedia pages"
 msgstr ""
 "Enlever l'entête, le pied de page, et la colonne de gauche des pages "
-"wikipedia"
+"Wikipédia"
 
 #: gmusicbrowser.pl:5599
 msgid "Remove label"
@@ -2235,7 +2232,7 @@ msgstr "Taux d'échantillonage"
 
 #: plugins/lullaby.pm:26
 msgid "Saturday"
-msgstr ""
+msgstr "Samedi"
 
 #: plugins/lyrics.pm:77
 msgid "Save"
@@ -2321,11 +2318,11 @@ msgstr "Recherche..."
 
 #: plugins/lyrics.pm:194
 msgid "Scroll with song"
-msgstr "Défiller avec la chanson"
+msgstr "Défiler avec la chanson"
 
 #: plugins/lyrics.pm:95
 msgid "Scroll with the song"
-msgstr "Défiller avec la chanson"
+msgstr "Défiler avec la chanson"
 
 #: plugins/fetch_cover.pm:89 layouts:142 layouts:145 layouts:151 layouts:159
 msgid "Search"
@@ -2379,7 +2376,7 @@ msgstr ""
 #: plugins/fetch_cover.pm:42 plugins/fetch_cover.pm:47
 #: plugins/fetch_cover.pm:52
 msgid "Search for a picture on internet"
-msgstr "Rechercher une image sur internet"
+msgstr "Rechercher une image sur Internet"
 
 #: plugins/fetch_cover.pm:90
 msgid "Search for current album"
@@ -2580,7 +2577,7 @@ msgstr "Arrêter quand la file d'attente est vide"
 
 #: plugins/webcontext.pm:254
 msgid "Strip wikipedia pages"
-msgstr "Simplifier les pages wikipedia"
+msgstr "Simplifier les pages Wikipédia"
 
 #: plugins/audioscrobbler.pm:161
 msgid "Submit OK"
@@ -2592,7 +2589,7 @@ msgstr "Erreur de soumission : "
 
 #: plugins/audioscrobbler.pm:11
 msgid "Submit played songs to last.fm"
-msgstr "Soumet les chansons jouées à last.fm"
+msgstr "Soumet les chansons jouées à Last.fm"
 
 #: gmusicbrowser_tags.pm:999
 msgid "Subtitle"
@@ -2600,7 +2597,7 @@ msgstr "Sous-titre"
 
 #: plugins/lullaby.pm:26
 msgid "Sunday"
-msgstr ""
+msgstr "Dimanche"
 
 #: gmusicbrowser_player.pm:41
 msgid "Switch to fullscreen mode"
@@ -2646,7 +2643,7 @@ msgstr[1] "%d chansons ont cette étiquette."
 
 #: plugins/lullaby.pm:26
 msgid "Thursday"
-msgstr ""
+msgstr "Jeudi"
 
 #: plugins/lullaby.pm:31
 msgid "Timespan of the fade-out in seconds"
@@ -2699,7 +2696,7 @@ msgstr "Disposition de la fenêtre d'info :"
 
 #: plugins/lullaby.pm:26
 msgid "Tuesday"
-msgstr ""
+msgstr "Mardi"
 
 #: gmusicbrowser.pl:329
 msgid "Turn Off"
@@ -2727,11 +2724,11 @@ msgstr "Identificateur de fichier"
 
 #: gmusicbrowser.pl:6124
 msgid "Unlock Album"
-msgstr "Dévérouille l'album"
+msgstr "Déverrouille l'album"
 
 #: gmusicbrowser.pl:6123
 msgid "Unlock Artist"
-msgstr "Dévérouille l'artiste"
+msgstr "Déverrouille l'artiste"
 
 #: gmusicbrowser.pl:5184
 msgid "Use Equalizer"
@@ -2828,15 +2825,15 @@ msgstr "Contexte Web"
 
 #: plugins/webcontext.pm:10
 msgid "Web context plugin"
-msgstr "Plugin Contexte web"
+msgstr "Plugin Contexte Web"
 
 #: plugins/lullaby.pm:26
 msgid "Wednesday"
-msgstr ""
+msgstr "Mercredi"
 
 #: gmusicbrowser_player.pm:1174
 msgid "Weighted Random"
-msgstr "Modes aléatoires"
+msgstr "Modes aléatoires pondérés"
 
 #: gmusicbrowser.pl:943
 msgid "Widget name"
@@ -2844,7 +2841,7 @@ msgstr "Nom du widget"
 
 #: plugins/webcontext.pm:350
 msgid "Wikipedia"
-msgstr "Wikipedia"
+msgstr "Wikipédia"
 
 #: gmusicbrowser.pl:5351
 msgid ""
@@ -3746,7 +3743,7 @@ msgstr "port :"
 
 #: gmusicbrowser_gstreamer-0.10.pm:571
 msgid "pre-amp"
-msgstr "pre-amp"
+msgstr "pré-amp"
 
 #: gmusicbrowser.pl:325
 msgid "quit"
@@ -3790,7 +3787,7 @@ msgstr "ré-essayer ?"
 
 #: plugins/audioscrobbler.pm:131
 msgid "retry in {seconds} s"
-msgstr "ré-essaye dans {seconds}"
+msgstr "ré-essaye dans {seconds} sec."
 
 #: plugins/nowplaying.pm:18
 msgid "run a command when playing a song"
