@@ -1652,7 +1652,7 @@ sub ReadSavedTags	#load tags _and_ settings
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};
 	$Options{SongArray_Queue}=undef unless $Options{RememberQueue};
 	if ($Options{RememberQueue})
-	{	$QueueAction= delete $Options{QueueAction} || '';
+	{	$QueueAction= $Options{QueueAction} || '';
 		IdleDo('1_QAuto',10,\&EnqueueAction,$QueueAction) if $QueueAction;
 	}
 	if ($Options{RememberPlayFilter})
@@ -1691,7 +1691,7 @@ sub SaveTags	#save tags _and_ settings
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
 	$Options{Lock}= $TogLock || '';
 	$Options{SavedSongID}= SongArray->new([$SongID]) if $Options{RememberPlaySong} && defined $SongID;
-	$Options{QueueAction}=$QueueAction if $QueueAction eq 'autofill' || $QueueAction eq 'wait';
+	$Options{QueueAction}= ($QueueAction eq 'autofill' || $QueueAction eq 'wait') ? $QueueAction : '';
 
 	$Options{SavedOn}= time;
 
