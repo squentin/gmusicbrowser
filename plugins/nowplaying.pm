@@ -82,7 +82,7 @@ sub Changed
 	$_=::ReplaceFields($ID,$_) for @cmd;
 	if ($::Options{OPT.'SENDSTDINPUT'})
 	{	my $string=::ReplaceFields($ID,"Title=%t\nArtist=%a\nAlbum=%l\nLength=%m\nYear=%y\nTrack=%n\n");
-		open my$out,'|-',@cmd;
+		open my$out,'|-:utf8',@cmd;
 		print $out $string;
 		close $out;
 	}
