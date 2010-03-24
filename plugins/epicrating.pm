@@ -10,6 +10,8 @@
 =gmbplugin EPICRATING
 name    EpicRating
 title   EpicRating plugin - massage ratings and other "enjoyment" metrics when stuff happens
+author  Andrew Clunis <andrew@orospakr.ca>
+author  Daniel Rubin <dan@fracturedproject.net>
 desc    Automatic heuristic rating updates on certain events, and statistical manipulation thereof.
 =cut
 
@@ -121,7 +123,7 @@ sub prefbox {
 
     my $rating_on_played_entry = ::NewPrefEntry(OPT.'RatingOnPlayed', _"Add to rating on played completely:", sizeg1 => $sg1,sizeg2=>$sg2);
 
-    my $set_default_rating_label = Gtk2::Label->new("Apply your default rating to files when they are first played (rating update will not work on files with default rating otherwise):");
+    my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (rating update will not work on files with default rating otherwise):");
     my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped", _"... on skipped songs");
     my $set_default_rating_played_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnPlayed", _"... on played songs");
 
