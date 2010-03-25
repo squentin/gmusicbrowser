@@ -1646,7 +1646,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		SongArray::updateIDs(\@newIDs);
 		my $filter=Filter->new('missing:e:0');
 		$Library=[];	#dummy array to avoid a warning when filtering in the next line
-		$Library= SongArray->new( $filter->filter([1..$Songs::LastID]) );
+		$Library= SongArray->new( $filter->filter_all );
 	}
 
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};

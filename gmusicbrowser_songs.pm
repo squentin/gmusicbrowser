@@ -1474,7 +1474,7 @@ sub FindID
 	{	$f=~s#$::QSLASH{2,}#::SLASH#goe; #remove double SLASH
 		if ($f=~s/$::QSLASH([^$::QSLASH]+)$//o)
 		{	return $IDFromFile->{$f}{$1} if $IDFromFile;
-			my $m=Filter->newadd(1,'file:e:'.$1, 'path:e:'.$f)->filter( [FIRSTID..$LastID] );
+			my $m=Filter->newadd(1,'file:e:'.$1, 'path:e:'.$f)->filter_all;
 			if (@$m)
 			{	warn "Error, more than one ID match $f/$1" if @$m>1;
 				return $m->[0];
@@ -1776,7 +1776,7 @@ sub BuildHash
 
 sub AllFilter
 {	my $filter=$_[0];
-	Filter->new($filter)->filter( [FIRSTID..$LastID] );
+	Filter->new($filter)->filter_all;
 }
 
 #sub GroupSub_old
@@ -2887,6 +2887,10 @@ sub invert
 	$self->{string}=join "\x1D",@filter;
 	warn 'after invert  : '.$self->{string} if $::debug;
 	return $self;
+}
+
+sub filter_all
+{	$_[0]->filter( [Songs::FIRSTID..$Songs::LastID] );
 }
 
 sub filter
