@@ -8284,10 +8284,14 @@ sub new
 	$self->set_line_wrap(1), $self->set_line_wrap_mode('word-char') if $args{wrap};
 	$self->{$_}=$args{$_} for qw/entry preview format empty noescape/;
 	my ($event,$entry)=@args{qw/event entry/};
-	$entry->signal_connect_swapped( changed => \&update, $self) if $entry;
-	if ($event) { ::Watch($self, $_ => \&update) for split / /,$event; }
+	$entry->signal_connect_swapped( changed => \&queue_update, $self) if $entry;
+	if ($event) { ::Watch($self, $_ => \&queue_update) for split / /,$event; }
 	$self->update;
 	return $self;
+}
+sub queue_update
+{	my $self=shift;
+	$self->{queue_update}||= Glib::Idle->add(\&update,$self)
 }
 sub update
 {	my $self=shift;
@@ -8303,5 +8307,6 @@ sub update
 		$text='' unless defined $text;
 	}
 	$self->set_markup($text);
+	return $self->{queue_update}=undef;
 }
 
