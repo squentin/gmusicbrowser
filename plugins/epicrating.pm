@@ -35,8 +35,11 @@ sub AddRatingPointsToSong {
     {
         warn "Yikes, can't rate this song above one hundred.";
         ::Songs::Set($ID, rating=>100);
+    } elsif(($ExistingRating + $PointsToRemove) < 0) {
+        warn "Negaive addend in EpicRating pushed song rating to below 0.  Pinning.";
+        ::Songs::Set($ID, rating => 0);
     } else {
-        warn "Rating up song by " . $PointsToRemove;
+        warn "EpicRating changing song rating by " . $PointsToRemove;
         ::Songs::Set($ID, rating=>($ExistingRating + $PointsToRemove));
     }
 }
