@@ -101,9 +101,9 @@ sub prefbox {
     # if less than 15% in there somehow
 
     my $grace_period_entry = ::NewPrefEntry(OPT."GracePeriod",
-                                            _"Grace period before applying different addend:",
+                                            _"Grace period:",
                                             sizeg1 => $sg1,sizeg2=>$sg2,
-                                            tip => _"grace period denoting a 'fast' skip, in seconds; if zero, grace period does not apply");
+                                            tip => _"grace period denoting a 'fast' skip in which to apply a different addend, in seconds; if zero, grace period does not apply");
     my $rating_on_skip_entry = ::NewPrefSpinButton(OPT.'RatingOnSkip',
                                                    -100, 100,
                                                    sizeg1 => $sg1,sizeg2=>$sg2,,
