@@ -1644,7 +1644,8 @@ sub ReadSavedTags	#load tags _and_ settings
 			}
 		}
 		SongArray::updateIDs(\@newIDs);
-		my $filter=Filter->new('missing:e:0');
+		my $mfilter= $Options{MasterFilterOn} && $Options{MasterFilter} || '';
+		my $filter= Filter->newadd(TRUE,'missing:e:0', $mfilter);
 		$Library=[];	#dummy array to avoid a warning when filtering in the next line
 		$Library= SongArray->new( $filter->filter_all );
 	}
@@ -4565,6 +4566,22 @@ sub SongsRemove
 	HasChanged(SongsRemoved=>$IDs);
 	Songs::AddMissing($IDs);
 }
+sub UpdateMasterFilter
+{	SongAdd_now();	#flush waiting list
+	my @diff;
+	$diff[$_]=1 for @$Library;
+	my $mfilter= $Options{MasterFilterOn} && $Options{MasterFilter} || '';
+	my $newlist= Filter->newadd(TRUE,'missing:e:0', $mfilter)->filter_all;
+	$diff[$_]+=2 for @$newlist;
+	my @toadd= grep $diff[$_]==2, @$newlist;
+	my @toremove= grep $diff[$_] && $diff[$_]==1, 0..$#diff;
+	$Filter::CachedList=undef;
+	AA::IDs_Changed();
+	$Library->Replace($newlist);
+	HasChanged(SongsRemoved=> \@toremove);
+	HasChanged(SongsAdded=> \@toadd);
+}
+
 
 #FIXME check completely replaced then remove
 =toremove
@@ -5621,10 +5638,27 @@ sub PrefLibrary
 		DialogMassRename(@$Library);
 	});
 
+	my $masterfilter= FilterCombo->new( $Options{MasterFilter}, sub { $Options{MasterFilter}=$_[1]; UpdateMasterFilter(); } );
+	my $masterfiltercheck= NewPrefCheckButton( MasterFilterOn=> _"Use a master filter", widget=>$masterfilter, cb=>\&UpdateMasterFilter, horizontal=>1 );
+	my $librarysize= Label::Preview->new(
+		event => 'SongsRemoved SongsAdded',
+		preview=> sub
+		{	my $listtotal=Filter->new('missing:e:0')->filter_all;
+			my $lib= scalar @$Library;
+			my $excl= scalar(@$listtotal)-$lib;
+			my $s= __("Library size : %d song","Library size : %d songs",$lib);
+			$s.= ' '. __("(%d song excluded)", "(%d songs excluded)",$excl) if $excl;
+			return $s;
+
+		} );
+
 	my $vbox=Vpack( 1,$label,
 			'_',$sw,
 			[$addbut,$rmdbut,'-',$reorg],
-			$table );
+			$table,
+			$masterfiltercheck,
+			$librarysize,
+		      );
 	return $vbox;
 }
 sub ChooseAddPath
@@ -8278,6 +8312,94 @@ sub make_toolitem
 {	warn "TextCombo::Tree : make_toolitem not implemented\n";	#FIXME not needed for now, but could be in the future
 	return undef;
 }
+
+package FilterCombo;
+use base 'Gtk2::ComboBox';
+
+sub new
+{	my ($class,$init,$sub) = @_;
+	my $store= Gtk2::ListStore->new('Glib::String','Glib::Scalar','Glib::String');
+	my $self= bless Gtk2::ComboBox->new($store), $class;
+	$self->fill_store;
+
+	my $renderer=Gtk2::CellRendererPixbuf->new;
+	$renderer->set_fixed_size( Gtk2::IconSize->lookup('menu') );
+	$self->pack_start($renderer,::FALSE);
+	$self->add_attribute($renderer, 'stock-id' => 2);
+
+	$renderer=Gtk2::CellRendererText->new;
+	$self->pack_start($renderer,::TRUE);
+	$self->add_attribute($renderer, text => 0);
+
+	$self->signal_connect( changed => \&value_changed );
+	$self->set_value($init);
+	$self->{cb}=$sub;
+	::Watch($self, 'SavedFilters', \&SavedFilters_changed);
+	return $self;
+}
+
+sub value_changed
+{	my $self=shift;
+	my $iter=$self->get_active_iter;
+	return unless $iter;
+	my $value= $self->get_model->get($iter,1); warn $value;
+	if (!defined $value)	#edit... filter
+	{	my $value=$self->{selected};
+		$self->{busy}=1;
+		$self->set_value($value);
+		delete $self->{busy};
+		::EditFilter($self->get_toplevel,$value,undef,sub { $self->set_value($_[0]) if $_[0]; });
+		return;
+	}
+	$self->{selected}=$value;
+	$self->set_tooltip_text( $value->explain );	#set tooltip to filter description
+	$self->{cb}->($self,$value) if $self->{cb} && !$self->{busy};
+}
+
+sub SavedFilters_changed
+{	my $self=shift;
+	my $value= $self->get_value;
+	$self->{busy}=1;
+	$self->fill_store;
+	$self->set_value($value);
+	delete $self->{busy};
+}
+
+sub fill_store
+{	my $self=shift;
+	my $store= $self->get_model;
+	$store->clear;
+	$store->set($store->append, 0,_"All Songs", 1,Filter->new, 2,'gmb-library');
+	my $hash=$Options{SavedFilters};
+	my @names= sort {::superlc($a) cmp ::superlc($b)} keys %$hash;
+	$store->set($store->append, 0,$_, 1,$hash->{$_}) for @names;
+	$store->set($store->append, 0,_"Edit ...", 1,undef, 2,'gtk-preferences');
+}
+
+sub set_value
+{	my ($self,$value)=@_;
+	$value=Filter->new($value) unless ref $value; warn $value;
+	my $store=$self->get_model;
+	my $founditer;
+	my $iter=$store->get_iter_first;
+	while ($iter)
+	{	my $v=$store->get($iter,1);
+		if ( defined $v && $value->are_equal($v) )
+		{	$founditer=$iter; last;
+		}
+		$iter=$store->iter_next($iter);
+	}
+	unless ($founditer)
+	{	$founditer= $store->prepend;
+		$store->set($founditer, 0, _"Unnamed filter", 1,$value)
+	}
+	$self->{selected}=$value;
+	$self->set_active_iter($founditer);
+}
+sub get_value
+{	$_[0]{selected};
+}
+
 
 package Label::Preview;
 use base 'Gtk2::Label';
