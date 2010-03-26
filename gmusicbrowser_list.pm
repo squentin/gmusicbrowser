@@ -1466,7 +1466,7 @@ my @MenuSubGroup=
 	{ label => _"font size depends on",	code => sub { $_[0]{self}->SetOption(cloud_stat=>$_[1]); },
 	  mode => 'C',
 	  submenu => \@cloudstats_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{cloud_stat}}, },
-	{ label => _"minimun font size", code => sub { $_[0]{self}->SetOption(cloud_min=>$_[1]); },
+	{ label => _"minimum font size", code => sub { $_[0]{self}->SetOption(cloud_min=>$_[1]); },
 	  mode => 'C',
 	  submenu => sub { [2..::min(20,$_[0]{self}{cloud_max}-1)] },  check => sub {$_[0]{self}{cloud_min}}, },
 	{ label => _"maximum font size", code => sub { $_[0]{self}->SetOption(cloud_max=>$_[1]); },

@@ -37,7 +37,7 @@ my %menuentry=
 	notempty => 'IDs',
  },
  tocmd =>
- {	label => sub { ($::Options{OPT.'tocmd_label'} || _"Unamed custom command") },
+ {	label => sub { ($::Options{OPT.'tocmd_label'} || _"Unnamed custom command") },
 	code => \&RunCommand,
 	test => sub {my $c=$::Options{OPT.'tocmd_cmd'}; defined $c && $c ne '';},
 	notempty => 'IDs',

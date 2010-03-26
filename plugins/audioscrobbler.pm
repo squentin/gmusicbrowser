@@ -123,7 +123,7 @@ sub response_cb
 	elsif	($response eq 'OK')		{  }
 	elsif	($response=~m/^FAILED (.*)$/)	{$error=$1}
 	elsif	($response eq 'BADAUTH')	{$error=_("User authentification error"); $Stop='BadAuth';}
-	elsif	($response eq 'BANNED')		{$error=_("Client banned, contact gmusicbrowser's developper");	$Stop='Banned';}
+	elsif	($response eq 'BANNED')		{$error=_("Client banned, contact gmusicbrowser's developer");	$Stop='Banned';}
 	elsif	($response eq 'BADTIME')	{$error=_("System clock is not close enough to the current time"); $Stop='BadTime';}
 	else					{$error=_"unknown error";}
 
