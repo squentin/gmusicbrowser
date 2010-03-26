@@ -9,10 +9,10 @@
 
 =gmbplugin EPICRATING
 name    EpicRating
-title   EpicRating plugin - massage ratings and other "enjoyment" metrics when stuff happens
+title   EpicRating plugin - automatically update ratings
 author  Andrew Clunis <andrew@orospakr.ca>
 author  Daniel Rubin <dan@fracturedproject.net>
-desc    Automatic heuristic rating updates on certain events, and statistical manipulation thereof.
+desc    Automatic rating updates on configurable listening behaviour events.
 =cut
 
 package GMB::Plugin::EPICRATING;
@@ -20,7 +20,6 @@ use strict;
 use warnings;
 
 use constant {
-    CLIENTID => 'gmb', VERSION => '1.1',
     OPT => 'PLUGIN_EPICRATING_',#used to identify the plugin's options
 };
 
@@ -102,9 +101,9 @@ sub prefbox {
     # if less than 15% in there somehow
 
     my $grace_period_entry = ::NewPrefEntry(OPT."GracePeriod",
-                                            _"Grace period before applying a different differential:",
+                                            _"Grace period before applying different addend:",
                                             sizeg1 => $sg1,sizeg2=>$sg2,
-                                            tip => "in seconds; if zero, grace period does not apply");
+                                            tip => _"grace period denoting a 'fast' skip, in seconds; if zero, grace period does not apply");
     my $rating_on_skip_entry = ::NewPrefSpinButton(OPT.'RatingOnSkip',
                                                    -100, 100,
                                                    sizeg1 => $sg1,sizeg2=>$sg2,,
