@@ -2395,8 +2395,7 @@ sub InsertAtPosition
 }
 sub Add		#only called in filter mode
 {	my ($self,$IDs)=@_;
-	::red("CHECKME ListPLay->Add($self,$IDs)");
-	$self->SUPER::Push($IDs);
+	$self->SUPER::Insert(scalar @$self,$IDs); # call SUPER::Insert directly instead of SUPER::Push because SUPER::Push calls $self->Insert and thus statify the list
 	if ($::RandomMode)
 	{	$::RandomMode->AddIDs(@$IDs);
 	}

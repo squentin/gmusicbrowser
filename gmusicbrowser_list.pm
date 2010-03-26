@@ -77,15 +77,10 @@ sub makeLockToggle
 	return $toggle;
 }
 
-sub make_playing_menu
-{	my $menu= ::BuildMenu(\@MenuPlaying, { self => $_[0], songlist => ::GetSonglist($_[0]) });
-	return $menu;
-}
-
 sub make_sort_menu
 {	my $selfitem=$_[0];
 	my $songlist=$selfitem->isa('SongList') || $selfitem->isa('SongTree') ? $selfitem : ::GetSonglist($selfitem);
-	my $menu=Gtk2::Menu->new;
+	my $menu= ($selfitem->isa('Gtk2::MenuItem') && $selfitem->get_submenu) || Gtk2::Menu->new;
 	my $menusub=sub { $songlist->Sort($_[1]) };
 	for my $name (sort keys %{$::Options{SavedSorts}})
 	{   my $sort=$::Options{SavedSorts}{$name};
@@ -105,9 +100,9 @@ sub make_sort_menu
 	return $menu;
 }
 
-sub make_history_menu
+sub fill_history_menu
 {	my $selfitem=$_[0];
-	my $menu=Gtk2::Menu->new;
+	my $menu= $selfitem->get_submenu || Gtk2::Menu->new;
 	my $mclicksub=sub   { $_[0]{middle}=1 if $_[1]->button == 2; return 0; };
 	my $menusub=sub
 	 { my $f=($_[0]{middle})? Filter->newadd(FALSE, ::GetFilter($selfitem,1),$_[1]) : $_[1];

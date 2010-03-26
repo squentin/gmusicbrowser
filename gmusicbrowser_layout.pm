@@ -155,7 +155,7 @@ our %Widgets=
 		stock	=> { random => 'gmb-random', shuffle => 'gmb-shuffle', sorted => 'gtk-sort-ascending' },
 		tip	=> sub { _("Play order :\n").::ExplainSort($::Options{Sort}); },
 		click1	=> \&::ToggleSort,
-		click3	=> \&SortMenu,
+		click3	=> sub { SortMenu() },
 		event	=> 'Sort SavedWRandoms SavedSorts',
 	},
 	Filter =>
@@ -170,7 +170,7 @@ our %Widgets=
 						: _("Playlist filter :\n").$::SelectedFilter->explain;
 			},
 		click1	=> \&RemoveFilter,
-		click3	=> \&FilterMenu,
+		click3	=> sub { FilterMenu() },
 		event	=> 'Filter SavedFilters',
 	},
 	Queue =>
@@ -446,40 +446,41 @@ our %Widgets=
 	FLock	=>	{ New		=> \&Browser::makeLockToggle,},
 	HistItem =>	{ New		=> \&Layout::MenuItem::new,
 			  label		=> _"Recent Filters",
-			  setmenu	=> \&Browser::make_history_menu,
+			  updatemenu	=> \&Browser::fill_history_menu,
 			},
 	PlayItem =>	{ New		=> \&Layout::MenuItem::new,
 			  label		=> _"Playing",
-			  setmenu	=> \&Browser::make_playing_menu,
+			  updatemenu	=> sub { ::BuildMenu(\@Browser::MenuPlaying, { self => $_[0], songlist => ::GetSonglist($_[0]) }, $_[0]->get_submenu); },
 			},
 	LSortItem =>	{ New		=> \&Layout::MenuItem::new,
 			  label		=> _"Sort",
-			  setmenu	=> \&Browser::make_sort_menu,
+			  updatemenu	=> \&Browser::make_sort_menu,
 			},
 	PSortItem =>	{ New		=> \&Layout::MenuItem::new,
 			  label		=> _"Play order",
-			  setmenu	=> sub {SortMenu();},
+			  updatemenu	=> sub { SortMenu($_[0]->get_submenu); },
 			},
 	PFilterItem =>	{ New		=> \&Layout::MenuItem::new,
 			  label		=> _"Playlist filter",
-			  setmenu	=> sub {FilterMenu();},
+			  updatemenu	=> sub { FilterMenu($_[0]->get_submenu); },
 			},
 	QueueItem =>	{ New		=> \&Layout::MenuItem::new,
 			  label		=> _"Queue",
-			  setmenu	=> sub{ ::BuildMenu(\@MenuQueue,{ID=>$::SongID}); },
+			  updatemenu	=> sub{ ::BuildMenu(\@MenuQueue,{ID=>$::SongID}, $_[0]->get_submenu); },
 			},
 	LayoutItem =>	{ New		=> \&Layout::MenuItem::new,
 			  label		=> _"Layout",
-			  setmenu	=> sub{ ::BuildChoiceMenu( Layout::get_layout_list(qr/G.*\+/),
+			  updatemenu	=> sub{ ::BuildChoiceMenu( Layout::get_layout_list(qr/G.*\+/),
 					 	 	tree=>1,
 							check=> sub {$::Options{Layout}},
-							code => sub {::CreateMainWindow( $::Options{Layout}=$_[1] );},
+							code => sub { $::Options{Layout}=$_[1]; ::IdleDo('2_ChangeLayout',500, \&::CreateMainWindow ); },
+							menu => $_[0]->get_submenu,	# re-use menu
 						);
 					},
 			},
 	MainMenuItem =>	{ New		=> \&Layout::MenuItem::new,
 			  label		=> _"Main",
-			  setmenu	=> sub{ ::BuildMenu(\@MainMenu); },
+			  updatemenu	=> sub{ ::BuildMenu(\@MainMenu,undef, $_[0]->get_submenu); },
 			},
 	MenuItem =>	{ New		=> \&Layout::MenuItem::new,
 			},
@@ -1280,7 +1281,10 @@ sub PlayOrderComboUpdate
 }
 
 sub SortMenu
-{	my $return=0;
+{	my $nopopup= $_[0];
+	my $menu = $_[0] || Gtk2::Menu->new;
+
+	my $return=0;
 	$return=1 unless @_;
 	my $check=$::Options{Sort};
 	my $found;
@@ -1295,7 +1299,6 @@ sub SortMenu
 		$item->signal_connect (activate => $cb, $sort );
 		$menu->append($item);
 	 };
-	my $menu = Gtk2::Menu->new;
 
 	my $submenu= Gtk2::Menu->new;
 	my $sitem = Gtk2::MenuItem->new(_"Weighted Random");
@@ -1328,17 +1331,17 @@ sub SortMenu
 		{	::EditSortOrder(undef,$::Options{Sort},undef, \&::Select_sort );
 		});
 	$menu->show_all;
-	return $menu if $return;
+	return $menu if $nopopup;
 	my $event=Gtk2->get_current_event;
 	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
 }
 
 sub FilterMenu
-{	my $return=0;
-	$return=1 unless @_;
+{	my $nopopup= $_[0];
+	my $menu = $_[0] || Gtk2::Menu->new;
+
 	my $check;
 	$check=$::SelectedFilter->{string} if $::SelectedFilter;
-	my $menu = Gtk2::Menu->new;
 	my $item_callback=sub { ::Select(filter => $_[1]); };
 	for my $list (sort keys %{$::Options{SavedFilters}})
 	{	next if $list eq 'Playlist';
@@ -1374,7 +1377,7 @@ sub FilterMenu
 		$menu->prepend($sitem);
 	}
 	$menu->show_all;
-	return $menu if $return;
+	return $menu if $nopopup;
 	my $event=Gtk2->get_current_event;
 	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
 }
@@ -1394,24 +1397,6 @@ sub VisualsMenu
 	$menu->show_all;
 	my $event=Gtk2->get_current_event;
 	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
-}
-
-sub NewMenuBar
-{	my $self=Gtk2::MenuBar->new;
-	$self->signal_connect( button_press_event => sub
-	 {	return 0 if $_[0]{busy};
-		$_[0]{busy}=1;
-		for my $item ($_[0]->get_children)
-		{	next unless $item->{setmenu};
-			my $submenu= $item->{setmenu}($item);
-			$item->set_submenu($submenu);
-			$submenu->show_all;
-		};
-		0;
-	 });
-	$self->signal_connect( selection_done => sub { $_[0]{busy}=undef; });
-
-	return $self;
 }
 
 sub UpdateLabelsIcon
@@ -1941,7 +1926,7 @@ our %Boxes=
 		EndInit	=> \&Layout::NoteBook::EndInit,
 	},
 	MB	=>
-	{	New	=> \&Layout::NewMenuBar,
+	{	New	=> sub { Gtk2::MenuBar->new },
 		Pack	=> sub { $_[0]->append($_[1]); },
 	},
 	SM	=>	#submenu
@@ -3187,8 +3172,12 @@ sub new
 					  $self->set_image( Gtk2::Image->new_from_stock($opt->{icon}, 'menu'));
 				  	}
 	else				{ $self=Gtk2::MenuItem->new($label); }
-	if ($opt->{setmenu})
-	{	$self->{setmenu}=$opt->{setmenu};
+	if ($opt->{updatemenu})
+	{	$self->{updatemenu}=$opt->{updatemenu};
+		my $submenu=Gtk2::Menu->new;
+		$self->set_submenu($submenu);
+		$self->signal_connect( activate=>\&UpdateSubMenu );
+		::IdleDo( '9_UpdateSubMenu_'.$self, undef, \&UpdateSubMenu,$self);	# (delayed) initial filling of the menu, not needed but makes the menu work better with gnome2-globalmenu
 	}
 	if ($opt->{togglewidget})
 	{	$self->{widget}=$opt->{togglewidget};
@@ -3209,6 +3198,14 @@ sub get_player_window
 	{	$menu=$menu->get_attach_widget->parent;
 	}
 	return ::get_layout_widget($menu);
+}
+
+sub UpdateSubMenu
+{	my $self=shift;
+	my $menu=$self->get_submenu;
+	$menu->remove($_) for $menu->get_children;
+	$self->{updatemenu}($self);
+	$menu->show_all;
 }
 
 package Layout::LabelToggleButtons;
