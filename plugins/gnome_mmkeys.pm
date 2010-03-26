@@ -9,6 +9,7 @@
 name	Gnome mmkeys
 title	Gnome multimedia keys plugin
 desc	Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in gnome.
+req	perl(Net::DBus, libnet-dbus-perl perl-Net-DBus)
 =cut
 
 package GMB::Plugin::GMMKEYS;

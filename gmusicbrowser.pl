@@ -1386,6 +1386,47 @@ sub DeactivatePlugin
 	warn "Plugin $plugin De-activated.\n" if $debug;
 	$package->Stop if $package->can('Stop');
 }
+sub CheckPluginRequirement
+{	my $plugin=shift;
+	my $ref=$Plugins{$plugin};
+	my $msg='';
+	if (my $req=$ref->{req})
+	{	my @req;
+		my @suggest;
+		while ($req=~m/\bperl\(([\w:]+)(?:\s*,\s*([-\.\w ]+))?\)/ig)
+		{	my ($module,$packages)=($1,$2);
+			my $file="/$module.pm";
+			$file=~s#::#/#g;
+			if (!grep -f $_.$file, @INC)
+			{	push @req, __x( _"the {name} perl module",name=>$module);
+				push @suggest, $packages;
+			}
+		}
+		while ($req=~m/\bexec\((\w+)(?:\s*,\s*([-\.\w ]+))?\)/ig)
+		{	my ($exec,$packages)=($1,$2);
+			if (!grep -x $_.$exec, split /:/, $ENV{PATH})
+			{	push @req, __x( _"the command {name}",name=>$exec);
+				push @suggest, $packages;
+			}
+		}
+		while ($req=~m/\bfile\(([-\w\.\/]+)(?:\s*,\s*([-\.\w ]+))?\)/ig)
+		{	my ($file,$packages)=($1,$2);
+			if (!-r $file)
+			{	push @req, __x( _"the file {name}",name=>$file);
+				push @suggest, $packages;
+			}
+		}
+		return unless @req;
+		my $msg= PangoEsc(_"This plugin requires :")."\n\n";
+		while (@req)
+		{	my $r=shift @req;
+			my $packages=shift @suggest;
+			$packages= $packages ? ("Possible package names providing this :".' '.$packages."\n") : '';
+			$msg.= MarkupFormat("- %s\n<small>%s</small>\n", $r, $packages);
+		}
+		return $msg;
+	}
+}
 
 sub ChangeVol
 {	my $cmd;
@@ -5203,10 +5244,15 @@ sub PrefPlugins
 		$plugdesc->set_text( $pref->{desc} );
 		if (my $error=$pref->{error})
 		{	$plug_box=Gtk2::Label->new;
-			$error=PangoEsc($error);
-			$error=~s#(\(\@INC contains: .*)#<small>$1</small>#s;
-			$plug_box->set_markup( MarkupFormat("<b>%s</b>\n", _("Error :")) .$error);
-			$plug_box->set_line_wrap(1);
+			if (my $req= CheckPluginRequirement($plugin) )
+			{	$plug_box->set_markup($req);
+			}
+			else
+			{	$error=PangoEsc($error);
+				$error=~s#(\(\@INC contains: .*)#<small>$1</small>#s;
+				$plug_box->set_markup( MarkupFormat("<b>%s</b>\n", _("Error :")) .$error);
+				$plug_box->set_line_wrap(1);
+			}
 			$plug_box->set_selectable(1);
 		}
 		elsif ($pref->{loaded})
