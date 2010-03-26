@@ -2378,7 +2378,7 @@ sub UpdateCurrentSong
 	{	QHasChanged('CurSongID',$SongID);
 		QHasChanged('CurSong',$SongID);
 		ShowTraytip($Options{TrayTipTimeLength}) if $TrayIcon && $Options{ShowTipOnSongChange} && !$FullscreenWindow;
-		IdleCheck($SongID) if defined $SongID && $Options{TAG_auto_check_current};
+		IdleDo('CheckCurrentSong',1000,\&CheckCurrentSong) if defined $SongID && $Options{TAG_auto_check_current};
 		if (defined $RecentPos && (!defined $SongID || $SongID!=$Recent->[$RecentPos-1])) { $RecentPos=undef }
 		$ChangedPos=1;
 	}
@@ -2522,6 +2522,10 @@ sub ReReadTags
 	elsif (@_) { push @ToReRead,@_; }
 	else	{ unshift @ToReRead,@$Library; }
 	&launchIdleLoop;
+}
+sub CheckCurrentSong
+{	return unless defined $::SongID;
+	Songs::ReReadFile($::SongID);
 }
 sub IdleCheck
 {	if (@_) { push @ToCheck,@_; }
