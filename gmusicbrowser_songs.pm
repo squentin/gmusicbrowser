@@ -1129,7 +1129,7 @@ sub New
 }
 
 sub ReReadFile
-{	my $ID=$_[0]; my $force=$_[1]; warn "ReReadFile(@_) called from : ".join(':',caller)."\n";
+{	my ($ID,$force,$noremove)=@_;
 	my $file= GetFullFilename($ID);
 	if (-r $file)
 	{	my ($size1,$modif1)=Songs::Get($ID,qw/size modif/);
@@ -1144,7 +1144,7 @@ sub ReReadFile
 		my %changed; $changed{$_}=undef for @changed;
 		Changed(\%changed,[$ID]);
 	}
-	else	#file not found/readable
+	elsif (!$noremove)	#file not found/readable
 	{	warn "can't read file '$file'\n";
 		::SongsRemove([$ID]);
 	}

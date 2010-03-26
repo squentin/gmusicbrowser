@@ -724,7 +724,7 @@ our %Options=
 	TAG_keep_id3v2_ver	=> 0,
 	'TAG_write_id3v2.4'	=> 0,
 	TAG_id3v1_encoding	=> 'iso-8859-1',
-	TAG_auto_check_current	=> 1,
+	AutoRemoveCurrentSong	=> 1,
 	Simplehttp_CacheSize	=> 200*1024,
 	CustomKeyBindings	=> {},
 	ArtistSplit		=> ' & |, |;',
@@ -1616,7 +1616,8 @@ sub ReadSavedTags	#load tags _and_ settings
 		$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2  #DELME in v1.1.3/4
 		if ($oldversion<1.1003) { delete $Options{$_} for grep m/^Layout(?:LastSeen)?_/, keys %Options }	#for version <1.1.2  #DELME in v1.1.3/4
 		if ($oldversion<1.1003) { $Options{WindowSizes}{$_}= join 'x',split / /,delete $Options{"WS$_"} for map m/^WS(.*)/, keys %Options; }	#for version <1.1.2  #DELME in v1.1.3/4
-		if ($oldversion<0.1004) {delete $Options{$_} for qw/Diacritic_sort gst_volume/;} #cleanup old options
+		if ($oldversion<1.1005) {delete $Options{$_} for qw/Diacritic_sort gst_volume/;} #cleanup old options
+		$Options{AutoRemoveCurrentSong}= delete $Options{TAG_auto_check_current} if $oldversion<1.1005 && exists $Options{TAG_auto_check_current};
 
 
 		Post_Options_init();
@@ -2379,7 +2380,7 @@ sub UpdateCurrentSong
 	{	QHasChanged('CurSongID',$SongID);
 		QHasChanged('CurSong',$SongID);
 		ShowTraytip($Options{TrayTipTimeLength}) if $TrayIcon && $Options{ShowTipOnSongChange} && !$FullscreenWindow;
-		IdleDo('CheckCurrentSong',1000,\&CheckCurrentSong) if defined $SongID && $Options{TAG_auto_check_current};
+		IdleDo('CheckCurrentSong',1000,\&CheckCurrentSong) if defined $SongID;
 		if (defined $RecentPos && (!defined $SongID || $SongID!=$Recent->[$RecentPos-1])) { $RecentPos=undef }
 		$ChangedPos=1;
 	}
@@ -2526,7 +2527,7 @@ sub ReReadTags
 }
 sub CheckCurrentSong
 {	return unless defined $::SongID;
-	Songs::ReReadFile($::SongID);
+	Songs::ReReadFile($::SongID,0, !$Options{AutoRemoveCurrentSong} );
 }
 sub IdleCheck
 {	if (@_) { push @ToCheck,@_; }
@@ -5506,10 +5507,9 @@ sub PrefTags
 	my @Encodings=grep $_ ne 'null', Encode->encodings(':all');
 	my $id3v1encoding=NewPrefCombo(TAG_id3v1_encoding => \@Encodings, text => _"Encoding used for id3v1 tags :");
 	my $nowrite=NewPrefCheckButton(TAG_nowrite_mode => _"Do not write the tags", tip=>_"Will not write the tags except with the advanced tag editing dialog. The changes will be kept in the library instead.\nWarning, the changes for a song will be lost if the tag is re-read.");
-	my $autocheck=NewPrefCheckButton(TAG_auto_check_current=> _"Auto-check current song for modification", tip=>_"Automatically check if the file for the current song has changed. And remove songs not found from the library.");
 	my $noid3v1=NewPrefCheckButton(TAG_id3v1_noautocreate=> _"Do not create an id3v1 tag in mp3 files", tip=>_"Only affect mp3 files that do not already have an id3v1 tag");
 
-	$vbox->pack_start($_,FALSE,FALSE,1) for $warning,$checkv4,$checklatin1,$check_unsync,$id3v1encoding,$noid3v1,$nowrite,$autocheck;
+	$vbox->pack_start($_,FALSE,FALSE,1) for $warning,$checkv4,$checklatin1,$check_unsync,$id3v1encoding,$noid3v1,$nowrite;
 	return $vbox;
 }
 
@@ -5638,6 +5638,8 @@ sub PrefLibrary
 		DialogMassRename(@$Library);
 	});
 
+	my $autoremove= NewPrefCheckButton( AutoRemoveCurrentSong => _"Automatically remove current song if not found");
+
 	my $masterfilter= FilterCombo->new( $Options{MasterFilter}, sub { $Options{MasterFilter}=$_[1]; UpdateMasterFilter(); } );
 	my $masterfiltercheck= NewPrefCheckButton( MasterFilterOn=> _"Use a master filter", widget=>$masterfilter, cb=>\&UpdateMasterFilter, horizontal=>1 );
 	my $librarysize= Label::Preview->new(
@@ -5656,6 +5658,7 @@ sub PrefLibrary
 			'_',$sw,
 			[$addbut,$rmdbut,'-',$reorg],
 			$table,
+			$autoremove,
 			$masterfiltercheck,
 			$librarysize,
 		      );
