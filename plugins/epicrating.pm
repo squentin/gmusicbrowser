@@ -116,9 +116,9 @@ sub prefbox {
 
     $authors_hbox->add($_) for $andrew_button, $and_label, $dan_button;
 
-    my $grace_period_entry = ::NewPrefEntry(OPT."GracePeriod", _"Grace period before applying a different differential (if zero, grace period does not apply)", sizeg1 => $sg1,sizeg2=>$sg2);
-    my $rating_on_skip_entry = ::NewPrefEntry(OPT.'RatingOnSkip', _"Add to rating on skip:", sizeg1 => $sg1,sizeg2=>$sg2);
-    my $rating_on_skip_before_grace_entry = ::NewPrefEntry(OPT.'RatingOnSkipBeforeGrace', _"Add to rating on skip (before grace period):", sizeg1 => $sg1,sizeg2=>$sg2);
+    my $grace_period_entry = ::NewPrefSpinEntry(OPT."GracePeriod", _"Grace period before applying a different differential (if zero, grace period does not apply)", sizeg1 => $sg1,sizeg2=>$sg2);
+    my $rating_on_skip_entry = ::NewPrefSpinEntry(OPT.'RatingOnSkip', _"Add to rating on skip:", sizeg1 => $sg1,sizeg2=>$sg2);
+    my $rating_on_skip_before_grace_entry = ::NewPrefSpinEntry(OPT.'RatingOnSkipBeforeGrace', _"Add to rating on skip (before grace period):", sizeg1 => $sg1,sizeg2=>$sg2);
 
 
     my $rating_on_played_entry = ::NewPrefEntry(OPT.'RatingOnPlayed', _"Add to rating on played completely:", sizeg1 => $sg1,sizeg2=>$sg2);
