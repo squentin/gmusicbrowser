@@ -60,7 +60,7 @@ sub Played {
         if ($PlayedPartial)
         {
                 my $song_rating = Songs::Get($ID, 'rating');
-                if(!$song_rating && $::Options{OPT."SetDefaultRatingOnSkipped"}) {
+                if(($song_rating eq "") && $::Options{OPT."SetDefaultRatingOnSkipped"}) {
                     ::Songs::Set($ID, rating=>$DefaultRating);
                 } elsif(!$song_rating) {
                     # user didn't have the setting on
@@ -75,7 +75,7 @@ sub Played {
         }
         else {
                 my $song_rating = ::Songs::Get($ID, 'rating');
-                if(!$song_rating && $::Options{OPT."SetDefaultRatingOnPlayed"}) {
+                if(($song_rating eq "") $::Options{OPT."SetDefaultRatingOnPlayed"}) {
                     ::Songs::Set($ID, rating=>$DefaultRating);
                 } elsif(!$song_rating) {
                     # user didn't have the setting on
