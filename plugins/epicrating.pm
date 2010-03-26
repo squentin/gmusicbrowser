@@ -116,16 +116,28 @@ sub prefbox {
 
     $authors_hbox->add($_) for $andrew_button, $and_label, $dan_button;
 
-    my $grace_period_entry = ::NewPrefSpinEntry(OPT."GracePeriod", _"Grace period before applying a different differential (if zero, grace period does not apply)", sizeg1 => $sg1,sizeg2=>$sg2);
-    my $rating_on_skip_entry = ::NewPrefSpinEntry(OPT.'RatingOnSkip', _"Add to rating on skip:", sizeg1 => $sg1,sizeg2=>$sg2);
-    my $rating_on_skip_before_grace_entry = ::NewPrefSpinEntry(OPT.'RatingOnSkipBeforeGrace', _"Add to rating on skip (before grace period):", sizeg1 => $sg1,sizeg2=>$sg2);
+    my $grace_period_entry = ::NewPrefEntry(OPT."GracePeriod",
+                                            _"Grace period before applying a different differential:",
+                                            sizeg1 => $sg1,sizeg2=>$sg2,
+                                            tip => "in seconds; if zero, grace period does not apply");
+    my $rating_on_skip_entry = ::NewPrefSpinButton(OPT.'RatingOnSkip',
+                                                   -100, 100,
+                                                   sizeg1 => $sg1,sizeg2=>$sg2,,
+                                                   text1 => _"Add to rating on skip:");
+    my $rating_on_skip_before_grace_entry = ::NewPrefSpinButton(OPT.'RatingOnSkipBeforeGrace',
+                                                                -100, 100,
+                                                                sizeg1 => $sg1,sizeg2=>$sg2,
+                                                                text1 => _"Add to rating on skip (before grace period):");
+    my $rating_on_played_entry = ::NewPrefSpinButton(OPT.'RatingOnPlayed',
+                                                     -100, 100,
+                                                     sizeg1 => $sg1,sizeg2=>$sg2,
+                                                     text1 => _"Add to rating on played completely:");
 
-
-    my $rating_on_played_entry = ::NewPrefEntry(OPT.'RatingOnPlayed', _"Add to rating on played completely:", sizeg1 => $sg1,sizeg2=>$sg2);
-
-    my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (rating update will not work on files with default rating otherwise):");
-    my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped", _"... on skipped songs");
-    my $set_default_rating_played_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnPlayed", _"... on played songs");
+    my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (required for rating update on files with default rating):");
+    my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped",
+                                                            _"... on skipped songs",);
+    my $set_default_rating_played_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnPlayed",
+                                                              _"... on played songs");
 
     $big_vbox->pack_start($_, ::FALSE, ::FALSE, 0) for $authors_hbox, $grace_period_entry, $rating_on_skip_entry, $rating_on_skip_before_grace_entry, $rating_on_played_entry, $set_default_rating_label, $set_default_rating_skip_check, $set_default_rating_played_check;
 
