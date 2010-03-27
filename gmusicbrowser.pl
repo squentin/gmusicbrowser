@@ -8391,7 +8391,7 @@ sub value_changed
 {	my $self=shift;
 	my $iter=$self->get_active_iter;
 	return unless $iter;
-	my $value= $self->get_model->get($iter,1); warn $value;
+	my $value= $self->get_model->get($iter,1);
 	if (!defined $value)	#edit... filter
 	{	my $value=$self->{selected};
 		$self->{busy}=1;
@@ -8427,7 +8427,7 @@ sub fill_store
 
 sub set_value
 {	my ($self,$value)=@_;
-	$value=Filter->new($value) unless ref $value; warn $value;
+	$value=Filter->new($value) unless ref $value;
 	my $store=$self->get_model;
 	my $founditer;
 	my $iter=$store->get_iter_first;
