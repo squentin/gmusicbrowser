@@ -1218,6 +1218,7 @@ sub PlayOrderComboNew
 	my $store=Gtk2::ListStore->new(('Glib::String')x3);
 	my $combo=Gtk2::ComboBox->new($store);
 	my $cell=Gtk2::CellRendererPixbuf->new;
+	$cell->set_fixed_size( Gtk2::IconSize->lookup('menu') );
 	$combo->pack_start($cell,0);
 	$combo->add_attribute($cell,stock_id => 2);
 	$cell=Gtk2::CellRendererText->new;
