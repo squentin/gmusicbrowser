@@ -592,7 +592,7 @@ our %Widgets=
 	{	New	=> \&PlayOrderComboNew,
 		event	=> 'Sort SavedWRandoms SavedSorts',
 		update	=> \&PlayOrderComboUpdate,
-		reqwidth=> 100,
+		minwidth=> 100,
 	},
 	Progress =>
 	{	class => 'Layout::Progress',
@@ -1217,7 +1217,6 @@ sub PlayOrderComboNew
 {	my $opt=$_[0];
 	my $store=Gtk2::ListStore->new(('Glib::String')x3);
 	my $combo=Gtk2::ComboBox->new($store);
-	$combo->set_size_request($opt->{reqwidth},-1);
 	my $cell=Gtk2::CellRendererPixbuf->new;
 	$combo->pack_start($cell,0);
 	$combo->add_attribute($cell,stock_id => 2);
