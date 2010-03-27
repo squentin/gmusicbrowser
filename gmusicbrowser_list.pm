@@ -3213,15 +3213,16 @@ sub new
 	$entry->signal_connect(activate => \&Filter);
 	$entry->signal_connect_after(activate => sub {::run_command($_[0],$opt->{activate});}) if $opt->{activate};
 	unless ($opt->{noselector})
-	{	for my $aref (	['gtk-find'=> \&PopupSelectorMenu,0],
-				['gtk-clear',sub {my $e=$_[0]->parent->{entry}; $e->set_text(''); Filter($e); },1]
+	{	for my $aref (	['gtk-find'	=> \&PopupSelectorMenu,	0, _"Search options"],
+				['gtk-clear'	=> \&ClearFilter,	1, _"Reset filter"]
 			     )
-		{	my ($stock,$cb,$end)=@$aref;
+		{	my ($stock,$cb,$end,$tip)=@$aref;
 			my $img=Gtk2::Image->new_from_stock($stock,'menu');
 			my $but=Gtk2::Button->new;
 			$but->add($img);
 			$but->can_focus(0);
 			$but->set_relief('none');
+			$but->set_tooltip_text($tip);
 			$but->signal_connect(expose_event => sub #prevent the button from beign drawn, but draw its child
 			{	my ($but,$event)=@_;
 				$but->propagate_expose($but->child,$event);
@@ -3233,7 +3234,7 @@ sub new
 			else { $self->pack_start($but,0,0,0); }
 			if ($stock eq 'gtk-clear')
 			{	$self->{clear_button}=$but;
-				$entry->signal_connect(changed => sub { $_[0]->parent->{clear_button}->set_sensitive($_[0]->get_text ne '' ); });
+				$entry->signal_connect(changed => \&UpdateClearButton);
 				$but->set_sensitive(0);
 			}
 		}
@@ -3253,7 +3254,7 @@ sub new
 				#$self->propagate_expose($_,$event) for $self->get_children;
 				0;
 			});
-		::WatchFilter($self, $self->{group},sub {$_[0]->{filtered}=0;$_[0]->queue_draw}); #to update background color
+		::WatchFilter($self, $self->{group},sub {$_[0]->{filtered}=0; $_[0]->UpdateClearButton; $_[0]->queue_draw}); #to update background color and clear button
 	}
 	else {$self->add($entry);}
 	return $self;
@@ -3265,11 +3266,22 @@ sub SaveOptions
 	return \%opt;
 }
 
+sub ClearFilter
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	$self->{entry}->set_text('');
+	$self->Filter;
+}
+sub UpdateClearButton
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $on= $self->{entry}->get_text ne '' || !::GetFilter($self)->is_empty;
+	$self->{clear_button}->set_sensitive($on);
+}
+
 sub ChangeOption
 {	my ($self,$key,$value)=@_;
 	$self->{$key}=$value;
 	$self->{last_filter}=undef;
-	Filter($self->{entry});
+	$self->Filter;
 }
 
 sub PopupSelectorMenu
@@ -3304,9 +3316,9 @@ sub PopupSelectorMenu
 }
 
 sub Filter
-{	my $entry=$_[0];
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $entry=$self->{entry};
 	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
-	my $self=::find_ancestor($entry,__PACKAGE__);
 	my ($last_filter,$last_eq,@last_substr)= @{ delete $self->{last_filter} || [] };
 	my $search0=my $search= $entry->get_text;
 	my $filter;
