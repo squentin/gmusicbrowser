@@ -2255,9 +2255,9 @@ sub GetNextSongs
 }
 
 sub PrepNextSongs
-{	if ($RandomMode) { @NextSongs=(); }
+{	if ($RandomMode) { @NextSongs=@$Queue; $#NextSongs=9 if $#NextSongs>9; }
 	else
-	{	@NextSongs= grep /^\d+$/, GetNextSongs(5); # FIXME GetNextSongs needs some changes to return only IDs, and in the GetNextSongs(1) case
+	{	@NextSongs= grep /^\d+$/, GetNextSongs(10); # FIXME GetNextSongs needs some changes to return only IDs, and in the GetNextSongs(1) case
 	}
 	my $nextID=$NextSongs[0];
 	$NextFileToPlay= defined $nextID ? Songs::GetFullFilename($nextID) : undef;
