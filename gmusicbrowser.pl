@@ -5925,7 +5925,7 @@ sub NewPrefCheckButton
 	my $return=$check;
 	if ($widget)
 	{	if ($horizontal)
-		{	$return=Hpack($check,$widget);
+		{	$return=Hpack(0,$check,$widget);
 		}
 		else
 		{	my $albox=Gtk2::Alignment->new(0,0,1,1);
