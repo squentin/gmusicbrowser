@@ -5249,7 +5249,7 @@ sub PrefPlugins
 		{	my ($format,@vars)= ('%s : ', _"by");
 			for my $author (@$aref)
 			{	if ($author=~m/(.*?)\s*<([-\w.]+@[-\w.]+)>$/)	#format : Name <email@example.com>
-				{	$format.='<a href="%s">%s</a>, ';
+				{	$format.='<a href="mailto:%s">%s</a>, ';
 					push @vars, $2,$1;
 				}
 				else
