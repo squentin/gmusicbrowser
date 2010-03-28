@@ -908,10 +908,26 @@ sub Parse_opt1
 		}
 		else
 		{	#%opt= $opt=~m/(\w+)=([^,]*)(?:,|$)/g;
-			return ::ParseOptions($opt);
+			return Hash_to_HoH( ::ParseOptions($opt) );
 		}
 	}
 	return \%opt;
+}
+
+sub Hash_to_HoH		# turn { 'key1/key2' => value } into { key1 => { key2 => value } }
+{	my $hash=shift;
+	for my $key (grep m#/#, keys %$hash)
+	{	my $val=delete $hash->{$key};
+		my @keys=split '/',$key;
+		$key= pop @keys;
+		my $h=$hash;
+		for (@keys)
+		{	$h= $h->{$_}||={};
+			last if !ref $h;
+		}
+		$h->{$key}=$val;
+	}
+	return $hash;	# the hash ref hasn't changed, but can be handy to return it anyway
 }
 
 sub NewWidget
