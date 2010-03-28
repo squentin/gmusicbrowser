@@ -1323,10 +1323,13 @@ sub LoadPlugins
 				my %plug= (version=>0,desc=>'',);
 				while ($line=<$fh>)
 				{	last if $line=~m/^=cut/;
-					my ($key,$val)= $line=~m/^\s*(\w+)\s+(.+)/;
+					my ($key,$val)= $line=~m/^\s*(\w+):?\s+(.+)/;
 					next unless $key;
 					if ($key eq 'desc')
 					{	$plug{desc} .= _($val)."\n";
+					}
+					elsif ($key eq 'author')
+					{	push @{$plug{author}}, $val;
 					}
 					else { $plug{$key}=$val; }
 				}
@@ -5232,6 +5235,7 @@ sub PrefPlugins
 	my $plugtitle=Gtk2::Label->new;
 	my $plugdesc=Gtk2::Label->new;
 	$plugdesc->set_line_wrap(1);
+	$plugtitle->set_justify('center');
 	my $plug_box;
 	my $plugin;
 
@@ -5240,6 +5244,22 @@ sub PrefPlugins
 		my $pref=$Plugins{$plugin};
 		if ($plug_box && $plug_box->parent) { $plug_box->parent->remove($plug_box); }
 		my $title= MarkupFormat('<b>%s</b>', $pref->{title}||$pref->{name} );
+		$title.= "\n". MarkupFormat('<small><a href="%s">%s</a></small>', $pref->{url},$pref->{url} )	if $pref->{url};
+		if (my $aref=$pref->{author})
+		{	my ($format,@vars)= ('%s : ', _"by");
+			for my $author (@$aref)
+			{	if ($author=~m/(.*?)\s*<([-\w.]+@[-\w.]+)>$/)	#format : Name <email@example.com>
+				{	$format.='<a href="%s">%s</a>, ';
+					push @vars, $2,$1;
+				}
+				else
+				{	$format.='%s, ';
+					push @vars, $author;
+				}
+			}
+			$format=~s/, $//;
+			$title.= "\n". MarkupFormat("<small>$format</small>",@vars);
+		}
 		$plugtitle->set_markup($title);
 		$plugdesc->set_text( $pref->{desc} );
 		if (my $error=$pref->{error})
