@@ -1089,9 +1089,10 @@ sub UpdateSongID
 #}
 
 sub ShowHide
-{	my ($self,$names,$resize)=@_;
-	if (grep $_ && $_->visible, map $self->{widgets}{$_}, split /\|/,$names)
-	{ &Hide	} else { &Show } #keep @_
+{	my ($self,$names,$resize,$show)=@_;
+	$show= !grep $_ && $_->visible, map $self->{widgets}{$_}, split /\|/,$names unless defined $show;
+	if ($show)	{ Show($self,$names,$resize); }
+	else		{ Hide($self,$names,$resize); }
 }
 
 sub Hide
@@ -3150,8 +3151,7 @@ sub new
 					$icon || $label;
 	$self->add($child) if $child;
 	#$self->{gravity}=$opt->{gravity};
-	$self->{widget}=$opt->{widget};
-	$self->{resize}=$opt->{resize};
+	$self->{$_}=$opt->{$_} for qw/widget resize togglegroup/;
 	$self->signal_connect( toggled => \&toggled_cb );
 	::Watch($self,'HiddenWidgets',\&UpdateToggleState);
 
@@ -3174,8 +3174,15 @@ sub toggled_cb
 	return if $self->{busy} || !$self->{widget};
 	my $layw=::get_layout_widget($self);
 	return unless $layw;
-	if ($self->get_active)	{ $layw->Show($self->{widget},$self->{resize}) }
-	else			{ $layw->Hide($self->{widget},$self->{resize}) }
+	my $show= $self->get_active;
+	if (my $tg=$self->{togglegroup})
+	{	unless ($show) { $show=1; $self->UpdateToggleState; } # togglegroup mode, click on a pressed button just press it again, doesn't un-pressed it
+		my @togbuttons= grep $_->{togglegroup} && $_!=$self && $_->{togglegroup} eq $tg,	#get list of widgets of the same togglegroup
+				values %{$layw->{widgets}};
+		my $hidewidgets=join '|',grep $_, map $_->{widget}, @togbuttons;
+		$layw->Hide($hidewidgets,$self->{resize}) if $hidewidgets;
+	}
+	if (my $w=$self->{widget})	{ $layw->ShowHide($w,$self->{resize},$show) }
 }
 
 package Layout::MenuItem;
@@ -3200,6 +3207,10 @@ sub new
 	if ($opt->{togglewidget})
 	{	$self->{widget}=$opt->{togglewidget};
 		$self->{resize}=$opt->{resize};
+		if (my $tg=$opt->{togglegroup})
+		{	$self->{togglegroup}=$tg;
+			$self->set_draw_as_radio(1);
+		}
 		$self->signal_connect( toggled => \&Layout::TogButton::toggled_cb );
 		::Watch($self,'HiddenWidgets',\&Layout::TogButton::UpdateToggleState);
 	}
