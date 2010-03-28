@@ -6076,6 +6076,7 @@ sub NewPrefFileEntry
 sub NewPrefSpinButton
 {	my ($key,$min,$max,%opt)=@_;
 	my ($text1,$text2,$sg1,$sg2,$tip,$sub,$climb_rate,$digits,$stepinc,$pageinc,$wrap)=@opt{qw/text1 text2 sizeg1 sizeg2 tip cb rate digits step page wrap/};
+	$stepinc||=1;
 	$pageinc||=$stepinc*10;
 	$climb_rate||=1;
 	$digits||=0;
