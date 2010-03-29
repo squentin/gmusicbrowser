@@ -517,6 +517,7 @@ our %Widgets=
 	},
 	TogButton =>
 	{	class	=> 'Layout::TogButton',
+		size	=> 'menu',
 	},
 	HSeparator =>
 	{	New	=> sub {Gtk2::HSeparator->new},
@@ -3146,7 +3147,7 @@ sub new
 	my $self = bless Gtk2::ToggleButton->new, $class;
 	my ($icon,$label);
 	$label=Gtk2::Label->new($opt->{label}) if defined $opt->{label};
-	$icon=Gtk2::Image->new_from_stock($opt->{icon},'menu') if $opt->{icon};
+	$icon=Gtk2::Image->new_from_stock($opt->{icon},$opt->{size}) if $opt->{icon};
 	my $child= ($label && $icon) ?	::Hpack($icon,$label) :
 					$icon || $label;
 	$self->add($child) if $child;
