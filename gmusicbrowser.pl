@@ -78,6 +78,7 @@ use constant
  DRAG_ID	=> 3, DRAG_ARTIST	=> 4, DRAG_ALBUM	=> 5,
  DRAG_FILTER	=> 6, DRAG_MARKUP	=> 7,
 
+ PI    => 4 * atan2(1, 1),	#needed for cairo rotation functions
 };
 
 sub _ ($) {$_[0]}	#dummy translation functions

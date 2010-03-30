@@ -3019,7 +3019,7 @@ use Gtk2;
 
 use base 'Gtk2::EventBox';
 
-our @default_options= (maxsize=>500, xalign=>.5, yalign=>.5);
+our @default_options= (maxsize=>500, xalign=>.5, yalign=>.5, r_height=>25, r_alpha1=>80, r_alpha2=>0, r_scale=>90);
 
 sub new
 {	my ($class,$opt)=@_;
@@ -3028,12 +3028,42 @@ sub new
 	$self->set_visible_window(0);
 	$self->{aa}=$opt->{aa};
 	my $minsize=$opt->{minsize};
-	$self->{$_}=$opt->{$_} for qw/maxsize xalign yalign multiple/;
+	$self->{$_}=$opt->{$_} for qw/maxsize xalign yalign multiple default/;
 
-	if ($opt->{forceratio}) { $self->{forceratio}=1; } #not sure it's still needed with the natural_size mode
+	$self->{usable_w}=$self->{usable_h}=1;
+	my $ratio=1;
+	if ( (my $refl=$opt->{reflection}) && $::CairoOK)
+	{	$self->{$_}= $opt->{$_}/100 for qw/r_alpha1 r_alpha2 r_scale/;
+		$self->{reflection}= $refl==1 ? $opt->{r_height}/100 : $refl/100;
+		my $height= $self->{reflection} +1;
+		$ratio/= $height;
+		$self->{usable_h}/=$height;
+	}
+	if (my $o=$opt->{overlay})
+	{{	my ($x,$y,$xy_or_wh,$w,$h,$file)= $o=~m/^(\d+)x(\d+)([-:])(\d+)x(\d+):(.+)/;
+		unless (defined $file) { warn "Invalid picture-overlay string : '$o' (format: XxY:WIDTHxHEIGHT:FILE)\n"; last }
+		$file= ::SearchFile( $file, $opt->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts' );
+		last unless $file;
+		my $pb=::PixBufFromFile($file);
+		last unless $pb;
+		if ($xy_or_wh eq '-') { $w-=$x; $h-=$y; }
+		my $w0=$pb->get_width;
+		my $h0=$pb->get_height;
+		warn "Bad picture-overlay values : rectangle bigger than the overlay picture\n" if $w0<$w+$x || $h0<$h+$y;
+		my $ws= $w0/$w;
+		my $hs= $h0/$h;
+		$ratio*= $ws/$hs;
+		$self->{usable_w}/= $ws;
+		$self->{usable_h}/= $hs;
+		$self->{overlay}=[$pb, $x/$w, $y/$h, $ws,$hs];
+	}}
+	if ($opt->{forceratio}) { $self->{forceratio}=$ratio; } #not sure it's still needed with the natural_size mode
 	else
-	{	$self->{expand_to_ratio}=1;
+	{	$self->{expand_to_ratio}=$ratio;
 		$self->{expand_weight}=10;
+	}
+	if (my $file=$opt->{'defaultfile'})
+	{	$self->{'default'}= ::SearchFile( $file, $opt->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts' );
 	}
 	$self->signal_connect(size_allocate => \&size_allocate_cb);
 	$self->signal_connect(expose_event => \&expose_cb);
@@ -3041,6 +3071,7 @@ sub new
 	$self->set_size_request($minsize,$minsize) if $minsize;
 	$self->{key}=[];
 	$self->{natural_size}=1;
+	$self->{ratio}=$ratio;
 	return $self;
 }
 
@@ -3063,21 +3094,12 @@ sub set
 		push @files, $f if $f;
 	}
 	$self->{pixbuf}=undef;
+	if ( !@files && (my $file=$self->{'default'}) ) { @files=($file); }	#default picture
 	if (@files)
-	{
-	 if (@files>1 && !$self->{multiple}) {$#files=0}
-	 $self->show;
-	 $self->queue_draw;
-	 ::IdleDo('8_LoadImg'.$self,500,sub
-	 {	my ($self,@files)=@_;
-		return if $self->{size} <10;
-		my $size=int $self->{size}/@files;
-		my @pix= grep $_, map ::PixBufFromFile($_,$size), @files;
-		$self->{pixbuf}= @pix ? \@pix : undef;
-		#$self->{pixbuf}=::PixBufFromFile($file,$self->{size});
+	{	 if (@files>1 && !$self->{multiple}) {$#files=0} # use only the first file if not in multiple mode
+		$self->show;
 		$self->queue_draw;
-		$self->hide unless @pix;
-	 },$self,@files);
+		::IdleDo('8_LoadImg'.$self,500,\&LoadImg,$self,@files);
 	}
 	else
 	{	$self->hide unless $self->{natural_size};
@@ -3090,28 +3112,50 @@ sub set
 	}) if $self->{natural_size};
 }
 
+sub LoadImg
+{	my ($self,@files)=@_;
+	my ($w,$h)=split /x/,$self->{size};
+	$w*= $self->{usable_w};
+	$h*= $self->{usable_h};
+	my $size= ::min($w,$h);
+	return if $size<8;	# no need to draw such a small picture
+	$size=int $size/@files;
+	my @pix= grep $_, map ::PixBufFromFile($_,$size), @files;
+	my $pix=shift @pix;
+	if (@pix) { $pix=collage($self->{multiple},$pix,@pix); }
+	$pix= $self->add_overlay($pix) if $pix && $self->{overlay};
+	$self->{pixbuf}= $pix;
+	$self->queue_draw;
+	$self->hide unless $pix;
+}
+
 sub size_allocate_cb
 {	my ($self,$alloc)=@_;
-	my $max=$self->{maxsize};
-	my $w=$alloc->width; my $h=$alloc->height;
+	my $ratio=$self->{ratio};
+	my $w=$alloc->width;
+	my $h=$alloc->height;
+	if (my $max=$self->{maxsize})
+	{	$w=$max if $w>$max;
+		$h=$max if $h>$max;
+	}
+	my $func= $self->{forceratio} ? \&::max : \&::min;
+	$w= $func->($w, int $h*$ratio);
+	$h= $func->($h, int $w/$ratio);
+	my $size=$w.'x'.$h;
+
 	if (delete $self->{natural_size})#set temporary settings for natural_size mode #FIXME should be simpler
-	{	my $s= $w<$h ? $h : $w;
-		$self->set_size_request($s,$s) if !defined $self->{size} || $s!=$self->{size};
-		$self->{size}=$s;
+	{	$self->set_size_request($w,$h) if !defined $self->{size} || $size ne $self->{size};
+		$self->{size}=$size;
 		return;
 	}
 
-	my $s= ($self->{forceratio} xor $w<$h) ? $w : $h;
-
-	$s=$max if $max && $s>$max;
 	if (!defined $self->{size})
 	{	unless ($self->{pixbuf} || $::ToDo{'8_LoadImg'.$self}) {$self->hide;return};
 	}
-	elsif ($self->{size}==$s) {return}
-	$self->set_size_request($s,$s) if $self->{forceratio};
-	$self->{size}=$s;
-	$self->set(delete $self->{key});
-	#::ScaleImage( $img, $s ) unless $::ToDo{'8_LoadImg'.$img};
+	elsif ($self->{size} eq $size) {return}
+	$self->set_size_request($w,$h) if $self->{forceratio};
+	$self->{size}=$size;
+	$self->set( delete $self->{key} ); #force reloading
 }
 
 sub expose_cb
@@ -3119,24 +3163,99 @@ sub expose_cb
 	my ($x,$y,$ww,$wh)=$self->allocation->values;
 	my $pixbuf= $self->{pixbuf};
 	return 1 unless $pixbuf;
-	my $multiple= @$pixbuf>1 ? $self->{multiple} : undef;
-	if ($multiple)
-	{	if ($multiple eq 'h')	{$ww= int $ww/@$pixbuf}
-		else			{$wh= int $wh/@$pixbuf}
-	}
-	for my $pix (@$pixbuf)
-	{	my $w=$pix->get_width;
-		my $h=$pix->get_height;
-		my $dx= int ($ww-$w)*$self->{xalign};
-		my $dy= int ($wh-$h)*$self->{yalign};
-		my $gc=Gtk2::Gdk::GC->new($self->window);
+	my $w=$pixbuf->get_width;
+	my $h=$pixbuf->get_height;
+	$x+= int ($ww-$w)*$self->{xalign};
+	$y+= int ($wh-$h)*$self->{yalign};
+	if (!$self->{reflection})
+	{	my $gc=Gtk2::Gdk::GC->new($self->window);
 		$gc->set_clip_rectangle($event->area);
-		$self->window->draw_pixbuf($gc,$pix,0,0,$x+$dx,$y+$dy,-1,-1,'none',0,0);
-		if ($multiple) {if ($multiple eq 'h') {$x+=$ww} else {$y+=$wh}}
+		$self->window->draw_pixbuf($gc,$pixbuf,0,0,$x,$y,-1,-1,'none',0,0);
+	}
+	else
+	{	my $cr= Gtk2::Gdk::Cairo::Context->create($self->window);
+		$cr->rectangle($event->area);
+		$cr->clip;
+		$cr->translate($x,$y);
+		$self->draw_with_reflection($cr,$pixbuf);
 	}
 	1;
 }
 
+sub draw_with_reflection
+{	my ($self,$cr,$pixbuf)=@_;
+	my $w=$pixbuf->get_width;
+	my $h=$pixbuf->get_height;
+	my $scale= $self->{r_scale};
+	my $rh=$h * $self->{reflection};
+
+	#draw picture
+	$cr->set_source_pixbuf($pixbuf,0,0);
+	$cr->paint;
+
+	#clip for reflection
+	$cr->rectangle(0,$h,$w,$h+$rh);
+	$cr->clip;
+
+	#create alpha gradient
+	my $pattern= Cairo::LinearGradient->create(0,$h, 0,$h-$rh*(1/$scale));
+	$pattern->add_color_stop_rgba(0, 0,0,0, $self->{r_alpha1} );
+	$pattern->add_color_stop_rgba(1, 0,0,0, $self->{r_alpha2} );
+
+	#draw reflection
+	my $angle=::PI;
+	$cr->translate(0,$h);
+	$cr->rotate($angle);
+	$cr->scale(1,-$scale);
+	$cr->rotate(-$angle);
+	$cr->translate(0,-$h);
+	$cr->set_source_pixbuf($pixbuf,0,0);
+	$cr->mask($pattern);
+}
+
+sub collage
+{	my ($mode,@pixbufs)=@_;
+	$mode= $mode eq 'h' ? 1 : 0;
+	my ($x,$y,$w,$h)=(0,0,0,0);
+
+	#find resulting width and height
+	for my $pb (@pixbufs)
+	{	my $pw=$pb->get_width;
+		my $ph=$pb->get_height;
+		if ($mode)	{ $w+=$pw; $h=$ph if $ph>$h; }
+		else		{ $h+=$ph; $w=$pw if $pw>$w; }
+	}
+
+	my $pixbuf= Gtk2::Gdk::Pixbuf->new( $pixbufs[0]->get_colorspace, 1,8, $w,$h);
+	$pixbuf->fill("\x00\x00\x00\x00");	 #fill with transparent black
+
+	for my $pb (@pixbufs)
+	{	my $pw=$pb->get_width;
+		my $ph=$pb->get_height;
+		# center pixbuf
+		if ($mode)	{ $y=int( ($h-$ph)/2 ); }
+		else		{ $x=int( ($w-$pw)/2 ); }
+		$pb->copy_area(0,0, $pw,$ph, $pixbuf, $x,$y);
+		if ($mode) { $x+=$pw } else { $y+=$ph }
+	}
+	return $pixbuf;
+}
+
+sub add_overlay
+{	my ($self,$pixbuf)=@_;
+	my $w=$pixbuf->get_width;
+	my $h=$pixbuf->get_height;
+	my ($overlay,$xs,$ys,$ws,$hs)= @{$self->{overlay}};
+	my $wo= $w*$ws;
+	my $ho= $h*$hs;
+	my $x= $w*$xs;
+	my $y= $h*$ys;
+	my $result= Gtk2::Gdk::Pixbuf->new( $pixbuf->get_colorspace, 1,8, $wo,$ho);
+	$result->fill(0);	 #fill with transparent black
+	$pixbuf->copy_area(0,0, $w,$h, $result, $x,$y);
+	$overlay->composite($result, 0,0, $wo,$ho, 0,0, $wo/$overlay->get_width,$ho/$overlay->get_height, 'bilinear',255);
+	return $result;
+}
 
 package Layout::TogButton;
 use Gtk2;
