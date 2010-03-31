@@ -269,7 +269,7 @@ sub Write
 		while (@todo)
 		{	my $key= shift @todo;
 			my $val= shift @todo;
-			if ($val)		{ $tag->insert($key,$_) for reverse @$val}
+			if ($val)		{ $ape->insert($key,$_) for reverse @$val}
 			else			{ $ape->remove_all($key) }
 		}
 	}
