@@ -1297,6 +1297,16 @@ sub GetActiveWindow
 	return undef;
 }
 
+sub SearchFile	# search for file with a relative path among a few folders, used to find pictures used by layouts
+{	my ($file,$layoutpaths,@paths)=@_;
+	return $file if file_name_is_absolute($file);
+	@paths=map ref() ? @$_ : $_, @paths;
+	my $found=first { -f $_.SLASH.$file } @paths;
+	return $found.SLASH.$file if $found;
+	warn "Can't find file '$file' (looked in : @paths)\n";
+	return undef;
+}
+
 sub FileList
 {	my ($re,@search)=@_;
 	my @found;

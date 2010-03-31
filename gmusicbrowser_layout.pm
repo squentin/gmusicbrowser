@@ -656,7 +656,7 @@ sub InitLayouts
 
 sub ReadLayoutFile
 {	my $file=shift;
-	#no warnings;#warn $file;
+	my $path=$file; $path=~s#[^/]+$##;
 	return unless -f $file && -r $file;
 	open my$fh,"<:utf8",$file;
 	my $first;
@@ -674,7 +674,7 @@ sub ReadLayoutFile
 			push @lines,$_;
 		}
 		if ($first)
-		{	if ($first=~m#^\[#) {ParseLayout(\@lines)}
+		{	if ($first=~m#^\[#) {ParseLayout(\@lines,$path)}
 			else		{ParseSongTreeSkin(\@lines)}
 		}
 		$first=$next;
@@ -684,7 +684,7 @@ sub ReadLayoutFile
 }
 
 sub ParseLayout
-{	my $lines=$_[0];	#print join "\n",@$lines,"\n\n\n";
+{	my ($lines,$path)=@_;
 	my $first=shift @$lines;
 	my $name;
 	if ($first=~m/^\[([^]=]+)\](?:\s*based on (.+))?$/)
@@ -704,6 +704,7 @@ sub ParseLayout
 		$Layouts{$name}{$1}= $2;
 	}
 	$Layouts{$name}{Name}=~s/^"(.*)"$/$1/ if $Layouts{$name}{Name};	#remove quotes from layout name
+	$Layouts{$name}{PATH}=$path;
 }
 
 sub ParseSongTreeSkin
@@ -788,7 +789,7 @@ sub InitLayout
 	$self->{KeyBindings}=::make_keybindingshash($boxes->{KeyBindings}) if $boxes->{KeyBindings};
 	$self->{widgets}={};
 	$self->{global_options}{default_group}=$self->{group};
-	for (qw/SkinPath SkinFile DefaultFont DefaultFontColor/)
+	for (qw/PATH SkinPath SkinFile DefaultFont DefaultFontColor/)
 	{	my $val= $self->{options}{$_} || $boxes->{$_};
 		$self->{global_options}{$_}=$val if defined $val;
 	}
@@ -3647,7 +3648,7 @@ sub new
 	{	$states{$s.$_}=$n++ for split '_',$states1;
 	}
 	$self->{states}=\%states;
-	$self->{skin_options}{$_}=$options->{$_} for qw/SkinPath SkinFile/;
+	$self->{skin_options}{$_}=$options->{$_} for qw/PATH SkinPath SkinFile/;
 	my $pb=$self->makepixbuf($states2[0].'normal');
 	return undef unless $pb;
 	$self->{minwidth}=my $w=$pb->get_width;
@@ -3707,20 +3708,14 @@ sub _load_skinfile
 	{	$pb=$file if ref $file eq 'Gtk2::Gdk::Pixbuf';
 	}
 	else
-	{ $options||={};
-	  $file ||= $options->{SkinFile};
-	  $file='' unless defined $file;
-	  unless (::file_name_is_absolute($file))
-	  {	my $path= $options->{SkinPath};
-		$path='' unless defined $path;
-		unless (::file_name_is_absolute($path))
-		{	my $p= $::HomeDir.'layouts'.::SLASH.$path;
-			$path= (-e $p.::SLASH.$file)? $p : $::DATADIR.::SLASH.$path;
+	{	$options||={};
+		$file ||= $options->{SkinFile};
+		if ($file)
+		{	my $path= $options->{SkinPath};
+			$file= $path.::SLASH.$file if defined $path;
+			$file= ::SearchFile($file, $options->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts');
+			$pb=Gtk2::Gdk::Pixbuf->new_from_file($file);
 		}
-		$file= $path.::SLASH.$file if defined $path;
-	  }
-	  return unless -r $file;
-	  $pb=Gtk2::Gdk::Pixbuf->new_from_file($file);
 	}
 	return unless $pb;
 	if ($crop)
