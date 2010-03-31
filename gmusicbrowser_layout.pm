@@ -1557,11 +1557,10 @@ sub new
 sub init
 {	my $self=$_[0];
 	if ($self->{options}{transparent})
-	{	eval { require Cairo unless $::useCairo; $::useCairo=1; };
-		if ($::useCairo)
+	{	if ($::CairoOK)
 		{	make_transparent($self);
 		}
-		else { warn "Error : can't load the Cairo perl module => can't make the window transparent\n" }
+		else { warn "no Cairo perl module => can't make the window transparent\n" }
 	}
 	$self->child->show_all;		#needed to get the true size of the window
 	$self->child->realize;		#

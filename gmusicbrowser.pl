@@ -111,12 +111,14 @@ require 'gmusicbrowser_list.pm';
 require 'simple_http.pm';
 }
 
+our $CairoOK;
 our $Gtk2TrayIcon;
 BEGIN
 { eval { require Gtk2::TrayIcon; $Gtk2TrayIcon=1; };
   if ($@) { warn "Gtk2::TrayIcon not found -> tray icon won't be available\n"; }
+  eval { require Cairo; $CairoOK=1; };
+  if ($@) { warn "Cairo perl module not found -> transparent windows and other effects won't be available\n"; }
 }
-
 
 our $debug;
 our %CmdLine;
