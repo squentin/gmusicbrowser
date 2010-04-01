@@ -734,6 +734,7 @@ our %Options=
 	VolumeStep		=> 10,
 	DateFormat_history	=> ['%c 604800 %A %X 86400 Today %X 60 now'],
 	AlwaysInPlaylist	=> 1,
+	PixCacheSize		=> 5,	# in MB
 
 	SavedSTGroupings=>
 	{	_"None"			=> '',
@@ -2839,7 +2840,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		my $picsize=$menu->size_request->width/$menu->{nbcols};
 		$picsize=200 if $picsize<200;
 		$picsize=$h if $picsize>$h;
-		if ( my $img=NewScaledImageFromFile( AAPicture::GetPicture(album=>$album) ,$picsize) )
+		if ( my $img= GMB::Picture::NewScaledImageFromFile( AAPicture::GetPicture(album=>$album) ,$picsize) )
 		{	my $item=Gtk2::MenuItem->new;
 			$item->add($img);
 			my $col=$menu->{nbcols};
@@ -2850,7 +2851,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 	elsif (0) #TEST not used
 	{	my $picsize=$menu->size_request->height;
 		$picsize=220 if $picsize>220;
-		if ( my $img=NewScaledImageFromFile( AAPicture::GetPicture(album=>$album) ,$picsize) )
+		if ( my $img= GMB::Picture::NewScaledImageFromFile( AAPicture::GetPicture(album=>$album) ,$picsize) )
 		{	my $item=Gtk2::MenuItem->new;
 			$item->add($img);
 			my $col=$menu->{nbcols};
@@ -2862,7 +2863,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		#		$item->signal_connect(size_allocate => sub  {my ($self,$alloc)=@_;warn $alloc->width;return if $self->{busy};$self->{busy}=1;my $w=$self->get_toplevel;$w->set_size_request($w->size_request->width-$alloc->width+$picsize+20,-1);$alloc->width($picsize+20);$self->size_allocate($alloc);});
 		}
 	}
-	elsif ( my $pixbuf=PixBufFromFile(AAPicture::GetPicture(album=>$album)) ) #TEST not used
+	elsif ( my $pixbuf= AAPicture::pixbuf(album=>$album,1) ) #TEST not used
 	{
 	 my $request=$menu->size_request;
 	 my $rwidth=$request->width;
@@ -3073,11 +3074,8 @@ sub PopupAA
 			$item->signal_connect(button_press_event => $rmbcallback,$key) if $rmbcallback;
 			#$menu->append($item);
 			$menu->attach($item, $colnb, $colnb+1, $row, $row+1); if (++$row>$rows) {$row=0;$colnb++;}
-			if (my $f=AAPicture::GetPicture($col,$key))
-			{	my $img=AAPicture::newimg($col,$key,$size,\@todo);
-				$item->set_image($img);
-				#push @todo,$item,$f,$size;
-			}
+			my $img=AAPicture::newimg($col,$key,$size);
+			$item->set_image($img) if $img;
 		}
 		return $menu;
 	}; #end of createAAMenu
@@ -3104,16 +3102,6 @@ sub PopupAA
 		$menu->append($item);
 	}
 	$menu->show_all;
-
-	if (@todo)
-	{ Glib::Idle->add(sub
-		{	my $img=shift @todo;
-			return 0 unless $img;
-			AAPicture::setimg($img);
-			1;
-		});
-	  $menu->signal_connect(destroy => sub {undef @todo})
-	}
 
 	if (defined wantarray) {return $menu}
 	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
@@ -3238,102 +3226,6 @@ sub Breakdown_List
 	else {return undef}
 
 	return $menu;
-}
-
-sub PixLoader_callback
-{	my ($loader,$w,$h,$max)=@_;
-	$loader->{w}=$w;
-	$loader->{h}=$h;
-	if ($max!~s/^-// or $w>$max or $h>$max)
-	{	my $r=$w/$h;
-		if ($r>1) {$h=int(($w=$max)/$r);}
-		else	  {$w=int(($h=$max)*$r);}
-		$loader->set_size($w,$h);
-	}
-}
-sub LoadPixData
-{	my $pixdata=$_[0]; my $size=$_[1];
-	my $loader=Gtk2::Gdk::PixbufLoader->new;
-	$loader->signal_connect(size_prepared => \&::PixLoader_callback,$size) if $size;
-	eval { $loader->write($pixdata); };
-	eval { $loader->close; } unless $@;
-	$loader=undef if $@;
-	warn "$@\n" if $@ && $debug;
-	return $loader;
-}
-
-sub PixBufFromFile
-{	my ($file,$size,$nowarn)=@_;
-	return unless $file;
-	my $nb= $file=~s/:(\d+)$// ? $1 : undef;
-	unless (-r $file) {warn "$file not found\n" unless $nowarn; return undef;}
-
-	my $loader=Gtk2::Gdk::PixbufLoader->new;
-	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
-	if ($file=~m/\.(?:mp3|flac|m4a|m4b)$/i)
-	{	my $data=FileTag::PixFromMusicFile($file,$nb);
-		eval { $loader->write($data) } if defined $data;
-	}
-	else	#eval{Gtk2::Gdk::Pixbuf->new_from_file(filename_to_unicode($file))};
-		# work around Gtk2::Gdk::Pixbuf->new_from_file which wants utf8 filename
-	{	open my$fh,'<',$file; binmode $fh;
-		my $buf; eval {$loader->write($buf) while read $fh,$buf,1024*64;};
-		close $fh;
-	}
-	eval {$loader->close;};
-	return $@ ? undef : $loader->get_pixbuf;
-}
-
-sub NewScaledImageFromFile
-{	my ($pix,$w,$q)=@_;	# $pix=file or pixbuf , $w=size, $q true for HQ
-	return undef unless $pix;
-	my $h=$w;
-	unless (ref $pix)
-	{ $pix=PixBufFromFile($pix);
-	  return undef unless $pix;
-	}
-	my $ratio=$pix->get_width / $pix->get_height;
-	if    ($ratio>1) {$h=int($w/$ratio);}
-	elsif ($ratio<1) {$w=int($h*$ratio);}
-	$q=($q)? 'bilinear' : 'nearest';
-	return Gtk2::Image->new_from_pixbuf( $pix->scale_simple($w, $h, $q) );
-}
-
-sub ScaleImageFromFile
-{	my ($img,$w,$file,$nowarn)=@_;
-	$img->{pixbuf}=PixBufFromFile($file,undef,$nowarn);
-	ScaleImage($img,$w);
-}
-
-sub ScaleImage
-{	my ($img,$w)=@_;
-	my $pix=$img->{pixbuf};
-	if (!$pix || !$w || $w<16) { $img->set_from_pixbuf(undef); return; }
-	my $h=$w;
-	my $ratio=$pix->get_width / $pix->get_height;
-	if    ($ratio>1) {$h=int($w/$ratio);}
-	elsif ($ratio<1) {$w=int($h*$ratio);}
-	$img->set_from_pixbuf( $pix->scale_simple($w, $h, 'bilinear') );
-}
-
-sub pixbox_button_press_cb	# zoom picture when clicked
-{	my ($eventbox,$event,$button)=@_;
-	return 0 if $button && $event->button != $button;
-	my $image;
-	if ($eventbox->{pixdata})
-	{	my $loader=::LoadPixData($eventbox->{pixdata},350);
-		$image=Gtk2::Image->new_from_pixbuf($loader->get_pixbuf) if $loader;
-	}
-	elsif (my $pixbuf=$eventbox->child->{pixbuf})
-	 { $image=::NewScaledImageFromFile($pixbuf,350,1); }
-	return 1 unless $image;
-	my $menu=Gtk2::Menu->new;
-	my $item=Gtk2::MenuItem->new;
-	$item->add($image);
-	$menu->append($item);
-	$menu->show_all;
-	$menu->popup(undef,undef,undef,undef,$event->button,$event->time);
-	1;
 }
 
 sub BuildMenu
@@ -3811,7 +3703,7 @@ sub ChoosePix
 		  $nb=0 if $nb<0 || $nb>=$max;
 		  my $file=$lastfile;
 		  $file.=":$nb" if $nb;
-		  ScaleImageFromFile($image,150,$file);
+		  GMB::Picture::ScaleImageFromFile($image,150,$file);
 		  my $p=$image->{pixbuf};
 		  if ($p) { $label->set_text($p->get_width.' x '.$p->get_height); }
 		  else { $label->set_text(''); }
@@ -3886,7 +3778,7 @@ sub ChoosePix
 #	$PixSelector->selection_entry->signal_connect(changed => sub
 #		{	my ($file)=$PixSelector->get_selections;
 #			$file=filename_from_unicode($file);
-#			ScaleImageFromFile($img,150,$file,'nowarn');
+#			GMB::Picture::ScaleImageFromFile($img,150,$file,'nowarn');
 #			my $p=$img->{pixbuf};
 #			my $text=$p? $p->get_width.' x '.$p->get_height  : '';
 #			$label->set_text($text);
@@ -5527,9 +5419,10 @@ sub PrefMisc
 
 	my $volstep= NewPrefSpinButton('VolumeStep',1,100, step=>1, text1=>_"Volume step :", tip=>_"Amount of volume changed by the mouse wheel");
 	my $always_in_pl=NewPrefCheckButton(AlwaysInPlaylist => _"Current song must always be in the playlist", tip=> _"- When selecting a song, the playlist filter will be reset if the song is not in it\n- Skip to another song when removing the current song from the playlist");
+	my $pixcache= NewPrefSpinButton('PixCacheSize',1,1000, text1=>_"Picture cache :", text2=>_"MB", cb=>\&GMB::Picture::trim);
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry,$volstep,$always_in_pl;
+	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry,$volstep,$always_in_pl,$pixcache;
 	return $vbox;
 }
 
@@ -5653,7 +5546,7 @@ sub UpdateFolderNames
 	}
 	Songs::Set($renamed,'@path'=>\@newpath);
 
-	AAPicture::UpdatePixPath($oldpath,$newpath);
+	GMB::Picture::UpdatePixPath($oldpath,$newpath);
 }
 
 sub PrefLibrary
@@ -8152,12 +8045,171 @@ sub Set
 	$self->{val}=$val;
 }
 
+package GMB::Picture;
+my (%PbCache,$CacheSize);
+our @ArraysOfFiles;	#array of filenames that needs updating in case a folder is renamed
+
+sub pixbuf
+{	my ($file,$size,$cacheonly)=@_;
+	my $key= defined $size ? $size.':'.$file : $file;
+	my $pb=$PbCache{$key};
+	unless ($pb || $cacheonly)
+	{	$pb=load($file,$size);
+		add_to_cache($key,$pb) if $pb;
+	}
+	$pb->{lastuse}=time if $pb;
+	return $pb;
+}
+
+sub load
+{	my ($file,$size,$nowarn)=@_;
+	return unless $file;
+
+	my $nb= $file=~s/:(\d+)$// ? $1 : undef;	#index number for embbeded pictures
+	unless (-r $file) {warn "$file not found\n" unless $nowarn; return undef;}
+
+	my $loader=Gtk2::Gdk::PixbufLoader->new;
+	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
+	if ($file=~m/\.(?:mp3|flac|m4a|m4b)$/i)
+	{	my $data=FileTag::PixFromMusicFile($file,$nb);
+		eval { $loader->write($data) } if defined $data;
+	}
+	else	#eval{Gtk2::Gdk::Pixbuf->new_from_file(filename_to_unicode($file))};
+		# work around Gtk2::Gdk::Pixbuf->new_from_file which wants utf8 filename
+	{	open my$fh,'<',$file; binmode $fh;
+		my $buf; eval {$loader->write($buf) while read $fh,$buf,1024*64;};
+		close $fh;
+	}
+	eval {$loader->close;};
+	return undef if $@;
+	return $loader->get_pixbuf;
+}
+
+#sub drop	#drop a file from the cache
+#{	my $file=shift;
+#	my $re=qr/^(?:\d+:)?\Q$file\E/;
+#	delete $PbCache{$_} for m/$re/, keys %PbCache;
+#}
+
+sub trim
+{	my @list= sort {$PbCache{$a}{lastuse} <=> $PbCache{$b}{lastuse}} keys %PbCache;
+	my $max= $::Options{PixCacheSize} *1000*1000 *.9;
+	warn "Trimming cache\n" if $::debug;
+	while ($CacheSize> $max)
+	{	my $key=shift @list;
+		$CacheSize-= (delete $PbCache{$key})->{size};
+	}
+}
+
+sub add_to_cache
+{	my ($key,$pb)=@_;
+	my $h=$pb->get_height;
+	my $rowstride=$pb->get_rowstride;
+	$CacheSize+= $pb->{size}= $h*$rowstride;	#warn "PixCache : +$pb->{size} = $CacheSize\n";
+	::IdleDo('9_AAPicPurge',undef,\&trim) if $CacheSize > $::Options{PixCacheSize}*1000*1000;
+	$PbCache{$key}=$pb;
+}
+
+sub load_skinfile
+{	my ($file,$crop,$resize,$now)=@_; #resize is resizeopt_w_h
+	my $key= ':'.join ':',$file,$crop,$resize||''; #FIXME remove w or h in resize if not resized in this dimension
+	my $pixbuf=$PbCache{$key};
+	unless ($pixbuf)
+	{	return unless $now;
+		$pixbuf=Skin::_load_skinfile($file,$crop);
+		$pixbuf=Skin::_resize($pixbuf,split /_/,$resize) if $resize && $pixbuf;
+		return unless $pixbuf;
+		add_to_cache($key,$pixbuf);
+	}
+	$pixbuf->{lastuse}=time;
+	return $pixbuf;
+}
+
+sub UpdatePixPath
+{	my ($oldpath,$newpath)=@_;
+	m/$::QSLASH$/o or $_.=::SLASH for $oldpath,$newpath; #make sure the path ends with SLASH
+	$oldpath=qr/^\Q$oldpath\E/;
+	s/$oldpath/$newpath/ for grep $_, map @$_, @ArraysOfFiles;
+}
+
+sub PixLoader_callback
+{	my ($loader,$w,$h,$max)=@_;
+	$loader->{w}=$w;
+	$loader->{h}=$h;
+	if ($max!~s/^-// or $w>$max or $h>$max)
+	{	my $r=$w/$h;
+		if ($r>1) {$h=int(($w=$max)/$r);}
+		else	  {$w=int(($h=$max)*$r);}
+		$loader->set_size($w,$h);
+	}
+}
+sub LoadPixData
+{	my $pixdata=$_[0]; my $size=$_[1];
+	my $loader=Gtk2::Gdk::PixbufLoader->new;
+	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
+	eval { $loader->write($pixdata); };
+	eval { $loader->close; } unless $@;
+	$loader=undef if $@;
+	warn "$@\n" if $@ && $debug;
+	return $loader;
+}
+
+sub NewScaledImageFromFile
+{	my ($pix,$w,$q)=@_;	# $pix=file or pixbuf , $w=size, $q true for HQ
+	return undef unless $pix;
+	my $h=$w;
+	unless (ref $pix)
+	{ $pix=load($pix);
+	  return undef unless $pix;
+	}
+	my $ratio=$pix->get_width / $pix->get_height;
+	if    ($ratio>1) {$h=int($w/$ratio);}
+	elsif ($ratio<1) {$w=int($h*$ratio);}
+	$q=($q)? 'bilinear' : 'nearest';
+	return Gtk2::Image->new_from_pixbuf( $pix->scale_simple($w, $h, $q) );
+}
+
+sub ScaleImageFromFile
+{	my ($img,$w,$file,$nowarn)=@_;
+	$img->{pixbuf}=load($file,undef,$nowarn);
+	ScaleImage($img,$w);
+}
+
+sub ScaleImage
+{	my ($img,$w)=@_;
+	my $pix=$img->{pixbuf};
+	if (!$pix || !$w || $w<16) { $img->set_from_pixbuf(undef); return; }
+	my $h=$w;
+	my $ratio=$pix->get_width / $pix->get_height;
+	if    ($ratio>1) {$h=int($w/$ratio);}
+	elsif ($ratio<1) {$w=int($h*$ratio);}
+	$img->set_from_pixbuf( $pix->scale_simple($w, $h, 'bilinear') );
+}
+
+sub pixbox_button_press_cb	# zoom picture when clicked
+{	my ($eventbox,$event,$button)=@_;
+	return 0 if $button && $event->button != $button;
+	my $image;
+	if ($eventbox->{pixdata})
+	{	my $loader=::LoadPixData($eventbox->{pixdata},350);
+		$image=Gtk2::Image->new_from_pixbuf($loader->get_pixbuf) if $loader;
+	}
+	elsif (my $pixbuf=$eventbox->child->{pixbuf})
+	 { $image= NewScaledImageFromFile($pixbuf,350,1); }
+	return 1 unless $image;
+	my $menu=Gtk2::Menu->new;
+	my $item=Gtk2::MenuItem->new;
+	$item->add($image);
+	$menu->append($item);
+	$menu->show_all;
+	$menu->popup(undef,undef,undef,undef,$event->button,$event->time);
+	1;
+}
+
+
 package AAPicture;
 
-my %Cache;
 my $watcher;
-our @ArraysOfFiles;	#array of filenames that needs updating in case a folder is renamed
-my %Field_id;
 
 INIT
 {	::Watch(undef, Picture_artist => \&AAPicture_Changed);	#FIXME PHASE1
@@ -8172,45 +8224,41 @@ sub SetPicture
 {	my ($field,$key,$file)=@_;
 	Songs::Picture($key,$field,'set',$file);
 }
-sub UpdatePixPath
-{	my ($oldpath,$newpath)=@_;
-	m/$::QSLASH$/o or $_.=::SLASH for $oldpath,$newpath; #make sure the path ends with SLASH
-	$oldpath=qr/^\Q$oldpath\E/;
-	s/$oldpath/$newpath/ for grep $_, map @$_, @ArraysOfFiles;
-}
 
+my @imgqueue;
 sub newimg
-{	my ($field,$key,$size,$todoref)=@_;
-	my $p= pixbuf($field,$key,$size, ($todoref ? 0 : 1));
-	return Gtk2::Image->new_from_pixbuf($p) if $p;
+{	my ($field,$key,$size)=@_;
+	my $pb= pixbuf($field,$key,$size);
+	return Gtk2::Image->new_from_pixbuf($pb) if $pb;	# cached
+	return undef unless defined $pb;			# no file
+	# $pb=0 => file but not cached
 
 	my $img=Gtk2::Image->new;
-	push @$todoref,$img;
 	$img->{params}=[$field,$key,$size];
 	$img->set_size_request($size,$size);
+
+	Glib::Idle->add(\&idle_loadimg_cb) unless @imgqueue;
+	push @imgqueue,$img;
+	::weaken($imgqueue[-1]);	#weaken ref so that it won't be loaded after img widget is destroyed
 	return $img;
 }
-sub setimg
-{	my $img=$_[0];
-	my $p=pixbuf( @{delete $img->{params}},1 );
-	$img->set_from_pixbuf($p);
+sub idle_loadimg_cb
+{	my $img;
+	$img=shift @imgqueue while @imgqueue && !$img;
+	if ($img)
+	{	my $pb=pixbuf( @{delete $img->{params}},1 );
+		$img->set_from_pixbuf($pb) if $pb;
+	}
+	return scalar @imgqueue;	#return 0 when finished => disconnect idle cb
 }
 
 sub pixbuf
 {	my ($field,$key,$size,$now)=@_;
-	my $fid= $Field_id{$field} ||= Songs::Code($field,'pic_cache_id|field');
 	my $file= GetPicture($field,$key);
-	#unless ($file)
-	#{	return undef unless $::Options{use_default_aapic};
-	#	$file=$::Options{default_aapic};
-		return undef unless $file;
-	#}
-	$key=$size.$fid.':'.$key;
-	my $p=$Cache{$key};
-	return 0 unless $p || $now;
-	$p||=load($file,$size,$key);
-	$p->{lastuse}=time if $p;
-	return $p;
+	return undef unless $file;
+	my $pb=GMB::Picture::pixbuf($file,$size,!$now);
+	return 0 unless $pb || $now;
+	return $pb;
 }
 
 sub draw
@@ -8225,48 +8273,6 @@ sub draw
 	}
 	return $pixbuf; # 0 if exist but not cached, undef if there is no picture for this key
 }
-
-sub load
-{	my ($file,$size,$key)=@_;
-	my $pixbuf=::PixBufFromFile($file,$size);
-	return undef unless $pixbuf;
-#	my $ratio=$pixbuf->get_width / $pixbuf->get_height;
-#	my $ph=my $pw=$s;
-#	if    ($ratio>1) {$ph=int($pw/$ratio);}
-#	elsif ($ratio<1) {$pw=int($ph*$ratio);}
-#	$Cache{$key}=$pixbuf=$pixbuf->scale_simple($pw, $ph, 'bilinear');
-	$Cache{$key}=$pixbuf;
-	::IdleDo('9_AAPicPurge',undef,\&purge) if keys %Cache >120;
-	return $pixbuf;
-}
-
-sub purge
-{	my $nb= keys(%Cache)-100;# warn "purging $nb cached AApixbufs\n";
-	delete $Cache{$_} for (sort {$Cache{$a}{lastuse} <=> $Cache{$b}{lastuse}} keys %Cache)[0..$nb];
-}
-
-sub AAPicture_Changed
-{	my $key=$_[1];
-	my $re=qr/^\d+\w+:\Q$key\E/;
-	delete $Cache{$_} for grep m/$re/, keys %Cache;
-}
-
-sub load_file #use the same cache as the AAPictures, #FIXME create a different package for all picture cache functions
-{	my ($file,$crop,$resize,$now)=@_; #resize is resizeopt_w_h
-	my $key= ':'.join ':',$file,$crop,$resize||''; #FIXME remove w or h in resize if not resized in this dimension
-	my $pixbuf=$Cache{$key};
-	unless ($pixbuf)
-	{	return unless $now;
-		$pixbuf=Skin::_load_skinfile($file,$crop);
-		$pixbuf=Skin::_resize($pixbuf,split /_/,$resize) if $resize && $pixbuf;
-		return unless $pixbuf;
-		$Cache{$key}=$pixbuf;
-	}
-	$pixbuf->{lastuse}=time;
-	::IdleDo('9_AAPicPurge',undef,\&purge) if keys %Cache >120;
-	return $pixbuf;
-}
-
 
 package TextCombo;
 use base 'Gtk2::ComboBox';

@@ -3133,13 +3133,13 @@ sub size_allocate_cb
 }
 sub setpic
 {	my $img=shift;
-	if ($img->{pixbuf}) { ::ScaleImage($img,$img->{size}) }
+	if ($img->{pixbuf}) { GMB::Picture::ScaleImage($img,$img->{size}) }
 	else
 	{	my $self= ::find_ancestor($img,__PACKAGE__);
 		my $file;
 		$file= AAPicture::GetPicture($self->{aa},$self->{Sel}) if defined $self->{Sel};
 		if ($file)
-		 { ::ScaleImageFromFile($img, $img->{size}, $file) }
+		 { GMB::Picture::ScaleImageFromFile($img, $img->{size}, $file) }
 		else { $img->set_from_pixbuf(undef); }
 	}
 }
@@ -6657,7 +6657,7 @@ sub pic_cached
 {	my ($arg,$file,$resize,$w,$h,$xpad,$ypad,$crop,$hide)=@_;
 	return undef,0 if $hide || !$file;
 	if ($resize) { $w-=2*$xpad; $h-=2*$ypad; $h=0 if $h<0; $w=0 if $w<0; $resize.="_$w"."_$h"; }
-	my $cached=AAPicture::load_file($file,$crop,$resize);
+	my $cached=GMB::Picture::load_skinfile($file,$crop,$resize);
 	return $cached||$resize, !$cached;
 }
 sub pic_size
@@ -6665,7 +6665,7 @@ sub pic_size
 	return undef,0,0 if $hide || !$file;
 	my $pixbuf=$cached;
 	unless (ref $cached) #=> cached is resize_w_h
-	{	$pixbuf=AAPicture::load_file($file,$crop,$cached,1);
+	{	$pixbuf=GMB::Picture::load_skinfile($file,$crop,$cached,1);
 	}
 	return undef,0,0 unless $pixbuf;
 	return $pixbuf,$pixbuf->get_width,$pixbuf->get_height;

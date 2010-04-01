@@ -291,7 +291,7 @@ sub loaded #_very_ crude html to gtktextview renderer
 	if ($type && $type!~m#^text/html#)
 	{	if	($type=~m#^text/#)	{$buffer->set_text($data);}
 		elsif	($type=~m#^image/#)
-		{	my $loader=::LoadPixData($data);
+		{	my $loader= GMB::Picture::LoadPixData($data);
 			if (my $p=$loader->get_pixbuf) {$buffer->insert_pixbuf(0,$p);}
 		}
 		return;
@@ -422,7 +422,7 @@ sub load_pixbuf
 	sub
 	{	$self->{waiting}=undef;
 		my $loader;
-		$loader=::LoadPixData($_[0]) if $_[0];
+		$loader= GMB::Picture::LoadPixData($_[0]) if $_[0];
 		if ($loader)
 		{	my $buffer=$self->{buffer};
 			my $iter=$buffer->get_iter_at_mark($mark);

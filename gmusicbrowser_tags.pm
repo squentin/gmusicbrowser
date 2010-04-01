@@ -2084,7 +2084,7 @@ sub set
 	my $Bsave=$self->{Bsave};
 	my $length=length $self->{value};
 	unless ($length) { $label->set_text(_"empty"); $Bsave->set_sensitive(0); return; }
-	my $loader=::LoadPixData( $self->{value} ,'-300');
+	my $loader= GMB::Picture::LoadPixData( $self->{value} ,'-300');
 	my $pixbuf;
 	if (!$loader)
 	{  $label->set_text(_"error");

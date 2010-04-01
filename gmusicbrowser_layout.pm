@@ -3044,7 +3044,7 @@ sub new
 		unless (defined $file) { warn "Invalid picture-overlay string : '$o' (format: XxY:WIDTHxHEIGHT:FILE)\n"; last }
 		$file= ::SearchFile( $file, $opt->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts' );
 		last unless $file;
-		my $pb=::PixBufFromFile($file);
+		my $pb= GMB::Picture::pixbuf($file);
 		last unless $pb;
 		if ($xy_or_wh eq '-') { $w-=$x; $h-=$y; }
 		my $w0=$pb->get_width;
@@ -3120,7 +3120,7 @@ sub LoadImg
 	my $size= ::min($w,$h);
 	return if $size<8;	# no need to draw such a small picture
 	$size=int $size/@files;
-	my @pix= grep $_, map ::PixBufFromFile($_,$size), @files;
+	my @pix= grep $_, map GMB::Picture::pixbuf($_,$size), @files;
 	my $pix=shift @pix;
 	if (@pix) { $pix=collage($self->{multiple},$pix,@pix); }
 	$pix= $self->add_overlay($pix) if $pix && $self->{overlay};
@@ -3833,7 +3833,7 @@ sub _load_skinfile
 		{	my $path= $options->{SkinPath};
 			$file= $path.::SLASH.$file if defined $path;
 			$file= ::SearchFile($file, $options->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts');
-			$pb=Gtk2::Gdk::Pixbuf->new_from_file($file);
+			$pb= GMB::Picture::pixbuf($file);
 		}
 	}
 	return unless $pb;

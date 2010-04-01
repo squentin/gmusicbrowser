@@ -148,7 +148,6 @@ our %timespan_menu=
 	{	#set		=> '#_#= (#VAL# eq "" ? 0 : (__#mainfield#_gid{#VAL#}||= (push @__#mainfield#_name, #VAL#)-1));',
 		parent		=> 'fewstring',
 		mainfield	=> 'artist',
-		pic_cache_id	=> 'a',
 		init		=> '____=""; __#mainfield#_gid{""}=1; #_iname#[1]=::superlc( #_name#[1]=_("<Unknown>") );',
 		get		=> 'do {my $v=#_#; $v!=1 ? #_name#[$v] : "";}',
 		gid_to_get	=> '(#GID#!=1 ? #_name#[#GID#] : "")',
@@ -164,7 +163,6 @@ our %timespan_menu=
 	album	=>
 	{	parent		=> 'fewstring',
 		mainfield	=> 'album',
-		pic_cache_id	=> 'b',
 		_empty		=> 'vec(__#mainfield#_empty,#_#,1)',
 		unknown		=> '_("<Unknown>")." "',
 		init		=> '____=""; __#mainfield#_gid{"\\x00"}=1; __#mainfield#_empty=""; vec(__#mainfield#_empty,1,1)=1; #_iname#[1]=::superlc( #_name#[1]=_("<Unknown>") );',
@@ -231,17 +229,17 @@ our %timespan_menu=
 	},
 # 	picture =>
 #	{	get_picture	=> '__#mainfield#_picture[#GID#] || $::Options{Default_picture_#mainfield#};',
-#		get_pixbuf	=> 'my $file= #get_picture#; ::PixBufFromFile($file);',
+#		get_pixbuf	=> 'my $file= #get_picture#; GMB::Picture::pixbuf($file);',
 #		set_picture	=> '::_utf8_off(#VAL#); __#mainfield#_picture[#GID#]= #VAL# eq "" ? undef : #VAL#; ::HasChanged("Picture_#mainfield#",#GID#);',
 #		'load_extra:picture'	=> 'if (#VAL# ne "") { __#mainfield#_picture[#GID#]= ::decode_url(#VAL#); }',
 #		'save_extra:picture'	=> 'do { my $v=__#mainfield#_picture[#GID#]; defined $v ? ::url_escape($v) : ""; }',
 #	},
  	_picture =>
 	{	_		=> '__#mainfield#_picture[#GID#]',
-		init		=> '@__#mainfield#_picture=(); push @AAPicture::ArraysOfFiles, \@__#mainfield#_picture;',
+		init		=> '@__#mainfield#_picture=(); push @GMB::Picture::ArraysOfFiles, \@__#mainfield#_picture;',
 		default		=> '$::Options{Default_picture}{#mainfield#}',
 		get_for_gid	=> '#_# || #default#;',
-		pixbuf_for_gid	=> 'my $file= #get_for_gid#; ::PixBufFromFile($file);',#FIXME use a cache
+		pixbuf_for_gid	=> 'my $file= #get_for_gid#; GMB::Picture::pixbuf($file);',
 		set_for_gid	=> '::_utf8_off(#VAL#); #_#= #VAL# eq "" ? undef : #VAL#; ::HasChanged("Picture_#mainfield#",#GID#);',
 		load_extra	=> 'if (#VAL# ne "") { #_#= ::decode_url(#VAL#); }',
 		save_extra	=> 'do { my $v=#_#; defined $v ? filename_escape($v) : ""; }',
@@ -249,7 +247,7 @@ our %timespan_menu=
 	},
 	_stars =>	#FIXME not used everywhere
 	{	_		=> 'sprintf("%d",#GID# * #nbpictures# /100)',
-		pixbuf_for_gid	=> 'my $r= #_#; __#mainfield#_pixbuf[$r] ||= ::PixBufFromFile( "#fileprefix#".$r.".png" );',
+		pixbuf_for_gid	=> 'my $r= #_#; __#mainfield#_pixbuf[$r] ||= GMB::Picture::pixbuf( "#fileprefix#".$r.".png" );',
 	},
 	fewstring=>	#for strings likely to be repeated
 	{	_		=> 'vec(____,#ID#,#bits#)',
@@ -1539,7 +1537,7 @@ sub ChooseIcon	 #FIXME add a way to create a colored square/circle/... icon
 	}
 	else
 	{	$destfile.='.png';
-		my $pixbuf=::PixBufFromFile($file,48);
+		my $pixbuf= GMB::Picture::load($file,48);
 		return unless $pixbuf;
 		$pixbuf->save($destfile,'png');
 	}

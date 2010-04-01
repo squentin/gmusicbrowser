@@ -372,7 +372,7 @@ sub get_next
 	{	my $pixdata=$_[0];
 		$result->{waiting}=undef;
 		my $loader;
-		$loader=::LoadPixData($pixdata,PREVIEW_SIZE) if $pixdata;
+		$loader= GMB::Picture::LoadPixData($pixdata,PREVIEW_SIZE) if $pixdata;
 		if ($loader)
 		{	my $dim=$loader->{w}.' x '.$loader->{h};
 			my $table=$self->{table};
