@@ -2980,7 +2980,7 @@ sub new
 	$img->{size}=0;
 	$img->signal_connect(size_allocate => \&size_allocate_cb);
 	$pixbox->add($img);
-	$pixbox->signal_connect(button_press_event => \&::pixbox_button_press_cb,1); # 1 : mouse button 1
+	$pixbox->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb,1); # 1 : mouse button 1
 
 	my $buttonbox=Gtk2::VBox->new;
 	my $Bfilter=::NewIconButton('gmb-filter',undef,sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->filter },'none');
@@ -3133,15 +3133,10 @@ sub size_allocate_cb
 }
 sub setpic
 {	my $img=shift;
-	if ($img->{pixbuf}) { GMB::Picture::ScaleImage($img,$img->{size}) }
-	else
-	{	my $self= ::find_ancestor($img,__PACKAGE__);
-		my $file;
-		$file= AAPicture::GetPicture($self->{aa},$self->{Sel}) if defined $self->{Sel};
-		if ($file)
-		 { GMB::Picture::ScaleImageFromFile($img, $img->{size}, $file) }
-		else { $img->set_from_pixbuf(undef); }
-	}
+	my $self= ::find_ancestor($img,__PACKAGE__);
+	my $file= $img->{filename}= AAPicture::GetPicture($self->{aa},$self->{Sel});
+	my $pixbuf= $file ? GMB::Picture::pixbuf($file,$img->{size}) : undef;
+	$img->set_from_pixbuf($pixbuf) if $pixbuf;
 }
 
 sub AABox_button_press_cb			#popup menu

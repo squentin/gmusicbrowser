@@ -2840,7 +2840,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		my $picsize=$menu->size_request->width/$menu->{nbcols};
 		$picsize=200 if $picsize<200;
 		$picsize=$h if $picsize>$h;
-		if ( my $img= GMB::Picture::NewScaledImageFromFile( AAPicture::GetPicture(album=>$album) ,$picsize) )
+		if ( my $img= AAPicture::newimg(album=>$album, $picsize) )
 		{	my $item=Gtk2::MenuItem->new;
 			$item->add($img);
 			my $col=$menu->{nbcols};
@@ -2851,7 +2851,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 	elsif (0) #TEST not used
 	{	my $picsize=$menu->size_request->height;
 		$picsize=220 if $picsize>220;
-		if ( my $img= GMB::Picture::NewScaledImageFromFile( AAPicture::GetPicture(album=>$album) ,$picsize) )
+		if ( my $img= AAPicture::newimg(album=>$album, $picsize) )
 		{	my $item=Gtk2::MenuItem->new;
 			$item->add($img);
 			my $col=$menu->{nbcols};
@@ -2863,7 +2863,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		#		$item->signal_connect(size_allocate => sub  {my ($self,$alloc)=@_;warn $alloc->width;return if $self->{busy};$self->{busy}=1;my $w=$self->get_toplevel;$w->set_size_request($w->size_request->width-$alloc->width+$picsize+20,-1);$alloc->width($picsize+20);$self->size_allocate($alloc);});
 		}
 	}
-	elsif ( my $pixbuf= AAPicture::pixbuf(album=>$album,1) ) #TEST not used
+	elsif ( my $pixbuf= AAPicture::pixbuf(album=>$album,undef,1) ) #TEST not used
 	{
 	 my $request=$menu->size_request;
 	 my $rwidth=$request->width;
@@ -3688,7 +3688,7 @@ sub ChoosePix
 	my $image=Gtk2::Image->new;
 	my $eventbox=Gtk2::EventBox->new;
 	$eventbox->add($image);
-	$eventbox->signal_connect(button_press_event => \&pixbox_button_press_cb);
+	$eventbox->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb);
 	my $max=my $nb=0; my $lastfile;
 	my $prev= NewIconButton('gtk-go-back',   undef, sub { $_[0]->parent->parent->{set_pic}->(-1); });
 	my $next= NewIconButton('gtk-go-forward',undef, sub { $_[0]->parent->parent->{set_pic}->(1); });
@@ -3703,7 +3703,7 @@ sub ChoosePix
 		  $nb=0 if $nb<0 || $nb>=$max;
 		  my $file=$lastfile;
 		  $file.=":$nb" if $nb;
-		  GMB::Picture::ScaleImageFromFile($image,150,$file);
+		  GMB::Picture::ScaleImage($image,150,$file);
 		  my $p=$image->{pixbuf};
 		  if ($p) { $label->set_text($p->get_width.' x '.$p->get_height); }
 		  else { $label->set_text(''); }
@@ -3770,7 +3770,7 @@ sub ChoosePix
 #	my $img=Gtk2::Image->new;
 #	$eventbox->add($img);
 #	$frame->add($eventbox);
-#	$eventbox->signal_connect(button_press_event => \&pixbox_button_press_cb);
+#	$eventbox->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb);
 #	$frame->set_size_request(155,155);
 #	my $label=Gtk2::Label->new;
 #	$PixSelector->set_filename(filename_to_utf8displayname($path.SLASH)) if $path &&  -d $path;
@@ -3778,7 +3778,7 @@ sub ChoosePix
 #	$PixSelector->selection_entry->signal_connect(changed => sub
 #		{	my ($file)=$PixSelector->get_selections;
 #			$file=filename_from_unicode($file);
-#			GMB::Picture::ScaleImageFromFile($img,150,$file,'nowarn');
+#			GMB::Picture::ScaleImage($img,150,$file);
 #			my $p=$img->{pixbuf};
 #			my $text=$p? $p->get_width.' x '.$p->get_height  : '';
 #			$label->set_text($text);
@@ -8062,11 +8062,11 @@ sub pixbuf
 }
 
 sub load
-{	my ($file,$size,$nowarn)=@_;
+{	my ($file,$size)=@_;
 	return unless $file;
 
 	my $nb= $file=~s/:(\d+)$// ? $1 : undef;	#index number for embbeded pictures
-	unless (-r $file) {warn "$file not found\n" unless $nowarn; return undef;}
+	unless (-r $file) {warn "$file not found\n"; return undef;}
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;
 	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
@@ -8085,11 +8085,11 @@ sub load
 	return $loader->get_pixbuf;
 }
 
-#sub drop	#drop a file from the cache
-#{	my $file=shift;
-#	my $re=qr/^(?:\d+:)?\Q$file\E/;
-#	delete $PbCache{$_} for m/$re/, keys %PbCache;
-#}
+sub drop	#drop a file from the cache
+{	my $file=shift;
+	my $re=qr/^(?:\d+:)?\Q$file\E/;
+	delete $PbCache{$_} for grep m/$re/, keys %PbCache;
+}
 
 sub trim
 {	my @list= sort {$PbCache{$a}{lastuse} <=> $PbCache{$b}{lastuse}} keys %PbCache;
@@ -8154,49 +8154,35 @@ sub LoadPixData
 	return $loader;
 }
 
-sub NewScaledImageFromFile
-{	my ($pix,$w,$q)=@_;	# $pix=file or pixbuf , $w=size, $q true for HQ
-	return undef unless $pix;
-	my $h=$w;
-	unless (ref $pix)
-	{ $pix=load($pix);
-	  return undef unless $pix;
-	}
+sub Scale_with_ratio
+{	my ($pix,$w,$h,$q)=@_;
 	my $ratio=$pix->get_width / $pix->get_height;
 	if    ($ratio>1) {$h=int($w/$ratio);}
 	elsif ($ratio<1) {$w=int($h*$ratio);}
-	$q=($q)? 'bilinear' : 'nearest';
-	return Gtk2::Image->new_from_pixbuf( $pix->scale_simple($w, $h, $q) );
-}
-
-sub ScaleImageFromFile
-{	my ($img,$w,$file,$nowarn)=@_;
-	$img->{pixbuf}=load($file,undef,$nowarn);
-	ScaleImage($img,$w);
+	$q= $q ? 'bilinear' : 'nearest';
+	return $pix->scale_simple($w, $h, $q);
 }
 
 sub ScaleImage
-{	my ($img,$w)=@_;
+{	my ($img,$s,$file)=@_;
+	$img->{pixbuf}=load($file) if $file;
 	my $pix=$img->{pixbuf};
-	if (!$pix || !$w || $w<16) { $img->set_from_pixbuf(undef); return; }
-	my $h=$w;
-	my $ratio=$pix->get_width / $pix->get_height;
-	if    ($ratio>1) {$h=int($w/$ratio);}
-	elsif ($ratio<1) {$w=int($h*$ratio);}
-	$img->set_from_pixbuf( $pix->scale_simple($w, $h, 'bilinear') );
+	if (!$pix || !$s || $s<16) { $img->set_from_pixbuf(undef); return; }
+	$img->set_from_pixbuf( Scale_with_ratio($pix,$s,$s,1) );
 }
 
 sub pixbox_button_press_cb	# zoom picture when clicked
 {	my ($eventbox,$event,$button)=@_;
 	return 0 if $button && $event->button != $button;
-	my $image;
+	my $pixbuf;
 	if ($eventbox->{pixdata})
-	{	my $loader=::LoadPixData($eventbox->{pixdata},350);
-		$image=Gtk2::Image->new_from_pixbuf($loader->get_pixbuf) if $loader;
+	{	my $loader=LoadPixData($eventbox->{pixdata},350);
+		$pixbuf=$loader->get_pixbuf if $loader;
 	}
-	elsif (my $pixbuf=$eventbox->child->{pixbuf})
-	 { $image= NewScaledImageFromFile($pixbuf,350,1); }
-	return 1 unless $image;
+	elsif (my $pb=$eventbox->child->{pixbuf})	{ $pixbuf= Scale_with_ratio($pb,350,350,1); }
+	elsif (my $file=$eventbox->child->{filename})	{ $pixbuf= pixbuf($file,350); }
+	return 1 unless $pixbuf;
+	my $image=Gtk2::Image->new_from_pixbuf($pixbuf);
 	my $menu=Gtk2::Menu->new;
 	my $item=Gtk2::MenuItem->new;
 	$item->add($image);
@@ -8211,17 +8197,13 @@ package AAPicture;
 
 my $watcher;
 
-INIT
-{	::Watch(undef, Picture_artist => \&AAPicture_Changed);	#FIXME PHASE1
-	::Watch(undef, Picture_album  => \&AAPicture_Changed);	#FIXME PHASE1
-}
-
 sub GetPicture
 {	my ($field,$key)=@_;
 	return Songs::Picture($key,$field,'get');
 }
 sub SetPicture
 {	my ($field,$key,$file)=@_;
+	GMB::Picture::drop($file); #make sure the cache is up-to-date
 	Songs::Picture($key,$field,'set',$file);
 }
 
