@@ -121,11 +121,19 @@ sub prefbox {
 
     my $rating_on_played_entry = ::NewPrefEntry(OPT.'RatingOnPlayed', _"Add to rating on played completely:", sizeg1 => $sg1,sizeg2=>$sg2);
 
-    my $set_default_rating_label = Gtk2::Label->new("Apply your default rating to files when they are first played (rating update will not work on files with default rating otherwise):");
+    my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (rating update will not work on files with default rating otherwise):");
     my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped", _"... on skipped songs");
     my $set_default_rating_played_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnPlayed", _"... on played songs");
+    my $rating_freq_dump_button = Gtk2::Button->new("CSV dump of rating populations to stdout");
+    $rating_freq_dump_button->signal_connect(clicked => sub {
+	for(my $r_count = 0; $r_count <= 100; $r_count++) {
+	    my $r_filter = Filter->new("rating:e:" . $r_count);
+	    my $IDs = $r_filter->filter;
+	    print $r_count . "," . scalar @$IDs . "\n";
+	}
+    });
 
-    $big_vbox->pack_start($_, ::FALSE, ::FALSE, 0) for $authors_hbox, $grace_period_entry, $rating_on_skip_entry, $rating_on_skip_before_grace_entry, $rating_on_played_entry, $set_default_rating_label, $set_default_rating_skip_check, $set_default_rating_played_check;
+    $big_vbox->pack_start($_, ::FALSE, ::FALSE, 0) for $authors_hbox, $grace_period_entry, $rating_on_skip_entry, $rating_on_skip_before_grace_entry, $rating_on_played_entry, $set_default_rating_label, $set_default_rating_skip_check, $set_default_rating_played_check, $rating_freq_dump_button;
 
     $big_vbox->show_all();
     return $big_vbox;
