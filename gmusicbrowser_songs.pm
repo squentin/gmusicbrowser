@@ -55,6 +55,8 @@ our %timespan_menu=
 		get_gid		=> 'my $v=#_#; ref $v ? $v : [$v]',
 		gid_to_get	=> '(#GID# ? ___name[#GID#] : "")',
 		gid_to_display	=> '___name[#GID#]',
+		s_sort		=> '___sort{ sprintf("%x", #_#)}',
+		si_sort		=> '___isort{ sprintf("%x", #_#)}',
 		's_sort:gid'	=> '___name[#GID#]',
 		'si_sort:gid'	=> '___iname[#GID#]',
 		get		=> 'do {my $v=#_#; !$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v];}',
@@ -67,8 +69,11 @@ our %timespan_menu=
 			{	my $id= #sgid_to_gid(VAL=$name)#;
 				push @ids,$id;
 			}
-			#_#=	@ids<2 ? $ids[0]||0 :
-				(___group{join(" ",map sprintf("%x",$_),@ids)}||= \@ids);}',
+			my $val=	@ids<2 ? $ids[0]||0 :
+				(___group{join(" ",map sprintf("%x",$_),@ids)}||= \@ids);
+			___isort{ sprintf("%x",$val) }||= ::superlc( ___sort{ sprintf("%x",$val) }||= join ";",@list );
+			#_#=$val;
+			}',
 		diff		=> 'do {my $v=#_#; my $old=!$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v]; $v=#VAL#; my $new= join "\\x00", sort (ref $v ? @$v : split /\\x00/,$v); $old ne $new; }', #FIXME use simpler/faster version if perl5.10
 		display 	=> 'do { my $v=#_#; !$v ? "" : ref $v ? join ", ",map ___name[$_],@$v : ___name[$v]; }',
 		set_multi	=> 'do {my $c=#_#; my %h=( $c ? ref $c ? map((___name[$_]=>0), @$c) : (___name[$c]=>0) : ()); my $changed; my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
@@ -1663,6 +1668,7 @@ sub SortList		#FIXME add a few fields (like 'disc track path file') to all sort 
 			unless ($Def{$field}) { warn "Songs::SortList : Invalid field $field\n"; next }
 			unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $field\n"; next }
 			my ($sortinit,$sortcode)= SortCode($field,$inv,$i);
+			unless ($sortcode) { warn "Error trying to sort by $field\n"; next }
 			push @code, $sortcode;
 			$init.= $sortinit."; " if $sortinit;
 		}
