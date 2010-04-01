@@ -3165,7 +3165,8 @@ sub AlbumListButton_press_cb
 	return unless defined $self->{Sel};
 	::PopupAA('album', from => $self->{Sel}, cb=>sub
 		{	my $key=$_[1];
-			::SetFilter( $self, 'album:~:'.$key, $self->{filternb}, $self->{group} );
+			my $filter= Songs::MakeFilterFromGID('album',$key);
+			::SetFilter( $self, $filter, $self->{filternb}, $self->{group} );
 		});
 	1;
 }
