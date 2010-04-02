@@ -7,7 +7,7 @@ HBmenu		= _MBmenu
 HBButtons1	= Prev Stop Play Next ExtraButtons 5-Vol -Pref -Playlist(toggle)
 HBButtons3	= 5Sort 5Filter 5Queue 5Pos -Stars
 HBTime		= LabelTime Length _TimeBar
-HBTitle		= LockSong _Title
+HBTitle		= LockSong _Title LabelsIcons
 HBArtist	= LockArtist _Artist
 HBAlbum		= LockAlbum _Album -Date
 VBText		= HBButtons1 2HBTitle 2HBArtist 2HBAlbum HBTime
@@ -30,14 +30,13 @@ Type=G
 Default	= Window(sticky=1)
 HBButtons	= Vol Prev Stop Play Next Playlist ExtraButtons Pref Quit
 HBIndic		= Sort 10Filter Queue 10Pos -Stars
-HBTitle		= Filler0 _Title LabelsIcons
+HBTitle		= LockSong _Title LabelsIcons
 HBArtist	= LockArtist _Artist
 HBAlbum		= LockAlbum _Album -Date
 HBTime		= LabelTime Length _TimeBar
 VBmain		= HBButtons HBIndic _VBText -HBTime
 VBText		= 2HBTitle 2HBArtist 2HBAlbum
 HBmain		= _VBmain 2Filler1 -Cover
-HSize0		= Filler0 LockArtist LockAlbum Sort
 VolumeScroll	= HBmain
 
 [with queue] based on Small player
