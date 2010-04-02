@@ -3265,6 +3265,7 @@ sub new
 {	my ($class,$opt)=@_;
 	my $self = bless Gtk2::ToggleButton->new, $class;
 	my ($icon,$label);
+	$self->set_relief($opt->{relief}) if $opt->{relief};
 	$label=Gtk2::Label->new($opt->{label}) if defined $opt->{label};
 	$icon=Gtk2::Image->new_from_stock($opt->{icon},$opt->{size}) if $opt->{icon};
 	my $child= ($label && $icon) ?	::Hpack($icon,$label) :

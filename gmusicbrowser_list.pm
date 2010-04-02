@@ -1548,7 +1548,7 @@ sub new
 	$self->{SaveOptions}=\&SaveOptions;
 	%$opt=( @DefaultOptions, %$opt );
 	my @pids=split /\|/, $opt->{pages};
-	$self->{$_}=$opt->{$_} for qw/nb group min/;
+	$self->{$_}=$opt->{$_} for qw/nb group min hidetabs/;
 	$self->{main_opt}{$_}=$opt->{$_} for qw/group no_typeahead searchbox activate/; #options passed to children
 	my $nb=$self->{nb};
 	my $group=$self->{group};
