@@ -26,7 +26,7 @@ use constant {
     ACTIONS => ["REMOVE_FROM_RATING", "ADD_TO_RATING", "RATING_SET_TO_DEFAULT"]
 };
 
-::SetDefaultOptions(OPT, RatingOnSkip => -5, GracePeriod => 15, RatingOnSkipBeforeGrace => -1, RatingOnPlayed => 5, SetDefaultRatingOnSkipped => 1, SetDefaultRatingOnPlayed => 1, MyHash => { a => "a", b => "actually b"}, Rules => {internet => 42});
+::SetDefaultOptions(OPT, RatingOnSkip => -5, GracePeriod => 15, RatingOnSkipBeforeGrace => -1, RatingOnPlayed => 5, SetDefaultRatingOnSkipped => 1, SetDefaultRatingOnPlayed => 1, MyHash => { a => "a", b => "actually b"}, Rules => [[ {signal => 'Finished', field => "rating", value => 5}, {signal => 'Skipped', field => 'rating', value => -5 }, { signal => "SkippedBefore15", field => "rating", value => -1}]]);
 
 my $self=bless {},__PACKAGE__;
 
@@ -96,12 +96,76 @@ sub Stop {
     ::UnWatch($self, $_) for qw/Played/;
 }
 
-sub AddRow {
-    my $rule = $_[0];
+# rule editor.
+# - event
+# - value .... could somehow be another one of these rules?
+# - operator
+
+my $editor_signals = ['Played', 'Skipped', 'Finished', 'SkippedBefore15'];
+my $editor_fields = ['rating'];
+
+# perl, sigh.
+# sub indexOfStr($arr, $matey) {
+#     for(my $idx = 0; idx < $#{$arr}; idx ++) {
+#         return $idx if $arr eq $matey;
+# }
+
+sub RuleEditor {
+    my ($rule) = @_;
+
+    my $frame = Gtk2::Frame->new();
+    my $editor_hbox = Gtk2::HBox->new();
+
+    my $signal_combo = Gtk2::ComboBox->new_text();
+    my $signal_idx = 0;
+    foreach my $signal (@{$editor_signals}) {
+        $signal_combo->append_text($signal);
+        if($signal eq ${$rule}{signal}) {
+            $signal_combo->set_active($signal_idx);
+        }
+        $signal_idx++;
+    }
+    $signal_combo->signal_connect('changed', sub {
+        ${$rule}{signal} = $signal_combo->get_active_text();
+    });
+
+    my $field_combo = Gtk2::ComboBox->new_text();
+    my $field_idx = 0;
+    foreach my $field (@{$editor_fields}) {
+        $field_combo->append_text($field);
+        if($field eq ${$rule}{field}) {
+            $field_combo->set_active($field_idx);
+        }
+        $field_idx++;
+    }
+    $field_combo->signal_connect('changed', sub {
+        ${$rule}{field} = $field_combo->get_active_text();
+    });
+
+    my $value_entry = Gtk2::Entry->new();
+    $value_entry->set_text(${$rule}{value});
+    $value_entry->signal_connect('changed', sub {
+        ${$rule}{value} = $value_entry->get_text();
+    });
 
 
-    my $button = Gtk2::Button->new("lolwhut: " . $rule);
-    $self->{rules_table}->attach($button, 0, 1, $self->{current_row}, $self->{current_row}+1, "shrink", "shrink", 0, 0);
+    $editor_hbox->add(Gtk2::Label->new("Signal: "));
+    $editor_hbox->add($signal_combo);
+    $editor_hbox->add(Gtk2::Label->new("Field: "));
+    $editor_hbox->add($field_combo);
+    $editor_hbox->add(Gtk2::Label->new("Differential: "));
+    $editor_hbox->add($value_entry);
+    $editor_hbox->show_all();
+    $frame->add($editor_hbox);
+
+    return $frame;
+}
+
+sub RulesListAddRow {
+    my $rule = $_[0]; # hash reference
+
+     my $rule_editor = RuleEditor($rule);
+    $self->{rules_table}->attach($rule_editor, 0, 1, $self->{current_row}, $self->{current_row}+1, "shrink", "shrink", 0, 0);
     $self->{current_row} += 1;
 }
 
@@ -112,69 +176,17 @@ sub prefbox {
     $rules_scroller->set_policy('never', 'automatic');
     $self->{rules_table} = Gtk2::Table->new(1, 4, ::FALSE);
     $rules_scroller->add_with_viewport($self->{rules_table});
-
-    # my $test_button = Gtk2::Button->new("you smell");
-    # $self->{rules_table}->attach($test_button, 0, 1, 0, 1, "shrink", "shrink", 0, 0); #expand, shrink, or fill?
-
-    # my $test_button2 = Gtk2::Button->new("you smell2");
-    # $self->{rules_table}->attach($test_button2, 0, 1, 1, 2, "shrink", "shrink", 0, 0); #expand, shrink, or fill?
-
-
-    # reset counters
-    # iterate over existing rules and Add 'em.
-
-
-
-
     $self->{current_row} = 0;
-#    warn $::Options{OPT.'Rules'}->values->join(', ');
+
+    # force some debug fixtures in
+    # $::Options{OPT.'Rules'} = [ {signal => 'Finished', field => "rating", value => 5}, {signal => 'Skipped', field => 'rating', value => -5 }, { signal => "SkippedBefore15", field => "rating", value => -1}];
 
     my $rules = $::Options{OPT.'Rules'};
 
-    # ${$rules}{"internet"} = 45;
-
-    # use Data::Dumper qw( Dumper );
-    # print STDERR "The hash is " . Dumper( $rules ) . "\n";
-
-
-    warn "attempting to extract keys from hash ref: " . $rules;
-
-    foreach my $key (keys %{$rules}) {
-        my $rule_settings = ${$rules}{$key};
-        AddRow($key);
+    foreach my $rule (@{$rules}) {
+        RulesListAddRow($rule);
     }
 
-    # my $sg1=Gtk2::SizeGroup->new('horizontal');
-    # my $sg2=Gtk2::SizeGroup->new('horizontal');
-
-    # # rating change on skip
-    # # rating change on full play
-    # # if less than 15% in there somehow
-
-    # my $grace_period_entry = ::NewPrefEntry(OPT."GracePeriod",
-    #                                         _"Grace period:",
-    #                                         sizeg1 => $sg1,sizeg2=>$sg2,
-    #                                         tip => _"grace period denoting a 'fast' skip in which to apply a different addend, in seconds; if zero, grace period does not apply");
-    # my $rating_on_skip_entry = ::NewPrefSpinButton(OPT.'RatingOnSkip',
-    #                                                -100, 100,
-    #                                                sizeg1 => $sg1,sizeg2=>$sg2,,
-    #                                                text1 => _"Add to rating on skip:");
-    # my $rating_on_skip_before_grace_entry = ::NewPrefSpinButton(OPT.'RatingOnSkipBeforeGrace',
-    #                                                             -100, 100,
-    #                                                             sizeg1 => $sg1,sizeg2=>$sg2,
-    #                                                             text1 => _"Add to rating on skip (before grace period):");
-    # my $rating_on_played_entry = ::NewPrefSpinButton(OPT.'RatingOnPlayed',
-    #                                                  -100, 100,
-    #                                                  sizeg1 => $sg1,sizeg2=>$sg2,
-    #                                                  text1 => _"Add to rating on played completely:");
-
-    # my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (required for rating update on files with default rating):");
-    # my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped",
-    #                                                         _"... on skipped songs",);
-    # my $set_default_rating_played_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnPlayed",
-    #                                                           _"... on played songs");
-
-    # $big_vbox->pack_start($_, ::FALSE, ::FALSE, 0) for $grace_period_entry, $rating_on_skip_entry, $rating_on_skip_before_grace_entry, $rating_on_played_entry, $set_default_rating_label, $set_default_rating_skip_check, $set_default_rating_played_check;
     $big_vbox->add($rules_scroller);
 
     $big_vbox->show_all();
