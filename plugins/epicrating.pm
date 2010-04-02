@@ -21,9 +21,12 @@ use warnings;
 
 use constant {
     OPT => 'PLUGIN_EPICRATING_',#used to identify the plugin's options
+    ALWAYS_AVAILABLE => ["PlayingID"],
+    EVENTS => {played => ["PlayTime", "PlayedPercent"]},
+    ACTIONS => ["REMOVE_FROM_RATING", "ADD_TO_RATING", "RATING_SET_TO_DEFAULT"]
 };
 
-::SetDefaultOptions(OPT, RatingOnSkip => -5, GracePeriod => 15, RatingOnSkipBeforeGrace => -1, RatingOnPlayed => 5, SetDefaultRatingOnSkipped => 1, SetDefaultRatingOnPlayed => 1);
+::SetDefaultOptions(OPT, RatingOnSkip => -5, GracePeriod => 15, RatingOnSkipBeforeGrace => -1, RatingOnPlayed => 5, SetDefaultRatingOnSkipped => 1, SetDefaultRatingOnPlayed => 1, MyHash => { a => "a", b => "actually b"}, Rules => {internet => 42});
 
 my $self=bless {},__PACKAGE__;
 
@@ -86,46 +89,93 @@ sub Played {
 
 sub Start {
     ::Watch($self, Played => \&Played);
+
 }
 
 sub Stop {
     ::UnWatch($self, $_) for qw/Played/;
 }
 
+sub AddRow {
+    my $rule = $_[0];
+
+
+    my $button = Gtk2::Button->new("lolwhut: " . $rule);
+    $self->{rules_table}->attach($button, 0, 1, $self->{current_row}, $self->{current_row}+1, "shrink", "shrink", 0, 0);
+    $self->{current_row} += 1;
+}
+
 sub prefbox {
     # TODO validate good values?E!??!
-    my $big_vbox= Gtk2::VBox->new(::FALSE, 2);
-    my $sg1=Gtk2::SizeGroup->new('horizontal');
-    my $sg2=Gtk2::SizeGroup->new('horizontal');
+    my $big_vbox = Gtk2::VBox->new(::FALSE, 2);
+    my $rules_scroller = Gtk2::ScrolledWindow->new();
+    $rules_scroller->set_policy('never', 'automatic');
+    $self->{rules_table} = Gtk2::Table->new(1, 4, ::FALSE);
+    $rules_scroller->add_with_viewport($self->{rules_table});
 
-    # rating change on skip
-    # rating change on full play
-    # if less than 15% in there somehow
+    # my $test_button = Gtk2::Button->new("you smell");
+    # $self->{rules_table}->attach($test_button, 0, 1, 0, 1, "shrink", "shrink", 0, 0); #expand, shrink, or fill?
 
-    my $grace_period_entry = ::NewPrefEntry(OPT."GracePeriod",
-                                            _"Grace period:",
-                                            sizeg1 => $sg1,sizeg2=>$sg2,
-                                            tip => _"grace period denoting a 'fast' skip in which to apply a different addend, in seconds; if zero, grace period does not apply");
-    my $rating_on_skip_entry = ::NewPrefSpinButton(OPT.'RatingOnSkip',
-                                                   -100, 100,
-                                                   sizeg1 => $sg1,sizeg2=>$sg2,,
-                                                   text1 => _"Add to rating on skip:");
-    my $rating_on_skip_before_grace_entry = ::NewPrefSpinButton(OPT.'RatingOnSkipBeforeGrace',
-                                                                -100, 100,
-                                                                sizeg1 => $sg1,sizeg2=>$sg2,
-                                                                text1 => _"Add to rating on skip (before grace period):");
-    my $rating_on_played_entry = ::NewPrefSpinButton(OPT.'RatingOnPlayed',
-                                                     -100, 100,
-                                                     sizeg1 => $sg1,sizeg2=>$sg2,
-                                                     text1 => _"Add to rating on played completely:");
+    # my $test_button2 = Gtk2::Button->new("you smell2");
+    # $self->{rules_table}->attach($test_button2, 0, 1, 1, 2, "shrink", "shrink", 0, 0); #expand, shrink, or fill?
 
-    my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (required for rating update on files with default rating):");
-    my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped",
-                                                            _"... on skipped songs",);
-    my $set_default_rating_played_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnPlayed",
-                                                              _"... on played songs");
 
-    $big_vbox->pack_start($_, ::FALSE, ::FALSE, 0) for $grace_period_entry, $rating_on_skip_entry, $rating_on_skip_before_grace_entry, $rating_on_played_entry, $set_default_rating_label, $set_default_rating_skip_check, $set_default_rating_played_check;
+    # reset counters
+    # iterate over existing rules and Add 'em.
+
+
+
+
+    $self->{current_row} = 0;
+#    warn $::Options{OPT.'Rules'}->values->join(', ');
+
+    my $rules = $::Options{OPT.'Rules'};
+
+    # ${$rules}{"internet"} = 45;
+
+    # use Data::Dumper qw( Dumper );
+    # print STDERR "The hash is " . Dumper( $rules ) . "\n";
+
+
+    warn "attempting to extract keys from hash ref: " . $rules;
+
+    foreach my $key (keys %{$rules}) {
+        my $rule_settings = ${$rules}{$key};
+        AddRow($key);
+    }
+
+    # my $sg1=Gtk2::SizeGroup->new('horizontal');
+    # my $sg2=Gtk2::SizeGroup->new('horizontal');
+
+    # # rating change on skip
+    # # rating change on full play
+    # # if less than 15% in there somehow
+
+    # my $grace_period_entry = ::NewPrefEntry(OPT."GracePeriod",
+    #                                         _"Grace period:",
+    #                                         sizeg1 => $sg1,sizeg2=>$sg2,
+    #                                         tip => _"grace period denoting a 'fast' skip in which to apply a different addend, in seconds; if zero, grace period does not apply");
+    # my $rating_on_skip_entry = ::NewPrefSpinButton(OPT.'RatingOnSkip',
+    #                                                -100, 100,
+    #                                                sizeg1 => $sg1,sizeg2=>$sg2,,
+    #                                                text1 => _"Add to rating on skip:");
+    # my $rating_on_skip_before_grace_entry = ::NewPrefSpinButton(OPT.'RatingOnSkipBeforeGrace',
+    #                                                             -100, 100,
+    #                                                             sizeg1 => $sg1,sizeg2=>$sg2,
+    #                                                             text1 => _"Add to rating on skip (before grace period):");
+    # my $rating_on_played_entry = ::NewPrefSpinButton(OPT.'RatingOnPlayed',
+    #                                                  -100, 100,
+    #                                                  sizeg1 => $sg1,sizeg2=>$sg2,
+    #                                                  text1 => _"Add to rating on played completely:");
+
+    # my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (required for rating update on files with default rating):");
+    # my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped",
+    #                                                         _"... on skipped songs",);
+    # my $set_default_rating_played_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnPlayed",
+    #                                                           _"... on played songs");
+
+    # $big_vbox->pack_start($_, ::FALSE, ::FALSE, 0) for $grace_period_entry, $rating_on_skip_entry, $rating_on_skip_before_grace_entry, $rating_on_played_entry, $set_default_rating_label, $set_default_rating_skip_check, $set_default_rating_played_check;
+    $big_vbox->add($rules_scroller);
 
     $big_vbox->show_all();
     return $big_vbox;
