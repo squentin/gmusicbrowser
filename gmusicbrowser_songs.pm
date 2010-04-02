@@ -2017,7 +2017,7 @@ sub AreIn
 	return [grep defined && vec($Presence{$self},$_,1), @$IDs];
 }
 sub save_to_string
-{	return join ' ',map sprintf("%d",$_), @{$_[0]};	#use sprintf so that the numbers are not stringified => use more memory
+{	return join ' ',map $_, @{$_[0]};	#map $_ so that the numbers are not stringified => use more memory
 }
 
 sub GetName

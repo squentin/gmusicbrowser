@@ -3227,7 +3227,7 @@ sub collage
 	}
 
 	my $pixbuf= Gtk2::Gdk::Pixbuf->new( $pixbufs[0]->get_colorspace, 1,8, $w,$h);
-	$pixbuf->fill("\x00\x00\x00\x00");	 #fill with transparent black
+	$pixbuf->fill(0);	 #fill with transparent black
 
 	for my $pb (@pixbufs)
 	{	my $pw=$pb->get_width;

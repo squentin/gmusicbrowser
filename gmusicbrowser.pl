@@ -911,7 +911,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	OpenQueue	=> [\&EditQueue,			_"Open Queue window"],
 	OpenSearch	=> [sub { Layout::Window->new($Options{LayoutS}, uniqueid=>'Search'); },	_"Open Search window"],
 	OpenContext	=> [\&ContextWindow,			_"Open Context window"],
-	OpenCustom	=> [sub { Layout::Window->new($_[1]); },	_"Open Custom window",_"Name of layout", sub { TextCombo->new( Layout::get_layout_list() ); }],
+	OpenCustom	=> [sub { Layout::Window->new($_[1]); },	_"Open Custom window",_"Name of layout", sub { TextCombo::Tree->new( Layout::get_layout_list() ); }],
 	PopupCustom	=> [sub { PopupLayout($_[1],$_[0]); },		_"Popup Custom window",_"Name of layout", sub { TextCombo::Tree->new( Layout::get_layout_list() ); }],
 	CloseWindow	=> [sub { $_[0]->get_toplevel->close_window if $_[0];}, _"Close Window"],
 	SetPlayerLayout => [sub { SetOption(Layout=>$_[1]); CreateMainWindow(); },_"Set player window layout",_"Name of layout", sub {  TextCombo::Tree->new( Layout::get_layout_list('G') ); }, ],
@@ -2912,6 +2912,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 
 sub ChooseSongs
 {	my ($format,@IDs)=@_;
+	return unless @IDs;
 	$format||= __x( _"{song} by {artist}", song => "<b>%t</b>", artist => "%a");
 	my $menu = Gtk2::Menu->new;
 	my $activate_callback=sub
@@ -8284,7 +8285,6 @@ sub build_store
 			push @$names,$h->{$key}
 		}
 	}
-	my $found;
 	for my $i (0..$#$list)
 	{	my $iter= $store->append;
 		$store->set($iter, 0,$names->[$i], 1,$list->[$i]);
