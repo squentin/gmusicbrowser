@@ -1714,10 +1714,12 @@ sub Position
 
 sub make_transparent
 {	my @children=($_[0]);
+	my $colormap=$children[0]->get_screen->get_rgba_colormap;
+	return unless $colormap;
 	while (my $widget=shift @children)
 	{	push @children, $widget->get_children if $widget->isa('Gtk2::Container');
 		unless ($widget->no_window)
-		{	$widget->set_colormap($widget->get_screen->get_rgba_colormap);
+		{	$widget->set_colormap($colormap);
 			$widget->set_app_paintable(1);
 			$widget->signal_connect(expose_event => \&transparent_expose_cb);
 		}
