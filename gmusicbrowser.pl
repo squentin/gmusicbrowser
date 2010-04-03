@@ -3034,27 +3034,35 @@ sub PopupAA
 	else { @keys=@{ AA::GetAAList($col) }; }
 
 #### callbacks
-	my $rmbcallback;
+	my $altcallback;
 	unless ($callback)
 	{  $callback=sub		#jump to first song
-	   {	return if $_[0]->get_submenu;
-		my $key=$_[1];
-		my $ID=FindFirstInListPlay( AA::GetIDs($col,$key) );
-		Select(song => $ID);
+	   {	my ($item,$key)=@_;
+		return if $item->get_submenu;
+		my $IDs=AA::GetIDs($col,$key);
+		if ($item->{middle})	{ Enqueue(@$IDs); }	#enqueue artist/album on middle-click
+		else
+		{	my $ID=FindFirstInListPlay( $IDs );
+			Select(song => $ID);
+		}
 	   };
-	   $rmbcallback=($col eq 'album')?
-		sub	#Albums rmb cb
+	   $altcallback=($col eq 'album')?
+		sub	#Albums button-press event : set up a songs submenu on right-click, alternate action on middle-click
 		{	my ($item,$event,$key)=@_;
-			return 0 unless $event->button==3;
-			my $submenu=ChooseSongsFromA($key);
-			$item->set_submenu($submenu);
+			if ($event->button==3)
+			{	my $submenu=ChooseSongsFromA($key);
+				$item->set_submenu($submenu);
+			}
+			elsif ($event->button==2) { $item->{middle}=1; }
 			0; #return 0 so that the item receive the click and popup the submenu
 		}:
-		sub	#Arists rmb cb
+		sub	#Artists button-press event : set up an album submenu on right-click, alternate action on middle-click
 		{	my ($item,$event,$key)=@_;
-			return 0 unless $event->button==3;
-			my $submenu=PopupAA('album', from=>$key);
-			$item->set_submenu($submenu);
+			if ($event->button==3)
+			{	my $submenu=PopupAA('album', from=>$key);
+				$item->set_submenu($submenu);
+			}
+			elsif ($event->button==2) { $item->{middle}=1; }
 			0;
 		};
 	}
@@ -3082,7 +3090,7 @@ sub PopupAA
 			#$label->set_markup( AA::ReplaceFields($key,"<b>%a</b>%Y\n<small>%s <small>%l</small></small>",$col,1) );
 			$item->add($label);
 			$item->signal_connect(activate => $callback,$key);
-			$item->signal_connect(button_press_event => $rmbcallback,$key) if $rmbcallback;
+			$item->signal_connect(button_press_event => $altcallback,$key) if $altcallback;
 			#$menu->append($item);
 			$menu->attach($item, $colnb, $colnb+1, $row, $row+1); if (++$row>$rows) {$row=0;$colnb++;}
 			my $img=AAPicture::newimg($col,$key,$size);
