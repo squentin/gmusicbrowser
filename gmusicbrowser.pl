@@ -335,6 +335,11 @@ our @submenuRemove=
 	{ label => _"Remove from library",	code => sub { SongsRemove($_[0]{IDs}); }, },
 	{ label => _"Remove from disk",		code => sub { DeleteFiles($_[0]{IDs}); },	test => sub {!$CmdLine{ro}},	stockicon => 'gtk-delete' },
 );
+our @submenuQueue=
+(	{ label => _"Prepend",			code => sub {  QueueInsert( @{ $_[0]{IDs} } ); }, },
+	{ label => _"Replace",			code => sub { ReplaceQueue( @{ $_[0]{IDs} } ); }, },
+	{ label => _"Append",			code => sub {      Enqueue( @{ $_[0]{IDs} } ); }, },
+);
 #modes : S:Search, B:Browser, Q:Queue, L:List, P:Playing song in the player window, F:Filter Panels (submenu "x songs")
 our @SongCMenu=
 (	{ label => _"Song Properties",	code => sub { DialogSongProp (@{ $_[0]{IDs} }); },	onlyone => 'IDs', stockicon => 'gtk-edit' },
@@ -343,7 +348,7 @@ our @SongCMenu=
 		onlymany => 'IDs', 	stockicon => 'gtk-media-play'},
 	{ label => _"Play Only Displayed",code => sub { Select(song => 'first', play => 1, staticlist => \@{$_[0]{listIDs}} ); },
 		test => sub { @{$_[0]{IDs}}<2 }, notmode => 'A',	onlymany => 'listIDs',	stockicon => 'gtk-media-play' },
-	{ label => _"Enqueue Selected",	code => sub { Enqueue(@{ $_[0]{IDs} }); },
+	{ label => _"Enqueue Selected",		code => sub { Enqueue(@{ $_[0]{IDs} }); },	submenu3=> \@submenuQueue,
 		notempty => 'IDs', notmode => 'QP', stockicon => 'gmb-queue' },
 	{ label => _"Enqueue Displayed",	code => sub { Enqueue(@{ $_[0]{listIDs} }); },
 		empty => 'IDs',	notempty=> 'listIDs', notmode => 'QP', stockicon => 'gmb-queue' },
@@ -2162,7 +2167,6 @@ sub EnqueueSame
 }
 sub EnqueueFilter
 {	my $l=$_[0]->filter;
-	SortList($l) if @$l>1;
 	Enqueue(@$l);
 }
 sub Enqueue
@@ -2171,6 +2175,12 @@ sub Enqueue
 	@l=grep $_!=$SongID, @l  if @l>1 && defined $SongID;
 	$Queue->Push(\@l);
 	# ToggleLock($TogLock) if $TogLock;	#unset lock
+}
+sub QueueInsert
+{	my @l=@_;
+	SortList(\@l) if @l>1;
+	@l=grep $_!=$SongID, @l  if @l>1 && defined $SongID;
+	$Queue->Unshift(\@l);
 }
 sub ReplaceQueue
 {	$Queue->Replace();
@@ -3291,7 +3301,15 @@ sub BuildMenu
 			$item->set_submenu($submenu);
 		}
 		else
-		{	$item->signal_connect (activate => sub { $m->{code}->($args); });
+		{	$item->{code}=$m->{code};
+			$item->signal_connect (activate => sub { $_[0]{code}->($_[1]) if $_[0]{code}; },$args);
+			if (my $submenu3=$m->{submenu3})	# set a submenu on right-click
+			{	$submenu3= BuildMenu($submenu3,$args);
+				$item->signal_connect (button_press_event => sub { my ($item,$event,$submenu3)=@_; return 0 unless $event->button==3; $item->{code}=undef;  $item->set_submenu($submenu3); $submenu3->show_all; 0;  },$submenu3);
+			}
+			elsif (my $code3=$m->{code3})		# alternate action on right-click
+			{	$item->signal_connect (button_press_event => sub { my ($item,$event,$code3)=@_; $item->{code}=$code3 if $event->button==3; 0;  }, $code3);
+			}
 		}
 		$menu->append($item);
 	}
