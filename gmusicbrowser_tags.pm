@@ -1151,7 +1151,7 @@ sub new
 	$self->{table}=$table;
 	$self->fill;
 
-	my $advanced=Gtk2::Button->new(_"Advanced Tag Editing".' ...');
+	my $advanced=Gtk2::Button->new(_("Advanced Tag Editing").' ...');
 	$advanced->signal_connect( clicked => \&advanced_cb );
 
 	$self->pack_start($labelfile,FALSE,FALSE,1);

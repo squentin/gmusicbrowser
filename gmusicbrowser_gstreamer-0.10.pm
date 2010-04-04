@@ -582,7 +582,7 @@ sub RGA_write
 	FileTag::Write($ID, \@modif, \&RGA_write_error);
 }
 sub RGA_write_error
-{	my $err=_"Error writing replaygain tags :\n".shift;
+{	my $err=_("Error writing replaygain tags :\n").shift;
 	my $abort=_"Abort ReplayGain analysis";
 	my $ret=::Retry_Dialog($err,undef,$abort);
 	if ($ret eq 'abort') {RGA_stop()}

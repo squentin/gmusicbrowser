@@ -1250,7 +1250,7 @@ sub TurnOff
 	my $sec=21;
 	my $timer=sub	#FIXME can be more than 1 second
 		{ 	return 0 unless $sec;
-			if (--$sec) {$dialog->set_markup(::PangoEsc(_"About to turn off the computer in :"."\n".__("%d second","%d seconds",$sec)))}
+			if (--$sec) {$dialog->set_markup(::PangoEsc(_("About to turn off the computer in :")."\n".__("%d second","%d seconds",$sec)))}
 			else { $dialog->response(1); }
 			return $sec;
 		};
@@ -6504,9 +6504,8 @@ sub new
 
 	if (defined $name)
 	{	if ($name eq '')
-		{	$name=0;
-			$name++ while exists $self->{hash}{_"noname".$name};
-			$name=_"noname".$name;
+		{	$name=_"noname";
+			$name=~s/(?<=\D)(\d*)$/($1||1)+1/e while $self->{hash}{$name};
 		}
 		else { $init=$self->{hash}{$name} unless defined $init; }
 	}

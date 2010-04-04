@@ -132,7 +132,7 @@ sub response_cb
 		{	$interval*=2;
 			$interval=30*60 if $interval>30*60;
 			$interval=60 if $interval<60;
-			$error.=::__x(' ('._"retry in {seconds} s".')',seconds => $interval);
+			$error.= ::__x( ' (' . _("retry in {seconds} s") . ')', seconds => $interval);
 		}
 		Log(_("Handshake failed : ").$error);
 	}

@@ -1443,10 +1443,10 @@ my %sort_menu=
 );
 our @MenuPageOptions;
 my @MenuSubGroup=
-(	{ label => sub {_"Set subgroup".' '.$_[0]{depth}},	submenu => sub { return {0 => _"None",map {$_=>Songs::FieldName($_)} Songs::FilterListFields()}; },
+(	{ label => sub {_("Set subgroup").' '.$_[0]{depth}},	submenu => sub { return {0 => _"None",map {$_=>Songs::FieldName($_)} Songs::FilterListFields()}; },
 		submenu_reverse => 1,	code => sub { $_[0]{self}->SetField($_[1],$_[0]{depth}) },	check => sub { $_[0]{self}{field}[$_[0]{depth}] ||0 },
 	},
-	{ label => sub {_"Options for subgroup".' '.$_[0]{depth}},	submenu => \@MenuPageOptions,
+	{ label => sub {_("Options for subgroup").' '.$_[0]{depth}},	submenu => \@MenuPageOptions,
 	  test  => sub { $_[0]{depth} <= $_[0]{self}{depth} },
 	},
 );
