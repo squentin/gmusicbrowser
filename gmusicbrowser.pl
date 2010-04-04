@@ -455,6 +455,10 @@ sub Gtk2::Label::set_markup_with_format
 	$label->set_markup( MarkupFormat(@_) );
 }
 
+sub IncSuffix	# increment a number suffix from a string
+{	$_[0] =~ s/(?<=\D)(\d*)$/($1||1)+1/e;
+}
+
 sub CleanupFileName
 {	local $_=$_[0];
 	s#[[:cntrl:]/:><\*\?\"\\]##g;
@@ -4688,7 +4692,7 @@ sub Import_playlist_file	#create saved lists from playlist files (.m3u, .pls, ..
 	unless (@list) { warn "No file from '$pl_file' found in the library\n"; return }
 	my ($name)= $pl_file=~m/([^$QSLASH]+?)\.[^.]*$/;
 	$name= _"imported list" unless $name=~m/\S/;
-	$name=~s/(?<=\D)(\d*)$/($1||1)+1/e while $Options{SavedLists}{$name}; #find a new name
+	::IncSuffix($name) while $Options{SavedLists}{$name}; #find a new name
 	SaveList($name,\@list);
 }
 sub Choose_and_import_playlist_files
@@ -6505,7 +6509,7 @@ sub new
 	if (defined $name)
 	{	if ($name eq '')
 		{	$name=_"noname";
-			$name=~s/(?<=\D)(\d*)$/($1||1)+1/e while $self->{hash}{$name};
+			::IncSuffix($name) while $self->{hash}{$name};
 		}
 		else { $init=$self->{hash}{$name} unless defined $init; }
 	}
