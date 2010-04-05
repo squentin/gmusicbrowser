@@ -9,8 +9,10 @@
 
 =gmbplugin EPICRATING
 name    EpicRating
-title   EpicRating plugin - massage ratings and other "enjoyment" metrics when stuff happens
-desc    Automatic heuristic rating updates on certain events, and statistical manipulation thereof.
+title   EpicRating plugin - automatically update ratings
+author  Andrew Clunis <andrew@orospakr.ca>
+author  Daniel Rubin <dan@fracturedproject.net>
+desc    Automatic rating updates on configurable listening behaviour events.
 =cut
 
 package GMB::Plugin::EPICRATING;
@@ -18,7 +20,6 @@ use strict;
 use warnings;
 
 use constant {
-    CLIENTID => 'gmb', VERSION => '1.1',
     OPT => 'PLUGIN_EPICRATING_',#used to identify the plugin's options
 };
 
@@ -34,8 +35,11 @@ sub AddRatingPointsToSong {
     {
         warn "Yikes, can't rate this song above one hundred.";
         ::Songs::Set($ID, rating=>100);
+    } elsif(($ExistingRating + $PointsToRemove) < 0) {
+        warn "Negative addend in EpicRating pushed song rating to below 0.  Pinning.";
+        ::Songs::Set($ID, rating => 0);
     } else {
-        warn "Rating up song by " . $PointsToRemove;
+        warn "EpicRating changing song rating by " . $PointsToRemove;
         ::Songs::Set($ID, rating=>($ExistingRating + $PointsToRemove));
     }
 }
@@ -56,7 +60,7 @@ sub Played {
         if ($PlayedPartial)
         {
                 my $song_rating = Songs::Get($ID, 'rating');
-                if(!$song_rating && $::Options{OPT."SetDefaultRatingOnSkipped"}) {
+                if(($song_rating eq "") && $::Options{OPT."SetDefaultRatingOnSkipped"}) {
                     ::Songs::Set($ID, rating=>$DefaultRating);
                 } elsif(!$song_rating) {
                     # user didn't have the setting on
@@ -68,10 +72,9 @@ sub Played {
                         AddRatingPointsToSong($ID, $RatingOnSkip);
                     }
                 }
-        }
-        else {
+        } else {
                 my $song_rating = ::Songs::Get($ID, 'rating');
-                if(!$song_rating && $::Options{OPT."SetDefaultRatingOnPlayed"}) {
+                if(($song_rating eq "") && $::Options{OPT."SetDefaultRatingOnPlayed"}) {
                     ::Songs::Set($ID, rating=>$DefaultRating);
                 } elsif(!$song_rating) {
                     # user didn't have the setting on
@@ -99,29 +102,24 @@ sub prefbox {
     # rating change on full play
     # if less than 15% in there somehow
 
-    my $authors_hbox = Gtk2::HBox->new();
-    my $andrew_button = Gtk2::Button->new('Andrew Clunis <andrew@orospakr.ca>');
-    $andrew_button->set_relief('none');
-    $andrew_button->signal_connect(clicked => sub {
-        ::openurl('mailto:andrew@orospakr.ca');
-    });
-    my $and_label = Gtk2::Label->new(_"and");
-    my $dan_button = Gtk2::Button->new('Daniel Rubin <dan@fracturedproject.net>');
-    $dan_button->set_relief('none');
-    $dan_button->signal_connect(clicked => sub {
-        ::openurl('mailto:dan@fracturedproject.net');
-    });
+    my $grace_period_entry = ::NewPrefEntry(OPT."GracePeriod",
+                                            _"Grace period:",
+                                            sizeg1 => $sg1,sizeg2=>$sg2,
+                                            tip => _"grace period denoting a 'fast' skip in which to apply a different addend, in seconds; if zero, grace period does not apply");
+    my $rating_on_skip_entry = ::NewPrefSpinButton(OPT.'RatingOnSkip',
+                                                   -100, 100,
+                                                   sizeg1 => $sg1,sizeg2=>$sg2,,
+                                                   text1 => _"Add to rating on skip:");
+    my $rating_on_skip_before_grace_entry = ::NewPrefSpinButton(OPT.'RatingOnSkipBeforeGrace',
+                                                                -100, 100,
+                                                                sizeg1 => $sg1,sizeg2=>$sg2,
+                                                                text1 => _"Add to rating on skip (before grace period):");
+    my $rating_on_played_entry = ::NewPrefSpinButton(OPT.'RatingOnPlayed',
+                                                     -100, 100,
+                                                     sizeg1 => $sg1,sizeg2=>$sg2,
+                                                     text1 => _"Add to rating on played completely:");
 
-    $authors_hbox->add($_) for $andrew_button, $and_label, $dan_button;
-
-    my $grace_period_entry = ::NewPrefEntry(OPT."GracePeriod", _"Grace period before applying a different differential (if zero, grace period does not apply)", sizeg1 => $sg1,sizeg2=>$sg2);
-    my $rating_on_skip_entry = ::NewPrefEntry(OPT.'RatingOnSkip', _"Add to rating on skip:", sizeg1 => $sg1,sizeg2=>$sg2);
-    my $rating_on_skip_before_grace_entry = ::NewPrefEntry(OPT.'RatingOnSkipBeforeGrace', _"Add to rating on skip (before grace period):", sizeg1 => $sg1,sizeg2=>$sg2);
-
-
-    my $rating_on_played_entry = ::NewPrefEntry(OPT.'RatingOnPlayed', _"Add to rating on played completely:", sizeg1 => $sg1,sizeg2=>$sg2);
-
-    my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (rating update will not work on files with default rating otherwise):");
+    my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (required for rating update on files with default rating):");
     my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped", _"... on skipped songs");
     my $set_default_rating_played_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnPlayed", _"... on played songs");
     my $rating_freq_dump_button = Gtk2::Button->new("CSV dump of rating populations to stdout");
@@ -133,7 +131,7 @@ sub prefbox {
 	}
     });
 
-    $big_vbox->pack_start($_, ::FALSE, ::FALSE, 0) for $authors_hbox, $grace_period_entry, $rating_on_skip_entry, $rating_on_skip_before_grace_entry, $rating_on_played_entry, $set_default_rating_label, $set_default_rating_skip_check, $set_default_rating_played_check, $rating_freq_dump_button;
+    $big_vbox->pack_start($_, ::FALSE, ::FALSE, 0) for $grace_period_entry, $rating_on_skip_entry, $rating_on_skip_before_grace_entry, $rating_on_played_entry, $set_default_rating_label, $set_default_rating_skip_check, $set_default_rating_played_check, $rating_freq_dump_button;
 
     $big_vbox->show_all();
     return $big_vbox;
