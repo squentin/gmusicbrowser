@@ -123,69 +123,57 @@ BEGIN
 
 our $debug;
 our %CmdLine;
-our ($HomeDir,$SaveFile,$FIFOFile);
+our ($HomeDir,$SaveFile,$FIFOFile,$ImportFile,$DBus_id);
 
 our $QSLASH;	#quoted SLASH for use in regex
 #FIXME use :		use constant QSLASH => quotemeta SLASH;
 #  ???			and ${\QSLASH} instead of $QSLASH
 
-########## cmdline
-BEGIN
+# Parse command line
+BEGIN	# in a BEGIN block so that commands for a running instance are sent sooner/faster
 { our $QSLASH=quotemeta SLASH;
-  $HomeDir=Glib::get_user_config_dir.SLASH.PROGRAM_NAME.SLASH;
-  unless (-d $HomeDir)
-  {	my $old=Glib::get_home_dir.SLASH.'.'.PROGRAM_NAME.SLASH;
-	if (-d $old)
-	{	warn "Using folder $old for configuration, you could move it to $HomeDir to conform to the XDG Base Directory Specification\n";
-		$HomeDir=$old;
-	}
-	else
-	{	warn "Creating folder $HomeDir\n";
-		my $current='';
-		for my $dir (split /$QSLASH/o,$HomeDir)
-		{	$current.=SLASH.$dir;
-			next if -d $current;
-			die "Can't create folder $HomeDir : $!\n" unless mkdir $current;
-		}
-	}
-  }
+  $DBus_id='org.gmusicbrowser';
 
-  $SaveFile=(-d $HomeDir)
-	?  $HomeDir.'gmbrc'
-	: rel2abs('gmbrc');
-  $FIFOFile=(-d $HomeDir && $^O ne 'MSWin32')
-	?  $HomeDir.'gmusicbrowser.fifo'
-	: undef;
+  my $default_home= Glib::get_user_config_dir.SLASH.'gmusicbrowser'.SLASH;
+  if (!-d $default_home && -d (my $old= Glib::get_home_dir.SLASH.'.gmusicbrowser'.SLASH ) )
+  {	warn "Using folder $old for configuration, you could move it to $default_home to conform to the XDG Base Directory Specification\n";
+	$default_home=$old;
+  }
 
 my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2010 Quentin Sculo
 options :
 -nocheck: don't check for updated/deleted songs on startup
 -noscan	: don't scan folders for songs on startup
--demo	: don't check if current song has been updated/deleted
+-demo	: don't save settings/tags on exit
 -ro	: prevent modifying/renaming/deleting song files
 -rotags	: prevent modifying tags of music files
 -play	: start playing on startup
--nodbus	: do not use DBus
 -gst	: use gstreamer
 -nogst  : do not use gstreamer
 -server	: send playing song to connected icecast clent
 -port N : listen for connection on port N in icecast server mode
 -debug	: print lots of mostly useless informations
--nofifo : do not create/use named pipe $FIFOFile
--C FILE, -cfg FILE	: use FILE as configuration file (instead of $SaveFile)
--F FIFO, -fifo FILE	: use FIFO as named pipe to receive commans (instead of $FIFOFile)
+-nodbus	: do not provide DBus services
+-dbus-id KEY : append .KEY to the DBus service id used by gmusicbrowser (org.gmusicbrowser)
+-nofifo : do not create/use named pipe
+-F FIFO, -fifo FILE	: use FIFO as named pipe to receive commands (instead of 'gmusicbrowser.fifo' in default folder)
+-C FILE, -cfg FILE	: use FILE as configuration file (instead of 'gmbrc' in default folder),
+			  if FILE is a folder, sets the default folder to FILE.
 -l NAME, -layout NAME	: Use layout NAME for player window
 +plugin NAME		: Enable plugin NAME
 -plugin NAME		: Disable plugin NAME
 -searchpath FOLDER	: Additional FOLDER to look for plugins and layouts
 -use-gnome-session 	: Use gnome libraries to save tags/settings on session logout
 
-
-Command options, all following arguments constitute CMD :
--cmd CMD...		: launch gmusicbrowser if not already running, and execute command CMD
--remotecmd CMD...	: execute command CMD in a running gmusicbrowser
--launch_or_cmd CMD...	: launch gmusicbrowser if not already running OR execute command CMD in a running gmusicbrowser
-(-cmd, -remotecmd and -launch_or_cmd must be the last option, all following arguments are put in CMD)
+-cmd CMD		: add CMD to the list of commands to execute
+-ifnotrunning MODE	: change behavior when no running gmusicbrowser instance is found
+	MODE can be one of :
+	* normal (default)	: launch a new instance and execute commands
+	* nocmd			: launch a new instance but discard commands
+	* abort			: do nothing
+-nolaunch		: same as : -ifnotrunning abort
+Running instances of gmusicbrowser are detected via the fifo or via DBus.
+To run more than one instance, use a unique fifo and a unique DBus-id, or deactivate them.
 
 Options to change what is done with files/folders passed as arguments (done in running gmusicbrowser if there is one) :
 -playlist		: Set them as playlist (default)
@@ -200,12 +188,12 @@ Options to change what is done with files/folders passed as arguments (done in r
 ";
   unshift @ARGV,'-tagedit' if $0=~m/tagedit/;
   $CmdLine{gst}=0;
-  my @files; my $filescmd;
+  my (@files,$filescmd,@cmd,$ignore);
+  my $ifnotrunning='normal';
    while (defined (my $arg=shift))
    {	if   ($arg eq '-c' || $arg eq '-nocheck')	{$CmdLine{nocheck}=1}
 	elsif($arg eq '-s' || $arg eq '-noscan')	{$CmdLine{noscan}=1}
 	elsif($arg eq '-demo')		{$CmdLine{demo}=1}
-#	elsif($arg eq '-empty')		{$CmdLine{empty}=1}
 	elsif($arg eq '-play')		{$CmdLine{play}=1}
 	elsif($arg eq '-hide')		{$CmdLine{hide}=1}
 	elsif($arg eq '-server')	{$CmdLine{server}=1}
@@ -216,19 +204,21 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-rotags')	{$CmdLine{rotags}=1}
 	elsif($arg eq '-port')		{$CmdLine{port}=shift if $ARGV[0]}
 	elsif($arg eq '-debug')		{$debug=1}
-	elsif($arg eq '-nofifo')	{$FIFOFile=undef}
-	elsif($arg eq '-C' || $arg eq '-cfg')		{$CmdLine{savefile}=1; $SaveFile=rel2abs(shift) if $ARGV[0]}
+	elsif($arg eq '-nofifo')	{$FIFOFile=''}
+	elsif($arg eq '-C' || $arg eq '-cfg')		{$CmdLine{savefile}=shift if $ARGV[0]}
 	elsif($arg eq '-F' || $arg eq '-fifo')		{$FIFOFile=rel2abs(shift) if $ARGV[0]}
 	elsif($arg eq '-l' || $arg eq '-layout')	{$CmdLine{layout}=shift if $ARGV[0]}
+	elsif($arg eq '-import')	{ $ImportFile=rel2abs(shift) if $ARGV[0]}
 	elsif($arg eq '-searchpath')	{ push @{ $CmdLine{searchpath} },shift if $ARGV[0]}
 	elsif($arg=~m/^([+-])plugin$/)	{ $CmdLine{plugins}{shift @ARGV}=($1 eq '+') if $ARGV[0]}
 	elsif($arg eq '-geometry')	{ $CmdLine{geometry}=shift if $ARGV[0]; }
-	elsif($arg eq '-tagedit')	{ $CmdLine{tagedit}=1;last; }
-	elsif($arg eq '-listcmd')	{ $CmdLine{cmdlist}=1;last; }
-	elsif($arg eq '-listlayout')	{ $CmdLine{layoutlist}=1;last; }
-	elsif($arg eq '-cmd')		{ RunRemoteCommand(@ARGV); $CmdLine{runcmd}="@ARGV"; last; }
-	elsif($arg eq '-remotecmd')	{ RunRemoteCommand(@ARGV); exit; }
-	elsif($arg eq '-launch_or_cmd')	{ RunRemoteCommand(@ARGV); last; }
+	elsif($arg eq '-tagedit')	{ $CmdLine{tagedit}=1; $ignore=1; last; }
+	elsif($arg eq '-listcmd')	{ $CmdLine{cmdlist}=1; $ignore=1; last; }
+	elsif($arg eq '-listlayout')	{ $CmdLine{layoutlist}=1; $ignore=1; last; }
+	elsif($arg eq '-cmd')		{ push @cmd, shift if $ARGV[0]; }
+	elsif($arg eq '-ifnotrunning')	{ $ifnotrunning=shift if $ARGV[0]; }
+	elsif($arg eq '-nolaunch')	{ $ifnotrunning='abort'; }
+	elsif($arg eq '-dbus-id')	{ if (my $id=shift) { if ($id=~m/^\w+$/) { $DBus_id.='.'.$id; } else { warn "invalid dbus-id '$id', only letters, numbers and _ allowed\n" }; } }
 	elsif($arg eq '-add')		{ $filescmd='AddToLibrary'; }
 	elsif($arg eq '-playlist')	{ $filescmd='OpenFiles'; }
 	elsif($arg eq '-enqueue')	{ $filescmd='EnqueueFiles'; }
@@ -242,30 +232,77 @@ Options to change what is done with files/folders passed as arguments (done in r
 		exit;
 	}
    }
-  if (@files)
-  {	for my $f (@files)
-	{ unless ($f=~m#^http://#)
-	  {	$f=rel2abs($f);
-		$f=~s/([^A-Za-z0-9])/sprintf('%%%02X', ord($1))/seg; #FIXME use url_escapeall, but not yet defined
-	  }
+   unless ($ignore)
+   {	# filenames given in the command line
+	if (@files)
+	{	for my $f (@files)
+		{	unless ($f=~m#^http://#)
+			{	$f=rel2abs($f);
+				$f=~s/([^A-Za-z0-9])/sprintf('%%%02X', ord($1))/seg; #FIXME use url_escapeall, but not yet defined
+			}
+		}
+		$filescmd ||= 'OpenFiles';
+		my $cmd="$filescmd(@files)";
+		push @cmd, $cmd;
 	}
-	$filescmd ||= 'OpenFiles';
-	my $cmd="$filescmd(@files)";
-	RunRemoteCommand($cmd);
-	$CmdLine{runcmd}=$cmd;
-  }
 
-  sub RunRemoteCommand
-  {	warn "Sending command @_\n" if $debug;
+	# determine $HomeDir $SaveFile $ImportFile and $FIFOFile
+	my $save= delete $CmdLine{savefile};
+	if (defined $save)
+	{	my $isdir= $save=~m#/$#;	## $save is considered a folder if ends with a "/"
+		$save= rel2abs($save);
+		if (-d $save || $isdir) { $HomeDir = $save.SLASH; }
+		else			{ $SaveFile= $save; }
+	}
+	warn "using '$HomeDir' folder for saving/setting folder instead of '$default_home'\n" if $debug;
+	$HomeDir ||= $default_home;
+	if (!-d $HomeDir)
+	{	warn "Creating folder $HomeDir\n";
+		my $current='';
+		for my $dir (split /$QSLASH/o,$HomeDir)
+		{	$current.=SLASH.$dir;
+			next if -d $current;
+			die "Can't create folder $HomeDir : $!\n" unless mkdir $current;
+		}
+	}
+	# auto import from old v1.0 tags file if using default savefile, it doesn't exist and old tags file exists
+	if (!$SaveFile && !-e $HomeDir.'gmbrc' && -e $HomeDir.'tags') { $ImportFile||=$HomeDir.'tags'; }
+
+	$SaveFile||= $HomeDir.'gmbrc';
+	$FIFOFile= $HomeDir.'gmusicbrowser.fifo' if !defined $FIFOFile && $^O ne 'MSWin32';
+	$FIFOFile=undef if $FIFOFile eq '';
+
+	#check if there is an instance already running
+	my $running;
 	if (defined $FIFOFile && -p $FIFOFile)
-	{	sysopen my$fifofh,$FIFOFile, O_NONBLOCK | O_WRONLY;
-		print $fifofh "@_" and exit; #exit if ok
+	{	my @c= @cmd ? @cmd : ('');	#fallback to empty command, needed to know if running
+		sysopen my$fifofh,$FIFOFile, O_NONBLOCK | O_WRONLY;
+		print $fifofh "$_\n" and $running=1 for @c;
 		close $fifofh;
-		#exit;
+		$running&&= "using '$FIFOFile'";
 	}
-  }
-  unless ($CmdLine{noDBus}) { eval {require 'gmusicbrowser_dbus.pm'} || warn "Error loading Net::DBus :\n$@ => controling gmusicbrowser through DBus won't be possible.\n\n"; }
+	elsif (!$CmdLine{noDBus})
+	{	eval
+		{	require 'gmusicbrowser_dbus.pm';
+			my $bus= $GMB::DBus::bus || die;
+			my $service = $bus->get_service($DBus_id) || die;
+			my $object = $service->get_object('/org/gmusicbrowser', 'org.gmusicbrowser') || die;
+			$object->RunCommand($_) for @cmd;
+		};
+		$running="using DBus id=$DBus_id" unless $@;
+	}
+	if ($running)
+	{	warn "Found a running instance ($running)\n";
+		exit;
+	}
+	else
+	{	exit if $ifnotrunning eq 'abort';
+		@cmd=() if $ifnotrunning eq 'nocmd';
+	}
+	$CmdLine{runcmd}=\@cmd if @cmd;
 
+	unless ($CmdLine{noDBus}) { eval {require 'gmusicbrowser_dbus.pm'} || warn "Error loading Net::DBus :\n$@ => controlling gmusicbrowser through DBus won't be possible.\n\n"; }
+   }
 }
 
 ##########
@@ -1119,7 +1156,7 @@ SkipTo($PlayTime) if $PlayTime; #done only now because of gstreamer
 
 CreateTrayIcon();
 
-run_command(undef,$CmdLine{runcmd}) if $CmdLine{runcmd};
+if (my $cmds=delete $CmdLine{runcmd}) { run_command(undef,$_) for @$cmds; }
 
 #--------------------------------------------------------------
 Gtk2->main;
@@ -1283,6 +1320,7 @@ sub Quit
 sub CmdFromFIFO
 {	while (my $cmd=<$fifofh>)
 	{	chomp $cmd;
+		next if $cmd eq '';
 		$cmd="$1($2)" if $cmd=~m/^(\w+) (.*)/;
 		($cmd, my$arg)= $cmd=~m/^(\w+)(?:\((.*)\))?$/;
 		#if ($cmd eq 'Print') {print $fifofh "Told to print : $arg\n";return}
@@ -1646,11 +1684,7 @@ sub ReadOldSavedTags
 }
 
 sub ReadSavedTags	#load tags _and_ settings
-{	if (-d $SaveFile) {$SaveFile.=SLASH.'gmbrc'}
-	my $LoadFile=$SaveFile;
-	if (!-e $LoadFile && !$CmdLine{savefile} && -r $HomeDir.'tags')
-	{	$LoadFile=$HomeDir.'tags';	#import from v1.0.x
-	}
+{	my $LoadFile= $ImportFile || $SaveFile;
 	unless (-r $LoadFile)
 	{	FirstTime();
 		Post_ReadSavedTags();
@@ -1752,6 +1786,7 @@ sub Post_ReadSavedTags
 
 sub SaveTags	#save tags _and_ settings
 {	HasChanged('Save');
+	if ($CmdLine{demo}) { warn "-demo option => not saving tags/settings\n"; return }
 	warn "Writing tags in $SaveFile ...\n";
 	setlocale(LC_NUMERIC, 'C');
 	my $savedir=$SaveFile;
