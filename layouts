@@ -74,7 +74,7 @@ VolumeScroll	= HBmain
 Type=T
 Window= borderwidth=0
 HBmain	= Play(size=menu) Next(size=menu) 2_TimeBar(text="%t by %a",minwidth=240) Cover
-Name= "Minimal tip"
+Name= _"Minimal tip"
 
 [with browser]
 Type=G

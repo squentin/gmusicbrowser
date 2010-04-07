@@ -624,13 +624,19 @@ sub get_layout_list
 	my @tree;
 	for my $id (@list)
 	{	my $name2=$id;
-		my $cat= $Layouts{$id}{Category} || ($name2=~s#(.+)/## && $1);
-		my $name= $Layouts{$id}{Name} || $name2;
+		my $cat= $Layouts{$id}{Category};
+		my $name= $Layouts{$id}{Name} || _( $name2 );
 		my $array= $cat ?  ($cat{$cat}||=[]) : \@tree;
-		push @$array, $id, _( $name );
+		push @$array, $id, $name;
 	}
-	push @tree, $cat{$_},_( $_ ) for keys %cat;
+	push @tree, $cat{$_},$_ for keys %cat;
 	return \@tree;
+}
+
+sub get_layout_name
+{	my $layout=shift;
+	my $name= $Layouts{$layout}{Name} || _( $layout );
+	return $name;
 }
 
 sub InitLayouts
@@ -645,7 +651,7 @@ sub InitLayouts
 	{	print "Available layouts : ((type) id\t: name)\n";
 		my ($max)= sort {$b<=>$a} map length, keys %Layouts;
 		for my $id (sort keys %Layouts)
-		{	my $name= $Layouts{$id}{Name} || $id;
+		{	my $name= get_layout_name($id);
 			my $type= $Layouts{$id}{Type} || '';
 			$type="($type)" if $type;
 			printf "%-4s %-${max}s : %s\n",$type,$id,$name;
@@ -698,12 +704,14 @@ sub ParseLayout
 	}
 	else {return}
 	for (@$lines)
-	{	s#_\"([^"]+)"#my $tr=$1; $tr=~y/"/'/; qq/"$tr"/#ge;	#translation, escaping the " so it is not picked up as a translatable string. Replace any " in translations because they would cause trouble
+	{	s#_\"([^"]+)"#my $tr=_( $1 ); $tr=~y/"/'/; qq/"$tr"/#ge;	#translation, escaping the " so it is not picked up as a translatable string. Replace any " in translations because they would cause trouble
 		next unless m/^(\w+)\s*=\s*(.*)$/;
 		if ($2 eq '') {delete $Layouts{$name}{$1};next}
 		$Layouts{$name}{$1}= $2;
 	}
-	$Layouts{$name}{Name}=~s/^"(.*)"$/$1/ if $Layouts{$name}{Name};	#remove quotes from layout name
+	for my $key (qw/Name Category/)
+	{	$Layouts{$name}{$key}=~s/^"(.*)"$/$1/ if $Layouts{$name}{$key};	#remove quotes from layout name and category
+	}
 	$Layouts{$name}{PATH}=$path;
 }
 
@@ -1588,7 +1596,7 @@ sub init
 sub layout_name
 {	my $self=shift;
 	my $id=$self->{layout};
-	return $Layout::Layouts{$id}{Name} || $id;
+	return Layout::get_layout_name($id);
 }
 sub close_window
 {	my $self=shift;
