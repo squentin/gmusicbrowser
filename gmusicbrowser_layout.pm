@@ -3116,7 +3116,7 @@ sub set
 
 sub LoadImg
 {	my ($self,@files)=@_;
-	my ($w,$h)=split /x/,$self->{size};
+	my ($w,$h)=split /x/, $self->{size}||'0x0';
 	$w*= $self->{usable_w};
 	$h*= $self->{usable_h};
 	my $size= ::min($w,$h);
