@@ -50,6 +50,7 @@ our %Widgets=
 		#size	=> SIZE_BUTTONS,
 		stock	=> 'gtk-media-previous',
 		tip	=> _"Recently played songs",
+		text	=> _"Previous",
 		activate=> \&::PrevSong,
 		options => 'nbsongs',
 		nbsongs	=> 10,
@@ -75,6 +76,7 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		stock	=> 'gtk-media-next',
 		tip	=> _"Next Song",
+		text	=> _"Next",
 		activate=> \&::NextSong,
 		options => 'nbsongs',
 		nbsongs	=> 10,
@@ -109,6 +111,7 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		stock	=> 'gtk-preferences',
 		tip	=> _"Edit Settings",
+		text	=> _"Settings",
 		activate=> \&::PrefDialog,
 		click3	=> sub {Layout::Window->new($::Options{Layout});}, #mostly for debugging purpose
 		click2	=> \&::AboutDialog,
@@ -154,6 +157,7 @@ our %Widgets=
 		state	=> sub { my $s=$::Options{'Sort'};($s=~m/^random:/)? 'random' : ($s eq 'shuffle')? 'shuffle' : 'sorted'; },
 		stock	=> { random => 'gmb-random', shuffle => 'gmb-shuffle', sorted => 'gtk-sort-ascending' },
 		tip	=> sub { _("Play order") ." :\n". ::ExplainSort($::Options{Sort}); },
+		text	=> sub { ::ExplainSort($::Options{Sort},1); },
 		click1	=> \&::ToggleSort,
 		click3	=> sub { SortMenu() },
 		event	=> 'Sort SavedWRandoms SavedSorts',
@@ -169,6 +173,7 @@ our %Widgets=
 			{ defined $::ListMode	? _"static list"
 						: _("Playlist filter :\n").$::SelectedFilter->explain;
 			},
+		text	=> sub { $::ListMode ? _"static list" : $::SelectedFilter->name; },
 		click1	=> \&RemoveFilter,
 		click3	=> sub { FilterMenu() },
 		event	=> 'Filter SavedFilters',
@@ -188,6 +193,7 @@ our %Widgets=
 		tip	=> sub { ::CalcListLength($::Queue,'queue')
 				.($::QueueAction? "\n". ::__x( _"then {action}", action => $::QActions{$::QueueAction}[2] ) : '');
 				},
+		text	=> _"Queue",
 		click1	=> \&::ClearQueue,
 		click3	=> sub {::PopupContextMenu(\@MenuQueue,{ID=>$::SongID});},
 		event	=> 'Queue QueueAction',
@@ -570,6 +576,7 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		stock	=> 'gtk-fullscreen',
 		tip	=> _"Toggle fullscreen mode",
+		text	=> _"Fullscreen",
 		activate=> \&::ToggleFullscreenLayout,
 		#activate=> \&ToggleFullscreen,
 		autoadd_type	=> 'button main',
@@ -2608,44 +2615,56 @@ sub SaveOptions
 
 package Layout::Button;
 use Gtk2;
-use base 'Gtk2::Button';
+use base 'Gtk2::Bin';
 
-our @default_options= (button=>1, relief=>'none', size=> Layout::SIZE_BUTTONS );
+our @default_options= (button=>1, relief=>'none', size=> Layout::SIZE_BUTTONS, ellipsize=> 'none', );
 
 sub new
 {	my ($class,$opt,$ref)=@_;
 	%$opt=( @default_options, %$opt );
-	my $self = bless Gtk2::Button->new, $class;
 	my $isbutton= $opt->{button};
-	$self->set_relief($opt->{relief}) if $isbutton;
+	my $self;
+	if ($isbutton)
+	{	$self=Gtk2::Button->new;
+		$self->set_relief($opt->{relief});
+		my $activate=delete $opt->{activate};
+		$opt->{click} ||= $activate;
+	}
+	else { $self=Gtk2::EventBox->new; }
+	bless $self, $class;
+	my $text= $opt->{text} || $opt->{label};
 	my $stock= $ref->{'state'} ? $ref->{stock} : $opt->{stock}; 	#FIXME support states ?
 	if ($opt->{skin})
 	{	my $skin=Skin->new($opt->{skin},$self,$opt);
 		$self->signal_connect(expose_event => \&Skin::draw,$skin);
 		$self->set_app_paintable(1); #needed ?
 		$self->{skin}=1;
-		if (0 && $opt->{shape}) #mess up button-press cb
+		if (0 && !$isbutton && $opt->{shape}) #mess up button-press cb TESTME
 		{	$self->{shape}=1;
-			my $ebox=Gtk2::EventBox->new;
-			$ebox->add($self);
-			$self=$ebox;
 		}
 	}
 	elsif ($stock)
-	{	unless ($isbutton)
-		{	$self=bless Gtk2::EventBox->new, $class; #ugly but simple solution
-			my $activate=delete $opt->{activate};
-			$opt->{click} ||= $activate;
-		}
-		$self->{stock}=$stock;
+	{	$self->{stock}=$stock;
 		$self->{state}=$ref->{state} if $ref->{state};
 		$self->{size}= $opt->{size};
-		my $img=Gtk2::Image->new;
+		my $img= $self->{img}= Gtk2::Image->new;
 		$img->set_size_request(Gtk2::IconSize->lookup($self->{size})); #so that it always request the same size, even when no icon
-		$self->add($img);
+		if ($opt->{with_text})
+		{	my $hbox=Gtk2::HBox->new(0,2);
+			my $label= $self->{label}= Gtk2::Label->new;
+			my $ellip= $opt->{ellipsize};
+			$ellip='end' if $ellip eq '1';
+			$label->set_ellipsize($ellip);
+			$self->{string}= $text || $opt->{tip};
+			$self->{markup}= $opt->{markup} || $opt->{size} eq 'menu' ? "<small>%s</small>" : "%s";
+			$hbox->pack_start($img,0,0,0);
+			$hbox->pack_start($label,1,1,0);
+			$self->add($hbox);
+		}
+		else { $self->add($img); }
 		$self->UpdateStock;
 	}
-	else { $self->set_label($opt->{label}); }
+	else { $self->set_label($text); }
 	return $self;
 }
 
@@ -2658,14 +2677,19 @@ sub UpdateStock
 	}
 	if ($stock=~m/ /)
 	{	$stock= (split /\s+/,$stock)[ $index || 0 ];
-		$stock='' if $stock eq '.'; #needed ?
+		$stock='' if $stock eq '.'; #needed ? the result is the same : no icon
 		unless (exists $self->{hasenterleavecb})
 		{	$self->{hasenterleavecb}=undef;
 			$self->signal_connect(enter_notify_event => \&UpdateStock,1);
 			$self->signal_connect(leave_notify_event => \&UpdateStock);
 		}
 	}
-	$self->child->set_from_stock($stock,$self->{size});
+	$self->{img}->set_from_stock($stock,$self->{size});
+	if (my $l=$self->{label})
+	{	my $string=$self->{string};
+		$string= $string->() if ref $string eq 'CODE';
+		$l->set_markup_with_format($self->{markup},$string);
+	}
 	0;
 }
 
