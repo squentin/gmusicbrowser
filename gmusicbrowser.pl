@@ -2606,14 +2606,18 @@ sub SortList	#sort @$listref according to $sort
 }
 
 sub ExplainSort
-{	my $sort=$_[0];
-	if ($sort eq '') {return 'no order'}
-	elsif ($sort=~m/^random:/)
-	{	for my $name (keys %{$Options{SavedWRandoms}})
-		{	return "Weighted Random $name." if $Options{SavedWRandoms}{$name} eq $sort;
+{	my ($sort,$usename)=@_;
+	return _"no order" if $sort eq '';
+	my $rand= $sort=~m/^random:/;
+
+	if ($usename || $rand)
+	{	my $h= $rand ? $Options{SavedWRandoms} : $Options{SavedSorts};
+		for my $name (sort keys %$h)
+		{	return $name if $h->{$name} eq $sort;
 		}
-		return _"unnamed random mode"; #describe ?
 	}
+	if ($rand) { return _"unnamed random mode"; }	 #describe ?
+
 	my @text;
 	for my $f (split / /,$sort)
 	{	my $field= $f=~s/^-// ? '-' : '';

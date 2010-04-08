@@ -153,7 +153,7 @@ our %Widgets=
 		size	=> SIZE_FLAGS,
 		state	=> sub { my $s=$::Options{'Sort'};($s=~m/^random:/)? 'random' : ($s eq 'shuffle')? 'shuffle' : 'sorted'; },
 		stock	=> { random => 'gmb-random', shuffle => 'gmb-shuffle', sorted => 'gtk-sort-ascending' },
-		tip	=> sub { _("Play order :\n").::ExplainSort($::Options{Sort}); },
+		tip	=> sub { _("Play order") ." :\n". ::ExplainSort($::Options{Sort}); },
 		click1	=> \&::ToggleSort,
 		click3	=> sub { SortMenu() },
 		event	=> 'Sort SavedWRandoms SavedSorts',

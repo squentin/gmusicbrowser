@@ -3122,6 +3122,16 @@ sub is_empty
 	return ($f eq '');
 }
 
+sub name
+{	my $self=shift;
+	my $h= $::Options{SavedFilters};
+	return _"All Songs" if $self->is_empty;
+	for my $name (sort keys %$h)
+	{	return $name if $self->are_equal($h->{$name});
+	}
+	return _"Unnamed filter";
+}
+
 sub explain	# return a string describing the filter
 {	my $self=shift;
 	return $self->{desc} if $self->{desc};
