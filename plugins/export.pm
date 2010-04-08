@@ -23,7 +23,7 @@ my %menuentry=
 (topath =>
  {	label => _"Copy to portable player",	#label of the menu entry
 	code => \&Copy,				#when menu entry selected
-	test => sub {my $p=$::Options{OPT.'path'}; $p && (-d $p || $p=~m/%/);},	#the menu entry is displayed if returns true
+	test => sub {my $p=$::Options{OPT.'path'}; $p && (-d $p || $p=~m/[%\$]/);},	#the menu entry is displayed if returns true
 	notempty => 'IDs',			#display only if at least one song
  },
  tom3u =>
@@ -48,7 +48,7 @@ my %FLmenuentry=
 (topath =>
  {	label => _"Copy to portable player",
 	code => \&Copy,
-	test => sub {my $p=$::Options{OPT.'path'}; $p && (-d $p || $p=~m/%/);},
+	test => sub {my $p=$::Options{OPT.'path'}; $p && (-d $p || $p=~m/[%\$]/);},
 	isdefined => 'filter',
  },
  tom3u =>

@@ -2788,8 +2788,7 @@ sub CalcListLength	#if $return, return formated string (0h00m00s)
 		return __("%d Song","%d Songs",$nb) .', '.__x($format, @values);
 	}
 	elsif ($return eq 'queue')
-	{	$h=($h)? $h.'h ' : '';
-		return _"Queue empty" if $nb==0;
+	{	return _"Queue empty" if $nb==0;
 		my $format= $h? _"{hours}h{min}m{sec}s" : _"{min}m{sec}s";
 		return __("%d song in queue","%d songs in queue",$nb) .' ('. __x($format, @values) . ')';
 	}
@@ -5039,7 +5038,6 @@ sub PrefDialog
 				'gtk-about' => 1,
 				'gtk-close' => 'close');
 	$dialog->set_default_response ('close');
-	#$dialog->action_area->pack_end(NewIconButton('gtk-about',_"about",\&AboutDialog),FALSE,FALSE,2);
 	SetWSize($dialog,'Pref');
 
 	my $notebook = Gtk2::Notebook->new;
