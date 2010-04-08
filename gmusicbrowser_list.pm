@@ -120,7 +120,7 @@ sub fill_history_menu
 package LabelTotal;
 use Gtk2;
 
-use base 'Gtk2::Button';
+use base 'Gtk2::Bin';
 
 our %Modes=
 (	list	 => {label=> _"Listed songs",	setup => \&list_Set,	update=>\&list_Update,		delay=> 1000,	},
@@ -129,20 +129,26 @@ our %Modes=
 	selected => {label=> _"Selected songs", setup => \&selected_Set,update=>\&selected_Update,	delay=> 500,	},
 );
 
+our @default_options=
+(	button =>1, format => 'long', relief=> 'none', mode=> 'list',
+);
 
 sub new
 {	my ($class,$opt) = @_;
-	my $self = bless Gtk2::Button->new, $class;
-	$self->set_relief('none');
-	my $mode=$opt->{mode} || 'list';
-	$self->{size}=$opt->{size};
-	$self->{format}= ($opt->{format} && $opt->{format} eq 'short') ? 'short' : 'long';
-	$self->{group}=$opt->{group};
+	%$opt=( @default_options, %$opt );
+	my $self;
+	if ($opt->{button})
+	{	$self=Gtk2::Button->new;
+		$self->set_relief($opt->{relief});
+	}
+	else { $self=Gtk2::EventBox->new; }
+	bless $self,$class;
+	$self->{$_}= $opt->{$_} for qw/size format group/;
 	$self->add(Gtk2::Label->new);
 	$self->signal_connect( destroy => \&Remove);
 	$self->signal_connect( button_press_event => \&button_press_event_cb);
 	::Watch($self, SongsChanged	=> \&SongsChanged_cb);
-	$self->Set_mode($mode);
+	$self->Set_mode($opt->{mode});
 	return $self;
 }
 
