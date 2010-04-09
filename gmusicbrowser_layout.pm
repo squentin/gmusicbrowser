@@ -990,7 +990,7 @@ sub NewWidget
 
 	$widget->{actions}{$_}=$options{$_}  for grep m/^click\d*/, keys %options;
 	$widget->signal_connect(button_press_event => \&Button_press_cb) if $widget->{actions};
-	if ($widget->isa('Gtk2::Button') and $options{activate})
+	if (($widget->isa('Gtk2::Button') or $widget->{isbutton}) and $options{activate})
 	{	$widget->{actions}{activate}=$options{activate};
 		$widget->signal_connect(clicked => \&Button_activate_cb);
 	}
@@ -2627,10 +2627,13 @@ sub new
 	if ($isbutton)
 	{	$self=Gtk2::Button->new;
 		$self->set_relief($opt->{relief});
+		$self->{isbutton}=1;
+	}
+	else
+	{	$self=Gtk2::EventBox->new;
 		my $activate=delete $opt->{activate};
 		$opt->{click} ||= $activate;
 	}
-	else { $self=Gtk2::EventBox->new; }
 	bless $self, $class;
 	my $text= $opt->{text} || $opt->{label};
 	my $stock= $ref->{'state'} ? $ref->{stock} : $opt->{stock}; 	#FIXME support states ?
