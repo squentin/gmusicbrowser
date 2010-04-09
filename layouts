@@ -624,6 +624,12 @@ Name = _"Buttons"
 Window =  transparent=1
 HBbuttons =	Prev Stop Play Next
 
+[D_hotspot]
+Type= D
+Name = _"Invisible hot spot"
+Window =  transparent=1
+HBmain = _EventBox(hover_layout="full with buttons",hover_delay=1)
+
 
 #type P layouts : pages that can be added to a TabbedLists
 [same_album]

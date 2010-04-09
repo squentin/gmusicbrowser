@@ -212,6 +212,10 @@ our %Widgets=
 	Button =>
 	{	class	=> 'Layout::Button',
 	},
+	EventBox =>
+	{	class	=> 'Layout::Button',
+		button	=> 0,
+	},
 	Label =>
 	{	class	=> 'Layout::Label',
 		oldopt1 => sub { 'text',$_[0] },
@@ -2667,7 +2671,7 @@ sub new
 		else { $self->add($img); }
 		$self->UpdateStock;
 	}
-	else { $self->set_label($text); }
+	elsif (defined $text) { $self->add( Gtk2::Label->new($text) ); }
 	return $self;
 }
 
