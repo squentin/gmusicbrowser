@@ -4741,20 +4741,13 @@ sub Choose_and_import_playlist_files
 }
 
 sub OpenFiles
-{	my @IDs;
-	for my $f (split / /,$_[1])
-	{	if ($f=~m#^http://#) { }#push @IDs,AddRadio($f,1); }
-		else
-		{	$f=decode_url($f);
-			my $l=ScanFolder($f);
-			push @IDs, @$l if ref $l;
-		}
-	}
-	Select(song=>'first',play=>1,staticlist => \@IDs) if @IDs;
+{	my $IDs=Uris_to_IDs($_[1]);
+	Select(song=>'first',play=>1,staticlist => $IDs) if @$IDs;
 }
 
 sub Uris_to_IDs
 {	my @urls=split / +/,$_[0];
+	#@urls= grep !m#^http://#, @urls;
 	$_=decode_url($_) for @urls;
 	my @IDs=FolderToIDs(1,1,@urls);
 	return \@IDs;
