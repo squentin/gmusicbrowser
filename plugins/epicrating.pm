@@ -26,7 +26,7 @@ use constant {
     ACTIONS => ["REMOVE_FROM_RATING", "ADD_TO_RATING", "RATING_SET_TO_DEFAULT"]
 };
 
-::SetDefaultOptions(OPT, RatingOnSkip => -5, GracePeriod => 15, RatingOnSkipBeforeGrace => -1, RatingOnPlayed => 5, SetDefaultRatingOnSkipped => 1, SetDefaultRatingOnFinished => 1, Rules => [[ {signal => 'Finished', field => "rating", value => 5}, {signal => 'Skipped', field => 'rating', value => -5 }, { signal => "SkippedBefore15", field => "rating", value => -1}]]);
+::SetDefaultOptions(OPT, SetDefaultRatingOnSkipped => 1, SetDefaultRatingOnFinished => 1, Rules => [[ {signal => 'Finished', field => "rating", value => 5}, {signal => 'Skipped', field => 'rating', value => -5 }, { signal => "SkippedBefore15", field => "rating", value => -1}]]);
 
 my $self=bless {},__PACKAGE__;
 
@@ -55,7 +55,7 @@ sub ApplyRuleByName {
         if(${$rule}{signal} eq $rule_name) {
             my $value = ::Songs::Get($song_id, ${$rule}{field});
             if((defined $value) && ($value ne "")) {
-		# should be handling different fields as necessary, but since we only have rating right now...
+                # should be handling different fields as necessary, but since we only have rating right now...
                 AddRatingPointsToSong($song_id, ${$rule}{value});
             }
         }
