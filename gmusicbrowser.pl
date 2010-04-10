@@ -2042,7 +2042,7 @@ sub Played
 {	return unless defined $PlayingID;
 	HasChanged('Played');
 	my $ID=$PlayingID;
-	undef $PlayingID;
+
 	warn "Played : $ID $StartTime $StartedAt $PlayTime\n" if $debug;
 	#add song to recently played list
 	unless (@$Recent && $Recent->[0]==$ID)
@@ -2055,11 +2055,14 @@ sub Played
 	if ($PlayedPartial) #FIXME maybe only count as a skip if played less than ~20% ?
 	{	my $nb= 1+Songs::Get($ID,'skipcount');
 		Songs::Set($ID, skipcount=> $nb, lastskip=> $StartTime);
+		HasChanged("Skipped");
 	}
 	else
 	{	my $nb= 1+Songs::Get($ID,'playcount');
 		Songs::Set($ID, playcount=> $nb, lastplay=> $StartTime);
+		HasChanged("Finished");
 	}
+	undef $PlayingID;
 }
 
 sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, or undef if none applies
