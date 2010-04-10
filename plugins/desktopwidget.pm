@@ -65,7 +65,7 @@ sub Fill
 	$store->clear;
 	for my $key (sort keys %$DWlist)
 	{	my $layout= $DWlist->{$key}{layout};
-		my $name= $Layout::Layouts{$layout}{Name} || $layout;
+		my $name= Layout::get_layout_name($layout);
 		my $iter=$store->append;
 		$store->set($iter, 0,$key, 1,!$DWlist->{$key}{dw_inactive}, 2,$name);
 		$Treeview->get_selection->select_iter($iter) if $selected && $key eq $selected;

@@ -262,7 +262,7 @@ sub UpdateCustom
 		$id= $hash->{tabtitle}||'' unless defined $id;
 		$id=~tr/a-zA-Z0-9//cd;
 		$id='custom' if $id eq '';
-		$id=~s/(?<=\D)(\d*)$/($1||1)+1/e while $Widgets{'PluginWebCustom_'.$id.'_'}; #find a new name
+		::IncSuffix($id) while $Widgets{'PluginWebCustom_'.$id.'_'}; #find a new name
 	}
 	elsif ($active) { Layout::RegisterWidget('PluginWebCustom_'.$id.'_' => undef); }
 	if ($hash)	# edit existing custom page

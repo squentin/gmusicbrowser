@@ -9,6 +9,7 @@
 name	Titlebar
 title	Titlebar overlay plugin
 desc	Display a special layout in or around the titlebar of the focused window
+req	perl(Gnome2::Wnck, libgnome2-wnck-perl perl-Gnome2-Wnck)
 =cut
 
 package GMB::Plugin::TitleBar;

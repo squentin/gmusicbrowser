@@ -55,6 +55,8 @@ our %timespan_menu=
 		get_gid		=> 'my $v=#_#; ref $v ? $v : [$v]',
 		gid_to_get	=> '(#GID# ? ___name[#GID#] : "")',
 		gid_to_display	=> '___name[#GID#]',
+		s_sort		=> '___sort{ sprintf("%x", #_#)}',
+		si_sort		=> '___isort{ sprintf("%x", #_#)}',
 		's_sort:gid'	=> '___name[#GID#]',
 		'si_sort:gid'	=> '___iname[#GID#]',
 		get		=> 'do {my $v=#_#; !$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v];}',
@@ -67,8 +69,11 @@ our %timespan_menu=
 			{	my $id= #sgid_to_gid(VAL=$name)#;
 				push @ids,$id;
 			}
-			#_#=	@ids<2 ? $ids[0]||0 :
-				(___group{join(" ",map sprintf("%x",$_),@ids)}||= \@ids);}',
+			my $val=	@ids<2 ? $ids[0]||0 :
+				(___group{join(" ",map sprintf("%x",$_),@ids)}||= \@ids);
+			___isort{ sprintf("%x",$val) }||= ::superlc( ___sort{ sprintf("%x",$val) }||= join ";",@list );
+			#_#=$val;
+			}',
 		diff		=> 'do {my $v=#_#; my $old=!$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v]; $v=#VAL#; my $new= join "\\x00", sort (ref $v ? @$v : split /\\x00/,$v); $old ne $new; }', #FIXME use simpler/faster version if perl5.10
 		display 	=> 'do { my $v=#_#; !$v ? "" : ref $v ? join ", ",map ___name[$_],@$v : ___name[$v]; }',
 		set_multi	=> 'do {my $c=#_#; my %h=( $c ? ref $c ? map((___name[$_]=>0), @$c) : (___name[$c]=>0) : ()); my $changed; my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
@@ -143,7 +148,6 @@ our %timespan_menu=
 	{	#set		=> '#_#= (#VAL# eq "" ? 0 : (__#mainfield#_gid{#VAL#}||= (push @__#mainfield#_name, #VAL#)-1));',
 		parent		=> 'fewstring',
 		mainfield	=> 'artist',
-		pic_cache_id	=> 'a',
 		init		=> '____=""; __#mainfield#_gid{""}=1; #_iname#[1]=::superlc( #_name#[1]=_("<Unknown>") );',
 		get		=> 'do {my $v=#_#; $v!=1 ? #_name#[$v] : "";}',
 		gid_to_get	=> '(#GID#!=1 ? #_name#[#GID#] : "")',
@@ -159,7 +163,6 @@ our %timespan_menu=
 	album	=>
 	{	parent		=> 'fewstring',
 		mainfield	=> 'album',
-		pic_cache_id	=> 'b',
 		_empty		=> 'vec(__#mainfield#_empty,#_#,1)',
 		unknown		=> '_("<Unknown>")." "',
 		init		=> '____=""; __#mainfield#_gid{"\\x00"}=1; __#mainfield#_empty=""; vec(__#mainfield#_empty,1,1)=1; #_iname#[1]=::superlc( #_name#[1]=_("<Unknown>") );',
@@ -226,17 +229,17 @@ our %timespan_menu=
 	},
 # 	picture =>
 #	{	get_picture	=> '__#mainfield#_picture[#GID#] || $::Options{Default_picture_#mainfield#};',
-#		get_pixbuf	=> 'my $file= #get_picture#; ::PixBufFromFile($file);',
+#		get_pixbuf	=> 'my $file= #get_picture#; GMB::Picture::pixbuf($file);',
 #		set_picture	=> '::_utf8_off(#VAL#); __#mainfield#_picture[#GID#]= #VAL# eq "" ? undef : #VAL#; ::HasChanged("Picture_#mainfield#",#GID#);',
 #		'load_extra:picture'	=> 'if (#VAL# ne "") { __#mainfield#_picture[#GID#]= ::decode_url(#VAL#); }',
 #		'save_extra:picture'	=> 'do { my $v=__#mainfield#_picture[#GID#]; defined $v ? ::url_escape($v) : ""; }',
 #	},
  	_picture =>
 	{	_		=> '__#mainfield#_picture[#GID#]',
-		init		=> '@__#mainfield#_picture=(); push @AAPicture::ArraysOfFiles, \@__#mainfield#_picture;',
+		init		=> '@__#mainfield#_picture=(); push @GMB::Picture::ArraysOfFiles, \@__#mainfield#_picture;',
 		default		=> '$::Options{Default_picture}{#mainfield#}',
 		get_for_gid	=> '#_# || #default#;',
-		pixbuf_for_gid	=> 'my $file= #get_for_gid#; ::PixBufFromFile($file);',#FIXME use a cache
+		pixbuf_for_gid	=> 'my $file= #get_for_gid#; GMB::Picture::pixbuf($file);',
 		set_for_gid	=> '::_utf8_off(#VAL#); #_#= #VAL# eq "" ? undef : #VAL#; ::HasChanged("Picture_#mainfield#",#GID#);',
 		load_extra	=> 'if (#VAL# ne "") { #_#= ::decode_url(#VAL#); }',
 		save_extra	=> 'do { my $v=#_#; defined $v ? filename_escape($v) : ""; }',
@@ -244,7 +247,7 @@ our %timespan_menu=
 	},
 	_stars =>	#FIXME not used everywhere
 	{	_		=> 'sprintf("%d",#GID# * #nbpictures# /100)',
-		pixbuf_for_gid	=> 'my $r= #_#; __#mainfield#_pixbuf[$r] ||= ::PixBufFromFile( "#fileprefix#".$r.".png" );',
+		pixbuf_for_gid	=> 'my $r= #_#; __#mainfield#_pixbuf[$r] ||= GMB::Picture::pixbuf( "#fileprefix#".$r.".png" );',
 	},
 	fewstring=>	#for strings likely to be repeated
 	{	_		=> 'vec(____,#ID#,#bits#)',
@@ -1129,7 +1132,7 @@ sub New
 }
 
 sub ReReadFile
-{	my $ID=$_[0]; my $force=$_[1]; warn "ReReadFile(@_) called from : ".join(':',caller)."\n";
+{	my ($ID,$force,$noremove)=@_;
 	my $file= GetFullFilename($ID);
 	if (-r $file)
 	{	my ($size1,$modif1)=Songs::Get($ID,qw/size modif/);
@@ -1144,7 +1147,7 @@ sub ReReadFile
 		my %changed; $changed{$_}=undef for @changed;
 		Changed(\%changed,[$ID]);
 	}
-	else	#file not found/readable
+	elsif (!$noremove)	#file not found/readable
 	{	warn "can't read file '$file'\n";
 		::SongsRemove([$ID]);
 	}
@@ -1474,7 +1477,7 @@ sub FindID
 	{	$f=~s#$::QSLASH{2,}#::SLASH#goe; #remove double SLASH
 		if ($f=~s/$::QSLASH([^$::QSLASH]+)$//o)
 		{	return $IDFromFile->{$f}{$1} if $IDFromFile;
-			my $m=Filter->newadd(1,'file:e:'.$1, 'path:e:'.$f)->filter( [FIRSTID..$LastID] );
+			my $m=Filter->newadd(1,'file:e:'.$1, 'path:e:'.$f)->filter_all;
 			if (@$m)
 			{	warn "Error, more than one ID match $f/$1" if @$m>1;
 				return $m->[0];
@@ -1534,7 +1537,7 @@ sub ChooseIcon	 #FIXME add a way to create a colored square/circle/... icon
 	}
 	else
 	{	$destfile.='.png';
-		my $pixbuf=::PixBufFromFile($file,48);
+		my $pixbuf= GMB::Picture::load($file,48);
 		return unless $pixbuf;
 		$pixbuf->save($destfile,'png');
 	}
@@ -1663,6 +1666,7 @@ sub SortList		#FIXME add a few fields (like 'disc track path file') to all sort 
 			unless ($Def{$field}) { warn "Songs::SortList : Invalid field $field\n"; next }
 			unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $field\n"; next }
 			my ($sortinit,$sortcode)= SortCode($field,$inv,$i);
+			unless ($sortcode) { warn "Error trying to sort by $field\n"; next }
 			push @code, $sortcode;
 			$init.= $sortinit."; " if $sortinit;
 		}
@@ -1776,7 +1780,7 @@ sub BuildHash
 
 sub AllFilter
 {	my $filter=$_[0];
-	Filter->new($filter)->filter( [FIRSTID..$LastID] );
+	Filter->new($filter)->filter_all;
 }
 
 #sub GroupSub_old
@@ -2013,7 +2017,7 @@ sub AreIn
 	return [grep defined && vec($Presence{$self},$_,1), @$IDs];
 }
 sub save_to_string
-{	return join ' ',map sprintf("%d",$_), @{$_[0]};	#use sprintf so that the numbers are not stringified => use more memory
+{	return join ' ',map $_, @{$_[0]};	#map $_ so that the numbers are not stringified => use more memory
 }
 
 sub GetName
@@ -2889,6 +2893,10 @@ sub invert
 	return $self;
 }
 
+sub filter_all
+{	$_[0]->filter( [Songs::FIRSTID..$Songs::LastID] );
+}
+
 sub filter
 {	my $self=$_[0]; my $listref=$_[1];
 	#my $time=times;								#DEBUG
@@ -3112,6 +3120,16 @@ sub is_empty
 	return if $f->{source}; #FIXME
 	$f=$f->{string} if ref $f;
 	return ($f eq '');
+}
+
+sub name
+{	my $self=shift;
+	my $h= $::Options{SavedFilters};
+	return _"All Songs" if $self->is_empty;
+	for my $name (sort keys %$h)
+	{	return $name if $self->are_equal($h->{$name});
+	}
+	return _"Unnamed filter";
 }
 
 sub explain	# return a string describing the filter

@@ -29,7 +29,7 @@ sub new
 	return $self;
 }
 
-dbus_method('RunCommand', ['string'], []);
+dbus_method('RunCommand', ['string'], [],{no_return=>1});
 sub RunCommand
 {   my ($self,$cmd) = @_;
     warn "Received DBus command : '$cmd'\n";
@@ -133,7 +133,7 @@ use Net::DBus;
 use Net::DBus::Service;
 
 my $not_glib_dbus;
-my $bus;
+our $bus;
 eval { require Net::DBus::GLib; $bus=Net::DBus::GLib->session; };
 unless ($bus)
 {	#warn "Net::DBus::GLib not found (not very important)\n";
@@ -145,7 +145,7 @@ Glib::Idle->add(\&init); #initialize once the main gmb init is finished
 
 sub init
 {	#my $bus = Net::DBus->session;
-	my $service= $bus->export_service('org.gmusicbrowser');
+	my $service= $bus->export_service($::DBus_id);	# $::DBus_id is 'org.gmusicbrowser' by default
 	my $object = GMB::DBus::Object->new($service);
 	DBus_mainloop_hack() if $not_glib_dbus;
 	0; #called in an idle, return 0 to run only once

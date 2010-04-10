@@ -120,7 +120,7 @@ sub fill_history_menu
 package LabelTotal;
 use Gtk2;
 
-use base 'Gtk2::Button';
+use base 'Gtk2::Bin';
 
 our %Modes=
 (	list	 => {label=> _"Listed songs",	setup => \&list_Set,	update=>\&list_Update,		delay=> 1000,	},
@@ -129,20 +129,26 @@ our %Modes=
 	selected => {label=> _"Selected songs", setup => \&selected_Set,update=>\&selected_Update,	delay=> 500,	},
 );
 
+our @default_options=
+(	button =>1, format => 'long', relief=> 'none', mode=> 'list',
+);
 
 sub new
 {	my ($class,$opt) = @_;
-	my $self = bless Gtk2::Button->new, $class;
-	$self->set_relief('none');
-	my $mode=$opt->{mode} || 'list';
-	$self->{size}=$opt->{size};
-	$self->{format}= ($opt->{format} && $opt->{format} eq 'short') ? 'short' : 'long';
-	$self->{group}=$opt->{group};
+	%$opt=( @default_options, %$opt );
+	my $self;
+	if ($opt->{button})
+	{	$self=Gtk2::Button->new;
+		$self->set_relief($opt->{relief});
+	}
+	else { $self=Gtk2::EventBox->new; }
+	bless $self,$class;
+	$self->{$_}= $opt->{$_} for qw/size format group/;
 	$self->add(Gtk2::Label->new);
 	$self->signal_connect( destroy => \&Remove);
 	$self->signal_connect( button_press_event => \&button_press_event_cb);
 	::Watch($self, SongsChanged	=> \&SongsChanged_cb);
-	$self->Set_mode($mode);
+	$self->Set_mode($opt->{mode});
 	return $self;
 }
 
@@ -1443,10 +1449,10 @@ my %sort_menu=
 );
 our @MenuPageOptions;
 my @MenuSubGroup=
-(	{ label => sub {_"Set subgroup".' '.$_[0]{depth}},	submenu => sub { return {0 => _"None",map {$_=>Songs::FieldName($_)} Songs::FilterListFields()}; },
-		submenu_reverse => 1,	code => sub { $_[0]{self}->SetField($_[1],$_[0]{depth}) },	check => sub {$_[0]{self}{field}[$_[0]{depth}]},
+(	{ label => sub {_("Set subgroup").' '.$_[0]{depth}},	submenu => sub { return {0 => _"None",map {$_=>Songs::FieldName($_)} Songs::FilterListFields()}; },
+		submenu_reverse => 1,	code => sub { $_[0]{self}->SetField($_[1],$_[0]{depth}) },	check => sub { $_[0]{self}{field}[$_[0]{depth}] ||0 },
 	},
-	{ label => sub {_"Options for subgroup".' '.$_[0]{depth}},	submenu => \@MenuPageOptions,
+	{ label => sub {_("Options for subgroup").' '.$_[0]{depth}},	submenu => \@MenuPageOptions,
 	  test  => sub { $_[0]{depth} <= $_[0]{self}{depth} },
 	},
 );
@@ -1466,7 +1472,7 @@ my @MenuSubGroup=
 	{ label => _"font size depends on",	code => sub { $_[0]{self}->SetOption(cloud_stat=>$_[1]); },
 	  mode => 'C',
 	  submenu => \@cloudstats_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{cloud_stat}}, },
-	{ label => _"minimun font size", code => sub { $_[0]{self}->SetOption(cloud_min=>$_[1]); },
+	{ label => _"minimum font size", code => sub { $_[0]{self}->SetOption(cloud_min=>$_[1]); },
 	  mode => 'C',
 	  submenu => sub { [2..::min(20,$_[0]{self}{cloud_max}-1)] },  check => sub {$_[0]{self}{cloud_min}}, },
 	{ label => _"maximum font size", code => sub { $_[0]{self}->SetOption(cloud_max=>$_[1]); },
@@ -1548,7 +1554,7 @@ sub new
 	$self->{SaveOptions}=\&SaveOptions;
 	%$opt=( @DefaultOptions, %$opt );
 	my @pids=split /\|/, $opt->{pages};
-	$self->{$_}=$opt->{$_} for qw/nb group min/;
+	$self->{$_}=$opt->{$_} for qw/nb group min hidetabs/;
 	$self->{main_opt}{$_}=$opt->{$_} for qw/group no_typeahead searchbox activate/; #options passed to children
 	my $nb=$self->{nb};
 	my $group=$self->{group};
@@ -2980,7 +2986,7 @@ sub new
 	$img->{size}=0;
 	$img->signal_connect(size_allocate => \&size_allocate_cb);
 	$pixbox->add($img);
-	$pixbox->signal_connect(button_press_event => \&::pixbox_button_press_cb,1); # 1 : mouse button 1
+	$pixbox->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb,1); # 1 : mouse button 1
 
 	my $buttonbox=Gtk2::VBox->new;
 	my $Bfilter=::NewIconButton('gmb-filter',undef,sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->filter },'none');
@@ -3133,15 +3139,10 @@ sub size_allocate_cb
 }
 sub setpic
 {	my $img=shift;
-	if ($img->{pixbuf}) { ::ScaleImage($img,$img->{size}) }
-	else
-	{	my $self= ::find_ancestor($img,__PACKAGE__);
-		my $file;
-		$file= AAPicture::GetPicture($self->{aa},$self->{Sel}) if defined $self->{Sel};
-		if ($file)
-		 { ::ScaleImageFromFile($img, $img->{size}, $file) }
-		else { $img->set_from_pixbuf(undef); }
-	}
+	my $self= ::find_ancestor($img,__PACKAGE__);
+	my $file= $img->{filename}= AAPicture::GetPicture($self->{aa},$self->{Sel});
+	my $pixbuf= $file ? GMB::Picture::pixbuf($file,$img->{size}) : undef;
+	$img->set_from_pixbuf($pixbuf) if $pixbuf;
 }
 
 sub AABox_button_press_cb			#popup menu
@@ -3170,7 +3171,8 @@ sub AlbumListButton_press_cb
 	return unless defined $self->{Sel};
 	::PopupAA('album', from => $self->{Sel}, cb=>sub
 		{	my $key=$_[1];
-			::SetFilter( $self, 'album:~:'.$key, $self->{filternb}, $self->{group} );
+			my $filter= Songs::MakeFilterFromGID('album',$key);
+			::SetFilter( $self, $filter, $self->{filternb}, $self->{group} );
 		});
 	1;
 }
@@ -3213,15 +3215,16 @@ sub new
 	$entry->signal_connect(activate => \&Filter);
 	$entry->signal_connect_after(activate => sub {::run_command($_[0],$opt->{activate});}) if $opt->{activate};
 	unless ($opt->{noselector})
-	{	for my $aref (	['gtk-find'=> \&PopupSelectorMenu,0],
-				['gtk-clear',sub {my $e=$_[0]->parent->{entry}; $e->set_text(''); Filter($e); },1]
+	{	for my $aref (	['gtk-find'	=> \&PopupSelectorMenu,	0, _"Search options"],
+				['gtk-clear'	=> \&ClearFilter,	1, _"Reset filter"]
 			     )
-		{	my ($stock,$cb,$end)=@$aref;
+		{	my ($stock,$cb,$end,$tip)=@$aref;
 			my $img=Gtk2::Image->new_from_stock($stock,'menu');
 			my $but=Gtk2::Button->new;
 			$but->add($img);
 			$but->can_focus(0);
 			$but->set_relief('none');
+			$but->set_tooltip_text($tip);
 			$but->signal_connect(expose_event => sub #prevent the button from beign drawn, but draw its child
 			{	my ($but,$event)=@_;
 				$but->propagate_expose($but->child,$event);
@@ -3233,7 +3236,7 @@ sub new
 			else { $self->pack_start($but,0,0,0); }
 			if ($stock eq 'gtk-clear')
 			{	$self->{clear_button}=$but;
-				$entry->signal_connect(changed => sub { $_[0]->parent->{clear_button}->set_sensitive($_[0]->get_text ne '' ); });
+				$entry->signal_connect(changed => \&UpdateClearButton);
 				$but->set_sensitive(0);
 			}
 		}
@@ -3253,7 +3256,7 @@ sub new
 				#$self->propagate_expose($_,$event) for $self->get_children;
 				0;
 			});
-		::WatchFilter($self, $self->{group},sub {$_[0]->{filtered}=0;$_[0]->queue_draw}); #to update background color
+		::WatchFilter($self, $self->{group},sub {$_[0]->{filtered}=0; $_[0]->UpdateClearButton; $_[0]->queue_draw}); #to update background color and clear button
 	}
 	else {$self->add($entry);}
 	return $self;
@@ -3265,11 +3268,22 @@ sub SaveOptions
 	return \%opt;
 }
 
+sub ClearFilter
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	$self->{entry}->set_text('');
+	$self->Filter;
+}
+sub UpdateClearButton
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $on= $self->{entry}->get_text ne '' || !::GetFilter($self)->is_empty;
+	$self->{clear_button}->set_sensitive($on);
+}
+
 sub ChangeOption
 {	my ($self,$key,$value)=@_;
 	$self->{$key}=$value;
 	$self->{last_filter}=undef;
-	Filter($self->{entry});
+	$self->Filter;
 }
 
 sub PopupSelectorMenu
@@ -3304,9 +3318,9 @@ sub PopupSelectorMenu
 }
 
 sub Filter
-{	my $entry=$_[0];
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $entry=$self->{entry};
 	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
-	my $self=::find_ancestor($entry,__PACKAGE__);
 	my ($last_filter,$last_eq,@last_substr)= @{ delete $self->{last_filter} || [] };
 	my $search0=my $search= $entry->get_text;
 	my $filter;
@@ -6645,7 +6659,7 @@ sub pic_cached
 {	my ($arg,$file,$resize,$w,$h,$xpad,$ypad,$crop,$hide)=@_;
 	return undef,0 if $hide || !$file;
 	if ($resize) { $w-=2*$xpad; $h-=2*$ypad; $h=0 if $h<0; $w=0 if $w<0; $resize.="_$w"."_$h"; }
-	my $cached=AAPicture::load_file($file,$crop,$resize);
+	my $cached=GMB::Picture::load_skinfile($file,$crop,$resize);
 	return $cached||$resize, !$cached;
 }
 sub pic_size
@@ -6653,7 +6667,7 @@ sub pic_size
 	return undef,0,0 if $hide || !$file;
 	my $pixbuf=$cached;
 	unless (ref $cached) #=> cached is resize_w_h
-	{	$pixbuf=AAPicture::load_file($file,$crop,$cached,1);
+	{	$pixbuf=GMB::Picture::load_skinfile($file,$crop,$cached,1);
 	}
 	return undef,0,0 unless $pixbuf;
 	return $pixbuf,$pixbuf->get_width,$pixbuf->get_height;

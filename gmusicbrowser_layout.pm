@@ -50,6 +50,7 @@ our %Widgets=
 		#size	=> SIZE_BUTTONS,
 		stock	=> 'gtk-media-previous',
 		tip	=> _"Recently played songs",
+		text	=> _"Previous",
 		activate=> \&::PrevSong,
 		options => 'nbsongs',
 		nbsongs	=> 10,
@@ -75,6 +76,7 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		stock	=> 'gtk-media-next',
 		tip	=> _"Next Song",
+		text	=> _"Next",
 		activate=> \&::NextSong,
 		options => 'nbsongs',
 		nbsongs	=> 10,
@@ -109,6 +111,7 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		stock	=> 'gtk-preferences',
 		tip	=> _"Edit Settings",
+		text	=> _"Settings",
 		activate=> \&::PrefDialog,
 		click3	=> sub {Layout::Window->new($::Options{Layout});}, #mostly for debugging purpose
 		click2	=> \&::AboutDialog,
@@ -153,7 +156,8 @@ our %Widgets=
 		size	=> SIZE_FLAGS,
 		state	=> sub { my $s=$::Options{'Sort'};($s=~m/^random:/)? 'random' : ($s eq 'shuffle')? 'shuffle' : 'sorted'; },
 		stock	=> { random => 'gmb-random', shuffle => 'gmb-shuffle', sorted => 'gtk-sort-ascending' },
-		tip	=> sub { _("Play order :\n").::ExplainSort($::Options{Sort}); },
+		tip	=> sub { _("Play order") ." :\n". ::ExplainSort($::Options{Sort}); },
+		text	=> sub { ::ExplainSort($::Options{Sort},1); },
 		click1	=> \&::ToggleSort,
 		click3	=> sub { SortMenu() },
 		event	=> 'Sort SavedWRandoms SavedSorts',
@@ -169,6 +173,7 @@ our %Widgets=
 			{ defined $::ListMode	? _"static list"
 						: _("Playlist filter :\n").$::SelectedFilter->explain;
 			},
+		text	=> sub { $::ListMode ? _"static list" : $::SelectedFilter->name; },
 		click1	=> \&RemoveFilter,
 		click3	=> sub { FilterMenu() },
 		event	=> 'Filter SavedFilters',
@@ -188,6 +193,7 @@ our %Widgets=
 		tip	=> sub { ::CalcListLength($::Queue,'queue')
 				.($::QueueAction? "\n". ::__x( _"then {action}", action => $::QActions{$::QueueAction}[2] ) : '');
 				},
+		text	=> _"Queue",
 		click1	=> \&::ClearQueue,
 		click3	=> sub {::PopupContextMenu(\@MenuQueue,{ID=>$::SongID});},
 		event	=> 'Queue QueueAction',
@@ -205,6 +211,10 @@ our %Widgets=
 	},
 	Button =>
 	{	class	=> 'Layout::Button',
+	},
+	EventBox =>
+	{	class	=> 'Layout::Button',
+		button	=> 0,
 	},
 	Label =>
 	{	class	=> 'Layout::Label',
@@ -517,6 +527,7 @@ our %Widgets=
 	},
 	TogButton =>
 	{	class	=> 'Layout::TogButton',
+		size	=> 'menu',
 	},
 	HSeparator =>
 	{	New	=> sub {Gtk2::HSeparator->new},
@@ -569,6 +580,7 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		stock	=> 'gtk-fullscreen',
 		tip	=> _"Toggle fullscreen mode",
+		text	=> _"Fullscreen",
 		activate=> \&::ToggleFullscreenLayout,
 		#activate=> \&ToggleFullscreen,
 		autoadd_type	=> 'button main',
@@ -592,7 +604,7 @@ our %Widgets=
 	{	New	=> \&PlayOrderComboNew,
 		event	=> 'Sort SavedWRandoms SavedSorts',
 		update	=> \&PlayOrderComboUpdate,
-		reqwidth=> 100,
+		minwidth=> 100,
 	},
 	Progress =>
 	{	class => 'Layout::Progress',
@@ -623,13 +635,19 @@ sub get_layout_list
 	my @tree;
 	for my $id (@list)
 	{	my $name2=$id;
-		my $cat= $Layouts{$id}{Category} || ($name2=~s#(.+)/## && $1);
-		my $name= $Layouts{$id}{Name} || $name2;
+		my $cat= $Layouts{$id}{Category};
+		my $name= $Layouts{$id}{Name} || _( $name2 );
 		my $array= $cat ?  ($cat{$cat}||=[]) : \@tree;
-		push @$array, $id, _( $name );
+		push @$array, $id, $name;
 	}
-	push @tree, $cat{$_},_( $_ ) for keys %cat;
+	push @tree, $cat{$_},$_ for keys %cat;
 	return \@tree;
+}
+
+sub get_layout_name
+{	my $layout=shift;
+	my $name= $Layouts{$layout}{Name} || _( $layout );
+	return $name;
 }
 
 sub InitLayouts
@@ -644,7 +662,7 @@ sub InitLayouts
 	{	print "Available layouts : ((type) id\t: name)\n";
 		my ($max)= sort {$b<=>$a} map length, keys %Layouts;
 		for my $id (sort keys %Layouts)
-		{	my $name= $Layouts{$id}{Name} || $id;
+		{	my $name= get_layout_name($id);
 			my $type= $Layouts{$id}{Type} || '';
 			$type="($type)" if $type;
 			printf "%-4s %-${max}s : %s\n",$type,$id,$name;
@@ -655,7 +673,7 @@ sub InitLayouts
 
 sub ReadLayoutFile
 {	my $file=shift;
-	#no warnings;#warn $file;
+	my $path=$file; $path=~s#[^/]+$##;
 	return unless -f $file && -r $file;
 	open my$fh,"<:utf8",$file;
 	my $first;
@@ -673,7 +691,7 @@ sub ReadLayoutFile
 			push @lines,$_;
 		}
 		if ($first)
-		{	if ($first=~m#^\[#) {ParseLayout(\@lines)}
+		{	if ($first=~m#^\[#) {ParseLayout(\@lines,$path)}
 			else		{ParseSongTreeSkin(\@lines)}
 		}
 		$first=$next;
@@ -683,7 +701,7 @@ sub ReadLayoutFile
 }
 
 sub ParseLayout
-{	my $lines=$_[0];	#print join "\n",@$lines,"\n\n\n";
+{	my ($lines,$path)=@_;
 	my $first=shift @$lines;
 	my $name;
 	if ($first=~m/^\[([^]=]+)\](?:\s*based on (.+))?$/)
@@ -697,12 +715,15 @@ sub ParseLayout
 	}
 	else {return}
 	for (@$lines)
-	{	s#_\"([^"]+)"#my $tr=$1; $tr=~y/"/'/; qq/"$tr"/#ge;	#translation, escaping the " so it is not picked up as a translatable string. Replace any " in translations because they would cause trouble
+	{	s#_\"([^"]+)"#my $tr=_( $1 ); $tr=~y/"/'/; qq/"$tr"/#ge;	#translation, escaping the " so it is not picked up as a translatable string. Replace any " in translations because they would cause trouble
 		next unless m/^(\w+)\s*=\s*(.*)$/;
 		if ($2 eq '') {delete $Layouts{$name}{$1};next}
 		$Layouts{$name}{$1}= $2;
 	}
-	$Layouts{$name}{Name}=~s/^"(.*)"$/$1/ if $Layouts{$name}{Name};	#remove quotes from layout name
+	for my $key (qw/Name Category/)
+	{	$Layouts{$name}{$key}=~s/^"(.*)"$/$1/ if $Layouts{$name}{$key};	#remove quotes from layout name and category
+	}
+	$Layouts{$name}{PATH}=$path;
 }
 
 sub ParseSongTreeSkin
@@ -787,7 +808,7 @@ sub InitLayout
 	$self->{KeyBindings}=::make_keybindingshash($boxes->{KeyBindings}) if $boxes->{KeyBindings};
 	$self->{widgets}={};
 	$self->{global_options}{default_group}=$self->{group};
-	for (qw/SkinPath SkinFile DefaultFont DefaultFontColor/)
+	for (qw/PATH SkinPath SkinFile DefaultFont DefaultFontColor/)
 	{	my $val= $self->{options}{$_} || $boxes->{$_};
 		$self->{global_options}{$_}=$val if defined $val;
 	}
@@ -908,10 +929,26 @@ sub Parse_opt1
 		}
 		else
 		{	#%opt= $opt=~m/(\w+)=([^,]*)(?:,|$)/g;
-			return ::ParseOptions($opt);
+			return Hash_to_HoH( ::ParseOptions($opt) );
 		}
 	}
 	return \%opt;
+}
+
+sub Hash_to_HoH		# turn { 'key1/key2' => value } into { key1 => { key2 => value } }
+{	my $hash=shift;
+	for my $key (grep m#/#, keys %$hash)
+	{	my $val=delete $hash->{$key};
+		my @keys=split '/',$key;
+		$key= pop @keys;
+		my $h=$hash;
+		for (@keys)
+		{	$h= $h->{$_}||={};
+			last if !ref $h;
+		}
+		$h->{$key}=$val;
+	}
+	return $hash;	# the hash ref hasn't changed, but can be handy to return it anyway
 }
 
 sub NewWidget
@@ -957,7 +994,7 @@ sub NewWidget
 
 	$widget->{actions}{$_}=$options{$_}  for grep m/^click\d*/, keys %options;
 	$widget->signal_connect(button_press_event => \&Button_press_cb) if $widget->{actions};
-	if ($widget->isa('Gtk2::Button') and $options{activate})
+	if (($widget->isa('Gtk2::Button') or $widget->{isbutton}) and $options{activate})
 	{	$widget->{actions}{activate}=$options{activate};
 		$widget->signal_connect(clicked => \&Button_activate_cb);
 	}
@@ -1073,9 +1110,10 @@ sub UpdateSongID
 #}
 
 sub ShowHide
-{	my ($self,$names,$resize)=@_;
-	if (grep $_ && $_->visible, map $self->{widgets}{$_}, split /\|/,$names)
-	{ &Hide	} else { &Show } #keep @_
+{	my ($self,$names,$resize,$show)=@_;
+	$show= !grep $_ && $_->visible, map $self->{widgets}{$_}, split /\|/,$names unless defined $show;
+	if ($show)	{ Show($self,$names,$resize); }
+	else		{ Hide($self,$names,$resize); }
 }
 
 sub Hide
@@ -1217,8 +1255,8 @@ sub PlayOrderComboNew
 {	my $opt=$_[0];
 	my $store=Gtk2::ListStore->new(('Glib::String')x3);
 	my $combo=Gtk2::ComboBox->new($store);
-	$combo->set_size_request($opt->{reqwidth},-1);
 	my $cell=Gtk2::CellRendererPixbuf->new;
+	$cell->set_fixed_size( Gtk2::IconSize->lookup('menu') );
 	$combo->pack_start($cell,0);
 	$combo->add_attribute($cell,stock_id => 2);
 	$cell=Gtk2::CellRendererText->new;
@@ -1539,11 +1577,10 @@ sub new
 sub init
 {	my $self=$_[0];
 	if ($self->{options}{transparent})
-	{	eval { require Cairo unless $::useCairo; $::useCairo=1; };
-		if ($::useCairo)
+	{	if ($::CairoOK)
 		{	make_transparent($self);
 		}
-		else { warn "Error : can't load the Cairo perl module => can't make the window transparent\n" }
+		else { warn "no Cairo perl module => can't make the window transparent\n" }
 	}
 	$self->child->show_all;		#needed to get the true size of the window
 	$self->child->realize;		#
@@ -1570,7 +1607,7 @@ sub init
 sub layout_name
 {	my $self=shift;
 	my $id=$self->{layout};
-	return $Layout::Layouts{$id}{Name} || $id;
+	return Layout::get_layout_name($id);
 }
 sub close_window
 {	my $self=shift;
@@ -1696,10 +1733,12 @@ sub Position
 
 sub make_transparent
 {	my @children=($_[0]);
+	my $colormap=$children[0]->get_screen->get_rgba_colormap;
+	return unless $colormap;
 	while (my $widget=shift @children)
 	{	push @children, $widget->get_children if $widget->isa('Gtk2::Container');
 		unless ($widget->no_window)
-		{	$widget->set_colormap($widget->get_screen->get_rgba_colormap);
+		{	$widget->set_colormap($colormap);
 			$widget->set_app_paintable(1);
 			$widget->signal_connect(expose_event => \&transparent_expose_cb);
 		}
@@ -2580,44 +2619,59 @@ sub SaveOptions
 
 package Layout::Button;
 use Gtk2;
-use base 'Gtk2::Button';
+use base 'Gtk2::Bin';
 
-our @default_options= (button=>1, relief=>'none', size=> Layout::SIZE_BUTTONS );
+our @default_options= (button=>1, relief=>'none', size=> Layout::SIZE_BUTTONS, ellipsize=> 'none', );
 
 sub new
 {	my ($class,$opt,$ref)=@_;
 	%$opt=( @default_options, %$opt );
-	my $self = bless Gtk2::Button->new, $class;
 	my $isbutton= $opt->{button};
-	$self->set_relief($opt->{relief}) if $isbutton;
+	my $self;
+	if ($isbutton)
+	{	$self=Gtk2::Button->new;
+		$self->set_relief($opt->{relief});
+		$self->{isbutton}=1;
+	}
+	else
+	{	$self=Gtk2::EventBox->new;
+		my $activate=delete $opt->{activate};
+		$opt->{click} ||= $activate;
+	}
+	bless $self, $class;
+	my $text= $opt->{text} || $opt->{label};
 	my $stock= $ref->{'state'} ? $ref->{stock} : $opt->{stock}; 	#FIXME support states ?
 	if ($opt->{skin})
 	{	my $skin=Skin->new($opt->{skin},$self,$opt);
 		$self->signal_connect(expose_event => \&Skin::draw,$skin);
 		$self->set_app_paintable(1); #needed ?
 		$self->{skin}=1;
-		if (0 && $opt->{shape}) #mess up button-press cb
+		if (0 && !$isbutton && $opt->{shape}) #mess up button-press cb TESTME
 		{	$self->{shape}=1;
-			my $ebox=Gtk2::EventBox->new;
-			$ebox->add($self);
-			$self=$ebox;
 		}
 	}
 	elsif ($stock)
-	{	unless ($isbutton)
-		{	$self=bless Gtk2::EventBox->new, $class; #ugly but simple solution
-			my $activate=delete $opt->{activate};
-			$opt->{click} ||= $activate;
-		}
-		$self->{stock}=$stock;
+	{	$self->{stock}=$stock;
 		$self->{state}=$ref->{state} if $ref->{state};
 		$self->{size}= $opt->{size};
-		my $img=Gtk2::Image->new;
+		my $img= $self->{img}= Gtk2::Image->new;
 		$img->set_size_request(Gtk2::IconSize->lookup($self->{size})); #so that it always request the same size, even when no icon
-		$self->add($img);
+		if ($opt->{with_text})
+		{	my $hbox=Gtk2::HBox->new(0,2);
+			my $label= $self->{label}= Gtk2::Label->new;
+			my $ellip= $opt->{ellipsize};
+			$ellip='end' if $ellip eq '1';
+			$label->set_ellipsize($ellip);
+			$self->{string}= $text || $opt->{tip};
+			$self->{markup}= $opt->{markup} || $opt->{size} eq 'menu' ? "<small>%s</small>" : "%s";
+			$hbox->pack_start($img,0,0,0);
+			$hbox->pack_start($label,1,1,0);
+			$self->add($hbox);
+		}
+		else { $self->add($img); }
 		$self->UpdateStock;
 	}
-	else { $self->set_label($opt->{label}); }
+	elsif (defined $text) { $self->add( Gtk2::Label->new($text) ); }
 	return $self;
 }
 
@@ -2630,14 +2684,19 @@ sub UpdateStock
 	}
 	if ($stock=~m/ /)
 	{	$stock= (split /\s+/,$stock)[ $index || 0 ];
-		$stock='' if $stock eq '.'; #needed ?
+		$stock='' if $stock eq '.'; #needed ? the result is the same : no icon
 		unless (exists $self->{hasenterleavecb})
 		{	$self->{hasenterleavecb}=undef;
 			$self->signal_connect(enter_notify_event => \&UpdateStock,1);
 			$self->signal_connect(leave_notify_event => \&UpdateStock);
 		}
 	}
-	$self->child->set_from_stock($stock,$self->{size});
+	$self->{img}->set_from_stock($stock,$self->{size});
+	if (my $l=$self->{label})
+	{	my $string=$self->{string};
+		$string= $string->() if ref $string eq 'CODE';
+		$l->set_markup_with_format($self->{markup},$string);
+	}
 	0;
 }
 
@@ -2651,7 +2710,7 @@ use base 'Gtk2::EventBox';
 our @default_options= ( xalign=>0, yalign=>.5, );
 
 sub new
-{	my ($class,$opt,$ref)=@_;
+{	my ($class,$opt)=@_;
 	%$opt=( @default_options, %$opt );
 	my $self = bless Gtk2::EventBox->new, $class;
 	my $label=Gtk2::Label->new;
@@ -2661,9 +2720,11 @@ sub new
 	{	$self->{$_}=$opt->{$_} if exists $opt->{$_};
 	}
 
-	my $font= $opt->{font} || $opt->{DefaultFont} || $ref->{font};
+	my $font= $opt->{font} || $opt->{DefaultFont};
 	$label->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
-	$label->modify_fg('normal', Gtk2::Gdk::Color->parse($opt->{DefaultFontColor}) ) if $opt->{DefaultFontColor};
+	if (my $color= $opt->{color} || $opt->{DefaultFontColor})
+	{	$label->modify_fg('normal', Gtk2::Gdk::Color->parse($color) );
+	}
 	$label->set_markup($opt->{markup}) if exists $opt->{markup};
 	$label->set_text($opt->{text}) if exists $opt->{text};
 	$self->add($label);
@@ -2999,7 +3060,7 @@ use Gtk2;
 
 use base 'Gtk2::EventBox';
 
-our @default_options= (maxsize=>500, xalign=>.5, yalign=>.5);
+our @default_options= (maxsize=>500, xalign=>.5, yalign=>.5, r_height=>25, r_alpha1=>80, r_alpha2=>0, r_scale=>90);
 
 sub new
 {	my ($class,$opt)=@_;
@@ -3008,12 +3069,42 @@ sub new
 	$self->set_visible_window(0);
 	$self->{aa}=$opt->{aa};
 	my $minsize=$opt->{minsize};
-	$self->{$_}=$opt->{$_} for qw/maxsize xalign yalign multiple/;
+	$self->{$_}=$opt->{$_} for qw/maxsize xalign yalign multiple default/;
 
-	if ($opt->{forceratio}) { $self->{forceratio}=1; } #not sure it's still needed with the natural_size mode
+	$self->{usable_w}=$self->{usable_h}=1;
+	my $ratio=1;
+	if ( (my $refl=$opt->{reflection}) && $::CairoOK)
+	{	$self->{$_}= $opt->{$_}/100 for qw/r_alpha1 r_alpha2 r_scale/;
+		$self->{reflection}= $refl==1 ? $opt->{r_height}/100 : $refl/100;
+		my $height= $self->{reflection} +1;
+		$ratio/= $height;
+		$self->{usable_h}/=$height;
+	}
+	if (my $o=$opt->{overlay})
+	{{	my ($x,$y,$xy_or_wh,$w,$h,$file)= $o=~m/^(\d+)x(\d+)([-:])(\d+)x(\d+):(.+)/;
+		unless (defined $file) { warn "Invalid picture-overlay string : '$o' (format: XxY:WIDTHxHEIGHT:FILE)\n"; last }
+		$file= ::SearchFile( $file, $opt->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts' );
+		last unless $file;
+		my $pb= GMB::Picture::pixbuf($file);
+		last unless $pb;
+		if ($xy_or_wh eq '-') { $w-=$x; $h-=$y; }
+		my $w0=$pb->get_width;
+		my $h0=$pb->get_height;
+		warn "Bad picture-overlay values : rectangle bigger than the overlay picture\n" if $w0<$w+$x || $h0<$h+$y;
+		my $ws= $w0/$w;
+		my $hs= $h0/$h;
+		$ratio*= $ws/$hs;
+		$self->{usable_w}/= $ws;
+		$self->{usable_h}/= $hs;
+		$self->{overlay}=[$pb, $x/$w, $y/$h, $ws,$hs];
+	}}
+	if ($opt->{forceratio}) { $self->{forceratio}=$ratio; } #not sure it's still needed with the natural_size mode
 	else
-	{	$self->{expand_to_ratio}=1;
+	{	$self->{expand_to_ratio}=$ratio;
 		$self->{expand_weight}=10;
+	}
+	if (my $file=$opt->{'defaultfile'})
+	{	$self->{'default'}= ::SearchFile( $file, $opt->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts' );
 	}
 	$self->signal_connect(size_allocate => \&size_allocate_cb);
 	$self->signal_connect(expose_event => \&expose_cb);
@@ -3021,6 +3112,7 @@ sub new
 	$self->set_size_request($minsize,$minsize) if $minsize;
 	$self->{key}=[];
 	$self->{natural_size}=1;
+	$self->{ratio}=$ratio;
 	return $self;
 }
 
@@ -3043,21 +3135,12 @@ sub set
 		push @files, $f if $f;
 	}
 	$self->{pixbuf}=undef;
+	if ( !@files && (my $file=$self->{'default'}) ) { @files=($file); }	#default picture
 	if (@files)
-	{
-	 if (@files>1 && !$self->{multiple}) {$#files=0}
-	 $self->show;
-	 $self->queue_draw;
-	 ::IdleDo('8_LoadImg'.$self,500,sub
-	 {	my ($self,@files)=@_;
-		return if $self->{size} <10;
-		my $size=int $self->{size}/@files;
-		my @pix= grep $_, map ::PixBufFromFile($_,$size), @files;
-		$self->{pixbuf}= @pix ? \@pix : undef;
-		#$self->{pixbuf}=::PixBufFromFile($file,$self->{size});
+	{	 if (@files>1 && !$self->{multiple}) {$#files=0} # use only the first file if not in multiple mode
+		$self->show;
 		$self->queue_draw;
-		$self->hide unless @pix;
-	 },$self,@files);
+		::IdleDo('8_LoadImg'.$self,500,\&LoadImg,$self,@files);
 	}
 	else
 	{	$self->hide unless $self->{natural_size};
@@ -3070,28 +3153,50 @@ sub set
 	}) if $self->{natural_size};
 }
 
+sub LoadImg
+{	my ($self,@files)=@_;
+	my ($w,$h)=split /x/, $self->{size}||'0x0';
+	$w*= $self->{usable_w};
+	$h*= $self->{usable_h};
+	my $size= ::min($w,$h);
+	return if $size<8;	# no need to draw such a small picture
+	$size=int $size/@files;
+	my @pix= grep $_, map GMB::Picture::pixbuf($_,$size), @files;
+	my $pix=shift @pix;
+	if (@pix) { $pix=collage($self->{multiple},$pix,@pix); }
+	$pix= $self->add_overlay($pix) if $pix && $self->{overlay};
+	$self->{pixbuf}= $pix;
+	$self->queue_draw;
+	$self->hide unless $pix;
+}
+
 sub size_allocate_cb
 {	my ($self,$alloc)=@_;
-	my $max=$self->{maxsize};
-	my $w=$alloc->width; my $h=$alloc->height;
+	my $ratio=$self->{ratio};
+	my $w=$alloc->width;
+	my $h=$alloc->height;
+	if (my $max=$self->{maxsize})
+	{	$w=$max if $w>$max;
+		$h=$max if $h>$max;
+	}
+	my $func= $self->{forceratio} ? \&::max : \&::min;
+	$w= $func->($w, int $h*$ratio);
+	$h= $func->($h, int $w/$ratio);
+	my $size=$w.'x'.$h;
+
 	if (delete $self->{natural_size})#set temporary settings for natural_size mode #FIXME should be simpler
-	{	my $s= $w<$h ? $h : $w;
-		$self->set_size_request($s,$s) if !defined $self->{size} || $s!=$self->{size};
-		$self->{size}=$s;
+	{	$self->set_size_request($w,$h) if !defined $self->{size} || $size ne $self->{size};
+		$self->{size}=$size;
 		return;
 	}
 
-	my $s= ($self->{forceratio} xor $w<$h) ? $w : $h;
-
-	$s=$max if $max && $s>$max;
 	if (!defined $self->{size})
 	{	unless ($self->{pixbuf} || $::ToDo{'8_LoadImg'.$self}) {$self->hide;return};
 	}
-	elsif ($self->{size}==$s) {return}
-	$self->set_size_request($s,$s) if $self->{forceratio};
-	$self->{size}=$s;
-	$self->set(delete $self->{key});
-	#::ScaleImage( $img, $s ) unless $::ToDo{'8_LoadImg'.$img};
+	elsif ($self->{size} eq $size) {return}
+	$self->set_size_request($w,$h) if $self->{forceratio};
+	$self->{size}=$size;
+	$self->set( delete $self->{key} ); #force reloading
 }
 
 sub expose_cb
@@ -3099,24 +3204,99 @@ sub expose_cb
 	my ($x,$y,$ww,$wh)=$self->allocation->values;
 	my $pixbuf= $self->{pixbuf};
 	return 1 unless $pixbuf;
-	my $multiple= @$pixbuf>1 ? $self->{multiple} : undef;
-	if ($multiple)
-	{	if ($multiple eq 'h')	{$ww= int $ww/@$pixbuf}
-		else			{$wh= int $wh/@$pixbuf}
-	}
-	for my $pix (@$pixbuf)
-	{	my $w=$pix->get_width;
-		my $h=$pix->get_height;
-		my $dx= int ($ww-$w)*$self->{xalign};
-		my $dy= int ($wh-$h)*$self->{yalign};
-		my $gc=Gtk2::Gdk::GC->new($self->window);
+	my $w=$pixbuf->get_width;
+	my $h=$pixbuf->get_height;
+	$x+= int ($ww-$w)*$self->{xalign};
+	$y+= int ($wh-$h)*$self->{yalign};
+	if (!$self->{reflection})
+	{	my $gc=Gtk2::Gdk::GC->new($self->window);
 		$gc->set_clip_rectangle($event->area);
-		$self->window->draw_pixbuf($gc,$pix,0,0,$x+$dx,$y+$dy,-1,-1,'none',0,0);
-		if ($multiple) {if ($multiple eq 'h') {$x+=$ww} else {$y+=$wh}}
+		$self->window->draw_pixbuf($gc,$pixbuf,0,0,$x,$y,-1,-1,'none',0,0);
+	}
+	else
+	{	my $cr= Gtk2::Gdk::Cairo::Context->create($self->window);
+		$cr->rectangle($event->area);
+		$cr->clip;
+		$cr->translate($x,$y);
+		$self->draw_with_reflection($cr,$pixbuf);
 	}
 	1;
 }
 
+sub draw_with_reflection
+{	my ($self,$cr,$pixbuf)=@_;
+	my $w=$pixbuf->get_width;
+	my $h=$pixbuf->get_height;
+	my $scale= $self->{r_scale};
+	my $rh=$h * $self->{reflection};
+
+	#draw picture
+	$cr->set_source_pixbuf($pixbuf,0,0);
+	$cr->paint;
+
+	#clip for reflection
+	$cr->rectangle(0,$h,$w,$h+$rh);
+	$cr->clip;
+
+	#create alpha gradient
+	my $pattern= Cairo::LinearGradient->create(0,$h, 0,$h-$rh*(1/$scale));
+	$pattern->add_color_stop_rgba(0, 0,0,0, $self->{r_alpha1} );
+	$pattern->add_color_stop_rgba(1, 0,0,0, $self->{r_alpha2} );
+
+	#draw reflection
+	my $angle=::PI;
+	$cr->translate(0,$h);
+	$cr->rotate($angle);
+	$cr->scale(1,-$scale);
+	$cr->rotate(-$angle);
+	$cr->translate(0,-$h);
+	$cr->set_source_pixbuf($pixbuf,0,0);
+	$cr->mask($pattern);
+}
+
+sub collage
+{	my ($mode,@pixbufs)=@_;
+	$mode= $mode eq 'h' ? 1 : 0;
+	my ($x,$y,$w,$h)=(0,0,0,0);
+
+	#find resulting width and height
+	for my $pb (@pixbufs)
+	{	my $pw=$pb->get_width;
+		my $ph=$pb->get_height;
+		if ($mode)	{ $w+=$pw; $h=$ph if $ph>$h; }
+		else		{ $h+=$ph; $w=$pw if $pw>$w; }
+	}
+
+	my $pixbuf= Gtk2::Gdk::Pixbuf->new( $pixbufs[0]->get_colorspace, 1,8, $w,$h);
+	$pixbuf->fill(0);	 #fill with transparent black
+
+	for my $pb (@pixbufs)
+	{	my $pw=$pb->get_width;
+		my $ph=$pb->get_height;
+		# center pixbuf
+		if ($mode)	{ $y=int( ($h-$ph)/2 ); }
+		else		{ $x=int( ($w-$pw)/2 ); }
+		$pb->copy_area(0,0, $pw,$ph, $pixbuf, $x,$y);
+		if ($mode) { $x+=$pw } else { $y+=$ph }
+	}
+	return $pixbuf;
+}
+
+sub add_overlay
+{	my ($self,$pixbuf)=@_;
+	my $w=$pixbuf->get_width;
+	my $h=$pixbuf->get_height;
+	my ($overlay,$xs,$ys,$ws,$hs)= @{$self->{overlay}};
+	my $wo= $w*$ws;
+	my $ho= $h*$hs;
+	my $x= $w*$xs;
+	my $y= $h*$ys;
+	my $result= Gtk2::Gdk::Pixbuf->new( $pixbuf->get_colorspace, 1,8, $wo,$ho);
+	$result->fill(0);	 #fill with transparent black
+	$pixbuf->copy_area(0,0, $w,$h, $result, $x,$y);
+	$overlay->composite($result, 0,0, $wo,$ho, 0,0, $wo/$overlay->get_width,$ho/$overlay->get_height, 'bilinear',255);
+	return $result;
+}
 
 package Layout::TogButton;
 use Gtk2;
@@ -3126,14 +3306,14 @@ sub new
 {	my ($class,$opt)=@_;
 	my $self = bless Gtk2::ToggleButton->new, $class;
 	my ($icon,$label);
+	$self->set_relief($opt->{relief}) if $opt->{relief};
 	$label=Gtk2::Label->new($opt->{label}) if defined $opt->{label};
-	$icon=Gtk2::Image->new_from_stock($opt->{icon},'menu') if $opt->{icon};
+	$icon=Gtk2::Image->new_from_stock($opt->{icon},$opt->{size}) if $opt->{icon};
 	my $child= ($label && $icon) ?	::Hpack($icon,$label) :
 					$icon || $label;
 	$self->add($child) if $child;
 	#$self->{gravity}=$opt->{gravity};
-	$self->{widget}=$opt->{widget};
-	$self->{resize}=$opt->{resize};
+	$self->{$_}=$opt->{$_} for qw/widget resize togglegroup/;
 	$self->signal_connect( toggled => \&toggled_cb );
 	::Watch($self,'HiddenWidgets',\&UpdateToggleState);
 
@@ -3156,8 +3336,15 @@ sub toggled_cb
 	return if $self->{busy} || !$self->{widget};
 	my $layw=::get_layout_widget($self);
 	return unless $layw;
-	if ($self->get_active)	{ $layw->Show($self->{widget},$self->{resize}) }
-	else			{ $layw->Hide($self->{widget},$self->{resize}) }
+	my $show= $self->get_active;
+	if (my $tg=$self->{togglegroup})
+	{	unless ($show) { $show=1; $self->UpdateToggleState; } # togglegroup mode, click on a pressed button just press it again, doesn't un-pressed it
+		my @togbuttons= grep $_->{togglegroup} && $_!=$self && $_->{togglegroup} eq $tg,	#get list of widgets of the same togglegroup
+				values %{$layw->{widgets}};
+		my $hidewidgets=join '|',grep $_, map $_->{widget}, @togbuttons;
+		$layw->Hide($hidewidgets,$self->{resize}) if $hidewidgets;
+	}
+	if (my $w=$self->{widget})	{ $layw->ShowHide($w,$self->{resize},$show) }
 }
 
 package Layout::MenuItem;
@@ -3182,6 +3369,10 @@ sub new
 	if ($opt->{togglewidget})
 	{	$self->{widget}=$opt->{togglewidget};
 		$self->{resize}=$opt->{resize};
+		if (my $tg=$opt->{togglegroup})
+		{	$self->{togglegroup}=$tg;
+			$self->set_draw_as_radio(1);
+		}
 		$self->signal_connect( toggled => \&Layout::TogButton::toggled_cb );
 		::Watch($self,'HiddenWidgets',\&Layout::TogButton::UpdateToggleState);
 	}
@@ -3618,7 +3809,7 @@ sub new
 	{	$states{$s.$_}=$n++ for split '_',$states1;
 	}
 	$self->{states}=\%states;
-	$self->{skin_options}{$_}=$options->{$_} for qw/SkinPath SkinFile/;
+	$self->{skin_options}{$_}=$options->{$_} for qw/PATH SkinPath SkinFile/;
 	my $pb=$self->makepixbuf($states2[0].'normal');
 	return undef unless $pb;
 	$self->{minwidth}=my $w=$pb->get_width;
@@ -3678,20 +3869,14 @@ sub _load_skinfile
 	{	$pb=$file if ref $file eq 'Gtk2::Gdk::Pixbuf';
 	}
 	else
-	{ $options||={};
-	  $file ||= $options->{SkinFile};
-	  $file='' unless defined $file;
-	  unless (::file_name_is_absolute($file))
-	  {	my $path= $options->{SkinPath};
-		$path='' unless defined $path;
-		unless (::file_name_is_absolute($path))
-		{	my $p= $::HomeDir.'layouts'.::SLASH.$path;
-			$path= (-e $p.::SLASH.$file)? $p : $::DATADIR.::SLASH.$path;
+	{	$options||={};
+		$file ||= $options->{SkinFile};
+		if ($file)
+		{	my $path= $options->{SkinPath};
+			$file= $path.::SLASH.$file if defined $path;
+			$file= ::SearchFile($file, $options->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts');
+			$pb= GMB::Picture::pixbuf($file);
 		}
-		$file= $path.::SLASH.$file if defined $path;
-	  }
-	  return unless -r $file;
-	  $pb=Gtk2::Gdk::Pixbuf->new_from_file($file);
 	}
 	return unless $pb;
 	if ($crop)

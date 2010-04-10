@@ -78,6 +78,7 @@ use constant
  DRAG_ID	=> 3, DRAG_ARTIST	=> 4, DRAG_ALBUM	=> 5,
  DRAG_FILTER	=> 6, DRAG_MARKUP	=> 7,
 
+ PI    => 4 * atan2(1, 1),	#needed for cairo rotation functions
 };
 
 sub _ ($) {$_[0]}	#dummy translation functions
@@ -111,78 +112,68 @@ require 'gmusicbrowser_list.pm';
 require 'simple_http.pm';
 }
 
+our $CairoOK;
 our $Gtk2TrayIcon;
 BEGIN
 { eval { require Gtk2::TrayIcon; $Gtk2TrayIcon=1; };
   if ($@) { warn "Gtk2::TrayIcon not found -> tray icon won't be available\n"; }
+  eval { require Cairo; $CairoOK=1; };
+  if ($@) { warn "Cairo perl module not found -> transparent windows and other effects won't be available\n"; }
 }
-
 
 our $debug;
 our %CmdLine;
-our ($HomeDir,$SaveFile,$FIFOFile);
+our ($HomeDir,$SaveFile,$FIFOFile,$ImportFile,$DBus_id);
 
 our $QSLASH;	#quoted SLASH for use in regex
 #FIXME use :		use constant QSLASH => quotemeta SLASH;
 #  ???			and ${\QSLASH} instead of $QSLASH
 
-########## cmdline
-BEGIN
+# Parse command line
+BEGIN	# in a BEGIN block so that commands for a running instance are sent sooner/faster
 { our $QSLASH=quotemeta SLASH;
-  $HomeDir=Glib::get_user_config_dir.SLASH.PROGRAM_NAME.SLASH;
-  unless (-d $HomeDir)
-  {	my $old=Glib::get_home_dir.SLASH.'.'.PROGRAM_NAME.SLASH;
-	if (-d $old)
-	{	warn "Using folder $old for configuration, you could move it to $HomeDir to conform to the XDG Base Directory Specification\n";
-		$HomeDir=$old;
-	}
-	else
-	{	warn "Creating folder $HomeDir\n";
-		my $current='';
-		for my $dir (split /$QSLASH/o,$HomeDir)
-		{	$current.=SLASH.$dir;
-			next if -d $current;
-			die "Can't create folder $HomeDir : $!\n" unless mkdir $current;
-		}
-	}
-  }
+  $DBus_id='org.gmusicbrowser';
 
-  $SaveFile=(-d $HomeDir)
-	?  $HomeDir.'gmbrc'
-	: rel2abs('gmbrc');
-  $FIFOFile=(-d $HomeDir && $^O ne 'MSWin32')
-	?  $HomeDir.'gmusicbrowser.fifo'
-	: undef;
+  my $default_home= Glib::get_user_config_dir.SLASH.'gmusicbrowser'.SLASH;
+  if (!-d $default_home && -d (my $old= Glib::get_home_dir.SLASH.'.gmusicbrowser'.SLASH ) )
+  {	warn "Using folder $old for configuration, you could move it to $default_home to conform to the XDG Base Directory Specification\n";
+	$default_home=$old;
+  }
 
 my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2010 Quentin Sculo
 options :
 -nocheck: don't check for updated/deleted songs on startup
 -noscan	: don't scan folders for songs on startup
--demo	: don't check if current song has been updated/deleted
+-demo	: don't save settings/tags on exit
 -ro	: prevent modifying/renaming/deleting song files
 -rotags	: prevent modifying tags of music files
 -play	: start playing on startup
--nodbus	: do not use DBus
 -gst	: use gstreamer
 -nogst  : do not use gstreamer
 -server	: send playing song to connected icecast clent
 -port N : listen for connection on port N in icecast server mode
 -debug	: print lots of mostly useless informations
--nofifo : do not create/use named pipe $FIFOFile
--C FILE, -cfg FILE	: use FILE as configuration file (instead of $SaveFile)
--F FIFO, -fifo FILE	: use FIFO as named pipe to receive commans (instead of $FIFOFile)
+-nodbus	: do not provide DBus services
+-dbus-id KEY : append .KEY to the DBus service id used by gmusicbrowser (org.gmusicbrowser)
+-nofifo : do not create/use named pipe
+-F FIFO, -fifo FILE	: use FIFO as named pipe to receive commands (instead of 'gmusicbrowser.fifo' in default folder)
+-C FILE, -cfg FILE	: use FILE as configuration file (instead of 'gmbrc' in default folder),
+			  if FILE is a folder, sets the default folder to FILE.
 -l NAME, -layout NAME	: Use layout NAME for player window
 +plugin NAME		: Enable plugin NAME
 -plugin NAME		: Disable plugin NAME
 -searchpath FOLDER	: Additional FOLDER to look for plugins and layouts
 -use-gnome-session 	: Use gnome libraries to save tags/settings on session logout
 
-
-Command options, all following arguments constitute CMD :
--cmd CMD...		: launch gmusicbrowser if not already running, and execute command CMD
--remotecmd CMD...	: execute command CMD in a running gmusicbrowser
--launch_or_cmd CMD...	: launch gmusicbrowser if not already running OR execute command CMD in a running gmusicbrowser
-(-cmd, -remotecmd and -launch_or_cmd must be the last option, all following arguments are put in CMD)
+-cmd CMD		: add CMD to the list of commands to execute
+-ifnotrunning MODE	: change behavior when no running gmusicbrowser instance is found
+	MODE can be one of :
+	* normal (default)	: launch a new instance and execute commands
+	* nocmd			: launch a new instance but discard commands
+	* abort			: do nothing
+-nolaunch		: same as : -ifnotrunning abort
+Running instances of gmusicbrowser are detected via the fifo or via DBus.
+To run more than one instance, use a unique fifo and a unique DBus-id, or deactivate them.
 
 Options to change what is done with files/folders passed as arguments (done in running gmusicbrowser if there is one) :
 -playlist		: Set them as playlist (default)
@@ -197,12 +188,12 @@ Options to change what is done with files/folders passed as arguments (done in r
 ";
   unshift @ARGV,'-tagedit' if $0=~m/tagedit/;
   $CmdLine{gst}=0;
-  my @files; my $filescmd;
+  my (@files,$filescmd,@cmd,$ignore);
+  my $ifnotrunning='normal';
    while (defined (my $arg=shift))
    {	if   ($arg eq '-c' || $arg eq '-nocheck')	{$CmdLine{nocheck}=1}
 	elsif($arg eq '-s' || $arg eq '-noscan')	{$CmdLine{noscan}=1}
 	elsif($arg eq '-demo')		{$CmdLine{demo}=1}
-#	elsif($arg eq '-empty')		{$CmdLine{empty}=1}
 	elsif($arg eq '-play')		{$CmdLine{play}=1}
 	elsif($arg eq '-hide')		{$CmdLine{hide}=1}
 	elsif($arg eq '-server')	{$CmdLine{server}=1}
@@ -213,19 +204,21 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-rotags')	{$CmdLine{rotags}=1}
 	elsif($arg eq '-port')		{$CmdLine{port}=shift if $ARGV[0]}
 	elsif($arg eq '-debug')		{$debug=1}
-	elsif($arg eq '-nofifo')	{$FIFOFile=undef}
-	elsif($arg eq '-C' || $arg eq '-cfg')		{$CmdLine{savefile}=1; $SaveFile=rel2abs(shift) if $ARGV[0]}
+	elsif($arg eq '-nofifo')	{$FIFOFile=''}
+	elsif($arg eq '-C' || $arg eq '-cfg')		{$CmdLine{savefile}=shift if $ARGV[0]}
 	elsif($arg eq '-F' || $arg eq '-fifo')		{$FIFOFile=rel2abs(shift) if $ARGV[0]}
 	elsif($arg eq '-l' || $arg eq '-layout')	{$CmdLine{layout}=shift if $ARGV[0]}
+	elsif($arg eq '-import')	{ $ImportFile=rel2abs(shift) if $ARGV[0]}
 	elsif($arg eq '-searchpath')	{ push @{ $CmdLine{searchpath} },shift if $ARGV[0]}
 	elsif($arg=~m/^([+-])plugin$/)	{ $CmdLine{plugins}{shift @ARGV}=($1 eq '+') if $ARGV[0]}
 	elsif($arg eq '-geometry')	{ $CmdLine{geometry}=shift if $ARGV[0]; }
-	elsif($arg eq '-tagedit')	{ $CmdLine{tagedit}=1;last; }
-	elsif($arg eq '-listcmd')	{ $CmdLine{cmdlist}=1;last; }
-	elsif($arg eq '-listlayout')	{ $CmdLine{layoutlist}=1;last; }
-	elsif($arg eq '-cmd')		{ RunRemoteCommand(@ARGV); $CmdLine{runcmd}="@ARGV"; last; }
-	elsif($arg eq '-remotecmd')	{ RunRemoteCommand(@ARGV); exit; }
-	elsif($arg eq '-launch_or_cmd')	{ RunRemoteCommand(@ARGV); last; }
+	elsif($arg eq '-tagedit')	{ $CmdLine{tagedit}=1; $ignore=1; last; }
+	elsif($arg eq '-listcmd')	{ $CmdLine{cmdlist}=1; $ignore=1; last; }
+	elsif($arg eq '-listlayout')	{ $CmdLine{layoutlist}=1; $ignore=1; last; }
+	elsif($arg eq '-cmd')		{ push @cmd, shift if $ARGV[0]; }
+	elsif($arg eq '-ifnotrunning')	{ $ifnotrunning=shift if $ARGV[0]; }
+	elsif($arg eq '-nolaunch')	{ $ifnotrunning='abort'; }
+	elsif($arg eq '-dbus-id')	{ if (my $id=shift) { if ($id=~m/^\w+$/) { $DBus_id.='.'.$id; } else { warn "invalid dbus-id '$id', only letters, numbers and _ allowed\n" }; } }
 	elsif($arg eq '-add')		{ $filescmd='AddToLibrary'; }
 	elsif($arg eq '-playlist')	{ $filescmd='OpenFiles'; }
 	elsif($arg eq '-enqueue')	{ $filescmd='EnqueueFiles'; }
@@ -239,30 +232,77 @@ Options to change what is done with files/folders passed as arguments (done in r
 		exit;
 	}
    }
-  if (@files)
-  {	for my $f (@files)
-	{ unless ($f=~m#^http://#)
-	  {	$f=rel2abs($f);
-		$f=~s/([^A-Za-z0-9])/sprintf('%%%02X', ord($1))/seg; #FIXME use url_escapeall, but not yet defined
-	  }
+   unless ($ignore)
+   {	# filenames given in the command line
+	if (@files)
+	{	for my $f (@files)
+		{	unless ($f=~m#^http://#)
+			{	$f=rel2abs($f);
+				$f=~s/([^A-Za-z0-9])/sprintf('%%%02X', ord($1))/seg; #FIXME use url_escapeall, but not yet defined
+			}
+		}
+		$filescmd ||= 'OpenFiles';
+		my $cmd="$filescmd(@files)";
+		push @cmd, $cmd;
 	}
-	$filescmd ||= 'OpenFiles';
-	my $cmd="$filescmd(@files)";
-	RunRemoteCommand($cmd);
-	$CmdLine{runcmd}=$cmd;
-  }
 
-  sub RunRemoteCommand
-  {	warn "Sending command @_\n" if $debug;
+	# determine $HomeDir $SaveFile $ImportFile and $FIFOFile
+	my $save= delete $CmdLine{savefile};
+	if (defined $save)
+	{	my $isdir= $save=~m#/$#;	## $save is considered a folder if ends with a "/"
+		$save= rel2abs($save);
+		if (-d $save || $isdir) { $HomeDir = $save.SLASH; }
+		else			{ $SaveFile= $save; }
+	}
+	warn "using '$HomeDir' folder for saving/setting folder instead of '$default_home'\n" if $debug;
+	$HomeDir ||= $default_home;
+	if (!-d $HomeDir)
+	{	warn "Creating folder $HomeDir\n";
+		my $current='';
+		for my $dir (split /$QSLASH/o,$HomeDir)
+		{	$current.=SLASH.$dir;
+			next if -d $current;
+			die "Can't create folder $HomeDir : $!\n" unless mkdir $current;
+		}
+	}
+	# auto import from old v1.0 tags file if using default savefile, it doesn't exist and old tags file exists
+	if (!$SaveFile && !-e $HomeDir.'gmbrc' && -e $HomeDir.'tags') { $ImportFile||=$HomeDir.'tags'; }
+
+	$SaveFile||= $HomeDir.'gmbrc';
+	$FIFOFile= $HomeDir.'gmusicbrowser.fifo' if !defined $FIFOFile && $^O ne 'MSWin32';
+	$FIFOFile=undef if $FIFOFile eq '';
+
+	#check if there is an instance already running
+	my $running;
 	if (defined $FIFOFile && -p $FIFOFile)
-	{	sysopen my$fifofh,$FIFOFile, O_NONBLOCK | O_WRONLY;
-		print $fifofh "@_" and exit; #exit if ok
+	{	my @c= @cmd ? @cmd : ('');	#fallback to empty command, needed to know if running
+		sysopen my$fifofh,$FIFOFile, O_NONBLOCK | O_WRONLY;
+		print $fifofh "$_\n" and $running=1 for @c;
 		close $fifofh;
-		#exit;
+		$running&&= "using '$FIFOFile'";
 	}
-  }
-  unless ($CmdLine{noDBus}) { eval {require 'gmusicbrowser_dbus.pm'} || warn "Error loading Net::DBus :\n$@ => controling gmusicbrowser through DBus won't be possible.\n\n"; }
+	elsif (!$CmdLine{noDBus})
+	{	eval
+		{	require 'gmusicbrowser_dbus.pm';
+			my $bus= $GMB::DBus::bus || die;
+			my $service = $bus->get_service($DBus_id) || die;
+			my $object = $service->get_object('/org/gmusicbrowser', 'org.gmusicbrowser') || die;
+			$object->RunCommand($_) for @cmd;
+		};
+		$running="using DBus id=$DBus_id" unless $@;
+	}
+	if ($running)
+	{	warn "Found a running instance ($running)\n";
+		exit;
+	}
+	else
+	{	exit if $ifnotrunning eq 'abort';
+		@cmd=() if $ifnotrunning eq 'nocmd';
+	}
+	$CmdLine{runcmd}=\@cmd if @cmd;
 
+	unless ($CmdLine{noDBus}) { eval {require 'gmusicbrowser_dbus.pm'} || warn "Error loading Net::DBus :\n$@ => controlling gmusicbrowser through DBus won't be possible.\n\n"; }
+   }
 }
 
 ##########
@@ -332,6 +372,11 @@ our @submenuRemove=
 	{ label => _"Remove from library",	code => sub { SongsRemove($_[0]{IDs}); }, },
 	{ label => _"Remove from disk",		code => sub { DeleteFiles($_[0]{IDs}); },	test => sub {!$CmdLine{ro}},	stockicon => 'gtk-delete' },
 );
+our @submenuQueue=
+(	{ label => _"Prepend",			code => sub {  QueueInsert( @{ $_[0]{IDs} } ); }, },
+	{ label => _"Replace",			code => sub { ReplaceQueue( @{ $_[0]{IDs} } ); }, },
+	{ label => _"Append",			code => sub {      Enqueue( @{ $_[0]{IDs} } ); }, },
+);
 #modes : S:Search, B:Browser, Q:Queue, L:List, P:Playing song in the player window, F:Filter Panels (submenu "x songs")
 our @SongCMenu=
 (	{ label => _"Song Properties",	code => sub { DialogSongProp (@{ $_[0]{IDs} }); },	onlyone => 'IDs', stockicon => 'gtk-edit' },
@@ -340,7 +385,7 @@ our @SongCMenu=
 		onlymany => 'IDs', 	stockicon => 'gtk-media-play'},
 	{ label => _"Play Only Displayed",code => sub { Select(song => 'first', play => 1, staticlist => \@{$_[0]{listIDs}} ); },
 		test => sub { @{$_[0]{IDs}}<2 }, notmode => 'A',	onlymany => 'listIDs',	stockicon => 'gtk-media-play' },
-	{ label => _"Enqueue Selected",	code => sub { Enqueue(@{ $_[0]{IDs} }); },
+	{ label => _"Enqueue Selected",		code => sub { Enqueue(@{ $_[0]{IDs} }); },	submenu3=> \@submenuQueue,
 		notempty => 'IDs', notmode => 'QP', stockicon => 'gmb-queue' },
 	{ label => _"Enqueue Displayed",	code => sub { Enqueue(@{ $_[0]{listIDs} }); },
 		empty => 'IDs',	notempty=> 'listIDs', notmode => 'QP', stockicon => 'gmb-queue' },
@@ -445,6 +490,10 @@ sub MarkupFormat
 sub Gtk2::Label::set_markup_with_format
 {	my $label=shift;
 	$label->set_markup( MarkupFormat(@_) );
+}
+
+sub IncSuffix	# increment a number suffix from a string
+{	$_[0] =~ s/(?<=\D)(\d*)$/($1||1)+1/e;
 }
 
 sub CleanupFileName
@@ -724,13 +773,14 @@ our %Options=
 	TAG_keep_id3v2_ver	=> 0,
 	'TAG_write_id3v2.4'	=> 0,
 	TAG_id3v1_encoding	=> 'iso-8859-1',
-	TAG_auto_check_current	=> 1,
+	AutoRemoveCurrentSong	=> 1,
 	Simplehttp_CacheSize	=> 200*1024,
 	CustomKeyBindings	=> {},
 	ArtistSplit		=> ' & |, |;',
 	VolumeStep		=> 10,
 	DateFormat_history	=> ['%c 604800 %A %X 86400 Today %X 60 now'],
 	AlwaysInPlaylist	=> 1,
+	PixCacheSize		=> 5,	# in MB
 
 	SavedSTGroupings=>
 	{	_"None"			=> '',
@@ -907,7 +957,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	OpenQueue	=> [\&EditQueue,			_"Open Queue window"],
 	OpenSearch	=> [sub { Layout::Window->new($Options{LayoutS}, uniqueid=>'Search'); },	_"Open Search window"],
 	OpenContext	=> [\&ContextWindow,			_"Open Context window"],
-	OpenCustom	=> [sub { Layout::Window->new($_[1]); },	_"Open Custom window",_"Name of layout", sub { TextCombo->new( Layout::get_layout_list() ); }],
+	OpenCustom	=> [sub { Layout::Window->new($_[1]); },	_"Open Custom window",_"Name of layout", sub { TextCombo::Tree->new( Layout::get_layout_list() ); }],
 	PopupCustom	=> [sub { PopupLayout($_[1],$_[0]); },		_"Popup Custom window",_"Name of layout", sub { TextCombo::Tree->new( Layout::get_layout_list() ); }],
 	CloseWindow	=> [sub { $_[0]->get_toplevel->close_window if $_[0];}, _"Close Window"],
 	SetPlayerLayout => [sub { SetOption(Layout=>$_[1]); CreateMainWindow(); },_"Set player window layout",_"Name of layout", sub {  TextCombo::Tree->new( Layout::get_layout_list('G') ); }, ],
@@ -1106,7 +1156,7 @@ SkipTo($PlayTime) if $PlayTime; #done only now because of gstreamer
 
 CreateTrayIcon();
 
-run_command(undef,$CmdLine{runcmd}) if $CmdLine{runcmd};
+if (my $cmds=delete $CmdLine{runcmd}) { run_command(undef,$_) for @$cmds; }
 
 #--------------------------------------------------------------
 Gtk2->main;
@@ -1241,7 +1291,7 @@ sub TurnOff
 	my $sec=21;
 	my $timer=sub	#FIXME can be more than 1 second
 		{ 	return 0 unless $sec;
-			if (--$sec) {$dialog->set_markup(::PangoEsc(_"About to turn off the computer in :"."\n".__("%d second","%d seconds",$sec)))}
+			if (--$sec) {$dialog->set_markup(::PangoEsc(_("About to turn off the computer in :")."\n".__("%d second","%d seconds",$sec)))}
 			else { $dialog->response(1); }
 			return $sec;
 		};
@@ -1270,6 +1320,7 @@ sub Quit
 sub CmdFromFIFO
 {	while (my $cmd=<$fifofh>)
 	{	chomp $cmd;
+		next if $cmd eq '';
 		$cmd="$1($2)" if $cmd=~m/^(\w+) (.*)/;
 		($cmd, my$arg)= $cmd=~m/^(\w+)(?:\((.*)\))?$/;
 		#if ($cmd eq 'Print') {print $fifofh "Told to print : $arg\n";return}
@@ -1292,6 +1343,16 @@ sub GetActiveWindow
 {	for my $w (Gtk2::Window->list_toplevels)
 	{	return $w if $w->get_focus;
 	}
+	return undef;
+}
+
+sub SearchFile	# search for file with a relative path among a few folders, used to find pictures used by layouts
+{	my ($file,$layoutpaths,@paths)=@_;
+	return $file if file_name_is_absolute($file);
+	@paths=map ref() ? @$_ : $_, @paths;
+	my $found=first { -f $_.SLASH.$file } @paths;
+	return $found.SLASH.$file if $found;
+	warn "Can't find file '$file' (looked in : @paths)\n";
 	return undef;
 }
 
@@ -1323,10 +1384,13 @@ sub LoadPlugins
 				my %plug= (version=>0,desc=>'',);
 				while ($line=<$fh>)
 				{	last if $line=~m/^=cut/;
-					my ($key,$val)= $line=~m/^\s*(\w+)\s+(.+)/;
+					my ($key,$val)= $line=~m/^\s*(\w+):?\s+(.+)/;
 					next unless $key;
 					if ($key eq 'desc')
 					{	$plug{desc} .= _($val)."\n";
+					}
+					elsif ($key eq 'author')
+					{	push @{$plug{author}}, $val;
 					}
 					else { $plug{$key}=$val; }
 				}
@@ -1385,6 +1449,47 @@ sub DeactivatePlugin
 	return unless $Plugins{$plugin}{loaded};
 	warn "Plugin $plugin De-activated.\n" if $debug;
 	$package->Stop if $package->can('Stop');
+}
+sub CheckPluginRequirement
+{	my $plugin=shift;
+	my $ref=$Plugins{$plugin};
+	my $msg='';
+	if (my $req=$ref->{req})
+	{	my @req;
+		my @suggest;
+		while ($req=~m/\bperl\(([\w:]+)(?:\s*,\s*([-\.\w ]+))?\)/ig)
+		{	my ($module,$packages)=($1,$2);
+			my $file="/$module.pm";
+			$file=~s#::#/#g;
+			if (!grep -f $_.$file, @INC)
+			{	push @req, __x( _"the {name} perl module",name=>$module);
+				push @suggest, $packages;
+			}
+		}
+		while ($req=~m/\bexec\((\w+)(?:\s*,\s*([-\.\w ]+))?\)/ig)
+		{	my ($exec,$packages)=($1,$2);
+			if (!grep -x $_.$exec, split /:/, $ENV{PATH})
+			{	push @req, __x( _"the command {name}",name=>$exec);
+				push @suggest, $packages;
+			}
+		}
+		while ($req=~m/\bfile\(([-\w\.\/]+)(?:\s*,\s*([-\.\w ]+))?\)/ig)
+		{	my ($file,$packages)=($1,$2);
+			if (!-r $file)
+			{	push @req, __x( _"the file {name}",name=>$file);
+				push @suggest, $packages;
+			}
+		}
+		return unless @req;
+		my $msg= PangoEsc(_"This plugin requires :")."\n\n";
+		while (@req)
+		{	my $r=shift @req;
+			my $packages=shift @suggest;
+			$packages= $packages ? ("Possible package names providing this :".' '.$packages."\n") : '';
+			$msg.= MarkupFormat("- %s\n<small>%s</small>\n", $r, $packages);
+		}
+		return $msg;
+	}
 }
 
 sub ChangeVol
@@ -1579,11 +1684,7 @@ sub ReadOldSavedTags
 }
 
 sub ReadSavedTags	#load tags _and_ settings
-{	if (-d $SaveFile) {$SaveFile.=SLASH.'gmbrc'}
-	my $LoadFile=$SaveFile;
-	if (!-e $LoadFile && !$CmdLine{savefile} && -r $HomeDir.'tags')
-	{	$LoadFile=$HomeDir.'tags';	#import from v1.0.x
-	}
+{	my $LoadFile= $ImportFile || $SaveFile;
 	unless (-r $LoadFile)
 	{	FirstTime();
 		Post_ReadSavedTags();
@@ -1616,7 +1717,8 @@ sub ReadSavedTags	#load tags _and_ settings
 		$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2  #DELME in v1.1.3/4
 		if ($oldversion<1.1003) { delete $Options{$_} for grep m/^Layout(?:LastSeen)?_/, keys %Options }	#for version <1.1.2  #DELME in v1.1.3/4
 		if ($oldversion<1.1003) { $Options{WindowSizes}{$_}= join 'x',split / /,delete $Options{"WS$_"} for map m/^WS(.*)/, keys %Options; }	#for version <1.1.2  #DELME in v1.1.3/4
-		if ($oldversion<0.1004) {delete $Options{$_} for qw/Diacritic_sort gst_volume/;} #cleanup old options
+		if ($oldversion<1.1005) {delete $Options{$_} for qw/Diacritic_sort gst_volume/;} #cleanup old options
+		$Options{AutoRemoveCurrentSong}= delete $Options{TAG_auto_check_current} if $oldversion<1.1005 && exists $Options{TAG_auto_check_current};
 
 
 		Post_Options_init();
@@ -1644,15 +1746,16 @@ sub ReadSavedTags	#load tags _and_ settings
 			}
 		}
 		SongArray::updateIDs(\@newIDs);
-		my $filter=Filter->new('missing:e:0');
+		my $mfilter= $Options{MasterFilterOn} && $Options{MasterFilter} || '';
+		my $filter= Filter->newadd(TRUE,'missing:e:0', $mfilter);
 		$Library=[];	#dummy array to avoid a warning when filtering in the next line
-		$Library= SongArray->new( $filter->filter([1..$Songs::LastID]) );
+		$Library= SongArray->new( $filter->filter_all );
 	}
 
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};
 	$Options{SongArray_Queue}=undef unless $Options{RememberQueue};
 	if ($Options{RememberQueue})
-	{	$QueueAction= delete $Options{QueueAction} || '';
+	{	$QueueAction= $Options{QueueAction} || '';
 		IdleDo('1_QAuto',10,\&EnqueueAction,$QueueAction) if $QueueAction;
 	}
 	if ($Options{RememberPlayFilter})
@@ -1683,6 +1786,7 @@ sub Post_ReadSavedTags
 
 sub SaveTags	#save tags _and_ settings
 {	HasChanged('Save');
+	if ($CmdLine{demo}) { warn "-demo option => not saving tags/settings\n"; return }
 	warn "Writing tags in $SaveFile ...\n";
 	setlocale(LC_NUMERIC, 'C');
 	my $savedir=$SaveFile;
@@ -1691,7 +1795,7 @@ sub SaveTags	#save tags _and_ settings
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
 	$Options{Lock}= $TogLock || '';
 	$Options{SavedSongID}= SongArray->new([$SongID]) if $Options{RememberPlaySong} && defined $SongID;
-	$Options{QueueAction}=$QueueAction if $QueueAction eq 'autofill' || $QueueAction eq 'wait';
+	$Options{QueueAction}= ($QueueAction eq 'autofill' || $QueueAction eq 'wait') ? $QueueAction : '';
 
 	$Options{SavedOn}= time;
 
@@ -2105,7 +2209,6 @@ sub EnqueueSame
 }
 sub EnqueueFilter
 {	my $l=$_[0]->filter;
-	SortList($l) if @$l>1;
 	Enqueue(@$l);
 }
 sub Enqueue
@@ -2114,6 +2217,12 @@ sub Enqueue
 	@l=grep $_!=$SongID, @l  if @l>1 && defined $SongID;
 	$Queue->Push(\@l);
 	# ToggleLock($TogLock) if $TogLock;	#unset lock
+}
+sub QueueInsert
+{	my @l=@_;
+	SortList(\@l) if @l>1;
+	@l=grep $_!=$SongID, @l  if @l>1 && defined $SongID;
+	$Queue->Unshift(\@l);
 }
 sub ReplaceQueue
 {	$Queue->Replace();
@@ -2215,9 +2324,9 @@ sub GetNextSongs
 }
 
 sub PrepNextSongs
-{	if ($RandomMode) { @NextSongs=(); }
+{	if ($RandomMode) { @NextSongs=@$Queue; $#NextSongs=9 if $#NextSongs>9; }
 	else
-	{	@NextSongs= grep /^\d+$/, GetNextSongs(5); # FIXME GetNextSongs needs some changes to return only IDs, and in the GetNextSongs(1) case
+	{	@NextSongs= grep /^\d+$/, GetNextSongs(10); # FIXME GetNextSongs needs some changes to return only IDs, and in the GetNextSongs(1) case
 	}
 	my $nextID=$NextSongs[0];
 	$NextFileToPlay= defined $nextID ? Songs::GetFullFilename($nextID) : undef;
@@ -2381,7 +2490,7 @@ sub UpdateCurrentSong
 	{	QHasChanged('CurSongID',$SongID);
 		QHasChanged('CurSong',$SongID);
 		ShowTraytip($Options{TrayTipTimeLength}) if $TrayIcon && $Options{ShowTipOnSongChange} && !$FullscreenWindow;
-		IdleCheck($SongID) if defined $SongID && $Options{TAG_auto_check_current};
+		IdleDo('CheckCurrentSong',1000,\&CheckCurrentSong) if defined $SongID;
 		if (defined $RecentPos && (!defined $SongID || $SongID!=$Recent->[$RecentPos-1])) { $RecentPos=undef }
 		$ChangedPos=1;
 	}
@@ -2500,14 +2609,18 @@ sub SortList	#sort @$listref according to $sort
 }
 
 sub ExplainSort
-{	my $sort=$_[0];
-	if ($sort eq '') {return 'no order'}
-	elsif ($sort=~m/^random:/)
-	{	for my $name (keys %{$Options{SavedWRandoms}})
-		{	return "Weighted Random $name." if $Options{SavedWRandoms}{$name} eq $sort;
+{	my ($sort,$usename)=@_;
+	return _"no order" if $sort eq '';
+	my $rand= $sort=~m/^random:/;
+
+	if ($usename || $rand)
+	{	my $h= $rand ? $Options{SavedWRandoms} : $Options{SavedSorts};
+		for my $name (sort keys %$h)
+		{	return $name if $h->{$name} eq $sort;
 		}
-		return _"unnamed random mode"; #describe ?
 	}
+	if ($rand) { return _"unnamed random mode"; }	 #describe ?
+
 	my @text;
 	for my $f (split / /,$sort)
 	{	my $field= $f=~s/^-// ? '-' : '';
@@ -2525,6 +2638,10 @@ sub ReReadTags
 	elsif (@_) { push @ToReRead,@_; }
 	else	{ unshift @ToReRead,@$Library; }
 	&launchIdleLoop;
+}
+sub CheckCurrentSong
+{	return unless defined $::SongID;
+	Songs::ReReadFile($::SongID,0, !$Options{AutoRemoveCurrentSong} );
 }
 sub IdleCheck
 {	if (@_) { push @ToCheck,@_; }
@@ -2779,7 +2896,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		my $picsize=$menu->size_request->width/$menu->{nbcols};
 		$picsize=200 if $picsize<200;
 		$picsize=$h if $picsize>$h;
-		if ( my $img=NewScaledImageFromFile( AAPicture::GetPicture(album=>$album) ,$picsize) )
+		if ( my $img= AAPicture::newimg(album=>$album, $picsize) )
 		{	my $item=Gtk2::MenuItem->new;
 			$item->add($img);
 			my $col=$menu->{nbcols};
@@ -2790,7 +2907,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 	elsif (0) #TEST not used
 	{	my $picsize=$menu->size_request->height;
 		$picsize=220 if $picsize>220;
-		if ( my $img=NewScaledImageFromFile( AAPicture::GetPicture(album=>$album) ,$picsize) )
+		if ( my $img= AAPicture::newimg(album=>$album, $picsize) )
 		{	my $item=Gtk2::MenuItem->new;
 			$item->add($img);
 			my $col=$menu->{nbcols};
@@ -2802,7 +2919,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		#		$item->signal_connect(size_allocate => sub  {my ($self,$alloc)=@_;warn $alloc->width;return if $self->{busy};$self->{busy}=1;my $w=$self->get_toplevel;$w->set_size_request($w->size_request->width-$alloc->width+$picsize+20,-1);$alloc->width($picsize+20);$self->size_allocate($alloc);});
 		}
 	}
-	elsif ( my $pixbuf=PixBufFromFile(AAPicture::GetPicture(album=>$album)) ) #TEST not used
+	elsif ( my $pixbuf= AAPicture::pixbuf(album=>$album,undef,1) ) #TEST not used
 	{
 	 my $request=$menu->size_request;
 	 my $rwidth=$request->width;
@@ -2851,6 +2968,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 
 sub ChooseSongs
 {	my ($format,@IDs)=@_;
+	return unless @IDs;
 	$format||= __x( _"{song} by {artist}", song => "<b>%t</b>", artist => "%a");
 	my $menu = Gtk2::Menu->new;
 	my $activate_callback=sub
@@ -2962,27 +3080,35 @@ sub PopupAA
 	else { @keys=@{ AA::GetAAList($col) }; }
 
 #### callbacks
-	my $rmbcallback;
+	my $altcallback;
 	unless ($callback)
 	{  $callback=sub		#jump to first song
-	   {	return if $_[0]->get_submenu;
-		my $key=$_[1];
-		my $ID=FindFirstInListPlay( AA::GetIDs($col,$key) );
-		Select(song => $ID);
+	   {	my ($item,$key)=@_;
+		return if $item->get_submenu;
+		my $IDs=AA::GetIDs($col,$key);
+		if ($item->{middle})	{ Enqueue(@$IDs); }	#enqueue artist/album on middle-click
+		else
+		{	my $ID=FindFirstInListPlay( $IDs );
+			Select(song => $ID);
+		}
 	   };
-	   $rmbcallback=($col eq 'album')?
-		sub	#Albums rmb cb
+	   $altcallback=($col eq 'album')?
+		sub	#Albums button-press event : set up a songs submenu on right-click, alternate action on middle-click
 		{	my ($item,$event,$key)=@_;
-			return 0 unless $event->button==3;
-			my $submenu=ChooseSongsFromA($key);
-			$item->set_submenu($submenu);
+			if ($event->button==3)
+			{	my $submenu=ChooseSongsFromA($key);
+				$item->set_submenu($submenu);
+			}
+			elsif ($event->button==2) { $item->{middle}=1; }
 			0; #return 0 so that the item receive the click and popup the submenu
 		}:
-		sub	#Arists rmb cb
+		sub	#Artists button-press event : set up an album submenu on right-click, alternate action on middle-click
 		{	my ($item,$event,$key)=@_;
-			return 0 unless $event->button==3;
-			my $submenu=PopupAA('album', from=>$key);
-			$item->set_submenu($submenu);
+			if ($event->button==3)
+			{	my $submenu=PopupAA('album', from=>$key);
+				$item->set_submenu($submenu);
+			}
+			elsif ($event->button==2) { $item->{middle}=1; }
 			0;
 		};
 	}
@@ -3010,14 +3136,11 @@ sub PopupAA
 			#$label->set_markup( AA::ReplaceFields($key,"<b>%a</b>%Y\n<small>%s <small>%l</small></small>",$col,1) );
 			$item->add($label);
 			$item->signal_connect(activate => $callback,$key);
-			$item->signal_connect(button_press_event => $rmbcallback,$key) if $rmbcallback;
+			$item->signal_connect(button_press_event => $altcallback,$key) if $altcallback;
 			#$menu->append($item);
 			$menu->attach($item, $colnb, $colnb+1, $row, $row+1); if (++$row>$rows) {$row=0;$colnb++;}
-			if (my $f=AAPicture::GetPicture($col,$key))
-			{	my $img=AAPicture::newimg($col,$key,$size,\@todo);
-				$item->set_image($img);
-				#push @todo,$item,$f,$size;
-			}
+			my $img=AAPicture::newimg($col,$key,$size);
+			$item->set_image($img) if $img;
 		}
 		return $menu;
 	}; #end of createAAMenu
@@ -3044,16 +3167,6 @@ sub PopupAA
 		$menu->append($item);
 	}
 	$menu->show_all;
-
-	if (@todo)
-	{ Glib::Idle->add(sub
-		{	my $img=shift @todo;
-			return 0 unless $img;
-			AAPicture::setimg($img);
-			1;
-		});
-	  $menu->signal_connect(destroy => sub {undef @todo})
-	}
 
 	if (defined wantarray) {return $menu}
 	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
@@ -3180,102 +3293,6 @@ sub Breakdown_List
 	return $menu;
 }
 
-sub PixLoader_callback
-{	my ($loader,$w,$h,$max)=@_;
-	$loader->{w}=$w;
-	$loader->{h}=$h;
-	if ($max!~s/^-// or $w>$max or $h>$max)
-	{	my $r=$w/$h;
-		if ($r>1) {$h=int(($w=$max)/$r);}
-		else	  {$w=int(($h=$max)*$r);}
-		$loader->set_size($w,$h);
-	}
-}
-sub LoadPixData
-{	my $pixdata=$_[0]; my $size=$_[1];
-	my $loader=Gtk2::Gdk::PixbufLoader->new;
-	$loader->signal_connect(size_prepared => \&::PixLoader_callback,$size) if $size;
-	eval { $loader->write($pixdata); };
-	eval { $loader->close; } unless $@;
-	$loader=undef if $@;
-	warn "$@\n" if $@ && $debug;
-	return $loader;
-}
-
-sub PixBufFromFile
-{	my ($file,$size,$nowarn)=@_;
-	return unless $file;
-	my $nb= $file=~s/:(\d+)$// ? $1 : undef;
-	unless (-r $file) {warn "$file not found\n" unless $nowarn; return undef;}
-
-	my $loader=Gtk2::Gdk::PixbufLoader->new;
-	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
-	if ($file=~m/\.(?:mp3|flac|m4a|m4b)$/i)
-	{	my $data=FileTag::PixFromMusicFile($file,$nb);
-		eval { $loader->write($data) } if defined $data;
-	}
-	else	#eval{Gtk2::Gdk::Pixbuf->new_from_file(filename_to_unicode($file))};
-		# work around Gtk2::Gdk::Pixbuf->new_from_file which wants utf8 filename
-	{	open my$fh,'<',$file; binmode $fh;
-		my $buf; eval {$loader->write($buf) while read $fh,$buf,1024*64;};
-		close $fh;
-	}
-	eval {$loader->close;};
-	return $@ ? undef : $loader->get_pixbuf;
-}
-
-sub NewScaledImageFromFile
-{	my ($pix,$w,$q)=@_;	# $pix=file or pixbuf , $w=size, $q true for HQ
-	return undef unless $pix;
-	my $h=$w;
-	unless (ref $pix)
-	{ $pix=PixBufFromFile($pix);
-	  return undef unless $pix;
-	}
-	my $ratio=$pix->get_width / $pix->get_height;
-	if    ($ratio>1) {$h=int($w/$ratio);}
-	elsif ($ratio<1) {$w=int($h*$ratio);}
-	$q=($q)? 'bilinear' : 'nearest';
-	return Gtk2::Image->new_from_pixbuf( $pix->scale_simple($w, $h, $q) );
-}
-
-sub ScaleImageFromFile
-{	my ($img,$w,$file,$nowarn)=@_;
-	$img->{pixbuf}=PixBufFromFile($file,undef,$nowarn);
-	ScaleImage($img,$w);
-}
-
-sub ScaleImage
-{	my ($img,$w)=@_;
-	my $pix=$img->{pixbuf};
-	if (!$pix || !$w || $w<16) { $img->set_from_pixbuf(undef); return; }
-	my $h=$w;
-	my $ratio=$pix->get_width / $pix->get_height;
-	if    ($ratio>1) {$h=int($w/$ratio);}
-	elsif ($ratio<1) {$w=int($h*$ratio);}
-	$img->set_from_pixbuf( $pix->scale_simple($w, $h, 'bilinear') );
-}
-
-sub pixbox_button_press_cb	# zoom picture when clicked
-{	my ($eventbox,$event,$button)=@_;
-	return 0 if $button && $event->button != $button;
-	my $image;
-	if ($eventbox->{pixdata})
-	{	my $loader=::LoadPixData($eventbox->{pixdata},350);
-		$image=Gtk2::Image->new_from_pixbuf($loader->get_pixbuf) if $loader;
-	}
-	elsif (my $pixbuf=$eventbox->child->{pixbuf})
-	 { $image=::NewScaledImageFromFile($pixbuf,350,1); }
-	return 1 unless $image;
-	my $menu=Gtk2::Menu->new;
-	my $item=Gtk2::MenuItem->new;
-	$item->add($image);
-	$menu->append($item);
-	$menu->show_all;
-	$menu->popup(undef,undef,undef,undef,$event->button,$event->time);
-	1;
-}
-
 sub BuildMenu
 {	my ($mref,$args,$menu)=@_;
 	$args ||={};
@@ -3338,7 +3355,15 @@ sub BuildMenu
 			$item->set_submenu($submenu);
 		}
 		else
-		{	$item->signal_connect (activate => sub { $m->{code}->($args); });
+		{	$item->{code}=$m->{code};
+			$item->signal_connect (activate => sub { $_[0]{code}->($_[1]) if $_[0]{code}; },$args);
+			if (my $submenu3=$m->{submenu3})	# set a submenu on right-click
+			{	$submenu3= BuildMenu($submenu3,$args);
+				$item->signal_connect (button_press_event => sub { my ($item,$event,$submenu3)=@_; return 0 unless $event->button==3; $item->{code}=undef;  $item->set_submenu($submenu3); $submenu3->show_all; 0;  },$submenu3);
+			}
+			elsif (my $code3=$m->{code3})		# alternate action on right-click
+			{	$item->signal_connect (button_press_event => sub { my ($item,$event,$code3)=@_; $item->{code}=$code3 if $event->button==3; 0;  }, $code3);
+			}
 		}
 		$menu->append($item);
 	}
@@ -3736,7 +3761,7 @@ sub ChoosePix
 	my $image=Gtk2::Image->new;
 	my $eventbox=Gtk2::EventBox->new;
 	$eventbox->add($image);
-	$eventbox->signal_connect(button_press_event => \&pixbox_button_press_cb);
+	$eventbox->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb);
 	my $max=my $nb=0; my $lastfile;
 	my $prev= NewIconButton('gtk-go-back',   undef, sub { $_[0]->parent->parent->{set_pic}->(-1); });
 	my $next= NewIconButton('gtk-go-forward',undef, sub { $_[0]->parent->parent->{set_pic}->(1); });
@@ -3751,7 +3776,7 @@ sub ChoosePix
 		  $nb=0 if $nb<0 || $nb>=$max;
 		  my $file=$lastfile;
 		  $file.=":$nb" if $nb;
-		  ScaleImageFromFile($image,150,$file);
+		  GMB::Picture::ScaleImage($image,150,$file);
 		  my $p=$image->{pixbuf};
 		  if ($p) { $label->set_text($p->get_width.' x '.$p->get_height); }
 		  else { $label->set_text(''); }
@@ -3818,7 +3843,7 @@ sub ChoosePix
 #	my $img=Gtk2::Image->new;
 #	$eventbox->add($img);
 #	$frame->add($eventbox);
-#	$eventbox->signal_connect(button_press_event => \&pixbox_button_press_cb);
+#	$eventbox->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb);
 #	$frame->set_size_request(155,155);
 #	my $label=Gtk2::Label->new;
 #	$PixSelector->set_filename(filename_to_utf8displayname($path.SLASH)) if $path &&  -d $path;
@@ -3826,7 +3851,7 @@ sub ChoosePix
 #	$PixSelector->selection_entry->signal_connect(changed => sub
 #		{	my ($file)=$PixSelector->get_selections;
 #			$file=filename_from_unicode($file);
-#			ScaleImageFromFile($img,150,$file,'nowarn');
+#			GMB::Picture::ScaleImage($img,150,$file);
 #			my $p=$img->{pixbuf};
 #			my $text=$p? $p->get_width.' x '.$p->get_height  : '';
 #			$label->set_text($text);
@@ -4564,6 +4589,22 @@ sub SongsRemove
 	HasChanged(SongsRemoved=>$IDs);
 	Songs::AddMissing($IDs);
 }
+sub UpdateMasterFilter
+{	SongAdd_now();	#flush waiting list
+	my @diff;
+	$diff[$_]=1 for @$Library;
+	my $mfilter= $Options{MasterFilterOn} && $Options{MasterFilter} || '';
+	my $newlist= Filter->newadd(TRUE,'missing:e:0', $mfilter)->filter_all;
+	$diff[$_]+=2 for @$newlist;
+	my @toadd= grep $diff[$_]==2, @$newlist;
+	my @toremove= grep $diff[$_] && $diff[$_]==1, 0..$#diff;
+	$Filter::CachedList=undef;
+	AA::IDs_Changed();
+	$Library->Replace($newlist);
+	HasChanged(SongsRemoved=> \@toremove);
+	HasChanged(SongsAdded=> \@toadd);
+}
+
 
 #FIXME check completely replaced then remove
 =toremove
@@ -4693,7 +4734,7 @@ sub Import_playlist_file	#create saved lists from playlist files (.m3u, .pls, ..
 	unless (@list) { warn "No file from '$pl_file' found in the library\n"; return }
 	my ($name)= $pl_file=~m/([^$QSLASH]+?)\.[^.]*$/;
 	$name= _"imported list" unless $name=~m/\S/;
-	$name=~s/(?<=\D)(\d*)$/($1||1)+1/e while $Options{SavedLists}{$name}; #find a new name
+	::IncSuffix($name) while $Options{SavedLists}{$name}; #find a new name
 	SaveList($name,\@list);
 }
 sub Choose_and_import_playlist_files
@@ -4703,20 +4744,13 @@ sub Choose_and_import_playlist_files
 }
 
 sub OpenFiles
-{	my @IDs;
-	for my $f (split / /,$_[1])
-	{	if ($f=~m#^http://#) { }#push @IDs,AddRadio($f,1); }
-		else
-		{	$f=decode_url($f);
-			my $l=ScanFolder($f);
-			push @IDs, @$l if ref $l;
-		}
-	}
-	Select(song=>'first',play=>1,staticlist => \@IDs) if @IDs;
+{	my $IDs=Uris_to_IDs($_[1]);
+	Select(song=>'first',play=>1,staticlist => $IDs) if @$IDs;
 }
 
 sub Uris_to_IDs
 {	my @urls=split / +/,$_[0];
+	#@urls= grep !m#^http://#, @urls;
 	$_=decode_url($_) for @urls;
 	my @IDs=FolderToIDs(1,1,@urls);
 	return \@IDs;
@@ -5172,6 +5206,7 @@ sub PrefPlugins
 	my $plugtitle=Gtk2::Label->new;
 	my $plugdesc=Gtk2::Label->new;
 	$plugdesc->set_line_wrap(1);
+	$plugtitle->set_justify('center');
 	my $plug_box;
 	my $plugin;
 
@@ -5180,14 +5215,35 @@ sub PrefPlugins
 		my $pref=$Plugins{$plugin};
 		if ($plug_box && $plug_box->parent) { $plug_box->parent->remove($plug_box); }
 		my $title= MarkupFormat('<b>%s</b>', $pref->{title}||$pref->{name} );
+		$title.= "\n". MarkupFormat('<small><a href="%s">%s</a></small>', $pref->{url},$pref->{url} )	if $pref->{url};
+		if (my $aref=$pref->{author})
+		{	my ($format,@vars)= ('%s : ', _"by");
+			for my $author (@$aref)
+			{	if ($author=~m/(.*?)\s*<([-\w.]+@[-\w.]+)>$/)	#format : Name <email@example.com>
+				{	$format.='<a href="mailto:%s">%s</a>, ';
+					push @vars, $2,$1;
+				}
+				else
+				{	$format.='%s, ';
+					push @vars, $author;
+				}
+			}
+			$format=~s/, $//;
+			$title.= "\n". MarkupFormat("<small>$format</small>",@vars);
+		}
 		$plugtitle->set_markup($title);
 		$plugdesc->set_text( $pref->{desc} );
 		if (my $error=$pref->{error})
 		{	$plug_box=Gtk2::Label->new;
-			$error=PangoEsc($error);
-			$error=~s#(\(\@INC contains: .*)#<small>$1</small>#s;
-			$plug_box->set_markup( MarkupFormat("<b>%s</b>\n", _("Error :")) .$error);
-			$plug_box->set_line_wrap(1);
+			if (my $req= CheckPluginRequirement($plugin) )
+			{	$plug_box->set_markup($req);
+			}
+			else
+			{	$error=PangoEsc($error);
+				$error=~s#(\(\@INC contains: .*)#<small>$1</small>#s;
+				$plug_box->set_markup( MarkupFormat("<b>%s</b>\n", _("Error :")) .$error);
+				$plug_box->set_line_wrap(1);
+			}
 			$plug_box->set_selectable(1);
 		}
 		elsif ($pref->{loaded})
@@ -5429,9 +5485,10 @@ sub PrefMisc
 
 	my $volstep= NewPrefSpinButton('VolumeStep',1,100, step=>1, text1=>_"Volume step :", tip=>_"Amount of volume changed by the mouse wheel");
 	my $always_in_pl=NewPrefCheckButton(AlwaysInPlaylist => _"Current song must always be in the playlist", tip=> _"- When selecting a song, the playlist filter will be reset if the song is not in it\n- Skip to another song when removing the current song from the playlist");
+	my $pixcache= NewPrefSpinButton('PixCacheSize',1,1000, text1=>_"Picture cache :", text2=>_"MB", cb=>\&GMB::Picture::trim);
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry,$volstep,$always_in_pl;
+	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry,$volstep,$always_in_pl,$pixcache;
 	return $vbox;
 }
 
@@ -5488,10 +5545,9 @@ sub PrefTags
 	my @Encodings=grep $_ ne 'null', Encode->encodings(':all');
 	my $id3v1encoding=NewPrefCombo(TAG_id3v1_encoding => \@Encodings, text => _"Encoding used for id3v1 tags :");
 	my $nowrite=NewPrefCheckButton(TAG_nowrite_mode => _"Do not write the tags", tip=>_"Will not write the tags except with the advanced tag editing dialog. The changes will be kept in the library instead.\nWarning, the changes for a song will be lost if the tag is re-read.");
-	my $autocheck=NewPrefCheckButton(TAG_auto_check_current=> _"Auto-check current song for modification", tip=>_"Automatically check if the file for the current song has changed. And remove songs not found from the library.");
 	my $noid3v1=NewPrefCheckButton(TAG_id3v1_noautocreate=> _"Do not create an id3v1 tag in mp3 files", tip=>_"Only affect mp3 files that do not already have an id3v1 tag");
 
-	$vbox->pack_start($_,FALSE,FALSE,1) for $warning,$checkv4,$checklatin1,$check_unsync,$id3v1encoding,$noid3v1,$nowrite,$autocheck;
+	$vbox->pack_start($_,FALSE,FALSE,1) for $warning,$checkv4,$checklatin1,$check_unsync,$id3v1encoding,$noid3v1,$nowrite;
 	return $vbox;
 }
 
@@ -5556,7 +5612,7 @@ sub UpdateFolderNames
 	}
 	Songs::Set($renamed,'@path'=>\@newpath);
 
-	AAPicture::UpdatePixPath($oldpath,$newpath);
+	GMB::Picture::UpdatePixPath($oldpath,$newpath);
 }
 
 sub PrefLibrary
@@ -5620,10 +5676,30 @@ sub PrefLibrary
 		DialogMassRename(@$Library);
 	});
 
+	my $autoremove= NewPrefCheckButton( AutoRemoveCurrentSong => _"Automatically remove current song if not found");
+
+	my $masterfilter= FilterCombo->new( $Options{MasterFilter}, sub { $Options{MasterFilter}=$_[1]; UpdateMasterFilter(); } );
+	my $masterfiltercheck= NewPrefCheckButton( MasterFilterOn=> _"Use a master filter", widget=>$masterfilter, cb=>\&UpdateMasterFilter, horizontal=>1 );
+	my $librarysize= Label::Preview->new(
+		event => 'SongsRemoved SongsAdded',
+		preview=> sub
+		{	my $listtotal=Filter->new('missing:e:0')->filter_all;
+			my $lib= scalar @$Library;
+			my $excl= scalar(@$listtotal)-$lib;
+			my $s= __("Library size : %d song","Library size : %d songs",$lib);
+			$s.= ' '. __("(%d song excluded)", "(%d songs excluded)",$excl) if $excl;
+			return $s;
+
+		} );
+
 	my $vbox=Vpack( 1,$label,
 			'_',$sw,
 			[$addbut,$rmdbut,'-',$reorg],
-			$table );
+			$table,
+			$autoremove,
+			$masterfiltercheck,
+			$librarysize,
+		      );
 	return $vbox;
 }
 sub ChooseAddPath
@@ -5841,7 +5917,7 @@ sub NewPrefCheckButton
 	my $return=$check;
 	if ($widget)
 	{	if ($horizontal)
-		{	$return=Hpack($check,$widget);
+		{	$return=Hpack(0,$check,$widget);
 		}
 		else
 		{	my $albox=Gtk2::Alignment->new(0,0,1,1);
@@ -5972,6 +6048,7 @@ sub NewPrefFileEntry
 sub NewPrefSpinButton
 {	my ($key,$min,$max,%opt)=@_;
 	my ($text1,$text2,$sg1,$sg2,$tip,$sub,$climb_rate,$digits,$stepinc,$pageinc,$wrap)=@opt{qw/text1 text2 sizeg1 sizeg2 tip cb rate digits step page wrap/};
+	$stepinc||=1;
 	$pageinc||=$stepinc*10;
 	$climb_rate||=1;
 	$digits||=0;
@@ -6466,9 +6543,8 @@ sub new
 
 	if (defined $name)
 	{	if ($name eq '')
-		{	$name=0;
-			$name++ while exists $self->{hash}{_"noname".$name};
-			$name=_"noname".$name;
+		{	$name=_"noname";
+			::IncSuffix($name) while $self->{hash}{$name};
 		}
 		else { $init=$self->{hash}{$name} unless defined $init; }
 	}
@@ -8034,26 +8110,86 @@ sub Set
 	$self->{val}=$val;
 }
 
-package AAPicture;
-
-my %Cache;
-my $watcher;
+package GMB::Picture;
+my (%PbCache,$CacheSize);
 our @ArraysOfFiles;	#array of filenames that needs updating in case a folder is renamed
-my %Field_id;
 
-INIT
-{	::Watch(undef, Picture_artist => \&AAPicture_Changed);	#FIXME PHASE1
-	::Watch(undef, Picture_album  => \&AAPicture_Changed);	#FIXME PHASE1
+sub pixbuf
+{	my ($file,$size,$cacheonly)=@_;
+	my $key= defined $size ? $size.':'.$file : $file;
+	my $pb=$PbCache{$key};
+	unless ($pb || $cacheonly)
+	{	$pb=load($file,$size);
+		add_to_cache($key,$pb) if $pb;
+	}
+	$pb->{lastuse}=time if $pb;
+	return $pb;
 }
 
-sub GetPicture
-{	my ($field,$key)=@_;
-	return Songs::Picture($key,$field,'get');
+sub load
+{	my ($file,$size)=@_;
+	return unless $file;
+
+	my $nb= $file=~s/:(\d+)$// ? $1 : undef;	#index number for embbeded pictures
+	unless (-r $file) {warn "$file not found\n"; return undef;}
+
+	my $loader=Gtk2::Gdk::PixbufLoader->new;
+	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
+	if ($file=~m/\.(?:mp3|flac|m4a|m4b)$/i)
+	{	my $data=FileTag::PixFromMusicFile($file,$nb);
+		eval { $loader->write($data) } if defined $data;
+	}
+	else	#eval{Gtk2::Gdk::Pixbuf->new_from_file(filename_to_unicode($file))};
+		# work around Gtk2::Gdk::Pixbuf->new_from_file which wants utf8 filename
+	{	open my$fh,'<',$file; binmode $fh;
+		my $buf; eval {$loader->write($buf) while read $fh,$buf,1024*64;};
+		close $fh;
+	}
+	eval {$loader->close;};
+	return undef if $@;
+	return $loader->get_pixbuf;
 }
-sub SetPicture
-{	my ($field,$key,$file)=@_;
-	Songs::Picture($key,$field,'set',$file);
+
+sub drop	#drop a file from the cache
+{	my $file=shift;
+	my $re=qr/^(?:\d+:)?\Q$file\E/;
+	delete $PbCache{$_} for grep m/$re/, keys %PbCache;
 }
+
+sub trim
+{	my @list= sort {$PbCache{$a}{lastuse} <=> $PbCache{$b}{lastuse}} keys %PbCache;
+	my $max= $::Options{PixCacheSize} *1000*1000 *.9;
+	warn "Trimming cache\n" if $::debug;
+	while ($CacheSize> $max)
+	{	my $key=shift @list;
+		$CacheSize-= (delete $PbCache{$key})->{size};
+	}
+}
+
+sub add_to_cache
+{	my ($key,$pb)=@_;
+	my $h=$pb->get_height;
+	my $rowstride=$pb->get_rowstride;
+	$CacheSize+= $pb->{size}= $h*$rowstride;	#warn "PixCache : +$pb->{size} = $CacheSize\n";
+	::IdleDo('9_AAPicPurge',undef,\&trim) if $CacheSize > $::Options{PixCacheSize}*1000*1000;
+	$PbCache{$key}=$pb;
+}
+
+sub load_skinfile
+{	my ($file,$crop,$resize,$now)=@_; #resize is resizeopt_w_h
+	my $key= ':'.join ':',$file,$crop,$resize||''; #FIXME remove w or h in resize if not resized in this dimension
+	my $pixbuf=$PbCache{$key};
+	unless ($pixbuf)
+	{	return unless $now;
+		$pixbuf=Skin::_load_skinfile($file,$crop);
+		$pixbuf=Skin::_resize($pixbuf,split /_/,$resize) if $resize && $pixbuf;
+		return unless $pixbuf;
+		add_to_cache($key,$pixbuf);
+	}
+	$pixbuf->{lastuse}=time;
+	return $pixbuf;
+}
+
 sub UpdatePixPath
 {	my ($oldpath,$newpath)=@_;
 	m/$::QSLASH$/o or $_.=::SLASH for $oldpath,$newpath; #make sure the path ends with SLASH
@@ -8061,38 +8197,115 @@ sub UpdatePixPath
 	s/$oldpath/$newpath/ for grep $_, map @$_, @ArraysOfFiles;
 }
 
+sub PixLoader_callback
+{	my ($loader,$w,$h,$max)=@_;
+	$loader->{w}=$w;
+	$loader->{h}=$h;
+	if ($max!~s/^-// or $w>$max or $h>$max)
+	{	my $r=$w/$h;
+		if ($r>1) {$h=int(($w=$max)/$r);}
+		else	  {$w=int(($h=$max)*$r);}
+		$loader->set_size($w,$h);
+	}
+}
+sub LoadPixData
+{	my $pixdata=$_[0]; my $size=$_[1];
+	my $loader=Gtk2::Gdk::PixbufLoader->new;
+	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
+	eval { $loader->write($pixdata); };
+	eval { $loader->close; } unless $@;
+	$loader=undef if $@;
+	warn "$@\n" if $@ && $debug;
+	return $loader;
+}
+
+sub Scale_with_ratio
+{	my ($pix,$w,$h,$q)=@_;
+	my $ratio=$pix->get_width / $pix->get_height;
+	if    ($ratio>1) {$h=int($w/$ratio);}
+	elsif ($ratio<1) {$w=int($h*$ratio);}
+	$q= $q ? 'bilinear' : 'nearest';
+	return $pix->scale_simple($w, $h, $q);
+}
+
+sub ScaleImage
+{	my ($img,$s,$file)=@_;
+	$img->{pixbuf}=load($file) if $file;
+	my $pix=$img->{pixbuf};
+	if (!$pix || !$s || $s<16) { $img->set_from_pixbuf(undef); return; }
+	$img->set_from_pixbuf( Scale_with_ratio($pix,$s,$s,1) );
+}
+
+sub pixbox_button_press_cb	# zoom picture when clicked
+{	my ($eventbox,$event,$button)=@_;
+	return 0 if $button && $event->button != $button;
+	my $pixbuf;
+	if ($eventbox->{pixdata})
+	{	my $loader=LoadPixData($eventbox->{pixdata},350);
+		$pixbuf=$loader->get_pixbuf if $loader;
+	}
+	elsif (my $pb=$eventbox->child->{pixbuf})	{ $pixbuf= Scale_with_ratio($pb,350,350,1); }
+	elsif (my $file=$eventbox->child->{filename})	{ $pixbuf= pixbuf($file,350); }
+	return 1 unless $pixbuf;
+	my $image=Gtk2::Image->new_from_pixbuf($pixbuf);
+	my $menu=Gtk2::Menu->new;
+	my $item=Gtk2::MenuItem->new;
+	$item->add($image);
+	$menu->append($item);
+	$menu->show_all;
+	$menu->popup(undef,undef,undef,undef,$event->button,$event->time);
+	1;
+}
+
+
+package AAPicture;
+
+my $watcher;
+
+sub GetPicture
+{	my ($field,$key)=@_;
+	return Songs::Picture($key,$field,'get');
+}
+sub SetPicture
+{	my ($field,$key,$file)=@_;
+	GMB::Picture::drop($file); #make sure the cache is up-to-date
+	Songs::Picture($key,$field,'set',$file);
+}
+
+my @imgqueue;
 sub newimg
-{	my ($field,$key,$size,$todoref)=@_;
-	my $p= pixbuf($field,$key,$size, ($todoref ? 0 : 1));
-	return Gtk2::Image->new_from_pixbuf($p) if $p;
+{	my ($field,$key,$size)=@_;
+	my $pb= pixbuf($field,$key,$size);
+	return Gtk2::Image->new_from_pixbuf($pb) if $pb;	# cached
+	return undef unless defined $pb;			# no file
+	# $pb=0 => file but not cached
 
 	my $img=Gtk2::Image->new;
-	push @$todoref,$img;
 	$img->{params}=[$field,$key,$size];
 	$img->set_size_request($size,$size);
+
+	Glib::Idle->add(\&idle_loadimg_cb) unless @imgqueue;
+	push @imgqueue,$img;
+	::weaken($imgqueue[-1]);	#weaken ref so that it won't be loaded after img widget is destroyed
 	return $img;
 }
-sub setimg
-{	my $img=$_[0];
-	my $p=pixbuf( @{delete $img->{params}},1 );
-	$img->set_from_pixbuf($p);
+sub idle_loadimg_cb
+{	my $img;
+	$img=shift @imgqueue while @imgqueue && !$img;
+	if ($img)
+	{	my $pb=pixbuf( @{delete $img->{params}},1 );
+		$img->set_from_pixbuf($pb) if $pb;
+	}
+	return scalar @imgqueue;	#return 0 when finished => disconnect idle cb
 }
 
 sub pixbuf
 {	my ($field,$key,$size,$now)=@_;
-	my $fid= $Field_id{$field} ||= Songs::Code($field,'pic_cache_id|field');
 	my $file= GetPicture($field,$key);
-	#unless ($file)
-	#{	return undef unless $::Options{use_default_aapic};
-	#	$file=$::Options{default_aapic};
-		return undef unless $file;
-	#}
-	$key=$size.$fid.':'.$key;
-	my $p=$Cache{$key};
-	return 0 unless $p || $now;
-	$p||=load($file,$size,$key);
-	$p->{lastuse}=time if $p;
-	return $p;
+	return undef unless $file;
+	my $pb=GMB::Picture::pixbuf($file,$size,!$now);
+	return 0 unless $pb || $now;
+	return $pb;
 }
 
 sub draw
@@ -8107,48 +8320,6 @@ sub draw
 	}
 	return $pixbuf; # 0 if exist but not cached, undef if there is no picture for this key
 }
-
-sub load
-{	my ($file,$size,$key)=@_;
-	my $pixbuf=::PixBufFromFile($file,$size);
-	return undef unless $pixbuf;
-#	my $ratio=$pixbuf->get_width / $pixbuf->get_height;
-#	my $ph=my $pw=$s;
-#	if    ($ratio>1) {$ph=int($pw/$ratio);}
-#	elsif ($ratio<1) {$pw=int($ph*$ratio);}
-#	$Cache{$key}=$pixbuf=$pixbuf->scale_simple($pw, $ph, 'bilinear');
-	$Cache{$key}=$pixbuf;
-	::IdleDo('9_AAPicPurge',undef,\&purge) if keys %Cache >120;
-	return $pixbuf;
-}
-
-sub purge
-{	my $nb= keys(%Cache)-100;# warn "purging $nb cached AApixbufs\n";
-	delete $Cache{$_} for (sort {$Cache{$a}{lastuse} <=> $Cache{$b}{lastuse}} keys %Cache)[0..$nb];
-}
-
-sub AAPicture_Changed
-{	my $key=$_[1];
-	my $re=qr/^\d+\w+:\Q$key\E/;
-	delete $Cache{$_} for grep m/$re/, keys %Cache;
-}
-
-sub load_file #use the same cache as the AAPictures, #FIXME create a different package for all picture cache functions
-{	my ($file,$crop,$resize,$now)=@_; #resize is resizeopt_w_h
-	my $key= ':'.join ':',$file,$crop,$resize||''; #FIXME remove w or h in resize if not resized in this dimension
-	my $pixbuf=$Cache{$key};
-	unless ($pixbuf)
-	{	return unless $now;
-		$pixbuf=Skin::_load_skinfile($file,$crop);
-		$pixbuf=Skin::_resize($pixbuf,split /_/,$resize) if $resize && $pixbuf;
-		return unless $pixbuf;
-		$Cache{$key}=$pixbuf;
-	}
-	$pixbuf->{lastuse}=time;
-	::IdleDo('9_AAPicPurge',undef,\&purge) if keys %Cache >120;
-	return $pixbuf;
-}
-
 
 package TextCombo;
 use base 'Gtk2::ComboBox';
@@ -8178,7 +8349,6 @@ sub build_store
 			push @$names,$h->{$key}
 		}
 	}
-	my $found;
 	for my $i (0..$#$list)
 	{	my $iter= $store->append;
 		$store->set($iter, 0,$names->[$i], 1,$list->[$i]);
@@ -8278,6 +8448,94 @@ sub make_toolitem
 	return undef;
 }
 
+package FilterCombo;
+use base 'Gtk2::ComboBox';
+
+sub new
+{	my ($class,$init,$sub) = @_;
+	my $store= Gtk2::ListStore->new('Glib::String','Glib::Scalar','Glib::String');
+	my $self= bless Gtk2::ComboBox->new($store), $class;
+	$self->fill_store;
+
+	my $renderer=Gtk2::CellRendererPixbuf->new;
+	$renderer->set_fixed_size( Gtk2::IconSize->lookup('menu') );
+	$self->pack_start($renderer,::FALSE);
+	$self->add_attribute($renderer, 'stock-id' => 2);
+
+	$renderer=Gtk2::CellRendererText->new;
+	$self->pack_start($renderer,::TRUE);
+	$self->add_attribute($renderer, text => 0);
+
+	$self->signal_connect( changed => \&value_changed );
+	$self->set_value($init);
+	$self->{cb}=$sub;
+	::Watch($self, 'SavedFilters', \&SavedFilters_changed);
+	return $self;
+}
+
+sub value_changed
+{	my $self=shift;
+	my $iter=$self->get_active_iter;
+	return unless $iter;
+	my $value= $self->get_model->get($iter,1);
+	if (!defined $value)	#edit... filter
+	{	my $value=$self->{selected};
+		$self->{busy}=1;
+		$self->set_value($value);
+		delete $self->{busy};
+		::EditFilter($self->get_toplevel,$value,undef,sub { $self->set_value($_[0]) if $_[0]; });
+		return;
+	}
+	$self->{selected}=$value;
+	$self->set_tooltip_text( $value->explain );	#set tooltip to filter description
+	$self->{cb}->($self,$value) if $self->{cb} && !$self->{busy};
+}
+
+sub SavedFilters_changed
+{	my $self=shift;
+	my $value= $self->get_value;
+	$self->{busy}=1;
+	$self->fill_store;
+	$self->set_value($value);
+	delete $self->{busy};
+}
+
+sub fill_store
+{	my $self=shift;
+	my $store= $self->get_model;
+	$store->clear;
+	$store->set($store->append, 0,_"All Songs", 1,Filter->new, 2,'gmb-library');
+	my $hash=$Options{SavedFilters};
+	my @names= sort {::superlc($a) cmp ::superlc($b)} keys %$hash;
+	$store->set($store->append, 0,$_, 1,$hash->{$_}) for @names;
+	$store->set($store->append, 0,_"Edit ...", 1,undef, 2,'gtk-preferences');
+}
+
+sub set_value
+{	my ($self,$value)=@_;
+	$value=Filter->new($value) unless ref $value;
+	my $store=$self->get_model;
+	my $founditer;
+	my $iter=$store->get_iter_first;
+	while ($iter)
+	{	my $v=$store->get($iter,1);
+		if ( defined $v && $value->are_equal($v) )
+		{	$founditer=$iter; last;
+		}
+		$iter=$store->iter_next($iter);
+	}
+	unless ($founditer)
+	{	$founditer= $store->prepend;
+		$store->set($founditer, 0, _"Unnamed filter", 1,$value)
+	}
+	$self->{selected}=$value;
+	$self->set_active_iter($founditer);
+}
+sub get_value
+{	$_[0]{selected};
+}
+
+
 package Label::Preview;
 use base 'Gtk2::Label';
 
@@ -8287,10 +8545,14 @@ sub new
 	$self->set_line_wrap(1), $self->set_line_wrap_mode('word-char') if $args{wrap};
 	$self->{$_}=$args{$_} for qw/entry preview format empty noescape/;
 	my ($event,$entry)=@args{qw/event entry/};
-	$entry->signal_connect_swapped( changed => \&update, $self) if $entry;
-	if ($event) { ::Watch($self, $_ => \&update) for split / /,$event; }
+	$entry->signal_connect_swapped( changed => \&queue_update, $self) if $entry;
+	if ($event) { ::Watch($self, $_ => \&queue_update) for split / /,$event; }
 	$self->update;
 	return $self;
+}
+sub queue_update
+{	my $self=shift;
+	$self->{queue_update}||= Glib::Idle->add(\&update,$self)
 }
 sub update
 {	my $self=shift;
@@ -8306,5 +8568,6 @@ sub update
 		$text='' unless defined $text;
 	}
 	$self->set_markup($text);
+	return $self->{queue_update}=undef;
 }
 

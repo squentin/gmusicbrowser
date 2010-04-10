@@ -269,7 +269,7 @@ sub Write
 		while (@todo)
 		{	my $key= shift @todo;
 			my $val= shift @todo;
-			if ($val)		{ $tag->insert($key,$_) for reverse @$val}
+			if ($val)		{ $ape->insert($key,$_) for reverse @$val}
 			else			{ $ape->remove_all($key) }
 		}
 	}
@@ -1151,7 +1151,7 @@ sub new
 	$self->{table}=$table;
 	$self->fill;
 
-	my $advanced=Gtk2::Button->new(_"Advanced Tag Editing".' ...');
+	my $advanced=Gtk2::Button->new(_("Advanced Tag Editing").' ...');
 	$advanced->signal_connect( clicked => \&advanced_cb );
 
 	$self->pack_start($labelfile,FALSE,FALSE,1);
@@ -2084,7 +2084,7 @@ sub set
 	my $Bsave=$self->{Bsave};
 	my $length=length $self->{value};
 	unless ($length) { $label->set_text(_"empty"); $Bsave->set_sensitive(0); return; }
-	my $loader=::LoadPixData( $self->{value} ,'-300');
+	my $loader= GMB::Picture::LoadPixData( $self->{value} ,'-300');
 	my $pixbuf;
 	if (!$loader)
 	{  $label->set_text(_"error");

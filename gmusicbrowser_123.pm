@@ -272,6 +272,8 @@ sub AdvancedOptions
 	for my $e (@ext) { $ext{$e}= join '/', $e, sort grep $::Alias_ext{$_} eq $e,keys %::Alias_ext; }
 	my $i=my $j=0;
 	$table->attach_defaults(Gtk2::Label->new($_), $i++,$i,$j,$j+1) for (_"Command", _"Output", _"Options",map " $ext{$_} ", @ext);
+	my $hsize= Gtk2::SizeGroup->new('vertical');
+	$hsize->add_widget($_) for $table->get_children;
 	for my $cmd (sort keys %Commands)
 	{	$i=0; $j++;
 		my $devs= $Commands{$cmd}{devices};
@@ -281,6 +283,7 @@ sub AdvancedOptions
 			Gtk2::Label->new($cmd),
 			::NewPrefCombo('123device_'.$cmd => ['default',@devlist]),
 			::NewPrefEntry('123options_'.$cmd);
+		$hsize->add_widget($_) for @widgets;
 		my %cando; $cando{$_}=undef for split / /,$Commands{$cmd}{type};
 		$table->attach_defaults($_, $i++,$i,$j,$j+1) for @widgets;
 		for my $ext (@ext)
@@ -288,7 +291,7 @@ sub AdvancedOptions
 			{	my $w=Gtk2::RadioButton->new($extgroup{$ext});
 				$w->set_tooltip_text( ::__x(_"Use {command} to play {ext} files",command=>$cmd, ext=>$ext{$ext}) );
 				$extgroup{$ext}||=$w;
-				$table->attach_defaults($w, $i,$i+1,$j,$j+1);
+				$table->attach($w, $i,$i+1,$j,$j+1,'expand','expand',0,0);
 				push @widgets,$w;
 				$w->set_active(1) if $cmd eq ($Supported{$ext} || '');
 				$w->signal_connect(toggled => sub { return unless $_[0]->get_active; $Supported{$ext}=$::Options{'123priority_'.$ext}=$cmd; $Supported{$_}=$Supported{$ext} for grep $::Alias_ext{$_} eq $ext, keys %::Alias_ext; });

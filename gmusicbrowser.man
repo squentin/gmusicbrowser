@@ -1,4 +1,4 @@
-.TH "gmusicbrowser" "1" "Nov 29, 2009" "gmusicbrowser" ""
+.TH "gmusicbrowser" "1" "Apr 06, 2010" "gmusicbrowser" ""
 .SH "NAME"
 gmusicbrowser \- Jukebox for large collections of audio files
 
@@ -22,16 +22,15 @@ gmusicbrowser \- Jukebox for large collections of audio files
 [\-plugin NAME]
 [\-searchpath FOLDER]
 [\-use\-gnome\-session]
-[\-cmd|\-launch_or_cmd CMD...]
+[\-cmd CMD]
+[\-ifnotrunning MODE]
+[\-dbus\-id KEY]
+FOLDER_OR_FILE ...
 .br
 
 .B gmusicbrowser
 .RI
 \-listcmd
-
-.B gmusicbrowser
-.RI
-\-remotecmd CMD...
 
 .B gmusicbrowser
 .RI
@@ -54,7 +53,7 @@ don't check for updated/deleted songs on startup
 don't scan folders for songs on startup
 .TP
 \fB\-demo\fR
-don't check if current song has been updated/deleted
+don't save settings/tags on exit
 .TP
 \fB\-ro\fR
 prevent modifying/renaming/deleting song files
@@ -81,13 +80,17 @@ send playing song to connected icecast client
 listen for connection on port N in icecast server mode
 .TP
 \fB\-C FILE\fR, \fB\-cfg FILE\fR
-use FILE as configuration file (instead of ~/.gmusicbroser/tags)
+use FILE as configuration file (instead of 'gmbrc' in default folder),
+if FILE is a folder (or ends with '/'), it will be used as base folder instead of ~/.config/gmusicbrowser/
 .TP
 \fB\-F FIFO\fR, \fB\-fifo FIFO\fR
-use FIFO as named pipe to receive commans (instead of ~/.gmusicbroser/gmusicbrowser.fifo)
+use FIFO as named pipe to receive commans (instead of 'gmusicbrowser.fifo' in default folder)
 .TP
 \fB\-nofifo\fR
-do not use/create named pipe $FIFOFile
+do not use/create named pipe
+.TP
+\fB\-dbus\-id KEY\fR
+append .KEY to the DBus service id used by gmusicbrowser (org.gmusicbrowser)
 .TP
 \fB\-debug\fR
 print lots of useless informations
@@ -107,14 +110,25 @@ add FOLDER to the list of folders searched for plugins and layouts
 \fB\-use\-gnome\-session\fR
 Use gnome libraries to save tags/settings on session logout (needs the Gnome2 perl module).
 .TP
-\fB\-cmd CMD...\fR
-launch gmusicbrowser if not already running, and execute command CMD.
+\fB\-cmd CMD\fR
+add CMD to the list of commands to execute. If a running instance of gmusicbrowser is found, these commands will be sent via the fifo file or via DBus. If there is no running instance of gmusicbrowser, the behavior depends on option -ifnotrunning
 .TP
-\fB\-remotecmd CMD...\fR
-execute command CMD in a running gmusicbrowser
-.TP
-\fB\-launch_or_cmd CMD...\fR
-launch gmusicbrowser if not already running OR execute command CMD in a running gmusicbrowser
+
+\fB\-ifnotrunning MODE\fR
+change behavior when no running gmusicbrowser instance is found, MODE can be one of :
+.RS
+.IP \fInormal\fR
+(default) launch a new instance and execute commands
+.IP \fInocmd\fR
+launch a new instance but discard commands
+.IP \fIabort\fR
+do nothing
+.RE
+.RS
+Running instances of gmusicbrowser are detected via the fifo or via DBus.
+To run more than one instance, use a unique fifo and a unique DBus\-id, or deactivate them.
+.RE
+
 .TP
 \fB\-listcmd\fR
 list the available fifo commands and exit
@@ -173,8 +187,5 @@ migrate the program to display DISPLAY (example : ":1")
 .SH "SEE ALSO"
 http://gmusicbrowser.org/,
 
-.SH "BUGS"
-If you wish to report a bug please use the reportbug(1) command.
-
 .SH "AUTHOR"
-Copyright (c) 2005-2009 Quentin Sculo <squentin@free.fr>
+Copyright (c) 2005-2010 Quentin Sculo <squentin@free.fr>

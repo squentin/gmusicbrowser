@@ -372,7 +372,7 @@ sub get_next
 	{	my $pixdata=$_[0];
 		$result->{waiting}=undef;
 		my $loader;
-		$loader=::LoadPixData($pixdata,PREVIEW_SIZE) if $pixdata;
+		$loader= GMB::Picture::LoadPixData($pixdata,PREVIEW_SIZE) if $pixdata;
 		if ($loader)
 		{	my $dim=$loader->{w}.' x '.$loader->{h};
 			my $table=$self->{table};
@@ -395,7 +395,7 @@ sub get_next
 			$tip.=$dim."\n".$result->{url};
 			$button->set_tooltip_text($tip);
 			$button->signal_connect(clicked => \&set_cover);
-			$button->signal_connect(button_press_event => \&::pixbox_button_press_cb,3); # 3 : mouse button 3
+			$button->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb,3); # 3 : mouse button 3
 			$button->set_relief('none');
 			$button->show_all;
 			my $i= $res_id % RES_PER_PAGE;
