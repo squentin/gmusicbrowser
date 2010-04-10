@@ -105,10 +105,29 @@ my $editor_signals = ['Played', 'Skipped', 'Finished', 'SkippedBefore15'];
 my $editor_fields = ['rating'];
 
 # perl, sigh.
-# sub indexOfStr($arr, $matey) {
-#     for(my $idx = 0; idx < $#{$arr}; idx ++) {
+# sub indexOfStr {
+#     my ($arr,  $matey) = @_;
+#     for(my $idx = 0; $idx < $#{$arr}; $idx ++) {
 #         return $idx if $arr eq $matey;
+#     }
 # }
+
+sub indexOfRef {
+   my ($arr, $matey) = @_;
+    for(my $idx = 0; $idx < $#{$arr}; $idx ++) {
+        return $idx if $arr == $matey;
+    }
+}
+
+# sub deleteStrFromArr {
+#     my ($arr, $strval) = @_;
+#     splice($arr, indexOfStr($strval), 1);
+# }
+
+sub deleteRefFromArr {
+    my ($arr, $ref) = @_;
+    splice(@$arr, indexOfRef($arr, $ref), 1);
+}
 
 sub RuleEditor {
     my ($rule) = @_;
@@ -155,6 +174,14 @@ sub RuleEditor {
     $editor_hbox->add($field_combo);
     $editor_hbox->add(Gtk2::Label->new("Differential: "));
     $editor_hbox->add($value_entry);
+
+    my $remove_button = Gtk2::Button->new_from_stock('gtk-delete');
+    $remove_button->signal_connect('clicked', sub {
+        deleteRefFromArr($::Options{OPT.'Rules'}, $rule);
+        $self->{rules_table}->remove($frame);
+                                   });
+
+    $editor_hbox->add($remove_button);
     $editor_hbox->show_all();
     $frame->add($editor_hbox);
 
@@ -169,6 +196,24 @@ sub RulesListAddRow {
     $self->{current_row} += 1;
 }
 
+sub NewRule {
+    my $new_rule = { signal => "", field => "", value => 0};
+
+    my $options_rules_array = $::Options{OPT.'Rules'};
+
+    push(@$options_rules_array, $new_rule);
+    return $new_rule;
+}
+
+sub PopulateRulesList {
+    my $rules = $::Options{OPT.'Rules'};
+     $self->{current_row} = 0;
+
+     foreach my $rule (@{$rules}) {
+        RulesListAddRow($rule);
+     }
+}
+
 sub prefbox {
     # TODO validate good values?E!??!
     my $big_vbox = Gtk2::VBox->new(::FALSE, 2);
@@ -176,18 +221,21 @@ sub prefbox {
     $rules_scroller->set_policy('never', 'automatic');
     $self->{rules_table} = Gtk2::Table->new(1, 4, ::FALSE);
     $rules_scroller->add_with_viewport($self->{rules_table});
-    $self->{current_row} = 0;
 
+    PopulateRulesList();
     # force some debug fixtures in
     # $::Options{OPT.'Rules'} = [ {signal => 'Finished', field => "rating", value => 5}, {signal => 'Skipped', field => 'rating', value => -5 }, { signal => "SkippedBefore15", field => "rating", value => -1}];
 
-    my $rules = $::Options{OPT.'Rules'};
-
-    foreach my $rule (@{$rules}) {
+    my $add_rule_button = Gtk2::Button->new_from_stock('gtk-add');
+    $add_rule_button->signal_connect('clicked', sub {
+        my $rule = NewRule();
+        # manually add the new rule, no point in repopulating everything
         RulesListAddRow($rule);
-    }
+    });
+
 
     $big_vbox->add($rules_scroller);
+    $big_vbox->add_with_properties($add_rule_button, "expand", ::FALSE);
 
     $big_vbox->show_all();
     return $big_vbox;
