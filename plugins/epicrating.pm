@@ -26,7 +26,7 @@ use constant {
     ACTIONS => ["REMOVE_FROM_RATING", "ADD_TO_RATING", "RATING_SET_TO_DEFAULT"]
 };
 
-::SetDefaultOptions(OPT, RatingOnSkip => -5, GracePeriod => 15, RatingOnSkipBeforeGrace => -1, RatingOnPlayed => 5, SetDefaultRatingOnSkipped => 1, SetDefaultRatingOnPlayed => 1, MyHash => { a => "a", b => "actually b"}, Rules => [[ {signal => 'Finished', field => "rating", value => 5}, {signal => 'Skipped', field => 'rating', value => -5 }, { signal => "SkippedBefore15", field => "rating", value => -1}]]);
+::SetDefaultOptions(OPT, RatingOnSkip => -5, GracePeriod => 15, RatingOnSkipBeforeGrace => -1, RatingOnPlayed => 5, SetDefaultRatingOnSkipped => 1, SetDefaultRatingOnFinished => 1, Rules => [[ {signal => 'Finished', field => "rating", value => 5}, {signal => 'Skipped', field => 'rating', value => -5 }, { signal => "SkippedBefore15", field => "rating", value => -1}]]);
 
 my $self=bless {},__PACKAGE__;
 
@@ -47,46 +47,6 @@ sub AddRatingPointsToSong {
     }
 }
 
-sub Played {
-        my $ID=$::PlayingID;
-        my $DefaultRating = $::Options{"DefaultRating"};
-        my $GracePeriod = $::Options{OPT.'GracePeriod'};
-        my $RatingOnSkip = $::Options{OPT.'RatingOnSkip'};
-        my $RatingOnSkipBeforeGrace = $::Options{OPT.'RatingOnSkipBeforeGrace'};
-        my $RatingOnPlayed = $::Options{OPT.'RatingOnPlayed'};
-
-        if(!defined $::PlayTime) {
-            warn "EpicRating's Played callback is missing PlayTime?!";
-            return;
-        }
-        my $PlayedPartial=$::PlayTime-$::StartedAt < $::Options{PlayedPercent} * ::Songs::Get($ID,'length');
-        if ($PlayedPartial)
-        {
-                my $song_rating = Songs::Get($ID, 'rating');
-                if(($song_rating eq "") && $::Options{OPT."SetDefaultRatingOnSkipped"}) {
-                    ::Songs::Set($ID, rating=>$DefaultRating);
-                } elsif(!$song_rating) {
-                    # user didn't have the setting on
-                    return;
-                } else {
-                    if(($GracePeriod != 0) && ($::PlayTime < $GracePeriod)) {
-                        AddRatingPointsToSong($ID, $RatingOnSkipBeforeGrace);
-                    } else {
-                        AddRatingPointsToSong($ID, $RatingOnSkip);
-                    }
-                }
-        } else {
-                my $song_rating = ::Songs::Get($ID, 'rating');
-                if(($song_rating eq "") && $::Options{OPT."SetDefaultRatingOnPlayed"}) {
-                    ::Songs::Set($ID, rating=>$DefaultRating);
-                } elsif(!$song_rating) {
-                    # user didn't have the setting on
-                    return;
-                }
-                AddRatingPointsToSong($ID, $RatingOnPlayed);
-        }
-}
-
 sub ApplyRuleByName {
     my ($rule_name, $song_id) = @_;
     my $rules = $::Options{OPT.'Rules'};
@@ -94,8 +54,9 @@ sub ApplyRuleByName {
     foreach my $rule (@{$rules}) {
         if(${$rule}{signal} eq $rule_name) {
             my $value = ::Songs::Get($song_id, ${$rule}{field});
-            warn "MATCHED A " . $rule_name . ", id: " . $song_id . ", field: " . ${$rule}{field} . ", existing val: " . $value;
-            ::Songs::Set($song_id,${$rule}{field}, $value + ${$rule}{value});
+            if(!($value eq "" || $value == undef)) {
+                AddRatingPointsToSong($song_id, ${$rule}{value});
+            }
         }
     }
 }
@@ -103,16 +64,29 @@ sub ApplyRuleByName {
 # Finished playing song (actually PlayedPercent or more, neat eh?)
 sub Finished {
     my $rules = $::Options{OPT.'Rules'};
+    my $DefaultRating = $::Options{"DefaultRating"};
+
+
     my $ID=$::PlayingID;
-    warn "Finished handle rrunning, about to scan for rules!";
+
+    my $song_rating = Songs::Get($ID, 'rating');
+    if(!($song_rating && $::Options{OPT."SetDefaultRatingOnFinished"})) {
+        ::Songs::Set($ID, rating=>$DefaultRating);
+    }
 
     ApplyRuleByName('Finished', $ID);
 }
 
 sub Skipped {
-
+    my $DefaultRating = $::Options{"DefaultRating"};
     my $rules = $::Options{OPT.'Rules'};
     my $ID=$::PlayingID;
+
+
+    my $song_rating = Songs::Get($ID, 'rating');
+    if(!($song_rating && $::Options{OPT."SetDefaultRatingOnSkipped"})) {
+        ::Songs::Set($ID, rating=>$DefaultRating);
+    }
 
     if($::PlayTime < 15) {
         ApplyRuleByName("SkippedBefore15", $ID);
@@ -275,20 +249,26 @@ sub prefbox {
         RulesListAddRow($rule);
     });
 
-#    my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (required for rating update on files with default rating):");
-#    my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped", _"... on skipped songs");
-#    my $set_default_rating_played_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnPlayed", _"... on played songs");
+    my $default_rating_box = Gtk2::VBox->new();
+    my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (required for rating update on files with default rating):");
+    my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped", _"... on skipped songs");
+    my $set_default_rating_finished_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnFinished", _"... on played songs");
+    $default_rating_box->add($set_default_rating_label);
+    $default_rating_box->add($set_default_rating_skip_check);
+    $default_rating_box->add($set_default_rating_finished_check);
+
     my $rating_freq_dump_button = Gtk2::Button->new("CSV dump of rating populations to stdout");
     $rating_freq_dump_button->signal_connect(clicked => sub {
-	for(my $r_count = 0; $r_count <= 100; $r_count++) {
-	    my $r_filter = Filter->new("rating:e:" . $r_count);
-	    my $IDs = $r_filter->filter;
-	    print $r_count . "," . scalar @$IDs . "\n";
-	}
+        for(my $r_count = 0; $r_count <= 100; $r_count++) {
+            my $r_filter = Filter->new("rating:e:" . $r_count);
+            my $IDs = $r_filter->filter;
+            print $r_count . "," . scalar @$IDs . "\n";
+        }
     });
 
     $big_vbox->add($rules_scroller);
     $big_vbox->add_with_properties($add_rule_button, "expand", ::FALSE);
+    $big_vbox->add_with_properties($default_rating_box, "expand", ::FALSE);
     $big_vbox->add_with_properties($rating_freq_dump_button, "expand", ::FALSE);
 
     $big_vbox->show_all();
