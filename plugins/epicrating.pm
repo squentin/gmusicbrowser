@@ -87,9 +87,45 @@ sub Played {
         }
 }
 
-sub Start {
-    ::Watch($self, Played => \&Played);
+sub ApplyRuleByName {
+    my ($rule_name, $song_id) = @_;
+    my $rules = $::Options{OPT.'Rules'};
 
+    foreach my $rule (@{$rules}) {
+        if(${$rule}{signal} eq $rule_name) {
+            my $value = ::Songs::Get($song_id, ${$rule}{field});
+            warn "MATCHED A " . $rule_name . ", id: " . $song_id . ", field: " . ${$rule}{field} . ", existing val: " . $value;
+            ::Songs::Set($song_id,${$rule}{field}, $value + ${$rule}{value});
+        }
+    }
+}
+
+# Finished playing song (actually PlayedPercent or more, neat eh?)
+sub Finished {
+    my $rules = $::Options{OPT.'Rules'};
+    my $ID=$::PlayingID;
+    warn "Finished handle rrunning, about to scan for rules!";
+
+    ApplyRuleByName('Finished', $ID);
+}
+
+sub Skipped {
+
+    my $rules = $::Options{OPT.'Rules'};
+    my $ID=$::PlayingID;
+
+    if($::PlayTime < 15) {
+        ApplyRuleByName("SkippedBefore15", $ID);
+    } else {
+        ApplyRuleByName("SkippedAfter15", $ID);
+    }
+    ApplyRuleByName("Skipped", $ID);
+}
+
+sub Start {
+    # ::Watch($self, Played => \&Played);
+    ::Watch($self, Finished => \&Finished);
+    ::Watch($self, Skipped => \&Skipped);
 }
 
 sub Stop {
@@ -98,11 +134,17 @@ sub Stop {
 
 # rule editor.
 # - event
-# - value .... could somehow be another one of these rules?
+# - value
 # - operator
 
-my $editor_signals = ['Played', 'Skipped', 'Finished', 'SkippedBefore15'];
+my $editor_signals = ['Finished', 'Skipped', 'SkippedBefore15', 'SkippedAfter15'];
 my $editor_fields = ['rating'];
+
+# checkbox for "set default rating when file played/skipped, required for rating update on files without a rating"
+
+# weird behaviour with Gtk2::Table->attach() not working for Add, even though the scenario ends up being no different than at creation time?! D:
+
+# add setting to gmusicbrowser core UI for PlayedPercent.  not sure why it isn't there already. :P
 
 # perl, sigh.
 # sub indexOfStr {
