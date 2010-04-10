@@ -39,7 +39,7 @@ sub AddRatingPointsToSong {
         warn "Yikes, can't rate this song above one hundred.";
         ::Songs::Set($ID, rating=>100);
     } elsif(($ExistingRating + $PointsToRemove) < 0) {
-        warn "Negaive addend in EpicRating pushed song rating to below 0.  Pinning.";
+        warn "Negative addend in EpicRating pushed song rating to below 0.  Pinning.";
         ::Songs::Set($ID, rating => 0);
     } else {
         warn "EpicRating changing song rating by " . $PointsToRemove;
@@ -275,9 +275,21 @@ sub prefbox {
         RulesListAddRow($rule);
     });
 
+#    my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (required for rating update on files with default rating):");
+#    my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped", _"... on skipped songs");
+#    my $set_default_rating_played_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnPlayed", _"... on played songs");
+    my $rating_freq_dump_button = Gtk2::Button->new("CSV dump of rating populations to stdout");
+    $rating_freq_dump_button->signal_connect(clicked => sub {
+	for(my $r_count = 0; $r_count <= 100; $r_count++) {
+	    my $r_filter = Filter->new("rating:e:" . $r_count);
+	    my $IDs = $r_filter->filter;
+	    print $r_count . "," . scalar @$IDs . "\n";
+	}
+    });
 
     $big_vbox->add($rules_scroller);
     $big_vbox->add_with_properties($add_rule_button, "expand", ::FALSE);
+    $big_vbox->add_with_properties($rating_freq_dump_button, "expand", ::FALSE);
 
     $big_vbox->show_all();
     return $big_vbox;
