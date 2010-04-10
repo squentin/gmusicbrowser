@@ -5435,6 +5435,7 @@ sub PrefMisc
 	my $DefRating=NewPrefSpinButton('DefaultRating',0,100, step=>10, page=>20, text1=>_"Default rating :", cb=> sub
 		{ IdleDo('0_DefaultRating',500,\&Songs::UpdateDefaultRating);
 		});
+	my $PlayedPercent=NewPrefSpinButton('PlayedPercent',0,1, step=>0.05,page=>20, digits=>2, text1=>_"Played percent :", tip=>_"Minimum amount of song playback time to consider a full play (playcount increment)");
 
 	my $checkR1=NewPrefCheckButton(RememberPlayFilter => _"Remember last Filter/Playlist between sessions");
 	my $checkR3=NewPrefCheckButton( RememberPlayTime  => _"Remember playing position between sessions");
@@ -5488,7 +5489,7 @@ sub PrefMisc
 	my $pixcache= NewPrefSpinButton('PixCacheSize',1,1000, text1=>_"Picture cache :", text2=>_"MB", cb=>\&GMB::Picture::trim);
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry,$volstep,$always_in_pl,$pixcache;
+	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$PlayedPercent,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry,$volstep,$always_in_pl,$pixcache;
 	return $vbox;
 }
 
