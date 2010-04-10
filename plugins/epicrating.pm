@@ -54,7 +54,8 @@ sub ApplyRuleByName {
     foreach my $rule (@{$rules}) {
         if(${$rule}{signal} eq $rule_name) {
             my $value = ::Songs::Get($song_id, ${$rule}{field});
-            if(!($value eq "" || $value == undef)) {
+            if((defined $value) && ($value ne "")) {
+		# should be handling different fields as necessary, but since we only have rating right now...
                 AddRatingPointsToSong($song_id, ${$rule}{value});
             }
         }
