@@ -121,11 +121,16 @@ sub Copy
 
 sub ToM3U
 {	my $IDs=$_[0]{IDs} || $_[0]{filter}->filter;
+	return unless @$IDs;
 	my $file=::ChooseSaveFile(undef,_"Write filenames to ...", Songs::Get($IDs->[0],'path'), 'list.m3u');
 	return unless defined $file;
-	open my$fh,'>',$file;
+	my $content="#EXTM3U\n";
 	for my $ID (@$IDs)
-	 { print $fh Songs::GetFullFilename($ID)."\n"; }
+	{	my ($file,$length,$artist,$title)= Songs::Get($ID,qw/fullfilename length artist title/);
+		$content.= "\n#EXTINF:$length,$artist - $title\n$file\n";
+	}
+	open my$fh,'>',$file or warn "Error opening '$file' for writing : $!\n";
+	print $fh $content   or warn "Error writing to '$file' : $!\n";
 	close $fh;
 }
 
