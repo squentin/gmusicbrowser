@@ -6049,7 +6049,7 @@ use constant TREE_VIEW_DRAG_WIDTH => 6;
 our @ColumnMenu=
 (	{ label => _"_Sort by",		submenu => sub { Browser::make_sort_menu($_[0]{songtree}); }
 	},
-	{ label => _"Set grouping",	submenu => sub {$::Options{SavedSTGroupings}},
+	{ label => _"Set grouping",	submenu => sub {$::Options{SavedSTGroupings}}, check =>sub { $_[0]{songtree}{grouping} },
 	  code => sub { $_[0]{songtree}->set_head_columns($_[1]); },
 	},
 	{ label => _"Edit grouping ...",	code => sub { my $songtree=$_[0]{songtree}; ::EditSTGroupings($songtree,$songtree->{grouping},undef,sub{ $songtree->set_head_columns($_[0]) if defined $_[0]; }); },
