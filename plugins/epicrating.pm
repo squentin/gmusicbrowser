@@ -104,7 +104,7 @@ sub Start {
 }
 
 sub Stop {
-    ::UnWatch($self, $_) for qw/Played/;
+    ::UnWatch($self, $_) for qw/Finished Skipped/;
 }
 
 # rule editor.
@@ -124,14 +124,14 @@ my $editor_fields = ['rating'];
 # perl, sigh.
 # sub indexOfStr {
 #     my ($arr,  $matey) = @_;
-#     for(my $idx = 0; $idx < $#{$arr}; $idx ++) {
+#     for(my $idx = 0; $idx <= $#{$arr}; $idx ++) {
 #         return $idx if $arr eq $matey;
 #     }
 # }
 
 sub indexOfRef {
    my ($arr, $matey) = @_;
-    for(my $idx = 0; $idx < $#{$arr}; $idx ++) {
+    for(my $idx = 0; $idx <= $#{$arr}; $idx ++) {
         return $idx if $arr == $matey;
     }
 }
