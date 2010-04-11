@@ -1685,7 +1685,7 @@ sub ReadOldSavedTags
 
 sub ReadSavedTags	#load tags _and_ settings
 {	my $LoadFile= $ImportFile || $SaveFile;
-	unless (-r $LoadFile)
+	unless (-r $LoadFile && -s $LoadFile)
 	{	FirstTime();
 		Post_ReadSavedTags();
 		return;
@@ -1708,7 +1708,7 @@ sub ReadSavedTags	#load tags _and_ settings
 			push @{$lines{$section}},$_;
 		}
 		close $fh;
-		# FIXME do someting clever if no [Options]
+		unless ($lines{Options}) { warn "Can't find Options section in '$LoadFile', it's probably not a gmusicbrowser save file -> aborting\n"; exit 1; }
 		SongArray::start_init(); #every SongArray read in Options will be updated to new IDs by SongArray::updateIDs later
 		ReadRefFromLines($lines{Options},\%Options);
 		my $oldversion=delete $Options{version} || VERSION;
