@@ -210,6 +210,7 @@ sub RulesListAddRow {
 
      my $rule_editor = RuleEditor($rule);
     $self->{rules_table}->attach($rule_editor, 0, 1, $self->{current_row}, $self->{current_row}+1, "shrink", "shrink", 0, 0);
+    $rule_editor->show_all();
     $self->{current_row} += 1;
 }
 
