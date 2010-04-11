@@ -1140,9 +1140,10 @@ sub ReReadFile
 		my $checklength= ($size1!=$size2 || ($force && $force==2)) ? 2 : 0;
 		return 1 unless $checklength || $force || $modif1!=$modif2;
 		my ($values,$estimated)=FileTag::Read($file,$checklength);
+		$values->{size}=$size2;
+		$values->{modif}=$modif2;
 		my @changed=$DIFFsub->($ID,$values);
 		return unless @changed;warn "Changed fields : @changed";
-		############SetDB($ID,map( ($_,$values->{$_}), @changed)); DELME
 		::SongsChanged([$ID],\@changed);
 		my %changed; $changed{$_}=undef for @changed;
 		Changed(\%changed,[$ID]);
