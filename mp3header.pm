@@ -1218,6 +1218,7 @@ sub new_from_file
 sub removetag {	$_[0]{deleted}=1; }
 sub add
 {	my ($self,$fname,@data)=@_;
+	if ($fname!~m/^[A-Z0-9]{4}$/) { warn "Invalid id3v2 frameID '$fname', ignoring\n"; return }
 	return undef unless _checkNumberOfSubFrame($fname,\@data);
 	push @{ $self->{frames}{$fname} },\@data;
 	push @{ $self->{framesorder} },$fname;
@@ -1226,6 +1227,7 @@ sub add
 }
 sub insert	#same as add but put it first (of its kind)
 {	my ($self,$fname,@data)=@_;
+	if ($fname!~m/^[A-Z0-9]{4}$/) { warn "Invalid id3v2 frameID '$fname', ignoring\n"; return }
 	return undef unless _checkNumberOfSubFrame($fname,\@data);
 	unshift @{ $self->{frames}{$fname} },\@data;
 	push @{ $self->{framesorder} },$fname;
