@@ -445,16 +445,16 @@ sub RGA_ReplayGainAnalyse_byAlbum
 	for my $ID (@$IDs)
 	{	my $aid= Songs::Get($ID,'album');
 		if (defined $aid0)
-		{	if ($aid0 eq $aid) {push @album,$ID;next}
-			else
-			{	push @list, (@album>1 ? [@album] : $album[0]);
+		{	if ($aid0 eq $aid) {push @album,$ID;next}	# same album
+			else						# different album
+			{	push @list, (@album>1 ? [@album] : $album[0]);	#add songs from previous album as a group
 				$aid0=undef; @album=undef;
 			}
 		}
-		if (AA::HasName('album',$aid)) {push @list,$ID}
-		else {$aid0=$aid; @album=($ID)}
+		if ($aid eq '') {push @list,$ID}	# songs with no album -> add song on its own
+		else {$aid0=$aid; @album=($ID)}		# new album
 	}
-	if (defined $aid0) { push @list, (@album>1 ? [@album] : $album[0]); }
+	if (defined $aid0) { push @list, (@album>1 ? [@album] : $album[0]); } # add songs from last album as a group
 	RGA_ReplayGainAnalyse(\@list);
 }
 sub RGA_ReplayGainAnalyse
