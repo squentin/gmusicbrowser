@@ -630,6 +630,11 @@ Name = _"Invisible hot spot"
 Window =  transparent=1
 HBmain = _EventBox(hover_layout="full with buttons",hover_delay=1)
 
+[D_lyrics]
+Type=D
+Name = _"Lyrics (requires lyrics plugin)"
+Window =  transparent=1
+VBmain = _PluginLyrics(shadow=none,HideToolbar=1)
 
 #type P layouts : pages that can be added to a TabbedLists
 [same_album]
