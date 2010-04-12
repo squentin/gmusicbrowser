@@ -14,7 +14,7 @@
 # in the Ubuntu (Debian?) packages.
 # As such, it needs to be loaded from CPAN (plus dependencies)
 
-# cpan -i POE POE::Loop::Glib POE::Component::Server::HTTP
+# cpan -i POE POE::Loop::Glib POE::Component::Server::HTTP Net::DAAP::DMAP
 
 # if other HTTP services might be useful to add, it might
 # be worth turning this plugin into a generic web interface plugin
@@ -39,12 +39,34 @@ use POE::Component::Server::HTTP;
 
 use CGI;
 use HTTP::Status qw/RC_OK/;
+use Net::DAAP::DMAP qw(:all);
 
 use constant {
     OPT => 'PLUGIN_DACPREMOTE_'
 };
 
 my $self=bless {}, __PACKAGE__;
+
+sub login_response {
+    my $dmap =   [
+	[
+	 'dmap.loginresponse',
+	 [
+	  [
+	       'dmap.status',
+	   200
+	  ],
+	  [
+	   'dmap.sessionid',
+	   2393
+	  ]
+	 ]
+	]
+	];
+    
+    return dmap_pack($dmap);
+}
+
 
 sub cgi_from_request {
     my ($request) = @_;
@@ -81,7 +103,7 @@ sub login_handler {
     # Build the response.
     $response->code(RC_OK);
     $response->push_header("Content-Type", "text/plain");
-    $response->content("");
+    $response->content(login_response());
 
     # Signal that the request was handled okay.
     return RC_OK;
