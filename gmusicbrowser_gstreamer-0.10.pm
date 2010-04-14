@@ -522,10 +522,11 @@ sub RGA_process_next
 			$ID=$list->[0];
 			$RGA_pipeline->{album_i}=0;
 		}
-		my $f= Songs::GetFullFilename($ID);
+		my $f= Songs::Get($ID,'fullfilename_raw');
+		::_utf8_on($f); # pretend it's utf8 to prevent a conversion to utf8 by the bindings
 		$RGA_pipeline->{ID}=$ID;
 		warn "analysing [$ID] $f\n";
-		$RGA_pipeline->get_by_name('filesrc')->set(location => $f);#set(uri => $f);
+		$RGA_pipeline->get_by_name('filesrc')->set(location => $f);
 		$rganalysis->set_locked_state(0);
 		$RGA_pipeline->set_state('playing');
 	}
