@@ -583,7 +583,7 @@ our %Widgets=
 		tip	=> _"Toggle fullscreen mode",
 		text	=> _"Fullscreen",
 		activate=> \&::ToggleFullscreenLayout,
-		#activate=> \&ToggleFullscreen,
+		click3	=> \&ToggleFullscreen,
 		autoadd_type	=> 'button main',
 		autoadd_option	=> 'AddFullscreenButton',
 	},
