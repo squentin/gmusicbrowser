@@ -510,6 +510,7 @@ our %Widgets=
 		stock	=> 'gtk-media-play',
 		tip	=> _"Play filter",
 		activate=> sub { ::Select( filter => ::GetFilter($_[0]), song=> 'trykeep', play =>1 ); },
+		click2	=> sub { ::EnqueueFilter( ::GetFilter($_[0]) ); },
 	},
 	QueueFilter =>
 	{	class	=> 'Layout::Button',
