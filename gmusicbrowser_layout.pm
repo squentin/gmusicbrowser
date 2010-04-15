@@ -3394,6 +3394,7 @@ sub get_player_window
 sub UpdateSubMenu
 {	my $self=shift;
 	my $menu=$self->get_submenu;
+	return unless $menu;
 	$menu->remove($_) for $menu->get_children;
 	$self->{updatemenu}($self);
 	$menu->show_all;
