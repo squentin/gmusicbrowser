@@ -303,15 +303,17 @@ sub new
 
 	::Watch($self,'Selection_'.$self->{group}, \&SelectionChanged);
 	::Watch($self,SongArray=> \&ListChanged);
+	Glib::Idle->add(sub { $self->SelectionChanged; $self->ListChanged; 0; });
 
 	return $self;
 }
 
 sub ListChanged
 {	my ($self,$array)=@_;
-	my $watchedarray=::GetSonglist($self);
-	return if !$watchedarray || $watchedarray!=$array;
-	$self->{bclear}->set_sensitive(scalar @$array);
+	my $songlist=::GetSonglist($self);
+	my $watchedarray= $songlist && $songlist->{array};
+	return if !$watchedarray || ($array && $watchedarray!=$array);
+	$self->{bclear}->set_sensitive(scalar @$watchedarray);
 }
 
 sub SelectionChanged
