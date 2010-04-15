@@ -6161,7 +6161,7 @@ sub Watch
 	}
 	else { push @{$EventWatchers{$key}},$object; weaken($EventWatchers{$key}[-1]); }
 	$object->{'WatchUpdate_'.$key}=$sub;
-	$object->signal_connect(destroy => \&UnWatch,$key) unless ref $object eq 'HASH' || !$object->isa('Gtk2::Object');
+	$object->{Watcher_DESTROY}||=$object->signal_connect(destroy => \&UnWatch_all) unless ref $object eq 'HASH' || !$object->isa('Gtk2::Object');
 }
 sub UnWatch
 {	my ($object,$key)=@_;
@@ -6170,9 +6170,10 @@ sub UnWatch
 	weaken($_) for @{$EventWatchers{$key}}; #re-weaken references (the grep above made them strong again)
 	delete $object->{'WatchUpdate_'.$key};
 }
-sub UnWatch_all #for when destructing non-Gtk2::Object
+sub UnWatch_all #for when destructing object (unwatch Watch() AND WatchFilter())
 {	my $object=shift;
 	UnWatch($object,$_) for map m/^WatchUpdate_(.+)/, keys %$object;
+	UnWatchFilter($object,$_) for map m/^UpdateFilter_(.+)/, keys %$object;
 }
 
 sub QHasChanged
@@ -6291,7 +6292,7 @@ sub WatchFilter
 		#$Filters{$group}[0]||=$Filters{$group}[1+1]||=Filter->new;
 	}
 	IdleDo('1_init_filter'.$group,0, \&InitFilter, $group);
-	$object->signal_connect(destroy => \&UnWatchFilter,$group) unless ref $object eq 'HASH' || !$object->isa('Glib::Object');
+	$object->{Watcher_DESTROY}||=$object->signal_connect(destroy => \&UnWatch_all) unless ref $object eq 'HASH' || !$object->isa('Glib::Object');
 }
 sub UnWatchFilter
 {	my ($object,$group)=@_;
@@ -6301,7 +6302,7 @@ sub UnWatchFilter
 		{	delete $Related_FilterWatchers{$group};
 		}
 	}
-	delete $object->{'UpdateFilter'.$group};
+	delete $object->{'UpdateFilter_'.$group};
 	my $ref=$FilterWatchers{$group};
 	@$ref=grep $_ ne $object, @$ref;
 	unless (@$ref)
