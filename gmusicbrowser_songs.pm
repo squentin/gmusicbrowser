@@ -424,6 +424,11 @@ our %timespan_menu=
 	gidshuffle=>
 	{	n_sort		=> 'Songs::update_shuffle(##mainfield#->maxgid#) ----  vec($Songs::SHUFFLE,##mainfield#->get_gid#,32)',
 	},
+	writeonly=>
+	{	diff=>'1',
+		set => '',
+		check=>'',
+	},
 );
 %Def=		#flags : Read Write Editable Sortable Column caseInsensitive sAve List Gettable
 (file	=>
@@ -698,9 +703,10 @@ our %timespan_menu=
 	id3v2	=> 'TXXX;replaygain_album_peak;%v',	vorbis	=> 'replaygain_album_peak',	ape	=> 'replaygain_album_peak', ilst => '----replaygain_album_peak',
 	type	=> 'float',
  },
-# replaygain_reference_level=>
-# {	id3v2	=> 'TXXX;replaygain_reference_level;%v',vorbis	=> 'replaygain_reference_level',ape	=> 'replaygain_reference_level', ilst => '----replaygain_reference_level',
-# },
+ replaygain_reference_level=>
+ {	flags => 'w',	type => 'writeonly',	#only used for writing
+	id3v2	=> 'TXXX;replaygain_reference_level;%v',vorbis	=> 'replaygain_reference_level',	ape => 'replaygain_reference_level', ilst => '----replaygain_reference_level',
+ },
  #mp3gain : APE tags,	peak : float 	: 0.787193
  #			gain float dB 	: -1.240000 dB
  #vorbisgain :	peak float : 0.00011510 1.01959181
@@ -973,7 +979,7 @@ warn "\@Fields=@Fields"; $Def{$_}{flags}||='' for @Fields;	#DELME
 		'my $IDs=$_[0]; my $values=$_[1]; my %onefieldchanged; my @towrite; my %changedfields; my @changedIDs; my $i=0; my $val;',
 		'for my $ID (@$IDs)',
 		'{	my $changed;';
-		for my $f (grep $Def{$_}{flags}=~m/a/, @Fields)
+		for my $f (grep $Def{$_}{flags}=~m/[aw]/, @Fields)
 		{	my $set=  ($Def{$f}{flags}=~m/w/ && !$::Options{TAG_nowrite_mode}) ?
 				"push \@{\$towrite[\$i]}, '$f',\$val;" :
 				"#set#; \$changedfields{$f}=undef; \$changed=1;";
