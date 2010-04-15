@@ -3921,15 +3921,15 @@ sub Retry_Dialog	#returns 'yes' 'no' or 'abort'
 	my $dialog = Gtk2::MessageDialog->new
 	( $window,
 	  [qw/modal destroy-with-parent/],
-	  'error','yes-no','%s',
-	  "$err\n "._("retry ?")
+	  'error','cancel','%s', $err,
 	);
-	$dialog->add_button($abortmsg, '1') if $abortmsg;
+	$dialog->add_button(_"_Retry", 2);
+	$dialog->add_button($abortmsg, 1) if $abortmsg;
 	$dialog->show_all;
 	my $ret=$dialog->run;
 	$dialog->destroy;
-	$ret=	($ret eq '1')	? 'abort':
-		($ret)		? $ret	  :
+	$ret=	($ret eq '2')		? 'yes':
+		($ret eq 'cancel')	? 'no' :
 		'abort';
 	return $ret;
 }
@@ -3997,13 +3997,14 @@ sub DeleteFiles
 	my $dialog = Gtk2::MessageDialog->new
 		( undef,
 		  'modal',
-		  'warning','ok-cancel','%s',
+		  'warning','cancel','%s',
 		  __x(_("About to delete {files}\nAre you sure ?"), files => $text)
 		);
+	my $yesbutton=$dialog->add_button("gtk-delete", 2);
 	$dialog->show_all;
-	if ('ok' eq $dialog->run)
+	if ('2' eq $dialog->run)
 	{ my $abortmsg;
-	  $abortmsg=_"Abort" if @$IDs>1;
+	  $abortmsg=_"Abort all" if @$IDs>1;
 	  for my $ID (@$IDs)
 	  {	my $f= Songs::GetFullFilename($ID);
 		unless (unlink $f)
