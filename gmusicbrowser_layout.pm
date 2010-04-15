@@ -2452,6 +2452,8 @@ sub SwitchedPage
 	delete $self->{DefaultFocus};
 	if (defined(my $group=delete $self->{active_group}))
 	{	::UnWatch($self,'SelectedID_'.$group);
+		::UnWatch($self,'Selection_'.$group);
+		#::UnWatchFilter($self,$group);
 	}
 	my $page=$self->get_nth_page($pagenb);
 	::weaken( $self->{DefaultFocus}=$page );
@@ -2460,16 +2462,15 @@ sub SwitchedPage
 	my $group= $self->{active_group}= $page->{group};
 	my $ID= ::GetSelID($group);
 	::HasChangedSelID($metagroup,$ID) if defined $ID;
+	if (my $songlist=$SongList::Common::Register{$group})
+	{	$songlist->RegisterGroup($self->{group});
+		::HasChanged('Selection_'.$self->{group});
+		::Watch($self,'Selection_'.$group,  sub { ::HasChanged('Selection_'.$_[0]->{group}); });
+		::HasChanged('SongArray',$songlist->{array},'proxychange');
+	}
 	# FIXME can't use WatchSelID, should special-case special groups : Play Recent\d *Next\d* ...
 	::Watch($self,'SelectedID_'.$group, sub { my ($self,$ID)=@_; ::HasChangedSelID($self->{group},$ID) if defined $ID; });
-	# FIXME add other group signals :
-	#::HasChanged('Selection_'.$self->{group});
-	#::Watch($self,'Selection_'.$group, sub { ::HasChanged('Selection_'.$_[0]->{group}); });
-	#
-	# ::WatchFilter($self,$group, ...
-	#
-	# FIXME make it so that LabelTotal can work with this metagroup
-	# ::HasChanged('SongArray'...
+	#::WatchFilter($self,$group, sub {  });
 }
 
 package Layout::PlaceHolder;
