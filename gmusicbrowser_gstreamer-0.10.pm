@@ -9,24 +9,13 @@ package Play_GST;
 use strict;
 use warnings;
 
-my ($GST_ok,$GST_visuals_ok,$GST_EQ_ok,$GST_RG_ok,$GST_RGA_ok);
+my ($GST_ok,$GST_visuals_ok,$GST_EQ_ok,$GST_RG_ok); our $GST_RGA_ok;
 my ($PlayBin,$Sink);
 my ($WatchTag,$Skip);
 my (%Plugins,%Sinks);
 my ($VSink,$visual_window);
 my $AlreadyNextSong;
 
-my $RGA_pipeline; my $RG_dialog;
-my $RGA_songmenu=
-{ label => _"Replaygain analysis",	notempty => 'IDs', notmode => 'P', test => sub {$GST_RGA_ok && $::Options{gst_rg_songmenu}; },
- submenu =>
- [	{ label => _"Scan this file",	code => sub { RGA_ReplayGainAnalyse ($_[0]{IDs}); },		onlyone => 'IDs', },
-	{ label => _"Scan per-file track gain",	code => sub { RGA_ReplayGainAnalyse ($_[0]{IDs}); },	onlymany => 'IDs', },
-	{ label => _"Scan using tag-defined album",	code => sub { RGA_ReplayGainAnalyse_byAlbum ($_[0]{IDs}); },	onlymany => 'IDs',  },
-	{ label => _"Scan as an album",	code => sub { RGA_ReplayGainAnalyse([ $_[0]{IDs} ]); },		onlymany=> 'IDs',  },
- ],
-};
-push @::SongCMenu,$RGA_songmenu;
 $::PlayPacks{Play_GST}=1; #register the package
 
 my $reg_keep; #work-around to keep the register from being finalized in gstreamer<0.10.4 (see http://bugzilla.gnome.org/show_bug.cgi?id=324818)
@@ -250,7 +239,7 @@ sub Play
 		if ($useRG)
 		{	my ($rgv,$rgl,$ac,$ar)=	map GStreamer::ElementFactory->make($_=>$_),
 					qw/rgvolume rglimiter audioconvert audioresample/;
-			RG_set_options($rgv,$rgl);
+			set_options($rgv,$rgl);
 			push @elems, $rgv,$rgl,$ac,$ar;
 		}
 		if (@elems)
@@ -427,7 +416,39 @@ sub Stop
 	#warn "--stop\n";
 }
 
-sub RG_set_options
+sub AdvancedOptions
+{	my $self=$_[0];
+	my $vbox=Gtk2::VBox->new(::FALSE, 2);
+	my $gapless= ::NewPrefCheckButton(gst_gapless => _"enable gapless (experimental)", cb=>sub { $self->{modif}=1 });
+	$vbox->pack_start($gapless,::FALSE,::FALSE,2);
+	my $sg1=Gtk2::SizeGroup->new('horizontal');
+	my $sg2=Gtk2::SizeGroup->new('horizontal');
+	for my $s (sort grep $Sinks{$_}{ok} && $Sinks{$_}{option}, keys %Sinks)
+	{	my $label= $Sinks{$s}{name}||$s;
+		for my $opt (sort split / /,$Sinks{$s}{option})
+		{	my $hbox=::NewPrefEntry("gst_${s}_$opt", "$s $opt : ", cb => sub { $self->{modif}=1 }, sizeg1 => $sg1, sizeg2 => $sg2);
+			$vbox->pack_start($hbox,::FALSE,::FALSE,2);
+		}
+	}
+	return $vbox;
+}
+
+package GMB::GST_ReplayGain;
+
+my ($RGA_pipeline,$RG_dialog);
+my (@towrite,$writing);
+my $RGA_songmenu=
+{ label => _"Replaygain analysis",	notempty => 'IDs', notmode => 'P', test => sub {$Play_GST::GST_RGA_ok && $::Options{gst_rg_songmenu}; },
+ submenu =>
+ [	{ label => _"Scan this file",			code => sub { Analyse ($_[0]{IDs}); },		onlyone => 'IDs', },
+	{ label => _"Scan per-file track gain",		code => sub { Analyse ($_[0]{IDs}); },		onlymany=> 'IDs', },
+	{ label => _"Scan using tag-defined album", 	code => sub { Analyse_byAlbum ($_[0]{IDs}); },	onlymany=> 'IDs', },
+	{ label => _"Scan as an album",			code => sub { Analyse([ $_[0]{IDs} ]); },	onlymany=> 'IDs', },
+ ],
+};
+push @::SongCMenu,$RGA_songmenu;
+
+sub set_options
 {	my ($rgv,$rgl)=@_;
 	$rgv||=$PlayBin->get_by_name('rgvolume');
 	$rgl||=$PlayBin->get_by_name('rglimiter');
@@ -438,7 +459,7 @@ sub RG_set_options
 	$rgv->set('fallback-gain' => $::Options{gst_rg_fallback}||0);
 	#$rgv->set(headroom => $::Options{gst_rg_headroom}||0);
 }
-sub RGA_ReplayGainAnalyse_byAlbum
+sub Analyse_byAlbum
 {	my $IDs=$_[0];
 	::SortList($IDs,'album');
 	my @list; my @album; my $aid0;
@@ -455,9 +476,9 @@ sub RGA_ReplayGainAnalyse_byAlbum
 		else {$aid0=$aid; @album=($ID)}		# new album
 	}
 	if (defined $aid0) { push @list, (@album>1 ? [@album] : $album[0]); } # add songs from last album as a group
-	RGA_ReplayGainAnalyse(\@list);
+	Analyse(\@list);
 }
-sub RGA_ReplayGainAnalyse
+sub Analyse
 {	my @IDs= ::uniq(@{ $_[0] });
 	unless ($RGA_pipeline)
 	{	$RGA_pipeline=GStreamer::Pipeline->new('RGA_pipeline');
@@ -472,7 +493,7 @@ sub RGA_ReplayGainAnalyse
 		$audiobin->add_pad(GStreamer::GhostPad ->new('sink', $audiopad));
 		$RGA_pipeline->add($src,$decodebin,$audiobin);
 		$src->link($decodebin);
-		$decodebin->signal_connect(new_decoded_pad => \&RGA_newpad_cb);
+		$decodebin->signal_connect(new_decoded_pad => \&newpad_cb);
 
 		#@elems= map GStreamer::ElementFactory->make($_ => $_), @elems;
 		#$RGA_pipeline->add(@elems);
@@ -481,17 +502,17 @@ sub RGA_ReplayGainAnalyse
 		my $bus=$RGA_pipeline->get_bus;
 		$bus->add_signal_watch;
 		$bus->signal_connect('message::error' => sub { warn "ReplayGain analysis error : ".$_[1]->error."\n"; }); #FIXME
-		$bus->signal_connect('message::tag' => \&RGA_bus_message_tag);
-		$bus->signal_connect('message::eos' => \&RGA_process_next);
+		$bus->signal_connect('message::tag' => \&bus_message_tag);
+		$bus->signal_connect('message::eos' => \&process_next);
 		#FIXME check errors
 	}
 	push @{$RGA_pipeline->{queue}},@IDs;
 	my $nb=@IDs; #warn "@IDs";
 	$nb+=@$_-1 for grep ref, @IDs; #count tracks in album lists
-	::Progress('replaygain', add=>$nb, abortcb=>\&RGA_stop, title=>_"Replaygain analysis");
-	RGA_process_next() unless $::Progress{replaygain}{current}; #FIXME maybe check if $RGA_pipeline is running instead
+	::Progress('replaygain', add=>$nb, abortcb=>\&StopAnalysis, title=>_"Replaygain analysis");
+	process_next() unless $::Progress{replaygain}{current}; #FIXME maybe check if $RGA_pipeline is running instead
 }
-sub RGA_newpad_cb
+sub newpad_cb
 {	my ($decodebin,$pad)=@_;
 	my $audiopad = $RGA_pipeline->get_by_name('RGA_audiobin')->get_pad('sink');
 	return if $audiopad->is_linked;
@@ -500,7 +521,7 @@ sub RGA_newpad_cb
 	return unless $str=~m/audio/;
 	$pad->link($audiopad);
 }
-sub RGA_process_next
+sub process_next
 {	::Progress('replaygain', inc=>1) if $_[0]; #called from callback => one file has been scanned => increment
 	unless ($RGA_pipeline) { ::Progress('replaygain', abort=>1); return; }
 
@@ -536,7 +557,7 @@ sub RGA_process_next
 	}
 	1;
 }
-sub RGA_bus_message_tag
+sub bus_message_tag
 {	my $msg=$_[1];
 	my $tags=$msg->tag_list;
 	#for my $key (sort keys %$tags) {warn "key=$key => $tags->{$key}\n"}
@@ -559,16 +580,16 @@ sub RGA_bus_message_tag
 			my $gainpeak= $RGA_pipeline->{album_tosave};
 			for my $ID (@$IDs)
 			{	@$tags{'replaygain-track-gain','replaygain-track-peak'}= @{$gainpeak->{$ID}};
-				RGA_write($ID,$tags,1);
+				queuewrite($ID,$tags,1);
 			}
 		}
 	}
 	else
-	{	RGA_write($cID,$tags,0);
+	{	queuewrite($cID,$tags,0);
 	}
 	1;
 }
-sub RGA_write
+sub queuewrite
 {	my ($ID,$tags,$albumtag)=@_;
 	my @keys=qw/replaygain-reference-level replaygain-track-gain replaygain-track-peak/;
 	push @keys, qw/replaygain-album-gain replaygain-album-peak/ if $albumtag;
@@ -580,21 +601,28 @@ sub RGA_write
 		push @modif, $field, "$tags->{$key}[0]";#string-ify them with C locale to make sure it's correct
 	}
 	::setlocale(::LC_NUMERIC, '');
-	FileTag::Write($ID, \@modif, \&RGA_write_error);
+	push @towrite, $ID,\@modif;
+	WriteRGtags() unless $writing;
 }
-sub RGA_write_error
-{	my $err=_("Error writing replaygain tags :\n").shift;
-	my $abort=_"Abort ReplayGain analysis";
-	my $ret=::Retry_Dialog($err,undef,$abort);
-	if ($ret eq 'abort') {RGA_stop()}
-	return $ret;
+sub WriteRGtags
+{	return $writing=0 if !@towrite;
+	$writing=1;
+	my $ID=   shift @towrite;
+	my $modif=shift @towrite;
+	Songs::Set($ID, $modif,
+		abortmsg	=> _"Abort ReplayGain analysis",
+		error_prefix	=> _"Error writing replaygain tags :\n",
+		abortcb		=> \&StopAnalysis,
+		callback_finish	=> \&WriteRGtags,
+	);
 }
-sub RGA_stop
-{	$RGA_pipeline->set_state('null');
+sub StopAnalysis
+{	$RGA_pipeline->set_state('null') if $RGA_pipeline;
 	$RGA_pipeline=undef;
 	::Progress('replaygain', abort=>1);
+	@towrite=();
 }
-sub RGA_PrefBox
+sub PrefBox
 {	my ($sg1,$sg2)=@_;
 	my $check=::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain", tip=>_"Normalize volume (the files must have replaygain tags)");
 	$sg1->add_widget($check);
@@ -606,7 +634,7 @@ sub RGA_PrefBox
 			$RG_dialog= Gtk2::Dialog->new (_"ReplayGain options", undef, [], 'gtk-close' => 'close');
 			$RG_dialog->signal_connect(destroy => sub {$RG_dialog=undef});
 			$RG_dialog->signal_connect(response =>sub {$_[0]->destroy;$RG_dialog=undef});
-			my $update=sub { RG_set_options(); };
+			my $update=sub { set_options(); };
 			my $songmenu=::NewPrefCheckButton(gst_rg_songmenu => _"Show replaygain submenu");
 			my $albummode=::NewPrefCheckButton(gst_rg_albummode => _"Album mode", cb=>$update, tip=>_"Use album normalization instead of track normalization");
 			my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter", cb=>$update, tip=>_"Used for clipping prevention");
@@ -627,32 +655,14 @@ sub RGA_PrefBox
 	#			{ push @list,[@$l] unless exists $done{$album}; $done{$aid}=undef; }
 	#			else { push @list,$ID; }
 	#		}
-	#		RGA_ReplayGainAnalyse(\@list);
+	#		Analyse(\@list);
 	#	});
-	#$start->signal_connect(clicked => sub { RGA_ReplayGainAnalyse(\@::Library) });
+	#$start->signal_connect(clicked => sub { Analyse(\@::Library) });
 	#$start->set_sensitive(0) unless $GST_RGA_ok;
 	my $box=::Hpack($check,$opt);
 	$box->set_sensitive(0) unless $GST_RG_ok;
 	return $box;
 }
-
-sub AdvancedOptions
-{	my $self=$_[0];
-	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $gapless= ::NewPrefCheckButton(gst_gapless => _"enable gapless (experimental)", cb=>sub { $self->{modif}=1 });
-	$vbox->pack_start($gapless,::FALSE,::FALSE,2);
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
-	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	for my $s (sort grep $Sinks{$_}{ok} && $Sinks{$_}{option}, keys %Sinks)
-	{	my $label= $Sinks{$s}{name}||$s;
-		for my $opt (sort split / /,$Sinks{$s}{option})
-		{	my $hbox=::NewPrefEntry("gst_${s}_$opt", "$s $opt : ", cb => sub { $self->{modif}=1 }, sizeg1 => $sg1, sizeg2 => $sg2);
-			$vbox->pack_start($hbox,::FALSE,::FALSE,2);
-		}
-	}
-	return $vbox;
-}
-
 
 package Play_GST_server;
 use Socket;

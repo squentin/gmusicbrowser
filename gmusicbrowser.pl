@@ -5346,7 +5346,7 @@ sub PrefAudio
 		$sg2->add_widget($EQbut);
 		my $EQbox=Hpack($EQcheck,$EQbut);
 		$EQbox->set_sensitive(0) unless $PlayPacks{Play_GST} && $PlayPacks{Play_GST}{EQ};
-		my $RGbox=Play_GST::RGA_PrefBox($sg1,$sg2);
+		my $RGbox= GMB::GST_ReplayGain::PrefBox($sg1,$sg2);
 		my $adv2=PrefAudio_makeadv('Play_GST','gstreamer');
 		my $albox=Gtk2::Alignment->new(0,0,1,1);
 		$albox->set_padding(0,0,15,0);
