@@ -1195,15 +1195,20 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 	}
 	if (@$towrite)
 	{	my $i=0; my $abort;
+		my $pid= ::Progress( undef, end=>scalar(@$IDs), abortcb=>sub {$abort=1}, widget =>$opt{progress}, title=>_"Writing tags");
 		my $errorsub=sub
-		 {	my $err=shift;
-			my $abortmsg;
-			$abortmsg=_"Abort mass-tagging" if (@$IDs-$i)>1;
-			my $ret=::Retry_Dialog($err,$opt{window},$abort);
-			$abort=1 if $ret eq 'abort';
+		 {	my $err= shift;
+			$err= $opt{error_prefix}. $err if $opt{error_prefix};
+			my $abortmsg=$opt{abortmsg};
+			$abortmsg||=_"Abort mass-tagging" if (@$IDs-$i)>1;
+			my $ret=::Retry_Dialog($err,$opt{window},$abortmsg);
+			if ($ret eq 'abort')
+			{	$opt{abortcb}() if $opt{abortcb};
+				$abort=1;
+			}
 			return $ret;
 		 };
-		my $pid= ::Progress( undef, end=>scalar(@$IDs), abortcb=>sub {$abort=1}, widget =>$opt{progress}, title=>_"Writing tags");
+
 		my $progress=$opt{progress};
 		Glib::Idle->add(sub
 		 {	if ($towrite->[$i])
@@ -1212,12 +1217,18 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 				::IdleCheck($IDs->[$i]);
 			}
 			$i++;
+			if ($abort || $i>=@$IDs)
+			{	::Progress($pid, abort=>1);
+				$opt{callback_finish}() if $opt{callback_finish};
+				return 0;
+			}
 			::Progress( $pid, current=>$i );
-			return 0 if $abort || $i>=@$IDs;
 			return 1;
 		 });
 	}
-	$opt{callback_finish}() if $opt{callback_finish};
+	else
+	{	$opt{callback_finish}() if $opt{callback_finish};
+	}
 }
 
 sub Changed
