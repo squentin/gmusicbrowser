@@ -3666,21 +3666,25 @@ sub ChooseDir
 	# there is no mode in Gtk2::FileChooserDialog that let you select both files or folders (Bug #136294), so have to work-around by connecting to the ok button and forcing the end of $dialog->run with a $dialog->hide (the dialog will be destroyed after)
 	$okbutton->signal_connect(clicked=> sub { $_[0]->{ok}=1; $dialog->hide; }) if $allowfiles;
 
-	if ($remember_key) { $path= decode_url($Options{$remember_key}); }
-	_utf8_on($path) if $path; #FIXME not sure if it's the right thing to do
-	$dialog->set_current_folder($path) if $path;
+	 warn $Options{$remember_key} if $remember_key;
+	if ($remember_key)	{ $path= $Options{$remember_key}; }
+	elsif ($path)		{ $path= url_escape($path); }
+	$dialog->set_current_folder_uri("file://".$path) if $path;
 	$dialog->set_extra_widget($extrawidget) if $extrawidget;
 	$dialog->set_select_multiple(1) if $multiple;
 
 	my @paths;
 	if ($dialog->run eq 'ok' || $okbutton->{ok})
-	{	@paths=$dialog->get_filenames;
-		eval { $_=filename_from_unicode($_); } for @paths;
-		_utf8_off($_) for @paths;# folder names that failed filename_from_unicode still have their uft8 flag on
-		@paths= grep -d, @paths unless $allowfiles;
+	{	for my $path ($dialog->get_uris)
+		{	next unless $path=~s#^file://##;
+			$path=decode_url($path);
+			next unless -e $path;
+			next unless $allowfiles or -d $path;
+			push @paths, $path;
+		}
 	}
 	else {@paths=()}
-	if ($remember_key) { $Options{$remember_key}= url_escape($dialog->get_current_folder); }
+	if ($remember_key) { my $uri=$dialog->get_current_folder_uri; $uri=~s#^file://##; $Options{$remember_key}= $uri; }
 	$dialog->destroy;
 	return @paths if $multiple;
 	return $paths[0];
@@ -3784,14 +3788,10 @@ sub ChoosePix
 	my $update_preview=sub
 		{ my ($dialog,$file)=@_;
 		  unless ($file)
-		  {	$file= eval {$dialog->get_preview_filename};
-			$file=$dialog->get_filename if $@; #for some reason get_preview_filename doesn't work with bad utf8 whereas get_filename works. don't know if there is any difference
+		  {	$file= $dialog->get_preview_uri;
+			$file= $file=~s#^file://## ? $file=decode_url($file) : undef;
 		  }
-		  return unless $file;
-		  unless (-f $file) #not sure it's needed - test with broken filenames on other OS
-		  {	eval{ $file=filename_from_unicode($file); };
-		  	_utf8_off($file); #shouldn't be needed :(
-		  }
+		  return unless $file && -f $file;
 		  $max=0;
 		  $nb=0 unless $lastfile && $lastfile eq $file;
 		  $lastfile=$file;
@@ -3806,23 +3806,24 @@ sub ChoosePix
 	$preview->show_all;
 	$more->set_no_show_all(1);
 	$dialog->set_preview_widget_active(0);
-	if ($remember_key) { $path= decode_url($Options{$remember_key}); }
+ warn $Options{$remember_key} if $remember_key;
+	if ($remember_key)	{ $path= $Options{$remember_key}; }
+	elsif ($path)		{ $path= url_escape($path); }
 	if ($file && $file=~s/:(\d+)$//) { $nb=$1; $lastfile=$file; }
 	if ($file && -f $file)	{ $dialog->set_filename($file); $update_preview->($dialog,$file); }
-	#elif ($path)		{ $dialog->set_current_folder($path); }
-	elsif ($path)		{ $dialog->set_filename($path.SLASH.'*.jpg'); }
+	elsif ($path)		{ $dialog->set_current_folder_uri( "file://$path" ); }
 
 	my $response=$dialog->run;
 	my $ret;
 	if ($response eq 'ok')
-	{	$ret=$dialog->get_filename;
-		eval { $ret=filename_from_unicode($ret); };
+	{	$ret= $dialog->get_uri;
+		$ret= $ret=~s#^file://## ? $ret=decode_url($ret) : undef;
 		unless (-r $ret) { warn "can't read $ret\n"; $ret=undef; }
 		$ret.=":$nb" if $nb;
 	}
 	elsif ($response eq 'reject') {$ret='0'}
 	else {$ret=undef}
-	if ($remember_key) { $Options{$remember_key}= url_escape($dialog->get_current_folder); }
+	if ($remember_key) { my $uri=$dialog->get_current_folder_uri; $uri=~s#^file://##; $Options{$remember_key}= $uri; }
 	$dialog->destroy;
 	return $ret;
 }
