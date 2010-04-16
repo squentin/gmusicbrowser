@@ -6084,6 +6084,10 @@ sub new
 	$self->signal_connect(button_release_event	=> \&button_release_cb);
 	$self->signal_connect(motion_notify_event	=> \&motion_notify_cb);
 	$self->signal_connect(button_press_event	=> \&button_press_cb);
+	my $rcstyle0=Gtk2::RcStyle->new;
+	$rcstyle0->ythickness(0);
+	$rcstyle0->xthickness(0);
+	$self->modify_style($rcstyle0);
 	return $self;
 }
 
@@ -6139,10 +6143,6 @@ sub update
 	$self->remove($self->child) if $self->child;
 	my $hbox=Gtk2::HBox->new(0,0);
 	$self->add($hbox);
-	my $rcstyle0=Gtk2::RcStyle->new;
-	$rcstyle0->ythickness(0);
-	$rcstyle0->xthickness(0);
-	$self->modify_style($rcstyle0);
 
 	if (my $w=$songtree->{songxoffset})
 	{	my $button=Gtk2::Button->new;
@@ -6228,7 +6228,7 @@ sub button_expose_cb
 	$button->propagate_expose($button->child,$event) if $button->child;
 	if ($button->{colid})
 	{	_create_dragwin($button) unless $button->{dragwin};
-		$button->{dragwin}->raise;
+		#$button->{dragwin}->raise;
 	}
 	1;
 }
