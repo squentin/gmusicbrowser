@@ -1685,7 +1685,7 @@ sub ReadOldSavedTags
 
 sub ReadSavedTags	#load tags _and_ settings
 {	my $LoadFile= $ImportFile || $SaveFile;
-	unless (-r $LoadFile)
+	unless (-r $LoadFile && -s $LoadFile)
 	{	FirstTime();
 		Post_ReadSavedTags();
 		return;
@@ -1708,7 +1708,7 @@ sub ReadSavedTags	#load tags _and_ settings
 			push @{$lines{$section}},$_;
 		}
 		close $fh;
-		# FIXME do someting clever if no [Options]
+		unless ($lines{Options}) { warn "Can't find Options section in '$LoadFile', it's probably not a gmusicbrowser save file -> aborting\n"; exit 1; }
 		SongArray::start_init(); #every SongArray read in Options will be updated to new IDs by SongArray::updateIDs later
 		ReadRefFromLines($lines{Options},\%Options);
 		my $oldversion=delete $Options{version} || VERSION;
@@ -2791,8 +2791,7 @@ sub CalcListLength	#if $return, return formated string (0h00m00s)
 		return __("%d Song","%d Songs",$nb) .', '.__x($format, @values);
 	}
 	elsif ($return eq 'queue')
-	{	$h=($h)? $h.'h ' : '';
-		return _"Queue empty" if $nb==0;
+	{	return _"Queue empty" if $nb==0;
 		my $format= $h? _"{hours}h{min}m{sec}s" : _"{min}m{sec}s";
 		return __("%d song in queue","%d songs in queue",$nb) .' ('. __x($format, @values) . ')';
 	}
@@ -3925,15 +3924,15 @@ sub Retry_Dialog	#returns 'yes' 'no' or 'abort'
 	my $dialog = Gtk2::MessageDialog->new
 	( $window,
 	  [qw/modal destroy-with-parent/],
-	  'error','yes-no','%s',
-	  "$err\n "._("retry ?")
+	  'error','cancel','%s', $err,
 	);
-	$dialog->add_button($abortmsg, '1') if $abortmsg;
+	$dialog->add_button(_"_Retry", 2);
+	$dialog->add_button($abortmsg, 1) if $abortmsg;
 	$dialog->show_all;
 	my $ret=$dialog->run;
 	$dialog->destroy;
-	$ret=	($ret eq '1')	? 'abort':
-		($ret)		? $ret	  :
+	$ret=	($ret eq '2')		? 'yes':
+		($ret eq 'cancel')	? 'no' :
 		'abort';
 	return $ret;
 }
@@ -4001,13 +4000,14 @@ sub DeleteFiles
 	my $dialog = Gtk2::MessageDialog->new
 		( undef,
 		  'modal',
-		  'warning','ok-cancel','%s',
+		  'warning','cancel','%s',
 		  __x(_("About to delete {files}\nAre you sure ?"), files => $text)
 		);
+	my $yesbutton=$dialog->add_button("gtk-delete", 2);
 	$dialog->show_all;
-	if ('ok' eq $dialog->run)
+	if ('2' eq $dialog->run)
 	{ my $abortmsg;
-	  $abortmsg=_"Abort" if @$IDs>1;
+	  $abortmsg=_"Abort all" if @$IDs>1;
 	  for my $ID (@$IDs)
 	  {	my $f= Songs::GetFullFilename($ID);
 		unless (unlink $f)
@@ -5042,7 +5042,6 @@ sub PrefDialog
 				'gtk-about' => 1,
 				'gtk-close' => 'close');
 	$dialog->set_default_response ('close');
-	#$dialog->action_area->pack_end(NewIconButton('gtk-about',_"about",\&AboutDialog),FALSE,FALSE,2);
 	SetWSize($dialog,'Pref');
 
 	my $notebook = Gtk2::Notebook->new;
@@ -5350,7 +5349,7 @@ sub PrefAudio
 		$sg2->add_widget($EQbut);
 		my $EQbox=Hpack($EQcheck,$EQbut);
 		$EQbox->set_sensitive(0) unless $PlayPacks{Play_GST} && $PlayPacks{Play_GST}{EQ};
-		my $RGbox=Play_GST::RGA_PrefBox($sg1,$sg2);
+		my $RGbox= GMB::GST_ReplayGain::PrefBox($sg1,$sg2);
 		my $adv2=PrefAudio_makeadv('Play_GST','gstreamer');
 		my $albox=Gtk2::Alignment->new(0,0,1,1);
 		$albox->set_padding(0,0,15,0);
@@ -6166,7 +6165,7 @@ sub Watch
 	}
 	else { push @{$EventWatchers{$key}},$object; weaken($EventWatchers{$key}[-1]); }
 	$object->{'WatchUpdate_'.$key}=$sub;
-	$object->signal_connect(destroy => \&UnWatch,$key) unless ref $object eq 'HASH' || !$object->isa('Gtk2::Object');
+	$object->{Watcher_DESTROY}||=$object->signal_connect(destroy => \&UnWatch_all) unless ref $object eq 'HASH' || !$object->isa('Gtk2::Object');
 }
 sub UnWatch
 {	my ($object,$key)=@_;
@@ -6175,9 +6174,10 @@ sub UnWatch
 	weaken($_) for @{$EventWatchers{$key}}; #re-weaken references (the grep above made them strong again)
 	delete $object->{'WatchUpdate_'.$key};
 }
-sub UnWatch_all #for when destructing non-Gtk2::Object
+sub UnWatch_all #for when destructing object (unwatch Watch() AND WatchFilter())
 {	my $object=shift;
 	UnWatch($object,$_) for map m/^WatchUpdate_(.+)/, keys %$object;
+	UnWatchFilter($object,$_) for map m/^UpdateFilter_(.+)/, keys %$object;
 }
 
 sub QHasChanged
@@ -6296,7 +6296,7 @@ sub WatchFilter
 		#$Filters{$group}[0]||=$Filters{$group}[1+1]||=Filter->new;
 	}
 	IdleDo('1_init_filter'.$group,0, \&InitFilter, $group);
-	$object->signal_connect(destroy => \&UnWatchFilter,$group) unless ref $object eq 'HASH' || !$object->isa('Glib::Object');
+	$object->{Watcher_DESTROY}||=$object->signal_connect(destroy => \&UnWatch_all) unless ref $object eq 'HASH' || !$object->isa('Glib::Object');
 }
 sub UnWatchFilter
 {	my ($object,$group)=@_;
@@ -6306,7 +6306,7 @@ sub UnWatchFilter
 		{	delete $Related_FilterWatchers{$group};
 		}
 	}
-	delete $object->{'UpdateFilter'.$group};
+	delete $object->{'UpdateFilter_'.$group};
 	my $ref=$FilterWatchers{$group};
 	@$ref=grep $_ ne $object, @$ref;
 	unless (@$ref)
