@@ -15,6 +15,8 @@ author  Daniel Rubin <dan@fracturedproject.net>
 desc    Automatic rating updates on configurable listening behaviour events.
 =cut
 
+# dependencies: Text::CSV, libtext-csv-perl
+
 package GMB::Plugin::EPICRATING;
 use strict;
 use warnings;
@@ -245,6 +247,7 @@ sub prefbox {
 
     my $add_rule_button = Gtk2::Button->new_from_stock('gtk-add');
     $add_rule_button->signal_connect('clicked', sub {
+
         my $rule = NewRule();
         # manually add the new rule, no point in repopulating everything
         RulesListAddRow($rule);
@@ -259,12 +262,35 @@ sub prefbox {
     $default_rating_box->add($set_default_rating_finished_check);
 
     my $rating_freq_dump_button = Gtk2::Button->new("CSV dump of rating populations to stdout");
+
+
+
+    use Text::CSV;
     $rating_freq_dump_button->signal_connect(clicked => sub {
-        for(my $r_count = 0; $r_count <= 100; $r_count++) {
-            my $r_filter = Filter->new("rating:e:" . $r_count);
-            my $IDs = $r_filter->filter;
-            print $r_count . "," . scalar @$IDs . "\n";
-        }
+	my $file_chooser = Gtk2::FileChooserDialog->new(
+	    _"Save gmusicbrowser song stats CSV dump as...",
+	    undef, 'save', 'gtk-save' => 'ok', 'gtk-cancel' => 'cancel');
+	my $response = $file_chooser->run();
+
+	
+	if($response eq 'ok') {
+	    my $csv_filename = $file_chooser->get_filename();
+	    open CSVF, ">", $csv_filename or warn "Couldn't open CSV output!";
+
+	    use Data::Dumper;
+	    my $csv = Text::CSV->new ({binary => 1 });
+	    
+	    my $all_songs = Filter->new("")->filter;
+	    for my $song_id (@{$all_songs}) {
+		my $rating = ::Songs::Get($song_id, 'rating');
+		my $title = ::Songs::Get($song_id, 'title');
+		my $playcount = ::Songs::Get($song_id, 'playcount');
+		my $skipcount = ::Songs::Get($song_id, 'skipcount');
+		$csv->combine(@{[$song_id, $title, $rating, $playcount, $skipcount]});
+		print CSVF $csv->string . "\n";
+	    }
+	    close CSVF;
+	}
     });
 
     $big_vbox->add($rules_scroller);
