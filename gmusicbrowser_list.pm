@@ -240,16 +240,14 @@ sub list_Set
 sub list_SongArray_changed
 {	my ($self,$array,$action)=@_;
 	return if $self->{needupdate};
-	my $songlist=::GetSonglist($self) || return;
-	my $array0=$songlist->{array};
+	my $array0=::GetSongArray($self) || return;
 	return unless $array0==$array;
 	return if grep $action eq $_, qw/mode sort move up down/;
 	$self->QueueUpdateFast;
 }
 sub list_Update
 {	my $self=shift;
-	my $songlist=::GetSonglist($self) || return;
-	my $array=$songlist->{array};
+	my $array=::GetSongArray($self) || return;
 	return _("Listed : "), $array,  ::__('%d song','%d songs',scalar@$array);
 }
 

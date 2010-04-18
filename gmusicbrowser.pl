@@ -6272,6 +6272,10 @@ sub GetSonglist
 	$group=$layw->{group} if !defined $group && $layw;
 	return $SongList::Common::Register{$group};
 }
+sub GetSongArray
+{	my $sl= GetSonglist($_[0]);
+	return $sl && $sl->{array};
+}
 sub InitFilter
 {	my $group=shift;
 	$group=$group->{group} if ref $group;
