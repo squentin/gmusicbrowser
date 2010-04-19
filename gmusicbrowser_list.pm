@@ -807,7 +807,7 @@ sub new
 
 	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
 	::Watch($self,	SongsChanged	=> \&SongsChanged_cb);
-	::Watch($self,	CurSong		=> \&CurSongChanged);
+	::Watch($self,	CurSongID	=> \&CurSongChanged);
 	$self->{DefaultFocus}=$tv;
 
 	return $self;
@@ -4909,7 +4909,7 @@ sub new
 		$view->signal_connect(query_tooltip=> \&query_tooltip_cb);
 	}
 
-	::Watch($self,	CurSong		=> \&CurSongChanged);
+	::Watch($self,	CurSongID	=> \&CurSongChanged);
 	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
 	::Watch($self,	SongsChanged	=> \&SongsChanged_cb);
 
