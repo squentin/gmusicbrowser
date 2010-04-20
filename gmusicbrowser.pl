@@ -1714,16 +1714,12 @@ sub ReadSavedTags	#load tags _and_ settings
 		my $oldversion=delete $Options{version} || VERSION;
 		$Options{ArtistSplit}||=' & |, |;';
 		$re_artist=qr/$Options{ArtistSplit}/;
-		$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2  #DELME in v1.1.3/4
-		if ($oldversion<1.1003) { delete $Options{$_} for grep m/^Layout(?:LastSeen)?_/, keys %Options }	#for version <1.1.2  #DELME in v1.1.3/4
-		if ($oldversion<1.1003) { $Options{WindowSizes}{$_}= join 'x',split / /,delete $Options{"WS$_"} for map m/^WS(.*)/, keys %Options; }	#for version <1.1.2  #DELME in v1.1.3/4
 		if ($oldversion<1.1005) {delete $Options{$_} for qw/Diacritic_sort gst_volume/;} #cleanup old options
 		$Options{AutoRemoveCurrentSong}= delete $Options{TAG_auto_check_current} if $oldversion<1.1005 && exists $Options{TAG_auto_check_current};
 
 
 		Post_Options_init();
 
-		if ($oldversion<1.1002) { for my $k (qw/Songs artist album/) {$lines{$k}[0]=~s/ /\t/g; s/\x1D/\t/g for @{$lines{$k}}; }}	#for version <1.1.2  #DELME in v1.1.3/4
 		my $songs=$lines{Songs};
 		my $fields=shift @$songs;
 		my ($loadsong,$extra_sub)=Songs::MakeLoadSub(\%lines,split /\t/,$fields);
