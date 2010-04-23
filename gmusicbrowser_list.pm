@@ -5441,6 +5441,7 @@ sub expose_cb
 				w	=> $cell->{width},		h	=> $bh,
 				grouptype => $cell->{grouptype},
 				groupsongs=> [@$list[$start..$end]],
+				odd	=> $i%2,	 row=>$i,
 			);
 			my $q= $cell->{draw}(\%arg);
 			my $qid=$depth.'g'.($yadj+$y);
