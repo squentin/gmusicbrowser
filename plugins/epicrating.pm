@@ -308,14 +308,14 @@ sub RuleEditor {
     $editor_hbox->add_with_properties(Gtk2::Label->new(_"Differential: "), "expand", ::FALSE);
     $editor_hbox->add_with_properties($value_entry, "expand", ::FALSE);
 
-    # my $remove_button = Gtk2::Button->new_from_stock('gtk-delete');
-    # $remove_button->signal_connect('clicked', sub {
-    # 	deleteRefFromArr($::Options{OPT.'Rules'}, $rule);
-    # 	$self->{rules_table}->remove($frame);
-    # 				   });
+    my $remove_button = Gtk2::Button->new_from_stock('gtk-delete');
+    $remove_button->signal_connect('clicked', sub {
+    	deleteRefFromArr($::Options{OPT.'Rules'}, $rule);
+    	$self->{rules_table}->remove($frame);
+    				   });
     
 
-    # $editor_hbox->add($remove_button);
+    $editor_hbox->pack_end($remove_button, ::FALSE, ::FALSE, 1);
     $editor_hbox->show_all();
     $frame->add($editor_hbox);
 
@@ -327,15 +327,16 @@ sub RulesListAddRow {
 
      my $rule_editor = RuleEditor($rule);
     
-#    $self->{rules_table}->add_with_properties($rule_editor, "expand", ::FALSE);
+    $self->{rules_table}->add_with_properties($rule_editor, "expand", ::FALSE);
     my $remove_button = Gtk2::Button->new_from_stock('gtk-delete');
-    $remove_button->signal_connect('clicked', sub {
-	deleteRefFromArr($::Options{OPT.'Rules'}, $rule);
-	$self->{rules_table}->remove($rule_editor);
-	$self->{rules_table}->remove($remove_button);
-    });
-    $self->{rules_table}->attach($rule_editor, 0, 1, $self->{current_row}, $self->{current_row}+1, "shrink", "shrink", 0, 0);
-    $self->{rules_table}->attach($remove_button, 1, 2, $self->{current_row}, $self->{current_row}+1, "shrink", "shrink", 0, 0);
+    # $remove_button->signal_connect('clicked', sub {
+    # 	deleteRefFromArr($::Options{OPT.'Rules'}, $rule);
+    # 	$self->{rules_table}->remove($rule_editor);
+    # 	$self->{rules_table}->remove($remove_button);
+    # });
+#    $self->{rules_table}->attach($rule_editor, 0, 1, $self->{current_row}, $self->{current_row}+1, "shrink", "shrink", 0, 0);
+#    $self->{rules_table}->attach($remove_button, 1, 2, $self->{current_row}, $self->{current_row}+1, "shrink", "shrink", 0, 0);
+
     $rule_editor->show_all();
     $self->{current_row} += 1;
 }
@@ -363,8 +364,8 @@ sub prefbox {
     my $big_vbox = Gtk2::VBox->new(::FALSE, 2);
     my $rules_scroller = Gtk2::ScrolledWindow->new();
     $rules_scroller->set_policy('never', 'automatic');
-    $self->{rules_table} = Gtk2::Table->new(1, 4, ::FALSE);
-#    $self->{rules_table} = Gtk2::VBox->new();
+#    $self->{rules_table} = Gtk2::Table->new(1, 4, ::FALSE);
+    $self->{rules_table} = Gtk2::VBox->new();
     $rules_scroller->add_with_viewport($self->{rules_table});
 
     PopulateRulesList();
