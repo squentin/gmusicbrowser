@@ -26,7 +26,7 @@ use constant {
     ACTIONS => ["REMOVE_FROM_RATING", "ADD_TO_RATING", "RATING_SET_TO_DEFAULT"]
 };
 
-::SetDefaultOptions(OPT, SetDefaultRatingOnSkipped => 1, SetDefaultRatingOnFinished => 1, Rules => [ {signal => 'Finished', field => "rating", value => 5}, {signal => 'Skipped', field => 'rating', value => -5 }, { signal => "SkippedBefore15", field => "rating", value => -1}]);
+::SetDefaultOptions(OPT, SetDefaultRatingOnSkipped => 1, SetDefaultRatingOnFinished => 1, Rules => [ {signal => 'Finished', field => "rating", value => 5}, {signal => 'Skipped', field => 'rating', value => -5 }, { signal => "Skipped", before => 15, field => "rating", value => -1}]);
 
 my $self=bless {},__PACKAGE__;
 
@@ -36,29 +36,46 @@ sub AddRatingPointsToSong {
     my $ExistingRating = ::Songs::Get($ID, 'rating');
     if(($ExistingRating + $PointsToRemove) > 100)
     {
-        warn "Yikes, can't rate this song above one hundred.";
-        ::Songs::Set($ID, rating=>100);
+	warn "Yikes, can't rate this song above one hundred.";
+	::Songs::Set($ID, rating=>100);
     } elsif(($ExistingRating + $PointsToRemove) < 0) {
-        warn "Negative addend in EpicRating pushed song rating to below 0.  Pinning.";
-        ::Songs::Set($ID, rating => 0);
+	warn "Negative addend in EpicRating pushed song rating to below 0.  Pinning.";
+	::Songs::Set($ID, rating => 0);
     } else {
-        warn "EpicRating changing song rating by " . $PointsToRemove;
-        ::Songs::Set($ID, rating=>($ExistingRating + $PointsToRemove));
+	warn "EpicRating changing song rating by " . $PointsToRemove;
+	::Songs::Set($ID, rating=>($ExistingRating + $PointsToRemove));
     }
+}
+
+sub GetRuleByName {
+    my ($rule_name) = @_;
+    my $rules = $::Options{OPT.'Rules'};
+
+
+    foreach my $rule (@{$rules}) {
+	if(${$rule}{signal} eq $rule_name) {
+	    return $rule;
+	}
+    }
+
+}
+
+# apply the action this rule specifies.
+sub ApplyRule {
+    my ($rule, $song_id) = @_;
+    AddRatingPointsToSong($song_id, ${$rule}{value});
 }
 
 sub ApplyRuleByName {
     my ($rule_name, $song_id) = @_;
     my $rules = $::Options{OPT.'Rules'};
 
-    foreach my $rule (@{$rules}) {
-        if(${$rule}{signal} eq $rule_name) {
-            my $value = ::Songs::Get($song_id, ${$rule}{field});
-            if((defined $value) && ($value ne "")) {
-                # should be handling different fields as necessary, but since we only have rating right now...
-                AddRatingPointsToSong($song_id, ${$rule}{value});
-            }
-        }
+    my $my_rule = GetRuleByName($rule_name);
+
+    my $value = ::Songs::Get($song_id, ${$my_rule}{field});
+    if((defined $value) && ($value ne "")) {
+	# should be handling different fields as necessary, but since we only have rating right now...
+	ApplyRule($song_id, $my_rule);
     }
 }
 
@@ -72,7 +89,7 @@ sub Finished {
 
     my $song_rating = Songs::Get($ID, 'rating');
     if(!($song_rating && $::Options{OPT."SetDefaultRatingOnFinished"})) {
-        ::Songs::Set($ID, rating=>$DefaultRating);
+	::Songs::Set($ID, rating=>$DefaultRating);
     }
 
     ApplyRuleByName('Finished', $ID);
@@ -83,18 +100,91 @@ sub Skipped {
     my $rules = $::Options{OPT.'Rules'};
     my $ID=$::PlayingID;
 
-
+    # we apply the default if the checkbox is enabled regardless
+    # of rules.
     my $song_rating = Songs::Get($ID, 'rating');
     if(!($song_rating && $::Options{OPT."SetDefaultRatingOnSkipped"})) {
-        ::Songs::Set($ID, rating=>$DefaultRating);
+	::Songs::Set($ID, rating=>$DefaultRating);
     }
 
-    if($::PlayTime < 15) {
-        ApplyRuleByName("SkippedBefore15", $ID);
+
+    my $rule = GetRuleByName('Skipped');
+
+    # if(!defined(${$rule}{'before'})) {
+    # 	#
+    # 	ApplyRuleByName('Skipped');
+    # 	return;
+
+
+
+
+
+    # if it is neither before or after, then it must always be applied.
+    my $before = ${$rule}{'before'};
+    my $after = ${$rule}{'after'};
+
+    # takes a list of expressions
+    # if an expression is true, OR an operand is nil, AND it with the others.
+    # return true
+    # meh, maybe not useful
+
+    if(!defined($before) && !defined($after)) {
+	# neither
+	ApplyRule($rule, $ID);
+	return;
+    } elsif(defined($before) && defined($after)) {
+	# both
+	if(($::PlayTime >= $after) && ($::PlayTime <= $before)) {
+	    ApplyRule($rule, $ID);
+	    return;
+	}
+    } elsif(defined($before)) {
+	# either
+	if($::Played <= $before) {
+	    ApplyRule($rule, $ID);
+	    return;
+	}
+
+    } elsif(defined($after)) {
+	if($::Played => $after) {
+	    ApplyRule($rule, $ID);
+	    return;
+	}
     } else {
-        ApplyRuleByName("SkippedAfter15", $ID);
+	warn "wow, um, I missed a case?";
     }
-    ApplyRuleByName("Skipped", $ID);
+
+
+
+
+    # if($before => $::PlayTime) {
+    # 	ApplyRule($rule, $ID);
+    # 	return;
+    # }
+
+    # if($after <= $::PlayTime) {
+    # 	ApplyRule($rule, $ID);
+    # 	return;
+    # }
+
+
+    # if($($rule}{'after'}
+
+    # if(${$rule}{'before'} >= $::PlayTime) {
+    # 	# it's before
+    # 	warn "Matched Skipped before: " > ${$rule}{'after'};
+    # 	AppyRuleRuleByName('Skipped');
+    # } else {
+    # 	# it's after
+    # }
+
+
+    # if($::PlayTime < 15) {
+    #     ApplyRuleByName("SkippedBefore15", $ID);
+    # } else {
+    #     ApplyRuleByName("SkippedAfter15", $ID);
+    # }
+    # ApplyRuleByName("Skipped", $ID);
 }
 
 sub Start {
@@ -132,7 +222,7 @@ my $editor_fields = ['rating'];
 sub indexOfRef {
    my ($arr, $matey) = @_;
     for(my $idx = 0; $idx <= $#{$arr}; $idx ++) {
-        return $idx if $arr == $matey;
+	return $idx if $arr == $matey;
     }
 }
 
@@ -152,53 +242,80 @@ sub RuleEditor {
     my $frame = Gtk2::Frame->new();
     my $editor_hbox = Gtk2::HBox->new();
 
+    my $sig = ${$rule}{signal};
+    my $extra_fields = [];
+
     my $signal_combo = Gtk2::ComboBox->new_text();
     my $signal_idx = 0;
     foreach my $signal (@{$editor_signals}) {
-        $signal_combo->append_text($signal);
-        if($signal eq ${$rule}{signal}) {
-            $signal_combo->set_active($signal_idx);
-        }
-        $signal_idx++;
+	$signal_combo->append_text($signal);
+	if($signal eq ${$rule}{signal}) {
+	    $signal_combo->set_active($signal_idx);
+	}
+	$signal_idx++;
     }
     $signal_combo->signal_connect('changed', sub {
-        ${$rule}{signal} = $signal_combo->get_active_text();
+	${$rule}{signal} = $signal_combo->get_active_text();
+	# shit, gotta repopulate the entire special-fields area
+	# even better just to repopulate the whole thing?
     });
 
     my $field_combo = Gtk2::ComboBox->new_text();
     my $field_idx = 0;
     foreach my $field (@{$editor_fields}) {
-        $field_combo->append_text($field);
-        if($field eq ${$rule}{field}) {
-            $field_combo->set_active($field_idx);
-        }
-        $field_idx++;
+	$field_combo->append_text($field);
+	if($field eq ${$rule}{field}) {
+	    $field_combo->set_active($field_idx);
+	}
+	$field_idx++;
     }
     $field_combo->signal_connect('changed', sub {
-        ${$rule}{field} = $field_combo->get_active_text();
+	 ${$rule}{field} = $field_combo->get_active_text();
     });
 
     my $value_entry = Gtk2::Entry->new();
     $value_entry->set_text(${$rule}{value});
     $value_entry->signal_connect('changed', sub {
-        ${$rule}{value} = $value_entry->get_text();
+	${$rule}{value} = $value_entry->get_text();
     });
 
 
-    $editor_hbox->add(Gtk2::Label->new("Signal: "));
-    $editor_hbox->add($signal_combo);
-    $editor_hbox->add(Gtk2::Label->new("Field: "));
-    $editor_hbox->add($field_combo);
-    $editor_hbox->add(Gtk2::Label->new("Differential: "));
-    $editor_hbox->add($value_entry);
+    $editor_hbox->add_with_properties(Gtk2::Label->new(_"Signal: "), "expand", ::FALSE);
+    $editor_hbox->add_with_properties($signal_combo, "expand", ::FALSE);
 
-    my $remove_button = Gtk2::Button->new_from_stock('gtk-delete');
-    $remove_button->signal_connect('clicked', sub {
-        deleteRefFromArr($::Options{OPT.'Rules'}, $rule);
-        $self->{rules_table}->remove($frame);
-                                   });
+    # signal-specific fields.  string literal alert, needs refactoring!
+    if($sig eq "Skipped") {
+	my $b_label = Gtk2::Label->new(_"Before: ");
+	my $b_entry = Gtk2::Entry->new();
+	$b_entry->signal_connect('changed', sub {
+	    ${$rule}{before} = $b_entry->get_active_text();
+	});
 
-    $editor_hbox->add($remove_button);
+	my $a_label = Gtk2::Label->new(_"After: ");
+	my $a_entry = Gtk2::Entry->new();
+	$a_entry->signal_connect('changed', sub {
+	    ${$rule}{after} = $a_entry->get_active_text();
+	});
+
+	$editor_hbox->add_with_properties($b_label, "expand", ::FALSE);
+	$editor_hbox->add_with_properties($b_entry, "expand", ::FALSE);
+	$editor_hbox->add_with_properties($a_label, "expand", ::FALSE);
+	$editor_hbox->add_with_properties($a_entry, "expand", ::FALSE);
+    }
+
+    $editor_hbox->add_with_properties(Gtk2::Label->new(_"Field: "), "expand", ::FALSE);
+    $editor_hbox->add_with_properties($field_combo, "expand", ::FALSE);
+    $editor_hbox->add_with_properties(Gtk2::Label->new(_"Differential: "), "expand", ::FALSE);
+    $editor_hbox->add_with_properties($value_entry, "expand", ::FALSE);
+
+    # my $remove_button = Gtk2::Button->new_from_stock('gtk-delete');
+    # $remove_button->signal_connect('clicked', sub {
+    # 	deleteRefFromArr($::Options{OPT.'Rules'}, $rule);
+    # 	$self->{rules_table}->remove($frame);
+    # 				   });
+    
+
+    # $editor_hbox->add($remove_button);
     $editor_hbox->show_all();
     $frame->add($editor_hbox);
 
@@ -209,7 +326,16 @@ sub RulesListAddRow {
     my $rule = $_[0]; # hash reference
 
      my $rule_editor = RuleEditor($rule);
+    
+#    $self->{rules_table}->add_with_properties($rule_editor, "expand", ::FALSE);
+    my $remove_button = Gtk2::Button->new_from_stock('gtk-delete');
+    $remove_button->signal_connect('clicked', sub {
+	deleteRefFromArr($::Options{OPT.'Rules'}, $rule);
+	$self->{rules_table}->remove($rule_editor);
+	$self->{rules_table}->remove($remove_button);
+    });
     $self->{rules_table}->attach($rule_editor, 0, 1, $self->{current_row}, $self->{current_row}+1, "shrink", "shrink", 0, 0);
+    $self->{rules_table}->attach($remove_button, 1, 2, $self->{current_row}, $self->{current_row}+1, "shrink", "shrink", 0, 0);
     $rule_editor->show_all();
     $self->{current_row} += 1;
 }
@@ -228,7 +354,7 @@ sub PopulateRulesList {
      $self->{current_row} = 0;
 
      foreach my $rule (@{$rules}) {
-        RulesListAddRow($rule);
+	RulesListAddRow($rule);
      }
 }
 
@@ -238,6 +364,7 @@ sub prefbox {
     my $rules_scroller = Gtk2::ScrolledWindow->new();
     $rules_scroller->set_policy('never', 'automatic');
     $self->{rules_table} = Gtk2::Table->new(1, 4, ::FALSE);
+#    $self->{rules_table} = Gtk2::VBox->new();
     $rules_scroller->add_with_viewport($self->{rules_table});
 
     PopulateRulesList();
@@ -246,9 +373,9 @@ sub prefbox {
 
     my $add_rule_button = Gtk2::Button->new_from_stock('gtk-add');
     $add_rule_button->signal_connect('clicked', sub {
-        my $rule = NewRule();
-        # manually add the new rule, no point in repopulating everything
-        RulesListAddRow($rule);
+	my $rule = NewRule();
+	# manually add the new rule, no point in repopulating everything
+	RulesListAddRow($rule);
     });
 
     my $default_rating_box = Gtk2::VBox->new();
@@ -261,11 +388,11 @@ sub prefbox {
 
     my $rating_freq_dump_button = Gtk2::Button->new("CSV dump of rating populations to stdout");
     $rating_freq_dump_button->signal_connect(clicked => sub {
-        for(my $r_count = 0; $r_count <= 100; $r_count++) {
-            my $r_filter = Filter->new("rating:e:" . $r_count);
-            my $IDs = $r_filter->filter;
-            print $r_count . "," . scalar @$IDs . "\n";
-        }
+	for(my $r_count = 0; $r_count <= 100; $r_count++) {
+	    my $r_filter = Filter->new("rating:e:" . $r_count);
+	    my $IDs = $r_filter->filter;
+	    print $r_count . "," . scalar @$IDs . "\n";
+	}
     });
 
     $big_vbox->add($rules_scroller);
