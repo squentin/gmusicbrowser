@@ -236,10 +236,96 @@ sub deleteRefFromArr {
     splice(@$arr, indexOfRef($arr, $ref), 1);
 }
 
-sub RuleEditor {
-    my ($rule) = @_;
+# sub RuleEditor {
+#     my ($rule) = @_;
 
-    my $frame = Gtk2::Frame->new();
+    
+
+#     return $frame;
+# }
+
+sub RulesListAddRow {
+    my $rule = $_[0]; # hash reference
+    my $rule_editor = GMB::Plugin::EPICRATING::Editor->new($rule);
+    $self->{rules_table}->add_with_properties($rule_editor, "expand", ::FALSE);
+
+    $rule_editor->show_all();
+    $self->{current_row} += 1;
+}
+
+sub NewRule {
+    my $new_rule = { signal => "", field => "", value => 0};
+    my $options_rules_array = $::Options{OPT.'Rules'};
+
+    push(@$options_rules_array, $new_rule);
+    return $new_rule;
+}
+
+sub PopulateRulesList {
+    my $rules = $::Options{OPT.'Rules'};
+     $self->{current_row} = 0;
+
+     foreach my $rule (@{$rules}) {
+	RulesListAddRow($rule);
+     }
+}
+
+sub prefbox {
+    # TODO validate good values?E!??!
+    my $big_vbox = Gtk2::VBox->new(::FALSE, 2);
+    my $rules_scroller = Gtk2::ScrolledWindow->new();
+    $rules_scroller->set_policy('never', 'automatic');
+#    $self->{rules_table} = Gtk2::Table->new(1, 4, ::FALSE);
+    $self->{rules_table} = Gtk2::VBox->new();
+    $rules_scroller->add_with_viewport($self->{rules_table});
+
+    PopulateRulesList();
+    # force some debug fixtures in
+    # $::Options{OPT.'Rules'} = [ {signal => 'Finished', field => "rating", value => 5}, {signal => 'Skipped', field => 'rating', value => -5 }, { signal => "SkippedBefore15", field => "rating", value => -1}];
+
+    my $add_rule_button = Gtk2::Button->new_from_stock('gtk-add');
+    $add_rule_button->signal_connect('clicked', sub {
+	my $rule = NewRule();
+	# manually add the new rule, no point in repopulating everything
+	RulesListAddRow($rule);
+    });
+
+    my $default_rating_box = Gtk2::VBox->new();
+    my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (required for rating update on files with default rating):");
+    my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped", _"... on skipped songs");
+    my $set_default_rating_finished_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnFinished", _"... on played songs");
+    $default_rating_box->add($set_default_rating_label);
+    $default_rating_box->add($set_default_rating_skip_check);
+    $default_rating_box->add($set_default_rating_finished_check);
+
+    my $rating_freq_dump_button = Gtk2::Button->new("CSV dump of rating populations to stdout");
+    $rating_freq_dump_button->signal_connect(clicked => sub {
+	for(my $r_count = 0; $r_count <= 100; $r_count++) {
+	    my $r_filter = Filter->new("rating:e:" . $r_count);
+	    my $IDs = $r_filter->filter;
+	    print $r_count . "," . scalar @$IDs . "\n";
+	}
+    });
+
+    $big_vbox->add($rules_scroller);
+    $big_vbox->add_with_properties($add_rule_button, "expand", ::FALSE);
+    $big_vbox->add_with_properties($default_rating_box, "expand", ::FALSE);
+    $big_vbox->add_with_properties($rating_freq_dump_button, "expand", ::FALSE);
+
+    $big_vbox->show_all();
+    return $big_vbox;
+}
+
+package GMB::Plugin::EPICRATING::Editor;
+use Gtk2;
+use base 'Gtk2::Frame';
+
+sub new
+{
+    my ($class, $rule) = @_;
+    my $self = bless Gtk2::Frame->new;
+    $self->{rule} = $rule;
+
     my $editor_hbox = Gtk2::HBox->new();
 
     my $sig = ${$rule}{signal};
@@ -310,97 +396,14 @@ sub RuleEditor {
 
     my $remove_button = Gtk2::Button->new_from_stock('gtk-delete');
     $remove_button->signal_connect('clicked', sub {
-    	deleteRefFromArr($::Options{OPT.'Rules'}, $rule);
-    	$self->{rules_table}->remove($frame);
+    	GMB::Plugin::EPICRATING::deleteRefFromArr($::Options{ GMB::Plugin::EPICRATING::OPT.'Rules'}, $rule);
+#    	$self->{rules_table}->remove($self);
+	$self->destroy();
     				   });
-    
 
     $editor_hbox->pack_end($remove_button, ::FALSE, ::FALSE, 1);
     $editor_hbox->show_all();
-    $frame->add($editor_hbox);
+    $self->add($editor_hbox);
 
-    return $frame;
-}
-
-sub RulesListAddRow {
-    my $rule = $_[0]; # hash reference
-
-     my $rule_editor = RuleEditor($rule);
-    
-    $self->{rules_table}->add_with_properties($rule_editor, "expand", ::FALSE);
-    my $remove_button = Gtk2::Button->new_from_stock('gtk-delete');
-    # $remove_button->signal_connect('clicked', sub {
-    # 	deleteRefFromArr($::Options{OPT.'Rules'}, $rule);
-    # 	$self->{rules_table}->remove($rule_editor);
-    # 	$self->{rules_table}->remove($remove_button);
-    # });
-#    $self->{rules_table}->attach($rule_editor, 0, 1, $self->{current_row}, $self->{current_row}+1, "shrink", "shrink", 0, 0);
-#    $self->{rules_table}->attach($remove_button, 1, 2, $self->{current_row}, $self->{current_row}+1, "shrink", "shrink", 0, 0);
-
-    $rule_editor->show_all();
-    $self->{current_row} += 1;
-}
-
-sub NewRule {
-    my $new_rule = { signal => "", field => "", value => 0};
-
-    my $options_rules_array = $::Options{OPT.'Rules'};
-
-    push(@$options_rules_array, $new_rule);
-    return $new_rule;
-}
-
-sub PopulateRulesList {
-    my $rules = $::Options{OPT.'Rules'};
-     $self->{current_row} = 0;
-
-     foreach my $rule (@{$rules}) {
-	RulesListAddRow($rule);
-     }
-}
-
-sub prefbox {
-    # TODO validate good values?E!??!
-    my $big_vbox = Gtk2::VBox->new(::FALSE, 2);
-    my $rules_scroller = Gtk2::ScrolledWindow->new();
-    $rules_scroller->set_policy('never', 'automatic');
-#    $self->{rules_table} = Gtk2::Table->new(1, 4, ::FALSE);
-    $self->{rules_table} = Gtk2::VBox->new();
-    $rules_scroller->add_with_viewport($self->{rules_table});
-
-    PopulateRulesList();
-    # force some debug fixtures in
-    # $::Options{OPT.'Rules'} = [ {signal => 'Finished', field => "rating", value => 5}, {signal => 'Skipped', field => 'rating', value => -5 }, { signal => "SkippedBefore15", field => "rating", value => -1}];
-
-    my $add_rule_button = Gtk2::Button->new_from_stock('gtk-add');
-    $add_rule_button->signal_connect('clicked', sub {
-	my $rule = NewRule();
-	# manually add the new rule, no point in repopulating everything
-	RulesListAddRow($rule);
-    });
-
-    my $default_rating_box = Gtk2::VBox->new();
-    my $set_default_rating_label = Gtk2::Label->new(_"Apply your default rating to files when they are first played (required for rating update on files with default rating):");
-    my $set_default_rating_skip_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnSkipped", _"... on skipped songs");
-    my $set_default_rating_finished_check = ::NewPrefCheckButton(OPT."SetDefaultRatingOnFinished", _"... on played songs");
-    $default_rating_box->add($set_default_rating_label);
-    $default_rating_box->add($set_default_rating_skip_check);
-    $default_rating_box->add($set_default_rating_finished_check);
-
-    my $rating_freq_dump_button = Gtk2::Button->new("CSV dump of rating populations to stdout");
-    $rating_freq_dump_button->signal_connect(clicked => sub {
-	for(my $r_count = 0; $r_count <= 100; $r_count++) {
-	    my $r_filter = Filter->new("rating:e:" . $r_count);
-	    my $IDs = $r_filter->filter;
-	    print $r_count . "," . scalar @$IDs . "\n";
-	}
-    });
-
-    $big_vbox->add($rules_scroller);
-    $big_vbox->add_with_properties($add_rule_button, "expand", ::FALSE);
-    $big_vbox->add_with_properties($default_rating_box, "expand", ::FALSE);
-    $big_vbox->add_with_properties($rating_freq_dump_button, "expand", ::FALSE);
-
-    $big_vbox->show_all();
-    return $big_vbox;
+    return $self;
 }
