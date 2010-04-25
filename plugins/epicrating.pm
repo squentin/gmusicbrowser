@@ -47,17 +47,17 @@ sub AddRatingPointsToSong {
     }
 }
 
-sub GetRuleByName {
+sub GetRulesBySignal {
     my ($rule_name) = @_;
     my $rules = $::Options{OPT.'Rules'};
-
+    my $matched_rules = [];
 
     foreach my $rule (@{$rules}) {
 	if(${$rule}{signal} eq $rule_name) {
-	    return $rule;
+	    push @{$matched_rules}, $rule;
 	}
     }
-
+    return $matched_rules;
 }
 
 # apply the action this rule specifies.
@@ -66,16 +66,18 @@ sub ApplyRule {
     AddRatingPointsToSong($song_id, ${$rule}{value});
 }
 
-sub ApplyRuleByName {
+# lasso all rules with a given signal and apply them all.  not appropriate for signals conditions/options.
+sub ApplyRulesByName {
     my ($rule_name, $song_id) = @_;
     my $rules = $::Options{OPT.'Rules'};
 
-    my $my_rule = GetRuleByName($rule_name);
+    my $matched_rules = GetRulesBySignal($rule_name);
 
-    my $value = ::Songs::Get($song_id, ${$my_rule}{field});
-    if((defined $value) && ($value ne "")) {
-	# should be handling different fields as necessary, but since we only have rating right now...
-	ApplyRule($song_id, $my_rule);
+    foreach my $matched_rule (@{$matched_rules}) {
+	my $value = ::Songs::Get($song_id, ${$matched_rule}{field});
+	if((defined $value) && ($value ne "")) {
+	    ApplyRule($matched_rule, $song_id);
+	}
     }
 }
 
@@ -92,10 +94,11 @@ sub Finished {
 	::Songs::Set($ID, rating=>$DefaultRating);
     }
 
-    ApplyRuleByName('Finished', $ID);
+    ApplyRulesByName('Finished', $ID);
 }
 
 sub Skipped {
+    warn 'EpicRating has noticed that a song has been skipped!';
     my $DefaultRating = $::Options{"DefaultRating"};
     my $rules = $::Options{OPT.'Rules'};
     my $ID=$::PlayingID;
@@ -108,83 +111,51 @@ sub Skipped {
     }
 
 
-    my $rule = GetRuleByName('Skipped');
+    my $all_skip_rules = GetRulesBySignal('Skipped');
 
-    # if(!defined(${$rule}{'before'})) {
-    # 	#
-    # 	ApplyRuleByName('Skipped');
-    # 	return;
+    foreach my $skip_rule (@{$all_skip_rules}) {
+	my $before = ${$skip_rule}{'before'};
+	my $after = ${$skip_rule}{'after'};
 
+	# takes a list of expressions
+	# if an expression is true, OR an operand is nil, AND it with the others.
+	# return true
+	# meh, maybe not useful
 
+	my $after_exists = defined($after)  && $after ne "";
+	my $before_exists = defined($before) && $before ne "";
 
-
-
-    # if it is neither before or after, then it must always be applied.
-    my $before = ${$rule}{'before'};
-    my $after = ${$rule}{'after'};
-
-    # takes a list of expressions
-    # if an expression is true, OR an operand is nil, AND it with the others.
-    # return true
-    # meh, maybe not useful
-
-    if(!defined($before) && !defined($after)) {
-	# neither
-	ApplyRule($rule, $ID);
-	return;
-    } elsif(defined($before) && defined($after)) {
-	# both
-	if(($::PlayTime >= $after) && ($::PlayTime <= $before)) {
-	    ApplyRule($rule, $ID);
+	if(!$before_exists && !$after_exists) {
+	    # neither
+	    # warn "Evalauted skip rule... neither after or before constraints.";
+	    ApplyRule($skip_rule, $ID);
 	    return;
-	}
-    } elsif(defined($before)) {
-	# either
-	if($::Played <= $before) {
-	    ApplyRule($rule, $ID);
-	    return;
-	}
+	} elsif($before_exists && $after_exists) {
+	    # both
+	    # warn "Evaluated skip rule... there's a range.";
+	    if(($::PlayTime >= $after) && ($::PlayTime <= $before)) {
+		ApplyRule($skip_rule, $ID);
+		return;
+	    }
+	} elsif($before_exists) {
+	    # only before
+	    # warn "Evaluated skip rule... only before constraint.";
+	    if($::PlayTime <= $before) {
+		ApplyRule($skip_rule, $ID);
+		return;
+	    }
 
-    } elsif(defined($after)) {
-	if($::Played => $after) {
-	    ApplyRule($rule, $ID);
-	    return;
+	} elsif($after_exists) {
+	    # only after
+	    # warn "Evaluated skip rule... only after constraint.";
+	    if($::PlayTime => $after) {
+		ApplyRule($skip_rule, $ID);
+		return;
+	    }
+	} else {
+	    warn "wow, um, I missed a case?";
 	}
-    } else {
-	warn "wow, um, I missed a case?";
     }
-
-
-
-
-    # if($before => $::PlayTime) {
-    # 	ApplyRule($rule, $ID);
-    # 	return;
-    # }
-
-    # if($after <= $::PlayTime) {
-    # 	ApplyRule($rule, $ID);
-    # 	return;
-    # }
-
-
-    # if($($rule}{'after'}
-
-    # if(${$rule}{'before'} >= $::PlayTime) {
-    # 	# it's before
-    # 	warn "Matched Skipped before: " > ${$rule}{'after'};
-    # 	AppyRuleRuleByName('Skipped');
-    # } else {
-    # 	# it's after
-    # }
-
-
-    # if($::PlayTime < 15) {
-    #     ApplyRuleByName("SkippedBefore15", $ID);
-    # } else {
-    #     ApplyRuleByName("SkippedAfter15", $ID);
-    # }
-    # ApplyRuleByName("Skipped", $ID);
 }
 
 sub Start {
@@ -327,14 +298,14 @@ sub ExtraFieldsEditor {
     if($self->{rule}{signal} eq "Skipped") {
 	my $b_label = Gtk2::Label->new(_"Before: ");
 	my $b_entry = Gtk2::Entry->new();
-	$b_entry->set_text($self->{rule}{before});
+	$b_entry->set_text($self->{rule}{before}) if defined($self->{rule}{before});
 	$b_entry->signal_connect('changed', sub {
 	    $self->{rule}{before} = $b_entry->get_text();
 	});
 
 	my $a_label = Gtk2::Label->new(_"After: ");
 	my $a_entry = Gtk2::Entry->new();
-	$a_entry->set_text($self->{rule}{after});
+	$a_entry->set_text($self->{rule}{after}) if defined($self->{rule}{after});
 	$a_entry->signal_connect('changed', sub {
 	    $self->{rule}{after} = $a_entry->get_text();
 	});
