@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.4\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2010-04-03 14:56+0200\n"
-"PO-Revision-Date: 2010-04-04 18:06+0100\n"
+"POT-Creation-Date: 2010-04-20 22:13+0200\n"
+"PO-Revision-Date: 2010-04-25 17:30+0100\n"
 "Last-Translator: Brice Boucard <boucard.brice@neuf.fr>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -214,6 +214,9 @@ msgstr "Annuler"
 msgid "Abort ReplayGain analysis"
 msgstr "Annuler l'analyse ReplayGain"
 
+msgid "Abort all"
+msgstr "Tout annuler"
+
 msgid "Abort mass-tagging"
 msgstr "Annuler le tagging de masse"
 
@@ -335,13 +338,13 @@ msgid "Album artist"
 msgstr "Artiste de l'album"
 
 msgid "Album gain"
-msgstr ""
+msgstr "Gain (Album)"
 
 msgid "Album mode"
 msgstr "Mode album"
 
 msgid "Album peak"
-msgstr ""
+msgstr "Pic de volume (Album)"
 
 msgid "Album picture"
 msgstr "Pochette de l'album"
@@ -396,6 +399,9 @@ msgstr "Pas de modification du volume avec la molette de la souris"
 
 msgid "Any of :"
 msgstr "Au moins un de :"
+
+msgid "Append"
+msgstr "Ajouter à la fin"
 
 msgid "Append (only if not already present)"
 msgstr "Ajouter (si pas déjà présent)"
@@ -717,7 +723,7 @@ msgid "Current song must always be in the playlist"
 msgstr "La chanson jouée doit toujours être dans la playlist"
 
 msgid "Custom"
-msgstr ""
+msgstr "Personnalisé"
 
 msgid "Custom Text"
 msgstr "Autre Texte"
@@ -806,8 +812,8 @@ msgstr "Affiche les chansons"
 msgid ""
 "Display a special layout in or around the titlebar of the focused window"
 msgstr ""
-"Affiche un layout particulier dans ou autour de la barre de titre de la "
-"fenêtre qui a le focus"
+"Affiche une disposition de fenêtre particulière dans ou autour de la barre "
+"de titre de la fenêtre qui a le focus"
 
 msgid "Display stop/next actions"
 msgstr "Affiche les actions Stop/Suivant"
@@ -1181,6 +1187,9 @@ msgstr "Chanson et pochette (non-cliquable)"
 msgid "Insert a list of files/folders at the start of the playlist"
 msgstr "Insérer une liste de fichiers/dossiers au début de la liste de lecture"
 
+msgid "Invisible hot spot"
+msgstr "Invisible (affiche la fenêtre d'info au survol)"
+
 msgid "KB"
 msgstr "Ko"
 
@@ -1236,7 +1245,7 @@ msgid "Layout :"
 msgstr "Apparence/Disposition :"
 
 msgid "Layouts"
-msgstr "Fenêtres"
+msgstr "Apparence de la fenêtre"
 
 msgid "Left pane"
 msgstr "Panneau de gauche"
@@ -1329,6 +1338,9 @@ msgstr "Plugin Lullaby"
 msgid "Lyrics"
 msgstr "Paroles"
 
+msgid "Lyrics (requires lyrics plugin)"
+msgstr "Paroles (nécessite le plugin Paroles)"
+
 msgid "Lyrics for "
 msgstr "Paroles de "
 
@@ -1369,6 +1381,9 @@ msgstr "Type de média"
 msgid "Menu entry name"
 msgstr "Nom dans le menu :"
 
+msgid "Minimal tip"
+msgstr "Fenêtre minimale"
+
 msgid "Minimum size"
 msgstr "Taille minimale"
 
@@ -1408,7 +1423,7 @@ msgid "Name"
 msgstr "Nom"
 
 msgid "Name of layout"
-msgstr "Nom du layout (=disposition)"
+msgstr "Nom de la disposition de la fenêtre"
 
 msgid "Name under which the command will appear in the menu"
 msgstr "Nom sous lequel la commande apparaîtra dans le menu"
@@ -1595,10 +1610,11 @@ msgid "Open link in Browser"
 msgstr "Ouvrir le lien dans le navigateur"
 
 msgid "Open page layout"
-msgstr "Ouvrir un onglet 'layout'"
+msgstr "Ouvrir un onglet 'Disposition'"
 
 msgid "Open special layouts as desktop widgets"
 msgstr ""
+"Affiche des dispositions de fenêtre spécifiques comme des gadgets de bureau"
 
 msgid "Open this page in the web browser"
 msgstr "Ouvrir cette page dans le navigateur"
@@ -1635,7 +1651,7 @@ msgid "Output"
 msgstr "Sortie"
 
 msgid "Overlay layout :"
-msgstr ""
+msgstr "Apparence de la sur-couche :"
 
 msgid "Owner identifier"
 msgstr "Identifiant du proriétaire"
@@ -1712,9 +1728,6 @@ msgstr "Jouer les chansons listées"
 msgid "Play order"
 msgstr "Ordre de lecture"
 
-msgid "Play order :\n"
-msgstr "Ordre de lecture :\n"
-
 msgid "Play/Pause"
 msgstr "Lecture/Pause"
 
@@ -1780,6 +1793,9 @@ msgstr "Afficher la fenêtre d'information (Traytip)"
 
 msgid "Pre-set"
 msgstr "Pré-configurées"
+
+msgid "Prepend"
+msgstr "Ajouter au début"
 
 msgid "Press a key or a key combination"
 msgstr "Appuyer sur une touche ou une combinaison de touches"
@@ -1875,7 +1891,7 @@ msgid "Rating between 0 and 100, or empty for default"
 msgstr "Note entre 0 et 100, ou vide pour valeur par défaut"
 
 msgid "Rating picture"
-msgstr ""
+msgstr "Image pour les notes"
 
 msgid "Re-read tags"
 msgstr "Relire les tags"
@@ -2010,6 +2026,9 @@ msgstr "Réorganiser les fichiers et dossiers"
 
 msgid "Repeat"
 msgstr "Répétition"
+
+msgid "Replace"
+msgstr "Remplacer"
 
 msgid "Replace..."
 msgstr "Remplacer..."
@@ -2191,7 +2210,7 @@ msgid "Select files"
 msgstr "Sélectionner les fichiers"
 
 msgid "Select matches"
-msgstr ""
+msgstr "Sélectionner les éléments correspondants"
 
 msgid "Selected : "
 msgstr "Sélectionné : "
@@ -2215,7 +2234,7 @@ msgid "Set as primary filter"
 msgstr "Sélectionner comme filtre primaire"
 
 msgid "Set focus on a layout widget"
-msgstr "Donner le focus sur un widget du layout"
+msgstr "Donner le focus sur un widget de la disposition"
 
 msgid "Set grouping"
 msgstr "Choisir le regroupement"
@@ -2440,12 +2459,14 @@ msgstr "(Dé)Verrouiller l'artiste"
 
 msgid "Toggle Song Lock"
 msgstr ""
+"(Dé)Verrouiller la chanson\n"
+"(Permet de lire en boucle la chanson)"
 
 msgid "Toggle a label of the current song"
 msgstr "Bascule une étiquette de la chanson actuelle"
 
 msgid "Toggle between Random/Shuffle and Ordered"
-msgstr ""
+msgstr "Basculer entre Aléatoire/Mélangé et Ordonné"
 
 msgid "Toggle fullscreen mode"
 msgstr "Mode plein écran on/off"
@@ -2457,10 +2478,10 @@ msgid "Track"
 msgstr "Piste"
 
 msgid "Track gain"
-msgstr ""
+msgstr "Gain (piste)"
 
 msgid "Track peak"
-msgstr ""
+msgstr "Pic de volume (piste)"
 
 msgid "Tray tip window layout :"
 msgstr "Disposition de la fenêtre d'info :"
@@ -2499,7 +2520,7 @@ msgid "Unnamed filter"
 msgstr "Filtre sans nom"
 
 msgid "Untitled"
-msgstr ""
+msgstr "Sans titre"
 
 msgid "Upper left"
 msgstr "En haut à gauche"
@@ -2660,6 +2681,9 @@ msgstr "Insérer une colonne"
 msgid "_Remove this column"
 msgstr "Supprimer cette colonne"
 
+msgid "_Retry"
+msgstr "Ré-essayer"
+
 msgid "_Sort by"
 msgstr "Trier selon"
 
@@ -2683,9 +2707,6 @@ msgstr "abandonner la copie"
 
 msgid "abort move"
 msgstr "abandonner le déplacement"
-
-msgid "about"
-msgstr "À propos"
 
 msgid "add"
 msgstr "ajouter"
@@ -2887,6 +2908,8 @@ msgstr "vide"
 
 msgid "enable gapless (experimental)"
 msgstr ""
+"Activer le mode \"gapless\" (expérimental)\n"
+"(pas de coupure entre les pistes)"
 
 msgid "error"
 msgstr "erreur"
@@ -3236,6 +3259,9 @@ msgstr ""
 "aucun résultat trouvé, peut-être devez-vous retirer quelques critères de "
 "recherche."
 
+msgid "no order"
+msgstr "Ordre de tri : aucun"
+
 msgid "no picture"
 msgstr "Pas d'image"
 
@@ -3358,9 +3384,6 @@ msgstr "enlever le filtre secondaire"
 msgid "retry"
 msgstr "ré-essayer"
 
-msgid "retry ?"
-msgstr "ré-essayer ?"
-
 msgid "retry in {seconds} s"
 msgstr "ré-essaye dans {seconds} sec."
 
@@ -3422,7 +3445,7 @@ msgid "skin options"
 msgstr "options du thème"
 
 msgid "skip count average"
-msgstr ""
+msgstr "Moyenne du nombre de saut"
 
 msgid "skipped"
 msgstr "sautée"
@@ -3497,13 +3520,13 @@ msgid "unnamed random mode"
 msgstr "mode aléatoire sans nom"
 
 msgid "unset"
-msgstr ""
+msgstr "Enlever"
 
 msgid "url"
-msgstr ""
+msgstr "url"
 
 msgid "url-encoded list of files"
-msgstr ""
+msgstr "Liste de fichiers (encodage url)"
 
 msgid "url-encoded list of files/folders"
 msgstr "liste de fichiers/dossiers (encodage url)"
@@ -3524,7 +3547,7 @@ msgid "use song folder"
 msgstr "utiliser le dossier de la chanson"
 
 msgid "use standard strftime variables"
-msgstr ""
+msgstr "Utilise les variables de la commande strftime"
 
 msgid "use the playing Filter"
 msgstr "utiliser le filtre de lecture"
@@ -3585,10 +3608,10 @@ msgstr ""
 "avec gstreamer : un flux continu, plusieurs connexions possibles"
 
 msgid "x offset :"
-msgstr ""
+msgstr "Décalage horizontal :"
 
 msgid "y offset :"
-msgstr ""
+msgstr "Décalage vertical :"
 
 msgid "year"
 msgstr "année"
@@ -3751,6 +3774,9 @@ msgstr "liste de widgets séparées par '|'"
 #~ msgid "Play a list of files/folders"
 #~ msgstr "Jouer une liste de fichiers/dossiers"
 
+#~ msgid "Play order :\n"
+#~ msgstr "Ordre de lecture :\n"
+
 #~ msgid "Remove existing"
 #~ msgstr "Effacer ceux existants"
 
@@ -3786,6 +3812,9 @@ msgstr "liste de widgets séparées par '|'"
 #~ "Vous devez choisir la sortie de mixage à contrôler dans les options "
 #~ "avancées"
 
+#~ msgid "about"
+#~ msgstr "À propos"
+
 #~ msgid "album"
 #~ msgstr "album"
 
@@ -3811,6 +3840,9 @@ msgstr "liste de widgets séparées par '|'"
 #~ msgid_plural "different folders"
 #~ msgstr[0] "un dossier"
 #~ msgstr[1] "différents dossiers"
+
+#~ msgid "retry ?"
+#~ msgstr "ré-essayer ?"
 
 #~ msgid "unnamed static list"
 #~ msgstr "liste statique sans nom"
