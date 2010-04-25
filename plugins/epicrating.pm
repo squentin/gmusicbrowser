@@ -325,6 +325,7 @@ sub ExtraFieldsEditor {
     if($self->{rule}{signal} eq "Skipped") {
 	my $b_label = Gtk2::Label->new(_"Before: ");
 	my $b_entry = Gtk2::Entry->new();
+	$b_entry->set_width_chars(4);
 	$b_entry->set_text($self->{rule}{before}) if defined($self->{rule}{before});
 	$b_entry->signal_connect('changed', sub {
 	    $self->{rule}{before} = $b_entry->get_text();
@@ -332,6 +333,7 @@ sub ExtraFieldsEditor {
 
 	my $a_label = Gtk2::Label->new(_"After: ");
 	my $a_entry = Gtk2::Entry->new();
+	$a_entry->set_width_chars(4);
 	$a_entry->set_text($self->{rule}{after}) if defined($self->{rule}{after});
 	$a_entry->signal_connect('changed', sub {
 	    $self->{rule}{after} = $a_entry->get_text();
@@ -394,6 +396,7 @@ sub new {
     });
 
     my $value_entry = Gtk2::Entry->new();
+    $value_entry->set_width_chars(4);
     $value_entry->set_text(${$rule}{value});
     $value_entry->signal_connect('changed', sub {
 	${$rule}{value} = $value_entry->get_text();
