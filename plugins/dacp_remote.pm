@@ -46,14 +46,15 @@ use warnings;
 use POE;
 # use Net::DAAP::Server::Track;
 use Net::DMAP::Server;
+use Net::DAAP::Server;
 use File::Find::Rule;
-use base qw( Net::DMAP::Server );
+use base qw( Net::DAAP::Server );
 
-sub protocol { 'dcap' }
+# sub protocol { 'dcap' }
 
-sub find_tracks {
-    warn "Finding tracks?!  You get NONE!"
-}
+# sub find_tracks {
+#     warn "Finding tracks?!  You get NONE!"
+# }
 
 # sub new {
 # }
@@ -209,7 +210,8 @@ sub Start {
     # 	Headers => {Server => 'Gmusicbrowser DACP',},
     # );
 
-    my $dacp_servar = GMB::Plugin::DACPREMOTE::DacpServer->new(path => "/home/orospakr/Music/Benn Jordan - Pale Blue Dot - V0/", port => 3689, debug => 1);
+    $self->{dacp_servar} = GMB::Plugin::DACPREMOTE::DacpServer->new(path => "/home/orospakr/Music/Benn Jordan - Pale Blue Dot - V0/", port => 3689, debug => 1);
+#   $self->{dacp_servar} = Net::DAAP::Server->new(path => "/home/orospakr/Music/Benn Jordan - Pale Blue Dot - V0/", port => 23689, debug => 1);
 
     # if GMB is started with this plugin enabled, this Start routine
     # appears to get hit too early.  This seems to defer it enough.
