@@ -424,6 +424,11 @@ our %timespan_menu=
 	gidshuffle=>
 	{	n_sort		=> 'Songs::update_shuffle(##mainfield#->maxgid#) ----  vec($Songs::SHUFFLE,##mainfield#->get_gid#,32)',
 	},
+	writeonly=>
+	{	diff=>'1',
+		set => '',
+		check=>'',
+	},
 );
 %Def=		#flags : Read Write Editable Sortable Column caseInsensitive sAve List Gettable
 (file	=>
@@ -698,9 +703,10 @@ our %timespan_menu=
 	id3v2	=> 'TXXX;replaygain_album_peak;%v',	vorbis	=> 'replaygain_album_peak',	ape	=> 'replaygain_album_peak', ilst => '----replaygain_album_peak',
 	type	=> 'float',
  },
-# replaygain_reference_level=>
-# {	id3v2	=> 'TXXX;replaygain_reference_level;%v',vorbis	=> 'replaygain_reference_level',ape	=> 'replaygain_reference_level', ilst => '----replaygain_reference_level',
-# },
+ replaygain_reference_level=>
+ {	flags => 'w',	type => 'writeonly',	#only used for writing
+	id3v2	=> 'TXXX;replaygain_reference_level;%v',vorbis	=> 'replaygain_reference_level',	ape => 'replaygain_reference_level', ilst => '----replaygain_reference_level',
+ },
  #mp3gain : APE tags,	peak : float 	: 0.787193
  #			gain float dB 	: -1.240000 dB
  #vorbisgain :	peak float : 0.00011510 1.01959181
@@ -973,7 +979,7 @@ warn "\@Fields=@Fields"; $Def{$_}{flags}||='' for @Fields;	#DELME
 		'my $IDs=$_[0]; my $values=$_[1]; my %onefieldchanged; my @towrite; my %changedfields; my @changedIDs; my $i=0; my $val;',
 		'for my $ID (@$IDs)',
 		'{	my $changed;';
-		for my $f (grep $Def{$_}{flags}=~m/a/, @Fields)
+		for my $f (grep $Def{$_}{flags}=~m/[aw]/, @Fields)
 		{	my $set=  ($Def{$f}{flags}=~m/w/ && !$::Options{TAG_nowrite_mode}) ?
 				"push \@{\$towrite[\$i]}, '$f',\$val;" :
 				"#set#; \$changedfields{$f}=undef; \$changed=1;";
@@ -1140,9 +1146,10 @@ sub ReReadFile
 		my $checklength= ($size1!=$size2 || ($force && $force==2)) ? 2 : 0;
 		return 1 unless $checklength || $force || $modif1!=$modif2;
 		my ($values,$estimated)=FileTag::Read($file,$checklength);
+		$values->{size}=$size2;
+		$values->{modif}=$modif2;
 		my @changed=$DIFFsub->($ID,$values);
 		return unless @changed;warn "Changed fields : @changed";
-		############SetDB($ID,map( ($_,$values->{$_}), @changed)); DELME
 		::SongsChanged([$ID],\@changed);
 		my %changed; $changed{$_}=undef for @changed;
 		Changed(\%changed,[$ID]);
@@ -1188,15 +1195,20 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 	}
 	if (@$towrite)
 	{	my $i=0; my $abort;
+		my $pid= ::Progress( undef, end=>scalar(@$IDs), abortcb=>sub {$abort=1}, widget =>$opt{progress}, title=>_"Writing tags");
 		my $errorsub=sub
-		 {	my $err=shift;
-			my $abortmsg;
-			$abortmsg=_"Abort mass-tagging" if (@$IDs-$i)>1;
-			my $ret=::Retry_Dialog($err,$opt{window},$abort);
-			$abort=1 if $ret eq 'abort';
+		 {	my $err= shift;
+			$err= $opt{error_prefix}. $err if $opt{error_prefix};
+			my $abortmsg=$opt{abortmsg};
+			$abortmsg||=_"Abort mass-tagging" if (@$IDs-$i)>1;
+			my $ret=::Retry_Dialog($err,$opt{window},$abortmsg);
+			if ($ret eq 'abort')
+			{	$opt{abortcb}() if $opt{abortcb};
+				$abort=1;
+			}
 			return $ret;
 		 };
-		my $pid= ::Progress( undef, end=>scalar(@$IDs), abortcb=>sub {$abort=1}, widget =>$opt{progress}, title=>_"Writing tags");
+
 		my $progress=$opt{progress};
 		Glib::Idle->add(sub
 		 {	if ($towrite->[$i])
@@ -1205,12 +1217,18 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 				::IdleCheck($IDs->[$i]);
 			}
 			$i++;
+			if ($abort || $i>=@$IDs)
+			{	::Progress($pid, abort=>1);
+				$opt{callback_finish}() if $opt{callback_finish};
+				return 0;
+			}
 			::Progress( $pid, current=>$i );
-			return 0 if $abort || $i>=@$IDs;
 			return 1;
 		 });
 	}
-	$opt{callback_finish}() if $opt{callback_finish};
+	else
+	{	$opt{callback_finish}() if $opt{callback_finish};
+	}
 }
 
 sub Changed

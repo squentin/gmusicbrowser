@@ -303,15 +303,17 @@ sub new
 
 	::Watch($self,'Selection_'.$self->{group}, \&SelectionChanged);
 	::Watch($self,SongArray=> \&ListChanged);
+	Glib::Idle->add(sub { $self->SelectionChanged; $self->ListChanged; 0; });
 
 	return $self;
 }
 
 sub ListChanged
 {	my ($self,$array)=@_;
-	my $watchedarray=::GetSonglist($self);
-	return if !$watchedarray || $watchedarray!=$array;
-	$self->{bclear}->set_sensitive(scalar @$array);
+	my $songlist=::GetSonglist($self);
+	my $watchedarray= $songlist && $songlist->{array};
+	return if !$watchedarray || ($array && $watchedarray!=$array);
+	$self->{bclear}->set_sensitive(scalar @$watchedarray);
 }
 
 sub SelectionChanged
@@ -465,10 +467,13 @@ sub CommonInit
 	}
 	$self->{array}= $songarray || SongArray->new;
 
-	$Register{ $self->{group} }=$self;
-	::weaken($Register{ $self->{group} });	#or use a destroy cb ?
-
+	$self->RegisterGroup($self->{group});
 	$self->{SaveOptions}=\&CommonSave;
+}
+sub RegisterGroup
+{	my ($self,$group)=@_;
+	$Register{ $group }=$self;
+	::weaken($Register{ $group });	#or use a destroy cb ?
 }
 sub UpdatePlayListFilter
 {	my $self=shift;
@@ -1151,7 +1156,7 @@ sub SongArray_changed_cb
 		$store->rowremove($rows);
 		$self->ResetModel if @$array==0; #don't know why, but when the list is not empty and adding/removing columns that result in a different row height; after removing all the rows, and then inserting a row, the row height is reset to the previous height. Doing a reset model when the list is empty solves this.
 	}
-	elsif ($action eq 'mode') {} #the list itself hasn't changed
+	elsif ($action eq 'mode' || $action eq 'proxychange') {return} #the list itself hasn't changed
 	else #'replace' or unknown action
 	{	$self->ResetModel;		#FIXME if replace : check if a filter is in $extra[0]
 		#$treesel->unselect_all;
@@ -5291,7 +5296,7 @@ sub SongArray_changed_cb
 		}
 		else {$self->{lastclick}=$self->{startgrow}=-1;$$selected='';}
 	}
-	elsif ($action eq 'mode') {return} #the list itself hasn't changed
+	elsif ($action eq 'mode' || $action eq 'proxychange') {return} #the list itself hasn't changed
 	else #'replace' or unknown action
 	{	#FIXME if replace : check if a filter is in $extra[0]
 		$self->{selected}=''; #clear selection
@@ -6049,7 +6054,7 @@ use constant TREE_VIEW_DRAG_WIDTH => 6;
 our @ColumnMenu=
 (	{ label => _"_Sort by",		submenu => sub { Browser::make_sort_menu($_[0]{songtree}); }
 	},
-	{ label => _"Set grouping",	submenu => sub {$::Options{SavedSTGroupings}},
+	{ label => _"Set grouping",	submenu => sub {$::Options{SavedSTGroupings}}, check =>sub { $_[0]{songtree}{grouping} },
 	  code => sub { $_[0]{songtree}->set_head_columns($_[1]); },
 	},
 	{ label => _"Edit grouping ...",	code => sub { my $songtree=$_[0]{songtree}; ::EditSTGroupings($songtree,$songtree->{grouping},undef,sub{ $songtree->set_head_columns($_[0]) if defined $_[0]; }); },

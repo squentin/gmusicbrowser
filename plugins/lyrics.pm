@@ -81,10 +81,13 @@ sub new
 	$textview->signal_connect(populate_popup	=> \&populate_popup_cb);
 	$textview->set_wrap_mode('word');
 	$textview->set_left_margin(5);
+	if (my $color= $options->{color} || $options->{DefaultFontColor})
+	{	$textview->modify_text('normal', Gtk2::Gdk::Color->parse($color) );
+	}
 	$self->{buffer}=$textview->get_buffer;
 	$self->{textview}=$textview;
 	my $sw=Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
+	$sw->set_shadow_type( $options->{shadow} || 'etched-in');
 	$sw->set_policy('automatic','automatic');
 	$sw->add($textview);
 	my $toolbar=Gtk2::Toolbar->new;

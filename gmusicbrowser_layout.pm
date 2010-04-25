@@ -510,6 +510,7 @@ our %Widgets=
 		stock	=> 'gtk-media-play',
 		tip	=> _"Play filter",
 		activate=> sub { ::Select( filter => ::GetFilter($_[0]), song=> 'trykeep', play =>1 ); },
+		click2	=> sub { ::EnqueueFilter( ::GetFilter($_[0]) ); },
 	},
 	QueueFilter =>
 	{	class	=> 'Layout::Button',
@@ -582,7 +583,7 @@ our %Widgets=
 		tip	=> _"Toggle fullscreen mode",
 		text	=> _"Fullscreen",
 		activate=> \&::ToggleFullscreenLayout,
-		#activate=> \&ToggleFullscreen,
+		click3	=> \&ToggleFullscreen,
 		autoadd_type	=> 'button main',
 		autoadd_option	=> 'AddFullscreenButton',
 	},
@@ -994,7 +995,7 @@ sub NewWidget
 
 	$widget->{actions}{$_}=$options{$_}  for grep m/^click\d*/, keys %options;
 	$widget->signal_connect(button_press_event => \&Button_press_cb) if $widget->{actions};
-	if (($widget->isa('Gtk2::Button') or $widget->{isbutton}) and $options{activate})
+	if ($options{activate})
 	{	$widget->{actions}{activate}=$options{activate};
 		$widget->signal_connect(clicked => \&Button_activate_cb);
 	}
@@ -2451,6 +2452,8 @@ sub SwitchedPage
 	delete $self->{DefaultFocus};
 	if (defined(my $group=delete $self->{active_group}))
 	{	::UnWatch($self,'SelectedID_'.$group);
+		::UnWatch($self,'Selection_'.$group);
+		#::UnWatchFilter($self,$group);
 	}
 	my $page=$self->get_nth_page($pagenb);
 	::weaken( $self->{DefaultFocus}=$page );
@@ -2459,16 +2462,15 @@ sub SwitchedPage
 	my $group= $self->{active_group}= $page->{group};
 	my $ID= ::GetSelID($group);
 	::HasChangedSelID($metagroup,$ID) if defined $ID;
+	if (my $songlist=$SongList::Common::Register{$group})
+	{	$songlist->RegisterGroup($self->{group});
+		::HasChanged('Selection_'.$self->{group});
+		::Watch($self,'Selection_'.$group,  sub { ::HasChanged('Selection_'.$_[0]->{group}); });
+		::HasChanged('SongArray',$songlist->{array},'proxychange');
+	}
 	# FIXME can't use WatchSelID, should special-case special groups : Play Recent\d *Next\d* ...
 	::Watch($self,'SelectedID_'.$group, sub { my ($self,$ID)=@_; ::HasChangedSelID($self->{group},$ID) if defined $ID; });
-	# FIXME add other group signals :
-	#::HasChanged('Selection_'.$self->{group});
-	#::Watch($self,'Selection_'.$group, sub { ::HasChanged('Selection_'.$_[0]->{group}); });
-	#
-	# ::WatchFilter($self,$group, ...
-	#
-	# FIXME make it so that LabelTotal can work with this metagroup
-	# ::HasChanged('SongArray'...
+	#::WatchFilter($self,$group, sub {  });
 }
 
 package Layout::PlaceHolder;
@@ -2631,7 +2633,6 @@ sub new
 	if ($isbutton)
 	{	$self=Gtk2::Button->new;
 		$self->set_relief($opt->{relief});
-		$self->{isbutton}=1;
 	}
 	else
 	{	$self=Gtk2::EventBox->new;
@@ -3394,6 +3395,7 @@ sub get_player_window
 sub UpdateSubMenu
 {	my $self=shift;
 	my $menu=$self->get_submenu;
+	return unless $menu;
 	$menu->remove($_) for $menu->get_children;
 	$self->{updatemenu}($self);
 	$menu->show_all;
