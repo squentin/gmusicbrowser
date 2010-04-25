@@ -202,7 +202,7 @@ sub Stop {
 # - value
 # - operator
 
-my $editor_signals = ['Finished', 'Skipped', 'SkippedBefore15', 'SkippedAfter15'];
+my $editor_signals = ['Finished', 'Skipped'];
 my $editor_fields = ['rating'];
 
 # checkbox for "set default rating when file played/skipped, required for rating update on files without a rating"
@@ -320,15 +320,50 @@ package GMB::Plugin::EPICRATING::Editor;
 use Gtk2;
 use base 'Gtk2::Frame';
 
-sub new
-{
+sub ExtraFieldsEditor {
+    my ($self) = @_;
+    my $hbox = Gtk2::HBox->new();
+    
+    if($self->{rule}{signal} eq "Skipped") {
+	my $b_label = Gtk2::Label->new(_"Before: ");
+	my $b_entry = Gtk2::Entry->new();
+	$b_entry->set_text($self->{rule}{before});
+	$b_entry->signal_connect('changed', sub {
+	    $self->{rule}{before} = $b_entry->get_text();
+	});
+
+	my $a_label = Gtk2::Label->new(_"After: ");
+	my $a_entry = Gtk2::Entry->new();
+	$a_entry->set_text($self->{rule}{after});
+	$a_entry->signal_connect('changed', sub {
+	    $self->{rule}{after} = $a_entry->get_text();
+	});
+
+	$hbox->add_with_properties($b_label, "expand", ::FALSE);
+	$hbox->add_with_properties($b_entry, "expand", ::FALSE);
+	$hbox->add_with_properties($a_label, "expand", ::FALSE);
+	$hbox->add_with_properties($a_entry, "expand", ::FALSE);
+	$hbox->show_all();
+    }
+    return $hbox;
+}
+
+sub rebuild_extra_fields {
+    my $self = shift;
+    $self->{editor_hbox}->remove($self->{extra_hbox}) unless(!defined($self->{extra_hbox}));
+    $self->{extra_hbox} = $self->ExtraFieldsEditor();
+    $self->{editor_hbox}->add_with_properties($self->{extra_hbox}, "expand", ::FALSE);
+}
+
+sub new {
     my ($class, $rule) = @_;
     my $self = bless Gtk2::Frame->new;
     $self->{rule} = $rule;
 
-    my $editor_hbox = Gtk2::HBox->new();
+    $self->{editor_hbox} = Gtk2::HBox->new();
 
-    my $sig = ${$rule}{signal};
+    $self->{extra_hbox} = undef;
+
     my $extra_fields = [];
 
     my $signal_combo = Gtk2::ComboBox->new_text();
@@ -344,6 +379,7 @@ sub new
 	${$rule}{signal} = $signal_combo->get_active_text();
 	# shit, gotta repopulate the entire special-fields area
 	# even better just to repopulate the whole thing?
+	$self->rebuild_extra_fields();
     });
 
     my $field_combo = Gtk2::ComboBox->new_text();
@@ -365,45 +401,25 @@ sub new
 	${$rule}{value} = $value_entry->get_text();
     });
 
+    $self->{editor_hbox}->add_with_properties(Gtk2::Label->new(_"Signal: "), "expand", ::FALSE);
+    $self->{editor_hbox}->add_with_properties($signal_combo, "expand", ::FALSE);
 
-    $editor_hbox->add_with_properties(Gtk2::Label->new(_"Signal: "), "expand", ::FALSE);
-    $editor_hbox->add_with_properties($signal_combo, "expand", ::FALSE);
+    $self->{editor_hbox}->add_with_properties(Gtk2::Label->new(_"Field: "), "expand", ::FALSE);
+    $self->{editor_hbox}->add_with_properties($field_combo, "expand", ::FALSE);
+    $self->{editor_hbox}->add_with_properties(Gtk2::Label->new(_"Differential: "), "expand", ::FALSE);
+    $self->{editor_hbox}->add_with_properties($value_entry, "expand", ::FALSE);
 
-    # signal-specific fields.  string literal alert, needs refactoring!
-    if($sig eq "Skipped") {
-	my $b_label = Gtk2::Label->new(_"Before: ");
-	my $b_entry = Gtk2::Entry->new();
-	$b_entry->signal_connect('changed', sub {
-	    ${$rule}{before} = $b_entry->get_active_text();
-	});
-
-	my $a_label = Gtk2::Label->new(_"After: ");
-	my $a_entry = Gtk2::Entry->new();
-	$a_entry->signal_connect('changed', sub {
-	    ${$rule}{after} = $a_entry->get_active_text();
-	});
-
-	$editor_hbox->add_with_properties($b_label, "expand", ::FALSE);
-	$editor_hbox->add_with_properties($b_entry, "expand", ::FALSE);
-	$editor_hbox->add_with_properties($a_label, "expand", ::FALSE);
-	$editor_hbox->add_with_properties($a_entry, "expand", ::FALSE);
-    }
-
-    $editor_hbox->add_with_properties(Gtk2::Label->new(_"Field: "), "expand", ::FALSE);
-    $editor_hbox->add_with_properties($field_combo, "expand", ::FALSE);
-    $editor_hbox->add_with_properties(Gtk2::Label->new(_"Differential: "), "expand", ::FALSE);
-    $editor_hbox->add_with_properties($value_entry, "expand", ::FALSE);
+    $self->rebuild_extra_fields();
 
     my $remove_button = Gtk2::Button->new_from_stock('gtk-delete');
     $remove_button->signal_connect('clicked', sub {
     	GMB::Plugin::EPICRATING::deleteRefFromArr($::Options{ GMB::Plugin::EPICRATING::OPT.'Rules'}, $rule);
-#    	$self->{rules_table}->remove($self);
 	$self->destroy();
-    				   });
+    });
 
-    $editor_hbox->pack_end($remove_button, ::FALSE, ::FALSE, 1);
-    $editor_hbox->show_all();
-    $self->add($editor_hbox);
+    $self->{editor_hbox}->pack_end($remove_button, ::FALSE, ::FALSE, 1);
+    $self->{editor_hbox}->show_all();
+    $self->add($self->{editor_hbox});
 
     return $self;
 }
