@@ -3145,7 +3145,7 @@ sub setpic
 	my $self= ::find_ancestor($img,__PACKAGE__);
 	my $file= $img->{filename}= AAPicture::GetPicture($self->{aa},$self->{Sel});
 	my $pixbuf= $file ? GMB::Picture::pixbuf($file,$img->{size}) : undef;
-	$img->set_from_pixbuf($pixbuf) if $pixbuf;
+	$img->set_from_pixbuf($pixbuf);
 }
 
 sub AABox_button_press_cb			#popup menu
