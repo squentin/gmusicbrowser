@@ -302,6 +302,7 @@ sub prefbox {
 	    }
 	    close CSVF;
 	}
+	$file_chooser->destroy();
     });
 
     $big_vbox->add($rules_scroller);
