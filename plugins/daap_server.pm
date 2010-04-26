@@ -90,71 +90,76 @@ use base qw( Net::DAAP::Server );
 
 sub find_tracks {
     my $self = shift;
-    warn "Finding tracks?!  You get NONE!";
-    my $dummy = GMB::Plugin::DAAPSERVER::TrackBinding->new();
-    
-    # $dummy->dmap_itemid("whooot");
-    # $dummy->dmap_containeritemid("0");
-    # $dummy->dmap_itemkind(2);
-    # $dummy->dmap_persistentid("fnaaaaart");
-    # $dummy->daap_songbeatsperminute(60);
-    # # $dummy->daap_songbitrate(96000); # yikes, I need this?
-    # $dummy->daap_songalbum("internet explorer");
-    # $dummy->dmap_itemname("windows welcome music");
-    # $dummy->daap_songartist("microsoft");
-    # $dummy->daap_
+    warn "Finding tracks?!  HERE IT GOES";
 
 
-    $dummy->dmap_itemid( 34564 ); # the inode should be good enough
-    $dummy->dmap_containeritemid( 5139 ); # huh
+    my $all_songs = Filter->new("")->filter;
 
-    $dummy->dmap_itemkind( 2 ); # music
-    $dummy->dmap_persistentid( "fneeeerrrr"); # blah, this should be some 64 bit thing
-    $dummy->daap_songbeatsperminute( 0 );
+    for my $song_id (@{$all_songs}) {
 
-    # All mp3 files have 'info'. If it doesn't, give up, we can't read it.
-    $dummy->daap_songbitrate( 222 );
-    $dummy->daap_songsamplerate( 44100 );
-    $dummy->daap_songtime( 34 * 1000 );
+	my $length = ::Songs::Get($song_id, 'length');
 
-    # read the tag if we can, fall back to very simple data otherwise.
-    $dummy->dmap_itemname( "windows welcome music" );
-    $dummy->daap_songalbum( "internet explorer" );
-    $dummy->daap_songartist( "microsoft" );
-    $dummy->daap_songcomment( "great bass if you've got the system for it" );
-    $dummy->daap_songyear( 1997 );
+	my $title = ::Songs::Get($song_id, 'title');
 
-    $dummy->daap_songtrackcount( 0 );
-    $dummy->daap_songtracknumber( 1 );
-    $dummy->daap_songcompilation( 0);
-    $dummy->daap_songdisccount(  0);
-    $dummy->daap_songdiscnumber(  0);
+	my $artist = ::Songs::Get($song_id, 'artist');
 
-    # $dummy->daap_songcomposer( );
-    $dummy->daap_songdateadded( 0 );
-    $dummy->daap_songdatemodified( 0 );
-    $dummy->daap_songdisabled( 0 );
-    $dummy->daap_songeqpreset( '' );
-    $dummy->daap_songformat( "mp3" );
-    $dummy->daap_songgenre( 'techno' );
-    $dummy->daap_songgrouping( '' );
-    # $dummy->daap_songdescription( );
-    # $dummy->daap_songrelativevolume( );
-    $dummy->daap_songsize( 1483000 );
-    $dummy->daap_songstarttime( 0 );
-    $dummy->daap_songstoptime( 0 );
+	my $album = ::Songs::Get($song_id, 'album');
+	
+	my $dummy = GMB::Plugin::DAAPSERVER::TrackBinding->new();
+	
+	$dummy->dmap_itemid( $song_id ); # the inode should be good enough
+	$dummy->dmap_containeritemid( 5139 ); # huh
 
-    $dummy->daap_songuserrating( 45 );
-    $dummy->daap_songdatakind( 0 );
-    # $dummy->daap_songdataurl( );
-    $dummy->com_apple_itunes_norm_volume( 17502 );
+	$dummy->dmap_itemkind( 2 ); # music
+	$dummy->dmap_persistentid( "fneeeerrrr" + $song_id); # blah, this should be some 64 bit thing
+	$dummy->daap_songbeatsperminute( 0 );
 
-    # $dummy->daap_songcodectype( 1836082535 ); # mp3?
-    # $self->daap_songcodecsubtype( 3 ); # or is this mp3?
+	# All mp3 files have 'info'. If it doesn't, give up, we can't read it.
+	$dummy->daap_songbitrate( 222 );
+	$dummy->daap_songsamplerate( 44100 );
+	$dummy->daap_songtime($length );
+
+	# read the tag if we can, fall back to very simple data otherwise.
+	$dummy->dmap_itemname( $title );
+	$dummy->daap_songalbum( $album );
+	$dummy->daap_songartist( $artist);
+	$dummy->daap_songcomment( );
+	$dummy->daap_songyear( 1997 );
+
+	$dummy->daap_songtrackcount( 0 );
+	$dummy->daap_songtracknumber( 1 );
+	$dummy->daap_songcompilation( 0);
+	$dummy->daap_songdisccount(  0);
+	$dummy->daap_songdiscnumber(  0);
+
+	# $dummy->daap_songcomposer( );
+	$dummy->daap_songdateadded( 0 );
+	$dummy->daap_songdatemodified( 0 );
+	$dummy->daap_songdisabled( 0 );
+	$dummy->daap_songeqpreset( '' );
+	$dummy->daap_songformat( "mp3" );
+	$dummy->daap_songgenre( 'techno' );
+	$dummy->daap_songgrouping( '' );
+	# $dummy->daap_songdescription( );
+	# $dummy->daap_songrelativevolume( );
+	$dummy->daap_songsize( 1483000 );
+	$dummy->daap_songstarttime( 0 );
+	$dummy->daap_songstoptime( 0 );
+
+	$dummy->daap_songuserrating( 45 );
+	$dummy->daap_songdatakind( 0 );
+	# $dummy->daap_songdataurl( );
+	$dummy->com_apple_itunes_norm_volume( 17502 );
+
+	# $dummy->daap_songcodectype( 1836082535 ); # mp3?
+	# $self->daap_songcodecsubtype( 3 ); # or is this mp3?
+
+	$self->tracks->{$song_id} = $dummy;
+
+    }
 
 
-    
-    $self->tracks->{"whooot"} = $dummy;
+
     
 }
 
