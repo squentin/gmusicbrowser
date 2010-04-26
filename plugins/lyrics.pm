@@ -326,6 +326,7 @@ sub loaded #_very_ crude html to gtktextview renderer
 	while (defined($_=shift @l))
 	{	s/[\r\n]//g;
 		s/\s+/ /g;
+		next if $_ eq ' ';
 		s#&nbsp;# #gi;
 		s#<br(?: */)?>#\n#gi;
 		if ($_ eq '<pre>') {$_="\n".shift(@l)."\n"}

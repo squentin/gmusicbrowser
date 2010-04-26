@@ -240,16 +240,14 @@ sub list_Set
 sub list_SongArray_changed
 {	my ($self,$array,$action)=@_;
 	return if $self->{needupdate};
-	my $songlist=::GetSonglist($self) || return;
-	my $array0=$songlist->{array};
+	my $array0=::GetSongArray($self) || return;
 	return unless $array0==$array;
 	return if grep $action eq $_, qw/mode sort move up down/;
 	$self->QueueUpdateFast;
 }
 sub list_Update
 {	my $self=shift;
-	my $songlist=::GetSonglist($self) || return;
-	my $array=$songlist->{array};
+	my $array=::GetSongArray($self) || return;
 	return _("Listed : "), $array,  ::__('%d song','%d songs',scalar@$array);
 }
 
@@ -809,7 +807,7 @@ sub new
 
 	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
 	::Watch($self,	SongsChanged	=> \&SongsChanged_cb);
-	::Watch($self,	CurSong		=> \&CurSongChanged);
+	::Watch($self,	CurSongID	=> \&CurSongChanged);
 	$self->{DefaultFocus}=$tv;
 
 	return $self;
@@ -3147,7 +3145,7 @@ sub setpic
 	my $self= ::find_ancestor($img,__PACKAGE__);
 	my $file= $img->{filename}= AAPicture::GetPicture($self->{aa},$self->{Sel});
 	my $pixbuf= $file ? GMB::Picture::pixbuf($file,$img->{size}) : undef;
-	$img->set_from_pixbuf($pixbuf) if $pixbuf;
+	$img->set_from_pixbuf($pixbuf);
 }
 
 sub AABox_button_press_cb			#popup menu
@@ -4911,7 +4909,7 @@ sub new
 		$view->signal_connect(query_tooltip=> \&query_tooltip_cb);
 	}
 
-	::Watch($self,	CurSong		=> \&CurSongChanged);
+	::Watch($self,	CurSongID	=> \&CurSongChanged);
 	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
 	::Watch($self,	SongsChanged	=> \&SongsChanged_cb);
 
@@ -5443,6 +5441,7 @@ sub expose_cb
 				w	=> $cell->{width},		h	=> $bh,
 				grouptype => $cell->{grouptype},
 				groupsongs=> [@$list[$start..$end]],
+				odd	=> $i%2,	 row=>$i,
 			);
 			my $q= $cell->{draw}(\%arg);
 			my $qid=$depth.'g'.($yadj+$y);
@@ -6084,6 +6083,10 @@ sub new
 	$self->signal_connect(button_release_event	=> \&button_release_cb);
 	$self->signal_connect(motion_notify_event	=> \&motion_notify_cb);
 	$self->signal_connect(button_press_event	=> \&button_press_cb);
+	my $rcstyle0=Gtk2::RcStyle->new;
+	$rcstyle0->ythickness(0);
+	$rcstyle0->xthickness(0);
+	$self->modify_style($rcstyle0);
 	return $self;
 }
 
@@ -6139,10 +6142,6 @@ sub update
 	$self->remove($self->child) if $self->child;
 	my $hbox=Gtk2::HBox->new(0,0);
 	$self->add($hbox);
-	my $rcstyle0=Gtk2::RcStyle->new;
-	$rcstyle0->ythickness(0);
-	$rcstyle0->xthickness(0);
-	$self->modify_style($rcstyle0);
 
 	if (my $w=$songtree->{songxoffset})
 	{	my $button=Gtk2::Button->new;
@@ -6228,7 +6227,7 @@ sub button_expose_cb
 	$button->propagate_expose($button->child,$event) if $button->child;
 	if ($button->{colid})
 	{	_create_dragwin($button) unless $button->{dragwin};
-		$button->{dragwin}->raise;
+		#$button->{dragwin}->raise;
 	}
 	1;
 }

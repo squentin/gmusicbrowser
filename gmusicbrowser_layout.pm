@@ -1898,7 +1898,7 @@ sub DestroyNow
 }
 
 package Layout::Embedded;
-use base 'Gtk2::Frame';
+use base 'Gtk2::Container';
 our @ISA;
 push @ISA,'Layout';
 
@@ -1906,8 +1906,7 @@ sub new
 {	my ($class,$opt)=@_;
 	my $layout=$opt->{layout};
 	return undef unless $Layout::Layouts{$layout};
-	my $self=bless Gtk2::Frame->new, $class;
-	$self->set_shadow_type('none');
+	my $self=bless Gtk2::VBox->new(0,0), $class;
 	$self->{SaveOptions}=\&SaveEmbeddedOptions;
 	$self->{group}=$opt->{group};
 	my %children_opt;

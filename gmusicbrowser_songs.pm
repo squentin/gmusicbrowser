@@ -848,7 +848,7 @@ sub LookupCode
 		my $c;
 		while (!$c && @or)
 		{	my $key=shift @or;
-			($c)=grep $_,map $_->{$key}, @hashlist;
+			($c)=grep defined,map $_->{$key}, @hashlist;
 			#if ($c) {warn " found $key for field $field\n"}
 		}
 		if ($c && !ref $c)

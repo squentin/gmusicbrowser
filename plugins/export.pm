@@ -58,13 +58,23 @@ my %FLmenuentry=
  },
 );
 
+my %exportbutton=
+(	class	=> 'Layout::Button',
+	stock	=> 'gtk-save',
+	tip	=> _"Export to .m3u file",
+	activate=> sub { my $array=::GetSongArray($_[0]); ToM3U({IDs=>$array}) if $array; },
+	#autoadd_type	=> 'button songs',
+);
+
 sub Start
 {	$ON=1;
 	updatemenu();
+	Layout::RegisterWidget(PluginM3UExport=>\%exportbutton);
 }
 sub Stop
 {	$ON=0;
 	updatemenu();
+	Layout::RegisterWidget(PluginM3UExport=>undef);
 }
 
 sub prefbox
