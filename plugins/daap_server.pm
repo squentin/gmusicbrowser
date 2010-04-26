@@ -19,16 +19,16 @@
 
 # if other HTTP services might be useful to add, it might
 # be worth turning this plugin into a generic web interface plugin
-# that happens to include DACP functionality...
+# that happens to include DAAP functionality...
 
-=gmbplugin DACPREMOTE
-name    DACP Remote
-title   DACP Remote - DACP remote control support
+=gmbplugin DAAPSERVER
+name    DAAP Server
+title   DAAP Server - Applish DA*P protocol access to gmusicbrowser library and facilities
 author  Andrew Clunis <andrew@orospakr.ca>
-desc    Use DACP-enabled devices to control Gmusicbrowser.
+desc    DAAP access to your gmusicbrowser library from DAAP clients (iTunes).  Use DACP-enabled devices to control Gmusicbrowser (soon).
 =cut
 
-# package GMB::Plugin::DACPREMOTE::Track;
+# package GMB::Plugin::DAAPSERVER::Track;
 # use strict;
 # use warnings;
 # # use Perl6::Slurp;
@@ -38,7 +38,7 @@ desc    Use DACP-enabled devices to control Gmusicbrowser.
 #     $self = bless {}, shift;
 # }
 
-package GMB::Plugin::DACPREMOTE::TrackBinding;
+package GMB::Plugin::DAAPSERVER::TrackBinding;
 use strict;
 use warnings;
 use base qw( Class::Accessor::Fast );
@@ -72,7 +72,7 @@ __PACKAGE__->mk_accessors(qw(
 
 
 
-package GMB::Plugin::DACPREMOTE::DacpServer;
+package GMB::Plugin::DAAPSERVER::DaapServer;
 use strict;
 use warnings;
 
@@ -91,7 +91,7 @@ use base qw( Net::DAAP::Server );
 sub find_tracks {
     my $self = shift;
     warn "Finding tracks?!  You get NONE!";
-    my $dummy = GMB::Plugin::DACPREMOTE::TrackBinding->new();
+    my $dummy = GMB::Plugin::DAAPSERVER::TrackBinding->new();
     
     # $dummy->dmap_itemid("whooot");
     # $dummy->dmap_containeritemid("0");
@@ -158,14 +158,7 @@ sub find_tracks {
     
 }
 
-# sub new {
-# }
-
-
-
-
-
-package GMB::Plugin::DACPREMOTE;
+package GMB::Plugin::DAAPSERVER;
 use strict;
 use warnings;
 
@@ -182,7 +175,7 @@ use HTTP::Status qw/RC_OK/;
 use Net::DAAP::DMAP qw(:all);
 
 use constant {
-    OPT => 'PLUGIN_DACPREMOTE_'
+    OPT => 'PLUGIN_DAAPSERVER_'
 };
 
 my $self=bless {}, __PACKAGE__;
@@ -303,7 +296,7 @@ my $self=bless {}, __PACKAGE__;
 #     return RC_OK;
 # }
 
-#our $dacp_servar;
+#our $daap_servar;
 
 sub Start {
     # POE::Component::Server::HTTP->new(
@@ -312,11 +305,11 @@ sub Start {
     # 	                   "/login" => \&login_handler,
     # 			   "/databases" => \&databases_handler
     # 	},
-    # 	Headers => {Server => 'Gmusicbrowser DACP',},
+    # 	Headers => {Server => 'Gmusicbrowser DAAP',},
     # );
 
-    $self->{dacp_servar} = GMB::Plugin::DACPREMOTE::DacpServer->new(path => "/home/orospakr/Music/Benn Jordan - Pale Blue Dot - V0/", port => 3689, debug => 1);
-#   $self->{dacp_servar} = Net::DAAP::Server->new(path => "/home/orospakr/Music/Benn Jordan - Pale Blue Dot - V0/", port => 23689, debug => 1);
+    $self->{daap_servar} = GMB::Plugin::DAAPSERVER::DaapServer->new(path => "/home/orospakr/Music/Benn Jordan - Pale Blue Dot - V0/", port => 3689, debug => 1);
+#   $self->{daap_servar} = Net::DAAP::Server->new(path => "/home/orospakr/Music/Benn Jordan - Pale Blue Dot - V0/", port => 23689, debug => 1);
 
     # if GMB is started with this plugin enabled, this Start routine
     # appears to get hit too early.  This seems to defer it enough.
