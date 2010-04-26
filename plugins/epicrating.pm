@@ -272,7 +272,7 @@ sub prefbox {
     $default_rating_box->add($set_default_rating_skip_check);
     $default_rating_box->add($set_default_rating_finished_check);
 
-    my $rating_freq_dump_button = Gtk2::Button->new("CSV dump of rating populations to stdout");
+    my $rating_freq_dump_button = Gtk2::Button->new("CSV dump of rating populations");
 
 
 

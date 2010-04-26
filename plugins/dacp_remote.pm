@@ -38,6 +38,39 @@ desc    Use DACP-enabled devices to control Gmusicbrowser.
 #     $self = bless {}, shift;
 # }
 
+package GMB::Plugin::DACPREMOTE::TrackBinding;
+use strict;
+use warnings;
+use base qw( Class::Accessor::Fast );
+use POE;
+
+
+#going to cheat for now to make a convenient mock
+__PACKAGE__->mk_accessors(qw(
+      file
+
+      dmap_itemid dmap_itemname dmap_itemkind dmap_persistentid
+      daap_songalbum daap_songartist daap_songbitrate
+      daap_songbeatsperminute daap_songcomment daap_songcompilation
+      daap_songcomposer daap_songdateadded daap_songdatemodified
+      daap_songdisccount daap_songdiscnumber daap_songdisabled
+      daap_songeqpreset daap_songformat daap_songgenre
+      daap_songdescription daap_songrelativevolume daap_songsamplerate
+      daap_songsize daap_songstarttime daap_songstoptime daap_songtime
+      daap_songtrackcount daap_songtracknumber daap_songuserrating
+      daap_songyear daap_songdatakind daap_songdataurl
+      com_apple_itunes_norm_volume
+
+      daap_songgrouping daap_songcodectype daap_songcodecsubtype
+      com_apple_itunes_itms_songid com_apple_itunes_itms_artistid
+      com_apple_itunes_itms_playlistid com_apple_itunes_itms_composerid
+      com_apple_itunes_itms_genreid
+      dmap_containeritemid
+     ));
+
+
+
+
 
 package GMB::Plugin::DACPREMOTE::DacpServer;
 use strict;
@@ -50,14 +83,86 @@ use Net::DAAP::Server;
 use File::Find::Rule;
 use base qw( Net::DAAP::Server );
 
+# not any more, and now we'll need a separate server for it, unless
+# only the interfaces of ::Server require improvement (pass multiple protocol names,
+# at least if it's only used for publishing on mdns anyway).
 # sub protocol { 'dcap' }
 
-# sub find_tracks {
-#     warn "Finding tracks?!  You get NONE!"
-# }
+sub find_tracks {
+    my $self = shift;
+    warn "Finding tracks?!  You get NONE!";
+    my $dummy = GMB::Plugin::DACPREMOTE::TrackBinding->new();
+    
+    # $dummy->dmap_itemid("whooot");
+    # $dummy->dmap_containeritemid("0");
+    # $dummy->dmap_itemkind(2);
+    # $dummy->dmap_persistentid("fnaaaaart");
+    # $dummy->daap_songbeatsperminute(60);
+    # # $dummy->daap_songbitrate(96000); # yikes, I need this?
+    # $dummy->daap_songalbum("internet explorer");
+    # $dummy->dmap_itemname("windows welcome music");
+    # $dummy->daap_songartist("microsoft");
+    # $dummy->daap_
+
+
+    $dummy->dmap_itemid( 34564 ); # the inode should be good enough
+    $dummy->dmap_containeritemid( 5139 ); # huh
+
+    $dummy->dmap_itemkind( 2 ); # music
+    $dummy->dmap_persistentid( "fneeeerrrr"); # blah, this should be some 64 bit thing
+    $dummy->daap_songbeatsperminute( 0 );
+
+    # All mp3 files have 'info'. If it doesn't, give up, we can't read it.
+    $dummy->daap_songbitrate( 222 );
+    $dummy->daap_songsamplerate( 44100 );
+    $dummy->daap_songtime( 34 * 1000 );
+
+    # read the tag if we can, fall back to very simple data otherwise.
+    $dummy->dmap_itemname( "windows welcome music" );
+    $dummy->daap_songalbum( "internet explorer" );
+    $dummy->daap_songartist( "microsoft" );
+    $dummy->daap_songcomment( "great bass if you've got the system for it" );
+    $dummy->daap_songyear( 1997 );
+
+    $dummy->daap_songtrackcount( 0 );
+    $dummy->daap_songtracknumber( 1 );
+    $dummy->daap_songcompilation( 0);
+    $dummy->daap_songdisccount(  0);
+    $dummy->daap_songdiscnumber(  0);
+
+    # $dummy->daap_songcomposer( );
+    $dummy->daap_songdateadded( 0 );
+    $dummy->daap_songdatemodified( 0 );
+    $dummy->daap_songdisabled( 0 );
+    $dummy->daap_songeqpreset( '' );
+    $dummy->daap_songformat( "mp3" );
+    $dummy->daap_songgenre( 'techno' );
+    $dummy->daap_songgrouping( '' );
+    # $dummy->daap_songdescription( );
+    # $dummy->daap_songrelativevolume( );
+    $dummy->daap_songsize( 1483000 );
+    $dummy->daap_songstarttime( 0 );
+    $dummy->daap_songstoptime( 0 );
+
+    $dummy->daap_songuserrating( 45 );
+    $dummy->daap_songdatakind( 0 );
+    # $dummy->daap_songdataurl( );
+    $dummy->com_apple_itunes_norm_volume( 17502 );
+
+    # $dummy->daap_songcodectype( 1836082535 ); # mp3?
+    # $self->daap_songcodecsubtype( 3 ); # or is this mp3?
+
+
+    
+    $self->tracks->{"whooot"} = $dummy;
+    
+}
 
 # sub new {
 # }
+
+
+
 
 
 package GMB::Plugin::DACPREMOTE;
