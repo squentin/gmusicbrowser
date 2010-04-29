@@ -55,6 +55,7 @@ install: all
 	install -pm 644 pix/*.png         "$(datadir)/gmusicbrowser/pix/"
 	install -pm 644 pix/gnome-classic/*    "$(datadir)/gmusicbrowser/pix/gnome-classic/"
 	install -pm 644 pix/tango/*            "$(datadir)/gmusicbrowser/pix/tango/"
+	install -pm 644 pix/oxygen/*           "$(datadir)/gmusicbrowser/pix/oxygen/"
 	install -pDm 644 gmusicbrowser.desktop "$(datadir)/applications/gmusicbrowser.desktop"
 	install -pDm 644 gmusicbrowser.menu    "$(menudir)/gmusicbrowser"
 	install -pDm 644 pix/gmusicbrowser32x32.png "$(iconsdir)/gmusicbrowser.png"
