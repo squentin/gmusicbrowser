@@ -41,40 +41,48 @@ desc    DAAP access to your gmusicbrowser library from DAAP clients (iTunes).  U
 package GMB::Plugin::DAAPSERVER::TrackBinding;
 use strict;
 use warnings;
-use base qw( Class::Accessor::Fast );
+use Net::DAAP::Server::Track;
+use base qw( Net::DAAP::Server::Track );
 use POE;
 
 
 #going to cheat for now to make a convenient mock
-__PACKAGE__->mk_accessors(qw(
-      file
+# __PACKAGE__->mk_accessors(qw(
+#       file
 
-      dmap_itemid dmap_itemname dmap_itemkind dmap_persistentid
-      daap_songalbum daap_songartist daap_songbitrate
-      daap_songbeatsperminute daap_songcomment daap_songcompilation
-      daap_songcomposer daap_songdateadded daap_songdatemodified
-      daap_songdisccount daap_songdiscnumber daap_songdisabled
-      daap_songeqpreset daap_songformat daap_songgenre
-      daap_songdescription daap_songrelativevolume daap_songsamplerate
-      daap_songsize daap_songstarttime daap_songstoptime daap_songtime
-      daap_songtrackcount daap_songtracknumber daap_songuserrating
-      daap_songyear daap_songdatakind daap_songdataurl
-      com_apple_itunes_norm_volume
+#       dmap_itemid dmap_itemname dmap_itemkind dmap_persistentid
+#       daap_songalbum daap_songartist daap_songbitrate
+#       daap_songbeatsperminute daap_songcomment daap_songcompilation
+#       daap_songcomposer daap_songdateadded daap_songdatemodified
+#       daap_songdisccount daap_songdiscnumber daap_songdisabled
+#       daap_songeqpreset daap_songformat daap_songgenre
+#       daap_songdescription daap_songrelativevolume daap_songsamplerate
+#       daap_songsize daap_songstarttime daap_songstoptime daap_songtime
+#       daap_songtrackcount daap_songtracknumber daap_songuserrating
+#       daap_songyear daap_songdatakind daap_songdataurl
+#       com_apple_itunes_norm_volume
 
-      daap_songgrouping daap_songcodectype daap_songcodecsubtype
-      com_apple_itunes_itms_songid com_apple_itunes_itms_artistid
-      com_apple_itunes_itms_playlistid com_apple_itunes_itms_composerid
-      com_apple_itunes_itms_genreid
-      dmap_containeritemid
-     ));
+#       daap_songgrouping daap_songcodectype daap_songcodecsubtype
+#       com_apple_itunes_itms_songid com_apple_itunes_itms_artistid
+#       com_apple_itunes_itms_playlistid com_apple_itunes_itms_composerid
+#       com_apple_itunes_itms_genreid
+#       dmap_containeritemid
+#      ));
 
-
+sub new {
+    my $class = shift;
+    my $file = shift;
+    # give it file so data() works!
+    my $self = $class->SUPER::new({file => $file});
+}
 
 
 
 package GMB::Plugin::DAAPSERVER::DaapServer;
 use strict;
 use warnings;
+
+use File::Spec;
 
 use POE;
 # use Net::DAAP::Server::Track;
@@ -105,7 +113,11 @@ sub find_tracks {
 
 	my $album = ::Songs::Get($song_id, 'album');
 	
-	my $dummy = GMB::Plugin::DAAPSERVER::TrackBinding->new();
+	my ($path, $filename) = ::Songs::Get($song_id, qw/path file/);
+
+	warn "Song pathname is: " . File::Spec->catfile($path,$filename);
+	
+	my $dummy = GMB::Plugin::DAAPSERVER::TrackBinding->new(File::Spec->catfile($path, $filename));
 	
 	$dummy->dmap_itemid( $song_id ); # the inode should be good enough
 	$dummy->dmap_containeritemid( 5139 ); # huh
