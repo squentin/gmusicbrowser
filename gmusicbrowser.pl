@@ -899,7 +899,7 @@ sub LoadIcons
 	$NBVolIcons=0;
 	$NBVolIcons++ while $icons{'gmb-vol'.$NBVolIcons};
 	$NBQueueIcons=0;
-	$NBQueueIcons++ while $icons{'gmb-queue'.$NBQueueIcons};
+	$NBQueueIcons++ while $icons{'gmb-queue'.($NBQueueIcons+1)};
 
 	$icon_factory->remove_default if $icon_factory;
 	$icon_factory=Gtk2::IconFactory->new;
@@ -2177,10 +2177,10 @@ sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, 
 	 @$Queue && $Queue->IsIn($ID) ?
 	 do{	my $n;
 		if ($NBQueueIcons)
-		{	my $max= $#$Queue; $max=$NBQueueIcons if $NBQueueIcons < $max;
-			$n= first { $Queue->[$_]==$ID } 0..$max;
+		{	my $max= @$Queue; $max=$NBQueueIcons if $NBQueueIcons < $max;
+			$n= first { $Queue->[$_]==$ID } 0..$max-1;
 		}
-		$n ? "gmb-queue$n" : 'gmb-queue';
+		defined $n ? "gmb-queue".($n+1) : 'gmb-queue';
 	 } : undef;
 }
 
