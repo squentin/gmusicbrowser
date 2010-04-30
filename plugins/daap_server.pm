@@ -131,6 +131,8 @@ sub find_tracks {
 	$dummy->daap_songsamplerate( 44100 );
 	$dummy->daap_songtime($length );
 
+	$dummy->daap_songtime($length * 1000);
+
 	# read the tag if we can, fall back to very simple data otherwise.
 	$dummy->dmap_itemname( $title );
 	$dummy->daap_songalbum( $album );
