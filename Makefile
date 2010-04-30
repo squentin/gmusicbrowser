@@ -46,6 +46,7 @@ install: all
 	install -pd "$(datadir)/gmusicbrowser/pix/"
 	install -pd "$(datadir)/gmusicbrowser/pix/gnome-classic/"
 	install -pd "$(datadir)/gmusicbrowser/pix/tango/"
+	install -pd "$(datadir)/gmusicbrowser/pix/oxygen/"
 	install -pd "$(datadir)/gmusicbrowser/plugins/"
 	install -pDm 755 gmusicbrowser.pl "$(bindir)/gmusicbrowser"
 	install -pm 755 iceserver.pl      "$(datadir)/gmusicbrowser/iceserver.pl"
