@@ -6961,10 +6961,8 @@ sub new
 	$self->{treeview1}=	my $treeview1=Gtk2::TreeView->new($store1);
 	$self->{treeview2}=	my $treeview2=Gtk2::TreeView->new($store2);
 	$treeview2->set_reorderable(TRUE);
-	$treeview2->append_column
-		( Gtk2::TreeViewColumn->new_with_attributes
-		  ('Order',Gtk2::CellRendererPixbuf->new,'stock-id',2)
-		);
+	my $order_column= Gtk2::TreeViewColumn->new_with_attributes( 'Order',Gtk2::CellRendererPixbuf->new,'stock-id',2 );
+	$treeview2->append_column($order_column);
 	my $butadd=	::NewIconButton('gtk-add',	_"Add",		sub {$self->Add_selected});
 	my $butrm=	::NewIconButton('gtk-remove',	_"Remove",	sub {$self->Del_selected});
 	my $butclear=	::NewIconButton('gtk-clear',	_"Clear",	sub { $self->Set(''); });
@@ -7019,13 +7017,20 @@ sub new
 		 {	my ($treeview2, $x, $y, $keyb, $tooltip)=@_;
 			return 0 if $keyb;
 			my ($path, $column)=$treeview2->get_path_at_pos($x,$y);
-			return 0 unless $path && $column && $column==$case_column;
+			return 0 unless $path && $column;
 			my $store2=$treeview2->get_model;
 			my $iter=$store2->get_iter($path);
 			return 0 unless $iter;
-			my $i=$store2->get_value($iter,3);
-			return 0 unless $i;
-			my $tip= $i==SENSITIVE ? _"Case sensitive" : _"Case insensitive";
+			my $tip;
+			if ($column==$case_column)
+			{	my $i=$store2->get_value($iter,3);
+				$tip= !$i ? undef : $i==SENSITIVE ? _"Case sensitive" : _"Case insensitive";
+			}
+			elsif ($column==$order_column)
+			{	my $o=$store2->get_value($iter,2);
+				$tip= $o eq 'gtk-sort-ascending' ? _"Ascending order" : _"Descending order";
+			}
+			return 0 unless defined $tip;
 			$tooltip->set_text($tip);
 			1;
 		 });
