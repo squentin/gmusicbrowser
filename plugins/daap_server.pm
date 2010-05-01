@@ -103,14 +103,8 @@ sub find_tracks {
 
     for my $song_id (@{$all_songs}) {
 
-	my $length = ::Songs::Get($song_id, 'length');
+	my ($length, $title, $artist, $album, $rating, $genre) = ::Songs::Get($song_id, 'length', 'title', 'artist', 'album', 'rating', 'genre');
 
-	my $title = ::Songs::Get($song_id, 'title');
-
-	my $artist = ::Songs::Get($song_id, 'artist');
-
-	my $album = ::Songs::Get($song_id, 'album');
-	
 	my ($path, $filename) = ::Songs::Get($song_id, qw/path file/);
 
 	# warn "Song pathname is: " . File::Spec->catfile($path,$filename);
@@ -150,7 +144,7 @@ sub find_tracks {
 	$dummy->daap_songdisabled( 0 );
 	$dummy->daap_songeqpreset( '' );
 	$dummy->daap_songformat( "mp3" );
-	$dummy->daap_songgenre( 'techno' );
+	$dummy->daap_songgenre( $genre );
 	$dummy->daap_songgrouping( '' );
 	# $dummy->daap_songdescription( );
 	# $dummy->daap_songrelativevolume( );
@@ -158,7 +152,7 @@ sub find_tracks {
 	$dummy->daap_songstarttime( 0 );
 	$dummy->daap_songstoptime( 0 );
 
-	$dummy->daap_songuserrating( 45 );
+	$dummy->daap_songuserrating( $rating );
 	$dummy->daap_songdatakind( 0 );
 	# $dummy->daap_songdataurl( );
 	$dummy->com_apple_itunes_norm_volume( 17502 );
