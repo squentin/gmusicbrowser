@@ -115,7 +115,7 @@ sub find_tracks {
 	
 	my ($path, $filename) = ::Songs::Get($song_id, qw/path file/);
 
-	warn "Song pathname is: " . File::Spec->catfile($path,$filename);
+	# warn "Song pathname is: " . File::Spec->catfile($path,$filename);
 	
 	my $dummy = GMB::Plugin::DAAPSERVER::TrackBinding->new(File::Spec->catfile($path, $filename));
 	
@@ -123,7 +123,7 @@ sub find_tracks {
 	$dummy->dmap_containeritemid( 5139 ); # huh
 
 	$dummy->dmap_itemkind( 2 ); # music
-	$dummy->dmap_persistentid( "fneeeerrrr" + $song_id); # blah, this should be some 64 bit thing
+	$dummy->dmap_persistentid( "GMB" . $song_id); # blah, this should be some 64 bit thing I guess?
 	$dummy->daap_songbeatsperminute( 0 );
 
 	# All mp3 files have 'info'. If it doesn't, give up, we can't read it.
@@ -171,11 +171,9 @@ sub find_tracks {
 	$self->tracks->{$song_id} = $dummy;
 
     }
-
-
-
-    
 }
+
+1;
 
 package GMB::Plugin::DAAPSERVER;
 use strict;
@@ -183,7 +181,6 @@ use warnings;
 
 # actually get *feedback* instead of silence if a session crashes.
 # sub POE::Kernel::CATCH_EXCEPTIONS () { 0 }
-
 
 use POE::Kernel { loop => "Glib" };
 use POE::Component::Server::HTTP;
@@ -199,140 +196,13 @@ use constant {
 
 my $self=bless {}, __PACKAGE__;
 
-# sub login_response {
-#     my $dmap =   [
-# 	[
-# 	 'dmap.loginresponse',
-# 	 [
-# 	  [
-# 	       'dmap.status',
-# 	   200
-# 	  ],
-# 	  [
-# 	   'dmap.sessionid',
-# 	   2393
-# 	  ]
-# 	 ]
-# 	]
-# 	];
-    
-#     return dmap_pack($dmap);
-# }
-
-# # sub databases_response {
-# #     $dmap = [
-# # 	[ 'dmap.serverdatabases',
-# # 	  [
-# # 	   ['dmap.status', 200],
-# # 	   ['dmap.updatetype',200]
-	   
-# # 	];
-# # }
-
-# sub cgi_from_request {
-#     my ($request) = @_;
-    
-#     # I'm not really sure why POE/HTTP isn't
-#     # doing this for me...
-#     # this implementation is rather naiive.
-#     my $q;
-#     if ($request->method() eq 'POST') {
-# 	$q = new CGI($request->content);
-#     }
-#     else {
-# 	$request->uri() =~ /\?(.+$)/;
-# 	if (defined($1)) {
-# 	    $q = new CGI($1);
-# 	}
-# 	else {
-# 	    $q = new CGI;
-# 	}
-#     }
-#     return $q;
-# }
-
-
-
-# sub databases_handler {
-#     my ($request, $response) = @_;
-
-#     my $dmap = [];
-       
-#     $response->code(RC_OK);
-#     $response->push_header("Content-Type", "application/x-dmap-tagged");
-#     $response->content(databases_response());
-# }
-
-# sub login_handler {
-#     my ($request, $response) = @_;
-#     warn "Login request received: " . $request;
-
-#     my $cgi = cgi_from_request($request);
-
-#     warn "got cgi";
-#     my $pairing_guid = $cgi->param("pairing-guid");
-#     warn "... got pairing-guid: " . $pairing_guid;
-
-#     # Build the response.
-#     $response->code(RC_OK);
-#     $response->push_header("Content-Type", "application/x-dmap-tagged");
-#     $response->content(login_response());
-
-#     # Signal that the request was handled okay.
-#     return RC_OK;
-# }
-
-# sub root_handler {
-    
-
-#     my $path = $request->uri->path;
-#     my $query = $request->uri->query;
-
-#     warn "HTTP request to root or unknown: " . $request->method . " " . $request->uri->path_query;
-
-#     # we might as well
-#     if($request->method eq "POST") {
-# 	warn "Attempt to decode DMAP: " . Dumper(dmap_unpack($request->content));
-#     }
-
-#     my $ID = $::PlayingID;
-
-
-
-#     my $playing_song;
-#     if(defined $ID) {
-# 	$playing_song = "Playing song: " . ::Songs::Get($ID, 'artist') . " - " . ::Songs::Get($ID, 'title');
-#     } else {
-# 	$playing_song = "None! :(";
-#     }
-    
-#     # Build the response.
-#     $response->code(RC_OK);
-#     $response->push_header("Content-Type", "application/x-dmap-tagged");
-#     $response->content($playing_song);
-
-#     # Signal that the request was handled okay.
-#     return RC_OK;
-# }
-
-#our $daap_servar;
-
 sub Start {
-    # POE::Component::Server::HTTP->new(
-    # 	Port           => 3689,
-    # 	ContentHandler => {"/" => \&root_handler,
-    # 	                   "/login" => \&login_handler,
-    # 			   "/databases" => \&databases_handler
-    # 	},
-    # 	Headers => {Server => 'Gmusicbrowser DAAP',},
-    # );
 
-    $self->{daap_servar} = GMB::Plugin::DAAPSERVER::DaapServer->new(path => "/home/orospakr/Music/Benn Jordan - Pale Blue Dot - V0/", port => 3689, debug => 1);
-#   $self->{daap_servar} = Net::DAAP::Server->new(path => "/home/orospakr/Music/Benn Jordan - Pale Blue Dot - V0/", port => 23689, debug => 1);
+    $self->{daap_servar} = GMB::Plugin::DAAPSERVER::DaapServer->new(port => 3689, debug => 1);
 
     # if GMB is started with this plugin enabled, this Start routine
     # appears to get hit too early.  This seems to defer it enough.
-    Glib::Timeout->add(0, sub { $poe_kernel->run(); ::FALSE; });
+#    Glib::Timeout->add(0, sub { $poe_kernel->run(); ::FALSE; });
 }
 
 sub Stop {
@@ -341,4 +211,4 @@ sub Stop {
 sub prefbox {
 }
 
-
+;1
