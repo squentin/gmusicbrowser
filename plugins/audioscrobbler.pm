@@ -91,8 +91,8 @@ sub SongChanged
 
 sub Played
 {	return if $ignore_current_song;
-	my $ID=$::PlayingID;
-	my $diff=($::PlayTime||0)-($::StartedAt||0);
+	my (undef,$ID,undef,$start_time,$seconds_start,$seconds_end)=@_; warn "Played @_\n";
+	my $diff= $seconds_end - $seconds_start;
 	return unless $diff>0;
 	$timecount+=$diff;
 	my $length= Songs::Get($ID,'length');
@@ -101,7 +101,7 @@ sub Played
 		my ($title,$artist,$album,$track)= Songs::Get($ID,qw/title artist album track/);
 		return if $title eq '' || $artist eq '';
 		::IdleDo("9_".__PACKAGE__,10000,\&Save) if @ToSubmit>$unsent_saved;
-		push @ToSubmit,[ $artist,$title,$album,'',$length,$::StartTime,$track,'P' ];
+		push @ToSubmit,[ $artist,$title,$album,'',$length,$start_time,$track,'P' ];
 		Sleep();
 	}
 }
