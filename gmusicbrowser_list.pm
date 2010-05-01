@@ -3631,7 +3631,7 @@ sub makelayout
 	my $layout=Gtk2::Pango::Layout->new( $widget->create_pango_context );
 	my $field=$prop->[P_FIELD][$depth];
 	my $markup=$prop->[P_MARKUP][$depth];
-	$markup= $markup ? "<b>%a</b>%Y\n<small>%s <small>%l</small></small>" : "%a"; #FIXME
+	$markup= $markup ? "<b>%a</b>%Y\n<small>%x / %s / <small>%l</small></small>" : "%a"; #FIXME
 	if ($gid==FilterList::GID_ALL)
 	{	$markup= ::MarkupFormat("<b>%s (%d)</b>", Songs::Field_All_string($field), $cell->get('all_count') );
 	}
