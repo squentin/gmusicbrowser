@@ -72,11 +72,9 @@ use POE;
 sub new {
     my $class = shift;
     my $file = shift;
-    # give it file so data() works!
+
     my $self = $class->SUPER::new({file => $file});
 }
-
-
 
 package GMB::Plugin::DAAPSERVER::DaapServer;
 use strict;
@@ -185,6 +183,7 @@ use warnings;
 use POE::Kernel { loop => "Glib" };
 use POE::Component::Server::HTTP;
 use Data::Dumper;
+use Sys::Hostname;
 
 use CGI;
 use HTTP::Status qw/RC_OK/;
@@ -198,11 +197,7 @@ my $self=bless {}, __PACKAGE__;
 
 sub Start {
 
-    $self->{daap_servar} = GMB::Plugin::DAAPSERVER::DaapServer->new(port => 3689, debug => 1);
-
-    # if GMB is started with this plugin enabled, this Start routine
-    # appears to get hit too early.  This seems to defer it enough.
-#    Glib::Timeout->add(0, sub { $poe_kernel->run(); ::FALSE; });
+    $self->{daap_servar} = GMB::Plugin::DAAPSERVER::DaapServer->new(port => 3689, debug => 1, name => getlogin() . _"'s gmusicbrowser@" . hostname());
 }
 
 sub Stop {
