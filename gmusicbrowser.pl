@@ -6154,11 +6154,15 @@ sub Watch
 {	my ($object,$key,$sub)=@_;
 	unless ($object) { push @{$EventWatchers{$key}},$sub; return } #for permanent watch
 	warn "watch $key $object\n" if $debug;
-	if ($object->{'WatchUpdate_'.$key})
-	{	warn "Warning : Object $object is already watching event $key => previous watch replaced\n";
+	if (my $existing=$object->{'WatchUpdate_'.$key})	# object is watching the event with multiple callbacks
+	{	$existing= [$existing] if ref $existing ne 'ARRAY';
+		push @$existing, $sub;
+		$object->{'WatchUpdate_'.$key}=$existing;
 	}
-	else { push @{$EventWatchers{$key}},$object; weaken($EventWatchers{$key}[-1]); }
-	$object->{'WatchUpdate_'.$key}=$sub;
+	else
+	{	push @{$EventWatchers{$key}},$object; weaken($EventWatchers{$key}[-1]);
+		$object->{'WatchUpdate_'.$key}=$sub;
+	}
 	$object->{Watcher_DESTROY}||=$object->signal_connect(destroy => \&UnWatch_all) unless ref $object eq 'HASH' || !$object->isa('Gtk2::Object');
 }
 sub UnWatch
@@ -6185,7 +6189,11 @@ sub HasChanged
 	warn "HasChanged $key -> updating @list\n" if $debug;
 	for my $r ( @list )
 	{	my ($sub,$o)= ref $r eq 'CODE' ? ($r) : ($r->{'WatchUpdate_'.$key},$r);
-		$sub->($o,@args) if $sub;
+		next unless $sub;
+		if (ref $sub eq 'ARRAY')
+		{	$_->($o,@args) for @$sub;
+		}
+		else { $sub->($o,@args) }
 	};
 }
 
