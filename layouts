@@ -1,3 +1,43 @@
+[shimmer]
+Type=G
+Title		= " "
+DefaultFocus	= SimpleSearch
+Default		= Window(size1000x750)
+Window		= hidden=SongTree|VPMosaic
+Author		= simon@shimmerproject.org
+### main window containers: top bar, main and statusbar ###
+VBmain		= HBTop _HBMain HBStatusbar
+HBMain		= VBArtist _HPRight
+HBTop		= VBButtons _15VBPlayer 15VBToggle -5VBSearchBox
+### top bar from left to right ###
+HBButtons	= Prev(size=button) Play(size=button) Next(size=button)
+VBButtons	= HBButtons Filler4
+VBPlayer	= HBTitle HBScale
+HBTitle		= Title(minsize=0,maxwidth=200,tip="Title: %t") Album(minsize=0,maxwidth=200,tip="Album: %l (%Y)",markup="  <big><b>«</b></big>  %l") Artist(minsize=0,maxwidth=200,tip="Artist: %a",markup="  <big><b>«</b></big>  %a") -HBTime
+HBTime		= LabelTime(xalign=1) Length(xalign=1)
+HBScale		= _Scale
+HBToggle	= TogButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1) TogButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1) TogButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1)
+VBToggle	= HBToggle _Filler1
+VBSearchBox	= 2SimpleSearch _Filler2
+### main left: artist pane and album-cover ###
+#VBArtist	= _FPane0(nb=1,hidebb=1,pages=artists/lmarkup=1,hidetabs=1) HBCover
+VBArtist	= _FPane0(nb=1,hidebb=1,pages=artists,artists/lmarkup=1,hidetabs=1) HBCover
+HBCover		= Cover(overlay=6x6:350x350:/usr/share/gmusicbrowser/pix/elementary/overlay.png,default=/usr/share/gmusicbrowser/pix/elementary/no-cover.svg)
+### main right: list/tree/mosaic widgets ###
+HPRight		= _HBSongListtree
+HBSongListtree	= _SongTree(cols="playandqueue track title artist length playcount lastplay",grouping="album|artistalbum_left(picsize=100)|disc|discright(width=15)") _HBSongPlaylist _VPMosaic
+HBSongPlaylist	= _SongList
+VPMosaic	= _FPane1(nb=2,hide=1,page_album/mode=mosaic,pages=album,hidetabs=1)
+### bottom: statusbar ###
+# OpenQueue(toggle=1,size=small-toolbar)  5
+HBStatusbar	= Pref(size=small-toolbar,button=0) Label0(text="Settings",click1=OpenPref) 15_HBSettings
+HBSettings	= Queue Label1(markup="<small>Queue</small>",click1=OpenQueue,size=small-toolbar) 5Filler3  10Filter(with_text=1) 10Sort(with_text=1) 10LockAlbum(with_text=1) 10LockArtist(with_text=1) -Total(format=short,relief=none,button=0)
+### positioning and sizing ###
+HSize0		= 10 Filler0 Filler1 Filler2 Filler5 Filler6 Filler7
+HSize0		= 5 Filler3 Filler4
+HSize0		= 350 VBArtist
+VSize0		= 350 HBCover
+
 [Lists, Library & Context]
 Type=G+
 Default		= Window(size=1120x820) FPane0(page=genre) FPane1(page=artist) FPane2(page=album,albumpsize=32,albuminfo=1) VPRight(size=200-550) HPmain(size=400)
@@ -51,6 +91,23 @@ Default	= Window(sticky=1)
 HBmain	= Playlist Pref Play Next 5_ABTitle
 ABTitle = (xalign=0,yscale=0) Title_by(minsize=20)
 VolumeScroll	= HBmain
+
+[shimmer_tray]
+Type=T
+VBMain		= HBTime Filler0 VBMain1
+VBMain1		= HBLeft _HBRight
+HBLeft		= _Cover(forceratio=1,default=/usr/share/gmusicbrowser/pix/elementary/no-cover.svg) VBText
+VBText		= 2HBAlbum HBYear _2HBTitle
+HBButtons	= Prev(size=small-toolbar) Play(size=small-toolbar) Next(size=small-toolbar)
+HBTitle		= LockSong _Title(font=16,interval=75)
+HBArtist	= LockArtist _Artist(font=10)
+HBAlbum		= LockAlbum _Album(font=10)
+HBYear		= Filler1 _Date(font=8,markup="%y")
+HBTime		= _TimeBar(minheight=5)
+HBRight		= HBButtons _2HBArtist
+VSize0		= 3 Filler0
+HSize0		= Filler1 LockArtist LockAlbum LockSong
+HSize1		= Cover HBButtons
 
 [full] based on Small player
 Type=T
@@ -403,6 +460,26 @@ KeyBindings	= Escape CloseWindow
 
 #SongTree Group & Columns definitions
 #####################################
+
+{Group discright}
+title=disc on the left side
+left=width
+title:	text(markup='<b><big>'.pesc($title).'</big></b>',pad=2,w=left)
+width:	OptionNumber(default=15,min=10,max=100,step=1)
+
+{Group artistalbum_left}
+title=album and artist left
+head=title:h
+tail=25
+vcollapse=head
+vmin=pic:y+pic:h+25
+left=pic:w+2
+#title2:	text(markup='<b><big>'.pesc($artist).'</big></b>',pad=2,x=-title2:w)
+#title2:	text(markup='by <b><big>'.pesc($artist).'</big></b>',pad=2,x=title:w)
+#title:	text(markup='<b><big>'.pesc($album).'</big></b> ',pad=2)
+title:	text(markup='<b><big>'.pesc($album).'</big></b>'. if($year,'  <big><b>«</b></big>  '.pesc($year)) . '  <big><b>«</b></big> '.pesc($artist),pad=2)
+pic:	+aapic(y=title:h+title:y+4,picsize=picsize,ypad=2,aa='album')
+picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 
 {Group pic}
 title= with picture
