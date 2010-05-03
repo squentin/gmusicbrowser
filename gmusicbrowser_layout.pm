@@ -291,15 +291,16 @@ our %Widgets=
 #		font	=> 'Monospace',
 	},
 	LabelTime =>
-	{	class	=> 'Layout::Label',
+	{	class	=> 'Layout::Label::Time',
 		group	=> 'Play',
+		markup	=> '%s',
 		xalign	=> 1,
 		saveoptions => 'remaining',
 		initsize=> '-XX:XX',
 #		font	=> 'Monospace',
 		event	=> 'Time',
-		click1	=> sub { $_[0]{remaining}=!$_[0]{remaining}; $_[0]{update}->($_[0]); },
-		update	=> sub { $_[0]->set_label( ::TimeString($_[0]{remaining}) ) unless $_[0]{busy}; },
+		click1	=> sub { $_[0]{remaining}=!$_[0]{remaining}; $_[0]->update_time; },
+		update	=> sub { $_[0]->update_time unless $_[0]{busy}; },
 	},
 	TimeBar =>
 	{	class	=> 'Layout::Bar',
@@ -1003,13 +1004,15 @@ sub NewWidget
 	{	$widget->signal_connect(realize => sub { $_[0]->window->set_cursor(Gtk2::Gdk::Cursor->new($_[1])); },$cursor);
 	}
 
-	my %towatch;
 	my $tip= $options{tip};
 	if ( defined $tip)
 	{  if (!ref $tip)
 	   {	my @fields=::UsedFields($tip);
-		$towatch{$_}=undef for @fields;
-		if (@fields) { $widget->{song_tip}=$tip; }
+		if (@fields)
+		{	$widget->{song_tip}=$tip;
+			::WatchSelID($widget,\&UpdateSongTip,\@fields);
+			UpdateSongTip($widget,::GetSelID($widget));
+		}
 		else
 		{	$tip=~s#\\n#\n#g;
 			$widget->set_tooltip_text($tip);
@@ -1018,16 +1021,11 @@ sub NewWidget
 	   else { $widget->{state_tip}=$tip; }
 	}
 	if ($options{hover_layout}) { $widget->{$_}=$options{$_} for qw/hover_layout hover_delay/; Layout::Window::Popup::set_hover($widget); }
-	if (my $f=$ref->{fields})
-	{	$towatch{$_}=undef for split / /,$f;
-	}
-	if ($widget->{markup})
-	{	$towatch{$_}=undef for ::UsedFields($widget->{markup});
-	}
-	if ($ref->{schange} || (keys %towatch))
-	{	$widget->{schange}=$ref->{schange} if $ref->{schange};
-		::WatchSelID($widget,\&UpdateSongID,\%towatch);
-		UpdateSongID($widget,::GetSelID($widget));
+	if (my $schange=$ref->{schange})
+	{	my $fields= $ref->{fields};
+		$fields= $fields ? [ split / /,$fields ] : undef;
+		::WatchSelID($widget,$schange, $fields);
+		$schange->($widget,::GetSelID($widget));
 	}
 	if ($ref->{event})
 	{	my $sub=$ref->{update} || \&UpdateObject;
@@ -1035,7 +1033,8 @@ sub NewWidget
 		$sub->($widget) unless $ref->{noinit};
 	}
 	::set_drag($widget,source => $ref->{dragsrc}, dest => $ref->{dragdest});
-	$ref->{EndInit}($widget) if $ref->{EndInit};
+	my $init= delete $widget->{EndInit} || $ref->{EndInit};
+	$init->($widget) if $init;
 	return $widget;
 }
 
@@ -1088,22 +1087,14 @@ sub Button_activate_cb
 	1;
 }
 
-sub UpdateSongID
+sub UpdateSongTip
 {	my ($widget,$ID)=@_;
-	for my $w ($widget)
-	{	$w->{schange}($w,$ID) if $w->{schange};
-		if ($w->{markup})
-		{	my $markup=	defined $ID			? ::ReplaceFieldsAndEsc( $ID,$w->{markup} ) :
-					defined $w->{markup_empty}	? $w->{markup_empty} :
-					'';
-			$w->set_markup($markup);
-		}
-		if ($w->{song_tip})
-		{	my $tip= defined $ID ? ::ReplaceFields($ID,$w->{song_tip}) : '';
-			$w->set_tooltip_text($tip);
-		}
+	if ($widget->{song_tip})
+	{	my $tip= defined $ID ? ::ReplaceFields($ID,$widget->{song_tip}) : '';
+		$widget->set_tooltip_text($tip);
 	}
 }
+
 
 #sub SetSort
 #{	my($self,$sort)=@_;
@@ -2716,7 +2707,7 @@ sub new
 	my $label=Gtk2::Label->new;
 	$label->set_alignment($opt->{xalign},$opt->{yalign});
 
-	for (qw/markup markup_empty update autoscroll interval/)	#$self->{update} is only used by LabelTime
+	for (qw/markup markup_empty autoscroll interval/)
 	{	$self->{$_}=$opt->{$_} if exists $opt->{$_};
 	}
 
@@ -2725,8 +2716,17 @@ sub new
 	if (my $color= $opt->{color} || $opt->{DefaultFontColor})
 	{	$label->modify_fg('normal', Gtk2::Gdk::Color->parse($color) );
 	}
-	$label->set_markup($opt->{markup}) if exists $opt->{markup};
-	$label->set_text($opt->{text}) if exists $opt->{text};
+	if (exists $opt->{markup})
+	{	my $m=$opt->{markup};
+		if (my @fields=::UsedFields($m))
+		{	$self->{markup}=$m;
+			$self->{EndInit}=\&init;	# needs $self->{group} set before this can be done
+		}
+		else { $label->set_markup($m) }
+	}
+	elsif (exists $opt->{text})
+	{	$label->set_text($opt->{text});
+	}
 	$self->add($label);
 #$self->signal_connect(enter_notify_event => sub {$_[0]->set_markup('<u>'.$_[0]->child->get_label.'</u>')});
 #$self->signal_connect(leave_notify_event => sub {my $m=$_[0]->child->get_label; $m=~s#^<u>##;$m=~s#</u>$##; $_[0]->set_markup($m)});
@@ -2763,6 +2763,22 @@ sub new
 	}
 
 	return $self;
+}
+
+sub init
+{	my $self=shift;
+	::WatchSelID($self,\&update_text);
+	update_text($self,::GetSelID($self));
+}
+
+sub update_text
+{	my ($self,$ID)=@_;
+	if ($self->{markup})
+	{	my $markup=	defined $ID			? ::ReplaceFieldsAndEsc( $ID,$self->{markup} ) :
+				defined $self->{markup_empty}	? $self->{markup_empty} :
+				'';
+		$self->set_markup($markup);
+	}
 }
 
 sub set_label
@@ -2843,6 +2859,25 @@ sub Scroll
 	{	$self->{scrolltimeout}=0 if $reached_max;
 	}
 	return $self->{scrolltimeout};
+}
+
+package Layout::Label::Time;
+use base 'Layout::Label';
+
+sub set_markup
+{	my ($self,$markup)=@_;
+	$self->{time_markup}=$markup;
+	$self->update_time;
+}
+sub update_time
+{	my ($self,$time)=@_;
+	my $markup=$self->{time_markup};
+	$time ||= ::TimeString($self->{remaining});
+	if ($markup)
+	{	$markup=~s/%s/$time/;
+	}
+	else { $markup=$time }
+	$self->SUPER::set_markup($markup);
 }
 
 package Layout::Bar;
@@ -2938,13 +2973,13 @@ sub update_preview_Time
 {	my ($self,$value)=@_;
 
 	my $h=::get_layout_widget($self)->{widgets};
-	my @labels= map $h->{$_}, grep m/^LabelTime\d*$/, keys %$h; #get list of LabelTime in the layouts
+	my @labels= grep $_->isa('Layout::Label::Time'), values %$h; #get list of Layout::Label::Time widgets in the layouts
 
 	my $preview= defined $value ? 1 : 0;
 	my $format=( $self->{max} <600 )? '%01d:%02d' : '%02d:%02d';
 	for my $label (@labels)
 	{	$label->{busy}=$preview;
-		$label->set_label( sprintf $format,int($value/60),$value%60 ) if $preview;
+		$label->update_time( sprintf $format,int($value/60),$value%60 ) if $preview;
 	}
 }
 
