@@ -6390,6 +6390,7 @@ sub CreateTrayIcon
 
 	$eventbox->add($img);
 	$TrayIcon->add($eventbox);
+	Layout::Window::make_transparent($TrayIcon) if $CairoOK;
 	$eventbox->signal_connect(scroll_event => \&::ChangeVol);
 	$eventbox->signal_connect(button_press_event => sub
 		{	my $b=$_[1]->button;
