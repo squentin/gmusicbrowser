@@ -1601,6 +1601,7 @@ sub new
 	{	my $n=$self->AppendPage($pid,$opt->{'page_'.$pid});
 		if ($opt->{page} && $opt->{page} eq $pid) { $setpage=$n }
 	}
+	$self->AppendPage('album') if $notebook->get_n_pages == 0;	# fallback in case no pages has been added
 
 	$self->pack_end($hbox, FALSE, FALSE, 0);
 	$notebook->show_all; #needed to set page in this sub
