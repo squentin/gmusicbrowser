@@ -1,3 +1,33 @@
+gmusicbrowser (1.1.5ppa4) karmic; urgency=low
+
+  * modified/updated default layout (now: shimmer)
+    new default traytip layout (shimmer_tray)
+    updated icon theme (elementary)
+    merge with git upstream (commit a8ba4a0098c5d96a98ea)
+
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Mon, 03 May 2010 15:10:30 +0200
+
+gmusicbrowser (1.1.5ppa3) karmic; urgency=low
+
+  * new default icon theme (elementary)
+    new default layout (default)
+    modified gmusicbrowser_list.pm (show artist/album count in "show info")
+    http_simple with wget (more responsive)
+
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Thu, 29 Apr 2010 12:10:00 +0200
+
+gmusicbrowser (1.1.5ppa2) karmic; urgency=low
+
+  * setting the default layout
+
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Thu, 29 Apr 2010 12:10:00 +0200
+
+gmusicbrowser (1.1.5ppa1) karmic; urgency=low
+  
+  * new version
+  
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Thu, 29 Apr 2010 11:10:00 +0200
+
 gmusicbrowser (1.1.5) karmic; urgency=low
 
   * new version
