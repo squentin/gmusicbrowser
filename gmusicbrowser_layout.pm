@@ -359,6 +359,7 @@ our %Widgets=
 		oldopt1 => 'maxsize',
 		schange	=> sub { my $key=(defined $_[1])? Songs::Get_gid($_[1],'album') : undef ; $_[0]->set($key); },
 		click1	=> \&PopupSongsFromAlbum,
+		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupAAContextMenu({self =>$_[0], field=>'album', ID=>$ID, gid=>Songs::Get_gid($ID,'album'), mode => 'P'}) if defined $ID; },
 		event	=> 'Picture_album',
 		update	=> \&Layout::AAPicture::Changed,
 		noinit	=> 1,
