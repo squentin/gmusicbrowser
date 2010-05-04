@@ -411,7 +411,9 @@ our @SongCMenu=
 	{ label => _"Open containing folder",	code => sub { openfolder( Songs::Get( $_[0]{IDs}[0], 'path') ); },	onlyone => 'IDs' },
 );
 our @cMenuAA=
-(	{ label => _"Lock",	code => sub { ToggleLock($_[0]{field}); }, check => sub { $::TogLock && $::TogLock eq $_[0]{field}}, mode => 'P' },
+(	{ label => _"Lock",	code => sub { ToggleLock($_[0]{lockfield}); }, check => sub { $::TogLock && $::TogLock eq $_[0]{lockfield}}, mode => 'P',
+	  test	=> sub { $_[0]{field} eq $_[0]{lockfield} || $_[0]{gid} == Songs::Get_gid($::SongID,$_[0]{lockfield}); },
+	},
 	{ label => _"Lookup in AMG",	code => sub { AMGLookup( $_[0]{mainfield}, $_[0]{aaname} ); },
 	  test => sub { $_[0]{mainfield} =~m/^album$|^artist$|^title$/; },
 	},
@@ -4288,6 +4290,7 @@ sub MakeFlagToggleMenu	#FIXME special case for no @keys, maybe a menu with a gre
 sub PopupAAContextMenu
 {	my $args=$_[0];
 	$args->{mainfield}= Songs::MainField($args->{field});
+	$args->{lockfield}= $args->{field} eq 'artists' ? 'first_artist' : $args->{field};
 	$args->{aaname}= Songs::Gid_to_Get($args->{field},$args->{gid});
 	defined wantarray ? BuildMenu(\@cMenuAA, $args) : PopupContextMenu(\@cMenuAA, $args);
 }
