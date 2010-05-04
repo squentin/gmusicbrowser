@@ -10,17 +10,17 @@ VBmain		= HBTop _HBMain HBStatusbar
 HBMain		= VBArtist _HPRight
 HBTop		= VBButtons _15VBPlayer 15VBToggle -5VBSearchBox
 ### top bar from left to right ###
-HBButtons	= Prev(size=button) Play(size=button) Next(size=button)
+HBButtons	= Prev Play Next
 VBButtons	= HBButtons Filler4
 VBPlayer	= HBTitle HBScale
-HBTitle		= Title(minsize=0,markup="<big><b>%t</b></big>",click1="") AlbumBreadcrumb(tip="Album: %l (%Y)") ArtistBreadcrumb(minsize=0,maxwidth=200,tip="Artist: %a") -LabelTime(markup="%s / $length", initsize="XX:XX / -XX:XX")
+HBTitle		= Title(minsize=0,markup="<big><b>%t</b></big>",click1="") AlbumBreadcrumb(tip="Album: %l (%Y)") ArtistBreadcrumb(tip="Artist: %a") -LabelTime(markup="%s / $length", initsize="XX:XX / -XX:XX")
 HBScale		= _Scale
 HBToggle	= TogButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1) TogButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1) TogButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1)
 VBToggle	= HBToggle _Filler1
 VBSearchBox	= 2SimpleSearch _Filler2
 ### main left: artist pane and album-cover ###
 VBArtist	= _FPane0(nb=1,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1) HBCover
-HBCover		= Cover(overlay=6x6:350x350:/usr/share/gmusicbrowser/pix/elementary/overlay.png,default=/usr/share/gmusicbrowser/pix/elementary/no-cover.svg,showcover=0)
+HBCover		= Cover(overlay=6x6:350x350:pix/elementary/overlay.png,default=pix/elementary/no-cover.svg,showcover=0)
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
 HBSongListtree	= _SongTree(cols="playandqueue track title artist length playcount lastplay",colwidth="artist 124 lastplay 107 length 40 playandqueue 19 playcount 18 ratingpic 100 title 280 titleaa 397 track 21",grouping="album|artistalbum_left(picsize=100)|disc|discright(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
@@ -93,7 +93,7 @@ VolumeScroll	= HBmain
 Type=T
 VBMain		= HBTime Filler0 VBMain1
 VBMain1		= HBLeft _HBRight
-HBLeft		= _Cover(forceratio=1,default=/usr/share/gmusicbrowser/pix/elementary/no-cover.svg) VBText
+HBLeft		= _Cover(forceratio=1,default=pix/elementary/no-cover.svg) VBText
 VBText		= 2HBAlbum HBYear _2HBTitle
 HBButtons	= Prev(size=small-toolbar) Play(size=small-toolbar) Next(size=small-toolbar)
 HBTitle		= LockSong _Title(font=16,interval=75)
