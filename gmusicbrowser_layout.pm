@@ -7,6 +7,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 package Layout;
 use Gtk2;
@@ -238,6 +239,7 @@ our %Widgets=
 	{	class	=> 'Layout::Label',
 		group	=> 'Play',
 		minsize	=> 20,
+		options => 'showcover',
 		markup	=> '<b><big>%S</big></b>%V',
 		markup_empty => '<b><big>&lt;'._("Playlist Empty").'&gt;</big></b>',
 		click1	=> \&PopupSongsFromAlbum,
@@ -261,6 +263,13 @@ our %Widgets=
 		dragsrc => [::DRAG_ARTIST,\&DragCurrentArtist],
 		cursor	=> 'hand2',
 	},
+	ArtistBreadcrumb =>
+	{	class	=> 'Layout::Label',
+		parent	=> 'Artist',
+		minsize	=> 0,
+		markup	=> '  <big><b>«</b></big>  %a',
+		click1	=> sub { my $ID=::GetSelID($_[0]); ::PopupAA( 'album', from=> Songs::Get_gid($ID,'artists')) if defined $ID; },
+	},
 	Album =>
 	{	class	=> 'Layout::Label',
 		group	=> 'Play',
@@ -270,6 +279,14 @@ our %Widgets=
 		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupAAContextMenu({self =>$_[0], field=>'album', ID=>$ID, gid=>Songs::Get_gid($ID,'album'), mode => 'P'}) if defined $ID; },
 		dragsrc => [::DRAG_ALBUM,\&DragCurrentAlbum],
 		cursor	=> 'hand2',
+	},
+	AlbumBreadcrumb =>
+	{	class	=> 'Layout::Label',
+		parent	=> 'Album',
+		minsize	=> 0,
+		markup	=> '  <big><b>«</b></big>  %l',
+		showcover => 0,
+		click1	=> \&PopupSongsFromAlbum,
 	},
 	Date =>
 	{	class	=> 'Layout::Label',
@@ -357,6 +374,7 @@ our %Widgets=
 		group	=> 'Play',
 		aa	=> 'album',
 		oldopt1 => 'maxsize',
+		options => 'showcover',
 		schange	=> sub { my $key=(defined $_[1])? Songs::Get_gid($_[1],'album') : undef ; $_[0]->set($key); },
 		click1	=> \&PopupSongsFromAlbum,
 		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupAAContextMenu({self =>$_[0], field=>'album', ID=>$ID, gid=>Songs::Get_gid($ID,'album'), mode => 'P'}) if defined $ID; },
