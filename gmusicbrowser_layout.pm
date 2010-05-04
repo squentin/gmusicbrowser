@@ -259,7 +259,7 @@ our %Widgets=
 		minsize	=> 20,
 		markup	=> '<b>%a</b>',
 		click1	=> sub { ::PopupAA('artists'); },
-		click3	=> sub { my $ID=::GetSelID($_[0]); ::ArtistContextMenu( Songs::Get_gid($ID,'first_artist'),{self =>$_[0], ID=>$ID, mode => 'P'}) if defined $ID; },
+		click3	=> sub { my $ID=::GetSelID($_[0]); ::ArtistContextMenu( Songs::Get_gid($ID,'artists'),{self =>$_[0], ID=>$ID, mode => 'P'}) if defined $ID; },
 		dragsrc => [::DRAG_ARTIST,\&DragCurrentArtist],
 		cursor	=> 'hand2',
 	},
