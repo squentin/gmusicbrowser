@@ -851,7 +851,13 @@ sub CreateWidgets
 		my $group=$opt1->{group};
 		$opt1->{group}= $defaultgroup.(length $group ? "-$group" : '') unless $group=~m/^[A-Z]/;
 		my $box=$widgets->{$key}= $type->{New}( $opt1 );
-		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle/;
+		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle maxwidth maxheight/;
+		if ($opt1->{minwidth} or $opt1->{minheight})
+		{	my ($minwidth,$minheight)=$box->get_size_request;
+			$minwidth=  $opt1->{minwidth}  || $minwidth;
+			$minheight= $opt1->{minheight} || $minheight;
+			$box->set_size_request($minwidth,$minheight);
+		}
 		$box->{name}=$fullname;
 		$box->set_border_width($opt1->{border}) if $opt1 && exists $opt1->{border} && $box->isa('Gtk2::Container');
 		$box->set_name($key);
