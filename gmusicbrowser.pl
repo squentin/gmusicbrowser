@@ -1348,12 +1348,17 @@ sub GetActiveWindow
 	return undef;
 }
 
-sub SearchFile	# search for file with a relative path among a few folders, used to find pictures used by layouts
-{	my ($file,$layoutpaths,@paths)=@_;
+sub SearchPicture	# search for file with a relative path among a few folders, used to find pictures used by layouts
+{	my ($file,@paths)=@_;
 	return $file if file_name_is_absolute($file);
-	@paths=map ref() ? @$_ : $_, @paths;
-	my $found=first { -f $_.SLASH.$file } @paths;
-	return $found.SLASH.$file if $found;
+	push @paths, $HomeDir.'layouts', $CmdLine{searchpath}, PIXPATH, $DATADIR.SLASH.'layouts';	#add some default folders
+	@paths= grep defined, map ref() ? @$_ : $_, @paths;
+	-f && s/[^$QSLASH]*$//o for @paths;			#replace files by their folder
+	if (my $found=first { -f $_.SLASH.$file } @paths)
+	{	$found.= SLASH.$file;
+		$found=~s#$QSLASH+\.?$QSLASH+#SLASH#goe;	#cleanup path
+		return $found;
+	}
 	warn "Can't find file '$file' (looked in : @paths)\n";
 	return undef;
 }
