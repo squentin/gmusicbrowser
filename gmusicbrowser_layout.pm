@@ -268,7 +268,7 @@ our %Widgets=
 		parent	=> 'Artist',
 		minsize	=> 0,
 		markup	=> '  <big><b>«</b></big>  %a',
-		click1	=> sub { my $ID=::GetSelID($_[0]); ::PopupAA( 'album', from=> Songs::Get_gid($ID,'artists')) if defined $ID; },
+		click1	=> sub { my $ID=::GetSelID($_[0]); ::PopupAA( 'album', format=> ::__x( _"<big><b>{album}</b></big>\n{year}  /  {songs}", album => "%a", year => "%y", songs => "%s"), from=> Songs::Get_gid($ID,'artists')) if defined $ID; },
 	},
 	Album =>
 	{	class	=> 'Layout::Label',
