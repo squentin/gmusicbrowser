@@ -3137,7 +3137,7 @@ sub new
 	if (my $o=$opt->{overlay})
 	{{	my ($x,$y,$xy_or_wh,$w,$h,$file)= $o=~m/^(\d+)x(\d+)([-:])(\d+)x(\d+):(.+)/;
 		unless (defined $file) { warn "Invalid picture-overlay string : '$o' (format: XxY:WIDTHxHEIGHT:FILE)\n"; last }
-		$file= ::SearchFile( $file, $opt->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts' );
+		$file= ::SearchPicture( $file, $opt->{PATH} );
 		last unless $file;
 		my $pb= GMB::Picture::pixbuf($file);
 		last unless $pb;
@@ -3158,7 +3158,7 @@ sub new
 		$self->{expand_weight}=10;
 	}
 	if (my $file=$opt->{'defaultfile'})
-	{	$self->{'default'}= ::SearchFile( $file, $opt->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts' );
+	{	$self->{'default'}= ::SearchPicture( $file, $opt->{PATH} );
 	}
 	$self->signal_connect(size_allocate => \&size_allocate_cb);
 	$self->signal_connect(expose_event => \&expose_cb);
@@ -3929,7 +3929,7 @@ sub _load_skinfile
 		if ($file)
 		{	my $path= $options->{SkinPath};
 			$file= $path.::SLASH.$file if defined $path;
-			$file= ::SearchFile($file, $options->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts');
+			$file= ::SearchPicture($file, $options->{PATH});
 			$pb= GMB::Picture::pixbuf($file);
 		}
 	}
