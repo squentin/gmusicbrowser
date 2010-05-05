@@ -3110,7 +3110,7 @@ sub new
 	$self->set_visible_window(0);
 	$self->{aa}=$opt->{aa};
 	my $minsize=$opt->{minsize};
-	$self->{$_}=$opt->{$_} for qw/maxsize xalign yalign multiple default/;
+	$self->{$_}=$opt->{$_} for qw/maxsize xalign yalign multiple/;
 
 	$self->{usable_w}=$self->{usable_h}=1;
 	my $ratio=1;
@@ -3144,7 +3144,7 @@ sub new
 	{	$self->{expand_to_ratio}=$ratio;
 		$self->{expand_weight}=10;
 	}
-	if (my $file=$opt->{'defaultfile'})
+	if (my $file=$opt->{'default'})
 	{	$self->{'default'}= ::SearchPicture( $file, $opt->{PATH} );
 	}
 	$self->signal_connect(size_allocate => \&size_allocate_cb);
