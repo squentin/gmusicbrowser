@@ -103,7 +103,7 @@ sub find_tracks {
 
     for my $song_id (@{$all_songs}) {
 
-	my ($length, $title, $artist, $album, $rating, $genre) = ::Songs::Get($song_id, 'length', 'title', 'artist', 'album', 'rating', 'genre');
+	my ($length, $title, $artist, $album, $rating, $genre, $track) = ::Songs::Get($song_id, 'length', 'title', 'artist', 'album', 'rating', 'genre', 'track');
 
 	my ($path, $filename) = ::Songs::Get($song_id, qw/path file/);
 
@@ -118,14 +118,12 @@ sub find_tracks {
 	$dummy->dmap_persistentid( "GMB" . $song_id); # blah, this should be some 64 bit thing I guess?
 	$dummy->daap_songbeatsperminute( 0 );
 
-	# All mp3 files have 'info'. If it doesn't, give up, we can't read it.
 	$dummy->daap_songbitrate( 222 );
 	$dummy->daap_songsamplerate( 44100 );
 	$dummy->daap_songtime($length );
 
 	$dummy->daap_songtime($length * 1000);
 
-	# read the tag if we can, fall back to very simple data otherwise.
 	$dummy->dmap_itemname( $title );
 	$dummy->daap_songalbum( $album );
 	$dummy->daap_songartist( $artist);
@@ -133,7 +131,7 @@ sub find_tracks {
 	$dummy->daap_songyear( 1997 );
 
 	$dummy->daap_songtrackcount( 0 );
-	$dummy->daap_songtracknumber( 1 );
+	$dummy->daap_songtracknumber( $track );
 	$dummy->daap_songcompilation( 0);
 	$dummy->daap_songdisccount(  0);
 	$dummy->daap_songdiscnumber(  0);
