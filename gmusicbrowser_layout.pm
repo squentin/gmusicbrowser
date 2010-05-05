@@ -3157,7 +3157,7 @@ sub new
 	{	$self->{expand_to_ratio}=$ratio;
 		$self->{expand_weight}=10;
 	}
-	if (my $file=$opt->{'defaultfile'})
+	if (my $file=$opt->{'default'})
 	{	$self->{'default'}= ::SearchPicture( $file, $opt->{PATH} );
 	}
 	$self->signal_connect(size_allocate => \&size_allocate_cb);
