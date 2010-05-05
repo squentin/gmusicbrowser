@@ -37,27 +37,35 @@ use HTTP::Status qw/RC_OK/;
 # my $cgi = cgi_from_request($request);
 # my $field = $cgi->param("field");
 
-# sub cgi_from_request {
-#     my ($request) = @_;
+sub cgi_from_request {
+    my ($request) = @_;
     
-#     # I'm not really sure why POE/HTTP isn't
-#     # doing this for me...
-#     # this implementation is rather naiive.
-#     my $q;
-#     if ($request->method() eq 'POST') {
-# 	$q = new CGI($request->content);
-#     }
-#     else {
-# 	$request->uri() =~ /\?(.+$)/;
-# 	if (defined($1)) {
-# 	    $q = new CGI($1);
-# 	}
-# 	else {
-# 	    $q = new CGI;
-# 	}
-#     }
-#     return $q;
-# }
+    # I'm not really sure why POE/HTTP isn't
+    # doing this for me...
+    # this implementation is rather naiive.
+    my $q;
+    if ($request->method() eq 'POST') {
+	$q = new CGI($request->content);
+    }
+    else {
+	$request->uri() =~ /\?(.+$)/;
+	if (defined($1)) {
+	    $q = new CGI($1);
+	}
+	else {
+	    $q = new CGI;
+	}
+    }
+    return $q;
+}
+
+sub player_handler {
+    my ($request, $response) = @_;
+    my $path = $request->uri->path;
+    my $query = $request->uri->query;
+
+    $cgi = cgi_from_request($request);
+}
 
 sub root_handler {
     my ($request, $response) = @_;
@@ -88,6 +96,7 @@ sub Start {
     my $http = POE::Component::Server::HTTP->new(
     	Port           => 8080,
     	ContentHandler => {"/" => \&root_handler,
+			   "/player" => \&player_handler
     	},
     	Headers => {Server => 'Gmusicbrowser HTTP',},
     );
