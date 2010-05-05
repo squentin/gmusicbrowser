@@ -3827,10 +3827,10 @@ sub size_allocate
 		{	my $give= int($w/(1+@tofit));	# space available for each child left
 			$give=0 if $give<0;
 			my $needed= $child->[5]+$child->[3];
-			if ($give < $needed)			# need less than available
+			if ($give >= $needed)			# need less than available
 			{	$give= $needed;			# give it its request
 			}
-			elsif ($give < $child->[3])	# space available more than padding
+			elsif ($give >= $child->[3])	# space available more than padding
 			{	$child->[5]= $give - $child->[3]; # reduce request to fit
 			}
 			else	# not even enough space for padding
