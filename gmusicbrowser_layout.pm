@@ -870,7 +870,13 @@ sub CreateWidgets
 		my $group=$opt1->{group};
 		$opt1->{group}= $defaultgroup.(length $group ? "-$group" : '') unless $group=~m/^[A-Z]/;
 		my $box=$widgets->{$key}= $type->{New}( $opt1 );
-		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle/;
+		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle maxwidth maxheight/;
+		if ($opt1->{minwidth} or $opt1->{minheight})
+		{	my ($minwidth,$minheight)=$box->get_size_request;
+			$minwidth=  $opt1->{minwidth}  || $minwidth;
+			$minheight= $opt1->{minheight} || $minheight;
+			$box->set_size_request($minwidth,$minheight);
+		}
 		$box->{name}=$fullname;
 		$box->set_border_width($opt1->{border}) if $opt1 && exists $opt1->{border} && $box->isa('Gtk2::Container');
 		$box->set_name($key);
@@ -3123,7 +3129,7 @@ sub new
 	$self->set_visible_window(0);
 	$self->{aa}=$opt->{aa};
 	my $minsize=$opt->{minsize};
-	$self->{$_}=$opt->{$_} for qw/maxsize xalign yalign multiple default/;
+	$self->{$_}=$opt->{$_} for qw/maxsize xalign yalign multiple/;
 
 	$self->{usable_w}=$self->{usable_h}=1;
 	my $ratio=1;
@@ -3805,10 +3811,19 @@ sub size_allocate
 		if ($type eq 'end')	{unshift @children,\@attrib} #to keep the same order as a HBox
 		else			{push @children,\@attrib}
 	}
-	$total_xreq+=$#children*$spacing if @children;
+	my $total_spacing=0;
+	if (@children>1)
+	{	$total_spacing= $#children*$spacing;
+		if ($bwidth<$total_spacing) { $total_spacing=$bwidth; $spacing=$total_spacing/$#children }
+		$total_xreq+= $total_spacing;
+	}
 	my $xend=$x+$bwidth;
-	my $wshare; my $wrest; my $only_etr;
-	if ($total_xreq<$bwidth && $ecount)
+	my $wshare;
+	my $homogeneous;
+	if ($self->get_homogeneous && @children)
+	{	$homogeneous=($bwidth-$total_spacing)/@children;
+	}
+	if ($total_xreq<$bwidth && $ecount)	# if enough room for all, and some have expand attribute
 	{	my $w=$bwidth-$total_xreq;
 		for my $emax (sort { $a->[0] <=> $b->[0] } @emax)
 		{	my (undef,$max,$eweight,$attrib)=@$emax;
@@ -3821,23 +3836,42 @@ sub size_allocate
 			{	$count++ if $ref->[1]; #expand
 			}
 			$wshare=$w/$count if $count;
-			$only_etr=1;
 		}
 	}
-	my $homogeneous;
-	if ($self->get_homogeneous)
-	{	$homogeneous=($bwidth-($#children*$spacing))/@children;
+	elsif ($total_xreq>$bwidth && @children && !defined $homogeneous)	#not enough room for requested width
+	{	my $w=$bwidth-$total_spacing;
+		# [5] is request [3] is padding
+		my @tofit= sort { $a->[5]+$a->[3] <=> $b->[5]+$b->[3] } @children; # sort from smallest to largest
+		while (my $child= shift @tofit)
+		{	my $give= int($w/(1+@tofit));	# space available for each child left
+			$give=0 if $give<0;
+			my $needed= $child->[5]+$child->[3];
+			if ($give >= $needed)			# need less than available
+			{	$give= $needed;			# give it its request
+			}
+			elsif ($give >= $child->[3])	# space available more than padding
+			{	$child->[5]= $give - $child->[3]; # reduce request to fit
+			}
+			else	# not even enough space for padding
+			{	$child->[5]=0;			# set request to 0
+				$child->[3]= $give;		# give as much padding as available
+			}
+			$w-= $give;				# remove given space
+		}
 	}
 	for my $ref (@children)
 	{	my ($child,$expand,$fill,$pad,$type,$ww,$maxedout)=@$ref;
 		my $wwf= $ww;
 		if ($maxedout)	{ $wwf+=$maxedout; }
 		elsif ($wshare)	{ $wwf+=$wshare*$expand; }
-		$wwf=$homogeneous-$pad*2 if $homogeneous;
+		if (defined $homogeneous)
+		{	$wwf=$homogeneous-$pad*2;
+			$wwf=0 if $wwf<0;
+			$ww=$wwf if $ww>$wwf;
+		}
 		$ww=$wwf if $fill;
 		my $wx;
 		my $totalw=$pad*2+$wwf+$spacing;
-		#warn "$child : $pad*2+$wwf+$spacing\n";
 		$pad+=($wwf-$ww)/2;
 		if ($type eq 'end')	{ $wx=$xend-$pad-$ww;   $xend-=$totalw; }
 		else			{ $wx=$x+$pad;		   $x+=$totalw; }
