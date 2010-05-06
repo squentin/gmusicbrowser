@@ -3791,7 +3791,7 @@ sub size_allocate
 	my $border=$self->get_border_width;
 	$x+=$border;  $bwidth-=$border*2;
 	$y+=$border; $bheight-=$border*2;
-	my $total_xreq=0; my @emax; my $ecount=0;
+	my $total_xreq=0; my $ecount=0;
 	my $spacing=$self->get_spacing;
 	my @children;
 	for my $child ($self->get_children)
@@ -3805,11 +3805,16 @@ sub size_allocate
 		my @attrib;
 		if (my $r=$child->{expand_to_ratio})	{$max=$r*$bheight}
 		else					{$max=$child->{$max_key}}
-		if	($max)		{ $max-=$xreq; if ($max>0) {push @emax,[$max*$eweight,$max,$eweight,\@attrib]; $ecount+=$eweight;$expand=$eweight;} else {$expand=0} }
-		elsif	($expand)	{$ecount+=$eweight;$expand=$eweight;}
-		@attrib=($child,$expand,$fill,$pad,$type,$xreq);
-		if ($type eq 'end')	{unshift @children,\@attrib} #to keep the same order as a HBox
-		else			{push @children,\@attrib}
+		if	($max)
+		{	$max-=$xreq;
+			if ($max>0)	{ $expand=$eweight; }
+			else		{ $expand=$max=0; }
+		}
+		if	($expand)	{ $ecount+=$eweight; $expand=$eweight; }
+		my $end= $type eq 'end';
+		@attrib= ($child,$expand,$fill,$pad,$end,$xreq,$max);
+		if ($end)	{unshift @children,\@attrib} #to keep the same order as a HBox
+		else		{push @children,\@attrib}
 	}
 	my $total_spacing=0;
 	if (@children>1)
@@ -3818,63 +3823,75 @@ sub size_allocate
 		$total_xreq+= $total_spacing;
 	}
 	my $xend=$x+$bwidth;
-	my $wshare;
 	my $homogeneous;
 	if ($self->get_homogeneous && @children)
 	{	$homogeneous=($bwidth-$total_spacing)/@children;
 	}
-	if ($total_xreq<$bwidth && $ecount)	# if enough room for all, and some have expand attribute
+	elsif ($total_xreq<$bwidth && $ecount)	# if enough room for all, and some have expand attribute
 	{	my $w=$bwidth-$total_xreq;
-		for my $emax (sort { $a->[0] <=> $b->[0] } @emax)
-		{	my (undef,$max,$eweight,$attrib)=@$emax;
-			if ($max < $w/$ecount*$eweight) {$w-=$max; push @$attrib,$max; $ecount-=$eweight;}
-		}
-		if ($ecount) {$wshare=$w/$ecount}
-		elsif ($w) #all expands were expand_to_ratio and satisfied and space left -> share between those which are packed with expand
-		{	my $count;
-			for my $ref (@children)
-			{	$count++ if $ref->[1]; #expand
+		my $i=0;
+		while ($w>0 && $ecount)
+		{	my $part= $w/$ecount;
+			$ecount=0;
+			my $leftover=0;
+			# [1] is expand, [6] is max, [7] is extra space given
+			for my $child (grep $_->[1], @children)	#children that want to expand
+			{	my $max=    $child->[6];
+				my $expand= $child->[1];
+				my $wpart0= $part*$expand+$leftover;
+				my $wpart= int($wpart0);
+				$leftover= $wpart0 - $wpart;
+				if ($max && $wpart>=$max)	# enough to fill its max
+				{	$child->[7]+= $max;	# give it its max
+					$w-= $max;
+					$child->[1]=0;		# no longer want to expand
+				}
+				else				# give it its part
+				{	$child->[7]+= $wpart;
+					$child->[6]-= $wpart if $max;
+					$w-= $wpart;
+					$ecount+=$expand;	#still want to expand
+				}
 			}
-			$wshare=$w/$count if $count;
 		}
 	}
-	elsif ($total_xreq>$bwidth && @children && !defined $homogeneous)	#not enough room for requested width
+	elsif ($total_xreq>$bwidth && @children)	#not enough room for requested width
 	{	my $w=$bwidth-$total_spacing;
 		# [5] is request [3] is padding
 		my @tofit= sort { $a->[5]+$a->[3] <=> $b->[5]+$b->[3] } @children; # sort from smallest to largest
 		while (my $child= shift @tofit)
 		{	my $give= int($w/(1+@tofit));	# space available for each child left
 			$give=0 if $give<0;
-			my $needed= $child->[5]+$child->[3];
+			my $padding=$child->[3]*2;
+			my $needed= $child->[5]+$padding;
 			if ($give >= $needed)			# need less than available
 			{	$give= $needed;			# give it its request
 			}
-			elsif ($give >= $child->[3])	# space available more than padding
-			{	$child->[5]= $give - $child->[3]; # reduce request to fit
+			elsif ($give >= $padding)	# space available more than padding
+			{	$child->[5]= $give - $padding; # reduce request to fit
 			}
 			else	# not even enough space for padding
 			{	$child->[5]=0;			# set request to 0
-				$child->[3]= $give;		# give as much padding as available
+				$child->[3]= $give/2;		# give as much padding as available
 			}
 			$w-= $give;				# remove given space
 		}
 	}
 	for my $ref (@children)
-	{	my ($child,$expand,$fill,$pad,$type,$ww,$maxedout)=@$ref;
+	{	my ($child,undef,$fill,$pad,$end,$ww,undef,$extra)=@$ref;
 		my $wwf= $ww;
-		if ($maxedout)	{ $wwf+=$maxedout; }
-		elsif ($wshare)	{ $wwf+=$wshare*$expand; }
+		$wwf+=$extra if $extra;	# space given by expand
 		if (defined $homogeneous)
 		{	$wwf=$homogeneous-$pad*2;
-			$wwf=0 if $wwf<0;
+			$wwf=0   if $wwf<0;
 			$ww=$wwf if $ww>$wwf;
 		}
 		$ww=$wwf if $fill;
 		my $wx;
 		my $totalw=$pad*2+$wwf+$spacing;
 		$pad+=($wwf-$ww)/2;
-		if ($type eq 'end')	{ $wx=$xend-$pad-$ww;   $xend-=$totalw; }
-		else			{ $wx=$x+$pad;		   $x+=$totalw; }
+		if ($end)	{ $wx=$xend-$pad-$ww;   $xend-=$totalw; }
+		else		{ $wx=$x+$pad;		   $x+=$totalw; }
 		my $wa= $vertical ?
 			Gtk2::Gdk::Rectangle->new($y, $wx, $bheight, $ww):
 			Gtk2::Gdk::Rectangle->new($wx, $y, $ww, $bheight);
