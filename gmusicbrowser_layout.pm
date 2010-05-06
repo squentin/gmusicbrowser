@@ -2766,7 +2766,7 @@ sub new
 			$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 			($minsize)=$lay->get_pixel_size;
 		}
-		$self->{maxwidth}=1 if $opt->{expand_max};
+		$self->{expand_max}=1 if $opt->{expand_max};
 		$self->set_size_request($minsize,-1);
 		$label->signal_connect(expose_event => \&expose_cb);
 		if ($self->{autoscroll})
@@ -2828,7 +2828,7 @@ sub checksize	#extend the requested size so that the string fit in initsize mode
 		$h=0 if $h0>$h;
 		$label->set_size_request($w||$w0,$h||$h0) if $w || $h;
 	}
-	elsif ($self->{maxwidth})
+	elsif ($self->{expand_max})
 	{	$self->{maxwidth}= ($self->child->get_layout->get_pixel_size)[0]||1;
 	}
 	$self->restart_scrollcheck if $self->{autoscroll};
