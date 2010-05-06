@@ -2160,7 +2160,7 @@ sub Played
 	$PlayedPartial=$PlayTime-$StartedAt < $Options{PlayedPercent} * Songs::Get($ID,'length');
 	HasChanged('Played',$ID, !$PlayedPartial, $StartTime, $StartedAt, $PlayTime);
 
-	if ($PlayedPartial) #FIXME maybe only count as a skip if played less than ~20% ?
+	if ($PlayedPartial)
 	{	my $nb= 1+Songs::Get($ID,'skipcount');
 		Songs::Set($ID, skipcount=> $nb, lastskip=> $StartTime);
 		HasChanged("Skipped");
