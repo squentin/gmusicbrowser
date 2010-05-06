@@ -411,7 +411,9 @@ our @SongCMenu=
 	{ label => _"Open containing folder",	code => sub { openfolder( Songs::Get( $_[0]{IDs}[0], 'path') ); },	onlyone => 'IDs' },
 );
 our @cMenuAA=
-(	{ label => _"Lock",	code => sub { ToggleLock($_[0]{field}); }, check => sub { $::TogLock && $::TogLock eq $_[0]{field}}, mode => 'P' },
+(	{ label => _"Lock",	code => sub { ToggleLock($_[0]{lockfield}); }, check => sub { $::TogLock && $::TogLock eq $_[0]{lockfield}}, mode => 'P',
+	  test	=> sub { $_[0]{field} eq $_[0]{lockfield} || $_[0]{gid} == Songs::Get_gid($::SongID,$_[0]{lockfield}); },
+	},
 	{ label => _"Lookup in AMG",	code => sub { AMGLookup( $_[0]{mainfield}, $_[0]{aaname} ); },
 	  test => sub { $_[0]{mainfield} =~m/^album$|^artist$|^title$/; },
 	},
@@ -899,7 +901,7 @@ sub LoadIcons
 	$NBVolIcons=0;
 	$NBVolIcons++ while $icons{'gmb-vol'.$NBVolIcons};
 	$NBQueueIcons=0;
-	$NBQueueIcons++ while $icons{'gmb-queue'.$NBQueueIcons};
+	$NBQueueIcons++ while $icons{'gmb-queue'.($NBQueueIcons+1)};
 
 	$icon_factory->remove_default if $icon_factory;
 	$icon_factory=Gtk2::IconFactory->new;
@@ -1346,12 +1348,17 @@ sub GetActiveWindow
 	return undef;
 }
 
-sub SearchFile	# search for file with a relative path among a few folders, used to find pictures used by layouts
-{	my ($file,$layoutpaths,@paths)=@_;
+sub SearchPicture	# search for file with a relative path among a few folders, used to find pictures used by layouts
+{	my ($file,@paths)=@_;
 	return $file if file_name_is_absolute($file);
-	@paths=map ref() ? @$_ : $_, @paths;
-	my $found=first { -f $_.SLASH.$file } @paths;
-	return $found.SLASH.$file if $found;
+	push @paths, $HomeDir.'layouts', $CmdLine{searchpath}, PIXPATH, $DATADIR.SLASH.'layouts';	#add some default folders
+	@paths= grep defined, map ref() ? @$_ : $_, @paths;
+	-f && s/[^$QSLASH]*$//o for @paths;			#replace files by their folder
+	if (my $found=first { -f $_.SLASH.$file } @paths)
+	{	$found.= SLASH.$file;
+		$found=~s#$QSLASH+\.?$QSLASH+#SLASH#goe;	#cleanup path
+		return $found;
+	}
 	warn "Can't find file '$file' (looked in : @paths)\n";
 	return undef;
 }
@@ -2140,7 +2147,6 @@ sub ResetTime
 
 sub Played
 {	return unless defined $PlayingID;
-	HasChanged('Played');
 	my $ID=$PlayingID;
 
 	warn "Played : $ID $StartTime $StartedAt $PlayTime\n" if $debug;
@@ -2152,6 +2158,8 @@ sub Played
 
 	return unless defined $PlayTime;
 	$PlayedPartial=$PlayTime-$StartedAt < $Options{PlayedPercent} * Songs::Get($ID,'length');
+	HasChanged('Played',$ID, !$PlayedPartial, $StartTime, $StartedAt, $PlayTime);
+
 	if ($PlayedPartial) #FIXME maybe only count as a skip if played less than ~20% ?
 	{	my $nb= 1+Songs::Get($ID,'skipcount');
 		Songs::Set($ID, skipcount=> $nb, lastskip=> $StartTime);
@@ -2180,10 +2188,10 @@ sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, 
 	 @$Queue && $Queue->IsIn($ID) ?
 	 do{	my $n;
 		if ($NBQueueIcons)
-		{	my $max= $#$Queue; $max=$NBQueueIcons if $NBQueueIcons < $max;
-			$n= first { $Queue->[$_]==$ID } 0..$max;
+		{	my $max= @$Queue; $max=$NBQueueIcons if $NBQueueIcons < $max;
+			$n= first { $Queue->[$_]==$ID } 0..$max-1;
 		}
-		$n ? "gmb-queue$n" : 'gmb-queue';
+		defined $n ? "gmb-queue".($n+1) : 'gmb-queue';
 	 } : undef;
 }
 
@@ -4332,6 +4340,7 @@ sub MakeFlagToggleMenu	#FIXME special case for no @keys, maybe a menu with a gre
 sub PopupAAContextMenu
 {	my $args=$_[0];
 	$args->{mainfield}= Songs::MainField($args->{field});
+	$args->{lockfield}= $args->{field} eq 'artists' ? 'first_artist' : $args->{field};
 	$args->{aaname}= Songs::Gid_to_Get($args->{field},$args->{gid});
 	defined wantarray ? BuildMenu(\@cMenuAA, $args) : PopupContextMenu(\@cMenuAA, $args);
 }
@@ -6157,11 +6166,15 @@ sub Watch
 {	my ($object,$key,$sub)=@_;
 	unless ($object) { push @{$EventWatchers{$key}},$sub; return } #for permanent watch
 	warn "watch $key $object\n" if $debug;
-	if ($object->{'WatchUpdate_'.$key})
-	{	warn "Warning : Object $object is already watching event $key => previous watch replaced\n";
+	if (my $existing=$object->{'WatchUpdate_'.$key})	# object is watching the event with multiple callbacks
+	{	$existing= [$existing] if ref $existing ne 'ARRAY';
+		push @$existing, $sub;
+		$object->{'WatchUpdate_'.$key}=$existing;
 	}
-	else { push @{$EventWatchers{$key}},$object; weaken($EventWatchers{$key}[-1]); }
-	$object->{'WatchUpdate_'.$key}=$sub;
+	else
+	{	push @{$EventWatchers{$key}},$object; weaken($EventWatchers{$key}[-1]);
+		$object->{'WatchUpdate_'.$key}=$sub;
+	}
 	$object->{Watcher_DESTROY}||=$object->signal_connect(destroy => \&UnWatch_all) unless ref $object eq 'HASH' || !$object->isa('Gtk2::Object');
 }
 sub UnWatch
@@ -6188,7 +6201,11 @@ sub HasChanged
 	warn "HasChanged $key -> updating @list\n" if $debug;
 	for my $r ( @list )
 	{	my ($sub,$o)= ref $r eq 'CODE' ? ($r) : ($r->{'WatchUpdate_'.$key},$r);
-		$sub->($o,@args) if $sub;
+		next unless $sub;
+		if (ref $sub eq 'ARRAY')
+		{	$_->($o,@args) for @$sub;
+		}
+		else { $sub->($o,@args) }
 	};
 }
 
@@ -6385,6 +6402,7 @@ sub CreateTrayIcon
 
 	$eventbox->add($img);
 	$TrayIcon->add($eventbox);
+	Layout::Window::make_transparent($TrayIcon) if $CairoOK;
 	$eventbox->signal_connect(scroll_event => \&::ChangeVol);
 	$eventbox->signal_connect(button_press_event => sub
 		{	my $b=$_[1]->button;
@@ -6965,10 +6983,8 @@ sub new
 	$self->{treeview1}=	my $treeview1=Gtk2::TreeView->new($store1);
 	$self->{treeview2}=	my $treeview2=Gtk2::TreeView->new($store2);
 	$treeview2->set_reorderable(TRUE);
-	$treeview2->append_column
-		( Gtk2::TreeViewColumn->new_with_attributes
-		  ('Order',Gtk2::CellRendererPixbuf->new,'stock-id',2)
-		);
+	my $order_column= Gtk2::TreeViewColumn->new_with_attributes( 'Order',Gtk2::CellRendererPixbuf->new,'stock-id',2 );
+	$treeview2->append_column($order_column);
 	my $butadd=	::NewIconButton('gtk-add',	_"Add",		sub {$self->Add_selected});
 	my $butrm=	::NewIconButton('gtk-remove',	_"Remove",	sub {$self->Del_selected});
 	my $butclear=	::NewIconButton('gtk-clear',	_"Clear",	sub { $self->Set(''); });
@@ -7023,13 +7039,20 @@ sub new
 		 {	my ($treeview2, $x, $y, $keyb, $tooltip)=@_;
 			return 0 if $keyb;
 			my ($path, $column)=$treeview2->get_path_at_pos($x,$y);
-			return 0 unless $path && $column && $column==$case_column;
+			return 0 unless $path && $column;
 			my $store2=$treeview2->get_model;
 			my $iter=$store2->get_iter($path);
 			return 0 unless $iter;
-			my $i=$store2->get_value($iter,3);
-			return 0 unless $i;
-			my $tip= $i==SENSITIVE ? _"Case sensitive" : _"Case insensitive";
+			my $tip;
+			if ($column==$case_column)
+			{	my $i=$store2->get_value($iter,3);
+				$tip= !$i ? undef : $i==SENSITIVE ? _"Case sensitive" : _"Case insensitive";
+			}
+			elsif ($column==$order_column)
+			{	my $o=$store2->get_value($iter,2);
+				$tip= $o eq 'gtk-sort-ascending' ? _"Ascending order" : _"Descending order";
+			}
+			return 0 unless defined $tip;
 			$tooltip->set_text($tip);
 			1;
 		 });

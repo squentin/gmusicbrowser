@@ -1601,6 +1601,7 @@ sub new
 	{	my $n=$self->AppendPage($pid,$opt->{'page_'.$pid});
 		if ($opt->{page} && $opt->{page} eq $pid) { $setpage=$n }
 	}
+	$self->AppendPage('album') if $notebook->get_n_pages == 0;	# fallback in case no pages has been added
 
 	$self->pack_end($hbox, FALSE, FALSE, 0);
 	$notebook->show_all; #needed to set page in this sub
@@ -6709,6 +6710,7 @@ sub icon_draw
 	my $i=0; my $y0=$y;
 	for my $icon (ref $icon ? @$icon : $icon)
 	{	my $pixbuf=$arg->{widget}->render_icon($icon,$size);
+		next unless $pixbuf;
 		$arg->{window}->draw_pixbuf($gc, $pixbuf,0,0, $x,$y, -1,-1,'none',0,0);
 		$i++;
 		if ($i>=$nbh) {$y=$y0; $x+=$w1; $i=0;} else {$y+=$h1}

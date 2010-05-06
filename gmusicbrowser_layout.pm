@@ -291,15 +291,16 @@ our %Widgets=
 #		font	=> 'Monospace',
 	},
 	LabelTime =>
-	{	class	=> 'Layout::Label',
+	{	class	=> 'Layout::Label::Time',
 		group	=> 'Play',
+		markup	=> '%s',
 		xalign	=> 1,
 		saveoptions => 'remaining',
 		initsize=> '-XX:XX',
 #		font	=> 'Monospace',
 		event	=> 'Time',
-		click1	=> sub { $_[0]{remaining}=!$_[0]{remaining}; $_[0]{update}->($_[0]); },
-		update	=> sub { $_[0]->set_label( ::TimeString($_[0]{remaining}) ) unless $_[0]{busy}; },
+		click1	=> sub { $_[0]{remaining}=!$_[0]{remaining}; $_[0]->update_time; },
+		update	=> sub { $_[0]->update_time unless $_[0]{busy}; },
 	},
 	TimeBar =>
 	{	class	=> 'Layout::Bar',
@@ -850,7 +851,13 @@ sub CreateWidgets
 		my $group=$opt1->{group};
 		$opt1->{group}= $defaultgroup.(length $group ? "-$group" : '') unless $group=~m/^[A-Z]/;
 		my $box=$widgets->{$key}= $type->{New}( $opt1 );
-		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle/;
+		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle maxwidth maxheight/;
+		if ($opt1->{minwidth} or $opt1->{minheight})
+		{	my ($minwidth,$minheight)=$box->get_size_request;
+			$minwidth=  $opt1->{minwidth}  || $minwidth;
+			$minheight= $opt1->{minheight} || $minheight;
+			$box->set_size_request($minwidth,$minheight);
+		}
 		$box->{name}=$fullname;
 		$box->set_border_width($opt1->{border}) if $opt1 && exists $opt1->{border} && $box->isa('Gtk2::Container');
 		$box->set_name($key);
@@ -1003,13 +1010,15 @@ sub NewWidget
 	{	$widget->signal_connect(realize => sub { $_[0]->window->set_cursor(Gtk2::Gdk::Cursor->new($_[1])); },$cursor);
 	}
 
-	my %towatch;
 	my $tip= $options{tip};
 	if ( defined $tip)
 	{  if (!ref $tip)
 	   {	my @fields=::UsedFields($tip);
-		$towatch{$_}=undef for @fields;
-		if (@fields) { $widget->{song_tip}=$tip; }
+		if (@fields)
+		{	$widget->{song_tip}=$tip;
+			::WatchSelID($widget,\&UpdateSongTip,\@fields);
+			UpdateSongTip($widget,::GetSelID($widget));
+		}
 		else
 		{	$tip=~s#\\n#\n#g;
 			$widget->set_tooltip_text($tip);
@@ -1018,16 +1027,11 @@ sub NewWidget
 	   else { $widget->{state_tip}=$tip; }
 	}
 	if ($options{hover_layout}) { $widget->{$_}=$options{$_} for qw/hover_layout hover_delay/; Layout::Window::Popup::set_hover($widget); }
-	if (my $f=$ref->{fields})
-	{	$towatch{$_}=undef for split / /,$f;
-	}
-	if ($widget->{markup})
-	{	$towatch{$_}=undef for ::UsedFields($widget->{markup});
-	}
-	if ($ref->{schange} || (keys %towatch))
-	{	$widget->{schange}=$ref->{schange} if $ref->{schange};
-		::WatchSelID($widget,\&UpdateSongID,\%towatch);
-		UpdateSongID($widget,::GetSelID($widget));
+	if (my $schange=$ref->{schange})
+	{	my $fields= $ref->{fields};
+		$fields= $fields ? [ split / /,$fields ] : undef;
+		::WatchSelID($widget,$schange, $fields);
+		$schange->($widget,::GetSelID($widget));
 	}
 	if ($ref->{event})
 	{	my $sub=$ref->{update} || \&UpdateObject;
@@ -1035,7 +1039,8 @@ sub NewWidget
 		$sub->($widget) unless $ref->{noinit};
 	}
 	::set_drag($widget,source => $ref->{dragsrc}, dest => $ref->{dragdest});
-	$ref->{EndInit}($widget) if $ref->{EndInit};
+	my $init= delete $widget->{EndInit} || $ref->{EndInit};
+	$init->($widget) if $init;
 	return $widget;
 }
 
@@ -1088,22 +1093,14 @@ sub Button_activate_cb
 	1;
 }
 
-sub UpdateSongID
+sub UpdateSongTip
 {	my ($widget,$ID)=@_;
-	for my $w ($widget)
-	{	$w->{schange}($w,$ID) if $w->{schange};
-		if ($w->{markup})
-		{	my $markup=	defined $ID			? ::ReplaceFieldsAndEsc( $ID,$w->{markup} ) :
-					defined $w->{markup_empty}	? $w->{markup_empty} :
-					'';
-			$w->set_markup($markup);
-		}
-		if ($w->{song_tip})
-		{	my $tip= defined $ID ? ::ReplaceFields($ID,$w->{song_tip}) : '';
-			$w->set_tooltip_text($tip);
-		}
+	if ($widget->{song_tip})
+	{	my $tip= defined $ID ? ::ReplaceFields($ID,$widget->{song_tip}) : '';
+		$widget->set_tooltip_text($tip);
 	}
 }
+
 
 #sub SetSort
 #{	my($self,$sort)=@_;
@@ -2716,7 +2713,7 @@ sub new
 	my $label=Gtk2::Label->new;
 	$label->set_alignment($opt->{xalign},$opt->{yalign});
 
-	for (qw/markup markup_empty update autoscroll interval/)	#$self->{update} is only used by LabelTime
+	for (qw/markup markup_empty autoscroll interval/)
 	{	$self->{$_}=$opt->{$_} if exists $opt->{$_};
 	}
 
@@ -2725,8 +2722,17 @@ sub new
 	if (my $color= $opt->{color} || $opt->{DefaultFontColor})
 	{	$label->modify_fg('normal', Gtk2::Gdk::Color->parse($color) );
 	}
-	$label->set_markup($opt->{markup}) if exists $opt->{markup};
-	$label->set_text($opt->{text}) if exists $opt->{text};
+	if (exists $opt->{markup})
+	{	my $m=$opt->{markup};
+		if (my @fields=::UsedFields($m))
+		{	$self->{markup}=$m;
+			$self->{EndInit}=\&init;	# needs $self->{group} set before this can be done
+		}
+		else { $label->set_markup($m) }
+	}
+	elsif (exists $opt->{text})
+	{	$label->set_text($opt->{text});
+	}
 	$self->add($label);
 #$self->signal_connect(enter_notify_event => sub {$_[0]->set_markup('<u>'.$_[0]->child->get_label.'</u>')});
 #$self->signal_connect(leave_notify_event => sub {my $m=$_[0]->child->get_label; $m=~s#^<u>##;$m=~s#</u>$##; $_[0]->set_markup($m)});
@@ -2741,7 +2747,7 @@ sub new
 			$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 			($minsize)=$lay->get_pixel_size;
 		}
-		$self->{maxwidth}=1 if $opt->{expand_max};
+		$self->{expand_max}=1 if $opt->{expand_max};
 		$self->set_size_request($minsize,-1);
 		$label->signal_connect(expose_event => \&expose_cb);
 		if ($self->{autoscroll})
@@ -2763,6 +2769,22 @@ sub new
 	}
 
 	return $self;
+}
+
+sub init
+{	my $self=shift;
+	::WatchSelID($self,\&update_text);
+	update_text($self,::GetSelID($self));
+}
+
+sub update_text
+{	my ($self,$ID)=@_;
+	if ($self->{markup})
+	{	my $markup=	defined $ID			? ::ReplaceFieldsAndEsc( $ID,$self->{markup} ) :
+				defined $self->{markup_empty}	? $self->{markup_empty} :
+				'';
+		$self->set_markup($markup);
+	}
 }
 
 sub set_label
@@ -2787,7 +2809,7 @@ sub checksize	#extend the requested size so that the string fit in initsize mode
 		$h=0 if $h0>$h;
 		$label->set_size_request($w||$w0,$h||$h0) if $w || $h;
 	}
-	elsif ($self->{maxwidth})
+	elsif ($self->{expand_max})
 	{	$self->{maxwidth}= ($self->child->get_layout->get_pixel_size)[0]||1;
 	}
 	$self->restart_scrollcheck if $self->{autoscroll};
@@ -2843,6 +2865,25 @@ sub Scroll
 	{	$self->{scrolltimeout}=0 if $reached_max;
 	}
 	return $self->{scrolltimeout};
+}
+
+package Layout::Label::Time;
+use base 'Layout::Label';
+
+sub set_markup
+{	my ($self,$markup)=@_;
+	$self->{time_markup}=$markup;
+	$self->update_time;
+}
+sub update_time
+{	my ($self,$time)=@_;
+	my $markup=$self->{time_markup};
+	$time ||= ::TimeString($self->{remaining});
+	if ($markup)
+	{	$markup=~s/%s/$time/;
+	}
+	else { $markup=$time }
+	$self->SUPER::set_markup($markup);
 }
 
 package Layout::Bar;
@@ -2938,13 +2979,13 @@ sub update_preview_Time
 {	my ($self,$value)=@_;
 
 	my $h=::get_layout_widget($self)->{widgets};
-	my @labels= map $h->{$_}, grep m/^LabelTime\d*$/, keys %$h; #get list of LabelTime in the layouts
+	my @labels= grep $_->isa('Layout::Label::Time'), values %$h; #get list of Layout::Label::Time widgets in the layouts
 
 	my $preview= defined $value ? 1 : 0;
 	my $format=( $self->{max} <600 )? '%01d:%02d' : '%02d:%02d';
 	for my $label (@labels)
 	{	$label->{busy}=$preview;
-		$label->set_label( sprintf $format,int($value/60),$value%60 ) if $preview;
+		$label->update_time( sprintf $format,int($value/60),$value%60 ) if $preview;
 	}
 }
 
@@ -3069,7 +3110,7 @@ sub new
 	$self->set_visible_window(0);
 	$self->{aa}=$opt->{aa};
 	my $minsize=$opt->{minsize};
-	$self->{$_}=$opt->{$_} for qw/maxsize xalign yalign multiple default/;
+	$self->{$_}=$opt->{$_} for qw/maxsize xalign yalign multiple/;
 
 	$self->{usable_w}=$self->{usable_h}=1;
 	my $ratio=1;
@@ -3083,7 +3124,7 @@ sub new
 	if (my $o=$opt->{overlay})
 	{{	my ($x,$y,$xy_or_wh,$w,$h,$file)= $o=~m/^(\d+)x(\d+)([-:])(\d+)x(\d+):(.+)/;
 		unless (defined $file) { warn "Invalid picture-overlay string : '$o' (format: XxY:WIDTHxHEIGHT:FILE)\n"; last }
-		$file= ::SearchFile( $file, $opt->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts' );
+		$file= ::SearchPicture( $file, $opt->{PATH} );
 		last unless $file;
 		my $pb= GMB::Picture::pixbuf($file);
 		last unless $pb;
@@ -3103,8 +3144,8 @@ sub new
 	{	$self->{expand_to_ratio}=$ratio;
 		$self->{expand_weight}=10;
 	}
-	if (my $file=$opt->{'defaultfile'})
-	{	$self->{'default'}= ::SearchFile( $file, $opt->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts' );
+	if (my $file=$opt->{'default'})
+	{	$self->{'default'}= ::SearchPicture( $file, $opt->{PATH} );
 	}
 	$self->signal_connect(size_allocate => \&size_allocate_cb);
 	$self->signal_connect(expose_event => \&expose_cb);
@@ -3731,7 +3772,7 @@ sub size_allocate
 	my $border=$self->get_border_width;
 	$x+=$border;  $bwidth-=$border*2;
 	$y+=$border; $bheight-=$border*2;
-	my $total_xreq=0; my @emax; my $ecount=0;
+	my $total_xreq=0; my $ecount=0;
 	my $spacing=$self->get_spacing;
 	my @children;
 	for my $child ($self->get_children)
@@ -3745,48 +3786,93 @@ sub size_allocate
 		my @attrib;
 		if (my $r=$child->{expand_to_ratio})	{$max=$r*$bheight}
 		else					{$max=$child->{$max_key}}
-		if	($max)		{ $max-=$xreq; if ($max>0) {push @emax,[$max*$eweight,$max,$eweight,\@attrib]; $ecount+=$eweight;$expand=$eweight;} else {$expand=0} }
-		elsif	($expand)	{$ecount+=$eweight;$expand=$eweight;}
-		@attrib=($child,$expand,$fill,$pad,$type,$xreq);
-		if ($type eq 'end')	{unshift @children,\@attrib} #to keep the same order as a HBox
-		else			{push @children,\@attrib}
+		if	($max)
+		{	$max-=$xreq;
+			if ($max>0)	{ $expand=$eweight; }
+			else		{ $expand=$max=0; }
+		}
+		if	($expand)	{ $ecount+=$eweight; $expand=$eweight; }
+		my $end= $type eq 'end';
+		@attrib= ($child,$expand,$fill,$pad,$end,$xreq,$max);
+		if ($end)	{unshift @children,\@attrib} #to keep the same order as a HBox
+		else		{push @children,\@attrib}
 	}
-	$total_xreq+=$#children*$spacing if @children;
+	my $total_spacing=0;
+	if (@children>1)
+	{	$total_spacing= $#children*$spacing;
+		if ($bwidth<$total_spacing) { $total_spacing=$bwidth; $spacing=$total_spacing/$#children }
+		$total_xreq+= $total_spacing;
+	}
 	my $xend=$x+$bwidth;
-	my $wshare; my $wrest; my $only_etr;
-	if ($total_xreq<$bwidth && $ecount)
+	my $homogeneous;
+	if ($self->get_homogeneous && @children)
+	{	$homogeneous=($bwidth-$total_spacing)/@children;
+	}
+	elsif ($total_xreq<$bwidth && $ecount)	# if enough room for all, and some have expand attribute
 	{	my $w=$bwidth-$total_xreq;
-		for my $emax (sort { $a->[0] <=> $b->[0] } @emax)
-		{	my (undef,$max,$eweight,$attrib)=@$emax;
-			if ($max < $w/$ecount*$eweight) {$w-=$max; push @$attrib,$max; $ecount-=$eweight;}
-		}
-		if ($ecount) {$wshare=$w/$ecount}
-		elsif ($w) #all expands were expand_to_ratio and satisfied and space left -> share between those which are packed with expand
-		{	my $count;
-			for my $ref (@children)
-			{	$count++ if $ref->[1]; #expand
+		my $i=0;
+		while ($w>0 && $ecount)
+		{	my $part= $w/$ecount;
+			$ecount=0;
+			my $leftover=0;
+			# [1] is expand, [6] is max, [7] is extra space given
+			for my $child (grep $_->[1], @children)	#children that want to expand
+			{	my $max=    $child->[6];
+				my $expand= $child->[1];
+				my $wpart0= $part*$expand+$leftover;
+				my $wpart= int($wpart0);
+				$leftover= $wpart0 - $wpart;
+				if ($max && $wpart>=$max)	# enough to fill its max
+				{	$child->[7]+= $max;	# give it its max
+					$w-= $max;
+					$child->[1]=0;		# no longer want to expand
+				}
+				else				# give it its part
+				{	$child->[7]+= $wpart;
+					$child->[6]-= $wpart if $max;
+					$w-= $wpart;
+					$ecount+=$expand;	#still want to expand
+				}
 			}
-			$wshare=$w/$count if $count;
-			$only_etr=1;
 		}
 	}
-	my $homogeneous;
-	if ($self->get_homogeneous)
-	{	$homogeneous=($bwidth-($#children*$spacing))/@children;
+	elsif ($total_xreq>$bwidth && @children)	#not enough room for requested width
+	{	my $w=$bwidth-$total_spacing;
+		# [5] is request [3] is padding
+		my @tofit= sort { $a->[5]+$a->[3] <=> $b->[5]+$b->[3] } @children; # sort from smallest to largest
+		while (my $child= shift @tofit)
+		{	my $give= int($w/(1+@tofit));	# space available for each child left
+			$give=0 if $give<0;
+			my $padding=$child->[3]*2;
+			my $needed= $child->[5]+$padding;
+			if ($give >= $needed)			# need less than available
+			{	$give= $needed;			# give it its request
+			}
+			elsif ($give >= $padding)	# space available more than padding
+			{	$child->[5]= $give - $padding; # reduce request to fit
+			}
+			else	# not even enough space for padding
+			{	$child->[5]=0;			# set request to 0
+				$child->[3]= $give/2;		# give as much padding as available
+			}
+			$w-= $give;				# remove given space
+		}
 	}
 	for my $ref (@children)
-	{	my ($child,$expand,$fill,$pad,$type,$ww,$maxedout)=@$ref;
+	{	my ($child,undef,$fill,$pad,$end,$ww,undef,$extra)=@$ref;
 		my $wwf= $ww;
-		if ($maxedout)	{ $wwf+=$maxedout; }
-		elsif ($wshare)	{ $wwf+=$wshare*$expand; }
-		$wwf=$homogeneous-$pad*2 if $homogeneous;
+		$wwf+=$extra if $extra;	# space given by expand
+		if (defined $homogeneous)
+		{	$wwf=$homogeneous-$pad*2;
+			$wwf=0   if $wwf<0;
+			$ww=$wwf if $ww>$wwf;
+		}
 		$ww=$wwf if $fill;
 		my $wx;
 		my $totalw=$pad*2+$wwf+$spacing;
-		#warn "$child : $pad*2+$wwf+$spacing\n";
 		$pad+=($wwf-$ww)/2;
-		if ($type eq 'end')	{ $wx=$xend-$pad-$ww;   $xend-=$totalw; }
-		else			{ $wx=$x+$pad;		   $x+=$totalw; }
+		if ($end)	{ $wx=$xend-$pad-$ww;   $xend-=$totalw; }
+		else		{ $wx=$x+$pad;		   $x+=$totalw; }
 		my $wa= $vertical ?
 			Gtk2::Gdk::Rectangle->new($y, $wx, $bheight, $ww):
 			Gtk2::Gdk::Rectangle->new($wx, $y, $ww, $bheight);
@@ -3875,7 +3961,7 @@ sub _load_skinfile
 		if ($file)
 		{	my $path= $options->{SkinPath};
 			$file= $path.::SLASH.$file if defined $path;
-			$file= ::SearchFile($file, $options->{PATH}, $::HomeDir.'layouts', $::CmdLine{searchpath}, $::DATADIR.::SLASH.'layouts');
+			$file= ::SearchPicture($file, $options->{PATH});
 			$pb= GMB::Picture::pixbuf($file);
 		}
 	}
