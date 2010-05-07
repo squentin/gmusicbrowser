@@ -2736,6 +2736,7 @@ sub new
 	$self->add($label);
 #$self->signal_connect(enter_notify_event => sub {$_[0]->set_markup('<u>'.$_[0]->child->get_label.'</u>')});
 #$self->signal_connect(leave_notify_event => sub {my $m=$_[0]->child->get_label; $m=~s#^<u>##;$m=~s#</u>$##; $_[0]->set_markup($m)});
+	$self->{expand_max}= $opt->{maxwidth} || -1 if $opt->{expand_max};
 	my $minsize= $opt->{minsize};
 	if (my $el=$opt->{ellipsize})
 	{	$label->set_ellipsize($el);
@@ -2747,7 +2748,6 @@ sub new
 			$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 			($minsize)=$lay->get_pixel_size;
 		}
-		$self->{expand_max}=1 if $opt->{expand_max};
 		$self->set_size_request($minsize,-1);
 		$label->signal_connect(expose_event => \&expose_cb);
 		if ($self->{autoscroll})
@@ -2809,8 +2809,13 @@ sub checksize	#extend the requested size so that the string fit in initsize mode
 		$h=0 if $h0>$h;
 		$label->set_size_request($w||$w0,$h||$h0) if $w || $h;
 	}
-	elsif ($self->{expand_max})
-	{	$self->{maxwidth}= ($self->child->get_layout->get_pixel_size)[0]||1;
+	elsif (my $emax=$self->{expand_max})
+	{	# make it expand up to min(maxwidth,string_width)
+		my $label=$self->child;
+		$label->get_layout->set_width($emax * Gtk2::Pango->scale) if $label->get_ellipsize ne 'none';
+		my ($w)= $label->get_layout->get_pixel_size;
+		$w=$emax if $emax>0 && $emax < $w;
+		$self->{maxwidth}= $w ||1;
 	}
 	$self->restart_scrollcheck if $self->{autoscroll};
 }
