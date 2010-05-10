@@ -713,7 +713,7 @@ sub ParseLayout
 		}
 		$name=$1;
 		if (defined $2) { %{$Layouts{$name}}=%{$Layouts{$2}}; }
-		else { $Layouts{$name}=undef; }
+		else { delete $Layouts{$name}; }
 	}
 	else {return}
 	for (@$lines)
@@ -816,7 +816,7 @@ sub InitLayout
 	}
 
 	my $mainwidget= $self->CreateWidgets($boxes,$opt2);
-	return unless $mainwidget;
+	$mainwidget ||= Gtk2::Label->new("Error : empty layout");
 	$self->add($mainwidget);
 
 	if (my $name=$boxes->{DefaultFocus})
@@ -922,7 +922,7 @@ sub CreateWidgets
 
 	$self->{layoutdepth}--;
 	my @noparentboxes=grep m/^(?:[HV][BP]|[AMETNFSW]B|FR)/ && !$widgets->{$_}->parent, keys %$boxes;
-	if	(@noparentboxes==0) {warn "layout empty\n"; return;}
+	if	(@noparentboxes==0) {warn "layout empty ('$self->{layout}')\n"; return;}
 	elsif	(@noparentboxes!=1) {warn "layout error: (@noparentboxes) have no parent -> can't find toplevel box\n"}
 	return $widgets->{ $noparentboxes[0] };
 }
