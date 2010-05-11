@@ -12,24 +12,24 @@ HBTop		= VBButtons _15VBPlayer 15VBToggle VBSettings -5VBSearchBox
 ### top bar from left to right ###
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBButtons	= HBButtons Filler4
-VBPlayer	= HBTitle(maxwidth=250) HBScale
-HBTitle		= Title(expand_max=1,maxwidth=250,minsize=1,markup="<big><b>%t</b></big>",click1="") AlbumBreadcrumb(tip="Album: %l (%Y)",expand_max=200,) ArtistBreadcrumb(tip="Artist: %a",expand_max=200,) -LabelTime(markup="%s / $length", initsize="XX:XX / -XX:XX")
-HBScale		= _Scale
-HBToggle	= TogButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1) TogButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1) TogButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1)
+VBPlayer	= HBTitle(maxwidth=250) HBTimeSlider
+HBTitle		= Title(expand_max=1,maxwidth=250,minsize=1,markup="<big><b>%t</b></big>",click1="") AlbumBreadcrumb(tip="Album: %l (%Y)",expand_max=200,) ArtistBreadcrumb(tip="Artist: %a",expand_max=200,) -PlayingTime(markup="%s / $length", initsize="XX:XX / -XX:XX")
+HBTimeSlider	= _TimeSlider
+HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1) ToggleButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1) ToggleButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1)
 VBToggle	= HBToggle _Filler1
 VBSearchBox	= 2SimpleSearch _Filler2
 VBSettings	= Pref(size=button) _Filler5
 ### main left: artist pane and album-cover ###
-VBArtist	= _FPane0(nb=1,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1) HBCover
+VBArtist	= _FilterPane0(nb=1,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1) HBCover
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
 HBSongListtree	= _SongTree(cols="playandqueue track title artist length playcount ratingpic",colwidth="artist 124 lastplay 107 length 40 playandqueue 19 playcount 18 ratingpic 100 title 280 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
 HBSongPlaylist	= _SongList(cols="playandqueue track title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueue 20 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
-VPMosaic	= _FPane1(nb=2,hidebb=1,pages=album,page_album/mode=mosaic,hidetabs=1)
+VPMosaic	= _FilterPane1(nb=2,hidebb=1,pages=album,page_album/mode=mosaic,hidetabs=1)
 ### bottom: statusbar ### Pref(size=small-toolbar,button=0) 
 HBStatusbar	= 5HBQueue 5Filler3  10Filter(with_text=1) 10Sort(with_text=1) 10LockAlbum(with_text=1) 10LockArtist(with_text=1) -Total(format=short,relief=none,button=0,mode=list)
-HBQueue		= Queue Label1(markup="<small>Queue</small>",click1=OpenQueue,size=small-toolbar)
+HBQueue		= Queue Text1(markup="<small>Queue</small>",click1=OpenQueue,size=small-toolbar)
 ### positioning and sizing ###
 HSize0		= 10 Filler0 Filler1 Filler2 Filler5 Filler6 Filler7
 HSize0		= 5 Filler3 Filler4
