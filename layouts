@@ -10,7 +10,7 @@ VBmain		= HBTop _HBMain HBStatusbar
 HBMain		= VBArtist _HPRight
 HBTop		= VBButtons _15VBPlayer 15VBToggle VBSettings -5VBSearchBox
 ### top bar from left to right ###
-HBButtons	= Prev Play Next
+HBButtons	= Prev Play Next(click2=NextAlbum)
 VBButtons	= HBButtons Filler4
 VBPlayer	= HBTitle(maxwidth=250) HBScale
 HBTitle		= Title(expand_max=1,maxwidth=250,minsize=1,markup="<big><b>%t</b></big>",click1="") AlbumBreadcrumb(tip="Album: %l (%Y)",expand_max=200,) ArtistBreadcrumb(tip="Artist: %a",expand_max=200,) -LabelTime(markup="%s / $length", initsize="XX:XX / -XX:XX")
@@ -100,7 +100,7 @@ HBButtons	= Prev(size=small-toolbar) Play(size=small-toolbar) Next(size=small-to
 HBTitle		= LockSong _Title(font=16,interval=75)
 HBArtist	= LockArtist _Artist(font=10)
 HBAlbum		= LockAlbum _Album(font=10)
-HBYear		= Filler1 _Date(font=8,markup="%y")
+HBYear		= Filler1 _Date(font=8,markup="%y") -Stars
 HBTime		= _TimeBar(minheight=5)
 HBRight		= HBButtons _2HBArtist
 VSize0		= 3 Filler0
@@ -481,6 +481,7 @@ left=pic:w+2
 title:	text(markup='<b><big>'.pesc($album).'</big></b>'. if($year,'  <big><b>«</b></big>  '.pesc($year)) . '  <big><b>«</b></big> '.pesc($artist),pad=2)
 pic:	+aapic(y=title:h+title:y,picsize=picsize,ypad=2,xpad=1,aa='album')
 picsize : OptionNumber(default=100,min=20,max=1000,step=10)
+picstars : picture(file=ratingpic($rating_avrg),x=(picsize/2)-(picstars:w/2),y=pic:y+pic:h,hide=$rating_avrg==50)
 
 {Group pic}
 title= with picture
@@ -523,6 +524,13 @@ hreq=text:h
 progress: pbar( fill=$progress, hide=!$playing,y=1,h=-2)
 text: text(markup=playmarkup(pesc($title)))
 
+{Column playandqueueandtrack}
+menutitle = Playing/Queue Icon and Track
+width = 40
+sort = text:i
+ico:	icon(pad=2,icon=$playicon)
+text:	text(markup=playmarkup(pesc($track)),x=-text:w)
+
 {Column playandqueue}
 menutitle = Playing & Queue
 width = 20
@@ -564,8 +572,8 @@ menutitle = Rating (picture)
 sort = rating
 width=100
 #hreq = pic:h
-#pic : picture(file=ratingpic($rating),init_file=ratingpic(0))
-pic : picture(file=ratingpic($rating),h=$_h,w=$_w,resize='ratio',init_file=ratingpic(0))
+pic : picture(file=ratingpic($rating),init_file=ratingpic(0))
+#pic : picture(file=ratingpic($rating),h=$_h,w=$_w,resize='ratio',init_file=ratingpic(0))
 
 {Column right_aligned_folder}
 menutitle = Folder (right-aligned)
