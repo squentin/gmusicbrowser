@@ -82,7 +82,7 @@ our %Widgets=
 		nbsongs	=> 10,
 		click3	=> sub { ::ChooseSongs(undef,::GetNextSongs($_[0]{nbsongs})); },
 	},
-	Playlist =>
+	OpenBrowser =>
 	{	class	=> 'Layout::Button',
 		oldopt1 => 'toggle',
 		options => 'toggle',
@@ -91,7 +91,7 @@ our %Widgets=
 		activate=> sub { ::OpenSpecialWindow('Browser',$_[0]{toggle}); },
 		click3	=> sub { ::OpenSpecialWindow('Browser'); },
 	},
-	BContext =>
+	OpenContext =>
 	{	class	=> 'Layout::Button',
 		oldopt1 => 'toggle',
 		options => 'toggle',
@@ -199,7 +199,7 @@ our %Widgets=
 		event	=> 'Queue QueueAction',
 		dragdest=> [::DRAG_ID,sub {shift;shift;::Enqueue(@_);}],
 	},
-	Vol =>
+	VolumeIcon =>
 	{	class	=> 'Layout::Button',
 		button	=> 0,
 		state	=> sub { ::GetMute() ? 'm' : ::GetVol() },
@@ -216,7 +216,7 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		button	=> 0,
 	},
-	Label =>
+	Text =>
 	{	class	=> 'Layout::Label',
 		oldopt1 => sub { 'text',$_[0] },
 		group	=> 'Play',
@@ -271,7 +271,7 @@ our %Widgets=
 		dragsrc => [::DRAG_ALBUM,\&DragCurrentAlbum],
 		cursor	=> 'hand2',
 	},
-	Date =>
+	Year =>
 	{	class	=> 'Layout::Label',
 		group	=> 'Play',
 		markup	=> ' %y',
@@ -290,7 +290,7 @@ our %Widgets=
 		markup_empty=>	::__x( _" of {length}", 'length' => "0:00" ),
 #		font	=> 'Monospace',
 	},
-	LabelTime =>
+	PlayingTime =>
 	{	class	=> 'Layout::Label::Time',
 		group	=> 'Play',
 		markup	=> '%s',
@@ -301,6 +301,13 @@ our %Widgets=
 		event	=> 'Time',
 		click1	=> sub { $_[0]{remaining}=!$_[0]{remaining}; $_[0]->update_time; },
 		update	=> sub { $_[0]->update_time unless $_[0]{busy}; },
+	},
+	Time =>
+	{	parent	=> 'PlayingTime',
+		xalign	=> .5,
+		markup	=> '%s'		. ::__x( _" of {length}", 'length' => "%m" ),
+		markup_empty=> '%s'	. ::__x( _" of {length}", 'length' => "0:00" ),
+		initsize=> '-XX:XX'	. ::__x( _" of {length}", 'length' => "XX:XX"),
 	},
 	TimeBar =>
 	{	class	=> 'Layout::Bar',
@@ -314,7 +321,7 @@ our %Widgets=
 		set_preview => \&Layout::Bar::update_preview_Time,
 		cursor	=> 'hand2',
 	},
-	Scale =>
+	TimeSlider =>
 	{	class	=> 'Layout::Bar::Scale',
 		parent	=> 'TimeBar',
 		cursor	=> undef,
@@ -329,13 +336,13 @@ our %Widgets=
 		max	=> 100,
 		cursor	=> 'hand2',
 	},
-	VolSlider =>
+	VolumeSlider =>
 	{	class	=> 'Layout::Bar::Scale',
 		orientation => 'bottom-to-top',
 		parent	=> 'VolBar',
 		cursor	=> undef,
 	},
-	LabelVol =>
+	Volume =>
 	{	class	=> 'Layout::Label',
 		initsize=> '000',
 		event	=> 'Vol',
@@ -438,7 +445,15 @@ our %Widgets=
 	{	class	=> 'GMB::AABox',
 		oldopt1	=> sub { 'aa='.( $_[0] ? 'artist' : 'album' ) },
 	},
-	FPane	=>
+	ArtistBox	=>
+	{	class	=> 'GMB::AABox',
+		aa	=> 'artists',
+	},
+	AlbumBox	=>
+	{	class	=> 'GMB::AABox',
+		aa	=> 'album',
+	},
+	FilterPane	=>
 	{	class	=> 'FilterPane',
 		oldopt1	=> sub
 			{	my ($nb,$hide,@pages)=split ',',$_[0];
@@ -450,11 +465,11 @@ our %Widgets=
 		oldopt1 => 'mode',
 		saveoptions=> 'mode',
 	},
-	FBox	=>
+	FilterBox =>
 	{	New => \&Browser::makeFilterBox,
 		dragdest => [::DRAG_FILTER,sub { ::SetFilter($_[0],$_[2]);}],
 	},
-	FLock	=>	{ New		=> \&Browser::makeLockToggle,},
+	FilterLock=>	{ New		=> \&Browser::makeLockToggle,},
 	HistItem =>	{ New		=> \&Layout::MenuItem::new,
 			  label		=> _"Recent Filters",
 			  updatemenu	=> \&Browser::fill_history_menu,
@@ -527,7 +542,7 @@ our %Widgets=
 		tip	=> _"Reset filter",
 		activate=> sub { ::SetFilter($_[0],undef); },
 	},
-	TogButton =>
+	ToggleButton =>
 	{	class	=> 'Layout::TogButton',
 		size	=> 'menu',
 	},
@@ -553,6 +568,14 @@ our %Widgets=
 	},
 	AASearch =>
 	{	class	=> 'AASearch',
+	},
+	ArtistSearch =>
+	{	class	=> 'AASearch',
+		aa	=> 'artists',
+	},
+	AlbumSearch =>
+	{	class	=> 'AASearch',
+		aa	=> 'album',
 	},
 	SongSearch =>
 	{	class	=> 'SongSearch',
@@ -612,7 +635,7 @@ our %Widgets=
 	{	class => 'Layout::Progress',
 		compact=>1,
 	},
-	ProgressV =>
+	VProgress =>
 	{	class => 'Layout::Progress',
 		vertical=>1,
 	},
@@ -625,6 +648,30 @@ our %Widgets=
 #	{	class => 'GMB::RadioList',
 #	},
 );
+
+# aliases for previous widget names
+{ my %aliases=
+  (	Playlist	=> 'OpenBrowser',
+	BContext	=> 'OpenContext',
+	Date		=> 'Year',
+	Label		=> 'Text',
+	Vol		=> 'VolumeIcon',
+	LabelVol	=> 'Volume',
+	FLock		=> 'FilterLock',
+	TogButton	=> 'ToggleButton',
+	ProgressV	=> 'VProgress',
+	FBox		=> 'FilterBox',
+	Scale		=> 'TimeSlider',
+	VolSlider	=> 'VolumeSlider',
+	FPane		=> 'FilterPane',
+	LabelTime	=> 'PlayingTime',
+	#Pos		=> 'PlaylistPosition', 'Position', ?
+	#SimpleSearch	=> 'Search', ?
+  );
+	while ( my($alias,$real)= each %aliases )
+	{	$Widgets{$alias}||=$Widgets{$real};
+	}
+}
 
 our %Layouts;
 
@@ -713,7 +760,7 @@ sub ParseLayout
 		}
 		$name=$1;
 		if (defined $2) { %{$Layouts{$name}}=%{$Layouts{$2}}; }
-		else { $Layouts{$name}=undef; }
+		else { delete $Layouts{$name}; }
 	}
 	else {return}
 	for (@$lines)
@@ -816,7 +863,7 @@ sub InitLayout
 	}
 
 	my $mainwidget= $self->CreateWidgets($boxes,$opt2);
-	return unless $mainwidget;
+	$mainwidget ||= Gtk2::Label->new("Error : empty layout");
 	$self->add($mainwidget);
 
 	if (my $name=$boxes->{DefaultFocus})
@@ -922,7 +969,7 @@ sub CreateWidgets
 
 	$self->{layoutdepth}--;
 	my @noparentboxes=grep m/^(?:[HV][BP]|[AMETNFSW]B|FR)/ && !$widgets->{$_}->parent, keys %$boxes;
-	if	(@noparentboxes==0) {warn "layout empty\n"; return;}
+	if	(@noparentboxes==0) {warn "layout empty ('$self->{layout}')\n"; return;}
 	elsif	(@noparentboxes!=1) {warn "layout error: (@noparentboxes) have no parent -> can't find toplevel box\n"}
 	return $widgets->{ $noparentboxes[0] };
 }
@@ -2736,6 +2783,7 @@ sub new
 	$self->add($label);
 #$self->signal_connect(enter_notify_event => sub {$_[0]->set_markup('<u>'.$_[0]->child->get_label.'</u>')});
 #$self->signal_connect(leave_notify_event => sub {my $m=$_[0]->child->get_label; $m=~s#^<u>##;$m=~s#</u>$##; $_[0]->set_markup($m)});
+	$self->{expand_max}= $opt->{maxwidth} || -1 if $opt->{expand_max};
 	my $minsize= $opt->{minsize};
 	if (my $el=$opt->{ellipsize})
 	{	$label->set_ellipsize($el);
@@ -2747,7 +2795,6 @@ sub new
 			$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 			($minsize)=$lay->get_pixel_size;
 		}
-		$self->{expand_max}=1 if $opt->{expand_max};
 		$self->set_size_request($minsize,-1);
 		$label->signal_connect(expose_event => \&expose_cb);
 		if ($self->{autoscroll})
@@ -2809,8 +2856,13 @@ sub checksize	#extend the requested size so that the string fit in initsize mode
 		$h=0 if $h0>$h;
 		$label->set_size_request($w||$w0,$h||$h0) if $w || $h;
 	}
-	elsif ($self->{expand_max})
-	{	$self->{maxwidth}= ($self->child->get_layout->get_pixel_size)[0]||1;
+	elsif (my $emax=$self->{expand_max})
+	{	# make it expand up to min(maxwidth,string_width)
+		my $label=$self->child;
+		$label->get_layout->set_width($emax * Gtk2::Pango->scale) if $label->get_ellipsize ne 'none';
+		my ($w)= $label->get_layout->get_pixel_size;
+		$w=$emax if $emax>0 && $emax < $w;
+		$self->{maxwidth}= $w ||1;
 	}
 	$self->restart_scrollcheck if $self->{autoscroll};
 }
