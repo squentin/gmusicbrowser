@@ -83,8 +83,18 @@ sub ApplyRulesByName {
     }
 }
 
+sub Played {
+    my ($self, $song_id, $finished, $start_time, $started_at, $play_time) = @_;
+    if(!$finished) {
+	Skipped();
+    } else {
+	Finished();
+    }
+}
+
 # Finished playing song (actually PlayedPercent or more, neat eh?)
 sub Finished {
+    warn 'EpicRating has noticed that a song has finished!';
     my $rules = $::Options{OPT.'Rules'};
     my $DefaultRating = $::Options{"DefaultRating"};
 
@@ -161,13 +171,11 @@ sub Skipped {
 }
 
 sub Start {
-    # ::Watch($self, Played => \&Played);
-    ::Watch($self, Finished => \&Finished);
-    ::Watch($self, Skipped => \&Skipped);
+    ::Watch($self, Played => \&Played);
 }
 
 sub Stop {
-    ::UnWatch($self, $_) for qw/Finished Skipped/;
+    ::UnWatch($self, 'Played');
 }
 
 # rule editor.
