@@ -33,8 +33,7 @@ use constant {
 my $self=bless {},__PACKAGE__;
 
 sub AddRatingPointsToSong {
-    my $ID=$_[0];
-    my $PointsToRemove = $_[1];
+    my ($ID, $PointsToRemove) = @_;
     my $ExistingRating = ::Songs::Get($ID, 'rating');
     if(($ExistingRating + $PointsToRemove) > 100)
     {
@@ -44,7 +43,7 @@ sub AddRatingPointsToSong {
 	warn "Negative addend in EpicRating pushed song rating to below 0.  Pinning.";
 	::Songs::Set($ID, rating => 0);
     } else {
-	warn "EpicRating changing song rating by " . $PointsToRemove;
+	warn "EpicRating changing song rating (title: " . ::Songs::Get($ID, 'title') . ", existing: " . $ExistingRating . ") by " . $PointsToRemove;
 	::Songs::Set($ID, rating=>($ExistingRating + $PointsToRemove));
     }
 }
@@ -86,40 +85,38 @@ sub ApplyRulesByName {
 sub Played {
     my ($self, $song_id, $finished, $start_time, $started_at, $play_time) = @_;
     if(!$finished) {
-	Skipped();
+	Skipped($song_id, $play_time);
     } else {
-	Finished();
+	Finished($song_id);
     }
 }
 
 # Finished playing song (actually PlayedPercent or more, neat eh?)
 sub Finished {
+    my ($self, $song_id) = @_;
     warn 'EpicRating has noticed that a song has finished!';
     my $rules = $::Options{OPT.'Rules'};
     my $DefaultRating = $::Options{"DefaultRating"};
 
-
-    my $ID=$::PlayingID;
-
-    my $song_rating = Songs::Get($ID, 'rating');
+    my $song_rating = Songs::Get($song_id, 'rating');
     if(!($song_rating && $::Options{OPT."SetDefaultRatingOnFinished"})) {
-	::Songs::Set($ID, rating=>$DefaultRating);
+	::Songs::Set($song_id, rating=>$DefaultRating);
     }
 
-    ApplyRulesByName('Finished', $ID);
+    ApplyRulesByName('Finished', $song_id);
 }
 
 sub Skipped {
+    my ($self, $song_id, $play_time) = @_;
     warn 'EpicRating has noticed that a song has been skipped!';
     my $DefaultRating = $::Options{"DefaultRating"};
     my $rules = $::Options{OPT.'Rules'};
-    my $ID=$::PlayingID;
 
     # we apply the default if the checkbox is enabled regardless
     # of rules.
-    my $song_rating = Songs::Get($ID, 'rating');
+    my $song_rating = Songs::Get($song_id, 'rating');
     if(!($song_rating && $::Options{OPT."SetDefaultRatingOnSkipped"})) {
-	::Songs::Set($ID, rating=>$DefaultRating);
+	::Songs::Set($song_id, rating=>$DefaultRating);
     }
 
 
@@ -140,28 +137,28 @@ sub Skipped {
 	if(!$before_exists && !$after_exists) {
 	    # neither
 	    # warn "Evalauted skip rule... neither after or before constraints.";
-	    ApplyRule($skip_rule, $ID);
+	    ApplyRule($skip_rule, $song_id);
 	    return;
 	} elsif($before_exists && $after_exists) {
 	    # both
 	    # warn "Evaluated skip rule... there's a range.";
-	    if(($::PlayTime >= $after) && ($::PlayTime <= $before)) {
-		ApplyRule($skip_rule, $ID);
+	    if(($play_time >= $after) && ($play_time <= $before)) {
+		ApplyRule($skip_rule, $song_id);
 		return;
 	    }
 	} elsif($before_exists) {
 	    # only before
 	    # warn "Evaluated skip rule... only before constraint.";
-	    if($::PlayTime <= $before) {
-		ApplyRule($skip_rule, $ID);
+	    if($play_time <= $before) {
+		ApplyRule($skip_rule, $song_id);
 		return;
 	    }
 
 	} elsif($after_exists) {
 	    # only after
 	    # warn "Evaluated skip rule... only after constraint.";
-	    if($::PlayTime => $after) {
-		ApplyRule($skip_rule, $ID);
+	    if($play_time => $after) {
+		ApplyRule($skip_rule, $song_id);
 		return;
 	    }
 	} else {
