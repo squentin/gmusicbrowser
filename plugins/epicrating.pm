@@ -22,25 +22,41 @@ use strict;
 use warnings;
 
 use constant {
-    OPT => 'PLUGIN_EPICRATING_',#used to identify the plugin's options
-    ALWAYS_AVAILABLE => ["PlayingID"],
-    EVENTS => {played => ["PlayTime", "PlayedPercent"]},
-    ACTIONS => ["REMOVE_FROM_RATING", "ADD_TO_RATING", "RATING_SET_TO_DEFAULT"]
+    OPT => 'PLUGIN_EPICRATING_', #used to identify the plugin's options
 };
 
 ::SetDefaultOptions(OPT, SetDefaultRatingOnSkipped => 1, SetDefaultRatingOnFinished => 1, Rules => [ {signal => 'Finished', field => "rating", value => 5}, {signal => 'Skipped', field => 'rating', value => -5 }, { signal => "Skipped", before => 15, field => "rating", value => -1}]);
 
 my $self=bless {},__PACKAGE__;
 
+sub IsFieldSet {
+    my ($self, $song_id, $field) = @_;
+
+    my $val = ::Songs::Get($song_id, $field);
+
+    my $answer = defined($val) && ($val ne "");
+
+    return $answer;
+}
+
 sub AddRatingPointsToSong {
-    my ($ID, $PointsToRemove) = @_;
+    my ($self, $ID, $PointsToRemove) = @_;
     my $ExistingRating = ::Songs::Get($ID, 'rating');
+
+    # actually, ApplyRulesByName() skips apply the rule if the target field (ie., rating, is unset)
+    # Skipped rules, however, do not make such a check.
+
+    if(!($self->IsFieldSet($ID, 'rating'))) {
+	warn "EpicRating cannot change the rating of a song that has no rating.  Ignoring.";
+	return;
+    }
+
     if(($ExistingRating + $PointsToRemove) > 100)
     {
 	warn "Yikes, can't rate this song above one hundred.";
 	::Songs::Set($ID, rating=>100);
     } elsif(($ExistingRating + $PointsToRemove) < 0) {
-	warn "Negative addend in EpicRating pushed song rating to below 0.  Pinning.";
+	warn "Negative addend in EpicRating pushed song rating to below 0.  Pinning at 0.";
 	::Songs::Set($ID, rating => 0);
     } else {
 	warn "EpicRating changing song rating (title: " . ::Songs::Get($ID, 'title') . ", existing: " . $ExistingRating . ") by " . $PointsToRemove;
@@ -63,21 +79,22 @@ sub GetRulesBySignal {
 
 # apply the action this rule specifies.
 sub ApplyRule {
-    my ($rule, $song_id) = @_;
-    AddRatingPointsToSong($song_id, ${$rule}{value});
+    my ($self, $rule, $song_id) = @_;
+    $self->AddRatingPointsToSong($song_id, ${$rule}{value});
 }
 
-# lasso all rules with a given signal and apply them all.  not appropriate for signals conditions/options.
+# lasso all rules with a given signal and apply them all. does not evalulate conditions.
 sub ApplyRulesByName {
-    my ($rule_name, $song_id) = @_;
+    my ($self, $rule_name, $song_id) = @_;
     my $rules = $::Options{OPT.'Rules'};
 
     my $matched_rules = GetRulesBySignal($rule_name);
 
     foreach my $matched_rule (@{$matched_rules}) {
 	my $value = ::Songs::Get($song_id, ${$matched_rule}{field});
+	# if the target field is unset, skip it.
 	if((defined $value) && ($value ne "")) {
-	    ApplyRule($matched_rule, $song_id);
+	    $self->ApplyRule($matched_rule, $song_id);
 	}
     }
 }
@@ -85,9 +102,9 @@ sub ApplyRulesByName {
 sub Played {
     my ($self, $song_id, $finished, $start_time, $started_at, $play_time) = @_;
     if(!$finished) {
-	Skipped($song_id, $play_time);
+	$self->Skipped($song_id, $play_time);
     } else {
-	Finished($song_id);
+	$self->Finished($song_id);
     }
 }
 
@@ -99,11 +116,11 @@ sub Finished {
     my $DefaultRating = $::Options{"DefaultRating"};
 
     my $song_rating = Songs::Get($song_id, 'rating');
-    if(!($song_rating && $::Options{OPT."SetDefaultRatingOnFinished"})) {
+    if(!($self->IsFieldSet($song_id, 'rating')) && $::Options{OPT."SetDefaultRatingOnFinished"}) {
 	::Songs::Set($song_id, rating=>$DefaultRating);
     }
 
-    ApplyRulesByName('Finished', $song_id);
+    $self->ApplyRulesByName('Finished', $song_id);
 }
 
 sub Skipped {
@@ -114,11 +131,11 @@ sub Skipped {
 
     # we apply the default if the checkbox is enabled regardless
     # of rules.
+    warn "Getting rating of song #" . $song_id;
     my $song_rating = Songs::Get($song_id, 'rating');
-    if(!($song_rating && $::Options{OPT."SetDefaultRatingOnSkipped"})) {
+    if(!($self->IsFieldSet($song_id, 'rating')) && $::Options{OPT."SetDefaultRatingOnSkipped"}) {
 	::Songs::Set($song_id, rating=>$DefaultRating);
     }
-
 
     my $all_skip_rules = GetRulesBySignal('Skipped');
 
@@ -137,20 +154,20 @@ sub Skipped {
 	if(!$before_exists && !$after_exists) {
 	    # neither
 	    # warn "Evalauted skip rule... neither after or before constraints.";
-	    ApplyRule($skip_rule, $song_id);
+	    $self->ApplyRule($skip_rule, $song_id);
 	    return;
 	} elsif($before_exists && $after_exists) {
 	    # both
 	    # warn "Evaluated skip rule... there's a range.";
 	    if(($play_time >= $after) && ($play_time <= $before)) {
-		ApplyRule($skip_rule, $song_id);
+		$self->ApplyRule($skip_rule, $song_id);
 		return;
 	    }
 	} elsif($before_exists) {
 	    # only before
 	    # warn "Evaluated skip rule... only before constraint.";
 	    if($play_time <= $before) {
-		ApplyRule($skip_rule, $song_id);
+		$self->ApplyRule($skip_rule, $song_id);
 		return;
 	    }
 
@@ -158,7 +175,7 @@ sub Skipped {
 	    # only after
 	    # warn "Evaluated skip rule... only after constraint.";
 	    if($play_time => $after) {
-		ApplyRule($skip_rule, $song_id);
+		$self->ApplyRule($skip_rule, $song_id);
 		return;
 	    }
 	} else {
@@ -182,12 +199,6 @@ sub Stop {
 
 my $editor_signals = ['Finished', 'Skipped'];
 my $editor_fields = ['rating'];
-
-# checkbox for "set default rating when file played/skipped, required for rating update on files without a rating"
-
-# weird behaviour with Gtk2::Table->attach() not working for Add, even though the scenario ends up being no different than at creation time?! D:
-
-# add setting to gmusicbrowser core UI for PlayedPercent.  not sure why it isn't there already. :P
 
 # perl, sigh.
 # sub indexOfStr {
@@ -213,14 +224,6 @@ sub deleteRefFromArr {
     my ($arr, $ref) = @_;
     splice(@$arr, indexOfRef($arr, $ref), 1);
 }
-
-# sub RuleEditor {
-#     my ($rule) = @_;
-
-    
-
-#     return $frame;
-# }
 
 sub RulesListAddRow {
     my $rule = $_[0]; # hash reference
