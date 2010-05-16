@@ -403,6 +403,12 @@ our @DefaultOptions=
 	hideif	=> '',
 	colwidth=> '',
 );
+our %Markup_Empty=
+(	Q => _"Queue empty",
+	L => _"List empty",
+	A => _"Playlist empty",
+	B => _"No songs found",
+);
 
 sub new
 {	my $opt=$_[1];
@@ -414,7 +420,7 @@ sub CommonInit
 {	my ($self,$opt)=@_;
 
 	%$opt=( @DefaultOptions, %$opt );
-	$self->{$_}=$opt->{$_} for qw/mode group follow sort hideif hidewidget shrinkonhide/,grep(m/^activate\d?$/, keys %$opt);
+	$self->{$_}=$opt->{$_} for qw/mode group follow sort hideif hidewidget shrinkonhide markup_empty markup_library_empty/,grep(m/^activate\d?$/, keys %$opt);
 	$self->{mode}||='';
 	my $type= $self->{type}=
 				$self->{mode} eq 'playlist' ? 'A' :
@@ -426,6 +432,10 @@ sub CommonInit
 				$type eq 'Q' ? 'remove_and_play' :
 				'play';
 	$self->{activate2}||='queue' unless $type eq 'Q'; #default to 'queue' songs when double middle-click
+
+	$self->{markup_empty}= $Markup_Empty{$type} unless defined $self->{markup_empty};
+	$self->{markup_library_empty}= _"Library empty.\n\nUse the settings dialog to add music."
+		unless defined $self->{markup_library_empty} or $type=~m/[QL]/;
 
 	::WatchFilter($self,$self->{group}, \&SetFilter ) if $type!~m/[QL]/;
 	$self->{need_init}=1;
@@ -626,6 +636,32 @@ sub DeleteList
 	::SaveList($name,undef) if defined $name;
 }
 
+sub DrawEmpty
+{	my ($self,$window,$window_size,$offset)=@_;
+	return unless $window;
+	$offset||=0;
+	$window_size||=$window;
+	my $type=$self->{type};
+	my $markup= scalar @$::Library ? undef : $self->{markup_library_empty};
+	$markup ||= $self->{markup_empty};
+	if ($markup)
+	{	$markup=~s#(?:\\n|<br>)#\n#g;
+		my ($width,$height)=$window_size->get_size;
+		my $layout= Gtk2::Pango::Layout->new( $self->create_pango_context );
+		$width-=2*5;
+		$layout->set_width( Gtk2::Pango->scale * $width );
+		$layout->set_wrap('word-char');
+		$layout->set_alignment('center');
+		my $style= $self->style;
+		my $font= $style->font_desc;
+		$font->set_size( 2 * $font->get_size );
+		$layout->set_font_description($font);
+		$layout->set_markup( "\n".$markup );
+		my $gc=$style->text_aa_gc($self->state);
+		$window->draw_layout($gc, $offset+5,5, $layout);
+	}
+}
+
 package SongList;
 use Glib qw(TRUE FALSE);
 use Gtk2;
@@ -802,6 +838,10 @@ sub new
 		$tv->signal_connect(query_tooltip=> \&query_tooltip_cb);
 	}
 
+	# used to draw text when treeview empty
+	$tv->signal_connect(expose_event=> \&expose_cb);
+	$tv->get_hadjustment->signal_connect_swapped(changed=> sub { my $tv=shift; $tv->queue_draw unless $tv->get_model->iter_n_children },$tv);
+
 	$self->AddColumn($_) for split / +/,$opt->{cols};
 	$self->AddColumn('title') unless $tv->get_columns; #make sure there is at least one column
 
@@ -922,6 +962,17 @@ sub ToggleColumn
 	$self->AddColumn($colid,$position) if defined $position;
 	$self->AddColumn('title') unless $tv->get_columns; #if removed the last column
 	$self->{cols_to_watch}=undef; #to force update list of columns to watch
+}
+
+sub expose_cb
+{	my ($tv,$event)=@_;
+	my $self=$tv->parent;
+	unless ($tv->get_model->iter_n_children && $event->window != $tv->window)
+	{	$tv->get_bin_window->clear;
+		# draw empty text when no songs
+		$self->DrawEmpty($tv->get_bin_window,$tv->window, $tv->get_hadjustment->value);
+	}
+	return 0;
 }
 
 sub query_tooltip_cb
@@ -5384,22 +5435,10 @@ sub expose_cb
 	#$window->draw_rectangle($style->base_gc($state), 1, $expose->values);
 	my $gc=$style->base_gc($nstate);
 	$window->draw_rectangle($gc, 1, $expose->values);
-	if (0)#if ($self->{background_picture}=PIXPATH.'gmb-queue.png')#TEST REMOVE PHASE1
-	{	my $pixbuf= $self->{background_pixbuf};
-		if (!$pixbuf || $self->{background_pixbuf_size} ne join('x',$window->get_size))
-		{	$pixbuf=Gtk2::Gdk::Pixbuf->new_from_file($self->{background_picture});#FIXME cache it
-			warn "reloading with size $self->{background_pixbuf_size}\n";
-			$pixbuf=Skin::_resize($pixbuf,'ratio',$window->get_size);
-			$pixbuf->saturate_and_pixelate($pixbuf,.5,1);
-			$self->{background_pixbuf_size}= join 'x', $window->get_size;
-			$self->{background_pixbuf}= $pixbuf;
-		}
-		my ($x,$y,$width,$height) = $expose->values;
-		$width=	$pixbuf->get_width-$x	if $width+$x >$pixbuf->get_width;
-		$height=$pixbuf->get_height-$y	if $height+$y>$pixbuf->get_height;
-		$window->draw_pixbuf($gc,$pixbuf, $x,$y, $x,$y, $width,$height, 'none',0,0) if $width>0 && $height>0;
+	unless ($list && @$list)
+	{	$self->DrawEmpty($window);
+		return 1;
 	}
-	return 1 unless $list && @$list;
 
 	my $xadj=int $self->{hadj}->value;
 	my $yadj=int $self->{vadj}->value;
