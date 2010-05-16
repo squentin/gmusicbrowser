@@ -1864,7 +1864,7 @@ our %ReplaceFields=
 sub ReplaceFields
 {	my ($gid,$format,$col,$esc)=@_;
 #my $u;$u=$format; #DEBUG DELME
-	$format=~s#\\n#\n#g;
+	$format=~s#(?:\\n|<br>)#\n#g;
 	if($esc){ $format=~s/%([alLyYsxXb%r])/::PangoEsc($ReplaceFields{$1}->($col,$gid))/ge; }
 	else	{ $format=~s/%([alLyYsxXb%r])/$ReplaceFields{$1}->($col,$gid)/ge; }
 #warn "ReplaceFields $gid : $u => $format\n" if defined $u; #DEBUG DELME

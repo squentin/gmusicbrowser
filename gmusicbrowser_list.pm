@@ -6604,7 +6604,7 @@ sub markup_layout
 		$pangocontext->set_matrix($matrix);
 	}
 	my $layout=Gtk2::Pango::Layout->new($pangocontext);
-	if (defined $markup) { $markup=~s#\\n#\n#g; $layout->set_markup($markup); }
+	if (defined $markup) { $markup=~s#(?:\\n|<br>)#\n#g; $layout->set_markup($markup); }
 	else { $text='' unless defined $text; $layout->set_text($text); }
 	return $layout;
 }

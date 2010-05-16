@@ -627,7 +627,7 @@ sub ReplaceFields
 {	my ($ID,$string,$esc,$special)=@_;
 	$special||={};
 	my $display= $esc ? ref $esc ? sub { $esc->(Songs::Display(@_)) } : \&Songs::DisplayEsc : \&Songs::Display;
-	$string=~s#\\n#\n#g;
+	$string=~s#(?:\\n|<br>)#\n#g;
 	$string=~s#([%\$]){2}|(%[a-zA-Z]|\$[a-zA-Z\$]\w*)|\${(.*?(?<!\\))}#
 		$1			? $1 :
 		defined $3		? ReplaceExpr($3) :
