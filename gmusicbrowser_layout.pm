@@ -490,31 +490,31 @@ our %Widgets=
 	},
 	FilterLock=>	{ New		=> \&Browser::makeLockToggle,},
 	HistItem =>	{ New		=> \&Layout::MenuItem::new,
-			  label		=> _"Recent Filters",
+			  text		=> _"Recent Filters",
 			  updatemenu	=> \&Browser::fill_history_menu,
 			},
 	PlayItem =>	{ New		=> \&Layout::MenuItem::new,
-			  label		=> _"Playing",
+			  text		=> _"Playing",
 			  updatemenu	=> sub { ::BuildMenu(\@Browser::MenuPlaying, { self => $_[0], songlist => ::GetSonglist($_[0]) }, $_[0]->get_submenu); },
 			},
 	LSortItem =>	{ New		=> \&Layout::MenuItem::new,
-			  label		=> _"Sort",
+			  text		=> _"Sort",
 			  updatemenu	=> \&Browser::make_sort_menu,
 			},
 	PSortItem =>	{ New		=> \&Layout::MenuItem::new,
-			  label		=> _"Play order",
+			  text		=> _"Play order",
 			  updatemenu	=> sub { SortMenu($_[0]->get_submenu); },
 			},
 	PFilterItem =>	{ New		=> \&Layout::MenuItem::new,
-			  label		=> _"Playlist filter",
+			  text		=> _"Playlist filter",
 			  updatemenu	=> sub { FilterMenu($_[0]->get_submenu); },
 			},
 	QueueItem =>	{ New		=> \&Layout::MenuItem::new,
-			  label		=> _"Queue",
+			  text		=> _"Queue",
 			  updatemenu	=> sub{ ::BuildMenu(\@MenuQueue,{ID=>$::SongID}, $_[0]->get_submenu); },
 			},
 	LayoutItem =>	{ New		=> \&Layout::MenuItem::new,
-			  label		=> _"Layout",
+			  text		=> _"Layout",
 			  updatemenu	=> sub{ ::BuildChoiceMenu( Layout::get_layout_list(qr/G.*\+/),
 					 	 	tree=>1,
 							check=> sub {$::Options{Layout}},
@@ -524,7 +524,7 @@ our %Widgets=
 					},
 			},
 	MainMenuItem =>	{ New		=> \&Layout::MenuItem::new,
-			  label		=> _"Main",
+			  text		=> _"Main",
 			  updatemenu	=> sub{ ::BuildMenu(\@MainMenu,undef, $_[0]->get_submenu); },
 			},
 	MenuItem =>	{ New		=> \&Layout::MenuItem::new,
@@ -3418,8 +3418,9 @@ sub new
 {	my ($class,$opt)=@_;
 	my $self = bless Gtk2::ToggleButton->new, $class;
 	my ($icon,$label);
+	my $text= $opt->{label} || $opt->{text};
 	$self->set_relief($opt->{relief}) if $opt->{relief};
-	$label=Gtk2::Label->new($opt->{label}) if defined $opt->{label};
+	$label=Gtk2::Label->new($text) if defined $text;
 	$icon=Gtk2::Image->new_from_stock($opt->{icon},$opt->{size}) if $opt->{icon};
 	my $child= ($label && $icon) ?	::Hpack($icon,$label) :
 					$icon || $label;
@@ -3465,7 +3466,7 @@ use Gtk2;
 sub new
 {	my $opt=shift;
 	my $self;
-	my $label=$opt->{label};
+	my $label= $opt->{label} || $opt->{text};
 	if ($opt->{togglewidget})	{ $self=Gtk2::CheckMenuItem->new($label); }
 	elsif ($opt->{icon})		{ $self=Gtk2::ImageMenuItem->new($label);
 					  $self->set_image( Gtk2::Image->new_from_stock($opt->{icon}, 'menu'));

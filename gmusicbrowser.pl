@@ -627,7 +627,7 @@ sub ReplaceFields
 {	my ($ID,$string,$esc,$special)=@_;
 	$special||={};
 	my $display= $esc ? ref $esc ? sub { $esc->(Songs::Display(@_)) } : \&Songs::DisplayEsc : \&Songs::Display;
-	$string=~s#\\n#\n#g;
+	$string=~s#(?:\\n|<br>)#\n#g;
 	$string=~s#([%\$]){2}|(%[a-zA-Z]|\$[a-zA-Z\$]\w*)|\${(.*?(?<!\\))}#
 		$1			? $1 :
 		defined $3		? ReplaceExpr($3) :
@@ -4991,7 +4991,7 @@ sub AboutDialog
 	$dialog->set_license("Released under the GNU General Public Licence version 3\n(http://www.gnu.org/copyleft/gpl.html)");
 	$dialog->set_website('http://gmusicbrowser.org');
 	$dialog->set_authors('Quentin Sculo <squentin@free.fr>');
-	$dialog->set_artists('tango icon theme : Jean-Philippe Guillemin');
+	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\nelementary icon theme : Simon Steinbeiß");
 	$dialog->set_translator_credits("French : Quentin Sculo and Jonathan Fretin\nHungarian : Zsombor\nSpanish : Martintxo, Juanjo and Elega\nGerman : vlad <donvla\@users.sourceforge.net> & staubi <staubi\@linuxmail.org>\nPolish : tizzilzol team\nSwedish : Olle Sandgren\nChinese : jk");
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
