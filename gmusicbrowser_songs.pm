@@ -370,7 +370,7 @@ our %timespan_menu=
 		get	=> '(#_#==255 ? "" : #_#)',
 		display	=> '(#_#==255 ? "" : #_#)',
 		'stats:average'	=> 'push @{#HVAL#},#_default#;  ---- #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
-		check	=> '#VAL#= #VAL# =~m/^\d+$/ ? (#VAL#>100 ? 100 : #VAL#) : 255;',
+		check	=> '#VAL#= #VAL# =~m/^\d+$/ ? (#VAL#>100 ? 100 : #VAL#) : "";',
 		set	=> '{ my $v=#VAL#; #_default#= ($v eq "" ? $::Options{DefaultRating} : $v); #_# = ($v eq "" ? 255 : $v); }',
 		'filter:e'	=> '#_# .==. #VAL#',		'filter_prep:e' =>  sub { $_[0] eq "" ? 255 : $_[0]=~m/(\d+(?:\.\d+)?)/ ? $1 : 0},
 		'filter:>'	=> '#_default# .>. #VAL#',
@@ -1864,7 +1864,7 @@ our %ReplaceFields=
 sub ReplaceFields
 {	my ($gid,$format,$col,$esc)=@_;
 #my $u;$u=$format; #DEBUG DELME
-	$format=~s#\\n#\n#g;
+	$format=~s#(?:\\n|<br>)#\n#g;
 	if($esc){ $format=~s/%([alLyYsxXb%r])/::PangoEsc($ReplaceFields{$1}->($col,$gid))/ge; }
 	else	{ $format=~s/%([alLyYsxXb%r])/$ReplaceFields{$1}->($col,$gid)/ge; }
 #warn "ReplaceFields $gid : $u => $format\n" if defined $u; #DEBUG DELME
