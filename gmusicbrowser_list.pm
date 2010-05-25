@@ -3575,6 +3575,7 @@ sub new
 	}
 
 	$self->{DefaultFocus}=$entry;
+	EntryChanged_cb($entry,1);
 	return $self;
 }
 
