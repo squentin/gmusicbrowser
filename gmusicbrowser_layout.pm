@@ -3533,7 +3533,7 @@ sub update_labels
 	my %checks; $self->{checks}=\%checks;
 	for my $label ( @{Songs::ListAll($self->{field})} )
 	{	my $check= $checks{$label}= Gtk2::CheckButton->new_with_label($label);
-		$check->signal_connect(toggled => sub { my $self=::find_ancestor($_[0],__PACKAGE__); return if $self->{busy}; my $field= ($_[0]->get_active ? '+' : '-').$self->{field}; Songs::Set($::SongID,$field,[$_[1]]); },$label);
+		$check->signal_connect(toggled => \&toggled_cb,$label);
 	}
 	$self->{width}=0;
 	$self->update_columns;
@@ -3562,14 +3562,23 @@ sub update_columns
 sub update_song
 {	my $self=shift;
 	$self->{busy}=1;
-	$self->{table}->set_sensitive(defined $::SongID);
+	my $ID= ::GetSelID($self);
+	$self->{table}->set_sensitive(defined $ID);
 	my $checks=$self->{checks};
 	for my $label (keys %$checks)
 	{	my $check=$checks->{$label};
-		my $on= defined $::SongID ? Songs::IsSet($::SongID,$self->{field}, $label) : 0;
+		my $on= defined $ID ? Songs::IsSet($ID,$self->{field}, $label) : 0;
 		$check->set_active($on);
 	}
 	$self->{busy}=0;
+}
+sub toggled_cb
+{	my ($check,$label)=@_;
+	my $self=::find_ancestor($check,__PACKAGE__);
+	return if $self->{busy};
+	my $field= ($check->get_active ? '+' : '-').$self->{field};
+	my $ID= ::GetSelID($self);
+	Songs::Set($ID,$field,[$label]);
 }
 
 package GMB::Context;
