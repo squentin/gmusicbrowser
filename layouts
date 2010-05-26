@@ -18,7 +18,7 @@ HBTimeSlider	= PlayingTime(markup="%s",initsize="X:XX") _TimeSlider -Length(mark
 HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1,tip="Simple List View") ToggleButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1,tip="Songtree View") ToggleButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1,tip="Mosaic View")
 VBToggle	= HBToggle _Filler1
 VBSearchBox	= 2SimpleSearch() _Filler2
-VBSettings	= Pref _Filler5
+VBSettings	= Pref(stock=gtk-preferences_20,size=button) _Filler5
 ### main left: artist pane and album-cover ###
 VBArtist	= _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1) HBCover
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
