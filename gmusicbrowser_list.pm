@@ -3268,6 +3268,7 @@ sub new
 	#$entry->set_width_chars($opt->{width_chars}) if $opt->{width_chars};
 	$entry->signal_connect(changed => \&EntryChanged_cb);
 	$entry->signal_connect(activate => \&Filter);
+	$entry->signal_connect(key_press_event	=> sub { my ($entry,$event)=@_; return 0 unless Gtk2::Gdk->keyval_name($event->keyval) eq 'Escape'; $entry->set_text(''); return 1; });
 	$entry->signal_connect_after(activate => sub {::run_command($_[0],$opt->{activate});}) if $opt->{activate};
 	unless ($opt->{noselector})
 	{	for my $aref (	['gtk-find'	=> \&PopupSelectorMenu,	0, _"Search options"],
@@ -3476,7 +3477,7 @@ sub EntryChanged_cb
 {	my $entry=$_[0];
 	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
 	my $l= length($entry->get_text);
-	my $timeout= $l>2 ? 100 : 1000;
+	my $timeout= $l==1 ? 1000 : 100;
 	$entry->{changed_timeout}= Glib::Timeout->add($timeout,\&Filter,$entry);
 }
 
