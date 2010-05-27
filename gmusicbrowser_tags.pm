@@ -680,7 +680,7 @@ sub autofill_cb
 	my $OBlank=$self->{AFOBlank}->get_active;
 	my @vals;
 	for my $ID (@{$self->{IDs}})
-	{	my $file= Songs::Get($ID,'file');
+	{	my $file= Songs::Display($ID,'file');
 		$file=~s/\.[^.]*$//;
 		my @v=($file=~m/$pattern/);
 		s/_/ /g for @v;		#should it be an option ?
