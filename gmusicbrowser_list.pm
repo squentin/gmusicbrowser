@@ -2354,6 +2354,8 @@ sub key_press_cb
 	my $shift=$state * ['shift-mask'];
 	if	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }	#ctrl-f : search
 	elsif	(lc$key eq 'g' && $ctrl) { $self->{isearchbox}->search($shift ? -1 : 1);}	#ctrl-g : next/prev match
+	elsif	($key eq 'F3')		 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
+	elsif	($key eq 'Escape')	 { $self->{view}->grab_focus;}				#Esc : hide searchbox
 	elsif	(!$self->{no_typeahead} && $unicode && !($state * [qw/control-mask mod1-mask mod4-mask/]))
 	{	$self->{isearchbox}->begin( chr $unicode );	#begin typeahead search
 	}
@@ -5408,6 +5410,8 @@ sub key_press_cb
 		{ vec($self->{selected},$_,1)=1 for 0..$#$list; $self->UpdateSelection;}
 	elsif	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }			#ctrl-f : search
 	elsif	(lc$key eq 'g' && $ctrl) { $self->{isearchbox}->search($shift ? -1 : 1);}	#ctrl-g : next/prev match
+	elsif	($key eq 'F3')		 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
+	elsif	($key eq 'Escape')	 { $self->{view}->grab_focus; }				#Esc : hide searchbox
 	elsif	(!$self->{no_typeahead} && $unicode && !($state * [qw/control-mask mod1-mask mod4-mask/]))
 	{	$self->{isearchbox}->begin( chr $unicode );	#begin typeahead search
 	}
