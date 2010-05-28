@@ -2354,6 +2354,8 @@ sub key_press_cb
 	my $shift=$state * ['shift-mask'];
 	if	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }	#ctrl-f : search
 	elsif	(lc$key eq 'g' && $ctrl) { $self->{isearchbox}->search($shift ? -1 : 1);}	#ctrl-g : next/prev match
+	elsif	($key eq 'F3')		 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
+	elsif	($key eq 'Escape')	 { $self->{view}->grab_focus;}				#Esc : hide searchbox
 	elsif	(!$self->{no_typeahead} && $unicode && !($state * [qw/control-mask mod1-mask mod4-mask/]))
 	{	$self->{isearchbox}->begin( chr $unicode );	#begin typeahead search
 	}
@@ -3268,8 +3270,8 @@ sub new
 	#$entry->set_width_chars($opt->{width_chars}) if $opt->{width_chars};
 	$entry->signal_connect(changed => \&EntryChanged_cb);
 	$entry->signal_connect(activate => \&Filter);
+	$entry->signal_connect(key_press_event	=> sub { my ($entry,$event)=@_; return 0 unless Gtk2::Gdk->keyval_name($event->keyval) eq 'Escape'; $entry->set_text(''); return 1; });
 	$entry->signal_connect_after(activate => sub {::run_command($_[0],$opt->{activate});}) if $opt->{activate};
-	$entry->signal_connect(key_press_event => sub { return 0 unless Gtk2::Gdk->keyval_name($_[1]->keyval) eq 'Escape'; $_[0]->set_text(''); return 1; }); # "esc" clears the simplesearch entry
 	unless ($opt->{noselector})
 	{	for my $aref (	['gtk-find'	=> \&PopupSelectorMenu,	0, _"Search options"],
 				['gtk-clear'	=> \&ClearFilter,	1, _"Reset filter"]
@@ -4688,7 +4690,7 @@ our @OptionsMenu=
 	{ label => _"Begin with",	code => sub { $_[0]{self}{onlybegin}^=1; $_[0]{self}{onlyword}=0; $_[0]{self}->changed;},	check => sub { $_[0]{self}{onlybegin}; }, },
 	{ label => _"Words that begin with",	code => sub { $_[0]{self}{onlyword}^=1;$_[0]{self}{onlybegin}=0; $_[0]{self}->changed;},		check => sub { $_[0]{self}{onlyword}; }, },
 	{ label => _"Fields",		submenu => sub { return {map { $_=>Songs::FieldName($_) } Songs::StringFields}; }, submenu_reverse => 1,
-	  check => sub { $_[0]{self}{fields}; },	test => sub { !$_[0]{type} },
+	  check => sub { $_[0]{self}{fields}; },	test => sub { !$_[0]{self}{type} },
 	  code => sub { my $toggle=$_[1]; my $l=$_[0]{self}{fields}; my $n=@$l; @$l=grep $toggle ne $_, @$l; push @$l,$toggle if @$l==$n; @$l=('title') unless @$l; $_[0]{self}->changed; }, #toggle selected field
 	},
 );
@@ -5408,6 +5410,8 @@ sub key_press_cb
 		{ vec($self->{selected},$_,1)=1 for 0..$#$list; $self->UpdateSelection;}
 	elsif	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }			#ctrl-f : search
 	elsif	(lc$key eq 'g' && $ctrl) { $self->{isearchbox}->search($shift ? -1 : 1);}	#ctrl-g : next/prev match
+	elsif	($key eq 'F3')		 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
+	elsif	($key eq 'Escape')	 { $self->{view}->grab_focus; }				#Esc : hide searchbox
 	elsif	(!$self->{no_typeahead} && $unicode && !($state * [qw/control-mask mod1-mask mod4-mask/]))
 	{	$self->{isearchbox}->begin( chr $unicode );	#begin typeahead search
 	}
