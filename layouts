@@ -14,7 +14,7 @@ HBButtons	= Prev Play Next(click2=NextAlbum)
 VBButtons	= HBButtons Filler4
 VBPlayer	= HBTitle(maxwidth=250) HBTimeSlider
 HBTitle		= Title(expand_max=1,maxwidth=250,minsize=1,markup="<big><b>%t</b></big>",click1="") AlbumBreadcrumb(tip="Album: %l (%Y)",expand_max=200,) ArtistBreadcrumb(tip="Artist: %a",expand_max=200,) -Stars
-HBTimeSlider	= PlayingTime(markup="%s",initsize="X:XX") _TimeSlider -Length(markup="$length",initsize="XX:XX")
+HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider -Length(markup="$length",initsize="XX:XX",xalign=1)
 HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1,tip="Simple List View") ToggleButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1,tip="Songtree View") ToggleButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1,tip="Mosaic View")
 VBToggle	= HBToggle _Filler1
 VBSearchBox	= 2SimpleSearch() _Filler2
@@ -527,7 +527,7 @@ text: text(markup=playmarkup(pesc($title)))
 {Column playandqueueandtrack}
 menutitle = Playing/Queue Icon and Track
 width = 40
-sort = text:i
+sort = track
 ico:	icon(pad=2,icon=$playicon)
 text:	text(markup=playmarkup(pesc($track)),x=-text:w)
 
