@@ -3609,7 +3609,7 @@ use Gtk2;
 use base 'Gtk2::EventBox';
 
 my (@pixbufs,$width);
-use constant NBSTARS => 5;
+use constant NBSTARS => 10;
 
 INIT
 {	@pixbufs=map Gtk2::Gdk::Pixbuf->new_from_file(::PIXPATH.'stars'.$_.'.png'), 0..NBSTARS;
