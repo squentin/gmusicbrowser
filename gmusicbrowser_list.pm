@@ -7100,7 +7100,7 @@ sub parse
 		if (m#\G(-?\d*\.?\d+)#gc)	{$r.=$1}	#number
 		elsif (m#\G('.*?[^\\]'|'')#gc){$r.=$1}	#string between ' '
 		  #variable or function
-		elsif (m#\G([-!])?(\$_?)?([a-zA-Z][:0-9_a-zA-Z]*)(\()?#gc)
+		elsif (m#\G([-!]\s*)?(\$_?)?([a-zA-Z][:0-9_a-zA-Z]*)(\()?#gc)
 		{	last if $2 && $4;
 			$r.=$1 if $1;
 			my $v=$3;
