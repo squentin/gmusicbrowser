@@ -119,8 +119,9 @@ sub SaveRatingScoresCSV {
 		foreach my $song (@sorted_by_lastplay) {
 		    my $rating_score = $used;
 		    my $rating = ::Songs::Get($song, "rating");
+		    my $final_rating = ($rating * 1.0) + ($rating_score - 0.5);
 		    $used += $step;
-		    print RSF $rating . ", " . $rating_score . "\n";
+		    print RSF $rating . ", " . $final_rating . "\n";
 		    warn "Song: " . ::Songs::Get($song, "title") . " gets ratingscore " . $rating_score;
 		}
 	    } else {
