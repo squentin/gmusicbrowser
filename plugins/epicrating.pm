@@ -21,6 +21,11 @@ package GMB::Plugin::EPICRATING;
 use strict;
 use warnings;
 
+Glib->install_exception_handler (sub {
+    warn shift;
+    exit -1;
+});
+
 use constant {
     OPT => 'PLUGIN_EPICRATING_', #used to identify the plugin's options
 };
@@ -75,6 +80,56 @@ sub GetRulesBySignal {
 	}
     }
     return $matched_rules;
+}
+
+sub gettimeofday_us {
+    require Time::HiRes;
+}
+
+sub SaveRatingScoresCSV {
+    my ($self) = @_;
+
+    use Text::CSV;
+    my $file_chooser = Gtk2::FileChooserDialog->new(
+	_"Save lastplay ratingscore to file",
+	undef, 'save', 'gtk-save', => 'ok', 'gtk-cancel' => 'cancel');
+    my $save_response = $file_chooser->run();
+    
+    if($save_response eq 'ok') {
+	my $filename = $file_chooser->get_filename();
+	open RSF, ">", $filename or warn("Could not save file.");
+	warn "Processing rating scores...";
+	for (0..100) {
+	    warn "... Processing rating #" . $_;
+	    my $filter = Filter->new("rating:e:" . $_)->filter;
+	    my $length = @{$filter};
+	    warn "... has " . $length . " songs.";
+
+	    my @sorted_by_lastplay = sort {
+		my $a_played = ::Songs::Get($a, 'lastplay');
+		my $b_played = ::Songs::Get($b, 'lastplay');
+		$a_played <=> $b_played;
+	    } @{$filter};
+
+	    if($length != 0) {
+		my $step = 1.0 / $length;
+
+		my $used = 0.0;
+
+		foreach my $song (@sorted_by_lastplay) {
+		    my $rating_score = $used;
+		    my $rating = ::Songs::Get($song, "rating");
+		    $used += $step;
+		    print RSF $rating . ", " . $rating_score . "\n";
+		    warn "Song: " . ::Songs::Get($song, "title") . " gets ratingscore " . $rating_score;
+		}
+	    } else {
+		warn "... not sorting empty rating.";
+	    }
+	}
+	close RSF;
+    }
+    $file_chooser->destroy();
 }
 
 # apply the action this rule specifies.
@@ -280,17 +335,22 @@ sub prefbox {
     $default_rating_box->add($set_default_rating_skip_check);
     $default_rating_box->add($set_default_rating_finished_check);
 
-    my $rating_freq_dump_button = Gtk2::Button->new("CSV dump of rating populations");
+    my $song_dump_button = Gtk2::Button->new("CSV dump of songs");
 
+    my $produce_ratingscore_button = Gtk2::Button->new("Emit CSV of heuristic rating scores");
 
+    $produce_ratingscore_button->signal_connect(clicked => sub {
+	warn "Ready to begin calculating rating scores.";
+	my $rating_scores = $self->SaveRatingScoresCSV();
+	
+    });
 
     use Text::CSV;
-    $rating_freq_dump_button->signal_connect(clicked => sub {
+    $song_dump_button->signal_connect(clicked => sub {
 	my $file_chooser = Gtk2::FileChooserDialog->new(
 	    _"Save gmusicbrowser song stats CSV dump as...",
 	    undef, 'save', 'gtk-save' => 'ok', 'gtk-cancel' => 'cancel');
 	my $response = $file_chooser->run();
-
 	
 	if($response eq 'ok') {
 	    my $csv_filename = $file_chooser->get_filename();
@@ -316,7 +376,8 @@ sub prefbox {
     $big_vbox->add($rules_scroller);
     $big_vbox->add_with_properties($add_rule_button, "expand", ::FALSE);
     $big_vbox->add_with_properties($default_rating_box, "expand", ::FALSE);
-    $big_vbox->add_with_properties($rating_freq_dump_button, "expand", ::FALSE);
+    $big_vbox->add_with_properties($song_dump_button, "expand", ::FALSE);
+    $big_vbox->add_with_properties($produce_ratingscore_button, "expand", ::FALSE);
 
     $big_vbox->show_all();
     return $big_vbox;
