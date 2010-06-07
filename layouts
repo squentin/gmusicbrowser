@@ -1,26 +1,29 @@
 [shimmer]
 Type=G
-Title		= " "
+Title		= "gmusicbrowser"
 DefaultFocus	= SimpleSearch
 Default		= Window(size=1000x750)
 Window		= hidden=SongTree|VPMosaic
 Author		= simon@shimmerproject.org
 ### main window containers: top bar, main and statusbar ###
-VBmain		= HBTop _HBMain HBStatusbar
-HBMain		= VBArtist _HPRight
+VBMain		= VBTop _HBMain HBStatusbar
+HBMain		= VBLeft _HPRight
+VBTop		= 3Filler8 HBTop
 HBTop		= VBButtons _15VBPlayer 15VBToggle VBSearchBox -5VBSettings
 ### top bar from left to right ###
+VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
-VBButtons	= HBButtons Filler4
-VBPlayer	= HBTitle(maxwidth=250) HBTimeSlider
-HBTitle		= Title(expand_max=1,maxwidth=250,minsize=1,markup="<big><b>%t</b></big>",click1="") AlbumBreadcrumb(tip="Album: %l (%Y)",expand_max=200,) ArtistBreadcrumb(tip="Artist: %a",expand_max=200,) -Stars
+VBPlayer	= HBTitle HBTimeSlider
+HBTitle		= Title(expand_max=1,minsize=1,markup="<big><b>%t</b></big>",click1="",tip="Title: %t (Track No. %n)".if($track,pesc($track))) AlbumBreadcrumb(tip="Album: %l (%Y)",expand_max=200,) ArtistBreadcrumb(tip="Artist: %a",expand_max=200,) -Stars(yalign=0)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider -Length(markup="$length",initsize="XX:XX",xalign=1)
+VBToggle	= HBToggle 5Filler1
 HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1,tip="Simple List View") ToggleButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1,tip="Songtree View") ToggleButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1,tip="Mosaic View")
-VBToggle	= HBToggle _Filler1
-VBSearchBox	= 2SimpleSearch() _Filler2
-VBSettings	= Pref(stock=gtk-preferences_20,size=button) _Filler5
+VBSearchBox	= 2SimpleSearch() 5Filler2
+VBSettings	= Pref(stock=gtk-preferences_20,size=button) 5Filler5
 ### main left: artist pane and album-cover ###
-VBArtist	= _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1) HBCover
+VBLeft		= _TBList HBCover
+TBList		= "Artists" VBArtist "Queue" QueueList
+VBArtist	= _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1)
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
@@ -28,11 +31,9 @@ HBSongListtree	= _SongTree(cols="playandqueue track title artist length playcoun
 HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
 VPMosaic	= _FilterPane1(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,hidetabs=1)
 ### bottom: statusbar ### Pref(size=small-toolbar,button=0) 
-HBStatusbar	= 5HBQueue 5Filler3  10Filter(with_text=1) 10Sort(with_text=1) 10LockAlbum(with_text=1) 10LockArtist(with_text=1) -Total(format=short,relief=none,button=0,mode=list)
+HBStatusbar	= 5HBQueue 3Filler3  10Filter(with_text=1) 10Sort(with_text=1) 10LockAlbum(with_text=1) 10LockArtist(with_text=1) -Total(format=short,relief=none,button=0,mode=list)
 HBQueue		= Queue Text1(markup="<small>Queue</small>",click1=OpenQueue,size=small-toolbar,tip="Show Queue")
 ### positioning and sizing ###
-HSize0		= 10 Filler0 Filler1 Filler2 Filler5 Filler6 Filler7
-HSize0		= 5 Filler3 Filler4
 HSize0		= 350 VBArtist
 VSize0		= 350 HBCover
 
@@ -525,11 +526,11 @@ progress: pbar( fill=$progress, hide=!$playing,y=1,h=-2)
 text: text(markup=playmarkup(pesc($title)))
 
 {Column playandqueueandtrack}
-menutitle = Playing/Queue Icon and Track
+menutitle = Playing/Queue Icon or Track
 width = 40
 sort = track
-ico:	icon(pad=2,icon=$playicon)
-text:	text(markup=playmarkup(pesc($track)),x=-text:w)
+ico:	icon(pad=2,icon=$playicon, hide=!$playing) #FIXME: hide elseif !$enqueued
+text:	text(markup=pesc($track), hide=$playing) #FIXME: hide elseif $enqueued
 
 {Column playandqueue}
 menutitle = Playing & Queue
