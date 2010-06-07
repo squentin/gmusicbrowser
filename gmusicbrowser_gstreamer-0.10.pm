@@ -9,7 +9,7 @@ package Play_GST;
 use strict;
 use warnings;
 
-my ($GST_ok,$GST_visuals_ok,$GST_EQ_ok,$GST_RG_ok); our $GST_RGA_ok;
+my ($GST_ok,$GST_visuals_ok,$GST_EQ_ok,$GST_RG_ok,$playbin2_ok); our $GST_RGA_ok;
 my ($PlayBin,$Sink);
 my ($WatchTag,$Skip);
 my (%Plugins,%Sinks);
@@ -53,7 +53,8 @@ BEGIN
 	{	GStreamer->init;
 		$reg=GStreamer::Registry->get_default;
 		$reg_keep=$reg if GStreamer->CHECK_VERSION(0,10,4);
-		if ( $reg->lookup_feature('playbin') ) { $GST_ok=1; }
+		$playbin2_ok= $reg->lookup_feature('playbin2');
+		if ( $playbin2_ok || $reg->lookup_feature('playbin') ) { $GST_ok=1; }
 		else { $error="gstreamer plugin 'playbin' not found\nYou need to install at least gst-plugins-base\n"; }
 	}
 	else { $error=$@? $@ : "Can't initialize GStreamer.\n"; }
@@ -99,9 +100,9 @@ sub init
 
 sub createPlayBin
 {	if ($PlayBin) { $PlayBin->get_bus->remove_signal_watch; }
-	my $pb= $::Options{gst_gapless} ? 'playbin2' : 'playbin';
+	my $pb= $playbin2_ok ? 'playbin2' : 'playbin';
 	$PlayBin=GStreamer::ElementFactory->make($pb => 'playbin'); #FIXME only the first one used works
-	$PlayBin->set('flags' => [qw/audio soft-volume/]) if $::Options{gst_gapless};
+	$PlayBin->set('flags' => [qw/audio soft-volume/]) if $playbin2_ok;
 	my $bus=$PlayBin->get_bus;
 	$bus->add_signal_watch;
 #	$bus->signal_connect('message' => \&bus_message);
@@ -319,7 +320,7 @@ sub create_visuals
 		$VSink->set_xwindow_id($visual_window->window->XID);
 	}
 	$PlayBin->set('video-sink' => $VSink) if $PlayBin;
-	$PlayBin->set('flags' => [qw/audio vis soft-volume/]) if $PlayBin && $::Options{gst_gapless};
+	$PlayBin->set('flags' => [qw/audio vis soft-volume/]) if $PlayBin && $playbin2_ok;
 	set_visual();
 }
 sub add_visuals
@@ -335,7 +336,7 @@ sub add_visuals
 }
 sub remove_visuals
 {	$VSink->set_xwindow_id(0) if $VSink;
-	$PlayBin->set('flags' => [qw/audio soft-volume/]) if $PlayBin && $::Options{gst_gapless};
+	$PlayBin->set('flags' => [qw/audio soft-volume/]) if $PlayBin && $playbin2_ok;
 	$PlayBin->set('video-sink' => undef) if $PlayBin;
 	$PlayBin->set('vis-plugin' => undef) if $PlayBin;
 	$visual_window=$VSink=undef;
@@ -475,6 +476,7 @@ sub AdvancedOptions
 {	my $self=$_[0];
 	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $gapless= ::NewPrefCheckButton(gst_gapless => _"enable gapless (experimental)", cb=>sub { $self->{modif}=1 });
+	$gapless->set_sensitive(0) unless $playbin2_ok;
 	$vbox->pack_start($gapless,::FALSE,::FALSE,2);
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');

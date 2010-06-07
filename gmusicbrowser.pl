@@ -844,7 +844,8 @@ our ($NBVolIcons,$NBQueueIcons); my $TrayIconFile;
 my $icon_factory;
 
 my %IconsFallbacks=
-(	'gmb-queue-window' => 'gmb-queue',
+(	'gmb-queue0'	   => 'gmb-queue',
+	'gmb-queue-window' => 'gmb-queue',
 	'gmb-random-album' => 'gmb-random',
 );
 
@@ -2188,7 +2189,7 @@ sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, 
 		{	my $max= @$Queue; $max=$NBQueueIcons if $NBQueueIcons < $max;
 			$n= first { $Queue->[$_]==$ID } 0..$max-1;
 		}
-		defined $n ? "gmb-queue".($n+1) : 'gmb-queue';
+		defined $n ? "gmb-queue".($n+1) : 'gmb-queue0';
 	 } : undef;
 }
 
