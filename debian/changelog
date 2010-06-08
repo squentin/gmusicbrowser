@@ -1,3 +1,14 @@
+gmusicbrowser (1.1.5ppa7) karmic; urgency=low
+
+  * modified/updated default layout (shimmer)
+  * switched to 10-stars system
+  * added "q+"-icon for queue-items>9
+    updated icon theme (elementary)
+    merge with git upstream (commit 6f008f3e6483ccc94600 - 2010-06-07)
+    for a complete changelog see: github.com/ochosi/gmusicbrowser/commits/
+
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Tue, 08 Jun 2010 02:39:41 +0200
+
 gmusicbrowser (1.1.5ppa6) karmic; urgency=low
 
   * added plugin: epic-rating (by orospakr)
