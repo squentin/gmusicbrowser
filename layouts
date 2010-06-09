@@ -21,15 +21,16 @@ HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist
 VBSearchBox	= 2SimpleSearch() 5Filler2
 VBSettings	= Pref(stock=gtk-preferences_20,size=button) 5Filler5
 ### main left: artist pane and album-cover ###
-VBLeft		= _TBList HBCover
-TBList		= "Artists" VBArtist "Queue" VBQueue
-VBQueue		= _QueueList HBQueueButtons
+VBLeft		= _NBList HBCover
+NBList		= (tabpos="bottom") VBArtist VBQueue HBLyrics
+HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
+VBQueue		= (tabtitle="Queue") _QueueList HBQueueButtons
 HBQueueButtons	= EditListButtons(small=1) QueueActions
-VBArtist	= _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1)
+VBArtist	= (tabtitle="Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1)
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
-HBSongListtree	= _SongTree(cols="playandqueue track title artist length playcount ratingpic",colwidth="artist 124 lastplay 107 length 40 playandqueue 19 playcount 18 ratingpic 100 title 280 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
+HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
 HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
 VPMosaic	= _FilterPane1(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,hidetabs=1)
 ### bottom: statusbar ### Pref(size=small-toolbar,button=0) 
