@@ -164,13 +164,13 @@ use constant
 };
 
 our %Predefined =
-(	google  => { tabtitle => 'google',	baseurl => 'http://www.google.com/search?q="%a"+"%t"', },
-	amgartist=>{ tabtitle => 'amg artist',	baseurl => 'http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=%a', },
-	amgalbum=> { tabtitle => 'amg album',	baseurl => 'http://www.allmusic.com/cg/amg.dll?p=amg&opt1=2&sql=%l', },
-	lastfm	=> { tabtitle => 'last.fm',	baseurl => 'http://www.last.fm/music/%a', },
-	discogs	=> { tabtitle => 'discogs',	baseurl => 'http://www.discogs.com/artist/%a', },
-	youtube	=> { tabtitle => 'youtube',	baseurl => 'http://www.youtube.com/results?search_query="%a"', },
-	pollstar=> { tabtitle => 'pollstar',	baseurl => 'http://www.pollstar.com/eventSearch.aspx?SearchBy=%a', },
+(	google  => { tabtitle => 'google',	baseurl => 'http://www.google.com/search?q="%a"+"%t"', tabicon => 'webcontext-google', },
+	amgartist=>{ tabtitle => 'amg artist',	baseurl => 'http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=%a', tabicon => 'webcontext-amg', },
+	amgalbum=> { tabtitle => 'amg album',	baseurl => 'http://www.allmusic.com/cg/amg.dll?p=amg&opt1=2&sql=%l', tabicon => 'webcontext-amg', },
+	lastfm	=> { tabtitle => 'last.fm',	baseurl => 'http://www.last.fm/music/%a', tabicon => 'webcontext-lastfm', },
+	discogs	=> { tabtitle => 'discogs',	baseurl => 'http://www.discogs.com/artist/%a', tabicon => 'webcontext-discogs', },
+	youtube	=> { tabtitle => 'youtube',	baseurl => 'http://www.youtube.com/results?search_query="%a"', tabicon => 'webcontext-youtube', },
+	pollstar=> { tabtitle => 'pollstar',	baseurl => 'http://www.pollstar.com/eventSearch.aspx?SearchBy=%a', tabicon => 'webcontext-pollstar', },
 );
 
 our %Widgets=
@@ -185,7 +185,7 @@ our %Widgets=
 	},
 	PluginWikipedia =>
 	{	class		=> 'GMB::Plugin::WebContext::Wikipedia',
-		tabicon		=> 'plugin-wikipedia',
+		tabicon		=> 'webcontext-wikipedia',
 		tabtitle	=> _"Wikipedia",
 		schange		=> \&Update,
 		group		=> 'Play',
