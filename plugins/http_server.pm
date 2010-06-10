@@ -78,7 +78,8 @@ sub skip_handler {
     ::NextSong();
     warn "Successfully skipped song!";
 
-    $response->code(RC_OK);
+    $response->code(301);
+    $response->header('Location' => "/");
     return RC_OK;
 }
 
@@ -98,10 +99,11 @@ sub root_handler {
 	$playing_song = "None! :(";
     }
     
-    $playing_song .= "<br /><br /><a href=\"/skip\">Skip!</a>";
+    $playing_song .= "<html><br /><br /><a href=\"/skip\">Skip!</a></html>";
     # Build the response.
     $response->code(RC_OK);
-#    $response->push_header("Content-Type", "application/x-dmap-tagged");
+    $response->header('Content-Type' => "text/html");
+
     $response->content($playing_song);
 
     # Signal that the request was handled okay.
