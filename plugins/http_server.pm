@@ -78,7 +78,7 @@ sub skip_handler {
     ::NextSong();
     warn "Successfully skipped song!";
 
-    $response->code(301);
+    $response->code(302);
     $response->header('Location' => "/");
     return RC_OK;
 }
