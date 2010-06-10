@@ -75,7 +75,7 @@ sub skip_handler {
     warn "Got Skip request!";
     my $cgi = cgi_from_request($request);
 
-    NextSong();
+    ::NextSong();
     warn "Successfully skipped song!";
 
     $response->code(RC_OK);
