@@ -3223,7 +3223,7 @@ sub new
 	$self->signal_connect(destroy => sub {delete $::ToDo{'8_LoadImg'.$_[0]}});
 	$self->set_size_request($minsize,$minsize) if $minsize;
 	$self->{key}=[];
-	$self->{natural_size}=1;
+	$self->{natural_size}=1 unless $minsize;
 	$self->{ratio}=$ratio;
 	return $self;
 }

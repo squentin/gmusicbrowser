@@ -2304,12 +2304,15 @@ sub Move
 	{	my $pos=$::Position;
 		my @rows=sort { $a <=> $b } @$rows;
 		my $delta=0;
-		for my $row (@rows)
-		{	if	($row==$::Position)	{$pos=$destrow+$delta;$delta=0;last}
-			elsif	($row<$::Position)	{$pos--}
+		for my $row (reverse @rows)
+		{	$destrow-- if $row<$destrow;
 			$delta++;
+			if	($row==$::Position)		{ $pos=undef; $delta=0; } #selected song has moved
+			elsif	(defined $pos && $row<$pos)	{ $pos-- }
 		}
-		$pos+=$delta if $destrow<=$::Position;
+		if (defined $pos)	{ $pos+=$delta if $destrow<=$pos; }
+		else			{ $pos=$destrow+$delta; }
+
 		if ($::Position!=$pos) { $::Position=$pos; ::QHasChanged('Pos'); }
 	}
 }
