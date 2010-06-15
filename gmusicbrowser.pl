@@ -1814,7 +1814,7 @@ sub SaveTags	#save tags _and_ settings
 	{	my $lastseen=$Options{LayoutsLastSeen}||={};
 		if 	(exists $Layout::Layouts{$key})	{ delete $lastseen->{$key}; }
 		elsif	(!$lastseen->{$key})		{ $lastseen->{$key}=$DAYNB; }
-		elsif	($lastseen->{$key}<$tooold)	{ delete $_->{$key} for $Options{Layout},$lastseen; }
+		elsif	($lastseen->{$key}<$tooold)	{ delete $_->{$key} for $Options{Layouts},$lastseen; }
 	}
 
 	my $error;
