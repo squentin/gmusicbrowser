@@ -2066,7 +2066,7 @@ sub Play
 
 sub ErrorPlay
 {	my ($error,$critical)=@_;
-	$error='Playing error : '.$error;
+	$error= __x( _"Playing error : {error}", error=> $error );
 	warn $error."\n";
 	return if $Options{IgnorePlayError} && !$critical;
 	my $dialog = Gtk2::MessageDialog->new
