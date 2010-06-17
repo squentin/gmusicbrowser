@@ -14,7 +14,7 @@ HBTop		= VBButtons _15VBPlayer 15VBToggle VBSearchBox -5VBSettings
 VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle HBTimeSlider
-HBTitle		= Title(expand_max=1,minsize=1,markup="<big><b>%t</b></big>",click1="",tip="Title: %t (Track No. %n)".if($track,pesc($track))) AlbumBreadcrumb(tip="Album: %l (%Y)",expand_max=200,) ArtistBreadcrumb(tip="Artist: %a",expand_max=200,) -Stars(yalign=0)
+HBTitle		= Title(expand_max=1,minsize=1,markup="<big><b>%t</b></big>",click1="",tip="Title: %t (Track No. %n)".if($track,pesc($track))) AlbumBreadcrumb(tip="Album: %l (%Y)",expand_max=200) ArtistBreadcrumb(tip="Artist: %a",expand_max=200) -Stars(yalign=0)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider -Length(markup="$length",initsize="XX:XX",xalign=1)
 VBToggle	= HBToggle 5Filler1
 HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1,tip="Simple List View") ToggleButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1,tip="Songtree View") ToggleButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1,tip="Mosaic View")
@@ -24,7 +24,7 @@ VBSettings	= Pref(stock=gtk-preferences_20,size=button) 5Filler5
 VBLeft		= _NBList HBCover
 NBList		= (tabpos="bottom") VBArtist VBQueue HBLyrics
 HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
-VBQueue		= (tabtitle="Queue") _QueueList HBQueueButtons
+VBQueue		= (tabtitle="Queue") _QueueList(songtree=1) HBQueueButtons
 HBQueueButtons	= EditListButtons(small=1) QueueActions
 VBArtist	= (tabtitle="Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1)
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
@@ -510,6 +510,15 @@ left=4
 vcollapse=head
 title: text(markup='<b><big>'.pesc($title).'</big></b>',pad=4)
 
+{Group shimmerqueue}
+title=Shimmer Queue
+head=title:h
+vcollapse=
+tail=3
+title: text(markup='<b>'.pesc($album).'</b>\n'.pesc($artist),ypad=2,xpad=2,x=23)
+pic: aapic(picsize=title:h,x=-pic:w - 2,ypad=2)
+picsize : OptionNumber(default=30,min=20,max=100,step=5)
+
 {Group artistalbumside}
 title=album and artist on the left side
 vmin= pic:y + pic:h +2
@@ -528,8 +537,15 @@ hreq=text:h
 progress: pbar( fill=$progress, hide=!$playing,y=1,h=-2)
 text: text(markup=playmarkup(pesc($title)))
 
+{Column queuenumber}
+menutitle = Queue-Item Number
+title = #
+width = 20
+text: text(markup=$queued, x=-text:w)
+
 {Column playandqueueandtrack}
 menutitle = Playing/Queue Icon or Track
+title = #
 width = 20
 sort = track
 ico:	icon(pad=2,icon=$playicon, hide= !$playing && !$queued)
