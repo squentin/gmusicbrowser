@@ -130,10 +130,14 @@ sub Play
 		@cmd_and_args= $Commands{$cmd}{cmdline}($file,$sec,$out,@extra);
 	}
 	else
-	{	my $hint='';
-		#FIXME FIXME
-		#$hint= "\n\n".::__x(_"{command} is needed to play this file.",command => $cmdname{$type}) if $cmdname{$type};#FIXME FIXME
-		::ErrorPlay( ::__x(_"Don't know how to play {file}", file => $file).$hint );
+	{	$type= $::Alias_ext{$type} if $::Alias_ext{$type};
+		my $re= qr/\b$type\b/;
+		my @hints= grep $Commands{$_}{type}=~m/$re/, sort keys %Commands;
+		my $msg= _("Can't play '{file}'."). "\n";
+		$msg.=	@hints>1 ?	_"One of these commands is required to play files of type {type} : {cmd}" :
+			@hints   ?	_"This command is required to play files of type {type} : {cmd}" :
+					_"Don't know how to play files of type {type}" ;
+		::ErrorPlay( ::__x($msg, file => $file, type=> $type, cmd=> join(', ',@hints)) );
 		return undef;
 	}
 	$RemoteMode=$Commands{$cmd}{remote};
