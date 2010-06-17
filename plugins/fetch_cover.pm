@@ -293,7 +293,7 @@ sub parse_googlei
 		}
 	}
 	my $nexturl;
-	if ($result=~m#<a href="(/images\?[^>"]*)"><img src="nav_next#)
+	if ($result=~m#<a href="(/images\?[^>"]*)"( [^>]*)?><img src="nav_next#)
 	{	$nexturl='http://images.google.com'.$1;
 		$nexturl=~s#&amp;#&#g;
 	}
