@@ -3041,7 +3041,7 @@ sub new
 	my $pixbox=Gtk2::EventBox->new;
 	$self->{img}=my $img=Gtk2::Image->new;
 	$img->{size}=0;
-	$img->signal_connect(size_allocate => \&size_allocate_cb);
+	$img->signal_connect(size_allocate => \&size_allocate_cb) unless $self->{nopic};
 	$pixbox->add($img);
 	$pixbox->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb,1); # 1 : mouse button 1
 
