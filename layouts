@@ -22,10 +22,11 @@ VBSearchBox	= 2SimpleSearch() 5Filler2
 VBSettings	= Pref(stock=gtk-preferences_20,size=button) 5Filler5
 ### main left: artist pane and album-cover ###
 VBLeft		= _NBList HBCover
-NBList		= (tabpos="bottom") VBArtist VBQueue HBLyrics
+NBList		= (tabpos="bottom") VBArtist VBQueue HBLyrics VBAbout
 HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
 VBQueue		= (tabtitle="Queue") _QueueList(songtree=1) HBQueueButtons
 HBQueueButtons	= EditListButtons(small=1) QueueActions
+VBAbout		= (tabtitle="Info") _ArtistBox _AlbumBox(nopic=1)
 VBArtist	= (tabtitle="Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1)
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
 ### main right: list/tree/mosaic widgets ###
