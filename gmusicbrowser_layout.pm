@@ -2078,7 +2078,10 @@ sub PanedNew
 {	my ($class,$opt)=@_;
 	my $self=$class->new;
 	($self->{size1},$self->{size2})= split /-|_/, $opt->{size} if defined $opt->{size};
-	$self->set_position($self->{size1}) if defined $self->{size1};
+	if (defined $self->{size1})
+	{	$self->set_position($self->{size1});
+		$self->set('position-set',1); # in case $self->{size1}==0 'position-set' is not set to true if child1's size is 0 (which is the case here as child1 doesn't exist yet)
+	}
 	$self->{SaveOptions}=sub { size => $_[0]{size1} .'-'. $_[0]{size2} };
 	$self->signal_connect(size_allocate => \&Paned_size_cb ); #needed to correctly behave when a child is hidden
 	return $self;
