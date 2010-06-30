@@ -1689,6 +1689,10 @@ sub PanedNew
 {	my ($class,$opt)=@_;
 	my $pane=$class->new;
 	($pane->{pos1},$pane->{pos2})=split /_/,$opt if $opt;
+	if (defined $pane->{pos1})
+	{	$pane->set_position($pane->{pos1});
+		$pane->set('position-set',1); # in case $pane->{pos1}==0 'position-set' is not set to true if child1's size is 0 (which is the case here as child1 doesn't exist yet)
+	}
 	$pane->set_position($pane->{pos1}) if defined $pane->{pos1};
 	$pane->{SaveOptions}=sub { $_[0]{pos1}.'_'.$_[0]{pos2} };
 	$pane->signal_connect(size_allocate => \&Paned_size_cb ); #needed to correctly behave when a child is hidden
