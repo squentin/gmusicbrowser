@@ -4736,6 +4736,12 @@ sub GetSelectedIDs
 	return map $list->[$_], grep $selected->[$_], 0..$#$selected;
 }
 
+sub EnqueueSelected
+{	my $self=$_[0];
+	my @IDs=$self->GetSelectedIDs;
+	::Enqueue(@IDs) if @IDs;
+}
+
 sub focus_change
 {	my $view=$_[0];
 	#my $sel=$self->{selected};
