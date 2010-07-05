@@ -631,8 +631,7 @@ our %Widgets=
 		autoadd_option	=> 'AddFullscreenButton',
 	},
 	Repeat	=>
-	{	New => sub { Gtk2::CheckButton->new(_"Repeat"); },
-		activate=> sub { ::SetRepeat($_[0]->get_active); },
+	{	New => sub { my $w=Gtk2::CheckButton->new(_"Repeat"); $w->signal_connect(clicked => sub { ::SetRepeat($_[0]->get_active); }); return $w; },
 		event	=> 'Repeat Sort',
 		update	=> sub { if ($_[0]->get_active xor $::Options{Repeat}) { $_[0]->set_active($::Options{Repeat});} $_[0]->set_sensitive(!$::RandomMode); },
 	},
@@ -1068,10 +1067,7 @@ sub NewWidget
 
 	$widget->{actions}{$_}=$options{$_}  for grep m/^click\d*/, keys %options;
 	$widget->signal_connect(button_press_event => \&Button_press_cb) if $widget->{actions};
-	if ($options{activate})
-	{	$widget->{actions}{activate}=$options{activate};
-		$widget->signal_connect(clicked => \&Button_activate_cb);
-	}
+
 	if (my $cursor=$options{cursor})
 	{	$widget->signal_connect(realize => sub { $_[0]->window->set_cursor(Gtk2::Gdk::Cursor->new($_[1])); },$cursor);
 	}
@@ -1143,22 +1139,13 @@ sub Button_press_cb
 	my $actions=$self->{actions};
 	my $key='click'.$event->button;
 	my $sub=$actions->{$key};
-	return 0 if !$sub && $actions->{activate};
+	return 0 if !$sub && $self->{clicked_cmd};
 	$sub||= $actions->{click} || $actions->{click1};
 	return 0 unless $sub;
 	if (ref $sub)	{&$sub}
 	else		{ ::run_command($self,$sub) }
 	1;
 }
-sub Button_activate_cb
-{	my $self=$_[0];
-	my $sub=$self->{actions}{activate};
-	return 0 unless $sub;
-	if (ref $sub)	{&$sub}
-	else		{ ::run_command($self,$sub) }
-	1;
-}
-
 sub UpdateSongTip
 {	my ($widget,$ID)=@_;
 	if ($widget->{song_tip})
@@ -2110,7 +2097,10 @@ sub PanedNew
 {	my ($class,$opt)=@_;
 	my $self=$class->new;
 	($self->{size1},$self->{size2})= split /-|_/, $opt->{size} if defined $opt->{size};
-	$self->set_position($self->{size1}) if defined $self->{size1};
+	if (defined $self->{size1})
+	{	$self->set_position($self->{size1});
+		$self->set('position-set',1); # in case $self->{size1}==0 'position-set' is not set to true if child1's size is 0 (which is the case here as child1 doesn't exist yet)
+	}
 	$self->{SaveOptions}=sub { size => $_[0]{size1} .'-'. $_[0]{size2} };
 	$self->signal_connect(size_allocate => \&Paned_size_cb ); #needed to correctly behave when a child is hidden
 	return $self;
@@ -2692,13 +2682,15 @@ sub new
 	%$opt=( @default_options, %$opt );
 	my $isbutton= $opt->{button};
 	my $self;
+	my $activate= $opt->{activate};
 	if ($isbutton)
 	{	$self=Gtk2::Button->new;
 		$self->set_relief($opt->{relief});
+		$self->{clicked_cmd}= $activate;
+		$self->signal_connect(clicked => \&clicked_cb);
 	}
 	else
 	{	$self=Gtk2::EventBox->new;
-		my $activate=delete $opt->{activate};
 		$opt->{click} ||= $activate;
 	}
 	bless $self, $class;
@@ -2736,6 +2728,15 @@ sub new
 	}
 	elsif (defined $text) { $self->add( Gtk2::Label->new($text) ); }
 	return $self;
+}
+
+sub clicked_cb
+{	my $self=$_[0];
+	my $sub=$self->{clicked_cmd};
+	return 0 unless $sub;
+	if (ref $sub)	{&$sub}
+	else		{ ::run_command($self,$sub) }
+	1;
 }
 
 sub UpdateStock
