@@ -26,7 +26,7 @@ NBList		= (tabpos="bottom") VBArtist VBQueue HBLyrics VBAbout
 HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
 VBQueue		= (tabtitle="Queue") _QueueList(songtree=1) HBQueueButtons
 HBQueueButtons	= EditListButtons(small=1) QueueActions
-VBAbout		= (tabtitle="Info") _ArtistBox _AlbumBox(nopic=1)
+VBAbout		= (tabtitle="Info") ArtistBox _PluginArtistinfo
 VBArtist	= (tabtitle="Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1)
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
 ### main right: list/tree/mosaic widgets ###
