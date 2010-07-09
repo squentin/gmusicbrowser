@@ -3074,10 +3074,7 @@ sub new
 		my $BAlblist=::NewIconButton('gmb-playlist',undef,undef,'none');
 		$BAlblist->signal_connect(button_press_event => \&AlbumListButton_press_cb);
 		$BAlblist->set_tooltip_text(_"Choose Album From this Artist");
-		my $Blastfm=::NewIconButton('webcontext-lastfm',undef,undef,'none');
-		$Blastfm->signal_connect(button_press_event => \&Lookup_Lastfm);
-		$Blastfm->set_tooltip_text(_"Show Artist page on last.fm");
-		$buttonbox->pack_start($_, ::FALSE, ::FALSE, 0) for $BAlblist,$Blastfm;
+		$buttonbox->pack_start($_, ::FALSE, ::FALSE, 0) for $BAlblist;
 	}
 
 	my $drgsrc=$aa eq 'album' ? ::DRAG_ALBUM : ::DRAG_ARTIST;
@@ -3237,14 +3234,6 @@ sub AlbumListButton_press_cb
 	1;
 }
 
-sub Lookup_Lastfm
-{	my $ID=$::SongID;
-	my $q=::ReplaceFields($ID,"%a");
-	# replace spaces with "+" for last.fm
-	$q =~ s/ /+/g;
-	my $url='http://www.last.fm/music/'.$q;
-	::main::openurl($url);
-}
 
 package SimpleSearch;
 use base 'Gtk2::HBox';
