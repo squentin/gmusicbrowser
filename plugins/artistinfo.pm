@@ -76,24 +76,21 @@ sub new
 	$sw->set_shadow_type( $options->{shadow} || 'none');
 	$sw->set_policy('automatic','automatic');
 	$sw->add($textview);
-	
+	my $lastfm_search = "http://www.last.fm/music/";
+	my $wiki_search = "http://en.wikipedia.org/wiki/";
 	my $linkbox = Gtk2::VBox->new;
 	for my $aref
 	(	['gtk-refresh',	\&Refresh_cb, "Refresh"],
-		['webcontext-lastfm',\&Lookup_lastfm, "Show Artist page on last.fm"],
-		['webcontext-wikipedia',\&Lookup_lastfm, "Show Artist page on wikipedia"],
+		['webcontext-lastfm', sub { Lookup_cb($lastfm_search) }, "Show Artist page on last.fm"],
+		['webcontext-wikipedia',sub { Lookup_cb($wiki_search) }, "Show Artist page on wikipedia"],
 	)
 	{	my ($stock,$cb,$tip)=@$aref;
 		my $item=::NewIconButton($stock,"",$cb,"none",$tip);
-		$item->signal_connect(clicked => $cb);
+		$item->signal_connect(button_press_event => $cb);
 		$item->set_tooltip_text($tip) if $tip;
 		$linkbox->pack_start($item,0,0,0);
 	}
-	
-#	'http://www.last.fm/music/'
-#	'http://en.wikipedia.org/wiki/'
-
-	
+		
 	my $linkbox_parent = Gtk2::Alignment->new(0.5,1,0,0);
 	$linkbox_parent->add($linkbox);
 	
@@ -112,16 +109,13 @@ sub new
 	return $self;
 }
 
-sub Lookup_lastfm
-{	#my ($ID)=@_;
-	#my $source = $_[0];
-	#print $_[0] . " : " . $_[1];
+sub Lookup_cb
+{	my $source = shift;
 	my $ID=$::SongID;
 	my $q=::ReplaceFields($ID,"%a");
-	#my ($artist)= map ::url_escapeall($_), Songs::Get($ID,qw/artist/);
-	#if ($source = m/last.fm/) { $q =~ s/ /+/g; } # replace spaces with "+" for last.fm
-	my $url='http://www.last.fm/music/'.$q;
-	#warn $url;
+	if ($source =~ m/last/gi) { $q =~ s/ /+/g; } # replace spaces with "+" for last.fm
+	if ($source =~ m/last/gi) { $q =~ s/ /_/g; } # replace spaces with "_" for wikipedia
+	my $url=$source.$q;
 	::main::openurl($url);
 }
 
