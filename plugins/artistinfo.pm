@@ -76,17 +76,16 @@ sub new
 	$sw->set_shadow_type( $options->{shadow} || 'none');
 	$sw->set_policy('automatic','automatic');
 	$sw->add($textview);
-	my $lastfm_search = "http://www.last.fm/music/";
-	my $wiki_search = "http://en.wikipedia.org/wiki/";
+
 	my $linkbox = Gtk2::VBox->new;
 	for my $aref
 	(	['gtk-refresh',	\&Refresh_cb, "Refresh"],
-		['webcontext-lastfm', sub { Lookup_cb($lastfm_search) }, "Show Artist page on last.fm"],
-		['webcontext-wikipedia',sub { Lookup_cb($wiki_search) }, "Show Artist page on wikipedia"],
+		['webcontext-lastfm', sub { Lookup_cb("http://www.last.fm/music/") }, "Show Artist page on last.fm"],
+		['webcontext-wikipedia',sub { Lookup_cb("http://en.wikipedia.org/wiki/") }, "Show Artist page on wikipedia"],
+		['webcontext-youtube',sub { Lookup_cb("http://www.youtube.com/results?search_type=&aq=1&search_query=") }, "Search Artist on youtube"],
 	)
 	{	my ($stock,$cb,$tip)=@$aref;
 		my $item=::NewIconButton($stock,"",$cb,"none",$tip);
-		$item->signal_connect(button_press_event => $cb);
 		$item->set_tooltip_text($tip) if $tip;
 		$linkbox->pack_start($item,0,0,0);
 	}
@@ -114,7 +113,7 @@ sub Lookup_cb
 	my $ID=$::SongID;
 	my $q=::ReplaceFields($ID,"%a");
 	if ($source =~ m/last/gi) { $q =~ s/ /+/g; } # replace spaces with "+" for last.fm
-	if ($source =~ m/last/gi) { $q =~ s/ /_/g; } # replace spaces with "_" for wikipedia
+	elsif ($source =~ m/wiki/gi) { $q =~ s/ /_/g; } # replace spaces with "_" for wikipedia
 	my $url=$source.$q;
 	::main::openurl($url);
 }
@@ -136,8 +135,6 @@ sub prefbox
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>30);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
-#	my $Bopen=Gtk2::Button->new(_"open context window");
-#	$Bopen->signal_connect(clicked => sub { ::ContextWindow; });
 	$vbox->pack_start($_,::FALSE,::FALSE,1) for $entry,$preview,$autosave;
 	return $vbox;
 }
