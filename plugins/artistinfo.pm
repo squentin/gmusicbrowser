@@ -38,8 +38,11 @@ my $artistinfowidget=
 	autoadd_type	=> 'context page text',
 };
 
+my $prev_artist = "";
+
 sub Start
 {	Layout::RegisterWidget(PluginArtistinfo => $artistinfowidget);
+
 }
 sub Stop
 {	Layout::RegisterWidget(PluginArtistinfo => undef);
@@ -181,11 +184,15 @@ sub SongChanged
 	}
 
 	my ($artist)= map ::url_escapeall($_), Songs::Get($ID,qw/artist/);
-	my $site=[undef,'http://www.last.fm/music/%a',sub { $_[0]=~m/<div id="wikiAbstract">(\s*)(.*)<div class="wikiOptions">/s; return 1 }];
-	my ($url,$post,$check)=@{$site};
-	for ($url,$post) { next unless defined $_; s/%a/$artist/; }
-	#$self->load_url($urlGtk2::Gdk::Color->parse($bgcolor),$post);
-	::IdleDo('8_lyrics'.$self,1000,\&load_url,$self,$url,$post,$check);
+	if ($artist ne $prev_artist) { # follow artist instead of song, not very pretty... :/
+		$prev_artist = $artist;
+		my $site=[undef,'http://www.last.fm/music/%a',sub { $_[0]=~m/<div id="wikiAbstract">(\s*)(.*)<div class="wikiOptions">/s; return 1 }];
+		my ($url,$post,$check)=@{$site};
+		for ($url,$post) { next unless defined $_; s/%a/$artist/; }
+		::IdleDo('8_lyrics'.$self,1000,\&load_url,$self,$url,$post,$check);
+	}
+	else { $prev_artist = $artist; }
+	warn $prev_artist ." and now: ".$artist;
 }
 
 sub load_url
