@@ -577,7 +577,9 @@ sub Hide
 }
 
 sub Activate
-{	my ($self,$row,$button)=@_;
+{	my ($self,$button)=@_;
+	my $row= $self->GetCurrentRow;
+	return unless defined $row;
 	my $songarray=$self->{array};
 	my $ID=$songarray->[$row];
 	my $activate=$self->{'activate'.$button} || $self->{activate};
@@ -587,7 +589,8 @@ sub Activate
 	{	$songarray->Remove([$row]);
 		::Select(song=>$ID,play=>1);
 	}
-	elsif	($activate eq 'queue')	{ ::Enqueue($ID); }
+	elsif	($activate eq 'remove') 	{ $songarray->Remove([$row]); }
+	elsif	($activate eq 'properties')	{ ::DialogSongProp($ID); }
 	elsif	($activate eq 'playlist')
 	{	if ($self->{filter})
 		{	::Select( filter=>$self->{filter}, song=>$ID, play=>1);
@@ -597,7 +600,7 @@ sub Activate
 		}
 		else {$activate='play'}
 	}
-	elsif	($activate eq 'addplay' || $activate eq 'insertplay'){ ::DoActionForList($activate,[$ID]); }
+	else	{ ::DoActionForList($activate,[$ID]); }
 	if	($activate eq 'play')
 	{	if ($self->{type} eq 'A')	{ ::Select(position=>$row,play=>1); }
 		else				{ ::Select(song=>$ID,play=>1); }
@@ -997,6 +1000,15 @@ sub PopupContextMenu
 	::PopupContextMenu(\@::SongCMenu,\%args );
 }
 
+sub GetCurrentRow
+{	my $self=shift;
+	my $tv=$self->child;
+	my ($path)= $tv->get_cursor;
+	return unless $path;
+	my $row=$path->to_string;
+	return $row;
+}
+
 sub GetSelectedRows
 {	my $self=shift;
 	return [map $_->to_string, $self->child->get_selection->get_selected_rows];
@@ -1042,15 +1054,6 @@ sub drag_motion_cb
 	return 1;
 }
 
-sub enqueue_current
-{	my $self=shift;
-	my $tv=$self->child;
-	my ($path)= $tv->get_cursor;
-	return unless $path;
-	my $ID=$self->{array}[ $path->to_string ];
-	::Enqueue($ID);
-}
-
 sub sel_changed_cb
 {	my $treesel=$_[0];
 	my $tv=$treesel->get_tree_view;
@@ -1068,7 +1071,7 @@ sub cursor_changed_cb
 sub row_activated_cb
 {	my ($tv,$path,$column)=@_;
 	my $self=$tv->parent;
-	$self->Activate($path->to_string,1);
+	$self->Activate(1);
 }
 
 sub ResetModel
@@ -1425,7 +1428,10 @@ sub button_press_cb
 	my $self=::find_ancestor($tv, $tv->{selfpkg} );
 	my $but=$event->button;
 	my $sel=$tv->get_selection;
-	if ($but==2 && $event->type eq '2button-press') { $self->enqueue_current; return 1; }
+	if ($event->type eq '2button-press')
+	{	$self->Activate($but);
+		return 1;
+	}
 	my $ctrl_shift=  $event->get_state * ['shift-mask', 'control-mask'];
 	if ($but==1) # do not clear multi-row selection if button press on a selected row (to allow dragging selected rows)
 	{{	 last if $ctrl_shift; #don't interfere with default if control or shift is pressed
@@ -1608,8 +1614,8 @@ sub new
 	$self->{SaveOptions}=\&SaveOptions;
 	%$opt=( @DefaultOptions, %$opt );
 	my @pids=split /\|/, $opt->{pages};
-	$self->{$_}=$opt->{$_} for qw/nb group min hidetabs/;
-	$self->{main_opt}{$_}=$opt->{$_} for qw/group no_typeahead searchbox activate/; #options passed to children
+	$self->{$_}=$opt->{$_} for qw/nb group min hidetabs/, grep(m/^activate\d?$/, keys %$opt);
+	$self->{main_opt}{$_}=$opt->{$_} for qw/group no_typeahead searchbox/; #options passed to children
 	my $nb=$self->{nb};
 	my $group=$self->{group};
 
@@ -1885,6 +1891,17 @@ sub cleanup
 	delete $::ToDo{'9_FPfull'.$self};
 }
 
+sub Activate
+{	my ($page,$button,$filter)=@_;
+	my $self=::find_ancestor($page,__PACKAGE__);
+	$button||=1;
+	my $action= $self->{"activate$button"} || $self->{activate} || ($button==2 ? 'queue' : 'play');
+	my $aftercmd;
+	$aftercmd=$1 if $action=~s/&(.*)$//;
+	::DoActionForFilter($action,$filter);
+	::run_command($self,$aftercmd) if $aftercmd;
+}
+
 sub PopupContextMenu
 {	my ($page,$event,$hash,$menu)=@_;
 	my $self=::find_ancestor($page,__PACKAGE__);
@@ -1955,16 +1972,7 @@ sub new
 	$self->{isearchbox}=GMB::ISearchBox->new($opt,$field,'nolabel');
 	$self->pack_end( $self->{isearchbox} ,::FALSE,::FALSE,1);
 	$self->signal_connect(key_press_event => \&key_press_cb); #only used for isearchbox
-
-
 	$self->signal_connect(map => \&Fill);
-
-	my $sub=\&play_current;
-	if ($opt->{activate})
-	{	$sub=\&enqueue_current	if $opt->{activate} eq 'queue';
-		$sub=\&add_current	if $opt->{activate} eq 'addplay';
-	}
-	$self->{activate}=$sub;
 
 	$self->set_mode($self->{mode});
 	return $self;
@@ -2062,11 +2070,15 @@ sub create_list
 	$selection->set_mode('multiple');
 	$selection->signal_connect(changed =>\&selection_changed_cb);
 
-	$treeview->signal_connect( row_activated => sub
-		{	my $self=::find_ancestor($_[0],__PACKAGE__);
-			&{$self->{activate}};
-		});
+	$treeview->signal_connect( row_activated => sub { Activate($_[0],1); });
 	return $sw,$treeview;
+}
+
+sub Activate
+{	my ($view,$button)=@_;
+	my $self=::find_ancestor($view,__PACKAGE__);
+	my $filter= $self->get_selected_filters;
+	FilterPane::Activate($self,$button,$filter);
 }
 
 sub create_cloud
@@ -2075,7 +2087,7 @@ sub create_cloud
 	my $sw=Gtk2::ScrolledWindow->new;
 	$sw->set_policy('never','automatic');
 	my $sub=Songs::DisplayFromGID_sub($self->{type}[0]);
-	my $cloud= GMB::Cloud->new(\&child_selection_changed_cb,\&get_fill_data,$self->{activate},\&enqueue_current,\&PopupContextMenu,$sub);
+	my $cloud= GMB::Cloud->new(\&child_selection_changed_cb,\&get_fill_data, \&Activate,\&PopupContextMenu,$sub);
 	$sw->add_with_viewport($cloud);
 	return $sw,$cloud;
 }
@@ -2086,7 +2098,7 @@ sub create_mosaic
 	my $hbox=Gtk2::HBox->new(0,0);
 	my $vscroll=Gtk2::VScrollbar->new;
 	$hbox->pack_end($vscroll,0,0,0);
-	my $mosaic= GMB::Mosaic->new(\&child_selection_changed_cb,\&get_fill_data,$self->{activate},\&enqueue_current,\&PopupContextMenu,$self->{type}[0],$vscroll);
+	my $mosaic= GMB::Mosaic->new(\&child_selection_changed_cb,\&get_fill_data,\&Activate,\&PopupContextMenu,$self->{type}[0],$vscroll);
 	$hbox->add($mosaic);
 	return $hbox,$mosaic;
 }
@@ -2324,15 +2336,6 @@ sub Fill
 	}
 }
 
-sub add_current
-{	::DoActionForList( 'addplay',get_selected_filters($_[0])->filter );
-}
-sub play_current
-{	::Select( filter=>get_selected_filters($_[0]), song=>'first',play=>1 );
-}
-sub enqueue_current
-{	::EnqueueFilter( get_selected_filters($_[0]) );
-}
 sub PopupContextMenu
 {	my ($self,undef,$event)=@_;
 	$self=::find_ancestor($self,__PACKAGE__);
@@ -2505,10 +2508,11 @@ sub _MakeFolderFilter
 	return Filter->newadd(::FALSE,map( 'path:i:'.$_, @paths ));
 }
 
-sub enqueue_current
-{	my $self=$_[0];
+sub Activate
+{	my ($self,$button)=@_;
 	my @paths=_get_path_selection( $self->{treeview} );
-	::EnqueueFilter( _MakeFolderFilter(@paths) );
+	my $filter= _MakeFolderFilter(@paths);
+	FilterPane::Activate($self,$button,$filter);
 }
 sub PopupContextMenu
 {	my ($self,$tv,$event)=@_;
@@ -2669,10 +2673,11 @@ sub _MakeFolderFilter
 	return $filter;
 }
 
-sub enqueue_current
-{	my $self=$_[0];
+sub Activate
+{	my ($self,$button)=@_;
 	my @paths=_get_path_selection( $self->{treeview} );
-	::EnqueueFilter( _MakeFolderFilter(@paths) );
+	my $filter= _MakeFolderFilter(@paths);
+	FilterPane::Activate($self,$button,$filter);
 }
 sub PopupContextMenu
 {	my ($self,$tv,$event)=@_;
@@ -2736,7 +2741,7 @@ INIT
 }
 
 sub new
-{	my ($class,$mode)=@_;
+{	my ($class,$mode,$opt)=@_;
 	my $self = bless Gtk2::VBox->new(FALSE, 4), $class;
 	my $store=Gtk2::TreeStore->new(('Glib::String')x4,'Glib::Boolean');
 	$self->{treeview}=my $treeview=Gtk2::TreeView->new($store);
@@ -2857,9 +2862,6 @@ sub fill_savednames
 	$self->{busy}=undef;
 }
 
-sub enqueue_current
-{ ::EnqueueFilter($_[0]->get_selected_filters); }
-
 sub PopupContextMenu
 {	my ($self,$tv,$event)=@_;
 	my @rows=$tv->get_selection->get_selected_rows;
@@ -2920,7 +2922,14 @@ sub drag_motion_cb
 
 sub row_activated_cb
 {	my ($treeview,$path,$column)=@_;
+	# rename, not sure if i
 	$treeview->set_cursor($path,$column,TRUE);
+}
+
+sub Activate
+{	my ($self,$button)=@_;
+	my $filter= $self->get_selected_filters;
+	FilterPane::Activate($self,$button,$filter);
 }
 
 sub name_edited_cb
@@ -3489,9 +3498,10 @@ use base 'Gtk2::VBox';
 sub new
 {	my ($class,$opt)=@_;
 	my $self= bless Gtk2::VBox->new, $class;
-	my $activate= $opt->{activate} || 'queue';
-	$self->{songlist}=
-	my $songlist=SongList->new({type=>'S',headers=>'off',activate=>$activate,'sort'=>'title',cols=>'titleaa', group=>"$self"});
+	my %sl_opt=( type=>'S', headers=>'off', 'sort'=>'title', cols=>'titleaa', group=>"$self" );
+	$sl_opt{$_}= $opt->{$_} for grep m/^activate\d?/, keys %$opt;
+	$sl_opt{activate} ||= 'queue';
+	$self->{songlist}= my $songlist= SongList->new(\%sl_opt);
 	my $hbox1=Gtk2::HBox->new;
 	my $entry=Gtk2::Entry->new;
 	$entry->signal_connect(changed => \&EntryChanged_cb,0);
@@ -3536,9 +3546,8 @@ sub new
 	$treeview->set_headers_visible(::FALSE);
 	my $renderer= CellRendererGID->new;
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes('', $renderer, gid=>0) );
-	my $sub=\&Enqueue;
-	$sub=\&AddToPlaylist if $opt->{activate} && $opt->{activate} eq 'addplay';
-	$treeview->signal_connect( row_activated => $sub);
+	$self->{activate}= $opt->{activate} || 'queue';
+	$treeview->signal_connect( row_activated => \&Activate);
 
 	$self->{field}= $opt->{aa} || 'artists';
 	$renderer->set(prop => [[$self->{field}],[1],[32],[0]], depth => 0);  # (field markup=1 picsize=32 icons=0)
@@ -3605,19 +3614,23 @@ sub EntryChanged_cb
 	$store->set($store->append,0,$_) for @$list;
 }
 
+sub Activate
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $filter=GetFilter($self);
+	my $action= $self->{activate};
+	my $aftercmd;
+	$aftercmd=$1 if $action=~s/&(.*)$//;
+	::DoActionForFilter($action,$filter);
+	::run_command($self,$aftercmd) if $aftercmd;
+}
+
 sub Enqueue
 {	my $filter=GetFilter($_[0]);
-	::EnqueueFilter($filter) if $filter;
+	::DoActionForFilter('queue',$filter);
 }
 sub Play
 {	my $filter=GetFilter($_[0]);
-	::Select(filter => $filter,song =>'first',play=>1) if $filter;
-}
-sub AddToPlaylist
-{	my $filter=GetFilter($_[0]);
-	return unless $filter;
-	my $list=$filter->filter;
-	::DoActionForList('addplay',$list);
+	::DoActionForFilter('play',$filter);
 }
 
 package CellRendererIconList;
@@ -3921,7 +3934,7 @@ use constant
 };
 
 sub new
-{	my ($class,$selectsub,$getdatasub,$activatesub,$queuesub,$menupopupsub,$displaykeysub)=@_;
+{	my ($class,$selectsub,$getdatasub,$activatesub,$menupopupsub,$displaykeysub)=@_;
 	my $self = bless Gtk2::DrawingArea->new, $class;
 	$self->can_focus(::TRUE);
 	$self->signal_connect(expose_event	=> \&expose_cb);
@@ -3935,7 +3948,6 @@ sub new
 	$self->{selectsub}=$selectsub;
 	$self->{get_fill_data_sub}=$getdatasub;
 	$self->{activatesub}=$activatesub;
-	$self->{queuesub}=$queuesub;
 	$self->{menupopupsub}=$menupopupsub;
 	$self->{displaykeysub}=$displaykeysub;
 	$self->{selected}={};
@@ -4089,8 +4101,8 @@ sub button_press_cb
 {	my ($self,$event)=@_;
 	$self->grab_focus;
 	my $but=$event->button;
-	if ($but==1 && $event->type eq '2button-press')
-	{	$self->{activatesub}($self);
+	if ($event->type eq '2button-press')
+	{	$self->{activatesub}($self,$but);
 		return 1;
 	}
 	if ($but==1)
@@ -4100,10 +4112,6 @@ sub button_press_cb
 			{ $self->key_selected($event,$i,$j);}
 		else	{ $self->{pressed}=1; }
 		return 0;
-	}
-	if ($but==2 && $event->type eq '2button-press')
-	{	$self->{queuesub}($self);
-		return 1;
 	}
 	if ($but==3)
 	{	my ($i,$j,$key)=$self->coord_to_index($event->get_coords);
@@ -4223,7 +4231,7 @@ sub key_press_cb
 {	my ($self,$event)=@_;
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
 	if ( $key eq 'space' || $key eq 'Return' )
-	{	$self->{activatesub}($self);
+	{	$self->{activatesub}($self,1);
 		return 1;
 	}
 	my ($i,$j)=(0,0);
@@ -4265,7 +4273,7 @@ use constant
 };
 
 sub new
-{	my ($class,$selectsub,$getdatasub,$activatesub,$queuesub,$menupopupsub,$col,$vscroll)=@_;
+{	my ($class,$selectsub,$getdatasub,$activatesub,$menupopupsub,$col,$vscroll)=@_;
 	my $self = bless Gtk2::DrawingArea->new, $class;
 	$self->can_focus(::TRUE);
 	$self->add_events(['pointer-motion-mask','leave-notify-mask']);
@@ -4285,7 +4293,6 @@ sub new
 	$self->{selectsub}=$selectsub;
 	$self->{get_fill_data_sub}=$getdatasub;
 	$self->{activatesub}=$activatesub;
-	$self->{queuesub}=$queuesub;
 	$self->{menupopupsub}=$menupopupsub;
 	$self->{col}=$col;
 	$self->{lastdy}=0;
@@ -4619,7 +4626,7 @@ sub key_press_cb
 {	my ($self,$event)=@_;
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
 	if ( $key eq 'space' || $key eq 'Return' )
-	{	$self->{activatesub}($self);
+	{	$self->{activatesub}($self,1);
 		return 1;
 	}
 	my $pos=0;
@@ -5104,6 +5111,12 @@ sub set_head_columns
 	$self->scroll_to_row($savedpos->{hirow}||0,1) if $savedpos;
 }
 
+sub GetCurrentRow
+{	my $self=shift;
+	my $row=$self->{lastclick};
+	return $row;
+}
+
 sub GetSelectedRows
 {	my $self=$_[0];
 	my $songarray=$self->{array};
@@ -5397,7 +5410,7 @@ sub key_press_cb
 	$row=0 if $row<0;
 	my $list=$self->{array};
 	if	($key eq 'space' || $key eq 'Return')
-					{ $self->Activate($row,1); }
+					{ $self->Activate(1); }
 	elsif	($key eq 'Up')		{ $row-- if $row>0;	 $self->song_selected($event,$row); }
 	elsif	($key eq 'Down')	{ $row++ if $row<$#$list;$self->song_selected($event,$row); }
 	elsif	($key eq 'Home')	{ $self->song_selected($event,0); }
@@ -5927,9 +5940,8 @@ sub button_press_cb
 		}
 		if ($found) {warn "actions : $_ => $found->{$_}" for keys %$found}
 	}
-	if ($but!=3 && $event->type eq '2button-press')
-	{	return 0 unless defined $row;
-		$self->Activate($row,$but);
+	if ($event->type eq '2button-press')
+	{	$self->Activate($but);
 		return 1;
 	}
 	if ($but==3)
