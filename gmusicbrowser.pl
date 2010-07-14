@@ -2429,17 +2429,30 @@ sub SetRepeat
 	::HasChanged('Repeat');
 }
 
+sub DoActionForFilter
+{	my ($action,$filter)=@_;
+	$filter||= Filter->new;
+	$action||='play';
+	if    ($action eq 'play')	{ Select( filter=>$filter, song=>'first',play=>1 ); }
+	else				{ DoActionForList($action,$filter->filter); }
+}
 sub DoActionForList
 {	my ($action,$list)=@_;
+	return unless ref $list && @$list;
 	$action||='playlist';
 	my @list=@$list;
+	# actions that don't need/want the lsit to be sorted (Enqueue will sort it itself)
 	if	($action eq 'queue')		{ Enqueue(@list) }
+	elsif	($action eq 'queueinsert')	{ QueueInsert(@list) }
 	elsif	($action eq 'replacequeue')	{ ReplaceQueue(@list) }
+	elsif	($action eq 'properties')	{ DialogSongsProp(@list) }
 	else
-	{SortList(\@list) if @list>1; #Enqueue will sort it
+	{ # actions that need the list to be sorted
+	 SortList(\@list) if @list>1;
 	 if	($action eq 'playlist')		{ $ListPlay->Replace(\@list); }
 	 elsif	($action eq 'addplay')		{ $ListPlay->Push(\@list); }
 	 elsif	($action eq 'insertplay')	{ $ListPlay->InsertAtPosition(\@list); }
+	 else	{ warn "Unknown action '$action'\n"; }
 	}
 }
 
