@@ -30,12 +30,17 @@ use POE::Component::Server::HTTP;
 use CGI;
 use HTTP::Status qw/RC_OK/;
 
+use File::Slurp;
+
 # actually get *feedback* instead of silence if a session crashes.
 sub POE::Kernel::CATCH_EXCEPTIONS () { 0 }
 
 
 # my $cgi = cgi_from_request($request);
 # my $field = $cgi->param("field");
+
+my $resource_path;
+my $resources = {};
 
 sub cgi_from_request {
     my ($request) = @_;
@@ -83,6 +88,38 @@ sub skip_handler {
     return RC_OK;
 }
 
+sub pause_handler {
+    my ($request, $response) = @_;
+    
+    my $path = $request->uri->path;
+    my $query = $request->uri->query;
+
+    warn "Got Skip request!";
+    my $cgi = cgi_from_request($request);
+
+    ::PlayPause();
+
+    $response->code(302);
+    $response->header('Location' => '/');
+    return RC_OK;
+}
+
+sub resource_handler {
+    my ($request, $response) = @_;
+    my $path = $request->uri->path;
+    my $query = $request->uri->query;
+
+    if($path eq "/resources/prototype.js") {
+	$response->code(200);
+	$response->content($resources->{prototypejs});
+	$response->header('Content-Type' => "application/javascript");
+    } else {
+	$response->code(404);
+    }
+
+    return RC_OK;
+}
+
 sub root_handler {
     my ($request, $response) = @_;
     my $path = $request->uri->path;
@@ -99,7 +136,7 @@ sub root_handler {
 	$playing_song = "None! :(";
     }
     
-    $playing_song .= "<html><br /><br /><a href=\"/skip\">Skip!</a></html>";
+    $playing_song .= '<html><br /><br /><a href="/skip">Skip!</a><br /><a href="/pause">Play/Pause!</a></html>';
     # Build the response.
     $response->code(RC_OK);
     $response->header('Content-Type' => "text/html");
@@ -111,15 +148,19 @@ sub root_handler {
 }
 
 sub Start {
+    my ($self) = @_;
     my $http = POE::Component::Server::HTTP->new(
     	Port           => 8080,
     	ContentHandler => {"/" => \&root_handler,
 			   "/player" => \&player_handler,
-			   "/skip" => \&skip_handler
+			   "/skip" => \&skip_handler,
+			   "/pause" => \&pause_handler,
+			   "/resources/" => \&resource_handler
     	},
     	Headers => {Server => 'Gmusicbrowser HTTP',},
     );
-    
+    $resource_path = $::DATADIR.::SLASH.'plugins'.::SLASH;
+    $resources->{prototypejs} = read_file($resource_path.::SLASH.'http_server'.::SLASH.'prototype.js');
 }
 
 sub Stop {
