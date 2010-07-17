@@ -115,7 +115,7 @@ sub new
 	my $zoom=Gtk2::ToolItem->new;
 	$zoom->add( Gtk2::SpinButton->new($adj,1,0) );
 	$zoom->set_tooltip_text(_"Font size");
-	my $source=::NewPrefCombo( OPT.'LyricSite', {map {$_=>$sites{$_}[0]} keys %sites} ,cb => \&SetSource, toolitem=> _"Lyrics source");
+	my $source=::NewPrefCombo( OPT.'LyricSite', {map {$_=>$sites{$_}[0]} keys %sites} ,cb => \&Refresh_cb, toolitem=> _"Lyrics source");
 	my $scroll=::NewPrefCheckButton( OPT.'AutoScroll', _"Auto-scroll", cb=>\&SetAutoScroll, tip=>_"Scroll with the song", toolitem=>1);
 	$toolbar->insert($_,-1) for $follow,$zoom,$scroll,$source;
 
@@ -175,11 +175,6 @@ sub SetFont
 	$textview->modify_font(Gtk2::Pango::FontDescription->from_string( $self->{FontSize} ));
 }
 
-sub SetSource
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
-	$self->SongChanged($self->{ID},1);
-}
-
 sub Back_cb
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $url=pop @{$self->{history}};
@@ -189,8 +184,7 @@ sub Back_cb
 }
 sub Refresh_cb
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
-	my $ID=delete $self->{ID};
-	$self->SongChanged($ID,1);
+	$self->SongChanged($self->{ID},1);
 }
 
 sub SongChanged
