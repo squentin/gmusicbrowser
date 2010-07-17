@@ -25,12 +25,18 @@ use constant
 {	OPT	=> 'PLUGIN_ARTISTINFO_', # MUST begin by PLUGIN_ followed by the plugin ID / package name
 };
 
-::SetDefaultOptions(OPT, FontSize => 10, PathFile => "~/.lyrics/%a/%t.lyric");
+my %sites =
+(
+	lastfm => [ 'lastfm artist-info', 'http://www.last.fm/music/%a',sub { $_[0]=~m/<div id="wikiAbstract">(\s*)(.*)<div class="wikiOptions">/s; return 1 }],
+	events => [ 'last-fm events', 'http://ws.audioscrobbler.com/1.0/artist/%a/events.rss',sub { $_[0]=~m/<title>(.*?)<\/title>/gi; return 1 }]
+);
 
+if (my $site=$::Options{OPT.'ArtistSite'}) { delete $::Options{OPT.'ArtistSite'} unless exists $sites{$site} } #reset selected site if no longer defined
+::SetDefaultOptions(OPT, FontSize => 10, PathFile => "~/Music/%a/%l/bio", ArtistSite => 'lastfm');
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
-	#tabicon		=> 'gmb-lyrics',		# no icon by that name by default
+	tabicon		=> 'gmb-artistinfo',		# no icon by that name by default (yet)
 	tabtitle	=> _"Artistinfo",
 	saveoptions	=> 'FontSize follow',
 	schange		=> \&SongChanged,
@@ -81,8 +87,10 @@ sub new
 	$sw->add($textview);
 
 	my $linkbox = Gtk2::VBox->new;
+	my $source=::NewPrefCombo( OPT.'ArtistSite', {map {$_=>$sites{$_}[0]} keys %sites} ,cb => \&SongChanged, text => "", toolitem=> _"Artist-info from last.fm");
+	$linkbox->pack_start($source,0,0,0);
 	for my $aref
-	(	['gtk-refresh',	\&Refresh_cb, "Refresh"],
+	(	['gtk-refresh',	\&SongChanged, "Refresh"],
 		['webcontext-lastfm', sub { Lookup_cb("http://www.last.fm/music/") }, "Show Artist page on last.fm"],
 		['webcontext-wikipedia',sub { Lookup_cb("http://en.wikipedia.org/wiki/") }, "Show Artist page on wikipedia"],
 		['webcontext-youtube',sub { Lookup_cb("http://www.youtube.com/results?search_type=&aq=1&search_query=") }, "Search Artist on youtube"],
@@ -149,61 +157,55 @@ sub filename_preview
 	return '<small>'.$t.'</small>';
 }
 
-#sub SetFont
-#{	my ($textview,$size)=@_;
-#	my $self=::find_ancestor($textview,__PACKAGE__);
-#	$::Options{OPT.'FontSize'}=$self->{FontSize}=$size if $size;
-#	$textview->modify_font(Gtk2::Pango::FontDescription->from_string( $self->{FontSize} ));
-#}
-
-sub SetSource
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
-	$self->SongChanged($self->{ID},1);
+=dop
+sub SetFont
+{	my ($textview,$size)=@_;
+	my $self=::find_ancestor($textview,__PACKAGE__);
+	$::Options{OPT.'FontSize'}=$self->{FontSize}=$size if $size;
+	$textview->modify_font(Gtk2::Pango::FontDescription->from_string( $self->{FontSize} ));
 }
 
-sub Refresh_cb
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
-	my $ID=delete $self->{ID};
-	$self->SongChanged($ID,1);
-}
+=cut
 
 sub SongChanged
-{	my ($self,$ID,$force)=@_;
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $ID = ::GetSelID($self);
+	$self -> ArtistChanged( Songs::Get_gid($ID,'artist') );
+}
+
+sub ArtistChanged
+{	my ($self,$aID)=@_;
 	return unless $self->mapped;
-	return unless defined $ID;
-	return if defined $self->{ID} && !$force && ( $ID==$self->{ID} || !$self->{follow} );
-	$self->{ID}=$ID;
-	$self->{time}=undef;
-
-	if (!$force)
-	{	my $file=::pathfilefromformat( $self->{ID}, $::Options{OPT.'PathFile'}, undef,1 );
-		if ($file && -r $file)
-		{	::IdleDo('8_lyrics'.$self,1000,\&load_file,$self,$file);
-			return
+	return unless defined $aID;
+#	if (!$force)
+#	{	my $file=::pathfilefromformat( $self->{ID}, $::Options{OPT.'PathFile'}, undef,1 );
+#		if ($file && -r $file)
+#		{	::IdleDo('8_artistinfo'.$self,1000,\&load_file,$self,$file);
+#			return
+#		}
+#	}
+	
+	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
+	$artist =~ s/%20/%2B/gi; # replace spaces by "+" for last.fm
+	my (undef,$url,$post,$check)=@{$sites{$::Options{OPT.'ArtistSite'}}};
+	for ($url,$post) { next unless defined $_; s/%a/$artist/; }
+	if ($artist ne $self->{artist_esc} or $url ne $self->{url}) {
+		$self->{artist_esc} = $artist;
+		$self->{url} = $url;
+		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url,$post,$check);
 		}
-	}
-
-	my ($artist)= map ::url_escapeall($_), Songs::Get($ID,qw/artist/);
-	if ($artist ne $prev_artist) { # follow artist instead of song, not very pretty... :/
-		$prev_artist = $artist;
-		my $site=[undef,'http://www.last.fm/music/%a',sub { $_[0]=~m/<div id="wikiAbstract">(\s*)(.*)<div class="wikiOptions">/s; return 1 }];
-		my ($url,$post,$check)=@{$site};
-		for ($url,$post) { next unless defined $_; s/%a/$artist/; }
-		::IdleDo('8_lyrics'.$self,1000,\&load_url,$self,$url,$post,$check);
-	}
-	else { $prev_artist = $artist; }
-	warn $prev_artist ." and now: ".$artist;
+	else { $self->{artist_esc} = $artist; $self->{url} = $url; }
 }
 
 sub load_url
-{	my ($self,$post,$url,$check)=@_;
+{	my ($self,$url,$post,$check)=@_;
 	$self->{buffer}->set_text(_"Loading...");
 	$self->{buffer}->set_modified(0);
 	$self->cancel;
 	warn "info : loading $url\n";# if $::debug;
 	$self->{url}=$url;
 	$self->{post}=$post;
-	$self->{check}=$check; # function to check if lyrics found
+	$self->{check}=$check; # function to check if artist-info found
 	$self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url,post => $post);
 }
 
@@ -214,71 +216,66 @@ sub loaded
 	unless ($data) { $data=_("Loading failed.").qq( <a href="$self->{url}">)._("retry").'</a>'; $type="text/html"; }
 	$self->{url}=$url if $url; #for redirections
 	$buffer->delete($buffer->get_bounds);
-	
-	my $encoding;
-	if ($type && $type=~m#^text/.*; ?charset=([\w-]+)#) {$encoding=$1}
-	if ($type && $type!~m#^text/html#)
-	{	if	($type=~m#^text/#)	{$buffer->set_text($data);}
-		#elsif	($type=~m#^image/#)
-		#{	my $loader= GMB::Picture::LoadPixData($data);
-		#	if (my $p=$loader->get_pixbuf) {$buffer->insert_pixbuf(0,$p);}
-		#}
-		return;
-	}
-	$encoding=$1 if $data=~m#<meta *http-equiv="Content-Type" *content="text/html; charset=([\w-]+)"#;
-	$encoding='cp1252' if $encoding && $encoding eq 'iso-8859-1'; #microsoft use the superset cp1252 of iso-8859-1 but says it's iso-8859-1
-	$encoding||='cp1252'; #default encoding
-	$data=Encode::decode($encoding,$data) if $encoding;
-	
-	my $artistheader;
-	if ($data =~ m/<p\ class="origin">(.*?)<\/p>/s)
-	{	$artistheader = $1;
-		for ($artistheader)
-		{	s/^\s+|\s+$|\n|<(.*?)>//gi;
-			s/ +/ /g;
-		}
-		$artistheader = $artistheader . "\n";
-	}
-	else { $artistheader = ""; }
-	
-	$data =~ m/<div id="wikiAbstract">(\s*)(.*)<div class="wikiOptions">/s;
-	$data = $2;
-	for ($data)
-	{	s/<br \/>|<\/p>/\n/gi; # never more than one empty line
-		s/\n\n/\n/gi; # never more than one empty line
-		s/&#8216;|&#8217;/\'/gi;
-		s/&#8220;|&#8221;/\"/gi;
-		s/&amp;/\&/gi;
-		s/<(.*?)>//gi;
-	}
-	#my $artistheader = "HEADER\n";
-	#$artistheader->modify_font(Gtk2::Pango::FontDescription->from_string("Sans Bold 18"));
-	#$data = qq/$artistheader/ . "\n" . $data;
-	#$data = substr($data,0,1000);
-
-#	my $artistbio = "";
-#	for(my $i = 1; $i < 125; $i++)
-#		{	my $word = (split(' ', $data));
-#			$artistbio = $artistbio.' '.$word;
-#		}
-	#for ($data)
-#			foreach my $word (split(' ', $data))
-#			{	$artistbio = $artistbio.' '.$word;
-#				#warn $i . " : ".$word;
-#			}
-		
-#	warn $artistbio;
-
-	
+#	my $encoding;
+#	if ($type && $type=~m#^text/.*; ?charset=([\w-]+)#) {$encoding=$1}
+#	if ($type && $type!~m#^text/html#)
+#	{	if	($type=~m#^text/#)	{$buffer->set_text($data);}
+#		return;
+#	}
+#	$encoding=$1 if $data=~m#<meta *http-equiv="Content-Type" *content="text/html; charset=([\w-]+)"#;
+#	$encoding='cp1252' if $encoding && $encoding eq 'iso-8859-1'; #microsoft use the superset cp1252 of iso-8859-1 but says it's iso-8859-1
+#	$encoding||='cp1252'; #default encoding
+#	$data=Encode::decode($encoding,$data) if $encoding;
 	my $iter=$buffer->get_start_iter;
 	my %prop;
 	$prop{weight}=Gtk2::Pango::PANGO_WEIGHT_BOLD;
 	my $tag=$buffer->create_tag(undef,%prop);
-	$buffer->insert_with_tags($iter,$artistheader,$tag);
+	my $infoheader;
+	
+	if ($url =~ m/music/gi) { # either it's artist-info or events-info
+		
+		if ($data =~ m/<p\ class="origin">(.*?)<\/p>/s)
+		{	$infoheader = $1;
+			for ($infoheader)
+			{	s/^\s+|\s+$|\n|<(.*?)>//gi;
+				s/ +/ /g;
+			}
+			$infoheader = $infoheader . "\n";
+		}
+		else { $infoheader = ""; }
+
+		$data =~ m/<div id="wikiAbstract">(\s*)(.*)<div class="wikiOptions">/s;
+		#$data =~ $regexp;
+		$data = $2;
+		for ($data)
+		{	s/<br \/>|<\/p>/\n/gi; # never more than one empty line
+			s/\n\n/\n/gi; # never more than one empty line
+			s/&#8216;|&#8217;/\'/gi;
+			s/&#8220;|&#8221;/\"/gi;
+			s/&Oslash;//gi;
+			s/&oslash;/\ø/gi;
+			s/&amp;/\&/gi;
+			s/<(.*?)>//gi;
+		}
+	}
+	elsif ($url =~ m/event/gi) {
+		my @line = $data =~ m/<title>(.*?)<\/title>/gi;
+		my $clip;
+		foreach (@line) {
+			if ($_ ne "Last.fm Events") { $clip = $clip . " * " . $_ . "\n"; }
+		}
+		$infoheader = "Upcoming Events\n";
+		$data = $clip;
+	}
+	#warn $url;
+	
+	
+	$buffer->insert_with_tags($iter,$infoheader,$tag);
 	$buffer->insert($iter,$data);
 	#$self->Save_text if $::Options{OPT.'AutoSave'} && $oklyrics && $oklyrics>0;
 }
 
+=dob
 sub load_file
 {	my ($self,$file)=@_;
 	my $buffer=$self->{buffer};
@@ -302,7 +299,7 @@ sub load_file
 	$artist='(?:by\W+)?'.$artist if $artist;
 	if ($text && $text=~m#^\W*($title\W*\n?(?:$artist)?)\W*\n#si)
 	{ my $tag=$buffer->create_tag(undef,scale => 1.5,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
-	  $buffer->apply_tag($tag,$buffer->get_iter_at_offset($-[0]),$buffer->get_iter_at_offset($+[0]));
+	  $buffer->appl$prev_artist = ""y_tag($tag,$buffer->get_iter_at_offset($-[0]),$buffer->get_iter_at_offset($+[0]));
 	}
 
 	$buffer->set_modified(0);
@@ -326,5 +323,5 @@ sub Save_text
 	}
 	else {::ErrorMessage(::__x(_("Error saving artist-info in '{file}' :\n{error}"), file => $file, error => $!),$win);}
 }
-
+=cut
 1
