@@ -88,7 +88,7 @@ sub skip_handler {
     return RC_OK;
 }
 
-sub pause_handler {
+sub playpause_handler {
     my ($request, $response) = @_;
     
     my $path = $request->uri->path;
@@ -99,8 +99,8 @@ sub pause_handler {
 
     ::PlayPause();
 
-    $response->code(302);
-    $response->header('Location' => '/');
+    $response->code(200);
+    $response->content("sadfsafaf");
     return RC_OK;
 }
 
@@ -112,7 +112,11 @@ sub resource_handler {
     if($path eq "/resources/prototype.js") {
 	$response->code(200);
 	$response->content($resources->{prototypejs});
-	$response->header('Content-Type' => "application/javascript");
+	$response->header('Content-Type' => "text/javascript");
+    } elsif($path eq "/resources/player.js") {
+	$response->code(200);
+	$response->content($resources->{playerjs});
+	$response->header('Content-Type' => "text/javascript");
     } else {
 	$response->code(404);
     }
@@ -127,21 +131,41 @@ sub root_handler {
 
     warn "HTTP request to root or unknown: " . $request->method . " " . $request->uri->path_query;
 
-    my $ID = $::PlayingID;
-
-    my $playing_song;
-    if(defined $ID) {
-	$playing_song = "Playing song: " . ::Songs::Get($ID, 'artist') . " - " . ::Songs::Get($ID, 'title');
-    } else {
-	$playing_song = "None! :(";
-    }
     
-    $playing_song .= '<html><br /><br /><a href="/skip">Skip!</a><br /><a href="/pause">Play/Pause!</a></html>';
+
+    # my $playing_song;
+    # if(defined $ID) {
+    # 	$playing_song = "Playing song: " . ::Songs::Get($ID, 'artist') . " - " . ::Songs::Get($ID, 'title');
+    # } else {
+    # 	$playing_song = "None! :(";
+    # }
+    
+    my $webapp = <<END;
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset=utf-8 />
+    <title>Gmusicbrowser</title>
+    <script type="text/javascript" src="/resources/prototype.js"></script>
+
+  </head>
+  <body>
+    
+    <button id=playpausebutton>Play</button>
+    <button id=skipbutton>Skip</button>
+    
+    <script type="text/javascript" src="/resources/player.js"></script>
+  </body>
+</html>
+END
+
+
+
     # Build the response.
     $response->code(RC_OK);
     $response->header('Content-Type' => "text/html");
 
-    $response->content($playing_song);
+    $response->content($webapp);
 
     # Signal that the request was handled okay.
     return RC_OK;
@@ -152,15 +176,17 @@ sub Start {
     my $http = POE::Component::Server::HTTP->new(
     	Port           => 8080,
     	ContentHandler => {"/" => \&root_handler,
+			   "/noscript" => \&root_noscript_handler,
 			   "/player" => \&player_handler,
 			   "/skip" => \&skip_handler,
-			   "/pause" => \&pause_handler,
+			   "/playpause" => \&playpause_handler,
 			   "/resources/" => \&resource_handler
     	},
     	Headers => {Server => 'Gmusicbrowser HTTP',},
     );
     $resource_path = $::DATADIR.::SLASH.'plugins'.::SLASH;
     $resources->{prototypejs} = read_file($resource_path.::SLASH.'http_server'.::SLASH.'prototype.js');
+    $resources->{playerjs} = read_file($resource_path.::SLASH.'http_server'.::SLASH.'player.js');
 }
 
 sub Stop {
