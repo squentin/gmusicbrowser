@@ -64,16 +64,9 @@ sub cgi_from_request {
     return $q;
 }
 
-sub player_handler {
-    my ($request, $response) = @_;
-    my $path = $request->uri->path;
-    my $query = $request->uri->query;
-
-    my $cgi = cgi_from_request($request);
-}
-
 sub skip_handler {
     my ($request, $response) = @_;
+    $request->header(Connection => 'close');
     my $path = $request->uri->path;
     my $query = $request->uri->query;
 
@@ -88,9 +81,27 @@ sub skip_handler {
     return RC_OK;
 }
 
+sub volume_handler {
+    my ($request, $response) = @_;
+    $request->header(Connection => 'close');
+    my $path = $request->uri->path;
+    my $query = $request->uri->query;
+
+    my $cgi = cgi_from_request($request);
+    foreach($cgi->param()) {
+    	if($_ eq "volume") {
+    	    ::UpdateVol($cgi->param($_) * 100);
+    	}
+    }
+    $response->code(200);
+
+    return RC_OK;
+}
+
 sub playpause_handler {
     my ($request, $response) = @_;
-    
+    $response->protocol( "HTTP/1.1" );
+    $request->header(Connection => 'close');
     my $path = $request->uri->path;
     my $query = $request->uri->query;
 
@@ -104,20 +115,27 @@ sub playpause_handler {
     return RC_OK;
 }
 
-sub resource_handler {
+sub code_handler {
     my ($request, $response) = @_;
+    $request->header(Connection => 'close');
     my $path = $request->uri->path;
     my $query = $request->uri->query;
 
-    if($path eq "/resources/prototype.js") {
+    my @split_request = split(/\//, $path);
+
+
+
+    my $local_filename = $resource_path.::SLASH.'http_server'.::SLASH.$split_request[2];
+
+    warn "DETECTED FILENAME: " . $local_filename;
+
+    if( -e $local_filename ) {
+	my $contents = read_file($local_filename);
+	$response->content($contents);
 	$response->code(200);
-	$response->content($resources->{prototypejs});
-	$response->header('Content-Type' => "text/javascript");
-    } elsif($path eq "/resources/player.js") {
-	$response->code(200);
-	$response->content($resources->{playerjs});
 	$response->header('Content-Type' => "text/javascript");
     } else {
+	warn "FILE DID NOT EXIST";
 	$response->code(404);
     }
 
@@ -126,12 +144,12 @@ sub resource_handler {
 
 sub root_handler {
     my ($request, $response) = @_;
+    $request->header(Connection => 'close');
     my $path = $request->uri->path;
     my $query = $request->uri->query;
 
-    warn "HTTP request to root or unknown: " . $request->method . " " . $request->uri->path_query;
 
-    
+    warn "HTTP request to root or unknown: " . $request->method . " " . $request->uri->path_query;
 
     # my $playing_song;
     # if(defined $ID) {
@@ -146,20 +164,36 @@ sub root_handler {
   <head>
     <meta charset=utf-8 />
     <title>Gmusicbrowser</title>
-    <script type="text/javascript" src="/resources/prototype.js"></script>
-
+    <script src="/code/prototype.js" type="text/javascript"></script>
+    <script src="/code/scriptaculous.js" type="text/javascript"></script>
+    <style type="text/css">
+      #seek_slider {
+        background-color: red;
+        height: 20px;
+        width: 500px;
+      }
+      #seek_position {
+        background-color: blue;
+        height: 20px;
+        width: 20px;
+      }
+    </style>
   </head>
   <body>
+    <div id=seek_slider>
+      <div id=seek_position></div>
+    </div>
+<br>
     
-    <button id=playpausebutton>Play</button>
-    <button id=skipbutton>Skip</button>
+    <div>
+      <button id=playpausebutton>Play</button>
+      <button id=skipbutton>Skip</button>
+    </div>
     
-    <script type="text/javascript" src="/resources/player.js"></script>
+    <script type="text/javascript" src="/code/player.js"></script>
   </body>
 </html>
 END
-
-
 
     # Build the response.
     $response->code(RC_OK);
@@ -177,16 +211,16 @@ sub Start {
     	Port           => 8080,
     	ContentHandler => {"/" => \&root_handler,
 			   "/noscript" => \&root_noscript_handler,
-			   "/player" => \&player_handler,
 			   "/skip" => \&skip_handler,
 			   "/playpause" => \&playpause_handler,
-			   "/resources/" => \&resource_handler
+			   "/volume" => \&volume_handler,
+			   "/code/" => \&code_handler
     	},
     	Headers => {Server => 'Gmusicbrowser HTTP',},
     );
     $resource_path = $::DATADIR.::SLASH.'plugins'.::SLASH;
-    $resources->{prototypejs} = read_file($resource_path.::SLASH.'http_server'.::SLASH.'prototype.js');
-    $resources->{playerjs} = read_file($resource_path.::SLASH.'http_server'.::SLASH.'player.js');
+    # $resources->{prototypejs} = read_file($resource_path.::SLASH.'http_server'.::SLASH.'prototype.js');
+    # $resources->{playerjs} = read_file($resource_path.::SLASH.'http_server'.::SLASH.'player.js');
 }
 
 sub Stop {
