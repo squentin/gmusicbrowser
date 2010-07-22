@@ -472,10 +472,9 @@ my %htmlelem= #FIXME maybe should use a module with a complete list
 	acirc => 'à', eacute => 'é', egrave => 'è', ecirc => 'ê',
 );
 sub decode_html
-{	local $_=$_[0];
-	s/&#(\d{2,4});/chr($1)/eg;
-	s/&([a-z]+);/$htmlelem{$1}||'?'/eg;
-	return $_;
+{	my $s=shift;
+	$s=~s/&(?:#(\d+)|#x([0-9A-F]+)|([a-z]+));/$1 ? chr($1) : $2 ? chr(hex $2) : $htmlelem{$3}||'?'/egi;
+	return $s;
 }
 
 sub PangoEsc	# escape special chars for pango ( & < > ) #replaced by Glib::Markup::escape_text if available

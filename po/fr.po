@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.4\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2010-04-20 22:13+0200\n"
-"PO-Revision-Date: 2010-04-25 17:30+0100\n"
+"POT-Creation-Date: 2010-06-17 23:20+0200\n"
+"PO-Revision-Date: 2010-07-14 15:31+0100\n"
 "Last-Translator: Brice Boucard <boucard.brice@neuf.fr>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -439,6 +439,9 @@ msgstr "Artiste, Date, Album, Disque, Piste"
 msgid "Artists"
 msgstr "Artistes"
 
+msgid "Ascending order"
+msgstr "Ordre de tri ascendant"
+
 msgid "Ask confirmation only if file already exists"
 msgstr "Demander une confirmation seulement si le fichier existe déjà"
 
@@ -533,6 +536,9 @@ msgstr ""
 
 msgid "Can't create sink '{sink}'"
 msgstr "Impossible de créer la sortie '{sink}'"
+
+msgid "Can't play '{file}'."
+msgstr "Ne sait pas jouer {file}"
 
 msgid "Can't read file or invalid file"
 msgstr "Impossible de lire le fichier ou fichier invalide"
@@ -778,6 +784,9 @@ msgstr "Effacer les chansons sélectionnées"
 msgid "Delete list"
 msgstr "Effacer cette liste"
 
+msgid "Descending order"
+msgstr "Ordre descendant"
+
 msgid "Descr."
 msgstr "Descr."
 
@@ -842,8 +851,8 @@ msgstr "Ne pas écrire les tags"
 msgid "Don't add the overlay to dialogs"
 msgstr "Ne pas ajouter de sur-couche aux textes"
 
-msgid "Don't know how to play {file}"
-msgstr "Ne sait pas jouer {file}"
+msgid "Don't know how to play files of type {type}"
+msgstr "Ne sait pas comment jouer les fichiers de type {type}"
 
 msgid "Don't notify if the main window is visible"
 msgstr "Ne pas afficher de notification si la fenêtre principale est visible"
@@ -1259,6 +1268,15 @@ msgstr "Bibliothèque"
 msgid "Library : "
 msgstr "Bibliothèque : "
 
+msgid ""
+"Library empty.\n"
+"\n"
+"Use the settings dialog to add music."
+msgstr ""
+"Bibliothèque vide.\n"
+"\n"
+"Pour ajouter des chansons, utilisez la fenêtre de configuration."
+
 msgid "Library size : %d song"
 msgid_plural "Library size : %d songs"
 msgstr[0] "La bibliothèque contient %d chanson"
@@ -1266,6 +1284,9 @@ msgstr[1] "La bibliothèque contient %d chansons"
 
 msgid "List"
 msgstr "Liste"
+
+msgid "List empty"
+msgstr "Liste vide"
 
 msgid "Listed : "
 msgstr "Listé : "
@@ -1470,6 +1491,9 @@ msgstr "Aucune étiquette"
 msgid "No locked filter"
 msgstr "Pas de filtre verrouillé"
 
+msgid "No songs found"
+msgstr "Aucune chanson trouvée"
+
 msgid "No web browser found."
 msgstr "Aucun navigateur web trouvé."
 
@@ -1557,6 +1581,11 @@ msgstr "Ancien nom"
 
 msgid "On top of other windows instead of below"
 msgstr "Par-dessus les autres fenêtres plutôt qu'au-dessous"
+
+msgid "One of these commands is required to play files of type {type} : {cmd}"
+msgstr ""
+"Une de ces commandes est nécessaire pour jouer les fichiers de type {type} : "
+"{cmd}"
 
 msgid "Only affect mp3 files that do not already have an id3v1 tag"
 msgstr "N'affecte que les fichiers mp3 qui n'ont pas déjà de tags ID3v1."
@@ -1758,10 +1787,16 @@ msgstr "Filtre en lecture"
 msgid "Playing Title"
 msgstr "Titre en lecture"
 
+msgid "Playing error : {error}"
+msgstr "Erreur de lecture : {error}"
+
 msgid "Playlist"
 msgstr "Liste de lecture"
 
 msgid "Playlist Empty"
+msgstr "Liste de lecture vide"
+
+msgid "Playlist empty"
 msgstr "Liste de lecture vide"
 
 msgid "Playlist files"
@@ -2421,6 +2456,10 @@ msgstr "Les [plus/moins]"
 
 msgid "These fields can be used :"
 msgstr "Ces champs peuvent être utilisés :"
+
+msgid "This command is required to play files of type {type} : {cmd}"
+msgstr ""
+"Cette commande est nécessaire pour jouer les fichiers de type {type} : {cmd}"
 
 msgid "This label is set for %d song."
 msgid_plural "This label is set for %d songs."
@@ -3632,9 +3671,6 @@ msgstr ""
 "{album}\n"
 "<small>par</small> {artist}"
 
-msgid "{command} is needed to play this file."
-msgstr "{command} est nécessaire pour jouer ce fichier."
-
 msgid "{folder} already exists"
 msgstr "{folder} existe déjà"
 
@@ -3849,3 +3885,6 @@ msgstr "liste de widgets séparées par '|'"
 
 #~ msgid "{cmd} options :"
 #~ msgstr "Options de {cmd} :"
+
+#~ msgid "{command} is needed to play this file."
+#~ msgstr "{command} est nécessaire pour jouer ce fichier."
