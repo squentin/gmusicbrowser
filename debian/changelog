@@ -1,3 +1,17 @@
+gmusicbrowser (1.1.5ppa9) lucid; urgency=low
+
+  * updated default layout (shimmer) - tabs on bottom
+  * added plugin "artist-info" (disabled by default, problems: e.g. decoding issues)
+    merge with git upstream (commit 10c7b87189f6dbe9f2a7 - 2010-07-13)
+    for a complete changelog see: github.com/ochosi/gmusicbrowser/commits/
+    
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Tue, 20 Jul 2010 20:16:28 +0200
+
+gmusicbrowser (1.1.5ppa8) karmic; urgency=low
+  * failed to build :/
+
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Tue, 20 Jul 2010 00:21:30 +0200
+
 gmusicbrowser (1.1.5ppa7) karmic; urgency=low
 
   * modified/updated default layout (shimmer)
