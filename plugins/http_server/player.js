@@ -128,9 +128,9 @@ volume.options.onChange = function(volume) {
     gmb.setVolume(volume);
 };
 
-seek.options.onSlide = function(position_ratio) {
+/* seek.options.onSlide = function(position_ratio) {
     gmb.setPositionByRatio(position_ratio);
-};
+}; uncomment for great hilarity. */
 
 seek.options.onChange = function(position_ratio) {
     gmb.setPositionByRatio(position_ratio);
