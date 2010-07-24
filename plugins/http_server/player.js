@@ -56,7 +56,7 @@ var GmusicBrowserClient = Class.create({
     },
 
     setVolume: function(volume) {
-	new Ajax.Request("/volume", {
+	new Ajax.Request("/player", {
 	    method: "post",
 	    onSuccess: function(response) {
 		// TODO check return value, factor out said checking
@@ -64,7 +64,8 @@ var GmusicBrowserClient = Class.create({
 	    onFailure: function(response) {
 		alert("holy shit problem setting volume");
 	    }.bind(this),
-	    parameters: {volume:volume}
+	    contentType:"application/json",
+	    postBody: Object.toJSON({volume:volume})
 	});
     },
 

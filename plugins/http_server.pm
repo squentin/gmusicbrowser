@@ -29,7 +29,10 @@ use constant {
 
 use JSON;
 
+# actually get *feedback* instead of silence if a session crashes.
+sub POE::Kernel::CATCH_EXCEPTIONS () { 0 }
 use POE;
+
 use POE::Kernel { loop => "Glib" };
 use POE::Component::Server::HTTP;
 
@@ -38,8 +41,7 @@ use HTTP::Status qw/RC_OK/;
 
 use File::Slurp;
 
-# actually get *feedback* instead of silence if a session crashes.
-sub POE::Kernel::CATCH_EXCEPTIONS () { 0 }
+
 
 ::SetDefaultOptions(OPT, PortNumber => 8080);
 
@@ -59,6 +61,15 @@ sub song2json {
 # current: current playing song in JSON representation, see song2json()
 sub state2json {
     return {"current" => song2json($::SongID), "playing" => $::TogPlay, "volume" => ::GetVol(), "playposition" => $::PlayTime};
+}
+
+# takes fields in the format of above (typically, only ones being actively changed should be supplied),
+# changes player state to match.
+sub json2state {
+    my ($state) = @_;
+    if(defined($state->{volume})) {
+	::UpdateVol($state->{volume} * 100);
+    }
 }
 
 sub cgi_from_request {
@@ -101,23 +112,6 @@ sub skip_handler {
     return RC_OK;
 }
 
-sub volume_handler {
-    my ($request, $response) = @_;
-    $request->header(Connection => 'close');
-    my $path = $request->uri->path;
-    my $query = $request->uri->query;
-
-    my $cgi = cgi_from_request($request);
-    foreach($cgi->param()) {
-    	if($_ eq "volume") {
-    	    ::UpdateVol($cgi->param($_) * 100);
-    	}
-    }
-    $response->code(200);
-
-    return RC_OK;
-}
-
 sub seek_handler {
     my ($request, $response) = @_;
     $request->header(Connection => 'close');
@@ -141,10 +135,21 @@ sub player_handler {
     my $path = $request->uri->path;
     my $query = $request->uri->query;
 
-    $response->code(200);
-    $response->content_type('application/json');
-    $response->content(encode_json(state2json()));
-    return RC_OK;
+    my $cgi = cgi_from_request($request);  
+
+    if($request->method() eq "GET") {
+	$response->code(200);
+	$response->content_type('application/json');
+	$response->content(encode_json(state2json()));
+	return RC_OK;
+    } elsif($request->method() eq "POST") {
+	# should check $request->header('Accept')
+	json2state(decode_json($request->content));
+	$response->code(200);
+	$response->content_type('application/json');
+	$response->content(encode_json(state2json()));
+	return RC_OK;
+    }
 }
 
 sub playpause_handler {
@@ -284,7 +289,6 @@ sub StartServer {
 			   "/noscript" => \&root_noscript_handler,
 			   "/skip" => \&skip_handler,
 			   "/playpause" => \&playpause_handler,
-			   "/volume" => \&volume_handler,
 			   "/code/" => \&code_handler,
 			   "/seek" => \&seek_handler
     	},
