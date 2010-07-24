@@ -67,11 +67,36 @@ var GmusicBrowserClient = Class.create({
 	    parameters: {volume:volume}
 	});
     },
+
+    setPosition: function(position) {
+	new Ajax.Request("/seek", {
+	    method: "post",
+	    onSuccess: function(response) {
+		// TODO check return value, factor out said checking
+	    }.bind(this),
+	    onFailure: function(response) {
+		alert("holy shit problem setting volume");
+	    }.bind(this),
+	    parameters: {position:position}
+	});
+    },
+
+    setPositionByRatio: function(position_ratio) {
+	this.setPosition(position_ratio * this.state_description.current.length);
+    }
 });
 
 var gmb = new GmusicBrowserClient();
 
-var volume = new Control.Slider('seek_position', 'seek_slider', {
+var volume = new Control.Slider('volume_position', 'volume_slider', {
+  axis:'horizontal',
+  minimum: 0,
+  maximum: 500,
+  increment: 1,
+  disabled: false, 
+});
+
+var seek = new Control.Slider('seek_position', 'seek_slider', {
   axis:'horizontal',
   minimum: 0,
   maximum: 500,
@@ -89,12 +114,26 @@ var do_update = function(state_description) {
 	$('playpausebutton').innerHTML = "Play";
     }
     volume.setValue(state_description.volume / 100);
+    var vol_ratio = state_description.playposition / state_description.current.length;
+    seek.setValue(vol_ratio);
 }.bind(this);
 
 gmb.onUpdate(do_update);
 
-volume.options.onSlide = function(value) {
-    gmb.setVolume(value);
+volume.options.onSlide = function(volume) {
+    gmb.setVolume(volume);
+};
+
+volume.options.onChange = function(volume) {
+    gmb.setVolume(volume);
+};
+
+seek.options.onSlide = function(position_ratio) {
+    gmb.setPositionByRatio(position_ratio);
+};
+
+seek.options.onChange = function(position_ratio) {
+    gmb.setPositionByRatio(position_ratio);
 };
 
 Event.observe('playpausebutton', 'click', function(event) {

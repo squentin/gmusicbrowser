@@ -51,14 +51,14 @@ my $resources = {};
 
 sub song2json {
     my ($song_id) = @_;
-    return {"id" => $song_id, "artist" => ::Songs::Get($song_id, "artist"), "title" => ::Songs::Get($song_id, "title")};
+    return {"id" => $song_id, "artist" => ::Songs::Get($song_id, "artist"), "title" => ::Songs::Get($song_id, "title"), "length" => ::Songs::Get($song_id, "length")};
 }
 
 # playing: 1 for playing, 0 for paused, null for stopped.
 # volume: value between 0 and 100.
 # current: current playing song in JSON representation, see song2json()
 sub state2json {
-    return {"current" => song2json($::SongID), "playing" => $::TogPlay, "volume" => ::GetVol()};
+    return {"current" => song2json($::SongID), "playing" => $::TogPlay, "volume" => ::GetVol(), "playposition" => $::PlayTime};
 }
 
 sub cgi_from_request {
@@ -115,6 +115,22 @@ sub volume_handler {
     }
     $response->code(200);
 
+    return RC_OK;
+}
+
+sub seek_handler {
+    my ($request, $response) = @_;
+    $request->header(Connection => 'close');
+    my $path = $request->uri->path;
+    my $query = $request->uri->query;
+
+    my $cgi = cgi_from_request($request);   
+    foreach($cgi->param()) {
+    	if($_ eq "position") {
+	    ::SkipTo($cgi->param($_));
+	}
+    }
+    $response->code(200);
     return RC_OK;
 }
 
@@ -209,12 +225,27 @@ sub root_handler {
         height: 20px;
         width: 20px;
       }
+      #volume_slider {
+        background-color: red;
+        height: 20px;
+        width: 500px;
+      }
+      #volume_position {
+        background-color: blue;
+        height: 20px;
+        width: 20px;
+      }
     </style>
   </head>
   <body>
     <div id=current_song>
       <span id=current_song_artist></span> - 
       <span id=current_song_title></span>
+    </div>
+    <br>
+
+    <div id=volume_slider>
+      <div id=volume_position></div>
     </div>
     <br>
 
@@ -254,7 +285,8 @@ sub StartServer {
 			   "/skip" => \&skip_handler,
 			   "/playpause" => \&playpause_handler,
 			   "/volume" => \&volume_handler,
-			   "/code/" => \&code_handler
+			   "/code/" => \&code_handler,
+			   "/seek" => \&seek_handler
     	},
     	Headers => {Server => 'Gmusicbrowser HTTP',},
     );
