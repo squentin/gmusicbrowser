@@ -55,7 +55,7 @@ var GmusicBrowserClient = Class.create({
 	});
     },
 
-    setVolume: function(volume) {
+    change: function(state_description) {
 	new Ajax.Request("/player", {
 	    method: "post",
 	    onSuccess: function(response) {
@@ -65,21 +65,16 @@ var GmusicBrowserClient = Class.create({
 		alert("holy shit problem setting volume");
 	    }.bind(this),
 	    contentType:"application/json",
-	    postBody: Object.toJSON({volume:volume})
+	    postBody: Object.toJSON(state_description)
 	});
     },
 
+    setVolume: function(volume) {
+	this.change({volume:volume});
+    },
+
     setPosition: function(position) {
-	new Ajax.Request("/seek", {
-	    method: "post",
-	    onSuccess: function(response) {
-		// TODO check return value, factor out said checking
-	    }.bind(this),
-	    onFailure: function(response) {
-		alert("holy shit problem setting volume");
-	    }.bind(this),
-	    parameters: {position:position}
-	});
+	this.change({playposition:position});
     },
 
     setPositionByRatio: function(position_ratio) {

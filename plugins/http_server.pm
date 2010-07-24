@@ -70,6 +70,9 @@ sub json2state {
     if(defined($state->{volume})) {
 	::UpdateVol($state->{volume} * 100);
     }
+    if(defined($state->{playposition})) {
+	::SkipTo($state->{playposition});
+    }
 }
 
 sub cgi_from_request {
@@ -112,22 +115,6 @@ sub skip_handler {
     return RC_OK;
 }
 
-sub seek_handler {
-    my ($request, $response) = @_;
-    $request->header(Connection => 'close');
-    my $path = $request->uri->path;
-    my $query = $request->uri->query;
-
-    my $cgi = cgi_from_request($request);   
-    foreach($cgi->param()) {
-    	if($_ eq "position") {
-	    ::SkipTo($cgi->param($_));
-	}
-    }
-    $response->code(200);
-    return RC_OK;
-}
-
 sub player_handler {
     my ($request, $response) = @_;
     $response->protocol( "HTTP/1.1" );
@@ -143,7 +130,7 @@ sub player_handler {
 	$response->content(encode_json(state2json()));
 	return RC_OK;
     } elsif($request->method() eq "POST") {
-	# should check $request->header('Accept')
+	# should check $request->header('Accept') for content-type negotiation
 	json2state(decode_json($request->content));
 	$response->code(200);
 	$response->content_type('application/json');
@@ -289,8 +276,7 @@ sub StartServer {
 			   "/noscript" => \&root_noscript_handler,
 			   "/skip" => \&skip_handler,
 			   "/playpause" => \&playpause_handler,
-			   "/code/" => \&code_handler,
-			   "/seek" => \&seek_handler
+			   "/code/" => \&code_handler
     	},
     	Headers => {Server => 'Gmusicbrowser HTTP',},
     );
