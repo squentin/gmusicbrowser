@@ -71,6 +71,14 @@ var GmusicBrowserClient = Class.create({
 
 var gmb = new GmusicBrowserClient();
 
+var volume = new Control.Slider('seek_position', 'seek_slider', {
+  axis:'horizontal',
+  minimum: 0,
+  maximum: 500,
+  increment: 1,
+  disabled: false, 
+});
+
 var do_update = function(state_description) {
     // TODO we may not get all fields here, only update ones that actually are.
     $('current_song_title').innerHTML = state_description.current.title.escapeHTML();
@@ -80,17 +88,12 @@ var do_update = function(state_description) {
     } else {
 	$('playpausebutton').innerHTML = "Play";
     }
+    volume.setValue(state_description.volume / 100);
 }.bind(this);
 
 gmb.onUpdate(do_update);
 
-var volume = new Control.Slider('seek_position', 'seek_slider', {
-  axis:'horizontal',
-  minimum: 0,
-  maximum: 500,
-  increment: 1,
-  disabled: false, 
-});
+
 
 volume.options.onSlide = function(value) {
     gmb.setVolume(value);

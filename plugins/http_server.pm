@@ -49,8 +49,11 @@ sub song2json {
     return {"id" => $song_id, "artist" => ::Songs::Get($song_id, "artist"), "title" => ::Songs::Get($song_id, "title")};
 }
 
+# playing: 1 for playing, 0 for paused, null for stopped.
+# volume: value between 0 and 100.
+# current: current playing song in JSON representation, see song2json()
 sub state2json {
-    return {"current" => song2json($::SongID), "playing" => $::TogPlay};
+    return {"current" => song2json($::SongID), "playing" => $::TogPlay, "volume" => ::GetVol()};
 }
 
 sub cgi_from_request {
