@@ -23,6 +23,10 @@ package GMB::Plugin::HTTPSERVER;
 use strict;
 use warnings;
 
+use constant {
+    OPT => 'PLUGIN_HTTPSERVER_'
+};
+
 use JSON;
 
 use POE;
@@ -37,6 +41,7 @@ use File::Slurp;
 # actually get *feedback* instead of silence if a session crashes.
 sub POE::Kernel::CATCH_EXCEPTIONS () { 0 }
 
+::SetDefaultOptions(OPT, PortNumber => 8080);
 
 # my $cgi = cgi_from_request($request);
 # my $field = $cgi->param("field");
@@ -238,10 +243,11 @@ END
     return RC_OK;
 }
 
-sub Start {
-    my ($self) = @_;
-    my $http = POE::Component::Server::HTTP->new(
-    	Port           => 8080,
+my $http_poe_server;
+
+sub StartServer {
+    $http_poe_server = POE::Component::Server::HTTP->new(
+    	Port           => $::Options{OPT.'PortNumber'},
     	ContentHandler => {"/" => \&root_handler,
 			   "/player" => \&player_handler,
 			   "/noscript" => \&root_noscript_handler,
@@ -252,15 +258,38 @@ sub Start {
     	},
     	Headers => {Server => 'Gmusicbrowser HTTP',},
     );
+}
+
+sub StopServer {
+    POE::Kernel->call($http_poe_server->{httpd}, "shutdown");
+    POE::Kernel->call($http_poe_server->{tcp}, "shutdown");
+}
+
+sub Start {
+    my ($self) = @_;
+
+
     $resource_path = $::DATADIR.::SLASH.'plugins'.::SLASH;
     # $resources->{prototypejs} = read_file($resource_path.::SLASH.'http_server'.::SLASH.'prototype.js');
     # $resources->{playerjs} = read_file($resource_path.::SLASH.'http_server'.::SLASH.'player.js');
+    StartServer();
 }
 
 sub Stop {
+    my ($self) = @_;
+    StopServer();
+}
+
+sub RestartServer {
+    StopServer();
+    StartServer();
 }
 
 sub prefbox {
+    my $vbox = new Gtk2::VBox->new();
+    my $port_setting = ::NewPrefEntry(OPT."PortNumber", _"Port Number", cb => \&RestartServer);
+    $vbox->add($port_setting);
+    return $vbox;
 }
 
 1;

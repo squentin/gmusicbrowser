@@ -93,8 +93,6 @@ var do_update = function(state_description) {
 
 gmb.onUpdate(do_update);
 
-
-
 volume.options.onSlide = function(value) {
     gmb.setVolume(value);
 };
