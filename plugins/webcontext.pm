@@ -246,7 +246,8 @@ sub UpdateBackend
 }
 
 sub Start
-{	$active=1;
+{	return unless $OKMoz or $OKWebKit;
+	$active=1;
 	Layout::RegisterWidget($_ => $Widgets{$_}) for keys %Widgets;
 	&set_stripped_wiki;
 }

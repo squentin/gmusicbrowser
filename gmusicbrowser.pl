@@ -472,10 +472,9 @@ my %htmlelem= #FIXME maybe should use a module with a complete list
 	acirc => 'à', eacute => 'é', egrave => 'è', ecirc => 'ê',
 );
 sub decode_html
-{	local $_=$_[0];
-	s/&#(\d{2,4});/chr($1)/eg;
-	s/&([a-z]+);/$htmlelem{$1}||'?'/eg;
-	return $_;
+{	my $s=shift;
+	$s=~s/&(?:#(\d+)|#x([0-9A-F]+)|([a-z]+));/$1 ? chr($1) : $2 ? chr(hex $2) : $htmlelem{$3}||'?'/egi;
+	return $s;
 }
 
 sub PangoEsc	# escape special chars for pango ( & < > ) #replaced by Glib::Markup::escape_text if available
@@ -844,7 +843,8 @@ our ($NBVolIcons,$NBQueueIcons); my $TrayIconFile;
 my $icon_factory;
 
 my %IconsFallbacks=
-(	'gmb-queue-window' => 'gmb-queue',
+(	'gmb-queue0'	   => 'gmb-queue',
+	'gmb-queue-window' => 'gmb-queue',
 	'gmb-random-album' => 'gmb-random',
 );
 
@@ -1813,7 +1813,7 @@ sub SaveTags	#save tags _and_ settings
 	{	my $lastseen=$Options{LayoutsLastSeen}||={};
 		if 	(exists $Layout::Layouts{$key})	{ delete $lastseen->{$key}; }
 		elsif	(!$lastseen->{$key})		{ $lastseen->{$key}=$DAYNB; }
-		elsif	($lastseen->{$key}<$tooold)	{ delete $_->{$key} for $Options{Layout},$lastseen; }
+		elsif	($lastseen->{$key}<$tooold)	{ delete $_->{$key} for $Options{Layouts},$lastseen; }
 	}
 
 	my $error;
@@ -2065,7 +2065,7 @@ sub Play
 
 sub ErrorPlay
 {	my ($error,$critical)=@_;
-	$error='Playing error : '.$error;
+	$error= __x( _"Playing error : {error}", error=> $error );
 	warn $error."\n";
 	return if $Options{IgnorePlayError} && !$critical;
 	my $dialog = Gtk2::MessageDialog->new
@@ -2188,7 +2188,7 @@ sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, 
 		{	my $max= @$Queue; $max=$NBQueueIcons if $NBQueueIcons < $max;
 			$n= first { $Queue->[$_]==$ID } 0..$max-1;
 		}
-		defined $n ? "gmb-queue".($n+1) : 'gmb-queue';
+		defined $n ? "gmb-queue".($n+1) : 'gmb-queue0';
 	 } : undef;
 }
 
@@ -2428,17 +2428,30 @@ sub SetRepeat
 	::HasChanged('Repeat');
 }
 
+sub DoActionForFilter
+{	my ($action,$filter)=@_;
+	$filter||= Filter->new;
+	$action||='play';
+	if    ($action eq 'play')	{ Select( filter=>$filter, song=>'first',play=>1 ); }
+	else				{ DoActionForList($action,$filter->filter); }
+}
 sub DoActionForList
 {	my ($action,$list)=@_;
+	return unless ref $list && @$list;
 	$action||='playlist';
 	my @list=@$list;
+	# actions that don't need/want the lsit to be sorted (Enqueue will sort it itself)
 	if	($action eq 'queue')		{ Enqueue(@list) }
+	elsif	($action eq 'queueinsert')	{ QueueInsert(@list) }
 	elsif	($action eq 'replacequeue')	{ ReplaceQueue(@list) }
+	elsif	($action eq 'properties')	{ DialogSongsProp(@list) }
 	else
-	{SortList(\@list) if @list>1; #Enqueue will sort it
+	{ # actions that need the list to be sorted
+	 SortList(\@list) if @list>1;
 	 if	($action eq 'playlist')		{ $ListPlay->Replace(\@list); }
 	 elsif	($action eq 'addplay')		{ $ListPlay->Push(\@list); }
 	 elsif	($action eq 'insertplay')	{ $ListPlay->InsertAtPosition(\@list); }
+	 else	{ warn "Unknown action '$action'\n"; }
 	}
 }
 
