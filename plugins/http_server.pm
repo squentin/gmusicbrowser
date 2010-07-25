@@ -288,7 +288,6 @@ sub StartServer {
     	Port           => $::Options{OPT.'PortNumber'},
     	ContentHandler => {"/" => \&root_handler,
 			   "/player" => \&player_handler,
-			   "/noscript" => \&root_noscript_handler,
 			   "/skip" => \&skip_handler,
 			   "/code/" => \&code_handler
     	},
