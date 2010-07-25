@@ -324,7 +324,7 @@ sub RestartServer {
 sub prefbox {
     my $vbox = new Gtk2::VBox->new();
     my $port_setting = ::NewPrefEntry(OPT."PortNumber", _"Port Number", cb => \&RestartServer);
-    $vbox->add($port_setting);
+    $vbox->add_with_properties($port_setting, "expand", ::FALSE);
     return $vbox;
 }
 
