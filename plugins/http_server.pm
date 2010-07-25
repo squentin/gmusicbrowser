@@ -14,7 +14,7 @@
 
 =gmbplugin HTTPSERVER
 name    HTTP Server
-title   HTTP Server - Provides a RESTful HTTP service (and Javascript player) on port 8080
+title   HTTP Server - Provides a RESTful HTTP service (and Javascript player)
 author  Andrew Clunis <andrew@orospakr.ca>
 desc    Access the gmusicbrowser library RESTfully, and use a simple javascript UI to interact with it.
 =cut

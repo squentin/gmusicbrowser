@@ -37,7 +37,7 @@ var GmusicBrowserClient = Class.create({
     },
 
     stop: function() {
-	this.change({'playing':null}, true);
+	this.change({'playing':-1}, true);
     },
 
     skip: function() {
