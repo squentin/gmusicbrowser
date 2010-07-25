@@ -56,11 +56,44 @@ sub song2json {
     return {"id" => $song_id, "artist" => ::Songs::Get($song_id, "artist"), "title" => ::Songs::Get($song_id, "title"), "length" => ::Songs::Get($song_id, "length")};
 }
 
-# playing: 1 for playing, 0 for paused, null for stopped.
+# playing: 1 for playing, 0 for paused, -1 for stopped.
 # volume: value between 0 and 100.
 # current: current playing song in JSON representation, see song2json()
 sub state2json {
-    return {"current" => song2json($::SongID), "playing" => $::TogPlay, "volume" => ::GetVol(), "playposition" => $::PlayTime};
+    my $playing;
+    if(!defined($::TogPlay)) {
+	$playing = -1;
+    } else {
+	$playing = $::TogPlay;
+    }
+    return {"current" => song2json($::SongID), "playing" => $playing, "volume" => ::GetVol(), "playposition" => $::PlayTime};
+}
+
+sub apply_playing_state {
+    my ($req_play_state) = @_;
+    
+    # being asked to play
+    if($req_play_state eq 1) {
+	if(!defined($::TogPlay)) {
+	    # we are stopped, and being asked to begin playback.
+	    ::Play();
+	    return;
+	}
+	if($::TogPlay eq 0) {
+	    # we are paused, and being asked to go resume playing.  ::Pause() will take care of it.
+	    ::Pause();
+	    return;
+	}
+    } elsif($req_play_state eq 0) { # asking to pause
+	if($::TogPlay eq 1) {
+	    # we are playing, and being asked to pause.  ::Pause() will take care of it.
+	    ::Pause();
+	    return;
+	}
+    } elsif($req_play_state eq -1) { # asking to stop
+	::Stop();
+	return;
+    }
 }
 
 # takes fields in the format of above (typically, only ones being actively changed should be supplied),
@@ -72,6 +105,9 @@ sub json2state {
     }
     if(defined($state->{playposition})) {
 	::SkipTo($state->{playposition});
+    }
+    if(defined($state->{playing})) {
+	apply_playing_state($state->{playing});
     }
 }
 
@@ -137,24 +173,6 @@ sub player_handler {
 	$response->content(encode_json(state2json()));
 	return RC_OK;
     }
-}
-
-sub playpause_handler {
-    my ($request, $response) = @_;
-    $response->protocol( "HTTP/1.1" );
-    $request->header(Connection => 'close');
-    my $path = $request->uri->path;
-    my $query = $request->uri->query;
-
-    warn "Got Skip request!";
-    my $cgi = cgi_from_request($request);
-
-    ::PlayPause();
-
-    $response->code(200);
-    $response->content_type('application/json');
-    $response->content(encode_json(state2json()));
-    return RC_OK;
 }
 
 sub code_handler {
@@ -275,7 +293,6 @@ sub StartServer {
 			   "/player" => \&player_handler,
 			   "/noscript" => \&root_noscript_handler,
 			   "/skip" => \&skip_handler,
-			   "/playpause" => \&playpause_handler,
 			   "/code/" => \&code_handler
     	},
     	Headers => {Server => 'Gmusicbrowser HTTP',},
