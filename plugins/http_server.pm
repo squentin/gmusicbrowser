@@ -185,8 +185,6 @@ sub code_handler {
 
     my $local_filename = $resource_path.::SLASH.'http_server'.::SLASH.$split_request[2];
 
-    warn "DETECTED FILENAME: " . $local_filename;
-
     if( -e $local_filename ) {
 	my $contents = read_file($local_filename);
 	$response->content($contents);
@@ -206,8 +204,7 @@ sub root_handler {
     my $path = $request->uri->path;
     my $query = $request->uri->query;
 
-
-    warn "HTTP request to root or unknown: " . $request->method . " " . $request->uri->path_query;
+    # warn "HTTP request to root or unknown: " . $request->method . " " . $request->uri->path_query;
 
     # my $playing_song;
     # if(defined $ID) {
