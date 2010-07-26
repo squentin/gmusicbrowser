@@ -9,7 +9,7 @@
 name	Artistinfo
 title	Artistinfo plugin
 author  Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
-desc	Display Artistinfo
+desc	Display Information about the playing Artist (short-biography or upcoming events) fetched from last.fm
 =cut
 
 package GMB::Plugin::ARTISTINFO;
@@ -21,6 +21,7 @@ BEGIN {push @ISA,'GMB::Context';}
 use base 'Gtk2::VBox';
 use base 'Gtk2::HBox';
 use base 'Gtk2::EventBox';
+use base 'Gtk2::ToggleButton';
 use constant
 {	OPT	=> 'PLUGIN_ARTISTINFO_', # MUST begin by PLUGIN_ followed by the plugin ID / package name
 };
@@ -65,15 +66,25 @@ sub new
 	$textview->set_cursor_visible(0);
 	$textview->set_wrap_mode('word');
 	$textview->set_left_margin(5);
-	#my $color = Gtk2::Gdk::Color->parse('black'); # hardcoding the color
+	my $label;
 	
-#	my $parent = bless Gtk2::Notebook->new, $class;
-#	my $bgcolor = $parent->get_style() ->bg('normal'); # retrieving the color
-#	$bgcolor =~ m/\((.*)\)/gi;
-#	$bgcolor = $1;
-#	my $bgcolor_ = Gtk2::Gdk::Color->new;
-#	$bgcolor_ > set_pixel($bgcolor->pixel);
-#	$textview->modify_base('normal',$bgcolor_);
+	my $togglebox = Gtk2::HBox->new(1,0);
+	my $toggleB = Gtk2::RadioButton->new(undef,'biography');
+	$toggleB->set_mode(0);
+	if ($::Options{OPT.'ArtistSite'} eq "lastfm") { $toggleB->set_active(1); }
+	else {$toggleB->set_active(0); }
+	$togglebox->pack_start($toggleB,0,0,0);
+	
+	my @group = $toggleB->get_group;
+	$toggleB=Gtk2::RadioButton->new_with_label(@group,'events');
+	$toggleB->signal_connect('toggled' => \&toggled_cb);
+	$toggleB->signal_connect('toggled' => \&SongChanged);
+	
+	
+	$toggleB->set_mode(0);
+	$togglebox->pack_start($toggleB,0,0,0);
+	#my $source=::NewPrefCombo( OPT.'ArtistSite', {map {$_=>$sites{$_}[0]} keys %sites} ,cb => \&SongChanged, toolitem=> _"Artist-info from last.fm");
+	#$togglebox->pack_start($source,0,0,0);
 	
 	if (my $color= $options->{color} || $options->{DefaultFontColor})
 	{	$textview->modify_text('normal', Gtk2::Gdk::Color->parse($color) );
@@ -87,8 +98,6 @@ sub new
 	$sw->add($textview);
 
 	my $linkbox = Gtk2::VBox->new;
-	my $source=::NewPrefCombo( OPT.'ArtistSite', {map {$_=>$sites{$_}[0]} keys %sites} ,cb => \&SongChanged, text => "", toolitem=> _"Artist-info from last.fm");
-	$linkbox->pack_start($source,0,0,0);
 	for my $aref
 	(	['gtk-refresh',	\&SongChanged, "Refresh"],
 		['webcontext-lastfm', sub { Lookup_cb("http://www.last.fm/music/") }, "Show Artist page on last.fm"],
@@ -106,7 +115,9 @@ sub new
 	
 	my $infobox = Gtk2::HBox->new;
 	
+	$self->pack_start($togglebox,0,0,0);
 	$self->add($infobox);
+	
 	$infobox->pack_start($sw,1,1,0);
 	$infobox->pack_start($linkbox_parent,0,0,0);
 
@@ -117,6 +128,12 @@ sub new
 #	SetFont($textview);
 
 	return $self;
+}
+
+sub toggled_cb
+{	my $toggleB = shift;
+	if ($toggleB->get_active) { $::Options{OPT.'ArtistSite'} = "events";}
+	else { $::Options{OPT.'ArtistSite'} = "lastfm";}
 }
 
 sub Lookup_cb
@@ -216,16 +233,19 @@ sub loaded
 	unless ($data) { $data=_("Loading failed.").qq( <a href="$self->{url}">)._("retry").'</a>'; $type="text/html"; }
 	$self->{url}=$url if $url; #for redirections
 	$buffer->delete($buffer->get_bounds);
-#	my $encoding;
-#	if ($type && $type=~m#^text/.*; ?charset=([\w-]+)#) {$encoding=$1}
+	my $encoding;
+	if ($type && $type=~m#^text/.*; ?charset=([\w-]+)#) {$encoding=$1}
 #	if ($type && $type!~m#^text/html#)
 #	{	if	($type=~m#^text/#)	{$buffer->set_text($data);}
 #		return;
 #	}
-#	$encoding=$1 if $data=~m#<meta *http-equiv="Content-Type" *content="text/html; charset=([\w-]+)"#;
-#	$encoding='cp1252' if $encoding && $encoding eq 'iso-8859-1'; #microsoft use the superset cp1252 of iso-8859-1 but says it's iso-8859-1
-#	$encoding||='cp1252'; #default encoding
-#	$data=Encode::decode($encoding,$data) if $encoding;
+	if ($data=~m/xml version/) { $encoding='utf-8'; }
+	$encoding=$1 if $data=~m#<meta *http-equiv="Content-Type" *content="text/html; charset=([\w-]+)"#;
+	$encoding='cp1252' if $encoding && $encoding eq 'iso-8859-1'; #microsoft use the superset cp1252 of iso-8859-1 but says it's iso-8859-1
+	$encoding||='cp1252'; #default encoding
+	$data=Encode::decode($encoding,$data) if $encoding;
+	
+	if ($encoding eq 'utf-8') { $data = ::decode_html($data); }
 	my $iter=$buffer->get_start_iter;
 	my %prop;
 	$prop{weight}=Gtk2::Pango::PANGO_WEIGHT_BOLD;
@@ -260,15 +280,12 @@ sub loaded
 	}
 	elsif ($url =~ m/event/gi) {
 		my @line = $data =~ m/<title>(.*?)<\/title>/gi;
-		my $clip;
+		$data = '';
 		foreach (@line) {
-			if ($_ ne "Last.fm Events") { $clip = $clip . " * " . $_ . "\n"; }
+			if ($_ ne "Last.fm Events") { $data = $data . " * " . $_ . "\n"; }
 		}
 		$infoheader = "Upcoming Events\n";
-		$data = $clip;
 	}
-	#warn $url;
-	
 	
 	$buffer->insert_with_tags($iter,$infoheader,$tag);
 	$buffer->insert($iter,$data);
