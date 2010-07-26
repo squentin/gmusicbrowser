@@ -103,6 +103,7 @@ sub createPlayBin
 	my $pb= $playbin2_ok ? 'playbin2' : 'playbin';
 	$PlayBin=GStreamer::ElementFactory->make($pb => 'playbin'); #FIXME only the first one used works
 	$PlayBin->set('flags' => [qw/audio soft-volume/]) if $playbin2_ok;
+	$PlayBin->set(volume => ($::Volume/100)**3); 	#initialize volume, use a cubic volume scale
 	my $bus=$PlayBin->get_bus;
 	$bus->add_signal_watch;
 #	$bus->signal_connect('message' => \&bus_message);
@@ -255,7 +256,6 @@ sub Play
 		}
 		else {$PlayBin->set('audio-sink' => $Sink);}
 	}
-	$PlayBin->set(volume => ($::Volume/100)**3); 	#use a cubic volume scale
 
 	if ($visual_window)
 	{	$VSink->set_xwindow_id($visual_window->window->XID);
