@@ -144,7 +144,9 @@ sub SetTags
 		tr/\x1D\x00//d for @$tag;
 		if ($n==::SONG_GENRE)
 		{	my %genres;
-			$genres{ucfirst $_}=undef for grep $_ ne '', @$tag;
+			@$tag= grep $_ ne '', @$tag;
+			next unless @$tag;
+			$genres{ucfirst $_}=undef for @$tag;
 			$$aref[$n]=join("\x00",sort keys %genres)."\x00";
 			next;
 		}
