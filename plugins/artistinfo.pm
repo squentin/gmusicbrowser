@@ -33,7 +33,7 @@ my %sites =
 );
 
 if (my $site=$::Options{OPT.'ArtistSite'}) { delete $::Options{OPT.'ArtistSite'} unless exists $sites{$site} } #reset selected site if no longer defined
-::SetDefaultOptions(OPT, FontSize => 10, PathFile => "~/Music/%a/%l/bio", ArtistSite => 'lastfm');
+::SetDefaultOptions(OPT, FontSize => 10, PathFile => "~/.config/gmusicbrowser/bio/%a/%l/bio.txt", ArtistSite => 'lastfm');
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
@@ -65,26 +65,21 @@ sub new
 	$self->signal_connect(map => sub { $_[0]->SongChanged( ::GetSelID($_[0]) ); });
 	$textview->set_cursor_visible(0);
 	$textview->set_wrap_mode('word');
+	$textview->set_pixels_below_lines(5);
+	$textview->set_editable(0);
 	$textview->set_left_margin(5);
 	my $label;
 	
 	my $togglebox = Gtk2::HBox->new(1,0);
 	my $toggleB = Gtk2::RadioButton->new(undef,'biography');
 	$toggleB->set_mode(0);
-	if ($::Options{OPT.'ArtistSite'} eq "lastfm") { $toggleB->set_active(1); }
-	else {$toggleB->set_active(0); }
+	my $toggleE=Gtk2::RadioButton->new_with_label($toggleB,'events');
+	$toggleE->set_mode(0);
+	if ($::Options{OPT.'ArtistSite'} eq "events") { $toggleE->set_active(1); }
+	$toggleE->signal_connect('toggled' => \&toggled_cb);
+	$toggleE->signal_connect('toggled' => \&SongChanged);
 	$togglebox->pack_start($toggleB,0,0,0);
-	
-	my @group = $toggleB->get_group;
-	$toggleB=Gtk2::RadioButton->new_with_label(@group,'events');
-	$toggleB->signal_connect('toggled' => \&toggled_cb);
-	$toggleB->signal_connect('toggled' => \&SongChanged);
-	
-	
-	$toggleB->set_mode(0);
-	$togglebox->pack_start($toggleB,0,0,0);
-	#my $source=::NewPrefCombo( OPT.'ArtistSite', {map {$_=>$sites{$_}[0]} keys %sites} ,cb => \&SongChanged, toolitem=> _"Artist-info from last.fm");
-	#$togglebox->pack_start($source,0,0,0);
+	$togglebox->pack_start($toggleE,0,0,0);
 	
 	if (my $color= $options->{color} || $options->{DefaultFontColor})
 	{	$textview->modify_text('normal', Gtk2::Gdk::Color->parse($color) );
@@ -203,6 +198,10 @@ sub ArtistChanged
 #	}
 	
 	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
+	# STATS (to come)
+	#print AA::Get("playcount:sum",'artist',$aID) . "\n"; # print total playcount of artist
+	#print AA::Get("rating:average",'artist',$artist_id) # print rating average of artist
+	#print AA::Get("rating:range",'artist',$artist_id) # print rating range (min-max) of artist
 	$artist =~ s/%20/%2B/gi; # replace spaces by "+" for last.fm
 	my (undef,$url,$post,$check)=@{$sites{$::Options{OPT.'ArtistSite'}}};
 	for ($url,$post) { next unless defined $_; s/%a/$artist/; }
@@ -235,10 +234,6 @@ sub loaded
 	$buffer->delete($buffer->get_bounds);
 	my $encoding;
 	if ($type && $type=~m#^text/.*; ?charset=([\w-]+)#) {$encoding=$1}
-#	if ($type && $type!~m#^text/html#)
-#	{	if	($type=~m#^text/#)	{$buffer->set_text($data);}
-#		return;
-#	}
 	if ($data=~m/xml version/) { $encoding='utf-8'; }
 	$encoding=$1 if $data=~m#<meta *http-equiv="Content-Type" *content="text/html; charset=([\w-]+)"#;
 	$encoding='cp1252' if $encoding && $encoding eq 'iso-8859-1'; #microsoft use the superset cp1252 of iso-8859-1 but says it's iso-8859-1
@@ -248,8 +243,11 @@ sub loaded
 	if ($encoding eq 'utf-8') { $data = ::decode_html($data); }
 	my $iter=$buffer->get_start_iter;
 	my %prop;
+	$prop{justification}='GTK_JUSTIFY_CENTER';
+	my $tag_center=$buffer->create_tag(undef,%prop);
 	$prop{weight}=Gtk2::Pango::PANGO_WEIGHT_BOLD;
 	my $tag=$buffer->create_tag(undef,%prop);
+	
 	my $infoheader;
 	
 	if ($url =~ m/music/gi) { # either it's artist-info or events-info
@@ -265,30 +263,30 @@ sub loaded
 		else { $infoheader = ""; }
 
 		$data =~ m/<div id="wikiAbstract">(\s*)(.*)<div class="wikiOptions">/s;
-		#$data =~ $regexp;
 		$data = $2;
 		for ($data)
 		{	s/<br \/>|<\/p>/\n/gi; # never more than one empty line
 			s/\n\n/\n/gi; # never more than one empty line
-			s/&#8216;|&#8217;/\'/gi;
-			s/&#8220;|&#8221;/\"/gi;
-			s/&Oslash;//gi;
-			s/&oslash;/\ø/gi;
-			s/&amp;/\&/gi;
 			s/<(.*?)>//gi;
 		}
+	$buffer->insert_with_tags($iter,$infoheader,$tag);
+	$buffer->insert($iter,$data);
 	}
 	elsif ($url =~ m/event/gi) {
+		$infoheader = "Upcoming Events\n";
+		$buffer->insert_with_tags($iter,$infoheader,$tag);
 		my @line = $data =~ m/<title>(.*?)<\/title>/gi;
 		$data = '';
 		foreach (@line) {
-			if ($_ ne "Last.fm Events") { $data = $data . " * " . $_ . "\n"; }
-		}
-		$infoheader = "Upcoming Events\n";
+			if ($_ ne "Last.fm Events") {
+				$buffer->insert_with_tags($iter,"******\n",$tag);
+				$buffer->insert_with_tags($iter,$_ . "\n",$tag_center);
+			}
+		}	
 	}
 	
-	$buffer->insert_with_tags($iter,$infoheader,$tag);
-	$buffer->insert($iter,$data);
+	
+	
 	#$self->Save_text if $::Options{OPT.'AutoSave'} && $oklyrics && $oklyrics>0;
 }
 
