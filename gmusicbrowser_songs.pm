@@ -589,6 +589,7 @@ our %timespan_menu=
  discname =>
  {	name	=> _"Disc name",	width	=> 100,		flags => 'garwesci',	type => 'fewstring',
 	id3v2	=> 'TSST',	vorbis	=> 'discsubtitle',	ape => 'DiscSubtitle',	ilst=> '----DISCSUBTITLE',
+	edit_many=>1,
 	_disabled=>1,
  },
  genre	=>
@@ -651,12 +652,14 @@ our %timespan_menu=
  {	name	=> _"Composer",		width	=> 100,		flags => 'garwesci',	type => 'artist',
 	id3v2	=> 'TCOM',	vorbis	=> 'composer',		ape => 'Composer',	ilst => "\xA9wrt",
 	FilterList => {search=>1},
+	edit_many=>1,
 	_disabled=>1,
  },
  author	=>
  {	name	=> _"Author",	width	=> 100,		flags => 'garwesci',	type => 'artist',
 	id3v2	=> 'TOPE',	vorbis	=> 'author',	lyrics3	=> 'AUT',	#ape => 'Author'#?? FIXME
 	FilterList => {search=>1},
+	edit_many=>1,
 	_disabled=>1,
  },
  version=> #subtitle ?

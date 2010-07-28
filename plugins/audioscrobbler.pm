@@ -91,7 +91,7 @@ sub SongChanged
 
 sub Played
 {	return if $ignore_current_song;
-	my (undef,$ID,undef,$start_time,$seconds_start,$seconds_end)=@_; warn "Played @_\n";
+	my (undef,$ID,undef,$start_time,$seconds_start,$seconds_end)=@_;
 	my $diff= $seconds_end - $seconds_start;
 	return unless $diff>0;
 	$timecount+=$diff;

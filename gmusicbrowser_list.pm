@@ -79,7 +79,7 @@ sub makeLockToggle
 
 sub make_sort_menu
 {	my $selfitem=$_[0];
-	my $songlist=$selfitem->isa('SongList') || $selfitem->isa('SongTree') ? $selfitem : ::GetSonglist($selfitem);
+	my $songlist= $selfitem->isa('SongList::Common') ? $selfitem : ::GetSonglist($selfitem);
 	my $menu= ($selfitem->isa('Gtk2::MenuItem') && $selfitem->get_submenu) || Gtk2::Menu->new;
 	my $menusub=sub { $songlist->Sort($_[1]) };
 	for my $name (sort keys %{$::Options{SavedSorts}})
@@ -4002,8 +4002,9 @@ sub Fill	#FIXME should be called when signals ::style-set and ::direction-change
 	my $displaykeysub=$self->{displaykeysub};
 	my $inverse= ($self->get_direction eq 'rtl');
 	::setlocale(::LC_NUMERIC,'C'); #for the sprintf in the loop
+	my $pango_context= $self->create_pango_context;
 	for my $key (@$list)
-	{	my $layout=Gtk2::Pango::Layout->new( $self->create_pango_context );
+	{	my $layout=Gtk2::Pango::Layout->new($pango_context);
 		my $value=sprintf '%.1f', $scalemin + $scalemax*($href->{$key}-$min)/($max-$min);
 		#$layout->set_text($key);
 		#$layout->get_attributes->insert( Gtk2::Pango::AttrScale->new($value) ); #need recent Gtk2
