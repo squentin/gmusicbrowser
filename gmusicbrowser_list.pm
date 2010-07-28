@@ -1606,6 +1606,7 @@ our @DefaultOptions=
 	nb	=> 1,	# filter level
 	min	=> 1,	# filter out entries with less than $min songs
 	hidebb	=> 0,	# hide button box
+	tabmode	=> 'text', # text, icon or both
 );
 
 sub new
@@ -1614,7 +1615,7 @@ sub new
 	$self->{SaveOptions}=\&SaveOptions;
 	%$opt=( @DefaultOptions, %$opt );
 	my @pids=split /\|/, $opt->{pages};
-	$self->{$_}=$opt->{$_} for qw/nb group min hidetabs/, grep(m/^activate\d?$/, keys %$opt);
+	$self->{$_}=$opt->{$_} for qw/nb group min hidetabs tabmode/, grep(m/^activate\d?$/, keys %$opt);
 	$self->{main_opt}{$_}=$opt->{$_} for qw/group no_typeahead searchbox/; #options passed to children
 	my $nb=$self->{nb};
 	my $group=$self->{group};
@@ -1687,6 +1688,7 @@ sub new
 	$self->{hidebb}=$opt->{hidebb};
 	$hbox->hide if $self->{hidebb};
 	$self->{resetbutton}=$ResetB;
+	::Watch($self, Icons => \&icons_changed);
 	::Watch($self, SongsChanged=> \&SongsChanged_cb);
 	::Watch($self, SongsAdded  => \&SongsAdded_cb);
 	::Watch($self, SongsRemoved=> \&SongsRemoved_cb);
@@ -1727,15 +1729,45 @@ sub AppendPage
 	my %opt=( %{$self->{main_opt}}, %$opt);
 	my $page=$package->new($col,\%opt); #create new page
 	$page->{pid}=$pid;
+	$page->{page_name}=$label;
 	if ($package eq 'FilterList' || $package eq 'FolderList')
 	{	$page->{Depend_on_field}=$col;
 	}
 	my $notebook=$self->{notebook};
-	my $n=$notebook->append_page( $page, Gtk2::Label->new($label) );
+	my $n=$notebook->append_page( $page, $self->create_tab($page) );
 	$n=$notebook->get_n_pages-1; # $notebook->append_page doesn't returns the page number before Gtk2-Perl 1.080
 	$notebook->set_tab_reorderable($page,TRUE);
 	$page->show_all;
 	return $n;
+}
+sub create_tab
+{	my ($self,$page)=@_;
+	my $pid=$page->{pid};
+	my $img;
+	my $label= Gtk2::Label->new( $page->{page_name} );
+	if ($self->{tabmode} ne 'text')
+	{	my $icon= "gmb-tab-$pid";
+		$img= Gtk2::Image->new_from_stock($icon,'menu') if Gtk2::IconFactory->lookup_default($icon);
+		$label=undef if $img && $self->{tabmode} eq 'icon';
+	}
+	my $tab;
+	if ($img && $label)
+	{	$tab= Gtk2::HBox->new(FALSE,0);
+		$tab->pack_start( $img, FALSE,FALSE,0 );
+		$tab->pack_start( $label, TRUE,TRUE,0 );
+	}
+	else { $tab= $img || $label; }
+	$tab->show_all;
+	return $tab;
+}
+sub icons_changed
+{	my $self=shift;
+	if ($self->{tabmode} ne 'text')
+	{	my $notebook=$self->{notebook};
+		for my $page ($notebook->get_children)
+		{	$notebook->set_tab_label( $page, $self->create_tab($page) );
+		}
+	}
 }
 sub RemovePage_cb
 {	my $self=$_[1];
@@ -1773,7 +1805,8 @@ sub button_press_event_cb
 		$new->set_image( Gtk2::Image->new_from_stock('gtk-add','menu') );
 		my $submenu=Gtk2::Menu->new;
 		for my $pid (sort {$pages{$a} cmp $pages{$b}} keys %pages)
-		{	my $item=Gtk2::MenuItem->new_with_label($pages{$pid});
+		{	my $item=Gtk2::ImageMenuItem->new_with_label($pages{$pid});
+			$item->set_image( Gtk2::Image->new_from_stock("gmb-tab-$pid",'menu') );
 			$item->signal_connect(activate=> sub { my $n=$self->AppendPage($pid); $self->{notebook}->set_current_page($n) });
 			$submenu->append($item);
 		}
