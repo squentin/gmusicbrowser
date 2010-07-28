@@ -17,7 +17,7 @@ my (@Cachedurl,%Cache,$CacheSize,%ipcache); #FIXME purge %ipcache from time to t
 sub get_with_cb
 {	my $self=bless {};
 	my $error;
-	if (ref $_[0]) {$self=shift; $error='Too many redirection' if 5 < $self->{redirect}++; }
+	if (ref $_[0]) {$self=shift; $error='Too many redirections' if 5 < $self->{redirect}++; }
 	my %params=@_;
 	$self->{params}=\%params;
 	my ($callback,$url,$post)=@params{qw/cb url post/};

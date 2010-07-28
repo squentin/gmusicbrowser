@@ -2724,7 +2724,7 @@ sub new
 			$self->add($hbox);
 		}
 		else { $self->add($img); }
-		$self->UpdateStock;
+		$self->{EndInit}=\&UpdateStock;
 	}
 	elsif (defined $text) { $self->add( Gtk2::Label->new($text) ); }
 	return $self;
@@ -3921,7 +3921,7 @@ sub size_allocate
 	elsif ($total_xreq>$bwidth && @children)	#not enough room for requested width
 	{	my $w=$bwidth-$total_spacing;
 		# [5] is request [3] is padding
-		my @tofit= sort { $a->[5]+$a->[3] <=> $b->[5]+$b->[3] } @children; # sort from smallest to largest
+		my @tofit= sort { $a->[5]+$a->[3]*2 <=> $b->[5]+$b->[3]*2 } @children; # sort from smallest to largest
 		while (my $child= shift @tofit)
 		{	my $give= int($w/(1+@tofit));	# space available for each child left
 			$give=0 if $give<0;

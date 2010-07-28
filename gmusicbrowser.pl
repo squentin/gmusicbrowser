@@ -3976,7 +3976,7 @@ sub DeleteFiles
 		  'warning','cancel','%s',
 		  __x(_("About to delete {files}\nAre you sure ?"), files => $text)
 		);
-	my $yesbutton=$dialog->add_button("gtk-delete", 2);
+	$dialog->add_button("gtk-delete", 2);
 	$dialog->show_all;
 	if ('2' eq $dialog->run)
 	{ my $abortmsg;
