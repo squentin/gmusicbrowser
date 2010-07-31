@@ -1,3 +1,11 @@
+var log = function(text) {
+    if(window.console != undefined) {
+        console.log(text);
+    }
+};
+
+new Resource("song", {fields: ["id", "title", "artist", "length"]});
+
 var GmusicBrowserClient = Class.create({
     initialize: function() {
 	this.update_callbacks = new Array();
@@ -160,6 +168,12 @@ Event.observe('playpausebutton', 'click', function(event) {
 Event.observe('skipbutton', 'click', function(event) { 
     gmb.skip();
 });
+
+var receiveSong = function(song) {
+    alert(song.title);
+};
+
+resources["song"].find(1, {}, receiveSong.bind(this));
 
 gmb.getStateUpdate();
 

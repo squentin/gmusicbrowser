@@ -198,6 +198,24 @@ sub code_handler {
     return RC_OK;
 }
 
+sub songs_handler {
+    my ($request, $response) = @_;
+    $request->header(Connection => 'close');
+    my $path = $request->uri->path;
+    my $query = $request->uri->query;
+
+    my @split_request = split(/\//, $path);
+
+    my @id_and_format = split(/\./, $split_request[2]);
+    warn "Asked for song with ID: " . $id_and_format[0] . ", w/ format: " . $id_and_format[1];
+    
+
+    $response->content(encode_json(song2json($id_and_format[0])));
+    $response->code(200);
+    $response->header('Content-Type' => "text/javascript");
+    return RC_OK;
+}
+
 sub root_handler {
     my ($request, $response) = @_;
     $request->header(Connection => 'close');
@@ -221,6 +239,7 @@ sub root_handler {
     <title>Gmusicbrowser</title>
     <script src="/code/prototype.js" type="text/javascript"></script>
     <script src="/code/scriptaculous.js" type="text/javascript"></script>
+    <script src="/code/resource.js" type="text/javascript"></script>
     <style type="text/css">
       #seek_slider {
         background-color: red;
@@ -265,7 +284,7 @@ sub root_handler {
       <button id=playpausebutton>Play</button>
       <button id=skipbutton>Skip</button>
     </div>
-    
+    <!-- I think I would prefer to load the player.js module in the head like the others, and have a single initialisation function invoked here -->
     <script type="text/javascript" src="/code/player.js"></script>
   </body>
 </html>
@@ -287,6 +306,7 @@ sub StartServer {
     $http_poe_server = POE::Component::Server::HTTP->new(
     	Port           => $::Options{OPT.'PortNumber'},
     	ContentHandler => {"/" => \&root_handler,
+			   "/songs/" => \&songs_handler, # resource: song
 			   "/player" => \&player_handler,
 			   "/skip" => \&skip_handler,
 			   "/code/" => \&code_handler
