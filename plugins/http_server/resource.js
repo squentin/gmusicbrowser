@@ -25,11 +25,11 @@ var resources = {};
 
 var pluralize = function(str) {
     if(str.endsWith('y')) {
-        return str.substring(0, str.length - 1) + "ies";
+	return str.substring(0, str.length - 1) + "ies";
     } else if(str.endsWith('h')) {
-        return str + "es";
+	return str + "es";
     } else {
-        return str + "s";
+	return str + "s";
     }
 };
 
@@ -41,262 +41,262 @@ var Instance = Class.create({
     // resource: Resource object to which this Instance belongs,
     // hash: already-decoded JSON values for this Instance
     initialize: function(resource, json) {
-        this.resource = resource;
-        this.update_callbacks = new Array();
-        if(json == undefined) {
-            log("Creating new instance of " + resource.name);
-            this.brand_new = true;
-        } else {
-            log("Loading existing instance of " + resource.name);
-            this.brand_new = false;
-            this.update(json);
-            this.resource.registerInstance(this);
-        }
+	this.resource = resource;
+	this.update_callbacks = new Array();
+	if(json == undefined) {
+	    log("Creating new instance of " + resource.name);
+	    this.brand_new = true;
+	} else {
+	    log("Loading existing instance of " + resource.name);
+	    this.brand_new = false;
+	    this.update(json);
+	    this.resource.registerInstance(this);
+	}
     },
 
     onUpdate: function(update_callback) {
-        this.update_callbacks.push(update_callback);
+	this.update_callbacks.push(update_callback);
     },
 
     // update this instance from JSON input
     update: function(json) {
-        this.resource.fields.each(function(f) {
-            // FIXME -- this does not distinguish between missing or set to null.
-            //          as such, if a new JSON comes along with a field that
-            //          has been newly set to null, the old value will persist.
-            if(json[f] != undefined) {
-                this[f] = json[f];
-            }
-        }.bind(this));
+	this.resource.fields.each(function(f) {
+	    // FIXME -- this does not distinguish between missing or set to null.
+	    //          as such, if a new JSON comes along with a field that
+	    //          has been newly set to null, the old value will persist.
+	    if(json[f] != undefined) {
+		this[f] = json[f];
+	    }
+	}.bind(this));
 
-        log("Now checking for belongs_to...");
+	log("Now checking for belongs_to...");
 
-        this.resource.belongs_to.each(function(res) {
-            log("Processing belongs_to: " + res.name);
-            if(json[res.name] != undefined) {
-//                log("... which was set!");
-//                this[res.name] = new Instance(res, json[res.name]);
-                this[res.name] = res.loadInstance(json[res.name].id, json[res.name]);
-            } else if(json[res.name + "_id"] != undefined) {
-                // check for res.name + "_id" here.
-                log("HAD AN NON-INLINE BELONGS TO");
-                this[res.name] = res.loadInstance(json[res.name + "_id"], {})
-            }
-        }.bind(this));
+	this.resource.belongs_to.each(function(res) {
+	    log("Processing belongs_to: " + res.name);
+	    if(json[res.name] != undefined) {
+		//                log("... which was set!");
+		//                this[res.name] = new Instance(res, json[res.name]);
+		this[res.name] = res.loadInstance(json[res.name].id, json[res.name]);
+	    } else if(json[res.name + "_id"] != undefined) {
+		// check for res.name + "_id" here.
+		log("HAD AN NON-INLINE BELONGS TO");
+		this[res.name] = res.loadInstance(json[res.name + "_id"], {})
+	    }
+	}.bind(this));
 
-        this.resource.has_many.each(function(hm) {
-            var pluralized_name = pluralize(hm.name);
-            this[pluralized_name] = new Array();
-            log(this.resource.name + " Checking for has_many " + pluralized_name);
-            if(json[pluralized_name] != undefined) {
-                $A(json[pluralized_name]).each(function(hm_item) {
-//                    this[pluralized_name].push(new Instance(hm, hm_item));
-                    this[pluralized_name].push(hm.loadInstance(hm_item.id, hm_item));
-                }.bind(this));
-            } else {
-                log("JSON does not include the relationship: " + pluralized_name);
-            }
-        }.bind(this));
+	this.resource.has_many.each(function(hm) {
+	    var pluralized_name = pluralize(hm.name);
+	    this[pluralized_name] = new Array();
+	    log(this.resource.name + " Checking for has_many " + pluralized_name);
+	    if(json[pluralized_name] != undefined) {
+		$A(json[pluralized_name]).each(function(hm_item) {
+		    //                    this[pluralized_name].push(new Instance(hm, hm_item));
+		    this[pluralized_name].push(hm.loadInstance(hm_item.id, hm_item));
+		}.bind(this));
+	    } else {
+		log("JSON does not include the relationship: " + pluralized_name);
+	    }
+	}.bind(this));
 
-        this.update_callbacks.each(function(cb) {
-            cb();
-        }.bind(this));
+	this.update_callbacks.each(function(cb) {
+	    cb();
+	}.bind(this));
     },
 
     destroy: function(success_callback, failure_callback) {
-        var req_opts = {
-            method: 'delete',
-            onSuccess: function(transport) {
-                log("delete complete!");
-                // TODO remove from the cache list to prevent any future id collisions
-                success_callback();
-            }.bind(this),
-            onFailure: function(transport) {
-                log("Problem deleting: " + this.resource.name + " #" + this.id);
-                if(failure_callback != undefined) {
-                    failure_callback();
-                }
-            }.bind(this),
+	var req_opts = {
+	    method: 'delete',
+	    onSuccess: function(transport) {
+		log("delete complete!");
+		// TODO remove from the cache list to prevent any future id collisions
+		success_callback();
+	    }.bind(this),
+	    onFailure: function(transport) {
+		log("Problem deleting: " + this.resource.name + " #" + this.id);
+		if(failure_callback != undefined) {
+		    failure_callback();
+		}
+	    }.bind(this),
 	    onException: function(e) {
 		logError(e);
 	    },
-            parameters: {authenticity_token: authenticity_token}
-        };
-        new Ajax.Request(this.resource.path(this.id), req_opts);
+	    parameters: {authenticity_token: authenticity_token}
+	};
+	new Ajax.Request(this.resource.path(this.id), req_opts);
     },
 
     // save specific values only.
     // TODO factor out common bits with save()
     save_values: function(values, success_callback, failure_callback) {
 	var to_save = new Object();
-        // scalar fields!
-        this.resource.fields.each(function(f) {
+	// scalar fields!
+	this.resource.fields.each(function(f) {
 	    if(values[f] != undefined) {
 		to_save[f] = values[f];
 	    }
-        }.bind(this));
+	}.bind(this));
 	to_save.id = this.id;
-        // belongs_to!
-        this.resource.belongs_to.each(function(bt) {
-            if(values[bt.name] != undefined)
-                to_save[bt.name + "_id"] = values[bt.name].id;
-        }.bind(this));
-        // no joy on has_many yet...
+	// belongs_to!
+	this.resource.belongs_to.each(function(bt) {
+	    if(values[bt.name] != undefined)
+		to_save[bt.name + "_id"] = values[bt.name].id;
+	}.bind(this));
+	// no joy on has_many yet...
 
-        var req_opts = {
-            method: 'put',
-            onSuccess: function(transport) {
-                log("... save complete!");
+	var req_opts = {
+	    method: 'put',
+	    onSuccess: function(transport) {
+		log("... save complete!");
 		// TODO: iterate through values and set instance values to them
-                this.update(transport.responseText.evalJSON(true));
-                if(this.brand_new) {
-                    this.resource.registerInstance(this);
-                }
-                this.brand_new = false;
-                success_callback();
-            }.bind(this),
-            onFailure: function(transport) {
-                log("... problem saving: " + this.resource.name + " #" + this.id);
-                if(failure_callback != undefined) {
-                    failure_callback();
-                }
-            }.bind(this),
+		this.update(transport.responseText.evalJSON(true));
+		if(this.brand_new) {
+		    this.resource.registerInstance(this);
+		}
+		this.brand_new = false;
+		success_callback();
+	    }.bind(this),
+	    onFailure: function(transport) {
+		log("... problem saving: " + this.resource.name + " #" + this.id);
+		if(failure_callback != undefined) {
+		    failure_callback();
+		}
+	    }.bind(this),
 	    onException: function(e) {
 		logError(e);
 	    },
-            parameters: {}
-        };
-        if(this.brand_new)
-            req_opts.method = "post";
-        req_opts.parameters[this.resource.name] = Object.toJSON(to_save);
-        req_opts.parameters.authenticity_token = authenticity_token;
+	    parameters: {}
+	};
+	if(this.brand_new)
+	    req_opts.method = "post";
+	req_opts.parameters[this.resource.name] = Object.toJSON(to_save);
+	req_opts.parameters.authenticity_token = authenticity_token;
 
 	log("firing save req");
-        new Ajax.Request(this.resource.path(this.id), req_opts);
+	new Ajax.Request(this.resource.path(this.id), req_opts);
     },
 
     save: function(success_callback, failure_callback) {
-        var to_save = new Object();
-        // scalar fields!
-        this.resource.fields.each(function(f) {
-            to_save[f] = this[f];
-        }.bind(this));
-        // belongs_to!
-        this.resource.belongs_to.each(function(bt) {
-            if(this[bt.name] != undefined)
-                to_save[bt.name + "_id"] = this[bt.name].id;
-        }.bind(this));
-        // no joy on has_many yet...
+	var to_save = new Object();
+	// scalar fields!
+	this.resource.fields.each(function(f) {
+	    to_save[f] = this[f];
+	}.bind(this));
+	// belongs_to!
+	this.resource.belongs_to.each(function(bt) {
+	    if(this[bt.name] != undefined)
+		to_save[bt.name + "_id"] = this[bt.name].id;
+	}.bind(this));
+	// no joy on has_many yet...
 
-        var req_opts = {
-            method: 'put',
-            onSuccess: function(transport) {
-                log("save complete!");
-                this.update(transport.responseText.evalJSON(true));
-                if(this.brand_new) {
-                    this.resource.registerInstance(this);
-                }
-                this.brand_new = false;
-                success_callback();
-            }.bind(this),
-            onFailure: function(transport) {
-                log("Problem saving: " + this.resource.name + " #" + this.id);
-                if(failure_callback != undefined) {
-                    failure_callback();
-                }
-            }.bind(this),
+	var req_opts = {
+	    method: 'put',
+	    onSuccess: function(transport) {
+		log("save complete!");
+		this.update(transport.responseText.evalJSON(true));
+		if(this.brand_new) {
+		    this.resource.registerInstance(this);
+		}
+		this.brand_new = false;
+		success_callback();
+	    }.bind(this),
+	    onFailure: function(transport) {
+		log("Problem saving: " + this.resource.name + " #" + this.id);
+		if(failure_callback != undefined) {
+		    failure_callback();
+		}
+	    }.bind(this),
 	    onException: function(e) {
 		logError(e);
 	    },
-            parameters: {}
-        };
-        if(this.brand_new)
-            req_opts.method = "post";
+	    parameters: {}
+	};
+	if(this.brand_new)
+	    req_opts.method = "post";
 	// this is form_encoded, with one parameter containing the json.  does this involve any weird-ass
 	// escaping/mangling that we want to avoid?  do we want to do it as raw JSON directly?
-        req_opts.parameters[this.resource.name] = Object.toJSON(to_save);
-        req_opts.parameters.authenticity_token = authenticity_token;
+	req_opts.parameters[this.resource.name] = Object.toJSON(to_save);
+	req_opts.parameters.authenticity_token = authenticity_token;
 
 	log("firing save req");
-        new Ajax.Request(this.resource.path(this.id), req_opts);
+	new Ajax.Request(this.resource.path(this.id), req_opts);
     }
 });
 
 var Resource = Class.create({
     initialize: function(name, options) {
-        if(options == undefined)
-            options = {};
-        this.instances = new Hash();
+	if(options == undefined)
+	    options = {};
+	this.instances = new Hash();
 
-        this.has_many = new Array();
-        this.belongs_to = new Array();
-        log("Defining Resource \"" + name + "\"");
-        this.name = name;
-        this.options = options;
-        if(options.has_many != undefined) {
-            log("has_many something...");
-            if(typeof(options.has_many) == "string") {
-                this.hasMany(options.has_many);
-            } else {
-                $A(options.has_many).each(function(rez) {
-                    this.hasMany(rez);
-                }.bind(this));
-            }
-        }
-        if(typeof(options.belongs_to) == "string") {
-            log("belongs_to something...");
-            this.belongsTo(options.belongs_to);
-        }
-        this.fields = $A(this.options.fields);
-        resources[name] = this;
+	this.has_many = new Array();
+	this.belongs_to = new Array();
+	log("Defining Resource \"" + name + "\"");
+	this.name = name;
+	this.options = options;
+	if(options.has_many != undefined) {
+	    log("has_many something...");
+	    if(typeof(options.has_many) == "string") {
+		this.hasMany(options.has_many);
+	    } else {
+		$A(options.has_many).each(function(rez) {
+		    this.hasMany(rez);
+		}.bind(this));
+	    }
+	}
+	if(typeof(options.belongs_to) == "string") {
+	    log("belongs_to something...");
+	    this.belongsTo(options.belongs_to);
+	}
+	this.fields = $A(this.options.fields);
+	resources[name] = this;
     },
 
     // TODO -- factor out belongs_to naming logic.
     belongsTo: function(resource) {
-        if(typeof(resource) == "string") {
-            this.belongs_to.push(resources[resource]);
-        } else {
-            this.belongs_to.push(resource);
-        }
+	if(typeof(resource) == "string") {
+	    this.belongs_to.push(resources[resource]);
+	} else {
+	    this.belongs_to.push(resource);
+	}
     },
 
     // TODO -- factor out has_many naming logic.
     hasMany: function(resource) {
-        if(typeof(resource) == "string") {
-            resource = resources[resource];
-        }
-        if(resource == undefined) {
-            log("Can't has_many of an undefined resource!");
-            return;
-        }
-        log(this.name + " has_many " + pluralize(resource.name));
-        this.has_many.push(resource);
+	if(typeof(resource) == "string") {
+	    resource = resources[resource];
+	}
+	if(resource == undefined) {
+	    log("Can't has_many of an undefined resource!");
+	    return;
+	}
+	log(this.name + " has_many " + pluralize(resource.name));
+	this.has_many.push(resource);
     },
 
     path: function(id, custom_action) {
-        if(id != undefined) {
-            return this.basePath() + "/" + id + ".json";
-        }
-        else {
-            if(custom_action == undefined)
-                return this.basePath() + ".json";
-            else
-                return this.basePath() + "/" + custom_action + ".json";
-        }
+	if(id != undefined) {
+	    return this.basePath() + "/" + id + ".json";
+	}
+	else {
+	    if(custom_action == undefined)
+		return this.basePath() + ".json";
+	    else
+		return this.basePath() + "/" + custom_action + ".json";
+	}
     },
 
     basePath: function() {
-        return "/" + pluralize(this.name);
+	return "/" + pluralize(this.name);
     },
 
     registerInstance: function(instance) {
-        this.instances.set(parseInt(instance.id), instance);
+	this.instances.set(parseInt(instance.id), instance);
     },
 
     getInstanceById: function(instance_id) {
-        var instance = this.instances.get(parseInt(instance_id));
+	var instance = this.instances.get(parseInt(instance_id));
 
-        return instance;
+	return instance;
     },
 
     // this is to be called when there's JSON available for a resource.
@@ -304,18 +304,18 @@ var Resource = Class.create({
     // otherwise, it will create a new one.
     // id may be given as either an integer or a string.
     loadInstance: function(instance_id, update_json) {
-        instance_id = parseInt(instance_id);
-        var instance = this.getInstanceById(instance_id);
-//        log("Getting instance of " + this.name + " by ID: " + instance_id);
-        if(instance == undefined) {
-  //          log("Does not already exist, creating a new one!");
-            instance = new Instance(this, update_json);
-//            this.registerInstance(instance);
-        } else {
-    //        log("... which did exist!");
-            instance.update(update_json);
-        }
-        return instance;
+	instance_id = parseInt(instance_id);
+	var instance = this.getInstanceById(instance_id);
+	//        log("Getting instance of " + this.name + " by ID: " + instance_id);
+	if(instance == undefined) {
+	    //          log("Does not already exist, creating a new one!");
+	    instance = new Instance(this, update_json);
+	    //            this.registerInstance(instance);
+	} else {
+	    //        log("... which did exist!");
+	    instance.update(update_json);
+	}
+	return instance;
     },
 
     // id:         Either the ID number of the resource you want to find,
@@ -333,73 +333,73 @@ var Resource = Class.create({
     //                     ("/kases/my_action.json" instead of
     //                     "/kases.json")
     find: function(id, parameters, callback, options) {
-        if(options == undefined)
-            options = {};
-        if (id == "all") {
-            var path = this.path(options["action"]);
-            log("Finding all, path is: " + path);
-            return new Ajax.Request(path, {
-                method: "get",
-                onSuccess: function(transport) {
-                    this.foundAll(transport.responseText, callback);
-                }.bind(this),
-                onFailure: function(transport) {
-                    log("Problem looking up all results, with parameters: " + parameters);
-                }.bind(this),
+	if(options == undefined)
+	    options = {};
+	if (id == "all") {
+	    var path = this.path(options["action"]);
+	    log("Finding all, path is: " + path);
+	    return new Ajax.Request(path, {
+		method: "get",
+		onSuccess: function(transport) {
+		    this.foundAll(transport.responseText, callback);
+		}.bind(this),
+		onFailure: function(transport) {
+		    log("Problem looking up all results, with parameters: " + parameters);
+		}.bind(this),
 		onException: function(e) {
 		    logError(e);
 		},
-                parameters: parameters
-            });
-        } else {
-            var path = this.path(id);
-            log("Finding first, path is: " + path);
-            return new Ajax.Request(path, {
-                method: 'get',
-                onSuccess: function(transport) {
-                    // log("complete: " + transport.responseText);
-                    this.foundOne(transport.responseText, callback);
-                }.bind(this),
-                onFailure: function(transport) {
-                    log("Problem looking up " + this.name + " #" + id);
-                },
+		parameters: parameters
+	    });
+	} else {
+	    var path = this.path(id);
+	    log("Finding first, path is: " + path);
+	    return new Ajax.Request(path, {
+		method: 'get',
+		onSuccess: function(transport) {
+		    // log("complete: " + transport.responseText);
+		    this.foundOne(transport.responseText, callback);
+		}.bind(this),
+		onFailure: function(transport) {
+		    log("Problem looking up " + this.name + " #" + id);
+		},
 		onException: function(transport, e) {
 		    logError(e);
 		},
-                parameters: parameters
-            });
-        }
+		parameters: parameters
+	    });
+	}
     },
 
     // keep in mind that, like ActiveRecord, "all" means process many
     // results as a list, and not necessarily existing instances of
     // the Resource.
     foundAll: function(json_text, callback) {
-        var json = json_text.evalJSON(true);
-        log("found all (many results), " + json.length + " in total.");
-        var pluralized_name = pluralize(this.name);
-        var results = new Array();
-        $A(json).each(function(item_json) {
-            log("... " + item_json.id);
-            results.push(this.loadInstance(item_json.id, item_json));
-        }.bind(this));
-        callback(results);
+	var json = json_text.evalJSON(true);
+	log("found all (many results), " + json.length + " in total.");
+	var pluralized_name = pluralize(this.name);
+	var results = new Array();
+	$A(json).each(function(item_json) {
+	    log("... " + item_json.id);
+	    results.push(this.loadInstance(item_json.id, item_json));
+	}.bind(this));
+	callback(results);
     },
 
     foundOne: function(json_text, callback) {
-        var json = json_text.evalJSON(true);
+	var json = json_text.evalJSON(true);
 	this.foundOneDecoded(json, callback);
     },
 
     foundOneDecoded: function(json, callback) {
-        log("foundone: " + json.id);
-        var instance = this.loadInstance(json.id, json);
-        log("instance instantiated!");
-        callback(instance);
+	log("foundone: " + json.id);
+	var instance = this.loadInstance(json.id, json);
+	log("instance instantiated!");
+	callback(instance);
     },
 
     // N.B. unlike AR's create, this one does not save right away!
     create: function() {
-        return new Instance(this, undefined);
+	return new Instance(this, undefined);
     }
 });

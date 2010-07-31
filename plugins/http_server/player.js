@@ -1,6 +1,6 @@
 var log = function(text) {
     if(window.console != undefined) {
-        console.log(text);
+	console.log(text);
     }
 };
 
@@ -20,7 +20,7 @@ var TransportUI = Class.create({
 	    minimum: 0,
 	    maximum: 500,
 	    increment: 1,
-	    disabled: false, 
+	    disabled: false,
 	});
 
 	this.seek = new Control.Slider('seek_position', 'seek_slider', {
@@ -28,7 +28,7 @@ var TransportUI = Class.create({
 	    minimum: 0,
 	    maximum: 500,
 	    increment: 1,
-	    disabled: false, 
+	    disabled: false,
 	});
 
 	this.client.onUpdate(this.doUpdate.bind(this));
@@ -43,8 +43,8 @@ var TransportUI = Class.create({
 	}.bind(this);
 
 	/* seek.options.onSlide = function(position_ratio) {
-	    client.setPositionByRatio(position_ratio);
-	    }; uncomment for great hilarity. */
+		    client.setPositionByRatio(position_ratio);
+		    	    }; uncomment for great hilarity. */
 
 	this.seek.options.onChange = function(position_ratio) {
 	    if(slider_lockout == false)
@@ -65,7 +65,7 @@ var TransportUI = Class.create({
 	    }
 	}.bind(this));
 
-	Event.observe('skipbutton', 'click', function(event) { 
+	Event.observe('skipbutton', 'click', function(event) {
 	    this.client.skip();
 	}.bind(this));
     },
@@ -127,7 +127,7 @@ var GmusicBrowserClient = Class.create({
     play: function() {
 	this.change({'playing': 1}, true);
     },
-    
+
     pause: function() {
 	this.change({'playing': 0}, true);
     },
@@ -205,4 +205,3 @@ var transport = new TransportUI(gmb);
 // resources["song"].find(1, {}, receiveSong.bind(this));
 
 gmb.getStateUpdate();
-

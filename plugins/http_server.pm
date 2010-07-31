@@ -90,7 +90,7 @@ sub state2json {
 
 sub apply_playing_state {
     my ($req_play_state) = @_;
-    
+
     # being asked to play
     if($req_play_state eq 1) {
 	if(!defined($::TogPlay)) {
@@ -132,7 +132,7 @@ sub json2state {
 
 sub cgi_from_request {
     my ($request) = @_;
-    
+
     # I'm not really sure why POE/HTTP isn't
     # doing this for me...
     # this implementation is rather naiive.
@@ -177,7 +177,7 @@ sub player_handler {
     my $path = $request->uri->path;
     my $query = $request->uri->query;
 
-    my $cgi = cgi_from_request($request);  
+    my $cgi = cgi_from_request($request);
 
     if($request->method() eq "GET") {
 	$response->code(200);
@@ -235,7 +235,7 @@ sub songs_handler {
 	warn "GOT SONG DATA POSTED: " . $cgi->param("song");
 	json2song(decode_json($cgi->param("song")));
     }
-    
+
     $response->content(encode_json(song2json($id_and_format[0])));
     $response->code(200);
     $response->header('Content-Type' => "text/javascript");
@@ -256,42 +256,42 @@ sub root_handler {
     # } else {
     # 	$playing_song = "None! :(";
     # }
-    
+
     my $webapp = <<END;
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset=utf-8 />
-    <title>Gmusicbrowser</title>
-    <script src="/code/prototype.js" type="text/javascript"></script>
-    <script src="/code/scriptaculous.js" type="text/javascript"></script>
-    <script src="/code/resource.js" type="text/javascript"></script>
-    <style type="text/css">
-      #seek_slider {
-        background-color: red;
-        height: 20px;
-        width: 500px;
-      }
-      #seek_position {
-        background-color: blue;
-        height: 20px;
-        width: 20px;
+    <!DOCTYPE html>
+	<html lang="en">
+	<head>
+	<meta charset=utf-8 />
+	<title>Gmusicbrowser</title>
+	<script src="/code/prototype.js" type="text/javascript"></script>
+	<script src="/code/scriptaculous.js" type="text/javascript"></script>
+	<script src="/code/resource.js" type="text/javascript"></script>
+	<style type="text/css">
+	#seek_slider {
+	background-color: red;
+  height: 20px;
+  width: 500px;
+}
+#seek_position {
+background-color: blue;
+ height: 20px;
+ width: 20px;
       }
       #volume_slider {
-        background-color: red;
-        height: 20px;
-        width: 500px;
+	background-color: red;
+	height: 20px;
+	width: 500px;
       }
       #volume_position {
-        background-color: blue;
-        height: 20px;
-        width: 20px;
+	background-color: blue;
+	height: 20px;
+	width: 20px;
       }
     </style>
   </head>
   <body>
     <div id=current_song>
-      <span id=current_song_artist></span> - 
+      <span id=current_song_artist></span> -
       <span id=current_song_title></span>
     </div>
     <br>
@@ -304,8 +304,8 @@ sub root_handler {
     <div id=seek_slider>
       <div id=seek_position></div>
     </div>
-<br>
-    
+    <br>
+
     <div>
       <button id=playpausebutton>Play</button>
       <button id=skipbutton>Skip</button>
@@ -348,8 +348,6 @@ sub StopServer {
 
 sub Start {
     my ($self) = @_;
-
-
     $resource_path = $::DATADIR.::SLASH.'plugins'.::SLASH;
     # $resources->{prototypejs} = read_file($resource_path.::SLASH.'http_server'.::SLASH.'prototype.js');
     # $resources->{playerjs} = read_file($resource_path.::SLASH.'http_server'.::SLASH.'player.js');
