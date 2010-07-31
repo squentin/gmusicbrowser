@@ -70,11 +70,11 @@ var TransportUI = Class.create({
 	}.bind(this));
     },
 
-    doUpdate: function(state_description) {
+    doUpdate: function(state_description, current_song) {
 	// TODO we may not get all fields here, only update ones that actually are
 
-	$('current_song_title').innerHTML = state_description.current.title.escapeHTML();
-	$('current_song_artist').innerHTML = state_description.current.artist.escapeHTML();
+	$('current_song_title').innerHTML = current_song.title.escapeHTML();
+	$('current_song_artist').innerHTML = current_song.artist.escapeHTML();
 	if(state_description.playing == 1) {
 	    $('playpausebutton').innerHTML = "Pause";
 	} else {
@@ -82,7 +82,7 @@ var TransportUI = Class.create({
 	}
 	slider_lockout = true;
 	this.volume.setValue(state_description.volume / 100);
-	var vol_ratio = state_description.playposition / state_description.current.length;
+	var vol_ratio = state_description.playposition / current_song.length;
 	this.seek.setValue(vol_ratio);
 	this.slider_lockout = false;
     }
@@ -103,7 +103,7 @@ var GmusicBrowserClient = Class.create({
 	    this.current_song = song;
 	}.bind(this));
 	this.update_callbacks.each(function(cb) {
-	    cb(this.state_description);
+	    cb(this.state_description, this.current_song);
 	}.bind(this));
     },
 
