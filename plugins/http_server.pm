@@ -53,7 +53,26 @@ my $resources = {};
 
 sub song2json {
     my ($song_id) = @_;
-    return {"id" => $song_id, "artist" => ::Songs::Get($song_id, "artist"), "title" => ::Songs::Get($song_id, "title"), "length" => ::Songs::Get($song_id, "length")};
+    return {"id" => $song_id, "artist" => ::Songs::Get($song_id, "artist"), "title" => ::Songs::Get($song_id, "title"), "length" => ::Songs::Get($song_id, "length"), "rating" => ::Songs::Get($song_id, "rating")};
+}
+
+# update a song with JSON parameters
+sub json2song {
+    my ($json) = @_;
+
+    my $song_id = $json->{id};
+    if(!defined($song_id)) {
+	warn "no id given in song JSON, unable to identify which one to update!";
+	return;
+    }
+
+    foreach my $parameter (keys %{$json}) {
+	if($parameter eq "id") {
+	    next;
+	}
+	warn "reading back param: " . $parameter;
+	::Songs::Set($song_id, $parameter => ${$json}{$parameter});
+    }
 }
 
 # playing: 1 for playing, 0 for paused, -1 for stopped.
@@ -203,13 +222,20 @@ sub songs_handler {
     $request->header(Connection => 'close');
     my $path = $request->uri->path;
     my $query = $request->uri->query;
+    my $cgi = cgi_from_request($request);
 
     my @split_request = split(/\//, $path);
 
     my @id_and_format = split(/\./, $split_request[2]);
     warn "Asked for song with ID: " . $id_and_format[0] . ", w/ format: " . $id_and_format[1];
-    
 
+    # since we only support update, not even going to bother to test for _method:put.
+    if($request->method() eq 'POST' || $request->method() eq "PUT") {
+	my $decoded = decode_json($cgi->param("song"));
+	warn "GOT SONG DATA POSTED: " . $cgi->param("song");
+	json2song(decode_json($cgi->param("song")));
+    }
+    
     $response->content(encode_json(song2json($id_and_format[0])));
     $response->code(200);
     $response->header('Content-Type' => "text/javascript");
