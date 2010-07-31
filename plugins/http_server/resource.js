@@ -33,6 +33,10 @@ var pluralize = function(str) {
     }
 };
 
+var logError = function(e) {
+    log("Error: " + e.message + ", stack: " + e.stack);
+};
+
 var Instance = Class.create({
     // resource: Resource object to which this Instance belongs,
     // hash: already-decoded JSON values for this Instance
@@ -113,8 +117,61 @@ var Instance = Class.create({
                     failure_callback();
                 }
             }.bind(this),
+	    onException: function(e) {
+		logError(e);
+	    },
             parameters: {authenticity_token: authenticity_token}
         };
+        new Ajax.Request(this.resource.path(this.id), req_opts);
+    },
+
+    // save specific values only.
+    // TODO factor out common bits with save()
+    save_values: function(values, success_callback, failure_callback) {
+	var to_save = new Object();
+        // scalar fields!
+        this.resource.fields.each(function(f) {
+	    if(values[f] != undefined) {
+		to_save[f] = values[f];
+	    }
+        }.bind(this));
+	to_save.id = this.id;
+        // belongs_to!
+        this.resource.belongs_to.each(function(bt) {
+            if(values[bt.name] != undefined)
+                to_save[bt.name + "_id"] = values[bt.name].id;
+        }.bind(this));
+        // no joy on has_many yet...
+
+        var req_opts = {
+            method: 'put',
+            onSuccess: function(transport) {
+                log("... save complete!");
+		// TODO: iterate through values and set instance values to them
+                this.update(transport.responseText.evalJSON(true));
+                if(this.brand_new) {
+                    this.resource.registerInstance(this);
+                }
+                this.brand_new = false;
+                success_callback();
+            }.bind(this),
+            onFailure: function(transport) {
+                log("... problem saving: " + this.resource.name + " #" + this.id);
+                if(failure_callback != undefined) {
+                    failure_callback();
+                }
+            }.bind(this),
+	    onException: function(e) {
+		logError(e);
+	    },
+            parameters: {}
+        };
+        if(this.brand_new)
+            req_opts.method = "post";
+        req_opts.parameters[this.resource.name] = Object.toJSON(to_save);
+        req_opts.parameters.authenticity_token = authenticity_token;
+
+	log("firing save req");
         new Ajax.Request(this.resource.path(this.id), req_opts);
     },
 
@@ -148,13 +205,19 @@ var Instance = Class.create({
                     failure_callback();
                 }
             }.bind(this),
+	    onException: function(e) {
+		logError(e);
+	    },
             parameters: {}
         };
         if(this.brand_new)
             req_opts.method = "post";
+	// this is form_encoded, with one parameter containing the json.  does this involve any weird-ass
+	// escaping/mangling that we want to avoid?  do we want to do it as raw JSON directly?
         req_opts.parameters[this.resource.name] = Object.toJSON(to_save);
         req_opts.parameters.authenticity_token = authenticity_token;
 
+	log("firing save req");
         new Ajax.Request(this.resource.path(this.id), req_opts);
     }
 });
@@ -283,6 +346,9 @@ var Resource = Class.create({
                 onFailure: function(transport) {
                     log("Problem looking up all results, with parameters: " + parameters);
                 }.bind(this),
+		onException: function(e) {
+		    logError(e);
+		},
                 parameters: parameters
             });
         } else {
@@ -297,6 +363,9 @@ var Resource = Class.create({
                 onFailure: function(transport) {
                     log("Problem looking up " + this.name + " #" + id);
                 },
+		onException: function(transport, e) {
+		    logError(e);
+		},
                 parameters: parameters
             });
         }
@@ -319,6 +388,10 @@ var Resource = Class.create({
 
     foundOne: function(json_text, callback) {
         var json = json_text.evalJSON(true);
+	this.foundOneDecoded(json, callback);
+    },
+
+    foundOneDecoded: function(json, callback) {
         log("foundone: " + json.id);
         var instance = this.loadInstance(json.id, json);
         log("instance instantiated!");
