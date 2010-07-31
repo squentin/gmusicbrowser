@@ -58,6 +58,10 @@ var Instance = Class.create({
 	this.update_callbacks.push(update_callback);
     },
 
+    rmOnUpdate: function(update_callback) {
+	this.update_callbacks.remove(update_callback);
+    },
+
     // update this instance from JSON input
     update: function(json) {
 	this.resource.fields.each(function(f) {
@@ -127,7 +131,7 @@ var Instance = Class.create({
 
     // save specific values only.
     // TODO factor out common bits with save()
-    save_values: function(values, success_callback, failure_callback) {
+    saveValues: function(values, success_callback, failure_callback) {
 	var to_save = new Object();
 	// scalar fields!
 	this.resource.fields.each(function(f) {

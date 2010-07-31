@@ -268,31 +268,45 @@ sub root_handler {
 	<script src="/code/resource.js" type="text/javascript"></script>
 	<style type="text/css">
 	#seek_slider {
-	background-color: red;
-  height: 20px;
-  width: 500px;
-}
-#seek_position {
+   	  background-color: red;
+          height: 20px;
+          width: 500px;
+        }
+        #seek_position {
+          background-color: blue;
+          height: 20px;
+          width: 20px;
+        }
+        #volume_slider {
+          background-color: red;
+          height: 20px;
+          width: 500px;
+        }
+        #volume_position {
+	  background-color: blue;
+	  height: 20px;
+	  width: 20px;
+        }
+        #rating_slider {
+          background-color: red;
+          height: 20px;
+          width: 200px;
+        }
+        #rating_position {
+	  background-color: blue;
+	  height: 20px;
+	  width: 10px;
+        }
 background-color: blue;
- height: 20px;
- width: 20px;
-      }
-      #volume_slider {
-	background-color: red;
-	height: 20px;
-	width: 500px;
-      }
-      #volume_position {
-	background-color: blue;
-	height: 20px;
-	width: 20px;
-      }
     </style>
   </head>
   <body>
     <div id=current_song>
       <span id=current_song_artist></span> -
       <span id=current_song_title></span>
+      <div id=rating_slider>
+        <div id=rating_position></div>
+      </div>
     </div>
     <br>
 
