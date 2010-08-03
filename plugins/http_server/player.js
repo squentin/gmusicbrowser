@@ -47,7 +47,7 @@ var TransportUI = Class.create({
 
 	this.rating.options.onChange = function(rating) {
 	    if(this.slider_lockout == false)
-		this.current_song.saveValues({rating: rating * 100}, function() {}, function() {});
+		this.current_song.saveValues({rating: parseInt(rating * 100)}, function() {}, function() {});
 	}.bind(this);
 
 	this.volume.options.onChange = function(volume) {

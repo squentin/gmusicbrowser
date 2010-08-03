@@ -165,7 +165,7 @@ var Instance = Class.create({
 		    failure_callback();
 		}
 	    }.bind(this),
-	    onException: function(e) {
+	    onException: function(transport, e) {
 		logError(e);
 	    },
 	    parameters: {}
