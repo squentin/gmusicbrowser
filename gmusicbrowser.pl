@@ -683,9 +683,11 @@ sub ConvertTime	# convert date pattern into nb of seconds
 	return $pat;
 }
 sub ConvertSize
-{	my $pat=$_[0];
-	if ($pat=~m/^(\d+)([bkm])$/) { $pat=$1*$::SIZEUNITS{$2}[0] }
-	return $pat;
+{	my ($size,$unit)= $_[0]=~m/^\s*(\d*)\s*([a-zA-Z]*)\s*$/;
+	return 0 unless $size;
+	if (my $ref= $SIZEUNITS{lc$unit}) { $size*= $ref->[0] }
+	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
+	return $size;
 }
 
 
