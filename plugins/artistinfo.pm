@@ -62,9 +62,10 @@ sub new
 	$options->{follow}=1 if not exists $options->{follow};
 	$self->{$_}=$options->{$_} for qw/HideToolbar follow group/;
 	
-	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>0,click1=>undef});
-
-	my $statbox=Gtk2::VBox->new(::FALSE, 0);
+	my $statbox=Gtk2::VBox->new(0,0);
+	
+	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>0,maxsize=>"100",click1=>undef,xalign=>0});
+	
 	for my $name (qw/Ltitle Lstats/)
 	{	my $l=Gtk2::Label->new('');
 		$self->{$name}=$l;
@@ -72,10 +73,10 @@ sub new
 		if ($name eq 'Ltitle') { $l->set_line_wrap(1);$l->set_ellipsize('end'); }
 		$statbox->pack_start($l, ::FALSE,::FALSE, 2);
 	}
-	$self->{Lrating}=Layout::NewWidget("Stars");
-	$statbox->pack_start($self->{Lrating}, ::FALSE,::FALSE, 2);
+	$self->{artistrating} = Gtk2::Image->new;
+	$statbox->pack_start($self->{artistrating}, ::FALSE,::FALSE, 2);
 	
-	my $linkbox = Gtk2::VBox->new;
+	my $linkbox = Gtk2::VBox->new(0,0);
 	for my $aref
 	(	['webcontext-lastfm', sub { Lookup_cb("http://www.last.fm/music/") }, "Show Artist page on last.fm"],
 		['webcontext-wikipedia',sub { Lookup_cb("http://en.wikipedia.org/wiki/") }, "Show Artist page on wikipedia"],
@@ -87,8 +88,7 @@ sub new
 		$linkbox->pack_start($item,0,0,0);
 	}
 	
-	my $artistbox = Gtk2::HBox->new;
-	$artistbox->set_spacing("0");
+	my $artistbox = Gtk2::HBox->new(0,1);
 	$artistbox->pack_start($artistpic,1,1,0);
 	$artistbox->pack_start($statbox,1,1,0);
 	$artistbox->pack_start($linkbox,0,0,0);
@@ -211,9 +211,18 @@ sub ArtistChanged
 	return unless defined $aID;
 	if ($::Options{OPT.'ArtistSite'} eq "events") { $force = 1; }
 	
+	$self->{artistratingvalue}=AA::Get("rating:average",'artist',$aID);
+	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
+	$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);
+	my $tip = "Average rating: ".$self->{artistratingvalue} ."\nRating range: ".$self->{artistratingrange}."\nTotal playcount: ".$self->{artistplaycount};
+	
+	$self->{artistrating}->set_from_pixbuf(Stars::get_pixbuf($self->{artistratingvalue},1));
+	#$self->{artistrating}->set_tooltip_text($tip);
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($aID,"<big><b>%a</b></big>","artist",1) );
+	#$self->{Lstats}->set_tooltip_text($tip);
 	$self->{Lstats}->set_markup( AA::ReplaceFields($aID,"%s\n%X\n<small>%L\n%y</small>","artist",1) );
-	$self->{Lrating}->set(new => sub	{ my $r=(defined $_[1])? AA::Get("rating:range",'artist',$aID) : 0; $_[0]->set($r); });
+	for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
+	#$self->{Ltitle}->set_tooltip_text($tip);
 	
 	if (!$force) # if not forced to reload (events, reload-button), check for local file first
 	{	my $file=::pathfilefromformat( ::GetSelID($self), $::Options{OPT.'PathFile'}, undef,1 );
@@ -224,10 +233,6 @@ sub ArtistChanged
 	}
 	
 	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
-	# STATS (to come)
-	#print AA::Get("playcount:sum",'artist',$aID) . "\n"; # print total playcount of artist
-	#print AA::Get("rating:average",'artist',$artist_id) # print rating average of artist
-	#print AA::Get("rating:range",'artist',$artist_id) # print rating range (min-max) of artist
 	for ($artist) {
 		s#%#%25#gi; # weird last.fm escaping, "/" -> %2f (url_escapeall) "%" -> %25 -> %252f
 		s/%20/%2B/gi; # replace spaces by "+" for last.fm
@@ -238,6 +243,7 @@ sub ArtistChanged
 	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) {
 		$self->{artist_esc} = $artist;
 		$self->{url} = $url;
+		# add rss-re-routing here
 		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url,$post,$check);
 		}
 	else { $self->{artist_esc} = $artist; $self->{url} = $url; }
@@ -279,6 +285,7 @@ sub loaded
 	my $iter=$buffer->get_start_iter;
 	my $fontsize=$self->style->font_desc;
 	$fontsize = $fontsize->get_size / Gtk2::Pango->scale;
+	$self->{fontsize}=$fontsize;
 	my $tag_noresults=$buffer->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
 	my $tag_header = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
 	my $artistinfo_ok;
@@ -292,7 +299,7 @@ sub loaded
 				s/ +/ /g;
 			}			
 		}
-		else { $infoheader = ""; }
+		else { $infoheader = "Artist Biography"; }
 
 		$data =~ m/<div id="wikiAbstract">(\s*)(.*)<div class="wikiOptions">/s;
 		$data = $2;
@@ -305,7 +312,10 @@ sub loaded
 		else { $artistinfo_ok = "1"; }
 		$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 		$buffer->insert($iter,$data);
+		$self->{infoheader}=$infoheader;
+		$self->{biography} = $data;
 	}
+	
 	
 	elsif ($::Options{OPT.'ArtistSite'} eq "events") {
 		my @line = split /\n/s, $data;
@@ -314,8 +324,8 @@ sub loaded
 		while (defined($_=shift @line)) {
 			if ($_ =~ m/<title>(.*?)<\/title>/i) {
 				if ($_ =~ m/<title>Last.fm Events/gi) {
-					my $gig = "Upcoming Events\n\n";
-					$buffer->insert_with_tags($iter,$gig,$tag_header);
+					$infoheader = "Upcoming Events\n\n";
+					$buffer->insert_with_tags($iter,$infoheader,$tag_header);
 				}
 				else {
 					s/<(.*?)>//gi;
@@ -341,7 +351,7 @@ sub loaded
 			$buffer->insert_with_tags($iter,$infoheader,$tag_noresults);
 		}
 	}
-	
+
 	$self->Save_text if $::Options{OPT.'AutoSave'} && $artistinfo_ok && $artistinfo_ok==1;
 }
 
@@ -356,16 +366,25 @@ sub load_file
 		close $fh;
 		if (my $utf8=Encode::decode_utf8($text)) {$text=$utf8}
 	}
-        $buffer->set_text($text);
+	my $fontsize=$self->style->font_desc;
+	$fontsize = $fontsize->get_size / Gtk2::Pango->scale;
+	my $tag_header = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
+	$text =~ m/<title>(.*?)<\/title>/gi;
+	my $infoheader = $1 . "\n";
+	$text =~ s/<title>(.*?)<\/title>\n//;
+	my $iter=$buffer->get_start_iter;
+	$buffer->insert_with_tags($iter,$infoheader,$tag_header);
+        $buffer->insert($iter,$text);
 	$buffer->set_modified(0);
 }
 
 sub Save_text
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $win=$self->get_toplevel;
+	#warn $self->{infoheader}."\n".$self->{biography};
 	my $buffer=$self->{buffer};
-	my $text= $buffer->get_text($buffer->get_bounds, ::FALSE);
-	#my $text = "<title>".$self->{infoheader}."</title>".$self->{artistinfo};
+	#my $text= $buffer->get_text($buffer->get_bounds, ::FALSE);
+	my $text = "<title>".$self->{infoheader}."</title>\n".$self->{biography};
 	my $format=$::Options{OPT.'PathFile'};
 	my ($path,$file)=::pathfilefromformat( ::GetSelID($self), $format, undef,1 );
 	unless ($path && $file) {::ErrorMessage(_("Error: invalid filename pattern")." : $format",$win); return}
