@@ -3749,6 +3749,7 @@ sub new
 		my $scale=Gtk2::VScale->new($adj);
 		$scale->set_draw_value(0);
 		$scale->set_inverted(1);
+		$scale->add_mark(0,'left',undef);
 		$self->{'adj'.$i}=$adj;
 		$adj->signal_connect(value_changed =>
 		sub { $::Play_package->set_equalizer($_[1],$_[0]->get_value) unless $_[0]{busy}; ::HasChanged('Equalizer','value') },$i);

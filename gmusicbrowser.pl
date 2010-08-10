@@ -30,6 +30,7 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  *Gtk2::Label::set_ellipsize=		sub {} unless *Gtk2::Label::set_ellipsize{CODE};	#for perl-Gtk2 version <1.080~1.083
  *Gtk2::Pango::Layout::set_height=	sub {} unless *Gtk2::Pango::Layout::set_height{CODE};	#for perl-Gtk2 version <1.180  pango <1.20
  *Gtk2::Label::set_line_wrap_mode=	sub {} unless *Gtk2::Label::set_line_wrap_mode{CODE};	#for gtk2 version <2.9
+ *Gtk2::Scale::add_mark=		sub {} unless *Gtk2::Scale::add_mark{CODE};		#for gtk2 version <2.16 (still not bound in perl-Gtk2)
  unless (*Gtk2::Widget::set_tooltip_text{CODE})		#for Gtk2 version <2.12
  {	my $Tooltips=Gtk2::Tooltips->new;
 	*Gtk2::Widget::set_tooltip_text= sub { $Tooltips->set_tip($_[0],$_[1]); };
