@@ -2033,9 +2033,6 @@ sub SkipTo
 	if (defined $PlayingID)
 	{	$StartedAt=$sec unless (defined $PlayTime && $PlayingID==$SongID && $PlayedPartial && $sec<$PlayTime);	#don't re-set $::StartedAt if rewinding a song not fully(85%) played
 		$Play_package->SkipTo($sec);
-		my $wasplaying=$TogPlay;
-		$TogPlay=1;
-		HasChanged('Playing') unless $wasplaying;
 	}
 	else	{ Play($sec); }
 }
