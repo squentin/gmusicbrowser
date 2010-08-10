@@ -1428,6 +1428,11 @@ sub PluginsInit
 	$Options{'PLUGIN_'.$_}=$p->{$_} for keys %$p;
 	ActivatePlugin($_,'init') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 }
+
+# $startup can be undef, 'init' or 'startup'
+# - 'init' when called after loading settings, run Init if defined
+# - 'startup' when called after the songs are loaded, run Start if defined
+# - undef when activated by the user, runs Init then Start
 sub ActivatePlugin
 {	my ($plugin,$startup)=@_;
 	my $ref=$Plugins{$plugin};
@@ -1442,7 +1447,8 @@ sub ActivatePlugin
 			}
 		}
 		else
-		{	$package->Start($startup) if $package->can('Start');
+		{	$package->Init if !$startup && $package->can('Init');
+			$package->Start($startup) if $package->can('Start');
 			warn "Plugin $plugin activated.\n" if $debug;
 		}
 		$Options{'PLUGIN_'.$plugin}=1;
