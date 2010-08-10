@@ -3835,7 +3835,7 @@ sub size_allocate
 	my $border=$self->get_border_width;
 	$x+=$border;  $bwidth-=$border*2;
 	$y+=$border; $bheight-=$border*2;
-	my $total_xreq=0; my $ecount=0;
+	my $total_xreq=0; my $weightsum=my $ecount=0;
 	my $spacing=$self->get_spacing;
 	my @children;
 	for my $child ($self->get_children)
@@ -3854,7 +3854,7 @@ sub size_allocate
 			if ($max>0)	{ $expand=$eweight; }
 			else		{ $expand=$max=0; }
 		}
-		if	($expand)	{ $ecount+=$eweight; $expand=$eweight; }
+		if	($expand)	{ $ecount++; $weightsum+=$eweight; $expand=$eweight; }
 		my $end= $type eq 'end';
 		@attrib= ($child,$expand,$fill,$pad,$end,$xreq,$max);
 		if ($end)	{unshift @children,\@attrib} #to keep the same order as a HBox
@@ -3874,29 +3874,33 @@ sub size_allocate
 	elsif ($total_xreq<$bwidth && $ecount)	# if enough room for all, and some have expand attribute
 	{	my $w=$bwidth-$total_xreq;
 		my $i=0;
-		while ($w>0 && $ecount)
-		{	my $part= $w/$ecount;
-			$ecount=0;
-			my $leftover=0;
+		while ($ecount && $w>$ecount)
+		{	my $part= $w/$weightsum;
 			# [1] is expand, [6] is max, [7] is extra space given
 			for my $child (grep $_->[1], @children)	#children that want to expand
 			{	my $max=    $child->[6];
 				my $expand= $child->[1];
-				my $wpart0= $part*$expand+$leftover;
-				my $wpart= int($wpart0);
-				$leftover= $wpart0 - $wpart;
+				my $wpart= int($part*$expand);
 				if ($max && $wpart>=$max)	# enough to fill its max
 				{	$child->[7]+= $max;	# give it its max
 					$w-= $max;
 					$child->[1]=0;		# no longer want to expand
+					$weightsum-=$expand;
+					$ecount--;
 				}
-				else				# give it its part
+				elsif ($wpart>0)		# give it its part
 				{	$child->[7]+= $wpart;
 					$child->[6]-= $wpart if $max;
 					$w-= $wpart;
-					$ecount+=$expand;	#still want to expand
 				}
 			}
+		}
+		if ($w>0 && $ecount)		# less than one pixel by widget left
+		{	for my $child (sort {$b->[1] <=> $a->[1] } grep $_->[1], @children)	# start with highest weight
+			{	$child->[7]++;		# give 1 pixel to each widget
+				last unless --$w;	# until no more pixels
+			}
+			# note that weightsum, ecount, max and expand are not updated here as they are no longer used
 		}
 	}
 	elsif ($total_xreq>$bwidth && @children)	#not enough room for requested width
