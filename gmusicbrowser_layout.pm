@@ -1698,6 +1698,7 @@ sub SetWindowOptions
 	$self->{opacity}=$opt->{opacity} if defined $opt->{opacity};
 	$self->{hidden}={ $opt->{hidden}=~m/(\w+)(?::?(\d+x\d+))?/g } if $opt->{hidden};
 
+	$self->{size}= $self->{fixedsize}= $opt->{fixedsize} if $opt->{fixedsize};
 	$self->set_border_width($self->{options}{borderwidth});
 	$self->set_gravity($opt->{gravity}) if $opt->{gravity};
 	my $title= $layouthash->{Title} || $opt->{title} || _"%S by %a";
@@ -1728,10 +1729,18 @@ sub Resize
 	my $monitor=$screen->get_monitor_at_window($self->window);
 	my (undef,undef,$monitorwidth,$monitorheight)=$screen->get_monitor_geometry($monitor)->values;
 	$w= $1*$monitorwidth/100 if $w=~m/(\d+)%/;
-	$h= $1*$monitorwidth/100 if $h=~m/(\d+)%/;
-	$w=1 if $w<1;
-	$h=1 if $h<1;
-	$self->resize($w,$h);
+	$h= $1*$monitorheight/100 if $h=~m/(\d+)%/;
+	if ($self->{fixedsize})
+	{	$w=-1 if $w<1;	# -1 => do not override default minimum size
+		$h=-1 if $h<1;
+		$self->set_size_request($w,$h);
+		$self->set_resizable(0);
+	}
+	else
+	{	$w=1 if $w<1;	# 1 => resize to minimum size
+		$h=1 if $h<1;
+		$self->resize($w,$h);
+	}
 }
 
 sub Position
