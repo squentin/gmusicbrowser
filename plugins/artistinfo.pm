@@ -9,12 +9,14 @@
 name	Artistinfo
 title	Artistinfo plugin
 author  Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
+author  Pasi Lallinaho <pasi@shimmerproject.org>
 desc	Display Information about the playing Artist (short-biography or upcoming events) fetched from last.fm
 =cut
 
 package GMB::Plugin::ARTISTINFO;
 use strict;
 use warnings;
+use utf8;
 require 'simple_http.pm';
 our @ISA;
 BEGIN {push @ISA,'GMB::Context';}
@@ -28,39 +30,38 @@ use constant
 
 my %sites =
 (
-	lastfm => [ 'lastfm artist-info', 'http://www.last.fm/music/%a',sub { $_[0]=~m/<div id="wikiAbstract">(\s*)(.*)<div class="wikiOptions">/s; return 1 }],
-	events => [ 'last-fm events', 'http://ws.audioscrobbler.com/1.0/artist/%a/events.rss',sub { $_[0]=~m/<title>(.*?)<\/title>/gi; return 1 }]
+	biography => [ 'lastfm artist-info', 'http://www.last.fm/music/%a'],
+	events => [ 'last-fm events', 'http://ws.audioscrobbler.com/1.0/artist/%a/events.rss'],
+	web => ['test','webcontext'],
 );
-#http://www.last.fm/music/%a/+events
 
-if (my $site=$::Options{OPT.'ArtistSite'}) { delete $::Options{OPT.'ArtistSite'} unless exists $sites{$site} } #reset selected site if no longer defined
-::SetDefaultOptions(OPT, FontSize => 10, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistSite => 'lastfm');
+
+::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a");
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
 	#tabicon		=> 'gmb-artistinfo',		# no icon by that name by default (yet)
 	tabtitle	=> _"Artistinfo",
-	saveoptions	=> 'FontSize follow',
+	saveoptions	=> 'site',
 	schange		=> \&SongChanged,
 	group		=> 'Play',
 	autoadd_type	=> 'context page text',
 };
 
-my $prev_artist = "";
-
 sub Start
-{	Layout::RegisterWidget(PluginArtistinfo => $artistinfowidget);
-
-}
+{	Layout::RegisterWidget(PluginArtistinfo => $artistinfowidget); }
 sub Stop
-{	Layout::RegisterWidget(PluginArtistinfo => undef);
-}
+{	Layout::RegisterWidget(PluginArtistinfo => undef); }
 
 sub new
 {	my ($class,$options)=@_;
 	my $self = bless Gtk2::VBox->new(0,0), $class;
-	$options->{follow}=1 if not exists $options->{follow};
-	$self->{$_}=$options->{$_} for qw/HideToolbar follow group/;
+	
+	$self->{$_}=$options->{$_} for qw/site/;
+	if ($self->{site}) { delete $self->{site} unless exists $sites{$self->{site}} } #reset selected site if no longer defined
+	my $fontsize=$self->style->font_desc;
+	$self->{fontsize} = $fontsize->get_size / Gtk2::Pango->scale;
+	$self->{artist_esc} = "";
 	
 	my $statbox=Gtk2::VBox->new(0,0);
 	
@@ -71,27 +72,14 @@ sub new
 		$self->{$name}=$l;
 		$l->set_justify('center');
 		if ($name eq 'Ltitle') { $l->set_line_wrap(1);$l->set_ellipsize('end'); }
-		$statbox->pack_start($l, ::FALSE,::FALSE, 2);
+		$statbox->pack_start($l,0,0,2);
 	}
 	$self->{artistrating} = Gtk2::Image->new;
-	$statbox->pack_start($self->{artistrating}, ::FALSE,::FALSE, 2);
-	
-	my $linkbox = Gtk2::VBox->new(0,0);
-	for my $aref
-	(	['webcontext-lastfm', sub { Lookup_cb("http://www.last.fm/music/") }, "Show Artist page on last.fm"],
-		['webcontext-wikipedia',sub { Lookup_cb("http://en.wikipedia.org/wiki/") }, "Show Artist page on wikipedia"],
-		['webcontext-youtube',sub { Lookup_cb("http://www.youtube.com/results?search_type=&aq=1&search_query=") }, "Search for Artist on youtube"],
-	)
-	{	my ($stock,$cb,$tip)=@$aref;
-		my $item=::NewIconButton($stock,"",$cb,"none",$tip);
-		$item->set_tooltip_text($tip) if $tip;
-		$linkbox->pack_start($item,0,0,0);
-	}
-	
+	$statbox->pack_start($self->{artistrating},0,0,2);
+
 	my $artistbox = Gtk2::HBox->new(0,1);
 	$artistbox->pack_start($artistpic,1,1,0);
 	$artistbox->pack_start($statbox,1,1,0);
-	$artistbox->pack_start($linkbox,0,0,0);
 	
 	my $textview=Gtk2::TextView->new;
 	$self->signal_connect(map => sub { $_[0]->SongChanged( ::GetSelID($_[0]) ); });
@@ -101,31 +89,34 @@ sub new
 	$textview->set_editable(0);
 	$textview->set_left_margin(5);
 	
-	my $toggleB = Gtk2::RadioButton->new(undef,'artistinfo-biography');
-	$toggleB->set_mode(0);
-	$toggleB->set_use_stock(1);
-	$toggleB->set_relief("none");
-	$toggleB->set_tooltip_text("Show artist's biography");
-	my $toggleE=Gtk2::RadioButton->new_with_label($toggleB,'artistinfo-events');
-	$toggleE->set_mode(0);
-	$toggleE->set_use_stock(1);
-	$toggleE->set_relief("none");
-	$toggleE->set_tooltip_text("Show artist's upcoming events");
-	if ($::Options{OPT.'ArtistSite'} eq "events") { $toggleE->set_active(1); }
-	$toggleE->signal_connect('toggled' => \&toggled_cb);
-	$toggleE->signal_connect('toggled' => \&SongChanged);
+	my $togglebox = Gtk2::HBox->new();
+	my $group;
+	for my $togglebutton
+	(	['biography',_"biography",_"Show artist's biography"],
+		['events',_"events",_"Show artist's upcoming events"],
+		['web',_"web",_"Search the web for artist"]#$artistpic -> set_tooltip($self->{artistpic_tip});
+	)
+	{	my ($key,$item,$tip) = @$togglebutton;
+		$item = Gtk2::RadioButton->new($group,$item);
+		$item->{key} = $key;
+		$item -> set_mode(0); # display as togglebutton
+		#$toggleE->set_use_stock(1); # show icon instead of tex#$artistpic -> set_tooltip($self->{artistpic_tip});t
+		$item -> set_relief("none");
+		$item -> set_tooltip_text($tip);
+		$item->set_active( $key eq $self->{site} );
+		$item->signal_connect('toggled' => sub { &toggled_cb($self,$item); } );
+		$group = $item -> get_group;
+		$togglebox->pack_start($item,1,0,0);
+	}
 	
 	my $refresh = ::NewIconButton('reload',"",\&Refresh_cb,"none","Refresh");
 	$refresh->set_tooltip_text("Refresh");
 	my $savebutton = ::NewIconButton('gtk-save',"",\&Save_text,"none","Save");
 	$savebutton->set_tooltip_text("Save artist biography");
 	
-	my $togglebox = Gtk2::VBox->new();
-	$togglebox->pack_start($toggleB,0,0,0);
-	$togglebox->pack_start($toggleE,0,0,0);
 	$togglebox->pack_start($refresh,0,0,0);
 	if ($::Options{OPT.'AutoSave'} != 1) { $togglebox->pack_start($savebutton,0,0,0); }
-	
+	$statbox->pack_start($togglebox,0,0,0);
 	if (my $color= $options->{color} || $options->{DefaultFontColor})
 	{	$textview->modify_text('normal', Gtk2::Gdk::Color->parse($color) );
 	}
@@ -139,7 +130,6 @@ sub new
 	
 	my $infobox = Gtk2::HBox->new;
 	$infobox->set_spacing("0");
-	$infobox->pack_start($togglebox,0,0,0);
 	$infobox->pack_start($sw,1,1,0);
 	
 	$self->pack_start($artistbox,0,0,0);
@@ -150,9 +140,11 @@ sub new
 }
 
 sub toggled_cb
-{	my $toggleB = shift;
-	if ($toggleB->get_active) { $::Options{OPT.'ArtistSite'} = "events"; }
-	else { $::Options{OPT.'ArtistSite'} = "lastfm"; }
+{	my ($self, $togglebutton) = @_;
+	if ($togglebutton -> get_active) {
+		$self->{site} = $togglebutton->{key};
+		SongChanged($togglebutton);
+	}
 }
 
 sub Lookup_cb
@@ -174,7 +166,6 @@ sub cancel
 {	my $self=shift;
 	delete $::ToDo{'8_artistinfo'.$self};
 	$self->{waiting}->abort if $self->{waiting};
-	$self->{waiting}=$self->{pixtoload}=undef;
 }
 
 sub prefbox
@@ -193,6 +184,38 @@ sub filename_preview
 	return '<small>'.$t.'</small>';
 }
 
+sub ExternalLinks
+{	my $self = shift;
+	my $buffer = $self -> {buffer};
+	$buffer->set_text("");
+	my $fontsize = $self->{fontsize};
+	my $tag_header = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
+	my $centered = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER');
+	my $iter=$buffer->get_start_iter;
+	$buffer->insert_with_tags($iter,"Search for artist on the web in your browser:\n\n",$tag_header);
+	
+	for my $linkbutton
+	(	['artistinfo-lastfm', sub { Lookup_cb("http://www.last.fm/music/") }, "Show Artist page on last.fm"],
+		['artistinfo-wikipedia',sub { Lookup_cb("http://en.wikipedia.org/wiki/") }, "Show Artist page on wikipedia"],
+		['artistinfo-youtube',sub { Lookup_cb("http://www.youtube.com/results?search_type=&aq=1&search_query=") }, "Search for Artist on youtube"],
+	)
+	{	$buffer->insert_with_tags($iter,"  ",$centered);
+		my ($stock,$cb,$tip)=@$linkbutton;
+		my $item=Gtk2::Button->new;
+		my $image=Gtk2::Image->new_from_stock($stock,'dnd');
+		$item->set_image($image);
+		$item->set_tooltip_text($tip);
+		$item->set_relief("none");
+		$item->signal_connect(clicked => $cb);
+		my $anchor = $buffer->create_child_anchor($iter);
+		$self->{textview}->add_child_at_anchor($item,$anchor);
+		$buffer->insert_with_tags($iter,"  ",$centered);
+		$item->show_all;
+	}
+	
+	$buffer->set_modified(0);
+}
+
 sub Refresh_cb
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $ID = ::GetSelID($self);
@@ -205,24 +228,26 @@ sub SongChanged
 	$self -> ArtistChanged( Songs::Get_gid($ID,'artist'));
 }
 
+sub getRSSurl
+{	
+
+}
+
 sub ArtistChanged
 {	my ($self,$aID,$force)=@_;
 	return unless $self->mapped;
 	return unless defined $aID;
-	if ($::Options{OPT.'ArtistSite'} eq "events") { $force = 1; }
-	
+	if ($self->{site} ne "biography") { $force = 1; }
+
 	$self->{artistratingvalue}=AA::Get("rating:average",'artist',$aID);
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
 	$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);
 	my $tip = "Average rating: ".$self->{artistratingvalue} ."\nRating range: ".$self->{artistratingrange}."\nTotal playcount: ".$self->{artistplaycount};
 	
 	$self->{artistrating}->set_from_pixbuf(Stars::get_pixbuf($self->{artistratingvalue},1));
-	#$self->{artistrating}->set_tooltip_text($tip);
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($aID,"<big><b>%a</b></big>","artist",1) );
-	#$self->{Lstats}->set_tooltip_text($tip);
-	$self->{Lstats}->set_markup( AA::ReplaceFields($aID,"%s\n%X\n<small>%L\n%y</small>","artist",1) );
+	$self->{Lstats}->set_markup( AA::ReplaceFields($aID,'%X « %s'."\n<small>%y</small>","artist",1) );
 	for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
-	#$self->{Ltitle}->set_tooltip_text($tip);
 	
 	if (!$force) # if not forced to reload (events, reload-button), check for local file first
 	{	my $file=::pathfilefromformat( ::GetSelID($self), $::Options{OPT.'PathFile'}, undef,1 );
@@ -238,19 +263,19 @@ sub ArtistChanged
 		s/%20/%2B/gi; # replace spaces by "+" for last.fm
 		s/\?/%3F/gi;
 	}
-	my (undef,$url,$post,$check)=@{$sites{$::Options{OPT.'ArtistSite'}}};
-	for ($url,$post) { next unless defined $_; s/%a/$artist/; }
+	my (undef,$url)=@{$sites{$self->{site}}};
+	for ($url) { next unless defined $_; s/%a/$artist/; }
 	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) {
 		$self->{artist_esc} = $artist;
 		$self->{url} = $url;
 		# add rss-re-routing here
-		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url,$post,$check);
+		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);
 		}
 	else { $self->{artist_esc} = $artist; $self->{url} = $url; }
 }
 
 sub load_url
-{	my ($self,$url,$post,$check)=@_;
+{	my ($self,$url)=@_;
 	$self->{buffer}->set_text("");
 	my $iter=$self->{buffer}->get_start_iter;
 	my $fontsize=$self->style->font_desc;
@@ -261,9 +286,8 @@ sub load_url
 	$self->cancel;
 	warn "info : loading $url\n";# if $::debug;
 	$self->{url}=$url;
-	$self->{post}=$post;
-	$self->{check}=$check; # function to check if artist-info found
-	$self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url,post => $post);
+	if ($self->{site} ne "web") { $self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url); }
+	else {	&ExternalLinks($self); }	
 }
 
 sub loaded
@@ -283,15 +307,12 @@ sub loaded
 	
 	if ($encoding eq 'utf-8') { $data = ::decode_html($data); }
 	my $iter=$buffer->get_start_iter;
-	my $fontsize=$self->style->font_desc;
-	$fontsize = $fontsize->get_size / Gtk2::Pango->scale;
-	$self->{fontsize}=$fontsize;
+	my $fontsize = $self->{fontsize};
 	my $tag_noresults=$buffer->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
 	my $tag_header = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
-	my $artistinfo_ok;
-	my $infoheader;
+	my ($artistinfo_ok,$infoheader);
 	
-	if ($::Options{OPT.'ArtistSite'} eq "lastfm") {	
+	if ($self->{site} eq "biography") {	
 		if ($data =~ m/<p\ class="origin">(.*?)<\/p>/s)
 		{	$infoheader = $1;
 			for ($infoheader)
@@ -316,8 +337,7 @@ sub loaded
 		$self->{biography} = $data;
 	}
 	
-	
-	elsif ($::Options{OPT.'ArtistSite'} eq "events") {
+	elsif ($self->{site} eq "events") {
 		my @line = split /\n/s, $data;
 		my $tag_title = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT'); 
 		my $tag_date = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'GTK_JUSTIFY_LEFT');
@@ -366,8 +386,7 @@ sub load_file
 		close $fh;
 		if (my $utf8=Encode::decode_utf8($text)) {$text=$utf8}
 	}
-	my $fontsize=$self->style->font_desc;
-	$fontsize = $fontsize->get_size / Gtk2::Pango->scale;
+	my $fontsize=$self->{fontsize};
 	my $tag_header = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
 	$text =~ m/<title>(.*?)<\/title>/gi;
 	my $infoheader = $1 . "\n";
@@ -381,9 +400,7 @@ sub load_file
 sub Save_text
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $win=$self->get_toplevel;
-	#warn $self->{infoheader}."\n".$self->{biography};
 	my $buffer=$self->{buffer};
-	#my $text= $buffer->get_text($buffer->get_bounds, ::FALSE);
 	my $text = "<title>".$self->{infoheader}."</title>\n".$self->{biography};
 	my $format=$::Options{OPT.'PathFile'};
 	my ($path,$file)=::pathfilefromformat( ::GetSelID($self), $format, undef,1 );
