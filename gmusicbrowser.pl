@@ -30,6 +30,7 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  *Gtk2::Label::set_ellipsize=		sub {} unless *Gtk2::Label::set_ellipsize{CODE};	#for perl-Gtk2 version <1.080~1.083
  *Gtk2::Pango::Layout::set_height=	sub {} unless *Gtk2::Pango::Layout::set_height{CODE};	#for perl-Gtk2 version <1.180  pango <1.20
  *Gtk2::Label::set_line_wrap_mode=	sub {} unless *Gtk2::Label::set_line_wrap_mode{CODE};	#for gtk2 version <2.9
+ *Gtk2::Scale::add_mark=		sub {} unless *Gtk2::Scale::add_mark{CODE};		#for gtk2 version <2.16 (still not bound in perl-Gtk2)
  unless (*Gtk2::Widget::set_tooltip_text{CODE})		#for Gtk2 version <2.12
  {	my $Tooltips=Gtk2::Tooltips->new;
 	*Gtk2::Widget::set_tooltip_text= sub { $Tooltips->set_tip($_[0],$_[1]); };
@@ -683,9 +684,11 @@ sub ConvertTime	# convert date pattern into nb of seconds
 	return $pat;
 }
 sub ConvertSize
-{	my $pat=$_[0];
-	if ($pat=~m/^(\d+)([bkm])$/) { $pat=$1*$::SIZEUNITS{$2}[0] }
-	return $pat;
+{	my ($size,$unit)= $_[0]=~m/^\s*(\d*)\s*([a-zA-Z]*)\s*$/;
+	return 0 unless $size;
+	if (my $ref= $SIZEUNITS{lc$unit}) { $size*= $ref->[0] }
+	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
+	return $size;
 }
 
 
@@ -1425,6 +1428,11 @@ sub PluginsInit
 	$Options{'PLUGIN_'.$_}=$p->{$_} for keys %$p;
 	ActivatePlugin($_,'init') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 }
+
+# $startup can be undef, 'init' or 'startup'
+# - 'init' when called after loading settings, run Init if defined
+# - 'startup' when called after the songs are loaded, run Start if defined
+# - undef when activated by the user, runs Init then Start
 sub ActivatePlugin
 {	my ($plugin,$startup)=@_;
 	my $ref=$Plugins{$plugin};
@@ -1439,7 +1447,8 @@ sub ActivatePlugin
 			}
 		}
 		else
-		{	$package->Start($startup) if $package->can('Start');
+		{	$package->Init if !$startup && $package->can('Init');
+			$package->Start($startup) if $package->can('Start');
 			warn "Plugin $plugin activated.\n" if $debug;
 		}
 		$Options{'PLUGIN_'.$plugin}=1;
@@ -2024,9 +2033,6 @@ sub SkipTo
 	if (defined $PlayingID)
 	{	$StartedAt=$sec unless (defined $PlayTime && $PlayingID==$SongID && $PlayedPartial && $sec<$PlayTime);	#don't re-set $::StartedAt if rewinding a song not fully(85%) played
 		$Play_package->SkipTo($sec);
-		my $wasplaying=$TogPlay;
-		$TogPlay=1;
-		HasChanged('Playing') unless $wasplaying;
 	}
 	else	{ Play($sec); }
 }

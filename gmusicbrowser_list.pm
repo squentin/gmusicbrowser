@@ -5454,6 +5454,7 @@ sub key_press_cb
 	elsif	($key eq 'Right')	{ $self->scroll_event_cb('right'); }
 	elsif	($key eq 'Page_Up')	{ $self->scroll_event_cb('up',1); }
 	elsif	($key eq 'Page_Down')	{ $self->scroll_event_cb('down',1); }
+	elsif	($key eq 'Delete')	{ $self->RemoveSelected; }
 	elsif	(lc$key eq 'a' && $ctrl)							#ctrl-a : select-all
 		{ vec($self->{selected},$_,1)=1 for 0..$#$list; $self->UpdateSelection;}
 	elsif	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }			#ctrl-f : search

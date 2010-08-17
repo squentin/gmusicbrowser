@@ -744,6 +744,11 @@ Window =  transparent=1
 VBmain = _PluginLyrics(shadow=none,HideToolbar=1)
 
 #type P layouts : pages that can be added to a TabbedLists
+[same_title]
+Type= P
+Name=Same title
+VBmain = _SongTree(group=Play:title)
+
 [same_album]
 Type= P
 Name=Album
