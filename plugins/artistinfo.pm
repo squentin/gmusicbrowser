@@ -23,16 +23,15 @@ BEGIN {push @ISA,'GMB::Context';}
 use base 'Gtk2::VBox';
 use base 'Gtk2::HBox';
 use base 'Gtk2::EventBox';
-use base 'Gtk2::ToggleButton';
 use constant
 {	OPT	=> 'PLUGIN_ARTISTINFO_', # MUST begin by PLUGIN_ followed by the plugin ID / package name
 };
 
 my %sites =
 (
-	biography => [ 'lastfm artist-info', 'http://www.last.fm/music/%a'],
-	events => [ 'last-fm events', 'http://ws.audioscrobbler.com/1.0/artist/%a/events.rss'],
-	web => ['test','webcontext'],
+	biography => [ 'http://www.last.fm/music/%a'],
+	events => [ 'http://www.last.fm/music/%a/+events'],
+	web => ['weblinks'],
 );
 
 
@@ -85,7 +84,7 @@ sub new
 	$self->signal_connect(map => sub { $_[0]->SongChanged( ::GetSelID($_[0]) ); });
 	$textview->set_cursor_visible(0);
 	$textview->set_wrap_mode('word');
-	$textview->set_pixels_below_lines(2);
+	$textview->set_pixels_above_lines(2);
 	$textview->set_editable(0);
 	$textview->set_left_margin(5);
 	
@@ -169,7 +168,7 @@ sub cancel
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
+{	my $vbox=Gtk2::VBox->new(0,2);
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>30);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
@@ -192,14 +191,21 @@ sub ExternalLinks
 	my $tag_header = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
 	my $centered = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER');
 	my $iter=$buffer->get_start_iter;
-	$buffer->insert_with_tags($iter,"Search for artist on the web in your browser:\n\n",$tag_header);
 	
+	$buffer->insert_with_tags($iter,"Search for artist on the web:\n\n",$tag_header);
+	my $i = 1;
 	for my $linkbutton
 	(	['artistinfo-lastfm', sub { Lookup_cb("http://www.last.fm/music/") }, "Show Artist page on last.fm"],
 		['artistinfo-wikipedia',sub { Lookup_cb("http://en.wikipedia.org/wiki/") }, "Show Artist page on wikipedia"],
 		['artistinfo-youtube',sub { Lookup_cb("http://www.youtube.com/results?search_type=&aq=1&search_query=") }, "Search for Artist on youtube"],
+		['artistinfo-amazon',sub { Lookup_cb("http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=") }, "Search amazon.com for Artist"],
+		['artistinfo-google',sub { Lookup_cb("http://www.google.at/search?q=") }, "Search google for Artist" ],
+		['artistinfo-allmusic',sub { Lookup_cb("http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=") }, "Search allmusic for Artist" ],
+		['artistinfo-pitchfork', sub { Lookup_cb("http://pitchfork.com/search/?search_type=standard&query=") }, "Search pitchfork for Artist" ],
+		['artistinfo-discogs', sub { Lookup_cb("http://www.discogs.com/artist/") }, "Search discogs for Artist" ],
 	)
-	{	$buffer->insert_with_tags($iter,"  ",$centered);
+	{	if ($i==5) {$buffer->insert($iter,"\n"); }
+		$i++;
 		my ($stock,$cb,$tip)=@$linkbutton;
 		my $item=Gtk2::Button->new;
 		my $image=Gtk2::Image->new_from_stock($stock,'dnd');
@@ -207,6 +213,7 @@ sub ExternalLinks
 		$item->set_tooltip_text($tip);
 		$item->set_relief("none");
 		$item->signal_connect(clicked => $cb);
+		$buffer->insert_with_tags($iter,"  ",$centered);
 		my $anchor = $buffer->create_child_anchor($iter);
 		$self->{textview}->add_child_at_anchor($item,$anchor);
 		$buffer->insert_with_tags($iter,"  ",$centered);
@@ -229,8 +236,35 @@ sub SongChanged
 }
 
 sub getRSSurl
-{	
+{	my ($self,$url) = @_;
+	$self->{buffer}->set_text("");
+	my $iter=$self->{buffer}->get_start_iter;
+	my $fontsize=$self->{fontsize};
+	my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
+	$self->{buffer}->insert_with_tags($iter,"\nLoading...",$tag_noresults);
+	$self->{buffer}->set_modified(0);
+	warn "info : loading $url\n";
+	$self->{waiting} = Simple_http::get_with_cb(cb => sub {$self->parseRSS(@_)},url => $url);
+}
 
+sub parseRSS
+{	my ($self,$data) = @_;
+	delete $self->{waiting};
+	my $url;
+	if ($data =~ m/There are no upcoming events for this artist./gi) {
+		$self->{buffer}->set_text("");
+		my $iter=$self->{buffer}->get_start_iter;
+		my $fontsize=$self->{fontsize};
+		my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
+		$self->{buffer}->insert_with_tags($iter,"\nThere are no upcoming events for this artist.",$tag_noresults);
+		$self->{buffer}->set_modified(0);
+		return;
+	}
+	elsif ($data =~ m/http:\/\/ws.audioscrobbler.com(.*?).rss/gi) {
+		$url = "http://ws.audioscrobbler.com".$1.".rss";
+	}
+	warn "info : loading $url\n";
+	$self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url);
 }
 
 sub ArtistChanged
@@ -238,7 +272,7 @@ sub ArtistChanged
 	return unless $self->mapped;
 	return unless defined $aID;
 	if ($self->{site} ne "biography") { $force = 1; }
-
+	$self->cancel;
 	$self->{artistratingvalue}=AA::Get("rating:average",'artist',$aID);
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
 	$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);
@@ -263,23 +297,21 @@ sub ArtistChanged
 		s/%20/%2B/gi; # replace spaces by "+" for last.fm
 		s/\?/%3F/gi;
 	}
-	my (undef,$url)=@{$sites{$self->{site}}};
+	my ($url)=@{$sites{$self->{site}}};
 	for ($url) { next unless defined $_; s/%a/$artist/; }
 	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) {
 		$self->{artist_esc} = $artist;
 		$self->{url} = $url;
-		# add rss-re-routing here
-		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);
+		if ($self->{site} eq "events") { ::IdleDo('8_artistinfo'.$self,1000,\&getRSSurl,$self,$url); }
+		else {	::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url); }
 		}
-	else { $self->{artist_esc} = $artist; $self->{url} = $url; }
 }
 
 sub load_url
 {	my ($self,$url)=@_;
 	$self->{buffer}->set_text("");
 	my $iter=$self->{buffer}->get_start_iter;
-	my $fontsize=$self->style->font_desc;
-	$fontsize = $fontsize->get_size / Gtk2::Pango->scale;
+	my $fontsize=$self->{fontsize};
 	my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
 	$self->{buffer}->insert_with_tags($iter,"\nLoading...",$tag_noresults);
 	$self->{buffer}->set_modified(0);
@@ -287,7 +319,7 @@ sub load_url
 	warn "info : loading $url\n";# if $::debug;
 	$self->{url}=$url;
 	if ($self->{site} ne "web") { $self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url); }
-	else {	&ExternalLinks($self); }	
+	else {	&ExternalLinks($self); }
 }
 
 sub loaded
