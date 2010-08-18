@@ -1387,7 +1387,7 @@ sub LoadPlugins
 	for my $file (grep !$loaded{$_}, @list)
 	{	warn "Reading plugin $file\n" if $::debug;
 		my ($found,$id);
-		open my$fh,'<',$file or do {warn "error opening $file : $!\n";next};
+		open my$fh,'<:utf8',$file or do {warn "error opening $file : $!\n";next};
 		while (my $line=<$fh>)
 		{	if ($line=~m/^=gmbplugin (\D\w+)/)
 			{	my $id=$1;
