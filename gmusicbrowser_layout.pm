@@ -312,6 +312,7 @@ our %Widgets=
 		group	=> 'Play',
 		markup	=> '%s',
 		xalign	=> 1,
+		options	=> 'remaining',
 		saveoptions => 'remaining',
 		initsize=> '-XX:XX',
 #		font	=> 'Monospace',
@@ -3137,6 +3138,7 @@ sub new
 	my $self = bless $scale->new_with_range(0,$max,$max/10), $class;
 	$self->set_inverted(1) if $scale eq 'Gtk2::VScale';
 	$self->{vertical}= $scale eq 'Gtk2::VScale';
+	$self->{direct_mode}=$opt->{direct_mode};
 	$self->set_draw_value(0);
 	$self->signal_connect(button_press_event => \&button_press_cb);
 	$self->signal_connect(button_release_event => \&button_release_cb);
@@ -3153,9 +3155,14 @@ sub set_max
 }
 
 sub button_press_cb
-{	my $self=$_[0];
+{	my ($self,$event)=@_;
+	if ($self->{direct_mode})	# short-circuit normal Gtk2::Scale click behaviour
+	{	$self->{pressed}= $self->signal_connect(motion_notify_event  => \&update_value_direct_mode);
+		$self->update_value_direct_mode($event);
+		return 1;		# return 1 so that Gtk2::Scale won't get the mouse click
+	}
 	$self->{pressed}= $self->signal_connect(value_changed  => \&value_changed_cb);
-	0;
+	return 0;
 }
 
 sub button_release_cb
@@ -3175,6 +3182,19 @@ sub value_changed_cb
 	$self->{newpos}=$s;
 	my $sub= $self->{set_preview} || $self->{set};
 	$sub->($self,$s);
+	1;
+}
+
+sub update_value_direct_mode
+{	my ($self,$event)=@_;
+	my ($x,$w)= $self->{vertical} ?	($event->y, $self->allocation->height):
+					($event->x, $self->allocation->width) ;
+	$w=1 if $w<1;
+	my $f=$x/$w;
+	$f=0 if $f<0; $f=1 if $f>1;
+	$f=1-$f if $self->{vertical};
+	$self->set_value( $f * $self->{max});
+	$self->value_changed_cb;
 	1;
 }
 

@@ -704,7 +704,7 @@ my $SavedListsWatcher;
 our $ListPlay;
 our ($TogPlay,$TogLock);
 our ($RandomMode,$SortFields,$ListMode);
-our ($SongID,$Recent,$RecentPos,$Queue); our $QueueAction='';
+our ($SongID,$prevID,$Recent,$RecentPos,$Queue); our $QueueAction='';
 our ($Position,$ChangedID,$ChangedPos,@NextSongs,$NextFileToPlay);
 our ($MainWindow,$FullscreenWindow); my $OptionsDialog;
 my $TrayIcon;
@@ -1387,7 +1387,7 @@ sub LoadPlugins
 	for my $file (grep !$loaded{$_}, @list)
 	{	warn "Reading plugin $file\n" if $::debug;
 		my ($found,$id);
-		open my$fh,'<',$file or do {warn "error opening $file : $!\n";next};
+		open my$fh,'<:utf8',$file or do {warn "error opening $file : $!\n";next};
 		while (my $line=<$fh>)
 		{	if ($line=~m/^=gmbplugin (\D\w+)/)
 			{	my $id=$1;
@@ -2151,17 +2151,20 @@ sub ResetTime
 	HasChanged('Time');
 }
 
+sub AddToRecent	#add song to recently played list
+{	my $ID=shift;
+	unless (@$Recent && $Recent->[0]==$ID)
+	{	$Recent->Unshift([$ID]);	#FIXME make sure it's not too slow, put in a idle ?
+		$Recent->Pop if @$Recent>80;	#
+	}
+}
+
 sub Played
 {	return unless defined $PlayingID;
 	my $ID=$PlayingID;
 	undef $PlayingID;
 	warn "Played : $ID $StartTime $StartedAt $PlayTime\n" if $debug;
-	#add song to recently played list
-	unless (@$Recent && $Recent->[0]==$ID)
-	{	$Recent->Unshift([$ID]);	#FIXME make sure it's not too slow, put in a idle ?
-		$Recent->Pop if @$Recent>80;	#
-	}
-
+	AddToRecent($ID) unless $Options{AddNotPlayedToRecent};
 	return unless defined $PlayTime;
 	$PlayedPartial=$PlayTime-$StartedAt < $Options{PlayedPercent} * Songs::Get($ID,'length');
 	HasChanged('Played',$ID, !$PlayedPartial, $StartTime, $StartedAt, $PlayTime);
@@ -2507,7 +2510,9 @@ sub SetPosition
 sub UpdateCurrentSong
 {	#my $force=shift;
 	if ($ChangedID)
-	{	QHasChanged('CurSongID',$SongID);
+	{	AddToRecent($prevID) if defined $prevID && $Options{AddNotPlayedToRecent};
+		$prevID=$SongID;
+		QHasChanged('CurSongID',$SongID);
 		QHasChanged('CurSong',$SongID);
 		ShowTraytip($Options{TrayTipTimeLength}) if $TrayIcon && $Options{ShowTipOnSongChange} && !$FullscreenWindow;
 		IdleDo('CheckCurrentSong',1000,\&CheckCurrentSong) if defined $SongID;
@@ -5466,8 +5471,10 @@ sub PrefMisc
 	my $always_in_pl=NewPrefCheckButton(AlwaysInPlaylist => _"Current song must always be in the playlist", tip=> _"- When selecting a song, the playlist filter will be reset if the song is not in it\n- Skip to another song when removing the current song from the playlist");
 	my $pixcache= NewPrefSpinButton('PixCacheSize',1,1000, text1=>_"Picture cache :", text2=>_"MB", cb=>\&GMB::Picture::trim);
 
+	my $recent_include_not_played= NewPrefCheckButton(AddNotPlayedToRecent => _"Recent songs include skipped songs that haven't been played.", tip=> _"When changing songs, the previous song is added to the recent list even if not played at all.");
+
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry,$volstep,$always_in_pl,$pixcache;
+	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry, $always_in_pl, $recent_include_not_played, $volstep, $pixcache;
 	return $vbox;
 }
 
