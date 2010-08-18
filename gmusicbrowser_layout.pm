@@ -295,6 +295,7 @@ our %Widgets=
 		group	=> 'Play',
 		markup	=> '%s',
 		xalign	=> 1,
+		options	=> 'remaining',
 		saveoptions => 'remaining',
 		initsize=> '-XX:XX',
 #		font	=> 'Monospace',
