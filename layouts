@@ -15,7 +15,7 @@ VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle HBTimeSlider
 HBTitle		= Title(expand_max=300,minsize=1,markup="<big><b>%t</b></big>",click1="",tip="Title: %t (Track No. %n)".if($track,pesc($track))) AlbumBreadcrumb(tip="Album: %l (%Y)",minsize=1,expand_max=200) ArtistBreadcrumb(tip="Artist: %a",expand_max=200) -Stars(yalign=0)
-HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider -Length(markup="$length",initsize="XX:XX",xalign=1)
+HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 VBToggle	= HBToggle 5Filler1
 HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1,tip="Simple List View") ToggleButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1,tip="Songtree View") ToggleButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1,tip="Mosaic View")
 VBSearchBox	= 2SimpleSearch() 5Filler2
