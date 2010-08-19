@@ -58,13 +58,14 @@ sub new
 	
 	$self->{$_}=$options->{$_} for qw/site/;
 	if ($self->{site}) { delete $self->{site} unless exists $sites{$self->{site}} } #reset selected site if no longer defined
+	else { $self->{site} = 'biography'; } # biography is the default site
 	my $fontsize=$self->style->font_desc;
 	$self->{fontsize} = $fontsize->get_size / Gtk2::Pango->scale;
 	$self->{artist_esc} = "";
 	
 	my $statbox=Gtk2::VBox->new(0,0);
 	
-	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>0,maxsize=>"100",click1=>undef,xalign=>0});
+	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>0,click1=>undef,xalign=>0});
 	
 	for my $name (qw/Ltitle Lstats/)
 	{	my $l=Gtk2::Label->new('');
@@ -76,7 +77,7 @@ sub new
 	$self->{artistrating} = Gtk2::Image->new;
 	$statbox->pack_start($self->{artistrating},0,0,2);
 
-	my $artistbox = Gtk2::HBox->new(0,1);
+	my $artistbox = Gtk2::HBox->new(0,0);
 	$artistbox->pack_start($artistpic,1,1,0);
 	$artistbox->pack_start($statbox,1,1,0);
 	
@@ -93,13 +94,12 @@ sub new
 	for my $togglebutton
 	(	['biography',_"biography",_"Show artist's biography"],
 		['events',_"events",_"Show artist's upcoming events"],
-		['web',_"web",_"Search the web for artist"]#$artistpic -> set_tooltip($self->{artistpic_tip});
+		['web',_"web",_"Search the web for artist"]
 	)
 	{	my ($key,$item,$tip) = @$togglebutton;
 		$item = Gtk2::RadioButton->new($group,$item);
 		$item->{key} = $key;
 		$item -> set_mode(0); # display as togglebutton
-		#$toggleE->set_use_stock(1); # show icon instead of tex#$artistpic -> set_tooltip($self->{artistpic_tip});t
 		$item -> set_relief("none");
 		$item -> set_tooltip_text($tip);
 		$item->set_active( $key eq $self->{site} );
@@ -108,7 +108,7 @@ sub new
 		$togglebox->pack_start($item,1,0,0);
 	}
 	
-	my $refresh = ::NewIconButton('reload',"",\&Refresh_cb,"none","Refresh");
+	my $refresh = ::NewIconButton('reload',"", \&Refresh_cb ,"none","Refresh");
 	$refresh->set_tooltip_text("Refresh");
 	my $savebutton = ::NewIconButton('gtk-save',"",\&Save_text,"none","Save");
 	$savebutton->set_tooltip_text("Save artist biography");
@@ -116,9 +116,6 @@ sub new
 	$togglebox->pack_start($refresh,0,0,0);
 	if ($::Options{OPT.'AutoSave'} != 1) { $togglebox->pack_start($savebutton,0,0,0); }
 	$statbox->pack_start($togglebox,0,0,0);
-	if (my $color= $options->{color} || $options->{DefaultFontColor})
-	{	$textview->modify_text('normal', Gtk2::Gdk::Color->parse($color) );
-	}
 	$self->{buffer}=$textview->get_buffer;
 	$self->{textview}=$textview;
 	
@@ -183,6 +180,16 @@ sub filename_preview
 	return '<small>'.$t.'</small>';
 }
 
+sub set_buffer
+{	my ($self,$text) = @_;
+	$self->{buffer}->set_text("");
+	my $iter=$self->{buffer}->get_start_iter;
+	my $fontsize=$self->{fontsize};
+	my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
+	$self->{buffer}->insert_with_tags($iter,"\n$text",$tag_noresults);
+	$self->{buffer}->set_modified(0);
+}
+
 sub ExternalLinks
 {	my $self = shift;
 	my $buffer = $self -> {buffer};
@@ -191,7 +198,6 @@ sub ExternalLinks
 	my $tag_header = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
 	my $centered = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER');
 	my $iter=$buffer->get_start_iter;
-	
 	$buffer->insert_with_tags($iter,"Search for artist on the web:\n\n",$tag_header);
 	my $i = 1;
 	for my $linkbutton
@@ -237,12 +243,7 @@ sub SongChanged
 
 sub getRSSurl
 {	my ($self,$url) = @_;
-	$self->{buffer}->set_text("");
-	my $iter=$self->{buffer}->get_start_iter;
-	my $fontsize=$self->{fontsize};
-	my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
-	$self->{buffer}->insert_with_tags($iter,"\nLoading...",$tag_noresults);
-	$self->{buffer}->set_modified(0);
+	&set_buffer($self,"Loading...");
 	warn "info : loading $url\n";
 	$self->{waiting} = Simple_http::get_with_cb(cb => sub {$self->parseRSS(@_)},url => $url);
 }
@@ -251,13 +252,8 @@ sub parseRSS
 {	my ($self,$data) = @_;
 	delete $self->{waiting};
 	my $url;
-	if ($data =~ m/There are no upcoming events for this artist./gi) {
-		$self->{buffer}->set_text("");
-		my $iter=$self->{buffer}->get_start_iter;
-		my $fontsize=$self->{fontsize};
-		my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
-		$self->{buffer}->insert_with_tags($iter,"\nThere are no upcoming events for this artist.",$tag_noresults);
-		$self->{buffer}->set_modified(0);
+	if ($data =~ m/There are no upcoming events for this artist./gi | $data =~ m/There are no events to list here./gi) {
+		&set_buffer($self,"No upcoming events for this artist.");
 		return;
 	}
 	elsif ($data =~ m/http:\/\/ws.audioscrobbler.com(.*?).rss/gi) {
@@ -273,7 +269,8 @@ sub ArtistChanged
 	return unless defined $aID;
 	if ($self->{site} ne "biography") { $force = 1; }
 	$self->cancel;
-	$self->{artistratingvalue}=AA::Get("rating:average",'artist',$aID);
+	my $rating = AA::Get("rating:average",'artist',$aID);
+	$self->{artistratingvalue}= int($rating+0.5);
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
 	$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);
 	my $tip = "Average rating: ".$self->{artistratingvalue} ."\nRating range: ".$self->{artistratingrange}."\nTotal playcount: ".$self->{artistplaycount};
@@ -309,12 +306,7 @@ sub ArtistChanged
 
 sub load_url
 {	my ($self,$url)=@_;
-	$self->{buffer}->set_text("");
-	my $iter=$self->{buffer}->get_start_iter;
-	my $fontsize=$self->{fontsize};
-	my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
-	$self->{buffer}->insert_with_tags($iter,"\nLoading...",$tag_noresults);
-	$self->{buffer}->set_modified(0);
+	&set_buffer($self,"Loading...");
 	$self->cancel;
 	warn "info : loading $url\n";# if $::debug;
 	$self->{url}=$url;
@@ -396,12 +388,7 @@ sub loaded
 			}
 		}
 		my $text= $buffer->get_text($buffer->get_bounds, ::FALSE);
-		if ($text eq "Upcoming Events\n\n") {
-			$self->{buffer}->set_text("");
-			$infoheader = "\nNo results found";
-			$iter=$buffer->get_start_iter;
-			$buffer->insert_with_tags($iter,$infoheader,$tag_noresults);
-		}
+		if ($text eq "Upcoming Events\n\n") {	&set_buffer($self,"No results found");	}
 	}
 
 	$self->Save_text if $::Options{OPT.'AutoSave'} && $artistinfo_ok && $artistinfo_ok==1;
