@@ -1,3 +1,11 @@
+gmusicbrowser (1.1.5ppa11) lucid; urgency=low
+
+  * plugin "artist-info": new layout, weblinks, rss-forwarding
+    merge with git upstream (commit d5d134b64d131d1dac16 - 2010-08-18)
+    for a complete changelog see: github.com/ochosi/gmusicbrowser/commits/
+    
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Thu, 19 Aug 2010 21:07:38 +0200
+
 gmusicbrowser (1.1.5ppa10) lucid; urgency=low
 
   * updated plugin "artist-info" (enabled by default)

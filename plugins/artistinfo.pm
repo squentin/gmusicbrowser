@@ -253,7 +253,7 @@ sub parseRSS
 	delete $self->{waiting};
 	my $url;
 	if ($data =~ m/There are no upcoming events for this artist./gi | $data =~ m/There are no events to list here./gi) {
-		&set_buffer($self,"No upcoming events for this artist.");
+		&set_buffer($self,"No upcoming events for this artist");
 		return;
 	}
 	elsif ($data =~ m/http:\/\/ws.audioscrobbler.com(.*?).rss/gi) {
