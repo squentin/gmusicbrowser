@@ -6284,6 +6284,7 @@ sub SetFilter
 	$filters->[0]= Filter->newadd(TRUE, map($filters->[$_], 1..$#$filters) ); #sum filter
 	AddToFilterHistory( $filters->[0] );
 	for my $r ( @{$FilterWatchers{$group}} ) { $r->{'UpdateFilter_'.$group}($r,$Filters{$group}[0],$level,$group) };
+	if ($group eq 'Play') { $ListPlay->SetFilter($filters->[0]) }
 }
 sub RefreshFilters
 {	my ($object,$group)=@_;
