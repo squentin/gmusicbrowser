@@ -369,6 +369,7 @@ our %timespan_menu=
 		default	=> '""',
 		get	=> '(#_#==255 ? "" : #_#)',
 		display	=> '(#_#==255 ? "" : #_#)',
+		'stats:range'	=> 'push @{#HVAL#},#_default#;  ---- #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
 		'stats:average'	=> 'push @{#HVAL#},#_default#;  ---- #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
 		check	=> '#VAL#= #VAL# =~m/^\d+$/ ? (#VAL#>100 ? 100 : #VAL#) : "";',
 		set	=> '{ my $v=#VAL#; #_default#= ($v eq "" ? $::Options{DefaultRating} : $v); #_# = ($v eq "" ? 255 : $v); }',
