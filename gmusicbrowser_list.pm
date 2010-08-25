@@ -3386,6 +3386,14 @@ sub ChangeOption
 	$self->{last_filter}=undef;
 	$self->Filter;
 }
+sub ToggleField
+{	my ($self,$field)=@_;
+	my @list= split /\|/,$self->{fields};
+	my $nb=@list;
+	@list= grep $_ ne $field, @list; #remove
+	push @list,$field if $nb==@list; #add if not removed
+	$self->ChangeOption(fields=> join '|',@list );
+}
 
 sub PopupSelectorMenu
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
@@ -3399,6 +3407,14 @@ sub PopupSelectorMenu
 		$item->signal_connect(activate => $cb,$fields);
 		$menu->append($item);
 	}
+	my $item1=Gtk2::MenuItem->new(_"Select search fields");
+	$item1->set_submenu( ::BuildChoiceMenu(
+					{ map { $_=>Songs::FieldName($_) } qw/title artist album comment label genre file path album_artist version/ },
+					'reverse' =>1,
+					check=> sub { [split /\|/,$self->{fields}]; },
+					code => sub { $self->ToggleField($_[1]); },
+				) );
+	$menu->append($item1);
 	$menu->append(Gtk2::SeparatorMenuItem->new);
 	for my $key (sort { $Options{$a} cmp $Options{$b} } keys %Options)
 	{	my $item=Gtk2::CheckMenuItem->new($Options{$key});
