@@ -8444,7 +8444,7 @@ sub make_toolitem
 	$titem->set_proxy_menu_item($menu_item_id,$item);
 	my $radioi;
 	my $store=$self->get_model;
-	my $iter=$self->get_active_iter;
+	my $iter=$store->get_iter_first;
 	while ($iter)
 	{	my ($name,$val)=$store->get($iter,0,1);
 		$radioi=Gtk2::RadioMenuItem->new_with_label($radioi,$name);
