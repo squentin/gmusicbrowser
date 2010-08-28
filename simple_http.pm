@@ -10,6 +10,7 @@ use strict;
 use warnings;
 use Socket;# 1.3; ?
 use Fcntl;
+use IO::Handle;
 
 use constant { EOL => "\015\012" };
 my (@Cachedurl,%Cache,$CacheSize,%ipcache); #FIXME purge %ipcache from time to time
@@ -76,7 +77,7 @@ sub get_with_cb
 
 sub connecting_cb
 {	my $failed= ($_[1] >= 'hup'); #connection failed
-	my $self=$_[2];#warn "@_";
+	my $self=$_[2];
 	my $socket=$self->{sock};
 	my $port=$self->{port};
 	my $host=$self->{host};
@@ -93,6 +94,7 @@ sub connecting_cb
 	my $method=defined $post ? 'POST' : 'GET';
 	print $socket "$method $self->{file} HTTP/1.0".EOL;
 	print $socket "Host: $host:$port".EOL;
+	print $socket "User-Agent: Mozilla/5.0".EOL;
 	#print $socket "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6".EOL;
 	#print $socket "Accept: */*".EOL;
 	#print $socket "Connection: Keep-Alive".EOL;

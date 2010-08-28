@@ -36,9 +36,15 @@ my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 		sub { my $no= $_[0]=~m/<div class="noarticletext">/s; $_[0]=~s/^.*<!--\s*start content\s*-->(.*?)<!--\s*end content\s*-->.*$/$1/s && !$no; }],
 	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a',undef,
 			sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
-	lyricssongs =>	['lyrics-songs','http://www.lyrics-songs.com/winamp.php?musica=%s&artista=%a',undef,
+	lyricssongs =>	['lyrics-songs','http://letras.terra.com.br/winamp.php?musica=%s&artista=%a',undef,
 			sub { $_[0]=~s#<img src='p_bg2.gif'[^/]*/>##si; return 0 }], #remove image, return always 0 as lyrics-songs sometimes guess when the song is not found
-	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%s',undef,sub { $_[0]=~s!.*lyricbox.*?((?:&\#\d+;|<br ?/>){5,}).*!$1!s; return !!$1 }],
+	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%s',undef,
+			 sub {	return 0,'http://lyrics.wikia.com/'.$1 if $_[0]=~m#<span class="redirectText"><a href="/([^"]+)"#;
+				 #open my($f),">/mnt/ramdisk/lyr2"; print $f $_[0]; close $f;
+				$_[0]=~s!.*<div class='lyricbox'>.*?((?:&\#\d+;|<br ?/>){5,}).*!$1!s; #keep only the "lyric box"
+				return 0 if $_[0]=~m/&#91;&#46;&#46;&#46;&#93;<br/; # truncated lyrics : "[...]" => not auto-saved
+				return !!$1;
+			}],
 	#lyricwikiapi => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%s&fmt=html',undef,
 	#	sub { $_[0]!~m#<pre>\W*Not found\W*</pre>#s }],
 	#azlyrics => [ azlyrics => 'http://search.azlyrics.com/cgi-bin/azseek.cgi?q="%a"+"%s"'],
@@ -205,7 +211,11 @@ sub SongChanged
 
 	my ($title,$artist)= map ::url_escapeall($_), Songs::Get($ID,qw/title artist/);
 	my (undef,$url,$post,$check)=@{$sites{$::Options{OPT.'LyricSite'}}};
-	for ($url,$post) { next unless defined $_; s/%a/$artist/; s/%s/$title/; }
+	for my $val ($url,$post)
+	{	next unless defined $val;
+		if (ref $val) { $val= $val->(Songs::Get($ID,qw/title artist/),$ID); }
+		else {	$val=~s/%a/$artist/; $val=~s/%s/$title/; }
+	}
 	#$self->load_url($url,$post);
 	::IdleDo('8_lyrics'.$self,1000,\&load_url,$self,$url,$post,$check);
 }
@@ -299,8 +309,10 @@ sub loaded #_very_ crude html to gtktextview renderer
 	$data=Encode::decode($encoding,$data) if $encoding;
 
 	my $oklyrics;
-	$oklyrics= $self->{check}($data) if $self->{check};
-#print "$data\n";
+	if (my $check=$self->{check})
+	{	($oklyrics,my $redirect)= $check->($data);
+		if ($redirect) { $self->load_url($redirect,undef,$check); return; }
+	}
 	if ($self->{lastokurl})
 	{	my $history=$self->{history}||=[];
 		push @$history,$self->{lastokurl};
