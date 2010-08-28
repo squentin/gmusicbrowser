@@ -22,6 +22,8 @@ use constant
 {	OPT	=> 'PLUGIN_LYRICS_', # MUST begin by PLUGIN_ followed by the plugin ID / package name
 };
 
+my $notfound=_"Not found";
+
 my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics can be saved
 (	#lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php','artist=%a&songname=%s'],
 	lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php?artist=%a&songname=%s',undef,sub
@@ -37,10 +39,9 @@ my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a',undef,
 			sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
 	lyricssongs =>	['lyrics-songs','http://letras.terra.com.br/winamp.php?musica=%s&artista=%a',undef,
-			sub { $_[0]=~s#<img src='p_bg2.gif'[^/]*/>##si; return 0 }], #remove image, return always 0 as lyrics-songs sometimes guess when the song is not found
+			sub { my $l=html_extract($_[0],div=>'letra'); my $ref=\$_[0]; $$ref=$l ? $l : $notfound; return !!$l }],
 	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%s',undef,
 			 sub {	return 0,'http://lyrics.wikia.com/'.$1 if $_[0]=~m#<span class="redirectText"><a href="/([^"]+)"#;
-				 #open my($f),">/mnt/ramdisk/lyr2"; print $f $_[0]; close $f;
 				$_[0]=~s!.*<div class='lyricbox'>.*?((?:&\#\d+;|<br ?/>){5,}).*!$1!s; #keep only the "lyric box"
 				return 0 if $_[0]=~m/&#91;&#46;&#46;&#46;&#93;<br/; # truncated lyrics : "[...]" => not auto-saved
 				return !!$1;
@@ -272,6 +273,27 @@ sub populate_popup_cb
 	}
 
 	$menu->show_all;
+}
+
+sub html_extract
+{	my ($data,$tag,$id)=@_;
+	my $re=qr/<\Q$tag\E [^>]*id="(\w+)"[^>]*>|<(\/)?\Q$tag\E>/i;
+	my ($start,$depth);
+	while ($data=~m/$re/g)
+	{	if ($2) #closing
+		{	if ($depth)
+			{	$depth--;
+				return substr $data,$start,$+[0]-$start unless $depth;
+			}
+		}
+		elsif ($depth)
+		{	$depth++
+		}
+		elsif (defined $1 && $1 eq $id)
+		{	$start=$-[0];
+			$depth=1;
+		}
+	}
 }
 
 sub load_url
