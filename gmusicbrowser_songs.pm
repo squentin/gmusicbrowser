@@ -1862,7 +1862,7 @@ our %ReplaceFields=
 	s	=>	sub { my $l=Get('idlist',$_[0],$_[1])||[]; ::__('%d song','%d songs',scalar @$l) },
 	x	=>	sub { my $nb=@{GetXRef($_[0],$_[1])}; return $_[0] ne 'album' ? ::__("%d Album","%d Albums",$nb) : ::__("%d Artist","%d Artists",$nb);  },
 	X	=>	sub { my $nb=@{GetXRef($_[0],$_[1])}; return $_[0] ne 'album' ? ::__("%d Album","%d Albums",$nb) : $nb>1 ? ::__("%d Artist","%d Artists",$nb) : '';  },
-	b	=>	sub { my $l=Songs::UniqList('artist', Get('idlist',$_[0],$_[1])); return @$l==1 ? $l->[0] : ::__("%d artist","%d artists", scalar(@$l));  },	#FIXME check if done correctly
+	b	=>	sub { my $l=Songs::UniqList('artist', Get('idlist',$_[0],$_[1])); return @$l==1 ? Songs::Gid_to_Display('artist',$l->[0]) : ::__("%d artist","%d artists", scalar(@$l));  },
 );
 
 sub ReplaceFields
@@ -1945,8 +1945,11 @@ sub SortKeys
 	my $invert= $mode=~s/^-//;
 	my $h=my $pre=0;
 	$mode||='';
-	if ($mode eq 'songs') { $h=$hsongs; $pre='number'; }
-	if ($mode eq 'length')
+	if ($mode eq 'songs')
+	{	$h= $hsongs || GetHash('count',$field);
+		$pre='number';
+	}
+	elsif ($mode eq 'length')
 	{	$h= GetHash('length:sum',$field);
 		$pre='number';
 	}
