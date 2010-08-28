@@ -17,7 +17,7 @@
 
 use strict;
 use warnings;
-
+use utf8;
 
 package main;
 use Gtk2 '-init';
@@ -467,14 +467,14 @@ sub decode_url
 	return $s;
 }
 
-my %htmlelem= #FIXME maybe should use a module with a complete list
+my %html_entities= #FIXME maybe should use a module with a complete list
 (	amp => '&', 'lt' => '<', 'gt' => '>', quot => '"', apos => "'",
-	raquo => '»', copy => '©', middot => '·',
-	acirc => 'à', eacute => 'é', egrave => 'è', ecirc => 'ê',
+	raquo => 'Â»', copy => 'Â©', middot => 'Â·',
+	acirc => 'Ã ', eacute => 'Ã©', egrave => 'Ã¨', ecirc => 'Ãª',
 );
 sub decode_html
 {	my $s=shift;
-	$s=~s/&(?:#(\d+)|#x([0-9A-F]+)|([a-z]+));/$1 ? chr($1) : $2 ? chr(hex $2) : $htmlelem{$3}||'?'/egi;
+	$s=~s/&(?:#(\d+)|#x([0-9A-F]+)|([a-z]+));/$1 ? chr($1) : $2 ? chr(hex $2) : $html_entities{$3}||'?'/egi;
 	return $s;
 }
 
@@ -5052,12 +5052,12 @@ sub CheckCover
 sub AboutDialog
 {	my $dialog=Gtk2::AboutDialog->new;
 	$dialog->set_version(VERSIONSTRING);
-	$dialog->set_copyright("Copyright © 2005-2010 Quentin Sculo");
+	$dialog->set_copyright("Copyright Â© 2005-2010 Quentin Sculo");
 	#$dialog->set_comments();
 	$dialog->set_license("Released under the GNU General Public Licence version 3\n(http://www.gnu.org/copyleft/gpl.html)");
 	$dialog->set_website('http://gmusicbrowser.org');
 	$dialog->set_authors('Quentin Sculo <squentin@free.fr>');
-	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\nelementary icon theme : Simon Steinbeiß");
+	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\nelementary icon theme : Simon SteinbeiÃŸ");
 	$dialog->set_translator_credits("French : Quentin Sculo and Jonathan Fretin\nHungarian : Zsombor\nSpanish : Martintxo, Juanjo and Elega\nGerman : vlad <donvla\@users.sourceforge.net> & staubi <staubi\@linuxmail.org>\nPolish : tizzilzol team\nSwedish : Olle Sandgren\nChinese : jk");
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
