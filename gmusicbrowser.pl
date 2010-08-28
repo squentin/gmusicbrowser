@@ -1107,13 +1107,13 @@ if ($CmdLine{UseGnomeSession})
 	Watch(undef,NextSongs	=> sub { UpdateRelatedFilter('Next'); });
 	Watch(undef,CurSong	=> sub { UpdateRelatedFilter('Play'); });
 }
-
 our ($Play_package,%PlayPacks); my ($PlayNext_package,$Vol_package);
 for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_gstreamer-0.10.pm gmusicbrowser_server.pm/)
 {	eval { require $file } || warn $@;	#each file sets $::PlayPacks{PACKAGENAME} to 1 for each of its included playback packages
 }
 
 LoadPlugins();
+$SIG{HUP} = 'IGNORE';
 ReadSavedTags();
 
 # global Volume and Mute are used only for gstreamer and mplayer in SoftVolume mode
@@ -1162,6 +1162,7 @@ SkipTo($PlayTime) if $PlayTime; #done only now because of gstreamer
 CreateTrayIcon();
 
 if (my $cmds=delete $CmdLine{runcmd}) { run_command(undef,$_) for @$cmds; }
+$SIG{TERM} = \&Quit;
 
 #--------------------------------------------------------------
 Gtk2->main;
