@@ -585,13 +585,7 @@ sub Activate
 	my $activate=$self->{'activate'.$button} || $self->{activate};
 	my $aftercmd;
 	$aftercmd=$1 if $activate=~s/&(.*)$//;
-	if	($activate eq 'remove_and_play')
-	{	$songarray->Remove([$row]);
-		::Select(song=>$ID,play=>1);
-	}
-	elsif	($activate eq 'remove') 	{ $songarray->Remove([$row]); }
-	elsif	($activate eq 'properties')	{ ::DialogSongProp($ID); }
-	elsif	($activate eq 'playlist')
+	if	($activate eq 'playlist')
 	{	if ($self->{filter})
 		{	::Select( filter=>$self->{filter}, song=>$ID, play=>1);
 		}
@@ -600,11 +594,17 @@ sub Activate
 		}
 		else {$activate='play'}
 	}
-	else	{ ::DoActionForList($activate,[$ID]); }
-	if	($activate eq 'play')
+	if	($activate eq 'remove_and_play')
+	{	$songarray->Remove([$row]);
+		::Select(song=>$ID,play=>1);
+	}
+	elsif	($activate eq 'remove') 	{ $songarray->Remove([$row]); }
+	elsif	($activate eq 'properties')	{ ::DialogSongProp($ID); }
+	elsif	($activate eq 'play')
 	{	if ($self->{type} eq 'A')	{ ::Select(position=>$row,play=>1); }
 		else				{ ::Select(song=>$ID,play=>1); }
 	}
+	else	{ ::DoActionForList($activate,[$ID]); }
 	::run_command($self,$aftercmd) if $aftercmd;
 }
 
@@ -1428,7 +1428,7 @@ sub button_press_cb
 	my $self=::find_ancestor($tv, $tv->{selfpkg} );
 	my $but=$event->button;
 	my $sel=$tv->get_selection;
-	if ($event->type eq '2button-press')
+	if ($but!=1 && $event->type eq '2button-press')
 	{	$self->Activate($but);
 		return 1;
 	}
