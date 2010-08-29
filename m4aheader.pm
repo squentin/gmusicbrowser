@@ -374,7 +374,7 @@ sub write_file
 			$self->_close;
 		}
 		elsif ($self->{nofullrewrite})
-		{	warn "file contains a co64 or tfhd atom, adding metadata bigger than the free space is not suppôrted.\n";
+		{	warn "file contains a co64 or tfhd atom, adding metadata bigger than the free space is not supported.\n";
 			return 0;
 		}
 		else

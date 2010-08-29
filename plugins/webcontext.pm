@@ -27,6 +27,7 @@ BEGIN
 
 use strict;
 use warnings;
+use utf8;
 
 package GMB::Plugin::WebContext::MozEmbed;
 #use Gtk2::MozEmbed;
@@ -446,14 +447,14 @@ use constant
 
 my %locales=
 (	en => 'English',
-	fr => 'Français',
+	fr => 'FranÃ§ais',
 	de => 'Deutsch',
 	pl => 'Polski',
 	nl => 'Nederlands',
 	sv => 'Svenska',
 	it => 'Italiano',
-	pt => 'Português',
-	es => 'Español',
+	pt => 'PortuguÃªs',
+	es => 'EspaÃ±ol',
 #	ja => "\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e\x0a",
 );
 #::_utf8_on( $locales{ja} );

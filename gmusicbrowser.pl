@@ -17,7 +17,7 @@
 
 use strict;
 use warnings;
-
+use utf8;
 
 package main;
 use Gtk2 '-init';
@@ -467,14 +467,14 @@ sub decode_url
 	return $s;
 }
 
-my %htmlelem= #FIXME maybe should use a module with a complete list
+my %html_entities= #FIXME maybe should use a module with a complete list
 (	amp => '&', 'lt' => '<', 'gt' => '>', quot => '"', apos => "'",
-	raquo => '»', copy => '©', middot => '·',
-	acirc => 'à', eacute => 'é', egrave => 'è', ecirc => 'ê',
+	raquo => 'Â»', copy => 'Â©', middot => 'Â·',
+	acirc => 'Ã ', eacute => 'Ã©', egrave => 'Ã¨', ecirc => 'Ãª',
 );
 sub decode_html
 {	my $s=shift;
-	$s=~s/&(?:#(\d+)|#x([0-9A-F]+)|([a-z]+));/$1 ? chr($1) : $2 ? chr(hex $2) : $htmlelem{$3}||'?'/egi;
+	$s=~s/&(?:#(\d+)|#x([0-9A-F]+)|([a-z]+));/$1 ? chr($1) : $2 ? chr(hex $2) : $html_entities{$3}||'?'/egi;
 	return $s;
 }
 
@@ -1107,13 +1107,13 @@ if ($CmdLine{UseGnomeSession})
 	Watch(undef,NextSongs	=> sub { UpdateRelatedFilter('Next'); });
 	Watch(undef,CurSong	=> sub { UpdateRelatedFilter('Play'); });
 }
-
 our ($Play_package,%PlayPacks); my ($PlayNext_package,$Vol_package);
 for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_gstreamer-0.10.pm gmusicbrowser_server.pm/)
 {	eval { require $file } || warn $@;	#each file sets $::PlayPacks{PACKAGENAME} to 1 for each of its included playback packages
 }
 
 LoadPlugins();
+$SIG{HUP} = 'IGNORE';
 ReadSavedTags();
 
 # global Volume and Mute are used only for gstreamer and mplayer in SoftVolume mode
@@ -1162,6 +1162,7 @@ SkipTo($PlayTime) if $PlayTime; #done only now because of gstreamer
 CreateTrayIcon();
 
 if (my $cmds=delete $CmdLine{runcmd}) { run_command(undef,$_) for @$cmds; }
+$SIG{TERM} = \&Quit;
 
 #--------------------------------------------------------------
 Gtk2->main;
@@ -3018,17 +3019,18 @@ sub menupos	# function to position popupmenu below clicked widget
 }
 
 sub PopupAA
-{	my ($col,%args)=@_;
+{	my ($field,%args)=@_;
 	my ($list,$from,$callback,$format,$widget,$nosort,$nominor)=@args{qw/list from cb format widget nosort nominor/};
 	return undef unless @$Library;
-	$format||="%a";
+	my $isaa= $field eq 'album' || $field eq 'artist' || $field eq 'artists';
+	$format||="%a"; # "<b>%a</b>%Y\n<small>%s <small>%l</small></small>"
 	my $event=Gtk2->get_current_event;
 
 #### make list of albums/artists
 	my @keys;
 	if (defined $list) { @keys=@$list; }
-	elsif (defined $from)
-	{	if ($col eq 'album')
+	elsif ($isaa && defined $from)
+	{	if ($field eq 'album')
 		{ my %alb;
 		  $from=[$from] unless ref $from;
 		  for my $artist (@$from)
@@ -3059,22 +3061,20 @@ sub PopupAA
 		else
 		{ @keys= @{ AA::GetXRef(album=>$from) }; }
 	}
-	else { @keys=@{ AA::GetAAList($col) }; }
+	else { @keys=@{ AA::GetAAList($field) }; }
 
 #### callbacks
-	my $altcallback;
-	unless ($callback)
-	{  $callback=sub		#jump to first song
+	$callback||=sub		#jump to first song
 	   {	my ($item,$key)=@_;
 		return if $item->get_submenu;
-		my $IDs=AA::GetIDs($col,$key);
+		my $IDs=AA::GetIDs($field,$key);
 		if ($item->{middle})	{ Enqueue(@$IDs); }	#enqueue artist/album on middle-click
 		else
 		{	my $ID=FindFirstInListPlay( $IDs );
 			Select(song => $ID);
 		}
 	   };
-	   $altcallback=($col eq 'album')?
+	my $altcallback= $field eq 'album' ?
 		sub	#Albums button-press event : set up a songs submenu on right-click, alternate action on middle-click
 		{	my ($item,$event,$key)=@_;
 			if ($event->button==3)
@@ -3084,6 +3084,7 @@ sub PopupAA
 			elsif ($event->button==2) { $item->{middle}=1; }
 			0; #return 0 so that the item receive the click and popup the submenu
 		}:
+		$isaa ?
 		sub	#Artists button-press event : set up an album submenu on right-click, alternate action on middle-click
 		{	my ($item,$event,$key)=@_;
 			if ($event->button==3)
@@ -3092,13 +3093,16 @@ sub PopupAA
 			}
 			elsif ($event->button==2) { $item->{middle}=1; }
 			0;
+		}:
+		sub	#not album nor artist
+		{	my ($item,$event,$key)=@_;
+			if ($event->button==2) { $item->{middle}=1; }
+			0;
 		};
-	}
 
 	my $screen= $widget ? $widget->get_screen : $event->get_screen;
 	my $max=($screen->get_height)*.8;
 	#my $minsize=Gtk2::ImageMenuItem->new('')->size_request->height;
-	my @todo;	#hold images not yet loaded because not cached
 
 	my $createAAMenu=sub
 	{	my ($start,$end,$names,$keys)=@_;
@@ -3114,35 +3118,36 @@ sub PopupAA
 			my $label=Gtk2::Label->new;
 			$label->set_line_wrap(TRUE);
 			$label->set_alignment(0,.5);
-			$label->set_markup( AA::ReplaceFields($key,$format,$col,1) );
-			#$label->set_markup( AA::ReplaceFields($key,"<b>%a</b>%Y\n<small>%s <small>%l</small></small>",$col,1) );
+			$label->set_markup( AA::ReplaceFields($key,$format,$field,1) );
 			$item->add($label);
 			$item->signal_connect(activate => $callback,$key);
 			$item->signal_connect(button_press_event => $altcallback,$key) if $altcallback;
 			#$menu->append($item);
 			$menu->attach($item, $colnb, $colnb+1, $row, $row+1); if (++$row>$rows) {$row=0;$colnb++;}
-			my $img=AAPicture::newimg($col,$key,$size);
-			$item->set_image($img) if $img;
+			if ($isaa)
+			{	my $img=AAPicture::newimg($field,$key,$size);
+				$item->set_image($img) if $img;
+			}
 		}
 		return $menu;
 	}; #end of createAAMenu
 
-	my $min= ($col eq 'album')? $Options{AlbumMenu_min} : $Options{ArtistMenu_min};
+	my $min= $field eq 'album' ? $Options{AlbumMenu_min} : $isaa ? $Options{ArtistMenu_min} : 0;
 	$min=0 if $nominor;
 	my @keys_minor;
 	if ($min)
-	{	@keys= grep {  @{ AA::GetAAList($col,$_) }>$min or push @keys_minor,$_ and 0 } @keys;
+	{	@keys= grep {  @{ AA::GetAAList($field,$_) }>$min or push @keys_minor,$_ and 0 } @keys;
 		if (!@keys) {@keys=@keys_minor; undef @keys_minor;}
 	}
 
-	Songs::sort_gid_by_name($col,\@keys) unless $nosort;
-	my @names=@{Songs::Gid_to_Display($col,\@keys)}; #convert @keys to list of names
+	Songs::sort_gid_by_name($field,\@keys) unless $nosort;
+	my @names=@{Songs::Gid_to_Display($field,\@keys)}; #convert @keys to list of names
 
 	my $menu=Breakdown_List(\@names,5,20,35,$createAAMenu,\@keys);
 	return undef unless $menu;
 	if (@keys_minor)
-	{	Songs::sort_gid_by_name($col,\@keys_minor) unless $nosort;
-		my @names=@{Songs::Gid_to_Display($col,\@keys)};
+	{	Songs::sort_gid_by_name($field,\@keys_minor) unless $nosort;
+		my @names=@{Songs::Gid_to_Display($field,\@keys)};
 		my $item=Gtk2::MenuItem->new('minor'); #FIXME
 		my $submenu=Breakdown_List(\@names,5,20,35,$createAAMenu,\@keys_minor);
 		$item->set_submenu($submenu);
@@ -5010,12 +5015,12 @@ sub CheckCover
 sub AboutDialog
 {	my $dialog=Gtk2::AboutDialog->new;
 	$dialog->set_version(VERSIONSTRING);
-	$dialog->set_copyright("Copyright © 2005-2010 Quentin Sculo");
+	$dialog->set_copyright("Copyright Â© 2005-2010 Quentin Sculo");
 	#$dialog->set_comments();
 	$dialog->set_license("Released under the GNU General Public Licence version 3\n(http://www.gnu.org/copyleft/gpl.html)");
 	$dialog->set_website('http://gmusicbrowser.org');
 	$dialog->set_authors('Quentin Sculo <squentin@free.fr>');
-	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\nelementary icon theme : Simon Steinbeiß");
+	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\nelementary icon theme : Simon SteinbeiÃŸ");
 	$dialog->set_translator_credits("French : Quentin Sculo and Jonathan Fretin\nHungarian : Zsombor\nSpanish : Martintxo, Juanjo and Elega\nGerman : vlad <donvla\@users.sourceforge.net> & staubi <staubi\@linuxmail.org>\nPolish : tizzilzol team\nSwedish : Olle Sandgren\nChinese : jk");
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;

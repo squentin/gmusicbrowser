@@ -585,13 +585,7 @@ sub Activate
 	my $activate=$self->{'activate'.$button} || $self->{activate};
 	my $aftercmd;
 	$aftercmd=$1 if $activate=~s/&(.*)$//;
-	if	($activate eq 'remove_and_play')
-	{	$songarray->Remove([$row]);
-		::Select(song=>$ID,play=>1);
-	}
-	elsif	($activate eq 'remove') 	{ $songarray->Remove([$row]); }
-	elsif	($activate eq 'properties')	{ ::DialogSongProp($ID); }
-	elsif	($activate eq 'playlist')
+	if	($activate eq 'playlist')
 	{	if ($self->{filter})
 		{	::Select( filter=>$self->{filter}, song=>$ID, play=>1);
 		}
@@ -600,11 +594,17 @@ sub Activate
 		}
 		else {$activate='play'}
 	}
-	else	{ ::DoActionForList($activate,[$ID]); }
-	if	($activate eq 'play')
+	if	($activate eq 'remove_and_play')
+	{	$songarray->Remove([$row]);
+		::Select(song=>$ID,play=>1);
+	}
+	elsif	($activate eq 'remove') 	{ $songarray->Remove([$row]); }
+	elsif	($activate eq 'properties')	{ ::DialogSongProp($ID); }
+	elsif	($activate eq 'play')
 	{	if ($self->{type} eq 'A')	{ ::Select(position=>$row,play=>1); }
 		else				{ ::Select(song=>$ID,play=>1); }
 	}
+	else	{ ::DoActionForList($activate,[$ID]); }
 	::run_command($self,$aftercmd) if $aftercmd;
 }
 
@@ -1428,7 +1428,7 @@ sub button_press_cb
 	my $self=::find_ancestor($tv, $tv->{selfpkg} );
 	my $but=$event->button;
 	my $sel=$tv->get_selection;
-	if ($event->type eq '2button-press')
+	if ($but!=1 && $event->type eq '2button-press')
 	{	$self->Activate($but);
 		return 1;
 	}
@@ -3297,22 +3297,28 @@ our %Options=
 	literal		=> _"Literal search",
 	regexp		=> _"Regular expression",
 );
+our %Options2=
+(	autofilter	=> _"Auto filter",
+	suggest		=> _"Show suggestions",
+);
 our @DefaultOptions=
 (	nb	=> 1,
 	fields	=> $SelectorMenu[0][1],
+	autofilter =>1,
 );
 
 sub new
 {	my ($class,$opt)=@_;
 	my $self= bless Gtk2::HBox->new(0,0), $class;
 	%$opt=( @DefaultOptions, %$opt );
-	$self->{$_}=$opt->{$_} for qw/nb fields group searchfb/,keys %Options;
+	$self->{$_}=$opt->{$_} for qw/nb fields group searchfb/,keys %Options,keys %Options2;
 	my $entry=$self->{entry}=Gtk2::Entry->new;
 	$self->{SaveOptions}=\&SaveOptions;
 	$self->{DefaultFocus}=$entry;
 	#$entry->set_width_chars($opt->{width_chars}) if $opt->{width_chars};
 	$entry->signal_connect(changed => \&EntryChanged_cb);
-	$entry->signal_connect(activate => \&Filter);
+	$entry->signal_connect(activate => \&DoFilter);
+	$entry->signal_connect(activate => \&CloseSuggestionMenu);
 	$entry->signal_connect(key_press_event	=> sub { my ($entry,$event)=@_; return 0 unless Gtk2::Gdk->keyval_name($event->keyval) eq 'Escape'; $entry->set_text(''); return 1; });
 	$entry->signal_connect_after(activate => sub {::run_command($_[0],$opt->{activate});}) if $opt->{activate};
 	unless ($opt->{noselector})
@@ -3365,14 +3371,14 @@ sub new
 sub SaveOptions
 {	my $self=$_[0];
 	my %opt=(fields => $self->{fields});
-	$opt{$_}=1 for grep $self->{$_}, keys %Options;
+	$opt{$_}=1 for grep $self->{$_}, keys %Options, keys %Options2;
 	return \%opt;
 }
 
 sub ClearFilter
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	$self->{entry}->set_text('');
-	$self->Filter;
+	$self->DoFilter;
 }
 sub UpdateClearButton
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
@@ -3384,7 +3390,7 @@ sub ChangeOption
 {	my ($self,$key,$value)=@_;
 	$self->{$key}=$value;
 	$self->{last_filter}=undef;
-	$self->Filter;
+	$self->DoFilter;
 }
 sub ToggleField
 {	my ($self,$field)=@_;
@@ -3424,6 +3430,15 @@ sub PopupSelectorMenu
 			},$key);
 		$menu->append($item);
 	}
+	$menu->append(Gtk2::SeparatorMenuItem->new);
+	for my $key (sort { $Options2{$a} cmp $Options2{$b} } keys %Options2)
+	{	my $item=Gtk2::CheckMenuItem->new($Options2{$key});
+		$item->set_active(1) if $self->{$key};
+		$item->signal_connect(activate => sub
+			{	$self->{$_[1]}= $_[0]->get_active;
+			},$key);
+		$menu->append($item);
+	}
 	my $item2=Gtk2::MenuItem->new(_"Advanced Search ...");
 	$item2->signal_connect(activate => sub
 		{	::EditFilter($self,::GetFilter($self),undef,sub {::SetFilter($self,$_[0]) if defined $_[0]});
@@ -3434,7 +3449,7 @@ sub PopupSelectorMenu
 	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
 }
 
-sub Filter
+sub DoFilter
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $entry=$self->{entry};
 	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
@@ -3536,10 +3551,187 @@ sub Filter
 
 sub EntryChanged_cb
 {	my $entry=$_[0];
-	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
 	my $l= length($entry->get_text);
-	my $timeout= $l!=1 ? 100 : 1000;
-	$entry->{changed_timeout}= Glib::Timeout->add($timeout,\&Filter,$entry);
+	my $self= ::find_ancestor($entry,__PACKAGE__);
+	if ($self->{autofilter})
+	{	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
+		my $timeout= $l<2 ? 1000 : $l==2 ? 200 : 100;
+		$entry->{changed_timeout}= Glib::Timeout->add($timeout,\&DoFilter,$entry);
+	}
+	if ($self->{suggest})
+	{	Glib::Source->remove(delete $self->{suggest_timeout}) if $self->{suggest_timeout};
+		my $timeout= $l<2 ? 0 : $l==2 ? 200 : 100;
+		if ($timeout)	{ $self->{suggest_timeout}= Glib::Timeout->add($timeout,\&UpdateSuggestionMenu,$self); }
+		else		{ $self->CloseSuggestionMenu; }
+	}
+}
+
+sub CloseSuggestionMenu
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	Glib::Source->remove(delete $self->{suggest_timeout}) if $self->{suggest_timeout};
+	my $menu= delete $self->{matchmenu};
+	return unless $menu;
+	$menu->cancel;
+	$menu->destroy;
+}
+
+sub UpdateSuggestionMenu
+{	my $self=shift;
+	$self->CloseSuggestionMenu;
+	my $menu= $self->{matchmenu}= Gtk2::Menu->new;
+
+	my $h=$self->size_request->height;
+	my $w=$self->size_request->width;
+	my $screen=$self->get_screen;
+	my $monitor=$screen->get_monitor_at_window($self->window);
+	my ($xmin,$ymin,$monitorwidth,$monitorheight)=$screen->get_monitor_geometry($monitor)->values;
+	my $xmax=$xmin + $monitorwidth;
+	my $ymax=$ymin + $monitorheight;
+	my ($x,$y)=$self->window->get_origin;		# position of the parent widget on the screen
+	my ($dx,$dy)=$self->window->get_size;		# width,height of the parent widget
+	if ($self->isa('Gtk2::Widget') && $self->no_window)
+	{	(my$x2,my$y2,$dx,$dy)=$self->allocation->values;
+		$x+=$x2;$y+=$y2;
+	}
+	my $above=0;
+	my $height=$ymax-$y-$h;
+	if ($height<$y-$ymin) { $height=$y-$ymin; $above=1; }
+	$height*=.9;
+
+	my $found;
+	my $text= $self->{entry}->get_text;
+	for my $field (qw/artists album genre label title/)
+	{	my $list;
+		if ($field eq 'title')
+		{	$list= Filter->new('title:s:'.$text)->filter;
+			next unless @$list;
+			Songs::SortList($list,'-rating -playcount -lastplay');
+		}
+		else
+		{	$list= AA::GrepKeys($field, $text);
+			next unless @$list;
+			#AA::SortKeys($field,$list,'alpha');
+			AA::SortKeys($field,$list,'songs'); @$list= reverse @$list;
+			# remove 0 songs ?
+		}
+		$found=1;
+		my $item0= Gtk2::MenuItem->new;
+		my $label0= Gtk2::Label->new;
+		$label0->set_markup_with_format("<i> %s : %d</i>", Songs::FieldName($field), scalar(@$list));
+		$label0->set_alignment(1,.5);
+		$item0->add($label0);
+		$item0->show_all;
+		$height-= $item0->size_request->height;
+		$menu->append($item0);
+		my $format=	$field eq 'album'	? "<b>%a</b>%Y\n<small>%s by %b</small>":
+				$field=~m/^artists?$/	? "<b>%a</b>\n<small>%x %s%Y</small>"	:
+				$field eq 'title'	? "<b>%t</b>\n<small><small>by</small> %a <small>from</small> %l</small>":
+							  "<b>%a</b> (<small>%s</small>)";
+		if ($field eq 'title')	{ $item0->set_sensitive(0) }
+		else
+		{	$item0->{field}=$field;
+			$item0->{list}=$list;
+			$item0->{format}=$format;
+			$item0->signal_connect(button_press_event => \&SuggestionMenu_field_expand) unless $field eq 'title';
+		}
+		for my $i (0..::min(4,$#$list))
+		{	my $val= $list->[$i];
+			my $item;
+			if ($field eq 'artists' || $field eq 'album') #FIXME be more generic
+			{	if ( my $img=AAPicture::newimg($field,$val,32) )
+				{	$item=Gtk2::ImageMenuItem->new;
+					$item->set_image($img);
+				}
+			}
+			elsif ($field eq 'label') #FIXME be more generic
+			{	if (my $icon=Songs::Picture($val,$field,'icon'))
+				{	$item=Gtk2::ImageMenuItem->new;
+					$item->set_image( Gtk2::Image->new_from_stock($icon,'menu') );
+				}
+			}
+			$item||=Gtk2::MenuItem->new;
+			my $markup;
+			if ($field eq 'title') { $markup=::ReplaceFieldsAndEsc($val,$format); }
+			else
+			{	$markup=AA::ReplaceFields($val,$format,$field,1);
+			}
+			my $label=Gtk2::Label->new;
+			$label->set_markup($markup);
+			$label->set_ellipsize('end');
+			$label->set_alignment(0,.5);
+			$item->{val}=$val;
+			$item->{field}=$field;
+			$item->signal_connect(button_press_event => sub { $_[0]{middle}=$_[1]->button==2; });
+			$item->signal_connect(activate=> \&SuggestionMenu_item_activated_cb);
+			$item->add($label);
+			$item->show_all;
+			$height-= $item->size_request->height;
+			if ($height<0)
+			{	$menu->remove($item0) if $i==0;
+				last;
+			}
+			$menu->append($item);
+		}
+		last if $height<0;
+	}
+	return unless $found;
+	$menu->set_size_request($w*2,-1);
+	$menu->attach_to_widget($self->{entry}, sub {'empty detaching callback'});
+	$menu->show_all;
+	$menu->set_take_focus(0);
+	$menu->signal_connect(key_press_event => \&SuggestionMenu_key_press_cb);
+	$menu->signal_connect(selection_done  => \&CloseSuggestionMenu);
+	$menu->popup(undef,undef,sub { my $menu=shift; $x, ($above ? $y-$menu->size_request->height : $y+$h); },undef,0,Gtk2->get_current_event_time);
+	$menu->parent->resize(1,1);
+}
+sub SuggestionMenu_key_press_cb
+{	my ($menu,$event)=@_;
+	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
+	if (grep $key eq $_, qw/Up Down Return Right/)
+	{	my @items=$menu->get_children;
+		if ($key eq 'Up'   && $items[0]->state  eq 'prelight')	{ $items[0] ->deselect; return 1 }
+		if ($key eq 'Down' && $items[-1]->state eq 'prelight')	{ $items[-1]->deselect; return 1 }
+		if ($key eq 'Return' || $key eq 'Right')
+		{	my ($item)= grep $_->state eq 'prelight', @items;
+			if ($item)
+			{	SuggestionMenu_field_expand($item) if $item->{list};
+				return 0;
+			}
+		}
+		else {	return 0 }
+	}
+	#return 0 if grep $key eq $_, qw/Up Down/;
+	$menu->get_attach_widget->event($event);	# redirect the event to the entry
+	1;
+}
+sub SuggestionMenu_item_activated_cb
+{	my $item=shift;
+	my $self= ::find_ancestor($item,__PACKAGE__); # use the attach_widget to get back to self
+	my $val=   $item->{val};
+	my $field= $item->{field};
+	my $filter;
+	if ($field eq 'title')
+	{	$filter= Songs::MakeFilterFromID($field,$val);
+	}
+	else
+	{	$filter= Songs::MakeFilterFromGID($field,$val);
+	}
+	if (my $watch=delete $self->{entry}{changed_timeout}) {	Glib::Source->remove($watch); }
+	$self->CloseSuggestionMenu;
+	if ($item->{middle})
+	{	my $IDs= $field eq 'title' ? [$val] : $filter->filter;
+		::DoActionForList('queue', $IDs);
+	}
+	else { ::SetFilter($self,$filter,$self->{nb}); }
+}
+
+sub SuggestionMenu_field_expand
+{	my $item=shift;
+	return 0 if $item->get_submenu;
+	my $field= $item->{field};
+	my $submenu=::PopupAA($field, list=>$item->{list}, format=>$item->{format}, cb => sub { my ($item,$val)=@_; $item->{field}=$field; $item->{val}=$val; SuggestionMenu_item_activated_cb($item); });
+	$item->set_submenu($submenu);
+	return 0;
 }
 
 package SongSearch;

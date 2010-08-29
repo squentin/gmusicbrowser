@@ -16,7 +16,7 @@ BEGIN
 }
 use strict;
 use warnings;
-
+use utf8;
 
 package FileTag;
 
@@ -1320,7 +1320,7 @@ INIT
 	GEOB => [_"Encapsulated object",60],
 	PRIV => [_"Private Data",98],
 	UFID => [_"Unique file identifier",99],
-	TCOP => [_("Copyright")." ©",80],
+	TCOP => [_("Copyright")." Â©",80],
 	TPRO => [_"Produced (P)",81], #FIXME find (P) symbol
 	TCOM => [_"Composer",12],
 	TIT1 => [_"Grouping",13],
