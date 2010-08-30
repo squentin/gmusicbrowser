@@ -2299,8 +2299,9 @@ sub Pack
 	if (delete $self->{chooser_mode}) { $self->remove($_) for $self->get_children; }
 	my $angle= $self->{angle} || 0;
 	my $label= $wg->{tabtitle};
-	$label=$wg->{name} unless defined $label; #FIXME ? what to do if no tabtitle given
-	$label= $label->($wg) if ref $label && ref $label eq 'CODE';
+	if (!defined $label)			{ $label= $wg->{name} } #FIXME ? what to do if no tabtitle given
+	elsif (ref $label eq 'CODE')		{ $label= $label->($wg); }
+	elsif ($wg->can('DynamicTitle'))	{ $label= $wg->DynamicTitle($label); }
 	$label=Gtk2::Label->new($label) unless ref $label;
 	$label->set_angle($angle) if $angle;
 	::weaken( $wg->{tab_page_label}=$label ) if $wg->{tabrename};

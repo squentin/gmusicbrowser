@@ -608,6 +608,26 @@ sub Activate
 	::run_command($self,$aftercmd) if $aftercmd;
 }
 
+# functions for dynamic titles
+sub DynamicTitle
+{	my ($self,$format)=@_;
+	return $format unless $format=~m/%n/;
+	my $label=Gtk2::Label->new;
+	$label->{format}=$format;
+	::weaken( $label->{songarray}=$self->{array} );
+	::Watch($label,SongArray=> \&UpdateDynamicTitle);
+	UpdateDynamicTitle($label);
+	return $label;
+}
+sub UpdateDynamicTitle
+{	my ($label,$array)=@_;
+	return if $array && $array != $label->{songarray};
+	my $format=$label->{format};
+	my $nb= @{ $label->{songarray} };
+	$format=~s/%(.)/$1 eq 'n' ? $nb : $1/eg;
+	$label->set_text($format);
+}
+
 # functions for SavedLists, ie type=L
 sub MakeTitleLabel
 {	my $self=shift;
