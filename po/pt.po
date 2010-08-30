@@ -18,7 +18,7 @@ msgid "# songs"
 msgstr "# sons"
 
 msgid "%S by %a"
-msgstr "%S por %a"
+msgstr "%S --> %a"
 
 msgid "%f is set"
 msgstr "%f está ativada"
@@ -30,37 +30,37 @@ msgid "%n first added"
 msgstr "%n primeira adicionada"
 
 msgid "%n last added"
-msgstr "%n última adicionada"
+msgstr "%n última(s) adicionada(s)"
 
 msgid "%n last played"
-msgstr "%n Últimas reproduzidas"
+msgstr "%n última(s) reproduzida(s)"
 
 msgid "%n last skipped"
-msgstr "%n últimas puladas "
+msgstr "%n última(s) pulada(s)"
 
 msgid "%n less played"
-msgstr "%n menos tocadas"
+msgstr "%n menos reproduzida(s)"
 
 msgid "%n less skipped"
-msgstr "%n menos puladas"
+msgstr "%n menos pulada(s)"
 
 msgid "%n longest"
-msgstr " %n maiores"
+msgstr "%n maior(es)"
 
 msgid "%n most played"
-msgstr "%n mais tocadas"
+msgstr "%n mais reproduzida(s)"
 
 msgid "%n most skipped"
-msgstr "%n mais puladas"
+msgstr "%n mais pulada(s)"
 
 msgid "%n not played for the longest time"
-msgstr "%n não tocadas ultimamente"
+msgstr "%n não reproduzida(s) ultimamente"
 
 msgid "%n not skipped for the longest time"
-msgstr "%n não puladas ultimamente"
+msgstr "%n não pulada(s) ultimamente"
 
 msgid "%n shortest"
-msgstr "%n mais curtas"
+msgstr "%n mais curta(s)"
 
 msgid "' & ' and ', ' and ';'"
 msgstr "' & ' e ', ' e ';'"
@@ -78,7 +78,7 @@ msgid "(case insensitive)"
 msgstr "(Não distinguir entre maiúsculas/minúsculas)"
 
 msgid "(common parent folder : {common})"
-msgstr "(folder acima camum : {common})"
+msgstr "(pasta acima comum : {common})"
 
 msgid "(other)"
 msgstr "(outro)"
@@ -99,22 +99,22 @@ msgid "0 chance"
 msgstr "0 possibilidades"
 
 msgid "1 chance in {probability}"
-msgstr "1 possibilidade in {probability}"
+msgstr "1 possibilidade em {probability}"
 
 msgid "3 Filter panes"
-msgstr " painéis de filtro"
+msgstr "3 painéis de filtro"
 
 msgid "32x32 PNG file icon"
-msgstr "32x32 íconePNG"
+msgstr "32x32 ícone PNG"
 
 msgid "50 Last Added"
 msgstr "50 Últimas adicionadas"
 
 msgid "50 Last Played"
-msgstr "50 Últimas tocadas"
+msgstr "50 Últimas reproduzidas"
 
 msgid "50 Most Played"
-msgstr "50 mais tocadas"
+msgstr "50 mais reproduzidas"
 
 msgid "<Unknown>"
 msgstr "<Desconhecido>"
@@ -214,10 +214,10 @@ msgid "Add to list"
 msgstr "Adicionar a lista"
 
 msgid "Added"
-msgstr "Adicionado"
+msgstr "Adicionada"
 
 msgid "Added Today"
-msgstr "Adicionado Hoje"
+msgstr "Adicionada Hoje"
 
 msgid "Adding a radio"
 msgstr "Adicionando uma rádio"
@@ -411,13 +411,13 @@ msgid "Body text is not supported by current notification daemon"
 msgstr "Texto do corpo não é suportado pelo serviço de notificação atual"
 
 msgid "Browser"
-msgstr "Navegar"
+msgstr "Navegador"
 
 msgid "Browser window layout :"
 msgstr "Estilo da janela de navegação"
 
 msgid "Browser with SongTree"
-msgstr "Navegar com Árvore de Músicas"
+msgstr "Navegador com Árvore de Músicas"
 
 msgid "Buttons"
 msgstr "Botões"
@@ -724,7 +724,7 @@ msgid "Display synchronized lyrics of the current song"
 msgstr "Mostrar letras sincronizadas da música atual"
 
 msgid "Display tray tip for"
-msgstr "Mostrar tela de dica para"
+msgstr "Mostrar tela de info para"
 
 msgid "Do not add a title row"
 msgstr "Não adicionar uma linha de título"
@@ -981,7 +981,7 @@ msgid "Folders to search for new songs"
 msgstr "Pasta para procurar novas músicas"
 
 msgid "Follow playing song"
-msgstr "Seguir a música tocada"
+msgstr "Seguir a música reproduzida"
 
 msgid "Follow selected song"
 msgstr "Seguir a música selecionada"
@@ -1134,7 +1134,7 @@ msgid "Lang."
 msgstr "Língua"
 
 msgid "Last played"
-msgstr "Última tocada"
+msgstr "Última execução"
 
 msgid "Last skipped"
 msgstr "Última pulada"
@@ -1260,7 +1260,7 @@ msgid ""
 "Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
 "gnome."
 msgstr ""
-"Faça gmusicbrowser reagir às teclas multimídia Próximo/Anterior/Tocar/Parar no "
+"Faça gmusicbrowser reagir às teclas multimídia Próxima/Anterior/Tocar/Parar no "
 "gnome."
 
 msgid "Mass Rename"
@@ -1276,13 +1276,13 @@ msgid "Menu entry name"
 msgstr "Nome da entrada do Menu"
 
 msgid "Minimal tip"
-msgstr "Dica pequena"
+msgstr "botões e barra de acompanhamento"
 
 msgid "Minimum size"
 msgstr "Mínimo tamanho"
 
 msgid "Misc."
-msgstr "Mist."
+msgstr "Outros"
 
 msgid "Modification"
 msgstr "Modificação"
@@ -1330,7 +1330,7 @@ msgid "New name"
 msgstr "Novo nome"
 
 msgid "Next"
-msgstr "Próximo"
+msgstr "Próxima"
 
 msgid "Next Album"
 msgstr "Próximo Álbum"
@@ -1387,13 +1387,13 @@ msgid "Notify you of the playing song with the system's notification popups"
 msgstr "Notifica você da música em execução com a tela do sistema de notificação"
 
 msgid "Now playing"
-msgstr "Tocando agora"
+msgstr "O que estou ouvindo?"
 
 msgid "NowPlaying plugin"
 msgstr "Plugin O que estou ouvindo?"
 
 msgid "Number of days since added"
-msgstr "Número de dias desde adicionado"
+msgstr "Número de dias desde adicionada"
 
 msgid "Number of days since last played"
 msgstr "Número de dias desde última execução"
@@ -1411,10 +1411,10 @@ msgid "Number of seconds"
 msgstr "Número de segundos"
 
 msgid "Number of times played"
-msgstr "Número de vezes que foi executo"
+msgstr "Número de vezes que foi executada"
 
 msgid "Number of times skipped"
-msgstr "Número de vezes que foi pulado"
+msgstr "Número de vezes que foi pulada"
 
 msgid ""
 "ON -> smaller means more probable\n"
@@ -1456,7 +1456,7 @@ msgid "Open Browser window"
 msgstr "Abrir janela do navegador"
 
 msgid "Open Context window"
-msgstr "Abrir janela de Contexto"
+msgstr "Abrir janela de Conteúdo"
 
 msgid "Open Custom window"
 msgstr "Abrir Janela de Personalização"
@@ -1616,13 +1616,13 @@ msgid "Play/Pause"
 msgstr "Toca/Pausa"
 
 msgid "Played Today"
-msgstr "Tocadas Hoje"
+msgstr "Reproduzidas Hoje"
 
 msgid "Player mounted on :"
-msgstr "Tocador montado em :"
+msgstr "Player montado em :"
 
 msgid "Player window layout :"
-msgstr "Formato da janela do Tocador"
+msgstr "Formato da janela do Player"
 
 msgid "Playing"
 msgstr "Tocando"
@@ -1793,10 +1793,10 @@ msgid "Recent songs"
 msgstr "Músicas Recentes"
 
 msgid "Recently played"
-msgstr "Recentemente tocadas"
+msgstr "Recentemente reproduzidas"
 
 msgid "Recently played songs"
-msgstr "Músicas Recentemente tocadas"
+msgstr "Músicas Recentemente reproduzidas"
 
 msgid "Recording Dates"
 msgstr "Datas das Gravações"
@@ -1880,7 +1880,7 @@ msgid "Rename File"
 msgstr "Renomear Arquivo"
 
 msgid "Rename file"
-msgstr "Renomera arquivo"
+msgstr "Renomear arquivo"
 
 msgid "Rename files using this pattern :"
 msgstr "Renomear arquivos usando este padrão:"
@@ -2018,7 +2018,7 @@ msgid "Search"
 msgstr "Procurar"
 
 msgid "Search & Playlist"
-msgstr "Procurar & listar"
+msgstr "Procurar & Listar"
 
 msgid "Search & Queue"
 msgstr "Procurar & Enfileirar"
@@ -2030,7 +2030,7 @@ msgid "Search Album"
 msgstr "Procurar Álbum"
 
 msgid "Search Artist"
-msgstr "Procuar Artista"
+msgstr "Procurar Artista"
 
 msgid "Search Comment"
 msgstr "Procurar Comentário"
@@ -2125,13 +2125,13 @@ msgid "Set icon"
 msgstr "Defina ícone"
 
 msgid "Set player window layout"
-msgstr "Defina estilo da janela do tocador"
+msgstr "Defina estilo da janela do Player"
 
 msgid "Set subgroup"
 msgstr "Defina sub-grupo"
 
 msgid "Settings"
-msgstr "Definições"
+msgstr "Preferências"
 
 msgid ""
 "Shell command\n"
@@ -2161,7 +2161,7 @@ msgid "Show tray icon"
 msgstr "Mostrar ícone na bandeja"
 
 msgid "Show tray tip on song change"
-msgstr "Mostrar dica na mudança de música"
+msgstr "Mostrar info na mudança de música"
 
 msgid "Show/Hide"
 msgstr "Mostrar/Esconder"
@@ -2203,7 +2203,7 @@ msgid "Skip to next song if an error occurs"
 msgstr "Pular para próxima música se ocorrer um erro"
 
 msgid "Small player"
-msgstr "Tocador pequeno"
+msgstr "Player Pequeno"
 
 msgid "Smaller browser"
 msgstr "Navegador Menor"
@@ -2224,13 +2224,13 @@ msgid "Sort"
 msgstr "Classificar"
 
 msgid "Sort mode edition"
-msgstr "Classificar modo de edição"
+msgstr "Edição de modo de Classificação"
 
 msgid "Sort order"
-msgstr "Classificar modo"
+msgstr "modo de Classificação"
 
 msgid "Split artist names on (needs restart) :"
-msgstr "Divisão de artistas por nome (necessário reiniciar)"
+msgstr "Separar artistas por nome (necessário reiniciar)"
 
 msgid "Stop"
 msgstr "Parar"
@@ -2242,7 +2242,7 @@ msgid "Stop scanning"
 msgstr "Parar varredura"
 
 msgid "Stop when queue empty"
-msgstr "Parar quando fila vazia"
+msgstr "Parar quando a fila esvaziar"
 
 msgid "Stop, Play and Next buttons"
 msgstr "Botões Parar, Tocar e Próxima"
@@ -2257,7 +2257,7 @@ msgid "Strip wikipedia pages"
 msgstr "Cortar páginas Wikipedia"
 
 msgid "Submit Now-Playing OK"
-msgstr "Enviar OK Estou-Ouvindo"
+msgstr "Enviar OK O que estou ouvindo?"
 
 msgid "Submit OK"
 msgstr "Enviar OK"
@@ -2266,7 +2266,7 @@ msgid "Submit failed : "
 msgstr "Enviar falhou : "
 
 msgid "Submit played songs to last.fm"
-msgstr "Enviar músicas tocadas para last.fm"
+msgstr "Enviar músicas reproduzidas para last.fm"
 
 msgid "Subtitle"
 msgstr "Subtítulo"
@@ -2359,7 +2359,7 @@ msgid "Track peak"
 msgstr "Pico da Faixa"
 
 msgid "Tray tip window layout :"
-msgstr "Estilo da janela de dica :"
+msgstr "Estilo da janela de info :"
 
 msgid "Tuesday"
 msgstr "Terça-feira"
@@ -2484,16 +2484,16 @@ msgstr ""
 "o que está fazendo."
 
 msgid "Web context"
-msgstr "Contexto da web"
+msgstr "Conteúdo da web"
 
 msgid "Web context plugin"
-msgstr "Plugin contexto da web"
+msgstr "Plugin Conteúdo da web"
 
 msgid "Wednesday"
 msgstr "Quarta-feira"
 
 msgid "Weighted Random"
-msgstr "Modo Randômico personalizado"
+msgstr "Modo Aleatório personalizado"
 
 msgid "Widget name"
 msgstr "Nome do Widget"
@@ -2607,7 +2607,7 @@ msgid "an ogg file"
 msgstr "um arquivo ogg"
 
 msgid "another example"
-msgstr "outro examplo"
+msgstr "outro exemplo"
 
 msgid "apply filter"
 msgstr "aplicar filtro"
@@ -2661,25 +2661,25 @@ msgid "bootleg"
 msgstr "bootleg"
 
 msgid "broken"
-msgstr "quebrado"
+msgstr "quebrada"
 
 msgid "by"
 msgstr "por"
 
 msgid "by added"
-msgstr "pelo adicionado"
+msgstr "pelo adicionada"
 
 msgid "by lastplay"
-msgstr "pela última tocada"
+msgstr "pela última reproduzida"
 
 msgid "by lastplay & bootleg"
-msgstr "pela última tocada & bootleg"
+msgstr "pela última reproduzida & bootleg"
 
 msgid "by lastplay & play count"
-msgstr "pela última tocada & número de vezes tocada"
+msgstr "pela última reproduzida & número de vezes reproduzida"
 
 msgid "by play count"
-msgstr "pelo número de vezes tocada"
+msgstr "pelo número de vezes reproduzida"
 
 msgid "by rating"
 msgstr "pela avaliação"
@@ -2724,7 +2724,7 @@ msgid "day"
 msgstr "dia"
 
 msgid "days"
-msgstr "dias"
+msgstr "dia(s)"
 
 msgid "default"
 msgstr "padrão"
@@ -2736,7 +2736,7 @@ msgid "default folder"
 msgstr "pasta padrão"
 
 msgid "default fullscreen"
-msgstr "tela cheia padrão"
+msgstr "Tela cheia padrão"
 
 msgid "delete selected filter"
 msgstr "detelar o filtro selecionado"
@@ -2805,13 +2805,13 @@ msgid "examples :"
 msgstr "exemplos :"
 
 msgid "fallback-gain"
-msgstr ""
+msgstr "ganho de retorno"
 
 msgid "false"
 msgstr "falso"
 
 msgid "favorite"
-msgstr "favorito"
+msgstr "favorita"
 
 msgid "file format"
 msgstr "formato do arquivo"
@@ -2823,7 +2823,7 @@ msgid "filename without extension"
 msgstr "nome do arquivo sem extensão"
 
 msgid "first added"
-msgstr "adicionado primeiro"
+msgstr "adicionada primeiro"
 
 msgid "font size depends on"
 msgstr "depende do tamanho da fonte"
@@ -2844,10 +2844,10 @@ msgid "group by"
 msgstr "agrupado por"
 
 msgid "half-life : "
-msgstr "meia-vida : "
+msgstr "quantidade:"
 
 msgid "hours"
-msgstr "horas"
+msgstr "hora(s)"
 
 msgid "huge size"
 msgstr "tamanho imenso"
@@ -2865,10 +2865,10 @@ msgid "imported list"
 msgstr "lista importada"
 
 msgid "info"
-msgstr "info"
+msgstr "só artista/título/álbum/capa"
 
 msgid "interview"
-msgstr "visualização interna"
+msgstr "entrevista"
 
 msgid "invalid pattern"
 msgstr "padrão inválido"
@@ -2995,13 +2995,13 @@ msgstr ""
 "normalmente tags com imagens"
 
 msgid "itunes-like"
-msgstr "semelhante ao itunes"
+msgstr "Semelhante ao itunes"
 
 msgid "last added"
-msgstr "última adicionada"
+msgstr "última(s) adicionada(s)"
 
 msgid "last played"
-msgstr "última tocada"
+msgstr "última execução"
 
 msgid "last skipped"
 msgstr "última pulada"
@@ -3016,16 +3016,16 @@ msgid "lead artist"
 msgstr "artista que lidera"
 
 msgid "leaflet page"
-msgstr ""
+msgstr "folheto"
 
 msgid "left-side filter panes"
-msgstr "painéis de filtro do lado esquerdo"
+msgstr "Painéis de filtro do lado esquerdo"
 
 msgid "length of songs"
 msgstr "quantidade de músicas"
 
 msgid "less played"
-msgstr "menos tocadas"
+msgstr "menos reproduzidas"
 
 msgid "less skipped"
 msgstr "menos puladas"
@@ -3064,7 +3064,7 @@ msgid "minimum font size"
 msgstr "tamanho mínimo da fonte"
 
 msgid "minutes"
-msgstr "minutos"
+msgstr "minuto(s)"
 
 msgid "modified"
 msgstr "modificado"
@@ -3076,7 +3076,7 @@ msgid "month"
 msgstr "mês"
 
 msgid "months"
-msgstr "meses"
+msgstr "mês(es)"
 
 msgid "more than %a( ago)"
 msgstr "mais que %a( atrás)"
@@ -3088,7 +3088,7 @@ msgid "mosaic mode"
 msgstr "modo mosáico"
 
 msgid "most played"
-msgstr "mais tocadas"
+msgstr "mais reproduzidas"
 
 msgid "most skipped"
 msgstr "mais puladas"
@@ -3118,7 +3118,7 @@ msgid "never"
 msgstr "nunca"
 
 msgid "never played"
-msgstr "nunca tocada"
+msgstr "nunca reproduzida"
 
 msgid "next"
 msgstr "próxima"
@@ -3139,7 +3139,7 @@ msgid "no plugins found"
 msgstr "nenhum plugin encontrado"
 
 msgid "no splitting"
-msgstr "nenhum corte"
+msgstr "nenhuma separação"
 
 msgid "no to all"
 msgstr "não para todos"
@@ -3157,7 +3157,7 @@ msgid "not bootleg"
 msgstr "sem bootleg"
 
 msgid "not played for the longest time"
-msgstr "não tocada por um período mais longo"
+msgstr "não reproduzida por um período mais longo"
 
 msgid "not skipped for the longest time"
 msgstr "não pulada por um período mais longo"
@@ -3178,7 +3178,7 @@ msgid "only works with some lyrics source and when the lyrics tab is displayed"
 msgstr "somente funciona com algumas origens de letras e quando a tab letras está mostrada"
 
 msgid "open context window"
-msgstr "abrir janela de contexto"
+msgstr "abrir janela de conteúdo"
 
 msgid "options"
 msgstr "opções"
@@ -3205,10 +3205,10 @@ msgid "play count average"
 msgstr "média de contagem de toques"
 
 msgid "played"
-msgstr "tocado"
+msgstr "reproduzida"
 
 msgid "played>4"
-msgstr "tocado>4"
+msgstr "reproduzida>4"
 
 msgid "port :"
 msgstr "porta :"
@@ -3223,7 +3223,7 @@ msgid "quit when queue empty"
 msgstr "sair quando vila esvaziar"
 
 msgid "quodlibet-like"
-msgstr "quodlibet-like"
+msgstr "Semelhante ao quodlibet"
 
 msgid "rating average"
 msgstr "média de avaliação"
@@ -3289,7 +3289,7 @@ msgid "scan now"
 msgstr "Verificar agora"
 
 msgid "seconds"
-msgstr "segundos"
+msgstr "segundo(s)"
 
 msgid "set"
 msgstr "dna"
@@ -3430,7 +3430,7 @@ msgid "wait for more when queue empty"
 msgstr "esperar por mais quando lista vazia"
 
 msgid "weeks"
-msgstr "semanas"
+msgstr "semana(s)"
 
 msgid "weight :"
 msgstr "peso :"
@@ -3485,7 +3485,7 @@ msgid "year (highest)"
 msgstr "ano (mais alto)"
 
 msgid "years"
-msgstr "anos"
+msgstr "ano(s)"
 
 msgid "yes to all"
 msgstr "sim para todos"
@@ -3644,4 +3644,10 @@ msgstr[1] "Essess rótulos são definidos para músicas% d."
 
 msgid "Queue Edit"
 msgstr "Edição de Fila"
+
+msgid "Recent songs include skipped songs that haven't been played."
+msgstr "Músicas recentes incluindo músicas saltadas que não foram reproduzidas."
+
+
+
 

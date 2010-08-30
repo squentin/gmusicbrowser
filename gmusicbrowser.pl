@@ -2963,7 +2963,7 @@ sub ChooseSongs
 	 { my ($mitem,$event)=@_;
 	   if	($event->button == 2) { $mitem->{middle}=1 }
 	   elsif($event->button == 3)
-	   {	my $submenu=BuildMenu(\@SongCMenu,{mode => '', IDs=> [$_[2]]});
+	   {	my $submenu=BuildMenu(\@SongCMenu,{mode => 'P', IDs=> [$_[2]]});
 		$submenu->show_all;
 		$_[0]->set_submenu($submenu);
 		#$submenu->signal_connect( selection_done => sub {$menu->popdown});
