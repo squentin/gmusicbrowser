@@ -6054,10 +6054,10 @@ sub update_row
 
 
 sub Scroll_to_TopEnd
-{	my ($self,$up)=@_;
+{	my ($self,$end)=@_;
 	my $adj=$self->{vadj};
-	if ($up)	{ $adj->set_value(0); }
-	else		{ $adj->set_value($adj->upper); }
+	if ($end)	{ $adj->set_value($adj->upper-$adj->page_size); }
+	else		{ $adj->set_value(0); }
 }
 
 sub drag_received_cb
