@@ -1528,7 +1528,7 @@ sub DateString
 		last if $diff>$max;
 		$fmt=shift @formats;
 	}
-	::strftime($fmt,localtime $time);
+	::strftime2($fmt,localtime $time);
 }
 
 #sub Album_Artist #guess album artist

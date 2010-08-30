@@ -41,7 +41,7 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  my $set_clip_rectangle_orig=\&Gtk2::Gdk::GC::set_clip_rectangle;
  *Gtk2::Gdk::GC::set_clip_rectangle=sub { &$set_clip_rectangle_orig if $_[1]; } if $Gtk2::VERSION <1.102; #work-around $rect can't be undef in old bindings versions
 }
-use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES strftime mktime/;
+use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime/;
 use List::Util qw/min max sum first/;
 use File::Copy;
 use File::Spec::Functions qw/file_name_is_absolute catfile rel2abs/;
@@ -691,6 +691,10 @@ sub ConvertSize
 	return $size;
 }
 
+my ($strftime_encoding)= setlocale(LC_TIME)=~m#\.([^@]+)#;
+sub strftime2	# try to return an utf8 value from strftime
+{	$strftime_encoding ? Encode::decode($strftime_encoding, &strftime) : &strftime;
+}
 
 #---------------------------------------------------------------
 our $DAYNB=int(time/86400)-12417;#number of days since 01 jan 2004
@@ -5496,7 +5500,7 @@ sub PrefMisc
 
 	my $dateex= mktime(5,4,3,2,0,(localtime)[5]);
 	my $datetip= join "\n", _"use standard strftime variables",	_"examples :",
-			map( sprintf("%s : %s",$_,strftime($_,localtime($dateex))), split(/ *\| */,"%a %b %d %H:%M:%S %Y | %A %B %I:%M:%S %p %Y | %d/%m/%y %H:%M | %X %x | %F %r | %c | %s") ),
+			map( sprintf("%s : %s",$_,strftime2($_,localtime($dateex))), split(/ *\| */,"%a %b %d %H:%M:%S %Y | %A %B %I:%M:%S %p %Y | %d/%m/%y %H:%M | %X %x | %F %r | %c | %s") ),
 			'',
 			_"Additionally this format can be used :\n default number1 format1 number2 format2 ...\n dates more recent than number1 seconds will use format1, ...";
 	my $datefmt=NewPrefEntry(DateFormat => _"Date format :", tip => $datetip, history=> 'DateFormat_history');
