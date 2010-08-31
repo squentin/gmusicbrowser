@@ -126,7 +126,7 @@ sub Resume
 sub SkipTo
 {	my $sec=$_[1];
 	::setlocale(::LC_NUMERIC, 'C');
-	print $CMDfh "seek $sec 2\n";
+	print $CMDfh "pausing_keep seek $sec 2\n";
 	::setlocale(::LC_NUMERIC, '');
 }
 
