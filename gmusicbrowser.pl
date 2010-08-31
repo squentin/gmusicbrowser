@@ -4346,22 +4346,29 @@ sub LabelEditMenu
 		if ($_[0]->get_active)	{ SetLabels($IDs,[$f],undef); }
 		else			{ SetLabels($IDs,undef,[$f]); }
 	 };
-	MakeFlagToggleMenu($field,$hash,$menusub_toggled);
+	MakeFlagMenu($field,$menusub_toggled,$hash);
 }
 
-sub MakeFlagToggleMenu	#FIXME special case for no @keys, maybe a menu with a greyed-out item "no #none#"
-{	my ($field,$hash,$callback)=@_;
+sub MakeFlagMenu	#FIXME special case for no @keys, maybe a menu with a greyed-out item "no #none#"
+{	my ($field,$callback,$hash)=@_;
 	my @keys= @{Songs::ListAll($field)};
 	my $makemenu=sub
 	{	my ($start,$end,$keys)=@_;
 		my $menu=Gtk2::Menu->new;
 		for my $i ($start..$end)
 		{	my $key=$keys->[$i];
-			my $item=Gtk2::CheckMenuItem->new_with_label($key);
-			my $state= $hash->{$key}||0;
-			if ($state==1){ $item->set_active(1); }
-			elsif ($state==2)  { $item->set_inconsistent(1); }
-			$item->signal_connect(toggled => $callback,$key);
+			my $item;
+			if ($hash)
+			{	$item=Gtk2::CheckMenuItem->new_with_label($key);
+				my $state= $hash->{$key}||0;
+				if ($state==1){ $item->set_active(1); }
+				elsif ($state==2)  { $item->set_inconsistent(1); }
+				$item->signal_connect(toggled => $callback,$key);
+			}
+			else
+			{	$item=Gtk2::MenuItem->new($key);
+				$item->signal_connect(activate => $callback,$key);
+			}
 			$menu->append($item);
 		}
 		return $menu;
