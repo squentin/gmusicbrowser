@@ -6279,8 +6279,10 @@ sub FollowSong
 	return unless defined $::SongID;
 	my $array=$self->{array};
 	return unless $array;
+	my $row;
+	if ($self->{mode} eq 'playlist') { $row=$::Position; }
 	if ($array->IsIn($::SongID))
-	{	my $row= ::first { $array->[$_]==$::SongID } 0..$#$array;
+	{	$row= ::first { $array->[$_]==$::SongID } 0..$#$array unless defined $row && $row>=0;
 		$self->set_cursor_to_row($row);
 	}
 	::HasChangedSelID($self->{group},$::SongID);
