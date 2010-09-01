@@ -2407,11 +2407,11 @@ sub NextDiff	#go to next song whose $field value is different than current's
 	my $position=$Position||0;
 	if ($TogLock && $TogLock eq $field)	 #remove lock on a different field if not found ?
 	{	$playlist=$SelectedFilter->filter;
-		SortList($playlist,$Options{Sort}) unless $RandomMode;
+		SortList($playlist) unless $RandomMode;
 		$position=FindPositionSong($SongID,$playlist);
 	}
 	my $list;
-	if ($RandomMode) { $list= $filter->filter($playlist); warn scalar @$playlist; }
+	if ($RandomMode) { $list= $filter->filter($playlist); }
 	else
 	{	my @rows=$position..$#$playlist;
 		push @rows, 0..$position-1 if $Options{Repeat};
@@ -2611,7 +2611,7 @@ sub FindFirstInListPlay		#Choose a song in @$lref based on sort order, if possib
 	else
 	{	@l=@$lref unless @l;
 		push @l,$SongID if defined $SongID && !exists $h{$SongID};
-		SortList(\@l,$sort);
+		SortList(\@l);
 		if (defined $SongID)
 		{ for my $i (0..$#l-1)
 		   { next if $l[$i]!=$SongID; $ID=$l[$i+1]; last; }
@@ -2626,12 +2626,9 @@ sub Shuffle
 	Select('sort' => 'shuffle');
 }
 
-sub SortList	#sort @$listref according to $sort
-{	my $time=times; #DEBUG
-	warn "deprecated SortList @_\n"; #PHASE1 DELME
-	my ($listref,$sort)=@_;
-	$sort||=$Options{Sort};
-	my $func; my $insensitive;
+sub SortList	#sort @$listref according to current sort order, or last ordered sort if no current sort order
+{	my $listref=shift;
+	my $sort=$Options{Sort};
 	if ($sort=~m/^random:/)
 	{	@$listref=Random->OneTimeDraw($sort,$listref);
 	}
@@ -2639,7 +2636,6 @@ sub SortList	#sort @$listref according to $sort
 	{	$sort=$Options{Sort_LastOrdered} if $sort eq '';
 		Songs::SortList($listref,$sort);
 	}
-	$time=times-$time; warn "sort ($sort) : $time s\n"; #DEBUG
 }
 
 sub ExplainSort
@@ -2904,7 +2900,7 @@ sub ChooseSongsTitle		#Songs with the same title
 	my $list= $filter->filter;
 	return 0 if @$list<2 || @$list>100;	#probably a problem if it finds >100 matching songs, and making a menu with a huge number of items is slow
 	my @list=grep $_!=$ID,@$list;
-	SortList(\@list,'artist:i album:i');
+	Songs::SortList(\@list,'artist:i album:i');
 	return ChooseSongs( __x( _"by {artist} from {album}", artist => "<b>%a</b>", album => "%l") ,@list);
 }
 
@@ -2912,7 +2908,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 {	my $album=$_[0];
 	return unless defined $album;
 	my $list= AA::GetIDs(album=>$album);
-	SortList($list,'disc track file');
+	Songs::SortList($list,'disc track file');
 	if (Songs::Get($list->[0],'disc'))
 	{	my $disc=''; my @list2;
 		for my $ID (@$list)
@@ -4131,7 +4127,7 @@ sub CaseSensFile	#find case-sensitive filename from a case-insensitive filename
 sub DialogMassRename
 {	return if $CmdLine{ro};
 	my @IDs= uniq(@_); #remove duplicates IDs in @_ => @IDs
-	::SortList(\@IDs,'path album disc track file');
+	Songs::SortList(\@IDs,'path album:i disc track file');
 	my $dialog = Gtk2::Dialog->new
 			(_"Mass Renaming", undef,
 			 [qw/destroy-with-parent/],

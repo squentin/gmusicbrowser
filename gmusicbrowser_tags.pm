@@ -492,7 +492,7 @@ sub new
 #short circuit if a LOT of songs : don't add file-specific tags, building the GUI would be too long anyway
 return $self if @IDs>1000;
 #######################################################
-	::SortList(\@IDs,'path album disc track file');
+	Songs::SortList(\@IDs,'path album:i disc track file');
 	#edition of file-specific tags (track title)
 	my $perfile_table=Gtk2::Table->new( scalar(@IDs), 10, FALSE);
 	$self->{perfile_table}=$perfile_table;
