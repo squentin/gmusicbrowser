@@ -2635,8 +2635,9 @@ sub SortList	#sort @$listref according to $sort
 	if ($sort=~m/^random:/)
 	{	@$listref=Random->OneTimeDraw($sort,$listref);
 	}
-	elsif ($sort ne '')		# generate custom sort function
-	{	Songs::SortList($listref,$sort);
+	else	# generate custom sort function
+	{	$sort=$Options{Sort_LastOrdered} if $sort eq '';
+		Songs::SortList($listref,$sort);
 	}
 	$time=times-$time; warn "sort ($sort) : $time s\n"; #DEBUG
 }

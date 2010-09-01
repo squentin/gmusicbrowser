@@ -2536,7 +2536,7 @@ sub _staticfy
 		::HasChanged('SongArray',$self,'mode');
 	}
 	$::PlayFilter=undef;
-	if (!$::RandomMode && $::Options{Sort})	{ $::SortFields=[]; $::Options{Sort}=''; ::QHasChanged('Sort'); }
+	if (!$::RandomMode && $::Options{Sort})	{ $::SortFields=[]; $::Options{Sort_LastOrdered}=$::Options{Sort}; $::Options{Sort}=''; ::QHasChanged('Sort'); }
 }
 
 #sub _updatepos
