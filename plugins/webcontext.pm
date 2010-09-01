@@ -17,9 +17,9 @@ my ($OKMoz,$OKWebKit,$CrashMoz);
 BEGIN
 {	{	last unless (grep -f $_.'/Gtk2/MozEmbed.pm',@INC);
 		# test if mozembed is working
-		system(q(GNOME_DISABLE_CRASH_DIALOG=1 perl -e 'use Gtk2 "-init"; use Gtk2::MozEmbed;$w=Gtk2::Window->new;my $e=Gtk2::MozEmbed->new; $w->add($e);$w->show_all;')); #this segfault when mozembed doesn't find its libs
+		system(q(GNOME_DISABLE_CRASH_DIALOG=1 perl -e 'use Gtk2 "-init"; use Gtk2::MozEmbed;$w=Gtk2::Window->new;my $e=Gtk2::MozEmbed->new; $w->add($e);$w->show_all; exit 0')); #this segfault when mozembed doesn't find its libs
 		#if (($? & 127) ==11) {die "Error : mozembed libraries not found. You need to add the mozilla path in /etc/ld.so.conf and run ldconfig (as root) or add the mozilla libraries path to the LD_LIBRARY_PATH environment variable.\n"}
-		if (($? & 127) ==11) { $CrashMoz=1; last; }
+		if ($?) { warn "Gtk2::MozEmbed found but not working.\n"; $CrashMoz=1; last; } #crash or fail to load
 		$OKMoz=1;
 	}
 	$OKWebKit=1 if grep -f $_.'/Gtk2/WebKit.pm',@INC;
