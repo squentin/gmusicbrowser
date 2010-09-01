@@ -1676,8 +1676,7 @@ sub FindFirst		#FIXME add a few fields (like 'disc track path file') to all sort
 }
 sub SortList		#FIXME add a few fields (like 'disc track path file') to all sort so that the sort result is constant, ie doesn't depend on the starting order
 {	my $time=times; #DEBUG
-	my $listref=$_[0]; my $sort=$_[1]; warn "Songs::SortList(@_)\n";
-	#warn "known sort functions :\n"; warn "$_\n" for grep m/^sort /, keys %FuncCache;
+	my $listref=$_[0]; my $sort=$_[1];
 	my $func= $FuncCache{"sort $sort"} ||=
 	 do {	#my $insensitive;
 		my @code;
@@ -1699,7 +1698,7 @@ sub SortList		#FIXME add a few fields (like 'disc track path file') to all sort 
 		Compile("sort $sort", $code);
 	    };
 	$func->($listref) if $func;
-	$time=times-$time; warn "sort ($sort) : $time s\n"; #DEBUG
+	warn "sort ($sort) : ".(times-$time)." s\n" if $::debug; #DEBUG
 }
 sub SortDepends
 {	my @f=split / /,shift;
