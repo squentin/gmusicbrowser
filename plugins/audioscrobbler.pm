@@ -26,7 +26,6 @@ require 'simple_http.pm';
 our $ignore_current_song;
 
 my $self=bless {},__PACKAGE__;
-my ($timecount,$songsubmitted);
 my @ToSubmit; my $NowPlaying; my $unsent_saved=0;
 my $interval=5; my ($timeout,$waiting);
 my ($HandshakeOK,$submiturl,$nowplayingurl,$sessionid);
@@ -67,8 +66,8 @@ sub prefbox
 			::openurl($url);
 		});
 	my $ignore=Gtk2::CheckButton->new(_"Don't submit current song");
-	$ignore->signal_connect(toggled=>sub { return if $_[0]->{busy}; $ignore_current_song=$_[0]->get_active; ::HasChanged('Lastfm_ignore_current'); });
-	::Watch($ignore,Lastfm_ignore_current => sub { $_[0]->{busy}=1; $_[0]->set_active($ignore_current_song);delete $_[0]->{busy}; } );
+	$ignore->signal_connect(toggled=>sub { return if $_[0]->{busy}; $ignore_current_song= $_[0]->get_active ? $::SongID : undef; ::HasChanged('Lastfm_ignore_current'); });
+	::Watch($ignore,Lastfm_ignore_current => sub { $_[0]->{busy}=1; $_[0]->set_active(defined $ignore_current_song); delete $_[0]->{busy}; } );
 	$vbox->pack_start($_,::FALSE,::FALSE,0) for $label2,$entry1,$entry2,$ignore;
 	$vbox->add( ::LogView($Log) );
 	return $vbox;
@@ -79,10 +78,11 @@ sub userpass_changed
 }
 
 sub SongChanged
-{	$songsubmitted=$timecount=0;
-	if ($ignore_current_song) {$ignore_current_song=undef; ::HasChanged('Lastfm_ignore_current');}
+{	if (defined $ignore_current_song)
+	{	return if defined $::SongID && $::SongID == $ignore_current_song;
+		$ignore_current_song=undef; ::HasChanged('Lastfm_ignore_current');
+	}
 	$NowPlaying=undef;
-
 	my ($title,$artist,$album,$track,$length)= Songs::Get($::SongID,qw/title artist album track length/);
 	return if $title eq '' || $artist eq '';
 	$NowPlaying= [ $artist, $title, $album, $length, $track, '' ];
@@ -90,15 +90,12 @@ sub SongChanged
 }
 
 sub Played
-{	return if $ignore_current_song;
-	my (undef,$ID,undef,$start_time,$seconds_start,$seconds_end)=@_;
-	my $diff= $seconds_end - $seconds_start;
-	return unless $diff>0;
-	$timecount+=$diff;
+{	my (undef,$ID,undef,$start_time,$seconds,$coverage)=@_;
+	return if $ignore_current_song;
+	return unless $seconds>10;
 	my $length= Songs::Get($ID,'length');
-	if (!$songsubmitted && $length>=30 && ($timecount >= 240 || $timecount >= $length/2) )
-	{	$songsubmitted=1;
-		my ($title,$artist,$album,$track)= Songs::Get($ID,qw/title artist album track/);
+	if ($length>=30 && ($seconds >= 240 || $coverage >= .5) )
+	{	my ($title,$artist,$album,$track)= Songs::Get($ID,qw/title artist album track/);
 		return if $title eq '' || $artist eq '';
 		::IdleDo("9_".__PACKAGE__,10000,\&Save) if @ToSubmit>$unsent_saved;
 		push @ToSubmit,[ $artist,$title,$album,'',$length,$start_time,$track,'P' ];
