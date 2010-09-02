@@ -717,7 +717,7 @@ our ($MainWindow,$FullscreenWindow); my $OptionsDialog;
 my $TrayIcon;
 my %Editing; #used to keep track of opened song properties dialog and lyrics dialog
 our $PlayTime;
-our ($StartTime,$StartedAt,$PlayingID,$PlayedPartial);
+our ($StartTime,$StartedAt,$PlayingID, @Played_segments);
 our $CurrentDir=$ENV{PWD};
 #$ENV{PULSE_PROP_media.role}='music'; # pulseaudio hint. could set other pulseaudio properties, FIXME doesn't seem to reach pulseaudio
 
@@ -2037,9 +2037,9 @@ sub Forward
 sub SkipTo
 {	return unless defined $SongID;
 	my $sec=shift;
-	#return unless $sec=~m/^\d+(?:\.\d+)?$/;
-	if (defined $PlayingID)
-	{	$StartedAt=$sec unless (defined $PlayTime && $PlayingID==$SongID && $PlayedPartial && $sec<$PlayTime);	#don't re-set $::StartedAt if rewinding a song not fully(85%) played
+	if (defined $PlayTime) # if song already playing
+	{	push @Played_segments, $StartedAt, $PlayTime;
+		$StartedAt=$sec;
 		$Play_package->SkipTo($sec);
 	}
 	else	{ Play($sec); }
@@ -2167,17 +2167,46 @@ sub AddToRecent	#add song to recently played list
 	}
 }
 
+sub Coverage	# find number of unique seconds played from a list of start,stop times
+{	my @segs=@_;
+	my $sum=0;
+	while (@segs)
+	{	my ($start,$stop)=splice @segs,0,2;
+		my $i=0;
+		my $th=.5;	#threshold : ignore differences of less than .5s
+		while ($i<@segs)
+		{	my $s1=$segs[$i];
+			my $s2=$segs[$i+1];
+			if ($start-$s1<=$th && $s1-$stop<=$th || $start-$s2<=$th && $s2-$stop<=$th) # segments overlap
+			{	$stop =$s2 if $s2>$stop;
+				$start=$s1 if $s1<$start;
+				splice @segs,$i,2;
+				$i=0;
+			}
+			else { $i+=2; }
+		}
+		my $length= $stop-$start;
+		$sum+= $length if $length>$th;
+	}
+	return $sum;
+}
+
 sub Played
 {	return unless defined $PlayingID;
 	my $ID=$PlayingID;
-	undef $PlayingID;
 	warn "Played : $ID $StartTime $StartedAt $PlayTime\n" if $debug;
 	AddToRecent($ID) unless $Options{AddNotPlayedToRecent};
 	return unless defined $PlayTime;
-	$PlayedPartial=$PlayTime-$StartedAt < $Options{PlayedPercent} * Songs::Get($ID,'length');
-	HasChanged('Played',$ID, !$PlayedPartial, $StartTime, $StartedAt, $PlayTime);
+	push @Played_segments, $StartedAt, $PlayTime;
+	my $seconds=Coverage(@Played_segments); # a bit overkill :)
+	
+	my $coverage_ratio= $seconds / Songs::Get($ID,'length');
+	my $partial= $Options{PlayedPercent} > $coverage_ratio;
+	HasChanged('Played',$ID, !$partial, $StartTime, $seconds, $coverage_ratio, \@Played_segments);
+	$PlayingID=undef;
+	@Played_segments=();
 
-	if ($PlayedPartial) #FIXME maybe only count as a skip if played less than ~20% ?
+	if ($partial) #FIXME maybe only count as a skip if played less than ~20% ?
 	{	my $nb= 1+Songs::Get($ID,'skipcount');
 		Songs::Set($ID, skipcount=> $nb, lastskip=> $StartTime);
 	}
