@@ -2037,7 +2037,7 @@ sub Forward
 sub SkipTo
 {	return unless defined $SongID;
 	my $sec=shift;
-	if (defined $PlayTime) # if song already playing
+	if (defined $PlayingID && defined $PlayTime) # if song already playing
 	{	push @Played_segments, $StartedAt, $PlayTime;
 		$StartedAt=$sec;
 		$Play_package->SkipTo($sec);
