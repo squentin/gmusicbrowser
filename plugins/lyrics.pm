@@ -199,6 +199,7 @@ sub SongChanged
 	return unless $self->mapped;
 	return unless defined $ID;
 	return if defined $self->{ID} && !$force && ( $ID==$self->{ID} || !$self->{follow} );
+	$self->cancel;	#cancel any lyrics operation in progress on an a previous song
 	$self->{ID}=$ID;
 	$self->{time}=undef;
 
