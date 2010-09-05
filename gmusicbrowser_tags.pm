@@ -2115,13 +2115,16 @@ sub new
 	$self->{init}=$self->{value}=shift;
 	my $img=$self->{img}=Gtk2::Image->new;
 	my $vbox=Gtk2::VBox->new;
-	$self->add($_) for $img,$vbox;
+	my $eventbox=Gtk2::EventBox->new;
+	$eventbox->add($img);
+	$self->add($_) for $eventbox,$vbox;
 	my $label=$self->{label}=Gtk2::Label->new;
 	my $Bload=::NewIconButton('gtk-open',_"Replace...");
 	my $Bsave=::NewIconButton('gtk-save-as',_"Save as...");
 	$vbox->pack_start($_,0,0,2) for $label,$Bload,$Bsave;
 	$Bload->signal_connect(clicked => \&load_cb);
 	$Bsave->signal_connect(clicked => \&save_cb);
+	$eventbox->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb);
 	$self->{Bsave}=$Bsave;
 	::set_drag($self, dest => [::DRAG_FILE,\&uri_dropped]);
 
@@ -2145,7 +2148,7 @@ sub set
 	my $Bsave=$self->{Bsave};
 	my $length=length $self->{value};
 	unless ($length) { $label->set_text(_"empty"); $Bsave->set_sensitive(0); return; }
-	my $loader= GMB::Picture::LoadPixData( $self->{value} ,'-300');
+	my $loader= GMB::Picture::LoadPixData( $self->{value} ,'-150');
 	my $pixbuf;
 	if (!$loader)
 	{  $label->set_text(_"error");
@@ -2168,6 +2171,7 @@ sub set
 	my $img=$self->{img};
 	$img->set_from_pixbuf($pixbuf);
 	$self->update_mime if $self->{mime_entry};
+	$img->parent->{pixdata}=$self->{value}; #for zoom on click
 }
 sub uri_dropped
 {	my $self=$_[0];
