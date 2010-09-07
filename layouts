@@ -6,7 +6,7 @@ Default		= Window(size=1000x750)
 Window		= hidden=SongTree|VPMosaic
 Author		= simon@shimmerproject.org
 ### main window containers: top bar, main and statusbar ###
-VBMain		= VBTop _HBMain HBStatusbar
+VBMain		= VBTop _HBMain
 HBMain		= VBLeft _HPRight
 VBTop		= 3Filler8 HBTop
 HBTop		= VBButtons _15VBPlayer 15VBToggle VBSearchBox -5VBSettings
@@ -21,22 +21,19 @@ HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist
 VBSearchBox	= 2SimpleSearch(suggest=1) 5Filler2
 VBSettings	= Pref(stock=gtk-preferences_20,size=button) 5Filler5
 ### main left: artist pane and album-cover ###
-VBLeft		= _NBList HBCover
-NBList		= (tabpos="bottom") VBArtist VBQueue HBLyrics VBAbout
+VBLeft		= _NBList HBCover HBStatus
+NBList		= (tabpos="bottom") VBArtist QueueList(songtree=1,tabtitle="Queue (%n)",tabicon="") HBLyrics VBAbout
 HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
-VBQueue		= (tabtitle="Queue") _QueueList(songtree=1) HBQueueButtons
-HBQueueButtons	= EditListButtons(small=1) QueueActions
 VBAbout		= (tabtitle="Info") _PluginArtistinfo
 VBArtist	= (tabtitle="Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1)
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
+HBStatus	= 3Total(format=short,relief=none,button=0,mode=list) -5SortIndicator -5FilterIndicator
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
 HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
 HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
 VPMosaic	= _FilterPane1(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,hidetabs=1)
 ### bottom: statusbar ### Pref(size=small-toolbar,button=0) 
-HBStatusbar	= 5HBQueue 3Filler3  10Filter(with_text=1) 10Sort(with_text=1) 10LockAlbum(with_text=1) 10LockArtist(with_text=1) -Total(format=short,relief=none,button=0,mode=list)
-HBQueue		= Queue Text1(markup="<small>Queue</small>",click1=OpenQueue,size=small-toolbar,tip="Show Queue")
 ### positioning and sizing ###
 HSize0		= 350 VBArtist
 VSize0		= 350 HBCover
