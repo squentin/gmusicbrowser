@@ -156,7 +156,6 @@ sub set_stripped_wiki {}	#FIXME use print version of the wikipedia page instead 
 # $::Options{OPT.'StrippedWiki'}
 
 package GMB::Plugin::WebContext;
-require 'simple_http.pm';
 our @ISA;
 BEGIN {push @ISA,'GMB::Context';}
 use base 'Gtk2::VBox';

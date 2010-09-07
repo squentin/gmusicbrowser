@@ -112,6 +112,23 @@ sub connecting_cb
 	return 0;
 }
 
+sub progress
+{	my $self=shift;
+	my ($length)= $self->{buffer}=~m/\015\012Content-Length:\s*(\d+)\015\012/i;
+	my $pos= index $self->{buffer}, EOL.EOL;
+	my $progress;
+	my $size=0;
+	if ($pos>=0)
+	{	$size=length($self->{buffer})-2-$pos;
+		if ($length)
+		{	$progress= $size/$length;
+			$progress=undef if $progress>1;
+		}
+	}
+	# $progress is undef or between 0 and 1
+	return $progress,$size;
+}
+
 sub receiving_cb
 {	my $self=$_[2];
 	return 1 if read $self->{sock},$self->{buffer},1024,length($self->{buffer});
@@ -121,7 +138,7 @@ sub receiving_cb
 	my $url=$self->{params}{url};
 	my $callback=$self->{params}{cb};
 	my $EOL=EOL;
-	my ($headers,$response)=split /$EOL$EOL/o,$self->{buffer},2;
+	my ($headers,$response)=split /$EOL$EOL/o,delete $self->{buffer},2;
 	$headers='empty answer' unless defined $headers;
 	(my$result,$headers)=split /$EOL/o,$headers,2;
 	if ($::debug)
@@ -145,7 +162,7 @@ sub receiving_cb
 		}
 		$callback->($response,$type,$self->{params}{url});
 	}
-	elsif ($result=~m#^HTTP/1\.\d+ 30[12]# && $headers{location}) #redirection
+	elsif ($result=~m#^HTTP/1\.\d+ 30[123]# && $headers{location}) #redirection
 	{	my $url=$headers{location};
 		unless ($url=~m#^http://#)
 		{	my $base=$self->{params}{url};

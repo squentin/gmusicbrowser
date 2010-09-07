@@ -21,7 +21,7 @@ use constant
 	SAVEFILE => 'audioscrobbler.queue', #file used to save unsent data
 };
 use Digest::MD5 'md5_hex';
-require 'simple_http.pm';
+require $::HTTP_module;
 
 our $ignore_current_song;
 

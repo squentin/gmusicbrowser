@@ -105,12 +105,17 @@ BEGIN
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
 INIT {%Alias_ext=(ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
 
+our $HTTP_module;
 BEGIN{
 require 'gmusicbrowser_songs.pm';
 require 'gmusicbrowser_tags.pm';
 require 'gmusicbrowser_layout.pm';
 require 'gmusicbrowser_list.pm';
-require 'simple_http.pm';
+$HTTP_module=	-e $DATADIR.SLASH.'simple_http_wget.pm' && (grep -x $_.SLASH.'wget', split /:/, $ENV{PATH})	? 'simple_http_wget.pm' :
+		-e $DATADIR.SLASH.'simple_http_AE.pm'   && (grep -f $_.SLASH.'AnyEvent'.SLASH.'HTTP.pm', @INC)	? 'simple_http_AE.pm' :
+		'simple_http.pm';
+#warn "using $HTTP_module for http requests\n";
+#require $HTTP_module;
 }
 
 our $CairoOK;
