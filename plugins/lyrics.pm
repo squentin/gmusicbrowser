@@ -14,7 +14,7 @@ desc	Search and display lyrics
 package GMB::Plugin::LYRICS;
 use strict;
 use warnings;
-require 'simple_http.pm';
+require $::HTTP_module;
 our @ISA;
 BEGIN {push @ISA,'GMB::Context';}
 use base 'Gtk2::VBox';
@@ -199,6 +199,7 @@ sub SongChanged
 	return unless $self->mapped;
 	return unless defined $ID;
 	return if defined $self->{ID} && !$force && ( $ID==$self->{ID} || !$self->{follow} );
+	$self->cancel;	#cancel any lyrics operation in progress on an a previous song
 	$self->{ID}=$ID;
 	$self->{time}=undef;
 

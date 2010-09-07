@@ -6055,10 +6055,10 @@ sub update_row
 
 
 sub Scroll_to_TopEnd
-{	my ($self,$up)=@_;
+{	my ($self,$end)=@_;
 	my $adj=$self->{vadj};
-	if ($up)	{ $adj->set_value(0); }
-	else		{ $adj->set_value($adj->upper); }
+	if ($end)	{ $adj->set_value($adj->upper-$adj->page_size); }
+	else		{ $adj->set_value(0); }
 }
 
 sub drag_received_cb
@@ -6280,8 +6280,10 @@ sub FollowSong
 	return unless defined $::SongID;
 	my $array=$self->{array};
 	return unless $array;
+	my $row;
+	if ($self->{mode} eq 'playlist') { $row=$::Position; }
 	if ($array->IsIn($::SongID))
-	{	my $row= ::first { $array->[$_]==$::SongID } 0..$#$array;
+	{	$row= ::first { $array->[$_]==$::SongID } 0..$#$array unless defined $row && $row>=0;
 		$self->set_cursor_to_row($row);
 	}
 	::HasChangedSelID($self->{group},$::SongID);
@@ -7288,7 +7290,7 @@ no warnings;
 
 our %alias=( 'if' => 'iff', pesc => '::PangoEsc', ratingpic => 'Stars::get_pixbuf', min =>'::min', max =>'::max', sum =>'::sum',); #FIXME use Songs::Picture instead of Stars::get_pixbuf
 our %functions=
-(	formattime=> ['do {my ($f,$t,$z)=(',		'); !$t && defined $z ? $z : ::strftime($f,localtime($t)); }'],
+(	formattime=> ['do {my ($f,$t,$z)=(',		'); !$t && defined $z ? $z : ::strftime2($f,localtime($t)); }'],
 	#sum	=>   ['do {my $sum; $sum+=$_ for ',	';$sum}'],
 	average	=>   ['do {my $sum=::sum(',		'); @l ? $sum/@l : undef}'],
 	#max	=>   ['do {my ($max,@l)=(',		'); $_>$max and $max=$_ for @l; $max}'],

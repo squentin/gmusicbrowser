@@ -507,7 +507,7 @@ push @::SongCMenu,$RGA_songmenu;
 
 sub Analyse_byAlbum
 {	my $IDs=$_[0];
-	::SortList($IDs,'album');
+	Songs::SortList($IDs,'album');
 	my @list; my @album; my $aid0;
 	for my $ID (@$IDs)
 	{	my $aid= Songs::Get($ID,'album');

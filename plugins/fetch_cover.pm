@@ -14,7 +14,7 @@ desc	Adds a menu entry to artist/album context menu, allowing to search the pict
 package GMB::Plugin::FETCHCOVER;
 use strict;
 use warnings;
-require 'simple_http.pm';
+require $::HTTP_module;
 use base 'Gtk2::Window';
 use constant
 {	OPT => 'PLUGIN_FETCHCOVER_',
@@ -295,7 +295,7 @@ sub parse_googlei
 		}
 	}
 	my $nexturl;
-	if ($result=~m#<a href="(/images\?[^>"]*)"( [^>]*)?><img src="nav_next#)
+	if ($result=~m#<a href="(/images\?[^>"]*)"( [^>]*)?class=pn\b#)
 	{	$nexturl='http://images.google.com'.$1;
 		$nexturl=~s#&amp;#&#g;
 	}

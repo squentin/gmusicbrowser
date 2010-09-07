@@ -492,7 +492,7 @@ sub new
 #short circuit if a LOT of songs : don't add file-specific tags, building the GUI would be too long anyway
 return $self if @IDs>1000;
 #######################################################
-	::SortList(\@IDs,'path album disc track file');
+	Songs::SortList(\@IDs,'path album:i disc track file');
 	#edition of file-specific tags (track title)
 	my $perfile_table=Gtk2::Table->new( scalar(@IDs), 10, FALSE);
 	$self->{perfile_table}=$perfile_table;
@@ -987,12 +987,12 @@ sub get_text
 
 package GMB::TagEdit::FlagList;
 use Gtk2;
-use base 'Gtk2::HBox';
+use base 'Gtk2::Box';
 
 sub new
 {	my ($class,$field,$ID) = @_;
 	my $self = bless Gtk2::HBox->new(0,0), $class;
-	#$self->{field}=$field;
+	$self->{field}=$field;
 	$self->{ID}=$ID;
 	my $label=$self->{label}=Gtk2::Label->new;
 	$label->set_ellipsize('end');
@@ -1002,7 +1002,8 @@ sub new
 	$button->add($label);
 	$self->pack_start($button,1,1,0);
 	$self->pack_start($entry,0,0,0);
-	$button->signal_connect( button_press_event => \&popup_menu_cb); #FIXME make it popup for keyboard activation too
+	$button->signal_connect( clicked => \&popup_menu_cb);
+	$button->signal_connect( button_press_event => sub { popup_menu_cb($_[0]); $_[0]->grab_focus;1; } );
 	$entry->signal_connect( activate => \&entry_activate_cb );
 	GMB::ListStore::Field::setcompletion($entry,$field);
 
@@ -1016,18 +1017,29 @@ sub entry_activate_cb
 {	my $entry=$_[0];
 	my $self=::find_ancestor($entry,__PACKAGE__);
 	my $text=$entry->get_text;
-	return if $text eq '';
+	if ($text eq '') { popup_add_menu($self,$entry); return }
+	#return if $text eq '';
 	$self->{selected}{ $text }=1;
 	$self->update;
 	$entry->set_text('');
 }
 
+sub popup_add_menu
+{	my ($self,$widget)=@_;
+	my $cb= sub { $self->{selected}{ $_[1] }= 1; $self->update; };
+	my $menu=::MakeFlagMenu($self->{field},$cb);
+	$menu->show_all;
+	my $event=Gtk2->get_current_event;
+	my $button= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
+	$menu->popup(undef,undef,sub {::windowpos($_[0],$widget)},undef,$button,$event->time);
+}
+
 sub popup_menu_cb
-{	my ($widget,$event)=@_;
+{	my $widget=shift;
 	my $self=::find_ancestor($widget,__PACKAGE__);
 	my $menu=Gtk2::Menu->new;
 	my $cb= sub { $self->{selected}{ $_[1] }^=1; $self->update; };
-	my @keys= sort {::superlc($a) cmp ::superlc($b)} keys %{$self->{selected}};
+	my @keys= ::superlc_sort(keys %{$self->{selected}});
 	return unless @keys;
 	for my $key (@keys)
 	{	my $item=Gtk2::CheckMenuItem->new_with_label($key);
@@ -1036,14 +1048,18 @@ sub popup_menu_cb
 		$menu->append($item);
 	}
 	$menu->show_all;
-	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
+	my $event=Gtk2->get_current_event;
+	my $button= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
+	$menu->popup(undef,undef,\&::menupos,undef,$button,$event->time);
 }
 
 sub update
 {	my $self=$_[0];
-	my $text=join ', ', sort { ::superlc($a) cmp ::superlc($b) } grep $self->{selected}{$_}, keys %{$self->{selected}};
-	$self->{label}->set_text($text);
-	$self->{label}->parent->set_tooltip_text($text);
+	my $h=$self->{selected};
+	my $text=join '<b>, </b>', map ::PangoEsc($_), ::superlc_sort(grep $h->{$_}, keys %$h);
+	#$text= ::MarkupFormat("<i>- %s -</i>",_"None") if $text eq '';
+	$self->{label}->set_markup($text);
+	$self->{label}->parent->set_tooltip_markup($text);
 }
 
 sub get_text
@@ -1054,78 +1070,123 @@ sub get_text
 
 package GMB::TagEdit::EntryMassList;	#for mass-editing fields with multiple values
 use Gtk2;
-use base 'Gtk2::HBox';
+use base 'Gtk2::Box';
 
 sub new
 {	my ($class,$field,$IDs) = @_;
-	my $self = bless Gtk2::HBox->new(1,1), $class;
-	my $vbox=Gtk2::VBox->new;
-	my $addbut=::NewIconButton('gtk-add',_"Add");
-	my $combo=Gtk2::ComboBoxEntry->new_text;
-	$combo->append_text($_) for @{ Songs::ListAll($field) };
-	my $entry=$combo->child;
-	$entry->set_text('');
-	$vbox->pack_start($_,::FALSE,::FALSE,0) for $combo,$addbut;
-	my $store=Gtk2::ListStore->new('Glib::String','Glib::Boolean','Glib::Boolean');
-	my $treeview=Gtk2::TreeView->new($store);
-	 my $sw=Gtk2::ScrolledWindow->new;
-	 $sw->set_shadow_type('etched-in');
-	 $sw->set_policy('never','automatic');
-	 $sw->add($treeview);
-	 $sw->set_size_request(-1, 4*$entry->size_request->height );
-	$self->pack_start($_,::TRUE,::TRUE,0) for $sw,$vbox;
-
-	for my $ref ([1,_"set"],[2,_"unset"])
-	{	my ($col,$title)=@$ref;
-		my $renderer=Gtk2::CellRendererToggle->new;
-		$renderer->{column}=$col;
-		$renderer->signal_connect(toggled => \&toggled_cb, $store);
-		my $tvcolumn=Gtk2::TreeViewColumn->new_with_attributes($title, $renderer, active=>$col);
-		$treeview->append_column($tvcolumn);
+	my $self = bless Gtk2::VBox->new(1,1), $class;
+	$self->{field}=$field;
+	my $sg= Gtk2::SizeGroup->new('horizontal');
+	my $entry= $self->{entry}= Gtk2::Entry->new;
+	my $add= ::NewIconButton('gtk-add', undef, \&add_entry_text_cb);
+	my $removeall= ::NewIconButton('gtk-clear', _"Remove all", \&clear);
+	$add->signal_connect( button_press_event => sub { add_entry_text_cb($_[0]); $_[0]->grab_focus;1; } );
+	for my $ref (['toadd',1,_"Add"],['toremove',-1,_"Remove"])
+	{	my ($key,$mode,$text)=@$ref;
+		my $label=$self->{$key}=Gtk2::Label->new;
+		$label->set_ellipsize('end');
+		$label->{mode}=$mode;
+		my $button= Gtk2::Button->new;
+		$button->add($label);
+		$button->{mode}=$mode;
+		$button->signal_connect( clicked => \&popup_menu_cb );
+		$button->signal_connect( button_press_event => sub { popup_menu_cb($_[0]); $_[0]->grab_focus;1; } );
+		my $sidelabel= Gtk2::Label->new($text);
+		my $hbox= Gtk2::HBox->new(0,1);
+		$hbox->pack_start($sidelabel,0,0,2);
+		$hbox->pack_start($button,1,1,2);
+		$hbox->pack_start($entry,0,0,0) if $mode>0;
+		$hbox->pack_start($add,0,0,0) if $mode>0;
+		$hbox->pack_start($removeall,0,0,0) if $mode<0;
+		$self->pack_start($hbox,0,0,2);
+		$sidelabel->set_alignment(0,.5);
+		$sg->add_widget($sidelabel);
 	}
-	my $column=Gtk2::TreeViewColumn->new_with_attributes('', Gtk2::CellRendererText->new,text=>0);
-	$treeview->append_column($column);
-	#$treeview->set_headers_visible(0);
-	$entry->signal_connect( activate => \&add_entry_text_cb);
-	$addbut->signal_connect( clicked => \&add_entry_text_cb);
-
+	GMB::ListStore::Field::setcompletion($entry,$field);
+	$entry->signal_connect(activate => \&add_entry_text_cb);
 	my $valueshash= Songs::BuildHash($field,$IDs);
-	$store->set($store->append,0=> Songs::Gid_to_Get($field,$_),1,0,2,0)  for sort keys %$valueshash; #FIXME check that fields use a gid, not the case for comments (yet ?)
-
-	$self->{entry}=$entry;
-	$self->{store}=$store;
+	my %selected;
+	$selected{ Songs::Gid_to_Get($field,$_) }= $valueshash->{$_}==@$IDs ? 1 : 0 for keys %$valueshash;
+	delete $selected{''};
+	$self->{selected}=\%selected;
+	$self->{all}= [keys %selected]; #all values that are set for at least one song
+	$self->update;
 	return $self;
 }
 
-sub add_entry_text_cb
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
-	my $entry=$self->{entry};
-	my $text=$entry->get_text;
-	return if $text eq '';
-	my $store=$self->{store};
-	$store->set($store->append,0=>$text,1,1,2,0);
-	$entry->set_text('');
+sub update	#update the text and tooltips of buttons
+{	my $self=shift;
+	for my $key (qw/toadd toremove/)
+	{	my $label= $self->{$key};
+		my $mode= $label->{mode}; # -1 or 1
+		my $h= $self->{selected};
+		my $text=join '<b>, </b>', map ::PangoEsc($_), ::superlc_sort(grep $h->{$_}==$mode, keys %$h);
+		#$text= ::MarkupFormat("<i>- %s -</i>",_"None") if $text eq '';
+		$label->set_markup($text);
+		$label->parent->set_tooltip_markup($text);	# set tooltip on button
+	}
 }
 
-sub toggled_cb
-{	my ($cell,$path_str,$store)=@_;
-	my $column=$cell->{column};
-	my $iter=$store->get_iter_from_string($path_str);
-	my $state=$store->get($iter,$column);
-	$store->set($iter,$column, $state^1);
-	$store->set($iter,($column==1 ? 2 : 1), 0) if !$state;
+sub add_entry_text_cb
+{	my $widget=shift;
+	my $self=::find_ancestor($widget,__PACKAGE__);
+	my $entry=$self->{entry};
+	my $text=$entry->get_text;
+	if ($text eq '') { $self->popup_add_menu($widget); return }
+	# split $text ?
+	$self->{selected}{$text}=1;
+	$entry->set_text('');
+	$self->update;
+}
+
+sub clear # set to -1 all values present in at least one song, set to 0 values not present
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $h= $self->{selected};
+	$_=0 for values %$h;
+	$h->{$_}=-1 for @{$self->{all}};
+	$self->update;
+}
+
+sub popup_add_menu
+{	my ($self,$widget)=@_;
+	my $cb= sub { $self->{selected}{ $_[1] }= 1; $self->update; };
+	my $menu=::MakeFlagMenu($self->{field},$cb);
+	$menu->show_all;
+	my $event=Gtk2->get_current_event;
+	my $button= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
+	$menu->popup(undef,undef,sub {::windowpos($_[0],$widget)},undef,$button,$event->time);
+}
+
+sub popup_menu_cb
+{	my $child=shift;
+	my $mode=$child->{mode};
+	my $self=::find_ancestor($child,__PACKAGE__);
+	my $h= $self->{selected};
+	my $menu=Gtk2::Menu->new;
+	my $cb= sub { $self->{selected}{ $_[1] }= $_[0]->get_active ? $mode : 0; $self->update; };
+	my @keys= ::superlc_sort(keys %$h);
+	return unless @keys;
+	for my $key (@keys)
+	{	my $item=Gtk2::CheckMenuItem->new_with_label($key);
+		$item->set_active(1) if $h->{$key}==$mode;
+		$item->signal_connect(toggled => $cb,$key);
+		$menu->append($item);
+	}
+	$menu->show_all;
+	my $event=Gtk2->get_current_event;
+	my $button= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
+	$menu->popup(undef,undef,\&::menupos,undef,$button,$event->time);
+	1;
 }
 
 sub return_setunset
 {	my $self=$_[0];
 	my (@set,@unset);
-	my $store=$self->{store};
-	my $iter=$store->get_iter_first;
-	while ($iter)
-	{	my ($value,$set,$unset)=$store->get($iter,0,1,2);
-		push @set,$value   if $set;
-		push @unset,$value if $unset;
-		$iter=$store->iter_next($iter);
+	my $h=$self->{selected};
+	for my $value (keys %$h)
+	{	my $mode=$h->{$value};
+		if	($mode>0)	{ push @set,$value }
+		elsif	($mode<0)	{ push @unset,$value }
 	}
 	return \@set,\@unset;
 }

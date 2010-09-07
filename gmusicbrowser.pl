@@ -41,7 +41,7 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  my $set_clip_rectangle_orig=\&Gtk2::Gdk::GC::set_clip_rectangle;
  *Gtk2::Gdk::GC::set_clip_rectangle=sub { &$set_clip_rectangle_orig if $_[1]; } if $Gtk2::VERSION <1.102; #work-around $rect can't be undef in old bindings versions
 }
-use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES strftime mktime/;
+use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime/;
 use List::Util qw/min max sum first/;
 use File::Copy;
 use File::Spec::Functions qw/file_name_is_absolute catfile rel2abs/;
@@ -105,12 +105,17 @@ BEGIN
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
 INIT {%Alias_ext=(ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
 
+our $HTTP_module;
 BEGIN{
 require 'gmusicbrowser_songs.pm';
 require 'gmusicbrowser_tags.pm';
 require 'gmusicbrowser_layout.pm';
 require 'gmusicbrowser_list.pm';
-require 'simple_http.pm';
+$HTTP_module=	-e $DATADIR.SLASH.'simple_http_wget.pm' && (grep -x $_.SLASH.'wget', split /:/, $ENV{PATH})	? 'simple_http_wget.pm' :
+		-e $DATADIR.SLASH.'simple_http_AE.pm'   && (grep -f $_.SLASH.'AnyEvent'.SLASH.'HTTP.pm', @INC)	? 'simple_http_AE.pm' :
+		'simple_http.pm';
+#warn "using $HTTP_module for http requests\n";
+#require $HTTP_module;
 }
 
 our $CairoOK;
@@ -525,6 +530,9 @@ sub superlc	##lowercase, normalize and remove accents/diacritics #not sure how g
 	$s=Unicode::Normalize::compose($s); #probably better to recompose #is it worth it ?
 	return lc $s;
 }
+sub superlc_sort
+{	return sort {superlc($a) cmp superlc($b)} @_;
+}
 sub sorted_keys		#return keys of $hash sorted by $hash->{$_}{$sort_subkey} using superlc
 {	my ($hash,$sort_subkey)=@_;
 	return sort { superlc($hash->{$a}{$sort_subkey}) cmp superlc($hash->{$b}{$sort_subkey}) } keys %$hash;
@@ -691,6 +699,10 @@ sub ConvertSize
 	return $size;
 }
 
+my ($strftime_encoding)= setlocale(LC_TIME)=~m#\.([^@]+)#;
+sub strftime2	# try to return an utf8 value from strftime
+{	$strftime_encoding ? Encode::decode($strftime_encoding, &strftime) : &strftime;
+}
 
 #---------------------------------------------------------------
 our $DAYNB=int(time/86400)-12417;#number of days since 01 jan 2004
@@ -710,7 +722,7 @@ our ($MainWindow,$FullscreenWindow); my $OptionsDialog;
 my $TrayIcon;
 my %Editing; #used to keep track of opened song properties dialog and lyrics dialog
 our $PlayTime;
-our ($StartTime,$StartedAt,$PlayingID,$PlayedPartial);
+our ($StartTime,$StartedAt,$PlayingID, @Played_segments);
 our $CurrentDir=$ENV{PWD};
 #$ENV{PULSE_PROP_media.role}='music'; # pulseaudio hint. could set other pulseaudio properties, FIXME doesn't seem to reach pulseaudio
 
@@ -2030,9 +2042,9 @@ sub Forward
 sub SkipTo
 {	return unless defined $SongID;
 	my $sec=shift;
-	#return unless $sec=~m/^\d+(?:\.\d+)?$/;
-	if (defined $PlayingID)
-	{	$StartedAt=$sec unless (defined $PlayTime && $PlayingID==$SongID && $PlayedPartial && $sec<$PlayTime);	#don't re-set $::StartedAt if rewinding a song not fully(85%) played
+	if (defined $PlayingID && defined $PlayTime) # if song already playing
+	{	push @Played_segments, $StartedAt, $PlayTime;
+		$StartedAt=$sec;
 		$Play_package->SkipTo($sec);
 	}
 	else	{ Play($sec); }
@@ -2160,17 +2172,46 @@ sub AddToRecent	#add song to recently played list
 	}
 }
 
+sub Coverage	# find number of unique seconds played from a list of start,stop times
+{	my @segs=@_;
+	my $sum=0;
+	while (@segs)
+	{	my ($start,$stop)=splice @segs,0,2;
+		my $i=0;
+		my $th=.5;	#threshold : ignore differences of less than .5s
+		while ($i<@segs)
+		{	my $s1=$segs[$i];
+			my $s2=$segs[$i+1];
+			if ($start-$s1<=$th && $s1-$stop<=$th || $start-$s2<=$th && $s2-$stop<=$th) # segments overlap
+			{	$stop =$s2 if $s2>$stop;
+				$start=$s1 if $s1<$start;
+				splice @segs,$i,2;
+				$i=0;
+			}
+			else { $i+=2; }
+		}
+		my $length= $stop-$start;
+		$sum+= $length if $length>$th;
+	}
+	return $sum;
+}
+
 sub Played
 {	return unless defined $PlayingID;
 	my $ID=$PlayingID;
-	undef $PlayingID;
 	warn "Played : $ID $StartTime $StartedAt $PlayTime\n" if $debug;
 	AddToRecent($ID) unless $Options{AddNotPlayedToRecent};
 	return unless defined $PlayTime;
-	$PlayedPartial=$PlayTime-$StartedAt < $Options{PlayedPercent} * Songs::Get($ID,'length');
-	HasChanged('Played',$ID, !$PlayedPartial, $StartTime, $StartedAt, $PlayTime);
+	push @Played_segments, $StartedAt, $PlayTime;
+	my $seconds=Coverage(@Played_segments); # a bit overkill :)
+	
+	my $coverage_ratio= $seconds / Songs::Get($ID,'length');
+	my $partial= $Options{PlayedPercent} > $coverage_ratio;
+	HasChanged('Played',$ID, !$partial, $StartTime, $seconds, $coverage_ratio, \@Played_segments);
+	$PlayingID=undef;
+	@Played_segments=();
 
-	if ($PlayedPartial) #FIXME maybe only count as a skip if played less than ~20% ?
+	if ($partial) #FIXME maybe only count as a skip if played less than ~20% ?
 	{	my $nb= 1+Songs::Get($ID,'skipcount');
 		Songs::Set($ID, skipcount=> $nb, lastskip=> $StartTime);
 	}
@@ -2400,11 +2441,11 @@ sub NextDiff	#go to next song whose $field value is different than current's
 	my $position=$Position||0;
 	if ($TogLock && $TogLock eq $field)	 #remove lock on a different field if not found ?
 	{	$playlist=$SelectedFilter->filter;
-		SortList($playlist,$Options{Sort}) unless $RandomMode;
+		SortList($playlist) unless $RandomMode;
 		$position=FindPositionSong($SongID,$playlist);
 	}
 	my $list;
-	if ($RandomMode) { $list= $filter->filter($playlist); warn scalar @$playlist; }
+	if ($RandomMode) { $list= $filter->filter($playlist); }
 	else
 	{	my @rows=$position..$#$playlist;
 		push @rows, 0..$position-1 if $Options{Repeat};
@@ -2604,7 +2645,7 @@ sub FindFirstInListPlay		#Choose a song in @$lref based on sort order, if possib
 	else
 	{	@l=@$lref unless @l;
 		push @l,$SongID if defined $SongID && !exists $h{$SongID};
-		SortList(\@l,$sort);
+		SortList(\@l);
 		if (defined $SongID)
 		{ for my $i (0..$#l-1)
 		   { next if $l[$i]!=$SongID; $ID=$l[$i+1]; last; }
@@ -2619,19 +2660,16 @@ sub Shuffle
 	Select('sort' => 'shuffle');
 }
 
-sub SortList	#sort @$listref according to $sort
-{	my $time=times; #DEBUG
-	warn "deprecated SortList @_\n"; #PHASE1 DELME
-	my ($listref,$sort)=@_;
-	$sort||=$Options{Sort};
-	my $func; my $insensitive;
+sub SortList	#sort @$listref according to current sort order, or last ordered sort if no current sort order
+{	my $listref=shift;
+	my $sort=$Options{Sort};
 	if ($sort=~m/^random:/)
 	{	@$listref=Random->OneTimeDraw($sort,$listref);
 	}
-	elsif ($sort ne '')		# generate custom sort function
-	{	Songs::SortList($listref,$sort);
+	else	# generate custom sort function
+	{	$sort=$Options{Sort_LastOrdered} if $sort eq '';
+		Songs::SortList($listref,$sort);
 	}
-	$time=times-$time; warn "sort ($sort) : $time s\n"; #DEBUG
 }
 
 sub ExplainSort
@@ -2896,7 +2934,7 @@ sub ChooseSongsTitle		#Songs with the same title
 	my $list= $filter->filter;
 	return 0 if @$list<2 || @$list>100;	#probably a problem if it finds >100 matching songs, and making a menu with a huge number of items is slow
 	my @list=grep $_!=$ID,@$list;
-	SortList(\@list,'artist:i album:i');
+	Songs::SortList(\@list,'artist:i album:i');
 	return ChooseSongs( __x( _"by {artist} from {album}", artist => "<b>%a</b>", album => "%l") ,@list);
 }
 
@@ -2904,7 +2942,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 {	my ($album,$showcover)=@_;
 	return unless defined $album;
 	my $list= AA::GetIDs(album=>$album);
-	SortList($list,'disc track file');
+	Songs::SortList($list,'disc track file');
 	if (Songs::Get($list->[0],'disc'))
 	{	my $disc=''; my @list2;
 		for my $ID (@$list)
@@ -4081,7 +4119,7 @@ sub CaseSensFile	#find case-sensitive filename from a case-insensitive filename
 sub DialogMassRename
 {	return if $CmdLine{ro};
 	my @IDs= uniq(@_); #remove duplicates IDs in @_ => @IDs
-	::SortList(\@IDs,'path album disc track file');
+	Songs::SortList(\@IDs,'path album:i disc track file');
 	my $dialog = Gtk2::Dialog->new
 			(_"Mass Renaming", undef,
 			 [qw/destroy-with-parent/],
@@ -4297,22 +4335,29 @@ sub LabelEditMenu
 		if ($_[0]->get_active)	{ SetLabels($IDs,[$f],undef); }
 		else			{ SetLabels($IDs,undef,[$f]); }
 	 };
-	MakeFlagToggleMenu($field,$hash,$menusub_toggled);
+	MakeFlagMenu($field,$menusub_toggled,$hash);
 }
 
-sub MakeFlagToggleMenu	#FIXME special case for no @keys, maybe a menu with a greyed-out item "no #none#"
-{	my ($field,$hash,$callback)=@_;
+sub MakeFlagMenu	#FIXME special case for no @keys, maybe a menu with a greyed-out item "no #none#"
+{	my ($field,$callback,$hash)=@_;
 	my @keys= @{Songs::ListAll($field)};
 	my $makemenu=sub
 	{	my ($start,$end,$keys)=@_;
 		my $menu=Gtk2::Menu->new;
 		for my $i ($start..$end)
 		{	my $key=$keys->[$i];
-			my $item=Gtk2::CheckMenuItem->new_with_label($key);
-			my $state= $hash->{$key}||0;
-			if ($state==1){ $item->set_active(1); }
-			elsif ($state==2)  { $item->set_inconsistent(1); }
-			$item->signal_connect(toggled => $callback,$key);
+			my $item;
+			if ($hash)
+			{	$item=Gtk2::CheckMenuItem->new_with_label($key);
+				my $state= $hash->{$key}||0;
+				if ($state==1){ $item->set_active(1); }
+				elsif ($state==2)  { $item->set_inconsistent(1); }
+				$item->signal_connect(toggled => $callback,$key);
+			}
+			else
+			{	$item=Gtk2::MenuItem->new($key);
+				$item->signal_connect(activate => $callback,$key);
+			}
 			$menu->append($item);
 		}
 		return $menu;
@@ -5454,7 +5499,7 @@ sub PrefMisc
 
 	my $dateex= mktime(5,4,3,2,0,(localtime)[5]);
 	my $datetip= join "\n", _"use standard strftime variables",	_"examples :",
-			map( sprintf("%s : %s",$_,strftime($_,localtime($dateex))), split(/ *\| */,"%a %b %d %H:%M:%S %Y | %A %B %I:%M:%S %p %Y | %d/%m/%y %H:%M | %X %x | %F %r | %c | %s") ),
+			map( sprintf("%s : %s",$_,strftime2($_,localtime($dateex))), split(/ *\| */,"%a %b %d %H:%M:%S %Y | %A %B %I:%M:%S %p %Y | %d/%m/%y %H:%M | %X %x | %F %r | %c | %s") ),
 			'',
 			_"Additionally this format can be used :\n default number1 format1 number2 format2 ...\n dates more recent than number1 seconds will use format1, ...";
 	my $datefmt=NewPrefEntry(DateFormat => _"Date format :", tip => $datetip, history=> 'DateFormat_history');
