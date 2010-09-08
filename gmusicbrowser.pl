@@ -3737,7 +3737,6 @@ sub ChooseDir
 	# there is no mode in Gtk2::FileChooserDialog that let you select both files or folders (Bug #136294), so have to work-around by connecting to the ok button and forcing the end of $dialog->run with a $dialog->hide (the dialog will be destroyed after)
 	$okbutton->signal_connect(clicked=> sub { $_[0]->{ok}=1; $dialog->hide; }) if $allowfiles;
 
-	 warn $Options{$remember_key} if $remember_key;
 	if ($remember_key)	{ $path= $Options{$remember_key}; }
 	elsif ($path)		{ $path= url_escape($path); }
 	$dialog->set_current_folder_uri("file://".$path) if $path;
@@ -3860,9 +3859,10 @@ sub ChoosePix
 		{ my ($dialog,$file)=@_;
 		  unless ($file)
 		  {	$file= $dialog->get_preview_uri;
-			$file= $file=~s#^file://## ? $file=decode_url($file) : undef;
+			$file= ($file && $file=~s#^file://##) ? decode_url($file) : undef;
 		  }
-		  return unless $file && -f $file;
+		  unless ($file && -f $file) { $preview->hide; return }
+		  $preview->show;
 		  $max=0;
 		  $nb=0 unless $lastfile && $lastfile eq $file;
 		  $lastfile=$file;
@@ -3877,7 +3877,6 @@ sub ChoosePix
 	$preview->show_all;
 	$more->set_no_show_all(1);
 	$dialog->set_preview_widget_active(0);
- warn $Options{$remember_key} if $remember_key;
 	if ($remember_key)	{ $path= $Options{$remember_key}; }
 	elsif ($path)		{ $path= url_escape($path); }
 	if ($file && $file=~s/:(\d+)$//) { $nb=$1; $lastfile=$file; }
