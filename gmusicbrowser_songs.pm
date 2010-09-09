@@ -367,6 +367,7 @@ our %timespan_menu=
 		_default=> 'vec(___default_,#ID#,#bits#)',
 		init	=> '____ = ___default_ = "";',
 		default	=> '""',
+		diff	=> '(#VAL# eq "" ? 255 : #VAL#)!=#_#',
 		get	=> '(#_#==255 ? "" : #_#)',
 		display	=> '(#_#==255 ? "" : #_#)',
 		'stats:range'	=> 'push @{#HVAL#},#_default#;  ---- #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
