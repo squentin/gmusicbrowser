@@ -838,7 +838,7 @@ sub make_keybindingshash
 	{	my $key=shift @list;
 		my $cmd=shift @list;
 		my $mod='';
-		$mod=$1 if $key=~s/^(c?a?w?s?-)//;
+		$mod=$1 if $key=~s/^([caws]+-)//;
 		my @keys=($key);
 		@keys=(lc$key,uc$key) if $key=~m/^[A-Za-z]$/;
 		$h{$mod.$_}=$cmd for @keys;
@@ -847,7 +847,7 @@ sub make_keybindingshash
 }
 sub keybinding_longname
 {	my $key=$_[0];
-	return $key unless $key=~s/^(c?a?w?s?)-//;
+	return $key unless $key=~s/^([caws]+)-//;
 	my $mod=$1;
 	my %h=(c => _"Ctrl", a => _"Alt", w => _"Win", s => _"Shift");
 	my $name=join '',map $h{$_}, split //,$mod;

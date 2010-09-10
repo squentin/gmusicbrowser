@@ -1622,7 +1622,7 @@ our @cMenu=
 );
 
 our @DefaultOptions=
-(	pages	=> 'savedtree|artist|album|genre|date|label|folder|added|lastplay',
+(	pages	=> 'savedtree|artist|album|genre|date|label|folder|added|lastplay|rating',
 	nb	=> 1,	# filter level
 	min	=> 1,	# filter out entries with less than $min songs
 	hidebb	=> 0,	# hide button box
