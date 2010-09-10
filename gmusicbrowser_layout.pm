@@ -1455,12 +1455,16 @@ sub FilterMenu
 		if ($list eq 'Library') {$menu->prepend($item);}
 		else			{$menu->append($item);}
 	}
-	my $item=Gtk2::CheckMenuItem->new(_"Edit...");
-	$item->set_draw_as_radio(1);
-	$item->signal_connect ( activate => sub
-		{ ::EditFilter(undef,$::SelectedFilter,undef, sub {::Select(filter => $_[0])});
-		});
-	$menu->append($item);
+	for my $items
+	(	["Edit...", sub{ ::EditFilter(undef,$::SelectedFilter,undef, sub {::Select(filter => $_[0])});}],
+		["No filter", \&RemoveFilter]
+	)
+	{	my ($item,$cb) = @$items;
+		$item=Gtk2::CheckMenuItem->new($item);
+		$item->set_draw_as_radio(1);
+		$item->signal_connect ( activate => $cb);
+		$menu->append($item);
+	}
 	if (my @SavedLists=::GetListOfSavedLists())
 	{	my $submenu=Gtk2::Menu->new;
 		my $list_cb=sub { ::Select( staticlist => $_[1] ) };
@@ -1477,9 +1481,6 @@ sub FilterMenu
 		$sitem->set_submenu($submenu);
 		$menu->prepend($sitem);
 	}
-	my $item=Gtk2::CheckMenuItem->new(_"Clear filter");
-	$item->signal_connect(activate => \&RemoveFilter);
-	$menu->append($item);
 	$menu->show_all;
 	return $menu if $nopopup;
 	my $event=Gtk2->get_current_event;
