@@ -385,6 +385,7 @@ use constant
 };
 
 our @FORMATS;
+our @FORMATS_user;
 our @Tools;
 INIT
 {
@@ -449,11 +450,12 @@ sub new
 
 	my $table=Gtk2::Table->new (6, 2, FALSE);
 	my $row1=my $row2=0;
-	my %frames;
-	$self->{frames}=\%frames;
-	$self->{pf_frames}={};
+	my %widgets;
+	$self->{widgets}=\%widgets;
+	$self->{pf_widgets}={};
 	$self->{IDs}=\@IDs;
 
+	# folder name at the top
 	{	my $folders= Songs::UniqList('path',\@IDs);
 		my $folder=$folders->[0];
 		if (@$folders>1)
@@ -474,27 +476,29 @@ sub new
 	{	my $check=Gtk2::CheckButton->new(Songs::FieldName($field));
 		my $widget=Songs::EditWidget($field,'many',\@IDs);
 		next unless $widget;
-		$frames{$field}=$widget;	#FIXME	rename ($frames and {combo})and maybe
-		$check->{combo}=$widget;	#	remove one
+		$widgets{$field}=$widget;
+		$check->{widget}=$widget;
 		$widget->set_sensitive(FALSE);
 
-		$check->signal_connect( toggled => sub
-			{  my $check=$_[0];
-			   my $active=$check->get_active;
-			   $check->{combo}->set_sensitive($active);
-			});
+		$check->signal_connect( toggled => sub { my $check=shift; $check->{widget}->set_sensitive( $check->get_active ); });
 		my ($row,$col)= $widget->{noexpand} ? ($row2++,2) : ($row1++,0);
 		$table->attach($check,$col++,$col,$row,$row+1,'fill','shrink',3,1);
 		$table->attach($widget,$col++,$col,$row,$row+1,['fill','expand'],'shrink',3,1);
 	}
 
 	$self->pack_start($table, FALSE, TRUE, 2);
-#short circuit if a LOT of songs : don't add file-specific tags, building the GUI would be too long anyway
-return $self if @IDs>1000;
-#######################################################
-	Songs::SortList(\@IDs,'path album:i disc track file');
-	#edition of file-specific tags (track title)
-	my $perfile_table=Gtk2::Table->new( scalar(@IDs), 10, FALSE);
+
+	# do not add per-file part if LOTS of songs, building the GUI would be too long anyway
+	$self->add_per_file_part unless @IDs>1000;
+	return $self;
+}
+
+# for edition of file-specific tags (track title ...)
+sub add_per_file_part
+{	my $self=shift;
+	my $IDs=$self->{IDs};
+	Songs::SortList($IDs,'path album:i disc track file');
+	my $perfile_table=Gtk2::Table->new( scalar(@$IDs), 10, FALSE);
 	$self->{perfile_table}=$perfile_table;
 	my $row=0;
 	$self->add_column('track');
@@ -526,7 +530,7 @@ return $self if @IDs>1000;
 
 	#add filename column
 	$perfile_table->attach( Gtk2::Label->new(Songs::FieldName('file')) ,$lastcol,$lastcol+1,$row,$row+1,'fill','shrink',1,1);
-	for my $ID (@IDs)
+	for my $ID (@$IDs)
 	{	$row++;
 		my $label=Gtk2::Label->new( Songs::Display($ID,'file') );
 		$label->set_selectable(TRUE);
@@ -559,37 +563,26 @@ return $self if @IDs>1000;
 	$sw->add_with_viewport($perfile_table);
 	$self->pack_start($sw, TRUE, TRUE, 4);
 
-########################################################### Autofill
-	my $Bautofill=Gtk2::OptionMenu->new;
-	my $menu=Gtk2::Menu->new;
-	$menu->append(Gtk2::MenuItem->new(_"Auto fill based on filenames ..."));
-	my @files= Songs::Map('file',\@IDs); #FIXME or use Songs::Display ?
-	s/\.[^.]*$//i for @files;
-	my $found;
-	for my $i (0..$#FORMATS)
-	{	next if @files/2>(grep m/$FORMATS[$i][1]/, @files);
-		my $formatname=$FORMATS[$i][0];
-		$formatname=~s/(%[taldnyCV%])/Songs::FieldName($::ReplaceFields{$1})/ge;
-		my $item=Gtk2::MenuItem->new_with_label($formatname);
-		$item->{'index'}=$i;
-		$item->signal_connect(activate => \&autofill_cb,$self);
-		$menu->append($item);
-		$found++;
-	}
-	$Bautofill->set_menu($menu);
+	my $store= Gtk2::ListStore->new('Glib::String','Glib::Scalar');
+	$self->{autofill_combo}= my $Bautofill=Gtk2::ComboBox->new($store);
+	my $renderer=Gtk2::CellRendererText->new;
+	$Bautofill->pack_start($renderer,::TRUE);
+	$Bautofill->add_attribute($renderer, markup => 0);
+	$self->autofill_check;
+	$Bautofill->signal_connect(changed => \&autofill_cb);
+	::Watch( $self, AutofillFormats => \&autofill_check);
+
 	my $checkOBlank=Gtk2::CheckButton->new(_"Auto fill only blank fields");
 	$self->{AFOBlank}=$checkOBlank;
 	my $hbox=Gtk2::HBox->new;
 	$hbox->pack_start($_, FALSE, FALSE, 0) for $BSelFields,Gtk2::VSeparator->new,$Bautofill,$BClear,$checkOBlank,$Btools,
 	$self->pack_start($hbox, FALSE, FALSE, 4);
-###########################################################
-	return $self;
 }
 
 sub add_column
 {	my ($self,$field)=@_;
 	if ($self->{'pfcheck_'.$field})	#if already created -> toggle show/hide
-	{	my @w=( $self->{'pfcheck_'.$field}, @{ $self->{pf_frames}{$field} } );
+	{	my @w=( $self->{'pfcheck_'.$field}, @{ $self->{pf_widgets}{$field} } );
 		if ($w[0]->visible)	{ $_->hide for @w; }
 		else			{ $_->show for @w; }
 		return;
@@ -600,7 +593,7 @@ sub add_column
 	my $check=Gtk2::CheckButton->new( Songs::FieldName($field) );
 	my @entries;
 	$self->{'pfcheck_'.$field}=$check;
-	$self->{pf_frames}{$field}=\@entries;
+	$self->{pf_widgets}{$field}=\@entries;
 	for my $ID ( @{$self->{IDs}} )
 	{	$row++;
 		my $widget=Songs::EditWidget($field,'per_id',$ID);
@@ -616,6 +609,8 @@ sub add_column
 		{  my $active=$_[0]->get_active;
 		   $_->set_sensitive($active) for @entries;
 		});
+
+	# add auto-increment button to track column
 	if ($field eq 'track' && 1)	#good idea ? make entries a bit large :(
 	{	#$_->set_alignment(1) for @entries;
 		my $increment=sub
@@ -654,7 +649,7 @@ sub add_selectfile_column
 	{	$row++;
 		my $check=Gtk2::CheckButton->new;
 		$check->set_active(1);
-		$check->signal_connect( toggled => sub { my ($check,$i)=@_; my $self=::find_ancestor($check,__PACKAGE__); my $active=$check->get_active; $self->{pf_frames}{$_}[$i]->set_sensitive($active) for keys %{ $self->{pf_frames} } },$i);
+		$check->signal_connect( toggled => sub { my ($check,$i)=@_; my $self=::find_ancestor($check,__PACKAGE__); my $active=$check->get_active; $self->{pf_widgets}{$_}[$i]->set_sensitive($active) for keys %{ $self->{pf_widgets} } },$i);
 		#$widget->signal_connect(focus_in_event=> \&scroll_to_entry);
 		$table->attach($check,$col,$col+1,$row,$row+1,'fill','shrink',1,1);
 		$check->show_all; warn $check;
@@ -673,18 +668,56 @@ sub scroll_to_entry
 	0;
 }
 
+sub autofill_check
+{	my $self=shift;
+	my $combo=$self->{autofill_combo};
+	my $store=$combo->get_model;
+	$store->clear;
+	$store->set( $store->append, 0, ::PangoEsc(_"Auto fill based on filenames ..."));
+	my @files= Songs::Map('barefilename',$self->{IDs});
+	autofill_user_formats();
+	for my $ref (@FORMATS_user,@FORMATS)
+	{	my ($format,$re)=@$ref;
+		next if @files/2 > (grep m/$re/, @files); # ignore patterns that match less than half of the filenames
+		my $formatname= '<b>'.::PangoEsc($format).'</b>';
+		$formatname= GMB::Edit::Autofill_formats::make_format_name($formatname,"</b><i>%s</i><b>");
+		$store->set($store->append, 0,$formatname, 1, $ref);
+	}
+	$store->set( $store->append, 0, ::PangoEsc(_"Edit auto-fill formats ..."), 1, \&GMB::Edit::Autofill_formats::new);
+	$combo->set_active(0);
+}
+
+sub autofill_user_formats
+{	my $h= $::Options{filename2tags_formats};
+	return if !$h || @FORMATS_user;
+	for my $format (sort keys %$h)
+	{	my $re= $h->{$format};
+		if (!defined $re)
+		{	$re= GMB::Edit::Autofill_formats::make_default_re($format);
+		}
+		my $qr=eval { qr/$re/i; };
+		if ($@) { warn "Error compiling regular expression for '$format' : $re\n$@"; next}
+		push @FORMATS_user, [$format,$qr];
+	}
+}
+
 sub autofill_cb
-{	my ($menuitem,$self)=@_;
-	my ($format,$pattern)=@{ $FORMATS[$menuitem->{'index'}] };
-	my @fields= map $::ReplaceFields{$_}, $format=~m/(%[taldnyCV])/g;
+{	my $combo=shift;
+	my $self=::find_ancestor($combo,__PACKAGE__);
+	my $iter=$combo->get_active_iter;
+	return unless $iter;
+	my $ref=$combo->get_model->get($iter,1);
+	return unless $ref;
+	if (ref $ref eq 'CODE') { $ref->($self); return; }	# for edition of filename formats
+	my ($format,$pattern)=@$ref;
+	my @fields= GMB::Edit::Autofill_formats::find_fields($format);
+	$_ eq 'album_artist' and $_='album_artist_raw' for @fields;	#FIXME find a more generic way to do that
 	my $OBlank=$self->{AFOBlank}->get_active;
 	my @vals;
 	for my $ID (@{$self->{IDs}})
-	{	my $file= Songs::Display($ID,'file');
-		$file=~s/\.[^.]*$//;
+	{	my $file= Songs::Display($ID,'barefilename');
 		my @v=($file=~m/$pattern/);
-		s/_/ /g for @v;		#should it be an option ?
-		s/^\s+//, s/\s+$// for @v;
+		s/_/ /g, s/^\s+//, s/\s+$// for @v;
 		@v=('')x scalar(@fields) unless @v;
 		my $n=0;
 		push @{$vals[$n++]},$_ for @v;
@@ -693,19 +726,19 @@ sub autofill_cb
 	{	my $varray=shift @vals;
 		my %h; $h{$_}=undef for @$varray; delete $h{''};
 		if ( (keys %h)==1 )
-		{	my $entry=$self->{frames}{$f};
-			next unless $entry && $entry->is_sensitive;
-			next if $OBlank && $entry->get_text ne '';
-			$entry->set_text(keys %h);
-		}
-		else
-		{	my $entries=$self->{pf_frames}{$f};
-			next unless $entries;
-			for my $e (@$entries)
-			{ my $v=shift @$varray;
-			  next if $OBlank && $e->get_text ne '';
-			  $e->set_text($v) if $e->is_sensitive && $v ne '';
+		{	my $entry=$self->{widgets}{$f};
+			if ($entry && $entry->is_sensitive)
+			{	next if $OBlank && ($entry->can('is_blank') ? $entry->is_blank : $entry->get_text ne '');
+				$entry->set_text(keys %h);
+				next
 			}
+		}
+		my $entries= $self->{pf_widgets}{$f};
+		next unless $entries;
+		for my $e (@$entries)
+		{	my $v=shift @$varray;
+			next if $OBlank && ($e->can('is_blank') ? $e->is_blank : $e->get_text ne '');
+			$e->set_text($v) if $e->is_sensitive && $v ne '';
 		}
 	}
 }
@@ -715,11 +748,11 @@ sub tool
 	#my $OBlank=$self->{AFOBlank}->get_active;
 	#$OBlank=0 if $ignoreOB;
 	my $IDs=$self->{IDs};
-	for my $wdgt ( values %{$self->{frames}}, map @$_, values %{$self->{pf_frames}} )
+	for my $wdgt ( values %{$self->{widgets}}, map @$_, values %{$self->{pf_widgets}} )
 	{	next unless $wdgt->is_sensitive && $wdgt->can('tool');
 		$wdgt->tool($sub);
 	}
-	#for my $entries (values %{$self->{pf_frames}})
+	#for my $entries (values %{$self->{pf_widgets}})
 	#{	next unless $entries->[0]->is_sensitive && $entries->[0]->can('tool');
 	#	for my $e (@$entries)
 	#	{	$wdgt->tool($sub);
@@ -731,7 +764,7 @@ sub save
 {	my ($self,$finishsub)=@_;
 	my $IDs=$self->{IDs};
 	my (%default,@modif);
-	while ( my ($f,$wdgt)=each %{$self->{frames}} )
+	while ( my ($f,$wdgt)=each %{$self->{widgets}} )
 	{	next unless $wdgt->is_sensitive;
 		if ($wdgt->can('return_setunset'))
 		{	my ($set,$unset)=$wdgt->return_setunset;
@@ -745,7 +778,7 @@ sub save
 			push @modif, $f,$v;
 		}
 	}
-	while ( my ($f,$wdgt)=each %{$self->{pf_frames}} )
+	while ( my ($f,$wdgt)=each %{$self->{pf_widgets}} )
 	{	next unless $wdgt->[0]->is_sensitive;
 		my @vals;
 		for my $ID (@$IDs)
@@ -763,6 +796,199 @@ sub save
 	$progressbar->show_all;
 	Songs::Set($IDs,\@modif, progress=>$progressbar, callback_finish=>$finishsub, window=> $self->get_toplevel);
 }
+
+package GMB::Edit::Autofill_formats;
+use base 'Gtk2::Dialog';
+our $Instance;
+
+sub new
+{	my $ID= $_[0]{IDs}[0];
+	if ($Instance) { $Instance->present; $Instance->{ID}=$ID; $Instance->preview_update; return };
+	my $self = Gtk2::Dialog->new ("Custom auto-fill filename formats", undef, [],  'gtk-close' => 'none');
+	$Instance=bless $self,__PACKAGE__;
+	::SetWSize($self,'AutofillFormats');
+	$self->set_border_width(4);
+	$self->{ID}=$ID;
+	$self->{store}=my $store= Gtk2::ListStore->new('Glib::String','Glib::String');
+	$self->{treeview}=my $treeview=Gtk2::TreeView->new($store);
+	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes(_"Custom formats", Gtk2::CellRendererText->new, text => 0 ));
+	#$treeview->set_headers_visible(::FALSE);
+	$treeview->signal_connect(cursor_changed=> \&cursor_changed_cb);
+
+	my $label_format=Gtk2::Label->new(_"Filename format :");
+	my $label_re=    Gtk2::Label->new(_"Regular expression :");
+	$self->{entry_format}=	my $entry_format=Gtk2::Entry->new;
+	$self->{entry_re}=	my $entry_re=	Gtk2::Entry->new;
+	$self->{check_re}=	my $check_re=	Gtk2::CheckButton->new(_"Use default regular expression");
+	$self->{error}=		my $error=	Gtk2::Label->new;
+	$self->{preview}=	my $preview=	Gtk2::Label->new;
+	$self->{remove_button}=	my $button_del= ::NewIconButton('gtk-remove',_"Remove");
+	$self->{add_button}=	my $button_add= ::NewIconButton('gtk-save',_"Save");
+	my $button_new= ::NewIconButton('gtk-new', _"New");
+	$button_del->signal_connect(clicked=>\&button_cb,'remove');
+	$button_add->signal_connect(clicked=>\&button_cb,'save');
+	$button_new->signal_connect(clicked=>\&button_cb,'new');
+	$preview->set_alignment(0,.5);
+	my $sg=Gtk2::SizeGroup->new('horizontal');
+	$sg->add_widget($_) for $label_format,$label_re;
+	my $bbox= Gtk2::HButtonBox->new;
+	$bbox->add($_) for $button_del, $button_add, $button_new;
+	my $table= ::MakeReplaceTable('taAlCyndgL');	#AutoFillFields
+	my $hbox= ::Hpack($treeview,'_',[[$label_format,'_',$entry_format],$table,$check_re,[$label_re,'_',$entry_re],$error,$preview,'-',$bbox]);
+	$self->vbox->add($hbox);
+
+	::set_drag($preview, dest => [::DRAG_ID,\&song_dropped]);
+	$entry_format->signal_connect(changed=> \&entry_changed);
+	$entry_re->signal_connect(changed=> \&preview_update);
+	$check_re->signal_connect(toggled=> sub { $entry_re->set_sensitive(!$_[0]->get_active); entry_changed($_[0]); });
+	$check_re->set_active(1);
+	$entry_re->set_sensitive(0);
+	$self->entry_changed;
+	$self->fill_store;
+	$self->show_all;
+	$self->signal_connect( response => sub { $_[0]->destroy; $Instance=undef; });
+}
+
+sub song_dropped
+{	my ($preview,$type,$ID)=@_;
+	my $self= ::find_ancestor($preview,__PACKAGE__);
+	$self->{ID}=$ID;
+	$self->preview_update;
+}
+
+sub entry_changed
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+	my $text= $self->{entry_format}->get_text;
+	my $match= exists $::Options{filename2tags_formats}{$text};
+	$self->{remove_button}->set_sensitive($match);
+	$self->{busy}=1;
+	my $selection= $self->{treeview}->get_selection;
+	$selection->unselect_all;
+	if ($match)
+	{	my $store=$self->{store};
+		my $iter=$store->get_iter_first;
+		while ($iter)
+		{	if ($store->get($iter,1) eq $text)
+			{	$selection->select_iter($iter);
+				last;
+			}
+			$iter=$store->iter_next($iter);
+		}
+	}
+	$self->{add_button}->set_sensitive( length $text );
+	if ($self->{check_re}->get_active)
+	{	$self->{entry_re}->set_text( make_default_re($text) );
+	}
+	$self->{busy}=0;
+	$self->preview_update;
+}
+
+sub preview_update
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+	return if $self->{busy};
+	my $re=$self->{entry_re}->get_text;
+	my $qr=eval { qr/$re/i; };
+	if ($@)
+	{	$self->{error}->show;
+		$self->{error}->set_markup_with_format("<i><b>%s</b></i>",_"Invalid regular expression");
+		$self->{preview}->set_text('');
+		return;
+	}
+	my $format=$self->{entry_format}->get_text;
+	my @fields= map Songs::FieldName($_), find_fields($format);
+	my $ID=$self->{ID};
+	my $file= Songs::Display($ID,'barefilename');
+	my @text=(_"Example :", Songs::FieldName('file'), $file);
+	my $preview= "%s\n<i>%s</i> : <small>%s</small>\n\n";
+	my @v;
+	@v= ($file=~m/$qr/) if $re;
+	if (@v || !$re) { $self->{error}->hide; $self->{error}->set_text(''); }
+	else
+	{	$self->{error}->show;
+		$self->{error}->set_markup_with_format("<i><b>%s</b></i>",_"Regular expression didn't match");
+	}
+	s/_/ /g, s/^\s+//, s/\s+$// for @v;
+	for my $i (sort { $fields[$a] cmp $fields[$b] } 0..$#fields)
+	{	my $v= $v[$i];
+		$v='' unless defined $v;
+		push @text, $fields[$i],$v;
+		$preview.= "<i>%s</i> : %s\n";
+	}
+	$self->{preview}->set_markup_with_format($preview,@text);
+}
+
+sub button_cb
+{	my ($button,$action)=@_;
+	my $self= ::find_ancestor($button,__PACKAGE__);
+	my $formats= $::Options{filename2tags_formats};
+	my $format= $self->{entry_format}->get_text;
+	if ($action eq 'remove')
+	{	delete $formats->{$format};
+	}
+	if ($action eq 'new' || $action eq 'remove')
+	{	$self->{check_re}->set_active(1);
+		$self->{entry_format}->set_text('');
+	}
+	else
+	{	$formats->{$format}= $self->{check_re}->get_active ? undef : $self->{entry_re}->get_text;
+	}
+	return if $action eq 'new';
+	$self->fill_store;
+	@FORMATS_user=();
+	::HasChanged('AutofillFormats');
+}
+
+sub fill_store
+{	my $self=shift;
+	my $store=$self->{store};
+	$store->clear;
+	my $formats= $::Options{filename2tags_formats} ||= {};
+	for my $format (sort keys %$formats)
+	{	my $formatname= make_format_name($format);
+		$store->set($store->append, 0,$formatname, 1,$format);
+	}
+	$self->entry_changed;
+}
+
+sub make_format_name
+{	my ($format,$markup)=@_;
+	$format=~s#(\$\w+|%[a-zA-Z]|\$\{\w+\})|([%\$])\2#
+		   $2 || do {	my $f= $::ReplaceFields{$1};
+		   		$f=undef if $f && $Songs::Def{$f}{flags}!~m/e/;
+				$f&&= Songs::FieldName($f);
+				$f&&= ::MarkupFormat($markup,$f) if $markup;
+				$f || $1
+			    }#ge;
+	return $format;
+}
+sub find_fields
+{	my $format=shift;
+	my @fields= map $::ReplaceFields{$_}, grep defined, $format=~m/ %% | \$\$ | ( \$\w+ | %[a-zA-Z] | \$\{\w+\} ) /gx;
+	@fields= grep defined && $Songs::Def{$_}{flags}=~m/e/, @fields;
+	return @fields;
+}
+sub make_default_re
+{	my $re=shift;
+	$re=~s#(\$\w+|%[a-zA-Z]|\$\{\w+\})|%(%)|\$(\$)|(%?[-,;\w ]+)|(.)#
+		$1 ? Songs::ReplaceFields_to_re($1) :
+		$2 ? $2 : $3 ? '\\'.$3 : defined $4 ? $4 : '\\'.$5 #ge;
+	return $re;
+}
+
+sub cursor_changed_cb
+{	my $treeview=shift;
+	my $self=::find_ancestor($treeview,__PACKAGE__);
+	return if $self->{busy};
+	my $path=($treeview->get_cursor)[0];
+	return unless $path;
+	my $store=$treeview->get_model;
+	my $format= $store->get( $store->get_iter($path), 1);
+	my $re= $::Options{filename2tags_formats}{$format};
+	$self->{entry_format}->set_text($format);
+	$self->{check_re}->set_active( !defined $re );
+	$self->{entry_re}->set_text($re) if defined $re;
+}
+
 
 package GMB::TagEdit::EntryString;
 use Gtk2;
@@ -1063,9 +1289,23 @@ sub update
 }
 
 sub get_text
-{	my $self=$_[0];
+{	my $self=shift;
 	my $h=$self->{selected};
 	return [grep $h->{$_}, keys %$h];
+}
+
+sub is_blank
+{	my $self=shift;
+	my $list= $self->get_text;
+	return !(@$list);
+}
+sub set_text		# for setting from autofill-from-filename
+{	my ($self,$val)=@_;
+	my @vals= grep $_ ne '', split /\s*[;,]\s*/, $val; # currently split on ; or ,
+	my $selected= $self->{selected};
+	$selected->{$_}=0 for keys %$selected; #remove all
+	$selected->{$_}=1 for @vals;
+	$self->update;
 }
 
 package GMB::TagEdit::EntryMassList;	#for mass-editing fields with multiple values
@@ -1189,6 +1429,16 @@ sub return_setunset
 		elsif	($mode<0)	{ push @unset,$value }
 	}
 	return \@set,\@unset;
+}
+
+sub is_blank {1}
+sub set_text		# for setting from autofill-from-filename
+{	my ($self,$val)=@_;
+	my @vals= grep $_ ne '', split /\s*[;,]\s*/, $val; # currently split on ; or ,
+	my $selected= $self->{selected};
+	#$selected->{$_}=0 for keys %$selected; #remove all
+	$selected->{$_}=1 for @vals;
+	$self->update;
 }
 
 package EditTagSimple;

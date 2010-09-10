@@ -37,6 +37,7 @@ our %timespan_menu=
 		'filter:mi'	=> '#display# .=~. m"#VAL#"i',			'filter_prep:mi'=> \&Filter::QuoteRegEx,
 		'filter:s'	=> 'index( lc(#display#),"#VAL#") .!=. -1',	'filter_prep:s'	=> sub {quotemeta lc($_[0])},
 		'filter:S'	=> 'index(    #display#, "#VAL#") .!=. -1',	'filter_prep:S'	=> sub {quotemeta $_[0]},
+		autofill_re	=> '.+',
 	},
 	unknown	=>
 	{	parent	=> 'generic',
@@ -97,6 +98,7 @@ our %timespan_menu=
 		'editwidget:many'	=> sub { GMB::TagEdit::EntryMassList->new(@_) },
 		'editwidget:single'	=> sub { GMB::TagEdit::FlagList->new(@_) },
 		'editwidget:per_id'	=> sub { GMB::TagEdit::FlagList->new(@_) },
+		autofill_re	=> '.+',
 	},
 	artists	=>
 	{	_		=> '____[#ID#]',
@@ -317,6 +319,7 @@ our %timespan_menu=
 		makefilter	=> '"#field#:e:#GID#"',
 		default		=> '0+0',	#not 0 because it needs to be true :(
 		filter_prep	=>  sub { $_[0]=~m/(\d+(?:\.\d+)?)/; return $1 || 0},
+		autofill_re	=> '\\d+',
 	},
 	'number.div' =>
 	{	group		=> 'int(#_#/#ARG0#) !=',
@@ -354,6 +357,7 @@ our %timespan_menu=
 		check		=> '#VAL#= #VAL# =~m/^(\d*(?:\.\d+)?)$/ ? $1 : 0;',
 		# FIXME make sure that locale is set to C (=> '.' as decimal separator) when needed
 		'editwidget:all'=> sub { GMB::TagEdit::EntryNumber->new(@_,undef,3); },
+		autofill_re	=> '(?:\\d+\\.)?\\.\\d+',
 	},
 	'length' =>
 	{	display	=> 'sprintf("%d:%02d", #_#/60, #_#%60)',
@@ -574,6 +578,7 @@ our %timespan_menu=
 	edit_order=> 50,	edit_many=>1,	letter => 'y',
 	can_group=>1,
 	FilterList => {},
+	autofill_re	=> '[12]\\d{3}',
  },
  track =>
  {	name	=> _"Track",	width => 40,	flags => 'garwesc',
@@ -1040,7 +1045,7 @@ warn "\@Fields=@Fields"; $Def{$_}{flags}||='' for @Fields;	#DELME
 		$LENGTHsub= Compile(Length =>"sub {$code}");
 	}
 	%::ReplaceFields= map { '%'.$Def{$_}{letter} => $_ } grep $Def{$_}{letter}, @Fields;
-	$::ReplaceFields{'$'.$_}=$_ for grep $Def{$_}{flags}=~m/g/, @Fields;
+	$::ReplaceFields{'$'.$_}= $::ReplaceFields{'${'.$_.'}'}= $_ for grep $Def{$_}{flags}=~m/g/, @Fields;
 
 	::HasChanged('fields_reset');
 	#FIXME connect them to 'fields_reset' event :
@@ -1635,6 +1640,15 @@ sub EditWidget
 	my ($sub)= LookupCode($field, "editwidget:all|editwidget:$type|editwidget");
 	unless ($sub) {warn "Can't find editwidget for field $field\n"; return undef;}
 	return $sub->($field,$IDs);
+}
+sub ReplaceFields_to_re
+{	my $string=shift;
+	my $field= $::ReplaceFields{$string};
+	if ($field && $Def{$field}{flags}=~m/e/)
+	{	return $Def{$field}{_autofill_re} ||= '('. LookupCode($field, 'autofill_re') .')';
+	}
+	$string=~s#(\$\{\})#\\$1#; # escape $ and {}
+	return $string;
 }
 sub StringFields #list of fields that are strings, used for selecting fields for interactive search
 {	grep SortICase($_), @Fields; #currently use SortICase #FIXME ?
