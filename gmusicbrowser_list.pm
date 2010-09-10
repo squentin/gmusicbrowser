@@ -201,8 +201,8 @@ sub Update
 	if (!$array)	{ $tip=$text=_"error"; }
 	else		{ $text.= ::CalcListLength($array,$self->{format}); }
 	my $format= $self->{size} ? '<span size="'.$self->{size}.'">%s</span>' : '%s';
-	$self->child->set_markup_with_format($format,$text);
-	$self->set_tooltip_text($tip);
+	$self->child->set_markup_with_format($format,$tip);
+	$self->set_tooltip_text($text);
 	$self->{needupdate}=0;
 }
 
@@ -229,7 +229,7 @@ sub filter_Update
 {	my $self=shift;
 	my $filter=::GetFilter($self);
 	my $array=$filter->filter;
-	return _("Filter : "), $array, $filter->explain;
+	return _("Filter : "), $array, ("Filter: ".$filter->explain);
 }
 
 ### list functions
@@ -248,7 +248,7 @@ sub list_SongArray_changed
 sub list_Update
 {	my $self=shift;
 	my $array=::GetSongArray($self) || return;
-	return _("Listed : "), $array,  ::__('%d song','%d songs',scalar@$array);
+	return _("Listed : "), $array,  ::__('%d song listed','%d songs listed',scalar@$array);
 }
 
 ### selected functions
