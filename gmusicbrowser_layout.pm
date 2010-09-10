@@ -187,7 +187,7 @@ our %Widgets=
 	FilterIndicator =>
 	{	parent  => 'Filter',
 		click1  => sub { FilterMenu() },
-		click2	=> \&RemoveFilter,
+		click3	=> \&RemoveFilter,
 	},
 	Queue =>
 	{	class	=> 'Layout::Button',
@@ -1477,6 +1477,9 @@ sub FilterMenu
 		$sitem->set_submenu($submenu);
 		$menu->prepend($sitem);
 	}
+	my $item=Gtk2::CheckMenuItem->new(_"Clear filter");
+	$item->signal_connect(activate => \&RemoveFilter);
+	$menu->append($item);
 	$menu->show_all;
 	return $menu if $nopopup;
 	my $event=Gtk2->get_current_event;
