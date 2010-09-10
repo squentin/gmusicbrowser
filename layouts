@@ -27,7 +27,7 @@ HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
 VBAbout		= (tabtitle="Info") _PluginArtistinfo
 VBArtist	= (tabtitle="Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1)
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
-HBStatus	= 3Total(format=short,relief=none,button=0,mode=list) -5SortIndicator -5FilterIndicator
+HBStatus	= 3Total(format=short,relief=none,button=0,mode=library) -5SortIndicator -5FilterIndicator
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
 HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
