@@ -739,10 +739,10 @@ our %timespan_menu=
 			type	=> 'virtual',	flags => 'g',	depend => 'file path',	letter => 'u',
 			'filter:e'	=> '#ID# == #VAL#',	'filter_prep:e'=> sub { FindID($_[0]); },
 		   },
- barefilename	=> {	name => _"filename without extension",	type=> 'virtual',	flags => 'g',	letter => 'o',
-			get => 'do {my $s=#file->display#; $s=~s/\.[^\.]+$//; $s;}',	depend => 'file',
+ barefilename	=> {	name => _"Filename without extension",	type=> 'virtual',	flags => 'g',	letter => 'o',
+			get => 'do {my $s=#file->display#; $s=~s/\.[^.]+$//; $s;}',	depend => 'file',
 		   },
- extension =>	   {	name => _"filename extension",		type=> 'virtual',	flags => 'g',
+ extension =>	   {	name => _"Filename extension",		type=> 'virtual',	flags => 'g',
 			get => 'do {my $s=#file->display#; $s=~s#^.*\.##; $s;}',	depend => 'file',
 		   },
  title_or_file	=> {get => '(#title->get# eq "" ? #file->display# : #title->get#)',	type=> 'virtual',	flags => 'g', depend => 'file title', letter => 'S',},	#why letter S ? :)
