@@ -6241,7 +6241,7 @@ sub button_press_cb
 }
 sub button_release_cb
 {	my ($view,$event)=@_;
-	return 0 unless $event->button==1 && $view->{pressed};
+	return 0 unless $view->{pressed};
 	$view->{pressed}=undef;
 	my $self=::find_ancestor($view,__PACKAGE__);
 	my $answer=$self->coord_to_path($event->coords);
