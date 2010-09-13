@@ -418,11 +418,11 @@ our @SongCMenu=
 );
 our @cMenuAA=
 (	{ label => _"Lock",	code => sub { ToggleLock($_[0]{lockfield}); }, check => sub { $::TogLock && $::TogLock eq $_[0]{lockfield}}, mode => 'P',
-	  test	=> sub { $_[0]{field} eq $_[0]{lockfield} || $_[0]{gid} == Songs::Get_gid($::SongID,$_[0]{lockfield}); },
+	  test	=> sub { $_[0]{field} eq $_[0]{lockfield} || $_[0]{gid} == Songs::Get_gid($::SongID,$_[0]{lockfield}); }, stockicon => 'gmb-lock',
 	},
-	{ label => _"Lookup in AMG",	code => sub { AMGLookup( $_[0]{mainfield}, $_[0]{aaname} ); },
-	  test => sub { $_[0]{mainfield} =~m/^album$|^artist$|^title$/; },
-	},
+	#{ label => _"Lookup in AMG",	code => sub { AMGLookup( $_[0]{mainfield}, $_[0]{aaname} ); },
+	#  test => sub { $_[0]{mainfield} =~m/^album$|^artist$|^title$/; },
+	#},
 	{ label => _"Filter",		code => sub { Select(filter => Songs::MakeFilterFromGID($_[0]{field},$_[0]{gid})); },	stockicon => 'gmb-filter', mode => 'P' },
 	{ label => \&SongsSubMenuTitle,		submenu => \&SongsSubMenu, },
 	{ label => sub {$_[0]{mode} eq 'P' ? _"Display Songs" : _"Filter"},	code => \&FilterOnAA,
