@@ -5587,11 +5587,17 @@ sub PrefLayouts
 	#layouts
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	my $layoutT=NewPrefCombo(LayoutT=> Layout::get_layout_list('T'), text => _"Tray tip window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
-	my $layout =NewPrefCombo(Layout => Layout::get_layout_list('G'), text =>_"Player window layout :", 	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => sub {CreateMainWindow();}, );
-	my $layoutB=NewPrefCombo(LayoutB=> Layout::get_layout_list('B'), text =>_"Browser window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
-	my $layoutF=NewPrefCombo(LayoutF=> Layout::get_layout_list('F'), text =>_"Full screen layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
-	my $layoutS=NewPrefCombo(LayoutS=> Layout::get_layout_list('S'), text =>_"Search window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
+	my @layouts_combos;
+	for my $layout	( [ 'Layout', 'G',_"Player window layout :", sub {CreateMainWindow();}, ],
+			  [ 'LayoutB','B',_"Browser window layout :", ],
+			  [ 'LayoutT','T',_"Tray tip window layout :", ],
+			  [ 'LayoutF','F',_"Full screen layout :", ],
+			  [ 'LayoutS','S',_"Search window layout :", ],
+			)
+	{	my ($key,$type,$text,$cb)=@$layout;
+		my $combo= NewPrefLayoutCombo($key,$type,$text,$sg1,$sg2,$cb);
+		push @layouts_combos, $combo;
+	}
 
 	#fullscreen button
 	my $fullbutton=NewPrefCheckButton(AddFullscreenButton => _"Add a fullscreen button", cb=>sub { Layout::WidgetChangedAutoAdd('Fullscreen'); }, tip=>_"Add a fullscreen button to layouts that can accept extra buttons");
@@ -5600,7 +5606,7 @@ sub PrefLayouts
 	my $icotheme=NewPrefCombo(IconTheme=> GetIconThemesList(), text =>_"Icon theme :", sizeg1=>$sg1,sizeg2=>$sg2, cb => \&LoadIcons);
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $layout,$layoutB,$layoutT,$layoutF,$layoutS,$checkT1,$fullbutton,$icotheme;
+	$vbox->pack_start($_,FALSE,FALSE,1) for @layouts_combos,$checkT1,$fullbutton,$icotheme;
 	return $vbox;
 }
 
@@ -6173,6 +6179,20 @@ sub NewPrefCombo
 	{	$widget= $combo->make_toolitem($toolitem,$key,$widget);
 	}
 	return $widget;
+}
+
+sub NewPrefLayoutCombo
+{	my ($key,$type,$text,$sg1,$sg2,$cb)=@_;
+	my $combo= NewPrefCombo($key => Layout::get_layout_list($type), text => $text, sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => $cb, );
+	my $set_tooltip= sub	#show layout author in tooltip
+	 {	return if $_[1] && $_[1] ne $key;
+		my $author= $Layout::Layouts{$Options{$key}}{Author};
+		$author&&= _("by").' '.$author;
+		$_[0]->set_tooltip_text($author);
+	 };
+	Watch( $combo, Option => $set_tooltip);
+	$set_tooltip->($combo);
+	return $combo;
 }
 
 sub NewIconButton

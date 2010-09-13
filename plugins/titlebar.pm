@@ -47,7 +47,7 @@ sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	my $layout=::NewPrefCombo(OPT.'layout'=> Layout::get_layout_list('O'), cb=> \&init, text =>_"Overlay layout :",tree=>1, sizeg1=>$sg1,sizeg2=>$sg2);
+	my $layout=::NewPrefLayoutCombo(OPT.'layout'=> 'O', _"Overlay layout :", $sg1,$sg2, \&init);
 	my $refpoint=::NewPrefCombo(OPT.'refpoint'=> \%refpoints, cb=> \&move, text =>_"Reference point :", sizeg1=>$sg1,sizeg2=>$sg2);
 	my $offx=::NewPrefSpinButton(OPT.'offx', -999,999, cb=>\&move, step=>1, page=>5, text1=>_"x offset :", sizeg1=>$sg1);
 	my $offy=::NewPrefSpinButton(OPT.'offy', -999,999, cb=>\&move, step=>1, page=>5, text1=>_"y offset :", sizeg1=>$sg1);
