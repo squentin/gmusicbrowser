@@ -22,12 +22,12 @@ VBSearchBox	= 2SimpleSearch(suggest=1) 5Filler2
 VBSettings	= Pref(stock=gtk-preferences_20,size=button) 5Filler5
 ### main left: artist pane and album-cover ###
 VBLeft		= _NBList HBCover HBStatus
-NBList		= (tabpos="bottom") VBArtist QueueList(songtree=1,tabtitle="Queue (%n)",tabicon="") HBLyrics VBAbout
+NBList		= (tabpos="bottom") VBArtist QueueList(songtree=1,tabtitle="Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248") HBLyrics VBAbout
 HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
 VBAbout		= (tabtitle="Info") _PluginArtistinfo
 VBArtist	= (tabtitle="Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1)
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
-HBStatus	= 3Total(format=short,relief=none,button=0,mode=library) -5SortIndicator -5FilterIndicator
+HBStatus	= 3Total(format=short,relief=none,button=0,mode=library) -5SortIndicator -5FilterIndicator #-5ToggleButton3(icon=list,relief=none,size=menu,widget=HBCover,togglegroup=2)
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
 HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
@@ -35,7 +35,7 @@ HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year le
 VPMosaic	= _FilterPane1(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,hidetabs=1)
 ### bottom: statusbar ### Pref(size=small-toolbar,button=0) 
 ### positioning and sizing ###
-HSize0		= 350 VBArtist
+HSize0		= 350 NBList
 VSize0		= 350 HBCover
 
 [Lists, Library & Context]
