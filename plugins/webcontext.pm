@@ -294,6 +294,8 @@ sub new
 	$self->{$_}=$opt->{$_} for qw/follow group urientry statusbar baseurl/;
 
 	my $toolbar=Gtk2::Toolbar->new;
+	$toolbar->set_style( $opt->{ToolbarStyle}||'both-horiz' );
+	$toolbar->set_icon_size( $opt->{ToolbarSize}||'small-toolbar' );
 	my $status=$self->{Status}=Gtk2::Statusbar->new;
 	$status->{id}=$status->get_context_id('link');
 	($self->{embed},my $container)= $self->new_embed;
