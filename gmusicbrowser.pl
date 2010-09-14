@@ -768,7 +768,8 @@ our %Options=
 	Labels		=> [_("favorite"),_("bootleg"),_("broken"),_("bonus tracks"),_("interview"),_("another example")],
 	FilenameSchema	=> ['%a - %l - %n - %t','%l - %n - %t','%n-%t','%d%n-%t'],
 	FolderSchema	=> ['%A/%l','%A','%A/%Y-%l','%A - %l'],
-	PlayedPercent	=> .85,	#percent of a song played to increase play count
+	PlayedMinPercent=> 80,	# Threshold to count a song as played in percent
+	PlayedMinSeconds=> 600,	# Threshold to count a song as played in seconds
 	DefaultRating	=> 50,
 #	Device		=> 'default',
 #	amixerSMC	=> 'PCM',
@@ -1745,7 +1746,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		$re_artist=qr/$Options{ArtistSplit}/;
 		if ($oldversion<1.1005) {delete $Options{$_} for qw/Diacritic_sort gst_volume/;} #cleanup old options
 		$Options{AutoRemoveCurrentSong}= delete $Options{TAG_auto_check_current} if $oldversion<1.1005 && exists $Options{TAG_auto_check_current};
-
+		$Options{PlayedMinPercent}= 100*delete $Options{PlayedPercent} if exists $Options{PlayedPercent};
 
 		Post_Options_init();
 
@@ -2204,9 +2205,9 @@ sub Played
 	return unless defined $PlayTime;
 	push @Played_segments, $StartedAt, $PlayTime;
 	my $seconds=Coverage(@Played_segments); # a bit overkill :)
-	
+
 	my $coverage_ratio= $seconds / Songs::Get($ID,'length');
-	my $partial= $Options{PlayedPercent} > $coverage_ratio;
+	my $partial= $Options{PlayedMinPercent}/100 > $coverage_ratio || ($Options{PlayedMinLength} && $Options{PlayedMinSeconds}<$seconds);
 	HasChanged('Played',$ID, !$partial, $StartTime, $seconds, $coverage_ratio, \@Played_segments);
 	$PlayingID=undef;
 	@Played_segments=();
@@ -5504,9 +5505,7 @@ sub PrefAudio_makeadv
 }
 
 sub PrefMisc
-{	my $vbox=Gtk2::VBox->new (FALSE, 2);
-
-	#Default rating
+{	#Default rating
 	my $DefRating=NewPrefSpinButton('DefaultRating',0,100, step=>10, page=>20, text1=>_"Default rating :", cb=> sub
 		{ IdleDo('0_DefaultRating',500,\&Songs::UpdateDefaultRating);
 		});
@@ -5553,10 +5552,8 @@ sub PrefMisc
 			join "\n", '', map Songs::DateString($_), @sec;
 		    }
 	);
-	#my $datebox= Hpack(0,$datefmt,$preview);
 	my $datealign=Gtk2::Alignment->new(0,.5,0,0);
 	$datealign->add($datefmt);
-	my $datebox= Hpack(0,$datealign,$preview);
 
 	my $volstep= NewPrefSpinButton('VolumeStep',1,100, step=>1, text1=>_"Volume step :", tip=>_"Amount of volume changed by the mouse wheel");
 	my $always_in_pl=NewPrefCheckButton(AlwaysInPlaylist => _"Current song must always be in the playlist", tip=> _"- When selecting a song, the playlist filter will be reset if the song is not in it\n- Skip to another song when removing the current song from the playlist");
@@ -5564,8 +5561,14 @@ sub PrefMisc
 
 	my $recent_include_not_played= NewPrefCheckButton(AddNotPlayedToRecent => _"Recent songs include skipped songs that haven't been played.", tip=> _"When changing songs, the previous song is added to the recent list even if not played at all.");
 
-	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry, $always_in_pl, $recent_include_not_played, $volstep, $pixcache;
+	my $playedpercent= NewPrefSpinButton('PlayedMinPercent'	,0,100,  text1=>_"Threshold to count a song as played :", text2=>"%");
+	my $playedseconds= NewPrefSpinButton('PlayedMinSeconds'	,0,99999,text1=>_"or", text2=>_"seconds");
+
+	my $vbox= Vpack( $checkR1,$checkR2,$checkR4, $DefRating,$ProxyCheck, $asplit,
+			[0,$datealign,$preview], $screensaver,$shutentry, $always_in_pl,
+			$recent_include_not_played, $volstep, $pixcache,
+			[ $playedpercent, $playedseconds ],
+		);
 	return $vbox;
 }
 
