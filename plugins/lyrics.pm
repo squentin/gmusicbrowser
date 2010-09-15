@@ -98,6 +98,8 @@ sub new
 	$sw->set_policy('automatic','automatic');
 	$sw->add($textview);
 	my $toolbar=Gtk2::Toolbar->new;
+	$toolbar->set_style( $options->{ToolbarStyle}||'both-horiz' );
+	$toolbar->set_icon_size( $options->{ToolbarSize}||'small-toolbar' );
 	for my $aref
 	(	[backb => 'gtk-go-back',\&Back_cb,	_"Previous page"],
 		[saveb => 'gtk-save',	\&Save_text,	_"Save",	_"Save lyrics"],

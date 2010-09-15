@@ -131,9 +131,15 @@ sub FillOptions
 	my $opt= $DWlist->{$key};
 	my $layout= $opt->{layout};
 	return unless $Layout::Layouts{$layout};
-	my $name= $Layout::Layouts{$layout}{Name} || $layout;
+	my $name=  $Layout::Layouts{$layout}{Name} || $layout;
+	my $author=$Layout::Layouts{$layout}{Author};
+	my $markup= "<b>%s</b>";
+	if (defined $author)
+	{	$author= _("by").' '.$author;
+		$markup.= "\n<i><small>%s</small></i>";
+	}
 	my $label= Gtk2::Label->new;
-	$label->set_markup_with_format('<b>%s</b>',$name);
+	$label->set_markup_with_format($markup,$name, $author||() );
 	my $remove= ::NewIconButton('gtk-remove',_"Remove this widget", sub { Remove($key) });
 
 	my $textcolor= Gtk2::ColorButton->new_with_color( Gtk2::Gdk::Color->parse($opt->{DefaultFontColor}) );

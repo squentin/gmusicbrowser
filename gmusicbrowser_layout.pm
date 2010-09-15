@@ -1364,7 +1364,7 @@ sub PlayOrderComboUpdate
 	$store->set($iter=$store->append, 0, _"Shuffle", 1,'shuffle',2,'gmb-shuffle');
 	$found=$iter if 'shuffle' eq $check;
 	if (defined $::ListMode)
-	{	$store->set($iter=$store->append, 0, _"list order", 1,'',2,'gmb-list');
+	{	$store->set($iter=$store->append, 0, _"List order", 1,'',2,'gmb-list');
 		$found=$iter if '' eq $check;
 	}
 	for my $name (sort keys %{$::Options{SavedSorts}})
@@ -1407,7 +1407,7 @@ sub SortMenu
 	{	$append->($submenu,$name, $::Options{SavedWRandoms}{$name} );
 	}
 	my $editcheck=(!$found && $check=~m/^random:/);
-	$append->($submenu,_"Edit ...", undef, $editcheck, sub
+	$append->($submenu,_"Edit...", undef, $editcheck, sub
 		{	::EditWeightedRandom(undef,$::Options{Sort},undef, \&::Select_sort);
 		});
 	$sitem->set_submenu($submenu);
@@ -1424,7 +1424,7 @@ sub SortMenu
 
 	$menu->append(Gtk2::SeparatorMenuItem->new); #separator between random and non-random modes
 
-	$append->($menu,_"list order", '' ) if defined $::ListMode;
+	$append->($menu,_"List order", '' ) if defined $::ListMode;
 	for my $name (sort keys %{$::Options{SavedSorts}})
 	{	$append->($menu,$name, $::Options{SavedSorts}{$name} );
 	}
@@ -3682,7 +3682,7 @@ sub set
 {	my ($self,$nb)=@_;
 	$self->{nb}=$nb;
 	$nb=$::Options{DefaultRating} if !defined $nb || $nb eq '';
-	$self->set_tooltip_text(_("song rating")." : $nb %");
+	$self->set_tooltip_text(_("Song rating")." : $nb %");
 	$self->{image}->set_from_pixbuf( get_pixbuf($nb) );
 }
 sub get { shift->{nb}; }

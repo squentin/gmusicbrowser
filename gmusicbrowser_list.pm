@@ -18,7 +18,7 @@ our @MenuPlaying=
 	{ label => _"Filter on playing Album",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('album',$::SongID) )	if defined $::SongID; }},
 	{ label => _"Filter on playing Artist",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('artists',$::SongID) )if defined $::SongID; }},
 	{ label => _"Filter on playing Song",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('title',$::SongID) )	if defined $::SongID; }},
-	{ label => _"use the playing Filter",	code => sub { ::SetFilter($_[0]{songlist}, $::PlayFilter ); }, test => sub {::GetSonglist($_[0]{songlist})->{mode} ne 'playlist'}}, #FIXME	if queue use queue, if $ListMode use list
+	{ label => _"Use the playing filter",	code => sub { ::SetFilter($_[0]{songlist}, $::PlayFilter ); }, test => sub {::GetSonglist($_[0]{songlist})->{mode} ne 'playlist'}}, #FIXME	if queue use queue, if $ListMode use list
 	{ label => _"Recent albums",		submenu => sub { my $sl=$_[0]{songlist};my @gid= ::uniq( Songs::Map_to_gid('album',$::Recent) ); $#gid=19 if $#gid>19; my $m=::PopupAA('album',nosort=>1,nominor=>1,widget => $_[0]{self}, list=>\@gid, cb=>sub { ::SetFilter($sl, Songs::MakeFilterFromGID('album',$_[1]) ); }); return $m; } },
 	{ label => _"Recent artists",		submenu => sub { my $sl=$_[0]{songlist};my @gid= ::uniq( Songs::Map_to_gid('artist',$::Recent) ); $#gid=19 if $#gid>19; my $m=::PopupAA('artists',nosort=>1,nominor=>1,widget => $_[0]{self}, list=>\@gid, cb=>sub { ::SetFilter($sl, Songs::MakeFilterFromGID('artists',$_[1]) ); }); return $m; } },
 	{ label => _"Recent songs",		submenu => sub { my @ids=@$::Recent; $#ids=19 if $#ids>19; return [map { $_,Songs::Display($_,'title') } @ids]; },
@@ -1821,7 +1821,7 @@ sub button_press_event_cb
 	$menu->append(Gtk2::SeparatorMenuItem->new);
 
 	if (keys %pages)
-	{	my $new=Gtk2::ImageMenuItem->new(_"add tab");
+	{	my $new=Gtk2::ImageMenuItem->new(_"Add tab");
 		$new->set_image( Gtk2::Image->new_from_stock('gtk-add','menu') );
 		my $submenu=Gtk2::Menu->new;
 		for my $pid (sort {$pages{$a} cmp $pages{$b}} keys %pages)
@@ -1834,7 +1834,7 @@ sub button_press_event_cb
 		$new->set_submenu($submenu);
 	}
 	if ($nb->get_n_pages>1)
-	{	my $item=Gtk2::ImageMenuItem->new(_"remove this tab");
+	{	my $item=Gtk2::ImageMenuItem->new(_"Remove this tab");
 		$item->set_image( Gtk2::Image->new_from_stock('gtk-remove','menu') );
 		$item->signal_connect(activate=> \&RemovePage_cb,$self);
 		$menu->append($item);
@@ -6242,7 +6242,7 @@ sub button_press_cb
 }
 sub button_release_cb
 {	my ($view,$event)=@_;
-	return 0 unless $event->button==1 && $view->{pressed};
+	return 0 unless $view->{pressed};
 	$view->{pressed}=undef;
 	my $self=::find_ancestor($view,__PACKAGE__);
 	my $answer=$self->coord_to_path($event->coords);

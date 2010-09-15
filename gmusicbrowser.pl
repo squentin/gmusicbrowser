@@ -768,7 +768,8 @@ our %Options=
 	Labels		=> [_("favorite"),_("bootleg"),_("broken"),_("bonus tracks"),_("interview"),_("another example")],
 	FilenameSchema	=> ['%a - %l - %n - %t','%l - %n - %t','%n-%t','%d%n-%t'],
 	FolderSchema	=> ['%A/%l','%A','%A/%Y-%l','%A - %l'],
-	PlayedPercent	=> .85,	#percent of a song played to increase play count
+	PlayedMinPercent=> 80,	# Threshold to count a song as played in percent
+	PlayedMinSeconds=> 600,	# Threshold to count a song as played in seconds
 	DefaultRating	=> 50,
 #	Device		=> 'default',
 #	amixerSMC	=> 'PCM',
@@ -1745,7 +1746,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		$re_artist=qr/$Options{ArtistSplit}/;
 		if ($oldversion<1.1005) {delete $Options{$_} for qw/Diacritic_sort gst_volume/;} #cleanup old options
 		$Options{AutoRemoveCurrentSong}= delete $Options{TAG_auto_check_current} if $oldversion<1.1005 && exists $Options{TAG_auto_check_current};
-
+		$Options{PlayedMinPercent}= 100*delete $Options{PlayedPercent} if exists $Options{PlayedPercent};
 
 		Post_Options_init();
 
@@ -2204,9 +2205,9 @@ sub Played
 	return unless defined $PlayTime;
 	push @Played_segments, $StartedAt, $PlayTime;
 	my $seconds=Coverage(@Played_segments); # a bit overkill :)
-	
+
 	my $coverage_ratio= $seconds / Songs::Get($ID,'length');
-	my $partial= $Options{PlayedPercent} > $coverage_ratio;
+	my $partial= $Options{PlayedMinPercent}/100 > $coverage_ratio || ($Options{PlayedMinLength} && $Options{PlayedMinSeconds}<$seconds);
 	HasChanged('Played',$ID, !$partial, $StartTime, $seconds, $coverage_ratio, \@Played_segments);
 	$PlayingID=undef;
 	@Played_segments=();
@@ -3695,7 +3696,6 @@ sub ChooseDir
 	# there is no mode in Gtk2::FileChooserDialog that let you select both files or folders (Bug #136294), so have to work-around by connecting to the ok button and forcing the end of $dialog->run with a $dialog->hide (the dialog will be destroyed after)
 	$okbutton->signal_connect(clicked=> sub { $_[0]->{ok}=1; $dialog->hide; }) if $allowfiles;
 
-	 warn $Options{$remember_key} if $remember_key;
 	if ($remember_key)	{ $path= $Options{$remember_key}; }
 	elsif ($path)		{ $path= url_escape($path); }
 	$dialog->set_current_folder_uri("file://".$path) if $path;
@@ -3818,9 +3818,10 @@ sub ChoosePix
 		{ my ($dialog,$file)=@_;
 		  unless ($file)
 		  {	$file= $dialog->get_preview_uri;
-			$file= $file=~s#^file://## ? $file=decode_url($file) : undef;
+			$file= ($file && $file=~s#^file://##) ? decode_url($file) : undef;
 		  }
-		  return unless $file && -f $file;
+		  unless ($file && -f $file) { $preview->hide; return }
+		  $preview->show;
 		  $max=0;
 		  $nb=0 unless $lastfile && $lastfile eq $file;
 		  $lastfile=$file;
@@ -3835,7 +3836,6 @@ sub ChoosePix
 	$preview->show_all;
 	$more->set_no_show_all(1);
 	$dialog->set_preview_widget_active(0);
- warn $Options{$remember_key} if $remember_key;
 	if ($remember_key)	{ $path= $Options{$remember_key}; }
 	elsif ($path)		{ $path= url_escape($path); }
 	if ($file && $file=~s/:(\d+)$//) { $nb=$1; $lastfile=$file; }
@@ -5463,9 +5463,7 @@ sub PrefAudio_makeadv
 }
 
 sub PrefMisc
-{	my $vbox=Gtk2::VBox->new (FALSE, 2);
-
-	#Default rating
+{	#Default rating
 	my $DefRating=NewPrefSpinButton('DefaultRating',0,100, step=>10, page=>20, text1=>_"Default rating :", cb=> sub
 		{ IdleDo('0_DefaultRating',500,\&Songs::UpdateDefaultRating);
 		});
@@ -5512,10 +5510,8 @@ sub PrefMisc
 			join "\n", '', map Songs::DateString($_), @sec;
 		    }
 	);
-	#my $datebox= Hpack(0,$datefmt,$preview);
 	my $datealign=Gtk2::Alignment->new(0,.5,0,0);
 	$datealign->add($datefmt);
-	my $datebox= Hpack(0,$datealign,$preview);
 
 	my $volstep= NewPrefSpinButton('VolumeStep',1,100, step=>1, text1=>_"Volume step :", tip=>_"Amount of volume changed by the mouse wheel");
 	my $always_in_pl=NewPrefCheckButton(AlwaysInPlaylist => _"Current song must always be in the playlist", tip=> _"- When selecting a song, the playlist filter will be reset if the song is not in it\n- Skip to another song when removing the current song from the playlist");
@@ -5523,8 +5519,14 @@ sub PrefMisc
 
 	my $recent_include_not_played= NewPrefCheckButton(AddNotPlayedToRecent => _"Recent songs include skipped songs that haven't been played.", tip=> _"When changing songs, the previous song is added to the recent list even if not played at all.");
 
-	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry, $always_in_pl, $recent_include_not_played, $volstep, $pixcache;
+	my $playedpercent= NewPrefSpinButton('PlayedMinPercent'	,0,100,  text1=>_"Threshold to count a song as played :", text2=>"%");
+	my $playedseconds= NewPrefSpinButton('PlayedMinSeconds'	,0,99999,text1=>_"or", text2=>_"seconds");
+
+	my $vbox= Vpack( $checkR1,$checkR2,$checkR4, $DefRating,$ProxyCheck, $asplit,
+			[0,$datealign,$preview], $screensaver,$shutentry, $always_in_pl,
+			$recent_include_not_played, $volstep, $pixcache,
+			[ $playedpercent, $playedseconds ],
+		);
 	return $vbox;
 }
 
@@ -5545,11 +5547,17 @@ sub PrefLayouts
 	#layouts
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	my $layoutT=NewPrefCombo(LayoutT=> Layout::get_layout_list('T'), text => _"Tray tip window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
-	my $layout =NewPrefCombo(Layout => Layout::get_layout_list('G'), text =>_"Player window layout :", 	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => sub {CreateMainWindow();}, );
-	my $layoutB=NewPrefCombo(LayoutB=> Layout::get_layout_list('B'), text =>_"Browser window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
-	my $layoutF=NewPrefCombo(LayoutF=> Layout::get_layout_list('F'), text =>_"Full screen layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
-	my $layoutS=NewPrefCombo(LayoutS=> Layout::get_layout_list('S'), text =>_"Search window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
+	my @layouts_combos;
+	for my $layout	( [ 'Layout', 'G',_"Player window layout :", sub {CreateMainWindow();}, ],
+			  [ 'LayoutB','B',_"Browser window layout :", ],
+			  [ 'LayoutT','T',_"Tray tip window layout :", ],
+			  [ 'LayoutF','F',_"Full screen layout :", ],
+			  [ 'LayoutS','S',_"Search window layout :", ],
+			)
+	{	my ($key,$type,$text,$cb)=@$layout;
+		my $combo= NewPrefLayoutCombo($key,$type,$text,$sg1,$sg2,$cb);
+		push @layouts_combos, $combo;
+	}
 
 	#fullscreen button
 	my $fullbutton=NewPrefCheckButton(AddFullscreenButton => _"Add a fullscreen button", cb=>sub { Layout::WidgetChangedAutoAdd('Fullscreen'); }, tip=>_"Add a fullscreen button to layouts that can accept extra buttons");
@@ -5558,7 +5566,7 @@ sub PrefLayouts
 	my $icotheme=NewPrefCombo(IconTheme=> GetIconThemesList(), text =>_"Icon theme :", sizeg1=>$sg1,sizeg2=>$sg2, cb => \&LoadIcons);
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $layout,$layoutB,$layoutT,$layoutF,$layoutS,$checkT1,$fullbutton,$icotheme;
+	$vbox->pack_start($_,FALSE,FALSE,1) for @layouts_combos,$checkT1,$fullbutton,$icotheme;
 	return $vbox;
 }
 
@@ -6131,6 +6139,20 @@ sub NewPrefCombo
 	{	$widget= $combo->make_toolitem($toolitem,$key,$widget);
 	}
 	return $widget;
+}
+
+sub NewPrefLayoutCombo
+{	my ($key,$type,$text,$sg1,$sg2,$cb)=@_;
+	my $combo= NewPrefCombo($key => Layout::get_layout_list($type), text => $text, sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => $cb, );
+	my $set_tooltip= sub	#show layout author in tooltip
+	 {	return if $_[1] && $_[1] ne $key;
+		my $author= $Layout::Layouts{$Options{$key}}{Author};
+		$author&&= _("by").' '.$author;
+		$_[0]->set_tooltip_text($author);
+	 };
+	Watch( $combo, Option => $set_tooltip);
+	$set_tooltip->($combo);
+	return $combo;
 }
 
 sub NewIconButton
