@@ -1696,6 +1696,7 @@ sub new
 		$addbut->signal_connect( clicked => sub
 		{	my $key=$list->[ $addlist->get_active ];
 			$self->addrow($key);
+			Glib::Idle->add(\&scroll_to_bottom,$self);
 		});
 	}
 	my %toadd= map { $_=>undef } $tag->get_keys;
@@ -1713,6 +1714,12 @@ sub new
 	return $self;
 }
 
+sub scroll_to_bottom
+{	my $self=shift;
+	my $adj= $self->{table}->parent->get_vadjustment;
+	$adj->clamp_page($adj->upper,$adj->upper);
+	0; #called from an idle => false to disconnect idle
+}
 
 sub addrow
 {	my ($self,$key,$nb,$value)=@_;
