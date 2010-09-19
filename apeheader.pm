@@ -1,4 +1,4 @@
-# Copyright (C) 2007 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2007,2010 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -42,28 +42,39 @@ sub new
 
 sub _ReadHeader
 {	my $self=$_[0];
-	my %info;
 	my $fh=$self->{fileHandle};
 	my $offset=$self->{startaudio};
 	seek $fh,$offset,0;
 	my $buf;
-	return unless read($fh,$buf,12)==12;
-	return unless $buf=~m/^MAC /;
-	my ($v,$desc_size)=unpack 'x4Vv',$buf;
-	$info{version}=$v/1000;
-	seek $fh,$desc_size-12,1;
-	return unless read($fh,$buf,24)==24;
-	my ($compression,$blocksperframe,$finalsblocks,$nbframes,$bitpersample,$channels,$freq)=unpack 'vx2VVVvvV',$buf;
-	$info{compression}=$compression{$compression} || $compression;
-	$info{channels}=$channels;
-	$info{frames}=$nbframes;
-	$info{rate}=$freq;
-	if ($nbframes==0) {$info{seconds}=$info{bitrate}=0}
-	else
-	{ $info{seconds}=( ($nbframes-1)*$blocksperframe+$finalsblocks )/$freq;
-	  #$info{seconds}=( ($nbframes-1)*$blocksperframe+$finalsblocks )*1000/$freq;
-	  $info{bitrate}=( $self->{endaudio}-$self->{startaudio} )*8/1000/$info{seconds};
+	return unless read($fh,$buf,32)==32;
+	my ($sig,$v,$desc_size)=unpack 'a4vx2v',$buf;
+	return unless $sig eq 'MAC ';
+	my ($compression,$blocksperframe,$finalsblocks,$nbframes,$channels,$freq);
+	if ($v<3980)	#old header
+	{	($compression,$channels,$freq,$nbframes,$finalsblocks)=unpack 'x6vx2vVx8VV',$buf;
+		$blocksperframe= $v>=3950 ? 73728*4 :
+				($v>=3900 || ($v>=3800 && $compression==4000)) ? 73728 : 9216;
 	}
+	else
+	{	seek $fh,$desc_size-32,1;
+		return unless read($fh,$buf,24)==24;
+		($compression,$blocksperframe,$finalsblocks,$nbframes,$channels,$freq)=unpack 'vx2VVVx2vV',$buf;
+	}
+	my $bitrate= my $seconds=0;
+	my $blocks = ($nbframes-1)*$blocksperframe+$finalsblocks;
+	if ($blocks & $freq)
+	{	$seconds= $blocks/$freq;
+		$bitrate= ( $self->{endaudio}-$self->{startaudio} ) *8/$seconds;
+	}
+	my %info=
+	(	version		=> $v/1000,
+		channels	=> $channels,
+		frames		=> $nbframes,
+		rate		=> $freq,
+		seconds		=> $seconds,
+		bitrate		=> $bitrate,
+		compression	=> $compression{$compression} || $compression,
+	);
 	#warn "$_=$info{$_}\n" for keys %info;
 	$self->{info}=\%info;
 }
