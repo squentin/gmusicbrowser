@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2008 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2010 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -15,11 +15,10 @@
 #http://www.matroska.org/technical/specs/tagging/othertagsystems/comparetable.html
 #http://hobba.hobba.nl/audio/tag_frame_reference.html
 
-package Tag::MP3;
-
 use strict;
 use warnings;
-use Encode qw(decode encode);
+
+package Tag::MP3;
 
 my (@bitrates,@freq,@versions,@encodings,$regex_t);
 our @Genres;
@@ -147,18 +146,9 @@ sub _FindTags
 	$self->{endaudio}=tell $fh;
 	seek $fh,-128,2;
 	read $fh,my($id3v1),128;
-	if ($id3v1=~s/^TAG//)	#ID3v1 tag
-	{	my ($title,$artist,$album,$year,$comment,$vers1_1,$track,$genre)
-		   =unpack 'Z30 Z30 Z30 Z4 Z28 C C C',$id3v1;
-		#print "Tag v1 found\n"; print "==$_==\n" for unpack 'Z30 Z30 Z30 A4 Z28 C C C',$id3v1;
-		if ($vers1_1!=0)	#-> id3v1.0
-		{	$comment=unpack 'x94 Z30',$id3v1;
-			$track='';
-		}
-		s/ *$// for $title,$artist,$album,$comment;
-		$_=decode($::Options{TAG_id3v1_encoding}||'iso-8859-1',$_) for $title,$artist,$album,$comment;
-		$genre=($genre<@Genres)? $Genres[$genre] : '';
-		$self->{ID3v1}=[$title,$artist,$album,$year,$comment,$track,$genre];
+	my $apefooter= substr($id3v1,-32,8) eq 'APETAGEX' && substr($id3v1,-8) eq ("\x00"x8);
+	if (!$apefooter && substr($id3v1,0,3) eq 'TAG')	#ID3v1 tag
+	{	$self->{ID3v1}= Tag::ID3v1->new_from_string($id3v1);
 		$self->{endaudio}-=128;
 	}
 
@@ -183,8 +173,7 @@ sub _FindTags
 
 sub SyncID3v1	#auto sync with id3v2
 {	my $self=shift;
-	$self->new_ID3v1 unless $self->{ID3v1};
-	my $id3v1= $self->{ID3v1};
+	my $id3v1= $self->{ID3v1} || $self->new_ID3v1;
 	my $genre=$id3v1->[6];
 	my @genres;
 	$id3v1->[6]=\@genres;
@@ -206,31 +195,7 @@ sub SyncID3v1	#auto sync with id3v2
 	}
 }
 
-sub new_ID3v1	{ $_[0]{ID3v1}=[]; }
-
-sub _MakeID3v1
-{	my $self=shift;
-	my ($title,$artist,$album,$year,$comment,$track,$genre)=@{ $self->{ID3v1} };
-	if (defined $genre)
-	{	if (ref $genre) { ($genre)=grep defined, map _findindex($_,\@Genres),@$genre; }
-		elsif ($genre=~m/^\D+$/) { $genre=_findindex($genre,\@Genres); }
-	}
-	$genre=255 unless defined $genre && $genre ne '';
-	my $buffer='TAG';
-	my @length=(30,30,30,4,30);
-	$length[4]=28 if $track;
-	for my $v ($title,$artist,$album,$year,$comment)
-	{	$v='' unless defined $v;
-		my $l=shift @length;
-		$v=encode( $::Options{TAG_id3v1_encoding}||'iso-8859-1', $v);
-		if (bytes::length($v)<$l){ $buffer.=pack "Z$l",$v }
-		else			 { $buffer.=pack "A$l",$v } #FIXME remove partial multi-byte chars
-	}
-	$buffer.="\x00".bytes::chr($track) if $track;
-	$buffer.=bytes::chr $genre;
-	return \$buffer;
-}
-
+sub new_ID3v1	 { Tag::ID3v1	 ->new($_[0]); }
 sub new_Lyrics3v2{ Tag::Lyrics3v2->new($_[0]);	}
 sub new_APE	 { Tag::APE	 ->new($_[0]);	}
 sub new_ID3v2	 { Tag::ID3v2	 ->new($_[0]);	}
@@ -309,7 +274,7 @@ sub write_file
 		}
 		$self->_close if $fh;
 	}
-	push @towriteafter, _MakeID3v1($self) if $self->{ID3v1};
+	push @towriteafter, $self->{ID3v1}->make if $self->{ID3v1};
 	warn "startaudio=".$self->{startaudio}." copybegin=$copybegin length(towritebefore)=".join(' ',map(length $$_,@towritebefore))."\n" if $::debug;
 	warn "endaudio=".$self->{endaudio}." copyend=$copyend length(towriteafter)=".join(' ',map(length $$_,@towriteafter))."\n" if $::debug;
 	my $in_place;
@@ -355,6 +320,7 @@ sub write_file
 	warn "replacing old file with new file.\n";
 	unlink $self->{filename} && rename $self->{filename}.'.TEMP',$self->{filename};
 	$MODIFIEDFILE=1;
+	%$self=(); #destroy the object to make sure it is not reused as many of its data are now invalid
 	return 1;
 }
 
@@ -565,19 +531,67 @@ sub _calclength
 	warn "total_frames=$info->{frames}, audio_size=$bytes, length=$info->{mmss},  bitrate=$info->{bitrate}\n" if $::debug;
 }
 
-sub _findindex
-{	my ($str,$listref)=@_;
+package Tag::ID3v1;
+use Encode qw(decode encode);
+
+sub new
+{	my $file=$_[1];
+	return $file->{ID3v1}= bless [];
+}
+
+sub new_from_string
+{	my $string=$_[1];
+	my ($title,$artist,$album,$year,$comment,$vers1_1,$track,$genre)
+	   =unpack 'x3 Z30 Z30 Z30 Z4 Z28 C C C',$string;
+	if ($vers1_1!=0)	#-> id3v1.0
+	{	$comment=unpack 'x97 Z30',$string;
+		$track='';
+	}
+	s/ *$// for $title,$artist,$album,$comment;
+	$_=decode($::Options{TAG_id3v1_encoding}||'iso-8859-1',$_) for $title,$artist,$album,$comment;
+	$genre=($genre<@Tag::MP3::Genres)? $Tag::MP3::Genres[$genre] : '';
+	return bless [$title,$artist,$album,$year,$comment,$track,$genre];
+}
+
+sub make
+{	my $self=shift;
+	my ($title,$artist,$album,$year,$comment,$track,$genre)= @$self;
+	if (defined $genre)
+	{	if (ref $genre) { ($genre)=grep defined, map _findgenre($_),@$genre; }
+		elsif ($genre=~m/^\D+$/) { $genre=_findgenre($genre); }
+	}
+	$genre=255 unless defined $genre && $genre ne '';
+	my $buffer='TAG';
+	my @length=(30,30,30,4,30);
+	$length[4]=28 if $track;
+	for my $v ($title,$artist,$album,$year,$comment)
+	{	$v='' unless defined $v;
+		my $l=shift @length;
+		$v=encode( $::Options{TAG_id3v1_encoding}||'iso-8859-1', $v);
+		if (bytes::length($v)<$l){ $buffer.=pack "Z$l",$v }
+		else			 { $buffer.=pack "A$l",$v } #FIXME remove partial multi-byte chars
+	}
+	$buffer.="\x00".bytes::chr($track) if $track;
+	$buffer.=bytes::chr $genre;
+	return \$buffer;
+}
+
+sub _findgenre
+{	my $str=shift;
+	my $list=\@Tag::MP3::Genres;
 	$str=lc$str;
 	my $i;
-	for (0..$#$listref)
-	{	if ($str eq lc$listref->[$_]) {$i=$_; last}
+	for (0..$#$list)
+	{	if ($str eq lc$list->[$_]) {$i=$_; last}
 	}
 	return $i;
 }
 
+sub get_values
+{	return $_[0][$_[1]];
+}
+
 package Tag::Lyrics3v1;
-use strict;
-use warnings;
 use Encode qw(decode encode);
 
 sub new_from_file	 #http://www.id3.org/lyrics3.html	#untested
@@ -601,8 +615,6 @@ sub make
 }
 
 package Tag::Lyrics3v2;
-use strict;
-use warnings;
 use Encode qw(decode encode);
 
 sub new
@@ -657,13 +669,20 @@ sub remove
 	return 1;
 }
 
+sub get_keys
+{	keys %{ $_[0]{fields} };
+}
+sub get_values
+{	return $_[0]{fields}{$_[1]};
+}
+
 sub make
 {	my $tag=shift;
 	my $tagstring='LYRICSBEGIN';
 	$tagstring.='IND'.sprintf( '%05d',length($tag->{IND}) ).$tag->{IND} if $tag->{IND};
 	for my $field (@{ $tag->{fields_order} })
 	{	next unless defined $tag->{fields}{$field};
-		my $v=substr encode('iso-8859-1',$tag->{fields}{$field}),0,99999;
+		my $v=substr encode('iso-8859-1',delete $tag->{fields}{$field}),0,99999;
 		$tagstring.=$field.sprintf('%05d',length $v).$v;
 	}
 	if ($tagstring ne 'LYRICSBEGIN') #not empty
@@ -673,18 +692,17 @@ sub make
 }
 
 package Tag::APE;
-use strict;
-use warnings;
+# http://wiki.hydrogenaudio.org/index.php?title=APEv2_specification
 use Encode qw(decode encode);
 
 sub new
 {	my ($class,$file)=@_;
-	my $self={ item => {}, item_type => {}, edited => 1 };
+	my $self={ realkey =>{}, item => {}, edited => 1 };
 	unshift @{ $file->{tags_after} },$self;
 	$file->{APE}=$self;
 	return bless($self,$class);
 }
-sub new_from_file	#http://www.ikol.dk/~jan/musepack/klemm/www.personal.uni-jena.de/~pfk/mpp/sv8/apetag.html
+sub new_from_file
 {	my ($class,$file,$isfooter)=@_;
 	my $fh=$file->{fileHandle};
 	if ($isfooter)	{ seek $fh,$file->{endaudio}-32,0; }
@@ -703,109 +721,120 @@ sub new_from_file	#http://www.ikol.dk/~jan/musepack/klemm/www.personal.uni-jena.
 		read $fh, $rawtag, $size;
 		return undef if ($flags & 0x80000000) && $rawtag!~m/^APETAGEX.{24}/sg; #check header
 	}
-	my %tag;
-	$tag{version}=$v/1000;
-	$tag{size}=$size;
+	my %self=( version=> $v/1000, size=> $size, realkey =>{}, item => {}, );
 	warn "found APE tag version ".($v/1000)." ($size bytes) ($Icount items)\n" if $::debug;
 	for (1..$Icount)
 	{	last unless $rawtag=~m/\G(........[\x20-\x7E]+)\x00/sg;
-		my ($len,$f,$key)=unpack 'VVa*',$1;
+		my ($len,$type,$key)=unpack 'VVa*',$1;
+		$key= $self{realkey}{lc$key}||=$key;
 		my $val=substr $rawtag,pos($rawtag),$len;
 		pos($rawtag)+=$len;
 		warn "APE : $key ($len bytes)\n" if $::debug;
-		my $t=($f&0b110)>>1;
-		if ($t&1) #binary
-		{	push @{$tag{item}{$key}},$val;
-			push @{$tag{item_type}{$key}},$t;
+		$type&= 0b111;
+		if ($type & 0b10) #binary
+		{	push @{$self{item}{$key}}, [$val,$type];
 		}
 		else #utf8 string or link
-		{	warn "      $val\n" if $::debug;
-			my @v=split /\x00/,$val;
-			$_=decode('utf8',$_) for @v;
-			push @{$tag{item}{$key}},@v;
-			push @{$tag{item_type}{$key}},($t)x@v;
+		{	my @v=split /\x00/,$val;
+			push @{$self{item}{$key}}, map {[decode('utf8',$_),$type]} @v;
 		}
 	}
-	return $file->{APE}=bless(\%tag,$class);
+	return $file->{APE}=bless(\%self,$class);
 }
 sub removetag {	$_[0]{deleted}=1; }
 sub insert
-{	my ($self,$item,$val,$type)=@_;
-	unshift @{$self->{item}{$item}},$val;
-	unshift @{$self->{item_type}{$item}},$type||0;
+{	my ($self,$key,$val,$type)=@_;
+	$key= $self->{realkey}{lc$key}||=$key;
+	unshift @{$self->{item}{$key}}, [ $val, $type||0];
 	$self->{edited}=1;
 	return 1;
 }
 sub add
-{	my ($self,$item,$val,$type)=@_;
-	push @{$self->{item}{$item}},$val;
-	push @{$self->{item_type}{$item}},$type||0;
+{	my ($self,$key,$val,$type)=@_;
+	$key= $self->{realkey}{lc$key}||=$key;
+	push @{$self->{item}{$key}}, [ $val, $type||0];
 	$self->{edited}=1;
 	return 1;
 }
 sub edit
-{	my ($self,$item,$nb,$val,$type)=@_;
-	return 0 unless defined $self->{item}{$item}[$nb];
-	$self->{item}{$item}[$nb]=$val;
-	$self->{item_type}{$item}[$nb]=$type if defined $type;
+{	my ($self,$key,$nb,$val,$type)=@_;
+	$key= $self->{realkey}{lc$key};
+	return unless defined $key && $self->{item}{$key}[$nb];
+	$self->{item}{$key}[$nb][0]=$val;
+	$self->{item}{$key}[$nb][1]=$type if defined $type;
 	$self->{edited}=1;
 	return 1;
 }
 sub remove
-{	my ($self,$item,$nb)=@_;
-	return 0 unless defined $self->{item}{$item}[$nb];
-	$self->{item}{$item}[$nb]=undef;
-	$self->{item_type}{$item}[$nb]=undef;
+{	my ($self,$key,$nb)=@_;
+	$key= $self->{realkey}{lc$key};
+	return unless defined $key && $self->{item}{$key}[$nb];
+	$self->{item}{$key}[$nb]=undef;
 	$self->{edited}=1;
 	return 1;
 }
 sub remove_all
-{	my ($self,$item)=@_;
-	delete $self->{item}{$item};
-	delete $self->{item_type}{$item};
-	$self->{edited}=1;
+{	my ($self,$key)=@_;
+	$key= delete $self->{realkey}{lc$key};
+	if (defined $key)
+	{	delete $self->{item}{$key};
+		$self->{edited}=1;
+	}
 	return 1;
+}
+
+sub get_keys
+{	keys %{ $_[0]{realkey} };
+}
+sub get_values
+{	my ($self,$key)=@_;
+	$key= $self->{realkey}{lc$key} || $key;
+	my $v= $self->{item}{$key};
+	return $v ? (map $_->[0],grep defined, @$v) : ();
+}
+sub is_binary
+{	my ($self,$key,$nb)=@_;
+	$key= $self->{realkey}{lc$key} || $key;
+	return unless defined $key && defined $nb;
+	my $ref= $self->{item}{$key}[$nb];
+	return $ref ? $ref->[1]&0b10 : undef;
 }
 
 sub make
 {	my $tag=shift;
 	my $tagstring='';
 	my $nb=0;
-	for my $key (keys %{ $tag->{item} })
-	{	next unless defined $tag->{item}{$key};
-		my $f1; my $v1;
-		for my $i (0..$#{$tag->{item}{$key}})
-		{	my $v2=$tag->{item}{$key}[$i];
-			next unless defined $v2;
-			my $f2=($tag->{item_type}{$key}[$i]||0)<<1;
-			$v2=encode('utf8',$v2) unless $f2 & 0b10; #if not binary
-			if (defined $f1)
-			{	if ($f1==$f2) {$v1.="\x00".$v2}
-				else
-				{	$tagstring.=pack('VV',length($v1),$f1).$key."\x00".$v1;
-					$nb++; $f1=$v1=undef;
-				}
+	for my $key (values %{ $tag->{realkey} })
+	{	my $values_types= $tag->{item}{$key};
+		next unless $values_types;
+		my @towrite;
+		for my $vt (@$values_types)
+		{	my ($value,$type)= @$vt;
+			next unless defined $value;
+			$type||=0;
+			unless ($type & 0b10) 	#if not binary
+			{	$value=encode('utf8',$value);
+				my ($prev)= grep $_->[1]==$type, @towrite;	#previous one with same type
+				if ($prev) { $prev->[2].= "\x00".$value; next }	#append value to previous
 			}
-			else { $f1=$f2; $v1=$v2; }
+			push @towrite,[$key,$type,$value];
 		}
-		$tagstring.=pack('VV',length($v1),$f1).$key."\x00".$v1 if defined $v1;
-		$nb++ if defined $v1;
-		#my $v=$tag->{item}{$key};
-		#my $f=( $tag->{item_type}{$key} || 0) <<1;
-		#$tagstring.=pack('VV',length($v),$f).$key."\x00".$v;
-		#$nb++;
+		for my $w (@towrite)
+		{	my ($key,$type,$value)=@$w;
+			$tagstring.=pack('VV',length($value),$type).$key."\x00".$value;
+			$nb++;
+		}
 	}
-	if ($nb>0)
-	{ my $header='APETAGEX'.pack('VVVVx8',2000,32+length$tagstring,$nb,0xa0000000);
-	  my $footer='APETAGEX'.pack('VVVVx8',2000,32+length$tagstring,$nb,0x80000000);
-	  $tagstring=$header.$tagstring.$footer;
+	if ($nb)
+	{	my $length= 32 + length $tagstring;
+		my $header= 'APETAGEX'.pack('VVVVx8', 2000, $length, $nb, 0xa0000000);
+		my $footer= 'APETAGEX'.pack('VVVVx8', 2000, $length, $nb, 0x80000000);
+		$tagstring= $header.$tagstring.$footer;
 	}
 	return \$tagstring;
 }
 
 package Tag::ID3v2;
-use strict;
-use warnings;
 use Encode qw(decode encode);
 
 my %FRAMES; my %FRAME_OLD; my %Special;
@@ -821,7 +850,7 @@ generic_text => 'eT',
 generic_url => 'eT',
 unknown => 'u',
 #text => 'eT',
-TXXX =>	'eTT',
+TXXX =>	'eTM',
 WXXX =>	'eTt',
 UFID =>	'tb',
 MCDI =>	'b',
@@ -922,7 +951,6 @@ ASPI =>	'u',
 TCMP => 'eT',	#compilation flag
 TSO2 => 'eT',	#Album Artist Sort
 TSOC => 'eT',	#Composer Sort
-
 
 #unconverted id3v2
 #XCRM => 'ttb',#CRM
@@ -1143,13 +1171,11 @@ sub new_from_file
 		  {	warn "frame $frame has Grouping identity\n" if $::debug;
 		  }
 		}
-		&$convertsub(\$rawf) if $convertsub;
+		$convertsub->(\$rawf) if $convertsub;
 		my @data;
-		push @{ $tag{frames}{$frame} },\@data;
-		push @{ $tag{framesorder} },$frame;
-		my $type=(exists $FRAMES{$frame})?	$frame	 :
-			 ($frame=~m/^T[A-Z]+$/)	 ?	'generic_text':
-			 ($frame=~m/^W[A-Z]+$/)	 ?	'generic_url' :
+		my $type= exists $FRAMES{$frame} ?	$frame	 :
+			  $frame=~m/^T[A-Z]+$/	 ?	'generic_text':
+			  $frame=~m/^W[A-Z]+$/	 ?	'generic_url' :
 							'unknown';
 		my $fields=$FRAMES{$type};
 		my ($encoding,$regex_T);
@@ -1159,22 +1185,18 @@ sub new_from_file
 			{	my $e=ord substr $rawf,0,1,'';
 				if ($e>$#encodings) { warn "unknown encoding ($e)\n"; $e=0; }
 				($encoding,undef,$regex_T)=@{ $encodings[$e] };
-				#print " encoding : $encoding\n"; #DEBUG
 			}
 			elsif ($t eq 't')	#text
 			{	$rawf=~s/$regex_t//;
 				push @data,decode('iso-8859-1',$1);
-				#warn " $data[-1]\n"; #DEBUG
 			}
 			elsif ($t eq 'T')	#text
-			{	#warn unpack('H*',$rawf)."\n"; #DEBUG
-				$joker=0 unless $rawf=~s/$regex_T//;
+			{	$joker=0 unless $rawf=~s/$regex_T//;
 				my $text=eval {decode($encoding,$1)};
 				if ($@) {warn $@;$text=''} #happens if no BOM in utf16
 				#$text=~s/\n/ /g;	#is it needed ?
 				$text=~s/\s+$//;
 				push @data,$text;
-				#warn " $data[-1]\n"; #DEBUG
 			}
 			elsif ($t eq 'M')	#multi-line text
 			{	$rawf=~s/$regex_T//;
@@ -1182,33 +1204,33 @@ sub new_from_file
 				if ($@) {warn $@;$text=''}
 				$text=~s/\s+$//;
 				push @data,$text;
-				#warn ' '.($data[-1]=~tr/\n//)." lines\n"; #DEBUG
 			}
 			elsif ($t eq 'l')	#language code
 			{	push @data,substr $rawf,0,3,'';
 			}
 			elsif ($t eq 'C')	#char value
-			{	my $i=ord substr $rawf,0,1,'';
-				push @data,$i;
+			{	push @data, ord(substr $rawf,0,1,'');
 			}
 			elsif ($t eq 'c')	#counter	#must be last field
-			{	@_=unpack 'C*',$rawf;
-				my $c=shift @_; $c=($c<<8)+$_ for @_;
+			{	my ($c,@bytes)=unpack 'C*',$rawf;
+				$c=($c<<8)+$_ for @bytes;
 				push @data,$c;
 			}
-			elsif ($t eq 'b')	#binary		#must be last field
-			{ push @data,$rawf; }
-			else	#elsif ($t eq 'u')	#not supported
+			else	#elsif ($t eq 'b' || $t eq 'u')	#binary	or unknown	#must be last field
 			{ push @data,$rawf; }
 			#warn "-- $frame -- $t ".($debug_pos-length($rawf))." bytes\n";	#DEBUG
 			redo if ($joker &&  $t ne 'e' && length($rawf)>0);
 		}
 		$Special{$frame}(\@data,$v1) if $Special{$frame};
-		#print " @data\n"; #DEBUG
-		if ($joker && $tag{frames}{$frame}[1])
-		{	delete $tag{frames}{$frame}[1];
-			pop @{ $tag{framesorder} };
-			push @{ $tag{frames}{$frame}[0] },@data;
+		if ($joker)
+		{	for (@data)
+			{	push @{ $tag{frames}{$frame} },$_;
+				push @{ $tag{framesorder} },$frame;
+			}
+		}
+		else
+		{	push @{ $tag{frames}{$frame} },  @data>1 ? \@data : $data[0];
+			push @{ $tag{framesorder} },$frame;
 		}
 	}
 	if ($file->{ID3v2}) { push @{ $file->{ID3v2s} },\%tag;  warn "found another ID3v2 tag\n"; }
@@ -1217,47 +1239,87 @@ sub new_from_file
 }
 sub removetag {	$_[0]{deleted}=1; }
 sub add
-{	my ($self,$fname,@data)=@_;
-	if ($fname!~m/^[A-Z0-9]{4}$/) { warn "Invalid id3v2 frameID '$fname', ignoring\n"; return }
-	return undef unless _checkNumberOfSubFrame($fname,\@data);
-	push @{ $self->{frames}{$fname} },\@data;
+{	my ($self,$fname,$data)=@_;
+	($fname,$data)=_prepare_data($fname,$data);
+	unless ($fname)	{ warn "Invalid frame\n"; return; }
+	push @{ $self->{frames}{$fname} },$data;
 	push @{ $self->{framesorder} },$fname;
 	$self->{edited}=1;
 	return 1;
 }
 sub insert	#same as add but put it first (of its kind)
-{	my ($self,$fname,@data)=@_;
-	if ($fname!~m/^[A-Z0-9]{4}$/) { warn "Invalid id3v2 frameID '$fname', ignoring\n"; return }
-	return undef unless _checkNumberOfSubFrame($fname,\@data);
-	unshift @{ $self->{frames}{$fname} },\@data;
-	push @{ $self->{framesorder} },$fname;
+{	my ($self,$fname,$data)=@_;
+	($fname,$data)=_prepare_data($fname,$data);
+	unless ($fname)	{ warn "Invalid frame\n"; return; }
+	return unless $fname;
+	unshift @{ $self->{frames}{$fname} },$data;
+	push @{ $self->{framesorder} }, $fname;
 	$self->{edited}=1;
 	return 1;
 }
 sub edit
-{	my ($self,$fname,$nb,@data)=@_;
-	unless (defined $self->{frames}{$fname}[$nb])
-		{ warn "Frame doesn't exist\n"; return undef; }
-	return undef unless _checkNumberOfSubFrame($fname,\@data);
-	$self->{frames}{$fname}[$nb]=\@data;
+{	my ($self,$fname,$nb,$data)=@_;
+	($fname,$data)=_prepare_data($fname,$data);
+	return unless $fname;
+	unless (defined $self->{frames}{$fname}[$nb])	{ warn "Frame doesn't exist\n"; return; }
+	$self->{frames}{$fname}[$nb]=$data;
 	$self->{edited}=1;
 	return 1;
 }
 sub remove
 {	my ($self,$fname,$nb)=@_;
-	unless (defined $self->{frames}{$fname}[$nb])
-		{ warn "Frame doesn't exist\n"; return undef; }
+	unless (defined $self->{frames}{$fname}[$nb])	{ warn "Frame doesn't exist\n"; return; }
 	$self->{frames}{$fname}[$nb]=undef;
 	$self->{edited}=1;
 	return 1;
 }
 sub remove_all
 {	my ($self,$fname)=@_;
-	return undef unless $self->{frames}{$fname};
+	($fname,my @extra)=split /;/,$fname,-1; #-1 to keep empty trailing fields #COMM;;%v; => key="COMM" and @extra=("","%v","")
 	my $ref=$self->{frames}{$fname};
-	$ref->[$_]=undef for 0..$#$ref;
-	$self->{edited}=1;
+	return unless $ref;
+	my @toremove;
+	if (@extra)
+	{	for my $i (0..$#$ref)
+		{	next unless $ref->[$i];
+			my $keep;
+			for my $j (0..$#extra)
+			{	my $extra= $extra[$j];
+				next if $extra eq '%v' || $extra eq '';
+				$keep=1 if $extra ne $ref->[$i][$j];
+			}
+			push @toremove,$i unless $keep;
+		}
+	}
+	else { @toremove= 0..$#$ref; }
+	$ref->[$_]=undef for @toremove;
+	$self->{edited}=1 if @toremove;
 	return 1;
+}
+
+sub get_keys
+{	keys %{ $_[0]{frames} };
+}
+sub get_values
+{	my ($self,$key)=@_;
+	($key,my @extra)= split /;/,$key,-1;  #-1 to keep empty trailing fields
+	my $v= $self->{frames}{$key};
+	return unless $v;
+	my @values= grep defined, @$v;
+	return unless @values;
+	if (@extra && ref $v->[0]) #for multi fields (COMM for example)
+	{	@values= map
+		 {	my $v_ok; my $notok;
+			for my $j (0..$#extra)
+			{	my $p=$extra[$j];
+				my $vj=$_->[$j];
+				if ($p eq '%v') { $v_ok=$vj; }
+				elsif ($p ne '' && $p ne $vj) {$notok=1;last}
+			}
+			$notok ? () : ($v_ok);
+		 } @values;
+	}
+	return @values;
 }
 
 sub make
@@ -1271,28 +1333,24 @@ sub make
 	my $unsync24all;
 	for my $frameid ( @{ $tag->{framesorder} } )
 	{	my $data=$tag->{frames}{$frameid}[ $framecount{$frameid}++ ];
-		my $datai=0;
 		next unless defined $data;
 		my $framestring;
-		my $type=(exists $FRAMES{$frameid})?	$frameid :
-			 ($frameid=~m/^T[A-Z]+$/)  ?	'TXXX'	 :
-			 ($frameid=~m/^W[A-Z]+$/)  ?	'WXXX'	 :
-							'unknown';
+		my $type= exists $FRAMES{$frameid}		?	$frameid :
+			  $frameid=~m/^T[A-Z]+$/		?	'generic_text'	 :
+			  $frameid=~m/^W[A-Z]+$/		?	'generic_url'	 :
+									'unknown';
 		my @fields=split //,$FRAMES{$type};
 		if ($fields[-1] eq '*')
 		{	pop @fields;
-			if ($v1==4)
-			{	push @fields,($fields[-1]) x $#$data;
-			}
-			else
-			{	for (1..$#$data)
-				{	push @{ $tag->{framesorder} },$frameid;
-					push @{ $tag->{frames}{$frameid} },[ $data->[$_] ];
-				}
+			if ($v1==4)	#put all values in the same frame
+			{	next if $framecount{$frameid}>1;
+				$data= [grep defined, @{$tag->{frames}{$frameid}}];
+				push @fields,($fields[-1]) x $#$data;
 			}
 		}
-		no warnings 'uninitialized';
 		my ($encoding,$term);
+		$data=[$data] unless ref $data;
+		my $datai=0;
 		for my $t (@fields)
 		{	if ($t eq 'e')		#encoding for T and M
 			{	#check if strings to be encoded use 8th bit
@@ -1306,35 +1364,36 @@ sub make
 				{	$framestring.=chr $def_encoding;
 					($encoding,$term)=@{ $encodings[$def_encoding] };
 				}
+				next;
 			}
-			elsif ($t eq 't')	#text	#FIXME there shouldn't be \n
-			{	$framestring.=encode('iso-8859-1',$data->[$datai++])."\x00";
+			my $val=$data->[$datai++];
+			if ($t eq 't')		#text
+			{	$val=~s#\n+# #g;
+				$framestring.=encode('iso-8859-1',$val)."\x00";
 			}
-			elsif ($t eq 'T')	#text	#FIXME there shouldn't be \n
-			{	$framestring.=encode($encoding,$data->[$datai++]).$term;
+			elsif ($t eq 'T')	#text
+			{	$val=~s#\n+# #g;
+				$framestring.=encode($encoding,$val).$term;
 			}
 			elsif ($t eq 'M')	#multi-line text
-			{	$framestring.=encode($encoding,$data->[$datai++]).$term;
+			{	$framestring.=encode($encoding,$val).$term;
 			}
 			elsif ($t eq 'l')	#language code
-			{	$framestring.=pack 'a3', encode('iso-8859-1',$data->[$datai++]);
+			{	$framestring.=pack 'a3', encode('iso-8859-1',$val);
 			}
 			elsif ($t eq 'C')	#char value
-			{	my $c=$data->[$datai++];
-				$c=255 if $c>255;
-				$framestring.=chr $c;
+			{	$val||=0;
+				$val=255 if $val>255;
+				$framestring.=chr $val;
 			}
 			elsif ($t eq 'c')	#counter
-			{	my $c=$data->[$datai++];
-				my $string;
-				while ($c>256) { $string.=chr($c&0xff); $c>>=8; }
-				$string.=chr($c).("\x00"x(3-length $string)); #must be at least 4 bytes
+			{	my $string;
+				while ($val>256) { $string.=chr($val&0xff); $val>>=8; }
+				$string.=chr($val).("\x00"x(3-length $string)); #must be at least 4 bytes
 				$framestring.=reverse $string;
 			}
-			elsif ($t eq 'b')	#binary
-			{ $framestring.=$data->[$datai++]; }
-			else	#elsif ($t eq 'u')	#not supported
-			{ $framestring.=$data->[$datai++]; }
+			else	#elsif ($t eq 'b' || $t eq 'u')	#binary or unknown
+			{ $framestring.=$val; }
 			#FIXME call special case sub
 			#warn "-- $frameid -- $t framepos=".length($framestring)."\n";	#DEBUG
 		}
@@ -1371,12 +1430,14 @@ sub _SetPadding
 }
 
 sub get_fieldtypes
-{	my $frame=shift;
-	my $type=(exists $FRAMES{$frame})?	$FRAMES{$frame}	  :
-		 ($frame=~m/^T[A-Z]+$/)	 ?	$FRAMES{'TXXX'}	  :
-		 ($frame=~m/^W[A-Z]+$/)	 ?	$FRAMES{'WXXX'}	  :
-						$FRAMES{'unknown'};
+{	my $frameid=shift;
+	my $type= exists $FRAMES{$frameid}		?	$frameid :
+		  $frameid=~m/^T[A-Z]+$/		?	'generic_text'	 :
+		  $frameid=~m/^W[A-Z]+$/		?	'generic_url'	 :
+								'unknown';
+	$type= $FRAMES{$type};
 	$type=~s/^e//;
+	$type=~s/\*$//;
 	return $type;
 }
 
@@ -1396,18 +1457,20 @@ sub _decodesyncsafe
 	return $int;
 }
 
-sub _checkNumberOfSubFrame
-{	my ($fname,$dataref)=@_;
-	my $type=get_fieldtypes($fname);
-	if (length($type) != @$dataref)
-	{	if (@$dataref==1 && $fname eq 'COMM') {unshift @$dataref,undef,undef}
-		elsif ($type=~m/\*$/ && @$dataref==0) {@$dataref=('')}
-		elsif (@$dataref==0)
-		{	warn "Not the right number of subtags for this frame ($fname ".scalar @$dataref.")\n";
-			return undef;
-		}
+sub _prepare_data
+{	my ($fname,$data)=@_;
+	($fname,my @extra)=split /;/,$fname,-1;
+	if ($fname!~m/^[A-Z0-9]{4}$/) { warn "Invalid id3v2 frameID '$fname', ignoring\n"; return }
+	if (@extra && !ref $data)
+	{	$data= [ map {$_ eq '%v' ? $data : $_} @extra ];
 	}
-	return 1;
+	my $type=get_fieldtypes($fname);
+	my $n= ref $data ? scalar @$data : 1;
+	if (length($type) != $n)
+	{	warn "Not the right number of subtags for this frame ($fname $n)\n";
+		return;
+	}
+	return $fname, $data;
 }
 
 sub _ConvertPIC

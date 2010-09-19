@@ -602,7 +602,7 @@ our %timespan_menu=
  genre	=>
  {	name		=> _"Genres",	width => 180,	flags => 'garwescil',
 	 #is_set	=> '(__GENRE__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
-	id3v1	=> 6,		id3v2	=> 'TCON*',	vorbis	=> 'genre',	ape	=> 'Genre', ilst => "\xA9gen",
+	id3v1	=> 6,		id3v2	=> 'TCON',	vorbis	=> 'genre',	ape	=> 'Genre', ilst => "\xA9gen",
 	read_split	=> qr/\s*;\s*/,
 	type		=> 'flags',		#init_namearray => '@Tag::MP3::Genres',
 	none		=> quotemeta _"No genre",
@@ -752,13 +752,21 @@ our %timespan_menu=
 
  shuffle	=> { name => _"Shuffle",	type => 'shuffle',	flags => 's', },
  album_shuffle	=> { name => _"Album shuffle",	type => 'gidshuffle',	flags => 's',	mainfield=>'album'	  },
+ embedded_pictures=>
+ {	flags => 'l',	type	=> 'virtual',
+	id3v2 => 'APIC',	vorbis => 'METADATA_BLOCK_PICTURE',	'ilst' => 'covr',
+ },
+ embedded_lyrics=>
+ {	flags => '',	type	=> 'virtual',
+	id3v2 => 'TXXX;FMPS_Lyrics;%v | USLT;;;%v',	vorbis => 'FMPS_LYRICS|lyrics',	ape => 'FMPS_LYRICS|Lyrics',
+	'ilst' => "----FMPS_Lyrics|\xA9lyr",	lyrics3v2 => 'LYR',
+ },
  filetags	=>	# debug field : list of the id3v2 frames / vorbis comments
  		{	name	=> "filetags", width => 180,	flags => 'grascil', type	=> 'flags',
-			"id3v2:read"	=> sub { my $h=$_[0]; my %res; for my $key (keys %$h) { my $v=$h->{$key}; if ($key=~m/^TXXX$|^COMM$|^WXXX$/) { my $i= $key eq 'COMM' ? 1 : 0; $res{"$key;$_->[$i]"}=undef for @$v; } else { $res{$key}=undef; } } ; return [keys %res]; },
-			#'id3v2:read'	=> sub { [keys %{$_[0]}] },
-			'vorbis:read'	=> sub { [map "vorbis_$_",keys %{$_[0]}] },
-			'ape:read'	=> sub { [map "ape_$_",   keys %{$_[0]}] },
-			'ilst:read'	=> sub { [map "ilst_$_",  keys %{$_[0]}] },
+			"id3v2:read"	=> sub { my $tag=shift; my %res; for my $key ($tag->get_keys) { my @v=$tag->get_values($key); if ($key=~m/^TXXX$|^COMM$|^WXXX$/) { my $i= $key eq 'COMM' ? 1 : 0; $res{"$key;$_->[$i]"}=undef for @v; } else { $res{$key}=undef; } } ; return [map "id3v2_$_", keys %res]; },
+			'vorbis:read'	=> sub { [map "vorbis_$_",$_[0]->get_keys] },
+			'ape:read'	=> sub { [map "ape_$_",   $_[0]->get_keys] },
+			'ilst:read'	=> sub { [map "ilst_$_",  $_[0]->get_keys] },
 			FilterList => {search=>1,none=>1},
 			none		=> quotemeta "No tags",	#not translated because made for debugging
 			_disabled=>1,
