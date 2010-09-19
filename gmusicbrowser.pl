@@ -2206,8 +2206,9 @@ sub Played
 	push @Played_segments, $StartedAt, $PlayTime;
 	my $seconds=Coverage(@Played_segments); # a bit overkill :)
 
-	my $coverage_ratio= $seconds / Songs::Get($ID,'length');
-	my $partial= $Options{PlayedMinPercent}/100 > $coverage_ratio || ($Options{PlayedMinLength} && $Options{PlayedMinSeconds}<$seconds);
+	my $length= Songs::Get($ID,'length');
+	my $coverage_ratio= $length ? $seconds / Songs::Get($ID,'length') : 1;
+	my $partial= $Options{PlayedMinPercent}/100 > $coverage_ratio || $Options{PlayedMinSeconds}<$seconds;
 	HasChanged('Played',$ID, !$partial, $StartTime, $seconds, $coverage_ratio, \@Played_segments);
 	$PlayingID=undef;
 	@Played_segments=();
