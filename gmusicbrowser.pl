@@ -2206,8 +2206,9 @@ sub Played
 	push @Played_segments, $StartedAt, $PlayTime;
 	my $seconds=Coverage(@Played_segments); # a bit overkill :)
 
-	my $coverage_ratio= $seconds / Songs::Get($ID,'length');
-	my $partial= $Options{PlayedMinPercent}/100 > $coverage_ratio || ($Options{PlayedMinLength} && $Options{PlayedMinSeconds}<$seconds);
+	my $length= Songs::Get($ID,'length');
+	my $coverage_ratio= $length ? $seconds / Songs::Get($ID,'length') : 1;
+	my $partial= $Options{PlayedMinPercent}/100 > $coverage_ratio || $Options{PlayedMinSeconds}<$seconds;
 	HasChanged('Played',$ID, !$partial, $StartTime, $seconds, $coverage_ratio, \@Played_segments);
 	$PlayingID=undef;
 	@Played_segments=();
@@ -3773,7 +3774,7 @@ sub ChoosePix
 					'gtk-cancel' => 'none');
 
 	for my $aref
-	(	[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b' ],
+	(	[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b *.ogg *.oga' ],
 		[_"Pictures files",'image/*'],
 		[_"All files",undef,'*'],
 	)
@@ -3825,7 +3826,7 @@ sub ChoosePix
 		  $max=0;
 		  $nb=0 unless $lastfile && $lastfile eq $file;
 		  $lastfile=$file;
-		  if ($file=~m/\.(?:mp3|flac|m4a|m4b)$/i)
+		  if ($file=~m/\.(?:mp3|flac|m4a|m4b|oga|ogg)$/i)
 		  {	my @pix= FileTag::PixFromMusicFile($file);
 			$max=@pix;
 		  }
@@ -8213,7 +8214,7 @@ sub load
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;
 	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
-	if ($file=~m/\.(?:mp3|flac|m4a|m4b)$/i)
+	if ($file=~m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i)
 	{	my $data=FileTag::PixFromMusicFile($file,$nb);
 		eval { $loader->write($data) } if defined $data;
 	}

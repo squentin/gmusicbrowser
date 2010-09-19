@@ -13,6 +13,7 @@ package Tag::OGG;
 use strict;
 use warnings;
 use Encode qw(decode encode);
+use MIME::Base64;
 
 use constant
 { PACKET_INFO	 => 1,
@@ -105,8 +106,8 @@ INIT
 # seg_table	segmentation table of last read page
 # granule	granule of last read page
 # info		-> hash containing : version channels rate bitrate_upper bitrate_nominal bitrate_lower seconds
-# comments	-> hash of arrays
-# CommentsOrder -> list of keys
+# comments	-> hash of arrays (lowercase keys)
+# CommentsOrder -> list of keys (mixed-case keys)
 # commentpack_size
 # vorbis_string
 # stream_vers
@@ -142,8 +143,6 @@ sub new
 	my $l=0;
 	$l=$l*256+$_ for reverse @granule;
 	$self->{info}{seconds}=my$s=$l/$self->{info}{rate};
-	#$self->{info}{mmss}=sprintf '%d:%02d',$s/60,$s%60;
-	#warn "length : ".$self->{info}{mmss}."\n";
     }
 
     $self->_close;
@@ -196,8 +195,7 @@ sub write_file
 	{	warn "in place editing.\n";
 		my $left=length $$newcom_packref;
 		my $offset2=0;
-		my $fh=$self->_openw or return undef;
-		return undef unless defined $fh;
+		my $fh=$self->_openw or return;
 		_read_packet($self,PACKET_INFO);	#skip first page
 		while ($left)
 		{ my $pos=tell $fh;
@@ -213,9 +211,8 @@ sub write_file
 		$self->_close;
 		return;
 	}
-	my $INfh=$self->_open or return undef;
-	my $OUTfh=$self->_openw(1) or return undef;	#open .TEMP file
-	return undef unless defined $INfh && defined $OUTfh;
+	my $INfh=$self->_open or return;
+	my $OUTfh=$self->_openw(1) or return;	#open .TEMP file
 
 	my $version=chr $self->{stream_vers};
 	my $serial=$self->{serial};
@@ -286,6 +283,8 @@ sub write_file
 	close $OUTfh;
 	warn "replacing old file with new file.\n";
 	unlink $self->{filename} && rename $self->{filename}.'.TEMP',$self->{filename};
+	%$self=(); #destroy the object to make sure it is not reused as many of its data are now invalid
+	return 1;
 }
 
 sub _ReadPage
@@ -342,15 +341,27 @@ sub _ReadComments
 		$self->{vorbis_string}=$vstring;
 		if ($::debug && $vstring!~m/^Xiph.* libVorbis I (\d{8})/)
 		 { warn "unknown comments vendor string : $vstring\n"; }
-		#warn "comment version $1\n";
 		my %comments;
+		my @order;
+		$self->{CommentsOrder}=\@order;
 		for my $kv (@comlist)
 		{	unless ($kv=~m/^([^=]+)=(.*)$/s) { warn "comment invalid - skipped\n"; next; }
 			my $key=$1;
 			my $val=decode('utf-8', $2);
 			#warn "$key = $val\n";
 			push @{ $comments{lc$key} },$val;
-			push @{$self->{CommentsOrder}}, $key;
+			push @order, $key;
+		}
+		if (my $covers=$comments{coverart})	#upgrade old embedded pictures format to metadata_block_picture
+		{	@order= grep !m/^coverart/i, @order;
+			for my $i (0..$#$covers)
+			{	my $data= $comments{"coverart"}[$i];
+				next unless $data;
+				my @val= ( map( $comments{"coverart$_"}[$i], qw/mime type description/ ), decode_base64($data) );
+				push @{$comments{metadata_block_picture}}, \@val;
+				push @order, 'METADATA_BLOCK_PICTURE';
+			}
+			delete $comments{"coverart$_"} for qw/mime type description/,'';
 		}
 		return \%comments;
 	}
@@ -369,6 +380,10 @@ sub _PackComments
 		next unless defined $val;
 		$key=encode('ascii',$key);
 		$key=~tr/\x20-\x7D/?/c; $key=~tr/=/?/; #replace characters that are not allowed by '?'
+		if (uc$key eq 'METADATA_BLOCK_PICTURE' && ref $val)
+		{	$val= Tag::Flac::_PackPicture($val);
+			$val= encode_base64($$val);
+		}
 		push @comments,$key.'='.encode('utf8',$val);
 	}
 	my $packet=pack 'Ca6 V/a* V (V/a*)*',PACKET_COMMENT,'vorbis',$self->{vorbis_string},scalar @comments, @comments;
@@ -380,29 +395,20 @@ sub edit
 {	my ($self,$key,$nb,$val)=@_;
 	$nb||=0;
 	my $aref=$self->{comments}{lc$key};
-	return undef unless $aref &&  @$aref >=$nb;	#FIXME more sanity checks
-	my $old=$aref->[$nb];
-	$aref->[$nb]=$val;
-	return $old;
+	return unless $aref &&  @$aref >=$nb;
+	$aref->[$nb]= $val;
+	return 1;
 }
 sub add
-{	my $self=shift;
-	if (@_%2) {warn 'invalid call to add comments, args must be pairs of $key,$val'."\n"; return undef;}
-	while (@_)
-	{	my $key=shift; my $val=shift;
-		push @{ $self->{comments}{lc$key} },$val;
-		push @{$self->{CommentsOrder}}, $key;
-	}
+{	my ($self,$key,$val)=@_;
+	push @{ $self->{comments}{lc$key} }, $val;
+	push @{$self->{CommentsOrder}}, $key;
 	return 1;
 }
 sub insert	#same as add but put it first (of its kind)
-{	my $self=shift;
-	if (@_%2) {warn 'invalid call to insert comments, args must be pairs of $key,$val'."\n"; return undef;}
-	while (@_)
-	{	my $key=shift; my $val=shift;
-		unshift @{ $self->{comments}{lc$key} },$val;
-		push @{$self->{CommentsOrder}}, $key;
-	}
+{	my ($self,$key,$val)=@_;
+	unshift @{ $self->{comments}{lc$key} }, $val;
+	push @{$self->{CommentsOrder}}, $key;
 	return 1;
 }
 
@@ -414,6 +420,23 @@ sub remove_all
 	return 1;
 }
 
+sub get_keys
+{	keys %{ $_[0]{comments} };
+}
+sub get_values
+{	my ($self,$key)=($_[0],lc$_[1]);
+	my $v= $self->{comments}{$key};
+	return () unless $v;
+	if ($key eq 'metadata_block_picture')
+	{	for my $val (@$v)
+		{	next if ref $val or !defined $val;
+			my $dec=decode_base64($val);
+			$val= $dec ? Tag::Flac::_ReadPicture(\$dec) : undef;
+		}
+	}
+	return grep defined, @$v;
+}
+
 sub remove
 {	my ($self,$key,$nb)=@_;
 	return undef unless defined $key and $nb=~m/^\d*$/;
@@ -422,42 +445,8 @@ sub remove
 	my $val=$self->{comments}{$key}[$nb];
 	unless (defined $val) {warn "comment to delete not found\n"; return undef; }
 	$self->{comments}{$key}[$nb]=undef;
-	#return 1;
-	return $val;
-}
-sub clear_comments	# Untested
-{	my $self=shift;
-	if (@_)
-	{	for my $key (@_)
-		{	return undef unless exists $self->{comments}{lc$key};
-			delete $self->{comments}{lc$key};
-			@{$self->{CommentsOrder}}=grep lc$_ ne $key, @{$self->{CommentsOrder}};
-		}
-	}
-	else
-	{	$self->{comments}={};
-		$self->{CommentsOrder}=[];
-	}
 	return 1;
 }
-sub listkeys
-{	my $self=shift;
-	return keys %{ $self->{comments} };
-}
-sub keyvalues
-{	my ($self,$key)=@_;
-	my $values=$self->{comments}{lc$key};
-	return undef unless $values;
-	return @$values;
-}
-sub info
-{	my $self=shift;
-	return $self->{info} unless @_;
-	#return map $self->{info}{$_}, @_;
-	my $key=shift;
-	return $self->{info}{$key};
-}
-sub path { shift->{filename}; }
 
 sub _read_packet
 {	my $self=shift;
