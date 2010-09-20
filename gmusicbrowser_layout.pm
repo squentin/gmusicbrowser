@@ -1377,7 +1377,7 @@ sub SortMenu
 	{	$append->($submenu,$name, $::Options{SavedWRandoms}{$name} );
 	}
 	my $editcheck=(!$found && $check=~m/^random:/);
-	$append->($submenu,_"Edit...", undef, $editcheck, sub
+	$append->($submenu,_"Custom...", undef, $editcheck, sub
 		{	::EditWeightedRandom(undef,$::Options{Sort},undef, \&::Select_sort);
 		});
 	$sitem->set_submenu($submenu);
@@ -1398,7 +1398,7 @@ sub SortMenu
 	for my $name (sort keys %{$::Options{SavedSorts}})
 	{	$append->($menu,$name, $::Options{SavedSorts}{$name} );
 	}
-	$append->($menu,_"Edit...",undef,!$found,sub
+	$append->($menu,_"Custom...",undef,!$found,sub
 		{	::EditSortOrder(undef,$::Options{Sort},undef, \&::Select_sort );
 		});
 	$menu->show_all;
@@ -1425,7 +1425,7 @@ sub FilterMenu
 		if ($list eq 'Library') {$menu->prepend($item);}
 		else			{$menu->append($item);}
 	}
-	my $item=Gtk2::CheckMenuItem->new(_"Edit...");
+	my $item=Gtk2::CheckMenuItem->new(_"Custom...");
 	$item->set_draw_as_radio(1);
 	$item->signal_connect ( activate => sub
 		{ ::EditFilter(undef,$::SelectedFilter,undef, sub {::Select(filter => $_[0])});

@@ -8625,11 +8625,11 @@ sub fill_store
 {	my $self=shift;
 	my $store= $self->get_model;
 	$store->clear;
-	$store->set($store->append, 0,_"All Songs", 1,Filter->new, 2,'gmb-library');
+	$store->set($store->append, 0,_"All songs", 1,Filter->new, 2,'gmb-library');
 	my $hash=$Options{SavedFilters};
 	my @names= sort {::superlc($a) cmp ::superlc($b)} keys %$hash;
 	$store->set($store->append, 0,$_, 1,$hash->{$_}) for @names;
-	$store->set($store->append, 0,_"Edit ...", 1,undef, 2,'gtk-preferences');
+	$store->set($store->append, 0,_"Edit...", 1,undef, 2,'gtk-preferences');
 }
 
 sub set_value
