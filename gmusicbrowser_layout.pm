@@ -1411,21 +1411,26 @@ sub FilterMenu
 {	my $nopopup= $_[0];
 	my $menu = $_[0] || Gtk2::Menu->new;
 
-	my $check;
+	my ($check,$found);
 	$check=$::SelectedFilter->{string} if $::SelectedFilter;
 	my $item_callback=sub { ::Select(filter => $_[1]); };
+
+	my $item0= Gtk2::CheckMenuItem->new(_"All songs");
+	$item0->set_active($found=1) if !$check && !defined $::ListMode;
+	$item0->set_draw_as_radio(1);
+	$item0->signal_connect ( activate =>  $item_callback ,'' );
+	$menu->append($item0);
+
 	for my $list (sort keys %{$::Options{SavedFilters}})
-	{	next if $list eq 'Playlist';
-		my $filt=$::Options{SavedFilters}{$list}->{string};
-		my $text=$list; $text=~s/^_//;
-		my $item = Gtk2::CheckMenuItem->new_with_label($text);
+	{	my $filt=$::Options{SavedFilters}{$list}->{string};
+		my $item = Gtk2::CheckMenuItem->new_with_label($list);
 		$item->set_draw_as_radio(1);
-		$item->set_active(1) if defined $check && $filt eq $check;
+		$item->set_active($found=1) if defined $check && $filt eq $check;
 		$item->signal_connect ( activate =>  $item_callback ,$filt );
-		if ($list eq 'Library') {$menu->prepend($item);}
-		else			{$menu->append($item);}
+		$menu->append($item);
 	}
 	my $item=Gtk2::CheckMenuItem->new(_"Custom...");
+	$item->set_active(1) if defined $check && !$found;
 	$item->set_draw_as_radio(1);
 	$item->signal_connect ( activate => sub
 		{ ::EditFilter(undef,$::SelectedFilter,undef, sub {::Select(filter => $_[0])});
