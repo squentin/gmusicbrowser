@@ -1169,7 +1169,7 @@ Layout::InitLayouts;
 ActivatePlugin($_,'startup') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 
 CreateMainWindow( $CmdLine{layout}||$Options{Layout} );
-&ShowHide if $CmdLine{hide};
+ShowHide() if $CmdLine{hide} || $Options{StartInTray};
 SkipTo($PlayTime) if $PlayTime; #done only now because of gstreamer
 
 CreateTrayIcon();
@@ -5578,12 +5578,13 @@ sub PrefLayouts
 
 	#Tray
 	my $traytiplength=NewPrefSpinButton('TrayTipTimeLength', 0,100000, step=>100, text1=>_"Display tray tip for", text2=>'ms');
+	my $checkT5=NewPrefCheckButton(StartInTray => _"Start in tray");
 	my $checkT2=NewPrefCheckButton(CloseToTray => _"Close to tray");
 	my $checkT3=NewPrefCheckButton(ShowTipOnSongChange => _"Show tray tip on song change", widget=>$traytiplength);
 	my $checkT4=NewPrefCheckButton(TrayTipDelay => _"Delay tray tip popup on mouse over", cb=>\&SetTrayTipDelay);
 	my $checkT1=NewPrefCheckButton( UseTray => _"Show tray icon",
 					cb=> sub { &CreateTrayIcon; },
-					widget=> Vpack($checkT2,$checkT4,$checkT3)
+					widget=> Vpack($checkT5,$checkT2,$checkT4,$checkT3)
 					);
 	$checkT1->set_sensitive($Gtk2TrayIcon);
 
