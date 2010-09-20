@@ -166,7 +166,7 @@ our %Widgets=
 	SortIndicator =>
 	{	parent  => 'Sort',
 		click1  => sub { SortMenu() },
-		click2	=> \&::ToggleSort,
+		click3	=> \&::ToggleSort,
 	},
 	Filter =>
 	{	class	=> 'Layout::Button',
