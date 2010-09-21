@@ -146,10 +146,22 @@ our %Widgets=
 		field	=> 'first_artist',
 		tip	=> _"Lock on Artist",
 	},
+	LockArtistBreadcrumb =>
+	{	parent	=> 'Lock',
+		field	=> 'first_artist',
+		tip	=> _"Lock on Artist",
+		stock	=> { on => 'gmb-lock', off => 'gmb-breadcrumb gmb-locklight' },
+	},
 	LockAlbum =>
 	{	parent	=> 'Lock',
 		field	=> 'album',
 		tip	=> _"Lock on Album",
+	},
+	LockAlbumBreadcrumb =>
+	{	parent	=> 'Lock',
+		field	=> 'album',
+		tip	=> _"Lock on Album",
+		stock	=> { on => 'gmb-lock', off => 'gmb-breadcrumb gmb-locklight' },
 	},
 	Sort =>
 	{	class	=> 'Layout::Button',
@@ -277,7 +289,7 @@ our %Widgets=
 	{	class	=> 'Layout::Label',
 		parent	=> 'Artist',
 		minsize	=> 0,
-		markup	=> '  <big><b>«</b></big>  %a',
+		markup	=> '<big> </big>%a',
 		click1	=> sub { my $ID=::GetSelID($_[0]); ::PopupAA( 'album', format=> ::__x( _"<big><b>{album}</b></big>\n{year}  /  {songs}", album => "%a", year => "%y", songs => "%s"), from=> Songs::Get_gid($ID,'artists')) if defined $ID; },
 	},
 	Album =>
@@ -294,7 +306,7 @@ our %Widgets=
 	{	class	=> 'Layout::Label',
 		parent	=> 'Album',
 		minsize	=> 0,
-		markup	=> '  <big><b>«</b></big>  %l',
+		markup	=> '<big> </big>%l ',
 		showcover => 0,
 		click1	=> \&PopupSongsFromAlbum,
 	},
