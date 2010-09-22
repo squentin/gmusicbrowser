@@ -1169,7 +1169,7 @@ Layout::InitLayouts;
 ActivatePlugin($_,'startup') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 
 CreateMainWindow( $CmdLine{layout}||$Options{Layout} );
-ShowHide() if $CmdLine{hide} || $Options{StartInTray};
+ShowHide() if $CmdLine{hide} || ($Options{StartInTray} && $Options{UseTray} && $Gtk2TrayIcon);
 SkipTo($PlayTime) if $PlayTime; #done only now because of gstreamer
 
 CreateTrayIcon();

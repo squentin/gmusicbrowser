@@ -121,11 +121,11 @@ our %timespan_menu=
 			#_# =	@ids==1 ? $ids[0] :
 				@ids==0 ? 0 :
 				(___group{join(" ",map sprintf("%x",$_),@ids)}||= \@ids);',
-		'filter:m'	=> '_name .=~. m"#VAL#"',
-		'filter:mi'	=> '_name .=~. m"#VAL#"i',
-		'filter:s'	=> 'index( lc(_name),"#VAL#") .!=. -1',
-		'filter:S'	=> 'index(    _name, "#VAL#") .!=. -1',
-		'filter:e'	=> '_name .eq. "#VAL#"',
+		'filter:m'	=> '#_name# .=~. m"#VAL#"',
+		'filter:mi'	=> '#_name# .=~. m"#VAL#"i',
+		'filter:s'	=> 'index( lc(#_name#),"#VAL#") .!=. -1',
+		'filter:S'	=> 'index(    #_name#, "#VAL#") .!=. -1',
+		'filter:e'	=> '#_name# .eq. "#VAL#"',
 		'filter:~'	=> '(ref #_# ?  (grep $_ .==. #VAL#, @{#_#}) : (#_# .==. #VAL#))',#FIXME use simpler/faster version if perl5.10 (with ~~)
 		'filter_prep:~'	=> '##mainfield#->filter_prep:~#',
 		'filter_prephash:~' => '##mainfield#->filter_prephash:~#',
