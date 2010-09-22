@@ -88,7 +88,7 @@ sub Read
 				{	if ($key=~m#%i#)
 					{	my $userid= $::Options{Fields}{$field}{user_identifier};
 						next unless defined $userid && length $userid;
-						$key=~s#%i#$id#;
+						$key=~s#%i#$userid#;
 					}
 					my $func='postread';
 					$func.=":$1" if $key=~s/^(\w+)\(\s*([^)]+?)\s*\)$/$2/; #for tag-specific postread function
@@ -179,24 +179,25 @@ sub Write
 
 			my $userid= $::Options{Fields}{$field}{user_identifier};
 			my ($wkey,@keys)= split /\s*\|\s*/,$keys;
-			my @wkeys= split /\s*&\s*/, $wkey;
-			if (defined $userid && length $userid)	{ s#%i#$userid#g for @wkeys,@keys; }
-			else					{ @keys= grep !m#%i#, @keys; @wkeys= grep !m#%i#, @wkeys; }
-			s/^\w+\(\s*([^)]+?)\s*\)$/$1/ for @keys; #remove tag-specific function from key name : "function( TAG )" => "TAG"
-			$tag->remove_all($_) for @keys; #remove alternate keys
-			# and set the other keys (first one and ones separated by &)
-			for my $key (@wkeys)
-			{	my $v=$vals;
+			my $toremove= @keys;			#these keys will be removed
+			push @keys, split /\s*&\s*/, $wkey;	#these keys will be updated (first one and ones separated by &)
+			while (@keys)
+			{	my $key=shift @keys;
+				if ($key=~m/%i/) { next unless defined $userid && length $userid; $key=~s#%i#$userid#g }
 				my $func='prewrite';
-				$func.=":$1" if $key=~s/^(\w+)\(\s*([^)]+?)\s*\)$/$2/; #for tag-specific prewrite function
-				if (my $sub= $def->{$func} || $def->{'prewrite'} )
-				{	$v= [map $sub->($_,$ids[-1],$key,$field), @$v];
+				$func.=":$1" if $key=~s/^(\w+)\(\s*([^)]+?)\s*\)$/$2/; #for tag-specific prewrite function  "function( TAG )"
+				my $sub= $def->{$func} || $def->{'prewrite'};
+				my @v= @$vals;
+				if ($toremove-- >0) { @v=(); } #remove "deprecated" keys
+				elsif ($sub)
+				{	@v= map $sub->($_,$ids[-1],$key,$field), @v;
 				}
 				if ($key=~m/FMPS_/ && $key=~s/::(.+)$//)	# FMPS list field such as FMPS_Rating_User
-				{	$v= FMPS_hash_write( $tag, $key, $1, $v->[0] );
+				{	my $v= FMPS_hash_write( $tag, $key, $1, $v[0] );
+					@v= $v eq '' ? () : ($v);
 				}
 				$tag->remove_all($key);
-				$tag->insert($key,$_) for reverse grep defined, @$v;
+				$tag->insert($key,$_) for reverse grep defined, @v;
 			}
 		}
 	}
@@ -225,7 +226,7 @@ sub FMPS_hash_to_string
 	for my $key (sort keys %$h)
 	{	my $v=$h->{$key};
 		s#(;;+|::+)#quotemeta $1#eg for $key,$v;
-		push @list, "$key::$v";
+		push @list, $key.'::'.$v;
 	}
 	return join ';;',@list;
 }
