@@ -73,6 +73,7 @@ sub init
 	(	$::Options{OPT.'layout'},	fallback=>'O_play',	title=>"gmusicbrowser_titlebar_overlay",
 		uniqueid=>'titlebar',		ifexist=>'replace',
 		wintype=>'popup',		transparent=>1,			ontop=>1,
+		sticky=>1,			typehint=>'dock',
 		@moreoptions,
 	);
 	window_changed($Screen);
