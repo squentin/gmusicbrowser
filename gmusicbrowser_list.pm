@@ -1543,6 +1543,8 @@ my @MenuSubGroup=
 		test => sub { Songs::FilterListProp($_[0]{subfield},'picture'); }, },
 	{ label => _"show info",	code => sub { my $self=$_[0]{self}; $self->{lmarkup}[$_[0]{depth}]^=1; $self->SetOption; },
 	  check => sub { $_[0]{self}{lmarkup}[$_[0]{depth}]}, istrue => 'aa', mode => 'LS', },
+	{ label => _"show info",	code => sub { my $self=$_[0]{self}; $self->{mmarkup}^=1; $self->SetOption; },
+	  check => sub { $_[0]{self}{mmarkup} }, mode => 'M', },
 	{ label => _"show the 'All' row",	code => sub { my $self=$_[0]{self}; $self->{noall}^=1; $self->SetOption; },
 	  check => sub { !$_[0]{self}{noall} }, mode => 'LS', },
 	{ label => _"picture size",	code => sub { $_[0]{self}->SetOption(mpicsize=>$_[1]);  },
@@ -4536,7 +4538,7 @@ use constant
 };
 
 sub new
-{	my ($class,$selectsub,$getdatasub,$activatesub,$menupopupsub,$col,$vscroll)=@_;
+{	my ($class,$selectsub,$getdatasub,$activatesub,$menupopupsub,$field,$vscroll)=@_;
 	my $self = bless Gtk2::DrawingArea->new, $class;
 	$self->can_focus(::TRUE);
 	$self->add_events(['pointer-motion-mask','leave-notify-mask']);
@@ -4557,7 +4559,7 @@ sub new
 	$self->{get_fill_data_sub}=$getdatasub;
 	$self->{activatesub}=$activatesub;
 	$self->{menupopupsub}=$menupopupsub;
-	$self->{col}=$col;
+	$self->{field}=$field;
 	$self->{lastdy}=0;
 
 	return $self;
@@ -4589,6 +4591,20 @@ sub Fill
 	$self->{picsize}=$mpsize;
 	$self->{hsize}=$mpsize;
 	$self->{vsize}=$mpsize;
+
+	if ($filterlist->{mmarkup})
+	{	$self->{markup}= my $markup= $self->{field} eq 'album'  ? "<small><b>%a</b></small>\n<small>%b</small>"
+									: "<small><b>%a</b></small>\n<small>%X</small>";
+		my @heights;
+		for my $m (split /\n/, $markup)
+		{	my $lay=$self->create_pango_layout($m);
+			my $h= ($lay->get_pixel_size)[1];
+			push @heights,$h;
+			$self->{vsize}+=$h;
+		}
+		$self->{markup_heights}=\@heights;
+		$self->{vsize}+= 2*YPAD;
+	}
 
 	my $nw= int($width / ($self->{hsize}+2*XPAD)) || 1;
 	my $nh= int(@$list/$nw);
@@ -4655,7 +4671,7 @@ sub show_tooltip
 	#$win->{key}=$key;
 	#$win->set_border_width(3);
 	my $label=Gtk2::Label->new;
-	$label->set_markup(AA::ReplaceFields($key,"<b>%a</b>%Y\n<small>%s <small>%l</small></small>",$self->{col},1));
+	$label->set_markup(AA::ReplaceFields($key,"<b>%a</b>%Y\n<small>%s <small>%l</small></small>",$self->{field},1));
 	my $request=$label->size_request;
 	my ($x,$y,$w,$h)=$self->index_to_rect($i,$j);
 	my ($rx,$ry)=$self->window->get_origin;
@@ -4719,7 +4735,7 @@ sub expose_cb
 	$self->start_tooltip if $self->{lastdy}!=$dy;
 	$self->{lastdy}=$dy;
 	my $window=$self->window;
-	my $col=$self->{col};
+	my $field=$self->{field};
 	my $style=$self->get_style;
 	#my ($width,$height)=$window->get_size;
 	#warn "expose_cb : $width,$height\n";
@@ -4738,6 +4754,8 @@ sub expose_cb
 	my $vsize=$self->{vsize};
 	my $hsize=$self->{hsize};
 	my $picsize=$self->{picsize};
+	my @markup= $self->{markup} ? (split /\n/,$self->{markup}) : ();
+	my $mheights= $self->{markup_heights};
 	my $i1=int($exp_x1/($hsize+2*XPAD));
 	my $i2=int($exp_x2/($hsize+2*XPAD));
 	my $j1=int(($dy+$exp_y1)/($vsize+2*YPAD));
@@ -4760,7 +4778,7 @@ sub expose_cb
 				#			$x-XPAD(),$y-YPAD(),$hsize+XPAD*2,$vsize+YPAD*2 );
 			}
 			#$window->draw_rectangle($style->text_gc($state),1,$x+20,$y+20,24,24); #DEBUG
-			my $pixbuf= AAPicture::draw($window,$x,$y,$col,$key,$picsize);
+			my $pixbuf= AAPicture::draw($window,$x,$y,$field,$key,$picsize);
 			if ($pixbuf) {}
 			elsif (defined $pixbuf)
 			{	#warn "add idle\n" unless $self->{idle};
@@ -4768,17 +4786,32 @@ sub expose_cb
 				$self->{window}||=$window;
 				$self->{queue}{$i+$j*$nw}=[$x,$y+$dy,$key,$picsize];
 			}
-			else
+			elsif (!@markup)
 			{	my $layout=Gtk2::Pango::Layout->new( $self->create_pango_context );
 				#$layout->set_text($key);
 				#$layout->set_markup('<small>'.::PangoEsc($key).'</small>');
-				$layout->set_markup(AA::ReplaceFields($key,"<small>%a</small>",$self->{col},1));
+				$layout->set_markup(AA::ReplaceFields($key,"<small>%a</small>",$field,1));
 				$layout->set_wrap('word-char');
 				$layout->set_width($hsize * Gtk2::Pango->scale);
 				$layout->set_height($vsize * Gtk2::Pango->scale);
 				$layout->set_ellipsize('end');
+				$layout->set_alignment('center');
 				$style->paint_layout($window, $state, 1,
 					Gtk2::Gdk::Rectangle->new($x,$y,$hsize,$vsize), $self, undef, $x, $y, $layout);
+			}
+			my $ym= $y+$picsize+YPAD;
+			my $i=0;
+			for my $markup (@markup)
+			{	my $layout=Gtk2::Pango::Layout->new( $self->create_pango_context );
+				$layout->set_markup(AA::ReplaceFields($key,$markup,$field,1));
+				$layout->set_width($hsize * Gtk2::Pango->scale);
+				$layout->set_alignment('center');
+				my $height= $mheights->[$i++];
+				$layout->set_height($height * Gtk2::Pango->scale);
+				$layout->set_ellipsize('end');
+				$style->paint_layout($window, $state, 1,
+					Gtk2::Gdk::Rectangle->new($x,$ym,$hsize,$height), $self, undef, $x, $ym, $layout);
+				$ym+=$height;
 			}
 		}
 	}
@@ -4924,7 +4957,7 @@ sub reset
 }
 
 sub idle
-{	my $self=$_[0];#warn " ...idle...\n";
+{	my $self=$_[0];
 	{	last unless $self->{queue} && $self->mapped;
 		my ($y,$ref)=each %{ $self->{queue} };
 		last unless $ref;
@@ -4934,7 +4967,7 @@ sub idle
 		return 1;
 	}
 	delete $self->{queue};
-	delete $self->{window};#warn "...idle END\n";
+	delete $self->{window};
 	return $self->{idle}=undef;
 }
 
@@ -4944,8 +4977,7 @@ sub _drawpix
 	my $dy=int $vadj->get_value;
 	my $page=$vadj->page_size;
 	return if $dy > $y+$s || $dy+$page < $y; #no longer visible
-#warn " drawing $key\n";
-	AAPicture::draw($window,$x,$y-$dy,$self->{col},$key, $s,1);
+	AAPicture::draw($window,$x,$y-$dy,$self->{field},$key, $s,1);
 }
 
 package GMB::ISearchBox;	#interactive search box (search as you type)
