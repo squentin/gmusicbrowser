@@ -1991,6 +1991,7 @@ our %defaults=
 	'sort'	=> 'default',
 	depth	=> 0,
 	noall	=> 0,
+	mmarkup => 0,
 	mpicsize=> 64,
 	cloud_min=> 5,
 	cloud_max=> 20,
@@ -2004,7 +2005,7 @@ sub new
 	$self->{rules_hint}=$opt->{rules_hint};
 
 	$opt= { %defaults, %$opt };
-	$self->{$_} = $opt->{$_} for qw/mode noall depth mpicsize cloud_min cloud_max cloud_stat/;
+	$self->{$_} = $opt->{$_} for qw/mode noall depth mmarkup mpicsize cloud_min cloud_max cloud_stat/;
 	$self->{$_} = [ split /\|/, $opt->{$_} ] for qw/sort type lmarkup lpicsize/;
 
 	$self->{type}[0] ||= $field.'.'.(Songs::FilterListProp($field,'type')||''); $self->{type}[0]=~s/\.$//;	#FIXME
@@ -2037,7 +2038,7 @@ sub SaveOptions
 {	my $self=$_[0];
 	my %opt;
 	$opt{$_} = join '|', @{$self->{$_}} for qw/type lmarkup lpicsize sort/;
-	$opt{$_} = $self->{$_} for qw/mode noall depth mpicsize cloud_min cloud_max cloud_stat/;
+	$opt{$_} = $self->{$_} for qw/mode noall depth mmarkup mpicsize cloud_min cloud_max cloud_stat/;
 	for (keys %opt) { delete $opt{$_} if $opt{$_} eq $defaults{$_}; }	#remove options equal to default value
 	delete $opt{type} if $opt{type} eq $self->{pid};			#remove unneeded type options
 	return %opt, $self->{isearchbox}->SaveOptions;
