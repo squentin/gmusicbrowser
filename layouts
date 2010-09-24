@@ -32,7 +32,7 @@ HBStatus	= 3Total(format=short,relief=none,button=0,mode=library) -5SortIndicato
 HPRight		= _HBSongListtree
 HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
 HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
-VPMosaic	= _FilterPane1(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,hidetabs=1)
+VPMosaic	= _FilterPane1(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,hidetabs=1)
 ### bottom: statusbar ### Pref(size=small-toolbar,button=0) 
 ### positioning and sizing ###
 HSize0		= 350 NBList
