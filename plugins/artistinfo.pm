@@ -10,7 +10,7 @@ name	Artistinfo
 title	Artistinfo plugin
 author  Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 author  Pasi Lallinaho <pasi@shimmerproject.org>
-desc	Display Information about the playing Artist (short-biography or upcoming events) fetched from last.fm
+desc	This plugin retrieves artist-relevant information (biography, upcoming events) from last.fm.
 =cut
 
 package GMB::Plugin::ARTISTINFO;
@@ -35,7 +35,7 @@ my %sites =
 );
 
 
-::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a");
+::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100");
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
@@ -64,9 +64,8 @@ sub new
 	$self->{artist_esc} = "";
 	
 	my $statbox=Gtk2::VBox->new(0,0);
-	
-	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>0,click1=>undef,xalign=>0});
-	
+# TODO use own widget to display artistpic and add left-click image-zoom
+	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,maxsize=>$::Options{OPT.'ArtistPicSize'},click1=>undef,xalign=>0});
 	for my $name (qw/Ltitle Lstats/)
 	{	my $l=Gtk2::Label->new('');
 		$self->{$name}=$l;
@@ -76,10 +75,14 @@ sub new
 	}
 	$self->{artistrating} = Gtk2::Image->new;
 	$statbox->pack_start($self->{artistrating},0,0,2);
+	my $stateventbox = Gtk2::EventBox->new;
+	$stateventbox->add($statbox);
+	$stateventbox->{group}="Play";
+	$stateventbox->signal_connect(button_release_event => sub { my ($self, $event) = @_; return unless $event->button == 3; my $ID=::GetSelID($self); ::ArtistContextMenu( Songs::Get_gid($ID,'artists'),{self =>$self, ID=>$ID, mode => 'P'}) if defined $ID; } ); # add right-click artist-contextmenu
 
 	my $artistbox = Gtk2::HBox->new(0,0);
 	$artistbox->pack_start($artistpic,1,1,0);
-	$artistbox->pack_start($statbox,1,1,0);
+	$artistbox->pack_start($stateventbox,1,1,0);
 	
 	my $textview=Gtk2::TextView->new;
 	$self->signal_connect(map => sub { $_[0]->SongChanged( ::GetSelID($_[0]) ); });
@@ -166,10 +169,30 @@ sub cancel
 
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(0,2);
+	my $titlebox=Gtk2::HBox->new(0,0);
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>30);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
-	$vbox->pack_start($_,::FALSE,::FALSE,1) for $entry,$preview,$autosave;
+	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text1=>_"Artist Picture Size : ", text2=>_"(applied after restart)");
+	
+	my $lastfmimage=Gtk2::Image->new_from_stock("artistinfo-lastfm",'dnd');
+	my $lastfm=Gtk2::Button->new;
+	$lastfm->set_image($lastfmimage);
+	$lastfm->set_tooltip_text("Open last.fm website in your browser");
+	$lastfm->signal_connect(clicked => sub { Lookup_cb("http://www.last.fm/music/") } );
+	$lastfm->set_relief("none");
+	my $title=Gtk2::Label->new;
+	$title->set_markup( "<big>Artist-Info Plugin</big>" );
+	my $description=Gtk2::Label->new;
+	$description->set_markup("This plugin displays artist information, partly from within gmusicbrowser itself, partly retrieved from the internet.\n\nIt will display artist information from gmusicbrowser on top, meaning statistics (number of albums, songs and rating) and a picture if set.\nBelow this section the plugin displays information retrieved from last.fm, the <b>biographical data</b>, the <b>upcoming events</b> and in a separate tab <b>weblinks</b>\nto search different webpages for the playing artist in your browser. The biographical information can be saved locally (settings below), the events\nwill always be retrieved live as they are always subject to change.\n\nIf you're having trouble or just need some information on how to use this plugin, please navigate to the <a href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>.");
+	#$description->set_line_wrap(1);
+	$titlebox->pack_start($title,1,1,0);
+	$titlebox->pack_start($lastfm,0,0,5);
+	my $optionbox=Gtk2::VBox->new(0,2);
+	$optionbox->pack_start($_,0,0,1) for $entry,$preview,$autosave,$picsize;
+	my $frame=Gtk2::Frame->new(_"Options");
+	$frame->add($optionbox);
+	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$description,$frame;
 	return $vbox;
 }
 
@@ -252,12 +275,15 @@ sub parseRSS
 {	my ($self,$data) = @_;
 	delete $self->{waiting};
 	my $url;
+	$data =~ m/<div class="skyWrap">(\s*)<h2>(\s*)(.*?)(\s*)<\/h2>/gi;
+	$self->{past_events} = $3."\n";
 	if ($data =~ m/There are no upcoming events for this artist./gi | $data =~ m/There are no events to list here./gi) {
-		&set_buffer($self,"No upcoming events for this artist");
+		&set_buffer($self,$self->{past_events}."No upcoming events for this artist");
 		return;
 	}
 	elsif ($data =~ m/http:\/\/ws.audioscrobbler.com(.*?).rss/gi) {
 		$url = "http://ws.audioscrobbler.com".$1.".rss";
+		
 	}
 	warn "info : loading $url\n";
 	$self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url);
@@ -308,7 +334,7 @@ sub load_url
 {	my ($self,$url)=@_;
 	&set_buffer($self,"Loading...");
 	$self->cancel;
-	warn "info : loading $url\n";# if $::debug;
+	warn "info : loading $url\n"; # if $::debug;
 	$self->{url}=$url;
 	if ($self->{site} ne "web") { $self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url); }
 	else {	&ExternalLinks($self); }
@@ -365,6 +391,7 @@ sub loaded
 		my @line = split /\n/s, $data;
 		my $tag_title = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT'); 
 		my $tag_date = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'GTK_JUSTIFY_LEFT');
+		my $tag_footer = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1);
 		while (defined($_=shift @line)) {
 			if ($_ =~ m/<title>(.*?)<\/title>/i) {
 				if ($_ =~ m/<title>Last.fm Events/gi) {
@@ -388,6 +415,7 @@ sub loaded
 			}
 		}
 		my $text= $buffer->get_text($buffer->get_bounds, ::FALSE);
+		$buffer->insert_with_tags($iter,$self->{past_events},$tag_footer);
 		if ($text eq "Upcoming Events\n\n") {	&set_buffer($self,"No results found");	}
 	}
 
