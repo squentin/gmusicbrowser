@@ -1,3 +1,19 @@
+gmusicbrowser (1.1.5ppa16) lucid; urgency=low
+
+  * update artistinfo-plugin (show "events in the past", better preferences-dialog)
+    merge with git upstream (commit 6e12b1e334b7cc880e44 - 2010-09-24)
+    for a complete changelog see: github.com/ochosi/gmusicbrowser
+    
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Wed, 29 Sep 2010 12:18:06 +0200
+
+gmusicbrowser (1.1.5ppa15) lucid; urgency=low
+
+  * improve mosaic-view, add lock-feature to breadcrumbs
+    merge with git upstream (commit 8180921a883bdf8e8124 - 2010-09-24)
+    for a complete changelog see: github.com/ochosi/gmusicbrowser
+    
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Fri, 24 Sep 2010 10:19:23 +0200
+
 gmusicbrowser (1.1.5ppa14) lucid; urgency=low
 
   * add "show/hide cover"-button to layout, improve sort/filter indicators
