@@ -201,8 +201,8 @@ sub Update
 	if (!$array)	{ $tip=$text=_"error"; }
 	else		{ $text.= ::CalcListLength($array,$self->{format}); }
 	my $format= $self->{size} ? '<span size="'.$self->{size}.'">%s</span>' : '%s';
-	$self->child->set_markup_with_format($format,$tip);
-	$self->set_tooltip_text($text);
+	if ($self->{mode} eq "filter") { $self->child->set_markup_with_format($format,$text); $self->set_tooltip_text($tip); }
+	else	{	$self->child->set_markup_with_format($format,$tip); $self->set_tooltip_text($text); }
 	$self->{needupdate}=0;
 }
 
