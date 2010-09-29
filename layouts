@@ -14,7 +14,7 @@ HBTop		= VBButtons _15VBPlayer 15VBToggle VBSearchBox -5VBSettings
 VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle HBTimeSlider
-HBTitle		= Title(expand_max=300,minsize=1,markup="<big><b>%t</b></big> ",click1="",tip="Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbumBreadcrumb AlbumBreadcrumb(tip="Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5) LockArtistBreadcrumb ArtistBreadcrumb(tip="Artist: %a",expand_max=200,yalign=0.5) -Stars(yalign=0.5)
+HBTitle		= Title(expand_max=300,minsize=1,markup="<big><b>%t</b></big> ",click1="",tip="Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbumBreadcrumb AlbumBreadcrumb(tip="Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%l ",showcover=0) LockArtistBreadcrumb ArtistBreadcrumb(tip="Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 VBToggle	= HBToggle 5Filler1
 HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1,tip="Simple List View") ToggleButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1,tip="Songtree View") ToggleButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1,tip="Mosaic View")
@@ -27,12 +27,12 @@ HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
 VBAbout		= (tabtitle="Info") _PluginArtistinfo
 VBArtist	= (tabtitle="Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1)
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
-HBStatus	= 3Total(format=short,relief=none,button=0,mode=library) -5SortIndicator -5FilterIndicator -5ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=HBCover,tip="Show/Hide Cover")
+HBStatus	= 3Total(format=short,relief=none,button=0,mode=library) -2SortIndicator(button=1,tip="Right-click to toggle Shuffle") -2FilterIndicator(button=1,tip="Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=HBCover,tip="Show/Hide Cover")
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
 HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
 HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
-VPMosaic	= _FilterPane1(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,hidetabs=1)
+VPMosaic	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
 ### bottom: statusbar ### Pref(size=small-toolbar,button=0) 
 ### positioning and sizing ###
 HSize0		= 350 NBList
@@ -465,6 +465,7 @@ KeyBindings	= Escape CloseWindow
 title=disc on the left side
 head=3
 left=width
+vcollapse=head+title:h+line:h
 title:	text(markup='<b><big>'.pesc($title).'</big></b>',pad=2,w=left)
 width:	OptionNumber(default=15,min=10,max=100,step=1)
 line: line(x1=1,y1=1,x2=$_w,y2=1,color='#ccc',width=1)

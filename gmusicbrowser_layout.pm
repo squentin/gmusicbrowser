@@ -286,10 +286,7 @@ our %Widgets=
 		cursor	=> 'hand2',
 	},
 	ArtistBreadcrumb =>
-	{	class	=> 'Layout::Label',
-		parent	=> 'Artist',
-		minsize	=> 0,
-		markup	=> '<big> </big>%a',
+	{	parent	=> 'Artist',
 		click1	=> sub { my $ID=::GetSelID($_[0]); ::PopupAA( 'album', format=> ::__x( _"<big><b>{album}</b></big>\n{year}  /  {songs}", album => "%a", year => "%y", songs => "%s"), from=> Songs::Get_gid($ID,'artists')) if defined $ID; },
 	},
 	Album =>
@@ -303,11 +300,7 @@ our %Widgets=
 		cursor	=> 'hand2',
 	},
 	AlbumBreadcrumb =>
-	{	class	=> 'Layout::Label',
-		parent	=> 'Album',
-		minsize	=> 0,
-		markup	=> '<big> </big>%l ',
-		showcover => 0,
+	{	parent	=> 'Album',
 		click1	=> \&PopupSongsFromAlbum,
 	},
 	Year =>
