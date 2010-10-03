@@ -1620,8 +1620,9 @@ sub init
 		}
 		else { warn "no Cairo perl module => can't make the window transparent\n" }
 	}
+	$self->realize;
+	$self->Resize if $self->{size};
 	$self->child->show_all;		#needed to get the true size of the window
-	$self->child->realize;		#
 	{	my @hidden;
 		@hidden=keys %{ $self->{hidden} } if $self->{hidden};
 		my $widgets=$self->{widgets};
@@ -1630,7 +1631,6 @@ sub init
 		$_->hide for @hidden;
 	}
 	#$self->set_position();#doesn't work before show, at least with sawfish
-	$self->Resize if $self->{size};
 	my ($x,$y)= $self->Position;
 	$self->move($x,$y) if defined $x;
 	$self->show;
@@ -2110,7 +2110,7 @@ sub Paned_size_cb
 	if (defined $size1 && defined $size2 && $alloc != ($size1 + $size2))
 	{	if    ($self->child1_resize && !$self->child2_resize)	{ $self->{size1}=$alloc-$size2; }
 		elsif ($self->child2_resize && !$self->child1_resize)	{ $self->{size2}=$alloc-$size1; }
-		else { my $diff= $alloc-$size1-$size2; $self->{size1}+=$diff/2; $self->{size2}+=$diff/2; }
+		else { my $diff= $alloc-$size1-$size2; $self->{size1}+= int(.5+$diff/2); $self->{size2}+= int($diff/2); }
 		$self->set_position( $self->{size1} );
 	}
 	else { my $size1=$self->get_position; $self->{size1}=$size1; $self->{size2}=$alloc-$size1; }
