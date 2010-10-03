@@ -354,13 +354,14 @@ sub new
 	# folder name at the top
 	{	my $folders= Songs::UniqList('path',\@IDs);
 		my $folder=$folders->[0];
+		my $displaysub= Songs::DisplayFromHash_sub('path');
 		if (@$folders>1)
 		{	my $common= ::find_common_parent_folder(@$folders);
 			$folder=_"different folders";
-			$folder.= "\n". ::__x(_"(common parent folder : {common})",common=>$common) if length($common)>5;
+			$folder.= "\n". ::__x(_"(common parent folder : {common})",common=> $displaysub->($common) ) if length($common)>5;
 		}
 		my $text= ::__("%d file in {folder}","%d files in {folder}",scalar@IDs);
-		$text= ::__x($text, folder => ::MarkupFormat('<small>%s</small>',$folder) );
+		$text= ::__x($text, folder => ::MarkupFormat('<small>%s</small>', $displaysub->($folder) ) );
 		my $labelfile = Gtk2::Label->new;
 		$labelfile->set_markup($text);
 		$labelfile->set_selectable(TRUE);

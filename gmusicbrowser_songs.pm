@@ -225,7 +225,7 @@ our %timespan_menu=
 		get	=> '#_#',
 		set	=> '#_#=#VAL#; ::_utf8_off(#_#);',
 		display	=> '::filename_to_utf8displayname(#get#)',
-		hash_to_display => '::filename_to_utf8displayname(#VAL#)', #only used by FolderList::
+		hash_to_display => '::filename_to_utf8displayname(#VAL#)', #only used by FolderList:: and MassTag::
 		load	=> '#_#=::decode_url(#VAL#)',
 		save	=> 'filename_escape(#_#)',
 	},
