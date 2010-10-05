@@ -4379,6 +4379,16 @@ sub button_press_cb
 		else	{ $self->{pressed}=1; }
 		return 0;
 	}
+	if ($but==2)
+	{	my ($i,$j,$key)=$self->coord_to_index($event->get_coords);
+		if (defined $key && !exists $self->{selected}{$key})
+		{	$self->key_selected($event,$i,$j);
+		}
+		my $menu = ::ChooseSongsFromA($key);
+		my $event = Gtk2->get_current_event;
+		$menu->show_all;
+		$menu->popup(undef,undef,undef,undef,$event->button,$event->time);
+	}
 	if ($but==3)
 	{	my ($i,$j,$key)=$self->coord_to_index($event->get_coords);
 		if (defined $key && !exists $self->{selected}{$key})
