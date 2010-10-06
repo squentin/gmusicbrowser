@@ -2209,7 +2209,7 @@ sub Played
 
 	my $length= Songs::Get($ID,'length');
 	my $coverage_ratio= $length ? $seconds / Songs::Get($ID,'length') : 1;
-	my $partial= $Options{PlayedMinPercent}/100 > $coverage_ratio || $Options{PlayedMinSeconds}<$seconds;
+	my $partial= $Options{PlayedMinPercent}/100 > $coverage_ratio && $Options{PlayedMinSeconds} > $seconds;
 	HasChanged('Played',$ID, !$partial, $StartTime, $seconds, $coverage_ratio, \@Played_segments);
 	$PlayingID=undef;
 	@Played_segments=();
