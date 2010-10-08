@@ -5223,7 +5223,7 @@ sub new
 	my $default= $::Options{"DefaultOptions_$name"} || {};
 
 	%$opt=( @DefaultOptions, %$default, %$opt );
-	$self->{$_}=$opt->{$_} for qw/headclick songxpad songypad no_typeahead grouping/;
+	$self->{$_}=$opt->{$_} for qw/headclick songxpad songypad no_typeahead grouping showbb/;
 
 	#create widgets used to draw the songtree as a treeview, would be nice to do without but it's not possible currently
 	$self->{stylewidget}=Gtk2::TreeView->new;
@@ -5293,7 +5293,17 @@ sub new
 
 	$self->AddColumn($_) for split / +/,$opt->{cols};
 	unless ($self->{cells}) { $self->AddColumn('title'); } #to ensure there is at least 1 column
-
+	
+	if ($self->{showbb}) { # show queue actions in QueueList if option showbb is set
+		my $qactions = Layout::NewWidget("QueueActions");
+		my $clearb = ::NewIconButton('gtk-clear',"",\&::ClearQueue,"none","Clear Queue");
+		my $shuffleb = ::NewIconButton('gmb-shuffle',"",\&::ShuffleQueue,"none","Shuffle Queue");
+		my $bbox = Gtk2::HBox->new(0,0);
+		$bbox->pack_start($qactions,0,0,0);
+		$bbox->pack_end($clearb,0,0,0);
+		$bbox->pack_end($shuffleb,0,0,0);
+		$vbox->pack_end($bbox,0,0,0);
+	}
 	$self->{selected}='';
 	$self->{lastclick}=$self->{startgrow}=-1;
 	$self->set_head_columns;
