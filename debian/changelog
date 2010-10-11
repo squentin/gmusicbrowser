@@ -1,3 +1,12 @@
+gmusicbrowser (1.1.5ppa17) lucid; urgency=low
+
+  * fix queue (add option "showbb" to show queueactions/buttons in queue)
+    a tracklist is now shown in mosaic-view on middleclick
+    merge with git upstream (commit a0959187a666b800dad1 - 2010-10-06)
+    for a complete changelog see: github.com/ochosi/gmusicbrowser
+    
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Fri, 08 Oct 2010 13:37:53 +0200
+
 gmusicbrowser (1.1.5ppa16) lucid; urgency=low
 
   * update artistinfo-plugin (show "events in the past", better preferences-dialog)
