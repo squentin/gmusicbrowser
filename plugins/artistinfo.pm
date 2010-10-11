@@ -8,6 +8,7 @@
 =gmbplugin ARTISTINFO
 name	Artistinfo
 title	Artistinfo plugin
+version	0.1
 author  Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 author  Pasi Lallinaho <pasi@shimmerproject.org>
 desc	This plugin retrieves artist-relevant information (biography, upcoming events) from last.fm.
@@ -29,10 +30,15 @@ use constant
 
 my %sites =
 (
-	biography => [ 'http://www.last.fm/music/%a'],
+	#biography => [ 'http://www.last.fm/music/%a'],
+	biography => [ 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1'],
 	events => [ 'http://www.last.fm/music/%a/+events'],
 	web => ['weblinks'],
 );
+
+# lastfm api key 7aa688c2466dc17263847da16f297835
+# "secret" string: 18cdd008e76705eb5f942892d49a71e2
+# artistinfo api example: http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=Kruder+Dorfmeister&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1
 
 
 ::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100");
@@ -185,12 +191,17 @@ sub prefbox
 	$title->set_markup( "<big>Artist-Info Plugin</big>" );
 	my $description=Gtk2::Label->new;
 	$description->set_markup("This plugin displays artist information, partly from within gmusicbrowser itself, partly retrieved from the internet.\n\nIt will display artist information from gmusicbrowser on top, meaning statistics (number of albums, songs and rating) and a picture if set.\nBelow this section the plugin displays information retrieved from last.fm, the <b>biographical data</b>, the <b>upcoming events</b> and in a separate tab <b>weblinks</b>\nto search different webpages for the playing artist in your browser. The biographical information can be saved locally (settings below), the events\nwill always be retrieved live as they are always subject to change.\n\nIf you're having trouble or just need some information on how to use this plugin, please navigate to the <a href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>.");
-	#$description->set_line_wrap(1);
+#	$description->set_line_wrap(1);
+#	$description->set_size_request(-1,10);
 	$titlebox->pack_start($title,1,1,0);
 	$titlebox->pack_start($lastfm,0,0,5);
 	my $optionbox=Gtk2::VBox->new(0,2);
 	$optionbox->pack_start($_,0,0,1) for $entry,$preview,$autosave,$picsize;
 	my $frame=Gtk2::Frame->new(_"Options");
+#	my $descriptionsize=Gtk2::SizeGroup->new('vertical');
+#	$descriptionsize->add_widget($description);
+#	$descriptionsize->add_widget($optionbox);
+#	$descriptionsize->add_widget($frame);
 	$frame->add($optionbox);
 	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$description,$frame;
 	return $vbox;
@@ -315,11 +326,11 @@ sub ArtistChanged
 	}
 	
 	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
-	for ($artist) {
-		s#%#%25#gi; # weird last.fm escaping, "/" -> %2f (url_escapeall) "%" -> %25 -> %252f
-		s/%20/%2B/gi; # replace spaces by "+" for last.fm
-		s/\?/%3F/gi;
-	}
+#	for ($artist) {
+#		s#%#%25#gi; # weird last.fm escaping, "/" -> %2f (url_escapeall) "%" -> %25 -> %252f
+#		s/%20/%2B/gi; # replace spaces by "+" for last.fm
+#		s/\?/%3F/gi;
+#	}
 	my ($url)=@{$sites{$self->{site}}};
 	for ($url) { next unless defined $_; s/%a/$artist/; }
 	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) {
@@ -372,8 +383,10 @@ sub loaded
 		}
 		else { $infoheader = "Artist Biography"; }
 
-		$data =~ m/<div id="wikiAbstract">(\s*)(.*)<div class="wikiOptions">/s;
-		$data = $2;
+		#$data =~ m/<div id="wikiAbstract">(\s*)(.*)<div class="wikiOptions">/s;
+		$data =~ m/<content><\!\[CDATA\[(.*?)]]>/gi;
+		#$data = $2;
+		$data = $1;
 		for ($data)
 		{	s/<br \/>|<\/p>/\n/gi; # never more than one empty line
 			s/\n\n/\n/gi; # never more than one empty line (again)
