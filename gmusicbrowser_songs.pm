@@ -31,8 +31,9 @@ our %timespan_menu=
 		set	=> '#get# = #VAL#',
 		display	=> '#get#',
 		grouptitle=> '#display#',
-		'editwidget'		=> sub { my $field=$_[0]; GMB::TagEdit::Combo->new(@_,$Def{$field}{edit_listall}); },
-		'editwidget:per_id'	=> sub { my $field=$_[0]; GMB::TagEdit::EntryString->new(@_,$Def{$field}{editwidth}); },
+		'editwidget:many'	=> sub { my $field=$_[0]; GMB::TagEdit::Combo->new(@_, Field_property($field,'edit_listall')); },
+		'editwidget:single'	=> sub { my $field=$_[0]; GMB::TagEdit::EntryString->new( @_,0,Field_property($field,'edit_listall') ); },
+		'editwidget:per_id'	=> sub { my $field=$_[0]; GMB::TagEdit::EntryString->new( @_,Field_properties($field,'editwidth','edit_listall') ); },
 		'filter:m'	=> '#display# .=~. m"#VAL#"',			'filter_prep:m'	=> \&Filter::QuoteRegEx,
 		'filter:mi'	=> '#display# .=~. m"#VAL#"i',			'filter_prep:mi'=> \&Filter::QuoteRegEx,
 		'filter:s'	=> 'index( lc(#display#),"#VAL#") .!=. -1',	'filter_prep:s'	=> sub {quotemeta lc($_[0])},
@@ -292,6 +293,7 @@ our %timespan_menu=
 		stats		=> '#HVAL#{#_name#[#_#]}=undef;  ----  #HVAL#=[keys %{#HVAL#}];',
 		'stats:gid'	=> '#HVAL#{#_#}=undef;  ----  #HVAL#=[keys %{#HVAL#}];',
 		listall		=> '2..@#_name#-1',
+		edit_listall	=> 1,
 		parent		=> 'generic',
 		maxgid		=> '@#_name#-1',
 		#gsummary	=> 'my $gids=Songs::UniqList(#field#,#IDs#); @$gids==1 ? #gid_to_display(GID=$gids->[0])# : #names(count=scalar @$gids)#;',
@@ -472,7 +474,6 @@ our %timespan_menu=
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	all_count=> _"All artists",
 	picture_field => 'artist_picture',
-	edit_listall => 1,
 	edit_order=> 20,	edit_many=>1,	letter => 'a',
 	can_group=>1,
 	#names => '::__("%d artist","%d artists",#count#);'
@@ -534,7 +535,7 @@ our %timespan_menu=
 	id3v2	=> 'TPE2',	vorbis	=> 'albumartist|album_artist',	ape	=> 'Album Artist|Album_artist',  ilst => "aART",
 	#FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
-	edit_order=> 35,	edit_many=>1,	edit_listall => 1,
+	edit_order=> 35,	edit_many=>1,
 	#can_group=>1,
  },
  album_artist =>
@@ -894,6 +895,21 @@ sub MakeCode		#keep ?
 	$code=~s/#[\w\|.]+#/shift @codes/ge;
 	return $code;
 }
+sub Field_property
+{	my ($field,$key)=@_;
+	my $h= $Def{$field};
+	while ($h)
+	{	return $h->{$key} if exists $h->{$key};
+		my $type= $h->{parent} || $h->{type};
+		return undef unless $type;
+		$h= $Types{$type};
+	}
+}
+sub Field_properties
+{	my ($field,@keys)=@_;
+	return map Field_property($field,$_), @keys;
+}
+
 sub CanDoFilter		#returns true if all @fields can do $op
 {	my ($op,@fields)=@_;
 	return !grep !LookupCode($_,'filter:'.$op), @fields;
