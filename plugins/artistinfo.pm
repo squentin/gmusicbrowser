@@ -30,16 +30,13 @@ use constant
 
 my %sites =
 (
-	#biography => [ 'http://www.last.fm/music/%a'],
 	biography => [ 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1'],
-	events => [ 'http://www.last.fm/music/%a/+events'],
+	events => [ 'http://ws.audioscrobbler.com/2.0/?method=artist.getevents&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1'],
 	web => ['weblinks'],
 );
 
 # lastfm api key 7aa688c2466dc17263847da16f297835
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
-# artistinfo api example: http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=Kruder+Dorfmeister&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1
-
 
 ::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100");
 
@@ -152,16 +149,6 @@ sub toggled_cb
 	}
 }
 
-sub Lookup_cb
-{	my $source = shift;
-	my $ID=$::SongID;
-	my $q=::ReplaceFields($ID,"%a");
-	if ($source =~ m/last/gi) { $q =~ s/ /+/g; } # replace spaces with "+" for last.fm
-	elsif ($source =~ m/wiki/gi) { $q =~ s/ /_/g; } # replace spaces with "_" for wikipedia
-	my $url=$source.$q;
-	::main::openurl($url);
-}
-
 sub destroy_event_cb
 {	my $self=shift;
 	$self->cancel;
@@ -187,23 +174,16 @@ sub prefbox
 	$lastfm->set_tooltip_text("Open last.fm website in your browser");
 	$lastfm->signal_connect(clicked => sub { Lookup_cb("http://www.last.fm/music/") } );
 	$lastfm->set_relief("none");
-	my $title=Gtk2::Label->new;
-	$title->set_markup( "<big>Artist-Info Plugin</big>" );
 	my $description=Gtk2::Label->new;
-	$description->set_markup("This plugin displays artist information, partly from within gmusicbrowser itself, partly retrieved from the internet.\n\nIt will display artist information from gmusicbrowser on top, meaning statistics (number of albums, songs and rating) and a picture if set.\nBelow this section the plugin displays information retrieved from last.fm, the <b>biographical data</b>, the <b>upcoming events</b> and in a separate tab <b>weblinks</b>\nto search different webpages for the playing artist in your browser. The biographical information can be saved locally (settings below), the events\nwill always be retrieved live as they are always subject to change.\n\nIf you're having trouble or just need some information on how to use this plugin, please navigate to the <a href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>.");
-#	$description->set_line_wrap(1);
-#	$description->set_size_request(-1,10);
-	$titlebox->pack_start($title,1,1,0);
+	$description->set_markup("For information on how to use this plugin, please navigate to the <a href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>.");
+	$description->set_line_wrap(1);
+	$titlebox->pack_start($description,1,1,0);
 	$titlebox->pack_start($lastfm,0,0,5);
 	my $optionbox=Gtk2::VBox->new(0,2);
 	$optionbox->pack_start($_,0,0,1) for $entry,$preview,$autosave,$picsize;
 	my $frame=Gtk2::Frame->new(_"Options");
-#	my $descriptionsize=Gtk2::SizeGroup->new('vertical');
-#	$descriptionsize->add_widget($description);
-#	$descriptionsize->add_widget($optionbox);
-#	$descriptionsize->add_widget($frame);
 	$frame->add($optionbox);
-	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$description,$frame;
+	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$frame;
 	return $vbox;
 }
 
@@ -234,15 +214,16 @@ sub ExternalLinks
 	my $iter=$buffer->get_start_iter;
 	$buffer->insert_with_tags($iter,"Search for artist on the web:\n\n",$tag_header);
 	my $i = 1;
+	my $artist = $self->{artist_esc};
 	for my $linkbutton
-	(	['artistinfo-lastfm', sub { Lookup_cb("http://www.last.fm/music/") }, "Show Artist page on last.fm"],
-		['artistinfo-wikipedia',sub { Lookup_cb("http://en.wikipedia.org/wiki/") }, "Show Artist page on wikipedia"],
-		['artistinfo-youtube',sub { Lookup_cb("http://www.youtube.com/results?search_type=&aq=1&search_query=") }, "Search for Artist on youtube"],
-		['artistinfo-amazon',sub { Lookup_cb("http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=") }, "Search amazon.com for Artist"],
-		['artistinfo-google',sub { Lookup_cb("http://www.google.at/search?q=") }, "Search google for Artist" ],
-		['artistinfo-allmusic',sub { Lookup_cb("http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=") }, "Search allmusic for Artist" ],
-		['artistinfo-pitchfork', sub { Lookup_cb("http://pitchfork.com/search/?search_type=standard&query=") }, "Search pitchfork for Artist" ],
-		['artistinfo-discogs', sub { Lookup_cb("http://www.discogs.com/artist/") }, "Search discogs for Artist" ],
+	(	['artistinfo-lastfm', sub { ::main::openurl("http://www.last.fm/music/$artist") }, "Show Artist page on last.fm"],
+		['artistinfo-wikipedia',sub { ::main::openurl("http://en.wikipedia.org/wiki/$artist") }, "Show Artist page on wikipedia"],
+		['artistinfo-youtube',sub { ::main::openurl("http://www.youtube.com/results?search_type=&aq=1&search_query=$artist") }, "Search for Artist on youtube"],
+		['artistinfo-amazon',sub { ::main::openurl("http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=$artist") }, "Search amazon.com for Artist"],
+		['artistinfo-google',sub { ::main::openurl("http://www.google.at/search?q=$artist") }, "Search google for Artist" ],
+		['artistinfo-allmusic',sub {::main::openurl("http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=$artist") }, "Search allmusic for Artist" ],
+		['artistinfo-pitchfork', sub { ::main::openurl("http://pitchfork.com/search/?search_type=standard&query=$artist") }, "Search pitchfork for Artist" ],
+		['artistinfo-discogs', sub { ::main::openurl("http://www.discogs.com/artist/$artist") }, "Search discogs for Artist" ],
 	)
 	{	if ($i==5) {$buffer->insert($iter,"\n"); }
 		$i++;
@@ -275,29 +256,12 @@ sub SongChanged
 	$self -> ArtistChanged( Songs::Get_gid($ID,'artist'));
 }
 
-sub getRSSurl
-{	my ($self,$url) = @_;
-	&set_buffer($self,"Loading...");
-	warn "info : loading $url\n";
-	$self->{waiting} = Simple_http::get_with_cb(cb => sub {$self->parseRSS(@_)},url => $url);
-}
-
-sub parseRSS
-{	my ($self,$data) = @_;
-	delete $self->{waiting};
-	my $url;
-	$data =~ m/<div class="skyWrap">(\s*)<h2>(\s*)(.*?)(\s*)<\/h2>/gi;
-	$self->{past_events} = $3."\n";
-	if ($data =~ m/There are no upcoming events for this artist./gi | $data =~ m/There are no events to list here./gi) {
-		&set_buffer($self,$self->{past_events}."No upcoming events for this artist");
-		return;
-	}
-	elsif ($data =~ m/http:\/\/ws.audioscrobbler.com(.*?).rss/gi) {
-		$url = "http://ws.audioscrobbler.com".$1.".rss";
-		
-	}
-	warn "info : loading $url\n";
-	$self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url);
+sub parseXML {
+	my $_ = shift;
+	s/<(.*?)>//gi;
+	$_ =~ s/^\s+//; # remove leading whitespace
+	$_ =~ s/\s+$//; # remove trailing whitespace
+	return $_;
 }
 
 sub ArtistChanged
@@ -336,8 +300,7 @@ sub ArtistChanged
 	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) {
 		$self->{artist_esc} = $artist;
 		$self->{url} = $url;
-		if ($self->{site} eq "events") { ::IdleDo('8_artistinfo'.$self,1000,\&getRSSurl,$self,$url); }
-		else {	::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url); }
+		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);
 		}
 }
 
@@ -345,7 +308,7 @@ sub load_url
 {	my ($self,$url)=@_;
 	&set_buffer($self,"Loading...");
 	$self->cancel;
-	warn "info : loading $url\n"; # if $::debug;
+	warn "info : loading $url\n" if $::debug;
 	$self->{url}=$url;
 	if ($self->{site} ne "web") { $self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url); }
 	else {	&ExternalLinks($self); }
@@ -383,9 +346,7 @@ sub loaded
 		}
 		else { $infoheader = "Artist Biography"; }
 
-		#$data =~ m/<div id="wikiAbstract">(\s*)(.*)<div class="wikiOptions">/s;
 		$data =~ m/<content><\!\[CDATA\[(.*?)]]>/gi;
-		#$data = $2;
 		$data = $1;
 		for ($data)
 		{	s/<br \/>|<\/p>/\n/gi; # never more than one empty line
@@ -405,31 +366,32 @@ sub loaded
 		my $tag_title = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT'); 
 		my $tag_date = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'GTK_JUSTIFY_LEFT');
 		my $tag_footer = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1);
+		
 		while (defined($_=shift @line)) {
-			if ($_ =~ m/<title>(.*?)<\/title>/i) {
-				if ($_ =~ m/<title>Last.fm Events/gi) {
-					$infoheader = "Upcoming Events\n\n";
-					$buffer->insert_with_tags($iter,$infoheader,$tag_header);
-				}
-				else {
-					s/<(.*?)>//gi;
-					$_ =~ s/^\s+//; # remove leading whitespace
-					$_ =~ s/\s+$//; # remove trailing whitespace
-					$_ =~ m/ on (.*)/g;
-					$_ =~ s/ on (.*)//gi;
-
-					$buffer->insert_with_tags($iter,$_ . "\n",$tag_title);
-					$buffer->insert_with_tags($iter,$1 . "\n",$tag_date);	
-				}
+			if ($_ =~ m/total=\"(.*?)\">/g) {
+				$_ =~ s/<(.*?)total\=//gi;
+				s/\"|>//gi;
+				if ( $_ == 1) { $infoheader = $_ ." Upcoming Event\n\n"; }
+				elsif ( $_ == 0) { &set_buffer($self,"No results found"); }
+				else { $infoheader = $_ ." Upcoming Events\n\n"; }
+				$buffer->insert_with_tags($iter,$infoheader,$tag_header);
 			}
-			elsif ($_ =~ m/<description><\!\[CDATA\[Location/gi ) {
-				$_ =~ s/  <description><!\[CDATA\[Location: //;					
-				$buffer->insert_with_tags($iter,$_ . "\n\n",$tag_date);
+			elsif ($_ =~ m/<name>(.*?)<\/name>/g) {
+				$buffer->insert_with_tags($iter,parseXML($_). "\n",$tag_title);
+			}
+			elsif ($_ =~ m/<city>(.*?)<\/city>/g) {
+				$buffer->insert_with_tags($iter,parseXML($_). " (",$tag_date);
+			}
+			elsif ($_ =~ m/<country>(.*?)<\/country>/g) {
+				$buffer->insert_with_tags($iter,parseXML($_). ")\n",$tag_date);
+			}
+			elsif ($_ =~ m/<startDate>(.*?)<\/startDate>/g) {
+				$buffer->insert_with_tags($iter,substr(parseXML($_),0,-9). "\n\n",$tag_date);
+			}
+			elsif ($_ =~ m/<url>(.*?)event(.*?)<\/url>/g) {
+				my $eventlink = parseXML($_); # TODO add anchor to events -> need to use multidimensional arrays for temp-storage/formatting
 			}
 		}
-		my $text= $buffer->get_text($buffer->get_bounds, ::FALSE);
-		$buffer->insert_with_tags($iter,$self->{past_events},$tag_footer);
-		if ($text eq "Upcoming Events\n\n") {	&set_buffer($self,"No results found");	}
 	}
 
 	$self->Save_text if $::Options{OPT.'AutoSave'} && $artistinfo_ok && $artistinfo_ok==1;
