@@ -1,3 +1,10 @@
+gmusicbrowser (1.1.5ppa18) lucid; urgency=low
+
+  * artistinfo-plugin: switch to last.fm's webapi(faster and cleaner), make event-formats customizable, make events clickable
+    for a complete changelog see: github.com/ochosi/gmusicbrowser
+    
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Fri, 15 Oct 2010 20:16:49 +0200
+
 gmusicbrowser (1.1.5ppa17) lucid; urgency=low
 
   * fix queue (add option "showbb" to show queueactions/buttons in queue)
