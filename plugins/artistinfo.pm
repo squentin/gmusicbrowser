@@ -38,7 +38,7 @@ my %sites =
 # lastfm api key 7aa688c2466dc17263847da16f297835
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
 
-::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100");
+::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", Eventformat => "%title at %name\\%startDate\\%city (%country)\\\\");
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
@@ -167,7 +167,7 @@ sub prefbox
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
 	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text1=>_"Artist Picture Size : ", text2=>_"(applied after restart)");
-	
+	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", width=>50, tip => "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '\\\\' and any text you'd like to have in between. E.g. '%title taking place at %startDate\\in %city, %country'");
 	my $lastfmimage=Gtk2::Image->new_from_stock("artistinfo-lastfm",'dnd');
 	my $lastfm=Gtk2::Button->new;
 	$lastfm->set_image($lastfmimage);
@@ -180,7 +180,7 @@ sub prefbox
 	$titlebox->pack_start($description,1,1,0);
 	$titlebox->pack_start($lastfm,0,0,5);
 	my $optionbox=Gtk2::VBox->new(0,2);
-	$optionbox->pack_start($_,0,0,1) for $entry,$preview,$autosave,$picsize;
+	$optionbox->pack_start($_,0,0,1) for $entry,$preview,$autosave,$picsize,$eventformat;
 	my $frame=Gtk2::Frame->new(_"Options");
 	$frame->add($optionbox);
 	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$frame;
@@ -256,14 +256,6 @@ sub SongChanged
 	$self -> ArtistChanged( Songs::Get_gid($ID,'artist'));
 }
 
-sub parseXML {
-	my $_ = shift;
-	s/<(.*?)>//gi;
-	$_ =~ s/^\s+//; # remove leading whitespace
-	$_ =~ s/\s+$//; # remove trailing whitespace
-	return $_;
-}
-
 sub ArtistChanged
 {	my ($self,$aID,$force)=@_;
 	return unless $self->mapped;
@@ -328,15 +320,15 @@ sub loaded
 	$encoding='cp1252' if $encoding && $encoding eq 'iso-8859-1'; #microsoft use the superset cp1252 of iso-8859-1 but says it's iso-8859-1
 	$encoding||='cp1252'; #default encoding
 	$data=Encode::decode($encoding,$data) if $encoding;
-	
 	if ($encoding eq 'utf-8') { $data = ::decode_html($data); }
 	my $iter=$buffer->get_start_iter;
+	
 	my $fontsize = $self->{fontsize};
 	my $tag_noresults=$buffer->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
 	my $tag_header = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
 	my ($artistinfo_ok,$infoheader);
 	
-	if ($self->{site} eq "biography") {	
+	if ($self->{site} eq "biography") {
 		if ($data =~ m/<p\ class="origin">(.*?)<\/p>/s)
 		{	$infoheader = $1;
 			for ($infoheader)
@@ -362,36 +354,32 @@ sub loaded
 	}
 	
 	elsif ($self->{site} eq "events") {
-		my @line = split /\n/s, $data;
-		my $tag_title = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT'); 
-		my $tag_date = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'GTK_JUSTIFY_LEFT');
-		my $tag_footer = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1);
 		
-		while (defined($_=shift @line)) {
-			if ($_ =~ m/total=\"(.*?)\">/g) {
-				$_ =~ s/<(.*?)total\=//gi;
-				s/\"|>//gi;
-				if ( $_ == 1) { $infoheader = $_ ." Upcoming Event\n\n"; }
-				elsif ( $_ == 0) { &set_buffer($self,"No results found"); }
-				else { $infoheader = $_ ." Upcoming Events\n\n"; }
-				$buffer->insert_with_tags($iter,$infoheader,$tag_header);
-			}
-			elsif ($_ =~ m/<name>(.*?)<\/name>/g) {
-				$buffer->insert_with_tags($iter,parseXML($_). "\n",$tag_title);
-			}
-			elsif ($_ =~ m/<city>(.*?)<\/city>/g) {
-				$buffer->insert_with_tags($iter,parseXML($_). " (",$tag_date);
-			}
-			elsif ($_ =~ m/<country>(.*?)<\/country>/g) {
-				$buffer->insert_with_tags($iter,parseXML($_). ")\n",$tag_date);
-			}
-			elsif ($_ =~ m/<startDate>(.*?)<\/startDate>/g) {
-				$buffer->insert_with_tags($iter,substr(parseXML($_),0,-9). "\n\n",$tag_date);
-			}
-			elsif ($_ =~ m/<url>(.*?)event(.*?)<\/url>/g) {
-				my $eventlink = parseXML($_); # TODO add anchor to events -> need to use multidimensional arrays for temp-storage/formatting
-			}
+		my %tag;
+		$tag{title} = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT');
+		$tag{default} = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'GTK_JUSTIFY_LEFT');
+		my @events;
+		if ($data =~ m#total=\"(.*?)\">#g) {
+			if ( $1 == 1) { $infoheader = $1 ." Upcoming Event\n\n"; }
+			elsif ( $1 == 0) { set_buffer($self,"No results found"); return; }
+			else { $infoheader = $1 ." Upcoming Events\n\n"; }
+			$buffer->insert_with_tags($iter,$infoheader,$tag_header) if $infoheader;
 		}
+		for my $event (split /<\/event>/, $data) {
+			my %event;
+			$event{$1} = ::decode_html($2) while $event=~ m#<(\w+)>([^<]*)</\1>#g;
+			next unless $event{id}; # otherwise the last </events> is also treated like an event
+			$event{startDate} = substr($event{startDate},0,-9); # cut the useless time (hh:mm:ss) from the date
+			my $format = $::Options{OPT.'Eventformat'};
+			while ($format =~ m/(%\w+)/g) { my $tag = $1; $tag =~ s/\%//g; $format =~ s/\%$tag/$event{$tag}/g; }
+			$format =~ s#\\\\#\n#g;
+			if ($format =~ m/(.*?)\n(.*)/gs) { # if there's more than one line, format only the first with the title-tag
+				$buffer->insert_with_tags($iter,$1."\n",$tag{title}); # TODO add hyperlink to event{url}
+				$buffer->insert_with_tags($iter,$2,$tag{default});
+			}
+			else { $buffer->insert_with_tags($iter,$format,$tag{title}); }
+		}
+		
 	}
 
 	$self->Save_text if $::Options{OPT.'AutoSave'} && $artistinfo_ok && $artistinfo_ok==1;
