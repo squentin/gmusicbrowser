@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 20010 Quentin Sculo <squentin@free.fr> and Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -8,7 +8,7 @@
 =gmbplugin ARTISTINFO
 name	Artistinfo
 title	Artistinfo plugin
-version	0.1
+version	0.3
 author  Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 author  Pasi Lallinaho <pasi@shimmerproject.org>
 desc	This plugin retrieves artist-relevant information (biography, upcoming events) from last.fm.
@@ -94,6 +94,11 @@ sub new
 	$textview->set_pixels_above_lines(2);
 	$textview->set_editable(0);
 	$textview->set_left_margin(5);
+	$textview->set_has_tooltip(1);
+	$textview->signal_connect(button_release_event	=> \&button_release_cb);
+	$textview->signal_connect(motion_notify_event 	=> \&update_cursor_cb);
+	$textview->signal_connect(visibility_notify_event=>\&update_cursor_cb);
+	$textview->signal_connect(query_tooltip => \&update_cursor_cb);
 	
 	my $togglebox = Gtk2::HBox->new();
 	my $group;
@@ -202,6 +207,44 @@ sub set_buffer
 	my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
 	$self->{buffer}->insert_with_tags($iter,"\n$text",$tag_noresults);
 	$self->{buffer}->set_modified(0);
+}
+
+sub update_cursor_cb
+{	my $textview=$_[0];
+	my (undef,$wx,$wy,undef)=$textview->window->get_pointer;
+	my ($x,$y)=$textview->window_to_buffer_coords('widget',$wx,$wy);
+	my $iter=$textview->get_iter_at_location($x,$y);
+	my $cursor='xterm';
+	for my $tag ($iter->get_tags)
+	{	next unless $tag->{url};
+		$cursor='hand2';
+		$textview->set_tooltip_text($tag->{url});
+		last;
+	}
+	return if ($textview->{cursor}||'') eq $cursor;
+	$textview->{cursor}=$cursor;
+	$textview->get_window('text')->set_cursor(Gtk2::Gdk::Cursor->new($cursor));
+}
+
+sub button_release_cb
+{	my ($textview,$event) = @_;
+	my $self=::find_ancestor($textview,__PACKAGE__);
+	return ::FALSE unless $event->button == 1;
+	my ($x,$y)=$textview->window_to_buffer_coords('widget',$event->x, $event->y);
+	my $url=$self->url_at_coords($x,$y);
+	::main::openurl($url) if $url;
+	return ::FALSE;
+}
+
+sub url_at_coords
+{	my ($self,$x,$y)=@_;
+	my $iter=$self->{textview}->get_iter_at_location($x,$y);
+	for my $tag ($iter->get_tags)
+	{	next unless $tag->{url};
+		if ($tag->{url}=~m/^#(\d+)?/) { $self->scrollto($1) if defined $1; last }
+		my $url= $tag->{url};
+		return $url;
+	}
 }
 
 sub ExternalLinks
@@ -329,19 +372,11 @@ sub loaded
 	my ($artistinfo_ok,$infoheader);
 	
 	if ($self->{site} eq "biography") {
-		if ($data =~ m/<p\ class="origin">(.*?)<\/p>/s)
-		{	$infoheader = $1;
-			for ($infoheader)
-			{	s/^\s+|\s+$|\n|<(.*?)>//gi;
-				s/ +/ /g;
-			}			
-		}
-		else { $infoheader = "Artist Biography"; }
-
+		$infoheader = "Artist Biography";
 		$data =~ m/<content><\!\[CDATA\[(.*?)]]>/gi;
 		$data = $1;
-		for ($data)
-		{	s/<br \/>|<\/p>/\n/gi; # never more than one empty line
+		for ($data) {
+			s/<br \/>|<\/p>/\n/gi; # never more than one empty line
 			s/\n\n/\n/gi; # never more than one empty line (again)
 			s/<(.*?)>//gi; # strip tags
 		}
@@ -355,9 +390,7 @@ sub loaded
 	
 	elsif ($self->{site} eq "events") {
 		
-		my %tag;
-		$tag{title} = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT');
-		$tag{default} = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'GTK_JUSTIFY_LEFT');
+		my $tag = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'GTK_JUSTIFY_LEFT');
 		my @events;
 		if ($data =~ m#total=\"(.*?)\">#g) {
 			if ( $1 == 1) { $infoheader = $1 ." Upcoming Event\n\n"; }
@@ -371,13 +404,16 @@ sub loaded
 			next unless $event{id}; # otherwise the last </events> is also treated like an event
 			$event{startDate} = substr($event{startDate},0,-9); # cut the useless time (hh:mm:ss) from the date
 			my $format = $::Options{OPT.'Eventformat'};
-			while ($format =~ m/(%\w+)/g) { my $tag = $1; $tag =~ s/\%//g; $format =~ s/\%$tag/$event{$tag}/g; }
+			$format =~ s/%(\w+)/$event{$1}/g;
 			$format =~ s#\\\\#\n#g;
-			if ($format =~ m/(.*?)\n(.*)/gs) { # if there's more than one line, format only the first with the title-tag
-				$buffer->insert_with_tags($iter,$1."\n",$tag{title}); # TODO add hyperlink to event{url}
-				$buffer->insert_with_tags($iter,$2,$tag{default});
-			}
-			else { $buffer->insert_with_tags($iter,$format,$tag{title}); }
+			my $offset1 = $iter->get_offset;
+			my $href = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT');
+			$href->{url}=$event{url};
+			my ($first,$rest) = split /\n/,$format,2;
+			$buffer->insert($iter,$first);
+			my $offset2 = $iter->get_offset;
+			$buffer->apply_tag($href,$buffer->get_iter_at_offset($offset1),$buffer->get_iter_at_offset($offset2));
+			$buffer->insert_with_tags($iter,"\n".$rest,$tag) if $rest;
 		}
 		
 	}
