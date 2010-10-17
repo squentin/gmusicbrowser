@@ -114,7 +114,7 @@ sub new
 		$item -> set_relief("none");
 		$item -> set_tooltip_text($tip);
 		$item->set_active( $key eq $self->{site} );
-		$item->signal_connect('toggled' => sub { &toggled_cb($self,$item); } );
+		$item->signal_connect('toggled' => sub { &toggled_cb($self,$item,$textview); } );
 		$group = $item -> get_group;
 		$togglebox->pack_start($item,1,0,0);
 	}
@@ -147,10 +147,11 @@ sub new
 }
 
 sub toggled_cb
-{	my ($self, $togglebutton) = @_;
+{	my ($self, $togglebutton,$textview) = @_;
 	if ($togglebutton -> get_active) {
 		$self->{site} = $togglebutton->{key};
 		SongChanged($togglebutton);
+		$textview->set_tooltip_text($self->{site}) if $self->{site} ne "events";
 	}
 }
 
@@ -325,11 +326,7 @@ sub ArtistChanged
 	}
 	
 	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
-#	for ($artist) {
-#		s#%#%25#gi; # weird last.fm escaping, "/" -> %2f (url_escapeall) "%" -> %25 -> %252f
-#		s/%20/%2B/gi; # replace spaces by "+" for last.fm
-#		s/\?/%3F/gi;
-#	}
+
 	my ($url)=@{$sites{$self->{site}}};
 	for ($url) { next unless defined $_; s/%a/$artist/; }
 	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) {
