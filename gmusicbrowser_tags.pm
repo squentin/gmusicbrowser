@@ -208,14 +208,12 @@ sub Write
 	return 1;
 }
 
-# FIXME FMPS escaping needs improvements (waiting for FMPS v1.0.1), but not should be ok for ratings
 sub FMPS_string_to_hash
 {	my $vlist=shift;
 	my %h;
 	for my $pair (split /;;/, $vlist)
 	{	my ($key,$value)= split /::/,$pair,2;
-		s#((?:\\;){2,})#';'x(length($1)/2)#eg for $key,$value;
-		s#((?:\\:){2,})#':'x(length($1)/2)#eg for $key,$value;
+		s#\\([;:\\])#$1#g for $key,$value;
 		$h{$key}=$value;
 	}
 	return \%h;
@@ -225,7 +223,7 @@ sub FMPS_hash_to_string
 	my @list;
 	for my $key (sort keys %$h)
 	{	my $v=$h->{$key};
-		s#(;;+|::+)#quotemeta $1#eg for $key,$v;
+		s#([;:\\])#\\$1#g for $key,$v;
 		push @list, $key.'::'.$v;
 	}
 	return join ';;',@list;
@@ -892,11 +890,12 @@ use Gtk2;
 use base 'Gtk2::Entry';
 
 sub new
-{	my ($class,$field,$ID,$width) = @_;
+{	my ($class,$field,$ID,$width,$completion) = @_;
 	my $self = bless Gtk2::Entry->new, $class;
 	#$self->{field}=$field;
 	my $val=Songs::Get($ID,$field);
 	$self->set_text($val);
+	GMB::ListStore::Field::setcompletion($self,$field) if $completion;
 	if ($width) { $self->set_width_chars($width); $self->{noexpand}=1; }
 	return $self;
 }
@@ -1022,24 +1021,19 @@ use base 'Gtk2::Combo';
 
 sub new
 {	my ($class,$field,$IDs,$listall) = @_;
-	my $self = bless Gtk2::Combo->new, $class;
+	my $self= bless Gtk2::Combo->new, $class;
 	#$self->{field}=$field;
-	GMB::ListStore::Field::setcompletion($self->entry,$field) if $listall;
 
-	if (ref $IDs)
-	{	my $values= Songs::BuildHash($field,$IDs);
-		my @l=sort { $values->{$b} <=> $values->{$a} } keys %$values; #sort values by their frequency
-		my $first=$l[0];
-		@l= @{ Songs::Gid_to_Get($field,\@l) };
-		if ($listall) { push @l, @{Songs::ListAll($field)}; }
-		$self->set_case_sensitive(1);
-		$self->set_popdown_strings(@l);
-		$self->set_text('') unless ( $values->{$first} > @$IDs/3 );
-	}
-	else
-	{	my $val=Songs::Get($IDs,$field);
-		$self->set_text($val);
-	}
+	my $values= Songs::BuildHash($field,$IDs);
+	my @l=sort { $values->{$b} <=> $values->{$a} } keys %$values; #sort values by their frequency
+	my $first=$l[0];
+	@l= @{ Songs::Gid_to_Get($field,\@l) } if Songs::Field_property($field,'gid_to_get');
+	if ($listall) { push @l, @{Songs::ListAll($field)}; }
+	$self->set_case_sensitive(1);
+	$self->set_popdown_strings(@l);
+	$self->set_text('') unless ( $values->{$first} > @$IDs/3 );
+
+	GMB::ListStore::Field::setcompletion($self->entry,$field) if $listall;
 
 	return $self;
 }
