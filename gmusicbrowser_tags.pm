@@ -208,14 +208,12 @@ sub Write
 	return 1;
 }
 
-# FIXME FMPS escaping needs improvements (waiting for FMPS v1.0.1), but not should be ok for ratings
 sub FMPS_string_to_hash
 {	my $vlist=shift;
 	my %h;
 	for my $pair (split /;;/, $vlist)
 	{	my ($key,$value)= split /::/,$pair,2;
-		s#((?:\\;){2,})#';'x(length($1)/2)#eg for $key,$value;
-		s#((?:\\:){2,})#':'x(length($1)/2)#eg for $key,$value;
+		s#\\([;:\\])#$1#g for $key,$value;
 		$h{$key}=$value;
 	}
 	return \%h;
@@ -225,7 +223,7 @@ sub FMPS_hash_to_string
 	my @list;
 	for my $key (sort keys %$h)
 	{	my $v=$h->{$key};
-		s#(;;+|::+)#quotemeta $1#eg for $key,$v;
+		s#([;:\\])#\\$1#g for $key,$v;
 		push @list, $key.'::'.$v;
 	}
 	return join ';;',@list;
