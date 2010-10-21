@@ -1,3 +1,12 @@
+gmusicbrowser (1.1.5ppa19) lucid; urgency=low
+
+  * add new icon theme: Faenza
+    artistinfo-plugin: fix tooltips
+    merge with git upstream (commit 64998d56d876f02f29ef - 2010-10-17)
+    for a complete changelog see: github.com/ochosi/gmusicbrowser
+    
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Thu, 21 Oct 2010 13:56:11 +0200
+
 gmusicbrowser (1.1.5ppa18) lucid; urgency=low
 
   * artistinfo-plugin: switch to last.fm's webapi(faster and cleaner), make event-formats customizable, make events clickable
