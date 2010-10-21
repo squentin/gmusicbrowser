@@ -45,6 +45,7 @@ install: all
 	install -pm 644 gmusicbrowser.man "$(mandir)/man1/gmusicbrowser.1"
 	install -pd "$(datadir)/gmusicbrowser/pix/"
 	install -pd "$(datadir)/gmusicbrowser/pix/elementary/"
+	install -pd "$(datadir)/gmusicbrowser/pix/Faenza/"
 	install -pd "$(datadir)/gmusicbrowser/pix/gnome-classic/"
 	install -pd "$(datadir)/gmusicbrowser/pix/tango/"
 	install -pd "$(datadir)/gmusicbrowser/pix/oxygen/"
