@@ -2364,7 +2364,15 @@ sub GetNextSongs
 	  my $pos;
 	  $pos=FindPositionSong( $IDs[-1],$ListPlay ) if @IDs;
 	  $pos= defined $Position ? $Position : -1  unless defined $pos;
-	  push @IDs,_"next" if $list;
+	  if ($pos==-1 && !$ListMode)
+	  {	my $ID= @IDs ? $IDs[-1] : $::SongID;
+		if (defined $ID)
+		{	$ID= Songs::FindNext($ListPlay, $Options{Sort}, $ID);
+			$pos=FindPositionSong( $ID,$ListPlay );
+			$pos=-1 if !defined $pos;
+		}
+	  }
+	  push @IDs,_"Next" if $list;
 	  while ($nb)
 	  {	if ( $pos+$nb > $#$ListPlay )
 		{	push @IDs,@$ListPlay[$pos+1..$#$ListPlay];

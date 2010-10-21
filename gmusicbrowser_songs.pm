@@ -1690,25 +1690,36 @@ sub SortField
 {	my $f=$_[0];
 	return $Def{$f} && $Def{$f}{flags}=~m/i/ ? $f.=':i' : $f;  #case-insensitive by default
 }
+sub MakeSortCode
+{	my $sort=shift;
+	my @code;
+	my $init='';
+	for my $s (split / /,$sort)
+	{	my ($inv,$field,$i)= $s=~m/^(-)?(\w+)(:i)?$/;
+		next unless $field;
+		unless ($Def{$field}) { warn "Songs::SortList : Invalid field $field\n"; next }
+		unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $field\n"; next }
+		my ($sortinit,$sortcode)= SortCode($field,$inv,$i);
+		push @code, $sortcode;
+		$init.= $sortinit."; " if $sortinit;
+	}
+	@code=('0') unless @code;
+	return $init, join(' || ',@code);
+}
+sub FindNext	# find the song in listref that would be right after ID if ID was in the list #could be optimized by not re-evaluating left-side for every comparison
+{	my ($listref,$sort,$ID)=@_;	# list must be sorted by $sort
+	my $func= $FuncCache{"FindNext $sort"} ||=
+	 do {	my ($init,$code)= MakeSortCode($sort);
+		$code= 'sub {my $l=$_[0];$a=$_[1]; '.$init.'for $b (@$l) { return $b if (' . $code . ')<1; } return undef;}';
+		Compile("FindNext $sort", $code);
+	    };
+	return $func->($listref,$ID);
+}
 sub FindFirst		#FIXME add a few fields (like 'disc track path file') to all sort so that the sort result is constant, ie doesn't depend on the starting order
 {	my ($listref,$sort)=@_;
 	my $func= $FuncCache{"FindFirst $sort"} ||=
-	 do {	#my $insensitive;
-		my @code;
-		my $init='';
-		for my $s (split / /,$sort)
-		{	my ($inv,$field,$i)= $s=~m/^(-)?(\w+)(:i)?$/;
-			next unless $field;
-			unless ($Def{$field}) { warn "Songs::SortList : Invalid field $field\n"; next }
-			unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $field\n"; next }
-			my ($sortinit,$sortcode)= SortCode($field,$inv,$i);
-			push @code, $sortcode;
-			$init.= $sortinit."; " if $sortinit;
-		}
-		return unless @code;
-		#if ($insensitive) { my $sort0=$sort; $sort0=~s/:i//g; SortList($listref,$sort0); } #do a case-sensitive sort first (faster)
-		#warn "sort function for '$sort' :\n".'sub {'.join(' || ',@code).'}'."\n" if $::debug;
-		my $code= 'sub {my $l=$_[0];$a=$l->[0]; '.$init.'for $b (@$l) { $a=$b if (' . join(' || ',@code) . ')>0; } return $a;}';
+	 do {	my ($init,$code)= MakeSortCode($sort);
+		$code= 'sub {my $l=$_[0];$a=$l->[0]; '.$init.'for $b (@$l) { $a=$b if (' . $code . ')>0; } return $a;}';
 		Compile("FindFirst $sort", $code);
 	    };
 	return $func->($listref);
@@ -1717,23 +1728,8 @@ sub SortList		#FIXME add a few fields (like 'disc track path file') to all sort 
 {	my $time=times; #DEBUG
 	my $listref=$_[0]; my $sort=$_[1];
 	my $func= $FuncCache{"sort $sort"} ||=
-	 do {	#my $insensitive;
-		my @code;
-		my $init='';
-		for my $s (split / /,$sort)
-		{	my ($inv,$field,$i)= $s=~m/^(-)?(\w+)(:i)?$/;
-			next unless $field;
-			unless ($Def{$field}) { warn "Songs::SortList : Invalid field $field\n"; next }
-			unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $field\n"; next }
-			my ($sortinit,$sortcode)= SortCode($field,$inv,$i);
-			unless ($sortcode) { warn "Error trying to sort by $field\n"; next }
-			push @code, $sortcode;
-			$init.= $sortinit."; " if $sortinit;
-		}
-		return unless @code;
-		#if ($insensitive) { my $sort0=$sort; $sort0=~s/:i//g; SortList($listref,$sort0); } #do a case-sensitive sort first (faster)
-		#warn "sort function for '$sort' :\n".'sub {'.join(' || ',@code).'}'."\n" if $::debug;
-		my $code= 'sub { my $list=shift; ' .$init. '@$list= sort {'. join(' || ',@code) . '} @$list; }';
+	 do {	my ($init,$code)= MakeSortCode($sort);
+		$code= 'sub { my $list=shift; ' .$init. '@$list= sort {'. $code . '} @$list; }';
 		Compile("sort $sort", $code);
 	    };
 	$func->($listref) if $func;
@@ -2433,7 +2429,7 @@ sub UpdateFilter
 	my @oldlist=@$self;
 	my $before=$::PlayFilter;
 	my $newID=$self->_filter;
-	if ($before==$::PlayFilter)
+	if ($::PlayFilter->are_equal($before))
 	{	::HasChanged('SongArray',$self,'update',\@oldlist);
 	}
 	else	#filter may change because of the lock
@@ -2510,15 +2506,29 @@ sub _filter
 	delete $::ToDo{'7_refilter_playlist'};
 	my $filter=$::SelectedFilter;
 	my $ID=$::SongID;
-	$ID=undef if defined $ID && !@{ $filter->filter([$ID]) };
 	$filter= Filter->newadd(1,$filter, Filter->newlock($::TogLock,$ID) )  if $::TogLock && defined $ID;
-	$::PlayFilter=$::SelectedFilter;
+	$::PlayFilter=$filter;
 	my $newlist=$filter->filter;
+	my $need_relock;
+	my $sorted;
+	if (defined $ID && $::Options{AlwaysInPlaylist} && !@{ $filter->filter([$ID]) })
+	{	if (!@$newlist && $::TogLock)
+		{	$newlist= $::SelectedFilter->filter;
+			$need_relock=1;
+		}
+		if ($::RandomMode) { $ID=undef; }
+		elsif (my $sort=$::Options{Sort})
+		{	Songs::SortList($newlist,$sort);
+			$sorted=1;
+			$ID= Songs::FindNext($newlist, $sort, $ID);
+		}
+	}
 	if (!defined $ID)
 	{	$ID= $self->_FindFirst($newlist);
-		$newlist=$self->_updatelock($ID,$newlist) if $::TogLock && defined $ID;
+		$need_relock=1 if $::TogLock;
 	}
-	$self->_sort($newlist);
+	$newlist=$self->_updatelock($ID,$newlist) if $need_relock;
+	$self->_sort($newlist) unless $sorted;
 	@$self=@$newlist;
 	delete $Presence{$self};
 	return $ID;
@@ -2559,7 +2569,11 @@ sub _list_without_lock
 }
 sub _updatelock
 {	my ($self,$ID,$newlist)=@_;
-	$ID=$::SongID unless defined $ID;
+	if (!defined $ID)
+	{	$::TogLock=undef;
+		::QHasChanged('Lock');
+		return $newlist;
+	}
 	my $lockfilter=Filter->newlock($::TogLock,$ID);
 	$::PlayFilter= $::ListMode ? $lockfilter : Filter->newadd(1,$::SelectedFilter,$lockfilter);
 	return $lockfilter->filter($newlist);
