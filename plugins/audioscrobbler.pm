@@ -7,7 +7,7 @@
 # published by the Free Software Foundation
 
 =gmbplugin AUDIOSCROBBLER
-name	last.fm
+name	last.fm/libre.fm
 title	last.fm/libre.fm plugin
 desc	Submit played songs to last.fm/libre.fm
 =cut
@@ -19,12 +19,12 @@ use warnings;
 use constant
 {	CLIENTID => 'gmb', VERSION => '0.1',
 	OPT => 'PLUGIN_AUDIOSCROBBLER_', #used to identify the plugin's options
-	SAVEFILE => 'audioscrobbler.queue', #file used to save unsent data
+	#SAVEFILE => 'audioscrobbler.queue', #file used to save unsent data
 };
 use Digest::MD5 'md5_hex';
 require $::HTTP_module;
 
-::SetDefaultOptions(OPT, Site => "last.fm");
+::SetDefaultOptions(OPT, Site => "last.fm", Savefile => "last.fm.queue");
 
 our $ignore_current_song;
 
@@ -63,13 +63,13 @@ sub prefbox
 	my @sites = ("last.fm","libre.fm");
 	my $label1=Gtk2::Label->new(_"Site :");
 	my $label3=Gtk2::Label->new(_"(applied after restart)");
-	my $site=::NewPrefCombo(OPT.'Site', \@sites, cb => sub {} );
+	my $site=::NewPrefCombo(OPT.'Site', \@sites, cb => sub {$::Options{OPT.'Savefile'} = $::Options{OPT.'Site'}.".queue"; } );
 	my $hbox=Gtk2::HBox->new();
 	$hbox->pack_start($_,0,0,0) for $label1,$site,$label3;
 	my $label2=Gtk2::Button->new(_"(see http://www.".$::Options{OPT.'Site'}.")");
 	$label2->set_relief('none');
 	$label2->signal_connect(clicked => sub
-		{	my $url='http://www'.$::Options{OPT.'Site'}'.fm';
+		{	my $url='http://www'.$::Options{OPT.'Site'}.'.fm';
 			my $user=$::Options{OPT.'USER'};
 			$url.="/user/$user/" if defined $user && $user ne '';
 			::openurl($url);
@@ -249,8 +249,8 @@ sub Log
 }
 
 sub Load 	#read unsent data
-{	return unless -r $::HomeDir.SAVEFILE;
-	return unless open my$fh,'<:utf8',$::HomeDir.SAVEFILE;
+{	return unless -r $::HomeDir.$::Options{OPT.'Savefile'};
+	return unless open my$fh,'<:utf8',$::HomeDir.$::Options{OPT.'Savefile'};
 	while (my $line=<$fh>)
 	{	chomp $line;
 		my @data=split "\x1D",$line;
@@ -262,10 +262,10 @@ sub Load 	#read unsent data
 sub Save	#save unsent data to a file
 {	$unsent_saved=@ToSubmit;
 	unless (@ToSubmit)
-	{ unlink $::HomeDir.SAVEFILE; return }
+	{ unlink $::HomeDir.$::Options{OPT.'Savefile'}; return }
 	my $fh;
-	unless (open $fh,'>:utf8',$::HomeDir.SAVEFILE)
-	 { warn "Error creating '$::HomeDir".SAVEFILE."' : $!\nUnsent last.fm data will be lost.\n"; return; }
+	unless (open $fh,'>:utf8',$::HomeDir.$::Options{OPT.'Savefile'})
+	 { warn "Error creating '$::HomeDir".$::Options{OPT.'Savefile'}."' : $!\nUnsent last.fm data will be lost.\n"; return; }
 	print $fh join("\x1D",@$_)."\n" for @ToSubmit;
 	close $fh;
 }
