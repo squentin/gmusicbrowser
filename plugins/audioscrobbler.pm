@@ -1,5 +1,6 @@
-# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2010 Quentin Sculo <squentin@free.fr>
 #
+# Modified to optionally scrobble to libre.fm by Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3, as
@@ -7,8 +8,8 @@
 
 =gmbplugin AUDIOSCROBBLER
 name	last.fm
-title	last.fm plugin
-desc	Submit played songs to last.fm
+title	last.fm/libre.fm plugin
+desc	Submit played songs to last.fm/libre.fm
 =cut
 
 
@@ -17,11 +18,13 @@ use strict;
 use warnings;
 use constant
 {	CLIENTID => 'gmb', VERSION => '0.1',
-	OPT => 'PLUGIN_AUDIOSCROBBLER_',#used to identify the plugin's options
+	OPT => 'PLUGIN_AUDIOSCROBBLER_', #used to identify the plugin's options
 	SAVEFILE => 'audioscrobbler.queue', #file used to save unsent data
 };
 use Digest::MD5 'md5_hex';
 require $::HTTP_module;
+
+::SetDefaultOptions(OPT, Site => "last.fm");
 
 our $ignore_current_song;
 
@@ -57,7 +60,13 @@ sub prefbox
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
 	my $entry1=::NewPrefEntry(OPT.'USER',_"username :", cb => \&userpass_changed, sizeg1 => $sg1,sizeg2=>$sg2);
 	my $entry2=::NewPrefEntry(OPT.'PASS',_"password :", cb => \&userpass_changed, sizeg1 => $sg1,sizeg2=>$sg2, hide => 1);
-	my $label2=Gtk2::Button->new(_"(see http://www.last.fm)");
+	my @sites = ("last.fm","libre.fm");
+	my $label1=Gtk2::Label->new(_"Site :");
+	my $label3=Gtk2::Label->new(_"(applied after restart)");
+	my $site=::NewPrefCombo(OPT.'Site', \@sites, cb => sub {} );
+	my $hbox=Gtk2::HBox->new();
+	$hbox->pack_start($_,0,0,0) for $label1,$site,$label3;
+	my $label2=Gtk2::Button->new(_"(see http://www.".$::Options{OPT.'Site'}.")");
 	$label2->set_relief('none');
 	$label2->signal_connect(clicked => sub
 		{	my $url='http://www.last.fm';
@@ -68,7 +77,7 @@ sub prefbox
 	my $ignore=Gtk2::CheckButton->new(_"Don't submit current song");
 	$ignore->signal_connect(toggled=>sub { return if $_[0]->{busy}; $ignore_current_song= $_[0]->get_active ? $::SongID : undef; ::HasChanged('Lastfm_ignore_current'); });
 	::Watch($ignore,Lastfm_ignore_current => sub { $_[0]->{busy}=1; $_[0]->set_active(defined $ignore_current_song); delete $_[0]->{busy}; } );
-	$vbox->pack_start($_,::FALSE,::FALSE,0) for $label2,$entry1,$entry2,$ignore;
+	$vbox->pack_start($_,::FALSE,::FALSE,0) for $label2,$hbox,$entry1,$entry2,$ignore;
 	$vbox->add( ::LogView($Log) );
 	return $vbox;
 }
@@ -110,7 +119,10 @@ sub Handshake
 	my $pass=$::Options{OPT.'PASS'};
 	my $time=time;
 	my $auth=md5_hex(md5_hex($pass).$time);
-	Send(\&response_cb,'http://post.audioscrobbler.com/?hs=true&p=1.2&c='.CLIENTID.'&v='.VERSION."&u=$user&t=$time&a=$auth");
+	my $site;
+	if ($::Options{OPT.'Site'} eq "last.fm") { $site = 'post.audioscrobbler.com'; }
+	else { $site = 'turtle.libre.fm'; }
+	Send(\&response_cb,'http://'.$site.'/?hs=true&p=1.2&c='.CLIENTID.'&v='.VERSION."&u=$user&t=$time&a=$auth");
 }
 
 sub response_cb
