@@ -69,7 +69,7 @@ sub prefbox
 	my $label2=Gtk2::Button->new(_"(see http://www.".$::Options{OPT.'Site'}.")");
 	$label2->set_relief('none');
 	$label2->signal_connect(clicked => sub
-		{	my $url='http://www.last.fm';
+		{	my $url='http://www'.$::Options{OPT.'Site'}'.fm';
 			my $user=$::Options{OPT.'USER'};
 			$url.="/user/$user/" if defined $user && $user ne '';
 			::openurl($url);
