@@ -57,6 +57,7 @@ install: all
 	install -pm 644 plugins/*.pm      "$(datadir)/gmusicbrowser/plugins/"
 	install -pm 644 pix/*.png         "$(datadir)/gmusicbrowser/pix/"
 	install -pm 644 pix/elementary/*    "$(datadir)/gmusicbrowser/pix/elementary/"
+	install -pm 644 pix/Faenza/*    "$(datadir)/gmusicbrowser/pix/Faenza/"
 	install -pm 644 pix/gnome-classic/*    "$(datadir)/gmusicbrowser/pix/gnome-classic/"
 	install -pm 644 pix/tango/*            "$(datadir)/gmusicbrowser/pix/tango/"
 	install -pm 644 pix/oxygen/*           "$(datadir)/gmusicbrowser/pix/oxygen/"
