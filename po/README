@@ -31,3 +31,7 @@ or
 * to send me translations, mail the $LANGUAGE.po to squentin@free.fr
   And tell me what name and (optionally) email I should credit the translation (both in git and in the about box).
   Don't hesitate to ask me if you have any questions.
+
+
+* translation updates will be cleaned-up by "msgattrib --no-location --translated --sort-output"
+  to minimize useless changes in the commit
