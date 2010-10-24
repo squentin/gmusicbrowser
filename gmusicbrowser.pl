@@ -499,7 +499,6 @@ sub Gtk2::Label::set_markup_with_format
 {	my $label=shift;
 	$label->set_markup( MarkupFormat(@_) );
 }
-
 sub IncSuffix	# increment a number suffix from a string
 {	$_[0] =~ s/(?<=\D)(\d*)$/($1||1)+1/e;
 }
@@ -3503,6 +3502,7 @@ sub BuildChoiceMenu
 			$item->{selected}= $value;
 			$item->signal_connect(activate => $smenu_callback, $options{code} );
 		}
+		$item->child->set_markup( $item->child->get_label ) if $options{submenu_ordered_hash};
 		$menu->append($item);
 	}
 	$menu=undef unless @order; #empty submenu

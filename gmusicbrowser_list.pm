@@ -1500,6 +1500,13 @@ our %Pages=
 	filesys	=> [Filesystem		=> '',			'',_"Filesystem"],
 );
 
+our @MenuMarkupOptions=
+(	"%a",
+	"<b>%a</b>%Y\n<small>%s <small>%l</small></small>",
+	"<b>%a</b>%Y\n<small>%b</small>",
+	"<b>%a</b>%Y\n<small>%b</small>\n<small>%s <small>%l</small></small>",
+	"<b>%y %a</b>",
+);
 my @picsize_menu=
 (	_("no pictures")	=>  0,
 	_("automatic size")	=> -1,
@@ -1541,7 +1548,11 @@ my @MenuSubGroup=
 (	{ label => _"show pictures",	code => sub { my $self=$_[0]{self}; $self->{lpicsize}[$_[0]{depth}]=$_[1]; $self->SetOption; },	mode => 'LS',
 	  submenu => \@picsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{lpicsize}[$_[0]{depth}]},
 		test => sub { Songs::FilterListProp($_[0]{subfield},'picture'); }, },
-	{ label => _"show info",	code => sub { my $self=$_[0]{self}; $self->{lmarkup}[$_[0]{depth}]^=1; $self->SetOption; },
+	{ label => _"text format",	code => sub { my $self=$_[0]{self}; $self->{lmarkup}[$_[0]{depth}]= $_[1]; $self->SetOption; },
+	  submenu => sub{	my $field= $_[0]{self}{field}[ $_[0]{depth} ];
+		  		my $gid=$_[0]{gidlist}[0]; return unless $gid; #FIXME option not shown when no gid is displayed, find a better way to display example format
+		  		return [ map { AA::ReplaceFields( $gid,$_,$field,::TRUE ), ($_ eq "%a" ? 0 : $_) } @MenuMarkupOptions ];
+	  		},	submenu_ordered_hash => 1, submenu_use_markup => 1,
 	  check => sub { $_[0]{self}{lmarkup}[$_[0]{depth}]}, istrue => 'aa', mode => 'LS', },
 	{ label => _"show info",	code => sub { my $self=$_[0]{self}; $self->{mmarkup}^=1; $self->SetOption; },
 	  check => sub { $_[0]{self}{mmarkup} }, mode => 'M', },
@@ -3964,7 +3975,7 @@ sub makelayout
 	my $layout=Gtk2::Pango::Layout->new( $widget->create_pango_context );
 	my $field=$prop->[P_FIELD][$depth];
 	my $markup=$prop->[P_MARKUP][$depth];
-	$markup= $markup ? "<b>%a</b>%Y\n<small>%s <small>%l</small></small>" : "%a"; #FIXME
+	$markup= !$markup ? "%a" : $markup eq 1 ? "<b>%a</b>%Y\n<small>%s <small>%l</small></small>" : $markup;
 	if ($gid==FilterList::GID_ALL)
 	{	$markup= ::MarkupFormat("<b>%s (%d)</b>", Songs::Field_All_string($field), $cell->get('all_count') );
 	}
