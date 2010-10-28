@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.4-se\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2010-01-31 15:26+0100\n"
-"PO-Revision-Date: 2010-03-22 10:35+0100\n"
+"POT-Creation-Date: 2010-04-20 22:21+0200\n"
+"PO-Revision-Date: 2010-10-21 14:31+0100\n"
 "Last-Translator: Olle Sandgren <olle.sandgren@blixtmail.se>\n"
 "Language-Team: Sweden <se@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -22,6 +22,76 @@ msgstr "# melodier"
 
 msgid "%S by %a"
 msgstr "%S av %a"
+
+msgid "%d Album"
+msgid_plural "%d Albums"
+msgstr[0] "%d Album"
+msgstr[1] "%d Album"
+
+msgid "%d Artist"
+msgid_plural "%d Artists"
+msgstr[0] "%d Artist"
+msgstr[1] "%d Artister"
+
+msgid "%d Song"
+msgid_plural "%d Songs"
+msgstr[0] "%d Melodi"
+msgstr[1] "%d Melodier"
+
+msgid "%d album"
+msgid_plural "%d albums"
+msgstr[0] "%d album"
+msgstr[1] "%d album"
+
+msgid "%d artist"
+msgid_plural "%d artists"
+msgstr[0] "%d artist"
+msgstr[1] "%d artister"
+
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] "%d fil"
+msgstr[1] "%d filer"
+
+msgid "%d file in {folder}"
+msgid_plural "%d files in {folder}"
+msgstr[0] "%d fil i {folder}"
+msgstr[1] "%d filer i {folder}"
+
+msgid "%d folder"
+msgid_plural "%d folders"
+msgstr[0] "%d mapp"
+msgstr[1] "%d mappar"
+
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d sekund"
+msgstr[1] "%d sekunder"
+
+msgid "%d song"
+msgid_plural "%d songs"
+msgstr[0] "%d melodi"
+msgstr[1] "%d melodier"
+
+msgid "%d song added"
+msgid_plural "%d songs added"
+msgstr[0] "%d melodi tillagd"
+msgstr[1] "%d melodier tillagda"
+
+msgid "%d song in queue"
+msgid_plural "%d songs in queue"
+msgstr[0] "%d melodi i kö"
+msgstr[1] "%d melodier i kö"
+
+msgid "%d song in the library"
+msgid_plural "%d songs in the library"
+msgstr[0] "%d melodi i biblioteket"
+msgstr[1] "%d melodier i biblioteket"
+
+msgid "%d song selected"
+msgid_plural "%d songs selected"
+msgstr[0] "%d melodi vald"
+msgstr[1] "%d melodier valda"
 
 msgid "%f is set"
 msgstr "%f är aktiv"
@@ -71,6 +141,11 @@ msgstr "' & ' och ', ' och ';'"
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' finns. Skriva över?"
 
+msgid "(%d song excluded)"
+msgid_plural "(%d songs excluded)"
+msgstr[0] "(%d melodi utesluten)"
+msgstr[1] "(%d melodier uteslutna)"
+
 msgid "(: )has one"
 msgstr "(: )har en"
 
@@ -88,6 +163,15 @@ msgstr "(annan)"
 
 msgid "(see http://www.last.fm)"
 msgstr "(se: http://www.last.fm)"
+
+msgid ""
+"- When selecting a song, the playlist filter will be reset if the song is "
+"not in it\n"
+"- Skip to another song when removing the current song from the playlist"
+msgstr ""
+"- När melodi är vald,  återställs spellistan om melodin inte finns i "
+"filtret\n"
+"- Hoppa till annan melodi när nuvarande melodi raderas från spellistan"
 
 msgid "0 chance"
 msgstr "0 chans"
@@ -130,6 +214,9 @@ msgstr "Avbryt"
 
 msgid "Abort ReplayGain analysis"
 msgstr "Avbryt ReplayGain analys"
+
+msgid "Abort all"
+msgstr "Avbryt alla"
 
 msgid "Abort mass-tagging"
 msgstr "Avbryt mass taggningar"
@@ -275,6 +362,9 @@ msgstr "Album år"
 msgid "All"
 msgstr "Alla"
 
+msgid "All Songs"
+msgstr "Alla Melodier"
+
 msgid "All albums"
 msgstr "Alla album"
 
@@ -307,6 +397,9 @@ msgstr "Mängden ljud ändras med mushjulet"
 
 msgid "Any of :"
 msgstr "Någon av:"
+
+msgid "Append"
+msgstr "Lägg till"
 
 msgid "Append (only if not already present)"
 msgstr "Bifoga (endast om den inte redan finns)"
@@ -362,9 +455,6 @@ msgstr "Fyll i automatiskt endast tomma fält"
 msgid "Auto fill queue"
 msgstr "Fyll automatiskt i kö"
 
-msgid "Auto-check current song for modification"
-msgstr "Kontrollera automatiskt gällande melodi ang modifiering"
-
 msgid "Auto-increment track numbers"
 msgstr "Automatisk ökning av spårnummer"
 
@@ -374,12 +464,8 @@ msgstr "Spara automatiskt positivt funna"
 msgid "Auto-scroll"
 msgstr "Auto-skrolla"
 
-msgid ""
-"Automatically check if the file for the current song has changed. And remove "
-"songs not found from the library."
-msgstr ""
-"Kontrollera automatiskt om filen för gällande melodi har ändrats. Och radera "
-"melodier som inte hittats från biblioteket."
+msgid "Automatically remove current song if not found"
+msgstr "Radera automatiskt nuvarande melodi om den inte återfinns"
 
 msgid "Autosave"
 msgstr "Autospara"
@@ -416,6 +502,12 @@ msgstr "Bläddrarfönster layout"
 
 msgid "Browser with SongTree"
 msgstr "Bläddra med SongTree"
+
+msgid "Buttons"
+msgstr "Knappar"
+
+msgid "Buttons, Song & Cover"
+msgstr "Knappar, Melodi & Omslag"
 
 msgid "Can't change the volume in non-gstreamer iceserver mode"
 msgstr "Kan inte ändra volymen i non-gstreamer iceserver läge"
@@ -461,8 +553,17 @@ msgstr "Känslig för VERSALER och gemener"
 msgid "Categories pane"
 msgstr "Kategoriruta"
 
+msgid "Centered on"
+msgstr "Centrerad på"
+
 msgid "Change Display"
 msgstr "Ändra display"
+
+msgid "Change default text color"
+msgstr "Ändra standardtextens färg"
+
+msgid "Change default text font and size"
+msgstr "Ändra standardtextens typ och storlek"
 
 msgid "Channels"
 msgstr "Kanaler"
@@ -599,11 +700,22 @@ msgstr "Kopiera till monterad spelare"
 msgid "Copy to portable player"
 msgstr "Kopiera till portabel spelare"
 
+msgid "Copying file"
+msgid_plural "Copying %d files"
+msgstr[0] "Kopierar fil"
+msgstr[1] "Kopierar filer"
+
 msgid "Copyright"
 msgstr "Copyright"
 
+msgid "Create ID3v2 tags as ID3v2.4"
+msgstr "Skapa ID3v2 taggar som ID3v2.4"
+
 msgid "Ctrl"
 msgstr "Ctrl"
+
+msgid "Current song must always be in the playlist"
+msgstr "Nuvarande melodi måste alltid finnas i spellistan"
 
 msgid "Custom"
 msgstr "Egen"
@@ -644,6 +756,12 @@ msgstr "Standard"
 msgid "Default rating :"
 msgstr "Ursprungligt betyg :"
 
+msgid "Default text color"
+msgstr "Standardtextens färg"
+
+msgid "Default text font"
+msgstr "Standardtextens typ"
+
 msgid "Delay tray tip popup on mouse over"
 msgstr "Stanna kvar i fack när markören är över den"
 
@@ -658,6 +776,12 @@ msgstr "Beskr."
 
 msgid "Description"
 msgstr "Beskrivning"
+
+msgid "Desktop widgets"
+msgstr "Skrivbordswidgets"
+
+msgid "Desktop widgets plugin"
+msgstr "Skrivbordswidgets modul"
 
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "Inaktivera skärmsläckare vid uppspelning"
@@ -1030,6 +1154,13 @@ msgstr "Ignorera playback fel"
 msgid "Import list"
 msgstr "Importera lista"
 
+msgid ""
+"In this case one command by file will be run\n"
+"\n"
+msgstr ""
+"I detta fall körs ett kommando per fil\n"
+"\n"
+
 msgid "Increase Volume"
 msgstr "Öka volym"
 
@@ -1042,8 +1173,14 @@ msgstr "Okänslig titel-artist (vänsterjusterad)"
 msgid "Insensitive title-artist (right-aligned)"
 msgstr "Okänslig titel-artist (högerjusterad)"
 
+msgid "Insensitive, Song & Cover"
+msgstr "Okänslig, Melodi & Omslag"
+
 msgid "Insert a list of files/folders at the start of the playlist"
 msgstr "Sätt in en lista med filer/mappar i början på spellistan"
+
+msgid "Invisible hot spot"
+msgstr "Osynlig hot spot"
 
 msgid "KB"
 msgstr "KB"
@@ -1093,6 +1230,12 @@ msgstr "Senast överhoppade"
 msgid "Launch ripping program"
 msgstr "Kör rippnings program"
 
+msgid "Layout"
+msgstr "Layout"
+
+msgid "Layout :"
+msgstr "Layout :"
+
 msgid "Layouts"
 msgstr "Layouter"
 
@@ -1107,6 +1250,11 @@ msgstr "Bibliotek"
 
 msgid "Library : "
 msgstr "Bibliotek :"
+
+msgid "Library size : %d song"
+msgid_plural "Library size : %d songs"
+msgstr[0] "Bibliotekstorlek : %d melodi"
+msgstr[1] "Bibliotekstorlek : %d melodier"
 
 msgid "List"
 msgstr "Lista"
@@ -1125,6 +1273,11 @@ msgstr "Ordagrann sökning"
 
 msgid "Load/Save lyrics in :"
 msgstr "Ladda/Spara låttext i :"
+
+msgid "Loaded %d unsent song from previous session"
+msgid_plural "Loaded %d unsent songs from previous session"
+msgstr[0] "Laddar %d ej sänd melodi från föregående session"
+msgstr[1] "Laddar %d ej sänd melodier från föregående session"
 
 msgid "Loading failed."
 msgstr "Misslyckades att ladda."
@@ -1150,6 +1303,9 @@ msgstr "Lås på Artist"
 msgid "Lock on song"
 msgstr "Lås på melodi"
 
+msgid "Lock on {field}"
+msgstr "Lås på {field}"
+
 msgid "Locked on :\n"
 msgstr "Lås på :\n"
 
@@ -1173,6 +1329,9 @@ msgstr "Vaggvisa insticksprogram"
 
 msgid "Lyrics"
 msgstr "Låttext"
+
+msgid "Lyrics (requires lyrics plugin)"
+msgstr "Låttext (kräver låttextmodul)"
 
 msgid "Lyrics for "
 msgstr "Låttext för"
@@ -1214,6 +1373,12 @@ msgstr "Mediatyp"
 msgid "Menu entry name"
 msgstr "Huvud ingångsnamn"
 
+msgid "Minimal tip"
+msgstr "Minimalt tips"
+
+msgid "Minimum size"
+msgstr "Minsta storlek"
+
 msgid "Misc."
 msgstr "Div."
 
@@ -1237,6 +1402,11 @@ msgstr "Misslyckades att flytta"
 
 msgid "Move folder to"
 msgstr "Flytta folder till"
+
+msgid "Moving file"
+msgid_plural "Moving %d files"
+msgstr[0] "Flyttar fil"
+msgstr[1] "Flyttar %d filer"
 
 msgid "Mute/Unmute"
 msgstr "Tysta/Återställ"
@@ -1336,6 +1506,9 @@ msgstr "Antal dagar sedan senast spelad"
 msgid "Number of days since last skipped"
 msgstr "Antal dagar sedan senast överhoppad"
 
+msgid "Number of days since modified"
+msgstr "Antal dagar sedan sist modifierad"
+
 msgid "Number of milliseconds"
 msgstr "Antal millisekunder"
 
@@ -1372,8 +1545,14 @@ msgstr ""
 msgid "Old name"
 msgstr "Gammalt namn"
 
+msgid "On top of other windows instead of below"
+msgstr "Över andra fönster istället för under"
+
 msgid "Only affect mp3 files that do not already have an id3v1 tag"
 msgstr "Gäller endast mp3 filer som inte redan har en id3v1 tagg"
+
+msgid "Opacity"
+msgstr "Opacitet"
 
 msgid "Open Browser"
 msgstr "Öppna bläddrare"
@@ -1423,6 +1602,9 @@ msgstr "_Öppna länk i bläddrare"
 msgid "Open page layout"
 msgstr "Öppna sidlayout"
 
+msgid "Open special layouts as desktop widgets"
+msgstr "Öppna speciallayouter som skrivbords widgetar"
+
 msgid "Open this page in the web browser"
 msgstr "Öppna denna sida i bläddrare"
 
@@ -1431,6 +1613,13 @@ msgstr "Alternativ"
 
 msgid "Options for subgroup"
 msgstr "Alternativ för undergrupp"
+
+msgid ""
+"Or you can use the field $files which will be replaced by the list of files, "
+"and only one command will be run"
+msgstr ""
+"Eller så kan du använda fältet $filer som kommer att återställas av "
+"fillistan, och endast ett kommando körs"
 
 msgid "Original Artist"
 msgstr "Original artist"
@@ -1473,6 +1662,9 @@ msgstr "Bild"
 
 msgid "Picture Type"
 msgstr "Bildtyp"
+
+msgid "Picture cache :"
+msgstr "Bild cache :"
 
 msgid "Picture finder"
 msgstr "Bildsökning"
@@ -1524,9 +1716,6 @@ msgstr "Spela upp listade melodier"
 
 msgid "Play order"
 msgstr "Spelordning"
-
-msgid "Play order :\n"
-msgstr "Spelordning :\n"
 
 msgid "Play/Pause"
 msgstr "Spela/Gör paus"
@@ -1593,6 +1782,9 @@ msgstr "Öppna lådtips"
 
 msgid "Pre-set"
 msgstr "Förvald"
+
+msgid "Prepend"
+msgstr "Förberedd"
 
 msgid "Press a key or a key combination"
 msgstr "Tryck en tangent för tangent kombination"
@@ -1783,6 +1975,9 @@ msgstr "Radera denna regel"
 msgid "Remove this tag"
 msgstr "Radera denna tagg"
 
+msgid "Remove this widget"
+msgstr "Ta bort denna widget"
+
 msgid "Rename"
 msgstr "Byt namn"
 
@@ -1818,6 +2013,9 @@ msgstr "Omorganisera filer och foldrar"
 
 msgid "Repeat"
 msgstr "Repetera"
+
+msgid "Replace"
+msgstr "Ersätt"
 
 msgid "Replace..."
 msgstr "Byt plats..."
@@ -1957,6 +2155,9 @@ msgstr "Sök Titel, Artist och Album"
 msgid "Search Title, Artist, Album, Comment, Label and Genre"
 msgstr "Sök Titel, Artist, Album, Kommentar, Etikett och Genre"
 
+msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
+msgstr "Sök Titel, Artist, Album, Kommentar, Etikett, Genre and Filnamn"
+
 msgid "Search and display lyrics"
 msgstr "Sök och visa låttexter"
 
@@ -1971,6 +2172,9 @@ msgstr "Sök på nuvarande artist"
 
 msgid "Search for new songs on startup"
 msgstr "Sök efter nya melodier vid uppstart"
+
+msgid "Search options"
+msgstr "Sök alternativ"
 
 msgid "Search window layout :"
 msgstr "Sökfönster layout :"
@@ -2052,6 +2256,9 @@ msgstr "Visa knappar"
 
 msgid "Show replaygain submenu"
 msgstr "Visa replaygain undermeny"
+
+msgid "Show tabs"
+msgstr "Visa flikar"
 
 msgid "Show tray icon"
 msgstr "Visa fackikon"
@@ -2200,6 +2407,14 @@ msgstr "De [mesta/minsta]"
 msgid "These fields can be used :"
 msgstr "Dessa fält kan användas :"
 
+msgid "This label is set for %d song."
+msgid_plural "This label is set for %d songs."
+msgstr[0] "Denna etikett är vald för %d melodi"
+msgstr[1] "Denna etikett är vald för %d melodier"
+
+msgid "This plugin requires :"
+msgstr "Denna modul kräver :"
+
 msgid "Thursday"
 msgstr "Torsdag"
 
@@ -2269,20 +2484,23 @@ msgstr "Typ"
 msgid "URL"
 msgstr "URL"
 
-msgid "Unnamed custom command"
-msgstr "Ej namngivet anpassat kommando"
-
 msgid "Unique file identifier"
 msgstr "Unik filidentifiering"
 
-msgid "Unknown field ($f)"
-msgstr "Okänt fält ($f)"
+msgid "Unknown field ({field})"
+msgstr "Okänt fält ({field})"
 
 msgid "Unlock Album"
 msgstr "Lås upp Album"
 
 msgid "Unlock Artist"
 msgstr "Lås upp Artist"
+
+msgid "Unnamed custom command"
+msgstr "Ej namngivet anpassat kommando"
+
+msgid "Unnamed filter"
+msgstr "Ej namngivet filter"
 
 msgid "Untitled"
 msgstr "Namnlös"
@@ -2297,11 +2515,11 @@ msgid "Use Equalizer"
 msgstr "Använd equaliser"
 
 msgid ""
-"Use ID3v2.4 instead of ID3v2.3, ID3v2.3 are probably better supported by "
-"other softwares"
+"Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are "
+"probably better supported by other softwares"
 msgstr ""
-"Använd ID3v2.4 istället för ID3v2.3, ID3v2.3 stöds kanske bättre av andra "
-"program"
+"Använd ID3v2.4 istället för ID3v2.3 när en ID3v2 tagg skapas, ID3v2.3 har "
+"förmodligen bättre support från andra mjukvaror"
 
 msgid "Use MozEmbed"
 msgstr "Använd MozEmbed"
@@ -2311,6 +2529,9 @@ msgstr "Använd ReplayGain"
 
 msgid "Use WebKit"
 msgstr "Använd WebKit"
+
+msgid "Use a master filter"
+msgstr "Använd ett huvudfilter"
 
 msgid "Use album normalization instead of track normalization"
 msgstr "Använd album normalisering istället för spår normalisering"
@@ -2409,9 +2630,6 @@ msgstr "Fönster"
 msgid "Words that begin with"
 msgstr "Ord som börjar med"
 
-msgid "Write ID3v2.4 tags"
-msgstr "Skriv ID3v2.4 tag"
-
 msgid "Write filenames to ..."
 msgstr "Skriv filnamn till ..."
 
@@ -2442,6 +2660,9 @@ msgstr "_Sätt in kolumn"
 msgid "_Remove this column"
 msgstr "_Ta bort denna kolumn"
 
+msgid "_Retry"
+msgstr "_Försök igen"
+
 msgid "_Sort by"
 msgstr "_Sorterade genom"
 
@@ -2465,9 +2686,6 @@ msgstr "avbryt kopiera"
 
 msgid "abort move"
 msgstr "avbryt flytta"
-
-msgid "about"
-msgstr "om"
 
 msgid "add"
 msgstr "lägg till"
@@ -2552,6 +2770,9 @@ msgstr "bootleg"
 
 msgid "broken"
 msgstr "bruten"
+
+msgid "by"
+msgstr "av"
 
 msgid "by added"
 msgstr "genom tillagd"
@@ -2704,10 +2925,10 @@ msgid "file format"
 msgstr "filformat"
 
 msgid "Filename extension"
-msgstr "Filnamnsändelser"
+msgstr "filnamnsändelser"
 
 msgid "Filename without extension"
-msgstr "Filnamn utan filändelse"
+msgstr "filnamn utan filändelse)"
 
 msgid "first added"
 msgstr "först tillagd"
@@ -3013,6 +3234,9 @@ msgstr "nästa"
 msgid "no matches found, you might want to remove some search terms."
 msgstr "inga matchningar funna, du kanske vill ta bort sökta termer."
 
+msgid "no order"
+msgstr "ingen order"
+
 msgid "no picture"
 msgstr "ingen bild"
 
@@ -3133,9 +3357,6 @@ msgstr "återställ sekundärt filter"
 msgid "retry"
 msgstr "försök igen"
 
-msgid "retry ?"
-msgstr "försök igen?"
-
 msgid "retry in {seconds} s"
 msgstr "försök igen om {seconds} s"
 
@@ -3226,8 +3447,17 @@ msgstr "stoppa när kö är tömd"
 msgid "supports : "
 msgstr "stödjer :"
 
+msgid "the command {name}"
+msgstr "kommandoot {name}"
+
 msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
 msgstr "standarden är utf16 för ID3v2.3 och utf8 för ID3v2.4"
+
+msgid "the file {name}"
+msgstr "filen {name}"
+
+msgid "the {name} perl module"
+msgstr "{name} perl modulen"
 
 msgid "then {action}"
 msgstr "då {action}"
@@ -3292,7 +3522,7 @@ msgstr "använd melodi folder"
 msgid "use standard strftime variables"
 msgstr "använd standard strftime variabler"
 
-msgid "Use the playing filter"
+msgid "Use the playing Filter"
 msgstr "Använd spelat filter"
 
 msgid "username :"
@@ -3405,9 +3635,6 @@ msgstr "{outputname} output inställningar"
 msgid "{songs} by {artists}"
 msgstr "{songs} med {artists}"
 
-msgid "{song} by {artist}"
-msgstr "{song} med {artist}"
-
 msgid ""
 "{song}\n"
 "by {artist}\n"
@@ -3417,98 +3644,26 @@ msgstr ""
 "av {artist}\n"
 "från {album}"
 
+msgid "{song} by {artist}"
+msgstr "{song} med {artist}"
+
 msgid "|-separated list of widget names"
 msgstr "|-separerad lista med widget namn"
 
-msgid "%d Album"
-msgid_plural "%d Albums"
-msgstr[0] "%d Album"
-msgstr[1] "%d Album"
+#~ msgid "Auto-check current song for modification"
+#~ msgstr "Kontrollera automatiskt gällande melodi ang modifiering"
 
-msgid "%d Artist"
-msgid_plural "%d Artists"
-msgstr[0] "%d Artist"
-msgstr[1] "%d Artister"
+#~ msgid ""
+#~ "Automatically check if the file for the current song has changed. And "
+#~ "remove songs not found from the library."
+#~ msgstr ""
+#~ "Kontrollera automatiskt om filen för gällande melodi har ändrats. Och "
+#~ "radera melodier som inte hittats från biblioteket."
 
-msgid "%d Song"
-msgid_plural "%d Songs"
-msgstr[0] "%d Melodi"
-msgstr[1] "%d Melodier"
-
-msgid "%d album"
-msgid_plural "%d albums"
-msgstr[0] "%d album"
-msgstr[1] "%d album"
-
-msgid "%d artist"
-msgid_plural "%d artists"
-msgstr[0] "%d artist"
-msgstr[1] "%d artister"
-
-msgid "%d file"
-msgid_plural "%d files"
-msgstr[0] "%d fil"
-msgstr[1] "%d filer"
-
-msgid "%d file in {folder}"
-msgid_plural "%d files in {folder}"
-msgstr[0] "%d fil i {folder}"
-msgstr[1] "%d filer i {folder}"
-
-msgid "%d folder"
-msgid_plural "%d folders"
-msgstr[0] "%d mapp"
-msgstr[1] "%d mappar"
-
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d sekund"
-msgstr[1] "%d sekunder"
-
-msgid "%d song"
-msgid_plural "%d songs"
-msgstr[0] "%d melodi"
-msgstr[1] "%d melodier"
-
-msgid "%d song added"
-msgid_plural "%d songs added"
-msgstr[0] "%d melodi tillagd"
-msgstr[1] "%d melodier tillagda"
-
-msgid "%d song in queue"
-msgid_plural "%d songs in queue"
-msgstr[0] "%d melodi i kö"
-msgstr[1] "%d melodier i kö"
-
-msgid "%d song in the library"
-msgid_plural "%d songs in the library"
-msgstr[0] "%d melodi i biblioteket"
-msgstr[1] "%d melodier i biblioteket"
-
-msgid "%d song selected"
-msgid_plural "%d songs selected"
-msgstr[0] "%d melodi vald"
-msgstr[1] "%d melodier valda"
-
-msgid "Copying file"
-msgid_plural "Copying %d files"
-msgstr[0] "Kopierar fil"
-msgstr[1] "Kopierar filer"
-
-msgid "Loaded %d unsent song from previous session"
-msgid_plural "Loaded %d unsent songs from previous session"
-msgstr[0] "Laddar %d ej sänd melodi från föregående session"
-msgstr[1] "Laddar %d ej sänd melodier från föregående session"
-
-msgid "Moving file"
-msgid_plural "Moving %d files"
-msgstr[0] "Flyttar fil"
-msgstr[1] "Flyttar %d filer"
-
-msgid "This label is set for %d song."
-msgid_plural "This label is set for %d songs."
-msgstr[0] "Denna etikett är vald för %d melodi"
-msgstr[1] "Denna etikett är vald för %d melodier"
+#~ msgid "Checking length/bitrate of %d mp3 file without VBR header..."
+#~ msgid_plural "Checking length/bitrate of %d mp3 files without VBR header..."
+#~ msgstr[0] "Kontrollerar längd/bitrate på %d mp3 fil utan VBR huvud..."
+#~ msgstr[1] "Kontrollerar längd/bitrate på %d mp3 filer utan VBR huvud..."
 
 #~ msgid "Cover"
 #~ msgstr "Omslag"
@@ -3544,8 +3699,16 @@ msgstr[1] "Denna etikett är vald för %d melodier"
 #~ "efter deras obetonade version.\n"
 #~ "(Märkbart långsammare)"
 
+#~ msgid "Play order :\n"
+#~ msgstr "Spelordning :\n"
+
 #~ msgid "Remove existing"
 #~ msgstr "Radera existerande"
+
+#~ msgid "Scanned %d folder, "
+#~ msgid_plural "Scanned %d folders, "
+#~ msgstr[0] "Skannat %d folder"
+#~ msgstr[1] "Skannat %d foldrar"
 
 #~ msgid "Shell command"
 #~ msgstr "Skal kommando"
@@ -3556,8 +3719,24 @@ msgstr[1] "Denna etikett är vald för %d melodier"
 #~ msgid "Title or filename"
 #~ msgstr "Titel eller filnamn"
 
+#~ msgid "Unknown field ($f)"
+#~ msgstr "Okänt fält ($f)"
+
+#~ msgid ""
+#~ "Use ID3v2.4 instead of ID3v2.3, ID3v2.3 are probably better supported by "
+#~ "other softwares"
+#~ msgstr ""
+#~ "Använd ID3v2.4 istället för ID3v2.3, ID3v2.3 stöds kanske bättre av andra "
+#~ "program"
+
+#~ msgid "Write ID3v2.4 tags"
+#~ msgstr "Skriv ID3v2.4 tag"
+
 #~ msgid "You must choose a mixer control in the advanced options"
 #~ msgstr "Du måste välja en mixer kontroll i avancerade inställningar"
+
+#~ msgid "about"
+#~ msgstr "om"
 
 #~ msgid "album"
 #~ msgstr "album"
@@ -3577,17 +3756,10 @@ msgstr[1] "Denna etikett är vald för %d melodier"
 #~ msgid "old filename"
 #~ msgstr "gammalt filnamn"
 
-#~ msgid "Checking length/bitrate of %d mp3 file without VBR header..."
-#~ msgid_plural "Checking length/bitrate of %d mp3 files without VBR header..."
-#~ msgstr[0] "Kontrollerar längd/bitrate på %d mp3 fil utan VBR huvud..."
-#~ msgstr[1] "Kontrollerar längd/bitrate på %d mp3 filer utan VBR huvud..."
-
-#~ msgid "Scanned %d folder, "
-#~ msgid_plural "Scanned %d folders, "
-#~ msgstr[0] "Skannat %d folder"
-#~ msgstr[1] "Skannat %d foldrar"
-
 #~ msgid "one folder"
 #~ msgid_plural "different folders"
 #~ msgstr[0] "en mapp"
 #~ msgstr[1] "skillda mappar"
+
+#~ msgid "retry ?"
+#~ msgstr "försök igen?"
