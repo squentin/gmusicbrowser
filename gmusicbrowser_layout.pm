@@ -2107,7 +2107,7 @@ sub Paned_size_cb
 	$alloc=$self->isa('Gtk2::VPaned')? $alloc->height : $alloc->width;
 	my $size1=$self->{size1};
 	my $size2=$self->{size2};
-	if (defined $size1 && defined $size2 && $alloc != ($size1 + $size2))
+	if (defined $size1 && defined $size2 && abs($alloc-$size1-$size2)>5)
 	{	if    ($self->child1_resize && !$self->child2_resize)	{ $self->{size1}=$alloc-$size2; }
 		elsif ($self->child2_resize && !$self->child1_resize)	{ $self->{size2}=$alloc-$size1; }
 		else { my $diff= $alloc-$size1-$size2; $self->{size1}+= int(.5+$diff/2); $self->{size2}+= int($diff/2); }
