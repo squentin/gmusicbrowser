@@ -25,7 +25,7 @@ VBLeft		= _NBList HBCover HBStatus
 NBList		= (tabpos="bottom") VBArtist QueueList(songtree=1,tabtitle="Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
 HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
 VBAbout		= (tabtitle="Info") _PluginArtistinfo
-VBArtist	= (tabtitle="Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1)
+VBArtist	= (tabtitle="Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1,lmarkup="<b>%a</b>%Y\x0a<small>%x / %s / <small>%l</small></small>")
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
 HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2SortIndicator(button=1,tip="Right-click to toggle Shuffle") -2FilterIndicator(button=1,tip="Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=HBCover,tip="Show/Hide Cover")
 ### main right: list/tree/mosaic widgets ###

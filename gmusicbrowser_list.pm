@@ -1503,6 +1503,7 @@ our %Pages=
 our @MenuMarkupOptions=
 (	"%a",
 	"<b>%a</b>%Y\n<small>%s <small>%l</small></small>",
+	"<b>%a</b>%Y\n<small>%x / %s / <small>%l</small></small>",
 	"<b>%a</b>%Y\n<small>%b</small>",
 	"<b>%a</b>%Y\n<small>%b</small>\n<small>%s <small>%l</small></small>",
 	"<b>%y %a</b>",
