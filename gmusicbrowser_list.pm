@@ -3450,7 +3450,7 @@ sub PopupSelectorMenu
 	}
 	my $item1=Gtk2::MenuItem->new(_"Select search fields");
 	$item1->set_submenu( ::BuildChoiceMenu(
-					{ map { $_=>Songs::FieldName($_) } qw/title artist album comment label genre file path album_artist version/ },
+					{ map { $_=>Songs::FieldName($_) } Songs::StringFields(),qw/file path/,},
 					'reverse' =>1,
 					check=> sub { [split /\|/,$self->{fields}]; },
 					code => sub { $self->ToggleField($_[1]); },

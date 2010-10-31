@@ -495,6 +495,12 @@ sub MarkupFormat
 {	my $format=shift;
 	sprintf $format, map PangoEsc($_), @_;
 }
+sub Gtk2::Label::new_with_format
+{	my $class=shift;
+	my $label=Gtk2::Label->new;
+	$label->set_markup( MarkupFormat(@_) );
+	return $label;
+}
 sub Gtk2::Label::set_markup_with_format
 {	my $label=shift;
 	$label->set_markup( MarkupFormat(@_) );
@@ -5095,6 +5101,7 @@ sub PrefDialog
 	$notebook->append_page( PrefAudio()	,Gtk2::Label->new(_"Audio"));
 	$notebook->append_page( PrefLayouts()	,Gtk2::Label->new(_"Layouts"));
 	$notebook->append_page( PrefMisc()	,Gtk2::Label->new(_"Misc."));
+	$notebook->append_page( Songs::PrefFields(),Gtk2::Label->new(_"Fields"));
 	$notebook->append_page( PrefPlugins()	,Gtk2::Label->new(_"Plugins"));
 	$notebook->append_page( PrefKeys()	,Gtk2::Label->new(_"Keys"));
 	$notebook->append_page( PrefTags()	,Gtk2::Label->new(_"Tags"));
