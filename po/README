@@ -1,3 +1,21 @@
+In the following, $LANGUAGE stands for :
+	an ISO 639 two-letter language code, example : fr
+ or	an ISO 639 two-letter language code + an ISO 3166 two-letter country code, example : pt_BR
+
+msginit, msgmerge and msgfmt can be found in the package gettext
+
+
+
+* check for latest translations first in the git repository :
+	http://gmusicbrowser.git.sourceforge.net/git/gitweb.cgi?p=gmusicbrowser/gmusicbrowser;a=tree;f=po
+ or	http://github.com/squentin/gmusicbrowser/tree/master/po/
+
+ The git repository contains the latest translations, but they should NOT be edited
+ directly, because the strings they contains are not necessary up to date.
+ So either update them like described below, or use files from http://gmusicbrowser.org/po/
+ that should contain the .po updated with the strings from the latest git, ready to be edited.
+
+
 * to edit existing translations :
   - create the gmusicbrowser.pot file :
 	./create_pot.pl
@@ -13,6 +31,9 @@
 	./create_pot.pl
   - rename gmusicbrowser.pot to $LANGUAGE.po
   - edit the headers of $LANGUAGE.po
+  - msginit can be used in place of the last 2 steps :
+	msginit -i gmusicbrowser.pot -l $LANGUAGE
+    (in particular msginit will take care of setting up plurals for your language)
 
 
 * to test your translations :
@@ -22,14 +43,9 @@
     or in locale/$LANGUAGE/LC_MESSAGES/ for non-installed version
 
 
-* check for latest translations first in the git repository :
- http://gmusicbrowser.git.sourceforge.net/git/gitweb.cgi?p=gmusicbrowser/gmusicbrowser;a=tree;f=po
-or
- http://github.com/squentin/gmusicbrowser/tree/master/po/
-
-
 * to send me translations, mail the $LANGUAGE.po to squentin@free.fr
   And tell me what name and (optionally) email I should credit the translation (both in git and in the about box).
+  No need to send the .mo file.
   Don't hesitate to ask me if you have any questions.
 
 
