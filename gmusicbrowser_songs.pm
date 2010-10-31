@@ -15,7 +15,7 @@ package Songs;
 our $IDFromFile;
 #our $re_artist;
 my (@Missing,$MissingHash,@MissingKeyFields);
-our (%Def,%Types,@Fields,%GTypes,%HSort);
+our (%Def,%Types,%FieldTemplates,@Fields,%GTypes,%HSort);
 my %FuncCache;
 INIT {
 our %timespan_menu=
@@ -51,6 +51,7 @@ our %timespan_menu=
 	{	_		=> '____[#ID#]',
 		init		=> '___name[0]="#none#"; ___iname[0]=::superlc(___name[0]); #sgid_to_gid(VAL=$_)# for #init_namearray#',
 		init_namearray	=> '()',
+		none		=> quotemeta _"None",
 		default		=> '""',
 		check		=> ';',
 		get_list	=> 'my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : ();',
@@ -423,7 +424,7 @@ our %timespan_menu=
 	boolean	=>
 	{	parent	=> 'integer',	bits => 1,
 		check	=> '#VAL#= #VAL# ? 1 : 0;',
-		display	=> "(#_# ? '#yes#' : '#no#')",	yes => _"Yes",	no => "",
+		display	=> "(#_# ? #yes# : #no#)",	yes => '_("Yes")',	no => 'q()',
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryBoolean->new(@_); },
 	},
 	shuffle=>
@@ -549,18 +550,17 @@ our %timespan_menu=
  haspicture =>
  {	name	=> _"Embedded picture", width => 20, flags => 'garwsc',	type => 'boolean',
 	id3v2 => 'APIC;;;;%v',	ilst => 'covr',		#or just id3v2 => 'APIC', ?
-	_disabled=>1,
+	disable=>1,
  },
  haslyrics =>
  {	name	=> _"Embedded lyrics", width => 20, flags => 'garwsc',	type => 'boolean',
 	id3v2 => 'USLT;;;%v',	vorbis	=> 'lyrics',	ape => 'Lyrics', #TESTME
-	_disabled=>1,
+	disable=>1,
  },
  compilation =>
  {	name	=> _"Compilation", width => 20, flags => 'garwesc',	type => 'boolean',
 	id3v2 => 'TCMP',	vorbis	=> 'compilation',	ape => 'Compilation',	ilst => 'cpil',
 	edit_many=>1,
-	#_disabled=>1,	#not tested
  },
  grouping =>
  {	name	=> _"Grouping",	width => 100,	flags => 'garwesci',	type => 'fewstring',
@@ -598,7 +598,7 @@ our %timespan_menu=
  {	name	=> _"Disc name",	width	=> 100,		flags => 'garwesci',	type => 'fewstring',
 	id3v2	=> 'TSST',	vorbis	=> 'discsubtitle',	ape => 'DiscSubtitle',	ilst=> '----DISCSUBTITLE',
 	edit_many=>1,
-	_disabled=>1,
+	disable=>1,	options => 'disable',
  },
  genre	=>
  {	name		=> _"Genres",	width => 180,	flags => 'garwescil',
@@ -624,6 +624,17 @@ our %timespan_menu=
 	icon_edit_string=> _"Choose icon for label {name}",
 	edit_order=> 80,	edit_many=>1,	letter => 'L',
  },
+ mood	=>
+ {	name		=> _"Moods",	width => 180,	flags => 'garwescil',
+	id3v2	=> 'TMOO',	vorbis	=> 'MOOD',	ape	=> 'Mood', ilst => "----MOOD",
+	read_split	=> qr/\s*;\s*/,
+	type		=> 'flags',
+	none		=> quotemeta _"No moods",
+	all_count	=> _"All moods",
+	FilterList	=> {search=>1},
+	edit_order=> 71,	edit_many=>1,
+	disable=>1,	options => 'disable',
+ },
  comment=>
  {	name	=> _"Comment",	width => 200,	flags => 'garwesci',		type => 'text',
 	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3	=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
@@ -631,9 +642,18 @@ our %timespan_menu=
  },
  rating	=>
  {	name	=> _"Rating",		width => 80,	flags => 'gaesc',	type => 'rating',
+	id3v2	=> 'TXXX;FMPS_Rating;%v & TXXX;FMPS_Rating_User;%v::%i | percent( TXXX;gmbrating;%v ) | five( TXXX;rating;%v )',
+	vorbis	=> 'FMPS_RATING & FMPS_RATING_USER::%i | percent( gmbrating ) | five( rating )',
+	ape	=> 'FMPS_RATING & FMPS_RATING_USER::%i | percent( gmbrating ) | five( rating )',
+	ilst	=> '----FMPS_Rating & ----FMPS_Rating_User::%i | percent( ----gmbrating ) | five( ----rating )',
+	postread=> \&FMPS_rating_postread,
+	prewrite=> \&FMPS_rating_prewrite, 
+	'postread:five'=> sub { my $v=shift; length $v && $v=~m/^\d+$/ && $v<=5 ? sprintf('%d',$v*20) : undef }, # for reading foobar2000 rating 0..5 ?
+	'postread:percent'=> sub { $_[0] }, # for anyone who used gmbrating
 	FilterList => {},
 	starfield => 'rating_picture',
 	edit_order=> 90,	edit_many=>1,
+	options	=> 'rw_ userid',
  },
  added	=>
  {	name	=> _"Added",		width => 100,	flags => 'gasc_',	type => 'date',
@@ -652,6 +672,13 @@ our %timespan_menu=
  },
  playcount	=>
  {	name	=> _"Play count",	width => 50,	flags => 'gaesc',	type => 'integer',	letter => 'p',
+	options => 'rw_ userid',
+	id3v2	=> 'TXXX;FMPS_Playcount;%v&TXXX;FMPS_Playcount_User;%v::%i',
+	vorbis	=> 'FMPS_PLAYCOUNT&FMPS_PLAYCOUNT_USER::%i',
+	ape	=> 'FMPS_PLAYCOUNT&FMPS_PLAYCOUNT_USER::%i',
+	ilst	=> '----FMPS_Playcount&----FMPS_Playcount_User::%i',
+	postread=> sub { my $v=shift; length $v ? sprintf('%d',$v) : undef },
+	prewrite=> sub { sprintf('%.1f', $_[0]); },
  },
  skipcount	=>
  {	name	=> _"Skip count",	width => 50,	flags => 'gaesc',	type => 'integer',	letter => 'k',
@@ -659,20 +686,44 @@ our %timespan_menu=
  composer =>
  {	name	=> _"Composer",		width	=> 100,		flags => 'garwesci',	type => 'artist',
 	id3v2	=> 'TCOM',	vorbis	=> 'composer',		ape => 'Composer',	ilst => "\xA9wrt",
+	picture_field => 'artist_picture',
 	FilterList => {search=>1},
 	edit_many=>1,
-	_disabled=>1,
+	disable=>1,	options => 'disable',
  },
- author	=>
- {	name	=> _"Author",	width	=> 100,		flags => 'garwesci',	type => 'artist',
-	id3v2	=> 'TOPE',	vorbis	=> 'author',	lyrics3	=> 'AUT',	#ape => 'Author'#?? FIXME
+ lyricist =>
+ {	name	=> _"Lyricist",		width	=> 100,		flags => 'garwesci',	type => 'artist',
+	id3v2	=> 'TEXT',	vorbis	=> 'LYRICIST',		ape => 'Lyricist',	ilst => '---LYRICIST',
+	picture_field => 'artist_picture',
 	FilterList => {search=>1},
 	edit_many=>1,
-	_disabled=>1,
+	disable=>1,	options => 'disable',
+ },
+ conductor =>
+ {	name	=> _"Conductor",	width	=> 100,		flags => 'garwesci',	type => 'artist',
+	id3v2	=> 'TPE3',	vorbis	=> 'CONDUCTOR',		ape => 'Conductor',	ilst => '---CONDUCTOR',
+	picture_field => 'artist_picture',
+	FilterList => {search=>1},
+	edit_many=>1,
+	disable=>1,	options => 'disable',
+ },
+ remixer =>
+ {	name	=> _"Remixer",	width	=> 100,		flags => 'garwesci',	type => 'artist',
+	id3v2	=> 'TPE4',	vorbis	=> 'REMIXER',		ape => 'MixArtist',	ilst => '---REMIXER',
+	picture_field => 'artist_picture',
+	FilterList => {search=>1},
+	edit_many=>1,
+	disable=>1,	options => 'disable',
  },
  version=> #subtitle ?
- {	name	=> _"Version",	width	=> 150,		flags => 'garwesci',	type => 'string',
+ {	name	=> _"Version",	width	=> 150,		flags => 'garwesci',	type => 'fewstring',
 	id3v2	=> 'TIT3',	vorbis	=> 'version|subtitle',			ape => 'Subtitle',	ilst=> '----SUBTITLE',
+ },
+ bpm	=>
+ {	name	=> _"BPM",	width	=> 60,		flags => 'garwesc',	type => 'integer',
+	id3v2	=> 'TBPM',	vorbis	=> 'BPM',	ape => 'BPM',		ilst=> 'tmpo',
+	FilterList => {type=>'div.10',},
+	disable=>1,	options => 'disable',
  },
  channel=>
  {	name	=> _"Channels",		width => 50,	flags => 'garsc',	type => 'integer',	bits => 4,	audioinfo => 'channels', },	# are 4 bits needed ? 1bit+1 could be enough ?
@@ -697,22 +748,26 @@ our %timespan_menu=
 	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
 	displayformat	=> '%.2f dB',
 	id3v2	=> 'TXXX;replaygain_track_gain;%v',	vorbis	=> 'replaygain_track_gain',	ape	=> 'replaygain_track_gain', ilst => '----replaygain_track_gain',
+	options => 'disable',
  },
  replaygain_track_peak=>
  {	name	=> _"Track peak",	width => 60,	flags => 'grwsca',
 	id3v2	=> 'TXXX;replaygain_track_peak;%v',	vorbis	=> 'replaygain_track_peak',	ape	=> 'replaygain_track_peak', ilst => '----replaygain_track_peak',
 	type	=> 'float',
+	options => 'disable',
  },
  replaygain_album_gain=>
  {	name	=> _"Album gain",	width => 60,	flags => 'grwsca',
 	id3v2	=> 'TXXX;replaygain_album_gain;%v',	vorbis	=> 'replaygain_album_gain',	ape	=> 'replaygain_album_gain', ilst => '----replaygain_album_gain',
 	displayformat	=> '%.2f dB',
 	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
+	options => 'disable',
  },
  replaygain_album_peak=>
  {	name	=> _"Album peak",	width => 60,	flags => 'grwsca',
 	id3v2	=> 'TXXX;replaygain_album_peak;%v',	vorbis	=> 'replaygain_album_peak',	ape	=> 'replaygain_album_peak', ilst => '----replaygain_album_peak',
 	type	=> 'float',
+	options => 'disable',
  },
  replaygain_reference_level=>
  {	flags => 'w',	type => 'writeonly',	#only used for writing
@@ -770,8 +825,24 @@ our %timespan_menu=
 			'ilst:read'	=> sub { [map "ilst_$_",  $_[0]->get_keys] },
 			FilterList => {search=>1,none=>1},
 			none		=> quotemeta "No tags",	#not translated because made for debugging
-			_disabled=>1,
+			disable=>1,
 		},
+);
+
+our %FieldTemplates=
+(	string	=> { type=>'string',	editname=>_"string",		flags=>'gaesc',	width=> 200,	edit_many =>1,		options=> 'customfield', },
+	text	=> { type=>'text',	editname=>_"multi-lines string",flags=>'gaesc',	width=> 200,	edit_many =>1,		options=> 'customfield', },
+	float	=> { type=>'float',	editname=>_"float",		flags=>'gaesc',	width=> 100,	edit_many =>1,		options=> 'customfield', },
+	boolean	=> { type=>'boolean',	editname=>_"boolean",		flags=>'gaesc',	width=> 20,	edit_many =>1,		options=> 'customfield', },
+	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'gaescil',width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
+	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'gaesci',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', },
+	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'gaesci',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
+	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'gaesc',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
+	integer	=> { type=>'integer',	editname=>_"integer",		flags=>'gaesc',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
+	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'gaesc_',width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid', FilterList=> {},
+		     postread => \&FMPS_rating_postread,		prewrite => \&FMPS_rating_prewrite,
+		     id3v2 => 'TXXX;FMPS_Rating_User;%v::%i',	vorbis	=> 'FMPS_RATING_USER::%i',	ape => 'FMPS_RATING_USER::%i',	ilst => '----FMPS_Rating_User::%i',
+		   },
 );
 
 our %HSort=
@@ -961,7 +1032,10 @@ sub UpdateFuncs
 
 	my %done;
 	my %_depended_on_by; my %_properties;
-	my @todo=grep !$Def{$_}{_disabled}, keys %Def;
+
+	Field_Apply_options();
+
+	my @todo=grep !$Def{$_}{disable}, keys %Def;
 	while (@todo)
 	{	my $count=@todo;
 		for my $f (@todo)
@@ -1123,7 +1197,9 @@ sub MakeSaveSub
 	my @code;
 	my %extra_sub; my %extra_subfields;
 	for my $field (sort grep $Def{$_}{flags}=~m/a/, @Fields)
-	{	push @saved_fields,$field;
+	{	next if $::Options{Fields_options}{$field}{remove}; #deleted custom field
+		my $save_as= $Def{$field}{_renamed_to} || $field;
+		push @saved_fields,$save_as;
 		push @code, Code($field, 'save|get', ID => '$_[0]');
 		my ($mainfield,$save_extra)=LookupCode($field,'mainfield','save_extra');
 		if ($save_extra && ( !$mainfield || $mainfield eq $field ))
@@ -1134,11 +1210,11 @@ sub MakeSaveSub
 				{	my $c=LookupCode($subfield,'save_extra',[GID => '$gid']);
 					push @extra_code, $c;
 				}
-				$extra_subfields{$field}= join ' ', @subfields;
+				$extra_subfields{$save_as}= join ' ', map $Def{$_}{_renamed_to}||$_, @subfields;
 				my $code= $save_extra;
 				my $extra_code=join ',', @extra_code;
 				$code=~s/#SUBFIELDS#/$extra_code/g;
-				$extra_sub{$field}= Compile("SaveSub_$field" => "sub { $code }") || sub {};
+				$extra_sub{$save_as}= Compile("SaveSub_$field" => "sub { $code }") || sub {};
 			}
 		}
 	}
@@ -1880,6 +1956,345 @@ sub GroupSub
 	    		#use a dummy function in case of error :
 		 	|| sub {warn "invalid groupsub (field=$field)"; my $lastrows=$_[1]; return [@$lastrows],[0..$#$lastrows] };
 	 };
+}
+
+sub PrefFields	#preference dialog for fields
+{	my $store=Gtk2::TreeStore->new('Glib::String','Glib::String','Glib::Boolean','Glib::Boolean','Glib::Boolean');
+	my $treeview=Gtk2::TreeView->new($store);
+	$treeview->set_headers_visible(0);
+	my $rightbox=Gtk2::VBox->new;
+	my $renderer=Gtk2::CellRendererText->new;
+	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
+	 ( 'field name',$renderer,text => 0, editable => 2, sensitive=>3, strikethrough => 4,
+	 ));
+	my @std= sort grep !$Def{$_}{template} && (!$Def{$_}{disable} || $Def{$_}{options} && $Def{$_}{options}=~m/\bdisable\b/), keys %Def;
+	@std= grep !$Def{$_}{property_of} && $Def{$_}{name} && $Def{$_}{flags}=~m/c/, @std;
+	my @custom= sort grep $::Options{Fields_options}{$_}{template}, keys %{$::Options{Fields_options}};
+	my %sensitive;
+	$sensitive{$_}= ($::Options{Fields_options}{$_} && exists $::Options{Fields_options}{$_}{disable} ? $::Options{Fields_options}{$_}{disable} : $Def{$_}{disable}) ? 0 : 1
+			for @std,@custom;
+	my $parent;
+	$store->set( $parent=$store->append(undef),	0,_"Standard fields", 1,'std', 3,::TRUE);
+	$store->set( $store->append($parent),		0,$_,1,'_std',3, $sensitive{$_} ) for @std;
+
+	$store->set( $parent=$store->append(undef),	0,_"Custom fields", 1,'cst', 3,::TRUE);
+	$store->set( $store->append($parent),		0,$_,1,'_cst',2,::TRUE, 3, $sensitive{$_}, 4,$::Options{Fields_options}{$_}{remove} ) for @custom;
+
+	$treeview->signal_connect(cursor_changed => sub
+		{	my $treeview=shift;
+			my $path=($treeview->get_cursor)[0];
+			my $store=$treeview->get_model;
+			my ($field,$type)=$store->get( $store->get_iter($path));
+			$rightbox->remove($_) for $rightbox->get_children;
+			if ($type!~m/^_/) {return}
+			return unless $field;
+			my $title=Gtk2::Label->new_with_format("<b>%s</b>",$field);
+			$rightbox->pack_start($title,::FALSE,::FALSE,2);
+			my $box=Gtk2::VBox->new;
+			::weaken( $box->{store}=$store );
+			$box->{path}=$path;
+			Field_fill_option_box($box,$field);
+			$rightbox->add($box);
+			$rightbox->show_all;
+		});
+	$renderer->signal_connect(edited => sub
+	    {	my ($cell,$pathstr,$new)=@_;
+		my $iter= $store->get_iter_from_string($pathstr);
+		my $old= $store->get($iter,0);
+		$new= ucfirst $new if $new=~m/^[a-z]/;
+		$new=~s/[^a-zA-Z0-9_]//g; $new=~s/_+/_/g; $new=~s/_$//; # custom field names restrictions, might be relaxed in the future
+		if ($new eq '' || $new!~m/^[A-Z]/ || $::Options{Fields_options}{$new} || ($Def{$new} && !$Def{$new}{template}))
+		{	$store->remove($iter) if $old eq '';
+			$treeview->set_cursor(Gtk2::TreePath->new('1')); # 1 is the custom fields parent
+			return;
+		}
+		$::Options{Fields_options}{$new}= delete($::Options{Fields_options}{$old}) || { template => 'string', name => $new, };
+		$Def{$new} ||= { template => 'string', options => $FieldTemplates{string}{options} };
+
+		if (my $id=$::Options{Fields_options}{$new}{currentid})
+		{	$Def{$id}{_renamed_to}=$new;
+		}
+		$store->set($iter,0,$new);
+		$treeview->set_cursor($store->get_path($iter));
+	    });
+
+	my $newcst=::NewIconButton('gtk-add', _"New custom field", sub
+		{	my $iter=$store->append($store->iter_nth_child(undef,1));	#1 is the custom fields parent
+			$store->set($iter,0,'',1,'_cst',2,::TRUE);
+			my $path=$store->get_path($iter);
+			$treeview->expand_to_path($path);
+			$treeview->set_cursor($path, $treeview->get_column(0), ::TRUE);
+		} );
+	my $warning=Gtk2::Label->new;
+	$warning->set_markup('<b>'.::PangoEsc(_"Settings on this page will only take effect after a restart").'</b>');
+	my $sw=Gtk2::ScrolledWindow->new;
+	$sw->set_shadow_type('etched-in');
+	$sw->set_policy('never','automatic');
+	$sw->add($treeview);
+	return ::Vpack( $warning, '_',[ ['0_',$sw,$newcst], '_', $rightbox ] );
+}
+
+our %Field_options_aliases=
+(	customfield	=> 'name template convwarn disable remove datawarn',
+	rw_		=> 'rw resetnotag',
+);
+our %Field_options=
+(	#bits	=>
+	#{	widget		=> 'combo',
+	#	combo		=> { 32 => "32 bits", 16 => "16 bits", },
+	#	'default'	=> 32,
+	#},
+	rw	=>
+	{	widget		=> 'check',
+		label		=> _"Read/write in file tag",
+		'default'	=> sub		#extract rw (sorted) from default flags
+		{		my $default_flags= $_[0]{flags} || '';
+				$default_flags=~tr/rw//dc;
+				return join '', sort split //, $default_flags;
+		},
+		apply		=> sub
+		{		my ($def,$opt,$value)=@_;
+				$def->{flags}=~s/[rw]//g;
+				$def->{flags}.='rw' if $value;
+		},
+	},
+	resetnotag =>
+	{	widget		=> 'check',
+		label		=> 'Reset current value if no tag found in file',
+		'default'	=> sub { my $default= $_[0]{flags} || ''; return $default!~m/_/ },
+		apply		=> sub { my ($def,$opt,$value)=@_; $def->{flags}=~s/_//g; $def->{flags}.='_' if !$value; },
+		update		=> sub { $_[0]{widget}->set_sensitive( $_[0]{opt}{rw} ); }, # set insensitive when tag not read/written
+	},
+	name	=>
+	{	widget		=> 'entry',
+		label		=> _"Field name",
+	},
+	disable	=>
+	{	widget		=> 'check',
+		label		=> _"Disabled",
+	},
+	remove	=>
+	{	widget		=> 'check',
+		label		=> _"Remove this field",
+	},
+	convwarn =>
+	{	widget		=> 'label',
+		label		=> _"Warning: converting existing data to this format may be lossy",
+		update		=> sub			# show only when field to be disabled or removed
+		{		my $arg=shift;
+				my $show= $arg->{opt}{currentid} && ( $arg->{opt}{template} ne $Def{$arg->{field}}{template} );
+				my $w= $arg->{widget};
+				if ($show) {$w->show} else {$w->hide}
+				$w->set_no_show_all(1);
+		},
+	},
+	datawarn =>
+	{	widget		=> 'label',
+		label		=> _"Warning: all existing data for this field will be lost",
+		update		=> sub			# show only when field to be disabled or removed
+		{		my $arg=shift;
+				my $opt=$arg->{opt};
+				my $show= $opt->{currentid} && ($opt->{disable} || $opt->{remove} );
+				my $w= $arg->{widget};
+				if ($show) {$w->show} else {$w->hide}
+				$w->set_no_show_all(1);
+		},
+	},
+	useridwarn =>
+	{	widget		=> 'label',
+		label		=> _"Warning: an identifier is needed",
+		update		=> sub
+		{		my $arg=shift;
+				my $show= $arg->{opt}{rw} && (!$arg->{opt}{userid} || $arg->{opt}{userid}=~m/^ *$/);
+				my $w= $arg->{widget};
+				if ($show) {$w->show} else {$w->hide}
+				$w->set_no_show_all(1);
+		},
+	},
+	userid	=>
+	{	widget		=> 'entry',
+		label		=> _"Identifier in file tag",
+		tip		=> _"Used to associate the saved value with a user or a function",
+		update		=> sub { $_[0]{widget}->parent->set_sensitive( $_[0]{opt}{rw} ); }, # set insensitive when tag not read/written
+	},
+	template=>
+	{	widget		=> \&Field_Edit_template,
+		label		=> _"Field type",
+	},
+);
+
+sub Field_fill_option_box
+{	my ($vbox,$field, $keep_option, @keep_widgets)=@_;
+	$_->parent->remove($_) for @keep_widgets;
+	$vbox->remove($_) for $vbox->get_children;
+
+	my $opt= $::Options{Fields_options}{$field} ||= {};
+	#$vbox->{opt_orig}={%$opt};	#warning : shallow copy, sub-hash/array stay linked
+	$vbox->{field}=$field;
+
+	my $def= $Def{$field} ||= {};
+	my $option_list= $def->{options}||'';
+
+	my $sg1=Gtk2::SizeGroup->new('horizontal');
+	my %widgets; my @topack;
+	$vbox->{widget_hash}=\%widgets;
+	#my $varname= '$'.$field;
+	#$varname.= ' , %'.$def->{letter} if $def->{letter};
+	#$varname= Gtk2::Label->new($varname);
+	#$varname->set_selectable(1);
+	#push @topack, $varname;
+	my @options= split /\s+/, $option_list;
+	while (my $option=shift @options)
+	{	if (my $o=$Field_options_aliases{$option})
+		{	unshift @options,split /\s+/,$o;
+			next;
+		}
+		my $ref=$Field_options{$option};
+		next unless $ref;
+		my $label=  $ref->{label};
+		my $widget= $ref->{widget};
+		my $key= $ref->{editkey} || $option;
+		my $base= $opt->{template} ? $FieldTemplates{$opt->{template}} : $def;
+		my $value= exists $opt->{$key} ? $opt->{$key} : Field_option_default($field,$option,$base);
+		my @extra;
+		if ($keep_option && $keep_option eq $option) { ($widget,@extra)= @keep_widgets;  }
+		elsif (ref $widget)
+		{	($widget,@extra) = $widget->( $vbox, $opt, $field );
+		}
+		elsif ($widget eq 'check')
+		{	$widget= Gtk2::CheckButton->new($label);
+			undef $label;
+			$widget->set_active($value);
+			$widget->signal_connect(toggled => sub { $opt->{$key}=$_[0]->get_active; &Field_Edit_update });
+		}
+		elsif ($widget eq 'entry')
+		{	$widget= Gtk2::Entry->new;
+			$widget->set_text($value);
+			$widget->signal_connect(changed => sub { my $t=$_[0]->get_text; if ($t=~m/^\s*$/) {delete $opt->{$key};} else {$opt->{$key}=$t;} &Field_Edit_update });
+		}
+		elsif ($widget eq 'combo')
+		{	$widget= TextCombo->new( $ref->{combo}, $value, sub { $opt->{$key}=$_[0]->get_value; &Field_Edit_update });
+		}
+		elsif ($widget eq 'label')
+		{	$widget= Gtk2::Label->new($label);
+			undef $label;
+		}
+		next unless $widget;
+		my $tip= $ref->{tip};
+		$widget->set_tooltip_text($tip) if defined $tip;
+
+		::weaken( $widget->{options_vbox}= $vbox );
+		$widgets{$option}=$widget;
+
+		if (defined $label)
+		{	$label= Gtk2::Label->new($label);
+			$sg1->add_widget($label);
+			$widget= [ $label, $widget ];
+		}
+		push @topack, $widget,@extra;
+	}
+	unshift @topack, Gtk2::Label->new( _("Field name").' : '. $def->{name} ) unless $widgets{name};
+	unshift @topack, Gtk2::Label->new( $def->{desc} ) if $def->{desc};
+	unless ($widgets{rw})
+	{	my $f= $def->{flags} || '';
+		my $text= $f=~m/rw/ ? _"Value written in file tag" :
+			  $f!~m/[rw]/ ? _"Value not written in file tag" :
+			  undef;
+		$text=undef if $field eq 'path' || $field eq 'file';
+		unshift @topack, Gtk2::Label->new_with_format( '<small>%s</small>', $text ) if $text;
+	}
+	unshift @topack, Gtk2::Label->new( $def->{desc} ) if $def->{desc};
+	$vbox->add( ::Vpack(@topack) );
+	$vbox->show_all;
+	Field_Edit_update($vbox);
+}
+
+sub Field_Edit_update
+{	my $vbox_or_child=shift;
+	my $vbox= $vbox_or_child->{options_vbox} || $vbox_or_child;
+	my $field= $vbox->{field};
+	my $opt= $::Options{Fields_options}{$field} ||= {};
+	my $widgets= $vbox->{widget_hash};
+	for my $option (sort keys %$widgets)
+	{	my $update= $Field_options{$option}{update};
+		next unless $update;
+		$update->({ vbox=>$vbox, opt=>$opt, field=>$field, widget=>$widgets->{$option}, });
+	}
+	my $store= $vbox->{store};
+	my $sensitive= (exists $opt->{disable} ? $opt->{disable} : $Def{$field}{disable}) ? 0 : 1;
+	$store->set( $store->get_iter($vbox->{path}), 3, $sensitive, 4, $opt->{remove});
+}
+
+sub Field_Edit_template
+{	my ($vbox,$opt,$field)=@_;
+	my %templatelist;
+	$templatelist{$_}= $FieldTemplates{$_}{editname} for keys %FieldTemplates;
+	my $combo= TextCombo->new(\%templatelist, $opt->{template}, sub
+		{	my $combo=shift;
+			my $t=$opt->{template}= $combo->get_value;
+			$Def{$field}{options}= $FieldTemplates{$t}{options};
+			my $focus= $combo->is_focus; #FIXME never true
+			Field_fill_option_box($vbox,$field, template=>$combo); # will reset the option box but keep $combo
+			$combo->grab_focus if $focus;	#reparenting $combo will make it lose focus, so regrab it #FIXME $focus never true
+		});
+	return $combo;
+}
+
+sub Field_Apply_options
+{	for my $field (keys %{ $::Options{Fields_options} })
+	{	my $opt= $::Options{Fields_options}{$field};
+		if ($opt->{remove}) { delete $::Options{Fields_options}{$field}; next; }
+		my $def= $Def{$field};
+		if (!$def || $def->{template})
+		{	my $template=$opt->{template};
+			next unless $template;	# could remove options of removed standard fields ?
+			my $hash= $FieldTemplates{$template};
+			next unless $hash;
+			$def=$Def{$field}= { %$hash }; #shallow copy of the template hash
+			$opt->{currentid}=$field;
+		}
+		my @options= split /\s+/, $def->{options}||'';
+		while (my $option=shift @options)
+		{	if (my $o=$Field_options_aliases{$option})
+			{	unshift @options,split /\s+/,$o;
+				next;
+			}
+			my $ref=$Field_options{$option};
+			next unless $ref;
+
+			my $key= $ref->{editkey} || $option;
+			my $value= exists $opt->{$key} ? $opt->{$key} : Field_option_default($field,$option,$def);
+			if (my $apply= $ref->{apply}) { $apply->($def,$opt,$value) }
+			else
+			{	$def->{$key}= $value;
+			}
+		}
+	}
+}
+
+sub Field_option_default
+{	my ($field,$option,$def)=@_;
+	my $ref=$Field_options{$option};
+	my $default= $ref->{'default'};
+	if (defined $default) { $default= $default->($def, $field) if ref $default; }
+	else
+	{	my $key= $ref->{editkey} || $option;
+		$default= $def->{$key};
+		$default='' unless defined $default;
+	}
+	return $default;
+}
+
+sub FMPS_rating_postread
+{	my $v=shift;
+	length $v && $v=~m/^\d*\.?\d+$/ ? sprintf('%d',$v*100) : undef;
+}
+sub FMPS_rating_prewrite
+{	my $v=shift;
+	($v eq '' || $v>100) ? '' : sprintf('%.6f', $v/100);
+	# write a rating of '' when no rating rather than undef, so that the tag is still written (undef would remove the tag)
+	# this allows us to distinguish "default rating" from "rating never written".
+	# without this, it would not be possible to remove the rating (ie: set it to "default rating") when the option resetnotag is off
 }
 
 

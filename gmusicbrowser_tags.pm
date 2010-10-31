@@ -86,7 +86,7 @@ sub Read
 				my $join= $def->{flags}=~m/l/ || defined $joinwith;
 				for my $key (split /\s*[|&]\s*/,$keys)
 				{	if ($key=~m#%i#)
-					{	my $userid= $::Options{Fields}{$field}{user_identifier};
+					{	my $userid= $def->{userid};
 						next unless defined $userid && length $userid;
 						$key=~s#%i#$userid#;
 					}
@@ -177,13 +177,12 @@ sub Write
 				next;
 			}
 
-			my $userid= $::Options{Fields}{$field}{user_identifier};
+			my $userid= $def->{userid};
 			my ($wkey,@keys)= split /\s*\|\s*/,$keys;
 			my $toremove= @keys;			#these keys will be removed
 			push @keys, split /\s*&\s*/, $wkey;	#these keys will be updated (first one and ones separated by &)
-			while (@keys)
-			{	my $key=shift @keys;
-				if ($key=~m/%i/) { next unless defined $userid && length $userid; $key=~s#%i#$userid#g }
+			for my $key (@keys)
+			{	if ($key=~m/%i/) { next unless defined $userid && length $userid; $key=~s#%i#$userid#g }
 				my $func='prewrite';
 				$func.=":$1" if $key=~s/^(\w+)\(\s*([^)]+?)\s*\)$/$2/; #for tag-specific prewrite function  "function( TAG )"
 				my $sub= $def->{$func} || $def->{'prewrite'};
