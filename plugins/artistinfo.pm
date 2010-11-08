@@ -370,7 +370,7 @@ sub loaded
 	
 	if ($self->{site} eq "biography") {
 		$infoheader = "Artist Biography";
-		$data =~ m/<content><\!\[CDATA\[(.*?)]]>/gi;
+		$data =~ m/<content><\!\[CDATA\[(.*)/gi;
 		$data = $1;
 		for ($data) {
 			s/<br \/>|<\/p>/\n/gi; # never more than one empty line
