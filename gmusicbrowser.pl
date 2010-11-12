@@ -259,7 +259,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 	#check if there is an instance already running
 	my $running;
 	if (defined $FIFOFile && -p $FIFOFile)
-	{	my @c= @cmd ? @cmd : ('');	#fallback to empty command, needed to know if running
+	{	my @c= @cmd ? @cmd : ('Show');	#fallback to "Show" command
 		sysopen my$fifofh,$FIFOFile, O_NONBLOCK | O_WRONLY;
 		print $fifofh "$_\n" and $running=1 for @c;
 		close $fifofh;
@@ -442,7 +442,7 @@ our @TrayMenu=
 	{ label=> sub {$::TogLock && $::TogLock eq 'album' ? _"Unlock Album"  : _"Lock Album"},	code => sub {ToggleLock('album');} },
 	{ label=> _"Windows",	code => \&PresentWindow,	submenu_ordered_hash =>1,
 		submenu => sub {  [map { $_->layout_name => $_ } grep $_->isa('Layout::Window'), Gtk2::Window->list_toplevels];  }, },
-	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => \&ShowHide },
+	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => sub { ShowHide(); } },
 	{ label=> _"Fullscreen",	code => \&ToggleFullscreenLayout,	stockicon => 'gtk-fullscreen' },
 	{ label=> _"Settings",		code => \&PrefDialog,	stockicon => 'gtk-preferences' },
 	{ label=> _"Quit",		code => \&Quit,		stockicon => 'gtk-quit' },
@@ -988,7 +988,9 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	OpenPref	=> [\&PrefDialog,			_"Open Preference window"],
 	OpenSongProp	=> [sub { DialogSongProp($SongID) if defined $SongID }, _"Edit Current Song Properties"],
 	EditSelectedSongsProperties => [sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; DialogSongsProp(@IDs) if @IDs; },		_"Edit selected song properties"],
-	ShowHide	=> [\&ShowHide,				_"Show/Hide"],
+	ShowHide	=> [sub {ShowHide();},			_"Show/Hide"],
+	Show		=> [sub {ShowHide(1);},			_"Show"],
+	Hide		=> [sub {ShowHide(0);},			_"Hide"],
 	Quit		=> [\&Quit,				_"Quit"],
 	Save		=> [\&SaveTags,				_"Save Tags/Options"],
 	ChangeDisplay	=> [\&ChangeDisplay,			_"Change Display",_"Display (:1 or host:0 for example)",qr/:\d/],
@@ -1175,7 +1177,7 @@ Layout::InitLayouts;
 ActivatePlugin($_,'startup') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 
 CreateMainWindow( $CmdLine{layout}||$Options{Layout} );
-ShowHide() if $CmdLine{hide} || ($Options{StartInTray} && $Options{UseTray} && $Gtk2TrayIcon);
+ShowHide(0) if $CmdLine{hide} || ($Options{StartInTray} && $Options{UseTray} && $Gtk2TrayIcon);
 SkipTo($PlayTime) if $PlayTime; #done only now because of gstreamer
 
 CreateTrayIcon();
@@ -6479,7 +6481,7 @@ sub CreateTrayIcon
 		{	my $b=$_[1]->button;
 			if	($b==3) { &TrayMenuPopup }
 			elsif	($b==2) { &PlayPause}
-			else		{ &ShowHide }
+			else		{ ShowHide() }
 			1;
 		});
 	SetTrayTipDelay();
@@ -6551,8 +6553,9 @@ sub IsWindowVisible
 	return $visible;
 }
 sub ShowHide
-{	my (@windows)=grep $_->isa('Layout::Window') && $_->{showhide} && $_!=$MainWindow, Gtk2::Window->list_toplevels;
-	if ( IsWindowVisible($MainWindow) )
+{	my $hide= defined $_[0] ? !$_[0] : IsWindowVisible($MainWindow);
+	my (@windows)=grep $_->isa('Layout::Window') && $_->{showhide} && $_!=$MainWindow, Gtk2::Window->list_toplevels;
+	if ($hide)
 	{	#hide
 		#warn "hiding\n";
 		for my $win ($MainWindow,@windows)
