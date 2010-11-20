@@ -1655,9 +1655,9 @@ sub init
 		}
 		else { warn "no Cairo perl module => can't make the window transparent\n" }
 	}
+	$self->child->show_all;		#needed to get the true size of the window
 	$self->realize;
 	$self->Resize if $self->{size};
-	$self->child->show_all;		#needed to get the true size of the window
 	{	my @hidden;
 		@hidden=keys %{ $self->{hidden} } if $self->{hidden};
 		my $widgets=$self->{widgets};
