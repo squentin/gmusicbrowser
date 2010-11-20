@@ -1,3 +1,17 @@
+gmusicbrowser (1.1.5ppa24) lucid; urgency=low
+  * fix broken artistinfo events formatting
+    various fixes from git upstream (commit dcf6317bbc9cfacd9a22 - 2010-11-10)
+    for a complete changelog see: github.com/ochosi/gmusicbrowser
+    
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Sat, 20 Nov 2010 01:13:57 +0100
+
+gmusicbrowser (1.1.5ppa23) lucid; urgency=low
+  * fpanes get format options, last.fm api fix for artistinfo-plugin, other various fixes
+    merge with git upstream (commit 6c22ca3c99d260546f94 - 2010-11-10)
+    for a complete changelog see: github.com/ochosi/gmusicbrowser
+    
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Fri, 12 Nov 2010 13:17:37 +0100
+
 gmusicbrowser (1.1.5ppa22) lucid; urgency=low
 
     for a complete changelog see: github.com/ochosi/gmusicbrowser
