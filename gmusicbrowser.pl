@@ -3510,7 +3510,7 @@ sub BuildChoiceMenu
 			$item->{selected}= $value;
 			$item->signal_connect(activate => $smenu_callback, $options{code} );
 		}
-		$item->child->set_markup( $item->child->get_label ) if $options{submenu_ordered_hash};
+		$item->child->set_markup( $item->child->get_label ) if $options{submenu_use_markup};
 		$menu->append($item);
 	}
 	$menu=undef unless @order; #empty submenu
