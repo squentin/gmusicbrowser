@@ -38,7 +38,7 @@ my %sites =
 # lastfm api key 7aa688c2466dc17263847da16f297835
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
 
-::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", Eventformat => "%title at %name\\%startDate\\%city (%country)\\\\");
+::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", Eventformat => "%title at %name<br>%startDate<br>%city (%country)<br><br>");
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
@@ -173,7 +173,7 @@ sub prefbox
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
 	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text1=>_"Artist Picture Size : ", text2=>_"(applied after restart)");
-	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", width=>50, tip => "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '\\\\' and any text you'd like to have in between. E.g. '%title taking place at %startDate\\in %city, %country'");
+	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", width=>50, tip => "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'");
 	my $lastfmimage=Gtk2::Image->new_from_stock("artistinfo-lastfm",'dnd');
 	my $lastfm=Gtk2::Button->new;
 	$lastfm->set_image($lastfmimage);
@@ -402,7 +402,7 @@ sub loaded
 			$event{startDate} = substr($event{startDate},0,-9); # cut the useless time (hh:mm:ss) from the date
 			my $format = $::Options{OPT.'Eventformat'};
 			$format =~ s/%(\w+)/$event{$1}/g;
-			$format =~ s#\\\\#\n#g;
+			$format =~ s#<br>#\n#g;
 			my $offset1 = $iter->get_offset;
 			my $href = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT');
 			$href->{url}=$event{url};
