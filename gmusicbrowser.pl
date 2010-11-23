@@ -2057,6 +2057,7 @@ sub SkipTo
 		$Play_package->SkipTo($sec);
 	}
 	else	{ Play($sec); }
+	::QHasChanged( Seek => $sec );
 }
 
 sub PlayPause
