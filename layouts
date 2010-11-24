@@ -103,7 +103,7 @@ HBTitle		= LockSong _Title(font=16,interval=75)
 HBArtist	= LockArtist _Artist(font=10)
 HBAlbum		= LockAlbum _Album(font=10)
 HBYear		= Filler1 _Date(font=8,markup="%y") -Stars
-HBTime		= _TimeBar(minheight=5)
+HBTime		= _TimeBar(minheight=7)
 HBRight		= HBButtons _2HBArtist
 VSize0		= 3 Filler0
 HSize0		= Filler1 LockArtist LockAlbum LockSong
