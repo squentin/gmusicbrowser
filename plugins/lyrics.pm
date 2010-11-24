@@ -24,6 +24,29 @@ use constant
 
 my $notfound=_"Not found";
 
+my @justification=
+(	left	=> _"Left aligned",
+	center	=> _"Centered",
+	right	=> _"Right aligned",
+	fill	=> _"Justified",
+);
+
+my @ContextMenuAppend=
+(	{	label	=> _"Scroll with song",		check	=> sub { $_[0]{self}{AutoScroll} },
+		code	=> sub { $::Options{OPT.'AutoScroll'}= $_[1]; $_[0]{self}->SetAutoScroll; },
+	},
+	{	label	=> _"Hide toolbar",		check	=> sub { $_[0]{self}{HideToolbar} },
+		code	=> sub { $_[0]{self}->SetToolbarHide($_[1]);  },
+	},
+	{	label	=> _"Choose font...",
+		code	=> sub { $_[0]{self}->ChooseFont; },
+	},
+	{	label	=> _"Lyrics alignement",	check	=> sub { $_[0]{self}{justification} },
+		submenu	=> \@justification,	submenu_reverse => 1,	submenu_ordered_hash=>1,
+		code	=> sub { $_[0]{self}{textview}->set_justification( $_[0]{self}{justification}=$_[1] );  },
+	},
+);
+
 my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics can be saved
 (	#lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php','artist=%a&songname=%s'],
 	lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php?artist=%a&songname=%s',undef,sub
@@ -52,18 +75,21 @@ my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 	#Lyricsfly ?
 );
 
+$::Options{OPT.'Font'} ||= delete $::Options{OPT.'FontSize'};	#for versions <1.1.6
+
 if (my $site=$::Options{OPT.'LyricSite'}) { delete $::Options{OPT.'LyricSite'} unless exists $sites{$site} } #reset selected site if no longer defined
-::SetDefaultOptions(OPT, FontSize => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyricsplugin');
+::SetDefaultOptions(OPT, font => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyricsplugin');
 
 
 my $lyricswidget=
 {	class		=> __PACKAGE__,
 	tabicon		=> 'gmb-lyrics',		# no icon by that name by default
 	tabtitle	=> _"Lyrics",
-	saveoptions	=> 'HideToolbar FontSize follow',
+	saveoptions	=> 'HideToolbar font follow justification',
 	schange		=> \&SongChanged,
 	group		=> 'Play',
 	autoadd_type	=> 'context page lyrics text',
+	justification	=> 'left',
 };
 
 sub Start
@@ -77,7 +103,7 @@ sub new
 {	my ($class,$options)=@_;
 	my $self = bless Gtk2::VBox->new(0,0), $class;
 	$options->{follow}=1 if not exists $options->{follow};
-	$self->{$_}=$options->{$_} for qw/HideToolbar follow group/;
+	$self->{$_}=$options->{$_} for qw/HideToolbar follow group font justification/;
 
 	my $textview=Gtk2::TextView->new;
 	$self->signal_connect(map => sub { $_[0]->SongChanged( ::GetSelID($_[0]) ); });
@@ -87,7 +113,9 @@ sub new
 	$textview->signal_connect(scroll_event		=> \&scroll_cb);
 	$textview->signal_connect(populate_popup	=> \&populate_popup_cb);
 	$textview->set_wrap_mode('word');
+	$textview->set_justification( $self->{justification} );
 	$textview->set_left_margin(5);
+	$textview->set_right_margin(5);
 	if (my $color= $options->{color} || $options->{DefaultFontColor})
 	{	$textview->modify_text('normal', Gtk2::Gdk::Color->parse($color) );
 	}
@@ -118,9 +146,7 @@ sub new
 	# create follow toggle button, function from GMB::Context
 	my $follow=$self->new_follow_toolitem;
 
-	$self->{FontSize}= $options->{FontSize} || $::Options{OPT.'FontSize'};
-	my $adj=Gtk2::Adjustment->new($self->{FontSize},4,50,1,5,0);
-	$adj->signal_connect(value_changed=> sub { SetFont($textview,$_[0]->get_value) });
+	my $adj= $self->{fontsize_adj}= Gtk2::Adjustment->new(10,4,80,1,5,0);
 	my $zoom=Gtk2::ToolItem->new;
 	$zoom->add( Gtk2::SpinButton->new($adj,1,0) );
 	$zoom->set_tooltip_text(_"Font size");
@@ -130,13 +156,14 @@ sub new
 
 	$self->pack_start($toolbar,0,0,0);
 	$self->add($sw);
-	$toolbar->set_no_show_all($self->{HideToolbar});
 	$self->{toolbar}=$toolbar;
 	$self->signal_connect(destroy => \&destroy_event_cb);
 
 	$self->{buffer}->signal_connect(modified_changed => sub {$_[1]->set_sensitive($_[0]->get_modified);}, $self->{saveb});
 	$self->{backb}->set_sensitive(0);
-	SetFont($textview);
+	$self->SetFont;
+	$adj->signal_connect(value_changed=> sub { $self->SetFont($_[0]->get_value) });
+	$self->SetToolbarHide($self->{HideToolbar});
 	$self->SetAutoScroll;
 
 	return $self;
@@ -171,6 +198,14 @@ sub filename_preview
 	return '<small>'.$t.'</small>';
 }
 
+sub SetToolbarHide
+{	my ($self,$hide)=@_;
+	$self->{HideToolbar}=$hide;
+	my $toolbar=$self->{toolbar};
+	if ($self->{HideToolbar})	{$toolbar->hide}
+	else				{$toolbar->set_no_show_all(0); $toolbar->show_all}
+}
+
 sub SetAutoScroll
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	if ($self->{AutoScroll}=$::Options{OPT.'AutoScroll'})
@@ -178,10 +213,37 @@ sub SetAutoScroll
 	else	{ ::UnWatch($self,'Time'); };
 }
 sub SetFont
-{	my ($textview,$size)=@_;
-	my $self=::find_ancestor($textview,__PACKAGE__);
-	$::Options{OPT.'FontSize'}=$self->{FontSize}=$size if $size;
-	$textview->modify_font(Gtk2::Pango::FontDescription->from_string( $self->{FontSize} ));
+{	my ($self,$newfont)=@_;
+	return if $self->{busy};
+	$self->{busy}=1;
+	my $textview=$self->{textview};
+	my $font= $self->{font} || $::Options{OPT.'Font'};
+	my $size;
+	if ($newfont)
+	{	if ($newfont=~m/\D/ || !$font) { $font=$newfont }
+		else { $size=$newfont }
+	}
+	my $fontdesc=Gtk2::Pango::FontDescription->from_string($font);
+	$fontdesc->set_size( $size * Gtk2::Pango->scale ) if $size;
+
+	# update spin button
+	$size= $fontdesc->get_size / Gtk2::Pango->scale;
+	my $adj=$self->{fontsize_adj};
+	$adj->set_value( $size );
+
+	$::Options{OPT.'Font'}= $self->{font}= $fontdesc->to_string;
+	$textview->modify_font($fontdesc);
+	delete $self->{busy};
+}
+sub ChooseFont
+{	my $self=shift;
+	my $dialog=Gtk2::FontSelectionDialog->new(_"Choose font for lyrics");
+	$dialog->set_font_name( $self->{font} );
+	my $response= $dialog->run;
+	if ($response eq 'ok')
+	{	$self->SetFont( $dialog->get_font_name );
+	}
+	$dialog->destroy;
 }
 
 sub Back_cb
@@ -243,24 +305,6 @@ sub populate_popup_cb
 {	my ($textview,$menu)=@_;
 	my $self=::find_ancestor($textview,__PACKAGE__);
 
-	my $item0=Gtk2::CheckMenuItem->new(_"Scroll with song");
-	$item0->set_active(1) if $self->{AutoScroll};
-	$item0->signal_connect(toggled => sub
-		{	my $self=$_[1];
-			$::Options{OPT.'AutoScroll'}=$_[0]->get_active;
-			$self->SetAutoScroll;
-		},$self);
-
-	my $item1=Gtk2::CheckMenuItem->new(_"Hide toolbar");
-	$item1->set_active(1) if $self->{HideToolbar};
-	$item1->signal_connect(toggled => sub
-		{	my $self=$_[1];
-			my $toolbar=$self->{toolbar};
-			if ($self->{HideToolbar}^=1)	{$toolbar->hide}
-			else				{$toolbar->set_no_show_all(0); $toolbar->show_all}
-		},$self);
-	$menu->append($_) for Gtk2::SeparatorMenuItem->new, $item0,$item1;
-
 	# add menu items for links
 	my ($x,$y)=$textview->window_to_buffer_coords('widget',$textview->get_pointer);
 	if (my $url=$self->url_at_coords($x,$y))
@@ -274,6 +318,9 @@ sub populate_popup_cb
 		},$url);
 		$menu->prepend($_) for Gtk2::SeparatorMenuItem->new, $item3,$item2;
 	}
+
+	$menu->append(Gtk2::SeparatorMenuItem->new);
+	::BuildMenu( \@ContextMenuAppend, { self=>$self, }, $menu );
 
 	$menu->show_all;
 }
@@ -507,11 +554,9 @@ sub scroll_cb	#zoom with ctrl-wheel
 {	my ($textview,$event) = @_;
 	return 0 unless $event->state >= 'control-mask';
 	my $self=::find_ancestor($textview,__PACKAGE__);
-	my $size=$self->{FontSize};
+	my $size= $self->{fontsize_adj}->get_value;
 	$size+= $event->direction eq 'up' ? 1 : -1;
-	$size=4 if $size<4;
-	$size=50 if $size>50;
-	SetFont($textview,$size);
+	$self->{fontsize_adj}->set_value($size);
 	return 1;
 }
 

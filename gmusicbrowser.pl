@@ -2057,6 +2057,7 @@ sub SkipTo
 		$Play_package->SkipTo($sec);
 	}
 	else	{ Play($sec); }
+	::QHasChanged( Seek => $sec );
 }
 
 sub PlayPause
@@ -3399,7 +3400,11 @@ sub BuildMenu
 		}
 		else
 		{	$item->{code}=$m->{code};
-			$item->signal_connect (activate => sub { $_[0]{code}->($_[1]) if $_[0]{code}; },$args);
+			$item->signal_connect (activate => sub
+				{	my ($self,$args)=@_;
+					my $on; $on=$self->get_active if $self->isa('Gtk2::CheckMenuItem');
+					$self->{code}->($args,$on) if $self->{code};
+				},$args);
 			if (my $submenu3=$m->{submenu3})	# set a submenu on right-click
 			{	$submenu3= BuildMenu($submenu3,$args);
 				$item->signal_connect (button_press_event => sub { my ($item,$event,$submenu3)=@_; return 0 unless $event->button==3; $item->{code}=undef;  $item->set_submenu($submenu3); $submenu3->show_all; 0;  },$submenu3);
