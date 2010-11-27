@@ -622,7 +622,7 @@ sub autofill_cb
 		if ( (keys %h)==1 )
 		{	my $entry=$self->{widgets}{$f};
 			if ($entry && $entry->is_sensitive)
-			{	next if $OBlank && ($entry->can('is_blank') ? $entry->is_blank : $entry->get_text ne '');
+			{	next if $OBlank && !($entry->can('is_blank') ? $entry->is_blank : $entry->get_text eq '');
 				$entry->set_text(keys %h);
 				next
 			}
@@ -631,7 +631,7 @@ sub autofill_cb
 		next unless $entries;
 		for my $e (@$entries)
 		{	my $v=shift @$varray;
-			next if $OBlank && ($e->can('is_blank') ? $e->is_blank : $e->get_text ne '');
+			next if $OBlank && !($e->can('is_blank') ? $e->is_blank : $e->get_text eq '');
 			$e->set_text($v) if $e->is_sensitive && $v ne '';
 		}
 	}
@@ -987,6 +987,10 @@ sub set_text
 	$v=0 unless $v=~m/^\d+$/;
 	$_[0]->set_value($v);
 }
+sub is_blank
+{	my $self=shift;
+	return ! $self->get_value;
+}
 sub tool
 {	&GMB::TagEdit::EntryString::tool;
 }
@@ -1099,6 +1103,10 @@ sub update_cb
 
 sub get_text
 {	$_[0]->{value};
+}
+sub is_blank
+{	my $v=$_[0]->{value};
+	$v eq '' || $v==255;
 }
 
 package GMB::TagEdit::FlagList;
