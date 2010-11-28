@@ -433,8 +433,8 @@ our @cMenuAA=
 );
 
 our @TrayMenu=
-(	{ label=> _"Play", code => \&PlayPause,	test => sub {!defined $::TogPlay},	stockicon => 'gtk-media-play' },
-	{ label=> _"Pause",code => \&PlayPause,	test => sub {defined $::TogPlay},	stockicon => 'gtk-media-pause' },
+(	{ label=> _"Play", code => \&PlayPause,	test => sub {!$::TogPlay},	stockicon => 'gtk-media-play' },
+	{ label=> _"Pause",code => \&PlayPause,	test => sub {$::TogPlay},	stockicon => 'gtk-media-pause' },
 	{ label=> _"Stop", code => \&Stop,	stockicon => 'gtk-media-stop' },
 	{ label=> _"Next", code => \&NextSong,	stockicon => 'gtk-media-next' },
 	{ label=> _"Recently played", submenu => sub { my $m=ChooseSongs(undef,GetPrevSongs(5)); }, stockicon => 'gtk-media-previous' },
@@ -2061,8 +2061,8 @@ sub SkipTo
 }
 
 sub PlayPause
-{	if (defined $TogPlay)	{ Pause()}
-	else			{ Play() }
+{	if (defined $TogPlay)	{ Pause()} #paused or playing => resume or pause
+	else			{ Play() } #stopped => play
 }
 
 sub Pause
