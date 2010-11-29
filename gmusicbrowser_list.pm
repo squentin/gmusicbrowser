@@ -706,11 +706,17 @@ INIT
 #	},
 	# italicrow & boldrow are special 'playrow', can't be updated via a event key, a redraw is made when CurSong changed if $self->{playrow}
 	italicrow =>
-	{	value => sub {defined $::SongID && $_[2]==$::SongID ? 'italic' : 'normal'},
+	{	value => sub
+		{	defined $::SongID && $_[2]==$::SongID && ($_[0]{currentrow}==-1 || $_[0]{currentrow}==$_[1]) ?
+				'italic' : 'normal';
+		},
 		attrib => 'style',	type => 'Gtk2::Pango::Style',
 	},
 	boldrow =>
-	{	value => sub {defined $::SongID && $_[2]==$::SongID ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL},
+	{	value => sub
+		{	defined $::SongID && $_[2]==$::SongID && ($_[0]{currentrow}==-1 || $_[0]{currentrow}==$_[1]) ?
+				PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL;
+		},
 		attrib => 'weight',	type => 'Glib::Uint',
 	},
 
@@ -729,7 +735,7 @@ INIT
 	},
 	playandqueue =>
 	{	menu => _('Playing & Queue'),		title => '',	width => 20,
-		value => sub { ::Get_PPSQ_Icon($_[2]); },
+		value => sub { ::Get_PPSQ_Icon($_[2], ($_[0]{currentrow}!=-1 && $_[0]{currentrow}!=$_[1])); },
 		class => 'Gtk2::CellRendererPixbuf',	attrib => 'stock-id',
 		type => 'Glib::String',			noncomp => 'boldrow italicrow',
 		event => 'Playing Queue CurSong',
@@ -997,6 +1003,7 @@ sub expose_cb
 		# draw empty text when no songs
 		$self->DrawEmpty($tv->get_bin_window,$tv->window, $tv->get_hadjustment->value);
 	}
+	$tv->get_model->{currentrow}= ($self->{mode} ne 'playlist' || !defined $::Position) ? -1 : $::Position;
 	return 0;
 }
 
@@ -1118,8 +1125,14 @@ sub Scroll_to_TopEnd
 
 sub CurSongChanged
 {	my $self=$_[0];
-	$self->queue_draw if defined $self->{playrow};
+	$self->check_current_row;
+	$self->queue_draw if $self->{playrow};
 	$self->FollowSong if $self->{follow};
+}
+
+sub check_current_row
+{	my $self=shift;
+	$self->{store}{currentrow}= ($self->{mode} ne 'playlist' || !defined $::Position) ? -1 : $::Position;
 }
 
 sub SongsChanged_cb
@@ -1237,6 +1250,7 @@ sub SongArray_changed_cb
 	}
 	$self->SetSelection(\@selected) if $updateselection;
 	$self->Hide(!scalar @$array) if $self->{hideif} eq 'empty';
+	$self->check_current_row;	
 }
 
 sub FollowSong
@@ -5861,6 +5875,7 @@ sub expose_cb
 					 x	=> $x,		y	=> $y,
 					 w	=> $width,	h	=> $vsizesong,
 					 odd	=> $odd,
+					 currentsong => ($::SongID && $ID==$::SongID && ($self->{mode} ne 'playlist' || !defined $::Position || $::Position==$row)),
 					);
 					my $q= $cell->{draw}(\%arg);
 					my $qid=$x.'s'.$y;
@@ -7352,7 +7367,7 @@ our %vars2=
 	progress=> ['$arg->{ID}==$::SongID ? $::PlayTime/Songs::Get($arg->{ID},"length") : 0',	'length','CurSong Time'],
 	queued	=> ['do {my $i;my $f;for (@$::Queue) {$i++; $f=$i,last if $arg->{ID}==$_};$f}',undef,'Queue'],
 	playing => ['$arg->{ID}==$::SongID',		undef,'CurSong'],
-	playicon=> ['::Get_PPSQ_Icon($arg->{ID})',	undef,'Playing Queue CurSong'],
+	playicon=> ['::Get_PPSQ_Icon($arg->{ID},!$arg->{currentsong})',	undef,'Playing Queue CurSong'],
 	labelicons=>['[Songs::Get_icon_list("label",$arg->{ID})]', 'label','Icons'],
 	ids	=> ['$arg->{ID}'],
  },
@@ -7681,7 +7696,7 @@ sub error
 
 sub playmarkup
 {	my $constant=$_[0];
-	return ['do { my $markup=',	'; $arg->{ID}==$::SongID ? \'<span '.$constant->{playmarkup}.'>\'.$markup."</span>" : $markup }',undef,'CurSong'];
+	return ['do { my $markup=',	'; $arg->{currentsong} ? \'<span '.$constant->{playmarkup}.'>\'.$markup."</span>" : $markup }',undef,'CurSong'];
 }
 
 

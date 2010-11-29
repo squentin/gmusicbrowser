@@ -2233,11 +2233,8 @@ sub Played
 }
 
 sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, or undef if none applies
-{	my $ID=$_[0];
-	my $playlist_row=$_[1]; # facultative
-	my $currentsong=defined $playlist_row ?
-				defined $Position && $Position==$playlist_row :
-				defined $SongID && $ID==$SongID ;
+{	my ($ID,$notcurrent)=@_;
+	my $currentsong= !$notcurrent && defined $SongID && $ID==$SongID;
 	return
 	 $currentsong ?
 	 (	$TogPlay		? 'gtk-media-play' :
