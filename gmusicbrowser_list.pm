@@ -4952,6 +4952,8 @@ sub key_press_cb
 	{	$self->{activatesub}($self,1);
 		return 1;
 	}
+	my $state=$event->get_state;
+	my $ctrl= $state * ['control-mask'];
 	my $pos=0;
 	$pos=$self->{lastclick} if $self->{lastclick};
 	my ($nw,$nh,$nwlast)=@{$self->{dim}};
@@ -4966,6 +4968,8 @@ sub key_press_cb
 	elsif	($key eq 'End')		{$i=$nwlast-1; $j=$nh-1;}
 	elsif	($key eq 'Page_Up')	{ $j-=$page; }
 	elsif	($key eq 'Page_Down')	{ $j+=$page; }
+	elsif	(lc$key eq 'a' && $ctrl)							#ctrl-a : select-all
+		{ $self->{selected}{$_}=undef for @{ $self->{list} }; $self->queue_draw; return 1; }
 	else {return 0}
 	if	($i<0)		{$j--; $i= $j<0 ? 0 : $nw-1}
 	elsif	($i>=$nw)	{$j++; $i= $j>=$nh ? $nwlast-1 : 0 }
