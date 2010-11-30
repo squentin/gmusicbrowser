@@ -2294,6 +2294,12 @@ sub get_selected_list
 	{{	my $store=$self->{view}->get_model;
 		my @iters=map $store->get_iter($_), $self->{view}->get_selection->get_selected_rows;
 		last unless @iters;
+		if ($store->get_value($iters[0],0)==GID_ALL)	# assumes "All row" first iter
+		{	my $iter= $store->get_iter_first;	# this iter is "All row" -> not added
+			# "all row" is selected, replace iters list by list of all iters of first depth
+			@iters=();
+			push @iters,$iter while $iter=$store->iter_next($iter);
+		}
 		my $depth=$store->iter_depth($iters[0]);
 		last if grep $depth != $store->iter_depth($_), @iters;
 		@vals=map $store->get_value($_,0) , @iters;
@@ -2423,12 +2429,10 @@ sub PopupContextMenu
 {	my ($self,undef,$event)=@_;
 	$self=::find_ancestor($self,__PACKAGE__);
 	my ($field,$gidlist)=$self->get_selected_list;
-	my $gidall;
-	if (grep GID_ALL==$_, @$gidlist) { $gidlist=[]; $gidall=1; }
 	my $mainfield=Songs::MainField($field);
 	my $aa= ($mainfield eq 'artist' || $mainfield eq 'album') ? $mainfield : undef; #FIXME
 	my $mode= uc(substr $self->{mode},0,1); # C => cloud, M => mosaic, L => list
-	FilterPane::PopupContextMenu($self,$event,{ self=> $self, filter => $self->get_selected_filters, field => $field, aa => $aa, gidlist =>$gidlist, gidall => $gidall, mode => $mode, subfield => $field, depth =>0 });
+	FilterPane::PopupContextMenu($self,$event,{ self=> $self, filter => $self->get_selected_filters, field => $field, aa => $aa, gidlist =>$gidlist, mode => $mode, subfield => $field, depth =>0 });
 }
 
 sub key_press_cb
