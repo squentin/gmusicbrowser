@@ -738,7 +738,7 @@ my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos CurSong P
 # Picture_#mainfield#
 
 my (%Watched,%WatchedFilt);
-my ($IdleLoop,@ToCheck,@ToReRead,@ToAdd_Files,@ToAdd_IDsBuffer,@ToScan,%FollowedDirs,$CoverCandidates);
+my ($IdleLoop,@ToCheck,@ToReRead,@ToAdd_Files,@ToAdd_IDsBuffer,@ToScan,%FollowedDirs,%AutoPicChooser);
 our ($LengthEstimated);
 our %Progress; my $ProgressWindowComing;
 my $Lengthcheck_max=0; my ($ScanProgress_cb,$CheckProgress_cb,$ProgressNBSongs,$ProgressNBFolders);
@@ -2766,7 +2766,6 @@ sub IdleLoop
 	}
 	elsif (@ToReRead){Songs::ReReadFile(pop(@ToReRead),1); }	#FIXME should show progress
 	elsif (@ToAdd_Files)  { SongAdd(shift @ToAdd_Files); }
-#	elsif ($CoverCandidates) {CheckCover();}	#FIXME PHASE1
 	elsif (@ToAdd_IDsBuffer>1000)	{ SongAdd_now() }
 	elsif (@ToScan) { $ProgressNBFolders++; ScanFolder(shift @ToScan); }
 	elsif (@ToAdd_IDsBuffer)	{ SongAdd_now() }
@@ -4632,6 +4631,7 @@ sub SongAdd_now
 	AA::IDs_Changed();
 	$Library->Push(\@IDs);
 	HasChanged(SongsAdded=>\@IDs);
+	AutoSelPictures(album=> @{Songs::UniqList(album=>\@IDs)});
 }
 sub SongsRemove
 {	my $IDs=$_[0];
@@ -4896,7 +4896,6 @@ sub ScanFolder
 			push @ToScan,$path_file;
 			next;
 		}
-		#if ($file=~m/\.(?:jpeg|jpg|png|gif)$/i) { push @pictures,$file; next; }
 		next unless $file=~$ScanRegex;
 		#my $ID=Songs::FindID($path_file);
 		my $ID=$Songs::IDFromFile->{$dir}{$file};
@@ -4965,117 +4964,105 @@ sub ScanProgress_cb
 	return 1;
 }
 
-#FIXME check completely replaced then remove
-=toremove
-sub ScanFolder_old
-{	my $notlibrary=$_[0];
-	my $dir= $notlibrary || shift @ToScan;
-	warn "Scanning $dir\n" if $debug;
-	$ProgressNBFolders++ unless $notlibrary;
-	my @pictures;
-	unless ($ScanRegex)
-	{	my @list= $Options{ScanPlayOnly}? ($PlayNext_package||$Play_package)->supported_formats
-						: qw/mp3 ogg oga flac mpc ape wv/; #FIXME find a better way,  wvc
-		my $s=join '|',@list;
-		$ScanRegex=qr/\.(?:$s)$/i;
-	}
-	my @files;
-	if (-d $dir)
-	{	opendir my($DIRH),$dir or warn "Can't read folder $dir : $!\n";
-		@files=readdir $DIRH;
-		closedir $DIRH;
-	}
-	elsif (-f $dir && $dir=~s/$QSLASH([^$QSLASH]+)$//o)
-	{	@files=($1);
-	}
-	my $utf8dir=filename_to_utf8displayname($dir);
-	my @toadd;
-	for my $file (@files)
-	{	next if $file=~m/^\./;		# skip . .. and hidden files/folders
-		my $path_file=$dir.SLASH.$file;
-		#warn "slash is utf8\n" if utf8::is_utf8(SLASH);
-		#if (-d $path_file) { push @ToScan,$path_file; next; }
-		if (-d $path_file)
-		{	next if $notlibrary;
-			if (-l $path_file)
-			{	my $real=readlink $path_file;
-				next if exists $FollowedDirs{$real};
-				$FollowedDirs{$real}=undef;
-			}
-			else
-			{	next if exists $FollowedDirs{$path_file};
-				$FollowedDirs{$path_file}=undef;
-			}
-			push @ToScan,$path_file;
-			next;
-		}
-		if ($file=~m/\.(?:jpeg|jpg|png|gif)$/i) { push @pictures,$file; next; }
-		next unless $file=~$ScanRegex;
-		my $rID=\$GetIDFromFile{$dir}{$file};
-		if (defined $$rID)
-		{	next unless ($Songs[$$rID][SONG_MISSINGSINCE] && $Songs[$$rID][SONG_MISSINGSINCE]=~m/^\d/) || $notlibrary;
-		}
-		else
-		{	my @song;#=('')xSONGLAST;	#FIXME only to avoid undef warnings
-			#$song[SONG_NBPLAY]=0;
-			@song[SONG_UFILE,SONG_UPATH,SONG_ADDED,SONG_FILE,SONG_PATH]=(filename_to_utf8displayname($file),$utf8dir,time,$file,$dir);
-			#_utf8_on($song[SONG_FILE]); # lie to perl so it doesn't get upgraded
-			#_utf8_on($song[SONG_PATH]); #  to utf8 when saving with '>:utf8'
-			push @Songs,\@song;
-			$$rID=$#Songs;
-		}
-		push @toadd,$$rID;
-	}
-	if ($notlibrary)
-	{	$_->[SONG_MODIF] or $_->[SONG_MISSINGSINCE]=$DAYNB for @Songs[@toadd]; # init MISSING_SINCE for new songs
-		@toadd= grep SongCheck($_), @toadd;
-		return \@toadd;
-	}
-	push @ToAdd_Files,@toadd;
-	undef %FollowedDirs unless @ToScan;
-	$CoverCandidates=[$dir,\@pictures] if @pictures;
+sub AutoSelPictures
+{	my ($field,@gids)=@_;
+	my $ref= $AutoPicChooser{$field} ||= { todo=>[] };
+	unshift @{$ref->{todo}}, @gids;
+	$ref->{idle}||= Glib::Idle->add(\&AutoSelPictures_do_next,$field);
+	$ref->{timeout}||= Glib::Timeout->add(1000,\&AutoSelPictures_progress_cb,$field);	#if @{$ref->{todo}}>10 ??
+}
+sub AutoSelPictures_do_next
+{	my $field=shift;
+	my $ref= $AutoPicChooser{$field};
+	return 0 unless $ref;
+	my $gid= shift @{$ref->{todo}};
+	AutoSelPicture($field,$gid);
+	$ref->{done}++;
+	return 1 if @{$ref->{todo}};
+	delete $AutoPicChooser{$field};
+	return 0;
+}
+sub AutoSelPictures_progress_cb
+{	my $field=shift;
+	my $ref= $AutoPicChooser{$field};
+	unless ($ref) { Progress('autopic_'.$field, abort=>1); return 0; }
+	return 0 unless $ref;
+	my $done= $ref->{done}||0;
+	Progress('autopic_'.$field, title => _"Selecting pictures", current=> $done, end=> $done+@{$ref->{todo}}, abortcb=> sub { delete $AutoPicChooser{$field}; }, aborthint=> _"Stop selecting pictures", );
+	return scalar @{$ref->{todo}};
 }
 
-sub CheckCover
-{	my ($dir,$pictures)=@$CoverCandidates; $CoverCandidates=undef;
-	return unless exists $GetIDFromFile{$dir};
-	my $h=$GetIDFromFile{$dir};
-	my ($first,@songs)=grep !($_->[SONG_MISSINGSINCE] && $_->[SONG_MISSINGSINCE]=~m/^\d/), map $Songs[$_],values %$h;
-	my $alb=$first->[SONG_ALBUM];
-	return unless defined $alb;
-	return if $alb=~m/^<Unknown>/;
-	for my $song (@songs)
-	{	my $alb2=$song->[SONG_ALBUM];
-		return if !defined $alb2 || $alb2 ne $alb;
-	}
-	#FIXME could check if all the songs of the album are in this dir
-	my $cover=AAPicture::GetPicture(album=>$alb);
-	return if $cover || (defined $cover && $cover eq '0');
+sub AutoSelPicture
+{	my ($field,$gid,$force)=@_;
 
-	my $match=$alb; $match=~s/[^0-9A-Za-z]+/ /g; $match=~tr/A-Z/a-z/;
-	$match=undef if $match eq ' ';
-	my (@words)= $alb=~m/([0-9A-Za-z]{4,})/g; tr/A-Z/a-z/ for @words;
-	my $hiscore; my $best;
-	for my $file (@$pictures)
-	{	my $score=0;
-		my $letters=$file; $letters=~s/\.[^.]+$//;
-		$letters=~s/[^0-9A-Za-z]+/ /g; $letters=~tr/A-Z/a-z/;
-		if (defined $match)
-		{	if    ($letters eq $match)		{$score+=100}
-			elsif ($letters=~m/\b\Q$match\E\b/)	{$score+=100}
-			else { $letters=~m/\Q$_\E/ && $score++ for @words; }
+	unless ($force)
+	# return if picture already set and existing
+	{	my $file= AAPicture::GetPicture($field,$gid);
+		if (defined $file)
+		{	return unless $file; # file eq '0' => no picture
+			if ($file=~s/:(\w+)$//) { return if FileTag::PixFromMusicFile($file,$1); }
+			else { return if -e $file }
 		}
-		$score+=2 if $letters=~m/\b(?:cover|front|folder|thumb|thumbnail)\b/;
-		$score-- if $letters=~m/\b(?:back|cd|inside|booklet)\b/;
-		#next unless defined $score;
-		next if $hiscore && $hiscore>$score;
-		$hiscore=$score; $best=$file;
 	}
-	return unless $best;
-	AAPicture::SetPicture(album=>$alb, $dir.SLASH.$best);
-	warn "found cover for $alb : $best)\n" if $debug;
+
+	my $IDs= AA::GetIDs($field,$gid);
+	return unless @$IDs;
+
+	my $set;
+	my %pictures_files;
+	for my $m (qw/embbeded guess/)
+	{	if ($m eq 'embbeded')
+		{	my @files= grep m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i, Songs::Map('fullfilename',$IDs);
+			if (@files)
+			{	$set= first { FileTag::PixFromMusicFile($_,$field,1) && $_ } @files;
+			}
+		}
+		elsif ($m eq 'guess')
+		{	warn "Selecting cover for ".Songs::Gid_to_Get($field,$gid)."\n" if $::debug;
+
+			my $path= Songs::BuildHash('path', $IDs);
+			for my $folder (keys %$path)
+			{	my $count_in_folder= AA::Get('count','path',$folder);
+				#warn " removing $folder $count_in_folder != $path->{$folder}\n" if $count_in_folder != $path->{$folder} if $::debug;
+				delete $path->{$folder} if $count_in_folder != $path->{$folder};
+			}
+			next unless keys %$path;
+			my $common= find_common_parent_folder(keys %$path);
+			if (length $common >5)	# ignore common parent folder if too short #FIXME compare the depth of $common with others, ignore it if more than 1 or 2 depth diff
+			{	if (!$path->{$common})
+				{	my $l=Filter->new( 'path:i:'.$common)->filter;
+					#warn " common=$common ".scalar(@$l)." == ".scalar(@$IDs)." ? \n" if $::debug;
+					$common=undef if @$l != @$IDs;
+				}
+				$path->{$common}= @$IDs if $common;
+			}
+			my @folders= sort { $path->{$b} <=> $path->{$a} } keys %$path;
+
+			my @words= split / +/, Songs::Gid_to_Get($field,$gid);
+			tr/0-9A-Za-z//cd for @words;
+			@words=grep length>2, @words;
+
+			my %found;
+			for my $folder (@folders)
+			{	opendir my($dh), $folder;
+				for my $file (grep m/\.(?:jpe?g|png|gif|bmp)$/i, readdir $dh)
+				{	my $score=0;
+					if ($field eq 'album') { $score+=100 if $file=~m/(?:^|[^a-zA-Z])(?:cover|front|folder|thumb|thumbnail)[^a-zA-Z]/i; }
+					elsif ( index($file,$field)!=-1 ) { $score+=10 }
+					#$score-- if $file=~m/\b(?:back|cd|inside|booklet)\b/;
+					$score+=10 for grep index($file,$_)!=-1, @words;
+					$found{ $folder.SLASH.$file }= $score;
+					warn " $file $score\n" if $::debug;
+				}
+				last if %found; #don't look in other folders if found a least a picture
+			}
+			($set)= sort { $found{$b} <=> $found{$a} } keys %found;
+		}
+		last if $set;
+	}
+	if ($set) { AAPicture::SetPicture($field, $gid, $set); }
 }
-=cut
+
 
 sub AboutDialog
 {	my $dialog=Gtk2::AboutDialog->new;
@@ -8231,7 +8218,7 @@ sub load
 {	my ($file,$size)=@_;
 	return unless $file;
 
-	my $nb= $file=~s/:(\d+)$// ? $1 : undef;	#index number for embbeded pictures
+	my $nb= $file=~s/:(\d+|\w+)$// ? $1 : undef;	#index number for embbeded pictures
 	unless (-r $file) {warn "$file not found\n"; return undef;}
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;

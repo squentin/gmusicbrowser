@@ -474,6 +474,7 @@ our %timespan_menu=
 	id3v1	=> 1,		id3v2	=> 'TPE1',	vorbis	=> 'artist',	ape	=> 'Artist',	lyrics3	=> 'EAR', ilst => "\xA9ART",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	all_count=> _"All artists",
+	apic_id	=> 8,
 	picture_field => 'artist_picture',
 	edit_order=> 20,	edit_many=>1,	letter => 'a',
 	can_group=>1,
@@ -499,6 +500,7 @@ our %timespan_menu=
 	depend	=> 'artist album_artist_raw', #because albums with no names get the name : <Unknown> (artist)
 	all_count=> _"All albums",
 	FilterList => {search=>1,drag=>::DRAG_ALBUM},
+	apic_id	=> 3,
 	picture_field => 'album_picture',
 	names => '::__("%d album","%d albums",#count#);',
 	edit_order=> 30,	edit_many=>1,	letter => 'l',
@@ -686,6 +688,7 @@ our %timespan_menu=
  composer =>
  {	name	=> _"Composer",		width	=> 100,		flags => 'garwesci',	type => 'artist',
 	id3v2	=> 'TCOM',	vorbis	=> 'composer',		ape => 'Composer',	ilst => "\xA9wrt",
+	apic_id	=> 11,
 	picture_field => 'artist_picture',
 	FilterList => {search=>1},
 	edit_many=>1,
@@ -694,6 +697,7 @@ our %timespan_menu=
  lyricist =>
  {	name	=> _"Lyricist",		width	=> 100,		flags => 'garwesci',	type => 'artist',
 	id3v2	=> 'TEXT',	vorbis	=> 'LYRICIST',		ape => 'Lyricist',	ilst => '---LYRICIST',
+	apic_id	=> 12,
 	picture_field => 'artist_picture',
 	FilterList => {search=>1},
 	edit_many=>1,
@@ -702,6 +706,7 @@ our %timespan_menu=
  conductor =>
  {	name	=> _"Conductor",	width	=> 100,		flags => 'garwesci',	type => 'artist',
 	id3v2	=> 'TPE3',	vorbis	=> 'CONDUCTOR',		ape => 'Conductor',	ilst => '---CONDUCTOR',
+	apic_id	=> 9,
 	picture_field => 'artist_picture',
 	FilterList => {search=>1},
 	edit_many=>1,

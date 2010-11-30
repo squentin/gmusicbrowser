@@ -1635,6 +1635,10 @@ our @cMenu=
 		code => sub { my $gid=$_[0]{gidlist}[0]; ::ChooseAAPicture(undef,$_[0]{field},$gid); },
 		onlyone=> 'gidlist',	test => sub { Songs::FilterListProp($_[0]{field},'picture') && $_[0]{gidlist}[0]>0; },
 	},
+	{ label => _"Auto-select Pictures",	code => sub { ::AutoSelPictures( $_[0]{field}, @{ $_[0]{gidlist} } ); },
+		onlymany=> 'gidlist',	test => sub { $_[0]{field} eq 'album' }, #test => sub { Songs::FilterListProp($_[0]{field},'picture'); },
+		stockicon => 'gmb-picture',
+	},
 	{ label=> _"Set icon",		stockicon => 'gmb-picture',
 		code => sub { my $gid=$_[0]{gidlist}[0]; Songs::ChooseIcon($_[0]{field},$gid); },
 		onlyone=> 'gidlist',	test => sub { Songs::FilterListProp($_[0]{field},'icon') && $_[0]{gidlist}[0]>0; },
@@ -2295,6 +2299,12 @@ sub get_selected_list
 	{{	my $store=$self->{view}->get_model;
 		my @iters=map $store->get_iter($_), $self->{view}->get_selection->get_selected_rows;
 		last unless @iters;
+		if ($store->get_value($iters[0],0)==GID_ALL)	# assumes "All row" first iter
+		{	my $iter= $store->get_iter_first;	# this iter is "All row" -> not added
+			# "all row" is selected, replace iters list by list of all iters of first depth
+			@iters=();
+			push @iters,$iter while $iter=$store->iter_next($iter);
+		}
 		my $depth=$store->iter_depth($iters[0]);
 		last if grep $depth != $store->iter_depth($_), @iters;
 		@vals=map $store->get_value($_,0) , @iters;
@@ -2424,12 +2434,10 @@ sub PopupContextMenu
 {	my ($self,undef,$event)=@_;
 	$self=::find_ancestor($self,__PACKAGE__);
 	my ($field,$gidlist)=$self->get_selected_list;
-	my $gidall;
-	if (grep GID_ALL==$_, @$gidlist) { $gidlist=[]; $gidall=1; }
 	my $mainfield=Songs::MainField($field);
 	my $aa= ($mainfield eq 'artist' || $mainfield eq 'album') ? $mainfield : undef; #FIXME
 	my $mode= uc(substr $self->{mode},0,1); # C => cloud, M => mosaic, L => list
-	FilterPane::PopupContextMenu($self,$event,{ self=> $self, filter => $self->get_selected_filters, field => $field, aa => $aa, gidlist =>$gidlist, gidall => $gidall, mode => $mode, subfield => $field, depth =>0 });
+	FilterPane::PopupContextMenu($self,$event,{ self=> $self, filter => $self->get_selected_filters, field => $field, aa => $aa, gidlist =>$gidlist, mode => $mode, subfield => $field, depth =>0 });
 }
 
 sub key_press_cb
@@ -4964,6 +4972,8 @@ sub key_press_cb
 	{	$self->{activatesub}($self,1);
 		return 1;
 	}
+	my $state=$event->get_state;
+	my $ctrl= $state * ['control-mask'];
 	my $pos=0;
 	$pos=$self->{lastclick} if $self->{lastclick};
 	my ($nw,$nh,$nwlast)=@{$self->{dim}};
@@ -4978,6 +4988,8 @@ sub key_press_cb
 	elsif	($key eq 'End')		{$i=$nwlast-1; $j=$nh-1;}
 	elsif	($key eq 'Page_Up')	{ $j-=$page; }
 	elsif	($key eq 'Page_Down')	{ $j+=$page; }
+	elsif	(lc$key eq 'a' && $ctrl)							#ctrl-a : select-all
+		{ $self->{selected}{$_}=undef for @{ $self->{list} }; $self->queue_draw; return 1; }
 	else {return 0}
 	if	($i<0)		{$j--; $i= $j<0 ? 0 : $nw-1}
 	elsif	($i>=$nw)	{$j++; $i= $j>=$nh ? $nwlast-1 : 0 }

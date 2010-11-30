@@ -244,15 +244,30 @@ sub FMPS_hash_write
 }
 
 sub PixFromMusicFile
-{	my ($file,$nb)=@_;
+{	my ($file,$nb,$quiet)=@_;
 	my ($h)=Read($file,0,'embedded_pictures');
 	return unless $h;
 	my $pix= $h->{embedded_pictures};
-	unless ($pix && @$pix)	{warn "no picture found in $file\n";return;}
-	$nb=0 if !defined $nb || $nb>$#$pix;
+	unless ($pix && @$pix)	{warn "no picture found in $file\n" unless $quiet;return;}
 	#FIXME filter out mimetype of "-->" (link) ?
-	#if (!defined $nb && @$pix>1 && ref $pix->[0]) {$nb=}	#FIXME if more than one picture in tag, use $pix->[$nb][1] to choose
+
 	return ref $pix->[0] ? (map $pix->[$_][3],0..$#$pix) : @$pix if wantarray;
+
+	if (!defined $nb) { $nb=0 }
+	elsif ($nb=~m/\D/)
+	{	if (ref $pix->[0]) #for APIC structures
+		{	my $apic_id= $Songs::Def{$nb} && $Songs::Def{$nb}{apic_id};
+			if ($apic_id)
+			{	($nb)= grep $pix->[$_][1]==$apic_id ,0..$#$pix;
+				return unless defined $nb;
+			}
+			return unless defined $nb;
+		}
+		elsif ($nb eq 'album') { $nb=0 }
+		else { return }
+	}
+	elsif ($nb>$#$pix) { $nb=0 }
+
 	return ref $pix->[0] ? $pix->[$nb][3] : $pix->[$nb];
 }
 
