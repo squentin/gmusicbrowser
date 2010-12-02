@@ -4616,6 +4616,7 @@ sub Fill
 	if ($width<2 && !$self->{delayed}) { $self->{delayed}=1; ::IdleDo('2_resizemosaic'.$self,100,\&Fill,$self);return}
 	delete $self->{delayed};
 	delete $::ToDo{'2_resizemosaic'.$self};
+	$self->abort_queue;
 	$self->{width}=$width;
 
 	my $list=$self->{list};
@@ -4758,7 +4759,7 @@ sub configure_cb		## FIXME I think it redraws everything even when it's not need
 	{	$self->update_scrollbar;
 		return;
 	}
-	$self->reset;
+	$self->abort_queue;
 	::IdleDo('2_resizecloud'.$self,100,\&Fill,$self,'samelist');
 }
 
@@ -4987,9 +4988,8 @@ sub key_press_cb
 	return 1;
 }
 
-sub reset
+sub abort_queue
 {	my $self=$_[0];
-	#delete $self->{list};
 	delete $self->{queue};
 	Glib::Source->remove( $self->{idle} ) if $self->{idle};
 	delete $self->{idle};
