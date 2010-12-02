@@ -4799,7 +4799,7 @@ sub expose_cb
 	$i2=$nw-1 if $i2>=$nw;
 	$j2=$nh-1 if $j2>=$nh;
 	for my $j ($j1..$j2)
-	{	my $y=$j*($vsize+2*YPAD)+YPAD - $dy;  #warn "j=$j y=$y\n";
+	{	my $y=$j*($vsize+2*YPAD)+YPAD - $dy;
 		$i2=$nwlast-1 if $j==$nh-1;
 		for my $i ($i1..$i2)
 		{	my $pos=$i+$j*$nw;
@@ -4809,7 +4809,7 @@ sub expose_cb
 			my $state=$state;
 			if (exists $self->{selected}{$key})
 			{	$window->draw_rectangle($sbgc,1,$x-XPAD(),$y-YPAD(),$hsize+XPAD*2,$vsize+YPAD*2);
-				#$state=$sstate;
+				$state=$sstate;
 				#$style->paint_flat_box( $window,$state,'none',$event->area,$self,'',
 				#			$x-XPAD(),$y-YPAD(),$hsize+XPAD*2,$vsize+YPAD*2 );
 			}
