@@ -1570,7 +1570,8 @@ my @MenuSubGroup=
 		  		return [ map { AA::ReplaceFields( $gid,$_,$field,::TRUE ), ($_ eq "%a" ? 0 : $_) } @MenuMarkupOptions ];
 	  		},	submenu_ordered_hash => 1, submenu_use_markup => 1,
 	  check => sub { $_[0]{self}{lmarkup}[$_[0]{depth}]}, istrue => 'aa', mode => 'LS', },
-	{ label => _"show info",	code => sub { my $self=$_[0]{self}; $self->{mmarkup}^=1; $self->SetOption; },
+	{ label => _"text mode",	code => sub { my $self=$_[0]{self}; $self->{mmarkup}=$_[1]; $self->SetOption; },
+	  submenu => [ 0 => _"None", below => _"Below", right => _"Right side", ], submenu_ordered_hash => 1, submenu_reverse => 1,
 	  check => sub { $_[0]{self}{mmarkup} }, mode => 'M', },
 	{ label => _"show the 'All' row",	code => sub { my $self=$_[0]{self}; $self->{noall}^=1; $self->SetOption; },
 	  check => sub { !$_[0]{self}{noall} }, mode => 'LS', },
@@ -4629,17 +4630,24 @@ sub Fill
 	$self->{vsize}=$mpsize;
 
 	if ($filterlist->{mmarkup})
-	{	$self->{markup}= my $markup= $self->{field} eq 'album'  ? "<small><b>%a</b></small>\n<small>%b</small>"
+	{	$self->{markup_pos}= $filterlist->{mmarkup};
+		$self->{markup}= my $markup= $self->{field} eq 'album'  ? "<small><b>%a</b></small>\n<small>%b</small>"
 									: "<small><b>%a</b></small>\n<small>%X</small>";
 		my @heights;
 		for my $m (split /\n/, $markup)
 		{	my $lay=$self->create_pango_layout($m);
-			my $h= ($lay->get_pixel_size)[1];
-			push @heights,$h;
-			$self->{vsize}+=$h;
+			push @heights, ($lay->get_pixel_size)[1];
 		}
 		$self->{markup_heights}=\@heights;
-		$self->{vsize}+= 2*YPAD;
+		if ($self->{markup_pos} eq 'right')
+		{	$self->{markup_width}= ::max(120,$mpsize*1.2);
+			$self->{hsize}+=$self->{markup_width};
+		}
+		else
+		{	$self->{markup_width}=$mpsize;
+			$self->{vsize}+= 2*YPAD;
+			$self->{vsize}+=$_ for @heights;
+		}
 	}
 
 	my $nw= int($width / ($self->{hsize}+2*XPAD)) || 1;
@@ -4791,6 +4799,7 @@ sub expose_cb
 	my $hsize=$self->{hsize};
 	my $picsize=$self->{picsize};
 	my @markup= $self->{markup} ? (split /\n/,$self->{markup}) : ();
+	my $markup_width= $self->{markup_width};
 	my $mheights= $self->{markup_heights};
 	my $i1=int($exp_x1/($hsize+2*XPAD));
 	my $i2=int($exp_x2/($hsize+2*XPAD));
@@ -4834,19 +4843,20 @@ sub expose_cb
 				$layout->set_alignment('center');
 				$style->paint_layout($window, $state, 1,
 					Gtk2::Gdk::Rectangle->new($x,$y,$hsize,$vsize), $self, undef, $x, $y, $layout);
+				next;
 			}
-			my $ym= $y+$picsize+YPAD;
+			my ($xm,$ym,$align)= $self->{markup_pos} eq 'right' ? ($x+$picsize+XPAD,$y,'left') : ($x,$y+$picsize+YPAD,'center');
 			my $i=0;
 			for my $markup (@markup)
 			{	my $layout=Gtk2::Pango::Layout->new( $self->create_pango_context );
 				$layout->set_markup(AA::ReplaceFields($key,$markup,$field,1));
-				$layout->set_width($hsize * Gtk2::Pango->scale);
-				$layout->set_alignment('center');
+				$layout->set_width($markup_width * Gtk2::Pango->scale);
+				$layout->set_alignment($align);
 				my $height= $mheights->[$i++];
 				$layout->set_height($height * Gtk2::Pango->scale);
 				$layout->set_ellipsize('end');
 				$style->paint_layout($window, $state, 1,
-					Gtk2::Gdk::Rectangle->new($x,$ym,$hsize,$height), $self, undef, $x, $ym, $layout);
+					Gtk2::Gdk::Rectangle->new($xm,$ym,$markup_width,$height), $self, undef, $xm, $ym, $layout);
 				$ym+=$height;
 			}
 		}
