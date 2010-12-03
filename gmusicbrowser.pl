@@ -1775,7 +1775,7 @@ sub ReadSavedTags	#load tags _and_ settings
 			my $sub=$extra_sub->{$extra};
 			while (my $line=shift @$lines)
 			{	my ($key,@vals)= split /\t/, $line,-1;
-				s#\\x([0-9a-fA-F]{2})#chr hex $1#eg for @vals;
+				s#\\x([0-9a-fA-F]{2})#chr hex $1#eg for $key,@vals;
 				$sub->($key,@vals);
 			}
 		}
@@ -1866,7 +1866,8 @@ sub SaveTags	#save tags _and_ settings
 		my $h= $extrasub->{$field}->();
 		for my $key (sort keys %$h)
 		{	my $vals= $h->{$key};
-			s#([\x00-\x1F\\])#sprintf "\\x%02x",ord $1#eg for @$vals;
+			s#([\x00-\x1F\\])#sprintf "\\x%02x",ord $1#eg for $key,@$vals;
+			$key=~s#^\[#\\x5b#; #escape leading "["
 			my $line= join "\t", @$vals;
 			next if $line=~m/^\t*$/;
 			print $fh "$key\t$line\n"  or $error||=$!;
