@@ -2392,8 +2392,9 @@ sub GetIDs
 
 sub GrepKeys
 {	my ($field,$string,$list)=@_;
-	my $re=qr/\Q$string\E/i;
 	$list||=GetAAList($field);
+	return [@$list] unless length $string;	# m// use last regular expression used
+	my $re=qr/\Q$string\E/i;
 	my $displaysub=Songs::DisplayFromGID_sub($field);
 	my @l=grep $displaysub->($_)=~m/$re/i, @$list;	#FIXME optimize ?
 	return \@l;

@@ -3908,7 +3908,7 @@ sub EntryChanged_cb
 	my $store=$self->{treeview}->get_model;
 	(($self->{treeview}->get_columns)[0]->get_cell_renderers)[0]->reset;
 	$store->clear;
-	return if !$force && 2>length $text;
+	#return if !$force && 2>length $text;
 	my $list= AA::GrepKeys($self->{field}, $text);
 	AA::SortKeys($self->{field},$list,'alpha');
 	$store->set($store->append,0,$_) for @$list;
