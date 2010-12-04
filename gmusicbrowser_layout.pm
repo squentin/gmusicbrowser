@@ -2098,22 +2098,23 @@ sub PanedNew
 		$self->set('position-set',1); # in case $self->{size1}==0 'position-set' is not set to true if child1's size is 0 (which is the case here as child1 doesn't exist yet)
 	}
 	$self->{SaveOptions}=sub { size => $_[0]{size1} .'-'. $_[0]{size2} };
-	$self->signal_connect(size_allocate => \&Paned_size_cb ); #needed to correctly behave when a child is hidden
+	$self->signal_connect(size_allocate => \&Paned_size_cb ); #needed to correctly save/restore the handle position
 	return $self;
 }
 
 sub Paned_size_cb
-{	my ($self,$alloc)=@_;
-	$alloc=$self->isa('Gtk2::VPaned')? $alloc->height : $alloc->width;
+{	my $self=shift;
+	my $max=$self->get('max-position');
 	my $size1=$self->{size1};
 	my $size2=$self->{size2};
-	if (defined $size1 && defined $size2 && abs($alloc-$size1-$size2)>5)
-	{	if    ($self->child1_resize && !$self->child2_resize)	{ $self->{size1}=$alloc-$size2; }
-		elsif ($self->child2_resize && !$self->child1_resize)	{ $self->{size2}=$alloc-$size1; }
-		else { my $diff= $alloc-$size1-$size2; $self->{size1}+= int(.5+$diff/2); $self->{size2}+= int($diff/2); }
-		$self->set_position( $self->{size1} );
+	if (defined $size1 && defined $size2 && abs($max-$size1-$size2)>5)
+	{	if    ($self->child1_resize && !$self->child2_resize)		{ $size1= ::max($max-$size2,0); }
+		elsif (!($self->child2_resize && !$self->child1_resize))	{ $size1= $max*$size1/($size1+$size2); }
+		$self->set_position( $size1 );
+		$self->{size1}= $size1;
+		$self->{size2}= ::max($max-$size1,0);
 	}
-	else { my $size1=$self->get_position; $self->{size1}=$size1; $self->{size2}=$alloc-$size1; }
+	else { my $size1=$self->get_position; $self->{size1}=$size1; $self->{size2}=$max-$size1; }
 }
 
 sub Fixed_pack
