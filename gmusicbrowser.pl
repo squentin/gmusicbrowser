@@ -398,7 +398,7 @@ our @SongCMenu=
 		empty => 'IDs',	notempty=> 'listIDs', notmode => 'QP', stockicon => 'gmb-queue' },
 	{ label => _"Add to list",	submenu => \&AddToListMenu,	notempty => 'IDs' },
 	{ label => _"Edit Labels",	submenu => \&LabelEditMenu,	notempty => 'IDs' },
-	{ label => _"Edit Rating",	submenu => \&Stars::createmenu,	notempty => 'IDs' },
+	{ label => _"Edit Rating",	submenu => sub{ Stars::createmenu('rating',$_[0]{IDs}); },	notempty => 'IDs' },
 	{ label => _"Find songs with the same names",	code => sub { SearchSame('title',$_[0]) },	mode => 'B',	notempty => 'IDs' },
 	{ label => _"Find songs with same artists",	code => sub { SearchSame('artists',$_[0])},	mode => 'B',	notempty => 'IDs' },
 	{ label => _"Find songs in same albums",	code => sub { SearchSame('album',$_[0]) },	mode => 'B',	notempty => 'IDs' },
@@ -924,6 +924,24 @@ sub LoadIcons
 	$NBVolIcons++ while $icons{'gmb-vol'.$NBVolIcons};
 	$NBQueueIcons=0;
 	$NBQueueIcons++ while $icons{'gmb-queue'.($NBQueueIcons+1)};
+
+	# find rating pictures
+	for my $field (keys %Songs::Def)
+	{	my $format= $Songs::Def{$field}{starprefix};
+		next unless $format;
+		if ($format!~m#^/#)
+		{	for my $path (reverse PIXPATH,@dirs)
+			{	next unless -f $path.SLASH.$format.'0.svg' || -f $path.SLASH.$format.'0.png';
+				$format= $path.SLASH.$format;
+				last;
+			}
+		}
+		$format.= (-f $format.'0.svg') ? "%d.svg" : "%d.png";
+		my $max=0;
+		$max++ while -f sprintf($format,$max+1);
+		$Songs::Def{$field}{pixbuf}= [ map eval {Gtk2::Gdk::Pixbuf->new_from_file( sprintf($format,$_) )}, 0..$max ];
+		$Songs::Def{$field}{nbpictures}= $max;
+	}
 
 	$icon_factory->remove_default if $icon_factory;
 	$icon_factory=Gtk2::IconFactory->new;
@@ -1775,7 +1793,7 @@ sub ReadSavedTags	#load tags _and_ settings
 			my $sub=$extra_sub->{$extra};
 			while (my $line=shift @$lines)
 			{	my ($key,@vals)= split /\t/, $line,-1;
-				s#\\x([0-9a-fA-F]{2})#chr hex $1#eg for @vals;
+				s#\\x([0-9a-fA-F]{2})#chr hex $1#eg for $key,@vals;
 				$sub->($key,@vals);
 			}
 		}
@@ -1866,7 +1884,8 @@ sub SaveTags	#save tags _and_ settings
 		my $h= $extrasub->{$field}->();
 		for my $key (sort keys %$h)
 		{	my $vals= $h->{$key};
-			s#([\x00-\x1F\\])#sprintf "\\x%02x",ord $1#eg for @$vals;
+			s#([\x00-\x1F\\])#sprintf "\\x%02x",ord $1#eg for $key,@$vals;
+			$key=~s#^\[#\\x5b#; #escape leading "["
 			my $line= join "\t", @$vals;
 			next if $line=~m/^\t*$/;
 			print $fh "$key\t$line\n"  or $error||=$!;

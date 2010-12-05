@@ -249,10 +249,6 @@ our %timespan_menu=
 		save_extra	=> 'do { my $v=#_#; defined $v ? filename_escape($v) : ""; }',
 		get		=> '__#mainfield#_picture[ ##mainfield#->get_gid# ]',
 	},
-	_stars =>	#FIXME not used everywhere
-	{	_		=> 'sprintf("%d",#GID# * #nbpictures# /100)',
-		pixbuf_for_gid	=> 'my $r= #_#; __#mainfield#_pixbuf[$r] ||= GMB::Picture::pixbuf( "#fileprefix#".$r.".png" );',
-	},
 	fewstring=>	#for strings likely to be repeated
 	{	_		=> 'vec(____,#ID#,#bits#)',
 		bits		=> 32,	#32 bits by default (16 bits ?)
@@ -523,16 +519,6 @@ our %timespan_menu=
 	mainfield	=> 'artist',
 	type		=> '_picture',
  },
- rating_picture =>
- {	name		=> _"Rating picture",
-	flags		=> '',		#FIXME
-	depend		=> 'rating',
-	property_of	=> 'rating',
-	mainfield	=> 'rating',
-	type		=> '_stars',
-	nbpictures	=> 5,
-	fileprefix	=> ::PIXPATH.'stars',
- },
  album_artist_raw =>
  {	name => _"Album artist",width => 200,	flags => 'garwesci',	type => 'artist',
 	id3v2	=> 'TPE2',	vorbis	=> 'albumartist|album_artist',	ape	=> 'Album Artist|Album_artist',  ilst => "aART",
@@ -653,7 +639,7 @@ our %timespan_menu=
 	'postread:five'=> sub { my $v=shift; length $v && $v=~m/^\d+$/ && $v<=5 ? sprintf('%d',$v*20) : undef }, # for reading foobar2000 rating 0..5 ?
 	'postread:percent'=> sub { $_[0] }, # for anyone who used gmbrating
 	FilterList => {},
-	starfield => 'rating_picture',
+	starprefix => 'stars',
 	edit_order=> 90,	edit_many=>1,
 	options	=> 'rw_ userid',
  },
@@ -847,6 +833,7 @@ our %FieldTemplates=
 	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'gaesc_',width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid', FilterList=> {},
 		     postread => \&FMPS_rating_postread,		prewrite => \&FMPS_rating_prewrite,
 		     id3v2 => 'TXXX;FMPS_Rating_User;%v::%i',	vorbis	=> 'FMPS_RATING_USER::%i',	ape => 'FMPS_RATING_USER::%i',	ilst => '----FMPS_Rating_User::%i',
+		     starprefix => 'stars', #FIXME make it an option
 		   },
 );
 
@@ -1415,6 +1402,12 @@ sub Makesub
 	my $sub=eval "sub {$c}";
 	if ($@) { warn "Compilation error :\n code : $c\n error : $@";}
 	return $sub;
+}
+sub Stars
+{	my ($gid,$field)=@_;
+	return undef if !defined $gid || $gid eq '' || $gid==255;
+	my $pb= $Def{$field}{pixbuf} || $Def{'rating'}{pixbuf};
+	return $pb->[ sprintf("%d",$gid/100*$#$pb) ];
 }
 sub Picture
 {	my ($gid,$field,$action,$extra)=@_;
@@ -2392,8 +2385,9 @@ sub GetIDs
 
 sub GrepKeys
 {	my ($field,$string,$list)=@_;
-	my $re=qr/\Q$string\E/i;
 	$list||=GetAAList($field);
+	return [@$list] unless length $string;	# m// use last regular expression used
+	my $re=qr/\Q$string\E/i;
 	my $displaysub=Songs::DisplayFromGID_sub($field);
 	my @l=grep $displaysub->($_)=~m/$re/i, @$list;	#FIXME optimize ?
 	return \@l;

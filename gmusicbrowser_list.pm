@@ -764,7 +764,7 @@ INIT
 	},
 	stars	=>
 	{	title	=> _("Rating"),			menu	=> _("Rating (picture)"),
-		value	=> sub { Stars::get_pixbuf( Songs::Get($_[2],'rating') ); }, #FIXME use Songs::Picture to get pixbuf
+		value	=> sub { Songs::Stars( Songs::Get($_[2],'rating'),'rating'); },
 		class	=> 'Gtk2::CellRendererPixbuf',	attrib	=> 'pixbuf',
 		type	=> 'Gtk2::Gdk::Pixbuf',		noncomp	=> 'boldrow italicrow',
 		depend	=> 'rating',			sort	=> 'rating',
@@ -3910,7 +3910,7 @@ sub EntryChanged_cb
 	my $store=$self->{treeview}->get_model;
 	(($self->{treeview}->get_columns)[0]->get_cell_renderers)[0]->reset;
 	$store->clear;
-	return if !$force && 2>length $text;
+	#return if !$force && 2>length $text;
 	my $list= AA::GrepKeys($self->{field}, $text);
 	AA::SortKeys($self->{field},$list,'alpha');
 	$store->set($store->append,0,$_) for @$list;
@@ -4069,9 +4069,9 @@ sub RENDER
 
 	my $field=$prop->[P_FIELD][$depth];
 	$field=~s/\..*//;
-	my $starfield= $Songs::Def{$field}{starfield}; #FIXME shouldn't use Songs::Def directly
-	if ($gid!=FilterList::GID_ALL && $starfield)
-	{	if (my $pb= Songs::Picture($gid,$starfield,'pixbuf'))
+	my $has_stars= $Songs::Def{$field}{starprefix}; #FIXME shouldn't use Songs::Def directly
+	if ($gid!=FilterList::GID_ALL && $has_stars)
+	{	if (my $pb= Songs::Stars($gid,$field))
 		{	# FIXME center verticaly or resize ?
 			$window->draw_pixbuf( $widget->style->black_gc, $pb,0,0, $x+XPAD+$w, $y+$offy,-1,-1,'none',0,0);
 		}
@@ -7392,7 +7392,7 @@ sub Result
 package GMB::Expression;
 no warnings;
 
-our %alias=( 'if' => 'iff', pesc => '::PangoEsc', ratingpic => 'Stars::get_pixbuf', min =>'::min', max =>'::max', sum =>'::sum',); #FIXME use Songs::Picture instead of Stars::get_pixbuf
+our %alias=( 'if' => 'iff', pesc => '::PangoEsc', min =>'::min', max =>'::max', sum =>'::sum',);
 our %functions=
 (	formattime=> ['do {my ($f,$t,$z)=(',		'); !$t && defined $z ? $z : ::strftime2($f,localtime($t)); }'],
 	#sum	=>   ['do {my $sum; $sum+=$_ for ',	';$sum}'],
@@ -7401,6 +7401,7 @@ our %functions=
 	#min	=>   ['do {my ($min,@l)=(',		'); $_<$min and $min=$_ for @l; $min}'],
 	iff	=>   ['do {my ($cond,$res,@l)=(',	'); while (@l>1) {last if $cond; $cond=shift @l;$res=shift @l;} $cond ? $res : $l[0] }'],
 	size	=>   ['do {my ($l)=(',			'); ref $l ? scalar @$l : 1}'],
+	ratingpic=>  ['Songs::Stars(',		',"rating");'],
 	playmarkup=> \&playmarkup,
 );
 $functions{$_}||=undef for qw/ucfirst uc lc chr ord not index length substr join sprintf warn abs int rand/, values %alias;
