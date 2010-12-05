@@ -350,14 +350,12 @@ our %Widgets=
 		update	=> sub { $_[0]->set_label(sprintf("%d",::GetVol())); },
 	},
 	Stars =>
-	{	New	=> sub	{ Stars->new(0,sub {	my $ID=::GetSelID($_[0]);
-							return unless defined $ID;
-							Songs::Set($ID, rating => $_[1])
-						  });
-				},
+	{	New	=> \&Stars::new_layout_widget,
 		group	=> 'Play',
-		fields	=> 'rating',
-		schange	=> sub	{ my $r=(defined $_[1])? Songs::Get($_[1],'rating') : 0; $_[0]->set($r); },
+		field	=> 'rating',
+		event	=> 'Icons',
+		schange	=> \&Stars::update_layout_widget,
+		update	=> sub { $_[0]->update_layout_widget( ::GetSelID($_[0]) ); },
 		cursor	=> 'hand2',
 	},
 	Cover =>
@@ -1072,7 +1070,7 @@ sub NewWidget
 	}
 	if ($options{hover_layout}) { $widget->{$_}=$options{$_} for qw/hover_layout hover_delay/; Layout::Window::Popup::set_hover($widget); }
 	if (my $schange=$ref->{schange})
-	{	my $fields= $ref->{fields};
+	{	my $fields= $options{fields} || $options{field};
 		$fields= $fields ? [ split / /,$fields ] : undef;
 		::WatchSelID($widget,$schange, $fields);
 		$schange->($widget,::GetSelID($widget));
@@ -3626,17 +3624,26 @@ package Stars;
 use Gtk2;
 use base 'Gtk2::EventBox';
 
-my (@pixbufs,$width);
-use constant NBSTARS => 5;
-
-INIT
-{	@pixbufs=map Gtk2::Gdk::Pixbuf->new_from_file(::PIXPATH.'stars'.$_.'.png'), 0..NBSTARS;
-	$width=$pixbufs[0]->get_width/NBSTARS;
+sub new_layout_widget
+{	my $field= $_[0]{field}; # FIXME check valid rating field
+	return Stars->new($field,0, \&set_rating_now_cb);
+}
+sub update_layout_widget
+{	my ($self,$ID)=@_;
+	my $r= defined $ID ? Songs::Get($ID,$self->{field}) : 0;
+	$self->set($r);
+}
+sub set_rating_now_cb
+{	my $ID=::GetSelID($_[0]);
+	return unless defined $ID;
+	Songs::Set($ID, $_[0]{field} => $_[1])
 }
 
+
 sub new
-{	my ($class,$nb,$sub) = @_;
+{	my ($class,$field,$nb,$sub) = @_;
 	my $self = bless Gtk2::EventBox->new, $class;
+	$self->{field}=$field;
 	$self->{callback}=$sub;
 	my $image=$self->{image}=Gtk2::Image->new;
 	$self->add($image);
@@ -3655,7 +3662,9 @@ sub set
 	$self->{nb}=$nb;
 	$nb=$::Options{DefaultRating} if !defined $nb || $nb eq '';
 	$self->set_tooltip_text(_("Song rating")." : $nb %");
-	$self->{image}->set_from_pixbuf( get_pixbuf($nb) );
+	my $pixbuf= Songs::Stars($nb,$self->{field});
+	$self->{width}= $pixbuf->get_width;
+	$self->{image}->set_from_pixbuf($pixbuf);
 }
 sub get { shift->{nb}; }
 
@@ -3663,8 +3672,10 @@ sub click
 {	my ($self,$event)=@_;
 	if ($event->button == 3) { $self->popup($event); return 1 }
 	my ($x)=$event->coords;
-	my $nb=1+int($x/$width);
-	$nb*=100/NBSTARS;
+	my $pb= $Songs::Def{$self->{field}}{pixbuf} || $Songs::Def{'rating'}{pixbuf};
+	my $nbstars=$#$pb;
+	my $nb=1+int($x*$nbstars/$self->{width});
+	$nb*=100/$nbstars;
 	$self->callback($nb);
 	return 1;
 }
@@ -3685,18 +3696,20 @@ sub popup
 	$menu->popup(undef, undef, \&::menupos, undef, $event->button, $event->time);
 }
 
+# not really part of Stars::
 sub createmenu
-{	my $IDs=$_[0]{IDs};
+{	my ($field,$IDs)=@_; # FIXME check valid rating field
+	my $pixbufs= $Songs::Def{$field}{pixbuf} || $Songs::Def{rating}{pixbuf};
+	my $nbstars= $#$pixbufs;
 	my %set;
-	$set{$_}++ for Songs::Map('rating',$IDs);
+	$set{$_}++ for Songs::Map($field,$IDs);
 	my $set= (keys %set ==1) ? each %set : 'undef';
-	my $cb=sub	{	Songs::Set($IDs,rating => $_[1]);
-			};
+	my $cb=sub { Songs::Set($IDs,$field => $_[1]); };
 	my $menu=Gtk2::Menu->new;
-	for my $nb ('',0..NBSTARS)
+	for my $nb ('',0..$nbstars)
 	{	my $item=Gtk2::CheckMenuItem->new;
 		my ($child,$rating)= $nb eq ''	? (Gtk2::Label->new(_"default"),'')
-						: (Gtk2::Image->new_from_pixbuf($pixbufs[$nb]),$nb*100/NBSTARS);
+						: (Gtk2::Image->new_from_pixbuf($pixbufs->[$nb]),$nb*100/$nbstars);
 		$item->add($child);
 		$item->set_draw_as_radio(1);
 		$item->set_active(1) if $set eq $rating;
@@ -3705,17 +3718,6 @@ sub createmenu
 	}
 	return $menu;
 }
-
-sub get_pixbuf
-{	my $r=$_[0]; my $def=$_[1];
-	if (!defined $r || $r eq '')
-	{	return undef unless $def;
-		$r=$::Options{DefaultRating};
-	}
-	$r=sprintf '%d',$r*NBSTARS/100;
-	return $pixbufs[$r];
-}
-
 
 
 package Layout::Progress;

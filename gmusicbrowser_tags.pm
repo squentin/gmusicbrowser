@@ -1086,7 +1086,7 @@ sub new
 	my $adj=Gtk2::Adjustment->new(0,0,100,10,20,0);
 	my $spin=Gtk2::SpinButton->new($adj,10,0);
 	my $check=Gtk2::CheckButton->new(_"use default");
-	my $stars=Stars->new($init,\&update_cb);
+	my $stars=Stars->new($field,$init,\&update_cb);
 
 	$self->pack_start($_,0,0,0) for $stars,$spin,$check;
 	$self->{stars}=$stars;
