@@ -1,3 +1,10 @@
+gmusicbrowser (1.1.5ppa25) lucid; urgency=low
+  * new features: (long-awaited) cover-autofinding, a new grey trayicon and
+    various fixes from git upstream (commit fffb2fdb7e1b14aa8ca2 - 2010-11-30)
+    for a complete changelog see: github.com/ochosi/gmusicbrowser
+    
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Wed, 01 Dec 2010 01:43:02 +0100
+
 gmusicbrowser (1.1.5ppa24) lucid; urgency=low
   * fix broken artistinfo events formatting
     various fixes from git upstream (commit dcf6317bbc9cfacd9a22 - 2010-11-10)
