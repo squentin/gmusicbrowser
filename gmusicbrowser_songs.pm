@@ -1405,7 +1405,7 @@ sub Makesub
 }
 sub Stars
 {	my ($gid,$field)=@_;
-	return undef if !defined $gid || $gid eq '';
+	return undef if !defined $gid || $gid eq '' || $gid==255;
 	my $pb= $Def{$field}{pixbuf} || $Def{'rating'}{pixbuf};
 	return $pb->[ sprintf("%d",$gid/100*$#$pb) ];
 }

@@ -3660,7 +3660,7 @@ sub callback
 sub set
 {	my ($self,$nb)=@_;
 	$self->{nb}=$nb;
-	$nb=$::Options{DefaultRating} if !defined $nb || $nb eq '';
+	$nb=$::Options{DefaultRating} if !defined $nb || $nb eq '' || $nb==255;
 	$self->set_tooltip_text(_("Song rating")." : $nb %");
 	my $pixbuf= Songs::Stars($nb,$self->{field});
 	$self->{width}= $pixbuf->get_width;
