@@ -18,21 +18,27 @@ package GMB::Plugin::ARTISTINFO;
 use strict;
 use warnings;
 use utf8;
-require 'simple_http.pm';
-our @ISA;
-BEGIN {push @ISA,'GMB::Context';}
-use base 'Gtk2::VBox';
-use base 'Gtk2::HBox';
-use base 'Gtk2::EventBox';
+require $::HTTP_module;
+use base 'Gtk2::Box';
 use constant
 {	OPT	=> 'PLUGIN_ARTISTINFO_', # MUST begin by PLUGIN_ followed by the plugin ID / package name
 };
 
 my %sites =
 (
-	biography => [ 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1'],
-	events => [ 'http://ws.audioscrobbler.com/2.0/?method=artist.getevents&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1'],
-	web => ['weblinks'],
+	biography => 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',
+	events => 'http://ws.audioscrobbler.com/2.0/?method=artist.getevents&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',
+	web => 'weblinks',
+);
+my @External=
+(	['lastfm',	"http://www.last.fm/music/%a",								_"Show Artist page on last.fm"],
+	['wikipedia',	"http://en.wikipedia.org/wiki/%a",							_"Show Artist page on wikipedia"],
+	['youtube',	"http://www.youtube.com/results?search_type=&aq=1&search_query=%a",			_"Search for Artist on youtube"],
+	['amazon',	"http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias=aps&field-keywords=%a",	_"Search amazon.com for Artist"],
+	['google',	"http://www.google.at/search?q=%a",							_"Search google for Artist" ],
+	['allmusic',	"http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=%a",				_"Search allmusic for Artist" ],
+	['pitchfork',	"http://pitchfork.com/search/?search_type=standard&query=%a",				_"Search pitchfork for Artist" ],
+	['discogs',	"http://www.discogs.com/artist/%a",							_"Search discogs for Artist" ],
 );
 
 # lastfm api key 7aa688c2466dc17263847da16f297835
@@ -42,7 +48,7 @@ my %sites =
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
-	#tabicon		=> 'gmb-artistinfo',		# no icon by that name by default (yet)
+	tabicon		=> 'plugin-artistinfo',		# no icon by that name by default (yet)
 	tabtitle	=> _"Artistinfo",
 	saveoptions	=> 'site',
 	schange		=> \&SongChanged,
@@ -58,14 +64,14 @@ sub Stop
 sub new
 {	my ($class,$options)=@_;
 	my $self = bless Gtk2::VBox->new(0,0), $class;
-	
+
 	$self->{$_}=$options->{$_} for qw/site/;
-	if ($self->{site}) { delete $self->{site} unless exists $sites{$self->{site}} } #reset selected site if no longer defined
-	else { $self->{site} = 'biography'; } # biography is the default site
+	delete $self->{site} if $self->{site} && !$sites{$self->{site}}; #reset selected site if no longer defined
+	$self->{site} ||= 'biography';	# biography is the default site
 	my $fontsize=$self->style->font_desc;
 	$self->{fontsize} = $fontsize->get_size / Gtk2::Pango->scale;
 	$self->{artist_esc} = "";
-	
+
 	my $statbox=Gtk2::VBox->new(0,0);
 # TODO use own widget to display artistpic and add left-click image-zoom
 	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,maxsize=>$::Options{OPT.'ArtistPicSize'},click1=>undef,xalign=>0});
@@ -80,15 +86,15 @@ sub new
 	$statbox->pack_start($self->{artistrating},0,0,2);
 	my $stateventbox = Gtk2::EventBox->new;
 	$stateventbox->add($statbox);
-	$stateventbox->{group}="Play";
-	$stateventbox->signal_connect(button_release_event => sub { my ($self, $event) = @_; return unless $event->button == 3; my $ID=::GetSelID($self); ::ArtistContextMenu( Songs::Get_gid($ID,'artists'),{self =>$self, ID=>$ID, mode => 'P'}) if defined $ID; } ); # add right-click artist-contextmenu
+	$stateventbox->{group}= $options->{group};
+	$stateventbox->signal_connect(button_press_event => sub {my ($stateventbox, $event) = @_; return 0 unless $event->button == 3; my $ID=::GetSelID($stateventbox); ::ArtistContextMenu( Songs::Get_gid($ID,'artists'),{ ID=>$ID, self=> $stateventbox, mode => 'B'}) if defined $ID; return 1; } ); # add right-click artist-contextmenu
 
 	my $artistbox = Gtk2::HBox->new(0,0);
 	$artistbox->pack_start($artistpic,1,1,0);
 	$artistbox->pack_start($stateventbox,1,1,0);
-	
+
 	my $textview=Gtk2::TextView->new;
-	$self->signal_connect(map => sub { $_[0]->SongChanged( ::GetSelID($_[0]) ); });
+	$self->signal_connect(map => \&SongChanged);
 	$textview->set_cursor_visible(0);
 	$textview->set_wrap_mode('word');
 	$textview->set_pixels_above_lines(2);
@@ -99,7 +105,7 @@ sub new
 	$textview->signal_connect(motion_notify_event 	=> \&update_cursor_cb);
 	$textview->signal_connect(visibility_notify_event=>\&update_cursor_cb);
 	$textview->signal_connect(query_tooltip => \&update_cursor_cb);
-	
+
 	my $togglebox = Gtk2::HBox->new();
 	my $group;
 	for my $togglebutton
@@ -118,30 +124,28 @@ sub new
 		$group = $item -> get_group;
 		$togglebox->pack_start($item,1,0,0);
 	}
-	
-	my $refresh = ::NewIconButton('reload',"", \&Refresh_cb ,"none","Refresh");
-	$refresh->set_tooltip_text("Refresh");
-	my $savebutton = ::NewIconButton('gtk-save',"",\&Save_text,"none","Save");
-	$savebutton->set_tooltip_text("Save artist biography");
-	
+
+	my $refresh =	::NewIconButton('gtk-refresh',undef, \&Refresh_cb ,"none",_"Refresh");
+	my $savebutton =::NewIconButton('gtk-save',   undef, \&Save_text,  "none",_"Save artist biography");
+
 	$togglebox->pack_start($refresh,0,0,0);
-	if ($::Options{OPT.'AutoSave'} != 1) { $togglebox->pack_start($savebutton,0,0,0); }
+	if (!$::Options{OPT.'AutoSave'}) { $togglebox->pack_start($savebutton,0,0,0); }
 	$statbox->pack_start($togglebox,0,0,0);
 	$self->{buffer}=$textview->get_buffer;
 	$self->{textview}=$textview;
-	
+
 	my $sw=Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type( $options->{shadow} || 'none');
 	$sw->set_policy('automatic','automatic');
 	$sw->add($textview);
-	
+
 	my $infobox = Gtk2::HBox->new;
-	$infobox->set_spacing("0");
+	$infobox->set_spacing(0);
 	$infobox->pack_start($sw,1,1,0);
-	
+
 	$self->pack_start($artistbox,0,0,0);
 	$self->pack_start($infobox,1,1,0);
-	
+
 	$self->signal_connect(destroy => \&destroy_event_cb);
 	return $self;
 }
@@ -150,7 +154,7 @@ sub toggled_cb
 {	my ($self, $togglebutton,$textview) = @_;
 	if ($togglebutton -> get_active) {
 		$self->{site} = $togglebutton->{key};
-		SongChanged($togglebutton);
+		$self->SongChanged;
 		$textview->set_tooltip_text($self->{site}) if $self->{site} ne "events";
 	}
 }
@@ -173,23 +177,21 @@ sub prefbox
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
 	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text1=>_"Artist Picture Size : ", text2=>_"(applied after restart)");
-	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", width=>50, tip => "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'");
-	my $lastfmimage=Gtk2::Image->new_from_stock("artistinfo-lastfm",'dnd');
+	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", width=>50, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'");
+	my $lastfmimage=Gtk2::Image->new_from_stock("plugin-artistinfo-lastfm",'dnd');
 	my $lastfm=Gtk2::Button->new;
 	$lastfm->set_image($lastfmimage);
-	$lastfm->set_tooltip_text("Open last.fm website in your browser");
-	$lastfm->signal_connect(clicked => sub { Lookup_cb("http://www.last.fm/music/") } );
+	$lastfm->set_tooltip_text(_"Open last.fm website in your browser");
+	$lastfm->signal_connect(clicked => sub { ::main::openurl("http://www.last.fm/music/"); } );
 	$lastfm->set_relief("none");
 	my $description=Gtk2::Label->new;
-	$description->set_markup("For information on how to use this plugin, please navigate to the <a href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>.");
+	$description->set_markup(_"For information on how to use this plugin, please navigate to the <a href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>.");
 	$description->set_line_wrap(1);
 	$titlebox->pack_start($description,1,1,0);
 	$titlebox->pack_start($lastfm,0,0,5);
 	my $optionbox=Gtk2::VBox->new(0,2);
 	$optionbox->pack_start($_,0,0,1) for $entry,$preview,$autosave,$picsize,$eventformat;
-	my $frame=Gtk2::Frame->new(_"Options");
-	$frame->add($optionbox);
-	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$frame;
+	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$optionbox;
 	return $vbox;
 }
 
@@ -205,7 +207,7 @@ sub set_buffer
 	$self->{buffer}->set_text("");
 	my $iter=$self->{buffer}->get_start_iter;
 	my $fontsize=$self->{fontsize};
-	my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
+	my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
 	$self->{buffer}->insert_with_tags($iter,"\n$text",$tag_noresults);
 	$self->{buffer}->set_modified(0);
 }
@@ -253,38 +255,30 @@ sub ExternalLinks
 	my $buffer = $self -> {buffer};
 	$buffer->set_text("");
 	my $fontsize = $self->{fontsize};
-	my $tag_header = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
-	my $centered = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER');
+	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
+	my $centered = $buffer->create_tag(undef,justification=>'center');
 	my $iter=$buffer->get_start_iter;
-	$buffer->insert_with_tags($iter,"Search for artist on the web:\n\n",$tag_header);
+	$buffer->insert_with_tags($iter,_("Search for artist on the web:")."\n\n",$tag_header);
 	my $i = 1;
 	my $artist = $self->{artist_esc};
-	for my $linkbutton
-	(	['artistinfo-lastfm', sub { ::main::openurl("http://www.last.fm/music/$artist") }, "Show Artist page on last.fm"],
-		['artistinfo-wikipedia',sub { ::main::openurl("http://en.wikipedia.org/wiki/$artist") }, "Show Artist page on wikipedia"],
-		['artistinfo-youtube',sub { ::main::openurl("http://www.youtube.com/results?search_type=&aq=1&search_query=$artist") }, "Search for Artist on youtube"],
-		['artistinfo-amazon',sub { ::main::openurl("http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=$artist") }, "Search amazon.com for Artist"],
-		['artistinfo-google',sub { ::main::openurl("http://www.google.at/search?q=$artist") }, "Search google for Artist" ],
-		['artistinfo-allmusic',sub {::main::openurl("http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=$artist") }, "Search allmusic for Artist" ],
-		['artistinfo-pitchfork', sub { ::main::openurl("http://pitchfork.com/search/?search_type=standard&query=$artist") }, "Search pitchfork for Artist" ],
-		['artistinfo-discogs', sub { ::main::openurl("http://www.discogs.com/artist/$artist") }, "Search discogs for Artist" ],
-	)
+	for my $linkbutton (@External)
 	{	if ($i==5) {$buffer->insert($iter,"\n"); }
 		$i++;
-		my ($stock,$cb,$tip)=@$linkbutton;
+		my ($stock,$url,$tip)=@$linkbutton;
 		my $item=Gtk2::Button->new;
-		my $image=Gtk2::Image->new_from_stock($stock,'dnd');
+		my $image=Gtk2::Image->new_from_stock("plugin-artistinfo-".$stock,'dnd');
 		$item->set_image($image);
 		$item->set_tooltip_text($tip);
 		$item->set_relief("none");
-		$item->signal_connect(clicked => $cb);
+		$url=~s/%a/$artist/;
+		$item->signal_connect(clicked => sub { ::main::openurl($_[1]); }, $url);
 		$buffer->insert_with_tags($iter,"  ",$centered);
 		my $anchor = $buffer->create_child_anchor($iter);
 		$self->{textview}->add_child_at_anchor($item,$anchor);
 		$buffer->insert_with_tags($iter,"  ",$centered);
 		$item->show_all;
 	}
-	
+
 	$buffer->set_modified(0);
 }
 
@@ -311,12 +305,12 @@ sub ArtistChanged
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
 	$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);
 	my $tip = "Average rating: ".$self->{artistratingvalue} ."\nRating range: ".$self->{artistratingrange}."\nTotal playcount: ".$self->{artistplaycount};
-	
-	$self->{artistrating}->set_from_pixbuf(Stars::get_pixbuf($self->{artistratingvalue},1));
+
+	$self->{artistrating}->set_from_pixbuf(Songs::Stars($self->{artistratingvalue},'rating'));
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($aID,"<big><b>%a</b></big>","artist",1) );
 	$self->{Lstats}->set_markup( AA::ReplaceFields($aID,'%X « %s'."\n<small>%y</small>","artist",1) );
 	for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
-	
+
 	if (!$force) # if not forced to reload (events, reload-button), check for local file first
 	{	my $file=::pathfilefromformat( ::GetSelID($self), $::Options{OPT.'PathFile'}, undef,1 );
 		if ($file && -r $file)
@@ -324,11 +318,11 @@ sub ArtistChanged
 			return
 		}
 	}
-	
+
 	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
 
-	my ($url)=@{$sites{$self->{site}}};
-	for ($url) { next unless defined $_; s/%a/$artist/; }
+	my $url= $sites{$self->{site}};
+	$url=~s/%a/$artist/;
 	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) {
 		$self->{artist_esc} = $artist;
 		$self->{url} = $url;
@@ -338,12 +332,12 @@ sub ArtistChanged
 
 sub load_url
 {	my ($self,$url)=@_;
-	&set_buffer($self,"Loading...");
+	$self->set_buffer(_"Loading...");
 	$self->cancel;
 	warn "info : loading $url\n" if $::debug;
 	$self->{url}=$url;
 	if ($self->{site} ne "web") { $self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url); }
-	else {	&ExternalLinks($self); }
+	else {	$self->ExternalLinks; }
 }
 
 sub loaded
@@ -362,12 +356,12 @@ sub loaded
 	$data=Encode::decode($encoding,$data) if $encoding;
 	if ($encoding eq 'utf-8') { $data = ::decode_html($data); }
 	my $iter=$buffer->get_start_iter;
-	
+
 	my $fontsize = $self->{fontsize};
-	my $tag_noresults=$buffer->create_tag(undef,justification=>'GTK_JUSTIFY_CENTER',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
-	my $tag_header = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
+	my $tag_noresults=$buffer->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
+	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
 	my ($artistinfo_ok,$infoheader);
-	
+
 	if ($self->{site} eq "biography") {
 		$infoheader = "Artist Biography";
 		$data =~ m/<content><\!\[CDATA\[(.*)/gi;
@@ -384,14 +378,14 @@ sub loaded
 		$self->{infoheader}=$infoheader;
 		$self->{biography} = $data;
 	}
-	
+
 	elsif ($self->{site} eq "events") {
-		
-		my $tag = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'GTK_JUSTIFY_LEFT');
+
+		my $tag = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'left');
 		my @events;
 		if ($data =~ m#total=\"(.*?)\">#g) {
 			if ( $1 == 1) { $infoheader = $1 ." Upcoming Event\n\n"; }
-			elsif ( $1 == 0) { set_buffer($self,"No results found"); return; }
+			elsif ( $1 == 0) { $self->set_buffer("No results found"); return; }
 			else { $infoheader = $1 ." Upcoming Events\n\n"; }
 			$buffer->insert_with_tags($iter,$infoheader,$tag_header) if $infoheader;
 		}
@@ -404,7 +398,7 @@ sub loaded
 			$format =~ s/%(\w+)/$event{$1}/g;
 			$format =~ s#<br>#\n#g;
 			my $offset1 = $iter->get_offset;
-			my $href = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT');
+			my $href = $buffer->create_tag(undef,justification=>'left');
 			$href->{url}=$event{url};
 			my ($first,$rest) = split /\n/,$format,2;
 			$buffer->insert($iter,$first);
@@ -412,7 +406,7 @@ sub loaded
 			$buffer->apply_tag($href,$buffer->get_iter_at_offset($offset1),$buffer->get_iter_at_offset($offset2));
 			$buffer->insert_with_tags($iter,"\n".$rest,$tag) if $rest;
 		}
-		
+
 	}
 
 	$self->Save_text if $::Options{OPT.'AutoSave'} && $artistinfo_ok && $artistinfo_ok==1;
@@ -430,10 +424,9 @@ sub load_file
 		if (my $utf8=Encode::decode_utf8($text)) {$text=$utf8}
 	}
 	my $fontsize=$self->{fontsize};
-	my $tag_header = $buffer->create_tag(undef,justification=>'GTK_JUSTIFY_LEFT',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
-	$text =~ m/<title>(.*?)<\/title>/gi;
+	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
+	$text =~ s/<title>(.*?)<\/title>\n?//i;
 	my $infoheader = $1 . "\n";
-	$text =~ s/<title>(.*?)<\/title>\n//;
 	my $iter=$buffer->get_start_iter;
 	$buffer->insert_with_tags($iter,$infoheader,$tag_header);
         $buffer->insert($iter,$text);
