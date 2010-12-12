@@ -7694,7 +7694,7 @@ sub groupartist	#FIXME optimize PHASE1
 	my $h=Songs::BuildHash('artist',$songs);
 	my $nb=keys %$h;
 	return Songs::Gid_to_Display('artist',(keys %$h)[0]) if $nb==1;
-	my @l=map split(/$::re_artist/o), keys %$h;
+	my @l=map split(/$Songs::Artists_split_re/), keys %$h;
 	my %h2; $h2{$_}++ for @l;
 	my @common;
 	for (@l) { if ($h2{$_}>=$nb) { push @common,$_; delete $h2{$_}; } }
