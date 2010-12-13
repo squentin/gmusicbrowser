@@ -3123,7 +3123,7 @@ sub new
 	my $self = bless $scale->new_with_range(0,$max,$max/10), $class;
 	$self->set_inverted(1) if $scale eq 'Gtk2::VScale';
 	$self->{vertical}= $scale eq 'Gtk2::VScale';
-	$self->{direct_mode}=$opt->{direct_mode};
+	$self->{step_mode}=$opt->{step_mode};
 	$self->set_draw_value(0);
 	$self->signal_connect(button_press_event => \&button_press_cb);
 	$self->signal_connect(button_release_event => \&button_release_cb);
@@ -3141,7 +3141,7 @@ sub set_max
 
 sub button_press_cb
 {	my ($self,$event)=@_;
-	if ($self->{direct_mode})	# short-circuit normal Gtk2::Scale click behaviour
+	if (!$self->{step_mode})	# short-circuit normal Gtk2::Scale click behaviour
 	{	$self->{pressed}= $self->signal_connect(motion_notify_event  => \&update_value_direct_mode);
 		$self->update_value_direct_mode($event);
 		return 1;		# return 1 so that Gtk2::Scale won't get the mouse click
