@@ -1624,13 +1624,13 @@ our @cMenu=
 		submenu => sub { ::BuildMenu(\@::SongCMenu, { mode => 'F', IDs=>$_[0]{filter}->filter }); },
 		isdefined => 'filter',
 	},
-	{ label=> _"Rename folder", code => sub { ::AskRenameFolder($_[0]{utf8pathlist}[0]); }, onlyone => 'utf8pathlist',	test => sub {!$::CmdLine{ro}}, },
-	{ label=> _"Open folder", code => sub { ::openfolder($_[0]{utf8pathlist}[0]); }, onlyone => 'utf8pathlist', },
-	#{ label=> _"move folder", code => sub { ::MoveFolder($_[0]{utf8pathlist}[0]); }, onlyone => 'utf8pathlist',	test => sub {!$::CmdLine{ro}}, },
-	{ label=> _"Scan for new songs", code => sub { ::IdleScan( map(::filename_from_unicode($_), @{$_[0]{utf8pathlist}}) ); },
-		notempty => 'utf8pathlist' },
+	{ label=> _"Rename folder", code => sub { ::AskRenameFolder($_[0]{rawpathlist}[0]); }, onlyone => 'rawpathlist',	test => sub {!$::CmdLine{ro}}, },
+	{ label=> _"Open folder", code => sub { ::openfolder( $_[0]{rawpathlist}[0] ); }, onlyone => 'rawpathlist', },
+	#{ label=> _"move folder", code => sub { ::MoveFolder($_[0]{pathlist}[0]); }, onlyone => 'pathlist',	test => sub {!$::CmdLine{ro}}, },
+	{ label=> _"Scan for new songs", code => sub { ::IdleScan( @{$_[0]{rawpathlist}} ); },
+		notempty => 'rawpathlist' },
 	{ label=> _"Check for updated/removed songs", code => sub { ::IdleCheck(  @{ $_[0]{filter}->filter } ); },
-		isdefined => 'filter', stockicon => 'gtk-refresh', istrue => 'utf8pathlist' }, #doesn't really need utf8pathlist, but makes less sense for non-folder pages
+		isdefined => 'filter', stockicon => 'gtk-refresh', istrue => 'pathlist' }, #doesn't really need pathlist, but makes less sense for non-folder pages
 	{ label=> _"Set Picture",	stockicon => 'gmb-picture',
 		code => sub { my $gid=$_[0]{gidlist}[0]; ::ChooseAAPicture(undef,$_[0]{field},$gid); },
 		onlyone=> 'gidlist',	test => sub { Songs::FilterListProp($_[0]{field},'picture') && $_[0]{gidlist}[0]>0; },
@@ -2569,7 +2569,7 @@ sub row_expanded_changed_cb	#keep track of which rows are expanded
 	my $self=::find_ancestor($treeview,__PACKAGE__);
 	return if $self->{busy};
 	my $expanded=$treeview->row_expanded($path);
-	$path=_treepath_to_foldername($treeview->get_model,$path);
+	$path= ::decode_url(_treepath_to_foldername($treeview->get_model,$path));
 	my $ref=[undef,$self->{hash}];
 	$ref=$ref->[1]{($_ eq '' ? ::SLASH : $_)}  for split /$::QSLASH/o,$path;
 	if ($expanded)
@@ -2595,7 +2595,7 @@ sub selection_changed_cb
 }
 
 sub _MakeFolderFilter
-{	my @paths=@_; #in utf8
+{	my @paths= map ::decode_url($_), @_;
 	s#\\#\\\\#g for @paths;
 	return Filter->newadd(::FALSE,map( 'path:i:'.$_, @paths ));
 }
@@ -2609,7 +2609,8 @@ sub Activate
 sub PopupContextMenu
 {	my ($self,$tv,$event)=@_;
 	my @paths=_get_path_selection($tv);
-	FilterPane::PopupContextMenu($self,$event,{self=>$tv, utf8pathlist => \@paths, filter => _MakeFolderFilter(@paths) });
+	my @raw= map ::decode_url($_), @paths;
+	FilterPane::PopupContextMenu($self,$event,{self=>$tv, rawpathlist=> \@raw, pathlist => \@paths, filter => _MakeFolderFilter(@paths) });
 }
 
 sub _get_path_selection
@@ -2625,7 +2626,7 @@ sub _treepath_to_foldername
 	my @folders;
 	my $iter=$store->get_iter($tp);
 	while ($iter)
-	{	unshift @folders, ::decode_url($store->get_value($iter,0));
+	{	unshift @folders, $store->get_value($iter,0);
 		$iter=$store->iter_parent($iter);
 	}
 	$folders[0]='' if $folders[0] eq ::SLASH;
@@ -2651,9 +2652,14 @@ sub new
 	$treeview->signal_connect(row_expanded  => \&row_expanded_changed_cb);
 	$treeview->signal_connect(row_collapsed => \&row_expanded_changed_cb);
 	#$treeview->{expanded}={}; #not used
-	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
-		( '',Gtk2::CellRendererText->new,'text',0)
-		);
+	my $renderer= Gtk2::CellRendererText->new;
+	my $column=Gtk2::TreeViewColumn->new_with_attributes('',$renderer);
+	$column->set_cell_data_func($renderer, sub
+		{	my (undef,$cell,$store,$iter)=@_;
+			my $folder=::decode_url($store->get($iter,0));
+			$cell->set( text=> ::filename_to_utf8displayname($folder) );
+		});
+	$treeview->append_column($column);
 
 	$self->add($treeview);
 	$self->{treeview}=$treeview;
@@ -2682,11 +2688,11 @@ sub Fill
 	my $iter=$store->append(undef);
 	my $root= ::SLASH;
 	$root='C:' if $^O eq 'MSWin32'; #FIXME Win32 find a way to list the drives
-	$store->set($iter,0,$root);
+	$store->set($iter,0, ::url_escape($root));
 	$self->refresh_path($store->get_path($iter));
 	$treeview->expand_to_path($store->get_path($iter));
 	 #expand to home dir
-	for my $folder (split /$::QSLASH/o,Glib::get_home_dir)
+	for my $folder (split /$::QSLASH/o, ::url_escape(Glib::get_home_dir))
 	{	next if $folder eq '';
 		$iter=$store->iter_children($iter);
 		while ($iter)
@@ -2722,6 +2728,7 @@ sub refresh_path
 	my $onlyfirst=!$treeview->row_expanded($path);
 	my $parent=$store->get_iter($path);
 	my $folder=_treepath_to_foldername($store,$path);
+	$folder= ::decode_url($folder);
 	unless (-d $folder)
 	{	$store->remove($parent);
 		return undef;
@@ -2731,6 +2738,7 @@ sub refresh_path
 	my $iter=$store->iter_children($parent);
 	NEXTDIR: for my $dir (sort grep -d $folder.::SLASH.$_ , readdir $dh)
 	{	next if $dir=~m#^\.#;
+		$dir= ::url_escape($dir);
 		while ($iter)
 		{	my $c= $dir cmp $store->get($iter,0);
 			unless ($c) { $iter=$store->iter_next($iter);next NEXTDIR;}
@@ -2759,7 +2767,7 @@ sub selection_changed_cb
 }
 
 sub _MakeFolderFilter
-{	my @paths=@_; #in utf8 ?
+{	my @paths= map ::decode_url($_), @_;
 	my @list= ::FolderToIDs(0,0,@paths);
 	my $filter= Filter->new('',\@list); #FIXME use a filter on path rather than a list ?
 	return $filter;
@@ -2774,7 +2782,8 @@ sub Activate
 sub PopupContextMenu
 {	my ($self,$tv,$event)=@_;
 	my @paths=_get_path_selection($tv);
-	FilterPane::PopupContextMenu($self,$event,{self=>$tv, utf8pathlist => \@paths, filter => _MakeFolderFilter(@paths) });
+	my @raw= map ::decode_url($_), @paths;
+	FilterPane::PopupContextMenu($self,$event,{self=>$tv, rawpathlist=> \@raw, pathlist => \@paths, filter => _MakeFolderFilter(@paths) });
 }
 
 sub _get_path_selection

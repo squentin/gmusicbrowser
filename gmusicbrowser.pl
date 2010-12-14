@@ -5742,7 +5742,7 @@ sub PrefTags
 }
 
 sub AskRenameFolder
-{	my $parent=shift; #parent is in utf8
+{	my $parent=shift;
 	$parent=~s/([^$QSLASH]+)$//o;
 	my $old=$1;
 	my $dialog=Gtk2::Dialog->new(_"Rename folder", undef,
@@ -5753,20 +5753,24 @@ sub AskRenameFolder
 	$dialog->set_border_width(3);
 	my $entry=Gtk2::Entry->new;
 	$entry->set_activates_default(TRUE);
-	$entry->set_text($old);
+	$entry->set_text( filename_to_utf8displayname($old) );
 	$dialog->vbox->pack_start( Gtk2::Label->new(_"Rename this folder to :") ,FALSE,FALSE,1);
 	$dialog->vbox->pack_start($entry,FALSE,FALSE,1);
 	$dialog->show_all;
 	{	last unless $dialog->run eq 'ok';
 		my $new=$entry->get_text;
 		last if $new eq '';
-		last if $old eq $new;
 		last if $new=~m/$QSLASH/o;	#FIXME allow moving folder
-		$old=filename_from_unicode($parent.$old.SLASH);
+		$old= $parent.$old.SLASH;
 		$new=filename_from_unicode($parent.$new.SLASH);
-		-d $new and ErrorMessage(__x(_"{folder} already exists",folder=>$new)) and last; #FIXME use an error dialog
+		last if $old eq $new;
+		-d $new and ErrorMessage(__x(_"{folder} already exists",folder=> filename_to_utf8displayname($new) )) and last; #FIXME use an error dialog
 		rename $old,$new
-			or ErrorMessage(__x(_"Renaming {oldname}\nto {newname}\nfailed : {error}",oldname=>$old,newname=>$new,error=>$!)) and last; #FIXME use an error dialog
+			or ErrorMessage(__x(_"Renaming {oldname}\nto {newname}\nfailed : {error}",
+				oldname=> filename_to_utf8displayname($old),
+				newname=> filename_to_utf8displayname($new),
+				error=>$!))
+			and last; #FIXME use an error dialog
 		UpdateFolderNames($old,$new);
 	}
 	$dialog->destroy;
@@ -5789,18 +5793,16 @@ sub MoveFolder #FIXME implement
 sub UpdateFolderNames
 {	my ($oldpath,$newpath)=@_;
 	s/$QSLASH+$//o for $oldpath,$newpath;
-	my $pattern= "^\Q$oldpath\E(?:".SLASH.'|$)';
-	my $renamed=Songs::AllFilter('path:m:'.$pattern);
-	return unless @$renamed;
+	my $renamed=Songs::AllFilter('path:i:'.$oldpath);
 
-	$pattern=qr/^\Q$oldpath\E/;
+	my $pattern=qr/^\Q$oldpath\E/;
 	my @newpath;
 	for my $ID (@$renamed)
 	{	my $path= Songs::Get($ID,'path');
-		$path=~s/$pattern/$newpath/;	#CHECKME check if works with broken filenames
+		$path=~s/$pattern/$newpath/;
 		push @newpath,$path;
 	}
-	Songs::Set($renamed,'@path'=>\@newpath);
+	Songs::Set($renamed,'@path'=>\@newpath) if @$renamed;
 
 	GMB::Picture::UpdatePixPath($oldpath,$newpath);
 }
