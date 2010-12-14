@@ -69,8 +69,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1005',
- VERSIONSTRING => '1.1.5',
+ VERSION => '1.1006',
+ VERSIONSTRING => '1.1.6',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
@@ -316,8 +316,6 @@ BEGIN
 
 #our $re_spaces_unlessinbrackets=qr/([^( ]+(?:\(.*?\))?)(?: +|$)/; #breaks "widget1(options with spaces) widget2" in "widget1(options with spaces)" and "widget2" #replaced by ExtractNameAndOptions
 
-our $re_artist; #regular expression used to split artist name into multiple artists, defined at init by the option ArtistSplit, may not be changed afterward because it is used with the /o option (faster)
-
 my ($browsercmd,$opendircmd);
 
 our %QActions=		#icon		#short		#long description
@@ -447,6 +445,25 @@ our @TrayMenu=
 	{ label=> _"Settings",		code => \&PrefDialog,	stockicon => 'gtk-preferences' },
 	{ label=> _"Quit",		code => \&Quit,		stockicon => 'gtk-quit' },
 );
+
+our %Artists_split=
+(	'\s*&\s*'		=> "&",
+	'\s*\\+\s*'		=> "+",
+	'\s*\\|\s*'		=> "|",
+	'\s*;\s*'		=> ";",
+	'\s*/\s*'		=> "/",
+	'\s*,\s*'		=> ",",
+	',?\s+and\s+'		=> "and",	#case-sensitive because the user might want to use "And" in artist names that should NOT be splitted
+	',?\s+And\s+'		=> "And",
+	'\s+featuring\s+'	=> "featuring",
+	'\s+feat\.\s+'		=> "feat.",
+);
+our %Artists_from_title=
+(	'\(with\s+([^)]+)\)'		=> "(with X)",
+	'\(feat\.\s+([^)]+)\)'		=> "(feat. X)",
+	'\(featuring\s+([^)]+)\)'	=> "(featuring X)",
+);
+
 
 #a few inactive debug functions
 sub red {}
@@ -799,7 +816,6 @@ our %Options=
 	AutoRemoveCurrentSong	=> 1,
 	Simplehttp_CacheSize	=> 200*1024,
 	CustomKeyBindings	=> {},
-	ArtistSplit		=> ' & |, |;',
 	VolumeStep		=> 10,
 	DateFormat_history	=> ['%c 604800 %A %X 86400 Today %X 60 now'],
 	AlwaysInPlaylist	=> 1,
@@ -1598,12 +1614,18 @@ sub FirstTime
 		%Options= ( %Options, %$opt );
 	}
 
-	$re_artist=qr/ & |, /;
 	Post_Options_init();
 }
 
 
-
+my %artistsplit_old_to_new=	#for versions <= 1.1.5 : to upgrade old ArtistSplit regexp to new default regexp
+(	' & '	=> '\s*&\s*',
+	', '	=> '\s*,\s*',
+	' \\+ '	=> '\s*\\+\s*',
+	'; *'	=> '\s*;\s*',
+	';'	=> '\s*;\s*',
+);
+			
 sub ReadOldSavedTags
 {	my $fh=$_[0];
 	while (<$fh>)
@@ -1627,8 +1649,7 @@ sub ReadOldSavedTags
 	$Options{FolderSchema}=		[split /\x1D/,$Options{FolderSchema}];
 	$Options{LibraryPath}= delete $Options{Path};
 	$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2
-	$Options{ArtistSplit}||=' & |, |;';
-	$re_artist=qr/$Options{ArtistSplit}/;
+	$Options{Artists_split_re}= [ map { $artistsplit_old_to_new{$_}||$_ } grep $_ ne '$', split /\|/, delete $Options{ArtistSplit} ];
 
 	Post_Options_init();
 
@@ -1768,11 +1789,12 @@ sub ReadSavedTags	#load tags _and_ settings
 		SongArray::start_init(); #every SongArray read in Options will be updated to new IDs by SongArray::updateIDs later
 		ReadRefFromLines($lines{Options},\%Options);
 		my $oldversion=delete $Options{version} || VERSION;
-		$Options{ArtistSplit}||=' & |, |;';
-		$re_artist=qr/$Options{ArtistSplit}/;
 		if ($oldversion<1.1005) {delete $Options{$_} for qw/Diacritic_sort gst_volume/;} #cleanup old options
 		$Options{AutoRemoveCurrentSong}= delete $Options{TAG_auto_check_current} if $oldversion<1.1005 && exists $Options{TAG_auto_check_current};
 		$Options{PlayedMinPercent}= 100*delete $Options{PlayedPercent} if exists $Options{PlayedPercent};
+		if ($Options{ArtistSplit}) # for versions <= 1.1.5
+		{	$Options{Artists_split_re}= [ map { $artistsplit_old_to_new{$_}||$_ } grep $_ ne '$', split /\|/, delete $Options{ArtistSplit} ];
+		}
 
 		Post_Options_init();
 
@@ -5489,6 +5511,48 @@ sub PrefAudio_makeadv
 	return $hbox;
 }
 
+sub pref_artists_update_desc
+{	my $button=shift;
+	my $hash= $button->{hash};
+	my $key=  $button->{key};
+	my $text= join '  ',map $hash->{$_}||=qq("$_"), @{ $Options{$key} };
+	$text||= $button->{empty};
+	unless ($button->{label})
+	{	my $label= $button->{label}= Gtk2::Label->new;
+		#$label->set_ellipsize('end');
+		my $hbox=Gtk2::HBox->new(0,0);
+		$hbox->pack_start($label,1,1,2);
+		$hbox->pack_start($_,0,0,2) for Gtk2::VSeparator->new, Gtk2::Arrow->new('down','none');
+		$button->add($hbox);
+	}
+	$button->{label}->set_text($text);
+}
+sub pref_artists_change_cb
+{	my $button= $_[0]{button};
+	my $key= $button->{key};
+	my $l= $Options{$key};
+	my $before=@$l;
+	@$l= grep $_ ne $_[1], @$l;
+	push @$l,$_[1] if $before==@$l;
+	@$l= sort @$l;
+	pref_artists_update_desc($button);
+	Songs::UpdateArtistsRE();
+}
+sub pref_artists_button_cb
+{	my ($button,$event)=@_;
+	my $menu=BuildChoiceMenu
+	(	$button->{hash},
+		check=> sub { $Options{$_[0]{button}{key}} },
+		code => \&pref_artists_change_cb,
+		'reverse'=>1,
+		args => {button=>$button},
+	);
+	$menu->show_all;
+	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
+	1;
+}
+
+
 sub PrefMisc
 {	#Default rating
 	my $DefRating=NewPrefSpinButton('DefaultRating',0,100, step=>10, page=>20, text1=>_"Default rating :", cb=> sub
@@ -5512,16 +5576,28 @@ sub PrefMisc
 	$screensaver->set_sensitive(0) unless findcmd('xdg-screensaver');
 	#shutdown
 	my $shutentry=NewPrefEntry(Shutdown_cmd => _"Shutdown command :", tip => _"Command used when\n'turn off computer when queue empty'\nis selected");
-	#artist splitting
-	my %split=
-	(	' & |, |;'	=> _"' & ' and ', ' and ';'",
-		' & '		=> "' & '",
-		' \\+ '		=> "' + '",
-		'; *'		=> "';'",
-		'$'		=> _"no splitting",
-	);
-	my $asplit=NewPrefCombo(ArtistSplit => \%split, text => _"Split artist names on (needs restart) :");
 
+	#artist splitting
+	my $asplit_label= Gtk2::Label->new(_"Split artist names on :");
+	my $asplit=Gtk2::Button->new;
+	$asplit->set_tooltip_text(_"Used for the Artists field");
+	$asplit->{hash}= \%Artists_split;
+	$asplit->{key}= 'Artists_split_re';
+	$asplit->{empty}= _"no splitting";
+	pref_artists_update_desc($asplit);
+	$asplit->signal_connect(button_press_event=> \&pref_artists_button_cb);
+
+	#artist in title
+	my $atitle_label= Gtk2::Label->new(_"Extract guest artist from title :");
+	my $atitle=Gtk2::Button->new;
+	$atitle->set_tooltip_text(_"Used for the Artists field");
+	$atitle->{hash}= \%Artists_from_title;
+	$atitle->{key}= 'Artists_title_re';
+	$atitle->{empty}= _"ignore title";
+	pref_artists_update_desc($atitle);
+	$atitle->signal_connect(button_press_event=> \&pref_artists_button_cb);
+
+	#date format
 	my $dateex= mktime(5,4,3,2,0,(localtime)[5]);
 	my $datetip= join "\n", _"use standard strftime variables",	_"examples :",
 			map( sprintf("%s : %s",$_,strftime2($_,localtime($dateex))), split(/ *\| */,"%a %b %d %H:%M:%S %Y | %A %B %I:%M:%S %p %Y | %d/%m/%y %H:%M | %X %x | %F %r | %c | %s") ),
@@ -5549,7 +5625,7 @@ sub PrefMisc
 	my $playedpercent= NewPrefSpinButton('PlayedMinPercent'	,0,100,  text1=>_"Threshold to count a song as played :", text2=>"%");
 	my $playedseconds= NewPrefSpinButton('PlayedMinSeconds'	,0,99999,text1=>_"or", text2=>_"seconds");
 
-	my $vbox= Vpack( $checkR1,$checkR2,$checkR4, $DefRating,$ProxyCheck, $asplit,
+	my $vbox= Vpack( $checkR1,$checkR2,$checkR4, $DefRating,$ProxyCheck, [$asplit_label, $asplit],[$atitle_label, $atitle],
 			[0,$datealign,$preview], $screensaver,$shutentry, $always_in_pl,
 			$recent_include_not_played, $volstep, $pixcache,
 			[ $playedpercent, $playedseconds ],

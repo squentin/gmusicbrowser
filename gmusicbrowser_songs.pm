@@ -11,9 +11,8 @@ use warnings;
 package Songs;
 
 #our %Songs;
-#our %Slot; our $SlotCount=0;
 our $IDFromFile;
-#our $re_artist;
+our ($Artists_split_re,$Artists_title_re);
 my (@Missing,$MissingHash,@MissingKeyFields);
 our (%Def,%Types,%FieldTemplates,@Fields,%GTypes,%HSort);
 my %FuncCache;
@@ -111,12 +110,11 @@ our %timespan_menu=
 		's_sort:gid'	=> '__#mainfield#_name[#GID#]',
 		'si_sort:gid'	=> '__#mainfield#_iname[#GID#]',
 		#display	=> '##mainfield#->display#',
-		get_list	=> 'split /$::re_artist/o, ##mainfield#->get#', #use artist field directly, maybe do this for all of artists ?
+		get_list	=> 'my @l=( ##mainfield#->get#, grep(defined, #title->get# =~ m/$Artists_title_re/g) ); my %h; grep !$h{$_}++, map split(/$Artists_split_re/), @l;',
 		gid_to_get	=> '(#GID#!=1 ? __#mainfield#_name[#GID#] : "")', # or just '__#mainfield#_name[#GID#]' ?
 		gid_to_display	=> '__#mainfield#_name[#GID#]',
-		update	=> 'my @list= split /$::re_artist/o, ##mainfield#->get#;
-			my @ids;
-			for my $name (@list)
+		update	=> 'my @ids;
+			for my $name (do{ #get_list# })
 			{	my $id= ##mainfield#->sgid_to_gid(VAL=$name)#;
 				push @ids,$id;
 			}
@@ -131,7 +129,7 @@ our %timespan_menu=
 		'filter:~'	=> '(ref #_# ?  (grep $_ .==. #VAL#, @{#_#}) : (#_# .==. #VAL#))',#FIXME use simpler/faster version if perl5.10 (with ~~)
 		'filter_prep:~'	=> '##mainfield#->filter_prep:~#',
 		'filter_prephash:~' => '##mainfield#->filter_prephash:~#',
-		'filter_simplify:~' => sub { split /$::re_artist/o,$_[0] },
+		'filter_simplify:~' => sub { split /$Artists_split_re/,$_[0] },
 		'filter:h~'	=> '(ref #_# ?  (grep .!!. exists $hash#VAL#->{$_+0}, @#_#) : (.!!. exists $hash#VAL#->{#_#+0}))',
 		gid_search	=> '__#mainfield#_name[#GID#] =~ m/#RE#/',
 		gid_isearch	=> '__#mainfield#_iname[#GID#] =~ m/#RE#/',
@@ -485,7 +483,7 @@ our %timespan_menu=
 	can_group=>1,
  },
  artists =>
- {	flags => 'l',	type	=> 'artists',	depend	=> 'artist',	name => _"Artists",
+ {	flags => 'l',	type	=> 'artists',	depend	=> 'artist title',	name => _"Artists",
 	all_count=> _"All artists",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
@@ -852,7 +850,7 @@ our %GTypes= #FIXME could be better
 	#year	=> {code => '__H__{__YEAR__}=undef',	after=>'delete __H__{""}; my @l=sort { $a <=> $b } keys %{__H__}; __H__= @l==0 ? "" : @l==1 ? $l[0] : "$l[0] - $l[-1]";',	depend=>'year',	},
 	#label	=> {code => '__H__{$_}=undef for split /\x00/,__LABEL__;',	after=>'__H__=[keys %{__H__}];',	depend=>'label',	},
 	#album	=> {code => '__H__{__ALBUM__}=undef',	after=>'__H__=[keys %{__H__}];',	depend=>'album',},
-	#artist	=> {code => '__H__{$_}=undef for split /$::re_artist/o,__ARTIST__;',	after=>'__H__=[keys %{__H__}];',	depend=>'artist',	},
+	#artist	=> {code => '__H__{$_}=undef for split /$Artists_split_re/,__ARTIST__;',	after=>'__H__=[keys %{__H__}];',	depend=>'artist',	},
 );
 
 # discname
@@ -1026,6 +1024,7 @@ sub UpdateFuncs
 	my %_depended_on_by; my %_properties;
 
 	Field_Apply_options();
+	CompileArtistsRE();
 
 	my @todo=grep !$Def{$_}{disable}, keys %Def;
 	while (@todo)
@@ -1619,6 +1618,21 @@ sub UpdateDefaultRating
 {	my $l=AllFilter('rating:e:');
 	Changed({'rating'},$l) if @$l;
 }
+sub UpdateArtistsRE
+{	CompileArtistsRE();
+	Songs::Changed({artist=>1}, [FIRSTID..$LastID]);
+}
+sub CompileArtistsRE
+{	my $ref1= $::Options{Artists_split_re} ||= ['\s*&\s*', '\s*;\s*', '\s*,\s*', '\s*/\s*'];
+	$Artists_split_re= join '|', @$ref1;
+	$Artists_split_re||='$';
+	$Artists_split_re=qr/$Artists_split_re/;
+
+	my $ref2= $::Options{Artists_title_re} ||= ['\(with\s+([^)]+)\)', '\(feat\.\s+([^)]+)\)'];
+	$Artists_title_re= join '|', @$ref2;
+	$Artists_title_re||='^\x00$';
+	$Artists_title_re=qr/$Artists_title_re/;
+}
 
 sub DateString
 {	my $time=shift;
@@ -1640,7 +1654,7 @@ sub DateString
 #	my %h; $h{ Get($_[0],'artist') }=undef for @{AA::GetIDs('album',$alb)};
 #	my $nb=keys %h;
 #	return Get($_[0],'artist') if $nb==1;
-#	my @l=map split(/$::re_artist/o), keys %h;
+#	my @l=map split(/$Artists_split_re/), keys %h;
 #	my %h2; $h2{$_}++ for @l;
 #	my @common;
 #	for (@l) { if ($h2{$_}>=$nb) { push @common,$_; delete $h2{$_}; } }
