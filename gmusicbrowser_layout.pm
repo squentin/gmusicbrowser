@@ -3123,7 +3123,7 @@ sub new
 	my $self = bless $scale->new_with_range(0,$max,$max/10), $class;
 	$self->set_inverted(1) if $scale eq 'Gtk2::VScale';
 	$self->{vertical}= $scale eq 'Gtk2::VScale';
-	#$self->{max}= $max;
+	$self->{max}= $max;
 	$self->{step_mode}=$opt->{step_mode};
 	$self->set_draw_value(0);
 	$self->signal_connect(button_press_event => \&button_press_cb);
