@@ -5762,7 +5762,7 @@ sub AskRenameFolder
 		last if $new eq '';
 		last if $new=~m/$QSLASH/o;	#FIXME allow moving folder
 		$old= $parent.$old.SLASH;
-		$new=filename_from_unicode($parent.$new.SLASH);
+		$new= $parent.filename_from_unicode($new).SLASH;
 		last if $old eq $new;
 		-d $new and ErrorMessage(__x(_"{folder} already exists",folder=> filename_to_utf8displayname($new) )) and last; #FIXME use an error dialog
 		rename $old,$new
