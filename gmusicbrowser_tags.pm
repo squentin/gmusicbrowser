@@ -583,7 +583,7 @@ sub autofill_check
 	my $store=$combo->get_model;
 	$store->clear;
 	$store->set( $store->append, 0, ::PangoEsc(_"Auto fill based on filenames ..."));
-	my @files= Songs::Map('barefilename',$self->{IDs});
+	my @files= map ::filename_to_utf8displayname($_), Songs::Map('barefilename',$self->{IDs});
 	autofill_user_formats();
 	for my $ref (@FORMATS_user,@FORMATS)
 	{	my ($format,$re)=@$ref;
