@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2010-10-31 23:56+0100\n"
-"PO-Revision-Date: 2010-11-14 09:46+0100\n"
+"POT-Creation-Date: 2010-12-13 19:34+0100\n"
+"PO-Revision-Date: 2010-12-18 04:41+0100\n"
 "Last-Translator: Vašek Kovářík <L3D9Z6@seznam.cz>\n"
 "Language-Team: Czech\n"
 "MIME-Version: 1.0\n"
@@ -150,9 +150,6 @@ msgstr "%n dlouho nepřeskakovaných"
 msgid "%n shortest"
 msgstr "%n nejkratších"
 
-msgid "' & ' and ', ' and ';'"
-msgstr "' & ' a ', ' a ';'"
-
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' existuje. Přepsat ?"
 
@@ -167,6 +164,9 @@ msgstr "(: )jakýkoliv"
 
 msgid "(: )none"
 msgstr "(: )žádný"
+
+msgid "(applied after restart)"
+msgstr "(vyžaduje restart)"
 
 msgid "(case insensitive)"
 msgstr "(nedostupné)"
@@ -452,6 +452,9 @@ msgstr "Interpret"
 msgid "Artist & album"
 msgstr "Interpret & album"
 
+msgid "Artist Picture Size : "
+msgstr "Velikost obrázku interpreta :"
+
 msgid "Artist URL"
 msgstr "URL interpreta"
 
@@ -463,6 +466,12 @@ msgstr "Interpret,album,disk,stopa"
 
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "Interpret,rok,album,disk,stopa"
+
+msgid "Artistinfo"
+msgstr "Informace o interpretovi"
+
+msgid "Artistinfo plugin"
+msgstr "Zásuvný modul Informace o interpretovi"
 
 msgid "Artists"
 msgstr "Interpreti"
@@ -500,6 +509,9 @@ msgstr "Automatické ukládání výsledků hledání"
 msgid "Auto-scroll"
 msgstr "Automatický posun"
 
+msgid "Auto-select Pictures"
+msgstr "Automatický výběr obrázků"
+
 msgid "Automatically remove current song if not found"
 msgstr "Automaticky odstranit stávající skladbu, pokud nebyla nalezena"
 
@@ -523,6 +535,9 @@ msgstr "Základní složka :"
 
 msgid "Begin with"
 msgstr "Začít s"
+
+msgid "Below"
+msgstr "Níže"
 
 msgid "Bitrate"
 msgstr "Datový tok"
@@ -595,6 +610,9 @@ msgstr "Dostupná položka"
 msgid "Categories pane"
 msgstr "Okno Kategorie"
 
+msgid "Centered"
+msgstr "Zarovnáno"
+
 msgid "Centered on"
 msgstr "Zarovnáno na"
 
@@ -648,6 +666,12 @@ msgstr "Vybrat soubory"
 
 msgid "Choose folder to add"
 msgstr "Vybrat složku pro přidání"
+
+msgid "Choose font for lyrics"
+msgstr "Vybrat typ písma pro texty"
+
+msgid "Choose font..."
+msgstr "Vybrat typ písma..."
 
 msgid "Choose icon for label {name}"
 msgstr "Vybrat ikonu pro štítek {name}"
@@ -999,11 +1023,21 @@ msgstr "Přidat do fronty seznam souborů/složek"
 msgid "Enqueue filter"
 msgstr "Přidat do fronty filtr"
 
+msgid "Enter custom event string :"
+msgstr "Vložit uživatelský řetězec události :"
+
 msgid "Equalizer"
 msgstr "Ekvalizér"
 
 msgid "Error :"
 msgstr "Chyba :"
+
+msgid ""
+"Error saving artistbio in '{file}' :\n"
+"{error}"
+msgstr ""
+"Chyba ukládání biografie interpreta do '{file}' :\n"
+"{error}"
 
 msgid ""
 "Error saving lyrics in '{file}' :\n"
@@ -1041,6 +1075,9 @@ msgstr "Exportovat do souboru .m3u"
 
 msgid "Extra gain"
 msgstr "Extra zisk"
+
+msgid "Extract guest artist from title :"
+msgstr "Vyčlenit hostujícího interpreta z názvu :"
 
 msgid "Fade-out"
 msgstr "Slábnout"
@@ -1147,6 +1184,17 @@ msgstr "Následovat vybranou skladbu"
 
 msgid "Font size"
 msgstr "Velikost písma"
+
+msgid ""
+"For information on how to use this plugin, please navigate to the <a "
+"href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
+"artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/"
+"dokuwiki/'>gmusicbrowser-wiki</a>."
+msgstr ""
+"Pro návod k použití tohoto zásuvného modulu přejít <a href='http://"
+"gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>wiki stránku "
+"zásuvných modulů</a> v <a href='http://gmusicbrowser.org/"
+"dokuwiki/'>gmusicbrowser-wiki</a>."
 
 msgid "Forward"
 msgstr "Vpřed"
@@ -1257,6 +1305,9 @@ msgstr "Chybný výraz"
 msgid "Invisible hot spot"
 msgstr "Neviditelný hot spot"
 
+msgid "Justified"
+msgstr "Do bloku"
+
 msgid "KB"
 msgstr "KB"
 
@@ -1317,6 +1368,9 @@ msgstr "Rozložení :"
 msgid "Layouts"
 msgstr "Vzhled"
 
+msgid "Left aligned"
+msgstr "Zarovnat vlevo"
+
 msgid "Left pane"
 msgstr "Levý panel"
 
@@ -1364,6 +1418,9 @@ msgstr "Seznamy, knihovna & kontext"
 
 msgid "Literal search"
 msgstr "Písmenné vyhledávání"
+
+msgid "Load/Save Artist Info in :"
+msgstr "Načíst/uložit biografii interpreta do:"
 
 msgid "Load/Save lyrics in :"
 msgstr "Načíst/uložit texty do :"
@@ -1430,6 +1487,9 @@ msgstr "Texty"
 
 msgid "Lyrics (requires lyrics plugin)"
 msgstr "Texty (vyžaduje zásuvný modul texty)"
+
+msgid "Lyrics alignement"
+msgstr "Zarovnání textů"
 
 msgid "Lyrics for "
 msgstr "Text pro"
@@ -1714,6 +1774,9 @@ msgstr "Otevřít existující seznam"
 
 msgid "Open folder"
 msgstr "Otevřít složku"
+
+msgid "Open last.fm website in your browser"
+msgstr "Otevřít stránku last.fm v prohlížeči"
 
 msgid "Open link in Browser"
 msgstr "Otevřít odkaz v prohlížeči"
@@ -2001,9 +2064,6 @@ msgstr "Hodnocení (obrázek)"
 msgid "Rating between 0 and 100, or empty for default"
 msgstr "Hodnotit od 0 do 100, prázdné pro výchozí"
 
-msgid "Rating picture"
-msgstr "Hodnocení obrázku"
-
 msgid "Re-read tags"
 msgstr "Znovu načíst popisky"
 
@@ -2178,6 +2238,12 @@ msgstr "Vynulovat filtr"
 msgid "Rewind"
 msgstr "Převinout"
 
+msgid "Right aligned"
+msgstr "Zarovnat vpravo"
+
+msgid "Right side"
+msgstr "Vpravo"
+
 msgid "Rip"
 msgstr "Rip"
 
@@ -2210,6 +2276,9 @@ msgstr "Uložit"
 
 msgid "Save Tags/Options"
 msgstr "Uložit popisky/nastavení"
+
+msgid "Save artist biography"
+msgstr "Uložit biografii interpreta"
 
 msgid "Save as..."
 msgstr "Uložit jako..."
@@ -2308,11 +2377,26 @@ msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
 msgstr ""
 "Vyhledat titul, interpreta, album, komentář, štítek, žánr a název souboru"
 
+msgid "Search allmusic for Artist"
+msgstr "Vyhledat interpreta na stránkách allmusic"
+
+msgid "Search amazon.com for Artist"
+msgstr "Vyhledat interpreta na stránkách amazon.com"
+
 msgid "Search and display lyrics"
 msgstr "Vyhledat a zobrazit texty"
 
+msgid "Search discogs for Artist"
+msgstr "Vyhledat interpreta na stránkách discogs"
+
+msgid "Search for Artist on youtube"
+msgstr "Vyhledat interpreta na stránkách youtube"
+
 msgid "Search for a picture on internet"
 msgstr "Vyhledat obrázek na internetu"
+
+msgid "Search for artist on the web:"
+msgstr "Vyhledat interpreta na stránkách :"
 
 msgid "Search for current album"
 msgstr "Vyhledat stávající album"
@@ -2323,8 +2407,17 @@ msgstr "Vyhledat stávajícího interpreta"
 msgid "Search for new songs on startup"
 msgstr "Vyhledat nové skladby při spuštění"
 
+msgid "Search google for Artist"
+msgstr "Použít google pro vyhledání interpreta"
+
 msgid "Search options"
 msgstr "Možnosti hledání"
+
+msgid "Search pitchfork for Artist"
+msgstr "Vyhledat interpreta na stránkách pitchfork"
+
+msgid "Search the web for artist"
+msgstr "Vyhledat interpreta na internetu"
 
 msgid "Search window layout :"
 msgstr "Styl okna hledání :"
@@ -2355,6 +2448,9 @@ msgstr "Vybráno :"
 
 msgid "Selected songs"
 msgstr "Vybrané skladby"
+
+msgid "Selecting pictures"
+msgstr "Výběr obrázků"
 
 msgid "Seller"
 msgstr "Prodejce"
@@ -2406,6 +2502,18 @@ msgstr "Shift"
 
 msgid "Show"
 msgstr "Zobrazit"
+
+msgid "Show Artist page on last.fm"
+msgstr "Zobrazit stránky interpreta na last.fm"
+
+msgid "Show Artist page on wikipedia"
+msgstr "Zobrazit stránky interpreta na wikipedii"
+
+msgid "Show artist's biography"
+msgstr "Zobrazit biografii interpreta"
+
+msgid "Show artist's upcoming events"
+msgstr "Zobrazit nadcházející plánované akce interpreta"
 
 msgid "Show buttons"
 msgstr "Zobrazit tlačítka"
@@ -2494,8 +2602,8 @@ msgstr "Edice režimu třídění"
 msgid "Sort order"
 msgstr "Třídit pořadí"
 
-msgid "Split artist names on (needs restart) :"
-msgstr "Rozdělit název interpreta na (vyžaduje restart) :"
+msgid "Split artist names on :"
+msgstr "Rozdělit jména interpreta na :"
 
 msgid "Standard fields"
 msgstr "Standardní pole"
@@ -2511,6 +2619,9 @@ msgstr "Zastavit kontrolu"
 
 msgid "Stop scanning"
 msgstr "Zastavit prohledávání"
+
+msgid "Stop selecting pictures"
+msgstr "Zastavit výběr obrázků"
 
 msgid "Stop when queue empty"
 msgstr "Zastavit po vyprázdnění fronty"
@@ -2586,6 +2697,13 @@ msgstr[2] "Tento štítek je nastaven pro %d skladeb."
 
 msgid "This plugin requires :"
 msgstr "Tento zásuvný modul vyžaduje :"
+
+msgid ""
+"This plugin retrieves artist-relevant information (biography, upcoming "
+"events) from last.fm."
+msgstr ""
+"Tento zásuvný modul vyhledává informace příslušné interpretovi (biografie, "
+"plánované akce) na last.fm"
 
 msgid "Threshold to count a song as played :"
 msgstr "Limit počítání skladby jako přehrané :"
@@ -2720,6 +2838,15 @@ msgstr "Použít gstreamer"
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "U ID3v2 popisků použít kódování latin1 pokud je dostupné "
 
+msgid ""
+"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
+"furthermore linebreaks '<br>' and any text you'd like to have in between. E."
+"g. '%title taking place at %startDate<br>in %city, %country<br><br>'"
+msgstr ""
+"Použít popisky ze stránek akcí  XML last.fm s předchozím % (např. %"
+"headliner), dále zalomení řádků '<br>' a libovolný text mezi. Např. '%title "
+"vystupující dne %startDate<br>v %city, %country<br><br>'"
+
 msgid "Use the playing filter"
 msgstr "Použít přehrávaný filtr"
 
@@ -2734,6 +2861,9 @@ msgstr "Pro přehrání souborů {ext} použít {command}"
 
 msgid "Used for clipping prevention"
 msgstr "Použito k prevenci ořezu"
+
+msgid "Used for the Artists field"
+msgstr "Použít pro pole interpret"
 
 msgid "Used to associate the saved value with a user or a function"
 msgstr "Použito k přiřazení uložené hodnoty k uživateli nebo funkci"
@@ -2962,6 +3092,9 @@ msgstr "mezi %n( a )%n"
 msgid "big size"
 msgstr "velká velikost"
 
+msgid "biography"
+msgstr "biografie"
+
 msgid "bitrate"
 msgstr "datový tok"
 
@@ -3103,6 +3236,9 @@ msgstr "umožnit přehrávání bez mezer (pokusně)"
 msgid "error"
 msgstr "chyba"
 
+msgid "events"
+msgstr "plánované akce"
+
 msgid "ex :"
 msgstr "ex :"
 
@@ -3177,6 +3313,9 @@ msgstr "server icecast"
 
 msgid "id3v1 tag"
 msgstr "ID3v1 popisek"
+
+msgid "ignore title"
+msgstr "ignorovat název"
 
 msgid "illustration"
 msgstr "ilustrace"
@@ -3494,6 +3633,9 @@ msgstr "při %d"
 msgid "only show entries with at least n songs"
 msgstr "zobrazit jen položky obsahující minimálně n skladeb"
 
+msgid "only works when the artist-info tab is displayed"
+msgstr "Funkční jen pokud je zobrazena záložka informace o interpretovi"
+
 msgid "only works with some lyrics source and when the lyrics tab is displayed"
 msgstr "Funkční pouze s některými texty a pokud je zobrazena záložka textů"
 
@@ -3614,9 +3756,6 @@ msgstr "vteřin"
 msgid "shortest"
 msgstr "nejkratší"
 
-msgid "show info"
-msgstr "zobrazit info"
-
 msgid "show pictures"
 msgstr "zobrazit obrázky"
 
@@ -3658,6 +3797,9 @@ msgstr "podporuje :"
 
 msgid "text format"
 msgstr "formát textu"
+
+msgid "text mode"
+msgstr "režim textu"
 
 msgid "the command {name}"
 msgstr "příkaz '{name}'"
@@ -3742,6 +3884,9 @@ msgstr "vyčkat"
 
 msgid "wait for more when queue empty"
 msgstr "vyčkat na vyprázdnění fronty"
+
+msgid "web"
+msgstr "internet"
 
 msgid "weeks"
 msgstr "týdnů"
@@ -3853,3 +3998,15 @@ msgstr "{song} od {artist}"
 
 msgid "|-separated list of widget names"
 msgstr "|-oddělený seznam názvů pomůcek"
+
+#~ msgid "' & ' and ', ' and ';'"
+#~ msgstr "' & ' a ', ' a ';'"
+
+#~ msgid "Rating picture"
+#~ msgstr "Hodnocení obrázku"
+
+#~ msgid "Split artist names on (needs restart) :"
+#~ msgstr "Rozdělit název interpreta na (vyžaduje restart) :"
+
+#~ msgid "show info"
+#~ msgstr "zobrazit info"
