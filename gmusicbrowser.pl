@@ -4976,8 +4976,14 @@ sub ScanFolder
 		#if (-d $path_file) { push @ToScan,$path_file; next; }
 		if (-d $path_file)
 		{	#next if $notrecursive;
+			# make sure it doesn't look in the same dir twice due to symlinks
 			if (-l $path_file)
 			{	my $real=readlink $path_file;
+				$real= $dir.SLASH.$real unless $real=~m#^$QSLASH#o;
+				$real.=SLASH;				#make it end with a slash to make regexes simpler
+				$real=~s#$QSLASH\.?$QSLASH+#SLASH#goe;					#simplify /./ or //
+				1 while $real=~s#$QSLASH[^$QSLASH]+$QSLASH\.\.$QSLASH#SLASH#oe;		#simplify /folder/../
+				$real=~s#$QSLASH+$##;							#remove trailing slash
 				next if exists $FollowedDirs{$real};
 				$FollowedDirs{$real}=undef;
 			}
