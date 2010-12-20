@@ -450,13 +450,21 @@ sub set_cover
 		$check);
 	}
 	return unless $file;
-	my $fh;
-	until (open $fh,'>',$file)
-	{	my $retry=::Retry_Dialog( ::__x( _"Error writing '{file}'", file => ::filename_to_utf8displayname($file) )." :\n$!." ,$self);
-		return unless $retry eq 'yes';
+
+	#write file
+	{	my $fh;
+		my $ok= open $fh,'>',$file;
+		if ($ok)
+		{	$ok= print $fh $button->{pixdata};
+			unlink $file unless $ok;
+		}
+		unless ($ok)
+		{	my $retry=::Retry_Dialog( ::__x( _"Error writing '{file}'", file => ::filename_to_utf8displayname($file) )." :\n$!." ,$self);
+			redo if $retry eq 'yes';
+			return;
+		}
+		close $fh;
 	}
-	print $fh $button->{pixdata};
-	close $fh;
 	return unless $check->get_active;
 	AAPicture::SetPicture($field,$gid,$file);
 }
