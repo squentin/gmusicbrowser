@@ -23,7 +23,7 @@ my %menuentry=
 (topath =>
  {	label => _"Copy to portable player",	#label of the menu entry
 	code => \&Copy,				#when menu entry selected
-	test => sub {my $p=$::Options{OPT.'path'}; $p && (-d $p || $p=~m/[%\$]/);},	#the menu entry is displayed if returns true
+	test => \&checkvalidpath,	#the menu entry is displayed if returns true
 	notempty => 'IDs',			#display only if at least one song
  },
  tom3u =>
@@ -48,7 +48,7 @@ my %FLmenuentry=
 (topath =>
  {	label => _"Copy to portable player",
 	code => \&Copy,
-	test => sub {my $p=$::Options{OPT.'path'}; $p && (-d $p || $p=~m/[%\$]/);},
+	test => \&checkvalidpath,
 	isdefined => 'filter',
  },
  tom3u =>
@@ -124,9 +124,14 @@ sub updatemenu
 	}
 }
 
+sub checkvalidpath
+{	my $p= ::decode_url($::Options{OPT.'path'});
+	$p && (-d $p || $p=~m/[%\$]/);
+}
 sub Copy
 {	my $IDs=$_[0]{IDs} || $_[0]{filter}->filter;
-	::CopyMoveFiles($IDs,::TRUE,$::Options{OPT.'path'},$::Options{OPT.'folderformat'},$::Options{OPT.'filenameformat'});
+	my $path= ::decode_url( $::Options{OPT.'path'} );
+	::CopyMoveFiles($IDs,::TRUE, $path, $::Options{OPT.'folderformat'},$::Options{OPT.'filenameformat'});
 }
 
 sub ToM3U

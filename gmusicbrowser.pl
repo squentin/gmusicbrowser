@@ -670,6 +670,11 @@ sub ReplaceFields
 sub ReplaceFieldsAndEsc
 {	ReplaceFields($_[0],$_[1],1);
 }
+sub ReplaceFieldsForFilename
+{	# use filename_from_unicode for everything but %o (existing filename in unknown encoding), leave %o as is
+	my $f= ReplaceFields( $_[0], filename_from_unicode($_[1]), \&Glib::filename_from_unicode, {"%o"=> sub { Songs::Get($_[0],'barefilename') }, } );
+	CleanupFileName($f);
+}
 sub MakeReplaceTable
 {	my $fields=$_[0];
 	my $table=Gtk2::Table->new (4, 2, FALSE);
@@ -3713,12 +3718,10 @@ COPYNEXTID:for my $ID (@$IDs)
 			my $res=CreateDir($newdir,$win, $abortmsg );
 			last if $res eq 'abort';
 			next if $res eq 'no';
-			$newdir=filename_from_unicode($newdir);
 		}
 		if ($fnformat)
 		{	$newfile=filenamefromformat($ID,$fnformat,1);
 			next unless defined $newfile;
-			$newfile=filename_from_unicode($newfile);
 		}
 		my $new=$newdir.$newfile;
 		next if $old eq $new;
@@ -4110,7 +4113,7 @@ sub DeleteFiles
 
 sub filenamefromformat
 {	my ($ID,$format,$ext)=@_;
-	my $s= CleanupFileName( ReplaceFields($ID,$format) );
+	my $s= ReplaceFieldsForFilename($ID,$format);
 	if ($ext)
 	{	$s= Songs::Get($ID,'barefilename') if $s eq '';
 		$s.= '.'.Songs::Get($ID,'extension');  #add extension
@@ -4129,10 +4132,10 @@ sub pathfromformat
 	$path=~s#$QSLASH+\.?$QSLASH+#SLASH#goe; 			# remove repeated slashes and /./
 	1 while $path=~s#$QSLASH[^$QSLASH]+$QSLASH\.\.$QSLASH#SLASH#oe;	# handle ..
 	for my $f0 (split /$QSLASH+/o,$format)
-	{	my $f= CleanupFileName( ReplaceFields($ID,$f0) );
+	{	my $f= ReplaceFieldsForFilename($ID,$f0);
 		next if $f=~m/^\.\.?$/;
-		if ($f0 ne $f)
-		{	$f=ICasePathFile($path,$f) if $icase;
+		if ($icase && $f0 ne $f)
+		{	$f=ICasePathFile($path,$f);
 		}
 		$path.=$f.SLASH;
 	}
@@ -4209,8 +4212,12 @@ sub DialogMassRename
 	  {	my (undef,$cell,$store,$iter)=@_;
 		my $ID=$store->get($iter,0);
 		my $text=filenamefromformat($ID,$combo->get_active_text,1);
-		if ($folders) {$text=pathfromformat($ID,$comboFolder->get_active_text, $Options{BaseFolder}).$text; }
-		$cell->set(text=>$text);
+		if ($folders)
+		{	my $base=  decode_url($Options{BaseFolder});
+			my $fmt= $comboFolder->get_active_text;
+			$text= pathfromformat($ID,$fmt,$base) . $text;
+		}
+		$cell->set(text=> filename_to_utf8displayname($text) );
 	  };
 	for ( [$treeview1,_"Old name",$func1], [$treeview2,_"New name",$func2] )
 	{	my ($tv,$title,$func)=@$_;
@@ -4275,13 +4282,13 @@ sub DialogMassRename
 		if ($response eq 'ok')
 		{ my $format=$combo->get_active_text;
 		  if ($folders)
-		  {	my $base= $Options{BaseFolder};
+		  {	my $base0= my $base= decode_url( $Options{BaseFolder} );
 			unless ( defined $base ) { ErrorMessage(_("You must specify a base folder"),$dialog); return }
 			until ( -d $base ) { last unless $base=~s/$QSLASH[^$QSLASH]*$//o && $base=~m/$QSLASH/o;  }
-			unless ( -w $base ) { ErrorMessage(__x(_("Can't write in base folder '{folder}'."), folder => $Options{BaseFolder}),$dialog); return }
+			unless ( -w $base ) { ErrorMessage(__x(_("Can't write in base folder '{folder}'."), folder => filename_to_utf8displayname($base0)),$dialog); return }
 			$dialog->set_sensitive(FALSE);
 			my $folderformat=$comboFolder->get_active_text;
-			CopyMoveFiles(\@IDs,FALSE,$Options{BaseFolder},$folderformat,$format);
+			CopyMoveFiles(\@IDs,FALSE,$base0,$folderformat,$format);
 		  }
 		  elsif ($format)
 		  {	$dialog->set_sensitive(FALSE);
@@ -4294,7 +4301,7 @@ sub DialogMassRename
 
 sub RenameFile
 {	my ($ID,$newutf8,$window,$abortmsg)=@_;
-	my $new=filename_from_unicode(CleanupFileName($newutf8));
+	my $new= CleanupFileName(filename_from_unicode($newutf8));
 	my ($dir,$old)= Songs::Get($ID,qw/path file/);
 	{	last if $new eq '';
 		last if $old eq $new;
@@ -5700,7 +5707,7 @@ sub PrefTags
 }
 
 sub AskRenameFolder
-{	my $parent=shift; #parent is in utf8
+{	my $parent=shift;
 	$parent=~s/([^$QSLASH]+)$//o;
 	my $old=$1;
 	my $dialog=Gtk2::Dialog->new(_"Rename folder", undef,
@@ -5711,20 +5718,24 @@ sub AskRenameFolder
 	$dialog->set_border_width(3);
 	my $entry=Gtk2::Entry->new;
 	$entry->set_activates_default(TRUE);
-	$entry->set_text($old);
+	$entry->set_text( filename_to_utf8displayname($old) );
 	$dialog->vbox->pack_start( Gtk2::Label->new(_"Rename this folder to :") ,FALSE,FALSE,1);
 	$dialog->vbox->pack_start($entry,FALSE,FALSE,1);
 	$dialog->show_all;
 	{	last unless $dialog->run eq 'ok';
 		my $new=$entry->get_text;
 		last if $new eq '';
-		last if $old eq $new;
 		last if $new=~m/$QSLASH/o;	#FIXME allow moving folder
-		$old=filename_from_unicode($parent.$old.SLASH);
-		$new=filename_from_unicode($parent.$new.SLASH);
-		-d $new and ErrorMessage(__x(_"{folder} already exists",folder=>$new)) and last; #FIXME use an error dialog
+		$old= $parent.$old.SLASH;
+		$new= $parent.filename_from_unicode($new).SLASH;
+		last if $old eq $new;
+		-d $new and ErrorMessage(__x(_"{folder} already exists",folder=> filename_to_utf8displayname($new) )) and last; #FIXME use an error dialog
 		rename $old,$new
-			or ErrorMessage(__x(_"Renaming {oldname}\nto {newname}\nfailed : {error}",oldname=>$old,newname=>$new,error=>$!)) and last; #FIXME use an error dialog
+			or ErrorMessage(__x(_"Renaming {oldname}\nto {newname}\nfailed : {error}",
+				oldname=> filename_to_utf8displayname($old),
+				newname=> filename_to_utf8displayname($new),
+				error=>$!))
+			and last; #FIXME use an error dialog
 		UpdateFolderNames($old,$new);
 	}
 	$dialog->destroy;
@@ -5747,18 +5758,16 @@ sub MoveFolder #FIXME implement
 sub UpdateFolderNames
 {	my ($oldpath,$newpath)=@_;
 	s/$QSLASH+$//o for $oldpath,$newpath;
-	my $pattern= "^\Q$oldpath\E(?:".SLASH.'|$)';
-	my $renamed=Songs::AllFilter('path:m:'.$pattern);
-	return unless @$renamed;
+	my $renamed=Songs::AllFilter('path:i:'.$oldpath);
 
-	$pattern=qr/^\Q$oldpath\E/;
+	my $pattern=qr/^\Q$oldpath\E/;
 	my @newpath;
 	for my $ID (@$renamed)
 	{	my $path= Songs::Get($ID,'path');
-		$path=~s/$pattern/$newpath/;	#CHECKME check if works with broken filenames
+		$path=~s/$pattern/$newpath/;
 		push @newpath,$path;
 	}
-	Songs::Set($renamed,'@path'=>\@newpath);
+	Songs::Set($renamed,'@path'=>\@newpath) if @$renamed;
 
 	GMB::Picture::UpdatePixPath($oldpath,$newpath);
 }
@@ -6160,7 +6169,7 @@ sub NewPrefFileEntry
 	{	$widget=Gtk2::ComboBoxEntry->new_text;
 		$entry=$widget->child;
 		my $hist= $Options{$key_history} || [];
-		$widget->append_text($_) for @$hist;
+		$widget->append_text(decode_url($_)) for grep length, @$hist; #won't work with filenames with broken encoding
 	}
 	my $button=NewIconButton('gtk-open');
 	my $hbox=Gtk2::HBox->new;
@@ -6170,28 +6179,39 @@ sub NewPrefFileEntry
 	$hbox->pack_start($_,FALSE,FALSE,2)  for $label,$hbox2;
 	$label->set_alignment(0,.5);
 
+	my $enc_warning=Gtk2::Label->new(_"Warning : using a folder with invalid encoding, you should rename it.");
+	$enc_warning->set_no_show_all(1);
+	my $vbox=Gtk2::VBox->new(FALSE,0);
+	$vbox->pack_start($hbox,FALSE,FALSE,0);
+	$vbox->pack_start($enc_warning,FALSE,FALSE,2);
+
 	if ($sg1) { $sg1->add_widget($label); $label->set_alignment(0,.5); }
 	if ($sg2) { $sg2->add_widget($hbox2); }
 
 	$entry->set_tooltip_text($tip) if defined $tip;
-	$entry->set_text(filename_to_utf8displayname($Options{$key})) if defined $Options{$key};
+	if (defined $Options{$key})
+	{	$entry->set_text(filename_to_utf8displayname(decode_url($Options{$key})));
+		$enc_warning->show if url_escape($entry->get_text) ne $Options{$key};
+	}
 
 	my $busy;
 	$entry->signal_connect( changed => sub
 	{	return if $busy;
-		SetOption( $key, filename_from_unicode( $_[0]->get_text ));
+		SetOption( $key, url_escape($_[0]->get_text) );
+		$enc_warning->hide;
 		&$cb if $cb;
 	});
 	$button->signal_connect( clicked => sub
 	{	my $file= $folder? ChooseDir($text,$Options{$key}) : undef;
 		return unless $file;
 		# could simply $entry->set_text(), but wouldn't work with filenames with broken encoding
-		SetOption( $key, $file);
+		SetOption( $key, url_escape($file) );
 		$busy=1; $entry->set_text(filename_to_utf8displayname($file)); $busy=undef;
+		if (url_escape($entry->get_text) eq $Options{$key} ) { $enc_warning->hide } else { $enc_warning->show }
 		&$cb if $cb;
 	});
-	$entry->signal_connect( destroy => sub { PrefSaveHistory($key_history,$_[0]->get_text); } ) if $key_history;
-	return $hbox;
+	$entry->signal_connect( destroy => sub { PrefSaveHistory($key_history,url_escape($_[0]->get_text)); } ) if $key_history;
+	return $vbox;
 }
 sub NewPrefSpinButton
 {	my ($key,$min,$max,%opt)=@_;
