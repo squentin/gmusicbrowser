@@ -5171,7 +5171,17 @@ sub AboutDialog
 	$dialog->set_website('http://gmusicbrowser.org');
 	$dialog->set_authors('Quentin Sculo <squentin@free.fr>');
 	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\nelementary icon theme : Simon Steinbeiß");
-	$dialog->set_translator_credits("French : Quentin Sculo and Jonathan Fretin\nHungarian : Zsombor\nSpanish : Martintxo, Juanjo and Elega\nGerman : vlad <donvla\@users.sourceforge.net> & staubi <staubi\@linuxmail.org>\nPolish : tizzilzol team\nSwedish : Olle Sandgren\nChinese : jk");
+	$dialog->set_translator_credits( join "\n", sort
+		'French : Quentin Sculo, Jonathan Fretin, Frédéric Urbain, Brice Boucard & Hornblende',
+		'Hungarian : Zsombor',
+		'Spanish : Martintxo, Juanjo & Elega',
+		'German : vlad <donvla@users.sourceforge.net> & staubi <staubi@linuxmail.org>',
+		'Polish : tizzilzol team',
+		'Swedish : Olle Sandgren',
+		'Chinese : jk',
+		'Czech : Vašek Kovářík',
+		'Portuguese : Gleriston Sampaio <gleriston_sampaio@hotmail.com>',
+	);
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
 }
