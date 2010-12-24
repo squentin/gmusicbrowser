@@ -258,7 +258,7 @@ sub ExternalLinks
 	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
 	my $centered = $buffer->create_tag(undef,justification=>'center');
 	my $iter=$buffer->get_start_iter;
-	$buffer->insert_with_tags($iter,_("Search for artist on the web:")."\n\n",$tag_header);
+	$buffer->insert_with_tags($iter,_("Search the web for artist")." :\n\n",$tag_header);
 	my $i = 1;
 	my $artist = $self->{artist_esc};
 	for my $linkbutton (@External)
