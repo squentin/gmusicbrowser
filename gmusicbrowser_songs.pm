@@ -641,6 +641,12 @@ our %timespan_menu=
 	edit_order=> 90,	edit_many=>1,
 	options	=> 'rw_ userid',
  },
+ ratingnumber =>	#same as rating but returns DefaultRating if rating set to default, will be replaced by rating.number or something in the future
+ {	type	=> 'virtual',
+	flags	=> 'g',
+	depend	=> 'rating',
+	get	=> '#rating->_default#',
+ },
  added	=>
  {	name	=> _"Added",		width => 100,	flags => 'gasc_',	type => 'date',
 	FilterList => {type=>'year', },
