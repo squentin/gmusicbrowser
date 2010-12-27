@@ -135,6 +135,63 @@ Default		= Window(size=1120x820) HPfp1(size=125) HPbig(size=750) HPfp2(size=125)
 HPfp		= _FilterPane0(nb=1) HPfp2
 HPfp2		= _FilterPane1(nb=2) FilterPane2(nb=3)
 
+[itunes++]
+
+    ### based on itunes-like-plus
+
+    ####General
+    Type		= G
+    Default		= Window size=1120x820 VPfp_list 120 HPfp0 300 VPfp_list 200_550
+
+    VSize1		= 90 HBHeader
+    HSize1		= HBRight
+    HSize2		= LockArtist LockAlbum
+
+    ### main layout with notebook tabs
+    VBmain		= MBmenu HBupper _TBupper
+        MBmenu		= MainMenuItem PSortItem PFilterItem QueueItem
+        HBupper		= _VBupper -HBRight
+            VBupper		= _HBHeader
+                HBHeader	= HBButtons _20ABInfo
+                    HBButtons	= Prev Play(side=button) Next
+                    ABInfo		= FRInfo(shadow=etched-out)
+                        FRInfo		= VBInfo
+                            VBInfo		= HBSongInfo HBScale
+                                HBSongInfo	= _VBSongInfo
+                                    VBSongInfo	= _HBTitle _HBArtist _HBAlbum
+                                        HBTitle		= _Title -Stars
+                                        HBArtist	= LockArtist _Artist
+                                        HBAlbum		= LockAlbum _Album -Date
+                                HBScale		= _Scale LabelTime -Length
+            HBRight		= 20VB_search
+                VB_search	= SimpleSearch 15_VolSlider(horizontal=1, hide=0) _Filler
+        TBupper		= _"Library" HPfp_list_src _"Queue" VBQueueList _"Context" Context
+
+    ## Notebook with 3 tabs
+    VBQueueList	= 3_QueueList(activate=playlist) HBQueueAct
+    HBQueueAct	= EditListButtons 10QueueActions
+
+    HPfp_list_src	= VPfilter_cover_artist_progress _VPfp_list
+    VPfp_list	= HPfp0 _VBlist
+
+    VPfilter_cover_artist_progress	= _FilterPane3(nb=1,hide=0) _VP_cover_artist
+
+    VP_cover_artist		= _Cover
+
+    VBlist		= HBstatus _SongTree VProgress
+    HBstatus	= Sort(button=1) Filter(button=1) Refresh ResetFilter PlayFilter QueueFilter -Total
+#    MBlist		= HistItem LSortItem PlayItem
+    HPfp0		= _FilterPane0(nb=2,hide=1,pages=genre) HPfp1
+    HPfp1		= FilterPane1(nb=3,hide=1,pages=artist) FilterPane2(nb=4,hide=1,pages=album)
+
+    VolumeScroll	= HBupper
+
+    [CoverPopup]
+    VBmain		= Cover(minsize=300,maxsize=300,click1=CloseWindow)
+
+    [ArtistPopup]
+    VBmain		= ArtistPic(minsize=300,maxsize=300,click1=CloseWindow)
+
 [itunes-like]
 Type=G+
 Default		= Window(size=1120x820,hidden=QueueList) VPfp_list(size=120) HPfp0(size=300) HPfp_list_src(size=175)
@@ -656,5 +713,4 @@ VBmain = _SongTree(group=Play:first_artist)
 Type= P
 Name=Same year
 VBmain = _SongTree(group=Play:year)
-
 
