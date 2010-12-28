@@ -2937,16 +2937,15 @@ sub CalcListLength	#if $return, return formated string (0h00m00s)
 	}
 }
 
-# http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=%s    artist search
-# http://www.allmusic.com/cg/amg.dll?p=amg&opt1=2&sql=%s    album search
+# http://www.allmusic.com/search/artist/%s    artist search
+# http://www.allmusic.com/search/album/%s    album search
 sub AMGLookup
 {	my ($col,$key)=@_;
-	my $opt1=	$col eq 'artist' ? 1 :
-			$col eq 'album'  ? 2 :
-			$col eq 'title'	 ? 3 : 0;
+	my $opt1=	$col eq 'artist' ? 'artist' :
+			$col eq 'album'  ? 'album' :
+			$col eq 'title'	 ? 'song' : '';
 	return unless $opt1;
-	my $url='http://www.allmusic.com/cg/amg.dll?p=amg&opt1='.$opt1.'&sql=';
-	$key=superlc($key);	#can't figure how to pass accents, removing them works better
+	my $url='http://www.allmusic.com/search/'.$opt1.'/';
 	$key=url_escape($key);
 	openurl($url.$key);
 }
