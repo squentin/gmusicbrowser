@@ -7414,7 +7414,7 @@ our %vars2=
 	labels	=> ['groupgenres($arg->{groupsongs},label)',	'label'],
 	gid	=> ['Songs::Get_gid($arg->{groupsongs}[0],$arg->{grouptype})'],	#FIXME PHASE1
 	title	=> ['($arg->{groupsongs} ? Songs::Get_grouptitle($arg->{grouptype},$arg->{groupsongs}) : "")'], #FIXME should the init case ($arg->{groupsongs}==undef) be treated here ?
-	rating_avrg => ['do {my $sum; $sum+= $_ eq "" ?  $::Options{DefaultRating} : $_ for Songs::Map(rating=>$arg->{groupsongs}); $sum/@{$arg->{groupsongs}}; }', 'rating'], #FIXME round, int ?
+	rating_avrg => ['do {my $sum; $sum+= $_ for Songs::Map(ratingnumber=>$arg->{groupsongs}); $sum/@{$arg->{groupsongs}}; }', 'rating'], #FIXME round, int ?
 	'length' => ['do {my (undef,$v)=Songs::ListLength($arg->{groupsongs}); sprintf "%d:%02d",$v/60,$v%60;}', 'length'],
 	nbsongs	=> ['scalar @{$arg->{groupsongs}}'],
 	disc	=> ['groupdisc($arg->{groupsongs})',	'disc'],

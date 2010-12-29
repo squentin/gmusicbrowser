@@ -36,7 +36,7 @@ my @External=
 	['youtube',	"http://www.youtube.com/results?search_type=&aq=1&search_query=%a",			_"Search for Artist on youtube"],
 	['amazon',	"http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias=aps&field-keywords=%a",	_"Search amazon.com for Artist"],
 	['google',	"http://www.google.at/search?q=%a",							_"Search google for Artist" ],
-	['allmusic',	"http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=%a",				_"Search allmusic for Artist" ],
+	['allmusic',	"http://www.allmusic.com/search/artist/%a",						_"Search allmusic for Artist" ],
 	['pitchfork',	"http://pitchfork.com/search/?search_type=standard&query=%a",				_"Search pitchfork for Artist" ],
 	['discogs',	"http://www.discogs.com/artist/%a",							_"Search discogs for Artist" ],
 );
