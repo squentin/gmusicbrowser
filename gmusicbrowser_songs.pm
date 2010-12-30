@@ -186,6 +186,7 @@ our %timespan_menu=
 		makefilter	=> '"#field#:~:" . #gid_to_sgid#',
 		update		=> 'my $old=#get#; #_#= #findgid(VAL=$old)#;',
 		listall		=> 'grep !vec(__#mainfield#_empty,$_,1), 2..@#_name#-1',
+		'stats:artistsort'	=> '#HVAL#->{ #album_artist->get_gid# }=undef;  ---- #HVAL#=do { my @ar= keys %{#HVAL#}; @ar>1 ? ::superlc(_"Various artists") : __artist_iname[$ar[0]]; }',
 		#plugin		=> 'picture',
 		load_extra	=> ' __#mainfield#_gid{#SGID#} || return;',
 		save_extra	=> 'my %h; while ( my ($sgid,$gid)=each %__#mainfield#_gid ) { $h{$sgid}= [#SUBFIELDS#] } delete $h{""}; return \%h;',
@@ -2433,6 +2434,10 @@ sub SortKeys
 	elsif ($mode eq 'year2') #use highest year
 	{	$h= GetHash('year:range',$field);
 		$pre='year2';	#sort using the 4 last characters
+	}
+	elsif ($mode eq 'artist') #only for albums
+	{	$h= GetHash('album:artistsort',$field);
+		$pre='string';
 	}
 	Songs::sort_gid_by_name($field,$list,$h,$pre,$mode);
 	@$list=reverse @$list if $invert;
