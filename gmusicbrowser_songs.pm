@@ -176,7 +176,8 @@ our %timespan_menu=
 		#				"album_artist"=album_artist	if non-empty album_artist
 		#				"compilation=1"			if empty album_artist, compilation flag set
 		#				""
-		set		=> '#_#= #findgid#;',
+		load		=> '#_#= #findgid#;',
+		set		=> 'my $oldgid=#_#; my $newgid= #_#= #findgid#; if ($newgid+1==@#_name# && $newgid!=$oldgid) { ___picture[$newgid]= ___picture[$oldgid]; }', #same as load, but if gid changed and is new, use picture from old gid
 		#newval		=> 'push @#_iname#, ::superlc( #_name#[-1] );',
 		get		=> '(#_empty# ? "" : #_name#[#_#])',
 		gid_to_get	=> '(vec(__#mainfield#_empty,#GID#,1) ? "" : #_name#[#GID#])',
@@ -184,8 +185,9 @@ our %timespan_menu=
 		#gid_to_sgid	=> 'vec(__#mainfield#_empty,#GID#,1) ? "\\x00".substr(#_name#[#GID#],length(#unknown#)) : #_name#[#GID#]',
 		gid_to_sgid	=> '::first {$__#mainfield#_gid{$_}==#GID#} keys %__#mainfield#_gid;', #slower but more simple and reliable
 		makefilter	=> '"#field#:~:" . #gid_to_sgid#',
-		update		=> 'my $old=#get#; #_#= #findgid(VAL=$old)#;',
+		update		=> 'my $albumname=#get#; #set(VAL=$albumname)#;',
 		listall		=> 'grep !vec(__#mainfield#_empty,$_,1), 2..@#_name#-1',
+		'stats:artistsort'	=> '#HVAL#->{ #album_artist->get_gid# }=undef;  ---- #HVAL#=do { my @ar= keys %{#HVAL#}; @ar>1 ? ::superlc(_"Various artists") : __artist_iname[$ar[0]]; }',
 		#plugin		=> 'picture',
 		load_extra	=> ' __#mainfield#_gid{#SGID#} || return;',
 		save_extra	=> 'my %h; while ( my ($sgid,$gid)=each %__#mainfield#_gid ) { $h{$sgid}= [#SUBFIELDS#] } delete $h{""}; return \%h;',
@@ -2433,6 +2435,10 @@ sub SortKeys
 	elsif ($mode eq 'year2') #use highest year
 	{	$h= GetHash('year:range',$field);
 		$pre='year2';	#sort using the 4 last characters
+	}
+	elsif ($mode eq 'artist') #only for albums
+	{	$h= GetHash('album:artistsort',$field);
+		$pre='string';
 	}
 	Songs::sort_gid_by_name($field,$list,$h,$pre,$mode);
 	@$list=reverse @$list if $invert;

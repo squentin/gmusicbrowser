@@ -1550,6 +1550,11 @@ my %sort_menu=
 	songs=> _("number of songs in filter"),
 	'length'=> _("length of songs"),
 );
+my %sort_menu_album=
+(	%sort_menu,
+	artist => _("artist")
+);
+
 our @MenuPageOptions;
 my @MenuSubGroup=
 (	{ label => sub {_("Set subgroup").' '.$_[0]{depth}},	submenu => sub { return {0 => _"None",map {$_=>Songs::FieldName($_)} Songs::FilterListFields()}; },
@@ -1590,7 +1595,7 @@ my @MenuSubGroup=
 	  submenu => sub { [::max(10,$_[0]{self}{cloud_min}+1)..40] },  check => sub {$_[0]{self}{cloud_max}}, },
 
 	{ label => _"sort by",		code => sub { my $self=$_[0]{self}; $self->{'sort'}[$_[0]{depth}]=$_[1]; $self->SetOption; },
-	  check => sub {$_[0]{self}{sort}[$_[0]{depth}]}, submenu => \%sort_menu, submenu_reverse => 1 },
+	  check => sub {$_[0]{self}{sort}[$_[0]{depth}]}, submenu =>  sub { $_[0]{field} eq 'album' ? \%sort_menu_album : \%sort_menu; }, submenu_reverse => 1 },
 	{ label => _"group by",
 	  code	=> sub { my $self=$_[0]{self}; my $d=$_[0]{depth}; $self->{type}[$d]=$self->{field}[$d].'.'.$_[1]; $self->Fill('rehash'); },
 	  check => sub { my $n=$_[0]{self}{type}[$_[0]{depth}]; $n=~s#^[^.]+\.##; $n },
