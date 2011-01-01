@@ -148,6 +148,7 @@ options :
 -plugin NAME		: Disable plugin NAME
 -searchpath FOLDER	: Additional FOLDER to look for plugins and layouts
 -use-gnome-session 	: Use gnome libraries to save tags/settings on session logout
+-workspace N		: move initial window to workspace N (requires Gnome2::Wnck)
 
 -cmd CMD		: add CMD to the list of commands to execute
 -ifnotrunning MODE	: change behavior when no running gmusicbrowser instance is found
@@ -189,6 +190,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-port')		{$CmdLine{port}=shift if $ARGV[0]}
 	elsif($arg eq '-debug')		{$debug=1}
 	elsif($arg eq '-nofifo')	{$FIFOFile=''}
+	elsif($arg eq '-workspace')	{$CmdLine{workspace}=shift if defined $ARGV[0]} #requires Gnome2::Wnck
 	elsif($arg eq '-C' || $arg eq '-cfg')		{$CmdLine{savefile}=shift if $ARGV[0]}
 	elsif($arg eq '-F' || $arg eq '-fifo')		{$FIFOFile=rel2abs(shift) if $ARGV[0]}
 	elsif($arg eq '-l' || $arg eq '-layout')	{$CmdLine{layout}=shift if $ARGV[0]}
@@ -1049,7 +1051,16 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	TogAlbumLock	=> [sub {ToggleLock('album')},		_"Toggle Album Lock"],
 	TogSongLock	=> [sub {ToggleLock('fullfilename')},	_"Toggle Song Lock"],
 	ToggleRandom	=> [\&ToggleSort, _"Toggle between Random/Shuffle and Ordered"],
-	SetSongRating	=> [sub {return unless defined $SongID && $_[1]=~m/^\d*$/; Songs::Set($SongID, rating=> $_[1]); },	_"Set Current Song Rating", _"Rating between 0 and 100, or empty for default", qr/^\d*$/],
+	SetSongRating	=> [sub
+	{	return unless defined $SongID && $_[1]=~m/^([-+])?(\d*)$/;
+		my $r=$2;
+		if ($1)
+		{	my $step= $r||10;
+			$step*=-1 if $1 eq '-';
+			$r= Songs::Get($SongID, 'ratingnumber') + $step;
+		}
+		Songs::Set($SongID, rating=> $r);
+	},	_"Set Current Song Rating", _("Rating between 0 and 100, or empty for default")."\n"._("Can be relative by using + or -"), qr/^[-+]?\d*$/],
 	ToggleFullscreen=> [\&Layout::ToggleFullscreen,		_"Toggle fullscreen mode"],
 	ToggleFullscreenLayout=> [\&ToggleFullscreenLayout, _"Toggle the fullscreen layout"],
 	OpenFiles	=> [\&OpenFiles, _"Play a list of files", _"url-encoded list of files",0],
@@ -2926,16 +2937,15 @@ sub CalcListLength	#if $return, return formated string (0h00m00s)
 	}
 }
 
-# http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=%s    artist search
-# http://www.allmusic.com/cg/amg.dll?p=amg&opt1=2&sql=%s    album search
+# http://www.allmusic.com/search/artist/%s    artist search
+# http://www.allmusic.com/search/album/%s    album search
 sub AMGLookup
 {	my ($col,$key)=@_;
-	my $opt1=	$col eq 'artist' ? 1 :
-			$col eq 'album'  ? 2 :
-			$col eq 'title'	 ? 3 : 0;
+	my $opt1=	$col eq 'artist' ? 'artist' :
+			$col eq 'album'  ? 'album' :
+			$col eq 'title'	 ? 'song' : '';
 	return unless $opt1;
-	my $url='http://www.allmusic.com/cg/amg.dll?p=amg&opt1='.$opt1.'&sql=';
-	$key=superlc($key);	#can't figure how to pass accents, removing them works better
+	my $url='http://www.allmusic.com/search/'.$opt1.'/';
 	$key=url_escape($key);
 	openurl($url.$key);
 }
@@ -4932,8 +4942,14 @@ sub ScanFolder
 		#if (-d $path_file) { push @ToScan,$path_file; next; }
 		if (-d $path_file)
 		{	#next if $notrecursive;
+			# make sure it doesn't look in the same dir twice due to symlinks
 			if (-l $path_file)
 			{	my $real=readlink $path_file;
+				$real= $dir.SLASH.$real unless $real=~m#^$QSLASH#o;
+				$real.=SLASH;				#make it end with a slash to make regexes simpler
+				$real=~s#$QSLASH\.?$QSLASH+#SLASH#goe;					#simplify /./ or //
+				1 while $real=~s#$QSLASH[^$QSLASH]+$QSLASH\.\.$QSLASH#SLASH#oe;		#simplify /folder/../
+				$real=~s#$QSLASH+$##;							#remove trailing slash
 				next if exists $FollowedDirs{$real};
 				$FollowedDirs{$real}=undef;
 			}
@@ -5121,7 +5137,17 @@ sub AboutDialog
 	$dialog->set_website('http://gmusicbrowser.org');
 	$dialog->set_authors('Quentin Sculo <squentin@free.fr>');
 	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\nelementary icon theme : Simon Steinbeiß");
-	$dialog->set_translator_credits("French : Quentin Sculo and Jonathan Fretin\nHungarian : Zsombor\nSpanish : Martintxo, Juanjo and Elega\nGerman : vlad <donvla\@users.sourceforge.net> & staubi <staubi\@linuxmail.org>\nPolish : tizzilzol team\nSwedish : Olle Sandgren\nChinese : jk");
+	$dialog->set_translator_credits( join "\n", sort
+		'French : Quentin Sculo, Jonathan Fretin, Frédéric Urbain, Brice Boucard & Hornblende',
+		'Hungarian : Zsombor',
+		'Spanish : Martintxo, Juanjo & Elega',
+		'German : vlad <donvla@users.sourceforge.net> & staubi <staubi@linuxmail.org>',
+		'Polish : tizzilzol team',
+		'Swedish : Olle Sandgren',
+		'Chinese : jk',
+		'Czech : Vašek Kovářík',
+		'Portuguese : Gleriston Sampaio <gleriston_sampaio@hotmail.com>',
+	);
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
 }

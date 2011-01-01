@@ -1669,6 +1669,7 @@ sub init
 	$self->show;
 	$self->move($x,$y) if defined $x;
 	$self->parse_geometry( delete $::CmdLine{geometry} ) if $::CmdLine{geometry};
+	$self->set_workspace( delete $::CmdLine{workspace} ) if exists $::CmdLine{workspace};
 	if ($self->{options}{insensitive})
 	{	my $mask=Gtk2::Gdk::Bitmap->create_from_data(undef,'',1,1);
 		$self->input_shape_combine_mask($mask,0,0);
@@ -1809,6 +1810,20 @@ sub Position
 	$x+=$xmin;
 	$y+=$ymin;
 	return $x,$y;
+}
+
+sub set_workspace	#only works with Gnome2::Wnck
+{	my ($self,$workspace)=@_;
+	eval {require Gnome2::Wnck};
+	if ($@) { warn "Setting workspace : error loading Gnome2::Wnck : $@\n"; return }
+	my $screen= Gnome2::Wnck::Screen->get_default;
+	$screen->force_update;
+	$workspace= $screen->get_workspace($workspace);
+	return unless $workspace;
+	my $xid= $self->window->get_xid;
+	my $w=Gnome2::Wnck::Window->get($xid);
+	return unless $w;
+	$w->move_to_workspace($workspace);
 }
 
 sub make_transparent

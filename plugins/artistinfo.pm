@@ -36,7 +36,7 @@ my @External=
 	['youtube',	"http://www.youtube.com/results?search_type=&aq=1&search_query=%a",			_"Search for Artist on youtube"],
 	['amazon',	"http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias=aps&field-keywords=%a",	_"Search amazon.com for Artist"],
 	['google',	"http://www.google.at/search?q=%a",							_"Search google for Artist" ],
-	['allmusic',	"http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=%a",				_"Search allmusic for Artist" ],
+	['allmusic',	"http://www.allmusic.com/search/artist/%a",						_"Search allmusic for Artist" ],
 	['pitchfork',	"http://pitchfork.com/search/?search_type=standard&query=%a",				_"Search pitchfork for Artist" ],
 	['discogs',	"http://www.discogs.com/artist/%a",							_"Search discogs for Artist" ],
 );
@@ -258,7 +258,7 @@ sub ExternalLinks
 	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
 	my $centered = $buffer->create_tag(undef,justification=>'center');
 	my $iter=$buffer->get_start_iter;
-	$buffer->insert_with_tags($iter,_("Search for artist on the web:")."\n\n",$tag_header);
+	$buffer->insert_with_tags($iter,_("Search the web for artist")." :\n\n",$tag_header);
 	my $i = 1;
 	my $artist = $self->{artist_esc};
 	for my $linkbutton (@External)
