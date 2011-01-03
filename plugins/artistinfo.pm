@@ -28,8 +28,9 @@ my %sites =
 (
 	biography => 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',
 	events => 'http://ws.audioscrobbler.com/2.0/?method=artist.getevents&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',
-	web => 'weblinks',
+	similar => 'http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1&limit=%l',
 );
+=dop
 my @External=
 (	['lastfm',	"http://www.last.fm/music/%a",								_"Show Artist page on last.fm"],
 	['wikipedia',	"http://en.wikipedia.org/wiki/%a",							_"Show Artist page on wikipedia"],
@@ -40,11 +41,19 @@ my @External=
 	['pitchfork',	"http://pitchfork.com/search/?search_type=standard&query=%a",				_"Search pitchfork for Artist" ],
 	['discogs',	"http://www.discogs.com/artist/%a",							_"Search discogs for Artist" ],
 );
+=cut
+my @similarity=
+(	['super',	'0.9',	'#ff0101'],
+	['very high',	'0.7',	'#e9c102'],
+	['high',	'0.5',	'#05bd4c'],
+	['medium',	'0.3',	'#453e45'],
+	['lower',	'0.1',	'#9a9a9a'],
+);
 
 # lastfm api key 7aa688c2466dc17263847da16f297835
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
 
-::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", Eventformat => "%title at %name<br>%startDate<br>%city (%country)<br><br>");
+::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", SimilarLimit => "15", SimilarRating => "50", Eventformat => "%title at %name<br>%startDate<br>%city (%country)<br><br>");
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
@@ -111,7 +120,7 @@ sub new
 	for my $togglebutton
 	(	['biography',_"biography",_"Show artist's biography"],
 		['events',_"events",_"Show artist's upcoming events"],
-		['web',_"web",_"Search the web for artist"]
+		['similar',_"similar",_"Show similar artists"]
 	)
 	{	my ($key,$item,$tip) = @$togglebutton;
 		$item = Gtk2::RadioButton->new($group,$item);
@@ -178,6 +187,8 @@ sub prefbox
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
 	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text1=>_"Artist Picture Size : ", text2=>_"(applied after restart)");
 	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", width=>50, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'");
+	my $similar_limit=::NewPrefSpinButton(OPT.'SimilarLimit',0,500, step=>1, page=>10, text1=>_"Limit similar artists to the first : ", tip=>_"0 means no limit");
+	my $similar_rating=::NewPrefSpinButton(OPT.'SimilarRating',0,100, step=>1, text1=>_"Limit similar artists to a rate of similarity : ", tip=>_"last.fm's similarity categories:\n>90 super\n>70 very high\n>50 high\n>30 medium\n>10 lower");
 	my $lastfmimage=Gtk2::Image->new_from_stock("plugin-artistinfo-lastfm",'dnd');
 	my $lastfm=Gtk2::Button->new;
 	$lastfm->set_image($lastfmimage);
@@ -190,7 +201,7 @@ sub prefbox
 	$titlebox->pack_start($description,1,1,0);
 	$titlebox->pack_start($lastfm,0,0,5);
 	my $optionbox=Gtk2::VBox->new(0,2);
-	$optionbox->pack_start($_,0,0,1) for $entry,$preview,$autosave,$picsize,$eventformat;
+	$optionbox->pack_start($_,0,0,1) for $entry,$preview,$autosave,$picsize,$eventformat,$similar_limit,$similar_rating;
 	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$optionbox;
 	return $vbox;
 }
@@ -249,7 +260,7 @@ sub url_at_coords
 		return $url;
 	}
 }
-
+=dop
 sub ExternalLinks
 {	my $self = shift;
 	my $buffer = $self -> {buffer};
@@ -281,7 +292,7 @@ sub ExternalLinks
 
 	$buffer->set_modified(0);
 }
-
+=cut
 sub Refresh_cb
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $ID = ::GetSelID($self);
@@ -323,6 +334,7 @@ sub ArtistChanged
 
 	my $url= $sites{$self->{site}};
 	$url=~s/%a/$artist/;
+	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/;
 	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) {
 		$self->{artist_esc} = $artist;
 		$self->{url} = $url;
@@ -336,8 +348,10 @@ sub load_url
 	$self->cancel;
 	warn "info : loading $url\n" if $::debug;
 	$self->{url}=$url;
-	if ($self->{site} ne "web") { $self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url); }
-	else {	$self->ExternalLinks; }
+	#if ($self->{site} ne "web") { 
+	$self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url);
+	# }
+	#else {	$self->ExternalLinks; }
 }
 
 sub loaded
@@ -377,12 +391,14 @@ sub loaded
 		$buffer->insert($iter,$data);
 		$self->{infoheader}=$infoheader;
 		$self->{biography} = $data;
+		# TODO: add listeners and playcount
+		# TODO: create "edit"-link for the last.fm wiki (ideally with the blue text plus original or similar icon)
+		#$href->{url}= 'http://www.last.fm/music/'..'/+wiki/edit';
 	}
 
 	elsif ($self->{site} eq "events") {
 
 		my $tag = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'left');
-		my @events;
 		if ($data =~ m#total=\"(.*?)\">#g) {
 			if ( $1 == 1) { $infoheader = $1 ." Upcoming Event\n\n"; }
 			elsif ( $1 == 0) { $self->set_buffer("No results found"); return; }
@@ -408,7 +424,17 @@ sub loaded
 		}
 
 	}
+	elsif ($self->{site} eq "similar") {
+		my $tag = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'left');
 
+		for my $s_artist (split /<\/artist>/, $data) {
+			my %s_artist;
+			$s_artist{$1} = ::decode_html($2) while $s_artist=~ m#<(\w+)>([^<]*)</\1>#g;
+			next unless $s_artist{name}; # otherwise the last </artist> is also treated like an artist
+			my $match = $::Options{OPT.'SimilarRating'} / 100;
+			if ($s_artist{match} >= $match) { $buffer->insert_with_tags($iter,$s_artist{name}."  ".$s_artist{match} ."\n",$tag); }
+		}
+	}
 	$self->Save_text if $::Options{OPT.'AutoSave'} && $artistinfo_ok && $artistinfo_ok==1;
 }
 
