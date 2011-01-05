@@ -7,18 +7,21 @@ VBmain = HBControls _HPContent
 
 
     HPContent = VPfp2 _HPfp1
-    VPfp2 = _HBCurrentTrack _FilterPane4(nb=1,hide=0)
+    VPfp2 = _HBCurrentTrack _VBSavedFilterPane
         HBCurrentTrack = 10_VBCurrentTrack
-            VBCurrentTrack = _Filler1 Title(xalign=0.5,markup="<b>%t</b>") HBArtistAndLock HBAlbumAndLock Stars 5Cover HBReplayButtons _Filler2
+            VBCurrentTrack = _Filler1 Title(xalign=0.5,markup="<b>%t</b>") HBArtistAndLock HBAlbumAndLock Stars Cover HBReplayButtons _Filler2
                 HBAlbumAndLock = LockAlbum _Album(xalign=0.5,markup="%l")
                 HBArtistAndLock = LockArtist _Artist(xalign=0.5,markup="%a")
+        VBSavedFilterPane = _FilterPane4(nb=1,hide=0) 4Filler7
 
     HPfp1 = _VPfp0 VPQueueContext
         VPQueueContext = _Context(page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo') _HBQueueList
             # an layout error occurs, if I use the padding in a VP
             HBQueueList = 10_VBQueueList
-                VBQueueList = 0Filler5 HBQueueAct _QueueList 22Filler6
-                    HBQueueAct = -QueueActions
+                VBQueueList = 0Filler5 VBQueueAct _QueueList(group=1) 5HBQueueActions 3Filler6
+                    VBQueueAct = _HBEditListButtons
+                        HBEditListButtons = -EditListButtons(group=1,small=1)
+                    HBQueueActions = -QueueActions
 
     HBControls = 10_HPfpSongInfo_Search -MBmain -HBVolume -Fullscreen(size=button)
 
@@ -67,30 +70,6 @@ HBPics = _HBCover
 
 KeyBindings	= Escape CloseWindow
 VolumeScroll	= VBmain
-
-
-#Type=F
-#Window		= fullscreen=1,sticky=0
-#HBPics		= _ArtistPic(maxsize=0) _Cover(maxsize=0)
-#HBButtons1	= Prev(size=dialog) Next(size=dialog)
-#HBButtons2	= Stop(size=dialog) Play(size=dialog)
-#VBButtons	= (border=20) _HBButtons1 _HBButtons2
-#VBVol		= Vol(size=dialog) _VolumeSlider
-#HBLower		= VBButtons _VBText 20VBVol
-#HBIndic		= 10Sort(size='large_toolbar') 10Filter(size='large_toolbar') Queue(size='large_toolbar') 10Pos -Stars
-#HBTitle		= Filler0 _Title
-#HBArtist	= LockArtist(size='large_toolbar') _Artist
-#HBAlbum		= LockAlbum(size='large_toolbar') _Album -Year
-#HBTime		= Time _TimeBar
-#VBmain		= (border=20) _HBPics FBLower
-#FBLower		= .1,0,.8,0 HBLower
-#VBText		= HBIndic 2HBTitle 2HBArtist 2HBAlbum -HBTime
-#VolumeScroll	= VBmain
-#HSize0		= Filler0 LockArtist LockAlbum
-#DefaultFont	= 20
-#KeyBindings	= Escape CloseWindow
-
-
 
 
 [Lists, Library & Context]
