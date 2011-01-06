@@ -7,11 +7,12 @@ VBmain = HBControls _HPContent
 
 
     HPContent = VPfp2 _HPfp1
-    VPfp2 = _HBCurrentTrack _VBSavedFilterPane
+    VPfp2 = _HBCurrentTrack VBSavedFilterPane
         HBCurrentTrack = 10_VBCurrentTrack
-            VBCurrentTrack = _Filler1 Title(xalign=0.5,markup="<b>%t</b>") HBArtistAndLock HBAlbumAndLock Stars Cover HBReplayButtons _Filler2
-                HBAlbumAndLock = LockAlbum _Album(xalign=0.5,markup="%l")
-                HBArtistAndLock = LockArtist _Artist(xalign=0.5,markup="%a")
+            VBCurrentTrack = _Filler1 Title(xalign=0.5,markup="<b>%t</b>") HBArtistAndLock HBAlbumAndLock HBStars Cover HBReplayButtons _Filler2
+                HBAlbumAndLock = LockAlbum _Album(xalign=0.45,markup="%l")
+                HBArtistAndLock = LockArtist _Artist(xalign=0.45,markup="%a")
+                HBStars =  _Stars
         VBSavedFilterPane = _FilterPane4(nb=1,hide=0) 4Filler7
 
     HPfp1 = _VPfp0 VPQueueContext
@@ -52,7 +53,7 @@ VBmain = HBControls _HPContent
 
             HBSongTree = _VBSongTree
             VBSongTree = HBSongTreeAct _SongTree 5HBSongTreeStats
-                HBSongTreeAct = Sort(button=1) Filter(button=1) QueueFilter PlayFilter FLock -ResetFilter -Refresh -FBox -MBSongTree
+                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter FLock _Filler9 _Filler10 -ResetFilter -Refresh -FBox -MBSongTree
                 HBSongTreeStats = -Total(size=small)
 
     VPfp0 = _VPfp1 _VBBottom
