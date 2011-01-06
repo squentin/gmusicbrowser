@@ -275,7 +275,7 @@ sub ParseAtomTree
 		my $flag=unpack 'x3C',$data;
 		if ($flag==1)				{ $val=decode('utf-8',$val); }
 		elsif ($key eq 'trkn' || $key eq 'disk'){ $val=join '/',unpack 'x2nn',$val; }
-		elsif ($key eq 'gnre')			{ $val=unpack 'xC',$val; $val=$Tag::MP3::Genres[$val]; $key="\xa9gen"; }
+		elsif ($key eq 'gnre')			{ $val=unpack 'xC',$val; $val= $val ? $Tag::MP3::Genres[$val-1] : ''; $key="\xa9gen"; }	#gnre uses id3 genre number +1
 		elsif ($key eq 'covr')			{  } #nothing to do, $val contains the binary data of the picture
 		elsif ($key eq 'tmpo')			{ $val=unpack 'n',$val; }
 		elsif ($key=~m/^cpil$|^pgap$|^pcst$/)	{ $val=unpack 'C',$val; }
@@ -321,7 +321,7 @@ sub Make_ilst
 			elsif ($key eq "\xA9gen" && grep $val eq $_, @Tag::MP3::Genres)
 			{	$key='gnre'; $flags=0;
 				$val=::first {$val eq $Tag::MP3::Genres[$_]} 0..$#Tag::MP3::Genres;
-				$val=pack 'xC',$val;
+				$val=pack 'xC',$val+1;	#gnre uses id3 genre number +1
 			}
 			elsif ($flags==1)			{ $val=encode('utf-8',$val); }
 
