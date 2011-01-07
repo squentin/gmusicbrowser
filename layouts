@@ -1,33 +1,48 @@
 [Arkanoid]
 Type=G+
-Default     = Window(size=1120x820) HBAlbum(size=700)
+Default     = Window(size=1120x820)
 
-KeyBindings = c-k SetFocusOn(SimpleSearch) c-r GoToCurrentSong
+KeyBindings = c-k SetFocusOn(SimpleSearch) c-space GoToCurrentSong
 
 HBmain = _VBmain
 VBmain = HBControls _HPContent
 
 
 
-    HPContent = VPfp2 _HPfp1
-    VPfp2 = _HBCurrentTrack VBSavedFilterPane
-        HBCurrentTrack = 10_VBCurrentTrack
-            VBCurrentTrack = _Filler1 Title(xalign=0.5,markup="<b>%t</b>") HBArtistAndLock HBAlbumAndLock HBStars Cover HBReplayButtons _Filler2
+    HPContent = _HPCurrentTrack _HPfp1
+        HPCurrentTrack = VPfp2 _VPfp0
+            VPfp2 = _HBCurrentTrack VBSavedFilterPane
+
+
+            HBCurrentTrack = 10_VBCurrentTrack
+                VBCurrentTrack = _Filler1 Title(xalign=0.5,markup="<b>%t</b>") HBArtistAndLock HBAlbumAndLock HBStars Cover HBReplayButtons _Filler2
                 HBAlbumAndLock = LockAlbum _Album(xalign=0.45,markup="%l")
                 HBArtistAndLock = LockArtist _Artist(xalign=0.45,markup="%a")
                 HBStars =  _Stars
-        VBSavedFilterPane = _FilterPane4(nb=1,hide=0) 4Filler7
+            VBSavedFilterPane = _FilterPane4(nb=1,hide=0) 4Filler7
 
-    HPfp1 = _VPfp0 VPQueueContext
-        VPQueueContext = _Context(page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo') _HBQueueList
-            # an layout error occurs, if I use the padding in a VP
-            HBQueueList = 10_VBQueueList
-                VBQueueList = 0Filler5 VBQueueAct _QueueList(group=1) 5HBQueueActions 3Filler6
-                    VBQueueAct = _HBEditListButtons
-                        HBEditListButtons = -EditListButtons(group=1,small=1)
-                    HBQueueActions = -QueueActions
+            VPfp0 = _VPfp1 _VBBottom
+                VPfp1 = _VPGenreYear _HPfp0
+                    VPGenreYear = _HBGenre _HBYear
+                        HBGenre = _FilterPane5(nb=2,hidebb=1,pages=genre,page=genre,page_genre/mode=cloud,page_genre/cloud_min=8,page_genre/sort=alpha)
+                        HBYear = _FilterPane2(nb=4,hidebb=1,pages=year,page=year,page_year/mode=cloud,page_year/cloud_min=8,page_year/sort=year)
 
-    HBControls = 10_HPfpSongInfo_Search -MBmain -HBVolume -Fullscreen(size=button)
+                    HPfp0 = HBArtist HBAlbum
+                        HBArtist = _FilterPane0(nb=3, hidebb=1,pages=artist,page=artist,page_artist/lpicsize=64,page_artist/lmarkup=1)
+                        HBAlbum = _FilterPane1(nb=5,hidebb=1,pages=album,page=album,page_album/mode=mosaic,page_album/lpicsize=64,page_album/lmarkup=1,page_album/mmarkup=below)
+
+                 VBBottom = 10_HBSongTree VProgress
+
+        HPfp1 =  VPQueueContext
+            VPQueueContext = _Context(page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo') _HBQueueList
+                # an layout error occurs, if I use the padding in a VP
+                HBQueueList = 10_VBQueueList
+                    VBQueueList = 0Filler5 VBQueueAct _QueueList(group=1) 5HBQueueActions 3Filler6
+                        VBQueueAct = _HBEditListButtons
+                            HBEditListButtons = -EditListButtons(group=1,small=1)
+                        HBQueueActions = -QueueActions
+
+    HBControls = 10_HPfpSongInfo_Search -MBmain -HBVolume -Fullscreen(size=button) -TogButton(icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
 
         HBVolume = VolumeIcon(button=1)
 
@@ -44,23 +59,21 @@ VBmain = HBControls _HPContent
 
         MBSongTree = HistItem
 
-        VPfp1 = _VPGenreYear _HPfp0
-        HPfp0 = HBArtist HBAlbum
-        VBBottom = 10_HBSongTree VProgress
 
-            VPGenreYear = _HBGenre _HBYear
 
-            HBGenre = _FilterPane5(nb=2,hidebb=1,pages=genre,page=genre,page_genre/mode=cloud,page_genre/cloud_min=8,page_genre/sort=alpha)
-            HBArtist = _FilterPane0(nb=3, hidebb=1,pages=artist,page=artist,page_artist/lpicsize=64,page_artist/lmarkup=1)
-            HBYear = _FilterPane2(nb=4,hidebb=1,pages=year,page=year,page_year/mode=cloud,page_year/cloud_min=8,page_year/sort=year)
-            HBAlbum = _FilterPane1(nb=5,hidebb=1,pages=album,page=album,page_album/mode=mosaic,page_album/lpicsize=64,page_album/lmarkup=1,page_album/mmarkup=below)
+
+
+
+
+
+
 
             HBSongTree = _VBSongTree
             VBSongTree = HBSongTreeAct _SongTree 5HBSongTreeStats
                 HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter FLock Button(click1=GoToCurrentSong,stock=gtk-jump-to) _Filler9 _Filler10 -ResetFilter -Refresh -FBox -MBSongTree
                 HBSongTreeStats = -Total(size=small)
 
-    VPfp0 = _VPfp1 _VBBottom
+
     VolumeScroll	= HBVolume
     # VBToggleYear = TogButton2(icon=gtk-close,widget=HBYear|HBGenre) _Filler8
 
