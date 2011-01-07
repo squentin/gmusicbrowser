@@ -1,6 +1,9 @@
 [Arkanoid]
 Type=G+
 Default     = Window(size=1120x820) HBAlbum(size=700)
+
+KeyBindings = c-k SetFocusOn(SimpleSearch) c-r GoToCurrentSong
+
 HBmain = _VBmain
 VBmain = HBControls _HPContent
 
@@ -38,6 +41,7 @@ VBmain = HBControls _HPContent
             HBSearch = 10-SimpleSearch(noselector=1,maxwidth=1000)
 
         MBmain = MainMenuItem
+
         MBSongTree = HistItem
 
         VPfp1 = _VPGenreYear _HPfp0
@@ -53,7 +57,7 @@ VBmain = HBControls _HPContent
 
             HBSongTree = _VBSongTree
             VBSongTree = HBSongTreeAct _SongTree 5HBSongTreeStats
-                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter FLock _Filler9 _Filler10 -ResetFilter -Refresh -FBox -MBSongTree
+                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter FLock Button(click1=GoToCurrentSong,stock=gtk-jump-to) _Filler9 _Filler10 -ResetFilter -Refresh -FBox -MBSongTree
                 HBSongTreeStats = -Total(size=small)
 
     VPfp0 = _VPfp1 _VBBottom
