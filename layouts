@@ -15,10 +15,11 @@ VBmain = HBControls _HPContent
 
 
             HBCurrentTrack = 10_VBCurrentTrack
-                VBCurrentTrack = _Filler1 Title(xalign=0.5,markup="<b>%t</b>") HBArtistAndLock HBAlbumAndLock HBStars Cover HBReplayButtons _Filler2
-                HBAlbumAndLock = LockAlbum _Album(xalign=0.45,markup="%l")
-                HBArtistAndLock = LockArtist _Artist(xalign=0.45,markup="%a")
-                HBStars =  _Stars
+                VBCurrentTrack = _Filler1 HBTitle HBArtistAndLock HBAlbumAndLock HBStars 15Cover _Filler2 5HBReplayButtons
+                HBTitle = 20Filler11 _Title(xalign=0.5,markup="<big><b>%t</b></big>")
+                HBAlbumAndLock = LockAlbum(button=1,relief=half) 5Filler14 _Album(xalign=0.5,markup="%l")
+                HBArtistAndLock = LockArtist(button=1,relief=half) 5Filler15 _Artist(xalign=0.5,markup="%a")
+                HBStars =  20Filler12 _Stars
             VBSavedFilterPane = _FilterPane4(nb=1,hide=0) 4Filler7
 
             VPfp0 = _VPfp1 _VBBottom
