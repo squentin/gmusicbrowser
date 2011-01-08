@@ -30,7 +30,8 @@ my %Sites=
 	lastfm => ['last.fm',"http://www.last.fm/music/%a/+images", \&parse_lastfm],
  },
  album =>
- {	googlei => ['google images',"http://images.google.com/images?q=%s&imgsz=medium|large", \&parse_googlei],
+ {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large&imgar=ns", \&parse_googlei],
+	googleihi =>[_"google images (hi-res)","http://www.google.com/images?q=%s&imgsz=xlarge|xxlarge&imgar=ns", \&parse_googlei],
 	slothradio => ['slothradio', "http://www.slothradio.com/covers/?artist=%a&album=%l", \&parse_sloth],
 	#itunesgrabber => ['itunesgrabber',"http://www.thejosher.net/iTunes/index.php?artist=%a&album=%l", \&parse_itunesgrabber],
 	freecovers => ['freecovers.net', "http://www.freecovers.net/api/search/%s", \&parse_freecovers], #could add /Music+CD but then we'd lose /Soundtrack
