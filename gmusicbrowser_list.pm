@@ -2114,6 +2114,7 @@ sub set_mode
 				$mode eq 'mosaic'? $self->create_mosaic :
 				$self->create_list;
 	$self->{view}=$view;
+	$self->{DefaultFocus}=$view;
 	$child->{is_a_view}=1;
 	$view->signal_connect(focus_in_event	=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->{isearchbox}->hide; 0; });	#hide isearchbox when focus goes to the view
 
@@ -2455,7 +2456,6 @@ sub key_press_cb
 	if	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }	#ctrl-f : search
 	elsif	(lc$key eq 'g' && $ctrl) { $self->{isearchbox}->search($shift ? -1 : 1);}	#ctrl-g : next/prev match
 	elsif	($key eq 'F3')		 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
-	elsif	($key eq 'Escape')	 { $self->{view}->grab_focus;}				#Esc : hide searchbox
 	elsif	(!$self->{no_typeahead} && $unicode && !($state * [qw/control-mask mod1-mask mod4-mask/]))
 	{	$self->{isearchbox}->begin( chr $unicode );	#begin typeahead search
 	}
@@ -5074,6 +5074,7 @@ sub new					##currently the returned widget must be put in ->{isearchbox} of a p
 
 	$self->{entry}=my $entry=Gtk2::Entry->new;
 	$entry->signal_connect( changed => \&changed );
+	$entry->signal_connect(key_press_event	=> \&key_press_event_cb);
 	my $select=::NewIconButton('gtk-index',	undef, \&select,'none',_"Select matches");
 	my $next=::NewIconButton('gtk-go-down',	($nolabel ? undef : _"Next"),	 \&button_cb,'none');
 	my $prev=::NewIconButton('gtk-go-up',	($nolabel ? undef : _"Previous"),\&button_cb,'none');
@@ -5119,6 +5120,17 @@ sub set_colors
 		$entry->modify_text('normal', $entry->style->text('selected') );
 	}
 
+}
+
+sub key_press_event_cb	# hide with Escape
+{	my ($entry,$event)=@_;
+	return 0 unless Gtk2::Gdk->keyval_name($event->keyval) eq 'Escape';
+	my $self= ::find_ancestor($entry,__PACKAGE__);
+	my $newfocus= $self->get_parent;
+	$newfocus= $newfocus->{DefaultFocus} while $newfocus->{DefaultFocus};
+	$newfocus->grab_focus; warn $newfocus;
+	$self->hide;
+	return 1;
 }
 
 sub begin
@@ -5168,8 +5180,7 @@ sub changed
 sub select
 {	my $widget=$_[0];
 	my $self=::find_ancestor($widget,__PACKAGE__);
-	my $parent=$self;
-	$parent=$parent->parent until $parent->{isearchbox};	#FIXME could be better, maybe pass a package name to new and use ::find_ancestor($self,$self->{targetpackage});
+	my $parent= $self->get_parent;
 	$parent->select_by_filter($self->{filter}) if $self->{filter};
 }
 sub button_cb
@@ -5182,8 +5193,7 @@ sub search
 {	my ($self,$direction)=@_;
 	my $search=$self->{searchsub};
 	return unless $search;
-	my $parent=$self;
-	$parent=$parent->parent until $parent->{isearchbox};	#FIXME could be better, maybe pass a package name to new and use ::find_ancestor($self,$self->{targetpackage});
+	my $parent= $self->get_parent;
 	my $array= $parent->{array}; 				#FIXME could be better
 	my $offset=$parent->{array_offset}||0;
 	my $start= $parent->get_cursor_row;
@@ -5197,6 +5207,12 @@ sub search
 		$self->set_colors(1);
 	}
 	else {	$self->set_colors(-1); }
+}
+
+sub get_parent
+{	my $parent=shift;
+	$parent=$parent->parent until $parent->{isearchbox};	#FIXME could be better, maybe pass a package name to new and use ::find_ancestor($self,$self->{targetpackage});
+	return $parent;
 }
 
 sub PopupOpt
@@ -5783,7 +5799,6 @@ sub key_press_cb
 	elsif	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }			#ctrl-f : search
 	elsif	(lc$key eq 'g' && $ctrl) { $self->{isearchbox}->search($shift ? -1 : 1);}	#ctrl-g : next/prev match
 	elsif	($key eq 'F3')		 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
-	elsif	($key eq 'Escape')	 { $self->{view}->grab_focus; }				#Esc : hide searchbox
 	elsif	(!$self->{no_typeahead} && $unicode && !($state * [qw/control-mask mod1-mask mod4-mask/]))
 	{	$self->{isearchbox}->begin( chr $unicode );	#begin typeahead search
 	}
