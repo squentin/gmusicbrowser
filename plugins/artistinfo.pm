@@ -309,8 +309,6 @@ sub ArtistChanged
 {	my ($self,$aID,$force)=@_;
 	return unless $self->mapped;
 	return unless defined $aID;
-	if ($self->{site} ne "biography") { $force = 1; }
-	$self->cancel;
 	my $rating = AA::Get("rating:average",'artist',$aID);
 	$self->{artistratingvalue}= int($rating+0.5);
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
@@ -322,24 +320,23 @@ sub ArtistChanged
 	$self->{Lstats}->set_markup( AA::ReplaceFields($aID,'%X « %s'."\n<small>%y</small>","artist",1) );
 	for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
 
-	if (!$force) # if not forced to reload (events, reload-button), check for local file first
-	{	my $file=::pathfilefromformat( ::GetSelID($self), $::Options{OPT.'PathFile'}, undef,1 );
-		if ($file && -r $file)
-		{	::IdleDo('8_artistinfo'.$self,1000,\&load_file,$self,$file);
-			return
-		}
-	}
-
 	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
-
 	my $url= $sites{$self->{site}};
 	$url=~s/%a/$artist/;
 	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/;
 	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) {
 		$self->{artist_esc} = $artist;
 		$self->{url} = $url;
-		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);
+		if ($self->{site} eq "biography") { # check for local biography file before loading the page
+			my $file=::pathfilefromformat( ::GetSelID($self), $::Options{OPT.'PathFile'}, undef,1 );
+			if ($file && -r $file)
+				{	::IdleDo('8_artistinfo'.$self,1000,\&load_file,$self,$file);
+					return
+				}
 		}
+		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);
+		
+		}	
 }
 
 sub load_url
@@ -432,7 +429,10 @@ sub loaded
 			$s_artist{$1} = ::decode_html($2) while $s_artist=~ m#<(\w+)>([^<]*)</\1>#g;
 			next unless $s_artist{name}; # otherwise the last </artist> is also treated like an artist
 			my $match = $::Options{OPT.'SimilarRating'} / 100;
-			if ($s_artist{match} >= $match) { $buffer->insert_with_tags($iter,$s_artist{name}."  ".$s_artist{match} ."\n",$tag); }
+			if ($s_artist{match} >= $match) {
+				my $similarity = $s_artist{match} * 100;
+				$buffer->insert_with_tags($iter,$s_artist{name}."  ".$similarity."\%\n",$tag);
+			}
 		}
 	}
 	$self->Save_text if $::Options{OPT.'AutoSave'} && $artistinfo_ok && $artistinfo_ok==1;
