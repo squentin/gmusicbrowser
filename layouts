@@ -5,7 +5,7 @@ Default     = Window(size=1120x820)
 KeyBindings = c-k SetFocusOn(SimpleSearch) c-space GoToCurrentSong
 
 HBmain = _VBmain
-VBmain = HBControls _HPContent
+VBmain = HPControlsInfoAndSearch _HPContent
 
 
 
@@ -43,7 +43,9 @@ VBmain = HBControls _HPContent
                             HBEditListButtons = -EditListButtons(group=1,small=1)
                         HBQueueActions = -QueueActions
 
-    HBControls = 10_HPfpSongInfo_Search -MBmain -HBVolume -Fullscreen(size=button) -TogButton(icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
+    HPControlsInfoAndSearch = _HPfpSongInfo_Search VBControls
+        VBControls = _Filler13 HBControls _Filler14
+            HBControls =  -MBmain -HBVolume -Fullscreen(size=button) -TogButton(icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
 
         HBVolume = VolumeIcon(button=1)
 
