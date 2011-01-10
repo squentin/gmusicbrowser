@@ -47,7 +47,7 @@ VBmain = HBControls _HPContent
 
         HBVolume = VolumeIcon(button=1)
 
-        HBReplayButtons = _Filler3 Prev Play(size=large-toolbar) Next _Filler4
+        HBReplayButtons = _Filler3 Prev(size=large-toolbar) Play(size=dialog) Next(size=large-toolbar) _Filler4
 
         HPfpSongInfo_Search = _HBSongInfo _HBSearch
             HBSongInfo = 10_HBSongInfoDetails
@@ -71,7 +71,7 @@ VBmain = HBControls _HPContent
 
             HBSongTree = _VBSongTree
             VBSongTree = HBSongTreeAct _SongTree 5HBSongTreeStats
-                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter FLock Button(click1=GoToCurrentSong,stock=gtk-jump-to) _Filler9 _Filler10 -ResetFilter -Refresh -FBox -MBSongTree
+                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter FLock Button(size=menu,click1=GoToCurrentSong,stock=gtk-jump-to) _Filler9 _Filler10 -ResetFilter -Refresh -FBox -MBSongTree
                 HBSongTreeStats = -Total(size=small)
 
 
