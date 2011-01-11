@@ -33,6 +33,7 @@ my %Sites=
  {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large&imgar=ns", \&parse_googlei],
 	googleihi =>[_"google images (hi-res)","http://www.google.com/images?q=%s&imgsz=xlarge|xxlarge&imgar=ns", \&parse_googlei],
 	slothradio => ['slothradio', "http://www.slothradio.com/covers/?artist=%a&album=%l", \&parse_sloth],
+    jamendo => ['Jamendo', "http://api.jamendo.com/get2/album_id+artist_id+artist_name+album_name+image/artist/jsonpretty/album_artist/?artist_name=%a&n=all&imagesize=100", \&parse_jamendo],
 	#itunesgrabber => ['itunesgrabber',"http://www.thejosher.net/iTunes/index.php?artist=%a&album=%l", \&parse_itunesgrabber],
 	#freecovers => ['freecovers.net', "http://www.freecovers.net/api/search/%s", \&parse_freecovers], #could add /Music+CD but then we'd lose /Soundtrack
 	#rateyourmusic=> ['rateyourmusic.com', "http://rateyourmusic.com/search?searchterm=%s&searchtype=l",\&parse_rateyourmusic], # urls results in "403 Forbidden"
@@ -304,6 +305,11 @@ sub parse_googlei
 	    }
     }
 	return \@list,$nexturl;
+}
+sub parse_jamendo
+{	my $result=$_[0];
+	my @list;
+	return \@list;
 }
 
 sub searchresults_cb
