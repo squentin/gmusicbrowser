@@ -1641,7 +1641,7 @@ my %artistsplit_old_to_new=	#for versions <= 1.1.5 : to upgrade old ArtistSplit 
 	'; *'	=> '\s*;\s*',
 	';'	=> '\s*;\s*',
 );
-			
+
 sub ReadOldSavedTags
 {	my $fh=$_[0];
 	while (<$fh>)
@@ -5008,7 +5008,7 @@ sub ScanFolder
 		if (defined $ID)
 		{	next unless Songs::Get($ID,'missing');
 			Songs::Set($ID,missing => 0);
-			push @ToReRead,$ID;	#or @ToCheck ? 
+			push @ToReRead,$ID;	#or @ToCheck ?
 			push @ToAdd_IDsBuffer,$ID;
 		}
 		else

@@ -19,7 +19,7 @@ VBmain = HPControlsInfoAndSearch _HPContent
                 HBTitle = 20Filler11 _Title(xalign=0.5,markup="<big><b>%t</b></big>")
                 HBAlbumAndLock = LockAlbum(button=1,relief=half) 5Filler14 _Album(xalign=0.5,markup="%l")
                 HBArtistAndLock = LockArtist(button=1,relief=half) 5Filler15 _Artist(xalign=0.5,markup="%a")
-                HBStars =  20Filler12 _Stars
+                HBStars =  20Filler12 _StarsfF
             VBSavedFilterPane = _FilterPane4(nb=0,hide=0) 4Filler7
 
             VPfp0 = _VPfp1 _VBBottom
@@ -44,7 +44,7 @@ VBmain = HPControlsInfoAndSearch _HPContent
                         HBQueueActions = -QueueActions
 
     HPControlsInfoAndSearch = _HPfpSongInfo_Search VBControls
-        VBControls = _Filler13 HBControls _Filler14
+        VBControls = _Filler15 HBControls _Filler16
             HBControls =  -MBmain -HBVolume -Fullscreen(size=button) -TogButton(icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
 
         HBVolume = VolumeIcon(button=1)
