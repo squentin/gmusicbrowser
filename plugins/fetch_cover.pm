@@ -287,8 +287,9 @@ sub parse_googlei
 	{	my @matches=split /\],\["/,$1;	#not very reliable
 		for my $m (@matches)
 		{	my @fields=split /["\]],["\[]/,$m;
+			next if @fields<3;	#happens if no results
 			my $url=$fields[3];
-			my $desc=$fields[6]; $desc=~s#\\x([0-9a-f]{2})#chr(hex $1)#gie; $desc=~s#</?b>##g;
+			my $desc= $fields[6]||''; $desc=~s#\\x([0-9a-f]{2})#chr(hex $1)#gie; $desc=~s#</?b>##g;
 			$desc=Encode::decode('cp1252',$desc); #FIXME not sure of the encoding
 			$desc=::decode_html($desc);
 			my $preview='http://images.google.com/images?q=tbn:'.$fields[2].$url;
