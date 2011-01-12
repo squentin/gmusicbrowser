@@ -154,6 +154,7 @@ our %timespan_menu=
 		get		=> 'do {my $v=#_#; $v!=1 ? #_name#[$v] : "";}',
 		gid_to_get	=> '(#GID#!=1 ? #_name#[#GID#] : "")',
 		gid_to_sgid	=> '(#GID#!=1 ? #_name#[#GID#] : "")',
+		search_gid	=> 'my $gid=__#mainfield#_gid{#VAL#}||0; $gid>1 ? $gid : undef;',
 		makefilter	=> '"#field#:~:" . #gid_to_sgid#',
 		diff		=> 'do {my $old=#_#; ($old!=1 ? #_name#[$old] : "") ne #VAL# }',
 		#save_extra	=> 'my %h; for my $gid (2..$##_name#) { my $v=__#mainfield#_picture[$gid]; next unless defined $v; ::_utf8_on($v); $h{ #_name#[$gid] }=$v; } return artist_pictures',
@@ -1448,6 +1449,11 @@ sub ListAll
 sub Get_grouptitle
 {	my ($field,$IDs)=@_;
 	($FuncCache{'grouptitle '.$field}||= Makesub($field, 'grouptitle', ID => '$_[0][0]', IDs=>'$_[0]') ) ->($IDs);
+}
+sub Search_artistid	#return artist id or undef if not found
+{	my $artistname=shift;
+	my $field='artist';
+	($FuncCache{'search_gid '.$field}||= Makesub($field, 'search_gid', VAL=>'$_[0]') ) ->($artistname);
 }
 sub Get_gid
 {	my ($ID,$field)=@_;
