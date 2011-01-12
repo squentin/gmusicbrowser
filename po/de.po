@@ -694,7 +694,7 @@ msgstr "Beginne mit"
 
 #: gmusicbrowser_list.pm:1579
 msgid "Below"
-msgstr "Unterhalb"
+msgstr "unterhalb"
 
 #: gmusicbrowser_songs.pm:729
 msgid "Bitrate"
@@ -2168,7 +2168,7 @@ msgstr "Kein Webbrowser gefunden."
 #: gmusicbrowser_songs.pm:53 gmusicbrowser_songs.pm:565
 #: gmusicbrowser_tags.pm:1199 gmusicbrowser_tags.pm:1277
 msgid "None"
-msgstr "keins"
+msgstr "ohne"
 
 #: gmusicbrowser_layout.pm:26
 msgid "Normal mode"
@@ -2970,7 +2970,7 @@ msgstr "Rechts ausgerichtet"
 
 #: gmusicbrowser_list.pm:1579
 msgid "Right side"
-msgstr "Rechte Seite"
+msgstr "rechte Seite"
 
 #: plugins/rip.pm:9
 msgid "Rip"
@@ -4021,7 +4021,7 @@ msgstr "nach %d"
 
 #: gmusicbrowser_list.pm:1549
 msgid "alphabetical"
-msgstr "alphabetisch"
+msgstr "Alphabet"
 
 #: gmusicbrowser_123.pm:386
 msgid "amixer control :"
@@ -4503,19 +4503,19 @@ msgstr "Ist in der Liste %l"
 
 #: gmusicbrowser.pl:7824
 msgid "is less than %b"
-msgstr "ist weniger als %b"
+msgstr "ist kleiner als %b"
 
 #: gmusicbrowser.pl:7802 gmusicbrowser.pl:7808
 msgid "is less than %n"
-msgstr "ist weniger als %n"
+msgstr "ist kleiner als %n"
 
 #: gmusicbrowser.pl:7814
 msgid "is less than %n( %)"
-msgstr "ist weniger als %n( %)"
+msgstr "ist schlechter als %n( %)"
 
 #: gmusicbrowser.pl:7819
 msgid "is less than %n( s)"
-msgstr "ist weniger als %n( s)"
+msgstr "ist kleiner als %n( s)"
 
 #: gmusicbrowser.pl:7984
 msgid "is less than %n(Hz)"
@@ -4527,21 +4527,21 @@ msgstr "ist weniger als %n(kbps)"
 
 #: gmusicbrowser.pl:7823
 msgid "is more than %b"
-msgstr "ist mehr als %b"
+msgstr "ist größer als %b"
 
 #: gmusicbrowser.pl:7801 gmusicbrowser.pl:7807
 msgid "is more than %n"
-msgstr "ist mehr als %n"
+msgstr "ist größer als %n"
 
 #: gmusicbrowser.pl:7813
 msgid "is more than %n( %)"
-msgstr "ist mehr als %n( %)"
+msgstr "ist besser als %n( %)"
 
 #: gmusicbrowser.pl:7818
 msgid "is more than %n( s)"
-msgstr "ist mehr als %n( s)"
+msgstr "ist größer als %n( s)"
 
-#: gmusicbrowser.pl:7983
+#: gmusicbrowser.pl:79837983
 msgid "is more than %n(Hz)"
 msgstr "ist mehr als %n(Hz)"
 
@@ -4577,7 +4577,7 @@ msgstr "ist nicht in %s"
 
 #: gmusicbrowser.pl:7952
 msgid "is not in list %l"
-msgstr "Ist nicht in Liste %l"
+msgstr "Ist nicht in der Liste %l"
 
 #: gmusicbrowser.pl:7903
 msgid "isn't %g"
@@ -4838,7 +4838,7 @@ msgstr "Anzahl Lieder"
 
 #: gmusicbrowser_list.pm:1550
 msgid "number of songs in filter"
-msgstr "Liederanzahl im Filter"
+msgstr "Anzahl der Titel im Filter"
 
 #: gmusicbrowser.pl:7847 gmusicbrowser.pl:7855 gmusicbrowser.pl:7863
 #: gmusicbrowser.pl:7871
@@ -5074,11 +5074,11 @@ msgstr ""
 
 #: gmusicbrowser_list.pm:1578
 msgid "text mode"
-msgstr ""
+msgstr "Text"
 
 #: gmusicbrowser.pl:1560
 msgid "the command {name}"
-msgstr ""
+msgstr "Der Befehl {name}"
 
 #: gmusicbrowser.pl:5766
 msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
@@ -5090,7 +5090,7 @@ msgstr ""
 
 #: gmusicbrowser.pl:1553
 msgid "the {name} perl module"
-msgstr ""
+msgstr "das {name} Perl Modul"
 
 #: gmusicbrowser_layout.pm:194
 msgid "then {action}"
