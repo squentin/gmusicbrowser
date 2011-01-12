@@ -16,7 +16,6 @@ use strict;
 use warnings;
 require $::HTTP_module;
 use base 'Gtk2::Window';
-use JSON;
 use constant
 {	OPT => 'PLUGIN_FETCHCOVER_',
 	RES_LINES => 4,
@@ -29,12 +28,13 @@ my %Sites=
 (artist =>
  {	googlei => ['google images',"http://images.google.com/images?q=%s&imgsz=medium|large", \&parse_googlei],
 	lastfm => ['last.fm',"http://www.last.fm/music/%a/+images", \&parse_lastfm],
+    jamendo => ['Jamendo', "http://api.jamendo.com/get2/image/artist/plain/?name=%a&n=all", \&parse_jamendo],
  },
  album =>
  {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large&imgar=ns", \&parse_googlei],
 	googleihi =>[_"google images (hi-res)","http://www.google.com/images?q=%s&imgsz=xlarge|xxlarge&imgar=ns", \&parse_googlei],
 	slothradio => ['slothradio', "http://www.slothradio.com/covers/?artist=%a&album=%l", \&parse_sloth],
-	jamendo => ['Jamendo', "http://api.jamendo.com/get2/album_id+artist_id+artist_name+album_name+image/artist/json/album_artist/?artist_name=%a&n=all&imagesize=100", \&parse_jamendo],
+	jamendo => ['Jamendo', "http://api.jamendo.com/get2/image/album/plain/?artist_name=%a&n=all&imagesize=600", \&parse_jamendo],
 	#itunesgrabber => ['itunesgrabber',"http://www.thejosher.net/iTunes/index.php?artist=%a&album=%l", \&parse_itunesgrabber],
 	#freecovers => ['freecovers.net', "http://www.freecovers.net/api/search/%s", \&parse_freecovers], #could add /Music+CD but then we'd lose /Soundtrack
 	#rateyourmusic=> ['rateyourmusic.com', "http://rateyourmusic.com/search?searchterm=%s&searchtype=l",\&parse_rateyourmusic], # urls results in "403 Forbidden"
@@ -312,18 +312,10 @@ sub parse_jamendo
 {	my $result=$_[0];
 	my @list;
 
-    my $json_text = from_json( $result, { utf8  => 1 } );
-    my %albums = @{$json_text};
-
-print $result."\n";
-
-    for my $album (values %albums) {
-        while (my ($key, $value) = each %{$album}) {
-            print "$key = $value\n";
-        }
-    }
-
-
+    #print $result."\n";
+    while ($result=~m#(.+imgjam.com/[albums|artists].+)#g)
+	{	push @list, {url => $1};
+	}
 	return \@list;
 }
 
