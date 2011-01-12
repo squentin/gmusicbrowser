@@ -114,7 +114,21 @@ sub new
 	$textview->signal_connect(motion_notify_event 	=> \&update_cursor_cb);
 	$textview->signal_connect(visibility_notify_event=>\&update_cursor_cb);
 	$textview->signal_connect(query_tooltip => \&update_cursor_cb);
-
+	
+	my $store=Gtk2::ListStore->new('Glib::String','Glib::Double');
+	my $treeview=Gtk2::TreeView->new($store);
+	my $tc_artist=Gtk2::TreeViewColumn->new_with_attributes( _"Artist",Gtk2::CellRendererText->new,text => 0);
+	$tc_artist->set_sort_column_id(0);
+	$tc_artist->set_expand(1);
+	$treeview->append_column($tc_artist);
+	my $renderer=Gtk2::CellRendererText->new;
+	my $tc_similar=Gtk2::TreeViewColumn->new_with_attributes( "%",$renderer,text => 1);
+	$tc_similar->set_cell_data_func($renderer, sub { my ($column, $cell, $model, $iter, $func_data) = @_; my $rating = $model->get($iter, 1); $cell->set( text => sprintf '%.1f', $rating ); }, undef); # limit similarity rating to one decimal
+	$tc_similar->set_sort_column_id(1);
+	$tc_similar->set_alignment(1.0);
+	$treeview->append_column($tc_similar);
+	$treeview->set_rules_hint(1);
+	
 	my $togglebox = Gtk2::HBox->new();
 	my $group;
 	for my $togglebutton
@@ -141,17 +155,25 @@ sub new
 	if (!$::Options{OPT.'AutoSave'}) { $togglebox->pack_start($savebutton,0,0,0); }
 	$statbox->pack_start($togglebox,0,0,0);
 	$self->{buffer}=$textview->get_buffer;
-	$self->{textview}=$textview;
-
-	my $sw=Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type( $options->{shadow} || 'none');
-	$sw->set_policy('automatic','automatic');
-	$sw->add($textview);
-
+	$self->{store}=$store;
+	
 	my $infobox = Gtk2::HBox->new;
 	$infobox->set_spacing(0);
-	$infobox->pack_start($sw,1,1,0);
-
+	my $sw1=Gtk2::ScrolledWindow->new;
+	my $sw2=Gtk2::ScrolledWindow->new;
+	$sw1->add($textview);
+	$sw2->add($treeview);
+	for ($sw1,$sw2) {
+		$_->set_shadow_type('none');
+		$_->set_policy('automatic','automatic');
+		#$self->{$_} = $_;
+		$infobox->pack_start($_,1,1,0);
+	}
+	if ($self->{site} ne "similar") { $treeview->show; $sw2->set_no_show_all(1); } # only show the correct widget at startup
+	else { $textview->show; $sw1->set_no_show_all(1); }
+	$self->{sw1} = $sw1;
+	$self->{sw2} = $sw2;
+	
 	$self->pack_start($artistbox,0,0,0);
 	$self->pack_start($infobox,1,1,0);
 
@@ -164,6 +186,8 @@ sub toggled_cb
 	if ($togglebutton -> get_active) {
 		$self->{site} = $togglebutton->{key};
 		$self->SongChanged;
+		if ($self->{site} eq "similar") { $self->{sw1}->hide; $self->{sw2}->show; }
+		else { $self->{sw2}->hide; $self->{sw1}->show; }
 		$textview->set_tooltip_text($self->{site}) if $self->{site} ne "events";
 	}
 }
@@ -245,14 +269,14 @@ sub button_release_cb
 	my $self=::find_ancestor($textview,__PACKAGE__);
 	return ::FALSE unless $event->button == 1;
 	my ($x,$y)=$textview->window_to_buffer_coords('widget',$event->x, $event->y);
-	my $url=$self->url_at_coords($x,$y);
+	my $url=$self->url_at_coords($x,$y,$textview);
 	::main::openurl($url) if $url;
 	return ::FALSE;
 }
 
 sub url_at_coords
-{	my ($self,$x,$y)=@_;
-	my $iter=$self->{textview}->get_iter_at_location($x,$y);
+{	my ($self,$x,$y,$textview)=@_;
+	my $iter=$textview->get_iter_at_location($x,$y);
 	for my $tag ($iter->get_tags)
 	{	next unless $tag->{url};
 		if ($tag->{url}=~m/^#(\d+)?/) { $self->scrollto($1) if defined $1; last }
@@ -422,16 +446,14 @@ sub loaded
 
 	}
 	elsif ($self->{site} eq "similar") {
-		my $tag = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'left');
-
+		$self->{store}->clear;
 		for my $s_artist (split /<\/artist>/, $data) {
 			my %s_artist;
 			$s_artist{$1} = ::decode_html($2) while $s_artist=~ m#<(\w+)>([^<]*)</\1>#g;
 			next unless $s_artist{name}; # otherwise the last </artist> is also treated like an artist
 			my $match = $::Options{OPT.'SimilarRating'} / 100;
-			if ($s_artist{match} >= $match) {
-				my $similarity = $s_artist{match} * 100;
-				$buffer->insert_with_tags($iter,$s_artist{name}."  ".$similarity."\%\n",$tag);
+			if ($s_artist{match} >= $::Options{OPT.'SimilarRating'} / 100) {
+				$self->{store}->set($self->{store}->append,0,$s_artist{name},1,$s_artist{match} * 100);
 			}
 		}
 	}
