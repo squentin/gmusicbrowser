@@ -23,7 +23,7 @@ msgstr " von {length}"
 
 #: gmusicbrowser.pl:6024
 msgid "# songs"
-msgstr "# Lieder"
+msgstr "# Titel"
 
 #: gmusicbrowser_layout.pm:1709
 msgid "%S by %a"
@@ -46,8 +46,8 @@ msgstr[1] "%d Künstler"
 #: gmusicbrowser_list.pm:1628
 msgid "%d Song"
 msgid_plural "%d Songs"
-msgstr[0] "%d Lied"
-msgstr[1] "%d Lieder"
+msgstr[0] "%d Titel"
+msgstr[1] "%d Titel"
 
 #: gmusicbrowser.pl:361 gmusicbrowser_list.pm:7722 gmusicbrowser_songs.pm:502
 msgid "%d album"
@@ -91,33 +91,33 @@ msgstr[1] "%d Sekunden"
 #: gmusicbrowser_songs.pm:2337 plugins/audioscrobbler.pm:173
 msgid "%d song"
 msgid_plural "%d songs"
-msgstr[0] "%d Lied"
-msgstr[1] "%d Lieder"
+msgstr[0] "%d Titel"
+msgstr[1] "%d Titel"
 
 #: gmusicbrowser.pl:5051
 msgid "%d song added"
 msgid_plural "%d songs added"
-msgstr[0] "%d Lied hinzugefügt"
-msgstr[1] "%d Lieder hinzugefügt"
+msgstr[0] "%d Titel hinzugefügt"
+msgstr[1] "%d Titel hinzugefügt"
 
 #: gmusicbrowser.pl:2932 gmusicbrowser_layout.pm:227
 #: gmusicbrowser_layout.pm:230
 msgid "%d song in queue"
 msgid_plural "%d songs in queue"
-msgstr[0] "%d Lied in Warteliste"
-msgstr[1] "%d Lieder in Warteliste"
+msgstr[0] "%d Titel in Warteliste"
+msgstr[1] "%d Titel in Warteliste"
 
 #: gmusicbrowser_list.pm:274
 msgid "%d song in the library"
 msgid_plural "%d songs in the library"
-msgstr[0] "%d Lied in der Sammlung"
-msgstr[1] "%d Lieder in der Sammlung"
+msgstr[0] "%d Titel in der Sammlung"
+msgstr[1] "%d Titel in der Sammlung"
 
 #: gmusicbrowser_list.pm:264
 msgid "%d song selected"
 msgid_plural "%d songs selected"
-msgstr[0] "%d Lied gewählt"
-msgstr[1] "%d Lieder gewählt"
+msgstr[0] "%d Titel gewählt"
+msgstr[1] "%d Titel gewählt"
 
 #: gmusicbrowser.pl:7910
 msgid "%f is set"
@@ -182,8 +182,8 @@ msgstr "Die Datei '{file}' existiert. Soll sie überschrieben werden?"
 #: gmusicbrowser.pl:5915
 msgid "(%d song excluded)"
 msgid_plural "(%d songs excluded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "(%d Titel ausgeschlossen)"
+msgstr[1] "(%d Titel ausgeschlossen)"
 
 #: gmusicbrowser.pl:7907 gmusicbrowser.pl:7915
 msgid "(: )has one"
@@ -195,11 +195,11 @@ msgstr "(: )keins"
 
 #: plugins/artistinfo.pm:179
 msgid "(applied after restart)"
-msgstr ""
+msgstr "(angewendet nach Neustart)"
 
 #: gmusicbrowser.pl:2766
 msgid "(case insensitive)"
-msgstr "(schreibungsunabhängig)"
+msgstr "(Groß-/Kleinschreibung nicht berücksichtigen)"
 
 #: gmusicbrowser_tags.pm:373
 msgid "(common parent folder : {common})"
@@ -518,7 +518,7 @@ msgstr "Alle Titel"
 
 #: plugins/lullaby.pm:11
 msgid "Allow for scheduling fade-out and stop"
-msgstr "Zeitgesteuertes Ausblenden oder Stoppen von gmusicbrowser"
+msgstr "Zeitgesteuertes Ausblenden und Stoppen"
 
 #: plugins/mpris1.pm:11
 msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
@@ -780,15 +780,15 @@ msgstr "Alle Anfangsbuchstaben groß"
 
 #: gmusicbrowser.pl:7295
 msgid "Case insensitive"
-msgstr "Schreibungsunabhängig"
+msgstr "Groß-/Kleinschreibung nicht berücksichtigen"
 
 #: gmusicbrowser.pl:7295 gmusicbrowser_list.pm:3371
 msgid "Case sensitive"
-msgstr "Schreibungsabhängig"
+msgstr "Groß-/Kleinschreibung berücksichtigen"
 
 #: gmusicbrowser_list.pm:5057
 msgid "Case-sensitive"
-msgstr "Schreibungsabhängig"
+msgstr "Groß-/Kleinschreibung berücksichtigen"
 
 #: layouts:295
 msgid "Categories pane"
@@ -1168,7 +1168,7 @@ msgstr ""
 
 #: plugins/notify.pm:54
 msgid "Display stop/next actions"
-msgstr "Zeige Stop/Nächste Aktionen"
+msgstr "Zeige Stopp/Nächste Aktionen"
 
 #: plugins/karaoke.pm:11
 msgid "Display synchronized lyrics of the current song"
@@ -1444,11 +1444,11 @@ msgstr ""
 
 #: gmusicbrowser_songs.pm:2096 gmusicbrowser_songs.pm:2222
 msgid "Field name"
-msgstr ""
+msgstr "Feldname"
 
 #: gmusicbrowser_songs.pm:2148
 msgid "Field type"
-msgstr ""
+msgstr "Feldtyp"
 
 #: gmusicbrowser.pl:5211 gmusicbrowser_list.pm:5060
 msgid "Fields"
@@ -1493,15 +1493,15 @@ msgstr "Filter-Bearbeitung"
 
 #: gmusicbrowser_list.pm:18
 msgid "Filter on playing Album"
-msgstr "Filtere nach laufendem Album"
+msgstr "Filtere nach wiedergegebenem Album"
 
 #: gmusicbrowser_list.pm:19
 msgid "Filter on playing Artist"
-msgstr "Filtere nach laufendem Künstler"
+msgstr "Filtere nach wiedergegebenem Künstler"
 
 #: gmusicbrowser_list.pm:20
 msgid "Filter on playing Song"
-msgstr "Filtere nach laufendem Lied"
+msgstr "Filtere nach wiedergegebenem Titel"
 
 #: gmusicbrowser_list.pm:3181
 msgid "Filter on this album"
@@ -1517,7 +1517,7 @@ msgstr "Finde:"
 
 #: plugins/fetch_cover.pm:69
 msgid "Find a unique filename if file already exists"
-msgstr "Erstelle anderen Namen, wenn Datei bereits existiert"
+msgstr "Erstelle anderen Dateinamen, wenn Datei bereits existiert"
 
 #: gmusicbrowser.pl:404
 msgid "Find songs in same albums"
@@ -1579,7 +1579,7 @@ msgstr "Vorwärts"
 
 #: plugins/webcontext.pm:352
 msgid "Found but not working"
-msgstr "Gefunden aber funktioniert nicht"
+msgstr "Gefunden, funktioniert aber nicht"
 
 #: plugins/lullaby.pm:27
 msgid "Friday"
@@ -1711,7 +1711,7 @@ msgstr "Füge Liste von Dateien/Ordnern am Anfang der Wiedergabeliste hinzu"
 
 #: gmusicbrowser_tags.pm:802
 msgid "Invalid regular expression"
-msgstr ""
+msgstr "Ungültiger regulärer Ausdruck"
 
 #: layouts:781
 msgid "Invisible hot spot"
@@ -1777,7 +1777,7 @@ msgstr "Sprache"
 
 #: gmusicbrowser_tags.pm:1537
 msgid "Languages"
-msgstr ""
+msgstr "Sprachen"
 
 #: gmusicbrowser.pl:850 gmusicbrowser_songs.pm:659
 msgid "Last played"
@@ -1793,11 +1793,11 @@ msgstr "Starte Rip-Programm"
 
 #: gmusicbrowser_layout.pm:497
 msgid "Layout"
-msgstr ""
+msgstr "Layout"
 
 #: plugins/desktopwidget.pm:35
 msgid "Layout :"
-msgstr ""
+msgstr "Layout:"
 
 #: gmusicbrowser.pl:5209
 msgid "Layouts"
@@ -5054,7 +5054,7 @@ msgstr "Stereo"
 
 #: gmusicbrowser.pl:327
 msgid "stop"
-msgstr "Stop"
+msgstr "Stopp"
 
 #: gmusicbrowser.pl:327
 msgid "stop when queue empty"
