@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-12 22:01+0100\n"
+"POT-Creation-Date: 2011-01-13 13:45+0100\n"
 "PO-Revision-Date: 2010-12-18 04:41+0100\n"
 "Last-Translator: Vašek Kovářík <L3D9Z6@seznam.cz>\n"
 "Language-Team: Czech\n"
@@ -1656,7 +1656,7 @@ msgstr "Multimediální klávesy Gnome"
 msgid "Gnome multimedia keys plugin"
 msgstr "Zásuvný modul multimediálních kláves Gnome"
 
-#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6512
+#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6512 layouts:76
 msgid "Go to playing song"
 msgstr "Přejít na přehrávanou skladbu"
 
@@ -2146,11 +2146,11 @@ msgstr "Nový název"
 msgid "Next"
 msgstr "Další"
 
-#: gmusicbrowser.pl:1012
+#: gmusicbrowser.pl:1012 layouts:20
 msgid "Next Album"
 msgstr "Další album"
 
-#: gmusicbrowser.pl:1013
+#: gmusicbrowser.pl:1013 layouts:21
 msgid "Next Artist"
 msgstr "Další interpret"
 
@@ -2639,7 +2639,7 @@ msgstr "Stisknout klávesu nebo kombinaci kláves"
 msgid "Previous"
 msgstr "Předchozí"
 
-#: gmusicbrowser.pl:1015
+#: gmusicbrowser.pl:1015 layouts:52
 msgid "Previous Song"
 msgstr "Předchozí skladba"
 
@@ -4970,6 +4970,10 @@ msgstr "průměrné hodnocení"
 #: gmusicbrowser_tags.pm:2025
 msgid "recording location"
 msgstr "nahrávání umístění"
+
+#: layouts:48
+msgid "reduced view"
+msgstr ""
 
 #: gmusicbrowser.pl:5650
 msgid "requires xdg-screensaver"

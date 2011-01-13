@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser.pot\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-12 22:01+0100\n"
+"POT-Creation-Date: 2011-01-13 13:45+0100\n"
 "PO-Revision-Date: 2009-04-30 13:14+0800\n"
 "Last-Translator: Google Translate\n"
 "Language-Team: Chinese\n"
@@ -1603,7 +1603,7 @@ msgstr "Gnome多媒体键"
 msgid "Gnome multimedia keys plugin"
 msgstr "Gnome的多媒体键插件"
 
-#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6512
+#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6512 layouts:76
 msgid "Go to playing song"
 msgstr "转到正在播放曲目"
 
@@ -2080,11 +2080,11 @@ msgstr "新名称"
 msgid "Next"
 msgstr "下一个"
 
-#: gmusicbrowser.pl:1012
+#: gmusicbrowser.pl:1012 layouts:20
 msgid "Next Album"
 msgstr ""
 
-#: gmusicbrowser.pl:1013
+#: gmusicbrowser.pl:1013 layouts:21
 msgid "Next Artist"
 msgstr ""
 
@@ -2570,7 +2570,7 @@ msgstr "按下一个键或组合键"
 msgid "Previous"
 msgstr ""
 
-#: gmusicbrowser.pl:1015
+#: gmusicbrowser.pl:1015 layouts:52
 msgid "Previous Song"
 msgstr "上一首"
 
@@ -4878,6 +4878,10 @@ msgstr ""
 #: gmusicbrowser_tags.pm:2025
 msgid "recording location"
 msgstr "记录位置"
+
+#: layouts:48
+msgid "reduced view"
+msgstr ""
 
 #: gmusicbrowser.pl:5650
 msgid "requires xdg-screensaver"

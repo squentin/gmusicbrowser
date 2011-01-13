@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-12 22:01+0100\n"
+"POT-Creation-Date: 2011-01-13 13:45+0100\n"
 "PO-Revision-Date: 2010-10-17 20:10-0300\n"
 "Last-Translator: Genesis Bustamante <genmarc@gmail.com>\n"
 "Language-Team:  <es@li.org>\n"
@@ -1634,7 +1634,7 @@ msgstr "Gnome mmkeys"
 msgid "Gnome multimedia keys plugin"
 msgstr "Teclas multimedia de Gnome"
 
-#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6512
+#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6512 layouts:76
 msgid "Go to playing song"
 msgstr "Ir a la canción que está sonando"
 
@@ -2118,11 +2118,11 @@ msgstr "Nuevo nombre"
 msgid "Next"
 msgstr "Siguiente"
 
-#: gmusicbrowser.pl:1012
+#: gmusicbrowser.pl:1012 layouts:20
 msgid "Next Album"
 msgstr "Siguiente álbum"
 
-#: gmusicbrowser.pl:1013
+#: gmusicbrowser.pl:1013 layouts:21
 msgid "Next Artist"
 msgstr "Siguiente artista"
 
@@ -2611,7 +2611,7 @@ msgstr "Pulse una tecla o combinación de teclas"
 msgid "Previous"
 msgstr "Anterior"
 
-#: gmusicbrowser.pl:1015
+#: gmusicbrowser.pl:1015 layouts:52
 msgid "Previous Song"
 msgstr "Canción anterior"
 
@@ -4940,6 +4940,10 @@ msgstr "puntuación promedio"
 #: gmusicbrowser_tags.pm:2025
 msgid "recording location"
 msgstr "grabando localización"
+
+#: layouts:48
+msgid "reduced view"
+msgstr ""
 
 #: gmusicbrowser.pl:5650
 msgid "requires xdg-screensaver"

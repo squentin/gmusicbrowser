@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9621\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-13 10:21+0100\n"
+"POT-Creation-Date: 2011-01-13 13:45+0100\n"
 "PO-Revision-Date: 2010-02-22 21:01+0100\n"
 "Last-Translator:  <staubi@linuxmail.org>\n"
 "Language-Team: german <de@li.org>\n"
@@ -1603,7 +1603,8 @@ msgstr "GStreamer Modul nicht geladen"
 
 #: gmusicbrowser_gstreamer-0.10.pm:452
 msgid "Gain for songs missing replaygain tags"
-msgstr "Wiedergabe-Verstärkung anwenden bei Liedern ohne Wiedergabe-Verstärkung-Tag"
+msgstr ""
+"Wiedergabe-Verstärkung anwenden bei Liedern ohne Wiedergabe-Verstärkung-Tag"
 
 #: gmusicbrowser.pl:7901 gmusicbrowser_tags.pm:1536 gmusicbrowser_tags.pm:1575
 #: gmusicbrowser_tags.pm:1588 gmusicbrowser_tags.pm:1610
@@ -1631,7 +1632,7 @@ msgstr "Gnome MMTasten"
 msgid "Gnome multimedia keys plugin"
 msgstr "Gnome Multimediatasten-Erweiterung"
 
-#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6512
+#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6512 layouts:76
 msgid "Go to playing song"
 msgstr "Gehe zu laufendem Titel"
 
@@ -1683,7 +1684,8 @@ msgstr "Importiere Liste"
 msgid ""
 "In this case one command by file will be run\n"
 "\n"
-msgstr "In diesem Fall wird ein Befehl pro Datei ausgeführt\n"
+msgstr ""
+"In diesem Fall wird ein Befehl pro Datei ausgeführt\n"
 "\n"
 
 #: gmusicbrowser.pl:1045
@@ -2117,21 +2119,21 @@ msgstr "Neuer Name"
 msgid "Next"
 msgstr "Nächstes"
 
-#: gmusicbrowser.pl:1012
+#: gmusicbrowser.pl:1012 layouts:20
 msgid "Next Album"
 msgstr "Nächstes Album"
 
-#: gmusicbrowser.pl:1013
+#: gmusicbrowser.pl:1013 layouts:21
 msgid "Next Artist"
 msgstr "Nächster Künstler"
 
 #: gmusicbrowser.pl:1014 gmusicbrowser_layout.pm:78
 msgid "Next Song"
-msgstr "Nächtes Lied"
+msgstr "Nächter Titel"
 
 #: gmusicbrowser.pl:1010
 msgid "Next Song In Playlist"
-msgstr "Nächstes Lied in Wiedergabeliste"
+msgstr "Nächster Titel in Wiedergabeliste"
 
 #: gmusicbrowser_layout.pm:594
 msgid "No connections"
@@ -2609,7 +2611,7 @@ msgstr "Taste oder Tastenkombination drücken"
 msgid "Previous"
 msgstr "Vorheriges"
 
-#: gmusicbrowser.pl:1015
+#: gmusicbrowser.pl:1015 layouts:52
 msgid "Previous Song"
 msgstr "Vorheriger Titel"
 
@@ -4939,6 +4941,10 @@ msgstr "Durchschnittliche Bewertung"
 #: gmusicbrowser_tags.pm:2025
 msgid "recording location"
 msgstr "Aufnahmeort"
+
+#: layouts:48
+msgid "reduced view"
+msgstr "Reduzierte Ansicht ein/ausschalten"
 
 #: gmusicbrowser.pl:5650
 msgid "requires xdg-screensaver"
