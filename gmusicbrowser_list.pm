@@ -1250,7 +1250,7 @@ sub SongArray_changed_cb
 	}
 	$self->SetSelection(\@selected) if $updateselection;
 	$self->Hide(!scalar @$array) if $self->{hideif} eq 'empty';
-	$self->check_current_row;	
+	$self->check_current_row;
 }
 
 sub FollowSong
@@ -1896,20 +1896,23 @@ sub SongsAdded_cb
 sub SongsChanged_cb
 {	my ($self,$IDs,$fields)=@_;
 	return if $self->{needupdate};
-	if ( $self->{filter}->changes_may_affect($IDs,$fields) )
-	{	$self->{needupdate}=1;
-		::IdleDo('9_FPfull'.$self,5000,\&updatefilter,$self);
-	}
-	else
-	{	for my $page ( $self->get_field_pages )
-		{	next unless $page->{valid} && $page->{hash};
-			my @depends= Songs::Depends( $page->{Depend_on_field} );
-			next unless ::OneInCommon(\@depends,$fields);
-			$page->{valid}=0;
-			$page->{hash}=undef;
-			::IdleDo('9_FP'.$self,1000,\&refresh_current_page,$self) if $page->mapped;
-		}
-	}
+    if (defined $self->{filter})
+    {
+	    if ( $self->{filter}->changes_may_affect($IDs,$fields) )
+	    {	$self->{needupdate}=1;
+		    ::IdleDo('9_FPfull'.$self,5000,\&updatefilter,$self);
+	    }
+	    else
+	    {	for my $page ( $self->get_field_pages )
+		    {	next unless $page->{valid} && $page->{hash};
+			    my @depends= Songs::Depends( $page->{Depend_on_field} );
+			    next unless ::OneInCommon(\@depends,$fields);
+			    $page->{valid}=0;
+			    $page->{hash}=undef;
+			    ::IdleDo('9_FP'.$self,1000,\&refresh_current_page,$self) if $page->mapped;
+		    }
+	    }
+    }
 }
 sub SongsRemoved_cb
 {	my ($self,$IDs)=@_;
@@ -7851,3 +7854,4 @@ sub Refresh
 =cut
 
 1;
+
