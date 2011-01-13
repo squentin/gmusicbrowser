@@ -22,14 +22,14 @@ require $::HTTP_module;
 use base 'Gtk2::Box';
 use constant
 {	OPT	=> 'PLUGIN_ARTISTINFO_', # MUST begin by PLUGIN_ followed by the plugin ID / package name
+	SITEURL => 0,
 };
 
 my %sites =
 (
-	biography => 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',
-	events => 'http://ws.audioscrobbler.com/2.0/?method=artist.getevents&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',
-	similar => 'http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1&limit=%l',
-);
+	biography => ['http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',_"biography",_"Show artist's biography"],
+	events => ['http://ws.audioscrobbler.com/2.0/?method=artist.getevents&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',_"events",_"Show artist's upcoming events"],
+	similar => ['http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1&limit=%l',_"similar",_"Show similar artists"]);
 =dop
 my @External=
 (	['lastfm',	"http://www.last.fm/music/%a",								_"Show Artist page on last.fm"],
@@ -73,9 +73,8 @@ sub Stop
 sub new
 {	my ($class,$options)=@_;
 	my $self = bless Gtk2::VBox->new(0,0), $class;
-
 	$self->{$_}=$options->{$_} for qw/site/;
-	delete $self->{site} if $self->{site} && !$sites{$self->{site}}; #reset selected site if no longer defined
+	delete $self->{site} if $self->{site} && !$sites{$self->{site}}[SITEURL]; #reset selected site if no longer defined
 	$self->{site} ||= 'biography';	# biography is the default site
 	my $fontsize=$self->style->font_desc;
 	$self->{fontsize} = $fontsize->get_size / Gtk2::Pango->scale;
@@ -117,7 +116,7 @@ sub new
 	
 	my $store=Gtk2::ListStore->new('Glib::String','Glib::Double');
 	my $treeview=Gtk2::TreeView->new($store);
-	my $tc_artist=Gtk2::TreeViewColumn->new_with_attributes( _"Artist",Gtk2::CellRendererText->new,text => 0);
+	my $tc_artist=Gtk2::TreeViewColumn->new_with_attributes( _"Artist",Gtk2::CellRendererText->new,markup=>0);
 	$tc_artist->set_sort_column_id(0);
 	$tc_artist->set_expand(1);
 	$treeview->append_column($tc_artist);
@@ -128,20 +127,17 @@ sub new
 	$tc_similar->set_alignment(1.0);
 	$treeview->append_column($tc_similar);
 	$treeview->set_rules_hint(1);
+	$treeview->signal_connect(button_release_event => \&tv_contextmenu);
 	
 	my $togglebox = Gtk2::HBox->new();
 	my $group;
-	for my $togglebutton
-	(	['biography',_"biography",_"Show artist's biography"],
-		['events',_"events",_"Show artist's upcoming events"],
-		['similar',_"similar",_"Show similar artists"]
-	)
-	{	my ($key,$item,$tip) = @$togglebutton;
+	foreach my $key (sort keys %sites)
+	{	my $item = $sites{$key}[1];
 		$item = Gtk2::RadioButton->new($group,$item);
 		$item->{key} = $key;
 		$item -> set_mode(0); # display as togglebutton
 		$item -> set_relief("none");
-		$item -> set_tooltip_text($tip);
+		$item -> set_tooltip_text($sites{$key}[2]);
 		$item->set_active( $key eq $self->{site} );
 		$item->signal_connect('toggled' => sub { &toggled_cb($self,$item,$textview); } );
 		$group = $item -> get_group;
@@ -166,7 +162,6 @@ sub new
 	for ($sw1,$sw2) {
 		$_->set_shadow_type('none');
 		$_->set_policy('automatic','automatic');
-		#$self->{$_} = $_;
 		$infobox->pack_start($_,1,1,0);
 	}
 	if ($self->{site} ne "similar") { $treeview->show; $sw2->set_no_show_all(1); } # only show the correct widget at startup
@@ -186,8 +181,6 @@ sub toggled_cb
 	if ($togglebutton -> get_active) {
 		$self->{site} = $togglebutton->{key};
 		$self->SongChanged;
-		if ($self->{site} eq "similar") { $self->{sw1}->hide; $self->{sw2}->show; }
-		else { $self->{sw2}->hide; $self->{sw1}->show; }
 		$textview->set_tooltip_text($self->{site}) if $self->{site} ne "events";
 	}
 }
@@ -245,6 +238,25 @@ sub set_buffer
 	my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
 	$self->{buffer}->insert_with_tags($iter,"\n$text",$tag_noresults);
 	$self->{buffer}->set_modified(0);
+}
+
+
+sub tv_contextmenu {
+	my ($widget, $event) = @_;
+	if ($event->button == 3) {
+	my $menu = Gtk2::Menu->new;
+	$menu->signal_connect (destroy => sub {
+		#TODO get url ($tree_view->get_path_at_pos ($x, $y))
+		#::main::openurl($url) if $url;
+	return 0;
+	});
+	my $item = Gtk2::MenuItem->new ("Open artist's last.fm page");
+	$menu->append ($item);
+	$item->show;
+	$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
+	# $menu will be destroyed when the user quits interacting with it.
+	return 0;
+	}
 }
 
 sub update_cursor_cb
@@ -337,7 +349,7 @@ sub ArtistChanged
 	$self->{artistratingvalue}= int($rating+0.5);
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
 	$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);
-	my $tip = "Average rating: ".$self->{artistratingvalue} ."\nRating range: ".$self->{artistratingrange}."\nTotal playcount: ".$self->{artistplaycount};
+	my $tip = _"Average rating: ".$self->{artistratingvalue} ._"\nRating range: ".$self->{artistratingrange}._"\nTotal playcount: ".$self->{artistplaycount};
 
 	$self->{artistrating}->set_from_pixbuf(Songs::Stars($self->{artistratingvalue},'rating'));
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($aID,"<big><b>%a</b></big>","artist",1) );
@@ -345,7 +357,7 @@ sub ArtistChanged
 	for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
 
 	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
-	my $url= $sites{$self->{site}};
+	my $url= $sites{$self->{site}}[SITEURL];
 	$url=~s/%a/$artist/;
 	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/;
 	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) {
@@ -370,6 +382,7 @@ sub load_url
 	warn "info : loading $url\n" if $::debug;
 	$self->{url}=$url;
 	#if ($self->{site} ne "web") { 
+	$self->{sw2}->hide; $self->{sw1}->show;
 	$self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url);
 	# }
 	#else {	$self->ExternalLinks; }
@@ -406,7 +419,7 @@ sub loaded
 			s/\n\n/\n/gi; # never more than one empty line (again)
 			s/<(.*?)>//gi; # strip tags
 		}
-		if ($data eq "") { $infoheader = "\nNo results found"; $artistinfo_ok = "0"; $tag_header = $tag_noresults; } # fallback text if artist-info not found
+		if ($data eq "") { $infoheader = _"\nNo results found"; $artistinfo_ok = "0"; $tag_header = $tag_noresults; } # fallback text if artist-info not found
 		else { $artistinfo_ok = "1"; }
 		$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 		$buffer->insert($iter,$data);
@@ -418,11 +431,10 @@ sub loaded
 	}
 
 	elsif ($self->{site} eq "events") {
-
 		my $tag = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'left');
 		if ($data =~ m#total=\"(.*?)\">#g) {
 			if ( $1 == 1) { $infoheader = $1 ." Upcoming Event\n\n"; }
-			elsif ( $1 == 0) { $self->set_buffer("No results found"); return; }
+			elsif ( $1 == 0) { $self->set_buffer(_"No results found"); return; }
 			else { $infoheader = $1 ." Upcoming Events\n\n"; }
 			$buffer->insert_with_tags($iter,$infoheader,$tag_header) if $infoheader;
 		}
@@ -447,14 +459,20 @@ sub loaded
 	}
 	elsif ($self->{site} eq "similar") {
 		$self->{store}->clear;
+		$self->{sw1}->hide; $self->{sw2}->show;
 		for my $s_artist (split /<\/artist>/, $data) {
 			my %s_artist;
 			$s_artist{$1} = ::decode_html($2) while $s_artist=~ m#<(\w+)>([^<]*)</\1>#g;
 			next unless $s_artist{name}; # otherwise the last </artist> is also treated like an artist
-			my $match = $::Options{OPT.'SimilarRating'} / 100;
 			if ($s_artist{match} >= $::Options{OPT.'SimilarRating'} / 100) {
-				$self->{store}->set($self->{store}->append,0,$s_artist{name},1,$s_artist{match} * 100);
+				my $aID=Songs::Search_artistid($s_artist{name});
+				my $stats='';
+				my $color=$self->style->text_aa("normal")->to_string;
+				my $fgcolor = substr($color,0,3).substr($color,5,2).substr($color,9,2);
+				$stats=AA::ReplaceFields($aID,' <span foreground="'.$fgcolor.'">(%X « %s)</span>',"artist",1) if $aID;
+				$self->{store}->set($self->{store}->append,0,::PangoEsc($s_artist{name}).$stats,1,$s_artist{match} * 100);
 			}
+			
 		}
 	}
 	$self->Save_text if $::Options{OPT.'AutoSave'} && $artistinfo_ok && $artistinfo_ok==1;
