@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9621\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-12 22:01+0100\n"
+"POT-Creation-Date: 2011-01-13 10:21+0100\n"
 "PO-Revision-Date: 2010-02-22 21:01+0100\n"
 "Last-Translator:  <staubi@linuxmail.org>\n"
 "Language-Team: german <de@li.org>\n"
@@ -273,15 +273,15 @@ msgstr "Abbrechen"
 
 #: gmusicbrowser_gstreamer-0.10.pm:659
 msgid "Abort ReplayGain analysis"
-msgstr "ReplayGain-Analyse abbrechen"
+msgstr "Analyse der Wiedergabe-Verstärkung abbrechen"
 
 #: gmusicbrowser.pl:4152
 msgid "Abort all"
-msgstr ""
+msgstr "Alles abbrechen"
 
 #: gmusicbrowser_songs.pm:1313
 msgid "Abort mass-tagging"
-msgstr "Alle taggen abbrechen"
+msgstr "Taggen abbrechen"
 
 #: gmusicbrowser_layout.pm:43
 msgid "About"
@@ -400,7 +400,7 @@ msgid ""
 msgstr ""
 "Zusätzlich kann folgendes Format verwendet werden:\n"
 " Standard Nummer1 Format1 Nummer2 Format2 ...\n"
-".ein Datum jünger als Nummer1 Sekunden verwendet Format1,..."
+" ein Datum jünger als Nummer1 Sekunden verwendet Format1, ..."
 
 #: plugins/fetch_cover.pm:11
 msgid ""
@@ -420,7 +420,7 @@ msgstr "Fügt Menüeintrag zum Liedkontextmenü hinzu"
 
 #: gmusicbrowser_list.pm:3517
 msgid "Advanced Search ..."
-msgstr "Erweiterte Suche..."
+msgstr "Erweiterte Suche ..."
 
 #: gmusicbrowser_tags.pm:1378 gmusicbrowser_tags.pm:1412
 msgid "Advanced Tag Editing"
@@ -441,7 +441,7 @@ msgstr "Album Künstler"
 
 #: gmusicbrowser_songs.pm:758
 msgid "Album gain"
-msgstr "Album Gain"
+msgstr "Wiedergabe-Verstärkung Album"
 
 #: gmusicbrowser_gstreamer-0.10.pm:447
 msgid "Album mode"
@@ -594,11 +594,11 @@ msgstr "Künstler Bild"
 
 #: gmusicbrowser.pl:851
 msgid "Artist,Album,Disc,Track"
-msgstr "Künstler,Album,Disk,Liednummer"
+msgstr "Künstler, Album, Disk, Titel-Nr."
 
 #: gmusicbrowser.pl:852
 msgid "Artist,Date,Album,Disc,Track"
-msgstr "Künstler,Datum,Album,Disk,Liednummer"
+msgstr "Künstler, Datum, Album, Disk, Titel-Nr."
 
 #: plugins/artistinfo.pm:9 plugins/artistinfo.pm:52
 msgid "Artistinfo"
@@ -630,7 +630,7 @@ msgstr "Author"
 
 #: gmusicbrowser_tags.pm:585
 msgid "Auto fill based on filenames ..."
-msgstr "Auf Basis der Dateinamen ausfüllen..."
+msgstr "Auf Basis der Dateinamen ausfüllen ..."
 
 #: gmusicbrowser_tags.pm:484
 msgid "Auto fill only blank fields"
@@ -646,11 +646,11 @@ msgstr "Automatischer Filter"
 
 #: gmusicbrowser_tags.pm:533
 msgid "Auto-increment track numbers"
-msgstr "Automatisch Lieder durchnummerieren"
+msgstr "Automatisch Erhöhung der Titel-Nr."
 
 #: plugins/artistinfo.pm:178 plugins/lyrics.pm:187
 msgid "Auto-save positive finds"
-msgstr "Automatisch positive Funde speichern"
+msgstr "Automatisch positive Treffer speichern"
 
 #: plugins/lyrics.pm:154
 msgid "Auto-scroll"
@@ -876,7 +876,7 @@ msgstr "Wähle Schriftart für die Liedtexte"
 
 #: plugins/lyrics.pm:41
 msgid "Choose font..."
-msgstr "Wähle Schriftart"
+msgstr "Wähle Schriftart ..."
 
 #: gmusicbrowser_songs.pm:613
 msgid "Choose icon for label {name}"
@@ -1058,7 +1058,7 @@ msgstr "Benutzerformate"
 #: gmusicbrowser_layout.pm:1378 gmusicbrowser_layout.pm:1399
 #: gmusicbrowser_layout.pm:1430 gmusicbrowser_list.pm:93
 msgid "Custom..."
-msgstr "Benutzerdefiniert..."
+msgstr "Benutzerdefiniert ..."
 
 #: gmusicbrowser.pl:848 gmusicbrowser_tags.pm:1534 gmusicbrowser_tags.pm:1572
 msgid "Date"
@@ -1212,7 +1212,7 @@ msgstr "Nicht benachrichtigen wenn das Hauptfenster sichtbar ist"
 
 #: plugins/audioscrobbler.pm:68
 msgid "Don't submit current song"
-msgstr "Aktuelles Lied nicht übertragen"
+msgstr "Aktuellen Titel nicht übertragen"
 
 #: gmusicbrowser.pl:1030
 msgid "Edit Current Song Properties"
@@ -1228,7 +1228,7 @@ msgstr "Editiere Liedtext"
 
 #: gmusicbrowser_tags.pm:2287
 msgid "Edit Lyrics ..."
-msgstr "Editiere Liedtext..."
+msgstr "Bearbeite Liedtext ..."
 
 #: gmusicbrowser.pl:4595
 msgid "Edit Multiple Songs Properties"
@@ -1252,7 +1252,7 @@ msgstr "Bearbeite Filter"
 
 #: gmusicbrowser_list.pm:6497
 msgid "Edit grouping ..."
-msgstr "Editiere Gruppierung..."
+msgstr "Bearbeite Gruppierungen ..."
 
 #: gmusicbrowser_list.pm:2836
 msgid "Edit list"
@@ -1260,11 +1260,11 @@ msgstr "Bearbeite Liste"
 
 #: gmusicbrowser_layout.pm:1347
 msgid "Edit ordered modes ..."
-msgstr "Editiere Sortiermodi..."
+msgstr "Editiere Sortiermodi ..."
 
 #: gmusicbrowser_layout.pm:1331
 msgid "Edit random modes ..."
-msgstr "Editiere Zufallsmodi..."
+msgstr "Editiere Zufallsmodi ..."
 
 #: gmusicbrowser.pl:1031
 msgid "Edit selected song properties"
@@ -1272,7 +1272,7 @@ msgstr "Bearbeite gewählte Datei-Infos"
 
 #: gmusicbrowser.pl:8782 gmusicbrowser_layout.pm:34
 msgid "Edit..."
-msgstr "Bearbeite..."
+msgstr "Bearbeite ..."
 
 #: layouts:360
 msgid "EditList"
@@ -1383,7 +1383,7 @@ msgstr "Fehler beim schreiben von '{file}'"
 
 #: gmusicbrowser_gstreamer-0.10.pm:660
 msgid "Error writing replaygain tags :\n"
-msgstr "Fehler beim schreiben der ReplayGain-Tags:\n"
+msgstr "Fehler beim schreiben der Wiedergabe-Verstärkung-Tags:\n"
 
 #: plugins/artistinfo.pm:443 plugins/lyrics.pm:653
 msgid "Error: invalid filename pattern"
@@ -1416,7 +1416,7 @@ msgstr "Exportiere zu M3U-Datei"
 
 #: gmusicbrowser_gstreamer-0.10.pm:451
 msgid "Extra gain"
-msgstr "ExtraGain"
+msgstr "Extra Wiedergabe-Verstärkung"
 
 #: gmusicbrowser.pl:5666
 msgid "Extract guest artist from title :"
@@ -1555,7 +1555,7 @@ msgstr "Ordner, in denen nach neuen Liedern gesucht werden soll"
 #: gmusicbrowser_layout.pm:3622 gmusicbrowser_list.pm:17
 #: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6509
 msgid "Follow playing song"
-msgstr "Folge laufendem Lied"
+msgstr "Folge laufendem Titel"
 
 #: gmusicbrowser_layout.pm:3622
 msgid "Follow selected song"
@@ -1603,7 +1603,7 @@ msgstr "GStreamer Modul nicht geladen"
 
 #: gmusicbrowser_gstreamer-0.10.pm:452
 msgid "Gain for songs missing replaygain tags"
-msgstr "Lautstärkeanpassung anwenden bei Liedern ohne ReplayGain-Tag"
+msgstr "Wiedergabe-Verstärkung anwenden bei Liedern ohne Wiedergabe-Verstärkung-Tag"
 
 #: gmusicbrowser.pl:7901 gmusicbrowser_tags.pm:1536 gmusicbrowser_tags.pm:1575
 #: gmusicbrowser_tags.pm:1588 gmusicbrowser_tags.pm:1610
@@ -1633,7 +1633,7 @@ msgstr "Gnome Multimediatasten-Erweiterung"
 
 #: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6512
 msgid "Go to playing song"
-msgstr "Gehe zu spielendem Lied"
+msgstr "Gehe zu laufendem Titel"
 
 #: gmusicbrowser_list.pm:7325
 msgid "Group by :"
@@ -1683,7 +1683,8 @@ msgstr "Importiere Liste"
 msgid ""
 "In this case one command by file will be run\n"
 "\n"
-msgstr ""
+msgstr "In diesem Fall wird ein Befehl pro Datei ausgeführt\n"
+"\n"
 
 #: gmusicbrowser.pl:1045
 msgid "Increase Volume"
@@ -1889,7 +1890,7 @@ msgstr "Laden fehlgeschlagen."
 
 #: plugins/artistinfo.pm:335 plugins/lyrics.pm:351
 msgid "Loading..."
-msgstr "Lade..."
+msgstr "Lade ..."
 
 #: gmusicbrowser.pl:421
 msgid "Lock"
@@ -2027,7 +2028,7 @@ msgstr "Menüeintragsname"
 
 #: layouts:172
 msgid "Minimal tip"
-msgstr ""
+msgstr "Mini"
 
 #: plugins/desktopwidget.pm:183
 msgid "Minimum size"
@@ -2176,7 +2177,7 @@ msgstr "Normaler Modus"
 
 #: gmusicbrowser_gstreamer-0.10.pm:435
 msgid "Normalize volume (the files must have replaygain tags)"
-msgstr "Lautstärkeanpassung (Dateien benötigen ReplayGain-Tags)"
+msgstr "Lautstärkeanpassung (Dateien benötigen Wiedergabe-Verstärkung-Tags)"
 
 #: plugins/lyrics.pm:25 plugins/webcontext.pm:351 plugins/webcontext.pm:352
 msgid "Not found"
@@ -2404,7 +2405,7 @@ msgstr "Besitzeridentifikation"
 
 #: gmusicbrowser.pl:853
 msgid "Path,Album,Disc,Track,File"
-msgstr "Pfad, Album, Disk, Titelnummer, Datei"
+msgstr "Pfad, Album, Disk, Titel-Nr., Datei"
 
 #: gmusicbrowser.pl:847
 msgid "Path,File"
@@ -2946,15 +2947,15 @@ msgstr "Ersetze"
 
 #: gmusicbrowser_tags.pm:2178
 msgid "Replace..."
-msgstr "Ersetzen..."
+msgstr "Ersetzen ..."
 
 #: gmusicbrowser_gstreamer-0.10.pm:438 gmusicbrowser_gstreamer-0.10.pm:442
 msgid "ReplayGain options"
-msgstr "ReplayGain-Einstellungen"
+msgstr "Einstellungen Wiedergabe-Verstärkung"
 
 #: gmusicbrowser_gstreamer-0.10.pm:498 gmusicbrowser_gstreamer-0.10.pm:558
 msgid "Replaygain analysis"
-msgstr "ReplayGain-Analyse"
+msgstr "Analyse Wiedergabe-Verstärkung"
 
 #: gmusicbrowser_layout.pm:541 gmusicbrowser_list.pm:3401
 msgid "Reset filter"
@@ -3022,7 +3023,7 @@ msgstr "Speichere Biografie des Künstlers"
 
 #: gmusicbrowser_tags.pm:2179
 msgid "Save as..."
-msgstr "Speichern unter..."
+msgstr "Speichern unter ..."
 
 #: gmusicbrowser_list.pm:2832
 msgid "Save current filter as"
@@ -3074,19 +3075,19 @@ msgstr "Nach neuen Titeln suchen"
 
 #: gmusicbrowser_gstreamer-0.10.pm:501
 msgid "Scan per-file track gain"
-msgstr "Scanne Abweichung pro Titel"
+msgstr "Prüfe Wiedergabe-Verstärkung pro Titel"
 
 #: gmusicbrowser_gstreamer-0.10.pm:500
 msgid "Scan this file"
-msgstr "Scanne diese Datei"
+msgstr "Prüfe diese Datei"
 
 #: gmusicbrowser_gstreamer-0.10.pm:502
 msgid "Scan using tag-defined album"
-msgstr "Scanne anhand Tag definierter Alben"
+msgstr "Prüfe anhand Tag definierter Alben"
 
 #: gmusicbrowser.pl:5050
 msgid "Scanning"
-msgstr "Scanne"
+msgstr "Prüfe"
 
 #: plugins/lyrics.pm:35
 msgid "Scroll with song"
@@ -3335,11 +3336,11 @@ msgstr "Zeige Knöpfe"
 
 #: gmusicbrowser_gstreamer-0.10.pm:446
 msgid "Show replaygain submenu"
-msgstr "Zeige ReplayGain-Untermenu"
+msgstr "Zeige Untermenü Wiedergabe-Verstärkung"
 
 #: gmusicbrowser_list.pm:3377
 msgid "Show suggestions"
-msgstr ""
+msgstr "Zeige Vorschlag"
 
 #: gmusicbrowser_list.pm:1659
 msgid "Show tabs"
@@ -3351,7 +3352,7 @@ msgstr "Symbol im Benachrichtigungsfeld anzeigen"
 
 #: gmusicbrowser.pl:5718
 msgid "Show tray tip on song change"
-msgstr "Benachrichtigung bei Liedwechsel anzeigen"
+msgstr "Benachrichtigung bei Titelwechsel anzeigen"
 
 #: gmusicbrowser.pl:1032
 msgid "Show/Hide"
@@ -3388,7 +3389,7 @@ msgstr "Gemischte Alben"
 
 #: gmusicbrowser.pl:855
 msgid "Shuffled albums, shuffled tracks"
-msgstr "Gemischte Alben, gemischte Lieder"
+msgstr "Gemischte Alben, gemischte Titel"
 
 #: gmusicbrowser.pl:5653
 msgid "Shutdown command :"
@@ -3424,15 +3425,15 @@ msgstr "Liedeigenschaften"
 
 #: gmusicbrowser_layout.pm:3680
 msgid "Song rating"
-msgstr "Liedbewertung"
+msgstr "Titelbewertung"
 
 #: gmusicbrowser.pl:6782
 msgid "SongTree groupings edition"
-msgstr "SongTree Gruppierung editieren"
+msgstr "SongTree Gruppierung bearbeiten"
 
 #: gmusicbrowser.pl:390
 msgid "Songs Properties"
-msgstr "Liedeigenschaften"
+msgstr "Titeleigenschaften"
 
 #: gmusicbrowser_layout.pm:481
 msgid "Sort"
@@ -3497,19 +3498,19 @@ msgstr "Beschneide WikiPedia Seiten"
 
 #: plugins/audioscrobbler.pm:179
 msgid "Submit Now-Playing OK"
-msgstr "Aktuelles Lied übermitteln OK"
+msgstr "Übertragung des aktuellen Titels OK"
 
 #: plugins/audioscrobbler.pm:172
 msgid "Submit OK"
-msgstr "Übermitteln OK"
+msgstr "Übertragung OK"
 
 #: plugins/audioscrobbler.pm:197
 msgid "Submit failed : "
-msgstr "Übermitteln gescheitert:"
+msgstr "Übertragung gescheitert:"
 
 #: plugins/audioscrobbler.pm:11
 msgid "Submit played songs to last.fm"
-msgstr "Übermittle gespielte Lieder an Last.FM"
+msgstr "Übertrage gespielte Titel an Last.FM"
 
 #: gmusicbrowser_tags.pm:1584
 msgid "Subtitle"
@@ -3653,7 +3654,7 @@ msgstr "Nr."
 
 #: gmusicbrowser_songs.pm:745
 msgid "Track gain"
-msgstr "Titel Gain"
+msgstr "Wiedergabe-Verstärkung Titel"
 
 #: gmusicbrowser_songs.pm:752
 msgid "Track peak"
@@ -3737,7 +3738,7 @@ msgstr "Verwende MozEmbed"
 
 #: gmusicbrowser_gstreamer-0.10.pm:435
 msgid "Use ReplayGain"
-msgstr "Verwende ReplayGain"
+msgstr "Verwende Wiedergabe-Verstärkung"
 
 #: plugins/webcontext.pm:349
 msgid "Use WebKit"
@@ -4281,7 +4282,7 @@ msgstr "während Aufnahme"
 
 #: gmusicbrowser_list.pm:37
 msgid "edit ..."
-msgstr "Editiere ..."
+msgstr "Bearbeite ..."
 
 #: gmusicbrowser_tags.pm:2051
 msgid "email"
@@ -4333,7 +4334,7 @@ msgstr "Beispiele:"
 
 #: gmusicbrowser_gstreamer-0.10.pm:452
 msgid "fallback-gain"
-msgstr "FallbackGain"
+msgstr "Fallback Wiedergabe-Verstärkung"
 
 #: gmusicbrowser_songs.pm:3996
 msgid "false"
@@ -4541,7 +4542,7 @@ msgstr "ist besser als %n( %)"
 msgid "is more than %n( s)"
 msgstr "ist größer als %n( s)"
 
-#: gmusicbrowser.pl:79837983
+#: gmusicbrowser.pl:7983
 msgid "is more than %n(Hz)"
 msgstr "ist mehr als %n(Hz)"
 
@@ -4993,15 +4994,15 @@ msgstr "gespeicherte Filter"
 
 #: gmusicbrowser.pl:6782
 msgid "saved groupings"
-msgstr "gespeicherte Gruppierungen"
+msgstr "Gespeicherte Gruppierungen"
 
 #: gmusicbrowser.pl:6780
 msgid "saved random modes"
-msgstr "gespeicherte Zufallsmodi"
+msgstr "Gespeicherte Zufallsmodi"
 
 #: gmusicbrowser.pl:6778
 msgid "saved sort modes"
-msgstr "gespeicherte Sortiermodi"
+msgstr "Gespeicherte Sortiermodi"
 
 #: gmusicbrowser.pl:5888
 msgid "scan now"
