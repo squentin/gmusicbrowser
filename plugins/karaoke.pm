@@ -64,6 +64,7 @@ sub new
 sub filename_preview
 {	return '' unless defined $::SongID;
 	my $t=::pathfilefromformat( $::SongID, $::Options{OPT.'PathFile'}, undef,1);
+	$t= ::filename_to_utf8displayname($t) if $t;
 	$t= $t ? ::PangoEsc(_("example : ").$t) : "<i>".::PangoEsc(_"invalid pattern")."</i>";
 	return '<small>'.$t.'</small>';
 }

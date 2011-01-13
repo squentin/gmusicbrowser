@@ -4122,7 +4122,7 @@ sub DeleteFiles
 }
 
 sub filenamefromformat
-{	my ($ID,$format,$ext)=@_;
+{	my ($ID,$format,$ext)=@_;	# $format is in utf8
 	my $s= ReplaceFieldsForFilename($ID,$format);
 	if ($ext)
 	{	$s= Songs::Get($ID,'barefilename') if $s eq '';
@@ -4134,9 +4134,12 @@ sub filenamefromformat
 	return $s;
 }
 sub pathfromformat
-{	my ($ID,$format,$basefolder,$icase)=@_;
+{	my ($ID,$format,$basefolder,$icase)=@_;		# $format is in utf8, $basefolder is a byte string
 	my $path= defined $basefolder ? $basefolder.SLASH : '';
-	$path.=$1 if $format=~s#^([^\$%]*$QSLASH)##;		# move constant part of format in path
+	if ($format=~s#^([^\$%]*$QSLASH)##)					# move constant part of format in path
+	{	my $constant=$1;
+		$path.= filename_from_unicode($constant);	# calling filename_from_unicode directly on $1 causes strange bugs afterward (with perl-Glib-1.222)
+	}
 	$path= Songs::Get($ID,'path').SLASH.$path if $path!~m#^~?$QSLASH#o; # use song's path as base for relative paths
 	$path=~s#^~($QSLASH)#$ENV{HOME}$1#o;				# replace leading ~/ by homedir
 	$path=~s#$QSLASH+\.?$QSLASH+#SLASH#goe; 			# remove repeated slashes and /./
@@ -4153,7 +4156,7 @@ sub pathfromformat
 	return $path;
 }
 sub pathfilefromformat
-{	my ($ID,$format,$ext,$icase)=@_;
+{	my ($ID,$format,$ext,$icase)=@_;	# $format is in utf8
 	my ($path,$file)= $format=~m/^(?:(.*)$QSLASH)?([^$QSLASH]+)$/o;
 	#return undef unless $file;
 	$file='' unless defined $file;
