@@ -16,10 +16,10 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
             HBCurrentTrack = 10_VBCurrentTrack
                 VBCurrentTrack = _Filler1 HBTitle HBArtistAndLock HBAlbumAndLock HBStars 15Cover _Filler2 5HBReplayButtons
-                HBTitle = 20Filler11 _Title(xalign=0.5,markup="<big><b>%t</b></big>")
-                HBAlbumAndLock = LockAlbum(button=1,relief=half) 5Filler14 _Album(xalign=0.5,markup="%l")
-                HBArtistAndLock = LockArtist(button=1,relief=half) 5Filler15 _Artist(xalign=0.5,markup="%a")
-                HBStars =  20Filler12 _Stars
+                HBTitle = 10Filler11 _Title(xalign=0.5,markup="<big><b>%t</b></big>")
+                HBAlbumAndLock = LockAlbum(button=1,relief=half) Next1(button=1,click1=NextAlbum,tip=_"Next Album") _Album(xalign=0.5,markup="%l") 20Filler14
+                HBArtistAndLock = LockArtist(button=1,relief=half) Next2(button=1,click1=NextArtist,tip=_"Next Artist") _Artist(xalign=0.5,markup="%a") 20Filler15
+                HBStars =  10Filler12 _Stars
             VBSavedFilterPane = _FilterPane4(nb=0,hide=0) 4Filler7
 
             VPfp0 = _VPfp1 _VBBottom
@@ -45,11 +45,11 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
     HPControlsInfoAndSearch = _HPfpSongInfo_Search VBControls
         VBControls = _Filler16 HBControls _Filler17
-            HBControls =  -MBmain -HBVolume -Fullscreen(size=button) -TogButton(icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
+            HBControls =  -MBmain -HBVolume -Fullscreen(size=button) -TogButton(tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
 
         HBVolume = VolumeIcon(button=1)
 
-        HBReplayButtons = _Filler3 Prev(size=large-toolbar) Play(size=dialog) Next(size=large-toolbar) _Filler4
+        HBReplayButtons = _Filler3 Prev(size=large-toolbar,tip=_"Previous Song") Play(size=dialog) Next(size=large-toolbar) _Filler4
 
         HPfpSongInfo_Search = _HBSongInfo _HBSearch
             HBSongInfo = 10_HBSongInfoDetails
@@ -73,7 +73,7 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
             HBSongTree = _VBSongTree
             VBSongTree = HBSongTreeAct _SongTree 5HBSongTreeStats
-                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter Button(size=menu,click1=GoToCurrentSong,stock=gtk-jump-to) 20FLock _Filler9 _Filler10 -ResetFilter -Refresh -FBox -MBSongTree
+                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter Button(size=menu,click1=GoToCurrentSong,stock=gtk-jump-to,tip=_"Go to playing song") 20FLock _Filler9 _Filler10 -ResetFilter -Refresh -FBox -MBSongTree
                 HBSongTreeStats = -Total(size=small)
 
 
