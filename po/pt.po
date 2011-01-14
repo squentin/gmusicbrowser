@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-14 20:19+0100\n"
+"POT-Creation-Date: 2011-01-14 12:26+0100\n"
 "PO-Revision-Date: 2010-12-21 14:24-0300\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese <LL@li.org>\n"
@@ -172,6 +172,10 @@ msgstr "%n não pulada(s) ultimamente"
 msgid "%n shortest"
 msgstr "%n mais curta(s)"
 
+#: plugins/daap_server.pm:192
+msgid "'s gmusicbrowser@"
+msgstr ""
+
 #: gmusicbrowser.pl:4047
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' existente. Sobrescrever ?"
@@ -220,6 +224,17 @@ msgstr ""
 "nele \n"
 "- Passar para outra canção ao retirar a música atual da lista de reprodução"
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:334
+msgid "... on played songs"
+msgstr ""
+
+#: plugins/epicrating.pm:333
+msgid "... on skipped songs"
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:7720
 msgid "0 chance"
 msgstr "0 possibilidades"
@@ -298,6 +313,12 @@ msgstr ""
 #: gmusicbrowser.pl:1371
 msgid "About to turn off the computer in :"
 msgstr "Sobre desligar o computador em:"
+
+#: plugins/http_server.pm:19
+msgid ""
+"Access the gmusicbrowser library RESTfully, and use a simple javascript UI "
+"to interact with it."
+msgstr ""
 
 #: plugins/notify.pm:56
 msgid "Actions are not supported by current notification daemon"
@@ -427,6 +448,13 @@ msgstr "Procura Avançada ..."
 msgid "Advanced Tag Editing"
 msgstr "Avançada Edição de Tag"
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:404
+msgid "After: "
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:835 gmusicbrowser.pl:7787 gmusicbrowser_songs.pm:495
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
@@ -553,6 +581,15 @@ msgstr "Anexar à lista de reprodução"
 msgid "Application"
 msgstr "Aplicações"
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:332
+msgid ""
+"Apply your default rating to files when they are first played (required for "
+"rating update on files with default rating):"
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:5988
 msgid "Are you sure you want to delete the '{label}' label ?"
 msgstr "Você tem certeza que quer deletar o '{label}' rótulo?"
@@ -661,6 +698,13 @@ msgstr "Rolar automaticamente"
 msgid "Auto-select Pictures"
 msgstr ""
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:15
+msgid "Automatic rating updates on configurable listening behaviour events."
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:5907
 msgid "Automatically remove current song if not found"
 msgstr "Automaticamente remover música se não encontrada"
@@ -688,6 +732,10 @@ msgstr "Sessão ruim"
 #: gmusicbrowser.pl:4307
 msgid "Base Folder :"
 msgstr "Pasta Base :"
+
+#: plugins/epicrating.pm:396
+msgid "Before: "
+msgstr ""
 
 #: gmusicbrowser_list.pm:5058
 msgid "Begin with"
@@ -728,6 +776,10 @@ msgstr "Botões"
 #: layouts:798
 msgid "Buttons, Song & Cover"
 msgstr "Botões, Músicas & Capa"
+
+#: plugins/epicrating.pm:339
+msgid "CSV dump of songs"
+msgstr ""
 
 #: gmusicbrowser.pl:1063
 msgid "Can be relative by using + or -"
@@ -1059,6 +1111,22 @@ msgstr ""
 msgid "Custom..."
 msgstr "Personalizado..."
 
+#: plugins/daap_server.pm:25
+msgid "DAAP Server"
+msgstr ""
+
+#: plugins/daap_server.pm:26
+msgid ""
+"DAAP Server - Applish DA*P protocol access to gmusicbrowser library and "
+"facilities"
+msgstr ""
+
+#: plugins/daap_server.pm:28
+msgid ""
+"DAAP access to your gmusicbrowser library from DAAP clients (iTunes).  Use "
+"DACP-enabled devices to control Gmusicbrowser (soon)."
+msgstr ""
+
 #: gmusicbrowser.pl:848 gmusicbrowser_tags.pm:1534 gmusicbrowser_tags.pm:1572
 msgid "Date"
 msgstr "Data"
@@ -1129,6 +1197,13 @@ msgstr "Widgets de Área de Trabalho"
 msgid "Desktop widgets plugin"
 msgstr "Plugin Widgets de Área de Trabalho"
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:480
+msgid "Differential: "
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:5653
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "Desabilitar proteção de tela quando em tela cheia e tocando"
@@ -1292,6 +1367,10 @@ msgstr "Letras Embutidas"
 msgid "Embedded picture"
 msgstr "Imagem Embutida"
 
+#: plugins/epicrating.pm:341
+msgid "Emit CSV of heuristic rating scores"
+msgstr ""
+
 #: gmusicbrowser_tags.pm:1546
 msgid "Encapsulated object"
 msgstr "Objeto Encapsulado"
@@ -1353,7 +1432,19 @@ msgstr "Filtro de Enfileirar"
 msgid "Enter custom event string :"
 msgstr ""
 
+<<<<<<< HEAD
 #: layouts:737
+=======
+#: plugins/epicrating.pm:11
+msgid "EpicRating"
+msgstr ""
+
+#: plugins/epicrating.pm:12
+msgid "EpicRating plugin - automatically update ratings"
+msgstr ""
+
+#: layouts:703
+>>>>>>> epic
 msgid "Equalizer"
 msgstr "Equalizador"
 
@@ -1448,6 +1539,13 @@ msgstr ""
 msgid "Field type"
 msgstr ""
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:478
+msgid "Field: "
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:5214 gmusicbrowser_list.pm:5060
 msgid "Fields"
 msgstr "Campos"
@@ -1640,6 +1738,14 @@ msgstr "Grupo de :"
 #: gmusicbrowser_songs.pm:555 gmusicbrowser_tags.pm:1552
 msgid "Grouping"
 msgstr "Agrupando"
+
+#: plugins/http_server.pm:16
+msgid "HTTP Server"
+msgstr ""
+
+#: plugins/http_server.pm:17
+msgid "HTTP Server - Provides a RESTful HTTP service (and Javascript player)"
+msgstr ""
 
 #: plugins/audioscrobbler.pm:141
 msgid "Handshake OK"
@@ -2594,6 +2700,10 @@ msgstr "Janela popup personalizada"
 msgid "Popup Traytip"
 msgstr "Tela de Dicas"
 
+#: plugins/http_server.pm:383
+msgid "Port Number"
+msgstr ""
+
 #: plugins/webcontext.pm:566
 msgid "Pre-set"
 msgstr "Pre-Configuração"
@@ -3033,6 +3143,14 @@ msgstr "Salvar filtro atual como"
 msgid "Save current list as"
 msgstr "Salvar lista atual como"
 
+#: plugins/epicrating.pm:352
+msgid "Save gmusicbrowser song stats CSV dump as..."
+msgstr ""
+
+#: plugins/epicrating.pm:94
+msgid "Save lastplay ratingscore to file"
+msgstr ""
+
 #: plugins/lyrics.pm:133
 msgid "Save lyrics"
 msgstr "Salvar letras"
@@ -3395,6 +3513,13 @@ msgstr "Embaralhar álbuns, embaralhar faixas"
 msgid "Shutdown command :"
 msgstr "Comando de desligamento :"
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:475
+msgid "Signal: "
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:7825 gmusicbrowser_songs.pm:455
 msgid "Size"
 msgstr "Tamanho"
@@ -5374,3 +5499,4 @@ msgstr "|-lista separada de nomes de widget"
 
 #~ msgid "{command} is needed to play this file."
 #~ msgstr "{command} é necessário para tocar este arquivo."
+

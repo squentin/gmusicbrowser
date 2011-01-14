@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.0\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-14 20:19+0100\n"
+"POT-Creation-Date: 2011-01-14 12:26+0100\n"
 "PO-Revision-Date: 2008-10-02 00:51+0100\n"
 "Last-Translator: Michael R' Tokarczyk <mrtokarczyk@gmail.com>\n"
 "Language-Team: tizzilzol team <tizzilzol@gmail.com>\n"
@@ -177,6 +177,10 @@ msgstr "%n nie pomijanych przez najdłuższy okres czasu"
 msgid "%n shortest"
 msgstr "%n najkrótszych"
 
+#: plugins/daap_server.pm:192
+msgid "'s gmusicbrowser@"
+msgstr ""
+
 #: gmusicbrowser.pl:4047
 msgid "'{file}' exists. Overwrite ?"
 msgstr "Plik '{file}' istnieje. Nadpisać?"
@@ -222,6 +226,17 @@ msgid ""
 "- Skip to another song when removing the current song from the playlist"
 msgstr ""
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:334
+msgid "... on played songs"
+msgstr ""
+
+#: plugins/epicrating.pm:333
+msgid "... on skipped songs"
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:7720
 msgid "0 chance"
 msgstr ""
@@ -299,6 +314,12 @@ msgstr "Czy na pewno skasować {files} ?"
 #, fuzzy
 msgid "About to turn off the computer in :"
 msgstr "Zakończenie pracy komputera za :"
+
+#: plugins/http_server.pm:19
+msgid ""
+"Access the gmusicbrowser library RESTfully, and use a simple javascript UI "
+"to interact with it."
+msgstr ""
 
 #: plugins/notify.pm:56
 msgid "Actions are not supported by current notification daemon"
@@ -428,6 +449,13 @@ msgstr "Zaawansowane wyszukiwanie ..."
 msgid "Advanced Tag Editing"
 msgstr "Zaawansowana edycja tagów"
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:404
+msgid "After: "
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:835 gmusicbrowser.pl:7787 gmusicbrowser_songs.pm:495
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
@@ -554,6 +582,15 @@ msgstr "Dołącz do listy"
 msgid "Application"
 msgstr ""
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:332
+msgid ""
+"Apply your default rating to files when they are first played (required for "
+"rating update on files with default rating):"
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:5988
 msgid "Are you sure you want to delete the '{label}' label ?"
 msgstr ""
@@ -662,6 +699,13 @@ msgstr "Autoprzewijanie"
 msgid "Auto-select Pictures"
 msgstr ""
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:15
+msgid "Automatic rating updates on configurable listening behaviour events."
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:5907
 msgid "Automatically remove current song if not found"
 msgstr ""
@@ -689,6 +733,10 @@ msgstr "Błędna sesja"
 #: gmusicbrowser.pl:4307
 msgid "Base Folder :"
 msgstr "Katalog bazowy :"
+
+#: plugins/epicrating.pm:396
+msgid "Before: "
+msgstr ""
 
 #: gmusicbrowser_list.pm:5058
 msgid "Begin with"
@@ -728,6 +776,10 @@ msgstr ""
 
 #: layouts:798
 msgid "Buttons, Song & Cover"
+msgstr ""
+
+#: plugins/epicrating.pm:339
+msgid "CSV dump of songs"
 msgstr ""
 
 #: gmusicbrowser.pl:1063
@@ -1059,6 +1111,22 @@ msgstr ""
 msgid "Custom..."
 msgstr "Inne..."
 
+#: plugins/daap_server.pm:25
+msgid "DAAP Server"
+msgstr ""
+
+#: plugins/daap_server.pm:26
+msgid ""
+"DAAP Server - Applish DA*P protocol access to gmusicbrowser library and "
+"facilities"
+msgstr ""
+
+#: plugins/daap_server.pm:28
+msgid ""
+"DAAP access to your gmusicbrowser library from DAAP clients (iTunes).  Use "
+"DACP-enabled devices to control Gmusicbrowser (soon)."
+msgstr ""
+
 #: gmusicbrowser.pl:848 gmusicbrowser_tags.pm:1534 gmusicbrowser_tags.pm:1572
 msgid "Date"
 msgstr "Rok"
@@ -1129,6 +1197,13 @@ msgstr ""
 msgid "Desktop widgets plugin"
 msgstr ""
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:480
+msgid "Differential: "
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:5653
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "Wyłącz wygaszacz ekranu, gdy odtwarza w trybie pełnoekranowym"
@@ -1292,6 +1367,10 @@ msgstr ""
 msgid "Embedded picture"
 msgstr ""
 
+#: plugins/epicrating.pm:341
+msgid "Emit CSV of heuristic rating scores"
+msgstr ""
+
 #: gmusicbrowser_tags.pm:1546
 msgid "Encapsulated object"
 msgstr ""
@@ -1353,7 +1432,19 @@ msgstr "Zakolejkuj filtr"
 msgid "Enter custom event string :"
 msgstr ""
 
+<<<<<<< HEAD
 #: layouts:737
+=======
+#: plugins/epicrating.pm:11
+msgid "EpicRating"
+msgstr ""
+
+#: plugins/epicrating.pm:12
+msgid "EpicRating plugin - automatically update ratings"
+msgstr ""
+
+#: layouts:703
+>>>>>>> epic
 msgid "Equalizer"
 msgstr "Korektor"
 
@@ -1448,6 +1539,13 @@ msgstr ""
 msgid "Field type"
 msgstr ""
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:478
+msgid "Field: "
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:5214 gmusicbrowser_list.pm:5060
 msgid "Fields"
 msgstr ""
@@ -1640,6 +1738,14 @@ msgstr "Grupuj według :"
 #: gmusicbrowser_songs.pm:555 gmusicbrowser_tags.pm:1552
 msgid "Grouping"
 msgstr "Grupowanie"
+
+#: plugins/http_server.pm:16
+msgid "HTTP Server"
+msgstr ""
+
+#: plugins/http_server.pm:17
+msgid "HTTP Server - Provides a RESTful HTTP service (and Javascript player)"
+msgstr ""
 
 #: plugins/audioscrobbler.pm:141
 msgid "Handshake OK"
@@ -2590,6 +2696,10 @@ msgstr "Otwórz inne okno"
 msgid "Popup Traytip"
 msgstr "Powiadamianie (zasobnik)"
 
+#: plugins/http_server.pm:383
+msgid "Port Number"
+msgstr ""
+
 #: plugins/webcontext.pm:566
 msgid "Pre-set"
 msgstr ""
@@ -3031,6 +3141,14 @@ msgstr "Zapisz aktualny filtr jako"
 msgid "Save current list as"
 msgstr "Zapisz aktualną listę jako"
 
+#: plugins/epicrating.pm:352
+msgid "Save gmusicbrowser song stats CSV dump as..."
+msgstr ""
+
+#: plugins/epicrating.pm:94
+msgid "Save lastplay ratingscore to file"
+msgstr ""
+
 #: plugins/lyrics.pm:133
 msgid "Save lyrics"
 msgstr "Zapisz tekst"
@@ -3390,6 +3508,13 @@ msgstr ""
 msgid "Shutdown command :"
 msgstr "Wyłącz komendę : "
 
+<<<<<<< HEAD
+=======
+#: plugins/epicrating.pm:475
+msgid "Signal: "
+msgstr ""
+
+>>>>>>> epic
 #: gmusicbrowser.pl:7825 gmusicbrowser_songs.pm:455
 msgid "Size"
 msgstr "Rozmiar"
@@ -5529,3 +5654,4 @@ msgstr ""
 
 #~ msgid "{command} is needed to play this file."
 #~ msgstr "{command} jest wymagane do odtworzenia pliku"
+
