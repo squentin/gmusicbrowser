@@ -94,7 +94,7 @@ sub SaveRatingScoresCSV {
 	_"Save lastplay ratingscore to file",
 	undef, 'save', 'gtk-save', => 'ok', 'gtk-cancel' => 'cancel');
     my $save_response = $file_chooser->run();
-    
+
     if($save_response eq 'ok') {
 	my $filename = $file_chooser->get_filename();
 	open RSF, ">", $filename or warn("Could not save file.");
@@ -336,14 +336,14 @@ sub prefbox {
     $default_rating_box->add($set_default_rating_skip_check);
     $default_rating_box->add($set_default_rating_finished_check);
 
-    my $song_dump_button = Gtk2::Button->new("CSV dump of songs");
+    my $song_dump_button = Gtk2::Button->new(_"CSV dump of songs");
 
-    my $produce_ratingscore_button = Gtk2::Button->new("Emit CSV of heuristic rating scores");
+    my $produce_ratingscore_button = Gtk2::Button->new(_"Emit CSV of heuristic rating scores");
 
     $produce_ratingscore_button->signal_connect(clicked => sub {
 	warn "Ready to begin calculating rating scores.";
 	my $rating_scores = $self->SaveRatingScoresCSV();
-	
+
     });
 
     use Text::CSV;
@@ -352,14 +352,14 @@ sub prefbox {
 	    _"Save gmusicbrowser song stats CSV dump as...",
 	    undef, 'save', 'gtk-save' => 'ok', 'gtk-cancel' => 'cancel');
 	my $response = $file_chooser->run();
-	
+
 	if($response eq 'ok') {
 	    my $csv_filename = $file_chooser->get_filename();
 	    open CSVF, ">", $csv_filename or warn "Couldn't open CSV output!";
 
 	    use Data::Dumper;
 	    my $csv = Text::CSV->new ({binary => 1 });
-	    
+
 	    my $all_songs = Filter->new("")->filter;
 	    for my $song_id (@{$all_songs}) {
 		my $rating = ::Songs::Get($song_id, 'rating');
@@ -391,7 +391,7 @@ use base 'Gtk2::Frame';
 sub ExtraFieldsEditor {
     my ($self) = @_;
     my $hbox = Gtk2::HBox->new();
-    
+
     if($self->{rule}{signal} eq "Skipped") {
 	my $b_label = Gtk2::Label->new(_"Before: ");
 	my $b_entry = Gtk2::Entry->new();
@@ -494,3 +494,4 @@ sub new {
 
     return $self;
 }
+
