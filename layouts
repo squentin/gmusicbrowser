@@ -66,7 +66,7 @@ VBmain = HPControlsInfoAndSearch _HPContent
                                 MenuItem0(togglewidget=VBSavedFilterPane|VPfp0|HBSearch,label=_"reduced view") \
                                 MenuItem1(togglewidget=VPGenreYear,label=_"Genre and Year") \
                                 MenuItem2(togglewidget=Cover,label=_"Album cover") \
-                                MenuItem3(togglewidget=HBArtistAndLock|HBAlbumAndLock,label=_"Artist and album modifier (leftmost pane)") \
+                                MenuItem3(togglewidget=LockArtist|Next2|Filler15|LockAlbum|Next1|Filler14|Filler11|Filler12,label=_"Artist and album modifier (leftmost pane)") \
                                 MenuItem4(togglewidget=VBSavedFilterPane,label=_"Lower left filter pane") \
                                 MenuItem5(togglewidget=VPQueueContext,label=_"Queue and Context")
 
