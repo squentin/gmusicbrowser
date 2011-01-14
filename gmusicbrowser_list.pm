@@ -1887,7 +1887,7 @@ sub button_press_event_cb
 sub SongsAdded_cb
 {	my ($self,$IDs)=@_;
 	return if $self->{needupdate};
-	if ( $self->{filter}->added_are_in($IDs) )
+	if (defined $self->{filter} && $self->{filter}->added_are_in($IDs) )
 	{	$self->{needupdate}=1;
 		::IdleDo('9_FPfull'.$self,5000,\&updatefilter,$self);
 	}
@@ -1919,7 +1919,7 @@ sub SongsRemoved_cb
 	return if $self->{needupdate};
 	my $list=$self->{list};
 	my $changed=1;
-	if ($list!=$::Library)					#CHECKME use $::Library or a copy ?
+	if (defined $list && $list!=$::Library)					#CHECKME use $::Library or a copy ?
 	{	my $isin='';
 		vec($isin,$_,1)=1 for @$IDs;
 		my $before=@$list;
