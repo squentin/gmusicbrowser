@@ -572,12 +572,46 @@ picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 showyear : OptionBoolean(default=1,name='show year')
 myfont : OptionFont(default='Arial Bold 18',name='font')
 
+{Group showHidePicture}
+title   = Show/Hide picture
+head    = 10
+tail    = 15
+vmin    = pic:h+10
+#vcollapse= pic1:h+10
+vcollapse= title:h
+left    = pic:w+2
+pic     : +aapic(y=title:h+title:y+4,picsize=100,ypad=2)
+pic1    : -aapic(y=title:h+title:y+4,picsize=50,ypad=2)
+#title   : -text(markup='<small><b>'.pesc($album).'</b></small>\n'.'<small>'.pesc($artist).'</small>',pad=0)
+title   : -text(markup='<big><b>+</b></big>'.' <small><b>'.pesc($album).'</b>'.' by '.'<b>'.pesc($artist).'</b></small>',pad=0)
+
+{Group albuminfo}
+title   = Show artist, album, year
+head    = 80
+vcollapse= 100
+vmin    = 100
+left    = 2
+title   : +text(pad=4, markup='\n<b><big>'.pesc($album).'</big></b>'.'\n'.pesc($artist).'\n'.\
+           if(showyear && $year,'('.pesc($year).')'),\
+    		init_markup='',)
+title1  : -text(pad=4, markup='\n<b><big>'.pesc($album).'</big></b>'.'\n'.pesc($artist).'\n'.\
+            if(showyear && $year,'('.pesc($year).')'),\
+    		init_markup='',)
+showyear : OptionBoolean(default=0,name='Show year')
+
 {Group simple}
 title= Simple title
 head=title:h
 left=4
 vcollapse=head
 title: text(markup='<b><big>'.pesc($title).'</big></b>',pad=4)
+
+{Group simplest}
+title=Simple title without any
+head=title:h
+left=2
+vcollapse=head
+title: text(markup=pesc($title),pad=4)
 
 {Group artistalbumside}
 title=album and artist on the left side
