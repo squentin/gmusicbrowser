@@ -30,7 +30,7 @@ my %sites =
 	biography => ['http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',_"biography",_"Show artist's biography"],
 	events => ['http://ws.audioscrobbler.com/2.0/?method=artist.getevents&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',_"events",_"Show artist's upcoming events"],
 	similar => ['http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1&limit=%l',_"similar",_"Show similar artists"]);
-=dop
+
 my @External=
 (	['lastfm',	"http://www.last.fm/music/%a",								_"Show Artist page on last.fm"],
 	['wikipedia',	"http://en.wikipedia.org/wiki/%a",							_"Show Artist page on wikipedia"],
@@ -41,7 +41,7 @@ my @External=
 	['pitchfork',	"http://pitchfork.com/search/?search_type=standard&query=%a",				_"Search pitchfork for Artist" ],
 	['discogs',	"http://www.discogs.com/artist/%a",							_"Search discogs for Artist" ],
 );
-=cut
+=dop
 my @similarity=
 (	['super',	'0.9',	'#ff0101'],
 	['very high',	'0.7',	'#e9c102'],
@@ -49,7 +49,7 @@ my @similarity=
 	['medium',	'0.3',	'#453e45'],
 	['lower',	'0.1',	'#9a9a9a'],
 );
-
+=cut
 # lastfm api key 7aa688c2466dc17263847da16f297835
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
 
@@ -114,7 +114,7 @@ sub new
 	$textview->signal_connect(visibility_notify_event=>\&update_cursor_cb);
 	$textview->signal_connect(query_tooltip => \&update_cursor_cb);
 	
-	my $store=Gtk2::ListStore->new('Glib::String','Glib::Double');
+	my $store=Gtk2::ListStore->new('Glib::String','Glib::Double','Glib::String','Glib::UInt');
 	my $treeview=Gtk2::TreeView->new($store);
 	my $tc_artist=Gtk2::TreeViewColumn->new_with_attributes( _"Artist",Gtk2::CellRendererText->new,markup=>0);
 	$tc_artist->set_sort_column_id(0);
@@ -127,7 +127,8 @@ sub new
 	$tc_similar->set_alignment(1.0);
 	$treeview->append_column($tc_similar);
 	$treeview->set_rules_hint(1);
-	$treeview->signal_connect(button_release_event => \&tv_contextmenu);
+	$treeview->signal_connect(button_press_event => \&tv_contextmenu);
+	$treeview->{store}=$store;
 	
 	my $togglebox = Gtk2::HBox->new();
 	my $group;
@@ -241,23 +242,32 @@ sub set_buffer
 	$self->{buffer}->set_modified(0);
 }
 
-
 sub tv_contextmenu {
-	my ($widget, $event) = @_;
-	if ($event->button == 3) {
-	my $menu = Gtk2::Menu->new;
-	$menu->signal_connect (destroy => sub {
-		#TODO get url ($tree_view->get_path_at_pos ($x, $y))
-		#::main::openurl($url) if $url;
-	return 0;
-	});
-	my $item = Gtk2::MenuItem->new ("Open artist's last.fm page");
-	$menu->append ($item);
-	$item->show;
-	$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
-	# $menu will be destroyed when the user quits interacting with it.
-	return 0;
+	my ($treeview, $event) = @_;
+	return 0 unless $event->button == 3;
+	my ($path, $column) = $treeview->get_cursor;
+	my $store=$treeview->{store};
+	my $iter=$store->get_iter($path);
+	my $artist=$store->get( $store->get_iter($path),0);
+	my $url=$store->get( $store->get_iter($path),2); # FIXME: use this url in case last.fm gets triggered in the menu
+	if ($url eq "local") { 
+		my $aID=$store->get( $store->get_iter($path),3);
+		::PopupAAContextMenu({gid=>$aID,self=>$treeview,field=>'artist',mode=>'S'});
+		return 0;
 	}
+	else {
+		my $menu=Gtk2::Menu->new;
+		for my $item (@External) {
+			my ($key,$url,$text)=@$item;
+			$url=~s/%a/$artist/;
+			my $menuitem = Gtk2::MenuItem->new ($text);
+			$menuitem->signal_connect(activate => sub { ::main::openurl($url) if $url; return 0; });
+			$menu->append($menuitem);
+			$menuitem->show;
+		}
+		$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
+	}
+	return 1;
 }
 
 sub update_cursor_cb
@@ -470,8 +480,11 @@ sub loaded
 				my $stats='';
 				my $color=$self->style->text_aa("normal")->to_string;
 				my $fgcolor = substr($color,0,3).substr($color,5,2).substr($color,9,2);
-				$stats=AA::ReplaceFields($aID,' <span foreground="'.$fgcolor.'">(%X « %s)</span>',"artist",1) if $aID;
-				$self->{store}->set($self->{store}->append,0,::PangoEsc($s_artist{name}).$stats,1,$s_artist{match} * 100);
+				if ($aID) {
+					$stats=AA::ReplaceFields($aID,' <span foreground="'.$fgcolor.'">(%X « %s)</span>',"artist",1);
+					$s_artist{url} = "local";
+				}
+				$self->{store}->set($self->{store}->append,0,::PangoEsc($s_artist{name}).$stats,1,$s_artist{match} * 100,2,$s_artist{url},3,$aID);
 			}
 			
 		}
