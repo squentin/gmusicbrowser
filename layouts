@@ -73,8 +73,8 @@ VBmain = HPControlsInfoAndSearch _HPContent
                                 SMQueueContextLists
 
                 SMQueueContextLists = (label=_"queue, context and lists") \
-                                        MenuItem5(togglewidget=Context|MenuItem6,label=_"context") \
-                                        MenuItem6(togglewidget=HBQueueList|MenuItem5,label=_"queue") \
+                                        MenuItem5(togglewidget=Context|MenuItem6,label=_"Context") \
+                                        MenuItem6(togglewidget=HBQueueList|MenuItem5,label=_"Queue") \
                                         MenuItem7(togglewidget=TBContextAndLists|MenuItem5|MenuItem6,label=_"rightmost pane")
 
 
