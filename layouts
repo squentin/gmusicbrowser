@@ -9,7 +9,7 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
 
 
-    HPContent = _HPCurrentTrack _VPQueueContext
+    HPContent = _HPCurrentTrack _TBContextAndLists
         HPCurrentTrack = VPfp2 _VPfp0
             VPfp2 = _HBCurrentTrack VBSavedFilterPane
 
@@ -35,7 +35,9 @@ VBmain = HPControlsInfoAndSearch _HPContent
                  VBBottom = 10_HBSongTree VProgress
 
         #HPfp1 =  VPQueueContext
-            VPQueueContext = _Context(page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo') _HBQueueList
+            #VPQueueContext =  _HBTabbedLists
+
+                TBContextAndLists = _"Context" Context(page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo') _"Queue" HBQueueList _"List" TabbedLists(group=1)
                 # an layout error occurs, if I use the padding in a VP
                 HBQueueList = 10_VBQueueList
                     VBQueueList = 0Filler5 VBQueueAct _QueueList(group=1) 5HBQueueActions 3Filler6
@@ -68,19 +70,15 @@ VBmain = HPControlsInfoAndSearch _HPContent
                                 MenuItem2(togglewidget=Cover,label=_"Album cover") \
                                 MenuItem3(togglewidget=LockArtist|Next2|Filler15|LockAlbum|Next1|Filler14|Filler11|Filler12,label=_"Artist and album modifier (leftmost pane)") \
                                 MenuItem4(togglewidget=VBSavedFilterPane,label=_"Lower left filter pane") \
-                                MenuItem5(togglewidget=VPQueueContext,label=_"Queue and Context")
+                                SMQueueContextLists
+
+                SMQueueContextLists = (label=_"queue, context and lists") \
+                                        MenuItem5(togglewidget=Context|MenuItem6,label=_"context") \
+                                        MenuItem6(togglewidget=HBQueueList|MenuItem5,label=_"queue") \
+                                        MenuItem7(togglewidget=TBContextAndLists|MenuItem5|MenuItem6,label=_"rightmost pane")
 
 
         MBSongTree = HistItem
-
-
-
-
-
-
-
-
-
 
             HBSongTree = _VBSongTree
             VBSongTree = HBSongTreeAct _SongTree 5HBSongTreeStats
@@ -591,10 +589,11 @@ vmin    = pic:h+10
 #vcollapse= pic1:h+10
 vcollapse= title:h
 left    = pic:w+2
-pic     : +aapic(y=title:h+title:y+4,picsize=100,ypad=2)
-pic1    : -aapic(y=title:h+title:y+4,picsize=50,ypad=2)
+pic     : +aapic(y=title:h+title:y+4,picsize=picsize,ypad=2)
+pic1    : -aapic(y=title:h+title:y+4,picsize=picsize,ypad=2)
 #title   : -text(markup='<small><b>'.pesc($album).'</b></small>\n'.'<small>'.pesc($artist).'</small>',pad=0)
 title   : -text(markup='<big><b>+</b></big>'.' <small><b>'.pesc($album).'</b>'.' by '.'<b>'.pesc($artist).'</b></small>',pad=0)
+picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 
 {Group albuminfo}
 title   = Show artist, album, year
