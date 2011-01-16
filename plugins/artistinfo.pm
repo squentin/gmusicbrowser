@@ -27,7 +27,7 @@ use constant
 
 my %sites =
 (
-	biography => ['http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1&lang='.$::Options{OPT.'Language'}',_"biography",_"Show artist's biography"],
+	biography => ['http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1&lang='.$::Options{OPT.'Language'},_"biography",_"Show artist's biography"],
 	events => ['http://ws.audioscrobbler.com/2.0/?method=artist.getevents&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',_"events",_"Show artist's upcoming events"],
 	similar => ['http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1&limit=%l',_"similar",_"Show similar artists"]);
 
