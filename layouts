@@ -694,14 +694,13 @@ left=4
 vcollapse=head
 title: text(markup='<b><big>'.pesc($title).'</big></b>',pad=4)
 
-<<<<<<< HEAD
 {Group simplest}
 title=Simple title without any
 head=title:h
 left=2
 vcollapse=head
 title: text(markup=pesc($title),pad=4)
-=======
+
 {Group shimmerqueue}
 title=Shimmer Queue
 head=title:h
@@ -710,7 +709,6 @@ tail=3
 title: text(markup='<b>'.pesc($album).'</b>\n'.pesc($artist),ypad=2,xpad=2,x=23)
 pic: aapic(picsize=title:h,x=-pic:w - 2,ypad=2)
 picsize : OptionNumber(default=30,min=20,max=100,step=5)
->>>>>>> 96de6c028f02a3137b313a7dca736a8bf9064122
 
 {Group artistalbumside}
 title=album and artist on the left side

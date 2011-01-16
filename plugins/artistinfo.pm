@@ -53,11 +53,7 @@ my @similarity=
 # lastfm api key 7aa688c2466dc17263847da16f297835
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
 
-<<<<<<< HEAD
-::SetDefaultOptions(OPT, Lang => "en", Domain => "com", PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", Eventformat => "%title at %name<br>%startDate<br>%city (%country)<br><br>");
-=======
-::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", SimilarLimit => "15", SimilarRating => "50", Eventformat => "%title at %name<br>%startDate<br>%city (%country)<br><br>");
->>>>>>> 96de6c028f02a3137b313a7dca736a8bf9064122
+::SetDefaultOptions(OPT, Lang => "en", Domain => "com", PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", SimilarLimit => "15", SimilarRating => "50", Eventformat => "%title at %name<br>%startDate<br>%city (%country)<br><br>");
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
@@ -224,11 +220,7 @@ sub prefbox
 	$titlebox->pack_start($description,1,1,0);
 	$titlebox->pack_start($lastfm,0,0,5);
 	my $optionbox=Gtk2::VBox->new(0,2);
-<<<<<<< HEAD
-	$optionbox->pack_start($_,0,0,1) for $language,$domain,$entry,$preview,$autosave,$picsize,$eventformat;
-=======
-	$optionbox->pack_start($_,0,0,1) for $entry,$preview,$autosave,$picsize,$eventformat,$similar_limit,$similar_rating;
->>>>>>> 96de6c028f02a3137b313a7dca736a8bf9064122
+	$optionbox->pack_start($_,0,0,1) for $language,$domain,$entry,$preview,$autosave,$picsize,$eventformat,$similar_limit,$similar_rating;
 	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$optionbox;
 	return $vbox;
 }
