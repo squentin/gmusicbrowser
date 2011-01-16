@@ -1,14 +1,15 @@
-# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2010 Quentin Sculo <squentin@free.fr>
 #
+# Modified to optionally scrobble to libre.fm by Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
 =gmbplugin AUDIOSCROBBLER
-name	last.fm
-title	last.fm plugin
-desc	Submit played songs to last.fm
+name	last.fm/libre.fm
+title	last.fm/libre.fm plugin
+desc	Submit played songs to last.fm/libre.fm
 =cut
 
 
@@ -17,11 +18,13 @@ use strict;
 use warnings;
 use constant
 {	CLIENTID => 'gmb', VERSION => '0.1',
-	OPT => 'PLUGIN_AUDIOSCROBBLER_',#used to identify the plugin's options
-	SAVEFILE => 'audioscrobbler.queue', #file used to save unsent data
+	OPT => 'PLUGIN_AUDIOSCROBBLER_', #used to identify the plugin's options
+	#SAVEFILE => 'audioscrobbler.queue', #file used to save unsent data
 };
 use Digest::MD5 'md5_hex';
 require $::HTTP_module;
+
+::SetDefaultOptions(OPT, Site => "last.fm", Savefile => "last.fm.queue");
 
 our $ignore_current_song;
 
@@ -57,10 +60,16 @@ sub prefbox
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
 	my $entry1=::NewPrefEntry(OPT.'USER',_"username :", cb => \&userpass_changed, sizeg1 => $sg1,sizeg2=>$sg2);
 	my $entry2=::NewPrefEntry(OPT.'PASS',_"password :", cb => \&userpass_changed, sizeg1 => $sg1,sizeg2=>$sg2, hide => 1);
-	my $label2=Gtk2::Button->new(_"(see http://www.last.fm)");
+	my @sites = ("last.fm","libre.fm");
+	my $label1=Gtk2::Label->new(_"Site :");
+	my $label3=Gtk2::Label->new(_"(applied after restart)");
+	my $site=::NewPrefCombo(OPT.'Site', \@sites, cb => sub {$::Options{OPT.'Savefile'} = $::Options{OPT.'Site'}.".queue"; } );
+	my $hbox=Gtk2::HBox->new();
+	$hbox->pack_start($_,0,0,0) for $label1,$site,$label3;
+	my $label2=Gtk2::Button->new(_"(see http://www.".$::Options{OPT.'Site'}.")");
 	$label2->set_relief('none');
 	$label2->signal_connect(clicked => sub
-		{	my $url='http://www.last.fm';
+		{	my $url='http://www'.$::Options{OPT.'Site'}.'.fm';
 			my $user=$::Options{OPT.'USER'};
 			$url.="/user/$user/" if defined $user && $user ne '';
 			::openurl($url);
@@ -68,7 +77,7 @@ sub prefbox
 	my $ignore=Gtk2::CheckButton->new(_"Don't submit current song");
 	$ignore->signal_connect(toggled=>sub { return if $_[0]->{busy}; $ignore_current_song= $_[0]->get_active ? $::SongID : undef; ::HasChanged('Lastfm_ignore_current'); });
 	::Watch($ignore,Lastfm_ignore_current => sub { $_[0]->{busy}=1; $_[0]->set_active(defined $ignore_current_song); delete $_[0]->{busy}; } );
-	$vbox->pack_start($_,::FALSE,::FALSE,0) for $label2,$entry1,$entry2,$ignore;
+	$vbox->pack_start($_,::FALSE,::FALSE,0) for $label2,$hbox,$entry1,$entry2,$ignore;
 	$vbox->add( ::LogView($Log) );
 	return $vbox;
 }
@@ -110,7 +119,10 @@ sub Handshake
 	my $pass=$::Options{OPT.'PASS'};
 	my $time=time;
 	my $auth=md5_hex(md5_hex($pass).$time);
-	Send(\&response_cb,'http://post.audioscrobbler.com/?hs=true&p=1.2&c='.CLIENTID.'&v='.VERSION."&u=$user&t=$time&a=$auth");
+	my $site;
+	if ($::Options{OPT.'Site'} eq "last.fm") { $site = 'post.audioscrobbler.com'; }
+	else { $site = 'turtle.libre.fm'; }
+	Send(\&response_cb,'http://'.$site.'/?hs=true&p=1.2&c='.CLIENTID.'&v='.VERSION."&u=$user&t=$time&a=$auth");
 }
 
 sub response_cb
@@ -237,8 +249,8 @@ sub Log
 }
 
 sub Load 	#read unsent data
-{	return unless -r $::HomeDir.SAVEFILE;
-	return unless open my$fh,'<:utf8',$::HomeDir.SAVEFILE;
+{	return unless -r $::HomeDir.$::Options{OPT.'Savefile'};
+	return unless open my$fh,'<:utf8',$::HomeDir.$::Options{OPT.'Savefile'};
 	while (my $line=<$fh>)
 	{	chomp $line;
 		my @data=split "\x1D",$line;
@@ -250,10 +262,10 @@ sub Load 	#read unsent data
 sub Save	#save unsent data to a file
 {	$unsent_saved=@ToSubmit;
 	unless (@ToSubmit)
-	{ unlink $::HomeDir.SAVEFILE; return }
+	{ unlink $::HomeDir.$::Options{OPT.'Savefile'}; return }
 	my $fh;
-	unless (open $fh,'>:utf8',$::HomeDir.SAVEFILE)
-	 { warn "Error creating '$::HomeDir".SAVEFILE."' : $!\nUnsent last.fm data will be lost.\n"; return; }
+	unless (open $fh,'>:utf8',$::HomeDir.$::Options{OPT.'Savefile'})
+	 { warn "Error creating '$::HomeDir".$::Options{OPT.'Savefile'}."' : $!\nUnsent last.fm data will be lost.\n"; return; }
 	print $fh join("\x1D",@$_)."\n" for @ToSubmit;
 	close $fh;
 }
