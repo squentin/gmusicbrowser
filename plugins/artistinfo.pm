@@ -1,4 +1,4 @@
-# Copyright (C) 20010 Quentin Sculo <squentin@free.fr> and Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
+# Copyright (C) 2010 Quentin Sculo <squentin@free.fr> and Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -8,7 +8,7 @@
 =gmbplugin ARTISTINFO
 name	Artistinfo
 title	Artistinfo plugin
-version	0.3
+version	0.4
 author  Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 author  Pasi Lallinaho <pasi@shimmerproject.org>
 desc	This plugin retrieves artist-relevant information (biography, upcoming events) from last.fm.
@@ -81,8 +81,7 @@ sub new
 	$self->{artist_esc} = "";
 
 	my $statbox=Gtk2::VBox->new(0,0);
-# TODO use own widget to display artistpic and add left-click image-zoom
-	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,maxsize=>$::Options{OPT.'ArtistPicSize'},click1=>undef,xalign=>0});
+	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,maxsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0});
 	for my $name (qw/Ltitle Lstats/)
 	{	my $l=Gtk2::Label->new('');
 		$self->{$name}=$l;
@@ -244,23 +243,35 @@ sub set_buffer
 
 sub tv_contextmenu {
 	my ($treeview, $event) = @_;
-	return 0 unless $event->button == 3;
+	return 0 unless $treeview;
 	my ($path, $column) = $treeview->get_cursor;
+	return unless defined $path;
 	my $store=$treeview->{store};
 	my $iter=$store->get_iter($path);
 	my $artist=$store->get( $store->get_iter($path),0);
-	my $url=$store->get( $store->get_iter($path),2); # FIXME: use this url in case last.fm gets triggered in the menu
-	if ($url eq "local") { 
-		my $aID=$store->get( $store->get_iter($path),3);
-		::PopupAAContextMenu({gid=>$aID,self=>$treeview,field=>'artist',mode=>'S'});
+	my $aID=$store->get( $store->get_iter($path),3);
+	if ($event->button == 2) { if ($url eq "local") {
+		my $filter = Songs::MakeFilterFromGID('artists',$aID);
+		::SetFilter($treeview,$filter,1);
+	}
+	return 1;
+	}
+	elsif ($event->button == 3) {
+	if ($url eq "local") {
+		::PopupAAContextMenu({gid=>$aID,self=>$treeview,field=>'artists',mode=>'S'});
 		return 0;
 	}
 	else {
 		my $menu=Gtk2::Menu->new;
+		my $title=Gtk2::MenuItem->new(_"Search for artist on:");
+		$menu->append($title);
+		$title->show;
 		for my $item (@External) {
 			my ($key,$url,$text)=@$item;
-			$url=~s/%a/$artist/;
-			my $menuitem = Gtk2::MenuItem->new ($text);
+			if ($key eq 'lastfm') { $url=$store->get( $store->get_iter($path),2); }
+			else { $url=~s/%a/$artist/; }
+			my $menuitem = Gtk2::ImageMenuItem->new ($key);
+			$menuitem->set_image( Gtk2::Image->new_from_stock('webcontext-'.$key,'menu') );
 			$menuitem->signal_connect(activate => sub { ::main::openurl($url) if $url; return 0; });
 			$menu->append($menuitem);
 			$menuitem->show;
@@ -268,6 +279,27 @@ sub tv_contextmenu {
 		$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
 	}
 	return 1;
+	}
+	
+}
+
+sub apiczoom {
+	my ($self, $event) = @_;
+	my $menu=Gtk2::Menu->new;
+	$menu->modify_bg('GTK_STATE_NORMAL',Gtk2::Gdk::Color->parse('black')); # black bg for the artistpic-popup
+	my $picsize=250;
+	my $ID = ::GetSelID($self);
+	my $aID = Songs::Get_gid($ID,'artist');
+	if (my $img= AAPicture::newimg(artist=>$aID,$picsize)) {
+		my $apic = Gtk2::MenuItem->new;
+		$apic->modify_bg('GTK_STATE_SELECTED',Gtk2::Gdk::Color->parse('black'));
+		$apic->add($img);
+		$apic->show_all;
+		$menu->append($apic);
+		$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
+		return 1;
+	}
+	else { return 0; }
 }
 
 sub update_cursor_cb
