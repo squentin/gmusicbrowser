@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-15 18:13+0100\n"
+"POT-Creation-Date: 2011-01-16 17:14+0100\n"
 "PO-Revision-Date: 2010-12-18 04:41+0100\n"
 "Last-Translator: Vašek Kovářík <L3D9Z6@seznam.cz>\n"
 "Language-Team: Czech\n"
@@ -212,7 +212,7 @@ msgstr "(: )jakýkoliv"
 msgid "(: )none"
 msgstr "(: )žádný"
 
-#: plugins/artistinfo.pm:179
+#: plugins/artistinfo.pm:181
 msgid "(applied after restart)"
 msgstr "(vyžaduje restart)"
 
@@ -431,6 +431,10 @@ msgstr "Přidáno dnes"
 msgid "Adding a radio"
 msgstr "Přidávání rádia"
 
+#: plugins/artistinfo.pm:177
+msgid "Additional domain for Last.fm, Amazon and so on."
+msgstr ""
+
 #: gmusicbrowser.pl:5683
 msgid ""
 "Additionally this format can be used :\n"
@@ -633,7 +637,7 @@ msgstr "Interpret"
 msgid "Artist & album"
 msgstr "Interpret & album"
 
-#: plugins/artistinfo.pm:179
+#: plugins/artistinfo.pm:181
 msgid "Artist Picture Size : "
 msgstr "Velikost obrázku interpreta :"
 
@@ -705,7 +709,7 @@ msgstr "Automatický filter"
 msgid "Auto-increment track numbers"
 msgstr "Automatický nárůst čísla stopy"
 
-#: plugins/artistinfo.pm:178 plugins/lyrics.pm:187
+#: plugins/artistinfo.pm:180 plugins/lyrics.pm:187
 msgid "Auto-save positive finds"
 msgstr "Automatické ukládání výsledků hledání"
 
@@ -1285,6 +1289,10 @@ msgstr "Nechat synchronizované ID3v2 popisky"
 msgid "Do not write the tags"
 msgstr "Nezapisovat popisky"
 
+#: plugins/artistinfo.pm:177
+msgid "Domain"
+msgstr ""
+
 #: plugins/titlebar.pm:54
 msgid "Don't add the overlay to dialogs"
 msgstr "Nepřidávat překrytí do dialogů"
@@ -1442,7 +1450,7 @@ msgstr "Přidat do fronty seznam souborů/složek"
 msgid "Enqueue filter"
 msgstr "Přidat do fronty filtr"
 
-#: plugins/artistinfo.pm:180
+#: plugins/artistinfo.pm:182
 msgid "Enter custom event string :"
 msgstr "Vložit uživatelský řetězec události :"
 
@@ -1462,7 +1470,7 @@ msgstr "Ekvalizér"
 msgid "Error :"
 msgstr "Chyba :"
 
-#: plugins/artistinfo.pm:453
+#: plugins/artistinfo.pm:455
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1486,7 +1494,7 @@ msgstr "Chyba zápisu do '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Chyba zápisu popisků replaygain :\n"
 
-#: plugins/artistinfo.pm:444 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:446 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Chyba: špatný tvar názvu souboru"
 
@@ -1670,7 +1678,7 @@ msgstr "Následovat vybranou skladbu"
 msgid "Font size"
 msgstr "Velikost písma"
 
-#: plugins/artistinfo.pm:188
+#: plugins/artistinfo.pm:190
 msgid ""
 "For information on how to use this plugin, please navigate to the <a "
 "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
@@ -1898,6 +1906,14 @@ msgstr "Jazyk"
 msgid "Lang."
 msgstr "Jazyk"
 
+#: plugins/artistinfo.pm:176
+msgid "Language"
+msgstr ""
+
+#: plugins/artistinfo.pm:176
+msgid "Language for last.fm artist info. (e.g. en, de, sp, fr, ...)"
+msgstr ""
+
 #: gmusicbrowser_tags.pm:1537
 msgid "Languages"
 msgstr "Jazyky"
@@ -1992,7 +2008,7 @@ msgstr "Seznamy, knihovna & kontext"
 msgid "Literal search"
 msgstr "Písmenné vyhledávání"
 
-#: plugins/artistinfo.pm:176
+#: plugins/artistinfo.pm:178
 msgid "Load/Save Artist Info in :"
 msgstr "Načíst/uložit biografii interpreta do:"
 
@@ -2007,12 +2023,12 @@ msgstr[0] "Načtena %d neodeslaná skladba z předchozího sezení"
 msgstr[1] "Načteny %d neodeslané skladby z předchozího sezení"
 msgstr[2] "Načteno %d neodeslaných skladeb z předchozího sezení"
 
-#: plugins/artistinfo.pm:348 plugins/artistinfo.pm:420 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:350 plugins/artistinfo.pm:422 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Načítání selhalo."
 
-#: plugins/artistinfo.pm:336 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:338 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Načítání..."
 
@@ -2469,7 +2485,7 @@ msgstr "Otevřít existující seznam"
 msgid "Open folder"
 msgstr "Otevřít složku"
 
-#: plugins/artistinfo.pm:184
+#: plugins/artistinfo.pm:186
 msgid "Open last.fm website in your browser"
 msgstr "Otevřít stránku last.fm v prohlížeči"
 
@@ -3342,7 +3358,7 @@ msgstr "Možnosti hledání"
 msgid "Search pitchfork for Artist"
 msgstr "Vyhledat interpreta na stránkách pitchfork"
 
-#: plugins/artistinfo.pm:114 plugins/artistinfo.pm:262
+#: plugins/artistinfo.pm:114 plugins/artistinfo.pm:264
 msgid "Search the web for artist"
 msgstr "Vyhledat interpreta na internetu"
 
@@ -3916,7 +3932,7 @@ msgstr "Použít gstreamer"
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "U ID3v2 popisků použít kódování latin1 pokud je dostupné "
 
-#: plugins/artistinfo.pm:180
+#: plugins/artistinfo.pm:182
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
@@ -4477,7 +4493,7 @@ msgstr "jinak než %n( krát)"
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "příklad (vybraná skladba) : {score}  ({chances})"
 
-#: plugins/artistinfo.pm:202 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:204 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "example : "
 msgstr "příklad :"
 
@@ -4593,7 +4609,7 @@ msgstr "celé číslo"
 msgid "interview"
 msgstr "interview"
 
-#: plugins/artistinfo.pm:202 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:204 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "invalid pattern"
 msgstr "chybná šablona"
 
@@ -5007,7 +5023,7 @@ msgstr "při %d"
 msgid "only show entries with at least n songs"
 msgstr "zobrazit jen položky obsahující minimálně n skladeb"
 
-#: plugins/artistinfo.pm:178
+#: plugins/artistinfo.pm:180
 msgid "only works when the artist-info tab is displayed"
 msgstr "Funkční jen pokud je zobrazena záložka informace o interpretovi"
 
@@ -5119,7 +5135,7 @@ msgstr "vymazat primární filtr"
 msgid "reset secondary filter"
 msgstr "vymazat sekundární filtr"
 
-#: plugins/artistinfo.pm:348 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:350 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "zkusit znovu"
 

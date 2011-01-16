@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.4-se\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-15 18:13+0100\n"
+"POT-Creation-Date: 2011-01-16 17:14+0100\n"
 "PO-Revision-Date: 2010-10-21 14:31+0100\n"
 "Last-Translator: Olle Sandgren <olle.sandgren@blixtmail.se>\n"
 "Language-Team: Sweden <se@li.org>\n"
@@ -197,7 +197,7 @@ msgstr "(: )har en"
 msgid "(: )none"
 msgstr "(: )ingen"
 
-#: plugins/artistinfo.pm:179
+#: plugins/artistinfo.pm:181
 msgid "(applied after restart)"
 msgstr ""
 
@@ -414,6 +414,10 @@ msgstr "Tillagda idag"
 msgid "Adding a radio"
 msgstr "Lägger till en radio"
 
+#: plugins/artistinfo.pm:177
+msgid "Additional domain for Last.fm, Amazon and so on."
+msgstr ""
+
 #: gmusicbrowser.pl:5683
 msgid ""
 "Additionally this format can be used :\n"
@@ -616,7 +620,7 @@ msgstr "Artist"
 msgid "Artist & album"
 msgstr "Artist & album"
 
-#: plugins/artistinfo.pm:179
+#: plugins/artistinfo.pm:181
 msgid "Artist Picture Size : "
 msgstr ""
 
@@ -688,7 +692,7 @@ msgstr ""
 msgid "Auto-increment track numbers"
 msgstr "Automatisk ökning av spårnummer"
 
-#: plugins/artistinfo.pm:178 plugins/lyrics.pm:187
+#: plugins/artistinfo.pm:180 plugins/lyrics.pm:187
 msgid "Auto-save positive finds"
 msgstr "Spara automatiskt positivt funna"
 
@@ -1268,6 +1272,10 @@ msgstr "Synkronisera inte id3v2 taggar"
 msgid "Do not write the tags"
 msgstr "Synkronisera inte taggar"
 
+#: plugins/artistinfo.pm:177
+msgid "Domain"
+msgstr ""
+
 #: plugins/titlebar.pm:54
 msgid "Don't add the overlay to dialogs"
 msgstr "Lägg inte till övertäckningen till dialoger"
@@ -1425,7 +1433,7 @@ msgstr "Köa en lista med filer/mappar"
 msgid "Enqueue filter"
 msgstr "Köfilter"
 
-#: plugins/artistinfo.pm:180
+#: plugins/artistinfo.pm:182
 msgid "Enter custom event string :"
 msgstr ""
 
@@ -1445,7 +1453,7 @@ msgstr "Equaliser"
 msgid "Error :"
 msgstr "Fel :"
 
-#: plugins/artistinfo.pm:453
+#: plugins/artistinfo.pm:455
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1467,7 +1475,7 @@ msgstr "Fel vid skrivning till '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Fel vid skrivning av replaygain tagg :\n"
 
-#: plugins/artistinfo.pm:444 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:446 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Fel: ogiltigt filnamns mönster"
 
@@ -1651,7 +1659,7 @@ msgstr "Följ utvald melodi"
 msgid "Font size"
 msgstr "Typsnittsstorlek"
 
-#: plugins/artistinfo.pm:188
+#: plugins/artistinfo.pm:190
 msgid ""
 "For information on how to use this plugin, please navigate to the <a "
 "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
@@ -1875,6 +1883,14 @@ msgstr "Språk"
 msgid "Lang."
 msgstr "Språk"
 
+#: plugins/artistinfo.pm:176
+msgid "Language"
+msgstr ""
+
+#: plugins/artistinfo.pm:176
+msgid "Language for last.fm artist info. (e.g. en, de, sp, fr, ...)"
+msgstr ""
+
 #: gmusicbrowser_tags.pm:1537
 msgid "Languages"
 msgstr ""
@@ -1965,7 +1981,7 @@ msgstr "Lista, Bibliotek & Sammanhang"
 msgid "Literal search"
 msgstr "Ordagrann sökning"
 
-#: plugins/artistinfo.pm:176
+#: plugins/artistinfo.pm:178
 msgid "Load/Save Artist Info in :"
 msgstr ""
 
@@ -1979,12 +1995,12 @@ msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "Laddar %d ej sänd melodi från föregående session"
 msgstr[1] "Laddar %d ej sänd melodier från föregående session"
 
-#: plugins/artistinfo.pm:348 plugins/artistinfo.pm:420 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:350 plugins/artistinfo.pm:422 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Misslyckades att ladda."
 
-#: plugins/artistinfo.pm:336 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:338 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Laddar..."
 
@@ -2441,7 +2457,7 @@ msgstr "Öppna existerande lista"
 msgid "Open folder"
 msgstr "Öppna mapp"
 
-#: plugins/artistinfo.pm:184
+#: plugins/artistinfo.pm:186
 msgid "Open last.fm website in your browser"
 msgstr ""
 
@@ -3313,7 +3329,7 @@ msgstr "Sök alternativ"
 msgid "Search pitchfork for Artist"
 msgstr ""
 
-#: plugins/artistinfo.pm:114 plugins/artistinfo.pm:262
+#: plugins/artistinfo.pm:114 plugins/artistinfo.pm:264
 msgid "Search the web for artist"
 msgstr ""
 
@@ -3884,7 +3900,7 @@ msgstr "Använd gstreamer"
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "Använd latin1 kodning av id3v2 tag om möjligt"
 
-#: plugins/artistinfo.pm:180
+#: plugins/artistinfo.pm:182
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
@@ -4440,7 +4456,7 @@ msgstr "exakt inte %n( gånger)"
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "exempel (valda melodier) : {score}  ({chances})"
 
-#: plugins/artistinfo.pm:202 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:204 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "example : "
 msgstr "exempel :"
 
@@ -4556,7 +4572,7 @@ msgstr ""
 msgid "interview"
 msgstr "intervju"
 
-#: plugins/artistinfo.pm:202 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:204 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "invalid pattern"
 msgstr "felaktigt mönster"
 
@@ -4970,7 +4986,7 @@ msgstr "på %d"
 msgid "only show entries with at least n songs"
 msgstr "visa endast inledningar med minst n melodier"
 
-#: plugins/artistinfo.pm:178
+#: plugins/artistinfo.pm:180
 msgid "only works when the artist-info tab is displayed"
 msgstr ""
 
@@ -5082,7 +5098,7 @@ msgstr "återställ primärt filter"
 msgid "reset secondary filter"
 msgstr "återställ sekundärt filter"
 
-#: plugins/artistinfo.pm:348 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:350 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "försök igen"
 

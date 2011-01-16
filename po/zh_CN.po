@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser.pot\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-15 18:13+0100\n"
+"POT-Creation-Date: 2011-01-16 17:14+0100\n"
 "PO-Revision-Date: 2009-04-30 13:14+0800\n"
 "Last-Translator: Google Translate\n"
 "Language-Team: Chinese\n"
@@ -179,7 +179,7 @@ msgstr "(: )有一个"
 msgid "(: )none"
 msgstr "(: )无"
 
-#: plugins/artistinfo.pm:179
+#: plugins/artistinfo.pm:181
 msgid "(applied after restart)"
 msgstr ""
 
@@ -392,6 +392,10 @@ msgstr "今天添加的"
 msgid "Adding a radio"
 msgstr "正在添加一个电台"
 
+#: plugins/artistinfo.pm:177
+msgid "Additional domain for Last.fm, Amazon and so on."
+msgstr ""
+
 #: gmusicbrowser.pl:5683
 msgid ""
 "Additionally this format can be used :\n"
@@ -589,7 +593,7 @@ msgstr "艺术家"
 msgid "Artist & album"
 msgstr "艺术家及专辑"
 
-#: plugins/artistinfo.pm:179
+#: plugins/artistinfo.pm:181
 msgid "Artist Picture Size : "
 msgstr ""
 
@@ -661,7 +665,7 @@ msgstr ""
 msgid "Auto-increment track numbers"
 msgstr ""
 
-#: plugins/artistinfo.pm:178 plugins/lyrics.pm:187
+#: plugins/artistinfo.pm:180 plugins/lyrics.pm:187
 msgid "Auto-save positive finds"
 msgstr "自动储存找到的"
 
@@ -1238,6 +1242,10 @@ msgstr "不要unsynchronise id3v2标签"
 msgid "Do not write the tags"
 msgstr "不写标签"
 
+#: plugins/artistinfo.pm:177
+msgid "Domain"
+msgstr ""
+
 #: plugins/titlebar.pm:54
 msgid "Don't add the overlay to dialogs"
 msgstr ""
@@ -1395,7 +1403,7 @@ msgstr "列出文件/文件夹"
 msgid "Enqueue filter"
 msgstr "排列滤波器"
 
-#: plugins/artistinfo.pm:180
+#: plugins/artistinfo.pm:182
 msgid "Enter custom event string :"
 msgstr ""
 
@@ -1415,7 +1423,7 @@ msgstr "均衡"
 msgid "Error :"
 msgstr "错误："
 
-#: plugins/artistinfo.pm:453
+#: plugins/artistinfo.pm:455
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1437,7 +1445,7 @@ msgstr "写'{file}'时发生错误"
 msgid "Error writing replaygain tags :\n"
 msgstr "写replaygain标签时发生错误：\n"
 
-#: plugins/artistinfo.pm:444 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:446 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "错误：无效的文件名模式"
 
@@ -1621,7 +1629,7 @@ msgstr "紧接着选定的歌曲"
 msgid "Font size"
 msgstr "字体大小"
 
-#: plugins/artistinfo.pm:188
+#: plugins/artistinfo.pm:190
 msgid ""
 "For information on how to use this plugin, please navigate to the <a "
 "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
@@ -1843,6 +1851,14 @@ msgstr "语言"
 msgid "Lang."
 msgstr "语言。"
 
+#: plugins/artistinfo.pm:176
+msgid "Language"
+msgstr ""
+
+#: plugins/artistinfo.pm:176
+msgid "Language for last.fm artist info. (e.g. en, de, sp, fr, ...)"
+msgstr ""
+
 #: gmusicbrowser_tags.pm:1537
 msgid "Languages"
 msgstr ""
@@ -1932,7 +1948,7 @@ msgstr ""
 msgid "Literal search"
 msgstr ""
 
-#: plugins/artistinfo.pm:176
+#: plugins/artistinfo.pm:178
 msgid "Load/Save Artist Info in :"
 msgstr ""
 
@@ -1945,12 +1961,12 @@ msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "正在加载上次会话中未送出的 %d 曲目"
 
-#: plugins/artistinfo.pm:348 plugins/artistinfo.pm:420 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:350 plugins/artistinfo.pm:422 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "载入中失败。"
 
-#: plugins/artistinfo.pm:336 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:338 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "载入中..."
 
@@ -2402,7 +2418,7 @@ msgstr "打开现有列表"
 msgid "Open folder"
 msgstr "打开文件夹"
 
-#: plugins/artistinfo.pm:184
+#: plugins/artistinfo.pm:186
 msgid "Open last.fm website in your browser"
 msgstr ""
 
@@ -3272,7 +3288,7 @@ msgstr ""
 msgid "Search pitchfork for Artist"
 msgstr ""
 
-#: plugins/artistinfo.pm:114 plugins/artistinfo.pm:262
+#: plugins/artistinfo.pm:114 plugins/artistinfo.pm:264
 msgid "Search the web for artist"
 msgstr ""
 
@@ -3837,7 +3853,7 @@ msgstr "使用gstreamer"
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "使用latin1编码如果可能的话在id3v2标签"
 
-#: plugins/artistinfo.pm:180
+#: plugins/artistinfo.pm:182
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
@@ -4387,7 +4403,7 @@ msgstr "完全没有%n( 次)"
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "例如 (selected song) : {score}  ({chances})"
 
-#: plugins/artistinfo.pm:202 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:204 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "example : "
 msgstr ""
 
@@ -4503,7 +4519,7 @@ msgstr ""
 msgid "interview"
 msgstr "采访"
 
-#: plugins/artistinfo.pm:202 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:204 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "invalid pattern"
 msgstr ""
 
@@ -4915,7 +4931,7 @@ msgstr "关于%d"
 msgid "only show entries with at least n songs"
 msgstr ""
 
-#: plugins/artistinfo.pm:178
+#: plugins/artistinfo.pm:180
 msgid "only works when the artist-info tab is displayed"
 msgstr ""
 
@@ -5027,7 +5043,7 @@ msgstr "重置初级过滤器"
 msgid "reset secondary filter"
 msgstr "重置二级过滤器"
 
-#: plugins/artistinfo.pm:348 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:350 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "重试"
 

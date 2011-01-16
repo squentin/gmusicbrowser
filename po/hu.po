@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9538\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-15 18:13+0100\n"
+"POT-Creation-Date: 2011-01-16 17:14+0100\n"
 "PO-Revision-Date: 2006-08-12 19:03+0200\n"
 "Last-Translator: Zsombor <gzsombor@gmail.com>\n"
 "Language-Team: Hungarian <translation-team-hu@lists.sourceforge.net>\n"
@@ -179,7 +179,7 @@ msgstr ""
 msgid "(: )none"
 msgstr ""
 
-#: plugins/artistinfo.pm:179
+#: plugins/artistinfo.pm:181
 msgid "(applied after restart)"
 msgstr ""
 
@@ -387,6 +387,10 @@ msgstr "Ma Hozzáadott"
 msgid "Adding a radio"
 msgstr ""
 
+#: plugins/artistinfo.pm:177
+msgid "Additional domain for Last.fm, Amazon and so on."
+msgstr ""
+
 #: gmusicbrowser.pl:5683
 msgid ""
 "Additionally this format can be used :\n"
@@ -584,7 +588,7 @@ msgstr "Előadó"
 msgid "Artist & album"
 msgstr ""
 
-#: plugins/artistinfo.pm:179
+#: plugins/artistinfo.pm:181
 msgid "Artist Picture Size : "
 msgstr ""
 
@@ -656,7 +660,7 @@ msgstr ""
 msgid "Auto-increment track numbers"
 msgstr ""
 
-#: plugins/artistinfo.pm:178 plugins/lyrics.pm:187
+#: plugins/artistinfo.pm:180 plugins/lyrics.pm:187
 msgid "Auto-save positive finds"
 msgstr ""
 
@@ -1228,6 +1232,10 @@ msgstr ""
 msgid "Do not write the tags"
 msgstr ""
 
+#: plugins/artistinfo.pm:177
+msgid "Domain"
+msgstr ""
+
 #: plugins/titlebar.pm:54
 msgid "Don't add the overlay to dialogs"
 msgstr ""
@@ -1385,7 +1393,7 @@ msgstr ""
 msgid "Enqueue filter"
 msgstr ""
 
-#: plugins/artistinfo.pm:180
+#: plugins/artistinfo.pm:182
 msgid "Enter custom event string :"
 msgstr ""
 
@@ -1405,7 +1413,7 @@ msgstr ""
 msgid "Error :"
 msgstr ""
 
-#: plugins/artistinfo.pm:453
+#: plugins/artistinfo.pm:455
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1425,7 +1433,7 @@ msgstr ""
 msgid "Error writing replaygain tags :\n"
 msgstr ""
 
-#: plugins/artistinfo.pm:444 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:446 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr ""
 
@@ -1607,7 +1615,7 @@ msgstr ""
 msgid "Font size"
 msgstr ""
 
-#: plugins/artistinfo.pm:188
+#: plugins/artistinfo.pm:190
 msgid ""
 "For information on how to use this plugin, please navigate to the <a "
 "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
@@ -1829,6 +1837,14 @@ msgstr "Nyelv"
 msgid "Lang."
 msgstr "Nyelv"
 
+#: plugins/artistinfo.pm:176
+msgid "Language"
+msgstr ""
+
+#: plugins/artistinfo.pm:176
+msgid "Language for last.fm artist info. (e.g. en, de, sp, fr, ...)"
+msgstr ""
+
 #: gmusicbrowser_tags.pm:1537
 msgid "Languages"
 msgstr ""
@@ -1918,7 +1934,7 @@ msgstr ""
 msgid "Literal search"
 msgstr ""
 
-#: plugins/artistinfo.pm:176
+#: plugins/artistinfo.pm:178
 msgid "Load/Save Artist Info in :"
 msgstr ""
 
@@ -1931,12 +1947,12 @@ msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] ""
 
-#: plugins/artistinfo.pm:348 plugins/artistinfo.pm:420 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:350 plugins/artistinfo.pm:422 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr ""
 
-#: plugins/artistinfo.pm:336 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:338 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr ""
 
@@ -2384,7 +2400,7 @@ msgstr ""
 msgid "Open folder"
 msgstr ""
 
-#: plugins/artistinfo.pm:184
+#: plugins/artistinfo.pm:186
 msgid "Open last.fm website in your browser"
 msgstr ""
 
@@ -3251,7 +3267,7 @@ msgstr ""
 msgid "Search pitchfork for Artist"
 msgstr ""
 
-#: plugins/artistinfo.pm:114 plugins/artistinfo.pm:262
+#: plugins/artistinfo.pm:114 plugins/artistinfo.pm:264
 msgid "Search the web for artist"
 msgstr ""
 
@@ -3816,7 +3832,7 @@ msgstr ""
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr ""
 
-#: plugins/artistinfo.pm:180
+#: plugins/artistinfo.pm:182
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
@@ -4364,7 +4380,7 @@ msgstr "pontosan nem %n -szer"
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "példa (kiválasztott szám) : {score} ({chances})"
 
-#: plugins/artistinfo.pm:202 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:204 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "example : "
 msgstr ""
 
@@ -4480,7 +4496,7 @@ msgstr ""
 msgid "interview"
 msgstr ""
 
-#: plugins/artistinfo.pm:202 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:204 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "invalid pattern"
 msgstr ""
 
@@ -4892,7 +4908,7 @@ msgstr "%d -on"
 msgid "only show entries with at least n songs"
 msgstr ""
 
-#: plugins/artistinfo.pm:178
+#: plugins/artistinfo.pm:180
 msgid "only works when the artist-info tab is displayed"
 msgstr ""
 
@@ -5004,7 +5020,7 @@ msgstr ""
 msgid "reset secondary filter"
 msgstr ""
 
-#: plugins/artistinfo.pm:348 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:350 plugins/lyrics.pm:366
 msgid "retry"
 msgstr ""
 

@@ -26,16 +26,16 @@ use constant
 
 my %sites =
 (
-	biography => 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',
+	biography => 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1&lang='.$::Options{OPT.'Language'},
 	events => 'http://ws.audioscrobbler.com/2.0/?method=artist.getevents&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',
 	web => 'weblinks',
 );
 my @External=
-(	['lastfm',	"http://www.last.fm/music/%a",								_"Show Artist page on last.fm"],
-	['wikipedia',	"http://en.wikipedia.org/wiki/%a",							_"Show Artist page on wikipedia"],
-	['youtube',	"http://www.youtube.com/results?search_type=&aq=1&search_query=%a",			_"Search for Artist on youtube"],
-	['amazon',	"http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias=aps&field-keywords=%a",	_"Search amazon.com for Artist"],
-	['google',	"http://www.google.at/search?q=%a",							_"Search google for Artist" ],
+(	['lastfm',	"http://www.lastfm.".$::Options{OPT.'Domain'}."/music/%a",								_"Show Artist page on last.fm"],
+	['wikipedia',	"http://".$::Options{OPT.'Domain'}.".wikipedia.org/wiki/%a",							_"Show Artist page on wikipedia"],
+	['youtube',	"http://www.youtube.".$::Options{OPT.'Domain'}."/results?search_type=&aq=1&search_query=%a",			_"Search for Artist on youtube"],
+	['amazon',	"http://www.amazon.".$::Options{OPT.'Domain'}."/s/ref=nb_sb_noss?url=search-alias=aps&field-keywords=%a",	_"Search amazon.com for Artist"],
+	['google',	"http://www.google.".$::Options{OPT.'Domain'}."/search?q=%a",							_"Search google for Artist" ],
 	['allmusic',	"http://www.allmusic.com/search/artist/%a",						_"Search allmusic for Artist" ],
 	['pitchfork',	"http://pitchfork.com/search/?search_type=standard&query=%a",				_"Search pitchfork for Artist" ],
 	['discogs',	"http://www.discogs.com/artist/%a",							_"Search discogs for Artist" ],
@@ -44,7 +44,7 @@ my @External=
 # lastfm api key 7aa688c2466dc17263847da16f297835
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
 
-::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", Eventformat => "%title at %name<br>%startDate<br>%city (%country)<br><br>");
+::SetDefaultOptions(OPT, Lang => "en", Domain => "com", PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", Eventformat => "%title at %name<br>%startDate<br>%city (%country)<br><br>");
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
@@ -173,6 +173,8 @@ sub cancel
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(0,2);
 	my $titlebox=Gtk2::HBox->new(0,0);
+    my $language=::NewPrefEntry(OPT.'Language' => _"Language", width=>5, tip => _"Language for last.fm artist info. (e.g. en, de, sp, fr, ...)");
+    my $domain=::NewPrefEntry(OPT.'Domain' => _"Domain", width=>5, tip => _"Additional domain for Last.fm, Amazon and so on.");
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>30);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
@@ -182,7 +184,7 @@ sub prefbox
 	my $lastfm=Gtk2::Button->new;
 	$lastfm->set_image($lastfmimage);
 	$lastfm->set_tooltip_text(_"Open last.fm website in your browser");
-	$lastfm->signal_connect(clicked => sub { ::main::openurl("http://www.last.fm/music/"); } );
+	$lastfm->signal_connect(clicked => sub { ::main::openurl("http://www.lastfm.".$::Options{OPT.'Domain'}."/music/"); } );
 	$lastfm->set_relief("none");
 	my $description=Gtk2::Label->new;
 	$description->set_markup(_"For information on how to use this plugin, please navigate to the <a href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>.");
@@ -190,7 +192,7 @@ sub prefbox
 	$titlebox->pack_start($description,1,1,0);
 	$titlebox->pack_start($lastfm,0,0,5);
 	my $optionbox=Gtk2::VBox->new(0,2);
-	$optionbox->pack_start($_,0,0,1) for $entry,$preview,$autosave,$picsize,$eventformat;
+	$optionbox->pack_start($_,0,0,1) for $language,$domain,$entry,$preview,$autosave,$picsize,$eventformat;
 	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$optionbox;
 	return $vbox;
 }
@@ -454,3 +456,4 @@ sub Save_text
 }
 
 1
+

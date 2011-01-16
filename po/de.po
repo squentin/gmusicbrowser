@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9621\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-15 18:13+0100\n"
+"POT-Creation-Date: 2011-01-16 17:14+0100\n"
 "PO-Revision-Date: 2010-02-22 21:01+0100\n"
 "Last-Translator:  <staubi@linuxmail.org>\n"
 "Language-Team: german <de@li.org>\n"
@@ -197,7 +197,7 @@ msgstr "(: )hat eins"
 msgid "(: )none"
 msgstr "(: )keins"
 
-#: plugins/artistinfo.pm:179
+#: plugins/artistinfo.pm:181
 msgid "(applied after restart)"
 msgstr "(angewendet nach Neustart)"
 
@@ -410,6 +410,10 @@ msgstr "Heute hinzugefügt"
 msgid "Adding a radio"
 msgstr "Füge Radio hinzu"
 
+#: plugins/artistinfo.pm:177
+msgid "Additional domain for Last.fm, Amazon and so on."
+msgstr "Domainzusatz für Last.fm, Amazon usw."
+
 #: gmusicbrowser.pl:5683
 msgid ""
 "Additionally this format can be used :\n"
@@ -615,7 +619,7 @@ msgstr "Künstler"
 msgid "Artist & album"
 msgstr "Künstler & Album"
 
-#: plugins/artistinfo.pm:179
+#: plugins/artistinfo.pm:181
 msgid "Artist Picture Size : "
 msgstr "Dimension des Künstlerbildes"
 
@@ -687,7 +691,7 @@ msgstr "Automatischer Filter"
 msgid "Auto-increment track numbers"
 msgstr "Automatisch Erhöhung der Titel-Nr."
 
-#: plugins/artistinfo.pm:178 plugins/lyrics.pm:187
+#: plugins/artistinfo.pm:180 plugins/lyrics.pm:187
 msgid "Auto-save positive finds"
 msgstr "Automatisch positive Treffer speichern"
 
@@ -1269,6 +1273,10 @@ msgstr "ID3v2 Tags nicht abgleichen"
 msgid "Do not write the tags"
 msgstr "Schreibe keine Tags"
 
+#: plugins/artistinfo.pm:177
+msgid "Domain"
+msgstr ""
+
 #: plugins/titlebar.pm:54
 msgid "Don't add the overlay to dialogs"
 msgstr "Überlagerung nicht für Dialoge verwenden"
@@ -1426,9 +1434,9 @@ msgstr "Liste von Dateien/Ordnern an Warteliste hängen"
 msgid "Enqueue filter"
 msgstr "Filter an Warteliste hängen"
 
-#: plugins/artistinfo.pm:180
+#: plugins/artistinfo.pm:182
 msgid "Enter custom event string :"
-msgstr ""
+msgstr "Formatierungen der Anzeige der Events"
 
 #: plugins/epicrating.pm:11
 msgid "EpicRating"
@@ -1446,7 +1454,7 @@ msgstr "Equalizer"
 msgid "Error :"
 msgstr "Fehler:"
 
-#: plugins/artistinfo.pm:453
+#: plugins/artistinfo.pm:455
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1468,13 +1476,13 @@ msgstr "Fehler beim schreiben von '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Fehler beim schreiben der Wiedergabe-Verstärkung-Tags:\n"
 
-#: plugins/artistinfo.pm:444 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:446 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Fehler: ungültiges Dateinamensmuster"
 
 #: gmusicbrowser_tags.pm:810
 msgid "Example :"
-msgstr ""
+msgstr "Beispiel:"
 
 #: plugins/export.pm:95
 msgid "Execute custom command on selected files"
@@ -1652,7 +1660,7 @@ msgstr "Folge gewähltem Titel"
 msgid "Font size"
 msgstr "Schriftgröße"
 
-#: plugins/artistinfo.pm:188
+#: plugins/artistinfo.pm:190
 msgid ""
 "For information on how to use this plugin, please navigate to the <a "
 "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
@@ -1877,6 +1885,14 @@ msgstr "Sprache"
 msgid "Lang."
 msgstr "Sprache"
 
+#: plugins/artistinfo.pm:176
+msgid "Language"
+msgstr "Sprache"
+
+#: plugins/artistinfo.pm:176
+msgid "Language for last.fm artist info. (e.g. en, de, sp, fr, ...)"
+msgstr "Sprache für die Künstlerinformationen von Last.fm (z.B. en, de, sp, fr, ...)"
+
 #: gmusicbrowser_tags.pm:1537
 msgid "Languages"
 msgstr "Sprachen"
@@ -1970,9 +1986,9 @@ msgstr "Listen, Sammlung & Kontext"
 msgid "Literal search"
 msgstr "Wortgetreue Suche"
 
-#: plugins/artistinfo.pm:176
+#: plugins/artistinfo.pm:178
 msgid "Load/Save Artist Info in :"
-msgstr "Lade/Speicher Künstlerinformationen in/aus:"
+msgstr "Lade/Speichere Künstlerinformationen in/aus:"
 
 #: plugins/lyrics.pm:185
 msgid "Load/Save lyrics in :"
@@ -1984,12 +2000,12 @@ msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "%d unübermittelter Titel aus letzter Sitzung geladen"
 msgstr[1] "%d unübermittelte Titel aus letzter Sitzung geladen"
 
-#: plugins/artistinfo.pm:348 plugins/artistinfo.pm:420 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:350 plugins/artistinfo.pm:422 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Laden fehlgeschlagen."
 
-#: plugins/artistinfo.pm:336 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:338 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Lade ..."
 
@@ -2446,7 +2462,7 @@ msgstr "Vorhandene Liste öffnen"
 msgid "Open folder"
 msgstr "Öffne Ordner"
 
-#: plugins/artistinfo.pm:184
+#: plugins/artistinfo.pm:186
 msgid "Open last.fm website in your browser"
 msgstr "Öffne last.fm im Browser"
 
@@ -3318,7 +3334,7 @@ msgstr "Sucheinstellungen"
 msgid "Search pitchfork for Artist"
 msgstr "Durchsuche pitchfork nach dem Künstler"
 
-#: plugins/artistinfo.pm:114 plugins/artistinfo.pm:262
+#: plugins/artistinfo.pm:114 plugins/artistinfo.pm:264
 msgid "Search the web for artist"
 msgstr "Suche im Internet nach dem Künstler"
 
@@ -3893,7 +3909,7 @@ msgstr "Verwende Gstreamer"
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "Verwende, wenn möglich, Latin1-Kodierung in ID3v2 Tags"
 
-#: plugins/artistinfo.pm:180
+#: plugins/artistinfo.pm:182
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
@@ -4449,7 +4465,7 @@ msgstr "genau nicht %n( Mal)"
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "Beispiel (gewählter Titel): {score}  ({chances})"
 
-#: plugins/artistinfo.pm:202 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:204 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "example : "
 msgstr "Beispiel: "
 
@@ -4565,7 +4581,7 @@ msgstr "Integer"
 msgid "interview"
 msgstr "Interview"
 
-#: plugins/artistinfo.pm:202 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:204 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "invalid pattern"
 msgstr "Ungültiges Muster"
 
@@ -4979,7 +4995,7 @@ msgstr "auf %d"
 msgid "only show entries with at least n songs"
 msgstr "Zeige nur Einträge mit mindestens n Titeln"
 
-#: plugins/artistinfo.pm:178
+#: plugins/artistinfo.pm:180
 msgid "only works when the artist-info tab is displayed"
 msgstr "Funktioniert nur, wenn Künstlerinformationen angezeigt werden"
 
@@ -5093,7 +5109,7 @@ msgstr "Primären Filter aufheben"
 msgid "reset secondary filter"
 msgstr "Sekundären Filter aufheben"
 
-#: plugins/artistinfo.pm:348 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:350 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "Erneut versuchen"
 
@@ -5545,6 +5561,10 @@ msgstr "|-getrennte Liste von Widgetnamen"
 #~ msgid "Display lyrics of the current song using lyrc.com.ar"
 #~ msgstr "Zeige zu aktuellem Lied den Liedtext von lyrc.com.ar"
 
+#, fuzzy
+#~ msgid "Domain:"
+#~ msgstr "Domain"
+
 #~ msgid "Don't know how to play {file}"
 #~ msgstr "Kann {file} nicht wiedergeben"
 
@@ -5566,6 +5586,12 @@ msgstr "|-getrennte Liste von Widgetnamen"
 
 #~ msgid "Group by"
 #~ msgstr "Gruppiere nach"
+
+#~ msgid "Language for last.fm artist info."
+#~ msgstr "Sprache der Informationen von last.fm"
+
+#~ msgid "Language:"
+#~ msgstr "Sprache"
 
 #~ msgid "Lock On Album"
 #~ msgstr "Halte das Album"
