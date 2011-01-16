@@ -1466,7 +1466,7 @@ sub LoadPlugins
 				my %plug= (version=>0,desc=>'',);
 				while ($line=<$fh>)
 				{	last if $line=~m/^=cut/;
-					my ($key,$val)= $line=~m/^\s*(\w+):?\s+(.+)/;
+					my ($key,$val)= $line=~m/^\s*(\w+):?\s+([^\n\r]+)/;
 					next unless $key;
 					if ($key eq 'desc')
 					{	$plug{desc} .= _($val)."\n";
