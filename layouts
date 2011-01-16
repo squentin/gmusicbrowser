@@ -15,7 +15,7 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
 
             HBCurrentTrack = 10_VBCurrentTrack
-                VBCurrentTrack = _Filler1 HBTitle HBArtistAndLock HBAlbumAndLock HBStars 15Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0) _Filler2 5HBReplayButtons
+                VBCurrentTrack = _Filler1 HBTitle HBArtistAndLock HBAlbumAndLock HBStars 15Cover(overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0) _Filler2 5HBReplayButtons
                 HBTitle = 10Filler11 _Title(xalign=0.5,markup="<big><b>%t</b></big>")
                 HBAlbumAndLock = LockAlbum(button=1,relief=half) Next1(button=1,click1=NextAlbum,tip=_"Next Album") _Album(xalign=0.5,markup="%l") 20Filler14
                 HBArtistAndLock = LockArtist(button=1,relief=half) Next2(button=1,click1=NextArtist,tip=_"Next Artist") _Artist(xalign=0.5,markup="%a") 20Filler15
