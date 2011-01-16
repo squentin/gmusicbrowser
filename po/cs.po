@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-16 17:42+0100\n"
+"POT-Creation-Date: 2011-01-16 18:19+0100\n"
 "PO-Revision-Date: 2010-12-18 04:41+0100\n"
 "Last-Translator: Vašek Kovářík <L3D9Z6@seznam.cz>\n"
 "Language-Team: Czech\n"
@@ -15,19 +15,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: plugins/artistinfo.pm:467
+#: plugins/artistinfo.pm:468
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:397
+#: plugins/artistinfo.pm:398
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:397
+#: plugins/artistinfo.pm:398
 msgid ""
 "\n"
 "Total playcount: "
@@ -776,7 +776,7 @@ msgstr "Zásuvný modul automatického ukládání"
 msgid "Available"
 msgstr "Dostupné"
 
-#: plugins/artistinfo.pm:397
+#: plugins/artistinfo.pm:398
 msgid "Average rating: "
 msgstr ""
 
@@ -1501,7 +1501,7 @@ msgstr "Ekvalizér"
 msgid "Error :"
 msgstr "Chyba :"
 
-#: plugins/artistinfo.pm:566
+#: plugins/artistinfo.pm:567
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1525,7 +1525,7 @@ msgstr "Chyba zápisu do '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Chyba zápisu popisků replaygain :\n"
 
-#: plugins/artistinfo.pm:557 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Chyba: špatný tvar názvu souboru"
 
@@ -2062,12 +2062,12 @@ msgstr[0] "Načtena %d neodeslaná skladba z předchozího sezení"
 msgstr[1] "Načteny %d neodeslané skladby z předchozího sezení"
 msgstr[2] "Načteno %d neodeslaných skladeb z předchozího sezení"
 
-#: plugins/artistinfo.pm:440 plugins/artistinfo.pm:533 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:441 plugins/artistinfo.pm:534 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Načítání selhalo."
 
-#: plugins/artistinfo.pm:425 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:426 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Načítání..."
 
@@ -2341,7 +2341,7 @@ msgstr "Žádný zamčený filtr"
 msgid "No moods"
 msgstr "Žádné nálady"
 
-#: plugins/artistinfo.pm:482
+#: plugins/artistinfo.pm:483
 msgid "No results found"
 msgstr ""
 
@@ -3382,7 +3382,7 @@ msgstr "Vyhledat interpreta na stránkách youtube"
 msgid "Search for a picture on internet"
 msgstr "Vyhledat obrázek na internetu"
 
-#: plugins/artistinfo.pm:268
+#: plugins/artistinfo.pm:269
 msgid "Search for artist on:"
 msgstr ""
 
@@ -3410,7 +3410,7 @@ msgstr "Možnosti hledání"
 msgid "Search pitchfork for Artist"
 msgstr "Vyhledat interpreta na stránkách pitchfork"
 
-#: plugins/artistinfo.pm:353
+#: plugins/artistinfo.pm:354
 msgid "Search the web for artist"
 msgstr "Vyhledat interpreta na internetu"
 
@@ -5205,7 +5205,7 @@ msgstr "vymazat primární filtr"
 msgid "reset secondary filter"
 msgstr "vymazat sekundární filtr"
 
-#: plugins/artistinfo.pm:440 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:441 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "zkusit znovu"
 

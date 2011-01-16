@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.4\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-16 17:42+0100\n"
+"POT-Creation-Date: 2011-01-16 18:19+0100\n"
 "PO-Revision-Date: 2010-07-14 15:31+0100\n"
 "Last-Translator: Brice Boucard <boucard.brice@neuf.fr>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -13,19 +13,19 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: plugins/artistinfo.pm:467
+#: plugins/artistinfo.pm:468
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:397
+#: plugins/artistinfo.pm:398
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:397
+#: plugins/artistinfo.pm:398
 msgid ""
 "\n"
 "Total playcount: "
@@ -762,7 +762,7 @@ msgstr "Plugin de sauvegarde automatique"
 msgid "Available"
 msgstr "Disponible"
 
-#: plugins/artistinfo.pm:397
+#: plugins/artistinfo.pm:398
 msgid "Average rating: "
 msgstr ""
 
@@ -1493,7 +1493,7 @@ msgstr "Égaliseur"
 msgid "Error :"
 msgstr "Erreur :"
 
-#: plugins/artistinfo.pm:566
+#: plugins/artistinfo.pm:567
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1518,7 +1518,7 @@ msgstr "Erreur en écrivant '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Erreur lors de l'écriture des tags replaygain :\n"
 
-#: plugins/artistinfo.pm:557 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Erreur : format de nom de fichier invalide"
 
@@ -2053,12 +2053,12 @@ msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "%d chanson non-envoyée depuis la session précédente"
 msgstr[1] "%d chansons non-envoyées depuis la session précédente"
 
-#: plugins/artistinfo.pm:440 plugins/artistinfo.pm:533 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:441 plugins/artistinfo.pm:534 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Chargement échoué."
 
-#: plugins/artistinfo.pm:425 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:426 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Chargement..."
 
@@ -2331,7 +2331,7 @@ msgstr "Pas de filtre verrouillé"
 msgid "No moods"
 msgstr "Pas d'ambiances"
 
-#: plugins/artistinfo.pm:482
+#: plugins/artistinfo.pm:483
 msgid "No results found"
 msgstr ""
 
@@ -3382,7 +3382,7 @@ msgstr "Cherche l'artiste sur youtube"
 msgid "Search for a picture on internet"
 msgstr "Rechercher une image sur Internet"
 
-#: plugins/artistinfo.pm:268
+#: plugins/artistinfo.pm:269
 msgid "Search for artist on:"
 msgstr ""
 
@@ -3410,7 +3410,7 @@ msgstr "Options de recherche"
 msgid "Search pitchfork for Artist"
 msgstr "Cherche l'artiste sur pitchfork"
 
-#: plugins/artistinfo.pm:353
+#: plugins/artistinfo.pm:354
 msgid "Search the web for artist"
 msgstr "Cherche l'artiste sur le web"
 
@@ -5223,7 +5223,7 @@ msgstr "enlever le filtre primaire"
 msgid "reset secondary filter"
 msgstr "enlever le filtre secondaire"
 
-#: plugins/artistinfo.pm:440 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:441 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "ré-essayer"
 
