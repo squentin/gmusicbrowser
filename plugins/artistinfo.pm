@@ -251,6 +251,7 @@ sub tv_contextmenu {
 	my $store=$treeview->{store};
 	my $iter=$store->get_iter($path);
 	my $artist=$store->get( $store->get_iter($path),0);
+	my $url=$store->get( $store->get_iter($path),2);
 	my $aID=$store->get( $store->get_iter($path),3);
 	if ($event->button == 2) { if ($url eq "local") {
 		my $filter = Songs::MakeFilterFromGID('artists',$aID);
