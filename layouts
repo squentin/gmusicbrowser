@@ -66,16 +66,16 @@ VBmain = HPControlsInfoAndSearch _HPContent
         MBLayoutSettings = SMLayoutSettings
             SMLayoutSettings =  (tip=_"Show/Hide elements",label=_"S/H") \
                                 MenuItem0(togglewidget=VBSavedFilterPane|VPfp0|HBSearch,label=_"reduced view") \
-                                MenuItem1(togglewidget=VPGenreYear,label=_"Genre and Year") \
+                                # MenuItem1(togglewidget=VPGenreYear,label=_"Genre and Year") \
                                 MenuItem2(togglewidget=Cover,label=_"Album cover") \
-                                MenuItem3(togglewidget=LockArtist|Next2|Filler15|LockAlbum|Next1|Filler14|Filler11|Filler12,label=_"Artist and album modifier (leftmost pane)") \
-                                MenuItem4(togglewidget=VBSavedFilterPane,label=_"Lower left filter pane") \
-                                SMQueueContextLists
+                                MenuItem3(togglewidget=LockArtist|Next2|Filler15|LockAlbum|Next1|Filler14|Filler11|Filler12,label=_"Artist and album modifier (leftmost pane)")
+                                # MenuItem4(togglewidget=VBSavedFilterPane,label=_"Lower left filter pane") \
+                                # SMQueueContextLists
 
-                SMQueueContextLists = (label=_"queue, context and lists") \
-                                        MenuItem5(togglewidget=Context|MenuItem6,label=_"Context") \
-                                        MenuItem6(togglewidget=HBQueueList|MenuItem5,label=_"Queue") \
-                                        MenuItem7(togglewidget=TBContextAndLists|MenuItem5|MenuItem6,label=_"rightmost pane")
+#                SMQueueContextLists = (label=_"queue, context and lists") \
+#                                        MenuItem5(togglewidget=Context|MenuItem6,label=_"Context") \
+#                                        MenuItem6(togglewidget=HBQueueList|MenuItem5,label=_"Queue") \
+#                                        MenuItem7(togglewidget=TBContextAndLists|MenuItem5|MenuItem6,label=_"rightmost pane")
 
 
         MBSongTree = HistItem
