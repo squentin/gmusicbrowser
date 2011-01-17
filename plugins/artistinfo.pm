@@ -271,7 +271,7 @@ sub tv_contextmenu {
 		$title->show;
 		for my $item (@External) {
 			my ($key,$url,$text)=@$item;
-			if ($key eq 'lastfm') { $url=$store->get( $store->get_iter($path),2); }
+			if ($key eq 'lastfm') { $url="http://".$store->get( $store->get_iter($path),2); }
 			else { $url=~s/%a/$artist/; }
 			my $menuitem = Gtk2::ImageMenuItem->new ($key);
 			$menuitem->set_image( Gtk2::Image->new_from_stock('webcontext-'.$key,'menu') );
