@@ -954,3 +954,8 @@ Type= P
 Name=_"Same year"
 VBmain = _SongTree(group=Play:year)
 
+[same_rating]
+Type= P
+Name=_"Same rating"
+VBmain = _SongTree(group=Play:rating)
+
