@@ -6957,7 +6957,7 @@ sub new
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->set_reorderable(TRUE);
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes(
-		filters => Gtk2::CellRendererText->new,
+		_("filters") => Gtk2::CellRendererText->new,
 		text => C_NAME) );
 	my $sw = Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');
