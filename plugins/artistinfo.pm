@@ -401,7 +401,6 @@ sub ArtistChanged
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($aID,"<big><b>%a</b></big>","artist",1) );
 	$self->{Lstats}->set_markup( AA::ReplaceFields($aID,'%X « %s'."\n<small>%y</small>","artist",1) );
 	for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
-
 	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
 	my $url= $sites{$self->{site}}[SITEURL];
 	$url=~s/%a/$artist/;
@@ -410,11 +409,14 @@ sub ArtistChanged
 		$self->{artist_esc} = $artist;
 		$self->{url} = $url;
 		if ($self->{site} eq "biography") { # check for local biography file before loading the page
+			unless ($force) {
 			my $file=::pathfilefromformat( ::GetSelID($self), $::Options{OPT.'PathFile'}, undef,1 );
 			if ($file && -r $file)
 				{	::IdleDo('8_artistinfo'.$self,1000,\&load_file,$self,$file);
+					$self->{sw2}->hide; $self->{sw1}->show; # otherwise switching back from the "similar" tab doesn't show the textview
 					return
 				}
+			}
 		}
 		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);
 
