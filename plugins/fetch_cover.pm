@@ -42,15 +42,17 @@ my %Sites=
 );
 
 my %menuitem=
-(	label => _"Search for a picture on internet",					#label of the menu item
+(	label => _"Search Picture",					#label of the menu item
 	code => sub { Fetch($_[0]{mainfield},$_[0]{gid},$_[0]{ID}); },			#when menu item selected
 	test => sub {$_[0]{mainfield} eq 'album' || $_[0]{mainfield} eq 'artist'},	#the menu item is displayed if returns true
+	stockicon => 'gtk-find',
 );
 my %fpane_menuitem=
 (	label=> _"Search for a picture on internet",
 	code => sub { Fetch($_[0]{field},$_[0]{gidlist}[0]); },
 	onlyone=> 'gidlist',	#menu item is hidden if more than one album/artist is selected
 	istrue => 'aa',		#menu item is hidden for non artist/album (aa) FPanes
+	stockicon => 'gtk-find',
 );
 
 ::SetDefaultOptions(OPT, USEFILE => 1, COVERFILE => 'cover', PictureSite_artist => 'googlei', PictureSite_album => 'googlei');

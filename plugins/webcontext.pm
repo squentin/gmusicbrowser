@@ -185,7 +185,7 @@ our %Widgets=
 	},
 	PluginWikipedia =>
 	{	class		=> 'GMB::Plugin::WebContext::Wikipedia',
-		tabicon		=> 'plugin-wikipedia',
+		tabicon		=> 'webcontext-wikipedia',
 		tabtitle	=> _"Wikipedia",
 		schange		=> \&Update,
 		group		=> 'Play',

@@ -9,13 +9,13 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
 
 
-    HPContent = _HPCurrentTrack _HPfp1
+    HPContent = _HPCurrentTrack _TBContextAndLists
         HPCurrentTrack = VPfp2 _VPfp0
             VPfp2 = _HBCurrentTrack VBSavedFilterPane
 
 
             HBCurrentTrack = 10_VBCurrentTrack
-                VBCurrentTrack = _Filler1 HBTitle HBArtistAndLock HBAlbumAndLock HBStars 15Cover _Filler2 5HBReplayButtons
+                VBCurrentTrack = _Filler1 HBTitle HBArtistAndLock HBAlbumAndLock HBStars 15Cover(overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0) _Filler2 5HBReplayButtons
                 HBTitle = 10Filler11 _Title(xalign=0.5,markup="<big><b>%t</b></big>")
                 HBAlbumAndLock = LockAlbum(button=1,relief=half) Next1(button=1,click1=NextAlbum,tip=_"Next Album") _Album(xalign=0.5,markup="%l") 20Filler14
                 HBArtistAndLock = LockArtist(button=1,relief=half) Next2(button=1,click1=NextArtist,tip=_"Next Artist") _Artist(xalign=0.5,markup="%a") 20Filler15
@@ -34,8 +34,10 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
                  VBBottom = 10_HBSongTree VProgress
 
-        HPfp1 =  VPQueueContext
-            VPQueueContext = _Context(page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo') _HBQueueList
+        #HPfp1 =  VPQueueContext
+            #VPQueueContext =  _HBTabbedLists
+
+                TBContextAndLists = _"Context" Context(page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo') _"Queue" HBQueueList _"List" TabbedLists(group=1)
                 # an layout error occurs, if I use the padding in a VP
                 HBQueueList = 10_VBQueueList
                     VBQueueList = 0Filler5 VBQueueAct _QueueList(group=1) 5HBQueueActions 3Filler6
@@ -45,7 +47,8 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
     HPControlsInfoAndSearch = _HPfpSongInfo_Search VBControls
         VBControls = _Filler16 HBControls _Filler17
-            HBControls =  -MBmain -HBVolume -Fullscreen(size=button) -TogButton(tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
+            # HBControls =  -MBmain -MBLayoutSettings -HBVolume -Fullscreen(size=button) -TogButton(tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
+            HBControls =  -MBmain -MBLayoutSettings -HBVolume -Fullscreen(size=button)
 
         HBVolume = VolumeIcon(button=1)
 
@@ -60,16 +63,22 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
         MBmain = MainMenuItem
 
+        MBLayoutSettings = SMLayoutSettings
+            SMLayoutSettings =  (tip=_"Show/Hide elements",label=_"S/H") \
+                                MenuItem0(togglewidget=VBSavedFilterPane|VPfp0|HBSearch,label=_"reduced view") \
+                                # MenuItem1(togglewidget=VPGenreYear,label=_"Genre and Year") \
+                                MenuItem2(togglewidget=Cover,label=_"Album cover") \
+                                MenuItem3(togglewidget=LockArtist|Next2|Filler15|LockAlbum|Next1|Filler14|Filler11|Filler12,label=_"Artist and album modifier (leftmost pane)")
+                                # MenuItem4(togglewidget=VBSavedFilterPane,label=_"Lower left filter pane") \
+                                # SMQueueContextLists
+
+#                SMQueueContextLists = (label=_"queue, context and lists") \
+#                                        MenuItem5(togglewidget=Context|MenuItem6,label=_"Context") \
+#                                        MenuItem6(togglewidget=HBQueueList|MenuItem5,label=_"Queue") \
+#                                        MenuItem7(togglewidget=TBContextAndLists|MenuItem5|MenuItem6,label=_"rightmost pane")
+
+
         MBSongTree = HistItem
-
-
-
-
-
-
-
-
-
 
             HBSongTree = _VBSongTree
             VBSongTree = HBSongTreeAct _SongTree 5HBSongTreeStats
@@ -87,11 +96,50 @@ VBmain  = _HBPics -HBReplayButtons
     HBReplayButtons = Prev(size=menu) Play(size=menu) Next(size=menu) 20VSeparator 5_TimeBar(text="%t by %a (%m)",minwidth=240) 10-Stars
 
 HBPics = _HBCover
-    HBCover = _Cover(maxsize=300,forceratio=1)
+    HBCover = _Cover(overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0)
 
 KeyBindings	= Escape CloseWindow
 VolumeScroll	= VBmain
 
+[shimmer]
+Type=G
+Title		= "gmusicbrowser"
+DefaultFocus	= SimpleSearch
+Default		= Window(size=1000x750)
+Window		= hidden=SongTree|VPMosaic
+Author		= simon@shimmerproject.org
+### main window containers: top bar, main and statusbar ###
+VBMain		= VBTop _HBMain
+HBMain		= VBLeft _HPRight
+VBTop		= 3Filler8 HBTop
+HBTop		= VBButtons _15VBPlayer 15VBToggle VBSearchBox -5VBSettings
+### top bar from left to right ###
+VBButtons	= HBButtons 3Filler4
+HBButtons	= Prev Play Next(click2=NextAlbum)
+VBPlayer	= HBTitle HBTimeSlider
+HBTitle		= Title(expand_max=300,minsize=1,markup="<big><b>%t</b></big> ",click1="",tip="Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbumBreadcrumb AlbumBreadcrumb(tip="Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%l ",showcover=0) LockArtistBreadcrumb ArtistBreadcrumb(tip="Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
+HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
+VBToggle	= HBToggle 5Filler1
+HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1,tip="Simple List View") ToggleButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1,tip="Songtree View") ToggleButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1,tip="Mosaic View")
+VBSearchBox	= 2SimpleSearch(suggest=1) 5Filler2
+VBSettings	= Pref(stock=gtk-preferences_20,size=button) 5Filler5
+### main left: artist pane and album-cover ###
+VBLeft		= _NBList HBCover HBStatus
+NBList		= (tabpos="bottom") VBArtist QueueList(songtree=1,tabtitle="Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
+HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
+VBAbout		= (tabtitle="Info") _PluginArtistinfo
+VBArtist	= (tabtitle="Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1,lmarkup="<b>%a</b>%Y\x0a<small>%x / %s / <small>%l</small></small>")
+HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
+HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2SortIndicator(button=1,tip="Right-click to toggle Shuffle") -2FilterIndicator(button=1,tip="Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=HBCover,tip="Show/Hide Cover")
+### main right: list/tree/mosaic widgets ###
+HPRight		= _HBSongListtree
+HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
+HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
+VPMosaic	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
+### bottom: statusbar ### Pref(size=small-toolbar,button=0)
+### positioning and sizing ###
+HSize0		= 350 NBList
+VSize0		= 350 HBCover
 
 [Lists, Library & Context]
 Type=G+
@@ -146,6 +194,23 @@ Default	= Window(sticky=1)
 HBmain	= OpenBrowser Pref Play Next 5_ABTitle
 ABTitle = (xalign=0,yscale=0) Title_by(minsize=20)
 VolumeScroll	= HBmain
+
+[shimmer_tray]
+Type=T
+VBMain		= HBTime Filler0 VBMain1
+VBMain1		= HBLeft _HBRight
+HBLeft		= _Cover(forceratio=1,default=pix/elementary/no-cover.svg) VBText
+VBText		= 2HBAlbum HBYear _2HBTitle
+HBButtons	= Prev(size=small-toolbar) Play(size=small-toolbar) Next(size=small-toolbar)
+HBTitle		= LockSong _Title(font=16,interval=75)
+HBArtist	= LockArtist _Artist(font=10)
+HBAlbum		= LockAlbum _Album(font=10)
+HBYear		= Filler1 _Date(font=8,markup="%y") -Stars
+HBTime		= _TimeBar(minheight=7)
+HBRight		= HBButtons _2HBArtist
+VSize0		= 3 Filler0
+HSize0		= Filler1 LockArtist LockAlbum LockSong
+HSize1		= Cover HBButtons
 
 [full] based on Small player
 Type=T
@@ -556,6 +621,28 @@ KeyBindings	= Escape CloseWindow
 #SongTree Group & Columns definitions
 #####################################
 
+{Group discleft}
+title=disc on the left side
+head=3
+left=width
+vcollapse=head+title:h+line:h
+title:	text(markup='<b><big>'.pesc($title).'</big></b>',pad=2,w=left)
+width:	OptionNumber(default=15,min=10,max=100,step=1)
+line: line(x1=1,y1=1,x2=$_w,y2=1,color='#ccc',width=1)
+#,hide=$disc==0)
+
+{Group artistalbum_breadcrumbs}
+title=album and artist breadcrumbs
+head=title:h
+tail=25
+vcollapse=head
+vmin=pic:y+pic:h+25
+left=pic:w+2
+title:	text(markup='<b><big>'.pesc($album).'</big></b>'. if($year,'  <big><b>«</b></big>  '.pesc($year)) . '  <big><b>«</b></big> '.pesc($artist),pad=2)
+pic:	+aapic(y=title:h+title:y,picsize=picsize,ypad=2,xpad=1,aa='album')
+picsize : OptionNumber(default=100,min=20,max=1000,step=10)
+picstars : picture(file=ratingpic($rating_avrg),x=(picsize/2)-(picstars:w/2),y=pic:y+pic:h,hide=$rating_avrg==50)
+
 {Group pic}
 title= with picture
 head=title:h
@@ -572,12 +659,56 @@ picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 showyear : OptionBoolean(default=1,name='show year')
 myfont : OptionFont(default='Arial Bold 18',name='font')
 
+{Group showHidePicture}
+title   = Show/Hide picture
+head    = 10
+tail    = 15
+vmin    = pic:h+10
+#vcollapse= pic1:h+10
+vcollapse= title:h
+left    = pic:w+2
+pic     : +aapic(y=title:h+title:y+4,picsize=picsize,ypad=2)
+pic1    : -aapic(y=title:h+title:y+4,picsize=picsize,ypad=2)
+#title   : -text(markup='<small><b>'.pesc($album).'</b></small>\n'.'<small>'.pesc($artist).'</small>',pad=0)
+title   : -text(markup='<big><b>+</b></big>'.' <small><b>'.pesc($album).'</b>'.' by '.'<b>'.pesc($artist).'</b></small>',pad=0)
+picsize : OptionNumber(default=100,min=20,max=1000,step=10)
+
+{Group albuminfo}
+title   = Show artist, album, year
+head    = 80
+vcollapse= 100
+vmin    = 100
+left    = 2
+title   : +text(pad=4, markup='\n<b><big>'.pesc($album).'</big></b>'.'\n'.pesc($artist).'\n'.\
+           if(showyear && $year,'('.pesc($year).')'),\
+    		init_markup='',)
+title1  : -text(pad=4, markup='\n<b><big>'.pesc($album).'</big></b>'.'\n'.pesc($artist).'\n'.\
+            if(showyear && $year,'('.pesc($year).')'),\
+    		init_markup='',)
+showyear : OptionBoolean(default=0,name='Show year')
+
 {Group simple}
 title= Simple title
 head=title:h
 left=4
 vcollapse=head
 title: text(markup='<b><big>'.pesc($title).'</big></b>',pad=4)
+
+{Group simplest}
+title=Simple title without any
+head=title:h
+left=2
+vcollapse=head
+title: text(markup=pesc($title),pad=4)
+
+{Group shimmerqueue}
+title=Shimmer Queue
+head=title:h
+vcollapse=
+tail=3
+title: text(markup='<b>'.pesc($album).'</b>\n'.pesc($artist),ypad=2,xpad=2,x=23)
+pic: aapic(picsize=title:h,x=-pic:w - 2,ypad=2)
+picsize : OptionNumber(default=30,min=20,max=100,step=5)
 
 {Group artistalbumside}
 title=album and artist on the left side
@@ -596,6 +727,20 @@ songbl=text
 hreq=text:h
 progress: pbar( fill=$progress, hide=!$playing,y=1,h=-2)
 text: text(markup=playmarkup(pesc($title)))
+
+{Column queuenumber}
+menutitle = Queue-Item Number
+title = #
+width = 20
+text: text(markup=$queued, x=-text:w)
+
+{Column playandqueueandtrack}
+menutitle = Playing/Queue Icon or Track
+title = #
+width = 20
+sort = track
+ico:	icon(pad=2,icon=$playicon, hide= !$playing && !$queued)
+text:	text(markup=pesc($track.' '.$queued), hide= $playing || $queued)
 
 {Column playandqueue}
 menutitle = Playing & Queue
@@ -638,8 +783,8 @@ menutitle = Rating (picture)
 sort = rating
 width=100
 #hreq = pic:h
-#pic : picture(file=ratingpic($rating),init_file=ratingpic(0))
-pic : picture(file=ratingpic($rating),h=$_h,w=$_w,resize='ratio',init_file=ratingpic(0))
+pic : picture(file=ratingpic($rating),init_file=ratingpic(0))
+#pic : picture(file=ratingpic($rating),h=$_h,w=$_w,resize='ratio',init_file=ratingpic(0))
 
 {Column right_aligned_folder}
 menutitle = Folder (right-aligned)
