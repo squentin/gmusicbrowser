@@ -96,7 +96,7 @@ VBmain  = _HBPics -HBReplayButtons
     HBReplayButtons = Prev(size=menu) Play(size=menu) Next(size=menu) 20VSeparator 5_TimeBar(text="%t by %a (%m)",minwidth=240) 10-Stars
 
 HBPics = _HBCover
-    HBCover = _Cover(maxsize=300,forceratio=1)
+    HBCover = _Cover(overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0)
 
 KeyBindings	= Escape CloseWindow
 VolumeScroll	= VBmain
