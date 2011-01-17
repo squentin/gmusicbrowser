@@ -1,6 +1,7 @@
 [Arkanoid]
 Type=G+
 Default     = Window(size=1120x820)
+Title		= _"%t - gmusicbrowser"
 
 KeyBindings = c-k SetFocusOn(SimpleSearch) c-space GoToCurrentSong
 
@@ -15,7 +16,7 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
 
             HBCurrentTrack = 10_VBCurrentTrack
-                VBCurrentTrack = _Filler1 HBTitle HBArtistAndLock HBAlbumAndLock HBStars 15Cover(overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0) _Filler2 5HBReplayButtons
+                VBCurrentTrack = 3Filler1 HBTitle HBArtistAndLock HBAlbumAndLock HBStars 15Cover(overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0) HBReplayButtons
                 HBTitle = 10Filler11 _Title(xalign=0.5,markup="<big><b>%t</b></big>")
                 HBAlbumAndLock = LockAlbum(button=1,relief=half) Next1(button=1,click1=NextAlbum,tip=_"Next Album") _Album(xalign=0.5,markup="%l") 20Filler14
                 HBArtistAndLock = LockArtist(button=1,relief=half) Next2(button=1,click1=NextArtist,tip=_"Next Artist") _Artist(xalign=0.5,markup="%a") 20Filler15
@@ -58,7 +59,7 @@ VBmain = HPControlsInfoAndSearch _HPContent
             HBSongInfo = 10_HBSongInfoDetails
                 #FRSongInfo = HBSongInfoDetails
                     HBSongInfoDetails = _VBTimeBar
-                        VBTimeBar = 8-TimeBar(text="%t by %a (%m)",minwidth=240)
+                        VBTimeBar = 8-TimeBar(text="",minwidth=240)
             HBSearch = 10-SimpleSearch(noselector=1,maxwidth=1000)
 
         MBmain = MainMenuItem
