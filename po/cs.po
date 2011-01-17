@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-13 16:21+0100\n"
+"POT-Creation-Date: 2011-01-16 18:19+0100\n"
 "PO-Revision-Date: 2010-12-18 04:41+0100\n"
 "Last-Translator: Vašek Kovářík <L3D9Z6@seznam.cz>\n"
 "Language-Team: Czech\n"
@@ -15,17 +15,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: gmusicbrowser_layout.pm:288 gmusicbrowser_layout.pm:289
-#: gmusicbrowser_layout.pm:290 gmusicbrowser_layout.pm:309
-#: gmusicbrowser_layout.pm:310 gmusicbrowser_layout.pm:311
+#: plugins/artistinfo.pm:468
+msgid ""
+"\n"
+"No results found"
+msgstr ""
+
+#: plugins/artistinfo.pm:398
+msgid ""
+"\n"
+"Rating range: "
+msgstr ""
+
+#: plugins/artistinfo.pm:398
+msgid ""
+"\n"
+"Total playcount: "
+msgstr ""
+
+#: gmusicbrowser_layout.pm:320 gmusicbrowser_layout.pm:321
+#: gmusicbrowser_layout.pm:322 gmusicbrowser_layout.pm:341
+#: gmusicbrowser_layout.pm:342 gmusicbrowser_layout.pm:343
 msgid " of {length}"
 msgstr " z {length}"
 
-#: gmusicbrowser.pl:6024
+#: gmusicbrowser.pl:5985
 msgid "# songs"
 msgstr "# skladby"
 
-#: gmusicbrowser_layout.pm:1709
+#: gmusicbrowser_layout.pm:1744
 msgid "%S by %a"
 msgstr "%S od %a"
 
@@ -44,22 +62,22 @@ msgstr[0] "%d Interpret"
 msgstr[1] "%d Interpreti"
 msgstr[2] "%d Interpretů"
 
-#: gmusicbrowser.pl:2923 gmusicbrowser.pl:2927 gmusicbrowser.pl:4512
-#: gmusicbrowser_list.pm:1628
+#: gmusicbrowser.pl:2923 gmusicbrowser.pl:2927 gmusicbrowser.pl:4473
+#: gmusicbrowser_list.pm:1629
 msgid "%d Song"
 msgid_plural "%d Songs"
 msgstr[0] "%d Skladba"
 msgstr[1] "%d Skladby"
 msgstr[2] "%d Skladeb"
 
-#: gmusicbrowser.pl:361 gmusicbrowser_list.pm:7722 gmusicbrowser_songs.pm:502
+#: gmusicbrowser.pl:361 gmusicbrowser_list.pm:7744 gmusicbrowser_songs.pm:502
 msgid "%d album"
 msgid_plural "%d albums"
 msgstr[0] "%d album"
 msgstr[1] "%d alba"
 msgstr[2] "%d alb"
 
-#: gmusicbrowser.pl:349 gmusicbrowser.pl:356 gmusicbrowser_list.pm:7733
+#: gmusicbrowser.pl:349 gmusicbrowser.pl:356 gmusicbrowser_list.pm:7755
 #: gmusicbrowser_songs.pm:478 gmusicbrowser_songs.pm:2343
 msgid "%d artist"
 msgid_plural "%d artists"
@@ -67,7 +85,7 @@ msgstr[0] "%d interpret"
 msgstr[1] "%d interpreti"
 msgstr[2] "%d interpretů"
 
-#: gmusicbrowser.pl:4141
+#: gmusicbrowser.pl:4099
 msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] "%d soubor"
@@ -81,7 +99,7 @@ msgstr[0] "%d soubor ve složce {folder}"
 msgstr[1] "%d soubory ve složce {folder}"
 msgstr[2] "%d souborů ve složce {folder}"
 
-#: gmusicbrowser.pl:5052
+#: gmusicbrowser.pl:5013
 msgid "%d folder"
 msgid_plural "%d folders"
 msgstr[0] "%d složka"
@@ -95,24 +113,24 @@ msgstr[0] "%d vteřina"
 msgstr[1] "%d vteřiny"
 msgstr[2] "%d vteřin"
 
-#: gmusicbrowser.pl:344 gmusicbrowser.pl:351 gmusicbrowser.pl:7577
-#: gmusicbrowser_layout.pm:231 gmusicbrowser_list.pm:251
-#: gmusicbrowser_songs.pm:2337 plugins/audioscrobbler.pm:173
+#: gmusicbrowser.pl:344 gmusicbrowser.pl:351 gmusicbrowser.pl:7538
+#: gmusicbrowser_layout.pm:254 gmusicbrowser_songs.pm:2337
+#: plugins/audioscrobbler.pm:185
 msgid "%d song"
 msgid_plural "%d songs"
 msgstr[0] "%d skladba"
 msgstr[1] "%d skladby"
 msgstr[2] "%d skladeb"
 
-#: gmusicbrowser.pl:5051
+#: gmusicbrowser.pl:5012
 msgid "%d song added"
 msgid_plural "%d songs added"
 msgstr[0] "%d skladba přidána"
 msgstr[1] "%d skladby přidány"
 msgstr[2] "%d skladeb přidáno"
 
-#: gmusicbrowser.pl:2932 gmusicbrowser_layout.pm:227
-#: gmusicbrowser_layout.pm:230
+#: gmusicbrowser.pl:2932 gmusicbrowser_layout.pm:250
+#: gmusicbrowser_layout.pm:253
 msgid "%d song in queue"
 msgid_plural "%d songs in queue"
 msgstr[0] "%d skladba ve frontě"
@@ -126,6 +144,13 @@ msgstr[0] "%d skladba v knihovně"
 msgstr[1] "%d skladby v knihovně"
 msgstr[2] "%d skladeb v knihovně"
 
+#: gmusicbrowser_list.pm:251
+msgid "%d song listed"
+msgid_plural "%d songs listed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: gmusicbrowser_list.pm:264
 msgid "%d song selected"
 msgid_plural "%d songs selected"
@@ -133,82 +158,86 @@ msgstr[0] "%d vybraná skladba"
 msgstr[1] "%d vybrané skladby"
 msgstr[2] "%d vybraných skladeb"
 
-#: gmusicbrowser.pl:7910
+#: gmusicbrowser.pl:7871
 msgid "%f is set"
 msgstr "%f je nastaven"
 
-#: gmusicbrowser.pl:7911
+#: gmusicbrowser.pl:7872
 msgid "%f isn't set"
 msgstr "%f není nastaven"
 
-#: gmusicbrowser.pl:7885
+#: gmusicbrowser.pl:7846
 msgid "%n first added"
 msgstr "%n prvně přidaných"
 
-#: gmusicbrowser.pl:7884
+#: gmusicbrowser.pl:7845
 msgid "%n last added"
 msgstr "%n naposled přidaných"
 
-#: gmusicbrowser.pl:7876
+#: gmusicbrowser.pl:7837
 msgid "%n last played"
 msgstr "%n naposled hraných"
 
-#: gmusicbrowser.pl:7880
+#: gmusicbrowser.pl:7841
 msgid "%n last skipped"
 msgstr "%n naposled přeskočených"
 
-#: gmusicbrowser.pl:7875
+#: gmusicbrowser.pl:7836
 msgid "%n less played"
 msgstr "%n nejméně hraných"
 
-#: gmusicbrowser.pl:7879
+#: gmusicbrowser.pl:7840
 msgid "%n less skipped"
 msgstr "%n nejméně přeskakovaných"
 
-#: gmusicbrowser.pl:7882
+#: gmusicbrowser.pl:7843
 msgid "%n longest"
 msgstr "%n nejdelších"
 
-#: gmusicbrowser.pl:7874
+#: gmusicbrowser.pl:7835
 msgid "%n most played"
 msgstr "%n nejhranější"
 
-#: gmusicbrowser.pl:7878
+#: gmusicbrowser.pl:7839
 msgid "%n most skipped"
 msgstr "%n nejvíce přeskakovaných"
 
-#: gmusicbrowser.pl:7877
+#: gmusicbrowser.pl:7838
 msgid "%n not played for the longest time"
 msgstr "%n dlouho nepřehrávaných"
 
-#: gmusicbrowser.pl:7881
+#: gmusicbrowser.pl:7842
 msgid "%n not skipped for the longest time"
 msgstr "%n dlouho nepřeskakovaných"
 
-#: gmusicbrowser.pl:7883
+#: gmusicbrowser.pl:7844
 msgid "%n shortest"
 msgstr "%n nejkratších"
 
-#: gmusicbrowser.pl:4047
+#: plugins/daap_server.pm:192
+msgid "'s gmusicbrowser@"
+msgstr ""
+
+#: gmusicbrowser.pl:4005
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' existuje. Přepsat ?"
 
-#: gmusicbrowser.pl:5915
+#: gmusicbrowser.pl:5876
 msgid "(%d song excluded)"
 msgid_plural "(%d songs excluded)"
 msgstr[0] "(%d skladba vyjmuta)"
 msgstr[1] "(%d skladby vyjmuty)"
 msgstr[2] "(%d skladeb vyjmuto)"
 
-#: gmusicbrowser.pl:7907 gmusicbrowser.pl:7915
+#: gmusicbrowser.pl:7868 gmusicbrowser.pl:7876
 msgid "(: )has one"
 msgstr "(: )jakýkoliv"
 
-#: gmusicbrowser.pl:7906 gmusicbrowser.pl:7914
+#: gmusicbrowser.pl:7867 gmusicbrowser.pl:7875
 msgid "(: )none"
 msgstr "(: )žádný"
 
-#: plugins/artistinfo.pm:179
+#: plugins/artistinfo.pm:207 plugins/audioscrobbler.pm:65
 msgid "(applied after restart)"
 msgstr "(vyžaduje restart)"
 
@@ -224,11 +253,11 @@ msgstr "(obvyklá nadřazená složka : {common})"
 msgid "(other)"
 msgstr "(další)"
 
-#: plugins/audioscrobbler.pm:60
-msgid "(see http://www.last.fm)"
-msgstr "(navštivte http://www.last.fm)"
+#: plugins/audioscrobbler.pm:69
+msgid "(see http://www."
+msgstr ""
 
-#: gmusicbrowser.pl:5695
+#: gmusicbrowser.pl:5656
 msgid ""
 "- When selecting a song, the playlist filter will be reset if the song is "
 "not in it\n"
@@ -239,15 +268,27 @@ msgstr ""
 "- Pokud bude stávající skladba odstraněna z playlistu, bude přeskočeno na "
 "další skladbu"
 
-#: gmusicbrowser.pl:7717
+#: plugins/epicrating.pm:333
+msgid "... on played songs"
+msgstr ""
+
+#: plugins/epicrating.pm:332
+msgid "... on skipped songs"
+msgstr ""
+
+#: gmusicbrowser.pl:7678
 msgid "0 chance"
 msgstr "0 možností"
 
-#: gmusicbrowser.pl:7715
+#: plugins/artistinfo.pm:209
+msgid "0 means no limit"
+msgstr ""
+
+#: gmusicbrowser.pl:7676
 msgid "1 chance in {probability}"
 msgstr "1 možnost v {probability}"
 
-#: layouts:227
+#: layouts:292
 msgid "3 Filter panes"
 msgstr "3 okna filtru"
 
@@ -282,11 +323,17 @@ msgstr ""
 "<small><small>od</small> %a\n"
 "<small>z</small> %l</small>"
 
+#: gmusicbrowser_layout.pm:290
+msgid ""
+"<big><b>{album}</b></big>\n"
+"{year}  /  {songs}"
+msgstr ""
+
 #: plugins/notify.pm:24
 msgid "<i>by</i> %a\\n<i>from</i> %l"
 msgstr "<i>od</i> %a\\n<i>z</i> %l"
 
-#: gmusicbrowser_layout.pm:3764
+#: gmusicbrowser_layout.pm:3799
 msgid "Abort"
 msgstr "Zrušit"
 
@@ -294,7 +341,7 @@ msgstr "Zrušit"
 msgid "Abort ReplayGain analysis"
 msgstr "Zrušit analýzu pomocí ReplayGain"
 
-#: gmusicbrowser.pl:4152
+#: gmusicbrowser.pl:4110
 msgid "Abort all"
 msgstr "Zrušit vše"
 
@@ -302,11 +349,11 @@ msgstr "Zrušit vše"
 msgid "Abort mass-tagging"
 msgstr "Zrušit hromadné popisování"
 
-#: gmusicbrowser_layout.pm:43
+#: gmusicbrowser_layout.pm:44
 msgid "About"
 msgstr "O aplikaci"
 
-#: gmusicbrowser.pl:4146
+#: gmusicbrowser.pl:4104
 msgid ""
 "About to delete {files}\n"
 "Are you sure ?"
@@ -318,11 +365,17 @@ msgstr ""
 msgid "About to turn off the computer in :"
 msgstr "Vypnout počítač za :"
 
+#: plugins/http_server.pm:19
+msgid ""
+"Access the gmusicbrowser library RESTfully, and use a simple javascript UI "
+"to interact with it."
+msgstr ""
+
 #: plugins/notify.pm:56
 msgid "Actions are not supported by current notification daemon"
 msgstr "Akce není podporována stávajícím notifikačním démonem"
 
-#: gmusicbrowser.pl:6963 gmusicbrowser.pl:7234 gmusicbrowser.pl:7455
+#: gmusicbrowser.pl:6924 gmusicbrowser.pl:7195 gmusicbrowser.pl:7416
 #: gmusicbrowser_tags.pm:1237 plugins/desktopwidget.pm:36
 msgid "Add"
 msgstr "Přidat"
@@ -331,17 +384,17 @@ msgstr "Přidat"
 msgid "Add a button to rip a CD"
 msgstr "Přidat tlačítko pro CD rip"
 
-#: gmusicbrowser.pl:5742
+#: gmusicbrowser.pl:5703
 msgid "Add a fullscreen button"
 msgstr "Přidat tlačítko celoobrazovkového režimu"
 
-#: gmusicbrowser.pl:5742
+#: gmusicbrowser.pl:5703
 msgid "Add a fullscreen button to layouts that can accept extra buttons"
 msgstr ""
 "Přidat tlačítko celoobrazovkového režimu do vzhledů, které akceptují extra "
 "tlačítka"
 
-#: gmusicbrowser_list.pm:7293
+#: gmusicbrowser_list.pm:7315
 msgid "Add a group"
 msgstr "Přidat skupinu"
 
@@ -353,11 +406,11 @@ msgstr "Přidat štítek stávající skladbě"
 msgid "Add a list of files/folders to the playlist"
 msgstr "Přidat seznam souborů/složek do playlistu"
 
-#: gmusicbrowser_list.pm:7765
+#: gmusicbrowser_list.pm:7787
 msgid "Add a radio"
 msgstr "Přidat rádio"
 
-#: gmusicbrowser_layout.pm:38
+#: gmusicbrowser_layout.pm:39
 msgid "Add files or folders"
 msgstr "Přidat soubory a složky"
 
@@ -365,35 +418,35 @@ msgstr "Přidat soubory a složky"
 msgid "Add files/folders to library"
 msgstr "Přidat soubory/složky do knihovny"
 
-#: gmusicbrowser.pl:5863
+#: gmusicbrowser.pl:5824
 msgid "Add folder"
 msgstr "Přidat složku"
 
-#: gmusicbrowser.pl:6070
+#: gmusicbrowser.pl:6031
 msgid "Add label"
 msgstr "Přidat štítek"
 
-#: gmusicbrowser.pl:6964
+#: gmusicbrowser.pl:6925
 msgid "Add multiple condition"
 msgstr "Přidat vícenásobnou podmínku"
 
-#: gmusicbrowser.pl:4574
+#: gmusicbrowser.pl:4535
 msgid "Add new label"
 msgstr "Přidat nový štítek"
 
-#: gmusicbrowser_list.pm:7835
+#: gmusicbrowser_list.pm:7857
 msgid "Add new radio"
 msgstr "Přidat nové rádio"
 
-#: gmusicbrowser.pl:7457
+#: gmusicbrowser.pl:7418
 msgid "Add rule : "
 msgstr "Přidat pravidlo :"
 
-#: gmusicbrowser.pl:5308
+#: gmusicbrowser.pl:5269
 msgid "Add shorcut key"
 msgstr "Přidat klávesovou zkratku"
 
-#: gmusicbrowser_list.pm:1863
+#: gmusicbrowser_list.pm:1864
 msgid "Add tab"
 msgstr "Přidat záložku"
 
@@ -409,11 +462,15 @@ msgstr "Přidáno"
 msgid "Added Today"
 msgstr "Přidáno dnes"
 
-#: gmusicbrowser_list.pm:7824
+#: gmusicbrowser_list.pm:7846
 msgid "Adding a radio"
 msgstr "Přidávání rádia"
 
-#: gmusicbrowser.pl:5680
+#: plugins/artistinfo.pm:203
+msgid "Additional domain for Last.fm, Amazon and so on."
+msgstr ""
+
+#: gmusicbrowser.pl:5641
 msgid ""
 "Additionally this format can be used :\n"
 " default number1 format1 number2 format2 ...\n"
@@ -431,7 +488,7 @@ msgstr ""
 "Přidat položku do kontextového menu interpreta/alba, která umožní hledat "
 "googlem obrázek/přebal a uložit jej."
 
-#: gmusicbrowser_layout.pm:1493
+#: gmusicbrowser_layout.pm:1528
 msgid "Adds labels to the current song"
 msgstr "Přidat štítky stávající skladbě"
 
@@ -439,7 +496,7 @@ msgstr "Přidat štítky stávající skladbě"
 msgid "Adds menu entries to song contextual menu"
 msgstr "Přidat položky do kontextového menu skladby"
 
-#: gmusicbrowser_list.pm:3517
+#: gmusicbrowser_list.pm:3519
 msgid "Advanced Search ..."
 msgstr "Rozšířené vyhledávání ..."
 
@@ -447,11 +504,15 @@ msgstr "Rozšířené vyhledávání ..."
 msgid "Advanced Tag Editing"
 msgstr "Rozšířená editace popisků"
 
-#: gmusicbrowser.pl:835 gmusicbrowser.pl:7784 gmusicbrowser_songs.pm:495
+#: plugins/epicrating.pm:403
+msgid "After: "
+msgstr ""
+
+#: gmusicbrowser.pl:835 gmusicbrowser.pl:7745 gmusicbrowser_songs.pm:495
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:101 layouts:334 layouts:437 layouts:443
+#: plugins/fetch_cover.pm:103 layouts:399 layouts:502 layouts:508
 msgid "Album"
 msgstr "Album"
 
@@ -459,6 +520,10 @@ msgstr "Album"
 #: gmusicbrowser_tags.pm:1530 gmusicbrowser_tags.pm:1617
 msgid "Album artist"
 msgstr "Interpret alba"
+
+#: layouts:70
+msgid "Album cover"
+msgstr ""
 
 #: gmusicbrowser_songs.pm:758
 msgid "Album gain"
@@ -508,11 +573,11 @@ msgstr "Všechna alba"
 msgid "All artists"
 msgstr "Všichni interpreti"
 
-#: gmusicbrowser.pl:7886
+#: gmusicbrowser.pl:7847
 msgid "All but the [most/less]%n"
 msgstr "Vše, ale nej[více/méně]%n"
 
-#: gmusicbrowser.pl:3893
+#: gmusicbrowser.pl:3851
 msgid "All files"
 msgstr "Všechny soubory"
 
@@ -528,12 +593,12 @@ msgstr "Všechny štítky"
 msgid "All moods"
 msgstr "Všechny nálady"
 
-#: gmusicbrowser.pl:7091 gmusicbrowser.pl:7132 gmusicbrowser.pl:7165
+#: gmusicbrowser.pl:7052 gmusicbrowser.pl:7093 gmusicbrowser.pl:7126
 #: gmusicbrowser_songs.pm:3675
 msgid "All of :"
 msgstr "Vše z :"
 
-#: gmusicbrowser.pl:8778 gmusicbrowser_layout.pm:1416
+#: gmusicbrowser.pl:8739 gmusicbrowser_layout.pm:1451
 msgid "All songs"
 msgstr "Všechny skladby"
 
@@ -549,11 +614,11 @@ msgstr "Umožnit ovládání prostřednictvím DBus za použití standardu MPRIS
 msgid "Alt"
 msgstr "Alt"
 
-#: gmusicbrowser.pl:5694
+#: gmusicbrowser.pl:5655
 msgid "Amount of volume changed by the mouse wheel"
 msgstr "Velikost kroku změny hlasitosti kolečkem myši"
 
-#: gmusicbrowser.pl:7091 gmusicbrowser.pl:7165 gmusicbrowser_songs.pm:3675
+#: gmusicbrowser.pl:7052 gmusicbrowser.pl:7126 gmusicbrowser_songs.pm:3675
 msgid "Any of :"
 msgstr "Cokoliv z :"
 
@@ -565,7 +630,7 @@ msgstr "Přidat"
 msgid "Append (only if not already present)"
 msgstr "Přidat (pouze pokud již neexistuje)"
 
-#: gmusicbrowser_list.pm:1617
+#: gmusicbrowser_list.pm:1618
 msgid "Append to playlist"
 msgstr "Přidat do playlistu"
 
@@ -573,11 +638,17 @@ msgstr "Přidat do playlistu"
 msgid "Application"
 msgstr "Aplikace"
 
-#: gmusicbrowser.pl:5985
+#: plugins/epicrating.pm:331
+msgid ""
+"Apply your default rating to files when they are first played (required for "
+"rating update on files with default rating):"
+msgstr ""
+
+#: gmusicbrowser.pl:5946
 msgid "Are you sure you want to delete the '{label}' label ?"
 msgstr "Určitě odstranit štítek '{label}' ?"
 
-#: gmusicbrowser.pl:5346
+#: gmusicbrowser.pl:5307
 msgid "Arguments"
 msgstr "Argumenty"
 
@@ -585,15 +656,15 @@ msgstr "Argumenty"
 msgid "Arkanoid"
 msgstr ""
 
-#: layouts:83
+#: layouts:92
 msgid "Arkanoid Fullscreen"
 msgstr ""
 
-#: gmusicbrowser.pl:7776 gmusicbrowser_songs.pm:469 gmusicbrowser_tags.pm:1529
+#: gmusicbrowser.pl:7737 gmusicbrowser_songs.pm:469 gmusicbrowser_tags.pm:1529
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
-#: gmusicbrowser_tags.pm:1852 plugins/fetch_cover.pm:100 layouts:334
-#: layouts:437 layouts:443
+#: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:118
+#: plugins/fetch_cover.pm:102 layouts:399 layouts:502 layouts:508
 msgid "Artist"
 msgstr "Interpret"
 
@@ -601,13 +672,17 @@ msgstr "Interpret"
 msgid "Artist & album"
 msgstr "Interpret & album"
 
-#: plugins/artistinfo.pm:179
+#: plugins/artistinfo.pm:207
 msgid "Artist Picture Size : "
 msgstr "Velikost obrázku interpreta :"
 
 #: gmusicbrowser_tags.pm:1542
 msgid "Artist URL"
 msgstr "URL interpreta"
+
+#: layouts:71
+msgid "Artist and album modifier (leftmost pane)"
+msgstr ""
 
 #: gmusicbrowser_list.pm:759 gmusicbrowser_songs.pm:516
 msgid "Artist picture"
@@ -621,7 +696,7 @@ msgstr "Interpret,album,disk,stopa"
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "Interpret,rok,album,disk,stopa"
 
-#: plugins/artistinfo.pm:9 plugins/artistinfo.pm:52
+#: plugins/artistinfo.pm:9 plugins/artistinfo.pm:61
 msgid "Artistinfo"
 msgstr "Informace o interpretovi"
 
@@ -633,15 +708,15 @@ msgstr "Zásuvný modul Informace o interpretovi"
 msgid "Artists"
 msgstr "Interpreti"
 
-#: gmusicbrowser.pl:7299
+#: gmusicbrowser.pl:7260
 msgid "Ascending order"
 msgstr "Vzrůstající"
 
-#: plugins/fetch_cover.pm:68
+#: plugins/fetch_cover.pm:70
 msgid "Ask confirmation only if file already exists"
 msgstr "Potvrzovat pouze pokud soubor již existuje"
 
-#: gmusicbrowser.pl:5208
+#: gmusicbrowser.pl:5169
 msgid "Audio"
 msgstr "Audio"
 
@@ -657,11 +732,11 @@ msgstr "Automaticky vyplnit dle názvu souboru .."
 msgid "Auto fill only blank fields"
 msgstr "Automaticky vyplnit jen prázdná pole"
 
-#: gmusicbrowser_layout.pm:27
+#: gmusicbrowser_layout.pm:28
 msgid "Auto fill queue"
 msgstr "Automaticky vyplnit frontu"
 
-#: gmusicbrowser_list.pm:3376
+#: gmusicbrowser_list.pm:3378
 msgid "Auto filter"
 msgstr "Automatický filter"
 
@@ -669,7 +744,7 @@ msgstr "Automatický filter"
 msgid "Auto-increment track numbers"
 msgstr "Automatický nárůst čísla stopy"
 
-#: plugins/artistinfo.pm:178 plugins/lyrics.pm:187
+#: plugins/artistinfo.pm:206 plugins/lyrics.pm:187
 msgid "Auto-save positive finds"
 msgstr "Automatické ukládání výsledků hledání"
 
@@ -677,11 +752,15 @@ msgstr "Automatické ukládání výsledků hledání"
 msgid "Auto-scroll"
 msgstr "Automatický posun"
 
-#: gmusicbrowser_list.pm:1643
+#: gmusicbrowser_list.pm:1644
 msgid "Auto-select Pictures"
 msgstr "Automatický výběr obrázků"
 
-#: gmusicbrowser.pl:5904
+#: plugins/epicrating.pm:15
+msgid "Automatic rating updates on configurable listening behaviour events."
+msgstr ""
+
+#: gmusicbrowser.pl:5865
 msgid "Automatically remove current song if not found"
 msgstr "Automaticky odstranit stávající skladbu, pokud nebyla nalezena"
 
@@ -693,27 +772,35 @@ msgstr "Automatické ukládání"
 msgid "Autosave plugin"
 msgstr "Zásuvný modul automatického ukládání"
 
-#: gmusicbrowser.pl:7255
+#: gmusicbrowser.pl:7216
 msgid "Available"
 msgstr "Dostupné"
+
+#: plugins/artistinfo.pm:398
+msgid "Average rating: "
+msgstr ""
 
 #: gmusicbrowser_songs.pm:721
 msgid "BPM"
 msgstr "BPM"
 
-#: plugins/audioscrobbler.pm:185
+#: plugins/audioscrobbler.pm:197
 msgid "Bad session"
 msgstr "Chyba sezení"
 
-#: gmusicbrowser.pl:4304
+#: gmusicbrowser.pl:4265
 msgid "Base Folder :"
 msgstr "Základní složka :"
 
-#: gmusicbrowser_list.pm:5058
+#: plugins/epicrating.pm:395
+msgid "Before: "
+msgstr ""
+
+#: gmusicbrowser_list.pm:5070
 msgid "Begin with"
 msgstr "Začít s"
 
-#: gmusicbrowser_list.pm:1579
+#: gmusicbrowser_list.pm:1580
 msgid "Below"
 msgstr "Níže"
 
@@ -729,23 +816,23 @@ msgstr "Tělo zprávy :"
 msgid "Body text is not supported by current notification daemon"
 msgstr "Text těla není podporován stávajícím notifikačním démonem"
 
-#: layouts:199
+#: layouts:264
 msgid "Browser"
 msgstr "Prohlížeč"
 
-#: gmusicbrowser.pl:5731
+#: gmusicbrowser.pl:5692
 msgid "Browser window layout :"
 msgstr "Styl prohlížeče"
 
-#: layouts:224
+#: layouts:289
 msgid "Browser with SongTree"
 msgstr "Prohlížeč se stromem skladeb"
 
-#: layouts:775
+#: layouts:920
 msgid "Buttons"
 msgstr "Tlačítka"
 
-#: layouts:764
+#: layouts:909
 msgid "Buttons, Song & Cover"
 msgstr "Tlačítka, skladba & přebal"
 
@@ -765,7 +852,7 @@ msgstr ""
 "Nelze změnit hlasitost. Při použití tohoto audio backendu je vyžadován "
 "amixer (obsažen v alsa-utils)."
 
-#: gmusicbrowser.pl:3717
+#: gmusicbrowser.pl:3675
 msgid ""
 "Can't create Folder '{path}' : \n"
 "{error}"
@@ -785,7 +872,7 @@ msgstr "Nelze přehrát '{file}'."
 msgid "Can't read file or invalid file"
 msgstr "Soubor nelze číst nebo je poškozený"
 
-#: gmusicbrowser.pl:4340
+#: gmusicbrowser.pl:4301
 msgid "Can't write in base folder '{folder}'."
 msgstr "Nelze zapisovat do základní složky '{folder}'."
 
@@ -797,19 +884,19 @@ msgstr "Psát s vekými písmeny"
 msgid "Capitalize each word"
 msgstr "Všechna slova psát s vekými písmeny"
 
-#: gmusicbrowser.pl:7295
+#: gmusicbrowser.pl:7256
 msgid "Case insensitive"
 msgstr "Nedostupná položka"
 
-#: gmusicbrowser.pl:7295 gmusicbrowser_list.pm:3371
+#: gmusicbrowser.pl:7256 gmusicbrowser_list.pm:3373
 msgid "Case sensitive"
 msgstr "Dostupná položka"
 
-#: gmusicbrowser_list.pm:5057
+#: gmusicbrowser_list.pm:5069
 msgid "Case-sensitive"
 msgstr "Dostupná položka"
 
-#: layouts:295
+#: layouts:360
 msgid "Categories pane"
 msgstr "Okno Kategorie"
 
@@ -837,59 +924,59 @@ msgstr "Změnit výchozí font a velikost písma"
 msgid "Channels"
 msgstr "Kanály"
 
-#: gmusicbrowser.pl:5887
+#: gmusicbrowser.pl:5848
 msgid "Check for updated/deleted songs on startup"
 msgstr "Kontrolovat přidané/smazané skladby při startu"
 
-#: gmusicbrowser_list.pm:1637
+#: gmusicbrowser_list.pm:1638
 msgid "Check for updated/removed songs"
 msgstr "Zkontrolovat přidané/smazané skladby"
 
-#: gmusicbrowser.pl:5058
+#: gmusicbrowser.pl:5019
 msgid "Checking length/bitrate"
 msgstr "Kontrolovat délku/datový tok"
 
-#: gmusicbrowser.pl:5031
+#: gmusicbrowser.pl:4992
 msgid "Checking songs"
 msgstr "Kontrolovat skladby"
 
-#: gmusicbrowser_list.pm:3194
+#: gmusicbrowser_list.pm:3195
 msgid "Choose Album From this Artist"
 msgstr "Vybrat album tohoto interpreta"
 
-#: gmusicbrowser_layout.pm:557
+#: gmusicbrowser_layout.pm:592
 msgid "Choose Artist/Album/Song"
 msgstr "Vybrat interpreta/album/skladbu"
 
-#: gmusicbrowser.pl:8228
+#: gmusicbrowser.pl:8189
 msgid "Choose Date"
 msgstr "Vybrat rok"
 
-#: gmusicbrowser.pl:3884
+#: gmusicbrowser.pl:3842
 msgid "Choose Picture"
 msgstr "Vybrat obrázek"
 
-#: gmusicbrowser_layout.pm:563
+#: gmusicbrowser_layout.pm:598
 msgid "Choose Random Album"
 msgstr "Vybrat náhodné album"
 
-#: gmusicbrowser.pl:3726
+#: gmusicbrowser.pl:3684
 msgid "Choose directory to copy files to"
 msgstr "Vybrat adresář pro kopírování souborů"
 
-#: gmusicbrowser.pl:3727
+#: gmusicbrowser.pl:3685
 msgid "Choose directory to move files to"
 msgstr "Vybrat adresář pro přesunutí souborů"
 
-#: gmusicbrowser.pl:3853
+#: gmusicbrowser.pl:3811
 msgid "Choose files"
 msgstr "Vybrat soubory"
 
-#: gmusicbrowser.pl:5932
+#: gmusicbrowser.pl:5893
 msgid "Choose folder to add"
 msgstr "Vybrat složku pro přidání"
 
-#: plugins/lyrics.pm:240
+#: plugins/lyrics.pm:241
 msgid "Choose font for lyrics"
 msgstr "Vybrat typ písma pro texty"
 
@@ -901,7 +988,7 @@ msgstr "Vybrat typ písma..."
 msgid "Choose icon for label {name}"
 msgstr "Vybrat ikonu pro štítek {name}"
 
-#: gmusicbrowser_layout.pm:2462
+#: gmusicbrowser_layout.pm:2497
 msgid "Choose page to open"
 msgstr "Vybrat stránku k otevření"
 
@@ -909,15 +996,15 @@ msgstr "Vybrat stránku k otevření"
 msgid "Choose picture for '%s'"
 msgstr "Vybrat obrázek pro.'%s'"
 
-#: gmusicbrowser.pl:4897
+#: gmusicbrowser.pl:4858
 msgid "Choose playlist files to import"
 msgstr "Vybrat soubory s playlisty k importu"
 
-#: gmusicbrowser.pl:7236 gmusicbrowser_list.pm:290
+#: gmusicbrowser.pl:7197 gmusicbrowser_list.pm:290
 msgid "Clear"
 msgstr "Smazat"
 
-#: gmusicbrowser.pl:1044 gmusicbrowser_layout.pm:32
+#: gmusicbrowser.pl:1044 gmusicbrowser_layout.pm:33
 msgid "Clear queue"
 msgstr "Smazat frontu"
 
@@ -925,12 +1012,12 @@ msgstr "Smazat frontu"
 msgid "Clear selected fields"
 msgstr "Smazat vybraná pole"
 
-#: plugins/audioscrobbler.pm:123
+#: plugins/audioscrobbler.pm:135
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "Zakázaný klient, kontaktujte vývojáře gmusicbrowser"
 
-#: gmusicbrowser_layout.pm:2205 gmusicbrowser_list.pm:3834
-#: gmusicbrowser_list.pm:3901
+#: gmusicbrowser_layout.pm:2240 gmusicbrowser_list.pm:3836
+#: gmusicbrowser_list.pm:3903
 msgid "Close"
 msgstr "Zavřít"
 
@@ -938,11 +1025,11 @@ msgstr "Zavřít"
 msgid "Close Window"
 msgstr "Zavřít okno"
 
-#: gmusicbrowser.pl:5717
+#: gmusicbrowser.pl:5678
 msgid "Close to tray"
 msgstr "Zavřít do oznamovací oblasti"
 
-#: gmusicbrowser.pl:5235 gmusicbrowser.pl:5345 gmusicbrowser_123.pm:287
+#: gmusicbrowser.pl:5196 gmusicbrowser.pl:5306 gmusicbrowser_123.pm:287
 msgid "Command"
 msgstr "Příkaz"
 
@@ -950,7 +1037,7 @@ msgstr "Příkaz"
 msgid "Command to launch when the button is pressed"
 msgstr "Při stisknutém tlačítku vykonat příkaz"
 
-#: gmusicbrowser.pl:5653
+#: gmusicbrowser.pl:5614
 msgid ""
 "Command used when\n"
 "'turn off computer when queue empty'\n"
@@ -968,7 +1055,7 @@ msgstr "Příkaz při změně přehrávané skladby :"
 msgid "Command when stopped :"
 msgstr "Příkaz při zastavení :"
 
-#: gmusicbrowser.pl:7935 gmusicbrowser_songs.pm:628 gmusicbrowser_tags.pm:1590
+#: gmusicbrowser.pl:7896 gmusicbrowser_songs.pm:628 gmusicbrowser_tags.pm:1590
 #: gmusicbrowser_tags.pm:1609 gmusicbrowser_tags.pm:1852
 msgid "Comment"
 msgstr "Komentář"
@@ -991,16 +1078,16 @@ msgstr "Skladatel"
 msgid "Conductor"
 msgstr "Dirigent"
 
-#: gmusicbrowser.pl:5643
+#: gmusicbrowser.pl:5604
 msgid "Connect through a proxy"
 msgstr "Připojit přes proxy"
 
-#: gmusicbrowser_layout.pm:594
+#: gmusicbrowser_layout.pm:629
 msgid "Connections from :"
 msgstr "Připojení od :"
 
-#: layouts:117 layouts:263 layouts:365 layouts:437 layouts:443 layouts:467
-#: layouts:529
+#: layouts:40 layouts:76 layouts:165 layouts:328 layouts:430 layouts:502
+#: layouts:508 layouts:532 layouts:594
 msgid "Context"
 msgstr "Kontext"
 
@@ -1008,11 +1095,11 @@ msgstr "Kontext"
 msgid "Copy"
 msgstr "Kopírovat"
 
-#: gmusicbrowser.pl:3736
+#: gmusicbrowser.pl:3694
 msgid "Copy failed"
 msgstr "Kopírování selhalo"
 
-#: plugins/lyrics.pm:313
+#: plugins/lyrics.pm:314
 msgid "Copy link address"
 msgstr "Kopírovat odkaz na adresu"
 
@@ -1024,7 +1111,7 @@ msgstr "Kopírovat do připojeného přenosného přehrávače"
 msgid "Copy to portable player"
 msgstr "Kopírovat do přenosného přehrávače"
 
-#: gmusicbrowser.pl:3739
+#: gmusicbrowser.pl:3697
 msgid "Copying file"
 msgid_plural "Copying %d files"
 msgstr[0] "Kopírování souboru"
@@ -1035,7 +1122,7 @@ msgstr[2] "Kopírování %d souborů"
 msgid "Copyright"
 msgstr "Autorská práva"
 
-#: gmusicbrowser.pl:5765
+#: gmusicbrowser.pl:5726
 msgid "Create ID3v2 tags as ID3v2.4"
 msgstr "Vytvořit ID3v2 popisky jako ID3v2.4"
 
@@ -1043,7 +1130,7 @@ msgstr "Vytvořit ID3v2 popisky jako ID3v2.4"
 msgid "Ctrl"
 msgstr "Ctrl"
 
-#: gmusicbrowser.pl:5695
+#: gmusicbrowser.pl:5656
 msgid "Current song must always be in the playlist"
 msgstr "Stávající skladba vždy musí být v playlistu"
 
@@ -1075,16 +1162,32 @@ msgstr "Uživatelská pole"
 msgid "Custom formats"
 msgstr "Obecné formáty"
 
-#: gmusicbrowser_layout.pm:1378 gmusicbrowser_layout.pm:1399
-#: gmusicbrowser_layout.pm:1430 gmusicbrowser_list.pm:93
+#: gmusicbrowser_layout.pm:1413 gmusicbrowser_layout.pm:1434
+#: gmusicbrowser_layout.pm:1465 gmusicbrowser_list.pm:93
 msgid "Custom..."
 msgstr "Obecné..."
+
+#: plugins/daap_server.pm:25
+msgid "DAAP Server"
+msgstr ""
+
+#: plugins/daap_server.pm:26
+msgid ""
+"DAAP Server - Applish DA*P protocol access to gmusicbrowser library and "
+"facilities"
+msgstr ""
+
+#: plugins/daap_server.pm:28
+msgid ""
+"DAAP access to your gmusicbrowser library from DAAP clients (iTunes).  Use "
+"DACP-enabled devices to control Gmusicbrowser (soon)."
+msgstr ""
 
 #: gmusicbrowser.pl:848 gmusicbrowser_tags.pm:1534 gmusicbrowser_tags.pm:1572
 msgid "Date"
 msgstr "Rok"
 
-#: gmusicbrowser.pl:5681
+#: gmusicbrowser.pl:5642
 msgid "Date format :"
 msgstr "Formát data:"
 
@@ -1104,7 +1207,7 @@ msgstr "Snížit hlasitost"
 msgid "Default"
 msgstr "Výchozí"
 
-#: gmusicbrowser.pl:5633
+#: gmusicbrowser.pl:5594
 msgid "Default rating :"
 msgstr "Výchozí hodnocení :"
 
@@ -1116,7 +1219,7 @@ msgstr "Výchozí barva textu"
 msgid "Default text font"
 msgstr "Výchozí font textu"
 
-#: gmusicbrowser.pl:5719
+#: gmusicbrowser.pl:5680
 msgid "Delay tray tip popup on mouse over"
 msgstr ""
 "Prodleva vyskakovacího okna oznamovací oblasti po umístění myši na ikonu"
@@ -1125,11 +1228,11 @@ msgstr ""
 msgid "Delete Selected Songs"
 msgstr "Odstranit vybrané skladby"
 
-#: gmusicbrowser_layout.pm:2203
+#: gmusicbrowser_layout.pm:2238
 msgid "Delete list"
 msgstr "Odstranit seznam"
 
-#: gmusicbrowser.pl:7299
+#: gmusicbrowser.pl:7260
 msgid "Descending order"
 msgstr "Sestupné pořadí"
 
@@ -1151,7 +1254,11 @@ msgstr "Pomůcky"
 msgid "Desktop widgets plugin"
 msgstr "Zásuvný modul pomůcek"
 
-#: gmusicbrowser.pl:5650
+#: plugins/epicrating.pm:479
+msgid "Differential: "
+msgstr ""
+
+#: gmusicbrowser.pl:5611
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "Při celoobrazovkovém režimu vypnout spořič obrazovky"
 
@@ -1159,7 +1266,7 @@ msgstr "Při celoobrazovkovém režimu vypnout spořič obrazovky"
 msgid "Disabled"
 msgstr "Neaktivováno"
 
-#: gmusicbrowser.pl:7804 gmusicbrowser_songs.pm:580
+#: gmusicbrowser.pl:7765 gmusicbrowser_songs.pm:580
 msgid "Disc"
 msgstr "Disk"
 
@@ -1193,7 +1300,7 @@ msgstr "Zobrazit akce zastavit/další"
 msgid "Display synchronized lyrics of the current song"
 msgstr "Zobrazovat texty v souladu se stávající skladbou"
 
-#: gmusicbrowser.pl:5715
+#: gmusicbrowser.pl:5676
 msgid "Display tray tip for"
 msgstr "Zobrazit vyskakovací okno oznamovací oblasti po dobu"
 
@@ -1201,21 +1308,25 @@ msgstr "Zobrazit vyskakovací okno oznamovací oblasti po dobu"
 msgid "Do not add a title row"
 msgstr "Nepřidávat titulkovou řádku"
 
-#: gmusicbrowser.pl:5885
+#: gmusicbrowser.pl:5846
 msgid "Do not add songs that can't be played"
 msgstr "Nepřidávat skladby, které nelze přehrát"
 
-#: gmusicbrowser.pl:5771
+#: gmusicbrowser.pl:5732
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr "Nevytvářet ID3v1 popisek u souborů mp3"
 
-#: gmusicbrowser.pl:5767
+#: gmusicbrowser.pl:5728
 msgid "Do not unsynchronise id3v2 tags"
 msgstr "Nechat synchronizované ID3v2 popisky"
 
-#: gmusicbrowser.pl:5770
+#: gmusicbrowser.pl:5731
 msgid "Do not write the tags"
 msgstr "Nezapisovat popisky"
+
+#: plugins/artistinfo.pm:203
+msgid "Domain"
+msgstr ""
 
 #: plugins/titlebar.pm:54
 msgid "Don't add the overlay to dialogs"
@@ -1229,7 +1340,7 @@ msgstr "Neznámý typ souboru {type}"
 msgid "Don't notify if the main window is visible"
 msgstr "Neupozorňovat pokud je hlavní okno viditelné"
 
-#: plugins/audioscrobbler.pm:68
+#: plugins/audioscrobbler.pm:77
 msgid "Don't submit current song"
 msgstr "Neodesílat stávající skladbu"
 
@@ -1241,7 +1352,7 @@ msgstr "Upravit vlastnosti stávající skladby"
 msgid "Edit Labels"
 msgstr "Upravit štítky"
 
-#: gmusicbrowser.pl:416 gmusicbrowser.pl:4110
+#: gmusicbrowser.pl:416 gmusicbrowser.pl:4068
 msgid "Edit Lyrics"
 msgstr "Upravit texty"
 
@@ -1249,7 +1360,7 @@ msgstr "Upravit texty"
 msgid "Edit Lyrics ..."
 msgstr "Upravit texty ..."
 
-#: gmusicbrowser.pl:4595
+#: gmusicbrowser.pl:4556
 msgid "Edit Multiple Songs Properties"
 msgstr "Upravit mnohočetné vlastnosti skladeb"
 
@@ -1257,7 +1368,7 @@ msgstr "Upravit mnohočetné vlastnosti skladeb"
 msgid "Edit Rating"
 msgstr "Upravit hodnocení"
 
-#: gmusicbrowser_layout.pm:113
+#: gmusicbrowser_layout.pm:114
 msgid "Edit Settings"
 msgstr "Nastavení"
 
@@ -1265,23 +1376,23 @@ msgstr "Nastavení"
 msgid "Edit auto-fill formats ..."
 msgstr "Upravit formáty automatického vyplňování ..."
 
-#: gmusicbrowser_list.pm:2828
+#: gmusicbrowser_list.pm:2829
 msgid "Edit filter"
 msgstr "Upravit filter"
 
-#: gmusicbrowser_list.pm:6497
+#: gmusicbrowser_list.pm:6519
 msgid "Edit grouping ..."
 msgstr "Upravit seskupení ..."
 
-#: gmusicbrowser_list.pm:2836
+#: gmusicbrowser_list.pm:2837
 msgid "Edit list"
 msgstr "Upravit seznam"
 
-#: gmusicbrowser_layout.pm:1347
+#: gmusicbrowser_layout.pm:1382
 msgid "Edit ordered modes ..."
 msgstr "Upravit režimy pořadí"
 
-#: gmusicbrowser_layout.pm:1331
+#: gmusicbrowser_layout.pm:1366
 msgid "Edit random modes ..."
 msgstr "Upravit náhodné režimy"
 
@@ -1289,11 +1400,11 @@ msgstr "Upravit náhodné režimy"
 msgid "Edit selected song properties"
 msgstr "Upravit vlastnosti vybrané skladby"
 
-#: gmusicbrowser.pl:8782 gmusicbrowser_layout.pm:34
+#: gmusicbrowser.pl:8743 gmusicbrowser_layout.pm:35
 msgid "Edit..."
 msgstr "Upravit..."
 
-#: layouts:360
+#: layouts:425
 msgid "EditList"
 msgstr "Editace seznamu"
 
@@ -1329,12 +1440,12 @@ msgstr "Kódováno s"
 msgid "Encoder"
 msgstr "Enkodér"
 
-#: gmusicbrowser.pl:5769
+#: gmusicbrowser.pl:5730
 msgid "Encoding used for id3v1 tags :"
 msgstr "Kódování použité pro ID3v1 popisky :"
 
-#: gmusicbrowser_list.pm:1620 gmusicbrowser_list.pm:3832
-#: gmusicbrowser_list.pm:3899
+#: gmusicbrowser_list.pm:1621 gmusicbrowser_list.pm:3834
+#: gmusicbrowser_list.pm:3901
 msgid "Enqueue"
 msgstr "Přidat do fronty"
 
@@ -1366,23 +1477,31 @@ msgstr "Přidat do fronty skladby stávajícího interpreta"
 msgid "Enqueue a list of files/folders"
 msgstr "Přidat do fronty seznam souborů/složek"
 
-#: gmusicbrowser_layout.pm:534
+#: gmusicbrowser_layout.pm:569
 msgid "Enqueue filter"
 msgstr "Přidat do fronty filtr"
 
-#: plugins/artistinfo.pm:180
+#: plugins/artistinfo.pm:208
 msgid "Enter custom event string :"
 msgstr "Vložit uživatelský řetězec události :"
 
-#: layouts:703
+#: plugins/epicrating.pm:11
+msgid "EpicRating"
+msgstr ""
+
+#: plugins/epicrating.pm:12
+msgid "EpicRating plugin - automatically update ratings"
+msgstr ""
+
+#: layouts:848
 msgid "Equalizer"
 msgstr "Ekvalizér"
 
-#: gmusicbrowser.pl:5402
+#: gmusicbrowser.pl:5363
 msgid "Error :"
 msgstr "Chyba :"
 
-#: plugins/artistinfo.pm:452
+#: plugins/artistinfo.pm:567
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1390,7 +1509,7 @@ msgstr ""
 "Chyba ukládání biografie interpreta do '{file}' :\n"
 "{error}"
 
-#: plugins/lyrics.pm:662
+#: plugins/lyrics.pm:663
 msgid ""
 "Error saving lyrics in '{file}' :\n"
 "{error}"
@@ -1398,7 +1517,7 @@ msgstr ""
 "Chyba ukládání textů do '{file}' :\n"
 "{error}"
 
-#: plugins/fetch_cover.pm:477
+#: plugins/fetch_cover.pm:479
 msgid "Error writing '{file}'"
 msgstr "Chyba zápisu do '{file}'"
 
@@ -1406,7 +1525,7 @@ msgstr "Chyba zápisu do '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Chyba zápisu popisků replaygain :\n"
 
-#: plugins/artistinfo.pm:443 plugins/lyrics.pm:653
+#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Chyba: špatný tvar názvu souboru"
 
@@ -1439,7 +1558,7 @@ msgstr "Exportovat do souboru .m3u"
 msgid "Extra gain"
 msgstr "Extra zisk"
 
-#: gmusicbrowser.pl:5666
+#: gmusicbrowser.pl:5627
 msgid "Extract guest artist from title :"
 msgstr "Vyčlenit hostujícího interpreta z názvu :"
 
@@ -1455,7 +1574,7 @@ msgstr "Slábnout po dobu"
 msgid "Fade-out then stop"
 msgstr "Slábnout, pak zastavit"
 
-#: gmusicbrowser.pl:4156
+#: gmusicbrowser.pl:4114
 msgid ""
 "Failed to delete '{file}' :\n"
 "{error}"
@@ -1471,7 +1590,11 @@ msgstr "Název pole"
 msgid "Field type"
 msgstr "Typ pole"
 
-#: gmusicbrowser.pl:5211 gmusicbrowser_list.pm:5060
+#: plugins/epicrating.pm:477
+msgid "Field: "
+msgstr ""
+
+#: gmusicbrowser.pl:5172 gmusicbrowser_list.pm:5072
 msgid "Fields"
 msgstr "Pole"
 
@@ -1479,7 +1602,7 @@ msgstr "Pole"
 msgid "File type"
 msgstr "Typ souboru"
 
-#: gmusicbrowser.pl:7917 gmusicbrowser_songs.pm:441 gmusicbrowser_tags.pm:2041
+#: gmusicbrowser.pl:7878 gmusicbrowser_songs.pm:441 gmusicbrowser_tags.pm:2041
 msgid "Filename"
 msgstr "Název souboru"
 
@@ -1508,7 +1631,7 @@ msgstr "Filtr"
 msgid "Filter : "
 msgstr "Filtr : "
 
-#: gmusicbrowser.pl:6776
+#: gmusicbrowser.pl:6737
 msgid "Filter edition"
 msgstr "Editace filtru"
 
@@ -1524,19 +1647,19 @@ msgstr "Filtr na přehrávaného interpreta"
 msgid "Filter on playing Song"
 msgstr "Filtr na přehrávanou skladbu"
 
-#: gmusicbrowser_list.pm:3181
+#: gmusicbrowser_list.pm:3182
 msgid "Filter on this album"
 msgstr "Filtr na toto album"
 
-#: gmusicbrowser_list.pm:3181
+#: gmusicbrowser_list.pm:3182
 msgid "Filter on this artist"
 msgstr "Filtr na tohoto interpreta"
 
-#: gmusicbrowser_list.pm:5085
+#: gmusicbrowser_list.pm:5097
 msgid "Find :"
 msgstr "Nalézt :"
 
-#: plugins/fetch_cover.pm:69
+#: plugins/fetch_cover.pm:71
 msgid "Find a unique filename if file already exists"
 msgstr "Pokud soubor již existuje, najít jedinečný název"
 
@@ -1552,7 +1675,7 @@ msgstr "Najít skladby stejných interpretů"
 msgid "Find songs with the same names"
 msgstr "Najít skladby stejných názvů"
 
-#: gmusicbrowser.pl:836 gmusicbrowser.pl:7925 gmusicbrowser_list.pm:724
+#: gmusicbrowser.pl:836 gmusicbrowser.pl:7886 gmusicbrowser_list.pm:724
 #: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445
 msgid "Folder"
 msgstr "Složka"
@@ -1565,20 +1688,20 @@ msgstr "Složka (zarovnáno vpravo)"
 msgid "Folder format :"
 msgstr "Formát složky :"
 
-#: gmusicbrowser.pl:4305
+#: gmusicbrowser.pl:4266
 msgid "Folder pattern :"
 msgstr "Vzor složky :"
 
-#: gmusicbrowser.pl:5848 gmusicbrowser.pl:5890
+#: gmusicbrowser.pl:5809 gmusicbrowser.pl:5851
 msgid "Folders to search for new songs"
 msgstr "Nové skladby hledat ve složkách"
 
-#: gmusicbrowser_layout.pm:3622 gmusicbrowser_list.pm:17
-#: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6509
+#: gmusicbrowser_layout.pm:3657 gmusicbrowser_list.pm:17
+#: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6531
 msgid "Follow playing song"
 msgstr "Následovat přehrávanou skladbu"
 
-#: gmusicbrowser_layout.pm:3622
+#: gmusicbrowser_layout.pm:3657
 msgid "Follow selected song"
 msgstr "Následovat vybranou skladbu"
 
@@ -1586,7 +1709,7 @@ msgstr "Následovat vybranou skladbu"
 msgid "Font size"
 msgstr "Velikost písma"
 
-#: plugins/artistinfo.pm:188
+#: plugins/artistinfo.pm:218
 msgid ""
 "For information on how to use this plugin, please navigate to the <a "
 "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
@@ -1610,19 +1733,19 @@ msgstr "Nalezeno, ale nefunkční"
 msgid "Friday"
 msgstr "Pátek"
 
-#: gmusicbrowser.pl:5733
+#: gmusicbrowser.pl:5694
 msgid "Full screen layout :"
 msgstr "Celoobrazovkové rozložení :"
 
-#: gmusicbrowser.pl:446 gmusicbrowser_layout.pm:607
+#: gmusicbrowser.pl:446 gmusicbrowser_layout.pm:642
 msgid "Fullscreen"
 msgstr "Celá obrazovka"
 
-#: layouts:535
+#: layouts:600
 msgid "Fullscreen simple"
 msgstr "Jednoduchá celá obrazovka"
 
-#: gmusicbrowser.pl:5519
+#: gmusicbrowser.pl:5480
 msgid "GStreamer module not loaded."
 msgstr "Modul GStreamer není zaveden"
 
@@ -1630,11 +1753,15 @@ msgstr "Modul GStreamer není zaveden"
 msgid "Gain for songs missing replaygain tags"
 msgstr "Výtěžek skladeb bez popisků replaygain"
 
-#: gmusicbrowser.pl:7901 gmusicbrowser_tags.pm:1536 gmusicbrowser_tags.pm:1575
+#: gmusicbrowser.pl:7862 gmusicbrowser_tags.pm:1536 gmusicbrowser_tags.pm:1575
 #: gmusicbrowser_tags.pm:1588 gmusicbrowser_tags.pm:1610
 #: gmusicbrowser_tags.pm:1862
 msgid "Genre"
 msgstr "Žánr"
+
+#: layouts:69
+msgid "Genre and Year"
+msgstr ""
 
 #: gmusicbrowser_songs.pm:3726
 msgid "Genre is set"
@@ -1644,7 +1771,7 @@ msgstr "Žánr je nastaven"
 msgid "Genres"
 msgstr "Žánry"
 
-#: layouts:295
+#: layouts:360
 msgid "Genres pane"
 msgstr "Panel žánrů"
 
@@ -1656,11 +1783,11 @@ msgstr "Multimediální klávesy Gnome"
 msgid "Gnome multimedia keys plugin"
 msgstr "Zásuvný modul multimediálních kláves Gnome"
 
-#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6512 layouts:76
+#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6534 layouts:85
 msgid "Go to playing song"
 msgstr "Přejít na přehrávanou skladbu"
 
-#: gmusicbrowser_list.pm:7325
+#: gmusicbrowser_list.pm:7347
 msgid "Group by :"
 msgstr "Seskupit s :"
 
@@ -1668,11 +1795,19 @@ msgstr "Seskupit s :"
 msgid "Grouping"
 msgstr "Seskupení"
 
-#: plugins/audioscrobbler.pm:141
+#: plugins/http_server.pm:16
+msgid "HTTP Server"
+msgstr ""
+
+#: plugins/http_server.pm:17
+msgid "HTTP Server - Provides a RESTful HTTP service (and Javascript player)"
+msgstr ""
+
+#: plugins/audioscrobbler.pm:153
 msgid "Handshake OK"
 msgstr "Spojení OK"
 
-#: plugins/audioscrobbler.pm:134
+#: plugins/audioscrobbler.pm:146
 msgid "Handshake failed : "
 msgstr "Selhání spojení :"
 
@@ -1688,7 +1823,7 @@ msgstr "Skrýt"
 msgid "Hide toolbar"
 msgstr "Skrýt lištu nástrojů"
 
-#: gmusicbrowser.pl:5745
+#: gmusicbrowser.pl:5706
 msgid "Icon theme :"
 msgstr "Téma ikon :"
 
@@ -1696,11 +1831,11 @@ msgstr "Téma ikon :"
 msgid "Identifier in file tag"
 msgstr "Identifikátor v popisku souboru"
 
-#: gmusicbrowser.pl:5548
+#: gmusicbrowser.pl:5509
 msgid "Ignore playback errors"
 msgstr "Ignorovat chyby přehrávání"
 
-#: gmusicbrowser_list.pm:2842
+#: gmusicbrowser_list.pm:2843
 msgid "Import list"
 msgstr "Seznam importů"
 
@@ -1716,19 +1851,19 @@ msgstr ""
 msgid "Increase Volume"
 msgstr "Zvýšit hlasitost"
 
-#: gmusicbrowser.pl:4648 gmusicbrowser_tags.pm:1598
+#: gmusicbrowser.pl:4609 gmusicbrowser_tags.pm:1598
 msgid "Info"
 msgstr "Info"
 
-#: layouts:740
+#: layouts:885
 msgid "Insensitive title-artist (left-aligned)"
 msgstr "Nedostupné titul-interpret (zarovnáno vlevo)"
 
-#: layouts:746
+#: layouts:891
 msgid "Insensitive title-artist (right-aligned)"
 msgstr "Nedostupné titul-interpret (zarovnáno vpravo)"
 
-#: layouts:753
+#: layouts:898
 msgid "Insensitive, Song & Cover"
 msgstr "Nedostupné, skladba & přebal"
 
@@ -1740,7 +1875,7 @@ msgstr "Vložit seznam souborů/složek na začátek playlistu"
 msgid "Invalid regular expression"
 msgstr "Chybný výraz"
 
-#: layouts:781
+#: layouts:926
 msgid "Invisible hot spot"
 msgstr "Neviditelný hot spot"
 
@@ -1752,7 +1887,7 @@ msgstr "Do bloku"
 msgid "KB"
 msgstr "KB"
 
-#: plugins/karaoke.pm:9 layouts:712
+#: plugins/karaoke.pm:9 layouts:857
 msgid "Karaoke"
 msgstr "Karaoke"
 
@@ -1760,20 +1895,20 @@ msgstr "Karaoke"
 msgid "Karaoke plugin"
 msgstr "Zásuvný modul karaoke"
 
-#: gmusicbrowser.pl:5232 gmusicbrowser.pl:5344
+#: gmusicbrowser.pl:5193 gmusicbrowser.pl:5305
 msgid "Key"
 msgstr "Klávesa"
 
-#: gmusicbrowser.pl:5213
+#: gmusicbrowser.pl:5174
 msgid "Keys"
 msgstr "Klávesy"
 
-#: plugins/fetch_cover.pm:99
+#: plugins/fetch_cover.pm:101
 msgid "Keywords"
 msgstr "Klíčová slova"
 
 #: gmusicbrowser.pl:1074 gmusicbrowser.pl:1075 gmusicbrowser.pl:1076
-#: gmusicbrowser.pl:6019 gmusicbrowser.pl:7909
+#: gmusicbrowser.pl:5980 gmusicbrowser.pl:7870
 msgid "Label"
 msgstr "Štítek"
 
@@ -1785,7 +1920,7 @@ msgstr "Štítek je nastaven"
 msgid "Label/Publisher"
 msgstr "Značka/vydavatel"
 
-#: gmusicbrowser.pl:4609 gmusicbrowser.pl:4646 gmusicbrowser.pl:5207
+#: gmusicbrowser.pl:4570 gmusicbrowser.pl:4607 gmusicbrowser.pl:5168
 #: gmusicbrowser_songs.pm:604
 msgid "Labels"
 msgstr "Štítky"
@@ -1801,6 +1936,14 @@ msgstr "Jazyk"
 #: gmusicbrowser_tags.pm:2027
 msgid "Lang."
 msgstr "Jazyk"
+
+#: plugins/artistinfo.pm:202
+msgid "Language"
+msgstr ""
+
+#: plugins/artistinfo.pm:202
+msgid "Language for last.fm artist info. (e.g. en, de, sp, fr, ...)"
+msgstr ""
 
 #: gmusicbrowser_tags.pm:1537
 msgid "Languages"
@@ -1818,7 +1961,7 @@ msgstr "Naposled přeskočené"
 msgid "Launch ripping program"
 msgstr "Spustit ripovací program"
 
-#: gmusicbrowser_layout.pm:497
+#: gmusicbrowser_layout.pm:532
 msgid "Layout"
 msgstr "Rozložení"
 
@@ -1826,7 +1969,7 @@ msgstr "Rozložení"
 msgid "Layout :"
 msgstr "Rozložení :"
 
-#: gmusicbrowser.pl:5209
+#: gmusicbrowser.pl:5170
 msgid "Layouts"
 msgstr "Vzhled"
 
@@ -1834,16 +1977,16 @@ msgstr "Vzhled"
 msgid "Left aligned"
 msgstr "Zarovnat vlevo"
 
-#: layouts:295
+#: layouts:360
 msgid "Left pane"
 msgstr "Levý panel"
 
-#: gmusicbrowser.pl:7817 gmusicbrowser_songs.pm:737
+#: gmusicbrowser.pl:7778 gmusicbrowser_songs.pm:737
 msgid "Length"
 msgstr "Délka"
 
-#: gmusicbrowser.pl:5206 gmusicbrowser_list.pm:128 layouts:117 layouts:263
-#: layouts:467 layouts:529
+#: gmusicbrowser.pl:5167 gmusicbrowser_list.pm:128 layouts:165 layouts:328
+#: layouts:532 layouts:594
 msgid "Library"
 msgstr "Knihovna"
 
@@ -1861,14 +2004,22 @@ msgstr ""
 "\n"
 "Použijte dialog nastavení pro přidání hudby."
 
-#: gmusicbrowser.pl:5914
+#: gmusicbrowser.pl:5875
 msgid "Library size : %d song"
 msgid_plural "Library size : %d songs"
 msgstr[0] "Velikost knihovny : %d skladba"
 msgstr[1] "Velikost knihovny : %d skladby"
 msgstr[2] "Velikost knihovny : %d skladeb"
 
-#: gmusicbrowser_list.pm:1513
+#: plugins/artistinfo.pm:210
+msgid "Limit similar artists to a rate of similarity : "
+msgstr ""
+
+#: plugins/artistinfo.pm:209
+msgid "Limit similar artists to the first : "
+msgstr ""
+
+#: gmusicbrowser_list.pm:1513 layouts:40
 msgid "List"
 msgstr "Seznam"
 
@@ -1876,7 +2027,7 @@ msgstr "Seznam"
 msgid "List empty"
 msgstr "Seznam je prázdný"
 
-#: gmusicbrowser_layout.pm:1335 gmusicbrowser_layout.pm:1395
+#: gmusicbrowser_layout.pm:1370 gmusicbrowser_layout.pm:1430
 msgid "List order"
 msgstr "Pořadí seznamu"
 
@@ -1888,15 +2039,15 @@ msgstr "V seznamu:"
 msgid "Listed songs"
 msgstr "Skladby v seznamu"
 
-#: layouts:96
+#: layouts:144
 msgid "Lists, Library & Context"
 msgstr "Seznamy, knihovna & kontext"
 
-#: gmusicbrowser_list.pm:3372
+#: gmusicbrowser_list.pm:3374
 msgid "Literal search"
 msgstr "Písmenné vyhledávání"
 
-#: plugins/artistinfo.pm:176
+#: plugins/artistinfo.pm:204
 msgid "Load/Save Artist Info in :"
 msgstr "Načíst/uložit biografii interpreta do:"
 
@@ -1904,19 +2055,19 @@ msgstr "Načíst/uložit biografii interpreta do:"
 msgid "Load/Save lyrics in :"
 msgstr "Načíst/uložit texty do :"
 
-#: plugins/audioscrobbler.pm:248
+#: plugins/audioscrobbler.pm:260
 msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "Načtena %d neodeslaná skladba z předchozího sezení"
 msgstr[1] "Načteny %d neodeslané skladby z předchozího sezení"
 msgstr[2] "Načteno %d neodeslaných skladeb z předchozího sezení"
 
-#: plugins/artistinfo.pm:347 plugins/artistinfo.pm:419 plugins/lyrics.pm:365
-#: plugins/lyrics.pm:528 plugins/lyrics.pm:621
+#: plugins/artistinfo.pm:441 plugins/artistinfo.pm:534 plugins/lyrics.pm:366
+#: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Načítání selhalo."
 
-#: plugins/artistinfo.pm:335 plugins/lyrics.pm:351
+#: plugins/artistinfo.pm:426 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Načítání..."
 
@@ -1932,19 +2083,19 @@ msgstr "Zamčené album"
 msgid "Lock Artist"
 msgstr "Zamčený interpret"
 
-#: gmusicbrowser_layout.pm:151
+#: gmusicbrowser_layout.pm:158 gmusicbrowser_layout.pm:163
 msgid "Lock on Album"
 msgstr "Zamčené album"
 
-#: gmusicbrowser_layout.pm:146
+#: gmusicbrowser_layout.pm:147 gmusicbrowser_layout.pm:152
 msgid "Lock on Artist"
 msgstr "Zamčený interpret"
 
-#: gmusicbrowser_layout.pm:141
+#: gmusicbrowser_layout.pm:142
 msgid "Lock on song"
 msgstr "Zamčená skladba"
 
-#: gmusicbrowser_layout.pm:134
+#: gmusicbrowser_layout.pm:135
 msgid "Lock on {field}"
 msgstr "Zamknuto {field}"
 
@@ -1963,6 +2114,10 @@ msgstr "Vyhledat googlem"
 #: plugins/titlebar.pm:30
 msgid "Lower left"
 msgstr "Dole vlevo"
+
+#: layouts:72
+msgid "Lower left filter pane"
+msgstr ""
 
 #: plugins/titlebar.pm:31
 msgid "Lower right"
@@ -1986,7 +2141,7 @@ msgstr "Textař"
 msgid "Lyrics"
 msgstr "Texty"
 
-#: layouts:787
+#: layouts:932
 msgid "Lyrics (requires lyrics plugin)"
 msgstr "Texty (vyžaduje zásuvný modul texty)"
 
@@ -1994,7 +2149,7 @@ msgstr "Texty (vyžaduje zásuvný modul texty)"
 msgid "Lyrics alignement"
 msgstr "Zarovnání textů"
 
-#: gmusicbrowser.pl:4102
+#: gmusicbrowser.pl:4060
 msgid "Lyrics for "
 msgstr "Text pro"
 
@@ -2006,7 +2161,7 @@ msgstr "Zásuvný modul texty"
 msgid "Lyrics source"
 msgstr "Zdroj textů"
 
-#: gmusicbrowser.pl:715 gmusicbrowser.pl:5696
+#: gmusicbrowser.pl:715 gmusicbrowser.pl:5657
 msgid "MB"
 msgstr "MB"
 
@@ -2022,7 +2177,7 @@ msgstr "MPRIS v1"
 msgid "MPRIS v1 support"
 msgstr "Podpora MPRIS v1"
 
-#: gmusicbrowser_layout.pm:507
+#: gmusicbrowser_layout.pm:542
 msgid "Main"
 msgstr "Hlavní"
 
@@ -2042,7 +2197,7 @@ msgstr ""
 msgid "Mass Rename"
 msgstr "Hromadně přejmenovat"
 
-#: gmusicbrowser.pl:4239
+#: gmusicbrowser.pl:4200
 msgid "Mass Renaming"
 msgstr "Hromadné přejmenování"
 
@@ -2054,7 +2209,7 @@ msgstr "Typ média"
 msgid "Menu entry name"
 msgstr "Název položky menu"
 
-#: layouts:172
+#: layouts:237
 msgid "Minimal tip"
 msgstr "Minimální"
 
@@ -2062,7 +2217,7 @@ msgstr "Minimální"
 msgid "Minimum size"
 msgstr "Minimální velikost"
 
-#: gmusicbrowser.pl:5210
+#: gmusicbrowser.pl:5171
 msgid "Misc."
 msgstr "Různé"
 
@@ -2078,7 +2233,7 @@ msgstr "Pondělí"
 msgid "Moods"
 msgstr "Nálady"
 
-#: plugins/fetch_cover.pm:104
+#: plugins/fetch_cover.pm:106
 msgid "More results"
 msgstr "Více výsledků"
 
@@ -2086,19 +2241,19 @@ msgstr "Více výsledků"
 msgid "Move"
 msgstr "Přesunout"
 
-#: gmusicbrowser.pl:4310
+#: gmusicbrowser.pl:4271
 msgid "Move Files to :"
 msgstr "Přesunout soubory do :"
 
-#: gmusicbrowser.pl:3737
+#: gmusicbrowser.pl:3695
 msgid "Move failed"
 msgstr "Přesouvání selhalo"
 
-#: gmusicbrowser.pl:5816
+#: gmusicbrowser.pl:5777
 msgid "Move folder to"
 msgstr "Přesunout složku do"
 
-#: gmusicbrowser.pl:3740
+#: gmusicbrowser.pl:3698
 msgid "Moving file"
 msgid_plural "Moving %d files"
 msgstr[0] "Přesouvání souboru"
@@ -2129,20 +2284,20 @@ msgstr "Nový"
 msgid "New custom field"
 msgstr "Nové uživatelské pole"
 
-#: gmusicbrowser_list.pm:2827
+#: gmusicbrowser_list.pm:2828
 msgid "New filter"
 msgstr "Nový filtr"
 
-#: gmusicbrowser_layout.pm:2190
+#: gmusicbrowser_layout.pm:2225
 msgid "New list"
 msgstr "Nový seznam"
 
-#: gmusicbrowser.pl:4274
+#: gmusicbrowser.pl:4235
 msgid "New name"
 msgstr "Nový název"
 
-#: gmusicbrowser.pl:439 gmusicbrowser.pl:2437 gmusicbrowser_layout.pm:79
-#: gmusicbrowser_list.pm:5082 plugins/notify.pm:90
+#: gmusicbrowser.pl:439 gmusicbrowser.pl:2437 gmusicbrowser_layout.pm:80
+#: gmusicbrowser_list.pm:5094 plugins/notify.pm:90
 msgid "Next"
 msgstr "Další"
 
@@ -2154,7 +2309,7 @@ msgstr "Další album"
 msgid "Next Artist"
 msgstr "Další interpret"
 
-#: gmusicbrowser.pl:1014 gmusicbrowser_layout.pm:78
+#: gmusicbrowser.pl:1014 gmusicbrowser_layout.pm:79
 msgid "Next Song"
 msgstr "Další"
 
@@ -2162,7 +2317,7 @@ msgstr "Další"
 msgid "Next Song In Playlist"
 msgstr "Další skladba v playlistu"
 
-#: gmusicbrowser_layout.pm:594
+#: gmusicbrowser_layout.pm:629
 msgid "No connections"
 msgstr "Není spojení"
 
@@ -2186,6 +2341,10 @@ msgstr "Žádný zamčený filtr"
 msgid "No moods"
 msgstr "Žádné nálady"
 
+#: plugins/artistinfo.pm:483
+msgid "No results found"
+msgstr ""
+
 #: gmusicbrowser_list.pm:410
 msgid "No songs found"
 msgstr "Žádné skladby nenalezeny"
@@ -2194,13 +2353,13 @@ msgstr "Žádné skladby nenalezeny"
 msgid "No web browser found."
 msgstr "Webový prohlížeč nenalezen."
 
-#: gmusicbrowser.pl:832 gmusicbrowser_list.pm:1560 gmusicbrowser_list.pm:1579
+#: gmusicbrowser.pl:832 gmusicbrowser_list.pm:1561 gmusicbrowser_list.pm:1580
 #: gmusicbrowser_songs.pm:53 gmusicbrowser_songs.pm:565
 #: gmusicbrowser_tags.pm:1199 gmusicbrowser_tags.pm:1277
 msgid "None"
 msgstr "Žádný"
 
-#: gmusicbrowser_layout.pm:26
+#: gmusicbrowser_layout.pm:27
 msgid "Normal mode"
 msgstr "Normální režim"
 
@@ -2268,7 +2427,7 @@ msgstr "Počet přehrání"
 msgid "Number of times skipped"
 msgstr "Počet přeskočení"
 
-#: gmusicbrowser.pl:7632 gmusicbrowser.pl:7655
+#: gmusicbrowser.pl:7593 gmusicbrowser.pl:7616
 msgid ""
 "ON -> smaller means more probable\n"
 "OFF -> bigger means more probable"
@@ -2276,7 +2435,7 @@ msgstr ""
 "ON -> menší znamená pravděpodobnější\n"
 "OFF -> větší znamená pravděpodobnější"
 
-#: gmusicbrowser.pl:7624
+#: gmusicbrowser.pl:7585
 msgid ""
 "ON less probable if genre is set\n"
 "OFF more probable if genre is set"
@@ -2284,7 +2443,7 @@ msgstr ""
 "ON méně pravděpodobně pokud je nastaven žánr\n"
 "OFF více pravděpodobně pokud je nastaven žánr"
 
-#: gmusicbrowser.pl:7616
+#: gmusicbrowser.pl:7577
 msgid ""
 "ON less probable if label is set\n"
 "OFF more probable if label is set"
@@ -2292,7 +2451,7 @@ msgstr ""
 "ON méně pravděpodobně pokud je nastaven štítek\n"
 "OFF více pravděpodobně pokud je nastaven štítek"
 
-#: gmusicbrowser.pl:4274
+#: gmusicbrowser.pl:4235
 msgid "Old name"
 msgstr "Starý název"
 
@@ -2305,7 +2464,7 @@ msgid "One of these commands is required to play files of type {type} : {cmd}"
 msgstr ""
 "Jeden z těchto příkazů je vyžadován pro přehrání souborů typu {type} : {cmd}"
 
-#: gmusicbrowser.pl:5771
+#: gmusicbrowser.pl:5732
 msgid "Only affect mp3 files that do not already have an id3v1 tag"
 msgstr "Ovlivní pouze mp3 soubory, které ještě nemají ID3v1 popisek"
 
@@ -2313,15 +2472,16 @@ msgstr "Ovlivní pouze mp3 soubory, které ještě nemají ID3v1 popisek"
 msgid "Opacity"
 msgstr "Neprůsvitnost"
 
-#: gmusicbrowser.pl:1021 gmusicbrowser_layout.pm:40
+#: gmusicbrowser.pl:1021 gmusicbrowser_layout.pm:41
 msgid "Open Browser"
 msgstr "Otevřít prohlížeč"
 
-#: gmusicbrowser_layout.pm:90
+#: gmusicbrowser_layout.pm:91
 msgid "Open Browser window"
 msgstr "Prohlížeč"
 
-#: gmusicbrowser.pl:1024 gmusicbrowser_layout.pm:41 gmusicbrowser_layout.pm:99
+#: gmusicbrowser.pl:1024 gmusicbrowser_layout.pm:42
+#: gmusicbrowser_layout.pm:100
 msgid "Open Context window"
 msgstr "Otevřít kontextové okno"
 
@@ -2329,11 +2489,11 @@ msgstr "Otevřít kontextové okno"
 msgid "Open Custom window"
 msgstr "Otevřít uživatelské okno"
 
-#: gmusicbrowser.pl:5504
+#: gmusicbrowser.pl:5465
 msgid "Open Equalizer"
 msgstr "Otevřít ekvalizér"
 
-#: gmusicbrowser_layout.pm:2193
+#: gmusicbrowser_layout.pm:2228
 msgid "Open Playlist"
 msgstr "Otevřít playlist"
 
@@ -2341,11 +2501,11 @@ msgstr "Otevřít playlist"
 msgid "Open Preference window"
 msgstr "Otevřít okno vlastností"
 
-#: gmusicbrowser_layout.pm:2191
+#: gmusicbrowser_layout.pm:2226
 msgid "Open Queue"
 msgstr "Otevřít frontu"
 
-#: gmusicbrowser.pl:1022 gmusicbrowser_layout.pm:106
+#: gmusicbrowser.pl:1022 gmusicbrowser_layout.pm:107
 msgid "Open Queue window"
 msgstr "Otevřít okno fronty"
 
@@ -2357,27 +2517,27 @@ msgstr "Otevřít okno vyhledávání"
 msgid "Open containing folder"
 msgstr "Otevřít obsahující složku"
 
-#: gmusicbrowser_layout.pm:2199
+#: gmusicbrowser_layout.pm:2234
 msgid "Open context page"
 msgstr "Otevřít kontextovou stránku"
 
-#: gmusicbrowser_layout.pm:2195
+#: gmusicbrowser_layout.pm:2230
 msgid "Open existing list"
 msgstr "Otevřít existující seznam"
 
-#: gmusicbrowser_list.pm:1633
+#: gmusicbrowser_list.pm:1634
 msgid "Open folder"
 msgstr "Otevřít složku"
 
-#: plugins/artistinfo.pm:184
+#: plugins/artistinfo.pm:214
 msgid "Open last.fm website in your browser"
 msgstr "Otevřít stránku last.fm v prohlížeči"
 
-#: plugins/lyrics.pm:311
+#: plugins/lyrics.pm:312
 msgid "Open link in Browser"
 msgstr "Otevřít odkaz v prohlížeči"
 
-#: gmusicbrowser_layout.pm:2197
+#: gmusicbrowser_layout.pm:2232
 msgid "Open page layout"
 msgstr "Otevřít rozložení stránky"
 
@@ -2389,11 +2549,11 @@ msgstr "Otevřít speciální rozložení jako pomůcku"
 msgid "Open this page in the web browser"
 msgstr "Otevřít tuto stránku ve webovém prohlížeči"
 
-#: gmusicbrowser_123.pm:287 gmusicbrowser_list.pm:1656
+#: gmusicbrowser_123.pm:287 gmusicbrowser_list.pm:1657
 msgid "Options"
 msgstr "Nastavení"
 
-#: gmusicbrowser_list.pm:1563
+#: gmusicbrowser_list.pm:1564
 msgid "Options for subgroup"
 msgstr "Možnosti podskupiny"
 
@@ -2445,7 +2605,7 @@ msgstr "Cesta,soubor"
 msgid "Pattern to find .lrc files :"
 msgstr "Šablona hledání souborů .lrc"
 
-#: gmusicbrowser.pl:437 gmusicbrowser_layout.pm:70
+#: gmusicbrowser.pl:437 gmusicbrowser_layout.pm:71
 msgid "Pause"
 msgstr "Pauza"
 
@@ -2458,7 +2618,7 @@ msgstr "Obrázek"
 msgid "Picture Type"
 msgstr "Typ obrázku"
 
-#: gmusicbrowser.pl:5696
+#: gmusicbrowser.pl:5657
 msgid "Picture cache :"
 msgstr "Úložiště obrázku :"
 
@@ -2474,16 +2634,16 @@ msgstr "Zásuvný modul vyhledávač obrázků"
 msgid "Picture size :"
 msgstr "Velikost obrázku :"
 
-#: gmusicbrowser.pl:3891
+#: gmusicbrowser.pl:3849
 msgid "Pictures and music files"
 msgstr "Soubory hudby a obrázků"
 
-#: gmusicbrowser.pl:3892
+#: gmusicbrowser.pl:3850
 msgid "Pictures files"
 msgstr "Soubory obrázků"
 
-#: gmusicbrowser.pl:436 gmusicbrowser_layout.pm:70 gmusicbrowser_list.pm:1614
-#: gmusicbrowser_list.pm:3833 gmusicbrowser_list.pm:3900
+#: gmusicbrowser.pl:436 gmusicbrowser_layout.pm:71 gmusicbrowser_list.pm:1615
+#: gmusicbrowser_list.pm:3835 gmusicbrowser_list.pm:3902
 msgid "Play"
 msgstr "Přehrát"
 
@@ -2499,15 +2659,15 @@ msgstr "Přehrát jen vybrané"
 msgid "Play a list of files"
 msgstr "Přehrát seznam souborů"
 
-#: gmusicbrowser_list.pm:3182
+#: gmusicbrowser_list.pm:3183
 msgid "Play all songs from this album"
 msgstr "Přehrát všechny skladby tohoto alba"
 
-#: gmusicbrowser_list.pm:3182
+#: gmusicbrowser_list.pm:3183
 msgid "Play all songs from this artist"
 msgstr "Přehrát všechny skladby tohoto interpreta"
 
-#: layouts:720
+#: layouts:865
 msgid "Play button"
 msgstr "Tlačítko přehrát"
 
@@ -2519,7 +2679,7 @@ msgstr "Počet přehrávání"
 msgid "Play counter"
 msgstr "Počítadlo přehrávání"
 
-#: gmusicbrowser_layout.pm:526
+#: gmusicbrowser_layout.pm:561
 msgid "Play filter"
 msgstr "Přehrát filtr"
 
@@ -2527,7 +2687,7 @@ msgstr "Přehrát filtr"
 msgid "Play listed songs"
 msgstr "Přehrát skladby ze seznamu"
 
-#: gmusicbrowser_layout.pm:159 gmusicbrowser_layout.pm:485
+#: gmusicbrowser_layout.pm:172 gmusicbrowser_layout.pm:520
 msgid "Play order"
 msgstr "Pořadí přehrávání"
 
@@ -2543,11 +2703,11 @@ msgstr "Přehráváno dnes"
 msgid "Player mounted on :"
 msgstr "Přehrávač připojen k :"
 
-#: gmusicbrowser.pl:5730
+#: gmusicbrowser.pl:5691
 msgid "Player window layout :"
 msgstr "Styl přehrávače :"
 
-#: gmusicbrowser_layout.pm:477 gmusicbrowser_list.pm:2848
+#: gmusicbrowser_layout.pm:512 gmusicbrowser_list.pm:2849
 msgid "Playing"
 msgstr "Přehrávání"
 
@@ -2555,19 +2715,19 @@ msgstr "Přehrávání"
 msgid "Playing & Queue"
 msgstr "Přehrávání & fronta"
 
-#: gmusicbrowser_list.pm:2935
+#: gmusicbrowser_list.pm:2936
 msgid "Playing Album"
 msgstr "Přehrávání alba"
 
-#: gmusicbrowser_list.pm:2934
+#: gmusicbrowser_list.pm:2935
 msgid "Playing Artist"
 msgstr "Přehrávání interpreta"
 
-#: gmusicbrowser_list.pm:2933
+#: gmusicbrowser_list.pm:2934
 msgid "Playing Filter"
 msgstr "Přehrávání filtru"
 
-#: gmusicbrowser_list.pm:2936
+#: gmusicbrowser_list.pm:2937
 msgid "Playing Title"
 msgstr "Přehrávání titulu"
 
@@ -2575,11 +2735,11 @@ msgstr "Přehrávání titulu"
 msgid "Playing error : {error}"
 msgstr "Chyba přehrávání : {error}"
 
-#: gmusicbrowser_layout.pm:407 layouts:371
+#: gmusicbrowser_layout.pm:442 layouts:436
 msgid "Playlist"
 msgstr "Playlist"
 
-#: gmusicbrowser_layout.pm:242 gmusicbrowser_layout.pm:1724
+#: gmusicbrowser_layout.pm:266 gmusicbrowser_layout.pm:1759
 msgid "Playlist Empty"
 msgstr "Playlist je prázdný"
 
@@ -2587,27 +2747,27 @@ msgstr "Playlist je prázdný"
 msgid "Playlist empty"
 msgstr "Playlist je prázdný"
 
-#: gmusicbrowser.pl:4897
+#: gmusicbrowser.pl:4858
 msgid "Playlist files"
 msgstr "Soubory playlistu"
 
-#: gmusicbrowser_layout.pm:489
+#: gmusicbrowser_layout.pm:524
 msgid "Playlist filter"
 msgstr "Filtr playlistu"
 
-#: gmusicbrowser_layout.pm:174
+#: gmusicbrowser_layout.pm:192
 msgid "Playlist filter :\n"
 msgstr "Filtr playlistu :\n"
 
-#: layouts:508
+#: layouts:573
 msgid "Playlist, Library & Context"
 msgstr "Playlist,knihovna & kontext"
 
-#: gmusicbrowser.pl:5413
+#: gmusicbrowser.pl:5374
 msgid "Plugin not loaded"
 msgstr "Zásuvný modul není zaveden"
 
-#: gmusicbrowser.pl:5212
+#: gmusicbrowser.pl:5173
 msgid "Plugins"
 msgstr "Zásuvné moduly"
 
@@ -2623,6 +2783,10 @@ msgstr "Vyskakovací uživatelské okno"
 msgid "Popup Traytip"
 msgstr "Vyskakovací okno oznamovací oblasti"
 
+#: plugins/http_server.pm:383
+msgid "Port Number"
+msgstr ""
+
 #: plugins/webcontext.pm:566
 msgid "Pre-set"
 msgstr "Předvolit"
@@ -2631,15 +2795,15 @@ msgstr "Předvolit"
 msgid "Prepend"
 msgstr "Předřadit"
 
-#: gmusicbrowser.pl:5259
+#: gmusicbrowser.pl:5220
 msgid "Press a key or a key combination"
 msgstr "Stisknout klávesu nebo kombinaci kláves"
 
-#: gmusicbrowser_layout.pm:53 gmusicbrowser_list.pm:5083
+#: gmusicbrowser_layout.pm:54 gmusicbrowser_list.pm:5095
 msgid "Previous"
 msgstr "Předchozí"
 
-#: gmusicbrowser.pl:1015 layouts:52
+#: gmusicbrowser.pl:1015 layouts:55
 msgid "Previous Song"
 msgstr "Předchozí skladba"
 
@@ -2663,7 +2827,7 @@ msgstr "Důvěrné údaje"
 msgid "Produced (P)"
 msgstr "Produkce (P)"
 
-#: layouts:708
+#: layouts:853
 msgid "Progress"
 msgstr "Vývoj"
 
@@ -2671,7 +2835,7 @@ msgstr "Vývoj"
 msgid "Provides context views using MozEmbed or WebKit"
 msgstr "Kontextový pohled pomocí MozEmbed nebo WebKit"
 
-#: gmusicbrowser.pl:5644
+#: gmusicbrowser.pl:5605
 msgid "Proxy host :"
 msgstr "Host proxy:"
 
@@ -2687,17 +2851,17 @@ msgstr "Vydavatel"
 msgid "Publisher/Studio logotype"
 msgstr "Vydavatel/logotyp studia"
 
-#: gmusicbrowser.pl:2409 gmusicbrowser_layout.pm:196
-#: gmusicbrowser_layout.pm:401 gmusicbrowser_layout.pm:493 layouts:263
-#: layouts:295 layouts:353
+#: gmusicbrowser.pl:2409 gmusicbrowser_layout.pm:219
+#: gmusicbrowser_layout.pm:436 gmusicbrowser_layout.pm:528 layouts:40
+#: layouts:77 layouts:328 layouts:360 layouts:418
 msgid "Queue"
 msgstr "Fronta"
 
-#: gmusicbrowser_layout.pm:24
+#: gmusicbrowser_layout.pm:25
 msgid "Queue album"
 msgstr "Fronta alb"
 
-#: gmusicbrowser_layout.pm:25
+#: gmusicbrowser_layout.pm:26
 msgid "Queue artist"
 msgstr "Fronta interpretů"
 
@@ -2709,32 +2873,32 @@ msgstr "Fronta prázdná"
 msgid "Queue mode"
 msgstr "Režim fronty"
 
-#: layouts:445
+#: layouts:510
 msgid "Queue, Library & Context"
 msgstr "Fronta, knihovna & kontext"
 
-#: layouts:337
+#: layouts:402
 msgid "Quick Search"
 msgstr "Rychlé hledání"
 
-#: layouts:345
+#: layouts:410
 msgid "Quick Search with SongTree"
 msgstr "Rychlé hledání se stromem skladeb"
 
-#: gmusicbrowser.pl:448 gmusicbrowser.pl:1035 gmusicbrowser_layout.pm:44
-#: gmusicbrowser_layout.pm:122
+#: gmusicbrowser.pl:448 gmusicbrowser.pl:1035 gmusicbrowser_layout.pm:45
+#: gmusicbrowser_layout.pm:123
 msgid "Quit"
 msgstr "Ukončit"
 
-#: gmusicbrowser_layout.pm:30
+#: gmusicbrowser_layout.pm:31
 msgid "Quit when queue empty"
 msgstr "Ukončit po vyprázdnění fronty"
 
-#: gmusicbrowser_list.pm:7771 gmusicbrowser_list.pm:7828
+#: gmusicbrowser_list.pm:7793 gmusicbrowser_list.pm:7850
 msgid "Radio title"
 msgstr "Název rádia"
 
-#: gmusicbrowser_list.pm:7829
+#: gmusicbrowser_list.pm:7851
 msgid "Radio url"
 msgstr "URL rádia"
 
@@ -2742,11 +2906,11 @@ msgstr "URL rádia"
 msgid "Random"
 msgstr "Náhodné"
 
-#: gmusicbrowser.pl:6780
+#: gmusicbrowser.pl:6741
 msgid "Random mode edition"
 msgstr "Editace náhodného režimu"
 
-#: gmusicbrowser.pl:4610 gmusicbrowser.pl:4647 gmusicbrowser.pl:7810
+#: gmusicbrowser.pl:4571 gmusicbrowser.pl:4608 gmusicbrowser.pl:7771
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
 #: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052
 msgid "Rating"
@@ -2768,7 +2932,7 @@ msgstr "Znovu načíst popisky"
 msgid "Read/write in file tag"
 msgstr "Číst/zapsat popisek souboru"
 
-#: gmusicbrowser_layout.pm:473
+#: gmusicbrowser_layout.pm:508
 msgid "Recent Filters"
 msgstr "Nedávné filtry"
 
@@ -2784,7 +2948,7 @@ msgstr "Nedávní interpreti"
 msgid "Recent songs"
 msgstr "Nedávné skladby"
 
-#: gmusicbrowser.pl:5698
+#: gmusicbrowser.pl:5659
 msgid "Recent songs include skipped songs that haven't been played."
 msgstr "Skladby včetně těch, které nemohly být přehrány."
 
@@ -2792,7 +2956,7 @@ msgstr "Skladby včetně těch, které nemohly být přehrány."
 msgid "Recently played"
 msgstr "Nedávno přehrávané"
 
-#: gmusicbrowser_layout.pm:52
+#: gmusicbrowser_layout.pm:53
 msgid "Recently played songs"
 msgstr "Předchozí"
 
@@ -2804,15 +2968,15 @@ msgstr "Data nahrávky"
 msgid "Reference point :"
 msgstr "Místo odkazu :"
 
-#: plugins/artistinfo.pm:128 plugins/lyrics.pm:134
+#: plugins/artistinfo.pm:147 plugins/lyrics.pm:134
 msgid "Refresh"
 msgstr "Obnovit"
 
-#: gmusicbrowser_layout.pm:519
+#: gmusicbrowser_layout.pm:554
 msgid "Refresh list"
 msgstr "Obnovit seznam"
 
-#: gmusicbrowser_list.pm:3373
+#: gmusicbrowser_list.pm:3375
 msgid "Regular expression"
 msgstr "Správný výraz"
 
@@ -2824,19 +2988,19 @@ msgstr "Správný výraz :"
 msgid "Regular expression didn't match"
 msgstr "Výraz neodpovídá"
 
-#: gmusicbrowser.pl:5637
+#: gmusicbrowser.pl:5598
 msgid "Remember last Filter/Playlist between sessions"
 msgstr "Zapamatovat si poslední filtr/playlist mezi sezeními"
 
-#: gmusicbrowser.pl:5638
+#: gmusicbrowser.pl:5599
 msgid "Remember playing position between sessions"
 msgstr "Zapamatovat si pozici přehrávání mezi sezeními"
 
-#: gmusicbrowser.pl:5639
+#: gmusicbrowser.pl:5600
 msgid "Remember playing song between sessions"
 msgstr "Zapamatovat si přehrávanou skladbu mezi sezeními"
 
-#: gmusicbrowser.pl:5640
+#: gmusicbrowser.pl:5601
 msgid "Remember queue between sessions"
 msgstr "Zapamatovat si frontu mezi sezeními"
 
@@ -2844,8 +3008,8 @@ msgstr "Zapamatovat si frontu mezi sezeními"
 msgid "Remixer"
 msgstr "Remixer"
 
-#: gmusicbrowser.pl:412 gmusicbrowser.pl:5320 gmusicbrowser.pl:5864
-#: gmusicbrowser.pl:6830 gmusicbrowser.pl:6965 gmusicbrowser.pl:7235
+#: gmusicbrowser.pl:412 gmusicbrowser.pl:5281 gmusicbrowser.pl:5825
+#: gmusicbrowser.pl:6791 gmusicbrowser.pl:6926 gmusicbrowser.pl:7196
 #: gmusicbrowser_list.pm:289 gmusicbrowser_tags.pm:734
 #: gmusicbrowser_tags.pm:1237 plugins/webcontext.pm:565
 msgid "Remove"
@@ -2863,7 +3027,7 @@ msgstr "Odstranit vše"
 msgid "Remove all songs"
 msgstr "Odstranit všechny skladby"
 
-#: gmusicbrowser_list.pm:2830
+#: gmusicbrowser_list.pm:2831
 msgid "Remove filter"
 msgstr "Odstranit filtr"
 
@@ -2891,11 +3055,11 @@ msgstr "Odstranit z fronty"
 msgid "Remove header, footer and left column from wikipedia pages"
 msgstr "Odstranit záhlaví, zápatí a levý sloupek ze stránek Wikipedie"
 
-#: gmusicbrowser.pl:6048 gmusicbrowser_list.pm:1651
+#: gmusicbrowser.pl:6009 gmusicbrowser_list.pm:1652
 msgid "Remove label"
 msgstr "Odstranit štítek"
 
-#: gmusicbrowser_list.pm:2838
+#: gmusicbrowser_list.pm:2839
 msgid "Remove list"
 msgstr "Odstranit seznam"
 
@@ -2907,11 +3071,11 @@ msgstr "Odstranit vybrané skladby"
 msgid "Remove this field"
 msgstr "Odstranit toto pole"
 
-#: gmusicbrowser.pl:7602
+#: gmusicbrowser.pl:7563
 msgid "Remove this rule"
 msgstr "Odstranit toto pravidlo"
 
-#: gmusicbrowser_list.pm:1876
+#: gmusicbrowser_list.pm:1877
 msgid "Remove this tab"
 msgstr "Odstranit tuto záložku"
 
@@ -2923,11 +3087,11 @@ msgstr "Odstranit tento popisek"
 msgid "Remove this widget"
 msgstr "Odstranit tuto pomůcku"
 
-#: gmusicbrowser_layout.pm:2204 gmusicbrowser_list.pm:2840
+#: gmusicbrowser_layout.pm:2239 gmusicbrowser_list.pm:2841
 msgid "Rename"
 msgstr "Přejmenovat"
 
-#: gmusicbrowser.pl:4378
+#: gmusicbrowser.pl:4339
 msgid "Rename File"
 msgstr "Přejmenovat soubor"
 
@@ -2935,23 +3099,23 @@ msgstr "Přejmenovat soubor"
 msgid "Rename file"
 msgstr "Přejmenovat soubor"
 
-#: gmusicbrowser.pl:4308 gmusicbrowser.pl:4309
+#: gmusicbrowser.pl:4269 gmusicbrowser.pl:4270
 msgid "Rename files using this pattern :"
 msgstr "Přejmenovat soubory dle šablony :"
 
-#: gmusicbrowser.pl:5781 gmusicbrowser_list.pm:1632
+#: gmusicbrowser.pl:5742 gmusicbrowser_list.pm:1633
 msgid "Rename folder"
 msgstr "Přejmenovat složku"
 
-#: gmusicbrowser.pl:5790
+#: gmusicbrowser.pl:5751
 msgid "Rename this folder to :"
 msgstr "Přejmenovat tuto složku na :"
 
-#: gmusicbrowser.pl:4307
+#: gmusicbrowser.pl:4268
 msgid "Rename/move files based on these fields :"
 msgstr "Přejmenovat/přesunout soubory v těchto polích :"
 
-#: gmusicbrowser.pl:4366 gmusicbrowser.pl:5802
+#: gmusicbrowser.pl:4327 gmusicbrowser.pl:5763
 msgid ""
 "Renaming {oldname}\n"
 "to {newname}\n"
@@ -2961,11 +3125,11 @@ msgstr ""
 "na {newname}\n"
 "selhalo : {error}"
 
-#: gmusicbrowser.pl:5898
+#: gmusicbrowser.pl:5859
 msgid "Reorganize files and folders"
 msgstr "Reorganizovat soubory a složky"
 
-#: gmusicbrowser_layout.pm:614 gmusicbrowser_layout.pm:1386
+#: gmusicbrowser_layout.pm:649 gmusicbrowser_layout.pm:1421
 msgid "Repeat"
 msgstr "Opakovat"
 
@@ -2985,7 +3149,7 @@ msgstr "Možnosti ReplayGain"
 msgid "Replaygain analysis"
 msgstr "Analýza ReplayGain"
 
-#: gmusicbrowser_layout.pm:541 gmusicbrowser_list.pm:3401
+#: gmusicbrowser_layout.pm:576 gmusicbrowser_list.pm:3403
 msgid "Reset filter"
 msgstr "Vynulovat filtr"
 
@@ -2997,7 +3161,7 @@ msgstr "Převinout"
 msgid "Right aligned"
 msgstr "Zarovnat vpravo"
 
-#: gmusicbrowser_list.pm:1579
+#: gmusicbrowser_list.pm:1580
 msgid "Right side"
 msgstr "Vpravo"
 
@@ -3025,6 +3189,10 @@ msgstr "Spustit kód perl"
 msgid "Run system command"
 msgstr "Spustit systémový příkaz"
 
+#: layouts:67
+msgid "S/H"
+msgstr ""
+
 #: gmusicbrowser.pl:415
 msgid "Same Title"
 msgstr "Stejný titul"
@@ -3045,7 +3213,7 @@ msgstr "Uložit"
 msgid "Save Tags/Options"
 msgstr "Uložit popisky/nastavení"
 
-#: plugins/artistinfo.pm:129
+#: plugins/artistinfo.pm:148
 msgid "Save artist biography"
 msgstr "Uložit biografii interpreta"
 
@@ -3053,13 +3221,21 @@ msgstr "Uložit biografii interpreta"
 msgid "Save as..."
 msgstr "Uložit jako..."
 
-#: gmusicbrowser_list.pm:2832
+#: gmusicbrowser_list.pm:2833
 msgid "Save current filter as"
 msgstr "Uložit stávající filtr jako"
 
-#: gmusicbrowser_list.pm:2834
+#: gmusicbrowser_list.pm:2835
 msgid "Save current list as"
 msgstr "Uložit stávající seznam jako"
+
+#: plugins/epicrating.pm:351
+msgid "Save gmusicbrowser song stats CSV dump as..."
+msgstr ""
+
+#: plugins/epicrating.pm:94
+msgid "Save lastplay ratingscore to file"
+msgstr ""
 
 #: plugins/lyrics.pm:133
 msgid "Save lyrics"
@@ -3069,7 +3245,7 @@ msgstr "Uložit texty"
 msgid "Save now"
 msgstr "Uložit nyní"
 
-#: gmusicbrowser_tags.pm:2260 plugins/fetch_cover.pm:463
+#: gmusicbrowser_tags.pm:2260 plugins/fetch_cover.pm:465
 msgid "Save picture as"
 msgstr "Uložit obrázek jako"
 
@@ -3081,15 +3257,15 @@ msgstr "Uložit popisky/nastavení každých"
 msgid "Saved"
 msgstr "Uloženo"
 
-#: gmusicbrowser_layout.pm:1447
+#: gmusicbrowser_layout.pm:1482
 msgid "Saved Lists"
 msgstr "Uložené seznamy"
 
-#: gmusicbrowser_list.pm:2846
+#: gmusicbrowser_list.pm:2847
 msgid "Saved filters"
 msgstr "Uložené filtry"
 
-#: gmusicbrowser_list.pm:2847
+#: gmusicbrowser_list.pm:2848
 msgid "Saved lists"
 msgstr "Uložené seznamy"
 
@@ -3097,7 +3273,7 @@ msgstr "Uložené seznamy"
 msgid "Scan as an album"
 msgstr "Prohledat jako album"
 
-#: gmusicbrowser_list.pm:1635
+#: gmusicbrowser_list.pm:1636
 msgid "Scan for new songs"
 msgstr "Vyhledat nové skladby"
 
@@ -3113,7 +3289,7 @@ msgstr "Prohledat tento soubor"
 msgid "Scan using tag-defined album"
 msgstr "Prohledávání pomocí alba definovaného popiskem"
 
-#: gmusicbrowser.pl:5050
+#: gmusicbrowser.pl:5011
 msgid "Scanning"
 msgstr "Prohledávání"
 
@@ -3125,64 +3301,68 @@ msgstr "Posunovat se skladbou"
 msgid "Scroll with the song"
 msgstr "Posunovat se skladbou"
 
-#: plugins/fetch_cover.pm:93 layouts:333 layouts:330 layouts:339 layouts:347
+#: plugins/fetch_cover.pm:95 layouts:398 layouts:395 layouts:404 layouts:412
 msgid "Search"
 msgstr "Vyhledat"
 
-#: layouts:439
+#: layouts:504
 msgid "Search & Playlist"
 msgstr "Vyhledat & Playlist"
 
-#: layouts:432
+#: layouts:497
 msgid "Search & Queue"
 msgstr "Vyhledat & Fronta"
 
-#: gmusicbrowser_list.pm:3826 gmusicbrowser_list.pm:3892
+#: gmusicbrowser_list.pm:3828 gmusicbrowser_list.pm:3894
 msgid "Search : "
 msgstr "Vyhledat ."
 
-#: gmusicbrowser_list.pm:3364
+#: gmusicbrowser_list.pm:3366
 msgid "Search Album"
 msgstr "Vyhledat album"
 
-#: gmusicbrowser_list.pm:3363
+#: gmusicbrowser_list.pm:3365
 msgid "Search Artist"
 msgstr "Vyhledat interpreta"
 
-#: gmusicbrowser_list.pm:3365
+#: gmusicbrowser_list.pm:3367
 msgid "Search Comment"
 msgstr "Vyhledat komentář"
 
-#: gmusicbrowser_list.pm:3367
+#: gmusicbrowser_list.pm:3369
 msgid "Search Genre"
 msgstr "Vyhledat žánr"
 
-#: gmusicbrowser_list.pm:3366
+#: gmusicbrowser_list.pm:3368
 msgid "Search Label"
 msgstr "Vyhledat štítek"
 
-#: gmusicbrowser_list.pm:3362
+#: plugins/fetch_cover.pm:45
+msgid "Search Picture"
+msgstr ""
+
+#: gmusicbrowser_list.pm:3364
 msgid "Search Title"
 msgstr "Vyhledat titul"
 
-#: gmusicbrowser_list.pm:3359
+#: gmusicbrowser_list.pm:3361
 msgid "Search Title, Artist and Album"
 msgstr "Vyhledat titul, interpreta a album"
 
-#: gmusicbrowser_list.pm:3360
+#: gmusicbrowser_list.pm:3362
 msgid "Search Title, Artist, Album, Comment, Label and Genre"
 msgstr "Vyhledat titul, interpreta, album, komentář, štítek a žánr"
 
-#: gmusicbrowser_list.pm:3361
+#: gmusicbrowser_list.pm:3363
 msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
 msgstr ""
 "Vyhledat titul, interpreta, album, komentář, štítek, žánr a název souboru"
 
-#: plugins/artistinfo.pm:39
+#: plugins/artistinfo.pm:40
 msgid "Search allmusic for Artist"
 msgstr "Vyhledat interpreta na stránkách allmusic"
 
-#: plugins/artistinfo.pm:37
+#: plugins/artistinfo.pm:38
 msgid "Search amazon.com for Artist"
 msgstr "Vyhledat interpreta na stránkách amazon.com"
 
@@ -3190,51 +3370,55 @@ msgstr "Vyhledat interpreta na stránkách amazon.com"
 msgid "Search and display lyrics"
 msgstr "Vyhledat a zobrazit texty"
 
-#: plugins/artistinfo.pm:41
+#: plugins/artistinfo.pm:42
 msgid "Search discogs for Artist"
 msgstr "Vyhledat interpreta na stránkách discogs"
 
-#: plugins/artistinfo.pm:36
+#: plugins/artistinfo.pm:37
 msgid "Search for Artist on youtube"
 msgstr "Vyhledat interpreta na stránkách youtube"
 
-#: plugins/fetch_cover.pm:45 plugins/fetch_cover.pm:50
+#: plugins/fetch_cover.pm:51
 msgid "Search for a picture on internet"
 msgstr "Vyhledat obrázek na internetu"
 
-#: plugins/fetch_cover.pm:94
+#: plugins/artistinfo.pm:269
+msgid "Search for artist on:"
+msgstr ""
+
+#: plugins/fetch_cover.pm:96
 msgid "Search for current album"
 msgstr "Vyhledat stávající album"
 
-#: plugins/fetch_cover.pm:94
+#: plugins/fetch_cover.pm:96
 msgid "Search for current artist"
 msgstr "Vyhledat stávajícího interpreta"
 
-#: gmusicbrowser.pl:5886
+#: gmusicbrowser.pl:5847
 msgid "Search for new songs on startup"
 msgstr "Vyhledat nové skladby při spuštění"
 
-#: plugins/artistinfo.pm:38
+#: plugins/artistinfo.pm:39
 msgid "Search google for Artist"
 msgstr "Použít google pro vyhledání interpreta"
 
-#: gmusicbrowser_list.pm:3400
+#: gmusicbrowser_list.pm:3402
 msgid "Search options"
 msgstr "Možnosti hledání"
 
-#: plugins/artistinfo.pm:40
+#: plugins/artistinfo.pm:41
 msgid "Search pitchfork for Artist"
 msgstr "Vyhledat interpreta na stránkách pitchfork"
 
-#: plugins/artistinfo.pm:114 plugins/artistinfo.pm:261
+#: plugins/artistinfo.pm:354
 msgid "Search the web for artist"
 msgstr "Vyhledat interpreta na internetu"
 
-#: gmusicbrowser.pl:5734
+#: gmusicbrowser.pl:5695
 msgid "Search window layout :"
 msgstr "Styl okna hledání :"
 
-#: plugins/fetch_cover.pm:169
+#: plugins/fetch_cover.pm:171
 msgid "Searching for a picture of : "
 msgstr "Hledání obrázku :"
 
@@ -3254,11 +3438,11 @@ msgstr "Vybrat pole"
 msgid "Select files"
 msgstr "Vybrat soubory"
 
-#: gmusicbrowser_list.pm:5081
+#: gmusicbrowser_list.pm:5093
 msgid "Select matches"
 msgstr "Zvolit shody"
 
-#: gmusicbrowser_list.pm:3491
+#: gmusicbrowser_list.pm:3493
 msgid "Select search fields"
 msgstr "Zvoli pole vyhledávání"
 
@@ -3270,7 +3454,7 @@ msgstr "Vybráno :"
 msgid "Selected songs"
 msgstr "Vybrané skladby"
 
-#: gmusicbrowser.pl:5097
+#: gmusicbrowser.pl:5058
 msgid "Selecting pictures"
 msgstr "Výběr obrázků"
 
@@ -3286,11 +3470,11 @@ msgstr "Odeslat Titul/Interpret/Album na standardní vstup"
 msgid "Set Current Song Rating"
 msgstr "Hodnotit stávající skladbu"
 
-#: gmusicbrowser.pl:431 gmusicbrowser_list.pm:1639
+#: gmusicbrowser.pl:431 gmusicbrowser_list.pm:1640
 msgid "Set Picture"
 msgstr "Nastavit obrázek"
 
-#: gmusicbrowser_list.pm:1623
+#: gmusicbrowser_list.pm:1624
 msgid "Set as primary filter"
 msgstr "Nastavit jako primární filtr"
 
@@ -3298,11 +3482,11 @@ msgstr "Nastavit jako primární filtr"
 msgid "Set focus on a layout widget"
 msgstr "Vybrat zaměření pomůcky rozložení"
 
-#: gmusicbrowser_list.pm:6494
+#: gmusicbrowser_list.pm:6516
 msgid "Set grouping"
 msgstr "Nastavit seskupování"
 
-#: gmusicbrowser.pl:6075 gmusicbrowser_list.pm:1647
+#: gmusicbrowser.pl:6036 gmusicbrowser_list.pm:1648
 msgid "Set icon"
 msgstr "Nastavit ikonu"
 
@@ -3310,12 +3494,12 @@ msgstr "Nastavit ikonu"
 msgid "Set player window layout"
 msgstr "Nastavit rozložení okna přehrávače"
 
-#: gmusicbrowser_list.pm:1560
+#: gmusicbrowser_list.pm:1561
 msgid "Set subgroup"
 msgstr "Nastavit podskupinu"
 
-#: gmusicbrowser.pl:447 gmusicbrowser.pl:5199 gmusicbrowser_layout.pm:39
-#: gmusicbrowser_layout.pm:114
+#: gmusicbrowser.pl:447 gmusicbrowser.pl:5160 gmusicbrowser_layout.pm:40
+#: gmusicbrowser_layout.pm:115
 msgid "Settings"
 msgstr "Nastavení"
 
@@ -3341,23 +3525,23 @@ msgstr "Shift"
 msgid "Show"
 msgstr "Zobrazit"
 
-#: plugins/artistinfo.pm:34
+#: plugins/artistinfo.pm:35
 msgid "Show Artist page on last.fm"
 msgstr "Zobrazit stránky interpreta na last.fm"
 
-#: plugins/artistinfo.pm:35
+#: plugins/artistinfo.pm:36
 msgid "Show Artist page on wikipedia"
 msgstr "Zobrazit stránky interpreta na wikipedii"
 
-#: plugins/artistinfo.pm:112
+#: plugins/artistinfo.pm:30
 msgid "Show artist's biography"
 msgstr "Zobrazit biografii interpreta"
 
-#: plugins/artistinfo.pm:113
+#: plugins/artistinfo.pm:31
 msgid "Show artist's upcoming events"
 msgstr "Zobrazit nadcházející plánované akce interpreta"
 
-#: gmusicbrowser_list.pm:1657
+#: gmusicbrowser_list.pm:1658
 msgid "Show buttons"
 msgstr "Zobrazit tlačítka"
 
@@ -3365,25 +3549,33 @@ msgstr "Zobrazit tlačítka"
 msgid "Show replaygain submenu"
 msgstr "Zobrazit podnabídku replaygain"
 
-#: gmusicbrowser_list.pm:3377
+#: plugins/artistinfo.pm:32
+msgid "Show similar artists"
+msgstr ""
+
+#: gmusicbrowser_list.pm:3379
 msgid "Show suggestions"
 msgstr "Zobrazit návrhy"
 
-#: gmusicbrowser_list.pm:1659
+#: gmusicbrowser_list.pm:1660
 msgid "Show tabs"
 msgstr "Zobrazit tebelátory"
 
-#: gmusicbrowser.pl:5720
+#: gmusicbrowser.pl:5681
 msgid "Show tray icon"
 msgstr "Zobrazit ikonu v oznamovací oblasti"
 
-#: gmusicbrowser.pl:5718
+#: gmusicbrowser.pl:5679
 msgid "Show tray tip on song change"
 msgstr "Zobrazit okno oznamovací oblasti při změně skladby"
 
 #: gmusicbrowser.pl:1032
 msgid "Show/Hide"
 msgstr "Zobrazit/skrýt"
+
+#: layouts:67
+msgid "Show/Hide elements"
+msgstr ""
 
 #: gmusicbrowser.pl:1072
 msgid "Show/Hide layout widget(s)"
@@ -3401,12 +3593,12 @@ msgstr "Zobrazit/skrýt URI vstup"
 msgid "Show/hide status bar"
 msgstr "Zobrazit/skrýt stavový řádek"
 
-#: gmusicbrowser_layout.pm:1332 gmusicbrowser_layout.pm:1384
+#: gmusicbrowser_layout.pm:1367 gmusicbrowser_layout.pm:1419
 #: gmusicbrowser_songs.pm:807
 msgid "Shuffle"
 msgstr "Zamíchat"
 
-#: gmusicbrowser_layout.pm:33
+#: gmusicbrowser_layout.pm:34
 msgid "Shuffle queue"
 msgstr "Zamíchat frontu"
 
@@ -3418,11 +3610,19 @@ msgstr "Zamíchaná alba"
 msgid "Shuffled albums, shuffled tracks"
 msgstr "Zamíchaná alba, zamíchané stopy"
 
-#: gmusicbrowser.pl:5653
+#: gmusicbrowser.pl:5614
 msgid "Shutdown command :"
 msgstr "Příkaz pro vypnutí :"
 
-#: gmusicbrowser.pl:7822 gmusicbrowser_songs.pm:455
+#: plugins/epicrating.pm:474
+msgid "Signal: "
+msgstr ""
+
+#: plugins/audioscrobbler.pm:64
+msgid "Site :"
+msgstr ""
+
+#: gmusicbrowser.pl:7783 gmusicbrowser_songs.pm:455
 msgid "Size"
 msgstr "Velikost"
 
@@ -3430,31 +3630,31 @@ msgstr "Velikost"
 msgid "Skip count"
 msgstr "Přeskočit počet"
 
-#: gmusicbrowser.pl:5548
+#: gmusicbrowser.pl:5509
 msgid "Skip to next song if an error occurs"
 msgstr "Při chybě přeskočit na další skladbu"
 
-#: layouts:123
+#: layouts:171
 msgid "Small player"
 msgstr "Malý přehrávač"
 
-#: layouts:211
+#: layouts:276
 msgid "Smaller browser"
 msgstr "Menší prohlížeč"
 
-#: gmusicbrowser_list.pm:731 layouts:334 layouts:437 layouts:443
+#: gmusicbrowser_list.pm:731 layouts:399 layouts:502 layouts:508
 msgid "Song"
 msgstr "Skladba"
 
-#: gmusicbrowser.pl:389 gmusicbrowser.pl:4632
+#: gmusicbrowser.pl:389 gmusicbrowser.pl:4593
 msgid "Song Properties"
 msgstr "Vlastnosti skladby"
 
-#: gmusicbrowser_layout.pm:3680
+#: gmusicbrowser_layout.pm:3715
 msgid "Song rating"
 msgstr "Hodnocení skladby"
 
-#: gmusicbrowser.pl:6782
+#: gmusicbrowser.pl:6743
 msgid "SongTree groupings edition"
 msgstr "Edice seskupení stromu skladeb"
 
@@ -3462,19 +3662,19 @@ msgstr "Edice seskupení stromu skladeb"
 msgid "Songs Properties"
 msgstr "Vlastnosti skladeb"
 
-#: gmusicbrowser_layout.pm:481
+#: gmusicbrowser_layout.pm:516
 msgid "Sort"
 msgstr "Třídit"
 
-#: gmusicbrowser.pl:6778
+#: gmusicbrowser.pl:6739
 msgid "Sort mode edition"
 msgstr "Edice režimu třídění"
 
-#: gmusicbrowser.pl:7255
+#: gmusicbrowser.pl:7216
 msgid "Sort order"
 msgstr "Třídit pořadí"
 
-#: gmusicbrowser.pl:5656
+#: gmusicbrowser.pl:5617
 msgid "Split artist names on :"
 msgstr "Rozdělit jména interpreta na :"
 
@@ -3482,40 +3682,40 @@ msgstr "Rozdělit jména interpreta na :"
 msgid "Standard fields"
 msgstr "Standardní pole"
 
-#: gmusicbrowser.pl:5716
+#: gmusicbrowser.pl:5677
 msgid "Start in tray"
 msgstr "Spustit v oznamovací oblasti"
 
-#: gmusicbrowser.pl:438 gmusicbrowser.pl:1020 gmusicbrowser_layout.pm:62
+#: gmusicbrowser.pl:438 gmusicbrowser.pl:1020 gmusicbrowser_layout.pm:63
 #: plugins/notify.pm:89
 msgid "Stop"
 msgstr "Zastavit"
 
-#: gmusicbrowser.pl:5032
+#: gmusicbrowser.pl:4993
 msgid "Stop checking"
 msgstr "Zastavit kontrolu"
 
-#: gmusicbrowser.pl:5069
+#: gmusicbrowser.pl:5030
 msgid "Stop scanning"
 msgstr "Zastavit prohledávání"
 
-#: gmusicbrowser.pl:5097
+#: gmusicbrowser.pl:5058
 msgid "Stop selecting pictures"
 msgstr "Zastavit výběr obrázků"
 
-#: gmusicbrowser_layout.pm:29
+#: gmusicbrowser_layout.pm:30
 msgid "Stop when queue empty"
 msgstr "Zastavit po vyprázdnění fronty"
 
-#: layouts:725
+#: layouts:870
 msgid "Stop, Play and Next buttons"
 msgstr "Tlačítka zastavit, přehrát a další"
 
-#: layouts:730
+#: layouts:875
 msgid "Stop, Play and Next buttons and Time"
 msgstr "Tlačítka Zastavit, Přehrát, Další a Čas"
 
-#: layouts:735
+#: layouts:880
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr "Tlačítka Zastavit, Přehrát, Další a Titul/Interpret"
 
@@ -3523,21 +3723,21 @@ msgstr "Tlačítka Zastavit, Přehrát, Další a Titul/Interpret"
 msgid "Strip wikipedia pages"
 msgstr "Pruh stránek Wikipedie"
 
-#: plugins/audioscrobbler.pm:179
+#: plugins/audioscrobbler.pm:191
 msgid "Submit Now-Playing OK"
 msgstr "Postoupení NowPlaying OK"
 
-#: plugins/audioscrobbler.pm:172
+#: plugins/audioscrobbler.pm:184
 msgid "Submit OK"
 msgstr "Postoupení OK"
 
-#: plugins/audioscrobbler.pm:197
+#: plugins/audioscrobbler.pm:209
 msgid "Submit failed : "
 msgstr "Selhání postoupení :"
 
-#: plugins/audioscrobbler.pm:11
-msgid "Submit played songs to last.fm"
-msgstr "Postoupit přehrávané skladby na last.fm"
+#: plugins/audioscrobbler.pm:12
+msgid "Submit played songs to last.fm/libre.fm"
+msgstr ""
 
 #: gmusicbrowser_tags.pm:1584
 msgid "Subtitle"
@@ -3551,11 +3751,11 @@ msgstr "Nadpis zprávy :"
 msgid "Sunday"
 msgstr "Neděle"
 
-#: gmusicbrowser_layout.pm:42
+#: gmusicbrowser_layout.pm:43
 msgid "Switch to fullscreen mode"
 msgstr "Přepnout do režimu celé obrazovky"
 
-#: plugins/audioscrobbler.pm:124
+#: plugins/audioscrobbler.pm:136
 msgid "System clock is not close enough to the current time"
 msgstr "Systémový čas se liší od stávajícího"
 
@@ -3563,11 +3763,11 @@ msgstr "Systémový čas se liší od stávajícího"
 msgid "System command :"
 msgstr "Systémový příkaz :"
 
-#: gmusicbrowser.pl:4608 gmusicbrowser.pl:4645
+#: gmusicbrowser.pl:4569 gmusicbrowser.pl:4606
 msgid "Tag"
 msgstr "Popisek"
 
-#: gmusicbrowser.pl:5214
+#: gmusicbrowser.pl:5175
 msgid "Tags"
 msgstr "Popisky"
 
@@ -3579,7 +3779,7 @@ msgstr "Podmínky používání"
 msgid "Text"
 msgstr "Text"
 
-#: gmusicbrowser.pl:7873
+#: gmusicbrowser.pl:7834
 msgid "The [most/less]"
 msgstr "Nej[více/méně]"
 
@@ -3591,7 +3791,7 @@ msgstr "Tato pole mohou být použita :"
 msgid "This command is required to play files of type {type} : {cmd}"
 msgstr "K přehrání souborů typu {type} je požadován příkaz : {cmd}"
 
-#: gmusicbrowser.pl:5984 gmusicbrowser.pl:6058
+#: gmusicbrowser.pl:5945 gmusicbrowser.pl:6019
 msgid "This label is set for %d song."
 msgid_plural "This label is set for %d songs."
 msgstr[0] "Tento štítek je nastaven pro %d skladbu."
@@ -3610,7 +3810,7 @@ msgstr ""
 "Tento zásuvný modul vyhledává informace příslušné interpretovi (biografie, "
 "plánované akce) na last.fm"
 
-#: gmusicbrowser.pl:5700
+#: gmusicbrowser.pl:5661
 msgid "Threshold to count a song as played :"
 msgstr "Limit počítání skladby jako přehrané :"
 
@@ -3626,7 +3826,7 @@ msgstr "Po dobu :"
 msgid "Timespan of the fade-out in seconds"
 msgstr "Časová rozteč slábnutí ve vteřinách"
 
-#: gmusicbrowser.pl:849 gmusicbrowser.pl:7768 gmusicbrowser_songs.pm:461
+#: gmusicbrowser.pl:849 gmusicbrowser.pl:7729 gmusicbrowser_songs.pm:461
 #: gmusicbrowser_tags.pm:1527 gmusicbrowser_tags.pm:1566
 #: gmusicbrowser_tags.pm:1581 gmusicbrowser_tags.pm:1602
 #: gmusicbrowser_tags.pm:1605 gmusicbrowser_tags.pm:1852
@@ -3666,7 +3866,7 @@ msgstr "Přepnout štítek stávající skladby"
 msgid "Toggle between Random/Shuffle and Ordered"
 msgstr "Přepnout mezi Náhodně/Zamíchat a Pořadí"
 
-#: gmusicbrowser.pl:1064 gmusicbrowser_layout.pm:606
+#: gmusicbrowser.pl:1064 gmusicbrowser_layout.pm:641
 msgid "Toggle fullscreen mode"
 msgstr "Celá obrazovka"
 
@@ -3674,7 +3874,7 @@ msgstr "Celá obrazovka"
 msgid "Toggle the fullscreen layout"
 msgstr "Přepnout celoobrazovkové rozložení"
 
-#: gmusicbrowser.pl:7798 gmusicbrowser_songs.pm:574 gmusicbrowser_tags.pm:1533
+#: gmusicbrowser.pl:7759 gmusicbrowser_songs.pm:574 gmusicbrowser_tags.pm:1533
 #: gmusicbrowser_tags.pm:1571 gmusicbrowser_tags.pm:1587
 #: gmusicbrowser_tags.pm:1615 gmusicbrowser_tags.pm:1852
 msgid "Track"
@@ -3688,7 +3888,7 @@ msgstr "Zisk stopy"
 msgid "Track peak"
 msgstr "Nejvyšší úroveň stopy"
 
-#: gmusicbrowser.pl:5732
+#: gmusicbrowser.pl:5693
 msgid "Tray tip window layout :"
 msgstr "Styl vyskakovacího okna oznamovací oblasti :"
 
@@ -3700,7 +3900,7 @@ msgstr "Úterý"
 msgid "Turn Off"
 msgstr "Vypnout"
 
-#: gmusicbrowser_layout.pm:31
+#: gmusicbrowser_layout.pm:32
 msgid "Turn off computer when queue empty"
 msgstr "Vypnout počítač po vyprázdnění fronty"
 
@@ -3732,7 +3932,7 @@ msgstr "Odemknout interpreta"
 msgid "Unnamed custom command"
 msgstr "Nepojmenovaný uživatelský příkaz"
 
-#: gmusicbrowser.pl:8800 gmusicbrowser_songs.pm:3663
+#: gmusicbrowser.pl:8761 gmusicbrowser_songs.pm:3663
 msgid "Unnamed filter"
 msgstr "Nepojmenovaný filtr"
 
@@ -3748,11 +3948,11 @@ msgstr "Nahoře vlevo"
 msgid "Upper right"
 msgstr "Nahoře vpravo"
 
-#: gmusicbrowser.pl:5506
+#: gmusicbrowser.pl:5467
 msgid "Use Equalizer"
 msgstr "Použít ekvalizér"
 
-#: gmusicbrowser.pl:5765
+#: gmusicbrowser.pl:5726
 msgid ""
 "Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are "
 "probably better supported by other softwares"
@@ -3772,7 +3972,7 @@ msgstr "Použít ReplayGain"
 msgid "Use WebKit"
 msgstr "Použít WebKit"
 
-#: gmusicbrowser.pl:5907
+#: gmusicbrowser.pl:5868
 msgid "Use a master filter"
 msgstr "Použít hlavní filtr"
 
@@ -3784,15 +3984,15 @@ msgstr "Použít normalizaci alba místo normalizace stopy"
 msgid "Use default regular expression"
 msgstr "Použít výchozí obvyklý výraz"
 
-#: gmusicbrowser.pl:5525
+#: gmusicbrowser.pl:5486
 msgid "Use gstreamer"
 msgstr "Použít gstreamer"
 
-#: gmusicbrowser.pl:5766
+#: gmusicbrowser.pl:5727
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "U ID3v2 popisků použít kódování latin1 pokud je dostupné "
 
-#: plugins/artistinfo.pm:180
+#: plugins/artistinfo.pm:208
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
@@ -3806,11 +4006,11 @@ msgstr ""
 msgid "Use the playing filter"
 msgstr "Použít přehrávaný filtr"
 
-#: plugins/fetch_cover.pm:442
+#: plugins/fetch_cover.pm:444
 msgid "Use this picture as cover for album '{album}'"
 msgstr "Použít tento obrázek jako přebal pro album '{album}'"
 
-#: plugins/fetch_cover.pm:445
+#: plugins/fetch_cover.pm:447
 msgid "Use this picture for artist '{artist}'"
 msgstr "Použít tento obrázek pro interpreta '{artist}'"
 
@@ -3822,7 +4022,7 @@ msgstr "Pro přehrání souborů {ext} použít {command}"
 msgid "Used for clipping prevention"
 msgstr "Použito k prevenci ořezu"
 
-#: gmusicbrowser.pl:5658 gmusicbrowser.pl:5668
+#: gmusicbrowser.pl:5619 gmusicbrowser.pl:5629
 msgid "Used for the Artists field"
 msgstr "Použít pro pole interpret"
 
@@ -3830,7 +4030,7 @@ msgstr "Použít pro pole interpret"
 msgid "Used to associate the saved value with a user or a function"
 msgstr "Použito k přiřazení uložené hodnoty k uživateli nebo funkci"
 
-#: plugins/audioscrobbler.pm:122
+#: plugins/audioscrobbler.pm:134
 msgid "User authentification error"
 msgstr "Chyba ověření uživatele"
 
@@ -3846,12 +4046,12 @@ msgstr "Hodnota zapsána v popisku souboru"
 msgid "Various artists"
 msgstr "Různí interpreti"
 
-#: gmusicbrowser.pl:7943 gmusicbrowser_songs.pm:717 gmusicbrowser_tags.pm:1528
+#: gmusicbrowser.pl:7904 gmusicbrowser_songs.pm:717 gmusicbrowser_tags.pm:1528
 #: gmusicbrowser_tags.pm:1567
 msgid "Version"
 msgstr "Verze"
 
-#: layouts:295
+#: layouts:360
 msgid "View"
 msgstr "Zobrazení"
 
@@ -3863,23 +4063,23 @@ msgstr "Zobrazit binární"
 msgid "View binary data ..."
 msgstr "Zobrazit binární data ..."
 
-#: layouts:699
+#: layouts:844
 msgid "Volume"
 msgstr "Hlasitost"
 
-#: gmusicbrowser_layout.pm:207
+#: gmusicbrowser_layout.pm:230
 msgid "Volume : "
 msgstr "Hlasitost : "
 
-#: gmusicbrowser.pl:5694
+#: gmusicbrowser.pl:5655
 msgid "Volume step :"
 msgstr "Krok nastavení hlasitosti :"
 
-#: gmusicbrowser_layout.pm:28
+#: gmusicbrowser_layout.pm:29
 msgid "Wait when queue empty"
 msgstr "Čekat do vyprázdnění fronty"
 
-#: gmusicbrowser.pl:5763
+#: gmusicbrowser.pl:5724
 msgid ""
 "Warning : these are advanced options, don't change them unless you know what "
 "you are doing."
@@ -3887,7 +4087,7 @@ msgstr ""
 "Pozor : toto jsou pokročilé volby, neměňte je, pokud si nejste jisti tím, co "
 "děláte."
 
-#: gmusicbrowser.pl:6250
+#: gmusicbrowser.pl:6211
 msgid "Warning : using a folder with invalid encoding, you should rename it."
 msgstr ""
 
@@ -3915,11 +4115,11 @@ msgstr "zásuvný modul webowého kontextu"
 msgid "Wednesday"
 msgstr "Středa"
 
-#: gmusicbrowser_layout.pm:1373
+#: gmusicbrowser_layout.pm:1408
 msgid "Weighted Random"
 msgstr "Náhodný význam"
 
-#: gmusicbrowser.pl:5698
+#: gmusicbrowser.pl:5659
 msgid ""
 "When changing songs, the previous song is added to the recent list even if "
 "not played at all."
@@ -3939,7 +4139,7 @@ msgstr "Wikipedie"
 msgid "Wikipedia Locale"
 msgstr "Místní Wikipedie"
 
-#: gmusicbrowser.pl:5770
+#: gmusicbrowser.pl:5731
 msgid ""
 "Will not write the tags except with the advanced tag editing dialog. The "
 "changes will be kept in the library instead.\n"
@@ -3957,7 +4157,7 @@ msgstr "Win"
 msgid "Windows"
 msgstr "Okna"
 
-#: gmusicbrowser_list.pm:5059
+#: gmusicbrowser_list.pm:5071
 msgid "Words that begin with"
 msgstr "Slova začínající na"
 
@@ -3969,7 +4169,7 @@ msgstr "Zapsat názvy souborů do ..."
 msgid "Writing tags"
 msgstr "Zápis popisků"
 
-#: gmusicbrowser.pl:7792 gmusicbrowser_songs.pm:562 gmusicbrowser_tags.pm:1593
+#: gmusicbrowser.pl:7753 gmusicbrowser_songs.pm:562 gmusicbrowser_tags.pm:1593
 #: gmusicbrowser_tags.pm:1608 gmusicbrowser_tags.pm:1852
 msgid "Year"
 msgstr "Rok"
@@ -3988,23 +4188,23 @@ msgstr ""
 "<b>tučně</b> <i>kurzíva</i> <u>podtržené</u>\n"
 "Označení může být ignorováno notifikačním démonem"
 
-#: gmusicbrowser.pl:4338
+#: gmusicbrowser.pl:4299
 msgid "You must specify a base folder"
 msgstr "Je nutné nastavit hlavní složku"
 
-#: gmusicbrowser_list.pm:780 gmusicbrowser_list.pm:6499
+#: gmusicbrowser_list.pm:780 gmusicbrowser_list.pm:6521
 msgid "_Insert column"
 msgstr "_Vložit sloupec"
 
-#: gmusicbrowser_list.pm:787 gmusicbrowser_list.pm:6506
+#: gmusicbrowser_list.pm:787 gmusicbrowser_list.pm:6528
 msgid "_Remove this column"
 msgstr "_Odstranit tento sloupec"
 
-#: gmusicbrowser.pl:4071
+#: gmusicbrowser.pl:4029
 msgid "_Retry"
 msgstr "_Zkusit znovu"
 
-#: gmusicbrowser_list.pm:779 gmusicbrowser_list.pm:6492
+#: gmusicbrowser_list.pm:779 gmusicbrowser_list.pm:6514
 msgid "_Sort by"
 msgstr "_Třídit dle"
 
@@ -4012,27 +4212,27 @@ msgstr "_Třídit dle"
 msgid "a bright coloured fish"
 msgstr "a bright coloured fish"
 
-#: gmusicbrowser.pl:7957 gmusicbrowser.pl:7967
+#: gmusicbrowser.pl:7918 gmusicbrowser.pl:7928
 msgid "a flac file"
 msgstr "soubor flac"
 
-#: gmusicbrowser.pl:7955 gmusicbrowser.pl:7965
+#: gmusicbrowser.pl:7916 gmusicbrowser.pl:7926
 msgid "a mp3 file"
 msgstr "soubor mp3"
 
-#: gmusicbrowser.pl:7958 gmusicbrowser.pl:7968
+#: gmusicbrowser.pl:7919 gmusicbrowser.pl:7929
 msgid "a musepack file"
 msgstr "soubor musepack"
 
-#: gmusicbrowser.pl:7959 gmusicbrowser.pl:7969
+#: gmusicbrowser.pl:7920 gmusicbrowser.pl:7930
 msgid "a wavepack file"
 msgstr "soubor wavepack"
 
-#: gmusicbrowser.pl:3736
+#: gmusicbrowser.pl:3694
 msgid "abort copy"
 msgstr "Zrušit kopírování"
 
-#: gmusicbrowser.pl:3737
+#: gmusicbrowser.pl:3695
 msgid "abort move"
 msgstr "Zrušit přesouvání"
 
@@ -4040,20 +4240,20 @@ msgstr "Zrušit přesouvání"
 msgid "add"
 msgstr "Přidat"
 
-#: gmusicbrowser.pl:7865
+#: gmusicbrowser.pl:7826
 msgid "added"
 msgstr "Přidáno"
 
-#: gmusicbrowser.pl:5570
+#: gmusicbrowser.pl:5531
 msgid "advanced options"
 msgstr "pokročilé volby"
 
-#: gmusicbrowser.pl:7845 gmusicbrowser.pl:7853 gmusicbrowser.pl:7861
-#: gmusicbrowser.pl:7869
+#: gmusicbrowser.pl:7806 gmusicbrowser.pl:7814 gmusicbrowser.pl:7822
+#: gmusicbrowser.pl:7830
 msgid "after %d"
 msgstr "po %d"
 
-#: gmusicbrowser_list.pm:1549
+#: gmusicbrowser_list.pm:1550
 msgid "alphabetical"
 msgstr "abecedně"
 
@@ -4061,11 +4261,11 @@ msgstr "abecedně"
 msgid "amixer control :"
 msgstr "ovládání amixeru :"
 
-#: gmusicbrowser.pl:7960 gmusicbrowser.pl:7970
+#: gmusicbrowser.pl:7921 gmusicbrowser.pl:7931
 msgid "an ape file"
 msgstr "soubor ape"
 
-#: gmusicbrowser.pl:7956 gmusicbrowser.pl:7966
+#: gmusicbrowser.pl:7917 gmusicbrowser.pl:7927
 msgid "an ogg file"
 msgstr "soubor ogg"
 
@@ -4081,7 +4281,7 @@ msgstr "použít filtr"
 msgid "argument {n} :"
 msgstr "argument {n} :"
 
-#: gmusicbrowser_list.pm:1555 gmusicbrowser_songs.pm:836
+#: gmusicbrowser_list.pm:1556 gmusicbrowser_songs.pm:836
 #: gmusicbrowser_tags.pm:2025
 msgid "artist"
 msgstr "interpret"
@@ -4098,7 +4298,7 @@ msgstr "automaticky vyplnit"
 msgid "autofill queue"
 msgstr "automaticky vyplnit frontu"
 
-#: gmusicbrowser_list.pm:1528
+#: gmusicbrowser_list.pm:1529
 msgid "automatic size"
 msgstr "automatická velikost"
 
@@ -4114,29 +4314,29 @@ msgstr "skupina"
 msgid "band/artist logotype"
 msgstr "logotyp skupiny/interpreta"
 
-#: gmusicbrowser.pl:7844 gmusicbrowser.pl:7852 gmusicbrowser.pl:7860
-#: gmusicbrowser.pl:7868
+#: gmusicbrowser.pl:7805 gmusicbrowser.pl:7813 gmusicbrowser.pl:7821
+#: gmusicbrowser.pl:7829
 msgid "before %d"
 msgstr "před %d"
 
-#: gmusicbrowser.pl:7846 gmusicbrowser.pl:7854 gmusicbrowser.pl:7862
-#: gmusicbrowser.pl:7870
+#: gmusicbrowser.pl:7807 gmusicbrowser.pl:7815 gmusicbrowser.pl:7823
+#: gmusicbrowser.pl:7831
 msgid "between %d( and )%d"
 msgstr "mezi %d( a )%d"
 
-#: gmusicbrowser.pl:7832 gmusicbrowser.pl:7839
+#: gmusicbrowser.pl:7793 gmusicbrowser.pl:7800
 msgid "between %n( and )%n"
 msgstr "mezi %n( a )%n"
 
-#: gmusicbrowser_list.pm:1531 gmusicbrowser_list.pm:1536
+#: gmusicbrowser_list.pm:1532 gmusicbrowser_list.pm:1537
 msgid "big size"
 msgstr "velká velikost"
 
-#: plugins/artistinfo.pm:112
+#: plugins/artistinfo.pm:30
 msgid "biography"
 msgstr "biografie"
 
-#: gmusicbrowser.pl:7974
+#: gmusicbrowser.pl:7935
 msgid "bitrate"
 msgstr "datový tok"
 
@@ -4156,7 +4356,7 @@ msgstr "bootleg"
 msgid "broken"
 msgstr "poškozeno"
 
-#: gmusicbrowser.pl:5378 gmusicbrowser.pl:6342 plugins/desktopwidget.pm:138
+#: gmusicbrowser.pl:5339 gmusicbrowser.pl:6303 plugins/desktopwidget.pm:138
 msgid "by"
 msgstr "dle"
 
@@ -4192,11 +4392,11 @@ msgstr "od {artist} z {album}"
 msgid "bytes"
 msgstr "bytů"
 
-#: gmusicbrowser.pl:5889
+#: gmusicbrowser.pl:5850
 msgid "check now"
 msgstr "kontrolovat nyní"
 
-#: gmusicbrowser_list.pm:1607
+#: gmusicbrowser_list.pm:1608
 msgid "cloud mode"
 msgstr "režim mraky"
 
@@ -4220,17 +4420,17 @@ msgstr "skladatel"
 msgid "conductor"
 msgstr "dirigent"
 
-#: plugins/audioscrobbler.pm:119 plugins/audioscrobbler.pm:168
+#: plugins/audioscrobbler.pm:131 plugins/audioscrobbler.pm:180
 msgid "connection failed"
 msgstr "selhání spojení"
 
-#: plugins/fetch_cover.pm:321
+#: plugins/fetch_cover.pm:323
 msgid "connection failed."
 msgstr "selhání spojení."
 
-#: gmusicbrowser.pl:7769 gmusicbrowser.pl:7777 gmusicbrowser.pl:7785
-#: gmusicbrowser.pl:7904 gmusicbrowser.pl:7912 gmusicbrowser.pl:7918
-#: gmusicbrowser.pl:7926 gmusicbrowser.pl:7936 gmusicbrowser.pl:7944
+#: gmusicbrowser.pl:7730 gmusicbrowser.pl:7738 gmusicbrowser.pl:7746
+#: gmusicbrowser.pl:7865 gmusicbrowser.pl:7873 gmusicbrowser.pl:7879
+#: gmusicbrowser.pl:7887 gmusicbrowser.pl:7897 gmusicbrowser.pl:7905
 msgid "contains %s"
 msgstr "obsahuje %s"
 
@@ -4252,36 +4452,36 @@ msgstr "den"
 msgid "days"
 msgstr "dnů"
 
-#: gmusicbrowser.pl:997 gmusicbrowser_layout.pm:3705
-#: gmusicbrowser_layout.pm:3727
+#: gmusicbrowser.pl:997 gmusicbrowser_layout.pm:3740
+#: gmusicbrowser_layout.pm:3762
 msgid "default"
 msgstr "výchozí"
 
-#: plugins/fetch_cover.pm:75
+#: plugins/fetch_cover.pm:77
 msgid "default filename"
 msgstr "výchozí název souboru"
 
-#: plugins/fetch_cover.pm:74
+#: plugins/fetch_cover.pm:76
 msgid "default folder"
 msgstr "výchozí složka"
 
-#: layouts:486
+#: layouts:551
 msgid "default fullscreen"
 msgstr "výchozí celá obrazovka"
 
-#: gmusicbrowser.pl:6777
+#: gmusicbrowser.pl:6738
 msgid "delete selected filter"
 msgstr "smazat vybraný filtr"
 
-#: gmusicbrowser.pl:6783
+#: gmusicbrowser.pl:6744
 msgid "delete selected grouping"
 msgstr "smazat vybrané seskupení"
 
-#: gmusicbrowser.pl:6781
+#: gmusicbrowser.pl:6742
 msgid "delete selected random mode"
 msgstr "smazat vybraný náhodný režim"
 
-#: gmusicbrowser.pl:6779
+#: gmusicbrowser.pl:6740
 msgid "delete selected sort mode"
 msgstr "smazat vybraný režim třídění"
 
@@ -4293,15 +4493,15 @@ msgstr "rozdílné složky"
 msgid "disc {disc}"
 msgstr "disk {disc}"
 
-#: gmusicbrowser.pl:7770 gmusicbrowser.pl:7778 gmusicbrowser.pl:7786
-#: gmusicbrowser.pl:7905 gmusicbrowser.pl:7913 gmusicbrowser.pl:7919
-#: gmusicbrowser.pl:7927 gmusicbrowser.pl:7937 gmusicbrowser.pl:7945
+#: gmusicbrowser.pl:7731 gmusicbrowser.pl:7739 gmusicbrowser.pl:7747
+#: gmusicbrowser.pl:7866 gmusicbrowser.pl:7874 gmusicbrowser.pl:7880
+#: gmusicbrowser.pl:7888 gmusicbrowser.pl:7898 gmusicbrowser.pl:7906
 msgid "doesn't contain %s"
 msgstr "neobsahuje %s"
 
-#: gmusicbrowser.pl:7774 gmusicbrowser.pl:7782 gmusicbrowser.pl:7790
-#: gmusicbrowser.pl:7923 gmusicbrowser.pl:7933 gmusicbrowser.pl:7941
-#: gmusicbrowser.pl:7949
+#: gmusicbrowser.pl:7735 gmusicbrowser.pl:7743 gmusicbrowser.pl:7751
+#: gmusicbrowser.pl:7884 gmusicbrowser.pl:7894 gmusicbrowser.pl:7902
+#: gmusicbrowser.pl:7910
 msgid "doesn't match regexp %r"
 msgstr "nesouhlasí výraz %r"
 
@@ -4333,35 +4533,35 @@ msgstr "umožnit přehrávání bez mezer (pokusně)"
 msgid "error"
 msgstr "chyba"
 
-#: plugins/artistinfo.pm:113
+#: plugins/artistinfo.pm:31
 msgid "events"
 msgstr "plánované akce"
 
-#: gmusicbrowser.pl:7700
+#: gmusicbrowser.pl:7661
 msgid "ex :"
 msgstr "ex :"
 
-#: gmusicbrowser.pl:7830 gmusicbrowser.pl:7837
+#: gmusicbrowser.pl:7791 gmusicbrowser.pl:7798
 msgid "exactly %n( times)"
 msgstr "přesně %n( krát)"
 
-#: gmusicbrowser.pl:7831 gmusicbrowser.pl:7838
+#: gmusicbrowser.pl:7792 gmusicbrowser.pl:7799
 msgid "exactly not %n( times)"
 msgstr "jinak než %n( krát)"
 
-#: gmusicbrowser.pl:7718
+#: gmusicbrowser.pl:7679
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "příklad (vybraná skladba) : {score}  ({chances})"
 
-#: plugins/artistinfo.pm:201 plugins/karaoke.pm:67 plugins/lyrics.pm:197
+#: plugins/artistinfo.pm:232 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "example : "
 msgstr "příklad :"
 
-#: gmusicbrowser.pl:5684 plugins/webcontext.pm:603
+#: gmusicbrowser.pl:5645 plugins/webcontext.pm:603
 msgid "example : %s"
 msgstr "příklad : %s"
 
-#: gmusicbrowser.pl:5677
+#: gmusicbrowser.pl:5638
 msgid "examples :"
 msgstr "příklady :"
 
@@ -4377,11 +4577,11 @@ msgstr "nepravda"
 msgid "favorite"
 msgstr "oblíbené"
 
-#: gmusicbrowser.pl:7953
+#: gmusicbrowser.pl:7914
 msgid "file format"
 msgstr "formát souboru"
 
-#: gmusicbrowser.pl:7898
+#: gmusicbrowser.pl:7859
 msgid "first added"
 msgstr "prvně přidáno"
 
@@ -4393,11 +4593,11 @@ msgstr "příznaky"
 msgid "float"
 msgstr "plovoucí"
 
-#: gmusicbrowser_list.pm:1587
+#: gmusicbrowser_list.pm:1588
 msgid "font size depends on"
 msgstr "velikost písma závisí na"
 
-#: gmusicbrowser.pl:5059
+#: gmusicbrowser.pl:5020
 msgid "for files without a VBR header"
 msgstr "pro soubory bez hlavičky VBR"
 
@@ -4405,11 +4605,11 @@ msgstr "pro soubory bez hlavičky VBR"
 msgid "front cover"
 msgstr "přední přebal"
 
-#: layouts:150
+#: layouts:215
 msgid "full"
 msgstr "úplné"
 
-#: layouts:156
+#: layouts:221
 msgid "full with buttons"
 msgstr "úplné s tlačítky"
 
@@ -4421,11 +4621,11 @@ msgstr ""
 msgid "google images (hi-res)"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1599
+#: gmusicbrowser_list.pm:1600
 msgid "group by"
 msgstr "seskupit s"
 
-#: gmusicbrowser.pl:7660
+#: gmusicbrowser.pl:7621
 msgid "half-life : "
 msgstr "poločas :"
 
@@ -4433,11 +4633,11 @@ msgstr "poločas :"
 msgid "hours"
 msgstr "hodin"
 
-#: gmusicbrowser_list.pm:1537
+#: gmusicbrowser_list.pm:1538
 msgid "huge size"
 msgstr "obrovská velikost"
 
-#: gmusicbrowser.pl:5491
+#: gmusicbrowser.pl:5452
 msgid "icecast server"
 msgstr "server icecast"
 
@@ -4445,7 +4645,7 @@ msgstr "server icecast"
 msgid "id3v1 tag"
 msgstr "ID3v1 popisek"
 
-#: gmusicbrowser.pl:5671
+#: gmusicbrowser.pl:5632
 msgid "ignore title"
 msgstr "ignorovat název"
 
@@ -4453,11 +4653,11 @@ msgstr "ignorovat název"
 msgid "illustration"
 msgstr "ilustrace"
 
-#: gmusicbrowser.pl:4891
+#: gmusicbrowser.pl:4852
 msgid "imported list"
 msgstr "importovaný seznam"
 
-#: layouts:161
+#: layouts:226
 msgid "info"
 msgstr "info"
 
@@ -4469,167 +4669,167 @@ msgstr "celé číslo"
 msgid "interview"
 msgstr "interview"
 
-#: plugins/artistinfo.pm:201 plugins/karaoke.pm:67 plugins/lyrics.pm:197
+#: plugins/artistinfo.pm:232 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "invalid pattern"
 msgstr "chybná šablona"
 
-#: gmusicbrowser.pl:7608
+#: gmusicbrowser.pl:7569
 msgid "inverse"
 msgstr "inverze"
 
-#: gmusicbrowser.pl:7954
+#: gmusicbrowser.pl:7915
 msgid "is"
 msgstr "je"
 
-#: gmusicbrowser.pl:7902
+#: gmusicbrowser.pl:7863
 msgid "is %g"
 msgstr "je %g"
 
-#: gmusicbrowser.pl:7793 gmusicbrowser.pl:7799 gmusicbrowser.pl:7805
+#: gmusicbrowser.pl:7754 gmusicbrowser.pl:7760 gmusicbrowser.pl:7766
 msgid "is %n"
 msgstr "je %n"
 
-#: gmusicbrowser.pl:7811
+#: gmusicbrowser.pl:7772
 msgid "is %n( %)"
 msgstr "je %n( %)"
 
-#: gmusicbrowser.pl:7981
+#: gmusicbrowser.pl:7942
 msgid "is %n(Hz)"
 msgstr "je %n(Hz)"
 
-#: gmusicbrowser.pl:7975
+#: gmusicbrowser.pl:7936
 msgid "is %n(kbps)"
 msgstr "je %n(kbps)"
 
-#: gmusicbrowser.pl:7771 gmusicbrowser.pl:7779 gmusicbrowser.pl:7787
-#: gmusicbrowser.pl:7920 gmusicbrowser.pl:7928 gmusicbrowser.pl:7938
-#: gmusicbrowser.pl:7946
+#: gmusicbrowser.pl:7732 gmusicbrowser.pl:7740 gmusicbrowser.pl:7748
+#: gmusicbrowser.pl:7881 gmusicbrowser.pl:7889 gmusicbrowser.pl:7899
+#: gmusicbrowser.pl:7907
 msgid "is %s"
 msgstr "je %s"
 
-#: gmusicbrowser.pl:7796
+#: gmusicbrowser.pl:7757
 msgid "is after %n"
 msgstr "je po %n"
 
-#: gmusicbrowser.pl:7795
+#: gmusicbrowser.pl:7756
 msgid "is before %n"
 msgstr "je před %n"
 
-#: gmusicbrowser.pl:7825
+#: gmusicbrowser.pl:7786
 msgid "is between %b( and )%b"
 msgstr "je mezi %b( a )%b"
 
-#: gmusicbrowser.pl:7815
+#: gmusicbrowser.pl:7776
 msgid "is between %n( and )%n( %)"
 msgstr "je mezi %n( a )%n( %)"
 
-#: gmusicbrowser.pl:7820
+#: gmusicbrowser.pl:7781
 msgid "is between %n( and )%n( s)"
 msgstr "je mezi %n( a )%n( s)"
 
-#: gmusicbrowser.pl:7930
+#: gmusicbrowser.pl:7891
 msgid "is in %s"
 msgstr "je v %s"
 
-#: gmusicbrowser.pl:7951
+#: gmusicbrowser.pl:7912
 msgid "is in list %l"
 msgstr "je v seznamu %l"
 
-#: gmusicbrowser.pl:7824
+#: gmusicbrowser.pl:7785
 msgid "is less than %b"
 msgstr "je méně než %b"
 
-#: gmusicbrowser.pl:7802 gmusicbrowser.pl:7808
+#: gmusicbrowser.pl:7763 gmusicbrowser.pl:7769
 msgid "is less than %n"
 msgstr "je méně než %n"
 
-#: gmusicbrowser.pl:7814
+#: gmusicbrowser.pl:7775
 msgid "is less than %n( %)"
 msgstr "je méně než %n( %)"
 
-#: gmusicbrowser.pl:7819
+#: gmusicbrowser.pl:7780
 msgid "is less than %n( s)"
 msgstr "je méně než %n( s)"
 
-#: gmusicbrowser.pl:7984
+#: gmusicbrowser.pl:7945
 msgid "is less than %n(Hz)"
 msgstr "je méně než %n(Hz)"
 
-#: gmusicbrowser.pl:7978
+#: gmusicbrowser.pl:7939
 msgid "is less than %n(kbps)"
 msgstr "je méně než %n(kbps)"
 
-#: gmusicbrowser.pl:7823
+#: gmusicbrowser.pl:7784
 msgid "is more than %b"
 msgstr "je více než %b"
 
-#: gmusicbrowser.pl:7801 gmusicbrowser.pl:7807
+#: gmusicbrowser.pl:7762 gmusicbrowser.pl:7768
 msgid "is more than %n"
 msgstr "je více než %n"
 
-#: gmusicbrowser.pl:7813
+#: gmusicbrowser.pl:7774
 msgid "is more than %n( %)"
 msgstr "je více než %n( %)"
 
-#: gmusicbrowser.pl:7818
+#: gmusicbrowser.pl:7779
 msgid "is more than %n( s)"
 msgstr "je více než %n( s)"
 
-#: gmusicbrowser.pl:7983
+#: gmusicbrowser.pl:7944
 msgid "is more than %n(Hz)"
 msgstr "je více než %n(Hz)"
 
-#: gmusicbrowser.pl:7977
+#: gmusicbrowser.pl:7938
 msgid "is more than %n(kbps)"
 msgstr "je více než %n(kbps)"
 
-#: gmusicbrowser.pl:7964
+#: gmusicbrowser.pl:7925
 msgid "is not"
 msgstr "není"
 
-#: gmusicbrowser.pl:7800 gmusicbrowser.pl:7806
+#: gmusicbrowser.pl:7761 gmusicbrowser.pl:7767
 msgid "is not %n"
 msgstr "není %n"
 
-#: gmusicbrowser.pl:7812
+#: gmusicbrowser.pl:7773
 msgid "is not %n( %)"
 msgstr "není %n( %)"
 
-#: gmusicbrowser.pl:7772 gmusicbrowser.pl:7780 gmusicbrowser.pl:7788
-#: gmusicbrowser.pl:7921 gmusicbrowser.pl:7929 gmusicbrowser.pl:7939
-#: gmusicbrowser.pl:7947
+#: gmusicbrowser.pl:7733 gmusicbrowser.pl:7741 gmusicbrowser.pl:7749
+#: gmusicbrowser.pl:7882 gmusicbrowser.pl:7890 gmusicbrowser.pl:7900
+#: gmusicbrowser.pl:7908
 msgid "is not %s"
 msgstr "není %s"
 
-#: gmusicbrowser.pl:7985
+#: gmusicbrowser.pl:7946
 msgid "is not 44.1kHz"
 msgstr "není 44.1kHz"
 
-#: gmusicbrowser.pl:7931
+#: gmusicbrowser.pl:7892
 msgid "is not in %s"
 msgstr "není v %s"
 
-#: gmusicbrowser.pl:7952
+#: gmusicbrowser.pl:7913
 msgid "is not in list %l"
 msgstr "není v seznamu %l"
 
-#: gmusicbrowser.pl:7903
+#: gmusicbrowser.pl:7864
 msgid "isn't %g"
 msgstr "není %g"
 
-#: gmusicbrowser.pl:7794
+#: gmusicbrowser.pl:7755
 msgid "isn't %n"
 msgstr "není %n"
 
-#: gmusicbrowser.pl:7982
+#: gmusicbrowser.pl:7943
 msgid "isn't %n(Hz)"
 msgstr "není %n(Hz)"
 
-#: gmusicbrowser.pl:7976
+#: gmusicbrowser.pl:7937
 msgid "isn't %n(kbps)"
 msgstr "není %n(kbps)"
 
-#: gmusicbrowser.pl:5767
+#: gmusicbrowser.pl:5728
 msgid ""
 "itunes doesn't support unsynchronised tags last time I checked, mostly "
 "affect tags with pictures"
@@ -4637,33 +4837,43 @@ msgstr ""
 "Při posledním ověření itunes nepodporovalo nesynchronizované popisky, patrné "
 "hlavně u popisků s obrázky"
 
-#: layouts:233
+#: layouts:298
 msgid "itunes++"
 msgstr ""
 
-#: layouts:290
+#: layouts:355
 msgid "itunes-like"
 msgstr "styl itunes"
 
-#: gmusicbrowser.pl:7897
+#: gmusicbrowser.pl:7858
 msgid "last added"
 msgstr "naposled přidané"
 
-#: gmusicbrowser.pl:7841 gmusicbrowser.pl:7889
+#: gmusicbrowser.pl:7802 gmusicbrowser.pl:7850
 msgid "last played"
 msgstr "naposled přehrávané"
 
-#: gmusicbrowser.pl:7849 gmusicbrowser.pl:7893
+#: gmusicbrowser.pl:7810 gmusicbrowser.pl:7854
 msgid "last skipped"
 msgstr "naposled přeskočené"
 
-#: plugins/audioscrobbler.pm:9
-msgid "last.fm"
-msgstr "last.fm"
+#: plugins/artistinfo.pm:210
+msgid ""
+"last.fm's similarity categories:\n"
+">90 super\n"
+">70 very high\n"
+">50 high\n"
+">30 medium\n"
+">10 lower"
+msgstr ""
 
 #: plugins/audioscrobbler.pm:10
-msgid "last.fm plugin"
-msgstr "zásuvný modul last.fm"
+msgid "last.fm/libre.fm"
+msgstr ""
+
+#: plugins/audioscrobbler.pm:11
+msgid "last.fm/libre.fm plugin"
+msgstr ""
 
 #: gmusicbrowser_tags.pm:2025
 msgid "lead artist"
@@ -4673,32 +4883,32 @@ msgstr "hlavní interpret"
 msgid "leaflet page"
 msgstr "prospektová strana"
 
-#: layouts:476
+#: layouts:541
 msgid "left-side filter panes"
 msgstr "panely s filtry vlevo"
 
-#: gmusicbrowser_list.pm:1551
+#: gmusicbrowser_list.pm:1552
 msgid "length of songs"
 msgstr "délka skladeb"
 
-#: gmusicbrowser.pl:7888
+#: gmusicbrowser.pl:7849
 msgid "less played"
 msgstr "nejméně přehrávané"
 
-#: gmusicbrowser.pl:7892
+#: gmusicbrowser.pl:7853
 msgid "less skipped"
 msgstr "nejméně přeskakované"
 
-#: gmusicbrowser.pl:7842 gmusicbrowser.pl:7850 gmusicbrowser.pl:7858
-#: gmusicbrowser.pl:7866
+#: gmusicbrowser.pl:7803 gmusicbrowser.pl:7811 gmusicbrowser.pl:7819
+#: gmusicbrowser.pl:7827
 msgid "less than %a( ago)"
 msgstr "méně než před %a"
 
-#: gmusicbrowser.pl:7829 gmusicbrowser.pl:7836
+#: gmusicbrowser.pl:7790 gmusicbrowser.pl:7797
 msgid "less than %n( times)"
 msgstr "méně než %n( krát)"
 
-#: gmusicbrowser.pl:7895
+#: gmusicbrowser.pl:7856
 msgid "longest"
 msgstr "nejdelší"
 
@@ -4706,13 +4916,13 @@ msgstr "nejdelší"
 msgid "lyricist"
 msgstr "textař"
 
-#: gmusicbrowser.pl:7773 gmusicbrowser.pl:7781 gmusicbrowser.pl:7789
-#: gmusicbrowser.pl:7922 gmusicbrowser.pl:7932 gmusicbrowser.pl:7940
-#: gmusicbrowser.pl:7948
+#: gmusicbrowser.pl:7734 gmusicbrowser.pl:7742 gmusicbrowser.pl:7750
+#: gmusicbrowser.pl:7883 gmusicbrowser.pl:7893 gmusicbrowser.pl:7901
+#: gmusicbrowser.pl:7909
 msgid "match regexp %r"
 msgstr "souhlasí výraz %r"
 
-#: gmusicbrowser_list.pm:1593
+#: gmusicbrowser_list.pm:1594
 msgid "maximum font size"
 msgstr "maximální velikost písma"
 
@@ -4720,15 +4930,15 @@ msgstr "maximální velikost písma"
 msgid "media"
 msgstr "média"
 
-#: gmusicbrowser_list.pm:1530 gmusicbrowser_list.pm:1535
+#: gmusicbrowser_list.pm:1531 gmusicbrowser_list.pm:1536
 msgid "medium size"
 msgstr "střední velikost"
 
-#: layouts:143
+#: layouts:191
 msgid "minimal"
 msgstr "minimální"
 
-#: gmusicbrowser_list.pm:1590
+#: gmusicbrowser_list.pm:1591
 msgid "minimum font size"
 msgstr "nejmenší velikost písma"
 
@@ -4736,11 +4946,11 @@ msgstr "nejmenší velikost písma"
 msgid "minutes"
 msgstr "minut"
 
-#: gmusicbrowser.pl:7857
+#: gmusicbrowser.pl:7818
 msgid "modified"
 msgstr "upraveno"
 
-#: gmusicbrowser.pl:7961 gmusicbrowser.pl:7971
+#: gmusicbrowser.pl:7922 gmusicbrowser.pl:7932
 msgid "mono"
 msgstr "mono"
 
@@ -4752,28 +4962,28 @@ msgstr "měsíc"
 msgid "months"
 msgstr "měsíce"
 
-#: gmusicbrowser.pl:7843 gmusicbrowser.pl:7851 gmusicbrowser.pl:7859
-#: gmusicbrowser.pl:7867
+#: gmusicbrowser.pl:7804 gmusicbrowser.pl:7812 gmusicbrowser.pl:7820
+#: gmusicbrowser.pl:7828
 msgid "more than %a( ago)"
 msgstr "více než před %a"
 
-#: gmusicbrowser.pl:7828 gmusicbrowser.pl:7835
+#: gmusicbrowser.pl:7789 gmusicbrowser.pl:7796
 msgid "more than %n( times)"
 msgstr "více než %n( krát)"
 
-#: gmusicbrowser_list.pm:1609
+#: gmusicbrowser_list.pm:1610
 msgid "mosaic mode"
 msgstr "režim mozaika"
 
-#: gmusicbrowser.pl:7887
+#: gmusicbrowser.pl:7848
 msgid "most played"
 msgstr "nevíce přehrávané"
 
-#: gmusicbrowser.pl:7891
+#: gmusicbrowser.pl:7852
 msgid "most skipped"
 msgstr "nejvíce přeskakované"
 
-#: gmusicbrowser_list.pm:1634
+#: gmusicbrowser_list.pm:1635
 msgid "move folder"
 msgstr "přesunout složku"
 
@@ -4789,19 +4999,19 @@ msgstr "možnosti mplayeru"
 msgid "multi-lines string"
 msgstr "víceřádkový řetězec"
 
-#: gmusicbrowser.pl:6777
+#: gmusicbrowser.pl:6738
 msgid "name of the new filter"
 msgstr "název nového filtru"
 
-#: gmusicbrowser.pl:6783
+#: gmusicbrowser.pl:6744
 msgid "name of the new grouping"
 msgstr "název nového seskupení"
 
-#: gmusicbrowser.pl:6781
+#: gmusicbrowser.pl:6742
 msgid "name of the new random mode"
 msgstr "název nového náhodného režimu"
 
-#: gmusicbrowser.pl:6779
+#: gmusicbrowser.pl:6740
 msgid "name of the new sort mode"
 msgstr "název nového režimu třídění"
 
@@ -4814,7 +5024,7 @@ msgstr "nikdy"
 msgid "never played"
 msgstr "nikdy nepřehrávané"
 
-#: plugins/fetch_cover.pm:329
+#: plugins/fetch_cover.pm:331
 msgid "no matches found, you might want to remove some search terms."
 msgstr "žádná shoda nenalezena, zkuste odstranit nějakou podmínku vyhledávání"
 
@@ -4822,27 +5032,27 @@ msgstr "žádná shoda nenalezena, zkuste odstranit nějakou podmínku vyhledáv
 msgid "no order"
 msgstr "bez pořadí"
 
-#: gmusicbrowser.pl:3886 gmusicbrowser.pl:3978
+#: gmusicbrowser.pl:3844 gmusicbrowser.pl:3936
 msgid "no picture"
 msgstr "bez obrázku"
 
-#: gmusicbrowser_list.pm:1527
+#: gmusicbrowser_list.pm:1528
 msgid "no pictures"
 msgstr "bez obrázků"
 
-#: gmusicbrowser.pl:5358
+#: gmusicbrowser.pl:5319
 msgid "no plugins found"
 msgstr "zásuvný modul nenalezen"
 
-#: gmusicbrowser.pl:5661
+#: gmusicbrowser.pl:5622
 msgid "no splitting"
 msgstr "bez dělení"
 
-#: gmusicbrowser.pl:4051
+#: gmusicbrowser.pl:4009
 msgid "no to all"
 msgstr "ne pro vše"
 
-#: gmusicbrowser.pl:6812
+#: gmusicbrowser.pl:6773
 msgid "noname"
 msgstr "bezejmenné"
 
@@ -4858,32 +5068,32 @@ msgstr "po vyprázdnění fronty normální přehrávání"
 msgid "not bootleg"
 msgstr "není bootleg"
 
-#: gmusicbrowser.pl:7890
+#: gmusicbrowser.pl:7851
 msgid "not played for the longest time"
 msgstr "dlouho nepřehrávané"
 
-#: gmusicbrowser.pl:7894
+#: gmusicbrowser.pl:7855
 msgid "not skipped for the longest time"
 msgstr "dlouho nepřeskočené"
 
-#: gmusicbrowser_list.pm:1540
+#: gmusicbrowser_list.pm:1541
 msgid "number of songs"
 msgstr "počet skladeb"
 
-#: gmusicbrowser_list.pm:1550
+#: gmusicbrowser_list.pm:1551
 msgid "number of songs in filter"
 msgstr "počet skladeb ve filtru"
 
-#: gmusicbrowser.pl:7847 gmusicbrowser.pl:7855 gmusicbrowser.pl:7863
-#: gmusicbrowser.pl:7871
+#: gmusicbrowser.pl:7808 gmusicbrowser.pl:7816 gmusicbrowser.pl:7824
+#: gmusicbrowser.pl:7832
 msgid "on %d"
 msgstr "při %d"
 
-#: gmusicbrowser_list.pm:1706
+#: gmusicbrowser_list.pm:1707
 msgid "only show entries with at least n songs"
 msgstr "zobrazit jen položky obsahující minimálně n skladeb"
 
-#: plugins/artistinfo.pm:178
+#: plugins/artistinfo.pm:206
 msgid "only works when the artist-info tab is displayed"
 msgstr "Funkční jen pokud je zobrazena záložka informace o interpretovi"
 
@@ -4895,11 +5105,11 @@ msgstr "Funkční pouze s některými texty a pokud je zobrazena záložka text�
 msgid "open context window"
 msgstr "otevřít okno kontext"
 
-#: gmusicbrowser_list.pm:1707 gmusicbrowser_list.pm:5090
+#: gmusicbrowser_list.pm:1708 gmusicbrowser_list.pm:5102
 msgid "options"
 msgstr "nastavit okna"
 
-#: gmusicbrowser.pl:5701
+#: gmusicbrowser.pl:5662
 msgid "or"
 msgstr "nebo"
 
@@ -4911,11 +5121,11 @@ msgstr "další"
 msgid "other file icon"
 msgstr "jiná ikona souboru"
 
-#: gmusicbrowser.pl:5496 gmusicbrowser.pl:5503
+#: gmusicbrowser.pl:5457 gmusicbrowser.pl:5464
 msgid "output device :"
 msgstr "výstupní zařízení :"
 
-#: plugins/audioscrobbler.pm:59
+#: plugins/audioscrobbler.pm:62
 msgid "password :"
 msgstr "heslo :"
 
@@ -4923,15 +5133,15 @@ msgstr "heslo :"
 msgid "perl code"
 msgstr "perl kód"
 
-#: gmusicbrowser_list.pm:1583
+#: gmusicbrowser_list.pm:1584
 msgid "picture size"
 msgstr "velikost obrázku"
 
-#: gmusicbrowser_list.pm:1542
+#: gmusicbrowser_list.pm:1543
 msgid "play count average"
 msgstr "průměrný počet přehrání"
 
-#: gmusicbrowser.pl:7827
+#: gmusicbrowser.pl:7788
 msgid "played"
 msgstr "přehráno"
 
@@ -4939,13 +5149,17 @@ msgstr "přehráno"
 msgid "played>4"
 msgstr "přehráno>4"
 
-#: gmusicbrowser.pl:5526 gmusicbrowser.pl:5645
+#: gmusicbrowser.pl:5487 gmusicbrowser.pl:5606
 msgid "port :"
 msgstr "port :"
 
 #: gmusicbrowser_gstreamer-0.10.pm:451
 msgid "pre-amp"
 msgstr "předzesilovač"
+
+#: layouts:75
+msgid "queue, context and lists"
+msgstr ""
 
 #: gmusicbrowser.pl:328
 msgid "quit"
@@ -4955,7 +5169,7 @@ msgstr "ukončit"
 msgid "quit when queue empty"
 msgstr "ukončit po vyprázdnění fronty"
 
-#: layouts:398
+#: layouts:463
 msgid "quodlibet-like"
 msgstr "styl quodlibet"
 
@@ -4963,7 +5177,7 @@ msgstr "styl quodlibet"
 msgid "rating"
 msgstr "hodnocení"
 
-#: gmusicbrowser_list.pm:1541
+#: gmusicbrowser_list.pm:1542
 msgid "rating average"
 msgstr "průměrné hodnocení"
 
@@ -4971,120 +5185,136 @@ msgstr "průměrné hodnocení"
 msgid "recording location"
 msgstr "nahrávání umístění"
 
-#: layouts:48
+#: layouts:50 layouts:68
 msgid "reduced view"
 msgstr ""
 
-#: gmusicbrowser.pl:5650
+#: gmusicbrowser.pl:5611
 msgid "requires xdg-screensaver"
 msgstr "je požadován xdg-screensaver"
 
-#: gmusicbrowser_list.pm:1702
+#: gmusicbrowser_list.pm:1703
 msgid "reset filter {nb}"
 msgstr "vymazat filtr {nb}"
 
-#: gmusicbrowser_list.pm:1700
+#: gmusicbrowser_list.pm:1701
 msgid "reset primary filter"
 msgstr "vymazat primární filtr"
 
-#: gmusicbrowser_list.pm:1701
+#: gmusicbrowser_list.pm:1702
 msgid "reset secondary filter"
 msgstr "vymazat sekundární filtr"
 
-#: plugins/artistinfo.pm:347 plugins/lyrics.pm:365
+#: plugins/artistinfo.pm:441 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "zkusit znovu"
 
-#: plugins/audioscrobbler.pm:132
+#: plugins/audioscrobbler.pm:144
 msgid "retry in {seconds} s"
 msgstr "zkusit znovu za {seconds} s"
 
-#: gmusicbrowser.pl:7980
+#: layouts:78
+msgid "rightmost pane"
+msgstr ""
+
+#: gmusicbrowser.pl:7941
 msgid "sampling rate"
 msgstr "vzorkovací frekvence"
 
-#: gmusicbrowser.pl:6794
+#: gmusicbrowser.pl:6755
 msgid "save as '{name}'"
 msgstr "uložit jako '{name}'"
 
-#: gmusicbrowser.pl:6777
+#: gmusicbrowser.pl:6738
 msgid "save filter as"
 msgstr "uložit filtr jako"
 
-#: gmusicbrowser.pl:6783
+#: gmusicbrowser.pl:6744
 msgid "save grouping as"
 msgstr "uložit seskupení jako"
 
-#: gmusicbrowser.pl:6781
+#: gmusicbrowser.pl:6742
 msgid "save random mode as"
 msgstr "uložit náhodný režim jako"
 
-#: gmusicbrowser.pl:6779
+#: gmusicbrowser.pl:6740
 msgid "save sort mode as"
 msgstr "uložit režim třídění jako"
 
-#: gmusicbrowser.pl:6776
+#: gmusicbrowser.pl:6737
 msgid "saved filters"
 msgstr "uložené filtry"
 
-#: gmusicbrowser.pl:6782
+#: gmusicbrowser.pl:6743
 msgid "saved groupings"
 msgstr "uloženená seskupení"
 
-#: gmusicbrowser.pl:6780
+#: gmusicbrowser.pl:6741
 msgid "saved random modes"
 msgstr "uložené náhodné režimy"
 
-#: gmusicbrowser.pl:6778
+#: gmusicbrowser.pl:6739
 msgid "saved sort modes"
 msgstr "uložené režimy třídění"
 
-#: gmusicbrowser.pl:5888
+#: gmusicbrowser.pl:5849
 msgid "scan now"
 msgstr "vyhledávat nyní"
 
-#: gmusicbrowser.pl:704 gmusicbrowser.pl:5701 plugins/lullaby.pm:44
+#: gmusicbrowser.pl:704 gmusicbrowser.pl:5662 plugins/lullaby.pm:44
 #: plugins/notify.pm:53
 msgid "seconds"
 msgstr "vteřin"
 
-#: gmusicbrowser.pl:7896
+#: layouts:104
+msgid "shimmer"
+msgstr ""
+
+#: layouts:198
+msgid "shimmer_tray"
+msgstr ""
+
+#: gmusicbrowser.pl:7857
 msgid "shortest"
 msgstr "nejkratší"
 
-#: gmusicbrowser_list.pm:1569
+#: gmusicbrowser_list.pm:1570
 msgid "show pictures"
 msgstr "zobrazit obrázky"
 
-#: gmusicbrowser_list.pm:1581
+#: gmusicbrowser_list.pm:1582
 msgid "show the 'All' row"
 msgstr "zobrazit položku 'Vše'"
 
-#: gmusicbrowser_list.pm:7349
+#: plugins/artistinfo.pm:32
+msgid "similar"
+msgstr ""
+
+#: gmusicbrowser_list.pm:7371
 msgid "skin options"
 msgstr "nastavení motivu"
 
-#: gmusicbrowser_list.pm:1543
+#: gmusicbrowser_list.pm:1544
 msgid "skip count average"
 msgstr "přeskočit počítadlo průměru"
 
-#: gmusicbrowser.pl:7834
+#: gmusicbrowser.pl:7795
 msgid "skipped"
 msgstr "přeskočeno"
 
-#: gmusicbrowser_list.pm:1529 gmusicbrowser_list.pm:1534
+#: gmusicbrowser_list.pm:1530 gmusicbrowser_list.pm:1535
 msgid "small size"
 msgstr "malá velikost"
 
-#: gmusicbrowser_list.pm:1597
+#: gmusicbrowser_list.pm:1598
 msgid "sort by"
 msgstr "třídit podle"
 
-#: gmusicbrowser_layout.pm:173 gmusicbrowser_layout.pm:176
+#: gmusicbrowser_layout.pm:191 gmusicbrowser_layout.pm:194
 msgid "static list"
 msgstr "statický seznam"
 
-#: gmusicbrowser.pl:7962 gmusicbrowser.pl:7972
+#: gmusicbrowser.pl:7923 gmusicbrowser.pl:7933
 msgid "stereo"
 msgstr "stereo"
 
@@ -5100,15 +5330,15 @@ msgstr "zastavit po vyprázdnění fronty"
 msgid "string"
 msgstr "řetězec"
 
-#: gmusicbrowser.pl:5564
+#: gmusicbrowser.pl:5525
 msgid "supports : "
 msgstr "podporuje :"
 
-#: gmusicbrowser_list.pm:1572
+#: gmusicbrowser_list.pm:1573
 msgid "text format"
 msgstr "formát textu"
 
-#: gmusicbrowser_list.pm:1578
+#: gmusicbrowser_list.pm:1579
 msgid "text mode"
 msgstr "režim textu"
 
@@ -5116,7 +5346,7 @@ msgstr "režim textu"
 msgid "the command {name}"
 msgstr "příkaz '{name}'"
 
-#: gmusicbrowser.pl:5766
+#: gmusicbrowser.pl:5727
 msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
 msgstr "výchozí je utf16 pro ID3v2.3 a utf8 pro ID3v2.4"
 
@@ -5128,7 +5358,7 @@ msgstr "soubor {name}"
 msgid "the {name} perl module"
 msgstr "perl režim {name}"
 
-#: gmusicbrowser_layout.pm:194
+#: gmusicbrowser_layout.pm:217
 msgid "then {action}"
 msgstr "pak {action}"
 
@@ -5136,11 +5366,11 @@ msgstr "pak {action}"
 msgid "times"
 msgstr "krát"
 
-#: gmusicbrowser_list.pm:1704
+#: gmusicbrowser_list.pm:1705
 msgid "toggle Intersection mode"
 msgstr "přepnout smíšený režim"
 
-#: gmusicbrowser_list.pm:1705
+#: gmusicbrowser_list.pm:1706
 msgid "toggle Invert mode"
 msgstr "přepnout invertní režim"
 
@@ -5164,11 +5394,11 @@ msgstr "vypnout počítač po vyprázdnění fronty"
 msgid "unknown"
 msgstr "neznámý"
 
-#: plugins/audioscrobbler.pm:125 plugins/audioscrobbler.pm:192
+#: plugins/audioscrobbler.pm:137 plugins/audioscrobbler.pm:204
 msgid "unknown error"
 msgstr "neznámá chyba"
 
-#: gmusicbrowser.pl:2759 gmusicbrowser_layout.pm:1328
+#: gmusicbrowser.pl:2759 gmusicbrowser_layout.pm:1363
 msgid "unnamed random mode"
 msgstr "nepojmenovaný náhodný režim"
 
@@ -5185,11 +5415,11 @@ msgstr "seznam souborů s url kódováním"
 msgid "url-encoded list of files/folders"
 msgstr "seznam souborů/složek s url kódováním"
 
-#: plugins/fetch_cover.pm:72 plugins/fetch_cover.pm:73
+#: plugins/fetch_cover.pm:74 plugins/fetch_cover.pm:75
 msgid "use :"
 msgstr "použít :"
 
-#: plugins/fetch_cover.pm:73
+#: plugins/fetch_cover.pm:75
 msgid "use album name"
 msgstr "použít název alba"
 
@@ -5201,19 +5431,19 @@ msgstr "použít výchozí"
 msgid "use gnome settings"
 msgstr "použít nastavení gnome"
 
-#: plugins/fetch_cover.pm:72
+#: plugins/fetch_cover.pm:74
 msgid "use song folder"
 msgstr "použít složku skladby"
 
-#: gmusicbrowser.pl:5677
+#: gmusicbrowser.pl:5638
 msgid "use standard strftime variables"
 msgstr "použít standardní proměnné funkce strftime"
 
-#: plugins/audioscrobbler.pm:58
+#: plugins/audioscrobbler.pm:61
 msgid "username :"
 msgstr "uživatelské jméno :"
 
-#: gmusicbrowser_list.pm:7326
+#: gmusicbrowser_list.pm:7348
 msgid "using skin :"
 msgstr "použitý motiv :"
 
@@ -5225,15 +5455,11 @@ msgstr "vyčkat"
 msgid "wait for more when queue empty"
 msgstr "vyčkat na vyprázdnění fronty"
 
-#: plugins/artistinfo.pm:114
-msgid "web"
-msgstr "internet"
-
 #: gmusicbrowser.pl:708
 msgid "weeks"
 msgstr "týdnů"
 
-#: gmusicbrowser.pl:7670
+#: gmusicbrowser.pl:7631
 msgid "weight :"
 msgstr "důležitost :"
 
@@ -5241,43 +5467,43 @@ msgstr "důležitost :"
 msgid "wikipedia, lyrics, and custom webpages"
 msgstr "Wikipedie, texty a uživatelské webové stránky"
 
-#: layouts:174
+#: layouts:239
 msgid "with browser"
 msgstr "s prohlížečem"
 
-#: layouts:391
+#: layouts:456
 msgid "with browser & queue"
 msgstr "s prohlížečem & frontou"
 
-#: layouts:196
+#: layouts:261
 msgid "with browser (SongTree)"
 msgstr "s prohlížečem (strom skladeb)"
 
-#: layouts:473
+#: layouts:538
 msgid "with context"
 msgstr "s kontextem"
 
-#: layouts:325
+#: layouts:390
 msgid "with playlist"
 msgstr "s playlistem"
 
-#: layouts:420
+#: layouts:485
 msgid "with playlist & context"
 msgstr "s playlistem & kontextem"
 
-#: layouts:137
+#: layouts:185
 msgid "with queue"
 msgstr "s frontou"
 
-#: layouts:321
+#: layouts:386
 msgid "with search"
 msgstr "s vyhledáváním"
 
-#: layouts:425
+#: layouts:490
 msgid "with tabbedlists"
 msgstr "s tabulkovými seznamy"
 
-#: gmusicbrowser.pl:5525
+#: gmusicbrowser.pl:5486
 msgid ""
 "without gstreamer : one stream per file, one connection at a time\n"
 "with gstreamer : one continuous stream, multiple connection possible"
@@ -5293,11 +5519,11 @@ msgstr "vyrovnat x :"
 msgid "y offset :"
 msgstr "vyrovnat y :"
 
-#: gmusicbrowser_list.pm:1547 gmusicbrowser_songs.pm:21
+#: gmusicbrowser_list.pm:1548 gmusicbrowser_songs.pm:21
 msgid "year"
 msgstr "rok"
 
-#: gmusicbrowser_list.pm:1548
+#: gmusicbrowser_list.pm:1549
 msgid "year (highest)"
 msgstr "rok (nejvyšší)"
 
@@ -5305,11 +5531,11 @@ msgstr "rok (nejvyšší)"
 msgid "years"
 msgstr "roky"
 
-#: gmusicbrowser.pl:4050
+#: gmusicbrowser.pl:4008
 msgid "yes to all"
 msgstr "ano pro vše"
 
-#: gmusicbrowser_layout.pm:566
+#: gmusicbrowser_layout.pm:601
 msgid ""
 "{album}\n"
 "<small>by</small> {artist}"
@@ -5317,7 +5543,7 @@ msgstr ""
 "{album}\n"
 "<small>od</small> {artist}"
 
-#: gmusicbrowser.pl:5800
+#: gmusicbrowser.pl:5761
 msgid "{folder} already exists"
 msgstr "{folder} již existuje"
 
@@ -5346,7 +5572,7 @@ msgstr "{min}m {sec}s ({size}M)"
 msgid "{min}m{sec}s"
 msgstr "{min}m{sec}s"
 
-#: gmusicbrowser.pl:5578
+#: gmusicbrowser.pl:5539
 msgid "{outputname} output settings"
 msgstr "{outputname} nastavení výstupu"
 
@@ -5354,7 +5580,7 @@ msgstr "{outputname} nastavení výstupu"
 msgid "{songs} by {artists}"
 msgstr "{songs} od {artists}"
 
-#: gmusicbrowser.pl:6712
+#: gmusicbrowser.pl:6673
 msgid ""
 "{song}\n"
 "by {artist}\n"
@@ -5364,8 +5590,8 @@ msgstr ""
 "od {artist}\n"
 "z {album}"
 
-#: gmusicbrowser.pl:3106 gmusicbrowser_layout.pm:252
-#: plugins/audioscrobbler.pm:174 plugins/audioscrobbler.pm:180
+#: gmusicbrowser.pl:3064 gmusicbrowser_layout.pm:276
+#: plugins/audioscrobbler.pm:186 plugins/audioscrobbler.pm:192
 msgid "{song} by {artist}"
 msgstr "{song} od {artist}"
 
@@ -5376,6 +5602,9 @@ msgstr "|-oddělený seznam názvů pomůcek"
 #~ msgid "' & ' and ', ' and ';'"
 #~ msgstr "' & ' a ', ' a ';'"
 
+#~ msgid "(see http://www.last.fm)"
+#~ msgstr "(navštivte http://www.last.fm)"
+
 #~ msgid "Rating picture"
 #~ msgstr "Hodnocení obrázku"
 
@@ -5385,5 +5614,17 @@ msgstr "|-oddělený seznam názvů pomůcek"
 #~ msgid "Split artist names on (needs restart) :"
 #~ msgstr "Rozdělit název interpreta na (vyžaduje restart) :"
 
+#~ msgid "Submit played songs to last.fm"
+#~ msgstr "Postoupit přehrávané skladby na last.fm"
+
+#~ msgid "last.fm"
+#~ msgstr "last.fm"
+
+#~ msgid "last.fm plugin"
+#~ msgstr "zásuvný modul last.fm"
+
 #~ msgid "show info"
 #~ msgstr "zobrazit info"
+
+#~ msgid "web"
+#~ msgstr "internet"
