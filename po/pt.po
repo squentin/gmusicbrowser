@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-16 18:19+0100\n"
+"POT-Creation-Date: 2011-01-17 12:00+0100\n"
 "PO-Revision-Date: 2010-12-21 14:24-0300\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese <LL@li.org>\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-#: plugins/artistinfo.pm:468
+#: plugins/artistinfo.pm:470
 msgid ""
 "\n"
 "No results found"
@@ -491,7 +491,7 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:399 layouts:502 layouts:508
+#: plugins/fetch_cover.pm:103 layouts:399 layouts:502 layouts:508 layouts:944
 msgid "Album"
 msgstr "Álbum"
 
@@ -1479,7 +1479,7 @@ msgstr "Equalizador"
 msgid "Error :"
 msgstr "Erro :"
 
-#: plugins/artistinfo.pm:567
+#: plugins/artistinfo.pm:569
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1501,7 +1501,7 @@ msgstr "Erro gravando '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Erro gravando tags do replaygain :\n"
 
-#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:560 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Erro: padrão de arquivo inválido"
 
@@ -2032,12 +2032,12 @@ msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "Carregado %d música não marcada da sessão anterior"
 msgstr[1] "Carregado %d músicas não marcada da sessão anterior"
 
-#: plugins/artistinfo.pm:441 plugins/artistinfo.pm:534 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:443 plugins/artistinfo.pm:536 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Falha ao tentar carregar"
 
-#: plugins/artistinfo.pm:426 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:428 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Carregando..."
 
@@ -2310,7 +2310,7 @@ msgstr "Sem filtro travado"
 msgid "No moods"
 msgstr ""
 
-#: plugins/artistinfo.pm:483
+#: plugins/artistinfo.pm:485
 msgid "No results found"
 msgstr ""
 
@@ -3167,6 +3167,18 @@ msgstr ""
 #: gmusicbrowser.pl:415
 msgid "Same Title"
 msgstr "Mesmo Título"
+
+#: layouts:949
+msgid "Same artist"
+msgstr ""
+
+#: layouts:939
+msgid "Same title"
+msgstr ""
+
+#: layouts:954
+msgid "Same year"
+msgstr ""
 
 #: gmusicbrowser_songs.pm:731 gmusicbrowser_songs.pm:733
 msgid "Sampling Rate"
@@ -5171,7 +5183,7 @@ msgstr "zerar filtro primário"
 msgid "reset secondary filter"
 msgstr "zerar filtro secundário"
 
-#: plugins/artistinfo.pm:441 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:443 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "tentar de novo"
 

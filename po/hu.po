@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9538\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-16 18:19+0100\n"
+"POT-Creation-Date: 2011-01-17 12:00+0100\n"
 "PO-Revision-Date: 2006-08-12 19:03+0200\n"
 "Last-Translator: Zsombor <gzsombor@gmail.com>\n"
 "Language-Team: Hungarian <translation-team-hu@lists.sourceforge.net>\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: plugins/artistinfo.pm:468
+#: plugins/artistinfo.pm:470
 msgid ""
 "\n"
 "No results found"
@@ -461,7 +461,7 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:399 layouts:502 layouts:508
+#: plugins/fetch_cover.pm:103 layouts:399 layouts:502 layouts:508 layouts:944
 msgid "Album"
 msgstr "Album"
 
@@ -1442,7 +1442,7 @@ msgstr ""
 msgid "Error :"
 msgstr ""
 
-#: plugins/artistinfo.pm:567
+#: plugins/artistinfo.pm:569
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1462,7 +1462,7 @@ msgstr ""
 msgid "Error writing replaygain tags :\n"
 msgstr ""
 
-#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:560 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr ""
 
@@ -1984,12 +1984,12 @@ msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] ""
 
-#: plugins/artistinfo.pm:441 plugins/artistinfo.pm:534 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:443 plugins/artistinfo.pm:536 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr ""
 
-#: plugins/artistinfo.pm:426 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:428 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr ""
 
@@ -2259,7 +2259,7 @@ msgstr ""
 msgid "No moods"
 msgstr ""
 
-#: plugins/artistinfo.pm:483
+#: plugins/artistinfo.pm:485
 msgid "No results found"
 msgstr ""
 
@@ -3104,6 +3104,18 @@ msgstr ""
 #: gmusicbrowser.pl:415
 msgid "Same Title"
 msgstr "Ugyanaz a Cim"
+
+#: layouts:949
+msgid "Same artist"
+msgstr ""
+
+#: layouts:939
+msgid "Same title"
+msgstr ""
+
+#: layouts:954
+msgid "Same year"
+msgstr ""
 
 #: gmusicbrowser_songs.pm:731 gmusicbrowser_songs.pm:733
 msgid "Sampling Rate"
@@ -5088,7 +5100,7 @@ msgstr ""
 msgid "reset secondary filter"
 msgstr ""
 
-#: plugins/artistinfo.pm:441 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:443 plugins/lyrics.pm:366
 msgid "retry"
 msgstr ""
 

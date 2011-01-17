@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser.pot\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-16 18:19+0100\n"
+"POT-Creation-Date: 2011-01-17 12:00+0100\n"
 "PO-Revision-Date: 2009-04-30 13:14+0800\n"
 "Last-Translator: Google Translate\n"
 "Language-Team: Chinese\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: plugins/artistinfo.pm:468
+#: plugins/artistinfo.pm:470
 msgid ""
 "\n"
 "No results found"
@@ -466,7 +466,7 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:399 layouts:502 layouts:508
+#: plugins/fetch_cover.pm:103 layouts:399 layouts:502 layouts:508 layouts:944
 msgid "Album"
 msgstr "专辑"
 
@@ -1452,7 +1452,7 @@ msgstr "均衡"
 msgid "Error :"
 msgstr "错误："
 
-#: plugins/artistinfo.pm:567
+#: plugins/artistinfo.pm:569
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1474,7 +1474,7 @@ msgstr "写'{file}'时发生错误"
 msgid "Error writing replaygain tags :\n"
 msgstr "写replaygain标签时发生错误：\n"
 
-#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:560 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "错误：无效的文件名模式"
 
@@ -1998,12 +1998,12 @@ msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "正在加载上次会话中未送出的 %d 曲目"
 
-#: plugins/artistinfo.pm:441 plugins/artistinfo.pm:534 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:443 plugins/artistinfo.pm:536 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "载入中失败。"
 
-#: plugins/artistinfo.pm:426 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:428 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "载入中..."
 
@@ -2273,7 +2273,7 @@ msgstr "没有已锁定的滤波器"
 msgid "No moods"
 msgstr ""
 
-#: plugins/artistinfo.pm:483
+#: plugins/artistinfo.pm:485
 msgid "No results found"
 msgstr ""
 
@@ -3125,6 +3125,18 @@ msgstr ""
 #: gmusicbrowser.pl:415
 msgid "Same Title"
 msgstr "同一标题"
+
+#: layouts:949
+msgid "Same artist"
+msgstr ""
+
+#: layouts:939
+msgid "Same title"
+msgstr ""
+
+#: layouts:954
+msgid "Same year"
+msgstr ""
 
 #: gmusicbrowser_songs.pm:731 gmusicbrowser_songs.pm:733
 msgid "Sampling Rate"
@@ -5111,7 +5123,7 @@ msgstr "重置初级过滤器"
 msgid "reset secondary filter"
 msgstr "重置二级过滤器"
 
-#: plugins/artistinfo.pm:441 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:443 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "重试"
 

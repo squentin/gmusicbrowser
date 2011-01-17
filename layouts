@@ -936,21 +936,21 @@ VBmain = _PluginLyrics(shadow=none,HideToolbar=1)
 #type P layouts : pages that can be added to a TabbedLists
 [same_title]
 Type= P
-Name=Same title
+Name=_"Same title"
 VBmain = _SongTree(group=Play:title)
 
 [same_album]
 Type= P
-Name=Album
+Name=_"Album"
 VBmain = _SongTree(group=Play:album)
 
 [same_artist]
 Type= P
-Name=Same artist
+Name=_"Same artist"
 VBmain = _SongTree(group=Play:first_artist)
 
 [same_year]
 Type= P
-Name=Same year
+Name=_"Same year"
 VBmain = _SongTree(group=Play:year)
 
