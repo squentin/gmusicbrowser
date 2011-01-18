@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.4-se\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-18 13:47+0100\n"
+"POT-Creation-Date: 2011-01-18 15:28+0100\n"
 "PO-Revision-Date: 2010-10-21 14:31+0100\n"
 "Last-Translator: Olle Sandgren <olle.sandgren@blixtmail.se>\n"
 "Language-Team: Sweden <se@li.org>\n"
@@ -271,7 +271,7 @@ msgstr ""
 msgid "1 chance in {probability}"
 msgstr "1 chans till {probability}"
 
-#: layouts:294
+#: layouts:295
 msgid "3 Filter panes"
 msgstr "3 filter rutor"
 
@@ -488,7 +488,7 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:401 layouts:504 layouts:510 layouts:946
+#: plugins/fetch_cover.pm:103 layouts:402 layouts:505 layouts:511 layouts:947
 msgid "Album"
 msgstr "Album"
 
@@ -632,7 +632,7 @@ msgstr "Argument"
 msgid "Arkanoid"
 msgstr ""
 
-#: layouts:94
+#: layouts:95
 msgid "Arkanoid Fullscreen"
 msgstr ""
 
@@ -640,7 +640,7 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
 #: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:118
-#: plugins/fetch_cover.pm:102 layouts:401 layouts:504 layouts:510
+#: plugins/fetch_cover.pm:102 layouts:402 layouts:505 layouts:511
 msgid "Artist"
 msgstr "Artist"
 
@@ -792,7 +792,7 @@ msgstr "Samling :"
 msgid "Body text is not supported by current notification daemon"
 msgstr "Huvudtexten stöds inte av gällande daemon notifiering"
 
-#: layouts:266
+#: layouts:267
 msgid "Browser"
 msgstr "Bläddrare"
 
@@ -800,15 +800,15 @@ msgstr "Bläddrare"
 msgid "Browser window layout :"
 msgstr "Bläddrarfönster layout"
 
-#: layouts:291
+#: layouts:292
 msgid "Browser with SongTree"
 msgstr "Bläddra med SongTree"
 
-#: layouts:922
+#: layouts:923
 msgid "Buttons"
 msgstr "Knappar"
 
-#: layouts:911
+#: layouts:912
 msgid "Buttons, Song & Cover"
 msgstr "Knappar, Melodi & Omslag"
 
@@ -872,7 +872,7 @@ msgstr "Känslig för VERSALER och gemener"
 msgid "Case-sensitive"
 msgstr "Känslig för VERSALER och gemener"
 
-#: layouts:362
+#: layouts:363
 msgid "Categories pane"
 msgstr "Kategoriruta"
 
@@ -1062,8 +1062,8 @@ msgstr "Anslut genom en proxy"
 msgid "Connections from :"
 msgstr "Anslutning från :"
 
-#: layouts:39 layouts:78 layouts:167 layouts:330 layouts:432 layouts:504
-#: layouts:510 layouts:534 layouts:596
+#: layouts:39 layouts:78 layouts:168 layouts:331 layouts:433 layouts:505
+#: layouts:511 layouts:535 layouts:597
 msgid "Context"
 msgstr "Sammanhang"
 
@@ -1364,7 +1364,7 @@ msgstr "Redigera gällande melodi egenskaper"
 msgid "Edit..."
 msgstr "Redigera..."
 
-#: layouts:427
+#: layouts:428
 msgid "EditList"
 msgstr "Redigera lista"
 
@@ -1453,7 +1453,7 @@ msgstr ""
 msgid "EpicRating plugin - automatically update ratings"
 msgstr ""
 
-#: layouts:850
+#: layouts:851
 msgid "Equalizer"
 msgstr "Equaliser"
 
@@ -1512,6 +1512,12 @@ msgstr "Exportera melodi egenskaper till en .csv fil"
 msgid "Export to .m3u file"
 msgstr "Explortera till .m3u fil"
 
+#: plugins/fetchcover_songmenu.pm:4
+msgid ""
+"Extends Picture finder plugin by adding menu entries to song context menu "
+"for fetching/setting album cover."
+msgstr ""
+
 #: gmusicbrowser_gstreamer-0.10.pm:451
 msgid "Extra gain"
 msgstr "Extra förstärkning"
@@ -1539,6 +1545,10 @@ msgid ""
 msgstr ""
 "Misslyckades att radera '{file}' :\n"
 "{error}"
+
+#: plugins/fetchcover_songmenu.pm:11
+msgid "Fetch cover"
+msgstr ""
 
 #: gmusicbrowser_songs.pm:2096 gmusicbrowser_songs.pm:2222
 msgid "Field name"
@@ -1695,7 +1705,7 @@ msgstr "Helskärms layout :"
 msgid "Fullscreen"
 msgstr "Helskärm"
 
-#: layouts:602
+#: layouts:603
 msgid "Fullscreen simple"
 msgstr "Enkel helskärm"
 
@@ -1725,7 +1735,7 @@ msgstr "Genre är aktiv"
 msgid "Genres"
 msgstr "Genrer"
 
-#: layouts:362
+#: layouts:363
 msgid "Genres pane"
 msgstr "Genrer fönster"
 
@@ -1737,7 +1747,7 @@ msgstr "Gnome mmkeys"
 msgid "Gnome multimedia keys plugin"
 msgstr "Insticksmodul för Gnome multimedia nyckel"
 
-#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6535 layouts:87
+#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6535 layouts:87 layouts:88
 msgid "Go to playing song"
 msgstr "Hoppa till aktuell melodi"
 
@@ -1801,15 +1811,15 @@ msgstr "Öka volym"
 msgid "Info"
 msgstr "Information"
 
-#: layouts:887
+#: layouts:888
 msgid "Insensitive title-artist (left-aligned)"
 msgstr "Okänslig titel-artist (vänsterjusterad)"
 
-#: layouts:893
+#: layouts:894
 msgid "Insensitive title-artist (right-aligned)"
 msgstr "Okänslig titel-artist (högerjusterad)"
 
-#: layouts:900
+#: layouts:901
 msgid "Insensitive, Song & Cover"
 msgstr "Okänslig, Melodi & Omslag"
 
@@ -1821,7 +1831,7 @@ msgstr "Sätt in en lista med filer/mappar i början på spellistan"
 msgid "Invalid regular expression"
 msgstr ""
 
-#: layouts:928
+#: layouts:929
 msgid "Invisible hot spot"
 msgstr "Osynlig hot spot"
 
@@ -1833,7 +1843,7 @@ msgstr ""
 msgid "KB"
 msgstr "KB"
 
-#: plugins/karaoke.pm:9 layouts:859
+#: plugins/karaoke.pm:9 layouts:860
 msgid "Karaoke"
 msgstr "Karaoke"
 
@@ -1923,7 +1933,7 @@ msgstr "Layouter"
 msgid "Left aligned"
 msgstr ""
 
-#: layouts:362
+#: layouts:363
 msgid "Left pane"
 msgstr "Vänster förnster"
 
@@ -1931,8 +1941,8 @@ msgstr "Vänster förnster"
 msgid "Length"
 msgstr "Längd"
 
-#: gmusicbrowser.pl:5167 gmusicbrowser_list.pm:128 layouts:167 layouts:330
-#: layouts:534 layouts:596
+#: gmusicbrowser.pl:5167 gmusicbrowser_list.pm:128 layouts:168 layouts:331
+#: layouts:535 layouts:597
 msgid "Library"
 msgstr "Bibliotek"
 
@@ -1981,7 +1991,7 @@ msgstr "Listad :"
 msgid "Listed songs"
 msgstr "Listade melodier"
 
-#: layouts:146
+#: layouts:147
 msgid "Lists, Library & Context"
 msgstr "Lista, Bibliotek & Sammanhang"
 
@@ -2082,7 +2092,7 @@ msgstr ""
 msgid "Lyrics"
 msgstr "Låttext"
 
-#: layouts:934
+#: layouts:935
 msgid "Lyrics (requires lyrics plugin)"
 msgstr "Låttext (kräver låttextmodul)"
 
@@ -2150,7 +2160,7 @@ msgstr "Mediatyp"
 msgid "Menu entry name"
 msgstr "Huvud ingångsnamn"
 
-#: layouts:239
+#: layouts:240
 msgid "Minimal tip"
 msgstr "Minimalt tips"
 
@@ -2567,6 +2577,14 @@ msgstr "Bild cache :"
 msgid "Picture finder"
 msgstr "Bildsökning"
 
+#: plugins/fetchcover_songmenu.pm:2
+msgid "Picture finder in song menu"
+msgstr ""
+
+#: plugins/fetchcover_songmenu.pm:3
+msgid "Picture finder in song menu plugin"
+msgstr ""
+
 #: plugins/fetch_cover.pm:10
 msgid "Picture finder plugin"
 msgstr "Bildsökning insticksmodul"
@@ -2608,7 +2626,7 @@ msgstr "Spela alla melodier från detta album"
 msgid "Play all songs from this artist"
 msgstr "Spela alla melodier med denna artist"
 
-#: layouts:867
+#: layouts:868
 msgid "Play button"
 msgstr "Spelknapp"
 
@@ -2676,7 +2694,7 @@ msgstr ""
 msgid "Playing error : {error}"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:448 layouts:438
+#: gmusicbrowser_layout.pm:448 layouts:439
 msgid "Playlist"
 msgstr "Spellista"
 
@@ -2700,7 +2718,7 @@ msgstr "Filter spellista"
 msgid "Playlist filter :\n"
 msgstr "Filter spellista :\n"
 
-#: layouts:575
+#: layouts:576
 msgid "Playlist, Library & Context"
 msgstr "Spellista, Bibliotek, & Sammanhang"
 
@@ -2764,7 +2782,7 @@ msgstr "Privat datum"
 msgid "Produced (P)"
 msgstr "Producerad (P)"
 
-#: layouts:855
+#: layouts:856
 msgid "Progress"
 msgstr "Förlopp"
 
@@ -2790,7 +2808,7 @@ msgstr "Utgivare/Studio logotype"
 
 #: gmusicbrowser.pl:2409 gmusicbrowser_layout.pm:225
 #: gmusicbrowser_layout.pm:442 gmusicbrowser_layout.pm:534 layouts:39
-#: layouts:79 layouts:330 layouts:362 layouts:420
+#: layouts:79 layouts:331 layouts:363 layouts:421
 msgid "Queue"
 msgstr "Kö"
 
@@ -2810,15 +2828,15 @@ msgstr "Kö är tom"
 msgid "Queue mode"
 msgstr "Köläge"
 
-#: layouts:512
+#: layouts:513
 msgid "Queue, Library & Context"
 msgstr "Kö, Bibliotek & Sammanhang"
 
-#: layouts:404
+#: layouts:405
 msgid "Quick Search"
 msgstr "Snabbsökning"
 
-#: layouts:412
+#: layouts:413
 msgid "Quick Search with SongTree"
 msgstr "Snabbsökning med SongTree"
 
@@ -3134,19 +3152,19 @@ msgstr ""
 msgid "Same Title"
 msgstr "Samma titel"
 
-#: layouts:951
+#: layouts:952
 msgid "Same artist"
 msgstr ""
 
-#: layouts:961
+#: layouts:962
 msgid "Same rating"
 msgstr ""
 
-#: layouts:941
+#: layouts:942
 msgid "Same title"
 msgstr ""
 
-#: layouts:956
+#: layouts:957
 msgid "Same year"
 msgstr ""
 
@@ -3254,15 +3272,15 @@ msgstr "Skrolla med melodi"
 msgid "Scroll with the song"
 msgstr "Skrolla med melodin"
 
-#: plugins/fetch_cover.pm:95 layouts:400 layouts:397 layouts:406 layouts:414
+#: plugins/fetch_cover.pm:95 layouts:401 layouts:398 layouts:407 layouts:415
 msgid "Search"
 msgstr "Sök"
 
-#: layouts:506
+#: layouts:507
 msgid "Search & Playlist"
 msgstr "Sök & Spellista"
 
-#: layouts:499
+#: layouts:500
 msgid "Search & Queue"
 msgstr "Sök & Kö"
 
@@ -3430,6 +3448,10 @@ msgstr "Ställ in bild"
 msgid "Set as primary filter"
 msgstr "Ställ in som primärt filter"
 
+#: plugins/fetchcover_songmenu.pm:17
+msgid "Set cover"
+msgstr ""
+
 #: gmusicbrowser.pl:1071
 msgid "Set focus on a layout widget"
 msgstr "Sätt fokus på en layout widget"
@@ -3586,15 +3608,15 @@ msgstr "Avbryt räkning"
 msgid "Skip to next song if an error occurs"
 msgstr "Avbryt till nästa melodi om fel uppstår"
 
-#: layouts:173
+#: layouts:174
 msgid "Small player"
 msgstr "Liten spelare"
 
-#: layouts:278
+#: layouts:279
 msgid "Smaller browser"
 msgstr "Mindre bläddrare"
 
-#: gmusicbrowser_list.pm:731 layouts:401 layouts:504 layouts:510
+#: gmusicbrowser_list.pm:731 layouts:402 layouts:505 layouts:511
 msgid "Song"
 msgstr "Melodi"
 
@@ -3659,15 +3681,15 @@ msgstr ""
 msgid "Stop when queue empty"
 msgstr "Stoppa när kö är tom"
 
-#: layouts:872
+#: layouts:873
 msgid "Stop, Play and Next buttons"
 msgstr "Stopp, Spela och Nästa knapp"
 
-#: layouts:877
+#: layouts:878
 msgid "Stop, Play and Next buttons and Time"
 msgstr "Stopp, Spela och Nästa knapp och Tid"
 
-#: layouts:882
+#: layouts:883
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr "Stopp, Spela och Nästa knapp och Titel/Artist"
 
@@ -3997,7 +4019,7 @@ msgstr "Blandade artister"
 msgid "Version"
 msgstr "Version"
 
-#: layouts:362
+#: layouts:363
 msgid "View"
 msgstr "Visa"
 
@@ -4009,7 +4031,7 @@ msgstr "Vis Binär"
 msgid "View binary data ..."
 msgstr "Visa binärdata ..."
 
-#: layouts:846
+#: layouts:847
 msgid "Volume"
 msgstr "Volym"
 
@@ -4409,7 +4431,7 @@ msgstr "standard filnamn"
 msgid "default folder"
 msgstr "standard folder"
 
-#: layouts:553
+#: layouts:554
 msgid "default fullscreen"
 msgstr "standard helskärm"
 
@@ -4553,11 +4575,11 @@ msgstr "för filer utan ett VBR huvud"
 msgid "front cover"
 msgstr "omslag framsida"
 
-#: layouts:217
+#: layouts:218
 msgid "full"
 msgstr "full"
 
-#: layouts:223
+#: layouts:224
 msgid "full with buttons"
 msgstr "full med knappar"
 
@@ -4605,7 +4627,7 @@ msgstr "illustration"
 msgid "imported list"
 msgstr "importerad lista"
 
-#: layouts:228
+#: layouts:229
 msgid "info"
 msgstr "info"
 
@@ -4785,11 +4807,11 @@ msgstr ""
 "itunes ger inte support på osynkroniserade taggar senast jag kontrollerade, "
 "påverkar speciellt taggar med bilder"
 
-#: layouts:300
+#: layouts:301
 msgid "itunes++"
 msgstr ""
 
-#: layouts:357
+#: layouts:358
 msgid "itunes-like"
 msgstr "itunes liknande"
 
@@ -4831,7 +4853,7 @@ msgstr "ledande artist"
 msgid "leaflet page"
 msgstr "omslagssida"
 
-#: layouts:543
+#: layouts:544
 msgid "left-side filter panes"
 msgstr "vänster sido filter fönster"
 
@@ -4882,7 +4904,7 @@ msgstr "media"
 msgid "medium size"
 msgstr "mellanstorlek"
 
-#: layouts:193
+#: layouts:194
 msgid "minimal"
 msgstr "minimal"
 
@@ -5117,7 +5139,7 @@ msgstr "avsluta"
 msgid "quit when queue empty"
 msgstr "avsluta när kö är tömd"
 
-#: layouts:465
+#: layouts:466
 msgid "quodlibet-like"
 msgstr "quodlibet liknande"
 
@@ -5214,11 +5236,11 @@ msgstr "skanna nu"
 msgid "seconds"
 msgstr "sekunder"
 
-#: layouts:106
+#: layouts:107
 msgid "shimmer"
 msgstr ""
 
-#: layouts:200
+#: layouts:201
 msgid "shimmer_tray"
 msgstr ""
 
@@ -5419,39 +5441,39 @@ msgstr "storlek :"
 msgid "wikipedia, lyrics, and custom webpages"
 msgstr "wikipedia, låttext, och anpassade webbsidor"
 
-#: layouts:241
+#: layouts:242
 msgid "with browser"
 msgstr "med bläddrare"
 
-#: layouts:458
+#: layouts:459
 msgid "with browser & queue"
 msgstr "med bläddrare & kö"
 
-#: layouts:263
+#: layouts:264
 msgid "with browser (SongTree)"
 msgstr "bläddra med (SongTree)"
 
-#: layouts:540
+#: layouts:541
 msgid "with context"
 msgstr "med sammanhang"
 
-#: layouts:392
+#: layouts:393
 msgid "with playlist"
 msgstr "med spellista"
 
-#: layouts:487
+#: layouts:488
 msgid "with playlist & context"
 msgstr "med spellista & sammanhang"
 
-#: layouts:187
+#: layouts:188
 msgid "with queue"
 msgstr "med kö"
 
-#: layouts:388
+#: layouts:389
 msgid "with search"
 msgstr "med sök"
 
-#: layouts:492
+#: layouts:493
 msgid "with tabbedlists"
 msgstr "med tabb redigeringar"
 

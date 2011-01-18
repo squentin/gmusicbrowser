@@ -1,7 +1,7 @@
 =gmbplugin COVERSONGCMENU
 name	Picture finder in song menu
 title	Picture finder in song menu plugin
-desc	Extends "Picture finder" plugin by adding menu entries to song context menu for fetching/setting album cover.
+desc	Extends Picture finder plugin by adding menu entries to song context menu for fetching/setting album cover.
 =cut
 
 package GMB::Plugin::COVERSONGCMENU;
