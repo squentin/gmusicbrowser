@@ -1622,11 +1622,17 @@ sub init
 	$self->realize;
 	$self->Resize if $self->{size};
 	{	my @hidden;
+		# widgets that were saved as hidden
 		@hidden=keys %{ $self->{hidden} } if $self->{hidden};
 		my $widgets=$self->{widgets};
-		push @hidden,$widgets->{$_}{need_hide} for grep $widgets->{$_}{need_hide}, keys %$widgets;
-		@hidden=map $widgets->{$_}, @hidden;
-		$_->hide for @hidden;
+		# look for widgets asking for other widgets to be hidden at init
+		for my $w (values %$widgets)
+		{	my $names= delete $w->{need_hide};
+			next unless $names;
+			push @hidden, split /\|/, $names;
+		}
+		# hide them
+		$_->hide for grep defined, map $widgets->{$_}, @hidden;
 	}
 	#$self->set_position();#doesn't work before show, at least with sawfish
 	my ($x,$y)= $self->Position;
