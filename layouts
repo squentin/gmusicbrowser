@@ -17,7 +17,7 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
             HBCurrentTrack = 10_VBCurrentTrack
                 VBCurrentTrack = 3Filler1 HBTitle 10Filler14 Cover(click1="",overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0) _Filler11 HBReplayButtons
-                    HBTitle = 5Filler12 Title(expand_max=300,minsize=1,markup="<big><b>%t</b></big> ",click1="",yalign=0.5) LockAlbumBreadcrumb AlbumBreadcrumb(minsize=1,expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%l ",showcover=0) LockArtistBreadcrumb ArtistBreadcrumb(expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
+                    HBTitle = 5Filler12 LockSongBreadcrumb Title(expand_max=300,minsize=1,markup="<big><b>%t</b></big> ",click1="",yalign=0.5) LockAlbumBreadcrumb AlbumBreadcrumb(minsize=1,expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%l ",showcover=0) LockArtistBreadcrumb ArtistBreadcrumb(expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
 ars
             VBSavedFilterPane = _FilterPane4(nb=0,hide=0) 4Filler7
 
@@ -48,7 +48,7 @@ ars
         VBControls = _Filler16 HBControls _Filler17
             # HBControls =  -MBmain -MBLayoutSettings -HBVolume -Fullscreen(size=button) -ToggleButton1(relief=none,size=button,tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
             # HBControls =  -MBmain -MBLayoutSettings -HBVolume -Fullscreen(size=button)
-            HBControls =  -MBmain -HBVolume -Fullscreen(size=button) -TogButton(tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
+            HBControls = -MBmain -HBVolume -Fullscreen(size=button) -TogButton(tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
 
         HBVolume = VolumeIcon(button=1)
 
@@ -84,7 +84,8 @@ ars
 
             HBSongTree = _VBSongTree
             VBSongTree = HBSongTreeAct _SongTree 5HBSongTreeStats
-                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter Button(size=menu,click1=GoToCurrentSong,stock=gtk-jump-to,tip=_"Go to playing song") 20FLock _Filler9 _Filler10 -ResetFilter -Refresh -FBox -MBSongTree
+#                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter Button(size=menu,click1=GoToCurrentSong,stock=gtk-jump-to,tip=_"Go to playing song") 20FilterLock _Filler9 _Filler10 -ResetFilter -Refresh -FilterBox -MBSongTree
+                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter Button(size=menu,click1=GoToCurrentSong,stock=gtk-jump-to,tip=_"Go to playing song") 20FilterLock _Filler9 _Filler10 -ResetFilter -MBSongTree
                 HBSongTreeStats = -Total(size=small)
 
 
@@ -119,7 +120,7 @@ HBTop		= VBButtons _15VBPlayer 15VBToggle VBSearchBox -5VBSettings
 VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle HBTimeSlider
-HBTitle		= Title(expand_max=300,minsize=1,markup="<big><b>%t</b></big> ",click1="",tip="Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbumBreadcrumb AlbumBreadcrumb(tip="Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%l ",showcover=0) LockArtistBreadcrumb ArtistBreadcrumb(tip="Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
+HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip="Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbumBreadcrumb AlbumBreadcrumb(tip="Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtistBreadcrumb ArtistBreadcrumb(tip="Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 VBToggle	= HBToggle 5Filler1
 HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1,tip="Simple List View") ToggleButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1,tip="Songtree View") ToggleButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1,tip="Mosaic View")
