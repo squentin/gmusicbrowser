@@ -625,7 +625,7 @@ KeyBindings	= Escape CloseWindow
 #####################################
 
 {Group discleft}
-title=disc on the left side
+title=_"disc on the left side"
 head=3
 left=width
 vcollapse=head+title:h+line:h
@@ -635,7 +635,7 @@ line: line(x1=1,y1=1,x2=$_w,y2=1,color='#ccc',width=1)
 #,hide=$disc==0)
 
 {Group artistalbum_breadcrumbs}
-title=album and artist breadcrumbs
+title=_"album and artist breadcrumbs"
 head=title:h
 tail=25
 vcollapse=head
@@ -663,7 +663,7 @@ showyear : OptionBoolean(default=1,name='show year')
 myfont : OptionFont(default='Arial Bold 18',name='font')
 
 {Group showHidePicture}
-title   = Show/Hide picture
+title   = _"Show/Hide picture"
 head    = 10
 tail    = 15
 vmin    = pic:h+10
@@ -677,7 +677,7 @@ title   : -text(markup='<big><b>+</b></big>'.' <small><b>'.pesc($album).'</b>'.'
 picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 
 {Group albuminfo}
-title   = Show artist, album, year
+title   = _"Show artist, album, year"
 head    = 80
 vcollapse= 100
 vmin    = 100
@@ -698,14 +698,14 @@ vcollapse=head
 title: text(markup='<b><big>'.pesc($title).'</big></b>',pad=4)
 
 {Group simplest}
-title=Simple title without any
+title=_"Simple title without any"
 head=title:h
 left=2
 vcollapse=head
 title: text(markup=pesc($title),pad=4)
 
 {Group shimmerqueue}
-title=Shimmer Queue
+title=_"Shimmer Queue"
 head=title:h
 vcollapse=
 tail=3
@@ -732,13 +732,13 @@ progress: pbar( fill=$progress, hide=!$playing,y=1,h=-2)
 text: text(markup=playmarkup(pesc($title)))
 
 {Column queuenumber}
-menutitle = Queue-Item Number
+menutitle =_"Queue-Item Number"
 title = #
 width = 20
 text: text(markup=$queued, x=-text:w)
 
 {Column playandqueueandtrack}
-menutitle = Playing/Queue Icon or Track
+menutitle = _"Playing/Queue Icon or Track"
 title = #
 width = 20
 sort = track
