@@ -777,15 +777,21 @@ sub ParseSongTreeSkin
 {	my $lines=$_[0];
 	my $first=shift @$lines;
 	my $ref;
+	my $name;
 	if ($first=~m#{(Column|Group) (.*)}#)
 	{	$ref= $1 eq 'Column' ? \%SongTree::STC : \%SongTree::GroupSkin;
-		$ref=$ref->{$2}={};
+		$name=$2;
+		$ref=$ref->{$name}={};
 	}
 	else {return}
 	for (@$lines)
 	{	my ($key,$e,$string)= m#^(\w+)\s*([=:])\s*(.*)$#;
 		next unless defined $key;
-		if ($e eq '=') {$ref->{$key}=$string unless $key eq 'elems' || $key eq 'options'}
+		if ($e eq '=')
+		{	if ($key eq 'elems' || $key eq 'options') { warn "Can't use reserved keyword $key in SongTreee column $name\n"; next }
+			$string= _( $1 ) if $string=~m/_"([^"]+)"/;
+			$ref->{$key}=$string;
+		}
 		elsif ($string=~m#^Option(\w*)\((.+)\)$#)
 		{	my $type=$1;
 			my $opt=::ParseOptions($2);

@@ -741,7 +741,7 @@ INIT
 		event => 'Playing Queue CurSong',
 	},
 	icolabel =>
-	{	menu => _("Labels' Icons"),	title => '',		value => sub { $_[2] },
+	{	menu => _("Labels' icons"),	title => '',		value => sub { $_[2] },
 		class => 'CellRendererIconList',attrib => 'ID',	type => 'Glib::Uint',
 		depend => 'label',	sort => 'label:i',	noncomp => 'boldrow italicrow',
 		event => 'Icons', 		width => 50,

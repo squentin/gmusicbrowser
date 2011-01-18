@@ -405,7 +405,7 @@ KeyBindings	= Escape CloseWindow
 #####################################
 
 {Group pic}
-title= with picture
+title= _"with picture"
 head=title:h
 vcollapse=head
 vmin=pic:y+pic:h+2
@@ -421,14 +421,14 @@ showyear : OptionBoolean(default=1,name='show year')
 myfont : OptionFont(default='Arial Bold 18',name='font')
 
 {Group simple}
-title= Simple title
+title= _"Simple title"
 head=title:h
 left=4
 vcollapse=head
 title: text(markup='<b><big>'.pesc($title).'</big></b>',pad=4)
 
 {Group artistalbumside}
-title=album and artist on the left side
+title= _"Album and artist on the left side"
 vmin= pic:y + pic:h +2
 left=width
 title:	text(markup='<b><big>'.pesc($album).'\n'.pesc($artist).'</big></b>',pad=2,w=left)
@@ -437,7 +437,7 @@ width:	OptionNumber(default=200,min=20,max=1000,step=10)
 picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 
 {Column testtitleandprogress}
-title=title & progress
+title= _"Title & progress"
 sort=album:i title:i
 width=200
 songbl=text
@@ -446,26 +446,26 @@ progress: pbar( fill=$progress, hide=!$playing,y=1,h=-2)
 text: text(markup=playmarkup(pesc($title)))
 
 {Column playandqueue}
-menutitle = Playing & Queue
+menutitle = _"Playing and queue icons"
 width = 20
 ico:	icon(pad=2,icon=$playicon)
 
 {Column icolabel}
-menutitle= Labels' Icons
+menutitle= _"Labels' icons"
 sort = label:i
 width = 50
 ico : icon(pad=2,icon=$labelicons)
 
 {Column titleaa}
-menutitle = Title - Artist - Album
-title = Song
+menutitle = _"Title - Artist - Album"
+title = _"Song"
 hreq=text:h
 width=200
 sort= title:i
 text : text(markup='<b>'.pesc($title).'</b>\n<small><i>'.pesc($artist).'</i> - '.pesc($album).'</small>',pad=2)
 
 {Column titleandicon}
-title = title & icon
+title = _"Title & icon"
 sort = title:i
 width = 200
 songbl= text
@@ -474,15 +474,15 @@ text : text(pad=2,markup=playmarkup(pesc($title)),w=-icolabel:w)
 icolabel : icon(pad=2,x=text:w,icon=$labelicons)
 
 {Column albumminipic}
-title = Small album picture
+title = _"Small album picture"
 sort = album:i
 width = 20
 hreq = 20
 album  : aapic(picsize=$_h,aa='album')
 
 {Column ratingpic}
-title = Rating
-menutitle = Rating (picture)
+title = _"Rating"
+menutitle = _"Rating (picture)"
 sort = rating
 width=100
 #hreq = pic:h
@@ -490,8 +490,8 @@ width=100
 pic : picture(file=ratingpic($rating),h=$_h,w=$_w,resize='ratio',init_file=ratingpic(0))
 
 {Column right_aligned_folder}
-menutitle = Folder (right-aligned)
-title = Folder
+menutitle = _"Folder (right-aligned)"
+title = _"Folder"
 hreq=text:h
 width=200
 sort= path
@@ -499,7 +499,7 @@ songbl= text
 text : text(markup= pesc($path), x=-text:w)
 
 {Group artistalbum}
-title=album and artist
+title= _"Album and artist"
 head=title:h
 vcollapse=head
 vmin=pic:y+pic:h+2
