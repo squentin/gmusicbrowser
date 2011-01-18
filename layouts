@@ -48,7 +48,7 @@ ars
         VBControls = _Filler16 HBControls _Filler17
             # HBControls =  -MBmain -MBLayoutSettings -HBVolume -Fullscreen(size=button) -ToggleButton1(relief=none,size=button,tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
             # HBControls =  -MBmain -MBLayoutSettings -HBVolume -Fullscreen(size=button)
-            HBControls =  -MBmain -HBVolume -Fullscreen(size=button) -TogButton(tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
+            HBControls = -MBmain -HBVolume -Fullscreen(size=button) -TogButton(tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
 
         HBVolume = VolumeIcon(button=1)
 
@@ -84,7 +84,7 @@ ars
 
             HBSongTree = _VBSongTree
             VBSongTree = HBSongTreeAct _SongTree 5HBSongTreeStats
-                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter Button(size=menu,click1=GoToCurrentSong,stock=gtk-jump-to,tip=_"Go to playing song") 20FLock _Filler9 _Filler10 -ResetFilter -Refresh -FBox -MBSongTree
+                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter Button(size=menu,click1=GoToCurrentSong,stock=gtk-jump-to,tip=_"Go to playing song") 20FilterLock _Filler9 _Filler10 -ResetFilter -Refresh -FilterBox -MBSongTree
                 HBSongTreeStats = -Total(size=small)
 
 
