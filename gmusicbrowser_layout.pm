@@ -1661,7 +1661,9 @@ sub init
 		my $widgets=$self->{widgets};
 		push @hidden,$widgets->{$_}{need_hide} for grep $widgets->{$_}{need_hide}, keys %$widgets;
 		@hidden=map $widgets->{$_}, @hidden;
-		$_->hide for @hidden;
+        if (defined $_) {
+    		$_->hide for @hidden;
+        }
 	}
 	#$self->set_position();#doesn't work before show, at least with sawfish
 	my ($x,$y)= $self->Position;
@@ -4211,3 +4213,4 @@ sub _resize
 }
 
 1;
+
