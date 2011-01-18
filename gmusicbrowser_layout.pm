@@ -812,15 +812,21 @@ sub ParseSongTreeSkin
 {	my $lines=$_[0];
 	my $first=shift @$lines;
 	my $ref;
+	my $name;
 	if ($first=~m#{(Column|Group) (.*)}#)
 	{	$ref= $1 eq 'Column' ? \%SongTree::STC : \%SongTree::GroupSkin;
-		$ref=$ref->{$2}={};
+		$name=$2;
+		$ref=$ref->{$name}={};
 	}
 	else {return}
 	for (@$lines)
 	{	my ($key,$e,$string)= m#^(\w+)\s*([=:])\s*(.*)$#;
 		next unless defined $key;
-		if ($e eq '=') {$ref->{$key}=$string unless $key eq 'elems' || $key eq 'options'}
+		if ($e eq '=')
+		{	if ($key eq 'elems' || $key eq 'options') { warn "Can't use reserved keyword $key in SongTreee column $name\n"; next }
+			$string= _( $1 ) if $string=~m/_"([^"]+)"/;
+			$ref->{$key}=$string;
+		}
 		elsif ($string=~m#^Option(\w*)\((.+)\)$#)
 		{	my $type=$1;
 			my $opt=::ParseOptions($2);
@@ -1657,11 +1663,17 @@ sub init
 	$self->realize;
 	$self->Resize if $self->{size};
 	{	my @hidden;
+		# widgets that were saved as hidden
 		@hidden=keys %{ $self->{hidden} } if $self->{hidden};
 		my $widgets=$self->{widgets};
-		push @hidden,$widgets->{$_}{need_hide} for grep $widgets->{$_}{need_hide}, keys %$widgets;
-		@hidden=map $widgets->{$_}, @hidden;
-		$_->hide for @hidden;
+		# look for widgets asking for other widgets to be hidden at init
+		for my $w (values %$widgets)
+		{	my $names= delete $w->{need_hide};
+			next unless $names;
+			push @hidden, split /\|/, $names;
+		}
+		# hide them
+		$_->hide for grep defined, map $widgets->{$_}, @hidden;
 	}
 	#$self->set_position();#doesn't work before show, at least with sawfish
 	my ($x,$y)= $self->Position;

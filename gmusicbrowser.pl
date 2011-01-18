@@ -5150,6 +5150,7 @@ sub AboutDialog
 		'Chinese : jk',
 		'Czech : Vašek Kovářík',
 		'Portuguese : Gleriston Sampaio <gleriston_sampaio@hotmail.com>',
+		'Korean : bluealbum',
 	);
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
