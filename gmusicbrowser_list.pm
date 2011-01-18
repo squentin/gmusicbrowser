@@ -5005,10 +5005,11 @@ sub key_press_cb
 	elsif	(lc$key eq 'a' && $ctrl)							#ctrl-a : select-all
 		{ $self->{selected}{$_}=undef for @{ $self->{list} }; $self->queue_draw; return 1; }
 	else {return 0}
-	if	($i<0)		{$j--; $i= $j<0 ? 0 : $nw-1}
-	elsif	($i>=$nw)	{$j++; $i= $j>=$nh ? $nwlast-1 : 0 }
+	if	($i<0)		{$j--;$i=$nw-1;}
+	elsif	($i>=$nw)	{$j++;$i=0;}
 	if	($j<0)		{$j=0;$i=0}
-	elsif	($j>=$nh-1)	{$j=$nh-1; $i=$nwlast-1 }
+	elsif	($j==$nh-1)	{$i=$nwlast-1 if $i>=$nwlast}
+	elsif	($j>$nh-1)	{$j=$nh-1; $i=$nwlast-1 }
 	$self->key_selected($event,$i,$j);
 	return 1;
 }
