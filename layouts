@@ -17,7 +17,7 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
             HBCurrentTrack = 10_VBCurrentTrack
                 VBCurrentTrack = 3Filler1 HBTitle 10Filler14 Cover(click1="",overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0) _Filler11 HBReplayButtons
-                    HBTitle = 5Filler12 Title(expand_max=300,minsize=1,markup="<big><b>%t</b></big> ",click1="",yalign=0.5) LockAlbumBreadcrumb AlbumBreadcrumb(minsize=1,expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%l ",showcover=0) LockArtistBreadcrumb ArtistBreadcrumb(expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
+                    HBTitle = 5Filler12 LockSongBreadcrumb Title(expand_max=300,minsize=1,markup="<big><b>%t</b></big> ",click1="",yalign=0.5) LockAlbumBreadcrumb AlbumBreadcrumb(minsize=1,expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%l ",showcover=0) LockArtistBreadcrumb ArtistBreadcrumb(expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
 ars
             VBSavedFilterPane = _FilterPane4(nb=0,hide=0) 4Filler7
 

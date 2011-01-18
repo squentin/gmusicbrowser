@@ -141,6 +141,12 @@ our %Widgets=
 		field	=> 'fullfilename',
 		tip	=> _"Lock on song",
 	},
+	LockSongBreadcrumb =>
+	{	parent	=> 'Lock',
+		field	=> 'fullfilename',
+		tip	=> _"Lock on song",
+        stock	=> { on => 'gmb-lock', off => 'gmb-breadcrumb-song gmb-locklight' },
+	},
 	LockArtist =>
 	{	parent	=> 'Lock',
 		field	=> 'first_artist',
@@ -150,7 +156,7 @@ our %Widgets=
 	{	parent	=> 'Lock',
 		field	=> 'first_artist',
 		tip	=> _"Lock on Artist",
-		stock	=> { on => 'gmb-lock', off => 'gmb-breadcrumb gmb-locklight' },
+		stock	=> { on => 'gmb-lock', off => 'gmb-breadcrumb-artist gmb-locklight' },
 	},
 	LockAlbum =>
 	{	parent	=> 'Lock',
@@ -161,7 +167,7 @@ our %Widgets=
 	{	parent	=> 'Lock',
 		field	=> 'album',
 		tip	=> _"Lock on Album",
-		stock	=> { on => 'gmb-lock', off => 'gmb-breadcrumb gmb-locklight' },
+		stock	=> { on => 'gmb-lock', off => 'gmb-breadcrumb-album gmb-locklight' },
 	},
 	Sort =>
 	{	class	=> 'Layout::Button',
