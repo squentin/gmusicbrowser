@@ -1929,13 +1929,13 @@ sub SongsRemoved_cb
 
 sub updatefilter
 {	my ($self,undef,$nb)=@_;
-	delete $::ToDo{'9_FPfull'.$self};
-	my $force=delete $self->{needupdate};
-
-	my $group=$self->{group};
 	my $mynb=$self->{nb};
 	return if $nb && $nb> $mynb;
+
+	delete $::ToDo{'9_FPfull'.$self};
+	my $force=delete $self->{needupdate};
 	warn "Filtering list for FilterPane$mynb\n" if $::debug;
+	my $group=$self->{group};
 	my $currentf=$::Filters{$group}[$mynb+1];
 	$self->{resetbutton}->set_sensitive( !Filter::is_empty($currentf) );
 	my $filt=Filter->newadd(TRUE, map($::Filters{$group}[$_+1],0..($mynb-1)) );
