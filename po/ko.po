@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-18 20:56+0100\n"
-"PO-Revision-Date: 2011-01-17 09:22+0900\n"
+"POT-Creation-Date: 2011-01-18 18:44+0100\n"
+"PO-Revision-Date: 2011-01-19 09:56+0900\n"
 "Last-Translator: bluealbum <bluealbum@gmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
 "Language: \n"
@@ -480,16 +480,12 @@ msgstr ""
 msgid "Album"
 msgstr "앨범"
 
-#: layouts:802
 msgid "Album and artist"
-msgstr ""
+msgstr "앨범과 가수"
 
-#: layouts:717
 msgid "Album and artist on the left side"
-msgstr ""
+msgstr "왼쪽에 앨범과 가수"
 
-#: gmusicbrowser_songs.pm:524 gmusicbrowser_songs.pm:532
-#: gmusicbrowser_tags.pm:1530 gmusicbrowser_tags.pm:1617
 msgid "Album artist"
 msgstr "앨범 아티스트"
 
@@ -1879,9 +1875,8 @@ msgstr "라벨/발행자"
 msgid "Labels"
 msgstr "라벨"
 
-#: gmusicbrowser_list.pm:744 layouts:754
 msgid "Labels' icons"
-msgstr ""
+msgstr "라벨 아이콘"
 
 #: gmusicbrowser_tags.pm:2031 gmusicbrowser_tags.pm:2055
 msgid "Lang"
@@ -2666,7 +2661,6 @@ msgstr "재생기 창 레이아웃 :"
 msgid "Playing"
 msgstr "재생중"
 
-#: gmusicbrowser_list.pm:2937
 msgid "Playing Album"
 msgstr "앨범 재생중"
 
@@ -2682,11 +2676,9 @@ msgstr "필터 재생중"
 msgid "Playing Title"
 msgstr "제목 재생중"
 
-#: gmusicbrowser_list.pm:737 layouts:749
 msgid "Playing and queue icons"
-msgstr ""
+msgstr "재생중 & 대기열 아이콘"
 
-#: gmusicbrowser.pl:2154
 msgid "Playing error : {error}"
 msgstr "재생중 에러 : {error}"
 
@@ -3604,23 +3596,9 @@ msgstr "섞여진 앨범들, 섞여진 트랙들"
 msgid "Shutdown command :"
 msgstr "끄기 명령어 :"
 
-#: plugins/epicrating.pm:474
-msgid "Signal: "
-msgstr ""
-
-#: layouts:694
 msgid "Simple title"
-msgstr ""
+msgstr "간단한 제목"
 
-#: layouts:701
-msgid "Simple title without any"
-msgstr ""
-
-#: plugins/audioscrobbler.pm:64
-msgid "Site :"
-msgstr ""
-
-#: gmusicbrowser.pl:7784 gmusicbrowser_songs.pm:455
 msgid "Size"
 msgstr "크기"
 
@@ -3632,11 +3610,9 @@ msgstr "스킵 수"
 msgid "Skip to next song if an error occurs"
 msgstr "오류가 발생하면 다음 노래로 스킵하기"
 
-#: layouts:777
 msgid "Small album picture"
-msgstr ""
+msgstr "작은 앨범 사진"
 
-#: layouts:174
 msgid "Small player"
 msgstr "작은 재생기"
 
@@ -3834,15 +3810,12 @@ msgstr "페이드-아웃의 타임스팬 "
 msgid "Title"
 msgstr "제목"
 
-#: layouts:768
 msgid "Title & icon"
-msgstr ""
+msgstr "제목 & 아이콘"
 
-#: layouts:726
 msgid "Title & progress"
-msgstr ""
+msgstr "제목 & 진행"
 
-#: gmusicbrowser_list.pm:731 layouts:760
 msgid "Title - Artist - Album"
 msgstr "제목 - 가수 - 앨범"
 
@@ -4595,11 +4568,9 @@ msgstr "즐겨찾기"
 msgid "file format"
 msgstr "파일 포맷"
 
-#: gmusicbrowser.pl:6919
 msgid "filters"
-msgstr ""
+msgstr "필터"
 
-#: gmusicbrowser.pl:7860
 msgid "first added"
 msgstr "처음 추가됨"
 
@@ -5505,11 +5476,9 @@ msgstr "브라우저 (노래트리) 포함"
 msgid "with context"
 msgstr "항목 포함"
 
-#: layouts:650
 msgid "with picture"
-msgstr ""
+msgstr "앨범 사진 포함"
 
-#: layouts:393
 msgid "with playlist"
 msgstr "재생목록 포함"
 
@@ -5595,7 +5564,7 @@ msgstr "{min}분 {sec}초 ({size}M)"
 
 #: gmusicbrowser.pl:2931 gmusicbrowser_songs.pm:2333
 msgid "{min}m{sec}s"
-msgstr "{min}분{sec}s"
+msgstr "{min}분{sec}초"
 
 #: gmusicbrowser.pl:5540
 msgid "{outputname} output settings"
@@ -5707,9 +5676,6 @@ msgstr "|-위젯 이름에서 목록 나누기"
 #~ msgid "Text :"
 #~ msgstr "텍스트 :"
 
-#~ msgid "Title :"
-#~ msgstr "제목 :"
-
 #~ msgid "You can use some markup, eg : <b>bold</b>"
 #~ msgstr "사용자가 일부 마크-표시를 사용할 수 있다, 예 : <b>bold</b>"
 
@@ -5752,3 +5718,4 @@ msgstr "|-위젯 이름에서 목록 나누기"
 
 #~ msgid "{command} is needed to play this file."
 #~ msgstr "이 파일을 재생하려면 {command}이 필요합니다."
+
