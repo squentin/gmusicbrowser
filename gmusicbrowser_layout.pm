@@ -789,7 +789,7 @@ sub ParseSongTreeSkin
 		next unless defined $key;
 		if ($e eq '=')
 		{	if ($key eq 'elems' || $key eq 'options') { warn "Can't use reserved keyword $key in SongTreee column $name\n"; next }
-			$string= _( $1 ) if $string=~m/_"([^"]+)"/;
+			$string= _( $1 ) if $string=~m/_\"([^"]+)"/;	#translation, escaping the " so it is not picked up as a translatable string
 			$ref->{$key}=$string;
 		}
 		elsif ($string=~m#^Option(\w*)\((.+)\)$#)
