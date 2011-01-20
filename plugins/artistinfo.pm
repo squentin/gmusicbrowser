@@ -41,6 +41,13 @@ my @External=
 	['pitchfork',	"http://pitchfork.com/search/?search_type=standard&query=%a",				_"Search pitchfork for Artist" ],
 	['discogs',	"http://www.discogs.com/artist/%a",							_"Search discogs for Artist" ],
 );
+
+my %menuitem=
+(	label => _"Search on the web",					#label of the menu item
+	submenu => sub { CreateSearchMenu( Songs::Gid_to_Get('artist',$_[0]{gid}) );  },			#when menu item selected
+	test => sub {$_[0]{mainfield} eq 'artist'},	#the menu item is displayed if returns true
+);
+
 =dop
 my @similarity=
 (	['super',	'0.9',	'#ff0101'],
@@ -65,10 +72,14 @@ my $artistinfowidget=
 	autoadd_type	=> 'context page text',
 };
 
-sub Start
-{	Layout::RegisterWidget(PluginArtistinfo => $artistinfowidget); }
-sub Stop
-{	Layout::RegisterWidget(PluginArtistinfo => undef); }
+sub Start {
+	Layout::RegisterWidget(PluginArtistinfo => $artistinfowidget);
+	push @::cMenuAA,\%menuitem;
+}
+sub Stop {
+	Layout::RegisterWidget(PluginArtistinfo => undef);
+	@::cMenuAA=  grep $_!=\%menuitem, @::SongCMenu;
+}
 
 sub new
 {	my ($class,$options)=@_;
@@ -113,7 +124,7 @@ sub new
 	$textview->signal_connect(visibility_notify_event=>\&update_cursor_cb);
 	$textview->signal_connect(query_tooltip => \&update_cursor_cb);
 	
-	my $store=Gtk2::ListStore->new('Glib::String','Glib::Double','Glib::String','Glib::UInt');
+	my $store=Gtk2::ListStore->new('Glib::String','Glib::Double','Glib::String','Glib::UInt','Glib::String');
 	my $treeview=Gtk2::TreeView->new($store);
 	my $tc_artist=Gtk2::TreeViewColumn->new_with_attributes( _"Artist",Gtk2::CellRendererText->new,markup=>0);
 	$tc_artist->set_sort_column_id(0);
@@ -248,7 +259,7 @@ sub tv_contextmenu {
 	return unless defined $path;
 	my $store=$treeview->{store};
 	my $iter=$store->get_iter($path);
-	my $artist=$store->get( $store->get_iter($path),0);
+	my $artist=$store->get( $store->get_iter($path),4);
 	my $url=$store->get( $store->get_iter($path),2);
 	my $aID=$store->get( $store->get_iter($path),3);
 	if ($event->button == 2) { if ($url eq "local") {
@@ -263,25 +274,31 @@ sub tv_contextmenu {
 		return 0;
 	}
 	else {
-		my $menu=Gtk2::Menu->new;
+		my $menu = CreateSearchMenu($artist,$url);
 		my $title=Gtk2::MenuItem->new(_"Search for artist on:");
-		$menu->append($title);
-		$title->show;
-		for my $item (@External) {
-			my ($key,$url,$text)=@$item;
-			if ($key eq 'lastfm') { $url='http://'.$store->get( $store->get_iter($path),2); }
-			else { $url=~s/%a/$artist/; }
-			my $menuitem = Gtk2::ImageMenuItem->new ($key);
-			$menuitem->set_image( Gtk2::Image->new_from_stock('webcontext-'.$key,'menu') );
-			$menuitem->signal_connect(activate => sub { ::main::openurl($url) if $url; return 0; });
-			$menu->append($menuitem);
-			$menuitem->show;
-		}
+		$menu->prepend($title);
+		$menu->show_all;
 		$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
 	}
 	return 1;
 	}
 	
+}
+
+sub CreateSearchMenu {
+	my($artist,$lastfm_url)=@_;
+	$artist=::url_escapeall($artist);
+	my $menu=Gtk2::Menu->new;
+	for my $item (@External) {
+			my ($key,$url,$text)=@$item;
+			if ($key eq "lastfm" && $lastfm_url) { $url='http://'.$lastfm_url; }
+			else { $url=~s/%a/$artist/; }
+			my $menuitem = Gtk2::ImageMenuItem->new ($key);
+			$menuitem->set_image( Gtk2::Image->new_from_stock('webcontext-'.$key,'menu') );
+			$menuitem->signal_connect(activate => sub { ::main::openurl($url) if $url; return 0; });
+			$menu->append($menuitem);
+		}
+	return $menu;
 }
 
 sub apiczoom {
@@ -340,39 +357,7 @@ sub url_at_coords
 		return $url;
 	}
 }
-=dop
-sub ExternalLinks
-{	my $self = shift;
-	my $buffer = $self -> {buffer};
-	$buffer->set_text("");
-	my $fontsize = $self->{fontsize};
-	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
-	my $centered = $buffer->create_tag(undef,justification=>'center');
-	my $iter=$buffer->get_start_iter;
-	$buffer->insert_with_tags($iter,_("Search the web for artist")." :\n\n",$tag_header);
-	my $i = 1;
-	my $artist = $self->{artist_esc};
-	for my $linkbutton (@External)
-	{	if ($i==5) {$buffer->insert($iter,"\n"); }
-		$i++;
-		my ($stock,$url,$tip)=@$linkbutton;
-		my $item=Gtk2::Button->new;
-		my $image=Gtk2::Image->new_from_stock("plugin-artistinfo-".$stock,'dnd');
-		$item->set_image($image);
-		$item->set_tooltip_text($tip);
-		$item->set_relief("none");
-		$url=~s/%a/$artist/;
-		$item->signal_connect(clicked => sub { ::main::openurl($_[1]); }, $url);
-		$buffer->insert_with_tags($iter,"  ",$centered);
-		my $anchor = $buffer->create_child_anchor($iter);
-		$self->{textview}->add_child_at_anchor($item,$anchor);
-		$buffer->insert_with_tags($iter,"  ",$centered);
-		$item->show_all;
-	}
 
-	$buffer->set_modified(0);
-}
-=cut
 sub Refresh_cb
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $ID = ::GetSelID($self);
@@ -403,7 +388,7 @@ sub ArtistChanged
 	my $url= $sites{$self->{site}}[SITEURL];
 	$url=~s/%a/$artist/;
 	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/;
-	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) {
+	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) { # FIXME: similar-tab always reloads when switched to
 		$self->{artist_esc} = $artist;
 		$self->{url} = $url;
 		if ($self->{site} eq "biography") { # check for local biography file before loading the page
@@ -416,9 +401,8 @@ sub ArtistChanged
 				}
 			}
 		}
-		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);
-		
-		}	
+		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);	
+	}
 }
 
 sub load_url
@@ -427,11 +411,8 @@ sub load_url
 	$self->cancel;
 	warn "info : loading $url\n" if $::debug;
 	$self->{url}=$url;
-	#if ($self->{site} ne "web") { 
 	$self->{sw2}->hide; $self->{sw1}->show;
 	$self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url);
-	# }
-	#else {	$self->ExternalLinks; }
 }
 
 sub loaded
@@ -519,7 +500,7 @@ sub loaded
 					$stats=AA::ReplaceFields($aID,' <span foreground="'.$fgcolor.'">(%X « %s)</span>',"artist",1);
 					$s_artist{url} = "local";
 				}
-				$self->{store}->set($self->{store}->append,0,::PangoEsc($s_artist{name}).$stats,1,$s_artist{match} * 100,2,$s_artist{url},3,$aID);
+				$self->{store}->set($self->{store}->append,0,::PangoEsc($s_artist{name}).$stats,1,$s_artist{match} * 100,2,$s_artist{url},3,$aID,4,$s_artist{name});
 			}
 			
 		}
