@@ -83,10 +83,11 @@ ars
         MBSongTree = HistItem
 
             HBSongTree = _VBSongTree
-            VBSongTree = HBSongTreeAct _SongTree 5HBSongTreeStats
+#            VBSongTree = HBSongTreeAct _SongTree 5HBSongTreeStats
+            VBSongTree = HBSongTreeAct _SongTree
 #                HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter Button(size=menu,click1=GoToCurrentSong,stock=gtk-jump-to,tip=_"Go to playing song") 20FilterLock _Filler9 _Filler10 -ResetFilter -Refresh -FilterBox -MBSongTree
                 HBSongTreeAct = Sort(button=1) QueueFilter Filter(button=1) PlayFilter Button(size=menu,click1=GoToCurrentSong,stock=gtk-jump-to,tip=_"Go to playing song") 20FilterLock _Filler9 _Filler10 -ResetFilter -MBSongTree
-                HBSongTreeStats = -Total(size=small)
+#                HBSongTreeStats = -Total(size=small)
 
 
     VolumeScroll	= HBVolume
