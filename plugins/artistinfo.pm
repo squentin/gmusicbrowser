@@ -300,15 +300,7 @@ sub CreateSearchMenu {
 			$menuitem->signal_connect(activate => sub { ::main::openurl($url) if $url; return 0; });
 			$menu->append($menuitem);
 		}
-<<<<<<< HEAD
-		$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
-	}
-	return 1;
-	}
-
-=======
 	return $menu;
->>>>>>> 899f961a4f93389e8813de550bc527204b057b54
 }
 
 sub apiczoom {
@@ -411,14 +403,8 @@ sub ArtistChanged
 				}
 			}
 		}
-<<<<<<< HEAD
-		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);
-
-		}
-=======
 		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);
 	}
->>>>>>> 899f961a4f93389e8813de550bc527204b057b54
 }
 
 sub load_url
@@ -427,10 +413,6 @@ sub load_url
 	$self->cancel;
 	warn "info : loading $url\n" if $::debug;
 	$self->{url}=$url;
-<<<<<<< HEAD
-	#if ($self->{site} ne "web") {
-=======
->>>>>>> 899f961a4f93389e8813de550bc527204b057b54
 	$self->{sw2}->hide; $self->{sw1}->show;
 	$self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url);
 }
