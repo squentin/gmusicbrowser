@@ -65,8 +65,8 @@ our %Widgets=
 	},
 	Play =>
 	{	class	=> 'Layout::Button',
-		state	=> sub {$::TogPlay? 'Paused' : 'Play'},
-		stock	=> {Paused => 'gtk-media-pause', Play => 'gtk-media-play' },
+		state	=> sub {$::TogPlay? 'pause' : 'play'},
+		stock	=> {pause => 'gtk-media-pause', play => 'gtk-media-play' },
 		tip	=> sub {$::TogPlay? _"Pause" : _"Play"},
 		activate=> \&::PlayPause,
 		#click3	=> undef,
@@ -2718,7 +2718,17 @@ sub new
 	}
 	bless $self, $class;
 	my $text= $opt->{text} || $opt->{label};
-	my $stock= $ref->{'state'} ? $ref->{stock} : $opt->{stock}; 	#FIXME support states ?
+	my $stock= $opt->{stock};
+	if (!ref $stock && $ref->{'state'})
+	{	my $default= $ref->{stock};
+		my %hash;
+		%hash = %$default if ref $default eq 'HASH'; #make a copy of the default setting if it is a hash
+		# extract icon(s) for each state using format : "state1: icon1 facultative_icon2 state2: icon3"
+		$hash{$1}=$2 while $stock=~s/(\w+) *: *([^:]+?) *$//;
+		$stock=\%hash;
+		#if default setting is a function, use a function that look in the hash, and fallback to the default function (this is the case for Queue and VolumeIcon widgets)
+		$stock= sub { $hash{$_[0]} || &$default } if ref $default eq 'CODE';
+	}
 	if ($opt->{skin})
 	{	my $skin=Skin->new($opt->{skin},$self,$opt);
 		$self->signal_connect(expose_event => \&Skin::draw,$skin);
