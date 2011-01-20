@@ -1,0 +1,4089 @@
+# bluealbum, 2009.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: squentin@free.fr\n"
+"POT-Creation-Date: 2011-01-18 18:44+0100\n"
+"PO-Revision-Date: 2011-01-19 09:56+0900\n"
+"Last-Translator: bluealbum <bluealbum@gmail.com>\n"
+"Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Korean\n"
+"X-Poedit-Country: KOREA, REPUBLIC OF\n"
+"X-Generator: Lokalize 1.0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+msgid " of {length}"
+msgstr "/ {length}"
+
+msgid "# songs"
+msgstr "# 노래들"
+
+msgid "%S by %a"
+msgstr "%S / %a"
+
+msgid "%d Album"
+msgid_plural "%d Albums"
+msgstr[0] "%d 앨범"
+
+msgid "%d Artist"
+msgid_plural "%d Artists"
+msgstr[0] "%d 음악가"
+
+msgid "%d Song"
+msgid_plural "%d Songs"
+msgstr[0] "%d 노래"
+
+msgid "%d album"
+msgid_plural "%d albums"
+msgstr[0] "%d 앨범"
+
+msgid "%d artist"
+msgid_plural "%d artists"
+msgstr[0] "%d 음악가"
+
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] "%d 파일"
+
+msgid "%d file in {folder}"
+msgid_plural "%d files in {folder}"
+msgstr[0] "{folder}의 %d 파일"
+
+msgid "%d folder"
+msgid_plural "%d folders"
+msgstr[0] "%d 폴더"
+
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d 초"
+
+msgid "%d song"
+msgid_plural "%d songs"
+msgstr[0] "%d 노래"
+
+msgid "%d song added"
+msgid_plural "%d songs added"
+msgstr[0] "%d 노래 추가됨"
+
+msgid "%d song in queue"
+msgid_plural "%d songs in queue"
+msgstr[0] "%d 노래 대기열에서"
+
+msgid "%d song in the library"
+msgid_plural "%d songs in the library"
+msgstr[0] "%d 노래 라이브러리에서"
+
+msgid "%d song selected"
+msgid_plural "%d songs selected"
+msgstr[0] "%d 노래 선택됨"
+
+msgid "%f is set"
+msgstr "%f 설정됨"
+
+msgid "%f isn't set"
+msgstr "%f 설정 안됨"
+
+msgid "%n first added"
+msgstr "%n 처음 추가됨"
+
+msgid "%n last added"
+msgstr "%n 마지막 추가됨"
+
+msgid "%n last played"
+msgstr "%n 마지막 연주됨"
+
+msgid "%n last skipped"
+msgstr "%n 마지막 스킵됨"
+
+msgid "%n less played"
+msgstr "%n 짧게 재생됨"
+
+msgid "%n less skipped"
+msgstr "%n 짧게 스킵됨"
+
+msgid "%n longest"
+msgstr "%n 가장 길게"
+
+msgid "%n most played"
+msgstr "%n 대부분 재생됨"
+
+msgid "%n most skipped"
+msgstr "%n 대부분 스킵됨"
+
+msgid "%n not played for the longest time"
+msgstr "%n 가장 긴 시간동안 재생되지 않음"
+
+msgid "%n not skipped for the longest time"
+msgstr "%n 가장 긴 시간동안 스킵되지 않음"
+
+msgid "%n shortest"
+msgstr "%n 가장 짧게"
+
+msgid "'{file}' exists. Overwrite ?"
+msgstr "'{file}' 이미 존재합니다. 덮어쓸까요?"
+
+msgid "(%d song excluded)"
+msgid_plural "(%d songs excluded)"
+msgstr[0] "(%d 노래 제외됨)"
+
+msgid "(: )has one"
+msgstr "(: ) 하나를 가짐"
+
+msgid "(: )none"
+msgstr "(: )없음"
+
+msgid "(applied after restart)"
+msgstr "(재시작 후 적용됩니다)"
+
+msgid "(case insensitive)"
+msgstr "(대소문자 구분)"
+
+msgid "(common parent folder : {common})"
+msgstr "(일반 부모 폴더 : {common})"
+
+msgid "(other)"
+msgstr "(기타)"
+
+msgid "(see http://www.last.fm)"
+msgstr "(보기 http://www.last.fm)"
+
+msgid ""
+"- When selecting a song, the playlist filter will be reset if the song is "
+"not in it\n"
+"- Skip to another song when removing the current song from the playlist"
+msgstr ""
+"- 노래를 선택하면, 재생목록 필터가 목록에 노래가 없으면 재설정됩니다\n"
+"- 재생목록에서 현재 노래를 제거하면 다른 노래로 건너뜁니다"
+
+msgid "0 chance"
+msgstr "0 회"
+
+msgid "1 chance in {probability}"
+msgstr "{probability}에서 1 기회 "
+
+msgid "3 Filter panes"
+msgstr "3 필터 패널"
+
+msgid "32x32 PNG file icon"
+msgstr "32x32 PNG 파일 아이콘"
+
+msgid "50 Last Added"
+msgstr "50 마지막 추가됨"
+
+msgid "50 Last Played"
+msgstr "50 마지막 재생됨"
+
+msgid "50 Most Played"
+msgstr "50 대부분 재생됨"
+
+msgid "<Unknown>"
+msgstr "<알 수 없음>"
+
+msgid ""
+"<b>%t</b>\n"
+"<small><small>by</small> %a\n"
+"<small>from</small> %l</small>"
+msgstr ""
+"<b>%t</b>\n"
+"<small><small>/</small> %a\n"
+"<small>에서</small> %l</small>"
+
+msgid "<i>by</i> %a\\n<i>from</i> %l"
+msgstr "<i>의해</i> %a\\n<i>으로부터</i> %l"
+
+msgid "Abort"
+msgstr "중단"
+
+msgid "Abort ReplayGain analysis"
+msgstr "리플레이게인 분석 중지"
+
+msgid "Abort all"
+msgstr "모두 중단"
+
+msgid "Abort mass-tagging"
+msgstr "많은 파일의-태깅 중지하기"
+
+msgid "About"
+msgstr "정보"
+
+msgid ""
+"About to delete {files}\n"
+"Are you sure ?"
+msgstr ""
+"{files} 지우기 정보\n"
+"확실합니까?"
+
+msgid "About to turn off the computer in :"
+msgstr "컴퓨터 끄기 정보 :"
+
+msgid "Actions are not supported by current notification daemon"
+msgstr "기능이 현재의 알림 데몬에서 지원되지 않습니다"
+
+msgid "Add"
+msgstr "추가"
+
+msgid "Add a button to rip a CD"
+msgstr "CD 립 버튼 추가"
+
+msgid "Add a fullscreen button"
+msgstr "전체화면 버튼 추가"
+
+msgid "Add a fullscreen button to layouts that can accept extra buttons"
+msgstr "나머지 버튼을 허용하는 레이아웃에 전체화면 버튼 추가하기"
+
+msgid "Add a group"
+msgstr "그룹 추가"
+
+msgid "Add a label to the current song"
+msgstr "현재 노래에 이름 추가하기"
+
+msgid "Add a list of files/folders to the playlist"
+msgstr "재생목록에 파일/폴더의 목록 추가하기"
+
+msgid "Add a radio"
+msgstr "라디오 추가"
+
+msgid "Add files or folders"
+msgstr "파일 또는 폴더 추가하기"
+
+msgid "Add files/folders to library"
+msgstr "라이브러리에 파일/폴더 추가"
+
+msgid "Add folder"
+msgstr "폴더 추가"
+
+msgid "Add label"
+msgstr "라벨 추가"
+
+msgid "Add multiple condition"
+msgstr "다중 조건 추가"
+
+msgid "Add new label"
+msgstr "새 이름 추가"
+
+msgid "Add new radio"
+msgstr "새 라디오 추가"
+
+msgid "Add rule : "
+msgstr "규칙 추가: "
+
+msgid "Add shorcut key"
+msgstr "단축 키 추가"
+
+msgid "Add tab"
+msgstr "탭 추가"
+
+msgid "Add to list"
+msgstr "목록에 추가"
+
+msgid "Added"
+msgstr "추가됨"
+
+msgid "Added Today"
+msgstr "날짜 추가됨"
+
+msgid "Adding a radio"
+msgstr "라디오 추가중"
+
+msgid ""
+"Additionally this format can be used :\n"
+" default number1 format1 number2 format2 ...\n"
+" dates more recent than number1 seconds will use format1, ..."
+msgstr ""
+"추가적으로 이 형식은 사용될 수 있습니다 :\n"
+" 기본값 number1 format1 number2 format2 ...\n"
+" number1 초 보다 최근의 날짜는 format1, ... 을 사용할 것입니다"
+
+msgid ""
+"Adds a menu entry to artist/album context menu, allowing to search the "
+"picture/cover in google and save it."
+msgstr ""
+"가수/앨범 항목 메뉴에 메뉴 항목 추가, 구글에서 사진/표지 찾기 허용 그리고 저"
+"장하기"
+
+msgid "Adds labels to the current song"
+msgstr "현재의 노래에 이름 추가하기"
+
+msgid "Adds menu entries to song contextual menu"
+msgstr "노래 문맥상의 메뉴에 메뉴 항목 추가"
+
+msgid "Advanced Search ..."
+msgstr "고급 찾기 ..."
+
+msgid "Advanced Tag Editing"
+msgstr "고급 태그 편집"
+
+msgid "Album"
+msgstr "앨범"
+
+msgid "Album and artist"
+msgstr "앨범과 가수"
+
+msgid "Album and artist on the left side"
+msgstr "왼쪽에 앨범과 가수"
+
+msgid "Album artist"
+msgstr "앨범 아티스트"
+
+msgid "Album gain"
+msgstr "앨범 게인"
+
+msgid "Album mode"
+msgstr "앨범 모드"
+
+msgid "Album peak"
+msgstr "앨범 피크"
+
+msgid "Album picture"
+msgstr "앨범 사진"
+
+msgid "Album picture & info"
+msgstr "앨범 사진 & 정보"
+
+msgid "Album shuffle"
+msgstr "앨범 섞기"
+
+msgid "Album with picture"
+msgstr "앨범 사진 포함"
+
+msgid "Album year(s)"
+msgstr "앨범 연도"
+
+msgid "All"
+msgstr "모두"
+
+msgid "All Songs"
+msgstr "모든 노래"
+
+msgid "All albums"
+msgstr "모든 앨범"
+
+msgid "All artists"
+msgstr "모든 가수"
+
+msgid "All but the [most/less]%n"
+msgstr "모두 그러나 [most/less]%n"
+
+msgid "All files"
+msgstr "모든 파일"
+
+msgid "All genres"
+msgstr "모든 장르"
+
+msgid "All labels"
+msgstr "모든 이름"
+
+msgid "All moods"
+msgstr "모든 분위기"
+
+msgid "All of :"
+msgstr "모두 :"
+
+msgid "All songs"
+msgstr "모든 노래"
+
+msgid "Allow for scheduling fade-out and stop"
+msgstr "패이드-아웃과 멈추기 스케쥴링을 허용하기"
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
+msgstr "MPRIS v1.0 표준을 사용하는 DBus를 통해 gmusicbrowser 제어를 허용합니다"
+
+msgid "Alt"
+msgstr "Alt"
+
+msgid "Amount of volume changed by the mouse wheel"
+msgstr "볼륨 크기는 마우스 휠로 바뀌어집니다"
+
+msgid "Any of :"
+msgstr "어느것 :"
+
+msgid "Append"
+msgstr "적용"
+
+msgid "Append (only if not already present)"
+msgstr "적용 (이미 존재하지 않을 때만)"
+
+msgid "Append to playlist"
+msgstr "재생목록에 적용하기"
+
+msgid "Application"
+msgstr "응용프로그램"
+
+msgid "Are you sure you want to delete the '{label}' label ?"
+msgstr "'{label}' 라벨을 지우시겠습니까?"
+
+msgid "Arguments"
+msgstr "줄거리"
+
+msgid "Artist"
+msgstr "음악가"
+
+msgid "Artist & album"
+msgstr "아티스트 & 앨범"
+
+msgid "Artist Picture Size : "
+msgstr "가수 사진 크기 :"
+
+msgid "Artist URL"
+msgstr "가수 주소"
+
+msgid "Artist picture"
+msgstr "가수 사진"
+
+msgid "Artist,Album,Disc,Track"
+msgstr "가수,앨범,디스크,트랙"
+
+msgid "Artist,Date,Album,Disc,Track"
+msgstr "가수,날짜,앨범,디스크,트랙"
+
+msgid "Artistinfo"
+msgstr "가수정보"
+
+msgid "Artistinfo plugin"
+msgstr "가수-정보 플러그인"
+
+msgid "Artists"
+msgstr "가수"
+
+msgid "Ascending order"
+msgstr "오름차순"
+
+msgid "Ask confirmation only if file already exists"
+msgstr "파일이 이미 존재하는지의 여부만 확인 요청하기"
+
+msgid "Audio"
+msgstr "오디오"
+
+msgid "Author"
+msgstr "제작자"
+
+msgid "Auto fill based on filenames ..."
+msgstr "파일이름에 자동으로 채우기 ..."
+
+msgid "Auto fill only blank fields"
+msgstr "빈 필드만 자동으로 채우기"
+
+msgid "Auto fill queue"
+msgstr "대기열 자동 채우기"
+
+msgid "Auto filter"
+msgstr "자동 필터"
+
+msgid "Auto-increment track numbers"
+msgstr "트랙 번호 자동 증가"
+
+msgid "Auto-save positive finds"
+msgstr "맞는 것을 찾으면 자동 저장하기"
+
+msgid "Auto-scroll"
+msgstr "자동 스크롤"
+
+msgid "Auto-select Pictures"
+msgstr "자동 사진 고르기"
+
+msgid "Automatically remove current song if not found"
+msgstr "찾지 못하면 현재 노래를 자동으로 제거하기"
+
+msgid "Autosave"
+msgstr "자동저장 "
+
+msgid "Autosave plugin"
+msgstr "자동저장 플러그인"
+
+msgid "Available"
+msgstr "사용 가능"
+
+msgid "BPM"
+msgstr "BPM"
+
+msgid "Bad session"
+msgstr "잘못된 세션"
+
+msgid "Base Folder :"
+msgstr "기본 폴더 :"
+
+msgid "Begin with"
+msgstr "다음으로 시작"
+
+msgid "Below"
+msgstr "아래로"
+
+msgid "Bitrate"
+msgstr "비트레이트"
+
+msgid "Body :"
+msgstr "본문 :"
+
+msgid "Body text is not supported by current notification daemon"
+msgstr "본문 텍스트 현재 알림 데몬에서 지원하지 않습니다."
+
+msgid "Browser"
+msgstr "브라우저"
+
+msgid "Browser window layout :"
+msgstr "브라우저 창 레이아웃 :"
+
+msgid "Browser with SongTree"
+msgstr "노래트리 가진 브라우저"
+
+msgid "Buttons"
+msgstr "버튼"
+
+msgid "Buttons, Song & Cover"
+msgstr "버튼, 노래 & 커버"
+
+msgid "Can be relative by using + or -"
+msgstr "+ 또는 - 를 사용해서 관련되게 할 수 있다."
+
+msgid "Can't change the volume in non-gstreamer iceserver mode"
+msgstr "non-gstreamer iceserver 모드에서 소리를 바꿀 수 없습니다"
+
+msgid ""
+"Can't change the volume. Needs amixer (packaged in alsa-utils) to change "
+"volume when using this audio backend."
+msgstr ""
+"소리를 바꿀 수 없습니다. 이 오디오 백앤드를 사용할 때 소리를 바꾸려면 알사믹"
+"서(amixer (alsa-utils 패키지에 포함됨))를 필요로 합니다."
+
+msgid ""
+"Can't create Folder '{path}' : \n"
+"{error}"
+msgstr ""
+"'{path}' 폴더를 만들 수 없습니다 : \n"
+"{error}"
+
+msgid "Can't create sink '{sink}'"
+msgstr "'{sink}' 싱크를 만들 수 없습니다"
+
+msgid "Can't play '{file}'."
+msgstr "'{file}' 재생할 수 없습니다"
+
+msgid "Can't read file or invalid file"
+msgstr "파일을 읽을 수 없거나 잘못된 파일"
+
+msgid "Can't write in base folder '{folder}'."
+msgstr "'{folder}' 기본 폴더에 쓰기를 할 수 없습니다."
+
+msgid "Capitalize"
+msgstr "대문자 사용"
+
+msgid "Capitalize each word"
+msgstr "각 단어 대문자 사용"
+
+msgid "Case insensitive"
+msgstr "대소문자 구분안함"
+
+msgid "Case sensitive"
+msgstr "대소문자 구분"
+
+msgid "Case-sensitive"
+msgstr "대소문자 구분"
+
+msgid "Categories pane"
+msgstr "카테고리 패널"
+
+msgid "Centered"
+msgstr "가운데"
+
+msgid "Centered on"
+msgstr "가운데로"
+
+msgid "Change Display"
+msgstr "표시 바꾸기"
+
+msgid "Change default text color"
+msgstr "기본 글자색 바꾸기"
+
+msgid "Change default text font and size"
+msgstr "기본 글자 글꼴과 크기 바꾸기"
+
+msgid "Channels"
+msgstr "채널"
+
+msgid "Check for updated/deleted songs on startup"
+msgstr "시작할 때 업데이트/지워진 노래 체크하기"
+
+msgid "Check for updated/removed songs"
+msgstr "업데이트/제거된 노래 체크하기"
+
+msgid "Checking length/bitrate"
+msgstr "길이/비트 레이트 체크중"
+
+msgid "Checking songs"
+msgstr "노래 체크중"
+
+msgid "Choose Album From this Artist"
+msgstr "이 가수의 앨범 고르기"
+
+msgid "Choose Artist/Album/Song"
+msgstr "가수/앨범/노래 고르기"
+
+msgid "Choose Date"
+msgstr "날짜 고르기"
+
+msgid "Choose Picture"
+msgstr "사진 고르기"
+
+msgid "Choose Random Album"
+msgstr "랜덤 앨범 고르기"
+
+msgid "Choose directory to copy files to"
+msgstr "파일을 복사위한 폴더 고르기"
+
+msgid "Choose directory to move files to"
+msgstr "파일을 이동할 폴더를 고르기"
+
+msgid "Choose files"
+msgstr "파일 고르기"
+
+msgid "Choose folder to add"
+msgstr "추가할 폴더 고르기"
+
+msgid "Choose font for lyrics"
+msgstr "가사 글꼴 고르기"
+
+msgid "Choose font..."
+msgstr "글꼴 고르기..."
+
+msgid "Choose icon for label {name}"
+msgstr "{name} 라벨 아이콘 고르기"
+
+msgid "Choose page to open"
+msgstr "불러올 페이지 고르기"
+
+msgid "Choose picture for '%s'"
+msgstr "'%s' 위한 사진 고르기"
+
+msgid "Choose playlist files to import"
+msgstr "가져올 재생목록 고르기"
+
+msgid "Clear"
+msgstr "비우기"
+
+msgid "Clear queue"
+msgstr "대기열 비움"
+
+msgid "Clear selected fields"
+msgstr "선택한 필드 비우기"
+
+msgid "Client banned, contact gmusicbrowser's developer"
+msgstr "클라이언트 금지됨, 프로그램 개발자와 접촉하세요"
+
+msgid "Close"
+msgstr "닫기"
+
+msgid "Close Window"
+msgstr "창 닫기"
+
+msgid "Close to tray"
+msgstr "트레이 닫기"
+
+msgid "Command"
+msgstr "명령"
+
+msgid "Command to launch when the button is pressed"
+msgstr "버튼이 눌러지면 실행할 명령"
+
+msgid ""
+"Command used when\n"
+"'turn off computer when queue empty'\n"
+"is selected"
+msgstr ""
+"'대기열 비워지면 컴퓨터 끄기'가\n"
+"선택되었을 때 명령어가\n"
+"사용됨"
+
+msgid "Command when playing song changed :"
+msgstr "재생중인 노래가 바뀔 때 명령 실행"
+
+msgid "Command when stopped :"
+msgstr "멈출때 명령 :"
+
+msgid "Comment"
+msgstr "주석"
+
+msgid "Comments"
+msgstr "주석"
+
+msgid "Compilation"
+msgstr "편집물"
+
+msgid "Composer"
+msgstr "작곡가"
+
+msgid "Conductor"
+msgstr "지휘자"
+
+msgid "Connect through a proxy"
+msgstr "프록시 통한 연결"
+
+msgid "Connections from :"
+msgstr "다음으로 연결 :"
+
+msgid "Context"
+msgstr "항목"
+
+msgid "Copy"
+msgstr "복사"
+
+msgid "Copy failed"
+msgstr "복사 실패함"
+
+msgid "Copy link address"
+msgstr "링크 주소 복사"
+
+msgid "Copy to mounted portable player"
+msgstr "마운트된 포터블 재생기에 복사"
+
+msgid "Copy to portable player"
+msgstr "포터블 재생기에 복사"
+
+msgid "Copying file"
+msgid_plural "Copying %d files"
+msgstr[0] "%d 파일 복사중"
+
+msgid "Copyright"
+msgstr "저작권"
+
+msgid "Create ID3v2 tags as ID3v2.4"
+msgstr "ID3v2 태그를 ID3v2.4 태그로 만들기"
+
+msgid "Ctrl"
+msgstr "Ctrl"
+
+msgid "Current song must always be in the playlist"
+msgstr "현재 노래는 항상 재생목록에 있어야 합니다."
+
+msgid "Custom"
+msgstr "사용자 정의"
+
+msgid "Custom Text"
+msgstr "사용자 정의 문자열"
+
+msgid "Custom URL"
+msgstr "사용자 정의 주소"
+
+msgid "Custom command :"
+msgstr "사용자 정의 명령 :"
+
+msgid "Custom context pages :"
+msgstr "상황에 맞는 문맥 페이지 :"
+
+msgid "Custom fields"
+msgstr "사용자 정의 필드"
+
+msgid "Custom formats"
+msgstr "사용자 포맷"
+
+msgid "Custom..."
+msgstr "사용자 정의..."
+
+msgid "Date"
+msgstr "날짜"
+
+msgid "Date format :"
+msgstr "날짜 형식 :"
+
+msgid "Date of purchase"
+msgstr "구매 날짜"
+
+msgid "Debut Album"
+msgstr "데뷰 앨범"
+
+msgid "Decrease Volume"
+msgstr "음량 감소"
+
+msgid "Default"
+msgstr "기본 값"
+
+msgid "Default rating :"
+msgstr "기본 점수 :"
+
+msgid "Default text color"
+msgstr "기본 글자색"
+
+msgid "Default text font"
+msgstr "기본 글자 글꼴"
+
+msgid "Delay tray tip popup on mouse over"
+msgstr "마우스상에 있으면 트레이 팁 팝업상자 지연하기"
+
+msgid "Delete Selected Songs"
+msgstr "선택한 노래 지우기"
+
+msgid "Delete list"
+msgstr "목록 지우기"
+
+msgid "Descending order"
+msgstr "내림차순"
+
+msgid "Descr."
+msgstr "설명."
+
+msgid "Description"
+msgstr "설명"
+
+msgid "Desktop widgets"
+msgstr "데스크탑 위젯"
+
+msgid "Desktop widgets plugin"
+msgstr "데스크탑 위젯 플로그인"
+
+msgid "Disable screensaver when fullscreen and playing"
+msgstr "전체화면과 재생할 때 스크린세이버 사용하지 않기"
+
+msgid "Disabled"
+msgstr "사용안함"
+
+msgid "Disc"
+msgstr "디스크"
+
+msgid "Disc #"
+msgstr "디스크 #"
+
+msgid "Disc name"
+msgstr "디스크 이름"
+
+msgid "Display (:1 or host:0 for example)"
+msgstr "표시 (예 :1 또는 host:0)"
+
+msgid "Display Songs"
+msgstr "노래 표시"
+
+msgid ""
+"Display a special layout in or around the titlebar of the focused window"
+msgstr "특별한 레이아웃에서 또는 포커스된 창의 제목바 주위에 표시"
+
+msgid "Display stop/next actions"
+msgstr "정지/다음 동작 표시"
+
+msgid "Display synchronized lyrics of the current song"
+msgstr "현재 노래의 동기화된 가사 표시하기"
+
+msgid "Display tray tip for"
+msgstr "트레이 팁 표시"
+
+msgid "Do not add a title row"
+msgstr "제목 열 추가하지 않기"
+
+msgid "Do not add songs that can't be played"
+msgstr "재생할 수 없는 노래는 추가하지 않기"
+
+msgid "Do not create an id3v1 tag in mp3 files"
+msgstr "mp3 파일에 id3v1 태그를 만들지 않기"
+
+msgid "Do not unsynchronise id3v2 tags"
+msgstr "id3v2 태그를 비동기화하지 않기"
+
+msgid "Do not write the tags"
+msgstr "태그 쓰지 않기"
+
+msgid "Don't add the overlay to dialogs"
+msgstr "대화상자에 오버레이 추가하지 않기"
+
+msgid "Don't know how to play files of type {type}"
+msgstr "{type} 형식의 파일 재생 방법을 알 수 없습니다"
+
+msgid "Don't notify if the main window is visible"
+msgstr "주 창이 보일 때는 알림을 표시하지 않기"
+
+msgid "Don't submit current song"
+msgstr "현재 노래 제출하지 않기"
+
+msgid "Edit Current Song Properties"
+msgstr "현재 노래 등록정보 편집"
+
+msgid "Edit Labels"
+msgstr "라벨 편집"
+
+msgid "Edit Lyrics"
+msgstr "가사 편집"
+
+msgid "Edit Lyrics ..."
+msgstr "가사 편집..."
+
+msgid "Edit Multiple Songs Properties"
+msgstr "다중 노래 등록정보 편집"
+
+msgid "Edit Rating"
+msgstr "점수 편집"
+
+msgid "Edit Settings"
+msgstr "설정 편집"
+
+msgid "Edit auto-fill formats ..."
+msgstr "자동-채움 포맷 편집 ..."
+
+msgid "Edit filter"
+msgstr "필터 편집"
+
+msgid "Edit grouping ..."
+msgstr "그룹으로 나누기 편집 ..."
+
+msgid "Edit list"
+msgstr "목록 편집"
+
+msgid "Edit ordered modes ..."
+msgstr "순서 모드 편집 ..."
+
+msgid "Edit random modes ..."
+msgstr "랜덤 모드 편집 ..."
+
+msgid "Edit selected song properties"
+msgstr "선택한 노래 등록정보 편집"
+
+msgid "Edit..."
+msgstr "편집..."
+
+msgid "EditList"
+msgstr "편집목록"
+
+msgid "Editing list : "
+msgstr "목록 편집 :"
+
+msgid "Editing tags"
+msgstr "태그 편집"
+
+msgid "Embedded lyrics"
+msgstr "내장된 가사"
+
+msgid "Embedded picture"
+msgstr "내장된 사진"
+
+msgid "Encapsulated object"
+msgstr "요약된 대상"
+
+msgid "Encoded by"
+msgstr "엔코드"
+
+msgid "Encoded with"
+msgstr "엔코드"
+
+msgid "Encoder"
+msgstr "엔코더"
+
+msgid "Encoding used for id3v1 tags :"
+msgstr "id3v1 태그 사용하기 :"
+
+msgid "Enqueue"
+msgstr "대기열로 보내기"
+
+msgid "Enqueue Action"
+msgstr "실행중인것 대기열로 보내기"
+
+msgid "Enqueue Displayed"
+msgstr "표시된 것 대기열로 보내기"
+
+msgid "Enqueue Selected"
+msgstr "선택한 것 대기열로 보내기"
+
+msgid "Enqueue Selected Songs"
+msgstr "선택한 노래 대기열로 보내기"
+
+msgid "Enqueue Songs from Current Album"
+msgstr "현재 앨범의 노래를 대기열로 보내기"
+
+msgid "Enqueue Songs from Current Artist"
+msgstr "현재 가수의 노래를 대기열로 보내기"
+
+msgid "Enqueue a list of files/folders"
+msgstr "파일/폴더의 목록을 대기열로 보내기"
+
+msgid "Enqueue filter"
+msgstr "대기열로 보내기 필터"
+
+msgid "Enter custom event string :"
+msgstr "상황에 맞는 이벤트 문자열 넣기 :"
+
+msgid "Equalizer"
+msgstr "이퀄라이저"
+
+msgid "Error :"
+msgstr "에러 :"
+
+msgid ""
+"Error saving artistbio in '{file}' :\n"
+"{error}"
+msgstr ""
+"'{file}'에 가수 일대기 저장 에러 :\n"
+"{error}"
+
+msgid ""
+"Error saving lyrics in '{file}' :\n"
+"{error}"
+msgstr ""
+"'{file}'에 가사 저장 에러 :\n"
+"{error}"
+
+msgid "Error writing '{file}'"
+msgstr " '{file}' 쓰기 에러!"
+
+msgid "Error writing replaygain tags :\n"
+msgstr "리플레이게인 태그 쓰기 에러 :\n"
+
+msgid "Error: invalid filename pattern"
+msgstr "에러: 잘못된 파일이름 패턴"
+
+msgid "Example :"
+msgstr "예 :"
+
+msgid "Execute custom command on selected files"
+msgstr "선택한 파일에 사용자 정의 명령 실행"
+
+msgid "Export"
+msgstr "내보내기"
+
+msgid "Export plugin"
+msgstr "내보내기 플러그인"
+
+msgid "Export song properties to a .csv file"
+msgstr "노래 등록정보를 .csv 파일로 내보내기"
+
+msgid "Export to .m3u file"
+msgstr ".m3u 파일로 내보내기"
+
+msgid "Extra gain"
+msgstr "익스트라 게인"
+
+msgid "Extract guest artist from title :"
+msgstr "제목에서 가수를 추출하기 :"
+
+msgid "Fade-out"
+msgstr "페이드-아웃"
+
+msgid "Fade-out in"
+msgstr "페이드-아웃"
+
+msgid "Fade-out then stop"
+msgstr "페이드-아웃 그런후 정지"
+
+msgid ""
+"Failed to delete '{file}' :\n"
+"{error}"
+msgstr ""
+"'{file}' 삭제 실패함 :\n"
+"{error}"
+
+msgid "Field name"
+msgstr "필드 이름"
+
+msgid "Field type"
+msgstr "파일 종류"
+
+msgid "Fields"
+msgstr "필드"
+
+msgid "File type"
+msgstr "파일 종류"
+
+msgid "Filename"
+msgstr "파일 이름"
+
+msgid "Filename extension"
+msgstr "파일이름 확장자"
+
+msgid "Filename format :"
+msgstr "파일이름 포맷 :"
+
+msgid "Filename without extension"
+msgstr "파일이름 확장자 없이"
+
+msgid "Filesystem"
+msgstr "파일 시스템"
+
+msgid "Filter"
+msgstr "필터"
+
+msgid "Filter : "
+msgstr "필터 : "
+
+msgid "Filter edition"
+msgstr "필터 편집"
+
+msgid "Filter on playing Album"
+msgstr "재생중 앨범 필터"
+
+msgid "Filter on playing Artist"
+msgstr "재생중 가수 필터"
+
+msgid "Filter on playing Song"
+msgstr "재생중 노래 필터"
+
+msgid "Filter on this album"
+msgstr "이 앨범 필터"
+
+msgid "Filter on this artist"
+msgstr "이 가수 필터"
+
+msgid "Find :"
+msgstr "찾기 :"
+
+msgid "Find a unique filename if file already exists"
+msgstr "파일이 이미 있으면 다른 파일이름 찾기"
+
+msgid "Find songs in same albums"
+msgstr "같은 앨범에서 노래 찾기"
+
+msgid "Find songs with same artists"
+msgstr "같은 가수의 노래 찾기"
+
+msgid "Find songs with the same names"
+msgstr "같은 이름을 가진 노래 찾기"
+
+msgid "Folder"
+msgstr "폴더"
+
+msgid "Folder (right-aligned)"
+msgstr "폴더 (오른쪽 정렬)"
+
+msgid "Folder format :"
+msgstr "폴더 포맷 :"
+
+msgid "Folder pattern :"
+msgstr "폴더 패턴 :"
+
+msgid "Folders to search for new songs"
+msgstr "새 노래 찾을 폴더"
+
+msgid "Follow playing song"
+msgstr "재생중인 노래를 따르기"
+
+msgid "Follow selected song"
+msgstr "다음의 선택한 노래"
+
+msgid "Font size"
+msgstr "글꼴 크기"
+
+msgid ""
+"For information on how to use this plugin, please navigate to the <a "
+"href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
+"artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/"
+"dokuwiki/'>gmusicbrowser-wiki</a>."
+msgstr ""
+"이 플러그인 사용하는 방법에 대한 정보는, <a href='http://gmusicbrowser.org/"
+"dokuwiki/doku.php?id=plugins:artistinfo'> 플러그인 위키 페이지</a> <a "
+"href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>."
+
+msgid "Forward"
+msgstr "앞으로"
+
+msgid "Found but not working"
+msgstr "찾았지만 동작하지 않음"
+
+msgid "Friday"
+msgstr "금요일"
+
+msgid "Full screen layout :"
+msgstr "전체 화면 레이아웃 :"
+
+msgid "Fullscreen"
+msgstr "전체화면"
+
+msgid "Fullscreen simple"
+msgstr "전체화면 간단히"
+
+msgid "GStreamer module not loaded."
+msgstr "GStreamer 모듈이 로드 되지 않았습니다."
+
+msgid "Gain for songs missing replaygain tags"
+msgstr "리플레이게인 태그가 없는 노래위한 게인"
+
+msgid "Genre"
+msgstr "장르"
+
+msgid "Genre is set"
+msgstr "장르가 설정됨"
+
+msgid "Genres"
+msgstr "장르"
+
+msgid "Genres pane"
+msgstr "장르 패널"
+
+msgid "Gnome mmkeys"
+msgstr "그놈 mmkeys"
+
+msgid "Gnome multimedia keys plugin"
+msgstr "그놈 멀티미디어 키 플러그인"
+
+msgid "Go to playing song"
+msgstr "재생중인 노래로 가기"
+
+msgid "Group by :"
+msgstr "그룹 :"
+
+msgid "Grouping"
+msgstr "그룹으로 나누기"
+
+msgid "Handshake OK"
+msgstr "연결 성공"
+
+msgid "Handshake failed : "
+msgstr "연결 실패 :"
+
+msgid "Hard limiter"
+msgstr "하드 리미터"
+
+msgid "Hide"
+msgstr "숨기기"
+
+msgid "Hide toolbar"
+msgstr "도구바 감추기"
+
+msgid "Icon theme :"
+msgstr "아이콘 테마 :"
+
+msgid "Identifier in file tag"
+msgstr "파일 태그에 인식자"
+
+msgid "Ignore playback errors"
+msgstr "재생 오류 무시하기"
+
+msgid "Import list"
+msgstr "목록 가져오기"
+
+msgid ""
+"In this case one command by file will be run\n"
+"\n"
+msgstr ""
+"하나의 명령어인 경우 파일은 실행되어질 것입니다\n"
+"\n"
+
+msgid "Increase Volume"
+msgstr "음량 증가"
+
+msgid "Info"
+msgstr "정보"
+
+msgid "Insensitive title-artist (left-aligned)"
+msgstr "둔감하게 제목-가수 (왼쪽 정렬)"
+
+msgid "Insensitive title-artist (right-aligned)"
+msgstr "둔감하게 제목-가수 (오른쪽 정렬)"
+
+msgid "Insensitive, Song & Cover"
+msgstr "둔감하게, 노래 & 커버"
+
+msgid "Insert a list of files/folders at the start of the playlist"
+msgstr "재생모록 시작할 때 파일/폴더의 목록 추가"
+
+msgid "Invalid regular expression"
+msgstr "잘못된 정규 표현"
+
+msgid "Invisible hot spot"
+msgstr "보이지않는 핫 스팟"
+
+msgid "Justified"
+msgstr "일반적인 정렬"
+
+msgid "KB"
+msgstr "KB"
+
+msgid "Karaoke"
+msgstr "노래방"
+
+msgid "Karaoke plugin"
+msgstr "노래방 플러그인"
+
+msgid "Key"
+msgstr "키"
+
+msgid "Keys"
+msgstr "키"
+
+msgid "Keywords"
+msgstr "키워드"
+
+msgid "Label"
+msgstr "라벨"
+
+msgid "Label is set"
+msgstr "라벨 설정됨"
+
+msgid "Label/Publisher"
+msgstr "라벨/발행자"
+
+msgid "Labels"
+msgstr "라벨"
+
+msgid "Labels' icons"
+msgstr "라벨 아이콘"
+
+msgid "Lang"
+msgstr "언어"
+
+msgid "Lang."
+msgstr "언어."
+
+msgid "Languages"
+msgstr "언어"
+
+msgid "Last played"
+msgstr "마지막 연주됨"
+
+msgid "Last skipped"
+msgstr "마지막 스킵됨"
+
+msgid "Launch ripping program"
+msgstr "립핑 프로그램 실행"
+
+msgid "Layout"
+msgstr "레이아웃"
+
+msgid "Layout :"
+msgstr "레이아웃 :"
+
+msgid "Layouts"
+msgstr "레이아웃"
+
+msgid "Left aligned"
+msgstr "왼쪽 정렬"
+
+msgid "Left pane"
+msgstr "왼쪽 패널"
+
+msgid "Length"
+msgstr "길이"
+
+msgid "Library"
+msgstr "라이브러리"
+
+msgid "Library : "
+msgstr "라이브러리 :"
+
+msgid ""
+"Library empty.\n"
+"\n"
+"Use the settings dialog to add music."
+msgstr ""
+"라이브러리 비어있음.\n"
+"\n"
+"음악을 추가하려면 설정 대화상자를 사용하세요."
+
+msgid "Library size : %d song"
+msgid_plural "Library size : %d songs"
+msgstr[0] "라이브러리 크기 : %d 노래"
+
+msgid "List"
+msgstr "목록"
+
+msgid "List empty"
+msgstr "재생목록 비어있음"
+
+msgid "List order"
+msgstr "목록 순서"
+
+msgid "Listed : "
+msgstr "목록에 있는 수 :"
+
+msgid "Listed songs"
+msgstr "목록에 있는 노래"
+
+msgid "Lists, Library & Context"
+msgstr "목록, 라이브러리 & 항목"
+
+msgid "Literal search"
+msgstr "글자대로 찾기"
+
+msgid "Load/Save Artist Info in :"
+msgstr "가수 정보 로드/저장 :"
+
+msgid "Load/Save lyrics in :"
+msgstr "가사 로드/저장 :"
+
+msgid "Loaded %d unsent song from previous session"
+msgid_plural "Loaded %d unsent songs from previous session"
+msgstr[0] "이전 세션에서 보내지 않은 노래 %d 가져옴"
+
+msgid "Loading failed."
+msgstr "가져오기 실패함."
+
+msgid "Loading..."
+msgstr "가져오는 중..."
+
+msgid "Lock"
+msgstr "잠금"
+
+msgid "Lock Album"
+msgstr "앨범 잠금"
+
+msgid "Lock Artist"
+msgstr "가수 잠금"
+
+msgid "Lock on Album"
+msgstr "앨범 상에 잠금"
+
+msgid "Lock on Artist"
+msgstr "가수 상에 잠금"
+
+msgid "Lock on song"
+msgstr "노래 잠금"
+
+msgid "Lock on {field}"
+msgstr "{field} 잠금"
+
+msgid "Locked on :\n"
+msgstr "잠금됨 :\n"
+
+msgid "Lookup in AMG"
+msgstr "AMG에서 찾기"
+
+msgid "Lookup in google"
+msgstr "google에서 찾기"
+
+msgid "Lower left"
+msgstr "맨아래 왼쪽"
+
+msgid "Lower right"
+msgstr "맨아래 오른쪽 :"
+
+msgid "Lullaby"
+msgstr "자장가"
+
+msgid "Lullaby plugin"
+msgstr "자장가 플러그인"
+
+msgid "Lyricist"
+msgstr "작사가"
+
+msgid "Lyrics"
+msgstr "가사"
+
+msgid "Lyrics (requires lyrics plugin)"
+msgstr "가사 (가사 플러그인이 필요함)"
+
+msgid "Lyrics alignement"
+msgstr "가사 정렬"
+
+msgid "Lyrics for "
+msgstr "가사"
+
+msgid "Lyrics plugin"
+msgstr "가사 플러그인"
+
+msgid "Lyrics source"
+msgstr "가사 소스"
+
+msgid "MB"
+msgstr "MB"
+
+msgid "MIME type"
+msgstr "Mime-type"
+
+msgid "MPRIS v1"
+msgstr "MPRIS v1"
+
+msgid "MPRIS v1 support"
+msgstr "MPRIS v1 지원"
+
+msgid "Main"
+msgstr "메인"
+
+msgid "Main artist"
+msgstr "메인 가수"
+
+msgid ""
+"Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
+"gnome."
+msgstr ""
+"그놈에서 다음/이전/재생/정지 멀티미디어 키가 반응하도록 gmusicbrowser 만들기."
+
+msgid "Mass Rename"
+msgstr "많은 파일 이름 바꾸기"
+
+msgid "Mass Renaming"
+msgstr "많은 파일 이름 바꾸는 중"
+
+msgid "Media type"
+msgstr "매체 형태"
+
+msgid "Menu entry name"
+msgstr "메뉴 항목 이름"
+
+msgid "Minimal tip"
+msgstr "최소화 팁"
+
+msgid "Minimum size"
+msgstr "최소 크기"
+
+msgid "Misc."
+msgstr "그 외"
+
+msgid "Modification"
+msgstr "수정"
+
+msgid "Monday"
+msgstr "월요일"
+
+msgid "Moods"
+msgstr "분위기"
+
+msgid "More results"
+msgstr "결과"
+
+msgid "Move"
+msgstr "이동"
+
+msgid "Move Files to :"
+msgstr "파일 이동 :"
+
+msgid "Move failed"
+msgstr "이동 실패함"
+
+msgid "Move folder to"
+msgstr "다음으로 폴더 이동 :"
+
+msgid "Moving file"
+msgid_plural "Moving %d files"
+msgstr[0] "%d 파일 이동중"
+
+msgid "Mute/Unmute"
+msgstr "소리끄기/소리켜기"
+
+msgid "Name"
+msgstr "이름"
+
+msgid "Name of layout"
+msgstr "레이아웃 이름"
+
+msgid "Name under which the command will appear in the menu"
+msgstr "명령어는 메뉴에 보여질 것입니다"
+
+msgid "New"
+msgstr "새로"
+
+msgid "New custom field"
+msgstr "새 사용자 정의 필드"
+
+msgid "New filter"
+msgstr "새 필터"
+
+msgid "New list"
+msgstr "새 목록"
+
+msgid "New name"
+msgstr "새 이름"
+
+msgid "Next"
+msgstr "다음"
+
+msgid "Next Album"
+msgstr "다음 앨범"
+
+msgid "Next Artist"
+msgstr "다음 가수"
+
+msgid "Next Song"
+msgstr "다음 노래"
+
+msgid "Next Song In Playlist"
+msgstr "재생목록에서 다음 노래"
+
+msgid "No connections"
+msgstr "연결 없음"
+
+msgid "No file browser found."
+msgstr "파일 브라우저 찾지 못함."
+
+msgid "No genre"
+msgstr "장르 없음"
+
+msgid "No label"
+msgstr "라벨 없음"
+
+msgid "No locked filter"
+msgstr "잠금된 필터 없음"
+
+msgid "No moods"
+msgstr "분위기 사용안함"
+
+msgid "No songs found"
+msgstr "노래를 찾지 못했습니다"
+
+msgid "No web browser found."
+msgstr "웹 브라우저 발견하지 못함."
+
+msgid "None"
+msgstr "없음"
+
+msgid "Normal mode"
+msgstr "표준 모드"
+
+msgid "Normalize volume (the files must have replaygain tags)"
+msgstr "소리 노말라이즈 (파일에 리플레이게인 태그가 있어야합니다)"
+
+msgid "Not found"
+msgstr "찾지 못함"
+
+msgid "Note that some notification daemons resize the displayed picture"
+msgstr "일부 알림 데몬은 표시된 사진을 크기 조정해서 알려주기"
+
+msgid "Notify"
+msgstr "알림"
+
+msgid "Notify plugin"
+msgstr "알림 플러그인"
+
+msgid "Notify you of the playing song with the system's notification popups"
+msgstr "시스템의 알림 팝업으로 재생중인 노래를 사용자에게 알려주기"
+
+msgid "Now playing"
+msgstr "연주중"
+
+msgid "NowPlaying plugin"
+msgstr "\"현재 재생중\" 플러그인"
+
+msgid "Number of days since added"
+msgstr "추가되어진 날짜의 수"
+
+msgid "Number of days since last played"
+msgstr "마지막 재생되어진 날짜의 수"
+
+msgid "Number of days since last skipped"
+msgstr "마지막 스킵되어진 날짜의 수"
+
+msgid "Number of days since modified"
+msgstr "수정되어진 날짜의 수"
+
+msgid "Number of milliseconds"
+msgstr "밀리초의 수"
+
+msgid "Number of seconds"
+msgstr "초의 수"
+
+msgid "Number of times played"
+msgstr "재생된 회수의 수"
+
+msgid "Number of times skipped"
+msgstr "스킵된 회수의 수"
+
+msgid ""
+"ON -> smaller means more probable\n"
+"OFF -> bigger means more probable"
+msgstr ""
+"ON -> 더 가능한 더 작은 방법\n"
+"OFF -> 더 가능한 더 큰 방법"
+
+msgid ""
+"ON less probable if genre is set\n"
+"OFF more probable if genre is set"
+msgstr ""
+"ON 장르가 설정되면 적게 예상\n"
+"OFF 장르가 설정되면 좀더 예상"
+
+msgid ""
+"ON less probable if label is set\n"
+"OFF more probable if label is set"
+msgstr ""
+"ON 라벨이 설정된다면 적게 예상\n"
+"OFF 라벨이 설정된다면 좀더 예상"
+
+msgid "Old name"
+msgstr "이전 이름"
+
+msgid "On top of other windows instead of below"
+msgstr "아래 대신 다른 창의 맨위로"
+
+msgid "One of these commands is required to play files of type {type} : {cmd}"
+msgstr ""
+"이 명령어 중 하나가 {type} 형식의 파일을 재생하기 위해 요청됩니다 : {cmd}"
+
+msgid "Only affect mp3 files that do not already have an id3v1 tag"
+msgstr "id3v1 태그를 가지지 않은 mp3 파일에만 영향을 줍니다"
+
+msgid "Opacity"
+msgstr "불투명"
+
+msgid "Open Browser"
+msgstr "브라우저 열기"
+
+msgid "Open Browser window"
+msgstr "브라우저 창 열기"
+
+msgid "Open Context window"
+msgstr "항목 창 열기"
+
+msgid "Open Custom window"
+msgstr "사용자 정의 창 열기"
+
+msgid "Open Equalizer"
+msgstr "이퀄라이저 열기"
+
+msgid "Open Playlist"
+msgstr "재생 목록 파일 열기"
+
+msgid "Open Preference window"
+msgstr "설정 창 열기"
+
+msgid "Open Queue"
+msgstr "대기열 열기"
+
+msgid "Open Queue window"
+msgstr "대기열 창 열기"
+
+msgid "Open Search window"
+msgstr "찾기 창 열기"
+
+msgid "Open containing folder"
+msgstr "이 노래가 있는 폴더 열기"
+
+msgid "Open context page"
+msgstr "항목 페이지 열기"
+
+msgid "Open existing list"
+msgstr "존재하는 목록 열기"
+
+msgid "Open folder"
+msgstr "폴더 열기"
+
+msgid "Open last.fm website in your browser"
+msgstr "사용자의 브라우저에서 last.fm 웹사이트 열기"
+
+msgid "Open link in Browser"
+msgstr "브라우저로 링크 열기"
+
+msgid "Open page layout"
+msgstr "페이지 레이아웃 열기"
+
+msgid "Open special layouts as desktop widgets"
+msgstr "데스크탑 위젯처럼 특별한 레이아웃 열기"
+
+msgid "Open this page in the web browser"
+msgstr "이 페이지를 웹 브라우저에서 열기"
+
+msgid "Options"
+msgstr "옵션"
+
+msgid "Options for subgroup"
+msgstr "서브그룹 옵션"
+
+msgid ""
+"Or you can use the field $files which will be replaced by the list of files, "
+"and only one command will be run"
+msgstr ""
+"또는 사용자는 파일 목록에서 바뀌어질 $files 필드를 사용할 수 있습니다. 그리"
+"고 단지 하나의 명령만 실행될 것입니다."
+
+msgid "Original Artist"
+msgstr "원래 아티스트"
+
+msgid "Original Filename"
+msgstr "원본 파일이름"
+
+msgid "Original release year"
+msgstr "원본 배포 년도"
+
+msgid "Originaly from"
+msgstr "원본"
+
+msgid "Output"
+msgstr "출력"
+
+msgid "Overlay layout :"
+msgstr "오버레이 레이아웃 :"
+
+msgid "Owner identifier"
+msgstr "소유자 인식자"
+
+msgid "Path,Album,Disc,Track,File"
+msgstr "경로,앨범,디스크,트랙,파일"
+
+msgid "Path,File"
+msgstr "경로,파일"
+
+msgid "Pattern to find .lrc files :"
+msgstr ".lrc 파일 찾기 패턴 :"
+
+msgid "Pause"
+msgstr "멈춤"
+
+msgid "Picture"
+msgstr "사진"
+
+msgid "Picture Type"
+msgstr "앨범아트 종류"
+
+msgid "Picture cache :"
+msgstr "사진 캐시 :"
+
+msgid "Picture finder"
+msgstr "사진 찾기"
+
+msgid "Picture finder plugin"
+msgstr "사진 찾기 플러그인"
+
+msgid "Picture size :"
+msgstr "사진 크기 :"
+
+msgid "Pictures and music files"
+msgstr "사진 그리고 음악 파일들"
+
+msgid "Pictures files"
+msgstr "사진 파일들"
+
+msgid "Play"
+msgstr "재생"
+
+msgid "Play Only Displayed"
+msgstr "표시된 것만 재생"
+
+msgid "Play Only Selected"
+msgstr "선택한 것만 재생"
+
+msgid "Play a list of files"
+msgstr "파일 목록 재생"
+
+msgid "Play all songs from this album"
+msgstr "이 앨범의 모든 노래 재생"
+
+msgid "Play all songs from this artist"
+msgstr "이 가수의 모든 노래 재생"
+
+msgid "Play button"
+msgstr "재생 버튼"
+
+msgid "Play count"
+msgstr "연주 횟수"
+
+msgid "Play counter"
+msgstr "재생 카운터"
+
+msgid "Play filter"
+msgstr "재생 필터"
+
+msgid "Play listed songs"
+msgstr "등록된 노래 재생"
+
+msgid "Play order"
+msgstr "재생 순서"
+
+msgid "Play/Pause"
+msgstr "재생/일시정지"
+
+msgid "Played Today"
+msgstr "재생된 날짜"
+
+msgid "Player mounted on :"
+msgstr "재생기 마운트됨 :"
+
+msgid "Player window layout :"
+msgstr "재생기 창 레이아웃 :"
+
+msgid "Playing"
+msgstr "재생중"
+
+msgid "Playing Album"
+msgstr "앨범 재생중"
+
+msgid "Playing Artist"
+msgstr "가수 재생중"
+
+msgid "Playing Filter"
+msgstr "필터 재생중"
+
+msgid "Playing Title"
+msgstr "제목 재생중"
+
+msgid "Playing and queue icons"
+msgstr "재생중 & 대기열 아이콘"
+
+msgid "Playing error : {error}"
+msgstr "재생중 에러 : {error}"
+
+msgid "Playlist"
+msgstr "연주 목록"
+
+msgid "Playlist Empty"
+msgstr "재생목록 비어있음"
+
+msgid "Playlist empty"
+msgstr "재생목록 비어있음"
+
+msgid "Playlist files"
+msgstr "재생목록 파일"
+
+msgid "Playlist filter"
+msgstr "재생목록 필터"
+
+msgid "Playlist filter :\n"
+msgstr "재생목록 필터 :\n"
+
+msgid "Playlist, Library & Context"
+msgstr "재생목록, 라이브러리 & 항목"
+
+msgid "Plugin not loaded"
+msgstr "플러그인이 로드되지 않음"
+
+msgid "Plugins"
+msgstr "플러그인"
+
+msgid "Popularimeter"
+msgstr "유명척도"
+
+msgid "Popup Custom window"
+msgstr "팝업 사용자정의 창"
+
+msgid "Popup Traytip"
+msgstr "팝업 트레이팁"
+
+msgid "Pre-set"
+msgstr "프리셋"
+
+msgid "Prepend"
+msgstr "첨가하기"
+
+msgid "Press a key or a key combination"
+msgstr "키 또는 키 조합을 누르시오"
+
+msgid "Previous"
+msgstr "이전"
+
+msgid "Previous Song"
+msgstr "이전 노래"
+
+msgid "Previous Song In Playlist"
+msgstr "목록에서 이전 노래"
+
+msgid "Previous page"
+msgstr "이전 페이지"
+
+msgid "Price paid"
+msgstr "금액 지불"
+
+msgid "Private Data"
+msgstr "개인 자료"
+
+msgid "Produced (P)"
+msgstr "제작됨 (P)"
+
+msgid "Progress"
+msgstr "진행률"
+
+msgid "Provides context views using MozEmbed or WebKit"
+msgstr "제공된 항목을 MozEmbed 또는 WebKit을 사용해서 보기"
+
+msgid "Proxy host :"
+msgstr "프록시 호스트 :"
+
+msgid "Publication right"
+msgstr "발행 권리"
+
+msgid "Publisher"
+msgstr "발행자"
+
+msgid "Publisher/Studio logotype"
+msgstr "발행자/스튜디오의 로고"
+
+msgid "Queue"
+msgstr "대기열"
+
+msgid "Queue album"
+msgstr "대기열 앨범"
+
+msgid "Queue artist"
+msgstr "대기열 가수"
+
+msgid "Queue empty"
+msgstr "대기열 비어있음"
+
+msgid "Queue mode"
+msgstr "대기열 모드"
+
+msgid "Queue, Library & Context"
+msgstr "대기열, 라이브러리 & 항목"
+
+msgid "Quick Search"
+msgstr "빠른 찾기"
+
+msgid "Quick Search with SongTree"
+msgstr "노래트리에서 빠른 찾기"
+
+msgid "Quit"
+msgstr "끝내기"
+
+msgid "Quit when queue empty"
+msgstr "대기열이 비면 끝내기"
+
+msgid "Radio title"
+msgstr "라디오 제목"
+
+msgid "Radio url"
+msgstr "라디오 주소"
+
+msgid "Random"
+msgstr "무작위"
+
+msgid "Random mode edition"
+msgstr "무작위 모드 편집"
+
+msgid "Rating"
+msgstr "점수"
+
+msgid "Rating (picture)"
+msgstr "점수 (사진)"
+
+msgid "Rating between 0 and 100, or empty for default"
+msgstr "0 에서 100 사이의 점수, 또는 기본값은 비어있음"
+
+msgid "Re-read tags"
+msgstr "태그 다시 읽기"
+
+msgid "Read/write in file tag"
+msgstr "파일 태그 읽기/쓰기"
+
+msgid "Recent Filters"
+msgstr "최근 필터들"
+
+msgid "Recent albums"
+msgstr "최근 앨범들"
+
+msgid "Recent artists"
+msgstr "최근 가수들"
+
+msgid "Recent songs"
+msgstr "최근 노래들"
+
+msgid "Recent songs include skipped songs that haven't been played."
+msgstr "최근 노래는 재생되지 않고 건너 띈 노래를 포함합니다."
+
+msgid "Recently played"
+msgstr "최근에 연주된 순으로"
+
+msgid "Recently played songs"
+msgstr "최근 재생한 노래들"
+
+msgid "Recording Dates"
+msgstr "레코딩 자료"
+
+msgid "Reference point :"
+msgstr "참조 포인트 :"
+
+msgid "Refresh"
+msgstr "다시 고치기"
+
+msgid "Refresh list"
+msgstr "목록 새로 고침"
+
+msgid "Regular expression"
+msgstr "정규 표현"
+
+msgid "Regular expression :"
+msgstr "정규 표현:"
+
+msgid "Regular expression didn't match"
+msgstr "정규 표현이 맞지 않습니다"
+
+msgid "Remember last Filter/Playlist between sessions"
+msgstr "세션 사이에 마지막 필터/재생목록 기억하기"
+
+msgid "Remember playing position between sessions"
+msgstr "세션 사이에 재생 위치 기억하기"
+
+msgid "Remember playing song between sessions"
+msgstr "세션 사이에 재생 노래 기억하기"
+
+msgid "Remember queue between sessions"
+msgstr "세션 사이에 대기열 기억하기"
+
+msgid "Remixer"
+msgstr "리믹서"
+
+msgid "Remove"
+msgstr "제거하기"
+
+msgid "Remove a label from the current song"
+msgstr "현재 노래의 라벨 제거하기"
+
+msgid "Remove all"
+msgstr "모두 제거하기"
+
+msgid "Remove all songs"
+msgstr "모든 노래 제거하기"
+
+msgid "Remove filter"
+msgstr "필터 제거하기"
+
+msgid "Remove from disk"
+msgstr "디스크에서 제거하기"
+
+msgid "Remove from library"
+msgstr "라이브러리에서 제거하기"
+
+msgid "Remove from list"
+msgstr "목록에서 제거하기"
+
+msgid "Remove from playlist"
+msgstr "재생목록에서 제거하기"
+
+msgid "Remove from queue"
+msgstr "대기열에서 제거하기"
+
+msgid "Remove header, footer and left column from wikipedia pages"
+msgstr "위키페디아 페이지에서 두주, 각주 그리고 왼쪽 컬럼 제거하기"
+
+msgid "Remove label"
+msgstr "이름 제거하기"
+
+msgid "Remove list"
+msgstr "목록 제거하기"
+
+msgid "Remove selected songs"
+msgstr "선택한 노래 제거하기"
+
+msgid "Remove this field"
+msgstr "이 필드 제거하기"
+
+msgid "Remove this rule"
+msgstr "이 규칙 제거하기"
+
+msgid "Remove this tab"
+msgstr "이 태그 제거하기"
+
+msgid "Remove this tag"
+msgstr "이 태그 제거하기"
+
+msgid "Remove this widget"
+msgstr "이 위젯 제거하기"
+
+msgid "Rename"
+msgstr "이름 바꾸기"
+
+msgid "Rename File"
+msgstr "파일 이름 바꾸기"
+
+msgid "Rename file"
+msgstr "파일 이름 바꾸기"
+
+msgid "Rename files using this pattern :"
+msgstr "이 패턴을 사용해서 파일 이름 바꾸기 :"
+
+msgid "Rename folder"
+msgstr "폴더 이름 바꾸기"
+
+msgid "Rename this folder to :"
+msgstr "이 폴더 이름 바꾸기 :"
+
+msgid "Rename/move files based on these fields :"
+msgstr "파일의 이름 바꾸기/이동은 아래 필드를 기본으로 합니다 :"
+
+msgid ""
+"Renaming {oldname}\n"
+"to {newname}\n"
+"failed : {error}"
+msgstr ""
+"{oldname}에서\n"
+"{newname}으로 이름바꾸는 중\n"
+"실패함 : {error}"
+
+msgid "Reorganize files and folders"
+msgstr "파일과 폴더를 다시 재편성하기"
+
+msgid "Repeat"
+msgstr "반복"
+
+msgid "Replace"
+msgstr "바꾸기"
+
+msgid "Replace..."
+msgstr "바꾸기..."
+
+msgid "ReplayGain options"
+msgstr "리플레이게인 옵션"
+
+msgid "Replaygain analysis"
+msgstr "리플레이게인 분석"
+
+msgid "Reset filter"
+msgstr "필터 재설정"
+
+msgid "Rewind"
+msgstr "되감기"
+
+msgid "Right aligned"
+msgstr "오른쪽 정렬"
+
+msgid "Right side"
+msgstr "오른쪽"
+
+msgid "Rip"
+msgstr "립"
+
+msgid "Rip plugin"
+msgstr "립 플러그인"
+
+msgid "Ripping software :"
+msgstr "립 소프트웨어 :"
+
+msgid "Run a command when playing a song"
+msgstr "노래 재생할 때 명령 실행"
+
+msgid "Run perl code"
+msgstr "펄 코드 실행"
+
+msgid "Run system command"
+msgstr "시스템 명령어 실행"
+
+msgid "Same Title"
+msgstr "같은 제목"
+
+msgid "Sampling Rate"
+msgstr "샘플 레이트"
+
+msgid "Saturday"
+msgstr "토요일"
+
+msgid "Save"
+msgstr "저장"
+
+msgid "Save Tags/Options"
+msgstr "태그/옵션 저장"
+
+msgid "Save artist biography"
+msgstr "가수 일대기 저장"
+
+msgid "Save as..."
+msgstr "다른 이름으로 저장..."
+
+msgid "Save current filter as"
+msgstr "현재 필터 저장"
+
+msgid "Save current list as"
+msgstr "현재 목록 저장"
+
+msgid "Save lyrics"
+msgstr "가사 저장"
+
+msgid "Save now"
+msgstr "지금 저장"
+
+msgid "Save picture as"
+msgstr "사진 저장"
+
+msgid "Save tags/settings every"
+msgstr "다음 시간 마다 태그/설정 저장"
+
+msgid "Saved"
+msgstr "저장됨"
+
+msgid "Saved Lists"
+msgstr "목록 저장됨"
+
+msgid "Saved filters"
+msgstr "필터 저장됨"
+
+msgid "Saved lists"
+msgstr "목록 저장됨"
+
+msgid "Scan as an album"
+msgstr "앨범 스캔"
+
+msgid "Scan for new songs"
+msgstr "새 노래 스캔"
+
+msgid "Scan per-file track gain"
+msgstr "파일마다 트랙 게인 스캔"
+
+msgid "Scan this file"
+msgstr "이 파일 스캔"
+
+msgid "Scan using tag-defined album"
+msgstr "태그-정의된 앨범 사용해서 스캔"
+
+msgid "Scanning"
+msgstr "스캔하는 중"
+
+msgid "Scroll with song"
+msgstr "노래 스크롤하기"
+
+msgid "Scroll with the song"
+msgstr "노래로 스크롤하기"
+
+msgid "Search"
+msgstr "찾기"
+
+msgid "Search & Playlist"
+msgstr "찾기 & 재생목록"
+
+msgid "Search & Queue"
+msgstr "찾기 & 대기열"
+
+msgid "Search : "
+msgstr "찾기 :"
+
+msgid "Search Album"
+msgstr "앨범 찾기"
+
+msgid "Search Artist"
+msgstr "가수 찾기"
+
+msgid "Search Comment"
+msgstr "설명 찾기"
+
+msgid "Search Genre"
+msgstr "장르 찾기"
+
+msgid "Search Label"
+msgstr "라벨 찾기"
+
+msgid "Search Title"
+msgstr "제목 찾기"
+
+msgid "Search Title, Artist and Album"
+msgstr "제목, 가수 그리고 앨범 찾기"
+
+msgid "Search Title, Artist, Album, Comment, Label and Genre"
+msgstr "제목, 가수, 앨범, 설명, 라벨 그리고 장르 찾기"
+
+msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
+msgstr "제목, 가수, 앨범, 설명, 라벨, 장르 그리고 파일이름 찾기"
+
+msgid "Search allmusic for Artist"
+msgstr "allmusic에서 가수 찾기"
+
+msgid "Search amazon.com for Artist"
+msgstr "amazon.com에서 가수 찾기"
+
+msgid "Search and display lyrics"
+msgstr "찾기 그리고 가사 표시"
+
+msgid "Search discogs for Artist"
+msgstr "discogs에서 가수 찾기"
+
+msgid "Search for Artist on youtube"
+msgstr "유투브에서 가수 찾기"
+
+msgid "Search for a picture on internet"
+msgstr "인터넷에서 사진 찾기"
+
+msgid "Search for current album"
+msgstr "현재 앨범 찾기"
+
+msgid "Search for current artist"
+msgstr "현재 가수 찾기"
+
+msgid "Search for new songs on startup"
+msgstr "시작할 때 새 노래 찾기"
+
+msgid "Search google for Artist"
+msgstr "구글에서 가수 찾기"
+
+msgid "Search options"
+msgstr "찾기 옵션"
+
+msgid "Search pitchfork for Artist"
+msgstr "pitchfork에서 가수 찾기"
+
+msgid "Search the web for artist"
+msgstr "웹에서 가수 찾기"
+
+msgid "Search window layout :"
+msgstr "찾기 창 레이아웃 :"
+
+msgid "Searching for a picture of : "
+msgstr "사진 찾는 중 :"
+
+msgid "Seek"
+msgstr "탐색"
+
+msgid "Select current song"
+msgstr "현재 노래 선택"
+
+msgid "Select fields"
+msgstr "필드를 선택"
+
+msgid "Select files"
+msgstr "파일 선택"
+
+msgid "Select matches"
+msgstr "적합한 것 고르기"
+
+msgid "Select search fields"
+msgstr "검색 필드를 선택"
+
+msgid "Selected : "
+msgstr "선택한 수 :"
+
+msgid "Selected songs"
+msgstr "선택한 노래"
+
+msgid "Selecting pictures"
+msgstr "사진 고르기"
+
+msgid "Seller"
+msgstr "판매자"
+
+msgid "Send Title/Artist/Album in standard input"
+msgstr "표준 입력으로 제목/가수/앨범 보내기"
+
+msgid "Set Current Song Rating"
+msgstr "현재 노래 점수 설정"
+
+msgid "Set Picture"
+msgstr "사진 설정"
+
+msgid "Set as primary filter"
+msgstr "기본 필터 설정"
+
+msgid "Set focus on a layout widget"
+msgstr "레이아웃 위젯에 포커스 설정"
+
+msgid "Set grouping"
+msgstr "그룹으로 나누기 설정"
+
+msgid "Set icon"
+msgstr "아이콘 설정"
+
+msgid "Set player window layout"
+msgstr "재생기 창 레이아웃 설정"
+
+msgid "Set subgroup"
+msgstr "서브그룹 설정"
+
+msgid "Settings"
+msgstr "설정"
+
+msgid "Settings on this page will only take effect after a restart"
+msgstr "이 페이지 상의 설정은 재시작 후 효과가 나타납니다"
+
+msgid ""
+"Shell command\n"
+"(some variables such as %f (current song filename) or %F (list of selected "
+"songs filenames) are available)"
+msgstr ""
+"쉘 명령어\n"
+"(%f (현재 노래 파일이름) 또는 %F (선택한 노래 파일이름의 목록) 같은 일부 변수"
+"를 이용할 수 있습니다)"
+
+msgid "Shift"
+msgstr "Shift"
+
+msgid "Show"
+msgstr "표시"
+
+msgid "Show Artist page on last.fm"
+msgstr "last.fm상의 가수 페이지 표시"
+
+msgid "Show Artist page on wikipedia"
+msgstr "위키페디아 가수 페이지 벅;"
+
+msgid "Show artist's biography"
+msgstr "가수 일대기 보기"
+
+msgid "Show artist's upcoming events"
+msgstr "가수의 다가올 이벤트 보기"
+
+msgid "Show buttons"
+msgstr "표시 버튼"
+
+msgid "Show replaygain submenu"
+msgstr "리플레이게인 서브메뉴 표시"
+
+msgid "Show suggestions"
+msgstr "제안 표시"
+
+msgid "Show tabs"
+msgstr "탭 표시"
+
+msgid "Show tray icon"
+msgstr "트레이 아이콘 표시"
+
+msgid "Show tray tip on song change"
+msgstr "노래 바뀔 때 마다 트레이 팁 표시"
+
+msgid "Show/Hide"
+msgstr "표시/숨기기"
+
+msgid "Show/Hide layout widget(s)"
+msgstr "표시/숨기기 레이아웃 위젯"
+
+msgid "Show/Hide lyrics line"
+msgstr "표시/숨기기 가사 줄"
+
+msgid "Show/hide URI entry"
+msgstr "주소 항목 표시/숨기기"
+
+msgid "Show/hide status bar"
+msgstr "상태바 표시/숨기기"
+
+msgid "Shuffle"
+msgstr "섞기"
+
+msgid "Shuffle queue"
+msgstr "섞기 대기열"
+
+msgid "Shuffled albums"
+msgstr "섞여진 앨범"
+
+msgid "Shuffled albums, shuffled tracks"
+msgstr "섞여진 앨범들, 섞여진 트랙들"
+
+msgid "Shutdown command :"
+msgstr "끄기 명령어 :"
+
+msgid "Simple title"
+msgstr "간단한 제목"
+
+msgid "Size"
+msgstr "크기"
+
+msgid "Skip count"
+msgstr "스킵 수"
+
+msgid "Skip to next song if an error occurs"
+msgstr "오류가 발생하면 다음 노래로 스킵하기"
+
+msgid "Small album picture"
+msgstr "작은 앨범 사진"
+
+msgid "Small player"
+msgstr "작은 재생기"
+
+msgid "Smaller browser"
+msgstr "작은 부라우저"
+
+msgid "Song"
+msgstr "노래"
+
+msgid "Song Properties"
+msgstr "노래 속성"
+
+msgid "Song rating"
+msgstr "노래 점수"
+
+msgid "SongTree groupings edition"
+msgstr "노래트리 그룹으로 나누기 편집"
+
+msgid "Songs Properties"
+msgstr "노래 등록정보"
+
+msgid "Sort"
+msgstr "정렬"
+
+msgid "Sort mode edition"
+msgstr "정렬 모드 편집"
+
+msgid "Sort order"
+msgstr "정렬 순서"
+
+msgid "Split artist names on :"
+msgstr "가수 이름으로 나누기 :"
+
+msgid "Standard fields"
+msgstr "표준 필드"
+
+msgid "Start in tray"
+msgstr "시스템 트레이에서 시작"
+
+msgid "Stop"
+msgstr "정지"
+
+msgid "Stop checking"
+msgstr "검사 중지"
+
+msgid "Stop scanning"
+msgstr "스캐닝 중지"
+
+msgid "Stop selecting pictures"
+msgstr "사진 고르기 중지"
+
+msgid "Stop when queue empty"
+msgstr "대기열 비었을 때 중지"
+
+msgid "Stop, Play and Next buttons"
+msgstr "멈춤, 재생 그리고 다음 버튼"
+
+msgid "Stop, Play and Next buttons and Time"
+msgstr "멈춤, 재생 그리고 다음 버튼 그리고 시간"
+
+msgid "Stop, Play and Next buttons and Title/Artist"
+msgstr "멈춤, 재생 그리고 다음 버튼 그리고 제목/가수"
+
+msgid "Strip wikipedia pages"
+msgstr "위키페디아 페이지 분해"
+
+msgid "Submit Now-Playing OK"
+msgstr "현재-재생 확인 제출"
+
+msgid "Submit OK"
+msgstr "제출 확인"
+
+msgid "Submit failed : "
+msgstr "제출 실패함 :"
+
+msgid "Submit played songs to last.fm"
+msgstr "재생한 노래 last.fm으로 제출"
+
+msgid "Subtitle"
+msgstr "부제목"
+
+msgid "Summary :"
+msgstr "요약:"
+
+msgid "Sunday"
+msgstr "일요일"
+
+msgid "Switch to fullscreen mode"
+msgstr "전체화면 모드 바꾸기"
+
+msgid "System clock is not close enough to the current time"
+msgstr "시스템 시계가 현재 시간과 충분히 가깝지 않습니다"
+
+msgid "System command :"
+msgstr "시스템 명령어 :"
+
+msgid "Tag"
+msgstr "태그"
+
+msgid "Tags"
+msgstr "태그"
+
+msgid "Terms of use"
+msgstr "사용 항목"
+
+msgid "Text"
+msgstr "텍스트"
+
+msgid "The [most/less]"
+msgstr "[많게/적게]"
+
+msgid "These fields can be used :"
+msgstr "이들 필드는 사용될 수 있음 :"
+
+msgid "This command is required to play files of type {type} : {cmd}"
+msgstr "이 명령어는 {type} 형식의 파일을 재생하기 위해 요청됩니다 : {cmd}"
+
+msgid "This label is set for %d song."
+msgid_plural "This label is set for %d songs."
+msgstr[0] "이 라벨이 %d 노래에 설정됨."
+
+msgid "This plugin requires :"
+msgstr "이 플로그인이 요구함 :"
+
+msgid ""
+"This plugin retrieves artist-relevant information (biography, upcoming "
+"events) from last.fm."
+msgstr ""
+"이 플러그인은 last.fm에서 가수-관련된 정보를 검색합니다 (일대기, 다가올 이벤"
+"트)."
+
+msgid "Threshold to count a song as played :"
+msgstr "재생한 노래로 인정하는 문턱값 :"
+
+msgid "Thursday"
+msgstr "화요일"
+
+msgid "Timeout :"
+msgstr "시간초과 :"
+
+msgid "Timespan of the fade-out in seconds"
+msgstr "페이드-아웃의 타임스팬 "
+
+msgid "Title"
+msgstr "제목"
+
+msgid "Title & icon"
+msgstr "제목 & 아이콘"
+
+msgid "Title & progress"
+msgstr "제목 & 진행"
+
+msgid "Title - Artist - Album"
+msgstr "제목 - 가수 - 앨범"
+
+msgid "Titlebar"
+msgstr "제목바"
+
+msgid "Titlebar overlay plugin"
+msgstr "제목바 오버레이 플러그인"
+
+msgid "Toggle Album Lock"
+msgstr "앨범 잠금 토글"
+
+msgid "Toggle Artist Lock"
+msgstr "가수 잠금 토글"
+
+msgid "Toggle Song Lock"
+msgstr "노래 잠금 토글"
+
+msgid "Toggle a label of the current song"
+msgstr "현재 노래의 라벨 토글"
+
+msgid "Toggle between Random/Shuffle and Ordered"
+msgstr "임의순서/반복 그리고 명령순으로 토글"
+
+msgid "Toggle fullscreen mode"
+msgstr "전체화면 모드 토글"
+
+msgid "Toggle the fullscreen layout"
+msgstr "전체화면 레이아웃 토글"
+
+msgid "Track"
+msgstr "트랙"
+
+msgid "Track gain"
+msgstr "트랙 게인"
+
+msgid "Track peak"
+msgstr "트랙 리크"
+
+msgid "Tray tip window layout :"
+msgstr "트레이 팁 창 레이아웃 :"
+
+msgid "Tuesday"
+msgstr "화요일"
+
+msgid "Turn Off"
+msgstr "끄기"
+
+msgid "Turn off computer when queue empty"
+msgstr "대기열이 비워지면 컴퓨터 끄기"
+
+msgid "Type"
+msgstr "형식"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Unique file identifier"
+msgstr "독특한 파일 인식자"
+
+msgid "Unknown field ({field})"
+msgstr "알려지지 않은 필드 ({field})"
+
+msgid "Unlock Album"
+msgstr "잠금이 해제된 앨범"
+
+msgid "Unlock Artist"
+msgstr "잠금이 해제된 가수"
+
+msgid "Unnamed custom command"
+msgstr "이름없는 사용자 정의 명령"
+
+msgid "Unnamed filter"
+msgstr "이름없는 필터"
+
+msgid "Untitled"
+msgstr "제목없음"
+
+msgid "Upper left"
+msgstr "맨위 왼쪽"
+
+msgid "Upper right"
+msgstr "맨위 오른쪽"
+
+msgid "Use Equalizer"
+msgstr "이퀄라이저 사용"
+
+msgid ""
+"Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are "
+"probably better supported by other softwares"
+msgstr ""
+"ID3v2 태그 만들때 ID3v2.3 대신 ID3v2.4 사용하기, ID3v2.3는 다른 소프트에어 들"
+"에서 더 많이 지원합니다"
+
+msgid "Use MozEmbed"
+msgstr "MozEmbed 사용하기"
+
+msgid "Use ReplayGain"
+msgstr "리플레이게인 사용하기"
+
+msgid "Use WebKit"
+msgstr "WebKit 사용하기"
+
+msgid "Use a master filter"
+msgstr "매스터 필터 사용하기"
+
+msgid "Use album normalization instead of track normalization"
+msgstr "트랙 노말라이즈 대신 앨범 노말라이즈 사용하기"
+
+msgid "Use default regular expression"
+msgstr "기본값 정규 표현 사용하기"
+
+msgid "Use gstreamer"
+msgstr "gstreamer 사용하기"
+
+msgid "Use latin1 encoding if possible in id3v2 tags"
+msgstr "id3v2 태그가 가능하면 latin1 엔코딩을 사용하기"
+
+msgid ""
+"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
+"furthermore linebreaks '<br>' and any text you'd like to have in between. E."
+"g. '%title taking place at %startDate<br>in %city, %country<br><br>'"
+msgstr ""
+"% (예. %headliner)를 첫 문자로 하는 last.fm's XML 이벤트 페이지의 태그를 사용"
+"합니다, 게다가 사용자가  '<br>' 줄바꿈과 아무 텍스트 사이에 원하는 것. 예. '%"
+"city, %country<br><br> 내의 %startDate<br>에 위치한 %title'"
+
+msgid "Use the playing filter"
+msgstr "재생중 필터 사용"
+
+msgid "Use this picture as cover for album '{album}'"
+msgstr "'{album}' 앨범 커버에 이 사진 사용하기"
+
+msgid "Use this picture for artist '{artist}'"
+msgstr "'{artist}' 가수에 이 사진 사용하기"
+
+msgid "Use {command} to play {ext} files"
+msgstr "{ext} 파일을 재생하려면 {command}을 사용하세요"
+
+msgid "Used for clipping prevention"
+msgstr "클리핑 방지 사용됨"
+
+msgid "Used for the Artists field"
+msgstr "가수 필드로 사용됨"
+
+msgid "Used to associate the saved value with a user or a function"
+msgstr "사용자 또는 기능 포함한 저장된 값을 연결해 사용됨"
+
+msgid "User authentification error"
+msgstr "사용자 인증 오류"
+
+msgid "Value not written in file tag"
+msgstr "파일 태그에 값이 쓰여지지 않음"
+
+msgid "Value written in file tag"
+msgstr "파일 태그에 값 쓰여짐"
+
+msgid "Various artists"
+msgstr "다양한 가수"
+
+msgid "Version"
+msgstr "버전"
+
+msgid "View"
+msgstr "보기"
+
+msgid "View Binary"
+msgstr "이진 보기"
+
+msgid "View binary data ..."
+msgstr "이진 자료 보기 ..."
+
+msgid "Volume"
+msgstr "음량"
+
+msgid "Volume : "
+msgstr "음량 :"
+
+msgid "Volume step :"
+msgstr "음량 :"
+
+msgid "Wait when queue empty"
+msgstr "대기열이 비면 기다리기"
+
+msgid ""
+"Warning : these are advanced options, don't change them unless you know what "
+"you are doing."
+msgstr ""
+"경고 : 고급 옵션은, 사용자가 설정하는 것이 무엇인지 모른다면 바꿀 필요가 없습"
+"니다."
+
+msgid "Warning : using a folder with invalid encoding, you should rename it."
+msgstr ""
+"경고 : 잘못된 엔코딩을 포함한 폴더를 사용하려면, 사용자는 이름을 바꾸어야만 "
+"합니다."
+
+msgid "Warning: all existing data for this field will be lost"
+msgstr "경고: 이 필드에 모든 존재하는 자료는 사라질 것입니다"
+
+msgid "Warning: an identifier is needed"
+msgstr "경고: 인식자가 필요합니다"
+
+msgid "Warning: converting existing data to this format may be lossy"
+msgstr "경고: 존재하는 자료를 이 형식으로 변환하면 잃게 될 것입니다"
+
+msgid "Web context"
+msgstr "웹 항목"
+
+msgid "Web context plugin"
+msgstr "웹 항목 플러그인"
+
+msgid "Wednesday"
+msgstr "수요일"
+
+msgid "Weighted Random"
+msgstr "강하게 무작위 순서로"
+
+msgid ""
+"When changing songs, the previous song is added to the recent list even if "
+"not played at all."
+msgstr ""
+"노래를 바꿀때, 이전 노래는 전혀 재생되지 않더라도 최근 목록에 추가됩니다."
+
+msgid "Widget name"
+msgstr "위젯 이름"
+
+msgid "Wikipedia"
+msgstr "위키페디아"
+
+msgid "Wikipedia Locale"
+msgstr "위키페디어 로케일"
+
+msgid ""
+"Will not write the tags except with the advanced tag editing dialog. The "
+"changes will be kept in the library instead.\n"
+"Warning, the changes for a song will be lost if the tag is re-read."
+msgstr "사용자 정의 명령"
+
+msgid "Win"
+msgstr "윈도우즈"
+
+msgid "Windows"
+msgstr "윈도우즈"
+
+msgid "Words that begin with"
+msgstr "다음으로 시작한 단어"
+
+msgid "Write filenames to ..."
+msgstr "파일이름 쓰기 ..."
+
+msgid "Writing tags"
+msgstr "태그 쓰는중"
+
+msgid "Year"
+msgstr "연도"
+
+msgid "Yes"
+msgstr "예"
+
+msgid ""
+"You can use some markup, eg :\n"
+"<b>bold</b> <i>italic</i> <u>underline</u>\n"
+"Note that the markup may be ignored by the notification daemon"
+msgstr ""
+"사용자가 일부 마크표시를 사용할 수 있습니다, 예 :\n"
+"<b>bold</b> <i>italic</i> <u>underline</u>\n"
+"알림 마크표시는 알림 데몬에서 무시될 수 있습니다."
+
+msgid "You must specify a base folder"
+msgstr "기본 폴더를 입력해야 합니다"
+
+msgid "_Insert column"
+msgstr "_컬럼 추가"
+
+msgid "_Remove this column"
+msgstr "_이 컬럼 제거"
+
+msgid "_Retry"
+msgstr "_다시 시도"
+
+msgid "_Sort by"
+msgstr "_정렬"
+
+msgid "a bright coloured fish"
+msgstr "밝은 색의 물고기"
+
+msgid "a flac file"
+msgstr "FLAC 파일"
+
+msgid "a mp3 file"
+msgstr "MP3 파일"
+
+msgid "a musepack file"
+msgstr "MusePack 파일"
+
+msgid "a wavepack file"
+msgstr "wavepack 파일"
+
+msgid "abort copy"
+msgstr "복사 중지"
+
+msgid "abort move"
+msgstr "이동 중지"
+
+msgid "add"
+msgstr "추가"
+
+msgid "added"
+msgstr "추가됨"
+
+msgid "advanced options"
+msgstr "고급 옵션"
+
+msgid "after %d"
+msgstr "%d 이후"
+
+msgid "alphabetical"
+msgstr "알파벳 순서로"
+
+msgid "amixer control :"
+msgstr "알사 믹서 제어 :"
+
+msgid "an ape file"
+msgstr "ape 파일"
+
+msgid "an ogg file"
+msgstr "ogg 파일"
+
+msgid "another example"
+msgstr "다른 예"
+
+msgid "apply filter"
+msgstr "필터 적용"
+
+msgid "argument {n} :"
+msgstr "인수 {n} :"
+
+msgid "artist"
+msgstr "음악가"
+
+msgid "auto detect"
+msgstr "자동 검출"
+
+msgid "autofill"
+msgstr "자동채움"
+
+msgid "autofill queue"
+msgstr "자동채움 대기열"
+
+msgid "automatic size"
+msgstr "자동 크기"
+
+msgid "back cover"
+msgstr "커버 (뒷면)"
+
+msgid "band"
+msgstr "밴드"
+
+msgid "band/artist logotype"
+msgstr "밴드/아티스트의 로고"
+
+msgid "before %d"
+msgstr "%d 이전"
+
+msgid "between %d( and )%d"
+msgstr "%d( 그리고 )%d 사이"
+
+msgid "between %n( and )%n"
+msgstr "%n( 그리고 )%n 사이"
+
+msgid "big size"
+msgstr "큰 크기"
+
+msgid "biography"
+msgstr "일대기"
+
+msgid "bitrate"
+msgstr "비트레이트:"
+
+msgid "bonus tracks"
+msgstr "보너스 트랙"
+
+msgid "boolean"
+msgstr "연산자"
+
+msgid "bootleg"
+msgstr "해적판"
+
+msgid "broken"
+msgstr "깨짐"
+
+msgid "by"
+msgstr "작성자"
+
+msgid "by added"
+msgstr "추가됨으로"
+
+msgid "by lastplay"
+msgstr "마지막재생으로"
+
+msgid "by lastplay & bootleg"
+msgstr "마지막재생 & 해적판으로"
+
+msgid "by lastplay & play count"
+msgstr "마지막재생 & 재생 수로"
+
+msgid "by play count"
+msgstr "재생 수로"
+
+msgid "by rating"
+msgstr "점수로"
+
+msgid "by {artist} from {album}"
+msgstr "{album}에서 {artist}로"
+
+msgid "bytes"
+msgstr "바이트"
+
+msgid "check now"
+msgstr "지금 체크하기"
+
+msgid "cloud mode"
+msgstr "흐림 모드"
+
+msgid "command :"
+msgstr "명령 :"
+
+msgid "common number"
+msgstr "일반 수"
+
+msgid "common string"
+msgstr "일반 문자열"
+
+msgid "composer"
+msgstr "작곡가"
+
+msgid "conductor"
+msgstr "지휘자"
+
+msgid "connection failed"
+msgstr "연결이 실패했습니다"
+
+msgid "connection failed."
+msgstr "연결이 실패했습니다"
+
+msgid "contains %s"
+msgstr "%s 포함"
+
+msgid "counter"
+msgstr "카운터"
+
+msgid "custom"
+msgstr "사용자 정의"
+
+msgid "day"
+msgstr "일"
+
+msgid "days"
+msgstr "일"
+
+msgid "default"
+msgstr "기본값"
+
+msgid "default filename"
+msgstr "기본값 파일이름"
+
+msgid "default folder"
+msgstr "기본값 폴더"
+
+msgid "default fullscreen"
+msgstr "기본값 전체화면"
+
+msgid "delete selected filter"
+msgstr "선택한 필터 지우기"
+
+msgid "delete selected grouping"
+msgstr "선택한 그룹 지우기"
+
+msgid "delete selected random mode"
+msgstr "선택한 무작위 모드 지우기"
+
+msgid "delete selected sort mode"
+msgstr "선택한 정렬 모드 지우기"
+
+msgid "different folders"
+msgstr "다른 폴더"
+
+msgid "disc {disc}"
+msgstr "디스크"
+
+msgid "doesn't contain %s"
+msgstr "%s 포함하지 않음"
+
+msgid "doesn't match regexp %r"
+msgstr "%r 정규표현과 맞지 않음"
+
+msgid "during performance"
+msgstr "연주 시간"
+
+msgid "during recording"
+msgstr "녹음 시간"
+
+msgid "edit ..."
+msgstr "편집 ..."
+
+msgid "email"
+msgstr "전자메일"
+
+msgid "empty"
+msgstr "비어있음"
+
+msgid "enable gapless (experimental)"
+msgstr "갭리스 사용하기 (실험중임)"
+
+msgid "error"
+msgstr "에러"
+
+msgid "events"
+msgstr "이벤트"
+
+msgid "ex :"
+msgstr "예 :"
+
+msgid "exactly %n( times)"
+msgstr "정확히 %n( 번)"
+
+msgid "exactly not %n( times)"
+msgstr "정확지 않게 %n( 번)"
+
+msgid "example (selected song) : {score}  ({chances})"
+msgstr "예제 (selected song) : {score}  ({chances})"
+
+msgid "example : "
+msgstr "예 :"
+
+msgid "example : %s"
+msgstr "예 :"
+
+msgid "examples :"
+msgstr "예 :"
+
+msgid "fallback-gain"
+msgstr "폴백-게인"
+
+msgid "false"
+msgstr "거짓"
+
+msgid "favorite"
+msgstr "즐겨찾기"
+
+msgid "file format"
+msgstr "파일 포맷"
+
+msgid "filters"
+msgstr "필터"
+
+msgid "first added"
+msgstr "처음 추가됨"
+
+msgid "flags"
+msgstr "표시 문자"
+
+msgid "float"
+msgstr "부표"
+
+msgid "font size depends on"
+msgstr "글꼴 크기 결정"
+
+msgid "for files without a VBR header"
+msgstr "VBR 헤더 없는 파일"
+
+msgid "front cover"
+msgstr "커버 (앞면)"
+
+msgid "full"
+msgstr "전체"
+
+msgid "full with buttons"
+msgstr "버튼 포함 전체"
+
+msgid "google images"
+msgstr "구글 이미지"
+
+msgid "google images (hi-res)"
+msgstr "구글 이미지 (고화질)"
+
+msgid "group by"
+msgstr "그룹"
+
+msgid "half-life : "
+msgstr "반감기 :"
+
+msgid "hours"
+msgstr "시간"
+
+msgid "huge size"
+msgstr "거대한 크기"
+
+msgid "icecast server"
+msgstr "icecast 서버"
+
+msgid "id3v1 tag"
+msgstr "id3v1 태그"
+
+msgid "ignore title"
+msgstr "제목 무시하기"
+
+msgid "illustration"
+msgstr "일러스트"
+
+msgid "imported list"
+msgstr "가져온 목록"
+
+msgid "info"
+msgstr "정보"
+
+msgid "integer"
+msgstr "정수"
+
+msgid "interview"
+msgstr "인터뷰"
+
+msgid "invalid pattern"
+msgstr "잘못된 패턴"
+
+msgid "inverse"
+msgstr "거꾸로"
+
+msgid "is"
+msgstr "같음"
+
+msgid "is %g"
+msgstr "%g 와 같음"
+
+msgid "is %n"
+msgstr "%n 와 같음"
+
+msgid "is %n( %)"
+msgstr "%n( %) 와 같음"
+
+msgid "is %n(Hz)"
+msgstr "%n(Hz) 와 같음"
+
+msgid "is %n(kbps)"
+msgstr "%n(kbps) 와 같음"
+
+msgid "is %s"
+msgstr "%s 와 같음"
+
+msgid "is after %n"
+msgstr "%n 이후"
+
+msgid "is before %n"
+msgstr "%n 이전"
+
+msgid "is between %b( and )%b"
+msgstr "%b( 그리고 )%b 사이"
+
+msgid "is between %n( and )%n( %)"
+msgstr "%n( 그리고 )%n( %) 사이"
+
+msgid "is between %n( and )%n( s)"
+msgstr "%n( 그리고 )%n( s) 사이"
+
+msgid "is in %s"
+msgstr "%s 에 있음"
+
+msgid "is in list %l"
+msgstr "%l 목록에 있음"
+
+msgid "is less than %b"
+msgstr "%b 보다 적음"
+
+msgid "is less than %n"
+msgstr "%n 보다 적음"
+
+msgid "is less than %n( %)"
+msgstr "%n( %) 보다 적음"
+
+msgid "is less than %n( s)"
+msgstr "%n( s) 보다 적음"
+
+msgid "is less than %n(Hz)"
+msgstr "%n(Hz) 보다 적음"
+
+msgid "is less than %n(kbps)"
+msgstr "%n(kbps) 보다 적음"
+
+msgid "is more than %b"
+msgstr "%b 보다 많음"
+
+msgid "is more than %n"
+msgstr "%n 보다 많음"
+
+msgid "is more than %n( %)"
+msgstr "%n( %) 보다 많음"
+
+msgid "is more than %n( s)"
+msgstr "%n( s) 보다 많음"
+
+msgid "is more than %n(Hz)"
+msgstr "%n(Hz) 보다 많음"
+
+msgid "is more than %n(kbps)"
+msgstr "%n(kbps) 보다 많음"
+
+msgid "is not"
+msgstr "제외"
+
+msgid "is not %n"
+msgstr "%n 제외"
+
+msgid "is not %n( %)"
+msgstr "%n( %) 제외"
+
+msgid "is not %s"
+msgstr "%s 제외"
+
+msgid "is not 44.1kHz"
+msgstr "44.1kHz 제외"
+
+msgid "is not in %s"
+msgstr "%s에서 제외"
+
+msgid "is not in list %l"
+msgstr "%l 목록에서 제외"
+
+msgid "isn't %g"
+msgstr "%g 제외"
+
+msgid "isn't %n"
+msgstr "%n 제외"
+
+msgid "isn't %n(Hz)"
+msgstr "%n(Hz) 제외"
+
+msgid "isn't %n(kbps)"
+msgstr "%n(kbps) 제외"
+
+msgid ""
+"itunes doesn't support unsynchronised tags last time I checked, mostly "
+"affect tags with pictures"
+msgstr ""
+"itunes는 제작자가 체크한 최근까지 비동기화된 태그를 지원하지 않습니다, 대부"
+"분 사진을 가진 태그에 영향을 줍니다"
+
+msgid "itunes-like"
+msgstr "아이튠즈 모양"
+
+msgid "last added"
+msgstr "마지막 추가됨"
+
+msgid "last played"
+msgstr "마지막 연주됨"
+
+msgid "last skipped"
+msgstr "마지막 스킴됨"
+
+msgid "last.fm"
+msgstr "Last.fm"
+
+msgid "last.fm plugin"
+msgstr "last.fm 플러그인"
+
+msgid "lead artist"
+msgstr "리드 가수"
+
+msgid "leaflet page"
+msgstr "광고전단 페이지"
+
+msgid "left-side filter panes"
+msgstr "왼편 필터 패널"
+
+msgid "length of songs"
+msgstr "노래 길이"
+
+msgid "less played"
+msgstr "적게 재생됨"
+
+msgid "less skipped"
+msgstr "적게 스킵됨"
+
+msgid "less than %a( ago)"
+msgstr "%a( 이전) 보다 적음"
+
+msgid "less than %n( times)"
+msgstr "%n( 번) 보다 적음"
+
+msgid "longest"
+msgstr "가장 긴"
+
+msgid "lyricist"
+msgstr "작사가"
+
+msgid "match regexp %r"
+msgstr "%r 정규표현에 맞음"
+
+msgid "maximum font size"
+msgstr "최대 글꼴 크기"
+
+msgid "media"
+msgstr "미디어"
+
+msgid "medium size"
+msgstr "중간 크기"
+
+msgid "minimal"
+msgstr "간단히"
+
+msgid "minimum font size"
+msgstr "최소 글꼴 크기"
+
+msgid "minutes"
+msgstr "분"
+
+msgid "modified"
+msgstr "수정됨"
+
+msgid "mono"
+msgstr "모노"
+
+msgid "month"
+msgstr "월"
+
+msgid "months"
+msgstr "월"
+
+msgid "more than %a( ago)"
+msgstr "%a( 이전) 보다 더"
+
+msgid "more than %n( times)"
+msgstr "%n( 번) 보다 더"
+
+msgid "mosaic mode"
+msgstr "모자이크 모드"
+
+msgid "most played"
+msgstr "대부부 재생됨"
+
+msgid "most skipped"
+msgstr "대부분 스킵됨"
+
+msgid "move folder"
+msgstr "폴더 이동"
+
+msgid "movie/video screen capture"
+msgstr "영화/비디오의 스크린 캡쳐"
+
+msgid "mplayer options :"
+msgstr "mplayer 옵션 :"
+
+msgid "multi-lines string"
+msgstr "여러줄 문자열"
+
+msgid "name of the new filter"
+msgstr "새 필터 이름"
+
+msgid "name of the new grouping"
+msgstr "새 그룹으로 나누기 이름"
+
+msgid "name of the new random mode"
+msgstr "새 무작위 모드 이름"
+
+msgid "name of the new sort mode"
+msgstr "새 정렬 모드 이름"
+
+msgid "never"
+msgstr "전혀"
+
+msgid "never played"
+msgstr "전혀 재생안됨"
+
+msgid "no matches found, you might want to remove some search terms."
+msgstr "맞는 것을 찾지 못함, 사용자는 일부 찾기 아목을 제거해야할 것입니다."
+
+msgid "no order"
+msgstr "정렬 안함"
+
+msgid "no picture"
+msgstr "사진 없음"
+
+msgid "no pictures"
+msgstr "사진 없음"
+
+msgid "no plugins found"
+msgstr "플러그인 찾지 못함"
+
+msgid "no splitting"
+msgstr "나누지 않음"
+
+msgid "no to all"
+msgstr "전체가 아님"
+
+msgid "noname"
+msgstr "이름없음"
+
+msgid "normal"
+msgstr "표준"
+
+msgid "normal play when queue empty"
+msgstr "대기열이 비면 표준 재생"
+
+msgid "not bootleg"
+msgstr "해적판 제외"
+
+msgid "not played for the longest time"
+msgstr "가장 긴 시간동안 재생되지 않음"
+
+msgid "not skipped for the longest time"
+msgstr "가장 긴 시간동안 스킵되지않음"
+
+msgid "number of songs"
+msgstr "노래의 수"
+
+msgid "number of songs in filter"
+msgstr "필터에서 노래 수"
+
+msgid "on %d"
+msgstr "%d 상에"
+
+msgid "only show entries with at least n songs"
+msgstr "적어도 입력된 수의 노래를 가진 항목만 표시하기"
+
+msgid "only works when the artist-info tab is displayed"
+msgstr "일부 가수-정보 탭이 표시될 때에만 동작합니다."
+
+msgid "only works with some lyrics source and when the lyrics tab is displayed"
+msgstr "일부 가사 소스와 가사 탭이 표시될 때에만 동작합니다."
+
+msgid "open context window"
+msgstr "항목 창 열기"
+
+msgid "options"
+msgstr "옵션"
+
+msgid "or"
+msgstr "또는"
+
+msgid "other"
+msgstr "기타"
+
+msgid "other file icon"
+msgstr "다른 종류의 아이콘"
+
+msgid "output device :"
+msgstr "출력 장치 :"
+
+msgid "password :"
+msgstr "비밀번호 :"
+
+msgid "perl code"
+msgstr "펄 코드"
+
+msgid "picture size"
+msgstr "사진 크기"
+
+msgid "play count average"
+msgstr "재생 카운터 평균"
+
+msgid "played"
+msgstr "재생됨"
+
+msgid "played>4"
+msgstr "재생됨>4"
+
+msgid "port :"
+msgstr "포트 :"
+
+msgid "pre-amp"
+msgstr "프리-앰프"
+
+msgid "quit"
+msgstr "종료"
+
+msgid "quit when queue empty"
+msgstr "대기열이 비면 종료"
+
+msgid "quodlibet-like"
+msgstr "quodlibet-like"
+
+msgid "rating"
+msgstr "등급"
+
+msgid "rating average"
+msgstr "점수 평균"
+
+msgid "recording location"
+msgstr "녹음 장소"
+
+msgid "requires xdg-screensaver"
+msgstr "xdg-screensaver가 필요함"
+
+msgid "reset filter {nb}"
+msgstr "{nb} 필터 재설정"
+
+msgid "reset primary filter"
+msgstr "기본 필터값 재설정"
+
+msgid "reset secondary filter"
+msgstr "두번째 필터 재설정"
+
+msgid "retry"
+msgstr "재시도"
+
+msgid "retry in {seconds} s"
+msgstr "{seconds} 초에 재시도"
+
+msgid "sampling rate"
+msgstr "샘플 레이트"
+
+msgid "save as '{name}'"
+msgstr "'{name}'로 저장"
+
+msgid "save filter as"
+msgstr "필터 저장"
+
+msgid "save grouping as"
+msgstr "그룹으로 나누기 새이름으로 저장"
+
+msgid "save random mode as"
+msgstr "무작위 모드 저장"
+
+msgid "save sort mode as"
+msgstr "정렬 모드 저장"
+
+msgid "saved filters"
+msgstr "저장된 필터"
+
+msgid "saved groupings"
+msgstr "저장된 그룹으로 나누기"
+
+msgid "saved random modes"
+msgstr "저장된 무작위 모드"
+
+msgid "saved sort modes"
+msgstr "저장된 정렬 모드"
+
+msgid "scan now"
+msgstr "바로 찾기"
+
+msgid "seconds"
+msgstr "초"
+
+msgid "shortest"
+msgstr "가장 짧게"
+
+msgid "show pictures"
+msgstr "사진 표시"
+
+msgid "show the 'All' row"
+msgstr "모든 열 표시"
+
+msgid "skin options"
+msgstr "스킨 옵션"
+
+msgid "skip count average"
+msgstr "스킵 카운트 평균"
+
+msgid "skipped"
+msgstr "스킵됨"
+
+msgid "small size"
+msgstr "작은 크기"
+
+msgid "sort by"
+msgstr "정렬"
+
+msgid "static list"
+msgstr "정적인 목록"
+
+msgid "stereo"
+msgstr "스테레오"
+
+msgid "stop"
+msgstr "정지"
+
+msgid "stop when queue empty"
+msgstr "대기열이 비면 정지"
+
+msgid "string"
+msgstr "문자열"
+
+msgid "supports : "
+msgstr "지원 :"
+
+msgid "text format"
+msgstr "텍스트 형식"
+
+msgid "text mode"
+msgstr "텍스트 모드"
+
+msgid "the command {name}"
+msgstr "명령 {name}"
+
+msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
+msgstr "기본값은 ID3v2.3는 utf16이고 ID3v2.4는 utf8이다."
+
+msgid "the file {name}"
+msgstr "파일 {name}"
+
+msgid "the {name} perl module"
+msgstr "{name} 펄 모듈"
+
+msgid "then {action}"
+msgstr "{action} 그런후"
+
+msgid "times"
+msgstr "번"
+
+msgid "toggle Intersection mode"
+msgstr "교차 모드 토글"
+
+msgid "toggle Invert mode"
+msgstr "거꾸로 모드 토글"
+
+msgid "tools"
+msgstr "도구"
+
+msgid "true"
+msgstr "진실"
+
+msgid "turn off"
+msgstr "끄기"
+
+msgid "turn off computer when queue empty"
+msgstr "대기열이 비면 컴퓨터 끄기"
+
+msgid "unknown"
+msgstr "알 수 없음"
+
+msgid "unknown error"
+msgstr "알려지지 않은 에러"
+
+msgid "unnamed random mode"
+msgstr "이름없는 무작위 모드"
+
+msgid "url"
+msgstr "주소"
+
+msgid "url-encoded list of files"
+msgstr "url-엔코드된 파일의 목록"
+
+msgid "url-encoded list of files/folders"
+msgstr "url-엔코드된 파일/폴더의 목록"
+
+msgid "use :"
+msgstr "사용 :"
+
+msgid "use album name"
+msgstr "앨범 이름 사용"
+
+msgid "use default"
+msgstr "기본값 사용"
+
+msgid "use gnome settings"
+msgstr "그놈 설정 사용"
+
+msgid "use song folder"
+msgstr "노래 폴더 사용"
+
+msgid "use standard strftime variables"
+msgstr "표준 strftime 변수 사용하기"
+
+msgid "username :"
+msgstr "사용자이름:"
+
+msgid "using skin :"
+msgstr "스킨 사용 :"
+
+msgid "wait for more"
+msgstr "좀더 기다리세요"
+
+msgid "wait for more when queue empty"
+msgstr "대기열이 비면 좀더 기다리세요"
+
+msgid "web"
+msgstr "웹"
+
+msgid "weeks"
+msgstr "주"
+
+msgid "weight :"
+msgstr "중요도 :"
+
+msgid "wikipedia, lyrics, and custom webpages"
+msgstr "위키페디아, 가사, 그리고 상황에 맞는 웹페이지"
+
+msgid "with browser"
+msgstr "브라우저 포함"
+
+msgid "with browser & queue"
+msgstr "브라우저 & 대기열 포함"
+
+msgid "with browser (SongTree)"
+msgstr "브라우저 (노래트리) 포함"
+
+msgid "with context"
+msgstr "항목 포함"
+
+msgid "with picture"
+msgstr "앨범 사진 포함"
+
+msgid "with playlist"
+msgstr "재생목록 포함"
+
+msgid "with playlist & context"
+msgstr "재생목록 & 항목 포함"
+
+msgid "with queue"
+msgstr "대기열 포함"
+
+msgid "with search"
+msgstr "찾기 포함"
+
+msgid "with tabbedlists"
+msgstr "탭으로된 목록 포함"
+
+msgid ""
+"without gstreamer : one stream per file, one connection at a time\n"
+"with gstreamer : one continuous stream, multiple connection possible"
+msgstr ""
+"gstreamer 없음: 파일 하나당 하나의 스트림, 한번에 하나의 연결\n"
+"gstreamer 있음: 하나의 연속된 스트림, 다중 연결 가능"
+
+msgid "x offset :"
+msgstr "x 오프셋 :"
+
+msgid "y offset :"
+msgstr "y 오프셋 :"
+
+msgid "year"
+msgstr "연도"
+
+msgid "year (highest)"
+msgstr "연도 (최고높음)"
+
+msgid "years"
+msgstr "연도들"
+
+msgid "yes to all"
+msgstr "모두 예"
+
+msgid ""
+"{album}\n"
+"<small>by</small> {artist}"
+msgstr ""
+"{album}\n"
+"<small>/</small> {artist}"
+
+msgid "{folder} already exists"
+msgstr "{folder}는 이미 존재합니다"
+
+msgid "{hours} hours {min} min {sec} s ({size} M)"
+msgstr "{hours} 시간 {min} 분 {sec} 초 ({size} M)"
+
+msgid "{hours}h {min}m {sec}s ({size}M)"
+msgstr "{hours}시 {min}분 {sec}초 ({size}M)"
+
+msgid "{hours}h{min}m{sec}s"
+msgstr "{hours}시{min}분{sec}초"
+
+msgid "{min} min {sec} s ({size} M)"
+msgstr "{min} 분 {sec} 초 ({size} M)"
+
+msgid "{min}m {sec}s ({size}M)"
+msgstr "{min}분 {sec}초 ({size}M)"
+
+msgid "{min}m{sec}s"
+msgstr "{min}분{sec}초"
+
+msgid "{outputname} output settings"
+msgstr "{outputname} 출력 설정"
+
+msgid "{songs} by {artists}"
+msgstr "{songs} / {artists}"
+
+msgid ""
+"{song}\n"
+"by {artist}\n"
+"from {album}"
+msgstr ""
+"{song}\n"
+" {artist}\n"
+" {album}"
+
+msgid "{song} by {artist}"
+msgstr "{song} / {artist}"
+
+msgid "|-separated list of widget names"
+msgstr "|-위젯 이름에서 목록 나누기"
+
+#~ msgid "' & ' and ', ' and ';'"
+#~ msgstr "' & ' 그리고 ', ' and ';'"
+
+#~ msgid "=> "
+#~ msgstr "=> "
+
+#~ msgid ""
+#~ "Automatically check if the file for the current song has changed. And "
+#~ "remove songs not found from the library."
+#~ msgstr ""
+#~ "현재 노래 파일이 바뀌는지를 자동으로 체크합니다. 그리고 라이브러리에서 발"
+#~ "견하지 못한 노래는 제거합니다."
+
+#~ msgid "Diacritic sort"
+#~ msgstr "발음으로 정렬"
+
+#~ msgid "Disable Last.fm context tab"
+#~ msgstr "Last.fm 항목 탭 사용하지 않기"
+
+#~ msgid "Disable Lyrics context tab"
+#~ msgstr "가사 항목 탭 사용하지 않기"
+
+#~ msgid "Disable wikipedia context tab"
+#~ msgstr "위키페디아 항목 탭 사용하지 않기"
+
+#~ msgid "Edit ..."
+#~ msgstr "편집 ..."
+
+#~ msgid ""
+#~ "Error creating {folder} :\n"
+#~ "{error}"
+#~ msgstr ""
+#~ "{folder} 만드는 중 에러:\n"
+#~ "{error}"
+
+#~ msgid "Lullaby plugin, to fade-out volume before stopping"
+#~ msgstr "자장가 플러그인, 중지 전에 소리 페이드-아웃위해서"
+
+#~ msgid ""
+#~ "Makes case insensitive sort puts accented letters right after their "
+#~ "unaccented version.\n"
+#~ "(Significantly slower)"
+#~ msgstr ""
+#~ "둔감한 정렬의 경우 악센트 있는 문자를 넣은 후 그들의 악센트가 없는 버전을 "
+#~ "넣는다.\n"
+#~ "(상당히 느려짐)"
+
+#~ msgid "Other"
+#~ msgstr "기타"
+
+#~ msgid "Pictures, mp3 & flac files"
+#~ msgstr "사진들, mp3 & flac 파일들"
+
+#~ msgid "Play order :\n"
+#~ msgstr "재생 순서 :\n"
+
+#~ msgid "Rating picture"
+#~ msgstr "점수 사진"
+
+#~ msgid "Remove existing"
+#~ msgstr "존재하는 것 제거하기"
+
+#~ msgid "Search for artist on the web:"
+#~ msgstr "웹상에서 가수 찾기:"
+
+#~ msgid "Split on words"
+#~ msgstr "단어로 나누기"
+
+#~ msgid "Text :"
+#~ msgstr "텍스트 :"
+
+#~ msgid "You can use some markup, eg : <b>bold</b>"
+#~ msgstr "사용자가 일부 마크-표시를 사용할 수 있다, 예 : <b>bold</b>"
+
+#~ msgid "about"
+#~ msgstr "정보"
+
+#~ msgid "minimum number of songs"
+#~ msgstr "노래 최저 수"
+
+#~ msgid "next"
+#~ msgstr "다음"
+
+#~ msgid "one folder"
+#~ msgid_plural "different folders"
+#~ msgstr[0] "다른 폴더들"
+
+#~ msgid "remove this tab"
+#~ msgstr "이 탭 제거하기"
+
+#~ msgid "retry ?"
+#~ msgstr "재시도 ?"
+
+#~ msgid "set"
+#~ msgstr "설정"
+
+#~ msgid "show info"
+#~ msgstr "정보 표시"
+
+#~ msgid "unset"
+#~ msgstr "설정해제"
+
+#~ msgid "{command} is needed to play this file."
+#~ msgstr "이 파일을 재생하려면 {command}이 필요합니다."

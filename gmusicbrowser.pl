@@ -1466,7 +1466,7 @@ sub LoadPlugins
 				my %plug= (version=>0,desc=>'',);
 				while ($line=<$fh>)
 				{	last if $line=~m/^=cut/;
-					my ($key,$val)= $line=~m/^\s*(\w+):?\s+(.+)/;
+					my ($key,$val)= $line=~m/^\s*(\w+):?\s+([^\n\r]+)/;
 					next unless $key;
 					if ($key eq 'desc')
 					{	$plug{desc} .= _($val)."\n";
@@ -5150,6 +5150,7 @@ sub AboutDialog
 		'Chinese : jk',
 		'Czech : Vašek Kovářík',
 		'Portuguese : Gleriston Sampaio <gleriston_sampaio@hotmail.com>',
+		'Korean : bluealbum',
 	);
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
@@ -6915,7 +6916,7 @@ sub new
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->set_reorderable(TRUE);
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes(
-		filters => Gtk2::CellRendererText->new,
+		_("filters") => Gtk2::CellRendererText->new,
 		text => C_NAME) );
 	my $sw = Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');

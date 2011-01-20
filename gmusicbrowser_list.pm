@@ -721,7 +721,7 @@ INIT
 	},
 
 	right_aligned_folder=>
-	{	menu	=> _"Folder (right-aligned)", title => _"Folder",
+	{	menu	=> _("Folder (right-aligned)"), title => _("Folder"),
 		value	=> sub { Songs::Display($_[2],'path'); },
 		attrib	=> 'text', type => 'Glib::String', depend => 'path',
 		sort	=> 'path',	width => 200,
@@ -734,14 +734,14 @@ INIT
 		sort => 'title:i',	noncomp => 'boldrow',		width => 200,
 	},
 	playandqueue =>
-	{	menu => _('Playing & Queue'),		title => '',	width => 20,
+	{	menu => _('Playing and queue icons'),		title => '',	width => 20,
 		value => sub { ::Get_PPSQ_Icon($_[2], ($_[0]{currentrow}!=-1 && $_[0]{currentrow}!=$_[1])); },
 		class => 'Gtk2::CellRendererPixbuf',	attrib => 'stock-id',
 		type => 'Glib::String',			noncomp => 'boldrow italicrow',
 		event => 'Playing Queue CurSong',
 	},
 	icolabel =>
-	{	menu => _("Labels' Icons"),	title => '',		value => sub { $_[2] },
+	{	menu => _("Labels' icons"),	title => '',		value => sub { $_[2] },
 		class => 'CellRendererIconList',attrib => 'ID',	type => 'Glib::Uint',
 		depend => 'label',	sort => 'label:i',	noncomp => 'boldrow italicrow',
 		event => 'Icons', 		width => 50,
@@ -1753,6 +1753,7 @@ sub new
 	::Watch($self, SongsAdded  => \&SongsAdded_cb);
 	::Watch($self, SongsRemoved=> \&SongsRemoved_cb);
 	$self->signal_connect(destroy => \&cleanup);
+	$self->{needupdate}=1;
 	::WatchFilter($self,$opt->{group},\&updatefilter);
 	::IdleDo('9_FPfull'.$self,100,\&updatefilter,$self);
 	return $self;
@@ -1929,13 +1930,13 @@ sub SongsRemoved_cb
 
 sub updatefilter
 {	my ($self,undef,$nb)=@_;
-	delete $::ToDo{'9_FPfull'.$self};
-	my $force=delete $self->{needupdate};
-
-	my $group=$self->{group};
 	my $mynb=$self->{nb};
 	return if $nb && $nb> $mynb;
+
+	delete $::ToDo{'9_FPfull'.$self};
+	my $force=delete $self->{needupdate};
 	warn "Filtering list for FilterPane$mynb\n" if $::debug;
+	my $group=$self->{group};
 	my $currentf=$::Filters{$group}[$mynb+1];
 	$self->{resetbutton}->set_sensitive( !Filter::is_empty($currentf) );
 	my $filt=Filter->newadd(TRUE, map($::Filters{$group}[$_+1],0..($mynb-1)) );
@@ -5016,10 +5017,11 @@ sub key_press_cb
 	elsif	(lc$key eq 'a' && $ctrl)							#ctrl-a : select-all
 		{ $self->{selected}{$_}=undef for @{ $self->{list} }; $self->queue_draw; return 1; }
 	else {return 0}
-	if	($i<0)		{$j--; $i= $j<0 ? 0 : $nw-1}
-	elsif	($i>=$nw)	{$j++; $i= $j>=$nh ? $nwlast-1 : 0 }
+	if	($i<0)		{$j--;$i=$nw-1;}
+	elsif	($i>=$nw)	{$j++;$i=0;}
 	if	($j<0)		{$j=0;$i=0}
-	elsif	($j>=$nh-1)	{$j=$nh-1; $i=$nwlast-1 }
+	elsif	($j==$nh-1)	{$i=$nwlast-1 if $i>=$nwlast}
+	elsif	($j>$nh-1)	{$j=$nh-1; $i=$nwlast-1 }
 	$self->key_selected($event,$i,$j);
 	return 1;
 }
