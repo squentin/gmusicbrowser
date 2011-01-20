@@ -10,7 +10,8 @@ VBmain = HPControlsInfoAndSearch _HPContent
 
 
 
-    HPContent = _HPCurrentTrack _TBContextAndLists
+    HPContent = _HPCurrentTrack _VBTabbedLists
+        VBTabbedLists = 10_TabbedLists(group=1,page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo')
         HPCurrentTrack = VPfp2 _VPfp0
             VPfp2 = _HBCurrentTrack VBSavedFilterPane
 
@@ -36,13 +37,13 @@ ars
         #HPfp1 =  VPQueueContext
             #VPQueueContext =  _HBTabbedLists
 
-                TBContextAndLists = _"Context" Context(page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo') _"Queue" HBQueueList _"List" TabbedLists(group=1)
-                # an layout error occurs, if I use the padding in a VP
-                HBQueueList = 10_VBQueueList
-                    VBQueueList = 0Filler5 VBQueueAct _QueueList(group=1) 5HBQueueActions 3Filler6
-                        VBQueueAct = _HBEditListButtons
-                            HBEditListButtons = -EditListButtons(group=1,small=1)
-                        HBQueueActions = -QueueActions
+#                TBContextAndLists = _"Context" Context(page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo') _"Queue" HBQueueList _"List" TabbedLists(group=1)
+#                # an layout error occurs, if I use the padding in a VP
+#                HBQueueList = 10_VBQueueList
+#                    VBQueueList = 0Filler5 VBQueueAct _QueueList(group=1) 5HBQueueActions 3Filler6
+#                        VBQueueAct = _HBEditListButtons
+#                            HBEditListButtons = -EditListButtons(group=1,small=1)
+#                        HBQueueActions = -QueueActions
 
     HPControlsInfoAndSearch = _HPfpSongInfo_Search VBControls
         VBControls = _Filler16 HBControls _Filler17
@@ -81,7 +82,6 @@ ars
 
 
         MBSongTree = HistItem
-
             HBSongTree = _VBSongTree
 #            VBSongTree = HBSongTreeAct _SongTree 5HBSongTreeStats
             VBSongTree = HBSongTreeAct _SongTree
