@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser.pot\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-18 20:56+0100\n"
+"POT-Creation-Date: 2011-01-20 17:51+0100\n"
 "PO-Revision-Date: 2009-04-30 13:14+0800\n"
 "Last-Translator: Google Translate\n"
 "Language-Team: Chinese\n"
@@ -12,19 +12,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: plugins/artistinfo.pm:470
+#: plugins/artistinfo.pm:451
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:398
+#: plugins/artistinfo.pm:383
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:398
+#: plugins/artistinfo.pm:383
 msgid ""
 "\n"
 "Total playcount: "
@@ -61,12 +61,12 @@ msgid "%d Song"
 msgid_plural "%d Songs"
 msgstr[0] "%d歌曲"
 
-#: gmusicbrowser.pl:361 gmusicbrowser_list.pm:7745 gmusicbrowser_songs.pm:502
+#: gmusicbrowser.pl:361 gmusicbrowser_list.pm:7746 gmusicbrowser_songs.pm:502
 msgid "%d album"
 msgid_plural "%d albums"
 msgstr[0] "%d专辑"
 
-#: gmusicbrowser.pl:349 gmusicbrowser.pl:356 gmusicbrowser_list.pm:7756
+#: gmusicbrowser.pl:349 gmusicbrowser.pl:356 gmusicbrowser_list.pm:7757
 #: gmusicbrowser_songs.pm:478 gmusicbrowser_songs.pm:2343
 msgid "%d artist"
 msgid_plural "%d artists"
@@ -202,11 +202,7 @@ msgstr "(: )有一个"
 msgid "(: )none"
 msgstr "(: )无"
 
-#: gmusicbrowser_layout.pm:833
-msgid "([^"
-msgstr ""
-
-#: plugins/artistinfo.pm:207 plugins/audioscrobbler.pm:65
+#: plugins/artistinfo.pm:218 plugins/audioscrobbler.pm:65
 msgid "(applied after restart)"
 msgstr ""
 
@@ -245,7 +241,7 @@ msgstr ""
 msgid "0 chance"
 msgstr "0机会"
 
-#: plugins/artistinfo.pm:209
+#: plugins/artistinfo.pm:220
 msgid "0 means no limit"
 msgstr ""
 
@@ -253,7 +249,7 @@ msgstr ""
 msgid "1 chance in {probability}"
 msgstr "1机会概率在{probability}"
 
-#: layouts:295
+#: layouts:296
 msgid "3 Filter panes"
 msgstr "3个过滤器窗格"
 
@@ -351,7 +347,7 @@ msgstr "添加全屏按钮"
 msgid "Add a fullscreen button to layouts that can accept extra buttons"
 msgstr "添加全屏按钮布局用来存放额外的按钮"
 
-#: gmusicbrowser_list.pm:7316
+#: gmusicbrowser_list.pm:7317
 msgid "Add a group"
 msgstr "添加群组"
 
@@ -363,7 +359,7 @@ msgstr "添加一个标签到当前歌曲"
 msgid "Add a list of files/folders to the playlist"
 msgstr "向播放列表添加文件或文件夹"
 
-#: gmusicbrowser_list.pm:7788
+#: gmusicbrowser_list.pm:7789
 msgid "Add a radio"
 msgstr "添加电台"
 
@@ -391,7 +387,7 @@ msgstr "新增多个条件"
 msgid "Add new label"
 msgstr "添加新的标签"
 
-#: gmusicbrowser_list.pm:7858
+#: gmusicbrowser_list.pm:7859
 msgid "Add new radio"
 msgstr "添加新的无线电台"
 
@@ -419,11 +415,11 @@ msgstr "已添加"
 msgid "Added Today"
 msgstr "今天添加的"
 
-#: gmusicbrowser_list.pm:7847
+#: gmusicbrowser_list.pm:7848
 msgid "Adding a radio"
 msgstr "正在添加一个电台"
 
-#: plugins/artistinfo.pm:203
+#: plugins/artistinfo.pm:214
 msgid "Additional domain for Last.fm, Amazon and so on."
 msgstr ""
 
@@ -464,15 +460,15 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:402 layouts:505 layouts:511 layouts:947
+#: plugins/fetch_cover.pm:103 layouts:403 layouts:506 layouts:512 layouts:948
 msgid "Album"
 msgstr "专辑"
 
-#: layouts:802
+#: layouts:803
 msgid "Album and artist"
 msgstr ""
 
-#: layouts:717
+#: layouts:718
 msgid "Album and artist on the left side"
 msgstr ""
 
@@ -616,15 +612,15 @@ msgstr "参数"
 msgid "Arkanoid"
 msgstr ""
 
-#: layouts:95
+#: layouts:96
 msgid "Arkanoid Fullscreen"
 msgstr ""
 
 #: gmusicbrowser.pl:7738 gmusicbrowser_songs.pm:469 gmusicbrowser_tags.pm:1529
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
-#: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:118
-#: plugins/fetch_cover.pm:102 layouts:402 layouts:505 layouts:511
+#: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:129
+#: plugins/fetch_cover.pm:102 layouts:403 layouts:506 layouts:512
 msgid "Artist"
 msgstr "艺术家"
 
@@ -632,7 +628,7 @@ msgstr "艺术家"
 msgid "Artist & album"
 msgstr "艺术家及专辑"
 
-#: plugins/artistinfo.pm:207
+#: plugins/artistinfo.pm:218
 msgid "Artist Picture Size : "
 msgstr ""
 
@@ -656,7 +652,7 @@ msgstr "艺术家，专辑，唱片，音轨"
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "艺术家，日期，专辑，光盘，音轨"
 
-#: plugins/artistinfo.pm:9 plugins/artistinfo.pm:61
+#: plugins/artistinfo.pm:9 plugins/artistinfo.pm:68
 msgid "Artistinfo"
 msgstr ""
 
@@ -704,7 +700,7 @@ msgstr ""
 msgid "Auto-increment track numbers"
 msgstr ""
 
-#: plugins/artistinfo.pm:206 plugins/lyrics.pm:187
+#: plugins/artistinfo.pm:217 plugins/lyrics.pm:187
 msgid "Auto-save positive finds"
 msgstr "自动储存找到的"
 
@@ -736,7 +732,7 @@ msgstr "自动存储插件"
 msgid "Available"
 msgstr "可用的"
 
-#: plugins/artistinfo.pm:398
+#: plugins/artistinfo.pm:383
 msgid "Average rating: "
 msgstr ""
 
@@ -756,7 +752,7 @@ msgstr "相应的文件夹："
 msgid "Before: "
 msgstr ""
 
-#: gmusicbrowser_list.pm:5071
+#: gmusicbrowser_list.pm:5072
 msgid "Begin with"
 msgstr ""
 
@@ -776,7 +772,7 @@ msgstr ""
 msgid "Body text is not supported by current notification daemon"
 msgstr ""
 
-#: layouts:267
+#: layouts:268
 msgid "Browser"
 msgstr "浏览器"
 
@@ -784,15 +780,15 @@ msgstr "浏览器"
 msgid "Browser window layout :"
 msgstr "浏览器窗口的布局："
 
-#: layouts:292
+#: layouts:293
 msgid "Browser with SongTree"
 msgstr "浏览器歌曲文件树"
 
-#: layouts:923
+#: layouts:924
 msgid "Buttons"
 msgstr ""
 
-#: layouts:912
+#: layouts:913
 msgid "Buttons, Song & Cover"
 msgstr ""
 
@@ -852,11 +848,11 @@ msgstr ""
 msgid "Case sensitive"
 msgstr ""
 
-#: gmusicbrowser_list.pm:5070
+#: gmusicbrowser_list.pm:5071
 msgid "Case-sensitive"
 msgstr ""
 
-#: layouts:363
+#: layouts:364
 msgid "Categories pane"
 msgstr "分类窗格"
 
@@ -1046,8 +1042,8 @@ msgstr "通过代理连接"
 msgid "Connections from :"
 msgstr "连线自："
 
-#: layouts:39 layouts:78 layouts:168 layouts:331 layouts:433 layouts:505
-#: layouts:511 layouts:535 layouts:597
+#: layouts:39 layouts:78 layouts:169 layouts:332 layouts:434 layouts:506
+#: layouts:512 layouts:536 layouts:598
 msgid "Context"
 msgstr "相关信息"
 
@@ -1265,7 +1261,7 @@ msgstr "不要unsynchronise id3v2标签"
 msgid "Do not write the tags"
 msgstr "不写标签"
 
-#: plugins/artistinfo.pm:203
+#: plugins/artistinfo.pm:214
 msgid "Domain"
 msgstr ""
 
@@ -1321,7 +1317,7 @@ msgstr ""
 msgid "Edit filter"
 msgstr "修改过滤器"
 
-#: gmusicbrowser_list.pm:6520
+#: gmusicbrowser_list.pm:6521
 msgid "Edit grouping ..."
 msgstr "编辑群组..."
 
@@ -1345,7 +1341,7 @@ msgstr ""
 msgid "Edit..."
 msgstr "修改..."
 
-#: layouts:428
+#: layouts:429
 msgid "EditList"
 msgstr "编辑列表"
 
@@ -1422,7 +1418,7 @@ msgstr "列出文件/文件夹"
 msgid "Enqueue filter"
 msgstr "排列滤波器"
 
-#: plugins/artistinfo.pm:208
+#: plugins/artistinfo.pm:219
 msgid "Enter custom event string :"
 msgstr ""
 
@@ -1434,7 +1430,7 @@ msgstr ""
 msgid "EpicRating plugin - automatically update ratings"
 msgstr ""
 
-#: layouts:851
+#: layouts:852
 msgid "Equalizer"
 msgstr "均衡"
 
@@ -1442,7 +1438,7 @@ msgstr "均衡"
 msgid "Error :"
 msgstr "错误："
 
-#: plugins/artistinfo.pm:569
+#: plugins/artistinfo.pm:550
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1464,7 +1460,7 @@ msgstr "写'{file}'时发生错误"
 msgid "Error writing replaygain tags :\n"
 msgstr "写replaygain标签时发生错误：\n"
 
-#: plugins/artistinfo.pm:560 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:541 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "错误：无效的文件名模式"
 
@@ -1543,7 +1539,7 @@ msgstr ""
 msgid "Field: "
 msgstr ""
 
-#: gmusicbrowser.pl:5173 gmusicbrowser_list.pm:5073
+#: gmusicbrowser.pl:5173 gmusicbrowser_list.pm:5074
 msgid "Fields"
 msgstr ""
 
@@ -1604,7 +1600,7 @@ msgstr "过滤这张专辑"
 msgid "Filter on this artist"
 msgstr "过滤这个艺术家"
 
-#: gmusicbrowser_list.pm:5098
+#: gmusicbrowser_list.pm:5099
 msgid "Find :"
 msgstr ""
 
@@ -1625,11 +1621,11 @@ msgid "Find songs with the same names"
 msgstr "查找相同的名字的歌曲"
 
 #: gmusicbrowser.pl:836 gmusicbrowser.pl:7887 gmusicbrowser_list.pm:724
-#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:794
+#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:795
 msgid "Folder"
 msgstr "文件夹"
 
-#: gmusicbrowser_list.pm:724 layouts:793
+#: gmusicbrowser_list.pm:724 layouts:794
 msgid "Folder (right-aligned)"
 msgstr ""
 
@@ -1646,7 +1642,7 @@ msgid "Folders to search for new songs"
 msgstr "文件夹中寻找新的歌曲"
 
 #: gmusicbrowser_layout.pm:3675 gmusicbrowser_list.pm:17
-#: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6532
+#: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6533
 msgid "Follow playing song"
 msgstr "紧接着正在播放的歌曲"
 
@@ -1658,7 +1654,7 @@ msgstr "紧接着选定的歌曲"
 msgid "Font size"
 msgstr "字体大小"
 
-#: plugins/artistinfo.pm:218
+#: plugins/artistinfo.pm:229
 msgid ""
 "For information on how to use this plugin, please navigate to the <a "
 "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
@@ -1686,7 +1682,7 @@ msgstr "全屏布局："
 msgid "Fullscreen"
 msgstr "全屏"
 
-#: layouts:603
+#: layouts:604
 msgid "Fullscreen simple"
 msgstr "简单全屏"
 
@@ -1716,7 +1712,7 @@ msgstr "流派设置为"
 msgid "Genres"
 msgstr "流派"
 
-#: layouts:363
+#: layouts:364
 msgid "Genres pane"
 msgstr "流派窗格"
 
@@ -1728,11 +1724,11 @@ msgstr "Gnome多媒体键"
 msgid "Gnome multimedia keys plugin"
 msgstr "Gnome的多媒体键插件"
 
-#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6535 layouts:87 layouts:88
+#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6536 layouts:88 layouts:89
 msgid "Go to playing song"
 msgstr "转到正在播放曲目"
 
-#: gmusicbrowser_list.pm:7348
+#: gmusicbrowser_list.pm:7349
 msgid "Group by :"
 msgstr "群组依据："
 
@@ -1790,15 +1786,15 @@ msgstr "增加音量"
 msgid "Info"
 msgstr "信息"
 
-#: layouts:888
+#: layouts:889
 msgid "Insensitive title-artist (left-aligned)"
 msgstr ""
 
-#: layouts:894
+#: layouts:895
 msgid "Insensitive title-artist (right-aligned)"
 msgstr ""
 
-#: layouts:901
+#: layouts:902
 msgid "Insensitive, Song & Cover"
 msgstr ""
 
@@ -1810,7 +1806,7 @@ msgstr "在播放列表开头插入一个文件/文件夹列表"
 msgid "Invalid regular expression"
 msgstr ""
 
-#: layouts:929
+#: layouts:930
 msgid "Invisible hot spot"
 msgstr ""
 
@@ -1822,7 +1818,7 @@ msgstr ""
 msgid "KB"
 msgstr "KB"
 
-#: plugins/karaoke.pm:9 layouts:860
+#: plugins/karaoke.pm:9 layouts:861
 msgid "Karaoke"
 msgstr ""
 
@@ -1860,7 +1856,7 @@ msgstr "标签/出版社"
 msgid "Labels"
 msgstr "标签"
 
-#: gmusicbrowser_list.pm:744 layouts:754
+#: gmusicbrowser_list.pm:744 layouts:755
 msgid "Labels' icons"
 msgstr ""
 
@@ -1872,11 +1868,11 @@ msgstr "语言"
 msgid "Lang."
 msgstr "语言。"
 
-#: plugins/artistinfo.pm:202
+#: plugins/artistinfo.pm:213
 msgid "Language"
 msgstr ""
 
-#: plugins/artistinfo.pm:202
+#: plugins/artistinfo.pm:213
 msgid "Language for last.fm artist info. (e.g. en, de, sp, fr, ...)"
 msgstr ""
 
@@ -1912,7 +1908,7 @@ msgstr "布局"
 msgid "Left aligned"
 msgstr ""
 
-#: layouts:363
+#: layouts:364
 msgid "Left pane"
 msgstr "左窗格"
 
@@ -1920,8 +1916,8 @@ msgstr "左窗格"
 msgid "Length"
 msgstr "长度"
 
-#: gmusicbrowser.pl:5168 gmusicbrowser_list.pm:128 layouts:168 layouts:331
-#: layouts:535 layouts:597
+#: gmusicbrowser.pl:5168 gmusicbrowser_list.pm:128 layouts:169 layouts:332
+#: layouts:536 layouts:598
 msgid "Library"
 msgstr "音乐库"
 
@@ -1941,11 +1937,11 @@ msgid "Library size : %d song"
 msgid_plural "Library size : %d songs"
 msgstr[0] ""
 
-#: plugins/artistinfo.pm:210
+#: plugins/artistinfo.pm:221
 msgid "Limit similar artists to a rate of similarity : "
 msgstr ""
 
-#: plugins/artistinfo.pm:209
+#: plugins/artistinfo.pm:220
 msgid "Limit similar artists to the first : "
 msgstr ""
 
@@ -1969,7 +1965,7 @@ msgstr "已列出："
 msgid "Listed songs"
 msgstr "已列出的歌曲"
 
-#: layouts:147
+#: layouts:148
 msgid "Lists, Library & Context"
 msgstr ""
 
@@ -1977,7 +1973,7 @@ msgstr ""
 msgid "Literal search"
 msgstr ""
 
-#: plugins/artistinfo.pm:204
+#: plugins/artistinfo.pm:215
 msgid "Load/Save Artist Info in :"
 msgstr ""
 
@@ -1990,12 +1986,12 @@ msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "正在加载上次会话中未送出的 %d 曲目"
 
-#: plugins/artistinfo.pm:443 plugins/artistinfo.pm:536 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:424 plugins/artistinfo.pm:517 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "载入中失败。"
 
-#: plugins/artistinfo.pm:428 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:412 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "载入中..."
 
@@ -2069,7 +2065,7 @@ msgstr ""
 msgid "Lyrics"
 msgstr "歌词"
 
-#: layouts:935
+#: layouts:936
 msgid "Lyrics (requires lyrics plugin)"
 msgstr ""
 
@@ -2135,7 +2131,7 @@ msgstr "媒体类型"
 msgid "Menu entry name"
 msgstr "菜单条目名称"
 
-#: layouts:240
+#: layouts:241
 msgid "Minimal tip"
 msgstr ""
 
@@ -2221,7 +2217,7 @@ msgid "New name"
 msgstr "新名称"
 
 #: gmusicbrowser.pl:439 gmusicbrowser.pl:2437 gmusicbrowser_layout.pm:80
-#: gmusicbrowser_list.pm:5095 plugins/notify.pm:90
+#: gmusicbrowser_list.pm:5096 plugins/notify.pm:90
 msgid "Next"
 msgstr "下一个"
 
@@ -2265,7 +2261,7 @@ msgstr "没有已锁定的滤波器"
 msgid "No moods"
 msgstr ""
 
-#: plugins/artistinfo.pm:485
+#: plugins/artistinfo.pm:466
 msgid "No results found"
 msgstr ""
 
@@ -2452,7 +2448,7 @@ msgstr "打开现有列表"
 msgid "Open folder"
 msgstr "打开文件夹"
 
-#: plugins/artistinfo.pm:214
+#: plugins/artistinfo.pm:225
 msgid "Open last.fm website in your browser"
 msgstr ""
 
@@ -2596,7 +2592,7 @@ msgstr "播放此专辑的全部歌曲"
 msgid "Play all songs from this artist"
 msgstr "播放这个艺术家的全部歌曲"
 
-#: layouts:868
+#: layouts:869
 msgid "Play button"
 msgstr ""
 
@@ -2656,7 +2652,7 @@ msgstr "正在播放的滤波器"
 msgid "Playing Title"
 msgstr "正在播放的名称"
 
-#: gmusicbrowser_list.pm:737 layouts:749
+#: gmusicbrowser_list.pm:737 layouts:750
 msgid "Playing and queue icons"
 msgstr ""
 
@@ -2664,11 +2660,11 @@ msgstr ""
 msgid "Playing error : {error}"
 msgstr ""
 
-#: layouts:741
+#: layouts:742
 msgid "Playing/Queue Icon or Track"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:448 layouts:439
+#: gmusicbrowser_layout.pm:448 layouts:440
 msgid "Playlist"
 msgstr "播放列表"
 
@@ -2692,7 +2688,7 @@ msgstr "播放列表过滤器"
 msgid "Playlist filter :\n"
 msgstr "播放列表过滤器：\n"
 
-#: layouts:576
+#: layouts:577
 msgid "Playlist, Library & Context"
 msgstr "播放列表，音乐库和相关信息"
 
@@ -2728,7 +2724,7 @@ msgstr ""
 msgid "Press a key or a key combination"
 msgstr "按下一个键或组合键"
 
-#: gmusicbrowser_layout.pm:54 gmusicbrowser_list.pm:5096
+#: gmusicbrowser_layout.pm:54 gmusicbrowser_list.pm:5097
 msgid "Previous"
 msgstr ""
 
@@ -2756,7 +2752,7 @@ msgstr "私密数据"
 msgid "Produced (P)"
 msgstr "生产（规划）"
 
-#: layouts:856
+#: layouts:857
 msgid "Progress"
 msgstr ""
 
@@ -2782,7 +2778,7 @@ msgstr "出版商/工作室标识"
 
 #: gmusicbrowser.pl:2409 gmusicbrowser_layout.pm:225
 #: gmusicbrowser_layout.pm:442 gmusicbrowser_layout.pm:534 layouts:39
-#: layouts:79 layouts:331 layouts:363 layouts:421
+#: layouts:79 layouts:332 layouts:364 layouts:422
 msgid "Queue"
 msgstr "队列"
 
@@ -2802,19 +2798,19 @@ msgstr "队列空"
 msgid "Queue mode"
 msgstr "队列模式"
 
-#: layouts:513
+#: layouts:514
 msgid "Queue, Library & Context"
 msgstr "队列，音乐库和相关信息"
 
-#: layouts:735
+#: layouts:736
 msgid "Queue-Item Number"
 msgstr ""
 
-#: layouts:405
+#: layouts:406
 msgid "Quick Search"
 msgstr "快速搜索"
 
-#: layouts:413
+#: layouts:414
 msgid "Quick Search with SongTree"
 msgstr "快速搜索曲目树"
 
@@ -2827,11 +2823,11 @@ msgstr "退出"
 msgid "Quit when queue empty"
 msgstr "队列空时结束"
 
-#: gmusicbrowser_list.pm:7794 gmusicbrowser_list.pm:7851
+#: gmusicbrowser_list.pm:7795 gmusicbrowser_list.pm:7852
 msgid "Radio title"
 msgstr "电台名称"
 
-#: gmusicbrowser_list.pm:7852
+#: gmusicbrowser_list.pm:7853
 msgid "Radio url"
 msgstr "电台网址"
 
@@ -2845,11 +2841,11 @@ msgstr "随机模式版本"
 
 #: gmusicbrowser.pl:4571 gmusicbrowser.pl:4608 gmusicbrowser.pl:7772
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
-#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:784
+#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:785
 msgid "Rating"
 msgstr "评分"
 
-#: gmusicbrowser_list.pm:766 layouts:785
+#: gmusicbrowser_list.pm:766 layouts:786
 msgid "Rating (picture)"
 msgstr "评分(图片)"
 
@@ -2901,7 +2897,7 @@ msgstr "记录日期"
 msgid "Reference point :"
 msgstr ""
 
-#: plugins/artistinfo.pm:147 plugins/lyrics.pm:134
+#: plugins/artistinfo.pm:158 plugins/lyrics.pm:134
 msgid "Refresh"
 msgstr "刷新"
 
@@ -3130,19 +3126,19 @@ msgstr ""
 msgid "Same Title"
 msgstr "同一标题"
 
-#: layouts:952
+#: layouts:953
 msgid "Same artist"
 msgstr ""
 
-#: layouts:962
+#: layouts:963
 msgid "Same rating"
 msgstr ""
 
-#: layouts:942
+#: layouts:943
 msgid "Same title"
 msgstr ""
 
-#: layouts:957
+#: layouts:958
 msgid "Same year"
 msgstr ""
 
@@ -3162,7 +3158,7 @@ msgstr "保存"
 msgid "Save Tags/Options"
 msgstr "保存标签/选项"
 
-#: plugins/artistinfo.pm:148
+#: plugins/artistinfo.pm:159
 msgid "Save artist biography"
 msgstr ""
 
@@ -3250,15 +3246,15 @@ msgstr "跟随歌曲滚动"
 msgid "Scroll with the song"
 msgstr "跟随歌曲滚动"
 
-#: plugins/fetch_cover.pm:95 layouts:401 layouts:398 layouts:407 layouts:415
+#: plugins/fetch_cover.pm:95 layouts:402 layouts:399 layouts:408 layouts:416
 msgid "Search"
 msgstr "搜索"
 
-#: layouts:507
+#: layouts:508
 msgid "Search & Playlist"
 msgstr "搜索和播放列表"
 
-#: layouts:500
+#: layouts:501
 msgid "Search & Queue"
 msgstr "搜索和队列"
 
@@ -3330,7 +3326,7 @@ msgstr ""
 msgid "Search for a picture on internet"
 msgstr "搜索互联网上的图片"
 
-#: plugins/artistinfo.pm:269
+#: plugins/artistinfo.pm:280
 msgid "Search for artist on:"
 msgstr ""
 
@@ -3350,16 +3346,16 @@ msgstr "在启动时寻找新的歌曲"
 msgid "Search google for Artist"
 msgstr ""
 
+#: plugins/artistinfo.pm:46
+msgid "Search on the web"
+msgstr ""
+
 #: gmusicbrowser_list.pm:3403
 msgid "Search options"
 msgstr ""
 
 #: plugins/artistinfo.pm:41
 msgid "Search pitchfork for Artist"
-msgstr ""
-
-#: plugins/artistinfo.pm:354
-msgid "Search the web for artist"
 msgstr ""
 
 #: gmusicbrowser.pl:5696
@@ -3386,7 +3382,7 @@ msgstr "选择字段"
 msgid "Select files"
 msgstr ""
 
-#: gmusicbrowser_list.pm:5094
+#: gmusicbrowser_list.pm:5095
 msgid "Select matches"
 msgstr ""
 
@@ -3434,7 +3430,7 @@ msgstr ""
 msgid "Set focus on a layout widget"
 msgstr "集重点布局的窗口小部件"
 
-#: gmusicbrowser_list.pm:6517
+#: gmusicbrowser_list.pm:6518
 msgid "Set grouping"
 msgstr "设置组"
 
@@ -3470,7 +3466,7 @@ msgstr ""
 msgid "Shift"
 msgstr "Shift"
 
-#: layouts:708
+#: layouts:709
 msgid "Shimmer Queue"
 msgstr ""
 
@@ -3494,7 +3490,7 @@ msgstr ""
 msgid "Show artist's upcoming events"
 msgstr ""
 
-#: layouts:680
+#: layouts:681
 msgid "Show artist, album, year"
 msgstr ""
 
@@ -3542,7 +3538,7 @@ msgstr "显示/隐藏布局的窗口小部件"
 msgid "Show/Hide lyrics line"
 msgstr ""
 
-#: layouts:666
+#: layouts:667
 msgid "Show/Hide picture"
 msgstr ""
 
@@ -3579,11 +3575,11 @@ msgstr "关闭命令："
 msgid "Signal: "
 msgstr ""
 
-#: layouts:694
+#: layouts:695
 msgid "Simple title"
 msgstr ""
 
-#: layouts:701
+#: layouts:702
 msgid "Simple title without any"
 msgstr ""
 
@@ -3603,19 +3599,19 @@ msgstr "跳过次数"
 msgid "Skip to next song if an error occurs"
 msgstr "如果发生错误跳到下一首歌曲"
 
-#: layouts:777
+#: layouts:778
 msgid "Small album picture"
 msgstr ""
 
-#: layouts:174
+#: layouts:175
 msgid "Small player"
 msgstr ""
 
-#: layouts:279
+#: layouts:280
 msgid "Smaller browser"
 msgstr "规模较小的浏览器"
 
-#: gmusicbrowser_list.pm:731 layouts:402 layouts:505 layouts:511 layouts:761
+#: gmusicbrowser_list.pm:731 layouts:403 layouts:506 layouts:512 layouts:762
 msgid "Song"
 msgstr "歌曲"
 
@@ -3680,15 +3676,15 @@ msgstr ""
 msgid "Stop when queue empty"
 msgstr "队列空时停止"
 
-#: layouts:873
+#: layouts:874
 msgid "Stop, Play and Next buttons"
 msgstr ""
 
-#: layouts:878
+#: layouts:879
 msgid "Stop, Play and Next buttons and Time"
 msgstr ""
 
-#: layouts:883
+#: layouts:884
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr ""
 
@@ -3803,15 +3799,15 @@ msgstr ""
 msgid "Title"
 msgstr "标题"
 
-#: layouts:768
+#: layouts:769
 msgid "Title & icon"
 msgstr ""
 
-#: layouts:726
+#: layouts:727
 msgid "Title & progress"
 msgstr ""
 
-#: gmusicbrowser_list.pm:731 layouts:760
+#: gmusicbrowser_list.pm:731 layouts:761
 msgid "Title - Artist - Album"
 msgstr "标题 - 作者 - 专辑"
 
@@ -3967,7 +3963,7 @@ msgstr "使用gstreamer"
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "使用latin1编码如果可能的话在id3v2标签"
 
-#: plugins/artistinfo.pm:208
+#: plugins/artistinfo.pm:219
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
@@ -4023,7 +4019,7 @@ msgstr "多个艺术家"
 msgid "Version"
 msgstr "版本"
 
-#: layouts:363
+#: layouts:364
 msgid "View"
 msgstr "查看"
 
@@ -4035,7 +4031,7 @@ msgstr "查看二进制"
 msgid "View binary data ..."
 msgstr "查看二进制数据..."
 
-#: layouts:847
+#: layouts:848
 msgid "Volume"
 msgstr ""
 
@@ -4124,7 +4120,7 @@ msgstr "视窗"
 msgid "Windows"
 msgstr "视窗"
 
-#: gmusicbrowser_list.pm:5072
+#: gmusicbrowser_list.pm:5073
 msgid "Words that begin with"
 msgstr ""
 
@@ -4156,11 +4152,11 @@ msgstr ""
 msgid "You must specify a base folder"
 msgstr "您必须指定一个基本文件夹"
 
-#: gmusicbrowser_list.pm:780 gmusicbrowser_list.pm:6522
+#: gmusicbrowser_list.pm:780 gmusicbrowser_list.pm:6523
 msgid "_Insert column"
 msgstr "插入栏(_I)"
 
-#: gmusicbrowser_list.pm:787 gmusicbrowser_list.pm:6529
+#: gmusicbrowser_list.pm:787 gmusicbrowser_list.pm:6530
 msgid "_Remove this column"
 msgstr "删除此列(_R)"
 
@@ -4168,7 +4164,7 @@ msgstr "删除此列(_R)"
 msgid "_Retry"
 msgstr ""
 
-#: gmusicbrowser_list.pm:779 gmusicbrowser_list.pm:6515
+#: gmusicbrowser_list.pm:779 gmusicbrowser_list.pm:6516
 msgid "_Sort by"
 msgstr "排序规则(_S)"
 
@@ -4217,7 +4213,7 @@ msgstr "高级选项"
 msgid "after %d"
 msgstr "后%d"
 
-#: layouts:638
+#: layouts:639
 msgid "album and artist breadcrumbs"
 msgstr ""
 
@@ -4433,7 +4429,7 @@ msgstr "默认的文件名"
 msgid "default folder"
 msgstr "默认文件夹"
 
-#: layouts:554
+#: layouts:555
 msgid "default fullscreen"
 msgstr "默认全屏"
 
@@ -4457,7 +4453,7 @@ msgstr "删除选定的排序模式"
 msgid "different folders"
 msgstr "其他文件夹"
 
-#: layouts:628
+#: layouts:629
 msgid "disc on the left side"
 msgstr ""
 
@@ -4525,7 +4521,7 @@ msgstr "完全没有%n( 次)"
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "例如 (selected song) : {score}  ({chances})"
 
-#: plugins/artistinfo.pm:232 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:243 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "example : "
 msgstr ""
 
@@ -4581,11 +4577,11 @@ msgstr ""
 msgid "front cover"
 msgstr "封面"
 
-#: layouts:218
+#: layouts:219
 msgid "full"
 msgstr "完全的"
 
-#: layouts:224
+#: layouts:225
 msgid "full with buttons"
 msgstr "充分的按钮"
 
@@ -4633,7 +4629,7 @@ msgstr "插图"
 msgid "imported list"
 msgstr ""
 
-#: layouts:229
+#: layouts:230
 msgid "info"
 msgstr "信息"
 
@@ -4645,7 +4641,7 @@ msgstr ""
 msgid "interview"
 msgstr "采访"
 
-#: plugins/artistinfo.pm:232 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:243 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "invalid pattern"
 msgstr ""
 
@@ -4811,11 +4807,11 @@ msgid ""
 "affect tags with pictures"
 msgstr "上次检查时iTunes不支持unsynchronised标签，主要是影响标签的照片"
 
-#: layouts:301
+#: layouts:302
 msgid "itunes++"
 msgstr ""
 
-#: layouts:358
+#: layouts:359
 msgid "itunes-like"
 msgstr "iTunes样式"
 
@@ -4831,7 +4827,7 @@ msgstr "上次播放"
 msgid "last skipped"
 msgstr "最后跳过"
 
-#: plugins/artistinfo.pm:210
+#: plugins/artistinfo.pm:221
 msgid ""
 "last.fm's similarity categories:\n"
 ">90 super\n"
@@ -4857,7 +4853,7 @@ msgstr "领衔艺术家"
 msgid "leaflet page"
 msgstr "单页"
 
-#: layouts:544
+#: layouts:545
 msgid "left-side filter panes"
 msgstr "过滤器窗格在左边"
 
@@ -4908,7 +4904,7 @@ msgstr "媒体"
 msgid "medium size"
 msgstr "中型"
 
-#: layouts:194
+#: layouts:195
 msgid "minimal"
 msgstr "最小"
 
@@ -5067,7 +5063,7 @@ msgstr "关于%d"
 msgid "only show entries with at least n songs"
 msgstr ""
 
-#: plugins/artistinfo.pm:206
+#: plugins/artistinfo.pm:217
 msgid "only works when the artist-info tab is displayed"
 msgstr ""
 
@@ -5079,7 +5075,7 @@ msgstr "只在选定特定歌词源并打开歌词显示框时工作"
 msgid "open context window"
 msgstr "打开背景信息窗口"
 
-#: gmusicbrowser_list.pm:1708 gmusicbrowser_list.pm:5103
+#: gmusicbrowser_list.pm:1708 gmusicbrowser_list.pm:5104
 msgid "options"
 msgstr "选项"
 
@@ -5143,7 +5139,7 @@ msgstr "退出"
 msgid "quit when queue empty"
 msgstr "队列空时结束"
 
-#: layouts:466
+#: layouts:467
 msgid "quodlibet-like"
 msgstr "quodlibet样式"
 
@@ -5179,7 +5175,7 @@ msgstr "重置初级过滤器"
 msgid "reset secondary filter"
 msgstr "重置二级过滤器"
 
-#: plugins/artistinfo.pm:443 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:424 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "重试"
 
@@ -5240,11 +5236,11 @@ msgstr "立即扫描"
 msgid "seconds"
 msgstr "秒"
 
-#: layouts:107
+#: layouts:108
 msgid "shimmer"
 msgstr ""
 
-#: layouts:201
+#: layouts:202
 msgid "shimmer_tray"
 msgstr ""
 
@@ -5268,7 +5264,7 @@ msgstr ""
 msgid "similar"
 msgstr ""
 
-#: gmusicbrowser_list.pm:7372
+#: gmusicbrowser_list.pm:7373
 msgid "skin options"
 msgstr "皮肤选项"
 
@@ -5421,7 +5417,7 @@ msgstr ""
 msgid "username :"
 msgstr "用户名："
 
-#: gmusicbrowser_list.pm:7349
+#: gmusicbrowser_list.pm:7350
 msgid "using skin :"
 msgstr "正在使用的皮肤："
 
@@ -5445,43 +5441,43 @@ msgstr "重量："
 msgid "wikipedia, lyrics, and custom webpages"
 msgstr ""
 
-#: layouts:242
+#: layouts:243
 msgid "with browser"
 msgstr "包含浏览器"
 
-#: layouts:459
+#: layouts:460
 msgid "with browser & queue"
 msgstr "包含浏览器和队列"
 
-#: layouts:264
+#: layouts:265
 msgid "with browser (SongTree)"
 msgstr "包含浏览器（ 曲目树 ）"
 
-#: layouts:541
+#: layouts:542
 msgid "with context"
 msgstr "包含背景信息"
 
-#: layouts:650
+#: layouts:651
 msgid "with picture"
 msgstr ""
 
-#: layouts:393
+#: layouts:394
 msgid "with playlist"
 msgstr "包含播放列表"
 
-#: layouts:488
+#: layouts:489
 msgid "with playlist & context"
 msgstr "包含播放列表和歌曲相关信息"
 
-#: layouts:188
+#: layouts:189
 msgid "with queue"
 msgstr "包含队列"
 
-#: layouts:389
+#: layouts:390
 msgid "with search"
 msgstr "包含搜索框"
 
-#: layouts:493
+#: layouts:494
 msgid "with tabbedlists"
 msgstr "包含tabbedlists"
 
