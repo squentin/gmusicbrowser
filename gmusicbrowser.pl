@@ -421,9 +421,9 @@ our @cMenuAA=
 (	{ label => _"Lock",	code => sub { ToggleLock($_[0]{lockfield}); }, check => sub { $::TogLock && $::TogLock eq $_[0]{lockfield}}, mode => 'P',
 	  test	=> sub { $_[0]{field} eq $_[0]{lockfield} || $_[0]{gid} == Songs::Get_gid($::SongID,$_[0]{lockfield}); },
 	},
-	#{ label => _"Lookup in AMG",	code => sub { AMGLookup( $_[0]{mainfield}, $_[0]{aaname} ); },
-	#  test => sub { $_[0]{mainfield} =~m/^album$|^artist$|^title$/; },
-	#},
+	{ label => _"Lookup in AMG",	code => sub { AMGLookup( $_[0]{mainfield}, $_[0]{aaname} ); },
+	  test => sub { $_[0]{mainfield} =~m/^album$|^artist$|^title$/; },
+	},
 	{ label => _"Filter",		code => sub { Select(filter => Songs::MakeFilterFromGID($_[0]{field},$_[0]{gid})); },	stockicon => 'gmb-filter', mode => 'P' },
 	{ label => \&SongsSubMenuTitle,		submenu => \&SongsSubMenu, },
 	{ label => sub {$_[0]{mode} eq 'P' ? _"Display Songs" : _"Filter"},	code => \&FilterOnAA,
@@ -1641,7 +1641,7 @@ my %artistsplit_old_to_new=	#for versions <= 1.1.5 : to upgrade old ArtistSplit 
 	'; *'	=> '\s*;\s*',
 	';'	=> '\s*;\s*',
 );
-
+			
 sub ReadOldSavedTags
 {	my $fh=$_[0];
 	while (<$fh>)
@@ -3010,7 +3010,7 @@ sub ChooseSongsTitle		#Songs with the same title
 }
 
 sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>100-200 ?)
-{	my ($album,$showcover)=@_;
+{	my $album=$_[0];
 	return unless defined $album;
 	my $list= AA::GetIDs(album=>$album);
 	Songs::SortList($list,'disc track file');
@@ -3025,7 +3025,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 	}
 	my $menu = ChooseSongs('%n %S', @$list);
 	$menu->show_all;
-	if ($showcover)
+	if (1)
 	{	my $h=$menu->size_request->height;
 		my $picsize=$menu->size_request->width/$menu->{nbcols};
 		$picsize=200 if $picsize<200;
@@ -3053,6 +3053,48 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		#		$item->signal_connect(size_allocate => sub  {my ($self,$alloc)=@_;warn $alloc->width;return if $self->{busy};$self->{busy}=1;my $w=$self->get_toplevel;$w->set_size_request($w->size_request->width-$alloc->width+$picsize+20,-1);$alloc->width($picsize+20);$self->size_allocate($alloc);});
 		}
 	}
+	elsif ( my $pixbuf= AAPicture::pixbuf(album=>$album,undef,1) ) #TEST not used
+	{
+	 my $request=$menu->size_request;
+	 my $rwidth=$request->width;
+	 my $rheight=$request->height;
+	 my $w=200;
+	 #$w=500-$rwidth if $rwidth <300;
+	 $w=300-$rwidth if $rwidth <100;
+	 my $h=200;
+	 $h=$rheight if $rheight >$h;
+	 my $r= $pixbuf->get_width / $pixbuf->get_height;
+	 #warn "max $w $h   r=$r\n";
+	 if ($w>$h*$r)	{$w=int($h*$r);}
+	 else		{$h=int($w/$r);}
+	 my $h2=$rheight; $h2=$h if $h>$h2;
+	 #warn "=> $w $h\n";
+	 $pixbuf=$pixbuf->scale_simple($w,$h,'bilinear');
+#	 $menu->set_size_request(1000+$rwidth+$w,$h2);
+
+#	$menu->signal_connect(size_request => sub {my ($self,$req)=@_;warn $req->width;return if $self->{busy};$self->{busy}=1;my $rw=$self->get_toplevel->size_request->width;$self->get_toplevel->set_size_request($rw+$w,-1);$self->{busy}=undef;});
+
+	 $menu->signal_connect(size_allocate => sub
+		{	# warn join(' ', $_[1]->values);
+			my ($self,$alloc)=@_;
+			return if $self->{picture_added};
+			$self->{picture_added}=1;
+
+			my $window=$self->parent;
+			$window->remove($self);
+			my $hbox=Gtk2::HBox->new(0,0);
+			my $frame=Gtk2::Frame->new;
+			my $image=Gtk2::Image->new_from_pixbuf($pixbuf);
+			$frame->add($image);
+			$frame->set_shadow_type('out');
+			$hbox->pack_start($self,0,0,0);
+			$hbox->pack_start($frame,1,1,0);
+			$window->add($hbox);
+			$hbox->show_all;
+			#$window->set_size_request($rwidth+$w,$h2);
+			$self->set_size_request($rwidth,-1);
+		});
+	}
 	if (defined wantarray)	{return $menu}
 	my $event=Gtk2->get_current_event;
 	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
@@ -3066,7 +3108,7 @@ sub ChooseSongs
 	my $activate_callback=sub
 	 {	return if $_[0]->get_submenu;
 		if ($_[0]{middle}) { Enqueue($_[1]); }
-		else { Select(song => $_[1], play=>1); }
+		else { Select(song => $_[1]); }
 	 };
 	my $click_callback=sub
 	 { my ($mitem,$event)=@_;
@@ -4969,7 +5011,7 @@ sub ScanFolder
 		if (defined $ID)
 		{	next unless Songs::Get($ID,'missing');
 			Songs::Set($ID,missing => 0);
-			push @ToReRead,$ID;	#or @ToCheck ?
+			push @ToReRead,$ID;	#or @ToCheck ? 
 			push @ToAdd_IDsBuffer,$ID;
 		}
 		else
@@ -6609,7 +6651,7 @@ sub CreateTrayIcon
 
 	$eventbox->add($img);
 	$TrayIcon->add($eventbox);
-	#Layout::Window::make_transparent($TrayIcon) if $CairoOK; #Simon Steinbeiss: uncomment this line to make the trayicon transparent in gnome-panel and xfce4-panel>4.7
+	Layout::Window::make_transparent($TrayIcon) if $CairoOK;
 	$eventbox->signal_connect(scroll_event => \&::ChangeVol);
 	$eventbox->signal_connect(button_press_event => sub
 		{	my $b=$_[1]->button;

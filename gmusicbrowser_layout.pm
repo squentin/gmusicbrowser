@@ -7,7 +7,6 @@
 
 use strict;
 use warnings;
-use utf8;
 
 package Layout;
 use Gtk2;
@@ -141,33 +140,15 @@ our %Widgets=
 		field	=> 'fullfilename',
 		tip	=> _"Lock on song",
 	},
-	LockSongBreadcrumb =>
-	{	parent	=> 'Lock',
-		field	=> 'fullfilename',
-		tip	=> _"Lock on song",
-        stock	=> { on => 'gmb-lock', off => 'gmb-breadcrumb-song gmb-locklight' },
-	},
 	LockArtist =>
 	{	parent	=> 'Lock',
 		field	=> 'first_artist',
 		tip	=> _"Lock on Artist",
 	},
-	LockArtistBreadcrumb =>
-	{	parent	=> 'Lock',
-		field	=> 'first_artist',
-		tip	=> _"Lock on Artist",
-		stock	=> { on => 'gmb-lock', off => 'gmb-breadcrumb-artist gmb-locklight' },
-	},
 	LockAlbum =>
 	{	parent	=> 'Lock',
 		field	=> 'album',
 		tip	=> _"Lock on Album",
-	},
-	LockAlbumBreadcrumb =>
-	{	parent	=> 'Lock',
-		field	=> 'album',
-		tip	=> _"Lock on Album",
-		stock	=> { on => 'gmb-lock', off => 'gmb-breadcrumb-album gmb-locklight' },
 	},
 	Sort =>
 	{	class	=> 'Layout::Button',
@@ -180,11 +161,6 @@ our %Widgets=
 		click1	=> \&::ToggleSort,
 		click3	=> sub { SortMenu() },
 		event	=> 'Sort SavedWRandoms SavedSorts',
-	},
-	SortIndicator =>
-	{	parent  => 'Sort',
-		click1  => sub { SortMenu() },
-		click3	=> \&::ToggleSort,
 	},
 	Filter =>
 	{	class	=> 'Layout::Button',
@@ -201,11 +177,6 @@ our %Widgets=
 		click1	=> \&RemoveFilter,
 		click3	=> sub { FilterMenu() },
 		event	=> 'Filter SavedFilters',
-	},
-	FilterIndicator =>
-	{	parent  => 'Filter',
-		click1  => sub { FilterMenu() },
-		click3	=> \&RemoveFilter,
 	},
 	Queue =>
 	{	class	=> 'Layout::Button',
@@ -267,7 +238,6 @@ our %Widgets=
 	{	class	=> 'Layout::Label',
 		group	=> 'Play',
 		minsize	=> 20,
-		options => 'showcover',
 		markup	=> '<b><big>%S</big></b>%V',
 		markup_empty => '<b><big>&lt;'._("Playlist Empty").'&gt;</big></b>',
 		click1	=> \&PopupSongsFromAlbum,
@@ -291,10 +261,6 @@ our %Widgets=
 		dragsrc => [::DRAG_ARTIST,\&DragCurrentArtist],
 		cursor	=> 'hand2',
 	},
-	ArtistBreadcrumb =>
-	{	parent	=> 'Artist',
-		click1	=> sub { my $ID=::GetSelID($_[0]); ::PopupAA( 'album', format=> ::__x( _"<big><b>{album}</b></big>\n{year}  /  {songs}", album => "%a", year => "%y", songs => "%s"), from=> Songs::Get_gid($ID,'artists')) if defined $ID; },
-	},
 	Album =>
 	{	class	=> 'Layout::Label',
 		group	=> 'Play',
@@ -304,10 +270,6 @@ our %Widgets=
 		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupAAContextMenu({self =>$_[0], field=>'album', ID=>$ID, gid=>Songs::Get_gid($ID,'album'), mode => 'P'}) if defined $ID; },
 		dragsrc => [::DRAG_ALBUM,\&DragCurrentAlbum],
 		cursor	=> 'hand2',
-	},
-	AlbumBreadcrumb =>
-	{	parent	=> 'Album',
-		click1	=> \&PopupSongsFromAlbum,
 	},
 	Year =>
 	{	class	=> 'Layout::Label',
@@ -401,10 +363,8 @@ our %Widgets=
 		group	=> 'Play',
 		aa	=> 'album',
 		oldopt1 => 'maxsize',
-		options => 'showcover',
 		schange	=> sub { my $key=(defined $_[1])? Songs::Get_gid($_[1],'album') : undef ; $_[0]->set($key); },
 		click1	=> \&PopupSongsFromAlbum,
-		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupAAContextMenu({self =>$_[0], field=>'album', ID=>$ID, gid=>Songs::Get_gid($ID,'album'), mode => 'P'}) if defined $ID; },
 		event	=> 'Picture_album',
 		update	=> \&Layout::AAPicture::Changed,
 		noinit	=> 1,
@@ -418,7 +378,6 @@ our %Widgets=
 		oldopt1 => 'maxsize',
 		schange	=> sub { my $key=(defined $_[1])? Songs::Get_gid($_[1],'artists') : undef ;$_[0]->set($key); },
 		click1	=> sub { ::PopupAA('artist'); },
-		click3	=> sub { my $ID=::GetSelID($_[0]); ::PopupAAContextMenu({self =>$_[0], field=>'artist', ID=>$ID, gid=>Songs::Get_gid($ID,'artist'), mode => 'P'}) if defined $ID; },
 		event	=> 'Picture_artist',
 		update	=> \&Layout::AAPicture::Changed,
 		noinit	=> 1,
@@ -4239,4 +4198,3 @@ sub _resize
 }
 
 1;
-
