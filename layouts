@@ -6,45 +6,41 @@ DefaultFocus    = SimpleSearch
 
 KeyBindings = c-k SetFocusOn(SimpleSearch) c-space GoToCurrentSong
 
-HBmain = _VBmain
-VBmain = HPControlsInfoAndSearch _HPContent
+HBmain = _VBMain
+VBMain = HPControlsInfoAndSearch _HPContent
 
 
 
-    HPContent = _HPCurrentTrack _VBTabbedLists
+    HPContent = VBTitleAndCurrentTrack _VBTabbedLists
+
+       VBTitleAndCurrentTrack = HPTitleAndFiller _HPCurrentTrack
+            HPTitleAndFiller = HBTitle Filler60
+
+                HBTitle = 5Filler12 LockSong(stock="on:gmb-lock gmb-locklight off:gmb-breadcrumb-song gmb-lock") Title(expand_max=300,minsize=1,markup="<big><b>%t</b></big> ",click1="",yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-locklight off:gmb-breadcrumb-album gmb-lock") Album(minsize=1,expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-locklight off:gmb-breadcrumb-artist gmb-lock") Artist(expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
+
+            HPCurrentTrack = VPfp2 _VPfp0
+
+                VPfp2 = _HBCurrentTrack VBSavedFilterPane
+
+                    HBCurrentTrack = 10_VBCurrentTrack
+                        VBCurrentTrack = 3Filler1 Cover(click1="",overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0) _Filler11 HBReplayButtons
+                    VBSavedFilterPane = _FilterPane4(nb=0,hide=0) 4Filler7
+
+                VPfp0 = _VPfp1 _VBSongTreeAndProgress
+                    VPfp1 = _VPGenreYear _HPfp0
+                        VPGenreYear = _HBGenre _HBYear
+                            HBGenre = _FilterPane5(nb=2,hidebb=1,pages=genre,page=genre,page_genre/mode=cloud,page_genre/cloud_min=8,page_genre/sort=alpha)
+                            HBYear = _FilterPane2(nb=4,hidebb=1,pages=year,page=year,page_year/mode=cloud,page_year/cloud_min=8,page_year/sort=year)
+
+                        HPfp0 = HBArtist HBAlbum
+                            HBArtist = _FilterPane0(nb=3, hidebb=1,pages=artist,page=artist,page_artist/lpicsize=64,page_artist/lmarkup=1)
+                            HBAlbum = _FilterPane1(nb=5,hidebb=1,pages=album,page=album,page_album/mode=mosaic,page_album/lpicsize=64,page_album/lmarkup=1,page_album/mmarkup=below)
+
+                     VBSongTreeAndProgress = 10_HBSongTree VProgress
+
+
         VBTabbedLists = 10_TabbedLists(group=1,page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo')
-        HPCurrentTrack = VPfp2 _VPfp0
-            VPfp2 = _HBCurrentTrack VBSavedFilterPane
 
-
-            HBCurrentTrack = 10_VBCurrentTrack
-                VBCurrentTrack = 3Filler1 HBTitle 10Filler14 Cover(click1="",overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0) _Filler11 HBReplayButtons
-                    HBTitle = 5Filler12 LockSong(stock="on:gmb-lock gmb-locklight off:gmb-breadcrumb-song gmb-lock") Title(expand_max=300,minsize=1,markup="<big><b>%t</b></big> ",click1="",yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-locklight off:gmb-breadcrumb-album gmb-lock") Album(minsize=1,expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-locklight off:gmb-breadcrumb-artist gmb-lock") Artist(expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
-ars
-            VBSavedFilterPane = _FilterPane4(nb=0,hide=0) 4Filler7
-
-            VPfp0 = _VPfp1 _VBBottom
-                VPfp1 = _VPGenreYear _HPfp0
-                    VPGenreYear = _HBGenre _HBYear
-                        HBGenre = _FilterPane5(nb=2,hidebb=1,pages=genre,page=genre,page_genre/mode=cloud,page_genre/cloud_min=8,page_genre/sort=alpha)
-                        HBYear = _FilterPane2(nb=4,hidebb=1,pages=year,page=year,page_year/mode=cloud,page_year/cloud_min=8,page_year/sort=year)
-
-                    HPfp0 = HBArtist HBAlbum
-                        HBArtist = _FilterPane0(nb=3, hidebb=1,pages=artist,page=artist,page_artist/lpicsize=64,page_artist/lmarkup=1)
-                        HBAlbum = _FilterPane1(nb=5,hidebb=1,pages=album,page=album,page_album/mode=mosaic,page_album/lpicsize=64,page_album/lmarkup=1,page_album/mmarkup=below)
-
-                 VBBottom = 10_HBSongTree VProgress
-
-        #HPfp1 =  VPQueueContext
-            #VPQueueContext =  _HBTabbedLists
-
-#                TBContextAndLists = _"Context" Context(page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo') _"Queue" HBQueueList _"List" TabbedLists(group=1)
-#                # an layout error occurs, if I use the padding in a VP
-#                HBQueueList = 10_VBQueueList
-#                    VBQueueList = 0Filler5 VBQueueAct _QueueList(group=1) 5HBQueueActions 3Filler6
-#                        VBQueueAct = _HBEditListButtons
-#                            HBEditListButtons = -EditListButtons(group=1,small=1)
-#                        HBQueueActions = -QueueActions
 
     HPControlsInfoAndSearch = _HPfpSongInfo_Search VBControls
         VBControls = _Filler16 HBControls _Filler17
@@ -55,7 +51,7 @@ ars
         HBVolume = VolumeIcon(button=1)
 
         HBReplayButtons = _Filler3 5Filler15 Prev(size=large-toolbar,tip=_"Previous Song") Play(size=dialog) Next(size=large-toolbar) _Filler4 VBToggleCover
-            VBToggleCover = _Filler20 ToggleButton0(relief=none,size=button,icon=list,widget=Cover,tip=_"show/hide album cover") 5Filler21
+            VBToggleCover = _Filler20 ToggleButton0(size=button,widget=Cover,tip=_"show/hide album cover") 5Filler21
 
 
         HPfpSongInfo_Search = _HBSongInfo _HBSearch
@@ -66,21 +62,6 @@ ars
             HBSearch = 10-SimpleSearch(noselector=1,maxwidth=1000)
 
         MBmain = MainMenuItem
-
-#        MBLayoutSettings = SMLayoutSettings
-#            SMLayoutSettings =  (tip=_"Show/Hide elements",label=_"S/H") \
-#                                MenuItem0(togglewidget=VBSavedFilterPane|VPfp0|HBSearch,label=_"reduced view") \
-#                                MenuItem1(togglewidget=VPGenreYear,label=_"Genre and Year") \
-#                                MenuItem2(togglewidget=Cover,label=_"Album cover")
-#                                # MenuItem3(togglewidget=LockArtist|Next2|Filler15|LockAlbum|Next1|Filler14|Filler11|Filler12,label=_"Artist and album modifier (leftmost pane)")
-#                                # MenuItem4(togglewidget=VBSavedFilterPane,label=_"Lower left filter pane") \
-#                                # SMQueueContextLists
-
-#                SMQueueContextLists = (label=_"queue, context and lists") \
-#                                        MenuItem5(togglewidget=Context|MenuItem6,label=_"Context") \
-#                                        MenuItem6(togglewidget=HBQueueList|MenuItem5,label=_"Queue") \
-#                                        MenuItem7(togglewidget=TBContextAndLists|MenuItem5|MenuItem6,label=_"rightmost pane")
-
 
         MBSongTree = HistItem
             HBSongTree = _VBSongTree
