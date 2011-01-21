@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9538\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-20 21:48+0100\n"
+"POT-Creation-Date: 2011-01-21 16:23+0100\n"
 "PO-Revision-Date: 2006-08-12 19:03+0200\n"
 "Last-Translator: Zsombor <gzsombor@gmail.com>\n"
 "Language-Team: Hungarian <translation-team-hu@lists.sourceforge.net>\n"
@@ -30,17 +30,17 @@ msgid ""
 "Total playcount: "
 msgstr ""
 
-#: gmusicbrowser_layout.pm:326 gmusicbrowser_layout.pm:327
-#: gmusicbrowser_layout.pm:328 gmusicbrowser_layout.pm:347
-#: gmusicbrowser_layout.pm:348 gmusicbrowser_layout.pm:349
+#: gmusicbrowser_layout.pm:288 gmusicbrowser_layout.pm:289
+#: gmusicbrowser_layout.pm:290 gmusicbrowser_layout.pm:309
+#: gmusicbrowser_layout.pm:310 gmusicbrowser_layout.pm:311
 msgid " of {length}"
 msgstr ""
 
-#: gmusicbrowser.pl:5986
+#: gmusicbrowser.pl:6028
 msgid "# songs"
 msgstr " szám"
 
-#: gmusicbrowser_layout.pm:1762
+#: gmusicbrowser_layout.pm:1721
 msgid "%S by %a"
 msgstr "%S  %a -tól"
 
@@ -55,24 +55,24 @@ msgid "%d Artist"
 msgid_plural "%d Artists"
 msgstr[0] "%d Előadó"
 
-#: gmusicbrowser.pl:2923 gmusicbrowser.pl:2927 gmusicbrowser.pl:4473
-#: gmusicbrowser_list.pm:1629
+#: gmusicbrowser.pl:2923 gmusicbrowser.pl:2927 gmusicbrowser.pl:4515
+#: gmusicbrowser_list.pm:1628
 msgid "%d Song"
 msgid_plural "%d Songs"
 msgstr[0] "%d Szám"
 
-#: gmusicbrowser.pl:361 gmusicbrowser_list.pm:7746 gmusicbrowser_songs.pm:502
+#: gmusicbrowser.pl:361 gmusicbrowser_list.pm:7721 gmusicbrowser_songs.pm:502
 msgid "%d album"
 msgid_plural "%d albums"
 msgstr[0] "%d album"
 
-#: gmusicbrowser.pl:349 gmusicbrowser.pl:356 gmusicbrowser_list.pm:7757
+#: gmusicbrowser.pl:349 gmusicbrowser.pl:356 gmusicbrowser_list.pm:7732
 #: gmusicbrowser_songs.pm:478 gmusicbrowser_songs.pm:2343
 msgid "%d artist"
 msgid_plural "%d artists"
 msgstr[0] "%d előadó"
 
-#: gmusicbrowser.pl:4099
+#: gmusicbrowser.pl:4141
 msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] ""
@@ -82,7 +82,7 @@ msgid "%d file in {folder}"
 msgid_plural "%d files in {folder}"
 msgstr[0] "%d fájl {folder}"
 
-#: gmusicbrowser.pl:5013
+#: gmusicbrowser.pl:5055
 msgid "%d folder"
 msgid_plural "%d folders"
 msgstr[0] ""
@@ -92,20 +92,20 @@ msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] ""
 
-#: gmusicbrowser.pl:344 gmusicbrowser.pl:351 gmusicbrowser.pl:7539
-#: gmusicbrowser_layout.pm:260 gmusicbrowser_songs.pm:2337
-#: plugins/audioscrobbler.pm:185
+#: gmusicbrowser.pl:344 gmusicbrowser.pl:351 gmusicbrowser.pl:7581
+#: gmusicbrowser_layout.pm:231 gmusicbrowser_list.pm:251
+#: gmusicbrowser_songs.pm:2337 plugins/audioscrobbler.pm:185
 msgid "%d song"
 msgid_plural "%d songs"
 msgstr[0] "%d szám"
 
-#: gmusicbrowser.pl:5012
+#: gmusicbrowser.pl:5054
 msgid "%d song added"
 msgid_plural "%d songs added"
 msgstr[0] ""
 
-#: gmusicbrowser.pl:2932 gmusicbrowser_layout.pm:256
-#: gmusicbrowser_layout.pm:259
+#: gmusicbrowser.pl:2932 gmusicbrowser_layout.pm:227
+#: gmusicbrowser_layout.pm:230
 msgid "%d song in queue"
 msgid_plural "%d songs in queue"
 msgstr[0] "%d szám van a lejátszási listán"
@@ -115,69 +115,64 @@ msgid "%d song in the library"
 msgid_plural "%d songs in the library"
 msgstr[0] "%d szám van az adatbázisban"
 
-#: gmusicbrowser_list.pm:251
-msgid "%d song listed"
-msgid_plural "%d songs listed"
-msgstr[0] ""
-
 #: gmusicbrowser_list.pm:264
 msgid "%d song selected"
 msgid_plural "%d songs selected"
 msgstr[0] "%d szám kiválasztva"
 
-#: gmusicbrowser.pl:7872
+#: gmusicbrowser.pl:7914
 msgid "%f is set"
 msgstr "%f be van állítva"
 
-#: gmusicbrowser.pl:7873
+#: gmusicbrowser.pl:7915
 msgid "%f isn't set"
 msgstr "%f nincs beállítva"
 
-#: gmusicbrowser.pl:7847
+#: gmusicbrowser.pl:7889
 msgid "%n first added"
 msgstr "%n elsőnek hozzáadott"
 
-#: gmusicbrowser.pl:7846
+#: gmusicbrowser.pl:7888
 msgid "%n last added"
 msgstr "%n utolsónak hozzáadott"
 
-#: gmusicbrowser.pl:7838
+#: gmusicbrowser.pl:7880
 msgid "%n last played"
 msgstr "%n utoljára játszott"
 
-#: gmusicbrowser.pl:7842
+#: gmusicbrowser.pl:7884
 msgid "%n last skipped"
 msgstr ""
 
-#: gmusicbrowser.pl:7837
+#: gmusicbrowser.pl:7879
 msgid "%n less played"
 msgstr "%n legkevesebbet játszott"
 
-#: gmusicbrowser.pl:7841
+#: gmusicbrowser.pl:7883
 msgid "%n less skipped"
 msgstr ""
 
-#: gmusicbrowser.pl:7844
+#: gmusicbrowser.pl:7886
 msgid "%n longest"
 msgstr "%n leghosszabb"
 
-#: gmusicbrowser.pl:7836
+#: gmusicbrowser.pl:7878
 msgid "%n most played"
 msgstr "%n legtöbbet játszott"
 
-#: gmusicbrowser.pl:7840
+#: gmusicbrowser.pl:7882
 msgid "%n most skipped"
 msgstr ""
 
-#: gmusicbrowser.pl:7839
+#: gmusicbrowser.pl:7881
 msgid "%n not played for the longest time"
 msgstr ""
 
-#: gmusicbrowser.pl:7843
+#: gmusicbrowser.pl:7885
 msgid "%n not skipped for the longest time"
 msgstr ""
 
-#: gmusicbrowser.pl:7845
+#: gmusicbrowser.pl:7887
 msgid "%n shortest"
 msgstr "%n legrövidebb"
 
@@ -185,20 +180,20 @@ msgstr "%n legrövidebb"
 msgid "%t - gmusicbrowser"
 msgstr ""
 
-#: gmusicbrowser.pl:4005
+#: gmusicbrowser.pl:4047
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' létezik. Felül írjam ?"
 
-#: gmusicbrowser.pl:5877
+#: gmusicbrowser.pl:5919
 msgid "(%d song excluded)"
 msgid_plural "(%d songs excluded)"
 msgstr[0] ""
 
-#: gmusicbrowser.pl:7869 gmusicbrowser.pl:7877
+#: gmusicbrowser.pl:7911 gmusicbrowser.pl:7919
 msgid "(: )has one"
 msgstr ""
 
-#: gmusicbrowser.pl:7868 gmusicbrowser.pl:7876
+#: gmusicbrowser.pl:7910 gmusicbrowser.pl:7918
 msgid "(: )none"
 msgstr ""
 
@@ -222,7 +217,7 @@ msgstr "(más)"
 msgid "(see http://www."
 msgstr ""
 
-#: gmusicbrowser.pl:5657
+#: gmusicbrowser.pl:5699
 msgid ""
 "- When selecting a song, the playlist filter will be reset if the song is "
 "not in it\n"
@@ -237,7 +232,7 @@ msgstr ""
 msgid "... on skipped songs"
 msgstr ""
 
-#: gmusicbrowser.pl:7679
+#: gmusicbrowser.pl:7721
 msgid "0 chance"
 msgstr "az esély 0"
 
@@ -245,11 +240,11 @@ msgstr "az esély 0"
 msgid "0 means no limit"
 msgstr ""
 
-#: gmusicbrowser.pl:7677
+#: gmusicbrowser.pl:7719
 msgid "1 chance in {probability}"
 msgstr "esélye 1 a {probability}-hoz"
 
-#: layouts:296
+#: layouts:309
 msgid "3 Filter panes"
 msgstr "3 szürő mező"
 
@@ -281,17 +276,11 @@ msgid ""
 "<small>from</small> %l</small>"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:296
-msgid ""
-"<big><b>{album}</b></big>\n"
-"{year}  /  {songs}"
-msgstr ""
-
 #: plugins/notify.pm:24
 msgid "<i>by</i> %a\\n<i>from</i> %l"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:3817
+#: gmusicbrowser_layout.pm:3786
 msgid "Abort"
 msgstr ""
 
@@ -299,7 +288,7 @@ msgstr ""
 msgid "Abort ReplayGain analysis"
 msgstr ""
 
-#: gmusicbrowser.pl:4110
+#: gmusicbrowser.pl:4152
 msgid "Abort all"
 msgstr ""
 
@@ -307,11 +296,11 @@ msgstr ""
 msgid "Abort mass-tagging"
 msgstr "A tömeges cimkézés leállítása"
 
-#: gmusicbrowser_layout.pm:44
+#: gmusicbrowser_layout.pm:43
 msgid "About"
 msgstr "Névjegy"
 
-#: gmusicbrowser.pl:4104
+#: gmusicbrowser.pl:4146
 msgid ""
 "About to delete {files}\n"
 "Are you sure ?"
@@ -325,7 +314,7 @@ msgstr ""
 msgid "Actions are not supported by current notification daemon"
 msgstr ""
 
-#: gmusicbrowser.pl:6925 gmusicbrowser.pl:7196 gmusicbrowser.pl:7417
+#: gmusicbrowser.pl:6967 gmusicbrowser.pl:7238 gmusicbrowser.pl:7459
 #: gmusicbrowser_tags.pm:1237 plugins/desktopwidget.pm:36
 msgid "Add"
 msgstr ""
@@ -334,15 +323,15 @@ msgstr ""
 msgid "Add a button to rip a CD"
 msgstr ""
 
-#: gmusicbrowser.pl:5704
+#: gmusicbrowser.pl:5746
 msgid "Add a fullscreen button"
 msgstr ""
 
-#: gmusicbrowser.pl:5704
+#: gmusicbrowser.pl:5746
 msgid "Add a fullscreen button to layouts that can accept extra buttons"
 msgstr ""
 
-#: gmusicbrowser_list.pm:7317
+#: gmusicbrowser_list.pm:7292
 msgid "Add a group"
 msgstr ""
 
@@ -354,11 +343,11 @@ msgstr ""
 msgid "Add a list of files/folders to the playlist"
 msgstr ""
 
-#: gmusicbrowser_list.pm:7789
+#: gmusicbrowser_list.pm:7764
 msgid "Add a radio"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:39
+#: gmusicbrowser_layout.pm:38
 msgid "Add files or folders"
 msgstr ""
 
@@ -366,35 +355,35 @@ msgstr ""
 msgid "Add files/folders to library"
 msgstr ""
 
-#: gmusicbrowser.pl:5825
+#: gmusicbrowser.pl:5867
 msgid "Add folder"
 msgstr ""
 
-#: gmusicbrowser.pl:6032
+#: gmusicbrowser.pl:6074
 msgid "Add label"
 msgstr ""
 
-#: gmusicbrowser.pl:6926
+#: gmusicbrowser.pl:6968
 msgid "Add multiple condition"
 msgstr ""
 
-#: gmusicbrowser.pl:4535
+#: gmusicbrowser.pl:4577
 msgid "Add new label"
 msgstr "Új cimke felvétele"
 
-#: gmusicbrowser_list.pm:7859
+#: gmusicbrowser_list.pm:7834
 msgid "Add new radio"
 msgstr ""
 
-#: gmusicbrowser.pl:7419
+#: gmusicbrowser.pl:7461
 msgid "Add rule : "
 msgstr "Új szabály : "
 
-#: gmusicbrowser.pl:5270
+#: gmusicbrowser.pl:5312
 msgid "Add shorcut key"
 msgstr "Új billentyü kombináció"
 
-#: gmusicbrowser_list.pm:1865
+#: gmusicbrowser_list.pm:1864
 msgid "Add tab"
 msgstr ""
 
@@ -410,7 +399,7 @@ msgstr "Hozzáadott"
 msgid "Added Today"
 msgstr "Ma Hozzáadott"
 
-#: gmusicbrowser_list.pm:7848
+#: gmusicbrowser_list.pm:7823
 msgid "Adding a radio"
 msgstr ""
 
@@ -418,7 +407,7 @@ msgstr ""
 msgid "Additional domain for Last.fm, Amazon and so on."
 msgstr ""
 
-#: gmusicbrowser.pl:5642
+#: gmusicbrowser.pl:5684
 msgid ""
 "Additionally this format can be used :\n"
 " default number1 format1 number2 format2 ...\n"
@@ -431,7 +420,7 @@ msgid ""
 "picture/cover in google and save it."
 msgstr ""
 
-#: gmusicbrowser_layout.pm:1540
+#: gmusicbrowser_layout.pm:1499
 msgid "Adds labels to the current song"
 msgstr ""
 
@@ -439,7 +428,7 @@ msgstr ""
 msgid "Adds menu entries to song contextual menu"
 msgstr "Menü elemet ad a szám helyi menüjéhez"
 
-#: gmusicbrowser_list.pm:3520
+#: gmusicbrowser_list.pm:3515
 msgid "Advanced Search ..."
 msgstr ""
 
@@ -451,19 +440,19 @@ msgstr ""
 msgid "After: "
 msgstr ""
 
-#: gmusicbrowser.pl:835 gmusicbrowser.pl:7746 gmusicbrowser_songs.pm:495
+#: gmusicbrowser.pl:835 gmusicbrowser.pl:7788 gmusicbrowser_songs.pm:495
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:403 layouts:506 layouts:512 layouts:948
+#: plugins/fetch_cover.pm:103 layouts:416 layouts:519 layouts:525 layouts:961
 msgid "Album"
 msgstr "Album"
 
-#: layouts:803
+#: layouts:816
 msgid "Album and artist"
 msgstr ""
 
-#: layouts:718
+#: layouts:731
 msgid "Album and artist on the left side"
 msgstr ""
 
@@ -524,11 +513,11 @@ msgstr ""
 msgid "All artists"
 msgstr ""
 
-#: gmusicbrowser.pl:7848
+#: gmusicbrowser.pl:7890
 msgid "All but the [most/less]%n"
 msgstr "Össszes kivéve a [legtöbbet/legkevesebbet] játszott %n"
 
-#: gmusicbrowser.pl:3851
+#: gmusicbrowser.pl:3893
 msgid "All files"
 msgstr "Összes fájl"
 
@@ -544,12 +533,12 @@ msgstr ""
 msgid "All moods"
 msgstr ""
 
-#: gmusicbrowser.pl:7053 gmusicbrowser.pl:7094 gmusicbrowser.pl:7127
+#: gmusicbrowser.pl:7095 gmusicbrowser.pl:7136 gmusicbrowser.pl:7169
 #: gmusicbrowser_songs.pm:3675
 msgid "All of :"
 msgstr "Az összes :"
 
-#: gmusicbrowser.pl:8740 gmusicbrowser_layout.pm:1463
+#: gmusicbrowser.pl:8782 gmusicbrowser_layout.pm:1422
 msgid "All songs"
 msgstr ""
 
@@ -565,11 +554,11 @@ msgstr ""
 msgid "Alt"
 msgstr ""
 
-#: gmusicbrowser.pl:5656
+#: gmusicbrowser.pl:5698
 msgid "Amount of volume changed by the mouse wheel"
 msgstr ""
 
-#: gmusicbrowser.pl:7053 gmusicbrowser.pl:7127 gmusicbrowser_songs.pm:3675
+#: gmusicbrowser.pl:7095 gmusicbrowser.pl:7169 gmusicbrowser_songs.pm:3675
 msgid "Any of :"
 msgstr "Bármelyik a következőkből :"
 
@@ -581,7 +570,7 @@ msgstr ""
 msgid "Append (only if not already present)"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1618
+#: gmusicbrowser_list.pm:1617
 msgid "Append to playlist"
 msgstr ""
 
@@ -595,11 +584,11 @@ msgid ""
 "rating update on files with default rating):"
 msgstr ""
 
-#: gmusicbrowser.pl:5947
+#: gmusicbrowser.pl:5989
 msgid "Are you sure you want to delete the '{label}' label ?"
 msgstr ""
 
-#: gmusicbrowser.pl:5308
+#: gmusicbrowser.pl:5350
 msgid "Arguments"
 msgstr "Paraméterek"
 
@@ -611,11 +600,15 @@ msgstr ""
 msgid "Arkanoid Fullscreen"
 msgstr ""
 
-#: gmusicbrowser.pl:7738 gmusicbrowser_songs.pm:469 gmusicbrowser_tags.pm:1529
+#: layouts:108
+msgid "Arkanoid Fullscreen with queue"
+msgstr ""
+
+#: gmusicbrowser.pl:7780 gmusicbrowser_songs.pm:469 gmusicbrowser_tags.pm:1529
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
 #: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:129
-#: plugins/fetch_cover.pm:102 layouts:403 layouts:506 layouts:512
+#: plugins/fetch_cover.pm:102 layouts:416 layouts:519 layouts:525
 msgid "Artist"
 msgstr "Előadó"
 
@@ -659,7 +652,7 @@ msgstr ""
 msgid "Artists"
 msgstr ""
 
-#: gmusicbrowser.pl:7261
+#: gmusicbrowser.pl:7303
 msgid "Ascending order"
 msgstr ""
 
@@ -667,7 +660,7 @@ msgstr ""
 msgid "Ask confirmation only if file already exists"
 msgstr "Megerősítést kér, csak ha a fájl már létezik"
 
-#: gmusicbrowser.pl:5170
+#: gmusicbrowser.pl:5212
 msgid "Audio"
 msgstr "Audió"
 
@@ -683,11 +676,11 @@ msgstr "Fájl név alapján automatikusan töltse ki"
 msgid "Auto fill only blank fields"
 msgstr "Automatikusan töltse ki az üres mezőket"
 
-#: gmusicbrowser_layout.pm:28
+#: gmusicbrowser_layout.pm:27
 msgid "Auto fill queue"
 msgstr "A lejátszási sort automatikusan töltse fel"
 
-#: gmusicbrowser_list.pm:3379
+#: gmusicbrowser_list.pm:3374
 msgid "Auto filter"
 msgstr ""
 
@@ -703,7 +696,7 @@ msgstr ""
 msgid "Auto-scroll"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1644
+#: gmusicbrowser_list.pm:1643
 msgid "Auto-select Pictures"
 msgstr ""
 
@@ -711,7 +704,7 @@ msgstr ""
 msgid "Automatic rating updates on configurable listening behaviour events."
 msgstr ""
 
-#: gmusicbrowser.pl:5866
+#: gmusicbrowser.pl:5908
 msgid "Automatically remove current song if not found"
 msgstr ""
 
@@ -723,7 +716,7 @@ msgstr "Automatikus mentés"
 msgid "Autosave plugin"
 msgstr "Automatikus mentés plugin"
 
-#: gmusicbrowser.pl:7217
+#: gmusicbrowser.pl:7259
 msgid "Available"
 msgstr "Elérhető"
 
@@ -739,7 +732,7 @@ msgstr ""
 msgid "Bad session"
 msgstr ""
 
-#: gmusicbrowser.pl:4265
+#: gmusicbrowser.pl:4307
 msgid "Base Folder :"
 msgstr ""
 
@@ -747,11 +740,11 @@ msgstr ""
 msgid "Before: "
 msgstr ""
 
-#: gmusicbrowser_list.pm:5072
+#: gmusicbrowser_list.pm:5057
 msgid "Begin with"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1580
+#: gmusicbrowser_list.pm:1579
 msgid "Below"
 msgstr ""
 
@@ -767,23 +760,23 @@ msgstr ""
 msgid "Body text is not supported by current notification daemon"
 msgstr ""
 
-#: layouts:268
+#: layouts:281
 msgid "Browser"
 msgstr "Böngésző"
 
-#: gmusicbrowser.pl:5693
+#: gmusicbrowser.pl:5735
 msgid "Browser window layout :"
 msgstr "Böngésző ablak elrendezése :"
 
-#: layouts:293
+#: layouts:306
 msgid "Browser with SongTree"
 msgstr ""
 
-#: layouts:924
+#: layouts:937
 msgid "Buttons"
 msgstr ""
 
-#: layouts:913
+#: layouts:926
 msgid "Buttons, Song & Cover"
 msgstr ""
 
@@ -801,7 +794,7 @@ msgid ""
 "volume when using this audio backend."
 msgstr ""
 
-#: gmusicbrowser.pl:3675
+#: gmusicbrowser.pl:3717
 msgid ""
 "Can't create Folder '{path}' : \n"
 "{error}"
@@ -821,7 +814,7 @@ msgstr ""
 msgid "Can't read file or invalid file"
 msgstr "Nem lehet olvasni a fájlt!"
 
-#: gmusicbrowser.pl:4301
+#: gmusicbrowser.pl:4343
 msgid "Can't write in base folder '{folder}'."
 msgstr ""
 
@@ -833,19 +826,19 @@ msgstr "Nagybetüsít"
 msgid "Capitalize each word"
 msgstr ""
 
-#: gmusicbrowser.pl:7257
+#: gmusicbrowser.pl:7299
 msgid "Case insensitive"
 msgstr ""
 
-#: gmusicbrowser.pl:7257 gmusicbrowser_list.pm:3374
+#: gmusicbrowser.pl:7299 gmusicbrowser_list.pm:3369
 msgid "Case sensitive"
 msgstr ""
 
-#: gmusicbrowser_list.pm:5071
+#: gmusicbrowser_list.pm:5056
 msgid "Case-sensitive"
 msgstr ""
 
-#: layouts:364
+#: layouts:377
 msgid "Categories pane"
 msgstr ""
 
@@ -873,55 +866,55 @@ msgstr ""
 msgid "Channels"
 msgstr "Csatorna"
 
-#: gmusicbrowser.pl:5849
+#: gmusicbrowser.pl:5891
 msgid "Check for updated/deleted songs on startup"
 msgstr "Módosított és törölt számok utáni keresés elinduláskor"
 
-#: gmusicbrowser_list.pm:1638
+#: gmusicbrowser_list.pm:1637
 msgid "Check for updated/removed songs"
 msgstr "Módosított és törölt számok utáni keresés"
 
-#: gmusicbrowser.pl:5019
+#: gmusicbrowser.pl:5061
 msgid "Checking length/bitrate"
 msgstr ""
 
-#: gmusicbrowser.pl:4992
+#: gmusicbrowser.pl:5034
 msgid "Checking songs"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3196
+#: gmusicbrowser_list.pm:3192
 msgid "Choose Album From this Artist"
 msgstr "Album Választása ettől az Előadótól"
 
-#: gmusicbrowser_layout.pm:598
+#: gmusicbrowser_layout.pm:557
 msgid "Choose Artist/Album/Song"
 msgstr "Válassz előadót,albumot,számot"
 
-#: gmusicbrowser.pl:8190
+#: gmusicbrowser.pl:8232
 msgid "Choose Date"
 msgstr "Dátum Választás"
 
-#: gmusicbrowser.pl:3842
+#: gmusicbrowser.pl:3884
 msgid "Choose Picture"
 msgstr "Kép Választás"
 
-#: gmusicbrowser_layout.pm:604
+#: gmusicbrowser_layout.pm:563
 msgid "Choose Random Album"
 msgstr "Album Véletlenszerü Választása"
 
-#: gmusicbrowser.pl:3684
+#: gmusicbrowser.pl:3726
 msgid "Choose directory to copy files to"
 msgstr "Másoláshoz cél könyvtár választása"
 
-#: gmusicbrowser.pl:3685
+#: gmusicbrowser.pl:3727
 msgid "Choose directory to move files to"
 msgstr "Mozgatáshoz cél könyvtár választása"
 
-#: gmusicbrowser.pl:3811
+#: gmusicbrowser.pl:3853
 msgid "Choose files"
 msgstr ""
 
-#: gmusicbrowser.pl:5894
+#: gmusicbrowser.pl:5936
 msgid "Choose folder to add"
 msgstr "Válasszon könyvtárat hozzáadáshoz"
 
@@ -937,7 +930,7 @@ msgstr ""
 msgid "Choose icon for label {name}"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2515
+#: gmusicbrowser_layout.pm:2474
 msgid "Choose page to open"
 msgstr ""
 
@@ -945,15 +938,15 @@ msgstr ""
 msgid "Choose picture for '%s'"
 msgstr ""
 
-#: gmusicbrowser.pl:4858
+#: gmusicbrowser.pl:4900
 msgid "Choose playlist files to import"
 msgstr ""
 
-#: gmusicbrowser.pl:7198 gmusicbrowser_list.pm:290
+#: gmusicbrowser.pl:7240 gmusicbrowser_list.pm:290
 msgid "Clear"
 msgstr ""
 
-#: gmusicbrowser.pl:1044 gmusicbrowser_layout.pm:33
+#: gmusicbrowser.pl:1044 gmusicbrowser_layout.pm:32
 msgid "Clear queue"
 msgstr "Lejátszási sor törlése"
 
@@ -965,8 +958,8 @@ msgstr ""
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2258 gmusicbrowser_list.pm:3837
-#: gmusicbrowser_list.pm:3904
+#: gmusicbrowser_layout.pm:2217 gmusicbrowser_list.pm:3832
+#: gmusicbrowser_list.pm:3899
 msgid "Close"
 msgstr "Bezárás"
 
@@ -974,11 +967,11 @@ msgstr "Bezárás"
 msgid "Close Window"
 msgstr ""
 
-#: gmusicbrowser.pl:5679
+#: gmusicbrowser.pl:5721
 msgid "Close to tray"
 msgstr "Tálcára csukás"
 
-#: gmusicbrowser.pl:5197 gmusicbrowser.pl:5307 gmusicbrowser_123.pm:287
+#: gmusicbrowser.pl:5239 gmusicbrowser.pl:5349 gmusicbrowser_123.pm:287
 msgid "Command"
 msgstr "Parancs"
 
@@ -986,7 +979,7 @@ msgstr "Parancs"
 msgid "Command to launch when the button is pressed"
 msgstr ""
 
-#: gmusicbrowser.pl:5615
+#: gmusicbrowser.pl:5657
 msgid ""
 "Command used when\n"
 "'turn off computer when queue empty'\n"
@@ -1001,7 +994,7 @@ msgstr ""
 msgid "Command when stopped :"
 msgstr ""
 
-#: gmusicbrowser.pl:7897 gmusicbrowser_songs.pm:628 gmusicbrowser_tags.pm:1590
+#: gmusicbrowser.pl:7939 gmusicbrowser_songs.pm:628 gmusicbrowser_tags.pm:1590
 #: gmusicbrowser_tags.pm:1609 gmusicbrowser_tags.pm:1852
 msgid "Comment"
 msgstr "Megjegyzés"
@@ -1024,16 +1017,16 @@ msgstr "Zeneszerző"
 msgid "Conductor"
 msgstr "Karmester"
 
-#: gmusicbrowser.pl:5605
+#: gmusicbrowser.pl:5647
 msgid "Connect through a proxy"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:635
+#: gmusicbrowser_layout.pm:594
 msgid "Connections from :"
 msgstr ""
 
-#: layouts:40 layouts:79 layouts:169 layouts:332 layouts:434 layouts:506
-#: layouts:512 layouts:536 layouts:598
+#: layouts:40 layouts:79 layouts:182 layouts:345 layouts:447 layouts:519
+#: layouts:525 layouts:549 layouts:611
 msgid "Context"
 msgstr ""
 
@@ -1041,7 +1034,7 @@ msgstr ""
 msgid "Copy"
 msgstr "Másolás"
 
-#: gmusicbrowser.pl:3694
+#: gmusicbrowser.pl:3736
 msgid "Copy failed"
 msgstr "Másolás sikertelen"
 
@@ -1057,7 +1050,7 @@ msgstr "Másolás a csatolt hordozható lejátszóra"
 msgid "Copy to portable player"
 msgstr "Másolás hordozható lejátszóra"
 
-#: gmusicbrowser.pl:3697
+#: gmusicbrowser.pl:3739
 msgid "Copying file"
 msgid_plural "Copying %d files"
 msgstr[0] "%d fájl másolása"
@@ -1066,7 +1059,7 @@ msgstr[0] "%d fájl másolása"
 msgid "Copyright"
 msgstr ""
 
-#: gmusicbrowser.pl:5727
+#: gmusicbrowser.pl:5769
 msgid "Create ID3v2 tags as ID3v2.4"
 msgstr ""
 
@@ -1074,7 +1067,7 @@ msgstr ""
 msgid "Ctrl"
 msgstr ""
 
-#: gmusicbrowser.pl:5657
+#: gmusicbrowser.pl:5699
 msgid "Current song must always be in the playlist"
 msgstr ""
 
@@ -1106,8 +1099,8 @@ msgstr ""
 msgid "Custom formats"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:1425 gmusicbrowser_layout.pm:1446
-#: gmusicbrowser_layout.pm:1477 gmusicbrowser_list.pm:93
+#: gmusicbrowser_layout.pm:1384 gmusicbrowser_layout.pm:1405
+#: gmusicbrowser_layout.pm:1436 gmusicbrowser_list.pm:93
 msgid "Custom..."
 msgstr ""
 
@@ -1115,7 +1108,7 @@ msgstr ""
 msgid "Date"
 msgstr "Dátum"
 
-#: gmusicbrowser.pl:5643
+#: gmusicbrowser.pl:5685
 msgid "Date format :"
 msgstr ""
 
@@ -1135,7 +1128,7 @@ msgstr "Hangerő csökkentése"
 msgid "Default"
 msgstr ""
 
-#: gmusicbrowser.pl:5595
+#: gmusicbrowser.pl:5637
 msgid "Default rating :"
 msgstr "Alapértelmezett értékelés :"
 
@@ -1147,7 +1140,7 @@ msgstr ""
 msgid "Default text font"
 msgstr ""
 
-#: gmusicbrowser.pl:5681
+#: gmusicbrowser.pl:5723
 msgid "Delay tray tip popup on mouse over"
 msgstr ""
 
@@ -1155,11 +1148,11 @@ msgstr ""
 msgid "Delete Selected Songs"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2256
+#: gmusicbrowser_layout.pm:2215
 msgid "Delete list"
 msgstr ""
 
-#: gmusicbrowser.pl:7261
+#: gmusicbrowser.pl:7303
 msgid "Descending order"
 msgstr ""
 
@@ -1185,7 +1178,7 @@ msgstr ""
 msgid "Differential: "
 msgstr ""
 
-#: gmusicbrowser.pl:5612
+#: gmusicbrowser.pl:5654
 msgid "Disable screensaver when fullscreen and playing"
 msgstr ""
 
@@ -1193,7 +1186,7 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: gmusicbrowser.pl:7766 gmusicbrowser_songs.pm:580
+#: gmusicbrowser.pl:7808 gmusicbrowser_songs.pm:580
 msgid "Disc"
 msgstr "Lemez"
 
@@ -1227,7 +1220,7 @@ msgstr ""
 msgid "Display synchronized lyrics of the current song"
 msgstr ""
 
-#: gmusicbrowser.pl:5677
+#: gmusicbrowser.pl:5719
 msgid "Display tray tip for"
 msgstr ""
 
@@ -1235,19 +1228,19 @@ msgstr ""
 msgid "Do not add a title row"
 msgstr ""
 
-#: gmusicbrowser.pl:5847
+#: gmusicbrowser.pl:5889
 msgid "Do not add songs that can't be played"
 msgstr "Lejátszhatatlan számokat ne addja hozzá"
 
-#: gmusicbrowser.pl:5733
+#: gmusicbrowser.pl:5775
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr ""
 
-#: gmusicbrowser.pl:5729
+#: gmusicbrowser.pl:5771
 msgid "Do not unsynchronise id3v2 tags"
 msgstr ""
 
-#: gmusicbrowser.pl:5732
+#: gmusicbrowser.pl:5774
 msgid "Do not write the tags"
 msgstr ""
 
@@ -1279,7 +1272,7 @@ msgstr "Az aktuális szám szerkesztése"
 msgid "Edit Labels"
 msgstr "Cimkék szerkesztése"
 
-#: gmusicbrowser.pl:416 gmusicbrowser.pl:4068
+#: gmusicbrowser.pl:416 gmusicbrowser.pl:4110
 msgid "Edit Lyrics"
 msgstr "Dalszöveg szerkesztése"
 
@@ -1287,7 +1280,7 @@ msgstr "Dalszöveg szerkesztése"
 msgid "Edit Lyrics ..."
 msgstr "Dalszöveg szerkesztése ..."
 
-#: gmusicbrowser.pl:4556
+#: gmusicbrowser.pl:4598
 msgid "Edit Multiple Songs Properties"
 msgstr "Több Szám Szerkesztése"
 
@@ -1295,7 +1288,7 @@ msgstr "Több Szám Szerkesztése"
 msgid "Edit Rating"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:114
+#: gmusicbrowser_layout.pm:113
 msgid "Edit Settings"
 msgstr "Beállítások módosítása"
 
@@ -1303,23 +1296,23 @@ msgstr "Beállítások módosítása"
 msgid "Edit auto-fill formats ..."
 msgstr ""
 
-#: gmusicbrowser_list.pm:2830
+#: gmusicbrowser_list.pm:2826
 msgid "Edit filter"
 msgstr "Szűrő módosítása"
 
-#: gmusicbrowser_list.pm:6521
+#: gmusicbrowser_list.pm:6496
 msgid "Edit grouping ..."
 msgstr ""
 
-#: gmusicbrowser_list.pm:2838
+#: gmusicbrowser_list.pm:2834
 msgid "Edit list"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:1394
+#: gmusicbrowser_layout.pm:1353
 msgid "Edit ordered modes ..."
 msgstr ""
 
-#: gmusicbrowser_layout.pm:1378
+#: gmusicbrowser_layout.pm:1337
 msgid "Edit random modes ..."
 msgstr ""
 
@@ -1327,11 +1320,11 @@ msgstr ""
 msgid "Edit selected song properties"
 msgstr ""
 
-#: gmusicbrowser.pl:8744 gmusicbrowser_layout.pm:35
+#: gmusicbrowser.pl:8786 gmusicbrowser_layout.pm:34
 msgid "Edit..."
 msgstr "Szerkesztés..."
 
-#: layouts:429
+#: layouts:442
 msgid "EditList"
 msgstr "Lista szerkesztése"
 
@@ -1367,12 +1360,12 @@ msgstr ""
 msgid "Encoder"
 msgstr ""
 
-#: gmusicbrowser.pl:5731
+#: gmusicbrowser.pl:5773
 msgid "Encoding used for id3v1 tags :"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1621 gmusicbrowser_list.pm:3835
-#: gmusicbrowser_list.pm:3902
+#: gmusicbrowser_list.pm:1620 gmusicbrowser_list.pm:3830
+#: gmusicbrowser_list.pm:3897
 msgid "Enqueue"
 msgstr "Listára vétel"
 
@@ -1404,7 +1397,7 @@ msgstr ""
 msgid "Enqueue a list of files/folders"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:575
+#: gmusicbrowser_layout.pm:534
 msgid "Enqueue filter"
 msgstr ""
 
@@ -1420,11 +1413,11 @@ msgstr ""
 msgid "EpicRating plugin - automatically update ratings"
 msgstr ""
 
-#: layouts:852
+#: layouts:865
 msgid "Equalizer"
 msgstr ""
 
-#: gmusicbrowser.pl:5364
+#: gmusicbrowser.pl:5406
 msgid "Error :"
 msgstr ""
 
@@ -1487,7 +1480,7 @@ msgstr ""
 msgid "Extra gain"
 msgstr ""
 
-#: gmusicbrowser.pl:5628
+#: gmusicbrowser.pl:5670
 msgid "Extract guest artist from title :"
 msgstr ""
 
@@ -1503,7 +1496,7 @@ msgstr ""
 msgid "Fade-out then stop"
 msgstr ""
 
-#: gmusicbrowser.pl:4114
+#: gmusicbrowser.pl:4156
 msgid ""
 "Failed to delete '{file}' :\n"
 "{error}"
@@ -1525,7 +1518,7 @@ msgstr ""
 msgid "Field: "
 msgstr ""
 
-#: gmusicbrowser.pl:5173 gmusicbrowser_list.pm:5074
+#: gmusicbrowser.pl:5215 gmusicbrowser_list.pm:5059
 msgid "Fields"
 msgstr ""
 
@@ -1533,7 +1526,7 @@ msgstr ""
 msgid "File type"
 msgstr "Fájl tipus"
 
-#: gmusicbrowser.pl:7879 gmusicbrowser_songs.pm:441 gmusicbrowser_tags.pm:2041
+#: gmusicbrowser.pl:7921 gmusicbrowser_songs.pm:441 gmusicbrowser_tags.pm:2041
 msgid "Filename"
 msgstr "Fájl név"
 
@@ -1562,7 +1555,7 @@ msgstr "Szürő"
 msgid "Filter : "
 msgstr ""
 
-#: gmusicbrowser.pl:6738
+#: gmusicbrowser.pl:6780
 msgid "Filter edition"
 msgstr ""
 
@@ -1578,15 +1571,15 @@ msgstr "Szürő az aktuális előadóra"
 msgid "Filter on playing Song"
 msgstr "Filter az aktuális számra"
 
-#: gmusicbrowser_list.pm:3183
+#: gmusicbrowser_list.pm:3179
 msgid "Filter on this album"
 msgstr "Filter erre az albumra"
 
-#: gmusicbrowser_list.pm:3183
+#: gmusicbrowser_list.pm:3179
 msgid "Filter on this artist"
 msgstr "Filter erre az előadóra"
 
-#: gmusicbrowser_list.pm:5099
+#: gmusicbrowser_list.pm:5084
 msgid "Find :"
 msgstr ""
 
@@ -1606,12 +1599,12 @@ msgstr ""
 msgid "Find songs with the same names"
 msgstr ""
 
-#: gmusicbrowser.pl:836 gmusicbrowser.pl:7887 gmusicbrowser_list.pm:724
-#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:795
+#: gmusicbrowser.pl:836 gmusicbrowser.pl:7929 gmusicbrowser_list.pm:724
+#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:808
 msgid "Folder"
 msgstr ""
 
-#: gmusicbrowser_list.pm:724 layouts:794
+#: gmusicbrowser_list.pm:724 layouts:807
 msgid "Folder (right-aligned)"
 msgstr ""
 
@@ -1619,20 +1612,20 @@ msgstr ""
 msgid "Folder format :"
 msgstr ""
 
-#: gmusicbrowser.pl:4266
+#: gmusicbrowser.pl:4308
 msgid "Folder pattern :"
 msgstr ""
 
-#: gmusicbrowser.pl:5810 gmusicbrowser.pl:5852
+#: gmusicbrowser.pl:5852 gmusicbrowser.pl:5894
 msgid "Folders to search for new songs"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:3675 gmusicbrowser_list.pm:17
-#: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6533
+#: gmusicbrowser_layout.pm:3644 gmusicbrowser_list.pm:17
+#: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6508
 msgid "Follow playing song"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:3675
+#: gmusicbrowser_layout.pm:3644
 msgid "Follow selected song"
 msgstr ""
 
@@ -1660,19 +1653,19 @@ msgstr ""
 msgid "Friday"
 msgstr ""
 
-#: gmusicbrowser.pl:5695
+#: gmusicbrowser.pl:5737
 msgid "Full screen layout :"
 msgstr ""
 
-#: gmusicbrowser.pl:446 gmusicbrowser_layout.pm:648
+#: gmusicbrowser.pl:446 gmusicbrowser_layout.pm:607
 msgid "Fullscreen"
 msgstr ""
 
-#: layouts:604
+#: layouts:617
 msgid "Fullscreen simple"
 msgstr ""
 
-#: gmusicbrowser.pl:5481
+#: gmusicbrowser.pl:5523
 msgid "GStreamer module not loaded."
 msgstr ""
 
@@ -1680,7 +1673,7 @@ msgstr ""
 msgid "Gain for songs missing replaygain tags"
 msgstr ""
 
-#: gmusicbrowser.pl:7863 gmusicbrowser_tags.pm:1536 gmusicbrowser_tags.pm:1575
+#: gmusicbrowser.pl:7905 gmusicbrowser_tags.pm:1536 gmusicbrowser_tags.pm:1575
 #: gmusicbrowser_tags.pm:1588 gmusicbrowser_tags.pm:1610
 #: gmusicbrowser_tags.pm:1862
 msgid "Genre"
@@ -1698,7 +1691,7 @@ msgstr ""
 msgid "Genres"
 msgstr ""
 
-#: layouts:364
+#: layouts:377
 msgid "Genres pane"
 msgstr ""
 
@@ -1710,11 +1703,11 @@ msgstr ""
 msgid "Gnome multimedia keys plugin"
 msgstr ""
 
-#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6536 layouts:88 layouts:89
+#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6511 layouts:88 layouts:89
 msgid "Go to playing song"
 msgstr ""
 
-#: gmusicbrowser_list.pm:7349
+#: gmusicbrowser_list.pm:7324
 msgid "Group by :"
 msgstr ""
 
@@ -1742,7 +1735,7 @@ msgstr "Eltüntetés"
 msgid "Hide toolbar"
 msgstr ""
 
-#: gmusicbrowser.pl:5707
+#: gmusicbrowser.pl:5749
 msgid "Icon theme :"
 msgstr ""
 
@@ -1750,11 +1743,11 @@ msgstr ""
 msgid "Identifier in file tag"
 msgstr ""
 
-#: gmusicbrowser.pl:5510
+#: gmusicbrowser.pl:5552
 msgid "Ignore playback errors"
 msgstr "Lejátszási hibák figyelmen kivűl hagyása"
 
-#: gmusicbrowser_list.pm:2844
+#: gmusicbrowser_list.pm:2840
 msgid "Import list"
 msgstr ""
 
@@ -1768,19 +1761,19 @@ msgstr ""
 msgid "Increase Volume"
 msgstr "Hangerő növelése"
 
-#: gmusicbrowser.pl:4609 gmusicbrowser_tags.pm:1598
+#: gmusicbrowser.pl:4651 gmusicbrowser_tags.pm:1598
 msgid "Info"
 msgstr ""
 
-#: layouts:889
+#: layouts:902
 msgid "Insensitive title-artist (left-aligned)"
 msgstr ""
 
-#: layouts:895
+#: layouts:908
 msgid "Insensitive title-artist (right-aligned)"
 msgstr ""
 
-#: layouts:902
+#: layouts:915
 msgid "Insensitive, Song & Cover"
 msgstr ""
 
@@ -1792,7 +1785,7 @@ msgstr ""
 msgid "Invalid regular expression"
 msgstr ""
 
-#: layouts:930
+#: layouts:943
 msgid "Invisible hot spot"
 msgstr ""
 
@@ -1804,7 +1797,7 @@ msgstr ""
 msgid "KB"
 msgstr ""
 
-#: plugins/karaoke.pm:9 layouts:861
+#: plugins/karaoke.pm:9 layouts:874
 msgid "Karaoke"
 msgstr ""
 
@@ -1812,11 +1805,11 @@ msgstr ""
 msgid "Karaoke plugin"
 msgstr ""
 
-#: gmusicbrowser.pl:5194 gmusicbrowser.pl:5306
+#: gmusicbrowser.pl:5236 gmusicbrowser.pl:5348
 msgid "Key"
 msgstr ""
 
-#: gmusicbrowser.pl:5175
+#: gmusicbrowser.pl:5217
 msgid "Keys"
 msgstr ""
 
@@ -1825,7 +1818,7 @@ msgid "Keywords"
 msgstr ""
 
 #: gmusicbrowser.pl:1074 gmusicbrowser.pl:1075 gmusicbrowser.pl:1076
-#: gmusicbrowser.pl:5981 gmusicbrowser.pl:7871
+#: gmusicbrowser.pl:6023 gmusicbrowser.pl:7913
 msgid "Label"
 msgstr ""
 
@@ -1837,12 +1830,12 @@ msgstr ""
 msgid "Label/Publisher"
 msgstr ""
 
-#: gmusicbrowser.pl:4570 gmusicbrowser.pl:4607 gmusicbrowser.pl:5169
+#: gmusicbrowser.pl:4612 gmusicbrowser.pl:4649 gmusicbrowser.pl:5211
 #: gmusicbrowser_songs.pm:604
 msgid "Labels"
 msgstr ""
 
-#: gmusicbrowser_list.pm:744 layouts:755
+#: gmusicbrowser_list.pm:744 layouts:768
 msgid "Labels' icons"
 msgstr ""
 
@@ -1878,7 +1871,7 @@ msgstr ""
 msgid "Launch ripping program"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:538
+#: gmusicbrowser_layout.pm:497
 msgid "Layout"
 msgstr ""
 
@@ -1886,7 +1879,7 @@ msgstr ""
 msgid "Layout :"
 msgstr ""
 
-#: gmusicbrowser.pl:5171
+#: gmusicbrowser.pl:5213
 msgid "Layouts"
 msgstr ""
 
@@ -1894,16 +1887,16 @@ msgstr ""
 msgid "Left aligned"
 msgstr ""
 
-#: layouts:364
+#: layouts:377
 msgid "Left pane"
 msgstr ""
 
-#: gmusicbrowser.pl:7779 gmusicbrowser_songs.pm:737
+#: gmusicbrowser.pl:7821 gmusicbrowser_songs.pm:737
 msgid "Length"
 msgstr "Hosszúság"
 
-#: gmusicbrowser.pl:5168 gmusicbrowser_list.pm:128 layouts:169 layouts:332
-#: layouts:536 layouts:598
+#: gmusicbrowser.pl:5210 gmusicbrowser_list.pm:128 layouts:182 layouts:345
+#: layouts:549 layouts:611
 msgid "Library"
 msgstr "Könyvtár"
 
@@ -1918,7 +1911,7 @@ msgid ""
 "Use the settings dialog to add music."
 msgstr ""
 
-#: gmusicbrowser.pl:5876
+#: gmusicbrowser.pl:5918
 msgid "Library size : %d song"
 msgid_plural "Library size : %d songs"
 msgstr[0] ""
@@ -1939,7 +1932,7 @@ msgstr "Lista"
 msgid "List empty"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:1382 gmusicbrowser_layout.pm:1442
+#: gmusicbrowser_layout.pm:1341 gmusicbrowser_layout.pm:1401
 msgid "List order"
 msgstr "Lista sorrend"
 
@@ -1951,11 +1944,11 @@ msgstr "Kilistázva :"
 msgid "Listed songs"
 msgstr ""
 
-#: layouts:148
+#: layouts:161
 msgid "Lists, Library & Context"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3375
+#: gmusicbrowser_list.pm:3370
 msgid "Literal search"
 msgstr ""
 
@@ -1993,19 +1986,19 @@ msgstr ""
 msgid "Lock Artist"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:164 gmusicbrowser_layout.pm:169
+#: gmusicbrowser_layout.pm:151
 msgid "Lock on Album"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:153 gmusicbrowser_layout.pm:158
+#: gmusicbrowser_layout.pm:146
 msgid "Lock on Artist"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:142 gmusicbrowser_layout.pm:147
+#: gmusicbrowser_layout.pm:141
 msgid "Lock on song"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:135
+#: gmusicbrowser_layout.pm:134
 msgid "Lock on {field}"
 msgstr ""
 
@@ -2051,7 +2044,7 @@ msgstr ""
 msgid "Lyrics"
 msgstr ""
 
-#: layouts:936
+#: layouts:949
 msgid "Lyrics (requires lyrics plugin)"
 msgstr ""
 
@@ -2059,7 +2052,7 @@ msgstr ""
 msgid "Lyrics alignement"
 msgstr ""
 
-#: gmusicbrowser.pl:4060
+#: gmusicbrowser.pl:4102
 msgid "Lyrics for "
 msgstr ""
 
@@ -2071,7 +2064,7 @@ msgstr ""
 msgid "Lyrics source"
 msgstr ""
 
-#: gmusicbrowser.pl:715 gmusicbrowser.pl:5658
+#: gmusicbrowser.pl:715 gmusicbrowser.pl:5700
 msgid "MB"
 msgstr ""
 
@@ -2087,7 +2080,7 @@ msgstr ""
 msgid "MPRIS v1 support"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:548
+#: gmusicbrowser_layout.pm:507
 msgid "Main"
 msgstr ""
 
@@ -2105,7 +2098,7 @@ msgstr ""
 msgid "Mass Rename"
 msgstr ""
 
-#: gmusicbrowser.pl:4200
+#: gmusicbrowser.pl:4242
 msgid "Mass Renaming"
 msgstr ""
 
@@ -2117,7 +2110,7 @@ msgstr ""
 msgid "Menu entry name"
 msgstr ""
 
-#: layouts:241
+#: layouts:254
 msgid "Minimal tip"
 msgstr ""
 
@@ -2125,7 +2118,7 @@ msgstr ""
 msgid "Minimum size"
 msgstr ""
 
-#: gmusicbrowser.pl:5172
+#: gmusicbrowser.pl:5214
 msgid "Misc."
 msgstr ""
 
@@ -2149,19 +2142,19 @@ msgstr ""
 msgid "Move"
 msgstr ""
 
-#: gmusicbrowser.pl:4271
+#: gmusicbrowser.pl:4313
 msgid "Move Files to :"
 msgstr ""
 
-#: gmusicbrowser.pl:3695
+#: gmusicbrowser.pl:3737
 msgid "Move failed"
 msgstr ""
 
-#: gmusicbrowser.pl:5778
+#: gmusicbrowser.pl:5820
 msgid "Move folder to"
 msgstr ""
 
-#: gmusicbrowser.pl:3698
+#: gmusicbrowser.pl:3740
 msgid "Moving file"
 msgid_plural "Moving %d files"
 msgstr[0] "%d fájl mozgatása"
@@ -2190,20 +2183,20 @@ msgstr ""
 msgid "New custom field"
 msgstr ""
 
-#: gmusicbrowser_list.pm:2829
+#: gmusicbrowser_list.pm:2825
 msgid "New filter"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2243
+#: gmusicbrowser_layout.pm:2202
 msgid "New list"
 msgstr ""
 
-#: gmusicbrowser.pl:4235
+#: gmusicbrowser.pl:4277
 msgid "New name"
 msgstr ""
 
-#: gmusicbrowser.pl:439 gmusicbrowser.pl:2437 gmusicbrowser_layout.pm:80
-#: gmusicbrowser_list.pm:5096 plugins/notify.pm:90
+#: gmusicbrowser.pl:439 gmusicbrowser.pl:2437 gmusicbrowser_layout.pm:79
+#: gmusicbrowser_list.pm:5081 plugins/notify.pm:90
 msgid "Next"
 msgstr "Következő"
 
@@ -2215,7 +2208,7 @@ msgstr ""
 msgid "Next Artist"
 msgstr ""
 
-#: gmusicbrowser.pl:1014 gmusicbrowser_layout.pm:79
+#: gmusicbrowser.pl:1014 gmusicbrowser_layout.pm:78
 msgid "Next Song"
 msgstr "Következő Szám"
 
@@ -2223,7 +2216,7 @@ msgstr "Következő Szám"
 msgid "Next Song In Playlist"
 msgstr "Következő Szám a listán"
 
-#: gmusicbrowser_layout.pm:635
+#: gmusicbrowser_layout.pm:594
 msgid "No connections"
 msgstr ""
 
@@ -2259,13 +2252,13 @@ msgstr ""
 msgid "No web browser found."
 msgstr ""
 
-#: gmusicbrowser.pl:832 gmusicbrowser_list.pm:1561 gmusicbrowser_list.pm:1580
+#: gmusicbrowser.pl:832 gmusicbrowser_list.pm:1560 gmusicbrowser_list.pm:1579
 #: gmusicbrowser_songs.pm:53 gmusicbrowser_songs.pm:565
 #: gmusicbrowser_tags.pm:1199 gmusicbrowser_tags.pm:1277
 msgid "None"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:27
+#: gmusicbrowser_layout.pm:26
 msgid "Normal mode"
 msgstr ""
 
@@ -2333,7 +2326,7 @@ msgstr "Lejátszások száma"
 msgid "Number of times skipped"
 msgstr ""
 
-#: gmusicbrowser.pl:7594 gmusicbrowser.pl:7617
+#: gmusicbrowser.pl:7636 gmusicbrowser.pl:7659
 msgid ""
 "ON -> smaller means more probable\n"
 "OFF -> bigger means more probable"
@@ -2341,19 +2334,19 @@ msgstr ""
 "ON -> kisebb jelenti a valószinübbet\n"
 "OFF -> a nagyobb jelenti a valószinübbet"
 
-#: gmusicbrowser.pl:7586
+#: gmusicbrowser.pl:7628
 msgid ""
 "ON less probable if genre is set\n"
 "OFF more probable if genre is set"
 msgstr ""
 
-#: gmusicbrowser.pl:7578
+#: gmusicbrowser.pl:7620
 msgid ""
 "ON less probable if label is set\n"
 "OFF more probable if label is set"
 msgstr ""
 
-#: gmusicbrowser.pl:4235
+#: gmusicbrowser.pl:4277
 msgid "Old name"
 msgstr ""
 
@@ -2365,7 +2358,7 @@ msgstr ""
 msgid "One of these commands is required to play files of type {type} : {cmd}"
 msgstr ""
 
-#: gmusicbrowser.pl:5733
+#: gmusicbrowser.pl:5775
 msgid "Only affect mp3 files that do not already have an id3v1 tag"
 msgstr ""
 
@@ -2373,16 +2366,15 @@ msgstr ""
 msgid "Opacity"
 msgstr ""
 
-#: gmusicbrowser.pl:1021 gmusicbrowser_layout.pm:41
+#: gmusicbrowser.pl:1021 gmusicbrowser_layout.pm:40
 msgid "Open Browser"
 msgstr "Böngésző megnyitása"
 
-#: gmusicbrowser_layout.pm:91
+#: gmusicbrowser_layout.pm:90
 msgid "Open Browser window"
 msgstr "Böngésző ablak megnyitása"
 
-#: gmusicbrowser.pl:1024 gmusicbrowser_layout.pm:42
-#: gmusicbrowser_layout.pm:100
+#: gmusicbrowser.pl:1024 gmusicbrowser_layout.pm:41 gmusicbrowser_layout.pm:99
 msgid "Open Context window"
 msgstr ""
 
@@ -2390,11 +2382,11 @@ msgstr ""
 msgid "Open Custom window"
 msgstr ""
 
-#: gmusicbrowser.pl:5466
+#: gmusicbrowser.pl:5508
 msgid "Open Equalizer"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2246
+#: gmusicbrowser_layout.pm:2205
 msgid "Open Playlist"
 msgstr ""
 
@@ -2402,11 +2394,11 @@ msgstr ""
 msgid "Open Preference window"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2244
+#: gmusicbrowser_layout.pm:2203
 msgid "Open Queue"
 msgstr ""
 
-#: gmusicbrowser.pl:1022 gmusicbrowser_layout.pm:107
+#: gmusicbrowser.pl:1022 gmusicbrowser_layout.pm:106
 msgid "Open Queue window"
 msgstr ""
 
@@ -2418,15 +2410,15 @@ msgstr ""
 msgid "Open containing folder"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2252
+#: gmusicbrowser_layout.pm:2211
 msgid "Open context page"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2248
+#: gmusicbrowser_layout.pm:2207
 msgid "Open existing list"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1634
+#: gmusicbrowser_list.pm:1633
 msgid "Open folder"
 msgstr ""
 
@@ -2438,7 +2430,7 @@ msgstr ""
 msgid "Open link in Browser"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2250
+#: gmusicbrowser_layout.pm:2209
 msgid "Open page layout"
 msgstr ""
 
@@ -2450,11 +2442,11 @@ msgstr ""
 msgid "Open this page in the web browser"
 msgstr ""
 
-#: gmusicbrowser_123.pm:287 gmusicbrowser_list.pm:1657
+#: gmusicbrowser_123.pm:287 gmusicbrowser_list.pm:1656
 msgid "Options"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1564
+#: gmusicbrowser_list.pm:1563
 msgid "Options for subgroup"
 msgstr ""
 
@@ -2504,7 +2496,7 @@ msgstr "Útvonal és fájl"
 msgid "Pattern to find .lrc files :"
 msgstr ""
 
-#: gmusicbrowser.pl:437 gmusicbrowser_layout.pm:71
+#: gmusicbrowser.pl:437 gmusicbrowser_layout.pm:70
 msgid "Pause"
 msgstr "Szünet"
 
@@ -2517,7 +2509,7 @@ msgstr "Kép"
 msgid "Picture Type"
 msgstr "Kép tipusa"
 
-#: gmusicbrowser.pl:5658
+#: gmusicbrowser.pl:5700
 msgid "Picture cache :"
 msgstr ""
 
@@ -2541,16 +2533,16 @@ msgstr ""
 msgid "Picture size :"
 msgstr ""
 
-#: gmusicbrowser.pl:3849
+#: gmusicbrowser.pl:3891
 msgid "Pictures and music files"
 msgstr ""
 
-#: gmusicbrowser.pl:3850
+#: gmusicbrowser.pl:3892
 msgid "Pictures files"
 msgstr "Kép fájlok"
 
-#: gmusicbrowser.pl:436 gmusicbrowser_layout.pm:71 gmusicbrowser_list.pm:1615
-#: gmusicbrowser_list.pm:3836 gmusicbrowser_list.pm:3903
+#: gmusicbrowser.pl:436 gmusicbrowser_layout.pm:70 gmusicbrowser_list.pm:1614
+#: gmusicbrowser_list.pm:3831 gmusicbrowser_list.pm:3898
 msgid "Play"
 msgstr "Lejátszás"
 
@@ -2566,15 +2558,15 @@ msgstr "Kiválasztottak lejátszása"
 msgid "Play a list of files"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3184
+#: gmusicbrowser_list.pm:3180
 msgid "Play all songs from this album"
 msgstr "Az összes dal lejátszása ebböl az albumból"
 
-#: gmusicbrowser_list.pm:3184
+#: gmusicbrowser_list.pm:3180
 msgid "Play all songs from this artist"
 msgstr "Az összes dal lejátszása ettől a művésztől"
 
-#: layouts:869
+#: layouts:882
 msgid "Play button"
 msgstr ""
 
@@ -2586,7 +2578,7 @@ msgstr ""
 msgid "Play counter"
 msgstr "Lejátszás számláló"
 
-#: gmusicbrowser_layout.pm:567
+#: gmusicbrowser_layout.pm:526
 msgid "Play filter"
 msgstr "Lejátszás szürő"
 
@@ -2594,7 +2586,7 @@ msgstr "Lejátszás szürő"
 msgid "Play listed songs"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:178 gmusicbrowser_layout.pm:526
+#: gmusicbrowser_layout.pm:159 gmusicbrowser_layout.pm:485
 msgid "Play order"
 msgstr "Lejátszási sorrend"
 
@@ -2610,31 +2602,31 @@ msgstr "Ma játszottak"
 msgid "Player mounted on :"
 msgstr ""
 
-#: gmusicbrowser.pl:5692
+#: gmusicbrowser.pl:5734
 msgid "Player window layout :"
 msgstr "Lejátszó ablak elrendezése :"
 
-#: gmusicbrowser_layout.pm:518 gmusicbrowser_list.pm:2850
+#: gmusicbrowser_layout.pm:477 gmusicbrowser_list.pm:2846
 msgid "Playing"
 msgstr "Lejátszás"
 
-#: gmusicbrowser_list.pm:2937
+#: gmusicbrowser_list.pm:2933
 msgid "Playing Album"
 msgstr ""
 
-#: gmusicbrowser_list.pm:2936
+#: gmusicbrowser_list.pm:2932
 msgid "Playing Artist"
 msgstr ""
 
-#: gmusicbrowser_list.pm:2935
+#: gmusicbrowser_list.pm:2931
 msgid "Playing Filter"
 msgstr ""
 
-#: gmusicbrowser_list.pm:2938
+#: gmusicbrowser_list.pm:2934
 msgid "Playing Title"
 msgstr ""
 
-#: gmusicbrowser_list.pm:737 layouts:750
+#: gmusicbrowser_list.pm:737 layouts:763
 msgid "Playing and queue icons"
 msgstr ""
 
@@ -2642,15 +2634,15 @@ msgstr ""
 msgid "Playing error : {error}"
 msgstr ""
 
-#: layouts:742
+#: layouts:755
 msgid "Playing/Queue Icon or Track"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:448 layouts:440
+#: gmusicbrowser_layout.pm:407 layouts:453
 msgid "Playlist"
 msgstr "Lejátszási lista"
 
-#: gmusicbrowser_layout.pm:272 gmusicbrowser_layout.pm:1777
+#: gmusicbrowser_layout.pm:242 gmusicbrowser_layout.pm:1736
 msgid "Playlist Empty"
 msgstr "Üres Lista"
 
@@ -2658,27 +2650,27 @@ msgstr "Üres Lista"
 msgid "Playlist empty"
 msgstr ""
 
-#: gmusicbrowser.pl:4858
+#: gmusicbrowser.pl:4900
 msgid "Playlist files"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:530
+#: gmusicbrowser_layout.pm:489
 msgid "Playlist filter"
 msgstr "Lista szürő"
 
-#: gmusicbrowser_layout.pm:198
+#: gmusicbrowser_layout.pm:174
 msgid "Playlist filter :\n"
 msgstr "Lista szürő :\n"
 
-#: layouts:577
+#: layouts:590
 msgid "Playlist, Library & Context"
 msgstr ""
 
-#: gmusicbrowser.pl:5375
+#: gmusicbrowser.pl:5417
 msgid "Plugin not loaded"
 msgstr ""
 
-#: gmusicbrowser.pl:5174
+#: gmusicbrowser.pl:5216
 msgid "Plugins"
 msgstr "Pluginek"
 
@@ -2702,11 +2694,11 @@ msgstr ""
 msgid "Prepend"
 msgstr ""
 
-#: gmusicbrowser.pl:5221
+#: gmusicbrowser.pl:5263
 msgid "Press a key or a key combination"
 msgstr "Nyomjon meg egy billentyüt, vagy billentyü kombinációt"
 
-#: gmusicbrowser_layout.pm:54 gmusicbrowser_list.pm:5097
+#: gmusicbrowser_layout.pm:53 gmusicbrowser_list.pm:5082
 msgid "Previous"
 msgstr ""
 
@@ -2734,7 +2726,7 @@ msgstr "Privát adat"
 msgid "Produced (P)"
 msgstr ""
 
-#: layouts:857
+#: layouts:870
 msgid "Progress"
 msgstr ""
 
@@ -2742,7 +2734,7 @@ msgstr ""
 msgid "Provides context views using MozEmbed or WebKit"
 msgstr ""
 
-#: gmusicbrowser.pl:5606
+#: gmusicbrowser.pl:5648
 msgid "Proxy host :"
 msgstr ""
 
@@ -2758,17 +2750,17 @@ msgstr "Publikáló"
 msgid "Publisher/Studio logotype"
 msgstr ""
 
-#: gmusicbrowser.pl:2409 gmusicbrowser_layout.pm:225
-#: gmusicbrowser_layout.pm:442 gmusicbrowser_layout.pm:534 layouts:40
-#: layouts:80 layouts:332 layouts:364 layouts:422
+#: gmusicbrowser.pl:2409 gmusicbrowser_layout.pm:196
+#: gmusicbrowser_layout.pm:401 gmusicbrowser_layout.pm:493 layouts:40
+#: layouts:80 layouts:345 layouts:377 layouts:435
 msgid "Queue"
 msgstr "Lejátszási Sor"
 
-#: gmusicbrowser_layout.pm:25
+#: gmusicbrowser_layout.pm:24
 msgid "Queue album"
 msgstr "Album lejátszási sorba rakása"
 
-#: gmusicbrowser_layout.pm:26
+#: gmusicbrowser_layout.pm:25
 msgid "Queue artist"
 msgstr "Előadó lejátszási sorba rakása"
 
@@ -2780,36 +2772,36 @@ msgstr "Sor üres"
 msgid "Queue mode"
 msgstr "Lejátszási sor mód"
 
-#: layouts:514
+#: layouts:527
 msgid "Queue, Library & Context"
 msgstr "Lejátszási sor, könyvtár, környezet"
 
-#: layouts:736
+#: layouts:749
 msgid "Queue-Item Number"
 msgstr ""
 
-#: layouts:406
+#: layouts:419
 msgid "Quick Search"
 msgstr ""
 
-#: layouts:414
+#: layouts:427
 msgid "Quick Search with SongTree"
 msgstr ""
 
-#: gmusicbrowser.pl:448 gmusicbrowser.pl:1035 gmusicbrowser_layout.pm:45
-#: gmusicbrowser_layout.pm:123
+#: gmusicbrowser.pl:448 gmusicbrowser.pl:1035 gmusicbrowser_layout.pm:44
+#: gmusicbrowser_layout.pm:122
 msgid "Quit"
 msgstr "Kiszállás"
 
-#: gmusicbrowser_layout.pm:31
+#: gmusicbrowser_layout.pm:30
 msgid "Quit when queue empty"
 msgstr "Kiszáll, mikor a sor üres"
 
-#: gmusicbrowser_list.pm:7795 gmusicbrowser_list.pm:7852
+#: gmusicbrowser_list.pm:7770 gmusicbrowser_list.pm:7827
 msgid "Radio title"
 msgstr ""
 
-#: gmusicbrowser_list.pm:7853
+#: gmusicbrowser_list.pm:7828
 msgid "Radio url"
 msgstr ""
 
@@ -2817,17 +2809,17 @@ msgstr ""
 msgid "Random"
 msgstr ""
 
-#: gmusicbrowser.pl:6742
+#: gmusicbrowser.pl:6784
 msgid "Random mode edition"
 msgstr ""
 
-#: gmusicbrowser.pl:4571 gmusicbrowser.pl:4608 gmusicbrowser.pl:7772
+#: gmusicbrowser.pl:4613 gmusicbrowser.pl:4650 gmusicbrowser.pl:7814
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
-#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:785
+#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:798
 msgid "Rating"
 msgstr "Értékelés"
 
-#: gmusicbrowser_list.pm:766 layouts:786
+#: gmusicbrowser_list.pm:766 layouts:799
 msgid "Rating (picture)"
 msgstr ""
 
@@ -2843,7 +2835,7 @@ msgstr "Cimkék újraolvasása"
 msgid "Read/write in file tag"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:514
+#: gmusicbrowser_layout.pm:473
 msgid "Recent Filters"
 msgstr "Mostanában használt szürők"
 
@@ -2859,7 +2851,7 @@ msgstr ""
 msgid "Recent songs"
 msgstr ""
 
-#: gmusicbrowser.pl:5660
+#: gmusicbrowser.pl:5702
 msgid "Recent songs include skipped songs that haven't been played."
 msgstr ""
 
@@ -2867,7 +2859,7 @@ msgstr ""
 msgid "Recently played"
 msgstr "Mostanában játszottak"
 
-#: gmusicbrowser_layout.pm:53
+#: gmusicbrowser_layout.pm:52
 msgid "Recently played songs"
 msgstr "Mostanában játszott számok"
 
@@ -2883,11 +2875,11 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:560
+#: gmusicbrowser_layout.pm:519
 msgid "Refresh list"
 msgstr "Lista frissítése"
 
-#: gmusicbrowser_list.pm:3376
+#: gmusicbrowser_list.pm:3371
 msgid "Regular expression"
 msgstr ""
 
@@ -2899,19 +2891,19 @@ msgstr ""
 msgid "Regular expression didn't match"
 msgstr ""
 
-#: gmusicbrowser.pl:5599
+#: gmusicbrowser.pl:5641
 msgid "Remember last Filter/Playlist between sessions"
 msgstr "A szürő/lejátszási lista megjegyzése"
 
-#: gmusicbrowser.pl:5600
+#: gmusicbrowser.pl:5642
 msgid "Remember playing position between sessions"
 msgstr "A számbeli pozició megjegyzése"
 
-#: gmusicbrowser.pl:5601
+#: gmusicbrowser.pl:5643
 msgid "Remember playing song between sessions"
 msgstr "A lejátszott szám megjegyzése"
 
-#: gmusicbrowser.pl:5602
+#: gmusicbrowser.pl:5644
 msgid "Remember queue between sessions"
 msgstr ""
 
@@ -2919,8 +2911,8 @@ msgstr ""
 msgid "Remixer"
 msgstr ""
 
-#: gmusicbrowser.pl:412 gmusicbrowser.pl:5282 gmusicbrowser.pl:5826
-#: gmusicbrowser.pl:6792 gmusicbrowser.pl:6927 gmusicbrowser.pl:7197
+#: gmusicbrowser.pl:412 gmusicbrowser.pl:5324 gmusicbrowser.pl:5868
+#: gmusicbrowser.pl:6834 gmusicbrowser.pl:6969 gmusicbrowser.pl:7239
 #: gmusicbrowser_list.pm:289 gmusicbrowser_tags.pm:734
 #: gmusicbrowser_tags.pm:1237 plugins/webcontext.pm:565
 msgid "Remove"
@@ -2938,7 +2930,7 @@ msgstr ""
 msgid "Remove all songs"
 msgstr "Az összes szám eltávolítása"
 
-#: gmusicbrowser_list.pm:2832
+#: gmusicbrowser_list.pm:2828
 msgid "Remove filter"
 msgstr ""
 
@@ -2966,11 +2958,11 @@ msgstr ""
 msgid "Remove header, footer and left column from wikipedia pages"
 msgstr ""
 
-#: gmusicbrowser.pl:6010 gmusicbrowser_list.pm:1652
+#: gmusicbrowser.pl:6052 gmusicbrowser_list.pm:1651
 msgid "Remove label"
 msgstr ""
 
-#: gmusicbrowser_list.pm:2840
+#: gmusicbrowser_list.pm:2836
 msgid "Remove list"
 msgstr ""
 
@@ -2982,11 +2974,11 @@ msgstr ""
 msgid "Remove this field"
 msgstr ""
 
-#: gmusicbrowser.pl:7564
+#: gmusicbrowser.pl:7606
 msgid "Remove this rule"
 msgstr "A szabály törlése"
 
-#: gmusicbrowser_list.pm:1878
+#: gmusicbrowser_list.pm:1877
 msgid "Remove this tab"
 msgstr ""
 
@@ -2998,11 +2990,11 @@ msgstr ""
 msgid "Remove this widget"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2257 gmusicbrowser_list.pm:2842
+#: gmusicbrowser_layout.pm:2216 gmusicbrowser_list.pm:2838
 msgid "Rename"
 msgstr ""
 
-#: gmusicbrowser.pl:4339
+#: gmusicbrowser.pl:4381
 msgid "Rename File"
 msgstr "Fájl Átnevezése"
 
@@ -3010,34 +3002,34 @@ msgstr "Fájl Átnevezése"
 msgid "Rename file"
 msgstr "Fájl átnevezése"
 
-#: gmusicbrowser.pl:4269 gmusicbrowser.pl:4270
+#: gmusicbrowser.pl:4311 gmusicbrowser.pl:4312
 msgid "Rename files using this pattern :"
 msgstr ""
 
-#: gmusicbrowser.pl:5743 gmusicbrowser_list.pm:1633
+#: gmusicbrowser.pl:5785 gmusicbrowser_list.pm:1632
 msgid "Rename folder"
 msgstr "Könyvtár átnevezése"
 
-#: gmusicbrowser.pl:5752
+#: gmusicbrowser.pl:5794
 msgid "Rename this folder to :"
 msgstr ""
 
-#: gmusicbrowser.pl:4268
+#: gmusicbrowser.pl:4310
 msgid "Rename/move files based on these fields :"
 msgstr ""
 
-#: gmusicbrowser.pl:4327 gmusicbrowser.pl:5764
+#: gmusicbrowser.pl:4369 gmusicbrowser.pl:5806
 msgid ""
 "Renaming {oldname}\n"
 "to {newname}\n"
 "failed : {error}"
 msgstr ""
 
-#: gmusicbrowser.pl:5860
+#: gmusicbrowser.pl:5902
 msgid "Reorganize files and folders"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:655 gmusicbrowser_layout.pm:1433
+#: gmusicbrowser_layout.pm:614 gmusicbrowser_layout.pm:1392
 msgid "Repeat"
 msgstr "Ismétlés"
 
@@ -3057,7 +3049,7 @@ msgstr ""
 msgid "Replaygain analysis"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:582 gmusicbrowser_list.pm:3404
+#: gmusicbrowser_layout.pm:541 gmusicbrowser_list.pm:3399
 msgid "Reset filter"
 msgstr "Szürő alaphelyzetbe"
 
@@ -3069,7 +3061,7 @@ msgstr "Visszateker"
 msgid "Right aligned"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1580
+#: gmusicbrowser_list.pm:1579
 msgid "Right side"
 msgstr ""
 
@@ -3105,19 +3097,19 @@ msgstr ""
 msgid "Same Title"
 msgstr "Ugyanaz a Cim"
 
-#: layouts:953
+#: layouts:966
 msgid "Same artist"
 msgstr ""
 
-#: layouts:963
+#: layouts:976
 msgid "Same rating"
 msgstr ""
 
-#: layouts:943
+#: layouts:956
 msgid "Same title"
 msgstr ""
 
-#: layouts:958
+#: layouts:971
 msgid "Same year"
 msgstr ""
 
@@ -3145,11 +3137,11 @@ msgstr ""
 msgid "Save as..."
 msgstr ""
 
-#: gmusicbrowser_list.pm:2834
+#: gmusicbrowser_list.pm:2830
 msgid "Save current filter as"
 msgstr ""
 
-#: gmusicbrowser_list.pm:2836
+#: gmusicbrowser_list.pm:2832
 msgid "Save current list as"
 msgstr ""
 
@@ -3181,15 +3173,15 @@ msgstr ""
 msgid "Saved"
 msgstr "Elmentett"
 
-#: gmusicbrowser_layout.pm:1494
+#: gmusicbrowser_layout.pm:1453
 msgid "Saved Lists"
 msgstr "Elmentett Listák"
 
-#: gmusicbrowser_list.pm:2848
+#: gmusicbrowser_list.pm:2844
 msgid "Saved filters"
 msgstr "Elmentett szürők"
 
-#: gmusicbrowser_list.pm:2849
+#: gmusicbrowser_list.pm:2845
 msgid "Saved lists"
 msgstr "Elmentett listák"
 
@@ -3197,7 +3189,7 @@ msgstr "Elmentett listák"
 msgid "Scan as an album"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1636
+#: gmusicbrowser_list.pm:1635
 msgid "Scan for new songs"
 msgstr "Új számok keresése"
 
@@ -3213,7 +3205,7 @@ msgstr ""
 msgid "Scan using tag-defined album"
 msgstr ""
 
-#: gmusicbrowser.pl:5011
+#: gmusicbrowser.pl:5053
 msgid "Scanning"
 msgstr ""
 
@@ -3225,39 +3217,39 @@ msgstr ""
 msgid "Scroll with the song"
 msgstr ""
 
-#: plugins/fetch_cover.pm:95 layouts:402 layouts:399 layouts:408 layouts:416
+#: plugins/fetch_cover.pm:95 layouts:415 layouts:412 layouts:421 layouts:429
 msgid "Search"
 msgstr "Keresés"
 
-#: layouts:508
+#: layouts:521
 msgid "Search & Playlist"
 msgstr "Keresés és lejátszási lista"
 
-#: layouts:501
+#: layouts:514
 msgid "Search & Queue"
 msgstr "Keresés és Sor"
 
-#: gmusicbrowser_list.pm:3829 gmusicbrowser_list.pm:3895
+#: gmusicbrowser_list.pm:3824 gmusicbrowser_list.pm:3890
 msgid "Search : "
 msgstr "Keresés : "
 
-#: gmusicbrowser_list.pm:3367
+#: gmusicbrowser_list.pm:3362
 msgid "Search Album"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3366
+#: gmusicbrowser_list.pm:3361
 msgid "Search Artist"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3368
+#: gmusicbrowser_list.pm:3363
 msgid "Search Comment"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3370
+#: gmusicbrowser_list.pm:3365
 msgid "Search Genre"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3369
+#: gmusicbrowser_list.pm:3364
 msgid "Search Label"
 msgstr ""
 
@@ -3265,19 +3257,19 @@ msgstr ""
 msgid "Search Picture"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3365
+#: gmusicbrowser_list.pm:3360
 msgid "Search Title"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3362
+#: gmusicbrowser_list.pm:3357
 msgid "Search Title, Artist and Album"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3363
+#: gmusicbrowser_list.pm:3358
 msgid "Search Title, Artist, Album, Comment, Label and Genre"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3364
+#: gmusicbrowser_list.pm:3359
 msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
 msgstr ""
 
@@ -3317,7 +3309,7 @@ msgstr ""
 msgid "Search for current artist"
 msgstr ""
 
-#: gmusicbrowser.pl:5848
+#: gmusicbrowser.pl:5890
 msgid "Search for new songs on startup"
 msgstr "Új számok keresése elindításkor"
 
@@ -3329,7 +3321,7 @@ msgstr ""
 msgid "Search on the web"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3403
+#: gmusicbrowser_list.pm:3398
 msgid "Search options"
 msgstr ""
 
@@ -3337,7 +3329,7 @@ msgstr ""
 msgid "Search pitchfork for Artist"
 msgstr ""
 
-#: gmusicbrowser.pl:5696
+#: gmusicbrowser.pl:5738
 msgid "Search window layout :"
 msgstr ""
 
@@ -3361,11 +3353,11 @@ msgstr "Mezők kiválasztása"
 msgid "Select files"
 msgstr ""
 
-#: gmusicbrowser_list.pm:5095
+#: gmusicbrowser_list.pm:5080
 msgid "Select matches"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3494
+#: gmusicbrowser_list.pm:3489
 msgid "Select search fields"
 msgstr ""
 
@@ -3377,7 +3369,7 @@ msgstr "Kiválasztott : "
 msgid "Selected songs"
 msgstr ""
 
-#: gmusicbrowser.pl:5058
+#: gmusicbrowser.pl:5100
 msgid "Selecting pictures"
 msgstr ""
 
@@ -3393,11 +3385,11 @@ msgstr ""
 msgid "Set Current Song Rating"
 msgstr "Az aktuális szám besorolása"
 
-#: gmusicbrowser.pl:431 gmusicbrowser_list.pm:1640
+#: gmusicbrowser.pl:431 gmusicbrowser_list.pm:1639
 msgid "Set Picture"
 msgstr "Kép beállítása"
 
-#: gmusicbrowser_list.pm:1624
+#: gmusicbrowser_list.pm:1623
 msgid "Set as primary filter"
 msgstr ""
 
@@ -3409,11 +3401,11 @@ msgstr ""
 msgid "Set focus on a layout widget"
 msgstr ""
 
-#: gmusicbrowser_list.pm:6518
+#: gmusicbrowser_list.pm:6493
 msgid "Set grouping"
 msgstr ""
 
-#: gmusicbrowser.pl:6037 gmusicbrowser_list.pm:1648
+#: gmusicbrowser.pl:6079 gmusicbrowser_list.pm:1647
 msgid "Set icon"
 msgstr ""
 
@@ -3421,12 +3413,12 @@ msgstr ""
 msgid "Set player window layout"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1561
+#: gmusicbrowser_list.pm:1560
 msgid "Set subgroup"
 msgstr ""
 
-#: gmusicbrowser.pl:447 gmusicbrowser.pl:5161 gmusicbrowser_layout.pm:40
-#: gmusicbrowser_layout.pm:115
+#: gmusicbrowser.pl:447 gmusicbrowser.pl:5203 gmusicbrowser_layout.pm:39
+#: gmusicbrowser_layout.pm:114
 msgid "Settings"
 msgstr "Beállítások"
 
@@ -3445,7 +3437,7 @@ msgstr ""
 msgid "Shift"
 msgstr ""
 
-#: layouts:709
+#: layouts:722
 msgid "Shimmer Queue"
 msgstr ""
 
@@ -3469,11 +3461,11 @@ msgstr ""
 msgid "Show artist's upcoming events"
 msgstr ""
 
-#: layouts:681
+#: layouts:694
 msgid "Show artist, album, year"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1658
+#: gmusicbrowser_list.pm:1657
 msgid "Show buttons"
 msgstr ""
 
@@ -3485,19 +3477,19 @@ msgstr ""
 msgid "Show similar artists"
 msgstr ""
 
-#: gmusicbrowser_list.pm:3380
+#: gmusicbrowser_list.pm:3375
 msgid "Show suggestions"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1660
+#: gmusicbrowser_list.pm:1659
 msgid "Show tabs"
 msgstr ""
 
-#: gmusicbrowser.pl:5682
+#: gmusicbrowser.pl:5724
 msgid "Show tray icon"
 msgstr ""
 
-#: gmusicbrowser.pl:5680
+#: gmusicbrowser.pl:5722
 msgid "Show tray tip on song change"
 msgstr "Szám váltáskor értesítés a tálcán"
 
@@ -3517,7 +3509,7 @@ msgstr ""
 msgid "Show/Hide lyrics line"
 msgstr ""
 
-#: layouts:667
+#: layouts:680
 msgid "Show/Hide picture"
 msgstr ""
 
@@ -3529,12 +3521,12 @@ msgstr ""
 msgid "Show/hide status bar"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:1379 gmusicbrowser_layout.pm:1431
+#: gmusicbrowser_layout.pm:1338 gmusicbrowser_layout.pm:1390
 #: gmusicbrowser_songs.pm:807
 msgid "Shuffle"
 msgstr "Összekever"
 
-#: gmusicbrowser_layout.pm:34
+#: gmusicbrowser_layout.pm:33
 msgid "Shuffle queue"
 msgstr "A sor összekeverése"
 
@@ -3546,7 +3538,7 @@ msgstr ""
 msgid "Shuffled albums, shuffled tracks"
 msgstr ""
 
-#: gmusicbrowser.pl:5615
+#: gmusicbrowser.pl:5657
 msgid "Shutdown command :"
 msgstr ""
 
@@ -3554,11 +3546,11 @@ msgstr ""
 msgid "Signal: "
 msgstr ""
 
-#: layouts:695
+#: layouts:708
 msgid "Simple title"
 msgstr ""
 
-#: layouts:702
+#: layouts:715
 msgid "Simple title without any"
 msgstr ""
 
@@ -3566,7 +3558,7 @@ msgstr ""
 msgid "Site :"
 msgstr ""
 
-#: gmusicbrowser.pl:7784 gmusicbrowser_songs.pm:455
+#: gmusicbrowser.pl:7826 gmusicbrowser_songs.pm:455
 msgid "Size"
 msgstr "Méret"
 
@@ -3574,35 +3566,35 @@ msgstr "Méret"
 msgid "Skip count"
 msgstr ""
 
-#: gmusicbrowser.pl:5510
+#: gmusicbrowser.pl:5552
 msgid "Skip to next song if an error occurs"
 msgstr "A következő szám játszása, ha hiba történik"
 
-#: layouts:778
+#: layouts:791
 msgid "Small album picture"
 msgstr ""
 
-#: layouts:175
+#: layouts:188
 msgid "Small player"
 msgstr ""
 
-#: layouts:280
+#: layouts:293
 msgid "Smaller browser"
 msgstr ""
 
-#: gmusicbrowser_list.pm:731 layouts:403 layouts:506 layouts:512 layouts:762
+#: gmusicbrowser_list.pm:731 layouts:416 layouts:519 layouts:525 layouts:775
 msgid "Song"
 msgstr "Szám"
 
-#: gmusicbrowser.pl:389 gmusicbrowser.pl:4593
+#: gmusicbrowser.pl:389 gmusicbrowser.pl:4635
 msgid "Song Properties"
 msgstr "Dalok tulajdonságai"
 
-#: gmusicbrowser_layout.pm:3733
+#: gmusicbrowser_layout.pm:3702
 msgid "Song rating"
 msgstr "Szám értékelés"
 
-#: gmusicbrowser.pl:6744
+#: gmusicbrowser.pl:6786
 msgid "SongTree groupings edition"
 msgstr ""
 
@@ -3610,19 +3602,19 @@ msgstr ""
 msgid "Songs Properties"
 msgstr "Dal tulajdonságai"
 
-#: gmusicbrowser_layout.pm:522
+#: gmusicbrowser_layout.pm:481
 msgid "Sort"
 msgstr "Rendezés"
 
-#: gmusicbrowser.pl:6740
+#: gmusicbrowser.pl:6782
 msgid "Sort mode edition"
 msgstr ""
 
-#: gmusicbrowser.pl:7217
+#: gmusicbrowser.pl:7259
 msgid "Sort order"
 msgstr "Rendezés"
 
-#: gmusicbrowser.pl:5618
+#: gmusicbrowser.pl:5660
 msgid "Split artist names on :"
 msgstr ""
 
@@ -3630,40 +3622,40 @@ msgstr ""
 msgid "Standard fields"
 msgstr ""
 
-#: gmusicbrowser.pl:5678
+#: gmusicbrowser.pl:5720
 msgid "Start in tray"
 msgstr ""
 
-#: gmusicbrowser.pl:438 gmusicbrowser.pl:1020 gmusicbrowser_layout.pm:63
+#: gmusicbrowser.pl:438 gmusicbrowser.pl:1020 gmusicbrowser_layout.pm:62
 #: plugins/notify.pm:89
 msgid "Stop"
 msgstr "Stop"
 
-#: gmusicbrowser.pl:4993
+#: gmusicbrowser.pl:5035
 msgid "Stop checking"
 msgstr "Ellenörzés leállítása"
 
-#: gmusicbrowser.pl:5030
+#: gmusicbrowser.pl:5072
 msgid "Stop scanning"
 msgstr "Keresés leállítása"
 
-#: gmusicbrowser.pl:5058
+#: gmusicbrowser.pl:5100
 msgid "Stop selecting pictures"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:30
+#: gmusicbrowser_layout.pm:29
 msgid "Stop when queue empty"
 msgstr "Megáll,ha a sor üres"
 
-#: layouts:874
+#: layouts:887
 msgid "Stop, Play and Next buttons"
 msgstr ""
 
-#: layouts:879
+#: layouts:892
 msgid "Stop, Play and Next buttons and Time"
 msgstr ""
 
-#: layouts:884
+#: layouts:897
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr ""
 
@@ -3699,7 +3691,7 @@ msgstr ""
 msgid "Sunday"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:43
+#: gmusicbrowser_layout.pm:42
 msgid "Switch to fullscreen mode"
 msgstr ""
 
@@ -3711,11 +3703,11 @@ msgstr ""
 msgid "System command :"
 msgstr ""
 
-#: gmusicbrowser.pl:4569 gmusicbrowser.pl:4606
+#: gmusicbrowser.pl:4611 gmusicbrowser.pl:4648
 msgid "Tag"
 msgstr "Cimke"
 
-#: gmusicbrowser.pl:5176
+#: gmusicbrowser.pl:5218
 msgid "Tags"
 msgstr "Cimkék"
 
@@ -3727,7 +3719,7 @@ msgstr "Felhasználási feltételek"
 msgid "Text"
 msgstr "Szöveg"
 
-#: gmusicbrowser.pl:7835
+#: gmusicbrowser.pl:7877
 msgid "The [most/less]"
 msgstr ""
 
@@ -3739,7 +3731,7 @@ msgstr ""
 msgid "This command is required to play files of type {type} : {cmd}"
 msgstr ""
 
-#: gmusicbrowser.pl:5946 gmusicbrowser.pl:6020
+#: gmusicbrowser.pl:5988 gmusicbrowser.pl:6062
 msgid "This label is set for %d song."
 msgid_plural "This label is set for %d songs."
 msgstr[0] ""
@@ -3754,7 +3746,7 @@ msgid ""
 "events) from last.fm."
 msgstr ""
 
-#: gmusicbrowser.pl:5662
+#: gmusicbrowser.pl:5704
 msgid "Threshold to count a song as played :"
 msgstr ""
 
@@ -3770,7 +3762,7 @@ msgstr ""
 msgid "Timespan of the fade-out in seconds"
 msgstr ""
 
-#: gmusicbrowser.pl:849 gmusicbrowser.pl:7730 gmusicbrowser_songs.pm:461
+#: gmusicbrowser.pl:849 gmusicbrowser.pl:7772 gmusicbrowser_songs.pm:461
 #: gmusicbrowser_tags.pm:1527 gmusicbrowser_tags.pm:1566
 #: gmusicbrowser_tags.pm:1581 gmusicbrowser_tags.pm:1602
 #: gmusicbrowser_tags.pm:1605 gmusicbrowser_tags.pm:1852
@@ -3778,15 +3770,15 @@ msgstr ""
 msgid "Title"
 msgstr "Cím"
 
-#: layouts:769
+#: layouts:782
 msgid "Title & icon"
 msgstr ""
 
-#: layouts:727
+#: layouts:740
 msgid "Title & progress"
 msgstr ""
 
-#: gmusicbrowser_list.pm:731 layouts:761
+#: gmusicbrowser_list.pm:731 layouts:774
 msgid "Title - Artist - Album"
 msgstr "Cím - Művész - Album"
 
@@ -3818,7 +3810,7 @@ msgstr ""
 msgid "Toggle between Random/Shuffle and Ordered"
 msgstr ""
 
-#: gmusicbrowser.pl:1064 gmusicbrowser_layout.pm:647
+#: gmusicbrowser.pl:1064 gmusicbrowser_layout.pm:606
 msgid "Toggle fullscreen mode"
 msgstr ""
 
@@ -3826,7 +3818,7 @@ msgstr ""
 msgid "Toggle the fullscreen layout"
 msgstr ""
 
-#: gmusicbrowser.pl:7760 gmusicbrowser_songs.pm:574 gmusicbrowser_tags.pm:1533
+#: gmusicbrowser.pl:7802 gmusicbrowser_songs.pm:574 gmusicbrowser_tags.pm:1533
 #: gmusicbrowser_tags.pm:1571 gmusicbrowser_tags.pm:1587
 #: gmusicbrowser_tags.pm:1615 gmusicbrowser_tags.pm:1852
 msgid "Track"
@@ -3840,7 +3832,7 @@ msgstr ""
 msgid "Track peak"
 msgstr ""
 
-#: gmusicbrowser.pl:5694
+#: gmusicbrowser.pl:5736
 msgid "Tray tip window layout :"
 msgstr ""
 
@@ -3852,7 +3844,7 @@ msgstr ""
 msgid "Turn Off"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:32
+#: gmusicbrowser_layout.pm:31
 msgid "Turn off computer when queue empty"
 msgstr ""
 
@@ -3884,7 +3876,7 @@ msgstr "Művész Feloldása"
 msgid "Unnamed custom command"
 msgstr ""
 
-#: gmusicbrowser.pl:8762 gmusicbrowser_songs.pm:3663
+#: gmusicbrowser.pl:8804 gmusicbrowser_songs.pm:3663
 msgid "Unnamed filter"
 msgstr ""
 
@@ -3900,11 +3892,11 @@ msgstr ""
 msgid "Upper right"
 msgstr ""
 
-#: gmusicbrowser.pl:5468
+#: gmusicbrowser.pl:5510
 msgid "Use Equalizer"
 msgstr ""
 
-#: gmusicbrowser.pl:5727
+#: gmusicbrowser.pl:5769
 msgid ""
 "Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are "
 "probably better supported by other softwares"
@@ -3922,7 +3914,7 @@ msgstr ""
 msgid "Use WebKit"
 msgstr ""
 
-#: gmusicbrowser.pl:5869
+#: gmusicbrowser.pl:5911
 msgid "Use a master filter"
 msgstr ""
 
@@ -3934,11 +3926,11 @@ msgstr ""
 msgid "Use default regular expression"
 msgstr ""
 
-#: gmusicbrowser.pl:5487
+#: gmusicbrowser.pl:5529
 msgid "Use gstreamer"
 msgstr ""
 
-#: gmusicbrowser.pl:5728
+#: gmusicbrowser.pl:5770
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr ""
 
@@ -3969,7 +3961,7 @@ msgstr ""
 msgid "Used for clipping prevention"
 msgstr ""
 
-#: gmusicbrowser.pl:5620 gmusicbrowser.pl:5630
+#: gmusicbrowser.pl:5662 gmusicbrowser.pl:5672
 msgid "Used for the Artists field"
 msgstr ""
 
@@ -3993,12 +3985,12 @@ msgstr ""
 msgid "Various artists"
 msgstr ""
 
-#: gmusicbrowser.pl:7905 gmusicbrowser_songs.pm:717 gmusicbrowser_tags.pm:1528
+#: gmusicbrowser.pl:7947 gmusicbrowser_songs.pm:717 gmusicbrowser_tags.pm:1528
 #: gmusicbrowser_tags.pm:1567
 msgid "Version"
 msgstr "Verzió"
 
-#: layouts:364
+#: layouts:377
 msgid "View"
 msgstr ""
 
@@ -4010,29 +4002,29 @@ msgstr ""
 msgid "View binary data ..."
 msgstr ""
 
-#: layouts:848
+#: layouts:861
 msgid "Volume"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:236
+#: gmusicbrowser_layout.pm:207
 msgid "Volume : "
 msgstr "Hangerő : "
 
-#: gmusicbrowser.pl:5656
+#: gmusicbrowser.pl:5698
 msgid "Volume step :"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:29
+#: gmusicbrowser_layout.pm:28
 msgid "Wait when queue empty"
 msgstr "Várakozás, mikor a lejátszási sor üres"
 
-#: gmusicbrowser.pl:5725
+#: gmusicbrowser.pl:5767
 msgid ""
 "Warning : these are advanced options, don't change them unless you know what "
 "you are doing."
 msgstr ""
 
-#: gmusicbrowser.pl:6212
+#: gmusicbrowser.pl:6254
 msgid "Warning : using a folder with invalid encoding, you should rename it."
 msgstr ""
 
@@ -4060,11 +4052,11 @@ msgstr ""
 msgid "Wednesday"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:1420
+#: gmusicbrowser_layout.pm:1379
 msgid "Weighted Random"
 msgstr "Súlyozott véletlen"
 
-#: gmusicbrowser.pl:5660
+#: gmusicbrowser.pl:5702
 msgid ""
 "When changing songs, the previous song is added to the recent list even if "
 "not played at all."
@@ -4082,7 +4074,7 @@ msgstr ""
 msgid "Wikipedia Locale"
 msgstr ""
 
-#: gmusicbrowser.pl:5732
+#: gmusicbrowser.pl:5774
 msgid ""
 "Will not write the tags except with the advanced tag editing dialog. The "
 "changes will be kept in the library instead.\n"
@@ -4097,7 +4089,7 @@ msgstr "Ablakok"
 msgid "Windows"
 msgstr "Ablakok"
 
-#: gmusicbrowser_list.pm:5073
+#: gmusicbrowser_list.pm:5058
 msgid "Words that begin with"
 msgstr ""
 
@@ -4109,7 +4101,7 @@ msgstr "Fájl nevek irása ..."
 msgid "Writing tags"
 msgstr ""
 
-#: gmusicbrowser.pl:7754 gmusicbrowser_songs.pm:562 gmusicbrowser_tags.pm:1593
+#: gmusicbrowser.pl:7796 gmusicbrowser_songs.pm:562 gmusicbrowser_tags.pm:1593
 #: gmusicbrowser_tags.pm:1608 gmusicbrowser_tags.pm:1852
 msgid "Year"
 msgstr "Év"
@@ -4125,23 +4117,23 @@ msgid ""
 "Note that the markup may be ignored by the notification daemon"
 msgstr ""
 
-#: gmusicbrowser.pl:4299
+#: gmusicbrowser.pl:4341
 msgid "You must specify a base folder"
 msgstr ""
 
-#: gmusicbrowser_list.pm:780 gmusicbrowser_list.pm:6523
+#: gmusicbrowser_list.pm:780 gmusicbrowser_list.pm:6498
 msgid "_Insert column"
 msgstr "Oszlop beszúrása"
 
-#: gmusicbrowser_list.pm:787 gmusicbrowser_list.pm:6530
+#: gmusicbrowser_list.pm:787 gmusicbrowser_list.pm:6505
 msgid "_Remove this column"
 msgstr "Oszlop törlése"
 
-#: gmusicbrowser.pl:4029
+#: gmusicbrowser.pl:4071
 msgid "_Retry"
 msgstr ""
 
-#: gmusicbrowser_list.pm:779 gmusicbrowser_list.pm:6516
+#: gmusicbrowser_list.pm:779 gmusicbrowser_list.pm:6491
 msgid "_Sort by"
 msgstr "Rendezés"
 
@@ -4149,27 +4141,27 @@ msgstr "Rendezés"
 msgid "a bright coloured fish"
 msgstr ""
 
-#: gmusicbrowser.pl:7919 gmusicbrowser.pl:7929
+#: gmusicbrowser.pl:7961 gmusicbrowser.pl:7971
 msgid "a flac file"
 msgstr "egy flac fájl"
 
-#: gmusicbrowser.pl:7917 gmusicbrowser.pl:7927
+#: gmusicbrowser.pl:7959 gmusicbrowser.pl:7969
 msgid "a mp3 file"
 msgstr "egy mp3 fájl"
 
-#: gmusicbrowser.pl:7920 gmusicbrowser.pl:7930
+#: gmusicbrowser.pl:7962 gmusicbrowser.pl:7972
 msgid "a musepack file"
 msgstr "egy musepack fájl"
 
-#: gmusicbrowser.pl:7921 gmusicbrowser.pl:7931
+#: gmusicbrowser.pl:7963 gmusicbrowser.pl:7973
 msgid "a wavepack file"
 msgstr ""
 
-#: gmusicbrowser.pl:3694
+#: gmusicbrowser.pl:3736
 msgid "abort copy"
 msgstr "másolás leállítása"
 
-#: gmusicbrowser.pl:3695
+#: gmusicbrowser.pl:3737
 msgid "abort move"
 msgstr "mozgatás leállítása"
 
@@ -4177,24 +4169,24 @@ msgstr "mozgatás leállítása"
 msgid "add"
 msgstr "hozzáadás"
 
-#: gmusicbrowser.pl:7827
+#: gmusicbrowser.pl:7869
 msgid "added"
 msgstr ""
 
-#: gmusicbrowser.pl:5532
+#: gmusicbrowser.pl:5574
 msgid "advanced options"
 msgstr "fejlett beállítások"
 
-#: gmusicbrowser.pl:7807 gmusicbrowser.pl:7815 gmusicbrowser.pl:7823
-#: gmusicbrowser.pl:7831
+#: gmusicbrowser.pl:7849 gmusicbrowser.pl:7857 gmusicbrowser.pl:7865
+#: gmusicbrowser.pl:7873
 msgid "after %d"
 msgstr "%d után"
 
-#: layouts:639
+#: layouts:652
 msgid "album and artist breadcrumbs"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1550
+#: gmusicbrowser_list.pm:1549
 msgid "alphabetical"
 msgstr ""
 
@@ -4202,11 +4194,11 @@ msgstr ""
 msgid "amixer control :"
 msgstr ""
 
-#: gmusicbrowser.pl:7922 gmusicbrowser.pl:7932
+#: gmusicbrowser.pl:7964 gmusicbrowser.pl:7974
 msgid "an ape file"
 msgstr ""
 
-#: gmusicbrowser.pl:7918 gmusicbrowser.pl:7928
+#: gmusicbrowser.pl:7960 gmusicbrowser.pl:7970
 msgid "an ogg file"
 msgstr "egy ogg fájl"
 
@@ -4222,7 +4214,7 @@ msgstr "szürő alkalmazása"
 msgid "argument {n} :"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1556 gmusicbrowser_songs.pm:836
+#: gmusicbrowser_list.pm:1555 gmusicbrowser_songs.pm:836
 #: gmusicbrowser_tags.pm:2025
 msgid "artist"
 msgstr "előadó"
@@ -4239,7 +4231,7 @@ msgstr "automatikus kitöltés"
 msgid "autofill queue"
 msgstr "automatikus sor feltöltése"
 
-#: gmusicbrowser_list.pm:1529
+#: gmusicbrowser_list.pm:1528
 msgid "automatic size"
 msgstr ""
 
@@ -4255,21 +4247,21 @@ msgstr ""
 msgid "band/artist logotype"
 msgstr ""
 
-#: gmusicbrowser.pl:7806 gmusicbrowser.pl:7814 gmusicbrowser.pl:7822
-#: gmusicbrowser.pl:7830
+#: gmusicbrowser.pl:7848 gmusicbrowser.pl:7856 gmusicbrowser.pl:7864
+#: gmusicbrowser.pl:7872
 msgid "before %d"
 msgstr "%d elött"
 
-#: gmusicbrowser.pl:7808 gmusicbrowser.pl:7816 gmusicbrowser.pl:7824
-#: gmusicbrowser.pl:7832
+#: gmusicbrowser.pl:7850 gmusicbrowser.pl:7858 gmusicbrowser.pl:7866
+#: gmusicbrowser.pl:7874
 msgid "between %d( and )%d"
 msgstr ""
 
-#: gmusicbrowser.pl:7794 gmusicbrowser.pl:7801
+#: gmusicbrowser.pl:7836 gmusicbrowser.pl:7843
 msgid "between %n( and )%n"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1532 gmusicbrowser_list.pm:1537
+#: gmusicbrowser_list.pm:1531 gmusicbrowser_list.pm:1536
 msgid "big size"
 msgstr ""
 
@@ -4277,7 +4269,7 @@ msgstr ""
 msgid "biography"
 msgstr ""
 
-#: gmusicbrowser.pl:7936
+#: gmusicbrowser.pl:7978
 msgid "bitrate"
 msgstr ""
 
@@ -4297,7 +4289,7 @@ msgstr ""
 msgid "broken"
 msgstr ""
 
-#: gmusicbrowser.pl:5340 gmusicbrowser.pl:6304 plugins/desktopwidget.pm:138
+#: gmusicbrowser.pl:5382 gmusicbrowser.pl:6346 plugins/desktopwidget.pm:138
 msgid "by"
 msgstr ""
 
@@ -4333,11 +4325,11 @@ msgstr "{artist}-tól, az "
 msgid "bytes"
 msgstr ""
 
-#: gmusicbrowser.pl:5851
+#: gmusicbrowser.pl:5893
 msgid "check now"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1608
+#: gmusicbrowser_list.pm:1607
 msgid "cloud mode"
 msgstr ""
 
@@ -4369,9 +4361,9 @@ msgstr "kapcsolat sikertelen"
 msgid "connection failed."
 msgstr "kapcsolat sikertelen."
 
-#: gmusicbrowser.pl:7731 gmusicbrowser.pl:7739 gmusicbrowser.pl:7747
-#: gmusicbrowser.pl:7866 gmusicbrowser.pl:7874 gmusicbrowser.pl:7880
-#: gmusicbrowser.pl:7888 gmusicbrowser.pl:7898 gmusicbrowser.pl:7906
+#: gmusicbrowser.pl:7773 gmusicbrowser.pl:7781 gmusicbrowser.pl:7789
+#: gmusicbrowser.pl:7908 gmusicbrowser.pl:7916 gmusicbrowser.pl:7922
+#: gmusicbrowser.pl:7930 gmusicbrowser.pl:7940 gmusicbrowser.pl:7948
 msgid "contains %s"
 msgstr "tartalmazza %s"
 
@@ -4393,8 +4385,8 @@ msgstr ""
 msgid "days"
 msgstr "napok"
 
-#: gmusicbrowser.pl:997 gmusicbrowser_layout.pm:3758
-#: gmusicbrowser_layout.pm:3780
+#: gmusicbrowser.pl:997 gmusicbrowser_layout.pm:3727
+#: gmusicbrowser_layout.pm:3749
 msgid "default"
 msgstr "alapértelmezett"
 
@@ -4406,23 +4398,23 @@ msgstr "alapértelmezett fájlnév"
 msgid "default folder"
 msgstr "könyvtár törlése"
 
-#: layouts:555
+#: layouts:568
 msgid "default fullscreen"
 msgstr ""
 
-#: gmusicbrowser.pl:6739
+#: gmusicbrowser.pl:6781
 msgid "delete selected filter"
 msgstr "a kiválasztott szürő törlése"
 
-#: gmusicbrowser.pl:6745
+#: gmusicbrowser.pl:6787
 msgid "delete selected grouping"
 msgstr ""
 
-#: gmusicbrowser.pl:6743
+#: gmusicbrowser.pl:6785
 msgid "delete selected random mode"
 msgstr "a kiválasztott véletlen mód törlése"
 
-#: gmusicbrowser.pl:6741
+#: gmusicbrowser.pl:6783
 msgid "delete selected sort mode"
 msgstr "a kiválasztott rendezési mód törlése"
 
@@ -4430,7 +4422,7 @@ msgstr "a kiválasztott rendezési mód törlése"
 msgid "different folders"
 msgstr ""
 
-#: layouts:629
+#: layouts:642
 msgid "disc on the left side"
 msgstr ""
 
@@ -4438,15 +4430,15 @@ msgstr ""
 msgid "disc {disc}"
 msgstr ""
 
-#: gmusicbrowser.pl:7732 gmusicbrowser.pl:7740 gmusicbrowser.pl:7748
-#: gmusicbrowser.pl:7867 gmusicbrowser.pl:7875 gmusicbrowser.pl:7881
-#: gmusicbrowser.pl:7889 gmusicbrowser.pl:7899 gmusicbrowser.pl:7907
+#: gmusicbrowser.pl:7774 gmusicbrowser.pl:7782 gmusicbrowser.pl:7790
+#: gmusicbrowser.pl:7909 gmusicbrowser.pl:7917 gmusicbrowser.pl:7923
+#: gmusicbrowser.pl:7931 gmusicbrowser.pl:7941 gmusicbrowser.pl:7949
 msgid "doesn't contain %s"
 msgstr "nem tartalmazza %s"
 
-#: gmusicbrowser.pl:7736 gmusicbrowser.pl:7744 gmusicbrowser.pl:7752
-#: gmusicbrowser.pl:7885 gmusicbrowser.pl:7895 gmusicbrowser.pl:7903
-#: gmusicbrowser.pl:7911
+#: gmusicbrowser.pl:7778 gmusicbrowser.pl:7786 gmusicbrowser.pl:7794
+#: gmusicbrowser.pl:7927 gmusicbrowser.pl:7937 gmusicbrowser.pl:7945
+#: gmusicbrowser.pl:7953
 msgid "doesn't match regexp %r"
 msgstr ""
 
@@ -4482,19 +4474,19 @@ msgstr "hiba"
 msgid "events"
 msgstr ""
 
-#: gmusicbrowser.pl:7662
+#: gmusicbrowser.pl:7704
 msgid "ex :"
 msgstr ""
 
-#: gmusicbrowser.pl:7792 gmusicbrowser.pl:7799
+#: gmusicbrowser.pl:7834 gmusicbrowser.pl:7841
 msgid "exactly %n( times)"
 msgstr "pontosan %n -szer"
 
-#: gmusicbrowser.pl:7793 gmusicbrowser.pl:7800
+#: gmusicbrowser.pl:7835 gmusicbrowser.pl:7842
 msgid "exactly not %n( times)"
 msgstr "pontosan nem %n -szer"
 
-#: gmusicbrowser.pl:7680
+#: gmusicbrowser.pl:7722
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "példa (kiválasztott szám) : {score} ({chances})"
 
@@ -4502,11 +4494,11 @@ msgstr "példa (kiválasztott szám) : {score} ({chances})"
 msgid "example : "
 msgstr ""
 
-#: gmusicbrowser.pl:5646 plugins/webcontext.pm:603
+#: gmusicbrowser.pl:5688 plugins/webcontext.pm:603
 msgid "example : %s"
 msgstr ""
 
-#: gmusicbrowser.pl:5639
+#: gmusicbrowser.pl:5681
 msgid "examples :"
 msgstr ""
 
@@ -4522,15 +4514,15 @@ msgstr "hamis"
 msgid "favorite"
 msgstr ""
 
-#: gmusicbrowser.pl:7915
+#: gmusicbrowser.pl:7957
 msgid "file format"
 msgstr "fájl formátum"
 
-#: gmusicbrowser.pl:6919
+#: gmusicbrowser.pl:6961
 msgid "filters"
 msgstr ""
 
-#: gmusicbrowser.pl:7860
+#: gmusicbrowser.pl:7902
 msgid "first added"
 msgstr "elsőnek hozzáadott"
 
@@ -4542,11 +4534,11 @@ msgstr ""
 msgid "float"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1588
+#: gmusicbrowser_list.pm:1587
 msgid "font size depends on"
 msgstr ""
 
-#: gmusicbrowser.pl:5020
+#: gmusicbrowser.pl:5062
 msgid "for files without a VBR header"
 msgstr ""
 
@@ -4554,11 +4546,11 @@ msgstr ""
 msgid "front cover"
 msgstr "előlap borító"
 
-#: layouts:219
+#: layouts:232
 msgid "full"
 msgstr ""
 
-#: layouts:225
+#: layouts:238
 msgid "full with buttons"
 msgstr ""
 
@@ -4570,11 +4562,11 @@ msgstr ""
 msgid "google images (hi-res)"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1600
+#: gmusicbrowser_list.pm:1599
 msgid "group by"
 msgstr ""
 
-#: gmusicbrowser.pl:7622
+#: gmusicbrowser.pl:7664
 msgid "half-life : "
 msgstr ""
 
@@ -4582,11 +4574,11 @@ msgstr ""
 msgid "hours"
 msgstr "órák"
 
-#: gmusicbrowser_list.pm:1538
+#: gmusicbrowser_list.pm:1537
 msgid "huge size"
 msgstr ""
 
-#: gmusicbrowser.pl:5453
+#: gmusicbrowser.pl:5495
 msgid "icecast server"
 msgstr "icecast szerver"
 
@@ -4594,7 +4586,7 @@ msgstr "icecast szerver"
 msgid "id3v1 tag"
 msgstr ""
 
-#: gmusicbrowser.pl:5633
+#: gmusicbrowser.pl:5675
 msgid "ignore title"
 msgstr ""
 
@@ -4602,11 +4594,11 @@ msgstr ""
 msgid "illustration"
 msgstr "illusztráció"
 
-#: gmusicbrowser.pl:4852
+#: gmusicbrowser.pl:4894
 msgid "imported list"
 msgstr ""
 
-#: layouts:230
+#: layouts:243
 msgid "info"
 msgstr "információ"
 
@@ -4622,185 +4614,185 @@ msgstr ""
 msgid "invalid pattern"
 msgstr ""
 
-#: gmusicbrowser.pl:7570
+#: gmusicbrowser.pl:7612
 msgid "inverse"
 msgstr "ellenkező"
 
-#: gmusicbrowser.pl:7916
+#: gmusicbrowser.pl:7958
 msgid "is"
 msgstr "a(z)"
 
-#: gmusicbrowser.pl:7864
+#: gmusicbrowser.pl:7906
 msgid "is %g"
 msgstr "a(z) %g"
 
-#: gmusicbrowser.pl:7755 gmusicbrowser.pl:7761 gmusicbrowser.pl:7767
+#: gmusicbrowser.pl:7797 gmusicbrowser.pl:7803 gmusicbrowser.pl:7809
 msgid "is %n"
 msgstr "a(z) %n"
 
-#: gmusicbrowser.pl:7773
+#: gmusicbrowser.pl:7815
 msgid "is %n( %)"
 msgstr "a(z) %n( %)"
 
-#: gmusicbrowser.pl:7943
+#: gmusicbrowser.pl:7985
 msgid "is %n(Hz)"
 msgstr "a(z) %n(Hz)"
 
-#: gmusicbrowser.pl:7937
+#: gmusicbrowser.pl:7979
 msgid "is %n(kbps)"
 msgstr ""
 
-#: gmusicbrowser.pl:7733 gmusicbrowser.pl:7741 gmusicbrowser.pl:7749
-#: gmusicbrowser.pl:7882 gmusicbrowser.pl:7890 gmusicbrowser.pl:7900
-#: gmusicbrowser.pl:7908
+#: gmusicbrowser.pl:7775 gmusicbrowser.pl:7783 gmusicbrowser.pl:7791
+#: gmusicbrowser.pl:7924 gmusicbrowser.pl:7932 gmusicbrowser.pl:7942
+#: gmusicbrowser.pl:7950
 msgid "is %s"
 msgstr " a(z) %s"
 
-#: gmusicbrowser.pl:7758
+#: gmusicbrowser.pl:7800
 msgid "is after %n"
 msgstr "utánna %n"
 
-#: gmusicbrowser.pl:7757
+#: gmusicbrowser.pl:7799
 msgid "is before %n"
 msgstr "elötte %n"
 
-#: gmusicbrowser.pl:7787
+#: gmusicbrowser.pl:7829
 msgid "is between %b( and )%b"
 msgstr "%b( és )%b között"
 
-#: gmusicbrowser.pl:7777
+#: gmusicbrowser.pl:7819
 msgid "is between %n( and )%n( %)"
 msgstr "%n( és )%n %) között"
 
-#: gmusicbrowser.pl:7782
+#: gmusicbrowser.pl:7824
 msgid "is between %n( and )%n( s)"
 msgstr "%n( és )%n( s) között"
 
-#: gmusicbrowser.pl:7892
+#: gmusicbrowser.pl:7934
 msgid "is in %s"
 msgstr "a %s -on"
 
-#: gmusicbrowser.pl:7913
+#: gmusicbrowser.pl:7955
 msgid "is in list %l"
 msgstr "a %l listán"
 
-#: gmusicbrowser.pl:7786
+#: gmusicbrowser.pl:7828
 msgid "is less than %b"
 msgstr "kevesebb mint %b"
 
-#: gmusicbrowser.pl:7764 gmusicbrowser.pl:7770
+#: gmusicbrowser.pl:7806 gmusicbrowser.pl:7812
 msgid "is less than %n"
 msgstr "kevesebb mint %nn"
 
-#: gmusicbrowser.pl:7776
+#: gmusicbrowser.pl:7818
 msgid "is less than %n( %)"
 msgstr "kevesebb mint %n ( %)"
 
-#: gmusicbrowser.pl:7781
+#: gmusicbrowser.pl:7823
 msgid "is less than %n( s)"
 msgstr "kevesebb mint %n( s)"
 
-#: gmusicbrowser.pl:7946
+#: gmusicbrowser.pl:7988
 msgid "is less than %n(Hz)"
 msgstr "kevesebb mint %n(Hz)"
 
-#: gmusicbrowser.pl:7940
+#: gmusicbrowser.pl:7982
 msgid "is less than %n(kbps)"
 msgstr "kevesebb mint %n(kbps)"
 
-#: gmusicbrowser.pl:7785
+#: gmusicbrowser.pl:7827
 msgid "is more than %b"
 msgstr "több mint %b"
 
-#: gmusicbrowser.pl:7763 gmusicbrowser.pl:7769
+#: gmusicbrowser.pl:7805 gmusicbrowser.pl:7811
 msgid "is more than %n"
 msgstr "több mint %n"
 
-#: gmusicbrowser.pl:7775
+#: gmusicbrowser.pl:7817
 msgid "is more than %n( %)"
 msgstr "több mint %n( %)"
 
-#: gmusicbrowser.pl:7780
+#: gmusicbrowser.pl:7822
 msgid "is more than %n( s)"
 msgstr "több mint %n( s)"
 
-#: gmusicbrowser.pl:7945
+#: gmusicbrowser.pl:7987
 msgid "is more than %n(Hz)"
 msgstr "több mint %n(Hz)"
 
-#: gmusicbrowser.pl:7939
+#: gmusicbrowser.pl:7981
 msgid "is more than %n(kbps)"
 msgstr "több mint %n(kbps)"
 
-#: gmusicbrowser.pl:7926
+#: gmusicbrowser.pl:7968
 msgid "is not"
 msgstr "nem "
 
-#: gmusicbrowser.pl:7762 gmusicbrowser.pl:7768
+#: gmusicbrowser.pl:7804 gmusicbrowser.pl:7810
 msgid "is not %n"
 msgstr "nem %n"
 
-#: gmusicbrowser.pl:7774
+#: gmusicbrowser.pl:7816
 msgid "is not %n( %)"
 msgstr "nem %n( %)"
 
-#: gmusicbrowser.pl:7734 gmusicbrowser.pl:7742 gmusicbrowser.pl:7750
-#: gmusicbrowser.pl:7883 gmusicbrowser.pl:7891 gmusicbrowser.pl:7901
-#: gmusicbrowser.pl:7909
+#: gmusicbrowser.pl:7776 gmusicbrowser.pl:7784 gmusicbrowser.pl:7792
+#: gmusicbrowser.pl:7925 gmusicbrowser.pl:7933 gmusicbrowser.pl:7943
+#: gmusicbrowser.pl:7951
 msgid "is not %s"
 msgstr "nem %s"
 
-#: gmusicbrowser.pl:7947
+#: gmusicbrowser.pl:7989
 msgid "is not 44.1kHz"
 msgstr "nem 44.1kHz"
 
-#: gmusicbrowser.pl:7893
+#: gmusicbrowser.pl:7935
 msgid "is not in %s"
 msgstr "nincs %s -on"
 
-#: gmusicbrowser.pl:7914
+#: gmusicbrowser.pl:7956
 msgid "is not in list %l"
 msgstr "nincs a %l listán"
 
-#: gmusicbrowser.pl:7865
+#: gmusicbrowser.pl:7907
 msgid "isn't %g"
 msgstr ""
 
-#: gmusicbrowser.pl:7756
+#: gmusicbrowser.pl:7798
 msgid "isn't %n"
 msgstr "nem %n"
 
-#: gmusicbrowser.pl:7944
+#: gmusicbrowser.pl:7986
 msgid "isn't %n(Hz)"
 msgstr "nem %n(Hz)"
 
-#: gmusicbrowser.pl:7938
+#: gmusicbrowser.pl:7980
 msgid "isn't %n(kbps)"
 msgstr "nem %n(kbps)"
 
-#: gmusicbrowser.pl:5729
+#: gmusicbrowser.pl:5771
 msgid ""
 "itunes doesn't support unsynchronised tags last time I checked, mostly "
 "affect tags with pictures"
 msgstr ""
 
-#: layouts:302
+#: layouts:315
 msgid "itunes++"
 msgstr ""
 
-#: layouts:359
+#: layouts:372
 msgid "itunes-like"
 msgstr ""
 
-#: gmusicbrowser.pl:7859
+#: gmusicbrowser.pl:7901
 msgid "last added"
 msgstr "utoljára hozzá adott"
 
-#: gmusicbrowser.pl:7803 gmusicbrowser.pl:7851
+#: gmusicbrowser.pl:7845 gmusicbrowser.pl:7893
 msgid "last played"
 msgstr "utoljára lejátszott"
 
-#: gmusicbrowser.pl:7811 gmusicbrowser.pl:7855
+#: gmusicbrowser.pl:7853 gmusicbrowser.pl:7897
 msgid "last skipped"
 msgstr ""
 
@@ -4830,32 +4822,32 @@ msgstr ""
 msgid "leaflet page"
 msgstr ""
 
-#: layouts:545
+#: layouts:558
 msgid "left-side filter panes"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1552
+#: gmusicbrowser_list.pm:1551
 msgid "length of songs"
 msgstr ""
 
-#: gmusicbrowser.pl:7850
+#: gmusicbrowser.pl:7892
 msgid "less played"
 msgstr "legkevésbé játszott"
 
-#: gmusicbrowser.pl:7854
+#: gmusicbrowser.pl:7896
 msgid "less skipped"
 msgstr ""
 
-#: gmusicbrowser.pl:7804 gmusicbrowser.pl:7812 gmusicbrowser.pl:7820
-#: gmusicbrowser.pl:7828
+#: gmusicbrowser.pl:7846 gmusicbrowser.pl:7854 gmusicbrowser.pl:7862
+#: gmusicbrowser.pl:7870
 msgid "less than %a( ago)"
 msgstr ""
 
-#: gmusicbrowser.pl:7791 gmusicbrowser.pl:7798
+#: gmusicbrowser.pl:7833 gmusicbrowser.pl:7840
 msgid "less than %n( times)"
 msgstr ""
 
-#: gmusicbrowser.pl:7857
+#: gmusicbrowser.pl:7899
 msgid "longest"
 msgstr "leghosszabb"
 
@@ -4863,13 +4855,13 @@ msgstr "leghosszabb"
 msgid "lyricist"
 msgstr "dalszöveg író"
 
-#: gmusicbrowser.pl:7735 gmusicbrowser.pl:7743 gmusicbrowser.pl:7751
-#: gmusicbrowser.pl:7884 gmusicbrowser.pl:7894 gmusicbrowser.pl:7902
-#: gmusicbrowser.pl:7910
+#: gmusicbrowser.pl:7777 gmusicbrowser.pl:7785 gmusicbrowser.pl:7793
+#: gmusicbrowser.pl:7926 gmusicbrowser.pl:7936 gmusicbrowser.pl:7944
+#: gmusicbrowser.pl:7952
 msgid "match regexp %r"
 msgstr "megfelel a %r reguláris kifejezésnek"
 
-#: gmusicbrowser_list.pm:1594
+#: gmusicbrowser_list.pm:1593
 msgid "maximum font size"
 msgstr ""
 
@@ -4877,15 +4869,15 @@ msgstr ""
 msgid "media"
 msgstr "média"
 
-#: gmusicbrowser_list.pm:1531 gmusicbrowser_list.pm:1536
+#: gmusicbrowser_list.pm:1530 gmusicbrowser_list.pm:1535
 msgid "medium size"
 msgstr ""
 
-#: layouts:195
+#: layouts:208
 msgid "minimal"
 msgstr "minimális"
 
-#: gmusicbrowser_list.pm:1591
+#: gmusicbrowser_list.pm:1590
 msgid "minimum font size"
 msgstr ""
 
@@ -4893,11 +4885,11 @@ msgstr ""
 msgid "minutes"
 msgstr "percek"
 
-#: gmusicbrowser.pl:7819
+#: gmusicbrowser.pl:7861
 msgid "modified"
 msgstr "módosított"
 
-#: gmusicbrowser.pl:7923 gmusicbrowser.pl:7933
+#: gmusicbrowser.pl:7965 gmusicbrowser.pl:7975
 msgid "mono"
 msgstr "monó"
 
@@ -4909,28 +4901,28 @@ msgstr ""
 msgid "months"
 msgstr "hónapok"
 
-#: gmusicbrowser.pl:7805 gmusicbrowser.pl:7813 gmusicbrowser.pl:7821
-#: gmusicbrowser.pl:7829
+#: gmusicbrowser.pl:7847 gmusicbrowser.pl:7855 gmusicbrowser.pl:7863
+#: gmusicbrowser.pl:7871
 msgid "more than %a( ago)"
 msgstr "több mint %a( ago)"
 
-#: gmusicbrowser.pl:7790 gmusicbrowser.pl:7797
+#: gmusicbrowser.pl:7832 gmusicbrowser.pl:7839
 msgid "more than %n( times)"
 msgstr "több mint %n( alkalommal)"
 
-#: gmusicbrowser_list.pm:1610
+#: gmusicbrowser_list.pm:1609
 msgid "mosaic mode"
 msgstr ""
 
-#: gmusicbrowser.pl:7849
+#: gmusicbrowser.pl:7891
 msgid "most played"
 msgstr "legtöbbet játszott"
 
-#: gmusicbrowser.pl:7853
+#: gmusicbrowser.pl:7895
 msgid "most skipped"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1635
+#: gmusicbrowser_list.pm:1634
 msgid "move folder"
 msgstr "könyvtár mozgatása"
 
@@ -4946,19 +4938,19 @@ msgstr ""
 msgid "multi-lines string"
 msgstr ""
 
-#: gmusicbrowser.pl:6739
+#: gmusicbrowser.pl:6781
 msgid "name of the new filter"
 msgstr "az új szürő neve"
 
-#: gmusicbrowser.pl:6745
+#: gmusicbrowser.pl:6787
 msgid "name of the new grouping"
 msgstr ""
 
-#: gmusicbrowser.pl:6743
+#: gmusicbrowser.pl:6785
 msgid "name of the new random mode"
 msgstr "az új random mód neve"
 
-#: gmusicbrowser.pl:6741
+#: gmusicbrowser.pl:6783
 msgid "name of the new sort mode"
 msgstr "az új rendezési mód neve"
 
@@ -4979,27 +4971,27 @@ msgstr "nincs találat, esetleg törölni kéne pár keresési feltételt."
 msgid "no order"
 msgstr ""
 
-#: gmusicbrowser.pl:3844 gmusicbrowser.pl:3936
+#: gmusicbrowser.pl:3886 gmusicbrowser.pl:3978
 msgid "no picture"
 msgstr "nincs kép"
 
-#: gmusicbrowser_list.pm:1528
+#: gmusicbrowser_list.pm:1527
 msgid "no pictures"
 msgstr ""
 
-#: gmusicbrowser.pl:5320
+#: gmusicbrowser.pl:5362
 msgid "no plugins found"
 msgstr ""
 
-#: gmusicbrowser.pl:5623
+#: gmusicbrowser.pl:5665
 msgid "no splitting"
 msgstr ""
 
-#: gmusicbrowser.pl:4009
+#: gmusicbrowser.pl:4051
 msgid "no to all"
 msgstr "nem,mindegyikre"
 
-#: gmusicbrowser.pl:6774
+#: gmusicbrowser.pl:6816
 msgid "noname"
 msgstr "névtelen"
 
@@ -5015,28 +5007,28 @@ msgstr "normális lejátszás amikor a lejátszási sor üres"
 msgid "not bootleg"
 msgstr "nem bootleg"
 
-#: gmusicbrowser.pl:7852
+#: gmusicbrowser.pl:7894
 msgid "not played for the longest time"
 msgstr ""
 
-#: gmusicbrowser.pl:7856
+#: gmusicbrowser.pl:7898
 msgid "not skipped for the longest time"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1541
+#: gmusicbrowser_list.pm:1540
 msgid "number of songs"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1551
+#: gmusicbrowser_list.pm:1550
 msgid "number of songs in filter"
 msgstr ""
 
-#: gmusicbrowser.pl:7809 gmusicbrowser.pl:7817 gmusicbrowser.pl:7825
-#: gmusicbrowser.pl:7833
+#: gmusicbrowser.pl:7851 gmusicbrowser.pl:7859 gmusicbrowser.pl:7867
+#: gmusicbrowser.pl:7875
 msgid "on %d"
 msgstr "%d -on"
 
-#: gmusicbrowser_list.pm:1707
+#: gmusicbrowser_list.pm:1706
 msgid "only show entries with at least n songs"
 msgstr ""
 
@@ -5052,11 +5044,11 @@ msgstr ""
 msgid "open context window"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1708 gmusicbrowser_list.pm:5104
+#: gmusicbrowser_list.pm:1707 gmusicbrowser_list.pm:5089
 msgid "options"
 msgstr "opciók"
 
-#: gmusicbrowser.pl:5663
+#: gmusicbrowser.pl:5705
 msgid "or"
 msgstr ""
 
@@ -5068,7 +5060,7 @@ msgstr "másik"
 msgid "other file icon"
 msgstr "másik fájl ikon"
 
-#: gmusicbrowser.pl:5458 gmusicbrowser.pl:5465
+#: gmusicbrowser.pl:5500 gmusicbrowser.pl:5507
 msgid "output device :"
 msgstr "kimeneti eszköz :"
 
@@ -5080,15 +5072,15 @@ msgstr "jelszó :"
 msgid "perl code"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1584
+#: gmusicbrowser_list.pm:1583
 msgid "picture size"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1543
+#: gmusicbrowser_list.pm:1542
 msgid "play count average"
 msgstr ""
 
-#: gmusicbrowser.pl:7789
+#: gmusicbrowser.pl:7831
 msgid "played"
 msgstr "lejátszott"
 
@@ -5096,7 +5088,7 @@ msgstr "lejátszott"
 msgid "played>4"
 msgstr "lejátszott>4-szer"
 
-#: gmusicbrowser.pl:5488 gmusicbrowser.pl:5607
+#: gmusicbrowser.pl:5530 gmusicbrowser.pl:5649
 msgid "port :"
 msgstr ""
 
@@ -5116,7 +5108,7 @@ msgstr "kiszállás"
 msgid "quit when queue empty"
 msgstr "kiszállás, amikor a sor üressé válik"
 
-#: layouts:467
+#: layouts:480
 msgid "quodlibet-like"
 msgstr ""
 
@@ -5124,7 +5116,7 @@ msgstr ""
 msgid "rating"
 msgstr "értékelés"
 
-#: gmusicbrowser_list.pm:1542
+#: gmusicbrowser_list.pm:1541
 msgid "rating average"
 msgstr ""
 
@@ -5136,19 +5128,19 @@ msgstr ""
 msgid "reduced view"
 msgstr ""
 
-#: gmusicbrowser.pl:5612
+#: gmusicbrowser.pl:5654
 msgid "requires xdg-screensaver"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1703
+#: gmusicbrowser_list.pm:1702
 msgid "reset filter {nb}"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1701
+#: gmusicbrowser_list.pm:1700
 msgid "reset primary filter"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1702
+#: gmusicbrowser_list.pm:1701
 msgid "reset secondary filter"
 msgstr ""
 
@@ -5164,72 +5156,72 @@ msgstr ""
 msgid "rightmost pane"
 msgstr ""
 
-#: gmusicbrowser.pl:7942
+#: gmusicbrowser.pl:7984
 msgid "sampling rate"
 msgstr ""
 
-#: gmusicbrowser.pl:6756
+#: gmusicbrowser.pl:6798
 msgid "save as '{name}'"
 msgstr ""
 
-#: gmusicbrowser.pl:6739
+#: gmusicbrowser.pl:6781
 msgid "save filter as"
 msgstr ""
 
-#: gmusicbrowser.pl:6745
+#: gmusicbrowser.pl:6787
 msgid "save grouping as"
 msgstr ""
 
-#: gmusicbrowser.pl:6743
+#: gmusicbrowser.pl:6785
 msgid "save random mode as"
 msgstr ""
 
-#: gmusicbrowser.pl:6741
+#: gmusicbrowser.pl:6783
 msgid "save sort mode as"
 msgstr ""
 
-#: gmusicbrowser.pl:6738
+#: gmusicbrowser.pl:6780
 msgid "saved filters"
 msgstr ""
 
-#: gmusicbrowser.pl:6744
+#: gmusicbrowser.pl:6786
 msgid "saved groupings"
 msgstr ""
 
-#: gmusicbrowser.pl:6742
+#: gmusicbrowser.pl:6784
 msgid "saved random modes"
 msgstr ""
 
-#: gmusicbrowser.pl:6740
+#: gmusicbrowser.pl:6782
 msgid "saved sort modes"
 msgstr ""
 
-#: gmusicbrowser.pl:5850
+#: gmusicbrowser.pl:5892
 msgid "scan now"
 msgstr ""
 
-#: gmusicbrowser.pl:704 gmusicbrowser.pl:5663 plugins/lullaby.pm:44
+#: gmusicbrowser.pl:704 gmusicbrowser.pl:5705 plugins/lullaby.pm:44
 #: plugins/notify.pm:53
 msgid "seconds"
 msgstr ""
 
-#: layouts:108
+#: layouts:121
 msgid "shimmer"
 msgstr ""
 
-#: layouts:202
+#: layouts:215
 msgid "shimmer_tray"
 msgstr ""
 
-#: gmusicbrowser.pl:7858
+#: gmusicbrowser.pl:7900
 msgid "shortest"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1570
+#: gmusicbrowser_list.pm:1569
 msgid "show pictures"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1582
+#: gmusicbrowser_list.pm:1581
 msgid "show the 'All' row"
 msgstr ""
 
@@ -5241,31 +5233,31 @@ msgstr ""
 msgid "similar"
 msgstr ""
 
-#: gmusicbrowser_list.pm:7373
+#: gmusicbrowser_list.pm:7348
 msgid "skin options"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1544
+#: gmusicbrowser_list.pm:1543
 msgid "skip count average"
 msgstr ""
 
-#: gmusicbrowser.pl:7796
+#: gmusicbrowser.pl:7838
 msgid "skipped"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1530 gmusicbrowser_list.pm:1535
+#: gmusicbrowser_list.pm:1529 gmusicbrowser_list.pm:1534
 msgid "small size"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1598
+#: gmusicbrowser_list.pm:1597
 msgid "sort by"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:197 gmusicbrowser_layout.pm:200
+#: gmusicbrowser_layout.pm:173 gmusicbrowser_layout.pm:176
 msgid "static list"
 msgstr ""
 
-#: gmusicbrowser.pl:7924 gmusicbrowser.pl:7934
+#: gmusicbrowser.pl:7966 gmusicbrowser.pl:7976
 msgid "stereo"
 msgstr "sztereó"
 
@@ -5281,15 +5273,15 @@ msgstr "leáll,mikor a sor üres"
 msgid "string"
 msgstr ""
 
-#: gmusicbrowser.pl:5526
+#: gmusicbrowser.pl:5568
 msgid "supports : "
 msgstr ""
 
-#: gmusicbrowser_list.pm:1573
+#: gmusicbrowser_list.pm:1572
 msgid "text format"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1579
+#: gmusicbrowser_list.pm:1578
 msgid "text mode"
 msgstr ""
 
@@ -5297,7 +5289,7 @@ msgstr ""
 msgid "the command {name}"
 msgstr ""
 
-#: gmusicbrowser.pl:5728
+#: gmusicbrowser.pl:5770
 msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
 msgstr "az alapértelmezett utf16 az ID3v2.3 és utf8 az ID3v2.4 tageknél"
 
@@ -5309,7 +5301,7 @@ msgstr ""
 msgid "the {name} perl module"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:223
+#: gmusicbrowser_layout.pm:194
 msgid "then {action}"
 msgstr "akkor {action}"
 
@@ -5317,11 +5309,11 @@ msgstr "akkor {action}"
 msgid "times"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1705
+#: gmusicbrowser_list.pm:1704
 msgid "toggle Intersection mode"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1706
+#: gmusicbrowser_list.pm:1705
 msgid "toggle Invert mode"
 msgstr ""
 
@@ -5349,7 +5341,7 @@ msgstr ""
 msgid "unknown error"
 msgstr "ismeretlen hiba"
 
-#: gmusicbrowser.pl:2759 gmusicbrowser_layout.pm:1375
+#: gmusicbrowser.pl:2759 gmusicbrowser_layout.pm:1334
 msgid "unnamed random mode"
 msgstr ""
 
@@ -5386,7 +5378,7 @@ msgstr ""
 msgid "use song folder"
 msgstr ""
 
-#: gmusicbrowser.pl:5639
+#: gmusicbrowser.pl:5681
 msgid "use standard strftime variables"
 msgstr ""
 
@@ -5394,7 +5386,7 @@ msgstr ""
 msgid "username :"
 msgstr "felhasználói név :"
 
-#: gmusicbrowser_list.pm:7350
+#: gmusicbrowser_list.pm:7325
 msgid "using skin :"
 msgstr ""
 
@@ -5410,7 +5402,7 @@ msgstr "várjon többre,mikor a sor üres"
 msgid "weeks"
 msgstr "hetek"
 
-#: gmusicbrowser.pl:7632
+#: gmusicbrowser.pl:7674
 msgid "weight :"
 msgstr "súly :"
 
@@ -5418,47 +5410,47 @@ msgstr "súly :"
 msgid "wikipedia, lyrics, and custom webpages"
 msgstr ""
 
-#: layouts:243
+#: layouts:256
 msgid "with browser"
 msgstr ""
 
-#: layouts:460
+#: layouts:473
 msgid "with browser & queue"
 msgstr ""
 
-#: layouts:265
+#: layouts:278
 msgid "with browser (SongTree)"
 msgstr ""
 
-#: layouts:542
+#: layouts:555
 msgid "with context"
 msgstr ""
 
-#: layouts:651
+#: layouts:664
 msgid "with picture"
 msgstr ""
 
-#: layouts:394
+#: layouts:407
 msgid "with playlist"
 msgstr "lejátszási listával"
 
-#: layouts:489
+#: layouts:502
 msgid "with playlist & context"
 msgstr ""
 
-#: layouts:189
+#: layouts:202
 msgid "with queue"
 msgstr "lejátszási sorral"
 
-#: layouts:390
+#: layouts:403
 msgid "with search"
 msgstr "kereséssel"
 
-#: layouts:494
+#: layouts:507
 msgid "with tabbedlists"
 msgstr ""
 
-#: gmusicbrowser.pl:5487
+#: gmusicbrowser.pl:5529
 msgid ""
 "without gstreamer : one stream per file, one connection at a time\n"
 "with gstreamer : one continuous stream, multiple connection possible"
@@ -5472,11 +5464,11 @@ msgstr ""
 msgid "y offset :"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1548 gmusicbrowser_songs.pm:21
+#: gmusicbrowser_list.pm:1547 gmusicbrowser_songs.pm:21
 msgid "year"
 msgstr ""
 
-#: gmusicbrowser_list.pm:1549
+#: gmusicbrowser_list.pm:1548
 msgid "year (highest)"
 msgstr ""
 
@@ -5484,17 +5476,17 @@ msgstr ""
 msgid "years"
 msgstr "évek"
 
-#: gmusicbrowser.pl:4008
+#: gmusicbrowser.pl:4050
 msgid "yes to all"
 msgstr "Igen, mindegyik kérdésre"
 
-#: gmusicbrowser_layout.pm:607
+#: gmusicbrowser_layout.pm:566
 msgid ""
 "{album}\n"
 "<small>by</small> {artist}"
 msgstr ""
 
-#: gmusicbrowser.pl:5762
+#: gmusicbrowser.pl:5804
 msgid "{folder} already exists"
 msgstr ""
 
@@ -5522,7 +5514,7 @@ msgstr "{min}p:{sec}mp ({size} MB)"
 msgid "{min}m{sec}s"
 msgstr "{min}p:{sec}mp"
 
-#: gmusicbrowser.pl:5540
+#: gmusicbrowser.pl:5582
 msgid "{outputname} output settings"
 msgstr ""
 
@@ -5530,14 +5522,14 @@ msgstr ""
 msgid "{songs} by {artists}"
 msgstr "{songs} {artists} -tól"
 
-#: gmusicbrowser.pl:6674
+#: gmusicbrowser.pl:6716
 msgid ""
 "{song}\n"
 "by {artist}\n"
 "from {album}"
 msgstr ""
 
-#: gmusicbrowser.pl:3064 gmusicbrowser_layout.pm:282
+#: gmusicbrowser.pl:3106 gmusicbrowser_layout.pm:252
 #: plugins/audioscrobbler.pm:186 plugins/audioscrobbler.pm:192
 msgid "{song} by {artist}"
 msgstr "{song} {artist} -tól"

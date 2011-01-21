@@ -100,7 +100,20 @@ VBmain  = _HBPics -HBReplayButtons
     HBReplayButtons = Prev(size=menu) Play(size=menu) Next(size=menu) 20VSeparator 5_TimeBar(text="%t by %a (%m)",minwidth=240) 10-Stars
 
 HBPics = _HBCover
-    HBCover = _Cover(overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0)
+    HBCover = _Cover(click1="",overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0)
+
+KeyBindings	= Escape CloseWindow
+VolumeScroll	= VBmain
+
+[Arkanoid Fullscreen with queue]
+Type=F
+Window  = fullscreen=1,sticky=0
+VBmain  = _HPContent -HBReplayButtons
+    HBReplayButtons = Prev(size=menu) Play(size=menu) Next(size=menu) 20VSeparator 5_TimeBar(text="%t by %a (%m)",minwidth=240) 10-Stars
+
+    HPContent = HBCover HBQueueList
+        HBCover = _Cover(click1="",overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0)
+        HBQueueList = _QueueList
 
 KeyBindings	= Escape CloseWindow
 VolumeScroll	= VBmain
