@@ -1032,7 +1032,7 @@ sub NewWidget
 	my %options= (group=>'', %$ref, %$opt1, %$opt2, name=>$namefull, %$global_opt);
 	my $group= $options{group};		#FIXME make undef group means parent's group ?
 	my $defaultgroup= $options{default_group} || 'default_group';
-	$options{group}= $defaultgroup.(length $group ? "-$group" : '') unless $group=~m/^[A-Z]/;	#group local to window unless it begins with uppercase
+	$options{group}= $defaultgroup.($group=~m/^\w/ ? '-' : '').$group unless $group=~m/^[A-Z]/;	#group local to window unless it begins with uppercase
 	my $widget= $ref->{class}
 		? $ref->{class}->new(\%options,$ref)
 		: $ref->{New}(\%options);
