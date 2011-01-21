@@ -46,9 +46,9 @@ VBMain = HPControlsInfoAndSearch _HPContent
 
     HPControlsInfoAndSearch = _HPfpSongInfo_Search VBControls
         VBControls = _Filler16 HBControls _Filler17
-            # HBControls =  -MBmain -MBLayoutSettings -HBVolume -Fullscreen(size=button) -ToggleButton1(relief=none,size=button,tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
+            # HBControls =  -MBmain -MBLayoutSettings -HBVolume -Fullscreen(size=button) -ToggleButton1(relief=none,size=button,tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch|HBSongTreeStats)
             # HBControls =  -MBmain -MBLayoutSettings -HBVolume -Fullscreen(size=button)
-            HBControls = -MBmain -HBVolume -Fullscreen(size=button) -TogButton(tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch)
+            HBControls = -MBmain -HBVolume -Fullscreen(size=button) -TogButton(tip=_"reduced view",icon=gtk-zoom-in,widget=VBSavedFilterPane|VPfp0|HBSearch|HBSongTreeStats)
 
         HBVolume = VolumeIcon(button=1)
 
