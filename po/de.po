@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9621\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-20 17:51+0100\n"
+"POT-Creation-Date: 2011-01-20 21:36+0100\n"
 "PO-Revision-Date: 2010-02-22 21:01+0100\n"
 "Last-Translator:  <staubi@linuxmail.org>\n"
 "Language-Team: german <de@li.org>\n"
@@ -507,7 +507,7 @@ msgstr "Album und Künstler auf der linken Seite"
 msgid "Album artist"
 msgstr "Album Künstler"
 
-#: layouts:72
+#: layouts:73
 msgid "Album cover"
 msgstr "Album Cover"
 
@@ -669,7 +669,7 @@ msgstr "Dimension des Künstlerbildes"
 msgid "Artist URL"
 msgstr "Künstler URL"
 
-#: layouts:73
+#: layouts:74
 msgid "Artist and album modifier (leftmost pane)"
 msgstr "Alben -bzw. Künstlerspezifische Funktionen (Bereich ganz links)"
 
@@ -1077,7 +1077,7 @@ msgstr "Verbinde über einen Proxyserver"
 msgid "Connections from :"
 msgstr "Verbindungen von:"
 
-#: layouts:39 layouts:78 layouts:169 layouts:332 layouts:434 layouts:506
+#: layouts:40 layouts:79 layouts:169 layouts:332 layouts:434 layouts:506
 #: layouts:512 layouts:536 layouts:598
 msgid "Context"
 msgstr "Kontext"
@@ -1533,7 +1533,8 @@ msgstr "Exportiere zu M3U-Datei"
 msgid ""
 "Extends Picture finder plugin by adding menu entries to song context menu "
 "for fetching/setting album cover."
-msgstr ""
+msgstr "Erweitert die Bildersuche durch das Hinzufügen von Einträgen im "
+"Kontextmenü eines Titels für die Suche bzw. Auswahl eines Albencovers."
 
 #: gmusicbrowser_gstreamer-0.10.pm:451
 msgid "Extra gain"
@@ -1745,7 +1746,7 @@ msgstr ""
 msgid "Genre"
 msgstr "Genre"
 
-#: layouts:71
+#: layouts:72
 msgid "Genre and Year"
 msgstr "Genre und Jahr"
 
@@ -1997,7 +1998,7 @@ msgstr "Mindeste Ähnlichkeit der Künstler um als ähnlich gelistet zu werden:"
 msgid "Limit similar artists to the first : "
 msgstr "Schränke ähnliche Künstler auf diese Anzahl ein:"
 
-#: gmusicbrowser_list.pm:1513 layouts:39
+#: gmusicbrowser_list.pm:1513 layouts:40
 msgid "List"
 msgstr "Liste"
 
@@ -2092,7 +2093,7 @@ msgstr "Bei Google suchen"
 msgid "Lower left"
 msgstr "Unten links"
 
-#: layouts:74
+#: layouts:75
 msgid "Lower left filter pane"
 msgstr "Filter, ganz links unten"
 
@@ -2599,19 +2600,19 @@ msgstr "Bildzwischenspeicher"
 
 #: plugins/fetch_cover.pm:9
 msgid "Picture finder"
-msgstr "Coversuche"
+msgstr "Bildersuche"
 
 #: plugins/fetchcover_songmenu.pm:2
 msgid "Picture finder in song menu"
-msgstr ""
+msgstr "Suche nach Bildern im Kontextmenü eines Titels."
 
 #: plugins/fetchcover_songmenu.pm:3
 msgid "Picture finder in song menu plugin"
-msgstr ""
+msgstr "Bildersuche im Kontextmenü-Erweiterung"
 
 #: plugins/fetch_cover.pm:10
 msgid "Picture finder plugin"
-msgstr "Cover-Such-Erweiterung"
+msgstr "Bildersuche-Erweiterung"
 
 #: plugins/notify.pm:52
 msgid "Picture size :"
@@ -2786,7 +2787,7 @@ msgstr "Taste oder Tastenkombination drücken"
 msgid "Previous"
 msgstr "Vorheriges"
 
-#: gmusicbrowser.pl:1015 layouts:55
+#: gmusicbrowser.pl:1015 layouts:56
 msgid "Previous Song"
 msgstr "Vorheriger Titel"
 
@@ -2837,8 +2838,8 @@ msgid "Publisher/Studio logotype"
 msgstr "Herausgeber/Studio Logoart"
 
 #: gmusicbrowser.pl:2409 gmusicbrowser_layout.pm:225
-#: gmusicbrowser_layout.pm:442 gmusicbrowser_layout.pm:534 layouts:39
-#: layouts:79 layouts:332 layouts:364 layouts:422
+#: gmusicbrowser_layout.pm:442 gmusicbrowser_layout.pm:534 layouts:40
+#: layouts:80 layouts:332 layouts:364 layouts:422
 msgid "Queue"
 msgstr "Warteliste"
 
@@ -3178,7 +3179,7 @@ msgstr "Rufe Perl-Code auf"
 msgid "Run system command"
 msgstr "Rufe System-Befehl auf"
 
-#: layouts:69
+#: layouts:70
 msgid "S/H"
 msgstr "S/H"
 
@@ -3344,7 +3345,7 @@ msgstr "Suche Label"
 
 #: plugins/fetch_cover.pm:45
 msgid "Search Picture"
-msgstr ""
+msgstr "Im Internet nach einem Bild suchen"
 
 #: gmusicbrowser_list.pm:3365
 msgid "Search Title"
@@ -3408,7 +3409,7 @@ msgstr "Suche mit Google nach dem Künstler"
 
 #: plugins/artistinfo.pm:46
 msgid "Search on the web"
-msgstr ""
+msgstr "Suche im Internet"
 
 #: gmusicbrowser_list.pm:3403
 msgid "Search options"
@@ -3591,7 +3592,7 @@ msgstr "Benachrichtigung bei Titelwechsel anzeigen"
 msgid "Show/Hide"
 msgstr "Anzeigen/Ausblenden"
 
-#: layouts:69
+#: layouts:70
 msgid "Show/Hide elements"
 msgstr "Zeige/Verstecke Elemente"
 
@@ -5214,7 +5215,7 @@ msgstr "Port:"
 msgid "pre-amp"
 msgstr "Vorverstärkung"
 
-#: layouts:77
+#: layouts:78
 msgid "queue, context and lists"
 msgstr "Warteschlange, Kontext und Listen"
 
@@ -5242,7 +5243,7 @@ msgstr "Durchschnittliche Bewertung"
 msgid "recording location"
 msgstr "Aufnahmeort"
 
-#: layouts:49 layouts:51 layouts:70
+#: layouts:50 layouts:52 layouts:71
 msgid "reduced view"
 msgstr "Reduzierte Ansicht ein/ausschalten"
 
@@ -5270,7 +5271,7 @@ msgstr "Erneut versuchen"
 msgid "retry in {seconds} s"
 msgstr "Versuche erneut in {seconds} s"
 
-#: layouts:80
+#: layouts:81
 msgid "rightmost pane"
 msgstr "Gesamter rechter Bereich (Kontext, Warteliste, ...)"
 
@@ -5343,7 +5344,7 @@ msgstr "Bilder anzeigen"
 msgid "show the 'All' row"
 msgstr "Zeige die 'Alle' Reihe"
 
-#: layouts:56
+#: layouts:57
 msgid "show/hide album cover"
 msgstr "verstecke/zeige Albencover"
 
@@ -5932,3 +5933,4 @@ msgstr "|-getrennte Liste von Widgetnamen"
 
 #~ msgid "{command} is needed to play this file."
 #~ msgstr "{command} ist benötigt um diese Datei abzuspielen."
+
