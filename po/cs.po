@@ -1,19 +1,20 @@
 #
-# Vašek Kovářík <L3D9Z6@seznam.cz>, 2010.
+# Vašek Kovářík <L3D9Z6@seznam.cz>, 2010, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-20 21:48+0100\n"
-"PO-Revision-Date: 2010-12-18 04:41+0100\n"
+"POT-Creation-Date: 2011-01-19 19:22+0100\n"
+"PO-Revision-Date: 2011-01-20 21:07+0100\n"
 "Last-Translator: Vašek Kovářík <L3D9Z6@seznam.cz>\n"
-"Language-Team: Czech\n"
-"Language: cs\n"
+"Language-Team: čeština <L3D9Z6@seznam.cz>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"\n"
+"Language: cs\n"
 
 #: plugins/artistinfo.pm:451
 msgid ""
@@ -510,16 +511,12 @@ msgstr ""
 msgid "Album"
 msgstr "Album"
 
-#: layouts:803
 msgid "Album and artist"
-msgstr ""
+msgstr "Album a interpret"
 
-#: layouts:718
 msgid "Album and artist on the left side"
-msgstr ""
+msgstr "Album a interpret na levé straně"
 
-#: gmusicbrowser_songs.pm:524 gmusicbrowser_songs.pm:532
-#: gmusicbrowser_tags.pm:1530 gmusicbrowser_tags.pm:1617
 msgid "Album artist"
 msgstr "Interpret alba"
 
@@ -838,11 +835,9 @@ msgstr "Tlačítka"
 msgid "Buttons, Song & Cover"
 msgstr "Tlačítka, skladba & přebal"
 
-#: gmusicbrowser.pl:1063
 msgid "Can be relative by using + or -"
-msgstr ""
+msgstr "Při použití + nebo - může být relativní"
 
-#: gmusicbrowser_server.pm:73
 msgid "Can't change the volume in non-gstreamer iceserver mode"
 msgstr "Nelze změnit hlasitost v non-gstreamer režimu iceserveru"
 
@@ -1913,9 +1908,8 @@ msgstr "Značka/vydavatel"
 msgid "Labels"
 msgstr "Štítky"
 
-#: gmusicbrowser_list.pm:744 layouts:755
 msgid "Labels' icons"
-msgstr ""
+msgstr "Ikony štítků"
 
 #: gmusicbrowser_tags.pm:2031 gmusicbrowser_tags.pm:2055
 msgid "Lang"
@@ -2707,7 +2701,6 @@ msgstr "Styl přehrávače :"
 msgid "Playing"
 msgstr "Přehrávání"
 
-#: gmusicbrowser_list.pm:2937
 msgid "Playing Album"
 msgstr "Přehrávání alba"
 
@@ -2723,11 +2716,9 @@ msgstr "Přehrávání filtru"
 msgid "Playing Title"
 msgstr "Přehrávání titulu"
 
-#: gmusicbrowser_list.pm:737 layouts:750
 msgid "Playing and queue icons"
-msgstr ""
+msgstr "Ikony přehrávání a fronty"
 
-#: gmusicbrowser.pl:2154
 msgid "Playing error : {error}"
 msgstr "Chyba přehrávání : {error}"
 
@@ -3398,11 +3389,6 @@ msgstr "Vyhledat interpreta na stránkách youtube"
 msgid "Search for a picture on internet"
 msgstr "Vyhledat obrázek na internetu"
 
-#: plugins/artistinfo.pm:280
-msgid "Search for artist on:"
-msgstr ""
-
-#: plugins/fetch_cover.pm:96
 msgid "Search for current album"
 msgstr "Vyhledat stávající album"
 
@@ -3646,23 +3632,9 @@ msgstr "Zamíchaná alba, zamíchané stopy"
 msgid "Shutdown command :"
 msgstr "Příkaz pro vypnutí :"
 
-#: plugins/epicrating.pm:474
-msgid "Signal: "
-msgstr ""
-
-#: layouts:695
 msgid "Simple title"
-msgstr ""
+msgstr "Jednoduchý název"
 
-#: layouts:702
-msgid "Simple title without any"
-msgstr ""
-
-#: plugins/audioscrobbler.pm:64
-msgid "Site :"
-msgstr ""
-
-#: gmusicbrowser.pl:7784 gmusicbrowser_songs.pm:455
 msgid "Size"
 msgstr "Velikost"
 
@@ -3674,11 +3646,9 @@ msgstr "Přeskočit počet"
 msgid "Skip to next song if an error occurs"
 msgstr "Při chybě přeskočit na další skladbu"
 
-#: layouts:778
 msgid "Small album picture"
-msgstr ""
+msgstr "Malý obrázek alba"
 
-#: layouts:175
 msgid "Small player"
 msgstr "Malý přehrávač"
 
@@ -3878,15 +3848,12 @@ msgstr "Časová rozteč slábnutí ve vteřinách"
 msgid "Title"
 msgstr "Název"
 
-#: layouts:769
 msgid "Title & icon"
-msgstr ""
+msgstr "Název a ikona"
 
-#: layouts:727
 msgid "Title & progress"
-msgstr ""
+msgstr "Název a stav"
 
-#: gmusicbrowser_list.pm:731 layouts:761
 msgid "Title - Artist - Album"
 msgstr "Název - Interpret - Album"
 
@@ -4139,11 +4106,9 @@ msgstr ""
 "Pozor : toto jsou pokročilé volby, neměňte je, pokud si nejste jisti tím, co "
 "děláte."
 
-#: gmusicbrowser.pl:6212
 msgid "Warning : using a folder with invalid encoding, you should rename it."
-msgstr ""
+msgstr "Upozornění : složka má chybné kódování, měli byste ji přejmenovat."
 
-#: gmusicbrowser_songs.pm:2119
 msgid "Warning: all existing data for this field will be lost"
 msgstr "Pozor: všechna existující data pro toto pole budou ztracena"
 
@@ -4641,11 +4606,9 @@ msgstr "oblíbené"
 msgid "file format"
 msgstr "formát souboru"
 
-#: gmusicbrowser.pl:6919
 msgid "filters"
-msgstr ""
+msgstr "Filtry"
 
-#: gmusicbrowser.pl:7860
 msgid "first added"
 msgstr "prvně přidáno"
 
@@ -4677,15 +4640,12 @@ msgstr "úplné"
 msgid "full with buttons"
 msgstr "úplné s tlačítky"
 
-#: plugins/fetch_cover.pm:34
 msgid "google images"
-msgstr ""
+msgstr "obrázky z googlu"
 
-#: plugins/fetch_cover.pm:35
 msgid "google images (hi-res)"
-msgstr ""
+msgstr "obrázky z googlu ve vysokém rozlišení"
 
-#: gmusicbrowser_list.pm:1600
 msgid "group by"
 msgstr "seskupit s"
 
@@ -5551,11 +5511,9 @@ msgstr "s prohlížečem (strom skladeb)"
 msgid "with context"
 msgstr "s kontextem"
 
-#: layouts:651
 msgid "with picture"
-msgstr ""
+msgstr "s obrázkem"
 
-#: layouts:394
 msgid "with playlist"
 msgstr "s playlistem"
 
@@ -5689,9 +5647,6 @@ msgstr "|-oddělený seznam názvů pomůcek"
 #~ msgid "Search for artist on the web:"
 #~ msgstr "Vyhledat interpreta na stránkách :"
 
-#~ msgid "Search the web for artist"
-#~ msgstr "Vyhledat interpreta na internetu"
-
 #~ msgid "Split artist names on (needs restart) :"
 #~ msgstr "Rozdělit název interpreta na (vyžaduje restart) :"
 
@@ -5709,3 +5664,4 @@ msgstr "|-oddělený seznam názvů pomůcek"
 
 #~ msgid "web"
 #~ msgstr "internet"
+
