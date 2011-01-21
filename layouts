@@ -2,6 +2,7 @@
 Type=G+
 Default     = Window(size=1120x820)
 Title		= _"%t - gmusicbrowser"
+DefaultFocus    = SimpleSearch
 
 KeyBindings = c-k SetFocusOn(SimpleSearch) c-space GoToCurrentSong
 
@@ -117,6 +118,20 @@ VBmain  = _HPContent -HBReplayButtons
 
 KeyBindings	= Escape CloseWindow
 VolumeScroll	= VBmain
+
+[Arkanoid browser]
+Type=B
+Default = Window(size=1024x600)
+VBmain  = HBStatus _VBTreeAndInfo
+    HBStatus = FilterBox 10MBlist ResetFilter Refresh PlayFilter FilterLock -Total
+        MBlist = HistItem LSortItem PlayItem
+    VBTreeAndInfo = _HPLists HBArtistAlbumBox
+        HPLists = SongTree(group=1) SongTree2(group=1:album)
+        HBArtistAlbumBox = _FRArtist _FRAlbum
+            FRArtist = (label=_"Artist Info") VBArtist
+                VBArtist = ArtistPic ArtistBox
+            FRAlbum = (label=_"Album Info") VBAlbum
+                VBAlbum = Cover AlbumBox
 
 [shimmer]
 Type=G
