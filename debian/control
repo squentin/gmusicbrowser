@@ -9,7 +9,7 @@ Standards-Version: 3.7.3
 Package: gmusicbrowser
 Architecture: all
 Depends: perl, libgtk2-perl, libgtk2.0-0 (>= 2.6)
-Recommends: liblocale-gettext-perl (>= 1.04), libnet-dbus-perl, libgtk2-trayicon-perl, libgstreamer-perl, libdigest-crc-perl, libcairo-perl
+Recommends: liblocale-gettext-perl (>= 1.04), libnet-dbus-perl, libgtk2-trayicon-perl, libgstreamer-perl, libdigest-crc-perl, libcairo-perl, libhtml-parser-perl
 Suggests: mplayer, mpg321, vorbis-tools, alsa-utils, libgtk2-mozembed-perl, libgstreamer-interfaces-perl, libgtk2-notify-perl, libgnome2-wnck-perl
 Description: jukebox for large collections of mp3/ogg/flac/mpc files
  Uses GStreamer, mpg321/ogg123/flac123 or mplayer for playback. It has easy
