@@ -296,7 +296,7 @@ sub CreateSearchMenu {
 			if ($key eq "lastfm" && $lastfm_url) { $url='http://'.$lastfm_url; }
 			else { $url=~s/%a/$artist/; }
 			my $menuitem = Gtk2::ImageMenuItem->new ($key);
-			$menuitem->set_image( Gtk2::Image->new_from_stock('webcontext-'.$key,'menu') );
+			$menuitem->set_image( Gtk2::Image->new_from_stock('plugin-artistinfo-'.$key,'menu') );
 			$menuitem->signal_connect(activate => sub { ::main::openurl($url) if $url; return 0; });
 			$menu->append($menuitem);
 		}
