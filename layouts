@@ -41,7 +41,7 @@ VBMain = HPControlsInfoAndSearch _HPContent
                      VBSongTreeAndProgress = 10_HBSongTree VProgress
 
 
-        VBTabbedLists = 10_TabbedLists(group=1,page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo')
+        VBTabbedLists = _TabbedLists(group=1,page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo')
 
 
     HPControlsInfoAndSearch = _HPfpSongInfo_Search VBControls
