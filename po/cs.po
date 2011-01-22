@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-21 18:00+0100\n"
+"POT-Creation-Date: 2011-01-21 21:01+0100\n"
 "PO-Revision-Date: 2011-01-20 21:07+0100\n"
 "Last-Translator: Vašek Kovářík <L3D9Z6@seznam.cz>\n"
 "Language-Team: čeština <L3D9Z6@seznam.cz>\n"
@@ -282,7 +282,7 @@ msgstr ""
 msgid "1 chance in {probability}"
 msgstr "1 možnost v {probability}"
 
-#: layouts:324
+#: layouts:307
 msgid "3 Filter panes"
 msgstr "3 okna filtru"
 
@@ -494,19 +494,19 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:431 layouts:534 layouts:540 layouts:976
+#: plugins/fetch_cover.pm:103 layouts:414 layouts:517 layouts:523 layouts:959
 msgid "Album"
 msgstr "Album"
 
-#: layouts:130
+#: layouts:116
 msgid "Album Info"
 msgstr ""
 
-#: layouts:831
+#: layouts:814
 msgid "Album and artist"
 msgstr "Album a interpret"
 
-#: layouts:746
+#: layouts:729
 msgid "Album and artist on the left side"
 msgstr "Album a interpret na levé straně"
 
@@ -514,10 +514,6 @@ msgstr "Album a interpret na levé straně"
 #: gmusicbrowser_tags.pm:1530 gmusicbrowser_tags.pm:1617
 msgid "Album artist"
 msgstr "Interpret alba"
-
-#: layouts:74
-msgid "Album cover"
-msgstr ""
 
 #: gmusicbrowser_songs.pm:758
 msgid "Album gain"
@@ -650,15 +646,15 @@ msgstr "Argumenty"
 msgid "Arkanoid"
 msgstr ""
 
-#: layouts:97
+#: layouts:80
 msgid "Arkanoid Fullscreen"
 msgstr ""
 
-#: layouts:109
+#: layouts:92
 msgid "Arkanoid Fullscreen with queue"
 msgstr ""
 
-#: layouts:122
+#: layouts:105
 msgid "Arkanoid browser"
 msgstr ""
 
@@ -666,7 +662,7 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
 #: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:129
-#: plugins/fetch_cover.pm:102 layouts:431 layouts:534 layouts:540
+#: plugins/fetch_cover.pm:102 layouts:414 layouts:517 layouts:523
 msgid "Artist"
 msgstr "Interpret"
 
@@ -674,7 +670,7 @@ msgstr "Interpret"
 msgid "Artist & album"
 msgstr "Interpret & album"
 
-#: layouts:130
+#: layouts:114
 msgid "Artist Info"
 msgstr ""
 
@@ -685,10 +681,6 @@ msgstr "Velikost obrázku interpreta :"
 #: gmusicbrowser_tags.pm:1542
 msgid "Artist URL"
 msgstr "URL interpreta"
-
-#: layouts:75
-msgid "Artist and album modifier (leftmost pane)"
-msgstr ""
 
 #: gmusicbrowser_list.pm:759 gmusicbrowser_songs.pm:516
 msgid "Artist picture"
@@ -822,7 +814,7 @@ msgstr "Tělo zprávy :"
 msgid "Body text is not supported by current notification daemon"
 msgstr "Text těla není podporován stávajícím notifikačním démonem"
 
-#: layouts:296
+#: layouts:279
 msgid "Browser"
 msgstr "Prohlížeč"
 
@@ -830,15 +822,15 @@ msgstr "Prohlížeč"
 msgid "Browser window layout :"
 msgstr "Styl prohlížeče"
 
-#: layouts:321
+#: layouts:304
 msgid "Browser with SongTree"
 msgstr "Prohlížeč se stromem skladeb"
 
-#: layouts:952
+#: layouts:935
 msgid "Buttons"
 msgstr "Tlačítka"
 
-#: layouts:941
+#: layouts:924
 msgid "Buttons, Song & Cover"
 msgstr "Tlačítka, skladba & přebal"
 
@@ -902,7 +894,7 @@ msgstr "Dostupná položka"
 msgid "Case-sensitive"
 msgstr "Dostupná položka"
 
-#: layouts:392
+#: layouts:375
 msgid "Categories pane"
 msgstr "Okno Kategorie"
 
@@ -1092,8 +1084,8 @@ msgstr "Připojit přes proxy"
 msgid "Connections from :"
 msgstr "Připojení od :"
 
-#: layouts:41 layouts:80 layouts:197 layouts:360 layouts:462 layouts:534
-#: layouts:540 layouts:564 layouts:626
+#: layouts:180 layouts:343 layouts:445 layouts:517 layouts:523 layouts:547
+#: layouts:609
 msgid "Context"
 msgstr "Kontext"
 
@@ -1394,7 +1386,7 @@ msgstr "Upravit vlastnosti vybrané skladby"
 msgid "Edit..."
 msgstr "Upravit..."
 
-#: layouts:457
+#: layouts:440
 msgid "EditList"
 msgstr "Editace seznamu"
 
@@ -1483,7 +1475,7 @@ msgstr ""
 msgid "EpicRating plugin - automatically update ratings"
 msgstr ""
 
-#: layouts:880
+#: layouts:863
 msgid "Equalizer"
 msgstr "Ekvalizér"
 
@@ -1676,11 +1668,11 @@ msgid "Find songs with the same names"
 msgstr "Najít skladby stejných názvů"
 
 #: gmusicbrowser.pl:836 gmusicbrowser.pl:7929 gmusicbrowser_list.pm:724
-#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:823
+#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:806
 msgid "Folder"
 msgstr "Složka"
 
-#: gmusicbrowser_list.pm:724 layouts:822
+#: gmusicbrowser_list.pm:724 layouts:805
 msgid "Folder (right-aligned)"
 msgstr "Složka (zarovnáno vpravo)"
 
@@ -1741,7 +1733,7 @@ msgstr "Celoobrazovkové rozložení :"
 msgid "Fullscreen"
 msgstr "Celá obrazovka"
 
-#: layouts:632
+#: layouts:615
 msgid "Fullscreen simple"
 msgstr "Jednoduchá celá obrazovka"
 
@@ -1759,10 +1751,6 @@ msgstr "Výtěžek skladeb bez popisků replaygain"
 msgid "Genre"
 msgstr "Žánr"
 
-#: layouts:73
-msgid "Genre and Year"
-msgstr ""
-
 #: gmusicbrowser_songs.pm:3726
 msgid "Genre is set"
 msgstr "Žánr je nastaven"
@@ -1771,7 +1759,7 @@ msgstr "Žánr je nastaven"
 msgid "Genres"
 msgstr "Žánry"
 
-#: layouts:392
+#: layouts:375
 msgid "Genres pane"
 msgstr "Panel žánrů"
 
@@ -1783,7 +1771,7 @@ msgstr "Multimediální klávesy Gnome"
 msgid "Gnome multimedia keys plugin"
 msgstr "Zásuvný modul multimediálních kláves Gnome"
 
-#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6511 layouts:89 layouts:90
+#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6511 layouts:72 layouts:73
 msgid "Go to playing song"
 msgstr "Přejít na přehrávanou skladbu"
 
@@ -1847,15 +1835,15 @@ msgstr "Zvýšit hlasitost"
 msgid "Info"
 msgstr "Info"
 
-#: layouts:917
+#: layouts:900
 msgid "Insensitive title-artist (left-aligned)"
 msgstr "Nedostupné titul-interpret (zarovnáno vlevo)"
 
-#: layouts:923
+#: layouts:906
 msgid "Insensitive title-artist (right-aligned)"
 msgstr "Nedostupné titul-interpret (zarovnáno vpravo)"
 
-#: layouts:930
+#: layouts:913
 msgid "Insensitive, Song & Cover"
 msgstr "Nedostupné, skladba & přebal"
 
@@ -1867,7 +1855,7 @@ msgstr "Vložit seznam souborů/složek na začátek playlistu"
 msgid "Invalid regular expression"
 msgstr "Chybný výraz"
 
-#: layouts:958
+#: layouts:941
 msgid "Invisible hot spot"
 msgstr "Neviditelný hot spot"
 
@@ -1879,7 +1867,7 @@ msgstr "Do bloku"
 msgid "KB"
 msgstr "KB"
 
-#: plugins/karaoke.pm:9 layouts:889
+#: plugins/karaoke.pm:9 layouts:872
 msgid "Karaoke"
 msgstr "Karaoke"
 
@@ -1917,7 +1905,7 @@ msgstr "Značka/vydavatel"
 msgid "Labels"
 msgstr "Štítky"
 
-#: gmusicbrowser_list.pm:744 layouts:783
+#: gmusicbrowser_list.pm:744 layouts:766
 msgid "Labels' icons"
 msgstr "Ikony štítků"
 
@@ -1969,7 +1957,7 @@ msgstr "Vzhled"
 msgid "Left aligned"
 msgstr "Zarovnat vlevo"
 
-#: layouts:392
+#: layouts:375
 msgid "Left pane"
 msgstr "Levý panel"
 
@@ -1977,8 +1965,8 @@ msgstr "Levý panel"
 msgid "Length"
 msgstr "Délka"
 
-#: gmusicbrowser.pl:5210 gmusicbrowser_list.pm:128 layouts:197 layouts:360
-#: layouts:564 layouts:626
+#: gmusicbrowser.pl:5210 gmusicbrowser_list.pm:128 layouts:180 layouts:343
+#: layouts:547 layouts:609
 msgid "Library"
 msgstr "Knihovna"
 
@@ -2011,7 +1999,7 @@ msgstr ""
 msgid "Limit similar artists to the first : "
 msgstr ""
 
-#: gmusicbrowser_list.pm:1513 layouts:41
+#: gmusicbrowser_list.pm:1513
 msgid "List"
 msgstr "Seznam"
 
@@ -2031,7 +2019,7 @@ msgstr "V seznamu:"
 msgid "Listed songs"
 msgstr "Skladby v seznamu"
 
-#: layouts:176
+#: layouts:159
 msgid "Lists, Library & Context"
 msgstr "Seznamy, knihovna & kontext"
 
@@ -2107,10 +2095,6 @@ msgstr "Vyhledat googlem"
 msgid "Lower left"
 msgstr "Dole vlevo"
 
-#: layouts:76
-msgid "Lower left filter pane"
-msgstr ""
-
 #: plugins/titlebar.pm:31
 msgid "Lower right"
 msgstr "Dole vpravo"
@@ -2133,7 +2117,7 @@ msgstr "Textař"
 msgid "Lyrics"
 msgstr "Texty"
 
-#: layouts:964
+#: layouts:947
 msgid "Lyrics (requires lyrics plugin)"
 msgstr "Texty (vyžaduje zásuvný modul texty)"
 
@@ -2201,7 +2185,7 @@ msgstr "Typ média"
 msgid "Menu entry name"
 msgstr "Název položky menu"
 
-#: layouts:269
+#: layouts:252
 msgid "Minimal tip"
 msgstr "Minimální"
 
@@ -2666,7 +2650,7 @@ msgstr "Přehrát všechny skladby tohoto alba"
 msgid "Play all songs from this artist"
 msgstr "Přehrát všechny skladby tohoto interpreta"
 
-#: layouts:897
+#: layouts:880
 msgid "Play button"
 msgstr "Tlačítko přehrát"
 
@@ -2726,7 +2710,7 @@ msgstr "Přehrávání filtru"
 msgid "Playing Title"
 msgstr "Přehrávání titulu"
 
-#: gmusicbrowser_list.pm:737 layouts:778
+#: gmusicbrowser_list.pm:737 layouts:761
 msgid "Playing and queue icons"
 msgstr "Ikony přehrávání a fronty"
 
@@ -2734,11 +2718,11 @@ msgstr "Ikony přehrávání a fronty"
 msgid "Playing error : {error}"
 msgstr "Chyba přehrávání : {error}"
 
-#: layouts:770
+#: layouts:753
 msgid "Playing/Queue Icon or Track"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:407 layouts:468
+#: gmusicbrowser_layout.pm:407 layouts:451
 msgid "Playlist"
 msgstr "Playlist"
 
@@ -2762,7 +2746,7 @@ msgstr "Filtr playlistu"
 msgid "Playlist filter :\n"
 msgstr "Filtr playlistu :\n"
 
-#: layouts:605
+#: layouts:588
 msgid "Playlist, Library & Context"
 msgstr "Playlist,knihovna & kontext"
 
@@ -2802,7 +2786,7 @@ msgstr "Stisknout klávesu nebo kombinaci kláves"
 msgid "Previous"
 msgstr "Předchozí"
 
-#: gmusicbrowser.pl:1015 layouts:57
+#: gmusicbrowser.pl:1015 layouts:55
 msgid "Previous Song"
 msgstr "Předchozí skladba"
 
@@ -2826,7 +2810,7 @@ msgstr "Důvěrné údaje"
 msgid "Produced (P)"
 msgstr "Produkce (P)"
 
-#: layouts:885
+#: layouts:868
 msgid "Progress"
 msgstr "Vývoj"
 
@@ -2851,8 +2835,8 @@ msgid "Publisher/Studio logotype"
 msgstr "Vydavatel/logotyp studia"
 
 #: gmusicbrowser.pl:2409 gmusicbrowser_layout.pm:196
-#: gmusicbrowser_layout.pm:401 gmusicbrowser_layout.pm:493 layouts:41
-#: layouts:81 layouts:360 layouts:392 layouts:450
+#: gmusicbrowser_layout.pm:401 gmusicbrowser_layout.pm:493 layouts:343
+#: layouts:375 layouts:433
 msgid "Queue"
 msgstr "Fronta"
 
@@ -2872,19 +2856,19 @@ msgstr "Fronta prázdná"
 msgid "Queue mode"
 msgstr "Režim fronty"
 
-#: layouts:542
+#: layouts:525
 msgid "Queue, Library & Context"
 msgstr "Fronta, knihovna & kontext"
 
-#: layouts:764
+#: layouts:747
 msgid "Queue-Item Number"
 msgstr ""
 
-#: layouts:434
+#: layouts:417
 msgid "Quick Search"
 msgstr "Rychlé hledání"
 
-#: layouts:442
+#: layouts:425
 msgid "Quick Search with SongTree"
 msgstr "Rychlé hledání se stromem skladeb"
 
@@ -2915,11 +2899,11 @@ msgstr "Editace náhodného režimu"
 
 #: gmusicbrowser.pl:4613 gmusicbrowser.pl:4650 gmusicbrowser.pl:7814
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
-#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:813
+#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:796
 msgid "Rating"
 msgstr "Hodnocení"
 
-#: gmusicbrowser_list.pm:766 layouts:814
+#: gmusicbrowser_list.pm:766 layouts:797
 msgid "Rating (picture)"
 msgstr "Hodnocení (obrázek)"
 
@@ -3192,27 +3176,23 @@ msgstr "Spustit kód perl"
 msgid "Run system command"
 msgstr "Spustit systémový příkaz"
 
-#: layouts:71
-msgid "S/H"
-msgstr ""
-
 #: gmusicbrowser.pl:415
 msgid "Same Title"
 msgstr "Stejný titul"
 
-#: layouts:981
+#: layouts:964
 msgid "Same artist"
 msgstr ""
 
-#: layouts:991
+#: layouts:974
 msgid "Same rating"
 msgstr ""
 
-#: layouts:971
+#: layouts:954
 msgid "Same title"
 msgstr ""
 
-#: layouts:986
+#: layouts:969
 msgid "Same year"
 msgstr ""
 
@@ -3320,15 +3300,15 @@ msgstr "Posunovat se skladbou"
 msgid "Scroll with the song"
 msgstr "Posunovat se skladbou"
 
-#: plugins/fetch_cover.pm:95 layouts:430 layouts:427 layouts:436 layouts:444
+#: plugins/fetch_cover.pm:95 layouts:413 layouts:410 layouts:419 layouts:427
 msgid "Search"
 msgstr "Vyhledat"
 
-#: layouts:536
+#: layouts:519
 msgid "Search & Playlist"
 msgstr "Vyhledat & Playlist"
 
-#: layouts:529
+#: layouts:512
 msgid "Search & Queue"
 msgstr "Vyhledat & Fronta"
 
@@ -3544,7 +3524,7 @@ msgstr ""
 msgid "Shift"
 msgstr "Shift"
 
-#: layouts:737
+#: layouts:720
 msgid "Shimmer Queue"
 msgstr ""
 
@@ -3568,7 +3548,7 @@ msgstr "Zobrazit biografii interpreta"
 msgid "Show artist's upcoming events"
 msgstr "Zobrazit nadcházející plánované akce interpreta"
 
-#: layouts:709
+#: layouts:692
 msgid "Show artist, album, year"
 msgstr ""
 
@@ -3604,10 +3584,6 @@ msgstr "Zobrazit okno oznamovací oblasti při změně skladby"
 msgid "Show/Hide"
 msgstr "Zobrazit/skrýt"
 
-#: layouts:71
-msgid "Show/Hide elements"
-msgstr ""
-
 #: gmusicbrowser.pl:1072
 msgid "Show/Hide layout widget(s)"
 msgstr "Zobrazit/skrýt pomůcku(y) rozložení"
@@ -3616,7 +3592,7 @@ msgstr "Zobrazit/skrýt pomůcku(y) rozložení"
 msgid "Show/Hide lyrics line"
 msgstr "Zobrazit/skrýt řádku textů"
 
-#: layouts:695
+#: layouts:678
 msgid "Show/Hide picture"
 msgstr ""
 
@@ -3653,11 +3629,11 @@ msgstr "Příkaz pro vypnutí :"
 msgid "Signal: "
 msgstr ""
 
-#: layouts:723
+#: layouts:706
 msgid "Simple title"
 msgstr "Jednoduchý název"
 
-#: layouts:730
+#: layouts:713
 msgid "Simple title without any"
 msgstr ""
 
@@ -3677,19 +3653,19 @@ msgstr "Přeskočit počet"
 msgid "Skip to next song if an error occurs"
 msgstr "Při chybě přeskočit na další skladbu"
 
-#: layouts:806
+#: layouts:789
 msgid "Small album picture"
 msgstr "Malý obrázek alba"
 
-#: layouts:203
+#: layouts:186
 msgid "Small player"
 msgstr "Malý přehrávač"
 
-#: layouts:308
+#: layouts:291
 msgid "Smaller browser"
 msgstr "Menší prohlížeč"
 
-#: gmusicbrowser_list.pm:731 layouts:431 layouts:534 layouts:540 layouts:790
+#: gmusicbrowser_list.pm:731 layouts:414 layouts:517 layouts:523 layouts:773
 msgid "Song"
 msgstr "Skladba"
 
@@ -3754,15 +3730,15 @@ msgstr "Zastavit výběr obrázků"
 msgid "Stop when queue empty"
 msgstr "Zastavit po vyprázdnění fronty"
 
-#: layouts:902
+#: layouts:885
 msgid "Stop, Play and Next buttons"
 msgstr "Tlačítka zastavit, přehrát a další"
 
-#: layouts:907
+#: layouts:890
 msgid "Stop, Play and Next buttons and Time"
 msgstr "Tlačítka Zastavit, Přehrát, Další a Čas"
 
-#: layouts:912
+#: layouts:895
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr "Tlačítka Zastavit, Přehrát, Další a Titul/Interpret"
 
@@ -3881,15 +3857,15 @@ msgstr "Časová rozteč slábnutí ve vteřinách"
 msgid "Title"
 msgstr "Název"
 
-#: layouts:797
+#: layouts:780
 msgid "Title & icon"
 msgstr "Název a ikona"
 
-#: layouts:755
+#: layouts:738
 msgid "Title & progress"
 msgstr "Název a stav"
 
-#: gmusicbrowser_list.pm:731 layouts:789
+#: gmusicbrowser_list.pm:731 layouts:772
 msgid "Title - Artist - Album"
 msgstr "Název - Interpret - Album"
 
@@ -4106,7 +4082,7 @@ msgstr "Různí interpreti"
 msgid "Version"
 msgstr "Verze"
 
-#: layouts:392
+#: layouts:375
 msgid "View"
 msgstr "Zobrazení"
 
@@ -4118,7 +4094,7 @@ msgstr "Zobrazit binární"
 msgid "View binary data ..."
 msgstr "Zobrazit binární data ..."
 
-#: layouts:876
+#: layouts:859
 msgid "Volume"
 msgstr "Hlasitost"
 
@@ -4308,7 +4284,7 @@ msgstr "pokročilé volby"
 msgid "after %d"
 msgstr "po %d"
 
-#: layouts:667
+#: layouts:650
 msgid "album and artist breadcrumbs"
 msgstr ""
 
@@ -4524,7 +4500,7 @@ msgstr "výchozí název souboru"
 msgid "default folder"
 msgstr "výchozí složka"
 
-#: layouts:583
+#: layouts:566
 msgid "default fullscreen"
 msgstr "výchozí celá obrazovka"
 
@@ -4548,7 +4524,7 @@ msgstr "smazat vybraný režim třídění"
 msgid "different folders"
 msgstr "rozdílné složky"
 
-#: layouts:657
+#: layouts:640
 msgid "disc on the left side"
 msgstr ""
 
@@ -4672,11 +4648,11 @@ msgstr "pro soubory bez hlavičky VBR"
 msgid "front cover"
 msgstr "přední přebal"
 
-#: layouts:247
+#: layouts:230
 msgid "full"
 msgstr "úplné"
 
-#: layouts:253
+#: layouts:236
 msgid "full with buttons"
 msgstr "úplné s tlačítky"
 
@@ -4724,7 +4700,7 @@ msgstr "ilustrace"
 msgid "imported list"
 msgstr "importovaný seznam"
 
-#: layouts:258
+#: layouts:241
 msgid "info"
 msgstr "info"
 
@@ -4904,11 +4880,11 @@ msgstr ""
 "Při posledním ověření itunes nepodporovalo nesynchronizované popisky, patrné "
 "hlavně u popisků s obrázky"
 
-#: layouts:330
+#: layouts:313
 msgid "itunes++"
 msgstr ""
 
-#: layouts:387
+#: layouts:370
 msgid "itunes-like"
 msgstr "styl itunes"
 
@@ -4950,7 +4926,7 @@ msgstr "hlavní interpret"
 msgid "leaflet page"
 msgstr "prospektová strana"
 
-#: layouts:573
+#: layouts:556
 msgid "left-side filter panes"
 msgstr "panely s filtry vlevo"
 
@@ -5001,7 +4977,7 @@ msgstr "média"
 msgid "medium size"
 msgstr "střední velikost"
 
-#: layouts:223
+#: layouts:206
 msgid "minimal"
 msgstr "minimální"
 
@@ -5224,10 +5200,6 @@ msgstr "port :"
 msgid "pre-amp"
 msgstr "předzesilovač"
 
-#: layouts:79
-msgid "queue, context and lists"
-msgstr ""
-
 #: gmusicbrowser.pl:328
 msgid "quit"
 msgstr "ukončit"
@@ -5236,7 +5208,7 @@ msgstr "ukončit"
 msgid "quit when queue empty"
 msgstr "ukončit po vyprázdnění fronty"
 
-#: layouts:495
+#: layouts:478
 msgid "quodlibet-like"
 msgstr "styl quodlibet"
 
@@ -5252,7 +5224,7 @@ msgstr "průměrné hodnocení"
 msgid "recording location"
 msgstr "nahrávání umístění"
 
-#: layouts:51 layouts:53 layouts:72
+#: layouts:49 layouts:51
 msgid "reduced view"
 msgstr ""
 
@@ -5279,10 +5251,6 @@ msgstr "zkusit znovu"
 #: plugins/audioscrobbler.pm:144
 msgid "retry in {seconds} s"
 msgstr "zkusit znovu za {seconds} s"
-
-#: layouts:82
-msgid "rightmost pane"
-msgstr ""
 
 #: gmusicbrowser.pl:7984
 msgid "sampling rate"
@@ -5333,11 +5301,11 @@ msgstr "vyhledávat nyní"
 msgid "seconds"
 msgstr "vteřin"
 
-#: layouts:136
+#: layouts:119
 msgid "shimmer"
 msgstr ""
 
-#: layouts:230
+#: layouts:213
 msgid "shimmer_tray"
 msgstr ""
 
@@ -5353,7 +5321,7 @@ msgstr "zobrazit obrázky"
 msgid "show the 'All' row"
 msgstr "zobrazit položku 'Vše'"
 
-#: layouts:58
+#: layouts:56
 msgid "show/hide album cover"
 msgstr ""
 
@@ -5538,43 +5506,43 @@ msgstr "důležitost :"
 msgid "wikipedia, lyrics, and custom webpages"
 msgstr "Wikipedie, texty a uživatelské webové stránky"
 
-#: layouts:271
+#: layouts:254
 msgid "with browser"
 msgstr "s prohlížečem"
 
-#: layouts:488
+#: layouts:471
 msgid "with browser & queue"
 msgstr "s prohlížečem & frontou"
 
-#: layouts:293
+#: layouts:276
 msgid "with browser (SongTree)"
 msgstr "s prohlížečem (strom skladeb)"
 
-#: layouts:570
+#: layouts:553
 msgid "with context"
 msgstr "s kontextem"
 
-#: layouts:679
+#: layouts:662
 msgid "with picture"
 msgstr "s obrázkem"
 
-#: layouts:422
+#: layouts:405
 msgid "with playlist"
 msgstr "s playlistem"
 
-#: layouts:517
+#: layouts:500
 msgid "with playlist & context"
 msgstr "s playlistem & kontextem"
 
-#: layouts:217
+#: layouts:200
 msgid "with queue"
 msgstr "s frontou"
 
-#: layouts:418
+#: layouts:401
 msgid "with search"
 msgstr "s vyhledáváním"
 
-#: layouts:522
+#: layouts:505
 msgid "with tabbedlists"
 msgstr "s tabulkovými seznamy"
 
