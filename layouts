@@ -108,7 +108,7 @@ Default = Window(size=1120x800) HPLists1(size=0-1) HPLists2(size=0-1)
 VBmain  = _VBTreeAndInfo
     VBTreeAndInfo = HBStatus 10_HPLists HBArtistAlbumBox
 
-        HBStatus = HistItem(group=1) ResetFilter(group=1) Refresh(group=1) PlayFilter(group=1) FilterLock(group=1) -SimpleSearch(group=1)
+        HBStatus = HistItem(group=1) ResetFilter(group=1) Refresh(group=1) PlayFilter(group=1) FilterLock(group=1) -Pref(stock=gtk-preferences,size=button) -SimpleSearch(group=1)
 
         HPLists = FRSongTree HPLists1
 
@@ -118,7 +118,7 @@ VBmain  = _VBTreeAndInfo
         HPLists1 = FRSongTree2 HPLists2
 
             FRSongTree2 = (label=_"Same Artist") VBSongTree2
-                VBSongTree2 = _SongTree2(group=1:first_artist,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
+                VBSongTree2 = _SongTree2(group=2,group=1:first_artist,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
 
         HPLists2 = FRSongTree3 FRSongTree4
 
