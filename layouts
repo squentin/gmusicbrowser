@@ -108,7 +108,7 @@ Default = Window(size=1120x800) HPLists1(size=0-1) HPLists2(size=0-1)
 VBmain  = _VBTreeAndInfo
     VBTreeAndInfo = HBStatus 10_HPLists HBArtistAlbumBox
 
-        HBStatus = HistItem ResetFilter Refresh PlayFilter FilterLock -SimpleSearch
+        HBStatus = HistItem(group=1) ResetFilter(group=1) Refresh(group=1) PlayFilter(group=1) FilterLock(group=1) -SimpleSearch(group=1)
 
         HPLists = FRSongTree HPLists1
 

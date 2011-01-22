@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-21 21:01+0100\n"
+"POT-Creation-Date: 2011-01-22 14:37+0100\n"
 "PO-Revision-Date: 2011-01-19 09:56+0900\n"
 "Last-Translator: bluealbum <bluealbum@gmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
@@ -251,7 +251,7 @@ msgstr ""
 msgid "1 chance in {probability}"
 msgstr "{probability}에서 1 기회 "
 
-#: layouts:307
+#: layouts:328
 msgid "3 Filter panes"
 msgstr "3 필터 패널"
 
@@ -461,19 +461,19 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:414 layouts:517 layouts:523 layouts:959
+#: plugins/fetch_cover.pm:103 layouts:435 layouts:538 layouts:544 layouts:980
 msgid "Album"
 msgstr "앨범"
 
-#: layouts:116
+#: layouts:134
 msgid "Album Info"
 msgstr ""
 
-#: layouts:814
+#: layouts:835
 msgid "Album and artist"
 msgstr "앨범과 가수"
 
-#: layouts:729
+#: layouts:750
 msgid "Album and artist on the left side"
 msgstr "왼쪽에 앨범과 가수"
 
@@ -629,7 +629,7 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
 #: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:129
-#: plugins/fetch_cover.pm:102 layouts:414 layouts:517 layouts:523
+#: plugins/fetch_cover.pm:102 layouts:435 layouts:538 layouts:544
 msgid "Artist"
 msgstr "음악가"
 
@@ -637,7 +637,7 @@ msgstr "음악가"
 msgid "Artist & album"
 msgstr "아티스트 & 앨범"
 
-#: layouts:114
+#: layouts:132
 msgid "Artist Info"
 msgstr ""
 
@@ -781,7 +781,7 @@ msgstr "본문 :"
 msgid "Body text is not supported by current notification daemon"
 msgstr "본문 텍스트 현재 알림 데몬에서 지원하지 않습니다."
 
-#: layouts:279
+#: layouts:300
 msgid "Browser"
 msgstr "브라우저"
 
@@ -789,15 +789,15 @@ msgstr "브라우저"
 msgid "Browser window layout :"
 msgstr "브라우저 창 레이아웃 :"
 
-#: layouts:304
+#: layouts:325
 msgid "Browser with SongTree"
 msgstr "노래트리 가진 브라우저"
 
-#: layouts:935
+#: layouts:956
 msgid "Buttons"
 msgstr "버튼"
 
-#: layouts:924
+#: layouts:945
 msgid "Buttons, Song & Cover"
 msgstr "버튼, 노래 & 커버"
 
@@ -861,7 +861,7 @@ msgstr "대소문자 구분"
 msgid "Case-sensitive"
 msgstr "대소문자 구분"
 
-#: layouts:375
+#: layouts:396
 msgid "Categories pane"
 msgstr "카테고리 패널"
 
@@ -1051,8 +1051,8 @@ msgstr "프록시 통한 연결"
 msgid "Connections from :"
 msgstr "다음으로 연결 :"
 
-#: layouts:180 layouts:343 layouts:445 layouts:517 layouts:523 layouts:547
-#: layouts:609
+#: layouts:201 layouts:364 layouts:466 layouts:538 layouts:544 layouts:568
+#: layouts:630
 msgid "Context"
 msgstr "항목"
 
@@ -1350,7 +1350,7 @@ msgstr "선택한 노래 등록정보 편집"
 msgid "Edit..."
 msgstr "편집..."
 
-#: layouts:440
+#: layouts:461
 msgid "EditList"
 msgstr "편집목록"
 
@@ -1439,7 +1439,7 @@ msgstr ""
 msgid "EpicRating plugin - automatically update ratings"
 msgstr ""
 
-#: layouts:863
+#: layouts:884
 msgid "Equalizer"
 msgstr "이퀄라이저"
 
@@ -1632,11 +1632,11 @@ msgid "Find songs with the same names"
 msgstr "같은 이름을 가진 노래 찾기"
 
 #: gmusicbrowser.pl:836 gmusicbrowser.pl:7929 gmusicbrowser_list.pm:724
-#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:806
+#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:827
 msgid "Folder"
 msgstr "폴더"
 
-#: gmusicbrowser_list.pm:724 layouts:805
+#: gmusicbrowser_list.pm:724 layouts:826
 msgid "Folder (right-aligned)"
 msgstr "폴더 (오른쪽 정렬)"
 
@@ -1696,7 +1696,7 @@ msgstr "전체 화면 레이아웃 :"
 msgid "Fullscreen"
 msgstr "전체화면"
 
-#: layouts:615
+#: layouts:636
 msgid "Fullscreen simple"
 msgstr "전체화면 간단히"
 
@@ -1722,7 +1722,7 @@ msgstr "장르가 설정됨"
 msgid "Genres"
 msgstr "장르"
 
-#: layouts:375
+#: layouts:396
 msgid "Genres pane"
 msgstr "장르 패널"
 
@@ -1798,15 +1798,15 @@ msgstr "음량 증가"
 msgid "Info"
 msgstr "정보"
 
-#: layouts:900
+#: layouts:921
 msgid "Insensitive title-artist (left-aligned)"
 msgstr "둔감하게 제목-가수 (왼쪽 정렬)"
 
-#: layouts:906
+#: layouts:927
 msgid "Insensitive title-artist (right-aligned)"
 msgstr "둔감하게 제목-가수 (오른쪽 정렬)"
 
-#: layouts:913
+#: layouts:934
 msgid "Insensitive, Song & Cover"
 msgstr "둔감하게, 노래 & 커버"
 
@@ -1818,7 +1818,7 @@ msgstr "재생모록 시작할 때 파일/폴더의 목록 추가"
 msgid "Invalid regular expression"
 msgstr "잘못된 정규 표현"
 
-#: layouts:941
+#: layouts:962
 msgid "Invisible hot spot"
 msgstr "보이지않는 핫 스팟"
 
@@ -1830,7 +1830,7 @@ msgstr "일반적인 정렬"
 msgid "KB"
 msgstr "KB"
 
-#: plugins/karaoke.pm:9 layouts:872
+#: plugins/karaoke.pm:9 layouts:893
 msgid "Karaoke"
 msgstr "노래방"
 
@@ -1868,7 +1868,7 @@ msgstr "라벨/발행자"
 msgid "Labels"
 msgstr "라벨"
 
-#: gmusicbrowser_list.pm:744 layouts:766
+#: gmusicbrowser_list.pm:744 layouts:787
 msgid "Labels' icons"
 msgstr "라벨 아이콘"
 
@@ -1920,7 +1920,7 @@ msgstr "레이아웃"
 msgid "Left aligned"
 msgstr "왼쪽 정렬"
 
-#: layouts:375
+#: layouts:396
 msgid "Left pane"
 msgstr "왼쪽 패널"
 
@@ -1928,8 +1928,8 @@ msgstr "왼쪽 패널"
 msgid "Length"
 msgstr "길이"
 
-#: gmusicbrowser.pl:5210 gmusicbrowser_list.pm:128 layouts:180 layouts:343
-#: layouts:547 layouts:609
+#: gmusicbrowser.pl:5210 gmusicbrowser_list.pm:128 layouts:201 layouts:364
+#: layouts:568 layouts:630
 msgid "Library"
 msgstr "라이브러리"
 
@@ -1980,7 +1980,7 @@ msgstr "목록에 있는 수 :"
 msgid "Listed songs"
 msgstr "목록에 있는 노래"
 
-#: layouts:159
+#: layouts:180
 msgid "Lists, Library & Context"
 msgstr "목록, 라이브러리 & 항목"
 
@@ -2076,7 +2076,7 @@ msgstr "작사가"
 msgid "Lyrics"
 msgstr "가사"
 
-#: layouts:947
+#: layouts:968
 msgid "Lyrics (requires lyrics plugin)"
 msgstr "가사 (가사 플러그인이 필요함)"
 
@@ -2116,6 +2116,10 @@ msgstr "MPRIS v1 지원"
 msgid "Main"
 msgstr "메인"
 
+#: layouts:115
+msgid "Main Tree"
+msgstr ""
+
 #: gmusicbrowser_songs.pm:482
 msgid "Main artist"
 msgstr "메인 가수"
@@ -2143,7 +2147,7 @@ msgstr "매체 형태"
 msgid "Menu entry name"
 msgstr "메뉴 항목 이름"
 
-#: layouts:252
+#: layouts:273
 msgid "Minimal tip"
 msgstr "최소화 팁"
 
@@ -2606,7 +2610,7 @@ msgstr "이 앨범의 모든 노래 재생"
 msgid "Play all songs from this artist"
 msgstr "이 가수의 모든 노래 재생"
 
-#: layouts:880
+#: layouts:901
 msgid "Play button"
 msgstr "재생 버튼"
 
@@ -2666,7 +2670,7 @@ msgstr "필터 재생중"
 msgid "Playing Title"
 msgstr "제목 재생중"
 
-#: gmusicbrowser_list.pm:737 layouts:761
+#: gmusicbrowser_list.pm:737 layouts:782
 msgid "Playing and queue icons"
 msgstr "재생중 & 대기열 아이콘"
 
@@ -2674,11 +2678,11 @@ msgstr "재생중 & 대기열 아이콘"
 msgid "Playing error : {error}"
 msgstr "재생중 에러 : {error}"
 
-#: layouts:753
+#: layouts:774
 msgid "Playing/Queue Icon or Track"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:407 layouts:451
+#: gmusicbrowser_layout.pm:407 layouts:472
 msgid "Playlist"
 msgstr "연주 목록"
 
@@ -2702,7 +2706,7 @@ msgstr "재생목록 필터"
 msgid "Playlist filter :\n"
 msgstr "재생목록 필터 :\n"
 
-#: layouts:588
+#: layouts:609
 msgid "Playlist, Library & Context"
 msgstr "재생목록, 라이브러리 & 항목"
 
@@ -2766,7 +2770,7 @@ msgstr "개인 자료"
 msgid "Produced (P)"
 msgstr "제작됨 (P)"
 
-#: layouts:868
+#: layouts:889
 msgid "Progress"
 msgstr "진행률"
 
@@ -2791,8 +2795,8 @@ msgid "Publisher/Studio logotype"
 msgstr "발행자/스튜디오의 로고"
 
 #: gmusicbrowser.pl:2409 gmusicbrowser_layout.pm:196
-#: gmusicbrowser_layout.pm:401 gmusicbrowser_layout.pm:493 layouts:343
-#: layouts:375 layouts:433
+#: gmusicbrowser_layout.pm:401 gmusicbrowser_layout.pm:493 layouts:364
+#: layouts:396 layouts:454
 msgid "Queue"
 msgstr "대기열"
 
@@ -2812,19 +2816,19 @@ msgstr "대기열 비어있음"
 msgid "Queue mode"
 msgstr "대기열 모드"
 
-#: layouts:525
+#: layouts:546
 msgid "Queue, Library & Context"
 msgstr "대기열, 라이브러리 & 항목"
 
-#: layouts:747
+#: layouts:768
 msgid "Queue-Item Number"
 msgstr ""
 
-#: layouts:417
+#: layouts:438
 msgid "Quick Search"
 msgstr "빠른 찾기"
 
-#: layouts:425
+#: layouts:446
 msgid "Quick Search with SongTree"
 msgstr "노래트리에서 빠른 찾기"
 
@@ -2855,11 +2859,11 @@ msgstr "무작위 모드 편집"
 
 #: gmusicbrowser.pl:4613 gmusicbrowser.pl:4650 gmusicbrowser.pl:7814
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
-#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:796
+#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:817
 msgid "Rating"
 msgstr "점수"
 
-#: gmusicbrowser_list.pm:766 layouts:797
+#: gmusicbrowser_list.pm:766 layouts:818
 msgid "Rating (picture)"
 msgstr "점수 (사진)"
 
@@ -3132,23 +3136,31 @@ msgstr "펄 코드 실행"
 msgid "Run system command"
 msgstr "시스템 명령어 실행"
 
-#: gmusicbrowser.pl:415
+#: layouts:125
+msgid "Same Album"
+msgstr ""
+
+#: layouts:120
+msgid "Same Artist"
+msgstr ""
+
+#: gmusicbrowser.pl:415 layouts:128
 msgid "Same Title"
 msgstr "같은 제목"
 
-#: layouts:964
+#: layouts:985
 msgid "Same artist"
 msgstr ""
 
-#: layouts:974
+#: layouts:995
 msgid "Same rating"
 msgstr ""
 
-#: layouts:954
+#: layouts:975
 msgid "Same title"
 msgstr ""
 
-#: layouts:969
+#: layouts:990
 msgid "Same year"
 msgstr ""
 
@@ -3256,15 +3268,15 @@ msgstr "노래 스크롤하기"
 msgid "Scroll with the song"
 msgstr "노래로 스크롤하기"
 
-#: plugins/fetch_cover.pm:95 layouts:413 layouts:410 layouts:419 layouts:427
+#: plugins/fetch_cover.pm:95 layouts:434 layouts:431 layouts:440 layouts:448
 msgid "Search"
 msgstr "찾기"
 
-#: layouts:519
+#: layouts:540
 msgid "Search & Playlist"
 msgstr "찾기 & 재생목록"
 
-#: layouts:512
+#: layouts:533
 msgid "Search & Queue"
 msgstr "찾기 & 대기열"
 
@@ -3479,7 +3491,7 @@ msgstr ""
 msgid "Shift"
 msgstr "Shift"
 
-#: layouts:720
+#: layouts:741
 msgid "Shimmer Queue"
 msgstr ""
 
@@ -3503,7 +3515,7 @@ msgstr "가수 일대기 보기"
 msgid "Show artist's upcoming events"
 msgstr "가수의 다가올 이벤트 보기"
 
-#: layouts:692
+#: layouts:713
 msgid "Show artist, album, year"
 msgstr ""
 
@@ -3547,7 +3559,7 @@ msgstr "표시/숨기기 레이아웃 위젯"
 msgid "Show/Hide lyrics line"
 msgstr "표시/숨기기 가사 줄"
 
-#: layouts:678
+#: layouts:699
 msgid "Show/Hide picture"
 msgstr ""
 
@@ -3584,11 +3596,11 @@ msgstr "끄기 명령어 :"
 msgid "Signal: "
 msgstr ""
 
-#: layouts:706
+#: layouts:727
 msgid "Simple title"
 msgstr "간단한 제목"
 
-#: layouts:713
+#: layouts:734
 msgid "Simple title without any"
 msgstr ""
 
@@ -3608,19 +3620,19 @@ msgstr "스킵 수"
 msgid "Skip to next song if an error occurs"
 msgstr "오류가 발생하면 다음 노래로 스킵하기"
 
-#: layouts:789
+#: layouts:810
 msgid "Small album picture"
 msgstr "작은 앨범 사진"
 
-#: layouts:186
+#: layouts:207
 msgid "Small player"
 msgstr "작은 재생기"
 
-#: layouts:291
+#: layouts:312
 msgid "Smaller browser"
 msgstr "작은 부라우저"
 
-#: gmusicbrowser_list.pm:731 layouts:414 layouts:517 layouts:523 layouts:773
+#: gmusicbrowser_list.pm:731 layouts:435 layouts:538 layouts:544 layouts:794
 msgid "Song"
 msgstr "노래"
 
@@ -3685,15 +3697,15 @@ msgstr "사진 고르기 중지"
 msgid "Stop when queue empty"
 msgstr "대기열 비었을 때 중지"
 
-#: layouts:885
+#: layouts:906
 msgid "Stop, Play and Next buttons"
 msgstr "멈춤, 재생 그리고 다음 버튼"
 
-#: layouts:890
+#: layouts:911
 msgid "Stop, Play and Next buttons and Time"
 msgstr "멈춤, 재생 그리고 다음 버튼 그리고 시간"
 
-#: layouts:895
+#: layouts:916
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr "멈춤, 재생 그리고 다음 버튼 그리고 제목/가수"
 
@@ -3810,15 +3822,15 @@ msgstr "페이드-아웃의 타임스팬 "
 msgid "Title"
 msgstr "제목"
 
-#: layouts:780
+#: layouts:801
 msgid "Title & icon"
 msgstr "제목 & 아이콘"
 
-#: layouts:738
+#: layouts:759
 msgid "Title & progress"
 msgstr "제목 & 진행"
 
-#: gmusicbrowser_list.pm:731 layouts:772
+#: gmusicbrowser_list.pm:731 layouts:793
 msgid "Title - Artist - Album"
 msgstr "제목 - 가수 - 앨범"
 
@@ -4035,7 +4047,7 @@ msgstr "다양한 가수"
 msgid "Version"
 msgstr "버전"
 
-#: layouts:375
+#: layouts:396
 msgid "View"
 msgstr "보기"
 
@@ -4047,7 +4059,7 @@ msgstr "이진 보기"
 msgid "View binary data ..."
 msgstr "이진 자료 보기 ..."
 
-#: layouts:859
+#: layouts:880
 msgid "Volume"
 msgstr "음량"
 
@@ -4235,7 +4247,7 @@ msgstr "고급 옵션"
 msgid "after %d"
 msgstr "%d 이후"
 
-#: layouts:650
+#: layouts:671
 msgid "album and artist breadcrumbs"
 msgstr ""
 
@@ -4451,7 +4463,7 @@ msgstr "기본값 파일이름"
 msgid "default folder"
 msgstr "기본값 폴더"
 
-#: layouts:566
+#: layouts:587
 msgid "default fullscreen"
 msgstr "기본값 전체화면"
 
@@ -4475,7 +4487,7 @@ msgstr "선택한 정렬 모드 지우기"
 msgid "different folders"
 msgstr "다른 폴더"
 
-#: layouts:640
+#: layouts:661
 msgid "disc on the left side"
 msgstr ""
 
@@ -4599,11 +4611,11 @@ msgstr "VBR 헤더 없는 파일"
 msgid "front cover"
 msgstr "커버 (앞면)"
 
-#: layouts:230
+#: layouts:251
 msgid "full"
 msgstr "전체"
 
-#: layouts:236
+#: layouts:257
 msgid "full with buttons"
 msgstr "버튼 포함 전체"
 
@@ -4651,7 +4663,7 @@ msgstr "일러스트"
 msgid "imported list"
 msgstr "가져온 목록"
 
-#: layouts:241
+#: layouts:262
 msgid "info"
 msgstr "정보"
 
@@ -4831,11 +4843,11 @@ msgstr ""
 "itunes는 제작자가 체크한 최근까지 비동기화된 태그를 지원하지 않습니다, 대부"
 "분 사진을 가진 태그에 영향을 줍니다"
 
-#: layouts:313
+#: layouts:334
 msgid "itunes++"
 msgstr ""
 
-#: layouts:370
+#: layouts:391
 msgid "itunes-like"
 msgstr "아이튠즈 모양"
 
@@ -4877,7 +4889,7 @@ msgstr "리드 가수"
 msgid "leaflet page"
 msgstr "광고전단 페이지"
 
-#: layouts:556
+#: layouts:577
 msgid "left-side filter panes"
 msgstr "왼편 필터 패널"
 
@@ -4928,7 +4940,7 @@ msgstr "미디어"
 msgid "medium size"
 msgstr "중간 크기"
 
-#: layouts:206
+#: layouts:227
 msgid "minimal"
 msgstr "간단히"
 
@@ -5159,7 +5171,7 @@ msgstr "종료"
 msgid "quit when queue empty"
 msgstr "대기열이 비면 종료"
 
-#: layouts:478
+#: layouts:499
 msgid "quodlibet-like"
 msgstr "quodlibet-like"
 
@@ -5252,11 +5264,11 @@ msgstr "바로 찾기"
 msgid "seconds"
 msgstr "초"
 
-#: layouts:119
+#: layouts:140
 msgid "shimmer"
 msgstr ""
 
-#: layouts:213
+#: layouts:234
 msgid "shimmer_tray"
 msgstr ""
 
@@ -5457,43 +5469,43 @@ msgstr "중요도 :"
 msgid "wikipedia, lyrics, and custom webpages"
 msgstr "위키페디아, 가사, 그리고 상황에 맞는 웹페이지"
 
-#: layouts:254
+#: layouts:275
 msgid "with browser"
 msgstr "브라우저 포함"
 
-#: layouts:471
+#: layouts:492
 msgid "with browser & queue"
 msgstr "브라우저 & 대기열 포함"
 
-#: layouts:276
+#: layouts:297
 msgid "with browser (SongTree)"
 msgstr "브라우저 (노래트리) 포함"
 
-#: layouts:553
+#: layouts:574
 msgid "with context"
 msgstr "항목 포함"
 
-#: layouts:662
+#: layouts:683
 msgid "with picture"
 msgstr "앨범 사진 포함"
 
-#: layouts:405
+#: layouts:426
 msgid "with playlist"
 msgstr "재생목록 포함"
 
-#: layouts:500
+#: layouts:521
 msgid "with playlist & context"
 msgstr "재생목록 & 항목 포함"
 
-#: layouts:200
+#: layouts:221
 msgid "with queue"
 msgstr "대기열 포함"
 
-#: layouts:401
+#: layouts:422
 msgid "with search"
 msgstr "찾기 포함"
 
-#: layouts:505
+#: layouts:526
 msgid "with tabbedlists"
 msgstr "탭으로된 목록 포함"
 
