@@ -737,6 +737,18 @@ left=2
 vcollapse=head
 title: text(markup=pesc($title),pad=4)
 
+{Group customprefix}
+title=_"Title with customizable prefix"
+head=title:h
+left=2
+vcollapse=
+title: text(markup='<span style="'.style.'" weight="'.weight.'">'.if(prefix, pesc(prefix)).' </span>'.pesc($title),xpad=xpad,ypad=ypad,init_markup='')
+xpad : OptionNumber(name='x padding',default=4)
+ypad : OptionNumber(name='y padding',default=4)
+prefix : OptionText(name='Prefix')
+weight : OptionCombo(default='bold',name='Prefix font weight',list='ultralight|light|normal|bold|ultrabold|heavy')
+style : OptionCombo(default='normal',name='Prefix font style',list='normal|oblique|italic')
+
 {Group shimmerqueue}
 title=_"Shimmer Queue"
 head=title:h
@@ -752,7 +764,7 @@ vmin= pic:y + pic:h +2
 left=width
 title:	text(markup='<b><big>'.pesc($album).'\n'.pesc($artist).'</big></b>',pad=2,w=left)
 pic:	aapic(y=title:y + title:h +2, picsize=min(picsize,width), pad=2)
-width:	OptionNumber(default=200,min=20,max=1000,step=10)
+width:	widthOptionNumber(default=200,min=20,max=1000,step=10)
 picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 
 {Column testtitleandprogress}
