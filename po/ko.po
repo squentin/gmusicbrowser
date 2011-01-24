@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-22 14:37+0100\n"
+"POT-Creation-Date: 2011-01-23 13:58+0100\n"
 "PO-Revision-Date: 2011-01-19 09:56+0900\n"
 "Last-Translator: bluealbum <bluealbum@gmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
@@ -41,7 +41,7 @@ msgstr ""
 msgid " of {length}"
 msgstr "/ {length}"
 
-#: gmusicbrowser.pl:6028
+#: gmusicbrowser.pl:6036
 msgid "# songs"
 msgstr "# 노래들"
 
@@ -60,24 +60,24 @@ msgid "%d Artist"
 msgid_plural "%d Artists"
 msgstr[0] "%d 음악가"
 
-#: gmusicbrowser.pl:2923 gmusicbrowser.pl:2927 gmusicbrowser.pl:4515
+#: gmusicbrowser.pl:2931 gmusicbrowser.pl:2935 gmusicbrowser.pl:4523
 #: gmusicbrowser_list.pm:1628
 msgid "%d Song"
 msgid_plural "%d Songs"
 msgstr[0] "%d 노래"
 
-#: gmusicbrowser.pl:361 gmusicbrowser_list.pm:7721 gmusicbrowser_songs.pm:502
+#: gmusicbrowser.pl:380 gmusicbrowser_list.pm:7721 gmusicbrowser_songs.pm:502
 msgid "%d album"
 msgid_plural "%d albums"
 msgstr[0] "%d 앨범"
 
-#: gmusicbrowser.pl:349 gmusicbrowser.pl:356 gmusicbrowser_list.pm:7732
+#: gmusicbrowser.pl:368 gmusicbrowser.pl:375 gmusicbrowser_list.pm:7732
 #: gmusicbrowser_songs.pm:478 gmusicbrowser_songs.pm:2343
 msgid "%d artist"
 msgid_plural "%d artists"
 msgstr[0] "%d 음악가"
 
-#: gmusicbrowser.pl:4141
+#: gmusicbrowser.pl:4149
 msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] "%d 파일"
@@ -87,29 +87,29 @@ msgid "%d file in {folder}"
 msgid_plural "%d files in {folder}"
 msgstr[0] "{folder}의 %d 파일"
 
-#: gmusicbrowser.pl:5055
+#: gmusicbrowser.pl:5063
 msgid "%d folder"
 msgid_plural "%d folders"
 msgstr[0] "%d 폴더"
 
-#: gmusicbrowser.pl:1371
+#: gmusicbrowser.pl:1379
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d 초"
 
-#: gmusicbrowser.pl:344 gmusicbrowser.pl:351 gmusicbrowser.pl:7581
+#: gmusicbrowser.pl:363 gmusicbrowser.pl:370 gmusicbrowser.pl:7589
 #: gmusicbrowser_layout.pm:231 gmusicbrowser_list.pm:251
 #: gmusicbrowser_songs.pm:2337 plugins/audioscrobbler.pm:185
 msgid "%d song"
 msgid_plural "%d songs"
 msgstr[0] "%d 노래"
 
-#: gmusicbrowser.pl:5054
+#: gmusicbrowser.pl:5062
 msgid "%d song added"
 msgid_plural "%d songs added"
 msgstr[0] "%d 노래 추가됨"
 
-#: gmusicbrowser.pl:2932 gmusicbrowser_layout.pm:227
+#: gmusicbrowser.pl:2940 gmusicbrowser_layout.pm:227
 #: gmusicbrowser_layout.pm:230
 msgid "%d song in queue"
 msgid_plural "%d songs in queue"
@@ -125,59 +125,59 @@ msgid "%d song selected"
 msgid_plural "%d songs selected"
 msgstr[0] "%d 노래 선택됨"
 
-#: gmusicbrowser.pl:7914
+#: gmusicbrowser.pl:7922
 msgid "%f is set"
 msgstr "%f 설정됨"
 
-#: gmusicbrowser.pl:7915
+#: gmusicbrowser.pl:7923
 msgid "%f isn't set"
 msgstr "%f 설정 안됨"
 
-#: gmusicbrowser.pl:7889
+#: gmusicbrowser.pl:7897
 msgid "%n first added"
 msgstr "%n 처음 추가됨"
 
-#: gmusicbrowser.pl:7888
+#: gmusicbrowser.pl:7896
 msgid "%n last added"
 msgstr "%n 마지막 추가됨"
 
-#: gmusicbrowser.pl:7880
+#: gmusicbrowser.pl:7888
 msgid "%n last played"
 msgstr "%n 마지막 연주됨"
 
-#: gmusicbrowser.pl:7884
+#: gmusicbrowser.pl:7892
 msgid "%n last skipped"
 msgstr "%n 마지막 스킵됨"
 
-#: gmusicbrowser.pl:7879
+#: gmusicbrowser.pl:7887
 msgid "%n less played"
 msgstr "%n 짧게 재생됨"
 
-#: gmusicbrowser.pl:7883
+#: gmusicbrowser.pl:7891
 msgid "%n less skipped"
 msgstr "%n 짧게 스킵됨"
 
-#: gmusicbrowser.pl:7886
+#: gmusicbrowser.pl:7894
 msgid "%n longest"
 msgstr "%n 가장 길게"
 
-#: gmusicbrowser.pl:7878
+#: gmusicbrowser.pl:7886
 msgid "%n most played"
 msgstr "%n 대부분 재생됨"
 
-#: gmusicbrowser.pl:7882
+#: gmusicbrowser.pl:7890
 msgid "%n most skipped"
 msgstr "%n 대부분 스킵됨"
 
-#: gmusicbrowser.pl:7881
+#: gmusicbrowser.pl:7889
 msgid "%n not played for the longest time"
 msgstr "%n 가장 긴 시간동안 재생되지 않음"
 
-#: gmusicbrowser.pl:7885
+#: gmusicbrowser.pl:7893
 msgid "%n not skipped for the longest time"
 msgstr "%n 가장 긴 시간동안 스킵되지 않음"
 
-#: gmusicbrowser.pl:7887
+#: gmusicbrowser.pl:7895
 msgid "%n shortest"
 msgstr "%n 가장 짧게"
 
@@ -185,20 +185,20 @@ msgstr "%n 가장 짧게"
 msgid "%t - gmusicbrowser"
 msgstr ""
 
-#: gmusicbrowser.pl:4047
+#: gmusicbrowser.pl:4055
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' 이미 존재합니다. 덮어쓸까요?"
 
-#: gmusicbrowser.pl:5919
+#: gmusicbrowser.pl:5927
 msgid "(%d song excluded)"
 msgid_plural "(%d songs excluded)"
 msgstr[0] "(%d 노래 제외됨)"
 
-#: gmusicbrowser.pl:7911 gmusicbrowser.pl:7919
+#: gmusicbrowser.pl:7919 gmusicbrowser.pl:7927
 msgid "(: )has one"
 msgstr "(: ) 하나를 가짐"
 
-#: gmusicbrowser.pl:7910 gmusicbrowser.pl:7918
+#: gmusicbrowser.pl:7918 gmusicbrowser.pl:7926
 msgid "(: )none"
 msgstr "(: )없음"
 
@@ -206,7 +206,7 @@ msgstr "(: )없음"
 msgid "(applied after restart)"
 msgstr "(재시작 후 적용됩니다)"
 
-#: gmusicbrowser.pl:2766
+#: gmusicbrowser.pl:2774
 msgid "(case insensitive)"
 msgstr "(대소문자 구분)"
 
@@ -222,7 +222,7 @@ msgstr "(기타)"
 msgid "(see http://www."
 msgstr ""
 
-#: gmusicbrowser.pl:5699
+#: gmusicbrowser.pl:5707
 msgid ""
 "- When selecting a song, the playlist filter will be reset if the song is "
 "not in it\n"
@@ -239,7 +239,7 @@ msgstr ""
 msgid "... on skipped songs"
 msgstr ""
 
-#: gmusicbrowser.pl:7721
+#: gmusicbrowser.pl:7729
 msgid "0 chance"
 msgstr "0 회"
 
@@ -247,7 +247,7 @@ msgstr "0 회"
 msgid "0 means no limit"
 msgstr ""
 
-#: gmusicbrowser.pl:7719
+#: gmusicbrowser.pl:7727
 msgid "1 chance in {probability}"
 msgstr "{probability}에서 1 기회 "
 
@@ -259,15 +259,15 @@ msgstr "3 필터 패널"
 msgid "32x32 PNG file icon"
 msgstr "32x32 PNG 파일 아이콘"
 
-#: gmusicbrowser.pl:1615
+#: gmusicbrowser.pl:1623
 msgid "50 Last Added"
 msgstr "50 마지막 추가됨"
 
-#: gmusicbrowser.pl:1614
+#: gmusicbrowser.pl:1622
 msgid "50 Last Played"
 msgstr "50 마지막 재생됨"
 
-#: gmusicbrowser.pl:1613
+#: gmusicbrowser.pl:1621
 msgid "50 Most Played"
 msgstr "50 대부분 재생됨"
 
@@ -276,7 +276,7 @@ msgstr "50 대부분 재생됨"
 msgid "<Unknown>"
 msgstr "<알 수 없음>"
 
-#: gmusicbrowser.pl:347
+#: gmusicbrowser.pl:366
 msgid ""
 "<b>%t</b>\n"
 "<small><small>by</small> %a\n"
@@ -298,7 +298,7 @@ msgstr "중단"
 msgid "Abort ReplayGain analysis"
 msgstr "리플레이게인 분석 중지"
 
-#: gmusicbrowser.pl:4152
+#: gmusicbrowser.pl:4160
 msgid "Abort all"
 msgstr "모두 중단"
 
@@ -310,7 +310,7 @@ msgstr "많은 파일의-태깅 중지하기"
 msgid "About"
 msgstr "정보"
 
-#: gmusicbrowser.pl:4146
+#: gmusicbrowser.pl:4154
 msgid ""
 "About to delete {files}\n"
 "Are you sure ?"
@@ -318,7 +318,7 @@ msgstr ""
 "{files} 지우기 정보\n"
 "확실합니까?"
 
-#: gmusicbrowser.pl:1371
+#: gmusicbrowser.pl:1379
 msgid "About to turn off the computer in :"
 msgstr "컴퓨터 끄기 정보 :"
 
@@ -326,7 +326,7 @@ msgstr "컴퓨터 끄기 정보 :"
 msgid "Actions are not supported by current notification daemon"
 msgstr "기능이 현재의 알림 데몬에서 지원되지 않습니다"
 
-#: gmusicbrowser.pl:6967 gmusicbrowser.pl:7238 gmusicbrowser.pl:7459
+#: gmusicbrowser.pl:6975 gmusicbrowser.pl:7246 gmusicbrowser.pl:7467
 #: gmusicbrowser_tags.pm:1237 plugins/desktopwidget.pm:36
 msgid "Add"
 msgstr "추가"
@@ -335,11 +335,11 @@ msgstr "추가"
 msgid "Add a button to rip a CD"
 msgstr "CD 립 버튼 추가"
 
-#: gmusicbrowser.pl:5746
+#: gmusicbrowser.pl:5754
 msgid "Add a fullscreen button"
 msgstr "전체화면 버튼 추가"
 
-#: gmusicbrowser.pl:5746
+#: gmusicbrowser.pl:5754
 msgid "Add a fullscreen button to layouts that can accept extra buttons"
 msgstr "나머지 버튼을 허용하는 레이아웃에 전체화면 버튼 추가하기"
 
@@ -347,11 +347,11 @@ msgstr "나머지 버튼을 허용하는 레이아웃에 전체화면 버튼 추
 msgid "Add a group"
 msgstr "그룹 추가"
 
-#: gmusicbrowser.pl:1074
+#: gmusicbrowser.pl:1082
 msgid "Add a label to the current song"
 msgstr "현재 노래에 이름 추가하기"
 
-#: gmusicbrowser.pl:1067
+#: gmusicbrowser.pl:1075
 msgid "Add a list of files/folders to the playlist"
 msgstr "재생목록에 파일/폴더의 목록 추가하기"
 
@@ -363,23 +363,23 @@ msgstr "라디오 추가"
 msgid "Add files or folders"
 msgstr "파일 또는 폴더 추가하기"
 
-#: gmusicbrowser.pl:1070
+#: gmusicbrowser.pl:1078
 msgid "Add files/folders to library"
 msgstr "라이브러리에 파일/폴더 추가"
 
-#: gmusicbrowser.pl:5867
+#: gmusicbrowser.pl:5875
 msgid "Add folder"
 msgstr "폴더 추가"
 
-#: gmusicbrowser.pl:6074
+#: gmusicbrowser.pl:6082
 msgid "Add label"
 msgstr "라벨 추가"
 
-#: gmusicbrowser.pl:6968
+#: gmusicbrowser.pl:6976
 msgid "Add multiple condition"
 msgstr "다중 조건 추가"
 
-#: gmusicbrowser.pl:4577
+#: gmusicbrowser.pl:4585
 msgid "Add new label"
 msgstr "새 이름 추가"
 
@@ -387,11 +387,11 @@ msgstr "새 이름 추가"
 msgid "Add new radio"
 msgstr "새 라디오 추가"
 
-#: gmusicbrowser.pl:7461
+#: gmusicbrowser.pl:7469
 msgid "Add rule : "
 msgstr "규칙 추가: "
 
-#: gmusicbrowser.pl:5312
+#: gmusicbrowser.pl:5320
 msgid "Add shorcut key"
 msgstr "단축 키 추가"
 
@@ -399,7 +399,7 @@ msgstr "단축 키 추가"
 msgid "Add tab"
 msgstr "탭 추가"
 
-#: gmusicbrowser.pl:399
+#: gmusicbrowser.pl:418
 msgid "Add to list"
 msgstr "목록에 추가"
 
@@ -407,7 +407,7 @@ msgstr "목록에 추가"
 msgid "Added"
 msgstr "추가됨"
 
-#: gmusicbrowser.pl:1617
+#: gmusicbrowser.pl:1625
 msgid "Added Today"
 msgstr "날짜 추가됨"
 
@@ -419,7 +419,7 @@ msgstr "라디오 추가중"
 msgid "Additional domain for Last.fm, Amazon and so on."
 msgstr ""
 
-#: gmusicbrowser.pl:5684
+#: gmusicbrowser.pl:5692
 msgid ""
 "Additionally this format can be used :\n"
 " default number1 format1 number2 format2 ...\n"
@@ -457,7 +457,7 @@ msgstr "고급 태그 편집"
 msgid "After: "
 msgstr ""
 
-#: gmusicbrowser.pl:835 gmusicbrowser.pl:7788 gmusicbrowser_songs.pm:495
+#: gmusicbrowser.pl:843 gmusicbrowser.pl:7796 gmusicbrowser_songs.pm:495
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
@@ -506,7 +506,7 @@ msgstr "앨범 사진 & 정보"
 msgid "Album shuffle"
 msgstr "앨범 섞기"
 
-#: gmusicbrowser.pl:834
+#: gmusicbrowser.pl:842
 msgid "Album with picture"
 msgstr "앨범 사진 포함"
 
@@ -530,11 +530,11 @@ msgstr "모든 앨범"
 msgid "All artists"
 msgstr "모든 가수"
 
-#: gmusicbrowser.pl:7890
+#: gmusicbrowser.pl:7898
 msgid "All but the [most/less]%n"
 msgstr "모두 그러나 [most/less]%n"
 
-#: gmusicbrowser.pl:3893
+#: gmusicbrowser.pl:3901
 msgid "All files"
 msgstr "모든 파일"
 
@@ -550,12 +550,12 @@ msgstr "모든 이름"
 msgid "All moods"
 msgstr "모든 분위기"
 
-#: gmusicbrowser.pl:7095 gmusicbrowser.pl:7136 gmusicbrowser.pl:7169
+#: gmusicbrowser.pl:7103 gmusicbrowser.pl:7144 gmusicbrowser.pl:7177
 #: gmusicbrowser_songs.pm:3675
 msgid "All of :"
 msgstr "모두 :"
 
-#: gmusicbrowser.pl:8782 gmusicbrowser_layout.pm:1422
+#: gmusicbrowser.pl:8790 gmusicbrowser_layout.pm:1422
 msgid "All songs"
 msgstr "모든 노래"
 
@@ -567,19 +567,19 @@ msgstr "패이드-아웃과 멈추기 스케쥴링을 허용하기"
 msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
 msgstr "MPRIS v1.0 표준을 사용하는 DBus를 통해 gmusicbrowser 제어를 허용합니다"
 
-#: gmusicbrowser.pl:882
+#: gmusicbrowser.pl:890
 msgid "Alt"
 msgstr "Alt"
 
-#: gmusicbrowser.pl:5698
+#: gmusicbrowser.pl:5706
 msgid "Amount of volume changed by the mouse wheel"
 msgstr "볼륨 크기는 마우스 휠로 바뀌어집니다"
 
-#: gmusicbrowser.pl:7095 gmusicbrowser.pl:7169 gmusicbrowser_songs.pm:3675
+#: gmusicbrowser.pl:7103 gmusicbrowser.pl:7177 gmusicbrowser_songs.pm:3675
 msgid "Any of :"
 msgstr "어느것 :"
 
-#: gmusicbrowser.pl:385
+#: gmusicbrowser.pl:404
 msgid "Append"
 msgstr "적용"
 
@@ -601,11 +601,11 @@ msgid ""
 "rating update on files with default rating):"
 msgstr ""
 
-#: gmusicbrowser.pl:5989
+#: gmusicbrowser.pl:5997
 msgid "Are you sure you want to delete the '{label}' label ?"
 msgstr "'{label}' 라벨을 지우시겠습니까?"
 
-#: gmusicbrowser.pl:5350
+#: gmusicbrowser.pl:5358
 msgid "Arguments"
 msgstr "줄거리"
 
@@ -625,7 +625,7 @@ msgstr ""
 msgid "Arkanoid browser"
 msgstr ""
 
-#: gmusicbrowser.pl:7780 gmusicbrowser_songs.pm:469 gmusicbrowser_tags.pm:1529
+#: gmusicbrowser.pl:7788 gmusicbrowser_songs.pm:469 gmusicbrowser_tags.pm:1529
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
 #: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:129
@@ -633,7 +633,7 @@ msgstr ""
 msgid "Artist"
 msgstr "음악가"
 
-#: gmusicbrowser.pl:833
+#: gmusicbrowser.pl:841
 msgid "Artist & album"
 msgstr "아티스트 & 앨범"
 
@@ -653,11 +653,11 @@ msgstr "가수 주소"
 msgid "Artist picture"
 msgstr "가수 사진"
 
-#: gmusicbrowser.pl:851
+#: gmusicbrowser.pl:859
 msgid "Artist,Album,Disc,Track"
 msgstr "가수,앨범,디스크,트랙"
 
-#: gmusicbrowser.pl:852
+#: gmusicbrowser.pl:860
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "가수,날짜,앨범,디스크,트랙"
 
@@ -673,7 +673,7 @@ msgstr "가수-정보 플러그인"
 msgid "Artists"
 msgstr "가수"
 
-#: gmusicbrowser.pl:7303
+#: gmusicbrowser.pl:7311
 msgid "Ascending order"
 msgstr "오름차순"
 
@@ -681,7 +681,7 @@ msgstr "오름차순"
 msgid "Ask confirmation only if file already exists"
 msgstr "파일이 이미 존재하는지의 여부만 확인 요청하기"
 
-#: gmusicbrowser.pl:5212
+#: gmusicbrowser.pl:5220
 msgid "Audio"
 msgstr "오디오"
 
@@ -725,7 +725,7 @@ msgstr "자동 사진 고르기"
 msgid "Automatic rating updates on configurable listening behaviour events."
 msgstr ""
 
-#: gmusicbrowser.pl:5908
+#: gmusicbrowser.pl:5916
 msgid "Automatically remove current song if not found"
 msgstr "찾지 못하면 현재 노래를 자동으로 제거하기"
 
@@ -737,7 +737,7 @@ msgstr "자동저장 "
 msgid "Autosave plugin"
 msgstr "자동저장 플러그인"
 
-#: gmusicbrowser.pl:7259
+#: gmusicbrowser.pl:7267
 msgid "Available"
 msgstr "사용 가능"
 
@@ -753,7 +753,7 @@ msgstr "BPM"
 msgid "Bad session"
 msgstr "잘못된 세션"
 
-#: gmusicbrowser.pl:4307
+#: gmusicbrowser.pl:4315
 msgid "Base Folder :"
 msgstr "기본 폴더 :"
 
@@ -785,7 +785,7 @@ msgstr "본문 텍스트 현재 알림 데몬에서 지원하지 않습니다."
 msgid "Browser"
 msgstr "브라우저"
 
-#: gmusicbrowser.pl:5735
+#: gmusicbrowser.pl:5743
 msgid "Browser window layout :"
 msgstr "브라우저 창 레이아웃 :"
 
@@ -801,7 +801,7 @@ msgstr "버튼"
 msgid "Buttons, Song & Cover"
 msgstr "버튼, 노래 & 커버"
 
-#: gmusicbrowser.pl:1063
+#: gmusicbrowser.pl:1071
 msgid "Can be relative by using + or -"
 msgstr "+ 또는 - 를 사용해서 관련되게 할 수 있다."
 
@@ -817,7 +817,7 @@ msgstr ""
 "소리를 바꿀 수 없습니다. 이 오디오 백앤드를 사용할 때 소리를 바꾸려면 알사믹"
 "서(amixer (alsa-utils 패키지에 포함됨))를 필요로 합니다."
 
-#: gmusicbrowser.pl:3717
+#: gmusicbrowser.pl:3725
 msgid ""
 "Can't create Folder '{path}' : \n"
 "{error}"
@@ -837,7 +837,7 @@ msgstr "'{file}' 재생할 수 없습니다"
 msgid "Can't read file or invalid file"
 msgstr "파일을 읽을 수 없거나 잘못된 파일"
 
-#: gmusicbrowser.pl:4343
+#: gmusicbrowser.pl:4351
 msgid "Can't write in base folder '{folder}'."
 msgstr "'{folder}' 기본 폴더에 쓰기를 할 수 없습니다."
 
@@ -849,11 +849,11 @@ msgstr "대문자 사용"
 msgid "Capitalize each word"
 msgstr "각 단어 대문자 사용"
 
-#: gmusicbrowser.pl:7299
+#: gmusicbrowser.pl:7307
 msgid "Case insensitive"
 msgstr "대소문자 구분안함"
 
-#: gmusicbrowser.pl:7299 gmusicbrowser_list.pm:3369
+#: gmusicbrowser.pl:7307 gmusicbrowser_list.pm:3369
 msgid "Case sensitive"
 msgstr "대소문자 구분"
 
@@ -873,7 +873,7 @@ msgstr "가운데"
 msgid "Centered on"
 msgstr "가운데로"
 
-#: gmusicbrowser.pl:1037
+#: gmusicbrowser.pl:1045
 msgid "Change Display"
 msgstr "표시 바꾸기"
 
@@ -889,7 +889,7 @@ msgstr "기본 글자 글꼴과 크기 바꾸기"
 msgid "Channels"
 msgstr "채널"
 
-#: gmusicbrowser.pl:5891
+#: gmusicbrowser.pl:5899
 msgid "Check for updated/deleted songs on startup"
 msgstr "시작할 때 업데이트/지워진 노래 체크하기"
 
@@ -897,11 +897,11 @@ msgstr "시작할 때 업데이트/지워진 노래 체크하기"
 msgid "Check for updated/removed songs"
 msgstr "업데이트/제거된 노래 체크하기"
 
-#: gmusicbrowser.pl:5061
+#: gmusicbrowser.pl:5069
 msgid "Checking length/bitrate"
 msgstr "길이/비트 레이트 체크중"
 
-#: gmusicbrowser.pl:5034
+#: gmusicbrowser.pl:5042
 msgid "Checking songs"
 msgstr "노래 체크중"
 
@@ -913,11 +913,11 @@ msgstr "이 가수의 앨범 고르기"
 msgid "Choose Artist/Album/Song"
 msgstr "가수/앨범/노래 고르기"
 
-#: gmusicbrowser.pl:8232
+#: gmusicbrowser.pl:8240
 msgid "Choose Date"
 msgstr "날짜 고르기"
 
-#: gmusicbrowser.pl:3884
+#: gmusicbrowser.pl:3892
 msgid "Choose Picture"
 msgstr "사진 고르기"
 
@@ -925,19 +925,19 @@ msgstr "사진 고르기"
 msgid "Choose Random Album"
 msgstr "랜덤 앨범 고르기"
 
-#: gmusicbrowser.pl:3726
+#: gmusicbrowser.pl:3734
 msgid "Choose directory to copy files to"
 msgstr "파일을 복사위한 폴더 고르기"
 
-#: gmusicbrowser.pl:3727
+#: gmusicbrowser.pl:3735
 msgid "Choose directory to move files to"
 msgstr "파일을 이동할 폴더를 고르기"
 
-#: gmusicbrowser.pl:3853
+#: gmusicbrowser.pl:3861
 msgid "Choose files"
 msgstr "파일 고르기"
 
-#: gmusicbrowser.pl:5936
+#: gmusicbrowser.pl:5944
 msgid "Choose folder to add"
 msgstr "추가할 폴더 고르기"
 
@@ -957,19 +957,19 @@ msgstr "{name} 라벨 아이콘 고르기"
 msgid "Choose page to open"
 msgstr "불러올 페이지 고르기"
 
-#: gmusicbrowser.pl:2997
+#: gmusicbrowser.pl:3005
 msgid "Choose picture for '%s'"
 msgstr "'%s' 위한 사진 고르기"
 
-#: gmusicbrowser.pl:4900
+#: gmusicbrowser.pl:4908
 msgid "Choose playlist files to import"
 msgstr "가져올 재생목록 고르기"
 
-#: gmusicbrowser.pl:7240 gmusicbrowser_list.pm:290
+#: gmusicbrowser.pl:7248 gmusicbrowser_list.pm:290
 msgid "Clear"
 msgstr "비우기"
 
-#: gmusicbrowser.pl:1044 gmusicbrowser_layout.pm:32
+#: gmusicbrowser.pl:1052 gmusicbrowser_layout.pm:32
 msgid "Clear queue"
 msgstr "대기열 비움"
 
@@ -986,15 +986,15 @@ msgstr "클라이언트 금지됨, 프로그램 개발자와 접촉하세요"
 msgid "Close"
 msgstr "닫기"
 
-#: gmusicbrowser.pl:1027
+#: gmusicbrowser.pl:1035
 msgid "Close Window"
 msgstr "창 닫기"
 
-#: gmusicbrowser.pl:5721
+#: gmusicbrowser.pl:5729
 msgid "Close to tray"
 msgstr "트레이 닫기"
 
-#: gmusicbrowser.pl:5239 gmusicbrowser.pl:5349 gmusicbrowser_123.pm:287
+#: gmusicbrowser.pl:5247 gmusicbrowser.pl:5357 gmusicbrowser_123.pm:287
 msgid "Command"
 msgstr "명령"
 
@@ -1002,7 +1002,7 @@ msgstr "명령"
 msgid "Command to launch when the button is pressed"
 msgstr "버튼이 눌러지면 실행할 명령"
 
-#: gmusicbrowser.pl:5657
+#: gmusicbrowser.pl:5665
 msgid ""
 "Command used when\n"
 "'turn off computer when queue empty'\n"
@@ -1020,7 +1020,7 @@ msgstr "재생중인 노래가 바뀔 때 명령 실행"
 msgid "Command when stopped :"
 msgstr "멈출때 명령 :"
 
-#: gmusicbrowser.pl:7939 gmusicbrowser_songs.pm:628 gmusicbrowser_tags.pm:1590
+#: gmusicbrowser.pl:7947 gmusicbrowser_songs.pm:628 gmusicbrowser_tags.pm:1590
 #: gmusicbrowser_tags.pm:1609 gmusicbrowser_tags.pm:1852
 msgid "Comment"
 msgstr "주석"
@@ -1043,7 +1043,7 @@ msgstr "작곡가"
 msgid "Conductor"
 msgstr "지휘자"
 
-#: gmusicbrowser.pl:5647
+#: gmusicbrowser.pl:5655
 msgid "Connect through a proxy"
 msgstr "프록시 통한 연결"
 
@@ -1056,11 +1056,11 @@ msgstr "다음으로 연결 :"
 msgid "Context"
 msgstr "항목"
 
-#: gmusicbrowser.pl:407
+#: gmusicbrowser.pl:426
 msgid "Copy"
 msgstr "복사"
 
-#: gmusicbrowser.pl:3736
+#: gmusicbrowser.pl:3744
 msgid "Copy failed"
 msgstr "복사 실패함"
 
@@ -1076,7 +1076,7 @@ msgstr "마운트된 포터블 재생기에 복사"
 msgid "Copy to portable player"
 msgstr "포터블 재생기에 복사"
 
-#: gmusicbrowser.pl:3739
+#: gmusicbrowser.pl:3747
 msgid "Copying file"
 msgid_plural "Copying %d files"
 msgstr[0] "%d 파일 복사중"
@@ -1085,15 +1085,15 @@ msgstr[0] "%d 파일 복사중"
 msgid "Copyright"
 msgstr "저작권"
 
-#: gmusicbrowser.pl:5769
+#: gmusicbrowser.pl:5777
 msgid "Create ID3v2 tags as ID3v2.4"
 msgstr "ID3v2 태그를 ID3v2.4 태그로 만들기"
 
-#: gmusicbrowser.pl:882
+#: gmusicbrowser.pl:890
 msgid "Ctrl"
 msgstr "Ctrl"
 
-#: gmusicbrowser.pl:5699
+#: gmusicbrowser.pl:5707
 msgid "Current song must always be in the playlist"
 msgstr "현재 노래는 항상 재생목록에 있어야 합니다."
 
@@ -1130,11 +1130,11 @@ msgstr "사용자 포맷"
 msgid "Custom..."
 msgstr "사용자 정의..."
 
-#: gmusicbrowser.pl:848 gmusicbrowser_tags.pm:1534 gmusicbrowser_tags.pm:1572
+#: gmusicbrowser.pl:856 gmusicbrowser_tags.pm:1534 gmusicbrowser_tags.pm:1572
 msgid "Date"
 msgstr "날짜"
 
-#: gmusicbrowser.pl:5685
+#: gmusicbrowser.pl:5693
 msgid "Date format :"
 msgstr "날짜 형식 :"
 
@@ -1146,7 +1146,7 @@ msgstr "구매 날짜"
 msgid "Debut Album"
 msgstr "데뷰 앨범"
 
-#: gmusicbrowser.pl:1046
+#: gmusicbrowser.pl:1054
 msgid "Decrease Volume"
 msgstr "음량 감소"
 
@@ -1154,7 +1154,7 @@ msgstr "음량 감소"
 msgid "Default"
 msgstr "기본 값"
 
-#: gmusicbrowser.pl:5637
+#: gmusicbrowser.pl:5645
 msgid "Default rating :"
 msgstr "기본 점수 :"
 
@@ -1166,11 +1166,11 @@ msgstr "기본 글자색"
 msgid "Default text font"
 msgstr "기본 글자 글꼴"
 
-#: gmusicbrowser.pl:5723
+#: gmusicbrowser.pl:5731
 msgid "Delay tray tip popup on mouse over"
 msgstr "마우스상에 있으면 트레이 팁 팝업상자 지연하기"
 
-#: gmusicbrowser.pl:1039
+#: gmusicbrowser.pl:1047
 msgid "Delete Selected Songs"
 msgstr "선택한 노래 지우기"
 
@@ -1178,7 +1178,7 @@ msgstr "선택한 노래 지우기"
 msgid "Delete list"
 msgstr "목록 지우기"
 
-#: gmusicbrowser.pl:7303
+#: gmusicbrowser.pl:7311
 msgid "Descending order"
 msgstr "내림차순"
 
@@ -1204,7 +1204,7 @@ msgstr "데스크탑 위젯 플로그인"
 msgid "Differential: "
 msgstr ""
 
-#: gmusicbrowser.pl:5654
+#: gmusicbrowser.pl:5662
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "전체화면과 재생할 때 스크린세이버 사용하지 않기"
 
@@ -1212,7 +1212,7 @@ msgstr "전체화면과 재생할 때 스크린세이버 사용하지 않기"
 msgid "Disabled"
 msgstr "사용안함"
 
-#: gmusicbrowser.pl:7808 gmusicbrowser_songs.pm:580
+#: gmusicbrowser.pl:7816 gmusicbrowser_songs.pm:580
 msgid "Disc"
 msgstr "디스크"
 
@@ -1225,11 +1225,11 @@ msgstr "디스크 #"
 msgid "Disc name"
 msgstr "디스크 이름"
 
-#: gmusicbrowser.pl:1037
+#: gmusicbrowser.pl:1045
 msgid "Display (:1 or host:0 for example)"
 msgstr "표시 (예 :1 또는 host:0)"
 
-#: gmusicbrowser.pl:429
+#: gmusicbrowser.pl:448
 msgid "Display Songs"
 msgstr "노래 표시"
 
@@ -1246,7 +1246,7 @@ msgstr "정지/다음 동작 표시"
 msgid "Display synchronized lyrics of the current song"
 msgstr "현재 노래의 동기화된 가사 표시하기"
 
-#: gmusicbrowser.pl:5719
+#: gmusicbrowser.pl:5727
 msgid "Display tray tip for"
 msgstr "트레이 팁 표시"
 
@@ -1254,19 +1254,19 @@ msgstr "트레이 팁 표시"
 msgid "Do not add a title row"
 msgstr "제목 열 추가하지 않기"
 
-#: gmusicbrowser.pl:5889
+#: gmusicbrowser.pl:5897
 msgid "Do not add songs that can't be played"
 msgstr "재생할 수 없는 노래는 추가하지 않기"
 
-#: gmusicbrowser.pl:5775
+#: gmusicbrowser.pl:5783
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr "mp3 파일에 id3v1 태그를 만들지 않기"
 
-#: gmusicbrowser.pl:5771
+#: gmusicbrowser.pl:5779
 msgid "Do not unsynchronise id3v2 tags"
 msgstr "id3v2 태그를 비동기화하지 않기"
 
-#: gmusicbrowser.pl:5774
+#: gmusicbrowser.pl:5782
 msgid "Do not write the tags"
 msgstr "태그 쓰지 않기"
 
@@ -1290,15 +1290,15 @@ msgstr "주 창이 보일 때는 알림을 표시하지 않기"
 msgid "Don't submit current song"
 msgstr "현재 노래 제출하지 않기"
 
-#: gmusicbrowser.pl:1030
+#: gmusicbrowser.pl:1038
 msgid "Edit Current Song Properties"
 msgstr "현재 노래 등록정보 편집"
 
-#: gmusicbrowser.pl:400
+#: gmusicbrowser.pl:419
 msgid "Edit Labels"
 msgstr "라벨 편집"
 
-#: gmusicbrowser.pl:416 gmusicbrowser.pl:4110
+#: gmusicbrowser.pl:435 gmusicbrowser.pl:4118
 msgid "Edit Lyrics"
 msgstr "가사 편집"
 
@@ -1306,11 +1306,11 @@ msgstr "가사 편집"
 msgid "Edit Lyrics ..."
 msgstr "가사 편집..."
 
-#: gmusicbrowser.pl:4598
+#: gmusicbrowser.pl:4606
 msgid "Edit Multiple Songs Properties"
 msgstr "다중 노래 등록정보 편집"
 
-#: gmusicbrowser.pl:401
+#: gmusicbrowser.pl:420
 msgid "Edit Rating"
 msgstr "점수 편집"
 
@@ -1342,11 +1342,11 @@ msgstr "순서 모드 편집 ..."
 msgid "Edit random modes ..."
 msgstr "랜덤 모드 편집 ..."
 
-#: gmusicbrowser.pl:1031
+#: gmusicbrowser.pl:1039
 msgid "Edit selected song properties"
 msgstr "선택한 노래 등록정보 편집"
 
-#: gmusicbrowser.pl:8786 gmusicbrowser_layout.pm:34
+#: gmusicbrowser.pl:8794 gmusicbrowser_layout.pm:34
 msgid "Edit..."
 msgstr "편집..."
 
@@ -1354,11 +1354,11 @@ msgstr "편집..."
 msgid "EditList"
 msgstr "편집목록"
 
-#: gmusicbrowser.pl:2902 gmusicbrowser.pl:2909
+#: gmusicbrowser.pl:2910 gmusicbrowser.pl:2917
 msgid "Editing list : "
 msgstr "목록 편집 :"
 
-#: gmusicbrowser.pl:1249
+#: gmusicbrowser.pl:1257
 msgid "Editing tags"
 msgstr "태그 편집"
 
@@ -1386,7 +1386,7 @@ msgstr "엔코드"
 msgid "Encoder"
 msgstr "엔코더"
 
-#: gmusicbrowser.pl:5773
+#: gmusicbrowser.pl:5781
 msgid "Encoding used for id3v1 tags :"
 msgstr "id3v1 태그 사용하기 :"
 
@@ -1395,31 +1395,31 @@ msgstr "id3v1 태그 사용하기 :"
 msgid "Enqueue"
 msgstr "대기열로 보내기"
 
-#: gmusicbrowser.pl:1043
+#: gmusicbrowser.pl:1051
 msgid "Enqueue Action"
 msgstr "실행중인것 대기열로 보내기"
 
-#: gmusicbrowser.pl:397
+#: gmusicbrowser.pl:416
 msgid "Enqueue Displayed"
 msgstr "표시된 것 대기열로 보내기"
 
-#: gmusicbrowser.pl:395
+#: gmusicbrowser.pl:414
 msgid "Enqueue Selected"
 msgstr "선택한 것 대기열로 보내기"
 
-#: gmusicbrowser.pl:1040
+#: gmusicbrowser.pl:1048
 msgid "Enqueue Selected Songs"
 msgstr "선택한 노래 대기열로 보내기"
 
-#: gmusicbrowser.pl:1042
+#: gmusicbrowser.pl:1050
 msgid "Enqueue Songs from Current Album"
 msgstr "현재 앨범의 노래를 대기열로 보내기"
 
-#: gmusicbrowser.pl:1041
+#: gmusicbrowser.pl:1049
 msgid "Enqueue Songs from Current Artist"
 msgstr "현재 가수의 노래를 대기열로 보내기"
 
-#: gmusicbrowser.pl:1069
+#: gmusicbrowser.pl:1077
 msgid "Enqueue a list of files/folders"
 msgstr "파일/폴더의 목록을 대기열로 보내기"
 
@@ -1443,7 +1443,7 @@ msgstr ""
 msgid "Equalizer"
 msgstr "이퀄라이저"
 
-#: gmusicbrowser.pl:5406
+#: gmusicbrowser.pl:5414
 msgid "Error :"
 msgstr "에러 :"
 
@@ -1510,7 +1510,7 @@ msgstr ""
 msgid "Extra gain"
 msgstr "익스트라 게인"
 
-#: gmusicbrowser.pl:5670
+#: gmusicbrowser.pl:5678
 msgid "Extract guest artist from title :"
 msgstr "제목에서 가수를 추출하기 :"
 
@@ -1526,7 +1526,7 @@ msgstr "페이드-아웃"
 msgid "Fade-out then stop"
 msgstr "페이드-아웃 그런후 정지"
 
-#: gmusicbrowser.pl:4156
+#: gmusicbrowser.pl:4164
 msgid ""
 "Failed to delete '{file}' :\n"
 "{error}"
@@ -1550,7 +1550,7 @@ msgstr "파일 종류"
 msgid "Field: "
 msgstr ""
 
-#: gmusicbrowser.pl:5215 gmusicbrowser_list.pm:5059
+#: gmusicbrowser.pl:5223 gmusicbrowser_list.pm:5059
 msgid "Fields"
 msgstr "필드"
 
@@ -1558,7 +1558,7 @@ msgstr "필드"
 msgid "File type"
 msgstr "파일 종류"
 
-#: gmusicbrowser.pl:7921 gmusicbrowser_songs.pm:441 gmusicbrowser_tags.pm:2041
+#: gmusicbrowser.pl:7929 gmusicbrowser_songs.pm:441 gmusicbrowser_tags.pm:2041
 msgid "Filename"
 msgstr "파일 이름"
 
@@ -1578,7 +1578,7 @@ msgstr "파일이름 확장자 없이"
 msgid "Filesystem"
 msgstr "파일 시스템"
 
-#: gmusicbrowser.pl:427 gmusicbrowser.pl:429 gmusicbrowser_list.pm:127
+#: gmusicbrowser.pl:446 gmusicbrowser.pl:448 gmusicbrowser_list.pm:127
 #: gmusicbrowser_list.pm:1512
 msgid "Filter"
 msgstr "필터"
@@ -1587,7 +1587,7 @@ msgstr "필터"
 msgid "Filter : "
 msgstr "필터 : "
 
-#: gmusicbrowser.pl:6780
+#: gmusicbrowser.pl:6788
 msgid "Filter edition"
 msgstr "필터 편집"
 
@@ -1619,19 +1619,19 @@ msgstr "찾기 :"
 msgid "Find a unique filename if file already exists"
 msgstr "파일이 이미 있으면 다른 파일이름 찾기"
 
-#: gmusicbrowser.pl:404
+#: gmusicbrowser.pl:423
 msgid "Find songs in same albums"
 msgstr "같은 앨범에서 노래 찾기"
 
-#: gmusicbrowser.pl:403
+#: gmusicbrowser.pl:422
 msgid "Find songs with same artists"
 msgstr "같은 가수의 노래 찾기"
 
-#: gmusicbrowser.pl:402
+#: gmusicbrowser.pl:421
 msgid "Find songs with the same names"
 msgstr "같은 이름을 가진 노래 찾기"
 
-#: gmusicbrowser.pl:836 gmusicbrowser.pl:7929 gmusicbrowser_list.pm:724
+#: gmusicbrowser.pl:844 gmusicbrowser.pl:7937 gmusicbrowser_list.pm:724
 #: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:827
 msgid "Folder"
 msgstr "폴더"
@@ -1644,11 +1644,11 @@ msgstr "폴더 (오른쪽 정렬)"
 msgid "Folder format :"
 msgstr "폴더 포맷 :"
 
-#: gmusicbrowser.pl:4308
+#: gmusicbrowser.pl:4316
 msgid "Folder pattern :"
 msgstr "폴더 패턴 :"
 
-#: gmusicbrowser.pl:5852 gmusicbrowser.pl:5894
+#: gmusicbrowser.pl:5860 gmusicbrowser.pl:5902
 msgid "Folders to search for new songs"
 msgstr "새 노래 찾을 폴더"
 
@@ -1676,7 +1676,7 @@ msgstr ""
 "dokuwiki/doku.php?id=plugins:artistinfo'> 플러그인 위키 페이지</a> <a "
 "href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>."
 
-#: gmusicbrowser.pl:1017
+#: gmusicbrowser.pl:1025
 msgid "Forward"
 msgstr "앞으로"
 
@@ -1688,11 +1688,11 @@ msgstr "찾았지만 동작하지 않음"
 msgid "Friday"
 msgstr "금요일"
 
-#: gmusicbrowser.pl:5737
+#: gmusicbrowser.pl:5745
 msgid "Full screen layout :"
 msgstr "전체 화면 레이아웃 :"
 
-#: gmusicbrowser.pl:446 gmusicbrowser_layout.pm:607
+#: gmusicbrowser.pl:465 gmusicbrowser_layout.pm:607
 msgid "Fullscreen"
 msgstr "전체화면"
 
@@ -1700,7 +1700,7 @@ msgstr "전체화면"
 msgid "Fullscreen simple"
 msgstr "전체화면 간단히"
 
-#: gmusicbrowser.pl:5523
+#: gmusicbrowser.pl:5531
 msgid "GStreamer module not loaded."
 msgstr "GStreamer 모듈이 로드 되지 않았습니다."
 
@@ -1708,7 +1708,7 @@ msgstr "GStreamer 모듈이 로드 되지 않았습니다."
 msgid "Gain for songs missing replaygain tags"
 msgstr "리플레이게인 태그가 없는 노래위한 게인"
 
-#: gmusicbrowser.pl:7905 gmusicbrowser_tags.pm:1536 gmusicbrowser_tags.pm:1575
+#: gmusicbrowser.pl:7913 gmusicbrowser_tags.pm:1536 gmusicbrowser_tags.pm:1575
 #: gmusicbrowser_tags.pm:1588 gmusicbrowser_tags.pm:1610
 #: gmusicbrowser_tags.pm:1862
 msgid "Genre"
@@ -1758,7 +1758,7 @@ msgstr "연결 실패 :"
 msgid "Hard limiter"
 msgstr "하드 리미터"
 
-#: gmusicbrowser.pl:445 gmusicbrowser.pl:1034
+#: gmusicbrowser.pl:464 gmusicbrowser.pl:1042
 msgid "Hide"
 msgstr "숨기기"
 
@@ -1766,7 +1766,7 @@ msgstr "숨기기"
 msgid "Hide toolbar"
 msgstr "도구바 감추기"
 
-#: gmusicbrowser.pl:5749
+#: gmusicbrowser.pl:5757
 msgid "Icon theme :"
 msgstr "아이콘 테마 :"
 
@@ -1774,7 +1774,7 @@ msgstr "아이콘 테마 :"
 msgid "Identifier in file tag"
 msgstr "파일 태그에 인식자"
 
-#: gmusicbrowser.pl:5552
+#: gmusicbrowser.pl:5560
 msgid "Ignore playback errors"
 msgstr "재생 오류 무시하기"
 
@@ -1790,11 +1790,11 @@ msgstr ""
 "하나의 명령어인 경우 파일은 실행되어질 것입니다\n"
 "\n"
 
-#: gmusicbrowser.pl:1045
+#: gmusicbrowser.pl:1053
 msgid "Increase Volume"
 msgstr "음량 증가"
 
-#: gmusicbrowser.pl:4651 gmusicbrowser_tags.pm:1598
+#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598
 msgid "Info"
 msgstr "정보"
 
@@ -1810,7 +1810,7 @@ msgstr "둔감하게 제목-가수 (오른쪽 정렬)"
 msgid "Insensitive, Song & Cover"
 msgstr "둔감하게, 노래 & 커버"
 
-#: gmusicbrowser.pl:1068
+#: gmusicbrowser.pl:1076
 msgid "Insert a list of files/folders at the start of the playlist"
 msgstr "재생모록 시작할 때 파일/폴더의 목록 추가"
 
@@ -1826,7 +1826,7 @@ msgstr "보이지않는 핫 스팟"
 msgid "Justified"
 msgstr "일반적인 정렬"
 
-#: gmusicbrowser.pl:714
+#: gmusicbrowser.pl:722
 msgid "KB"
 msgstr "KB"
 
@@ -1838,11 +1838,11 @@ msgstr "노래방"
 msgid "Karaoke plugin"
 msgstr "노래방 플러그인"
 
-#: gmusicbrowser.pl:5236 gmusicbrowser.pl:5348
+#: gmusicbrowser.pl:5244 gmusicbrowser.pl:5356
 msgid "Key"
 msgstr "키"
 
-#: gmusicbrowser.pl:5217
+#: gmusicbrowser.pl:5225
 msgid "Keys"
 msgstr "키"
 
@@ -1850,8 +1850,8 @@ msgstr "키"
 msgid "Keywords"
 msgstr "키워드"
 
-#: gmusicbrowser.pl:1074 gmusicbrowser.pl:1075 gmusicbrowser.pl:1076
-#: gmusicbrowser.pl:6023 gmusicbrowser.pl:7913
+#: gmusicbrowser.pl:1082 gmusicbrowser.pl:1083 gmusicbrowser.pl:1084
+#: gmusicbrowser.pl:6031 gmusicbrowser.pl:7921
 msgid "Label"
 msgstr "라벨"
 
@@ -1863,7 +1863,7 @@ msgstr "라벨 설정됨"
 msgid "Label/Publisher"
 msgstr "라벨/발행자"
 
-#: gmusicbrowser.pl:4612 gmusicbrowser.pl:4649 gmusicbrowser.pl:5211
+#: gmusicbrowser.pl:4620 gmusicbrowser.pl:4657 gmusicbrowser.pl:5219
 #: gmusicbrowser_songs.pm:604
 msgid "Labels"
 msgstr "라벨"
@@ -1892,7 +1892,7 @@ msgstr ""
 msgid "Languages"
 msgstr "언어"
 
-#: gmusicbrowser.pl:850 gmusicbrowser_songs.pm:659
+#: gmusicbrowser.pl:858 gmusicbrowser_songs.pm:659
 msgid "Last played"
 msgstr "마지막 연주됨"
 
@@ -1912,7 +1912,7 @@ msgstr "레이아웃"
 msgid "Layout :"
 msgstr "레이아웃 :"
 
-#: gmusicbrowser.pl:5213
+#: gmusicbrowser.pl:5221
 msgid "Layouts"
 msgstr "레이아웃"
 
@@ -1924,11 +1924,11 @@ msgstr "왼쪽 정렬"
 msgid "Left pane"
 msgstr "왼쪽 패널"
 
-#: gmusicbrowser.pl:7821 gmusicbrowser_songs.pm:737
+#: gmusicbrowser.pl:7829 gmusicbrowser_songs.pm:737
 msgid "Length"
 msgstr "길이"
 
-#: gmusicbrowser.pl:5210 gmusicbrowser_list.pm:128 layouts:201 layouts:364
+#: gmusicbrowser.pl:5218 gmusicbrowser_list.pm:128 layouts:201 layouts:364
 #: layouts:568 layouts:630
 msgid "Library"
 msgstr "라이브러리"
@@ -1947,7 +1947,7 @@ msgstr ""
 "\n"
 "음악을 추가하려면 설정 대화상자를 사용하세요."
 
-#: gmusicbrowser.pl:5918
+#: gmusicbrowser.pl:5926
 msgid "Library size : %d song"
 msgid_plural "Library size : %d songs"
 msgstr[0] "라이브러리 크기 : %d 노래"
@@ -2010,15 +2010,15 @@ msgstr "가져오기 실패함."
 msgid "Loading..."
 msgstr "가져오는 중..."
 
-#: gmusicbrowser.pl:421
+#: gmusicbrowser.pl:440
 msgid "Lock"
 msgstr "잠금"
 
-#: gmusicbrowser.pl:442
+#: gmusicbrowser.pl:461
 msgid "Lock Album"
 msgstr "앨범 잠금"
 
-#: gmusicbrowser.pl:441
+#: gmusicbrowser.pl:460
 msgid "Lock Artist"
 msgstr "가수 잠금"
 
@@ -2042,11 +2042,11 @@ msgstr "{field} 잠금"
 msgid "Locked on :\n"
 msgstr "잠금됨 :\n"
 
-#: gmusicbrowser.pl:424
+#: gmusicbrowser.pl:443
 msgid "Lookup in AMG"
 msgstr "AMG에서 찾기"
 
-#: gmusicbrowser.pl:417
+#: gmusicbrowser.pl:436
 msgid "Lookup in google"
 msgstr "google에서 찾기"
 
@@ -2084,7 +2084,7 @@ msgstr "가사 (가사 플러그인이 필요함)"
 msgid "Lyrics alignement"
 msgstr "가사 정렬"
 
-#: gmusicbrowser.pl:4102
+#: gmusicbrowser.pl:4110
 msgid "Lyrics for "
 msgstr "가사"
 
@@ -2096,7 +2096,7 @@ msgstr "가사 플러그인"
 msgid "Lyrics source"
 msgstr "가사 소스"
 
-#: gmusicbrowser.pl:715 gmusicbrowser.pl:5700
+#: gmusicbrowser.pl:723 gmusicbrowser.pl:5708
 msgid "MB"
 msgstr "MB"
 
@@ -2131,11 +2131,11 @@ msgid ""
 msgstr ""
 "그놈에서 다음/이전/재생/정지 멀티미디어 키가 반응하도록 gmusicbrowser 만들기."
 
-#: gmusicbrowser.pl:406
+#: gmusicbrowser.pl:425
 msgid "Mass Rename"
 msgstr "많은 파일 이름 바꾸기"
 
-#: gmusicbrowser.pl:4242
+#: gmusicbrowser.pl:4250
 msgid "Mass Renaming"
 msgstr "많은 파일 이름 바꾸는 중"
 
@@ -2155,7 +2155,7 @@ msgstr "최소화 팁"
 msgid "Minimum size"
 msgstr "최소 크기"
 
-#: gmusicbrowser.pl:5214
+#: gmusicbrowser.pl:5222
 msgid "Misc."
 msgstr "그 외"
 
@@ -2175,28 +2175,28 @@ msgstr "분위기"
 msgid "More results"
 msgstr "결과"
 
-#: gmusicbrowser.pl:409
+#: gmusicbrowser.pl:428
 msgid "Move"
 msgstr "이동"
 
-#: gmusicbrowser.pl:4313
+#: gmusicbrowser.pl:4321
 msgid "Move Files to :"
 msgstr "파일 이동 :"
 
-#: gmusicbrowser.pl:3737
+#: gmusicbrowser.pl:3745
 msgid "Move failed"
 msgstr "이동 실패함"
 
-#: gmusicbrowser.pl:5820
+#: gmusicbrowser.pl:5828
 msgid "Move folder to"
 msgstr "다음으로 폴더 이동 :"
 
-#: gmusicbrowser.pl:3740
+#: gmusicbrowser.pl:3748
 msgid "Moving file"
 msgid_plural "Moving %d files"
 msgstr[0] "%d 파일 이동중"
 
-#: gmusicbrowser.pl:1047
+#: gmusicbrowser.pl:1055
 msgid "Mute/Unmute"
 msgstr "소리끄기/소리켜기"
 
@@ -2204,7 +2204,7 @@ msgstr "소리끄기/소리켜기"
 msgid "Name"
 msgstr "이름"
 
-#: gmusicbrowser.pl:1025 gmusicbrowser.pl:1026 gmusicbrowser.pl:1028
+#: gmusicbrowser.pl:1033 gmusicbrowser.pl:1034 gmusicbrowser.pl:1036
 msgid "Name of layout"
 msgstr "레이아웃 이름"
 
@@ -2228,28 +2228,28 @@ msgstr "새 필터"
 msgid "New list"
 msgstr "새 목록"
 
-#: gmusicbrowser.pl:4277
+#: gmusicbrowser.pl:4285
 msgid "New name"
 msgstr "새 이름"
 
-#: gmusicbrowser.pl:439 gmusicbrowser.pl:2437 gmusicbrowser_layout.pm:79
+#: gmusicbrowser.pl:458 gmusicbrowser.pl:2445 gmusicbrowser_layout.pm:79
 #: gmusicbrowser_list.pm:5081 plugins/notify.pm:90
 msgid "Next"
 msgstr "다음"
 
-#: gmusicbrowser.pl:1012
+#: gmusicbrowser.pl:1020
 msgid "Next Album"
 msgstr "다음 앨범"
 
-#: gmusicbrowser.pl:1013
+#: gmusicbrowser.pl:1021
 msgid "Next Artist"
 msgstr "다음 가수"
 
-#: gmusicbrowser.pl:1014 gmusicbrowser_layout.pm:78
+#: gmusicbrowser.pl:1022 gmusicbrowser_layout.pm:78
 msgid "Next Song"
 msgstr "다음 노래"
 
-#: gmusicbrowser.pl:1010
+#: gmusicbrowser.pl:1018
 msgid "Next Song In Playlist"
 msgstr "재생목록에서 다음 노래"
 
@@ -2257,7 +2257,7 @@ msgstr "재생목록에서 다음 노래"
 msgid "No connections"
 msgstr "연결 없음"
 
-#: gmusicbrowser.pl:2974
+#: gmusicbrowser.pl:2982
 msgid "No file browser found."
 msgstr "파일 브라우저 찾지 못함."
 
@@ -2285,11 +2285,11 @@ msgstr ""
 msgid "No songs found"
 msgstr "노래를 찾지 못했습니다"
 
-#: gmusicbrowser.pl:2966
+#: gmusicbrowser.pl:2974
 msgid "No web browser found."
 msgstr "웹 브라우저 발견하지 못함."
 
-#: gmusicbrowser.pl:832 gmusicbrowser_list.pm:1560 gmusicbrowser_list.pm:1579
+#: gmusicbrowser.pl:840 gmusicbrowser_list.pm:1560 gmusicbrowser_list.pm:1579
 #: gmusicbrowser_songs.pm:53 gmusicbrowser_songs.pm:565
 #: gmusicbrowser_tags.pm:1199 gmusicbrowser_tags.pm:1277
 msgid "None"
@@ -2347,11 +2347,11 @@ msgstr "마지막 스킵되어진 날짜의 수"
 msgid "Number of days since modified"
 msgstr "수정되어진 날짜의 수"
 
-#: gmusicbrowser.pl:1073
+#: gmusicbrowser.pl:1081
 msgid "Number of milliseconds"
 msgstr "밀리초의 수"
 
-#: gmusicbrowser.pl:1017 gmusicbrowser.pl:1018 gmusicbrowser.pl:1019
+#: gmusicbrowser.pl:1025 gmusicbrowser.pl:1026 gmusicbrowser.pl:1027
 msgid "Number of seconds"
 msgstr "초의 수"
 
@@ -2363,7 +2363,7 @@ msgstr "재생된 회수의 수"
 msgid "Number of times skipped"
 msgstr "스킵된 회수의 수"
 
-#: gmusicbrowser.pl:7636 gmusicbrowser.pl:7659
+#: gmusicbrowser.pl:7644 gmusicbrowser.pl:7667
 msgid ""
 "ON -> smaller means more probable\n"
 "OFF -> bigger means more probable"
@@ -2371,7 +2371,7 @@ msgstr ""
 "ON -> 더 가능한 더 작은 방법\n"
 "OFF -> 더 가능한 더 큰 방법"
 
-#: gmusicbrowser.pl:7628
+#: gmusicbrowser.pl:7636
 msgid ""
 "ON less probable if genre is set\n"
 "OFF more probable if genre is set"
@@ -2379,7 +2379,7 @@ msgstr ""
 "ON 장르가 설정되면 적게 예상\n"
 "OFF 장르가 설정되면 좀더 예상"
 
-#: gmusicbrowser.pl:7620
+#: gmusicbrowser.pl:7628
 msgid ""
 "ON less probable if label is set\n"
 "OFF more probable if label is set"
@@ -2387,7 +2387,7 @@ msgstr ""
 "ON 라벨이 설정된다면 적게 예상\n"
 "OFF 라벨이 설정된다면 좀더 예상"
 
-#: gmusicbrowser.pl:4277
+#: gmusicbrowser.pl:4285
 msgid "Old name"
 msgstr "이전 이름"
 
@@ -2400,7 +2400,7 @@ msgid "One of these commands is required to play files of type {type} : {cmd}"
 msgstr ""
 "이 명령어 중 하나가 {type} 형식의 파일을 재생하기 위해 요청됩니다 : {cmd}"
 
-#: gmusicbrowser.pl:5775
+#: gmusicbrowser.pl:5783
 msgid "Only affect mp3 files that do not already have an id3v1 tag"
 msgstr "id3v1 태그를 가지지 않은 mp3 파일에만 영향을 줍니다"
 
@@ -2408,7 +2408,7 @@ msgstr "id3v1 태그를 가지지 않은 mp3 파일에만 영향을 줍니다"
 msgid "Opacity"
 msgstr "불투명"
 
-#: gmusicbrowser.pl:1021 gmusicbrowser_layout.pm:40
+#: gmusicbrowser.pl:1029 gmusicbrowser_layout.pm:40
 msgid "Open Browser"
 msgstr "브라우저 열기"
 
@@ -2416,15 +2416,15 @@ msgstr "브라우저 열기"
 msgid "Open Browser window"
 msgstr "브라우저 창 열기"
 
-#: gmusicbrowser.pl:1024 gmusicbrowser_layout.pm:41 gmusicbrowser_layout.pm:99
+#: gmusicbrowser.pl:1032 gmusicbrowser_layout.pm:41 gmusicbrowser_layout.pm:99
 msgid "Open Context window"
 msgstr "항목 창 열기"
 
-#: gmusicbrowser.pl:1025
+#: gmusicbrowser.pl:1033
 msgid "Open Custom window"
 msgstr "사용자 정의 창 열기"
 
-#: gmusicbrowser.pl:5508
+#: gmusicbrowser.pl:5516
 msgid "Open Equalizer"
 msgstr "이퀄라이저 열기"
 
@@ -2432,7 +2432,7 @@ msgstr "이퀄라이저 열기"
 msgid "Open Playlist"
 msgstr "재생 목록 파일 열기"
 
-#: gmusicbrowser.pl:1029
+#: gmusicbrowser.pl:1037
 msgid "Open Preference window"
 msgstr "설정 창 열기"
 
@@ -2440,15 +2440,15 @@ msgstr "설정 창 열기"
 msgid "Open Queue"
 msgstr "대기열 열기"
 
-#: gmusicbrowser.pl:1022 gmusicbrowser_layout.pm:106
+#: gmusicbrowser.pl:1030 gmusicbrowser_layout.pm:106
 msgid "Open Queue window"
 msgstr "대기열 창 열기"
 
-#: gmusicbrowser.pl:1023
+#: gmusicbrowser.pl:1031
 msgid "Open Search window"
 msgstr "찾기 창 열기"
 
-#: gmusicbrowser.pl:418
+#: gmusicbrowser.pl:437
 msgid "Open containing folder"
 msgstr "이 노래가 있는 폴더 열기"
 
@@ -2528,11 +2528,11 @@ msgstr "오버레이 레이아웃 :"
 msgid "Owner identifier"
 msgstr "소유자 인식자"
 
-#: gmusicbrowser.pl:853
+#: gmusicbrowser.pl:861
 msgid "Path,Album,Disc,Track,File"
 msgstr "경로,앨범,디스크,트랙,파일"
 
-#: gmusicbrowser.pl:847
+#: gmusicbrowser.pl:855
 msgid "Path,File"
 msgstr "경로,파일"
 
@@ -2540,7 +2540,7 @@ msgstr "경로,파일"
 msgid "Pattern to find .lrc files :"
 msgstr ".lrc 파일 찾기 패턴 :"
 
-#: gmusicbrowser.pl:437 gmusicbrowser_layout.pm:70
+#: gmusicbrowser.pl:456 gmusicbrowser_layout.pm:70
 msgid "Pause"
 msgstr "멈춤"
 
@@ -2553,7 +2553,7 @@ msgstr "사진"
 msgid "Picture Type"
 msgstr "앨범아트 종류"
 
-#: gmusicbrowser.pl:5700
+#: gmusicbrowser.pl:5708
 msgid "Picture cache :"
 msgstr "사진 캐시 :"
 
@@ -2577,28 +2577,28 @@ msgstr "사진 찾기 플러그인"
 msgid "Picture size :"
 msgstr "사진 크기 :"
 
-#: gmusicbrowser.pl:3891
+#: gmusicbrowser.pl:3899
 msgid "Pictures and music files"
 msgstr "사진 그리고 음악 파일들"
 
-#: gmusicbrowser.pl:3892
+#: gmusicbrowser.pl:3900
 msgid "Pictures files"
 msgstr "사진 파일들"
 
-#: gmusicbrowser.pl:436 gmusicbrowser_layout.pm:70 gmusicbrowser_list.pm:1614
+#: gmusicbrowser.pl:455 gmusicbrowser_layout.pm:70 gmusicbrowser_list.pm:1614
 #: gmusicbrowser_list.pm:3831 gmusicbrowser_list.pm:3898
 msgid "Play"
 msgstr "재생"
 
-#: gmusicbrowser.pl:393
+#: gmusicbrowser.pl:412
 msgid "Play Only Displayed"
 msgstr "표시된 것만 재생"
 
-#: gmusicbrowser.pl:391
+#: gmusicbrowser.pl:410
 msgid "Play Only Selected"
 msgstr "선택한 것만 재생"
 
-#: gmusicbrowser.pl:1066
+#: gmusicbrowser.pl:1074
 msgid "Play a list of files"
 msgstr "파일 목록 재생"
 
@@ -2626,7 +2626,7 @@ msgstr "재생 카운터"
 msgid "Play filter"
 msgstr "재생 필터"
 
-#: gmusicbrowser.pl:1077
+#: gmusicbrowser.pl:1085
 msgid "Play listed songs"
 msgstr "등록된 노래 재생"
 
@@ -2634,11 +2634,11 @@ msgstr "등록된 노래 재생"
 msgid "Play order"
 msgstr "재생 순서"
 
-#: gmusicbrowser.pl:1016
+#: gmusicbrowser.pl:1024
 msgid "Play/Pause"
 msgstr "재생/일시정지"
 
-#: gmusicbrowser.pl:1616
+#: gmusicbrowser.pl:1624
 msgid "Played Today"
 msgstr "재생된 날짜"
 
@@ -2646,7 +2646,7 @@ msgstr "재생된 날짜"
 msgid "Player mounted on :"
 msgstr "재생기 마운트됨 :"
 
-#: gmusicbrowser.pl:5734
+#: gmusicbrowser.pl:5742
 msgid "Player window layout :"
 msgstr "재생기 창 레이아웃 :"
 
@@ -2674,7 +2674,7 @@ msgstr "제목 재생중"
 msgid "Playing and queue icons"
 msgstr "재생중 & 대기열 아이콘"
 
-#: gmusicbrowser.pl:2154
+#: gmusicbrowser.pl:2162
 msgid "Playing error : {error}"
 msgstr "재생중 에러 : {error}"
 
@@ -2694,7 +2694,7 @@ msgstr "재생목록 비어있음"
 msgid "Playlist empty"
 msgstr "재생목록 비어있음"
 
-#: gmusicbrowser.pl:4900
+#: gmusicbrowser.pl:4908
 msgid "Playlist files"
 msgstr "재생목록 파일"
 
@@ -2710,11 +2710,11 @@ msgstr "재생목록 필터 :\n"
 msgid "Playlist, Library & Context"
 msgstr "재생목록, 라이브러리 & 항목"
 
-#: gmusicbrowser.pl:5417
+#: gmusicbrowser.pl:5425
 msgid "Plugin not loaded"
 msgstr "플러그인이 로드되지 않음"
 
-#: gmusicbrowser.pl:5216
+#: gmusicbrowser.pl:5224
 msgid "Plugins"
 msgstr "플러그인"
 
@@ -2722,11 +2722,11 @@ msgstr "플러그인"
 msgid "Popularimeter"
 msgstr "유명척도"
 
-#: gmusicbrowser.pl:1026
+#: gmusicbrowser.pl:1034
 msgid "Popup Custom window"
 msgstr "팝업 사용자정의 창"
 
-#: gmusicbrowser.pl:1073
+#: gmusicbrowser.pl:1081
 msgid "Popup Traytip"
 msgstr "팝업 트레이팁"
 
@@ -2734,11 +2734,11 @@ msgstr "팝업 트레이팁"
 msgid "Pre-set"
 msgstr "프리셋"
 
-#: gmusicbrowser.pl:383
+#: gmusicbrowser.pl:402
 msgid "Prepend"
 msgstr "첨가하기"
 
-#: gmusicbrowser.pl:5263
+#: gmusicbrowser.pl:5271
 msgid "Press a key or a key combination"
 msgstr "키 또는 키 조합을 누르시오"
 
@@ -2746,11 +2746,11 @@ msgstr "키 또는 키 조합을 누르시오"
 msgid "Previous"
 msgstr "이전"
 
-#: gmusicbrowser.pl:1015 layouts:55
+#: gmusicbrowser.pl:1023 layouts:55
 msgid "Previous Song"
 msgstr "이전 노래"
 
-#: gmusicbrowser.pl:1011
+#: gmusicbrowser.pl:1019
 msgid "Previous Song In Playlist"
 msgstr "목록에서 이전 노래"
 
@@ -2778,7 +2778,7 @@ msgstr "진행률"
 msgid "Provides context views using MozEmbed or WebKit"
 msgstr "제공된 항목을 MozEmbed 또는 WebKit을 사용해서 보기"
 
-#: gmusicbrowser.pl:5648
+#: gmusicbrowser.pl:5656
 msgid "Proxy host :"
 msgstr "프록시 호스트 :"
 
@@ -2794,7 +2794,7 @@ msgstr "발행자"
 msgid "Publisher/Studio logotype"
 msgstr "발행자/스튜디오의 로고"
 
-#: gmusicbrowser.pl:2409 gmusicbrowser_layout.pm:196
+#: gmusicbrowser.pl:2417 gmusicbrowser_layout.pm:196
 #: gmusicbrowser_layout.pm:401 gmusicbrowser_layout.pm:493 layouts:364
 #: layouts:396 layouts:454
 msgid "Queue"
@@ -2808,11 +2808,11 @@ msgstr "대기열 앨범"
 msgid "Queue artist"
 msgstr "대기열 가수"
 
-#: gmusicbrowser.pl:2930 gmusicbrowser_list.pm:407
+#: gmusicbrowser.pl:2938 gmusicbrowser_list.pm:407
 msgid "Queue empty"
 msgstr "대기열 비어있음"
 
-#: gmusicbrowser.pl:1043
+#: gmusicbrowser.pl:1051
 msgid "Queue mode"
 msgstr "대기열 모드"
 
@@ -2832,7 +2832,7 @@ msgstr "빠른 찾기"
 msgid "Quick Search with SongTree"
 msgstr "노래트리에서 빠른 찾기"
 
-#: gmusicbrowser.pl:448 gmusicbrowser.pl:1035 gmusicbrowser_layout.pm:44
+#: gmusicbrowser.pl:467 gmusicbrowser.pl:1043 gmusicbrowser_layout.pm:44
 #: gmusicbrowser_layout.pm:122
 msgid "Quit"
 msgstr "끝내기"
@@ -2849,15 +2849,15 @@ msgstr "라디오 제목"
 msgid "Radio url"
 msgstr "라디오 주소"
 
-#: gmusicbrowser.pl:2420
+#: gmusicbrowser.pl:2428
 msgid "Random"
 msgstr "무작위"
 
-#: gmusicbrowser.pl:6784
+#: gmusicbrowser.pl:6792
 msgid "Random mode edition"
 msgstr "무작위 모드 편집"
 
-#: gmusicbrowser.pl:4613 gmusicbrowser.pl:4650 gmusicbrowser.pl:7814
+#: gmusicbrowser.pl:4621 gmusicbrowser.pl:4658 gmusicbrowser.pl:7822
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
 #: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:817
 msgid "Rating"
@@ -2867,11 +2867,11 @@ msgstr "점수"
 msgid "Rating (picture)"
 msgstr "점수 (사진)"
 
-#: gmusicbrowser.pl:1063
+#: gmusicbrowser.pl:1071
 msgid "Rating between 0 and 100, or empty for default"
 msgstr "0 에서 100 사이의 점수, 또는 기본값은 비어있음"
 
-#: gmusicbrowser.pl:413
+#: gmusicbrowser.pl:432
 msgid "Re-read tags"
 msgstr "태그 다시 읽기"
 
@@ -2895,11 +2895,11 @@ msgstr "최근 가수들"
 msgid "Recent songs"
 msgstr "최근 노래들"
 
-#: gmusicbrowser.pl:5702
+#: gmusicbrowser.pl:5710
 msgid "Recent songs include skipped songs that haven't been played."
 msgstr "최근 노래는 재생되지 않고 건너 띈 노래를 포함합니다."
 
-#: gmusicbrowser.pl:440 gmusicbrowser.pl:2470
+#: gmusicbrowser.pl:459 gmusicbrowser.pl:2478
 msgid "Recently played"
 msgstr "최근에 연주된 순으로"
 
@@ -2935,19 +2935,19 @@ msgstr "정규 표현:"
 msgid "Regular expression didn't match"
 msgstr "정규 표현이 맞지 않습니다"
 
-#: gmusicbrowser.pl:5641
+#: gmusicbrowser.pl:5649
 msgid "Remember last Filter/Playlist between sessions"
 msgstr "세션 사이에 마지막 필터/재생목록 기억하기"
 
-#: gmusicbrowser.pl:5642
+#: gmusicbrowser.pl:5650
 msgid "Remember playing position between sessions"
 msgstr "세션 사이에 재생 위치 기억하기"
 
-#: gmusicbrowser.pl:5643
+#: gmusicbrowser.pl:5651
 msgid "Remember playing song between sessions"
 msgstr "세션 사이에 재생 노래 기억하기"
 
-#: gmusicbrowser.pl:5644
+#: gmusicbrowser.pl:5652
 msgid "Remember queue between sessions"
 msgstr "세션 사이에 대기열 기억하기"
 
@@ -2955,14 +2955,14 @@ msgstr "세션 사이에 대기열 기억하기"
 msgid "Remixer"
 msgstr "리믹서"
 
-#: gmusicbrowser.pl:412 gmusicbrowser.pl:5324 gmusicbrowser.pl:5868
-#: gmusicbrowser.pl:6834 gmusicbrowser.pl:6969 gmusicbrowser.pl:7239
+#: gmusicbrowser.pl:431 gmusicbrowser.pl:5332 gmusicbrowser.pl:5876
+#: gmusicbrowser.pl:6842 gmusicbrowser.pl:6977 gmusicbrowser.pl:7247
 #: gmusicbrowser_list.pm:289 gmusicbrowser_tags.pm:734
 #: gmusicbrowser_tags.pm:1237 plugins/webcontext.pm:565
 msgid "Remove"
 msgstr "제거하기"
 
-#: gmusicbrowser.pl:1075
+#: gmusicbrowser.pl:1083
 msgid "Remove a label from the current song"
 msgstr "현재 노래의 라벨 제거하기"
 
@@ -2978,23 +2978,23 @@ msgstr "모든 노래 제거하기"
 msgid "Remove filter"
 msgstr "필터 제거하기"
 
-#: gmusicbrowser.pl:380
+#: gmusicbrowser.pl:399
 msgid "Remove from disk"
 msgstr "디스크에서 제거하기"
 
-#: gmusicbrowser.pl:379
+#: gmusicbrowser.pl:398
 msgid "Remove from library"
 msgstr "라이브러리에서 제거하기"
 
-#: gmusicbrowser.pl:378
+#: gmusicbrowser.pl:397
 msgid "Remove from list"
 msgstr "목록에서 제거하기"
 
-#: gmusicbrowser.pl:378
+#: gmusicbrowser.pl:397
 msgid "Remove from playlist"
 msgstr "재생목록에서 제거하기"
 
-#: gmusicbrowser.pl:378
+#: gmusicbrowser.pl:397
 msgid "Remove from queue"
 msgstr "대기열에서 제거하기"
 
@@ -3002,7 +3002,7 @@ msgstr "대기열에서 제거하기"
 msgid "Remove header, footer and left column from wikipedia pages"
 msgstr "위키페디아 페이지에서 두주, 각주 그리고 왼쪽 컬럼 제거하기"
 
-#: gmusicbrowser.pl:6052 gmusicbrowser_list.pm:1651
+#: gmusicbrowser.pl:6060 gmusicbrowser_list.pm:1651
 msgid "Remove label"
 msgstr "이름 제거하기"
 
@@ -3018,7 +3018,7 @@ msgstr "선택한 노래 제거하기"
 msgid "Remove this field"
 msgstr "이 필드 제거하기"
 
-#: gmusicbrowser.pl:7606
+#: gmusicbrowser.pl:7614
 msgid "Remove this rule"
 msgstr "이 규칙 제거하기"
 
@@ -3038,31 +3038,31 @@ msgstr "이 위젯 제거하기"
 msgid "Rename"
 msgstr "이름 바꾸기"
 
-#: gmusicbrowser.pl:4381
+#: gmusicbrowser.pl:4389
 msgid "Rename File"
 msgstr "파일 이름 바꾸기"
 
-#: gmusicbrowser.pl:405
+#: gmusicbrowser.pl:424
 msgid "Rename file"
 msgstr "파일 이름 바꾸기"
 
-#: gmusicbrowser.pl:4311 gmusicbrowser.pl:4312
+#: gmusicbrowser.pl:4319 gmusicbrowser.pl:4320
 msgid "Rename files using this pattern :"
 msgstr "이 패턴을 사용해서 파일 이름 바꾸기 :"
 
-#: gmusicbrowser.pl:5785 gmusicbrowser_list.pm:1632
+#: gmusicbrowser.pl:5793 gmusicbrowser_list.pm:1632
 msgid "Rename folder"
 msgstr "폴더 이름 바꾸기"
 
-#: gmusicbrowser.pl:5794
+#: gmusicbrowser.pl:5802
 msgid "Rename this folder to :"
 msgstr "이 폴더 이름 바꾸기 :"
 
-#: gmusicbrowser.pl:4310
+#: gmusicbrowser.pl:4318
 msgid "Rename/move files based on these fields :"
 msgstr "파일의 이름 바꾸기/이동은 아래 필드를 기본으로 합니다 :"
 
-#: gmusicbrowser.pl:4369 gmusicbrowser.pl:5806
+#: gmusicbrowser.pl:4377 gmusicbrowser.pl:5814
 msgid ""
 "Renaming {oldname}\n"
 "to {newname}\n"
@@ -3072,7 +3072,7 @@ msgstr ""
 "{newname}으로 이름바꾸는 중\n"
 "실패함 : {error}"
 
-#: gmusicbrowser.pl:5902
+#: gmusicbrowser.pl:5910
 msgid "Reorganize files and folders"
 msgstr "파일과 폴더를 다시 재편성하기"
 
@@ -3080,7 +3080,7 @@ msgstr "파일과 폴더를 다시 재편성하기"
 msgid "Repeat"
 msgstr "반복"
 
-#: gmusicbrowser.pl:384
+#: gmusicbrowser.pl:403
 msgid "Replace"
 msgstr "바꾸기"
 
@@ -3100,7 +3100,7 @@ msgstr "리플레이게인 분석"
 msgid "Reset filter"
 msgstr "필터 재설정"
 
-#: gmusicbrowser.pl:1018
+#: gmusicbrowser.pl:1026
 msgid "Rewind"
 msgstr "되감기"
 
@@ -3128,11 +3128,11 @@ msgstr "립 소프트웨어 :"
 msgid "Run a command when playing a song"
 msgstr "노래 재생할 때 명령 실행"
 
-#: gmusicbrowser.pl:1049
+#: gmusicbrowser.pl:1057
 msgid "Run perl code"
 msgstr "펄 코드 실행"
 
-#: gmusicbrowser.pl:1048
+#: gmusicbrowser.pl:1056
 msgid "Run system command"
 msgstr "시스템 명령어 실행"
 
@@ -3144,7 +3144,7 @@ msgstr ""
 msgid "Same Artist"
 msgstr ""
 
-#: gmusicbrowser.pl:415 layouts:128
+#: gmusicbrowser.pl:434 layouts:128
 msgid "Same Title"
 msgstr "같은 제목"
 
@@ -3176,7 +3176,7 @@ msgstr "토요일"
 msgid "Save"
 msgstr "저장"
 
-#: gmusicbrowser.pl:1036
+#: gmusicbrowser.pl:1044
 msgid "Save Tags/Options"
 msgstr "태그/옵션 저장"
 
@@ -3256,7 +3256,7 @@ msgstr "이 파일 스캔"
 msgid "Scan using tag-defined album"
 msgstr "태그-정의된 앨범 사용해서 스캔"
 
-#: gmusicbrowser.pl:5053
+#: gmusicbrowser.pl:5061
 msgid "Scanning"
 msgstr "스캔하는 중"
 
@@ -3360,7 +3360,7 @@ msgstr "현재 앨범 찾기"
 msgid "Search for current artist"
 msgstr "현재 가수 찾기"
 
-#: gmusicbrowser.pl:5890
+#: gmusicbrowser.pl:5898
 msgid "Search for new songs on startup"
 msgstr "시작할 때 새 노래 찾기"
 
@@ -3380,7 +3380,7 @@ msgstr "찾기 옵션"
 msgid "Search pitchfork for Artist"
 msgstr "pitchfork에서 가수 찾기"
 
-#: gmusicbrowser.pl:5738
+#: gmusicbrowser.pl:5746
 msgid "Search window layout :"
 msgstr "찾기 창 레이아웃 :"
 
@@ -3388,11 +3388,11 @@ msgstr "찾기 창 레이아웃 :"
 msgid "Searching for a picture of : "
 msgstr "사진 찾는 중 :"
 
-#: gmusicbrowser.pl:1019
+#: gmusicbrowser.pl:1027
 msgid "Seek"
 msgstr "탐색"
 
-#: gmusicbrowser.pl:1038
+#: gmusicbrowser.pl:1046
 msgid "Select current song"
 msgstr "현재 노래 선택"
 
@@ -3420,7 +3420,7 @@ msgstr "선택한 수 :"
 msgid "Selected songs"
 msgstr "선택한 노래"
 
-#: gmusicbrowser.pl:5100
+#: gmusicbrowser.pl:5108
 msgid "Selecting pictures"
 msgstr "사진 고르기"
 
@@ -3432,11 +3432,11 @@ msgstr "판매자"
 msgid "Send Title/Artist/Album in standard input"
 msgstr "표준 입력으로 제목/가수/앨범 보내기"
 
-#: gmusicbrowser.pl:1063
+#: gmusicbrowser.pl:1071
 msgid "Set Current Song Rating"
 msgstr "현재 노래 점수 설정"
 
-#: gmusicbrowser.pl:431 gmusicbrowser_list.pm:1639
+#: gmusicbrowser.pl:450 gmusicbrowser_list.pm:1639
 msgid "Set Picture"
 msgstr "사진 설정"
 
@@ -3448,7 +3448,7 @@ msgstr "기본 필터 설정"
 msgid "Set cover"
 msgstr ""
 
-#: gmusicbrowser.pl:1071
+#: gmusicbrowser.pl:1079
 msgid "Set focus on a layout widget"
 msgstr "레이아웃 위젯에 포커스 설정"
 
@@ -3456,11 +3456,11 @@ msgstr "레이아웃 위젯에 포커스 설정"
 msgid "Set grouping"
 msgstr "그룹으로 나누기 설정"
 
-#: gmusicbrowser.pl:6079 gmusicbrowser_list.pm:1647
+#: gmusicbrowser.pl:6087 gmusicbrowser_list.pm:1647
 msgid "Set icon"
 msgstr "아이콘 설정"
 
-#: gmusicbrowser.pl:1028
+#: gmusicbrowser.pl:1036
 msgid "Set player window layout"
 msgstr "재생기 창 레이아웃 설정"
 
@@ -3468,7 +3468,7 @@ msgstr "재생기 창 레이아웃 설정"
 msgid "Set subgroup"
 msgstr "서브그룹 설정"
 
-#: gmusicbrowser.pl:447 gmusicbrowser.pl:5203 gmusicbrowser_layout.pm:39
+#: gmusicbrowser.pl:466 gmusicbrowser.pl:5211 gmusicbrowser_layout.pm:39
 #: gmusicbrowser_layout.pm:114
 msgid "Settings"
 msgstr "설정"
@@ -3477,7 +3477,7 @@ msgstr "설정"
 msgid "Settings on this page will only take effect after a restart"
 msgstr "이 페이지 상의 설정은 재시작 후 효과가 나타납니다"
 
-#: gmusicbrowser.pl:1048
+#: gmusicbrowser.pl:1056
 msgid ""
 "Shell command\n"
 "(some variables such as %f (current song filename) or %F (list of selected "
@@ -3487,7 +3487,7 @@ msgstr ""
 "(%f (현재 노래 파일이름) 또는 %F (선택한 노래 파일이름의 목록) 같은 일부 변수"
 "를 이용할 수 있습니다)"
 
-#: gmusicbrowser.pl:882
+#: gmusicbrowser.pl:890
 msgid "Shift"
 msgstr "Shift"
 
@@ -3495,7 +3495,7 @@ msgstr "Shift"
 msgid "Shimmer Queue"
 msgstr ""
 
-#: gmusicbrowser.pl:445 gmusicbrowser.pl:1033
+#: gmusicbrowser.pl:464 gmusicbrowser.pl:1041
 msgid "Show"
 msgstr "표시"
 
@@ -3539,19 +3539,19 @@ msgstr "제안 표시"
 msgid "Show tabs"
 msgstr "탭 표시"
 
-#: gmusicbrowser.pl:5724
+#: gmusicbrowser.pl:5732
 msgid "Show tray icon"
 msgstr "트레이 아이콘 표시"
 
-#: gmusicbrowser.pl:5722
+#: gmusicbrowser.pl:5730
 msgid "Show tray tip on song change"
 msgstr "노래 바뀔 때 마다 트레이 팁 표시"
 
-#: gmusicbrowser.pl:1032
+#: gmusicbrowser.pl:1040
 msgid "Show/Hide"
 msgstr "표시/숨기기"
 
-#: gmusicbrowser.pl:1072
+#: gmusicbrowser.pl:1080
 msgid "Show/Hide layout widget(s)"
 msgstr "표시/숨기기 레이아웃 위젯"
 
@@ -3580,15 +3580,15 @@ msgstr "섞기"
 msgid "Shuffle queue"
 msgstr "섞기 대기열"
 
-#: gmusicbrowser.pl:854
+#: gmusicbrowser.pl:862
 msgid "Shuffled albums"
 msgstr "섞여진 앨범"
 
-#: gmusicbrowser.pl:855
+#: gmusicbrowser.pl:863
 msgid "Shuffled albums, shuffled tracks"
 msgstr "섞여진 앨범들, 섞여진 트랙들"
 
-#: gmusicbrowser.pl:5657
+#: gmusicbrowser.pl:5665
 msgid "Shutdown command :"
 msgstr "끄기 명령어 :"
 
@@ -3608,7 +3608,7 @@ msgstr ""
 msgid "Site :"
 msgstr ""
 
-#: gmusicbrowser.pl:7826 gmusicbrowser_songs.pm:455
+#: gmusicbrowser.pl:7834 gmusicbrowser_songs.pm:455
 msgid "Size"
 msgstr "크기"
 
@@ -3616,7 +3616,7 @@ msgstr "크기"
 msgid "Skip count"
 msgstr "스킵 수"
 
-#: gmusicbrowser.pl:5552
+#: gmusicbrowser.pl:5560
 msgid "Skip to next song if an error occurs"
 msgstr "오류가 발생하면 다음 노래로 스킵하기"
 
@@ -3636,7 +3636,7 @@ msgstr "작은 부라우저"
 msgid "Song"
 msgstr "노래"
 
-#: gmusicbrowser.pl:389 gmusicbrowser.pl:4635
+#: gmusicbrowser.pl:408 gmusicbrowser.pl:4643
 msgid "Song Properties"
 msgstr "노래 속성"
 
@@ -3644,11 +3644,11 @@ msgstr "노래 속성"
 msgid "Song rating"
 msgstr "노래 점수"
 
-#: gmusicbrowser.pl:6786
+#: gmusicbrowser.pl:6794
 msgid "SongTree groupings edition"
 msgstr "노래트리 그룹으로 나누기 편집"
 
-#: gmusicbrowser.pl:390
+#: gmusicbrowser.pl:409
 msgid "Songs Properties"
 msgstr "노래 등록정보"
 
@@ -3656,15 +3656,15 @@ msgstr "노래 등록정보"
 msgid "Sort"
 msgstr "정렬"
 
-#: gmusicbrowser.pl:6782
+#: gmusicbrowser.pl:6790
 msgid "Sort mode edition"
 msgstr "정렬 모드 편집"
 
-#: gmusicbrowser.pl:7259
+#: gmusicbrowser.pl:7267
 msgid "Sort order"
 msgstr "정렬 순서"
 
-#: gmusicbrowser.pl:5660
+#: gmusicbrowser.pl:5668
 msgid "Split artist names on :"
 msgstr "가수 이름으로 나누기 :"
 
@@ -3672,24 +3672,24 @@ msgstr "가수 이름으로 나누기 :"
 msgid "Standard fields"
 msgstr "표준 필드"
 
-#: gmusicbrowser.pl:5720
+#: gmusicbrowser.pl:5728
 msgid "Start in tray"
 msgstr "시스템 트레이에서 시작"
 
-#: gmusicbrowser.pl:438 gmusicbrowser.pl:1020 gmusicbrowser_layout.pm:62
+#: gmusicbrowser.pl:457 gmusicbrowser.pl:1028 gmusicbrowser_layout.pm:62
 #: plugins/notify.pm:89
 msgid "Stop"
 msgstr "정지"
 
-#: gmusicbrowser.pl:5035
+#: gmusicbrowser.pl:5043
 msgid "Stop checking"
 msgstr "검사 중지"
 
-#: gmusicbrowser.pl:5072
+#: gmusicbrowser.pl:5080
 msgid "Stop scanning"
 msgstr "스캐닝 중지"
 
-#: gmusicbrowser.pl:5100
+#: gmusicbrowser.pl:5108
 msgid "Stop selecting pictures"
 msgstr "사진 고르기 중지"
 
@@ -3753,11 +3753,11 @@ msgstr "시스템 시계가 현재 시간과 충분히 가깝지 않습니다"
 msgid "System command :"
 msgstr "시스템 명령어 :"
 
-#: gmusicbrowser.pl:4611 gmusicbrowser.pl:4648
+#: gmusicbrowser.pl:4619 gmusicbrowser.pl:4656
 msgid "Tag"
 msgstr "태그"
 
-#: gmusicbrowser.pl:5218
+#: gmusicbrowser.pl:5226
 msgid "Tags"
 msgstr "태그"
 
@@ -3769,7 +3769,7 @@ msgstr "사용 항목"
 msgid "Text"
 msgstr "텍스트"
 
-#: gmusicbrowser.pl:7877
+#: gmusicbrowser.pl:7885
 msgid "The [most/less]"
 msgstr "[많게/적게]"
 
@@ -3781,12 +3781,12 @@ msgstr "이들 필드는 사용될 수 있음 :"
 msgid "This command is required to play files of type {type} : {cmd}"
 msgstr "이 명령어는 {type} 형식의 파일을 재생하기 위해 요청됩니다 : {cmd}"
 
-#: gmusicbrowser.pl:5988 gmusicbrowser.pl:6062
+#: gmusicbrowser.pl:5996 gmusicbrowser.pl:6070
 msgid "This label is set for %d song."
 msgid_plural "This label is set for %d songs."
 msgstr[0] "이 라벨이 %d 노래에 설정됨."
 
-#: gmusicbrowser.pl:1572
+#: gmusicbrowser.pl:1580
 msgid "This plugin requires :"
 msgstr "이 플로그인이 요구함 :"
 
@@ -3798,7 +3798,7 @@ msgstr ""
 "이 플러그인은 last.fm에서 가수-관련된 정보를 검색합니다 (일대기, 다가올 이벤"
 "트)."
 
-#: gmusicbrowser.pl:5704
+#: gmusicbrowser.pl:5712
 msgid "Threshold to count a song as played :"
 msgstr "재생한 노래로 인정하는 문턱값 :"
 
@@ -3814,7 +3814,7 @@ msgstr "시간초과 :"
 msgid "Timespan of the fade-out in seconds"
 msgstr "페이드-아웃의 타임스팬 "
 
-#: gmusicbrowser.pl:849 gmusicbrowser.pl:7772 gmusicbrowser_songs.pm:461
+#: gmusicbrowser.pl:857 gmusicbrowser.pl:7780 gmusicbrowser_songs.pm:461
 #: gmusicbrowser_tags.pm:1527 gmusicbrowser_tags.pm:1566
 #: gmusicbrowser_tags.pm:1581 gmusicbrowser_tags.pm:1602
 #: gmusicbrowser_tags.pm:1605 gmusicbrowser_tags.pm:1852
@@ -3842,35 +3842,35 @@ msgstr "제목바"
 msgid "Titlebar overlay plugin"
 msgstr "제목바 오버레이 플러그인"
 
-#: gmusicbrowser.pl:1051
+#: gmusicbrowser.pl:1059
 msgid "Toggle Album Lock"
 msgstr "앨범 잠금 토글"
 
-#: gmusicbrowser.pl:1050
+#: gmusicbrowser.pl:1058
 msgid "Toggle Artist Lock"
 msgstr "가수 잠금 토글"
 
-#: gmusicbrowser.pl:1052
+#: gmusicbrowser.pl:1060
 msgid "Toggle Song Lock"
 msgstr "노래 잠금 토글"
 
-#: gmusicbrowser.pl:1076
+#: gmusicbrowser.pl:1084
 msgid "Toggle a label of the current song"
 msgstr "현재 노래의 라벨 토글"
 
-#: gmusicbrowser.pl:1053
+#: gmusicbrowser.pl:1061
 msgid "Toggle between Random/Shuffle and Ordered"
 msgstr "임의순서/반복 그리고 명령순으로 토글"
 
-#: gmusicbrowser.pl:1064 gmusicbrowser_layout.pm:606
+#: gmusicbrowser.pl:1072 gmusicbrowser_layout.pm:606
 msgid "Toggle fullscreen mode"
 msgstr "전체화면 모드 토글"
 
-#: gmusicbrowser.pl:1065
+#: gmusicbrowser.pl:1073
 msgid "Toggle the fullscreen layout"
 msgstr "전체화면 레이아웃 토글"
 
-#: gmusicbrowser.pl:7802 gmusicbrowser_songs.pm:574 gmusicbrowser_tags.pm:1533
+#: gmusicbrowser.pl:7810 gmusicbrowser_songs.pm:574 gmusicbrowser_tags.pm:1533
 #: gmusicbrowser_tags.pm:1571 gmusicbrowser_tags.pm:1587
 #: gmusicbrowser_tags.pm:1615 gmusicbrowser_tags.pm:1852
 msgid "Track"
@@ -3884,7 +3884,7 @@ msgstr "트랙 게인"
 msgid "Track peak"
 msgstr "트랙 리크"
 
-#: gmusicbrowser.pl:5736
+#: gmusicbrowser.pl:5744
 msgid "Tray tip window layout :"
 msgstr "트레이 팁 창 레이아웃 :"
 
@@ -3892,7 +3892,7 @@ msgstr "트레이 팁 창 레이아웃 :"
 msgid "Tuesday"
 msgstr "화요일"
 
-#: gmusicbrowser.pl:332
+#: gmusicbrowser.pl:351
 msgid "Turn Off"
 msgstr "끄기"
 
@@ -3916,11 +3916,11 @@ msgstr "독특한 파일 인식자"
 msgid "Unknown field ({field})"
 msgstr "알려지지 않은 필드 ({field})"
 
-#: gmusicbrowser.pl:442
+#: gmusicbrowser.pl:461
 msgid "Unlock Album"
 msgstr "잠금이 해제된 앨범"
 
-#: gmusicbrowser.pl:441
+#: gmusicbrowser.pl:460
 msgid "Unlock Artist"
 msgstr "잠금이 해제된 가수"
 
@@ -3928,7 +3928,7 @@ msgstr "잠금이 해제된 가수"
 msgid "Unnamed custom command"
 msgstr "이름없는 사용자 정의 명령"
 
-#: gmusicbrowser.pl:8804 gmusicbrowser_songs.pm:3663
+#: gmusicbrowser.pl:8812 gmusicbrowser_songs.pm:3663
 msgid "Unnamed filter"
 msgstr "이름없는 필터"
 
@@ -3944,11 +3944,11 @@ msgstr "맨위 왼쪽"
 msgid "Upper right"
 msgstr "맨위 오른쪽"
 
-#: gmusicbrowser.pl:5510
+#: gmusicbrowser.pl:5518
 msgid "Use Equalizer"
 msgstr "이퀄라이저 사용"
 
-#: gmusicbrowser.pl:5769
+#: gmusicbrowser.pl:5777
 msgid ""
 "Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are "
 "probably better supported by other softwares"
@@ -3968,7 +3968,7 @@ msgstr "리플레이게인 사용하기"
 msgid "Use WebKit"
 msgstr "WebKit 사용하기"
 
-#: gmusicbrowser.pl:5911
+#: gmusicbrowser.pl:5919
 msgid "Use a master filter"
 msgstr "매스터 필터 사용하기"
 
@@ -3980,11 +3980,11 @@ msgstr "트랙 노말라이즈 대신 앨범 노말라이즈 사용하기"
 msgid "Use default regular expression"
 msgstr "기본값 정규 표현 사용하기"
 
-#: gmusicbrowser.pl:5529
+#: gmusicbrowser.pl:5537
 msgid "Use gstreamer"
 msgstr "gstreamer 사용하기"
 
-#: gmusicbrowser.pl:5770
+#: gmusicbrowser.pl:5778
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "id3v2 태그가 가능하면 latin1 엔코딩을 사용하기"
 
@@ -4018,7 +4018,7 @@ msgstr "{ext} 파일을 재생하려면 {command}을 사용하세요"
 msgid "Used for clipping prevention"
 msgstr "클리핑 방지 사용됨"
 
-#: gmusicbrowser.pl:5662 gmusicbrowser.pl:5672
+#: gmusicbrowser.pl:5670 gmusicbrowser.pl:5680
 msgid "Used for the Artists field"
 msgstr "가수 필드로 사용됨"
 
@@ -4042,7 +4042,7 @@ msgstr "파일 태그에 값 쓰여짐"
 msgid "Various artists"
 msgstr "다양한 가수"
 
-#: gmusicbrowser.pl:7947 gmusicbrowser_songs.pm:717 gmusicbrowser_tags.pm:1528
+#: gmusicbrowser.pl:7955 gmusicbrowser_songs.pm:717 gmusicbrowser_tags.pm:1528
 #: gmusicbrowser_tags.pm:1567
 msgid "Version"
 msgstr "버전"
@@ -4067,7 +4067,7 @@ msgstr "음량"
 msgid "Volume : "
 msgstr "음량 :"
 
-#: gmusicbrowser.pl:5698
+#: gmusicbrowser.pl:5706
 msgid "Volume step :"
 msgstr "음량 :"
 
@@ -4075,7 +4075,7 @@ msgstr "음량 :"
 msgid "Wait when queue empty"
 msgstr "대기열이 비면 기다리기"
 
-#: gmusicbrowser.pl:5767
+#: gmusicbrowser.pl:5775
 msgid ""
 "Warning : these are advanced options, don't change them unless you know what "
 "you are doing."
@@ -4083,7 +4083,7 @@ msgstr ""
 "경고 : 고급 옵션은, 사용자가 설정하는 것이 무엇인지 모른다면 바꿀 필요가 없습"
 "니다."
 
-#: gmusicbrowser.pl:6254
+#: gmusicbrowser.pl:6262
 msgid "Warning : using a folder with invalid encoding, you should rename it."
 msgstr ""
 "경고 : 잘못된 엔코딩을 포함한 폴더를 사용하려면, 사용자는 이름을 바꾸어야만 "
@@ -4117,14 +4117,14 @@ msgstr "수요일"
 msgid "Weighted Random"
 msgstr "강하게 무작위 순서로"
 
-#: gmusicbrowser.pl:5702
+#: gmusicbrowser.pl:5710
 msgid ""
 "When changing songs, the previous song is added to the recent list even if "
 "not played at all."
 msgstr ""
 "노래를 바꿀때, 이전 노래는 전혀 재생되지 않더라도 최근 목록에 추가됩니다."
 
-#: gmusicbrowser.pl:1071
+#: gmusicbrowser.pl:1079
 msgid "Widget name"
 msgstr "위젯 이름"
 
@@ -4136,18 +4136,18 @@ msgstr "위키페디아"
 msgid "Wikipedia Locale"
 msgstr "위키페디어 로케일"
 
-#: gmusicbrowser.pl:5774
+#: gmusicbrowser.pl:5782
 msgid ""
 "Will not write the tags except with the advanced tag editing dialog. The "
 "changes will be kept in the library instead.\n"
 "Warning, the changes for a song will be lost if the tag is re-read."
 msgstr "사용자 정의 명령"
 
-#: gmusicbrowser.pl:882
+#: gmusicbrowser.pl:890
 msgid "Win"
 msgstr "윈도우즈"
 
-#: gmusicbrowser.pl:443
+#: gmusicbrowser.pl:462
 msgid "Windows"
 msgstr "윈도우즈"
 
@@ -4163,7 +4163,7 @@ msgstr "파일이름 쓰기 ..."
 msgid "Writing tags"
 msgstr "태그 쓰는중"
 
-#: gmusicbrowser.pl:7796 gmusicbrowser_songs.pm:562 gmusicbrowser_tags.pm:1593
+#: gmusicbrowser.pl:7804 gmusicbrowser_songs.pm:562 gmusicbrowser_tags.pm:1593
 #: gmusicbrowser_tags.pm:1608 gmusicbrowser_tags.pm:1852
 msgid "Year"
 msgstr "연도"
@@ -4182,7 +4182,7 @@ msgstr ""
 "<b>bold</b> <i>italic</i> <u>underline</u>\n"
 "알림 마크표시는 알림 데몬에서 무시될 수 있습니다."
 
-#: gmusicbrowser.pl:4341
+#: gmusicbrowser.pl:4349
 msgid "You must specify a base folder"
 msgstr "기본 폴더를 입력해야 합니다"
 
@@ -4194,7 +4194,7 @@ msgstr "_컬럼 추가"
 msgid "_Remove this column"
 msgstr "_이 컬럼 제거"
 
-#: gmusicbrowser.pl:4071
+#: gmusicbrowser.pl:4079
 msgid "_Retry"
 msgstr "_다시 시도"
 
@@ -4206,27 +4206,27 @@ msgstr "_정렬"
 msgid "a bright coloured fish"
 msgstr "밝은 색의 물고기"
 
-#: gmusicbrowser.pl:7961 gmusicbrowser.pl:7971
+#: gmusicbrowser.pl:7969 gmusicbrowser.pl:7979
 msgid "a flac file"
 msgstr "FLAC 파일"
 
-#: gmusicbrowser.pl:7959 gmusicbrowser.pl:7969
+#: gmusicbrowser.pl:7967 gmusicbrowser.pl:7977
 msgid "a mp3 file"
 msgstr "MP3 파일"
 
-#: gmusicbrowser.pl:7962 gmusicbrowser.pl:7972
+#: gmusicbrowser.pl:7970 gmusicbrowser.pl:7980
 msgid "a musepack file"
 msgstr "MusePack 파일"
 
-#: gmusicbrowser.pl:7963 gmusicbrowser.pl:7973
+#: gmusicbrowser.pl:7971 gmusicbrowser.pl:7981
 msgid "a wavepack file"
 msgstr "wavepack 파일"
 
-#: gmusicbrowser.pl:3736
+#: gmusicbrowser.pl:3744
 msgid "abort copy"
 msgstr "복사 중지"
 
-#: gmusicbrowser.pl:3737
+#: gmusicbrowser.pl:3745
 msgid "abort move"
 msgstr "이동 중지"
 
@@ -4234,16 +4234,16 @@ msgstr "이동 중지"
 msgid "add"
 msgstr "추가"
 
-#: gmusicbrowser.pl:7869
+#: gmusicbrowser.pl:7877
 msgid "added"
 msgstr "추가됨"
 
-#: gmusicbrowser.pl:5574
+#: gmusicbrowser.pl:5582
 msgid "advanced options"
 msgstr "고급 옵션"
 
-#: gmusicbrowser.pl:7849 gmusicbrowser.pl:7857 gmusicbrowser.pl:7865
-#: gmusicbrowser.pl:7873
+#: gmusicbrowser.pl:7857 gmusicbrowser.pl:7865 gmusicbrowser.pl:7873
+#: gmusicbrowser.pl:7881
 msgid "after %d"
 msgstr "%d 이후"
 
@@ -4259,15 +4259,15 @@ msgstr "알파벳 순서로"
 msgid "amixer control :"
 msgstr "알사 믹서 제어 :"
 
-#: gmusicbrowser.pl:7964 gmusicbrowser.pl:7974
+#: gmusicbrowser.pl:7972 gmusicbrowser.pl:7982
 msgid "an ape file"
 msgstr "ape 파일"
 
-#: gmusicbrowser.pl:7960 gmusicbrowser.pl:7970
+#: gmusicbrowser.pl:7968 gmusicbrowser.pl:7978
 msgid "an ogg file"
 msgstr "ogg 파일"
 
-#: gmusicbrowser.pl:798
+#: gmusicbrowser.pl:806
 msgid "another example"
 msgstr "다른 예"
 
@@ -4288,11 +4288,11 @@ msgstr "음악가"
 msgid "auto detect"
 msgstr "자동 검출"
 
-#: gmusicbrowser.pl:325
+#: gmusicbrowser.pl:344
 msgid "autofill"
 msgstr "자동채움"
 
-#: gmusicbrowser.pl:325
+#: gmusicbrowser.pl:344
 msgid "autofill queue"
 msgstr "자동채움 대기열"
 
@@ -4312,17 +4312,17 @@ msgstr "밴드"
 msgid "band/artist logotype"
 msgstr "밴드/아티스트의 로고"
 
-#: gmusicbrowser.pl:7848 gmusicbrowser.pl:7856 gmusicbrowser.pl:7864
-#: gmusicbrowser.pl:7872
+#: gmusicbrowser.pl:7856 gmusicbrowser.pl:7864 gmusicbrowser.pl:7872
+#: gmusicbrowser.pl:7880
 msgid "before %d"
 msgstr "%d 이전"
 
-#: gmusicbrowser.pl:7850 gmusicbrowser.pl:7858 gmusicbrowser.pl:7866
-#: gmusicbrowser.pl:7874
+#: gmusicbrowser.pl:7858 gmusicbrowser.pl:7866 gmusicbrowser.pl:7874
+#: gmusicbrowser.pl:7882
 msgid "between %d( and )%d"
 msgstr "%d( 그리고 )%d 사이"
 
-#: gmusicbrowser.pl:7836 gmusicbrowser.pl:7843
+#: gmusicbrowser.pl:7844 gmusicbrowser.pl:7851
 msgid "between %n( and )%n"
 msgstr "%n( 그리고 )%n 사이"
 
@@ -4334,11 +4334,11 @@ msgstr "큰 크기"
 msgid "biography"
 msgstr "일대기"
 
-#: gmusicbrowser.pl:7978
+#: gmusicbrowser.pl:7986
 msgid "bitrate"
 msgstr "비트레이트:"
 
-#: gmusicbrowser.pl:798
+#: gmusicbrowser.pl:806
 msgid "bonus tracks"
 msgstr "보너스 트랙"
 
@@ -4346,51 +4346,51 @@ msgstr "보너스 트랙"
 msgid "boolean"
 msgstr "연산자"
 
-#: gmusicbrowser.pl:798
+#: gmusicbrowser.pl:806
 msgid "bootleg"
 msgstr "해적판"
 
-#: gmusicbrowser.pl:798
+#: gmusicbrowser.pl:806
 msgid "broken"
 msgstr "깨짐"
 
-#: gmusicbrowser.pl:5382 gmusicbrowser.pl:6346 plugins/desktopwidget.pm:138
+#: gmusicbrowser.pl:5390 gmusicbrowser.pl:6354 plugins/desktopwidget.pm:138
 msgid "by"
 msgstr "작성자"
 
-#: gmusicbrowser.pl:842
+#: gmusicbrowser.pl:850
 msgid "by added"
 msgstr "추가됨으로"
 
-#: gmusicbrowser.pl:841
+#: gmusicbrowser.pl:849
 msgid "by lastplay"
 msgstr "마지막재생으로"
 
-#: gmusicbrowser.pl:844
+#: gmusicbrowser.pl:852
 msgid "by lastplay & bootleg"
 msgstr "마지막재생 & 해적판으로"
 
-#: gmusicbrowser.pl:843
+#: gmusicbrowser.pl:851
 msgid "by lastplay & play count"
 msgstr "마지막재생 & 재생 수로"
 
-#: gmusicbrowser.pl:840
+#: gmusicbrowser.pl:848
 msgid "by play count"
 msgstr "재생 수로"
 
-#: gmusicbrowser.pl:839
+#: gmusicbrowser.pl:847
 msgid "by rating"
 msgstr "점수로"
 
-#: gmusicbrowser.pl:3009
+#: gmusicbrowser.pl:3017
 msgid "by {artist} from {album}"
 msgstr "{album}에서 {artist}로"
 
-#: gmusicbrowser.pl:713
+#: gmusicbrowser.pl:721
 msgid "bytes"
 msgstr "바이트"
 
-#: gmusicbrowser.pl:5893
+#: gmusicbrowser.pl:5901
 msgid "check now"
 msgstr "지금 체크하기"
 
@@ -4426,9 +4426,9 @@ msgstr "연결이 실패했습니다"
 msgid "connection failed."
 msgstr "연결이 실패했습니다"
 
-#: gmusicbrowser.pl:7773 gmusicbrowser.pl:7781 gmusicbrowser.pl:7789
-#: gmusicbrowser.pl:7908 gmusicbrowser.pl:7916 gmusicbrowser.pl:7922
-#: gmusicbrowser.pl:7930 gmusicbrowser.pl:7940 gmusicbrowser.pl:7948
+#: gmusicbrowser.pl:7781 gmusicbrowser.pl:7789 gmusicbrowser.pl:7797
+#: gmusicbrowser.pl:7916 gmusicbrowser.pl:7924 gmusicbrowser.pl:7930
+#: gmusicbrowser.pl:7938 gmusicbrowser.pl:7948 gmusicbrowser.pl:7956
 msgid "contains %s"
 msgstr "%s 포함"
 
@@ -4444,13 +4444,13 @@ msgstr "사용자 정의"
 msgid "day"
 msgstr "일"
 
-#: gmusicbrowser.pl:707 gmusicbrowser_songs.pm:3731
+#: gmusicbrowser.pl:715 gmusicbrowser_songs.pm:3731
 #: gmusicbrowser_songs.pm:3737 gmusicbrowser_songs.pm:3743
 #: gmusicbrowser_songs.pm:3749
 msgid "days"
 msgstr "일"
 
-#: gmusicbrowser.pl:997 gmusicbrowser_layout.pm:3727
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3727
 #: gmusicbrowser_layout.pm:3749
 msgid "default"
 msgstr "기본값"
@@ -4467,19 +4467,19 @@ msgstr "기본값 폴더"
 msgid "default fullscreen"
 msgstr "기본값 전체화면"
 
-#: gmusicbrowser.pl:6781
+#: gmusicbrowser.pl:6789
 msgid "delete selected filter"
 msgstr "선택한 필터 지우기"
 
-#: gmusicbrowser.pl:6787
+#: gmusicbrowser.pl:6795
 msgid "delete selected grouping"
 msgstr "선택한 그룹 지우기"
 
-#: gmusicbrowser.pl:6785
+#: gmusicbrowser.pl:6793
 msgid "delete selected random mode"
 msgstr "선택한 무작위 모드 지우기"
 
-#: gmusicbrowser.pl:6783
+#: gmusicbrowser.pl:6791
 msgid "delete selected sort mode"
 msgstr "선택한 정렬 모드 지우기"
 
@@ -4491,19 +4491,19 @@ msgstr "다른 폴더"
 msgid "disc on the left side"
 msgstr ""
 
-#: gmusicbrowser.pl:3021
+#: gmusicbrowser.pl:3029
 msgid "disc {disc}"
 msgstr "디스크"
 
-#: gmusicbrowser.pl:7774 gmusicbrowser.pl:7782 gmusicbrowser.pl:7790
-#: gmusicbrowser.pl:7909 gmusicbrowser.pl:7917 gmusicbrowser.pl:7923
-#: gmusicbrowser.pl:7931 gmusicbrowser.pl:7941 gmusicbrowser.pl:7949
+#: gmusicbrowser.pl:7782 gmusicbrowser.pl:7790 gmusicbrowser.pl:7798
+#: gmusicbrowser.pl:7917 gmusicbrowser.pl:7925 gmusicbrowser.pl:7931
+#: gmusicbrowser.pl:7939 gmusicbrowser.pl:7949 gmusicbrowser.pl:7957
 msgid "doesn't contain %s"
 msgstr "%s 포함하지 않음"
 
-#: gmusicbrowser.pl:7778 gmusicbrowser.pl:7786 gmusicbrowser.pl:7794
-#: gmusicbrowser.pl:7927 gmusicbrowser.pl:7937 gmusicbrowser.pl:7945
-#: gmusicbrowser.pl:7953
+#: gmusicbrowser.pl:7786 gmusicbrowser.pl:7794 gmusicbrowser.pl:7802
+#: gmusicbrowser.pl:7935 gmusicbrowser.pl:7945 gmusicbrowser.pl:7953
+#: gmusicbrowser.pl:7961
 msgid "doesn't match regexp %r"
 msgstr "%r 정규표현과 맞지 않음"
 
@@ -4539,19 +4539,19 @@ msgstr "에러"
 msgid "events"
 msgstr "이벤트"
 
-#: gmusicbrowser.pl:7704
+#: gmusicbrowser.pl:7712
 msgid "ex :"
 msgstr "예 :"
 
-#: gmusicbrowser.pl:7834 gmusicbrowser.pl:7841
+#: gmusicbrowser.pl:7842 gmusicbrowser.pl:7849
 msgid "exactly %n( times)"
 msgstr "정확히 %n( 번)"
 
-#: gmusicbrowser.pl:7835 gmusicbrowser.pl:7842
+#: gmusicbrowser.pl:7843 gmusicbrowser.pl:7850
 msgid "exactly not %n( times)"
 msgstr "정확지 않게 %n( 번)"
 
-#: gmusicbrowser.pl:7722
+#: gmusicbrowser.pl:7730
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "예제 (selected song) : {score}  ({chances})"
 
@@ -4559,11 +4559,11 @@ msgstr "예제 (selected song) : {score}  ({chances})"
 msgid "example : "
 msgstr "예 :"
 
-#: gmusicbrowser.pl:5688 plugins/webcontext.pm:603
+#: gmusicbrowser.pl:5696 plugins/webcontext.pm:603
 msgid "example : %s"
 msgstr "예 :"
 
-#: gmusicbrowser.pl:5681
+#: gmusicbrowser.pl:5689
 msgid "examples :"
 msgstr "예 :"
 
@@ -4575,19 +4575,19 @@ msgstr "폴백-게인"
 msgid "false"
 msgstr "거짓"
 
-#: gmusicbrowser.pl:798
+#: gmusicbrowser.pl:806
 msgid "favorite"
 msgstr "즐겨찾기"
 
-#: gmusicbrowser.pl:7957
+#: gmusicbrowser.pl:7965
 msgid "file format"
 msgstr "파일 포맷"
 
-#: gmusicbrowser.pl:6961
+#: gmusicbrowser.pl:6969
 msgid "filters"
 msgstr "필터"
 
-#: gmusicbrowser.pl:7902
+#: gmusicbrowser.pl:7910
 msgid "first added"
 msgstr "처음 추가됨"
 
@@ -4603,7 +4603,7 @@ msgstr "부표"
 msgid "font size depends on"
 msgstr "글꼴 크기 결정"
 
-#: gmusicbrowser.pl:5062
+#: gmusicbrowser.pl:5070
 msgid "for files without a VBR header"
 msgstr "VBR 헤더 없는 파일"
 
@@ -4631,11 +4631,11 @@ msgstr "구글 이미지 (고화질)"
 msgid "group by"
 msgstr "그룹"
 
-#: gmusicbrowser.pl:7664
+#: gmusicbrowser.pl:7672
 msgid "half-life : "
 msgstr "반감기 :"
 
-#: gmusicbrowser.pl:706
+#: gmusicbrowser.pl:714
 msgid "hours"
 msgstr "시간"
 
@@ -4643,7 +4643,7 @@ msgstr "시간"
 msgid "huge size"
 msgstr "거대한 크기"
 
-#: gmusicbrowser.pl:5495
+#: gmusicbrowser.pl:5503
 msgid "icecast server"
 msgstr "icecast 서버"
 
@@ -4651,7 +4651,7 @@ msgstr "icecast 서버"
 msgid "id3v1 tag"
 msgstr "id3v1 태그"
 
-#: gmusicbrowser.pl:5675
+#: gmusicbrowser.pl:5683
 msgid "ignore title"
 msgstr "제목 무시하기"
 
@@ -4659,7 +4659,7 @@ msgstr "제목 무시하기"
 msgid "illustration"
 msgstr "일러스트"
 
-#: gmusicbrowser.pl:4894
+#: gmusicbrowser.pl:4902
 msgid "imported list"
 msgstr "가져온 목록"
 
@@ -4671,7 +4671,7 @@ msgstr "정보"
 msgid "integer"
 msgstr "정수"
 
-#: gmusicbrowser.pl:798
+#: gmusicbrowser.pl:806
 msgid "interview"
 msgstr "인터뷰"
 
@@ -4679,163 +4679,163 @@ msgstr "인터뷰"
 msgid "invalid pattern"
 msgstr "잘못된 패턴"
 
-#: gmusicbrowser.pl:7612
+#: gmusicbrowser.pl:7620
 msgid "inverse"
 msgstr "거꾸로"
 
-#: gmusicbrowser.pl:7958
+#: gmusicbrowser.pl:7966
 msgid "is"
 msgstr "같음"
 
-#: gmusicbrowser.pl:7906
+#: gmusicbrowser.pl:7914
 msgid "is %g"
 msgstr "%g 와 같음"
 
-#: gmusicbrowser.pl:7797 gmusicbrowser.pl:7803 gmusicbrowser.pl:7809
+#: gmusicbrowser.pl:7805 gmusicbrowser.pl:7811 gmusicbrowser.pl:7817
 msgid "is %n"
 msgstr "%n 와 같음"
 
-#: gmusicbrowser.pl:7815
+#: gmusicbrowser.pl:7823
 msgid "is %n( %)"
 msgstr "%n( %) 와 같음"
 
-#: gmusicbrowser.pl:7985
+#: gmusicbrowser.pl:7993
 msgid "is %n(Hz)"
 msgstr "%n(Hz) 와 같음"
 
-#: gmusicbrowser.pl:7979
+#: gmusicbrowser.pl:7987
 msgid "is %n(kbps)"
 msgstr "%n(kbps) 와 같음"
 
-#: gmusicbrowser.pl:7775 gmusicbrowser.pl:7783 gmusicbrowser.pl:7791
-#: gmusicbrowser.pl:7924 gmusicbrowser.pl:7932 gmusicbrowser.pl:7942
-#: gmusicbrowser.pl:7950
+#: gmusicbrowser.pl:7783 gmusicbrowser.pl:7791 gmusicbrowser.pl:7799
+#: gmusicbrowser.pl:7932 gmusicbrowser.pl:7940 gmusicbrowser.pl:7950
+#: gmusicbrowser.pl:7958
 msgid "is %s"
 msgstr "%s 와 같음"
 
-#: gmusicbrowser.pl:7800
+#: gmusicbrowser.pl:7808
 msgid "is after %n"
 msgstr "%n 이후"
 
-#: gmusicbrowser.pl:7799
+#: gmusicbrowser.pl:7807
 msgid "is before %n"
 msgstr "%n 이전"
 
-#: gmusicbrowser.pl:7829
+#: gmusicbrowser.pl:7837
 msgid "is between %b( and )%b"
 msgstr "%b( 그리고 )%b 사이"
 
-#: gmusicbrowser.pl:7819
+#: gmusicbrowser.pl:7827
 msgid "is between %n( and )%n( %)"
 msgstr "%n( 그리고 )%n( %) 사이"
 
-#: gmusicbrowser.pl:7824
+#: gmusicbrowser.pl:7832
 msgid "is between %n( and )%n( s)"
 msgstr "%n( 그리고 )%n( s) 사이"
 
-#: gmusicbrowser.pl:7934
+#: gmusicbrowser.pl:7942
 msgid "is in %s"
 msgstr "%s 에 있음"
 
-#: gmusicbrowser.pl:7955
+#: gmusicbrowser.pl:7963
 msgid "is in list %l"
 msgstr "%l 목록에 있음"
 
-#: gmusicbrowser.pl:7828
+#: gmusicbrowser.pl:7836
 msgid "is less than %b"
 msgstr "%b 보다 적음"
 
-#: gmusicbrowser.pl:7806 gmusicbrowser.pl:7812
+#: gmusicbrowser.pl:7814 gmusicbrowser.pl:7820
 msgid "is less than %n"
 msgstr "%n 보다 적음"
 
-#: gmusicbrowser.pl:7818
+#: gmusicbrowser.pl:7826
 msgid "is less than %n( %)"
 msgstr "%n( %) 보다 적음"
 
-#: gmusicbrowser.pl:7823
+#: gmusicbrowser.pl:7831
 msgid "is less than %n( s)"
 msgstr "%n( s) 보다 적음"
 
-#: gmusicbrowser.pl:7988
+#: gmusicbrowser.pl:7996
 msgid "is less than %n(Hz)"
 msgstr "%n(Hz) 보다 적음"
 
-#: gmusicbrowser.pl:7982
+#: gmusicbrowser.pl:7990
 msgid "is less than %n(kbps)"
 msgstr "%n(kbps) 보다 적음"
 
-#: gmusicbrowser.pl:7827
+#: gmusicbrowser.pl:7835
 msgid "is more than %b"
 msgstr "%b 보다 많음"
 
-#: gmusicbrowser.pl:7805 gmusicbrowser.pl:7811
+#: gmusicbrowser.pl:7813 gmusicbrowser.pl:7819
 msgid "is more than %n"
 msgstr "%n 보다 많음"
 
-#: gmusicbrowser.pl:7817
+#: gmusicbrowser.pl:7825
 msgid "is more than %n( %)"
 msgstr "%n( %) 보다 많음"
 
-#: gmusicbrowser.pl:7822
+#: gmusicbrowser.pl:7830
 msgid "is more than %n( s)"
 msgstr "%n( s) 보다 많음"
 
-#: gmusicbrowser.pl:7987
+#: gmusicbrowser.pl:7995
 msgid "is more than %n(Hz)"
 msgstr "%n(Hz) 보다 많음"
 
-#: gmusicbrowser.pl:7981
+#: gmusicbrowser.pl:7989
 msgid "is more than %n(kbps)"
 msgstr "%n(kbps) 보다 많음"
 
-#: gmusicbrowser.pl:7968
+#: gmusicbrowser.pl:7976
 msgid "is not"
 msgstr "제외"
 
-#: gmusicbrowser.pl:7804 gmusicbrowser.pl:7810
+#: gmusicbrowser.pl:7812 gmusicbrowser.pl:7818
 msgid "is not %n"
 msgstr "%n 제외"
 
-#: gmusicbrowser.pl:7816
+#: gmusicbrowser.pl:7824
 msgid "is not %n( %)"
 msgstr "%n( %) 제외"
 
-#: gmusicbrowser.pl:7776 gmusicbrowser.pl:7784 gmusicbrowser.pl:7792
-#: gmusicbrowser.pl:7925 gmusicbrowser.pl:7933 gmusicbrowser.pl:7943
-#: gmusicbrowser.pl:7951
+#: gmusicbrowser.pl:7784 gmusicbrowser.pl:7792 gmusicbrowser.pl:7800
+#: gmusicbrowser.pl:7933 gmusicbrowser.pl:7941 gmusicbrowser.pl:7951
+#: gmusicbrowser.pl:7959
 msgid "is not %s"
 msgstr "%s 제외"
 
-#: gmusicbrowser.pl:7989
+#: gmusicbrowser.pl:7997
 msgid "is not 44.1kHz"
 msgstr "44.1kHz 제외"
 
-#: gmusicbrowser.pl:7935
+#: gmusicbrowser.pl:7943
 msgid "is not in %s"
 msgstr "%s에서 제외"
 
-#: gmusicbrowser.pl:7956
+#: gmusicbrowser.pl:7964
 msgid "is not in list %l"
 msgstr "%l 목록에서 제외"
 
-#: gmusicbrowser.pl:7907
+#: gmusicbrowser.pl:7915
 msgid "isn't %g"
 msgstr "%g 제외"
 
-#: gmusicbrowser.pl:7798
+#: gmusicbrowser.pl:7806
 msgid "isn't %n"
 msgstr "%n 제외"
 
-#: gmusicbrowser.pl:7986
+#: gmusicbrowser.pl:7994
 msgid "isn't %n(Hz)"
 msgstr "%n(Hz) 제외"
 
-#: gmusicbrowser.pl:7980
+#: gmusicbrowser.pl:7988
 msgid "isn't %n(kbps)"
 msgstr "%n(kbps) 제외"
 
-#: gmusicbrowser.pl:5771
+#: gmusicbrowser.pl:5779
 msgid ""
 "itunes doesn't support unsynchronised tags last time I checked, mostly "
 "affect tags with pictures"
@@ -4851,15 +4851,15 @@ msgstr ""
 msgid "itunes-like"
 msgstr "아이튠즈 모양"
 
-#: gmusicbrowser.pl:7901
+#: gmusicbrowser.pl:7909
 msgid "last added"
 msgstr "마지막 추가됨"
 
-#: gmusicbrowser.pl:7845 gmusicbrowser.pl:7893
+#: gmusicbrowser.pl:7853 gmusicbrowser.pl:7901
 msgid "last played"
 msgstr "마지막 연주됨"
 
-#: gmusicbrowser.pl:7853 gmusicbrowser.pl:7897
+#: gmusicbrowser.pl:7861 gmusicbrowser.pl:7905
 msgid "last skipped"
 msgstr "마지막 스킴됨"
 
@@ -4897,24 +4897,24 @@ msgstr "왼편 필터 패널"
 msgid "length of songs"
 msgstr "노래 길이"
 
-#: gmusicbrowser.pl:7892
+#: gmusicbrowser.pl:7900
 msgid "less played"
 msgstr "적게 재생됨"
 
-#: gmusicbrowser.pl:7896
+#: gmusicbrowser.pl:7904
 msgid "less skipped"
 msgstr "적게 스킵됨"
 
-#: gmusicbrowser.pl:7846 gmusicbrowser.pl:7854 gmusicbrowser.pl:7862
-#: gmusicbrowser.pl:7870
+#: gmusicbrowser.pl:7854 gmusicbrowser.pl:7862 gmusicbrowser.pl:7870
+#: gmusicbrowser.pl:7878
 msgid "less than %a( ago)"
 msgstr "%a( 이전) 보다 적음"
 
-#: gmusicbrowser.pl:7833 gmusicbrowser.pl:7840
+#: gmusicbrowser.pl:7841 gmusicbrowser.pl:7848
 msgid "less than %n( times)"
 msgstr "%n( 번) 보다 적음"
 
-#: gmusicbrowser.pl:7899
+#: gmusicbrowser.pl:7907
 msgid "longest"
 msgstr "가장 긴"
 
@@ -4922,9 +4922,9 @@ msgstr "가장 긴"
 msgid "lyricist"
 msgstr "작사가"
 
-#: gmusicbrowser.pl:7777 gmusicbrowser.pl:7785 gmusicbrowser.pl:7793
-#: gmusicbrowser.pl:7926 gmusicbrowser.pl:7936 gmusicbrowser.pl:7944
-#: gmusicbrowser.pl:7952
+#: gmusicbrowser.pl:7785 gmusicbrowser.pl:7793 gmusicbrowser.pl:7801
+#: gmusicbrowser.pl:7934 gmusicbrowser.pl:7944 gmusicbrowser.pl:7952
+#: gmusicbrowser.pl:7960
 msgid "match regexp %r"
 msgstr "%r 정규표현에 맞음"
 
@@ -4948,15 +4948,15 @@ msgstr "간단히"
 msgid "minimum font size"
 msgstr "최소 글꼴 크기"
 
-#: gmusicbrowser.pl:705 plugins/autosave.pm:36
+#: gmusicbrowser.pl:713 plugins/autosave.pm:36
 msgid "minutes"
 msgstr "분"
 
-#: gmusicbrowser.pl:7861
+#: gmusicbrowser.pl:7869
 msgid "modified"
 msgstr "수정됨"
 
-#: gmusicbrowser.pl:7965 gmusicbrowser.pl:7975
+#: gmusicbrowser.pl:7973 gmusicbrowser.pl:7983
 msgid "mono"
 msgstr "모노"
 
@@ -4964,16 +4964,16 @@ msgstr "모노"
 msgid "month"
 msgstr "월"
 
-#: gmusicbrowser.pl:709
+#: gmusicbrowser.pl:717
 msgid "months"
 msgstr "월"
 
-#: gmusicbrowser.pl:7847 gmusicbrowser.pl:7855 gmusicbrowser.pl:7863
-#: gmusicbrowser.pl:7871
+#: gmusicbrowser.pl:7855 gmusicbrowser.pl:7863 gmusicbrowser.pl:7871
+#: gmusicbrowser.pl:7879
 msgid "more than %a( ago)"
 msgstr "%a( 이전) 보다 더"
 
-#: gmusicbrowser.pl:7832 gmusicbrowser.pl:7839
+#: gmusicbrowser.pl:7840 gmusicbrowser.pl:7847
 msgid "more than %n( times)"
 msgstr "%n( 번) 보다 더"
 
@@ -4981,11 +4981,11 @@ msgstr "%n( 번) 보다 더"
 msgid "mosaic mode"
 msgstr "모자이크 모드"
 
-#: gmusicbrowser.pl:7891
+#: gmusicbrowser.pl:7899
 msgid "most played"
 msgstr "대부부 재생됨"
 
-#: gmusicbrowser.pl:7895
+#: gmusicbrowser.pl:7903
 msgid "most skipped"
 msgstr "대부분 스킵됨"
 
@@ -5005,19 +5005,19 @@ msgstr "mplayer 옵션 :"
 msgid "multi-lines string"
 msgstr "여러줄 문자열"
 
-#: gmusicbrowser.pl:6781
+#: gmusicbrowser.pl:6789
 msgid "name of the new filter"
 msgstr "새 필터 이름"
 
-#: gmusicbrowser.pl:6787
+#: gmusicbrowser.pl:6795
 msgid "name of the new grouping"
 msgstr "새 그룹으로 나누기 이름"
 
-#: gmusicbrowser.pl:6785
+#: gmusicbrowser.pl:6793
 msgid "name of the new random mode"
 msgstr "새 무작위 모드 이름"
 
-#: gmusicbrowser.pl:6783
+#: gmusicbrowser.pl:6791
 msgid "name of the new sort mode"
 msgstr "새 정렬 모드 이름"
 
@@ -5026,7 +5026,7 @@ msgstr "새 정렬 모드 이름"
 msgid "never"
 msgstr "전혀"
 
-#: gmusicbrowser.pl:1612
+#: gmusicbrowser.pl:1620
 msgid "never played"
 msgstr "전혀 재생안됨"
 
@@ -5034,11 +5034,11 @@ msgstr "전혀 재생안됨"
 msgid "no matches found, you might want to remove some search terms."
 msgstr "맞는 것을 찾지 못함, 사용자는 일부 찾기 아목을 제거해야할 것입니다."
 
-#: gmusicbrowser.pl:2750
+#: gmusicbrowser.pl:2758
 msgid "no order"
 msgstr "정렬 안함"
 
-#: gmusicbrowser.pl:3886 gmusicbrowser.pl:3978
+#: gmusicbrowser.pl:3894 gmusicbrowser.pl:3986
 msgid "no picture"
 msgstr "사진 없음"
 
@@ -5046,39 +5046,39 @@ msgstr "사진 없음"
 msgid "no pictures"
 msgstr "사진 없음"
 
-#: gmusicbrowser.pl:5362
+#: gmusicbrowser.pl:5370
 msgid "no plugins found"
 msgstr "플러그인 찾지 못함"
 
-#: gmusicbrowser.pl:5665
+#: gmusicbrowser.pl:5673
 msgid "no splitting"
 msgstr "나누지 않음"
 
-#: gmusicbrowser.pl:4051
+#: gmusicbrowser.pl:4059
 msgid "no to all"
 msgstr "전체가 아님"
 
-#: gmusicbrowser.pl:6816
+#: gmusicbrowser.pl:6824
 msgid "noname"
 msgstr "이름없음"
 
-#: gmusicbrowser.pl:324
+#: gmusicbrowser.pl:343
 msgid "normal"
 msgstr "표준"
 
-#: gmusicbrowser.pl:324
+#: gmusicbrowser.pl:343
 msgid "normal play when queue empty"
 msgstr "대기열이 비면 표준 재생"
 
-#: gmusicbrowser.pl:1619
+#: gmusicbrowser.pl:1627
 msgid "not bootleg"
 msgstr "해적판 제외"
 
-#: gmusicbrowser.pl:7894
+#: gmusicbrowser.pl:7902
 msgid "not played for the longest time"
 msgstr "가장 긴 시간동안 재생되지 않음"
 
-#: gmusicbrowser.pl:7898
+#: gmusicbrowser.pl:7906
 msgid "not skipped for the longest time"
 msgstr "가장 긴 시간동안 스킵되지않음"
 
@@ -5090,8 +5090,8 @@ msgstr "노래의 수"
 msgid "number of songs in filter"
 msgstr "필터에서 노래 수"
 
-#: gmusicbrowser.pl:7851 gmusicbrowser.pl:7859 gmusicbrowser.pl:7867
-#: gmusicbrowser.pl:7875
+#: gmusicbrowser.pl:7859 gmusicbrowser.pl:7867 gmusicbrowser.pl:7875
+#: gmusicbrowser.pl:7883
 msgid "on %d"
 msgstr "%d 상에"
 
@@ -5115,7 +5115,7 @@ msgstr "항목 창 열기"
 msgid "options"
 msgstr "옵션"
 
-#: gmusicbrowser.pl:5705
+#: gmusicbrowser.pl:5713
 msgid "or"
 msgstr "또는"
 
@@ -5127,7 +5127,7 @@ msgstr "기타"
 msgid "other file icon"
 msgstr "다른 종류의 아이콘"
 
-#: gmusicbrowser.pl:5500 gmusicbrowser.pl:5507
+#: gmusicbrowser.pl:5508 gmusicbrowser.pl:5515
 msgid "output device :"
 msgstr "출력 장치 :"
 
@@ -5135,7 +5135,7 @@ msgstr "출력 장치 :"
 msgid "password :"
 msgstr "비밀번호 :"
 
-#: gmusicbrowser.pl:1049
+#: gmusicbrowser.pl:1057
 msgid "perl code"
 msgstr "펄 코드"
 
@@ -5147,15 +5147,15 @@ msgstr "사진 크기"
 msgid "play count average"
 msgstr "재생 카운터 평균"
 
-#: gmusicbrowser.pl:7831
+#: gmusicbrowser.pl:7839
 msgid "played"
 msgstr "재생됨"
 
-#: gmusicbrowser.pl:1618
+#: gmusicbrowser.pl:1626
 msgid "played>4"
 msgstr "재생됨>4"
 
-#: gmusicbrowser.pl:5530 gmusicbrowser.pl:5649
+#: gmusicbrowser.pl:5538 gmusicbrowser.pl:5657
 msgid "port :"
 msgstr "포트 :"
 
@@ -5163,11 +5163,11 @@ msgstr "포트 :"
 msgid "pre-amp"
 msgstr "프리-앰프"
 
-#: gmusicbrowser.pl:328
+#: gmusicbrowser.pl:347
 msgid "quit"
 msgstr "종료"
 
-#: gmusicbrowser.pl:328
+#: gmusicbrowser.pl:347
 msgid "quit when queue empty"
 msgstr "대기열이 비면 종료"
 
@@ -5191,7 +5191,7 @@ msgstr "녹음 장소"
 msgid "reduced view"
 msgstr ""
 
-#: gmusicbrowser.pl:5654
+#: gmusicbrowser.pl:5662
 msgid "requires xdg-screensaver"
 msgstr "xdg-screensaver가 필요함"
 
@@ -5215,51 +5215,51 @@ msgstr "재시도"
 msgid "retry in {seconds} s"
 msgstr "{seconds} 초에 재시도"
 
-#: gmusicbrowser.pl:7984
+#: gmusicbrowser.pl:7992
 msgid "sampling rate"
 msgstr "샘플 레이트"
 
-#: gmusicbrowser.pl:6798
+#: gmusicbrowser.pl:6806
 msgid "save as '{name}'"
 msgstr "'{name}'로 저장"
 
-#: gmusicbrowser.pl:6781
+#: gmusicbrowser.pl:6789
 msgid "save filter as"
 msgstr "필터 저장"
 
-#: gmusicbrowser.pl:6787
+#: gmusicbrowser.pl:6795
 msgid "save grouping as"
 msgstr "그룹으로 나누기 새이름으로 저장"
 
-#: gmusicbrowser.pl:6785
+#: gmusicbrowser.pl:6793
 msgid "save random mode as"
 msgstr "무작위 모드 저장"
 
-#: gmusicbrowser.pl:6783
+#: gmusicbrowser.pl:6791
 msgid "save sort mode as"
 msgstr "정렬 모드 저장"
 
-#: gmusicbrowser.pl:6780
+#: gmusicbrowser.pl:6788
 msgid "saved filters"
 msgstr "저장된 필터"
 
-#: gmusicbrowser.pl:6786
+#: gmusicbrowser.pl:6794
 msgid "saved groupings"
 msgstr "저장된 그룹으로 나누기"
 
-#: gmusicbrowser.pl:6784
+#: gmusicbrowser.pl:6792
 msgid "saved random modes"
 msgstr "저장된 무작위 모드"
 
-#: gmusicbrowser.pl:6782
+#: gmusicbrowser.pl:6790
 msgid "saved sort modes"
 msgstr "저장된 정렬 모드"
 
-#: gmusicbrowser.pl:5892
+#: gmusicbrowser.pl:5900
 msgid "scan now"
 msgstr "바로 찾기"
 
-#: gmusicbrowser.pl:704 gmusicbrowser.pl:5705 plugins/lullaby.pm:44
+#: gmusicbrowser.pl:712 gmusicbrowser.pl:5713 plugins/lullaby.pm:44
 #: plugins/notify.pm:53
 msgid "seconds"
 msgstr "초"
@@ -5272,7 +5272,7 @@ msgstr ""
 msgid "shimmer_tray"
 msgstr ""
 
-#: gmusicbrowser.pl:7900
+#: gmusicbrowser.pl:7908
 msgid "shortest"
 msgstr "가장 짧게"
 
@@ -5300,7 +5300,7 @@ msgstr "스킨 옵션"
 msgid "skip count average"
 msgstr "스킵 카운트 평균"
 
-#: gmusicbrowser.pl:7838
+#: gmusicbrowser.pl:7846
 msgid "skipped"
 msgstr "스킵됨"
 
@@ -5316,15 +5316,15 @@ msgstr "정렬"
 msgid "static list"
 msgstr "정적인 목록"
 
-#: gmusicbrowser.pl:7966 gmusicbrowser.pl:7976
+#: gmusicbrowser.pl:7974 gmusicbrowser.pl:7984
 msgid "stereo"
 msgstr "스테레오"
 
-#: gmusicbrowser.pl:327
+#: gmusicbrowser.pl:346
 msgid "stop"
 msgstr "정지"
 
-#: gmusicbrowser.pl:327
+#: gmusicbrowser.pl:346
 msgid "stop when queue empty"
 msgstr "대기열이 비면 정지"
 
@@ -5332,7 +5332,7 @@ msgstr "대기열이 비면 정지"
 msgid "string"
 msgstr "문자열"
 
-#: gmusicbrowser.pl:5568
+#: gmusicbrowser.pl:5576
 msgid "supports : "
 msgstr "지원 :"
 
@@ -5344,19 +5344,19 @@ msgstr "텍스트 형식"
 msgid "text mode"
 msgstr "텍스트 모드"
 
-#: gmusicbrowser.pl:1560
+#: gmusicbrowser.pl:1568
 msgid "the command {name}"
 msgstr "명령 {name}"
 
-#: gmusicbrowser.pl:5770
+#: gmusicbrowser.pl:5778
 msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
 msgstr "기본값은 ID3v2.3는 utf16이고 ID3v2.4는 utf8이다."
 
-#: gmusicbrowser.pl:1567
+#: gmusicbrowser.pl:1575
 msgid "the file {name}"
 msgstr "파일 {name}"
 
-#: gmusicbrowser.pl:1553
+#: gmusicbrowser.pl:1561
 msgid "the {name} perl module"
 msgstr "{name} 펄 모듈"
 
@@ -5384,11 +5384,11 @@ msgstr "도구"
 msgid "true"
 msgstr "진실"
 
-#: gmusicbrowser.pl:329
+#: gmusicbrowser.pl:348
 msgid "turn off"
 msgstr "끄기"
 
-#: gmusicbrowser.pl:329
+#: gmusicbrowser.pl:348
 msgid "turn off computer when queue empty"
 msgstr "대기열이 비면 컴퓨터 끄기"
 
@@ -5400,7 +5400,7 @@ msgstr "알 수 없음"
 msgid "unknown error"
 msgstr "알려지지 않은 에러"
 
-#: gmusicbrowser.pl:2759 gmusicbrowser_layout.pm:1334
+#: gmusicbrowser.pl:2767 gmusicbrowser_layout.pm:1334
 msgid "unnamed random mode"
 msgstr "이름없는 무작위 모드"
 
@@ -5408,12 +5408,12 @@ msgstr "이름없는 무작위 모드"
 msgid "url"
 msgstr "주소"
 
-#: gmusicbrowser.pl:1066
+#: gmusicbrowser.pl:1074
 msgid "url-encoded list of files"
 msgstr "url-엔코드된 파일의 목록"
 
-#: gmusicbrowser.pl:1067 gmusicbrowser.pl:1068 gmusicbrowser.pl:1069
-#: gmusicbrowser.pl:1070
+#: gmusicbrowser.pl:1075 gmusicbrowser.pl:1076 gmusicbrowser.pl:1077
+#: gmusicbrowser.pl:1078
 msgid "url-encoded list of files/folders"
 msgstr "url-엔코드된 파일/폴더의 목록"
 
@@ -5437,7 +5437,7 @@ msgstr "그놈 설정 사용"
 msgid "use song folder"
 msgstr "노래 폴더 사용"
 
-#: gmusicbrowser.pl:5681
+#: gmusicbrowser.pl:5689
 msgid "use standard strftime variables"
 msgstr "표준 strftime 변수 사용하기"
 
@@ -5449,19 +5449,19 @@ msgstr "사용자이름:"
 msgid "using skin :"
 msgstr "스킨 사용 :"
 
-#: gmusicbrowser.pl:326
+#: gmusicbrowser.pl:345
 msgid "wait for more"
 msgstr "좀더 기다리세요"
 
-#: gmusicbrowser.pl:326
+#: gmusicbrowser.pl:345
 msgid "wait for more when queue empty"
 msgstr "대기열이 비면 좀더 기다리세요"
 
-#: gmusicbrowser.pl:708
+#: gmusicbrowser.pl:716
 msgid "weeks"
 msgstr "주"
 
-#: gmusicbrowser.pl:7674
+#: gmusicbrowser.pl:7682
 msgid "weight :"
 msgstr "중요도 :"
 
@@ -5509,7 +5509,7 @@ msgstr "찾기 포함"
 msgid "with tabbedlists"
 msgstr "탭으로된 목록 포함"
 
-#: gmusicbrowser.pl:5529
+#: gmusicbrowser.pl:5537
 msgid ""
 "without gstreamer : one stream per file, one connection at a time\n"
 "with gstreamer : one continuous stream, multiple connection possible"
@@ -5533,11 +5533,11 @@ msgstr "연도"
 msgid "year (highest)"
 msgstr "연도 (최고높음)"
 
-#: gmusicbrowser.pl:710
+#: gmusicbrowser.pl:718
 msgid "years"
 msgstr "연도들"
 
-#: gmusicbrowser.pl:4050
+#: gmusicbrowser.pl:4058
 msgid "yes to all"
 msgstr "모두 예"
 
@@ -5549,43 +5549,43 @@ msgstr ""
 "{album}\n"
 "<small>/</small> {artist}"
 
-#: gmusicbrowser.pl:5804
+#: gmusicbrowser.pl:5812
 msgid "{folder} already exists"
 msgstr "{folder}는 이미 존재합니다"
 
-#: gmusicbrowser.pl:2922
+#: gmusicbrowser.pl:2930
 msgid "{hours} hours {min} min {sec} s ({size} M)"
 msgstr "{hours} 시간 {min} 분 {sec} 초 ({size} M)"
 
-#: gmusicbrowser.pl:2926 gmusicbrowser.pl:2935
+#: gmusicbrowser.pl:2934 gmusicbrowser.pl:2943
 msgid "{hours}h {min}m {sec}s ({size}M)"
 msgstr "{hours}시 {min}분 {sec}초 ({size}M)"
 
-#: gmusicbrowser.pl:2931 gmusicbrowser_songs.pm:2333
+#: gmusicbrowser.pl:2939 gmusicbrowser_songs.pm:2333
 msgid "{hours}h{min}m{sec}s"
 msgstr "{hours}시{min}분{sec}초"
 
-#: gmusicbrowser.pl:2922
+#: gmusicbrowser.pl:2930
 msgid "{min} min {sec} s ({size} M)"
 msgstr "{min} 분 {sec} 초 ({size} M)"
 
-#: gmusicbrowser.pl:2926 gmusicbrowser.pl:2935
+#: gmusicbrowser.pl:2934 gmusicbrowser.pl:2943
 msgid "{min}m {sec}s ({size}M)"
 msgstr "{min}분 {sec}초 ({size}M)"
 
-#: gmusicbrowser.pl:2931 gmusicbrowser_songs.pm:2333
+#: gmusicbrowser.pl:2939 gmusicbrowser_songs.pm:2333
 msgid "{min}m{sec}s"
 msgstr "{min}분{sec}초"
 
-#: gmusicbrowser.pl:5582
+#: gmusicbrowser.pl:5590
 msgid "{outputname} output settings"
 msgstr "{outputname} 출력 설정"
 
-#: gmusicbrowser.pl:350
+#: gmusicbrowser.pl:369
 msgid "{songs} by {artists}"
 msgstr "{songs} / {artists}"
 
-#: gmusicbrowser.pl:6716
+#: gmusicbrowser.pl:6724
 msgid ""
 "{song}\n"
 "by {artist}\n"
@@ -5595,12 +5595,12 @@ msgstr ""
 " {artist}\n"
 " {album}"
 
-#: gmusicbrowser.pl:3106 gmusicbrowser_layout.pm:252
+#: gmusicbrowser.pl:3114 gmusicbrowser_layout.pm:252
 #: plugins/audioscrobbler.pm:186 plugins/audioscrobbler.pm:192
 msgid "{song} by {artist}"
 msgstr "{song} / {artist}"
 
-#: gmusicbrowser.pl:1072
+#: gmusicbrowser.pl:1080
 msgid "|-separated list of widget names"
 msgstr "|-위젯 이름에서 목록 나누기"
 

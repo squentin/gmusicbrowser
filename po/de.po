@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9621\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-22 14:37+0100\n"
+"POT-Creation-Date: 2011-01-23 13:58+0100\n"
 "PO-Revision-Date: 2010-02-22 21:01+0100\n"
 "Last-Translator:  <staubi@linuxmail.org>\n"
 "Language-Team: german <de@li.org>\n"
@@ -45,7 +45,7 @@ msgstr ""
 msgid " of {length}"
 msgstr " von {length}"
 
-#: gmusicbrowser.pl:6028
+#: gmusicbrowser.pl:6036
 msgid "# songs"
 msgstr "# Titel"
 
@@ -66,27 +66,27 @@ msgid_plural "%d Artists"
 msgstr[0] "%d Künstler"
 msgstr[1] "%d Künstler"
 
-#: gmusicbrowser.pl:2923 gmusicbrowser.pl:2927 gmusicbrowser.pl:4515
+#: gmusicbrowser.pl:2931 gmusicbrowser.pl:2935 gmusicbrowser.pl:4523
 #: gmusicbrowser_list.pm:1628
 msgid "%d Song"
 msgid_plural "%d Songs"
 msgstr[0] "%d Titel"
 msgstr[1] "%d Titel"
 
-#: gmusicbrowser.pl:361 gmusicbrowser_list.pm:7721 gmusicbrowser_songs.pm:502
+#: gmusicbrowser.pl:380 gmusicbrowser_list.pm:7721 gmusicbrowser_songs.pm:502
 msgid "%d album"
 msgid_plural "%d albums"
 msgstr[0] "%d Album"
 msgstr[1] "%d Alben"
 
-#: gmusicbrowser.pl:349 gmusicbrowser.pl:356 gmusicbrowser_list.pm:7732
+#: gmusicbrowser.pl:368 gmusicbrowser.pl:375 gmusicbrowser_list.pm:7732
 #: gmusicbrowser_songs.pm:478 gmusicbrowser_songs.pm:2343
 msgid "%d artist"
 msgid_plural "%d artists"
 msgstr[0] "%d Künstler"
 msgstr[1] "%d Künstler"
 
-#: gmusicbrowser.pl:4141
+#: gmusicbrowser.pl:4149
 msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] "%d Datei"
@@ -98,19 +98,19 @@ msgid_plural "%d files in {folder}"
 msgstr[0] "%d Datei in {folder}"
 msgstr[1] "%d Dateien in {folder}"
 
-#: gmusicbrowser.pl:5055
+#: gmusicbrowser.pl:5063
 msgid "%d folder"
 msgid_plural "%d folders"
 msgstr[0] "%d Ordner"
 msgstr[1] "%d Ordner"
 
-#: gmusicbrowser.pl:1371
+#: gmusicbrowser.pl:1379
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d Sekunde"
 msgstr[1] "%d Sekunden"
 
-#: gmusicbrowser.pl:344 gmusicbrowser.pl:351 gmusicbrowser.pl:7581
+#: gmusicbrowser.pl:363 gmusicbrowser.pl:370 gmusicbrowser.pl:7589
 #: gmusicbrowser_layout.pm:231 gmusicbrowser_list.pm:251
 #: gmusicbrowser_songs.pm:2337 plugins/audioscrobbler.pm:185
 msgid "%d song"
@@ -118,13 +118,13 @@ msgid_plural "%d songs"
 msgstr[0] "%d Titel"
 msgstr[1] "%d Titel"
 
-#: gmusicbrowser.pl:5054
+#: gmusicbrowser.pl:5062
 msgid "%d song added"
 msgid_plural "%d songs added"
 msgstr[0] "%d Titel hinzugefügt"
 msgstr[1] "%d Titel hinzugefügt"
 
-#: gmusicbrowser.pl:2932 gmusicbrowser_layout.pm:227
+#: gmusicbrowser.pl:2940 gmusicbrowser_layout.pm:227
 #: gmusicbrowser_layout.pm:230
 msgid "%d song in queue"
 msgid_plural "%d songs in queue"
@@ -143,59 +143,59 @@ msgid_plural "%d songs selected"
 msgstr[0] "%d Titel gewählt"
 msgstr[1] "%d Titel gewählt"
 
-#: gmusicbrowser.pl:7914
+#: gmusicbrowser.pl:7922
 msgid "%f is set"
 msgstr "%f ist gesetzt"
 
-#: gmusicbrowser.pl:7915
+#: gmusicbrowser.pl:7923
 msgid "%f isn't set"
 msgstr "%f nicht gesetzt"
 
-#: gmusicbrowser.pl:7889
+#: gmusicbrowser.pl:7897
 msgid "%n first added"
 msgstr "%n zuerst hinzugefügt"
 
-#: gmusicbrowser.pl:7888
+#: gmusicbrowser.pl:7896
 msgid "%n last added"
 msgstr "%n zuletzt hinzugefügt"
 
-#: gmusicbrowser.pl:7880
+#: gmusicbrowser.pl:7888
 msgid "%n last played"
 msgstr "%n zuletzt gespielten"
 
-#: gmusicbrowser.pl:7884
+#: gmusicbrowser.pl:7892
 msgid "%n last skipped"
 msgstr "%n zuletzt übersprungen"
 
-#: gmusicbrowser.pl:7879
+#: gmusicbrowser.pl:7887
 msgid "%n less played"
 msgstr "%n wenigst gespielten"
 
-#: gmusicbrowser.pl:7883
+#: gmusicbrowser.pl:7891
 msgid "%n less skipped"
 msgstr "%n wenigst übersprungenen"
 
-#: gmusicbrowser.pl:7886
+#: gmusicbrowser.pl:7894
 msgid "%n longest"
 msgstr "%n am längsten"
 
-#: gmusicbrowser.pl:7878
+#: gmusicbrowser.pl:7886
 msgid "%n most played"
 msgstr "%n meist gespielten"
 
-#: gmusicbrowser.pl:7882
+#: gmusicbrowser.pl:7890
 msgid "%n most skipped"
 msgstr "%n meist übersprungenen"
 
-#: gmusicbrowser.pl:7881
+#: gmusicbrowser.pl:7889
 msgid "%n not played for the longest time"
 msgstr "%n am längsten nicht gespielt"
 
-#: gmusicbrowser.pl:7885
+#: gmusicbrowser.pl:7893
 msgid "%n not skipped for the longest time"
 msgstr "%n am längsten nicht übersprungenen"
 
-#: gmusicbrowser.pl:7887
+#: gmusicbrowser.pl:7895
 msgid "%n shortest"
 msgstr "%n am kürzesten"
 
@@ -203,21 +203,21 @@ msgstr "%n am kürzesten"
 msgid "%t - gmusicbrowser"
 msgstr "%t - gmusicbrowser"
 
-#: gmusicbrowser.pl:4047
+#: gmusicbrowser.pl:4055
 msgid "'{file}' exists. Overwrite ?"
 msgstr "Die Datei '{file}' existiert. Soll sie überschrieben werden?"
 
-#: gmusicbrowser.pl:5919
+#: gmusicbrowser.pl:5927
 msgid "(%d song excluded)"
 msgid_plural "(%d songs excluded)"
 msgstr[0] "(%d Titel ausgeschlossen)"
 msgstr[1] "(%d Titel ausgeschlossen)"
 
-#: gmusicbrowser.pl:7911 gmusicbrowser.pl:7919
+#: gmusicbrowser.pl:7919 gmusicbrowser.pl:7927
 msgid "(: )has one"
 msgstr "(: )hat eins"
 
-#: gmusicbrowser.pl:7910 gmusicbrowser.pl:7918
+#: gmusicbrowser.pl:7918 gmusicbrowser.pl:7926
 msgid "(: )none"
 msgstr "(: )keins"
 
@@ -225,7 +225,7 @@ msgstr "(: )keins"
 msgid "(applied after restart)"
 msgstr "(nach Neustart wirksam)"
 
-#: gmusicbrowser.pl:2766
+#: gmusicbrowser.pl:2774
 msgid "(case insensitive)"
 msgstr "(Groß-/Kleinschreibung nicht berücksichtigen)"
 
@@ -241,7 +241,7 @@ msgstr "(andere)"
 msgid "(see http://www."
 msgstr ""
 
-#: gmusicbrowser.pl:5699
+#: gmusicbrowser.pl:5707
 msgid ""
 "- When selecting a song, the playlist filter will be reset if the song is "
 "not in it\n"
@@ -256,7 +256,7 @@ msgstr "... auf gespielte Titel"
 msgid "... on skipped songs"
 msgstr "... auf übersprungene Titel"
 
-#: gmusicbrowser.pl:7721
+#: gmusicbrowser.pl:7729
 msgid "0 chance"
 msgstr "0 Chance"
 
@@ -264,7 +264,7 @@ msgstr "0 Chance"
 msgid "0 means no limit"
 msgstr "0 - kein Limit"
 
-#: gmusicbrowser.pl:7719
+#: gmusicbrowser.pl:7727
 msgid "1 chance in {probability}"
 msgstr "1 zu {probability}"
 
@@ -276,15 +276,15 @@ msgstr "3 Filter Reihen"
 msgid "32x32 PNG file icon"
 msgstr "32x32 PNG Datei-Icon"
 
-#: gmusicbrowser.pl:1615
+#: gmusicbrowser.pl:1623
 msgid "50 Last Added"
 msgstr "50 zuletzt hinzugefügten"
 
-#: gmusicbrowser.pl:1614
+#: gmusicbrowser.pl:1622
 msgid "50 Last Played"
 msgstr "50 zuletzt gespielten"
 
-#: gmusicbrowser.pl:1613
+#: gmusicbrowser.pl:1621
 msgid "50 Most Played"
 msgstr "50 meist gespielten"
 
@@ -293,7 +293,7 @@ msgstr "50 meist gespielten"
 msgid "<Unknown>"
 msgstr "<Unknown>"
 
-#: gmusicbrowser.pl:347
+#: gmusicbrowser.pl:366
 msgid ""
 "<b>%t</b>\n"
 "<small><small>by</small> %a\n"
@@ -315,7 +315,7 @@ msgstr "Abbrechen"
 msgid "Abort ReplayGain analysis"
 msgstr "Analyse der Wiedergabe-Verstärkung abbrechen"
 
-#: gmusicbrowser.pl:4152
+#: gmusicbrowser.pl:4160
 msgid "Abort all"
 msgstr "Alles abbrechen"
 
@@ -327,13 +327,13 @@ msgstr "Taggen abbrechen"
 msgid "About"
 msgstr "Über"
 
-#: gmusicbrowser.pl:4146
+#: gmusicbrowser.pl:4154
 msgid ""
 "About to delete {files}\n"
 "Are you sure ?"
 msgstr "Möchten Sie wirklich diese Dateien {files} löschen?"
 
-#: gmusicbrowser.pl:1371
+#: gmusicbrowser.pl:1379
 msgid "About to turn off the computer in :"
 msgstr "Computer wird abgeschaltet in:"
 
@@ -341,7 +341,7 @@ msgstr "Computer wird abgeschaltet in:"
 msgid "Actions are not supported by current notification daemon"
 msgstr "Aktion wird nicht von verwendetem Benachrichtigungs-Daemon unterstützt"
 
-#: gmusicbrowser.pl:6967 gmusicbrowser.pl:7238 gmusicbrowser.pl:7459
+#: gmusicbrowser.pl:6975 gmusicbrowser.pl:7246 gmusicbrowser.pl:7467
 #: gmusicbrowser_tags.pm:1237 plugins/desktopwidget.pm:36
 msgid "Add"
 msgstr "Hinzufügen"
@@ -350,11 +350,11 @@ msgstr "Hinzufügen"
 msgid "Add a button to rip a CD"
 msgstr "Knopf zum CD-rippen hinzufügen"
 
-#: gmusicbrowser.pl:5746
+#: gmusicbrowser.pl:5754
 msgid "Add a fullscreen button"
 msgstr "Knopf für Vollbildmodus hinzufügen"
 
-#: gmusicbrowser.pl:5746
+#: gmusicbrowser.pl:5754
 msgid "Add a fullscreen button to layouts that can accept extra buttons"
 msgstr ""
 "Knopf für Vollbildmodus zu Layouts hinzufügen, die Extraknöpfe verwenden "
@@ -364,11 +364,11 @@ msgstr ""
 msgid "Add a group"
 msgstr "Füge Gruppe hinzu"
 
-#: gmusicbrowser.pl:1074
+#: gmusicbrowser.pl:1082
 msgid "Add a label to the current song"
 msgstr "Füge dem aktuellen Titel ein neues Label hinzu"
 
-#: gmusicbrowser.pl:1067
+#: gmusicbrowser.pl:1075
 msgid "Add a list of files/folders to the playlist"
 msgstr "Füge eine Liste von Dateien/Ordnern der Wiedergabeliste hinzu"
 
@@ -380,23 +380,23 @@ msgstr "Füge Radio hinzu"
 msgid "Add files or folders"
 msgstr "Füge Dateien oder Ordner hinzu"
 
-#: gmusicbrowser.pl:1070
+#: gmusicbrowser.pl:1078
 msgid "Add files/folders to library"
 msgstr "Füge Dateien/Ordner zur Sammlung hinzu"
 
-#: gmusicbrowser.pl:5867
+#: gmusicbrowser.pl:5875
 msgid "Add folder"
 msgstr "Ordner hinzufügen"
 
-#: gmusicbrowser.pl:6074
+#: gmusicbrowser.pl:6082
 msgid "Add label"
 msgstr "Label hinzufügen"
 
-#: gmusicbrowser.pl:6968
+#: gmusicbrowser.pl:6976
 msgid "Add multiple condition"
 msgstr "Mehrere Bedingungen hinzufügen"
 
-#: gmusicbrowser.pl:4577
+#: gmusicbrowser.pl:4585
 msgid "Add new label"
 msgstr "Neues Label hinzufügen"
 
@@ -404,11 +404,11 @@ msgstr "Neues Label hinzufügen"
 msgid "Add new radio"
 msgstr "Neues Radio hinzufügen"
 
-#: gmusicbrowser.pl:7461
+#: gmusicbrowser.pl:7469
 msgid "Add rule : "
 msgstr "Neues Suchmuster hinzufügen: "
 
-#: gmusicbrowser.pl:5312
+#: gmusicbrowser.pl:5320
 msgid "Add shorcut key"
 msgstr "Schnelltaste hinzufügen"
 
@@ -416,7 +416,7 @@ msgstr "Schnelltaste hinzufügen"
 msgid "Add tab"
 msgstr "Reiter hinzufügen"
 
-#: gmusicbrowser.pl:399
+#: gmusicbrowser.pl:418
 msgid "Add to list"
 msgstr "Zur Liste hinzufügen"
 
@@ -424,7 +424,7 @@ msgstr "Zur Liste hinzufügen"
 msgid "Added"
 msgstr "Hinzugefügt"
 
-#: gmusicbrowser.pl:1617
+#: gmusicbrowser.pl:1625
 msgid "Added Today"
 msgstr "Heute hinzugefügt"
 
@@ -436,7 +436,7 @@ msgstr "Füge Radio hinzu"
 msgid "Additional domain for Last.fm, Amazon and so on."
 msgstr "Domainzusatz für Last.fm, Amazon usw."
 
-#: gmusicbrowser.pl:5684
+#: gmusicbrowser.pl:5692
 msgid ""
 "Additionally this format can be used :\n"
 " default number1 format1 number2 format2 ...\n"
@@ -474,7 +474,7 @@ msgstr "Erweiterte Tag-Bearbeitung"
 msgid "After: "
 msgstr "Nach: "
 
-#: gmusicbrowser.pl:835 gmusicbrowser.pl:7788 gmusicbrowser_songs.pm:495
+#: gmusicbrowser.pl:843 gmusicbrowser.pl:7796 gmusicbrowser_songs.pm:495
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
@@ -523,7 +523,7 @@ msgstr "Album Bild & Info"
 msgid "Album shuffle"
 msgstr "Album mischen"
 
-#: gmusicbrowser.pl:834
+#: gmusicbrowser.pl:842
 msgid "Album with picture"
 msgstr "Album mit Bild"
 
@@ -547,11 +547,11 @@ msgstr "Alle Alben"
 msgid "All artists"
 msgstr "Alle Künstler"
 
-#: gmusicbrowser.pl:7890
+#: gmusicbrowser.pl:7898
 msgid "All but the [most/less]%n"
 msgstr "Alle, ausser die [meist/wenigst]%n"
 
-#: gmusicbrowser.pl:3893
+#: gmusicbrowser.pl:3901
 msgid "All files"
 msgstr "Alle Dateien"
 
@@ -567,12 +567,12 @@ msgstr "Alle Label"
 msgid "All moods"
 msgstr "Alle Stimmungen"
 
-#: gmusicbrowser.pl:7095 gmusicbrowser.pl:7136 gmusicbrowser.pl:7169
+#: gmusicbrowser.pl:7103 gmusicbrowser.pl:7144 gmusicbrowser.pl:7177
 #: gmusicbrowser_songs.pm:3675
 msgid "All of :"
 msgstr "Alles trifft zu:"
 
-#: gmusicbrowser.pl:8782 gmusicbrowser_layout.pm:1422
+#: gmusicbrowser.pl:8790 gmusicbrowser_layout.pm:1422
 msgid "All songs"
 msgstr "Alle Titel"
 
@@ -584,19 +584,19 @@ msgstr "Zeitgesteuertes Ausblenden und Stoppen"
 msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
 msgstr "Erlaubt die Steuerung von gmusicbrowser durch DBus via MPRIS v1.0"
 
-#: gmusicbrowser.pl:882
+#: gmusicbrowser.pl:890
 msgid "Alt"
 msgstr "Alt"
 
-#: gmusicbrowser.pl:5698
+#: gmusicbrowser.pl:5706
 msgid "Amount of volume changed by the mouse wheel"
 msgstr "Schrittgrösse der Lautstärkeregelung durch Mausrad"
 
-#: gmusicbrowser.pl:7095 gmusicbrowser.pl:7169 gmusicbrowser_songs.pm:3675
+#: gmusicbrowser.pl:7103 gmusicbrowser.pl:7177 gmusicbrowser_songs.pm:3675
 msgid "Any of :"
 msgstr "Zumindest eine Bedingung ist gültig:"
 
-#: gmusicbrowser.pl:385
+#: gmusicbrowser.pl:404
 msgid "Append"
 msgstr "Anhängen"
 
@@ -621,11 +621,11 @@ msgstr ""
 "gespielt werden (Notwendig, wenn die Standardbewertung zu grunde gelegt "
 "werden soll):"
 
-#: gmusicbrowser.pl:5989
+#: gmusicbrowser.pl:5997
 msgid "Are you sure you want to delete the '{label}' label ?"
 msgstr "Wirklich das '{label}' Label löschen?"
 
-#: gmusicbrowser.pl:5350
+#: gmusicbrowser.pl:5358
 msgid "Arguments"
 msgstr "Argumente"
 
@@ -645,7 +645,7 @@ msgstr "Vollbild für Arkanoid Layout mit Warteschlange"
 msgid "Arkanoid browser"
 msgstr ""
 
-#: gmusicbrowser.pl:7780 gmusicbrowser_songs.pm:469 gmusicbrowser_tags.pm:1529
+#: gmusicbrowser.pl:7788 gmusicbrowser_songs.pm:469 gmusicbrowser_tags.pm:1529
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
 #: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:129
@@ -653,7 +653,7 @@ msgstr ""
 msgid "Artist"
 msgstr "Künstler"
 
-#: gmusicbrowser.pl:833
+#: gmusicbrowser.pl:841
 msgid "Artist & album"
 msgstr "Künstler & Album"
 
@@ -673,11 +673,11 @@ msgstr "Künstler URL"
 msgid "Artist picture"
 msgstr "Künstler Bild"
 
-#: gmusicbrowser.pl:851
+#: gmusicbrowser.pl:859
 msgid "Artist,Album,Disc,Track"
 msgstr "Künstler, Album, Disk, Titel-Nr."
 
-#: gmusicbrowser.pl:852
+#: gmusicbrowser.pl:860
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "Künstler, Datum, Album, Disk, Titel-Nr."
 
@@ -693,7 +693,7 @@ msgstr "Plugin Künstlerinformationen"
 msgid "Artists"
 msgstr "Künstler"
 
-#: gmusicbrowser.pl:7303
+#: gmusicbrowser.pl:7311
 msgid "Ascending order"
 msgstr "Aufsteigende Reihenfolge"
 
@@ -701,7 +701,7 @@ msgstr "Aufsteigende Reihenfolge"
 msgid "Ask confirmation only if file already exists"
 msgstr "Nur bestätigen, falls die Datei existiert"
 
-#: gmusicbrowser.pl:5212
+#: gmusicbrowser.pl:5220
 msgid "Audio"
 msgstr "Audio"
 
@@ -745,7 +745,7 @@ msgstr "Automatische Auswahl des Bildes"
 msgid "Automatic rating updates on configurable listening behaviour events."
 msgstr "Automatische Anpassung der Bewertung durch konfigurierbare Ereignisse."
 
-#: gmusicbrowser.pl:5908
+#: gmusicbrowser.pl:5916
 msgid "Automatically remove current song if not found"
 msgstr "Entferne den Titel automatisch, wenn er nicht gefunden wurde."
 
@@ -757,7 +757,7 @@ msgstr "Automatisch speichern"
 msgid "Autosave plugin"
 msgstr "Automatisch speichern-Erweiterung"
 
-#: gmusicbrowser.pl:7259
+#: gmusicbrowser.pl:7267
 msgid "Available"
 msgstr "Verfügbar"
 
@@ -773,7 +773,7 @@ msgstr "BPM"
 msgid "Bad session"
 msgstr "Ungültige Session"
 
-#: gmusicbrowser.pl:4307
+#: gmusicbrowser.pl:4315
 msgid "Base Folder :"
 msgstr "Grundordner:"
 
@@ -806,7 +806,7 @@ msgstr ""
 msgid "Browser"
 msgstr "Browser"
 
-#: gmusicbrowser.pl:5735
+#: gmusicbrowser.pl:5743
 msgid "Browser window layout :"
 msgstr "Browser:"
 
@@ -822,7 +822,7 @@ msgstr "Knöpfe"
 msgid "Buttons, Song & Cover"
 msgstr "Knöpfe, Titel und Alben Cover"
 
-#: gmusicbrowser.pl:1063
+#: gmusicbrowser.pl:1071
 msgid "Can be relative by using + or -"
 msgstr "Relative Angaben möglich mit + bzw. -"
 
@@ -838,7 +838,7 @@ msgstr ""
 "Kann Lautstärke nicht ändern. Benötige amixer (aus alsa-utils Paket) um "
 "Lautstärke bei verwendetem Audio Backend zu ändern."
 
-#: gmusicbrowser.pl:3717
+#: gmusicbrowser.pl:3725
 msgid ""
 "Can't create Folder '{path}' : \n"
 "{error}"
@@ -859,7 +859,7 @@ msgstr "Kann '{file}' nicht wiedergeben."
 msgid "Can't read file or invalid file"
 msgstr "Kann Datei nicht lesen oder Datei ist korrupt"
 
-#: gmusicbrowser.pl:4343
+#: gmusicbrowser.pl:4351
 msgid "Can't write in base folder '{folder}'."
 msgstr "Kann nicht in Grundordner '{folder}' schreiben."
 
@@ -871,11 +871,11 @@ msgstr "1. Buchstabe groß"
 msgid "Capitalize each word"
 msgstr "Alle Anfangsbuchstaben groß"
 
-#: gmusicbrowser.pl:7299
+#: gmusicbrowser.pl:7307
 msgid "Case insensitive"
 msgstr "Groß-/Kleinschreibung nicht berücksichtigen"
 
-#: gmusicbrowser.pl:7299 gmusicbrowser_list.pm:3369
+#: gmusicbrowser.pl:7307 gmusicbrowser_list.pm:3369
 msgid "Case sensitive"
 msgstr "Groß-/Kleinschreibung berücksichtigen"
 
@@ -895,7 +895,7 @@ msgstr "Zentriert"
 msgid "Centered on"
 msgstr "Zentriert innerhalb"
 
-#: gmusicbrowser.pl:1037
+#: gmusicbrowser.pl:1045
 msgid "Change Display"
 msgstr "Ändere Anzeige"
 
@@ -911,7 +911,7 @@ msgstr "Ändere die vorgegebene Schriftart und deren Größe"
 msgid "Channels"
 msgstr "Kanäle"
 
-#: gmusicbrowser.pl:5891
+#: gmusicbrowser.pl:5899
 msgid "Check for updated/deleted songs on startup"
 msgstr "Beim Programmstart auf veränderte/gelöschte Titel prüfen"
 
@@ -919,11 +919,11 @@ msgstr "Beim Programmstart auf veränderte/gelöschte Titel prüfen"
 msgid "Check for updated/removed songs"
 msgstr "Auf veränderte/gelöschte Titel prüfen"
 
-#: gmusicbrowser.pl:5061
+#: gmusicbrowser.pl:5069
 msgid "Checking length/bitrate"
 msgstr "Überprüfe Länge/Bitrate"
 
-#: gmusicbrowser.pl:5034
+#: gmusicbrowser.pl:5042
 msgid "Checking songs"
 msgstr "Überprüfe Titel"
 
@@ -935,11 +935,11 @@ msgstr "Album dieses Künstlers auswählen"
 msgid "Choose Artist/Album/Song"
 msgstr "Künstler/Album/Titel auswählen"
 
-#: gmusicbrowser.pl:8232
+#: gmusicbrowser.pl:8240
 msgid "Choose Date"
 msgstr "Datum auswählen"
 
-#: gmusicbrowser.pl:3884
+#: gmusicbrowser.pl:3892
 msgid "Choose Picture"
 msgstr "Bild auswählen"
 
@@ -947,19 +947,19 @@ msgstr "Bild auswählen"
 msgid "Choose Random Album"
 msgstr "Zufälliges Album auswählen"
 
-#: gmusicbrowser.pl:3726
+#: gmusicbrowser.pl:3734
 msgid "Choose directory to copy files to"
 msgstr "Wohin sollen die Dateien kopiert werden"
 
-#: gmusicbrowser.pl:3727
+#: gmusicbrowser.pl:3735
 msgid "Choose directory to move files to"
 msgstr "Wohin sollen die Dateien verschoben werden"
 
-#: gmusicbrowser.pl:3853
+#: gmusicbrowser.pl:3861
 msgid "Choose files"
 msgstr "Wähle Titel"
 
-#: gmusicbrowser.pl:5936
+#: gmusicbrowser.pl:5944
 msgid "Choose folder to add"
 msgstr "Welcher Ordner soll hinzugefügt werden"
 
@@ -979,19 +979,19 @@ msgstr "Wähle Icon für {name} Label"
 msgid "Choose page to open"
 msgstr "Wähle zu öffnende Seite"
 
-#: gmusicbrowser.pl:2997
+#: gmusicbrowser.pl:3005
 msgid "Choose picture for '%s'"
 msgstr "Wähle Bild für '%s'"
 
-#: gmusicbrowser.pl:4900
+#: gmusicbrowser.pl:4908
 msgid "Choose playlist files to import"
 msgstr "Wähle zu improtierende Wiedergabelistendateien"
 
-#: gmusicbrowser.pl:7240 gmusicbrowser_list.pm:290
+#: gmusicbrowser.pl:7248 gmusicbrowser_list.pm:290
 msgid "Clear"
 msgstr "Leeren"
 
-#: gmusicbrowser.pl:1044 gmusicbrowser_layout.pm:32
+#: gmusicbrowser.pl:1052 gmusicbrowser_layout.pm:32
 msgid "Clear queue"
 msgstr "Leere Warteliste"
 
@@ -1008,15 +1008,15 @@ msgstr "Client gesperrt, kontaktiere den Entwickler von gmusicbrowser."
 msgid "Close"
 msgstr "Schließen"
 
-#: gmusicbrowser.pl:1027
+#: gmusicbrowser.pl:1035
 msgid "Close Window"
 msgstr "Schließe Fenster"
 
-#: gmusicbrowser.pl:5721
+#: gmusicbrowser.pl:5729
 msgid "Close to tray"
 msgstr "Schließe zum Benachrichtigungsfeld"
 
-#: gmusicbrowser.pl:5239 gmusicbrowser.pl:5349 gmusicbrowser_123.pm:287
+#: gmusicbrowser.pl:5247 gmusicbrowser.pl:5357 gmusicbrowser_123.pm:287
 msgid "Command"
 msgstr "Befehl"
 
@@ -1024,7 +1024,7 @@ msgstr "Befehl"
 msgid "Command to launch when the button is pressed"
 msgstr "Auszuführender Befehl nach anklicken des Knopfes"
 
-#: gmusicbrowser.pl:5657
+#: gmusicbrowser.pl:5665
 msgid ""
 "Command used when\n"
 "'turn off computer when queue empty'\n"
@@ -1042,7 +1042,7 @@ msgstr "Befehl wenn Titel wechselt:"
 msgid "Command when stopped :"
 msgstr "Befehl wenn gestoppt:"
 
-#: gmusicbrowser.pl:7939 gmusicbrowser_songs.pm:628 gmusicbrowser_tags.pm:1590
+#: gmusicbrowser.pl:7947 gmusicbrowser_songs.pm:628 gmusicbrowser_tags.pm:1590
 #: gmusicbrowser_tags.pm:1609 gmusicbrowser_tags.pm:1852
 msgid "Comment"
 msgstr "Kommentar"
@@ -1065,7 +1065,7 @@ msgstr "Komponist"
 msgid "Conductor"
 msgstr "Dirigent"
 
-#: gmusicbrowser.pl:5647
+#: gmusicbrowser.pl:5655
 msgid "Connect through a proxy"
 msgstr "Verbinde über einen Proxyserver"
 
@@ -1078,11 +1078,11 @@ msgstr "Verbindungen von:"
 msgid "Context"
 msgstr "Kontext"
 
-#: gmusicbrowser.pl:407
+#: gmusicbrowser.pl:426
 msgid "Copy"
 msgstr "Kopieren"
 
-#: gmusicbrowser.pl:3736
+#: gmusicbrowser.pl:3744
 msgid "Copy failed"
 msgstr "Kopieren fehlgeschlagen"
 
@@ -1098,7 +1098,7 @@ msgstr "Kopiere auf eingebundenen, tragbaren Player"
 msgid "Copy to portable player"
 msgstr "Kopiere auf tragbaren Player"
 
-#: gmusicbrowser.pl:3739
+#: gmusicbrowser.pl:3747
 msgid "Copying file"
 msgid_plural "Copying %d files"
 msgstr[0] "Kopiere Datei"
@@ -1108,15 +1108,15 @@ msgstr[1] "Kopiere %d Dateien"
 msgid "Copyright"
 msgstr "Copyright"
 
-#: gmusicbrowser.pl:5769
+#: gmusicbrowser.pl:5777
 msgid "Create ID3v2 tags as ID3v2.4"
 msgstr "Erstelle ID3v2 Tags als ID3v2.4"
 
-#: gmusicbrowser.pl:882
+#: gmusicbrowser.pl:890
 msgid "Ctrl"
 msgstr "Strg"
 
-#: gmusicbrowser.pl:5699
+#: gmusicbrowser.pl:5707
 msgid "Current song must always be in the playlist"
 msgstr "Aktueller Titel muss sich in der Wiedergabeliste befinden"
 
@@ -1153,11 +1153,11 @@ msgstr "Benutzerformate"
 msgid "Custom..."
 msgstr "Benutzerdefiniert ..."
 
-#: gmusicbrowser.pl:848 gmusicbrowser_tags.pm:1534 gmusicbrowser_tags.pm:1572
+#: gmusicbrowser.pl:856 gmusicbrowser_tags.pm:1534 gmusicbrowser_tags.pm:1572
 msgid "Date"
 msgstr "Datum"
 
-#: gmusicbrowser.pl:5685
+#: gmusicbrowser.pl:5693
 msgid "Date format :"
 msgstr "Datumsformat:"
 
@@ -1169,7 +1169,7 @@ msgstr "Kaufdatum"
 msgid "Debut Album"
 msgstr "Debütalbum"
 
-#: gmusicbrowser.pl:1046
+#: gmusicbrowser.pl:1054
 msgid "Decrease Volume"
 msgstr "Leiser"
 
@@ -1177,7 +1177,7 @@ msgstr "Leiser"
 msgid "Default"
 msgstr "Standard"
 
-#: gmusicbrowser.pl:5637
+#: gmusicbrowser.pl:5645
 msgid "Default rating :"
 msgstr "Standardbewertung:"
 
@@ -1189,11 +1189,11 @@ msgstr "Vorgegebene Textfarbe"
 msgid "Default text font"
 msgstr "Vorgegebene Schriftart"
 
-#: gmusicbrowser.pl:5723
+#: gmusicbrowser.pl:5731
 msgid "Delay tray tip popup on mouse over"
 msgstr "Verzögere Benachrichtigung bei Mausberührung"
 
-#: gmusicbrowser.pl:1039
+#: gmusicbrowser.pl:1047
 msgid "Delete Selected Songs"
 msgstr "Lösche gewählte Titel"
 
@@ -1201,7 +1201,7 @@ msgstr "Lösche gewählte Titel"
 msgid "Delete list"
 msgstr "Liste löschen"
 
-#: gmusicbrowser.pl:7303
+#: gmusicbrowser.pl:7311
 msgid "Descending order"
 msgstr "Absteigende Reihenfolge"
 
@@ -1227,7 +1227,7 @@ msgstr "Desktop Miniprogramme-Erweiterung"
 msgid "Differential: "
 msgstr "Anpassung:"
 
-#: gmusicbrowser.pl:5654
+#: gmusicbrowser.pl:5662
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "Deaktiviere Bildschirmschoner bei Vollbildwiedergabe"
 
@@ -1235,7 +1235,7 @@ msgstr "Deaktiviere Bildschirmschoner bei Vollbildwiedergabe"
 msgid "Disabled"
 msgstr "Deaktiviert"
 
-#: gmusicbrowser.pl:7808 gmusicbrowser_songs.pm:580
+#: gmusicbrowser.pl:7816 gmusicbrowser_songs.pm:580
 msgid "Disc"
 msgstr "Disk"
 
@@ -1248,11 +1248,11 @@ msgstr "Disk #"
 msgid "Disc name"
 msgstr "Disk-Name"
 
-#: gmusicbrowser.pl:1037
+#: gmusicbrowser.pl:1045
 msgid "Display (:1 or host:0 for example)"
 msgstr "Zeige (z.B. :1 oder host:0)"
 
-#: gmusicbrowser.pl:429
+#: gmusicbrowser.pl:448
 msgid "Display Songs"
 msgstr "Titel anzeigen"
 
@@ -1271,7 +1271,7 @@ msgstr "Zeige Stopp/Nächste Aktionen"
 msgid "Display synchronized lyrics of the current song"
 msgstr "Zeige synchronisierte Liedtexte des aktuellen Titels"
 
-#: gmusicbrowser.pl:5719
+#: gmusicbrowser.pl:5727
 msgid "Display tray tip for"
 msgstr "Zeige Benachrichtigung für"
 
@@ -1279,19 +1279,19 @@ msgstr "Zeige Benachrichtigung für"
 msgid "Do not add a title row"
 msgstr "Keine Titelzeile hinzufügen"
 
-#: gmusicbrowser.pl:5889
+#: gmusicbrowser.pl:5897
 msgid "Do not add songs that can't be played"
 msgstr "Titel, die nicht gespielt werden können, weglassen"
 
-#: gmusicbrowser.pl:5775
+#: gmusicbrowser.pl:5783
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr "Erzeuge keine ID3v1 Tags in MP3 Dateien"
 
-#: gmusicbrowser.pl:5771
+#: gmusicbrowser.pl:5779
 msgid "Do not unsynchronise id3v2 tags"
 msgstr "ID3v2 Tags nicht abgleichen"
 
-#: gmusicbrowser.pl:5774
+#: gmusicbrowser.pl:5782
 msgid "Do not write the tags"
 msgstr "Schreibe keine Tags"
 
@@ -1315,15 +1315,15 @@ msgstr "Nicht benachrichtigen wenn das Hauptfenster sichtbar ist"
 msgid "Don't submit current song"
 msgstr "Aktuellen Titel nicht übertragen"
 
-#: gmusicbrowser.pl:1030
+#: gmusicbrowser.pl:1038
 msgid "Edit Current Song Properties"
 msgstr "Bearbeite aktuelle Datei-Info"
 
-#: gmusicbrowser.pl:400
+#: gmusicbrowser.pl:419
 msgid "Edit Labels"
 msgstr "Bearbeite Labels"
 
-#: gmusicbrowser.pl:416 gmusicbrowser.pl:4110
+#: gmusicbrowser.pl:435 gmusicbrowser.pl:4118
 msgid "Edit Lyrics"
 msgstr "Editiere Liedtext"
 
@@ -1331,11 +1331,11 @@ msgstr "Editiere Liedtext"
 msgid "Edit Lyrics ..."
 msgstr "Bearbeite Liedtext ..."
 
-#: gmusicbrowser.pl:4598
+#: gmusicbrowser.pl:4606
 msgid "Edit Multiple Songs Properties"
 msgstr "Bearbeite mehrere Datei-Infos"
 
-#: gmusicbrowser.pl:401
+#: gmusicbrowser.pl:420
 msgid "Edit Rating"
 msgstr "Ändere Bewertung"
 
@@ -1367,11 +1367,11 @@ msgstr "Editiere Sortiermodi ..."
 msgid "Edit random modes ..."
 msgstr "Editiere Zufallsmodi ..."
 
-#: gmusicbrowser.pl:1031
+#: gmusicbrowser.pl:1039
 msgid "Edit selected song properties"
 msgstr "Bearbeite gewählte Datei-Infos"
 
-#: gmusicbrowser.pl:8786 gmusicbrowser_layout.pm:34
+#: gmusicbrowser.pl:8794 gmusicbrowser_layout.pm:34
 msgid "Edit..."
 msgstr "Bearbeite ..."
 
@@ -1379,11 +1379,11 @@ msgstr "Bearbeite ..."
 msgid "EditList"
 msgstr "Bearbeite Liste"
 
-#: gmusicbrowser.pl:2902 gmusicbrowser.pl:2909
+#: gmusicbrowser.pl:2910 gmusicbrowser.pl:2917
 msgid "Editing list : "
 msgstr "Bearbeite Liste:"
 
-#: gmusicbrowser.pl:1249
+#: gmusicbrowser.pl:1257
 msgid "Editing tags"
 msgstr "Bearbeite Tags"
 
@@ -1411,7 +1411,7 @@ msgstr "Kodiert mit"
 msgid "Encoder"
 msgstr "Kodierer"
 
-#: gmusicbrowser.pl:5773
+#: gmusicbrowser.pl:5781
 msgid "Encoding used for id3v1 tags :"
 msgstr "Verwendete Kodierung für ID3v1 tags:"
 
@@ -1420,31 +1420,31 @@ msgstr "Verwendete Kodierung für ID3v1 tags:"
 msgid "Enqueue"
 msgstr "An Warteliste hängen"
 
-#: gmusicbrowser.pl:1043
+#: gmusicbrowser.pl:1051
 msgid "Enqueue Action"
 msgstr "Aktion an Warteliste hängen"
 
-#: gmusicbrowser.pl:397
+#: gmusicbrowser.pl:416
 msgid "Enqueue Displayed"
 msgstr "Angezeigte an Warteliste hängen"
 
-#: gmusicbrowser.pl:395
+#: gmusicbrowser.pl:414
 msgid "Enqueue Selected"
 msgstr "Ausgewählte an Warteliste hängen"
 
-#: gmusicbrowser.pl:1040
+#: gmusicbrowser.pl:1048
 msgid "Enqueue Selected Songs"
 msgstr "Ausgewählte Titel an Warteliste hängen"
 
-#: gmusicbrowser.pl:1042
+#: gmusicbrowser.pl:1050
 msgid "Enqueue Songs from Current Album"
 msgstr "Titel des momentanen Albums an Warteliste hängen"
 
-#: gmusicbrowser.pl:1041
+#: gmusicbrowser.pl:1049
 msgid "Enqueue Songs from Current Artist"
 msgstr "Titel des momentanen Künstler an Warteliste hängen"
 
-#: gmusicbrowser.pl:1069
+#: gmusicbrowser.pl:1077
 msgid "Enqueue a list of files/folders"
 msgstr "Liste von Dateien/Ordnern an Warteliste hängen"
 
@@ -1468,7 +1468,7 @@ msgstr "EpicRating Plugin - Automatische Anpassung der Bewertung"
 msgid "Equalizer"
 msgstr "Equalizer"
 
-#: gmusicbrowser.pl:5406
+#: gmusicbrowser.pl:5414
 msgid "Error :"
 msgstr "Fehler:"
 
@@ -1537,7 +1537,7 @@ msgstr ""
 msgid "Extra gain"
 msgstr "Extra Wiedergabe-Verstärkung"
 
-#: gmusicbrowser.pl:5670
+#: gmusicbrowser.pl:5678
 msgid "Extract guest artist from title :"
 msgstr "Ermittle weiteren Künstlenamen aus dem Titel:"
 
@@ -1553,7 +1553,7 @@ msgstr "Ausblenden in"
 msgid "Fade-out then stop"
 msgstr "Ausblenden, dann stoppen"
 
-#: gmusicbrowser.pl:4156
+#: gmusicbrowser.pl:4164
 msgid ""
 "Failed to delete '{file}' :\n"
 "{error}"
@@ -1577,7 +1577,7 @@ msgstr "Feldtyp"
 msgid "Field: "
 msgstr "Feld: "
 
-#: gmusicbrowser.pl:5215 gmusicbrowser_list.pm:5059
+#: gmusicbrowser.pl:5223 gmusicbrowser_list.pm:5059
 msgid "Fields"
 msgstr "Felder"
 
@@ -1585,7 +1585,7 @@ msgstr "Felder"
 msgid "File type"
 msgstr "Dateityp"
 
-#: gmusicbrowser.pl:7921 gmusicbrowser_songs.pm:441 gmusicbrowser_tags.pm:2041
+#: gmusicbrowser.pl:7929 gmusicbrowser_songs.pm:441 gmusicbrowser_tags.pm:2041
 msgid "Filename"
 msgstr "Dateiname"
 
@@ -1605,7 +1605,7 @@ msgstr "Dateiname ohne Erweiterung"
 msgid "Filesystem"
 msgstr "Dateisystem"
 
-#: gmusicbrowser.pl:427 gmusicbrowser.pl:429 gmusicbrowser_list.pm:127
+#: gmusicbrowser.pl:446 gmusicbrowser.pl:448 gmusicbrowser_list.pm:127
 #: gmusicbrowser_list.pm:1512
 msgid "Filter"
 msgstr "Filter"
@@ -1614,7 +1614,7 @@ msgstr "Filter"
 msgid "Filter : "
 msgstr "Filter:"
 
-#: gmusicbrowser.pl:6780
+#: gmusicbrowser.pl:6788
 msgid "Filter edition"
 msgstr "Filter-Bearbeitung"
 
@@ -1646,19 +1646,19 @@ msgstr "Finde:"
 msgid "Find a unique filename if file already exists"
 msgstr "Erstelle anderen Dateinamen, wenn Datei bereits existiert"
 
-#: gmusicbrowser.pl:404
+#: gmusicbrowser.pl:423
 msgid "Find songs in same albums"
 msgstr "Finde Titel in gleichen Alben"
 
-#: gmusicbrowser.pl:403
+#: gmusicbrowser.pl:422
 msgid "Find songs with same artists"
 msgstr "Finde Titel mit gleichen Künstlern"
 
-#: gmusicbrowser.pl:402
+#: gmusicbrowser.pl:421
 msgid "Find songs with the same names"
 msgstr "Finde Titel mit gleichen Namen"
 
-#: gmusicbrowser.pl:836 gmusicbrowser.pl:7929 gmusicbrowser_list.pm:724
+#: gmusicbrowser.pl:844 gmusicbrowser.pl:7937 gmusicbrowser_list.pm:724
 #: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:827
 msgid "Folder"
 msgstr "Ordner"
@@ -1671,11 +1671,11 @@ msgstr "Ordner (rechtsbündig)"
 msgid "Folder format :"
 msgstr "Ordnerformat:"
 
-#: gmusicbrowser.pl:4308
+#: gmusicbrowser.pl:4316
 msgid "Folder pattern :"
 msgstr "Ordnermuster:"
 
-#: gmusicbrowser.pl:5852 gmusicbrowser.pl:5894
+#: gmusicbrowser.pl:5860 gmusicbrowser.pl:5902
 msgid "Folders to search for new songs"
 msgstr "Ordner, in denen nach neuen Titeln gesucht werden soll"
 
@@ -1704,7 +1704,7 @@ msgstr ""
 "Seite des Plugins</a> im  <a href='http://gmusicbrowser.org/"
 "dokuwiki/'>gmusicbrowser Wiki</a>."
 
-#: gmusicbrowser.pl:1017
+#: gmusicbrowser.pl:1025
 msgid "Forward"
 msgstr "Vorwärts"
 
@@ -1716,11 +1716,11 @@ msgstr "Gefunden, funktioniert aber nicht"
 msgid "Friday"
 msgstr "Freitag"
 
-#: gmusicbrowser.pl:5737
+#: gmusicbrowser.pl:5745
 msgid "Full screen layout :"
 msgstr "Vollbildansicht:"
 
-#: gmusicbrowser.pl:446 gmusicbrowser_layout.pm:607
+#: gmusicbrowser.pl:465 gmusicbrowser_layout.pm:607
 msgid "Fullscreen"
 msgstr "Vollbild"
 
@@ -1728,7 +1728,7 @@ msgstr "Vollbild"
 msgid "Fullscreen simple"
 msgstr "Einfaches Vollbild"
 
-#: gmusicbrowser.pl:5523
+#: gmusicbrowser.pl:5531
 msgid "GStreamer module not loaded."
 msgstr "GStreamer Modul nicht geladen"
 
@@ -1737,7 +1737,7 @@ msgid "Gain for songs missing replaygain tags"
 msgstr ""
 "Wiedergabe-Verstärkung anwenden bei Titeln ohne Wiedergabe-Verstärkung-Tag"
 
-#: gmusicbrowser.pl:7905 gmusicbrowser_tags.pm:1536 gmusicbrowser_tags.pm:1575
+#: gmusicbrowser.pl:7913 gmusicbrowser_tags.pm:1536 gmusicbrowser_tags.pm:1575
 #: gmusicbrowser_tags.pm:1588 gmusicbrowser_tags.pm:1610
 #: gmusicbrowser_tags.pm:1862
 msgid "Genre"
@@ -1787,7 +1787,7 @@ msgstr "Bekanntmachung gescheitert:"
 msgid "Hard limiter"
 msgstr ""
 
-#: gmusicbrowser.pl:445 gmusicbrowser.pl:1034
+#: gmusicbrowser.pl:464 gmusicbrowser.pl:1042
 msgid "Hide"
 msgstr "Ausblenden"
 
@@ -1795,7 +1795,7 @@ msgstr "Ausblenden"
 msgid "Hide toolbar"
 msgstr "Verberge Werkzeugleiste"
 
-#: gmusicbrowser.pl:5749
+#: gmusicbrowser.pl:5757
 msgid "Icon theme :"
 msgstr "Symbolthema:"
 
@@ -1803,7 +1803,7 @@ msgstr "Symbolthema:"
 msgid "Identifier in file tag"
 msgstr ""
 
-#: gmusicbrowser.pl:5552
+#: gmusicbrowser.pl:5560
 msgid "Ignore playback errors"
 msgstr "Ignoriere Abspielfehler"
 
@@ -1819,11 +1819,11 @@ msgstr ""
 "In diesem Fall wird ein Befehl pro Datei ausgeführt\n"
 "\n"
 
-#: gmusicbrowser.pl:1045
+#: gmusicbrowser.pl:1053
 msgid "Increase Volume"
 msgstr "Lauter"
 
-#: gmusicbrowser.pl:4651 gmusicbrowser_tags.pm:1598
+#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598
 msgid "Info"
 msgstr "Info"
 
@@ -1839,7 +1839,7 @@ msgstr "Titel-Künstler (rechtsbündig & nur Anzeige)"
 msgid "Insensitive, Song & Cover"
 msgstr "Titel und Cover (nur Anzeige)"
 
-#: gmusicbrowser.pl:1068
+#: gmusicbrowser.pl:1076
 msgid "Insert a list of files/folders at the start of the playlist"
 msgstr "Füge Liste von Dateien/Ordnern am Anfang der Wiedergabeliste hinzu"
 
@@ -1855,7 +1855,7 @@ msgstr "Unsichtbarer Hotspot"
 msgid "Justified"
 msgstr "Ausgerichtet"
 
-#: gmusicbrowser.pl:714
+#: gmusicbrowser.pl:722
 msgid "KB"
 msgstr "KB"
 
@@ -1867,11 +1867,11 @@ msgstr "Karaoke"
 msgid "Karaoke plugin"
 msgstr "Karaoke Erweiterung"
 
-#: gmusicbrowser.pl:5236 gmusicbrowser.pl:5348
+#: gmusicbrowser.pl:5244 gmusicbrowser.pl:5356
 msgid "Key"
 msgstr "Taste"
 
-#: gmusicbrowser.pl:5217
+#: gmusicbrowser.pl:5225
 msgid "Keys"
 msgstr "Tasten"
 
@@ -1879,8 +1879,8 @@ msgstr "Tasten"
 msgid "Keywords"
 msgstr "Schlüsselworte"
 
-#: gmusicbrowser.pl:1074 gmusicbrowser.pl:1075 gmusicbrowser.pl:1076
-#: gmusicbrowser.pl:6023 gmusicbrowser.pl:7913
+#: gmusicbrowser.pl:1082 gmusicbrowser.pl:1083 gmusicbrowser.pl:1084
+#: gmusicbrowser.pl:6031 gmusicbrowser.pl:7921
 msgid "Label"
 msgstr "Label"
 
@@ -1892,7 +1892,7 @@ msgstr "Label ist gesetzt"
 msgid "Label/Publisher"
 msgstr "Label/Herausgeber"
 
-#: gmusicbrowser.pl:4612 gmusicbrowser.pl:4649 gmusicbrowser.pl:5211
+#: gmusicbrowser.pl:4620 gmusicbrowser.pl:4657 gmusicbrowser.pl:5219
 #: gmusicbrowser_songs.pm:604
 msgid "Labels"
 msgstr "Label"
@@ -1922,7 +1922,7 @@ msgstr ""
 msgid "Languages"
 msgstr "Sprachen"
 
-#: gmusicbrowser.pl:850 gmusicbrowser_songs.pm:659
+#: gmusicbrowser.pl:858 gmusicbrowser_songs.pm:659
 msgid "Last played"
 msgstr "Zuletzt gespielt"
 
@@ -1942,7 +1942,7 @@ msgstr "Layout"
 msgid "Layout :"
 msgstr "Layout:"
 
-#: gmusicbrowser.pl:5213
+#: gmusicbrowser.pl:5221
 msgid "Layouts"
 msgstr "Layouts"
 
@@ -1954,11 +1954,11 @@ msgstr "Links ausgerichtet"
 msgid "Left pane"
 msgstr "Linker Abschnitt"
 
-#: gmusicbrowser.pl:7821 gmusicbrowser_songs.pm:737
+#: gmusicbrowser.pl:7829 gmusicbrowser_songs.pm:737
 msgid "Length"
 msgstr "Länge"
 
-#: gmusicbrowser.pl:5210 gmusicbrowser_list.pm:128 layouts:201 layouts:364
+#: gmusicbrowser.pl:5218 gmusicbrowser_list.pm:128 layouts:201 layouts:364
 #: layouts:568 layouts:630
 msgid "Library"
 msgstr "Sammlung"
@@ -1977,7 +1977,7 @@ msgstr ""
 "\n"
 "Benutze den Einstellungsdialog um die Orte deiner Musiksammlung hinzuzufügen"
 
-#: gmusicbrowser.pl:5918
+#: gmusicbrowser.pl:5926
 msgid "Library size : %d song"
 msgid_plural "Library size : %d songs"
 msgstr[0] "Umfang der Sammlung: %d Titel"
@@ -2042,15 +2042,15 @@ msgstr "Laden fehlgeschlagen."
 msgid "Loading..."
 msgstr "Lade ..."
 
-#: gmusicbrowser.pl:421
+#: gmusicbrowser.pl:440
 msgid "Lock"
 msgstr "Halte"
 
-#: gmusicbrowser.pl:442
+#: gmusicbrowser.pl:461
 msgid "Lock Album"
 msgstr "Halte Album"
 
-#: gmusicbrowser.pl:441
+#: gmusicbrowser.pl:460
 msgid "Lock Artist"
 msgstr "Halte Künstler"
 
@@ -2074,11 +2074,11 @@ msgstr ""
 msgid "Locked on :\n"
 msgstr "Halte auf:\n"
 
-#: gmusicbrowser.pl:424
+#: gmusicbrowser.pl:443
 msgid "Lookup in AMG"
 msgstr "Bei AllMusicGuide suchen"
 
-#: gmusicbrowser.pl:417
+#: gmusicbrowser.pl:436
 msgid "Lookup in google"
 msgstr "Bei Google suchen"
 
@@ -2116,7 +2116,7 @@ msgstr "Liedtexte (benötigt das Lyrics Plugin)"
 msgid "Lyrics alignement"
 msgstr "Ausrichtung der Liedtexte"
 
-#: gmusicbrowser.pl:4102
+#: gmusicbrowser.pl:4110
 msgid "Lyrics for "
 msgstr "Liedtexte für"
 
@@ -2128,7 +2128,7 @@ msgstr "Liedtext-PlugIn"
 msgid "Lyrics source"
 msgstr "Liedtextquelle"
 
-#: gmusicbrowser.pl:715 gmusicbrowser.pl:5700
+#: gmusicbrowser.pl:723 gmusicbrowser.pl:5708
 msgid "MB"
 msgstr "MB"
 
@@ -2164,11 +2164,11 @@ msgstr ""
 "Lässt gmusicbrowser auf Nächste/Vorherige/Wiedergabe/Stop Multimedia Tasten "
 "von Gnome reagieren"
 
-#: gmusicbrowser.pl:406
+#: gmusicbrowser.pl:425
 msgid "Mass Rename"
 msgstr "Alle umbenennen"
 
-#: gmusicbrowser.pl:4242
+#: gmusicbrowser.pl:4250
 msgid "Mass Renaming"
 msgstr "Umbenennung von allen"
 
@@ -2188,7 +2188,7 @@ msgstr "Mini"
 msgid "Minimum size"
 msgstr "Kleinste Größe"
 
-#: gmusicbrowser.pl:5214
+#: gmusicbrowser.pl:5222
 msgid "Misc."
 msgstr "Verschiedenes"
 
@@ -2208,29 +2208,29 @@ msgstr "Stimmungen"
 msgid "More results"
 msgstr "Mehr Treffer"
 
-#: gmusicbrowser.pl:409
+#: gmusicbrowser.pl:428
 msgid "Move"
 msgstr "Verschieben"
 
-#: gmusicbrowser.pl:4313
+#: gmusicbrowser.pl:4321
 msgid "Move Files to :"
 msgstr "Dateien verschieben nach:"
 
-#: gmusicbrowser.pl:3737
+#: gmusicbrowser.pl:3745
 msgid "Move failed"
 msgstr "Verschieben fehlgeschlagen"
 
-#: gmusicbrowser.pl:5820
+#: gmusicbrowser.pl:5828
 msgid "Move folder to"
 msgstr "Ordner verschieben nach"
 
-#: gmusicbrowser.pl:3740
+#: gmusicbrowser.pl:3748
 msgid "Moving file"
 msgid_plural "Moving %d files"
 msgstr[0] "Verschiebe Datei"
 msgstr[1] "Verschiebe %d Dateien"
 
-#: gmusicbrowser.pl:1047
+#: gmusicbrowser.pl:1055
 msgid "Mute/Unmute"
 msgstr "Ton aus/an"
 
@@ -2238,7 +2238,7 @@ msgstr "Ton aus/an"
 msgid "Name"
 msgstr "Name"
 
-#: gmusicbrowser.pl:1025 gmusicbrowser.pl:1026 gmusicbrowser.pl:1028
+#: gmusicbrowser.pl:1033 gmusicbrowser.pl:1034 gmusicbrowser.pl:1036
 msgid "Name of layout"
 msgstr "Name des Layouts"
 
@@ -2262,28 +2262,28 @@ msgstr "Neuer Filter"
 msgid "New list"
 msgstr "Neue Liste"
 
-#: gmusicbrowser.pl:4277
+#: gmusicbrowser.pl:4285
 msgid "New name"
 msgstr "Neuer Name"
 
-#: gmusicbrowser.pl:439 gmusicbrowser.pl:2437 gmusicbrowser_layout.pm:79
+#: gmusicbrowser.pl:458 gmusicbrowser.pl:2445 gmusicbrowser_layout.pm:79
 #: gmusicbrowser_list.pm:5081 plugins/notify.pm:90
 msgid "Next"
 msgstr "Nächstes"
 
-#: gmusicbrowser.pl:1012
+#: gmusicbrowser.pl:1020
 msgid "Next Album"
 msgstr "Nächstes Album"
 
-#: gmusicbrowser.pl:1013
+#: gmusicbrowser.pl:1021
 msgid "Next Artist"
 msgstr "Nächster Künstler"
 
-#: gmusicbrowser.pl:1014 gmusicbrowser_layout.pm:78
+#: gmusicbrowser.pl:1022 gmusicbrowser_layout.pm:78
 msgid "Next Song"
 msgstr "Nächter Titel"
 
-#: gmusicbrowser.pl:1010
+#: gmusicbrowser.pl:1018
 msgid "Next Song In Playlist"
 msgstr "Nächster Titel in Wiedergabeliste"
 
@@ -2291,7 +2291,7 @@ msgstr "Nächster Titel in Wiedergabeliste"
 msgid "No connections"
 msgstr "Keine Verbindungen"
 
-#: gmusicbrowser.pl:2974
+#: gmusicbrowser.pl:2982
 msgid "No file browser found."
 msgstr "Kein Dateibrowser gefunden."
 
@@ -2319,11 +2319,11 @@ msgstr "Keine Ergebnisse gefunden"
 msgid "No songs found"
 msgstr "Keine Titel gefunden"
 
-#: gmusicbrowser.pl:2966
+#: gmusicbrowser.pl:2974
 msgid "No web browser found."
 msgstr "Kein Webbrowser gefunden."
 
-#: gmusicbrowser.pl:832 gmusicbrowser_list.pm:1560 gmusicbrowser_list.pm:1579
+#: gmusicbrowser.pl:840 gmusicbrowser_list.pm:1560 gmusicbrowser_list.pm:1579
 #: gmusicbrowser_songs.pm:53 gmusicbrowser_songs.pm:565
 #: gmusicbrowser_tags.pm:1199 gmusicbrowser_tags.pm:1277
 msgid "None"
@@ -2381,11 +2381,11 @@ msgstr "Anzahl Tage seit letztem Überspringen"
 msgid "Number of days since modified"
 msgstr "Anzahl der Tage seit letztem ändern"
 
-#: gmusicbrowser.pl:1073
+#: gmusicbrowser.pl:1081
 msgid "Number of milliseconds"
 msgstr "Millisekunden"
 
-#: gmusicbrowser.pl:1017 gmusicbrowser.pl:1018 gmusicbrowser.pl:1019
+#: gmusicbrowser.pl:1025 gmusicbrowser.pl:1026 gmusicbrowser.pl:1027
 msgid "Number of seconds"
 msgstr "Sekundenanzahl"
 
@@ -2397,7 +2397,7 @@ msgstr "Anzahl der Wiedergaben"
 msgid "Number of times skipped"
 msgstr "Anzahl der Übersprünge"
 
-#: gmusicbrowser.pl:7636 gmusicbrowser.pl:7659
+#: gmusicbrowser.pl:7644 gmusicbrowser.pl:7667
 msgid ""
 "ON -> smaller means more probable\n"
 "OFF -> bigger means more probable"
@@ -2405,7 +2405,7 @@ msgstr ""
 "AN -> kleiner = wahrscheinlicher\n"
 "AUS -> grösser = wahrscheinlicher"
 
-#: gmusicbrowser.pl:7628
+#: gmusicbrowser.pl:7636
 msgid ""
 "ON less probable if genre is set\n"
 "OFF more probable if genre is set"
@@ -2413,7 +2413,7 @@ msgstr ""
 "AN unwahrscheinlicher wenn Genre gesetzt\n"
 "AUS wahrscheinlicher wenn Genre gesetzt"
 
-#: gmusicbrowser.pl:7620
+#: gmusicbrowser.pl:7628
 msgid ""
 "ON less probable if label is set\n"
 "OFF more probable if label is set"
@@ -2421,7 +2421,7 @@ msgstr ""
 "AN unwahrscheinlicher wenn Label gesetzt\n"
 "AUS wahrscheinlicher wenn Label gesetzt"
 
-#: gmusicbrowser.pl:4277
+#: gmusicbrowser.pl:4285
 msgid "Old name"
 msgstr "Alter Name"
 
@@ -2435,7 +2435,7 @@ msgstr ""
 "Eines dieser Kommandos ist notwendig um Dateien vom Typ {type} abzuspielen: "
 "{cmd}"
 
-#: gmusicbrowser.pl:5775
+#: gmusicbrowser.pl:5783
 msgid "Only affect mp3 files that do not already have an id3v1 tag"
 msgstr "Nur bei MP3 Dateien ohne ID3v1 Tag anwenden"
 
@@ -2443,7 +2443,7 @@ msgstr "Nur bei MP3 Dateien ohne ID3v1 Tag anwenden"
 msgid "Opacity"
 msgstr "Transparenz"
 
-#: gmusicbrowser.pl:1021 gmusicbrowser_layout.pm:40
+#: gmusicbrowser.pl:1029 gmusicbrowser_layout.pm:40
 msgid "Open Browser"
 msgstr "Browser öffnen"
 
@@ -2451,15 +2451,15 @@ msgstr "Browser öffnen"
 msgid "Open Browser window"
 msgstr "Browserfenster öffnen"
 
-#: gmusicbrowser.pl:1024 gmusicbrowser_layout.pm:41 gmusicbrowser_layout.pm:99
+#: gmusicbrowser.pl:1032 gmusicbrowser_layout.pm:41 gmusicbrowser_layout.pm:99
 msgid "Open Context window"
 msgstr "Kontextfenster öffnen"
 
-#: gmusicbrowser.pl:1025
+#: gmusicbrowser.pl:1033
 msgid "Open Custom window"
 msgstr "Benutzerdefiniertes Fenster öffnen"
 
-#: gmusicbrowser.pl:5508
+#: gmusicbrowser.pl:5516
 msgid "Open Equalizer"
 msgstr "Öffne Equalizer"
 
@@ -2467,7 +2467,7 @@ msgstr "Öffne Equalizer"
 msgid "Open Playlist"
 msgstr "Öffne Wiedergabeliste"
 
-#: gmusicbrowser.pl:1029
+#: gmusicbrowser.pl:1037
 msgid "Open Preference window"
 msgstr "Einstellungsfenster öffnen"
 
@@ -2475,15 +2475,15 @@ msgstr "Einstellungsfenster öffnen"
 msgid "Open Queue"
 msgstr "Öffne Warteliste"
 
-#: gmusicbrowser.pl:1022 gmusicbrowser_layout.pm:106
+#: gmusicbrowser.pl:1030 gmusicbrowser_layout.pm:106
 msgid "Open Queue window"
 msgstr "Öffne Wartelistenfenster"
 
-#: gmusicbrowser.pl:1023
+#: gmusicbrowser.pl:1031
 msgid "Open Search window"
 msgstr "Suchfenster öffnen"
 
-#: gmusicbrowser.pl:418
+#: gmusicbrowser.pl:437
 msgid "Open containing folder"
 msgstr "Beinhaltenden Ordner öffnen"
 
@@ -2561,11 +2561,11 @@ msgstr "Art der Überlagerung:"
 msgid "Owner identifier"
 msgstr "Besitzeridentifikation"
 
-#: gmusicbrowser.pl:853
+#: gmusicbrowser.pl:861
 msgid "Path,Album,Disc,Track,File"
 msgstr "Pfad, Album, Disk, Titel-Nr., Datei"
 
-#: gmusicbrowser.pl:847
+#: gmusicbrowser.pl:855
 msgid "Path,File"
 msgstr "Pfad, Datei"
 
@@ -2573,7 +2573,7 @@ msgstr "Pfad, Datei"
 msgid "Pattern to find .lrc files :"
 msgstr "Muster um .lrc Dateien zu finden"
 
-#: gmusicbrowser.pl:437 gmusicbrowser_layout.pm:70
+#: gmusicbrowser.pl:456 gmusicbrowser_layout.pm:70
 msgid "Pause"
 msgstr "Pause"
 
@@ -2586,7 +2586,7 @@ msgstr "Bild"
 msgid "Picture Type"
 msgstr "Bildtyp"
 
-#: gmusicbrowser.pl:5700
+#: gmusicbrowser.pl:5708
 msgid "Picture cache :"
 msgstr "Bildzwischenspeicher"
 
@@ -2610,28 +2610,28 @@ msgstr "Bildersuche-Erweiterung"
 msgid "Picture size :"
 msgstr "Bildgröße:"
 
-#: gmusicbrowser.pl:3891
+#: gmusicbrowser.pl:3899
 msgid "Pictures and music files"
 msgstr "Bild- und Musikdateien"
 
-#: gmusicbrowser.pl:3892
+#: gmusicbrowser.pl:3900
 msgid "Pictures files"
 msgstr "Bilddateien"
 
-#: gmusicbrowser.pl:436 gmusicbrowser_layout.pm:70 gmusicbrowser_list.pm:1614
+#: gmusicbrowser.pl:455 gmusicbrowser_layout.pm:70 gmusicbrowser_list.pm:1614
 #: gmusicbrowser_list.pm:3831 gmusicbrowser_list.pm:3898
 msgid "Play"
 msgstr "Wiedergabe"
 
-#: gmusicbrowser.pl:393
+#: gmusicbrowser.pl:412
 msgid "Play Only Displayed"
 msgstr "Nur angezeigte wiedergeben"
 
-#: gmusicbrowser.pl:391
+#: gmusicbrowser.pl:410
 msgid "Play Only Selected"
 msgstr "Nur markierte wiedergeben"
 
-#: gmusicbrowser.pl:1066
+#: gmusicbrowser.pl:1074
 msgid "Play a list of files"
 msgstr "Eine Liste von Dateien wiedergeben"
 
@@ -2659,7 +2659,7 @@ msgstr "Wiedergabezähler"
 msgid "Play filter"
 msgstr "Wiedergabefilter"
 
-#: gmusicbrowser.pl:1077
+#: gmusicbrowser.pl:1085
 msgid "Play listed songs"
 msgstr "Titel in Liste wiedergeben"
 
@@ -2667,11 +2667,11 @@ msgstr "Titel in Liste wiedergeben"
 msgid "Play order"
 msgstr "Abspielreihenfolge"
 
-#: gmusicbrowser.pl:1016
+#: gmusicbrowser.pl:1024
 msgid "Play/Pause"
 msgstr "Wiedergabe/Pause"
 
-#: gmusicbrowser.pl:1616
+#: gmusicbrowser.pl:1624
 msgid "Played Today"
 msgstr "Heute gespielt"
 
@@ -2679,7 +2679,7 @@ msgstr "Heute gespielt"
 msgid "Player mounted on :"
 msgstr "Player eingehängt unter:"
 
-#: gmusicbrowser.pl:5734
+#: gmusicbrowser.pl:5742
 msgid "Player window layout :"
 msgstr "Hauptfenster:"
 
@@ -2707,7 +2707,7 @@ msgstr "Wiedergegebener Titel"
 msgid "Playing and queue icons"
 msgstr "Icons für Wiedergabe und Warteschlange"
 
-#: gmusicbrowser.pl:2154
+#: gmusicbrowser.pl:2162
 msgid "Playing error : {error}"
 msgstr "Abspielfehler: {error}"
 
@@ -2727,7 +2727,7 @@ msgstr "Wiedergabeliste ist leer"
 msgid "Playlist empty"
 msgstr "Wiedergabeliste ist leer"
 
-#: gmusicbrowser.pl:4900
+#: gmusicbrowser.pl:4908
 msgid "Playlist files"
 msgstr "Wiedergabelistendateien"
 
@@ -2743,11 +2743,11 @@ msgstr "Wiedergabelistenfilter:\n"
 msgid "Playlist, Library & Context"
 msgstr "Wiedergabeliste, Sammlung & Kontext"
 
-#: gmusicbrowser.pl:5417
+#: gmusicbrowser.pl:5425
 msgid "Plugin not loaded"
 msgstr "Erweiterung nicht geladen"
 
-#: gmusicbrowser.pl:5216
+#: gmusicbrowser.pl:5224
 msgid "Plugins"
 msgstr "Erweiterungen"
 
@@ -2755,11 +2755,11 @@ msgstr "Erweiterungen"
 msgid "Popularimeter"
 msgstr "Popularimeter"
 
-#: gmusicbrowser.pl:1026
+#: gmusicbrowser.pl:1034
 msgid "Popup Custom window"
 msgstr "Öffne benutzerdefiniertes Fenster"
 
-#: gmusicbrowser.pl:1073
+#: gmusicbrowser.pl:1081
 msgid "Popup Traytip"
 msgstr "Benachrichtigungen anzeigen"
 
@@ -2767,11 +2767,11 @@ msgstr "Benachrichtigungen anzeigen"
 msgid "Pre-set"
 msgstr "Voreingestellt"
 
-#: gmusicbrowser.pl:383
+#: gmusicbrowser.pl:402
 msgid "Prepend"
 msgstr ""
 
-#: gmusicbrowser.pl:5263
+#: gmusicbrowser.pl:5271
 msgid "Press a key or a key combination"
 msgstr "Taste oder Tastenkombination drücken"
 
@@ -2779,11 +2779,11 @@ msgstr "Taste oder Tastenkombination drücken"
 msgid "Previous"
 msgstr "Vorheriges"
 
-#: gmusicbrowser.pl:1015 layouts:55
+#: gmusicbrowser.pl:1023 layouts:55
 msgid "Previous Song"
 msgstr "Vorheriger Titel"
 
-#: gmusicbrowser.pl:1011
+#: gmusicbrowser.pl:1019
 msgid "Previous Song In Playlist"
 msgstr "Vorheriges Titel in Wiedergabeliste"
 
@@ -2813,7 +2813,7 @@ msgstr ""
 "Bietet zusätzliche Infos aus dem Netz durch Verwendung von MozEmbed oder "
 "WebKit."
 
-#: gmusicbrowser.pl:5648
+#: gmusicbrowser.pl:5656
 msgid "Proxy host :"
 msgstr "Proxy-Host:"
 
@@ -2829,7 +2829,7 @@ msgstr "Herausgeber"
 msgid "Publisher/Studio logotype"
 msgstr "Herausgeber/Studio Logoart"
 
-#: gmusicbrowser.pl:2409 gmusicbrowser_layout.pm:196
+#: gmusicbrowser.pl:2417 gmusicbrowser_layout.pm:196
 #: gmusicbrowser_layout.pm:401 gmusicbrowser_layout.pm:493 layouts:364
 #: layouts:396 layouts:454
 msgid "Queue"
@@ -2843,11 +2843,11 @@ msgstr "Album in Warteliste"
 msgid "Queue artist"
 msgstr "Künstler in Warteliste"
 
-#: gmusicbrowser.pl:2930 gmusicbrowser_list.pm:407
+#: gmusicbrowser.pl:2938 gmusicbrowser_list.pm:407
 msgid "Queue empty"
 msgstr "Warteliste ist leer"
 
-#: gmusicbrowser.pl:1043
+#: gmusicbrowser.pl:1051
 msgid "Queue mode"
 msgstr "Wartelistenmodus"
 
@@ -2867,7 +2867,7 @@ msgstr "Schnellsuche"
 msgid "Quick Search with SongTree"
 msgstr "Schnellsuche mit SongTree"
 
-#: gmusicbrowser.pl:448 gmusicbrowser.pl:1035 gmusicbrowser_layout.pm:44
+#: gmusicbrowser.pl:467 gmusicbrowser.pl:1043 gmusicbrowser_layout.pm:44
 #: gmusicbrowser_layout.pm:122
 msgid "Quit"
 msgstr "Beenden"
@@ -2884,15 +2884,15 @@ msgstr "Radiotitel"
 msgid "Radio url"
 msgstr "Radio URL"
 
-#: gmusicbrowser.pl:2420
+#: gmusicbrowser.pl:2428
 msgid "Random"
 msgstr "Zufällig"
 
-#: gmusicbrowser.pl:6784
+#: gmusicbrowser.pl:6792
 msgid "Random mode edition"
 msgstr "Zufallsmodus"
 
-#: gmusicbrowser.pl:4613 gmusicbrowser.pl:4650 gmusicbrowser.pl:7814
+#: gmusicbrowser.pl:4621 gmusicbrowser.pl:4658 gmusicbrowser.pl:7822
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
 #: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:817
 msgid "Rating"
@@ -2902,11 +2902,11 @@ msgstr "Bewertung"
 msgid "Rating (picture)"
 msgstr "Bewertung (Symbole)"
 
-#: gmusicbrowser.pl:1063
+#: gmusicbrowser.pl:1071
 msgid "Rating between 0 and 100, or empty for default"
 msgstr "Bewertung zwischen 0 und 100 oder leer für Standardbewertung"
 
-#: gmusicbrowser.pl:413
+#: gmusicbrowser.pl:432
 msgid "Re-read tags"
 msgstr "Tags neu einlesen"
 
@@ -2930,11 +2930,11 @@ msgstr "Kürzlich gehörte Künstler"
 msgid "Recent songs"
 msgstr "Kürzlich gehörte Titel"
 
-#: gmusicbrowser.pl:5702
+#: gmusicbrowser.pl:5710
 msgid "Recent songs include skipped songs that haven't been played."
 msgstr ""
 
-#: gmusicbrowser.pl:440 gmusicbrowser.pl:2470
+#: gmusicbrowser.pl:459 gmusicbrowser.pl:2478
 msgid "Recently played"
 msgstr "Kürzlich gespielt"
 
@@ -2970,19 +2970,19 @@ msgstr "Regulärer Ausdruck:"
 msgid "Regular expression didn't match"
 msgstr "Regulärer Ausdruck erzielte keine Treffer"
 
-#: gmusicbrowser.pl:5641
+#: gmusicbrowser.pl:5649
 msgid "Remember last Filter/Playlist between sessions"
 msgstr "Letzten Filter/letzte Wiedergabeliste zwischen den Sitzungen merken"
 
-#: gmusicbrowser.pl:5642
+#: gmusicbrowser.pl:5650
 msgid "Remember playing position between sessions"
 msgstr "Merke Abspielposition zwischen den Sitzungen"
 
-#: gmusicbrowser.pl:5643
+#: gmusicbrowser.pl:5651
 msgid "Remember playing song between sessions"
 msgstr "Merke gespielten Titel zwischen den Sitzungen"
 
-#: gmusicbrowser.pl:5644
+#: gmusicbrowser.pl:5652
 msgid "Remember queue between sessions"
 msgstr "Warteliste zwischen den Sitzungen merken"
 
@@ -2990,14 +2990,14 @@ msgstr "Warteliste zwischen den Sitzungen merken"
 msgid "Remixer"
 msgstr ""
 
-#: gmusicbrowser.pl:412 gmusicbrowser.pl:5324 gmusicbrowser.pl:5868
-#: gmusicbrowser.pl:6834 gmusicbrowser.pl:6969 gmusicbrowser.pl:7239
+#: gmusicbrowser.pl:431 gmusicbrowser.pl:5332 gmusicbrowser.pl:5876
+#: gmusicbrowser.pl:6842 gmusicbrowser.pl:6977 gmusicbrowser.pl:7247
 #: gmusicbrowser_list.pm:289 gmusicbrowser_tags.pm:734
 #: gmusicbrowser_tags.pm:1237 plugins/webcontext.pm:565
 msgid "Remove"
 msgstr "Entfernen"
 
-#: gmusicbrowser.pl:1075
+#: gmusicbrowser.pl:1083
 msgid "Remove a label from the current song"
 msgstr "Entferne ein Label vom aktuellen Titel"
 
@@ -3013,23 +3013,23 @@ msgstr "Alle Titel entfernen"
 msgid "Remove filter"
 msgstr "Entferne Filter"
 
-#: gmusicbrowser.pl:380
+#: gmusicbrowser.pl:399
 msgid "Remove from disk"
 msgstr "Von der Festplatte löschen"
 
-#: gmusicbrowser.pl:379
+#: gmusicbrowser.pl:398
 msgid "Remove from library"
 msgstr "Aus der Sammlung entfernen"
 
-#: gmusicbrowser.pl:378
+#: gmusicbrowser.pl:397
 msgid "Remove from list"
 msgstr "Aus der Liste entfernen"
 
-#: gmusicbrowser.pl:378
+#: gmusicbrowser.pl:397
 msgid "Remove from playlist"
 msgstr "Entferne aus Wiedergabeliste"
 
-#: gmusicbrowser.pl:378
+#: gmusicbrowser.pl:397
 msgid "Remove from queue"
 msgstr "Entferne aus Warteliste"
 
@@ -3037,7 +3037,7 @@ msgstr "Entferne aus Warteliste"
 msgid "Remove header, footer and left column from wikipedia pages"
 msgstr "Entferne Kopf-, Fußzeile und linke Spalte aus Wikipedia-Seiten"
 
-#: gmusicbrowser.pl:6052 gmusicbrowser_list.pm:1651
+#: gmusicbrowser.pl:6060 gmusicbrowser_list.pm:1651
 msgid "Remove label"
 msgstr "Entferne Label"
 
@@ -3053,7 +3053,7 @@ msgstr "Markierte Titel entfernen"
 msgid "Remove this field"
 msgstr "Entferne dieses Feld"
 
-#: gmusicbrowser.pl:7606
+#: gmusicbrowser.pl:7614
 msgid "Remove this rule"
 msgstr "Diese Regel entfernen"
 
@@ -3073,31 +3073,31 @@ msgstr "Entferne dieses Miniprogramm"
 msgid "Rename"
 msgstr "Umbenennen"
 
-#: gmusicbrowser.pl:4381
+#: gmusicbrowser.pl:4389
 msgid "Rename File"
 msgstr "Datei umbenennen"
 
-#: gmusicbrowser.pl:405
+#: gmusicbrowser.pl:424
 msgid "Rename file"
 msgstr "Datei umbenennen"
 
-#: gmusicbrowser.pl:4311 gmusicbrowser.pl:4312
+#: gmusicbrowser.pl:4319 gmusicbrowser.pl:4320
 msgid "Rename files using this pattern :"
 msgstr "Dateien nach diesem Muster umbenennen:"
 
-#: gmusicbrowser.pl:5785 gmusicbrowser_list.pm:1632
+#: gmusicbrowser.pl:5793 gmusicbrowser_list.pm:1632
 msgid "Rename folder"
 msgstr "Ordner umbenennen"
 
-#: gmusicbrowser.pl:5794
+#: gmusicbrowser.pl:5802
 msgid "Rename this folder to :"
 msgstr "Diesen Ordner umbenennen in:"
 
-#: gmusicbrowser.pl:4310
+#: gmusicbrowser.pl:4318
 msgid "Rename/move files based on these fields :"
 msgstr "Benenne um bzw. verschiebe Dateien basierend auf diesen Feldern:"
 
-#: gmusicbrowser.pl:4369 gmusicbrowser.pl:5806
+#: gmusicbrowser.pl:4377 gmusicbrowser.pl:5814
 msgid ""
 "Renaming {oldname}\n"
 "to {newname}\n"
@@ -3107,7 +3107,7 @@ msgstr ""
 "nach {newname}\n"
 "fehlgeschlagen: {error}"
 
-#: gmusicbrowser.pl:5902
+#: gmusicbrowser.pl:5910
 msgid "Reorganize files and folders"
 msgstr "Reorganisiere Dateien und Ordner"
 
@@ -3115,7 +3115,7 @@ msgstr "Reorganisiere Dateien und Ordner"
 msgid "Repeat"
 msgstr "Wiederholen"
 
-#: gmusicbrowser.pl:384
+#: gmusicbrowser.pl:403
 msgid "Replace"
 msgstr "Ersetze"
 
@@ -3135,7 +3135,7 @@ msgstr "Analyse Wiedergabe-Verstärkung"
 msgid "Reset filter"
 msgstr "Filter aufheben"
 
-#: gmusicbrowser.pl:1018
+#: gmusicbrowser.pl:1026
 msgid "Rewind"
 msgstr "Zurückspulen"
 
@@ -3163,11 +3163,11 @@ msgstr "Programm zum rippen:"
 msgid "Run a command when playing a song"
 msgstr "Führe einen Befehl aus, wenn ein Titel gestartet wird"
 
-#: gmusicbrowser.pl:1049
+#: gmusicbrowser.pl:1057
 msgid "Run perl code"
 msgstr "Rufe Perl-Code auf"
 
-#: gmusicbrowser.pl:1048
+#: gmusicbrowser.pl:1056
 msgid "Run system command"
 msgstr "Rufe System-Befehl auf"
 
@@ -3179,7 +3179,7 @@ msgstr ""
 msgid "Same Artist"
 msgstr ""
 
-#: gmusicbrowser.pl:415 layouts:128
+#: gmusicbrowser.pl:434 layouts:128
 msgid "Same Title"
 msgstr "Gleicher Titel"
 
@@ -3211,7 +3211,7 @@ msgstr "Samstag"
 msgid "Save"
 msgstr "Speichere"
 
-#: gmusicbrowser.pl:1036
+#: gmusicbrowser.pl:1044
 msgid "Save Tags/Options"
 msgstr "Speichere Tags/Optionen"
 
@@ -3291,7 +3291,7 @@ msgstr "Prüfe diese Datei"
 msgid "Scan using tag-defined album"
 msgstr "Prüfe anhand Tag definierter Alben"
 
-#: gmusicbrowser.pl:5053
+#: gmusicbrowser.pl:5061
 msgid "Scanning"
 msgstr "Prüfe"
 
@@ -3395,7 +3395,7 @@ msgstr "Suche nach aktuellem Album"
 msgid "Search for current artist"
 msgstr "Suche nach aktuellem Künstler"
 
-#: gmusicbrowser.pl:5890
+#: gmusicbrowser.pl:5898
 msgid "Search for new songs on startup"
 msgstr "Bei jedem Programmstart nach neuen Titeln suchen"
 
@@ -3415,7 +3415,7 @@ msgstr "Sucheinstellungen"
 msgid "Search pitchfork for Artist"
 msgstr "Durchsuche pitchfork nach dem Künstler"
 
-#: gmusicbrowser.pl:5738
+#: gmusicbrowser.pl:5746
 msgid "Search window layout :"
 msgstr "Suchfenster:"
 
@@ -3423,11 +3423,11 @@ msgstr "Suchfenster:"
 msgid "Searching for a picture of : "
 msgstr "Suche nach einem Bild von:"
 
-#: gmusicbrowser.pl:1019
+#: gmusicbrowser.pl:1027
 msgid "Seek"
 msgstr "Suche"
 
-#: gmusicbrowser.pl:1038
+#: gmusicbrowser.pl:1046
 msgid "Select current song"
 msgstr "Wähle aktuellen Titel"
 
@@ -3455,7 +3455,7 @@ msgstr "Ausgewählt: "
 msgid "Selected songs"
 msgstr "Ausgewählte Titel"
 
-#: gmusicbrowser.pl:5100
+#: gmusicbrowser.pl:5108
 msgid "Selecting pictures"
 msgstr "Ausgewählte Bilder"
 
@@ -3467,11 +3467,11 @@ msgstr "Verkäufer"
 msgid "Send Title/Artist/Album in standard input"
 msgstr "Schicke Titel/Künstler/Album an Standardeingabe"
 
-#: gmusicbrowser.pl:1063
+#: gmusicbrowser.pl:1071
 msgid "Set Current Song Rating"
 msgstr "Aktuellen Titel bewerten"
 
-#: gmusicbrowser.pl:431 gmusicbrowser_list.pm:1639
+#: gmusicbrowser.pl:450 gmusicbrowser_list.pm:1639
 msgid "Set Picture"
 msgstr "Bild auswählen"
 
@@ -3483,7 +3483,7 @@ msgstr "Als primären Filter verwenden"
 msgid "Set cover"
 msgstr "Bild auswählen"
 
-#: gmusicbrowser.pl:1071
+#: gmusicbrowser.pl:1079
 msgid "Set focus on a layout widget"
 msgstr "Setze den Fokus auf ein Layoutwidget"
 
@@ -3491,11 +3491,11 @@ msgstr "Setze den Fokus auf ein Layoutwidget"
 msgid "Set grouping"
 msgstr "Setzte Gruppierung"
 
-#: gmusicbrowser.pl:6079 gmusicbrowser_list.pm:1647
+#: gmusicbrowser.pl:6087 gmusicbrowser_list.pm:1647
 msgid "Set icon"
 msgstr "Icon auswählen"
 
-#: gmusicbrowser.pl:1028
+#: gmusicbrowser.pl:1036
 msgid "Set player window layout"
 msgstr "Setze Layout des Hauptfensters"
 
@@ -3503,7 +3503,7 @@ msgstr "Setze Layout des Hauptfensters"
 msgid "Set subgroup"
 msgstr "Setze Untergruppe"
 
-#: gmusicbrowser.pl:447 gmusicbrowser.pl:5203 gmusicbrowser_layout.pm:39
+#: gmusicbrowser.pl:466 gmusicbrowser.pl:5211 gmusicbrowser_layout.pm:39
 #: gmusicbrowser_layout.pm:114
 msgid "Settings"
 msgstr "Einstellungen"
@@ -3514,7 +3514,7 @@ msgstr ""
 "Die Einstellungen auf dieser Seite werden erst nach einem Programmneustart "
 "wirksam"
 
-#: gmusicbrowser.pl:1048
+#: gmusicbrowser.pl:1056
 msgid ""
 "Shell command\n"
 "(some variables such as %f (current song filename) or %F (list of selected "
@@ -3524,7 +3524,7 @@ msgstr ""
 "(manche Variablen wie z.B. %f (Dateiname des aktuellen Titels) oder %F "
 "(Liste der Dateinamen der ausgewählten Titel) sind möglich)"
 
-#: gmusicbrowser.pl:882
+#: gmusicbrowser.pl:890
 msgid "Shift"
 msgstr "Umschalt"
 
@@ -3532,7 +3532,7 @@ msgstr "Umschalt"
 msgid "Shimmer Queue"
 msgstr "Shimmer Warteschlange"
 
-#: gmusicbrowser.pl:445 gmusicbrowser.pl:1033
+#: gmusicbrowser.pl:464 gmusicbrowser.pl:1041
 msgid "Show"
 msgstr "Anzeigen"
 
@@ -3576,19 +3576,19 @@ msgstr "Zeige Vorschlag"
 msgid "Show tabs"
 msgstr "Zeige Tabs"
 
-#: gmusicbrowser.pl:5724
+#: gmusicbrowser.pl:5732
 msgid "Show tray icon"
 msgstr "Symbol im Benachrichtigungsfeld anzeigen"
 
-#: gmusicbrowser.pl:5722
+#: gmusicbrowser.pl:5730
 msgid "Show tray tip on song change"
 msgstr "Benachrichtigung bei Titelwechsel anzeigen"
 
-#: gmusicbrowser.pl:1032
+#: gmusicbrowser.pl:1040
 msgid "Show/Hide"
 msgstr "Anzeigen/Ausblenden"
 
-#: gmusicbrowser.pl:1072
+#: gmusicbrowser.pl:1080
 msgid "Show/Hide layout widget(s)"
 msgstr "Zeige/Verstecke Layoutwidgets"
 
@@ -3617,15 +3617,15 @@ msgstr "Mischen"
 msgid "Shuffle queue"
 msgstr "Mische Warteliste"
 
-#: gmusicbrowser.pl:854
+#: gmusicbrowser.pl:862
 msgid "Shuffled albums"
 msgstr "Gemischte Alben"
 
-#: gmusicbrowser.pl:855
+#: gmusicbrowser.pl:863
 msgid "Shuffled albums, shuffled tracks"
 msgstr "Gemischte Alben, gemischte Titel"
 
-#: gmusicbrowser.pl:5657
+#: gmusicbrowser.pl:5665
 msgid "Shutdown command :"
 msgstr "Befehl um herunterzufahren:"
 
@@ -3645,7 +3645,7 @@ msgstr "Simple Anzeige ohne irgendeine Formatierung"
 msgid "Site :"
 msgstr "Seite:"
 
-#: gmusicbrowser.pl:7826 gmusicbrowser_songs.pm:455
+#: gmusicbrowser.pl:7834 gmusicbrowser_songs.pm:455
 msgid "Size"
 msgstr "Größe"
 
@@ -3653,7 +3653,7 @@ msgstr "Größe"
 msgid "Skip count"
 msgstr "Übersprungen"
 
-#: gmusicbrowser.pl:5552
+#: gmusicbrowser.pl:5560
 msgid "Skip to next song if an error occurs"
 msgstr "Zum nächsten Titel springen, falls Fehler auftritt"
 
@@ -3673,7 +3673,7 @@ msgstr "Kleinerer Browser"
 msgid "Song"
 msgstr "Titel"
 
-#: gmusicbrowser.pl:389 gmusicbrowser.pl:4635
+#: gmusicbrowser.pl:408 gmusicbrowser.pl:4643
 msgid "Song Properties"
 msgstr "Eigenschaften des Titels"
 
@@ -3681,11 +3681,11 @@ msgstr "Eigenschaften des Titels"
 msgid "Song rating"
 msgstr "Titelbewertung"
 
-#: gmusicbrowser.pl:6786
+#: gmusicbrowser.pl:6794
 msgid "SongTree groupings edition"
 msgstr "SongTree Gruppierung bearbeiten"
 
-#: gmusicbrowser.pl:390
+#: gmusicbrowser.pl:409
 msgid "Songs Properties"
 msgstr "Titeleigenschaften"
 
@@ -3693,15 +3693,15 @@ msgstr "Titeleigenschaften"
 msgid "Sort"
 msgstr "Sortieren"
 
-#: gmusicbrowser.pl:6782
+#: gmusicbrowser.pl:6790
 msgid "Sort mode edition"
 msgstr "Sortiermodus-Bearbeitung"
 
-#: gmusicbrowser.pl:7259
+#: gmusicbrowser.pl:7267
 msgid "Sort order"
 msgstr "Sortierordnung"
 
-#: gmusicbrowser.pl:5660
+#: gmusicbrowser.pl:5668
 msgid "Split artist names on :"
 msgstr "Trenne Künstlernamen an:"
 
@@ -3709,24 +3709,24 @@ msgstr "Trenne Künstlernamen an:"
 msgid "Standard fields"
 msgstr "Standardfelder"
 
-#: gmusicbrowser.pl:5720
+#: gmusicbrowser.pl:5728
 msgid "Start in tray"
 msgstr "Starte minimiert im Benachrichtigungsfeld"
 
-#: gmusicbrowser.pl:438 gmusicbrowser.pl:1020 gmusicbrowser_layout.pm:62
+#: gmusicbrowser.pl:457 gmusicbrowser.pl:1028 gmusicbrowser_layout.pm:62
 #: plugins/notify.pm:89
 msgid "Stop"
 msgstr "Stop"
 
-#: gmusicbrowser.pl:5035
+#: gmusicbrowser.pl:5043
 msgid "Stop checking"
 msgstr "Suche beenden"
 
-#: gmusicbrowser.pl:5072
+#: gmusicbrowser.pl:5080
 msgid "Stop scanning"
 msgstr "Suche beenden"
 
-#: gmusicbrowser.pl:5100
+#: gmusicbrowser.pl:5108
 msgid "Stop selecting pictures"
 msgstr ""
 
@@ -3790,11 +3790,11 @@ msgstr "Systemzeit weicht zu stark von aktueller Zeit ab"
 msgid "System command :"
 msgstr "Systembefehl:"
 
-#: gmusicbrowser.pl:4611 gmusicbrowser.pl:4648
+#: gmusicbrowser.pl:4619 gmusicbrowser.pl:4656
 msgid "Tag"
 msgstr "Tag"
 
-#: gmusicbrowser.pl:5218
+#: gmusicbrowser.pl:5226
 msgid "Tags"
 msgstr "Tags"
 
@@ -3806,7 +3806,7 @@ msgstr "Nutzungsbedingungen"
 msgid "Text"
 msgstr "Text"
 
-#: gmusicbrowser.pl:7877
+#: gmusicbrowser.pl:7885
 msgid "The [most/less]"
 msgstr "Die [meist/wenigst]"
 
@@ -3819,13 +3819,13 @@ msgid "This command is required to play files of type {type} : {cmd}"
 msgstr ""
 "Dieses Kommando ist nötig, um Dateien vom Typ {type} wiederzugeben: {cmd}"
 
-#: gmusicbrowser.pl:5988 gmusicbrowser.pl:6062
+#: gmusicbrowser.pl:5996 gmusicbrowser.pl:6070
 msgid "This label is set for %d song."
 msgid_plural "This label is set for %d songs."
 msgstr[0] "Dieses Label ist für %d Titel gesetzt."
 msgstr[1] "Dieses Label ist für %d Titel gesetzt."
 
-#: gmusicbrowser.pl:1572
+#: gmusicbrowser.pl:1580
 msgid "This plugin requires :"
 msgstr "Dieses Plugin benötigt:"
 
@@ -3837,7 +3837,7 @@ msgstr ""
 "Dieses Plugin ermittelt künstlerbezogene Informationen (Biografie, "
 "Events, ...) von last.fm"
 
-#: gmusicbrowser.pl:5704
+#: gmusicbrowser.pl:5712
 msgid "Threshold to count a song as played :"
 msgstr "Schwellwert, damit ein Titel als 'gespielt' markiert wird:"
 
@@ -3853,7 +3853,7 @@ msgstr "Timeout:"
 msgid "Timespan of the fade-out in seconds"
 msgstr "Zeitspanne für Ausblenden in Sekunden"
 
-#: gmusicbrowser.pl:849 gmusicbrowser.pl:7772 gmusicbrowser_songs.pm:461
+#: gmusicbrowser.pl:857 gmusicbrowser.pl:7780 gmusicbrowser_songs.pm:461
 #: gmusicbrowser_tags.pm:1527 gmusicbrowser_tags.pm:1566
 #: gmusicbrowser_tags.pm:1581 gmusicbrowser_tags.pm:1602
 #: gmusicbrowser_tags.pm:1605 gmusicbrowser_tags.pm:1852
@@ -3881,35 +3881,35 @@ msgstr "Titelleiste"
 msgid "Titlebar overlay plugin"
 msgstr "Titelleistenüberlagerungs-Erweiterung"
 
-#: gmusicbrowser.pl:1051
+#: gmusicbrowser.pl:1059
 msgid "Toggle Album Lock"
 msgstr "Album halten umschalten"
 
-#: gmusicbrowser.pl:1050
+#: gmusicbrowser.pl:1058
 msgid "Toggle Artist Lock"
 msgstr "Künstler halten umschalten"
 
-#: gmusicbrowser.pl:1052
+#: gmusicbrowser.pl:1060
 msgid "Toggle Song Lock"
 msgstr "Titel halten umschalten"
 
-#: gmusicbrowser.pl:1076
+#: gmusicbrowser.pl:1084
 msgid "Toggle a label of the current song"
 msgstr "Label des aktuellen Titels umschalten"
 
-#: gmusicbrowser.pl:1053
+#: gmusicbrowser.pl:1061
 msgid "Toggle between Random/Shuffle and Ordered"
 msgstr "Wechseln zwischen Zufall/Mischen und Sortiert"
 
-#: gmusicbrowser.pl:1064 gmusicbrowser_layout.pm:606
+#: gmusicbrowser.pl:1072 gmusicbrowser_layout.pm:606
 msgid "Toggle fullscreen mode"
 msgstr "Vollbildmodus umschalten"
 
-#: gmusicbrowser.pl:1065
+#: gmusicbrowser.pl:1073
 msgid "Toggle the fullscreen layout"
 msgstr "Aussehen des Vollbildes wechseln"
 
-#: gmusicbrowser.pl:7802 gmusicbrowser_songs.pm:574 gmusicbrowser_tags.pm:1533
+#: gmusicbrowser.pl:7810 gmusicbrowser_songs.pm:574 gmusicbrowser_tags.pm:1533
 #: gmusicbrowser_tags.pm:1571 gmusicbrowser_tags.pm:1587
 #: gmusicbrowser_tags.pm:1615 gmusicbrowser_tags.pm:1852
 msgid "Track"
@@ -3923,7 +3923,7 @@ msgstr "Wiedergabe-Verstärkung Titel"
 msgid "Track peak"
 msgstr "Höchster Pegel"
 
-#: gmusicbrowser.pl:5736
+#: gmusicbrowser.pl:5744
 msgid "Tray tip window layout :"
 msgstr "Benachrichtigungen:"
 
@@ -3931,7 +3931,7 @@ msgstr "Benachrichtigungen:"
 msgid "Tuesday"
 msgstr "Dienstag"
 
-#: gmusicbrowser.pl:332
+#: gmusicbrowser.pl:351
 msgid "Turn Off"
 msgstr "Ausschalten"
 
@@ -3955,11 +3955,11 @@ msgstr "Eindeutiger Datei-Identifikator"
 msgid "Unknown field ({field})"
 msgstr "Unbekanntes Feld ({field})"
 
-#: gmusicbrowser.pl:442
+#: gmusicbrowser.pl:461
 msgid "Unlock Album"
 msgstr "Album nicht halten"
 
-#: gmusicbrowser.pl:441
+#: gmusicbrowser.pl:460
 msgid "Unlock Artist"
 msgstr "Künstler nicht halten"
 
@@ -3967,7 +3967,7 @@ msgstr "Künstler nicht halten"
 msgid "Unnamed custom command"
 msgstr "Unbenannter Benutzerbefehl"
 
-#: gmusicbrowser.pl:8804 gmusicbrowser_songs.pm:3663
+#: gmusicbrowser.pl:8812 gmusicbrowser_songs.pm:3663
 msgid "Unnamed filter"
 msgstr "Unbenannter Filter"
 
@@ -3983,11 +3983,11 @@ msgstr "Oben links"
 msgid "Upper right"
 msgstr "Oben rechts"
 
-#: gmusicbrowser.pl:5510
+#: gmusicbrowser.pl:5518
 msgid "Use Equalizer"
 msgstr "Verwende Equalizer"
 
-#: gmusicbrowser.pl:5769
+#: gmusicbrowser.pl:5777
 msgid ""
 "Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are "
 "probably better supported by other softwares"
@@ -4007,7 +4007,7 @@ msgstr "Verwende Wiedergabe-Verstärkung"
 msgid "Use WebKit"
 msgstr "Verwende WebKit"
 
-#: gmusicbrowser.pl:5911
+#: gmusicbrowser.pl:5919
 msgid "Use a master filter"
 msgstr "Benutze einen Hauptfilter"
 
@@ -4019,11 +4019,11 @@ msgstr "Verwende Lautstärkeanpassung des Albums, statt des Titels"
 msgid "Use default regular expression"
 msgstr "Benutze den vorgegebenen regulären Ausdruck"
 
-#: gmusicbrowser.pl:5529
+#: gmusicbrowser.pl:5537
 msgid "Use gstreamer"
 msgstr "Verwende Gstreamer"
 
-#: gmusicbrowser.pl:5770
+#: gmusicbrowser.pl:5778
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "Verwende, wenn möglich, Latin1-Kodierung in ID3v2 Tags"
 
@@ -4054,7 +4054,7 @@ msgstr "Verwende {command} um {ext} Dateien abzuspielen"
 msgid "Used for clipping prevention"
 msgstr "Verwendet um \"Clipping\" zu vermeiden"
 
-#: gmusicbrowser.pl:5662 gmusicbrowser.pl:5672
+#: gmusicbrowser.pl:5670 gmusicbrowser.pl:5680
 msgid "Used for the Artists field"
 msgstr "Für das Künstlerfeld verwendet"
 
@@ -4078,7 +4078,7 @@ msgstr "Angaben wurden in die Tags geschrieben"
 msgid "Various artists"
 msgstr "Verschiedene Künstler"
 
-#: gmusicbrowser.pl:7947 gmusicbrowser_songs.pm:717 gmusicbrowser_tags.pm:1528
+#: gmusicbrowser.pl:7955 gmusicbrowser_songs.pm:717 gmusicbrowser_tags.pm:1528
 #: gmusicbrowser_tags.pm:1567
 msgid "Version"
 msgstr "Version"
@@ -4103,7 +4103,7 @@ msgstr "Lautstärke"
 msgid "Volume : "
 msgstr "Lautstärke: "
 
-#: gmusicbrowser.pl:5698
+#: gmusicbrowser.pl:5706
 msgid "Volume step :"
 msgstr "Lautstärkeschritte:"
 
@@ -4111,7 +4111,7 @@ msgstr "Lautstärkeschritte:"
 msgid "Wait when queue empty"
 msgstr "Warte wenn Warteliste leer"
 
-#: gmusicbrowser.pl:5767
+#: gmusicbrowser.pl:5775
 msgid ""
 "Warning : these are advanced options, don't change them unless you know what "
 "you are doing."
@@ -4119,7 +4119,7 @@ msgstr ""
 "Warnung: Dies sind erweiterte Einstellungen! Nicht ändern, es sei denn Du "
 "weißt was Du tust."
 
-#: gmusicbrowser.pl:6254
+#: gmusicbrowser.pl:6262
 msgid "Warning : using a folder with invalid encoding, you should rename it."
 msgstr ""
 
@@ -4151,13 +4151,13 @@ msgstr "Mittwoch"
 msgid "Weighted Random"
 msgstr "Gewichteter Zufallsmodus"
 
-#: gmusicbrowser.pl:5702
+#: gmusicbrowser.pl:5710
 msgid ""
 "When changing songs, the previous song is added to the recent list even if "
 "not played at all."
 msgstr ""
 
-#: gmusicbrowser.pl:1071
+#: gmusicbrowser.pl:1079
 msgid "Widget name"
 msgstr "Widgetname"
 
@@ -4169,7 +4169,7 @@ msgstr "Wikipedia"
 msgid "Wikipedia Locale"
 msgstr "Wikipediasprache"
 
-#: gmusicbrowser.pl:5774
+#: gmusicbrowser.pl:5782
 msgid ""
 "Will not write the tags except with the advanced tag editing dialog. The "
 "changes will be kept in the library instead.\n"
@@ -4179,11 +4179,11 @@ msgstr ""
 "Änderungen werden stattdessen in der Sammlung gehalten.\n"
 "Warnung, die Änderungen gehen verloren, wenn der Tag neu eingelesen wird."
 
-#: gmusicbrowser.pl:882
+#: gmusicbrowser.pl:890
 msgid "Win"
 msgstr "Extra"
 
-#: gmusicbrowser.pl:443
+#: gmusicbrowser.pl:462
 msgid "Windows"
 msgstr "Fenster"
 
@@ -4199,7 +4199,7 @@ msgstr "Schreibe Dateinamen nach ..."
 msgid "Writing tags"
 msgstr "Schreibe Tags"
 
-#: gmusicbrowser.pl:7796 gmusicbrowser_songs.pm:562 gmusicbrowser_tags.pm:1593
+#: gmusicbrowser.pl:7804 gmusicbrowser_songs.pm:562 gmusicbrowser_tags.pm:1593
 #: gmusicbrowser_tags.pm:1608 gmusicbrowser_tags.pm:1852
 msgid "Year"
 msgstr "Jahr"
@@ -4218,7 +4218,7 @@ msgstr ""
 "<b>fett</b> <i>kursiv</i> <u>unterstrichen</u>\n"
 "Jedoch werden sie evtl. vom Benachrichtigungs Daemon ignoriert"
 
-#: gmusicbrowser.pl:4341
+#: gmusicbrowser.pl:4349
 msgid "You must specify a base folder"
 msgstr "Du musst einen Basisordner angeben"
 
@@ -4230,7 +4230,7 @@ msgstr "_Füge Spalte ein"
 msgid "_Remove this column"
 msgstr "_Entferne diese Spalte"
 
-#: gmusicbrowser.pl:4071
+#: gmusicbrowser.pl:4079
 msgid "_Retry"
 msgstr "_Wiedeholung"
 
@@ -4242,27 +4242,27 @@ msgstr "_Sortiere nach"
 msgid "a bright coloured fish"
 msgstr "ein heller farbiger Fisch"
 
-#: gmusicbrowser.pl:7961 gmusicbrowser.pl:7971
+#: gmusicbrowser.pl:7969 gmusicbrowser.pl:7979
 msgid "a flac file"
 msgstr "eine FLAC-Datei"
 
-#: gmusicbrowser.pl:7959 gmusicbrowser.pl:7969
+#: gmusicbrowser.pl:7967 gmusicbrowser.pl:7977
 msgid "a mp3 file"
 msgstr "eine MP3-Datei"
 
-#: gmusicbrowser.pl:7962 gmusicbrowser.pl:7972
+#: gmusicbrowser.pl:7970 gmusicbrowser.pl:7980
 msgid "a musepack file"
 msgstr "eine Musepack-Datei"
 
-#: gmusicbrowser.pl:7963 gmusicbrowser.pl:7973
+#: gmusicbrowser.pl:7971 gmusicbrowser.pl:7981
 msgid "a wavepack file"
 msgstr "eine Wavepack-Datei"
 
-#: gmusicbrowser.pl:3736
+#: gmusicbrowser.pl:3744
 msgid "abort copy"
 msgstr "Kopieren abbrechen"
 
-#: gmusicbrowser.pl:3737
+#: gmusicbrowser.pl:3745
 msgid "abort move"
 msgstr "Verschieben abbrechen"
 
@@ -4270,16 +4270,16 @@ msgstr "Verschieben abbrechen"
 msgid "add"
 msgstr "Hinzufügen"
 
-#: gmusicbrowser.pl:7869
+#: gmusicbrowser.pl:7877
 msgid "added"
 msgstr "Hinzugefügt"
 
-#: gmusicbrowser.pl:5574
+#: gmusicbrowser.pl:5582
 msgid "advanced options"
 msgstr "Erweiterte Einstellungen"
 
-#: gmusicbrowser.pl:7849 gmusicbrowser.pl:7857 gmusicbrowser.pl:7865
-#: gmusicbrowser.pl:7873
+#: gmusicbrowser.pl:7857 gmusicbrowser.pl:7865 gmusicbrowser.pl:7873
+#: gmusicbrowser.pl:7881
 msgid "after %d"
 msgstr "nach %d"
 
@@ -4295,15 +4295,15 @@ msgstr "Alphabet"
 msgid "amixer control :"
 msgstr "AMixer Kontrolle:"
 
-#: gmusicbrowser.pl:7964 gmusicbrowser.pl:7974
+#: gmusicbrowser.pl:7972 gmusicbrowser.pl:7982
 msgid "an ape file"
 msgstr "eine APE-Datei"
 
-#: gmusicbrowser.pl:7960 gmusicbrowser.pl:7970
+#: gmusicbrowser.pl:7968 gmusicbrowser.pl:7978
 msgid "an ogg file"
 msgstr "eine OGG-Datei"
 
-#: gmusicbrowser.pl:798
+#: gmusicbrowser.pl:806
 msgid "another example"
 msgstr "anderes Beispiel"
 
@@ -4324,11 +4324,11 @@ msgstr "Künstler"
 msgid "auto detect"
 msgstr "automatisch feststellen"
 
-#: gmusicbrowser.pl:325
+#: gmusicbrowser.pl:344
 msgid "autofill"
 msgstr "Automatisch füllen"
 
-#: gmusicbrowser.pl:325
+#: gmusicbrowser.pl:344
 msgid "autofill queue"
 msgstr "Warteliste automatisch füllen"
 
@@ -4348,17 +4348,17 @@ msgstr "Band"
 msgid "band/artist logotype"
 msgstr "Band/Künstler Logotyp"
 
-#: gmusicbrowser.pl:7848 gmusicbrowser.pl:7856 gmusicbrowser.pl:7864
-#: gmusicbrowser.pl:7872
+#: gmusicbrowser.pl:7856 gmusicbrowser.pl:7864 gmusicbrowser.pl:7872
+#: gmusicbrowser.pl:7880
 msgid "before %d"
 msgstr "vor %d"
 
-#: gmusicbrowser.pl:7850 gmusicbrowser.pl:7858 gmusicbrowser.pl:7866
-#: gmusicbrowser.pl:7874
+#: gmusicbrowser.pl:7858 gmusicbrowser.pl:7866 gmusicbrowser.pl:7874
+#: gmusicbrowser.pl:7882
 msgid "between %d( and )%d"
 msgstr "zwischen %d( und)%d"
 
-#: gmusicbrowser.pl:7836 gmusicbrowser.pl:7843
+#: gmusicbrowser.pl:7844 gmusicbrowser.pl:7851
 msgid "between %n( and )%n"
 msgstr "zwischen %n( und)%n"
 
@@ -4370,11 +4370,11 @@ msgstr "groß"
 msgid "biography"
 msgstr "Biografie"
 
-#: gmusicbrowser.pl:7978
+#: gmusicbrowser.pl:7986
 msgid "bitrate"
 msgstr "Bitrate"
 
-#: gmusicbrowser.pl:798
+#: gmusicbrowser.pl:806
 msgid "bonus tracks"
 msgstr "Bonusstücke"
 
@@ -4382,51 +4382,51 @@ msgstr "Bonusstücke"
 msgid "boolean"
 msgstr "Boolean"
 
-#: gmusicbrowser.pl:798
+#: gmusicbrowser.pl:806
 msgid "bootleg"
 msgstr "Bootleg"
 
-#: gmusicbrowser.pl:798
+#: gmusicbrowser.pl:806
 msgid "broken"
 msgstr "defekt"
 
-#: gmusicbrowser.pl:5382 gmusicbrowser.pl:6346 plugins/desktopwidget.pm:138
+#: gmusicbrowser.pl:5390 gmusicbrowser.pl:6354 plugins/desktopwidget.pm:138
 msgid "by"
 msgstr "von"
 
-#: gmusicbrowser.pl:842
+#: gmusicbrowser.pl:850
 msgid "by added"
 msgstr "nach Hinzufügen"
 
-#: gmusicbrowser.pl:841
+#: gmusicbrowser.pl:849
 msgid "by lastplay"
 msgstr "nach letztem Abspielen"
 
-#: gmusicbrowser.pl:844
+#: gmusicbrowser.pl:852
 msgid "by lastplay & bootleg"
 msgstr "nach letztem Abspielen & Bootleg"
 
-#: gmusicbrowser.pl:843
+#: gmusicbrowser.pl:851
 msgid "by lastplay & play count"
 msgstr "nach letztem Abspielen & Abspielanzahl"
 
-#: gmusicbrowser.pl:840
+#: gmusicbrowser.pl:848
 msgid "by play count"
 msgstr "nach Abspielanzahl"
 
-#: gmusicbrowser.pl:839
+#: gmusicbrowser.pl:847
 msgid "by rating"
 msgstr "nach Bewertung"
 
-#: gmusicbrowser.pl:3009
+#: gmusicbrowser.pl:3017
 msgid "by {artist} from {album}"
 msgstr "nach {artist} von {album}"
 
-#: gmusicbrowser.pl:713
+#: gmusicbrowser.pl:721
 msgid "bytes"
 msgstr "Bytes"
 
-#: gmusicbrowser.pl:5893
+#: gmusicbrowser.pl:5901
 msgid "check now"
 msgstr "Jetzt prüfen"
 
@@ -4462,9 +4462,9 @@ msgstr "Verbindung fehlgeschlagen"
 msgid "connection failed."
 msgstr "Verbindung fehlgeschlagen."
 
-#: gmusicbrowser.pl:7773 gmusicbrowser.pl:7781 gmusicbrowser.pl:7789
-#: gmusicbrowser.pl:7908 gmusicbrowser.pl:7916 gmusicbrowser.pl:7922
-#: gmusicbrowser.pl:7930 gmusicbrowser.pl:7940 gmusicbrowser.pl:7948
+#: gmusicbrowser.pl:7781 gmusicbrowser.pl:7789 gmusicbrowser.pl:7797
+#: gmusicbrowser.pl:7916 gmusicbrowser.pl:7924 gmusicbrowser.pl:7930
+#: gmusicbrowser.pl:7938 gmusicbrowser.pl:7948 gmusicbrowser.pl:7956
 msgid "contains %s"
 msgstr "enthält %s"
 
@@ -4480,13 +4480,13 @@ msgstr "Benutzerdefiniert"
 msgid "day"
 msgstr "Tag"
 
-#: gmusicbrowser.pl:707 gmusicbrowser_songs.pm:3731
+#: gmusicbrowser.pl:715 gmusicbrowser_songs.pm:3731
 #: gmusicbrowser_songs.pm:3737 gmusicbrowser_songs.pm:3743
 #: gmusicbrowser_songs.pm:3749
 msgid "days"
 msgstr "Tagen"
 
-#: gmusicbrowser.pl:997 gmusicbrowser_layout.pm:3727
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3727
 #: gmusicbrowser_layout.pm:3749
 msgid "default"
 msgstr "Standard"
@@ -4503,19 +4503,19 @@ msgstr "Standardordner"
 msgid "default fullscreen"
 msgstr "Standardvollbild"
 
-#: gmusicbrowser.pl:6781
+#: gmusicbrowser.pl:6789
 msgid "delete selected filter"
 msgstr "Markierte Filter löschen"
 
-#: gmusicbrowser.pl:6787
+#: gmusicbrowser.pl:6795
 msgid "delete selected grouping"
 msgstr "Markierte Gruppierung löschen"
 
-#: gmusicbrowser.pl:6785
+#: gmusicbrowser.pl:6793
 msgid "delete selected random mode"
 msgstr "Lösche gewählten Zufallsmodus"
 
-#: gmusicbrowser.pl:6783
+#: gmusicbrowser.pl:6791
 msgid "delete selected sort mode"
 msgstr "Lösche gewählten Sortiermodus"
 
@@ -4527,19 +4527,19 @@ msgstr "Verschiedene Ordner"
 msgid "disc on the left side"
 msgstr "Disk auf der linken Seite"
 
-#: gmusicbrowser.pl:3021
+#: gmusicbrowser.pl:3029
 msgid "disc {disc}"
 msgstr "Disk {disc}"
 
-#: gmusicbrowser.pl:7774 gmusicbrowser.pl:7782 gmusicbrowser.pl:7790
-#: gmusicbrowser.pl:7909 gmusicbrowser.pl:7917 gmusicbrowser.pl:7923
-#: gmusicbrowser.pl:7931 gmusicbrowser.pl:7941 gmusicbrowser.pl:7949
+#: gmusicbrowser.pl:7782 gmusicbrowser.pl:7790 gmusicbrowser.pl:7798
+#: gmusicbrowser.pl:7917 gmusicbrowser.pl:7925 gmusicbrowser.pl:7931
+#: gmusicbrowser.pl:7939 gmusicbrowser.pl:7949 gmusicbrowser.pl:7957
 msgid "doesn't contain %s"
 msgstr "enthält nicht %s"
 
-#: gmusicbrowser.pl:7778 gmusicbrowser.pl:7786 gmusicbrowser.pl:7794
-#: gmusicbrowser.pl:7927 gmusicbrowser.pl:7937 gmusicbrowser.pl:7945
-#: gmusicbrowser.pl:7953
+#: gmusicbrowser.pl:7786 gmusicbrowser.pl:7794 gmusicbrowser.pl:7802
+#: gmusicbrowser.pl:7935 gmusicbrowser.pl:7945 gmusicbrowser.pl:7953
+#: gmusicbrowser.pl:7961
 msgid "doesn't match regexp %r"
 msgstr "passt nicht zu RegExp %r"
 
@@ -4575,19 +4575,19 @@ msgstr "Fehler"
 msgid "events"
 msgstr "Events"
 
-#: gmusicbrowser.pl:7704
+#: gmusicbrowser.pl:7712
 msgid "ex :"
 msgstr "ex:"
 
-#: gmusicbrowser.pl:7834 gmusicbrowser.pl:7841
+#: gmusicbrowser.pl:7842 gmusicbrowser.pl:7849
 msgid "exactly %n( times)"
 msgstr "genau %n( Mal)"
 
-#: gmusicbrowser.pl:7835 gmusicbrowser.pl:7842
+#: gmusicbrowser.pl:7843 gmusicbrowser.pl:7850
 msgid "exactly not %n( times)"
 msgstr "genau nicht %n( Mal)"
 
-#: gmusicbrowser.pl:7722
+#: gmusicbrowser.pl:7730
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "Beispiel (gewählter Titel): {score}  ({chances})"
 
@@ -4595,11 +4595,11 @@ msgstr "Beispiel (gewählter Titel): {score}  ({chances})"
 msgid "example : "
 msgstr "Beispiel: "
 
-#: gmusicbrowser.pl:5688 plugins/webcontext.pm:603
+#: gmusicbrowser.pl:5696 plugins/webcontext.pm:603
 msgid "example : %s"
 msgstr "Beispiel: %s"
 
-#: gmusicbrowser.pl:5681
+#: gmusicbrowser.pl:5689
 msgid "examples :"
 msgstr "Beispiele:"
 
@@ -4611,19 +4611,19 @@ msgstr "Fallback Wiedergabe-Verstärkung"
 msgid "false"
 msgstr "falsch"
 
-#: gmusicbrowser.pl:798
+#: gmusicbrowser.pl:806
 msgid "favorite"
 msgstr "Lieblings"
 
-#: gmusicbrowser.pl:7957
+#: gmusicbrowser.pl:7965
 msgid "file format"
 msgstr "Dateiformat"
 
-#: gmusicbrowser.pl:6961
+#: gmusicbrowser.pl:6969
 msgid "filters"
 msgstr "Filter"
 
-#: gmusicbrowser.pl:7902
+#: gmusicbrowser.pl:7910
 msgid "first added"
 msgstr "erstmals hinzugefügt"
 
@@ -4639,7 +4639,7 @@ msgstr "Fließkommazahl"
 msgid "font size depends on"
 msgstr "Schriftgröße hängt ab von"
 
-#: gmusicbrowser.pl:5062
+#: gmusicbrowser.pl:5070
 msgid "for files without a VBR header"
 msgstr "für Dateien ohne VBR Header"
 
@@ -4667,11 +4667,11 @@ msgstr "Google Bilder (hochauflösend)"
 msgid "group by"
 msgstr "gruppiere nach"
 
-#: gmusicbrowser.pl:7664
+#: gmusicbrowser.pl:7672
 msgid "half-life : "
 msgstr "Zeit für 50% Chance:"
 
-#: gmusicbrowser.pl:706
+#: gmusicbrowser.pl:714
 msgid "hours"
 msgstr "Stunden"
 
@@ -4679,7 +4679,7 @@ msgstr "Stunden"
 msgid "huge size"
 msgstr "riesig"
 
-#: gmusicbrowser.pl:5495
+#: gmusicbrowser.pl:5503
 msgid "icecast server"
 msgstr "Icecast-Server"
 
@@ -4687,7 +4687,7 @@ msgstr "Icecast-Server"
 msgid "id3v1 tag"
 msgstr "ID3v1 Tag"
 
-#: gmusicbrowser.pl:5675
+#: gmusicbrowser.pl:5683
 msgid "ignore title"
 msgstr "Ignoriere Titel"
 
@@ -4695,7 +4695,7 @@ msgstr "Ignoriere Titel"
 msgid "illustration"
 msgstr "Illustration"
 
-#: gmusicbrowser.pl:4894
+#: gmusicbrowser.pl:4902
 msgid "imported list"
 msgstr "Importierte Liste"
 
@@ -4707,7 +4707,7 @@ msgstr "Info"
 msgid "integer"
 msgstr "Integer"
 
-#: gmusicbrowser.pl:798
+#: gmusicbrowser.pl:806
 msgid "interview"
 msgstr "Interview"
 
@@ -4715,163 +4715,163 @@ msgstr "Interview"
 msgid "invalid pattern"
 msgstr "Ungültiges Muster"
 
-#: gmusicbrowser.pl:7612
+#: gmusicbrowser.pl:7620
 msgid "inverse"
 msgstr "invertiert"
 
-#: gmusicbrowser.pl:7958
+#: gmusicbrowser.pl:7966
 msgid "is"
 msgstr "ist"
 
-#: gmusicbrowser.pl:7906
+#: gmusicbrowser.pl:7914
 msgid "is %g"
 msgstr "ist %g"
 
-#: gmusicbrowser.pl:7797 gmusicbrowser.pl:7803 gmusicbrowser.pl:7809
+#: gmusicbrowser.pl:7805 gmusicbrowser.pl:7811 gmusicbrowser.pl:7817
 msgid "is %n"
 msgstr "ist %n"
 
-#: gmusicbrowser.pl:7815
+#: gmusicbrowser.pl:7823
 msgid "is %n( %)"
 msgstr "ist %n( %)"
 
-#: gmusicbrowser.pl:7985
+#: gmusicbrowser.pl:7993
 msgid "is %n(Hz)"
 msgstr "ist %n(Hz)"
 
-#: gmusicbrowser.pl:7979
+#: gmusicbrowser.pl:7987
 msgid "is %n(kbps)"
 msgstr "ist %n(kbps)"
 
-#: gmusicbrowser.pl:7775 gmusicbrowser.pl:7783 gmusicbrowser.pl:7791
-#: gmusicbrowser.pl:7924 gmusicbrowser.pl:7932 gmusicbrowser.pl:7942
-#: gmusicbrowser.pl:7950
+#: gmusicbrowser.pl:7783 gmusicbrowser.pl:7791 gmusicbrowser.pl:7799
+#: gmusicbrowser.pl:7932 gmusicbrowser.pl:7940 gmusicbrowser.pl:7950
+#: gmusicbrowser.pl:7958
 msgid "is %s"
 msgstr "ist %s"
 
-#: gmusicbrowser.pl:7800
+#: gmusicbrowser.pl:7808
 msgid "is after %n"
 msgstr "ist nach %n"
 
-#: gmusicbrowser.pl:7799
+#: gmusicbrowser.pl:7807
 msgid "is before %n"
 msgstr "ist vor %n"
 
-#: gmusicbrowser.pl:7829
+#: gmusicbrowser.pl:7837
 msgid "is between %b( and )%b"
 msgstr "ist zwischen %b( und )%b"
 
-#: gmusicbrowser.pl:7819
+#: gmusicbrowser.pl:7827
 msgid "is between %n( and )%n( %)"
 msgstr "ist zwischen %n( und )%n( %)"
 
-#: gmusicbrowser.pl:7824
+#: gmusicbrowser.pl:7832
 msgid "is between %n( and )%n( s)"
 msgstr "ist zwischen %n( und )%n( s)"
 
-#: gmusicbrowser.pl:7934
+#: gmusicbrowser.pl:7942
 msgid "is in %s"
 msgstr "ist in %s"
 
-#: gmusicbrowser.pl:7955
+#: gmusicbrowser.pl:7963
 msgid "is in list %l"
 msgstr "Ist in der Liste %l"
 
-#: gmusicbrowser.pl:7828
+#: gmusicbrowser.pl:7836
 msgid "is less than %b"
 msgstr "ist kleiner als %b"
 
-#: gmusicbrowser.pl:7806 gmusicbrowser.pl:7812
+#: gmusicbrowser.pl:7814 gmusicbrowser.pl:7820
 msgid "is less than %n"
 msgstr "ist kleiner als %n"
 
-#: gmusicbrowser.pl:7818
+#: gmusicbrowser.pl:7826
 msgid "is less than %n( %)"
 msgstr "ist schlechter als %n( %)"
 
-#: gmusicbrowser.pl:7823
+#: gmusicbrowser.pl:7831
 msgid "is less than %n( s)"
 msgstr "ist kleiner als %n( s)"
 
-#: gmusicbrowser.pl:7988
+#: gmusicbrowser.pl:7996
 msgid "is less than %n(Hz)"
 msgstr "ist weniger als %n(Hz)"
 
-#: gmusicbrowser.pl:7982
+#: gmusicbrowser.pl:7990
 msgid "is less than %n(kbps)"
 msgstr "ist weniger als %n(kbps)"
 
-#: gmusicbrowser.pl:7827
+#: gmusicbrowser.pl:7835
 msgid "is more than %b"
 msgstr "ist größer als %b"
 
-#: gmusicbrowser.pl:7805 gmusicbrowser.pl:7811
+#: gmusicbrowser.pl:7813 gmusicbrowser.pl:7819
 msgid "is more than %n"
 msgstr "ist größer als %n"
 
-#: gmusicbrowser.pl:7817
+#: gmusicbrowser.pl:7825
 msgid "is more than %n( %)"
 msgstr "ist besser als %n( %)"
 
-#: gmusicbrowser.pl:7822
+#: gmusicbrowser.pl:7830
 msgid "is more than %n( s)"
 msgstr "ist größer als %n( s)"
 
-#: gmusicbrowser.pl:7987
+#: gmusicbrowser.pl:7995
 msgid "is more than %n(Hz)"
 msgstr "ist mehr als %n(Hz)"
 
-#: gmusicbrowser.pl:7981
+#: gmusicbrowser.pl:7989
 msgid "is more than %n(kbps)"
 msgstr "ist mehr als %n(kbps)"
 
-#: gmusicbrowser.pl:7968
+#: gmusicbrowser.pl:7976
 msgid "is not"
 msgstr "ist nicht"
 
-#: gmusicbrowser.pl:7804 gmusicbrowser.pl:7810
+#: gmusicbrowser.pl:7812 gmusicbrowser.pl:7818
 msgid "is not %n"
 msgstr "ist nicht %n"
 
-#: gmusicbrowser.pl:7816
+#: gmusicbrowser.pl:7824
 msgid "is not %n( %)"
 msgstr "ist nicht %n( %)"
 
-#: gmusicbrowser.pl:7776 gmusicbrowser.pl:7784 gmusicbrowser.pl:7792
-#: gmusicbrowser.pl:7925 gmusicbrowser.pl:7933 gmusicbrowser.pl:7943
-#: gmusicbrowser.pl:7951
+#: gmusicbrowser.pl:7784 gmusicbrowser.pl:7792 gmusicbrowser.pl:7800
+#: gmusicbrowser.pl:7933 gmusicbrowser.pl:7941 gmusicbrowser.pl:7951
+#: gmusicbrowser.pl:7959
 msgid "is not %s"
 msgstr "ist nicht %s"
 
-#: gmusicbrowser.pl:7989
+#: gmusicbrowser.pl:7997
 msgid "is not 44.1kHz"
 msgstr "ist nicht 44.1kHz"
 
-#: gmusicbrowser.pl:7935
+#: gmusicbrowser.pl:7943
 msgid "is not in %s"
 msgstr "ist nicht in %s"
 
-#: gmusicbrowser.pl:7956
+#: gmusicbrowser.pl:7964
 msgid "is not in list %l"
 msgstr "Ist nicht in der Liste %l"
 
-#: gmusicbrowser.pl:7907
+#: gmusicbrowser.pl:7915
 msgid "isn't %g"
 msgstr "ist nicht %g"
 
-#: gmusicbrowser.pl:7798
+#: gmusicbrowser.pl:7806
 msgid "isn't %n"
 msgstr "ist nicht %n"
 
-#: gmusicbrowser.pl:7986
+#: gmusicbrowser.pl:7994
 msgid "isn't %n(Hz)"
 msgstr "ist nicht %n(Hz)"
 
-#: gmusicbrowser.pl:7980
+#: gmusicbrowser.pl:7988
 msgid "isn't %n(kbps)"
 msgstr "ist nicht %n(kbps)"
 
-#: gmusicbrowser.pl:5771
+#: gmusicbrowser.pl:5779
 msgid ""
 "itunes doesn't support unsynchronised tags last time I checked, mostly "
 "affect tags with pictures"
@@ -4887,15 +4887,15 @@ msgstr "iTunes++"
 msgid "itunes-like"
 msgstr "iTunes-Stil"
 
-#: gmusicbrowser.pl:7901
+#: gmusicbrowser.pl:7909
 msgid "last added"
 msgstr "zuletzt hinzugefügten"
 
-#: gmusicbrowser.pl:7845 gmusicbrowser.pl:7893
+#: gmusicbrowser.pl:7853 gmusicbrowser.pl:7901
 msgid "last played"
 msgstr "Zuletzt gespielt"
 
-#: gmusicbrowser.pl:7853 gmusicbrowser.pl:7897
+#: gmusicbrowser.pl:7861 gmusicbrowser.pl:7905
 msgid "last skipped"
 msgstr "Zuletzt übersprungen"
 
@@ -4939,24 +4939,24 @@ msgstr "Filterfensterbereich links"
 msgid "length of songs"
 msgstr "Länge der Titels"
 
-#: gmusicbrowser.pl:7892
+#: gmusicbrowser.pl:7900
 msgid "less played"
 msgstr "wenigst gespielten"
 
-#: gmusicbrowser.pl:7896
+#: gmusicbrowser.pl:7904
 msgid "less skipped"
 msgstr "wenigst übersprungen"
 
-#: gmusicbrowser.pl:7846 gmusicbrowser.pl:7854 gmusicbrowser.pl:7862
-#: gmusicbrowser.pl:7870
+#: gmusicbrowser.pl:7854 gmusicbrowser.pl:7862 gmusicbrowser.pl:7870
+#: gmusicbrowser.pl:7878
 msgid "less than %a( ago)"
 msgstr "vor weniger als %a"
 
-#: gmusicbrowser.pl:7833 gmusicbrowser.pl:7840
+#: gmusicbrowser.pl:7841 gmusicbrowser.pl:7848
 msgid "less than %n( times)"
 msgstr "weniger als %n ( Mal)"
 
-#: gmusicbrowser.pl:7899
+#: gmusicbrowser.pl:7907
 msgid "longest"
 msgstr "längsten"
 
@@ -4964,9 +4964,9 @@ msgstr "längsten"
 msgid "lyricist"
 msgstr "Texter"
 
-#: gmusicbrowser.pl:7777 gmusicbrowser.pl:7785 gmusicbrowser.pl:7793
-#: gmusicbrowser.pl:7926 gmusicbrowser.pl:7936 gmusicbrowser.pl:7944
-#: gmusicbrowser.pl:7952
+#: gmusicbrowser.pl:7785 gmusicbrowser.pl:7793 gmusicbrowser.pl:7801
+#: gmusicbrowser.pl:7934 gmusicbrowser.pl:7944 gmusicbrowser.pl:7952
+#: gmusicbrowser.pl:7960
 msgid "match regexp %r"
 msgstr "passt zu RegExp %r"
 
@@ -4990,15 +4990,15 @@ msgstr "minimal"
 msgid "minimum font size"
 msgstr "minimale Schriftgröße"
 
-#: gmusicbrowser.pl:705 plugins/autosave.pm:36
+#: gmusicbrowser.pl:713 plugins/autosave.pm:36
 msgid "minutes"
 msgstr "Minuten"
 
-#: gmusicbrowser.pl:7861
+#: gmusicbrowser.pl:7869
 msgid "modified"
 msgstr "Verändert"
 
-#: gmusicbrowser.pl:7965 gmusicbrowser.pl:7975
+#: gmusicbrowser.pl:7973 gmusicbrowser.pl:7983
 msgid "mono"
 msgstr "Mono"
 
@@ -5006,16 +5006,16 @@ msgstr "Mono"
 msgid "month"
 msgstr "Monat"
 
-#: gmusicbrowser.pl:709
+#: gmusicbrowser.pl:717
 msgid "months"
 msgstr "Monaten"
 
-#: gmusicbrowser.pl:7847 gmusicbrowser.pl:7855 gmusicbrowser.pl:7863
-#: gmusicbrowser.pl:7871
+#: gmusicbrowser.pl:7855 gmusicbrowser.pl:7863 gmusicbrowser.pl:7871
+#: gmusicbrowser.pl:7879
 msgid "more than %a( ago)"
 msgstr "vor mehr als %a"
 
-#: gmusicbrowser.pl:7832 gmusicbrowser.pl:7839
+#: gmusicbrowser.pl:7840 gmusicbrowser.pl:7847
 msgid "more than %n( times)"
 msgstr "mehr als %n( Mal)"
 
@@ -5023,11 +5023,11 @@ msgstr "mehr als %n( Mal)"
 msgid "mosaic mode"
 msgstr "Mosaikmodus"
 
-#: gmusicbrowser.pl:7891
+#: gmusicbrowser.pl:7899
 msgid "most played"
 msgstr "meist gespielten"
 
-#: gmusicbrowser.pl:7895
+#: gmusicbrowser.pl:7903
 msgid "most skipped"
 msgstr "meist übersprungen"
 
@@ -5047,19 +5047,19 @@ msgstr "Mplayer-Optionen:"
 msgid "multi-lines string"
 msgstr "mehrzeilige Zeichenkette"
 
-#: gmusicbrowser.pl:6781
+#: gmusicbrowser.pl:6789
 msgid "name of the new filter"
 msgstr "Name des neuen Filters"
 
-#: gmusicbrowser.pl:6787
+#: gmusicbrowser.pl:6795
 msgid "name of the new grouping"
 msgstr "Name der neuen Gruppierung"
 
-#: gmusicbrowser.pl:6785
+#: gmusicbrowser.pl:6793
 msgid "name of the new random mode"
 msgstr "Name des neuen Zufallsmodus"
 
-#: gmusicbrowser.pl:6783
+#: gmusicbrowser.pl:6791
 msgid "name of the new sort mode"
 msgstr "Name des neuen Sortiermodus"
 
@@ -5068,7 +5068,7 @@ msgstr "Name des neuen Sortiermodus"
 msgid "never"
 msgstr "nie"
 
-#: gmusicbrowser.pl:1612
+#: gmusicbrowser.pl:1620
 msgid "never played"
 msgstr "nie gespielten"
 
@@ -5076,11 +5076,11 @@ msgstr "nie gespielten"
 msgid "no matches found, you might want to remove some search terms."
 msgstr "Keine Treffer, versuche ein paar Suchbegriffe zu entfernen."
 
-#: gmusicbrowser.pl:2750
+#: gmusicbrowser.pl:2758
 msgid "no order"
 msgstr "keine Sortierung"
 
-#: gmusicbrowser.pl:3886 gmusicbrowser.pl:3978
+#: gmusicbrowser.pl:3894 gmusicbrowser.pl:3986
 msgid "no picture"
 msgstr "kein Bild"
 
@@ -5088,39 +5088,39 @@ msgstr "kein Bild"
 msgid "no pictures"
 msgstr "keine Bilder"
 
-#: gmusicbrowser.pl:5362
+#: gmusicbrowser.pl:5370
 msgid "no plugins found"
 msgstr "Keine Erweiterungen gefunden"
 
-#: gmusicbrowser.pl:5665
+#: gmusicbrowser.pl:5673
 msgid "no splitting"
 msgstr "kein trennen"
 
-#: gmusicbrowser.pl:4051
+#: gmusicbrowser.pl:4059
 msgid "no to all"
 msgstr "nein zu allem"
 
-#: gmusicbrowser.pl:6816
+#: gmusicbrowser.pl:6824
 msgid "noname"
 msgstr "kein Name"
 
-#: gmusicbrowser.pl:324
+#: gmusicbrowser.pl:343
 msgid "normal"
 msgstr "Normal"
 
-#: gmusicbrowser.pl:324
+#: gmusicbrowser.pl:343
 msgid "normal play when queue empty"
 msgstr "normale Wiedergabe, wenn Warteliste leer"
 
-#: gmusicbrowser.pl:1619
+#: gmusicbrowser.pl:1627
 msgid "not bootleg"
 msgstr "Kein Bootleg"
 
-#: gmusicbrowser.pl:7894
+#: gmusicbrowser.pl:7902
 msgid "not played for the longest time"
 msgstr "am längsten nicht Gespielten"
 
-#: gmusicbrowser.pl:7898
+#: gmusicbrowser.pl:7906
 msgid "not skipped for the longest time"
 msgstr "am längsten nicht Übersprungenen"
 
@@ -5132,8 +5132,8 @@ msgstr "Anzahl der Titel"
 msgid "number of songs in filter"
 msgstr "Anzahl der Titel im Filter"
 
-#: gmusicbrowser.pl:7851 gmusicbrowser.pl:7859 gmusicbrowser.pl:7867
-#: gmusicbrowser.pl:7875
+#: gmusicbrowser.pl:7859 gmusicbrowser.pl:7867 gmusicbrowser.pl:7875
+#: gmusicbrowser.pl:7883
 msgid "on %d"
 msgstr "auf %d"
 
@@ -5159,7 +5159,7 @@ msgstr "Öffne Kontextfenster"
 msgid "options"
 msgstr "Einstellungen"
 
-#: gmusicbrowser.pl:5705
+#: gmusicbrowser.pl:5713
 msgid "or"
 msgstr "oder"
 
@@ -5171,7 +5171,7 @@ msgstr "andere"
 msgid "other file icon"
 msgstr "anderes Datei-Icon"
 
-#: gmusicbrowser.pl:5500 gmusicbrowser.pl:5507
+#: gmusicbrowser.pl:5508 gmusicbrowser.pl:5515
 msgid "output device :"
 msgstr "Ausgabe über:"
 
@@ -5179,7 +5179,7 @@ msgstr "Ausgabe über:"
 msgid "password :"
 msgstr "Passwort:"
 
-#: gmusicbrowser.pl:1049
+#: gmusicbrowser.pl:1057
 msgid "perl code"
 msgstr "Perl-Code"
 
@@ -5191,15 +5191,15 @@ msgstr "Bildgröße"
 msgid "play count average"
 msgstr "durchschnittliche Wiedergabeanzahl"
 
-#: gmusicbrowser.pl:7831
+#: gmusicbrowser.pl:7839
 msgid "played"
 msgstr "Gespielt"
 
-#: gmusicbrowser.pl:1618
+#: gmusicbrowser.pl:1626
 msgid "played>4"
 msgstr "gespielt>4"
 
-#: gmusicbrowser.pl:5530 gmusicbrowser.pl:5649
+#: gmusicbrowser.pl:5538 gmusicbrowser.pl:5657
 msgid "port :"
 msgstr "Port:"
 
@@ -5207,11 +5207,11 @@ msgstr "Port:"
 msgid "pre-amp"
 msgstr "Vorverstärkung"
 
-#: gmusicbrowser.pl:328
+#: gmusicbrowser.pl:347
 msgid "quit"
 msgstr "Beenden"
 
-#: gmusicbrowser.pl:328
+#: gmusicbrowser.pl:347
 msgid "quit when queue empty"
 msgstr "beende wenn Warteliste leer"
 
@@ -5235,7 +5235,7 @@ msgstr "Aufnahmeort"
 msgid "reduced view"
 msgstr "Reduzierte Ansicht ein/ausschalten"
 
-#: gmusicbrowser.pl:5654
+#: gmusicbrowser.pl:5662
 msgid "requires xdg-screensaver"
 msgstr "benötigt XDG-Bildschirmschoner"
 
@@ -5259,51 +5259,51 @@ msgstr "Erneut versuchen"
 msgid "retry in {seconds} s"
 msgstr "Versuche erneut in {seconds} s"
 
-#: gmusicbrowser.pl:7984
+#: gmusicbrowser.pl:7992
 msgid "sampling rate"
 msgstr "Samplerate"
 
-#: gmusicbrowser.pl:6798
+#: gmusicbrowser.pl:6806
 msgid "save as '{name}'"
 msgstr "Speichern unter '{name}'"
 
-#: gmusicbrowser.pl:6781
+#: gmusicbrowser.pl:6789
 msgid "save filter as"
 msgstr "Speichere Filter als"
 
-#: gmusicbrowser.pl:6787
+#: gmusicbrowser.pl:6795
 msgid "save grouping as"
 msgstr "Speichere Gruppierung als"
 
-#: gmusicbrowser.pl:6785
+#: gmusicbrowser.pl:6793
 msgid "save random mode as"
 msgstr "Speichere Zufallsmodus als"
 
-#: gmusicbrowser.pl:6783
+#: gmusicbrowser.pl:6791
 msgid "save sort mode as"
 msgstr "Speichere Sortiermodus als"
 
-#: gmusicbrowser.pl:6780
+#: gmusicbrowser.pl:6788
 msgid "saved filters"
 msgstr "gespeicherte Filter"
 
-#: gmusicbrowser.pl:6786
+#: gmusicbrowser.pl:6794
 msgid "saved groupings"
 msgstr "Gespeicherte Gruppierungen"
 
-#: gmusicbrowser.pl:6784
+#: gmusicbrowser.pl:6792
 msgid "saved random modes"
 msgstr "Gespeicherte Zufallsmodi"
 
-#: gmusicbrowser.pl:6782
+#: gmusicbrowser.pl:6790
 msgid "saved sort modes"
 msgstr "Gespeicherte Sortiermodi"
 
-#: gmusicbrowser.pl:5892
+#: gmusicbrowser.pl:5900
 msgid "scan now"
 msgstr "Jetzt suchen"
 
-#: gmusicbrowser.pl:704 gmusicbrowser.pl:5705 plugins/lullaby.pm:44
+#: gmusicbrowser.pl:712 gmusicbrowser.pl:5713 plugins/lullaby.pm:44
 #: plugins/notify.pm:53
 msgid "seconds"
 msgstr "Sekunden"
@@ -5316,7 +5316,7 @@ msgstr "Shimmer"
 msgid "shimmer_tray"
 msgstr "Shimmer_Tray"
 
-#: gmusicbrowser.pl:7900
+#: gmusicbrowser.pl:7908
 msgid "shortest"
 msgstr "kürzest"
 
@@ -5344,7 +5344,7 @@ msgstr "Aussehen einstellen"
 msgid "skip count average"
 msgstr "durchschnittlich Übersprungen"
 
-#: gmusicbrowser.pl:7838
+#: gmusicbrowser.pl:7846
 msgid "skipped"
 msgstr "Übersprungen"
 
@@ -5360,15 +5360,15 @@ msgstr "Sortiere nach"
 msgid "static list"
 msgstr "statische Liste"
 
-#: gmusicbrowser.pl:7966 gmusicbrowser.pl:7976
+#: gmusicbrowser.pl:7974 gmusicbrowser.pl:7984
 msgid "stereo"
 msgstr "Stereo"
 
-#: gmusicbrowser.pl:327
+#: gmusicbrowser.pl:346
 msgid "stop"
 msgstr "Stopp"
 
-#: gmusicbrowser.pl:327
+#: gmusicbrowser.pl:346
 msgid "stop when queue empty"
 msgstr "Stoppe, wenn Warteliste leer"
 
@@ -5376,7 +5376,7 @@ msgstr "Stoppe, wenn Warteliste leer"
 msgid "string"
 msgstr "Zeichenkette"
 
-#: gmusicbrowser.pl:5568
+#: gmusicbrowser.pl:5576
 msgid "supports : "
 msgstr "unterstützt: "
 
@@ -5388,19 +5388,19 @@ msgstr "Textformat"
 msgid "text mode"
 msgstr "Text"
 
-#: gmusicbrowser.pl:1560
+#: gmusicbrowser.pl:1568
 msgid "the command {name}"
 msgstr "Der Befehl {name}"
 
-#: gmusicbrowser.pl:5770
+#: gmusicbrowser.pl:5778
 msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
 msgstr "Der Standard ist utf16 für ID3v2.3 und utf8 für ID3v2.4"
 
-#: gmusicbrowser.pl:1567
+#: gmusicbrowser.pl:1575
 msgid "the file {name}"
 msgstr "die Datei {name}"
 
-#: gmusicbrowser.pl:1553
+#: gmusicbrowser.pl:1561
 msgid "the {name} perl module"
 msgstr "das {name} Perl Modul"
 
@@ -5428,11 +5428,11 @@ msgstr "Hilfen"
 msgid "true"
 msgstr "wahr"
 
-#: gmusicbrowser.pl:329
+#: gmusicbrowser.pl:348
 msgid "turn off"
 msgstr "Ausschalten"
 
-#: gmusicbrowser.pl:329
+#: gmusicbrowser.pl:348
 msgid "turn off computer when queue empty"
 msgstr "Computer ausschalten, wenn Warteliste leer"
 
@@ -5444,7 +5444,7 @@ msgstr "unbekannt"
 msgid "unknown error"
 msgstr "Unbekannter Fehler"
 
-#: gmusicbrowser.pl:2759 gmusicbrowser_layout.pm:1334
+#: gmusicbrowser.pl:2767 gmusicbrowser_layout.pm:1334
 msgid "unnamed random mode"
 msgstr "unbenannter Zufallsmodus"
 
@@ -5452,12 +5452,12 @@ msgstr "unbenannter Zufallsmodus"
 msgid "url"
 msgstr "URL"
 
-#: gmusicbrowser.pl:1066
+#: gmusicbrowser.pl:1074
 msgid "url-encoded list of files"
 msgstr "URL-codierte Dateiliste"
 
-#: gmusicbrowser.pl:1067 gmusicbrowser.pl:1068 gmusicbrowser.pl:1069
-#: gmusicbrowser.pl:1070
+#: gmusicbrowser.pl:1075 gmusicbrowser.pl:1076 gmusicbrowser.pl:1077
+#: gmusicbrowser.pl:1078
 msgid "url-encoded list of files/folders"
 msgstr "URL-kodierte Liste von Dateien/Ordnern"
 
@@ -5481,7 +5481,7 @@ msgstr "Verwende Gnome Einstellungen"
 msgid "use song folder"
 msgstr "Verwende Ordner des Titels"
 
-#: gmusicbrowser.pl:5681
+#: gmusicbrowser.pl:5689
 msgid "use standard strftime variables"
 msgstr "Verwende Standard Unix Zeitvariablen"
 
@@ -5493,19 +5493,19 @@ msgstr "Benutzername:"
 msgid "using skin :"
 msgstr "Verwende Skin:"
 
-#: gmusicbrowser.pl:326
+#: gmusicbrowser.pl:345
 msgid "wait for more"
 msgstr "Warte auf mehr"
 
-#: gmusicbrowser.pl:326
+#: gmusicbrowser.pl:345
 msgid "wait for more when queue empty"
 msgstr "Warte auf mehr, wenn Warteliste leer"
 
-#: gmusicbrowser.pl:708
+#: gmusicbrowser.pl:716
 msgid "weeks"
 msgstr "Wochen"
 
-#: gmusicbrowser.pl:7674
+#: gmusicbrowser.pl:7682
 msgid "weight :"
 msgstr "Gewicht:"
 
@@ -5553,7 +5553,7 @@ msgstr "mit Suche"
 msgid "with tabbedlists"
 msgstr "mit Tab-Listen"
 
-#: gmusicbrowser.pl:5529
+#: gmusicbrowser.pl:5537
 msgid ""
 "without gstreamer : one stream per file, one connection at a time\n"
 "with gstreamer : one continuous stream, multiple connection possible"
@@ -5577,11 +5577,11 @@ msgstr "Jahr"
 msgid "year (highest)"
 msgstr "Jahr (höchstes)"
 
-#: gmusicbrowser.pl:710
+#: gmusicbrowser.pl:718
 msgid "years"
 msgstr "Jahren"
 
-#: gmusicbrowser.pl:4050
+#: gmusicbrowser.pl:4058
 msgid "yes to all"
 msgstr "ja zu allem"
 
@@ -5593,43 +5593,43 @@ msgstr ""
 "{album}\n"
 "<small>von</small> {artist}"
 
-#: gmusicbrowser.pl:5804
+#: gmusicbrowser.pl:5812
 msgid "{folder} already exists"
 msgstr "{folder} existiert bereits"
 
-#: gmusicbrowser.pl:2922
+#: gmusicbrowser.pl:2930
 msgid "{hours} hours {min} min {sec} s ({size} M)"
 msgstr "{hours} Std. {min} Min. {sec} s ({size} M)"
 
-#: gmusicbrowser.pl:2926 gmusicbrowser.pl:2935
+#: gmusicbrowser.pl:2934 gmusicbrowser.pl:2943
 msgid "{hours}h {min}m {sec}s ({size}M)"
 msgstr "{hours}h {min}m {sec}s ({size}M)"
 
-#: gmusicbrowser.pl:2931 gmusicbrowser_songs.pm:2333
+#: gmusicbrowser.pl:2939 gmusicbrowser_songs.pm:2333
 msgid "{hours}h{min}m{sec}s"
 msgstr "{hours}h{min}m{sec}s"
 
-#: gmusicbrowser.pl:2922
+#: gmusicbrowser.pl:2930
 msgid "{min} min {sec} s ({size} M)"
 msgstr "{min} Min {sec} Sek ({size} M)"
 
-#: gmusicbrowser.pl:2926 gmusicbrowser.pl:2935
+#: gmusicbrowser.pl:2934 gmusicbrowser.pl:2943
 msgid "{min}m {sec}s ({size}M)"
 msgstr "{min}m {sec}s ({size}M)"
 
-#: gmusicbrowser.pl:2931 gmusicbrowser_songs.pm:2333
+#: gmusicbrowser.pl:2939 gmusicbrowser_songs.pm:2333
 msgid "{min}m{sec}s"
 msgstr "{min}m{sec}s"
 
-#: gmusicbrowser.pl:5582
+#: gmusicbrowser.pl:5590
 msgid "{outputname} output settings"
 msgstr "{outputname}·Ausgabeeinstellungen"
 
-#: gmusicbrowser.pl:350
+#: gmusicbrowser.pl:369
 msgid "{songs} by {artists}"
 msgstr "{songs} von {artists}"
 
-#: gmusicbrowser.pl:6716
+#: gmusicbrowser.pl:6724
 msgid ""
 "{song}\n"
 "by {artist}\n"
@@ -5639,12 +5639,12 @@ msgstr ""
 "von {artist}\n"
 "auf {album}"
 
-#: gmusicbrowser.pl:3106 gmusicbrowser_layout.pm:252
+#: gmusicbrowser.pl:3114 gmusicbrowser_layout.pm:252
 #: plugins/audioscrobbler.pm:186 plugins/audioscrobbler.pm:192
 msgid "{song} by {artist}"
 msgstr "{song} von {artist}"
 
-#: gmusicbrowser.pl:1072
+#: gmusicbrowser.pl:1080
 msgid "|-separated list of widget names"
 msgstr "|-getrennte Liste von Widgetnamen"
 
@@ -5941,4 +5941,3 @@ msgstr "|-getrennte Liste von Widgetnamen"
 
 #~ msgid "{command} is needed to play this file."
 #~ msgstr "{command} ist benötigt um diese Datei abzuspielen."
-
