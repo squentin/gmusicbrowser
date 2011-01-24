@@ -102,6 +102,25 @@ BEGIN
 	}
  }
 }
+
+# %html_entities and decode_html() are only used if HTML::Entities is not found
+my %html_entities=
+(	amp => '&', 'lt' => '<', 'gt' => '>', quot => '"', apos => "'",
+	raquo => '»', copy => '©', middot => '·',
+	acirc => 'â', eacute => 'é', egrave => 'è', ecirc => 'ê',
+	agrave=> 'à', ccedil => 'ç',
+);
+sub decode_html
+{	my $s=shift;
+	$s=~s/&(?:#(\d+)|#x([0-9A-F]+)|([a-z]+));/$1 ? chr($1) : $2 ? chr(hex $2) : $html_entities{$3}||'?'/egi;
+	return $s;
+}
+BEGIN
+{	no warnings 'redefine';
+	eval {require HTML::Entities};
+	*decode_html= \&HTML::Entities::decode_entities unless $@;
+}
+
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
 INIT {%Alias_ext=(ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
 
@@ -489,17 +508,6 @@ sub decode_url
 	return undef unless defined $s;
 	_utf8_off($s);
 	$s=~s#%([0-9A-F]{2})#chr(hex $1)#ieg;
-	return $s;
-}
-
-my %html_entities= #FIXME maybe should use a module with a complete list
-(	amp => '&', 'lt' => '<', 'gt' => '>', quot => '"', apos => "'",
-	raquo => '»', copy => '©', middot => '·',
-	acirc => 'à', eacute => 'é', egrave => 'è', ecirc => 'ê',
-);
-sub decode_html
-{	my $s=shift;
-	$s=~s/&(?:#(\d+)|#x([0-9A-F]+)|([a-z]+));/$1 ? chr($1) : $2 ? chr(hex $2) : $html_entities{$3}||'?'/egi;
 	return $s;
 }
 

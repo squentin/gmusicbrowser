@@ -1,18 +1,19 @@
 #
-# Vašek Kovářík <L3D9Z6@seznam.cz>, 2010.
+# Vašek Kovářík <L3D9Z6@seznam.cz>, 2010, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2010-12-13 19:34+0100\n"
-"PO-Revision-Date: 2010-12-18 04:41+0100\n"
+"POT-Creation-Date: 2011-01-19 19:22+0100\n"
+"PO-Revision-Date: 2011-01-20 21:07+0100\n"
 "Last-Translator: Vašek Kovářík <L3D9Z6@seznam.cz>\n"
-"Language-Team: Czech\n"
+"Language-Team: čeština <L3D9Z6@seznam.cz>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"\n"
 "Language: cs\n"
 
 msgid " of {length}"
@@ -353,6 +354,12 @@ msgstr "Rozšířená editace popisků"
 msgid "Album"
 msgstr "Album"
 
+msgid "Album and artist"
+msgstr "Album a interpret"
+
+msgid "Album and artist on the left side"
+msgstr "Album a interpret na levé straně"
+
 msgid "Album artist"
 msgstr "Interpret alba"
 
@@ -562,6 +569,9 @@ msgstr "Tlačítka"
 
 msgid "Buttons, Song & Cover"
 msgstr "Tlačítka, skladba & přebal"
+
+msgid "Can be relative by using + or -"
+msgstr "Při použití + nebo - může být relativní"
 
 msgid "Can't change the volume in non-gstreamer iceserver mode"
 msgstr "Nelze změnit hlasitost v non-gstreamer režimu iceserveru"
@@ -1338,7 +1348,7 @@ msgstr "Značka/vydavatel"
 msgid "Labels"
 msgstr "Štítky"
 
-msgid "Labels' Icons"
+msgid "Labels' icons"
 msgstr "Ikony štítků"
 
 msgid "Lang"
@@ -1911,9 +1921,6 @@ msgstr "Styl přehrávače :"
 msgid "Playing"
 msgstr "Přehrávání"
 
-msgid "Playing & Queue"
-msgstr "Přehrávání & fronta"
-
 msgid "Playing Album"
 msgstr "Přehrávání alba"
 
@@ -1925,6 +1932,9 @@ msgstr "Přehrávání filtru"
 
 msgid "Playing Title"
 msgstr "Přehrávání titulu"
+
+msgid "Playing and queue icons"
+msgstr "Ikony přehrávání a fronty"
 
 msgid "Playing error : {error}"
 msgstr "Chyba přehrávání : {error}"
@@ -2395,9 +2405,6 @@ msgstr "Vyhledat interpreta na stránkách youtube"
 msgid "Search for a picture on internet"
 msgstr "Vyhledat obrázek na internetu"
 
-msgid "Search for artist on the web:"
-msgstr "Vyhledat interpreta na stránkách :"
-
 msgid "Search for current album"
 msgstr "Vyhledat stávající album"
 
@@ -2563,6 +2570,9 @@ msgstr "Zamíchaná alba, zamíchané stopy"
 msgid "Shutdown command :"
 msgstr "Příkaz pro vypnutí :"
 
+msgid "Simple title"
+msgstr "Jednoduchý název"
+
 msgid "Size"
 msgstr "Velikost"
 
@@ -2571,6 +2581,9 @@ msgstr "Přeskočit počet"
 
 msgid "Skip to next song if an error occurs"
 msgstr "Při chybě přeskočit na další skladbu"
+
+msgid "Small album picture"
+msgstr "Malý obrázek alba"
 
 msgid "Small player"
 msgstr "Malý přehrávač"
@@ -2719,6 +2732,12 @@ msgstr "Časová rozteč slábnutí ve vteřinách"
 
 msgid "Title"
 msgstr "Název"
+
+msgid "Title & icon"
+msgstr "Název a ikona"
+
+msgid "Title & progress"
+msgstr "Název a stav"
 
 msgid "Title - Artist - Album"
 msgstr "Název - Interpret - Album"
@@ -2910,6 +2929,9 @@ msgid ""
 msgstr ""
 "Pozor : toto jsou pokročilé volby, neměňte je, pokud si nejste jisti tím, co "
 "děláte."
+
+msgid "Warning : using a folder with invalid encoding, you should rename it."
+msgstr "Upozornění : složka má chybné kódování, měli byste ji přejmenovat."
 
 msgid "Warning: all existing data for this field will be lost"
 msgstr "Pozor: všechna existující data pro toto pole budou ztracena"
@@ -3272,6 +3294,9 @@ msgstr "oblíbené"
 msgid "file format"
 msgstr "formát souboru"
 
+msgid "filters"
+msgstr "Filtry"
+
 msgid "first added"
 msgstr "prvně přidáno"
 
@@ -3295,6 +3320,12 @@ msgstr "úplné"
 
 msgid "full with buttons"
 msgstr "úplné s tlačítky"
+
+msgid "google images"
+msgstr "obrázky z googlu"
+
+msgid "google images (hi-res)"
+msgstr "obrázky z googlu ve vysokém rozlišení"
 
 msgid "group by"
 msgstr "seskupit s"
@@ -3909,6 +3940,9 @@ msgstr "s prohlížečem (strom skladeb)"
 msgid "with context"
 msgstr "s kontextem"
 
+msgid "with picture"
+msgstr "s obrázkem"
+
 msgid "with playlist"
 msgstr "s playlistem"
 
@@ -4004,6 +4038,9 @@ msgstr "|-oddělený seznam názvů pomůcek"
 
 #~ msgid "Rating picture"
 #~ msgstr "Hodnocení obrázku"
+
+#~ msgid "Search for artist on the web:"
+#~ msgstr "Vyhledat interpreta na stránkách :"
 
 #~ msgid "Split artist names on (needs restart) :"
 #~ msgstr "Rozdělit název interpreta na (vyžaduje restart) :"
