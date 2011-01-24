@@ -118,7 +118,7 @@ VBmain  = _VBTreeAndInfo
         HPLists1 = FRSongTree2 HPLists2
 
             FRSongTree2 = (label=_"Same Artist") VBSongTree2
-                VBSongTree2 = _SongTree2(group=2,group=1:first_artist,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
+                VBSongTree2 = _SongTree2(group=1:first_artist,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
 
         HPLists2 = FRSongTree3 FRSongTree4
 
