@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser.pot\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-23 13:58+0100\n"
+"POT-Creation-Date: 2011-01-24 17:11+0100\n"
 "PO-Revision-Date: 2009-04-30 13:14+0800\n"
 "Last-Translator: Google Translate\n"
 "Language-Team: Chinese\n"
@@ -449,7 +449,7 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:435 layouts:538 layouts:544 layouts:980
+#: plugins/fetch_cover.pm:103 layouts:435 layouts:538 layouts:544 layouts:992
 msgid "Album"
 msgstr "专辑"
 
@@ -457,11 +457,11 @@ msgstr "专辑"
 msgid "Album Info"
 msgstr ""
 
-#: layouts:835
+#: layouts:847
 msgid "Album and artist"
 msgstr ""
 
-#: layouts:750
+#: layouts:762
 msgid "Album and artist on the left side"
 msgstr ""
 
@@ -781,11 +781,11 @@ msgstr "浏览器窗口的布局："
 msgid "Browser with SongTree"
 msgstr "浏览器歌曲文件树"
 
-#: layouts:956
+#: layouts:968
 msgid "Buttons"
 msgstr ""
 
-#: layouts:945
+#: layouts:957
 msgid "Buttons, Song & Cover"
 msgstr ""
 
@@ -1427,7 +1427,7 @@ msgstr ""
 msgid "EpicRating plugin - automatically update ratings"
 msgstr ""
 
-#: layouts:884
+#: layouts:896
 msgid "Equalizer"
 msgstr "均衡"
 
@@ -1618,11 +1618,11 @@ msgid "Find songs with the same names"
 msgstr "查找相同的名字的歌曲"
 
 #: gmusicbrowser.pl:844 gmusicbrowser.pl:7937 gmusicbrowser_list.pm:724
-#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:827
+#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:839
 msgid "Folder"
 msgstr "文件夹"
 
-#: gmusicbrowser_list.pm:724 layouts:826
+#: gmusicbrowser_list.pm:724 layouts:838
 msgid "Folder (right-aligned)"
 msgstr ""
 
@@ -1779,15 +1779,15 @@ msgstr "增加音量"
 msgid "Info"
 msgstr "信息"
 
-#: layouts:921
+#: layouts:933
 msgid "Insensitive title-artist (left-aligned)"
 msgstr ""
 
-#: layouts:927
+#: layouts:939
 msgid "Insensitive title-artist (right-aligned)"
 msgstr ""
 
-#: layouts:934
+#: layouts:946
 msgid "Insensitive, Song & Cover"
 msgstr ""
 
@@ -1799,7 +1799,7 @@ msgstr "在播放列表开头插入一个文件/文件夹列表"
 msgid "Invalid regular expression"
 msgstr ""
 
-#: layouts:962
+#: layouts:974
 msgid "Invisible hot spot"
 msgstr ""
 
@@ -1811,7 +1811,7 @@ msgstr ""
 msgid "KB"
 msgstr "KB"
 
-#: plugins/karaoke.pm:9 layouts:893
+#: plugins/karaoke.pm:9 layouts:905
 msgid "Karaoke"
 msgstr ""
 
@@ -1849,7 +1849,7 @@ msgstr "标签/出版社"
 msgid "Labels"
 msgstr "标签"
 
-#: gmusicbrowser_list.pm:744 layouts:787
+#: gmusicbrowser_list.pm:744 layouts:799
 msgid "Labels' icons"
 msgstr ""
 
@@ -2054,7 +2054,7 @@ msgstr ""
 msgid "Lyrics"
 msgstr "歌词"
 
-#: layouts:968
+#: layouts:980
 msgid "Lyrics (requires lyrics plugin)"
 msgstr ""
 
@@ -2584,7 +2584,7 @@ msgstr "播放此专辑的全部歌曲"
 msgid "Play all songs from this artist"
 msgstr "播放这个艺术家的全部歌曲"
 
-#: layouts:901
+#: layouts:913
 msgid "Play button"
 msgstr ""
 
@@ -2644,7 +2644,7 @@ msgstr "正在播放的滤波器"
 msgid "Playing Title"
 msgstr "正在播放的名称"
 
-#: gmusicbrowser_list.pm:737 layouts:782
+#: gmusicbrowser_list.pm:737 layouts:794
 msgid "Playing and queue icons"
 msgstr ""
 
@@ -2652,7 +2652,7 @@ msgstr ""
 msgid "Playing error : {error}"
 msgstr ""
 
-#: layouts:774
+#: layouts:786
 msgid "Playing/Queue Icon or Track"
 msgstr ""
 
@@ -2708,6 +2708,18 @@ msgstr "弹出托盘"
 msgid "Pre-set"
 msgstr ""
 
+#: layouts:748
+msgid "Prefix"
+msgstr ""
+
+#: layouts:750
+msgid "Prefix font style"
+msgstr ""
+
+#: layouts:749
+msgid "Prefix font weight"
+msgstr ""
+
 #: gmusicbrowser.pl:402
 msgid "Prepend"
 msgstr ""
@@ -2744,7 +2756,7 @@ msgstr "私密数据"
 msgid "Produced (P)"
 msgstr "生产（规划）"
 
-#: layouts:889
+#: layouts:901
 msgid "Progress"
 msgstr ""
 
@@ -2794,7 +2806,7 @@ msgstr "队列模式"
 msgid "Queue, Library & Context"
 msgstr "队列，音乐库和相关信息"
 
-#: layouts:768
+#: layouts:780
 msgid "Queue-Item Number"
 msgstr ""
 
@@ -2833,11 +2845,11 @@ msgstr "随机模式版本"
 
 #: gmusicbrowser.pl:4621 gmusicbrowser.pl:4658 gmusicbrowser.pl:7822
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
-#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:817
+#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:829
 msgid "Rating"
 msgstr "评分"
 
-#: gmusicbrowser_list.pm:766 layouts:818
+#: gmusicbrowser_list.pm:766 layouts:830
 msgid "Rating (picture)"
 msgstr "评分(图片)"
 
@@ -3122,19 +3134,19 @@ msgstr ""
 msgid "Same Title"
 msgstr "同一标题"
 
-#: layouts:985
+#: layouts:997
 msgid "Same artist"
 msgstr ""
 
-#: layouts:995
+#: layouts:1007
 msgid "Same rating"
 msgstr ""
 
-#: layouts:975
+#: layouts:987
 msgid "Same title"
 msgstr ""
 
-#: layouts:990
+#: layouts:1002
 msgid "Same year"
 msgstr ""
 
@@ -3462,7 +3474,7 @@ msgstr ""
 msgid "Shift"
 msgstr "Shift"
 
-#: layouts:741
+#: layouts:753
 msgid "Shimmer Queue"
 msgstr ""
 
@@ -3591,7 +3603,7 @@ msgstr "跳过次数"
 msgid "Skip to next song if an error occurs"
 msgstr "如果发生错误跳到下一首歌曲"
 
-#: layouts:810
+#: layouts:822
 msgid "Small album picture"
 msgstr ""
 
@@ -3603,7 +3615,7 @@ msgstr ""
 msgid "Smaller browser"
 msgstr "规模较小的浏览器"
 
-#: gmusicbrowser_list.pm:731 layouts:435 layouts:538 layouts:544 layouts:794
+#: gmusicbrowser_list.pm:731 layouts:435 layouts:538 layouts:544 layouts:806
 msgid "Song"
 msgstr "歌曲"
 
@@ -3668,15 +3680,15 @@ msgstr ""
 msgid "Stop when queue empty"
 msgstr "队列空时停止"
 
-#: layouts:906
+#: layouts:918
 msgid "Stop, Play and Next buttons"
 msgstr ""
 
-#: layouts:911
+#: layouts:923
 msgid "Stop, Play and Next buttons and Time"
 msgstr ""
 
-#: layouts:916
+#: layouts:928
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr ""
 
@@ -3791,17 +3803,21 @@ msgstr ""
 msgid "Title"
 msgstr "标题"
 
-#: layouts:801
+#: layouts:813
 msgid "Title & icon"
 msgstr ""
 
-#: layouts:759
+#: layouts:771
 msgid "Title & progress"
 msgstr ""
 
-#: gmusicbrowser_list.pm:731 layouts:793
+#: gmusicbrowser_list.pm:731 layouts:805
 msgid "Title - Artist - Album"
 msgstr "标题 - 作者 - 专辑"
+
+#: layouts:741
+msgid "Title with customizable prefix"
+msgstr ""
 
 #: plugins/titlebar.pm:9
 msgid "Titlebar"
@@ -4023,7 +4039,7 @@ msgstr "查看二进制"
 msgid "View binary data ..."
 msgstr "查看二进制数据..."
 
-#: layouts:880
+#: layouts:892
 msgid "Volume"
 msgstr ""
 
@@ -5477,8 +5493,16 @@ msgstr ""
 msgid "x offset :"
 msgstr ""
 
+#: layouts:746
+msgid "x padding"
+msgstr ""
+
 #: plugins/titlebar.pm:53
 msgid "y offset :"
+msgstr ""
+
+#: layouts:747
+msgid "y padding"
 msgstr ""
 
 #: gmusicbrowser_list.pm:1547 gmusicbrowser_songs.pm:21

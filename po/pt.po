@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-23 13:58+0100\n"
+"POT-Creation-Date: 2011-01-24 17:11+0100\n"
 "PO-Revision-Date: 2010-12-21 14:24-0300\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese <LL@li.org>\n"
@@ -473,7 +473,7 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:435 layouts:538 layouts:544 layouts:980
+#: plugins/fetch_cover.pm:103 layouts:435 layouts:538 layouts:544 layouts:992
 msgid "Album"
 msgstr "Álbum"
 
@@ -481,11 +481,11 @@ msgstr "Álbum"
 msgid "Album Info"
 msgstr ""
 
-#: layouts:835
+#: layouts:847
 msgid "Album and artist"
 msgstr ""
 
-#: layouts:750
+#: layouts:762
 msgid "Album and artist on the left side"
 msgstr ""
 
@@ -805,11 +805,11 @@ msgstr "Estilo da janela de navegação"
 msgid "Browser with SongTree"
 msgstr "Navegador com Árvore de Músicas"
 
-#: layouts:956
+#: layouts:968
 msgid "Buttons"
 msgstr "Botões"
 
-#: layouts:945
+#: layouts:957
 msgid "Buttons, Song & Cover"
 msgstr "Botões, Músicas & Capa"
 
@@ -1453,7 +1453,7 @@ msgstr ""
 msgid "EpicRating plugin - automatically update ratings"
 msgstr ""
 
-#: layouts:884
+#: layouts:896
 msgid "Equalizer"
 msgstr "Equalizador"
 
@@ -1644,11 +1644,11 @@ msgid "Find songs with the same names"
 msgstr "Procurar músicas com mesmo nome"
 
 #: gmusicbrowser.pl:844 gmusicbrowser.pl:7937 gmusicbrowser_list.pm:724
-#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:827
+#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:839
 msgid "Folder"
 msgstr "Pasta"
 
-#: gmusicbrowser_list.pm:724 layouts:826
+#: gmusicbrowser_list.pm:724 layouts:838
 msgid "Folder (right-aligned)"
 msgstr "Pasta (alinhado à direita)"
 
@@ -1807,18 +1807,18 @@ msgstr "Aumentar Volume"
 msgid "Info"
 msgstr "Informação"
 
-#: layouts:921
+#: layouts:933
 msgid "Insensitive title-artist (left-aligned)"
 msgstr ""
 "Não sensível ao clique do mouse para o título do artista (alinhado à "
 "esquerda)"
 
-#: layouts:927
+#: layouts:939
 msgid "Insensitive title-artist (right-aligned)"
 msgstr ""
 "Não sensível ao clique do mouse para o título do artista (alinhado à direita)"
 
-#: layouts:934
+#: layouts:946
 msgid "Insensitive, Song & Cover"
 msgstr "Não sensível ao clique do mouse, Música & Capa"
 
@@ -1830,7 +1830,7 @@ msgstr "Inserir uma lista de arquivos/pastas no início da lista de reprodução
 msgid "Invalid regular expression"
 msgstr ""
 
-#: layouts:962
+#: layouts:974
 msgid "Invisible hot spot"
 msgstr "Hot spot invísivel"
 
@@ -1842,7 +1842,7 @@ msgstr ""
 msgid "KB"
 msgstr "KB"
 
-#: plugins/karaoke.pm:9 layouts:893
+#: plugins/karaoke.pm:9 layouts:905
 msgid "Karaoke"
 msgstr "Karaokê"
 
@@ -1880,7 +1880,7 @@ msgstr "Etiqueta/Publicar"
 msgid "Labels"
 msgstr "Etiquetas"
 
-#: gmusicbrowser_list.pm:744 layouts:787
+#: gmusicbrowser_list.pm:744 layouts:799
 msgid "Labels' icons"
 msgstr ""
 
@@ -2087,7 +2087,7 @@ msgstr ""
 msgid "Lyrics"
 msgstr "Letras"
 
-#: layouts:968
+#: layouts:980
 msgid "Lyrics (requires lyrics plugin)"
 msgstr "Letras (requer plugin Letras)"
 
@@ -2624,7 +2624,7 @@ msgstr "Tocar todas as músicas deste álbum"
 msgid "Play all songs from this artist"
 msgstr "Tocar todas as músicas deste artista"
 
-#: layouts:901
+#: layouts:913
 msgid "Play button"
 msgstr "Bõtão Tocar"
 
@@ -2684,7 +2684,7 @@ msgstr "Tocando Filtro"
 msgid "Playing Title"
 msgstr "Tocando Título"
 
-#: gmusicbrowser_list.pm:737 layouts:782
+#: gmusicbrowser_list.pm:737 layouts:794
 msgid "Playing and queue icons"
 msgstr ""
 
@@ -2692,7 +2692,7 @@ msgstr ""
 msgid "Playing error : {error}"
 msgstr ""
 
-#: layouts:774
+#: layouts:786
 msgid "Playing/Queue Icon or Track"
 msgstr ""
 
@@ -2748,6 +2748,18 @@ msgstr "Tela de Dicas"
 msgid "Pre-set"
 msgstr "Pre-Configuração"
 
+#: layouts:748
+msgid "Prefix"
+msgstr ""
+
+#: layouts:750
+msgid "Prefix font style"
+msgstr ""
+
+#: layouts:749
+msgid "Prefix font weight"
+msgstr ""
+
 #: gmusicbrowser.pl:402
 msgid "Prepend"
 msgstr "Preceder"
@@ -2784,7 +2796,7 @@ msgstr "Dados Privativos"
 msgid "Produced (P)"
 msgstr "Produzido (P)"
 
-#: layouts:889
+#: layouts:901
 msgid "Progress"
 msgstr "Progresso"
 
@@ -2834,7 +2846,7 @@ msgstr "Modo de fila"
 msgid "Queue, Library & Context"
 msgstr "Fila, Biblioteca & Conteúdo"
 
-#: layouts:768
+#: layouts:780
 msgid "Queue-Item Number"
 msgstr ""
 
@@ -2873,11 +2885,11 @@ msgstr "Edição de modo Aleatório"
 
 #: gmusicbrowser.pl:4621 gmusicbrowser.pl:4658 gmusicbrowser.pl:7822
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
-#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:817
+#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:829
 msgid "Rating"
 msgstr "Avaliação"
 
-#: gmusicbrowser_list.pm:766 layouts:818
+#: gmusicbrowser_list.pm:766 layouts:830
 msgid "Rating (picture)"
 msgstr "Avaliação (imagem)"
 
@@ -3163,19 +3175,19 @@ msgstr ""
 msgid "Same Title"
 msgstr "Mesmo Título"
 
-#: layouts:985
+#: layouts:997
 msgid "Same artist"
 msgstr ""
 
-#: layouts:995
+#: layouts:1007
 msgid "Same rating"
 msgstr ""
 
-#: layouts:975
+#: layouts:987
 msgid "Same title"
 msgstr ""
 
-#: layouts:990
+#: layouts:1002
 msgid "Same year"
 msgstr ""
 
@@ -3508,7 +3520,7 @@ msgstr ""
 msgid "Shift"
 msgstr "Shift"
 
-#: layouts:741
+#: layouts:753
 msgid "Shimmer Queue"
 msgstr ""
 
@@ -3637,7 +3649,7 @@ msgstr "Pular contagem"
 msgid "Skip to next song if an error occurs"
 msgstr "Pular para próxima música se ocorrer um erro"
 
-#: layouts:810
+#: layouts:822
 msgid "Small album picture"
 msgstr ""
 
@@ -3649,7 +3661,7 @@ msgstr "Player Pequeno"
 msgid "Smaller browser"
 msgstr "Navegador Menor"
 
-#: gmusicbrowser_list.pm:731 layouts:435 layouts:538 layouts:544 layouts:794
+#: gmusicbrowser_list.pm:731 layouts:435 layouts:538 layouts:544 layouts:806
 msgid "Song"
 msgstr "Música"
 
@@ -3714,15 +3726,15 @@ msgstr ""
 msgid "Stop when queue empty"
 msgstr "Parar quando a fila esvaziar"
 
-#: layouts:906
+#: layouts:918
 msgid "Stop, Play and Next buttons"
 msgstr "Botões Parar, Tocar e Próxima"
 
-#: layouts:911
+#: layouts:923
 msgid "Stop, Play and Next buttons and Time"
 msgstr "Botões Parar, Tocar e Próxima e Tempo"
 
-#: layouts:916
+#: layouts:928
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr "Botões Parar, Tocar e Próxima e Título/Artista"
 
@@ -3838,17 +3850,21 @@ msgstr "Tempo do som diminuindo devagar no fim da música em segundos"
 msgid "Title"
 msgstr "Título"
 
-#: layouts:801
+#: layouts:813
 msgid "Title & icon"
 msgstr ""
 
-#: layouts:759
+#: layouts:771
 msgid "Title & progress"
 msgstr ""
 
-#: gmusicbrowser_list.pm:731 layouts:793
+#: gmusicbrowser_list.pm:731 layouts:805
 msgid "Title - Artist - Album"
 msgstr "Título - Artista - Álbum"
+
+#: layouts:741
+msgid "Title with customizable prefix"
+msgstr ""
 
 #: plugins/titlebar.pm:9
 msgid "Titlebar"
@@ -4072,7 +4088,7 @@ msgstr "Ver Binário"
 msgid "View binary data ..."
 msgstr "Ver dados binários ..."
 
-#: layouts:880
+#: layouts:892
 msgid "Volume"
 msgstr "Volume"
 
@@ -5536,9 +5552,17 @@ msgstr ""
 msgid "x offset :"
 msgstr "x offset :"
 
+#: layouts:746
+msgid "x padding"
+msgstr ""
+
 #: plugins/titlebar.pm:53
 msgid "y offset :"
 msgstr "y offset :"
+
+#: layouts:747
+msgid "y padding"
+msgstr ""
 
 #: gmusicbrowser_list.pm:1547 gmusicbrowser_songs.pm:21
 msgid "year"

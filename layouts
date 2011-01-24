@@ -743,11 +743,11 @@ head=title:h
 left=2
 vcollapse=
 title: text(markup='<span style="'.style.'" weight="'.weight.'">'.if(prefix, pesc(prefix)).' </span>'.pesc($title),xpad=xpad,ypad=ypad,init_markup='')
-xpad : OptionNumber(name='x padding',default=4)
-ypad : OptionNumber(name='y padding',default=4)
-prefix : OptionText(name='Prefix')
-weight : OptionCombo(default='bold',name='Prefix font weight',list='ultralight|light|normal|bold|ultrabold|heavy')
-style : OptionCombo(default='normal',name='Prefix font style',list='normal|oblique|italic')
+xpad : OptionNumber(name=_"x padding",default=4)
+ypad : OptionNumber(name=_"y padding",default=4)
+prefix : OptionText(name=_"Prefix")
+weight : OptionCombo(default='bold',name=_"Prefix font weight",list='ultralight|light|normal|bold|ultrabold|heavy')
+style : OptionCombo(default='normal',name=_"Prefix font style",list='normal|oblique|italic')
 
 {Group shimmerqueue}
 title=_"Shimmer Queue"
