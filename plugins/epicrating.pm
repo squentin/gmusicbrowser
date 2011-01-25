@@ -15,7 +15,7 @@ author  Daniel Rubin <dan@fracturedproject.net>
 desc    Automatic rating updates on configurable listening behaviour events.
 =cut
 
-# dependencies: Text::CSV, libtext-csv-perl
+# dependencies: Text::CSV, libtext-csv-perl  # dependencies removed by Simon Steinbeiß (commented out export function)
 
 package GMB::Plugin::EPICRATING;
 use strict;
@@ -86,6 +86,7 @@ sub gettimeofday_us {
     require Time::HiRes;
 }
 
+=dop
 sub SaveRatingScoresCSV {
     my ($self) = @_;
 
@@ -94,7 +95,7 @@ sub SaveRatingScoresCSV {
 	_"Save lastplay ratingscore to file",
 	undef, 'save', 'gtk-save', => 'ok', 'gtk-cancel' => 'cancel');
     my $save_response = $file_chooser->run();
-
+    
     if($save_response eq 'ok') {
 	my $filename = $file_chooser->get_filename();
 	open RSF, ">", $filename or warn("Could not save file.");
@@ -131,6 +132,7 @@ sub SaveRatingScoresCSV {
     }
     $file_chooser->destroy();
 }
+=cut
 
 # apply the action this rule specifies.
 sub ApplyRule {
@@ -335,6 +337,7 @@ sub prefbox {
     $default_rating_box->add($set_default_rating_skip_check);
     $default_rating_box->add($set_default_rating_finished_check);
 
+=dop
     my $song_dump_button = Gtk2::Button->new("CSV dump of songs");
 
     my $produce_ratingscore_button = Gtk2::Button->new("Emit CSV of heuristic rating scores");
@@ -342,7 +345,7 @@ sub prefbox {
     $produce_ratingscore_button->signal_connect(clicked => sub {
 	warn "Ready to begin calculating rating scores.";
 	my $rating_scores = $self->SaveRatingScoresCSV();
-
+	
     });
 
     use Text::CSV;
@@ -351,14 +354,14 @@ sub prefbox {
 	    _"Save gmusicbrowser song stats CSV dump as...",
 	    undef, 'save', 'gtk-save' => 'ok', 'gtk-cancel' => 'cancel');
 	my $response = $file_chooser->run();
-
+	
 	if($response eq 'ok') {
 	    my $csv_filename = $file_chooser->get_filename();
 	    open CSVF, ">", $csv_filename or warn "Couldn't open CSV output!";
 
 	    use Data::Dumper;
 	    my $csv = Text::CSV->new ({binary => 1 });
-
+	    
 	    my $all_songs = Filter->new("")->filter;
 	    for my $song_id (@{$all_songs}) {
 		my $rating = ::Songs::Get($song_id, 'rating');
@@ -372,12 +375,13 @@ sub prefbox {
 	}
 	$file_chooser->destroy();
     });
+=cut
 
     $big_vbox->add($rules_scroller);
     $big_vbox->add_with_properties($add_rule_button, "expand", ::FALSE);
     $big_vbox->add_with_properties($default_rating_box, "expand", ::FALSE);
-    $big_vbox->add_with_properties($song_dump_button, "expand", ::FALSE);
-    $big_vbox->add_with_properties($produce_ratingscore_button, "expand", ::FALSE);
+    #$big_vbox->add_with_properties($song_dump_button, "expand", ::FALSE);
+    #$big_vbox->add_with_properties($produce_ratingscore_button, "expand", ::FALSE);
 
     $big_vbox->show_all();
     return $big_vbox;
@@ -390,7 +394,7 @@ use base 'Gtk2::Frame';
 sub ExtraFieldsEditor {
     my ($self) = @_;
     my $hbox = Gtk2::HBox->new();
-
+    
     if($self->{rule}{signal} eq "Skipped") {
 	my $b_label = Gtk2::Label->new(_"Before: ");
 	my $b_entry = Gtk2::Entry->new();
@@ -493,4 +497,3 @@ sub new {
 
     return $self;
 }
-
