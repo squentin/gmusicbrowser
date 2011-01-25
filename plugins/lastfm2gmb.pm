@@ -124,7 +124,7 @@ sub prefbox
     my $tmp_dir=::NewPrefEntry(OPT.'tmp_dir' => _"Temp dir:", width=>50, tip => _"tmp dir for cache store, etc");
     my $user=::NewPrefEntry(OPT.'user' => _"LastFM user:", width=>50, tip => _"lastfm username");
 	my $description=Gtk2::Label->new;
-	$description->set_markup(_"The plugin is based on the Program <b>lastfm2gmb</b> by Sergiy Borodych and is hosted on <a href='https://github.com/bor/lastfm2gmb'>lastfm2gmb - GitHub</a>.");
+	$description->set_markup(_"PRE ALPHA!!! Nothing works!!!\nThe plugin is based on the Program <b>lastfm2gmb</b> by Sergiy Borodych and is hosted on <a href='https://github.com/bor/lastfm2gmb'>lastfm2gmb - GitHub</a>.");
 	$description->set_line_wrap(1);
 	$titlebox->pack_start($description,1,1,0);
 	my $optionbox=Gtk2::VBox->new(0,2);
