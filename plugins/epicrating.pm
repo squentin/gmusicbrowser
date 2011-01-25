@@ -15,7 +15,7 @@ author  Daniel Rubin <dan@fracturedproject.net>
 desc    Automatic rating updates on configurable listening behaviour events.
 =cut
 
-# dependencies: Text::CSV, libtext-csv-perl  # dependencies removed by Simon Steinbeiß (commented out export function)
+# dependencies: Text::CSV, libtext-csv-perl
 
 package GMB::Plugin::EPICRATING;
 use strict;
@@ -86,7 +86,6 @@ sub gettimeofday_us {
     require Time::HiRes;
 }
 
-=dop
 sub SaveRatingScoresCSV {
     my ($self) = @_;
 
@@ -132,7 +131,6 @@ sub SaveRatingScoresCSV {
     }
     $file_chooser->destroy();
 }
-=cut
 
 # apply the action this rule specifies.
 sub ApplyRule {
@@ -337,7 +335,6 @@ sub prefbox {
     $default_rating_box->add($set_default_rating_skip_check);
     $default_rating_box->add($set_default_rating_finished_check);
 
-=dop
     my $song_dump_button = Gtk2::Button->new("CSV dump of songs");
 
     my $produce_ratingscore_button = Gtk2::Button->new("Emit CSV of heuristic rating scores");
@@ -375,13 +372,12 @@ sub prefbox {
 	}
 	$file_chooser->destroy();
     });
-=cut
 
     $big_vbox->add($rules_scroller);
     $big_vbox->add_with_properties($add_rule_button, "expand", ::FALSE);
     $big_vbox->add_with_properties($default_rating_box, "expand", ::FALSE);
-    #$big_vbox->add_with_properties($song_dump_button, "expand", ::FALSE);
-    #$big_vbox->add_with_properties($produce_ratingscore_button, "expand", ::FALSE);
+    $big_vbox->add_with_properties($song_dump_button, "expand", ::FALSE);
+    $big_vbox->add_with_properties($produce_ratingscore_button, "expand", ::FALSE);
 
     $big_vbox->show_all();
     return $big_vbox;
