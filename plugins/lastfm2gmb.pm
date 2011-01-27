@@ -84,38 +84,20 @@ binmode(STDOUT, ":utf8");
 
 
 
-::SetDefaultOptions(OPT, api_uri => "http://ws.audioscrobbler.com/2.0/", key => "4d4019927a5f30dc7d515ede3b3e7f79", mode => "a", rating_loved => "100", tmp_dir => File::Spec->catdir( File::Spec->tmpdir(), 'lastfm2gmb' ), user => "");
-
-my $lastfm2gmbwidget=
-{	class		=> __PACKAGE__,
-	tabicon		=> 'plugin-lastfm2gmb',		# no icon by that name by default (yet)
-	tabtitle	=> _"Artistinfo",
-};
+::SetDefaultOptions(OPT, api_uri => "http://ws.audioscrobbler.com/2.0/", key => "4d4019927a5f30dc7d515ede3b3e7f79", mode => "a", rating_loved => "100", tmp_dir => File::Spec->catdir( File::Spec->tmpdir(), 'lastfm2gmb' ), user => "", quiet => "false", debug => "0");
 
 our $ua = LWP::UserAgent->new( timeout=>15 );
 our $xs = XML::Simple->new(ForceArray=>['track']);
 
 sub Start {
-	Layout::RegisterWidget(PluginLastfm2gmb => $lastfm2gmbwidget);
-	#push @::cMenuAA,\%menuitem;
 }
+
 sub Stop {
-	Layout::RegisterWidget(PluginLastfm2gmb => undef);
-	#@::cMenuAA=  grep $_!=\%menuitem, @::SongCMenu;
-}
-
-
-sub new {
-    my ($class,$options)=@_;
-    my $self = bless Gtk2::VBox->new(0,0), $class;
-
-
-
-    return $self;
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(0,2);
+{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
+
 	my $titlebox=Gtk2::HBox->new(0,0);
     my $api_uri=::NewPrefEntry(OPT.'api_uri' => _"API URI:", width=>50, tip => _"lastFM API request URL");
     my $key=::NewPrefEntry(OPT.'key' => _"User API Key:", width=>50, tip => _"lastfm api key");
@@ -129,8 +111,167 @@ sub prefbox
 	$titlebox->pack_start($description,1,1,0);
 	my $optionbox=Gtk2::VBox->new(0,2);
 	$optionbox->pack_start($_,0,0,1) for $api_uri,$key,$mode,$rating_loved,$tmp_dir,$user;
-	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$optionbox;
+
+    my $button=Gtk2::Button->new(_"Make it now");
+    $button->signal_connect('clicked', sub {
+        make_it_now
+    });
+
+	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$optionbox,$button;
 	return $vbox;
+}
+
+sub make_it_now {
+    if ( $::Options{OPT.'cache'} and ! -d $::Options{OPT.'tmp_dir'} ) {
+        mkdir($::Options{OPT.'tmp_dir'}) or die "Can't create tmp dir $::Options{OPT.'tmp_dir'}: $!";
+    }
+    die "Unknown mode!" unless $::Options{OPT.'mode'}=~/[pl]/;
+
+    my $bus = Net::DBus->session;
+    my $service = $bus->get_service("org.gmusicbrowser");
+    my $gmb_obj = $service->get_object("/org/gmusicbrowser","org.gmusicbrowser");
+
+    $| = 1;
+    my %stats = ( imported_playcount => 0, imported_lastplay => 0, imported_loved => 0, lastfm_plays => 0, skiped => 0 );
+    my $gmb_library = {};
+    my $lastfm_library = {};
+
+    # get current gmb library
+    print "Looking up gmb library " unless $::Options{OPT.'quiet'};
+    print "\n" if $::Options{OPT.'debug'} >= 2;
+    foreach my $id ( @{$gmb_obj->GetLibrary} ) {
+        my $artist = $gmb_obj->Get([$id,'artist']) or next;
+        my $title = $gmb_obj->Get([$id,'title']) or next;
+        utf8::decode($artist);
+        utf8::decode($title);
+        $artist = lc($artist);
+        $title = lc($title);
+        # TODO: if multiple song's with same names when skip it now
+        if ( $gmb_library->{$artist}{$title} ) {
+            print "[$id] $artist - $title : found dup - skiped\n" if $::Options{OPT.'debug'} >= 2;
+            $gmb_library->{$artist}{$title} = { skip => 1 };
+            $stats{skiped}++;
+        }
+        else {
+            print "[$id] $artist - $title : " if $::Options{OPT.'debug'} >= 2;
+            $gmb_library->{$artist}{$title}{id} = $id;
+            if ( $::Options{OPT.'mode'}=~m/p/o ) {
+                $gmb_library->{$artist}{$title}{playcount} = $gmb_obj->Get([$id,'playcount']) || 0;
+                $gmb_library->{$artist}{$title}{lastplay} = $gmb_obj->Get([$id,'lastplay']) || 0;
+                print "playcount: $gmb_library->{$artist}{$title}{playcount} lastplay: $gmb_library->{$artist}{$title}{lastplay} "
+                    if $::Options{OPT.'debug'} >= 2;
+            }
+            if ( $::Options{OPT.'mode'}=~m/l/o ) {
+                $gmb_library->{$artist}{$title}{rating} = $gmb_obj->Get([$id,'rating']) || 0;
+                print "rating: $gmb_library->{$artist}{$title}{rating}" if $::Options{OPT.'debug'} >= 2;
+            }
+            print "\n" if $::Options{OPT.'debug'} >= 2;
+        }
+        $stats{gmb_tracks}++;
+        print '.' unless $::Options{OPT.'quiet'} or $stats{gmb_tracks} % 100;
+        last if $stats{gmb_tracks} > 100 and $::Options{OPT.'debug'} >= 3;
+    }
+    print " $stats{gmb_tracks} tracks ($stats{skiped} skipped as dup)\n" unless $::Options{OPT.'quiet'};
+
+    our $ua = LWP::UserAgent->new( timeout=>15 );
+    our $xs = XML::Simple->new(ForceArray=>['track']);
+
+    # playcount & lastplay
+    if ( $::Options{OPT.'mode'}=~m/p/ ) {
+        # get weekly chart list
+        my $charts_data = lastfm_request({method=>'user.getWeeklyChartList'}) or die 'Cant get data from lastfm';
+        # add current (last) week
+        my $last_week_from = $charts_data->{weeklychartlist}{chart}[$#{$charts_data->{weeklychartlist}{chart}}]{to};
+        push @{$charts_data->{weeklychartlist}{chart}}, { from=>$last_week_from, to=>time() }
+            if $last_week_from < time();
+        print "LastFM request 'WeeklyChartList' found ".scalar(@{$charts_data->{weeklychartlist}{chart}})." pages\n"
+            unless $::Options{OPT.'quiet'};
+        # clean 'last week' pages workaround
+        unlink(glob(File::Spec->catfile($::Options{OPT.'tmp_dir'},"WeeklyTrackChart-$::Options{OPT.'user'}-$last_week_from-*")));
+        # get weekly track chart
+        print "LastFM request 'WeeklyTrackChart' pages " unless $::Options{OPT.'quiet'};
+        foreach my $date ( @{$charts_data->{weeklychartlist}{chart}} ) {
+            print "$date->{from}-$date->{to}.." if $::Options{OPT.'debug'};
+            print '.' unless $::Options{OPT.'quiet'};
+            my $data = lastfm_get_weeklytrackchart({from=>$date->{from},to=>$date->{to}});
+            foreach my $title ( keys %{$data->{weeklytrackchart}{track}} ) {
+                my $artist = lc($data->{weeklytrackchart}{track}{$title}{artist}{name}||$data->{weeklytrackchart}{track}{$title}{artist}{content});
+                my $playcount = $data->{weeklytrackchart}{track}{$title}{playcount};
+                $title = lc($title);
+                print "$artist - $title - $playcount\n" if $::Options{OPT.'debug'} >= 2;
+                if ( $gmb_library->{$artist}{$title} and $gmb_library->{$artist}{$title}{id} ) {
+                    $lastfm_library->{$artist}{$title}{playcount} += $playcount;
+                    $lastfm_library->{$artist}{$title}{lastplay} = $date->{from}
+                        if ( !$lastfm_library->{$artist}{$title}{lastplay}
+                                or $lastfm_library->{$artist}{$title}{lastplay} < $date->{from} );
+                }
+                $stats{lastfm_plays} += $playcount;
+            }
+            last if $::Options{OPT.'debug'} >= 3;
+        }
+        print " total $stats{lastfm_plays} plays\n" unless $::Options{OPT.'quiet'};
+    }
+
+    # loved tracks (rating)
+    if ( $::Options{OPT.'mode'}=~m/l/ ) {
+        # first request for get totalPages
+        my $data = lastfm_request({method=>'user.getLovedTracks'}) or die 'Cant get data from lastfm';
+        die "Something wrong: status = $data->{status}" unless $data->{status} eq 'ok';
+        my $pages = $data->{lovedtracks}{totalPages};
+        print "LastFM request 'getLovedTracks' found $pages pages ($data->{lovedtracks}{total} tracks)\n" unless $::Options{OPT.'quiet'};
+        print "LastFM request 'getLovedTracks' pages " unless $::Options{OPT.'quiet'};
+        for ( my $p = 1; $p <= $pages; $p++ ) {
+            print "$p.." if $::Options{OPT.'debug'};
+            print '.' unless $::Options{OPT.'quiet'};
+            $data = lastfm_request({method=>'user.getLovedTracks',page=>$p}) or die "Cant get data from lastfm";
+            foreach my $title ( keys %{$data->{lovedtracks}{track}} ) {
+                my $artist = lc($data->{lovedtracks}{track}{$title}{artist}{name}||$data->{lovedtracks}{track}{$title}{artist}{content});
+                $title = lc($title);
+                print "$artist - $title is a loved\n" if $::Options{OPT.'debug'} >= 2;
+                if ( $gmb_library->{$artist}{$title} and $gmb_library->{$artist}{$title}{id} ) {
+                    $lastfm_library->{$artist}{$title}{rating} = $::Options{OPT.'rating_loved'};
+                }
+            }
+        }
+        print "\n" unless $::Options{OPT.'quiet'};
+    }
+
+    # import info to gmb
+    print "Import to gmb " unless $::Options{OPT.'quiet'};
+    foreach my $artist ( sort keys %{$lastfm_library} ) {
+        print '.' unless $::Options{OPT.'quiet'};
+        print "$artist\n" if $::Options{OPT.'debug'} >= 2;
+        foreach my $title ( keys %{$lastfm_library->{$artist}} ) {
+            my $e;
+            print " $title - $lastfm_library->{$artist}{$title}{playcount} <=> $gmb_library->{$artist}{$title}{playcount}\n" if $::Options{OPT.'debug'} >= 2;
+            # playcount
+            if ( $lastfm_library->{$artist}{$title}{playcount}
+                    and $lastfm_library->{$artist}{$title}{playcount} > $gmb_library->{$artist}{$title}{playcount} ) {
+                print "  $artist - $title : playcount : $gmb_library->{$artist}{$title}{playcount} -> $lastfm_library->{$artist}{$title}{playcount}\n" if $::Options{OPT.'debug'};
+                $gmb_obj->Set([ $gmb_library->{$artist}{$title}{id}, 'playcount', $lastfm_library->{$artist}{$title}{playcount}])
+                    or $e++ and warn " error setting 'playcount' for track ID $gmb_library->{$artist}{$title}{id}\n";
+                $e ? $stats{errors}++ : $stats{imported_playcount}++;
+            }
+            # lastplay
+            if ( $lastfm_library->{$artist}{$title}{lastplay}
+                    and $lastfm_library->{$artist}{$title}{lastplay} > $gmb_library->{$artist}{$title}{lastplay} ) {
+                print "  $artist - $title : lastplay : $gmb_library->{$artist}{$title}{lastplay} -> $lastfm_library->{$artist}{$title}{lastplay}\n" if $::Options{OPT.'debug'};
+                $gmb_obj->Set([ $gmb_library->{$artist}{$title}{id}, 'lastplay', $lastfm_library->{$artist}{$title}{lastplay} ])
+                    or $e++ and warn " error setting 'lastplay' for track ID $gmb_library->{$artist}{$title}{id}\n";
+                $e ? $stats{errors}++ : $stats{imported_lastplay}++;
+            }
+            # loved
+            if ( $lastfm_library->{$artist}{$title}{rating}
+                    and $lastfm_library->{$artist}{$title}{rating} > $gmb_library->{$artist}{$title}{rating} ) {
+                $gmb_obj->Set([ $gmb_library->{$artist}{$title}{id}, 'rating', $lastfm_library->{$artist}{$title}{rating}])
+                                or $e++ and warn " error setting 'rating' for track ID $gmb_library->{$artist}{$title}{id}\n";
+                $e ? $stats{errors}++ : $stats{imported_loved}++;
+            }
+        }
+    }
+
+    print "\nImported : playcount - $stats{imported_playcount}, lastplay - $stats{imported_lastplay}, loved - $stats{imported_loved}. " . ($stats{errors} ? $stats{errors} : 'No') . " errors detected.\n"
+        unless $::Options{OPT.'quiet'};
 }
 
 

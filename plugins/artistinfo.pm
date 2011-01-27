@@ -11,7 +11,8 @@ title	Artistinfo plugin
 version	0.4
 author  Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 author  Pasi Lallinaho <pasi@shimmerproject.org>
-desc	This plugin retrieves artist-relevant information (biography, upcoming events) from last.fm.
+desc	This plugin retrieves artist-relevant information (biography, upcoming events, similar artists) from last.fm.
+url	http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo
 =cut
 
 package GMB::Plugin::ARTISTINFO;
@@ -27,16 +28,16 @@ use constant
 
 my %sites =
 (
-	biography => ['http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1&lang='.$::Options{OPT.'Language'},_"biography",_"Show artist's biography"],
+	biography => ['http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',_"biography",_"Show artist's biography"],
 	events => ['http://ws.audioscrobbler.com/2.0/?method=artist.getevents&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',_"events",_"Show artist's upcoming events"],
 	similar => ['http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1&limit=%l',_"similar",_"Show similar artists"]);
 
 my @External=
-(	['lastfm',	"http://www.lastfm.".$::Options{OPT.'Domain'}."/music/%a",								_"Show Artist page on last.fm"],
-	['wikipedia',	"http://".$::Options{OPT.'Domain'}.".wikipedia.org/wiki/%a",							_"Show Artist page on wikipedia"],
-	['youtube',	"http://www.youtube.".$::Options{OPT.'Domain'}."/results?search_type=&aq=1&search_query=%a",			_"Search for Artist on youtube"],
-	['amazon',	"http://www.amazon.".$::Options{OPT.'Domain'}."/s/ref=nb_sb_noss?url=search-alias=aps&field-keywords=%a",	_"Search amazon.com for Artist"],
-	['google',	"http://www.google.".$::Options{OPT.'Domain'}."/search?q=%a",							_"Search google for Artist" ],
+(	['lastfm',	"http://www.last.fm/music/%a",								_"Show Artist page on last.fm"],
+	['wikipedia',	"http://en.wikipedia.org/wiki/%a",							_"Show Artist page on wikipedia"],
+	['youtube',	"http://www.youtube.com/results?search_type=&aq=1&search_query=%a",			_"Search for Artist on youtube"],
+	['amazon',	"http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias=aps&field-keywords=%a",	_"Search amazon.com for Artist"],
+	['google',	"http://www.google.at/search?q=%a",							_"Search google for Artist" ],
 	['allmusic',	"http://www.allmusic.com/search/artist/%a",						_"Search allmusic for Artist" ],
 	['pitchfork',	"http://pitchfork.com/search/?search_type=standard&query=%a",				_"Search pitchfork for Artist" ],
 	['discogs',	"http://www.discogs.com/artist/%a",							_"Search discogs for Artist" ],
@@ -60,7 +61,7 @@ my @similarity=
 # lastfm api key 7aa688c2466dc17263847da16f297835
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
 
-::SetDefaultOptions(OPT, Lang => "en", Domain => "com", PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", SimilarLimit => "15", SimilarRating => "50", Eventformat => "%title at %name<br>%startDate<br>%city (%country)<br><br>");
+::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", SimilarLimit => "15", SimilarRating => "50", Eventformat => '%title at %name<br>%startDate<br>%city (%country)<br><br>', Eventformat_history => (['%title<br>%startDate<br><br>','%title on %startDate<br><br>']));
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
@@ -123,7 +124,7 @@ sub new
 	$textview->signal_connect(motion_notify_event 	=> \&update_cursor_cb);
 	$textview->signal_connect(visibility_notify_event=>\&update_cursor_cb);
 	$textview->signal_connect(query_tooltip => \&update_cursor_cb);
-
+	
 	my $store=Gtk2::ListStore->new('Glib::String','Glib::Double','Glib::String','Glib::UInt','Glib::String');
 	my $treeview=Gtk2::TreeView->new($store);
 	my $tc_artist=Gtk2::TreeViewColumn->new_with_attributes( _"Artist",Gtk2::CellRendererText->new,markup=>0);
@@ -139,7 +140,7 @@ sub new
 	$treeview->set_rules_hint(1);
 	$treeview->signal_connect(button_press_event => \&tv_contextmenu);
 	$treeview->{store}=$store;
-
+	
 	my $togglebox = Gtk2::HBox->new();
 	my $group;
 	foreach my $key (sort keys %sites)
@@ -163,7 +164,7 @@ sub new
 	$statbox->pack_start($togglebox,0,0,0);
 	$self->{buffer}=$textview->get_buffer;
 	$self->{store}=$store;
-
+	
 	my $infobox = Gtk2::HBox->new;
 	$infobox->set_spacing(0);
 	my $sw1=Gtk2::ScrolledWindow->new;
@@ -179,7 +180,7 @@ sub new
 	else { $textview->show; $sw1->set_no_show_all(1); }
 	$self->{sw1} = $sw1;
 	$self->{sw2} = $sw2;
-
+	
 	$self->pack_start($artistbox,0,0,0);
 	$self->pack_start($infobox,1,1,0);
 
@@ -209,30 +210,33 @@ sub cancel
 
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(0,2);
-	my $titlebox=Gtk2::HBox->new(0,0);
-    my $language=::NewPrefEntry(OPT.'Language' => _"Language", width=>5, tip => _"Language for last.fm artist info. (e.g. en, de, sp, fr, ...)");
-    my $domain=::NewPrefEntry(OPT.'Domain' => _"Domain", width=>5, tip => _"Additional domain for Last.fm, Amazon and so on.");
-	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>30);
+	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>50);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
 	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text1=>_"Artist Picture Size : ", text2=>_"(applied after restart)");
-	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", width=>50, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'");
-	my $similar_limit=::NewPrefSpinButton(OPT.'SimilarLimit',0,500, step=>1, page=>10, text1=>_"Limit similar artists to the first : ", tip=>_"0 means no limit");
+	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", width=>80, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'", history=>OPT.'Eventformat_history');
+	my $eventformat_reset=Gtk2::Button->new(_"reset format");
+	$eventformat_reset->{format_combo}=$eventformat;
+	$eventformat_reset->signal_connect(clicked => sub {
+		my $self = shift;
+		my $prefentry = $self->{format_combo};
+		my ($combo) = grep $_->isa("Gtk2::ComboBoxEntry"), $prefentry->get_children;
+		$combo->child->set_text('%title at %name<br>%startDate<br>%city (%country)<br><br>');
+		$::Options{OPT.'Eventformat'} = '%title at %name<br>%startDate<br>%city (%country)<br><br>';
+	});
+	my $similar_limit=::NewPrefSpinButton(OPT.'SimilarLimit',0,500, step=>1, page=>10, text1=>_"Limit similar artists to the first : ", tip=>_"0 means 'show all'");
 	my $similar_rating=::NewPrefSpinButton(OPT.'SimilarRating',0,100, step=>1, text1=>_"Limit similar artists to a rate of similarity : ", tip=>_"last.fm's similarity categories:\n>90 super\n>70 very high\n>50 high\n>30 medium\n>10 lower");
-	my $lastfmimage=Gtk2::Image->new_from_stock("plugin-artistinfo-lastfm",'dnd');
-	my $lastfm=Gtk2::Button->new;
-	$lastfm->set_image($lastfmimage);
-	$lastfm->set_tooltip_text(_"Open last.fm website in your browser");
-	$lastfm->signal_connect(clicked => sub { ::main::openurl("http://www.lastfm.".$::Options{OPT.'Domain'}."/music/"); } );
-	$lastfm->set_relief("none");
-	my $description=Gtk2::Label->new;
-	$description->set_markup(_"For information on how to use this plugin, please navigate to the <a href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>.");
-	$description->set_line_wrap(1);
-	$titlebox->pack_start($description,1,1,0);
+	my $lastfm=::NewIconButton('plugin-artistinfo-lastfm',undef,sub { ::main::openurl("http://www.last.fm/music/"); },'none',_"Open last.fm website in your browser");
+	my $titlebox=Gtk2::HBox->new(0,0);
+	$titlebox->pack_start($picsize,1,1,0);
 	$titlebox->pack_start($lastfm,0,0,5);
-	my $optionbox=Gtk2::VBox->new(0,2);
-	$optionbox->pack_start($_,0,0,1) for $language,$domain,$entry,$preview,$autosave,$picsize,$eventformat,$similar_limit,$similar_rating;
-	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$optionbox;
+	my $frame_bio=Gtk2::Frame->new(_"biography");
+	$frame_bio->add(::Vpack($entry,$preview,$autosave));
+	my $frame_events=Gtk2::Frame->new(_"events");
+	$frame_events->add(::Hpack($eventformat,$eventformat_reset));
+	my $frame_similar=Gtk2::Frame->new(_"similar artists");
+	$frame_similar->add(::Vpack($similar_limit,$similar_rating));
+	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$frame_bio,$frame_events,$frame_similar;
 	return $vbox;
 }
 
@@ -284,7 +288,7 @@ sub tv_contextmenu {
 	}
 	return 1;
 	}
-
+	
 }
 
 sub CreateSearchMenu {
@@ -403,7 +407,7 @@ sub ArtistChanged
 				}
 			}
 		}
-		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);
+		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);	
 	}
 }
 
@@ -469,7 +473,7 @@ sub loaded
 		}
 		for my $event (split /<\/event>/, $data) {
 			my %event;
-			$event{$1} = ::decode_html($2) while $event=~ m#<(\w+)>([^<]*)</\1>#g;
+			$event{$1} = ::decode_html($2) while $event=~ m#<(\w+)>([^<]*)</\1>#g; # FIXME: add workaround for description (which includes <tags>)
 			next unless $event{id}; # otherwise the last </events> is also treated like an event
 			$event{startDate} = substr($event{startDate},0,-9); # cut the useless time (hh:mm:ss) from the date
 			my $format = $::Options{OPT.'Eventformat'};
@@ -504,7 +508,7 @@ sub loaded
 				}
 				$self->{store}->set($self->{store}->append,0,::PangoEsc($s_artist{name}).$stats,1,$s_artist{match} * 100,2,$s_artist{url},3,$aID,4,$s_artist{name});
 			}
-
+			
 		}
 	}
 	$self->Save_text if $::Options{OPT.'AutoSave'} && $artistinfo_ok && $artistinfo_ok==1;
