@@ -146,22 +146,10 @@ our %Widgets=
 		field	=> 'first_artist',
 		tip	=> _"Lock on Artist",
 	},
-	LockArtistBreadcrumb =>
-	{	parent	=> 'Lock',
-		field	=> 'first_artist',
-		tip	=> _"Lock on Artist",
-		stock	=> { on => 'gmb-lock', off => 'gmb-breadcrumb gmb-locklight' },
-	},
 	LockAlbum =>
 	{	parent	=> 'Lock',
 		field	=> 'album',
 		tip	=> _"Lock on Album",
-	},
-	LockAlbumBreadcrumb =>
-	{	parent	=> 'Lock',
-		field	=> 'album',
-		tip	=> _"Lock on Album",
-		stock	=> { on => 'gmb-lock', off => 'gmb-breadcrumb gmb-locklight' },
 	},
 	Sort =>
 	{	class	=> 'Layout::Button',

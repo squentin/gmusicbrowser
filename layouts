@@ -14,7 +14,7 @@ HBTop		= VBButtons _15VBPlayer 15VBToggle VBSearchBox -5VBSettings
 VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle HBTimeSlider
-HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip="Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbumBreadcrumb AlbumBreadcrumb(tip="Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtistBreadcrumb ArtistBreadcrumb(tip="Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
+HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip="Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip="Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip="Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 VBToggle	= HBToggle 5Filler1
 HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1,tip="Simple List View") ToggleButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1,tip="Songtree View") ToggleButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1,tip="Mosaic View")
@@ -465,11 +465,10 @@ KeyBindings	= Escape CloseWindow
 title=disc on the left side
 head=3
 left=width
-vcollapse=head+title:h+line:h
-title:	text(markup='<b><big>'.pesc($title).'</big></b>',pad=2,w=left)
+vcollapse=head+title:h+line:h+2
+title:	text(markup='<b><big>'.pesc($title).'</big></b>'.if(!$_expanded,'<big><b>»</b></big>'),pad=2,w=left))
 width:	OptionNumber(default=15,min=10,max=100,step=1)
 line: line(x1=1,y1=1,x2=$_w,y2=1,color='#ccc',width=1)
-#,hide=$disc==0)
 
 {Group artistalbum_breadcrumbs}
 title=album and artist breadcrumbs
