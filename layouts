@@ -116,7 +116,7 @@ VolumeScroll	= VBmain
 Type=B
 Default = Window(size=1120x800) HPLists1(size=0-1) HPLists2(size=0-1)
 VBmain  = _VBTreeAndInfo
-    VBTreeAndInfo = HBStatus 10_VPFilterLists
+    VBTreeAndInfo = HBStatus _VPFilterLists VProgress
         VPFilterLists = HBFilterPanes HPLists
 
         HBFilterPanes = _HBArtist _HBAlbum
