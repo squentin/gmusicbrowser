@@ -2136,7 +2136,8 @@ sub Paned_size_cb
 	my $size2=$self->{size2};
 	if (defined $size1 && defined $size2 && abs($max-$size1-$size2)>5)
 	{	if    ($self->child1_resize && !$self->child2_resize)		{ $size1= ::max($max-$size2,0); }
-		elsif (!($self->child2_resize && !$self->child1_resize))	{ $size1= $max*$size1/($size1+$size2); }
+		elsif ($self->child2_resize && !$self->child1_resize)		{ $size1= $max if $size1>$max; }
+		else								{ $size1= $max*$size1/($size1+$size2); }
 		$self->set_position( $size1 );
 		$self->{size1}= $size1;
 		$self->{size2}= ::max($max-$size1,0);
