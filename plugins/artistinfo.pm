@@ -439,14 +439,18 @@ sub loaded
 	my $iter=$buffer->get_start_iter;
 
 	my $fontsize = $self->{fontsize};
+	my $tag_extra = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'left');
 	my $tag_noresults=$buffer->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
 	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
 	my ($artistinfo_ok,$infoheader);
 
 	if ($self->{site} eq "biography") {
 		$infoheader = "Artist Biography";
-		$data =~ m/<content><\!\[CDATA\[(.*)/gi;
-		$data = $1;
+		$data =~ m#^.*<url>(.*?)</url>.*<listeners>(.*?)</listeners>.*<playcount>(.*?)</playcount>.*<content><\!\[CDATA\[(.*?)[\n].*$\]\]></content>#s; # last part of the regexp removes the license-notice (=last line)
+		my $url = $1.'/+wiki/edit'; # TODO: create "edit"-link for the last.fm wiki (ideally with the blue text plus original or similar icon)
+		my $listeners = $2; # TODO: add listeners and playcount (also in load file)
+		my $playcount = $3;
+		$data = $4;
 		for ($data) {
 			s/<br \/>|<\/p>/\n/gi; # never more than one empty line
 			s/\n\n/\n/gi; # never more than one empty line (again)
@@ -456,15 +460,13 @@ sub loaded
 		else { $artistinfo_ok = "1"; }
 		$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 		$buffer->insert($iter,$data);
+		#$buffer->insert_with_tags($iter,"\n\nListeners: ".$listeners."  |   Playcount: ".$playcount,$tag_extra);
 		$self->{infoheader}=$infoheader;
 		$self->{biography} = $data;
-		# TODO: add listeners and playcount
-		# TODO: create "edit"-link for the last.fm wiki (ideally with the blue text plus original or similar icon)
-		#$href->{url}= 'http://www.last.fm/music/'..'/+wiki/edit';
 	}
 
 	elsif ($self->{site} eq "events") {
-		my $tag = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'left');
+		
 		if ($data =~ m#total=\"(.*?)\">#g) {
 			if ( $1 == 1) { $infoheader = $1 ." Upcoming Event\n\n"; }
 			elsif ( $1 == 0) { $self->set_buffer(_"No results found"); return; }
@@ -486,7 +488,7 @@ sub loaded
 			$buffer->insert($iter,$first);
 			my $offset2 = $iter->get_offset;
 			$buffer->apply_tag($href,$buffer->get_iter_at_offset($offset1),$buffer->get_iter_at_offset($offset2));
-			$buffer->insert_with_tags($iter,"\n".$rest,$tag) if $rest;
+			$buffer->insert_with_tags($iter,"\n".$rest,$tag_extra) if $rest;
 		}
 
 	}
