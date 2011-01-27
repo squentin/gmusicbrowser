@@ -11,7 +11,8 @@ title	Artistinfo plugin
 version	0.4
 author  Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 author  Pasi Lallinaho <pasi@shimmerproject.org>
-desc	This plugin retrieves artist-relevant information (biography, upcoming events) from last.fm.
+desc	This plugin retrieves artist-relevant information (biography, upcoming events, similar artists) from last.fm.
+url	http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo
 =cut
 
 package GMB::Plugin::ARTISTINFO;
@@ -60,7 +61,7 @@ my @similarity=
 # lastfm api key 7aa688c2466dc17263847da16f297835
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
 
-::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", SimilarLimit => "15", SimilarRating => "50", Eventformat => "%title at %name<br>%startDate<br>%city (%country)<br><br>");
+::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", SimilarLimit => "15", SimilarRating => "50", Eventformat => '%title at %name<br>%startDate<br>%city (%country)<br><br>', Eventformat_history => (['%title<br>%startDate<br><br>','%title on %startDate<br><br>']));
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
@@ -209,28 +210,33 @@ sub cancel
 
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(0,2);
-	my $titlebox=Gtk2::HBox->new(0,0);
-	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>30);
+	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>50);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
 	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text1=>_"Artist Picture Size : ", text2=>_"(applied after restart)");
-	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", width=>50, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'");
-	my $similar_limit=::NewPrefSpinButton(OPT.'SimilarLimit',0,500, step=>1, page=>10, text1=>_"Limit similar artists to the first : ", tip=>_"0 means no limit");
+	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", width=>80, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'", history=>OPT.'Eventformat_history');
+	my $eventformat_reset=Gtk2::Button->new(_"reset format");
+	$eventformat_reset->{format_combo}=$eventformat;
+	$eventformat_reset->signal_connect(clicked => sub {
+		my $self = shift;
+		my $prefentry = $self->{format_combo};
+		my ($combo) = grep $_->isa("Gtk2::ComboBoxEntry"), $prefentry->get_children;
+		$combo->child->set_text('%title at %name<br>%startDate<br>%city (%country)<br><br>');
+		$::Options{OPT.'Eventformat'} = '%title at %name<br>%startDate<br>%city (%country)<br><br>';
+	});
+	my $similar_limit=::NewPrefSpinButton(OPT.'SimilarLimit',0,500, step=>1, page=>10, text1=>_"Limit similar artists to the first : ", tip=>_"0 means 'show all'");
 	my $similar_rating=::NewPrefSpinButton(OPT.'SimilarRating',0,100, step=>1, text1=>_"Limit similar artists to a rate of similarity : ", tip=>_"last.fm's similarity categories:\n>90 super\n>70 very high\n>50 high\n>30 medium\n>10 lower");
-	my $lastfmimage=Gtk2::Image->new_from_stock("plugin-artistinfo-lastfm",'dnd');
-	my $lastfm=Gtk2::Button->new;
-	$lastfm->set_image($lastfmimage);
-	$lastfm->set_tooltip_text(_"Open last.fm website in your browser");
-	$lastfm->signal_connect(clicked => sub { ::main::openurl("http://www.last.fm/music/"); } );
-	$lastfm->set_relief("none");
-	my $description=Gtk2::Label->new;
-	$description->set_markup(_"For information on how to use this plugin, please navigate to the <a href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>.");
-	$description->set_line_wrap(1);
-	$titlebox->pack_start($description,1,1,0);
+	my $lastfm=::NewIconButton('plugin-artistinfo-lastfm',undef,sub { ::main::openurl("http://www.last.fm/music/"); },'none',_"Open last.fm website in your browser");
+	my $titlebox=Gtk2::HBox->new(0,0);
+	$titlebox->pack_start($picsize,1,1,0);
 	$titlebox->pack_start($lastfm,0,0,5);
-	my $optionbox=Gtk2::VBox->new(0,2);
-	$optionbox->pack_start($_,0,0,1) for $entry,$preview,$autosave,$picsize,$eventformat,$similar_limit,$similar_rating;
-	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$optionbox;
+	my $frame_bio=Gtk2::Frame->new(_"biography");
+	$frame_bio->add(::Vpack($entry,$preview,$autosave));
+	my $frame_events=Gtk2::Frame->new(_"events");
+	$frame_events->add(::Hpack($eventformat,$eventformat_reset));
+	my $frame_similar=Gtk2::Frame->new(_"similar artists");
+	$frame_similar->add(::Vpack($similar_limit,$similar_rating));
+	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$frame_bio,$frame_events,$frame_similar;
 	return $vbox;
 }
 
@@ -467,7 +473,7 @@ sub loaded
 		}
 		for my $event (split /<\/event>/, $data) {
 			my %event;
-			$event{$1} = ::decode_html($2) while $event=~ m#<(\w+)>([^<]*)</\1>#g;
+			$event{$1} = ::decode_html($2) while $event=~ m#<(\w+)>([^<]*)</\1>#g; # FIXME: add workaround for description (which includes <tags>)
 			next unless $event{id}; # otherwise the last </events> is also treated like an event
 			$event{startDate} = substr($event{startDate},0,-9); # cut the useless time (hh:mm:ss) from the date
 			my $format = $::Options{OPT.'Eventformat'};
