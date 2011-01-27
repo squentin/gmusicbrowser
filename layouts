@@ -28,7 +28,7 @@ VBMain = HPControlsInfoAndSearch _HPContent
 
                     HBCurrentTrack = 10_VBCurrentTrack
                         VBCurrentTrack = _Filler1 Cover(click1="",overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0) _Filler11 HBReplayButtons
-                    VBSavedFilterPane = _FilterPane4(nb=0,hide=0)
+                    VBSavedFilterPane = _FilterPane4(nb=0,hidebb=1,page=savedtree,pages=savedtree)
 
                 VPfp0 = _VPfp1 HPFilterPaneAndSongTree
                     HPFilterPaneAndSongTree = VBSavedFilterPane _VBSongTreeAndProgress
