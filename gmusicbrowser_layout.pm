@@ -2117,12 +2117,14 @@ sub PanedPack
 sub PanedNew
 {	my ($class,$opt)=@_;
 	my $self=$class->new;
-	($self->{size1},$self->{size2})= split /-|_/, $opt->{size} if defined $opt->{size};
+	::setlocale(::LC_NUMERIC, 'C');
+	($self->{size1},$self->{size2})= map $_+0, split /-|_/, $opt->{size} if defined $opt->{size};	# +0 to make the conversion to numeric while LC_NUMERIC is set to C
+	::setlocale(::LC_NUMERIC, '');
 	if (defined $self->{size1})
 	{	$self->set_position($self->{size1});
 		$self->set('position-set',1); # in case $self->{size1}==0 'position-set' is not set to true if child1's size is 0 (which is the case here as child1 doesn't exist yet)
 	}
-	$self->{SaveOptions}=sub { size => $_[0]{size1} .'-'. $_[0]{size2} };
+	$self->{SaveOptions}=sub { ::setlocale(::LC_NUMERIC, 'C'); my $s=$_[0]{size1} .'-'. $_[0]{size2}; ::setlocale(::LC_NUMERIC, ''); return size => $s };
 	$self->signal_connect(size_allocate => \&Paned_size_cb ); #needed to correctly save/restore the handle position
 	return $self;
 }
@@ -2134,7 +2136,8 @@ sub Paned_size_cb
 	my $size2=$self->{size2};
 	if (defined $size1 && defined $size2 && abs($max-$size1-$size2)>5)
 	{	if    ($self->child1_resize && !$self->child2_resize)		{ $size1= ::max($max-$size2,0); }
-		elsif (!($self->child2_resize && !$self->child1_resize))	{ $size1= $max*$size1/($size1+$size2); }
+		elsif ($self->child2_resize && !$self->child1_resize)		{ $size1= $max if $size1>$max; }
+		else								{ $size1= $max*$size1/($size1+$size2); }
 		$self->set_position( $size1 );
 		$self->{size1}= $size1;
 		$self->{size2}= ::max($max-$size1,0);
