@@ -114,7 +114,7 @@ VolumeScroll	= VBmain
 
 [Arkanoid browser]
 Type=B
-Default = Window(size=1120x800) HPLists1(size=0-1) HPLists2(size=0-1)
+Default = Window(size=1120x800)
 VBmain  = _VBTreeAndInfo
     VBTreeAndInfo = HBStatus _VPFilterLists VProgress
         VPFilterLists = HBFilterPanes HPLists
@@ -125,31 +125,31 @@ VBmain  = _VBTreeAndInfo
 
         HBStatus = HistItem(group=1) ResetFilter(group=1) Refresh(group=1) PlayFilter(group=1) FilterLock(group=1) -Pref(stock=gtk-preferences,size=button) -SimpleSearch(group=1,nb=1)
 
-        HPLists = FRSongTree HPLists1
+        HPLists = FRSongTree FRSongTree4
 
             FRSongTree = (label=_"Main Tree") VBSongTree
                 VBSongTree = _SongTree(group=1,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15)) -Total(group=1,size=small)
 
-        HPLists1 = FRSongTree2 HPLists2
+#        HPLists1 = FRSongTree2 HPLists2
 
-            FRSongTree2 = (label=_"Same Artist") VBSongTree2
-                VBSongTree2 = _SongTree2(group=1:first_artist,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
+#            FRSongTree2 = (label=_"Same Artist") VBSongTree2
+#                VBSongTree2 = _SongTree2(group=1:first_artist,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
 
-        HPLists2 = FRSongTree3 _VPSongTreesSameTitle
+#        HPLists2 = FRSongTree3 _VPSongTreesSameTitle
 
-            FRSongTree3 = (label=_"Same Album") VBSongTree3
-                VBSongTree3 = _SongTree3(group=1:album,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
+#            FRSongTree3 = (label=_"Same Album") VBSongTree3
+#                VBSongTree3 = _SongTree3(group=1:album,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
 
-            VPSongTreesSameTitle = FRSongTree4 FRSongTree5
+#            VPSongTreesSameTitle = FRSongTree4 FRSongTree5
 
                 FRSongTree4 = (label=_"Same Title (1)") VBSongTree4
                     VBSongTree4 = _SongTree4(group=1:title,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
 
-                FRSongTree5 = (label=_"Same Title (2)") VBSongTree5
-                VBSongTree5 = _SongTree5(group=1:title,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
+#                FRSongTree5 = (label=_"Same Title (2)") VBSongTree5
+#                VBSongTree5 = _SongTree5(group=1:title,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
 
-    HSize0 = 350 VBSongTree
-    HSize1 = 0 VBSongTree2 VBSongTree3 VBSongTree4
+#    HSize0 = 350 VBSongTree
+#    HSize1 = 0 VBSongTree2 VBSongTree3 VBSongTree4
 
 [shimmer]
 Type=G
