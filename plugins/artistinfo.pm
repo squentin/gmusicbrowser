@@ -380,6 +380,7 @@ sub ArtistChanged
 {	my ($self,$aID,$force)=@_;
 	return unless $self->mapped;
 	return unless defined $aID;
+	$self->cancel;
 	my $rating = AA::Get("rating:average",'artist',$aID);
 	$self->{artistratingvalue}= int($rating+0.5);
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
@@ -445,9 +446,11 @@ sub loaded
 	my ($artistinfo_ok,$infoheader);
 
 	if ($self->{site} eq "biography") {
-		$infoheader = "Artist Biography";
+		$infoheader = _"Artist Biography";
 		$data =~ m#^.*<url>(.*?)</url>.*<listeners>(.*?)</listeners>.*<playcount>(.*?)</playcount>.*<content><\!\[CDATA\[(.*?)[\n].*$\]\]></content>#s; # last part of the regexp removes the license-notice (=last line)
 		my $url = $1.'/+wiki/edit'; # TODO: create "edit"-link for the last.fm wiki (ideally with the blue text plus original or similar icon)
+		my $href = $buffer->create_tag(undef,justification=>'left',foreground=>"#4ba3d2",underline=>'single');
+		$href->{url}=$url;
 		my $listeners = $2; # TODO: add listeners and playcount (also in load file)
 		my $playcount = $3;
 		$data = $4;
@@ -460,17 +463,19 @@ sub loaded
 		else { $artistinfo_ok = "1"; }
 		$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 		$buffer->insert($iter,$data);
+		$buffer->insert_with_tags($iter,_"\n\nEdit in the last.fm wiki",$href);
 		#$buffer->insert_with_tags($iter,"\n\nListeners: ".$listeners."  |   Playcount: ".$playcount,$tag_extra);
 		$self->{infoheader}=$infoheader;
-		$self->{biography} = $data;
+		$self->{biography}=$data;
+		$self->{lfm_url}=$url;
 	}
 
 	elsif ($self->{site} eq "events") {
 		
 		if ($data =~ m#total=\"(.*?)\">#g) {
-			if ( $1 == 1) { $infoheader = $1 ." Upcoming Event\n\n"; }
+			if ( $1 == 1) { $infoheader = $1 ._" Upcoming Event\n\n"; }
 			elsif ( $1 == 0) { $self->set_buffer(_"No results found"); return; }
-			else { $infoheader = $1 ." Upcoming Events\n\n"; }
+			else { $infoheader = $1 ._" Upcoming Events\n\n"; }
 			$buffer->insert_with_tags($iter,$infoheader,$tag_header) if $infoheader;
 		}
 		for my $event (split /<\/event>/, $data) {
@@ -528,12 +533,18 @@ sub load_file
 		if (my $utf8=Encode::decode_utf8($text)) {$text=$utf8}
 	}
 	my $fontsize=$self->{fontsize};
+	my $href = $buffer->create_tag(undef,justification=>'left',foreground=>"#4ba3d2",underline=>'single');
 	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
-	$text =~ s/<title>(.*?)<\/title>\n?//i;
-	my $infoheader = $1 . "\n";
+	my ($infoheader,$url);
+	if ($text =~ m/<title>(.*?)<\/title>(.*?)<url>(.*?)<\/url>/s) {
+		$infoheader = $1; $url = $3; $text = $2;
+	}
+	else { $text =~ s/<title>(.*?)<\/title>\n?//i; $infoheader = $1 . "\n"; }
 	my $iter=$buffer->get_start_iter;
 	$buffer->insert_with_tags($iter,$infoheader,$tag_header);
         $buffer->insert($iter,$text);
+	$href->{url}=$url;
+	$buffer->insert_with_tags($iter,_"Edit in the last.fm wiki",$href) if $url ne "";
 	$buffer->set_modified(0);
 }
 
@@ -541,7 +552,7 @@ sub Save_text
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $win=$self->get_toplevel;
 	my $buffer=$self->{buffer};
-	my $text = "<title>".$self->{infoheader}."</title>\n".$self->{biography};
+	my $text = "<title>".$self->{infoheader}."</title>\n".$self->{biography}."\n\n<url>".$self->{lfm_url}."</url>";
 	my $format=$::Options{OPT.'PathFile'};
 	my ($path,$file)=::pathfilefromformat( ::GetSelID($self), $format, undef,1 );
 	unless ($path && $file) {::ErrorMessage(_("Error: invalid filename pattern")." : $format",$win); return}
