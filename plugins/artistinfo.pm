@@ -380,6 +380,7 @@ sub ArtistChanged
 {	my ($self,$aID,$force)=@_;
 	return unless $self->mapped;
 	return unless defined $aID;
+	$self->cancel;
 	my $rating = AA::Get("rating:average",'artist',$aID);
 	$self->{artistratingvalue}= int($rating+0.5);
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
@@ -448,6 +449,8 @@ sub loaded
 		$infoheader = "Artist Biography";
 		$data =~ m#^.*<url>(.*?)</url>.*<listeners>(.*?)</listeners>.*<playcount>(.*?)</playcount>.*<content><\!\[CDATA\[(.*?)[\n].*$\]\]></content>#s; # last part of the regexp removes the license-notice (=last line)
 		my $url = $1.'/+wiki/edit'; # TODO: create "edit"-link for the last.fm wiki (ideally with the blue text plus original or similar icon)
+		my $href = $buffer->create_tag(undef,justification=>'left',foreground=>"#4ba3d2",underline=>'single');
+		$href->{url}=$url;
 		my $listeners = $2; # TODO: add listeners and playcount (also in load file)
 		my $playcount = $3;
 		$data = $4;
@@ -460,9 +463,11 @@ sub loaded
 		else { $artistinfo_ok = "1"; }
 		$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 		$buffer->insert($iter,$data);
+		$buffer->insert_with_tags($iter,_"\n\nEdit in the last.fm wiki",$href);
 		#$buffer->insert_with_tags($iter,"\n\nListeners: ".$listeners."  |   Playcount: ".$playcount,$tag_extra);
 		$self->{infoheader}=$infoheader;
-		$self->{biography} = $data;
+		$self->{biography}=$data;
+		$self->{lfm_url}=$url;
 	}
 
 	elsif ($self->{site} eq "events") {
