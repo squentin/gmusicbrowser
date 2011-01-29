@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9621\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-28 10:17+0100\n"
+"POT-Creation-Date: 2011-01-29 20:22+0100\n"
 "PO-Revision-Date: 2010-02-22 21:01+0100\n"
 "Last-Translator:  <staubi@linuxmail.org>\n"
 "Language-Team: german <de@li.org>\n"
@@ -15,7 +15,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
-#: plugins/artistinfo.pm:459
+#: plugins/artistinfo.pm:466
+msgid ""
+"\n"
+"\n"
+"Edit in the last.fm wiki"
+msgstr ""
+
+#: plugins/artistinfo.pm:462
 msgid ""
 "\n"
 "No results found"
@@ -23,7 +30,7 @@ msgstr ""
 "\n"
 "Keine Ergebnisse gefunden"
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid ""
 "\n"
 "Rating range: "
@@ -31,13 +38,25 @@ msgstr ""
 "\n"
 "Bewertungsbereich:"
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid ""
 "\n"
 "Total playcount: "
 msgstr ""
 "\n"
 "Insgesamt gespielt:"
+
+#: plugins/artistinfo.pm:476
+msgid ""
+" Upcoming Event\n"
+"\n"
+msgstr ""
+
+#: plugins/artistinfo.pm:478
+msgid ""
+" Upcoming Events\n"
+"\n"
+msgstr ""
 
 #: gmusicbrowser_layout.pm:288 gmusicbrowser_layout.pm:289
 #: gmusicbrowser_layout.pm:290 gmusicbrowser_layout.pm:309
@@ -653,13 +672,17 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
 #: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:130
-#: plugins/fetch_cover.pm:102 layouts:449 layouts:552 layouts:558
+#: plugins/fetch_cover.pm:102 layouts:181 layouts:449 layouts:552 layouts:558
 msgid "Artist"
 msgstr "Künstler"
 
 #: gmusicbrowser.pl:841
 msgid "Artist & album"
 msgstr "Künstler & Album"
+
+#: plugins/artistinfo.pm:449
+msgid "Artist Biography"
+msgstr ""
 
 #: plugins/artistinfo.pm:216
 msgid "Artist Picture Size : "
@@ -765,7 +788,7 @@ msgstr "Automatisch speichern-Erweiterung"
 msgid "Available"
 msgstr "Verfügbar"
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid "Average rating: "
 msgstr "Durchschnittliche Bewertung"
 
@@ -1355,6 +1378,10 @@ msgstr "Bearbeite Filter"
 msgid "Edit grouping ..."
 msgstr "Bearbeite Gruppierungen ..."
 
+#: plugins/artistinfo.pm:547
+msgid "Edit in the last.fm wiki"
+msgstr ""
+
 #: gmusicbrowser_list.pm:2834
 msgid "Edit list"
 msgstr "Bearbeite Liste"
@@ -1472,7 +1499,7 @@ msgstr "Equalizer"
 msgid "Error :"
 msgstr "Fehler:"
 
-#: plugins/artistinfo.pm:556
+#: plugins/artistinfo.pm:567
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1496,7 +1523,7 @@ msgstr "Fehler beim schreiben von '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Fehler beim schreiben der Wiedergabe-Verstärkung-Tags:\n"
 
-#: plugins/artistinfo.pm:547 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Fehler: ungültiges Dateinamensmuster"
 
@@ -1823,7 +1850,7 @@ msgstr ""
 msgid "Increase Volume"
 msgstr "Lauter"
 
-#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598
+#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598 layouts:180
 msgid "Info"
 msgstr "Info"
 
@@ -2032,12 +2059,12 @@ msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "%d unübermittelter Titel aus letzter Sitzung geladen"
 msgstr[1] "%d unübermittelte Titel aus letzter Sitzung geladen"
 
-#: plugins/artistinfo.pm:428 plugins/artistinfo.pm:523 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:429 plugins/artistinfo.pm:528 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Laden fehlgeschlagen."
 
-#: plugins/artistinfo.pm:416 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:417 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Lade ..."
 
@@ -2107,7 +2134,7 @@ msgstr ""
 
 #: gmusicbrowser_tags.pm:1538 gmusicbrowser_tags.pm:1576
 #: gmusicbrowser_tags.pm:1597 gmusicbrowser_tags.pm:1612 plugins/lyrics.pm:9
-#: plugins/lyrics.pm:87 plugins/webcontext.pm:180
+#: plugins/lyrics.pm:87 plugins/webcontext.pm:180 layouts:179
 msgid "Lyrics"
 msgstr "Liedtexte"
 
@@ -2322,7 +2349,7 @@ msgstr "Kein Haltefilter"
 msgid "No moods"
 msgstr "Keine Stimmungen"
 
-#: plugins/artistinfo.pm:472
+#: plugins/artistinfo.pm:477
 msgid "No results found"
 msgstr "Keine Ergebnisse gefunden"
 
@@ -2865,6 +2892,10 @@ msgstr "Herausgeber/Studio Logoart"
 #: layouts:410 layouts:468
 msgid "Queue"
 msgstr "Warteliste"
+
+#: layouts:178
+msgid "Queue (%n)"
+msgstr ""
 
 #: gmusicbrowser_layout.pm:24
 msgid "Queue album"
@@ -5348,7 +5379,7 @@ msgstr "Primären Filter aufheben"
 msgid "reset secondary filter"
 msgstr "Sekundären Filter aufheben"
 
-#: plugins/artistinfo.pm:428 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:429 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "Erneut versuchen"
 

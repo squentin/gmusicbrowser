@@ -4,7 +4,7 @@
 #
 
 Type=G+
-Default     = Window(size=1120x820)
+Default     = Window(size=1120x820) HPContent(size=963-151) HPControlsInfoAndSearch(size=970-144) HPCurrentTrack(size=394-563) HPFilterPaneAndSongTree(size=0-557) HPTitleAndFiller(size=484-473) HPfp0(size=196-361) HPfpSongInfo_Search(size=385-579) VPGenreYear(size=48-45) VPfp0(size=410-344) VPfp1(size=99-305)
 Title		= _"%t - gmusicbrowser"
 DefaultFocus    = SimpleSearch
 
@@ -38,7 +38,7 @@ VBMain = HPControlsInfoAndSearch _HPContent
                             HBYear = _FilterPane2(nb=4,hidebb=1,pages=year,page=year,page_year/mode=cloud,page_year/cloud_min=8,page_year/sort=year)
 
                         HPfp0 = HBArtist HBAlbum
-                            HBArtist = _FilterPane0(nb=3, hidebb=1,pages=artist,page=artist,page_artist/lpicsize=64,page_artist/lmarkup=1)
+                            HBArtist = _FilterPane0(nb=3, hidebb=1,pages=artist,page=artist,page_artist/lmarkup=1)
                             HBAlbum = _FilterPane1(nb=5,hidebb=1,pages=album,page=album,page_album/mode=mosaic,page_album/lpicsize=64,page_album/lmarkup=1,page_album/mmarkup=below)
 
                      VBSongTreeAndProgress = _HBSongTree VProgress
@@ -114,14 +114,15 @@ VolumeScroll	= VBmain
 
 [Arkanoid browser]
 Type=B
-Default = Window(size=1120x800)
+Default = Window(size=1120x800) HPFilterPanes(size=100) VPFilterLists(size=60)
 VBmain  = _VBTreeAndInfo
     VBTreeAndInfo = HBStatus _VPFilterLists VProgress
-        VPFilterLists = HBFilterPanes HPLists
+        VPFilterLists = HPFilterPanes HPLists
 
-        HBFilterPanes = _HBArtist _HBAlbum
-            HBArtist = _FilterPane0(group=1,nb=2, hidebb=1,pages=artist,page=artist,page_artist/lpicsize=64,page_artist/lmarkup=1)
-            HBAlbum = _FilterPane1(group=1,nb=3,hidebb=1,pages=album,page=album,page_album/mode=mosaic,page_album/lpicsize=64,page_album/lmarkup=1,page_album/mmarkup=below)
+        HPFilterPanes = FilterPane0(nb=0,hidebb=1,page=savedtree,pages=savedtree) HBArtistAlbum
+            HBArtistAlbum = _HBArtist _HBAlbum
+            HBArtist = _FilterPane2(group=1,nb=2, hidebb=1,pages=artist,page=artist,page_artist/lpicsize=64,page_artist/lmarkup=1)
+            HBAlbum = _FilterPane3(group=1,nb=3,hidebb=1,pages=album,page=album,page_album/mode=mosaic,page_album/lpicsize=64,page_album/lmarkup=1,page_album/mmarkup=below)
 
         HBStatus = HistItem(group=1) ResetFilter(group=1) Refresh(group=1) PlayFilter(group=1) FilterLock(group=1) -Pref(stock=gtk-preferences,size=button) -SimpleSearch(group=1,nb=1)
 
@@ -130,26 +131,10 @@ VBmain  = _VBTreeAndInfo
             FRSongTree = (label=_"Main Tree") VBSongTree
                 VBSongTree = _SongTree(group=1,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15)) -Total(group=1,size=small)
 
-#        HPLists1 = FRSongTree2 HPLists2
-
-#            FRSongTree2 = (label=_"Same Artist") VBSongTree2
-#                VBSongTree2 = _SongTree2(group=1:first_artist,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
-
-#        HPLists2 = FRSongTree3 _VPSongTreesSameTitle
-
-#            FRSongTree3 = (label=_"Same Album") VBSongTree3
-#                VBSongTree3 = _SongTree3(group=1:album,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
-
-#            VPSongTreesSameTitle = FRSongTree4 FRSongTree5
-
-                FRSongTree4 = (label=_"Same Title (1)") VBSongTree4
+                FRSongTree4 = (label=_"Same Title") VBSongTree4
                     VBSongTree4 = _SongTree4(group=1:title,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
 
-#                FRSongTree5 = (label=_"Same Title (2)") VBSongTree5
-#                VBSongTree5 = _SongTree5(group=1:title,cols=title,grouping=album|artistalbum_breadcrumbs(picsize=50)|year|simple|disc|discleft(width=15))
-
-#    HSize0 = 350 VBSongTree
-#    HSize1 = 0 VBSongTree2 VBSongTree3 VBSongTree4
+    HSize0 = FRSongTree FRSongTree4
 
 [shimmer]
 Type=G

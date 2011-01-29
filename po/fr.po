@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.4\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-28 10:17+0100\n"
+"POT-Creation-Date: 2011-01-29 20:22+0100\n"
 "PO-Revision-Date: 2010-07-14 15:31+0100\n"
 "Last-Translator: Brice Boucard <boucard.brice@neuf.fr>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -13,22 +13,41 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: plugins/artistinfo.pm:459
+#: plugins/artistinfo.pm:466
+msgid ""
+"\n"
+"\n"
+"Edit in the last.fm wiki"
+msgstr ""
+
+#: plugins/artistinfo.pm:462
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid ""
 "\n"
 "Total playcount: "
+msgstr ""
+
+#: plugins/artistinfo.pm:476
+msgid ""
+" Upcoming Event\n"
+"\n"
+msgstr ""
+
+#: plugins/artistinfo.pm:478
+msgid ""
+" Upcoming Events\n"
+"\n"
 msgstr ""
 
 #: gmusicbrowser_layout.pm:288 gmusicbrowser_layout.pm:289
@@ -652,13 +671,17 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
 #: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:130
-#: plugins/fetch_cover.pm:102 layouts:449 layouts:552 layouts:558
+#: plugins/fetch_cover.pm:102 layouts:181 layouts:449 layouts:552 layouts:558
 msgid "Artist"
 msgstr "Artiste"
 
 #: gmusicbrowser.pl:841
 msgid "Artist & album"
 msgstr "Artiste & album"
+
+#: plugins/artistinfo.pm:449
+msgid "Artist Biography"
+msgstr ""
 
 #: plugins/artistinfo.pm:216
 msgid "Artist Picture Size : "
@@ -764,7 +787,7 @@ msgstr "Plugin de sauvegarde automatique"
 msgid "Available"
 msgstr "Disponible"
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid "Average rating: "
 msgstr ""
 
@@ -1358,6 +1381,10 @@ msgstr "Modifier ce filtre"
 msgid "Edit grouping ..."
 msgstr "Modifier le regroupement..."
 
+#: plugins/artistinfo.pm:547
+msgid "Edit in the last.fm wiki"
+msgstr ""
+
 #: gmusicbrowser_list.pm:2834
 msgid "Edit list"
 msgstr "Modifier cette liste"
@@ -1475,7 +1502,7 @@ msgstr "Égaliseur"
 msgid "Error :"
 msgstr "Erreur :"
 
-#: plugins/artistinfo.pm:556
+#: plugins/artistinfo.pm:567
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1500,7 +1527,7 @@ msgstr "Erreur en écrivant '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Erreur lors de l'écriture des tags replaygain :\n"
 
-#: plugins/artistinfo.pm:547 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Erreur : format de nom de fichier invalide"
 
@@ -1824,7 +1851,7 @@ msgstr ""
 msgid "Increase Volume"
 msgstr "Augmenter le volume"
 
-#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598
+#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598 layouts:180
 msgid "Info"
 msgstr "Info"
 
@@ -2033,12 +2060,12 @@ msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "%d chanson non-envoyée depuis la session précédente"
 msgstr[1] "%d chansons non-envoyées depuis la session précédente"
 
-#: plugins/artistinfo.pm:428 plugins/artistinfo.pm:523 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:429 plugins/artistinfo.pm:528 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Chargement échoué."
 
-#: plugins/artistinfo.pm:416 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:417 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Chargement..."
 
@@ -2108,7 +2135,7 @@ msgstr "Parolier"
 
 #: gmusicbrowser_tags.pm:1538 gmusicbrowser_tags.pm:1576
 #: gmusicbrowser_tags.pm:1597 gmusicbrowser_tags.pm:1612 plugins/lyrics.pm:9
-#: plugins/lyrics.pm:87 plugins/webcontext.pm:180
+#: plugins/lyrics.pm:87 plugins/webcontext.pm:180 layouts:179
 msgid "Lyrics"
 msgstr "Paroles"
 
@@ -2323,7 +2350,7 @@ msgstr "Pas de filtre verrouillé"
 msgid "No moods"
 msgstr "Pas d'ambiances"
 
-#: plugins/artistinfo.pm:472
+#: plugins/artistinfo.pm:477
 msgid "No results found"
 msgstr ""
 
@@ -2871,6 +2898,10 @@ msgstr "Éditeur/Studio logo"
 #: layouts:410 layouts:468
 msgid "Queue"
 msgstr "File d'attente"
+
+#: layouts:178
+msgid "Queue (%n)"
+msgstr ""
 
 #: gmusicbrowser_layout.pm:24
 msgid "Queue album"
@@ -5374,7 +5405,7 @@ msgstr "enlever le filtre primaire"
 msgid "reset secondary filter"
 msgstr "enlever le filtre secondaire"
 
-#: plugins/artistinfo.pm:428 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:429 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "ré-essayer"
 

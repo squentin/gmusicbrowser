@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-28 10:17+0100\n"
+"POT-Creation-Date: 2011-01-29 20:22+0100\n"
 "PO-Revision-Date: 2011-01-19 09:56+0900\n"
 "Last-Translator: bluealbum <bluealbum@gmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
@@ -17,22 +17,41 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: plugins/artistinfo.pm:459
+#: plugins/artistinfo.pm:466
+msgid ""
+"\n"
+"\n"
+"Edit in the last.fm wiki"
+msgstr ""
+
+#: plugins/artistinfo.pm:462
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid ""
 "\n"
 "Total playcount: "
+msgstr ""
+
+#: plugins/artistinfo.pm:476
+msgid ""
+" Upcoming Event\n"
+"\n"
+msgstr ""
+
+#: plugins/artistinfo.pm:478
+msgid ""
+" Upcoming Events\n"
+"\n"
 msgstr ""
 
 #: gmusicbrowser_layout.pm:288 gmusicbrowser_layout.pm:289
@@ -633,13 +652,17 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
 #: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:130
-#: plugins/fetch_cover.pm:102 layouts:449 layouts:552 layouts:558
+#: plugins/fetch_cover.pm:102 layouts:181 layouts:449 layouts:552 layouts:558
 msgid "Artist"
 msgstr "음악가"
 
 #: gmusicbrowser.pl:841
 msgid "Artist & album"
 msgstr "아티스트 & 앨범"
+
+#: plugins/artistinfo.pm:449
+msgid "Artist Biography"
+msgstr ""
 
 #: plugins/artistinfo.pm:216
 msgid "Artist Picture Size : "
@@ -745,7 +768,7 @@ msgstr "자동저장 플러그인"
 msgid "Available"
 msgstr "사용 가능"
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid "Average rating: "
 msgstr ""
 
@@ -1330,6 +1353,10 @@ msgstr "필터 편집"
 msgid "Edit grouping ..."
 msgstr "그룹으로 나누기 편집 ..."
 
+#: plugins/artistinfo.pm:547
+msgid "Edit in the last.fm wiki"
+msgstr ""
+
 #: gmusicbrowser_list.pm:2834
 msgid "Edit list"
 msgstr "목록 편집"
@@ -1447,7 +1474,7 @@ msgstr "이퀄라이저"
 msgid "Error :"
 msgstr "에러 :"
 
-#: plugins/artistinfo.pm:556
+#: plugins/artistinfo.pm:567
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1471,7 +1498,7 @@ msgstr " '{file}' 쓰기 에러!"
 msgid "Error writing replaygain tags :\n"
 msgstr "리플레이게인 태그 쓰기 에러 :\n"
 
-#: plugins/artistinfo.pm:547 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "에러: 잘못된 파일이름 패턴"
 
@@ -1795,7 +1822,7 @@ msgstr ""
 msgid "Increase Volume"
 msgstr "음량 증가"
 
-#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598
+#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598 layouts:180
 msgid "Info"
 msgstr "정보"
 
@@ -2002,12 +2029,12 @@ msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "이전 세션에서 보내지 않은 노래 %d 가져옴"
 
-#: plugins/artistinfo.pm:428 plugins/artistinfo.pm:523 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:429 plugins/artistinfo.pm:528 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "가져오기 실패함."
 
-#: plugins/artistinfo.pm:416 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:417 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "가져오는 중..."
 
@@ -2077,7 +2104,7 @@ msgstr "작사가"
 
 #: gmusicbrowser_tags.pm:1538 gmusicbrowser_tags.pm:1576
 #: gmusicbrowser_tags.pm:1597 gmusicbrowser_tags.pm:1612 plugins/lyrics.pm:9
-#: plugins/lyrics.pm:87 plugins/webcontext.pm:180
+#: plugins/lyrics.pm:87 plugins/webcontext.pm:180 layouts:179
 msgid "Lyrics"
 msgstr "가사"
 
@@ -2290,7 +2317,7 @@ msgstr "잠금된 필터 없음"
 msgid "No moods"
 msgstr "분위기 사용안함"
 
-#: plugins/artistinfo.pm:472
+#: plugins/artistinfo.pm:477
 msgid "No results found"
 msgstr ""
 
@@ -2832,6 +2859,10 @@ msgstr "발행자/스튜디오의 로고"
 #: layouts:410 layouts:468
 msgid "Queue"
 msgstr "대기열"
+
+#: layouts:178
+msgid "Queue (%n)"
+msgstr ""
 
 #: gmusicbrowser_layout.pm:24
 msgid "Queue album"
@@ -5306,7 +5337,7 @@ msgstr "기본 필터값 재설정"
 msgid "reset secondary filter"
 msgstr "두번째 필터 재설정"
 
-#: plugins/artistinfo.pm:428 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:429 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "재시도"
 

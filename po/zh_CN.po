@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser.pot\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-28 10:17+0100\n"
+"POT-Creation-Date: 2011-01-29 20:22+0100\n"
 "PO-Revision-Date: 2009-04-30 13:14+0800\n"
 "Last-Translator: Google Translate\n"
 "Language-Team: Chinese\n"
@@ -12,22 +12,41 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: plugins/artistinfo.pm:459
+#: plugins/artistinfo.pm:466
+msgid ""
+"\n"
+"\n"
+"Edit in the last.fm wiki"
+msgstr ""
+
+#: plugins/artistinfo.pm:462
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid ""
 "\n"
 "Total playcount: "
+msgstr ""
+
+#: plugins/artistinfo.pm:476
+msgid ""
+" Upcoming Event\n"
+"\n"
+msgstr ""
+
+#: plugins/artistinfo.pm:478
+msgid ""
+" Upcoming Events\n"
+"\n"
 msgstr ""
 
 #: gmusicbrowser_layout.pm:288 gmusicbrowser_layout.pm:289
@@ -621,13 +640,17 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
 #: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:130
-#: plugins/fetch_cover.pm:102 layouts:449 layouts:552 layouts:558
+#: plugins/fetch_cover.pm:102 layouts:181 layouts:449 layouts:552 layouts:558
 msgid "Artist"
 msgstr "艺术家"
 
 #: gmusicbrowser.pl:841
 msgid "Artist & album"
 msgstr "艺术家及专辑"
+
+#: plugins/artistinfo.pm:449
+msgid "Artist Biography"
+msgstr ""
 
 #: plugins/artistinfo.pm:216
 msgid "Artist Picture Size : "
@@ -733,7 +756,7 @@ msgstr "自动存储插件"
 msgid "Available"
 msgstr "可用的"
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid "Average rating: "
 msgstr ""
 
@@ -1318,6 +1341,10 @@ msgstr "修改过滤器"
 msgid "Edit grouping ..."
 msgstr "编辑群组..."
 
+#: plugins/artistinfo.pm:547
+msgid "Edit in the last.fm wiki"
+msgstr ""
+
 #: gmusicbrowser_list.pm:2834
 msgid "Edit list"
 msgstr "修改列表"
@@ -1435,7 +1462,7 @@ msgstr "均衡"
 msgid "Error :"
 msgstr "错误："
 
-#: plugins/artistinfo.pm:556
+#: plugins/artistinfo.pm:567
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1457,7 +1484,7 @@ msgstr "写'{file}'时发生错误"
 msgid "Error writing replaygain tags :\n"
 msgstr "写replaygain标签时发生错误：\n"
 
-#: plugins/artistinfo.pm:547 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "错误：无效的文件名模式"
 
@@ -1779,7 +1806,7 @@ msgstr ""
 msgid "Increase Volume"
 msgstr "增加音量"
 
-#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598
+#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598 layouts:180
 msgid "Info"
 msgstr "信息"
 
@@ -1983,12 +2010,12 @@ msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "正在加载上次会话中未送出的 %d 曲目"
 
-#: plugins/artistinfo.pm:428 plugins/artistinfo.pm:523 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:429 plugins/artistinfo.pm:528 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "载入中失败。"
 
-#: plugins/artistinfo.pm:416 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:417 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "载入中..."
 
@@ -2058,7 +2085,7 @@ msgstr ""
 
 #: gmusicbrowser_tags.pm:1538 gmusicbrowser_tags.pm:1576
 #: gmusicbrowser_tags.pm:1597 gmusicbrowser_tags.pm:1612 plugins/lyrics.pm:9
-#: plugins/lyrics.pm:87 plugins/webcontext.pm:180
+#: plugins/lyrics.pm:87 plugins/webcontext.pm:180 layouts:179
 msgid "Lyrics"
 msgstr "歌词"
 
@@ -2270,7 +2297,7 @@ msgstr "没有已锁定的滤波器"
 msgid "No moods"
 msgstr ""
 
-#: plugins/artistinfo.pm:472
+#: plugins/artistinfo.pm:477
 msgid "No results found"
 msgstr ""
 
@@ -2809,6 +2836,10 @@ msgstr "出版商/工作室标识"
 #: layouts:410 layouts:468
 msgid "Queue"
 msgstr "队列"
+
+#: layouts:178
+msgid "Queue (%n)"
+msgstr ""
 
 #: gmusicbrowser_layout.pm:24
 msgid "Queue album"
@@ -5267,7 +5298,7 @@ msgstr "重置初级过滤器"
 msgid "reset secondary filter"
 msgstr "重置二级过滤器"
 
-#: plugins/artistinfo.pm:428 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:429 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "重试"
 

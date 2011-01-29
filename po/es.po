@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-28 10:17+0100\n"
+"POT-Creation-Date: 2011-01-29 20:22+0100\n"
 "PO-Revision-Date: 2010-10-17 20:10-0300\n"
 "Last-Translator: Genesis Bustamante <genmarc@gmail.com>\n"
 "Language-Team:  <es@li.org>\n"
@@ -18,22 +18,41 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: plugins/artistinfo.pm:459
+#: plugins/artistinfo.pm:466
+msgid ""
+"\n"
+"\n"
+"Edit in the last.fm wiki"
+msgstr ""
+
+#: plugins/artistinfo.pm:462
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid ""
 "\n"
 "Total playcount: "
+msgstr ""
+
+#: plugins/artistinfo.pm:476
+msgid ""
+" Upcoming Event\n"
+"\n"
+msgstr ""
+
+#: plugins/artistinfo.pm:478
+msgid ""
+" Upcoming Events\n"
+"\n"
 msgstr ""
 
 #: gmusicbrowser_layout.pm:288 gmusicbrowser_layout.pm:289
@@ -646,13 +665,17 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
 #: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:130
-#: plugins/fetch_cover.pm:102 layouts:449 layouts:552 layouts:558
+#: plugins/fetch_cover.pm:102 layouts:181 layouts:449 layouts:552 layouts:558
 msgid "Artist"
 msgstr "Artista"
 
 #: gmusicbrowser.pl:841
 msgid "Artist & album"
 msgstr "Artista y álbum"
+
+#: plugins/artistinfo.pm:449
+msgid "Artist Biography"
+msgstr ""
 
 #: plugins/artistinfo.pm:216
 msgid "Artist Picture Size : "
@@ -758,7 +781,7 @@ msgstr "Complemento autoguardar"
 msgid "Available"
 msgstr "Disponible"
 
-#: plugins/artistinfo.pm:387
+#: plugins/artistinfo.pm:388
 msgid "Average rating: "
 msgstr ""
 
@@ -1349,6 +1372,10 @@ msgstr "Editar filtro"
 msgid "Edit grouping ..."
 msgstr "Edición agrupada ..."
 
+#: plugins/artistinfo.pm:547
+msgid "Edit in the last.fm wiki"
+msgstr ""
+
 #: gmusicbrowser_list.pm:2834
 msgid "Edit list"
 msgstr "Editar lista"
@@ -1466,7 +1493,7 @@ msgstr "Ecualizador"
 msgid "Error :"
 msgstr "Error :"
 
-#: plugins/artistinfo.pm:556
+#: plugins/artistinfo.pm:567
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1488,7 +1515,7 @@ msgstr "Error escribiendo '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Error escribiendo etiquetas de ganancia : \n"
 
-#: plugins/artistinfo.pm:547 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Error: modelo de nombre de archivo incorrecto"
 
@@ -1810,7 +1837,7 @@ msgstr ""
 msgid "Increase Volume"
 msgstr "Subir volumen"
 
-#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598
+#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598 layouts:180
 msgid "Info"
 msgstr "Propiedades"
 
@@ -2018,12 +2045,12 @@ msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "Cargada %d canción no enviada en la sesión anterior"
 msgstr[1] "Cargadas %d canciones no enviadas en la sesión anterior"
 
-#: plugins/artistinfo.pm:428 plugins/artistinfo.pm:523 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:429 plugins/artistinfo.pm:528 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Carga fallida."
 
-#: plugins/artistinfo.pm:416 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:417 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Cargando..."
 
@@ -2093,7 +2120,7 @@ msgstr ""
 
 #: gmusicbrowser_tags.pm:1538 gmusicbrowser_tags.pm:1576
 #: gmusicbrowser_tags.pm:1597 gmusicbrowser_tags.pm:1612 plugins/lyrics.pm:9
-#: plugins/lyrics.pm:87 plugins/webcontext.pm:180
+#: plugins/lyrics.pm:87 plugins/webcontext.pm:180 layouts:179
 msgid "Lyrics"
 msgstr "Letras"
 
@@ -2308,7 +2335,7 @@ msgstr "Ningún filtro de bloqueo"
 msgid "No moods"
 msgstr ""
 
-#: plugins/artistinfo.pm:472
+#: plugins/artistinfo.pm:477
 msgid "No results found"
 msgstr ""
 
@@ -2850,6 +2877,10 @@ msgstr "Sello discográfico"
 #: layouts:410 layouts:468
 msgid "Queue"
 msgstr "Cola"
+
+#: layouts:178
+msgid "Queue (%n)"
+msgstr ""
 
 #: gmusicbrowser_layout.pm:24
 msgid "Queue album"
@@ -5329,7 +5360,7 @@ msgstr "Reiniciar filtro principal"
 msgid "reset secondary filter"
 msgstr "reiniciar filtro secundario"
 
-#: plugins/artistinfo.pm:428 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:429 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "reintentar"
 
