@@ -956,7 +956,7 @@ sub CreateWidgets
 		if ( $names[0]=~m/^\d+$/ )
 		{	my $s=shift @names;
 			my @req=($mode eq 'vertical')? (-1,$s) : ($s,-1);
-			$widgets->{$_}->set_size_request(@req) for @names;
+			$_->set_size_request(@req) for grep defined, map $widgets->{$_}, @names;
 			next if @names==1;
 		}
 		my $sizegroup=Gtk2::SizeGroup->new($mode);
