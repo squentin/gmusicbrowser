@@ -85,6 +85,8 @@ VBMain = HPControlsInfoAndSearch _HPContent
 # saved filters below the cover picture
 #
 
+Default = Window(size=1120x820) HPContent(size=963-151) HPControlsInfoAndSearch(size=970-144) HPCurrentTrack(size=394-563) HPFilterPaneAndSongTree(size=0-557) HPTitleAndFiller(size=484-473) HPfp0(size=196-361) HPfpSongInfo_Search(size=385-579) VPGenreYear(size=48-45) VPfp0(size=410-344) VPfp1(size=99-305) VPfp2(size=515-239)
+
 HPCurrentTrack = VPfp2 _VPfp0
     VPfp2 = _HBCurrentTrack VBSavedFilterPane
 
