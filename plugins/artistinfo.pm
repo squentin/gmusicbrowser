@@ -106,7 +106,7 @@ sub new
 	my $stateventbox = Gtk2::EventBox->new;
 	$stateventbox->add($statbox);
 	$stateventbox->{group}= $options->{group};
-	$stateventbox->signal_connect(button_press_event => sub {my ($stateventbox, $event) = @_; return 0 unless $event->button == 3; my $ID=::GetSelID($stateventbox); ::ArtistContextMenu( Songs::Get_gid($ID,'artists'),{ ID=>$ID, self=> $stateventbox, mode => 'B'}) if defined $ID; return 1; } ); # add right-click artist-contextmenu
+	$stateventbox->signal_connect(button_press_event => sub {my ($stateventbox, $event) = @_; return 0 unless $event->button == 3; my $ID=::GetSelID($stateventbox); ::ArtistContextMenu( Songs::Get_gid($ID,'artists'),{ ID=>$ID, self=> $stateventbox, mode => 'S'}) if defined $ID; return 1; } ); # FIXME: do a proper cm
 
 	my $artistbox = Gtk2::HBox->new(0,0);
 	$artistbox->pack_start($artistpic,1,1,0);
@@ -156,7 +156,7 @@ sub new
 		$togglebox->pack_start($item,1,0,0);
 	}
 
-	my $refresh =	::NewIconButton('gtk-refresh',undef, \&Refresh_cb ,"none",_"Refresh");
+	my $refresh =	::NewIconButton('gtk-refresh',undef, sub { SongChanged($self,'1'); } ,"none",_"Refresh");
 	my $savebutton =::NewIconButton('gtk-save',   undef, \&Save_text,  "none",_"Save artist biography");
 
 	$togglebox->pack_start($refresh,0,0,0);
@@ -319,6 +319,14 @@ sub apiczoom {
 		$apic->modify_bg('GTK_STATE_SELECTED',Gtk2::Gdk::Color->parse('black'));
 		$apic->add($img);
 		$apic->show_all;
+# use a label instead of a normal menu-item for formatted text
+#		my $item=Gtk2::ImageMenuItem->new;
+#		my $label=Gtk2::Label->new;
+#		$label->set_line_wrap(TRUE);
+#		$label->set_alignment(0,.5);
+#		$label->set_markup( AA::ReplaceFields($key,$format,$field,1) );
+#		$item->add($label);
+#		$menu->attach($item, $colnb, $colnb+1, $row, $row+1); if (++$row>$rows) {$row=0;$colnb++;}
 		$menu->append($apic);
 		$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
 		return 1;
@@ -364,16 +372,12 @@ sub url_at_coords
 	}
 }
 
-sub Refresh_cb
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
-	my $ID = ::GetSelID($self);
-	$self -> ArtistChanged( Songs::Get_gid($ID,'artist'),1);
-}
-
 sub SongChanged
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
+{	my ($widget,$force) = @_;
+	my $self=::find_ancestor($widget,__PACKAGE__);
 	my $ID = ::GetSelID($self);
-	$self -> ArtistChanged( Songs::Get_gid($ID,'artist'));
+	$force = 0 unless $force;
+	$self -> ArtistChanged( Songs::Get_gid($ID,'artist'),$force);
 }
 
 sub ArtistChanged
@@ -395,16 +399,15 @@ sub ArtistChanged
 	my $url= $sites{$self->{site}}[SITEURL];
 	$url=~s/%a/$artist/;
 	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/;
-	if ($artist ne $self->{artist_esc} or $url ne $self->{url} or $force) { # FIXME: similar-tab always reloads when switched to
-		$self->{artist_esc} = $artist;
+	if ($url ne $self->{url} or $force == 1) { # FIXME: events and similar-tabs always reload when switched to
 		$self->{url} = $url;
 		if ($self->{site} eq "biography") { # check for local biography file before loading the page
 			unless ($force) {
 			my $file=::pathfilefromformat( ::GetSelID($self), $::Options{OPT.'PathFile'}, undef,1 );
 			if ($file && -r $file)
 				{	::IdleDo('8_artistinfo'.$self,1000,\&load_file,$self,$file);
-					$self->{sw2}->hide; $self->{sw1}->show; # otherwise switching back from the "similar" tab doesn't show the textview
-					return
+					$self->{sw2}->hide; $self->{sw1}->show;
+					return;
 				}
 			}
 		}
@@ -419,7 +422,7 @@ sub load_url
 	warn "info : loading $url\n" if $::debug;
 	$self->{url}=$url;
 	$self->{sw2}->hide; $self->{sw1}->show;
-	$self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url);
+	$self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->loaded(@_)},url => $url, cache => 1);
 }
 
 sub loaded
@@ -447,11 +450,11 @@ sub loaded
 
 	if ($self->{site} eq "biography") {
 		$infoheader = _"Artist Biography";
-		$data =~ m#^.*<url>(.*?)</url>.*<listeners>(.*?)</listeners>.*<playcount>(.*?)</playcount>.*<content><\!\[CDATA\[(.*?)[\n].*$\]\]></content>#s; # last part of the regexp removes the license-notice (=last line)
-		my $url = $1.'/+wiki/edit'; # TODO: create "edit"-link for the last.fm wiki (ideally with the blue text plus original or similar icon)
+		$data =~ m|^.*<url>(.*?)</url>.*<listeners>(.*?)</listeners>.*<playcount>(.*?)</playcount>.*<content><\!\[CDATA\[(.*?)\n.*\]\]></content>|s; # last part of the regexp removes the license-notice (=last line)
+		my $url = $1.'/+wiki/edit';
 		my $href = $buffer->create_tag(undef,justification=>'left',foreground=>"#4ba3d2",underline=>'single');
 		$href->{url}=$url;
-		my $listeners = $2; # TODO: add listeners and playcount (also in load file)
+		my $listeners = $2;
 		my $playcount = $3;
 		$data = $4;
 		for ($data) {
@@ -459,15 +462,21 @@ sub loaded
 			s/\n\n/\n/gi; # never more than one empty line (again)
 			s/<(.*?)>//gi; # strip tags
 		}
-		if ($data eq "") { $infoheader = _"\nNo results found"; $artistinfo_ok = "0"; $tag_header = $tag_noresults; } # fallback text if artist-info not found
-		else { $artistinfo_ok = "1"; }
-		$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
-		$buffer->insert($iter,$data);
-		$buffer->insert_with_tags($iter,_"\n\nEdit in the last.fm wiki",$href);
-		#$buffer->insert_with_tags($iter,"\n\nListeners: ".$listeners."  |   Playcount: ".$playcount,$tag_extra);
-		$self->{infoheader}=$infoheader;
-		$self->{biography}=$data;
-		$self->{lfm_url}=$url;
+		if ($data eq "") {
+			$infoheader = _"\nNo results found";
+			$artistinfo_ok = "0";
+			$tag_header = $tag_noresults;
+			$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
+		} # fallback text if artist-info not found
+		else {	$artistinfo_ok = "1";
+			$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
+			$buffer->insert($iter,$data);
+			$buffer->insert_with_tags($iter,_"\n\nEdit in the last.fm wiki",$href);
+			#$buffer->insert_with_tags($iter,"\n\nListeners: ".$listeners."  |   Playcount: ".$playcount,$tag_extra);
+			$self->{infoheader}=$infoheader;
+			$self->{biography}=$data;
+			$self->{lfm_url}=$url;
+		}
 	}
 
 	elsif ($self->{site} eq "events") {
@@ -543,8 +552,10 @@ sub load_file
 	my $iter=$buffer->get_start_iter;
 	$buffer->insert_with_tags($iter,$infoheader,$tag_header);
         $buffer->insert($iter,$text);
-	$href->{url}=$url;
-	$buffer->insert_with_tags($iter,_"Edit in the last.fm wiki",$href) if $url ne "";
+	if ($url) {
+		$href->{url}=$url;
+		$buffer->insert_with_tags($iter,_"Edit in the last.fm wiki",$href);
+	}
 	$buffer->set_modified(0);
 }
 
@@ -562,7 +573,7 @@ sub Save_text
 	{	print $fh $text;
 		close $fh;
 		$buffer->set_modified(0);
-		warn "Saved artistbio in ".$path.$file."\n"; #if $::debug;
+		warn "Saved artistbio in ".$path.$file."\n" if $::debug;
 	}
 	else {::ErrorMessage(::__x(_("Error saving artistbio in '{file}' :\n{error}"), file => $file, error => $!),$win);}
 }

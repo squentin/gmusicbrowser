@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-29 20:22+0100\n"
+"POT-Creation-Date: 2011-01-29 21:17+0100\n"
 "PO-Revision-Date: 2010-12-21 14:24-0300\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese <LL@li.org>\n"
@@ -281,7 +281,7 @@ msgstr ""
 msgid "1 chance in {probability}"
 msgstr "1 possibilidade em {probability}"
 
-#: layouts:342
+#: layouts:329
 msgid "3 Filter panes"
 msgstr "3 painéis de filtro"
 
@@ -492,15 +492,15 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:449 layouts:552 layouts:558 layouts:1005
+#: plugins/fetch_cover.pm:103 layouts:436 layouts:539 layouts:545 layouts:992
 msgid "Album"
 msgstr "Álbum"
 
-#: layouts:860
+#: layouts:847
 msgid "Album and artist"
 msgstr ""
 
-#: layouts:775
+#: layouts:762
 msgid "Album and artist on the left side"
 msgstr ""
 
@@ -541,7 +541,7 @@ msgstr "Álbum com imagem"
 msgid "Album year(s)"
 msgstr "Ano do álbum"
 
-#: layouts:170
+#: layouts:157
 msgid "Album: %l (%Y)"
 msgstr ""
 
@@ -644,11 +644,11 @@ msgstr "Argumentos"
 msgid "Arkanoid"
 msgstr ""
 
-#: layouts:97
+#: layouts:99
 msgid "Arkanoid Fullscreen"
 msgstr ""
 
-#: layouts:110
+#: layouts:112
 msgid "Arkanoid Fullscreen with queue"
 msgstr ""
 
@@ -656,7 +656,7 @@ msgstr ""
 msgid "Arkanoid alternative"
 msgstr ""
 
-#: layouts:115
+#: layouts:117
 msgid "Arkanoid browser"
 msgstr ""
 
@@ -664,7 +664,7 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
 #: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:130
-#: plugins/fetch_cover.pm:102 layouts:181 layouts:449 layouts:552 layouts:558
+#: plugins/fetch_cover.pm:102 layouts:168 layouts:436 layouts:539 layouts:545
 msgid "Artist"
 msgstr "Artista"
 
@@ -696,7 +696,7 @@ msgstr "Artista,Álbum,Disco,Faixa"
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "Artista,Data,Álbum,Disco,Faixa"
 
-#: layouts:170
+#: layouts:157
 msgid "Artist: %a"
 msgstr ""
 
@@ -820,7 +820,7 @@ msgstr "Corpo :"
 msgid "Body text is not supported by current notification daemon"
 msgstr "Texto do corpo não é suportado pelo serviço de notificação atual"
 
-#: layouts:314
+#: layouts:301
 msgid "Browser"
 msgstr "Navegador"
 
@@ -828,15 +828,15 @@ msgstr "Navegador"
 msgid "Browser window layout :"
 msgstr "Estilo da janela de navegação"
 
-#: layouts:339
+#: layouts:326
 msgid "Browser with SongTree"
 msgstr "Navegador com Árvore de Músicas"
 
-#: layouts:981
+#: layouts:968
 msgid "Buttons"
 msgstr "Botões"
 
-#: layouts:970
+#: layouts:957
 msgid "Buttons, Song & Cover"
 msgstr "Botões, Músicas & Capa"
 
@@ -900,7 +900,7 @@ msgstr "Distinguir entre maiúsculas/minúsculas"
 msgid "Case-sensitive"
 msgstr "Distingue maiúsculas de minúsculas"
 
-#: layouts:410
+#: layouts:397
 msgid "Categories pane"
 msgstr "Painel de categorias"
 
@@ -1090,8 +1090,8 @@ msgstr "Conectar através de um proxy"
 msgid "Connections from :"
 msgstr "Conexões de :"
 
-#: layouts:215 layouts:378 layouts:480 layouts:552 layouts:558 layouts:582
-#: layouts:644
+#: layouts:202 layouts:365 layouts:467 layouts:539 layouts:545 layouts:569
+#: layouts:631
 msgid "Context"
 msgstr "Conteúdo"
 
@@ -1391,7 +1391,7 @@ msgstr "Editar propriedades da música selecionada"
 msgid "Edit..."
 msgstr "Editar..."
 
-#: layouts:475
+#: layouts:462
 msgid "EditList"
 msgstr "EditList"
 
@@ -1480,7 +1480,7 @@ msgstr ""
 msgid "EpicRating plugin - automatically update ratings"
 msgstr ""
 
-#: layouts:909
+#: layouts:896
 msgid "Equalizer"
 msgstr "Equalizador"
 
@@ -1671,11 +1671,11 @@ msgid "Find songs with the same names"
 msgstr "Procurar músicas com mesmo nome"
 
 #: gmusicbrowser.pl:844 gmusicbrowser.pl:7937 gmusicbrowser_list.pm:724
-#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:852
+#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:839
 msgid "Folder"
 msgstr "Pasta"
 
-#: gmusicbrowser_list.pm:724 layouts:851
+#: gmusicbrowser_list.pm:724 layouts:838
 msgid "Folder (right-aligned)"
 msgstr "Pasta (alinhado à direita)"
 
@@ -1724,7 +1724,7 @@ msgstr "Formato tela cheia"
 msgid "Fullscreen"
 msgstr "Tela cheia"
 
-#: layouts:650
+#: layouts:637
 msgid "Fullscreen simple"
 msgstr "Tela cheia simples"
 
@@ -1750,7 +1750,7 @@ msgstr "Gênero está definido"
 msgid "Genres"
 msgstr "Gêneros"
 
-#: layouts:410
+#: layouts:397
 msgid "Genres pane"
 msgstr "Painel de Gêneros"
 
@@ -1834,22 +1834,22 @@ msgstr ""
 msgid "Increase Volume"
 msgstr "Aumentar Volume"
 
-#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598 layouts:180
+#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598 layouts:167
 msgid "Info"
 msgstr "Informação"
 
-#: layouts:946
+#: layouts:933
 msgid "Insensitive title-artist (left-aligned)"
 msgstr ""
 "Não sensível ao clique do mouse para o título do artista (alinhado à "
 "esquerda)"
 
-#: layouts:952
+#: layouts:939
 msgid "Insensitive title-artist (right-aligned)"
 msgstr ""
 "Não sensível ao clique do mouse para o título do artista (alinhado à direita)"
 
-#: layouts:959
+#: layouts:946
 msgid "Insensitive, Song & Cover"
 msgstr "Não sensível ao clique do mouse, Música & Capa"
 
@@ -1861,7 +1861,7 @@ msgstr "Inserir uma lista de arquivos/pastas no início da lista de reprodução
 msgid "Invalid regular expression"
 msgstr ""
 
-#: layouts:987
+#: layouts:974
 msgid "Invisible hot spot"
 msgstr "Hot spot invísivel"
 
@@ -1873,7 +1873,7 @@ msgstr ""
 msgid "KB"
 msgstr "KB"
 
-#: plugins/karaoke.pm:9 layouts:918
+#: plugins/karaoke.pm:9 layouts:905
 msgid "Karaoke"
 msgstr "Karaokê"
 
@@ -1911,7 +1911,7 @@ msgstr "Etiqueta/Publicar"
 msgid "Labels"
 msgstr "Etiquetas"
 
-#: gmusicbrowser_list.pm:744 layouts:812
+#: gmusicbrowser_list.pm:744 layouts:799
 msgid "Labels' icons"
 msgstr ""
 
@@ -1963,7 +1963,7 @@ msgstr "Estilos"
 msgid "Left aligned"
 msgstr ""
 
-#: layouts:410
+#: layouts:397
 msgid "Left pane"
 msgstr "Painel Esquerdo"
 
@@ -1971,8 +1971,8 @@ msgstr "Painel Esquerdo"
 msgid "Length"
 msgstr "Tempo"
 
-#: gmusicbrowser.pl:5218 gmusicbrowser_list.pm:128 layouts:215 layouts:378
-#: layouts:582 layouts:644
+#: gmusicbrowser.pl:5218 gmusicbrowser_list.pm:128 layouts:202 layouts:365
+#: layouts:569 layouts:631
 msgid "Library"
 msgstr "Biblioteca"
 
@@ -2021,7 +2021,7 @@ msgstr "Listadas : "
 msgid "Listed songs"
 msgstr "Músicas Listadas"
 
-#: layouts:194
+#: layouts:181
 msgid "Lists, Library & Context"
 msgstr "Listas, Biblioteca & Conteúdo"
 
@@ -2118,11 +2118,11 @@ msgstr ""
 
 #: gmusicbrowser_tags.pm:1538 gmusicbrowser_tags.pm:1576
 #: gmusicbrowser_tags.pm:1597 gmusicbrowser_tags.pm:1612 plugins/lyrics.pm:9
-#: plugins/lyrics.pm:87 plugins/webcontext.pm:180 layouts:179
+#: plugins/lyrics.pm:87 plugins/webcontext.pm:180 layouts:166
 msgid "Lyrics"
 msgstr "Letras"
 
-#: layouts:993
+#: layouts:980
 msgid "Lyrics (requires lyrics plugin)"
 msgstr "Letras (requer plugin Letras)"
 
@@ -2162,7 +2162,7 @@ msgstr ""
 msgid "Main"
 msgstr "Principal"
 
-#: layouts:130
+#: layouts:133
 msgid "Main Tree"
 msgstr ""
 
@@ -2198,7 +2198,7 @@ msgstr "Tipo de mídia"
 msgid "Menu entry name"
 msgstr "Nome da entrada do Menu"
 
-#: layouts:287
+#: layouts:274
 msgid "Minimal tip"
 msgstr "botões e barra de acompanhamento"
 
@@ -2226,7 +2226,7 @@ msgstr ""
 msgid "More results"
 msgstr "Mais resultados"
 
-#: layouts:173
+#: layouts:160
 msgid "Mosaic View"
 msgstr ""
 
@@ -2675,7 +2675,7 @@ msgstr "Tocar todas as músicas deste álbum"
 msgid "Play all songs from this artist"
 msgstr "Tocar todas as músicas deste artista"
 
-#: layouts:926
+#: layouts:913
 msgid "Play button"
 msgstr "Bõtão Tocar"
 
@@ -2735,7 +2735,7 @@ msgstr "Tocando Filtro"
 msgid "Playing Title"
 msgstr "Tocando Título"
 
-#: gmusicbrowser_list.pm:737 layouts:807
+#: gmusicbrowser_list.pm:737 layouts:794
 msgid "Playing and queue icons"
 msgstr ""
 
@@ -2743,11 +2743,11 @@ msgstr ""
 msgid "Playing error : {error}"
 msgstr ""
 
-#: layouts:799
+#: layouts:786
 msgid "Playing/Queue Icon or Track"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:407 layouts:486
+#: gmusicbrowser_layout.pm:407 layouts:473
 msgid "Playlist"
 msgstr "Lista de músicas"
 
@@ -2771,7 +2771,7 @@ msgstr "Lista de filtros"
 msgid "Playlist filter :\n"
 msgstr "Lista de filtro :\n"
 
-#: layouts:623
+#: layouts:610
 msgid "Playlist, Library & Context"
 msgstr "Lista, Biblioteca & Conteúdo"
 
@@ -2799,15 +2799,15 @@ msgstr "Tela de Dicas"
 msgid "Pre-set"
 msgstr "Pre-Configuração"
 
-#: layouts:761
+#: layouts:748
 msgid "Prefix"
 msgstr ""
 
-#: layouts:763
+#: layouts:750
 msgid "Prefix font style"
 msgstr ""
 
-#: layouts:762
+#: layouts:749
 msgid "Prefix font weight"
 msgstr ""
 
@@ -2847,7 +2847,7 @@ msgstr "Dados Privativos"
 msgid "Produced (P)"
 msgstr "Produzido (P)"
 
-#: layouts:914
+#: layouts:901
 msgid "Progress"
 msgstr "Progresso"
 
@@ -2872,12 +2872,12 @@ msgid "Publisher/Studio logotype"
 msgstr "Distribuidor/Logotipo do Estúdio"
 
 #: gmusicbrowser.pl:2417 gmusicbrowser_layout.pm:196
-#: gmusicbrowser_layout.pm:401 gmusicbrowser_layout.pm:493 layouts:378
-#: layouts:410 layouts:468
+#: gmusicbrowser_layout.pm:401 gmusicbrowser_layout.pm:493 layouts:365
+#: layouts:397 layouts:455
 msgid "Queue"
 msgstr "Fila"
 
-#: layouts:178
+#: layouts:165
 msgid "Queue (%n)"
 msgstr ""
 
@@ -2897,19 +2897,19 @@ msgstr "Fila vazia"
 msgid "Queue mode"
 msgstr "Modo de fila"
 
-#: layouts:560
+#: layouts:547
 msgid "Queue, Library & Context"
 msgstr "Fila, Biblioteca & Conteúdo"
 
-#: layouts:793
+#: layouts:780
 msgid "Queue-Item Number"
 msgstr ""
 
-#: layouts:452
+#: layouts:439
 msgid "Quick Search"
 msgstr "Procura Rápida"
 
-#: layouts:460
+#: layouts:447
 msgid "Quick Search with SongTree"
 msgstr "Procura Rápida com Árvore"
 
@@ -2940,11 +2940,11 @@ msgstr "Edição de modo Aleatório"
 
 #: gmusicbrowser.pl:4621 gmusicbrowser.pl:4658 gmusicbrowser.pl:7822
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
-#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:842
+#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:829
 msgid "Rating"
 msgstr "Avaliação"
 
-#: gmusicbrowser_list.pm:766 layouts:843
+#: gmusicbrowser_list.pm:766 layouts:830
 msgid "Rating (picture)"
 msgstr "Avaliação (imagem)"
 
@@ -3194,11 +3194,11 @@ msgstr ""
 msgid "Right side"
 msgstr ""
 
-#: layouts:183
+#: layouts:170
 msgid "Right-click to remove filters"
 msgstr ""
 
-#: layouts:183
+#: layouts:170
 msgid "Right-click to toggle Shuffle"
 msgstr ""
 
@@ -3226,39 +3226,23 @@ msgstr "Carregar código em perl"
 msgid "Run system command"
 msgstr "Executar comando do sistema"
 
-#: layouts:140
-msgid "Same Album"
-msgstr ""
-
-#: layouts:135
-msgid "Same Artist"
-msgstr ""
-
-#: gmusicbrowser.pl:434
+#: gmusicbrowser.pl:434 layouts:136
 msgid "Same Title"
 msgstr "Mesmo Título"
 
-#: layouts:145
-msgid "Same Title (1)"
-msgstr ""
-
-#: layouts:148
-msgid "Same Title (2)"
-msgstr ""
-
-#: layouts:1010
+#: layouts:997
 msgid "Same artist"
 msgstr ""
 
-#: layouts:1020
+#: layouts:1007
 msgid "Same rating"
 msgstr ""
 
-#: layouts:1000
+#: layouts:987
 msgid "Same title"
 msgstr ""
 
-#: layouts:1015
+#: layouts:1002
 msgid "Same year"
 msgstr ""
 
@@ -3366,15 +3350,15 @@ msgstr "Continuando com canção"
 msgid "Scroll with the song"
 msgstr "Continuando com a canção"
 
-#: plugins/fetch_cover.pm:95 layouts:448 layouts:445 layouts:454 layouts:462
+#: plugins/fetch_cover.pm:95 layouts:435 layouts:432 layouts:441 layouts:449
 msgid "Search"
 msgstr "Procurar"
 
-#: layouts:554
+#: layouts:541
 msgid "Search & Playlist"
 msgstr "Procurar & Listar"
 
-#: layouts:547
+#: layouts:534
 msgid "Search & Queue"
 msgstr "Procurar & Enfileirar"
 
@@ -3591,7 +3575,7 @@ msgstr ""
 msgid "Shift"
 msgstr "Shift"
 
-#: layouts:766
+#: layouts:753
 msgid "Shimmer Queue"
 msgstr ""
 
@@ -3615,7 +3599,7 @@ msgstr ""
 msgid "Show artist's upcoming events"
 msgstr ""
 
-#: layouts:726
+#: layouts:713
 msgid "Show artist, album, year"
 msgstr ""
 
@@ -3651,7 +3635,7 @@ msgstr "Mostrar info na mudança de música"
 msgid "Show/Hide"
 msgstr "Mostrar/Esconder"
 
-#: layouts:183
+#: layouts:170
 msgid "Show/Hide Cover"
 msgstr ""
 
@@ -3663,7 +3647,7 @@ msgstr "Mostrar/Esconder esstilo do widget"
 msgid "Show/Hide lyrics line"
 msgstr "Mostrar/Esconder linha de letras"
 
-#: layouts:712
+#: layouts:699
 msgid "Show/Hide picture"
 msgstr ""
 
@@ -3700,15 +3684,15 @@ msgstr "Comando de desligamento :"
 msgid "Signal: "
 msgstr ""
 
-#: layouts:173
+#: layouts:160
 msgid "Simple List View"
 msgstr ""
 
-#: layouts:740
+#: layouts:727
 msgid "Simple title"
 msgstr ""
 
-#: layouts:747
+#: layouts:734
 msgid "Simple title without any"
 msgstr ""
 
@@ -3728,19 +3712,19 @@ msgstr "Pular contagem"
 msgid "Skip to next song if an error occurs"
 msgstr "Pular para próxima música se ocorrer um erro"
 
-#: layouts:835
+#: layouts:822
 msgid "Small album picture"
 msgstr ""
 
-#: layouts:221
+#: layouts:208
 msgid "Small player"
 msgstr "Player Pequeno"
 
-#: layouts:326
+#: layouts:313
 msgid "Smaller browser"
 msgstr "Navegador Menor"
 
-#: gmusicbrowser_list.pm:731 layouts:449 layouts:552 layouts:558 layouts:819
+#: gmusicbrowser_list.pm:731 layouts:436 layouts:539 layouts:545 layouts:806
 msgid "Song"
 msgstr "Música"
 
@@ -3760,7 +3744,7 @@ msgstr "Edição de agrupamento de Árvore"
 msgid "Songs Properties"
 msgstr "Propriedades das músicas"
 
-#: layouts:173
+#: layouts:160
 msgid "Songtree View"
 msgstr ""
 
@@ -3809,15 +3793,15 @@ msgstr ""
 msgid "Stop when queue empty"
 msgstr "Parar quando a fila esvaziar"
 
-#: layouts:931
+#: layouts:918
 msgid "Stop, Play and Next buttons"
 msgstr "Botões Parar, Tocar e Próxima"
 
-#: layouts:936
+#: layouts:923
 msgid "Stop, Play and Next buttons and Time"
 msgstr "Botões Parar, Tocar e Próxima e Tempo"
 
-#: layouts:941
+#: layouts:928
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr "Botões Parar, Tocar e Próxima e Título/Artista"
 
@@ -3937,23 +3921,23 @@ msgstr "Tempo do som diminuindo devagar no fim da música em segundos"
 msgid "Title"
 msgstr "Título"
 
-#: layouts:826
+#: layouts:813
 msgid "Title & icon"
 msgstr ""
 
-#: layouts:784
+#: layouts:771
 msgid "Title & progress"
 msgstr ""
 
-#: gmusicbrowser_list.pm:731 layouts:818
+#: gmusicbrowser_list.pm:731 layouts:805
 msgid "Title - Artist - Album"
 msgstr "Título - Artista - Álbum"
 
-#: layouts:754
+#: layouts:741
 msgid "Title with customizable prefix"
 msgstr ""
 
-#: layouts:170
+#: layouts:157
 msgid "Title: %t (Track No. %n)"
 msgstr ""
 
@@ -4171,7 +4155,7 @@ msgstr "Artistas variados"
 msgid "Version"
 msgstr "Versão"
 
-#: layouts:410
+#: layouts:397
 msgid "View"
 msgstr "Visual"
 
@@ -4183,7 +4167,7 @@ msgstr "Ver Binário"
 msgid "View binary data ..."
 msgstr "Ver dados binários ..."
 
-#: layouts:905
+#: layouts:892
 msgid "Volume"
 msgstr "Volume"
 
@@ -4371,7 +4355,7 @@ msgstr "opções avançadas"
 msgid "after %d"
 msgstr "depois %d"
 
-#: layouts:684
+#: layouts:671
 msgid "album and artist breadcrumbs"
 msgstr ""
 
@@ -4587,7 +4571,7 @@ msgstr "nome de arquivo padrão"
 msgid "default folder"
 msgstr "pasta padrão"
 
-#: layouts:601
+#: layouts:588
 msgid "default fullscreen"
 msgstr "Tela cheia padrão"
 
@@ -4611,7 +4595,7 @@ msgstr "Deletar modo de classificação selecionado"
 msgid "different folders"
 msgstr "arquivos diferente"
 
-#: layouts:675
+#: layouts:662
 msgid "disc on the left side"
 msgstr ""
 
@@ -4691,7 +4675,7 @@ msgstr "exemplo : %s"
 msgid "examples :"
 msgstr "exemplos :"
 
-#: layouts:58 layouts:93
+#: layouts:58 layouts:95
 msgid "expand/collapse cover area"
 msgstr ""
 
@@ -4739,11 +4723,11 @@ msgstr "para arquivos sem um cabeçalho VBR"
 msgid "front cover"
 msgstr "capa da frente"
 
-#: layouts:265
+#: layouts:252
 msgid "full"
 msgstr "completo"
 
-#: layouts:271
+#: layouts:258
 msgid "full with buttons"
 msgstr "completo com botões"
 
@@ -4795,7 +4779,7 @@ msgstr ""
 msgid "imported list"
 msgstr "lista importada"
 
-#: layouts:276
+#: layouts:263
 msgid "info"
 msgstr "só artista/título/álbum/capa"
 
@@ -4975,11 +4959,11 @@ msgstr ""
 "itunes não suportava tags sem sincronia a última vez que eu chequei, afeta "
 "normalmente tags com imagens"
 
-#: layouts:348
+#: layouts:335
 msgid "itunes++"
 msgstr ""
 
-#: layouts:405
+#: layouts:392
 msgid "itunes-like"
 msgstr "Semelhante ao itunes"
 
@@ -5033,7 +5017,7 @@ msgstr "artista que lidera"
 msgid "leaflet page"
 msgstr "folheto"
 
-#: layouts:591
+#: layouts:578
 msgid "left-side filter panes"
 msgstr "Painéis de filtro do lado esquerdo"
 
@@ -5084,7 +5068,7 @@ msgstr "mídia"
 msgid "medium size"
 msgstr "tamanho médio"
 
-#: layouts:241
+#: layouts:228
 msgid "minimal"
 msgstr "mínimo"
 
@@ -5317,7 +5301,7 @@ msgstr "fechar"
 msgid "quit when queue empty"
 msgstr "sair quando vila esvaziar"
 
-#: layouts:513
+#: layouts:500
 msgid "quodlibet-like"
 msgstr "Semelhante ao quodlibet"
 
@@ -5414,11 +5398,11 @@ msgstr "Verificar agora"
 msgid "seconds"
 msgstr "segundo(s)"
 
-#: layouts:154
+#: layouts:141
 msgid "shimmer"
 msgstr ""
 
-#: layouts:248
+#: layouts:235
 msgid "shimmer_tray"
 msgstr ""
 
@@ -5438,7 +5422,7 @@ msgstr "mostra a linha 'COMPLETA'"
 msgid "show/hide album cover"
 msgstr ""
 
-#: layouts:59 layouts:95
+#: layouts:59 layouts:97
 msgid "show/hide playlists"
 msgstr ""
 
@@ -5631,43 +5615,43 @@ msgstr "peso :"
 msgid "wikipedia, lyrics, and custom webpages"
 msgstr "wikipedia, letras e páginas personalizadas"
 
-#: layouts:289
+#: layouts:276
 msgid "with browser"
 msgstr "com navegador"
 
-#: layouts:506
+#: layouts:493
 msgid "with browser & queue"
 msgstr "com navegador & fila"
 
-#: layouts:311
+#: layouts:298
 msgid "with browser (SongTree)"
 msgstr "com navegador (Árvore)"
 
-#: layouts:588
+#: layouts:575
 msgid "with context"
 msgstr "com conteúdo"
 
-#: layouts:696
+#: layouts:683
 msgid "with picture"
 msgstr ""
 
-#: layouts:440
+#: layouts:427
 msgid "with playlist"
 msgstr "com lista de reprodução"
 
-#: layouts:535
+#: layouts:522
 msgid "with playlist & context"
 msgstr "com lista de reprodução & conteúdo"
 
-#: layouts:235
+#: layouts:222
 msgid "with queue"
 msgstr "com fila"
 
-#: layouts:436
+#: layouts:423
 msgid "with search"
 msgstr "com procura"
 
-#: layouts:540
+#: layouts:527
 msgid "with tabbedlists"
 msgstr "com lista tabuladas"
 
@@ -5683,7 +5667,7 @@ msgstr ""
 msgid "x offset :"
 msgstr "x offset :"
 
-#: layouts:759
+#: layouts:746
 msgid "x padding"
 msgstr ""
 
@@ -5691,7 +5675,7 @@ msgstr ""
 msgid "y offset :"
 msgstr "y offset :"
 
-#: layouts:760
+#: layouts:747
 msgid "y padding"
 msgstr ""
 

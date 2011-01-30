@@ -64,7 +64,7 @@ VBMain = HPControlsInfoAndSearch _HPContent
                 #FRSongInfo = HBSongInfoDetails
                     HBSongInfoDetails = _VBTimeBar
                         VBTimeBar = 8-TimeBar(text="",minwidth=240)
-            HBSearch = 10-SimpleSearch(noselector=1,maxwidth=1000)
+            HBSearch = 10-SimpleSearch(noselector=1)
 
         MBmain = MainMenuItem
 
