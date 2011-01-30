@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-29 21:17+0100\n"
+"POT-Creation-Date: 2011-01-30 11:09+0100\n"
 "PO-Revision-Date: 2010-12-21 14:24-0300\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese <LL@li.org>\n"
@@ -12,38 +12,38 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-#: plugins/artistinfo.pm:466
+#: plugins/artistinfo.pm:474
 msgid ""
 "\n"
 "\n"
 "Edit in the last.fm wiki"
 msgstr ""
 
-#: plugins/artistinfo.pm:462
+#: plugins/artistinfo.pm:466
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Total playcount: "
 msgstr ""
 
-#: plugins/artistinfo.pm:476
+#: plugins/artistinfo.pm:485
 msgid ""
 " Upcoming Event\n"
 "\n"
 msgstr ""
 
-#: plugins/artistinfo.pm:478
+#: plugins/artistinfo.pm:487
 msgid ""
 " Upcoming Events\n"
 "\n"
@@ -672,7 +672,7 @@ msgstr "Artista"
 msgid "Artist & album"
 msgstr "Artista & álbum"
 
-#: plugins/artistinfo.pm:449
+#: plugins/artistinfo.pm:452
 msgid "Artist Biography"
 msgstr ""
 
@@ -780,7 +780,7 @@ msgstr "Plugin Auto Salvar"
 msgid "Available"
 msgstr "Disponível"
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid "Average rating: "
 msgstr ""
 
@@ -1367,7 +1367,7 @@ msgstr "Editar filtro"
 msgid "Edit grouping ..."
 msgstr "Editar grupos ..."
 
-#: plugins/artistinfo.pm:547
+#: plugins/artistinfo.pm:557
 msgid "Edit in the last.fm wiki"
 msgstr ""
 
@@ -1488,7 +1488,7 @@ msgstr "Equalizador"
 msgid "Error :"
 msgstr "Erro :"
 
-#: plugins/artistinfo.pm:567
+#: plugins/artistinfo.pm:578
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1510,7 +1510,7 @@ msgstr "Erro gravando '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Erro gravando tags do replaygain :\n"
 
-#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:569 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Erro: padrão de arquivo inválido"
 
@@ -2043,12 +2043,12 @@ msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "Carregado %d música não marcada da sessão anterior"
 msgstr[1] "Carregado %d músicas não marcada da sessão anterior"
 
-#: plugins/artistinfo.pm:429 plugins/artistinfo.pm:528 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/artistinfo.pm:537 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Falha ao tentar carregar"
 
-#: plugins/artistinfo.pm:417 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:420 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Carregando..."
 
@@ -2333,7 +2333,7 @@ msgstr "Sem filtro travado"
 msgid "No moods"
 msgstr ""
 
-#: plugins/artistinfo.pm:477
+#: plugins/artistinfo.pm:486
 msgid "No results found"
 msgstr ""
 
@@ -5341,7 +5341,7 @@ msgstr "zerar filtro primário"
 msgid "reset secondary filter"
 msgstr "zerar filtro secundário"
 
-#: plugins/artistinfo.pm:429 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "tentar de novo"
 

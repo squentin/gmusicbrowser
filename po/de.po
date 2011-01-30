@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9621\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-29 21:17+0100\n"
+"POT-Creation-Date: 2011-01-30 11:09+0100\n"
 "PO-Revision-Date: 2010-02-22 21:01+0100\n"
 "Last-Translator:  <staubi@linuxmail.org>\n"
 "Language-Team: german <de@li.org>\n"
@@ -15,14 +15,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
-#: plugins/artistinfo.pm:466
+#: plugins/artistinfo.pm:474
 msgid ""
 "\n"
 "\n"
 "Edit in the last.fm wiki"
 msgstr ""
 
-#: plugins/artistinfo.pm:462
+#: plugins/artistinfo.pm:466
 msgid ""
 "\n"
 "No results found"
@@ -30,7 +30,7 @@ msgstr ""
 "\n"
 "Keine Ergebnisse gefunden"
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Rating range: "
@@ -38,7 +38,7 @@ msgstr ""
 "\n"
 "Bewertungsbereich:"
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Total playcount: "
@@ -46,13 +46,13 @@ msgstr ""
 "\n"
 "Insgesamt gespielt:"
 
-#: plugins/artistinfo.pm:476
+#: plugins/artistinfo.pm:485
 msgid ""
 " Upcoming Event\n"
 "\n"
 msgstr ""
 
-#: plugins/artistinfo.pm:478
+#: plugins/artistinfo.pm:487
 msgid ""
 " Upcoming Events\n"
 "\n"
@@ -680,7 +680,7 @@ msgstr "Künstler"
 msgid "Artist & album"
 msgstr "Künstler & Album"
 
-#: plugins/artistinfo.pm:449
+#: plugins/artistinfo.pm:452
 msgid "Artist Biography"
 msgstr ""
 
@@ -788,7 +788,7 @@ msgstr "Automatisch speichern-Erweiterung"
 msgid "Available"
 msgstr "Verfügbar"
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid "Average rating: "
 msgstr "Durchschnittliche Bewertung"
 
@@ -1378,7 +1378,7 @@ msgstr "Bearbeite Filter"
 msgid "Edit grouping ..."
 msgstr "Bearbeite Gruppierungen ..."
 
-#: plugins/artistinfo.pm:547
+#: plugins/artistinfo.pm:557
 msgid "Edit in the last.fm wiki"
 msgstr ""
 
@@ -1499,7 +1499,7 @@ msgstr "Equalizer"
 msgid "Error :"
 msgstr "Fehler:"
 
-#: plugins/artistinfo.pm:567
+#: plugins/artistinfo.pm:578
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1523,7 +1523,7 @@ msgstr "Fehler beim schreiben von '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Fehler beim schreiben der Wiedergabe-Verstärkung-Tags:\n"
 
-#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:569 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Fehler: ungültiges Dateinamensmuster"
 
@@ -2059,12 +2059,12 @@ msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "%d unübermittelter Titel aus letzter Sitzung geladen"
 msgstr[1] "%d unübermittelte Titel aus letzter Sitzung geladen"
 
-#: plugins/artistinfo.pm:429 plugins/artistinfo.pm:528 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/artistinfo.pm:537 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Laden fehlgeschlagen."
 
-#: plugins/artistinfo.pm:417 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:420 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Lade ..."
 
@@ -2349,7 +2349,7 @@ msgstr "Kein Haltefilter"
 msgid "No moods"
 msgstr "Keine Stimmungen"
 
-#: plugins/artistinfo.pm:477
+#: plugins/artistinfo.pm:486
 msgid "No results found"
 msgstr "Keine Ergebnisse gefunden"
 
@@ -5363,7 +5363,7 @@ msgstr "Primären Filter aufheben"
 msgid "reset secondary filter"
 msgstr "Sekundären Filter aufheben"
 
-#: plugins/artistinfo.pm:429 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "Erneut versuchen"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser.pot\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-29 21:17+0100\n"
+"POT-Creation-Date: 2011-01-30 11:09+0100\n"
 "PO-Revision-Date: 2009-04-30 13:14+0800\n"
 "Last-Translator: Google Translate\n"
 "Language-Team: Chinese\n"
@@ -12,38 +12,38 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: plugins/artistinfo.pm:466
+#: plugins/artistinfo.pm:474
 msgid ""
 "\n"
 "\n"
 "Edit in the last.fm wiki"
 msgstr ""
 
-#: plugins/artistinfo.pm:462
+#: plugins/artistinfo.pm:466
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Total playcount: "
 msgstr ""
 
-#: plugins/artistinfo.pm:476
+#: plugins/artistinfo.pm:485
 msgid ""
 " Upcoming Event\n"
 "\n"
 msgstr ""
 
-#: plugins/artistinfo.pm:478
+#: plugins/artistinfo.pm:487
 msgid ""
 " Upcoming Events\n"
 "\n"
@@ -648,7 +648,7 @@ msgstr "艺术家"
 msgid "Artist & album"
 msgstr "艺术家及专辑"
 
-#: plugins/artistinfo.pm:449
+#: plugins/artistinfo.pm:452
 msgid "Artist Biography"
 msgstr ""
 
@@ -756,7 +756,7 @@ msgstr "自动存储插件"
 msgid "Available"
 msgstr "可用的"
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid "Average rating: "
 msgstr ""
 
@@ -1341,7 +1341,7 @@ msgstr "修改过滤器"
 msgid "Edit grouping ..."
 msgstr "编辑群组..."
 
-#: plugins/artistinfo.pm:547
+#: plugins/artistinfo.pm:557
 msgid "Edit in the last.fm wiki"
 msgstr ""
 
@@ -1462,7 +1462,7 @@ msgstr "均衡"
 msgid "Error :"
 msgstr "错误："
 
-#: plugins/artistinfo.pm:567
+#: plugins/artistinfo.pm:578
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1484,7 +1484,7 @@ msgstr "写'{file}'时发生错误"
 msgid "Error writing replaygain tags :\n"
 msgstr "写replaygain标签时发生错误：\n"
 
-#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:569 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "错误：无效的文件名模式"
 
@@ -2010,12 +2010,12 @@ msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "正在加载上次会话中未送出的 %d 曲目"
 
-#: plugins/artistinfo.pm:429 plugins/artistinfo.pm:528 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/artistinfo.pm:537 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "载入中失败。"
 
-#: plugins/artistinfo.pm:417 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:420 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "载入中..."
 
@@ -2297,7 +2297,7 @@ msgstr "没有已锁定的滤波器"
 msgid "No moods"
 msgstr ""
 
-#: plugins/artistinfo.pm:477
+#: plugins/artistinfo.pm:486
 msgid "No results found"
 msgstr ""
 
@@ -5282,7 +5282,7 @@ msgstr "重置初级过滤器"
 msgid "reset secondary filter"
 msgstr "重置二级过滤器"
 
-#: plugins/artistinfo.pm:429 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "重试"
 

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-29 21:17+0100\n"
+"POT-Creation-Date: 2011-01-30 11:09+0100\n"
 "PO-Revision-Date: 2011-01-19 09:56+0900\n"
 "Last-Translator: bluealbum <bluealbum@gmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
@@ -17,38 +17,38 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: plugins/artistinfo.pm:466
+#: plugins/artistinfo.pm:474
 msgid ""
 "\n"
 "\n"
 "Edit in the last.fm wiki"
 msgstr ""
 
-#: plugins/artistinfo.pm:462
+#: plugins/artistinfo.pm:466
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Total playcount: "
 msgstr ""
 
-#: plugins/artistinfo.pm:476
+#: plugins/artistinfo.pm:485
 msgid ""
 " Upcoming Event\n"
 "\n"
 msgstr ""
 
-#: plugins/artistinfo.pm:478
+#: plugins/artistinfo.pm:487
 msgid ""
 " Upcoming Events\n"
 "\n"
@@ -660,7 +660,7 @@ msgstr "음악가"
 msgid "Artist & album"
 msgstr "아티스트 & 앨범"
 
-#: plugins/artistinfo.pm:449
+#: plugins/artistinfo.pm:452
 msgid "Artist Biography"
 msgstr ""
 
@@ -768,7 +768,7 @@ msgstr "자동저장 플러그인"
 msgid "Available"
 msgstr "사용 가능"
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid "Average rating: "
 msgstr ""
 
@@ -1353,7 +1353,7 @@ msgstr "필터 편집"
 msgid "Edit grouping ..."
 msgstr "그룹으로 나누기 편집 ..."
 
-#: plugins/artistinfo.pm:547
+#: plugins/artistinfo.pm:557
 msgid "Edit in the last.fm wiki"
 msgstr ""
 
@@ -1474,7 +1474,7 @@ msgstr "이퀄라이저"
 msgid "Error :"
 msgstr "에러 :"
 
-#: plugins/artistinfo.pm:567
+#: plugins/artistinfo.pm:578
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1498,7 +1498,7 @@ msgstr " '{file}' 쓰기 에러!"
 msgid "Error writing replaygain tags :\n"
 msgstr "리플레이게인 태그 쓰기 에러 :\n"
 
-#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:569 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "에러: 잘못된 파일이름 패턴"
 
@@ -2029,12 +2029,12 @@ msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "이전 세션에서 보내지 않은 노래 %d 가져옴"
 
-#: plugins/artistinfo.pm:429 plugins/artistinfo.pm:528 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/artistinfo.pm:537 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "가져오기 실패함."
 
-#: plugins/artistinfo.pm:417 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:420 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "가져오는 중..."
 
@@ -2317,7 +2317,7 @@ msgstr "잠금된 필터 없음"
 msgid "No moods"
 msgstr "분위기 사용안함"
 
-#: plugins/artistinfo.pm:477
+#: plugins/artistinfo.pm:486
 msgid "No results found"
 msgstr ""
 
@@ -5321,7 +5321,7 @@ msgstr "기본 필터값 재설정"
 msgid "reset secondary filter"
 msgstr "두번째 필터 재설정"
 
-#: plugins/artistinfo.pm:429 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "재시도"
 

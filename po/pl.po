@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.0\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-29 21:17+0100\n"
+"POT-Creation-Date: 2011-01-30 11:09+0100\n"
 "PO-Revision-Date: 2008-10-02 00:51+0100\n"
 "Last-Translator: Michael R' Tokarczyk <mrtokarczyk@gmail.com>\n"
 "Language-Team: tizzilzol team <tizzilzol@gmail.com>\n"
@@ -17,38 +17,38 @@ msgstr ""
 "X-Poedit-Country: POLAND\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: plugins/artistinfo.pm:466
+#: plugins/artistinfo.pm:474
 msgid ""
 "\n"
 "\n"
 "Edit in the last.fm wiki"
 msgstr ""
 
-#: plugins/artistinfo.pm:462
+#: plugins/artistinfo.pm:466
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Total playcount: "
 msgstr ""
 
-#: plugins/artistinfo.pm:476
+#: plugins/artistinfo.pm:485
 msgid ""
 " Upcoming Event\n"
 "\n"
 msgstr ""
 
-#: plugins/artistinfo.pm:478
+#: plugins/artistinfo.pm:487
 msgid ""
 " Upcoming Events\n"
 "\n"
@@ -673,7 +673,7 @@ msgstr "Wykonawca"
 msgid "Artist & album"
 msgstr "Wykonawca & album"
 
-#: plugins/artistinfo.pm:449
+#: plugins/artistinfo.pm:452
 msgid "Artist Biography"
 msgstr ""
 
@@ -781,7 +781,7 @@ msgstr "Autozapis"
 msgid "Available"
 msgstr "Dostępne"
 
-#: plugins/artistinfo.pm:388
+#: plugins/artistinfo.pm:392
 msgid "Average rating: "
 msgstr ""
 
@@ -1367,7 +1367,7 @@ msgstr "Edytuj filtr"
 msgid "Edit grouping ..."
 msgstr "Edytuj grupowanie ..."
 
-#: plugins/artistinfo.pm:547
+#: plugins/artistinfo.pm:557
 msgid "Edit in the last.fm wiki"
 msgstr ""
 
@@ -1488,7 +1488,7 @@ msgstr "Korektor"
 msgid "Error :"
 msgstr "Błąd :"
 
-#: plugins/artistinfo.pm:567
+#: plugins/artistinfo.pm:578
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1510,7 +1510,7 @@ msgstr "Błąd zapisywania '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Błąd zapisu znaczników Replay Gain :\n"
 
-#: plugins/artistinfo.pm:558 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:569 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Błąd: Niewłaściwa nazwa pliku"
 
@@ -2040,12 +2040,12 @@ msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "Zgłoszono %d utwór z poprzedniej sesji"
 msgstr[1] "Zgłoszono %d utworów z poprzedniej sesji"
 
-#: plugins/artistinfo.pm:429 plugins/artistinfo.pm:528 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/artistinfo.pm:537 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Błąd wczytywania."
 
-#: plugins/artistinfo.pm:417 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:420 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Wczytywanie ..."
 
@@ -2328,7 +2328,7 @@ msgstr "Filtr nie zablokowany"
 msgid "No moods"
 msgstr ""
 
-#: plugins/artistinfo.pm:477
+#: plugins/artistinfo.pm:486
 msgid "No results found"
 msgstr ""
 
@@ -5338,7 +5338,7 @@ msgstr "resetuj główny filtr"
 msgid "reset secondary filter"
 msgstr "resetuj podrzędny filtr"
 
-#: plugins/artistinfo.pm:429 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "ponów"
 
