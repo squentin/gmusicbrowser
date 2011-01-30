@@ -1,6 +1,6 @@
 // resource.js
-// Copyright (c) 2009 Andrew Clunis <aclunis@credil.org>
-// Copyright (c) 2009 CREDIL
+// Copyright (c) 2009-2010 Andrew Clunis <aclunis@credil.org>
+// Copyright (c) 2009-2010 CREDIL
 
 // very simple Rails-esque REST library, vaguely inspired by Jester,
 // ActiveRecord and ActiveResource.  Requires Prototype 1.6.
@@ -17,9 +17,33 @@
 // it's really only useful for my use case (needed_songs has_many relationship
 // inlined on the Playlist resource in Calliope).
 
-// Hmm, really need to be able to define resources by defining a class,
-// rather just insantiating Resource with some arguments, and then using actual
-// inheritance.  A la ActiveRecord.
+// TODO: really need to be able to define resources by defining a
+// class, rather just insantiating Resource with some arguments, and
+// then using actual inheritance.  A la ActiveRecord.
+
+// TODO: figure out what some more of the REST conventions are: if sending
+// JSON, do I put it in a single field of form-encoded, or just raw,
+// or should I support form-encoded at all, or...?
+
+// TODO: has_many arrays should be preinitialized to []., so that they
+// aren't undefined in the event of the resource getting updated
+// with JSON that includes no array by that name.
+
+// TODO: add "deep save" which will walk the tree of all owned
+// subresources and save them if needed.  this will be useful for
+// having subresources created and added to a brand new resource, and
+// then saving them all at once.
+// Convenient for UIs that wrap Resource instances where you want
+// users to be able to create a structure of objects with depth and
+// save them all at once, without needing to save the higher objects
+// before the subobjects can be meaningfully created.
+
+// TODO: even better, a inline deep save which will send JSON to the
+// resource that had save() called on it that includes inline JSON of
+// the subresources as configured.  (obviously the "_id" fields on the
+// subresources would not be included as they would be normally).
+// Much more efficient and atomic than the above approach, at least if
+// your REST server supports it.
 
 var resources = {};
 
@@ -40,14 +64,16 @@ var logError = function(e) {
 var Instance = Class.create({
     // resource: Resource object to which this Instance belongs,
     // hash: already-decoded JSON values for this Instance
-    initialize: function(resource, json) {
+    // id: ID if Resource already exists. If so, the instance is updated with the JSON.
+    initialize: function(resource, id, json) {
+	this.id = id;
 	this.resource = resource;
 	this.update_callbacks = new Array();
-	if(json == undefined) {
-	    log("Creating new instance of " + resource.name);
+	if(id == undefined) {
+	    log("Creating new instance for new " + resource.name);
 	    this.brand_new = true;
 	} else {
-	    log("Loading existing instance of " + resource.name);
+	    log("Creating instance for existing " + resource.name + ", id: " + id);
 	    this.brand_new = false;
 	    this.update(json);
 	    this.resource.registerInstance(this);
@@ -75,16 +101,22 @@ var Instance = Class.create({
 
 	log("Now checking for belongs_to...");
 
-	this.resource.belongs_to.each(function(res) {
-	    log("Processing belongs_to: " + res.name);
-	    if(json[res.name] != undefined) {
+	this.resource.belongs_to.each(function(bt) {
+	    log("Processing belongs_to: " + bt.resource.name + ", with name: " + bt.field_name);
+	    var field_name = undefined;
+	    if(bt.field_name == undefined) {
+		field_name = bt.resource.name;
+	    } else {
+		field_name = bt.field_name;
+	    }
+	    if(json[field_name] != undefined) {
 		//                log("... which was set!");
 		//                this[res.name] = new Instance(res, json[res.name]);
-		this[res.name] = res.loadInstance(json[res.name].id, json[res.name]);
-	    } else if(json[res.name + "_id"] != undefined) {
+		this[field_name] = bt.resource.loadInstance(json[field_name].id, json[field_name]);
+	    } else if(json[field_name + "_id"] != undefined) {
 		// check for res.name + "_id" here.
 		log("HAD AN NON-INLINE BELONGS TO");
-		this[res.name] = res.loadInstance(json[res.name + "_id"], {})
+		this[field_name] = bt.resource.loadInstance(json[field_name + "_id"], {});
 	    }
 	}.bind(this));
 
@@ -142,8 +174,14 @@ var Instance = Class.create({
 	to_save.id = this.id;
 	// belongs_to!
 	this.resource.belongs_to.each(function(bt) {
-	    if(values[bt.name] != undefined)
-		to_save[bt.name + "_id"] = values[bt.name].id;
+	    var field_name = undefined;
+	    if(bt.field_name == undefined) {
+		field_name = bt.resource.name;
+	    } else {
+		field_name = bt.field_name;
+	    }
+	    if(values[field_name] != undefined)
+		to_save[field_name + "_id"] = values[field_name].id;
 	}.bind(this));
 	// no joy on has_many yet...
 
@@ -152,11 +190,14 @@ var Instance = Class.create({
 	    onSuccess: function(transport) {
 		log("... save complete!");
 		// TODO: iterate through values and set instance values to them
-		this.update(transport.responseText.evalJSON(true));
+		json = transport.responseText.evalJSON(true);
 		if(this.brand_new) {
+		    this.id = parseInt(json.id);
 		    this.resource.registerInstance(this);
 		}
 		this.brand_new = false;
+		this.update(json);
+		
 		success_callback();
 	    }.bind(this),
 	    onFailure: function(transport) {
@@ -179,6 +220,7 @@ var Instance = Class.create({
 	new Ajax.Request(this.resource.path(this.id), req_opts);
     },
 
+    // TODO does not support inline saving.
     save: function(success_callback, failure_callback) {
 	var to_save = new Object();
 	// scalar fields!
@@ -187,8 +229,14 @@ var Instance = Class.create({
 	}.bind(this));
 	// belongs_to!
 	this.resource.belongs_to.each(function(bt) {
-	    if(this[bt.name] != undefined)
-		to_save[bt.name + "_id"] = this[bt.name].id;
+	    var field_name = undefined;
+	    if(bt.field_name == undefined) {
+		field_name = bt.resource.name;
+	    } else {
+		field_name = bt.field_name;
+	    }
+	    if(this[field_name] != undefined)
+		to_save[field_name + "_id"] = this[field_name].id;
 	}.bind(this));
 	// no joy on has_many yet...
 
@@ -196,11 +244,14 @@ var Instance = Class.create({
 	    method: 'put',
 	    onSuccess: function(transport) {
 		log("save complete!");
-		this.update(transport.responseText.evalJSON(true));
+		json = transport.responseText.evalJSON(true);
 		if(this.brand_new) {
+		    this.id = parseInt(json.id);
 		    this.resource.registerInstance(this);
 		}
 		this.brand_new = false;
+		this.update(json);
+	
 		success_callback();
 	    }.bind(this),
 	    onFailure: function(transport) {
@@ -256,11 +307,11 @@ var Resource = Class.create({
     },
 
     // TODO -- factor out belongs_to naming logic.
-    belongsTo: function(resource) {
+    belongsTo: function(resource, field_name) {
 	if(typeof(resource) == "string") {
-	    this.belongs_to.push(resources[resource]);
+	    this.belongs_to.push({"resource":resources[resource], "field_name":field_name});
 	} else {
-	    this.belongs_to.push(resource);
+	    this.belongs_to.push({"resource":resource, "field_name":field_name});
 	}
     },
 
@@ -313,7 +364,7 @@ var Resource = Class.create({
 	//        log("Getting instance of " + this.name + " by ID: " + instance_id);
 	if(instance == undefined) {
 	    //          log("Does not already exist, creating a new one!");
-	    instance = new Instance(this, update_json);
+	    instance = new Instance(this, instance_id, update_json);
 	    //            this.registerInstance(instance);
 	} else {
 	    //        log("... which did exist!");
@@ -404,6 +455,6 @@ var Resource = Class.create({
 
     // N.B. unlike AR's create, this one does not save right away!
     create: function() {
-	return new Instance(this, undefined);
+	return new Instance(this, undefined, undefined);
     }
 });
