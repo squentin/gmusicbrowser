@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-30 11:09+0100\n"
+"POT-Creation-Date: 2011-01-30 20:18+0100\n"
 "PO-Revision-Date: 2011-01-19 09:56+0900\n"
 "Last-Translator: bluealbum <bluealbum@gmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
@@ -309,7 +309,7 @@ msgstr ""
 msgid "<i>by</i> %a\\n<i>from</i> %l"
 msgstr "<i>의해</i> %a\\n<i>으로부터</i> %l"
 
-#: plugins/lastfm2gmb.pm:102
+#: plugins/lastfm2gmb.pm:104
 msgid "API URI:"
 msgstr ""
 
@@ -855,6 +855,15 @@ msgstr ""
 #: gmusicbrowser_gstreamer-0.10.pm:231
 msgid "Can't create sink '{sink}'"
 msgstr "'{sink}' 싱크를 만들 수 없습니다"
+
+#: plugins/lastfm2gmb.pm:128
+msgid "Can't create tmp dir"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:191 plugins/lastfm2gmb.pm:227
+#: plugins/lastfm2gmb.pm:236 plugins/lastfm2gmb.pm:316
+msgid "Can't get data from lastfm"
+msgstr ""
 
 #: gmusicbrowser_123.pm:138
 msgid "Can't play '{file}'."
@@ -1798,7 +1807,7 @@ msgstr "재생 오류 무시하기"
 msgid "Import list"
 msgstr "목록 가져오기"
 
-#: plugins/lastfm2gmb.pm:104
+#: plugins/lastfm2gmb.pm:106
 msgid "Import mode:"
 msgstr ""
 
@@ -1920,11 +1929,15 @@ msgstr "마지막 연주됨"
 msgid "Last skipped"
 msgstr "마지막 스킵됨"
 
+#: plugins/lastfm2gmb.pm:133
+msgid "Last.FM user necessary."
+msgstr ""
+
 #: plugins/lastfm2gmb.pm:11
 msgid "LastFM import plugin"
 msgstr ""
 
-#: plugins/lastfm2gmb.pm:107
+#: plugins/lastfm2gmb.pm:109
 msgid "LastFM user:"
 msgstr ""
 
@@ -1955,6 +1968,10 @@ msgstr "왼쪽 패널"
 #: gmusicbrowser.pl:7829 gmusicbrowser_songs.pm:737
 msgid "Length"
 msgstr "길이"
+
+#: plugins/lastfm2gmb.pm:126
+msgid "Let's start"
+msgstr ""
 
 #: gmusicbrowser.pl:5218 gmusicbrowser_list.pm:128 layouts:202 layouts:365
 #: layouts:569 layouts:631
@@ -2070,6 +2087,10 @@ msgstr "{field} 잠금"
 msgid "Locked on :\n"
 msgstr "잠금됨 :\n"
 
+#: plugins/lastfm2gmb.pm:146
+msgid "Looking up gmb library"
+msgstr ""
+
 #: gmusicbrowser.pl:443
 msgid "Lookup in AMG"
 msgstr "AMG에서 찾기"
@@ -2078,7 +2099,7 @@ msgstr "AMG에서 찾기"
 msgid "Lookup in google"
 msgstr "google에서 찾기"
 
-#: plugins/lastfm2gmb.pm:105
+#: plugins/lastfm2gmb.pm:107
 msgid "Loved tracks rating:"
 msgstr ""
 
@@ -2156,7 +2177,7 @@ msgstr ""
 msgid "Main artist"
 msgstr "메인 가수"
 
-#: plugins/lastfm2gmb.pm:115
+#: plugins/lastfm2gmb.pm:117
 msgid "Make it now"
 msgstr ""
 
@@ -2568,7 +2589,7 @@ msgstr "오버레이 레이아웃 :"
 msgid "Owner identifier"
 msgstr "소유자 인식자"
 
-#: plugins/lastfm2gmb.pm:109
+#: plugins/lastfm2gmb.pm:111
 msgid ""
 "PRE ALPHA!!! Nothing works!!!\n"
 "The plugin is based on the Program <b>lastfm2gmb</b> by Sergiy Borodych and "
@@ -3704,6 +3725,10 @@ msgstr "작은 재생기"
 msgid "Smaller browser"
 msgstr "작은 부라우저"
 
+#: plugins/lastfm2gmb.pm:228
+msgid "Something wrong: status = "
+msgstr ""
+
 #: gmusicbrowser_list.pm:731 layouts:436 layouts:539 layouts:545 layouts:806
 msgid "Song"
 msgstr "노래"
@@ -3837,7 +3862,7 @@ msgstr "태그"
 msgid "Tags"
 msgstr "태그"
 
-#: plugins/lastfm2gmb.pm:106
+#: plugins/lastfm2gmb.pm:108
 msgid "Temp dir:"
 msgstr ""
 
@@ -4002,6 +4027,10 @@ msgstr "독특한 파일 인식자"
 msgid "Unknown field ({field})"
 msgstr "알려지지 않은 필드 ({field})"
 
+#: plugins/lastfm2gmb.pm:132
+msgid "Unknown mode: "
+msgstr ""
+
 #: gmusicbrowser.pl:461
 msgid "Unlock Album"
 msgstr "잠금이 해제된 앨범"
@@ -4112,7 +4141,7 @@ msgstr "가수 필드로 사용됨"
 msgid "Used to associate the saved value with a user or a function"
 msgstr "사용자 또는 기능 포함한 저장된 값을 연결해 사용됨"
 
-#: plugins/lastfm2gmb.pm:103
+#: plugins/lastfm2gmb.pm:105
 msgid "User API Key:"
 msgstr ""
 
@@ -4753,7 +4782,7 @@ msgstr "제목 무시하기"
 msgid "illustration"
 msgstr "일러스트"
 
-#: plugins/lastfm2gmb.pm:104
+#: plugins/lastfm2gmb.pm:106
 msgid "import mode: a - all, p - playcount & lastplay, l - loved"
 msgstr ""
 
@@ -4979,15 +5008,15 @@ msgstr ""
 msgid "last.fm/libre.fm plugin"
 msgstr ""
 
-#: plugins/lastfm2gmb.pm:102
+#: plugins/lastfm2gmb.pm:104
 msgid "lastFM API request URL"
 msgstr ""
 
-#: plugins/lastfm2gmb.pm:103
+#: plugins/lastfm2gmb.pm:105
 msgid "lastfm api key"
 msgstr ""
 
-#: plugins/lastfm2gmb.pm:107
+#: plugins/lastfm2gmb.pm:109
 msgid "lastfm username"
 msgstr ""
 
@@ -5293,7 +5322,7 @@ msgstr "등급"
 msgid "rating average"
 msgstr "점수 평균"
 
-#: plugins/lastfm2gmb.pm:105
+#: plugins/lastfm2gmb.pm:107
 msgid "rating for loved tracks (1..100)"
 msgstr ""
 
@@ -5490,7 +5519,7 @@ msgstr "{action} 그런후"
 msgid "times"
 msgstr "번"
 
-#: plugins/lastfm2gmb.pm:106
+#: plugins/lastfm2gmb.pm:108
 msgid "tmp dir for cache store, etc"
 msgstr ""
 

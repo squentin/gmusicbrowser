@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9621\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-30 11:09+0100\n"
+"POT-Creation-Date: 2011-01-30 20:18+0100\n"
 "PO-Revision-Date: 2010-02-22 21:01+0100\n"
 "Last-Translator:  <staubi@linuxmail.org>\n"
 "Language-Team: german <de@li.org>\n"
@@ -326,7 +326,7 @@ msgstr ""
 msgid "<i>by</i> %a\\n<i>from</i> %l"
 msgstr "<i>von</i> %a\\n<i>aus</i> %l"
 
-#: plugins/lastfm2gmb.pm:102
+#: plugins/lastfm2gmb.pm:104
 msgid "API URI:"
 msgstr ""
 
@@ -877,6 +877,15 @@ msgstr ""
 #, fuzzy
 msgid "Can't create sink '{sink}'"
 msgstr "Kann '{sink}' nicht erstellen"
+
+#: plugins/lastfm2gmb.pm:128
+msgid "Can't create tmp dir"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:191 plugins/lastfm2gmb.pm:227
+#: plugins/lastfm2gmb.pm:236 plugins/lastfm2gmb.pm:316
+msgid "Can't get data from lastfm"
+msgstr ""
 
 #: gmusicbrowser_123.pm:138
 msgid "Can't play '{file}'."
@@ -1826,7 +1835,7 @@ msgstr "Ignoriere Abspielfehler"
 msgid "Import list"
 msgstr "Importiere Liste"
 
-#: plugins/lastfm2gmb.pm:104
+#: plugins/lastfm2gmb.pm:106
 msgid "Import mode:"
 msgstr ""
 
@@ -1948,11 +1957,15 @@ msgstr "Zuletzt gespielt"
 msgid "Last skipped"
 msgstr "Zuletzt übersprungen"
 
+#: plugins/lastfm2gmb.pm:133
+msgid "Last.FM user necessary."
+msgstr ""
+
 #: plugins/lastfm2gmb.pm:11
 msgid "LastFM import plugin"
 msgstr ""
 
-#: plugins/lastfm2gmb.pm:107
+#: plugins/lastfm2gmb.pm:109
 msgid "LastFM user:"
 msgstr ""
 
@@ -1983,6 +1996,10 @@ msgstr "Linker Abschnitt"
 #: gmusicbrowser.pl:7829 gmusicbrowser_songs.pm:737
 msgid "Length"
 msgstr "Länge"
+
+#: plugins/lastfm2gmb.pm:126
+msgid "Let's start"
+msgstr ""
 
 #: gmusicbrowser.pl:5218 gmusicbrowser_list.pm:128 layouts:202 layouts:365
 #: layouts:569 layouts:631
@@ -2100,6 +2117,10 @@ msgstr ""
 msgid "Locked on :\n"
 msgstr "Halte auf:\n"
 
+#: plugins/lastfm2gmb.pm:146
+msgid "Looking up gmb library"
+msgstr ""
+
 #: gmusicbrowser.pl:443
 msgid "Lookup in AMG"
 msgstr "Bei AllMusicGuide suchen"
@@ -2108,7 +2129,7 @@ msgstr "Bei AllMusicGuide suchen"
 msgid "Lookup in google"
 msgstr "Bei Google suchen"
 
-#: plugins/lastfm2gmb.pm:105
+#: plugins/lastfm2gmb.pm:107
 msgid "Loved tracks rating:"
 msgstr ""
 
@@ -2186,7 +2207,7 @@ msgstr ""
 msgid "Main artist"
 msgstr "Hauptkünstler"
 
-#: plugins/lastfm2gmb.pm:115
+#: plugins/lastfm2gmb.pm:117
 msgid "Make it now"
 msgstr ""
 
@@ -2599,7 +2620,7 @@ msgstr "Art der Überlagerung:"
 msgid "Owner identifier"
 msgstr "Besitzeridentifikation"
 
-#: plugins/lastfm2gmb.pm:109
+#: plugins/lastfm2gmb.pm:111
 msgid ""
 "PRE ALPHA!!! Nothing works!!!\n"
 "The plugin is based on the Program <b>lastfm2gmb</b> by Sergiy Borodych and "
@@ -3739,6 +3760,10 @@ msgstr "Kleiner Player"
 msgid "Smaller browser"
 msgstr "Kleinerer Browser"
 
+#: plugins/lastfm2gmb.pm:228
+msgid "Something wrong: status = "
+msgstr ""
+
 #: gmusicbrowser_list.pm:731 layouts:436 layouts:539 layouts:545 layouts:806
 msgid "Song"
 msgstr "Titel"
@@ -3872,7 +3897,7 @@ msgstr "Tag"
 msgid "Tags"
 msgstr "Tags"
 
-#: plugins/lastfm2gmb.pm:106
+#: plugins/lastfm2gmb.pm:108
 msgid "Temp dir:"
 msgstr ""
 
@@ -4039,6 +4064,10 @@ msgstr "Eindeutiger Datei-Identifikator"
 msgid "Unknown field ({field})"
 msgstr "Unbekanntes Feld ({field})"
 
+#: plugins/lastfm2gmb.pm:132
+msgid "Unknown mode: "
+msgstr ""
+
 #: gmusicbrowser.pl:461
 msgid "Unlock Album"
 msgstr "Album nicht halten"
@@ -4146,7 +4175,7 @@ msgstr "Für das Künstlerfeld verwendet"
 msgid "Used to associate the saved value with a user or a function"
 msgstr ""
 
-#: plugins/lastfm2gmb.pm:103
+#: plugins/lastfm2gmb.pm:105
 msgid "User API Key:"
 msgstr ""
 
@@ -4787,7 +4816,7 @@ msgstr "Ignoriere Titel"
 msgid "illustration"
 msgstr "Illustration"
 
-#: plugins/lastfm2gmb.pm:104
+#: plugins/lastfm2gmb.pm:106
 msgid "import mode: a - all, p - playcount & lastplay, l - loved"
 msgstr ""
 
@@ -5019,15 +5048,15 @@ msgstr "Last.fm/Libre.fm"
 msgid "last.fm/libre.fm plugin"
 msgstr "Last.fm/Libre.fm Plugin"
 
-#: plugins/lastfm2gmb.pm:102
+#: plugins/lastfm2gmb.pm:104
 msgid "lastFM API request URL"
 msgstr ""
 
-#: plugins/lastfm2gmb.pm:103
+#: plugins/lastfm2gmb.pm:105
 msgid "lastfm api key"
 msgstr ""
 
-#: plugins/lastfm2gmb.pm:107
+#: plugins/lastfm2gmb.pm:109
 msgid "lastfm username"
 msgstr ""
 
@@ -5335,7 +5364,7 @@ msgstr "Bewertung"
 msgid "rating average"
 msgstr "Durchschnittliche Bewertung"
 
-#: plugins/lastfm2gmb.pm:105
+#: plugins/lastfm2gmb.pm:107
 msgid "rating for loved tracks (1..100)"
 msgstr ""
 
@@ -5532,7 +5561,7 @@ msgstr "dann {action}"
 msgid "times"
 msgstr "mal"
 
-#: plugins/lastfm2gmb.pm:106
+#: plugins/lastfm2gmb.pm:108
 msgid "tmp dir for cache store, etc"
 msgstr ""
 
