@@ -365,10 +365,12 @@ sub prefbox {
 	    my $all_songs = Filter->new("")->filter;
 	    for my $song_id (@{$all_songs}) {
 		my $rating = ::Songs::Get($song_id, 'rating');
+		my $artist = ::Songs::Get($song_id, 'artist');
 		my $title = ::Songs::Get($song_id, 'title');
+		my $length = ::Songs::Get($song_id, 'length');
 		my $playcount = ::Songs::Get($song_id, 'playcount');
 		my $skipcount = ::Songs::Get($song_id, 'skipcount');
-		$csv->combine(@{[$song_id, $title, $rating, $playcount, $skipcount]});
+		$csv->combine(@{[$song_id, $artist, $title, $length, $rating, $playcount, $skipcount]});
 		print CSVF $csv->string . "\n";
 	    }
 	    close CSVF;
