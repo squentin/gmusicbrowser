@@ -1,4 +1,4 @@
-# Copyright (C) 2010      Andrew Clunis <andrew@orospakr.ca>
+# Copyright (C) 2010-2011 Andrew Clunis <andrew@orospakr.ca>
 #                         Daniel Rubin <dan@fracturedproject.net>
 #               2005-2009 Quentin Sculo <squentin@free.fr>
 #

@@ -1,4 +1,4 @@
-# Copyright (C) 2010      Andrew Clunis <andrew@orospakr.ca>
+# Copyright (C) 2010-2011 Andrew Clunis <andrew@orospakr.ca>
 #               2005-2009 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
@@ -53,6 +53,7 @@ my $resources = {};
 
 sub song2json {
     my ($song_id) = @_;
+    # TODO: if rating is unset, send default rating?
     return {"id" => $song_id, "artist" => ::Songs::Get($song_id, "artist"), "title" => ::Songs::Get($song_id, "title"), "length" => ::Songs::Get($song_id, "length"), "rating" => ::Songs::Get($song_id, "rating")};
 }
 

@@ -4,6 +4,14 @@ var log = function(text) {
     }
 };
 
+var gracefulErrorDisplay = function(error, predicate) {
+    var summary = "Exception while " + predicate + ": " + error.message;
+    var stacklog = error.stack;
+    log(summary);
+    log("... " + stacklog);
+    alert(summary + "\n" + "... " + stacklog);
+};
+
 // used in resource.js's rails-inspired XSS protection.  not implemented on the server yet...
 var authenticity_token = "fnubbbbbiats";
 
@@ -14,6 +22,9 @@ var TransportUI = Class.create({
 	this.client = client;
 	// we *don't* want callbacks from the Sliders when we update them programmatically
 	this.slider_lockout = false;
+
+	this.current_song = undefined;
+	this.current_song_cb_token = undefined;
 
 	this.volume = new Control.Slider('volume_position', 'volume_slider', {
 	    axis:'horizontal',
@@ -88,21 +99,36 @@ var TransportUI = Class.create({
     },
 
     songUpdated: function() {
-	$('current_song_title').innerHTML = this.current_song.title.escapeHTML();
-	$('current_song_artist').innerHTML = this.current_song.artist.escapeHTML();
-	this.slider_lockout = true;
-	this.rating.setValue(this.current_song.rating / 100);
-	this.slider_lockout = false;
+	if(this.current_song === undefined) {
+	    $('current_song_title').innerHTML = "-";
+	    $('current_song_artist').innerHTML = "-";
+	    this.slider_lockout = true;
+	    this.rating.setValue(0);
+	    this.slider_lockout = false;
+	} else {
+	    $('current_song_title').innerHTML = this.current_song.title.escapeHTML();
+	    $('current_song_artist').innerHTML = this.current_song.artist.escapeHTML();
+	    this.slider_lockout = true;
+	    this.rating.setValue(this.current_song.rating / 100);
+	    this.slider_lockout = false;
+	}
     },
 
+    /**
+      * Received new description of gmusicbrowser's state.
+      */
     doUpdate: function(state_description, current_song) {
 	// TODO we may not get all fields here, only update ones that actually are
 	
-	if(this.current_song != undefined) {
-	    this.current_song.rmOnUpdate(this.songUpdated.bind(this));
-	}
+	// stop listening to updates for the old currently playing song
+	// if(this.current_song_cb_token !== undefined) {
+	//     this.current_song.rmOnUpdate(this.current_song_cb_token);
+	//     this.current_song_cb_token = undefined;
+	// }
+
+	// // ... and listen to updates for the new current song
+	// this.current_song_cb_token = current_song.onUpdate(this.songUpdated.bind(this));
 	this.current_song = current_song;
-	current_song.onUpdate(this.songUpdated.bind(this));
 	this.songUpdated();
 	if(state_description.playing == 1) {
 	    $('playpausebutton').innerHTML = "Pause";
@@ -148,7 +174,7 @@ var GmusicBrowserClient = Class.create({
 		alert("holy crap problem play/pause'ing");
 	    },
 	    onException: function(response, exception) {
-		log("Problem getting status update: " + exception.message + ", stack: " + exception.stack);
+		gracefulErrorDisplay(exception, "getting player state update");
 	    }
 	});
     },
@@ -176,7 +202,7 @@ var GmusicBrowserClient = Class.create({
 		alert("holy crap problem skipping");
 	    },
 	    onException: function(response, e) {
-		alert(e);
+		gracefulErrorDisplay(e, "skipping");
 	    }
 	});
     },
@@ -192,7 +218,7 @@ var GmusicBrowserClient = Class.create({
 		alert("holy crap problem going back");
 	    },
 	    onException: function(response, e) {
-		alert(e);
+		gracefulErrorDisplay(e, "skipping to previous");
 	    }
 	});
     },
@@ -206,10 +232,10 @@ var GmusicBrowserClient = Class.create({
 		    thiz.update(response.responseText);
 	    }.bind(this),
 	    onFailure: function(response) {
-		alert("holy shit problem setting volume");
+		alert("Server problem while changing player state");
 	    }.bind(this),
 	    onException: function(response, e) {
-		alert(e);
+		gracefulErrorDisplay(e, "changing player state");
 	    },
 	    contentType:"application/json",
 	    postBody: Object.toJSON(state_description)

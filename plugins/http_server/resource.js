@@ -68,7 +68,8 @@ var Instance = Class.create({
     initialize: function(resource, id, json) {
 	this.id = id;
 	this.resource = resource;
-	this.update_callbacks = new Array();
+	this.update_callbacks_sequence = 0;
+	this.update_callbacks = new Hash();
 	if(id == undefined) {
 	    log("Creating new instance for new " + resource.name);
 	    this.brand_new = true;
@@ -80,12 +81,20 @@ var Instance = Class.create({
 	}
     },
 
+    /**
+      * Register a callback to receive notification when this instance receives updates.
+      * Returns an integer token you can use to unregister this callback in the future.
+      */
     onUpdate: function(update_callback) {
-	this.update_callbacks.push(update_callback);
+	this.update_callbacks[++(this.update_callbacks_sequence)] = update_callback;
+	return this.update_callbacks_sequence;
     },
 
-    rmOnUpdate: function(update_callback) {
-	this.update_callbacks.remove(update_callback);
+    rmOnUpdate: function(update_callback_token) {
+	if(!this.update_callbacks.keys().include(update_callback_token)) {
+	    log("Hey! resource.js asked to remove an update callback that has not been added. token: " + update_callback_token);
+	}
+	this.update_callbacks.unset(update_callback_token);
     },
 
     // update this instance from JSON input
@@ -134,8 +143,8 @@ var Instance = Class.create({
 	    }
 	}.bind(this));
 
-	this.update_callbacks.each(function(cb) {
-	    cb();
+	this.update_callbacks.each(function(pair) {
+	    pair.value();
 	}.bind(this));
     },
 
