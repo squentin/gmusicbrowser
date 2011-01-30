@@ -152,6 +152,24 @@ sub cgi_from_request {
     return $q;
 }
 
+sub prev_handler {
+    my ($request, $response) = @_;
+    $request->header(Connection => 'close');
+    my $path = $request->uri->path;
+    my $query = $request->uri->query;
+
+    warn "Got Prev request!";
+    my $cgi = cgi_from_request($request);
+
+    ::PrevSong();
+    warn "Successfully went back a song!";
+
+    $response->code(200);
+    $response->content_type('application/json');
+    $response->content(encode_json(state2json()));
+    return RC_OK;
+}
+
 sub skip_handler {
     my ($request, $response) = @_;
     $request->header(Connection => 'close');
@@ -321,6 +339,7 @@ background-color: blue;
     <br>
 
     <div>
+      <button id=prevbutton>Prev</button>
       <button id=playpausebutton>Play</button>
       <button id=skipbutton>Skip</button>
     </div>
@@ -349,6 +368,7 @@ sub StartServer {
 			   "/songs/" => \&songs_handler, # resource: song
 			   "/player" => \&player_handler,
 			   "/skip" => \&skip_handler,
+			   "/prev" => \&prev_handler,
 			   "/code/" => \&code_handler
     	},
     	Headers => {Server => 'Gmusicbrowser HTTP',},
