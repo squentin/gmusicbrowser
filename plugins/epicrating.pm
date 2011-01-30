@@ -157,7 +157,7 @@ sub ApplyRulesByName {
 }
 
 sub Played {
-    my ($self, $song_id, $finished, $start_time, $started_at, $play_time) = @_;
+    my ($self, $song_id, $finished, $start_time, $play_time, $play_ratio) = @_;
     if(!$finished) {
 	$self->Skipped($song_id, $play_time);
     } else {
