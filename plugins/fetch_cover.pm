@@ -14,7 +14,7 @@ desc	Adds a menu entry to artist/album context menu, allowing to search the pict
 package GMB::Plugin::FETCHCOVER;
 use strict;
 use warnings;
-require 'simple_http.pm';
+require $::HTTP_module;
 use base 'Gtk2::Window';
 use constant
 {	OPT => 'PLUGIN_FETCHCOVER_',
@@ -30,7 +30,8 @@ my %Sites=
 	lastfm => ['last.fm',"http://www.last.fm/music/%a/+images", \&parse_lastfm],
  },
  album =>
- {	googlei => ['google images',"http://images.google.com/images?q=%s&imgsz=medium|large", \&parse_googlei],
+ {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large&imgar=ns", \&parse_googlei],
+	googleihi =>[_"google images (hi-res)","http://www.google.com/images?q=%s&imgsz=xlarge|xxlarge&imgar=ns", \&parse_googlei],
 	slothradio => ['slothradio', "http://www.slothradio.com/covers/?artist=%a&album=%l", \&parse_sloth],
 	#itunesgrabber => ['itunesgrabber',"http://www.thejosher.net/iTunes/index.php?artist=%a&album=%l", \&parse_itunesgrabber],
 	freecovers => ['freecovers.net', "http://www.freecovers.net/api/search/%s", \&parse_freecovers], #could add /Music+CD but then we'd lose /Soundtrack
@@ -284,8 +285,9 @@ sub parse_googlei
 	{	my @matches=split /\],\["/,$1;	#not very reliable
 		for my $m (@matches)
 		{	my @fields=split /["\]],["\[]/,$m;
+			next if @fields<3;	#happens if no results
 			my $url=$fields[3];
-			my $desc=$fields[6]; $desc=~s#\\x([0-9a-f]{2})#chr(hex $1)#gie; $desc=~s#</?b>##g;
+			my $desc= $fields[6]||''; $desc=~s#\\x([0-9a-f]{2})#chr(hex $1)#gie; $desc=~s#</?b>##g;
 			$desc=Encode::decode('cp1252',$desc); #FIXME not sure of the encoding
 			$desc=::decode_html($desc);
 			my $preview='http://images.google.com/images?q=tbn:'.$fields[2].$url;
@@ -293,7 +295,7 @@ sub parse_googlei
 		}
 	}
 	my $nexturl;
-	if ($result=~m#<a href="(/images\?[^>"]*)"( [^>]*)?><img src="nav_next#)
+	if ($result=~m#<a href="(/images\?[^>"]*)"( [^>]*)?class=pn\b#)
 	{	$nexturl='http://images.google.com'.$1;
 		$nexturl=~s#&amp;#&#g;
 	}
@@ -450,13 +452,21 @@ sub set_cover
 		$check);
 	}
 	return unless $file;
-	my $fh;
-	until (open $fh,'>',$file)
-	{	my $retry=::Retry_Dialog( ::__x( _"Error writing '{file}'", file => ::filename_to_utf8displayname($file) )." :\n$!." ,$self);
-		return unless $retry eq 'yes';
+
+	#write file
+	{	my $fh;
+		my $ok= open $fh,'>',$file;
+		if ($ok)
+		{	$ok= print $fh $button->{pixdata};
+			unlink $file unless $ok;
+		}
+		unless ($ok)
+		{	my $retry=::Retry_Dialog( ::__x( _"Error writing '{file}'", file => ::filename_to_utf8displayname($file) )." :\n$!." ,$self);
+			redo if $retry eq 'yes';
+			return;
+		}
+		close $fh;
 	}
-	print $fh $button->{pixdata};
-	close $fh;
 	return unless $check->get_active;
 	AAPicture::SetPicture($field,$gid,$file);
 }

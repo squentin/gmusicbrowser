@@ -10,6 +10,7 @@ use strict;
 use warnings;
 use Socket;# 1.3; ?
 use Fcntl;
+use IO::Handle;
 
 use constant { EOL => "\015\012" };
 my (@Cachedurl,%Cache,$CacheSize,%ipcache); #FIXME purge %ipcache from time to time
@@ -17,7 +18,7 @@ my (@Cachedurl,%Cache,$CacheSize,%ipcache); #FIXME purge %ipcache from time to t
 sub get_with_cb
 {	my $self=bless {};
 	my $error;
-	if (ref $_[0]) {$self=shift; $error='Too many redirection' if 5 < $self->{redirect}++; }
+	if (ref $_[0]) {$self=shift; $error='Too many redirections' if 5 < $self->{redirect}++; }
 	my %params=@_;
 	$self->{params}=\%params;
 	my ($callback,$url,$post)=@params{qw/cb url post/};
@@ -76,7 +77,7 @@ sub get_with_cb
 
 sub connecting_cb
 {	my $failed= ($_[1] >= 'hup'); #connection failed
-	my $self=$_[2];#warn "@_";
+	my $self=$_[2];
 	my $socket=$self->{sock};
 	my $port=$self->{port};
 	my $host=$self->{host};
@@ -93,6 +94,7 @@ sub connecting_cb
 	my $method=defined $post ? 'POST' : 'GET';
 	print $socket "$method $self->{file} HTTP/1.0".EOL;
 	print $socket "Host: $host:$port".EOL;
+	print $socket "User-Agent: Mozilla/5.0".EOL;
 	#print $socket "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6".EOL;
 	#print $socket "Accept: */*".EOL;
 	#print $socket "Connection: Keep-Alive".EOL;
@@ -110,6 +112,23 @@ sub connecting_cb
 	return 0;
 }
 
+sub progress
+{	my $self=shift;
+	my ($length)= $self->{buffer}=~m/\015\012Content-Length:\s*(\d+)\015\012/i;
+	my $pos= index $self->{buffer}, EOL.EOL;
+	my $progress;
+	my $size=0;
+	if ($pos>=0)
+	{	$size=length($self->{buffer})-2-$pos;
+		if ($length)
+		{	$progress= $size/$length;
+			$progress=undef if $progress>1;
+		}
+	}
+	# $progress is undef or between 0 and 1
+	return $progress,$size;
+}
+
 sub receiving_cb
 {	my $self=$_[2];
 	return 1 if read $self->{sock},$self->{buffer},1024,length($self->{buffer});
@@ -119,7 +138,7 @@ sub receiving_cb
 	my $url=$self->{params}{url};
 	my $callback=$self->{params}{cb};
 	my $EOL=EOL;
-	my ($headers,$response)=split /$EOL$EOL/o,$self->{buffer},2;
+	my ($headers,$response)=split /$EOL$EOL/o,delete $self->{buffer},2;
 	$headers='empty answer' unless defined $headers;
 	(my$result,$headers)=split /$EOL/o,$headers,2;
 	if ($::debug)
@@ -143,7 +162,7 @@ sub receiving_cb
 		}
 		$callback->($response,$type,$self->{params}{url});
 	}
-	elsif ($result=~m#^HTTP/1\.\d+ 30[12]# && $headers{location}) #redirection
+	elsif ($result=~m#^HTTP/1\.\d+ 30[123]# && $headers{location}) #redirection
 	{	my $url=$headers{location};
 		unless ($url=~m#^http://#)
 		{	my $base=$self->{params}{url};

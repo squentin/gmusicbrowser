@@ -15,7 +15,7 @@
 =gmbplugin NOWPLAYING
 name	Now playing
 title	NowPlaying plugin
-desc	run a command when playing a song
+desc	Run a command when playing a song
 =cut
 
 # the plugin package must be named GMB::Plugin::PID (replace PID), and must have these sub :

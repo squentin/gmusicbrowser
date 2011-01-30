@@ -17,7 +17,7 @@
 
 use strict;
 use warnings;
-
+use utf8;
 
 package main;
 use Gtk2 '-init';
@@ -30,6 +30,7 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  *Gtk2::Label::set_ellipsize=		sub {} unless *Gtk2::Label::set_ellipsize{CODE};	#for perl-Gtk2 version <1.080~1.083
  *Gtk2::Pango::Layout::set_height=	sub {} unless *Gtk2::Pango::Layout::set_height{CODE};	#for perl-Gtk2 version <1.180  pango <1.20
  *Gtk2::Label::set_line_wrap_mode=	sub {} unless *Gtk2::Label::set_line_wrap_mode{CODE};	#for gtk2 version <2.9
+ *Gtk2::Scale::add_mark=		sub {} unless *Gtk2::Scale::add_mark{CODE};		#for gtk2 version <2.16 (still not bound in perl-Gtk2)
  unless (*Gtk2::Widget::set_tooltip_text{CODE})		#for Gtk2 version <2.12
  {	my $Tooltips=Gtk2::Tooltips->new;
 	*Gtk2::Widget::set_tooltip_text= sub { $Tooltips->set_tip($_[0],$_[1]); };
@@ -40,7 +41,7 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  my $set_clip_rectangle_orig=\&Gtk2::Gdk::GC::set_clip_rectangle;
  *Gtk2::Gdk::GC::set_clip_rectangle=sub { &$set_clip_rectangle_orig if $_[1]; } if $Gtk2::VERSION <1.102; #work-around $rect can't be undef in old bindings versions
 }
-use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES strftime mktime/;
+use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime/;
 use List::Util qw/min max sum first/;
 use File::Copy;
 use File::Spec::Functions qw/file_name_is_absolute catfile rel2abs/;
@@ -68,8 +69,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1005',
- VERSIONSTRING => '1.1.5',
+ VERSION => '1.1006',
+ VERSIONSTRING => '1.1.6',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
@@ -101,25 +102,27 @@ BEGIN
 	}
  }
 }
+
+# %html_entities and decode_html() are only used if HTML::Entities is not found
+my %html_entities=
+(	amp => '&', 'lt' => '<', 'gt' => '>', quot => '"', apos => "'",
+	raquo => '¬ª', copy => '¬©', middot => '¬∑',
+	acirc => '√¢', eacute => '√©', egrave => '√®', ecirc => '√™',
+	agrave=> '√†', ccedil => '√ß',
+);
+sub decode_html
+{	my $s=shift;
+	$s=~s/&(?:#(\d+)|#x([0-9A-F]+)|([a-z]+));/$1 ? chr($1) : $2 ? chr(hex $2) : $html_entities{$3}||'?'/egi;
+	return $s;
+}
+BEGIN
+{	no warnings 'redefine';
+	eval {require HTML::Entities};
+	*decode_html= \&HTML::Entities::decode_entities unless $@;
+}
+
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
 INIT {%Alias_ext=(ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
-
-BEGIN{
-require 'gmusicbrowser_songs.pm';
-require 'gmusicbrowser_tags.pm';
-require 'gmusicbrowser_layout.pm';
-require 'gmusicbrowser_list.pm';
-require 'simple_http.pm';
-}
-
-our $CairoOK;
-our $Gtk2TrayIcon;
-BEGIN
-{ eval { require Gtk2::TrayIcon; $Gtk2TrayIcon=1; };
-  if ($@) { warn "Gtk2::TrayIcon not found -> tray icon won't be available\n"; }
-  eval { require Cairo; $CairoOK=1; };
-  if ($@) { warn "Cairo perl module not found -> transparent windows and other effects won't be available\n"; }
-}
 
 our $debug;
 our %CmdLine;
@@ -164,6 +167,7 @@ options :
 -plugin NAME		: Disable plugin NAME
 -searchpath FOLDER	: Additional FOLDER to look for plugins and layouts
 -use-gnome-session 	: Use gnome libraries to save tags/settings on session logout
+-workspace N		: move initial window to workspace N (requires Gnome2::Wnck)
 
 -cmd CMD		: add CMD to the list of commands to execute
 -ifnotrunning MODE	: change behavior when no running gmusicbrowser instance is found
@@ -205,6 +209,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-port')		{$CmdLine{port}=shift if $ARGV[0]}
 	elsif($arg eq '-debug')		{$debug=1}
 	elsif($arg eq '-nofifo')	{$FIFOFile=''}
+	elsif($arg eq '-workspace')	{$CmdLine{workspace}=shift if defined $ARGV[0]} #requires Gnome2::Wnck
 	elsif($arg eq '-C' || $arg eq '-cfg')		{$CmdLine{savefile}=shift if $ARGV[0]}
 	elsif($arg eq '-F' || $arg eq '-fifo')		{$FIFOFile=rel2abs(shift) if $ARGV[0]}
 	elsif($arg eq '-l' || $arg eq '-layout')	{$CmdLine{layout}=shift if $ARGV[0]}
@@ -275,7 +280,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 	#check if there is an instance already running
 	my $running;
 	if (defined $FIFOFile && -p $FIFOFile)
-	{	my @c= @cmd ? @cmd : ('');	#fallback to empty command, needed to know if running
+	{	my @c= @cmd ? @cmd : ('Show');	#fallback to "Show" command
 		sysopen my$fifofh,$FIFOFile, O_NONBLOCK | O_WRONLY;
 		print $fifofh "$_\n" and $running=1 for @c;
 		close $fifofh;
@@ -304,12 +309,33 @@ Options to change what is done with files/folders passed as arguments (done in r
 	unless ($CmdLine{noDBus}) { eval {require 'gmusicbrowser_dbus.pm'} || warn "Error loading Net::DBus :\n$@ => controlling gmusicbrowser through DBus won't be possible.\n\n"; }
    }
 }
+# end of command line handling
+
+our $HTTP_module;
+BEGIN{
+require 'gmusicbrowser_songs.pm';
+require 'gmusicbrowser_tags.pm';
+require 'gmusicbrowser_layout.pm';
+require 'gmusicbrowser_list.pm';
+$HTTP_module=	-e $DATADIR.SLASH.'simple_http_wget.pm' && (grep -x $_.SLASH.'wget', split /:/, $ENV{PATH})	? 'simple_http_wget.pm' :
+		-e $DATADIR.SLASH.'simple_http_AE.pm'   && (grep -f $_.SLASH.'AnyEvent'.SLASH.'HTTP.pm', @INC)	? 'simple_http_AE.pm' :
+		'simple_http.pm';
+#warn "using $HTTP_module for http requests\n";
+#require $HTTP_module;
+}
+
+our $CairoOK;
+our $Gtk2TrayIcon;
+BEGIN
+{ eval { require Gtk2::TrayIcon; $Gtk2TrayIcon=1; };
+  if ($@) { warn "Gtk2::TrayIcon not found -> tray icon won't be available\n"; }
+  eval { require Cairo; $CairoOK=1; };
+  if ($@) { warn "Cairo perl module not found -> transparent windows and other effects won't be available\n"; }
+}
 
 ##########
 
 #our $re_spaces_unlessinbrackets=qr/([^( ]+(?:\(.*?\))?)(?: +|$)/; #breaks "widget1(options with spaces) widget2" in "widget1(options with spaces)" and "widget2" #replaced by ExtractNameAndOptions
-
-our $re_artist; #regular expression used to split artist name into multiple artists, defined at init by the option ArtistSplit, may not be changed afterward because it is used with the /o option (faster)
 
 my ($browsercmd,$opendircmd);
 
@@ -391,7 +417,7 @@ our @SongCMenu=
 		empty => 'IDs',	notempty=> 'listIDs', notmode => 'QP', stockicon => 'gmb-queue' },
 	{ label => _"Add to list",	submenu => \&AddToListMenu,	notempty => 'IDs' },
 	{ label => _"Edit Labels",	submenu => \&LabelEditMenu,	notempty => 'IDs' },
-	{ label => _"Edit Rating",	submenu => \&Stars::createmenu,	notempty => 'IDs' },
+	{ label => _"Edit Rating",	submenu => sub{ Stars::createmenu('rating',$_[0]{IDs}); },	notempty => 'IDs' },
 	{ label => _"Find songs with the same names",	code => sub { SearchSame('title',$_[0]) },	mode => 'B',	notempty => 'IDs' },
 	{ label => _"Find songs with same artists",	code => sub { SearchSame('artists',$_[0])},	mode => 'B',	notempty => 'IDs' },
 	{ label => _"Find songs in same albums",	code => sub { SearchSame('album',$_[0]) },	mode => 'B',	notempty => 'IDs' },
@@ -426,8 +452,8 @@ our @cMenuAA=
 );
 
 our @TrayMenu=
-(	{ label=> _"Play", code => \&PlayPause,	test => sub {!defined $::TogPlay},	stockicon => 'gtk-media-play' },
-	{ label=> _"Pause",code => \&PlayPause,	test => sub {defined $::TogPlay},	stockicon => 'gtk-media-pause' },
+(	{ label=> _"Play", code => \&PlayPause,	test => sub {!$::TogPlay},	stockicon => 'gtk-media-play' },
+	{ label=> _"Pause",code => \&PlayPause,	test => sub {$::TogPlay},	stockicon => 'gtk-media-pause' },
 	{ label=> _"Stop", code => \&Stop,	stockicon => 'gtk-media-stop' },
 	{ label=> _"Next", code => \&NextSong,	stockicon => 'gtk-media-next' },
 	{ label=> _"Recently played", submenu => sub { my $m=ChooseSongs(undef,GetPrevSongs(5)); }, stockicon => 'gtk-media-previous' },
@@ -435,11 +461,30 @@ our @TrayMenu=
 	{ label=> sub {$::TogLock && $::TogLock eq 'album' ? _"Unlock Album"  : _"Lock Album"},	code => sub {ToggleLock('album');} },
 	{ label=> _"Windows",	code => \&PresentWindow,	submenu_ordered_hash =>1,
 		submenu => sub {  [map { $_->layout_name => $_ } grep $_->isa('Layout::Window'), Gtk2::Window->list_toplevels];  }, },
-	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => \&ShowHide },
+	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => sub { ShowHide(); } },
 	{ label=> _"Fullscreen",	code => \&ToggleFullscreenLayout,	stockicon => 'gtk-fullscreen' },
 	{ label=> _"Settings",		code => \&PrefDialog,	stockicon => 'gtk-preferences' },
 	{ label=> _"Quit",		code => \&Quit,		stockicon => 'gtk-quit' },
 );
+
+our %Artists_split=
+(	'\s*&\s*'		=> "&",
+	'\s*\\+\s*'		=> "+",
+	'\s*\\|\s*'		=> "|",
+	'\s*;\s*'		=> ";",
+	'\s*/\s*'		=> "/",
+	'\s*,\s*'		=> ",",
+	',?\s+and\s+'		=> "and",	#case-sensitive because the user might want to use "And" in artist names that should NOT be splitted
+	',?\s+And\s+'		=> "And",
+	'\s+featuring\s+'	=> "featuring",
+	'\s+feat\.\s+'		=> "feat.",
+);
+our %Artists_from_title=
+(	'\(with\s+([^)]+)\)'		=> "(with X)",
+	'\(feat\.\s+([^)]+)\)'		=> "(feat. X)",
+	'\(featuring\s+([^)]+)\)'	=> "(featuring X)",
+);
+
 
 #a few inactive debug functions
 sub red {}
@@ -466,17 +511,6 @@ sub decode_url
 	return $s;
 }
 
-my %htmlelem= #FIXME maybe should use a module with a complete list
-(	amp => '&', 'lt' => '<', 'gt' => '>', quot => '"', apos => "'",
-	raquo => 'ª', copy => '©', middot => '∑',
-	acirc => '‡', eacute => 'È', egrave => 'Ë', ecirc => 'Í',
-);
-sub decode_html
-{	my $s=shift;
-	$s=~s/&(?:#(\d+)|#x([0-9A-F]+)|([a-z]+));/$1 ? chr($1) : $2 ? chr(hex $2) : $htmlelem{$3}||'?'/egi;
-	return $s;
-}
-
 sub PangoEsc	# escape special chars for pango ( & < > ) #replaced by Glib::Markup::escape_text if available
 {	local $_=$_[0];
 	return '' unless defined;
@@ -488,11 +522,16 @@ sub MarkupFormat
 {	my $format=shift;
 	sprintf $format, map PangoEsc($_), @_;
 }
+sub Gtk2::Label::new_with_format
+{	my $class=shift;
+	my $label=Gtk2::Label->new;
+	$label->set_markup( MarkupFormat(@_) );
+	return $label;
+}
 sub Gtk2::Label::set_markup_with_format
 {	my $label=shift;
 	$label->set_markup( MarkupFormat(@_) );
 }
-
 sub IncSuffix	# increment a number suffix from a string
 {	$_[0] =~ s/(?<=\D)(\d*)$/($1||1)+1/e;
 }
@@ -523,6 +562,9 @@ sub superlc	##lowercase, normalize and remove accents/diacritics #not sure how g
 	$s=~s/\pM//og;	#remove Marks (see perlunicode)
 	$s=Unicode::Normalize::compose($s); #probably better to recompose #is it worth it ?
 	return lc $s;
+}
+sub superlc_sort
+{	return sort {superlc($a) cmp superlc($b)} @_;
 }
 sub sorted_keys		#return keys of $hash sorted by $hash->{$_}{$sort_subkey} using superlc
 {	my ($hash,$sort_subkey)=@_;
@@ -638,6 +680,11 @@ sub ReplaceFields
 sub ReplaceFieldsAndEsc
 {	ReplaceFields($_[0],$_[1],1);
 }
+sub ReplaceFieldsForFilename
+{	# use filename_from_unicode for everything but %o (existing filename in unknown encoding), leave %o as is
+	my $f= ReplaceFields( $_[0], filename_from_unicode($_[1]), \&Glib::filename_from_unicode, {"%o"=> sub { Songs::Get($_[0],'barefilename') }, } );
+	CleanupFileName($f);
+}
 sub MakeReplaceTable
 {	my $fields=$_[0];
 	my $table=Gtk2::Table->new (4, 2, FALSE);
@@ -683,11 +730,17 @@ sub ConvertTime	# convert date pattern into nb of seconds
 	return $pat;
 }
 sub ConvertSize
-{	my $pat=$_[0];
-	if ($pat=~m/^(\d+)([bkm])$/) { $pat=$1*$::SIZEUNITS{$2}[0] }
-	return $pat;
+{	my ($size,$unit)= $_[0]=~m/^\s*(\d*)\s*([a-zA-Z]*)\s*$/;
+	return 0 unless $size;
+	if (my $ref= $SIZEUNITS{lc$unit}) { $size*= $ref->[0] }
+	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
+	return $size;
 }
 
+my ($strftime_encoding)= setlocale(LC_TIME)=~m#\.([^@]+)#;
+sub strftime2	# try to return an utf8 value from strftime
+{	$strftime_encoding ? Encode::decode($strftime_encoding, &strftime) : &strftime;
+}
 
 #---------------------------------------------------------------
 our $DAYNB=int(time/86400)-12417;#number of days since 01 jan 2004
@@ -701,13 +754,13 @@ my $SavedListsWatcher;
 our $ListPlay;
 our ($TogPlay,$TogLock);
 our ($RandomMode,$SortFields,$ListMode);
-our ($SongID,$Recent,$RecentPos,$Queue); our $QueueAction='';
+our ($SongID,$prevID,$Recent,$RecentPos,$Queue); our $QueueAction='';
 our ($Position,$ChangedID,$ChangedPos,@NextSongs,$NextFileToPlay);
 our ($MainWindow,$FullscreenWindow); my $OptionsDialog;
 my $TrayIcon;
 my %Editing; #used to keep track of opened song properties dialog and lyrics dialog
 our $PlayTime;
-our ($StartTime,$StartedAt,$PlayingID,$PlayedPartial);
+our ($StartTime,$StartedAt,$PlayingID, @Played_segments);
 our $CurrentDir=$ENV{PWD};
 #$ENV{PULSE_PROP_media.role}='music'; # pulseaudio hint. could set other pulseaudio properties, FIXME doesn't seem to reach pulseaudio
 
@@ -717,7 +770,7 @@ my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos CurSong P
 # Picture_#mainfield#
 
 my (%Watched,%WatchedFilt);
-my ($IdleLoop,@ToCheck,@ToReRead,@ToAdd_Files,@ToAdd_IDsBuffer,@ToScan,%FollowedDirs,$CoverCandidates);
+my ($IdleLoop,@ToCheck,@ToReRead,@ToAdd_Files,@ToAdd_IDsBuffer,@ToScan,%FollowedDirs,%AutoPicChooser);
 our ($LengthEstimated);
 our %Progress; my $ProgressWindowComing;
 my $Lengthcheck_max=0; my ($ScanProgress_cb,$CheckProgress_cb,$ProgressNBSongs,$ProgressNBFolders);
@@ -753,7 +806,8 @@ our %Options=
 	Labels		=> [_("favorite"),_("bootleg"),_("broken"),_("bonus tracks"),_("interview"),_("another example")],
 	FilenameSchema	=> ['%a - %l - %n - %t','%l - %n - %t','%n-%t','%d%n-%t'],
 	FolderSchema	=> ['%A/%l','%A','%A/%Y-%l','%A - %l'],
-	PlayedPercent	=> .85,	#percent of a song played to increase play count
+	PlayedMinPercent=> 80,	# Threshold to count a song as played in percent
+	PlayedMinSeconds=> 600,	# Threshold to count a song as played in seconds
 	DefaultRating	=> 50,
 #	Device		=> 'default',
 #	amixerSMC	=> 'PCM',
@@ -777,7 +831,6 @@ our %Options=
 	AutoRemoveCurrentSong	=> 1,
 	Simplehttp_CacheSize	=> 200*1024,
 	CustomKeyBindings	=> {},
-	ArtistSplit		=> ' & |, |;',
 	VolumeStep		=> 10,
 	DateFormat_history	=> ['%c 604800 %A %X 86400 Today %X 60 now'],
 	AlwaysInPlaylist	=> 1,
@@ -823,7 +876,7 @@ sub make_keybindingshash
 	{	my $key=shift @list;
 		my $cmd=shift @list;
 		my $mod='';
-		$mod=$1 if $key=~s/^(c?a?w?s?-)//;
+		$mod=$1 if $key=~s/^([caws]+-)//;
 		my @keys=($key);
 		@keys=(lc$key,uc$key) if $key=~m/^[A-Za-z]$/;
 		$h{$mod.$_}=$cmd for @keys;
@@ -832,7 +885,7 @@ sub make_keybindingshash
 }
 sub keybinding_longname
 {	my $key=$_[0];
-	return $key unless $key=~s/^(c?a?w?s?)-//;
+	return $key unless $key=~s/^([caws]+)-//;
 	my $mod=$1;
 	my %h=(c => _"Ctrl", a => _"Alt", w => _"Win", s => _"Shift");
 	my $name=join '',map $h{$_}, split //,$mod;
@@ -903,6 +956,24 @@ sub LoadIcons
 	$NBQueueIcons=0;
 	$NBQueueIcons++ while $icons{'gmb-queue'.($NBQueueIcons+1)};
 
+	# find rating pictures
+	for my $field (keys %Songs::Def)
+	{	my $format= $Songs::Def{$field}{starprefix};
+		next unless $format;
+		if ($format!~m#^/#)
+		{	for my $path (reverse PIXPATH,@dirs)
+			{	next unless -f $path.SLASH.$format.'0.svg' || -f $path.SLASH.$format.'0.png';
+				$format= $path.SLASH.$format;
+				last;
+			}
+		}
+		$format.= (-f $format.'0.svg') ? "%d.svg" : "%d.png";
+		my $max=0;
+		$max++ while -f sprintf($format,$max+1);
+		$Songs::Def{$field}{pixbuf}= [ map eval {Gtk2::Gdk::Pixbuf->new_from_file( sprintf($format,$_) )}, 0..$max ];
+		$Songs::Def{$field}{nbpictures}= $max;
+	}
+
 	$icon_factory->remove_default if $icon_factory;
 	$icon_factory=Gtk2::IconFactory->new;
 	$icon_factory->add_default;
@@ -966,7 +1037,9 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	OpenPref	=> [\&PrefDialog,			_"Open Preference window"],
 	OpenSongProp	=> [sub { DialogSongProp($SongID) if defined $SongID }, _"Edit Current Song Properties"],
 	EditSelectedSongsProperties => [sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; DialogSongsProp(@IDs) if @IDs; },		_"Edit selected song properties"],
-	ShowHide	=> [\&ShowHide,				_"Show/Hide"],
+	ShowHide	=> [sub {ShowHide();},			_"Show/Hide"],
+	Show		=> [sub {ShowHide(1);},			_"Show"],
+	Hide		=> [sub {ShowHide(0);},			_"Hide"],
 	Quit		=> [\&Quit,				_"Quit"],
 	Save		=> [\&SaveTags,				_"Save Tags/Options"],
 	ChangeDisplay	=> [\&ChangeDisplay,			_"Change Display",_"Display (:1 or host:0 for example)",qr/:\d/],
@@ -986,7 +1059,16 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	TogAlbumLock	=> [sub {ToggleLock('album')},		_"Toggle Album Lock"],
 	TogSongLock	=> [sub {ToggleLock('fullfilename')},	_"Toggle Song Lock"],
 	ToggleRandom	=> [\&ToggleSort, _"Toggle between Random/Shuffle and Ordered"],
-	SetSongRating	=> [sub {return unless defined $SongID && $_[1]=~m/^\d*$/; Songs::Set($SongID, rating=> $_[1]); },	_"Set Current Song Rating", _"Rating between 0 and 100, or empty for default", qr/^\d*$/],
+	SetSongRating	=> [sub
+	{	return unless defined $SongID && $_[1]=~m/^([-+])?(\d*)$/;
+		my $r=$2;
+		if ($1)
+		{	my $step= $r||10;
+			$step*=-1 if $1 eq '-';
+			$r= Songs::Get($SongID, 'ratingnumber') + $step;
+		}
+		Songs::Set($SongID, rating=> $r);
+	},	_"Set Current Song Rating", _("Rating between 0 and 100, or empty for default")."\n"._("Can be relative by using + or -"), qr/^[-+]?\d*$/],
 	ToggleFullscreen=> [\&Layout::ToggleFullscreen,		_"Toggle fullscreen mode"],
 	ToggleFullscreenLayout=> [\&ToggleFullscreenLayout, _"Toggle the fullscreen layout"],
 	OpenFiles	=> [\&OpenFiles, _"Play a list of files", _"url-encoded list of files",0],
@@ -1104,13 +1186,13 @@ if ($CmdLine{UseGnomeSession})
 	Watch(undef,NextSongs	=> sub { UpdateRelatedFilter('Next'); });
 	Watch(undef,CurSong	=> sub { UpdateRelatedFilter('Play'); });
 }
-
 our ($Play_package,%PlayPacks); my ($PlayNext_package,$Vol_package);
 for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_gstreamer-0.10.pm gmusicbrowser_server.pm/)
 {	eval { require $file } || warn $@;	#each file sets $::PlayPacks{PACKAGENAME} to 1 for each of its included playback packages
 }
 
 LoadPlugins();
+$SIG{HUP} = 'IGNORE';
 ReadSavedTags();
 
 # global Volume and Mute are used only for gstreamer and mplayer in SoftVolume mode
@@ -1153,12 +1235,13 @@ Layout::InitLayouts;
 ActivatePlugin($_,'startup') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 
 CreateMainWindow( $CmdLine{layout}||$Options{Layout} );
-&ShowHide if $CmdLine{hide};
+ShowHide(0) if $CmdLine{hide} || ($Options{StartInTray} && $Options{UseTray} && $Gtk2TrayIcon);
 SkipTo($PlayTime) if $PlayTime; #done only now because of gstreamer
 
 CreateTrayIcon();
 
 if (my $cmds=delete $CmdLine{runcmd}) { run_command(undef,$_) for @$cmds; }
+$SIG{TERM} = \&Quit;
 
 #--------------------------------------------------------------
 Gtk2->main;
@@ -1384,14 +1467,14 @@ sub LoadPlugins
 	for my $file (grep !$loaded{$_}, @list)
 	{	warn "Reading plugin $file\n" if $::debug;
 		my ($found,$id);
-		open my$fh,'<',$file or do {warn "error opening $file : $!\n";next};
+		open my$fh,'<:utf8',$file or do {warn "error opening $file : $!\n";next};
 		while (my $line=<$fh>)
 		{	if ($line=~m/^=gmbplugin (\D\w+)/)
 			{	my $id=$1;
 				my %plug= (version=>0,desc=>'',);
 				while ($line=<$fh>)
 				{	last if $line=~m/^=cut/;
-					my ($key,$val)= $line=~m/^\s*(\w+):?\s+(.+)/;
+					my ($key,$val)= $line=~m/^\s*(\w+):?\s+([^\n\r]+)/;
 					next unless $key;
 					if ($key eq 'desc')
 					{	$plug{desc} .= _($val)."\n";
@@ -1425,6 +1508,11 @@ sub PluginsInit
 	$Options{'PLUGIN_'.$_}=$p->{$_} for keys %$p;
 	ActivatePlugin($_,'init') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 }
+
+# $startup can be undef, 'init' or 'startup'
+# - 'init' when called after loading settings, run Init if defined
+# - 'startup' when called after the songs are loaded, run Start if defined
+# - undef when activated by the user, runs Init then Start
 sub ActivatePlugin
 {	my ($plugin,$startup)=@_;
 	my $ref=$Plugins{$plugin};
@@ -1439,7 +1527,8 @@ sub ActivatePlugin
 			}
 		}
 		else
-		{	$package->Start($startup) if $package->can('Start');
+		{	$package->Init if !$startup && $package->can('Init');
+			$package->Start($startup) if $package->can('Start');
 			warn "Plugin $plugin activated.\n" if $debug;
 		}
 		$Options{'PLUGIN_'.$plugin}=1;
@@ -1549,12 +1638,18 @@ sub FirstTime
 		%Options= ( %Options, %$opt );
 	}
 
-	$re_artist=qr/ & |, /;
 	Post_Options_init();
 }
 
 
-
+my %artistsplit_old_to_new=	#for versions <= 1.1.5 : to upgrade old ArtistSplit regexp to new default regexp
+(	' & '	=> '\s*&\s*',
+	', '	=> '\s*,\s*',
+	' \\+ '	=> '\s*\\+\s*',
+	'; *'	=> '\s*;\s*',
+	';'	=> '\s*;\s*',
+);
+			
 sub ReadOldSavedTags
 {	my $fh=$_[0];
 	while (<$fh>)
@@ -1578,8 +1673,7 @@ sub ReadOldSavedTags
 	$Options{FolderSchema}=		[split /\x1D/,$Options{FolderSchema}];
 	$Options{LibraryPath}= delete $Options{Path};
 	$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2
-	$Options{ArtistSplit}||=' & |, |;';
-	$re_artist=qr/$Options{ArtistSplit}/;
+	$Options{Artists_split_re}= [ map { $artistsplit_old_to_new{$_}||$_ } grep $_ ne '$', split /\|/, delete $Options{ArtistSplit} ];
 
 	Post_Options_init();
 
@@ -1719,11 +1813,12 @@ sub ReadSavedTags	#load tags _and_ settings
 		SongArray::start_init(); #every SongArray read in Options will be updated to new IDs by SongArray::updateIDs later
 		ReadRefFromLines($lines{Options},\%Options);
 		my $oldversion=delete $Options{version} || VERSION;
-		$Options{ArtistSplit}||=' & |, |;';
-		$re_artist=qr/$Options{ArtistSplit}/;
 		if ($oldversion<1.1005) {delete $Options{$_} for qw/Diacritic_sort gst_volume/;} #cleanup old options
 		$Options{AutoRemoveCurrentSong}= delete $Options{TAG_auto_check_current} if $oldversion<1.1005 && exists $Options{TAG_auto_check_current};
-
+		$Options{PlayedMinPercent}= 100*delete $Options{PlayedPercent} if exists $Options{PlayedPercent};
+		if ($Options{ArtistSplit}) # for versions <= 1.1.5
+		{	$Options{Artists_split_re}= [ map { $artistsplit_old_to_new{$_}||$_ } grep $_ ne '$', split /\|/, delete $Options{ArtistSplit} ];
+		}
 
 		Post_Options_init();
 
@@ -1744,7 +1839,7 @@ sub ReadSavedTags	#load tags _and_ settings
 			my $sub=$extra_sub->{$extra};
 			while (my $line=shift @$lines)
 			{	my ($key,@vals)= split /\t/, $line,-1;
-				s#\\x([0-9a-fA-F]{2})#chr hex $1#eg for @vals;
+				s#\\x([0-9a-fA-F]{2})#chr hex $1#eg for $key,@vals;
 				$sub->($key,@vals);
 			}
 		}
@@ -1835,7 +1930,8 @@ sub SaveTags	#save tags _and_ settings
 		my $h= $extrasub->{$field}->();
 		for my $key (sort keys %$h)
 		{	my $vals= $h->{$key};
-			s#([\x00-\x1F\\])#sprintf "\\x%02x",ord $1#eg for @$vals;
+			s#([\x00-\x1F\\])#sprintf "\\x%02x",ord $1#eg for $key,@$vals;
+			$key=~s#^\[#\\x5b#; #escape leading "["
 			my $line= join "\t", @$vals;
 			next if $line=~m/^\t*$/;
 			print $fh "$key\t$line\n"  or $error||=$!;
@@ -2020,20 +2116,18 @@ sub Forward
 sub SkipTo
 {	return unless defined $SongID;
 	my $sec=shift;
-	#return unless $sec=~m/^\d+(?:\.\d+)?$/;
-	if (defined $PlayingID)
-	{	$StartedAt=$sec unless (defined $PlayTime && $PlayingID==$SongID && $PlayedPartial && $sec<$PlayTime);	#don't re-set $::StartedAt if rewinding a song not fully(85%) played
+	if (defined $PlayingID && defined $PlayTime) # if song already playing
+	{	push @Played_segments, $StartedAt, $PlayTime;
+		$StartedAt=$sec;
 		$Play_package->SkipTo($sec);
-		my $wasplaying=$TogPlay;
-		$TogPlay=1;
-		HasChanged('Playing') unless $wasplaying;
 	}
 	else	{ Play($sec); }
+	::QHasChanged( Seek => $sec );
 }
 
 sub PlayPause
-{	if (defined $TogPlay)	{ Pause()}
-	else			{ Play() }
+{	if (defined $TogPlay)	{ Pause()} #paused or playing => resume or pause
+	else			{ Play() } #stopped => play
 }
 
 sub Pause
@@ -2145,22 +2239,55 @@ sub ResetTime
 	HasChanged('Time');
 }
 
-sub Played
-{	return unless defined $PlayingID;
-	my $ID=$PlayingID;
-	undef $PlayingID;
-	warn "Played : $ID $StartTime $StartedAt $PlayTime\n" if $debug;
-	#add song to recently played list
+sub AddToRecent	#add song to recently played list
+{	my $ID=shift;
 	unless (@$Recent && $Recent->[0]==$ID)
 	{	$Recent->Unshift([$ID]);	#FIXME make sure it's not too slow, put in a idle ?
 		$Recent->Pop if @$Recent>80;	#
 	}
+}
 
+sub Coverage	# find number of unique seconds played from a list of start,stop times
+{	my @segs=@_;
+	my $sum=0;
+	while (@segs)
+	{	my ($start,$stop)=splice @segs,0,2;
+		my $i=0;
+		my $th=.5;	#threshold : ignore differences of less than .5s
+		while ($i<@segs)
+		{	my $s1=$segs[$i];
+			my $s2=$segs[$i+1];
+			if ($start-$s1<=$th && $s1-$stop<=$th || $start-$s2<=$th && $s2-$stop<=$th) # segments overlap
+			{	$stop =$s2 if $s2>$stop;
+				$start=$s1 if $s1<$start;
+				splice @segs,$i,2;
+				$i=0;
+			}
+			else { $i+=2; }
+		}
+		my $length= $stop-$start;
+		$sum+= $length if $length>$th;
+	}
+	return $sum;
+}
+
+sub Played
+{	return unless defined $PlayingID;
+	my $ID=$PlayingID;
+	warn "Played : $ID $StartTime $StartedAt $PlayTime\n" if $debug;
+	AddToRecent($ID) unless $Options{AddNotPlayedToRecent};
 	return unless defined $PlayTime;
-	$PlayedPartial=$PlayTime-$StartedAt < $Options{PlayedPercent} * Songs::Get($ID,'length');
-	HasChanged('Played',$ID, !$PlayedPartial, $StartTime, $StartedAt, $PlayTime);
+	push @Played_segments, $StartedAt, $PlayTime;
+	my $seconds=Coverage(@Played_segments); # a bit overkill :)
 
-	if ($PlayedPartial) #FIXME maybe only count as a skip if played less than ~20% ?
+	my $length= Songs::Get($ID,'length');
+	my $coverage_ratio= $length ? $seconds / Songs::Get($ID,'length') : 1;
+	my $partial= $Options{PlayedMinPercent}/100 > $coverage_ratio && $Options{PlayedMinSeconds} > $seconds;
+	HasChanged('Played',$ID, !$partial, $StartTime, $seconds, $coverage_ratio, \@Played_segments);
+	$PlayingID=undef;
+	@Played_segments=();
+
+	if ($partial) #FIXME maybe only count as a skip if played less than ~20% ?
 	{	my $nb= 1+Songs::Get($ID,'skipcount');
 		Songs::Set($ID, skipcount=> $nb, lastskip=> $StartTime);
 	}
@@ -2171,11 +2298,8 @@ sub Played
 }
 
 sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, or undef if none applies
-{	my $ID=$_[0];
-	my $playlist_row=$_[1]; # facultative
-	my $currentsong=defined $playlist_row ?
-				defined $Position && $Position==$playlist_row :
-				defined $SongID && $ID==$SongID ;
+{	my ($ID,$notcurrent)=@_;
+	my $currentsong= !$notcurrent && defined $SongID && $ID==$SongID;
 	return
 	 $currentsong ?
 	 (	$TogPlay		? 'gtk-media-play' :
@@ -2310,7 +2434,15 @@ sub GetNextSongs
 	  my $pos;
 	  $pos=FindPositionSong( $IDs[-1],$ListPlay ) if @IDs;
 	  $pos= defined $Position ? $Position : -1  unless defined $pos;
-	  push @IDs,_"next" if $list;
+	  if ($pos==-1 && !$ListMode)
+	  {	my $ID= @IDs ? $IDs[-1] : $::SongID;
+		if (defined $ID)
+		{	$ID= Songs::FindNext($ListPlay, $Options{Sort}, $ID);
+			$pos=FindPositionSong( $ID,$ListPlay );
+			$pos=-1 if !defined $pos;
+		}
+	  }
+	  push @IDs,_"Next" if $list;
 	  while ($nb)
 	  {	if ( $pos+$nb > $#$ListPlay )
 		{	push @IDs,@$ListPlay[$pos+1..$#$ListPlay];
@@ -2390,11 +2522,11 @@ sub NextDiff	#go to next song whose $field value is different than current's
 	my $position=$Position||0;
 	if ($TogLock && $TogLock eq $field)	 #remove lock on a different field if not found ?
 	{	$playlist=$SelectedFilter->filter;
-		SortList($playlist,$Options{Sort}) unless $RandomMode;
+		SortList($playlist) unless $RandomMode;
 		$position=FindPositionSong($SongID,$playlist);
 	}
 	my $list;
-	if ($RandomMode) { $list= $filter->filter($playlist); warn scalar @$playlist; }
+	if ($RandomMode) { $list= $filter->filter($playlist); }
 	else
 	{	my @rows=$position..$#$playlist;
 		push @rows, 0..$position-1 if $Options{Repeat};
@@ -2501,7 +2633,9 @@ sub SetPosition
 sub UpdateCurrentSong
 {	#my $force=shift;
 	if ($ChangedID)
-	{	QHasChanged('CurSongID',$SongID);
+	{	AddToRecent($prevID) if defined $prevID && $Options{AddNotPlayedToRecent};
+		$prevID=$SongID;
+		QHasChanged('CurSongID',$SongID);
 		QHasChanged('CurSong',$SongID);
 		ShowTraytip($Options{TrayTipTimeLength}) if $TrayIcon && $Options{ShowTipOnSongChange} && !$FullscreenWindow;
 		IdleDo('CheckCurrentSong',1000,\&CheckCurrentSong) if defined $SongID;
@@ -2592,7 +2726,7 @@ sub FindFirstInListPlay		#Choose a song in @$lref based on sort order, if possib
 	else
 	{	@l=@$lref unless @l;
 		push @l,$SongID if defined $SongID && !exists $h{$SongID};
-		SortList(\@l,$sort);
+		SortList(\@l);
 		if (defined $SongID)
 		{ for my $i (0..$#l-1)
 		   { next if $l[$i]!=$SongID; $ID=$l[$i+1]; last; }
@@ -2607,19 +2741,16 @@ sub Shuffle
 	Select('sort' => 'shuffle');
 }
 
-sub SortList	#sort @$listref according to $sort
-{	my $time=times; #DEBUG
-	warn "deprecated SortList @_\n"; #PHASE1 DELME
-	my ($listref,$sort)=@_;
-	$sort||=$Options{Sort};
-	my $func; my $insensitive;
+sub SortList	#sort @$listref according to current sort order, or last ordered sort if no current sort order
+{	my $listref=shift;
+	my $sort=$Options{Sort};
 	if ($sort=~m/^random:/)
 	{	@$listref=Random->OneTimeDraw($sort,$listref);
 	}
-	elsif ($sort ne '')		# generate custom sort function
-	{	Songs::SortList($listref,$sort);
+	else	# generate custom sort function
+	{	$sort=$Options{Sort_LastOrdered} if $sort eq '';
+		Songs::SortList($listref,$sort);
 	}
-	$time=times-$time; warn "sort ($sort) : $time s\n"; #DEBUG
 }
 
 sub ExplainSort
@@ -2700,7 +2831,6 @@ sub IdleLoop
 	}
 	elsif (@ToReRead){Songs::ReReadFile(pop(@ToReRead),1); }	#FIXME should show progress
 	elsif (@ToAdd_Files)  { SongAdd(shift @ToAdd_Files); }
-#	elsif ($CoverCandidates) {CheckCover();}	#FIXME PHASE1
 	elsif (@ToAdd_IDsBuffer>1000)	{ SongAdd_now() }
 	elsif (@ToScan) { $ProgressNBFolders++; ScanFolder(shift @ToScan); }
 	elsif (@ToAdd_IDsBuffer)	{ SongAdd_now() }
@@ -2815,16 +2945,15 @@ sub CalcListLength	#if $return, return formated string (0h00m00s)
 	}
 }
 
-# http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=%s    artist search
-# http://www.allmusic.com/cg/amg.dll?p=amg&opt1=2&sql=%s    album search
+# http://www.allmusic.com/search/artist/%s    artist search
+# http://www.allmusic.com/search/album/%s    album search
 sub AMGLookup
 {	my ($col,$key)=@_;
-	my $opt1=	$col eq 'artist' ? 1 :
-			$col eq 'album'  ? 2 :
-			$col eq 'title'	 ? 3 : 0;
+	my $opt1=	$col eq 'artist' ? 'artist' :
+			$col eq 'album'  ? 'album' :
+			$col eq 'title'	 ? 'song' : '';
 	return unless $opt1;
-	my $url='http://www.allmusic.com/cg/amg.dll?p=amg&opt1='.$opt1.'&sql=';
-	$key=superlc($key);	#can't figure how to pass accents, removing them works better
+	my $url='http://www.allmusic.com/search/'.$opt1.'/';
 	$key=url_escape($key);
 	openurl($url.$key);
 }
@@ -2884,7 +3013,7 @@ sub ChooseSongsTitle		#Songs with the same title
 	my $list= $filter->filter;
 	return 0 if @$list<2 || @$list>100;	#probably a problem if it finds >100 matching songs, and making a menu with a huge number of items is slow
 	my @list=grep $_!=$ID,@$list;
-	SortList(\@list,'artist:i album:i');
+	Songs::SortList(\@list,'artist:i album:i');
 	return ChooseSongs( __x( _"by {artist} from {album}", artist => "<b>%a</b>", album => "%l") ,@list);
 }
 
@@ -2892,7 +3021,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 {	my $album=$_[0];
 	return unless defined $album;
 	my $list= AA::GetIDs(album=>$album);
-	SortList($list,'disc track file');
+	Songs::SortList($list,'disc track file');
 	if (Songs::Get($list->[0],'disc'))
 	{	my $disc=''; my @list2;
 		for my $ID (@$list)
@@ -2993,7 +3122,7 @@ sub ChooseSongs
 	 { my ($mitem,$event)=@_;
 	   if	($event->button == 2) { $mitem->{middle}=1 }
 	   elsif($event->button == 3)
-	   {	my $submenu=BuildMenu(\@SongCMenu,{mode => '', IDs=> [$_[2]]});
+	   {	my $submenu=BuildMenu(\@SongCMenu,{mode => 'P', IDs=> [$_[2]]});
 		$submenu->show_all;
 		$_[0]->set_submenu($submenu);
 		#$submenu->signal_connect( selection_done => sub {$menu->popdown});
@@ -3049,17 +3178,18 @@ sub menupos	# function to position popupmenu below clicked widget
 }
 
 sub PopupAA
-{	my ($col,%args)=@_;
+{	my ($field,%args)=@_;
 	my ($list,$from,$callback,$format,$widget,$nosort,$nominor)=@args{qw/list from cb format widget nosort nominor/};
 	return undef unless @$Library;
-	$format||="%a";
+	my $isaa= $field eq 'album' || $field eq 'artist' || $field eq 'artists';
+	$format||="%a"; # "<b>%a</b>%Y\n<small>%s <small>%l</small></small>"
 	my $event=Gtk2->get_current_event;
 
 #### make list of albums/artists
 	my @keys;
 	if (defined $list) { @keys=@$list; }
-	elsif (defined $from)
-	{	if ($col eq 'album')
+	elsif ($isaa && defined $from)
+	{	if ($field eq 'album')
 		{ my %alb;
 		  $from=[$from] unless ref $from;
 		  for my $artist (@$from)
@@ -3090,22 +3220,20 @@ sub PopupAA
 		else
 		{ @keys= @{ AA::GetXRef(album=>$from) }; }
 	}
-	else { @keys=@{ AA::GetAAList($col) }; }
+	else { @keys=@{ AA::GetAAList($field) }; }
 
 #### callbacks
-	my $altcallback;
-	unless ($callback)
-	{  $callback=sub		#jump to first song
+	$callback||=sub		#jump to first song
 	   {	my ($item,$key)=@_;
 		return if $item->get_submenu;
-		my $IDs=AA::GetIDs($col,$key);
+		my $IDs=AA::GetIDs($field,$key);
 		if ($item->{middle})	{ Enqueue(@$IDs); }	#enqueue artist/album on middle-click
 		else
 		{	my $ID=FindFirstInListPlay( $IDs );
 			Select(song => $ID);
 		}
 	   };
-	   $altcallback=($col eq 'album')?
+	my $altcallback= $field eq 'album' ?
 		sub	#Albums button-press event : set up a songs submenu on right-click, alternate action on middle-click
 		{	my ($item,$event,$key)=@_;
 			if ($event->button==3)
@@ -3115,6 +3243,7 @@ sub PopupAA
 			elsif ($event->button==2) { $item->{middle}=1; }
 			0; #return 0 so that the item receive the click and popup the submenu
 		}:
+		$isaa ?
 		sub	#Artists button-press event : set up an album submenu on right-click, alternate action on middle-click
 		{	my ($item,$event,$key)=@_;
 			if ($event->button==3)
@@ -3123,13 +3252,16 @@ sub PopupAA
 			}
 			elsif ($event->button==2) { $item->{middle}=1; }
 			0;
+		}:
+		sub	#not album nor artist
+		{	my ($item,$event,$key)=@_;
+			if ($event->button==2) { $item->{middle}=1; }
+			0;
 		};
-	}
 
 	my $screen= $widget ? $widget->get_screen : $event->get_screen;
 	my $max=($screen->get_height)*.8;
 	#my $minsize=Gtk2::ImageMenuItem->new('')->size_request->height;
-	my @todo;	#hold images not yet loaded because not cached
 
 	my $createAAMenu=sub
 	{	my ($start,$end,$names,$keys)=@_;
@@ -3145,35 +3277,36 @@ sub PopupAA
 			my $label=Gtk2::Label->new;
 			$label->set_line_wrap(TRUE);
 			$label->set_alignment(0,.5);
-			$label->set_markup( AA::ReplaceFields($key,$format,$col,1) );
-			#$label->set_markup( AA::ReplaceFields($key,"<b>%a</b>%Y\n<small>%s <small>%l</small></small>",$col,1) );
+			$label->set_markup( AA::ReplaceFields($key,$format,$field,1) );
 			$item->add($label);
 			$item->signal_connect(activate => $callback,$key);
 			$item->signal_connect(button_press_event => $altcallback,$key) if $altcallback;
 			#$menu->append($item);
 			$menu->attach($item, $colnb, $colnb+1, $row, $row+1); if (++$row>$rows) {$row=0;$colnb++;}
-			my $img=AAPicture::newimg($col,$key,$size);
-			$item->set_image($img) if $img;
+			if ($isaa)
+			{	my $img=AAPicture::newimg($field,$key,$size);
+				$item->set_image($img) if $img;
+			}
 		}
 		return $menu;
 	}; #end of createAAMenu
 
-	my $min= ($col eq 'album')? $Options{AlbumMenu_min} : $Options{ArtistMenu_min};
+	my $min= $field eq 'album' ? $Options{AlbumMenu_min} : $isaa ? $Options{ArtistMenu_min} : 0;
 	$min=0 if $nominor;
 	my @keys_minor;
 	if ($min)
-	{	@keys= grep {  @{ AA::GetAAList($col,$_) }>$min or push @keys_minor,$_ and 0 } @keys;
+	{	@keys= grep {  @{ AA::GetAAList($field,$_) }>$min or push @keys_minor,$_ and 0 } @keys;
 		if (!@keys) {@keys=@keys_minor; undef @keys_minor;}
 	}
 
-	Songs::sort_gid_by_name($col,\@keys) unless $nosort;
-	my @names=@{Songs::Gid_to_Display($col,\@keys)}; #convert @keys to list of names
+	Songs::sort_gid_by_name($field,\@keys) unless $nosort;
+	my @names=@{Songs::Gid_to_Display($field,\@keys)}; #convert @keys to list of names
 
 	my $menu=Breakdown_List(\@names,5,20,35,$createAAMenu,\@keys);
 	return undef unless $menu;
 	if (@keys_minor)
-	{	Songs::sort_gid_by_name($col,\@keys_minor) unless $nosort;
-		my @names=@{Songs::Gid_to_Display($col,\@keys)};
+	{	Songs::sort_gid_by_name($field,\@keys_minor) unless $nosort;
+		my @names=@{Songs::Gid_to_Display($field,\@keys)};
 		my $item=Gtk2::MenuItem->new('minor'); #FIXME
 		my $submenu=Breakdown_List(\@names,5,20,35,$createAAMenu,\@keys_minor);
 		$item->set_submenu($submenu);
@@ -3369,7 +3502,11 @@ sub BuildMenu
 		}
 		else
 		{	$item->{code}=$m->{code};
-			$item->signal_connect (activate => sub { $_[0]{code}->($_[1]) if $_[0]{code}; },$args);
+			$item->signal_connect (activate => sub
+				{	my ($self,$args)=@_;
+					my $on; $on=$self->get_active if $self->isa('Gtk2::CheckMenuItem');
+					$self->{code}->($args,$on) if $self->{code};
+				},$args);
 			if (my $submenu3=$m->{submenu3})	# set a submenu on right-click
 			{	$submenu3= BuildMenu($submenu3,$args);
 				$item->signal_connect (button_press_event => sub { my ($item,$event,$submenu3)=@_; return 0 unless $event->button==3; $item->{code}=undef;  $item->set_submenu($submenu3); $submenu3->show_all; 0;  },$submenu3);
@@ -3438,6 +3575,7 @@ sub BuildChoiceMenu
 			$item->{selected}= $value;
 			$item->signal_connect(activate => $smenu_callback, $options{code} );
 		}
+		$item->child->set_markup( $item->child->get_label ) if $options{submenu_use_markup};
 		$menu->append($item);
 	}
 	$menu=undef unless @order; #empty submenu
@@ -3640,12 +3778,10 @@ COPYNEXTID:for my $ID (@$IDs)
 			my $res=CreateDir($newdir,$win, $abortmsg );
 			last if $res eq 'abort';
 			next if $res eq 'no';
-			$newdir=filename_from_unicode($newdir);
 		}
 		if ($fnformat)
 		{	$newfile=filenamefromformat($ID,$fnformat,1);
 			next unless defined $newfile;
-			$newfile=filename_from_unicode($newfile);
 		}
 		my $new=$newdir.$newfile;
 		next if $old eq $new;
@@ -3683,7 +3819,6 @@ sub ChooseDir
 	# there is no mode in Gtk2::FileChooserDialog that let you select both files or folders (Bug #136294), so have to work-around by connecting to the ok button and forcing the end of $dialog->run with a $dialog->hide (the dialog will be destroyed after)
 	$okbutton->signal_connect(clicked=> sub { $_[0]->{ok}=1; $dialog->hide; }) if $allowfiles;
 
-	 warn $Options{$remember_key} if $remember_key;
 	if ($remember_key)	{ $path= $Options{$remember_key}; }
 	elsif ($path)		{ $path= url_escape($path); }
 	$dialog->set_current_folder_uri("file://".$path) if $path;
@@ -3761,7 +3896,7 @@ sub ChoosePix
 					'gtk-cancel' => 'none');
 
 	for my $aref
-	(	[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b' ],
+	(	[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b *.ogg *.oga' ],
 		[_"Pictures files",'image/*'],
 		[_"All files",undef,'*'],
 	)
@@ -3806,13 +3941,14 @@ sub ChoosePix
 		{ my ($dialog,$file)=@_;
 		  unless ($file)
 		  {	$file= $dialog->get_preview_uri;
-			$file= $file=~s#^file://## ? $file=decode_url($file) : undef;
+			$file= ($file && $file=~s#^file://##) ? decode_url($file) : undef;
 		  }
-		  return unless $file && -f $file;
+		  unless ($file && -f $file) { $preview->hide; return }
+		  $preview->show;
 		  $max=0;
 		  $nb=0 unless $lastfile && $lastfile eq $file;
 		  $lastfile=$file;
-		  if ($file=~m/\.(?:mp3|flac|m4a|m4b)$/i)
+		  if ($file=~m/\.(?:mp3|flac|m4a|m4b|oga|ogg)$/i)
 		  {	my @pix= FileTag::PixFromMusicFile($file);
 			$max=@pix;
 		  }
@@ -3823,7 +3959,6 @@ sub ChoosePix
 	$preview->show_all;
 	$more->set_no_show_all(1);
 	$dialog->set_preview_widget_active(0);
- warn $Options{$remember_key} if $remember_key;
 	if ($remember_key)	{ $path= $Options{$remember_key}; }
 	elsif ($path)		{ $path= url_escape($path); }
 	if ($file && $file=~s/:(\d+)$//) { $nb=$1; $lastfile=$file; }
@@ -4018,7 +4153,7 @@ sub DeleteFiles
 		  'warning','cancel','%s',
 		  __x(_("About to delete {files}\nAre you sure ?"), files => $text)
 		);
-	my $yesbutton=$dialog->add_button("gtk-delete", 2);
+	$dialog->add_button("gtk-delete", 2);
 	$dialog->show_all;
 	if ('2' eq $dialog->run)
 	{ my $abortmsg;
@@ -4037,8 +4172,8 @@ sub DeleteFiles
 }
 
 sub filenamefromformat
-{	my ($ID,$format,$ext)=@_;
-	my $s= CleanupFileName( ReplaceFields($ID,$format) );
+{	my ($ID,$format,$ext)=@_;	# $format is in utf8
+	my $s= ReplaceFieldsForFilename($ID,$format);
 	if ($ext)
 	{	$s= Songs::Get($ID,'barefilename') if $s eq '';
 		$s.= '.'.Songs::Get($ID,'extension');  #add extension
@@ -4049,18 +4184,21 @@ sub filenamefromformat
 	return $s;
 }
 sub pathfromformat
-{	my ($ID,$format,$basefolder,$icase)=@_;
+{	my ($ID,$format,$basefolder,$icase)=@_;		# $format is in utf8, $basefolder is a byte string
 	my $path= defined $basefolder ? $basefolder.SLASH : '';
-	$path.=$1 if $format=~s#^([^\$%]*$QSLASH)##;		# move constant part of format in path
+	if ($format=~s#^([^\$%]*$QSLASH)##)					# move constant part of format in path
+	{	my $constant=$1;
+		$path.= filename_from_unicode($constant);	# calling filename_from_unicode directly on $1 causes strange bugs afterward (with perl-Glib-1.222)
+	}
 	$path= Songs::Get($ID,'path').SLASH.$path if $path!~m#^~?$QSLASH#o; # use song's path as base for relative paths
 	$path=~s#^~($QSLASH)#$ENV{HOME}$1#o;				# replace leading ~/ by homedir
 	$path=~s#$QSLASH+\.?$QSLASH+#SLASH#goe; 			# remove repeated slashes and /./
 	1 while $path=~s#$QSLASH[^$QSLASH]+$QSLASH\.\.$QSLASH#SLASH#oe;	# handle ..
 	for my $f0 (split /$QSLASH+/o,$format)
-	{	my $f= CleanupFileName( ReplaceFields($ID,$f0) );
+	{	my $f= ReplaceFieldsForFilename($ID,$f0);
 		next if $f=~m/^\.\.?$/;
-		if ($f0 ne $f)
-		{	$f=ICasePathFile($path,$f) if $icase;
+		if ($icase && $f0 ne $f)
+		{	$f=ICasePathFile($path,$f);
 		}
 		$path.=$f.SLASH;
 	}
@@ -4068,7 +4206,7 @@ sub pathfromformat
 	return $path;
 }
 sub pathfilefromformat
-{	my ($ID,$format,$ext,$icase)=@_;
+{	my ($ID,$format,$ext,$icase)=@_;	# $format is in utf8
 	my ($path,$file)= $format=~m/^(?:(.*)$QSLASH)?([^$QSLASH]+)$/o;
 	#return undef unless $file;
 	$file='' unless defined $file;
@@ -4107,7 +4245,7 @@ sub CaseSensFile	#find case-sensitive filename from a case-insensitive filename
 sub DialogMassRename
 {	return if $CmdLine{ro};
 	my @IDs= uniq(@_); #remove duplicates IDs in @_ => @IDs
-	::SortList(\@IDs,'path album disc track file');
+	Songs::SortList(\@IDs,'path album:i disc track file');
 	my $dialog = Gtk2::Dialog->new
 			(_"Mass Renaming", undef,
 			 [qw/destroy-with-parent/],
@@ -4137,8 +4275,12 @@ sub DialogMassRename
 	  {	my (undef,$cell,$store,$iter)=@_;
 		my $ID=$store->get($iter,0);
 		my $text=filenamefromformat($ID,$combo->get_active_text,1);
-		if ($folders) {$text=pathfromformat($ID,$comboFolder->get_active_text, $Options{BaseFolder}).$text; }
-		$cell->set(text=>$text);
+		if ($folders)
+		{	my $base=  decode_url($Options{BaseFolder});
+			my $fmt= $comboFolder->get_active_text;
+			$text= pathfromformat($ID,$fmt,$base) . $text;
+		}
+		$cell->set(text=> filename_to_utf8displayname($text) );
 	  };
 	for ( [$treeview1,_"Old name",$func1], [$treeview2,_"New name",$func2] )
 	{	my ($tv,$title,$func)=@$_;
@@ -4203,13 +4345,13 @@ sub DialogMassRename
 		if ($response eq 'ok')
 		{ my $format=$combo->get_active_text;
 		  if ($folders)
-		  {	my $base= $Options{BaseFolder};
+		  {	my $base0= my $base= decode_url( $Options{BaseFolder} );
 			unless ( defined $base ) { ErrorMessage(_("You must specify a base folder"),$dialog); return }
 			until ( -d $base ) { last unless $base=~s/$QSLASH[^$QSLASH]*$//o && $base=~m/$QSLASH/o;  }
-			unless ( -w $base ) { ErrorMessage(__x(_("Can't write in base folder '{folder}'."), folder => $Options{BaseFolder}),$dialog); return }
+			unless ( -w $base ) { ErrorMessage(__x(_("Can't write in base folder '{folder}'."), folder => filename_to_utf8displayname($base0)),$dialog); return }
 			$dialog->set_sensitive(FALSE);
 			my $folderformat=$comboFolder->get_active_text;
-			CopyMoveFiles(\@IDs,FALSE,$Options{BaseFolder},$folderformat,$format);
+			CopyMoveFiles(\@IDs,FALSE,$base0,$folderformat,$format);
 		  }
 		  elsif ($format)
 		  {	$dialog->set_sensitive(FALSE);
@@ -4222,7 +4364,7 @@ sub DialogMassRename
 
 sub RenameFile
 {	my ($ID,$newutf8,$window,$abortmsg)=@_;
-	my $new=filename_from_unicode(CleanupFileName($newutf8));
+	my $new= CleanupFileName(filename_from_unicode($newutf8));
 	my ($dir,$old)= Songs::Get($ID,qw/path file/);
 	{	last if $new eq '';
 		last if $old eq $new;
@@ -4323,22 +4465,29 @@ sub LabelEditMenu
 		if ($_[0]->get_active)	{ SetLabels($IDs,[$f],undef); }
 		else			{ SetLabels($IDs,undef,[$f]); }
 	 };
-	MakeFlagToggleMenu($field,$hash,$menusub_toggled);
+	MakeFlagMenu($field,$menusub_toggled,$hash);
 }
 
-sub MakeFlagToggleMenu	#FIXME special case for no @keys, maybe a menu with a greyed-out item "no #none#"
-{	my ($field,$hash,$callback)=@_;
+sub MakeFlagMenu	#FIXME special case for no @keys, maybe a menu with a greyed-out item "no #none#"
+{	my ($field,$callback,$hash)=@_;
 	my @keys= @{Songs::ListAll($field)};
 	my $makemenu=sub
 	{	my ($start,$end,$keys)=@_;
 		my $menu=Gtk2::Menu->new;
 		for my $i ($start..$end)
 		{	my $key=$keys->[$i];
-			my $item=Gtk2::CheckMenuItem->new_with_label($key);
-			my $state= $hash->{$key}||0;
-			if ($state==1){ $item->set_active(1); }
-			elsif ($state==2)  { $item->set_inconsistent(1); }
-			$item->signal_connect(toggled => $callback,$key);
+			my $item;
+			if ($hash)
+			{	$item=Gtk2::CheckMenuItem->new_with_label($key);
+				my $state= $hash->{$key}||0;
+				if ($state==1){ $item->set_active(1); }
+				elsif ($state==2)  { $item->set_inconsistent(1); }
+				$item->signal_connect(toggled => $callback,$key);
+			}
+			else
+			{	$item=Gtk2::MenuItem->new($key);
+				$item->signal_connect(activate => $callback,$key);
+			}
 			$menu->append($item);
 		}
 		return $menu;
@@ -4593,6 +4742,7 @@ sub SongAdd_now
 	AA::IDs_Changed();
 	$Library->Push(\@IDs);
 	HasChanged(SongsAdded=>\@IDs);
+	AutoSelPictures(album=> @{Songs::UniqList(album=>\@IDs)});
 }
 sub SongsRemove
 {	my $IDs=$_[0];
@@ -4845,8 +4995,14 @@ sub ScanFolder
 		#if (-d $path_file) { push @ToScan,$path_file; next; }
 		if (-d $path_file)
 		{	#next if $notrecursive;
+			# make sure it doesn't look in the same dir twice due to symlinks
 			if (-l $path_file)
 			{	my $real=readlink $path_file;
+				$real= $dir.SLASH.$real unless $real=~m#^$QSLASH#o;
+				$real.=SLASH;				#make it end with a slash to make regexes simpler
+				$real=~s#$QSLASH\.?$QSLASH+#SLASH#goe;					#simplify /./ or //
+				1 while $real=~s#$QSLASH[^$QSLASH]+$QSLASH\.\.$QSLASH#SLASH#oe;		#simplify /folder/../
+				$real=~s#$QSLASH+$##;							#remove trailing slash
 				next if exists $FollowedDirs{$real};
 				$FollowedDirs{$real}=undef;
 			}
@@ -4857,7 +5013,6 @@ sub ScanFolder
 			push @ToScan,$path_file;
 			next;
 		}
-		#if ($file=~m/\.(?:jpeg|jpg|png|gif)$/i) { push @pictures,$file; next; }
 		next unless $file=~$ScanRegex;
 		#my $ID=Songs::FindID($path_file);
 		my $ID=$Songs::IDFromFile->{$dir}{$file};
@@ -4926,128 +5081,127 @@ sub ScanProgress_cb
 	return 1;
 }
 
-#FIXME check completely replaced then remove
-=toremove
-sub ScanFolder_old
-{	my $notlibrary=$_[0];
-	my $dir= $notlibrary || shift @ToScan;
-	warn "Scanning $dir\n" if $debug;
-	$ProgressNBFolders++ unless $notlibrary;
-	my @pictures;
-	unless ($ScanRegex)
-	{	my @list= $Options{ScanPlayOnly}? ($PlayNext_package||$Play_package)->supported_formats
-						: qw/mp3 ogg oga flac mpc ape wv/; #FIXME find a better way,  wvc
-		my $s=join '|',@list;
-		$ScanRegex=qr/\.(?:$s)$/i;
-	}
-	my @files;
-	if (-d $dir)
-	{	opendir my($DIRH),$dir or warn "Can't read folder $dir : $!\n";
-		@files=readdir $DIRH;
-		closedir $DIRH;
-	}
-	elsif (-f $dir && $dir=~s/$QSLASH([^$QSLASH]+)$//o)
-	{	@files=($1);
-	}
-	my $utf8dir=filename_to_utf8displayname($dir);
-	my @toadd;
-	for my $file (@files)
-	{	next if $file=~m/^\./;		# skip . .. and hidden files/folders
-		my $path_file=$dir.SLASH.$file;
-		#warn "slash is utf8\n" if utf8::is_utf8(SLASH);
-		#if (-d $path_file) { push @ToScan,$path_file; next; }
-		if (-d $path_file)
-		{	next if $notlibrary;
-			if (-l $path_file)
-			{	my $real=readlink $path_file;
-				next if exists $FollowedDirs{$real};
-				$FollowedDirs{$real}=undef;
-			}
-			else
-			{	next if exists $FollowedDirs{$path_file};
-				$FollowedDirs{$path_file}=undef;
-			}
-			push @ToScan,$path_file;
-			next;
-		}
-		if ($file=~m/\.(?:jpeg|jpg|png|gif)$/i) { push @pictures,$file; next; }
-		next unless $file=~$ScanRegex;
-		my $rID=\$GetIDFromFile{$dir}{$file};
-		if (defined $$rID)
-		{	next unless ($Songs[$$rID][SONG_MISSINGSINCE] && $Songs[$$rID][SONG_MISSINGSINCE]=~m/^\d/) || $notlibrary;
-		}
-		else
-		{	my @song;#=('')xSONGLAST;	#FIXME only to avoid undef warnings
-			#$song[SONG_NBPLAY]=0;
-			@song[SONG_UFILE,SONG_UPATH,SONG_ADDED,SONG_FILE,SONG_PATH]=(filename_to_utf8displayname($file),$utf8dir,time,$file,$dir);
-			#_utf8_on($song[SONG_FILE]); # lie to perl so it doesn't get upgraded
-			#_utf8_on($song[SONG_PATH]); #  to utf8 when saving with '>:utf8'
-			push @Songs,\@song;
-			$$rID=$#Songs;
-		}
-		push @toadd,$$rID;
-	}
-	if ($notlibrary)
-	{	$_->[SONG_MODIF] or $_->[SONG_MISSINGSINCE]=$DAYNB for @Songs[@toadd]; # init MISSING_SINCE for new songs
-		@toadd= grep SongCheck($_), @toadd;
-		return \@toadd;
-	}
-	push @ToAdd_Files,@toadd;
-	undef %FollowedDirs unless @ToScan;
-	$CoverCandidates=[$dir,\@pictures] if @pictures;
+sub AutoSelPictures
+{	my ($field,@gids)=@_;
+	my $ref= $AutoPicChooser{$field} ||= { todo=>[] };
+	unshift @{$ref->{todo}}, @gids;
+	$ref->{idle}||= Glib::Idle->add(\&AutoSelPictures_do_next,$field);
+	$ref->{timeout}||= Glib::Timeout->add(1000,\&AutoSelPictures_progress_cb,$field);	#if @{$ref->{todo}}>10 ??
+}
+sub AutoSelPictures_do_next
+{	my $field=shift;
+	my $ref= $AutoPicChooser{$field};
+	return 0 unless $ref;
+	my $gid= shift @{$ref->{todo}};
+	AutoSelPicture($field,$gid);
+	$ref->{done}++;
+	return 1 if @{$ref->{todo}};
+	delete $AutoPicChooser{$field};
+	return 0;
+}
+sub AutoSelPictures_progress_cb
+{	my $field=shift;
+	my $ref= $AutoPicChooser{$field};
+	unless ($ref) { Progress('autopic_'.$field, abort=>1); return 0; }
+	return 0 unless $ref;
+	my $done= $ref->{done}||0;
+	Progress('autopic_'.$field, title => _"Selecting pictures", current=> $done, end=> $done+@{$ref->{todo}}, abortcb=> sub { delete $AutoPicChooser{$field}; }, aborthint=> _"Stop selecting pictures", );
+	return scalar @{$ref->{todo}};
 }
 
-sub CheckCover
-{	my ($dir,$pictures)=@$CoverCandidates; $CoverCandidates=undef;
-	return unless exists $GetIDFromFile{$dir};
-	my $h=$GetIDFromFile{$dir};
-	my ($first,@songs)=grep !($_->[SONG_MISSINGSINCE] && $_->[SONG_MISSINGSINCE]=~m/^\d/), map $Songs[$_],values %$h;
-	my $alb=$first->[SONG_ALBUM];
-	return unless defined $alb;
-	return if $alb=~m/^<Unknown>/;
-	for my $song (@songs)
-	{	my $alb2=$song->[SONG_ALBUM];
-		return if !defined $alb2 || $alb2 ne $alb;
-	}
-	#FIXME could check if all the songs of the album are in this dir
-	my $cover=AAPicture::GetPicture(album=>$alb);
-	return if $cover || (defined $cover && $cover eq '0');
+sub AutoSelPicture
+{	my ($field,$gid,$force)=@_;
 
-	my $match=$alb; $match=~s/[^0-9A-Za-z]+/ /g; $match=~tr/A-Z/a-z/;
-	$match=undef if $match eq ' ';
-	my (@words)= $alb=~m/([0-9A-Za-z]{4,})/g; tr/A-Z/a-z/ for @words;
-	my $hiscore; my $best;
-	for my $file (@$pictures)
-	{	my $score=0;
-		my $letters=$file; $letters=~s/\.[^.]+$//;
-		$letters=~s/[^0-9A-Za-z]+/ /g; $letters=~tr/A-Z/a-z/;
-		if (defined $match)
-		{	if    ($letters eq $match)		{$score+=100}
-			elsif ($letters=~m/\b\Q$match\E\b/)	{$score+=100}
-			else { $letters=~m/\Q$_\E/ && $score++ for @words; }
+	unless ($force)
+	# return if picture already set and existing
+	{	my $file= AAPicture::GetPicture($field,$gid);
+		if (defined $file)
+		{	return unless $file; # file eq '0' => no picture
+			if ($file=~s/:(\w+)$//) { return if FileTag::PixFromMusicFile($file,$1); }
+			else { return if -e $file }
 		}
-		$score+=2 if $letters=~m/\b(?:cover|front|folder|thumb|thumbnail)\b/;
-		$score-- if $letters=~m/\b(?:back|cd|inside|booklet)\b/;
-		#next unless defined $score;
-		next if $hiscore && $hiscore>$score;
-		$hiscore=$score; $best=$file;
 	}
-	return unless $best;
-	AAPicture::SetPicture(album=>$alb, $dir.SLASH.$best);
-	warn "found cover for $alb : $best)\n" if $debug;
+
+	my $IDs= AA::GetIDs($field,$gid);
+	return unless @$IDs;
+
+	my $set;
+	my %pictures_files;
+	for my $m (qw/embbeded guess/)
+	{	if ($m eq 'embbeded')
+		{	my @files= grep m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i, Songs::Map('fullfilename',$IDs);
+			if (@files)
+			{	$set= first { FileTag::PixFromMusicFile($_,$field,1) && $_ } @files;
+			}
+		}
+		elsif ($m eq 'guess')
+		{	warn "Selecting cover for ".Songs::Gid_to_Get($field,$gid)."\n" if $::debug;
+
+			my $path= Songs::BuildHash('path', $IDs);
+			for my $folder (keys %$path)
+			{	my $count_in_folder= AA::Get('count','path',$folder);
+				#warn " removing $folder $count_in_folder != $path->{$folder}\n" if $count_in_folder != $path->{$folder} if $::debug;
+				delete $path->{$folder} if $count_in_folder != $path->{$folder};
+			}
+			next unless keys %$path;
+			my $common= find_common_parent_folder(keys %$path);
+			if (length $common >5)	# ignore common parent folder if too short #FIXME compare the depth of $common with others, ignore it if more than 1 or 2 depth diff
+			{	if (!$path->{$common})
+				{	my $l=Filter->new( 'path:i:'.$common)->filter;
+					#warn " common=$common ".scalar(@$l)." == ".scalar(@$IDs)." ? \n" if $::debug;
+					$common=undef if @$l != @$IDs;
+				}
+				$path->{$common}= @$IDs if $common;
+			}
+			my @folders= sort { $path->{$b} <=> $path->{$a} } keys %$path;
+
+			my @words= split / +/, Songs::Gid_to_Get($field,$gid);
+			tr/0-9A-Za-z//cd for @words;
+			@words=grep length>2, @words;
+
+			my %found;
+			for my $folder (@folders)
+			{	opendir my($dh), $folder;
+				for my $file (grep m/\.(?:jpe?g|png|gif|bmp)$/i, readdir $dh)
+				{	my $score=0;
+					if ($field eq 'album') { $score+=100 if $file=~m/(?:^|[^a-zA-Z])(?:cover|front|folder|thumb|thumbnail)[^a-zA-Z]/i; }
+					elsif ( index($file,$field)!=-1 ) { $score+=10 }
+					#$score-- if $file=~m/\b(?:back|cd|inside|booklet)\b/;
+					$score+=10 for grep index($file,$_)!=-1, @words;
+					$found{ $folder.SLASH.$file }= $score;
+					warn " $file $score\n" if $::debug;
+				}
+				last if %found; #don't look in other folders if found a least a picture
+			}
+			($set)= sort { $found{$b} <=> $found{$a} } keys %found;
+		}
+		last if $set;
+	}
+	if ($set) { AAPicture::SetPicture($field, $gid, $set); }
 }
-=cut
+
 
 sub AboutDialog
 {	my $dialog=Gtk2::AboutDialog->new;
 	$dialog->set_version(VERSIONSTRING);
-	$dialog->set_copyright("Copyright © 2005-2010 Quentin Sculo");
+	$dialog->set_copyright("Copyright ¬© 2005-2010 Quentin Sculo");
 	#$dialog->set_comments();
 	$dialog->set_license("Released under the GNU General Public Licence version 3\n(http://www.gnu.org/copyleft/gpl.html)");
 	$dialog->set_website('http://gmusicbrowser.org');
 	$dialog->set_authors('Quentin Sculo <squentin@free.fr>');
-	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\nelementary icon theme : Simon Steinbeiﬂ");
-	$dialog->set_translator_credits("French : Quentin Sculo and Jonathan Fretin\nHungarian : Zsombor\nSpanish : Martintxo, Juanjo and Elega\nGerman : vlad <donvla\@users.sourceforge.net> & staubi <staubi\@linuxmail.org>\nPolish : tizzilzol team\nSwedish : Olle Sandgren\nChinese : jk");
+	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\nelementary icon theme : Simon Steinbei√ü");
+	$dialog->set_translator_credits( join "\n", sort
+		'French : Quentin Sculo, Jonathan Fretin, Fr√©d√©ric Urbain, Brice Boucard & Hornblende',
+		'Hungarian : Zsombor',
+		'Spanish : Martintxo, Juanjo & Elega',
+		'German : vlad <donvla@users.sourceforge.net> & staubi <staubi@linuxmail.org>',
+		'Polish : tizzilzol team',
+		'Swedish : Olle Sandgren',
+		'Chinese : jk',
+		'Czech : Va≈°ek Kov√°≈ô√≠k',
+		'Portuguese : Gleriston Sampaio <gleriston_sampaio@hotmail.com>',
+		'Korean : bluealbum',
+	);
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
 }
@@ -5066,6 +5220,7 @@ sub PrefDialog
 	$notebook->append_page( PrefAudio()	,Gtk2::Label->new(_"Audio"));
 	$notebook->append_page( PrefLayouts()	,Gtk2::Label->new(_"Layouts"));
 	$notebook->append_page( PrefMisc()	,Gtk2::Label->new(_"Misc."));
+	$notebook->append_page( Songs::PrefFields(),Gtk2::Label->new(_"Fields"));
 	$notebook->append_page( PrefPlugins()	,Gtk2::Label->new(_"Plugins"));
 	$notebook->append_page( PrefKeys()	,Gtk2::Label->new(_"Keys"));
 	$notebook->append_page( PrefTags()	,Gtk2::Label->new(_"Tags"));
@@ -5443,10 +5598,50 @@ sub PrefAudio_makeadv
 	return $hbox;
 }
 
-sub PrefMisc
-{	my $vbox=Gtk2::VBox->new (FALSE, 2);
+sub pref_artists_update_desc
+{	my $button=shift;
+	my $hash= $button->{hash};
+	my $key=  $button->{key};
+	my $text= join '  ',map $hash->{$_}||=qq("$_"), @{ $Options{$key} };
+	$text||= $button->{empty};
+	unless ($button->{label})
+	{	my $label= $button->{label}= Gtk2::Label->new;
+		#$label->set_ellipsize('end');
+		my $hbox=Gtk2::HBox->new(0,0);
+		$hbox->pack_start($label,1,1,2);
+		$hbox->pack_start($_,0,0,2) for Gtk2::VSeparator->new, Gtk2::Arrow->new('down','none');
+		$button->add($hbox);
+	}
+	$button->{label}->set_text($text);
+}
+sub pref_artists_change_cb
+{	my $button= $_[0]{button};
+	my $key= $button->{key};
+	my $l= $Options{$key};
+	my $before=@$l;
+	@$l= grep $_ ne $_[1], @$l;
+	push @$l,$_[1] if $before==@$l;
+	@$l= sort @$l;
+	pref_artists_update_desc($button);
+	Songs::UpdateArtistsRE();
+}
+sub pref_artists_button_cb
+{	my ($button,$event)=@_;
+	my $menu=BuildChoiceMenu
+	(	$button->{hash},
+		check=> sub { $Options{$_[0]{button}{key}} },
+		code => \&pref_artists_change_cb,
+		'reverse'=>1,
+		args => {button=>$button},
+	);
+	$menu->show_all;
+	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
+	1;
+}
 
-	#Default rating
+
+sub PrefMisc
+{	#Default rating
 	my $DefRating=NewPrefSpinButton('DefaultRating',0,100, step=>10, page=>20, text1=>_"Default rating :", cb=> sub
 		{ IdleDo('0_DefaultRating',500,\&Songs::UpdateDefaultRating);
 		});
@@ -5468,19 +5663,31 @@ sub PrefMisc
 	$screensaver->set_sensitive(0) unless findcmd('xdg-screensaver');
 	#shutdown
 	my $shutentry=NewPrefEntry(Shutdown_cmd => _"Shutdown command :", tip => _"Command used when\n'turn off computer when queue empty'\nis selected");
-	#artist splitting
-	my %split=
-	(	' & |, |;'	=> _"' & ' and ', ' and ';'",
-		' & '		=> "' & '",
-		' \\+ '		=> "' + '",
-		'; *'		=> "';'",
-		'$'		=> _"no splitting",
-	);
-	my $asplit=NewPrefCombo(ArtistSplit => \%split, text => _"Split artist names on (needs restart) :");
 
+	#artist splitting
+	my $asplit_label= Gtk2::Label->new(_"Split artist names on :");
+	my $asplit=Gtk2::Button->new;
+	$asplit->set_tooltip_text(_"Used for the Artists field");
+	$asplit->{hash}= \%Artists_split;
+	$asplit->{key}= 'Artists_split_re';
+	$asplit->{empty}= _"no splitting";
+	pref_artists_update_desc($asplit);
+	$asplit->signal_connect(button_press_event=> \&pref_artists_button_cb);
+
+	#artist in title
+	my $atitle_label= Gtk2::Label->new(_"Extract guest artist from title :");
+	my $atitle=Gtk2::Button->new;
+	$atitle->set_tooltip_text(_"Used for the Artists field");
+	$atitle->{hash}= \%Artists_from_title;
+	$atitle->{key}= 'Artists_title_re';
+	$atitle->{empty}= _"ignore title";
+	pref_artists_update_desc($atitle);
+	$atitle->signal_connect(button_press_event=> \&pref_artists_button_cb);
+
+	#date format
 	my $dateex= mktime(5,4,3,2,0,(localtime)[5]);
 	my $datetip= join "\n", _"use standard strftime variables",	_"examples :",
-			map( sprintf("%s : %s",$_,strftime($_,localtime($dateex))), split(/ *\| */,"%a %b %d %H:%M:%S %Y | %A %B %I:%M:%S %p %Y | %d/%m/%y %H:%M | %X %x | %F %r | %c | %s") ),
+			map( sprintf("%s : %s",$_,strftime2($_,localtime($dateex))), split(/ *\| */,"%a %b %d %H:%M:%S %Y | %A %B %I:%M:%S %p %Y | %d/%m/%y %H:%M | %X %x | %F %r | %c | %s") ),
 			'',
 			_"Additionally this format can be used :\n default number1 format1 number2 format2 ...\n dates more recent than number1 seconds will use format1, ...";
 	my $datefmt=NewPrefEntry(DateFormat => _"Date format :", tip => $datetip, history=> 'DateFormat_history');
@@ -5493,17 +5700,23 @@ sub PrefMisc
 			join "\n", '', map Songs::DateString($_), @sec;
 		    }
 	);
-	#my $datebox= Hpack(0,$datefmt,$preview);
 	my $datealign=Gtk2::Alignment->new(0,.5,0,0);
 	$datealign->add($datefmt);
-	my $datebox= Hpack(0,$datealign,$preview);
 
 	my $volstep= NewPrefSpinButton('VolumeStep',1,100, step=>1, text1=>_"Volume step :", tip=>_"Amount of volume changed by the mouse wheel");
 	my $always_in_pl=NewPrefCheckButton(AlwaysInPlaylist => _"Current song must always be in the playlist", tip=> _"- When selecting a song, the playlist filter will be reset if the song is not in it\n- Skip to another song when removing the current song from the playlist");
 	my $pixcache= NewPrefSpinButton('PixCacheSize',1,1000, text1=>_"Picture cache :", text2=>_"MB", cb=>\&GMB::Picture::trim);
 
-	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $checkR1,$checkR2,$checkR4,$DefRating,$ProxyCheck,$asplit,$datebox,$screensaver,$shutentry,$volstep,$always_in_pl,$pixcache;
+	my $recent_include_not_played= NewPrefCheckButton(AddNotPlayedToRecent => _"Recent songs include skipped songs that haven't been played.", tip=> _"When changing songs, the previous song is added to the recent list even if not played at all.");
+
+	my $playedpercent= NewPrefSpinButton('PlayedMinPercent'	,0,100,  text1=>_"Threshold to count a song as played :", text2=>"%");
+	my $playedseconds= NewPrefSpinButton('PlayedMinSeconds'	,0,99999,text1=>_"or", text2=>_"seconds");
+
+	my $vbox= Vpack( $checkR1,$checkR2,$checkR4, $DefRating,$ProxyCheck, [$asplit_label, $asplit],[$atitle_label, $atitle],
+			[0,$datealign,$preview], $screensaver,$shutentry, $always_in_pl,
+			$recent_include_not_played, $volstep, $pixcache,
+			[ $playedpercent, $playedseconds ],
+		);
 	return $vbox;
 }
 
@@ -5512,23 +5725,30 @@ sub PrefLayouts
 
 	#Tray
 	my $traytiplength=NewPrefSpinButton('TrayTipTimeLength', 0,100000, step=>100, text1=>_"Display tray tip for", text2=>'ms');
+	my $checkT5=NewPrefCheckButton(StartInTray => _"Start in tray");
 	my $checkT2=NewPrefCheckButton(CloseToTray => _"Close to tray");
 	my $checkT3=NewPrefCheckButton(ShowTipOnSongChange => _"Show tray tip on song change", widget=>$traytiplength);
 	my $checkT4=NewPrefCheckButton(TrayTipDelay => _"Delay tray tip popup on mouse over", cb=>\&SetTrayTipDelay);
 	my $checkT1=NewPrefCheckButton( UseTray => _"Show tray icon",
 					cb=> sub { &CreateTrayIcon; },
-					widget=> Vpack($checkT2,$checkT4,$checkT3)
+					widget=> Vpack($checkT5,$checkT2,$checkT4,$checkT3)
 					);
 	$checkT1->set_sensitive($Gtk2TrayIcon);
 
 	#layouts
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	my $layoutT=NewPrefCombo(LayoutT=> Layout::get_layout_list('T'), text => _"Tray tip window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
-	my $layout =NewPrefCombo(Layout => Layout::get_layout_list('G'), text =>_"Player window layout :", 	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => sub {CreateMainWindow();}, );
-	my $layoutB=NewPrefCombo(LayoutB=> Layout::get_layout_list('B'), text =>_"Browser window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
-	my $layoutF=NewPrefCombo(LayoutF=> Layout::get_layout_list('F'), text =>_"Full screen layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
-	my $layoutS=NewPrefCombo(LayoutS=> Layout::get_layout_list('S'), text =>_"Search window layout :",	sizeg1=>$sg1,sizeg2=>$sg2, tree=>1);
+	my @layouts_combos;
+	for my $layout	( [ 'Layout', 'G',_"Player window layout :", sub {CreateMainWindow();}, ],
+			  [ 'LayoutB','B',_"Browser window layout :", ],
+			  [ 'LayoutT','T',_"Tray tip window layout :", ],
+			  [ 'LayoutF','F',_"Full screen layout :", ],
+			  [ 'LayoutS','S',_"Search window layout :", ],
+			)
+	{	my ($key,$type,$text,$cb)=@$layout;
+		my $combo= NewPrefLayoutCombo($key,$type,$text,$sg1,$sg2,$cb);
+		push @layouts_combos, $combo;
+	}
 
 	#fullscreen button
 	my $fullbutton=NewPrefCheckButton(AddFullscreenButton => _"Add a fullscreen button", cb=>sub { Layout::WidgetChangedAutoAdd('Fullscreen'); }, tip=>_"Add a fullscreen button to layouts that can accept extra buttons");
@@ -5537,7 +5757,7 @@ sub PrefLayouts
 	my $icotheme=NewPrefCombo(IconTheme=> GetIconThemesList(), text =>_"Icon theme :", sizeg1=>$sg1,sizeg2=>$sg2, cb => \&LoadIcons);
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for $layout,$layoutB,$layoutT,$layoutF,$layoutS,$checkT1,$fullbutton,$icotheme;
+	$vbox->pack_start($_,FALSE,FALSE,1) for @layouts_combos,$checkT1,$fullbutton,$icotheme;
 	return $vbox;
 }
 
@@ -5567,7 +5787,7 @@ sub PrefTags
 }
 
 sub AskRenameFolder
-{	my $parent=shift; #parent is in utf8
+{	my $parent=shift;
 	$parent=~s/([^$QSLASH]+)$//o;
 	my $old=$1;
 	my $dialog=Gtk2::Dialog->new(_"Rename folder", undef,
@@ -5578,20 +5798,24 @@ sub AskRenameFolder
 	$dialog->set_border_width(3);
 	my $entry=Gtk2::Entry->new;
 	$entry->set_activates_default(TRUE);
-	$entry->set_text($old);
+	$entry->set_text( filename_to_utf8displayname($old) );
 	$dialog->vbox->pack_start( Gtk2::Label->new(_"Rename this folder to :") ,FALSE,FALSE,1);
 	$dialog->vbox->pack_start($entry,FALSE,FALSE,1);
 	$dialog->show_all;
 	{	last unless $dialog->run eq 'ok';
 		my $new=$entry->get_text;
 		last if $new eq '';
-		last if $old eq $new;
 		last if $new=~m/$QSLASH/o;	#FIXME allow moving folder
-		$old=filename_from_unicode($parent.$old.SLASH);
-		$new=filename_from_unicode($parent.$new.SLASH);
-		-d $new and ErrorMessage(__x(_"{folder} already exists",folder=>$new)) and last; #FIXME use an error dialog
+		$old= $parent.$old.SLASH;
+		$new= $parent.filename_from_unicode($new).SLASH;
+		last if $old eq $new;
+		-d $new and ErrorMessage(__x(_"{folder} already exists",folder=> filename_to_utf8displayname($new) )) and last; #FIXME use an error dialog
 		rename $old,$new
-			or ErrorMessage(__x(_"Renaming {oldname}\nto {newname}\nfailed : {error}",oldname=>$old,newname=>$new,error=>$!)) and last; #FIXME use an error dialog
+			or ErrorMessage(__x(_"Renaming {oldname}\nto {newname}\nfailed : {error}",
+				oldname=> filename_to_utf8displayname($old),
+				newname=> filename_to_utf8displayname($new),
+				error=>$!))
+			and last; #FIXME use an error dialog
 		UpdateFolderNames($old,$new);
 	}
 	$dialog->destroy;
@@ -5614,18 +5838,16 @@ sub MoveFolder #FIXME implement
 sub UpdateFolderNames
 {	my ($oldpath,$newpath)=@_;
 	s/$QSLASH+$//o for $oldpath,$newpath;
-	my $pattern= "^\Q$oldpath\E(?:".SLASH.'|$)';
-	my $renamed=Songs::AllFilter('path:m:'.$pattern);
-	return unless @$renamed;
+	my $renamed=Songs::AllFilter('path:i:'.$oldpath);
 
-	$pattern=qr/^\Q$oldpath\E/;
+	my $pattern=qr/^\Q$oldpath\E/;
 	my @newpath;
 	for my $ID (@$renamed)
 	{	my $path= Songs::Get($ID,'path');
-		$path=~s/$pattern/$newpath/;	#CHECKME check if works with broken filenames
+		$path=~s/$pattern/$newpath/;
 		push @newpath,$path;
 	}
-	Songs::Set($renamed,'@path'=>\@newpath);
+	Songs::Set($renamed,'@path'=>\@newpath) if @$renamed;
 
 	GMB::Picture::UpdatePixPath($oldpath,$newpath);
 }
@@ -6027,7 +6249,7 @@ sub NewPrefFileEntry
 	{	$widget=Gtk2::ComboBoxEntry->new_text;
 		$entry=$widget->child;
 		my $hist= $Options{$key_history} || [];
-		$widget->append_text($_) for @$hist;
+		$widget->append_text(decode_url($_)) for grep length, @$hist; #won't work with filenames with broken encoding
 	}
 	my $button=NewIconButton('gtk-open');
 	my $hbox=Gtk2::HBox->new;
@@ -6037,28 +6259,39 @@ sub NewPrefFileEntry
 	$hbox->pack_start($_,FALSE,FALSE,2)  for $label,$hbox2;
 	$label->set_alignment(0,.5);
 
+	my $enc_warning=Gtk2::Label->new(_"Warning : using a folder with invalid encoding, you should rename it.");
+	$enc_warning->set_no_show_all(1);
+	my $vbox=Gtk2::VBox->new(FALSE,0);
+	$vbox->pack_start($hbox,FALSE,FALSE,0);
+	$vbox->pack_start($enc_warning,FALSE,FALSE,2);
+
 	if ($sg1) { $sg1->add_widget($label); $label->set_alignment(0,.5); }
 	if ($sg2) { $sg2->add_widget($hbox2); }
 
 	$entry->set_tooltip_text($tip) if defined $tip;
-	$entry->set_text(filename_to_utf8displayname($Options{$key})) if defined $Options{$key};
+	if (defined $Options{$key})
+	{	$entry->set_text(filename_to_utf8displayname(decode_url($Options{$key})));
+		$enc_warning->show if url_escape($entry->get_text) ne $Options{$key};
+	}
 
 	my $busy;
 	$entry->signal_connect( changed => sub
 	{	return if $busy;
-		SetOption( $key, filename_from_unicode( $_[0]->get_text ));
+		SetOption( $key, url_escape($_[0]->get_text) );
+		$enc_warning->hide;
 		&$cb if $cb;
 	});
 	$button->signal_connect( clicked => sub
 	{	my $file= $folder? ChooseDir($text,$Options{$key}) : undef;
 		return unless $file;
 		# could simply $entry->set_text(), but wouldn't work with filenames with broken encoding
-		SetOption( $key, $file);
+		SetOption( $key, url_escape($file) );
 		$busy=1; $entry->set_text(filename_to_utf8displayname($file)); $busy=undef;
+		if (url_escape($entry->get_text) eq $Options{$key} ) { $enc_warning->hide } else { $enc_warning->show }
 		&$cb if $cb;
 	});
-	$entry->signal_connect( destroy => sub { PrefSaveHistory($key_history,$_[0]->get_text); } ) if $key_history;
-	return $hbox;
+	$entry->signal_connect( destroy => sub { PrefSaveHistory($key_history,url_escape($_[0]->get_text)); } ) if $key_history;
+	return $vbox;
 }
 sub NewPrefSpinButton
 {	my ($key,$min,$max,%opt)=@_;
@@ -6110,6 +6343,20 @@ sub NewPrefCombo
 	{	$widget= $combo->make_toolitem($toolitem,$key,$widget);
 	}
 	return $widget;
+}
+
+sub NewPrefLayoutCombo
+{	my ($key,$type,$text,$sg1,$sg2,$cb)=@_;
+	my $combo= NewPrefCombo($key => Layout::get_layout_list($type), text => $text, sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => $cb, );
+	my $set_tooltip= sub	#show layout author in tooltip
+	 {	return if $_[1] && $_[1] ne $key;
+		my $author= $Layout::Layouts{$Options{$key}}{Author};
+		$author&&= _("by").' '.$author;
+		$_[0]->set_tooltip_text($author);
+	 };
+	Watch( $combo, Option => $set_tooltip);
+	$set_tooltip->($combo);
+	return $combo;
 }
 
 sub NewIconButton
@@ -6271,6 +6518,7 @@ sub SetFilter
 	$filters->[0]= Filter->newadd(TRUE, map($filters->[$_], 1..$#$filters) ); #sum filter
 	AddToFilterHistory( $filters->[0] );
 	for my $r ( @{$FilterWatchers{$group}} ) { $r->{'UpdateFilter_'.$group}($r,$Filters{$group}[0],$level,$group) };
+	if ($group eq 'Play') { $ListPlay->SetFilter($filters->[0]) }
 }
 sub RefreshFilters
 {	my ($object,$group)=@_;
@@ -6417,7 +6665,7 @@ sub CreateTrayIcon
 		{	my $b=$_[1]->button;
 			if	($b==3) { &TrayMenuPopup }
 			elsif	($b==2) { &PlayPause}
-			else		{ &ShowHide }
+			else		{ ShowHide() }
 			1;
 		});
 	SetTrayTipDelay();
@@ -6489,8 +6737,9 @@ sub IsWindowVisible
 	return $visible;
 }
 sub ShowHide
-{	my (@windows)=grep $_->isa('Layout::Window') && $_->{showhide} && $_!=$MainWindow, Gtk2::Window->list_toplevels;
-	if ( IsWindowVisible($MainWindow) )
+{	my $hide= defined $_[0] ? !$_[0] : IsWindowVisible($MainWindow);
+	my (@windows)=grep $_->isa('Layout::Window') && $_->{showhide} && $_!=$MainWindow, Gtk2::Window->list_toplevels;
+	if ($hide)
 	{	#hide
 		#warn "hiding\n";
 		for my $win ($MainWindow,@windows)
@@ -6717,7 +6966,7 @@ sub new
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->set_reorderable(TRUE);
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes(
-		filters => Gtk2::CellRendererText->new,
+		_("filters") => Gtk2::CellRendererText->new,
 		text => C_NAME) );
 	my $sw = Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');
@@ -8164,12 +8413,12 @@ sub load
 {	my ($file,$size)=@_;
 	return unless $file;
 
-	my $nb= $file=~s/:(\d+)$// ? $1 : undef;	#index number for embbeded pictures
+	my $nb= $file=~s/:(\d+|\w+)$// ? $1 : undef;	#index number for embbeded pictures
 	unless (-r $file) {warn "$file not found\n"; return undef;}
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;
 	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
-	if ($file=~m/\.(?:mp3|flac|m4a|m4b)$/i)
+	if ($file=~m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i)
 	{	my $data=FileTag::PixFromMusicFile($file,$nb);
 		eval { $loader->write($data) } if defined $data;
 	}
@@ -8430,7 +8679,7 @@ sub make_toolitem
 	$titem->set_proxy_menu_item($menu_item_id,$item);
 	my $radioi;
 	my $store=$self->get_model;
-	my $iter=$self->get_active_iter;
+	my $iter=$store->get_iter_first;
 	while ($iter)
 	{	my ($name,$val)=$store->get($iter,0,1);
 		$radioi=Gtk2::RadioMenuItem->new_with_label($radioi,$name);
@@ -8538,11 +8787,11 @@ sub fill_store
 {	my $self=shift;
 	my $store= $self->get_model;
 	$store->clear;
-	$store->set($store->append, 0,_"All Songs", 1,Filter->new, 2,'gmb-library');
+	$store->set($store->append, 0,_"All songs", 1,Filter->new, 2,'gmb-library');
 	my $hash=$Options{SavedFilters};
 	my @names= sort {::superlc($a) cmp ::superlc($b)} keys %$hash;
 	$store->set($store->append, 0,$_, 1,$hash->{$_}) for @names;
-	$store->set($store->append, 0,_"Edit ...", 1,undef, 2,'gtk-preferences');
+	$store->set($store->append, 0,_"Edit...", 1,undef, 2,'gtk-preferences');
 }
 
 sub set_value

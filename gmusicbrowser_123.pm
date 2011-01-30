@@ -17,12 +17,12 @@ use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 #$SIG{CHLD} = sub { while (waitpid(-1, WNOHANG)>0) {} };
 
 my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill);
+my ($Paused,$SkipTo);
 my ($CMDfh,$RemoteMode);
 my $alsa09;
 our %Commands=
 (	mpg321	=> {type => 'mp3', devices => 'oss alsa esd arts sun',	cmdline => \&mpg321_cmdline, },
 	ogg123	=> {type => 'oga flac', devices => 'pulse alsa arts esd oss', cmdline => \&ogg123_cmdline,
-			priority=> 1, #makes it higher priority than flac123
 		   }, #FIXME could check if flac codec is available
 	mpg123	=>
 		{ type => 'mp3', devices =>  sub { return grep $_ ne 'dummy', map m/^(\w+)\s+output*/g, qx/mpg123 --list-modules/; },
@@ -40,6 +40,7 @@ our %Commands=
 			      LOAD => sub { "L $_[0]" }, JUMP => sub { "J $_[0]" }, watcher => \&_remotemsg,
 		      	    },
 		  cmdline => \&flac123_cmdline,
+		  priority=> 1, #makes it higher priority than ogg123 (because ogg123 can't seek in flac files)
 		},
 );
 our %Supported;
@@ -117,6 +118,7 @@ sub mpg123_cmdline
 sub Play
 {	(undef,$file,my$sec)=@_;
 	&Stop if $ChildPID;
+	$SkipTo=undef;
 	@cmd_and_args=();
 	my $device_option;
 	my $device=$::Options{Device};
@@ -196,27 +198,34 @@ sub _remotemsg	#used by flac123 and mpg123
 }
 
 sub Pause
-{	if ($RemoteMode) { print $CMDfh $RemoteMode->{PAUSE}."\n" }
+{	$Paused=1;
+	if ($RemoteMode) { print $CMDfh $RemoteMode->{PAUSE}."\n" }
 	elsif ($ChildPID) {kill STOP=>$ChildPID};
 }
 sub Resume
-{	if ($RemoteMode) { print $CMDfh $RemoteMode->{RESUME}."\n" }
-	elsif ($ChildPID) {kill CONT=>$ChildPID;}
+{	$Paused=0;
+	if ($ChildPID)
+	{	if ($RemoteMode) { print $CMDfh $RemoteMode->{RESUME}."\n" }
+		else 		 { kill CONT=>$ChildPID; }
+	}
+	else { SkipTo(undef,$SkipTo); $SkipTo=undef; }
 }
 
 sub SkipTo
 {	my $sec=$_[1];
-	if ($RemoteMode)
+	if ($Paused) { Stop(); $Paused=1; $SkipTo=$sec; }
+	elsif ($RemoteMode && $ChildPID)
 	{	::setlocale(::LC_NUMERIC, 'C'); #flac123 ignores decimals anyway
 		print $CMDfh $RemoteMode->{JUMP}($sec)."\n";
 		::setlocale(::LC_NUMERIC, '');
 	}
-	else { Play(undef,$file,$sec); }
+	else	{ Play(undef,$file,$sec); }
 }
 
 
 sub Stop
-{	if ($WatchTag)
+{	$Paused=0;
+	if ($WatchTag)
 	{	Glib::Source->remove($WatchTag);
 		Glib::Source->remove($WatchTag2);
 		$WatchTag=$WatchTag2=undef;

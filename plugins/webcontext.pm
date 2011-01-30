@@ -17,9 +17,9 @@ my ($OKMoz,$OKWebKit,$CrashMoz);
 BEGIN
 {	{	last unless (grep -f $_.'/Gtk2/MozEmbed.pm',@INC);
 		# test if mozembed is working
-		system(q(GNOME_DISABLE_CRASH_DIALOG=1 perl -e 'use Gtk2 "-init"; use Gtk2::MozEmbed;$w=Gtk2::Window->new;my $e=Gtk2::MozEmbed->new; $w->add($e);$w->show_all;')); #this segfault when mozembed doesn't find its libs
+		system(q(GNOME_DISABLE_CRASH_DIALOG=1 perl -e 'use Gtk2 "-init"; use Gtk2::MozEmbed;$w=Gtk2::Window->new;my $e=Gtk2::MozEmbed->new; $w->add($e);$w->show_all; exit 0')); #this segfault when mozembed doesn't find its libs
 		#if (($? & 127) ==11) {die "Error : mozembed libraries not found. You need to add the mozilla path in /etc/ld.so.conf and run ldconfig (as root) or add the mozilla libraries path to the LD_LIBRARY_PATH environment variable.\n"}
-		if (($? & 127) ==11) { $CrashMoz=1; last; }
+		if ($?) { warn "Gtk2::MozEmbed found but not working.\n"; $CrashMoz=1; last; } #crash or fail to load
 		$OKMoz=1;
 	}
 	$OKWebKit=1 if grep -f $_.'/Gtk2/WebKit.pm',@INC;
@@ -27,6 +27,7 @@ BEGIN
 
 use strict;
 use warnings;
+use utf8;
 
 package GMB::Plugin::WebContext::MozEmbed;
 #use Gtk2::MozEmbed;
@@ -155,7 +156,6 @@ sub set_stripped_wiki {}	#FIXME use print version of the wikipedia page instead 
 # $::Options{OPT.'StrippedWiki'}
 
 package GMB::Plugin::WebContext;
-require 'simple_http.pm';
 our @ISA;
 BEGIN {push @ISA,'GMB::Context';}
 use base 'Gtk2::VBox';
@@ -165,8 +165,8 @@ use constant
 
 our %Predefined =
 (	google  => { tabtitle => 'google',	baseurl => 'http://www.google.com/search?q="%a"+"%t"', },
-	amgartist=>{ tabtitle => 'amg artist',	baseurl => 'http://www.allmusic.com/cg/amg.dll?p=amg&opt1=1&sql=%a', },
-	amgalbum=> { tabtitle => 'amg album',	baseurl => 'http://www.allmusic.com/cg/amg.dll?p=amg&opt1=2&sql=%l', },
+	amgartist=>{ tabtitle => 'amg artist',	baseurl => 'http://www.allmusic.com/search/artist/%a', },
+	amgalbum=> { tabtitle => 'amg album',	baseurl => 'http://www.allmusic.com/search/album/%l', },
 	lastfm	=> { tabtitle => 'last.fm',	baseurl => 'http://www.last.fm/music/%a', },
 	discogs	=> { tabtitle => 'discogs',	baseurl => 'http://www.discogs.com/artist/%a', },
 	youtube	=> { tabtitle => 'youtube',	baseurl => 'http://www.youtube.com/results?search_query="%a"', },
@@ -294,6 +294,8 @@ sub new
 	$self->{$_}=$opt->{$_} for qw/follow group urientry statusbar baseurl/;
 
 	my $toolbar=Gtk2::Toolbar->new;
+	$toolbar->set_style( $opt->{ToolbarStyle}||'both-horiz' );
+	$toolbar->set_icon_size( $opt->{ToolbarSize}||'small-toolbar' );
 	my $status=$self->{Status}=Gtk2::Statusbar->new;
 	$status->{id}=$status->get_context_id('link');
 	($self->{embed},my $container)= $self->new_embed;
@@ -446,14 +448,14 @@ use constant
 
 my %locales=
 (	en => 'English',
-	fr => 'Français',
+	fr => 'FranÃ§ais',
 	de => 'Deutsch',
 	pl => 'Polski',
 	nl => 'Nederlands',
 	sv => 'Svenska',
 	it => 'Italiano',
-	pt => 'Português',
-	es => 'Español',
+	pt => 'PortuguÃªs',
+	es => 'EspaÃ±ol',
 #	ja => "\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e\x0a",
 );
 #::_utf8_on( $locales{ja} );

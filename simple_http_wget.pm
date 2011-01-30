@@ -9,8 +9,10 @@ package Simple_http;
 use strict;
 use warnings;
 use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
+use IO::Handle;
 
 my (@Cachedurl,%Cache,$CacheSize);
+my $orig_proxy=$ENV{http_proxy};
 
 sub get_with_cb
 {	my $self=bless {};
@@ -21,6 +23,10 @@ sub get_with_cb
 		{ warn "cached result\n" if $::debug; $callback->( @{$Cache{$url}} ); return undef; }
 
 	warn "simple_http_wget : fetching $url\n" if $::debug;
+
+	my $proxy= $::Options{Simplehttp_Proxy} ?	$::Options{Simplehttp_ProxyHost}.':'.($::Options{Simplehttp_ProxyPort}||3128)
+							: $orig_proxy;
+	$ENV{http_proxy}=$proxy;
 
 	my @cmd_and_args=qw/wget --timeout=10 --header=Accept: --user-agent= -S -O -/;
 	push @cmd_and_args, '--post-data='.$post if $post;	#FIXME not sure if I should escape something
@@ -33,9 +39,8 @@ sub get_with_cb
 		open \*STDOUT,'>&='.fileno $wfh;
 		open \*STDERR,'>&='.fileno $ewfh;
 		exec @cmd_and_args;
-		die "launch failed : @cmd_and_args\n"; #FIXME never happens
 	}
-	elsif (!defined $pid) { warn "fork failed\n" } #FIXME never happens
+	elsif (!defined $pid) { warn "fork failed\n" }
 	close $wfh; close $ewfh;
 	$content_fh->blocking(0); #set non-blocking IO
 	$error_fh->blocking(0);
@@ -44,8 +49,8 @@ sub get_with_cb
 	$self->{error_fh}=$error_fh;
 	$self->{pid}=$pid;
 	$self->{content}=$self->{ebuffer}='';
-	$self->{watch}= Glib::IO->add_watch(fileno($content_fh),['out','hup'],\&receiving_cb,$self);
-	$self->{ewatch}= Glib::IO->add_watch(fileno($error_fh), ['out','hup'],\&receiving_e_cb,$self);
+	$self->{watch}= Glib::IO->add_watch(fileno($content_fh),[qw/hup err in/],\&receiving_cb,$self);
+	$self->{ewatch}= Glib::IO->add_watch(fileno($error_fh), [qw/hup err in/],\&receiving_e_cb,$self);
 
 	return $self;
 }
@@ -90,6 +95,19 @@ sub receiving_cb
 	return $self->{watch}=0;
 }
 
+sub progress
+{	my $self=shift;
+	my $length;
+	$length=$1 while $self->{ebuffer}=~m/Content-Length:\s*(\d+)/ig;
+	my $size= length $self->{content};
+	my $progress;
+	if ($length && $size)
+	{	$progress= $size/$length;
+		$progress=undef if $progress>1;
+	}
+	# $progress is undef or between 0 and 1
+	return $progress,$size;
+}
 
 sub abort
 {	my $self=$_[0];

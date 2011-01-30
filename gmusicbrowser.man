@@ -22,6 +22,7 @@ gmusicbrowser \- Jukebox for large collections of audio files
 [\-plugin NAME]
 [\-searchpath FOLDER]
 [\-use\-gnome\-session]
+[\-workspace N]
 [\-cmd CMD]
 [\-ifnotrunning MODE]
 [\-dbus\-id KEY]
@@ -109,6 +110,9 @@ add FOLDER to the list of folders searched for plugins and layouts
 .TP
 \fB\-use\-gnome\-session\fR
 Use gnome libraries to save tags/settings on session logout (needs the Gnome2 perl module).
+.TP
+\fB\-workspace N\fR
+Move initial window to workspace N (needs the Gnome2::Wnck perl module).
 .TP
 \fB\-cmd CMD\fR
 add CMD to the list of commands to execute. If a running instance of gmusicbrowser is found, these commands will be sent via the fifo file or via DBus. If there is no running instance of gmusicbrowser, the behavior depends on option -ifnotrunning

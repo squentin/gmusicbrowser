@@ -11,11 +11,10 @@ use warnings;
 package Songs;
 
 #our %Songs;
-#our %Slot; our $SlotCount=0;
 our $IDFromFile;
-#our $re_artist;
+our ($Artists_split_re,$Artists_title_re);
 my (@Missing,$MissingHash,@MissingKeyFields);
-our (%Def,%Types,@Fields,%GTypes,%HSort);
+our (%Def,%Types,%FieldTemplates,@Fields,%GTypes,%HSort);
 my %FuncCache;
 INIT {
 our %timespan_menu=
@@ -31,12 +30,14 @@ our %timespan_menu=
 		set	=> '#get# = #VAL#',
 		display	=> '#get#',
 		grouptitle=> '#display#',
-		'editwidget'		=> sub { my $field=$_[0]; GMB::TagEdit::Combo->new(@_,$Def{$field}{edit_listall}); },
-		'editwidget:per_id'	=> sub { my $field=$_[0]; GMB::TagEdit::EntryString->new(@_,$Def{$field}{editwidth}); },
+		'editwidget:many'	=> sub { my $field=$_[0]; GMB::TagEdit::Combo->new(@_, Field_property($field,'edit_listall')); },
+		'editwidget:single'	=> sub { my $field=$_[0]; GMB::TagEdit::EntryString->new( @_,0,Field_property($field,'edit_listall') ); },
+		'editwidget:per_id'	=> sub { my $field=$_[0]; GMB::TagEdit::EntryString->new( @_,Field_properties($field,'editwidth','edit_listall') ); },
 		'filter:m'	=> '#display# .=~. m"#VAL#"',			'filter_prep:m'	=> \&Filter::QuoteRegEx,
 		'filter:mi'	=> '#display# .=~. m"#VAL#"i',			'filter_prep:mi'=> \&Filter::QuoteRegEx,
 		'filter:s'	=> 'index( lc(#display#),"#VAL#") .!=. -1',	'filter_prep:s'	=> sub {quotemeta lc($_[0])},
 		'filter:S'	=> 'index(    #display#, "#VAL#") .!=. -1',	'filter_prep:S'	=> sub {quotemeta $_[0]},
+		autofill_re	=> '.+',
 	},
 	unknown	=>
 	{	parent	=> 'generic',
@@ -49,6 +50,7 @@ our %timespan_menu=
 	{	_		=> '____[#ID#]',
 		init		=> '___name[0]="#none#"; ___iname[0]=::superlc(___name[0]); #sgid_to_gid(VAL=$_)# for #init_namearray#',
 		init_namearray	=> '()',
+		none		=> quotemeta _"None",
 		default		=> '""',
 		check		=> ';',
 		get_list	=> 'my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : ();',
@@ -97,6 +99,7 @@ our %timespan_menu=
 		'editwidget:many'	=> sub { GMB::TagEdit::EntryMassList->new(@_) },
 		'editwidget:single'	=> sub { GMB::TagEdit::FlagList->new(@_) },
 		'editwidget:per_id'	=> sub { GMB::TagEdit::FlagList->new(@_) },
+		autofill_re	=> '.+',
 	},
 	artists	=>
 	{	_		=> '____[#ID#]',
@@ -107,27 +110,26 @@ our %timespan_menu=
 		's_sort:gid'	=> '__#mainfield#_name[#GID#]',
 		'si_sort:gid'	=> '__#mainfield#_iname[#GID#]',
 		#display	=> '##mainfield#->display#',
-		get_list	=> 'split /$::re_artist/o, ##mainfield#->get#', #use artist field directly, maybe do this for all of artists ?
+		get_list	=> 'my @l=( ##mainfield#->get#, grep(defined, #title->get# =~ m/$Artists_title_re/g) ); my %h; grep !$h{$_}++, map split(/$Artists_split_re/), @l;',
 		gid_to_get	=> '(#GID#!=1 ? __#mainfield#_name[#GID#] : "")', # or just '__#mainfield#_name[#GID#]' ?
 		gid_to_display	=> '__#mainfield#_name[#GID#]',
-		update	=> 'my @list= split /$::re_artist/o, ##mainfield#->get#;
-			my @ids;
-			for my $name (@list)
+		update	=> 'my @ids;
+			for my $name (do{ #get_list# })
 			{	my $id= ##mainfield#->sgid_to_gid(VAL=$name)#;
 				push @ids,$id;
 			}
 			#_# =	@ids==1 ? $ids[0] :
 				@ids==0 ? 0 :
 				(___group{join(" ",map sprintf("%x",$_),@ids)}||= \@ids);',
-		'filter:m'	=> '_name .=~. m"#VAL#"',
-		'filter:mi'	=> '_name .=~. m"#VAL#"i',
-		'filter:s'	=> 'index( lc(_name),"#VAL#") .!=. -1',
-		'filter:S'	=> 'index(    _name, "#VAL#") .!=. -1',
-		'filter:e'	=> '_name .eq. "#VAL#"',
+		'filter:m'	=> '#_name# .=~. m"#VAL#"',
+		'filter:mi'	=> '#_name# .=~. m"#VAL#"i',
+		'filter:s'	=> 'index( lc(#_name#),"#VAL#") .!=. -1',
+		'filter:S'	=> 'index(    #_name#, "#VAL#") .!=. -1',
+		'filter:e'	=> '#_name# .eq. "#VAL#"',
 		'filter:~'	=> '(ref #_# ?  (grep $_ .==. #VAL#, @{#_#}) : (#_# .==. #VAL#))',#FIXME use simpler/faster version if perl5.10 (with ~~)
 		'filter_prep:~'	=> '##mainfield#->filter_prep:~#',
 		'filter_prephash:~' => '##mainfield#->filter_prephash:~#',
-		'filter_simplify:~' => sub { split /$::re_artist/o,$_[0] },
+		'filter_simplify:~' => sub { split /$Artists_split_re/,$_[0] },
 		'filter:h~'	=> '(ref #_# ?  (grep .!!. exists $hash#VAL#->{$_+0}, @#_#) : (.!!. exists $hash#VAL#->{#_#+0}))',
 		gid_search	=> '__#mainfield#_name[#GID#] =~ m/#RE#/',
 		gid_isearch	=> '__#mainfield#_iname[#GID#] =~ m/#RE#/',
@@ -152,6 +154,7 @@ our %timespan_menu=
 		get		=> 'do {my $v=#_#; $v!=1 ? #_name#[$v] : "";}',
 		gid_to_get	=> '(#GID#!=1 ? #_name#[#GID#] : "")',
 		gid_to_sgid	=> '(#GID#!=1 ? #_name#[#GID#] : "")',
+		search_gid	=> 'my $gid=__#mainfield#_gid{#VAL#}||0; $gid>1 ? $gid : undef;',
 		makefilter	=> '"#field#:~:" . #gid_to_sgid#',
 		diff		=> 'do {my $old=#_#; ($old!=1 ? #_name#[$old] : "") ne #VAL# }',
 		#save_extra	=> 'my %h; for my $gid (2..$##_name#) { my $v=__#mainfield#_picture[$gid]; next unless defined $v; ::_utf8_on($v); $h{ #_name#[$gid] }=$v; } return artist_pictures',
@@ -174,7 +177,8 @@ our %timespan_menu=
 		#				"album_artist"=album_artist	if non-empty album_artist
 		#				"compilation=1"			if empty album_artist, compilation flag set
 		#				""
-		set		=> '#_#= #findgid#;',
+		load		=> '#_#= #findgid#;',
+		set		=> 'my $oldgid=#_#; my $newgid= #_#= #findgid#; if ($newgid+1==@#_name# && $newgid!=$oldgid) { ___picture[$newgid]= ___picture[$oldgid]; }', #same as load, but if gid changed and is new, use picture from old gid
 		#newval		=> 'push @#_iname#, ::superlc( #_name#[-1] );',
 		get		=> '(#_empty# ? "" : #_name#[#_#])',
 		gid_to_get	=> '(vec(__#mainfield#_empty,#GID#,1) ? "" : #_name#[#GID#])',
@@ -182,8 +186,9 @@ our %timespan_menu=
 		#gid_to_sgid	=> 'vec(__#mainfield#_empty,#GID#,1) ? "\\x00".substr(#_name#[#GID#],length(#unknown#)) : #_name#[#GID#]',
 		gid_to_sgid	=> '::first {$__#mainfield#_gid{$_}==#GID#} keys %__#mainfield#_gid;', #slower but more simple and reliable
 		makefilter	=> '"#field#:~:" . #gid_to_sgid#',
-		update		=> 'my $old=#get#; #_#= #findgid(VAL=$old)#;',
+		update		=> 'my $albumname=#get#; #set(VAL=$albumname)#;',
 		listall		=> 'grep !vec(__#mainfield#_empty,$_,1), 2..@#_name#-1',
+		'stats:artistsort'	=> '#HVAL#->{ #album_artist->get_gid# }=undef;  ---- #HVAL#=do { my @ar= keys %{#HVAL#}; @ar>1 ? ::superlc(_"Various artists") : __artist_iname[$ar[0]]; }',
 		#plugin		=> 'picture',
 		load_extra	=> ' __#mainfield#_gid{#SGID#} || return;',
 		save_extra	=> 'my %h; while ( my ($sgid,$gid)=each %__#mainfield#_gid ) { $h{$sgid}= [#SUBFIELDS#] } delete $h{""}; return \%h;',
@@ -223,7 +228,7 @@ our %timespan_menu=
 		get	=> '#_#',
 		set	=> '#_#=#VAL#; ::_utf8_off(#_#);',
 		display	=> '::filename_to_utf8displayname(#get#)',
-		hash_to_display => '::filename_to_utf8displayname(#VAL#)', #only used by FolderList::
+		hash_to_display => '::filename_to_utf8displayname(#VAL#)', #only used by FolderList:: and MassTag::
 		load	=> '#_#=::decode_url(#VAL#)',
 		save	=> 'filename_escape(#_#)',
 	},
@@ -245,10 +250,6 @@ our %timespan_menu=
 		save_extra	=> 'do { my $v=#_#; defined $v ? filename_escape($v) : ""; }',
 		get		=> '__#mainfield#_picture[ ##mainfield#->get_gid# ]',
 	},
-	_stars =>	#FIXME not used everywhere
-	{	_		=> 'sprintf("%d",#GID# * #nbpictures# /100)',
-		pixbuf_for_gid	=> 'my $r= #_#; __#mainfield#_pixbuf[$r] ||= GMB::Picture::pixbuf( "#fileprefix#".$r.".png" );',
-	},
 	fewstring=>	#for strings likely to be repeated
 	{	_		=> 'vec(____,#ID#,#bits#)',
 		bits		=> 32,	#32 bits by default (16 bits ?)
@@ -265,7 +266,7 @@ our %timespan_menu=
 		get_gid		=> '#_#',
 		get		=> '#_name#[#_#]',
 		diff		=> '#get# ne #VAL#',
-		display 	=> '#get#',
+		display 	=> '#_name#[#_#]',
 		s_sort		=> '#_name#[#_#]',
 		si_sort		=> '#_iname#[#_#]',
 		gid_to_get	=> '#_name#[#GID#]',
@@ -290,6 +291,7 @@ our %timespan_menu=
 		stats		=> '#HVAL#{#_name#[#_#]}=undef;  ----  #HVAL#=[keys %{#HVAL#}];',
 		'stats:gid'	=> '#HVAL#{#_#}=undef;  ----  #HVAL#=[keys %{#HVAL#}];',
 		listall		=> '2..@#_name#-1',
+		edit_listall	=> 1,
 		parent		=> 'generic',
 		maxgid		=> '@#_name#-1',
 		#gsummary	=> 'my $gids=Songs::UniqList(#field#,#IDs#); @$gids==1 ? #gid_to_display(GID=$gids->[0])# : #names(count=scalar @$gids)#;',
@@ -317,6 +319,7 @@ our %timespan_menu=
 		makefilter	=> '"#field#:e:#GID#"',
 		default		=> '0+0',	#not 0 because it needs to be true :(
 		filter_prep	=>  sub { $_[0]=~m/(\d+(?:\.\d+)?)/; return $1 || 0},
+		autofill_re	=> '\\d+',
 	},
 	'number.div' =>
 	{	group		=> 'int(#_#/#ARG0#) !=',
@@ -354,6 +357,7 @@ our %timespan_menu=
 		check		=> '#VAL#= #VAL# =~m/^(\d*(?:\.\d+)?)$/ ? $1 : 0;',
 		# FIXME make sure that locale is set to C (=> '.' as decimal separator) when needed
 		'editwidget:all'=> sub { GMB::TagEdit::EntryNumber->new(@_,undef,3); },
+		autofill_re	=> '(?:\\d+\\.)?\\.\\d+',
 	},
 	'length' =>
 	{	display	=> 'sprintf("%d:%02d", #_#/60, #_#%60)',
@@ -367,8 +371,10 @@ our %timespan_menu=
 		_default=> 'vec(___default_,#ID#,#bits#)',
 		init	=> '____ = ___default_ = "";',
 		default	=> '""',
+		diff	=> '(#VAL# eq "" ? 255 : #VAL#)!=#_#',
 		get	=> '(#_#==255 ? "" : #_#)',
 		display	=> '(#_#==255 ? "" : #_#)',
+		'stats:range'	=> 'push @{#HVAL#},#_default#;  ---- #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
 		'stats:average'	=> 'push @{#HVAL#},#_default#;  ---- #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
 		check	=> '#VAL#= #VAL# =~m/^\d+$/ ? (#VAL#>100 ? 100 : #VAL#) : "";',
 		set	=> '{ my $v=#VAL#; #_default#= ($v eq "" ? $::Options{DefaultRating} : $v); #_# = ($v eq "" ? 255 : $v); }',
@@ -415,7 +421,7 @@ our %timespan_menu=
 	boolean	=>
 	{	parent	=> 'integer',	bits => 1,
 		check	=> '#VAL#= #VAL# ? 1 : 0;',
-		display	=> "(#_# ? '#yes#' : '#no#')",	yes => _"Yes",	no => "",
+		display	=> "(#_# ? #yes# : #no#)",	yes => '_("Yes")',	no => 'q()',
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryBoolean->new(@_); },
 	},
 	shuffle=>
@@ -465,8 +471,8 @@ our %timespan_menu=
 	id3v1	=> 1,		id3v2	=> 'TPE1',	vorbis	=> 'artist',	ape	=> 'Artist',	lyrics3	=> 'EAR', ilst => "\xA9ART",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	all_count=> _"All artists",
+	apic_id	=> 8,
 	picture_field => 'artist_picture',
-	edit_listall => 1,
 	edit_order=> 20,	edit_many=>1,	letter => 'a',
 	can_group=>1,
 	#names => '::__("%d artist","%d artists",#count#);'
@@ -480,7 +486,7 @@ our %timespan_menu=
 	can_group=>1,
  },
  artists =>
- {	flags => 'l',	type	=> 'artists',	depend	=> 'artist',	name => _"Artists",
+ {	flags => 'l',	type	=> 'artists',	depend	=> 'artist title',	name => _"Artists",
 	all_count=> _"All artists",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
@@ -491,6 +497,7 @@ our %timespan_menu=
 	depend	=> 'artist album_artist_raw', #because albums with no names get the name : <Unknown> (artist)
 	all_count=> _"All albums",
 	FilterList => {search=>1,drag=>::DRAG_ALBUM},
+	apic_id	=> 3,
 	picture_field => 'album_picture',
 	names => '::__("%d album","%d albums",#count#);',
 	edit_order=> 30,	edit_many=>1,	letter => 'l',
@@ -513,22 +520,12 @@ our %timespan_menu=
 	mainfield	=> 'artist',
 	type		=> '_picture',
  },
- rating_picture =>
- {	name		=> _"Rating picture",
-	flags		=> '',		#FIXME
-	depend		=> 'rating',
-	property_of	=> 'rating',
-	mainfield	=> 'rating',
-	type		=> '_stars',
-	nbpictures	=> 5,
-	fileprefix	=> ::PIXPATH.'stars',
- },
  album_artist_raw =>
  {	name => _"Album artist",width => 200,	flags => 'garwesci',	type => 'artist',
 	id3v2	=> 'TPE2',	vorbis	=> 'albumartist|album_artist',	ape	=> 'Album Artist|Album_artist',  ilst => "aART",
 	#FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
-	edit_order=> 35,	edit_many=>1,	edit_listall => 1,
+	edit_order=> 35,	edit_many=>1,
 	#can_group=>1,
  },
  album_artist =>
@@ -542,18 +539,17 @@ our %timespan_menu=
  haspicture =>
  {	name	=> _"Embedded picture", width => 20, flags => 'garwsc',	type => 'boolean',
 	id3v2 => 'APIC;;;;%v',	ilst => 'covr',		#or just id3v2 => 'APIC', ?
-	_disabled=>1,
+	disable=>1,
  },
  haslyrics =>
  {	name	=> _"Embedded lyrics", width => 20, flags => 'garwsc',	type => 'boolean',
 	id3v2 => 'USLT;;;%v',	vorbis	=> 'lyrics',	ape => 'Lyrics', #TESTME
-	_disabled=>1,
+	disable=>1,
  },
  compilation =>
  {	name	=> _"Compilation", width => 20, flags => 'garwesc',	type => 'boolean',
 	id3v2 => 'TCMP',	vorbis	=> 'compilation',	ape => 'Compilation',	ilst => 'cpil',
 	edit_many=>1,
-	#_disabled=>1,	#not tested
  },
  grouping =>
  {	name	=> _"Grouping",	width => 100,	flags => 'garwesci',	type => 'fewstring',
@@ -572,6 +568,7 @@ our %timespan_menu=
 	edit_order=> 50,	edit_many=>1,	letter => 'y',
 	can_group=>1,
 	FilterList => {},
+	autofill_re	=> '[12]\\d{3}',
  },
  track =>
  {	name	=> _"Track",	width => 40,	flags => 'garwesc',
@@ -589,12 +586,13 @@ our %timespan_menu=
  discname =>
  {	name	=> _"Disc name",	width	=> 100,		flags => 'garwesci',	type => 'fewstring',
 	id3v2	=> 'TSST',	vorbis	=> 'discsubtitle',	ape => 'DiscSubtitle',	ilst=> '----DISCSUBTITLE',
-	_disabled=>1,
+	edit_many=>1,
+	disable=>1,	options => 'disable',
  },
  genre	=>
  {	name		=> _"Genres",	width => 180,	flags => 'garwescil',
 	 #is_set	=> '(__GENRE__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
-	id3v1	=> 6,		id3v2	=> 'TCON*',	vorbis	=> 'genre',	ape	=> 'Genre', ilst => "\xA9gen",
+	id3v1	=> 6,		id3v2	=> 'TCON',	vorbis	=> 'genre',	ape	=> 'Genre', ilst => "\xA9gen",
 	read_split	=> qr/\s*;\s*/,
 	type		=> 'flags',		#init_namearray => '@Tag::MP3::Genres',
 	none		=> quotemeta _"No genre",
@@ -615,6 +613,17 @@ our %timespan_menu=
 	icon_edit_string=> _"Choose icon for label {name}",
 	edit_order=> 80,	edit_many=>1,	letter => 'L',
  },
+ mood	=>
+ {	name		=> _"Moods",	width => 180,	flags => 'garwescil',
+	id3v2	=> 'TMOO',	vorbis	=> 'MOOD',	ape	=> 'Mood', ilst => "----MOOD",
+	read_split	=> qr/\s*;\s*/,
+	type		=> 'flags',
+	none		=> quotemeta _"No moods",
+	all_count	=> _"All moods",
+	FilterList	=> {search=>1},
+	edit_order=> 71,	edit_many=>1,
+	disable=>1,	options => 'disable',
+ },
  comment=>
  {	name	=> _"Comment",	width => 200,	flags => 'garwesci',		type => 'text',
 	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3	=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
@@ -622,9 +631,24 @@ our %timespan_menu=
  },
  rating	=>
  {	name	=> _"Rating",		width => 80,	flags => 'gaesc',	type => 'rating',
+	id3v2	=> 'TXXX;FMPS_Rating;%v & TXXX;FMPS_Rating_User;%v::%i | percent( TXXX;gmbrating;%v ) | five( TXXX;rating;%v )',
+	vorbis	=> 'FMPS_RATING & FMPS_RATING_USER::%i | percent( gmbrating ) | five( rating )',
+	ape	=> 'FMPS_RATING & FMPS_RATING_USER::%i | percent( gmbrating ) | five( rating )',
+	ilst	=> '----FMPS_Rating & ----FMPS_Rating_User::%i | percent( ----gmbrating ) | five( ----rating )',
+	postread=> \&FMPS_rating_postread,
+	prewrite=> \&FMPS_rating_prewrite, 
+	'postread:five'=> sub { my $v=shift; length $v && $v=~m/^\d+$/ && $v<=5 ? sprintf('%d',$v*20) : undef }, # for reading foobar2000 rating 0..5 ?
+	'postread:percent'=> sub { $_[0] }, # for anyone who used gmbrating
 	FilterList => {},
-	starfield => 'rating_picture',
+	starprefix => 'stars',
 	edit_order=> 90,	edit_many=>1,
+	options	=> 'rw_ userid',
+ },
+ ratingnumber =>	#same as rating but returns DefaultRating if rating set to default, will be replaced by rating.number or something in the future
+ {	type	=> 'virtual',
+	flags	=> 'g',
+	depend	=> 'rating',
+	get	=> '#rating->_default#',
  },
  added	=>
  {	name	=> _"Added",		width => 100,	flags => 'gasc_',	type => 'date',
@@ -643,6 +667,13 @@ our %timespan_menu=
  },
  playcount	=>
  {	name	=> _"Play count",	width => 50,	flags => 'gaesc',	type => 'integer',	letter => 'p',
+	options => 'rw_ userid',
+	id3v2	=> 'TXXX;FMPS_Playcount;%v&TXXX;FMPS_Playcount_User;%v::%i',
+	vorbis	=> 'FMPS_PLAYCOUNT&FMPS_PLAYCOUNT_USER::%i',
+	ape	=> 'FMPS_PLAYCOUNT&FMPS_PLAYCOUNT_USER::%i',
+	ilst	=> '----FMPS_Playcount&----FMPS_Playcount_User::%i',
+	postread=> sub { my $v=shift; length $v ? sprintf('%d',$v) : undef },
+	prewrite=> sub { sprintf('%.1f', $_[0]); },
  },
  skipcount	=>
  {	name	=> _"Skip count",	width => 50,	flags => 'gaesc',	type => 'integer',	letter => 'k',
@@ -650,18 +681,47 @@ our %timespan_menu=
  composer =>
  {	name	=> _"Composer",		width	=> 100,		flags => 'garwesci',	type => 'artist',
 	id3v2	=> 'TCOM',	vorbis	=> 'composer',		ape => 'Composer',	ilst => "\xA9wrt",
+	apic_id	=> 11,
+	picture_field => 'artist_picture',
 	FilterList => {search=>1},
-	_disabled=>1,
+	edit_many=>1,
+	disable=>1,	options => 'disable',
  },
- author	=>
- {	name	=> _"Author",	width	=> 100,		flags => 'garwesci',	type => 'artist',
-	id3v2	=> 'TOPE',	vorbis	=> 'author',	lyrics3	=> 'AUT',	#ape => 'Author'#?? FIXME
+ lyricist =>
+ {	name	=> _"Lyricist",		width	=> 100,		flags => 'garwesci',	type => 'artist',
+	id3v2	=> 'TEXT',	vorbis	=> 'LYRICIST',		ape => 'Lyricist',	ilst => '---LYRICIST',
+	apic_id	=> 12,
+	picture_field => 'artist_picture',
 	FilterList => {search=>1},
-	_disabled=>1,
+	edit_many=>1,
+	disable=>1,	options => 'disable',
+ },
+ conductor =>
+ {	name	=> _"Conductor",	width	=> 100,		flags => 'garwesci',	type => 'artist',
+	id3v2	=> 'TPE3',	vorbis	=> 'CONDUCTOR',		ape => 'Conductor',	ilst => '---CONDUCTOR',
+	apic_id	=> 9,
+	picture_field => 'artist_picture',
+	FilterList => {search=>1},
+	edit_many=>1,
+	disable=>1,	options => 'disable',
+ },
+ remixer =>
+ {	name	=> _"Remixer",	width	=> 100,		flags => 'garwesci',	type => 'artist',
+	id3v2	=> 'TPE4',	vorbis	=> 'REMIXER',		ape => 'MixArtist',	ilst => '---REMIXER',
+	picture_field => 'artist_picture',
+	FilterList => {search=>1},
+	edit_many=>1,
+	disable=>1,	options => 'disable',
  },
  version=> #subtitle ?
- {	name	=> _"Version",	width	=> 150,		flags => 'garwesci',	type => 'string',
+ {	name	=> _"Version",	width	=> 150,		flags => 'garwesci',	type => 'fewstring',
 	id3v2	=> 'TIT3',	vorbis	=> 'version|subtitle',			ape => 'Subtitle',	ilst=> '----SUBTITLE',
+ },
+ bpm	=>
+ {	name	=> _"BPM",	width	=> 60,		flags => 'garwesc',	type => 'integer',
+	id3v2	=> 'TBPM',	vorbis	=> 'BPM',	ape => 'BPM',		ilst=> 'tmpo',
+	FilterList => {type=>'div.10',},
+	disable=>1,	options => 'disable',
  },
  channel=>
  {	name	=> _"Channels",		width => 50,	flags => 'garsc',	type => 'integer',	bits => 4,	audioinfo => 'channels', },	# are 4 bits needed ? 1bit+1 could be enough ?
@@ -686,22 +746,26 @@ our %timespan_menu=
 	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
 	displayformat	=> '%.2f dB',
 	id3v2	=> 'TXXX;replaygain_track_gain;%v',	vorbis	=> 'replaygain_track_gain',	ape	=> 'replaygain_track_gain', ilst => '----replaygain_track_gain',
+	options => 'disable',
  },
  replaygain_track_peak=>
  {	name	=> _"Track peak",	width => 60,	flags => 'grwsca',
 	id3v2	=> 'TXXX;replaygain_track_peak;%v',	vorbis	=> 'replaygain_track_peak',	ape	=> 'replaygain_track_peak', ilst => '----replaygain_track_peak',
 	type	=> 'float',
+	options => 'disable',
  },
  replaygain_album_gain=>
  {	name	=> _"Album gain",	width => 60,	flags => 'grwsca',
 	id3v2	=> 'TXXX;replaygain_album_gain;%v',	vorbis	=> 'replaygain_album_gain',	ape	=> 'replaygain_album_gain', ilst => '----replaygain_album_gain',
 	displayformat	=> '%.2f dB',
 	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
+	options => 'disable',
  },
  replaygain_album_peak=>
  {	name	=> _"Album peak",	width => 60,	flags => 'grwsca',
 	id3v2	=> 'TXXX;replaygain_album_peak;%v',	vorbis	=> 'replaygain_album_peak',	ape	=> 'replaygain_album_peak', ilst => '----replaygain_album_peak',
 	type	=> 'float',
+	options => 'disable',
  },
  replaygain_reference_level=>
  {	flags => 'w',	type => 'writeonly',	#only used for writing
@@ -729,11 +793,11 @@ our %timespan_menu=
 			type	=> 'virtual',	flags => 'g',	depend => 'file path',	letter => 'u',
 			'filter:e'	=> '#ID# == #VAL#',	'filter_prep:e'=> sub { FindID($_[0]); },
 		   },
- barefilename	=> {	name => _"filename without extension",	type=> 'virtual',	flags => 'g',	letter => 'o',
-			get => 'do {my $s=#file->display#; $s=~s/\.[^\.]+$//; $s;}',	depend => 'file',
+ barefilename	=> {	name => _"Filename without extension",	type=> 'filename',	flags => 'g',	letter => 'o',
+			get => 'do {my $s=#file->get#; $s=~s/\.[^.]+$//; $s;}',	depend => 'file',
 		   },
- extension =>	   {	name => _"filename extension",		type=> 'virtual',	flags => 'g',
-			get => 'do {my $s=#file->display#; $s=~s#^.*\.##; $s;}',	depend => 'file',
+ extension =>	   {	name => _"Filename extension",		type=> 'filename',	flags => 'g',
+			get => 'do {my $s=#file->get#; $s=~s#^.*\.##; $s;}',	depend => 'file',
 		   },
  title_or_file	=> {get => '(#title->get# eq "" ? #file->display# : #title->get#)',	type=> 'virtual',	flags => 'g', depend => 'file title', letter => 'S',},	#why letter S ? :)
 
@@ -742,17 +806,42 @@ our %timespan_menu=
 
  shuffle	=> { name => _"Shuffle",	type => 'shuffle',	flags => 's', },
  album_shuffle	=> { name => _"Album shuffle",	type => 'gidshuffle',	flags => 's',	mainfield=>'album'	  },
+ embedded_pictures=>
+ {	flags => 'l',	type	=> 'virtual',
+	id3v2 => 'APIC',	vorbis => 'METADATA_BLOCK_PICTURE',	'ilst' => 'covr',
+ },
+ embedded_lyrics=>
+ {	flags => '',	type	=> 'virtual',
+	id3v2 => 'TXXX;FMPS_Lyrics;%v | USLT;;;%v',	vorbis => 'FMPS_LYRICS|lyrics',	ape => 'FMPS_LYRICS|Lyrics',
+	'ilst' => "----FMPS_Lyrics|\xA9lyr",	lyrics3v2 => 'LYR',
+ },
  filetags	=>	# debug field : list of the id3v2 frames / vorbis comments
  		{	name	=> "filetags", width => 180,	flags => 'grascil', type	=> 'flags',
-			"id3v2:read"	=> sub { my $h=$_[0]; my %res; for my $key (keys %$h) { my $v=$h->{$key}; if ($key=~m/^TXXX$|^COMM$|^WXXX$/) { my $i= $key eq 'COMM' ? 1 : 0; $res{"$key;$_->[$i]"}=undef for @$v; } else { $res{$key}=undef; } } ; return [keys %res]; },
-			#'id3v2:read'	=> sub { [keys %{$_[0]}] },
-			'vorbis:read'	=> sub { [map "vorbis_$_",keys %{$_[0]}] },
-			'ape:read'	=> sub { [map "ape_$_",   keys %{$_[0]}] },
-			'ilst:read'	=> sub { [map "ilst_$_",  keys %{$_[0]}] },
+			"id3v2:read"	=> sub { my $tag=shift; my %res; for my $key ($tag->get_keys) { my @v=$tag->get_values($key); if ($key=~m/^TXXX$|^COMM$|^WXXX$/) { my $i= $key eq 'COMM' ? 1 : 0; $res{"$key;$_->[$i]"}=undef for @v; } else { $res{$key}=undef; } } ; return [map "id3v2_$_", keys %res]; },
+			'vorbis:read'	=> sub { [map "vorbis_$_",$_[0]->get_keys] },
+			'ape:read'	=> sub { [map "ape_$_",   $_[0]->get_keys] },
+			'ilst:read'	=> sub { [map "ilst_$_",  $_[0]->get_keys] },
 			FilterList => {search=>1,none=>1},
 			none		=> quotemeta "No tags",	#not translated because made for debugging
-			_disabled=>1,
+			disable=>1,
 		},
+);
+
+our %FieldTemplates=
+(	string	=> { type=>'string',	editname=>_"string",		flags=>'gaesc',	width=> 200,	edit_many =>1,		options=> 'customfield', },
+	text	=> { type=>'text',	editname=>_"multi-lines string",flags=>'gaesc',	width=> 200,	edit_many =>1,		options=> 'customfield', },
+	float	=> { type=>'float',	editname=>_"float",		flags=>'gaesc',	width=> 100,	edit_many =>1,		options=> 'customfield', },
+	boolean	=> { type=>'boolean',	editname=>_"boolean",		flags=>'gaesc',	width=> 20,	edit_many =>1,		options=> 'customfield', },
+	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'gaescil',width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
+	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'gaesci',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', },
+	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'gaesci',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
+	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'gaesc',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
+	integer	=> { type=>'integer',	editname=>_"integer",		flags=>'gaesc',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
+	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'gaesc_',width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid', FilterList=> {},
+		     postread => \&FMPS_rating_postread,		prewrite => \&FMPS_rating_prewrite,
+		     id3v2 => 'TXXX;FMPS_Rating_User;%v::%i',	vorbis	=> 'FMPS_RATING_USER::%i',	ape => 'FMPS_RATING_USER::%i',	ilst => '----FMPS_Rating_User::%i',
+		     starprefix => 'stars', #FIXME make it an option
+		   },
 );
 
 our %HSort=
@@ -770,7 +859,7 @@ our %GTypes= #FIXME could be better
 	#year	=> {code => '__H__{__YEAR__}=undef',	after=>'delete __H__{""}; my @l=sort { $a <=> $b } keys %{__H__}; __H__= @l==0 ? "" : @l==1 ? $l[0] : "$l[0] - $l[-1]";',	depend=>'year',	},
 	#label	=> {code => '__H__{$_}=undef for split /\x00/,__LABEL__;',	after=>'__H__=[keys %{__H__}];',	depend=>'label',	},
 	#album	=> {code => '__H__{__ALBUM__}=undef',	after=>'__H__=[keys %{__H__}];',	depend=>'album',},
-	#artist	=> {code => '__H__{$_}=undef for split /$::re_artist/o,__ARTIST__;',	after=>'__H__=[keys %{__H__}];',	depend=>'artist',	},
+	#artist	=> {code => '__H__{$_}=undef for split /$Artists_split_re/,__ARTIST__;',	after=>'__H__=[keys %{__H__}];',	depend=>'artist',	},
 );
 
 # discname
@@ -876,6 +965,21 @@ sub MakeCode		#keep ?
 	$code=~s/#[\w\|.]+#/shift @codes/ge;
 	return $code;
 }
+sub Field_property
+{	my ($field,$key)=@_;
+	my $h= $Def{$field};
+	while ($h)
+	{	return $h->{$key} if exists $h->{$key};
+		my $type= $h->{parent} || $h->{type};
+		return undef unless $type;
+		$h= $Types{$type};
+	}
+}
+sub Field_properties
+{	my ($field,@keys)=@_;
+	return map Field_property($field,$_), @keys;
+}
+
 sub CanDoFilter		#returns true if all @fields can do $op
 {	my ($op,@fields)=@_;
 	return !grep !LookupCode($_,'filter:'.$op), @fields;
@@ -927,7 +1031,11 @@ sub UpdateFuncs
 
 	my %done;
 	my %_depended_on_by; my %_properties;
-	my @todo=grep !$Def{$_}{_disabled}, keys %Def;
+
+	Field_Apply_options();
+	CompileArtistsRE();
+
+	my @todo=grep !$Def{$_}{disable}, keys %Def;
 	while (@todo)
 	{	my $count=@todo;
 		for my $f (@todo)
@@ -1035,7 +1143,7 @@ warn "\@Fields=@Fields"; $Def{$_}{flags}||='' for @Fields;	#DELME
 		$LENGTHsub= Compile(Length =>"sub {$code}");
 	}
 	%::ReplaceFields= map { '%'.$Def{$_}{letter} => $_ } grep $Def{$_}{letter}, @Fields;
-	$::ReplaceFields{'$'.$_}=$_ for grep $Def{$_}{flags}=~m/g/, @Fields;
+	$::ReplaceFields{'$'.$_}= $::ReplaceFields{'${'.$_.'}'}= $_ for grep $Def{$_}{flags}=~m/g/, @Fields;
 
 	::HasChanged('fields_reset');
 	#FIXME connect them to 'fields_reset' event :
@@ -1089,7 +1197,9 @@ sub MakeSaveSub
 	my @code;
 	my %extra_sub; my %extra_subfields;
 	for my $field (sort grep $Def{$_}{flags}=~m/a/, @Fields)
-	{	push @saved_fields,$field;
+	{	next if $::Options{Fields_options}{$field}{remove}; #deleted custom field
+		my $save_as= $Def{$field}{_renamed_to} || $field;
+		push @saved_fields,$save_as;
 		push @code, Code($field, 'save|get', ID => '$_[0]');
 		my ($mainfield,$save_extra)=LookupCode($field,'mainfield','save_extra');
 		if ($save_extra && ( !$mainfield || $mainfield eq $field ))
@@ -1100,11 +1210,11 @@ sub MakeSaveSub
 				{	my $c=LookupCode($subfield,'save_extra',[GID => '$gid']);
 					push @extra_code, $c;
 				}
-				$extra_subfields{$field}= join ' ', @subfields;
+				$extra_subfields{$save_as}= join ' ', map $Def{$_}{_renamed_to}||$_, @subfields;
 				my $code= $save_extra;
 				my $extra_code=join ',', @extra_code;
 				$code=~s/#SUBFIELDS#/$extra_code/g;
-				$extra_sub{$field}= Compile("SaveSub_$field" => "sub { $code }") || sub {};
+				$extra_sub{$save_as}= Compile("SaveSub_$field" => "sub { $code }") || sub {};
 			}
 		}
 	}
@@ -1301,6 +1411,12 @@ sub Makesub
 	if ($@) { warn "Compilation error :\n code : $c\n error : $@";}
 	return $sub;
 }
+sub Stars
+{	my ($gid,$field)=@_;
+	return undef if !defined $gid || $gid eq '' || $gid==255;
+	my $pb= $Def{$field}{pixbuf} || $Def{'rating'}{pixbuf};
+	return $pb->[ sprintf("%d",$gid/100*$#$pb) ];
+}
 sub Picture
 {	my ($gid,$field,$action,$extra)=@_;
 	$action.='_for_gid';
@@ -1333,6 +1449,11 @@ sub ListAll
 sub Get_grouptitle
 {	my ($field,$IDs)=@_;
 	($FuncCache{'grouptitle '.$field}||= Makesub($field, 'grouptitle', ID => '$_[0][0]', IDs=>'$_[0]') ) ->($IDs);
+}
+sub Search_artistid	#return artist id or undef if not found
+{	my $artistname=shift;
+	my $field='artist';
+	($FuncCache{'search_gid '.$field}||= Makesub($field, 'search_gid', VAL=>'$_[0]') ) ->($artistname);
 }
 sub Get_gid
 {	my ($ID,$field)=@_;
@@ -1511,6 +1632,21 @@ sub UpdateDefaultRating
 {	my $l=AllFilter('rating:e:');
 	Changed({'rating'},$l) if @$l;
 }
+sub UpdateArtistsRE
+{	CompileArtistsRE();
+	Songs::Changed({artist=>1}, [FIRSTID..$LastID]);
+}
+sub CompileArtistsRE
+{	my $ref1= $::Options{Artists_split_re} ||= ['\s*&\s*', '\s*;\s*', '\s*,\s*', '\s*/\s*'];
+	$Artists_split_re= join '|', @$ref1;
+	$Artists_split_re||='$';
+	$Artists_split_re=qr/$Artists_split_re/;
+
+	my $ref2= $::Options{Artists_title_re} ||= ['\(with\s+([^)]+)\)', '\(feat\.\s+([^)]+)\)'];
+	$Artists_title_re= join '|', @$ref2;
+	$Artists_title_re||='^\x00$';
+	$Artists_title_re=qr/$Artists_title_re/;
+}
 
 sub DateString
 {	my $time=shift;
@@ -1524,7 +1660,7 @@ sub DateString
 		last if $diff>$max;
 		$fmt=shift @formats;
 	}
-	::strftime($fmt,localtime $time);
+	::strftime2($fmt,localtime $time);
 }
 
 #sub Album_Artist #guess album artist
@@ -1532,7 +1668,7 @@ sub DateString
 #	my %h; $h{ Get($_[0],'artist') }=undef for @{AA::GetIDs('album',$alb)};
 #	my $nb=keys %h;
 #	return Get($_[0],'artist') if $nb==1;
-#	my @l=map split(/$::re_artist/o), keys %h;
+#	my @l=map split(/$Artists_split_re/), keys %h;
 #	my %h2; $h2{$_}++ for @l;
 #	my @common;
 #	for (@l) { if ($h2{$_}>=$nb) { push @common,$_; delete $h2{$_}; } }
@@ -1631,6 +1767,15 @@ sub EditWidget
 	unless ($sub) {warn "Can't find editwidget for field $field\n"; return undef;}
 	return $sub->($field,$IDs);
 }
+sub ReplaceFields_to_re
+{	my $string=shift;
+	my $field= $::ReplaceFields{$string};
+	if ($field && $Def{$field}{flags}=~m/e/)
+	{	return $Def{$field}{_autofill_re} ||= '('. LookupCode($field, 'autofill_re') .')';
+	}
+	$string=~s#(\$\{\})#\\$1#; # escape $ and {}
+	return $string;
+}
 sub StringFields #list of fields that are strings, used for selecting fields for interactive search
 {	grep SortICase($_), @Fields; #currently use SortICase #FIXME ?
 }
@@ -1647,55 +1792,50 @@ sub SortField
 {	my $f=$_[0];
 	return $Def{$f} && $Def{$f}{flags}=~m/i/ ? $f.=':i' : $f;  #case-insensitive by default
 }
+sub MakeSortCode
+{	my $sort=shift;
+	my @code;
+	my $init='';
+	for my $s (split / /,$sort)
+	{	my ($inv,$field,$i)= $s=~m/^(-)?(\w+)(:i)?$/;
+		next unless $field;
+		unless ($Def{$field}) { warn "Songs::SortList : Invalid field $field\n"; next }
+		unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $field\n"; next }
+		my ($sortinit,$sortcode)= SortCode($field,$inv,$i);
+		push @code, $sortcode;
+		$init.= $sortinit."; " if $sortinit;
+	}
+	@code=('0') unless @code;
+	return $init, join(' || ',@code);
+}
+sub FindNext	# find the song in listref that would be right after ID if ID was in the list #could be optimized by not re-evaluating left-side for every comparison
+{	my ($listref,$sort,$ID)=@_;	# list must be sorted by $sort
+	my $func= $FuncCache{"FindNext $sort"} ||=
+	 do {	my ($init,$code)= MakeSortCode($sort);
+		$code= 'sub {my $l=$_[0];$a=$_[1]; '.$init.'for $b (@$l) { return $b if (' . $code . ')<1; } return undef;}';
+		Compile("FindNext $sort", $code);
+	    };
+	return $func->($listref,$ID);
+}
 sub FindFirst		#FIXME add a few fields (like 'disc track path file') to all sort so that the sort result is constant, ie doesn't depend on the starting order
 {	my ($listref,$sort)=@_;
 	my $func= $FuncCache{"FindFirst $sort"} ||=
-	 do {	#my $insensitive;
-		my @code;
-		my $init='';
-		for my $s (split / /,$sort)
-		{	my ($inv,$field,$i)= $s=~m/^(-)?(\w+)(:i)?$/;
-			next unless $field;
-			unless ($Def{$field}) { warn "Songs::SortList : Invalid field $field\n"; next }
-			unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $field\n"; next }
-			my ($sortinit,$sortcode)= SortCode($field,$inv,$i);
-			push @code, $sortcode;
-			$init.= $sortinit."; " if $sortinit;
-		}
-		return unless @code;
-		#if ($insensitive) { my $sort0=$sort; $sort0=~s/:i//g; SortList($listref,$sort0); } #do a case-sensitive sort first (faster)
-		#warn "sort function for '$sort' :\n".'sub {'.join(' || ',@code).'}'."\n" if $::debug;
-		my $code= 'sub {my $l=$_[0];$a=$l->[0]; '.$init.'for $b (@$l) { $a=$b if (' . join(' || ',@code) . ')>0; } return $a;}';
+	 do {	my ($init,$code)= MakeSortCode($sort);
+		$code= 'sub {my $l=$_[0];$a=$l->[0]; '.$init.'for $b (@$l) { $a=$b if (' . $code . ')>0; } return $a;}';
 		Compile("FindFirst $sort", $code);
 	    };
 	return $func->($listref);
 }
 sub SortList		#FIXME add a few fields (like 'disc track path file') to all sort so that the sort result is constant, ie doesn't depend on the starting order
 {	my $time=times; #DEBUG
-	my $listref=$_[0]; my $sort=$_[1]; warn "Songs::SortList(@_)\n";
-	#warn "known sort functions :\n"; warn "$_\n" for grep m/^sort /, keys %FuncCache;
+	my $listref=$_[0]; my $sort=$_[1];
 	my $func= $FuncCache{"sort $sort"} ||=
-	 do {	#my $insensitive;
-		my @code;
-		my $init='';
-		for my $s (split / /,$sort)
-		{	my ($inv,$field,$i)= $s=~m/^(-)?(\w+)(:i)?$/;
-			next unless $field;
-			unless ($Def{$field}) { warn "Songs::SortList : Invalid field $field\n"; next }
-			unless ($Def{$field}{flags}=~m/s/) { warn "Don't know how to sort $field\n"; next }
-			my ($sortinit,$sortcode)= SortCode($field,$inv,$i);
-			unless ($sortcode) { warn "Error trying to sort by $field\n"; next }
-			push @code, $sortcode;
-			$init.= $sortinit."; " if $sortinit;
-		}
-		return unless @code;
-		#if ($insensitive) { my $sort0=$sort; $sort0=~s/:i//g; SortList($listref,$sort0); } #do a case-sensitive sort first (faster)
-		#warn "sort function for '$sort' :\n".'sub {'.join(' || ',@code).'}'."\n" if $::debug;
-		my $code= 'sub { my $list=shift; ' .$init. '@$list= sort {'. join(' || ',@code) . '} @$list; }';
+	 do {	my ($init,$code)= MakeSortCode($sort);
+		$code= 'sub { my $list=shift; ' .$init. '@$list= sort {'. $code . '} @$list; }';
 		Compile("sort $sort", $code);
 	    };
 	$func->($listref) if $func;
-	$time=times-$time; warn "sort ($sort) : $time s\n"; #DEBUG
+	warn "sort ($sort) : ".(times-$time)." s\n" if $::debug; #DEBUG
 }
 sub SortDepends
 {	my @f=split / /,shift;
@@ -1844,6 +1984,345 @@ sub GroupSub
 	 };
 }
 
+sub PrefFields	#preference dialog for fields
+{	my $store=Gtk2::TreeStore->new('Glib::String','Glib::String','Glib::Boolean','Glib::Boolean','Glib::Boolean');
+	my $treeview=Gtk2::TreeView->new($store);
+	$treeview->set_headers_visible(0);
+	my $rightbox=Gtk2::VBox->new;
+	my $renderer=Gtk2::CellRendererText->new;
+	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
+	 ( 'field name',$renderer,text => 0, editable => 2, sensitive=>3, strikethrough => 4,
+	 ));
+	my @std= sort grep !$Def{$_}{template} && (!$Def{$_}{disable} || $Def{$_}{options} && $Def{$_}{options}=~m/\bdisable\b/), keys %Def;
+	@std= grep !$Def{$_}{property_of} && $Def{$_}{name} && $Def{$_}{flags}=~m/c/, @std;
+	my @custom= sort grep $::Options{Fields_options}{$_}{template}, keys %{$::Options{Fields_options}};
+	my %sensitive;
+	$sensitive{$_}= ($::Options{Fields_options}{$_} && exists $::Options{Fields_options}{$_}{disable} ? $::Options{Fields_options}{$_}{disable} : $Def{$_}{disable}) ? 0 : 1
+			for @std,@custom;
+	my $parent;
+	$store->set( $parent=$store->append(undef),	0,_"Standard fields", 1,'std', 3,::TRUE);
+	$store->set( $store->append($parent),		0,$_,1,'_std',3, $sensitive{$_} ) for @std;
+
+	$store->set( $parent=$store->append(undef),	0,_"Custom fields", 1,'cst', 3,::TRUE);
+	$store->set( $store->append($parent),		0,$_,1,'_cst',2,::TRUE, 3, $sensitive{$_}, 4,$::Options{Fields_options}{$_}{remove} ) for @custom;
+
+	$treeview->signal_connect(cursor_changed => sub
+		{	my $treeview=shift;
+			my $path=($treeview->get_cursor)[0];
+			my $store=$treeview->get_model;
+			my ($field,$type)=$store->get( $store->get_iter($path));
+			$rightbox->remove($_) for $rightbox->get_children;
+			if ($type!~m/^_/) {return}
+			return unless $field;
+			my $title=Gtk2::Label->new_with_format("<b>%s</b>",$field);
+			$rightbox->pack_start($title,::FALSE,::FALSE,2);
+			my $box=Gtk2::VBox->new;
+			::weaken( $box->{store}=$store );
+			$box->{path}=$path;
+			Field_fill_option_box($box,$field);
+			$rightbox->add($box);
+			$rightbox->show_all;
+		});
+	$renderer->signal_connect(edited => sub
+	    {	my ($cell,$pathstr,$new)=@_;
+		my $iter= $store->get_iter_from_string($pathstr);
+		my $old= $store->get($iter,0);
+		$new= ucfirst $new if $new=~m/^[a-z]/;
+		$new=~s/[^a-zA-Z0-9_]//g; $new=~s/_+/_/g; $new=~s/_$//; # custom field names restrictions, might be relaxed in the future
+		if ($new eq '' || $new!~m/^[A-Z]/ || $::Options{Fields_options}{$new} || ($Def{$new} && !$Def{$new}{template}))
+		{	$store->remove($iter) if $old eq '';
+			$treeview->set_cursor(Gtk2::TreePath->new('1')); # 1 is the custom fields parent
+			return;
+		}
+		$::Options{Fields_options}{$new}= delete($::Options{Fields_options}{$old}) || { template => 'string', name => $new, };
+		$Def{$new} ||= { template => 'string', options => $FieldTemplates{string}{options} };
+
+		if (my $id=$::Options{Fields_options}{$new}{currentid})
+		{	$Def{$id}{_renamed_to}=$new;
+		}
+		$store->set($iter,0,$new);
+		$treeview->set_cursor($store->get_path($iter));
+	    });
+
+	my $newcst=::NewIconButton('gtk-add', _"New custom field", sub
+		{	my $iter=$store->append($store->iter_nth_child(undef,1));	#1 is the custom fields parent
+			$store->set($iter,0,'',1,'_cst',2,::TRUE);
+			my $path=$store->get_path($iter);
+			$treeview->expand_to_path($path);
+			$treeview->set_cursor($path, $treeview->get_column(0), ::TRUE);
+		} );
+	my $warning=Gtk2::Label->new;
+	$warning->set_markup('<b>'.::PangoEsc(_"Settings on this page will only take effect after a restart").'</b>');
+	my $sw=Gtk2::ScrolledWindow->new;
+	$sw->set_shadow_type('etched-in');
+	$sw->set_policy('never','automatic');
+	$sw->add($treeview);
+	return ::Vpack( $warning, '_',[ ['0_',$sw,$newcst], '_', $rightbox ] );
+}
+
+our %Field_options_aliases=
+(	customfield	=> 'name template convwarn disable remove datawarn',
+	rw_		=> 'rw resetnotag',
+);
+our %Field_options=
+(	#bits	=>
+	#{	widget		=> 'combo',
+	#	combo		=> { 32 => "32 bits", 16 => "16 bits", },
+	#	'default'	=> 32,
+	#},
+	rw	=>
+	{	widget		=> 'check',
+		label		=> _"Read/write in file tag",
+		'default'	=> sub		#extract rw (sorted) from default flags
+		{		my $default_flags= $_[0]{flags} || '';
+				$default_flags=~tr/rw//dc;
+				return join '', sort split //, $default_flags;
+		},
+		apply		=> sub
+		{		my ($def,$opt,$value)=@_;
+				$def->{flags}=~s/[rw]//g;
+				$def->{flags}.='rw' if $value;
+		},
+	},
+	resetnotag =>
+	{	widget		=> 'check',
+		label		=> 'Reset current value if no tag found in file',
+		'default'	=> sub { my $default= $_[0]{flags} || ''; return $default!~m/_/ },
+		apply		=> sub { my ($def,$opt,$value)=@_; $def->{flags}=~s/_//g; $def->{flags}.='_' if !$value; },
+		update		=> sub { $_[0]{widget}->set_sensitive( $_[0]{opt}{rw} ); }, # set insensitive when tag not read/written
+	},
+	name	=>
+	{	widget		=> 'entry',
+		label		=> _"Field name",
+	},
+	disable	=>
+	{	widget		=> 'check',
+		label		=> _"Disabled",
+	},
+	remove	=>
+	{	widget		=> 'check',
+		label		=> _"Remove this field",
+	},
+	convwarn =>
+	{	widget		=> 'label',
+		label		=> _"Warning: converting existing data to this format may be lossy",
+		update		=> sub			# show only when field to be disabled or removed
+		{		my $arg=shift;
+				my $show= $arg->{opt}{currentid} && ( $arg->{opt}{template} ne $Def{$arg->{field}}{template} );
+				my $w= $arg->{widget};
+				if ($show) {$w->show} else {$w->hide}
+				$w->set_no_show_all(1);
+		},
+	},
+	datawarn =>
+	{	widget		=> 'label',
+		label		=> _"Warning: all existing data for this field will be lost",
+		update		=> sub			# show only when field to be disabled or removed
+		{		my $arg=shift;
+				my $opt=$arg->{opt};
+				my $show= $opt->{currentid} && ($opt->{disable} || $opt->{remove} );
+				my $w= $arg->{widget};
+				if ($show) {$w->show} else {$w->hide}
+				$w->set_no_show_all(1);
+		},
+	},
+	useridwarn =>
+	{	widget		=> 'label',
+		label		=> _"Warning: an identifier is needed",
+		update		=> sub
+		{		my $arg=shift;
+				my $show= $arg->{opt}{rw} && (!$arg->{opt}{userid} || $arg->{opt}{userid}=~m/^ *$/);
+				my $w= $arg->{widget};
+				if ($show) {$w->show} else {$w->hide}
+				$w->set_no_show_all(1);
+		},
+	},
+	userid	=>
+	{	widget		=> 'entry',
+		label		=> _"Identifier in file tag",
+		tip		=> _"Used to associate the saved value with a user or a function",
+		update		=> sub { $_[0]{widget}->parent->set_sensitive( $_[0]{opt}{rw} ); }, # set insensitive when tag not read/written
+	},
+	template=>
+	{	widget		=> \&Field_Edit_template,
+		label		=> _"Field type",
+	},
+);
+
+sub Field_fill_option_box
+{	my ($vbox,$field, $keep_option, @keep_widgets)=@_;
+	$_->parent->remove($_) for @keep_widgets;
+	$vbox->remove($_) for $vbox->get_children;
+
+	my $opt= $::Options{Fields_options}{$field} ||= {};
+	#$vbox->{opt_orig}={%$opt};	#warning : shallow copy, sub-hash/array stay linked
+	$vbox->{field}=$field;
+
+	my $def= $Def{$field} ||= {};
+	my $option_list= $def->{options}||'';
+
+	my $sg1=Gtk2::SizeGroup->new('horizontal');
+	my %widgets; my @topack;
+	$vbox->{widget_hash}=\%widgets;
+	#my $varname= '$'.$field;
+	#$varname.= ' , %'.$def->{letter} if $def->{letter};
+	#$varname= Gtk2::Label->new($varname);
+	#$varname->set_selectable(1);
+	#push @topack, $varname;
+	my @options= split /\s+/, $option_list;
+	while (my $option=shift @options)
+	{	if (my $o=$Field_options_aliases{$option})
+		{	unshift @options,split /\s+/,$o;
+			next;
+		}
+		my $ref=$Field_options{$option};
+		next unless $ref;
+		my $label=  $ref->{label};
+		my $widget= $ref->{widget};
+		my $key= $ref->{editkey} || $option;
+		my $base= $opt->{template} ? $FieldTemplates{$opt->{template}} : $def;
+		my $value= exists $opt->{$key} ? $opt->{$key} : Field_option_default($field,$option,$base);
+		my @extra;
+		if ($keep_option && $keep_option eq $option) { ($widget,@extra)= @keep_widgets;  }
+		elsif (ref $widget)
+		{	($widget,@extra) = $widget->( $vbox, $opt, $field );
+		}
+		elsif ($widget eq 'check')
+		{	$widget= Gtk2::CheckButton->new($label);
+			undef $label;
+			$widget->set_active($value);
+			$widget->signal_connect(toggled => sub { $opt->{$key}=$_[0]->get_active; &Field_Edit_update });
+		}
+		elsif ($widget eq 'entry')
+		{	$widget= Gtk2::Entry->new;
+			$widget->set_text($value);
+			$widget->signal_connect(changed => sub { my $t=$_[0]->get_text; if ($t=~m/^\s*$/) {delete $opt->{$key};} else {$opt->{$key}=$t;} &Field_Edit_update });
+		}
+		elsif ($widget eq 'combo')
+		{	$widget= TextCombo->new( $ref->{combo}, $value, sub { $opt->{$key}=$_[0]->get_value; &Field_Edit_update });
+		}
+		elsif ($widget eq 'label')
+		{	$widget= Gtk2::Label->new($label);
+			undef $label;
+		}
+		next unless $widget;
+		my $tip= $ref->{tip};
+		$widget->set_tooltip_text($tip) if defined $tip;
+
+		::weaken( $widget->{options_vbox}= $vbox );
+		$widgets{$option}=$widget;
+
+		if (defined $label)
+		{	$label= Gtk2::Label->new($label);
+			$sg1->add_widget($label);
+			$widget= [ $label, $widget ];
+		}
+		push @topack, $widget,@extra;
+	}
+	unshift @topack, Gtk2::Label->new( _("Field name").' : '. $def->{name} ) unless $widgets{name};
+	unshift @topack, Gtk2::Label->new( $def->{desc} ) if $def->{desc};
+	unless ($widgets{rw})
+	{	my $f= $def->{flags} || '';
+		my $text= $f=~m/rw/ ? _"Value written in file tag" :
+			  $f!~m/[rw]/ ? _"Value not written in file tag" :
+			  undef;
+		$text=undef if $field eq 'path' || $field eq 'file';
+		unshift @topack, Gtk2::Label->new_with_format( '<small>%s</small>', $text ) if $text;
+	}
+	unshift @topack, Gtk2::Label->new( $def->{desc} ) if $def->{desc};
+	$vbox->add( ::Vpack(@topack) );
+	$vbox->show_all;
+	Field_Edit_update($vbox);
+}
+
+sub Field_Edit_update
+{	my $vbox_or_child=shift;
+	my $vbox= $vbox_or_child->{options_vbox} || $vbox_or_child;
+	my $field= $vbox->{field};
+	my $opt= $::Options{Fields_options}{$field} ||= {};
+	my $widgets= $vbox->{widget_hash};
+	for my $option (sort keys %$widgets)
+	{	my $update= $Field_options{$option}{update};
+		next unless $update;
+		$update->({ vbox=>$vbox, opt=>$opt, field=>$field, widget=>$widgets->{$option}, });
+	}
+	my $store= $vbox->{store};
+	my $sensitive= (exists $opt->{disable} ? $opt->{disable} : $Def{$field}{disable}) ? 0 : 1;
+	$store->set( $store->get_iter($vbox->{path}), 3, $sensitive, 4, $opt->{remove});
+}
+
+sub Field_Edit_template
+{	my ($vbox,$opt,$field)=@_;
+	my %templatelist;
+	$templatelist{$_}= $FieldTemplates{$_}{editname} for keys %FieldTemplates;
+	my $combo= TextCombo->new(\%templatelist, $opt->{template}, sub
+		{	my $combo=shift;
+			my $t=$opt->{template}= $combo->get_value;
+			$Def{$field}{options}= $FieldTemplates{$t}{options};
+			my $focus= $combo->is_focus; #FIXME never true
+			Field_fill_option_box($vbox,$field, template=>$combo); # will reset the option box but keep $combo
+			$combo->grab_focus if $focus;	#reparenting $combo will make it lose focus, so regrab it #FIXME $focus never true
+		});
+	return $combo;
+}
+
+sub Field_Apply_options
+{	for my $field (keys %{ $::Options{Fields_options} })
+	{	my $opt= $::Options{Fields_options}{$field};
+		if ($opt->{remove}) { delete $::Options{Fields_options}{$field}; next; }
+		my $def= $Def{$field};
+		if (!$def || $def->{template})
+		{	my $template=$opt->{template};
+			next unless $template;	# could remove options of removed standard fields ?
+			my $hash= $FieldTemplates{$template};
+			next unless $hash;
+			$def=$Def{$field}= { %$hash }; #shallow copy of the template hash
+			$opt->{currentid}=$field;
+		}
+		my @options= split /\s+/, $def->{options}||'';
+		while (my $option=shift @options)
+		{	if (my $o=$Field_options_aliases{$option})
+			{	unshift @options,split /\s+/,$o;
+				next;
+			}
+			my $ref=$Field_options{$option};
+			next unless $ref;
+
+			my $key= $ref->{editkey} || $option;
+			my $value= exists $opt->{$key} ? $opt->{$key} : Field_option_default($field,$option,$def);
+			if (my $apply= $ref->{apply}) { $apply->($def,$opt,$value) }
+			else
+			{	$def->{$key}= $value;
+			}
+		}
+	}
+}
+
+sub Field_option_default
+{	my ($field,$option,$def)=@_;
+	my $ref=$Field_options{$option};
+	my $default= $ref->{'default'};
+	if (defined $default) { $default= $default->($def, $field) if ref $default; }
+	else
+	{	my $key= $ref->{editkey} || $option;
+		$default= $def->{$key};
+		$default='' unless defined $default;
+	}
+	return $default;
+}
+
+sub FMPS_rating_postread
+{	my $v=shift;
+	length $v && $v=~m/^\d*\.?\d+$/ ? sprintf('%d',$v*100) : undef;
+}
+sub FMPS_rating_prewrite
+{	my $v=shift;
+	($v eq '' || $v>100) ? '' : sprintf('%.6f', $v/100);
+	# write a rating of '' when no rating rather than undef, so that the tag is still written (undef would remove the tag)
+	# this allows us to distinguish "default rating" from "rating never written".
+	# without this, it would not be possible to remove the rating (ie: set it to "default rating") when the option resetnotag is off
+}
+
 
 package AA;
 our (%GHash,%GHash_Depend);
@@ -1858,7 +2337,12 @@ our %ReplaceFields=
 	s	=>	sub { my $l=Get('idlist',$_[0],$_[1])||[]; ::__('%d song','%d songs',scalar @$l) },
 	x	=>	sub { my $nb=@{GetXRef($_[0],$_[1])}; return $_[0] ne 'album' ? ::__("%d Album","%d Albums",$nb) : ::__("%d Artist","%d Artists",$nb);  },
 	X	=>	sub { my $nb=@{GetXRef($_[0],$_[1])}; return $_[0] ne 'album' ? ::__("%d Album","%d Albums",$nb) : $nb>1 ? ::__("%d Artist","%d Artists",$nb) : '';  },
-	b	=>	sub { my $l=Songs::UniqList('artist', Get('idlist',$_[0],$_[1])); return @$l==1 ? $l->[0] : ::__("%d artist","%d artists", scalar(@$l));  },	#FIXME check if done correctly
+	b	=>	sub {	if ($_[0] ne 'album') { my $nb=@{GetXRef($_[0],$_[1])}; return ::__("%d Album","%d Albums",$nb); }
+				else
+				{	my $l=Songs::UniqList('artist', Get('idlist',$_[0],$_[1]));
+					return @$l==1 ? Songs::Gid_to_Display('artist',$l->[0]) : ::__("%d artist","%d artists", scalar(@$l));
+				}
+			    },
 );
 
 sub ReplaceFields
@@ -1929,8 +2413,9 @@ sub GetIDs
 
 sub GrepKeys
 {	my ($field,$string,$list)=@_;
-	my $re=qr/\Q$string\E/i;
 	$list||=GetAAList($field);
+	return [@$list] unless length $string;	# m// use last regular expression used
+	my $re=qr/\Q$string\E/i;
 	my $displaysub=Songs::DisplayFromGID_sub($field);
 	my @l=grep $displaysub->($_)=~m/$re/i, @$list;	#FIXME optimize ?
 	return \@l;
@@ -1941,8 +2426,11 @@ sub SortKeys
 	my $invert= $mode=~s/^-//;
 	my $h=my $pre=0;
 	$mode||='';
-	if ($mode eq 'songs') { $h=$hsongs; $pre='number'; }
-	if ($mode eq 'length')
+	if ($mode eq 'songs')
+	{	$h= $hsongs || GetHash('count',$field);
+		$pre='number';
+	}
+	elsif ($mode eq 'length')
 	{	$h= GetHash('length:sum',$field);
 		$pre='number';
 	}
@@ -1953,6 +2441,10 @@ sub SortKeys
 	elsif ($mode eq 'year2') #use highest year
 	{	$h= GetHash('year:range',$field);
 		$pre='year2';	#sort using the 4 last characters
+	}
+	elsif ($mode eq 'artist') #only for albums
+	{	$h= GetHash('album:artistsort',$field);
+		$pre='string';
 	}
 	Songs::sort_gid_by_name($field,$list,$h,$pre,$mode);
 	@$list=reverse @$list if $invert;
@@ -2388,7 +2880,7 @@ sub UpdateFilter
 	my @oldlist=@$self;
 	my $before=$::PlayFilter;
 	my $newID=$self->_filter;
-	if ($before==$::PlayFilter)
+	if ($::PlayFilter->are_equal($before))
 	{	::HasChanged('SongArray',$self,'update',\@oldlist);
 	}
 	else	#filter may change because of the lock
@@ -2465,15 +2957,29 @@ sub _filter
 	delete $::ToDo{'7_refilter_playlist'};
 	my $filter=$::SelectedFilter;
 	my $ID=$::SongID;
-	$ID=undef if defined $ID && !@{ $filter->filter([$ID]) };
 	$filter= Filter->newadd(1,$filter, Filter->newlock($::TogLock,$ID) )  if $::TogLock && defined $ID;
-	$::PlayFilter=$::SelectedFilter;
+	$::PlayFilter=$filter;
 	my $newlist=$filter->filter;
+	my $need_relock;
+	my $sorted;
+	if (defined $ID && $::Options{AlwaysInPlaylist} && !@{ $filter->filter([$ID]) })
+	{	if (!@$newlist && $::TogLock)
+		{	$newlist= $::SelectedFilter->filter;
+			$need_relock=1;
+		}
+		if ($::RandomMode) { $ID=undef; }
+		elsif (my $sort=$::Options{Sort})
+		{	Songs::SortList($newlist,$sort);
+			$sorted=1;
+			$ID= Songs::FindNext($newlist, $sort, $ID);
+		}
+	}
 	if (!defined $ID)
 	{	$ID= $self->_FindFirst($newlist);
-		$newlist=$self->_updatelock($ID,$newlist) if $::TogLock && defined $ID;
+		$need_relock=1 if $::TogLock;
 	}
-	$self->_sort($newlist);
+	$newlist=$self->_updatelock($ID,$newlist) if $need_relock;
+	$self->_sort($newlist) unless $sorted;
 	@$self=@$newlist;
 	delete $Presence{$self};
 	return $ID;
@@ -2514,7 +3020,11 @@ sub _list_without_lock
 }
 sub _updatelock
 {	my ($self,$ID,$newlist)=@_;
-	$ID=$::SongID unless defined $ID;
+	if (!defined $ID)
+	{	$::TogLock=undef;
+		::QHasChanged('Lock');
+		return $newlist;
+	}
 	my $lockfilter=Filter->newlock($::TogLock,$ID);
 	$::PlayFilter= $::ListMode ? $lockfilter : Filter->newadd(1,$::SelectedFilter,$lockfilter);
 	return $lockfilter->filter($newlist);
@@ -2529,7 +3039,7 @@ sub _staticfy
 		::HasChanged('SongArray',$self,'mode');
 	}
 	$::PlayFilter=undef;
-	if (!$::RandomMode && $::Options{Sort})	{ $::SortFields=[]; $::Options{Sort}=''; ::QHasChanged('Sort'); }
+	if (!$::RandomMode && $::Options{Sort})	{ $::SortFields=[]; $::Options{Sort_LastOrdered}=$::Options{Sort}; $::Options{Sort}=''; ::QHasChanged('Sort'); }
 }
 
 #sub _updatepos

@@ -10,6 +10,7 @@ package Tag::Flac;
 use strict;
 use warnings;
 use Encode qw(decode encode);
+use MIME::Base64;
 our @ISA=('Tag::OGG');
 
 use constant
@@ -47,6 +48,7 @@ sub new
 	{ warn "flac: Not a flac header\n"; $self->_close; return undef; }
 
     my $last;
+    my @pictures;
     while ( !$last && read($fh,$buffer,4)==4 )
     {	$buffer=unpack 'N',$buffer;
 	my $size=$buffer & 0xffffff;
@@ -57,7 +59,7 @@ sub new
 	 { warn "flac: Premature end of file\n"; $self->_close; return undef; }
 	if	($type==STREAMINFO)	{$self->{info}=_ReadInfo(\$buffer);}
 	elsif	($type==VORBIS_COMMENT) {$self->{comments}=_UnpackComments($self,\$buffer); $self->{comment_offset}=$pos-4}
-	elsif	($type==PICTURE)	{my $pic=_ReadPicture(\$buffer); push @{$self->{pictures}},$pic if $pic;}
+	elsif	($type==PICTURE)	{my $pic=_ReadPicture(\$buffer); push @pictures,$pic if $pic;}
     }
     my $audiosize=(stat $fh)[7]-tell($fh);
     $self->_close;
@@ -71,6 +73,10 @@ sub new
 	$self->{CommentsOrder}=[];
 	$self->{comments}={};
     }
+    for my $pic (@pictures)
+    {	push @{ $self->{comments}{metadata_block_picture} }, $pic;
+	push @{ $self->{CommentsOrder} }, 'metadata_block_picture',
+    }
     return $self;
 
 }
@@ -79,6 +85,15 @@ sub write_file
 {	my $self=shift;
 	local $_;
 	my ($INfh,$OUTfh);
+	my $pictures='';
+	if (my $list=$self->{comments}{metadata_block_picture})
+	{	for my $pic (grep defined, @$list)
+		{	my $packet= _PackPicture($pic);
+			my $head=pack 'N', (PICTURE<<24)+length $$packet;
+			$pictures.= $head.$$packet;
+		}
+		@$list=(); #remove the pictures from vorbis comments
+	}
 	my $newcom_packref=_PackComments($self);
 	my $fh=$self->_open  or return undef;
 	my $buffer; my $last; my $towrite='fLaC'; my $padding=0;
@@ -89,7 +104,7 @@ sub write_file
 		my $size=$buffer & 0xffffff;
 		my $type=($buffer >> 24) & 0x7f;
 		$last=$buffer >>31;
-		if ($type!=VORBIS_COMMENT && $type!=PADDING)
+		if ($type!=VORBIS_COMMENT && $type!=PADDING && $type!=PICTURE)
 		{	$buffer&=0x7fffffff;	#set Last-metadata-block flag to 0
 			$towrite.=pack 'N',$buffer;
 			unless (read($fh,$towrite,$size,length($towrite))==$size)
@@ -97,11 +112,9 @@ sub write_file
 		}
 		else {$padding+=$size+4; seek $fh,$size,1; }
 	}
-	$padding-=4+length $$newcom_packref;
+	$padding-= 4 + length($$newcom_packref) + length $pictures;
 	my $header=VORBIS_COMMENT;
 	my $inplace=($padding==0 || ($padding>3 && $padding<8192) );
-	#if ($inplace && $padding<4)
-	# { $$newcom_packref.="\x00" x(4-$padding); $padding=''; $header+=0x80; }
 	if ($padding==0) {$header+=0x80;$padding='';}
 	else
 	{	$padding=$inplace? $padding-4 : 256;
@@ -112,9 +125,8 @@ sub write_file
 	{	$self->_close;
 		$fh=$self->_openw or return undef;
 		seek $fh,$self->{startaudio} ,0;
-		print $fh $towrite.$header.$$newcom_packref.$padding or warn $!;
+		print $fh $towrite.$pictures.$header.$$newcom_packref.$padding or warn $!;
 		$self->_close;
-		return 1;
 	}
 	else
 	{	my $tmpfh=$self->_openw(1) or return undef;
@@ -123,15 +135,16 @@ sub write_file
 			read($fh,$buffer,$self->{startaudio});
 			print $tmpfh $buffer or warn $!;
 		}
-		print $tmpfh $towrite.$header.$$newcom_packref.$padding or warn $!;
+		print $tmpfh $towrite.$pictures.$header.$$newcom_packref.$padding or warn $!;
 		while (read($fh,$buffer,1048576))
 		 { print $tmpfh $buffer or warn $!; }
 		$self->_close;
 		close $tmpfh;
 		warn "replacing old file with new file.\n";
 		unlink $self->{filename} && rename $self->{filename}.'.TEMP',$self->{filename};
-		return 1;
 	}
+	%$self=(); #destroy the object to make sure it is not reused as many of its data are now invalid
+	return 1;
 }
 
 sub _close
@@ -174,6 +187,13 @@ sub _ReadPicture
 	};
 	if ($@) { warn "invalid picture block - skipped\n"; }
 	return $ret;
+}
+sub _PackPicture
+{	my $pic=shift;
+	if (!ref $pic) { my $packet=decode_base64($pic); return \$packet; }
+	my ($mime,$type,$desc,$data)=@$pic;
+	my $packet= pack 'N N/a N/a NNNN N/a', ($type||0),$mime,$desc,0,0,0,0, $data;
+	return \$packet;
 }
 
 sub _UnpackComments

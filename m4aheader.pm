@@ -13,7 +13,7 @@
 #blame Apple for the absence of official specs for metadata :(
 
 #usage :
-#my $tag=Tag::M4A->new(shift);
+#my $tag=Tag::M4A->new($file);
 #if ($tag)
 #{	$tag->add(name => 'value');
 #	$tag->insert('org.gmusicbrowser----mytag' => 'mytagvalue');
@@ -87,45 +87,46 @@ sub _close
 }
 
 sub edit
-{	my ($self,$key,$nb,@val)=@_;
+{	my ($self,$key,$nb,$val)=@_;
 	$nb||=0;
 	my $aref=$self->{ilst}{$key};
 	return undef unless $aref &&  @$aref >=$nb;
 	my $old=$aref->[$nb];
-	if (@val>1 && $key ne $val[1].'----'.$val[2])	#for editing a '----' tag
-	{	$self->remove($key,$nb);
-		$key= $key=~m/^(Unknown tag with flag=\d+ and key=)/ ? $1 : '';
-		$key.=$val[1].'----'.$val[2];
-		$self->add($key,@val);
-	}
-	else { $aref->[$nb]=$val[0]; }
+	$aref->[$nb]=$val;
 	return $old;
 }
 sub add
-{	my ($self,$key,@val)=@_;
-	if (@val>1)	#for adding a '----' tag
-	{	$key= $key=~m/^(Unknown tag with flag=\d+ and key=)/ ? $1 : '';
-		$key.=$val[1].'----'.$val[2];
-	}
-	push @{ $self->{ilst}{$key} },$val[0];
+{	my ($self,$key,$val)=@_;
+	$key=~s/^----/com.apple.iTunes----/;
+	push @{ $self->{ilst}{$key} },$val;
 	push @{$self->{ilst_order}}, $key;
 	return 1;
 }
 sub insert	#same as add but put it first (of its kind)
-{	my ($self,$key,@val)=@_;
-	if (@val>1)	#for adding a '----' tag
-	{	$key= $key=~m/^(Unknown tag with flag=\d+ and key=)/ ? $1 : '';
-		$key.=$val[1].'----'.$val[2];
-	}
-	unshift @{ $self->{ilst}{$key} },$val[0];
+{	my ($self,$key,$val)=@_;
+	$key=~s/^----/com.apple.iTunes----/;
+	unshift @{ $self->{ilst}{$key} },$val;
 	push @{$self->{ilst_order}}, $key;
 	return 1;
 }
 
 sub remove_all
 {	my ($self,$key)=@_;
-	return undef unless defined $key;
-	$_=undef for @{ $self->{ilst}{$key} };
+	return unless defined $key;
+	my $ilst=$self->{ilst};
+	my @arrays;
+	if ($key=~m/^(.*)----(.*)$/)
+	{	my $appid=$1;
+		my $subkey=$2;
+		my $re= $appid eq '' ? qr/^.*----\Q$subkey\E$/i : qr/^(?:\Q$appid\E)?----\Q$subkey\E$/i;
+		@arrays= map $ilst->{$_}, grep m/$re/, keys %$ilst;
+	}
+	elsif (my $array=$ilst->{$key})
+	{	@arrays=($array);
+	}
+	for my $array (@arrays)
+	{	$_=undef for @$array;
+	}
 	return 1;
 }
 sub remove
@@ -139,16 +140,32 @@ sub remove
 	return $val;
 }
 
-sub get_fieldtypes
-{	my ($self,$key,$nb)=@_;
-	my $type= $key=~m/^Unknown tag with flag=\d+ and key=/ ?	'u'  :
+sub get_keys
+{	keys %{ $_[0]{ilst} };
+}
+sub get_values
+{	my ($self,$key)=@_;
+	my $ilst=$self->{ilst};
+	if ($key=~m/^(.*)----(.*)$/)
+	{	my $appid=$1;
+		my $subkey=$2;
+		my $re= $appid eq '' ? qr/^.*----\Q$subkey\E$/i : qr/^(?:\Q$appid\E)?----\Q$subkey\E$/i;
+		return map @{$ilst->{$_}}, grep m/$re/, keys %$ilst;
+	}
+	my $v= $ilst->{$key};
+	return $v ? (grep defined, @$v) : ();
+}
+
+sub get_field_info
+{	my $key=shift;
+	my $type= $key=~s/^Unknown tag with flag=\d+ and key=// ? 'u':
 		  $key eq 'covr' ?		'p':
 		  $key=~m/^cpil$|^pgap$|^pcst$/?'f':
 		  				't';
-	if ($key=~m/^(?:Unknown tag with flag=\d+ and key=)?(.*)----(.*)$/)
-	{	return $type.'tt',_"Other",[$self->{ilst}{$key}[$nb],$1,$2],'----';
+	if ($key=~m/^(.*)----(.*)$/)
+	{	return 'tt'.$type,'----',$key,$1,$2;
 	}
-	return $type;
+	return $type,undef,$key;
 }
 
 sub ParseAtomTree
@@ -245,6 +262,8 @@ sub ParseAtomTree
 
 	#warn "$_ => $info{$_}\n" for sort keys %info;
 
+	return unless $ilst[0];
+
 	@ilst=@{$ilst[0]}; #ignore an eventual 2nd ilst
 	while (@ilst)
 	{	my ($key,$data)=splice @ilst,0,2;
@@ -256,7 +275,7 @@ sub ParseAtomTree
 		my $flag=unpack 'x3C',$data;
 		if ($flag==1)				{ $val=decode('utf-8',$val); }
 		elsif ($key eq 'trkn' || $key eq 'disk'){ $val=join '/',unpack 'x2nn',$val; }
-		elsif ($key eq 'gnre')			{ $val=unpack 'xC',$val; $val=$Tag::MP3::Genres[$val]; $key="\xa9gen"; }
+		elsif ($key eq 'gnre')			{ $val=unpack 'xC',$val; $val= $val ? $Tag::MP3::Genres[$val-1] : ''; $key="\xa9gen"; }	#gnre uses id3 genre number +1
 		elsif ($key eq 'covr')			{  } #nothing to do, $val contains the binary data of the picture
 		elsif ($key eq 'tmpo')			{ $val=unpack 'n',$val; }
 		elsif ($key=~m/^cpil$|^pgap$|^pcst$/)	{ $val=unpack 'C',$val; }
@@ -285,9 +304,11 @@ sub Make_ilst
 		else
 		{	my $flags=1;
 			if ($key=~m/^Unknown tag with flag=(\d+) and key=(.*)$/)	{$key=$2; $flags=$1;}
-			if ($key=~m/^(.*)----(.*)$/)
-			{	$key='----';
-				$data=pack 'NA4x4a*NA4x4a*', (12+length $1), 'mean', $1, (12+length $2), 'name',$2;
+			if (ref $val || $key=~m/^(.*)----(.*)$/)
+			{	my ($mean,$name)= ref $val ? @$val : ($1,$2);
+				$val=$val->[2] if ref $val;
+				$key='----';
+				$data=pack 'NA4x4a*NA4x4a*', (12+length $mean), 'mean', $mean, (12+length $name), 'name',$name;
 			}
 			if ($key eq 'trkn' || $key eq 'disk')
 			{	next unless $val=~m#(\d+)(?:/(\d+))?#;
@@ -300,7 +321,7 @@ sub Make_ilst
 			elsif ($key eq "\xA9gen" && grep $val eq $_, @Tag::MP3::Genres)
 			{	$key='gnre'; $flags=0;
 				$val=::first {$val eq $Tag::MP3::Genres[$_]} 0..$#Tag::MP3::Genres;
-				$val=pack 'xC',$val;
+				$val=pack 'xC',$val+1;	#gnre uses id3 genre number +1
 			}
 			elsif ($flags==1)			{ $val=encode('utf-8',$val); }
 
@@ -374,7 +395,7 @@ sub write_file
 			$self->_close;
 		}
 		elsif ($self->{nofullrewrite})
-		{	warn "file contains a co64 or tfhd atom, adding metadata bigger than the free space is not suppôrted.\n";
+		{	warn "file contains a co64 or tfhd atom, adding metadata bigger than the free space is not supported.\n";
 			return 0;
 		}
 		else
@@ -417,7 +438,7 @@ sub write_file
 			unlink $self->{filename} && rename $self->{filename}.'.TEMP',$self->{filename};
 		}
 	}
-	$self=undef;	#to prevent re-use of the object
+	%$self=(); #destroy the object to make sure it is not reused as many of its data are now invalid
 	return 1;
 }
 
