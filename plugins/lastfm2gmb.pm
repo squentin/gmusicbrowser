@@ -89,6 +89,8 @@ binmode(STDOUT, ":utf8");
 our $ua = LWP::UserAgent->new( timeout=>15 );
 our $xs = XML::Simple->new(ForceArray=>['track']);
 
+my $Log=Gtk2::ListStore->new('Glib::String');
+
 sub Start {
 }
 
@@ -113,19 +115,23 @@ sub prefbox
 	$optionbox->pack_start($_,0,0,1) for $api_uri,$key,$mode,$rating_loved,$tmp_dir,$user;
 
     my $button=Gtk2::Button->new(_"Make it now");
-    $button->signal_connect('clicked', sub {
-        make_it_now
-    });
+    $button->signal_connect(clicked => \&make_it_now);
 
 	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$optionbox,$button;
+    $vbox->add( ::LogView($Log) );
 	return $vbox;
 }
 
 sub make_it_now {
+    Log(_"Let's start");
     if ( $::Options{OPT.'cache'} and ! -d $::Options{OPT.'tmp_dir'} ) {
-        mkdir($::Options{OPT.'tmp_dir'}) or die "Can't create tmp dir $::Options{OPT.'tmp_dir'}: $!";
+        mkdir($::Options{OPT.'tmp_dir'}) or Log(_("Can't create tmp dir").$::Options{OPT.'tmp_dir'});
+        # die "Can't create tmp dir $::Options{OPT.'tmp_dir'}: $!";
     }
-    die "Unknown mode!" unless $::Options{OPT.'mode'}=~/[pl]/;
+    $::Options{OPT.'mode'} = 'pl' if $::Options{OPT.'mode'} eq 'a';
+    Log(_("Unknown mode: ").$::Options{OPT.'mode'}) unless $::Options{OPT.'mode'}=~/[pl]/;
+    Log(_("Last.FM user necessary.").$::Options{OPT.'user'}) unless $::Options{OPT.'user'}=~/.+/;
+    # die "Unknown mode!" unless $::Options{OPT.'mode'}=~/[pl]/;
 
     my $bus = Net::DBus->session;
     my $service = $bus->get_service("org.gmusicbrowser");
@@ -137,8 +143,9 @@ sub make_it_now {
     my $lastfm_library = {};
 
     # get current gmb library
-    print "Looking up gmb library " unless $::Options{OPT.'quiet'};
-    print "\n" if $::Options{OPT.'debug'} >= 2;
+    Log(_"Looking up gmb library");
+    Log("Pre Alpha, I do nothing.");
+=dop
     foreach my $id ( @{$gmb_obj->GetLibrary} ) {
         my $artist = $gmb_obj->Get([$id,'artist']) or next;
         my $title = $gmb_obj->Get([$id,'title']) or next;
@@ -148,12 +155,12 @@ sub make_it_now {
         $title = lc($title);
         # TODO: if multiple song's with same names when skip it now
         if ( $gmb_library->{$artist}{$title} ) {
-            print "[$id] $artist - $title : found dup - skiped\n" if $::Options{OPT.'debug'} >= 2;
+            Log("[$id] $artist - $title : found dup - skiped");
             $gmb_library->{$artist}{$title} = { skip => 1 };
             $stats{skiped}++;
         }
         else {
-            print "[$id] $artist - $title : " if $::Options{OPT.'debug'} >= 2;
+            Log("[$id] $artist - $title : ");
             $gmb_library->{$artist}{$title}{id} = $id;
             if ( $::Options{OPT.'mode'}=~m/p/o ) {
                 $gmb_library->{$artist}{$title}{playcount} = $gmb_obj->Get([$id,'playcount']) || 0;
@@ -171,7 +178,9 @@ sub make_it_now {
         print '.' unless $::Options{OPT.'quiet'} or $stats{gmb_tracks} % 100;
         last if $stats{gmb_tracks} > 100 and $::Options{OPT.'debug'} >= 3;
     }
-    print " $stats{gmb_tracks} tracks ($stats{skiped} skipped as dup)\n" unless $::Options{OPT.'quiet'};
+
+=dop
+    Log(" $stats{gmb_tracks} tracks ($stats{skiped} skipped as dup)";
 
     our $ua = LWP::UserAgent->new( timeout=>15 );
     our $xs = XML::Simple->new(ForceArray=>['track']);
@@ -179,7 +188,7 @@ sub make_it_now {
     # playcount & lastplay
     if ( $::Options{OPT.'mode'}=~m/p/ ) {
         # get weekly chart list
-        my $charts_data = lastfm_request({method=>'user.getWeeklyChartList'}) or die 'Cant get data from lastfm';
+        my $charts_data = lastfm_request({method=>'user.getWeeklyChartList'}) or Log(_"Can't get data from lastfm");
         # add current (last) week
         my $last_week_from = $charts_data->{weeklychartlist}{chart}[$#{$charts_data->{weeklychartlist}{chart}}]{to};
         push @{$charts_data->{weeklychartlist}{chart}}, { from=>$last_week_from, to=>time() }
@@ -215,15 +224,16 @@ sub make_it_now {
     # loved tracks (rating)
     if ( $::Options{OPT.'mode'}=~m/l/ ) {
         # first request for get totalPages
-        my $data = lastfm_request({method=>'user.getLovedTracks'}) or die 'Cant get data from lastfm';
-        die "Something wrong: status = $data->{status}" unless $data->{status} eq 'ok';
+        my $data = lastfm_request({method=>'user.getLovedTracks'}) or Log(_"Can't get data from lastfm");
+        Log(_("Something wrong: status = ").$data->{status}) unless $data->{status} eq 'ok';
+        #die "Something wrong: status = $data->{status}" unless $data->{status} eq 'ok';
         my $pages = $data->{lovedtracks}{totalPages};
         print "LastFM request 'getLovedTracks' found $pages pages ($data->{lovedtracks}{total} tracks)\n" unless $::Options{OPT.'quiet'};
         print "LastFM request 'getLovedTracks' pages " unless $::Options{OPT.'quiet'};
         for ( my $p = 1; $p <= $pages; $p++ ) {
             print "$p.." if $::Options{OPT.'debug'};
             print '.' unless $::Options{OPT.'quiet'};
-            $data = lastfm_request({method=>'user.getLovedTracks',page=>$p}) or die "Cant get data from lastfm";
+            $data = lastfm_request({method=>'user.getLovedTracks',page=>$p}) or Log(_"Can't get data from lastfm");
             foreach my $title ( keys %{$data->{lovedtracks}{track}} ) {
                 my $artist = lc($data->{lovedtracks}{track}{$title}{artist}{name}||$data->{lovedtracks}{track}{$title}{artist}{content});
                 $title = lc($title);
@@ -272,6 +282,7 @@ sub make_it_now {
 
     print "\nImported : playcount - $stats{imported_playcount}, lastplay - $stats{imported_lastplay}, loved - $stats{imported_loved}. " . ($stats{errors} ? $stats{errors} : 'No') . " errors detected.\n"
         unless $::Options{OPT.'quiet'};
+=cut
 }
 
 
@@ -302,10 +313,17 @@ sub lastfm_get_weeklytrackchart {
         $data = retrieve($filename);
     }
     else {
-        $data = lastfm_request({method=>'user.getWeeklyTrackChart',%{$params}}) or die 'Cant get data from lastfm';
+        $data = lastfm_request({method=>'user.getWeeklyTrackChart',%{$params}}) or Log(_"Can't get data from lastfm");
         # TODO : strip some data, for left only need info like: artist, name, playcount
         store $data, $filename if $::Options{OPT.'cache'};
     }
     return $data;
+}
+
+sub Log {
+    my $text=$_[0];
+	$Log->set( $Log->prepend,0, localtime().'  '.$text );
+	warn "$text\n" if $::debug;
+	if (my $iter=$Log->iter_nth_child(undef,50)) { $Log->remove($iter); }
 }
 
