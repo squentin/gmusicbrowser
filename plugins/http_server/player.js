@@ -81,6 +81,10 @@ var TransportUI = Class.create({
 	Event.observe('skipbutton', 'click', function(event) {
 	    this.client.skip();
 	}.bind(this));
+
+	Event.observe('prevbutton', 'click', function(event) {
+	    this.client.prev();
+	}.bind(this));
     },
 
     songUpdated: function() {
@@ -170,6 +174,22 @@ var GmusicBrowserClient = Class.create({
 	    },
 	    onFailure: function(response) {
 		alert("holy crap problem skipping");
+	    },
+	    onException: function(response, e) {
+		alert(e);
+	    }
+	});
+    },
+
+    prev: function() {
+	var thiz = this;
+	new Ajax.Request("/prev", {
+	    method: 'post',
+	    onSuccess: function(response) {
+		thiz.update(response.responseText);
+	    },
+	    onFailure: function(response) {
+		alert("holy crap problem going back");
 	    },
 	    onException: function(response, e) {
 		alert(e);
