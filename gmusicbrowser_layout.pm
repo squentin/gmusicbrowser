@@ -2134,15 +2134,22 @@ sub Paned_size_cb
 	my $max=$self->get('max-position');
 	my $size1=$self->{size1};
 	my $size2=$self->{size2};
-	if (defined $size1 && defined $size2 && abs($max-$size1-$size2)>5)
-	{	if    ($self->child1_resize && !$self->child2_resize)		{ $size1= ::max($max-$size2,0); }
-		elsif ($self->child2_resize && !$self->child1_resize)		{ $size1= $max if $size1>$max; }
+	if (defined $size1 && defined $size2 && abs($max-$size1-$size2)>5 || $self->{need_resize})
+	{	my $not_enough;
+		if    ($self->child1_resize && !$self->child2_resize)		{ $size1= ::max($max-$size2,0); $not_enough= $size2>$max; }
+		elsif ($self->child2_resize && !$self->child1_resize)		{ $size1= $max if $not_enough= $size1>$max; }
 		else								{ $size1= $max*$size1/($size1+$size2); }
 		$self->set_position( $size1 );
-		$self->{size1}= $size1;
-		$self->{size2}= ::max($max-$size1,0);
+		if ($not_enough)	#don't change the saved value if couldn't restore the size properly
+		{	$self->{need_resize}=1;	#  => will retry in a later size_allocate event unless the position is set manually
+		}
+		unless ($not_enough)
+		{	$self->{size1}= $size1;
+			$self->{size2}= $max-$size1;
+			delete $self->{need_resize};
+		}
 	}
-	else { my $size1=$self->get_position; $self->{size1}=$size1; $self->{size2}=$max-$size1; }
+	else { my $size1=$self->get_position; $self->{size1}=$size1; $self->{size2}=$max-$size1; delete $self->{need_resize}; }
 }
 
 sub Fixed_pack
