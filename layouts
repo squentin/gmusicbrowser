@@ -674,7 +674,19 @@ tail=25
 vcollapse=head
 vmin=pic:y+pic:h+25
 left=pic:w+2
-title:	text(markup='<b><big>'.pesc($album).'</big></b>'. if($year,'  <big><b>«</b></big>  '.pesc($year)) . '  <big><b>«</b></big> '.pesc($artist),pad=2)
+title:	text(markup='<b><big>'.pesc($album).'</big></b>'. if($year,'  <big><b>«</b></big>  '.pesc($year)) . '  <big><b>«</b></big>  '.pesc($artist),pad=2)
+pic:	+aapic(y=title:h+title:y,picsize=picsize,ypad=2,xpad=1,aa='album')
+picsize : OptionNumber(default=100,min=20,max=1000,step=10)
+picstars : picture(file=ratingpic($rating_avrg),x=(picsize/2)-(picstars:w/2),y=pic:y+pic:h,hide=$rating_avrg==50)
+
+{Group artistalbumdisk_breadcrumbs}
+title=_"album, artist and disk breadcrumbs"
+head=title:h
+tail=25
+vcollapse=head
+vmin=pic:y+pic:h+25
+left=pic:w+2
+title:	text(markup='<b><big>'.pesc($album).'</big></b>'. if($disc,'  <big><b>«</b></big>  <b>'.pesc($disc).'</b>'). if($year,'  <big><b>«</b></big>  '.pesc($year)) . '  <big><b>«</b></big>  '.pesc($artist),pad=2)
 pic:	+aapic(y=title:h+title:y,picsize=picsize,ypad=2,xpad=1,aa='album')
 picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 picstars : picture(file=ratingpic($rating_avrg),x=(picsize/2)-(picstars:w/2),y=pic:y+pic:h,hide=$rating_avrg==50)
@@ -766,6 +778,10 @@ title:	text(markup='<b><big>'.pesc($album).'\n'.pesc($artist).'</big></b>',pad=2
 pic:	aapic(y=title:y + title:h +2, picsize=min(picsize,width), pad=2)
 width:	widthOptionNumber(default=200,min=20,max=1000,step=10)
 picsize : OptionNumber(default=100,min=20,max=1000,step=10)
+
+{Column playandskip}
+title = _"P&S"
+text: text(markup='<small>'.pesc(if($playcount,$playcount,0).'/'.if($skipcount,$skipcount,0)).'</small>')
 
 {Column testtitleandprogress}
 title= _"Title & progress"
