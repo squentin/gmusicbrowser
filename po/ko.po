@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-25 10:48+0100\n"
+"POT-Creation-Date: 2011-01-30 20:18+0100\n"
 "PO-Revision-Date: 2011-01-19 09:56+0900\n"
 "Last-Translator: bluealbum <bluealbum@gmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
@@ -17,22 +17,41 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: plugins/artistinfo.pm:451
+#: plugins/artistinfo.pm:474
+msgid ""
+"\n"
+"\n"
+"Edit in the last.fm wiki"
+msgstr ""
+
+#: plugins/artistinfo.pm:466
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:383
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:383
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Total playcount: "
+msgstr ""
+
+#: plugins/artistinfo.pm:485
+msgid ""
+" Upcoming Event\n"
+"\n"
+msgstr ""
+
+#: plugins/artistinfo.pm:487
+msgid ""
+" Upcoming Events\n"
+"\n"
 msgstr ""
 
 #: gmusicbrowser_layout.pm:288 gmusicbrowser_layout.pm:289
@@ -181,7 +200,7 @@ msgstr "%n 가장 긴 시간동안 스킵되지 않음"
 msgid "%n shortest"
 msgstr "%n 가장 짧게"
 
-#: layouts:4
+#: layouts:8
 msgid "%t - gmusicbrowser"
 msgstr ""
 
@@ -202,7 +221,7 @@ msgstr "(: ) 하나를 가짐"
 msgid "(: )none"
 msgstr "(: )없음"
 
-#: plugins/artistinfo.pm:218 plugins/audioscrobbler.pm:65
+#: plugins/artistinfo.pm:216 plugins/audioscrobbler.pm:65
 msgid "(applied after restart)"
 msgstr "(재시작 후 적용됩니다)"
 
@@ -243,8 +262,8 @@ msgstr ""
 msgid "0 chance"
 msgstr "0 회"
 
-#: plugins/artistinfo.pm:220
-msgid "0 means no limit"
+#: plugins/artistinfo.pm:227
+msgid "0 means 'show all'"
 msgstr ""
 
 #: gmusicbrowser.pl:7727
@@ -290,7 +309,11 @@ msgstr ""
 msgid "<i>by</i> %a\\n<i>from</i> %l"
 msgstr "<i>의해</i> %a\\n<i>으로부터</i> %l"
 
-#: gmusicbrowser_layout.pm:3786
+#: plugins/lastfm2gmb.pm:104
+msgid "API URI:"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:3789
 msgid "Abort"
 msgstr "중단"
 
@@ -415,10 +438,6 @@ msgstr "날짜 추가됨"
 msgid "Adding a radio"
 msgstr "라디오 추가중"
 
-#: plugins/artistinfo.pm:214
-msgid "Additional domain for Last.fm, Amazon and so on."
-msgstr ""
-
 #: gmusicbrowser.pl:5692
 msgid ""
 "Additionally this format can be used :\n"
@@ -461,19 +480,15 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:436 layouts:539 layouts:545 layouts:993
+#: plugins/fetch_cover.pm:103 layouts:436 layouts:539 layouts:545 layouts:992
 msgid "Album"
 msgstr "앨범"
 
-#: layouts:135
-msgid "Album Info"
-msgstr ""
-
-#: layouts:848
+#: layouts:847
 msgid "Album and artist"
 msgstr "앨범과 가수"
 
-#: layouts:763
+#: layouts:762
 msgid "Album and artist on the left side"
 msgstr "왼쪽에 앨범과 가수"
 
@@ -513,6 +528,10 @@ msgstr "앨범 사진 포함"
 #: gmusicbrowser_songs.pm:787
 msgid "Album year(s)"
 msgstr "앨범 연도"
+
+#: layouts:157
+msgid "Album: %l (%Y)"
+msgstr ""
 
 #: gmusicbrowser_songs.pm:1727 gmusicbrowser_songs.pm:3670
 msgid "All"
@@ -613,23 +632,27 @@ msgstr "줄거리"
 msgid "Arkanoid"
 msgstr ""
 
-#: layouts:81
+#: layouts:99
 msgid "Arkanoid Fullscreen"
 msgstr ""
 
-#: layouts:93
+#: layouts:112
 msgid "Arkanoid Fullscreen with queue"
 msgstr ""
 
-#: layouts:106
+#: layouts:83
+msgid "Arkanoid alternative"
+msgstr ""
+
+#: layouts:117
 msgid "Arkanoid browser"
 msgstr ""
 
 #: gmusicbrowser.pl:7788 gmusicbrowser_songs.pm:469 gmusicbrowser_tags.pm:1529
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
-#: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:129
-#: plugins/fetch_cover.pm:102 layouts:436 layouts:539 layouts:545
+#: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:130
+#: plugins/fetch_cover.pm:102 layouts:168 layouts:436 layouts:539 layouts:545
 msgid "Artist"
 msgstr "음악가"
 
@@ -637,11 +660,11 @@ msgstr "음악가"
 msgid "Artist & album"
 msgstr "아티스트 & 앨범"
 
-#: layouts:133
-msgid "Artist Info"
+#: plugins/artistinfo.pm:452
+msgid "Artist Biography"
 msgstr ""
 
-#: plugins/artistinfo.pm:218
+#: plugins/artistinfo.pm:216
 msgid "Artist Picture Size : "
 msgstr "가수 사진 크기 :"
 
@@ -661,7 +684,11 @@ msgstr "가수,앨범,디스크,트랙"
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "가수,날짜,앨범,디스크,트랙"
 
-#: plugins/artistinfo.pm:9 plugins/artistinfo.pm:68
+#: layouts:157
+msgid "Artist: %a"
+msgstr ""
+
+#: plugins/artistinfo.pm:9 plugins/artistinfo.pm:69
 msgid "Artistinfo"
 msgstr "가수정보"
 
@@ -709,7 +736,7 @@ msgstr "자동 필터"
 msgid "Auto-increment track numbers"
 msgstr "트랙 번호 자동 증가"
 
-#: plugins/artistinfo.pm:217 plugins/lyrics.pm:187
+#: plugins/artistinfo.pm:215 plugins/lyrics.pm:187
 msgid "Auto-save positive finds"
 msgstr "맞는 것을 찾으면 자동 저장하기"
 
@@ -741,7 +768,7 @@ msgstr "자동저장 플러그인"
 msgid "Available"
 msgstr "사용 가능"
 
-#: plugins/artistinfo.pm:383
+#: plugins/artistinfo.pm:392
 msgid "Average rating: "
 msgstr ""
 
@@ -793,11 +820,11 @@ msgstr "브라우저 창 레이아웃 :"
 msgid "Browser with SongTree"
 msgstr "노래트리 가진 브라우저"
 
-#: layouts:969
+#: layouts:968
 msgid "Buttons"
 msgstr "버튼"
 
-#: layouts:958
+#: layouts:957
 msgid "Buttons, Song & Cover"
 msgstr "버튼, 노래 & 커버"
 
@@ -828,6 +855,15 @@ msgstr ""
 #: gmusicbrowser_gstreamer-0.10.pm:231
 msgid "Can't create sink '{sink}'"
 msgstr "'{sink}' 싱크를 만들 수 없습니다"
+
+#: plugins/lastfm2gmb.pm:128
+msgid "Can't create tmp dir"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:191 plugins/lastfm2gmb.pm:227
+#: plugins/lastfm2gmb.pm:236 plugins/lastfm2gmb.pm:316
+msgid "Can't get data from lastfm"
+msgstr ""
 
 #: gmusicbrowser_123.pm:138
 msgid "Can't play '{file}'."
@@ -953,7 +989,7 @@ msgstr "글꼴 고르기..."
 msgid "Choose icon for label {name}"
 msgstr "{name} 라벨 아이콘 고르기"
 
-#: gmusicbrowser_layout.pm:2474
+#: gmusicbrowser_layout.pm:2477
 msgid "Choose page to open"
 msgstr "불러올 페이지 고르기"
 
@@ -981,7 +1017,7 @@ msgstr "선택한 필드 비우기"
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "클라이언트 금지됨, 프로그램 개발자와 접촉하세요"
 
-#: gmusicbrowser_layout.pm:2217 gmusicbrowser_list.pm:3832
+#: gmusicbrowser_layout.pm:2220 gmusicbrowser_list.pm:3832
 #: gmusicbrowser_list.pm:3899
 msgid "Close"
 msgstr "닫기"
@@ -1174,7 +1210,7 @@ msgstr "마우스상에 있으면 트레이 팁 팝업상자 지연하기"
 msgid "Delete Selected Songs"
 msgstr "선택한 노래 지우기"
 
-#: gmusicbrowser_layout.pm:2215
+#: gmusicbrowser_layout.pm:2218
 msgid "Delete list"
 msgstr "목록 지우기"
 
@@ -1270,10 +1306,6 @@ msgstr "id3v2 태그를 비동기화하지 않기"
 msgid "Do not write the tags"
 msgstr "태그 쓰지 않기"
 
-#: plugins/artistinfo.pm:214
-msgid "Domain"
-msgstr ""
-
 #: plugins/titlebar.pm:54
 msgid "Don't add the overlay to dialogs"
 msgstr "대화상자에 오버레이 추가하지 않기"
@@ -1329,6 +1361,10 @@ msgstr "필터 편집"
 #: gmusicbrowser_list.pm:6496
 msgid "Edit grouping ..."
 msgstr "그룹으로 나누기 편집 ..."
+
+#: plugins/artistinfo.pm:557
+msgid "Edit in the last.fm wiki"
+msgstr ""
 
 #: gmusicbrowser_list.pm:2834
 msgid "Edit list"
@@ -1427,7 +1463,7 @@ msgstr "파일/폴더의 목록을 대기열로 보내기"
 msgid "Enqueue filter"
 msgstr "대기열로 보내기 필터"
 
-#: plugins/artistinfo.pm:219
+#: plugins/artistinfo.pm:217
 msgid "Enter custom event string :"
 msgstr "상황에 맞는 이벤트 문자열 넣기 :"
 
@@ -1439,7 +1475,7 @@ msgstr ""
 msgid "EpicRating plugin - automatically update ratings"
 msgstr ""
 
-#: layouts:897
+#: layouts:896
 msgid "Equalizer"
 msgstr "이퀄라이저"
 
@@ -1447,7 +1483,7 @@ msgstr "이퀄라이저"
 msgid "Error :"
 msgstr "에러 :"
 
-#: plugins/artistinfo.pm:550
+#: plugins/artistinfo.pm:578
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1471,7 +1507,7 @@ msgstr " '{file}' 쓰기 에러!"
 msgid "Error writing replaygain tags :\n"
 msgstr "리플레이게인 태그 쓰기 에러 :\n"
 
-#: plugins/artistinfo.pm:541 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:569 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "에러: 잘못된 파일이름 패턴"
 
@@ -1632,11 +1668,11 @@ msgid "Find songs with the same names"
 msgstr "같은 이름을 가진 노래 찾기"
 
 #: gmusicbrowser.pl:844 gmusicbrowser.pl:7937 gmusicbrowser_list.pm:724
-#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:840
+#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:839
 msgid "Folder"
 msgstr "폴더"
 
-#: gmusicbrowser_list.pm:724 layouts:839
+#: gmusicbrowser_list.pm:724 layouts:838
 msgid "Folder (right-aligned)"
 msgstr "폴더 (오른쪽 정렬)"
 
@@ -1652,29 +1688,18 @@ msgstr "폴더 패턴 :"
 msgid "Folders to search for new songs"
 msgstr "새 노래 찾을 폴더"
 
-#: gmusicbrowser_layout.pm:3644 gmusicbrowser_list.pm:17
+#: gmusicbrowser_layout.pm:3647 gmusicbrowser_list.pm:17
 #: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6508
 msgid "Follow playing song"
 msgstr "재생중인 노래를 따르기"
 
-#: gmusicbrowser_layout.pm:3644
+#: gmusicbrowser_layout.pm:3647
 msgid "Follow selected song"
 msgstr "다음의 선택한 노래"
 
 #: plugins/lyrics.pm:152
 msgid "Font size"
 msgstr "글꼴 크기"
-
-#: plugins/artistinfo.pm:229
-msgid ""
-"For information on how to use this plugin, please navigate to the <a "
-"href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
-"artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/"
-"dokuwiki/'>gmusicbrowser-wiki</a>."
-msgstr ""
-"이 플러그인 사용하는 방법에 대한 정보는, <a href='http://gmusicbrowser.org/"
-"dokuwiki/doku.php?id=plugins:artistinfo'> 플러그인 위키 페이지</a> <a "
-"href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>."
 
 #: gmusicbrowser.pl:1025
 msgid "Forward"
@@ -1734,7 +1759,7 @@ msgstr "그놈 mmkeys"
 msgid "Gnome multimedia keys plugin"
 msgstr "그놈 멀티미디어 키 플러그인"
 
-#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6511 layouts:73 layouts:74
+#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6511 layouts:75 layouts:76
 msgid "Go to playing song"
 msgstr "재생중인 노래로 가기"
 
@@ -1782,6 +1807,18 @@ msgstr "재생 오류 무시하기"
 msgid "Import list"
 msgstr "목록 가져오기"
 
+#: plugins/lastfm2gmb.pm:106
+msgid "Import mode:"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:15
+msgid "Import playcount, lastplay and rating from last.fm."
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:10
+msgid "ImportLastFM"
+msgstr ""
+
 #: plugins/export.pm:93
 msgid ""
 "In this case one command by file will be run\n"
@@ -1794,19 +1831,19 @@ msgstr ""
 msgid "Increase Volume"
 msgstr "음량 증가"
 
-#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598
+#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598 layouts:167
 msgid "Info"
 msgstr "정보"
 
-#: layouts:934
+#: layouts:933
 msgid "Insensitive title-artist (left-aligned)"
 msgstr "둔감하게 제목-가수 (왼쪽 정렬)"
 
-#: layouts:940
+#: layouts:939
 msgid "Insensitive title-artist (right-aligned)"
 msgstr "둔감하게 제목-가수 (오른쪽 정렬)"
 
-#: layouts:947
+#: layouts:946
 msgid "Insensitive, Song & Cover"
 msgstr "둔감하게, 노래 & 커버"
 
@@ -1818,7 +1855,7 @@ msgstr "재생모록 시작할 때 파일/폴더의 목록 추가"
 msgid "Invalid regular expression"
 msgstr "잘못된 정규 표현"
 
-#: layouts:975
+#: layouts:974
 msgid "Invisible hot spot"
 msgstr "보이지않는 핫 스팟"
 
@@ -1830,7 +1867,7 @@ msgstr "일반적인 정렬"
 msgid "KB"
 msgstr "KB"
 
-#: plugins/karaoke.pm:9 layouts:906
+#: plugins/karaoke.pm:9 layouts:905
 msgid "Karaoke"
 msgstr "노래방"
 
@@ -1868,7 +1905,7 @@ msgstr "라벨/발행자"
 msgid "Labels"
 msgstr "라벨"
 
-#: gmusicbrowser_list.pm:744 layouts:800
+#: gmusicbrowser_list.pm:744 layouts:799
 msgid "Labels' icons"
 msgstr "라벨 아이콘"
 
@@ -1879,14 +1916,6 @@ msgstr "언어"
 #: gmusicbrowser_tags.pm:2027
 msgid "Lang."
 msgstr "언어."
-
-#: plugins/artistinfo.pm:213
-msgid "Language"
-msgstr ""
-
-#: plugins/artistinfo.pm:213
-msgid "Language for last.fm artist info. (e.g. en, de, sp, fr, ...)"
-msgstr ""
 
 #: gmusicbrowser_tags.pm:1537
 msgid "Languages"
@@ -1899,6 +1928,18 @@ msgstr "마지막 연주됨"
 #: gmusicbrowser_songs.pm:664
 msgid "Last skipped"
 msgstr "마지막 스킵됨"
+
+#: plugins/lastfm2gmb.pm:133
+msgid "Last.FM user necessary."
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:11
+msgid "LastFM import plugin"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:109
+msgid "LastFM user:"
+msgstr ""
 
 #: plugins/rip.pm:33
 msgid "Launch ripping program"
@@ -1928,6 +1969,10 @@ msgstr "왼쪽 패널"
 msgid "Length"
 msgstr "길이"
 
+#: plugins/lastfm2gmb.pm:126
+msgid "Let's start"
+msgstr ""
+
 #: gmusicbrowser.pl:5218 gmusicbrowser_list.pm:128 layouts:202 layouts:365
 #: layouts:569 layouts:631
 msgid "Library"
@@ -1952,11 +1997,11 @@ msgid "Library size : %d song"
 msgid_plural "Library size : %d songs"
 msgstr[0] "라이브러리 크기 : %d 노래"
 
-#: plugins/artistinfo.pm:221
+#: plugins/artistinfo.pm:228
 msgid "Limit similar artists to a rate of similarity : "
 msgstr ""
 
-#: plugins/artistinfo.pm:220
+#: plugins/artistinfo.pm:227
 msgid "Limit similar artists to the first : "
 msgstr ""
 
@@ -1988,7 +2033,7 @@ msgstr "목록, 라이브러리 & 항목"
 msgid "Literal search"
 msgstr "글자대로 찾기"
 
-#: plugins/artistinfo.pm:215
+#: plugins/artistinfo.pm:213
 msgid "Load/Save Artist Info in :"
 msgstr "가수 정보 로드/저장 :"
 
@@ -2001,12 +2046,12 @@ msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "이전 세션에서 보내지 않은 노래 %d 가져옴"
 
-#: plugins/artistinfo.pm:424 plugins/artistinfo.pm:517 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/artistinfo.pm:537 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "가져오기 실패함."
 
-#: plugins/artistinfo.pm:412 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:420 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "가져오는 중..."
 
@@ -2042,6 +2087,10 @@ msgstr "{field} 잠금"
 msgid "Locked on :\n"
 msgstr "잠금됨 :\n"
 
+#: plugins/lastfm2gmb.pm:146
+msgid "Looking up gmb library"
+msgstr ""
+
 #: gmusicbrowser.pl:443
 msgid "Lookup in AMG"
 msgstr "AMG에서 찾기"
@@ -2049,6 +2098,10 @@ msgstr "AMG에서 찾기"
 #: gmusicbrowser.pl:436
 msgid "Lookup in google"
 msgstr "google에서 찾기"
+
+#: plugins/lastfm2gmb.pm:107
+msgid "Loved tracks rating:"
+msgstr ""
 
 #: plugins/titlebar.pm:30
 msgid "Lower left"
@@ -2072,11 +2125,11 @@ msgstr "작사가"
 
 #: gmusicbrowser_tags.pm:1538 gmusicbrowser_tags.pm:1576
 #: gmusicbrowser_tags.pm:1597 gmusicbrowser_tags.pm:1612 plugins/lyrics.pm:9
-#: plugins/lyrics.pm:87 plugins/webcontext.pm:180
+#: plugins/lyrics.pm:87 plugins/webcontext.pm:180 layouts:166
 msgid "Lyrics"
 msgstr "가사"
 
-#: layouts:981
+#: layouts:980
 msgid "Lyrics (requires lyrics plugin)"
 msgstr "가사 (가사 플러그인이 필요함)"
 
@@ -2116,13 +2169,17 @@ msgstr "MPRIS v1 지원"
 msgid "Main"
 msgstr "메인"
 
-#: layouts:116
+#: layouts:133
 msgid "Main Tree"
 msgstr ""
 
 #: gmusicbrowser_songs.pm:482
 msgid "Main artist"
 msgstr "메인 가수"
+
+#: plugins/lastfm2gmb.pm:117
+msgid "Make it now"
+msgstr ""
 
 #: plugins/gnome_mmkeys.pm:11
 msgid ""
@@ -2175,6 +2232,10 @@ msgstr "분위기"
 msgid "More results"
 msgstr "결과"
 
+#: layouts:160
+msgid "Mosaic View"
+msgstr ""
+
 #: gmusicbrowser.pl:428
 msgid "Move"
 msgstr "이동"
@@ -2224,7 +2285,7 @@ msgstr "새 사용자 정의 필드"
 msgid "New filter"
 msgstr "새 필터"
 
-#: gmusicbrowser_layout.pm:2202
+#: gmusicbrowser_layout.pm:2205
 msgid "New list"
 msgstr "새 목록"
 
@@ -2277,7 +2338,7 @@ msgstr "잠금된 필터 없음"
 msgid "No moods"
 msgstr "분위기 사용안함"
 
-#: plugins/artistinfo.pm:466
+#: plugins/artistinfo.pm:486
 msgid "No results found"
 msgstr ""
 
@@ -2428,7 +2489,7 @@ msgstr "사용자 정의 창 열기"
 msgid "Open Equalizer"
 msgstr "이퀄라이저 열기"
 
-#: gmusicbrowser_layout.pm:2205
+#: gmusicbrowser_layout.pm:2208
 msgid "Open Playlist"
 msgstr "재생 목록 파일 열기"
 
@@ -2436,7 +2497,7 @@ msgstr "재생 목록 파일 열기"
 msgid "Open Preference window"
 msgstr "설정 창 열기"
 
-#: gmusicbrowser_layout.pm:2203
+#: gmusicbrowser_layout.pm:2206
 msgid "Open Queue"
 msgstr "대기열 열기"
 
@@ -2452,11 +2513,11 @@ msgstr "찾기 창 열기"
 msgid "Open containing folder"
 msgstr "이 노래가 있는 폴더 열기"
 
-#: gmusicbrowser_layout.pm:2211
+#: gmusicbrowser_layout.pm:2214
 msgid "Open context page"
 msgstr "항목 페이지 열기"
 
-#: gmusicbrowser_layout.pm:2207
+#: gmusicbrowser_layout.pm:2210
 msgid "Open existing list"
 msgstr "존재하는 목록 열기"
 
@@ -2464,7 +2525,7 @@ msgstr "존재하는 목록 열기"
 msgid "Open folder"
 msgstr "폴더 열기"
 
-#: plugins/artistinfo.pm:225
+#: plugins/artistinfo.pm:229
 msgid "Open last.fm website in your browser"
 msgstr "사용자의 브라우저에서 last.fm 웹사이트 열기"
 
@@ -2472,7 +2533,7 @@ msgstr "사용자의 브라우저에서 last.fm 웹사이트 열기"
 msgid "Open link in Browser"
 msgstr "브라우저로 링크 열기"
 
-#: gmusicbrowser_layout.pm:2209
+#: gmusicbrowser_layout.pm:2212
 msgid "Open page layout"
 msgstr "페이지 레이아웃 열기"
 
@@ -2527,6 +2588,14 @@ msgstr "오버레이 레이아웃 :"
 #: gmusicbrowser_tags.pm:2062 gmusicbrowser_tags.pm:2065
 msgid "Owner identifier"
 msgstr "소유자 인식자"
+
+#: plugins/lastfm2gmb.pm:111
+msgid ""
+"PRE ALPHA!!! Nothing works!!!\n"
+"The plugin is based on the Program <b>lastfm2gmb</b> by Sergiy Borodych and "
+"is hosted on <a href='https://github.com/bor/lastfm2gmb'>lastfm2gmb - "
+"GitHub</a>."
+msgstr ""
 
 #: gmusicbrowser.pl:861
 msgid "Path,Album,Disc,Track,File"
@@ -2610,7 +2679,7 @@ msgstr "이 앨범의 모든 노래 재생"
 msgid "Play all songs from this artist"
 msgstr "이 가수의 모든 노래 재생"
 
-#: layouts:914
+#: layouts:913
 msgid "Play button"
 msgstr "재생 버튼"
 
@@ -2670,7 +2739,7 @@ msgstr "필터 재생중"
 msgid "Playing Title"
 msgstr "제목 재생중"
 
-#: gmusicbrowser_list.pm:737 layouts:795
+#: gmusicbrowser_list.pm:737 layouts:794
 msgid "Playing and queue icons"
 msgstr "재생중 & 대기열 아이콘"
 
@@ -2678,7 +2747,7 @@ msgstr "재생중 & 대기열 아이콘"
 msgid "Playing error : {error}"
 msgstr "재생중 에러 : {error}"
 
-#: layouts:787
+#: layouts:786
 msgid "Playing/Queue Icon or Track"
 msgstr ""
 
@@ -2734,15 +2803,15 @@ msgstr "팝업 트레이팁"
 msgid "Pre-set"
 msgstr "프리셋"
 
-#: layouts:749
+#: layouts:748
 msgid "Prefix"
 msgstr ""
 
-#: layouts:751
+#: layouts:750
 msgid "Prefix font style"
 msgstr ""
 
-#: layouts:750
+#: layouts:749
 msgid "Prefix font weight"
 msgstr ""
 
@@ -2758,7 +2827,7 @@ msgstr "키 또는 키 조합을 누르시오"
 msgid "Previous"
 msgstr "이전"
 
-#: gmusicbrowser.pl:1023 layouts:55
+#: gmusicbrowser.pl:1023 layouts:56
 msgid "Previous Song"
 msgstr "이전 노래"
 
@@ -2782,7 +2851,7 @@ msgstr "개인 자료"
 msgid "Produced (P)"
 msgstr "제작됨 (P)"
 
-#: layouts:902
+#: layouts:901
 msgid "Progress"
 msgstr "진행률"
 
@@ -2812,6 +2881,10 @@ msgstr "발행자/스튜디오의 로고"
 msgid "Queue"
 msgstr "대기열"
 
+#: layouts:165
+msgid "Queue (%n)"
+msgstr ""
+
 #: gmusicbrowser_layout.pm:24
 msgid "Queue album"
 msgstr "대기열 앨범"
@@ -2832,7 +2905,7 @@ msgstr "대기열 모드"
 msgid "Queue, Library & Context"
 msgstr "대기열, 라이브러리 & 항목"
 
-#: layouts:781
+#: layouts:780
 msgid "Queue-Item Number"
 msgstr ""
 
@@ -2871,11 +2944,11 @@ msgstr "무작위 모드 편집"
 
 #: gmusicbrowser.pl:4621 gmusicbrowser.pl:4658 gmusicbrowser.pl:7822
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
-#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:830
+#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:829
 msgid "Rating"
 msgstr "점수"
 
-#: gmusicbrowser_list.pm:766 layouts:831
+#: gmusicbrowser_list.pm:766 layouts:830
 msgid "Rating (picture)"
 msgstr "점수 (사진)"
 
@@ -2927,7 +3000,7 @@ msgstr "레코딩 자료"
 msgid "Reference point :"
 msgstr "참조 포인트 :"
 
-#: plugins/artistinfo.pm:158 plugins/lyrics.pm:134
+#: plugins/artistinfo.pm:159 plugins/lyrics.pm:134
 msgid "Refresh"
 msgstr "다시 고치기"
 
@@ -3046,7 +3119,7 @@ msgstr "이 태그 제거하기"
 msgid "Remove this widget"
 msgstr "이 위젯 제거하기"
 
-#: gmusicbrowser_layout.pm:2216 gmusicbrowser_list.pm:2838
+#: gmusicbrowser_layout.pm:2219 gmusicbrowser_list.pm:2838
 msgid "Rename"
 msgstr "이름 바꾸기"
 
@@ -3124,6 +3197,14 @@ msgstr "오른쪽 정렬"
 msgid "Right side"
 msgstr "오른쪽"
 
+#: layouts:170
+msgid "Right-click to remove filters"
+msgstr ""
+
+#: layouts:170
+msgid "Right-click to toggle Shuffle"
+msgstr ""
+
 #: plugins/rip.pm:9
 msgid "Rip"
 msgstr "립"
@@ -3148,31 +3229,23 @@ msgstr "펄 코드 실행"
 msgid "Run system command"
 msgstr "시스템 명령어 실행"
 
-#: layouts:126
-msgid "Same Album"
-msgstr ""
-
-#: layouts:121
-msgid "Same Artist"
-msgstr ""
-
-#: gmusicbrowser.pl:434 layouts:129
+#: gmusicbrowser.pl:434 layouts:136
 msgid "Same Title"
 msgstr "같은 제목"
 
-#: layouts:998
+#: layouts:997
 msgid "Same artist"
 msgstr ""
 
-#: layouts:1008
+#: layouts:1007
 msgid "Same rating"
 msgstr ""
 
-#: layouts:988
+#: layouts:987
 msgid "Same title"
 msgstr ""
 
-#: layouts:1003
+#: layouts:1002
 msgid "Same year"
 msgstr ""
 
@@ -3192,7 +3265,7 @@ msgstr "저장"
 msgid "Save Tags/Options"
 msgstr "태그/옵션 저장"
 
-#: plugins/artistinfo.pm:159
+#: plugins/artistinfo.pm:160
 msgid "Save artist biography"
 msgstr "가수 일대기 저장"
 
@@ -3336,11 +3409,11 @@ msgstr "제목, 가수, 앨범, 설명, 라벨 그리고 장르 찾기"
 msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
 msgstr "제목, 가수, 앨범, 설명, 라벨, 장르 그리고 파일이름 찾기"
 
-#: plugins/artistinfo.pm:40
+#: plugins/artistinfo.pm:41
 msgid "Search allmusic for Artist"
 msgstr "allmusic에서 가수 찾기"
 
-#: plugins/artistinfo.pm:38
+#: plugins/artistinfo.pm:39
 msgid "Search amazon.com for Artist"
 msgstr "amazon.com에서 가수 찾기"
 
@@ -3348,11 +3421,11 @@ msgstr "amazon.com에서 가수 찾기"
 msgid "Search and display lyrics"
 msgstr "찾기 그리고 가사 표시"
 
-#: plugins/artistinfo.pm:42
+#: plugins/artistinfo.pm:43
 msgid "Search discogs for Artist"
 msgstr "discogs에서 가수 찾기"
 
-#: plugins/artistinfo.pm:37
+#: plugins/artistinfo.pm:38
 msgid "Search for Artist on youtube"
 msgstr "유투브에서 가수 찾기"
 
@@ -3360,7 +3433,7 @@ msgstr "유투브에서 가수 찾기"
 msgid "Search for a picture on internet"
 msgstr "인터넷에서 사진 찾기"
 
-#: plugins/artistinfo.pm:280
+#: plugins/artistinfo.pm:284
 msgid "Search for artist on:"
 msgstr ""
 
@@ -3376,11 +3449,11 @@ msgstr "현재 가수 찾기"
 msgid "Search for new songs on startup"
 msgstr "시작할 때 새 노래 찾기"
 
-#: plugins/artistinfo.pm:39
+#: plugins/artistinfo.pm:40
 msgid "Search google for Artist"
 msgstr "구글에서 가수 찾기"
 
-#: plugins/artistinfo.pm:46
+#: plugins/artistinfo.pm:47
 msgid "Search on the web"
 msgstr ""
 
@@ -3388,7 +3461,7 @@ msgstr ""
 msgid "Search options"
 msgstr "찾기 옵션"
 
-#: plugins/artistinfo.pm:41
+#: plugins/artistinfo.pm:42
 msgid "Search pitchfork for Artist"
 msgstr "pitchfork에서 가수 찾기"
 
@@ -3503,7 +3576,7 @@ msgstr ""
 msgid "Shift"
 msgstr "Shift"
 
-#: layouts:754
+#: layouts:753
 msgid "Shimmer Queue"
 msgstr ""
 
@@ -3511,23 +3584,23 @@ msgstr ""
 msgid "Show"
 msgstr "표시"
 
-#: plugins/artistinfo.pm:35
+#: plugins/artistinfo.pm:36
 msgid "Show Artist page on last.fm"
 msgstr "last.fm상의 가수 페이지 표시"
 
-#: plugins/artistinfo.pm:36
+#: plugins/artistinfo.pm:37
 msgid "Show Artist page on wikipedia"
 msgstr "위키페디아 가수 페이지 벅;"
 
-#: plugins/artistinfo.pm:30
+#: plugins/artistinfo.pm:31
 msgid "Show artist's biography"
 msgstr "가수 일대기 보기"
 
-#: plugins/artistinfo.pm:31
+#: plugins/artistinfo.pm:32
 msgid "Show artist's upcoming events"
 msgstr "가수의 다가올 이벤트 보기"
 
-#: layouts:714
+#: layouts:713
 msgid "Show artist, album, year"
 msgstr ""
 
@@ -3539,7 +3612,7 @@ msgstr "표시 버튼"
 msgid "Show replaygain submenu"
 msgstr "리플레이게인 서브메뉴 표시"
 
-#: plugins/artistinfo.pm:32
+#: plugins/artistinfo.pm:33
 msgid "Show similar artists"
 msgstr ""
 
@@ -3563,6 +3636,10 @@ msgstr "노래 바뀔 때 마다 트레이 팁 표시"
 msgid "Show/Hide"
 msgstr "표시/숨기기"
 
+#: layouts:170
+msgid "Show/Hide Cover"
+msgstr ""
+
 #: gmusicbrowser.pl:1080
 msgid "Show/Hide layout widget(s)"
 msgstr "표시/숨기기 레이아웃 위젯"
@@ -3571,7 +3648,7 @@ msgstr "표시/숨기기 레이아웃 위젯"
 msgid "Show/Hide lyrics line"
 msgstr "표시/숨기기 가사 줄"
 
-#: layouts:700
+#: layouts:699
 msgid "Show/Hide picture"
 msgstr ""
 
@@ -3608,11 +3685,15 @@ msgstr "끄기 명령어 :"
 msgid "Signal: "
 msgstr ""
 
-#: layouts:728
+#: layouts:160
+msgid "Simple List View"
+msgstr ""
+
+#: layouts:727
 msgid "Simple title"
 msgstr "간단한 제목"
 
-#: layouts:735
+#: layouts:734
 msgid "Simple title without any"
 msgstr ""
 
@@ -3632,7 +3713,7 @@ msgstr "스킵 수"
 msgid "Skip to next song if an error occurs"
 msgstr "오류가 발생하면 다음 노래로 스킵하기"
 
-#: layouts:823
+#: layouts:822
 msgid "Small album picture"
 msgstr "작은 앨범 사진"
 
@@ -3644,7 +3725,11 @@ msgstr "작은 재생기"
 msgid "Smaller browser"
 msgstr "작은 부라우저"
 
-#: gmusicbrowser_list.pm:731 layouts:436 layouts:539 layouts:545 layouts:807
+#: plugins/lastfm2gmb.pm:228
+msgid "Something wrong: status = "
+msgstr ""
+
+#: gmusicbrowser_list.pm:731 layouts:436 layouts:539 layouts:545 layouts:806
 msgid "Song"
 msgstr "노래"
 
@@ -3652,7 +3737,7 @@ msgstr "노래"
 msgid "Song Properties"
 msgstr "노래 속성"
 
-#: gmusicbrowser_layout.pm:3702
+#: gmusicbrowser_layout.pm:3705
 msgid "Song rating"
 msgstr "노래 점수"
 
@@ -3663,6 +3748,10 @@ msgstr "노래트리 그룹으로 나누기 편집"
 #: gmusicbrowser.pl:409
 msgid "Songs Properties"
 msgstr "노래 등록정보"
+
+#: layouts:160
+msgid "Songtree View"
+msgstr ""
 
 #: gmusicbrowser_layout.pm:481
 msgid "Sort"
@@ -3709,15 +3798,15 @@ msgstr "사진 고르기 중지"
 msgid "Stop when queue empty"
 msgstr "대기열 비었을 때 중지"
 
-#: layouts:919
+#: layouts:918
 msgid "Stop, Play and Next buttons"
 msgstr "멈춤, 재생 그리고 다음 버튼"
 
-#: layouts:924
+#: layouts:923
 msgid "Stop, Play and Next buttons and Time"
 msgstr "멈춤, 재생 그리고 다음 버튼 그리고 시간"
 
-#: layouts:929
+#: layouts:928
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr "멈춤, 재생 그리고 다음 버튼 그리고 제목/가수"
 
@@ -3773,6 +3862,10 @@ msgstr "태그"
 msgid "Tags"
 msgstr "태그"
 
+#: plugins/lastfm2gmb.pm:108
+msgid "Temp dir:"
+msgstr ""
+
 #: gmusicbrowser_tags.pm:2056
 msgid "Terms of use"
 msgstr "사용 항목"
@@ -3805,10 +3898,8 @@ msgstr "이 플로그인이 요구함 :"
 #: plugins/artistinfo.pm:14
 msgid ""
 "This plugin retrieves artist-relevant information (biography, upcoming "
-"events) from last.fm."
+"events, similar artists) from last.fm."
 msgstr ""
-"이 플러그인은 last.fm에서 가수-관련된 정보를 검색합니다 (일대기, 다가올 이벤"
-"트)."
 
 #: gmusicbrowser.pl:5712
 msgid "Threshold to count a song as played :"
@@ -3834,20 +3925,24 @@ msgstr "페이드-아웃의 타임스팬 "
 msgid "Title"
 msgstr "제목"
 
-#: layouts:814
+#: layouts:813
 msgid "Title & icon"
 msgstr "제목 & 아이콘"
 
-#: layouts:772
+#: layouts:771
 msgid "Title & progress"
 msgstr "제목 & 진행"
 
-#: gmusicbrowser_list.pm:731 layouts:806
+#: gmusicbrowser_list.pm:731 layouts:805
 msgid "Title - Artist - Album"
 msgstr "제목 - 가수 - 앨범"
 
-#: layouts:742
+#: layouts:741
 msgid "Title with customizable prefix"
+msgstr ""
+
+#: layouts:157
+msgid "Title: %t (Track No. %n)"
 msgstr ""
 
 #: plugins/titlebar.pm:9
@@ -3932,6 +4027,10 @@ msgstr "독특한 파일 인식자"
 msgid "Unknown field ({field})"
 msgstr "알려지지 않은 필드 ({field})"
 
+#: plugins/lastfm2gmb.pm:132
+msgid "Unknown mode: "
+msgstr ""
+
 #: gmusicbrowser.pl:461
 msgid "Unlock Album"
 msgstr "잠금이 해제된 앨범"
@@ -4004,7 +4103,7 @@ msgstr "gstreamer 사용하기"
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "id3v2 태그가 가능하면 latin1 엔코딩을 사용하기"
 
-#: plugins/artistinfo.pm:219
+#: plugins/artistinfo.pm:217
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
@@ -4042,6 +4141,10 @@ msgstr "가수 필드로 사용됨"
 msgid "Used to associate the saved value with a user or a function"
 msgstr "사용자 또는 기능 포함한 저장된 값을 연결해 사용됨"
 
+#: plugins/lastfm2gmb.pm:105
+msgid "User API Key:"
+msgstr ""
+
 #: plugins/audioscrobbler.pm:134
 msgid "User authentification error"
 msgstr "사용자 인증 오류"
@@ -4075,7 +4178,7 @@ msgstr "이진 보기"
 msgid "View binary data ..."
 msgstr "이진 자료 보기 ..."
 
-#: layouts:893
+#: layouts:892
 msgid "Volume"
 msgstr "음량"
 
@@ -4263,7 +4366,7 @@ msgstr "고급 옵션"
 msgid "after %d"
 msgstr "%d 이후"
 
-#: layouts:672
+#: layouts:671
 msgid "album and artist breadcrumbs"
 msgstr ""
 
@@ -4346,7 +4449,7 @@ msgstr "%n( 그리고 )%n 사이"
 msgid "big size"
 msgstr "큰 크기"
 
-#: plugins/artistinfo.pm:30
+#: plugins/artistinfo.pm:31 plugins/artistinfo.pm:233
 msgid "biography"
 msgstr "일대기"
 
@@ -4466,8 +4569,8 @@ msgstr "일"
 msgid "days"
 msgstr "일"
 
-#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3727
-#: gmusicbrowser_layout.pm:3749
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3730
+#: gmusicbrowser_layout.pm:3752
 msgid "default"
 msgstr "기본값"
 
@@ -4551,7 +4654,7 @@ msgstr "갭리스 사용하기 (실험중임)"
 msgid "error"
 msgstr "에러"
 
-#: plugins/artistinfo.pm:31
+#: plugins/artistinfo.pm:32 plugins/artistinfo.pm:235
 msgid "events"
 msgstr "이벤트"
 
@@ -4571,7 +4674,7 @@ msgstr "정확지 않게 %n( 번)"
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "예제 (selected song) : {score}  ({chances})"
 
-#: plugins/artistinfo.pm:243 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:247 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "example : "
 msgstr "예 :"
 
@@ -4583,7 +4686,7 @@ msgstr "예 :"
 msgid "examples :"
 msgstr "예 :"
 
-#: layouts:57
+#: layouts:58 layouts:95
 msgid "expand/collapse cover area"
 msgstr ""
 
@@ -4679,6 +4782,10 @@ msgstr "제목 무시하기"
 msgid "illustration"
 msgstr "일러스트"
 
+#: plugins/lastfm2gmb.pm:106
+msgid "import mode: a - all, p - playcount & lastplay, l - loved"
+msgstr ""
+
 #: gmusicbrowser.pl:4902
 msgid "imported list"
 msgstr "가져온 목록"
@@ -4695,7 +4802,7 @@ msgstr "정수"
 msgid "interview"
 msgstr "인터뷰"
 
-#: plugins/artistinfo.pm:243 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:247 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "invalid pattern"
 msgstr "잘못된 패턴"
 
@@ -4883,7 +4990,7 @@ msgstr "마지막 연주됨"
 msgid "last skipped"
 msgstr "마지막 스킴됨"
 
-#: plugins/artistinfo.pm:221
+#: plugins/artistinfo.pm:228
 msgid ""
 "last.fm's similarity categories:\n"
 ">90 super\n"
@@ -4899,6 +5006,18 @@ msgstr ""
 
 #: plugins/audioscrobbler.pm:11
 msgid "last.fm/libre.fm plugin"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:104
+msgid "lastFM API request URL"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:105
+msgid "lastfm api key"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:109
+msgid "lastfm username"
 msgstr ""
 
 #: gmusicbrowser_tags.pm:2025
@@ -5119,7 +5238,7 @@ msgstr "%d 상에"
 msgid "only show entries with at least n songs"
 msgstr "적어도 입력된 수의 노래를 가진 항목만 표시하기"
 
-#: plugins/artistinfo.pm:217
+#: plugins/artistinfo.pm:215
 msgid "only works when the artist-info tab is displayed"
 msgstr "일부 가수-정보 탭이 표시될 때에만 동작합니다."
 
@@ -5203,13 +5322,13 @@ msgstr "등급"
 msgid "rating average"
 msgstr "점수 평균"
 
+#: plugins/lastfm2gmb.pm:107
+msgid "rating for loved tracks (1..100)"
+msgstr ""
+
 #: gmusicbrowser_tags.pm:2025
 msgid "recording location"
 msgstr "녹음 장소"
-
-#: layouts:49 layouts:51
-msgid "reduced view"
-msgstr ""
 
 #: gmusicbrowser.pl:5662
 msgid "requires xdg-screensaver"
@@ -5219,6 +5338,10 @@ msgstr "xdg-screensaver가 필요함"
 msgid "reset filter {nb}"
 msgstr "{nb} 필터 재설정"
 
+#: plugins/artistinfo.pm:218
+msgid "reset format"
+msgstr ""
+
 #: gmusicbrowser_list.pm:1700
 msgid "reset primary filter"
 msgstr "기본 필터값 재설정"
@@ -5227,7 +5350,7 @@ msgstr "기본 필터값 재설정"
 msgid "reset secondary filter"
 msgstr "두번째 필터 재설정"
 
-#: plugins/artistinfo.pm:424 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "재시도"
 
@@ -5304,12 +5427,20 @@ msgstr "사진 표시"
 msgid "show the 'All' row"
 msgstr "모든 열 표시"
 
-#: layouts:56
+#: layouts:57
 msgid "show/hide album cover"
 msgstr ""
 
-#: plugins/artistinfo.pm:32
+#: layouts:59 layouts:97
+msgid "show/hide playlists"
+msgstr ""
+
+#: plugins/artistinfo.pm:33
 msgid "similar"
+msgstr ""
+
+#: plugins/artistinfo.pm:237
+msgid "similar artists"
 msgstr ""
 
 #: gmusicbrowser_list.pm:7348
@@ -5387,6 +5518,10 @@ msgstr "{action} 그런후"
 #: gmusicbrowser_songs.pm:3755 gmusicbrowser_songs.pm:3760
 msgid "times"
 msgstr "번"
+
+#: plugins/lastfm2gmb.pm:108
+msgid "tmp dir for cache store, etc"
+msgstr ""
 
 #: gmusicbrowser_list.pm:1704
 msgid "toggle Intersection mode"
@@ -5505,7 +5640,7 @@ msgstr "브라우저 (노래트리) 포함"
 msgid "with context"
 msgstr "항목 포함"
 
-#: layouts:684
+#: layouts:683
 msgid "with picture"
 msgstr "앨범 사진 포함"
 
@@ -5541,7 +5676,7 @@ msgstr ""
 msgid "x offset :"
 msgstr "x 오프셋 :"
 
-#: layouts:747
+#: layouts:746
 msgid "x padding"
 msgstr ""
 
@@ -5549,7 +5684,7 @@ msgstr ""
 msgid "y offset :"
 msgstr "y 오프셋 :"
 
-#: layouts:748
+#: layouts:747
 msgid "y padding"
 msgstr ""
 
@@ -5670,6 +5805,16 @@ msgstr "|-위젯 이름에서 목록 나누기"
 #~ "{folder} 만드는 중 에러:\n"
 #~ "{error}"
 
+#~ msgid ""
+#~ "For information on how to use this plugin, please navigate to the <a "
+#~ "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
+#~ "artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser."
+#~ "org/dokuwiki/'>gmusicbrowser-wiki</a>."
+#~ msgstr ""
+#~ "이 플러그인 사용하는 방법에 대한 정보는, <a href='http://gmusicbrowser."
+#~ "org/dokuwiki/doku.php?id=plugins:artistinfo'> 플러그인 위키 페이지</a> <a "
+#~ "href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>."
+
 #~ msgid "Labels' Icons"
 #~ msgstr "라벨 아이콘"
 
@@ -5717,6 +5862,13 @@ msgstr "|-위젯 이름에서 목록 나누기"
 
 #~ msgid "Text :"
 #~ msgstr "텍스트 :"
+
+#~ msgid ""
+#~ "This plugin retrieves artist-relevant information (biography, upcoming "
+#~ "events) from last.fm."
+#~ msgstr ""
+#~ "이 플러그인은 last.fm에서 가수-관련된 정보를 검색합니다 (일대기, 다가올 이"
+#~ "벤트)."
 
 #~ msgid "You can use some markup, eg : <b>bold</b>"
 #~ msgstr "사용자가 일부 마크-표시를 사용할 수 있다, 예 : <b>bold</b>"

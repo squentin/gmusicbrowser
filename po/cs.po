@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-25 10:48+0100\n"
+"POT-Creation-Date: 2011-01-30 20:18+0100\n"
 "PO-Revision-Date: 2011-01-20 21:07+0100\n"
 "Last-Translator: Vašek Kovářík <L3D9Z6@seznam.cz>\n"
 "Language-Team: čeština <L3D9Z6@seznam.cz>\n"
@@ -16,22 +16,41 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "\n"
 
-#: plugins/artistinfo.pm:451
+#: plugins/artistinfo.pm:474
+msgid ""
+"\n"
+"\n"
+"Edit in the last.fm wiki"
+msgstr ""
+
+#: plugins/artistinfo.pm:466
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:383
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:383
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Total playcount: "
+msgstr ""
+
+#: plugins/artistinfo.pm:485
+msgid ""
+" Upcoming Event\n"
+"\n"
+msgstr ""
+
+#: plugins/artistinfo.pm:487
+msgid ""
+" Upcoming Events\n"
+"\n"
 msgstr ""
 
 #: gmusicbrowser_layout.pm:288 gmusicbrowser_layout.pm:289
@@ -208,7 +227,7 @@ msgstr "%n dlouho nepřeskakovaných"
 msgid "%n shortest"
 msgstr "%n nejkratších"
 
-#: layouts:4
+#: layouts:8
 msgid "%t - gmusicbrowser"
 msgstr ""
 
@@ -231,7 +250,7 @@ msgstr "(: )jakýkoliv"
 msgid "(: )none"
 msgstr "(: )žádný"
 
-#: plugins/artistinfo.pm:218 plugins/audioscrobbler.pm:65
+#: plugins/artistinfo.pm:216 plugins/audioscrobbler.pm:65
 msgid "(applied after restart)"
 msgstr "(vyžaduje restart)"
 
@@ -274,8 +293,8 @@ msgstr ""
 msgid "0 chance"
 msgstr "0 možností"
 
-#: plugins/artistinfo.pm:220
-msgid "0 means no limit"
+#: plugins/artistinfo.pm:227
+msgid "0 means 'show all'"
 msgstr ""
 
 #: gmusicbrowser.pl:7727
@@ -321,7 +340,11 @@ msgstr ""
 msgid "<i>by</i> %a\\n<i>from</i> %l"
 msgstr "<i>od</i> %a\\n<i>z</i> %l"
 
-#: gmusicbrowser_layout.pm:3786
+#: plugins/lastfm2gmb.pm:104
+msgid "API URI:"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:3789
 msgid "Abort"
 msgstr "Zrušit"
 
@@ -448,10 +471,6 @@ msgstr "Přidáno dnes"
 msgid "Adding a radio"
 msgstr "Přidávání rádia"
 
-#: plugins/artistinfo.pm:214
-msgid "Additional domain for Last.fm, Amazon and so on."
-msgstr ""
-
 #: gmusicbrowser.pl:5692
 msgid ""
 "Additionally this format can be used :\n"
@@ -494,19 +513,15 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:436 layouts:539 layouts:545 layouts:993
+#: plugins/fetch_cover.pm:103 layouts:436 layouts:539 layouts:545 layouts:992
 msgid "Album"
 msgstr "Album"
 
-#: layouts:135
-msgid "Album Info"
-msgstr ""
-
-#: layouts:848
+#: layouts:847
 msgid "Album and artist"
 msgstr "Album a interpret"
 
-#: layouts:763
+#: layouts:762
 msgid "Album and artist on the left side"
 msgstr "Album a interpret na levé straně"
 
@@ -546,6 +561,10 @@ msgstr "Album s obrázkem"
 #: gmusicbrowser_songs.pm:787
 msgid "Album year(s)"
 msgstr "Rok alba"
+
+#: layouts:157
+msgid "Album: %l (%Y)"
+msgstr ""
 
 #: gmusicbrowser_songs.pm:1727 gmusicbrowser_songs.pm:3670
 msgid "All"
@@ -646,23 +665,27 @@ msgstr "Argumenty"
 msgid "Arkanoid"
 msgstr ""
 
-#: layouts:81
+#: layouts:99
 msgid "Arkanoid Fullscreen"
 msgstr ""
 
-#: layouts:93
+#: layouts:112
 msgid "Arkanoid Fullscreen with queue"
 msgstr ""
 
-#: layouts:106
+#: layouts:83
+msgid "Arkanoid alternative"
+msgstr ""
+
+#: layouts:117
 msgid "Arkanoid browser"
 msgstr ""
 
 #: gmusicbrowser.pl:7788 gmusicbrowser_songs.pm:469 gmusicbrowser_tags.pm:1529
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
-#: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:129
-#: plugins/fetch_cover.pm:102 layouts:436 layouts:539 layouts:545
+#: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:130
+#: plugins/fetch_cover.pm:102 layouts:168 layouts:436 layouts:539 layouts:545
 msgid "Artist"
 msgstr "Interpret"
 
@@ -670,11 +693,11 @@ msgstr "Interpret"
 msgid "Artist & album"
 msgstr "Interpret & album"
 
-#: layouts:133
-msgid "Artist Info"
+#: plugins/artistinfo.pm:452
+msgid "Artist Biography"
 msgstr ""
 
-#: plugins/artistinfo.pm:218
+#: plugins/artistinfo.pm:216
 msgid "Artist Picture Size : "
 msgstr "Velikost obrázku interpreta :"
 
@@ -694,7 +717,11 @@ msgstr "Interpret,album,disk,stopa"
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "Interpret,rok,album,disk,stopa"
 
-#: plugins/artistinfo.pm:9 plugins/artistinfo.pm:68
+#: layouts:157
+msgid "Artist: %a"
+msgstr ""
+
+#: plugins/artistinfo.pm:9 plugins/artistinfo.pm:69
 msgid "Artistinfo"
 msgstr "Informace o interpretovi"
 
@@ -742,7 +769,7 @@ msgstr "Automatický filter"
 msgid "Auto-increment track numbers"
 msgstr "Automatický nárůst čísla stopy"
 
-#: plugins/artistinfo.pm:217 plugins/lyrics.pm:187
+#: plugins/artistinfo.pm:215 plugins/lyrics.pm:187
 msgid "Auto-save positive finds"
 msgstr "Automatické ukládání výsledků hledání"
 
@@ -774,7 +801,7 @@ msgstr "Zásuvný modul automatického ukládání"
 msgid "Available"
 msgstr "Dostupné"
 
-#: plugins/artistinfo.pm:383
+#: plugins/artistinfo.pm:392
 msgid "Average rating: "
 msgstr ""
 
@@ -826,11 +853,11 @@ msgstr "Styl prohlížeče"
 msgid "Browser with SongTree"
 msgstr "Prohlížeč se stromem skladeb"
 
-#: layouts:969
+#: layouts:968
 msgid "Buttons"
 msgstr "Tlačítka"
 
-#: layouts:958
+#: layouts:957
 msgid "Buttons, Song & Cover"
 msgstr "Tlačítka, skladba & přebal"
 
@@ -861,6 +888,15 @@ msgstr ""
 #: gmusicbrowser_gstreamer-0.10.pm:231
 msgid "Can't create sink '{sink}'"
 msgstr "Nelze vytvořit sink '{sink}'"
+
+#: plugins/lastfm2gmb.pm:128
+msgid "Can't create tmp dir"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:191 plugins/lastfm2gmb.pm:227
+#: plugins/lastfm2gmb.pm:236 plugins/lastfm2gmb.pm:316
+msgid "Can't get data from lastfm"
+msgstr ""
 
 #: gmusicbrowser_123.pm:138
 msgid "Can't play '{file}'."
@@ -986,7 +1022,7 @@ msgstr "Vybrat typ písma..."
 msgid "Choose icon for label {name}"
 msgstr "Vybrat ikonu pro štítek {name}"
 
-#: gmusicbrowser_layout.pm:2474
+#: gmusicbrowser_layout.pm:2477
 msgid "Choose page to open"
 msgstr "Vybrat stránku k otevření"
 
@@ -1014,7 +1050,7 @@ msgstr "Smazat vybraná pole"
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "Zakázaný klient, kontaktujte vývojáře gmusicbrowser"
 
-#: gmusicbrowser_layout.pm:2217 gmusicbrowser_list.pm:3832
+#: gmusicbrowser_layout.pm:2220 gmusicbrowser_list.pm:3832
 #: gmusicbrowser_list.pm:3899
 msgid "Close"
 msgstr "Zavřít"
@@ -1210,7 +1246,7 @@ msgstr ""
 msgid "Delete Selected Songs"
 msgstr "Odstranit vybrané skladby"
 
-#: gmusicbrowser_layout.pm:2215
+#: gmusicbrowser_layout.pm:2218
 msgid "Delete list"
 msgstr "Odstranit seznam"
 
@@ -1306,10 +1342,6 @@ msgstr "Nechat synchronizované ID3v2 popisky"
 msgid "Do not write the tags"
 msgstr "Nezapisovat popisky"
 
-#: plugins/artistinfo.pm:214
-msgid "Domain"
-msgstr ""
-
 #: plugins/titlebar.pm:54
 msgid "Don't add the overlay to dialogs"
 msgstr "Nepřidávat překrytí do dialogů"
@@ -1365,6 +1397,10 @@ msgstr "Upravit filter"
 #: gmusicbrowser_list.pm:6496
 msgid "Edit grouping ..."
 msgstr "Upravit seskupení ..."
+
+#: plugins/artistinfo.pm:557
+msgid "Edit in the last.fm wiki"
+msgstr ""
 
 #: gmusicbrowser_list.pm:2834
 msgid "Edit list"
@@ -1463,7 +1499,7 @@ msgstr "Přidat do fronty seznam souborů/složek"
 msgid "Enqueue filter"
 msgstr "Přidat do fronty filtr"
 
-#: plugins/artistinfo.pm:219
+#: plugins/artistinfo.pm:217
 msgid "Enter custom event string :"
 msgstr "Vložit uživatelský řetězec události :"
 
@@ -1475,7 +1511,7 @@ msgstr ""
 msgid "EpicRating plugin - automatically update ratings"
 msgstr ""
 
-#: layouts:897
+#: layouts:896
 msgid "Equalizer"
 msgstr "Ekvalizér"
 
@@ -1483,7 +1519,7 @@ msgstr "Ekvalizér"
 msgid "Error :"
 msgstr "Chyba :"
 
-#: plugins/artistinfo.pm:550
+#: plugins/artistinfo.pm:578
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1507,7 +1543,7 @@ msgstr "Chyba zápisu do '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Chyba zápisu popisků replaygain :\n"
 
-#: plugins/artistinfo.pm:541 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:569 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Chyba: špatný tvar názvu souboru"
 
@@ -1668,11 +1704,11 @@ msgid "Find songs with the same names"
 msgstr "Najít skladby stejných názvů"
 
 #: gmusicbrowser.pl:844 gmusicbrowser.pl:7937 gmusicbrowser_list.pm:724
-#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:840
+#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:839
 msgid "Folder"
 msgstr "Složka"
 
-#: gmusicbrowser_list.pm:724 layouts:839
+#: gmusicbrowser_list.pm:724 layouts:838
 msgid "Folder (right-aligned)"
 msgstr "Složka (zarovnáno vpravo)"
 
@@ -1688,30 +1724,18 @@ msgstr "Vzor složky :"
 msgid "Folders to search for new songs"
 msgstr "Nové skladby hledat ve složkách"
 
-#: gmusicbrowser_layout.pm:3644 gmusicbrowser_list.pm:17
+#: gmusicbrowser_layout.pm:3647 gmusicbrowser_list.pm:17
 #: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6508
 msgid "Follow playing song"
 msgstr "Následovat přehrávanou skladbu"
 
-#: gmusicbrowser_layout.pm:3644
+#: gmusicbrowser_layout.pm:3647
 msgid "Follow selected song"
 msgstr "Následovat vybranou skladbu"
 
 #: plugins/lyrics.pm:152
 msgid "Font size"
 msgstr "Velikost písma"
-
-#: plugins/artistinfo.pm:229
-msgid ""
-"For information on how to use this plugin, please navigate to the <a "
-"href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
-"artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/"
-"dokuwiki/'>gmusicbrowser-wiki</a>."
-msgstr ""
-"Pro návod k použití tohoto zásuvného modulu přejít <a href='http://"
-"gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>wiki stránku "
-"zásuvných modulů</a> v <a href='http://gmusicbrowser.org/"
-"dokuwiki/'>gmusicbrowser-wiki</a>."
 
 #: gmusicbrowser.pl:1025
 msgid "Forward"
@@ -1771,7 +1795,7 @@ msgstr "Multimediální klávesy Gnome"
 msgid "Gnome multimedia keys plugin"
 msgstr "Zásuvný modul multimediálních kláves Gnome"
 
-#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6511 layouts:73 layouts:74
+#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6511 layouts:75 layouts:76
 msgid "Go to playing song"
 msgstr "Přejít na přehrávanou skladbu"
 
@@ -1819,6 +1843,18 @@ msgstr "Ignorovat chyby přehrávání"
 msgid "Import list"
 msgstr "Seznam importů"
 
+#: plugins/lastfm2gmb.pm:106
+msgid "Import mode:"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:15
+msgid "Import playcount, lastplay and rating from last.fm."
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:10
+msgid "ImportLastFM"
+msgstr ""
+
 #: plugins/export.pm:93
 msgid ""
 "In this case one command by file will be run\n"
@@ -1831,19 +1867,19 @@ msgstr ""
 msgid "Increase Volume"
 msgstr "Zvýšit hlasitost"
 
-#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598
+#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598 layouts:167
 msgid "Info"
 msgstr "Info"
 
-#: layouts:934
+#: layouts:933
 msgid "Insensitive title-artist (left-aligned)"
 msgstr "Nedostupné titul-interpret (zarovnáno vlevo)"
 
-#: layouts:940
+#: layouts:939
 msgid "Insensitive title-artist (right-aligned)"
 msgstr "Nedostupné titul-interpret (zarovnáno vpravo)"
 
-#: layouts:947
+#: layouts:946
 msgid "Insensitive, Song & Cover"
 msgstr "Nedostupné, skladba & přebal"
 
@@ -1855,7 +1891,7 @@ msgstr "Vložit seznam souborů/složek na začátek playlistu"
 msgid "Invalid regular expression"
 msgstr "Chybný výraz"
 
-#: layouts:975
+#: layouts:974
 msgid "Invisible hot spot"
 msgstr "Neviditelný hot spot"
 
@@ -1867,7 +1903,7 @@ msgstr "Do bloku"
 msgid "KB"
 msgstr "KB"
 
-#: plugins/karaoke.pm:9 layouts:906
+#: plugins/karaoke.pm:9 layouts:905
 msgid "Karaoke"
 msgstr "Karaoke"
 
@@ -1905,7 +1941,7 @@ msgstr "Značka/vydavatel"
 msgid "Labels"
 msgstr "Štítky"
 
-#: gmusicbrowser_list.pm:744 layouts:800
+#: gmusicbrowser_list.pm:744 layouts:799
 msgid "Labels' icons"
 msgstr "Ikony štítků"
 
@@ -1916,14 +1952,6 @@ msgstr "Jazyk"
 #: gmusicbrowser_tags.pm:2027
 msgid "Lang."
 msgstr "Jazyk"
-
-#: plugins/artistinfo.pm:213
-msgid "Language"
-msgstr ""
-
-#: plugins/artistinfo.pm:213
-msgid "Language for last.fm artist info. (e.g. en, de, sp, fr, ...)"
-msgstr ""
 
 #: gmusicbrowser_tags.pm:1537
 msgid "Languages"
@@ -1936,6 +1964,18 @@ msgstr "Naposled přehrávané"
 #: gmusicbrowser_songs.pm:664
 msgid "Last skipped"
 msgstr "Naposled přeskočené"
+
+#: plugins/lastfm2gmb.pm:133
+msgid "Last.FM user necessary."
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:11
+msgid "LastFM import plugin"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:109
+msgid "LastFM user:"
+msgstr ""
 
 #: plugins/rip.pm:33
 msgid "Launch ripping program"
@@ -1965,6 +2005,10 @@ msgstr "Levý panel"
 msgid "Length"
 msgstr "Délka"
 
+#: plugins/lastfm2gmb.pm:126
+msgid "Let's start"
+msgstr ""
+
 #: gmusicbrowser.pl:5218 gmusicbrowser_list.pm:128 layouts:202 layouts:365
 #: layouts:569 layouts:631
 msgid "Library"
@@ -1991,11 +2035,11 @@ msgstr[0] "Velikost knihovny : %d skladba"
 msgstr[1] "Velikost knihovny : %d skladby"
 msgstr[2] "Velikost knihovny : %d skladeb"
 
-#: plugins/artistinfo.pm:221
+#: plugins/artistinfo.pm:228
 msgid "Limit similar artists to a rate of similarity : "
 msgstr ""
 
-#: plugins/artistinfo.pm:220
+#: plugins/artistinfo.pm:227
 msgid "Limit similar artists to the first : "
 msgstr ""
 
@@ -2027,7 +2071,7 @@ msgstr "Seznamy, knihovna & kontext"
 msgid "Literal search"
 msgstr "Písmenné vyhledávání"
 
-#: plugins/artistinfo.pm:215
+#: plugins/artistinfo.pm:213
 msgid "Load/Save Artist Info in :"
 msgstr "Načíst/uložit biografii interpreta do:"
 
@@ -2042,12 +2086,12 @@ msgstr[0] "Načtena %d neodeslaná skladba z předchozího sezení"
 msgstr[1] "Načteny %d neodeslané skladby z předchozího sezení"
 msgstr[2] "Načteno %d neodeslaných skladeb z předchozího sezení"
 
-#: plugins/artistinfo.pm:424 plugins/artistinfo.pm:517 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/artistinfo.pm:537 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Načítání selhalo."
 
-#: plugins/artistinfo.pm:412 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:420 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Načítání..."
 
@@ -2083,6 +2127,10 @@ msgstr "Zamknuto {field}"
 msgid "Locked on :\n"
 msgstr "Zamknuto :\n"
 
+#: plugins/lastfm2gmb.pm:146
+msgid "Looking up gmb library"
+msgstr ""
+
 #: gmusicbrowser.pl:443
 msgid "Lookup in AMG"
 msgstr "Vyhledat na AMG"
@@ -2090,6 +2138,10 @@ msgstr "Vyhledat na AMG"
 #: gmusicbrowser.pl:436
 msgid "Lookup in google"
 msgstr "Vyhledat googlem"
+
+#: plugins/lastfm2gmb.pm:107
+msgid "Loved tracks rating:"
+msgstr ""
 
 #: plugins/titlebar.pm:30
 msgid "Lower left"
@@ -2113,11 +2165,11 @@ msgstr "Textař"
 
 #: gmusicbrowser_tags.pm:1538 gmusicbrowser_tags.pm:1576
 #: gmusicbrowser_tags.pm:1597 gmusicbrowser_tags.pm:1612 plugins/lyrics.pm:9
-#: plugins/lyrics.pm:87 plugins/webcontext.pm:180
+#: plugins/lyrics.pm:87 plugins/webcontext.pm:180 layouts:166
 msgid "Lyrics"
 msgstr "Texty"
 
-#: layouts:981
+#: layouts:980
 msgid "Lyrics (requires lyrics plugin)"
 msgstr "Texty (vyžaduje zásuvný modul texty)"
 
@@ -2157,13 +2209,17 @@ msgstr "Podpora MPRIS v1"
 msgid "Main"
 msgstr "Hlavní"
 
-#: layouts:116
+#: layouts:133
 msgid "Main Tree"
 msgstr ""
 
 #: gmusicbrowser_songs.pm:482
 msgid "Main artist"
 msgstr "Hlavní interpret"
+
+#: plugins/lastfm2gmb.pm:117
+msgid "Make it now"
+msgstr ""
 
 #: plugins/gnome_mmkeys.pm:11
 msgid ""
@@ -2217,6 +2273,10 @@ msgstr "Nálady"
 msgid "More results"
 msgstr "Více výsledků"
 
+#: layouts:160
+msgid "Mosaic View"
+msgstr ""
+
 #: gmusicbrowser.pl:428
 msgid "Move"
 msgstr "Přesunout"
@@ -2268,7 +2328,7 @@ msgstr "Nové uživatelské pole"
 msgid "New filter"
 msgstr "Nový filtr"
 
-#: gmusicbrowser_layout.pm:2202
+#: gmusicbrowser_layout.pm:2205
 msgid "New list"
 msgstr "Nový seznam"
 
@@ -2321,7 +2381,7 @@ msgstr "Žádný zamčený filtr"
 msgid "No moods"
 msgstr "Žádné nálady"
 
-#: plugins/artistinfo.pm:466
+#: plugins/artistinfo.pm:486
 msgid "No results found"
 msgstr ""
 
@@ -2472,7 +2532,7 @@ msgstr "Otevřít uživatelské okno"
 msgid "Open Equalizer"
 msgstr "Otevřít ekvalizér"
 
-#: gmusicbrowser_layout.pm:2205
+#: gmusicbrowser_layout.pm:2208
 msgid "Open Playlist"
 msgstr "Otevřít playlist"
 
@@ -2480,7 +2540,7 @@ msgstr "Otevřít playlist"
 msgid "Open Preference window"
 msgstr "Otevřít okno vlastností"
 
-#: gmusicbrowser_layout.pm:2203
+#: gmusicbrowser_layout.pm:2206
 msgid "Open Queue"
 msgstr "Otevřít frontu"
 
@@ -2496,11 +2556,11 @@ msgstr "Otevřít okno vyhledávání"
 msgid "Open containing folder"
 msgstr "Otevřít obsahující složku"
 
-#: gmusicbrowser_layout.pm:2211
+#: gmusicbrowser_layout.pm:2214
 msgid "Open context page"
 msgstr "Otevřít kontextovou stránku"
 
-#: gmusicbrowser_layout.pm:2207
+#: gmusicbrowser_layout.pm:2210
 msgid "Open existing list"
 msgstr "Otevřít existující seznam"
 
@@ -2508,7 +2568,7 @@ msgstr "Otevřít existující seznam"
 msgid "Open folder"
 msgstr "Otevřít složku"
 
-#: plugins/artistinfo.pm:225
+#: plugins/artistinfo.pm:229
 msgid "Open last.fm website in your browser"
 msgstr "Otevřít stránku last.fm v prohlížeči"
 
@@ -2516,7 +2576,7 @@ msgstr "Otevřít stránku last.fm v prohlížeči"
 msgid "Open link in Browser"
 msgstr "Otevřít odkaz v prohlížeči"
 
-#: gmusicbrowser_layout.pm:2209
+#: gmusicbrowser_layout.pm:2212
 msgid "Open page layout"
 msgstr "Otevřít rozložení stránky"
 
@@ -2571,6 +2631,14 @@ msgstr "Rozložení překrytí :"
 #: gmusicbrowser_tags.pm:2062 gmusicbrowser_tags.pm:2065
 msgid "Owner identifier"
 msgstr "Identifikátor vlastníka"
+
+#: plugins/lastfm2gmb.pm:111
+msgid ""
+"PRE ALPHA!!! Nothing works!!!\n"
+"The plugin is based on the Program <b>lastfm2gmb</b> by Sergiy Borodych and "
+"is hosted on <a href='https://github.com/bor/lastfm2gmb'>lastfm2gmb - "
+"GitHub</a>."
+msgstr ""
 
 #: gmusicbrowser.pl:861
 msgid "Path,Album,Disc,Track,File"
@@ -2654,7 +2722,7 @@ msgstr "Přehrát všechny skladby tohoto alba"
 msgid "Play all songs from this artist"
 msgstr "Přehrát všechny skladby tohoto interpreta"
 
-#: layouts:914
+#: layouts:913
 msgid "Play button"
 msgstr "Tlačítko přehrát"
 
@@ -2714,7 +2782,7 @@ msgstr "Přehrávání filtru"
 msgid "Playing Title"
 msgstr "Přehrávání titulu"
 
-#: gmusicbrowser_list.pm:737 layouts:795
+#: gmusicbrowser_list.pm:737 layouts:794
 msgid "Playing and queue icons"
 msgstr "Ikony přehrávání a fronty"
 
@@ -2722,7 +2790,7 @@ msgstr "Ikony přehrávání a fronty"
 msgid "Playing error : {error}"
 msgstr "Chyba přehrávání : {error}"
 
-#: layouts:787
+#: layouts:786
 msgid "Playing/Queue Icon or Track"
 msgstr ""
 
@@ -2778,15 +2846,15 @@ msgstr "Vyskakovací okno oznamovací oblasti"
 msgid "Pre-set"
 msgstr "Předvolit"
 
-#: layouts:749
+#: layouts:748
 msgid "Prefix"
 msgstr ""
 
-#: layouts:751
+#: layouts:750
 msgid "Prefix font style"
 msgstr ""
 
-#: layouts:750
+#: layouts:749
 msgid "Prefix font weight"
 msgstr ""
 
@@ -2802,7 +2870,7 @@ msgstr "Stisknout klávesu nebo kombinaci kláves"
 msgid "Previous"
 msgstr "Předchozí"
 
-#: gmusicbrowser.pl:1023 layouts:55
+#: gmusicbrowser.pl:1023 layouts:56
 msgid "Previous Song"
 msgstr "Předchozí skladba"
 
@@ -2826,7 +2894,7 @@ msgstr "Důvěrné údaje"
 msgid "Produced (P)"
 msgstr "Produkce (P)"
 
-#: layouts:902
+#: layouts:901
 msgid "Progress"
 msgstr "Vývoj"
 
@@ -2856,6 +2924,10 @@ msgstr "Vydavatel/logotyp studia"
 msgid "Queue"
 msgstr "Fronta"
 
+#: layouts:165
+msgid "Queue (%n)"
+msgstr ""
+
 #: gmusicbrowser_layout.pm:24
 msgid "Queue album"
 msgstr "Fronta alb"
@@ -2876,7 +2948,7 @@ msgstr "Režim fronty"
 msgid "Queue, Library & Context"
 msgstr "Fronta, knihovna & kontext"
 
-#: layouts:781
+#: layouts:780
 msgid "Queue-Item Number"
 msgstr ""
 
@@ -2915,11 +2987,11 @@ msgstr "Editace náhodného režimu"
 
 #: gmusicbrowser.pl:4621 gmusicbrowser.pl:4658 gmusicbrowser.pl:7822
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
-#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:830
+#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:829
 msgid "Rating"
 msgstr "Hodnocení"
 
-#: gmusicbrowser_list.pm:766 layouts:831
+#: gmusicbrowser_list.pm:766 layouts:830
 msgid "Rating (picture)"
 msgstr "Hodnocení (obrázek)"
 
@@ -2971,7 +3043,7 @@ msgstr "Data nahrávky"
 msgid "Reference point :"
 msgstr "Místo odkazu :"
 
-#: plugins/artistinfo.pm:158 plugins/lyrics.pm:134
+#: plugins/artistinfo.pm:159 plugins/lyrics.pm:134
 msgid "Refresh"
 msgstr "Obnovit"
 
@@ -3090,7 +3162,7 @@ msgstr "Odstranit tento popisek"
 msgid "Remove this widget"
 msgstr "Odstranit tuto pomůcku"
 
-#: gmusicbrowser_layout.pm:2216 gmusicbrowser_list.pm:2838
+#: gmusicbrowser_layout.pm:2219 gmusicbrowser_list.pm:2838
 msgid "Rename"
 msgstr "Přejmenovat"
 
@@ -3168,6 +3240,14 @@ msgstr "Zarovnat vpravo"
 msgid "Right side"
 msgstr "Vpravo"
 
+#: layouts:170
+msgid "Right-click to remove filters"
+msgstr ""
+
+#: layouts:170
+msgid "Right-click to toggle Shuffle"
+msgstr ""
+
 #: plugins/rip.pm:9
 msgid "Rip"
 msgstr "Rip"
@@ -3192,31 +3272,23 @@ msgstr "Spustit kód perl"
 msgid "Run system command"
 msgstr "Spustit systémový příkaz"
 
-#: layouts:126
-msgid "Same Album"
-msgstr ""
-
-#: layouts:121
-msgid "Same Artist"
-msgstr ""
-
-#: gmusicbrowser.pl:434 layouts:129
+#: gmusicbrowser.pl:434 layouts:136
 msgid "Same Title"
 msgstr "Stejný titul"
 
-#: layouts:998
+#: layouts:997
 msgid "Same artist"
 msgstr ""
 
-#: layouts:1008
+#: layouts:1007
 msgid "Same rating"
 msgstr ""
 
-#: layouts:988
+#: layouts:987
 msgid "Same title"
 msgstr ""
 
-#: layouts:1003
+#: layouts:1002
 msgid "Same year"
 msgstr ""
 
@@ -3236,7 +3308,7 @@ msgstr "Uložit"
 msgid "Save Tags/Options"
 msgstr "Uložit popisky/nastavení"
 
-#: plugins/artistinfo.pm:159
+#: plugins/artistinfo.pm:160
 msgid "Save artist biography"
 msgstr "Uložit biografii interpreta"
 
@@ -3381,11 +3453,11 @@ msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
 msgstr ""
 "Vyhledat titul, interpreta, album, komentář, štítek, žánr a název souboru"
 
-#: plugins/artistinfo.pm:40
+#: plugins/artistinfo.pm:41
 msgid "Search allmusic for Artist"
 msgstr "Vyhledat interpreta na stránkách allmusic"
 
-#: plugins/artistinfo.pm:38
+#: plugins/artistinfo.pm:39
 msgid "Search amazon.com for Artist"
 msgstr "Vyhledat interpreta na stránkách amazon.com"
 
@@ -3393,11 +3465,11 @@ msgstr "Vyhledat interpreta na stránkách amazon.com"
 msgid "Search and display lyrics"
 msgstr "Vyhledat a zobrazit texty"
 
-#: plugins/artistinfo.pm:42
+#: plugins/artistinfo.pm:43
 msgid "Search discogs for Artist"
 msgstr "Vyhledat interpreta na stránkách discogs"
 
-#: plugins/artistinfo.pm:37
+#: plugins/artistinfo.pm:38
 msgid "Search for Artist on youtube"
 msgstr "Vyhledat interpreta na stránkách youtube"
 
@@ -3405,7 +3477,7 @@ msgstr "Vyhledat interpreta na stránkách youtube"
 msgid "Search for a picture on internet"
 msgstr "Vyhledat obrázek na internetu"
 
-#: plugins/artistinfo.pm:280
+#: plugins/artistinfo.pm:284
 msgid "Search for artist on:"
 msgstr ""
 
@@ -3421,11 +3493,11 @@ msgstr "Vyhledat stávajícího interpreta"
 msgid "Search for new songs on startup"
 msgstr "Vyhledat nové skladby při spuštění"
 
-#: plugins/artistinfo.pm:39
+#: plugins/artistinfo.pm:40
 msgid "Search google for Artist"
 msgstr "Použít google pro vyhledání interpreta"
 
-#: plugins/artistinfo.pm:46
+#: plugins/artistinfo.pm:47
 msgid "Search on the web"
 msgstr ""
 
@@ -3433,7 +3505,7 @@ msgstr ""
 msgid "Search options"
 msgstr "Možnosti hledání"
 
-#: plugins/artistinfo.pm:41
+#: plugins/artistinfo.pm:42
 msgid "Search pitchfork for Artist"
 msgstr "Vyhledat interpreta na stránkách pitchfork"
 
@@ -3548,7 +3620,7 @@ msgstr ""
 msgid "Shift"
 msgstr "Shift"
 
-#: layouts:754
+#: layouts:753
 msgid "Shimmer Queue"
 msgstr ""
 
@@ -3556,23 +3628,23 @@ msgstr ""
 msgid "Show"
 msgstr "Zobrazit"
 
-#: plugins/artistinfo.pm:35
+#: plugins/artistinfo.pm:36
 msgid "Show Artist page on last.fm"
 msgstr "Zobrazit stránky interpreta na last.fm"
 
-#: plugins/artistinfo.pm:36
+#: plugins/artistinfo.pm:37
 msgid "Show Artist page on wikipedia"
 msgstr "Zobrazit stránky interpreta na wikipedii"
 
-#: plugins/artistinfo.pm:30
+#: plugins/artistinfo.pm:31
 msgid "Show artist's biography"
 msgstr "Zobrazit biografii interpreta"
 
-#: plugins/artistinfo.pm:31
+#: plugins/artistinfo.pm:32
 msgid "Show artist's upcoming events"
 msgstr "Zobrazit nadcházející plánované akce interpreta"
 
-#: layouts:714
+#: layouts:713
 msgid "Show artist, album, year"
 msgstr ""
 
@@ -3584,7 +3656,7 @@ msgstr "Zobrazit tlačítka"
 msgid "Show replaygain submenu"
 msgstr "Zobrazit podnabídku replaygain"
 
-#: plugins/artistinfo.pm:32
+#: plugins/artistinfo.pm:33
 msgid "Show similar artists"
 msgstr ""
 
@@ -3608,6 +3680,10 @@ msgstr "Zobrazit okno oznamovací oblasti při změně skladby"
 msgid "Show/Hide"
 msgstr "Zobrazit/skrýt"
 
+#: layouts:170
+msgid "Show/Hide Cover"
+msgstr ""
+
 #: gmusicbrowser.pl:1080
 msgid "Show/Hide layout widget(s)"
 msgstr "Zobrazit/skrýt pomůcku(y) rozložení"
@@ -3616,7 +3692,7 @@ msgstr "Zobrazit/skrýt pomůcku(y) rozložení"
 msgid "Show/Hide lyrics line"
 msgstr "Zobrazit/skrýt řádku textů"
 
-#: layouts:700
+#: layouts:699
 msgid "Show/Hide picture"
 msgstr ""
 
@@ -3653,11 +3729,15 @@ msgstr "Příkaz pro vypnutí :"
 msgid "Signal: "
 msgstr ""
 
-#: layouts:728
+#: layouts:160
+msgid "Simple List View"
+msgstr ""
+
+#: layouts:727
 msgid "Simple title"
 msgstr "Jednoduchý název"
 
-#: layouts:735
+#: layouts:734
 msgid "Simple title without any"
 msgstr ""
 
@@ -3677,7 +3757,7 @@ msgstr "Přeskočit počet"
 msgid "Skip to next song if an error occurs"
 msgstr "Při chybě přeskočit na další skladbu"
 
-#: layouts:823
+#: layouts:822
 msgid "Small album picture"
 msgstr "Malý obrázek alba"
 
@@ -3689,7 +3769,11 @@ msgstr "Malý přehrávač"
 msgid "Smaller browser"
 msgstr "Menší prohlížeč"
 
-#: gmusicbrowser_list.pm:731 layouts:436 layouts:539 layouts:545 layouts:807
+#: plugins/lastfm2gmb.pm:228
+msgid "Something wrong: status = "
+msgstr ""
+
+#: gmusicbrowser_list.pm:731 layouts:436 layouts:539 layouts:545 layouts:806
 msgid "Song"
 msgstr "Skladba"
 
@@ -3697,7 +3781,7 @@ msgstr "Skladba"
 msgid "Song Properties"
 msgstr "Vlastnosti skladby"
 
-#: gmusicbrowser_layout.pm:3702
+#: gmusicbrowser_layout.pm:3705
 msgid "Song rating"
 msgstr "Hodnocení skladby"
 
@@ -3708,6 +3792,10 @@ msgstr "Edice seskupení stromu skladeb"
 #: gmusicbrowser.pl:409
 msgid "Songs Properties"
 msgstr "Vlastnosti skladeb"
+
+#: layouts:160
+msgid "Songtree View"
+msgstr ""
 
 #: gmusicbrowser_layout.pm:481
 msgid "Sort"
@@ -3754,15 +3842,15 @@ msgstr "Zastavit výběr obrázků"
 msgid "Stop when queue empty"
 msgstr "Zastavit po vyprázdnění fronty"
 
-#: layouts:919
+#: layouts:918
 msgid "Stop, Play and Next buttons"
 msgstr "Tlačítka zastavit, přehrát a další"
 
-#: layouts:924
+#: layouts:923
 msgid "Stop, Play and Next buttons and Time"
 msgstr "Tlačítka Zastavit, Přehrát, Další a Čas"
 
-#: layouts:929
+#: layouts:928
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr "Tlačítka Zastavit, Přehrát, Další a Titul/Interpret"
 
@@ -3818,6 +3906,10 @@ msgstr "Popisek"
 msgid "Tags"
 msgstr "Popisky"
 
+#: plugins/lastfm2gmb.pm:108
+msgid "Temp dir:"
+msgstr ""
+
 #: gmusicbrowser_tags.pm:2056
 msgid "Terms of use"
 msgstr "Podmínky používání"
@@ -3852,10 +3944,8 @@ msgstr "Tento zásuvný modul vyžaduje :"
 #: plugins/artistinfo.pm:14
 msgid ""
 "This plugin retrieves artist-relevant information (biography, upcoming "
-"events) from last.fm."
+"events, similar artists) from last.fm."
 msgstr ""
-"Tento zásuvný modul vyhledává informace příslušné interpretovi (biografie, "
-"plánované akce) na last.fm"
 
 #: gmusicbrowser.pl:5712
 msgid "Threshold to count a song as played :"
@@ -3881,20 +3971,24 @@ msgstr "Časová rozteč slábnutí ve vteřinách"
 msgid "Title"
 msgstr "Název"
 
-#: layouts:814
+#: layouts:813
 msgid "Title & icon"
 msgstr "Název a ikona"
 
-#: layouts:772
+#: layouts:771
 msgid "Title & progress"
 msgstr "Název a stav"
 
-#: gmusicbrowser_list.pm:731 layouts:806
+#: gmusicbrowser_list.pm:731 layouts:805
 msgid "Title - Artist - Album"
 msgstr "Název - Interpret - Album"
 
-#: layouts:742
+#: layouts:741
 msgid "Title with customizable prefix"
+msgstr ""
+
+#: layouts:157
+msgid "Title: %t (Track No. %n)"
 msgstr ""
 
 #: plugins/titlebar.pm:9
@@ -3979,6 +4073,10 @@ msgstr "Unikátní identifikátor souboru"
 msgid "Unknown field ({field})"
 msgstr "Neznámé pole ({field})"
 
+#: plugins/lastfm2gmb.pm:132
+msgid "Unknown mode: "
+msgstr ""
+
 #: gmusicbrowser.pl:461
 msgid "Unlock Album"
 msgstr "Odemknout album"
@@ -4051,7 +4149,7 @@ msgstr "Použít gstreamer"
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "U ID3v2 popisků použít kódování latin1 pokud je dostupné "
 
-#: plugins/artistinfo.pm:219
+#: plugins/artistinfo.pm:217
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
@@ -4089,6 +4187,10 @@ msgstr "Použít pro pole interpret"
 msgid "Used to associate the saved value with a user or a function"
 msgstr "Použito k přiřazení uložené hodnoty k uživateli nebo funkci"
 
+#: plugins/lastfm2gmb.pm:105
+msgid "User API Key:"
+msgstr ""
+
 #: plugins/audioscrobbler.pm:134
 msgid "User authentification error"
 msgstr "Chyba ověření uživatele"
@@ -4122,7 +4224,7 @@ msgstr "Zobrazit binární"
 msgid "View binary data ..."
 msgstr "Zobrazit binární data ..."
 
-#: layouts:893
+#: layouts:892
 msgid "Volume"
 msgstr "Hlasitost"
 
@@ -4312,7 +4414,7 @@ msgstr "pokročilé volby"
 msgid "after %d"
 msgstr "po %d"
 
-#: layouts:672
+#: layouts:671
 msgid "album and artist breadcrumbs"
 msgstr ""
 
@@ -4395,7 +4497,7 @@ msgstr "mezi %n( a )%n"
 msgid "big size"
 msgstr "velká velikost"
 
-#: plugins/artistinfo.pm:30
+#: plugins/artistinfo.pm:31 plugins/artistinfo.pm:233
 msgid "biography"
 msgstr "biografie"
 
@@ -4515,8 +4617,8 @@ msgstr "den"
 msgid "days"
 msgstr "dnů"
 
-#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3727
-#: gmusicbrowser_layout.pm:3749
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3730
+#: gmusicbrowser_layout.pm:3752
 msgid "default"
 msgstr "výchozí"
 
@@ -4600,7 +4702,7 @@ msgstr "umožnit přehrávání bez mezer (pokusně)"
 msgid "error"
 msgstr "chyba"
 
-#: plugins/artistinfo.pm:31
+#: plugins/artistinfo.pm:32 plugins/artistinfo.pm:235
 msgid "events"
 msgstr "plánované akce"
 
@@ -4620,7 +4722,7 @@ msgstr "jinak než %n( krát)"
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "příklad (vybraná skladba) : {score}  ({chances})"
 
-#: plugins/artistinfo.pm:243 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:247 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "example : "
 msgstr "příklad :"
 
@@ -4632,7 +4734,7 @@ msgstr "příklad : %s"
 msgid "examples :"
 msgstr "příklady :"
 
-#: layouts:57
+#: layouts:58 layouts:95
 msgid "expand/collapse cover area"
 msgstr ""
 
@@ -4728,6 +4830,10 @@ msgstr "ignorovat název"
 msgid "illustration"
 msgstr "ilustrace"
 
+#: plugins/lastfm2gmb.pm:106
+msgid "import mode: a - all, p - playcount & lastplay, l - loved"
+msgstr ""
+
 #: gmusicbrowser.pl:4902
 msgid "imported list"
 msgstr "importovaný seznam"
@@ -4744,7 +4850,7 @@ msgstr "celé číslo"
 msgid "interview"
 msgstr "interview"
 
-#: plugins/artistinfo.pm:243 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:247 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "invalid pattern"
 msgstr "chybná šablona"
 
@@ -4932,7 +5038,7 @@ msgstr "naposled přehrávané"
 msgid "last skipped"
 msgstr "naposled přeskočené"
 
-#: plugins/artistinfo.pm:221
+#: plugins/artistinfo.pm:228
 msgid ""
 "last.fm's similarity categories:\n"
 ">90 super\n"
@@ -4948,6 +5054,18 @@ msgstr ""
 
 #: plugins/audioscrobbler.pm:11
 msgid "last.fm/libre.fm plugin"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:104
+msgid "lastFM API request URL"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:105
+msgid "lastfm api key"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:109
+msgid "lastfm username"
 msgstr ""
 
 #: gmusicbrowser_tags.pm:2025
@@ -5168,7 +5286,7 @@ msgstr "při %d"
 msgid "only show entries with at least n songs"
 msgstr "zobrazit jen položky obsahující minimálně n skladeb"
 
-#: plugins/artistinfo.pm:217
+#: plugins/artistinfo.pm:215
 msgid "only works when the artist-info tab is displayed"
 msgstr "Funkční jen pokud je zobrazena záložka informace o interpretovi"
 
@@ -5252,13 +5370,13 @@ msgstr "hodnocení"
 msgid "rating average"
 msgstr "průměrné hodnocení"
 
+#: plugins/lastfm2gmb.pm:107
+msgid "rating for loved tracks (1..100)"
+msgstr ""
+
 #: gmusicbrowser_tags.pm:2025
 msgid "recording location"
 msgstr "nahrávání umístění"
-
-#: layouts:49 layouts:51
-msgid "reduced view"
-msgstr ""
 
 #: gmusicbrowser.pl:5662
 msgid "requires xdg-screensaver"
@@ -5268,6 +5386,10 @@ msgstr "je požadován xdg-screensaver"
 msgid "reset filter {nb}"
 msgstr "vymazat filtr {nb}"
 
+#: plugins/artistinfo.pm:218
+msgid "reset format"
+msgstr ""
+
 #: gmusicbrowser_list.pm:1700
 msgid "reset primary filter"
 msgstr "vymazat primární filtr"
@@ -5276,7 +5398,7 @@ msgstr "vymazat primární filtr"
 msgid "reset secondary filter"
 msgstr "vymazat sekundární filtr"
 
-#: plugins/artistinfo.pm:424 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "zkusit znovu"
 
@@ -5353,12 +5475,20 @@ msgstr "zobrazit obrázky"
 msgid "show the 'All' row"
 msgstr "zobrazit položku 'Vše'"
 
-#: layouts:56
+#: layouts:57
 msgid "show/hide album cover"
 msgstr ""
 
-#: plugins/artistinfo.pm:32
+#: layouts:59 layouts:97
+msgid "show/hide playlists"
+msgstr ""
+
+#: plugins/artistinfo.pm:33
 msgid "similar"
+msgstr ""
+
+#: plugins/artistinfo.pm:237
+msgid "similar artists"
 msgstr ""
 
 #: gmusicbrowser_list.pm:7348
@@ -5436,6 +5566,10 @@ msgstr "pak {action}"
 #: gmusicbrowser_songs.pm:3755 gmusicbrowser_songs.pm:3760
 msgid "times"
 msgstr "krát"
+
+#: plugins/lastfm2gmb.pm:108
+msgid "tmp dir for cache store, etc"
+msgstr ""
 
 #: gmusicbrowser_list.pm:1704
 msgid "toggle Intersection mode"
@@ -5554,7 +5688,7 @@ msgstr "s prohlížečem (strom skladeb)"
 msgid "with context"
 msgstr "s kontextem"
 
-#: layouts:684
+#: layouts:683
 msgid "with picture"
 msgstr "s obrázkem"
 
@@ -5590,7 +5724,7 @@ msgstr ""
 msgid "x offset :"
 msgstr "vyrovnat x :"
 
-#: layouts:747
+#: layouts:746
 msgid "x padding"
 msgstr ""
 
@@ -5598,7 +5732,7 @@ msgstr ""
 msgid "y offset :"
 msgstr "vyrovnat y :"
 
-#: layouts:748
+#: layouts:747
 msgid "y padding"
 msgstr ""
 
@@ -5688,6 +5822,17 @@ msgstr "|-oddělený seznam názvů pomůcek"
 #~ msgid "(see http://www.last.fm)"
 #~ msgstr "(navštivte http://www.last.fm)"
 
+#~ msgid ""
+#~ "For information on how to use this plugin, please navigate to the <a "
+#~ "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
+#~ "artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser."
+#~ "org/dokuwiki/'>gmusicbrowser-wiki</a>."
+#~ msgstr ""
+#~ "Pro návod k použití tohoto zásuvného modulu přejít <a href='http://"
+#~ "gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>wiki stránku "
+#~ "zásuvných modulů</a> v <a href='http://gmusicbrowser.org/"
+#~ "dokuwiki/'>gmusicbrowser-wiki</a>."
+
 #~ msgid "Labels' Icons"
 #~ msgstr "Ikony štítků"
 
@@ -5705,6 +5850,13 @@ msgstr "|-oddělený seznam názvů pomůcek"
 
 #~ msgid "Submit played songs to last.fm"
 #~ msgstr "Postoupit přehrávané skladby na last.fm"
+
+#~ msgid ""
+#~ "This plugin retrieves artist-relevant information (biography, upcoming "
+#~ "events) from last.fm."
+#~ msgstr ""
+#~ "Tento zásuvný modul vyhledává informace příslušné interpretovi "
+#~ "(biografie, plánované akce) na last.fm"
 
 #~ msgid "last.fm"
 #~ msgstr "last.fm"

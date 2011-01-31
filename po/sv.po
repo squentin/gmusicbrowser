@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.4-se\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-25 10:48+0100\n"
+"POT-Creation-Date: 2011-01-30 20:18+0100\n"
 "PO-Revision-Date: 2010-10-21 14:31+0100\n"
 "Last-Translator: Olle Sandgren <olle.sandgren@blixtmail.se>\n"
 "Language-Team: Sweden <se@li.org>\n"
@@ -15,22 +15,41 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: plugins/artistinfo.pm:451
+#: plugins/artistinfo.pm:474
+msgid ""
+"\n"
+"\n"
+"Edit in the last.fm wiki"
+msgstr ""
+
+#: plugins/artistinfo.pm:466
 msgid ""
 "\n"
 "No results found"
 msgstr ""
 
-#: plugins/artistinfo.pm:383
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Rating range: "
 msgstr ""
 
-#: plugins/artistinfo.pm:383
+#: plugins/artistinfo.pm:392
 msgid ""
 "\n"
 "Total playcount: "
+msgstr ""
+
+#: plugins/artistinfo.pm:485
+msgid ""
+" Upcoming Event\n"
+"\n"
+msgstr ""
+
+#: plugins/artistinfo.pm:487
+msgid ""
+" Upcoming Events\n"
+"\n"
 msgstr ""
 
 #: gmusicbrowser_layout.pm:288 gmusicbrowser_layout.pm:289
@@ -193,7 +212,7 @@ msgstr "%n inte överhoppade på länge"
 msgid "%n shortest"
 msgstr "%n kortast"
 
-#: layouts:4
+#: layouts:8
 msgid "%t - gmusicbrowser"
 msgstr ""
 
@@ -215,7 +234,7 @@ msgstr "(: )har en"
 msgid "(: )none"
 msgstr "(: )ingen"
 
-#: plugins/artistinfo.pm:218 plugins/audioscrobbler.pm:65
+#: plugins/artistinfo.pm:216 plugins/audioscrobbler.pm:65
 msgid "(applied after restart)"
 msgstr ""
 
@@ -257,8 +276,8 @@ msgstr ""
 msgid "0 chance"
 msgstr "0 chans"
 
-#: plugins/artistinfo.pm:220
-msgid "0 means no limit"
+#: plugins/artistinfo.pm:227
+msgid "0 means 'show all'"
 msgstr ""
 
 #: gmusicbrowser.pl:7727
@@ -304,7 +323,11 @@ msgstr ""
 msgid "<i>by</i> %a\\n<i>from</i> %l"
 msgstr "<i>av</i> %a\\n<i>från</i> %l"
 
-#: gmusicbrowser_layout.pm:3786
+#: plugins/lastfm2gmb.pm:104
+msgid "API URI:"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:3789
 msgid "Abort"
 msgstr "Avbryt"
 
@@ -430,10 +453,6 @@ msgstr "Tillagda idag"
 msgid "Adding a radio"
 msgstr "Lägger till en radio"
 
-#: plugins/artistinfo.pm:214
-msgid "Additional domain for Last.fm, Amazon and so on."
-msgstr ""
-
 #: gmusicbrowser.pl:5692
 msgid ""
 "Additionally this format can be used :\n"
@@ -476,19 +495,15 @@ msgstr ""
 #: gmusicbrowser_tags.pm:1531 gmusicbrowser_tags.pm:1569
 #: gmusicbrowser_tags.pm:1583 gmusicbrowser_tags.pm:1600
 #: gmusicbrowser_tags.pm:1607 gmusicbrowser_tags.pm:1852
-#: plugins/fetch_cover.pm:103 layouts:436 layouts:539 layouts:545 layouts:993
+#: plugins/fetch_cover.pm:103 layouts:436 layouts:539 layouts:545 layouts:992
 msgid "Album"
 msgstr "Album"
 
-#: layouts:135
-msgid "Album Info"
-msgstr ""
-
-#: layouts:848
+#: layouts:847
 msgid "Album and artist"
 msgstr ""
 
-#: layouts:763
+#: layouts:762
 msgid "Album and artist on the left side"
 msgstr ""
 
@@ -528,6 +543,10 @@ msgstr "Album med bild"
 #: gmusicbrowser_songs.pm:787
 msgid "Album year(s)"
 msgstr "Album år"
+
+#: layouts:157
+msgid "Album: %l (%Y)"
+msgstr ""
 
 #: gmusicbrowser_songs.pm:1727 gmusicbrowser_songs.pm:3670
 msgid "All"
@@ -628,23 +647,27 @@ msgstr "Argument"
 msgid "Arkanoid"
 msgstr ""
 
-#: layouts:81
+#: layouts:99
 msgid "Arkanoid Fullscreen"
 msgstr ""
 
-#: layouts:93
+#: layouts:112
 msgid "Arkanoid Fullscreen with queue"
 msgstr ""
 
-#: layouts:106
+#: layouts:83
+msgid "Arkanoid alternative"
+msgstr ""
+
+#: layouts:117
 msgid "Arkanoid browser"
 msgstr ""
 
 #: gmusicbrowser.pl:7788 gmusicbrowser_songs.pm:469 gmusicbrowser_tags.pm:1529
 #: gmusicbrowser_tags.pm:1568 gmusicbrowser_tags.pm:1582
 #: gmusicbrowser_tags.pm:1601 gmusicbrowser_tags.pm:1606
-#: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:129
-#: plugins/fetch_cover.pm:102 layouts:436 layouts:539 layouts:545
+#: gmusicbrowser_tags.pm:1852 plugins/artistinfo.pm:130
+#: plugins/fetch_cover.pm:102 layouts:168 layouts:436 layouts:539 layouts:545
 msgid "Artist"
 msgstr "Artist"
 
@@ -652,11 +675,11 @@ msgstr "Artist"
 msgid "Artist & album"
 msgstr "Artist & album"
 
-#: layouts:133
-msgid "Artist Info"
+#: plugins/artistinfo.pm:452
+msgid "Artist Biography"
 msgstr ""
 
-#: plugins/artistinfo.pm:218
+#: plugins/artistinfo.pm:216
 msgid "Artist Picture Size : "
 msgstr ""
 
@@ -676,7 +699,11 @@ msgstr "Artist, Album, Skiva, Spår"
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "Artist, Datum, Album, Skiva, Spår"
 
-#: plugins/artistinfo.pm:9 plugins/artistinfo.pm:68
+#: layouts:157
+msgid "Artist: %a"
+msgstr ""
+
+#: plugins/artistinfo.pm:9 plugins/artistinfo.pm:69
 msgid "Artistinfo"
 msgstr ""
 
@@ -724,7 +751,7 @@ msgstr ""
 msgid "Auto-increment track numbers"
 msgstr "Automatisk ökning av spårnummer"
 
-#: plugins/artistinfo.pm:217 plugins/lyrics.pm:187
+#: plugins/artistinfo.pm:215 plugins/lyrics.pm:187
 msgid "Auto-save positive finds"
 msgstr "Spara automatiskt positivt funna"
 
@@ -756,7 +783,7 @@ msgstr "Autospara plugin"
 msgid "Available"
 msgstr "Tillgänglig"
 
-#: plugins/artistinfo.pm:383
+#: plugins/artistinfo.pm:392
 msgid "Average rating: "
 msgstr ""
 
@@ -808,11 +835,11 @@ msgstr "Bläddrarfönster layout"
 msgid "Browser with SongTree"
 msgstr "Bläddra med SongTree"
 
-#: layouts:969
+#: layouts:968
 msgid "Buttons"
 msgstr "Knappar"
 
-#: layouts:958
+#: layouts:957
 msgid "Buttons, Song & Cover"
 msgstr "Knappar, Melodi & Omslag"
 
@@ -843,6 +870,15 @@ msgstr ""
 #: gmusicbrowser_gstreamer-0.10.pm:231
 msgid "Can't create sink '{sink}'"
 msgstr "Kan inte skapa sänkning '{sink}'"
+
+#: plugins/lastfm2gmb.pm:128
+msgid "Can't create tmp dir"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:191 plugins/lastfm2gmb.pm:227
+#: plugins/lastfm2gmb.pm:236 plugins/lastfm2gmb.pm:316
+msgid "Can't get data from lastfm"
+msgstr ""
 
 #: gmusicbrowser_123.pm:138
 msgid "Can't play '{file}'."
@@ -968,7 +1004,7 @@ msgstr ""
 msgid "Choose icon for label {name}"
 msgstr "Välj ikon för etikett {name}"
 
-#: gmusicbrowser_layout.pm:2474
+#: gmusicbrowser_layout.pm:2477
 msgid "Choose page to open"
 msgstr "Välj sida att öppna"
 
@@ -996,7 +1032,7 @@ msgstr "Ta bort valda fält"
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "Klient bannlyst, kontakta gmusicbrowser's utvecklare"
 
-#: gmusicbrowser_layout.pm:2217 gmusicbrowser_list.pm:3832
+#: gmusicbrowser_layout.pm:2220 gmusicbrowser_list.pm:3832
 #: gmusicbrowser_list.pm:3899
 msgid "Close"
 msgstr "Stäng"
@@ -1190,7 +1226,7 @@ msgstr "Stanna kvar i fack när markören är över den"
 msgid "Delete Selected Songs"
 msgstr "Radera valda melodier"
 
-#: gmusicbrowser_layout.pm:2215
+#: gmusicbrowser_layout.pm:2218
 msgid "Delete list"
 msgstr "Ta bort lista"
 
@@ -1288,10 +1324,6 @@ msgstr "Synkronisera inte id3v2 taggar"
 msgid "Do not write the tags"
 msgstr "Synkronisera inte taggar"
 
-#: plugins/artistinfo.pm:214
-msgid "Domain"
-msgstr ""
-
 #: plugins/titlebar.pm:54
 msgid "Don't add the overlay to dialogs"
 msgstr "Lägg inte till övertäckningen till dialoger"
@@ -1347,6 +1379,10 @@ msgstr "Redigera filter"
 #: gmusicbrowser_list.pm:6496
 msgid "Edit grouping ..."
 msgstr "Redigera gruppering"
+
+#: plugins/artistinfo.pm:557
+msgid "Edit in the last.fm wiki"
+msgstr ""
 
 #: gmusicbrowser_list.pm:2834
 msgid "Edit list"
@@ -1445,7 +1481,7 @@ msgstr "Köa en lista med filer/mappar"
 msgid "Enqueue filter"
 msgstr "Köfilter"
 
-#: plugins/artistinfo.pm:219
+#: plugins/artistinfo.pm:217
 msgid "Enter custom event string :"
 msgstr ""
 
@@ -1457,7 +1493,7 @@ msgstr ""
 msgid "EpicRating plugin - automatically update ratings"
 msgstr ""
 
-#: layouts:897
+#: layouts:896
 msgid "Equalizer"
 msgstr "Equaliser"
 
@@ -1465,7 +1501,7 @@ msgstr "Equaliser"
 msgid "Error :"
 msgstr "Fel :"
 
-#: plugins/artistinfo.pm:550
+#: plugins/artistinfo.pm:578
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1487,7 +1523,7 @@ msgstr "Fel vid skrivning till '{file}'"
 msgid "Error writing replaygain tags :\n"
 msgstr "Fel vid skrivning av replaygain tagg :\n"
 
-#: plugins/artistinfo.pm:541 plugins/lyrics.pm:654
+#: plugins/artistinfo.pm:569 plugins/lyrics.pm:654
 msgid "Error: invalid filename pattern"
 msgstr "Fel: ogiltigt filnamns mönster"
 
@@ -1648,11 +1684,11 @@ msgid "Find songs with the same names"
 msgstr "Hitta melodier med samma namn"
 
 #: gmusicbrowser.pl:844 gmusicbrowser.pl:7937 gmusicbrowser_list.pm:724
-#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:840
+#: gmusicbrowser_list.pm:1515 gmusicbrowser_songs.pm:445 layouts:839
 msgid "Folder"
 msgstr "Mapp"
 
-#: gmusicbrowser_list.pm:724 layouts:839
+#: gmusicbrowser_list.pm:724 layouts:838
 msgid "Folder (right-aligned)"
 msgstr "Mapp (höger justerad)"
 
@@ -1668,26 +1704,18 @@ msgstr "Mappmönster :"
 msgid "Folders to search for new songs"
 msgstr "Mappar att söka i för samma melodier"
 
-#: gmusicbrowser_layout.pm:3644 gmusicbrowser_list.pm:17
+#: gmusicbrowser_layout.pm:3647 gmusicbrowser_list.pm:17
 #: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6508
 msgid "Follow playing song"
 msgstr "Följ uppspelad melodi"
 
-#: gmusicbrowser_layout.pm:3644
+#: gmusicbrowser_layout.pm:3647
 msgid "Follow selected song"
 msgstr "Följ utvald melodi"
 
 #: plugins/lyrics.pm:152
 msgid "Font size"
 msgstr "Typsnittsstorlek"
-
-#: plugins/artistinfo.pm:229
-msgid ""
-"For information on how to use this plugin, please navigate to the <a "
-"href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
-"artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/"
-"dokuwiki/'>gmusicbrowser-wiki</a>."
-msgstr ""
 
 #: gmusicbrowser.pl:1025
 msgid "Forward"
@@ -1747,7 +1775,7 @@ msgstr "Gnome mmkeys"
 msgid "Gnome multimedia keys plugin"
 msgstr "Insticksmodul för Gnome multimedia nyckel"
 
-#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6511 layouts:73 layouts:74
+#: gmusicbrowser_list.pm:793 gmusicbrowser_list.pm:6511 layouts:75 layouts:76
 msgid "Go to playing song"
 msgstr "Hoppa till aktuell melodi"
 
@@ -1795,6 +1823,18 @@ msgstr "Ignorera playback fel"
 msgid "Import list"
 msgstr "Importera lista"
 
+#: plugins/lastfm2gmb.pm:106
+msgid "Import mode:"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:15
+msgid "Import playcount, lastplay and rating from last.fm."
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:10
+msgid "ImportLastFM"
+msgstr ""
+
 #: plugins/export.pm:93
 msgid ""
 "In this case one command by file will be run\n"
@@ -1807,19 +1847,19 @@ msgstr ""
 msgid "Increase Volume"
 msgstr "Öka volym"
 
-#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598
+#: gmusicbrowser.pl:4659 gmusicbrowser_tags.pm:1598 layouts:167
 msgid "Info"
 msgstr "Information"
 
-#: layouts:934
+#: layouts:933
 msgid "Insensitive title-artist (left-aligned)"
 msgstr "Okänslig titel-artist (vänsterjusterad)"
 
-#: layouts:940
+#: layouts:939
 msgid "Insensitive title-artist (right-aligned)"
 msgstr "Okänslig titel-artist (högerjusterad)"
 
-#: layouts:947
+#: layouts:946
 msgid "Insensitive, Song & Cover"
 msgstr "Okänslig, Melodi & Omslag"
 
@@ -1831,7 +1871,7 @@ msgstr "Sätt in en lista med filer/mappar i början på spellistan"
 msgid "Invalid regular expression"
 msgstr ""
 
-#: layouts:975
+#: layouts:974
 msgid "Invisible hot spot"
 msgstr "Osynlig hot spot"
 
@@ -1843,7 +1883,7 @@ msgstr ""
 msgid "KB"
 msgstr "KB"
 
-#: plugins/karaoke.pm:9 layouts:906
+#: plugins/karaoke.pm:9 layouts:905
 msgid "Karaoke"
 msgstr "Karaoke"
 
@@ -1881,7 +1921,7 @@ msgstr "Etikett/Utgivare"
 msgid "Labels"
 msgstr "Etiketter"
 
-#: gmusicbrowser_list.pm:744 layouts:800
+#: gmusicbrowser_list.pm:744 layouts:799
 msgid "Labels' icons"
 msgstr ""
 
@@ -1892,14 +1932,6 @@ msgstr "Språk"
 #: gmusicbrowser_tags.pm:2027
 msgid "Lang."
 msgstr "Språk"
-
-#: plugins/artistinfo.pm:213
-msgid "Language"
-msgstr ""
-
-#: plugins/artistinfo.pm:213
-msgid "Language for last.fm artist info. (e.g. en, de, sp, fr, ...)"
-msgstr ""
 
 #: gmusicbrowser_tags.pm:1537
 msgid "Languages"
@@ -1912,6 +1944,18 @@ msgstr "Senast spelad"
 #: gmusicbrowser_songs.pm:664
 msgid "Last skipped"
 msgstr "Senast överhoppade"
+
+#: plugins/lastfm2gmb.pm:133
+msgid "Last.FM user necessary."
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:11
+msgid "LastFM import plugin"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:109
+msgid "LastFM user:"
+msgstr ""
 
 #: plugins/rip.pm:33
 msgid "Launch ripping program"
@@ -1941,6 +1985,10 @@ msgstr "Vänster förnster"
 msgid "Length"
 msgstr "Längd"
 
+#: plugins/lastfm2gmb.pm:126
+msgid "Let's start"
+msgstr ""
+
 #: gmusicbrowser.pl:5218 gmusicbrowser_list.pm:128 layouts:202 layouts:365
 #: layouts:569 layouts:631
 msgid "Library"
@@ -1963,11 +2011,11 @@ msgid_plural "Library size : %d songs"
 msgstr[0] "Bibliotekstorlek : %d melodi"
 msgstr[1] "Bibliotekstorlek : %d melodier"
 
-#: plugins/artistinfo.pm:221
+#: plugins/artistinfo.pm:228
 msgid "Limit similar artists to a rate of similarity : "
 msgstr ""
 
-#: plugins/artistinfo.pm:220
+#: plugins/artistinfo.pm:227
 msgid "Limit similar artists to the first : "
 msgstr ""
 
@@ -1999,7 +2047,7 @@ msgstr "Lista, Bibliotek & Sammanhang"
 msgid "Literal search"
 msgstr "Ordagrann sökning"
 
-#: plugins/artistinfo.pm:215
+#: plugins/artistinfo.pm:213
 msgid "Load/Save Artist Info in :"
 msgstr ""
 
@@ -2013,12 +2061,12 @@ msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "Laddar %d ej sänd melodi från föregående session"
 msgstr[1] "Laddar %d ej sänd melodier från föregående session"
 
-#: plugins/artistinfo.pm:424 plugins/artistinfo.pm:517 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/artistinfo.pm:537 plugins/lyrics.pm:366
 #: plugins/lyrics.pm:529 plugins/lyrics.pm:622
 msgid "Loading failed."
 msgstr "Misslyckades att ladda."
 
-#: plugins/artistinfo.pm:412 plugins/lyrics.pm:352
+#: plugins/artistinfo.pm:420 plugins/lyrics.pm:352
 msgid "Loading..."
 msgstr "Laddar..."
 
@@ -2054,6 +2102,10 @@ msgstr "Lås på {field}"
 msgid "Locked on :\n"
 msgstr "Lås på :\n"
 
+#: plugins/lastfm2gmb.pm:146
+msgid "Looking up gmb library"
+msgstr ""
+
 #: gmusicbrowser.pl:443
 msgid "Lookup in AMG"
 msgstr "Kolla på AMG"
@@ -2061,6 +2113,10 @@ msgstr "Kolla på AMG"
 #: gmusicbrowser.pl:436
 msgid "Lookup in google"
 msgstr "Kolla på google"
+
+#: plugins/lastfm2gmb.pm:107
+msgid "Loved tracks rating:"
+msgstr ""
 
 #: plugins/titlebar.pm:30
 msgid "Lower left"
@@ -2084,11 +2140,11 @@ msgstr ""
 
 #: gmusicbrowser_tags.pm:1538 gmusicbrowser_tags.pm:1576
 #: gmusicbrowser_tags.pm:1597 gmusicbrowser_tags.pm:1612 plugins/lyrics.pm:9
-#: plugins/lyrics.pm:87 plugins/webcontext.pm:180
+#: plugins/lyrics.pm:87 plugins/webcontext.pm:180 layouts:166
 msgid "Lyrics"
 msgstr "Låttext"
 
-#: layouts:981
+#: layouts:980
 msgid "Lyrics (requires lyrics plugin)"
 msgstr "Låttext (kräver låttextmodul)"
 
@@ -2128,13 +2184,17 @@ msgstr ""
 msgid "Main"
 msgstr "Arkiv"
 
-#: layouts:116
+#: layouts:133
 msgid "Main Tree"
 msgstr ""
 
 #: gmusicbrowser_songs.pm:482
 msgid "Main artist"
 msgstr "Huvudartist"
+
+#: plugins/lastfm2gmb.pm:117
+msgid "Make it now"
+msgstr ""
 
 #: plugins/gnome_mmkeys.pm:11
 msgid ""
@@ -2188,6 +2248,10 @@ msgstr ""
 msgid "More results"
 msgstr "Fler resultat"
 
+#: layouts:160
+msgid "Mosaic View"
+msgstr ""
+
 #: gmusicbrowser.pl:428
 msgid "Move"
 msgstr "Flytta"
@@ -2238,7 +2302,7 @@ msgstr ""
 msgid "New filter"
 msgstr "Nytt filter"
 
-#: gmusicbrowser_layout.pm:2202
+#: gmusicbrowser_layout.pm:2205
 msgid "New list"
 msgstr "Ny lista"
 
@@ -2291,7 +2355,7 @@ msgstr "Inget låst filter"
 msgid "No moods"
 msgstr ""
 
-#: plugins/artistinfo.pm:466
+#: plugins/artistinfo.pm:486
 msgid "No results found"
 msgstr ""
 
@@ -2443,7 +2507,7 @@ msgstr "Öppna anpassat fönster"
 msgid "Open Equalizer"
 msgstr "Öppna equaliser"
 
-#: gmusicbrowser_layout.pm:2205
+#: gmusicbrowser_layout.pm:2208
 msgid "Open Playlist"
 msgstr "Öppna spellista"
 
@@ -2451,7 +2515,7 @@ msgstr "Öppna spellista"
 msgid "Open Preference window"
 msgstr "Öppna preferensfönster"
 
-#: gmusicbrowser_layout.pm:2203
+#: gmusicbrowser_layout.pm:2206
 msgid "Open Queue"
 msgstr "Öppna kö"
 
@@ -2467,11 +2531,11 @@ msgstr "Öppna sökfönster"
 msgid "Open containing folder"
 msgstr "Öppna innehållsmapp"
 
-#: gmusicbrowser_layout.pm:2211
+#: gmusicbrowser_layout.pm:2214
 msgid "Open context page"
 msgstr "Öppna sammanhangssida"
 
-#: gmusicbrowser_layout.pm:2207
+#: gmusicbrowser_layout.pm:2210
 msgid "Open existing list"
 msgstr "Öppna existerande lista"
 
@@ -2479,7 +2543,7 @@ msgstr "Öppna existerande lista"
 msgid "Open folder"
 msgstr "Öppna mapp"
 
-#: plugins/artistinfo.pm:225
+#: plugins/artistinfo.pm:229
 msgid "Open last.fm website in your browser"
 msgstr ""
 
@@ -2487,7 +2551,7 @@ msgstr ""
 msgid "Open link in Browser"
 msgstr "_Öppna länk i bläddrare"
 
-#: gmusicbrowser_layout.pm:2209
+#: gmusicbrowser_layout.pm:2212
 msgid "Open page layout"
 msgstr "Öppna sidlayout"
 
@@ -2542,6 +2606,14 @@ msgstr "Övertäcknings layout"
 #: gmusicbrowser_tags.pm:2062 gmusicbrowser_tags.pm:2065
 msgid "Owner identifier"
 msgstr "Ägare identifierad"
+
+#: plugins/lastfm2gmb.pm:111
+msgid ""
+"PRE ALPHA!!! Nothing works!!!\n"
+"The plugin is based on the Program <b>lastfm2gmb</b> by Sergiy Borodych and "
+"is hosted on <a href='https://github.com/bor/lastfm2gmb'>lastfm2gmb - "
+"GitHub</a>."
+msgstr ""
 
 #: gmusicbrowser.pl:861
 msgid "Path,Album,Disc,Track,File"
@@ -2625,7 +2697,7 @@ msgstr "Spela alla melodier från detta album"
 msgid "Play all songs from this artist"
 msgstr "Spela alla melodier med denna artist"
 
-#: layouts:914
+#: layouts:913
 msgid "Play button"
 msgstr "Spelknapp"
 
@@ -2685,7 +2757,7 @@ msgstr "Spelar filter"
 msgid "Playing Title"
 msgstr "Spelar titel"
 
-#: gmusicbrowser_list.pm:737 layouts:795
+#: gmusicbrowser_list.pm:737 layouts:794
 msgid "Playing and queue icons"
 msgstr ""
 
@@ -2693,7 +2765,7 @@ msgstr ""
 msgid "Playing error : {error}"
 msgstr ""
 
-#: layouts:787
+#: layouts:786
 msgid "Playing/Queue Icon or Track"
 msgstr ""
 
@@ -2749,15 +2821,15 @@ msgstr "Öppna lådtips"
 msgid "Pre-set"
 msgstr "Förvald"
 
-#: layouts:749
+#: layouts:748
 msgid "Prefix"
 msgstr ""
 
-#: layouts:751
+#: layouts:750
 msgid "Prefix font style"
 msgstr ""
 
-#: layouts:750
+#: layouts:749
 msgid "Prefix font weight"
 msgstr ""
 
@@ -2773,7 +2845,7 @@ msgstr "Tryck en tangent för tangent kombination"
 msgid "Previous"
 msgstr "Föregående"
 
-#: gmusicbrowser.pl:1023 layouts:55
+#: gmusicbrowser.pl:1023 layouts:56
 msgid "Previous Song"
 msgstr "Föregående melodi"
 
@@ -2797,7 +2869,7 @@ msgstr "Privat datum"
 msgid "Produced (P)"
 msgstr "Producerad (P)"
 
-#: layouts:902
+#: layouts:901
 msgid "Progress"
 msgstr "Förlopp"
 
@@ -2827,6 +2899,10 @@ msgstr "Utgivare/Studio logotype"
 msgid "Queue"
 msgstr "Kö"
 
+#: layouts:165
+msgid "Queue (%n)"
+msgstr ""
+
 #: gmusicbrowser_layout.pm:24
 msgid "Queue album"
 msgstr "Albumkö"
@@ -2847,7 +2923,7 @@ msgstr "Köläge"
 msgid "Queue, Library & Context"
 msgstr "Kö, Bibliotek & Sammanhang"
 
-#: layouts:781
+#: layouts:780
 msgid "Queue-Item Number"
 msgstr ""
 
@@ -2886,11 +2962,11 @@ msgstr "Redigera Slumpvalt läge"
 
 #: gmusicbrowser.pl:4621 gmusicbrowser.pl:4658 gmusicbrowser.pl:7822
 #: gmusicbrowser_list.pm:766 gmusicbrowser_songs.pm:633
-#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:830
+#: gmusicbrowser_songs.pm:3765 gmusicbrowser_tags.pm:2052 layouts:829
 msgid "Rating"
 msgstr "Betyg"
 
-#: gmusicbrowser_list.pm:766 layouts:831
+#: gmusicbrowser_list.pm:766 layouts:830
 msgid "Rating (picture)"
 msgstr "Betyg (bild)"
 
@@ -2942,7 +3018,7 @@ msgstr "Inspelnings datum"
 msgid "Reference point :"
 msgstr "Referenspunkt :"
 
-#: plugins/artistinfo.pm:158 plugins/lyrics.pm:134
+#: plugins/artistinfo.pm:159 plugins/lyrics.pm:134
 msgid "Refresh"
 msgstr "Uppdatera"
 
@@ -3061,7 +3137,7 @@ msgstr "Radera denna tagg"
 msgid "Remove this widget"
 msgstr "Ta bort denna widget"
 
-#: gmusicbrowser_layout.pm:2216 gmusicbrowser_list.pm:2838
+#: gmusicbrowser_layout.pm:2219 gmusicbrowser_list.pm:2838
 msgid "Rename"
 msgstr "Byt namn"
 
@@ -3139,6 +3215,14 @@ msgstr ""
 msgid "Right side"
 msgstr ""
 
+#: layouts:170
+msgid "Right-click to remove filters"
+msgstr ""
+
+#: layouts:170
+msgid "Right-click to toggle Shuffle"
+msgstr ""
+
 #: plugins/rip.pm:9
 msgid "Rip"
 msgstr "Rippa"
@@ -3163,31 +3247,23 @@ msgstr "Kör perl kod"
 msgid "Run system command"
 msgstr "Kör systemkommando"
 
-#: layouts:126
-msgid "Same Album"
-msgstr ""
-
-#: layouts:121
-msgid "Same Artist"
-msgstr ""
-
-#: gmusicbrowser.pl:434 layouts:129
+#: gmusicbrowser.pl:434 layouts:136
 msgid "Same Title"
 msgstr "Samma titel"
 
-#: layouts:998
+#: layouts:997
 msgid "Same artist"
 msgstr ""
 
-#: layouts:1008
+#: layouts:1007
 msgid "Same rating"
 msgstr ""
 
-#: layouts:988
+#: layouts:987
 msgid "Same title"
 msgstr ""
 
-#: layouts:1003
+#: layouts:1002
 msgid "Same year"
 msgstr ""
 
@@ -3207,7 +3283,7 @@ msgstr "Spara"
 msgid "Save Tags/Options"
 msgstr "Spara Taggar/Optioner"
 
-#: plugins/artistinfo.pm:159
+#: plugins/artistinfo.pm:160
 msgid "Save artist biography"
 msgstr ""
 
@@ -3351,11 +3427,11 @@ msgstr "Sök Titel, Artist, Album, Kommentar, Etikett och Genre"
 msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
 msgstr "Sök Titel, Artist, Album, Kommentar, Etikett, Genre and Filnamn"
 
-#: plugins/artistinfo.pm:40
+#: plugins/artistinfo.pm:41
 msgid "Search allmusic for Artist"
 msgstr ""
 
-#: plugins/artistinfo.pm:38
+#: plugins/artistinfo.pm:39
 msgid "Search amazon.com for Artist"
 msgstr ""
 
@@ -3363,11 +3439,11 @@ msgstr ""
 msgid "Search and display lyrics"
 msgstr "Sök och visa låttexter"
 
-#: plugins/artistinfo.pm:42
+#: plugins/artistinfo.pm:43
 msgid "Search discogs for Artist"
 msgstr ""
 
-#: plugins/artistinfo.pm:37
+#: plugins/artistinfo.pm:38
 msgid "Search for Artist on youtube"
 msgstr ""
 
@@ -3375,7 +3451,7 @@ msgstr ""
 msgid "Search for a picture on internet"
 msgstr "Sök efter en bild på Internet"
 
-#: plugins/artistinfo.pm:280
+#: plugins/artistinfo.pm:284
 msgid "Search for artist on:"
 msgstr ""
 
@@ -3391,11 +3467,11 @@ msgstr "Sök på nuvarande artist"
 msgid "Search for new songs on startup"
 msgstr "Sök efter nya melodier vid uppstart"
 
-#: plugins/artistinfo.pm:39
+#: plugins/artistinfo.pm:40
 msgid "Search google for Artist"
 msgstr ""
 
-#: plugins/artistinfo.pm:46
+#: plugins/artistinfo.pm:47
 msgid "Search on the web"
 msgstr ""
 
@@ -3403,7 +3479,7 @@ msgstr ""
 msgid "Search options"
 msgstr "Sök alternativ"
 
-#: plugins/artistinfo.pm:41
+#: plugins/artistinfo.pm:42
 msgid "Search pitchfork for Artist"
 msgstr ""
 
@@ -3518,7 +3594,7 @@ msgstr ""
 msgid "Shift"
 msgstr "Skifta"
 
-#: layouts:754
+#: layouts:753
 msgid "Shimmer Queue"
 msgstr ""
 
@@ -3526,23 +3602,23 @@ msgstr ""
 msgid "Show"
 msgstr "Visa"
 
-#: plugins/artistinfo.pm:35
+#: plugins/artistinfo.pm:36
 msgid "Show Artist page on last.fm"
 msgstr ""
 
-#: plugins/artistinfo.pm:36
+#: plugins/artistinfo.pm:37
 msgid "Show Artist page on wikipedia"
 msgstr ""
 
-#: plugins/artistinfo.pm:30
+#: plugins/artistinfo.pm:31
 msgid "Show artist's biography"
 msgstr ""
 
-#: plugins/artistinfo.pm:31
+#: plugins/artistinfo.pm:32
 msgid "Show artist's upcoming events"
 msgstr ""
 
-#: layouts:714
+#: layouts:713
 msgid "Show artist, album, year"
 msgstr ""
 
@@ -3554,7 +3630,7 @@ msgstr "Visa knappar"
 msgid "Show replaygain submenu"
 msgstr "Visa replaygain undermeny"
 
-#: plugins/artistinfo.pm:32
+#: plugins/artistinfo.pm:33
 msgid "Show similar artists"
 msgstr ""
 
@@ -3578,6 +3654,10 @@ msgstr "Visa facktips när melodi skiftar"
 msgid "Show/Hide"
 msgstr "Visa/Dölj"
 
+#: layouts:170
+msgid "Show/Hide Cover"
+msgstr ""
+
 #: gmusicbrowser.pl:1080
 msgid "Show/Hide layout widget(s)"
 msgstr "Visa/Dölj widget"
@@ -3586,7 +3666,7 @@ msgstr "Visa/Dölj widget"
 msgid "Show/Hide lyrics line"
 msgstr "Visa/Döj låttexter"
 
-#: layouts:700
+#: layouts:699
 msgid "Show/Hide picture"
 msgstr ""
 
@@ -3623,11 +3703,15 @@ msgstr "Avslutnings kommando"
 msgid "Signal: "
 msgstr ""
 
-#: layouts:728
+#: layouts:160
+msgid "Simple List View"
+msgstr ""
+
+#: layouts:727
 msgid "Simple title"
 msgstr ""
 
-#: layouts:735
+#: layouts:734
 msgid "Simple title without any"
 msgstr ""
 
@@ -3647,7 +3731,7 @@ msgstr "Avbryt räkning"
 msgid "Skip to next song if an error occurs"
 msgstr "Avbryt till nästa melodi om fel uppstår"
 
-#: layouts:823
+#: layouts:822
 msgid "Small album picture"
 msgstr ""
 
@@ -3659,7 +3743,11 @@ msgstr "Liten spelare"
 msgid "Smaller browser"
 msgstr "Mindre bläddrare"
 
-#: gmusicbrowser_list.pm:731 layouts:436 layouts:539 layouts:545 layouts:807
+#: plugins/lastfm2gmb.pm:228
+msgid "Something wrong: status = "
+msgstr ""
+
+#: gmusicbrowser_list.pm:731 layouts:436 layouts:539 layouts:545 layouts:806
 msgid "Song"
 msgstr "Melodi"
 
@@ -3667,7 +3755,7 @@ msgstr "Melodi"
 msgid "Song Properties"
 msgstr "Melodi Egenskaper"
 
-#: gmusicbrowser_layout.pm:3702
+#: gmusicbrowser_layout.pm:3705
 msgid "Song rating"
 msgstr "Melodi betyg"
 
@@ -3678,6 +3766,10 @@ msgstr "SongTree grupperings redigering"
 #: gmusicbrowser.pl:409
 msgid "Songs Properties"
 msgstr "Melodiers egenskaper"
+
+#: layouts:160
+msgid "Songtree View"
+msgstr ""
 
 #: gmusicbrowser_layout.pm:481
 msgid "Sort"
@@ -3724,15 +3816,15 @@ msgstr ""
 msgid "Stop when queue empty"
 msgstr "Stoppa när kö är tom"
 
-#: layouts:919
+#: layouts:918
 msgid "Stop, Play and Next buttons"
 msgstr "Stopp, Spela och Nästa knapp"
 
-#: layouts:924
+#: layouts:923
 msgid "Stop, Play and Next buttons and Time"
 msgstr "Stopp, Spela och Nästa knapp och Tid"
 
-#: layouts:929
+#: layouts:928
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr "Stopp, Spela och Nästa knapp och Titel/Artist"
 
@@ -3788,6 +3880,10 @@ msgstr "Tagg"
 msgid "Tags"
 msgstr "Taggar"
 
+#: plugins/lastfm2gmb.pm:108
+msgid "Temp dir:"
+msgstr ""
+
 #: gmusicbrowser_tags.pm:2056
 msgid "Terms of use"
 msgstr "Användarvillkor"
@@ -3821,7 +3917,7 @@ msgstr "Denna modul kräver :"
 #: plugins/artistinfo.pm:14
 msgid ""
 "This plugin retrieves artist-relevant information (biography, upcoming "
-"events) from last.fm."
+"events, similar artists) from last.fm."
 msgstr ""
 
 #: gmusicbrowser.pl:5712
@@ -3848,20 +3944,24 @@ msgstr "Tidsgräns för fade-out i sekunder"
 msgid "Title"
 msgstr "Titel"
 
-#: layouts:814
+#: layouts:813
 msgid "Title & icon"
 msgstr ""
 
-#: layouts:772
+#: layouts:771
 msgid "Title & progress"
 msgstr ""
 
-#: gmusicbrowser_list.pm:731 layouts:806
+#: gmusicbrowser_list.pm:731 layouts:805
 msgid "Title - Artist - Album"
 msgstr "Títel - Artist - Album"
 
-#: layouts:742
+#: layouts:741
 msgid "Title with customizable prefix"
+msgstr ""
+
+#: layouts:157
+msgid "Title: %t (Track No. %n)"
 msgstr ""
 
 #: plugins/titlebar.pm:9
@@ -3946,6 +4046,10 @@ msgstr "Unik filidentifiering"
 msgid "Unknown field ({field})"
 msgstr "Okänt fält ({field})"
 
+#: plugins/lastfm2gmb.pm:132
+msgid "Unknown mode: "
+msgstr ""
+
 #: gmusicbrowser.pl:461
 msgid "Unlock Album"
 msgstr "Lås upp Album"
@@ -4018,7 +4122,7 @@ msgstr "Använd gstreamer"
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "Använd latin1 kodning av id3v2 tag om möjligt"
 
-#: plugins/artistinfo.pm:219
+#: plugins/artistinfo.pm:217
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
@@ -4051,6 +4155,10 @@ msgstr ""
 
 #: gmusicbrowser_songs.pm:2143
 msgid "Used to associate the saved value with a user or a function"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:105
+msgid "User API Key:"
 msgstr ""
 
 #: plugins/audioscrobbler.pm:134
@@ -4086,7 +4194,7 @@ msgstr "Vis Binär"
 msgid "View binary data ..."
 msgstr "Visa binärdata ..."
 
-#: layouts:893
+#: layouts:892
 msgid "Volume"
 msgstr "Volym"
 
@@ -4274,7 +4382,7 @@ msgstr "avancerade tillval"
 msgid "after %d"
 msgstr "efter %d"
 
-#: layouts:672
+#: layouts:671
 msgid "album and artist breadcrumbs"
 msgstr ""
 
@@ -4357,7 +4465,7 @@ msgstr "mellan %n( och )%n"
 msgid "big size"
 msgstr "stor storlek"
 
-#: plugins/artistinfo.pm:30
+#: plugins/artistinfo.pm:31 plugins/artistinfo.pm:233
 msgid "biography"
 msgstr ""
 
@@ -4477,8 +4585,8 @@ msgstr "dag"
 msgid "days"
 msgstr "dagar"
 
-#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3727
-#: gmusicbrowser_layout.pm:3749
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3730
+#: gmusicbrowser_layout.pm:3752
 msgid "default"
 msgstr "förvald"
 
@@ -4562,7 +4670,7 @@ msgstr "aktivera gapless (experimentell)"
 msgid "error"
 msgstr "fel"
 
-#: plugins/artistinfo.pm:31
+#: plugins/artistinfo.pm:32 plugins/artistinfo.pm:235
 msgid "events"
 msgstr ""
 
@@ -4582,7 +4690,7 @@ msgstr "exakt inte %n( gånger)"
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "exempel (valda melodier) : {score}  ({chances})"
 
-#: plugins/artistinfo.pm:243 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:247 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "example : "
 msgstr "exempel :"
 
@@ -4594,7 +4702,7 @@ msgstr "exempel : %s"
 msgid "examples :"
 msgstr "exempel :"
 
-#: layouts:57
+#: layouts:58 layouts:95
 msgid "expand/collapse cover area"
 msgstr ""
 
@@ -4690,6 +4798,10 @@ msgstr ""
 msgid "illustration"
 msgstr "illustration"
 
+#: plugins/lastfm2gmb.pm:106
+msgid "import mode: a - all, p - playcount & lastplay, l - loved"
+msgstr ""
+
 #: gmusicbrowser.pl:4902
 msgid "imported list"
 msgstr "importerad lista"
@@ -4706,7 +4818,7 @@ msgstr ""
 msgid "interview"
 msgstr "intervju"
 
-#: plugins/artistinfo.pm:243 plugins/karaoke.pm:68 plugins/lyrics.pm:198
+#: plugins/artistinfo.pm:247 plugins/karaoke.pm:68 plugins/lyrics.pm:198
 msgid "invalid pattern"
 msgstr "felaktigt mönster"
 
@@ -4894,7 +5006,7 @@ msgstr "senast spelad"
 msgid "last skipped"
 msgstr "senast överhoppade"
 
-#: plugins/artistinfo.pm:221
+#: plugins/artistinfo.pm:228
 msgid ""
 "last.fm's similarity categories:\n"
 ">90 super\n"
@@ -4910,6 +5022,18 @@ msgstr ""
 
 #: plugins/audioscrobbler.pm:11
 msgid "last.fm/libre.fm plugin"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:104
+msgid "lastFM API request URL"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:105
+msgid "lastfm api key"
+msgstr ""
+
+#: plugins/lastfm2gmb.pm:109
+msgid "lastfm username"
 msgstr ""
 
 #: gmusicbrowser_tags.pm:2025
@@ -5130,7 +5254,7 @@ msgstr "på %d"
 msgid "only show entries with at least n songs"
 msgstr "visa endast inledningar med minst n melodier"
 
-#: plugins/artistinfo.pm:217
+#: plugins/artistinfo.pm:215
 msgid "only works when the artist-info tab is displayed"
 msgstr ""
 
@@ -5214,13 +5338,13 @@ msgstr ""
 msgid "rating average"
 msgstr "medelbetyg"
 
+#: plugins/lastfm2gmb.pm:107
+msgid "rating for loved tracks (1..100)"
+msgstr ""
+
 #: gmusicbrowser_tags.pm:2025
 msgid "recording location"
 msgstr "inspelnings lokalisering"
-
-#: layouts:49 layouts:51
-msgid "reduced view"
-msgstr ""
 
 #: gmusicbrowser.pl:5662
 msgid "requires xdg-screensaver"
@@ -5230,6 +5354,10 @@ msgstr "kräver xdg-skärmsläckare"
 msgid "reset filter {nb}"
 msgstr "återställ filter {nb}"
 
+#: plugins/artistinfo.pm:218
+msgid "reset format"
+msgstr ""
+
 #: gmusicbrowser_list.pm:1700
 msgid "reset primary filter"
 msgstr "återställ primärt filter"
@@ -5238,7 +5366,7 @@ msgstr "återställ primärt filter"
 msgid "reset secondary filter"
 msgstr "återställ sekundärt filter"
 
-#: plugins/artistinfo.pm:424 plugins/lyrics.pm:366
+#: plugins/artistinfo.pm:432 plugins/lyrics.pm:366
 msgid "retry"
 msgstr "försök igen"
 
@@ -5315,12 +5443,20 @@ msgstr "visa bilder"
 msgid "show the 'All' row"
 msgstr "visa 'Alla' i rad"
 
-#: layouts:56
+#: layouts:57
 msgid "show/hide album cover"
 msgstr ""
 
-#: plugins/artistinfo.pm:32
+#: layouts:59 layouts:97
+msgid "show/hide playlists"
+msgstr ""
+
+#: plugins/artistinfo.pm:33
 msgid "similar"
+msgstr ""
+
+#: plugins/artistinfo.pm:237
+msgid "similar artists"
 msgstr ""
 
 #: gmusicbrowser_list.pm:7348
@@ -5398,6 +5534,10 @@ msgstr "då {action}"
 #: gmusicbrowser_songs.pm:3755 gmusicbrowser_songs.pm:3760
 msgid "times"
 msgstr "tider"
+
+#: plugins/lastfm2gmb.pm:108
+msgid "tmp dir for cache store, etc"
+msgstr ""
 
 #: gmusicbrowser_list.pm:1704
 msgid "toggle Intersection mode"
@@ -5516,7 +5656,7 @@ msgstr "bläddra med (SongTree)"
 msgid "with context"
 msgstr "med sammanhang"
 
-#: layouts:684
+#: layouts:683
 msgid "with picture"
 msgstr ""
 
@@ -5552,7 +5692,7 @@ msgstr ""
 msgid "x offset :"
 msgstr "x-avstånd :"
 
-#: layouts:747
+#: layouts:746
 msgid "x padding"
 msgstr ""
 
@@ -5560,7 +5700,7 @@ msgstr ""
 msgid "y offset :"
 msgstr "y-avstånd :"
 
-#: layouts:748
+#: layouts:747
 msgid "y padding"
 msgstr ""
 
