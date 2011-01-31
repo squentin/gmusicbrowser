@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.4-se\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-30 20:18+0100\n"
+"POT-Creation-Date: 2011-01-31 09:47+0100\n"
 "PO-Revision-Date: 2010-10-21 14:31+0100\n"
 "Last-Translator: Olle Sandgren <olle.sandgren@blixtmail.se>\n"
 "Language-Team: Sweden <se@li.org>\n"
@@ -327,7 +327,7 @@ msgstr "<i>av</i> %a\\n<i>från</i> %l"
 msgid "API URI:"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:3789
+#: gmusicbrowser_layout.pm:3796
 msgid "Abort"
 msgstr "Avbryt"
 
@@ -1004,7 +1004,7 @@ msgstr ""
 msgid "Choose icon for label {name}"
 msgstr "Välj ikon för etikett {name}"
 
-#: gmusicbrowser_layout.pm:2477
+#: gmusicbrowser_layout.pm:2484
 msgid "Choose page to open"
 msgstr "Välj sida att öppna"
 
@@ -1032,7 +1032,7 @@ msgstr "Ta bort valda fält"
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "Klient bannlyst, kontakta gmusicbrowser's utvecklare"
 
-#: gmusicbrowser_layout.pm:2220 gmusicbrowser_list.pm:3832
+#: gmusicbrowser_layout.pm:2227 gmusicbrowser_list.pm:3832
 #: gmusicbrowser_list.pm:3899
 msgid "Close"
 msgstr "Stäng"
@@ -1226,7 +1226,7 @@ msgstr "Stanna kvar i fack när markören är över den"
 msgid "Delete Selected Songs"
 msgstr "Radera valda melodier"
 
-#: gmusicbrowser_layout.pm:2218
+#: gmusicbrowser_layout.pm:2225
 msgid "Delete list"
 msgstr "Ta bort lista"
 
@@ -1704,12 +1704,12 @@ msgstr "Mappmönster :"
 msgid "Folders to search for new songs"
 msgstr "Mappar att söka i för samma melodier"
 
-#: gmusicbrowser_layout.pm:3647 gmusicbrowser_list.pm:17
+#: gmusicbrowser_layout.pm:3654 gmusicbrowser_list.pm:17
 #: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6508
 msgid "Follow playing song"
 msgstr "Följ uppspelad melodi"
 
-#: gmusicbrowser_layout.pm:3647
+#: gmusicbrowser_layout.pm:3654
 msgid "Follow selected song"
 msgstr "Följ utvald melodi"
 
@@ -2302,7 +2302,7 @@ msgstr ""
 msgid "New filter"
 msgstr "Nytt filter"
 
-#: gmusicbrowser_layout.pm:2205
+#: gmusicbrowser_layout.pm:2212
 msgid "New list"
 msgstr "Ny lista"
 
@@ -2507,7 +2507,7 @@ msgstr "Öppna anpassat fönster"
 msgid "Open Equalizer"
 msgstr "Öppna equaliser"
 
-#: gmusicbrowser_layout.pm:2208
+#: gmusicbrowser_layout.pm:2215
 msgid "Open Playlist"
 msgstr "Öppna spellista"
 
@@ -2515,7 +2515,7 @@ msgstr "Öppna spellista"
 msgid "Open Preference window"
 msgstr "Öppna preferensfönster"
 
-#: gmusicbrowser_layout.pm:2206
+#: gmusicbrowser_layout.pm:2213
 msgid "Open Queue"
 msgstr "Öppna kö"
 
@@ -2531,11 +2531,11 @@ msgstr "Öppna sökfönster"
 msgid "Open containing folder"
 msgstr "Öppna innehållsmapp"
 
-#: gmusicbrowser_layout.pm:2214
+#: gmusicbrowser_layout.pm:2221
 msgid "Open context page"
 msgstr "Öppna sammanhangssida"
 
-#: gmusicbrowser_layout.pm:2210
+#: gmusicbrowser_layout.pm:2217
 msgid "Open existing list"
 msgstr "Öppna existerande lista"
 
@@ -2551,7 +2551,7 @@ msgstr ""
 msgid "Open link in Browser"
 msgstr "_Öppna länk i bläddrare"
 
-#: gmusicbrowser_layout.pm:2212
+#: gmusicbrowser_layout.pm:2219
 msgid "Open page layout"
 msgstr "Öppna sidlayout"
 
@@ -3137,7 +3137,7 @@ msgstr "Radera denna tagg"
 msgid "Remove this widget"
 msgstr "Ta bort denna widget"
 
-#: gmusicbrowser_layout.pm:2219 gmusicbrowser_list.pm:2838
+#: gmusicbrowser_layout.pm:2226 gmusicbrowser_list.pm:2838
 msgid "Rename"
 msgstr "Byt namn"
 
@@ -3755,7 +3755,7 @@ msgstr "Melodi"
 msgid "Song Properties"
 msgstr "Melodi Egenskaper"
 
-#: gmusicbrowser_layout.pm:3705
+#: gmusicbrowser_layout.pm:3712
 msgid "Song rating"
 msgstr "Melodi betyg"
 
@@ -4585,8 +4585,8 @@ msgstr "dag"
 msgid "days"
 msgstr "dagar"
 
-#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3730
-#: gmusicbrowser_layout.pm:3752
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3737
+#: gmusicbrowser_layout.pm:3759
 msgid "default"
 msgstr "förvald"
 

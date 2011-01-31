@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9621\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-30 20:18+0100\n"
+"POT-Creation-Date: 2011-01-31 09:47+0100\n"
 "PO-Revision-Date: 2010-02-22 21:01+0100\n"
 "Last-Translator:  <staubi@linuxmail.org>\n"
 "Language-Team: german <de@li.org>\n"
@@ -330,7 +330,7 @@ msgstr "<i>von</i> %a\\n<i>aus</i> %l"
 msgid "API URI:"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:3789
+#: gmusicbrowser_layout.pm:3796
 msgid "Abort"
 msgstr "Abbrechen"
 
@@ -1011,7 +1011,7 @@ msgstr "Wähle Schriftart ..."
 msgid "Choose icon for label {name}"
 msgstr "Wähle Icon für {name} Label"
 
-#: gmusicbrowser_layout.pm:2477
+#: gmusicbrowser_layout.pm:2484
 msgid "Choose page to open"
 msgstr "Wähle zu öffnende Seite"
 
@@ -1039,7 +1039,7 @@ msgstr "Leere ausgewählte Felder"
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "Client gesperrt, kontaktiere den Entwickler von gmusicbrowser."
 
-#: gmusicbrowser_layout.pm:2220 gmusicbrowser_list.pm:3832
+#: gmusicbrowser_layout.pm:2227 gmusicbrowser_list.pm:3832
 #: gmusicbrowser_list.pm:3899
 msgid "Close"
 msgstr "Schließen"
@@ -1233,7 +1233,7 @@ msgstr "Verzögere Benachrichtigung bei Mausberührung"
 msgid "Delete Selected Songs"
 msgstr "Lösche gewählte Titel"
 
-#: gmusicbrowser_layout.pm:2218
+#: gmusicbrowser_layout.pm:2225
 msgid "Delete list"
 msgstr "Liste löschen"
 
@@ -1715,12 +1715,12 @@ msgstr "Ordnermuster:"
 msgid "Folders to search for new songs"
 msgstr "Ordner, in denen nach neuen Titeln gesucht werden soll"
 
-#: gmusicbrowser_layout.pm:3647 gmusicbrowser_list.pm:17
+#: gmusicbrowser_layout.pm:3654 gmusicbrowser_list.pm:17
 #: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6508
 msgid "Follow playing song"
 msgstr "Folge laufendem Titel"
 
-#: gmusicbrowser_layout.pm:3647
+#: gmusicbrowser_layout.pm:3654
 msgid "Follow selected song"
 msgstr "Folge gewähltem Titel"
 
@@ -2317,7 +2317,7 @@ msgstr "Neues Benutzerfeld"
 msgid "New filter"
 msgstr "Neuer Filter"
 
-#: gmusicbrowser_layout.pm:2205
+#: gmusicbrowser_layout.pm:2212
 msgid "New list"
 msgstr "Neue Liste"
 
@@ -2522,7 +2522,7 @@ msgstr "Benutzerdefiniertes Fenster öffnen"
 msgid "Open Equalizer"
 msgstr "Öffne Equalizer"
 
-#: gmusicbrowser_layout.pm:2208
+#: gmusicbrowser_layout.pm:2215
 msgid "Open Playlist"
 msgstr "Öffne Wiedergabeliste"
 
@@ -2530,7 +2530,7 @@ msgstr "Öffne Wiedergabeliste"
 msgid "Open Preference window"
 msgstr "Einstellungsfenster öffnen"
 
-#: gmusicbrowser_layout.pm:2206
+#: gmusicbrowser_layout.pm:2213
 msgid "Open Queue"
 msgstr "Öffne Warteliste"
 
@@ -2546,11 +2546,11 @@ msgstr "Suchfenster öffnen"
 msgid "Open containing folder"
 msgstr "Beinhaltenden Ordner öffnen"
 
-#: gmusicbrowser_layout.pm:2214
+#: gmusicbrowser_layout.pm:2221
 msgid "Open context page"
 msgstr "Öffne Kontextseite"
 
-#: gmusicbrowser_layout.pm:2210
+#: gmusicbrowser_layout.pm:2217
 msgid "Open existing list"
 msgstr "Vorhandene Liste öffnen"
 
@@ -2566,7 +2566,7 @@ msgstr "Öffne last.fm im Browser"
 msgid "Open link in Browser"
 msgstr "Öffne Link im Browser"
 
-#: gmusicbrowser_layout.pm:2212
+#: gmusicbrowser_layout.pm:2219
 msgid "Open page layout"
 msgstr "Öffne Seitenlayout"
 
@@ -3152,7 +3152,7 @@ msgstr "Entferne dieses Tag"
 msgid "Remove this widget"
 msgstr "Entferne dieses Miniprogramm"
 
-#: gmusicbrowser_layout.pm:2219 gmusicbrowser_list.pm:2838
+#: gmusicbrowser_layout.pm:2226 gmusicbrowser_list.pm:2838
 msgid "Rename"
 msgstr "Umbenennen"
 
@@ -3772,7 +3772,7 @@ msgstr "Titel"
 msgid "Song Properties"
 msgstr "Eigenschaften des Titels"
 
-#: gmusicbrowser_layout.pm:3705
+#: gmusicbrowser_layout.pm:3712
 msgid "Song rating"
 msgstr "Titelbewertung"
 
@@ -4603,8 +4603,8 @@ msgstr "Tag"
 msgid "days"
 msgstr "Tagen"
 
-#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3730
-#: gmusicbrowser_layout.pm:3752
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3737
+#: gmusicbrowser_layout.pm:3759
 msgid "default"
 msgstr "Standard"
 

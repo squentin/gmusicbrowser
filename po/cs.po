@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-30 20:18+0100\n"
+"POT-Creation-Date: 2011-01-31 09:47+0100\n"
 "PO-Revision-Date: 2011-01-20 21:07+0100\n"
 "Last-Translator: Vašek Kovářík <L3D9Z6@seznam.cz>\n"
 "Language-Team: čeština <L3D9Z6@seznam.cz>\n"
@@ -344,7 +344,7 @@ msgstr "<i>od</i> %a\\n<i>z</i> %l"
 msgid "API URI:"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:3789
+#: gmusicbrowser_layout.pm:3796
 msgid "Abort"
 msgstr "Zrušit"
 
@@ -1022,7 +1022,7 @@ msgstr "Vybrat typ písma..."
 msgid "Choose icon for label {name}"
 msgstr "Vybrat ikonu pro štítek {name}"
 
-#: gmusicbrowser_layout.pm:2477
+#: gmusicbrowser_layout.pm:2484
 msgid "Choose page to open"
 msgstr "Vybrat stránku k otevření"
 
@@ -1050,7 +1050,7 @@ msgstr "Smazat vybraná pole"
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "Zakázaný klient, kontaktujte vývojáře gmusicbrowser"
 
-#: gmusicbrowser_layout.pm:2220 gmusicbrowser_list.pm:3832
+#: gmusicbrowser_layout.pm:2227 gmusicbrowser_list.pm:3832
 #: gmusicbrowser_list.pm:3899
 msgid "Close"
 msgstr "Zavřít"
@@ -1246,7 +1246,7 @@ msgstr ""
 msgid "Delete Selected Songs"
 msgstr "Odstranit vybrané skladby"
 
-#: gmusicbrowser_layout.pm:2218
+#: gmusicbrowser_layout.pm:2225
 msgid "Delete list"
 msgstr "Odstranit seznam"
 
@@ -1724,12 +1724,12 @@ msgstr "Vzor složky :"
 msgid "Folders to search for new songs"
 msgstr "Nové skladby hledat ve složkách"
 
-#: gmusicbrowser_layout.pm:3647 gmusicbrowser_list.pm:17
+#: gmusicbrowser_layout.pm:3654 gmusicbrowser_list.pm:17
 #: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6508
 msgid "Follow playing song"
 msgstr "Následovat přehrávanou skladbu"
 
-#: gmusicbrowser_layout.pm:3647
+#: gmusicbrowser_layout.pm:3654
 msgid "Follow selected song"
 msgstr "Následovat vybranou skladbu"
 
@@ -2328,7 +2328,7 @@ msgstr "Nové uživatelské pole"
 msgid "New filter"
 msgstr "Nový filtr"
 
-#: gmusicbrowser_layout.pm:2205
+#: gmusicbrowser_layout.pm:2212
 msgid "New list"
 msgstr "Nový seznam"
 
@@ -2532,7 +2532,7 @@ msgstr "Otevřít uživatelské okno"
 msgid "Open Equalizer"
 msgstr "Otevřít ekvalizér"
 
-#: gmusicbrowser_layout.pm:2208
+#: gmusicbrowser_layout.pm:2215
 msgid "Open Playlist"
 msgstr "Otevřít playlist"
 
@@ -2540,7 +2540,7 @@ msgstr "Otevřít playlist"
 msgid "Open Preference window"
 msgstr "Otevřít okno vlastností"
 
-#: gmusicbrowser_layout.pm:2206
+#: gmusicbrowser_layout.pm:2213
 msgid "Open Queue"
 msgstr "Otevřít frontu"
 
@@ -2556,11 +2556,11 @@ msgstr "Otevřít okno vyhledávání"
 msgid "Open containing folder"
 msgstr "Otevřít obsahující složku"
 
-#: gmusicbrowser_layout.pm:2214
+#: gmusicbrowser_layout.pm:2221
 msgid "Open context page"
 msgstr "Otevřít kontextovou stránku"
 
-#: gmusicbrowser_layout.pm:2210
+#: gmusicbrowser_layout.pm:2217
 msgid "Open existing list"
 msgstr "Otevřít existující seznam"
 
@@ -2576,7 +2576,7 @@ msgstr "Otevřít stránku last.fm v prohlížeči"
 msgid "Open link in Browser"
 msgstr "Otevřít odkaz v prohlížeči"
 
-#: gmusicbrowser_layout.pm:2212
+#: gmusicbrowser_layout.pm:2219
 msgid "Open page layout"
 msgstr "Otevřít rozložení stránky"
 
@@ -3162,7 +3162,7 @@ msgstr "Odstranit tento popisek"
 msgid "Remove this widget"
 msgstr "Odstranit tuto pomůcku"
 
-#: gmusicbrowser_layout.pm:2219 gmusicbrowser_list.pm:2838
+#: gmusicbrowser_layout.pm:2226 gmusicbrowser_list.pm:2838
 msgid "Rename"
 msgstr "Přejmenovat"
 
@@ -3781,7 +3781,7 @@ msgstr "Skladba"
 msgid "Song Properties"
 msgstr "Vlastnosti skladby"
 
-#: gmusicbrowser_layout.pm:3705
+#: gmusicbrowser_layout.pm:3712
 msgid "Song rating"
 msgstr "Hodnocení skladby"
 
@@ -4617,8 +4617,8 @@ msgstr "den"
 msgid "days"
 msgstr "dnů"
 
-#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3730
-#: gmusicbrowser_layout.pm:3752
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3737
+#: gmusicbrowser_layout.pm:3759
 msgid "default"
 msgstr "výchozí"
 

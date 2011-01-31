@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-30 20:18+0100\n"
+"POT-Creation-Date: 2011-01-31 09:47+0100\n"
 "PO-Revision-Date: 2011-01-19 09:56+0900\n"
 "Last-Translator: bluealbum <bluealbum@gmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
@@ -313,7 +313,7 @@ msgstr "<i>의해</i> %a\\n<i>으로부터</i> %l"
 msgid "API URI:"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:3789
+#: gmusicbrowser_layout.pm:3796
 msgid "Abort"
 msgstr "중단"
 
@@ -989,7 +989,7 @@ msgstr "글꼴 고르기..."
 msgid "Choose icon for label {name}"
 msgstr "{name} 라벨 아이콘 고르기"
 
-#: gmusicbrowser_layout.pm:2477
+#: gmusicbrowser_layout.pm:2484
 msgid "Choose page to open"
 msgstr "불러올 페이지 고르기"
 
@@ -1017,7 +1017,7 @@ msgstr "선택한 필드 비우기"
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "클라이언트 금지됨, 프로그램 개발자와 접촉하세요"
 
-#: gmusicbrowser_layout.pm:2220 gmusicbrowser_list.pm:3832
+#: gmusicbrowser_layout.pm:2227 gmusicbrowser_list.pm:3832
 #: gmusicbrowser_list.pm:3899
 msgid "Close"
 msgstr "닫기"
@@ -1210,7 +1210,7 @@ msgstr "마우스상에 있으면 트레이 팁 팝업상자 지연하기"
 msgid "Delete Selected Songs"
 msgstr "선택한 노래 지우기"
 
-#: gmusicbrowser_layout.pm:2218
+#: gmusicbrowser_layout.pm:2225
 msgid "Delete list"
 msgstr "목록 지우기"
 
@@ -1688,12 +1688,12 @@ msgstr "폴더 패턴 :"
 msgid "Folders to search for new songs"
 msgstr "새 노래 찾을 폴더"
 
-#: gmusicbrowser_layout.pm:3647 gmusicbrowser_list.pm:17
+#: gmusicbrowser_layout.pm:3654 gmusicbrowser_list.pm:17
 #: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6508
 msgid "Follow playing song"
 msgstr "재생중인 노래를 따르기"
 
-#: gmusicbrowser_layout.pm:3647
+#: gmusicbrowser_layout.pm:3654
 msgid "Follow selected song"
 msgstr "다음의 선택한 노래"
 
@@ -2285,7 +2285,7 @@ msgstr "새 사용자 정의 필드"
 msgid "New filter"
 msgstr "새 필터"
 
-#: gmusicbrowser_layout.pm:2205
+#: gmusicbrowser_layout.pm:2212
 msgid "New list"
 msgstr "새 목록"
 
@@ -2489,7 +2489,7 @@ msgstr "사용자 정의 창 열기"
 msgid "Open Equalizer"
 msgstr "이퀄라이저 열기"
 
-#: gmusicbrowser_layout.pm:2208
+#: gmusicbrowser_layout.pm:2215
 msgid "Open Playlist"
 msgstr "재생 목록 파일 열기"
 
@@ -2497,7 +2497,7 @@ msgstr "재생 목록 파일 열기"
 msgid "Open Preference window"
 msgstr "설정 창 열기"
 
-#: gmusicbrowser_layout.pm:2206
+#: gmusicbrowser_layout.pm:2213
 msgid "Open Queue"
 msgstr "대기열 열기"
 
@@ -2513,11 +2513,11 @@ msgstr "찾기 창 열기"
 msgid "Open containing folder"
 msgstr "이 노래가 있는 폴더 열기"
 
-#: gmusicbrowser_layout.pm:2214
+#: gmusicbrowser_layout.pm:2221
 msgid "Open context page"
 msgstr "항목 페이지 열기"
 
-#: gmusicbrowser_layout.pm:2210
+#: gmusicbrowser_layout.pm:2217
 msgid "Open existing list"
 msgstr "존재하는 목록 열기"
 
@@ -2533,7 +2533,7 @@ msgstr "사용자의 브라우저에서 last.fm 웹사이트 열기"
 msgid "Open link in Browser"
 msgstr "브라우저로 링크 열기"
 
-#: gmusicbrowser_layout.pm:2212
+#: gmusicbrowser_layout.pm:2219
 msgid "Open page layout"
 msgstr "페이지 레이아웃 열기"
 
@@ -3119,7 +3119,7 @@ msgstr "이 태그 제거하기"
 msgid "Remove this widget"
 msgstr "이 위젯 제거하기"
 
-#: gmusicbrowser_layout.pm:2219 gmusicbrowser_list.pm:2838
+#: gmusicbrowser_layout.pm:2226 gmusicbrowser_list.pm:2838
 msgid "Rename"
 msgstr "이름 바꾸기"
 
@@ -3737,7 +3737,7 @@ msgstr "노래"
 msgid "Song Properties"
 msgstr "노래 속성"
 
-#: gmusicbrowser_layout.pm:3705
+#: gmusicbrowser_layout.pm:3712
 msgid "Song rating"
 msgstr "노래 점수"
 
@@ -4569,8 +4569,8 @@ msgstr "일"
 msgid "days"
 msgstr "일"
 
-#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3730
-#: gmusicbrowser_layout.pm:3752
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3737
+#: gmusicbrowser_layout.pm:3759
 msgid "default"
 msgstr "기본값"
 
