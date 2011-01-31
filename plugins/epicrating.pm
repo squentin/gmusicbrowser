@@ -1,4 +1,4 @@
-# Copyright (C) 2010      Andrew Clunis <andrew@orospakr.ca>
+# Copyright (C) 2010-2011 Andrew Clunis <andrew@orospakr.ca>
 #                         Daniel Rubin <dan@fracturedproject.net>
 #               2005-2009 Quentin Sculo <squentin@free.fr>
 #
@@ -157,7 +157,7 @@ sub ApplyRulesByName {
 }
 
 sub Played {
-    my ($self, $song_id, $finished, $start_time, $started_at, $play_time) = @_;
+    my ($self, $song_id, $finished, $start_time, $play_time, $play_ratio) = @_;
     if(!$finished) {
 	$self->Skipped($song_id, $play_time);
     } else {
@@ -365,10 +365,12 @@ sub prefbox {
 	    my $all_songs = Filter->new("")->filter;
 	    for my $song_id (@{$all_songs}) {
 		my $rating = ::Songs::Get($song_id, 'rating');
+		my $artist = ::Songs::Get($song_id, 'artist');
 		my $title = ::Songs::Get($song_id, 'title');
+		my $length = ::Songs::Get($song_id, 'length');
 		my $playcount = ::Songs::Get($song_id, 'playcount');
 		my $skipcount = ::Songs::Get($song_id, 'skipcount');
-		$csv->combine(@{[$song_id, $title, $rating, $playcount, $skipcount]});
+		$csv->combine(@{[$song_id, $artist, $title, $length, $rating, $playcount, $skipcount]});
 		print CSVF $csv->string . "\n";
 	    }
 	    close CSVF;
