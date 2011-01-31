@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.0\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-30 20:18+0100\n"
+"POT-Creation-Date: 2011-01-31 13:08+0100\n"
 "PO-Revision-Date: 2008-10-02 00:51+0100\n"
 "Last-Translator: Michael R' Tokarczyk <mrtokarczyk@gmail.com>\n"
 "Language-Team: tizzilzol team <tizzilzol@gmail.com>\n"
@@ -326,7 +326,7 @@ msgstr ""
 msgid "API URI:"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:3789
+#: gmusicbrowser_layout.pm:3796
 msgid "Abort"
 msgstr "Anuluj"
 
@@ -356,6 +356,12 @@ msgstr "Czy na pewno skasować {files} ?"
 #, fuzzy
 msgid "About to turn off the computer in :"
 msgstr "Zakończenie pracy komputera za :"
+
+#: plugins/http_server.pm:19
+msgid ""
+"Access the gmusicbrowser library RESTfully, and use a simple javascript UI "
+"to interact with it."
+msgstr ""
 
 #: plugins/notify.pm:56
 msgid "Actions are not supported by current notification daemon"
@@ -485,7 +491,7 @@ msgstr "Zaawansowane wyszukiwanie ..."
 msgid "Advanced Tag Editing"
 msgstr "Zaawansowana edycja tagów"
 
-#: plugins/epicrating.pm:407
+#: plugins/epicrating.pm:409
 msgid "After: "
 msgstr ""
 
@@ -797,7 +803,7 @@ msgstr "Błędna sesja"
 msgid "Base Folder :"
 msgstr "Katalog bazowy :"
 
-#: plugins/epicrating.pm:399
+#: plugins/epicrating.pm:401
 msgid "Before: "
 msgstr ""
 
@@ -1000,7 +1006,7 @@ msgstr ""
 msgid "Choose icon for label {name}"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2477
+#: gmusicbrowser_layout.pm:2484
 msgid "Choose page to open"
 msgstr ""
 
@@ -1029,7 +1035,7 @@ msgid "Client banned, contact gmusicbrowser's developer"
 msgstr ""
 "Klient zablokowan. Skontaktuj się z deweloperami programu \"gmusicbrowser\""
 
-#: gmusicbrowser_layout.pm:2220 gmusicbrowser_list.pm:3832
+#: gmusicbrowser_layout.pm:2227 gmusicbrowser_list.pm:3832
 #: gmusicbrowser_list.pm:3899
 msgid "Close"
 msgstr "Zamknij"
@@ -1223,7 +1229,7 @@ msgstr "Opoźnij pojawianie się panelu powiadomień po najechaniu kursorem"
 msgid "Delete Selected Songs"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2218
+#: gmusicbrowser_layout.pm:2225
 msgid "Delete list"
 msgstr "Usuń listę"
 
@@ -1249,7 +1255,7 @@ msgstr ""
 msgid "Desktop widgets plugin"
 msgstr ""
 
-#: plugins/epicrating.pm:483
+#: plugins/epicrating.pm:485
 msgid "Differential: "
 msgstr ""
 
@@ -1594,7 +1600,7 @@ msgstr ""
 msgid "Field type"
 msgstr ""
 
-#: plugins/epicrating.pm:481
+#: plugins/epicrating.pm:483
 msgid "Field: "
 msgstr ""
 
@@ -1700,12 +1706,12 @@ msgstr "Typ katalogu :"
 msgid "Folders to search for new songs"
 msgstr "Katalogi kolekcji"
 
-#: gmusicbrowser_layout.pm:3647 gmusicbrowser_list.pm:17
+#: gmusicbrowser_layout.pm:3654 gmusicbrowser_list.pm:17
 #: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6508
 msgid "Follow playing song"
 msgstr "Śledź odtwarzany utwór"
 
-#: gmusicbrowser_layout.pm:3647
+#: gmusicbrowser_layout.pm:3654
 msgid "Follow selected song"
 msgstr "Śledź wybrany utwór"
 
@@ -1782,6 +1788,14 @@ msgstr "Grupuj według :"
 #: gmusicbrowser_songs.pm:555 gmusicbrowser_tags.pm:1552
 msgid "Grouping"
 msgstr "Grupowanie"
+
+#: plugins/http_server.pm:16
+msgid "HTTP Server"
+msgstr ""
+
+#: plugins/http_server.pm:17
+msgid "HTTP Server - Provides a RESTful HTTP service (and Javascript player)"
+msgstr ""
 
 #: plugins/audioscrobbler.pm:153
 msgid "Handshake OK"
@@ -2296,7 +2310,7 @@ msgstr ""
 msgid "New filter"
 msgstr "Nowy filtr"
 
-#: gmusicbrowser_layout.pm:2205
+#: gmusicbrowser_layout.pm:2212
 msgid "New list"
 msgstr "Nowa lista"
 
@@ -2502,7 +2516,7 @@ msgstr "Otwórz inne okno"
 msgid "Open Equalizer"
 msgstr "Otwórz Korektor"
 
-#: gmusicbrowser_layout.pm:2208
+#: gmusicbrowser_layout.pm:2215
 msgid "Open Playlist"
 msgstr "Otwórz listę"
 
@@ -2510,7 +2524,7 @@ msgstr "Otwórz listę"
 msgid "Open Preference window"
 msgstr "Otwórz okno ustawień"
 
-#: gmusicbrowser_layout.pm:2206
+#: gmusicbrowser_layout.pm:2213
 msgid "Open Queue"
 msgstr "Otwórz kolejkę"
 
@@ -2526,11 +2540,11 @@ msgstr "Otwórz okno wyszukiwania"
 msgid "Open containing folder"
 msgstr "Otwórz katalog zawierający"
 
-#: gmusicbrowser_layout.pm:2214
+#: gmusicbrowser_layout.pm:2221
 msgid "Open context page"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2210
+#: gmusicbrowser_layout.pm:2217
 msgid "Open existing list"
 msgstr "Otwórz istniejącą listę"
 
@@ -2547,7 +2561,7 @@ msgstr ""
 msgid "Open link in Browser"
 msgstr "Otwórz w Przeglądarce"
 
-#: gmusicbrowser_layout.pm:2212
+#: gmusicbrowser_layout.pm:2219
 msgid "Open page layout"
 msgstr "Otwórz na stronie przeglądarki"
 
@@ -2811,6 +2825,10 @@ msgstr "Otwórz inne okno"
 #: gmusicbrowser.pl:1081
 msgid "Popup Traytip"
 msgstr "Powiadamianie (zasobnik)"
+
+#: plugins/http_server.pm:404
+msgid "Port Number"
+msgstr ""
 
 #: plugins/webcontext.pm:566
 msgid "Pre-set"
@@ -3135,7 +3153,7 @@ msgstr "Usuń ten tag"
 msgid "Remove this widget"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2219 gmusicbrowser_list.pm:2838
+#: gmusicbrowser_layout.pm:2226 gmusicbrowser_list.pm:2838
 msgid "Rename"
 msgstr "Zmień nazwę"
 
@@ -3696,7 +3714,7 @@ msgstr ""
 msgid "Shutdown command :"
 msgstr "Wyłącz komendę : "
 
-#: plugins/epicrating.pm:478
+#: plugins/epicrating.pm:480
 msgid "Signal: "
 msgstr ""
 
@@ -3752,7 +3770,7 @@ msgstr "Utwór"
 msgid "Song Properties"
 msgstr "Właściwości utworu"
 
-#: gmusicbrowser_layout.pm:3705
+#: gmusicbrowser_layout.pm:3712
 msgid "Song rating"
 msgstr "Ocena utworu"
 
@@ -4583,8 +4601,8 @@ msgstr "dni"
 msgid "days"
 msgstr "dni"
 
-#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3730
-#: gmusicbrowser_layout.pm:3752
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3737
+#: gmusicbrowser_layout.pm:3759
 msgid "default"
 msgstr "domyślny"
 

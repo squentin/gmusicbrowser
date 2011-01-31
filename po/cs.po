@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-30 20:18+0100\n"
+"POT-Creation-Date: 2011-01-31 13:08+0100\n"
 "PO-Revision-Date: 2011-01-20 21:07+0100\n"
 "Last-Translator: Vašek Kovářík <L3D9Z6@seznam.cz>\n"
 "Language-Team: čeština <L3D9Z6@seznam.cz>\n"
@@ -344,7 +344,7 @@ msgstr "<i>od</i> %a\\n<i>z</i> %l"
 msgid "API URI:"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:3789
+#: gmusicbrowser_layout.pm:3796
 msgid "Abort"
 msgstr "Zrušit"
 
@@ -375,6 +375,12 @@ msgstr ""
 #: gmusicbrowser.pl:1379
 msgid "About to turn off the computer in :"
 msgstr "Vypnout počítač za :"
+
+#: plugins/http_server.pm:19
+msgid ""
+"Access the gmusicbrowser library RESTfully, and use a simple javascript UI "
+"to interact with it."
+msgstr ""
 
 #: plugins/notify.pm:56
 msgid "Actions are not supported by current notification daemon"
@@ -505,7 +511,7 @@ msgstr "Rozšířené vyhledávání ..."
 msgid "Advanced Tag Editing"
 msgstr "Rozšířená editace popisků"
 
-#: plugins/epicrating.pm:407
+#: plugins/epicrating.pm:409
 msgid "After: "
 msgstr ""
 
@@ -817,7 +823,7 @@ msgstr "Chyba sezení"
 msgid "Base Folder :"
 msgstr "Základní složka :"
 
-#: plugins/epicrating.pm:399
+#: plugins/epicrating.pm:401
 msgid "Before: "
 msgstr ""
 
@@ -1022,7 +1028,7 @@ msgstr "Vybrat typ písma..."
 msgid "Choose icon for label {name}"
 msgstr "Vybrat ikonu pro štítek {name}"
 
-#: gmusicbrowser_layout.pm:2477
+#: gmusicbrowser_layout.pm:2484
 msgid "Choose page to open"
 msgstr "Vybrat stránku k otevření"
 
@@ -1050,7 +1056,7 @@ msgstr "Smazat vybraná pole"
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "Zakázaný klient, kontaktujte vývojáře gmusicbrowser"
 
-#: gmusicbrowser_layout.pm:2220 gmusicbrowser_list.pm:3832
+#: gmusicbrowser_layout.pm:2227 gmusicbrowser_list.pm:3832
 #: gmusicbrowser_list.pm:3899
 msgid "Close"
 msgstr "Zavřít"
@@ -1246,7 +1252,7 @@ msgstr ""
 msgid "Delete Selected Songs"
 msgstr "Odstranit vybrané skladby"
 
-#: gmusicbrowser_layout.pm:2218
+#: gmusicbrowser_layout.pm:2225
 msgid "Delete list"
 msgstr "Odstranit seznam"
 
@@ -1272,7 +1278,7 @@ msgstr "Pomůcky"
 msgid "Desktop widgets plugin"
 msgstr "Zásuvný modul pomůcek"
 
-#: plugins/epicrating.pm:483
+#: plugins/epicrating.pm:485
 msgid "Differential: "
 msgstr ""
 
@@ -1618,7 +1624,7 @@ msgstr "Název pole"
 msgid "Field type"
 msgstr "Typ pole"
 
-#: plugins/epicrating.pm:481
+#: plugins/epicrating.pm:483
 msgid "Field: "
 msgstr ""
 
@@ -1724,12 +1730,12 @@ msgstr "Vzor složky :"
 msgid "Folders to search for new songs"
 msgstr "Nové skladby hledat ve složkách"
 
-#: gmusicbrowser_layout.pm:3647 gmusicbrowser_list.pm:17
+#: gmusicbrowser_layout.pm:3654 gmusicbrowser_list.pm:17
 #: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6508
 msgid "Follow playing song"
 msgstr "Následovat přehrávanou skladbu"
 
-#: gmusicbrowser_layout.pm:3647
+#: gmusicbrowser_layout.pm:3654
 msgid "Follow selected song"
 msgstr "Následovat vybranou skladbu"
 
@@ -1806,6 +1812,14 @@ msgstr "Seskupit s :"
 #: gmusicbrowser_songs.pm:555 gmusicbrowser_tags.pm:1552
 msgid "Grouping"
 msgstr "Seskupení"
+
+#: plugins/http_server.pm:16
+msgid "HTTP Server"
+msgstr ""
+
+#: plugins/http_server.pm:17
+msgid "HTTP Server - Provides a RESTful HTTP service (and Javascript player)"
+msgstr ""
 
 #: plugins/audioscrobbler.pm:153
 msgid "Handshake OK"
@@ -2328,7 +2342,7 @@ msgstr "Nové uživatelské pole"
 msgid "New filter"
 msgstr "Nový filtr"
 
-#: gmusicbrowser_layout.pm:2205
+#: gmusicbrowser_layout.pm:2212
 msgid "New list"
 msgstr "Nový seznam"
 
@@ -2532,7 +2546,7 @@ msgstr "Otevřít uživatelské okno"
 msgid "Open Equalizer"
 msgstr "Otevřít ekvalizér"
 
-#: gmusicbrowser_layout.pm:2208
+#: gmusicbrowser_layout.pm:2215
 msgid "Open Playlist"
 msgstr "Otevřít playlist"
 
@@ -2540,7 +2554,7 @@ msgstr "Otevřít playlist"
 msgid "Open Preference window"
 msgstr "Otevřít okno vlastností"
 
-#: gmusicbrowser_layout.pm:2206
+#: gmusicbrowser_layout.pm:2213
 msgid "Open Queue"
 msgstr "Otevřít frontu"
 
@@ -2556,11 +2570,11 @@ msgstr "Otevřít okno vyhledávání"
 msgid "Open containing folder"
 msgstr "Otevřít obsahující složku"
 
-#: gmusicbrowser_layout.pm:2214
+#: gmusicbrowser_layout.pm:2221
 msgid "Open context page"
 msgstr "Otevřít kontextovou stránku"
 
-#: gmusicbrowser_layout.pm:2210
+#: gmusicbrowser_layout.pm:2217
 msgid "Open existing list"
 msgstr "Otevřít existující seznam"
 
@@ -2576,7 +2590,7 @@ msgstr "Otevřít stránku last.fm v prohlížeči"
 msgid "Open link in Browser"
 msgstr "Otevřít odkaz v prohlížeči"
 
-#: gmusicbrowser_layout.pm:2212
+#: gmusicbrowser_layout.pm:2219
 msgid "Open page layout"
 msgstr "Otevřít rozložení stránky"
 
@@ -2841,6 +2855,10 @@ msgstr "Vyskakovací uživatelské okno"
 #: gmusicbrowser.pl:1081
 msgid "Popup Traytip"
 msgstr "Vyskakovací okno oznamovací oblasti"
+
+#: plugins/http_server.pm:404
+msgid "Port Number"
+msgstr ""
 
 #: plugins/webcontext.pm:566
 msgid "Pre-set"
@@ -3162,7 +3180,7 @@ msgstr "Odstranit tento popisek"
 msgid "Remove this widget"
 msgstr "Odstranit tuto pomůcku"
 
-#: gmusicbrowser_layout.pm:2219 gmusicbrowser_list.pm:2838
+#: gmusicbrowser_layout.pm:2226 gmusicbrowser_list.pm:2838
 msgid "Rename"
 msgstr "Přejmenovat"
 
@@ -3725,7 +3743,7 @@ msgstr "Zamíchaná alba, zamíchané stopy"
 msgid "Shutdown command :"
 msgstr "Příkaz pro vypnutí :"
 
-#: plugins/epicrating.pm:478
+#: plugins/epicrating.pm:480
 msgid "Signal: "
 msgstr ""
 
@@ -3781,7 +3799,7 @@ msgstr "Skladba"
 msgid "Song Properties"
 msgstr "Vlastnosti skladby"
 
-#: gmusicbrowser_layout.pm:3705
+#: gmusicbrowser_layout.pm:3712
 msgid "Song rating"
 msgstr "Hodnocení skladby"
 
@@ -4617,8 +4635,8 @@ msgstr "den"
 msgid "days"
 msgstr "dnů"
 
-#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3730
-#: gmusicbrowser_layout.pm:3752
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3737
+#: gmusicbrowser_layout.pm:3759
 msgid "default"
 msgstr "výchozí"
 

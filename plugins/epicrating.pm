@@ -95,7 +95,7 @@ sub SaveRatingScoresCSV {
 	_"Save lastplay ratingscore to file",
 	undef, 'save', 'gtk-save', => 'ok', 'gtk-cancel' => 'cancel');
     my $save_response = $file_chooser->run();
-
+    
     if($save_response eq 'ok') {
 	my $filename = $file_chooser->get_filename();
 	open RSF, ">", $filename or warn("Could not save file.");
@@ -345,7 +345,7 @@ sub prefbox {
     $produce_ratingscore_button->signal_connect(clicked => sub {
 	warn "Ready to begin calculating rating scores.";
 	my $rating_scores = $self->SaveRatingScoresCSV();
-
+	
     });
 
     use Text::CSV;
@@ -354,14 +354,14 @@ sub prefbox {
 	    _"Save gmusicbrowser song stats CSV dump as...",
 	    undef, 'save', 'gtk-save' => 'ok', 'gtk-cancel' => 'cancel');
 	my $response = $file_chooser->run();
-
+	
 	if($response eq 'ok') {
 	    my $csv_filename = $file_chooser->get_filename();
 	    open CSVF, ">", $csv_filename or warn "Couldn't open CSV output!";
 
 	    use Data::Dumper;
 	    my $csv = Text::CSV->new ({binary => 1 });
-
+	    
 	    my $all_songs = Filter->new("")->filter;
 	    for my $song_id (@{$all_songs}) {
 		my $rating = ::Songs::Get($song_id, 'rating');
@@ -396,7 +396,7 @@ use base 'Gtk2::Frame';
 sub ExtraFieldsEditor {
     my ($self) = @_;
     my $hbox = Gtk2::HBox->new();
-
+    
     if($self->{rule}{signal} eq "Skipped") {
 	my $b_label = Gtk2::Label->new(_"Before: ");
 	my $b_entry = Gtk2::Entry->new();
@@ -499,4 +499,3 @@ sub new {
 
     return $self;
 }
-

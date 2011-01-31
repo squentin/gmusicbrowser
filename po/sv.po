@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.4-se\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-30 20:18+0100\n"
+"POT-Creation-Date: 2011-01-31 13:08+0100\n"
 "PO-Revision-Date: 2010-10-21 14:31+0100\n"
 "Last-Translator: Olle Sandgren <olle.sandgren@blixtmail.se>\n"
 "Language-Team: Sweden <se@li.org>\n"
@@ -327,7 +327,7 @@ msgstr "<i>av</i> %a\\n<i>från</i> %l"
 msgid "API URI:"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:3789
+#: gmusicbrowser_layout.pm:3796
 msgid "Abort"
 msgstr "Avbryt"
 
@@ -358,6 +358,12 @@ msgstr ""
 #: gmusicbrowser.pl:1379
 msgid "About to turn off the computer in :"
 msgstr "Om att stänga av datorn i :"
+
+#: plugins/http_server.pm:19
+msgid ""
+"Access the gmusicbrowser library RESTfully, and use a simple javascript UI "
+"to interact with it."
+msgstr ""
 
 #: plugins/notify.pm:56
 msgid "Actions are not supported by current notification daemon"
@@ -487,7 +493,7 @@ msgstr "Avancerad sökning ..."
 msgid "Advanced Tag Editing"
 msgstr "Avancerad tag redigering"
 
-#: plugins/epicrating.pm:407
+#: plugins/epicrating.pm:409
 msgid "After: "
 msgstr ""
 
@@ -799,7 +805,7 @@ msgstr "Dålig session"
 msgid "Base Folder :"
 msgstr "Huvudfolder :"
 
-#: plugins/epicrating.pm:399
+#: plugins/epicrating.pm:401
 msgid "Before: "
 msgstr ""
 
@@ -1004,7 +1010,7 @@ msgstr ""
 msgid "Choose icon for label {name}"
 msgstr "Välj ikon för etikett {name}"
 
-#: gmusicbrowser_layout.pm:2477
+#: gmusicbrowser_layout.pm:2484
 msgid "Choose page to open"
 msgstr "Välj sida att öppna"
 
@@ -1032,7 +1038,7 @@ msgstr "Ta bort valda fält"
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "Klient bannlyst, kontakta gmusicbrowser's utvecklare"
 
-#: gmusicbrowser_layout.pm:2220 gmusicbrowser_list.pm:3832
+#: gmusicbrowser_layout.pm:2227 gmusicbrowser_list.pm:3832
 #: gmusicbrowser_list.pm:3899
 msgid "Close"
 msgstr "Stäng"
@@ -1226,7 +1232,7 @@ msgstr "Stanna kvar i fack när markören är över den"
 msgid "Delete Selected Songs"
 msgstr "Radera valda melodier"
 
-#: gmusicbrowser_layout.pm:2218
+#: gmusicbrowser_layout.pm:2225
 msgid "Delete list"
 msgstr "Ta bort lista"
 
@@ -1252,7 +1258,7 @@ msgstr "Skrivbordswidgets"
 msgid "Desktop widgets plugin"
 msgstr "Skrivbordswidgets modul"
 
-#: plugins/epicrating.pm:483
+#: plugins/epicrating.pm:485
 msgid "Differential: "
 msgstr ""
 
@@ -1598,7 +1604,7 @@ msgstr ""
 msgid "Field type"
 msgstr ""
 
-#: plugins/epicrating.pm:481
+#: plugins/epicrating.pm:483
 msgid "Field: "
 msgstr ""
 
@@ -1704,12 +1710,12 @@ msgstr "Mappmönster :"
 msgid "Folders to search for new songs"
 msgstr "Mappar att söka i för samma melodier"
 
-#: gmusicbrowser_layout.pm:3647 gmusicbrowser_list.pm:17
+#: gmusicbrowser_layout.pm:3654 gmusicbrowser_list.pm:17
 #: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6508
 msgid "Follow playing song"
 msgstr "Följ uppspelad melodi"
 
-#: gmusicbrowser_layout.pm:3647
+#: gmusicbrowser_layout.pm:3654
 msgid "Follow selected song"
 msgstr "Följ utvald melodi"
 
@@ -1786,6 +1792,14 @@ msgstr "Grupp med ..."
 #: gmusicbrowser_songs.pm:555 gmusicbrowser_tags.pm:1552
 msgid "Grouping"
 msgstr "Gruppering"
+
+#: plugins/http_server.pm:16
+msgid "HTTP Server"
+msgstr ""
+
+#: plugins/http_server.pm:17
+msgid "HTTP Server - Provides a RESTful HTTP service (and Javascript player)"
+msgstr ""
 
 #: plugins/audioscrobbler.pm:153
 msgid "Handshake OK"
@@ -2302,7 +2316,7 @@ msgstr ""
 msgid "New filter"
 msgstr "Nytt filter"
 
-#: gmusicbrowser_layout.pm:2205
+#: gmusicbrowser_layout.pm:2212
 msgid "New list"
 msgstr "Ny lista"
 
@@ -2507,7 +2521,7 @@ msgstr "Öppna anpassat fönster"
 msgid "Open Equalizer"
 msgstr "Öppna equaliser"
 
-#: gmusicbrowser_layout.pm:2208
+#: gmusicbrowser_layout.pm:2215
 msgid "Open Playlist"
 msgstr "Öppna spellista"
 
@@ -2515,7 +2529,7 @@ msgstr "Öppna spellista"
 msgid "Open Preference window"
 msgstr "Öppna preferensfönster"
 
-#: gmusicbrowser_layout.pm:2206
+#: gmusicbrowser_layout.pm:2213
 msgid "Open Queue"
 msgstr "Öppna kö"
 
@@ -2531,11 +2545,11 @@ msgstr "Öppna sökfönster"
 msgid "Open containing folder"
 msgstr "Öppna innehållsmapp"
 
-#: gmusicbrowser_layout.pm:2214
+#: gmusicbrowser_layout.pm:2221
 msgid "Open context page"
 msgstr "Öppna sammanhangssida"
 
-#: gmusicbrowser_layout.pm:2210
+#: gmusicbrowser_layout.pm:2217
 msgid "Open existing list"
 msgstr "Öppna existerande lista"
 
@@ -2551,7 +2565,7 @@ msgstr ""
 msgid "Open link in Browser"
 msgstr "_Öppna länk i bläddrare"
 
-#: gmusicbrowser_layout.pm:2212
+#: gmusicbrowser_layout.pm:2219
 msgid "Open page layout"
 msgstr "Öppna sidlayout"
 
@@ -2816,6 +2830,10 @@ msgstr "Öppna anpassat fönster"
 #: gmusicbrowser.pl:1081
 msgid "Popup Traytip"
 msgstr "Öppna lådtips"
+
+#: plugins/http_server.pm:404
+msgid "Port Number"
+msgstr ""
 
 #: plugins/webcontext.pm:566
 msgid "Pre-set"
@@ -3137,7 +3155,7 @@ msgstr "Radera denna tagg"
 msgid "Remove this widget"
 msgstr "Ta bort denna widget"
 
-#: gmusicbrowser_layout.pm:2219 gmusicbrowser_list.pm:2838
+#: gmusicbrowser_layout.pm:2226 gmusicbrowser_list.pm:2838
 msgid "Rename"
 msgstr "Byt namn"
 
@@ -3699,7 +3717,7 @@ msgstr "Blandade album, blandade spår"
 msgid "Shutdown command :"
 msgstr "Avslutnings kommando"
 
-#: plugins/epicrating.pm:478
+#: plugins/epicrating.pm:480
 msgid "Signal: "
 msgstr ""
 
@@ -3755,7 +3773,7 @@ msgstr "Melodi"
 msgid "Song Properties"
 msgstr "Melodi Egenskaper"
 
-#: gmusicbrowser_layout.pm:3705
+#: gmusicbrowser_layout.pm:3712
 msgid "Song rating"
 msgstr "Melodi betyg"
 
@@ -4585,8 +4603,8 @@ msgstr "dag"
 msgid "days"
 msgstr "dagar"
 
-#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3730
-#: gmusicbrowser_layout.pm:3752
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3737
+#: gmusicbrowser_layout.pm:3759
 msgid "default"
 msgstr "förvald"
 

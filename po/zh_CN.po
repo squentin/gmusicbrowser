@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser.pot\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-30 20:18+0100\n"
+"POT-Creation-Date: 2011-01-31 13:08+0100\n"
 "PO-Revision-Date: 2009-04-30 13:14+0800\n"
 "Last-Translator: Google Translate\n"
 "Language-Team: Chinese\n"
@@ -306,7 +306,7 @@ msgstr ""
 msgid "API URI:"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:3789
+#: gmusicbrowser_layout.pm:3796
 msgid "Abort"
 msgstr "中止"
 
@@ -337,6 +337,12 @@ msgstr ""
 #: gmusicbrowser.pl:1379
 msgid "About to turn off the computer in :"
 msgstr "计划关闭计算机在："
+
+#: plugins/http_server.pm:19
+msgid ""
+"Access the gmusicbrowser library RESTfully, and use a simple javascript UI "
+"to interact with it."
+msgstr ""
 
 #: plugins/notify.pm:56
 msgid "Actions are not supported by current notification daemon"
@@ -460,7 +466,7 @@ msgstr "高级搜索..."
 msgid "Advanced Tag Editing"
 msgstr "高级标签编辑"
 
-#: plugins/epicrating.pm:407
+#: plugins/epicrating.pm:409
 msgid "After: "
 msgstr ""
 
@@ -772,7 +778,7 @@ msgstr "错误会话"
 msgid "Base Folder :"
 msgstr "相应的文件夹："
 
-#: plugins/epicrating.pm:399
+#: plugins/epicrating.pm:401
 msgid "Before: "
 msgstr ""
 
@@ -977,7 +983,7 @@ msgstr ""
 msgid "Choose icon for label {name}"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2477
+#: gmusicbrowser_layout.pm:2484
 msgid "Choose page to open"
 msgstr ""
 
@@ -1005,7 +1011,7 @@ msgstr ""
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "客户受禁止，请联系gmusicbrowser的开发者"
 
-#: gmusicbrowser_layout.pm:2220 gmusicbrowser_list.pm:3832
+#: gmusicbrowser_layout.pm:2227 gmusicbrowser_list.pm:3832
 #: gmusicbrowser_list.pm:3899
 msgid "Close"
 msgstr "关闭"
@@ -1198,7 +1204,7 @@ msgstr "鼠标停留于托盘图表上显示提示"
 msgid "Delete Selected Songs"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2218
+#: gmusicbrowser_layout.pm:2225
 msgid "Delete list"
 msgstr "删除列表"
 
@@ -1224,7 +1230,7 @@ msgstr ""
 msgid "Desktop widgets plugin"
 msgstr ""
 
-#: plugins/epicrating.pm:483
+#: plugins/epicrating.pm:485
 msgid "Differential: "
 msgstr ""
 
@@ -1568,7 +1574,7 @@ msgstr ""
 msgid "Field type"
 msgstr ""
 
-#: plugins/epicrating.pm:481
+#: plugins/epicrating.pm:483
 msgid "Field: "
 msgstr ""
 
@@ -1674,12 +1680,12 @@ msgstr "文件夹的模式："
 msgid "Folders to search for new songs"
 msgstr "文件夹中寻找新的歌曲"
 
-#: gmusicbrowser_layout.pm:3647 gmusicbrowser_list.pm:17
+#: gmusicbrowser_layout.pm:3654 gmusicbrowser_list.pm:17
 #: gmusicbrowser_list.pm:790 gmusicbrowser_list.pm:6508
 msgid "Follow playing song"
 msgstr "紧接着正在播放的歌曲"
 
-#: gmusicbrowser_layout.pm:3647
+#: gmusicbrowser_layout.pm:3654
 msgid "Follow selected song"
 msgstr "紧接着选定的歌曲"
 
@@ -1756,6 +1762,14 @@ msgstr "群组依据："
 #: gmusicbrowser_songs.pm:555 gmusicbrowser_tags.pm:1552
 msgid "Grouping"
 msgstr "分组"
+
+#: plugins/http_server.pm:16
+msgid "HTTP Server"
+msgstr ""
+
+#: plugins/http_server.pm:17
+msgid "HTTP Server - Provides a RESTful HTTP service (and Javascript player)"
+msgstr ""
 
 #: plugins/audioscrobbler.pm:153
 msgid "Handshake OK"
@@ -2265,7 +2279,7 @@ msgstr ""
 msgid "New filter"
 msgstr "新的过滤器"
 
-#: gmusicbrowser_layout.pm:2205
+#: gmusicbrowser_layout.pm:2212
 msgid "New list"
 msgstr "新列表"
 
@@ -2468,7 +2482,7 @@ msgstr "打开自定义窗口"
 msgid "Open Equalizer"
 msgstr "打开均衡"
 
-#: gmusicbrowser_layout.pm:2208
+#: gmusicbrowser_layout.pm:2215
 msgid "Open Playlist"
 msgstr "打开播放"
 
@@ -2476,7 +2490,7 @@ msgstr "打开播放"
 msgid "Open Preference window"
 msgstr "打开偏好窗口"
 
-#: gmusicbrowser_layout.pm:2206
+#: gmusicbrowser_layout.pm:2213
 msgid "Open Queue"
 msgstr "打开队列"
 
@@ -2492,11 +2506,11 @@ msgstr "打开搜索窗口"
 msgid "Open containing folder"
 msgstr "打开所在的文件夹"
 
-#: gmusicbrowser_layout.pm:2214
+#: gmusicbrowser_layout.pm:2221
 msgid "Open context page"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2210
+#: gmusicbrowser_layout.pm:2217
 msgid "Open existing list"
 msgstr "打开现有列表"
 
@@ -2512,7 +2526,7 @@ msgstr ""
 msgid "Open link in Browser"
 msgstr "在浏览器中打开链接"
 
-#: gmusicbrowser_layout.pm:2212
+#: gmusicbrowser_layout.pm:2219
 msgid "Open page layout"
 msgstr "打开网页布局"
 
@@ -2775,6 +2789,10 @@ msgstr "弹出自定义窗口"
 #: gmusicbrowser.pl:1081
 msgid "Popup Traytip"
 msgstr "弹出托盘"
+
+#: plugins/http_server.pm:404
+msgid "Port Number"
+msgstr ""
 
 #: plugins/webcontext.pm:566
 msgid "Pre-set"
@@ -3096,7 +3114,7 @@ msgstr "删除此标签"
 msgid "Remove this widget"
 msgstr ""
 
-#: gmusicbrowser_layout.pm:2219 gmusicbrowser_list.pm:2838
+#: gmusicbrowser_layout.pm:2226 gmusicbrowser_list.pm:2838
 msgid "Rename"
 msgstr "重命名"
 
@@ -3655,7 +3673,7 @@ msgstr ""
 msgid "Shutdown command :"
 msgstr "关闭命令："
 
-#: plugins/epicrating.pm:478
+#: plugins/epicrating.pm:480
 msgid "Signal: "
 msgstr ""
 
@@ -3711,7 +3729,7 @@ msgstr "歌曲"
 msgid "Song Properties"
 msgstr "歌曲信息"
 
-#: gmusicbrowser_layout.pm:3705
+#: gmusicbrowser_layout.pm:3712
 msgid "Song rating"
 msgstr "歌曲评级"
 
@@ -4532,8 +4550,8 @@ msgstr "天"
 msgid "days"
 msgstr "天"
 
-#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3730
-#: gmusicbrowser_layout.pm:3752
+#: gmusicbrowser.pl:1005 gmusicbrowser_layout.pm:3737
+#: gmusicbrowser_layout.pm:3759
 msgid "default"
 msgstr "默认"
 
