@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.4\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-31 09:47+0100\n"
+"POT-Creation-Date: 2011-01-31 13:08+0100\n"
 "PO-Revision-Date: 2010-07-14 15:31+0100\n"
 "Last-Translator: Brice Boucard <boucard.brice@neuf.fr>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -358,6 +358,12 @@ msgstr ""
 msgid "About to turn off the computer in :"
 msgstr "Éteint l'ordinateur dans :"
 
+#: plugins/http_server.pm:19
+msgid ""
+"Access the gmusicbrowser library RESTfully, and use a simple javascript UI "
+"to interact with it."
+msgstr ""
+
 #: plugins/notify.pm:56
 msgid "Actions are not supported by current notification daemon"
 msgstr ""
@@ -489,7 +495,7 @@ msgstr "Recherche avancée..."
 msgid "Advanced Tag Editing"
 msgstr "Edition avancée du tag"
 
-#: plugins/epicrating.pm:407
+#: plugins/epicrating.pm:409
 msgid "After: "
 msgstr ""
 
@@ -803,7 +809,7 @@ msgstr "Erreur de session"
 msgid "Base Folder :"
 msgstr "Dossier de base :"
 
-#: plugins/epicrating.pm:399
+#: plugins/epicrating.pm:401
 msgid "Before: "
 msgstr ""
 
@@ -1261,7 +1267,7 @@ msgstr "Gadgets de bureau"
 msgid "Desktop widgets plugin"
 msgstr "Plugin Gadgets de bureau"
 
-#: plugins/epicrating.pm:483
+#: plugins/epicrating.pm:485
 msgid "Differential: "
 msgstr ""
 
@@ -1611,7 +1617,7 @@ msgstr "Nom du champ"
 msgid "Field type"
 msgstr "Type de champ"
 
-#: plugins/epicrating.pm:481
+#: plugins/epicrating.pm:483
 msgid "Field: "
 msgstr ""
 
@@ -1799,6 +1805,14 @@ msgstr "Grouper selon :"
 #: gmusicbrowser_songs.pm:555 gmusicbrowser_tags.pm:1552
 msgid "Grouping"
 msgstr "Regroupement"
+
+#: plugins/http_server.pm:16
+msgid "HTTP Server"
+msgstr ""
+
+#: plugins/http_server.pm:17
+msgid "HTTP Server - Provides a RESTful HTTP service (and Javascript player)"
+msgstr ""
 
 #: plugins/audioscrobbler.pm:153
 msgid "Handshake OK"
@@ -2838,6 +2852,10 @@ msgstr "Ouvrir une fenêtre personalisée en popup"
 msgid "Popup Traytip"
 msgstr "Afficher la fenêtre d'information (Traytip)"
 
+#: plugins/http_server.pm:404
+msgid "Port Number"
+msgstr ""
+
 #: plugins/webcontext.pm:566
 msgid "Pre-set"
 msgstr "Pré-configurées"
@@ -3727,7 +3745,7 @@ msgstr "Albums aléatoires, pistes aléatoires"
 msgid "Shutdown command :"
 msgstr "Commande pour éteindre l'ordinateur :"
 
-#: plugins/epicrating.pm:478
+#: plugins/epicrating.pm:480
 msgid "Signal: "
 msgstr ""
 

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9621\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-31 09:47+0100\n"
+"POT-Creation-Date: 2011-01-31 13:08+0100\n"
 "PO-Revision-Date: 2010-02-22 21:01+0100\n"
 "Last-Translator:  <staubi@linuxmail.org>\n"
 "Language-Team: german <de@li.org>\n"
@@ -360,6 +360,12 @@ msgstr "Möchten Sie wirklich diese Dateien {files} löschen?"
 msgid "About to turn off the computer in :"
 msgstr "Computer wird abgeschaltet in:"
 
+#: plugins/http_server.pm:19
+msgid ""
+"Access the gmusicbrowser library RESTfully, and use a simple javascript UI "
+"to interact with it."
+msgstr ""
+
 #: plugins/notify.pm:56
 msgid "Actions are not supported by current notification daemon"
 msgstr "Aktion wird nicht von verwendetem Benachrichtigungs-Daemon unterstützt"
@@ -489,7 +495,7 @@ msgstr "Erweiterte Suche ..."
 msgid "Advanced Tag Editing"
 msgstr "Erweiterte Tag-Bearbeitung"
 
-#: plugins/epicrating.pm:407
+#: plugins/epicrating.pm:409
 msgid "After: "
 msgstr "Nach: "
 
@@ -804,7 +810,7 @@ msgstr "Ungültige Session"
 msgid "Base Folder :"
 msgstr "Grundordner:"
 
-#: plugins/epicrating.pm:399
+#: plugins/epicrating.pm:401
 msgid "Before: "
 msgstr "Vor: "
 
@@ -1259,7 +1265,7 @@ msgstr "Desktop Miniprogramme"
 msgid "Desktop widgets plugin"
 msgstr "Desktop Miniprogramme-Erweiterung"
 
-#: plugins/epicrating.pm:483
+#: plugins/epicrating.pm:485
 msgid "Differential: "
 msgstr "Anpassung:"
 
@@ -1609,7 +1615,7 @@ msgstr "Feldname"
 msgid "Field type"
 msgstr "Feldtyp"
 
-#: plugins/epicrating.pm:481
+#: plugins/epicrating.pm:483
 msgid "Field: "
 msgstr "Feld: "
 
@@ -1798,6 +1804,14 @@ msgstr "Guppiere nach:"
 #: gmusicbrowser_songs.pm:555 gmusicbrowser_tags.pm:1552
 msgid "Grouping"
 msgstr "Gruppieren"
+
+#: plugins/http_server.pm:16
+msgid "HTTP Server"
+msgstr ""
+
+#: plugins/http_server.pm:17
+msgid "HTTP Server - Provides a RESTful HTTP service (and Javascript player)"
+msgstr ""
 
 #: plugins/audioscrobbler.pm:153
 msgid "Handshake OK"
@@ -2830,6 +2844,10 @@ msgstr "Öffne benutzerdefiniertes Fenster"
 msgid "Popup Traytip"
 msgstr "Benachrichtigungen anzeigen"
 
+#: plugins/http_server.pm:404
+msgid "Port Number"
+msgstr ""
+
 #: plugins/webcontext.pm:566
 msgid "Pre-set"
 msgstr "Voreingestellt"
@@ -3716,7 +3734,7 @@ msgstr "Gemischte Alben, gemischte Titel"
 msgid "Shutdown command :"
 msgstr "Befehl um herunterzufahren:"
 
-#: plugins/epicrating.pm:478
+#: plugins/epicrating.pm:480
 msgid "Signal: "
 msgstr "Auslöser: "
 

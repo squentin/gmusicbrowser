@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-31 09:47+0100\n"
+"POT-Creation-Date: 2011-01-31 13:08+0100\n"
 "PO-Revision-Date: 2011-01-19 09:56+0900\n"
 "Last-Translator: bluealbum <bluealbum@gmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
@@ -345,6 +345,12 @@ msgstr ""
 msgid "About to turn off the computer in :"
 msgstr "컴퓨터 끄기 정보 :"
 
+#: plugins/http_server.pm:19
+msgid ""
+"Access the gmusicbrowser library RESTfully, and use a simple javascript UI "
+"to interact with it."
+msgstr ""
+
 #: plugins/notify.pm:56
 msgid "Actions are not supported by current notification daemon"
 msgstr "기능이 현재의 알림 데몬에서 지원되지 않습니다"
@@ -472,7 +478,7 @@ msgstr "고급 찾기 ..."
 msgid "Advanced Tag Editing"
 msgstr "고급 태그 편집"
 
-#: plugins/epicrating.pm:407
+#: plugins/epicrating.pm:409
 msgid "After: "
 msgstr ""
 
@@ -784,7 +790,7 @@ msgstr "잘못된 세션"
 msgid "Base Folder :"
 msgstr "기본 폴더 :"
 
-#: plugins/epicrating.pm:399
+#: plugins/epicrating.pm:401
 msgid "Before: "
 msgstr ""
 
@@ -1236,7 +1242,7 @@ msgstr "데스크탑 위젯"
 msgid "Desktop widgets plugin"
 msgstr "데스크탑 위젯 플로그인"
 
-#: plugins/epicrating.pm:483
+#: plugins/epicrating.pm:485
 msgid "Differential: "
 msgstr ""
 
@@ -1582,7 +1588,7 @@ msgstr "필드 이름"
 msgid "Field type"
 msgstr "파일 종류"
 
-#: plugins/epicrating.pm:481
+#: plugins/epicrating.pm:483
 msgid "Field: "
 msgstr ""
 
@@ -1770,6 +1776,14 @@ msgstr "그룹 :"
 #: gmusicbrowser_songs.pm:555 gmusicbrowser_tags.pm:1552
 msgid "Grouping"
 msgstr "그룹으로 나누기"
+
+#: plugins/http_server.pm:16
+msgid "HTTP Server"
+msgstr ""
+
+#: plugins/http_server.pm:17
+msgid "HTTP Server - Provides a RESTful HTTP service (and Javascript player)"
+msgstr ""
 
 #: plugins/audioscrobbler.pm:153
 msgid "Handshake OK"
@@ -2799,6 +2813,10 @@ msgstr "팝업 사용자정의 창"
 msgid "Popup Traytip"
 msgstr "팝업 트레이팁"
 
+#: plugins/http_server.pm:404
+msgid "Port Number"
+msgstr ""
+
 #: plugins/webcontext.pm:566
 msgid "Pre-set"
 msgstr "프리셋"
@@ -3681,7 +3699,7 @@ msgstr "섞여진 앨범들, 섞여진 트랙들"
 msgid "Shutdown command :"
 msgstr "끄기 명령어 :"
 
-#: plugins/epicrating.pm:478
+#: plugins/epicrating.pm:480
 msgid "Signal: "
 msgstr ""
 

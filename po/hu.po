@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 0.9538\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-31 09:47+0100\n"
+"POT-Creation-Date: 2011-01-31 13:08+0100\n"
 "PO-Revision-Date: 2006-08-12 19:03+0200\n"
 "Last-Translator: Zsombor <gzsombor@gmail.com>\n"
 "Language-Team: Hungarian <translation-team-hu@lists.sourceforge.net>\n"
@@ -333,6 +333,12 @@ msgstr ""
 msgid "About to turn off the computer in :"
 msgstr ""
 
+#: plugins/http_server.pm:19
+msgid ""
+"Access the gmusicbrowser library RESTfully, and use a simple javascript UI "
+"to interact with it."
+msgstr ""
+
 #: plugins/notify.pm:56
 msgid "Actions are not supported by current notification daemon"
 msgstr ""
@@ -455,7 +461,7 @@ msgstr ""
 msgid "Advanced Tag Editing"
 msgstr ""
 
-#: plugins/epicrating.pm:407
+#: plugins/epicrating.pm:409
 msgid "After: "
 msgstr ""
 
@@ -767,7 +773,7 @@ msgstr ""
 msgid "Base Folder :"
 msgstr ""
 
-#: plugins/epicrating.pm:399
+#: plugins/epicrating.pm:401
 msgid "Before: "
 msgstr ""
 
@@ -1214,7 +1220,7 @@ msgstr ""
 msgid "Desktop widgets plugin"
 msgstr ""
 
-#: plugins/epicrating.pm:483
+#: plugins/epicrating.pm:485
 msgid "Differential: "
 msgstr ""
 
@@ -1554,7 +1560,7 @@ msgstr ""
 msgid "Field type"
 msgstr ""
 
-#: plugins/epicrating.pm:481
+#: plugins/epicrating.pm:483
 msgid "Field: "
 msgstr ""
 
@@ -1741,6 +1747,14 @@ msgstr ""
 
 #: gmusicbrowser_songs.pm:555 gmusicbrowser_tags.pm:1552
 msgid "Grouping"
+msgstr ""
+
+#: plugins/http_server.pm:16
+msgid "HTTP Server"
+msgstr ""
+
+#: plugins/http_server.pm:17
+msgid "HTTP Server - Provides a RESTful HTTP service (and Javascript player)"
 msgstr ""
 
 #: plugins/audioscrobbler.pm:153
@@ -2758,6 +2772,10 @@ msgstr ""
 msgid "Popup Traytip"
 msgstr ""
 
+#: plugins/http_server.pm:404
+msgid "Port Number"
+msgstr ""
+
 #: plugins/webcontext.pm:566
 msgid "Pre-set"
 msgstr ""
@@ -3634,7 +3652,7 @@ msgstr ""
 msgid "Shutdown command :"
 msgstr ""
 
-#: plugins/epicrating.pm:478
+#: plugins/epicrating.pm:480
 msgid "Signal: "
 msgstr ""
 

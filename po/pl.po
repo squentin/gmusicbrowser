@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.0\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-31 09:47+0100\n"
+"POT-Creation-Date: 2011-01-31 13:08+0100\n"
 "PO-Revision-Date: 2008-10-02 00:51+0100\n"
 "Last-Translator: Michael R' Tokarczyk <mrtokarczyk@gmail.com>\n"
 "Language-Team: tizzilzol team <tizzilzol@gmail.com>\n"
@@ -357,6 +357,12 @@ msgstr "Czy na pewno skasować {files} ?"
 msgid "About to turn off the computer in :"
 msgstr "Zakończenie pracy komputera za :"
 
+#: plugins/http_server.pm:19
+msgid ""
+"Access the gmusicbrowser library RESTfully, and use a simple javascript UI "
+"to interact with it."
+msgstr ""
+
 #: plugins/notify.pm:56
 msgid "Actions are not supported by current notification daemon"
 msgstr ""
@@ -485,7 +491,7 @@ msgstr "Zaawansowane wyszukiwanie ..."
 msgid "Advanced Tag Editing"
 msgstr "Zaawansowana edycja tagów"
 
-#: plugins/epicrating.pm:407
+#: plugins/epicrating.pm:409
 msgid "After: "
 msgstr ""
 
@@ -797,7 +803,7 @@ msgstr "Błędna sesja"
 msgid "Base Folder :"
 msgstr "Katalog bazowy :"
 
-#: plugins/epicrating.pm:399
+#: plugins/epicrating.pm:401
 msgid "Before: "
 msgstr ""
 
@@ -1249,7 +1255,7 @@ msgstr ""
 msgid "Desktop widgets plugin"
 msgstr ""
 
-#: plugins/epicrating.pm:483
+#: plugins/epicrating.pm:485
 msgid "Differential: "
 msgstr ""
 
@@ -1594,7 +1600,7 @@ msgstr ""
 msgid "Field type"
 msgstr ""
 
-#: plugins/epicrating.pm:481
+#: plugins/epicrating.pm:483
 msgid "Field: "
 msgstr ""
 
@@ -1782,6 +1788,14 @@ msgstr "Grupuj według :"
 #: gmusicbrowser_songs.pm:555 gmusicbrowser_tags.pm:1552
 msgid "Grouping"
 msgstr "Grupowanie"
+
+#: plugins/http_server.pm:16
+msgid "HTTP Server"
+msgstr ""
+
+#: plugins/http_server.pm:17
+msgid "HTTP Server - Provides a RESTful HTTP service (and Javascript player)"
+msgstr ""
 
 #: plugins/audioscrobbler.pm:153
 msgid "Handshake OK"
@@ -2812,6 +2826,10 @@ msgstr "Otwórz inne okno"
 msgid "Popup Traytip"
 msgstr "Powiadamianie (zasobnik)"
 
+#: plugins/http_server.pm:404
+msgid "Port Number"
+msgstr ""
+
 #: plugins/webcontext.pm:566
 msgid "Pre-set"
 msgstr ""
@@ -3696,7 +3714,7 @@ msgstr ""
 msgid "Shutdown command :"
 msgstr "Wyłącz komendę : "
 
-#: plugins/epicrating.pm:478
+#: plugins/epicrating.pm:480
 msgid "Signal: "
 msgstr ""
 
