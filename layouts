@@ -1,3 +1,47 @@
+[Rhythmbox]
+Author = aboettger
+Type = G
+Title = %a - %t
+Default = Window(size=80%x80%)
+DefaultFocus =
+Window =
+
+VolumeScroll = HBVolume
+
+VBMain = HBMenubar 1HBToolbar 4VBSliderbar _VBPlayer HBStatusbar
+
+    HBMenubar = MBEdit
+        MBEdit = SMMusic0 SMEdit1 SMView2 SMControl3 SMHelp4
+            SMMusic0 = (label=_"Music") SeparatorMenuItem00 MenuItem00(command=Quit,label=_"Quit")
+            SMEdit1 = (label=_"Edit") SeparatorMenuItem10 MenuItem10(command=OpenPref,label=_"Options ...")
+            SMView2 = (label=_"View")
+            SMControl3 = (label=_"Control")
+            SMHelp4 = (label=_"Help")
+
+    HBToolbar = Play Prev Next 3VSeparator -HBVolume
+        HBVolume = VolumeIcon(size=menu,button=1)
+
+    VBSliderbar = 5HBText 1TimeSlider(direct_mode=0)
+
+        HBText = 4Filler0 _Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",yalign=0.5) ArtistBreadcrumb(expand_max=200,yalign=1,minsize=0,markup=" by <i>%a</i> ") AlbumBreadcrumb(minsize=1,expand_max=200,yalign=1,minsize=1,markup=" on <i>%l</i>   ",showcover=0) -Time
+
+    VBPlayer = _HPLeftCenter
+
+        HPLeftCenter = VBLeft VBCenter
+
+            VBLeft = _FilterPane0(minheight=200,nb=0,hidebb=1,page=savedtree,pages=savedtree) 3Cover(maxsize=400)
+
+            VBCenter = HBSearch _VPFilterAndSongList
+
+                HBSearch = 5Text(text=_"Search:") _SimpleSearch(maxwidth=420,noselector=1)
+
+                VPFilterAndSongList = _HBFilter _SongList
+
+                    HBFilter = _FilterPane2(nb=2, hidebb=1,pages=artist,page=artist) _FilterPane3(nb=3,hidebb=1,pages=album,page=album)
+
+    HBStatusbar = Total(mode=filter)
+
+
 [shimmer]
 Type=G
 Title		= "gmusicbrowser"
@@ -33,7 +77,7 @@ HPRight		= _HBSongListtree
 HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
 HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
 VPMosaic	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
-### bottom: statusbar ### Pref(size=small-toolbar,button=0) 
+### bottom: statusbar ### Pref(size=small-toolbar,button=0)
 ### positioning and sizing ###
 HSize0		= 350 NBList
 VSize0		= 350 HBCover
@@ -757,5 +801,4 @@ VBmain = _SongTree(group=Play:first_artist)
 Type= P
 Name=Same year
 VBmain = _SongTree(group=Play:year)
-
 
