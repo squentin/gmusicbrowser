@@ -399,10 +399,10 @@ sub ArtistChanged
 	my $url= $sites{$self->{site}}[SITEURL];
 	$url=~s/%a/$artist/;
 	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/;
-	if ($url ne $self->{url} or $force == 1) { # FIXME: events and similar-tabs always reload when switched to
+	if ($url ne $self->{url} or $force == 1) {
 		$self->{url} = $url;
 		if ($self->{site} eq "biography") { # check for local biography file before loading the page
-			unless ($force) {
+			unless ($force == 1) {
 			my $file=::pathfilefromformat( ::GetSelID($self), $::Options{OPT.'PathFile'}, undef,1 );
 			if ($file && -r $file)
 				{	::IdleDo('8_artistinfo'.$self,1000,\&load_file,$self,$file);
