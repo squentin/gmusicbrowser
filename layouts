@@ -8,7 +8,7 @@ Default     = Window(size=1120x820) HPContent(size=963-151) HPControlsInfoAndSea
 Title		= _"%t - gmusicbrowser"
 DefaultFocus    = SimpleSearch
 
-KeyBindings = c-k SetFocusOn(SimpleSearch) c-space GoToCurrentSong a-Return OpenPref
+KeyBindings = c-k SetFocusOn(SimpleSearch) a-Return OpenSongProp
 
 HBmain = _VBMain
 VBMain = HPControlsInfoAndSearch _HPContent
