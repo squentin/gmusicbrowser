@@ -6,15 +6,28 @@ Default = Window(size=80%x80%) HPSidebarAndCenter(size=200)
 DefaultFocus =
 Window = hidden=Context|HBSearch|FilterPane2|SimpleSearch1|SimpleSearch2|SimpleSearch3|QueueList
 
+KeyBindings = a-Return OpenSongProp c-space PlayPause a-Left PrevSong a-Right NextSong c-Down DecVolume c-Up IncVolume
+
 VolumeScroll = HBVolume
 
 VBMain = HBMenubar 1HBToolbar 4VBSliderbar _HPSidebarCenterContext HBStatusbar
 
     HBMenubar = _MBEdit
         MBEdit = SMMusic0 SMEdit1 SMView2 SMControl3 SMHelp4
-            SMMusic0 = (label=_"Music") SeparatorMenuItem00 MenuItem00(command=Quit,label=_"Quit")
+            SMMusic0 = (label=_"Music") \
+                # MenuItem00(command="ChooseAddPath(0,1)",label=_"Add folder ...") \
+                # SeparatorMenuItem01 \
+                MenuItem01(command="OpenSongProp",label=_"Properties") \
+                SeparatorMenuItem02 \
+                MenuItem02(command=Quit,label=_"Quit")
             SMEdit1 = (label=_"Edit") \
-                SeparatorMenuItem10 MenuItem10(command=OpenPref,label=_"Options ...")
+                MenuItem10(command=EnqueueSelected,label=_"Add to queue") \
+                # MenuItem11(command=,label=_"Add to playlist") \ \
+                SeparatorMenuItem10 \
+                # MenuItem10(command=OpenPref,label=_"Remove") \
+                MenuItem11(command=DeleteSelected,label=_"Delete") \
+                SeparatorMenuItem11 \
+                MenuItem14(command=OpenPref,label=_"Options ...")
             SMView2 = (label=_"View") \
                 SeparatorMenuItem20 \
                 SMBrowserViews20 \
@@ -36,7 +49,17 @@ VBMain = HBMenubar 1HBToolbar 4VBSliderbar _HPSidebarCenterContext HBStatusbar
                     MenuItem211(togglegroup=2,togglewidget=HBSearchGMB,label=_"gmusicbrowser") \
                     MenuItem212(togglegroup=2,togglewidget=HBSearch,label=_"Rhythmbox")
 
-            SMControl3 = (label=_"Control")
+            SMControl3 = (label=_"Control") \
+                MenuItem30(command=PlayPause,label=_"Play") \
+                SeparatorMenuItem31 \
+                MenuItem31(command=PrevSong,label=_"Previous") \
+                MenuItem32(command=NextSong,label=_"Next") \
+                SeparatorMenuItem32 \
+                MenuItem33(command=IncVolume,label=_"Increase volume") \
+                MenuItem34(command=DecVolume,label=_"Decrease volume") \
+                SeparatorMenuItem33 \
+                MenuItem35(command=ToggleRandom,label=_"Random") # funktioniert nicht wirklich gut
+
             SMHelp4 = (label=_"Help")
 
     HBToolbar = Play Prev Next \
