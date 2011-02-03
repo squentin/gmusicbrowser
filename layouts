@@ -3,6 +3,7 @@
 # Saved filters next to the song list
 #
 
+Author=aboettger
 Type=G+
 Default     = Window(size=1120x820) HPContent(size=963-151) HPControlsInfoAndSearch(size=970-144) HPCurrentTrack(size=394-563) HPFilterPaneAndSongTree(size=0-557) HPTitleAndFiller(size=484-473) HPfp0(size=196-361) HPfpSongInfo_Search(size=385-579) VPGenreYear(size=48-45) VPfp0(size=410-344) VPfp1(size=99-305)
 Title		= _"%t - gmusicbrowser"
@@ -27,8 +28,8 @@ VBMain = HPControlsInfoAndSearch _HPContent
             HPCurrentTrack = _HBCurrentTrack _VPfp0
 
                     HBCurrentTrack = 10_VBCurrentTrack
-                        VBCurrentTrack = _Filler1 Cover(click1="",overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0) _Filler11 HBReplayButtons
-                    VBSavedFilterPane = _FilterPane4(nb=0,hidebb=1,page=savedtree,pages=savedtree)
+                        VBCurrentTrack = _Filler1 Cover(click1="",reflection=0,overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0) _Filler11 HBReplayButtons
+                    VBSavedFilterPane = _FilterPane4(nb=0,hidebb=1,tabpos=left90,page=savedtree,pages=savedtree)
 
                 VPfp0 = _VPfp1 HPFilterPaneAndSongTree
                     HPFilterPaneAndSongTree = VBSavedFilterPane _VBSongTreeAndProgress
@@ -44,7 +45,7 @@ VBMain = HPControlsInfoAndSearch _HPContent
                      VBSongTreeAndProgress = _HBSongTree VProgress
 
 
-        VBTabbedLists = _TabbedLists(group=1,page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo')
+        VBTabbedLists = _TabbedLists(group=1,tabpos=right270,page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo')
 
 
     HPControlsInfoAndSearch = _HPfpSongInfo_Search VBControls
@@ -64,7 +65,7 @@ VBMain = HPControlsInfoAndSearch _HPContent
                 #FRSongInfo = HBSongInfoDetails
                     HBSongInfoDetails = _VBTimeBar
                         VBTimeBar = 8-TimeBar(text="",minwidth=240)
-            HBSearch = 10-SimpleSearch(noselector=1,maxwidth=10000)
+            HBSearch = 10-SimpleSearch(noselector=1,maxwidth=10000,suggest=1)
 
         MBmain = MainMenuItem
 
@@ -85,6 +86,7 @@ VBMain = HPControlsInfoAndSearch _HPContent
 # saved filters below the cover picture
 #
 
+Author=aboettger
 Default = Window(size=1120x820) HPContent(size=963-151) HPControlsInfoAndSearch(size=970-144) HPCurrentTrack(size=394-563) HPFilterPaneAndSongTree(size=0-557) HPTitleAndFiller(size=484-473) HPfp0(size=196-361) HPfpSongInfo_Search(size=385-579) VPGenreYear(size=48-45) VPfp0(size=410-344) VPfp1(size=99-305) VPfp2(size=515-239)
 
 HPCurrentTrack = VPfp2 _VPfp0
@@ -97,13 +99,15 @@ VBExpandCollapse = _Filler24 ToggleButton1(size=button,widget=VBToggleSavedFilte
 VBToggleSavedFilterPane = _Filler26 ToggleButton2(size=button,widget=VBSavedFilterPane,tip=_"show/hide playlists") 5Filler27
 
 [Arkanoid Fullscreen]
+
+Author=aboettger
 Type=F
 Window  = fullscreen=1,sticky=0
 VBmain  = _HPContent -HBReplayButtons
     HBReplayButtons = Prev(size=menu) Play(size=menu) Next(size=menu) 20VSeparator 5_TimeBar(text="%t by %a (%m)",minwidth=240) 10-Stars
 
 HPContent = _HBCover
-    HBCover = _Cover(click1="",overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0)
+    HBCover = _Cover(click1="",reflection=1,overlay=6x6:778x778:awoken/overlay.png,default=awoken/no-cover.png,showcover=0)
 
 KeyBindings	= Escape CloseWindow
 VolumeScroll	= VBmain
@@ -115,6 +119,7 @@ VolumeScroll	= VBmain
         HBQueueList = _QueueList
 
 [Arkanoid browser]
+Author=aboettger
 Type=B
 Default = Window(size=1120x800) HPFilterPanes(size=100) VPFilterLists(size=60)
 VBmain  = _VBTreeAndInfo
