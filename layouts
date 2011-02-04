@@ -54,7 +54,7 @@ VBMain = HPControlsInfoAndSearch _HPContent
 
         HBVolume = VolumeIcon(button=1)
 
-        HBReplayButtons = _Filler3 5Filler15 Prev(size=large-toolbar,tip=_"Previous Song") Play(size=dialog) Next(size=large-toolbar) _Filler4 VBToggleCover VBExpandCollapse VBToggleSavedFilterPane
+        HBReplayButtons = _Filler3 5Filler15 Prev(size=large-toolbar,tip=_"Previous Song") Play(size=dialog) Next(size=large-toolbar) _Filler4 VBToggleCover VBToggleSavedFilterPane VBExpandCollapse
             VBToggleCover = _Filler20 ToggleButton0(size=button,widget=Cover,tip=_"show/hide album cover") 5Filler21
             VBExpandCollapse = _Filler24 ToggleButton1(size=button,widget=VBToggleSavedFilterPane|VPfp0|HBSearch|HBSongTreeStats,tip=_"expand/collapse cover area") 5Filler25
             VBToggleSavedFilterPane = _Filler26 ToggleButton2(size=button,widget=VBSavedFilterPane,tip=_"show/hide playlists") 5Filler27
