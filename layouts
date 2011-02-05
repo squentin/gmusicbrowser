@@ -15,7 +15,7 @@ HBmain = _VBMain
 
 VBMain = HPControlsInfoAndSearch _HPContent
 
-    HPContent = VBTitleAndCurrentTrack _VBTabbedLists
+    HPContent = VBTitleAndCurrentTrack _TBRight
 
        VBTitleAndCurrentTrack = HPTitleAndFiller _HPCurrentTrack
 
@@ -59,8 +59,13 @@ VBMain = HPControlsInfoAndSearch _HPContent
                             HBArtist = _FilterPane0(nb=3, hidebb=1,pages=artist,page=artist,page_artist/lmarkup=1)
                             HBAlbum = _FilterPane1(nb=5,hidebb=1,pages=album,page=album,page_album/mode=mosaic,page_album/lpicsize=64,page_album/lmarkup=1,page_album/mmarkup=below)
 
-        VBTabbedLists = _TabbedLists(group=1,tabpos=right270,page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo')
+#        VBTabbedLists = _TabbedLists(group=1,tabpos=right270,page='+PluginLyrics',page_opt/PluginLyrics/justification=center,page_opt/PluginArtistinfo/site=biography,pages='+PluginLyrics +PluginArtistinfo')
+        TBRight = \
+            _"Playlist" SongList(cols=playandqueue titleaa,mode=playlist,group=1,follow=1) \
+            _"Queue" VBQueueList \
+            _"Context" Context
 
+                VBQueueList = EditListButtons(group=2,small=1) _QueueList(cols=titleaa,songtree=1,group=2)
 
     HPControlsInfoAndSearch = _HPfpSongInfo_Search VBControls
 
