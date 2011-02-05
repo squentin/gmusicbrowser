@@ -1627,8 +1627,10 @@ sub FirstTime
 	};
 	$_=Filter->new($_) for values %{ $Options{SavedFilters} };
 
-	if (-r $DATADIR.SLASH.'gmbrc.default')
-	{	open my($fh),'<:utf8', $DATADIR.SLASH.'gmbrc.default';
+	my @dirs= reverse map $_.SLASH.'gmusicbrowser', Glib::get_system_config_dirs;
+	for my $dir ($DATADIR,@dirs)
+	{	next unless -r $dir.SLASH.'gmbrc.default';
+		open my($fh),'<:utf8', $dir.SLASH.'gmbrc.default';
 		my @lines=<$fh>;
 		close $fh;
 		chomp @lines;
