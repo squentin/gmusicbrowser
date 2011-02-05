@@ -43,8 +43,6 @@ VBMain = HPControlsInfoAndSearch _HPContent
                         _Filler11 \
                         HBReplayButtons
 
-
-
                 VPfp0 = _VPfp1 HPFilterPaneAndSongTree
                     HPFilterPaneAndSongTree = VBSavedFilterPane _VBSongTreeAndProgress
 
@@ -68,7 +66,14 @@ VBMain = HPControlsInfoAndSearch _HPContent
 
         VBControls = _Filler16 HBControls _Filler17
 
-            HBControls = -MBmain -HBVolume -Fullscreen(size=button)
+            HBControls = -HBVolume \
+                -Fullscreen(size=button) \
+                -Pref(stock=gtk-preferences,size=button) \
+                -Button1(click1="RunPerlCode(::ChooseAddPath(0,1))",stock=gtk-add,size=button,tip=_"Add folder ...") \
+                -Playlist(size=button) \
+                -VSeparator \
+                -Button2(click1="RunPerlCode(::IdleCheck)",stock=gtk-refresh,size=button,tip=_"check now") \
+                -Button3(click1="RunPerlCode(::IdleScan)",stock=gtk-zoom-in,size=button,tip=_"scan now")
 
         HBVolume = VolumeIcon(button=1)
 
@@ -107,8 +112,6 @@ VBMain = HPControlsInfoAndSearch _HPContent
                         VBTimeBar = 8-TimeBar(text="",minwidth=240)
 
                         HBSearch = 10-SimpleSearch(noselector=1,maxwidth=10000,suggest=1)
-
-        MBmain = MainMenuItem
 
         MBSongTree = HistItem
 
@@ -179,7 +182,13 @@ VBmain  = _VBTreeAndInfo
             HBArtist = _FilterPane2(group=1,nb=2, hidebb=1,pages=artist,page=artist,page_artist/lpicsize=64,page_artist/lmarkup=1)
             HBAlbum = _FilterPane3(group=1,nb=3,hidebb=1,pages=album,page=album,page_album/mode=mosaic,page_album/lpicsize=64,page_album/lmarkup=1,page_album/mmarkup=below)
 
-        HBStatus = HistItem(group=1) ResetFilter(group=1) Refresh(group=1) PlayFilter(group=1) FilterLock(group=1) -Pref(stock=gtk-preferences,size=button) -SimpleSearch(group=1,nb=1)
+        HBStatus = HistItem(group=1) \
+            ResetFilter(group=1) \
+            Refresh(group=1) \
+            PlayFilter(group=1) \
+            FilterLock(group=1) \
+            -Pref(stock=gtk-preferences,size=button) \
+            -SimpleSearch(group=1,nb=1)
 
         HPLists = FRSongTree FRSongTree4
 
