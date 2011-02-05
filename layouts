@@ -65,7 +65,7 @@ VBMain = HPControlsInfoAndSearch _HPContent
             _"Queue" VBQueueList \
             _"Context" Context
 
-                VBQueueList = EditListButtons(group=2,small=1) _QueueList(cols=titleaa,songtree=1,group=2)
+                VBQueueList = EditListButtons(group=2,small=1,relief=none) _QueueList(cols=titleaa,songtree=1,group=2)
 
     HPControlsInfoAndSearch = _HPfpSongInfo_Search VBControls
 
