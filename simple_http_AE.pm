@@ -9,15 +9,16 @@ package Simple_http;
 use strict;
 use warnings;
 use AnyEvent::HTTP;
-my (@Cachedurl,%Cache,$CacheSize);
+my $UseCache= *GMB::Cache::add{CODE};
 
 sub get_with_cb
 {	my $self=bless {};
 	my %params=@_;
 	$self->{params}=\%params;
 	my ($callback,$url,$post)=@params{qw/cb url post/};
-	if ($params{cache} && defined $Cache{$url})
-		{ warn "cached result\n" if $::debug; $callback->( @{$Cache{$url}} ); return undef; }
+	delete $params{cache} unless $UseCache;
+	if (my $cached= $params{cache} && GMB::Cache::get($url))
+		{ warn "cached result\n" if $::debug; $callback->( ${$cached->{data}}, $cached->{type} ); return undef; }
 
 	warn "simple_http_AE : fetching $url\n" if $::debug;
 
@@ -47,17 +48,11 @@ sub finished
 	delete $_[0]{request};
 	#warn "$_=>$headers->{$_}\n" for sort keys %$headers;
 	if ($headers->{Reason} eq 'OK') # and $headers->{Status} == 200 ?
-	{	if ($self->{params}{cache} && defined $response && length($response)<$::Options{Simplehttp_CacheSize})
-		{	$CacheSize+=length($response);
-			$Cache{$url}=[$response,$headers->{'content-type'}];
-			push @Cachedurl,$url;
-			while ($CacheSize>$::Options{Simplehttp_CacheSize})
-			{	my $old=pop @Cachedurl;
-				$CacheSize-=length $Cache{$old}[0];
-				delete $Cache{$old};
-			}
+	{	my $type= $headers->{'content-type'};
+		if ($self->{params}{cache} && defined $response)
+		{	GMB::Cache::add($url,{data=>\$response,type=>$type,size=>length($response)});
 		}
-		$callback->($response,$headers->{'content-type'},$self->{params}{url});
+		$callback->($response,$type,$self->{params}{url});
 	}
 	else
 	{	warn "Error fetching $url : $headers->{Status} $headers->{Reason}\n";

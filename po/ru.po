@@ -1,0 +1,4104 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gmusicbrowser 1.1006\n"
+"Report-Msgid-Bugs-To: squentin@free.fr\n"
+"POT-Creation-Date: 2011-01-28 00:16+0100\n"
+"PO-Revision-Date: 2011-02-05 19:46+0700\n"
+"Last-Translator: tin <girlwithoutadream@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+"Plural-Forms: nplurals=3; plural=((((n%10)==1)&&((n%100)!=11))?(0):(((((n%10)"
+">=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
+"X-Poedit-Language: Russian\n"
+"X-Poedit-Country: RUSSIAN FEDERATION\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+msgid " of {length}"
+msgstr " из {length}"
+
+msgid "# songs"
+msgstr "# песен"
+
+msgid "%S by %a"
+msgstr "%S из %a"
+
+msgid "%d Album"
+msgid_plural "%d Albums"
+msgstr[0] "%d альбом"
+msgstr[1] "%d альбома"
+msgstr[2] "%d альбомов"
+
+msgid "%d Artist"
+msgid_plural "%d Artists"
+msgstr[0] "%d исполнитель"
+msgstr[1] "%d исполнителя"
+msgstr[2] "%d исполнителей"
+
+msgid "%d Song"
+msgid_plural "%d Songs"
+msgstr[0] "%d песня"
+msgstr[1] "%d песни"
+msgstr[2] "%d песен"
+
+msgid "%d album"
+msgid_plural "%d albums"
+msgstr[0] "%d альбом"
+msgstr[1] "%d альбома"
+msgstr[2] "%d альбомов"
+
+msgid "%d artist"
+msgid_plural "%d artists"
+msgstr[0] "%d исполнитель"
+msgstr[1] "%d исполнителя"
+msgstr[2] "%d исполнителей"
+
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] "%d файл"
+msgstr[1] "%d файла"
+msgstr[2] "%d файлов"
+
+msgid "%d file in {folder}"
+msgid_plural "%d files in {folder}"
+msgstr[0] "%d файл в {folder}"
+msgstr[1] "%d файла в {folder}"
+msgstr[2] "%d файлов в {folder}"
+
+msgid "%d folder"
+msgid_plural "%d folders"
+msgstr[0] "%d папка"
+msgstr[1] "%d папки"
+msgstr[2] "%d папок"
+
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d секунда"
+msgstr[1] "%d секунды"
+msgstr[2] "%d секунд"
+
+msgid "%d song"
+msgid_plural "%d songs"
+msgstr[0] "%d песня"
+msgstr[1] "%d песни"
+msgstr[2] "%d песен"
+
+msgid "%d song added"
+msgid_plural "%d songs added"
+msgstr[0] "%d песня добавлена"
+msgstr[1] "%d песни добавлены"
+msgstr[2] "%d песен добавлено"
+
+msgid "%d song in queue"
+msgid_plural "%d songs in queue"
+msgstr[0] "%d песня в очереди"
+msgstr[1] "%d песни в очереди"
+msgstr[2] "%d песен в очереди"
+
+msgid "%d song in the library"
+msgid_plural "%d songs in the library"
+msgstr[0] "%d песня в библиотеке"
+msgstr[1] "%d песни в библиотеке"
+msgstr[2] "%d песен в библиотеке"
+
+msgid "%d song selected"
+msgid_plural "%d songs selected"
+msgstr[0] "%d песня выделена"
+msgstr[1] "%d песни выделены"
+msgstr[2] "%d песен выделено"
+
+msgid "%f is set"
+msgstr "%f установлен"
+
+msgid "%f isn't set"
+msgstr "%f не установлен"
+
+msgid "%n first added"
+msgstr "%n первых добавленных"
+
+msgid "%n last added"
+msgstr "%n последних добавленных"
+
+msgid "%n last played"
+msgstr "%n последних воспроизведённых"
+
+msgid "%n last skipped"
+msgstr "%n последних пропущенных"
+
+msgid "%n less played"
+msgstr "%n наименее воспроизводимых"
+
+msgid "%n less skipped"
+msgstr "%n наименее пропускаемых"
+
+msgid "%n longest"
+msgstr "%n самых длинных"
+
+msgid "%n most played"
+msgstr "%n воспроизводимых больше всех"
+
+msgid "%n most skipped"
+msgstr "%n наиболее пропускаемых"
+
+msgid "%n not played for the longest time"
+msgstr "%n не воспроизводившихся долгое время"
+
+msgid "%n not skipped for the longest time"
+msgstr "%n не пропускавшихся долгое время"
+
+msgid "%n shortest"
+msgstr "%n самых коротких"
+
+msgid "'{file}' exists. Overwrite ?"
+msgstr "'{file}' существует. Перезаписать?"
+
+msgid "(%d song excluded)"
+msgid_plural "(%d songs excluded)"
+msgstr[0] "(%d песня исключена)"
+msgstr[1] "(%d песни исключены)"
+msgstr[2] "(%d песен исключено)"
+
+# ?
+msgid "(: )has one"
+msgstr "(: )есть один"
+
+# ?
+msgid "(: )none"
+msgstr "(: )нет"
+
+msgid "(applied after restart)"
+msgstr "(вступит в силу после перезапуска)"
+
+msgid "(case insensitive)"
+msgstr "(не чувствительно к регистру)"
+
+# обычная?
+msgid "(common parent folder : {common})"
+msgstr "(общая родительская папка: {common})"
+
+msgid "(other)"
+msgstr "(другое)"
+
+msgid "(see http://www.last.fm)"
+msgstr "(смотри http://www.last.fm)"
+
+msgid ""
+"- When selecting a song, the playlist filter will be reset if the song is "
+"not in it\n"
+"- Skip to another song when removing the current song from the playlist"
+msgstr ""
+"- Когда выбрана песня, фильтр списка воспроизведения будет сброшен, если "
+"песня не в нём\n"
+"- Перейти к другой песне при удалении текущей песни из списка воспроизведения"
+
+msgid "0 chance"
+msgstr "0 шансов"
+
+msgid "1 chance in {probability}"
+msgstr "1 шанс из {probability}"
+
+msgid "3 Filter panes"
+msgstr "3 окна фильтра"
+
+msgid "32x32 PNG file icon"
+msgstr "32x32 PNG-значок"
+
+msgid "50 Last Added"
+msgstr "50 последних добавленных"
+
+msgid "50 Last Played"
+msgstr "50 последних воспроизведённых"
+
+msgid "50 Most Played"
+msgstr "50 наиболее воспроизводимых"
+
+msgid "<Unknown>"
+msgstr "<Неизвестный>"
+
+msgid ""
+"<b>%t</b>\n"
+"<small><small>by</small> %a\n"
+"<small>from</small> %l</small>"
+msgstr ""
+"<b>%t</b>\n"
+"<small><small>из</small> %a\n"
+"<small>из</small> %l</small>"
+
+msgid "<i>by</i> %a\\n<i>from</i> %l"
+msgstr "<i>из</i> %a\\n<i>из</i> %l"
+
+msgid "Abort"
+msgstr "Прервать"
+
+msgid "Abort ReplayGain analysis"
+msgstr "Прервать анализ ReplayGain"
+
+msgid "Abort all"
+msgstr "Прервать все"
+
+msgid "Abort mass-tagging"
+msgstr "Прервать массовое тегирование"
+
+msgid "About"
+msgstr "О программе"
+
+msgid ""
+"About to delete {files}\n"
+"Are you sure ?"
+msgstr ""
+"Собираетесь удалить {files}\n"
+"Уверены?"
+
+msgid "About to turn off the computer in :"
+msgstr "Компьютер выключится через:"
+
+msgid "Actions are not supported by current notification daemon"
+msgstr "Действие не поддерживается текущей службой уведомления"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "Add a button to rip a CD"
+msgstr "Добавить кнопку для копирования CD"
+
+msgid "Add a fullscreen button"
+msgstr "Добавить кнопку полноэкранного режима"
+
+msgid "Add a fullscreen button to layouts that can accept extra buttons"
+msgstr ""
+"Добавить кнопку полноэкранного режима к слоям, поддерживающим дополнительные "
+"кнопки"
+
+msgid "Add a group"
+msgstr "Добавить группу"
+
+msgid "Add a label to the current song"
+msgstr "Добавить метку к текущей песне"
+
+msgid "Add a list of files/folders to the playlist"
+msgstr "Добавить список файлов/папок к списку воспроизведения"
+
+msgid "Add a radio"
+msgstr "Добавить радио"
+
+msgid "Add files or folders"
+msgstr "Добавить файл или папку"
+
+msgid "Add files/folders to library"
+msgstr "Добавить файл/папку в библиотеку"
+
+msgid "Add folder"
+msgstr "Добавить папку"
+
+msgid "Add label"
+msgstr "Добавить метку"
+
+msgid "Add multiple condition"
+msgstr "Добавить несколько условий"
+
+msgid "Add new label"
+msgstr "Добавить новую метку"
+
+msgid "Add new radio"
+msgstr "Добавить новое радио"
+
+msgid "Add rule : "
+msgstr "Добавить правило: "
+
+msgid "Add shorcut key"
+msgstr "Добавить горячую клавишу"
+
+msgid "Add tab"
+msgstr "Добавить вкладку"
+
+msgid "Add to list"
+msgstr "Добавить к списку"
+
+msgid "Added"
+msgstr "Добавлено"
+
+msgid "Added Today"
+msgstr "Добавленные сегодня"
+
+msgid "Adding a radio"
+msgstr "Добавляется радио"
+
+msgid ""
+"Additionally this format can be used :\n"
+" default number1 format1 number2 format2 ...\n"
+" dates more recent than number1 seconds will use format1, ..."
+msgstr ""
+"Также может быть использован такой формат:\n"
+" по умолчанию число1 формат1 число2 формат2 ...\n"
+" более поздние даты, чем число1 секунд будет использован формат1, ..."
+
+msgid ""
+"Adds a menu entry to artist/album context menu, allowing to search the "
+"picture/cover in google and save it."
+msgstr ""
+"Добавляет пункт к контекстному меню исполнителя/альбома, позволяющий искать "
+"изображение/обложку в google и сохранять её."
+
+msgid "Adds labels to the current song"
+msgstr "Добавляет метки к текущей песне"
+
+msgid "Adds menu entries to song contextual menu"
+msgstr "Добавляет пункты к контекстному меню песни"
+
+msgid "Advanced Search ..."
+msgstr "Расширенный поиск..."
+
+msgid "Advanced Tag Editing"
+msgstr "Расширенное редактирование тегов"
+
+msgid "Album"
+msgstr "Альбом"
+
+msgid "Album and artist"
+msgstr "Альбом и исполнитель"
+
+msgid "Album and artist on the left side"
+msgstr "Альбом и исполнитель слева"
+
+msgid "Album artist"
+msgstr "Исполнитель альбома"
+
+msgid "Album gain"
+msgstr "Усиление альбома"
+
+msgid "Album mode"
+msgstr "Режим альбома"
+
+msgid "Album peak"
+msgstr "Пик альбома"
+
+msgid "Album picture"
+msgstr "Обложка альбома"
+
+msgid "Album picture & info"
+msgstr "Обложка и информация об альбоме"
+
+msgid "Album shuffle"
+msgstr "Перемешивание альбома"
+
+msgid "Album with picture"
+msgstr "Альбом с изображением"
+
+msgid "Album year(s)"
+msgstr "Год(ы) альбома"
+
+msgid "All"
+msgstr "Все"
+
+msgid "All Songs"
+msgstr "Все песни"
+
+msgid "All albums"
+msgstr "Все альбомы"
+
+msgid "All artists"
+msgstr "Все исполнители"
+
+msgid "All but the [most/less]%n"
+msgstr "Все кроме [наиболее/наименее]%n"
+
+msgid "All files"
+msgstr "Все файлы"
+
+msgid "All genres"
+msgstr "Все жанры"
+
+msgid "All labels"
+msgstr "Все метки"
+
+msgid "All moods"
+msgstr "Все настроения"
+
+msgid "All of :"
+msgstr "Все из:"
+
+msgid "All songs"
+msgstr "Все песни"
+
+msgid "Allow for scheduling fade-out and stop"
+msgstr "Позволяет планировать затухание и остановку"
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
+msgstr ""
+"Позволяет контролировать gmusicbrowser через DBus, используя стандарт MPRIS "
+"v1.0"
+
+msgid "Alt"
+msgstr "Alt"
+
+msgid "Amount of volume changed by the mouse wheel"
+msgstr "Объем звука, изменяемый колесом мыши"
+
+msgid "Any of :"
+msgstr "Любой из:"
+
+msgid "Append"
+msgstr "Добавить"
+
+msgid "Append (only if not already present)"
+msgstr "Добавить (только если уже не существует)"
+
+msgid "Append to playlist"
+msgstr "Добавить к списку воспроизведения"
+
+msgid "Application"
+msgstr "Приложения"
+
+msgid "Are you sure you want to delete the '{label}' label ?"
+msgstr "Уверены, что хотите удалить метку '{label}'?"
+
+msgid "Arguments"
+msgstr "Аргументы"
+
+msgid "Artist"
+msgstr "Исполнитель"
+
+msgid "Artist & album"
+msgstr "Исполнитель и альбом"
+
+msgid "Artist Picture Size : "
+msgstr "Размер изображения исполнителя:"
+
+msgid "Artist URL"
+msgstr "URL исполнителя"
+
+msgid "Artist picture"
+msgstr "Изображение исполнителя"
+
+msgid "Artist,Album,Disc,Track"
+msgstr "Исполнитель,Альбом,Диск,Трек"
+
+msgid "Artist,Date,Album,Disc,Track"
+msgstr "Исполнитель,Дата,Альбом,Диск,Трек"
+
+msgid "Artistinfo"
+msgstr "Информация об исполнителе"
+
+msgid "Artistinfo plugin"
+msgstr "Плагин 'Информация об исполнителе'"
+
+msgid "Artists"
+msgstr "Исполнители"
+
+msgid "Ascending order"
+msgstr "Возрастающий порядок"
+
+msgid "Ask confirmation only if file already exists"
+msgstr "Спрашивать подтверждение только, если файл уже существует"
+
+msgid "Audio"
+msgstr "Аудио"
+
+msgid "Author"
+msgstr "Автор"
+
+msgid "Auto fill based on filenames ..."
+msgstr "Автозаполнение на основе имен файлов ..."
+
+msgid "Auto fill only blank fields"
+msgstr "Автозаполнение только пустых полей"
+
+msgid "Auto fill queue"
+msgstr "Автозаполнение очереди"
+
+msgid "Auto filter"
+msgstr "Авто-фильтр"
+
+msgid "Auto-increment track numbers"
+msgstr "Автодополнение номеров треков"
+
+msgid "Auto-save positive finds"
+msgstr "Автоматически сохранять положительные находки"
+
+msgid "Auto-scroll"
+msgstr "Автопрокрутка"
+
+msgid "Auto-select Pictures"
+msgstr "Автовыбор изображений"
+
+msgid "Automatically remove current song if not found"
+msgstr "Автоматически удалять текущую песню, если не найдена"
+
+msgid "Autosave"
+msgstr "Автосохранение"
+
+msgid "Autosave plugin"
+msgstr "Плагин автосохранения"
+
+msgid "Available"
+msgstr "Доступно"
+
+msgid "BPM"
+msgstr "BPM"
+
+msgid "Bad session"
+msgstr "Неудачный сеанс"
+
+msgid "Base Folder :"
+msgstr "Базовая папка:"
+
+msgid "Begin with"
+msgstr "Начинается с:"
+
+msgid "Below"
+msgstr "Ниже"
+
+msgid "Bitrate"
+msgstr "Битрейт"
+
+msgid "Body :"
+msgstr "Текст сообщения:"
+
+msgid "Body text is not supported by current notification daemon"
+msgstr "Bodytext не поддерживается текущей службой оповещения"
+
+msgid "Browser"
+msgstr "Браузер"
+
+msgid "Browser window layout :"
+msgstr "Вид окна браузера:"
+
+msgid "Browser with SongTree"
+msgstr "Браузер и SongTree"
+
+msgid "Buttons"
+msgstr "Кнопки"
+
+msgid "Buttons, Song & Cover"
+msgstr "Кнопки, песня и обложка"
+
+msgid "Can be relative by using + or -"
+msgstr "Может быть относительным при использовании + или -"
+
+msgid "Can't change the volume in non-gstreamer iceserver mode"
+msgstr "Не могу изменить громкость в non-gstreamer-режиме iceserver"
+
+msgid ""
+"Can't change the volume. Needs amixer (packaged in alsa-utils) to change "
+"volume when using this audio backend."
+msgstr ""
+"Невозможно изменить громкость. Нужен amixer (часть пакета alsa-utils) для "
+"изменения громкости при использовании этого аудио-бэкэнда."
+
+msgid ""
+"Can't create Folder '{path}' : \n"
+"{error}"
+msgstr ""
+"Не могу создать папку '{path}' : \n"
+"{error}"
+
+# ...
+msgid "Can't create sink '{sink}'"
+msgstr "Невозможно создать приёмник данных '{sink}'"
+
+msgid "Can't play '{file}'."
+msgstr "Не могу воспроизвести '{file}'."
+
+msgid "Can't read file or invalid file"
+msgstr "Не могу прочитать файл или файл испорчен"
+
+msgid "Can't write in base folder '{folder}'."
+msgstr "Невозможно записать в базовую папку '{folder}'."
+
+msgid "Capitalize"
+msgstr "Прописными буквами"
+
+msgid "Capitalize each word"
+msgstr "Все слова прописными буквами"
+
+msgid "Case insensitive"
+msgstr "Не чувствительно к регистру"
+
+msgid "Case sensitive"
+msgstr "Чувствительно к регистру"
+
+msgid "Case-sensitive"
+msgstr "Регистрочувствительно"
+
+# Окно категорий?
+msgid "Categories pane"
+msgstr "Панель категорий"
+
+msgid "Centered"
+msgstr "По центру"
+
+msgid "Centered on"
+msgstr "Выравнивание по"
+
+msgid "Change Display"
+msgstr "Сменить дисплей"
+
+msgid "Change default text color"
+msgstr "Изменить цвет шрифта по умолчанию"
+
+msgid "Change default text font and size"
+msgstr "Изменить цвет и размер шрифта по умолчанию"
+
+msgid "Channels"
+msgstr "Каналы"
+
+msgid "Check for updated/deleted songs on startup"
+msgstr "Проверять обновлённые/удалённые песни на старте"
+
+msgid "Check for updated/removed songs"
+msgstr "Проверить обновлённые/удалённые песни"
+
+msgid "Checking length/bitrate"
+msgstr "Проверка длины/битрейта"
+
+msgid "Checking songs"
+msgstr "Проверка песен"
+
+msgid "Choose Album From this Artist"
+msgstr "Выбрать альбом этого исполнителя"
+
+msgid "Choose Artist/Album/Song"
+msgstr "Выбрать Исполнителя/Альбом/Песню"
+
+msgid "Choose Date"
+msgstr "Выбрать дату"
+
+msgid "Choose Picture"
+msgstr "Выбрать изображение"
+
+msgid "Choose Random Album"
+msgstr "Выбрать случайный альбом"
+
+msgid "Choose directory to copy files to"
+msgstr "Выбрать директорию для копирования файлов"
+
+msgid "Choose directory to move files to"
+msgstr "Выбрать директорию для перемещения файлов"
+
+msgid "Choose files"
+msgstr "Выбрать файлы"
+
+msgid "Choose folder to add"
+msgstr "Выбрать папку для добавления"
+
+msgid "Choose font for lyrics"
+msgstr "Выбрать шрифт для текстов песен"
+
+msgid "Choose font..."
+msgstr "Выбрать шрифт..."
+
+msgid "Choose icon for label {name}"
+msgstr "Выбрать значок для метки {name}"
+
+msgid "Choose page to open"
+msgstr "Выбрать страницу для открытия"
+
+msgid "Choose picture for '%s'"
+msgstr "Выбрать изображение для '%s'"
+
+msgid "Choose playlist files to import"
+msgstr "Выбрать файлы списков воспроизведения для импорта"
+
+msgid "Clear"
+msgstr "Очистить"
+
+msgid "Clear queue"
+msgstr "Очистить очередь"
+
+msgid "Clear selected fields"
+msgstr "Очистить выделенные поля"
+
+msgid "Client banned, contact gmusicbrowser's developer"
+msgstr "Клиент заблокирован, свяжитесь с разработчиком gmusicbrowser"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Close Window"
+msgstr "Закрыть окно"
+
+msgid "Close to tray"
+msgstr "Закрывать в трей"
+
+msgid "Command"
+msgstr "Команда"
+
+msgid "Command to launch when the button is pressed"
+msgstr "Команда для запуска при нажатии кнопки"
+
+msgid ""
+"Command used when\n"
+"'turn off computer when queue empty'\n"
+"is selected"
+msgstr ""
+"Команда, используемая, когда\n"
+"'выключить компьютер, когда очередь пуста'\n"
+"выбрано"
+
+msgid "Command when playing song changed :"
+msgstr "Команда, используемая при смене песни:"
+
+msgid "Command when stopped :"
+msgstr "Команда при остановке:"
+
+msgid "Comment"
+msgstr "Комментарий"
+
+msgid "Comments"
+msgstr "Комментарии"
+
+msgid "Compilation"
+msgstr "Сборник"
+
+msgid "Composer"
+msgstr "Композитор"
+
+msgid "Conductor"
+msgstr "Дирижёр"
+
+msgid "Connect through a proxy"
+msgstr "Подключаться через прокси"
+
+msgid "Connections from :"
+msgstr "Соединения из:"
+
+msgid "Context"
+msgstr "Контекст"
+
+msgid "Copy"
+msgstr "Копировать"
+
+msgid "Copy failed"
+msgstr "Копирование не удалось"
+
+msgid "Copy link address"
+msgstr "Копировать адрес ссылки"
+
+msgid "Copy to mounted portable player"
+msgstr "Копировать на подключенный портативный плеер"
+
+msgid "Copy to portable player"
+msgstr "Копировать на портативный плеер"
+
+msgid "Copying file"
+msgid_plural "Copying %d files"
+msgstr[0] "Копируется файл"
+msgstr[1] "Копируется %d файла"
+msgstr[2] "Копируется %d файлов"
+
+msgid "Copyright"
+msgstr "Авторские права"
+
+msgid "Create ID3v2 tags as ID3v2.4"
+msgstr "Создавать ID3v2-теги как ID3v2.4-теги"
+
+msgid "Ctrl"
+msgstr "Ctrl"
+
+msgid "Current song must always be in the playlist"
+msgstr "Текущая песня всегда должна быть в списке воспроизведения"
+
+msgid "Custom"
+msgstr "Настраиваемая"
+
+msgid "Custom Text"
+msgstr "Пользовательский текст"
+
+msgid "Custom URL"
+msgstr "Пользовательский URL"
+
+msgid "Custom command :"
+msgstr "Настраиваемая команда"
+
+msgid "Custom context pages :"
+msgstr "Пользовательские контекстные страницы:"
+
+msgid "Custom fields"
+msgstr "Настраиваемые поля"
+
+msgid "Custom formats"
+msgstr "Пользовательские форматы"
+
+msgid "Custom..."
+msgstr "Пользовательское..."
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "Date format :"
+msgstr "Формат даты:"
+
+msgid "Date of purchase"
+msgstr "Дата покупки"
+
+msgid "Debut Album"
+msgstr "Дебютный альбом"
+
+msgid "Decrease Volume"
+msgstr "Убавить звук"
+
+msgid "Default"
+msgstr "По умолчанию"
+
+msgid "Default rating :"
+msgstr "Оценка по умолчанию:"
+
+msgid "Default text color"
+msgstr "Цвет текста по умолчанию"
+
+msgid "Default text font"
+msgstr "Шрифт текста по умолчанию"
+
+msgid "Delay tray tip popup on mouse over"
+msgstr "Задерживать всплывающее окно при наведении курсора"
+
+msgid "Delete Selected Songs"
+msgstr "Удалить выделенные песни"
+
+msgid "Delete list"
+msgstr "Удалить список"
+
+msgid "Descending order"
+msgstr "В порядке убыванию"
+
+msgid "Descr."
+msgstr "Описание"
+
+msgid "Description"
+msgstr "Описание"
+
+msgid "Desktop widgets"
+msgstr "Виджеты рабочего стола"
+
+msgid "Desktop widgets plugin"
+msgstr "Плагин виджетов рабочего стола"
+
+msgid "Disable screensaver when fullscreen and playing"
+msgstr "Отключить скринсейвер при полноэкранном воспроизведении"
+
+msgid "Disabled"
+msgstr "Отключено"
+
+msgid "Disc"
+msgstr "Диск"
+
+msgid "Disc #"
+msgstr "Диск №"
+
+msgid "Disc name"
+msgstr "Название диска"
+
+msgid "Display (:1 or host:0 for example)"
+msgstr "Показать (:1 или host:0 к примеру)"
+
+msgid "Display Songs"
+msgstr "Отобразить песни"
+
+msgid ""
+"Display a special layout in or around the titlebar of the focused window"
+msgstr ""
+"Показывать специальный слой в заголовке (или рядом с ним) активного окна"
+
+msgid "Display stop/next actions"
+msgstr "Отобразить действия стоп/дальше"
+
+msgid "Display synchronized lyrics of the current song"
+msgstr "Показать синхронизированный текст текущей песни"
+
+msgid "Display tray tip for"
+msgstr "Показать всплывающее окно"
+
+msgid "Do not add a title row"
+msgstr "Не добавлять строку заголовка"
+
+msgid "Do not add songs that can't be played"
+msgstr "Не добавлять песни, которые не могут быть воспроизведены"
+
+msgid "Do not create an id3v1 tag in mp3 files"
+msgstr "Не создавать id3v1-теги в mp3-файлах"
+
+msgid "Do not unsynchronise id3v2 tags"
+msgstr "Не рассинхронизировать теги id3v2"
+
+msgid "Do not write the tags"
+msgstr "Не записывать теги"
+
+msgid "Don't add the overlay to dialogs"
+msgstr "Не добавлять перекрывающий слой к диалоговым окнам"
+
+msgid "Don't know how to play files of type {type}"
+msgstr "Не знаю как воспроизвести файлы типа {type}"
+
+msgid "Don't notify if the main window is visible"
+msgstr "Не показывать уведомление, когда главное окно видимо"
+
+msgid "Don't submit current song"
+msgstr "Не отправлять текущую песню"
+
+msgid "Edit Current Song Properties"
+msgstr "Править свойства текущей песни"
+
+msgid "Edit Labels"
+msgstr "Править метки"
+
+msgid "Edit Lyrics"
+msgstr "Править текст"
+
+msgid "Edit Lyrics ..."
+msgstr "Править текст..."
+
+msgid "Edit Multiple Songs Properties"
+msgstr "Править свойства нескольких песен"
+
+msgid "Edit Rating"
+msgstr "Изменить оценку"
+
+msgid "Edit Settings"
+msgstr "Изменить настройки"
+
+msgid "Edit auto-fill formats ..."
+msgstr "Править формат автозаполнения ..."
+
+msgid "Edit filter"
+msgstr "Править фильтр"
+
+msgid "Edit grouping ..."
+msgstr "Правка группирования..."
+
+msgid "Edit list"
+msgstr "Править список"
+
+msgid "Edit ordered modes ..."
+msgstr "Правка режима порядка..."
+
+msgid "Edit random modes ..."
+msgstr "Править случайные режимы ..."
+
+msgid "Edit selected song properties"
+msgstr "Править свойства выделенных песен"
+
+msgid "Edit..."
+msgstr "Править ..."
+
+msgid "EditList"
+msgstr "Правка списка"
+
+msgid "Editing list : "
+msgstr "Правка списка:"
+
+msgid "Editing tags"
+msgstr "Правка тегов"
+
+msgid "Embedded lyrics"
+msgstr "Встроенный текст песни"
+
+msgid "Embedded picture"
+msgstr "Встроенное изображение"
+
+msgid "Encapsulated object"
+msgstr "Инкапсулированный объект"
+
+msgid "Encoded by"
+msgstr "Кодер"
+
+msgid "Encoded with"
+msgstr "Кодировано с"
+
+msgid "Encoder"
+msgstr "Кодировщик"
+
+msgid "Encoding used for id3v1 tags :"
+msgstr "Кодирование для тегов id3v1:"
+
+msgid "Enqueue"
+msgstr "В очередь"
+
+msgid "Enqueue Action"
+msgstr "Параметры добавления в очередь"
+
+msgid "Enqueue Displayed"
+msgstr "В очередь отображаемые"
+
+msgid "Enqueue Selected"
+msgstr "Добавить в очередь выделенное"
+
+msgid "Enqueue Selected Songs"
+msgstr "Добавить в очередь выделенные песни"
+
+msgid "Enqueue Songs from Current Album"
+msgstr "Добавить в очередь песни из текущего альбома"
+
+msgid "Enqueue Songs from Current Artist"
+msgstr "Добавить в очередь песни текущего исполнителя"
+
+msgid "Enqueue a list of files/folders"
+msgstr "Добавить в очередь список файлов/папок"
+
+msgid "Enqueue filter"
+msgstr "Добавить в очередь фильтр"
+
+msgid "Enter custom event string :"
+msgstr "Ввести пользовательскую строку события:"
+
+msgid "Equalizer"
+msgstr "Эквалайзер"
+
+msgid "Error :"
+msgstr "Ошибка:"
+
+msgid ""
+"Error saving artistbio in '{file}' :\n"
+"{error}"
+msgstr ""
+"Ошибка сохранения биографии в '{file}':\n"
+"{error}"
+
+msgid ""
+"Error saving lyrics in '{file}' :\n"
+"{error}"
+msgstr ""
+"Ошибка сохранения теста в '{file}' :\n"
+"{error}"
+
+msgid "Error writing '{file}'"
+msgstr "Ошибка записи '{file}'"
+
+msgid "Error writing replaygain tags :\n"
+msgstr "Ошибка записи тегов replaygain :\n"
+
+msgid "Error: invalid filename pattern"
+msgstr "Ошибка: неверный шаблон имени файла"
+
+msgid "Example :"
+msgstr "Пример:"
+
+msgid "Execute custom command on selected files"
+msgstr "Выполнить пользовательскую команду над выбранными файлами"
+
+msgid "Export"
+msgstr "Экспорт"
+
+msgid "Export plugin"
+msgstr "Плагин экспорта"
+
+msgid "Export song properties to a .csv file"
+msgstr "Экспортировать свойства песни в cvs-файл"
+
+msgid "Export to .m3u file"
+msgstr "Экспорт в m3u-файл"
+
+msgid "Extra gain"
+msgstr "Дополнительное усиление"
+
+msgid "Extract guest artist from title :"
+msgstr "Извлекать приглашенного исполнителя из названия:"
+
+msgid "Fade-out"
+msgstr "Затухание"
+
+msgid "Fade-out in"
+msgstr "Затухание в"
+
+msgid "Fade-out then stop"
+msgstr "Затухнуть, затем остановить"
+
+msgid ""
+"Failed to delete '{file}' :\n"
+"{error}"
+msgstr ""
+"Не удалось удалить '{file}' :\n"
+"{error}"
+
+msgid "Field name"
+msgstr "Название поля"
+
+msgid "Field type"
+msgstr "Тип поля"
+
+msgid "Fields"
+msgstr "Поля"
+
+msgid "File type"
+msgstr "Тип файла"
+
+msgid "Filename"
+msgstr "Имя файла"
+
+msgid "Filename extension"
+msgstr "Расширение имени файла"
+
+msgid "Filename format :"
+msgstr "Формат имени файла:"
+
+msgid "Filename without extension"
+msgstr "Имя файла без расширения"
+
+msgid "Filesystem"
+msgstr "Файловая система"
+
+msgid "Filter"
+msgstr "Фильтр"
+
+msgid "Filter : "
+msgstr "Фильтр:"
+
+msgid "Filter edition"
+msgstr "Правка фильтра"
+
+msgid "Filter on playing Album"
+msgstr "Фильтр по играющему альбому"
+
+msgid "Filter on playing Artist"
+msgstr "Фильтр по играющему исполнителю"
+
+msgid "Filter on playing Song"
+msgstr "Фильтр по играющей песне"
+
+msgid "Filter on this album"
+msgstr "Фильтр по этому альбому"
+
+msgid "Filter on this artist"
+msgstr "Фильтр по этому исполнителю"
+
+msgid "Find :"
+msgstr "Поиск:"
+
+msgid "Find a unique filename if file already exists"
+msgstr "Найти уникальное имя файла, если файл уже существует"
+
+msgid "Find songs in same albums"
+msgstr "Найти песни в тех же альбома"
+
+msgid "Find songs with same artists"
+msgstr "Найти песни с тем же исполнителем"
+
+msgid "Find songs with the same names"
+msgstr "Найти песни с такими же именами"
+
+msgid "Folder"
+msgstr "Папка"
+
+msgid "Folder (right-aligned)"
+msgstr "Папка (по правому краю)"
+
+msgid "Folder format :"
+msgstr "Формат папки:"
+
+msgid "Folder pattern :"
+msgstr "Формат шаблона:"
+
+msgid "Folders to search for new songs"
+msgstr "Папки для поиска новых песен"
+
+msgid "Follow playing song"
+msgstr "Следовать за воспроизводимой песней"
+
+msgid "Follow selected song"
+msgstr "Следовать за выделенной песней"
+
+msgid "Font size"
+msgstr "Размер шрифта"
+
+msgid ""
+"For information on how to use this plugin, please navigate to the <a "
+"href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
+"artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/"
+"dokuwiki/'>gmusicbrowser-wiki</a>."
+msgstr ""
+"Для информации об использовании этого плагина, пожалуйста, перейдите на <a "
+"href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>wiki-"
+"страницу плагина</a> на <a href='http://gmusicbrowser.org/"
+"dokuwiki/'>gmusicbrowser-wiki</a>."
+
+msgid "Forward"
+msgstr "Вперёд"
+
+msgid "Found but not working"
+msgstr "Найдено, но не работает"
+
+msgid "Friday"
+msgstr "Пятница"
+
+msgid "Full screen layout :"
+msgstr "Полноэкранный вид:"
+
+msgid "Fullscreen"
+msgstr "На весь экран"
+
+msgid "Fullscreen simple"
+msgstr "Полноэкранный простой"
+
+msgid "GStreamer module not loaded."
+msgstr "Модуль GStreamer не загружен"
+
+msgid "Gain for songs missing replaygain tags"
+msgstr "Усиление для песен, не имеющих replaygain-тегов"
+
+msgid "Genre"
+msgstr "Жанр"
+
+msgid "Genre is set"
+msgstr "Жанр установлен"
+
+msgid "Genres"
+msgstr "Жанры"
+
+# Окно жанров?
+msgid "Genres pane"
+msgstr "Панель жанров"
+
+msgid "Gnome mmkeys"
+msgstr "Мультимедийные клавиши Gnome"
+
+msgid "Gnome multimedia keys plugin"
+msgstr "Плагин мультимедийных клавиш Gnome"
+
+msgid "Go to playing song"
+msgstr "Перейти к исполняемой песне"
+
+msgid "Group by :"
+msgstr "Группировать по:"
+
+msgid "Grouping"
+msgstr "Группирование"
+
+msgid "Handshake OK"
+msgstr "Успешное соединение"
+
+msgid "Handshake failed : "
+msgstr "Ошибка подтверждения: "
+
+msgid "Hard limiter"
+msgstr "Жесткое ограничение"
+
+msgid "Hide"
+msgstr "Спрятать"
+
+msgid "Hide toolbar"
+msgstr "Спрятать панель инструментов"
+
+msgid "Icon theme :"
+msgstr "Тема значков:"
+
+msgid "Identifier in file tag"
+msgstr "Идентификатора в теге файла"
+
+msgid "Ignore playback errors"
+msgstr "Игнорировать ошибки воспроизведения"
+
+msgid "Import list"
+msgstr "Импортировать список"
+
+msgid ""
+"In this case one command by file will be run\n"
+"\n"
+msgstr ""
+"В этом случае будет запущена одна команда на файл\n"
+"\n"
+
+msgid "Increase Volume"
+msgstr "Повысить громкость"
+
+msgid "Info"
+msgstr "Информация"
+
+msgid "Insensitive title-artist (left-aligned)"
+msgstr "Нечувствительные заголовок-исполнитель (по левому краю)"
+
+msgid "Insensitive title-artist (right-aligned)"
+msgstr "Нечувствительные заголовок-исполнитель (по правому краю)"
+
+msgid "Insensitive, Song & Cover"
+msgstr "Нечувствительные, Песня и Обложка"
+
+msgid "Insert a list of files/folders at the start of the playlist"
+msgstr "Вставить список файлов/папок в начало списка воспроизведения"
+
+msgid "Invalid regular expression"
+msgstr "Неверное регулярное выражение"
+
+msgid "Invisible hot spot"
+msgstr "Невидимый хот-спот"
+
+msgid "Justified"
+msgstr "Выравненно"
+
+msgid "KB"
+msgstr "Кб"
+
+msgid "Karaoke"
+msgstr "Караоке"
+
+msgid "Karaoke plugin"
+msgstr "Плагин караоке"
+
+msgid "Key"
+msgstr "Клавиша"
+
+msgid "Keys"
+msgstr "Клавиши"
+
+msgid "Keywords"
+msgstr "Ключевые слова"
+
+msgid "Label"
+msgstr "Метка"
+
+msgid "Label is set"
+msgstr "Метка установлена"
+
+msgid "Label/Publisher"
+msgstr "Лейбл/Издатель"
+
+msgid "Labels"
+msgstr "Метки"
+
+msgid "Labels' icons"
+msgstr "Значок метки"
+
+msgid "Lang"
+msgstr "Язык"
+
+msgid "Lang."
+msgstr "Язык"
+
+msgid "Languages"
+msgstr "Языки"
+
+msgid "Last played"
+msgstr "Послед. воспроизв."
+
+msgid "Last skipped"
+msgstr "Пропущено в последний раз"
+
+msgid "Launch ripping program"
+msgstr "Запустить программу риппинга"
+
+msgid "Layout"
+msgstr "Вид"
+
+msgid "Layout :"
+msgstr "Вид:"
+
+msgid "Layouts"
+msgstr "Вид"
+
+msgid "Left aligned"
+msgstr "По левому краю"
+
+msgid "Left pane"
+msgstr "Левая панель"
+
+msgid "Length"
+msgstr "Длина"
+
+msgid "Library"
+msgstr "Библиотека"
+
+msgid "Library : "
+msgstr "Библиотека:"
+
+msgid ""
+"Library empty.\n"
+"\n"
+"Use the settings dialog to add music."
+msgstr ""
+"Библиотека пуста.\n"
+"\n"
+"Используйте настройки, чтобы добавить музыку"
+
+msgid "Library size : %d song"
+msgid_plural "Library size : %d songs"
+msgstr[0] "Размер библиотеки: %d песня"
+msgstr[1] "Размер библиотеки: %d песни"
+msgstr[2] "Размер библиотеки: %d песен"
+
+msgid "List"
+msgstr "Список"
+
+msgid "List empty"
+msgstr "Список пуст"
+
+msgid "List order"
+msgstr "Порядок списка"
+
+msgid "Listed : "
+msgstr "В списке: "
+
+msgid "Listed songs"
+msgstr "Песни в списке"
+
+msgid "Lists, Library & Context"
+msgstr "Списки, библиотека и контекст"
+
+msgid "Literal search"
+msgstr "Точный поиск"
+
+msgid "Load/Save Artist Info in :"
+msgstr "Загрузить/Сохранить информацию в:"
+
+msgid "Load/Save lyrics in :"
+msgstr "Загрузить/Сохранить текст в:"
+
+msgid "Loaded %d unsent song from previous session"
+msgid_plural "Loaded %d unsent songs from previous session"
+msgstr[0] "Загружена %d песня с прошлой сессии"
+msgstr[1] "Загружены %d песни с прошлой сессии"
+msgstr[2] "Загружено %d песни с прошлой сессии"
+
+msgid "Loading failed."
+msgstr "Загрузка не удалась."
+
+msgid "Loading..."
+msgstr "Загрузка..."
+
+msgid "Lock"
+msgstr "Замкнуть"
+
+msgid "Lock Album"
+msgstr "Замкнуть альбом"
+
+msgid "Lock Artist"
+msgstr "Замкнуть исполнителя"
+
+msgid "Lock on Album"
+msgstr "Замкнуть на альбоме"
+
+msgid "Lock on Artist"
+msgstr "Замкнуть на исполнителе"
+
+msgid "Lock on song"
+msgstr "Замкнуть на песне"
+
+msgid "Lock on {field}"
+msgstr "Замкнуть на {field}"
+
+msgid "Locked on :\n"
+msgstr "Замкнуто на: \n"
+
+msgid "Lookup in AMG"
+msgstr "Искать в AMG"
+
+msgid "Lookup in google"
+msgstr "Искать в google"
+
+msgid "Lower left"
+msgstr "Нижний левый"
+
+msgid "Lower right"
+msgstr "Нижний правый"
+
+msgid "Lullaby"
+msgstr "Lullaby"
+
+# Плагин "Колыбельная"?
+msgid "Lullaby plugin"
+msgstr "Плагин Lullaby"
+
+msgid "Lyricist"
+msgstr "Автор текста"
+
+msgid "Lyrics"
+msgstr "Текст песни"
+
+msgid "Lyrics (requires lyrics plugin)"
+msgstr "Текст песни (требуется плагин текстов песен)"
+
+msgid "Lyrics alignement"
+msgstr "Выравнивание текстов песен"
+
+msgid "Lyrics for "
+msgstr "Текст песни "
+
+msgid "Lyrics plugin"
+msgstr "Плагин текстов песен"
+
+msgid "Lyrics source"
+msgstr "Источник текстов песен"
+
+msgid "MB"
+msgstr "МБ"
+
+msgid "MIME type"
+msgstr "тип MIME"
+
+msgid "MPRIS v1"
+msgstr "MPRIS v1"
+
+msgid "MPRIS v1 support"
+msgstr "поддержка MPRIS v1"
+
+msgid "Main"
+msgstr "Главное"
+
+msgid "Main artist"
+msgstr "Основной исполнитель"
+
+msgid ""
+"Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
+"gnome."
+msgstr ""
+"Заставляет gmusicbrowser реагировать на мультимедийные клавиши Next/Previous/"
+"Play/Stop в Gnome."
+
+msgid "Mass Rename"
+msgstr "Массовое переименование"
+
+msgid "Mass Renaming"
+msgstr "Массовое переименование"
+
+# Надеюсь, речь не про "тип носителя"? о_О
+msgid "Media type"
+msgstr "Медиатип"
+
+msgid "Menu entry name"
+msgstr "Название пункта меню"
+
+msgid "Minimal tip"
+msgstr "Минимальный"
+
+msgid "Minimum size"
+msgstr "Минимальный размер"
+
+msgid "Misc."
+msgstr "Разное"
+
+msgid "Modification"
+msgstr "Изменение"
+
+msgid "Monday"
+msgstr "Понедельник"
+
+msgid "Moods"
+msgstr "Настроения"
+
+msgid "More results"
+msgstr "Больше результатов"
+
+msgid "Move"
+msgstr "Переместить"
+
+msgid "Move Files to :"
+msgstr "Переместить файлы в:"
+
+msgid "Move failed"
+msgstr "Перемещение не удалось"
+
+msgid "Move folder to"
+msgstr "Переместить папку в"
+
+msgid "Moving file"
+msgid_plural "Moving %d files"
+msgstr[0] "Перемещается файл"
+msgstr[1] "Перемещаются %d файла"
+msgstr[2] "Перемещаются %d файлов"
+
+msgid "Mute/Unmute"
+msgstr "Вкл/выкл звук"
+
+msgid "Name"
+msgstr "Название"
+
+msgid "Name of layout"
+msgstr "Название вида"
+
+msgid "Name under which the command will appear in the menu"
+msgstr "Название, под которым команда будет отображаться в меню"
+
+# Новая?
+msgid "New"
+msgstr "Новый"
+
+msgid "New custom field"
+msgstr "Новое пользовательское поле"
+
+msgid "New filter"
+msgstr "Новый фильтр"
+
+msgid "New list"
+msgstr "Новый список"
+
+msgid "New name"
+msgstr "Новое название"
+
+msgid "Next"
+msgstr "Next"
+
+msgid "Next Album"
+msgstr "Следующий альбом"
+
+msgid "Next Artist"
+msgstr "Следующий исполнитель"
+
+msgid "Next Song"
+msgstr "Следующая песня"
+
+msgid "Next Song In Playlist"
+msgstr "Следующая песня в списке воспроизведения"
+
+msgid "No connections"
+msgstr "Нет соединения"
+
+msgid "No file browser found."
+msgstr "Не найден файловый менеджер."
+
+msgid "No genre"
+msgstr "Нет жанра"
+
+msgid "No label"
+msgstr "Нет метки"
+
+msgid "No locked filter"
+msgstr "Нет замкнутого фильтра"
+
+msgid "No moods"
+msgstr "Нет настроений"
+
+msgid "No songs found"
+msgstr "Не найдено песен"
+
+msgid "No web browser found."
+msgstr "Не найден веб-браузер."
+
+msgid "None"
+msgstr "Нет"
+
+msgid "Normal mode"
+msgstr "Нормальный режим"
+
+msgid "Normalize volume (the files must have replaygain tags)"
+msgstr "Нормализовать громкость (файлы должны иметь replaygain-теги)"
+
+msgid "Not found"
+msgstr "Не найдено"
+
+msgid "Note that some notification daemons resize the displayed picture"
+msgstr ""
+"Заметьте, что некоторые службы уведомления изменяют размер отображаемого "
+"изображения"
+
+msgid "Notify"
+msgstr "Уведомление"
+
+msgid "Notify plugin"
+msgstr "Плагин уведомления"
+
+msgid "Notify you of the playing song with the system's notification popups"
+msgstr "Уведомляет о воспроизводимой песне с помощью всплывающих уведомлений"
+
+msgid "Now playing"
+msgstr "Сейчас играет"
+
+msgid "NowPlaying plugin"
+msgstr "Плагин \"Сейчас играет\""
+
+msgid "Number of days since added"
+msgstr "Число дней со времени добавления"
+
+msgid "Number of days since last played"
+msgstr "Число дней со времени последнего воспроизведения"
+
+msgid "Number of days since last skipped"
+msgstr "Число дней со времени последнего пропуска"
+
+msgid "Number of days since modified"
+msgstr "Число дней со времени изменения"
+
+msgid "Number of milliseconds"
+msgstr "Количество миллисекунд"
+
+msgid "Number of seconds"
+msgstr "Количество секунд"
+
+msgid "Number of times played"
+msgstr "Количество воспроизведений"
+
+msgid "Number of times skipped"
+msgstr "Количество пропусков"
+
+msgid ""
+"ON -> smaller means more probable\n"
+"OFF -> bigger means more probable"
+msgstr ""
+"ВКЛ -> меньшее значит более вероятно\n"
+"ВЫКЛ -> большее значит более вероятно"
+
+msgid ""
+"ON less probable if genre is set\n"
+"OFF more probable if genre is set"
+msgstr ""
+"ВКЛ менее вероятно, если жанр установлен\n"
+"ВЫКЛ более вероятно, если жанр установлен"
+
+msgid ""
+"ON less probable if label is set\n"
+"OFF more probable if label is set"
+msgstr ""
+"ВКЛ менее вероятно, если метка установлена\n"
+"ВЫКЛ более вероятно, если метка установлена"
+
+msgid "Old name"
+msgstr "Старое название"
+
+msgid "On top of other windows instead of below"
+msgstr "Поверх всех окон"
+
+msgid "One of these commands is required to play files of type {type} : {cmd}"
+msgstr ""
+"Одна из этих команд нужна для воспроизведения файлов типа {type}: {cmd}"
+
+msgid "Only affect mp3 files that do not already have an id3v1 tag"
+msgstr "Повлияет только на mp3-файлы, в которых ещё нет id3v1-тегов"
+
+msgid "Opacity"
+msgstr "Непрозрачность"
+
+msgid "Open Browser"
+msgstr "Открыть браузер"
+
+msgid "Open Browser window"
+msgstr "Открыть окно браузера"
+
+msgid "Open Context window"
+msgstr "Открыть контекстное окно"
+
+# настраиваемое?
+msgid "Open Custom window"
+msgstr "Открыть пользовательское окно"
+
+msgid "Open Equalizer"
+msgstr "Открыть эквалайзер"
+
+msgid "Open Playlist"
+msgstr "Открыть список воспроизведения"
+
+msgid "Open Preference window"
+msgstr "Открыть окно настроек"
+
+msgid "Open Queue"
+msgstr "Открыть очередь"
+
+msgid "Open Queue window"
+msgstr "Открыть окно очереди"
+
+msgid "Open Search window"
+msgstr "Открыть окно поиска"
+
+msgid "Open containing folder"
+msgstr "Открыть содержащую объект папку"
+
+msgid "Open context page"
+msgstr "Открыть контекстную страницу"
+
+msgid "Open existing list"
+msgstr "Открыть существующий список"
+
+msgid "Open folder"
+msgstr "Открыть папку"
+
+msgid "Open last.fm website in your browser"
+msgstr "Открыть сайт last.fm в Вашем браузере"
+
+msgid "Open link in Browser"
+msgstr "Открыть ссылку в браузере"
+
+# ?
+msgid "Open page layout"
+msgstr "Открыть вид страницы"
+
+msgid "Open special layouts as desktop widgets"
+msgstr "Открыть специальный слой как виджет рабочего стола"
+
+msgid "Open this page in the web browser"
+msgstr "Открыть эту страницу в веб-браузере"
+
+msgid "Options"
+msgstr "Опции"
+
+msgid "Options for subgroup"
+msgstr "Опции для подгруппы"
+
+msgid ""
+"Or you can use the field $files which will be replaced by the list of files, "
+"and only one command will be run"
+msgstr ""
+"Или вы можете использовать поле $file, которое будет заменено списком "
+"файлов, и только одна команда будет запущена"
+
+msgid "Original Artist"
+msgstr "Оригинальный исполнитель"
+
+msgid "Original Filename"
+msgstr "Оригинальное имя файла"
+
+msgid "Original release year"
+msgstr "Оригинальный год выхода"
+
+msgid "Originaly from"
+msgstr "Родом из"
+
+msgid "Output"
+msgstr "Вывод"
+
+msgid "Overlay layout :"
+msgstr "Перекрывающий слой:"
+
+msgid "Owner identifier"
+msgstr "Идентификатор пользователя"
+
+msgid "Path,Album,Disc,Track,File"
+msgstr "Путь,Альбом,Диск,Трек,Файл"
+
+msgid "Path,File"
+msgstr "Путь,Файл"
+
+msgid "Pattern to find .lrc files :"
+msgstr "Шаблон для поиска файлов .lrc:"
+
+msgid "Pause"
+msgstr "Пауза"
+
+msgid "Picture"
+msgstr "Изображение"
+
+msgid "Picture Type"
+msgstr "Тип изображения"
+
+msgid "Picture cache :"
+msgstr "Кэш изображений:"
+
+msgid "Picture finder"
+msgstr "Поиск изображений"
+
+msgid "Picture finder plugin"
+msgstr "Плагин поиска изображений"
+
+msgid "Picture size :"
+msgstr "Размер изображения"
+
+msgid "Pictures and music files"
+msgstr "Изображения и аудиофайлы"
+
+msgid "Pictures files"
+msgstr "Файлы изображений"
+
+msgid "Play"
+msgstr "Воспроизвести"
+
+msgid "Play Only Displayed"
+msgstr "Играть только отображённые"
+
+msgid "Play Only Selected"
+msgstr "Играть только выделенные"
+
+msgid "Play a list of files"
+msgstr "Играть список файлов"
+
+msgid "Play all songs from this album"
+msgstr "Играть все песни из этого альбома"
+
+msgid "Play all songs from this artist"
+msgstr "Играть все песни этого исполнителя"
+
+msgid "Play button"
+msgstr "Кнопка воспроизведения"
+
+msgid "Play count"
+msgstr "Число воспроизведений"
+
+msgid "Play counter"
+msgstr "Счётчик воспроизведений"
+
+msgid "Play filter"
+msgstr "Играть фильтр"
+
+msgid "Play listed songs"
+msgstr "Играть песни в списке"
+
+msgid "Play order"
+msgstr "Порядок воспроизведения"
+
+msgid "Play/Pause"
+msgstr "Играть/Пауза"
+
+msgid "Played Today"
+msgstr "Воспроизведённые сегодня"
+
+msgid "Player mounted on :"
+msgstr "Плеер смонтирован в:"
+
+msgid "Player window layout :"
+msgstr "Вид окна плеера:"
+
+msgid "Playing"
+msgstr "Воспроизводимое"
+
+msgid "Playing Album"
+msgstr "Играющий альбом"
+
+msgid "Playing Artist"
+msgstr "Играющий исполнитель"
+
+msgid "Playing Filter"
+msgstr "Играющий фильтр"
+
+msgid "Playing Title"
+msgstr "Играющий заголовок"
+
+msgid "Playing and queue icons"
+msgstr "Значки играющего и очереди"
+
+msgid "Playing error : {error}"
+msgstr "Ошибка воспроизведения: {error}"
+
+msgid "Playlist"
+msgstr "Список воспроизведения"
+
+msgid "Playlist Empty"
+msgstr "Список воспроизведения пуст"
+
+msgid "Playlist empty"
+msgstr "Список воспроизведения пуст"
+
+msgid "Playlist files"
+msgstr "Файлы списков воспроизведения"
+
+msgid "Playlist filter"
+msgstr "Фильтр списка воспроизведения"
+
+msgid "Playlist filter :\n"
+msgstr "Фильтр списка воспроизведения:\n"
+
+msgid "Playlist, Library & Context"
+msgstr "Список воспроизведения, библиотека и контекст"
+
+msgid "Plugin not loaded"
+msgstr "Плагин не загружен"
+
+msgid "Plugins"
+msgstr "Плагины"
+
+msgid "Popularimeter"
+msgstr "Popularimeter"
+
+msgid "Popup Custom window"
+msgstr "Показать пользовательское всплывающее окно"
+
+msgid "Popup Traytip"
+msgstr "Всплывающее уведомление"
+
+msgid "Pre-set"
+msgstr "Предустановки"
+
+msgid "Prepend"
+msgstr "Присоединение"
+
+msgid "Press a key or a key combination"
+msgstr "Нажмите клавишу или комбинацию клавиш"
+
+msgid "Previous"
+msgstr "Предыдущая"
+
+msgid "Previous Song"
+msgstr "Предыдущая песня"
+
+msgid "Previous Song In Playlist"
+msgstr "Предыдущая песня в списке воспроизведения"
+
+msgid "Previous page"
+msgstr "Предыдущая страница"
+
+msgid "Price paid"
+msgstr "Уплаченная цена"
+
+msgid "Private Data"
+msgstr "Закрытые данные"
+
+msgid "Produced (P)"
+msgstr "Продюсер (P)"
+
+msgid "Progress"
+msgstr "Прогресс"
+
+msgid "Provides context views using MozEmbed or WebKit"
+msgstr "Обеспечивает просмотр контекста с использованием MozEmbed или WebKit"
+
+msgid "Proxy host :"
+msgstr "Хост прокси:"
+
+msgid "Publication right"
+msgstr "Право на издание"
+
+msgid "Publisher"
+msgstr "Издатель"
+
+msgid "Publisher/Studio logotype"
+msgstr "Логотип издателя/студии"
+
+msgid "Queue"
+msgstr "Очередь"
+
+msgid "Queue album"
+msgstr "Добавить в очередь альбом"
+
+msgid "Queue artist"
+msgstr "Добавить в очередь исполнителя"
+
+msgid "Queue empty"
+msgstr "Очередь пуста"
+
+msgid "Queue mode"
+msgstr "Режим очереди"
+
+msgid "Queue, Library & Context"
+msgstr "Очередь, библиотека и контекст"
+
+msgid "Quick Search"
+msgstr "Быстрый поиск"
+
+msgid "Quick Search with SongTree"
+msgstr "Быстрый поиск и SongTree"
+
+msgid "Quit"
+msgstr "Выйти"
+
+msgid "Quit when queue empty"
+msgstr "Выйти, когда очередь пуста"
+
+msgid "Radio title"
+msgstr "Название радио"
+
+msgid "Radio url"
+msgstr "Url радио"
+
+msgid "Random"
+msgstr "Случайно"
+
+msgid "Random mode edition"
+msgstr "Правка случайного режима"
+
+msgid "Rating"
+msgstr "Оценка"
+
+msgid "Rating (picture)"
+msgstr "Оценка (изображение)"
+
+msgid "Rating between 0 and 100, or empty for default"
+msgstr "Оценка между 0 и 100 или пустая по умолчанию"
+
+msgid "Re-read tags"
+msgstr "Перечитать теги"
+
+msgid "Read/write in file tag"
+msgstr "Читать/записать в тег файла"
+
+msgid "Recent Filters"
+msgstr "Последние фильтры"
+
+msgid "Recent albums"
+msgstr "Последние альбомы"
+
+msgid "Recent artists"
+msgstr "Последние исполнители"
+
+msgid "Recent songs"
+msgstr "Последние песни"
+
+msgid "Recent songs include skipped songs that haven't been played."
+msgstr ""
+"Последние песни, включая пропущенные никогда не воспроизводившиеся песни"
+
+msgid "Recently played"
+msgstr "Последние воспроизведённые"
+
+msgid "Recently played songs"
+msgstr "Последние воспроизведённые песни"
+
+msgid "Recording Dates"
+msgstr "Дата записи"
+
+msgid "Reference point :"
+msgstr "Ориентир"
+
+msgid "Refresh"
+msgstr "Обновить"
+
+msgid "Refresh list"
+msgstr "Обновить список"
+
+msgid "Regular expression"
+msgstr "Регулярное выражение"
+
+msgid "Regular expression :"
+msgstr "Регулярное выражение:"
+
+msgid "Regular expression didn't match"
+msgstr "Регулярное выражение не соответствует"
+
+msgid "Remember last Filter/Playlist between sessions"
+msgstr "Помнить последний Фильтр/Список воспроизведения между сессиями"
+
+msgid "Remember playing position between sessions"
+msgstr "Помнить позицию воспроизведения между сессиями"
+
+msgid "Remember playing song between sessions"
+msgstr "Помнить воспроизводимую песню между сессиями"
+
+msgid "Remember queue between sessions"
+msgstr "Помнить очередь между сессиями"
+
+msgid "Remixer"
+msgstr "Ремиксер"
+
+msgid "Remove"
+msgstr "Удалить"
+
+msgid "Remove a label from the current song"
+msgstr "Удалить метку из текущей песни"
+
+msgid "Remove all"
+msgstr "Удалить все"
+
+msgid "Remove all songs"
+msgstr "Удалить все песни"
+
+msgid "Remove filter"
+msgstr "Удалить фильтр"
+
+msgid "Remove from disk"
+msgstr "Удалить с диска"
+
+msgid "Remove from library"
+msgstr "Удалить из библиотеки"
+
+msgid "Remove from list"
+msgstr "Удалить из списка"
+
+msgid "Remove from playlist"
+msgstr "Удалить из списка воспроизведения"
+
+msgid "Remove from queue"
+msgstr "Удалить из очереди"
+
+msgid "Remove header, footer and left column from wikipedia pages"
+msgstr ""
+"Удалять верхний и нижний колонтитулы и левую колонку в страницах Википедии"
+
+msgid "Remove label"
+msgstr "Удалить метку"
+
+msgid "Remove list"
+msgstr "Удалить список"
+
+msgid "Remove selected songs"
+msgstr "Удалить выделенные песни"
+
+msgid "Remove this field"
+msgstr "Удалить это поле"
+
+msgid "Remove this rule"
+msgstr "Удалить это правило"
+
+msgid "Remove this tab"
+msgstr "Удалить эту вкладку"
+
+msgid "Remove this tag"
+msgstr "Удалить этот тег"
+
+msgid "Remove this widget"
+msgstr "Удалить этот виджет"
+
+msgid "Rename"
+msgstr "Переименовать"
+
+msgid "Rename File"
+msgstr "Переименовать файл"
+
+msgid "Rename file"
+msgstr "Переименовать файл"
+
+msgid "Rename files using this pattern :"
+msgstr "Переименовать файлы, используя этот шаблон:"
+
+msgid "Rename folder"
+msgstr "Переименовать папку"
+
+msgid "Rename this folder to :"
+msgstr "Переименовать эту папку в:"
+
+msgid "Rename/move files based on these fields :"
+msgstr "Переименовать/переместить файлы, основываясь на этих полях:"
+
+msgid ""
+"Renaming {oldname}\n"
+"to {newname}\n"
+"failed : {error}"
+msgstr ""
+"Переименование {oldname}\n"
+"в {newname}\n"
+"не удалось: {error}"
+
+msgid "Reorganize files and folders"
+msgstr "Реорганизовать файлы и папки"
+
+msgid "Repeat"
+msgstr "Повторить"
+
+msgid "Replace"
+msgstr "Заменить"
+
+msgid "Replace..."
+msgstr "Заменить..."
+
+msgid "ReplayGain options"
+msgstr "Настройки ReplayGain"
+
+msgid "Replaygain analysis"
+msgstr "Анализ уровня громкости (ReplayGain)"
+
+msgid "Reset filter"
+msgstr "Сбросить фильтр"
+
+msgid "Rewind"
+msgstr "Перемотать вперёд"
+
+msgid "Right aligned"
+msgstr "По правому краю"
+
+msgid "Right side"
+msgstr "Справа"
+
+msgid "Rip"
+msgstr "Рип CD"
+
+msgid "Rip plugin"
+msgstr "Плагин копирования CD"
+
+msgid "Ripping software :"
+msgstr "Программа копирования CD"
+
+msgid "Run a command when playing a song"
+msgstr "Запустить команду, когда играет песня"
+
+msgid "Run perl code"
+msgstr "Запустить perl-код"
+
+msgid "Run system command"
+msgstr "Запустить системную команду"
+
+msgid "Same Title"
+msgstr "Такое же название"
+
+msgid "Sampling Rate"
+msgstr "Частота дискретизации"
+
+msgid "Saturday"
+msgstr "Суббота"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Save Tags/Options"
+msgstr "Сохранить Теги/Свойства"
+
+msgid "Save artist biography"
+msgstr "Сохранить биографию исполнителя"
+
+msgid "Save as..."
+msgstr "Сохранить как..."
+
+msgid "Save current filter as"
+msgstr "Сохранить текущий фильтр как"
+
+msgid "Save current list as"
+msgstr "Сохранить текущий список как"
+
+msgid "Save lyrics"
+msgstr "Сохранить текст"
+
+msgid "Save now"
+msgstr "Сохранить сейчас"
+
+msgid "Save picture as"
+msgstr "Сохранить изображение как"
+
+msgid "Save tags/settings every"
+msgstr "Сохранять теги/настойки каждые"
+
+msgid "Saved"
+msgstr "Сохранено"
+
+msgid "Saved Lists"
+msgstr "Сохраненные списки"
+
+msgid "Saved filters"
+msgstr "Сохраненные фильтры"
+
+msgid "Saved lists"
+msgstr "Сохраненные списки"
+
+msgid "Scan as an album"
+msgstr "Сканировать как альбом"
+
+msgid "Scan for new songs"
+msgstr "Искать новые песни"
+
+msgid "Scan per-file track gain"
+msgstr "Сканировать потрековое усиление"
+
+msgid "Scan this file"
+msgstr "Сканировать этот файл"
+
+msgid "Scan using tag-defined album"
+msgstr "Сканировать, используя "
+
+msgid "Scanning"
+msgstr "Сканирование"
+
+msgid "Scroll with song"
+msgstr "Прокрутка следует за песней"
+
+msgid "Scroll with the song"
+msgstr "Прокрутка следует за песней"
+
+msgid "Search"
+msgstr "Поиск"
+
+msgid "Search & Playlist"
+msgstr "Поиск и список воспроизведения"
+
+msgid "Search & Queue"
+msgstr "Поиск и очередь"
+
+msgid "Search : "
+msgstr "Искать: "
+
+msgid "Search Album"
+msgstr "Искать альбом"
+
+msgid "Search Artist"
+msgstr "Искать исполнителя"
+
+msgid "Search Comment"
+msgstr "Искать комментарий"
+
+msgid "Search Genre"
+msgstr "Искать жанр"
+
+msgid "Search Label"
+msgstr "Искать метку"
+
+msgid "Search Title"
+msgstr "Искать название"
+
+msgid "Search Title, Artist and Album"
+msgstr "Искать название, исполнителя и альбом"
+
+msgid "Search Title, Artist, Album, Comment, Label and Genre"
+msgstr "Искать название, исполнителя, альбом, комментарий, метку и жанр"
+
+msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
+msgstr ""
+"Искать название, исполнителя, альбом, комментарий, метку, жанр и имя файла"
+
+msgid "Search allmusic for Artist"
+msgstr "Искать исполнителя на Allmusic"
+
+msgid "Search amazon.com for Artist"
+msgstr "Искать исполнителя на Amazon.com"
+
+msgid "Search and display lyrics"
+msgstr "Найти и показать текст песни"
+
+msgid "Search discogs for Artist"
+msgstr "Искать исполнителя на Discogs"
+
+msgid "Search for Artist on youtube"
+msgstr "Искать исполнителя на Youtube"
+
+msgid "Search for a picture on internet"
+msgstr "Искать изображение в Интернете"
+
+msgid "Search for current album"
+msgstr "Искать текущий альбом"
+
+msgid "Search for current artist"
+msgstr "Искать текущего исполнителя"
+
+msgid "Search for new songs on startup"
+msgstr "Проверять наличие новых песен при запуске"
+
+msgid "Search google for Artist"
+msgstr "Искать исполнителя в google"
+
+msgid "Search options"
+msgstr "Искать настройки"
+
+msgid "Search pitchfork for Artist"
+msgstr "Искать исполнителя на Pitchfork"
+
+msgid "Search the web for artist"
+msgstr "Искать исполнителя в Интернете"
+
+msgid "Search window layout :"
+msgstr "Вид окна поиска:"
+
+msgid "Searching for a picture of : "
+msgstr "Искать изображение: "
+
+msgid "Seek"
+msgstr "Искать"
+
+msgid "Select current song"
+msgstr "Выбрать текущую песню"
+
+msgid "Select fields"
+msgstr "Выбрать поля"
+
+msgid "Select files"
+msgstr "Выбрать файлы"
+
+msgid "Select matches"
+msgstr "Выделить совпадения"
+
+msgid "Select search fields"
+msgstr "Выбрать поля поиска"
+
+msgid "Selected : "
+msgstr "Выделено: "
+
+msgid "Selected songs"
+msgstr "Выделенные песни"
+
+msgid "Selecting pictures"
+msgstr "Выбор изображений"
+
+msgid "Seller"
+msgstr "Продавец"
+
+msgid "Send Title/Artist/Album in standard input"
+msgstr "Отправить Заголовок/Исполнителя/Альбом в стандартный ввод"
+
+msgid "Set Current Song Rating"
+msgstr "Установить оценку текущей песни"
+
+msgid "Set Picture"
+msgstr "Установить изображение"
+
+msgid "Set as primary filter"
+msgstr "Установить в качестве основного фильтра"
+
+msgid "Set focus on a layout widget"
+msgstr "Установить фокус виджете лейаута"
+
+msgid "Set grouping"
+msgstr "Установить группирование"
+
+msgid "Set icon"
+msgstr "Установить значок"
+
+msgid "Set player window layout"
+msgstr "Установить вид окна плеера"
+
+msgid "Set subgroup"
+msgstr "Установить подгруппу"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Settings on this page will only take effect after a restart"
+msgstr "Настройки на этой странице вступят в силу только после перезапуска"
+
+msgid ""
+"Shell command\n"
+"(some variables such as %f (current song filename) or %F (list of selected "
+"songs filenames) are available)"
+msgstr ""
+"Консольная команда\n"
+"(доступны некоторые переменные, такие как %f (имя файла текущей песни) или %"
+"F (список имён файлов выделенных песен))"
+
+msgid "Shift"
+msgstr "Shift"
+
+msgid "Show"
+msgstr "Показать"
+
+msgid "Show Artist page on last.fm"
+msgstr "Показать страницу исполнителя на last.fm"
+
+msgid "Show Artist page on wikipedia"
+msgstr "Показать страницу исполнителя в Википедии"
+
+msgid "Show artist's biography"
+msgstr "Показать биографию исполнителя"
+
+msgid "Show artist's upcoming events"
+msgstr "Показать предстоящие события исполнителя"
+
+msgid "Show buttons"
+msgstr "Показать кнопки"
+
+msgid "Show replaygain submenu"
+msgstr "Показать подменю replaygain"
+
+# предложения?
+msgid "Show suggestions"
+msgstr "Показать варианты"
+
+msgid "Show tabs"
+msgstr "Показать вкладки"
+
+msgid "Show tray icon"
+msgstr "Показывать значок в трее"
+
+msgid "Show tray tip on song change"
+msgstr "Показывать всплывающее уведомление при смене песни"
+
+msgid "Show/Hide"
+msgstr "Показать/Скрыть"
+
+msgid "Show/Hide layout widget(s)"
+msgstr "Показать/Скрыть ______ виджет(ы)"
+
+msgid "Show/Hide lyrics line"
+msgstr "Показать/Скрыть строку текста песни"
+
+# entry?
+msgid "Show/hide URI entry"
+msgstr "Показать/спрятать URI"
+
+msgid "Show/hide status bar"
+msgstr "Показать/Скрыть строку состояния"
+
+msgid "Shuffle"
+msgstr "Перемешать"
+
+msgid "Shuffle queue"
+msgstr "Перемешать очередь"
+
+msgid "Shuffled albums"
+msgstr "Перемешанные альбомы"
+
+msgid "Shuffled albums, shuffled tracks"
+msgstr "Перемешанные альбомы, перемешанные треки"
+
+msgid "Shutdown command :"
+msgstr "Команда выключения:"
+
+msgid "Simple title"
+msgstr "Простой заголовок"
+
+msgid "Size"
+msgstr "Размер"
+
+msgid "Skip count"
+msgstr "Число пропусков"
+
+msgid "Skip to next song if an error occurs"
+msgstr "Перейти к следующей песне, если происходит ошибка"
+
+msgid "Small album picture"
+msgstr "Маленькая обложка альбома"
+
+msgid "Small player"
+msgstr "Маленький плеер"
+
+msgid "Smaller browser"
+msgstr "Маленький браузер"
+
+msgid "Song"
+msgstr "Песня"
+
+msgid "Song Properties"
+msgstr "Свойства песни"
+
+msgid "Song rating"
+msgstr "Оценка песни"
+
+# ?
+msgid "SongTree groupings edition"
+msgstr "Правка группирования SongTree"
+
+msgid "Songs Properties"
+msgstr "Свойства песен"
+
+msgid "Sort"
+msgstr "Сортировать"
+
+msgid "Sort mode edition"
+msgstr "Правка режима сортировки"
+
+msgid "Sort order"
+msgstr "Порядок сортировки"
+
+msgid "Split artist names on :"
+msgstr "Разделять имена исполнителей с:"
+
+msgid "Standard fields"
+msgstr "Стандартные поля"
+
+msgid "Start in tray"
+msgstr "Запускаться в трее"
+
+msgid "Stop"
+msgstr "Остановить"
+
+msgid "Stop checking"
+msgstr "Остановить проверку"
+
+msgid "Stop scanning"
+msgstr "Остановить сканирование"
+
+msgid "Stop selecting pictures"
+msgstr "Остановить выбор изображений"
+
+msgid "Stop when queue empty"
+msgstr "Остановить, конда очередь пуста"
+
+msgid "Stop, Play and Next buttons"
+msgstr "Кнопки Стоп, Играть и Следующая"
+
+msgid "Stop, Play and Next buttons and Time"
+msgstr "Кнопки Стоп, Играть и Следующая и время"
+
+msgid "Stop, Play and Next buttons and Title/Artist"
+msgstr "Кнопки Стоп, Играть и Следующая и Название/Исполнитель"
+
+msgid "Strip wikipedia pages"
+msgstr "Обрезать страницы из Википедии"
+
+msgid "Submit Now-Playing OK"
+msgstr "Передача играющей сейчас песни - ОК"
+
+msgid "Submit OK"
+msgstr "Передача - ОК"
+
+msgid "Submit failed : "
+msgstr "Передача не удалась: "
+
+msgid "Submit played songs to last.fm"
+msgstr "Передаёт воспроизведённые песни на last.fm"
+
+msgid "Subtitle"
+msgstr "Подзаголовок"
+
+# ?
+msgid "Summary :"
+msgstr "Итог:"
+
+msgid "Sunday"
+msgstr "Воскресенье"
+
+msgid "Switch to fullscreen mode"
+msgstr "Переключиться в полноэкранный режим"
+
+msgid "System clock is not close enough to the current time"
+msgstr "Системные часы не достаточно близки к текущему времени"
+
+msgid "System command :"
+msgstr "Системная команда:"
+
+msgid "Tag"
+msgstr "Тег"
+
+msgid "Tags"
+msgstr "Теги"
+
+msgid "Terms of use"
+msgstr "Условия использования"
+
+msgid "Text"
+msgstr "Текст"
+
+msgid "The [most/less]"
+msgstr "[наиболее/наименее]"
+
+msgid "These fields can be used :"
+msgstr "Эти поля могут быть использованы:"
+
+msgid "This command is required to play files of type {type} : {cmd}"
+msgstr "Эта команда требуется для воспроизведения файлов типа {type} : {cmd}"
+
+msgid "This label is set for %d song."
+msgid_plural "This label is set for %d songs."
+msgstr[0] "Эта метка установлена для %d песни."
+msgstr[1] "Эта метка установлена для %d песен."
+msgstr[2] "Эта метка установлена для %d песен."
+
+msgid "This plugin requires :"
+msgstr "Этому плагину требуется:"
+
+msgid ""
+"This plugin retrieves artist-relevant information (biography, upcoming "
+"events) from last.fm."
+msgstr ""
+"Этот плагин извлекает относящуюся к исполнителю информацию (биографию, "
+"предстоящие события) с last.fm."
+
+# Начальный пункт?
+msgid "Threshold to count a song as played :"
+msgstr "Порог для подсчёта песни как проигранной:"
+
+msgid "Thursday"
+msgstr "Четверг"
+
+msgid "Timeout :"
+msgstr "Оставшееся время:"
+
+msgid "Timespan of the fade-out in seconds"
+msgstr "Время постепенного затихания в секундах"
+
+msgid "Title"
+msgstr "Название"
+
+msgid "Title & icon"
+msgstr "Заголовок и значок"
+
+msgid "Title & progress"
+msgstr "Заголовок и полоса прогресса"
+
+msgid "Title - Artist - Album"
+msgstr "Название - Исполнитель - Альбом"
+
+msgid "Titlebar"
+msgstr "Заголовок"
+
+msgid "Titlebar overlay plugin"
+msgstr "Плагин перекрывающего слоя"
+
+msgid "Toggle Album Lock"
+msgstr "Переключить замок альбома"
+
+msgid "Toggle Artist Lock"
+msgstr "Переключить замок исполнителя"
+
+msgid "Toggle Song Lock"
+msgstr "Переключить замок песни"
+
+msgid "Toggle a label of the current song"
+msgstr "Переключить метку текущей песни"
+
+msgid "Toggle between Random/Shuffle and Ordered"
+msgstr "Переключиться между Случайным/Перемешанным и Упорядоченным"
+
+msgid "Toggle fullscreen mode"
+msgstr "Переключить полноэкранный режим"
+
+msgid "Toggle the fullscreen layout"
+msgstr "Переключить полноэкранный вид"
+
+msgid "Track"
+msgstr "Трек"
+
+msgid "Track gain"
+msgstr "Усиление трека"
+
+msgid "Track peak"
+msgstr "Пик трека"
+
+msgid "Tray tip window layout :"
+msgstr "Вид всплывающего уведомления:"
+
+msgid "Tuesday"
+msgstr "Вторник"
+
+msgid "Turn Off"
+msgstr "Выключить"
+
+msgid "Turn off computer when queue empty"
+msgstr "Выключить компьютер, когда очередь пуста"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Unique file identifier"
+msgstr "Уникальный идентификатор файла"
+
+msgid "Unknown field ({field})"
+msgstr "Unknown field ({field})"
+
+# разомкнуть??? о_О
+msgid "Unlock Album"
+msgstr "Разблокировать альбом"
+
+msgid "Unlock Artist"
+msgstr "Разблокировать исполнителя"
+
+msgid "Unnamed custom command"
+msgstr "Безымянная пользовательская команда"
+
+msgid "Unnamed filter"
+msgstr "Безымянный фильтр"
+
+msgid "Untitled"
+msgstr "Без названия"
+
+msgid "Upper left"
+msgstr "Верхний левый"
+
+msgid "Upper right"
+msgstr "Верхний правый"
+
+msgid "Use Equalizer"
+msgstr "Использовать эквалайзер"
+
+msgid ""
+"Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are "
+"probably better supported by other softwares"
+msgstr ""
+"Использовать теги ID3v2.4 вместо ID3v2.3 при создании тегов ID3v2. Теги "
+"ID3v2.3, вероятно, лучше поддерживаются другим программным обеспечением"
+
+msgid "Use MozEmbed"
+msgstr "Использовать MozEmbed"
+
+msgid "Use ReplayGain"
+msgstr "Использовать ReplayGain"
+
+msgid "Use WebKit"
+msgstr "Использовать WebKit"
+
+msgid "Use a master filter"
+msgstr "Использовать главный фильтр"
+
+msgid "Use album normalization instead of track normalization"
+msgstr "Использовать нормализацию альбома вместо нормализации трека"
+
+msgid "Use default regular expression"
+msgstr "Использование регулярное выражение по умолчанию"
+
+msgid "Use gstreamer"
+msgstr "Использовать gstreamer"
+
+msgid "Use latin1 encoding if possible in id3v2 tags"
+msgstr "Использовать кодировку latin1, если возможно, в тегах id3v2"
+
+msgid ""
+"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
+"furthermore linebreaks '<br>' and any text you'd like to have in between. E."
+"g. '%title taking place at %startDate<br>in %city, %country<br><br>'"
+msgstr ""
+"Используйте теги из XML-страниц last.fm, начинающиеся с % (например, %"
+"headliner), а также переносы строк '<br>' и любой текст, какой хотите, между "
+"ними.\n"
+"Например, '%title, проходящее %startDate<br>в %city, %country<br><br>'"
+
+msgid "Use the playing filter"
+msgstr "Использовать играющий фильтр"
+
+msgid "Use this picture as cover for album '{album}'"
+msgstr "Использовать это изображение как обложку для альбома '{album}'"
+
+msgid "Use this picture for artist '{artist}'"
+msgstr "Использовать это изображение для исполнителя '{artist}'"
+
+msgid "Use {command} to play {ext} files"
+msgstr "Использовать {command} для воспроизведения {ext} файлов"
+
+msgid "Used for clipping prevention"
+msgstr "Используется для предотвращения клиппинга"
+
+msgid "Used for the Artists field"
+msgstr "Используется для поля 'Исполнитель'"
+
+msgid "Used to associate the saved value with a user or a function"
+msgstr ""
+"Используется, чтобы ассоциировать сохранённые значения с пользователем или "
+"функцией"
+
+msgid "User authentification error"
+msgstr "Ошибка аутентификации пользователя"
+
+# Значение не записано в файл?
+msgid "Value not written in file tag"
+msgstr "Значение, не записанное в файл"
+
+# Значение записано в файл?
+msgid "Value written in file tag"
+msgstr "Значение, записанное в файл"
+
+msgid "Various artists"
+msgstr "Сборник"
+
+msgid "Version"
+msgstr "Версия"
+
+msgid "View"
+msgstr "Показывать"
+
+msgid "View Binary"
+msgstr "Показать двоичные данные"
+
+msgid "View binary data ..."
+msgstr "Показать двоичные данные..."
+
+msgid "Volume"
+msgstr "Громкость"
+
+msgid "Volume : "
+msgstr "Громкость: "
+
+msgid "Volume step :"
+msgstr "Шаг громкости:"
+
+msgid "Wait when queue empty"
+msgstr "Ждать, когда очередь пуста"
+
+msgid ""
+"Warning : these are advanced options, don't change them unless you know what "
+"you are doing."
+msgstr ""
+"Предупреждение: это расширенные настройки, не изменяйте их, если не знаете, "
+"что делаете."
+
+msgid "Warning : using a folder with invalid encoding, you should rename it."
+msgstr ""
+"Предупреждение: используется папка с неверной кодировкой, вам нужно "
+"переименовать её."
+
+msgid "Warning: all existing data for this field will be lost"
+msgstr "Предупреждение: все существующие данные для этого поля будут потеряны"
+
+msgid "Warning: an identifier is needed"
+msgstr "Предупреждение: идентификатор необходим:"
+
+msgid "Warning: converting existing data to this format may be lossy"
+msgstr ""
+"Предупреждение: преобразования существующих данных в этот формат может быть "
+"с потерями"
+
+msgid "Web context"
+msgstr "Веб-контекст"
+
+msgid "Web context plugin"
+msgstr "Плагин веб-контекста"
+
+msgid "Wednesday"
+msgstr "Среда"
+
+msgid "Weighted Random"
+msgstr "Взвешенный случайный порядок"
+
+msgid ""
+"When changing songs, the previous song is added to the recent list even if "
+"not played at all."
+msgstr ""
+"При смене песни предыдущая песня добавляется в список последних, даже если "
+"она не воспроизводилась"
+
+msgid "Widget name"
+msgstr "Название виджета"
+
+msgid "Wikipedia"
+msgstr "Википедия"
+
+msgid "Wikipedia Locale"
+msgstr "Локаль Википедии"
+
+msgid ""
+"Will not write the tags except with the advanced tag editing dialog. The "
+"changes will be kept in the library instead.\n"
+"Warning, the changes for a song will be lost if the tag is re-read."
+msgstr ""
+"Теги не будут записываться (кроме как в расширенном диалоге редактирования "
+"тегов). Вместо этого изменения будут храниться в библиотеке.\n"
+"Предупреждение: изменения для песни будут потеряны, если теги будут "
+"перечитаны."
+
+msgid "Win"
+msgstr "Win"
+
+msgid "Windows"
+msgstr "Окна"
+
+msgid "Words that begin with"
+msgstr "Слова, начинающиеся с"
+
+msgid "Write filenames to ..."
+msgstr "Записать имена файлов в..."
+
+msgid "Writing tags"
+msgstr "Записываются теги"
+
+msgid "Year"
+msgstr "Год"
+
+msgid "Yes"
+msgstr "Да"
+
+msgid ""
+"You can use some markup, eg :\n"
+"<b>bold</b> <i>italic</i> <u>underline</u>\n"
+"Note that the markup may be ignored by the notification daemon"
+msgstr ""
+"Вы можете использовать разметку, например:\n"
+"<b>жирный</b> <i>курсив</i> <u>подчёркнутый</u>\n"
+"Обратите внимание, что разметка может быть проигнорирована службой "
+"уведомлений"
+
+msgid "You must specify a base folder"
+msgstr "Вы должны указать базовую папку"
+
+msgid "_Insert column"
+msgstr "_Вставить столбец"
+
+msgid "_Remove this column"
+msgstr "_Удалить этот столбец"
+
+msgid "_Retry"
+msgstr "_Повторить попытку"
+
+msgid "_Sort by"
+msgstr "_Сортировать по"
+
+# ?
+msgid "a bright coloured fish"
+msgstr "ярко окрашенная рыбка"
+
+msgid "a flac file"
+msgstr "flac-файл"
+
+msgid "a mp3 file"
+msgstr "mp3-файл"
+
+msgid "a musepack file"
+msgstr "musepack-файл"
+
+msgid "a wavepack file"
+msgstr "wavepack-файл"
+
+msgid "abort copy"
+msgstr "прервать копирование"
+
+msgid "abort move"
+msgstr "прервать перемещение"
+
+msgid "add"
+msgstr "добавить"
+
+msgid "added"
+msgstr "добавлено"
+
+msgid "advanced options"
+msgstr "расширенные настройки"
+
+msgid "after %d"
+msgstr "после %d"
+
+msgid "alphabetical"
+msgstr "по алфавиту"
+
+msgid "amixer control :"
+msgstr "контроль amixer:"
+
+msgid "an ape file"
+msgstr "ape-файл"
+
+msgid "an ogg file"
+msgstr "ogg-файл"
+
+msgid "another example"
+msgstr "другой пример"
+
+msgid "apply filter"
+msgstr "применить фильтр"
+
+msgid "argument {n} :"
+msgstr "аргумент {n}:"
+
+msgid "artist"
+msgstr "исполнитель"
+
+msgid "auto detect"
+msgstr "автоопределение"
+
+msgid "autofill"
+msgstr "автозаполнение"
+
+msgid "autofill queue"
+msgstr "автозаполнение очереди"
+
+msgid "automatic size"
+msgstr "автоматический размер"
+
+msgid "back cover"
+msgstr "обратная сторона обложки"
+
+msgid "band"
+msgstr "группа"
+
+msgid "band/artist logotype"
+msgstr "логотип группы/исполнителя"
+
+msgid "before %d"
+msgstr "до %d"
+
+msgid "between %d( and )%d"
+msgstr "между %d( and )%d"
+
+msgid "between %n( and )%n"
+msgstr "между %n( and )%n"
+
+msgid "big size"
+msgstr "большой"
+
+msgid "biography"
+msgstr "биография"
+
+msgid "bitrate"
+msgstr "битрейт"
+
+msgid "bonus tracks"
+msgstr "бонус-трек"
+
+# логический
+msgid "boolean"
+msgstr "булев"
+
+msgid "bootleg"
+msgstr "бутлег"
+
+msgid "broken"
+msgstr "повреждён"
+
+msgid "by"
+msgstr "автор"
+
+msgid "by added"
+msgstr "по времени добавления"
+
+msgid "by lastplay"
+msgstr "по последнему воспроизведению"
+
+msgid "by lastplay & bootleg"
+msgstr "по последнему воспроизведению и бутлегу"
+
+msgid "by lastplay & play count"
+msgstr "по последнему воспроизведению и числу воспроизведений"
+
+msgid "by play count"
+msgstr "по количеству воспроизведений"
+
+msgid "by rating"
+msgstr "по оценке"
+
+msgid "by {artist} from {album}"
+msgstr "по {artist} из {album}"
+
+msgid "bytes"
+msgstr "байт"
+
+msgid "check now"
+msgstr "проверить сейчас"
+
+msgid "cloud mode"
+msgstr "режим облака"
+
+msgid "command :"
+msgstr "команда:"
+
+msgid "common number"
+msgstr "общее число"
+
+# ?
+msgid "common string"
+msgstr "общая подстрока"
+
+msgid "composer"
+msgstr "композитор"
+
+msgid "conductor"
+msgstr "дирижер"
+
+msgid "connection failed"
+msgstr "соединение разорвано"
+
+msgid "connection failed."
+msgstr "соединение разорвано."
+
+msgid "contains %s"
+msgstr "содержит %s"
+
+msgid "counter"
+msgstr "счётчик"
+
+msgid "custom"
+msgstr "другое"
+
+msgid "day"
+msgstr "день"
+
+msgid "days"
+msgstr "дней"
+
+msgid "default"
+msgstr "по умолчанию"
+
+msgid "default filename"
+msgstr "имя файла по умолчанию"
+
+msgid "default folder"
+msgstr "папка по умолчанию"
+
+msgid "default fullscreen"
+msgstr "полноэкранный режим по умолчанию"
+
+msgid "delete selected filter"
+msgstr "удалить выделенные фильтры"
+
+msgid "delete selected grouping"
+msgstr "удалить выделенное группирование"
+
+msgid "delete selected random mode"
+msgstr "удалить выбранный случайный режим"
+
+msgid "delete selected sort mode"
+msgstr "удалить выделенный режим сортировки"
+
+msgid "different folders"
+msgstr "различные папки"
+
+msgid "disc {disc}"
+msgstr "диск {disc}"
+
+msgid "doesn't contain %s"
+msgstr "не содержит %s"
+
+msgid "doesn't match regexp %r"
+msgstr "не совпадает с регулярным выражением %r"
+
+msgid "during performance"
+msgstr "во время исполнения"
+
+msgid "during recording"
+msgstr "во время записи"
+
+msgid "edit ..."
+msgstr "правка..."
+
+msgid "email"
+msgstr "email"
+
+msgid "empty"
+msgstr "пусто"
+
+msgid "enable gapless (experimental)"
+msgstr "включает воспроизведение без пауз (экспериментально)"
+
+msgid "error"
+msgstr "ошибка"
+
+msgid "events"
+msgstr "события"
+
+# не нашла в коде
+msgid "ex :"
+msgstr "пример:"
+
+msgid "exactly %n( times)"
+msgstr "точно %n( times)"
+
+msgid "exactly not %n( times)"
+msgstr "точно не %n( times)"
+
+msgid "example (selected song) : {score}  ({chances})"
+msgstr "пример (выделенная песня) : {score}  ({chances})"
+
+msgid "example : "
+msgstr "пример:"
+
+msgid "example : %s"
+msgstr "пример: %s"
+
+msgid "examples :"
+msgstr "примеры:"
+
+msgid "fallback-gain"
+msgstr "резервное усиление"
+
+msgid "false"
+msgstr "неправда"
+
+msgid "favorite"
+msgstr "любимое"
+
+msgid "file format"
+msgstr "формат файла"
+
+msgid "filters"
+msgstr "фильтры"
+
+msgid "first added"
+msgstr "первых добаленных"
+
+msgid "flags"
+msgstr "флаги"
+
+# ???
+msgid "float"
+msgstr "плавающая"
+
+msgid "font size depends on"
+msgstr "размер шрифта зависит от"
+
+msgid "for files without a VBR header"
+msgstr "для файлов без VBR-заголовка"
+
+msgid "front cover"
+msgstr "лицевая сторона обложки"
+
+msgid "full"
+msgstr "полный"
+
+msgid "full with buttons"
+msgstr "полный с кнопками"
+
+msgid "google images"
+msgstr "Картинки Google"
+
+msgid "google images (hi-res)"
+msgstr "Картинки Google (высокое разрешение)"
+
+msgid "group by"
+msgstr "группировать по"
+
+msgid "half-life : "
+msgstr "полупериод?: "
+
+msgid "hours"
+msgstr "часов"
+
+msgid "huge size"
+msgstr "огромный размер"
+
+msgid "icecast server"
+msgstr "сервер icecast"
+
+msgid "id3v1 tag"
+msgstr "теги id3v1"
+
+msgid "ignore title"
+msgstr "игнорировать заголовок"
+
+msgid "illustration"
+msgstr "иллюстрация"
+
+msgid "imported list"
+msgstr "импортированный список"
+
+msgid "info"
+msgstr "информация"
+
+msgid "integer"
+msgstr "целое число"
+
+msgid "interview"
+msgstr "интԵрвью"
+
+msgid "invalid pattern"
+msgstr "неверный шаблон"
+
+msgid "inverse"
+msgstr "в обратном порядке"
+
+msgid "is"
+msgstr "точно"
+
+msgid "is %g"
+msgstr "- %g"
+
+msgid "is %n"
+msgstr "- %n"
+
+msgid "is %n( %)"
+msgstr "- %n( %)"
+
+msgid "is %n(Hz)"
+msgstr "- %n(Гц)"
+
+msgid "is %n(kbps)"
+msgstr "- %n(kbps)"
+
+msgid "is %s"
+msgstr "- %s"
+
+msgid "is after %n"
+msgstr "после %n"
+
+msgid "is before %n"
+msgstr "до %n"
+
+msgid "is between %b( and )%b"
+msgstr "между %b( и )%b"
+
+msgid "is between %n( and )%n( %)"
+msgstr "между %n( и )%n( %)"
+
+msgid "is between %n( and )%n( s)"
+msgstr "между %n( и )%n( с)"
+
+msgid "is in %s"
+msgstr "в %s"
+
+msgid "is in list %l"
+msgstr "в списке %l"
+
+msgid "is less than %b"
+msgstr "меньше чем %b"
+
+msgid "is less than %n"
+msgstr "меньше чем %n"
+
+msgid "is less than %n( %)"
+msgstr "меньше чем %n( %)"
+
+msgid "is less than %n( s)"
+msgstr "меньше чем %n( s)"
+
+msgid "is less than %n(Hz)"
+msgstr "меньше чем %n(Гц)"
+
+msgid "is less than %n(kbps)"
+msgstr "меньше чем %n(kbps)"
+
+msgid "is more than %b"
+msgstr "больше чем %b"
+
+msgid "is more than %n"
+msgstr "больше чем %n"
+
+msgid "is more than %n( %)"
+msgstr "больше чем %n( %)"
+
+msgid "is more than %n( s)"
+msgstr "больше чем %n( с)"
+
+msgid "is more than %n(Hz)"
+msgstr "больше чем %n(Гц)"
+
+msgid "is more than %n(kbps)"
+msgstr "больше чем %n(kbps)"
+
+msgid "is not"
+msgstr "точно не"
+
+msgid "is not %n"
+msgstr "не %n"
+
+msgid "is not %n( %)"
+msgstr "не %n( %)"
+
+msgid "is not %s"
+msgstr "не %s"
+
+msgid "is not 44.1kHz"
+msgstr "не 44.1 кГц"
+
+msgid "is not in %s"
+msgstr "не в %s"
+
+msgid "is not in list %l"
+msgstr "не в списке %l"
+
+msgid "isn't %g"
+msgstr "не %g"
+
+msgid "isn't %n"
+msgstr "не %n"
+
+msgid "isn't %n(Hz)"
+msgstr "не %n(Гц)"
+
+msgid "isn't %n(kbps)"
+msgstr "не %n(kbps)"
+
+msgid ""
+"itunes doesn't support unsynchronised tags last time I checked, mostly "
+"affect tags with pictures"
+msgstr ""
+"при последней проверке itunes не поддерживал несинхронизированные теги, в "
+"основном теги с изображениями"
+
+msgid "itunes-like"
+msgstr "в стиле itunes"
+
+msgid "last added"
+msgstr "последние добавленные"
+
+msgid "last played"
+msgstr "последние воспроизведённых"
+
+msgid "last skipped"
+msgstr "последних пропущенных"
+
+msgid "last.fm"
+msgstr "last.fm"
+
+msgid "last.fm plugin"
+msgstr "плагин last.fm"
+
+msgid "lead artist"
+msgstr "солист"
+
+# листочек :)
+msgid "leaflet page"
+msgstr "лист"
+
+msgid "left-side filter panes"
+msgstr "панели фильтра слева"
+
+msgid "length of songs"
+msgstr "длина песен"
+
+msgid "less played"
+msgstr "наименее воспроизводимые"
+
+msgid "less skipped"
+msgstr "наименее пропускаемые"
+
+msgid "less than %a( ago)"
+msgstr "менее чем %a( ago)"
+
+msgid "less than %n( times)"
+msgstr "менее чем %n( times)"
+
+msgid "longest"
+msgstr "самых длинных"
+
+msgid "lyricist"
+msgstr "автор текста"
+
+msgid "match regexp %r"
+msgstr "совпадает с регулярным выражением %r"
+
+msgid "maximum font size"
+msgstr "максимальный размер шрифта"
+
+msgid "media"
+msgstr "медиа"
+
+msgid "medium size"
+msgstr "средний размер"
+
+msgid "minimal"
+msgstr "минимальный"
+
+msgid "minimum font size"
+msgstr "минимальный размер шрифта"
+
+msgid "minutes"
+msgstr "минут"
+
+msgid "modified"
+msgstr "изменено"
+
+msgid "mono"
+msgstr "моно"
+
+msgid "month"
+msgstr "месяц"
+
+msgid "months"
+msgstr "месяцев"
+
+msgid "more than %a( ago)"
+msgstr "больше чем %a( ago)"
+
+msgid "more than %n( times)"
+msgstr "больше чем %n( раз)"
+
+msgid "mosaic mode"
+msgstr "режим мозаики"
+
+msgid "most played"
+msgstr "наиболее часто играемых"
+
+msgid "most skipped"
+msgstr "наиболее часто пропускаемых"
+
+msgid "move folder"
+msgstr "переместить папку"
+
+msgid "movie/video screen capture"
+msgstr "захват экрана фильма/видео"
+
+msgid "mplayer options :"
+msgstr "настройки mplayer:"
+
+msgid "multi-lines string"
+msgstr "многолинейная строка"
+
+msgid "name of the new filter"
+msgstr "название нового фильтра"
+
+msgid "name of the new grouping"
+msgstr "название нового группирования"
+
+msgid "name of the new random mode"
+msgstr "название нового случайного режима"
+
+msgid "name of the new sort mode"
+msgstr "название нового режима сортировки"
+
+msgid "never"
+msgstr "никогда"
+
+msgid "never played"
+msgstr "никогда не воспроизводившиеся"
+
+msgid "no matches found, you might want to remove some search terms."
+msgstr "совпадений не найдено, вы можете удалить некоторые условия поиска."
+
+msgid "no order"
+msgstr "нет порядка"
+
+msgid "no picture"
+msgstr "нет изображения"
+
+msgid "no pictures"
+msgstr "нет изображений"
+
+msgid "no plugins found"
+msgstr "плагины не найдены"
+
+msgid "no splitting"
+msgstr "не объединять"
+
+msgid "no to all"
+msgstr "нет для всех"
+
+msgid "noname"
+msgstr "без имени"
+
+msgid "normal"
+msgstr "нормально"
+
+msgid "normal play when queue empty"
+msgstr "нормальное воспроизведение, когда очередь пуста"
+
+msgid "not bootleg"
+msgstr "не бутлег"
+
+msgid "not played for the longest time"
+msgstr "не воспроизводившихся долгое время"
+
+msgid "not skipped for the longest time"
+msgstr "не пропускавшихся дольше"
+
+msgid "number of songs"
+msgstr "количество песен"
+
+msgid "number of songs in filter"
+msgstr "количество песен в фильтре"
+
+msgid "on %d"
+msgstr "на %d"
+
+msgid "only show entries with at least n songs"
+msgstr "показывать только записи, где не менее n песен"
+
+msgid "only works when the artist-info tab is displayed"
+msgstr "работает только, когда вкладка отображена"
+
+msgid "only works with some lyrics source and when the lyrics tab is displayed"
+msgstr ""
+"работает только с некоторыми источниками текстов и когда вкладка текстов "
+"отображена"
+
+msgid "open context window"
+msgstr "открыть контекстное окно"
+
+msgid "options"
+msgstr "опции"
+
+msgid "or"
+msgstr "или"
+
+msgid "other"
+msgstr "другое"
+
+msgid "other file icon"
+msgstr "другой значок файла"
+
+msgid "output device :"
+msgstr "устройство вывода:"
+
+msgid "password :"
+msgstr "пароль:"
+
+msgid "perl code"
+msgstr "perl-код"
+
+msgid "picture size"
+msgstr "размер изображения"
+
+msgid "play count average"
+msgstr "средний счётчик воспроизведений"
+
+msgid "played"
+msgstr "воспроизв."
+
+msgid "played>4"
+msgstr "воспроизведённые >4"
+
+msgid "port :"
+msgstr "порт:"
+
+msgid "pre-amp"
+msgstr "предусилитель"
+
+msgid "quit"
+msgstr "выйти"
+
+msgid "quit when queue empty"
+msgstr "выйти, когда очередь пуста"
+
+msgid "quodlibet-like"
+msgstr "в стиле quodlibet"
+
+msgid "rating"
+msgstr "рейтинг"
+
+msgid "rating average"
+msgstr "средняя оценка"
+
+msgid "recording location"
+msgstr "место записи"
+
+msgid "requires xdg-screensaver"
+msgstr "требуется xdg-screensaver"
+
+msgid "reset filter {nb}"
+msgstr "сбросить фильтр {nb}"
+
+msgid "reset primary filter"
+msgstr "сбросить основной фильтр"
+
+msgid "reset secondary filter"
+msgstr "сбросить дополнительный фильтр"
+
+msgid "retry"
+msgstr "повторить попытку"
+
+msgid "retry in {seconds} s"
+msgstr "повторить попытку через {seconds} сек"
+
+msgid "sampling rate"
+msgstr "частота дискретизации"
+
+msgid "save as '{name}'"
+msgstr "сохранить как '{name}'"
+
+msgid "save filter as"
+msgstr "сохранить фильтр как"
+
+msgid "save grouping as"
+msgstr "сохранить группирование как"
+
+msgid "save random mode as"
+msgstr "сохранить случайный режим как"
+
+msgid "save sort mode as"
+msgstr "сохранить режим сортировки как"
+
+msgid "saved filters"
+msgstr "сохранённые фильтры"
+
+msgid "saved groupings"
+msgstr "сохранённые группирования"
+
+msgid "saved random modes"
+msgstr "сохранённые случайные режимы"
+
+msgid "saved sort modes"
+msgstr "сохранённые режимы сортировки"
+
+msgid "scan now"
+msgstr "искать сейчас"
+
+msgid "seconds"
+msgstr "секунд"
+
+msgid "shortest"
+msgstr "самые короткие"
+
+msgid "show pictures"
+msgstr "показывать изображения"
+
+msgid "show the 'All' row"
+msgstr "показывать строку 'Все'"
+
+# какого скина?
+msgid "skin options"
+msgstr "настройки скина"
+
+msgid "skip count average"
+msgstr "среднее количество пропусков"
+
+msgid "skipped"
+msgstr "пропущено"
+
+msgid "small size"
+msgstr "маленький размер"
+
+msgid "sort by"
+msgstr "сортировка по"
+
+msgid "static list"
+msgstr "статический список"
+
+msgid "stereo"
+msgstr "стерео"
+
+msgid "stop"
+msgstr "остановить"
+
+msgid "stop when queue empty"
+msgstr "остановить, когда очередь пуста"
+
+msgid "string"
+msgstr "строка"
+
+msgid "supports : "
+msgstr "поддерживает: "
+
+msgid "text format"
+msgstr "формат текста"
+
+msgid "text mode"
+msgstr "текстовый режим"
+
+msgid "the command {name}"
+msgstr "команда {name}"
+
+msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
+msgstr "по умолчанию это utf16 для ID3v2.3 и utf8 для ID3v2.4"
+
+msgid "the file {name}"
+msgstr "файл {name}"
+
+msgid "the {name} perl module"
+msgstr "{name} модуль perl"
+
+msgid "then {action}"
+msgstr "потом {action}"
+
+msgid "times"
+msgstr "раз"
+
+msgid "toggle Intersection mode"
+msgstr "переключить режим пересечения"
+
+msgid "toggle Invert mode"
+msgstr "переключить обратный режим"
+
+msgid "tools"
+msgstr "инструменты"
+
+msgid "true"
+msgstr "верно"
+
+msgid "turn off"
+msgstr "выключить"
+
+msgid "turn off computer when queue empty"
+msgstr "выключить компьютер, когда очередь пуста"
+
+msgid "unknown"
+msgstr "неизвестный"
+
+msgid "unknown error"
+msgstr "неизвестная ошибка"
+
+msgid "unnamed random mode"
+msgstr "случайный режим без названия"
+
+msgid "url"
+msgstr "url"
+
+msgid "url-encoded list of files"
+msgstr "url-кодированный список файлов"
+
+msgid "url-encoded list of files/folders"
+msgstr "url-кодированный список файлов/папок"
+
+msgid "use :"
+msgstr "использовать:"
+
+msgid "use album name"
+msgstr "использовать название альбома"
+
+msgid "use default"
+msgstr "использовать по умолчанию"
+
+msgid "use gnome settings"
+msgstr "использовать настройки Gnome"
+
+msgid "use song folder"
+msgstr "использовать папку песни"
+
+msgid "use standard strftime variables"
+msgstr "использовать стандартные переменные strftime"
+
+msgid "username :"
+msgstr "имя пользователя:"
+
+# ?
+msgid "using skin :"
+msgstr "используемый скин:"
+
+msgid "wait for more"
+msgstr "ждать ещё"
+
+msgid "wait for more when queue empty"
+msgstr "ждать ещё, когда очередь пуста"
+
+msgid "web"
+msgstr "web"
+
+msgid "weeks"
+msgstr "недель"
+
+msgid "weight :"
+msgstr "вес:"
+
+msgid "wikipedia, lyrics, and custom webpages"
+msgstr "википедию, тексты и пользовательские веб-страницы"
+
+msgid "with browser"
+msgstr "с браузером"
+
+msgid "with browser & queue"
+msgstr "с браузером и очередью"
+
+msgid "with browser (SongTree)"
+msgstr "с браузером (SongTree)"
+
+msgid "with context"
+msgstr "с контекстом"
+
+msgid "with picture"
+msgstr "с изображением"
+
+msgid "with playlist"
+msgstr "со списком воспроизведения"
+
+msgid "with playlist & context"
+msgstr "со списком воспроизведения и контекстом"
+
+msgid "with queue"
+msgstr "с очередью"
+
+msgid "with search"
+msgstr "с поиском"
+
+msgid "with tabbedlists"
+msgstr "со списками-вкладками"
+
+msgid ""
+"without gstreamer : one stream per file, one connection at a time\n"
+"with gstreamer : one continuous stream, multiple connection possible"
+msgstr ""
+"без gstreamer: один поток на файл, один соединение за раз\n"
+"с gstreamer: один непрерывный поток, возможно несколько подключений"
+
+msgid "x offset :"
+msgstr "смещение по оси x:"
+
+msgid "y offset :"
+msgstr "смещение по оси y:"
+
+msgid "year"
+msgstr "год"
+
+msgid "year (highest)"
+msgstr "год (по убыванию)"
+
+msgid "years"
+msgstr "годы"
+
+msgid "yes to all"
+msgstr "да для всех"
+
+msgid ""
+"{album}\n"
+"<small>by</small> {artist}"
+msgstr ""
+"{album}\n"
+"<small>из</small> {artist}"
+
+msgid "{folder} already exists"
+msgstr "{folder} уже существует"
+
+msgid "{hours} hours {min} min {sec} s ({size} M)"
+msgstr "{hours} час {min} мин {sec} сек ({size} M)"
+
+msgid "{hours}h {min}m {sec}s ({size}M)"
+msgstr "{hours}ч {min}м {sec}с ({size}M)"
+
+msgid "{hours}h{min}m{sec}s"
+msgstr "{hours}ч{min}м{sec}с"
+
+msgid "{min} min {sec} s ({size} M)"
+msgstr "{min} мин {sec} с ({size} M)"
+
+msgid "{min}m {sec}s ({size}M)"
+msgstr "{min}м {sec}с ({size}M)"
+
+msgid "{min}m{sec}s"
+msgstr "{min}м{sec}с"
+
+msgid "{outputname} output settings"
+msgstr "{outputname} настройки вывода"
+
+msgid "{songs} by {artists}"
+msgstr "{songs} из {artists}"
+
+msgid ""
+"{song}\n"
+"by {artist}\n"
+"from {album}"
+msgstr ""
+"{song}\n"
+"из {artist}\n"
+"из {album}"
+
+msgid "{song} by {artist}"
+msgstr "{song} из {artist}"
+
+msgid "|-separated list of widget names"
+msgstr "разделённый знаком | список виджетов"
+
+#~ msgid "' & ' and ', ' and ';'"
+#~ msgstr "' & ' и ', ' и ';'"
+
+#~ msgid "Edit ..."
+#~ msgstr "Правка..."
+
+#~ msgid "Other"
+#~ msgstr "Другое"
+
+#, fuzzy
+#~ msgid "Search for artist on the web:"
+#~ msgstr "Искать изображение в Интернете"
+
+#~ msgid "next"
+#~ msgstr "следующая"
+
+#~ msgid "remove this tab"
+#~ msgstr "удалить эту вкладку"
+
+#~ msgid "set"
+#~ msgstr "установить"
+
+#~ msgid "show info"
+#~ msgstr "показать информацию"
+
+#~ msgid "{command} is needed to play this file."
+#~ msgstr "{command} нужна, чтобы воспроизвести этот файл."

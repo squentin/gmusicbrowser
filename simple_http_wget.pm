@@ -11,7 +11,7 @@ use warnings;
 use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 use IO::Handle;
 
-my (@Cachedurl,%Cache,$CacheSize);
+my $UseCache= *GMB::Cache::add{CODE};
 my $orig_proxy=$ENV{http_proxy};
 
 sub get_with_cb
@@ -19,8 +19,9 @@ sub get_with_cb
 	my %params=@_;
 	$self->{params}=\%params;
 	my ($callback,$url,$post)=@params{qw/cb url post/};
-	if ($params{cache} && defined $Cache{$url})
-		{ warn "cached result\n" if $::debug; $callback->( @{$Cache{$url}} ); return undef; }
+	delete $params{cache} unless $UseCache;
+	if (my $cached= $params{cache} && GMB::Cache::get($url))
+		{ warn "cached result\n" if $::debug; $callback->( ${$cached->{data}}, $cached->{type} ); return undef; }
 
 	warn "simple_http_wget : fetching $url\n" if $::debug;
 
@@ -76,15 +77,8 @@ sub receiving_cb
 	$result=$1	while $self->{ebuffer}=~m#^  (HTTP/1\.\d+.*)$#mg;	##
 	if ($result=~m#^HTTP/1\.\d+ 200 OK#)
 	{	my $response=\$self->{content};
-		if ($self->{params}{cache} && defined $$response && length($$response)<$::Options{Simplehttp_CacheSize})
-		{	$CacheSize+=length($$response);
-			$Cache{$url}=[$$response,$type];
-			push @Cachedurl,$url;
-			while ($CacheSize>$::Options{Simplehttp_CacheSize})
-			{	my $old=pop @Cachedurl;
-				$CacheSize-=length $Cache{$old}[0];
-				delete $Cache{$old};
-			}
+		if ($self->{params}{cache} && defined $$response)
+		{	GMB::Cache::add($url,{data=>$response,type=>$type,size=>length($$response)});
 		}
 		$callback->($$response,$type,$self->{params}{url});
 	}
