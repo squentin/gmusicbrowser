@@ -1,3 +1,393 @@
+[Exaile]
+Author = shimmerproject.org
+Type = G+
+Title = %t by %a
+Default = Window(size=80%x80%)
+
+KeyBindings = c-J GoToCurrentSong
+
+VolumeScroll = HBVolume
+
+# Window = hidden=FilterPane2|FilterPane3|FilterPane4|FilterPane5|FilterPane6|FilterPane7
+
+VBMain = HBMenubar _HPSidebarCenter HBStatusbar
+
+    HBStatusbar = 10-Total(mode=filter)
+
+    HBMenubar = _MBEdit
+        MBEdit = SMMusic0 SMEdit1 SMView20 SMControl3 SMHelp4
+            SMMusic0 = (label=_"File") \
+                MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add folder ...") \
+                SeparatorMenuItem01 \
+                MenuItem01(command="OpenSongProp",label=_"Song Properties") \
+                SeparatorMenuItem02 \
+                MenuItem02(command=Quit,label=_"Quit")
+            SMEdit1 = (label=_"Edit") \
+                MenuItem10(command=EnqueueSelected,label=_"Add to queue") \
+                # MenuItem11(command=,label=_"Add to playlist") \ \
+                SeparatorMenuItem10 \
+                # MenuItem10(command=OpenPref,label=_"Remove") \
+                MenuItem11(command=DeleteSelected,label=_"Delete") \
+                SeparatorMenuItem11 \
+                MenuItem14(command=OpenPref,label=_"Options ...")
+
+            # SMView menu for common mode
+            SMView20 = (label=_"View") \
+                MenuItem25(command=GoToCurrentSong,label=_"Go to playing song") \
+                SeparatorMenuItem21 \
+                LayoutItem \
+                MenuItem24(togglewidget=HBSearchAndToolbar,label=_"Toolbar")
+
+
+            SMControl3 = (label=_"Tools") \
+                MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Reread library") \
+                MenuItem33(command="OpenSongProp",label=_"Properties") \
+                MenuItem34(click1=OpenCustom(Equalizer),label=_"Equalizer")
+
+            SMHelp4 = (label=_"Help") \
+                MenuItem35(command="RunPerlCode(::AboutDialog)",label=_"About",stock="gtk-about",icon="gtk-about")
+
+    HPSidebarCenter = VBSidebar VBCenter
+
+        VBSidebar = _NBSidebar VProgress
+
+            NBSidebar = (tabpos=left90,typesubmenu='PC') \
+                NBSidebar1 \
+                FilterPane10(tabtitle=_"Playlists",nb=0,hidebb=1,tabpos=left90,page=savedtree,pages=savedtree) \
+                FilterPane11(tabtitle=_"Files",nb=0,hidebb=1,tabpos=left90,page=folder,pages=folder)
+
+                NBSidebar1 = (tabtitle=_"Collection",typesubmenu='') \
+                    FilterPane1(tabtitle=_"Artist",\
+                        group=99,\
+                        nb=0,\
+                        hidebb=1,\
+                        pages=artist,\
+                        page=artist,\
+                        page_artist/depth=1,\
+                        page_artist/lmarkup="0|<b>%a</b>%Y <small>%s <small>%l</small></small>",\
+                        page_artist/lpicsize='0|32',\
+                        page_artist/noall=1,\
+                        page_artist/sort=default|default,\
+                        page_artist/type=artist|album\
+                    ) \
+                    FilterPane2(tabtitle=_"Album",\
+                        group=99,\
+                        nb=0,\
+                        hidebb=1,\
+                        page=album,\
+                        pages=album,\
+                        page_album/noall=1\
+                    ) \
+                    FilterPane3(tabtitle=_"Genre - Artist",\
+                        group=99,\
+                        nb=0,\
+                        hidebb=1,\
+                        page=genre,\
+                        pages=genre,\
+                        page_genre/depth=2,\
+                        page_genre/lmarkup="0|0|<b>%a</b>%Y <small>%s <small>%l</small></small>",\
+                        page_genre/lpicsize='0|32|32',\
+                        page_genre/noall=1,\
+                        page_genre/sort=default|default|default,\
+                        page_genre/type=genre|artist|album\
+                    ) \
+                    FilterPane4(tabtitle=_"Genre - Album",\
+                        group=99,\
+                        nb=0,\
+                        hidebb=1,\
+                        page=genre,\
+                        pages=genre,\
+                        page_genre/depth=2,\
+                        page_genre/lmarkup="0|0|<b>%a</b>%Y <small>%s <small>%l</small></small>",\
+                        page_genre/lpicsize='0|32|32',\
+                        page_genre/noall=1,\
+                        page_genre/sort=default|default|default,\
+                        page_genre/type=genre|album|artist\
+                    ) \
+                    FilterPane5(tabtitle=_"Year - Artist",\
+                        group=99,\
+                        nb=0,\
+                        hidebb=1,\
+                        page=year,\
+                        pages=year,\
+                        page_year/depth=2,\
+                        page_year/lmarkup="0|0|<b>%a</b>%Y <small>%s <small>%l</small></small>",\
+                        page_year/lpicsize='0|32|32',\
+                        page_year/noall=1,\
+                        page_year/sort=default|default|default,\
+                        page_year/type=year|artist|album\
+                    ) \
+                    FilterPane6(tabtitle=_"Year - Album",\
+                        group=99,\
+                        nb=0,\
+                        hidebb=1,\
+                        page=year,\
+                        pages=year,\
+                        page_year/depth=2,\
+                        page_year/lmarkup="0|0|<b>%a</b>%Y <small>%s <small>%l</small></small>",\
+                        page_year/lpicsize='0|32|32',\
+                        page_year/noall=1,\
+                        page_year/sort=default|default|default,\
+                        page_year/type=year|album|artist\
+                    ) \
+                    FilterPane7(tabtitle=_"Artist (Jahr - Album)",\
+                        group=99,\
+                        nb=0,\
+                        hidebb=1,\
+                        pages=artist,\
+                        page=artist,\
+                        page_artist/depth=1,\
+                        page_artist/lmarkup="0|<b>%y %a</b>",\
+                        page_artist/lpicsize='0|32',\
+                        page_artist/noall=1,\
+                        page_artist/sort=default|default,\
+                        page_artist/type=artist|album\
+                    )
+
+        VBCenter = 10HBPlayer _HBSongLists 5HBSearchAndToolbar HBControls
+
+            HBSongLists = _NBSongLists \
+                3Filler7
+
+                NBSongLists = (typesubmenu='L') SongList(tabtitle=_"Playlist 1",mode=playlist,tabicon="gmb-list",cols="playandqueue track title album artist length")
+
+            HBPlayer = (maxheight=100,minheight=100) \
+                HBCover \
+                5VBSongInfo \
+                _VBVolume \
+                5Filler5
+
+                HBCover = (maxheight=100,minheight=100,minwidth=100,maxwidth=100) \
+                    Cover(default=elementary/no-cover.svg,showcover=0,minsize=100,maxsize=100)
+
+                VBVolume = 100Filler3 HBVolume
+                    HBVolume = \
+                        -VolSlider(horizontal=1,minwidth=125,maxwidth=125) \
+                        -VolumeIcon(click1=TogMute,size=button,button=1)
+
+                VBSongInfo =  \
+                    _Title(minsize=0,markup="<big><big><b>%t</b></big></big>",click1="",yalign=0.5) \
+                    _Artist(yalign=1,minsize=0,markup="by %a",click1="") \
+                    _Album(minsize=1,expand_max=200,yalign=1,minsize=1,markup="from %l",click1="")\
+                    100Filler2
+
+
+            HBSearchAndToolbar = _HBToolbar \
+                Text1(text=_"Search:") \
+                10_SimpleSearch
+
+                HBToolbar = Sort(button=1,relief=none,minwidth=28) \
+                    ResetFilter(button=1,relief=none,minwidth=28)
+
+            HBControls = Prev(size=button,relief=normal) \
+                Play(size=button,relief=normal) \
+                Stop(size=button,relief=normal) \
+                Next(size=button,relief=normal) \
+                _VBTimeBar \
+                3Filler4
+
+                VBTimeBar = 2Filler0 TimeBar 1Filler1
+
+[Rhythmbox]
+Author = shimmerproject.org
+Type = G+
+Title = %a - %t
+Default = Window(size=80%x80%) HPSidebarAndCenter(size=200)
+DefaultFocus =
+Window = hidden=Context|HBSearch|FilterPane2|SimpleSearch1|SimpleSearch2|SimpleSearch3|QueueList
+
+KeyBindings = a-Return OpenSongProp c-space PlayPause a-Left PrevSong a-Right NextSong c-Down DecVolume c-Up IncVolume
+
+VolumeScroll = HBVolume
+
+VBMain = HBMenubar HBToolbar VBSliderbar _HPSidebarCenterContext HBStatusbar
+
+    HBMenubar = _MBEdit
+        MBEdit = SMMusic0 SMEdit1 SMView20 SMControl3 SMHelp4
+            SMMusic0 = (label=_"Music") \
+                MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add folder ...") \
+                SeparatorMenuItem01 \
+                MenuItem01(command="OpenSongProp",label=_"Song Properties") \
+                SeparatorMenuItem02 \
+                MenuItem02(command=Quit,label=_"Quit")
+            SMEdit1 = (label=_"Edit") \
+                MenuItem10(command=EnqueueSelected,label=_"Add to queue") \
+                # MenuItem11(command=,label=_"Add to playlist") \ \
+                SeparatorMenuItem10 \
+                # MenuItem10(command=OpenPref,label=_"Remove") \
+                MenuItem11(command=DeleteSelected,label=_"Delete") \
+                SeparatorMenuItem11 \
+                MenuItem14(command=OpenPref,label=_"Options ...")
+
+            # SMView menu for common mode
+            SMView20 = (label=_"View") \
+                LayoutItem \
+                SeparatorMenuItem20 \
+                SMBrowserViews20 \
+                SMSearchBox21 \
+                SeparatorMenuItem21 \
+                MenuItem20(togglewidget=VBSidebar,label=_"Sidebar") \
+                MenuItem21(togglewidget=QueueList,label=_"Queue in Sidebar") \
+                MenuItem22(togglewidget=HBFilters,label=_"Search") \
+                MenuItem23(togglewidget=HBStatusbar,label=_"Statusbar") \
+                MenuItem24(togglewidget=HBToolbar,label=_"Toolbar")
+
+                SMBrowserViews20 = (label=_"Browser views") \
+                    MenuItem201(togglewidget=FilterPane2,label=_"Show genre") \
+                    MenuItem202(togglewidget=FilterPane4,label=_"Show album")
+
+                SMSearchBox21 = (label=_"Search box type") \
+                    MenuItem211(togglegroup=2,togglewidget=HBSearchGMB,label=_"gmusicbrowser") \
+                    MenuItem212(togglegroup=2,togglewidget=HBSearch,label=_"Rhythmbox")
+
+            SMControl3 = (label=_"Control") \
+                MenuItem30(command=PlayPause,label=_"Play") \
+                SeparatorMenuItem31 \
+                MenuItem31(command=PrevSong,label=_"Previous") \
+                MenuItem32(command=NextSong,label=_"Next") \
+                SeparatorMenuItem32 \
+                MenuItem33(command=IncVolume,label=_"Increase volume") \
+                MenuItem34(command=DecVolume,label=_"Decrease volume")
+
+            SMHelp4 = (label=_"Help")
+
+    HBToolbar = Play Prev Next \
+        3VSeparator1 \
+        Sort(button=1,relief=none,minwidth=35) \
+        ToggleButton4(relief=none,minwidth=35,size=button,icon=gmb-picture,widget=HBFilters,tip=_"Show/Hide Browser") \
+        ToggleButton5(relief=none,minwidth=35,size=button,icon=gmb-picture,widget=Context,tip=_"Change the context visibility") \
+        -HBVolume
+
+        HBVolume = VolumeIcon(size=menu,button=1)
+
+    VBSliderbar = 5HBText 1HBTimeSlider
+
+        HBTimeSlider = 5_TimeSlider(direct_mode=0)
+
+        HBText = 2Filler0 \
+            _Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",yalign=0.5) \
+            ArtistBreadcrumb(expand_max=200,yalign=1,minsize=0,markup=" by <i>%a</i> ") \
+            AlbumBreadcrumb(minsize=1,expand_max=200,yalign=1,minsize=1,markup=" on <i>%l</i>   ",showcover=0) \
+            -Time
+
+    HPSidebarCenterContext = HPSidebarAndCenter Context
+
+        HPSidebarAndCenter = VBSidebar VBCenter
+
+            VBSidebar = _VPListAndQueue 3Cover(maxsize=400)
+
+                VPListAndQueue = _FilterPane0(minheight=200,nb=0,hidebb=1,page=savedtree,pages=savedtree) _QueueList(songtree=1,cols="playandqueue RhythmboxQueue")
+
+            VBCenter = 5HBSearch 5HBSearchGMB _VPFilterAndSongList1 _VPFilterAndSongList2 _VPFilterAndSongList3
+
+                HBSearchGMB = 5Text1(text=_"Search:") _SimpleSearch4(maxwidth=500,noselector=0)
+
+                HBSearch = 5Text(text=_"Search:") _SimpleSearch0(maxwidth=500,noselector=1) \
+                    _SimpleSearch1(maxwidth=500,fields=artist,noselector=1) \
+                    _SimpleSearch2(maxwidth=500,fields=album,noselector=1) \
+                    _SimpleSearch3(maxwidth=500,fields=title,noselector=1) \
+                    15HBSearchSelector
+
+                    HBSearchSelector = ToggleButton0(relief=none,minwidth=60,size=button,widget=SimpleSearch0,togglegroup=1,label=_"All", tip=_"Search all fields") \
+                                        ToggleButton1(relief=none,minwidth=60,size=button,widget=SimpleSearch1,togglegroup=1,label=_"Artist",tip=_"Search Artist") \
+                                        ToggleButton2(relief=none,minwidth=60,size=button,widget=SimpleSearch2,togglegroup=1,label=_"Album",tip=_"Search album") \
+                                        ToggleButton3(relief=none,minwidth=60,size=button,widget=SimpleSearch3,togglegroup=1,label="Title",tip=_"Search title")
+
+                VPFilterAndSongList1 = _HBFilters _SongList(mode=playlist)
+
+                    HBFilters = _FilterPane2(nb=2, hidebb=1,pages=genre,page=genre) \
+                        _FilterPane3(nb=3, hidebb=1,pages=artist,page=artist) \
+                        _FilterPane4(nb=4,hidebb=1,pages=album,page=album)
+
+    HBStatusbar = Total(mode=filter) -Progress(maxheight=1)
+
+[Rhythmbox Compact] based on Rhythmbox
+Default = Window(size=600x126)
+
+VBMain = HBMenubar HBToolbar VBSliderbar
+
+    HBMenubar = _MBEdit
+        MBEdit = SMMusic0 SMEdit1 SMView20 SMControl3 SMHelp4
+            SMMusic0 = (label=_"Music") \
+                MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add folder ...") \
+                # SeparatorMenuItem01 \
+                MenuItem01(command="OpenSongProp",label=_"Properties") \
+                SeparatorMenuItem02 \
+                MenuItem02(command=Quit,label=_"Quit")
+            SMEdit1 = (label=_"Edit") \
+                MenuItem14(command=OpenPref,label=_"Options ...")
+
+            # SMView menu for compact mode
+            SMView20 = (label=_"View") \
+                LayoutItem \
+                SeparatorMenuItem20 \
+                MenuItem24(togglewidget=HBToolbar,label=_"Toolbar")
+
+            SMControl3 = (label=_"Control") \
+                MenuItem30(command=PlayPause,label=_"Play") \
+                SeparatorMenuItem31 \
+                MenuItem31(command=PrevSong,label=_"Previous") \
+                MenuItem32(command=NextSong,label=_"Next") \
+                SeparatorMenuItem32 \
+                MenuItem33(command=IncVolume,label=_"Increase volume") \
+                MenuItem34(command=DecVolume,label=_"Decrease volume")
+
+    HBToolbar = Play Prev Next \
+        3VSeparator1 \
+        Sort(button=1,relief=none,minwidth=35) \
+        -HBVolume
+
+        HBVolume = VolumeIcon(size=menu,button=1)
+
+
+{Column RhythmboxQueue}
+menutitle = _"Rhythmbox 2nd queue column"
+title = _"Queue"
+hreq=text:h
+width=200
+sort= title:i
+text : text(markup=pesc($title).'\n<small>by <i>'.pesc($artist).'</i>\non <i>'.pesc($album).'</i></small>',pad=2)
+
+[shimmer]
+Type=G
+Title		= "gmusicbrowser"
+DefaultFocus	= SimpleSearch
+Default		= Window(size=1000x750)
+Window		= hidden=SongTree|VPMosaic
+Author		= simon@shimmerproject.org
+### main window containers: top bar, main and statusbar ###
+VBMain		= VBTop _HBMain
+HBMain		= VBLeft _HPRight
+VBTop		= 3Filler8 HBTop
+HBTop		= VBButtons _15VBPlayer 15VBToggle VBSearchBox -5VBSettings
+### top bar from left to right ###
+VBButtons	= HBButtons 3Filler4
+HBButtons	= Prev Play Next(click2=NextAlbum)
+VBPlayer	= HBTitle HBTimeSlider
+HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
+HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
+VBToggle	= HBToggle 5Filler1
+HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1,tip=_"Mosaic View")
+VBSearchBox	= 2SimpleSearch(suggest=1) 5Filler2
+VBSettings	= Pref(stock=gtk-preferences_20,size=button) 5Filler5
+### main left: artist pane and album-cover ###
+VBLeft		= _NBList HBCover HBStatus
+NBList		= (tabpos="bottom") VBArtist QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
+HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
+VBAbout		= (tabtitle=_"Info") _PluginArtistinfo
+VBArtist	= (tabtitle=_"Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1,lmarkup="<b>%a</b>%Y\x0a<small>%x / %s / <small>%l</small></small>")
+HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
+HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2SortIndicator(button=1,tip=_"Right-click to toggle Shuffle") -2FilterIndicator(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=HBCover,tip=_"Show/Hide Cover")
+### main right: list/tree/mosaic widgets ###
+HPRight		= _HBSongListtree
+HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
+HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
+VPMosaic	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
+### bottom: statusbar ### Pref(size=small-toolbar,button=0)
+### positioning and sizing ###
+HSize0		= 350 NBList
+VSize0		= 350 HBCover
+
 [Arkanoid]
 #
 # Saved filters next to the song list
@@ -9,7 +399,7 @@ Default     = Window(size=1120x820) HPContent(size=963-151) HPControlsInfoAndSea
 Title		= _"%t - gmusicbrowser"
 DefaultFocus    = SimpleSearch
 
-KeyBindings = c-k SetFocusOn(SimpleSearch) a-Return OpenSongProp
+KeyBindings = c-k SetFocusOn(SimpleSearch) a-Return OpenSongProp c-J GoToCurrentSong
 
 HBmain = _VBMain
 
@@ -212,46 +602,6 @@ hreq=text:h
 width=200
 sort= title:i
 text : text(markup=pesc($title).'\n<small>by <i>'.pesc($artist).'</i>\non <i>'.pesc($album).'</i></small>',pad=2)
-
-[shimmer]
-Type=G
-Title		= "gmusicbrowser"
-DefaultFocus	= SimpleSearch
-Default		= Window(size=1000x750)
-Window		= hidden=SongTree|VPMosaic
-Author		= simon@shimmerproject.org
-### main window containers: top bar, main and statusbar ###
-VBMain		= VBTop _HBMain
-HBMain		= VBLeft _HPRight
-VBTop		= 3Filler8 HBTop
-HBTop		= VBButtons _15VBPlayer 15VBToggle VBSearchBox -5VBSettings
-### top bar from left to right ###
-VBButtons	= HBButtons 3Filler4
-HBButtons	= Prev Play Next(click2=NextAlbum)
-VBPlayer	= HBTitle HBTimeSlider
-HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
-HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
-VBToggle	= HBToggle 5Filler1
-HBToggle	= ToggleButton0(relief=none,size=button,icon=list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=button,icon=tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=button,icon=mosaic,widget=VPMosaic,togglegroup=1,tip=_"Mosaic View")
-VBSearchBox	= 2SimpleSearch(suggest=1) 5Filler2
-VBSettings	= Pref(stock=gtk-preferences_20,size=button) 5Filler5
-### main left: artist pane and album-cover ###
-VBLeft		= _NBList HBCover HBStatus
-NBList		= (tabpos="bottom") VBArtist QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
-HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
-VBAbout		= (tabtitle=_"Info") _PluginArtistinfo
-VBArtist	= (tabtitle=_"Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1,lmarkup="<b>%a</b>%Y\x0a<small>%x / %s / <small>%l</small></small>")
-HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
-HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2SortIndicator(button=1,tip=_"Right-click to toggle Shuffle") -2FilterIndicator(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=HBCover,tip=_"Show/Hide Cover")
-### main right: list/tree/mosaic widgets ###
-HPRight		= _HBSongListtree
-HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
-HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
-VPMosaic	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
-### bottom: statusbar ### Pref(size=small-toolbar,button=0)
-### positioning and sizing ###
-HSize0		= 350 NBList
-VSize0		= 350 HBCover
 
 [Lists, Library & Context]
 Type=G+
