@@ -1637,7 +1637,7 @@ sub UpdateArtistsRE
 	Songs::Changed({artist=>1}, [FIRSTID..$LastID]);
 }
 sub CompileArtistsRE
-{	my $ref1= $::Options{Artists_split_re} ||= ['\s*&\s*', '\s*;\s*', '\s*,\s*', '\s*/\s*'];
+{	my $ref1= $::Options{Artists_split_re} ||= ['\s*&\s*', '\s*;\s*', '\s*,\s+', '\s*/\s*'];
 	$Artists_split_re= join '|', @$ref1;
 	$Artists_split_re||='$';
 	$Artists_split_re=qr/$Artists_split_re/;

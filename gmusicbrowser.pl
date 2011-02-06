@@ -473,7 +473,7 @@ our %Artists_split=
 	'\s*\\|\s*'		=> "|",
 	'\s*;\s*'		=> ";",
 	'\s*/\s*'		=> "/",
-	'\s*,\s*'		=> ",",
+	'\s*,\s+'		=> ", ",
 	',?\s+and\s+'		=> "and",	#case-sensitive because the user might want to use "And" in artist names that should NOT be splitted
 	',?\s+And\s+'		=> "And",
 	'\s+featuring\s+'	=> "featuring",
@@ -1645,7 +1645,7 @@ sub FirstTime
 
 my %artistsplit_old_to_new=	#for versions <= 1.1.5 : to upgrade old ArtistSplit regexp to new default regexp
 (	' & '	=> '\s*&\s*',
-	', '	=> '\s*,\s*',
+	', '	=> '\s*,\s+',
 	' \\+ '	=> '\s*\\+\s*',
 	'; *'	=> '\s*;\s*',
 	';'	=> '\s*;\s*',
@@ -1820,6 +1820,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		if ($Options{ArtistSplit}) # for versions <= 1.1.5
 		{	$Options{Artists_split_re}= [ map { $artistsplit_old_to_new{$_}||$_ } grep $_ ne '$', split /\|/, delete $Options{ArtistSplit} ];
 		}
+		if ($oldversion<1.1007) { for my $re (@{$Options{Artists_split_re}}) { $re='\s*,\s+' if $re eq '\s*,\s*'; } }
 
 		Post_Options_init();
 
