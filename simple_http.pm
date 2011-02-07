@@ -13,7 +13,8 @@ use Fcntl;
 use IO::Handle;
 
 use constant { EOL => "\015\012" };
-my (@Cachedurl,%Cache,$CacheSize,%ipcache); #FIXME purge %ipcache from time to time
+my %ipcache; #FIXME purge %ipcache from time to time
+my $UseCache= *GMB::Cache::add{CODE};
 
 sub get_with_cb
 {	my $self=bless {};
@@ -21,9 +22,10 @@ sub get_with_cb
 	if (ref $_[0]) {$self=shift; $error='Too many redirections' if 5 < $self->{redirect}++; }
 	my %params=@_;
 	$self->{params}=\%params;
+	delete $params{cache} unless $UseCache;
 	my ($callback,$url,$post)=@params{qw/cb url post/};
-	if ($params{cache} && defined $Cache{$url})
-		{ warn "cached result\n" if $::debug; $callback->( @{$Cache{$url}} ); return undef; }
+	if (my $cached= $params{cache} && GMB::Cache::get($url))
+		{ warn "cached result\n" if $::debug; $callback->( ${$cached->{data}}, $cached->{type} ); return undef; }
 
 	warn "simple_http : fetching $url\n" if $::debug;
 
@@ -150,15 +152,8 @@ sub receiving_cb
 	if ($result=~m#^HTTP/1\.\d+ 200 OK#)
 	{	#warn "ok $url\n$callback\n";
 		my $type=$headers{'content-type'};
-		if ($self->{params}{cache} && defined $response && length($response)<$::Options{Simplehttp_CacheSize})
-		{	$CacheSize+= length $response;
-			$Cache{$url}=[$response,$type];
-			push @Cachedurl,$url;
-			while ($CacheSize>$::Options{Simplehttp_CacheSize})
-			{	my $old=pop @Cachedurl;
-				$CacheSize-= length $Cache{$old}[0];
-				delete $Cache{$old};
-			}
+		if ($self->{params}{cache} && defined $response)
+		{	GMB::Cache::add($url,{data=>\$response,type=>$type,size=>length($response)});
 		}
 		$callback->($response,$type,$self->{params}{url});
 	}
