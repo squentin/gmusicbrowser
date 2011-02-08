@@ -8628,6 +8628,8 @@ sub new
 	my $renderer=Gtk2::CellRendererText->new;
 	$self->pack_start($renderer,::TRUE);
 	$self->add_attribute($renderer, text => 0);
+	$self->set_cell_data_func($renderer,sub { my (undef,$renderer,$store,$iter)=@_; $renderer->set(sensitive=> ! $store->iter_n_children($iter) );  })
+		if $self->get_model->isa('Gtk2::TreeStore');	#hide title of submenus
 	$self->set_value($init);
 	$self->set_value(undef) unless $self->get_active_iter; #in case $init was not found
 	$self->signal_connect( changed => $sub ) if $sub;
