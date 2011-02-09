@@ -473,7 +473,7 @@ our %Artists_split=
 	'\s*\\|\s*'		=> "|",
 	'\s*;\s*'		=> ";",
 	'\s*/\s*'		=> "/",
-	'\s*,\s*'		=> ",",
+	'\s*,\s+'		=> ", ",
 	',?\s+and\s+'		=> "and",	#case-sensitive because the user might want to use "And" in artist names that should NOT be splitted
 	',?\s+And\s+'		=> "And",
 	'\s+featuring\s+'	=> "featuring",
@@ -1645,7 +1645,7 @@ sub FirstTime
 
 my %artistsplit_old_to_new=	#for versions <= 1.1.5 : to upgrade old ArtistSplit regexp to new default regexp
 (	' & '	=> '\s*&\s*',
-	', '	=> '\s*,\s*',
+	', '	=> '\s*,\s+',
 	' \\+ '	=> '\s*\\+\s*',
 	'; *'	=> '\s*;\s*',
 	';'	=> '\s*;\s*',
@@ -1820,6 +1820,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		if ($Options{ArtistSplit}) # for versions <= 1.1.5
 		{	$Options{Artists_split_re}= [ map { $artistsplit_old_to_new{$_}||$_ } grep $_ ne '$', split /\|/, delete $Options{ArtistSplit} ];
 		}
+		if ($oldversion<1.1007) { for my $re (@{$Options{Artists_split_re}}) { $re='\s*,\s+' if $re eq '\s*,\s*'; } }
 
 		Post_Options_init();
 
@@ -8627,6 +8628,8 @@ sub new
 	my $renderer=Gtk2::CellRendererText->new;
 	$self->pack_start($renderer,::TRUE);
 	$self->add_attribute($renderer, text => 0);
+	$self->set_cell_data_func($renderer,sub { my (undef,$renderer,$store,$iter)=@_; $renderer->set(sensitive=> ! $store->iter_n_children($iter) );  })
+		if $self->get_model->isa('Gtk2::TreeStore');	#hide title of submenus
 	$self->set_value($init);
 	$self->set_value(undef) unless $self->get_active_iter; #in case $init was not found
 	$self->signal_connect( changed => $sub ) if $sub;
