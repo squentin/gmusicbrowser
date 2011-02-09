@@ -341,6 +341,7 @@ our %Widgets=
 		scroll	=> sub { $_[1] ? ::Forward(undef,10) : ::Rewind (undef,10) },
 		set_preview => \&Layout::Bar::update_preview_Time,
 		cursor	=> 'hand2',
+		text_empty=> '',
 	},
 	TimeSlider =>
 	{	class	=> 'Layout::Bar::Scale',
@@ -3033,6 +3034,7 @@ sub new
 	my $self=bless Gtk2::ProgressBar->new, $class;
 	if ($opt->{text})
 	{	$self->{text}=$opt->{text};
+		$self->{text_empty}=$opt->{text_empty};
 		$self->set_ellipsize( $opt->{ellipsize}||'end' );
 		my $font= $opt->{font} || $opt->{DefaultFont};
 		$self->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
@@ -3067,9 +3069,10 @@ sub update
 	$f=0 if $f<0; $f=1 if $f>1;
 	$self->set_fraction($f);
 	if (my $text=$self->{text})
-	{	my $format=( $self->{max} <600 )? '%01d:%02d' : '%02d:%02d';
+	{	$text= $self->{text_empty} if !defined $::SongID && defined $self->{text_empty};
 		my $now=$self->{now}||0;
 		my $max=$self->{max}||0;
+		my $format= $max<600 ? '%01d:%02d' : '%02d:%02d';
 		my $left=$max-$now;
 		$_=sprintf($format,int($_/60),$_%60) for $now,$max,$left;
 		my %special=
