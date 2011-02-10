@@ -3523,7 +3523,7 @@ sub new
 	return $self;
 }
 
-sub UpdateToggleState
+sub UpdateToggleState	#also used by Layout::MenuItem
 {	my $self=$_[0];
 	return unless $self->{widget};
 	my $layw=::get_layout_widget($self);
@@ -3534,14 +3534,14 @@ sub UpdateToggleState
 	delete $self->{busy};
 }
 
-sub toggled_cb
+sub toggled_cb		#also used by Layout::MenuItem
 {	my $self=$_[0];
 	return if $self->{busy} || !$self->{widget};
 	my $layw=::get_layout_widget($self);
 	return unless $layw;
 	my $show= $self->get_active;
 	if (my $tg=$self->{togglegroup})
-	{	unless ($show) { $show=1; $self->UpdateToggleState; } # togglegroup mode, click on a pressed button just press it again, doesn't un-pressed it
+	{	unless ($show) { $show=1; UpdateToggleState($self); } # togglegroup mode, click on a pressed button just press it again, doesn't un-pressed it
 		my @togbuttons= grep $_->{togglegroup} && $_!=$self && $_->{togglegroup} eq $tg,	#get list of widgets of the same togglegroup
 				values %{$layw->{widgets}};
 		my $hidewidgets=join '|',grep $_, map $_->{widget}, @togbuttons;
