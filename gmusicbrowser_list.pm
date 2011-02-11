@@ -2312,6 +2312,7 @@ sub get_selected_list
 			# "all row" is selected, replace iters list by list of all iters of first depth
 			@iters=();
 			push @iters,$iter while $iter=$store->iter_next($iter);
+			last unless @iters;
 		}
 		my $depth=$store->iter_depth($iters[0]);
 		last if grep $depth != $store->iter_depth($_), @iters;
@@ -2425,7 +2426,7 @@ sub Fill
 		$store->set($store->append(undef),0,$_) for @$list;
 		if ($self->{field}[1]) # add a chidren to every row
 		{	my $first=$store->get_iter_first;
-			$first=$store->iter_next($first) if $store->get($first,0)==GID_ALL; #skip "all" row
+			$first=$store->iter_next($first) if $first && $store->get($first,0)==GID_ALL; #skip "all" row
 			for (my $iter=$first; $iter; $iter=$store->iter_next($iter))
 			{	$store->append($iter);
 			}

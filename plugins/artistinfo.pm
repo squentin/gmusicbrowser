@@ -472,7 +472,7 @@ sub loaded
 			$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 			$buffer->insert($iter,$data);
 			$buffer->insert_with_tags($iter,_"\n\nEdit in the last.fm wiki",$href);
-			#$buffer->insert_with_tags($iter,"\n\nListeners: ".$listeners."  |   Playcount: ".$playcount,$tag_extra);
+			$buffer->insert_with_tags($iter,"\n\nListeners: ".$listeners."  |   Playcount: ".$playcount,$tag_extra); # only shown on fresh load, not saved to local info
 			$self->{infoheader}=$infoheader;
 			$self->{biography}=$data;
 			$self->{lfm_url}=$url;

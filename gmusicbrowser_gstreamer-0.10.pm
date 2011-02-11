@@ -258,7 +258,8 @@ sub Play
 	}
 
 	if ($visual_window)
-	{	$VSink->set_xwindow_id($visual_window->window->XID);
+	{	$visual_window->realize unless $visual_window->window;
+		if (my $w=$visual_window->window) { $VSink->set_xwindow_id($w->XID); }
 	}
 	warn "playing $file\n";
 	set_file($file);
@@ -317,7 +318,8 @@ sub create_visuals
 {	unless ($VSink)
 	{	$VSink=GStreamer::ElementFactory->make(ximagesink => 'ximagesink');
 		return unless $VSink;
-		$VSink->set_xwindow_id($visual_window->window->XID);
+		$visual_window->realize unless $visual_window->window;
+		if (my $w=$visual_window->window) { $VSink->set_xwindow_id($w->XID); }
 	}
 	$PlayBin->set('video-sink' => $VSink) if $PlayBin;
 	$PlayBin->set('flags' => [qw/audio vis soft-volume/]) if $PlayBin && $playbin2_ok;

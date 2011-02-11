@@ -473,7 +473,7 @@ our %Artists_split=
 	'\s*\\|\s*'		=> "|",
 	'\s*;\s*'		=> ";",
 	'\s*/\s*'		=> "/",
-	'\s*,\s*'		=> ",",
+	'\s*,\s+'		=> ", ",
 	',?\s+and\s+'		=> "and",	#case-sensitive because the user might want to use "And" in artist names that should NOT be splitted
 	',?\s+And\s+'		=> "And",
 	'\s+featuring\s+'	=> "featuring",
@@ -829,7 +829,6 @@ our %Options=
 	'TAG_write_id3v2.4'	=> 0,
 	TAG_id3v1_encoding	=> 'iso-8859-1',
 	AutoRemoveCurrentSong	=> 1,
-	Simplehttp_CacheSize	=> 200*1024,
 	CustomKeyBindings	=> {},
 	VolumeStep		=> 10,
 	DateFormat_history	=> ['%c 604800 %A %X 86400 Today %X 60 now'],
@@ -1628,8 +1627,10 @@ sub FirstTime
 	};
 	$_=Filter->new($_) for values %{ $Options{SavedFilters} };
 
-	if (-r $DATADIR.SLASH.'gmbrc.default')
-	{	open my($fh),'<:utf8', $DATADIR.SLASH.'gmbrc.default';
+	my @dirs= reverse map $_.SLASH.'gmusicbrowser', Glib::get_system_config_dirs;
+	for my $dir ($DATADIR,@dirs)
+	{	next unless -r $dir.SLASH.'gmbrc.default';
+		open my($fh),'<:utf8', $dir.SLASH.'gmbrc.default';
 		my @lines=<$fh>;
 		close $fh;
 		chomp @lines;
@@ -1644,7 +1645,7 @@ sub FirstTime
 
 my %artistsplit_old_to_new=	#for versions <= 1.1.5 : to upgrade old ArtistSplit regexp to new default regexp
 (	' & '	=> '\s*&\s*',
-	', '	=> '\s*,\s*',
+	', '	=> '\s*,\s+',
 	' \\+ '	=> '\s*\\+\s*',
 	'; *'	=> '\s*;\s*',
 	';'	=> '\s*;\s*',
@@ -1661,7 +1662,7 @@ sub ReadOldSavedTags
 	$Options{'123options_mpg321'}=delete $Options{'123options_mp3'};
 	$Options{'123options_ogg123'}=delete $Options{'123options_ogg'};
 	$Options{'123options_flac123'}=delete $Options{'123options_flac'};
-	delete $Options{$_} for qw/Device 123options_mp3 123options_ogg 123options_flac test Diacritic_sort gst_volume/; #cleanup old options
+	delete $Options{$_} for qw/Device 123options_mp3 123options_ogg 123options_flac test Diacritic_sort gst_volume Simplehttp_CacheSize/; #cleanup old options
 	delete $Options{$_} for qw/SavedSongID SavedPlayTime Lock SavedSort/; #don't bother supporting upgrade for these
 	$Options{CustomKeyBindings}= { ExtractNameAndOptions($Options{CustomKeyBindings}) };
 	delete $Options{$_} for grep m/^PLUGIN_MozEmbed/,keys %Options; #for versions <=1.0
@@ -1813,12 +1814,13 @@ sub ReadSavedTags	#load tags _and_ settings
 		SongArray::start_init(); #every SongArray read in Options will be updated to new IDs by SongArray::updateIDs later
 		ReadRefFromLines($lines{Options},\%Options);
 		my $oldversion=delete $Options{version} || VERSION;
-		if ($oldversion<1.1005) {delete $Options{$_} for qw/Diacritic_sort gst_volume/;} #cleanup old options
+		if ($oldversion<1.1007) {delete $Options{$_} for qw/Diacritic_sort gst_volume Simplehttp_CacheSize/;} #cleanup old options
 		$Options{AutoRemoveCurrentSong}= delete $Options{TAG_auto_check_current} if $oldversion<1.1005 && exists $Options{TAG_auto_check_current};
 		$Options{PlayedMinPercent}= 100*delete $Options{PlayedPercent} if exists $Options{PlayedPercent};
 		if ($Options{ArtistSplit}) # for versions <= 1.1.5
 		{	$Options{Artists_split_re}= [ map { $artistsplit_old_to_new{$_}||$_ } grep $_ ne '$', split /\|/, delete $Options{ArtistSplit} ];
 		}
+		if ($oldversion<1.1007) { for my $re (@{$Options{Artists_split_re}}) { $re='\s*,\s+' if $re eq '\s*,\s*'; } }
 
 		Post_Options_init();
 
@@ -2572,7 +2574,7 @@ sub DoActionForList
 	return unless ref $list && @$list;
 	$action||='playlist';
 	my @list=@$list;
-	# actions that don't need/want the lsit to be sorted (Enqueue will sort it itself)
+	# actions that don't need/want the list to be sorted (Enqueue will sort it itself)
 	if	($action eq 'queue')		{ Enqueue(@list) }
 	elsif	($action eq 'queueinsert')	{ QueueInsert(@list) }
 	elsif	($action eq 'replacequeue')	{ ReplaceQueue(@list) }
@@ -5159,6 +5161,7 @@ sub AboutDialog
 		'Czech : Vašek Kovářík',
 		'Portuguese : Gleriston Sampaio <gleriston_sampaio@hotmail.com>',
 		'Korean : bluealbum',
+		'Russian : tin',
 	);
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
@@ -8351,19 +8354,56 @@ sub Set
 	$self->{val}=$val;
 }
 
+package GMB::Cache;
+my (%Cache,$CacheSize);
+
+sub drop_file	#drop a file from the cache
+{	my $file=shift;
+	my $re=qr/^(?:\d+:)?\Q$file\E/;
+	delete $Cache{$_} for grep m/$re/, keys %Cache;
+}
+
+sub trim
+{	my @list= sort {$Cache{$a}{lastuse} <=> $Cache{$b}{lastuse}} keys %Cache;
+	my $max= $::Options{PixCacheSize} *1000*1000 *.9;
+	warn "Trimming cache\n" if $::debug;
+	while ($CacheSize> $max)
+	{	my $key=shift @list;
+		$CacheSize-= (delete $Cache{$key})->{size};
+	}
+}
+
+sub add_pb	#add pixbuf ref
+{	my ($key,$pb)=@_;
+	$pb->{size}= $pb->get_height * $pb->get_rowstride;
+	add($key,$pb);
+}
+sub add
+{	my ($key,$ref)=@_;
+	$ref->{lastuse}=time;
+	$CacheSize+= $ref->{size};
+	::IdleDo('9_CachePurge',undef,\&trim) if $CacheSize > $::Options{PixCacheSize}*1000*1000;
+	$Cache{$key}=$ref;
+}
+sub get
+{	my $key=shift;
+	my $ref= $Cache{$key};
+	$ref->{lastuse}=time if $ref;
+	return $ref;
+}
+
+
 package GMB::Picture;
-my (%PbCache,$CacheSize);
 our @ArraysOfFiles;	#array of filenames that needs updating in case a folder is renamed
 
 sub pixbuf
 {	my ($file,$size,$cacheonly)=@_;
 	my $key= defined $size ? $size.':'.$file : $file;
-	my $pb=$PbCache{$key};
+	my $pb= GMB::Cache::get($key);
 	unless ($pb || $cacheonly)
 	{	$pb=load($file,$size);
-		add_to_cache($key,$pb) if $pb;
+		GMB::Cache::add_pb($key,$pb) if $pb;
 	}
-	$pb->{lastuse}=time if $pb;
 	return $pb;
 }
 
@@ -8391,43 +8431,17 @@ sub load
 	return $loader->get_pixbuf;
 }
 
-sub drop	#drop a file from the cache
-{	my $file=shift;
-	my $re=qr/^(?:\d+:)?\Q$file\E/;
-	delete $PbCache{$_} for grep m/$re/, keys %PbCache;
-}
-
-sub trim
-{	my @list= sort {$PbCache{$a}{lastuse} <=> $PbCache{$b}{lastuse}} keys %PbCache;
-	my $max= $::Options{PixCacheSize} *1000*1000 *.9;
-	warn "Trimming cache\n" if $::debug;
-	while ($CacheSize> $max)
-	{	my $key=shift @list;
-		$CacheSize-= (delete $PbCache{$key})->{size};
-	}
-}
-
-sub add_to_cache
-{	my ($key,$pb)=@_;
-	my $h=$pb->get_height;
-	my $rowstride=$pb->get_rowstride;
-	$CacheSize+= $pb->{size}= $h*$rowstride;	#warn "PixCache : +$pb->{size} = $CacheSize\n";
-	::IdleDo('9_AAPicPurge',undef,\&trim) if $CacheSize > $::Options{PixCacheSize}*1000*1000;
-	$PbCache{$key}=$pb;
-}
-
 sub load_skinfile
 {	my ($file,$crop,$resize,$now)=@_; #resize is resizeopt_w_h
 	my $key= ':'.join ':',$file,$crop,$resize||''; #FIXME remove w or h in resize if not resized in this dimension
-	my $pixbuf=$PbCache{$key};
+	my $pixbuf= GMB::Cache::get($key);
 	unless ($pixbuf)
 	{	return unless $now;
 		$pixbuf=Skin::_load_skinfile($file,$crop);
 		$pixbuf=Skin::_resize($pixbuf,split /_/,$resize) if $resize && $pixbuf;
 		return unless $pixbuf;
-		add_to_cache($key,$pixbuf);
+		GMB::Cache::add_pb($key,$pixbuf);
 	}
-	$pixbuf->{lastuse}=time;
 	return $pixbuf;
 }
 
@@ -8509,7 +8523,7 @@ sub GetPicture
 }
 sub SetPicture
 {	my ($field,$key,$file)=@_;
-	GMB::Picture::drop($file); #make sure the cache is up-to-date
+	GMB::Cache::drop_file($file); #make sure the cache is up-to-date
 	Songs::Picture($key,$field,'set',$file);
 }
 
@@ -8572,6 +8586,8 @@ sub new
 	my $renderer=Gtk2::CellRendererText->new;
 	$self->pack_start($renderer,::TRUE);
 	$self->add_attribute($renderer, text => 0);
+	$self->set_cell_data_func($renderer,sub { my (undef,$renderer,$store,$iter)=@_; $renderer->set(sensitive=> ! $store->iter_n_children($iter) );  })
+		if $self->get_model->isa('Gtk2::TreeStore');	#hide title of submenus
 	$self->set_value($init);
 	$self->set_value(undef) unless $self->get_active_iter; #in case $init was not found
 	$self->signal_connect( changed => $sub ) if $sub;

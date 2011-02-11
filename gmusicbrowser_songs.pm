@@ -364,6 +364,12 @@ our %timespan_menu=
 		parent	=> 'integer',
 	},
 	'length.div' => { gid_to_display	=> 'my $v=#GID# * #ARG0#; sprintf("%d:%02d", $v/60, $v%60);', },
+	size	=>
+	{	display	=> 'sprintf("%.1fM", #_#/1000/1000)',
+		filter_prep	=> \&::ConvertSize,
+		parent	=> 'integer',
+	},
+	'size.div'   => { gid_to_display	=> 'sprintf("%dM", #GID# * #ARG0#/1000/1000);', },
 	rating	=>
 	{	parent	=> 'integer',
 		bits	=> 8,
@@ -453,9 +459,8 @@ our %timespan_menu=
  },
  size	=>
  {	name => _"Size",	width => 80,	flags => 'garsc_',		#32bits => 4G max
-	type => 'integer',
-	display	=> 'sprintf("%.1fM", #_#/1024/1024)',
-	filter_prep	=> \&::ConvertSize,
+	type => 'size',
+	FilterList => {type=>'div.1000000',},
  },
  title	=>
  {	name	=> _"Title",	width	=> 270,		flags	=> 'garwesci',	type => 'istring',
@@ -726,13 +731,19 @@ our %timespan_menu=
  channel=>
  {	name	=> _"Channels",		width => 50,	flags => 'garsc',	type => 'integer',	bits => 4,	audioinfo => 'channels', },	# are 4 bits needed ? 1bit+1 could be enough ?
  bitrate=>
- {	name	=> _"Bitrate",		width => 70,	flags => 'garsc_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;' },
+ {	name	=> _"Bitrate",		width => 70,	flags => 'garsc_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
+	FilterList => {type=>'div.32',},
+ },
  #samprate=>
  #{	name	=> _"Sampling Rate",	width => 60,	flags => 'gasc',	type => 'integer',	bits => 16,	audioinfo => 'rate', },
  samprate=>
- {	name	=> _"Sampling Rate",	width => 60,	flags => 'garsc',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate', },
+ {	name	=> _"Sampling Rate",	width => 60,	flags => 'garsc',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate',
+	FilterList => {},
+ },
  filetype=>
- {	name	=> _"Type",		width => 80,	flags => 'garsc',	type => 'fewstring',	bits => 8, }, #could probably fit in 4bit
+ {	name	=> _"Type",		width => 80,	flags => 'garsc',	type => 'fewstring',	bits => 8, #could probably fit in 4bit
+	FilterList => {},
+ },
  'length'=>
  {	name	=> _"Length",		width => 50,	flags => 'garsc_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
 	audioinfo => 'seconds',		check	=> '#VAL#= sprintf "%.0f",#VAL#;',
@@ -1637,7 +1648,7 @@ sub UpdateArtistsRE
 	Songs::Changed({artist=>1}, [FIRSTID..$LastID]);
 }
 sub CompileArtistsRE
-{	my $ref1= $::Options{Artists_split_re} ||= ['\s*&\s*', '\s*;\s*', '\s*,\s*', '\s*/\s*'];
+{	my $ref1= $::Options{Artists_split_re} ||= ['\s*&\s*', '\s*;\s*', '\s*,\s+', '\s*/\s*'];
 	$Artists_split_re= join '|', @$ref1;
 	$Artists_split_re||='$';
 	$Artists_split_re=qr/$Artists_split_re/;

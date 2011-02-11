@@ -341,6 +341,7 @@ our %Widgets=
 		scroll	=> sub { $_[1] ? ::Forward(undef,10) : ::Rewind (undef,10) },
 		set_preview => \&Layout::Bar::update_preview_Time,
 		cursor	=> 'hand2',
+		text_empty=> '',
 	},
 	TimeSlider =>
 	{	class	=> 'Layout::Bar::Scale',
@@ -3033,6 +3034,7 @@ sub new
 	my $self=bless Gtk2::ProgressBar->new, $class;
 	if ($opt->{text})
 	{	$self->{text}=$opt->{text};
+		$self->{text_empty}=$opt->{text_empty};
 		$self->set_ellipsize( $opt->{ellipsize}||'end' );
 		my $font= $opt->{font} || $opt->{DefaultFont};
 		$self->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
@@ -3067,9 +3069,10 @@ sub update
 	$f=0 if $f<0; $f=1 if $f>1;
 	$self->set_fraction($f);
 	if (my $text=$self->{text})
-	{	my $format=( $self->{max} <600 )? '%01d:%02d' : '%02d:%02d';
+	{	$text= $self->{text_empty} if !defined $::SongID && defined $self->{text_empty};
 		my $now=$self->{now}||0;
 		my $max=$self->{max}||0;
+		my $format= $max<600 ? '%01d:%02d' : '%02d:%02d';
 		my $left=$max-$now;
 		$_=sprintf($format,int($_/60),$_%60) for $now,$max,$left;
 		my %special=
@@ -3520,7 +3523,7 @@ sub new
 	return $self;
 }
 
-sub UpdateToggleState
+sub UpdateToggleState	#also used by Layout::MenuItem
 {	my $self=$_[0];
 	return unless $self->{widget};
 	my $layw=::get_layout_widget($self);
@@ -3531,14 +3534,14 @@ sub UpdateToggleState
 	delete $self->{busy};
 }
 
-sub toggled_cb
+sub toggled_cb		#also used by Layout::MenuItem
 {	my $self=$_[0];
 	return if $self->{busy} || !$self->{widget};
 	my $layw=::get_layout_widget($self);
 	return unless $layw;
 	my $show= $self->get_active;
 	if (my $tg=$self->{togglegroup})
-	{	unless ($show) { $show=1; $self->UpdateToggleState; } # togglegroup mode, click on a pressed button just press it again, doesn't un-pressed it
+	{	unless ($show) { $show=1; UpdateToggleState($self); } # togglegroup mode, click on a pressed button just press it again, doesn't un-pressed it
 		my @togbuttons= grep $_->{togglegroup} && $_!=$self && $_->{togglegroup} eq $tg,	#get list of widgets of the same togglegroup
 				values %{$layw->{widgets}};
 		my $hidewidgets=join '|',grep $_, map $_->{widget}, @togbuttons;
