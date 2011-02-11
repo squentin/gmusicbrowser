@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1006\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-28 00:16+0100\n"
-"PO-Revision-Date: 2011-02-05 19:46+0700\n"
+"POT-Creation-Date: 2011-02-11 17:29+0600\n"
+"PO-Revision-Date: 2011-02-11 19:36+0700\n"
 "Last-Translator: tin <girlwithoutadream@gmail.com>\n"
 "Language-Team: \n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
 "Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=((((n%10)==1)&&((n%100)!=11))?(0):(((((n%10)"
 ">=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
 "X-Poedit-Language: Russian\n"
@@ -174,7 +174,6 @@ msgstr "(вступит в силу после перезапуска)"
 msgid "(case insensitive)"
 msgstr "(не чувствительно к регистру)"
 
-# обычная?
 msgid "(common parent folder : {common})"
 msgstr "(общая родительская папка: {common})"
 
@@ -356,12 +355,6 @@ msgstr "Расширенное редактирование тегов"
 msgid "Album"
 msgstr "Альбом"
 
-msgid "Album and artist"
-msgstr "Альбом и исполнитель"
-
-msgid "Album and artist on the left side"
-msgstr "Альбом и исполнитель слева"
-
 msgid "Album artist"
 msgstr "Исполнитель альбома"
 
@@ -464,7 +457,7 @@ msgid "Artist & album"
 msgstr "Исполнитель и альбом"
 
 msgid "Artist Picture Size : "
-msgstr "Размер изображения исполнителя:"
+msgstr "Размер изображения исполнителя: "
 
 msgid "Artist URL"
 msgstr "URL исполнителя"
@@ -545,7 +538,7 @@ msgid "Base Folder :"
 msgstr "Базовая папка:"
 
 msgid "Begin with"
-msgstr "Начинается с:"
+msgstr "Начинается с"
 
 msgid "Below"
 msgstr "Ниже"
@@ -574,9 +567,6 @@ msgstr "Кнопки"
 msgid "Buttons, Song & Cover"
 msgstr "Кнопки, песня и обложка"
 
-msgid "Can be relative by using + or -"
-msgstr "Может быть относительным при использовании + или -"
-
 msgid "Can't change the volume in non-gstreamer iceserver mode"
 msgstr "Не могу изменить громкость в non-gstreamer-режиме iceserver"
 
@@ -591,7 +581,7 @@ msgid ""
 "Can't create Folder '{path}' : \n"
 "{error}"
 msgstr ""
-"Не могу создать папку '{path}' : \n"
+"Не могу создать папку '{path}': \n"
 "{error}"
 
 # ...
@@ -801,7 +791,7 @@ msgid "Current song must always be in the playlist"
 msgstr "Текущая песня всегда должна быть в списке воспроизведения"
 
 msgid "Custom"
-msgstr "Настраиваемая"
+msgstr "Пользовательское"
 
 msgid "Custom Text"
 msgstr "Пользовательский текст"
@@ -810,13 +800,13 @@ msgid "Custom URL"
 msgstr "Пользовательский URL"
 
 msgid "Custom command :"
-msgstr "Настраиваемая команда"
+msgstr "Пользовательская команда:"
 
 msgid "Custom context pages :"
 msgstr "Пользовательские контекстные страницы:"
 
 msgid "Custom fields"
-msgstr "Настраиваемые поля"
+msgstr "Пользовательские поля"
 
 msgid "Custom formats"
 msgstr "Пользовательские форматы"
@@ -986,7 +976,7 @@ msgid "EditList"
 msgstr "Правка списка"
 
 msgid "Editing list : "
-msgstr "Правка списка:"
+msgstr "Правка списка: "
 
 msgid "Editing tags"
 msgstr "Правка тегов"
@@ -1059,14 +1049,14 @@ msgid ""
 "Error saving lyrics in '{file}' :\n"
 "{error}"
 msgstr ""
-"Ошибка сохранения теста в '{file}' :\n"
+"Ошибка сохранения теста в '{file}':\n"
 "{error}"
 
 msgid "Error writing '{file}'"
 msgstr "Ошибка записи '{file}'"
 
 msgid "Error writing replaygain tags :\n"
-msgstr "Ошибка записи тегов replaygain :\n"
+msgstr "Ошибка записи тегов replaygain:\n"
 
 msgid "Error: invalid filename pattern"
 msgstr "Ошибка: неверный шаблон имени файла"
@@ -1108,7 +1098,7 @@ msgid ""
 "Failed to delete '{file}' :\n"
 "{error}"
 msgstr ""
-"Не удалось удалить '{file}' :\n"
+"Не удалось удалить '{file}':\n"
 "{error}"
 
 msgid "Field name"
@@ -1142,7 +1132,7 @@ msgid "Filter"
 msgstr "Фильтр"
 
 msgid "Filter : "
-msgstr "Фильтр:"
+msgstr "Фильтр: "
 
 msgid "Filter edition"
 msgstr "Правка фильтра"
@@ -1326,7 +1316,7 @@ msgid "Justified"
 msgstr "Выравненно"
 
 msgid "KB"
-msgstr "Кб"
+msgstr "КБ"
 
 msgid "Karaoke"
 msgstr "Караоке"
@@ -1355,7 +1345,7 @@ msgstr "Лейбл/Издатель"
 msgid "Labels"
 msgstr "Метки"
 
-msgid "Labels' icons"
+msgid "Labels' Icons"
 msgstr "Значок метки"
 
 msgid "Lang"
@@ -1398,7 +1388,7 @@ msgid "Library"
 msgstr "Библиотека"
 
 msgid "Library : "
-msgstr "Библиотека:"
+msgstr "Библиотека: "
 
 msgid ""
 "Library empty.\n"
@@ -1549,7 +1539,6 @@ msgstr "Массовое переименование"
 msgid "Mass Renaming"
 msgstr "Массовое переименование"
 
-# Надеюсь, речь не про "тип носителя"? о_О
 msgid "Media type"
 msgstr "Медиатип"
 
@@ -1876,7 +1865,7 @@ msgid "Picture finder plugin"
 msgstr "Плагин поиска изображений"
 
 msgid "Picture size :"
-msgstr "Размер изображения"
+msgstr "Размер изображения:"
 
 msgid "Pictures and music files"
 msgstr "Изображения и аудиофайлы"
@@ -1933,7 +1922,10 @@ msgid "Player window layout :"
 msgstr "Вид окна плеера:"
 
 msgid "Playing"
-msgstr "Воспроизводимое"
+msgstr "Воспроизведение"
+
+msgid "Playing & Queue"
+msgstr "Играющее и очередь"
 
 msgid "Playing Album"
 msgstr "Играющий альбом"
@@ -1946,9 +1938,6 @@ msgstr "Играющий фильтр"
 
 msgid "Playing Title"
 msgstr "Играющий заголовок"
-
-msgid "Playing and queue icons"
-msgstr "Значки играющего и очереди"
 
 msgid "Playing error : {error}"
 msgstr "Ошибка воспроизведения: {error}"
@@ -2120,7 +2109,7 @@ msgid "Recording Dates"
 msgstr "Дата записи"
 
 msgid "Reference point :"
-msgstr "Ориентир"
+msgstr "Ориентир:"
 
 msgid "Refresh"
 msgstr "Обновить"
@@ -2277,7 +2266,7 @@ msgid "Rip plugin"
 msgstr "Плагин копирования CD"
 
 msgid "Ripping software :"
-msgstr "Программа копирования CD"
+msgstr "Программа копирования CD:"
 
 msgid "Run a command when playing a song"
 msgstr "Запустить команду, когда играет песня"
@@ -2420,6 +2409,9 @@ msgstr "Искать исполнителя на Youtube"
 
 msgid "Search for a picture on internet"
 msgstr "Искать изображение в Интернете"
+
+msgid "Search for artist on the web:"
+msgstr "Искать исполнителя в Интернете:"
 
 msgid "Search for current album"
 msgstr "Искать текущий альбом"
@@ -2588,9 +2580,6 @@ msgstr "Перемешанные альбомы, перемешанные тре
 msgid "Shutdown command :"
 msgstr "Команда выключения:"
 
-msgid "Simple title"
-msgstr "Простой заголовок"
-
 msgid "Size"
 msgstr "Размер"
 
@@ -2599,9 +2588,6 @@ msgstr "Число пропусков"
 
 msgid "Skip to next song if an error occurs"
 msgstr "Перейти к следующей песне, если происходит ошибка"
-
-msgid "Small album picture"
-msgstr "Маленькая обложка альбома"
 
 msgid "Small player"
 msgstr "Маленький плеер"
@@ -2656,7 +2642,7 @@ msgid "Stop selecting pictures"
 msgstr "Остановить выбор изображений"
 
 msgid "Stop when queue empty"
-msgstr "Остановить, конда очередь пуста"
+msgstr "Остановить, когда очередь пуста"
 
 msgid "Stop, Play and Next buttons"
 msgstr "Кнопки Стоп, Играть и Следующая"
@@ -2720,7 +2706,7 @@ msgid "These fields can be used :"
 msgstr "Эти поля могут быть использованы:"
 
 msgid "This command is required to play files of type {type} : {cmd}"
-msgstr "Эта команда требуется для воспроизведения файлов типа {type} : {cmd}"
+msgstr "Эта команда требуется для воспроизведения файлов типа {type}: {cmd}"
 
 msgid "This label is set for %d song."
 msgid_plural "This label is set for %d songs."
@@ -2738,7 +2724,6 @@ msgstr ""
 "Этот плагин извлекает относящуюся к исполнителю информацию (биографию, "
 "предстоящие события) с last.fm."
 
-# Начальный пункт?
 msgid "Threshold to count a song as played :"
 msgstr "Порог для подсчёта песни как проигранной:"
 
@@ -2753,12 +2738,6 @@ msgstr "Время постепенного затихания в секунда
 
 msgid "Title"
 msgstr "Название"
-
-msgid "Title & icon"
-msgstr "Заголовок и значок"
-
-msgid "Title & progress"
-msgstr "Заголовок и полоса прогресса"
 
 msgid "Title - Artist - Album"
 msgstr "Название - Исполнитель - Альбом"
@@ -2823,7 +2802,6 @@ msgstr "Уникальный идентификатор файла"
 msgid "Unknown field ({field})"
 msgstr "Unknown field ({field})"
 
-# разомкнуть??? о_О
 msgid "Unlock Album"
 msgstr "Разблокировать альбом"
 
@@ -2957,11 +2935,6 @@ msgstr ""
 "Предупреждение: это расширенные настройки, не изменяйте их, если не знаете, "
 "что делаете."
 
-msgid "Warning : using a folder with invalid encoding, you should rename it."
-msgstr ""
-"Предупреждение: используется папка с неверной кодировкой, вам нужно "
-"переименовать её."
-
 msgid "Warning: all existing data for this field will be lost"
 msgstr "Предупреждение: все существующие данные для этого поля будут потеряны"
 
@@ -3006,7 +2979,7 @@ msgid ""
 "changes will be kept in the library instead.\n"
 "Warning, the changes for a song will be lost if the tag is re-read."
 msgstr ""
-"Теги не будут записываться (кроме как в расширенном диалоге редактирования "
+"Теги не будут записываться (кроме как в диалоге расширенного редактирования "
 "тегов). Вместо этого изменения будут храниться в библиотеке.\n"
 "Предупреждение: изменения для песни будут потеряны, если теги будут "
 "перечитаны."
@@ -3308,10 +3281,10 @@ msgid "exactly not %n( times)"
 msgstr "точно не %n( times)"
 
 msgid "example (selected song) : {score}  ({chances})"
-msgstr "пример (выделенная песня) : {score}  ({chances})"
+msgstr "пример (выделенная песня): {score}  ({chances})"
 
 msgid "example : "
-msgstr "пример:"
+msgstr "пример: "
 
 msgid "example : %s"
 msgstr "пример: %s"
@@ -3330,9 +3303,6 @@ msgstr "любимое"
 
 msgid "file format"
 msgstr "формат файла"
-
-msgid "filters"
-msgstr "фильтры"
 
 msgid "first added"
 msgstr "первых добаленных"
@@ -3359,17 +3329,11 @@ msgstr "полный"
 msgid "full with buttons"
 msgstr "полный с кнопками"
 
-msgid "google images"
-msgstr "Картинки Google"
-
-msgid "google images (hi-res)"
-msgstr "Картинки Google (высокое разрешение)"
-
 msgid "group by"
 msgstr "группировать по"
 
 msgid "half-life : "
-msgstr "полупериод?: "
+msgstr "полупериод: "
 
 msgid "hours"
 msgstr "часов"
@@ -3411,22 +3375,22 @@ msgid "is"
 msgstr "точно"
 
 msgid "is %g"
-msgstr "- %g"
+msgstr "точно %g"
 
 msgid "is %n"
-msgstr "- %n"
+msgstr "точно %n"
 
 msgid "is %n( %)"
-msgstr "- %n( %)"
+msgstr "точно %n( %)"
 
 msgid "is %n(Hz)"
-msgstr "- %n(Гц)"
+msgstr "точно %n(Гц)"
 
 msgid "is %n(kbps)"
-msgstr "- %n(kbps)"
+msgstr "точно %n(kbps)"
 
 msgid "is %s"
-msgstr "- %s"
+msgstr "точно %s"
 
 msgid "is after %n"
 msgstr "после %n"
@@ -3489,31 +3453,31 @@ msgid "is not"
 msgstr "точно не"
 
 msgid "is not %n"
-msgstr "не %n"
+msgstr "точно не %n"
 
 msgid "is not %n( %)"
-msgstr "не %n( %)"
+msgstr "точно не %n( %)"
 
 msgid "is not %s"
-msgstr "не %s"
+msgstr "точно не %s"
 
 msgid "is not 44.1kHz"
-msgstr "не 44.1 кГц"
+msgstr "точно не 44.1 кГц"
 
 msgid "is not in %s"
-msgstr "не в %s"
+msgstr "точно не в %s"
 
 msgid "is not in list %l"
 msgstr "не в списке %l"
 
 msgid "isn't %g"
-msgstr "не %g"
+msgstr "точно не %g"
 
 msgid "isn't %n"
-msgstr "не %n"
+msgstr "точно не %n"
 
 msgid "isn't %n(Hz)"
-msgstr "не %n(Гц)"
+msgstr "точно не %n(Гц)"
 
 msgid "isn't %n(kbps)"
 msgstr "не %n(kbps)"
@@ -3668,7 +3632,7 @@ msgid "no plugins found"
 msgstr "плагины не найдены"
 
 msgid "no splitting"
-msgstr "не объединять"
+msgstr "не разделять"
 
 msgid "no to all"
 msgstr "нет для всех"
@@ -3983,9 +3947,6 @@ msgstr "с браузером (SongTree)"
 msgid "with context"
 msgstr "с контекстом"
 
-msgid "with picture"
-msgstr "с изображением"
-
 msgid "with playlist"
 msgstr "со списком воспроизведения"
 
@@ -4078,15 +4039,47 @@ msgstr "разделённый знаком | список виджетов"
 #~ msgid "' & ' and ', ' and ';'"
 #~ msgstr "' & ' и ', ' и ';'"
 
+#~ msgid "Album and artist"
+#~ msgstr "Альбом и исполнитель"
+
+#~ msgid "Album and artist on the left side"
+#~ msgstr "Альбом и исполнитель слева"
+
+#~ msgid "Can be relative by using + or -"
+#~ msgstr "Может быть относительным при использовании + или -"
+
 #~ msgid "Edit ..."
 #~ msgstr "Правка..."
 
 #~ msgid "Other"
 #~ msgstr "Другое"
 
-#, fuzzy
-#~ msgid "Search for artist on the web:"
-#~ msgstr "Искать изображение в Интернете"
+#~ msgid "Simple title"
+#~ msgstr "Простой заголовок"
+
+#~ msgid "Small album picture"
+#~ msgstr "Маленькая обложка альбома"
+
+#~ msgid "Title & icon"
+#~ msgstr "Заголовок и значок"
+
+#~ msgid "Title & progress"
+#~ msgstr "Заголовок и полоса прогресса"
+
+#~ msgid ""
+#~ "Warning : using a folder with invalid encoding, you should rename it."
+#~ msgstr ""
+#~ "Предупреждение: используется папка с неверной кодировкой, вам нужно "
+#~ "переименовать её."
+
+#~ msgid "filters"
+#~ msgstr "фильтры"
+
+#~ msgid "google images"
+#~ msgstr "Картинки Google"
+
+#~ msgid "google images (hi-res)"
+#~ msgstr "Картинки Google (высокое разрешение)"
 
 #~ msgid "next"
 #~ msgstr "следующая"
@@ -4099,6 +4092,9 @@ msgstr "разделённый знаком | список виджетов"
 
 #~ msgid "show info"
 #~ msgstr "показать информацию"
+
+#~ msgid "with picture"
+#~ msgstr "с изображением"
 
 #~ msgid "{command} is needed to play this file."
 #~ msgstr "{command} нужна, чтобы воспроизвести этот файл."
