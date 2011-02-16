@@ -2740,6 +2740,7 @@ sub new
 		#if default setting is a function, use a function that look in the hash, and fallback to the default function (this is the case for Queue and VolumeIcon widgets)
 		$stock= sub { $hash{$_[0]} || &$default } if ref $default eq 'CODE';
 	}
+	$self->{state}=$ref->{state} if $ref->{state};
 	if ($opt->{skin})
 	{	my $skin=Skin->new($opt->{skin},$self,$opt);
 		$self->signal_connect(expose_event => \&Skin::draw,$skin);
@@ -2751,7 +2752,6 @@ sub new
 	}
 	elsif ($stock)
 	{	$self->{stock}=$stock;
-		$self->{state}=$ref->{state} if $ref->{state};
 		$self->{size}= $opt->{size};
 		my $img= $self->{img}= Gtk2::Image->new;
 		$img->set_size_request(Gtk2::IconSize->lookup($self->{size})); #so that it always request the same size, even when no icon
