@@ -2763,18 +2763,17 @@ sub new
 		#if default setting is a function, use a function that look in the hash, and fallback to the default function (this is the case for Queue and VolumeIcon widgets)
 		$stock= sub { $hash{$_[0]} || &$default } if ref $default eq 'CODE';
 	}
+	$self->{state}=$ref->{state} if $ref->{state};
 	if ($opt->{skin})
 	{	my $skin=Skin->new($opt->{skin},$self,$opt);
 		$self->signal_connect(expose_event => \&Skin::draw,$skin);
 		$self->set_app_paintable(1); #needed ?
-		$self->{skin}=1;
 		if (0 && !$isbutton && $opt->{shape}) #mess up button-press cb TESTME
 		{	$self->{shape}=1;
 		}
 	}
 	elsif ($stock)
 	{	$self->{stock}=$stock;
-		$self->{state}=$ref->{state} if $ref->{state};
 		$self->{size}= $opt->{size};
 		my $img= $self->{img}= Gtk2::Image->new;
 		$img->set_size_request(Gtk2::IconSize->lookup($self->{size})); #so that it always request the same size, even when no icon
@@ -3519,6 +3518,14 @@ sub new
 	$self->{$_}=$opt->{$_} for qw/widget resize togglegroup/;
 	$self->signal_connect( toggled => \&toggled_cb );
 	::Watch($self,'HiddenWidgets',\&UpdateToggleState);
+	if ($opt->{skin})
+	{	my $skin=Skin->new($opt->{skin},$self,$opt);
+		$self->signal_connect(expose_event => \&Skin::draw,$skin);
+		$self->set_app_paintable(1); #needed ?
+		if (0 && $opt->{shape}) #mess up button-press cb TESTME
+		{	$self->{shape}=1;
+		}
+	}
 
 	return $self;
 }

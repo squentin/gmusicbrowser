@@ -1709,6 +1709,10 @@ sub new
 
 	my $notebook = Gtk2::Notebook->new;
 	$notebook->set_scrollable(TRUE);
+	if (my $tabpos=$opt->{tabpos})
+	{	($tabpos,$self->{angle})= $tabpos=~m/^(left|right|top|bottom)?(90|180|270)?/;
+		$notebook->set_tab_pos($tabpos) if $tabpos;
+	}
 	#$notebook->popup_enable;
 	$self->{hidetabs}= (@pids==1) unless defined $self->{hidetabs};
 	$notebook->set_show_tabs( !$self->{hidetabs} );
@@ -1805,7 +1809,9 @@ sub create_tab
 {	my ($self,$page)=@_;
 	my $pid=$page->{pid};
 	my $img;
+	my $angle= $self->{angle} || 0;
 	my $label= Gtk2::Label->new( $page->{page_name} );
+	$label->set_angle($angle) if $angle;
 	if ($self->{tabmode} ne 'text')
 	{	my $icon= "gmb-tab-$pid";
 		$img= Gtk2::Image->new_from_stock($icon,'menu') if Gtk2::IconFactory->lookup_default($icon);
@@ -1813,9 +1819,9 @@ sub create_tab
 	}
 	my $tab;
 	if ($img && $label)
-	{	$tab= Gtk2::HBox->new(FALSE,0);
-		$tab->pack_start( $img, FALSE,FALSE,0 );
-		$tab->pack_start( $label, TRUE,TRUE,0 );
+	{	$tab= $angle%180 ? Gtk2::VBox->new(FALSE,0) : Gtk2::HBox->new(FALSE,0);
+		my @pack= $angle%180 ? ($label,TRUE,$img,FALSE) : ($img,FALSE,$label,TRUE);
+		$tab->pack_start( $pack[$_], $pack[$_+1],$pack[$_+1],0 ) for 0,2;
 	}
 	else { $tab= $img || $label; }
 	$tab->show_all;

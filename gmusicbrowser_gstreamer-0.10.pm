@@ -245,6 +245,11 @@ sub Play
 			RG_set_options($rgv,$rgl);
 			push @elems, $rgv,$rgl,$ac,$ar;
 		}
+		if (my $custom=$::Options{gst_custom})
+		{	my $elem= eval { GStreamer::parse_launch($custom) };
+			warn "gstreamer custom pipeline error : $@\n" if $@;
+			push @elems, $elem if $elem;
+		}
 		if (@elems)
 		{	my $sink0=GStreamer::Bin->new('sink0');
 			push @elems,$Sink;
@@ -477,15 +482,17 @@ sub RG_PrefBox
 sub AdvancedOptions
 {	my $self=$_[0];
 	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $gapless= ::NewPrefCheckButton(gst_gapless => _"enable gapless (experimental)", cb=>sub { $self->{modif}=1 });
+	my $modif_cb= sub { $self->{modif}=1 };
+	my $gapless= ::NewPrefCheckButton(gst_gapless => _"enable gapless (experimental)", cb=> $modif_cb);
 	$gapless->set_sensitive(0) unless $playbin2_ok;
 	$vbox->pack_start($gapless,::FALSE,::FALSE,2);
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
-	my $sg2=Gtk2::SizeGroup->new('horizontal');
+	my $custom= ::NewPrefEntry(gst_custom => _"Custom pipeline", cb=>$modif_cb, sizeg1 => $sg1, expand => 1, tip => _"Insert this pipeline before the audio sink", history => 'gst_custom_history');
+	$vbox->pack_start($custom,::FALSE,::FALSE,2);
 	for my $s (sort grep $Sinks{$_}{ok} && $Sinks{$_}{option}, keys %Sinks)
 	{	my $label= $Sinks{$s}{name}||$s;
 		for my $opt (sort split / /,$Sinks{$s}{option})
-		{	my $hbox=::NewPrefEntry("gst_${s}_$opt", "$s $opt : ", cb => sub { $self->{modif}=1 }, sizeg1 => $sg1, sizeg2 => $sg2);
+		{	my $hbox=::NewPrefEntry("gst_${s}_$opt", "$s $opt : ", cb => $modif_cb, sizeg1 => $sg1, expand => 1);
 			$vbox->pack_start($hbox,::FALSE,::FALSE,2);
 		}
 	}
