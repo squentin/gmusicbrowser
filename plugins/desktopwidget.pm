@@ -110,6 +110,9 @@ sub New
 	return unless $layoutdef;
 	my $key='DesktopWidget000';
 	$key++ while defined $DWlist->{$key};
+	my $default_window_opt= ::ParseOptions( $layoutdef->{Window}||'' );
+	my $size= $default_window_opt->{size} || '1x1';
+	my ($w,$h)= $size=~m/(\d+)x(\d+)/;
 	my %opt=
 	(	layout		=> $layout,
 		DefaultFontColor=> $layoutdef->{DefaultFontColor} || 'white',
@@ -118,8 +121,8 @@ sub New
 		opacity	=> 1,
 		x	=> 0,
 		y	=> 0,
-		w	=> 1,
-		h	=> 1,
+		w	=> $w||1,
+		h	=> $h||1,
 	);
 	$DWlist->{$key}= \%opt;
 	CreateWindow($key);
