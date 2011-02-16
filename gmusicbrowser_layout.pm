@@ -2745,7 +2745,6 @@ sub new
 	{	my $skin=Skin->new($opt->{skin},$self,$opt);
 		$self->signal_connect(expose_event => \&Skin::draw,$skin);
 		$self->set_app_paintable(1); #needed ?
-		$self->{skin}=1;
 		if (0 && !$isbutton && $opt->{shape}) #mess up button-press cb TESTME
 		{	$self->{shape}=1;
 		}
@@ -3496,6 +3495,14 @@ sub new
 	$self->{$_}=$opt->{$_} for qw/widget resize togglegroup/;
 	$self->signal_connect( toggled => \&toggled_cb );
 	::Watch($self,'HiddenWidgets',\&UpdateToggleState);
+	if ($opt->{skin})
+	{	my $skin=Skin->new($opt->{skin},$self,$opt);
+		$self->signal_connect(expose_event => \&Skin::draw,$skin);
+		$self->set_app_paintable(1); #needed ?
+		if (0 && $opt->{shape}) #mess up button-press cb TESTME
+		{	$self->{shape}=1;
+		}
+	}
 
 	return $self;
 }
