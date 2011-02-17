@@ -1558,7 +1558,7 @@ use base 'Gtk2::Window';
 
 sub new
 {	my ($class,$layout,%options)=@_;
-	my $fallback=delete $options{fallback} || 'Lists, Library & Context';
+	my $fallback=delete $options{fallback} || 'shimmer';
 	my $opt0={};
 	if (my $opt= $layout=~m/^[^(]+\(.*=/)
 	{	($layout,$opt0)= $layout=~m/^([^(]+)\((.*)\)$/; #separate layout id and options
