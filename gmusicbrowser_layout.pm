@@ -2744,6 +2744,7 @@ sub new
 	if ($opt->{skin})
 	{	my $skin=Skin->new($opt->{skin},$self,$opt);
 		$self->signal_connect(expose_event => \&Skin::draw,$skin);
+		$self->{skin}=1; # will force a repaint on stock state change
 		$self->set_app_paintable(1); #needed ?
 		if (0 && !$isbutton && $opt->{shape}) #mess up button-press cb TESTME
 		{	$self->{shape}=1;
