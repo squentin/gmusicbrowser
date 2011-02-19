@@ -246,8 +246,17 @@ sub Play
 			push @elems, $rgv,$rgl,$ac,$ar;
 		}
 		if (my $custom=$::Options{gst_custom})
-		{	my $elem= eval { GStreamer::parse_launch($custom) };
+		{	$custom="( $custom )" if $custom=~m/^\s*\w/ && $custom=~m/!/;	#make a Bin by default instead of a pipeline
+			my $elem= eval { GStreamer::parse_launch($custom) };
 			warn "gstreamer custom pipeline error : $@\n" if $@;
+			if ($elem && $elem->isa('GStreamer::Bin'))
+			{	my $first=my $last=$elem;
+				# will work at least for simple cases #FIXME could be better
+				$first=@{ $first->iterate_sorted }[0]  while $first->isa('GStreamer::Bin');
+				$last =@{  $last->iterate_sorted }[-1] while  $last->isa('GStreamer::Bin');
+				$elem->add_pad( GStreamer::GhostPad->new('sink', $last->get_pad('sink') ));
+				$elem->add_pad( GStreamer::GhostPad->new('src', $first->get_pad('src') ));
+			}
 			push @elems, $elem if $elem;
 		}
 		if (@elems)
