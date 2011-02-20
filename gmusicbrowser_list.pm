@@ -280,11 +280,13 @@ package EditListButtons;
 use Glib qw(TRUE FALSE);
 use Gtk2;
 
-use base 'Gtk2::HBox';
+use base 'Gtk2::Box';
 
 sub new
 {	my ($class,$opt)=@_;
-	my $self=bless Gtk2::HBox->new, $class;
+	my $v= ($opt->{orientation}||'') eq 'vertical';
+	my $self=bless ($v ? Gtk2::VBox->new : Gtk2::HBox->new), $class;
+
 	$self->{group}=$opt->{group};
 	$self->{brm}=	::NewIconButton('gtk-remove',	($opt->{small} ? '' : _"Remove"),sub {::GetSonglist($self)->RemoveSelected});
 	$self->{bclear}=::NewIconButton('gtk-clear',	($opt->{small} ? '' : _"Clear"),sub {::GetSonglist($self)->Empty} );
