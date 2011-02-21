@@ -44,26 +44,29 @@ Title		= "gmusicbrowser"
 DefaultFocus	= SimpleSearch
 Default		= Window(size=1000x750)
 Author		= simon@shimmerproject.org
-Window		= hidden=HBSearch
+Window		= hidden=VBSearchBox
 ### main window containers: top bar, main and statusbar ###
 VBMain		= VBTop _NBList
 VBTop		= 3Filler8 HBTop
-HBTop		= VBButtons _HBPlayer _HBSearch -5VBSettings
-    HBPlayer = _15VBPlayer VBToggleBox1
-	VBToggleBox1 = ToggleButton0(togglegroup=50,size=button,relief=none,icon=gtk-find,widget=HBSearch,tip=_"Show the search") 5Filler6
-    HBSearch = _VBSearchBox VBToggleBox2
-	VBToggleBox2 = ToggleButton1(togglegroup=50,size=button,relief=none,icon=gtk-media-play,widget=HBPlayer,tip=_"Show now-playing Info") 5Filler7
+HBTop		= VBButtons _VBPlayer -5VBSettings
+#HBPlayerSearch	= _VBPlayer _VBSearchBox
+#HBPlayer = _15VBPlayer ##VBToggleBox1
+#VBToggleBox1 = ToggleButton0(togglegroup=50,size=button,relief=none,icon=gtk-find,widget=HBSearch,tip=_"Show the search") 5Filler6
+#HBSearch = _VBSearchBox  ##VBToggleBox2
+#VBToggleBox2 = ToggleButton1(togglegroup=50,size=button,relief=none,icon=gtk-media-play,widget=HBPlayer,tip=_"Show now-playing Info") 5Filler7
 VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
-VBPlayer	= HBTitle HBTimeSlider
-HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
+VBPlayer	= HBTitle VBTime
+HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=0,expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
+VBTime		= _HBTimeSlider _VBSearchBox
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 VBSearchBox	= SimpleSearch(suggest=1,maxsize=300) 5Filler2
-VBSettings	= Pref(stock=gtk-preferences_20,size=button) 5Filler5
+VBSettings	= HBPrefSearch 5Filler5
+HBPrefSearch	= ToggleButton0(size=button,relief=none,icon=gtk-find,widget=VBSearchBox) Pref(stock=gtk-preferences_20,size=button)
 NBList		= (tabpos="bottom") HBSongListtree QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
 HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
 VBAbout		= (tabtitle=_"Info") _PluginArtistinfo
-HBSongListtree	= (tabtitle=_"Playlist") _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track")
+HBSongListtree	= (tabtitle=_"Playlist") _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|Compact(picsize=50)|disc|discleft(width=15)",follow=1,sort="year album disc track")
 
 [Small player]
 Type=G
@@ -648,6 +651,16 @@ KeyBindings	= Escape CloseWindow
 
 #SongTree Group & Columns definitions
 #####################################
+
+{Group Compact}
+title=Compact
+head=pic:h
+tail=25
+vcollapse=head
+vmin=pic:y+pic:h+25
+title:	text(markup='<b><big>'.pesc($album).'</big></b>'. if($year,'\n'.pesc($year)) . '\n'.pesc($artist),pad=2,x=pic:w)
+pic:	aapic(y=title:y,picsize=picsize,ypad=2,xpad=1,aa='album')
+picsize : OptionNumber(default=50,min=20,max=1000,step=10)
 
 {Group discleft}
 title=disc on the left side
