@@ -606,6 +606,15 @@ HBAA		= _ArtistBox _AlbumBox
 # Fullscreen Layouts
 #####################################
 
+[Mosaic]
+Type=F
+Window		= fullscreen=1,sticky=0
+VBMain		= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1) HBNowPlaying
+HBNowPlaying	= HBButtons 15Filler1 _HBTitle
+HBButtons	= Prev Play Next
+HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)	
+KeyBindings	= Escape CloseWindow
+
 [default fullscreen]
 Type=F
 Window		= fullscreen=1,sticky=0
