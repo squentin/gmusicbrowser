@@ -78,7 +78,7 @@ my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 $::Options{OPT.'Font'} ||= delete $::Options{OPT.'FontSize'};	#for versions <1.1.6
 
 if (my $site=$::Options{OPT.'LyricSite'}) { delete $::Options{OPT.'LyricSite'} unless exists $sites{$site} } #reset selected site if no longer defined
-::SetDefaultOptions(OPT, font => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyricsplugin');
+::SetDefaultOptions(OPT, Font => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyricsplugin');
 
 
 my $lyricswidget=

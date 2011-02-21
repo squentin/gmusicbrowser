@@ -2223,7 +2223,7 @@ our @contextmenu=
 		submenu => sub { $_[0]{self}->make_widget_list('context page'); },	submenu_reverse=>1,
 		code	=> sub { $_[0]{self}->newtab($_[1],1); },
 	},
-	{ label => _"Delete list", code => sub { $_[0]{page}->DeleteList; },	cat=> 'L',	test => sub { $_[0]{page}{name}=~m/^EditList\d*$/; } },
+	{ label => _"Delete list", code => sub { $_[0]{page}->DeleteList; },	type=> 'L',	test => sub { $_[0]{page}{name}=~m/^EditList\d*$/; } },
 	{ label => _"Rename",	code => \&pagerename_cb,				istrue => 'rename',},
 	{ label => _"Close",	code => sub { $_[0]{self}->close_tab($_[0]{page},1); },	istrue => 'close',	stockicon=> 'gtk-close',},
 );

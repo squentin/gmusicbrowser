@@ -1330,7 +1330,6 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 			return $ret;
 		 };
 
-		my $progress=$opt{progress};
 		Glib::Idle->add(sub
 		 {	if ($towrite->[$i])
 			{	FileTag::Write($IDs->[$i], $towrite->[$i], $errorsub);
@@ -1489,7 +1488,7 @@ sub Gid_to_Display	#convert a gid from a Get_gid to a displayable value
 	return $sub->($gid);
 }
 sub DisplayFromGID_sub
-{	my $field=$_[0];	warn "DisplayFromGID_sub(@_)\n";
+{	my $field=$_[0];
 	return $Gid_to_display{$field}||= Makesub($field, 'gid_to_display', GID => '$_[0]');
 }
 sub DisplayFromHash_sub	 #not a good name, very specific, only used for $field=path currently
@@ -2833,7 +2832,6 @@ sub SongsAdded_cb
 }
 sub SongsChanged_cb
 {	my (undef,$IDs,$fields)=@_;
-if (!$fields || grep(!defined, @$fields)) { ::callstack(@_,'fields=>',@$fields) }	#DEBUG
 	return if $::ToDo{'7_refilter_playlist'};
 	if ($::PlayFilter && $::PlayFilter->changes_may_affect($IDs,$fields,$::ListPlay))
 	{	::IdleDo('7_refilter_playlist',9000, \&UpdateFilter, $::ListPlay);

@@ -171,6 +171,8 @@ our %Predefined =
 	discogs	=> { tabtitle => 'discogs',	baseurl => 'http://www.discogs.com/artist/%a', },
 	youtube	=> { tabtitle => 'youtube',	baseurl => 'http://www.youtube.com/results?search_query="%a"', },
 	pollstar=> { tabtitle => 'pollstar',	baseurl => 'http://www.pollstar.com/eventSearch.aspx?SearchBy=%a', },
+	songfacts=>{ tabtitle => 'songfacts',	baseurl => 'http://www.songfacts.com/search_fact.php?title=%t', },
+    rateyourmusic=>{ tabtitle => 'rateyourmusic',baseurl=> 'http://rateyourmusic.com/search?searchterm=%a&searchtype=a', },
 );
 
 our %Widgets=
