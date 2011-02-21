@@ -6243,7 +6243,7 @@ sub drag_leave_cb
 	$self->update_row($row) if defined $row;
 }
 
-sub expand_colapse
+sub expand_collapse
 {	my ($self,$depth,$i)=@_;
 	$self->{TREE}{expanded}[$depth][$i]^=1;
 	$self->compute_height;	# FIXME could compute only ($depth,$i)
@@ -6347,7 +6347,7 @@ sub button_press_cb
 		if (defined $depth && $answer->{area} eq 'head' || $answer->{area} eq 'collapsed')
 		{	if ($answer->{area} eq 'head' && $self->{headclick} eq 'select')
 			 { $self->song_selected($event,$answer->{start},$answer->{end}); return 0}
-			else { $self->expand_colapse($depth,$answer->{branch}); }
+			else { $self->expand_collapse($depth,$answer->{branch}); }
 			return 1;
 		}
 		elsif (defined $depth && $answer->{harea} eq 'left' || $answer->{harea} eq 'right')

@@ -561,7 +561,7 @@ sub add_selectfile_column
 		$check->signal_connect( toggled => sub { my ($check,$i)=@_; my $self=::find_ancestor($check,__PACKAGE__); my $active=$check->get_active; $self->{pf_widgets}{$_}[$i]->set_sensitive($active) for keys %{ $self->{pf_widgets} } },$i);
 		#$widget->signal_connect(focus_in_event=> \&scroll_to_entry);
 		$table->attach($check,$col,$col+1,$row,$row+1,'fill','shrink',1,1);
-		$check->show_all; warn $check;
+		$check->show_all;
 		push @toggles,$check;
 		$i++;
 	}
