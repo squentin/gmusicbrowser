@@ -284,8 +284,8 @@ use base 'Gtk2::Box';
 
 sub new
 {	my ($class,$opt)=@_;
-	my $v= ($opt->{orientation}||'') eq 'vertical';
-	my $self=bless ($v ? Gtk2::VBox->new : Gtk2::HBox->new), $class;
+	my $self= ($opt->{orientation}||'') eq 'vertical' ? Gtk2::VBox->new : Gtk2::HBox->new;
+	bless $self, $class;
 
 	$self->{group}=$opt->{group};
 	$self->{brm}=	::NewIconButton('gtk-remove',	($opt->{small} ? '' : _"Remove"),sub {::GetSonglist($self)->RemoveSelected});
