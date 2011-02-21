@@ -1770,6 +1770,7 @@ sub SaveOptions
 	(	hidebb	=> $self->{hidebb},
 		min	=> $self->{min},
 		page	=> $self->{page},
+		hidetabs=> $self->{hidetabs},
 		pages	=> (join '|', map $_->{pid}, $self->{notebook}->get_children),
 	);
 	for my $page (grep $_->isa('FilterList'), $self->{notebook}->get_children)
