@@ -23,7 +23,7 @@ clean:
 distclean: clean
 	rm -rf locale/
 
-po/gmusicbrowser.pot : gmusicbrowser.pl *.pm plugins/*.pm layouts
+po/gmusicbrowser.pot : gmusicbrowser.pl *.pm plugins/*.pm layouts/*.layout
 	perl po/create_pot.pl --quiet
 
 po/%.po : po/gmusicbrowser.pot
@@ -49,10 +49,12 @@ install: all
 	install -pd "$(datadir)/gmusicbrowser/pix/tango/"
 	install -pd "$(datadir)/gmusicbrowser/pix/oxygen/"
 	install -pd "$(datadir)/gmusicbrowser/plugins/"
+	install -pd "$(datadir)/gmusicbrowser/layouts/"
 	install -pDm 755 gmusicbrowser.pl "$(bindir)/gmusicbrowser"
 	install -pm 755 iceserver.pl      "$(datadir)/gmusicbrowser/iceserver.pl"
-	install -pm 644 *.pm layouts      "$(datadir)/gmusicbrowser/"
+	install -pm 644 *.pm		  "$(datadir)/gmusicbrowser/"
 	install -pm 644 gmbrc.default     "$(datadir)/gmusicbrowser/"
+	install -pm 644 layouts/*.layout  "$(datadir)/gmusicbrowser/layouts/"
 	install -pm 644 plugins/*.pm      "$(datadir)/gmusicbrowser/plugins/"
 	install -pm 644 pix/*.png         "$(datadir)/gmusicbrowser/pix/"
 	install -pm 644 pix/elementary/*    "$(datadir)/gmusicbrowser/pix/elementary/"

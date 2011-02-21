@@ -7,7 +7,7 @@ m/-q|--quiet/ and $verbose=0 for @ARGV;
 use FindBin;
 my $path=$FindBin::Bin;
 $path=~s#/[^/]*/?$##; #up one dir
-my @files=( "$path/gmusicbrowser.pl", glob("$path/*.pm"), glob("$path/plugins/*.pm"), "$path/layouts" );
+my @files=( "$path/gmusicbrowser.pl", glob("$path/*.pm"), glob("$path/plugins/*.pm"), glob("$path/layouts/*.layout") );
 
 my %msgid;
 my %msgid_p;
@@ -37,7 +37,7 @@ while (my $file=shift @files)
 			$msgid{$1}.= " $file:$." if m/^\s*(?:name|title|desc)\s+(.+)/;
 		}
 	}
-	if ($file eq 'layouts') #id of layouts is used as default layout name => may need translation
+	if ($file=~m/\.layout$/) #id of layouts is used as default layout name => may need translation
 	{	if (m/^\[([^]]+)\]/)
 		{	$msgid{ $layout_id }.= $layout_loc if defined $layout_id;
 			$layout_id=$1;
