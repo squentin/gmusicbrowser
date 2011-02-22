@@ -2621,7 +2621,7 @@ sub Select	#Set filter, sort order, selected song, playing state, staticlist, so
 		$ListPlay->Replace($staticlist);
 	}
 	elsif (defined $song) { $ListPlay->SetID($song) }
-	elsif (defined $pos) { warn $pos;SetPosition($pos) }
+	elsif (defined $pos) { SetPosition($pos) }
 	Play() if $args{play} && !$TogPlay;
 }
 
@@ -3589,7 +3589,7 @@ sub drag_begin_cb	#create drag icon
 	else		{ $layout->set_markup($text); }
 	my $PAD=3;
 	my ($w,$h)=$layout->get_pixel_size; $w+=$PAD*2; $h+=$PAD*2;
-	my $pixmap = Gtk2::Gdk::Pixmap->new(undef,$w,$h, $self->window->get_depth);
+	my $pixmap = Gtk2::Gdk::Pixmap->new($self->window,$w,$h,-1);
 	my $style=$self->style;
 	$pixmap->draw_rectangle($style->bg_gc('normal'),TRUE,0,0,$w,$h);
 	$pixmap->draw_rectangle($style->fg_gc('normal'),FALSE,0,0,$w-1,$h-1);
@@ -8355,7 +8355,7 @@ sub Set
 }
 
 package GMB::Cache;
-my (%Cache,$CacheSize);
+my %Cache; my $CacheSize=0;
 
 sub drop_file	#drop a file from the cache
 {	my $file=shift;

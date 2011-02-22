@@ -284,8 +284,8 @@ use base 'Gtk2::Box';
 
 sub new
 {	my ($class,$opt)=@_;
-	my $v= ($opt->{orientation}||'') eq 'vertical';
-	my $self=bless ($v ? Gtk2::VBox->new : Gtk2::HBox->new), $class;
+	my $self= ($opt->{orientation}||'') eq 'vertical' ? Gtk2::VBox->new : Gtk2::HBox->new;
+	bless $self, $class;
 
 	$self->{group}=$opt->{group};
 	$self->{brm}=	::NewIconButton('gtk-remove',	($opt->{small} ? '' : _"Remove"),sub {::GetSonglist($self)->RemoveSelected});
@@ -1771,6 +1771,7 @@ sub SaveOptions
 	(	hidebb	=> $self->{hidebb},
 		min	=> $self->{min},
 		page	=> $self->{page},
+		hidetabs=> $self->{hidetabs},
 		pages	=> (join '|', map $_->{pid}, $self->{notebook}->get_children),
 	);
 	for my $page (grep $_->isa('FilterList'), $self->{notebook}->get_children)
@@ -6264,7 +6265,7 @@ sub drag_leave_cb
 	$self->update_row($row) if defined $row;
 }
 
-sub expand_colapse
+sub expand_collapse
 {	my ($self,$depth,$i)=@_;
 	$self->{TREE}{expanded}[$depth][$i]^=1;
 	$self->compute_height;	# FIXME could compute only ($depth,$i)
@@ -6368,7 +6369,7 @@ sub button_press_cb
 		if (defined $depth && $answer->{area} eq 'head' || $answer->{area} eq 'collapsed')
 		{	if ($answer->{area} eq 'head' && $self->{headclick} eq 'select')
 			 { $self->song_selected($event,$answer->{start},$answer->{end}); return 0}
-			else { $self->expand_colapse($depth,$answer->{branch}); }
+			else { $self->expand_collapse($depth,$answer->{branch}); }
 			return 1;
 		}
 		elsif (defined $depth && $answer->{harea} eq 'left' || $answer->{harea} eq 'right')

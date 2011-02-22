@@ -148,7 +148,7 @@ contains songs tags and program options
 \fI/usr/share/gmusicbrowser/plugins/\fP, \fI~/.gmusicbrowser/plugins/\fP
 files with extention .pm in these folders are loaded as plugins on startup
 .TP
-\fI/usr/share/gmusicbrowser/layouts\fP, \fI~/.gmusicbrowser/layouts\fP
+\fI/usr/share/gmusicbrowser/layouts/*.layout\fP, \fI~/.gmusicbrowser/layouts/*.layout\fP
 contains layouts definitions
 .TP
 \fI~/.gmusicbrowser/gmusicbrowser.fifo\fP

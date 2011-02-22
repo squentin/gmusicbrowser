@@ -61,7 +61,13 @@ my @similarity=
 # lastfm api key 7aa688c2466dc17263847da16f297835
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
 
-::SetDefaultOptions(OPT, PathFile => "~/.config/gmusicbrowser/bio/%a", ArtistPicSize => "100", SimilarLimit => "15", SimilarRating => "50", Eventformat => '%title at %name<br>%startDate<br>%city (%country)<br><br>', Eventformat_history => (['%title<br>%startDate<br><br>','%title on %startDate<br><br>']));
+::SetDefaultOptions(OPT,PathFile	=> "~/.config/gmusicbrowser/bio/%a",
+			ArtistPicSize	=> 100,
+			SimilarLimit	=> 15,
+			SimilarRating	=> 50,
+			Eventformat	=> '%title at %name<br>%startDate<br>%city (%country)<br><br>',
+			Eventformat_history => ['%title<br>%startDate<br><br>','%title on %startDate<br><br>'],
+);
 
 my $artistinfowidget=
 {	class		=> __PACKAGE__,
@@ -124,7 +130,7 @@ sub new
 	$textview->signal_connect(motion_notify_event 	=> \&update_cursor_cb);
 	$textview->signal_connect(visibility_notify_event=>\&update_cursor_cb);
 	$textview->signal_connect(query_tooltip => \&update_cursor_cb);
-	
+
 	my $store=Gtk2::ListStore->new('Glib::String','Glib::Double','Glib::String','Glib::UInt','Glib::String');
 	my $treeview=Gtk2::TreeView->new($store);
 	my $tc_artist=Gtk2::TreeViewColumn->new_with_attributes( _"Artist",Gtk2::CellRendererText->new,markup=>0);
@@ -140,7 +146,7 @@ sub new
 	$treeview->set_rules_hint(1);
 	$treeview->signal_connect(button_press_event => \&tv_contextmenu);
 	$treeview->{store}=$store;
-	
+
 	my $togglebox = Gtk2::HBox->new();
 	my $group;
 	foreach my $key (sort keys %sites)
@@ -164,7 +170,7 @@ sub new
 	$statbox->pack_start($togglebox,0,0,0);
 	$self->{buffer}=$textview->get_buffer;
 	$self->{store}=$store;
-	
+
 	my $infobox = Gtk2::HBox->new;
 	$infobox->set_spacing(0);
 	my $sw1=Gtk2::ScrolledWindow->new;
@@ -180,7 +186,7 @@ sub new
 	else { $textview->show; $sw1->set_no_show_all(1); }
 	$self->{sw1} = $sw1;
 	$self->{sw2} = $sw2;
-	
+
 	$self->pack_start($artistbox,0,0,0);
 	$self->pack_start($infobox,1,1,0);
 
@@ -288,7 +294,7 @@ sub tv_contextmenu {
 	}
 	return 1;
 	}
-	
+
 }
 
 sub CreateSearchMenu {
@@ -389,7 +395,9 @@ sub ArtistChanged
 	$self->{artistratingvalue}= int($rating+0.5);
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
 	$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);
-	my $tip = _"Average rating: ".$self->{artistratingvalue} ._"\nRating range: ".$self->{artistratingrange}._"\nTotal playcount: ".$self->{artistplaycount};
+	my $tip = join "\n",	_("Average rating:")	.' '.$self->{artistratingvalue},
+				_("Rating range:")	.' '.$self->{artistratingrange},
+				_("Total playcount:")	.' '.$self->{artistplaycount};
 
 	$self->{artistrating}->set_from_pixbuf(Songs::Stars($self->{artistratingvalue},'rating'));
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($aID,"<big><b>%a</b></big>","artist",1) );
@@ -399,7 +407,7 @@ sub ArtistChanged
 	my $url= $sites{$self->{site}}[SITEURL];
 	$url=~s/%a/$artist/;
 	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/;
-	if ($url ne $self->{url} or $force == 1) {
+	if (!$self->{url} or $url ne $self->{url} or $force == 1) {
 		$self->{url} = $url;
 		if ($self->{site} eq "biography") { # check for local biography file before loading the page
 			unless ($force == 1) {
@@ -411,7 +419,7 @@ sub ArtistChanged
 				}
 			}
 		}
-		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);	
+		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);
 	}
 }
 
@@ -463,7 +471,7 @@ sub loaded
 			s/<(.*?)>//gi; # strip tags
 		}
 		if ($data eq "") {
-			$infoheader = _"\nNo results found";
+			$infoheader = "\n". _"No results found";
 			$artistinfo_ok = "0";
 			$tag_header = $tag_noresults;
 			$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
@@ -471,8 +479,8 @@ sub loaded
 		else {	$artistinfo_ok = "1";
 			$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 			$buffer->insert($iter,$data);
-			$buffer->insert_with_tags($iter,_"\n\nEdit in the last.fm wiki",$href);
-			$buffer->insert_with_tags($iter,"\n\nListeners: ".$listeners."  |   Playcount: ".$playcount,$tag_extra); # only shown on fresh load, not saved to local info
+			$buffer->insert_with_tags($iter,"\n\n"._"Edit in the last.fm wiki",$href);
+			$buffer->insert_with_tags($iter,"\n\n"._"Listeners: ".$listeners."  |   "._"Playcount: ".$playcount,$tag_extra); # only shown on fresh load, not saved to local info
 			$self->{infoheader}=$infoheader;
 			$self->{biography}=$data;
 			$self->{lfm_url}=$url;
@@ -480,11 +488,10 @@ sub loaded
 	}
 
 	elsif ($self->{site} eq "events") {
-		
+
 		if ($data =~ m#total=\"(.*?)\">#g) {
-			if ( $1 == 1) { $infoheader = $1 ._" Upcoming Event\n\n"; }
-			elsif ( $1 == 0) { $self->set_buffer(_"No results found"); return; }
-			else { $infoheader = $1 ._" Upcoming Events\n\n"; }
+			if ( $1 == 0) { $self->set_buffer(_"No results found"); return; }
+			else { $infoheader = ::__("%d Upcoming Event","%d Upcoming Events",$1)."\n\n"; }
 			$buffer->insert_with_tags($iter,$infoheader,$tag_header) if $infoheader;
 		}
 		for my $event (split /<\/event>/, $data) {
@@ -524,7 +531,7 @@ sub loaded
 				}
 				$self->{store}->set($self->{store}->append,0,::PangoEsc($s_artist{name}).$stats,1,$s_artist{match} * 100,2,$s_artist{url},3,$aID,4,$s_artist{name});
 			}
-			
+
 		}
 	}
 	$self->Save_text if $::Options{OPT.'AutoSave'} && $artistinfo_ok && $artistinfo_ok==1;
@@ -551,7 +558,7 @@ sub load_file
 	else { $text =~ s/<title>(.*?)<\/title>\n?//i; $infoheader = $1 . "\n"; }
 	my $iter=$buffer->get_start_iter;
 	$buffer->insert_with_tags($iter,$infoheader,$tag_header);
-        $buffer->insert($iter,$text);
+	$buffer->insert($iter,$text);
 	if ($url) {
 		$href->{url}=$url;
 		$buffer->insert_with_tags($iter,_"Edit in the last.fm wiki",$href);
