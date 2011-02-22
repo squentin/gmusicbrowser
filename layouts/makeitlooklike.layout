@@ -277,8 +277,8 @@ VBMain = HBMenubar HBToolbar VBSliderbar _HPSidebarCenterContext HBStatusbar
     HBToolbar = Play Prev Next \
         3VSeparator1 \
         Sort(button=1,relief=none,minwidth=35) \
-        ToggleButton4(relief=none,minwidth=35,size=button,icon=gmb-picture,widget=HBFilters,tip=_"Show/Hide Browser") \
-        ToggleButton5(relief=none,minwidth=35,size=button,icon=gmb-picture,widget=Context,tip=_"Change the context visibility") \
+        ToggleButton4(relief=none,minwidth=35,size=button,icon=gtk-find,widget=HBFilters,tip=_"Show/Hide Browser") \
+        ToggleButton5(relief=none,minwidth=35,size=button,icon=gtk-info,widget=Context,tip=_"Change the context visibility") \
         -HBVolume
 
         HBVolume = VolumeIcon(size=menu,button=1)
