@@ -1,4 +1,4 @@
-[shimmer]
+[Shimmer Desktop]
 Type=G
 Title		= "gmusicbrowser"
 DefaultFocus	= SimpleSearch
@@ -38,7 +38,7 @@ VPMosaic	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_al
 HSize0		= 350 NBList
 VSize0		= 350 HBCover
 
-[Netbook]
+[Shimmer Netbook]
 Type=G
 Title		= "gmusicbrowser"
 DefaultFocus	= SimpleSearch
@@ -49,18 +49,13 @@ Window		= hidden=VBSearchBox
 VBMain		= VBTop _NBList
 VBTop		= 3Filler8 HBTop
 HBTop		= VBButtons _VBPlayer -5VBSettings
-#HBPlayerSearch	= _VBPlayer _VBSearchBox
-#HBPlayer = _15VBPlayer ##VBToggleBox1
-#VBToggleBox1 = ToggleButton0(togglegroup=50,size=button,relief=none,icon=gtk-find,widget=HBSearch,tip=_"Show the search") 5Filler6
-#HBSearch = _VBSearchBox  ##VBToggleBox2
-#VBToggleBox2 = ToggleButton1(togglegroup=50,size=button,relief=none,icon=gtk-media-play,widget=HBPlayer,tip=_"Show now-playing Info") 5Filler7
 VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle VBTime
 HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=0,expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
 VBTime		= _HBTimeSlider _VBSearchBox
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
-VBSearchBox	= SimpleSearch(suggest=1,maxsize=300) 5Filler2
+VBSearchBox	= SimpleSearch(suggest=1) 5Filler2
 VBSettings	= HBPrefSearch 5Filler5
 HBPrefSearch	= ToggleButton0(size=button,relief=none,icon=gtk-find,widget=VBSearchBox) Pref(stock=gtk-preferences_20,size=button)
 NBList		= (tabpos="bottom") HBSongListtree QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
@@ -606,13 +601,17 @@ HBAA		= _ArtistBox _AlbumBox
 # Fullscreen Layouts
 #####################################
 
-[Mosaic]
+[Shimmer Party]
 Type=F
-Window		= fullscreen=1,sticky=0
-VBMain		= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1) HBNowPlaying
-HBNowPlaying	= HBButtons 15Filler1 _HBTitle
+Window		= fullscreen=1,sticky=0,hidden=VBSidebar
+VBMain		= _HPMain HBNowPlaying
+HPMain		= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=128,hidetabs=1) VBSidebar
+HBNowPlaying	= HBButtons 15Filler0 _HBTitle
 HBButtons	= Prev Play Next
-HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)	
+HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -ToggleButton1(size=button,relief=none,icon=gtk-find,widget=VBSidebar) -20Stars(yalign=0.5)
+VBSidebar	= 4Filler1 7HBSearch _7HBQueue 4Filler2
+HBQueue		= 14_QueueList(group=1,songtree=1,cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248")
+HBSearch	= 4Filler3 6Label0(markup='<span size="xx-large" weight="ultrabold">«</span>') _SimpleSearch(suggest=1) 7Filler4
 KeyBindings	= Escape CloseWindow
 
 [default fullscreen]
