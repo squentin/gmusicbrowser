@@ -3015,15 +3015,15 @@ sub new
 		my $font= $opt->{font} || $opt->{DefaultFont};
 		$self->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 	}
-	$self->{left}=$self->{right}=0;
-	$self->{max}= $ref->{max} || 1;
 	my $orientation= $opt->{vertical} ? 'bottom-to-top' : $opt->{horizontal} ? 'left-to-right' : $opt->{orientation} || 'left-to-right';
 	$self->set_orientation($orientation);
-	$self=Layout::Bar::skin->new($opt,$orientation) if $opt->{skin};
+	$self=Layout::Bar::skin->new($opt) if $opt->{skin};
 	$self->add_events([qw/pointer-motion-mask button-press-mask button-release-mask scroll-mask/]);
 	$self->signal_connect(button_press_event	=> \&button_press_cb);
 	$self->signal_connect(button_release_event	=> \&button_release_cb);
 	$self->signal_connect(scroll_event		=> \&scroll_cb);
+	$self->{left}=$self->{right}=0;
+	$self->{max}= $ref->{max} || 1;
 	$self->{scroll}=$ref->{scroll};
 	$self->{set}=$ref->{set};
 	$self->{set_preview}=$ref->{set_preview};
@@ -3123,7 +3123,7 @@ our @ISA=('Layout::Bar');
 use base 'Gtk2::EventBox';
 
 sub new
-{	my ($class,$opt,$orientation)=@_; #FIXME $orientation is ignored for now
+{	my ($class,$opt)=@_;
 	my $self=bless Gtk2::EventBox->new,$class;
 	my $hskin=$self->{handle_skin}=Skin->new($opt->{handle_skin},undef,$opt);
 	my $bskin=$self->{back_skin}=  Skin->new($opt->{skin},undef,$opt);
@@ -3149,12 +3149,21 @@ sub set_fraction
 sub expose_cb
 {	my ($self,$event)=@_;
 	Skin::draw($self,$event,$self->{back_skin});
-	my $minw=$self->{handle_skin}{minwidth};
 	my ($w,$h)=($self->allocation->values)[2,3];
-	$w-= $self->{right}+$self->{left};
-	my $x= $self->{left} + $w *$self->{fraction};
-	$x-= $minw/2;
-	Skin::draw($self,$event,$self->{handle_skin},int($x),$self->{top},$minw,$h-$self->{top}-$self->{bottom});
+	if ($self->{vertical})
+	{	my $minh=$self->{handle_skin}{minheight};
+		$h-= $self->{top}+$self->{bottom};
+		my $y= $self->{top} + $h *(1-$self->{fraction});
+		$y-= $minh/2;
+		Skin::draw($self,$event,$self->{handle_skin},$self->{left},int($y),$w-$self->{left}-$self->{right},$minh);
+	}
+	else
+	{	my $minw=$self->{handle_skin}{minwidth};
+		$w-= $self->{right}+$self->{left};
+		my $x= $self->{left} + $w *$self->{fraction};
+		$x-= $minw/2;
+		Skin::draw($self,$event,$self->{handle_skin},int($x),$self->{top},$minw,$h-$self->{top}-$self->{bottom});
+	}
 	1;
 }
 
