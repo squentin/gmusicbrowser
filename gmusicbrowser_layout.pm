@@ -2833,17 +2833,6 @@ sub new
 	if (my $color= $opt->{color} || $opt->{DefaultFontColor})
 	{	$label->modify_fg('normal', Gtk2::Gdk::Color->parse($color) );
 	}
-	if (exists $opt->{markup})
-	{	my $m=$opt->{markup};
-		if (my @fields=::UsedFields($m))
-		{	$self->{markup}=$m;
-			$self->{EndInit}=\&init;	# needs $self->{group} set before this can be done
-		}
-		else { $label->set_markup($m) }
-	}
-	elsif (exists $opt->{text})
-	{	$label->set_text($opt->{text});
-	}
 	$self->add($label);
 #$self->signal_connect(enter_notify_event => sub {$_[0]->set_markup('<u>'.$_[0]->child->get_label.'</u>')});
 #$self->signal_connect(leave_notify_event => sub {my $m=$_[0]->child->get_label; $m=~s#^<u>##;$m=~s#</u>$##; $_[0]->set_markup($m)});
@@ -2877,6 +2866,16 @@ sub new
 		$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 		$label->set_size_request($lay->get_pixel_size);
 		$self->{resize}=1;
+	}
+	if (exists $opt->{markup})
+	{	my $m=$opt->{markup};
+		if (my @fields=::UsedFields($m))
+		{	$self->{EndInit}=\&init;	# needs $self->{group} set before this can be done
+		}
+		else { $self->set_markup($m) }
+	}
+	elsif (exists $opt->{text})
+	{	$label->set_text($opt->{text});
 	}
 
 	return $self;
