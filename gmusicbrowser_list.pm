@@ -1538,6 +1538,7 @@ my @mpicsize_menu=
 	_("medium size")	=> 64,
 	_("big size")		=> 96,
 	_("huge size")		=> 128,
+	_("giant size")		=> 256,
 );
 my @cloudstats_menu=
 (	_("number of songs")	=> 'count',
