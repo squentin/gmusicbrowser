@@ -2015,6 +2015,7 @@ sub PrefFields	#preference dialog for fields
 
 	$store->set( $parent=$store->append(undef),	0,_"Custom fields", 1,'cst', 3,::TRUE);
 	$store->set( $store->append($parent),		0,$_,1,'_cst',2,::TRUE, 3, $sensitive{$_}, 4,$::Options{Fields_options}{$_}{remove} ) for @custom;
+	$treeview->expand_all;
 
 	$treeview->signal_connect(cursor_changed => sub
 		{	my $treeview=shift;
