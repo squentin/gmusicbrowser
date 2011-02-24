@@ -1082,6 +1082,10 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	UnsetSongLabel	=> [sub{ Songs::Set($SongID,'-label' => $_[1]); }, _"Remove a label from the current song", _"Label",qr/./],
 	ToggleSongLabel	=> [sub{ ToggleLabel($_[1],$::SongID); }, _"Toggle a label of the current song", _"Label",qr/./],
 	PlayListed	=> [sub{ my $songlist=GetSonglist($_[0]) or return; Select(song => 'first', play => 1, staticlist => $songlist->{array} ); }, _"Play listed songs"],
+	ClearPlayFilter	=> [sub {Select(filter => '') if defined $ListMode || !$SelectedFilter->is_empty;}, _"Clear playlist filter"],
+	MenuPlayFilter	=> [sub { Layout::FilterMenu(); }, _"Popup playlist filter menu"],
+	MenuPlayOrder	=> [sub { Layout::SortMenu(); },   _"Popup playlist order menu"],
+	MenuQueue	=> [sub { PopupContextMenu(\@Layout::MenuQueue,{ID=>$SongID, usemenupos=>1}); }, _"Popup queue menu"],
 );
 
 sub run_command
@@ -3528,7 +3532,8 @@ sub PopupContextMenu
 	$menu->show_all;
 	my $posfunction= $args && $args->{usemenupos} ? \&menupos : undef;
 	my $event=Gtk2->get_current_event;
-	$menu->popup(undef,undef,$posfunction,undef,$event->button,$event->time);
+	my ($button,$pos)= $event->isa('Gtk2::Gdk::Event::Button') ? ($event->button,$posfunction) : (0,undef);
+	$menu->popup(undef,undef,$pos,undef,$button,$event->time);
 }
 
 sub BuildChoiceMenu

@@ -20,7 +20,7 @@ use constant
  SIZE_FLAGS => 'menu',
 };
 
-my @MenuQueue=
+our @MenuQueue=
 (	{label => _"Queue album",	code => sub { ::EnqueueSame('album',$_[0]{ID}); } },
 	{label => _"Queue artist",	code => sub { ::EnqueueSame('artist',$_[0]{ID});} },  # or use field 'artists' or 'first_artist' ?
 	{label => _"Normal mode",	code => sub {&::EnqueueAction('')},		radio => sub {!$::QueueAction} },
@@ -34,7 +34,7 @@ my @MenuQueue=
 	{label => _"Edit...",		code => \&::EditQueue},
 );
 
-my @MainMenu=
+our @MainMenu=
 (	{label => _"Add files or folders",code => sub {::ChooseAddPath(0,1)},	stockicon => 'gtk-add' },
 	{label => _"Settings",		code => \&::PrefDialog,	stockicon => 'gtk-preferences' },
 	{label => _"Open Browser",	code => \&::OpenBrowser,stockicon => 'gmb-playlist' },
@@ -158,8 +158,8 @@ our %Widgets=
 		stock	=> { random => 'gmb-random', shuffle => 'gmb-shuffle', sorted => 'gtk-sort-ascending' },
 		tip	=> sub { _("Play order") ." :\n". ::ExplainSort($::Options{Sort}); },
 		text	=> sub { ::ExplainSort($::Options{Sort},1); },
-		click1	=> \&::ToggleSort,
-		click3	=> sub { SortMenu() },
+		click1	=> 'ToggleRandom',
+		click3	=> 'MenuPlayOrder',
 		event	=> 'Sort SavedWRandoms SavedSorts',
 	},
 	Filter =>
@@ -174,8 +174,8 @@ our %Widgets=
 						: _("Playlist filter :\n").$::SelectedFilter->explain;
 			},
 		text	=> sub { $::ListMode ? _"static list" : $::SelectedFilter->name; },
-		click1	=> \&RemoveFilter,
-		click3	=> sub { FilterMenu() },
+		click1	=> 'ClearPlayFilter',
+		click3	=> 'MenuPlayFilter',
 		event	=> 'Filter SavedFilters',
 	},
 	Queue =>
@@ -194,8 +194,8 @@ our %Widgets=
 				.($::QueueAction? "\n". ::__x( _"then {action}", action => $::QActions{$::QueueAction}[2] ) : '');
 				},
 		text	=> _"Queue",
-		click1	=> \&::ClearQueue,
-		click3	=> sub {::PopupContextMenu(\@MenuQueue,{ID=>$::SongID});},
+		click1	=> 'ClearQueue',
+		click3	=> 'MenuQueue',
 		event	=> 'Queue QueueAction',
 		dragdest=> [::DRAG_ID,sub {shift;shift;::Enqueue(@_);}],
 	},
@@ -1285,10 +1285,6 @@ sub TurnPagesToWidget #change the current page of all parent notebook so that wi
 
 #################################################################################
 
-sub RemoveFilter
-{	::Select(filter => '') if defined $::ListMode || !$::SelectedFilter->is_empty;
-}
-
 sub PlayOrderComboNew
 {	my $opt=$_[0];
 	my $store=Gtk2::ListStore->new(('Glib::String')x3);
@@ -1409,7 +1405,8 @@ sub SortMenu
 	$menu->show_all;
 	return $menu if $nopopup;
 	my $event=Gtk2->get_current_event;
-	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
+	my ($button,$pos)= $event->isa('Gtk2::Gdk::Event::Button') ? ($event->button,\&::menupos) : (0,undef);
+	$menu->popup(undef,undef,$pos,undef,$button,$event->time);
 }
 
 sub FilterMenu
@@ -1460,7 +1457,8 @@ sub FilterMenu
 	$menu->show_all;
 	return $menu if $nopopup;
 	my $event=Gtk2->get_current_event;
-	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
+	my ($button,$pos)= $event->isa('Gtk2::Gdk::Event::Button') ? ($event->button,\&::menupos) : (0,undef);
+	$menu->popup(undef,undef,$pos,undef,$button,$event->time);
 }
 
 sub VisualsMenu
