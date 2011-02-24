@@ -3,7 +3,7 @@
 
 [Quodlibet]
 Type=G+
-Category = "Make it look like:"
+Category = "Make it look like"
 Default		= Window(size=700x600,sticky=1) HPbrowser(size=160-600) FilterPane0(artistinfo=1,albumpsize=32,albuminfo=1)
 MBmenu		= MainMenuItem LayoutItem PSortItem PFilterItem QueueItem
 HBButtons1	= Prev Play Next
@@ -27,7 +27,7 @@ VolumeScroll	= HBupper
 [Exaile]
 Author = shimmerproject.org
 Type = G+
-Category = "Make it look like:"
+Category = "Make it look like"
 Title = %t by %a
 Default = Window(size=80%x80%)
 
@@ -212,7 +212,7 @@ VBMain = HBMenubar _HPSidebarCenter HBStatusbar
 [Rhythmbox]
 Author = shimmerproject.org
 Type = G+
-Category = "Make it look like:"
+Category = "Make it look like"
 Title = %a - %t
 Default = Window(size=80%x80%) HPSidebarAndCenter(size=200)
 DefaultFocus =
@@ -326,7 +326,7 @@ VBMain = HBMenubar HBToolbar VBSliderbar _HPSidebarCenterContext HBStatusbar
 
 [Rhythmbox Compact] based on Rhythmbox
 Default = Window(size=600x126)
-
+Category = "Make it look like"
 VBMain = HBMenubar HBToolbar VBSliderbar
 
     HBMenubar = _MBEdit
