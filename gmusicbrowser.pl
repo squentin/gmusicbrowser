@@ -863,7 +863,7 @@ our %Options=
 	},
 );
 
-our $GlobalKeyBindings='Insert OpenSearch c-q EnqueueSelected p PlayPause c OpenContext q OpenQueue ca-f ToggleFullscreenLayout';
+our $GlobalKeyBindings='Insert OpenSearch c-q Quit a-q EnqueueSelected p PlayPause c OpenContext q OpenQueue ca-f ToggleFullscreenLayout F11 ToggleFullscreen';
 %GlobalBoundKeys=%{ make_keybindingshash($GlobalKeyBindings) };
 
 
