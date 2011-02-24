@@ -21,7 +21,7 @@ use constant
  SIZE_FLAGS => 'menu',
 };
 
-my @MenuQueue=
+our @MenuQueue=
 (	{label => _"Queue album",	code => sub { ::EnqueueSame('album',$_[0]{ID}); } },
 	{label => _"Queue artist",	code => sub { ::EnqueueSame('artist',$_[0]{ID});} },  # or use field 'artists' or 'first_artist' ?
 	{label => _"Normal mode",	code => sub {&::EnqueueAction('')},		radio => sub {!$::QueueAction} },
@@ -35,7 +35,7 @@ my @MenuQueue=
 	{label => _"Edit...",		code => \&::EditQueue},
 );
 
-my @MainMenu=
+our @MainMenu=
 (	{label => _"Add files or folders",code => sub {::ChooseAddPath(0,1)},	stockicon => 'gtk-add' },
 	{label => _"Settings",		code => \&::PrefDialog,	stockicon => 'gtk-preferences' },
 	{label => _"Open Browser",	code => \&::OpenBrowser,stockicon => 'gmb-playlist' },
@@ -159,8 +159,8 @@ our %Widgets=
 		stock	=> { random => 'gmb-random', shuffle => 'gmb-shuffle', sorted => 'gtk-sort-ascending' },
 		tip	=> sub { _("Play order") ." :\n". ::ExplainSort($::Options{Sort}); },
 		text	=> sub { ::ExplainSort($::Options{Sort},1); },
-		click1	=> \&::ToggleSort,
-		click3	=> sub { SortMenu() },
+		click1	=> 'MenuPlayOrder',
+		click3	=> 'ToggleRandom',
 		event	=> 'Sort SavedWRandoms SavedSorts',
 	},
 	SortIndicator =>
@@ -180,8 +180,8 @@ our %Widgets=
 						: _("Playlist filter :\n").$::SelectedFilter->explain;
 			},
 		text	=> sub { $::ListMode ? _"static list" : $::SelectedFilter->name; },
-		click1	=> \&RemoveFilter,
-		click3	=> sub { FilterMenu() },
+		click1	=> 'MenuPlayFilter',
+		click3	=> 'ClearPlayFilter',
 		event	=> 'Filter SavedFilters',
 	},
 	FilterIndicator =>
@@ -205,8 +205,8 @@ our %Widgets=
 				.($::QueueAction? "\n". ::__x( _"then {action}", action => $::QActions{$::QueueAction}[2] ) : '');
 				},
 		text	=> _"Queue",
-		click1	=> \&::ClearQueue,
-		click3	=> sub {::PopupContextMenu(\@MenuQueue,{ID=>$::SongID});},
+		click1	=> 'MenuQueue',
+		click3	=> 'ClearQueue',
 		event	=> 'Queue QueueAction',
 		dragdest=> [::DRAG_ID,sub {shift;shift;::Enqueue(@_);}],
 	},
@@ -1308,10 +1308,6 @@ sub TurnPagesToWidget #change the current page of all parent notebook so that wi
 
 #################################################################################
 
-sub RemoveFilter
-{	::Select(filter => '') if defined $::ListMode || !$::SelectedFilter->is_empty;
-}
-
 sub PlayOrderComboNew
 {	my $opt=$_[0];
 	my $store=Gtk2::ListStore->new(('Glib::String')x3);
@@ -1432,7 +1428,8 @@ sub SortMenu
 	$menu->show_all;
 	return $menu if $nopopup;
 	my $event=Gtk2->get_current_event;
-	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
+	my ($button,$pos)= $event->isa('Gtk2::Gdk::Event::Button') ? ($event->button,\&::menupos) : (0,undef);
+	$menu->popup(undef,undef,$pos,undef,$button,$event->time);
 }
 
 sub FilterMenu
@@ -1483,7 +1480,8 @@ sub FilterMenu
 	$menu->show_all;
 	return $menu if $nopopup;
 	my $event=Gtk2->get_current_event;
-	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
+	my ($button,$pos)= $event->isa('Gtk2::Gdk::Event::Button') ? ($event->button,\&::menupos) : (0,undef);
+	$menu->popup(undef,undef,$pos,undef,$button,$event->time);
 }
 
 sub VisualsMenu
@@ -3715,8 +3713,9 @@ use Gtk2;
 use base 'Gtk2::EventBox';
 
 sub new_layout_widget
-{	my $field= $_[0]{field}; # FIXME check valid rating field
-	return Stars->new($field,0, \&set_rating_now_cb);
+{	my $opt=shift;
+	my $field= $opt->{field}; # FIXME check valid rating field
+	return Stars->new($field,0, \&set_rating_now_cb, %$opt);
 }
 sub update_layout_widget
 {	my ($self,$ID)=@_;
@@ -3731,11 +3730,13 @@ sub set_rating_now_cb
 
 
 sub new
-{	my ($class,$field,$nb,$sub) = @_;
+{	my ($class,$field,$nb,$sub, %opt) = @_;
 	my $self = bless Gtk2::EventBox->new, $class;
 	$self->{field}=$field;
 	$self->{callback}=$sub;
+	%opt=(xalign=>.5, yalign=>.5,%opt);
 	my $image=$self->{image}=Gtk2::Image->new;
+	$image->set_alignment($opt{xalign},$opt{yalign});
 	$self->add($image);
 	$self->set($nb);
 	$self->signal_connect(button_press_event => \&click);
@@ -3761,10 +3762,17 @@ sub get { shift->{nb}; }
 sub click
 {	my ($self,$event)=@_;
 	if ($event->button == 3) { $self->popup($event); return 1 }
+	my ($xalign)=$self->child->get_alignment;
+	my $walloc= $self->allocation->width;
+	my $width= $self->{width};
 	my ($x)=$event->coords;
+	$x-= $xalign*($walloc-$width);
+	$x/=$width;
+	$x=0 if $x<0;
+	$x=1 if $x>1;
 	my $pb= $Songs::Def{$self->{field}}{pixbuf} || $Songs::Def{'rating'}{pixbuf};
 	my $nbstars=$#$pb;
-	my $nb=1+int($x*$nbstars/$self->{width});
+	my $nb=1+int($x*$nbstars);
 	$nb*=100/$nbstars;
 	$self->callback($nb);
 	return 1;
