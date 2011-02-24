@@ -3690,8 +3690,9 @@ use Gtk2;
 use base 'Gtk2::EventBox';
 
 sub new_layout_widget
-{	my $field= $_[0]{field}; # FIXME check valid rating field
-	return Stars->new($field,0, \&set_rating_now_cb);
+{	my $opt=shift;
+	my $field= $opt->{field}; # FIXME check valid rating field
+	return Stars->new($field,0, \&set_rating_now_cb, %$opt);
 }
 sub update_layout_widget
 {	my ($self,$ID)=@_;
@@ -3706,11 +3707,13 @@ sub set_rating_now_cb
 
 
 sub new
-{	my ($class,$field,$nb,$sub) = @_;
+{	my ($class,$field,$nb,$sub, %opt) = @_;
 	my $self = bless Gtk2::EventBox->new, $class;
 	$self->{field}=$field;
 	$self->{callback}=$sub;
+	%opt=(xalign=>.5, yalign=>.5,%opt);
 	my $image=$self->{image}=Gtk2::Image->new;
+	$image->set_alignment($opt{xalign},$opt{yalign});
 	$self->add($image);
 	$self->set($nb);
 	$self->signal_connect(button_press_event => \&click);
@@ -3736,10 +3739,17 @@ sub get { shift->{nb}; }
 sub click
 {	my ($self,$event)=@_;
 	if ($event->button == 3) { $self->popup($event); return 1 }
+	my ($xalign)=$self->child->get_alignment;
+	my $walloc= $self->allocation->width;
+	my $width= $self->{width};
 	my ($x)=$event->coords;
+	$x-= $xalign*($walloc-$width);
+	$x/=$width;
+	$x=0 if $x<0;
+	$x=1 if $x>1;
 	my $pb= $Songs::Def{$self->{field}}{pixbuf} || $Songs::Def{'rating'}{pixbuf};
 	my $nbstars=$#$pb;
-	my $nb=1+int($x*$nbstars/$self->{width});
+	my $nb=1+int($x*$nbstars);
 	$nb*=100/$nbstars;
 	$self->callback($nb);
 	return 1;
