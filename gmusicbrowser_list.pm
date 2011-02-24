@@ -860,8 +860,7 @@ sub new
 	MultiTreeView::init($tv,__PACKAGE__);
 	$tv->signal_connect(cursor_changed	=> \&cursor_changed_cb);
 	$tv->signal_connect(row_activated	=> \&row_activated_cb);
-	#$tv->get_selection->signal_connect(changed => \&sel_changed_cb);
-	$tv->get_selection->signal_connect(changed => sub { ::IdleDo('1_Changed'.$_[0],10,\&sel_changed_cb,$_[0]); }); #delay it, because it can be called A LOT when, for example, removing 10000 selected rows
+	$tv->get_selection->signal_connect(changed => \&sel_changed_cb);
 	$tv->get_selection->set_mode('multiple');
 
 	if (my $tip=$opt->{rowtip} and *Gtk2::Widget::set_has_tooltip{CODE})  # since gtk+ 2.12, Gtk2 1.160
@@ -1087,8 +1086,8 @@ sub drag_motion_cb
 
 sub sel_changed_cb
 {	my $treesel=$_[0];
-	my $tv=$treesel->get_tree_view;
-	::HasChanged('Selection_'.$tv->parent->{group});
+	my $group=$treesel->get_tree_view->parent->{group};
+	::IdleDo('1_Changed'.$group,10, \&::HasChanged, 'Selection_'.$group);	#delay it, because it can be called A LOT when, for example, removing 10000 selected rows
 }
 sub cursor_changed_cb
 {	my $tv=$_[0];
