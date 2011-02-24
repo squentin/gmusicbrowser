@@ -3736,10 +3736,17 @@ sub get { shift->{nb}; }
 sub click
 {	my ($self,$event)=@_;
 	if ($event->button == 3) { $self->popup($event); return 1 }
+	my ($xalign)=$self->child->get_alignment;
+	my $walloc= $self->allocation->width;
+	my $width= $self->{width};
 	my ($x)=$event->coords;
+	$x-= $xalign*($walloc-$width);
+	$x/=$width;
+	$x=0 if $x<0;
+	$x=1 if $x>1;
 	my $pb= $Songs::Def{$self->{field}}{pixbuf} || $Songs::Def{'rating'}{pixbuf};
 	my $nbstars=$#$pb;
-	my $nb=1+int($x*$nbstars/$self->{width});
+	my $nb=1+int($x*$nbstars);
 	$nb*=100/$nbstars;
 	$self->callback($nb);
 	return 1;
