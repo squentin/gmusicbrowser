@@ -19,8 +19,7 @@ HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(di
 VBToggle	= HBToggle 5Filler1
 HBToggle	= ToggleButton0(relief=none,size=button,icon=view-list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=button,icon=view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=button,icon=view-mosaic,widget=VPMosaic,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=view-fullscreen,size=button,tip="Fullscreen View")
 VBSearchBox	= 2SimpleSearch(suggest=1) 5Filler2
-VBSettings	= HBSettings 5Filler5
-HBSettings	= ExtraButtons(size=button) 5Pref(stock=gtk-preferences_20,size=button)
+VBSettings	= ExtraButtons(size=large-toolbar) Pref(stock=gtk-preferences,size=large-toolbar)
 ### main left: artist pane and album-cover ###
 VBLeft		= _NBList HBCover HBStatus
 NBList		= (tabpos="bottom") VBArtist QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
@@ -38,7 +37,9 @@ VPMosaic	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_al
 ### positioning and sizing ###
 HSize0		= 350 NBList
 VSize0		= 350 HBCover
-KeyBindings	= F11 ToggleFullscreenLayout
+
+[shimmer] based on [Shimmer Desktop]
+Type=
 
 [Shimmer Netbook]
 Type=G
@@ -50,7 +51,7 @@ Window		= hidden=VBSearchBox
 ### main window containers: top bar, main and statusbar ###
 VBMain		= VBTop _NBList
 VBTop		= 3Filler8 HBTop
-HBTop		= VBButtons _VBPlayer -5VBSettings
+HBTop		= VBButtons _15VBPlayer -5VBSettings
 VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle VBTime
@@ -59,12 +60,11 @@ VBTime		= _HBTimeSlider _VBSearchBox
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 VBSearchBox	= SimpleSearch(suggest=1) 5Filler2
 VBSettings	= HBPrefSearch 5Filler5
-HBPrefSearch	= ToggleButton0(size=button,relief=none,icon=gmb-search,widget=VBSearchBox) ExtraButtons  Pref(stock=gtk-preferences_20,size=button)
+HBPrefSearch	= ToggleButton0(size=large-toolbar,relief=none,icon=gmb-search,widget=VBSearchBox) ExtraButtons  Pref(stock=gtk-preferences,size=large-toolbar)
 NBList		= (tabpos="bottom") HBSongListtree QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
 HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
 VBAbout		= (tabtitle=_"Info") _PluginArtistinfo
 HBSongListtree	= (tabtitle=_"Playlist") _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|Compact(picsize=50)|disc|discleft(width=15)",follow=1,sort="year album disc track")
-KeyBindings	= F11 ToggleFullscreenLayout
 
 # Trayicon-Layouts
 #####################################
@@ -100,4 +100,4 @@ HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1=
 VBSidebar	= 4Filler1 7HBSearch _7HBQueue 4Filler2
 HBQueue		= 14_QueueList(group=1,songtree=1,cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248")
 HBSearch	= 4Filler3 6Label0(markup='<span size="xx-large" weight="ultrabold">«</span>') _SimpleSearch(suggest=1) 7Filler4
-KeyBindings	= Escape CloseWindow F11 ToggleFullscreenLayout
+KeyBindings	= Escape CloseWindow
