@@ -158,8 +158,8 @@ our %Widgets=
 		stock	=> { random => 'gmb-random', shuffle => 'gmb-shuffle', sorted => 'gtk-sort-ascending' },
 		tip	=> sub { _("Play order") ." :\n". ::ExplainSort($::Options{Sort}); },
 		text	=> sub { ::ExplainSort($::Options{Sort},1); },
-		click1	=> 'ToggleRandom',
-		click3	=> 'MenuPlayOrder',
+		click1	=> 'MenuPlayOrder',
+		click3	=> 'ToggleRandom',
 		event	=> 'Sort SavedWRandoms SavedSorts',
 	},
 	Filter =>
@@ -174,8 +174,8 @@ our %Widgets=
 						: _("Playlist filter :\n").$::SelectedFilter->explain;
 			},
 		text	=> sub { $::ListMode ? _"static list" : $::SelectedFilter->name; },
-		click1	=> 'ClearPlayFilter',
-		click3	=> 'MenuPlayFilter',
+		click1	=> 'MenuPlayFilter',
+		click3	=> 'ClearPlayFilter',
 		event	=> 'Filter SavedFilters',
 	},
 	Queue =>
@@ -194,8 +194,8 @@ our %Widgets=
 				.($::QueueAction? "\n". ::__x( _"then {action}", action => $::QActions{$::QueueAction}[2] ) : '');
 				},
 		text	=> _"Queue",
-		click1	=> 'ClearQueue',
-		click3	=> 'MenuQueue',
+		click1	=> 'MenuQueue',
+		click3	=> 'ClearQueue',
 		event	=> 'Queue QueueAction',
 		dragdest=> [::DRAG_ID,sub {shift;shift;::Enqueue(@_);}],
 	},
