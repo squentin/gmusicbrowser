@@ -203,7 +203,7 @@ sub SetToolbarHide
 {	my ($self,$hide)=@_;
 	$self->{HideToolbar}=$hide;
 	my $toolbar=$self->{toolbar};
-	if ($self->{HideToolbar})	{$toolbar->hide}
+	if ($self->{HideToolbar})	{$toolbar->set_no_show_all(1); $toolbar->hide}
 	else				{$toolbar->set_no_show_all(0); $toolbar->show_all}
 }
 
