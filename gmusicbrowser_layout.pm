@@ -163,11 +163,6 @@ our %Widgets=
 		click3	=> 'ToggleRandom',
 		event	=> 'Sort SavedWRandoms SavedSorts',
 	},
-	SortIndicator =>
-	{	parent  => 'Sort',
-		click1  => sub { SortMenu() },
-		click3	=> \&::ToggleSort,
-	},
 	Filter =>
 	{	class	=> 'Layout::Button',
 		button	=> 0,
@@ -183,11 +178,6 @@ our %Widgets=
 		click1	=> 'MenuPlayFilter',
 		click3	=> 'ClearPlayFilter',
 		event	=> 'Filter SavedFilters',
-	},
-	FilterIndicator =>
-	{	parent  => 'Filter',
-		click1  => sub { FilterMenu() },
-		click3	=> \&RemoveFilter,
 	},
 	Queue =>
 	{	class	=> 'Layout::Button',

@@ -28,7 +28,7 @@ HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
 VBAbout		= (tabtitle=_"Info") _PluginArtistinfo
 VBArtist	= (tabtitle=_"Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1,lmarkup="<b>%a</b>%Y\x0a<small>%x / %s / <small>%l</small></small>")
 HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
-HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2SortIndicator(button=1,tip=_"Right-click to toggle Shuffle") -2FilterIndicator(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=HBCover,tip=_"Show/Hide Cover")
+HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle Shuffle") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=HBCover,tip=_"Show/Hide Cover")
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
 HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
