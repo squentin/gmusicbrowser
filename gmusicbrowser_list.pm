@@ -3360,7 +3360,7 @@ sub AlbumListButton_press_cb
 }
 
 package SimpleSearch;
-use base 'Gtk2::HBox';
+use base 'Gtk2::Entry';
 
 our @SelectorMenu= #the first one is the default
 (	[_"Search Title, Artist and Album", 'title|artist|album' ],
@@ -3391,65 +3391,35 @@ our @DefaultOptions=
 
 sub new
 {	my ($class,$opt)=@_;
-	my $self= bless Gtk2::HBox->new(0,0), $class;
+	my $self= bless Gtk2::Entry->new, $class;
 	%$opt=( @DefaultOptions, %$opt );
-	$self->{$_}=$opt->{$_} for qw/nb fields group searchfb/,keys %Options,keys %Options2;
-	my $entry=$self->{entry}=Gtk2::Entry->new;
-	$self->{SaveOptions}=\&SaveOptions;
-	$self->{DefaultFocus}=$entry;
-	#$entry->set_width_chars($opt->{width_chars}) if $opt->{width_chars};
-	$entry->signal_connect(changed => \&EntryChanged_cb);
-	$entry->signal_connect(activate => \&DoFilter);
-	$entry->signal_connect(activate => \&CloseSuggestionMenu);
-	$entry->signal_connect(key_press_event	=> sub { my ($entry,$event)=@_; return 0 unless Gtk2::Gdk->keyval_name($event->keyval) eq 'Escape'; $entry->set_text(''); return 1; });
-	$entry->signal_connect_after(activate => sub {::run_command($_[0],$opt->{activate});}) if $opt->{activate};
+	$self->signal_connect(changed => \&EntryChanged_cb);
+	$self->signal_connect(activate => \&DoFilter);
+	$self->signal_connect(activate => \&CloseSuggestionMenu);
+	$self->signal_connect(key_press_event	=> sub { my ($self,$event)=@_; return 0 unless Gtk2::Gdk->keyval_name($event->keyval) eq 'Escape'; $self->set_text(''); return 1; });
+	$self->signal_connect_after(activate => sub {::run_command($_[0],$opt->{activate});}) if $opt->{activate};
+	#$self->set_width_chars($opt->{width_chars}) if $opt->{width_chars};
 	unless ($opt->{noselector})
-	{	for my $aref (	['gtk-find'	=> \&PopupSelectorMenu,	0, _"Search options"],
-				['gtk-clear'	=> \&ClearFilter,	1, _"Reset filter"]
-			     )
-		{	my ($stock,$cb,$end,$tip)=@$aref;
-			my $img=Gtk2::Image->new_from_stock($stock,'menu');
-			my $but=Gtk2::Button->new;
-			$but->add($img);
-			$but->can_focus(0);
-			$but->set_relief('none');
-			$but->set_tooltip_text($tip);
-			$but->signal_connect(expose_event => sub #prevent the button from beign drawn, but draw its child
-			{	my ($but,$event)=@_;
-				$but->propagate_expose($but->child,$event);
-				1;
-			});
-			#$but->signal_connect(realize => sub { $_[0]->window->set_cursor(Gtk2::Gdk::Cursor->new('hand2')); });
-			$but->signal_connect(button_press_event=> $cb);
-			if ($end) { $self->pack_end($but,0,0,0); }
-			else { $self->pack_start($but,0,0,0); }
-			if ($stock eq 'gtk-clear')
-			{	$self->{clear_button}=$but;
-				$entry->signal_connect(changed => \&UpdateClearButton);
-				$but->set_sensitive(0);
-			}
+	{	if (*Gtk2::Entry::set_icon_from_stock{CODE})	# requires gtk>=2.16 && perl-Gtk2 version >=1.211
+		{	$self->set_icon_from_stock('primary','gtk-find');
+			$self->set_icon_from_stock('secondary','gtk-clear');
+			$self->set_icon_activatable($_,1) for qw/primary secondary/;
+			$self->set_icon_tooltip_text('primary',_"Search options");
+			$self->set_icon_tooltip_text('secondary',_"Reset filter");
+			$self->set_icon_sensitive('secondary',0);
+			$self->signal_connect(changed => \&UpdateClearButton);
+			$self->signal_connect(icon_press => sub { my ($self,$iconpos)=@_; if ($iconpos eq 'primary') {$self->PopupSelectorMenu} else {$self->ClearFilter} });
 		}
-		$self->pack_start($entry,1,1,0);
-		$entry->set('has-frame',0);
-		$entry->signal_connect($_ => sub {$_[0]->parent->queue_draw}) for qw/focus_in_event focus_out_event/;
-		$self->signal_connect(expose_event => sub #draw an entry frame inside $self
-			{	my ($self,$event)=@_;
-				my $entry=$self->{entry};
-				if ($entry->state eq 'normal')
-				{	my $s= $self->{filtered} && !$entry->is_focus;
-					$entry->modify_base('normal', ($s? $entry->style->bg('selected') : undef) );
-					$entry->modify_text('normal', ($s? $entry->style->text('selected') : undef) );
-				}
-				$entry->style->paint_flat_box( $self->window, $entry->state, 'none', $event->area, $entry, 'entry_bg', $self->allocation->values );
-				$entry->style->paint_shadow( $self->window, 'normal', $entry->get('shadow-type'), $event->area, $entry, 'entry', $self->allocation->values);
-				#$self->propagate_expose($_,$event) for $self->get_children;
-				0;
-			});
-		::WatchFilter($self, $self->{group},sub {$_[0]->{filtered}=0; $_[0]->UpdateClearButton; $_[0]->queue_draw}); #to update background color and clear button
+		else	# old version => use old hackish entry with icons
+		{	$self= SimpleSearch::old->new($opt);
+		}
 	}
-	else {$self->add($entry);}
+	$self->{$_}=$opt->{$_} for qw/nb fields group searchfb/,keys %Options,keys %Options2;
+	$self->{SaveOptions}=\&SaveOptions;
+	::WatchFilter($self, $self->{group},sub { $_[0]->set_progress_fraction(0); $_[0]->UpdateClearButton;}) unless $opt->{noselector}; #to update background color and clear button
 	return $self;
 }
+
 sub SaveOptions
 {	my $self=$_[0];
 	my %opt=(fields => $self->{fields});
@@ -3458,14 +3428,14 @@ sub SaveOptions
 }
 
 sub ClearFilter
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
-	$self->{entry}->set_text('');
+{	my $self=shift;
+	$self->set_text('');
 	$self->DoFilter;
 }
 sub UpdateClearButton
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
-	my $on= $self->{entry}->get_text ne '' || !::GetFilter($self)->is_empty;
-	$self->{clear_button}->set_sensitive($on);
+{	my $self=shift;
+	my $on= $self->get_text ne '' || !::GetFilter($self)->is_empty;
+	$self->set_icon_sensitive('secondary',$on);
 }
 
 sub ChangeOption
@@ -3484,7 +3454,7 @@ sub ToggleField
 }
 
 sub PopupSelectorMenu
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
+{	my $self=shift;
 	my $menu=Gtk2::Menu->new;
 	my $cb=sub { $self->ChangeOption( fields => $_[1]); };
 	for my $ref (@SelectorMenu)
@@ -3532,11 +3502,10 @@ sub PopupSelectorMenu
 }
 
 sub DoFilter
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
-	my $entry=$self->{entry};
-	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
+{	my $self=shift;
+	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
 	my ($last_filter,$last_eq,@last_substr)= @{ delete $self->{last_filter} || [] };
-	my $search0=my $search= $entry->get_text;
+	my $search0=my $search= $self->get_text;
 	my $filter;
 
 	my (@filters,@or);
@@ -3628,17 +3597,17 @@ sub DoFilter
 	if ($self->{searchfb})
 	{	::HasChanged('SearchText_'.$self->{group},$search0); #FIXME
 	}
-	$self->{filtered}= 1 && !$filter->is_empty; #used to set the background color
+	$self->set_progress_fraction( !$filter->is_empty );  #used to set the background color
 }
 
 sub EntryChanged_cb
-{	my $entry=$_[0];
-	my $l= length($entry->get_text);
-	my $self= ::find_ancestor($entry,__PACKAGE__);
+{	my $self=shift;
+	$self->set_progress_fraction(0);
+	my $l= length($self->get_text);
 	if ($self->{autofilter})
-	{	Glib::Source->remove(delete $entry->{changed_timeout}) if $entry->{changed_timeout};
+	{	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
 		my $timeout= $l<2 ? 1000 : $l==2 ? 200 : 100;
-		$entry->{changed_timeout}= Glib::Timeout->add($timeout,\&DoFilter,$entry);
+		$self->{changed_timeout}= Glib::Timeout->add($timeout,\&DoFilter,$self);
 	}
 	if ($self->{suggest})
 	{	Glib::Source->remove(delete $self->{suggest_timeout}) if $self->{suggest_timeout};
@@ -3649,7 +3618,7 @@ sub EntryChanged_cb
 }
 
 sub CloseSuggestionMenu
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
+{	my $self=shift;
 	Glib::Source->remove(delete $self->{suggest_timeout}) if $self->{suggest_timeout};
 	my $menu= delete $self->{matchmenu};
 	return unless $menu;
@@ -3681,7 +3650,7 @@ sub UpdateSuggestionMenu
 	$height*=.9;
 
 	my $found;
-	my $text= $self->{entry}->get_text;
+	my $text= $self->get_text;
 	for my $field (qw/artists album genre label title/)
 	{	my $list;
 		if ($field eq 'title')
@@ -3758,7 +3727,7 @@ sub UpdateSuggestionMenu
 	}
 	return unless $found;
 	$menu->set_size_request($w*2,-1);
-	$menu->attach_to_widget($self->{entry}, sub {'empty detaching callback'});
+	$menu->attach_to_widget($self, sub {'empty detaching callback'});
 	$menu->show_all;
 	$menu->set_take_focus(0);
 	$menu->signal_connect(key_press_event => \&SuggestionMenu_key_press_cb);
@@ -3798,7 +3767,7 @@ sub SuggestionMenu_item_activated_cb
 	else
 	{	$filter= Songs::MakeFilterFromGID($field,$val);
 	}
-	if (my $watch=delete $self->{entry}{changed_timeout}) {	Glib::Source->remove($watch); }
+	if (my $watch=delete $self->{changed_timeout}) { Glib::Source->remove($watch); }
 	$self->CloseSuggestionMenu;
 	if ($item->{middle})
 	{	my $IDs= $field eq 'title' ? [$val] : $filter->filter;
@@ -3815,6 +3784,83 @@ sub SuggestionMenu_field_expand
 	$item->set_submenu($submenu);
 	return 0;
 }
+
+package SimpleSearch::old;
+use base 'Gtk2::HBox';
+our @ISA;
+BEGIN {unshift @ISA,'SimpleSearch';}
+
+sub new
+{	my ($class,$opt)=@_;
+	my $self= bless Gtk2::HBox->new(0,0), $class;
+	my $entry=$self->{entry}=Gtk2::Entry->new;
+	$self->{DefaultFocus}=$entry;
+	$entry->signal_connect(changed => sub { $_[0]->parent->EntryChanged_cb });
+	$entry->signal_connect(activate => sub { $_[0]->parent->DoFilter; });
+	$entry->signal_connect(activate => sub { $_[0]->parent->CloseSuggestionMenu; });
+	$entry->signal_connect(key_press_event	=> sub { my ($entry,$event)=@_; return 0 unless Gtk2::Gdk->keyval_name($event->keyval) eq 'Escape'; $entry->set_text(''); return 1; });
+	$entry->signal_connect_after(activate => sub {::run_command($_[0]->parent,$opt->{activate});}) if $opt->{activate};
+
+	for my $aref (	['gtk-find'	=> sub {$_[0]->parent->PopupSelectorMenu},	0, _"Search options"],
+			['gtk-clear'	=> sub {$_[0]->parent->ClearFilter},	1, _"Reset filter"]
+		     )
+	{	my ($stock,$cb,$end,$tip)=@$aref;
+		my $img=Gtk2::Image->new_from_stock($stock,'menu');
+		my $but=Gtk2::Button->new;
+		$but->add($img);
+		$but->can_focus(0);
+		$but->set_relief('none');
+		$but->set_tooltip_text($tip);
+		$but->signal_connect(expose_event => sub #prevent the button from beign drawn, but draw its child
+		{	my ($but,$event)=@_;
+			$but->propagate_expose($but->child,$event);
+			1;
+		});
+		#$but->signal_connect(realize => sub { $_[0]->window->set_cursor(Gtk2::Gdk::Cursor->new('hand2')); });
+		$but->signal_connect(button_press_event=> $cb);
+		if ($end) { $self->pack_end($but,0,0,0); }
+		else { $self->pack_start($but,0,0,0); }
+		if ($stock eq 'gtk-clear')
+		{	$self->{clear_button}=$but;
+			$entry->signal_connect(changed => sub { $_[0]->parent->UpdateClearButton });
+			$but->set_sensitive(0);
+		}
+	}
+	$self->pack_start($entry,1,1,0);
+	$entry->set('has-frame',0);
+	$entry->signal_connect($_ => sub {$_[0]->parent->queue_draw}) for qw/focus_in_event focus_out_event/;
+	$self->signal_connect(expose_event => sub #draw an entry frame inside $self
+		{	my ($self,$event)=@_;
+			my $entry=$self->{entry};
+			if ($entry->state eq 'normal')
+			{	my $s= $self->{filtered} && !$entry->is_focus;
+				$entry->modify_base('normal', ($s? $entry->style->bg('selected') : undef) );
+				$entry->modify_text('normal', ($s? $entry->style->text('selected') : undef) );
+			}
+			$entry->style->paint_flat_box( $self->window, $entry->state, 'none', $event->area, $entry, 'entry_bg', $self->allocation->values );
+			$entry->style->paint_shadow( $self->window, 'normal', $entry->get('shadow-type'), $event->area, $entry, 'entry', $self->allocation->values);
+			#$self->propagate_expose($_,$event) for $self->get_children;
+			0;
+		});
+	#$entry->set_width_chars($opt->{width_chars}) if $opt->{width_chars};
+	return $self;
+}
+
+sub set_progress_fraction
+{	$_[0]->{filtered}=$_[1];
+	$_[0]->queue_draw;
+}
+sub set_text
+{	$_[0]{entry}->set_text($_[1]);
+}
+sub get_text
+{	$_[0]{entry}->get_text;
+}
+sub set_icon_sensitive
+{	my ($self,$icon,$on)=@_;
+	$self->{clear_button}->set_sensitive($on) if $icon eq 'secondary';
+}
+
 
 package SongSearch;
 use base 'Gtk2::VBox';
