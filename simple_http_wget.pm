@@ -29,7 +29,7 @@ sub get_with_cb
 							: $orig_proxy;
 	$ENV{http_proxy}=$proxy;
 
-	my @cmd_and_args=qw/wget --timeout=10 --header=Accept: --user-agent= -S -O -/;
+	my @cmd_and_args=qw/wget --timeout=40 --header=Accept: --user-agent= -S -O -/;
 	push @cmd_and_args, '--post-data='.$post if $post;	#FIXME not sure if I should escape something
 	push @cmd_and_args, '--',$url;
 	pipe my($content_fh),my$wfh;

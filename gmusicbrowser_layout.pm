@@ -24,14 +24,18 @@ use constant
 our @MenuQueue=
 (	{label => _"Queue album",	code => sub { ::EnqueueSame('album',$_[0]{ID}); } },
 	{label => _"Queue artist",	code => sub { ::EnqueueSame('artist',$_[0]{ID});} },  # or use field 'artists' or 'first_artist' ?
-	{label => _"Normal mode",	code => sub {&::EnqueueAction('')},		radio => sub {!$::QueueAction} },
-	{label => _"Auto fill queue",	code => sub {&::EnqueueAction('autofill')},	radio => sub {$::QueueAction eq 'autofill'} },
-	{label => _"Wait when queue empty",	code => sub {&::EnqueueAction('wait')}, radio => sub {$::QueueAction eq 'wait'} },
-	{label => _"Stop when queue empty",	code => sub {&::EnqueueAction('stop')}, radio => sub {$::QueueAction eq 'stop'} },
-	{label => _"Quit when queue empty",	code => sub {&::EnqueueAction('quit')}, radio => sub {$::QueueAction eq 'quit'} },
-	{label => _"Turn off computer when queue empty",	code => sub {&::EnqueueAction('turnoff')}, radio => sub {$::QueueAction eq 'turnoff'}, test => sub { $::Options{Shutdown_cmd}; } },
+	{label => _"Normal mode",	code => sub { ::EnqueueAction('')},		radio => sub {!$::QueueAction} },
+	{label => _"Auto fill queue",	code => sub { ::EnqueueAction('autofill')},	radio => sub {$::QueueAction eq 'autofill'} },
+	{label => _"Wait when queue empty",	code => sub {::EnqueueAction('wait')}, radio => sub {$::QueueAction eq 'wait'} },
+	{label => _"Stop when queue empty",	code => sub {::EnqueueAction('stop')}, radio => sub {$::QueueAction eq 'stop'} },
+	{label => _"Quit when queue empty",	code => sub {::EnqueueAction('quit')}, radio => sub {$::QueueAction eq 'quit'} },
+	{label => _"Turn off computer when queue empty",	code => sub {::EnqueueAction('turnoff')}, radio => sub {$::QueueAction eq 'turnoff'}, test => sub { $::Options{Shutdown_cmd}; } },
 	{label => _"Clear queue",	code => \&::ClearQueue,		test => sub{@$::Queue}},
 	{label => _"Shuffle queue",	code => \&::ShuffleQueue,	test => sub{@$::Queue}},
+	{label => _"Auto fill up to",	code => sub { $::Options{MaxAutoFill}=$_[1]; ::HasChanged('QueueAction','maxautofill'); },
+	 				submenu => sub { my $m= ::max(1,$::Options{MaxAutoFill}-5); return [$m..$m+10]; },
+					check => sub {$::Options{MaxAutoFill};},
+	},
 	{label => _"Edit...",		code => \&::EditQueue},
 );
 
@@ -1069,7 +1073,19 @@ sub NewWidget
 	$widget->signal_connect(button_press_event => \&Button_press_cb) if $widget->{actions};
 
 	if (my $cursor=$options{cursor})
-	{	$widget->signal_connect(realize => sub { $_[0]->window->set_cursor(Gtk2::Gdk::Cursor->new($_[1])); },$cursor);
+	{	$widget->signal_connect(realize => sub {
+				my ($widget,$cursor)=@_;
+				my $gdkwin= $widget->window;
+				if ($widget->isa('Gtk2::EventBox') && !$widget->get_visible_window)
+				{	# for eventbox using an input-only gdkwindow, $widget->window is actually the parent's gdkwin,
+					# the only way to get to the input-only gdkwin is looking at all the children of its parent :(
+					for my $child ($gdkwin->get_children)
+					{	my $w= Glib::Object->new_from_pointer($child->get_user_data);
+						if ($w && $w==$widget) { $gdkwin=$child; last }
+					}
+				}
+				$gdkwin->set_cursor(Gtk2::Gdk::Cursor->new($cursor));
+			},$cursor);
 	}
 
 	my $tip= $options{tip};
@@ -2742,6 +2758,7 @@ sub new
 	}
 	else
 	{	$self=Gtk2::EventBox->new;
+		$self->set_visible_window(0);
 		$opt->{click} ||= $activate;
 	}
 	bless $self, $class;
@@ -2840,6 +2857,7 @@ sub new
 	my $self = bless Gtk2::EventBox->new, $class;
 	my $label=Gtk2::Label->new;
 	$label->set_alignment($opt->{xalign},$opt->{yalign});
+	$self->set_visible_window(0);
 
 	for (qw/markup markup_empty autoscroll interval/)
 	{	$self->{$_}=$opt->{$_} if exists $opt->{$_};
@@ -3728,6 +3746,7 @@ sub set_rating_now_cb
 sub new
 {	my ($class,$field,$nb,$sub, %opt) = @_;
 	my $self = bless Gtk2::EventBox->new, $class;
+	$self->set_visible_window(0);
 	$self->{field}=$field;
 	$self->{callback}=$sub;
 	%opt=(xalign=>.5, yalign=>.5,%opt);
