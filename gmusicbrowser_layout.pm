@@ -23,14 +23,18 @@ use constant
 our @MenuQueue=
 (	{label => _"Queue album",	code => sub { ::EnqueueSame('album',$_[0]{ID}); } },
 	{label => _"Queue artist",	code => sub { ::EnqueueSame('artist',$_[0]{ID});} },  # or use field 'artists' or 'first_artist' ?
-	{label => _"Normal mode",	code => sub {&::EnqueueAction('')},		radio => sub {!$::QueueAction} },
-	{label => _"Auto fill queue",	code => sub {&::EnqueueAction('autofill')},	radio => sub {$::QueueAction eq 'autofill'} },
-	{label => _"Wait when queue empty",	code => sub {&::EnqueueAction('wait')}, radio => sub {$::QueueAction eq 'wait'} },
-	{label => _"Stop when queue empty",	code => sub {&::EnqueueAction('stop')}, radio => sub {$::QueueAction eq 'stop'} },
-	{label => _"Quit when queue empty",	code => sub {&::EnqueueAction('quit')}, radio => sub {$::QueueAction eq 'quit'} },
-	{label => _"Turn off computer when queue empty",	code => sub {&::EnqueueAction('turnoff')}, radio => sub {$::QueueAction eq 'turnoff'}, test => sub { $::Options{Shutdown_cmd}; } },
+	{label => _"Normal mode",	code => sub { ::EnqueueAction('')},		radio => sub {!$::QueueAction} },
+	{label => _"Auto fill queue",	code => sub { ::EnqueueAction('autofill')},	radio => sub {$::QueueAction eq 'autofill'} },
+	{label => _"Wait when queue empty",	code => sub {::EnqueueAction('wait')}, radio => sub {$::QueueAction eq 'wait'} },
+	{label => _"Stop when queue empty",	code => sub {::EnqueueAction('stop')}, radio => sub {$::QueueAction eq 'stop'} },
+	{label => _"Quit when queue empty",	code => sub {::EnqueueAction('quit')}, radio => sub {$::QueueAction eq 'quit'} },
+	{label => _"Turn off computer when queue empty",	code => sub {::EnqueueAction('turnoff')}, radio => sub {$::QueueAction eq 'turnoff'}, test => sub { $::Options{Shutdown_cmd}; } },
 	{label => _"Clear queue",	code => \&::ClearQueue,		test => sub{@$::Queue}},
 	{label => _"Shuffle queue",	code => \&::ShuffleQueue,	test => sub{@$::Queue}},
+	{label => _"Auto fill up to",	code => sub { $::Options{MaxAutoFill}=$_[1]; ::HasChanged('QueueAction','maxautofill'); },
+	 				submenu => sub { my $m= ::max(1,$::Options{MaxAutoFill}-5); return [$m..$m+10]; },
+					check => sub {$::Options{MaxAutoFill};},
+	},
 	{label => _"Edit...",		code => \&::EditQueue},
 );
 

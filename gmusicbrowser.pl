@@ -1183,6 +1183,7 @@ if ($CmdLine{UseGnomeSession})
 #-------------INIT-------------
 
 {	Watch(undef, SongArray	=> \&SongArray_changed);
+	Watch(undef, QueueAction=> sub { if ($QueueAction eq 'autofill'){ IdleDo('1_QAuto',10,\&QAutoFill); } });
 	Watch(undef, $_	=> \&QueueUpdateNextSongs) for qw/Playlist Queue Sort Pos QueueAction/;
 	Watch(undef, $_ => sub { return unless defined $SongID && $TogPlay; HasChanged('PlayingSong'); }) for qw/CurSongID Playing/;
 	Watch(undef,RecentSongs	=> sub { UpdateRelatedFilter('Recent'); });
@@ -2361,7 +2362,6 @@ sub ReplaceQueue
 }
 sub EnqueueAction
 {	$QueueAction=shift;
-	if ($QueueAction eq 'autofill')	{ IdleDo('1_QAuto',10,\&QAutoFill); }
 	HasChanged('QueueAction');
 }
 sub QAutoFill
