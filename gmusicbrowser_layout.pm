@@ -1847,6 +1847,7 @@ sub transparent_expose_cb #use Cairo
 	$cr->set_source_rgba(0, 0, 0, 0);
 	$cr->rectangle($event->area);
 	$cr->fill;
+	if (my $pixbuf=$w->{skinpb}) { $cr->set_source_pixbuf($pixbuf,0,0); $cr->paint; }
 	return 0; #send expose to children
 }
 
@@ -1858,8 +1859,11 @@ sub set_background_skin
 	return unless $self->{pixbuf};
 	$self->{resizeparam}=$resize;
 	$self->{skinsize}='0x0';
-	$self->signal_connect(style_set => sub {warn "style set : @_" if $::debug;$_[0]->set_style($_[2]);} ,$self->get_style); #FIXME find the cause of these signals, seems related to stock icons
 	$self->signal_connect(size_allocate => \&resize_skin_cb);
+	return if $self->{options}{transparent};
+	# following not needed when using transparency
+
+	$self->signal_connect(style_set => sub {warn "style set : @_" if $::debug;$_[0]->set_style($_[2]);} ,$self->get_style); #FIXME find the cause of these signals, seems related to stock icons
 	my $rc_style= Gtk2::RcStyle->new;
 	#$rc_style->bg_pixmap_name($_,'<parent>') for qw/normal selected prelight insensitive active/;
 	$rc_style->bg_pixmap_name('normal','<parent>');
@@ -1877,18 +1881,27 @@ sub resize_skin_cb	#FIXME needs to add a delay to better deal with a burst of re
 	return if $w.'x'.$h eq $self->{skinsize};
 	my $pb=Skin::_resize($self->{pixbuf},$self->{resizeparam},$w,$h);
 	return unless $pb;
-	#my ($pixmap,$mask)=$pb->render_pixmap_and_mask(1); #leaks X memory for Gtk2 <1.146 or <1.153
-	# create shape mask
-	my $mask=Gtk2::Gdk::Pixmap->new(undef,$w,$h,1);
-	$pb->render_threshold_alpha($mask,0,0,0,0,-1,-1,1);
-	$self->shape_combine_mask($mask,0,0);
-	# create pixmap background
-	my $pixmap=Gtk2::Gdk::Pixmap->new($self->window,$w,$h,-1);
-	$pb->render_to_drawable($pixmap, Gtk2::Gdk::GC->new($self->window), 0,0,0,0,-1,-1,'none',0,0);
-	$self->window->set_back_pixmap($pixmap,0);
+	if ($self->{options}{transparent})
+	{	$self->{skinpb}=$pb;	#will be used by transparent_expose_cb()
+		if (my $shape= $self->{options}{shape})
+		{	my $mask=Gtk2::Gdk::Pixmap->new(undef,$w,$h,1);
+			$pb->render_threshold_alpha($mask,0,0,0,0,-1,-1, $shape);
+			$self->input_shape_combine_mask($mask,0,0);
+		}
+	}
+	else
+	{	#my ($pixmap,$mask)=$pb->render_pixmap_and_mask(1); #leaks X memory for Gtk2 <1.146 or <1.153
+		# create shape mask
+		my $mask=Gtk2::Gdk::Pixmap->new(undef,$w,$h,1);
+		$pb->render_threshold_alpha($mask,0,0,0,0,-1,-1,1);
+		$self->shape_combine_mask($mask,0,0);
+		# create pixmap background
+		my $pixmap=Gtk2::Gdk::Pixmap->new($self->window,$w,$h,-1);
+		$pb->render_to_drawable($pixmap, Gtk2::Gdk::GC->new($self->window), 0,0,0,0,-1,-1,'none',0,0);
+		$self->window->set_back_pixmap($pixmap,0);
+	}
 	$self->{skinsize}=$w.'x'.$h;
 	$self->queue_draw;
-	return
 }
 
 package Layout::Window::Popup;
