@@ -1056,7 +1056,19 @@ sub NewWidget
 	$widget->signal_connect(button_press_event => \&Button_press_cb) if $widget->{actions};
 
 	if (my $cursor=$options{cursor})
-	{	$widget->signal_connect(realize => sub { $_[0]->window->set_cursor(Gtk2::Gdk::Cursor->new($_[1])); },$cursor);
+	{	$widget->signal_connect(realize => sub {
+				my ($widget,$cursor)=@_;
+				my $gdkwin= $widget->window;
+				if ($widget->isa('Gtk2::EventBox') && !$widget->get_visible_window)
+				{	# for eventbox using an input-only gdkwindow, $widget->window is actually the parent's gdkwin,
+					# the only way to get to the input-only gdkwin is looking at all the children of its parent :(
+					for my $child ($gdkwin->get_children)
+					{	my $w= Glib::Object->new_from_pointer($child->get_user_data);
+						if ($w && $w==$widget) { $gdkwin=$child; last }
+					}
+				}
+				$gdkwin->set_cursor(Gtk2::Gdk::Cursor->new($cursor));
+			},$cursor);
 	}
 
 	my $tip= $options{tip};
@@ -2729,6 +2741,7 @@ sub new
 	}
 	else
 	{	$self=Gtk2::EventBox->new;
+		$self->set_visible_window(0);
 		$opt->{click} ||= $activate;
 	}
 	bless $self, $class;
@@ -2827,6 +2840,7 @@ sub new
 	my $self = bless Gtk2::EventBox->new, $class;
 	my $label=Gtk2::Label->new;
 	$label->set_alignment($opt->{xalign},$opt->{yalign});
+	$self->set_visible_window(0);
 
 	for (qw/markup markup_empty autoscroll interval/)
 	{	$self->{$_}=$opt->{$_} if exists $opt->{$_};
@@ -3715,6 +3729,7 @@ sub set_rating_now_cb
 sub new
 {	my ($class,$field,$nb,$sub, %opt) = @_;
 	my $self = bless Gtk2::EventBox->new, $class;
+	$self->set_visible_window(0);
 	$self->{field}=$field;
 	$self->{callback}=$sub;
 	%opt=(xalign=>.5, yalign=>.5,%opt);
