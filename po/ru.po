@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1006\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-02-11 17:29+0600\n"
-"PO-Revision-Date: 2011-02-11 19:36+0700\n"
+"POT-Creation-Date: 2011-02-27 21:12+0600\n"
+"PO-Revision-Date: 2011-02-27 21:36+0700\n"
 "Last-Translator: tin <girlwithoutadream@gmail.com>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -42,6 +42,12 @@ msgid_plural "%d Songs"
 msgstr[0] "%d песня"
 msgstr[1] "%d песни"
 msgstr[2] "%d песен"
+
+msgid "%d Upcoming Event"
+msgid_plural "%d Upcoming Events"
+msgstr[0] "%d предстоящее событие"
+msgstr[1] "%d предстоящих события"
+msgstr[2] "%d предстоящих событий"
 
 msgid "%d album"
 msgid_plural "%d albums"
@@ -194,6 +200,9 @@ msgstr ""
 
 msgid "0 chance"
 msgstr "0 шансов"
+
+msgid "0 means 'show all'"
+msgstr "0 означает 'показать всех'"
 
 msgid "1 chance in {probability}"
 msgstr "1 шанс из {probability}"
@@ -355,6 +364,12 @@ msgstr "Расширенное редактирование тегов"
 msgid "Album"
 msgstr "Альбом"
 
+msgid "Album and artist"
+msgstr "Альбом и исполнитель"
+
+msgid "Album and artist on the left side"
+msgstr "Альбом и исполнитель слева"
+
 msgid "Album artist"
 msgstr "Исполнитель альбома"
 
@@ -423,6 +438,11 @@ msgstr ""
 "Позволяет контролировать gmusicbrowser через DBus, используя стандарт MPRIS "
 "v1.0"
 
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v2.0 standard"
+msgstr ""
+"Позволяет контролировать gmusicbrowser через DBus, используя стандарт MPRIS "
+"v2.0"
+
 msgid "Alt"
 msgstr "Alt"
 
@@ -436,7 +456,7 @@ msgid "Append"
 msgstr "Добавить"
 
 msgid "Append (only if not already present)"
-msgstr "Добавить (только если уже не существует)"
+msgstr "Дописать в конец (только если уже существует)"
 
 msgid "Append to playlist"
 msgstr "Добавить к списку воспроизведения"
@@ -455,6 +475,9 @@ msgstr "Исполнитель"
 
 msgid "Artist & album"
 msgstr "Исполнитель и альбом"
+
+msgid "Artist Biography"
+msgstr "Биография исполнителя"
 
 msgid "Artist Picture Size : "
 msgstr "Размер изображения исполнителя: "
@@ -501,6 +524,9 @@ msgstr "Автозаполнение только пустых полей"
 msgid "Auto fill queue"
 msgstr "Автозаполнение очереди"
 
+msgid "Auto fill up to"
+msgstr "Автозаполнение до"
+
 msgid "Auto filter"
 msgstr "Авто-фильтр"
 
@@ -527,6 +553,9 @@ msgstr "Плагин автосохранения"
 
 msgid "Available"
 msgstr "Доступно"
+
+msgid "Average rating:"
+msgstr "Средняя оценка:"
 
 msgid "BPM"
 msgstr "BPM"
@@ -567,6 +596,9 @@ msgstr "Кнопки"
 msgid "Buttons, Song & Cover"
 msgstr "Кнопки, песня и обложка"
 
+msgid "Can be relative by using + or -"
+msgstr "Может быть относительным при использовании + или -"
+
 msgid "Can't change the volume in non-gstreamer iceserver mode"
 msgstr "Не могу изменить громкость в non-gstreamer-режиме iceserver"
 
@@ -584,7 +616,6 @@ msgstr ""
 "Не могу создать папку '{path}': \n"
 "{error}"
 
-# ...
 msgid "Can't create sink '{sink}'"
 msgstr "Невозможно создать приёмник данных '{sink}'"
 
@@ -598,10 +629,10 @@ msgid "Can't write in base folder '{folder}'."
 msgstr "Невозможно записать в базовую папку '{folder}'."
 
 msgid "Capitalize"
-msgstr "Прописными буквами"
+msgstr "Первая заглавная"
 
 msgid "Capitalize each word"
-msgstr "Все слова прописными буквами"
+msgstr "Каждое слово с заглавной"
 
 msgid "Case insensitive"
 msgstr "Не чувствительно к регистру"
@@ -693,6 +724,9 @@ msgstr "Выбрать файлы списков воспроизведения 
 
 msgid "Clear"
 msgstr "Очистить"
+
+msgid "Clear playlist filter"
+msgstr "Очистить фильтр списка воспроизведения"
 
 msgid "Clear queue"
 msgstr "Очистить очередь"
@@ -810,6 +844,9 @@ msgstr "Пользовательские поля"
 
 msgid "Custom formats"
 msgstr "Пользовательские форматы"
+
+msgid "Custom pipeline"
+msgstr "Пользовательский конвейер"
 
 msgid "Custom..."
 msgstr "Пользовательское..."
@@ -956,6 +993,9 @@ msgstr "Править фильтр"
 
 msgid "Edit grouping ..."
 msgstr "Правка группирования..."
+
+msgid "Edit in the last.fm wiki"
+msgstr "Править вики-страницу на last.fm"
 
 msgid "Edit list"
 msgstr "Править список"
@@ -1191,17 +1231,6 @@ msgstr "Следовать за выделенной песней"
 msgid "Font size"
 msgstr "Размер шрифта"
 
-msgid ""
-"For information on how to use this plugin, please navigate to the <a "
-"href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
-"artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/"
-"dokuwiki/'>gmusicbrowser-wiki</a>."
-msgstr ""
-"Для информации об использовании этого плагина, пожалуйста, перейдите на <a "
-"href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>wiki-"
-"страницу плагина</a> на <a href='http://gmusicbrowser.org/"
-"dokuwiki/'>gmusicbrowser-wiki</a>."
-
 msgid "Forward"
 msgstr "Вперёд"
 
@@ -1301,10 +1330,13 @@ msgid "Insensitive title-artist (right-aligned)"
 msgstr "Нечувствительные заголовок-исполнитель (по правому краю)"
 
 msgid "Insensitive, Song & Cover"
-msgstr "Нечувствительные, Песня и Обложка"
+msgstr "Нечувствительные Песня и Обложка"
 
 msgid "Insert a list of files/folders at the start of the playlist"
 msgstr "Вставить список файлов/папок в начало списка воспроизведения"
+
+msgid "Insert this pipeline before the audio sink"
+msgstr "Вставить этот конвейер перед модулем вывода звука"
 
 msgid "Invalid regular expression"
 msgstr "Неверное регулярное выражение"
@@ -1345,7 +1377,7 @@ msgstr "Лейбл/Издатель"
 msgid "Labels"
 msgstr "Метки"
 
-msgid "Labels' Icons"
+msgid "Labels' icons"
 msgstr "Значок метки"
 
 msgid "Lang"
@@ -1405,6 +1437,12 @@ msgstr[0] "Размер библиотеки: %d песня"
 msgstr[1] "Размер библиотеки: %d песни"
 msgstr[2] "Размер библиотеки: %d песен"
 
+msgid "Limit similar artists to a rate of similarity : "
+msgstr "Ограничить похожих исполнителей по степени похожести: "
+
+msgid "Limit similar artists to the first : "
+msgstr "Ограничивать похожих исполнителей первыми: "
+
 msgid "List"
 msgstr "Список"
 
@@ -1419,6 +1457,9 @@ msgstr "В списке: "
 
 msgid "Listed songs"
 msgstr "Песни в списке"
+
+msgid "Listeners: "
+msgstr "Слушателей: "
 
 msgid "Lists, Library & Context"
 msgstr "Списки, библиотека и контекст"
@@ -1520,6 +1561,12 @@ msgstr "MPRIS v1"
 msgid "MPRIS v1 support"
 msgstr "поддержка MPRIS v1"
 
+msgid "MPRIS v2"
+msgstr "MPRIS v2"
+
+msgid "MPRIS v2 support"
+msgstr "поддержка MPRIS v2"
+
 msgid "Main"
 msgstr "Главное"
 
@@ -1613,7 +1660,7 @@ msgid "New name"
 msgstr "Новое название"
 
 msgid "Next"
-msgstr "Next"
+msgstr "Следующая"
 
 msgid "Next Album"
 msgstr "Следующий альбом"
@@ -1644,6 +1691,9 @@ msgstr "Нет замкнутого фильтра"
 
 msgid "No moods"
 msgstr "Нет настроений"
+
+msgid "No results found"
+msgstr "Ничего не найдено"
 
 msgid "No songs found"
 msgstr "Не найдено песен"
@@ -1912,6 +1962,9 @@ msgstr "Порядок воспроизведения"
 msgid "Play/Pause"
 msgstr "Играть/Пауза"
 
+msgid "Playcount: "
+msgstr "Прослушиваний: "
+
 msgid "Played Today"
 msgstr "Воспроизведённые сегодня"
 
@@ -1924,9 +1977,6 @@ msgstr "Вид окна плеера:"
 msgid "Playing"
 msgstr "Воспроизведение"
 
-msgid "Playing & Queue"
-msgstr "Играющее и очередь"
-
 msgid "Playing Album"
 msgstr "Играющий альбом"
 
@@ -1938,6 +1988,9 @@ msgstr "Играющий фильтр"
 
 msgid "Playing Title"
 msgstr "Играющий заголовок"
+
+msgid "Playing and queue icons"
+msgstr "Значки воспроизведения и очереди"
 
 msgid "Playing error : {error}"
 msgstr "Ошибка воспроизведения: {error}"
@@ -1977,6 +2030,15 @@ msgstr "Показать пользовательское всплывающее
 
 msgid "Popup Traytip"
 msgstr "Всплывающее уведомление"
+
+msgid "Popup playlist filter menu"
+msgstr "Показать меню фильтра списка воспроизведения"
+
+msgid "Popup playlist order menu"
+msgstr "Показать меню порядка списка воспроизведения"
+
+msgid "Popup queue menu"
+msgstr "Показать меню очереди"
 
 msgid "Pre-set"
 msgstr "Предустановки"
@@ -2077,8 +2139,14 @@ msgstr "Оценка (изображение)"
 msgid "Rating between 0 and 100, or empty for default"
 msgstr "Оценка между 0 и 100 или пустая по умолчанию"
 
+msgid "Rating range:"
+msgstr "Диапазон оценок:"
+
 msgid "Re-read tags"
 msgstr "Перечитать теги"
+
+msgid "Re-shuffle"
+msgstr "Перемешать"
 
 msgid "Read/write in file tag"
 msgstr "Читать/записать в тег файла"
@@ -2410,8 +2478,8 @@ msgstr "Искать исполнителя на Youtube"
 msgid "Search for a picture on internet"
 msgstr "Искать изображение в Интернете"
 
-msgid "Search for artist on the web:"
-msgstr "Искать исполнителя в Интернете:"
+msgid "Search for artist on:"
+msgstr "Искать исполнителя на:"
 
 msgid "Search for current album"
 msgstr "Искать текущий альбом"
@@ -2425,14 +2493,14 @@ msgstr "Проверять наличие новых песен при запу�
 msgid "Search google for Artist"
 msgstr "Искать исполнителя в google"
 
+msgid "Search on the web"
+msgstr "Искать в Интернете"
+
 msgid "Search options"
 msgstr "Искать настройки"
 
 msgid "Search pitchfork for Artist"
 msgstr "Искать исполнителя на Pitchfork"
-
-msgid "Search the web for artist"
-msgstr "Искать исполнителя в Интернете"
 
 msgid "Search window layout :"
 msgstr "Вид окна поиска:"
@@ -2536,6 +2604,9 @@ msgstr "Показать кнопки"
 msgid "Show replaygain submenu"
 msgstr "Показать подменю replaygain"
 
+msgid "Show similar artists"
+msgstr "Показать похожих исполнителей"
+
 # предложения?
 msgid "Show suggestions"
 msgstr "Показать варианты"
@@ -2580,6 +2651,9 @@ msgstr "Перемешанные альбомы, перемешанные тре
 msgid "Shutdown command :"
 msgstr "Команда выключения:"
 
+msgid "Simple title"
+msgstr "Простой заголовок"
+
 msgid "Size"
 msgstr "Размер"
 
@@ -2588,6 +2662,9 @@ msgstr "Число пропусков"
 
 msgid "Skip to next song if an error occurs"
 msgstr "Перейти к следующей песне, если происходит ошибка"
+
+msgid "Small album picture"
+msgstr "Маленькая обложка альбома"
 
 msgid "Small player"
 msgstr "Маленький плеер"
@@ -2719,10 +2796,10 @@ msgstr "Этому плагину требуется:"
 
 msgid ""
 "This plugin retrieves artist-relevant information (biography, upcoming "
-"events) from last.fm."
+"events, similar artists) from last.fm."
 msgstr ""
-"Этот плагин извлекает относящуюся к исполнителю информацию (биографию, "
-"предстоящие события) с last.fm."
+"Этот плагин извлекает относящуюся к исполнителю информацию (биография, "
+"предстоящие события, похожие исполнители) с last.fm."
 
 msgid "Threshold to count a song as played :"
 msgstr "Порог для подсчёта песни как проигранной:"
@@ -2738,6 +2815,12 @@ msgstr "Время постепенного затихания в секунда
 
 msgid "Title"
 msgstr "Название"
+
+msgid "Title & icon"
+msgstr "Заголовок и значок"
+
+msgid "Title & progress"
+msgstr "Заголовок и полоса прогресса"
 
 msgid "Title - Artist - Album"
 msgstr "Название - Исполнитель - Альбом"
@@ -2768,6 +2851,9 @@ msgstr "Переключить полноэкранный режим"
 
 msgid "Toggle the fullscreen layout"
 msgstr "Переключить полноэкранный вид"
+
+msgid "Total playcount:"
+msgstr "Всего прослушиваний:"
 
 msgid "Track"
 msgstr "Трек"
@@ -2893,13 +2979,11 @@ msgstr ""
 msgid "User authentification error"
 msgstr "Ошибка аутентификации пользователя"
 
-# Значение не записано в файл?
 msgid "Value not written in file tag"
-msgstr "Значение, не записанное в файл"
+msgstr "Значение не записано в файл"
 
-# Значение записано в файл?
 msgid "Value written in file tag"
-msgstr "Значение, записанное в файл"
+msgstr "Значение записано в файл"
 
 msgid "Various artists"
 msgstr "Сборник"
@@ -2934,6 +3018,11 @@ msgid ""
 msgstr ""
 "Предупреждение: это расширенные настройки, не изменяйте их, если не знаете, "
 "что делаете."
+
+msgid "Warning : using a folder with invalid encoding, you should rename it."
+msgstr ""
+"Предупреждение: используется папка с неверной кодировкой, вам нужно "
+"переименовать её."
 
 msgid "Warning: all existing data for this field will be lost"
 msgstr "Предупреждение: все существующие данные для этого поля будут потеряны"
@@ -3270,7 +3359,6 @@ msgstr "ошибка"
 msgid "events"
 msgstr "события"
 
-# не нашла в коде
 msgid "ex :"
 msgstr "пример:"
 
@@ -3304,6 +3392,9 @@ msgstr "любимое"
 msgid "file format"
 msgstr "формат файла"
 
+msgid "filters"
+msgstr "фильтры"
+
 msgid "first added"
 msgstr "первых добаленных"
 
@@ -3328,6 +3419,12 @@ msgstr "полный"
 
 msgid "full with buttons"
 msgstr "полный с кнопками"
+
+msgid "google images"
+msgstr "Картинки Google"
+
+msgid "google images (hi-res)"
+msgstr "Картинки Google (высокое разрешение)"
 
 msgid "group by"
 msgstr "группировать по"
@@ -3363,7 +3460,7 @@ msgid "integer"
 msgstr "целое число"
 
 msgid "interview"
-msgstr "интԵрвью"
+msgstr "интервью"
 
 msgid "invalid pattern"
 msgstr "неверный шаблон"
@@ -3506,6 +3603,21 @@ msgstr "last.fm"
 
 msgid "last.fm plugin"
 msgstr "плагин last.fm"
+
+msgid ""
+"last.fm's similarity categories:\n"
+">90 super\n"
+">70 very high\n"
+">50 high\n"
+">30 medium\n"
+">10 lower"
+msgstr ""
+"категории похожести на last.fm:\n"
+">90 невероятно похожи\n"
+">70 очень похожи\n"
+">50 похожи\n"
+">30 есть что-то общее\n"
+">10 почти непохожи"
 
 msgid "lead artist"
 msgstr "солист"
@@ -3741,6 +3853,9 @@ msgstr "требуется xdg-screensaver"
 msgid "reset filter {nb}"
 msgstr "сбросить фильтр {nb}"
 
+msgid "reset format"
+msgstr "изменить формат"
+
 msgid "reset primary filter"
 msgstr "сбросить основной фильтр"
 
@@ -3797,6 +3912,12 @@ msgstr "показывать изображения"
 
 msgid "show the 'All' row"
 msgstr "показывать строку 'Все'"
+
+msgid "similar"
+msgstr "похожие"
+
+msgid "similar artists"
+msgstr "похожие исполнители"
 
 # какого скина?
 msgid "skin options"
@@ -3923,9 +4044,6 @@ msgstr "ждать ещё"
 msgid "wait for more when queue empty"
 msgstr "ждать ещё, когда очередь пуста"
 
-msgid "web"
-msgstr "web"
-
 msgid "weeks"
 msgstr "недель"
 
@@ -3933,7 +4051,7 @@ msgid "weight :"
 msgstr "вес:"
 
 msgid "wikipedia, lyrics, and custom webpages"
-msgstr "википедию, тексты и пользовательские веб-страницы"
+msgstr "Википедия, тексты и пользовательские веб-страницы"
 
 msgid "with browser"
 msgstr "с браузером"
@@ -3946,6 +4064,9 @@ msgstr "с браузером (SongTree)"
 
 msgid "with context"
 msgstr "с контекстом"
+
+msgid "with picture"
+msgstr "с изображением"
 
 msgid "with playlist"
 msgstr "со списком воспроизведения"
@@ -4039,47 +4160,25 @@ msgstr "разделённый знаком | список виджетов"
 #~ msgid "' & ' and ', ' and ';'"
 #~ msgstr "' & ' и ', ' и ';'"
 
-#~ msgid "Album and artist"
-#~ msgstr "Альбом и исполнитель"
-
-#~ msgid "Album and artist on the left side"
-#~ msgstr "Альбом и исполнитель слева"
-
-#~ msgid "Can be relative by using + or -"
-#~ msgstr "Может быть относительным при использовании + или -"
-
 #~ msgid "Edit ..."
 #~ msgstr "Правка..."
+
+#~ msgid ""
+#~ "For information on how to use this plugin, please navigate to the <a "
+#~ "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
+#~ "artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser."
+#~ "org/dokuwiki/'>gmusicbrowser-wiki</a>."
+#~ msgstr ""
+#~ "Для информации об использовании этого плагина, пожалуйста, перейдите на "
+#~ "<a href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
+#~ "artistinfo'>wiki-страницу плагина</a> на <a href='http://gmusicbrowser."
+#~ "org/dokuwiki/'>gmusicbrowser-wiki</a>."
 
 #~ msgid "Other"
 #~ msgstr "Другое"
 
-#~ msgid "Simple title"
-#~ msgstr "Простой заголовок"
-
-#~ msgid "Small album picture"
-#~ msgstr "Маленькая обложка альбома"
-
-#~ msgid "Title & icon"
-#~ msgstr "Заголовок и значок"
-
-#~ msgid "Title & progress"
-#~ msgstr "Заголовок и полоса прогресса"
-
-#~ msgid ""
-#~ "Warning : using a folder with invalid encoding, you should rename it."
-#~ msgstr ""
-#~ "Предупреждение: используется папка с неверной кодировкой, вам нужно "
-#~ "переименовать её."
-
-#~ msgid "filters"
-#~ msgstr "фильтры"
-
-#~ msgid "google images"
-#~ msgstr "Картинки Google"
-
-#~ msgid "google images (hi-res)"
-#~ msgstr "Картинки Google (высокое разрешение)"
+#~ msgid "Search the web for artist"
+#~ msgstr "Искать исполнителя в Интернете"
 
 #~ msgid "next"
 #~ msgstr "следующая"
@@ -4093,8 +4192,8 @@ msgstr "разделённый знаком | список виджетов"
 #~ msgid "show info"
 #~ msgstr "показать информацию"
 
-#~ msgid "with picture"
-#~ msgstr "с изображением"
+#~ msgid "web"
+#~ msgstr "web"
 
 #~ msgid "{command} is needed to play this file."
 #~ msgstr "{command} нужна, чтобы воспроизвести этот файл."
