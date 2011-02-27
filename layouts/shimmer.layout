@@ -9,18 +9,17 @@ Author		= simon@shimmerproject.org
 VBMain		= VBTop _HBMain
 HBMain		= VBLeft _HPRight
 VBTop		= 3Filler8 HBTop
-HBTop		= VBButtons _15VBPlayer 15VBToggle VBSearchBox -5VBSettings
+HBTop		= VBButtons _15VBPlayer 15ABToggle -5ABSettings
 ### top bar from left to right ###
 VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle HBTimeSlider
 HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
-VBToggle	= HBToggle 3Filler1
-HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=view-list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=view-mosaic,widget=VPMosaic,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=view-fullscreen,size=large-toolbar,tip="Fullscreen View")
-VBSearchBox	= 4SimpleSearch(suggest=1)
-VBSettings	= HBSettings 3Filler3
-HBSettings	= ExtraButtons(size=large-toolbar) Pref(stock=gtk-preferences,size=large-toolbar)
+ABToggle	= (yalign=0.3,yscale=0.0) HBToggle
+HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=view-list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=view-mosaic,widget=VPMosaic,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=view-fullscreen,size=large-toolbar,tip="Fullscreen View") 15Filler2 ABSearchBox
+ABSearchBox	= (yalign=0.3) SimpleSearch(suggest=1)
+ABSettings	= (yalign=0.3,yscale=0.0) ExtraButtons(size=large-toolbar) Pref(stock=gtk-preferences,size=large-toolbar)
 ### main left: artist pane and album-cover ###
 VBLeft		= _NBList HBCover HBStatus
 NBList		= (tabpos="bottom") VBArtist QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
@@ -48,7 +47,7 @@ Title		= "gmusicbrowser"
 DefaultFocus	= SimpleSearch
 Default		= Window(size=1000x750)
 Author		= simon@shimmerproject.org
-Window		= hidden=VBSearchBox
+Window		= hidden=SimpleSearch
 ### main window containers: top bar, main and statusbar ###
 VBMain		= VBTop _NBList
 VBTop		= 3Filler8 HBTop
@@ -57,11 +56,10 @@ VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle VBTime
 HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=0,expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
-VBTime		= _HBTimeSlider _VBSearchBox
+VBTime		= _HBTimeSlider _SimpleSearch(suggest=1)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
-VBSearchBox	= SimpleSearch(suggest=1) 5Filler2
 VBSettings	= HBPrefSearch 5Filler5
-HBPrefSearch	= ToggleButton0(size=large-toolbar,relief=none,icon=gmb-search,widget=VBSearchBox) ExtraButtons  Pref(stock=gtk-preferences,size=large-toolbar)
+HBPrefSearch	= ToggleButton0(size=large-toolbar,relief=none,icon=gmb-search,widget=SimpleSearch) ExtraButtons  Pref(stock=gtk-preferences,size=large-toolbar)
 NBList		= (tabpos="bottom") HBSongListtree QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
 HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
 VBAbout		= (tabtitle=_"Info") _PluginArtistinfo
@@ -74,7 +72,7 @@ HBSongListtree	= (tabtitle=_"Playlist") _SongTree(cols="playandqueueandtrack tit
 Type=T
 VBMain		= HBTime Filler0 VBMain1
 VBMain1		= HBLeft _HBRight
-HBLeft		= _Cover(forceratio=1,default=pix/elementary/no-cover.svg) VBText
+HBLeft		= _Cover(forceratio=1,default=elementary/no-cover.svg) VBText
 VBText		= 2HBAlbum HBYear _2HBTitle
 HBButtons	= Prev(size=small-toolbar) Play(size=small-toolbar) Next(size=small-toolbar)
 HBTitle		= LockSong _Title(font=16,interval=75)
