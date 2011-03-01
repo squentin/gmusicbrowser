@@ -891,7 +891,7 @@ sub keybinding_longname
 	return $name.'-'.$key;
 }
 
-our ($NBVolIcons,$NBQueueIcons); my $TrayIconFile;
+our ($NBVolIcons,$NBQueueIcons); my %TrayIcon;
 my $icon_factory;
 
 my %IconsFallbacks=
@@ -945,10 +945,18 @@ sub LoadIcons
 		closedir $dh;
 	}
 
-	$TrayIconFile=delete $icons{trayicon} || PIXPATH.'trayicon.png';
-	$TrayIcon->child->child->set_from_file($TrayIconFile) if $TrayIcon;
 	eval { Gtk2::Window->set_default_icon_from_file( delete $icons{gmusicbrowser} || PIXPATH.'gmusicbrowser.png' ); };
 	warn $@ if $@;
+
+	#trayicons
+	{	%TrayIcon=();
+		my $prefix= $TrayIcon{'default'}= $icons{trayicon} || PIXPATH.'trayicon.png';
+		$prefix=~s/\.[^.]+$//;
+		for my $key (qw/play pause/)
+		{	($TrayIcon{$key})= grep -r $_, map "$prefix-$key.$_",qw/png svg/;
+		}
+		UpdateTrayIcon(1);
+	}
 
 	$NBVolIcons=0;
 	$NBVolIcons++ while $icons{'gmb-vol'.$NBVolIcons};
@@ -977,7 +985,8 @@ sub LoadIcons
 	$icon_factory=Gtk2::IconFactory->new;
 	$icon_factory->add_default;
 	for my $stock_id (keys %icons,keys %IconsFallbacks)
-	{	my %h= ( stock_id => $stock_id );
+	{	next if $stock_id=~m/^trayicon/;
+		my %h= ( stock_id => $stock_id );
 			#label    => $$ref[1],
 			#modifier => [],
 			#keyval   => $Gtk2::Gdk::Keysyms{L},
@@ -6642,6 +6651,16 @@ sub PopupLayout
 	my $popup=Layout::Window::Popup->new($layout,$widget);
 }
 
+sub UpdateTrayIcon
+{	my $force=shift;
+	return unless $TrayIcon;
+	return unless $force || $TrayIcon{play} || $TrayIcon{pause};
+	my $state= !defined $TogPlay ? 'default' : $TogPlay ? 'play' : 'pause';
+	$state='default' unless $TrayIcon{$state};
+	my $pb=$TrayIcon{$state};
+	if (!ref $pb) { $pb=$TrayIcon{$state}= eval {Gtk2::Gdk::Pixbuf->new_from_file($pb)}; }
+	$TrayIcon->child->child->set_from_pixbuf($pb);
+}
 sub CreateTrayIcon
 {	if ($TrayIcon)
 	{	return if $Options{UseTray};
@@ -6654,7 +6673,8 @@ sub CreateTrayIcon
 	if (0) {&CreateTrayIcon_StatusIcon}
 	$TrayIcon= Gtk2::TrayIcon->new(PROGRAM_NAME);
 	my $eventbox=Gtk2::EventBox->new;
-	my $img=Gtk2::Image->new_from_file($TrayIconFile);
+	$eventbox->set_visible_window(0);
+	my $img=Gtk2::Image->new;
 
 	Glib::Timeout->add(1000,sub {$TrayIcon->{respawn}=1 if $TrayIcon; 0;});
 	 #recreate Trayicon if it is deleted, for example when the gnome-panel crashed, but only if it has lived >1sec to avoid an endless loop
@@ -6680,8 +6700,8 @@ sub CreateTrayIcon
 	Layout::Window::Popup::set_hover($eventbox);
 
 	$TrayIcon->show_all;
-	#Watch($eventbox,'CurSong', \&UpdateTrayTip);
-	#&UpdateTrayTip($eventbox);
+	UpdateTrayIcon(1);
+	Watch($TrayIcon, Playing=> sub { UpdateTrayIcon(); });
 }
 sub SetTrayTipDelay
 {	return unless $TrayIcon;
