@@ -73,14 +73,14 @@ Type=T
 VBMain		= HBTime Filler0 VBMain1
 VBMain1		= HBLeft _HBRight
 HBLeft		= _Cover(forceratio=1,default=elementary/no-cover.svg) VBText
-VBText		= 2HBAlbum HBYear _2HBTitle
+VBText		= 2HBArtist HBAlbum _2HBTitle
 HBButtons	= Prev(size=small-toolbar) Play(size=small-toolbar) Next(size=small-toolbar)
-HBTitle		= LockSong _Title(font=16,interval=75)
-HBArtist	= LockArtist _Artist(font=10)
-HBAlbum		= LockAlbum _Album(font=10)
-HBYear		= Filler1 _Date(font=8,markup="%y") -Stars
+HBTitle		= LockSong _Title(font=12,interval=75)
+HBArtist	= LockArtist _Artist(font=8)
+HBAlbum		= LockAlbum Album(font=8) Date(font=7,markup="<b>»</b> %y")
+HBRating	= Filler1  -Stars
 HBTime		= _TimeBar(minheight=7)
-HBRight		= HBButtons _2HBArtist
+HBRight		= HBButtons _2HBRating
 VSize0		= 3 Filler0
 HSize0		= Filler1 LockArtist LockAlbum LockSong
 HSize1		= Cover HBButtons
