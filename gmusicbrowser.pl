@@ -29,8 +29,9 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  *Gtk2::AboutDialog::set_url_hook=	sub {} unless *Gtk2::AboutDialog::set_url_hook{CODE};	#for perl-Gtk2 version <1.080~1.083
  *Gtk2::Label::set_ellipsize=		sub {} unless *Gtk2::Label::set_ellipsize{CODE};	#for perl-Gtk2 version <1.080~1.083
  *Gtk2::Pango::Layout::set_height=	sub {} unless *Gtk2::Pango::Layout::set_height{CODE};	#for perl-Gtk2 version <1.180  pango <1.20
- *Gtk2::Label::set_line_wrap_mode=	sub {} unless *Gtk2::Label::set_line_wrap_mode{CODE};	#for gtk2 version <2.9
- *Gtk2::Scale::add_mark=		sub {} unless *Gtk2::Scale::add_mark{CODE};		#for gtk2 version <2.16 (still not bound in perl-Gtk2)
+ *Gtk2::Label::set_line_wrap_mode=	sub {} unless *Gtk2::Label::set_line_wrap_mode{CODE};	#for gtk2 version <2.9 or perl-Gtk2 <1.131
+ *Gtk2::Scale::add_mark=		sub {} unless *Gtk2::Scale::add_mark{CODE};		#for gtk2 version <2.16 or perl-Gtk2 <1.230
+ *Gtk2::ImageMenuItem::set_always_show_image= sub {} unless *Gtk2::ImageMenuItem::set_always_show_image{CODE};#for gtk2 version <2.16 or perl-Gtk2 <1.230
  unless (*Gtk2::Widget::set_tooltip_text{CODE})		#for Gtk2 version <2.12
  {	my $Tooltips=Gtk2::Tooltips->new;
 	*Gtk2::Widget::set_tooltip_text= sub { $Tooltips->set_tip($_[0],$_[1]); };
@@ -3157,6 +3158,7 @@ sub ChooseSongs
 	    my $item;
 	    if ($ID=~m/^\d+$/) #songs
 	    {	$item=Gtk2::ImageMenuItem->new;
+		$item->set_always_show_image(1);
 		$label->set_alignment(0,.5); #left-aligned
 		$label->set_markup( ReplaceFieldsAndEsc($ID,$format) );
 		my $icon=Get_PPSQ_Icon($ID);
@@ -3289,6 +3291,7 @@ sub PopupAA
 		for my $i ($start..$end)
 		{	my $key=$keys->[$i];
 			my $item=Gtk2::ImageMenuItem->new;
+			$item->set_always_show_image(1); # to override /desktop/gnome/interface/menus_have_icons gnome setting
 			my $label=Gtk2::Label->new;
 			$label->set_line_wrap(TRUE);
 			$label->set_alignment(0,.5);
