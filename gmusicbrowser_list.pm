@@ -47,6 +47,7 @@ sub makeFilterBox
 sub makeLockToggle
 {	my $opt=$_[0];
 	my $toggle=Gtk2::ToggleButton->new;
+	$toggle->set_relief( $opt->{relief} ) if $opt->{relief};
 	$toggle->add(Gtk2::Image->new_from_stock('gmb-lock','menu'));
 	#$toggle->set_active(1) if $self->{Filter0};
 	$toggle->signal_connect( clicked =>sub
