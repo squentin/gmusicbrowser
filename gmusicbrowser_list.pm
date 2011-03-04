@@ -1664,7 +1664,7 @@ our @cMenu=
 );
 
 our @DefaultOptions=
-(	pages	=> 'savedtree|artist|album|genre|date|label|folder|added|lastplay|rating',
+(	pages	=> 'savedtree|artists|album|genre|date|label|folder|added|lastplay|rating',
 	nb	=> 1,	# filter level
 	min	=> 1,	# filter out entries with less than $min songs
 	hidebb	=> 0,	# hide button box
@@ -4382,7 +4382,7 @@ sub Fill	#FIXME should be called when signals ::style-set and ::direction-change
 		#$layout->set_text($key);
 		#$layout->get_attributes->insert( Gtk2::Pango::AttrScale->new($value) ); #need recent Gtk2
 		my $text= $displaykeysub ? $displaykeysub->($key) : $key;
-		$layout->set_markup('<span size="'.(10240*$value).'">'.::PangoEsc($text).'</span>');
+		$layout->set_markup('<span size="'.(10240*$value).'"> '.::PangoEsc($text).'</span> ');
 		my ($w,$h)=$layout->get_pixel_size;
 		my $bl= $self->{baselines}{$h}||= $layout->get_iter->get_baseline / Gtk2::Pango->scale; #cache not needed for $Gtk2::VERSION>1.161
 		if ( $x+$w+XPAD > $width )
