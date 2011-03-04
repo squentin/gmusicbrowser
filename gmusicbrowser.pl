@@ -6648,7 +6648,7 @@ sub CreateTrayIcon
 
 	$eventbox->add($img);
 	$TrayIcon->add($eventbox);
-	#Layout::Window::make_transparent($TrayIcon) if $CairoOK; #Simon Steinbeiss: uncomment this line to make the trayicon transparent in gnome-panel and xfce4-panel>4.7
+	Layout::Window::make_transparent($TrayIcon) if $CairoOK; #Simon Steinbeiss: comment this line to make the trayicon transparent in xfce4-panel <=4.6, lxpanel and fluxbox
 	$eventbox->signal_connect(scroll_event => \&::ChangeVol);
 	$eventbox->signal_connect(button_press_event => sub
 		{	my $b=$_[1]->button;
