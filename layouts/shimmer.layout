@@ -14,12 +14,13 @@ HBTop		= VBButtons _15VBPlayer 15ABToggle -5ABSettings
 VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle HBTimeSlider
-HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
+HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)",yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 ABToggle	= (yalign=0.3,yscale=0.0) HBToggle
 HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=view-list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=view-mosaic,widget=VPMosaic,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=view-fullscreen,size=large-toolbar,tip="Fullscreen View") 15Filler2 ABSearchBox
 ABSearchBox	= (yalign=0.3) SimpleSearch(suggest=1)
-ABSettings	= (yalign=0.3,yscale=0.0) ExtraButtons(size=large-toolbar) Pref(stock=gtk-preferences,size=large-toolbar)
+ABSettings	= (yalign=0.3,yscale=0.0) HBSettings
+HBSettings	= ExtraButtons(size=large-toolbar) Pref(stock=gtk-preferences,size=large-toolbar)
 ### main left: artist pane and album-cover ###
 VBLeft		= _NBList HBCover HBStatus
 NBList		= (tabpos="bottom") VBArtist QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
