@@ -534,7 +534,7 @@ our %timespan_menu=
 	#can_group=>1,
  },
  album_artist =>
- {	name => _"Album artist",width => 200,	flags => 'gc',	type => 'artist',
+ {	name => _"Album artist or artist",width => 200,	flags => 'gcsi',	type => 'artist',
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
 	_ => 'do {my $n=vec(__album_artist_raw__,#ID#,#bits#); $n==1 ? vec(__artist__,#ID#,#bits#) : $n}',
