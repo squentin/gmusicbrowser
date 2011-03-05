@@ -1,3 +1,10 @@
+gmusicbrowser (1.1.6ppa8) lucid; urgency=low
+
+  * Fixed: XPM problem
+    upstream fixes
+
+ -- Andreas Böttger <andreas.boettger@gmx.de> Sat, 05 Mar 2011 13:07:22 +0100
+
 gmusicbrowser (1.1.6ppa7) lucid; urgency=low
 
   * icon and layout fixes
@@ -56,48 +63,48 @@ gmusicbrowser (1.1.6) lucid; urgency=low
 gmusicbrowser (1.1.5ppa26) lucid; urgency=low
   * just another sync with git upstream (commit e0bea0c59af627cde44f - 2010-12-05)
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Fri, 10 Dec 2010 13:38:54 +0100
 
 gmusicbrowser (1.1.5ppa25) lucid; urgency=low
   * new features: (long-awaited) cover-autofinding, a new grey trayicon and
     various fixes from git upstream (commit fffb2fdb7e1b14aa8ca2 - 2010-11-30)
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Wed, 01 Dec 2010 01:43:02 +0100
 
 gmusicbrowser (1.1.5ppa24) lucid; urgency=low
   * fix broken artistinfo events formatting
     various fixes from git upstream (commit dcf6317bbc9cfacd9a22 - 2010-11-10)
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Sat, 20 Nov 2010 01:13:57 +0100
 
 gmusicbrowser (1.1.5ppa23) lucid; urgency=low
   * fpanes get format options, last.fm api fix for artistinfo-plugin, other various fixes
     merge with git upstream (commit 6c22ca3c99d260546f94 - 2010-11-10)
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Fri, 12 Nov 2010 13:17:37 +0100
 
 gmusicbrowser (1.1.5ppa22) lucid; urgency=low
 
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Thu, 21 Oct 2010 17:51:35 +0200
 
 gmusicbrowser (1.1.5ppa21) lucid; urgency=low
 
   * spectacular fail: add new icon theme: Faenza (fixed Makefile again)
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Thu, 21 Oct 2010 16:52:44 +0200
 
 gmusicbrowser (1.1.5ppa20) lucid; urgency=low
 
   * this time really add new icon theme: Faenza (fixed Makefile)
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Thu, 21 Oct 2010 16:01:06 +0200
 
 gmusicbrowser (1.1.5ppa19) lucid; urgency=low
@@ -106,14 +113,14 @@ gmusicbrowser (1.1.5ppa19) lucid; urgency=low
     artistinfo-plugin: fix tooltips
     merge with git upstream (commit 64998d56d876f02f29ef - 2010-10-17)
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Thu, 21 Oct 2010 13:56:11 +0200
 
 gmusicbrowser (1.1.5ppa18) lucid; urgency=low
 
   * artistinfo-plugin: switch to last.fm's webapi(faster and cleaner), make event-formats customizable, make events clickable
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Fri, 15 Oct 2010 20:16:49 +0200
 
 gmusicbrowser (1.1.5ppa17) lucid; urgency=low
@@ -122,7 +129,7 @@ gmusicbrowser (1.1.5ppa17) lucid; urgency=low
     a tracklist is now shown in mosaic-view on middleclick
     merge with git upstream (commit a0959187a666b800dad1 - 2010-10-06)
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Fri, 08 Oct 2010 13:37:53 +0200
 
 gmusicbrowser (1.1.5ppa16) lucid; urgency=low
@@ -130,7 +137,7 @@ gmusicbrowser (1.1.5ppa16) lucid; urgency=low
   * update artistinfo-plugin (show "events in the past", better preferences-dialog)
     merge with git upstream (commit 6e12b1e334b7cc880e44 - 2010-09-24)
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Wed, 29 Sep 2010 12:18:06 +0200
 
 gmusicbrowser (1.1.5ppa15) lucid; urgency=low
@@ -138,7 +145,7 @@ gmusicbrowser (1.1.5ppa15) lucid; urgency=low
   * improve mosaic-view, add lock-feature to breadcrumbs
     merge with git upstream (commit 8180921a883bdf8e8124 - 2010-09-24)
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Fri, 24 Sep 2010 10:19:23 +0200
 
 gmusicbrowser (1.1.5ppa14) lucid; urgency=low
@@ -146,7 +153,7 @@ gmusicbrowser (1.1.5ppa14) lucid; urgency=low
   * add "show/hide cover"-button to layout, improve sort/filter indicators
     merge with git upstream (commit a500e66a3f3bbb3a5c43 - 2010-09-19)
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Mon, 20 Sep 2010 09:56:55 +0200
 
 gmusicbrowser (1.1.5ppa13) lucid; urgency=low
@@ -154,14 +161,14 @@ gmusicbrowser (1.1.5ppa13) lucid; urgency=low
   * small cosmetic changes to the layout (smaller statusbar, filter- and sort-indicators, more readable totalwidget)
     merge with git upstream (commit 95af8dc86a24616fc79a - 2010-09-07)
     for a complete changelog see: github.com/ochosi/gmusicbrowser
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Fri, 10 Sep 2010 23:14:43 +0200
 
 gmusicbrowser (1.1.5ppa12) lucid; urgency=low
 
   * merge with git upstream (commit 42105794533c029b76fc - 2010-08-28)
     for a complete changelog see: github.com/squentin/gmusicbrowser/commits/master
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Sun, 29 Aug 2010 19:24:33 +0200
 
 gmusicbrowser (1.1.5ppa11) lucid; urgency=low
@@ -169,7 +176,7 @@ gmusicbrowser (1.1.5ppa11) lucid; urgency=low
   * plugin "artist-info": new layout, weblinks, rss-forwarding
     merge with git upstream (commit d5d134b64d131d1dac16 - 2010-08-18)
     for a complete changelog see: github.com/ochosi/gmusicbrowser/commits/
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Thu, 19 Aug 2010 21:07:38 +0200
 
 gmusicbrowser (1.1.5ppa10) lucid; urgency=low
@@ -177,7 +184,7 @@ gmusicbrowser (1.1.5ppa10) lucid; urgency=low
   * updated plugin "artist-info" (enabled by default)
     merge with git upstream (commit 3267d250e3bf87b51ae3 - 2010-07-28)
     for a complete changelog see: github.com/ochosi/gmusicbrowser/commits/
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Sun, 08 Aug 2010 23:21:39 +0200
 
 gmusicbrowser (1.1.5ppa9) lucid; urgency=low
@@ -186,7 +193,7 @@ gmusicbrowser (1.1.5ppa9) lucid; urgency=low
   * added plugin "artist-info" (disabled by default, problems: e.g. decoding issues)
     merge with git upstream (commit 10c7b87189f6dbe9f2a7 - 2010-07-13)
     for a complete changelog see: github.com/ochosi/gmusicbrowser/commits/
-    
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Tue, 20 Jul 2010 20:16:28 +0200
 
 gmusicbrowser (1.1.5ppa8) karmic; urgency=low
@@ -213,7 +220,7 @@ gmusicbrowser (1.1.5ppa6) karmic; urgency=low
     merge with git upstream (commit f29eed567709a3e20b74)
     for a complete changelog see: github.com/ochosi/gmusicbrowser/commits/
 
- -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Wed, 26 May 2010 21:19:26 +0200 
+ -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Wed, 26 May 2010 21:19:26 +0200
 
 gmusicbrowser (1.1.5ppa5) lucid; urgency=low
 
@@ -248,9 +255,9 @@ gmusicbrowser (1.1.5ppa2) karmic; urgency=low
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Thu, 29 Apr 2010 12:10:00 +0200
 
 gmusicbrowser (1.1.5ppa1) karmic; urgency=low
-  
+
   * new version
-  
+
  -- Simon Steinbeiß <simon.steinbeiss@elfenbeinturm.at> Thu, 29 Apr 2010 11:10:00 +0200
 
 gmusicbrowser (1.1.5) karmic; urgency=low
@@ -340,3 +347,4 @@ gmusicbrowser (0.958-0ubuntu1) gutsy; urgency=low
     - Added to create usr/share/pixmaps
 
  -- Andy Price <andy@andrewprice.me.uk>  Sat, 23 Jun 2007 21:37:50 +0100
+
