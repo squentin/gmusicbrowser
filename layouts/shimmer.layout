@@ -39,9 +39,6 @@ VPMosaic	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_al
 HSize0		= 350 NBList
 VSize0		= 350 HBCover
 
-[shimmer] based on Shimmer Desktop
-Type=
-
 [Shimmer Netbook]
 Type=G
 Title		= "gmusicbrowser"
@@ -78,7 +75,7 @@ VBText		= 2HBArtist HBAlbum _2HBTitle
 HBButtons	= Prev(size=small-toolbar) Play(size=small-toolbar) Next(size=small-toolbar)
 HBTitle		= LockSong _Title(font=12,interval=75)
 HBArtist	= LockArtist _Artist(font=8)
-HBAlbum		= LockAlbum Album(font=8) Date(font=7,markup="<b>»</b> %y")
+HBAlbum		= LockAlbum Album(font=8,minsize=0) Date(font=7,markup=" <b>»</b> %y")
 HBRating	= Filler1  -Stars
 HBTime		= _TimeBar(minheight=7)
 HBRight		= HBButtons _2HBRating
