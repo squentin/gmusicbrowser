@@ -5457,6 +5457,7 @@ sub remove_column
 	my $cell= $self->{cells}[$cellnb];
 	splice @{$self->{cells}}, $cellnb, 1;
 	$self->{cols_changed}=1;
+	unless (@{$self->{cells}}) { $self->AddColumn('title'); } #to ensure there is at least 1 column
 	$self->update_columns if $self->{ready};
 }
 sub update_columns
