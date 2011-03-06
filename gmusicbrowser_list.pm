@@ -47,6 +47,7 @@ sub makeFilterBox
 sub makeLockToggle
 {	my $opt=$_[0];
 	my $toggle=Gtk2::ToggleButton->new;
+	$toggle->set_relief( $opt->{relief} ) if $opt->{relief};
 	$toggle->add(Gtk2::Image->new_from_stock('gmb-lock','menu'));
 	#$toggle->set_active(1) if $self->{Filter0};
 	$toggle->signal_connect( clicked =>sub
@@ -1573,16 +1574,15 @@ my @MenuSubGroup=
 	  submenu => \@picsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{lpicsize}[$_[0]{depth}]},
 		test => sub { Songs::FilterListProp($_[0]{subfield},'picture'); }, },
 	{ label => _"text format",	code => sub { my $self=$_[0]{self}; $self->{lmarkup}[$_[0]{depth}]= $_[1]; $self->SetOption; },
-	  submenu => sub{	my $field= $_[0]{self}{field}[ $_[0]{depth} ];
-		  		my $gid=$_[0]{gidlist}[0]; return unless $gid; #FIXME option not shown when no gid is displayed, find a better way to display example format
+	  submenu => sub{	my $field= $_[0]{self}{type}[ $_[0]{depth} ];
+		  		my $gid= Songs::Get_gid($::SongID,$field); $gid=$gid->[0] if ref $gid;
+				return unless $gid;	# option not shown if no current song, FIXME could try to find a song in the library
 		  		return [ map { AA::ReplaceFields( $gid,$_,$field,::TRUE ), ($_ eq "%a" ? 0 : $_) } @MenuMarkupOptions ];
 	  		},	submenu_ordered_hash => 1, submenu_use_markup => 1,
 	  check => sub { $_[0]{self}{lmarkup}[$_[0]{depth}]}, istrue => 'aa', mode => 'LS', },
 	{ label => _"text mode",	code => sub { my $self=$_[0]{self}; $self->{mmarkup}=$_[1]; $self->SetOption; },
 	  submenu => [ 0 => _"None", below => _"Below", right => _"Right side", ], submenu_ordered_hash => 1, submenu_reverse => 1,
 	  check => sub { $_[0]{self}{mmarkup} }, mode => 'M', },
-	{ label => _"show the 'All' row",	code => sub { my $self=$_[0]{self}; $self->{noall}^=1; $self->SetOption; },
-	  check => sub { !$_[0]{self}{noall} }, mode => 'LS', },
 	{ label => _"picture size",	code => sub { $_[0]{self}->SetOption(mpicsize=>$_[1]);  },
 	  mode => 'M',
 	  submenu => \@mpicsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{mpicsize}}, istrue => 'aa' },
@@ -1602,7 +1602,7 @@ my @MenuSubGroup=
 	{ label => _"group by",
 	  code	=> sub { my $self=$_[0]{self}; my $d=$_[0]{depth}; $self->{type}[$d]=$self->{field}[$d].'.'.$_[1]; $self->Fill('rehash'); },
 	  check => sub { my $n=$_[0]{self}{type}[$_[0]{depth}]; $n=~s#^[^.]+\.##; $n },
-	  submenu=>sub { Songs::LookupCode( $_[0]{subfield}, 'subtypes_menu' ); }, submenu_reverse => 1,
+	  submenu=>sub { Songs::LookupCode( $_[0]{self}{field}[$_[0]{depth}], 'subtypes_menu' ); }, submenu_reverse => 1,
 	  #test => sub { $FilterList::Field{ $_[0]{self}{field}[$_[0]{depth}] }{types}; },
 	},
 	{ repeat => sub { map [\@MenuSubGroup, depth=>$_, mode => 'S', subfield => $_[0]{self}{field}[$_], ], 1..$_[0]{self}{depth}+1; },	mode => 'L',
@@ -1610,7 +1610,11 @@ my @MenuSubGroup=
 	{ label => _"cloud mode",	code => sub { my $self=$_[0]{self}; $self->set_mode(($self->{mode} eq 'cloud' ? 'list' : 'cloud'),1); },
 	  check => sub {$_[0]{mode} eq 'C'},	notmode => 'S', },
 	{ label => _"mosaic mode",	code => sub { my $self=$_[0]{self}; $self->set_mode(($self->{mode} eq 'mosaic' ? 'list' : 'mosaic'),1);},
-	  check => sub {$_[0]{mode} eq 'M'}, istrue => 'aa',	notmode => 'S', },
+	  check => sub {$_[0]{mode} eq 'M'},	notmode => 'S',
+	  test	=> sub { my $field=Songs::MainField($_[0]{self}{field}[0]); $field eq 'artist' || $field eq 'album' }, #FIXME use more generic test : does it have pictures
+	},
+	{ label => _"show the 'All' row",	code => sub { my $self=$_[0]{self}; $self->{noall}^=1; $self->SetOption; },
+	  check => sub { !$_[0]{self}{noall} }, mode => 'L', },
 );
 
 our @cMenu=
@@ -5479,6 +5483,7 @@ sub remove_column
 	my $cell= $self->{cells}[$cellnb];
 	splice @{$self->{cells}}, $cellnb, 1;
 	$self->{cols_changed}=1;
+	unless (@{$self->{cells}}) { $self->AddColumn('title'); } #to ensure there is at least 1 column
 	$self->update_columns if $self->{ready};
 }
 sub update_columns
