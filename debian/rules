@@ -19,8 +19,8 @@ install:
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/gmusicbrowser \
           docdir=$(CURDIR)/debian/gmusicbrowser/usr/share/doc/gmusicbrowser \
           menudir=$(CURDIR)/debian/gmusicbrowser/usr/share/menu
-	# menu needs an xpm instead of a png
-	dh_install debian/gmusicbrowser.xpm usr/share/pixmaps
+	# previously used xpm, switched to png
+	dh_install debian/gmusicbrowser.png usr/share/pixmaps
 	# docs are handled in binary-indep
 	rm $(CURDIR)/debian/gmusicbrowser/usr/share/doc/gmusicbrowser/*
 
