@@ -578,7 +578,7 @@ our %timespan_menu=
  track =>
  {	name	=> _"Track",	width => 40,	flags => 'garwesc',
 	id3v1	=> 5,		id3v2	=> 'TRCK',	vorbis	=> 'tracknumber',	ape	=> 'Track', ilst => "trkn",
-	type => 'integer',	displayformat => '%02d', bits => 8, edit_max => 255,
+	type => 'integer',	displayformat => '%02d', bits => 16, edit_max => 65535,
 	edit_order=> 20,	editwidth => 4,		letter => 'n',
  },
  disc =>
