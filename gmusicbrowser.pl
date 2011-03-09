@@ -567,9 +567,14 @@ sub superlc	##lowercase, normalize and remove accents/diacritics #not sure how g
 sub superlc_sort
 {	return sort {superlc($a) cmp superlc($b)} @_;
 }
-sub sorted_keys		#return keys of $hash sorted by $hash->{$_}{$sort_subkey} using superlc
+sub sorted_keys		#return keys of $hash sorted by $hash->{$_}{$sort_subkey} or by $hash->{$_} using superlc
 {	my ($hash,$sort_subkey)=@_;
-	return sort { superlc($hash->{$a}{$sort_subkey}) cmp superlc($hash->{$b}{$sort_subkey}) } keys %$hash;
+	if (defined $sort_subkey)
+	{	return sort { superlc($hash->{$a}{$sort_subkey}) cmp superlc($hash->{$b}{$sort_subkey}) } keys %$hash;
+	}
+	else
+	{	return sort { superlc($hash->{$a}) cmp superlc($hash->{$b}) } keys %$hash;
+	}
 }
 
 sub OneInCommon	#true if at least one string common to both list
