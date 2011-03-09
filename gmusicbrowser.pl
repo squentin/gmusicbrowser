@@ -567,9 +567,14 @@ sub superlc	##lowercase, normalize and remove accents/diacritics #not sure how g
 sub superlc_sort
 {	return sort {superlc($a) cmp superlc($b)} @_;
 }
-sub sorted_keys		#return keys of $hash sorted by $hash->{$_}{$sort_subkey} using superlc
+sub sorted_keys		#return keys of $hash sorted by $hash->{$_}{$sort_subkey} or by $hash->{$_} using superlc
 {	my ($hash,$sort_subkey)=@_;
-	return sort { superlc($hash->{$a}{$sort_subkey}) cmp superlc($hash->{$b}{$sort_subkey}) } keys %$hash;
+	if (defined $sort_subkey)
+	{	return sort { superlc($hash->{$a}{$sort_subkey}) cmp superlc($hash->{$b}{$sort_subkey}) } keys %$hash;
+	}
+	else
+	{	return sort { superlc($hash->{$a}) cmp superlc($hash->{$b}) } keys %$hash;
+	}
 }
 
 sub OneInCommon	#true if at least one string common to both list
@@ -5759,9 +5764,54 @@ sub PrefTags
 	my $id3v1encoding=NewPrefCombo(TAG_id3v1_encoding => \@Encodings, text => _"Encoding used for id3v1 tags :");
 	my $nowrite=NewPrefCheckButton(TAG_nowrite_mode => _"Do not write the tags", tip=>_"Will not write the tags except with the advanced tag editing dialog. The changes will be kept in the library instead.\nWarning, the changes for a song will be lost if the tag is re-read.");
 	my $noid3v1=NewPrefCheckButton(TAG_id3v1_noautocreate=> _"Do not create an id3v1 tag in mp3 files", tip=>_"Only affect mp3 files that do not already have an id3v1 tag");
+	my $updatetags= Gtk2::Button->new(_"Update tags...");
+	$updatetags->signal_connect(clicked => \&UpdateTags);
+	my $updatetags_box= Gtk2::HBox->new(0,0);
+	$updatetags_box->pack_start($updatetags,FALSE,FALSE,2);
 
-	$vbox->pack_start($_,FALSE,FALSE,1) for $warning,$checkv4,$checklatin1,$check_unsync,$id3v1encoding,$noid3v1,$nowrite;
+	$vbox->pack_start($_,FALSE,FALSE,1) for $warning,$checkv4,$checklatin1,$check_unsync,$id3v1encoding,$noid3v1,$nowrite,$updatetags_box;
 	return $vbox;
+}
+
+sub UpdateTags
+{	my $dialog=Gtk2::Dialog->new(_"Update tags", undef, [],
+		'gtk-ok' => 'ok',
+		'gtk-cancel' => 'none');
+	my $table=Gtk2::Table->new(2,2);
+	my %checks;
+	$checks{$_}= Songs::FieldName($_) for Songs::WriteableFields();
+	my $rowmax= (keys %checks)/3; #split in 3 columns
+	my $row=my $col=0;
+	for my $field (sorted_keys(\%checks))
+	{	my $check= Gtk2::CheckButton->new( $checks{$field} );
+		$checks{$field}=$check;
+		$table->attach_defaults($check,$col,$col+1,$row,$row+1);
+		$row++;
+		if ($row>=$rowmax) {$col++; $row=0}
+	}
+	my $label1= Gtk2::Label->new(_"Write value of selected fields in the tags. Useful for fields that were previously not written to tags, to make sure the current value is written.");
+	my $label2= Gtk2::Label->new(_"Selected songs to update :");
+	my $IDs;
+	$dialog->{label}= my $label3= Gtk2::Label->new(_("Whole library")."\n"._"Drag and drop songs here to replace the selection.");
+	$label3->set_justify('center');
+	$dialog->vbox->pack_start($_,FALSE,FALSE,4) for $label1, $table, $label2, $label3;
+	$_->set_line_wrap(1) for $label1, $label2, $label3;
+	$dialog->show_all;
+	::set_drag($dialog, dest => [::DRAG_ID,sub { my ($dialog,$type,@IDs)=@_; $IDs=\@IDs; $dialog->{label}->set_text( ::__('%d song','%d songs',scalar @IDs) ); }]);
+
+	$dialog->signal_connect( response => sub
+		{	my ($dialog,$response)=@_;
+			$IDs||= [@$::Library];
+			my @fields= sort grep $checks{$_}->get_active, keys %checks;
+			if ($response eq 'ok' && @fields && @$IDs)
+			{	$dialog->set_sensitive(0);
+				my $progressbar = Gtk2::ProgressBar->new;
+				$dialog->vbox->pack_start($progressbar, 0, 0, 0);
+				$progressbar->show_all;
+				Songs::UpdateTags($IDs,\@fields, progress => $progressbar, callback_finish=> sub {$dialog->destroy});
+			}
+			else {$dialog->destroy}
+		});
 }
 
 sub AskRenameFolder

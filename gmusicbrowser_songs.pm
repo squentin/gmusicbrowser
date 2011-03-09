@@ -1372,6 +1372,50 @@ sub Changed
 #	}
 #}
 
+sub UpdateTags
+{	my ($IDs,$fields,%opt)=@_;
+	if (@$IDs)
+	{	my $i=0; my $abort;
+		my $pid= ::Progress( undef, end=>scalar(@$IDs), abortcb=>sub {$abort=1}, widget =>$opt{progress}, title=>_"Writing tags");
+		my $errorsub=sub
+		 {	my $err= shift;
+			$err= $opt{error_prefix}. $err if $opt{error_prefix};
+			my $abortmsg=$opt{abortmsg};
+			$abortmsg||=_"Abort mass-tagging" if (@$IDs-$i)>1;
+			my $ret=::Retry_Dialog($err,$opt{window},$abortmsg);
+			if ($ret eq 'abort')
+			{	$opt{abortcb}() if $opt{abortcb};
+				$abort=1;
+			}
+			return $ret;
+		 };
+
+		Glib::Idle->add(sub
+		 {	my $ID= $IDs->[$i];
+			if (defined $ID)
+			{	my @modif;
+				for my $f (@$fields)
+				{	my $v= $Def{$f}{flags}=~m/l/ ? [Get_list($ID,$f)] : Get($ID,$f);
+					push @modif, $f,$v;
+				}
+				FileTag::Write($ID, \@modif, $errorsub);
+				#::IdleCheck($ID);
+			}
+			$i++;
+			if ($abort || $i>=@$IDs)
+			{	::Progress($pid, abort=>1);
+				$opt{callback_finish}() if $opt{callback_finish};
+				return 0;
+			}
+			::Progress( $pid, current=>$i );
+			return 1;
+		 });
+	}
+	else
+	{	$opt{callback_finish}() if $opt{callback_finish};
+	}
+}
+
 sub AddMissing	#FIXME if song in EstimatedLength, set length to 0
 {	my $IDs=$_[0];
 	push @Missing,@$IDs;
@@ -1761,6 +1805,9 @@ sub ListGroupTypes
 		push @ret, $val,$name;
 	}
 	return \@ret;
+}
+sub WriteableFields
+{	grep  $Def{$_}{flags}=~m/a/ && $Def{$_}{flags}=~m/w/, @Fields;
 }
 sub EditFields	#type is one of qw/single many per_id/
 {	my $type=$_[0];
