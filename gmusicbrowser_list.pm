@@ -7159,7 +7159,14 @@ sub line_draw
 sub pic_cached
 {	my ($arg,$file,$resize,$w,$h,$xpad,$ypad,$crop,$hide)=@_;
 	return undef,0 if $hide || !$file;
-	if ($resize) { $w-=2*$xpad; $h-=2*$ypad; $h=0 if $h<0; $w=0 if $w<0; $resize.="_$w"."_$h"; }
+	if (defined $w || defined $h)
+	{	if (defined $w)	{ $w-=2*$xpad; return undef,0 if $w<=0 }
+		else {$w=0; $resize='ratio'}
+		if (defined $h)	{ $h-=2*$ypad; return undef,0 if $h<=0 }
+		else {$h=0; $resize='ratio'}
+		$resize||='s';
+		$resize.="_$w"."_$h";
+	}
 	my $cached=GMB::Picture::load_skinfile($file,$crop,$resize);
 	return $cached||$resize, !$cached;
 }
