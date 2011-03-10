@@ -81,7 +81,7 @@ sub makeLockToggle
 sub make_sort_menu
 {	my $selfitem=$_[0];
 	my $songlist= $selfitem->isa('SongList::Common') ? $selfitem : ::GetSonglist($selfitem);
-	my $menu= ($selfitem->isa('Gtk2::MenuItem') && $selfitem->get_submenu) || Gtk2::Menu->new;
+	my $menu= ($selfitem->can('get_submenu') && $selfitem->get_submenu) || Gtk2::Menu->new;
 	my $menusub=sub { $songlist->Sort($_[1]) };
 	for my $name (sort keys %{$::Options{SavedSorts}})
 	{   my $sort=$::Options{SavedSorts}{$name};

@@ -2079,6 +2079,10 @@ our %Boxes=
 	{	New	=> sub { my $item=Gtk2::MenuItem->new($_[0]{label}); my $menu=Gtk2::Menu->new; $item->set_submenu($menu); return $item; },
 		Pack	=> sub { $_[0]->get_submenu->append($_[1]); },
 	},
+	BM	=>	#button menu
+	{	New	=> sub { Layout::ButtonMenu->new(@_); },
+		Pack	=> sub { $_[0]->append($_[1]); },
+	},
 	EB	=>
 	{	New	=> sub { my $self=Gtk2::Expander->new($_[0]{label}); $self->set_expanded($_[0]{expand}); $self->{SaveOptions}=sub { expand=>$_[0]->get_expanded; }; return $self; },
 		Pack	=> \&SimpleAdd,
@@ -3585,6 +3589,7 @@ use Gtk2;
 
 sub new
 {	my $opt=shift;
+	if ($opt->{button} && $opt->{updatemenu}) { return Layout::ButtonMenu->new($opt); }
 	my $self;
 	my $label= $opt->{label} || $opt->{text};
 	if ($opt->{togglewidget})	{ $self=Gtk2::CheckMenuItem->new($label); }
@@ -3632,6 +3637,46 @@ sub UpdateSubMenu
 	$self->{updatemenu}($self);
 	$menu->show_all;
 }
+
+package Layout::ButtonMenu;
+use base 'Gtk2::Button';
+
+sub new
+{	my ($class,$opt0)=@_;
+	my %opt= ( relief=>'none', size=> 'menu', text=>'', %$opt0 );
+	my $self= bless Gtk2::Button->new, $class;
+	my $child;
+	my $label= $opt{label} || $opt{text};
+	$child=Gtk2::Label->new($label) if length $label;
+	if ($opt{icon})
+	{	my $img= Gtk2::Image->new_from_stock($opt{icon},'menu');
+		if ($child)
+		{	my $hbox= Gtk2::HBox->new(0,4);
+			$hbox->pack_start($img,0,0,2);
+			$hbox->pack_start($child,0,0,2);
+			$child=$hbox;
+		}
+		$child||=$img;
+	}
+	$self->add($child) if $child;
+	$self->set_relief($opt{relief});
+	$self->{menu}=Gtk2::Menu->new;
+	$self->{menu}->attach_to_widget($self,undef);
+	$self->{updatemenu}=$opt{updatemenu};
+	$self->signal_connect(button_press_event => sub
+		{	my ($self,$event) = @_;
+			my $menu= $self->{menu};
+			if ($self->{updatemenu})
+			{	$menu->remove($_) for $menu->get_children;
+				$self->{updatemenu}($self);
+			}
+			$menu->show_all;
+			$menu->popup (undef, undef, \&::menupos, undef, $event->button, $event->time);
+		});
+	return $self;
+}
+sub append { $_[0]{menu}->append($_[1]) }
+sub get_submenu { $_[0]{menu} }
 
 package Layout::LabelToggleButtons;
 use base 'Gtk2::ScrolledWindow';
