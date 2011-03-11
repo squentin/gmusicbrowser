@@ -3649,7 +3649,7 @@ sub new
 	my $label= $opt{label} || $opt{text};
 	$child=Gtk2::Label->new($label) if length $label;
 	if ($opt{icon})
-	{	my $img= Gtk2::Image->new_from_stock($opt{icon},'menu');
+	{	my $img= Gtk2::Image->new_from_stock($opt{icon},$opt{size});
 		if ($child)
 		{	my $hbox= Gtk2::HBox->new(0,4);
 			$hbox->pack_start($img,0,0,2);
