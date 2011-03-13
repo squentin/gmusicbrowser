@@ -4703,6 +4703,7 @@ sub Fill
 	$self->{hsize}=$mpsize;
 	$self->{vsize}=$mpsize;
 
+	$self->{markup}= $self->{markup_pos}= '';
 	if ($filterlist->{mmarkup})
 	{	$self->{markup_pos}= $filterlist->{mmarkup};
 		$self->{markup}= my $markup= $self->{field} eq 'album'  ? "<small><b>%a</b></small>\n<small>%b</small>"
