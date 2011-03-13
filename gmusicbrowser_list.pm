@@ -4760,6 +4760,13 @@ sub scroll_event_cb
 	my $dir= ref $event ? $event->direction : $event;
 	$dir= $dir eq 'up' ? -1 : $dir eq 'down' ? 1 : 0;
 	return unless $dir;
+	if ($event->state >= 'control-mask')	# increase/decrease picture size
+	{	my $filterlist= ::find_ancestor($self,'FilterList');
+		my $size= $filterlist->{mpicsize} - 8*$dir;
+		return if $size<16 || $size>1024;
+		$filterlist->SetOption(mpicsize=>$size);
+		return 1;
+	}
 	my $adj=$self->{vscroll}->get_adjustment;
 	my $max= $adj->upper - $adj->page_size;
 	my $value= $adj->value + $dir* ($pageinc? $adj->page_increment : $adj->step_increment);
