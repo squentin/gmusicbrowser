@@ -1261,22 +1261,24 @@ sub New
 sub ReReadFile
 {	my ($ID,$force,$noremove)=@_;
 	my $file= GetFullFilename($ID);
-	if (-r $file)
+	if (-e $file)
 	{	my ($size1,$modif1)=Songs::Get($ID,qw/size modif/);
 		my ($size2,$modif2)=(stat $file)[7,9];
 		my $checklength= ($size1!=$size2 || ($force && $force==2)) ? 2 : 0;
 		return 1 unless $checklength || $force || $modif1!=$modif2;
 		my ($values,$estimated)=FileTag::Read($file,$checklength);
+		return unless $values;
 		$values->{size}=$size2;
 		$values->{modif}=$modif2;
 		my @changed=$DIFFsub->($ID,$values);
-		return unless @changed;warn "Changed fields : @changed";
+		return unless @changed;
+		warn "Changed fields : @changed" if $::debug;
 		::SongsChanged([$ID],\@changed);
 		my %changed; $changed{$_}=undef for @changed;
 		Changed(\%changed,[$ID]);
 	}
-	elsif (!$noremove)	#file not found/readable
-	{	warn "can't read file '$file'\n";
+	elsif (!$noremove)	#file not found
+	{	warn "can't find file '$file'\n";
 		::SongsRemove([$ID]);
 	}
 }
