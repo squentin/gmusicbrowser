@@ -37,9 +37,11 @@ sub Start
 	$can_actions=	grep $_ eq 'actions',	@caps;
 	set_actions();
 	::Watch($notify,'PlayingSong',\&Changed);
+	$::Command{PopupNotify}=[\&Changed,_"Popup notify window"];
 }
 sub Stop
 {	$notify=undef;
+	delete $::Command{PopupNotify};
 }
 
 sub prefbox
