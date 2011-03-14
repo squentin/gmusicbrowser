@@ -5515,6 +5515,7 @@ sub update_columns
 	$self->update_scrollbar;
 	delete $self->{queue};
 	$self->{view}->queue_draw;
+	$self->update_sorted_column;
 	$self->{headers}->update if $self->{headers};
 }
 sub set_head_columns
@@ -5719,6 +5720,7 @@ sub SongArray_changed_cb
 		$order[ $songarray->[$_] ]=$_ for reverse 0..$#$songarray; #reverse so that in case of duplicates ID, $order[$ID] is the first row with this $ID
 		my @IDs= map $oldarray->[$_], @selected;
 		@selected= map $order[$_]++, @IDs; # $order->[$ID]++ so that in case of duplicates ID, the next row (with same $ID) are used
+		$self->update_sorted_column;
 		$self->{headers}->update if $self->{headers}; #to update sort indicator
 		$$selected=''; vec($$selected,$_,1)=1 for @selected;
 		$self->{new_expand_state}=0;
@@ -5824,6 +5826,20 @@ sub SongArray_changed_cb
 	}
 	::HasChanged('Selection_'.$self->{group});
 	$self->Hide(!scalar @$songarray) if $self->{hideif} eq 'empty';
+}
+
+sub update_sorted_column
+{	my $self=shift;
+	my $sort= $self->{'sort'};
+	my $invsort= join ' ', map { s/^-// && $_ || '-'.$_ } split / /,$sort;
+	for my $cell (@{$self->{cells}})
+	{	my $s= $cell->{sort} || '';
+		my $arrow=	$s eq $sort	? 'down':
+				$s eq $invsort	? 'up'	:
+				undef;
+		if ($arrow)	{ $cell->{sorted}=$arrow; } # used by SongTree to draw background of cells differently for sorted column
+		else		{ delete $cell->{sorted}; } # and by SongTree::Headers to draw up/down arrow
+	}	
 }
 
 sub scroll_event_cb
@@ -5988,7 +6004,12 @@ sub expose_cb
 				  $width+=$self->{extra} if $cell->{last};
 				  my $clip=$expose->intersect( Gtk2::Gdk::Rectangle->new($x,$y,$width,$vsizesong) );
 				  if ($clip)
-				  {	my %arg=
+				  {	if ($cell->{sorted}) 	# if column is sorted, redraw background with '_sorted' hint
+					{	$style->paint_flat_box( $window,$state,'none',$expose,$self->{stylewidget},$detail.'_sorted',
+							$x,$y,$width,$vsizesong );
+					}
+
+					my %arg=
 					(state	=> $state,	self	=> $cell,	widget	=> $self,
 					 style	=> $style,	window	=> $window,	clip	=> $clip,
 					 ID	=> $ID,		firstrow=> $first,	lastrow => $last, row=>$row,
@@ -5998,6 +6019,7 @@ sub expose_cb
 					 odd	=> $odd,
 					 currentsong => ($::SongID && $ID==$::SongID && ($self->{mode} ne 'playlist' || !defined $::Position || $::Position==$row)),
 					);
+
 					my $q= $cell->{draw}(\%arg);
 					my $qid=$x.'s'.$y;
 					delete $self->{queue}{$qid};
@@ -6660,8 +6682,6 @@ sub update
 		$hbox->pack_end($button,0,0,0);
 		$button->{insertpos}=@{$songtree->{cells}};
 	}
-	my $sort=$songtree->{sort};
-	my $invsort= join ' ', map { s/^-// && $_ || '-'.$_ } split / /,$sort;
 	my $i=0;
 	for my $cell (@{$songtree->{cells}})
 	{	my $button=Gtk2::Button->new;
@@ -6669,13 +6689,10 @@ sub update
 		my $label=Gtk2::Label->new( $SongTree::STC{ $cell->{colid} }{title} );
 		$button->add($hbox2);
 		$hbox2->add($label);
-		if (defined (my $s=$cell->{sort}))
-		{	$button->{sort}=$s;
-			my $arrow=	$s eq $sort	? 'down':
-					$s eq $invsort	? 'up'	:
-					undef;
-			$hbox2->pack_end(Gtk2::Arrow->new($arrow,'in'),0,0,0) if $arrow;
+		if (my $arrow=$cell->{sorted})
+		{	$hbox2->pack_end(Gtk2::Arrow->new($arrow,'in'),0,0,0);
 		}
+		$button->{sort}=$cell->{sort};
 		$label->set_alignment(0,.5);
 		#FIXME	the drag_wins need to be destroyed, but this sometimes
 		#	create "GdkWindow  unexpectedly destroyed" warnings
