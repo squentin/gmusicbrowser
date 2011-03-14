@@ -1680,7 +1680,7 @@ sub new
 	%$opt=( @DefaultOptions, %$opt );
 	my @pids=split /\|/, $opt->{pages};
 	$self->{$_}=$opt->{$_} for qw/nb group min hidetabs tabmode/, grep(m/^activate\d?$/, keys %$opt);
-	$self->{main_opt}{$_}=$opt->{$_} for qw/group no_typeahead searchbox/; #options passed to children
+	$self->{main_opt}{$_}=$opt->{$_} for qw/group no_typeahead searchbox rules_hint/; #options passed to children
 	my $nb=$self->{nb};
 	my $group=$self->{group};
 
@@ -2051,11 +2051,9 @@ our %defaults=
 sub new
 {	my ($class,$field,$opt)=@_;
 	my $self = bless Gtk2::VBox->new, $class;
-	$self->{no_typeahead}=$opt->{no_typeahead};
-	$self->{rules_hint}=$opt->{rules_hint};
 
 	$opt= { %defaults, %$opt };
-	$self->{$_} = $opt->{$_} for qw/mode noall depth mmarkup mpicsize cloud_min cloud_max cloud_stat/;
+	$self->{$_} = $opt->{$_} for qw/mode noall depth mmarkup mpicsize cloud_min cloud_max cloud_stat no_typeahead rules_hint/;
 	$self->{$_} = [ split /\|/, $opt->{$_} ] for qw/sort type lmarkup lpicsize/;
 
 	$self->{type}[0] ||= $field.'.'.(Songs::FilterListProp($field,'type')||''); $self->{type}[0]=~s/\.$//;	#FIXME
