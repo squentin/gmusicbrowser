@@ -741,8 +741,8 @@ sub InitLayouts
 sub ReadLayoutFile
 {	my $file=shift;
 	my $path=$file; $path=~s#[^/]+$##;
-	return unless -f $file && -r $file;
-	open my$fh,"<:utf8",$file;
+	return unless -f $file;
+	open my$fh,"<:utf8",$file  or do { warn $!; return };
 	my $first;
 	while (1)
 	{	my ($next,$longline);
@@ -1729,7 +1729,7 @@ sub SaveWindowOptions
 	}
 	my $hidden=$self->{hidden};
 	if ($hidden && keys %$hidden)
-	{	$wstate{hidden}=join ':', %$hidden;
+	{	$wstate{hidden}= join '|', map { my $dim=$hidden->{$_}; $_.($dim ? ":$dim" : '') } sort keys %$hidden;
 	}
 	return \%wstate;
 }

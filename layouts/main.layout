@@ -24,7 +24,7 @@ TBRight		= _"Library" VPRight _"Context" Context
 HPmain		= VBLeft _TBRight
 VBmain		= HBmenu _HPmain Progress
 VolumeScroll	= VBplayer
-
+DefaultFocus	= Play
 
 [Small player]
 Type=G

@@ -19,9 +19,9 @@ sub new
 {   my ($class,$file,$findlength)=@_;
     my $self=bless {}, $class;
     local $_;
-    # check that the file exists and is readable
-    unless ( -e $file && -r $file )
-    {	warn "File '$file' does not exist or cannot be read.\n";
+    # check that the file exists
+    unless (-e $file)
+    {	warn "File '$file' does not exist.\n";
 	return undef;
     }
     $self->{filename} = $file;

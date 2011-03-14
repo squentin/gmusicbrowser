@@ -1682,7 +1682,7 @@ sub new
 	%$opt=( @DefaultOptions, %$opt );
 	my @pids=split /\|/, $opt->{pages};
 	$self->{$_}=$opt->{$_} for qw/nb group min hidetabs tabmode/, grep(m/^activate\d?$/, keys %$opt);
-	$self->{main_opt}{$_}=$opt->{$_} for qw/group no_typeahead searchbox/; #options passed to children
+	$self->{main_opt}{$_}=$opt->{$_} for qw/group no_typeahead searchbox rules_hint/; #options passed to children
 	my $nb=$self->{nb};
 	my $group=$self->{group};
 
@@ -2053,11 +2053,9 @@ our %defaults=
 sub new
 {	my ($class,$field,$opt)=@_;
 	my $self = bless Gtk2::VBox->new, $class;
-	$self->{no_typeahead}=$opt->{no_typeahead};
-	$self->{rules_hint}=$opt->{rules_hint};
 
 	$opt= { %defaults, %$opt };
-	$self->{$_} = $opt->{$_} for qw/mode noall depth mmarkup mpicsize cloud_min cloud_max cloud_stat/;
+	$self->{$_} = $opt->{$_} for qw/mode noall depth mmarkup mpicsize cloud_min cloud_max cloud_stat no_typeahead rules_hint/;
 	$self->{$_} = [ split /\|/, $opt->{$_} ] for qw/sort type lmarkup lpicsize/;
 
 	$self->{type}[0] ||= $field.'.'.(Songs::FilterListProp($field,'type')||''); $self->{type}[0]=~s/\.$//;	#FIXME
@@ -3474,7 +3472,7 @@ sub PopupSelectorMenu
 	}
 	my $item1=Gtk2::MenuItem->new(_"Select search fields");
 	$item1->set_submenu( ::BuildChoiceMenu(
-					{ map { $_=>Songs::FieldName($_) } Songs::StringFields(),qw/file path/,},
+					{ map { $_=>Songs::FieldName($_) } Songs::StringFields(),qw/file path year/,},
 					'reverse' =>1,
 					check=> sub { [split /\|/,$self->{fields}]; },
 					code => sub { $self->ToggleField($_[1]); },
@@ -4716,6 +4714,7 @@ sub Fill
 	$self->{hsize}=$mpsize;
 	$self->{vsize}=$mpsize;
 
+	$self->{markup}= $self->{markup_pos}= '';
 	if ($filterlist->{mmarkup})
 	{	$self->{markup_pos}= $filterlist->{mmarkup};
 		$self->{markup}= my $markup= $self->{field} eq 'album'  ? "<small><b>%a</b></small>\n<small>%b</small>"
@@ -4772,6 +4771,13 @@ sub scroll_event_cb
 	my $dir= ref $event ? $event->direction : $event;
 	$dir= $dir eq 'up' ? -1 : $dir eq 'down' ? 1 : 0;
 	return unless $dir;
+	if ($event->state >= 'control-mask')	# increase/decrease picture size
+	{	my $filterlist= ::find_ancestor($self,'FilterList');
+		my $size= $filterlist->{mpicsize} - 8*$dir;
+		return if $size<16 || $size>1024;
+		$filterlist->SetOption(mpicsize=>$size);
+		return 1;
+	}
 	my $adj=$self->{vscroll}->get_adjustment;
 	my $max= $adj->upper - $adj->page_size;
 	my $value= $adj->value + $dir* ($pageinc? $adj->page_increment : $adj->step_increment);
@@ -5530,6 +5536,7 @@ sub update_columns
 	$self->update_scrollbar;
 	delete $self->{queue};
 	$self->{view}->queue_draw;
+	$self->update_sorted_column;
 	$self->{headers}->update if $self->{headers};
 }
 sub set_head_columns
@@ -5734,6 +5741,7 @@ sub SongArray_changed_cb
 		$order[ $songarray->[$_] ]=$_ for reverse 0..$#$songarray; #reverse so that in case of duplicates ID, $order[$ID] is the first row with this $ID
 		my @IDs= map $oldarray->[$_], @selected;
 		@selected= map $order[$_]++, @IDs; # $order->[$ID]++ so that in case of duplicates ID, the next row (with same $ID) are used
+		$self->update_sorted_column;
 		$self->{headers}->update if $self->{headers}; #to update sort indicator
 		$$selected=''; vec($$selected,$_,1)=1 for @selected;
 		$self->{new_expand_state}=0;
@@ -5839,6 +5847,20 @@ sub SongArray_changed_cb
 	}
 	::HasChanged('Selection_'.$self->{group});
 	$self->Hide(!scalar @$songarray) if $self->{hideif} eq 'empty';
+}
+
+sub update_sorted_column
+{	my $self=shift;
+	my $sort= $self->{'sort'};
+	my $invsort= join ' ', map { s/^-// && $_ || '-'.$_ } split / /,$sort;
+	for my $cell (@{$self->{cells}})
+	{	my $s= $cell->{sort} || '';
+		my $arrow=	$s eq $sort	? 'down':
+				$s eq $invsort	? 'up'	:
+				undef;
+		if ($arrow)	{ $cell->{sorted}=$arrow; } # used by SongTree to draw background of cells differently for sorted column
+		else		{ delete $cell->{sorted}; } # and by SongTree::Headers to draw up/down arrow
+	}	
 }
 
 sub scroll_event_cb
@@ -6003,7 +6025,12 @@ sub expose_cb
 				  $width+=$self->{extra} if $cell->{last};
 				  my $clip=$expose->intersect( Gtk2::Gdk::Rectangle->new($x,$y,$width,$vsizesong) );
 				  if ($clip)
-				  {	my %arg=
+				  {	if ($cell->{sorted}) 	# if column is sorted, redraw background with '_sorted' hint
+					{	$style->paint_flat_box( $window,$state,'none',$expose,$self->{stylewidget},$detail.'_sorted',
+							$x,$y,$width,$vsizesong );
+					}
+
+					my %arg=
 					(state	=> $state,	self	=> $cell,	widget	=> $self,
 					 style	=> $style,	window	=> $window,	clip	=> $clip,
 					 ID	=> $ID,		firstrow=> $first,	lastrow => $last, row=>$row,
@@ -6013,6 +6040,7 @@ sub expose_cb
 					 odd	=> $odd,
 					 currentsong => ($::SongID && $ID==$::SongID && ($self->{mode} ne 'playlist' || !defined $::Position || $::Position==$row)),
 					);
+
 					my $q= $cell->{draw}(\%arg);
 					my $qid=$x.'s'.$y;
 					delete $self->{queue}{$qid};
@@ -6675,8 +6703,6 @@ sub update
 		$hbox->pack_end($button,0,0,0);
 		$button->{insertpos}=@{$songtree->{cells}};
 	}
-	my $sort=$songtree->{sort};
-	my $invsort= join ' ', map { s/^-// && $_ || '-'.$_ } split / /,$sort;
 	my $i=0;
 	for my $cell (@{$songtree->{cells}})
 	{	my $button=Gtk2::Button->new;
@@ -6684,13 +6710,10 @@ sub update
 		my $label=Gtk2::Label->new( $SongTree::STC{ $cell->{colid} }{title} );
 		$button->add($hbox2);
 		$hbox2->add($label);
-		if (defined (my $s=$cell->{sort}))
-		{	$button->{sort}=$s;
-			my $arrow=	$s eq $sort	? 'down':
-					$s eq $invsort	? 'up'	:
-					undef;
-			$hbox2->pack_end(Gtk2::Arrow->new($arrow,'in'),0,0,0) if $arrow;
+		if (my $arrow=$cell->{sorted})
+		{	$hbox2->pack_end(Gtk2::Arrow->new($arrow,'in'),0,0,0);
 		}
+		$button->{sort}=$cell->{sort};
 		$label->set_alignment(0,.5);
 		#FIXME	the drag_wins need to be destroyed, but this sometimes
 		#	create "GdkWindow  unexpectedly destroyed" warnings

@@ -3952,7 +3952,7 @@ sub ChoosePix
 	if ($response eq 'ok')
 	{	$ret= $dialog->get_uri;
 		$ret= $ret=~s#^file://## ? $ret=decode_url($ret) : undef;
-		unless (-r $ret) { warn "can't read $ret\n"; $ret=undef; }
+		unless (-e $ret) { warn "can't find $ret\n"; $ret=undef; }
 		$ret.=":$nb" if $nb;
 	}
 	elsif ($response eq 'reject') {$ret='0'}
@@ -8490,7 +8490,7 @@ sub load
 	return unless $file;
 
 	my $nb= $file=~s/:(\d+|\w+)$// ? $1 : undef;	#index number for embbeded pictures
-	unless (-r $file) {warn "$file not found\n"; return undef;}
+	unless (-e $file) {warn "$file not found\n"; return undef;}
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;
 	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
