@@ -1716,7 +1716,7 @@ sub SaveWindowOptions
 	}
 	my $hidden=$self->{hidden};
 	if ($hidden && keys %$hidden)
-	{	$wstate{hidden}=join ':', %$hidden;
+	{	$wstate{hidden}= join '|', map { my $dim=$hidden->{$_}; $_.($dim ? ":$dim" : '') } sort keys %$hidden;
 	}
 	return \%wstate;
 }
