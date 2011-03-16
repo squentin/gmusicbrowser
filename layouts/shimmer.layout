@@ -8,18 +8,18 @@ Author		= simon@shimmerproject.org
 ### main window containers: top bar, main and statusbar ###
 VBMain		= VBTop _HBMain
 HBMain		= VBLeft _HPRight
-VBTop		= 3Filler8 HBTop
-HBTop		= VBButtons _15VBPlayer 15ABToggle -5ABSettings
+VBTop		= HBTop
+HBTop		= ABButtons _15VBPlayer 15ABToggle -5ABSettings
 ### top bar from left to right ###
-VBButtons	= HBButtons 3Filler4
+ABButtons	= (yalign=0,yscale=0.0) HBButtons
 HBButtons	= Prev Play Next(click2=NextAlbum)
-VBPlayer	= HBTitle HBTimeSlider
+VBPlayer	= 1Filler0 HBTitle HBTimeSlider
 HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)",yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
-ABToggle	= (yalign=0.3,yscale=0.0) HBToggle
-HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=view-list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=view-mosaic,widget=VPMosaic,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=view-fullscreen,size=large-toolbar,tip="Fullscreen View") 15Filler2 ABSearchBox
-ABSearchBox	= (yalign=0.3) SimpleSearch(suggest=1)
-ABSettings	= (yalign=0.3,yscale=0.0) HBSettings
+ABToggle	= (yalign=0,yscale=0.0) HBToggle
+HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=gmb-view-list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=gmb-view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=gmb-view-mosaic,widget=VPMosaic,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=gmb-view-fullscreen,size=large-toolbar,tip="Fullscreen View") 15Filler2 ABSearchBox
+ABSearchBox	= (yalign=0) SimpleSearch(suggest=1)
+ABSettings	= (yalign=0,yscale=0.0) HBSettings
 HBSettings	= ExtraButtons(size=large-toolbar) BMSettings
 BMSettings	= (icon=gtk-preferences,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(click1=OpenCustom(Equalizer),label=_"Equalizer") SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="gtk-preferences") MenuItem05(command=Quit,label=_"Quit",icon="gtk-quit")
 SMLibrary	= (label=_"Library") MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Music",icon="gtk-add") MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="gtk-refresh")
