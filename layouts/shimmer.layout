@@ -40,6 +40,7 @@ VPMosaic	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_al
 ### positioning and sizing ###
 HSize0		= 350 NBList
 VSize0		= 350 HBCover
+DefaultFocus	= SimpleSearch
 
 [Shimmer Netbook]
 Type=G+
@@ -66,6 +67,7 @@ NBList		= (tabpos="bottom") HBSongListtree QueueList(songtree=1,tabtitle=_"Queue
 HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
 VBAbout		= (tabtitle=_"Info") _PluginArtistinfo
 HBSongListtree	= (tabtitle=_"Playlist") _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|Compact(picsize=50)|disc|discleft(width=15)",follow=1,sort="year album disc track")
+DefaultFocus	= Play
 
 # Trayicon-Layouts
 #####################################
