@@ -135,9 +135,9 @@ title = _"Rating"
 menutitle = _"Rating (picture)"
 sort = rating
 width=100
-#hreq = pic:h
-#pic : picture(file=ratingpic($rating),init_file=ratingpic(0))
-pic : picture(file=ratingpic($rating),h=$_h,w=$_w,resize='ratio',init_file=ratingpic(0))
+hreq = pic:h
+pic : picture(file=ratingpic($rating),init_file=ratingpic(0),x=pic:w)
+#pic : picture(file=ratingpic($rating),h=$_h,w=$_w,resize='ratio',init_file=ratingpic(0))
 
 {Column right_aligned_folder}
 menutitle = _"Folder (right-aligned)"
