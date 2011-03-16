@@ -3652,12 +3652,12 @@ sub UpdateSubMenu
 }
 
 package Layout::ButtonMenu;
-use base 'Gtk2::Button';
+use base 'Gtk2::ToggleButton';
 
 sub new
 {	my ($class,$opt0)=@_;
 	my %opt= ( relief=>'none', size=> 'menu', text=>'', %$opt0 );
-	my $self= bless Gtk2::Button->new, $class;
+	my $self= bless Gtk2::ToggleButton->new, $class;
 	my $child;
 	my $label= $opt{label} || $opt{text};
 	$child=Gtk2::Label->new($label) if length $label;
@@ -3684,8 +3684,10 @@ sub new
 				$self->{updatemenu}($self);
 			}
 			$menu->show_all;
+			$self->set_active(1);
 			$menu->popup (undef, undef, \&::menupos, undef, $event->button, $event->time);
 		});
+	$self->{menu}->signal_connect(deactivate => sub { my $self = shift; $self->get_attach_widget->set_active(0); } );
 	return $self;
 }
 sub append { $_[0]{menu}->append($_[1]) }
