@@ -6,8 +6,8 @@ Default		= Window(size=1000x750)
 Window		= hidden=HBSongPlaylist|VPMosaic
 Author		= simon@shimmerproject.org
 ### main window containers: top bar, main and statusbar ###
-VBMain		= VBTop _HBMain
-HBMain		= VBLeft _HPRight
+VBMain		= VBTop _HPMain
+HPMain		= VBLeft _HPRight
 VBTop		= HBTop
 HBTop		= ABButtons _15VBPlayer 10ABToggle -5ABSettings
 ### top bar from left to right ###
@@ -24,12 +24,13 @@ HBSettings	= ExtraButtons(size=large-toolbar) BMSettings
 BMSettings	= (icon=gtk-preferences,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(click1=OpenCustom(Equalizer),label=_"Equalizer",icon=gmb-equalizer) SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="gtk-preferences") MenuItem05(command=Quit,label=_"Quit",icon="gtk-quit")
 SMLibrary	= (label=_"Library") MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Music",icon="gtk-add") MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="gtk-refresh")
 ### main left: artist pane and album-cover ###
-VBLeft		= _NBList HBCover HBStatus
+VBLeft		= _VBListCover HBStatus
+VBListCover	= _NBList Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=1,maxsize=350)
 NBList		= (tabpos="bottom") VBArtist QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
 HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
 VBAbout		= (tabtitle=_"Info") _PluginArtistinfo
 VBArtist	= (tabtitle=_"Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1,lmarkup="<b>%a</b>%Y\x0a<small>%x / %s / <small>%l</small></small>")
-HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
+#HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
 HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=HBCover,tip=_"Show/Hide Cover")
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
@@ -38,8 +39,8 @@ HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year le
 VPMosaic	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
 ### bottom: statusbar ### Pref(size=small-toolbar,button=0)
 ### positioning and sizing ###
-HSize0		= 350 NBList
-VSize0		= 350 HBCover
+#HSize0		= 350 NBList
+#VSize0		= 350 HBCover
 DefaultFocus	= SimpleSearch
 
 [Shimmer Netbook]
