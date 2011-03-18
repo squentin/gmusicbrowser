@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (C) 2005-2010 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2011 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -70,8 +70,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1006',
- VERSIONSTRING => '1.1.6',
+ VERSION => '1.1007',
+ VERSIONSTRING => '1.1.7',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',

@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2011 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
