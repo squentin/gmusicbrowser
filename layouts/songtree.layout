@@ -11,27 +11,6 @@ title:	text(markup='<b><big>'.pesc($album).'</big></b>'. if($year,'\n'.pesc($yea
 pic:	aapic(y=title:y,picsize=picsize,ypad=2,xpad=1,aa='album')
 picsize : OptionNumber(default=50,min=20,max=1000,step=10)
 
-{Group discleft}
-title=disc on the left side
-head=3
-left=width
-vcollapse=head+title:h+line:h+2
-title:	text(markup='<b><big>'.pesc($title).'</big></b>'.if(!$_expanded,'<big><b>»</b></big>'),pad=2,w=left))
-width:	OptionNumber(default=15,min=10,max=100,step=1)
-line: line(x1=1,y1=1,x2=$_w,y2=1,color='#ccc',width=1)
-
-{Group artistalbum_breadcrumbs}
-title=album and artist breadcrumbs
-head=title:h
-tail=25
-vcollapse=head
-vmin=pic:y+pic:h+25
-left=pic:w+2
-title:	text(markup='<b><big>'.pesc($album).'</big></b>'. if($year,'  <big><b>«</b></big>  '.pesc($year)) . '  <big><b>«</b></big>  '.pesc($artist),pad=2)
-pic:	+aapic(y=title:h+title:y,picsize=picsize,ypad=2,xpad=1,aa='album')
-picsize : OptionNumber(default=100,min=20,max=1000,step=10)
-picstars : picture(file=ratingpic($rating_avrg),x=(picsize/2)-(picstars:w/2),y=pic:y+pic:h,hide=$rating_avrg==50 || picsize < 80)
-
 {Group pic}
 title= _"with picture"
 head=title:h
@@ -63,14 +42,6 @@ title:	text(markup='<b><big>'.pesc($album).'\n'.pesc($artist).'</big></b>',pad=2
 pic:	aapic(y=title:y + title:h +2, picsize=min(picsize,width), pad=2)
 width:	OptionNumber(default=200,min=20,max=1000,step=10)
 picsize : OptionNumber(default=100,min=20,max=1000,step=10)
-
-{Column RhythmboxQueue}
-menutitle = _"Rhythmbox 2nd queue column"
-title = _"Queue"
-hreq=text:h
-width=200
-sort= title:i
-text : text(markup=pesc($title).'\n<small>by <i>'.pesc($artist).'</i>\non <i>'.pesc($album).'</i></small>',pad=2)
 
 {Column testtitleandprogress}
 title= _"Title & progress"

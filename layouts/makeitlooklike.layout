@@ -361,3 +361,11 @@ VBMain = HBMenubar HBToolbar VBSliderbar
         -HBVolume
 
         HBVolume = VolumeIcon(size=menu,button=1)
+
+{Column RhythmboxQueue}
+menutitle = _"Rhythmbox 2nd queue column"
+title = _"Queue"
+hreq=text:h
+width=200
+sort= title:i
+text : text(markup=pesc($title).'\n<small>by <i>'.pesc($artist).'</i>\non <i>'.pesc($album).'</i></small>',pad=2)
