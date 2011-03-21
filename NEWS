@@ -1,3 +1,38 @@
+v1.1.7
+loads of small bug fixes and small new features (see git log for more details)
+some highlights :
+
+- add mpris2 plugin, makes gmb work with the SoundMenu in ubuntu natty
+- update artistinfo plugin
+- add "Update tags" button in Misc. tab (to force writing of values in gmb to the tags, particulary useful after enabling writing of a field in tags)
+- invert left and right-click behavior of Sort, Queue and Filter widgets (it is possible to configure a layout to have the old behavior)
+- add some default keyboard shortcuts : F11 for making the window fullscreen, ctr-q to save-and-quit, alt-q to enqueue songs (was previously ctrl-q)
+- add re-shuffle entry in sort menu when in shuffle mode
+- FilterPane : add option to sort by artist for albums
+- FilterPane mosaic : crtl-wheel increase/decrease picture size
+- rename album_artist field and allow sorting by it
+- add support for changing trayicon when playing or paused (with trayicon-play and trayicon-pause icons)
+- should correctly add songs on a network drive that were wrongly considered as not readable
+- increase the timeout when downloading a url
+- keep cover when renaming albums
+- increase limit for track value from 255 to 65535
+- fix some drawing artifacts with some widgets
+- small changes to google image search parameters and add a google image hi-res source
+
+new layout options :
+- split layouts file into songtree.layout and main.layout  default layouts are now read from layouts/*.layout
+- add BM container 'Button Menu', a button that pops-up a layout-defined menu
+- add option to change the icons of Buttons/Indicators that have different states such as Locks
+- add orientation=vertical option to EditListButtons
+- add tabpos option for FilterPane
+- add new icons mainly for use in layouts
+- add support for alpha-transparency in skins
+
+translations :
+update portuguese, czech and german
+add korean and russian
+(many thanks to the translators)
+
 v1.1.6
 loads of small bug fixes (see git log for more details)
 small change to gmbrc file (don't go back to a previous version or you will lose your artist/album pictures)
