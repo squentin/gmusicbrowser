@@ -8177,7 +8177,7 @@ sub makesub
 				{ $code=($inv ? '!':'').'exists $hashes['.$#hashes.']{$Songs[$_]['.$col.']}'; }
 				elsif ($cmd eq 'f' || $cmd eq '~')
 				{ my $sep=($cmd eq '~')? '$::re_artist' : '\x00';
-				  $code='do { my $r;exists($hashes['.$#hashes.']{$_}) and $r=1 and last for split /'.$sep.'/,$Songs[$_]['.$col.'];'.$inv.'$r;}';
+				  $code='do { my $r;exists($hashes['.$#hashes.']{$_}) and $r=1 and last for split /'.$sep.'/,$Songs[$_]['.$col.'];'.($inv ? '!':'').'$r;}';
 				}
 				$filter[$first]=$col.'c'.$code;
 			}
