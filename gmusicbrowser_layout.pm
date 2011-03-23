@@ -3058,12 +3058,15 @@ sub new
 	}
 	my $orientation= $opt->{vertical} ? 'bottom-to-top' : $opt->{horizontal} ? 'left-to-right' : $opt->{orientation} || 'left-to-right';
 	$self->set_orientation($orientation);
-	$self=Layout::Bar::skin->new($opt) if $opt->{skin};
+	if ($opt->{skin} && $opt->{handle_skin})
+	{	$self= Layout::Bar::skin->new($opt) || $self;  # warning : replace $self
+	}
 	$self->add_events([qw/pointer-motion-mask button-press-mask button-release-mask scroll-mask/]);
 	$self->signal_connect(button_press_event	=> \&button_press_cb);
 	$self->signal_connect(button_release_event	=> \&button_release_cb);
 	$self->signal_connect(scroll_event		=> \&scroll_cb);
-	$self->{left}=$self->{right}=0;
+	$self->{left} ||=0;
+	$self->{right}||=0;
 	$self->{max}= $ref->{max} || 1;
 	$self->{scroll}=$ref->{scroll};
 	$self->{set}=$ref->{set};
@@ -3168,6 +3171,11 @@ sub new
 	my $self=bless Gtk2::EventBox->new,$class;
 	my $hskin=$self->{handle_skin}=Skin->new($opt->{handle_skin},undef,$opt);
 	my $bskin=$self->{back_skin}=  Skin->new($opt->{skin},undef,$opt);
+	unless ($hskin && $bskin)
+	{	warn "Error loading background skin='$opt->{skin}'\n" unless $bskin;
+		warn "Error loading handle handle_skin='$opt->{skin}'\n" unless $hskin;
+		return;
+	}
 	my $resize=$bskin->{resize};
 	my ($left)= $resize=~m/l[es](\d+)/;
 	my ($right)=$resize=~m/r[es](\d+)/;
