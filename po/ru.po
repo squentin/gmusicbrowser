@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1006\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-02-27 21:12+0600\n"
-"PO-Revision-Date: 2011-02-27 21:36+0700\n"
+"POT-Creation-Date: 2011-03-26 14:10+0600\n"
+"PO-Revision-Date: 2011-03-27 19:31+0700\n"
 "Last-Translator: tin <girlwithoutadream@gmail.com>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -372,6 +372,9 @@ msgstr "Альбом и исполнитель слева"
 
 msgid "Album artist"
 msgstr "Исполнитель альбома"
+
+msgid "Album artist or artist"
+msgstr "Исполнитель альбома или исполнитель"
 
 msgid "Album gain"
 msgstr "Усиление альбома"
@@ -963,6 +966,9 @@ msgstr "Не показывать уведомление, когда главн�
 
 msgid "Don't submit current song"
 msgstr "Не отправлять текущую песню"
+
+msgid "Drag and drop songs here to replace the selection."
+msgstr "Перетащите песни сюда, чтобы заменить выделение."
 
 msgid "Edit Current Song Properties"
 msgstr "Править свойства текущей песни"
@@ -2031,6 +2037,9 @@ msgstr "Показать пользовательское всплывающее
 msgid "Popup Traytip"
 msgstr "Всплывающее уведомление"
 
+msgid "Popup notify window"
+msgstr "Показать окно уведомления"
+
 msgid "Popup playlist filter menu"
 msgstr "Показать меню фильтра списка воспроизведения"
 
@@ -2532,6 +2541,9 @@ msgstr "Выделено: "
 msgid "Selected songs"
 msgstr "Выделенные песни"
 
+msgid "Selected songs to update :"
+msgstr "Выделенные для обновления песни:"
+
 msgid "Selecting pictures"
 msgstr "Выбор изображений"
 
@@ -2624,7 +2636,7 @@ msgid "Show/Hide"
 msgstr "Показать/Скрыть"
 
 msgid "Show/Hide layout widget(s)"
-msgstr "Показать/Скрыть ______ виджет(ы)"
+msgstr "Показать/Скрыть виджет(ы)"
 
 msgid "Show/Hide lyrics line"
 msgstr "Показать/Скрыть строку текста песни"
@@ -2681,7 +2693,6 @@ msgstr "Свойства песни"
 msgid "Song rating"
 msgstr "Оценка песни"
 
-# ?
 msgid "SongTree groupings edition"
 msgstr "Правка группирования SongTree"
 
@@ -2748,7 +2759,6 @@ msgstr "Передаёт воспроизведённые песни на last.f
 msgid "Subtitle"
 msgstr "Подзаголовок"
 
-# ?
 msgid "Summary :"
 msgstr "Итог:"
 
@@ -2903,6 +2913,12 @@ msgstr "Безымянный фильтр"
 msgid "Untitled"
 msgstr "Без названия"
 
+msgid "Update tags"
+msgstr "Обновление тегов"
+
+msgid "Update tags..."
+msgstr "Обновить теги..."
+
 msgid "Upper left"
 msgstr "Верхний левый"
 
@@ -3054,6 +3070,9 @@ msgstr ""
 "При смене песни предыдущая песня добавляется в список последних, даже если "
 "она не воспроизводилась"
 
+msgid "Whole library"
+msgstr "Вся библиотека"
+
 msgid "Widget name"
 msgstr "Название виджета"
 
@@ -3084,6 +3103,13 @@ msgstr "Слова, начинающиеся с"
 
 msgid "Write filenames to ..."
 msgstr "Записать имена файлов в..."
+
+msgid ""
+"Write value of selected fields in the tags. Useful for fields that were "
+"previously not written to tags, to make sure the current value is written."
+msgstr ""
+"Записать значение отмеченных полей в теги. Полезно для полей, прежде не "
+"записанных в теги, чтобы убедиться, что текущее значение записано."
 
 msgid "Writing tags"
 msgstr "Записываются теги"
@@ -3401,7 +3427,6 @@ msgstr "первых добаленных"
 msgid "flags"
 msgstr "флаги"
 
-# ???
 msgid "float"
 msgstr "плавающая"
 
@@ -3622,7 +3647,6 @@ msgstr ""
 msgid "lead artist"
 msgstr "солист"
 
-# листочек :)
 msgid "leaflet page"
 msgstr "лист"
 
@@ -3919,7 +3943,6 @@ msgstr "похожие"
 msgid "similar artists"
 msgstr "похожие исполнители"
 
-# какого скина?
 msgid "skin options"
 msgstr "настройки скина"
 
