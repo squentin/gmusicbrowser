@@ -3431,7 +3431,13 @@ sub SaveOptions
 
 sub ClearFilter
 {	my $self=shift;
-	$self->set_text('');
+	my $event=Gtk2->get_current_event;
+	my $text='';
+	if ($event->isa('Gtk2::Gdk::Event::Button') && $event->button == 2) #paste clipboard if middle-click
+	{	my $clip= $self->get_clipboard(Gtk2::Gdk::Atom->new('PRIMARY',1))->wait_for_text;
+		$text=$1 if $clip=~m/([^\n\r]+)/;
+	}
+	$self->set_text($text);
 	$self->DoFilter;
 }
 sub UpdateClearButton
