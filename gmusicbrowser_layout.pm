@@ -1916,7 +1916,7 @@ sub new
 	$layout||=$::Options{LayoutT};
 	my $self=Layout::Window::new($class,$layout, wintype=>'popup', 'pos'=>undef, size=>undef, fallback=>'full with buttons', popped_from=>$widget);
 
-	if ($widget)
+	if ($widget)	#warning : widget can be a Gtk2::StatusIcon
 	{	::weaken( $widget->{PoppedUpWindow}=$self );
 		$self->set_screen($widget->get_screen);
 		#$self->set_transient_for($widget->get_toplevel);
@@ -1950,9 +1950,13 @@ sub init
 
 sub CheckCursor		# StartDestroy if popup is not ancestor of widget under cursor and cursor isn't grabbed (menu)
 {	my $self=shift;
-	$self->{check_timeout} ||= Glib::Timeout->add(1000, \&CheckCursor, $self);
+	$self->{check_timeout} ||= Glib::Timeout->add(800, \&CheckCursor, $self);
 
 	return 1 if $self->get_display->pointer_is_grabbed;	# to prevent destroying while a menu is open
+
+	if (my $sicon=$self->{popped_from})
+	{	return 1 if $sicon->isa('Gtk2::StatusIcon') && OnStatusIcon($sicon);	#check if pointer above statusicon
+	}
 
 	my ($gdkwin)=Gtk2::Gdk::Window->at_pointer;
 	my $widget= $gdkwin ? Glib::Object->new_from_pointer($gdkwin->get_user_data) : undef;
@@ -1967,6 +1971,14 @@ sub CheckCursor		# StartDestroy if popup is not ancestor of widget under cursor 
 	return 1
 }
 
+sub OnStatusIcon	#return true if pointer is above sicon
+{	my $sicon=shift;
+	my ($screen,$area)= $sicon->get_geometry;
+	my ($x,$y,$w,$h)= $area->values;
+	my ($pscreen,$px,$py)= $screen->get_display->get_pointer;
+	return $pscreen==$screen && $px>=$x && $px<=$x+$w && $py>=$y && $py<=$y+$h;
+}
+
 sub Position
 {	my $self=shift;
 	if ( my $widget= delete $self->{options}{popped_from})
@@ -1976,6 +1988,13 @@ sub Position
 	$self->SUPER::Position;
 }
 
+sub HoverPopup
+{	my $widget=shift;
+	delete $widget->{hover_timeout};
+	return 0 if $widget->isa('Gtk2::StatusIcon') && !OnStatusIcon($widget);	# for statusicon, don't popup if no longer above icon
+	Popup($widget);
+	0;
+}
 sub Popup
 {	my ($widget,$addtimeout)=@_;
 	my $self= $widget->{PoppedUpWindow};
@@ -1984,21 +2003,31 @@ sub Popup
 	return 0 unless $self;
 	$self->CancelDestroy;
 	$self->{destroy_timeout}=Glib::Timeout->add( $addtimeout,\&DestroyNow,$self) if $addtimeout;
+	$self->{check_timeout} ||= Glib::Timeout->add(400, \&CheckCursor, $self) if $widget->isa('Gtk2::StatusIcon') && !$addtimeout;
 	0;
 }
 
 sub set_hover
 {	my $widget=$_[0];
-	#$widget->add_events([qw/enter-notify-mask leave-notify-mask/]);
-	$widget->signal_connect(enter_notify_event =>
-	    sub	{ if (!$widget->{PoppedUpWindow})
-		  {	my $delay=$widget->{hover_delay}||1000;
-			$widget->{hover_timeout}||= Glib::Timeout->add($delay,\&Popup,$widget);
-		  }
-		  else {Popup($widget)}
-		  0;
-		});
-	$widget->signal_connect(leave_notify_event => \&CancelPopup );
+	if ($widget->isa('Gtk2::StatusIcon'))
+	{	$widget->set_has_tooltip(1);
+		$widget->signal_connect(query_tooltip => sub { return if $_[0]{hover_timeout}; &PreparePopup });
+	}
+	else
+	{	$widget->signal_connect(enter_notify_event => \&PreparePopup);
+		$widget->signal_connect(leave_notify_event => \&CancelPopup );
+	}
+}
+
+sub PreparePopup
+{	my $widget=shift;	#widget can be a statusicon
+	if (!$widget->{PoppedUpWindow})
+	{	my $delay=$widget->{hover_delay}||1000;
+		if (my $t=delete $widget->{hover_timeout})	{ Glib::Source->remove($t); }
+		$widget->{hover_timeout}= Glib::Timeout->add($delay,\&HoverPopup, $widget);
+	}
+	else {Popup($widget)}
+	0;
 }
 
 sub CancelPopup
