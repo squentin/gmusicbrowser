@@ -1944,15 +1944,34 @@ sub init
 		##$self->set_type_hint('notification'); #TEST
 		#$self->set_focus_on_map(0);
 		#$self->set_accept_focus(0); #?
-	$self->signal_connect(leave_notify_event => sub
-		{ $_[0]->StartDestroy if $_[1]->detail ne 'inferior';0; });
+	$self->signal_connect(leave_notify_event => sub	{ $_[0]->CheckCursor if $_[1]->detail ne 'inferior'; 0; });
 	$self->SUPER::init;
+}
+
+sub CheckCursor		# StartDestroy if popup is not ancestor of widget under cursor and cursor isn't grabbed (menu)
+{	my $self=shift;
+	$self->{check_timeout} ||= Glib::Timeout->add(1000, \&CheckCursor, $self);
+
+	return 1 if $self->get_display->pointer_is_grabbed;	# to prevent destroying while a menu is open
+
+	my ($gdkwin)=Gtk2::Gdk::Window->at_pointer;
+	my $widget= $gdkwin ? Glib::Object->new_from_pointer($gdkwin->get_user_data) : undef;
+	while ($widget)
+	{	$widget= ::find_ancestor($widget,'Layout::Window::Popup');
+		last unless $widget;
+		return 1 if $widget==$self;	# don't destroy if cursor is over child of self
+		$widget= $widget->{popped_from};# parent popup
+	}
+
+	$self->StartDestroy;
+	return 1
 }
 
 sub Position
 {	my $self=shift;
 	if ( my $widget= delete $self->{options}{popped_from})
-	{	return ::windowpos($self,$widget);
+	{	::weaken( $self->{popped_from}=$widget );
+		return ::windowpos($self,$widget);
 	}
 	$self->SUPER::Position;
 }
@@ -1985,16 +2004,19 @@ sub set_hover
 sub CancelPopup
 {	my $widget=shift;
 	if (my $t=delete $widget->{hover_timeout})	{ Glib::Source->remove($t); }
-	if (my $self=$widget->{PoppedUpWindow})		{ $self->StartDestroy }
+	if (my $self=$widget->{PoppedUpWindow})
+	{	$self->StartDestroy;
+		$self->{check_timeout} ||= Glib::Timeout->add(1000, \&CheckCursor, $self);
+	}
 }
 sub CancelDestroy
 {	my $self=shift;
 	if (my $t=delete $self->{destroy_timeout}) { Glib::Source->remove($t); }
+	if (my $t=delete $self->{check_timeout}) { Glib::Source->remove($t); }
 }
 sub StartDestroy
 {	my $self=shift;
-	return 0 if !$self || $self->{destroy_timeout};
-	$self->{destroy_timeout}=Glib::Timeout->add( 300,\&DestroyNow,$self);
+	$self->{destroy_timeout} ||= Glib::Timeout->add(300,\&DestroyNow,$self);
 	0;
 }
 sub DestroyNow
