@@ -610,8 +610,8 @@ our %timespan_menu=
 	 #is_set	=> '(__LABEL__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
 	type		=> 'flags',		init_namearray	=> '@{$::Options{Labels}}',
 	iconprefix	=> 'label-',
-	icon		=> sub { $Def{label}{iconprefix}.::url_escape($_[0]); }, #FIXME use icon_for_gid
-	icon_for_gid	=> '"#iconprefix#".::url_escape(#gid_to_get#)',
+	icon		=> sub { $Def{label}{iconprefix}.$_[0]; }, #FIXME use icon_for_gid
+	icon_for_gid	=> '"#iconprefix#".#gid_to_get#',
 	all_count	=> _"All labels",
 	none		=> quotemeta _"No label",
 	FilterList	=> {search=>1,icon=>1},
@@ -1004,7 +1004,7 @@ sub FilterCode
 	$code=~s/#ID#/\$_/g;
 	if ($inv)	{$code=~s#$Filter::OpRe#$Filter::InvOp{$1}#go}
 	else		{$code=~s#$Filter::OpRe#$1 eq '!!' ? '' : $1#ego}
-	if ($code=~m/#VAL1#/) { my ($p1,$p2)=map $convert->($_), split / /,$pat; $code=~s/#VAL1#/$p1/g; $code=~s/#VAL2#/$p2/g; }
+	if ($code=~m/#VAL1#/) { my ($p1,$p2)=sort { $a<=>$b } map $convert->($_), split / /,$pat; $code=~s/#VAL1#/$p1/g; $code=~s/#VAL2#/$p2/g; }
 	else { my $p=$convert->($pat,$field); $code=~s/#VAL#/$p/g; }
 	return $code;
 }
@@ -1738,7 +1738,7 @@ sub ChooseIcon	 #FIXME add a way to create a colored square/circle/... icon
 	return unless defined $file;
 	my $dir=$::HomeDir.'icons';
 	return if ::CreateDir($dir) ne 'ok';
-	my $destfile= $dir. ::SLASH. Picture($gid,$field,'icon');
+	my $destfile= $dir. ::SLASH. ::url_escape( Picture($gid,$field,'icon') );
 	unlink $destfile.'.svg',$destfile.'.png';
 	if ($file eq '0') {}	#unset icon
 	elsif ($file=~m/\.svg/i)

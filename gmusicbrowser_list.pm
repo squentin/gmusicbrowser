@@ -3434,7 +3434,13 @@ sub SaveOptions
 
 sub ClearFilter
 {	my $self=shift;
-	$self->set_text('');
+	my $event=Gtk2->get_current_event;
+	my $text='';
+	if ($event->isa('Gtk2::Gdk::Event::Button') && $event->button == 2) #paste clipboard if middle-click
+	{	my $clip= $self->get_clipboard(Gtk2::Gdk::Atom->new('PRIMARY',1))->wait_for_text;
+		$text=$1 if $clip=~m/([^\n\r]+)/;
+	}
+	$self->set_text($text);
 	$self->DoFilter;
 }
 sub UpdateClearButton
@@ -3559,10 +3565,12 @@ sub DoFilter
 		{	my $op=$op;
 			# for number fields, check if $string is a range :
 			if ($op eq 'e' && $s=~m/\.\.|^[^-]+\s*-[^-]*$/ && Songs::CanDoFilter('b',split /\|/, $fields))
-			{	$s=~m/(\d+\w*\s*)?(?:\.\.|-)(\s*\d+\w*)?/;
-				if (defined $1 && defined $2)		{ $op='b'; $s="$1 $2"; }
-				elsif (!defined $1 && defined $2)	{ $op='>'; $not=!$not; $s=$2; }
-				elsif (!defined $2 && defined $1)	{ $op='<'; $not=!$not; $s=$1; }
+			{	my ($s1,$s2);
+				if ($s=~m/\.\./) { ($s1,$s2)= split /\s*\.\.\s*/,$s,2; }
+				else { ($s1,$s2)= split /\s*-\s*/,$s,2; }
+				if (length $s1 && length $s2)		{ $op='b'; $s="$s1 $s2"; }
+				elsif (!length $s1 && length $s2)	{ $op='>'; $not=!$not; $s=$s2; }
+				elsif (!length $s2 && length $s1)	{ $op='<'; $not=!$not; $s=$s1; }
 				$not= $not ? '-' : '';
 			}
 			if ($self->{casesens})

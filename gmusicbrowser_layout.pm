@@ -1957,15 +1957,34 @@ sub init
 		##$self->set_type_hint('notification'); #TEST
 		#$self->set_focus_on_map(0);
 		#$self->set_accept_focus(0); #?
-	$self->signal_connect(leave_notify_event => sub
-		{ $_[0]->StartDestroy if $_[1]->detail ne 'inferior';0; });
+	$self->signal_connect(leave_notify_event => sub	{ $_[0]->CheckCursor if $_[1]->detail ne 'inferior'; 0; });
 	$self->SUPER::init;
+}
+
+sub CheckCursor		# StartDestroy if popup is not ancestor of widget under cursor and cursor isn't grabbed (menu)
+{	my $self=shift;
+	$self->{check_timeout} ||= Glib::Timeout->add(1000, \&CheckCursor, $self);
+
+	return 1 if $self->get_display->pointer_is_grabbed;	# to prevent destroying while a menu is open
+
+	my ($gdkwin)=Gtk2::Gdk::Window->at_pointer;
+	my $widget= $gdkwin ? Glib::Object->new_from_pointer($gdkwin->get_user_data) : undef;
+	while ($widget)
+	{	$widget= ::find_ancestor($widget,'Layout::Window::Popup');
+		last unless $widget;
+		return 1 if $widget==$self;	# don't destroy if cursor is over child of self
+		$widget= $widget->{popped_from};# parent popup
+	}
+
+	$self->StartDestroy;
+	return 1
 }
 
 sub Position
 {	my $self=shift;
 	if ( my $widget= delete $self->{options}{popped_from})
-	{	return ::windowpos($self,$widget);
+	{	::weaken( $self->{popped_from}=$widget );
+		return ::windowpos($self,$widget);
 	}
 	$self->SUPER::Position;
 }
@@ -1998,16 +2017,19 @@ sub set_hover
 sub CancelPopup
 {	my $widget=shift;
 	if (my $t=delete $widget->{hover_timeout})	{ Glib::Source->remove($t); }
-	if (my $self=$widget->{PoppedUpWindow})		{ $self->StartDestroy }
+	if (my $self=$widget->{PoppedUpWindow})
+	{	$self->StartDestroy;
+		$self->{check_timeout} ||= Glib::Timeout->add(1000, \&CheckCursor, $self);
+	}
 }
 sub CancelDestroy
 {	my $self=shift;
 	if (my $t=delete $self->{destroy_timeout}) { Glib::Source->remove($t); }
+	if (my $t=delete $self->{check_timeout}) { Glib::Source->remove($t); }
 }
 sub StartDestroy
 {	my $self=shift;
-	return 0 if !$self || $self->{destroy_timeout};
-	$self->{destroy_timeout}=Glib::Timeout->add( 300,\&DestroyNow,$self);
+	$self->{destroy_timeout} ||= Glib::Timeout->add(300,\&DestroyNow,$self);
 	0;
 }
 sub DestroyNow
@@ -3071,12 +3093,15 @@ sub new
 	}
 	my $orientation= $opt->{vertical} ? 'bottom-to-top' : $opt->{horizontal} ? 'left-to-right' : $opt->{orientation} || 'left-to-right';
 	$self->set_orientation($orientation);
-	$self=Layout::Bar::skin->new($opt) if $opt->{skin};
+	if ($opt->{skin} && $opt->{handle_skin})
+	{	$self= Layout::Bar::skin->new($opt) || $self;  # warning : replace $self
+	}
 	$self->add_events([qw/pointer-motion-mask button-press-mask button-release-mask scroll-mask/]);
 	$self->signal_connect(button_press_event	=> \&button_press_cb);
 	$self->signal_connect(button_release_event	=> \&button_release_cb);
 	$self->signal_connect(scroll_event		=> \&scroll_cb);
-	$self->{left}=$self->{right}=0;
+	$self->{left} ||=0;
+	$self->{right}||=0;
 	$self->{max}= $ref->{max} || 1;
 	$self->{scroll}=$ref->{scroll};
 	$self->{set}=$ref->{set};
@@ -3181,6 +3206,11 @@ sub new
 	my $self=bless Gtk2::EventBox->new,$class;
 	my $hskin=$self->{handle_skin}=Skin->new($opt->{handle_skin},undef,$opt);
 	my $bskin=$self->{back_skin}=  Skin->new($opt->{skin},undef,$opt);
+	unless ($hskin && $bskin)
+	{	warn "Error loading background skin='$opt->{skin}'\n" unless $bskin;
+		warn "Error loading handle handle_skin='$opt->{skin}'\n" unless $hskin;
+		return;
+	}
 	my $resize=$bskin->{resize};
 	my ($left)= $resize=~m/l[es](\d+)/;
 	my ($right)=$resize=~m/r[es](\d+)/;
