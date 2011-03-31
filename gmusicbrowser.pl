@@ -3215,7 +3215,7 @@ sub PopupAA
 		{ my %alb;
 		  $from=[$from] unless ref $from;
 		  for my $artist (@$from)
-		  {	push @{$alb{$_}},$artist for @{ AA::GetXRef(artist=>$artist) };  }
+		  {	push @{$alb{$_}},$artist for @{ AA::GetXRef(artists=>$artist) };  }
 		  #{	$alb{$_}=undef for @{ AA::GetXRef(artist=>$artist) };  }
 		  #@keys=keys %alb;
 		  my %art_keys;
