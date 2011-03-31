@@ -326,10 +326,13 @@ $HTTP_module=	-e $DATADIR.SLASH.'simple_http_wget.pm' && (grep -x $_.SLASH.'wget
 }
 
 our $CairoOK;
-our $Gtk2TrayIcon;
+my ($UseGtk2StatusIcon,$TrayIconAvailable);
 BEGIN
-{ eval { require Gtk2::TrayIcon; $Gtk2TrayIcon=1; };
-  if ($@) { warn "Gtk2::TrayIcon not found -> tray icon won't be available\n"; }
+{ if (*Gtk2::StatusIcon::set_has_tooltip{CODE}) { $TrayIconAvailable= $UseGtk2StatusIcon= 1; }
+  else
+  {	eval { require Gtk2::TrayIcon; $TrayIconAvailable=1; };
+	if ($@) { warn "Gtk2::TrayIcon not found -> tray icon won't be available\n"; }
+  }
   eval { require Cairo; $CairoOK=1; };
   if ($@) { warn "Cairo perl module not found -> transparent windows and other effects won't be available\n"; }
 }
@@ -1254,7 +1257,7 @@ Layout::InitLayouts;
 ActivatePlugin($_,'startup') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 
 CreateMainWindow( $CmdLine{layout}||$Options{Layout} );
-ShowHide(0) if $CmdLine{hide} || ($Options{StartInTray} && $Options{UseTray} && $Gtk2TrayIcon);
+ShowHide(0) if $CmdLine{hide} || ($Options{StartInTray} && $Options{UseTray} && $TrayIconAvailable);
 SkipTo($PlayTime) if $PlayTime; #done only now because of gstreamer
 
 CreateTrayIcon();
@@ -5716,7 +5719,7 @@ sub PrefLayouts
 					cb=> sub { &CreateTrayIcon; },
 					widget=> Vpack($checkT5,$checkT2,$checkT4,$checkT3)
 					);
-	$checkT1->set_sensitive($Gtk2TrayIcon);
+	$checkT1->set_sensitive($TrayIconAvailable);
 
 	#layouts
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
@@ -6670,8 +6673,12 @@ sub UpdateTrayIcon
 	$state='default' unless $TrayIcon{$state};
 	my $pb=$TrayIcon{$state};
 	if (!ref $pb) { $pb=$TrayIcon{$state}= eval {Gtk2::Gdk::Pixbuf->new_from_file($pb)}; }
-	$TrayIcon->child->child->set_from_pixbuf($pb);
+	my $widget= $TrayIcon->isa('Gtk2::StatusIcon') ? $TrayIcon : $TrayIcon->child->child;
+	$widget->set_from_pixbuf($pb);
 }
+
+sub Gtk2::StatusIcon::child {$_[0]}
+
 sub CreateTrayIcon
 {	if ($TrayIcon)
 	{	return if $Options{UseTray};
@@ -6679,26 +6686,35 @@ sub CreateTrayIcon
 		$TrayIcon=undef;
 		return;
 	}
-	elsif (!$Options{UseTray} || !$Gtk2TrayIcon)
-	 {return}
-	if (0) {&CreateTrayIcon_StatusIcon}
-	$TrayIcon= Gtk2::TrayIcon->new(PROGRAM_NAME);
-	my $eventbox=Gtk2::EventBox->new;
-	$eventbox->set_visible_window(0);
-	my $img=Gtk2::Image->new;
+	elsif (!$Options{UseTray} || !$TrayIconAvailable)	 {return}
 
-	Glib::Timeout->add(1000,sub {$TrayIcon->{respawn}=1 if $TrayIcon; 0;});
-	 #recreate Trayicon if it is deleted, for example when the gnome-panel crashed, but only if it has lived >1sec to avoid an endless loop
-	$TrayIcon->signal_connect(delete_event => sub
-		{	my $respawn=$TrayIcon->{respawn};
+	my $eventbox;
+	if ($UseGtk2StatusIcon)
+	{	$TrayIcon= $eventbox= Gtk2::StatusIcon->new;
+	}
+	else	# use Gtk2::TrayIcon
+	{	$TrayIcon= Gtk2::TrayIcon->new(PROGRAM_NAME);
+		$eventbox=Gtk2::EventBox->new;
+		$eventbox->set_visible_window(0);
+		my $img=Gtk2::Image->new;
+
+		Glib::Timeout->add(1000,sub {$TrayIcon->{respawn}=1 if $TrayIcon; 0;});
+		 #recreate Trayicon if it is deleted, for example when the gnome-panel crashed, but only if it has lived >1sec to avoid an endless loop
+		$TrayIcon->signal_connect(delete_event => sub
+		 {	my $respawn=$TrayIcon->{respawn};
 			$TrayIcon=undef;
 			CreateTrayIcon() if $respawn;
 			0;
-		});
+		 });
+		$eventbox->add($img);
+		$TrayIcon->add($eventbox);
+		Layout::Window::make_transparent($TrayIcon) if $CairoOK;
+		$TrayIcon->show_all;
+	}
 
-	$eventbox->add($img);
-	$TrayIcon->add($eventbox);
-	Layout::Window::make_transparent($TrayIcon) if $CairoOK; #Simon Steinbeiss: comment this line to make the trayicon transparent in xfce4-panel <=4.6, lxpanel and fluxbox
+	SetTrayTipDelay();
+	Layout::Window::Popup::set_hover($eventbox);
+
 	$eventbox->signal_connect(scroll_event => \&::ChangeVol);
 	$eventbox->signal_connect(button_press_event => sub
 		{	my $b=$_[1]->button;
@@ -6707,10 +6723,7 @@ sub CreateTrayIcon
 			else		{ ShowHide() }
 			1;
 		});
-	SetTrayTipDelay();
-	Layout::Window::Popup::set_hover($eventbox);
 
-	$TrayIcon->show_all;
 	UpdateTrayIcon(1);
 	Watch($TrayIcon, Playing=> sub { UpdateTrayIcon(); });
 }
@@ -6737,17 +6750,24 @@ sub windowpos	# function to position window next to clicked widget ($event can b
 	my $h=$win->size_request->height;		# height of window to position
 	my $w=$win->size_request->width;		# width of window to position
 	my $screen=$event->get_screen;
-	my $monitor=$screen->get_monitor_at_window($event->window);
+	my ($monitor,$x,$y,$dx,$dy);
+	if ($event->isa('Gtk2::StatusIcon'))
+	{	($x,$y,$dx,$dy)=($event->get_geometry)[1]->values; # position and size of statusicon
+		$monitor=$screen->get_monitor_at_point($x,$y);
+	}
+	else
+	{	$monitor=$screen->get_monitor_at_window($event->window);
+		($x,$y)=$event->window->get_origin;		# position of the clicked widget on the screen
+		($dx,$dy)=$event->window->get_size;		# width,height of the clicked widget
+		if ($event->isa('Gtk2::Widget') && $event->no_window)
+		{	(my$x2,my$y2,$dx,$dy)=$event->allocation->values;
+			$x+=$x2;$y+=$y2;
+		}
+	}
 	my ($xmin,$ymin,$monitorwidth,$monitorheight)=$screen->get_monitor_geometry($monitor)->values;
 	my $xmax=$xmin + $monitorwidth;
 	my $ymax=$ymin + $monitorheight;
 
-	my ($x,$y)=$event->window->get_origin;		# position of the clicked widget on the screen
-	my ($dx,$dy)=$event->window->get_size;		# width,height of the clicked widget
-	if ($event->isa('Gtk2::Widget') && $event->no_window)
-	{	(my$x2,my$y2,$dx,$dy)=$event->allocation->values;
-		$x+=$x2;$y+=$y2;
-	}
 	my $ycenter=0;
 	if ($x+$dx/2+$w/2 < $xmax && $x+$dx/2-$w/2 >$xmin){ $x-=int($w/2-$dx/2); }	# centered
 	elsif ($x+$dx+$w > $xmax)	{ $x=max($xmax-$w,$xmin) }		# right side
