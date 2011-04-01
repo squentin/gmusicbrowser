@@ -65,6 +65,7 @@ my @similarity=
 			ArtistPicSize	=> 100,
 			SimilarLimit	=> 15,
 			SimilarRating	=> 50,
+			SimilarLocal	=> 0,
 			Eventformat	=> '%title at %name<br>%startDate<br>%city (%country)<br><br>',
 			Eventformat_history => ['%title<br>%startDate<br><br>','%title on %startDate<br><br>'],
 );
@@ -232,6 +233,7 @@ sub prefbox
 	});
 	my $similar_limit=::NewPrefSpinButton(OPT.'SimilarLimit',0,500, step=>1, page=>10, text1=>_"Limit similar artists to the first : ", tip=>_"0 means 'show all'");
 	my $similar_rating=::NewPrefSpinButton(OPT.'SimilarRating',0,100, step=>1, text1=>_"Limit similar artists to a rate of similarity : ", tip=>_"last.fm's similarity categories:\n>90 super\n>70 very high\n>50 high\n>30 medium\n>10 lower");
+	my $similar_local=::NewPrefCheckButton(OPT.'SimilarLocal' => _"Only show similar artists from local library", tip=>_"applied on reload");
 	my $lastfm=::NewIconButton('plugin-artistinfo-lastfm',undef,sub { ::main::openurl("http://www.last.fm/music/"); },'none',_"Open last.fm website in your browser");
 	my $titlebox=Gtk2::HBox->new(0,0);
 	$titlebox->pack_start($picsize,1,1,0);
@@ -241,7 +243,7 @@ sub prefbox
 	my $frame_events=Gtk2::Frame->new(_"events");
 	$frame_events->add(::Hpack($eventformat,$eventformat_reset));
 	my $frame_similar=Gtk2::Frame->new(_"similar artists");
-	$frame_similar->add(::Vpack($similar_limit,$similar_rating));
+	$frame_similar->add(::Vpack($similar_limit,$similar_rating,$similar_local));
 	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$frame_bio,$frame_events,$frame_similar;
 	return $vbox;
 }
@@ -383,21 +385,24 @@ sub SongChanged
 	my $self=::find_ancestor($widget,__PACKAGE__);
 	my $ID = ::GetSelID($self);
 	$force = 0 unless $force;
-	$self -> ArtistChanged( Songs::Get_gid($ID,'artist'),$force);
+	$self -> ArtistChanged( Songs::Get_gid($ID,'artist'),Songs::Get_gid($ID,'album'),$force);
 }
 
 sub ArtistChanged
-{	my ($self,$aID,$force)=@_;
+{	my ($self,$aID,$albumID,$force)=@_;
 	return unless $self->mapped;
 	return unless defined $aID;
 	$self->cancel;
 	my $rating = AA::Get("rating:average",'artist',$aID);
+	#my $albumID = Songs::Get_gid($aID,'album');
 	$self->{artistratingvalue}= int($rating+0.5);
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
 	$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);
+	$self->{albumplaycount}=AA::Get("playcount:sum",'album',$albumID);
 	my $tip = join "\n",	_("Average rating:")	.' '.$self->{artistratingvalue},
 				_("Rating range:")	.' '.$self->{artistratingrange},
-				_("Total playcount:")	.' '.$self->{artistplaycount};
+				_("Artist playcount:")	.' '.$self->{artistplaycount},
+				_("Album playcount:")	.' '.$self->{albumplaycount};
 
 	$self->{artistrating}->set_from_pixbuf(Songs::Stars($self->{artistratingvalue},'rating'));
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($aID,"<big><b>%a</b></big>","artist",1) );
@@ -528,8 +533,11 @@ sub loaded
 				if ($aID) {
 					$stats=AA::ReplaceFields($aID,' <span foreground="'.$fgcolor.'">(%X « %s)</span>',"artist",1);
 					$s_artist{url} = "local";
+					$self->{store}->set($self->{store}->append,0,::PangoEsc($s_artist{name}).$stats,1,$s_artist{match} * 100,2,$s_artist{url},3,$aID,4,$s_artist{name});
 				}
-				$self->{store}->set($self->{store}->append,0,::PangoEsc($s_artist{name}).$stats,1,$s_artist{match} * 100,2,$s_artist{url},3,$aID,4,$s_artist{name});
+				elsif ($::Options{OPT.'SimilarLocal'} == 0) {
+					$self->{store}->set($self->{store}->append,0,::PangoEsc($s_artist{name}).$stats,1,$s_artist{match} * 100,2,$s_artist{url},3,$aID,4,$s_artist{name});
+				}
 			}
 
 		}
