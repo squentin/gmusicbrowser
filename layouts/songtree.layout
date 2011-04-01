@@ -1,16 +1,6 @@
 #SongTree Group & Columns definitions
 #####################################
 
-{Group Compact}
-title=Compact
-head=pic:h
-tail=25
-vcollapse=head
-vmin=pic:y+pic:h+25
-title:	text(markup='<b><big>'.pesc($album).'</big></b>'. if($year,'\n'.pesc($year)) . '\n'.pesc($artist),pad=2,x=pic:w)
-pic:	aapic(y=title:y,picsize=picsize,ypad=2,xpad=1,aa='album')
-picsize : OptionNumber(default=50,min=20,max=1000,step=10)
-
 {Group pic}
 title= _"with picture"
 head=title:h
@@ -51,20 +41,6 @@ songbl=text
 hreq=text:h
 progress: pbar( fill=$progress, hide=!$playing,y=1,h=-2)
 text: text(markup=playmarkup(pesc($title)))
-
-{Column queuenumber}
-menutitle = Queue-Item Number
-title = #
-width = 20
-text: text(markup=$queued, x=-text:w)
-
-{Column playandqueueandtrack}
-menutitle = Playing/Queue Icon or Track
-title = #
-width = 20
-sort = track
-ico:	icon(pad=2,icon=$playicon, hide= !$playing && !$queued)
-text:	text(markup=pesc($track.' '.$queued), hide= $playing || $queued)
 
 {Column playandqueue}
 menutitle = _"Playing and queue icons"
@@ -107,8 +83,8 @@ menutitle = _"Rating (picture)"
 sort = rating
 width=100
 hreq = pic:h
-pic : picture(file=ratingpic($rating),init_file=ratingpic(0),x=pic:w)
-#pic : picture(file=ratingpic($rating),h=$_h,w=$_w,resize='ratio',init_file=ratingpic(0))
+pic : picture(file=ratingpic($rating),init_file=ratingpic(0),x=($_w-pic:w)/2)
+#pic : picture(file=ratingpic($rating),h=$_h,w=$_w,resize='ratio',init_file=ratingpic(0)) ## scales the rating-stars
 
 {Column right_aligned_folder}
 menutitle = _"Folder (right-aligned)"

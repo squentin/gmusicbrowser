@@ -106,7 +106,7 @@ HBQueue		= 14_QueueList(group=1,songtree=1,cols="queuenumber titleaa",colwidth="
 HBSearch	= 4Filler3 6Label0(markup='<span size="xx-large" weight="ultrabold">«</span>') _SimpleSearch(suggest=1) 7Filler4
 KeyBindings	= Escape CloseWindow
 
-# Groups for Songtree
+# Groups and Columns for Songtree
 #####################################
 
 {Group discleft}
@@ -129,3 +129,27 @@ title:	text(markup='<b><big>'.pesc($album).'</big></b>'. if($year,'  <big><b>«<
 pic:	+aapic(y=title:h+title:y,picsize=picsize,ypad=2,xpad=1,aa='album')
 picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 picstars : picture(file=ratingpic($rating_avrg),x=(picsize/2)-(picstars:w/2),y=pic:y+pic:h,hide=$rating_avrg==50 || picsize < 80)
+
+{Group Compact}
+title=Compact
+head=pic:h
+tail=25
+vcollapse=head
+vmin=pic:y+pic:h+25
+title:	text(markup='<b><big>'.pesc($album).'</big></b>'. if($year,'\n'.pesc($year)) . '\n'.pesc($artist),pad=2,x=pic:w)
+pic:	aapic(y=title:y,picsize=picsize,ypad=2,xpad=1,aa='album')
+picsize : OptionNumber(default=50,min=20,max=1000,step=10)
+
+{Column queuenumber}
+menutitle = Queue-Item Number
+title = #
+width = 20
+text: text(markup=$queued, x=-text:w)
+
+{Column playandqueueandtrack}
+menutitle = Playing/Queue Icon or Track
+title = #
+width = 20
+sort = track
+ico:	icon(pad=2,icon=$playicon, hide= !$playing && !$queued)
+text:	text(markup=pesc($track.' '.$queued), hide= $playing || $queued)
