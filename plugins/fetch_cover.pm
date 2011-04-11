@@ -80,17 +80,12 @@ sub prefbox
 
 sub Fetch
 {	my ($field,$gid,$ID)=@_;
-	unless (defined $ID)
-	{	my $list= AA::GetIDs($field,$gid);
-		$ID=$list->[0];
-		return unless defined $ID;
-	}
 	my $mainfield=Songs::MainField($field);	#'artist' or 'album'
 	my $self=bless Gtk2::Window->new;
 	$self->set_border_width(4);
 	my $Bsearch=::NewIconButton('gtk-find',_"Search");
 	my $Bcur=Gtk2::Button->new($mainfield eq 'artist' ? _"Search for current artist" : _"Search for current album");
-	::set_drag($Bcur, dest =>	[::DRAG_ID, sub { $_[0]->get_toplevel->SearchID($_[2]); }], );
+	::set_drag($Bcur, dest =>	[::DRAG_ID, sub { $_[0]->get_toplevel->SearchID(undef,$_[2]); }], );
 	my $Bclose=Gtk2::Button->new_from_stock('gtk-close');
 	my @entry;
 	push @entry, $self->{"searchentry_$_"}=Gtk2::Entry->new for qw/s a l/;
@@ -118,7 +113,7 @@ sub Fetch
 	$Bstop->signal_connect( clicked => sub {$_[0]->get_toplevel->stop });
 	$Bclose->signal_connect(clicked => sub {$_[0]->get_toplevel->destroy});
 	$Bnext->signal_connect( clicked => sub {$_[0]->get_toplevel->NextPage});
-	$Bcur->signal_connect(clicked =>sub {$_[0]->get_toplevel->SearchID($::SongID)});
+	$Bcur->signal_connect(clicked =>sub {$_[0]->get_toplevel->SearchID(undef,$::SongID)});
 	$self->signal_connect( destroy => \&abort);
 	$self->signal_connect( unrealize => sub {$::Options{OPT.'winsize'}=join ' ',$_[0]->get_size; });
 
@@ -128,7 +123,7 @@ sub Fetch
 	$self->{mainfield}=$mainfield;
 	$self->{field}=$field;
 	$self->{site}=$::Options{OPT.'PictureSite_'.$mainfield};
-	$self->SearchID($ID);
+	$self->SearchID($gid,$ID);
 	$self->UpdateSite;
 }
 
@@ -149,12 +144,23 @@ sub UpdateSite
 }
 
 sub SearchID
-{	my ($self,$ID)=@_;
+{	my ($self,$gid,$ID)=@_;	#only one of $gid and $ID needs to be defined
 	$self=::find_ancestor($_[0],__PACKAGE__);
+	my $field= $self->{field};
+	if (!defined $ID)
+	{	return unless defined $gid;
+		my $list= AA::GetIDs($field,$gid);
+		$ID=$list->[0];
+		return unless defined $ID;
+	}
+	elsif (!defined $gid)
+	{	$gid= Songs::Get_gid($ID,$field);
+		$gid= $gid->[0] if ref $gid;	#for field like artists return an array of values, use first value
+	}
 
-	$self->{gid}= Songs::Get_gid($ID,$self->{field});
+	$self->{gid}= $gid;
 	$self->{dir}= Songs::Get($ID,'path');
-	my $search=my $name= Songs::Get($ID,$self->{field});
+	my $search=my $name= Songs::Gid_to_Get($field,$gid);
 	$search="\"$search\"" unless $search eq '';
 	my $albumname='';
 	my $artistname='';
