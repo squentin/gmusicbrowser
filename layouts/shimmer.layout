@@ -144,7 +144,7 @@ picsize : OptionNumber(default=50,min=20,max=1000,step=10)
 menutitle = Queue-Item Number
 title = #
 width = 20
-text: text(markup=$queued, x=-text:w)
+text: text(markup=$_row+1, x=-text:w)
 
 {Column playandqueueandtrack}
 menutitle = Playing/Queue Icon or Track
