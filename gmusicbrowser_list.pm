@@ -3425,7 +3425,7 @@ sub new
 sub SaveOptions
 {	my $self=$_[0];
 	my %opt=(fields => $self->{fields});
-	$opt{$_}=1 for grep $self->{$_}, keys %Options, keys %Options2;
+	$opt{$_}= $self->{$_} ? 1 : 0 for keys %Options, keys %Options2;
 	return \%opt;
 }
 
