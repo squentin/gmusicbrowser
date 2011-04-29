@@ -1012,14 +1012,14 @@ sub expose_cb
 sub query_tooltip_cb
 {	my ($tv, $x, $y, $keyb, $tooltip)=@_;
 	return 0 if $keyb;
-	my ($path, $column)=$tv->get_path_at_pos($x,$y);
+	my ($path, $column)=$tv->get_path_at_pos($tv->convert_widget_to_bin_window_coords($x,$y));
 	return 0 unless $path;
 	my ($row)=$path->get_indices;
 	my $self=::find_ancestor($tv,__PACKAGE__);
 	my $ID=$self->{array}[$row];
 	my $markup= ::ReplaceFieldsAndEsc($ID,$self->{rowtip});
 	$tooltip->set_markup($markup);
-	#$tv->set_tooltip_row($tooltip,$path); # => no tip displayed ! ?
+	$tv->set_tooltip_row($tooltip,$path);
 	1;
 }
 

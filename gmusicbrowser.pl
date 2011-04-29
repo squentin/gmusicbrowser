@@ -1698,6 +1698,7 @@ sub ReadOldSavedTags
 	$Options{LibraryPath}= delete $Options{Path};
 	$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2
 	$Options{Artists_split_re}= [ map { $artistsplit_old_to_new{$_}||$_ } grep $_ ne '$', split /\|/, delete $Options{ArtistSplit} ];
+	$Options{TrayTipDelay}&&=900;
 
 	Post_Options_init();
 
@@ -1844,6 +1845,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		{	$Options{Artists_split_re}= [ map { $artistsplit_old_to_new{$_}||$_ } grep $_ ne '$', split /\|/, delete $Options{ArtistSplit} ];
 		}
 		if ($oldversion<1.1007) { for my $re (@{$Options{Artists_split_re}}) { $re='\s*,\s+' if $re eq '\s*,\s*'; } }
+		if ($oldversion<1.1008) { my $d=$Options{TrayTipDelay}||0; $Options{TrayTipDelay}= $d==1 ? 900 : $d; }
 
 		Post_Options_init();
 
@@ -5187,6 +5189,7 @@ sub AboutDialog
 		'Portuguese : Gleriston Sampaio <gleriston_sampaio@hotmail.com>',
 		'Korean : bluealbum',
 		'Russian : tin',
+		'Italian : Michele Giampaolo',
 	);
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
@@ -5714,7 +5717,7 @@ sub PrefLayouts
 	my $checkT5=NewPrefCheckButton(StartInTray => _"Start in tray");
 	my $checkT2=NewPrefCheckButton(CloseToTray => _"Close to tray");
 	my $checkT3=NewPrefCheckButton(ShowTipOnSongChange => _"Show tray tip on song change", widget=>$traytiplength);
-	my $checkT4=NewPrefCheckButton(TrayTipDelay => _"Delay tray tip popup on mouse over", cb=>\&SetTrayTipDelay);
+	my $checkT4=NewPrefSpinButton('TrayTipDelay', 0,10000, step=>100, text1=> _"Delay before showing tray tip popup on mouse over :", text2=>'ms', cb=>\&SetTrayTipDelay);
 	my $checkT1=NewPrefCheckButton( UseTray => _"Show tray icon",
 					cb=> sub { &CreateTrayIcon; },
 					widget=> Vpack($checkT5,$checkT2,$checkT4,$checkT3)
@@ -6729,7 +6732,7 @@ sub CreateTrayIcon
 }
 sub SetTrayTipDelay
 {	return unless $TrayIcon;
-	$TrayIcon->child->{hover_delay}= $Options{TrayTipDelay} ? 900 : 1;
+	$TrayIcon->child->{hover_delay}= $Options{TrayTipDelay}||1;
 }
 sub TrayMenuPopup
 {	my $traytip=$TrayIcon->child->{PoppedUpWindow};
