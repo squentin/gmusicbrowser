@@ -3446,8 +3446,7 @@ sub UpdateClearButton
 sub ChangeOption
 {	my ($self,$key,$value)=@_;
 	$self->{$key}=$value;
-	$self->{last_filter}=undef;
-	$self->DoFilter;
+	$self->DoFilter unless $self->get_text eq '';
 }
 sub ToggleField
 {	my ($self,$field)=@_;
