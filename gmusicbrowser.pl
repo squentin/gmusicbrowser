@@ -8723,12 +8723,15 @@ package TextCombo;
 use base 'Gtk2::ComboBox';
 
 sub new
-{	my ($class,$list,$init,$sub) = @_;
+{	my ($class,$list,$init,$sub,%opt) = @_;
 	my $self= bless Gtk2::ComboBox->new, $class;
-	$self->build_store($list);
+	$self->build_store($list,%opt);
 	my $renderer=Gtk2::CellRendererText->new;
 	$self->pack_start($renderer,::TRUE);
 	$self->add_attribute($renderer, text => 0);
+	if ($opt{separator})	#rows with empty string in col 1 is separator
+	{	$self->set_row_separator_func(sub { $_[0]->get($_[1],1) eq ''; });
+	}
 	$self->set_cell_data_func($renderer,sub { my (undef,$renderer,$store,$iter)=@_; $renderer->set(sensitive=> ! $store->iter_n_children($iter) );  })
 		if $self->get_model->isa('Gtk2::TreeStore');	#hide title of submenus
 	$self->set_value($init);
@@ -8737,11 +8740,19 @@ sub new
 	return $self;
 }
 
-sub build_store
-{	my ($self,$list)=@_;
+sub build_store		#FIXME allow rebuilding store while keeping the value (and not calling the changed cb)
+{	my ($self,$list,%opt)=@_;
 	my $store= Gtk2::ListStore->new('Glib::String','Glib::String');
 	my $names=$list;
-	if (ref $list eq 'HASH')
+	if (ref $list eq 'ARRAY' && $opt{ordered_hash})
+	{	my $i=0;
+		my $array=$list;
+		$list=[]; $names=[];
+		while ($i<$#$array)
+		{	push @$list,$array->[$i++]; push @$names,$array->[$i++];
+		}
+	}
+	elsif (ref $list eq 'HASH')
 	{	my $h=$list;
 		$list=[]; $names=[];
 		for my $key (sort {::superlc($h->{$a}) cmp ::superlc($h->{$b})} keys %$h)
