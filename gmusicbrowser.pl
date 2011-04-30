@@ -7068,7 +7068,6 @@ sub new
 	my $store=Gtk2::TreeStore->new(('Glib::String')x4);
 	$self->{treeview}=
 	my $treeview=Gtk2::TreeView->new($store);
-	$treeview->set_reorderable(TRUE);
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes(
 		_("filters") => Gtk2::CellRendererText->new,
 		text => C_NAME) );
