@@ -27,14 +27,11 @@ our @MenuPlaying=
 
 sub makeFilterBox
 {	my $box=Gtk2::HBox->new;
-	my $FilterWdgt=FilterBox->new
-	( sub	{	my $filt=FilterBox::posval2filter(@_);
-			::SetFilter($box,$filt);
-		},
+	my $FilterWdgt=GMB::FilterBox->new
+	( sub	{ my $filt=shift; ::SetFilter($box,$filt); },
 	  undef,
-	  FilterBox::filter2posval('title:s:')
-	);
-	$FilterWdgt->addtomainmenu(_"edit ..." => sub
+	  'title:si:',
+		_"Edit filter..." => sub
 		{	::EditFilter($box,::GetFilter($box),undef,sub {::SetFilter($box,$_[0]) if defined $_[0]});
 		});
 	my $okbutton=::NewIconButton('gtk-apply',undef,sub {$FilterWdgt->activate},'none');
@@ -3105,7 +3102,7 @@ sub get_selected_filters
 	{	my ($name,$type,undef,$extra)=$store->get_value($store->get_iter($path));
 		next unless $type;
 		if ($type eq 'sfilter') {push @filters,$::Options{SavedFilters}{$name};}
-		elsif ($type eq 'slist'){push @filters,':l:'.$name;}
+		elsif ($type eq 'slist'){push @filters,'list:~:'.$name;}
 		elsif ($type eq 'play') {push @filters,_getplayfilter($extra);}
 	}
 	return undef unless @filters;
@@ -3512,100 +3509,28 @@ sub PopupSelectorMenu
 sub DoFilter
 {	my $self=shift;
 	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
-	my ($last_filter,$last_eq,@last_substr)= @{ delete $self->{last_filter} || [] };
-	my $search0=my $search= $self->get_text;
-	my $filter;
+	my $search= $self->get_text;
 
-	my (@filters,@or);
-	my ($now_eq,@now_substr);
-	while (length $search)
-	{	my $op= $self->{regexp} ? 'mi' : 's';
-		my $not=0;
-		my $fields=$self->{fields};
-		my @words;
-		if ($self->{literal})
-		{	push @words,$search;
-			$search='';
+	my $filter;
+	if (length $search)
+	{	if ($self->{literal})
+		{	my $op= $self->{regexp} ? ($self->{casesens} ? 'm' : 'mi') : ($self->{casesens} ? 's' : 'si');
+			my $fields=$self->{fields};
+			$filter= Filter->newadd(0, map($_.$op.$search, split /\|/, $self->{fields}) );
 		}
 		else
-		{	$search=~s/^\s+//;
-			if ($search=~s#^(?:\||OR)\s+##) { push @or, scalar @filters;next; }
-			$not=1 if $search=~s/^[-!]//;
-			$search=~s/^\\(?=[-!O|])//;
-			if ($search=~s#^([A-Za-z]\w*(?:\|[A-Za-z]\w*)*)?([:<>=~])##)
-			{	my $o= $2 eq ':' ? 's' : $2 eq '~' ? 'mi' : $2 eq '=' ? 'e' : $2; #FIXME use a hash ?
-				my $f= $1 || $fields;
-				if (Songs::CanDoFilter($o,split /\|/, $f))
-				{	$fields=$f;
-					$op=$o;
-				}
-				else {$search=$1.$2.$search;}
-			}
-			{	if ($search=~s#^(['"])(.+?)(?<!\\)\1((?<!\\)\||\s+|$)##)
-				{	push @words,$2;
-					redo if $3 eq '|';
-				}
-				elsif ($search=~s#^(\S.*?)((?<!\\)\||(?<!\\)\s+|$)##)
-				{	push @words,$1;
-					redo if $2 eq '|';
-				}
-			}
-			unless (@words) {push @filters,undef;next}
-			#warn "$_:$words[$_].\n" for 0..$#words;
-			s#\\([ "'|])#$1#g for @words;
+		{	$filter= Filter->new_from_smartstring($search,$self->{casesens},$self->{regexp},$self->{fields});
 		}
-
-		my $and= $not ? 1 : 0;
-		$not= $not ? '-' : '';
-		my @f;
-		for my $s (@words)
-		{	my $op=$op;
-			# for number fields, check if $string is a range :
-			if ($op eq 'e' && $s=~m/\.\.|^[^-]+\s*-[^-]*$/ && Songs::CanDoFilter('b',split /\|/, $fields))
-			{	my ($s1,$s2);
-				if ($s=~m/\.\./) { ($s1,$s2)= split /\s*\.\.\s*/,$s,2; }
-				else { ($s1,$s2)= split /\s*-\s*/,$s,2; }
-				if (length $s1 && length $s2)		{ $op='b'; $s="$s1 $s2"; }
-				elsif (!length $s1 && length $s2)	{ $op='>'; $not=!$not; $s=$s2; }
-				elsif (!length $s2 && length $s1)	{ $op='<'; $not=!$not; $s=$s1; }
-				$not= $not ? '-' : '';
-			}
-			if ($self->{casesens})
-			{	if ($op eq 's') {$op='S'} elsif ($op eq 'mi') {$op='m'}
-			}
-			push @f,Filter->newadd( $and,map "$not$_:$op:$s", split /\|/,$fields );
-			#@now_substr and $now_eq are for filter comparison->optimization
-			if ($op eq 's')
-			{	push @now_substr,$s;
-				$s='';
-			}
-			$now_eq.="$not$and$fields:$op:$s\x00";
-		}
-		push @filters, Filter->newadd(::FALSE,@f);
-		$now_eq="or(@or)".$now_eq."\x00";
-		while (@or)
-		{	my $first=my $last=pop @or;
-			$first=pop @or while @or && $or[-1]==$first-1;
-			$first-- if $first>0;
-			$last-- if $last>$#filters;
-			splice @filters,$first,1+$last-$first, Filter->newadd(::FALSE,@filters[$first..$last]) if $last>$first;
-		}
-		@filters=grep defined, @filters;
-
-		if (@filters)
-		{	$filter=Filter->newadd( ::TRUE,@filters );
-			if ($last_eq && !$self->{regexp} && $last_eq eq $now_eq && !grep index($now_substr[$_],$last_substr[$_])==-1, 0..$#now_substr )
-			{	#optimization : indicate that this filter will only match songs that match $last_filter
-				$filter->set_parent($last_filter);
-				#warn "----optimization : base results on previous filter results (if cached)\n";
-			}
-			$self->{last_filter}=[$filter,$now_eq,@now_substr];
-		}
+		# optimization : see if it can use previous search
+		my $last_filter= delete $self->{last_filter};
+		$filter->add_possible_superset($last_filter) if $last_filter;
+		$self->{last_filter}=$filter;
 	}
-	$filter||=Filter->new;
+	else { $filter= Filter->new }
+
 	::SetFilter($self,$filter,$self->{nb});
 	if ($self->{searchfb})
-	{	::HasChanged('SearchText_'.$self->{group},$search0); #FIXME
+	{	::HasChanged('SearchText_'.$self->{group},$search); #FIXME
 	}
 	$self->set_progress_fraction( !$filter->is_empty );  #used to set the background color
 }
@@ -3664,7 +3589,7 @@ sub UpdateSuggestionMenu
 	for my $field (qw/artists album genre label title/)
 	{	my $list;
 		if ($field eq 'title')
-		{	$list= Filter->new('title:s:'.$text)->filter;
+		{	$list= Filter->new('title:si:'.$text)->filter;
 			next unless @$list;
 			Songs::SortList($list,'-rating -playcount -lastplay');
 		}
@@ -3908,7 +3833,7 @@ sub EntryChanged_cb
 	my $text=$entry->get_text;
 	my $self=::find_ancestor($entry,__PACKAGE__);
 	if (!$force && 2>length $text) { $self->{songlist}->Empty }
-	else { $self->{songlist}->SetFilter( Filter->new('title:s:'.$text) ); }
+	else { $self->{songlist}->SetFilter( Filter->new('title:si:'.$text) ); }
 }
 
 package AASearch;

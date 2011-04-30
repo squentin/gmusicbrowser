@@ -70,8 +70,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1007',
- VERSIONSTRING => '1.1.7',
+ VERSION => '1.1007001',
+ VERSIONSTRING => '1.1.7.1',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
@@ -732,11 +732,11 @@ our %SIZEUNITS=
 		m => [1000000,_"MB"],
 );
 sub ConvertTime	# convert date pattern into nb of seconds
-{	my $pat=$_[0];
-	if ($pat=~m/(\d\d\d\d)-(\d\d?)-(\d\d?)/) { $pat=mktime(0,0,0,$3,$2-1,$1-1900); }
-	elsif ($pat=~m/(\d+(?:\.\d+)?)\s*([smhdwMy])/){ $pat=time-$1*$DATEUNITS{$2}[0];   }
-	else {$pat=~m/(\d+)/; $pat=$1||0}
-	return $pat;
+{	my ($date,$unit)= $_[0]=~m/^\s*(\d*)\s*([a-zA-Z]*)\s*$/;
+	return 0 unless $date;
+	if (my $ref= $DATEUNITS{$unit}) { $date*= $ref->[0] }
+	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
+	return time-$date;
 }
 sub ConvertSize
 {	my ($size,$unit)= $_[0]=~m/^\s*(\d*)\s*([a-zA-Z]*)\s*$/;
@@ -1382,13 +1382,6 @@ sub IsEventInNotebookTabs
 	return ($x1<$x && $x2>$x && $y1<$y && $y2>$y);
 }
 
-sub GetGenresList	#FIXME inline it or rename it
-{	return Songs::ListAll('genre');
-}
-sub SortedLabels	#FIXME inline it or rename it
-{	return Songs::ListAll('label');
-}
-
 sub TurnOff
 {	my $dialog=Gtk2::MessageDialog->new
 	(	$MainWindow,[qw/modal destroy-with-parent/],
@@ -1643,10 +1636,10 @@ sub FirstTime
 		_"50 Most Played"	=> 'playcount:h:50',
 		_"50 Last Played"	=> 'lastplay:h:50',
 		_"50 Last Added"	=> 'added:h:50',
-		_"Played Today"		=> 'lastplay:>:1d',
-		_"Added Today"		=> 'added:>:1d',
+		_"Played Today"		=> 'lastplay:>ago:1d',
+		_"Added Today"		=> 'added:>ago:1d',
 		_"played>4"		=> 'playcount:>:4',
-		_"not bootleg"		=> '-label:~:bootleg',
+		_"not bootleg"		=> 'label:-~:bootleg',
 	};
 	$_=Filter->new($_) for values %{ $Options{SavedFilters} };
 
@@ -1673,7 +1666,7 @@ my %artistsplit_old_to_new=	#for versions <= 1.1.5 : to upgrade old ArtistSplit 
 	'; *'	=> '\s*;\s*',
 	';'	=> '\s*;\s*',
 );
-			
+
 sub ReadOldSavedTags
 {	my $fh=$_[0];
 	while (<$fh>)
@@ -1771,7 +1764,7 @@ sub ReadOldSavedTags
 		{	$val=~s/((?:^|\x1D)-?)(\d+)?([^0-9()])/$1.(defined $2? Songs::FieldUpgrade($2) : '').":$3:"/ge;
 			$val=~s/((?:^|\x1D)-?(?:label|genre)):e:(?=\x1D|$)/$1:ecount:0/g;
 			$val=~s/((?:^|\x1D)-?(?:label|genre)):f:/$1:~:/g;
-			$Options{SavedFilters}{$key}=Filter->new($val);
+			$Options{SavedFilters}{$key}=Filter->new_from_string($val);
 		}
 		elsif ($1 eq 'S')
 		{	$Options{SavedSorts}{$key}=$val;
@@ -1790,7 +1783,7 @@ sub ReadOldSavedTags
 	if (my $f=delete $Options{LastPlayFilter})
 	{	if ($f=~s/^(filter|savedlist|list) //)
 		{	$Options{LastPlayFilter}=
-			$1 eq 'filter' ?	Filter->new($f) :
+			$1 eq 'filter' ?	Filter->new_from_string($f) :
 			$1 eq 'savedlist' ?	$f		:
 			$1 eq 'list' ?		SongArray->new_from_string($f):
 			undef;
@@ -1809,6 +1802,36 @@ sub ReadOldSavedTags
 	$Options{SongArray_Estimated}=SongArray->new($LengthEstimated);
 }
 
+sub Filter_new_from_string_with_upgrade	# for versions <=1.1.7
+{	my @filter=split /\x1D/,$_[1];
+	my @new;
+	for my $f (@filter)
+	{	if ($f=~m/^[()]/) { push @new,$f; next }
+		my ($field,$cmd,$pat)=split ':',$f,3;
+		if    ($cmd eq 's') {$cmd='si'}
+		elsif ($cmd eq 'S') {$cmd='s'}
+		elsif ($cmd eq 'l') { $field='list'; $cmd='e'; }
+		elsif ($field eq 'rating' && $cmd eq 'e') { $cmd='~'}
+		elsif ($cmd=~m/^[b<>]$/ && $field=~m/^-?lastplay$|^-?lastskip$|^-?added$|^-?modif$/)
+		{	if ($pat=~m/[a-zA-Z]/)
+			{	$cmd=	$cmd eq '<' ? '>ago' :
+					$cmd eq '>' ? '<ago' : 'bago';
+			}
+			else { $pat=~s/(\d\d\d\d)-(\d\d?)-(\d\d?)/mktime(0,0,0,$3,$2-1,$1-1900)/eg }
+		}
+		elsif ($cmd eq 'b')
+		{	my ($n1,$n2)= split / /,$pat;
+			if ($field=~s/^-//)	{ push @new, '(|', "$field:<:$n1",  "$field:->:$n2",')'; }
+			else			{ push @new, '(&', "$field:-<:$n1", "$field:<:$n2" ,')'; }
+			next
+		}
+		$cmd= '-'.$cmd if $field=~s/^-//;
+		push @new, "$field:$cmd:$pat";
+	}
+	my $string= join "\x1D", @new;
+	return Filter->new_from_string_real($string);
+}
+
 sub ReadSavedTags	#load tags _and_ settings
 {	my $LoadFile= $ImportFile || $SaveFile;
 	unless (-r $LoadFile && -s $LoadFile)
@@ -1820,11 +1843,18 @@ sub ReadSavedTags	#load tags _and_ settings
 	warn "Reading saved tags in $LoadFile ...\n";
 	open my($fh),'<:utf8',$LoadFile;
 
-	# read first line to determine if old version, old version starts with a letter, new with blank or # (for comments) or [ (section name)
+	# read first line to determine if old version, version >1.1.7 stars with "# gmbrc version=",  version <1.1 starts with a letter, else it's version<=1.1.7 (starts with blank or # (for comments) or [ (section name))
 	my $firstline=<$fh>;
-	seek $fh,0,SEEK_SET;
-	if ($firstline=~m/^\w/) { ReadOldSavedTags($fh); }
-	else
+	my $oldversion;
+	if ($firstline=~m/^#?\s*gmbrc version=(\d+\.\d+)/) { $oldversion=$1 }
+	elsif ($firstline=~m/^\w/) { seek $fh,0,SEEK_SET; ReadOldSavedTags($fh); $oldversion=1 }
+	else	# version <=1.1.7
+	{	seek $fh,0,SEEK_SET;
+		no warnings qw/redefine once/;
+		*Filter::new_from_string_real= \&Filter::new_from_string;
+		*Filter::new_from_string= \&Filter_new_from_string_with_upgrade;
+	}
+	if (!$oldversion || $oldversion>1) # version >=1.1
 	{	my %lines;
 		my $section='HEADER';
 		while (<$fh>)
@@ -1837,7 +1867,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		unless ($lines{Options}) { warn "Can't find Options section in '$LoadFile', it's probably not a gmusicbrowser save file -> aborting\n"; exit 1; }
 		SongArray::start_init(); #every SongArray read in Options will be updated to new IDs by SongArray::updateIDs later
 		ReadRefFromLines($lines{Options},\%Options);
-		my $oldversion=delete $Options{version} || VERSION;
+		$oldversion||=delete $Options{version} || VERSION;  # for version <=1.1.7
 		if ($oldversion<1.1007) {delete $Options{$_} for qw/Diacritic_sort gst_volume Simplehttp_CacheSize/;} #cleanup old options
 		$Options{AutoRemoveCurrentSong}= delete $Options{TAG_auto_check_current} if $oldversion<1.1005 && exists $Options{TAG_auto_check_current};
 		$Options{PlayedMinPercent}= 100*delete $Options{PlayedPercent} if exists $Options{PlayedPercent};
@@ -1940,6 +1970,8 @@ sub SaveTags	#save tags _and_ settings
 
 	my $error;
 	open my($fh),'>:utf8',$SaveFile.'.new' or warn "Error opening '$SaveFile.new' for writing : $!";
+	print $fh "# gmbrc version=".VERSION." time=".time."\n"  or $error||=$!;
+
 	my $optionslines=SaveRefToLines(\%Options);
 	print $fh "[Options]\n$$optionslines\n"  or $error||=$!;
 
@@ -4595,7 +4627,7 @@ sub EditLabels
 		$table->attach($check,$col,$col+1,$row,$row+1,['fill','expand'],'shrink',1,1);
 		$col++;
 	 };
-	$addlabel->($_) for @{SortedLabels()};
+	$addlabel->($_) for @{ Songs::ListAll('label') };
 	my $sw=Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('automatic','automatic');
@@ -6116,7 +6148,7 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 	    {	delete $ToDo{'9_Labels'};
 		$store->clear;
 		my $set=Songs::BuildHash('label');
-		for my $f (@{SortedLabels()})
+		for my $f (@{ Songs::ListAll('label') })
 		{	$store->set($store->append, 0,$f, 1,$set->{$f}||0, 2,'label-'.$f);
 		}
 	    };
@@ -7058,14 +7090,15 @@ use Gtk2;
 use base 'Gtk2::VBox';
 use constant
 {  TRUE  => 1, FALSE => 0,
-   C_NAME => 0,	C_POS => 1, C_VAL1 => 2, C_VAL2	=> 3,
+   C_NAME => 0,	C_FILTER => 1,
+   DEFAULT_FILTER => 'title:si:',
 };
 
 sub new
 {	my ($class,$dialog,$init) = @_;
 	my $self = bless Gtk2::VBox->new, $class;
 
-	my $store=Gtk2::TreeStore->new(('Glib::String')x4);
+	my $store=Gtk2::TreeStore->new(('Glib::String')x2);
 	$self->{treeview}=
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes(
@@ -7082,8 +7115,8 @@ sub new
 	$butadd2->signal_connect(clicked => \&Add_cb,$self);
 	$butrm->signal_connect(  clicked => \&Rm_cb, $self);
 	$butrm->set_sensitive(FALSE);
-	$butadd->{filter}='title:s:';
-	$butadd2->{filter}="(\x1Dtitle:s:\x1D)";
+	$butadd->{filter}= DEFAULT_FILTER;
+	$butadd2->{filter}="(\x1D".DEFAULT_FILTER."\x1D)";
 
 	$treeview->get_selection->signal_connect( changed => sub
 		{	my $sel=$_[0]->count_selected_rows;
@@ -7184,7 +7217,7 @@ sub Remove_path
 	my $oldpath=$store->get_path($iter);
 	$store->remove($iter);
 	# recreate a default entry if no more entry :
-	$self->Set('title:s:') unless $store->get_iter_first;
+	$self->Set(DEFAULT_FILTER) unless $store->get_iter_first;
 	return $oldpath;
 }
 
@@ -7200,7 +7233,7 @@ sub cursor_changed_cb
 	my $box;
 	if ($store->iter_has_child($iter))
 	{	$box=Gtk2::HBox->new;
-		my $state=$store->get($iter,C_POS);
+		my $state=$store->get($iter,C_FILTER);
 		my $group;
 		for my $ao ('&','|')
 		{	my $name=($ao eq '&')? _"All of :":_"Any of :";
@@ -7209,22 +7242,21 @@ sub cursor_changed_cb
 			$b->set_active(1) if $ao eq $state;
 			$b->signal_connect( toggled => sub
 			{	return unless $_[0]->get_active;
-				$store->set($iter,C_NAME,$name,C_POS,$ao);
+				$store->set($iter,C_NAME,$name,C_FILTER,$ao);
 			});
 			$box->add($b);
 		}
 	}
 	else
-	{	$box=FilterBox->new
+	{	$box=GMB::FilterBox->new
 		(	undef,
 			sub
 			{	warn "filter : @_\n" if $::debug;
-				my ($pos,@vals)=@_;
-				$store->set($iter,
-					C_NAME,FilterBox::posval2desc($pos,@vals),
-					C_POS,$pos,C_VAL1,$vals[0], C_VAL2,$vals[1]);
+				my $filter=shift;
+				my $desc= Filter::_explain_element($filter) || _("Unknown filter :")." '$filter'";
+				$store->set($iter, C_NAME, $desc, C_FILTER,$filter);
 			},
-			$store->get($iter,C_POS,C_VAL1,C_VAL2)
+			$store->get($iter,C_FILTER),
 		);
 	}
 	$fbox->add($box);
@@ -7244,9 +7276,9 @@ sub Set
 		my $parent=$store->iter_parent($iter);
 		if (!$parent && !$store->iter_has_child($iter)) #add a root
 		{	$parent=$store->prepend(undef);
-			$store->set($parent,C_NAME,_"All of :",C_POS,'&');
+			$store->set($parent,C_NAME,_"All of :",C_FILTER,'&');
 			my $new=$store->append($parent);
-			$store->set($new,$_,$store->get($iter,$_)) for C_NAME,C_POS,C_VAL1,C_VAL2;
+			$store->set($new,$_,$store->get($iter,$_)) for C_NAME,C_FILTER;
 			$store->remove($iter);
 			$iter=$parent;
 			$startpos='into-or-'.$startpos if $startpos;
@@ -7278,20 +7310,18 @@ sub Set
 		elsif ($f=~m/^\(/)	# '(|' or '(&'
 		{	$iter=&$createrowsub($iter);
 			my ($ao,$text)=($f eq '(|')? ('|',_"Any of :") : ('&',_"All of :");
-			$store->set($iter,C_NAME,$text,C_POS,$ao);
+			$store->set($iter,C_NAME,$text,C_FILTER,$ao);
 		}
 		else
 		{ next if $f eq '';
-		  my ($pos,@vals)=FilterBox::filter2posval($f);
-		  unless ($pos) { warn "Invalid filter : $f\n"; next; }
-		  my $leaf=&$createrowsub($iter);
+		  my $leaf= $createrowsub->($iter);
 		  $firstnewpath=$store->get_path($leaf) unless $firstnewpath;
-		  $store->set($leaf, C_NAME,FilterBox::posval2desc($pos,@vals),	C_POS,$pos, C_VAL1,$vals[0], C_VAL2,$vals[1]);
+		  $store->set($leaf, C_NAME, Filter::_explain_element($f), C_FILTER,$f);
 		}
 	}
 	unless ($store->get_iter_first)	#default filter if no/invalid filter
-	{	my ($pos,@vals)=FilterBox::filter2posval('title:s:');
-		$store->set($store->append(undef), C_NAME,FilterBox::posval2desc($pos,@vals),	C_POS,$pos, C_VAL1,$vals[0], C_VAL2,$vals[1]);
+	{	my $f= DEFAULT_FILTER;
+		$store->set($store->append(undef), C_NAME, Filter::_explain_element($f), C_FILTER,$f);
 	}
 
 	$firstnewpath||=Gtk2::TreePath->new_first;
@@ -7308,13 +7338,13 @@ sub Result
 	my $depth=0;
 	my $next=$startpath? $store->get_iter($startpath) : $store->get_iter_first;
 	while (my $iter=$next)
-	{	my ($pos,@vals)=$store->get($iter,C_POS,C_VAL1,C_VAL2);
+	{	my $elem=$store->get($iter,C_FILTER);
 		if ( $next=$store->iter_children($iter) )
-		{	$filter.="($pos\x1D" unless $store->iter_n_children($iter)<2;
+		{	$filter.="($elem\x1D" unless $store->iter_n_children($iter)<2;
 			$depth++;
 		}
 		else
-		{	$filter.=FilterBox::posval2filter($pos,@vals)."\x1D";
+		{	$filter.= $elem."\x1D";
 			last unless $depth;
 			$next=$store->iter_next($iter);
 		}
@@ -7851,445 +7881,215 @@ sub Result
 	return $sort;
 }
 
-package FilterBox;
+package GMB::FilterBox;
 use Gtk2;
 use base 'Gtk2::HBox';
 
-my (@FLIST,%TYPEREGEX,%ENTRYTYPE);
-my %PosRe;
+our (%ENTRYTYPE);
 
 INIT
-{ %TYPEREGEX=
-  (	s => '[^\x1D]*',
-	r => '[^\x1D]*',
-	n => '[0-9]*',
-	d => '(?:\d+)|(?:\d\d\d\d-\d\d?-\d\d?)',
-	a => '[-0-9]*[smhdwMy]',	#see %DATEUNITS
-	b => '[-0-9]*[bkm]',		#see %SIZEUNITS
-	l => '.+'
+{ %ENTRYTYPE=
+  (	substring=>'GMB::FilterEdit::String',
+	string	=> 'GMB::FilterEdit::String',
+	regexp	=> 'GMB::FilterEdit::String',
+	number	=> 'GMB::FilterEdit::Number',
+	value	=> 'GMB::FilterEdit::Number',
+	date	=> 'GMB::FilterEdit::Date',
+	ago	=> 'GMB::FilterEdit::Number',
+	listname=> 'GMB::FilterEdit::SavedListCombo',
+	combostring=> 'GMB::FilterEdit::Combo',
   );
-  %ENTRYTYPE=
-  (	s => 'FilterEntryString',
-	r => 'FilterEntryString',
-	n => 'FilterEntryNumber',
-	d => 'FilterEntryDate',
-	a => 'FilterEntryUnit',
-	b => 'FilterEntryUnit',
-	f => 'FilterEntryCombo',
-	g => 'FilterEntryCombo',
-	l => 'FilterEntryCombo',
-  );
-  @FLIST=
-  (	_"Title",
-	[	_"contains %s",		 'title:s:%s',
-		_"doesn't contain %s",	'-title:s:%s',
-		_"is %s",		 'title:~:%s',
-		_"is not %s",		'-title:~:%s',
-		_"match regexp %r",	 'title:m:%r',
-		_"doesn't match regexp %r",'-title:m:%r',
-	],
-	_"Artist",
-	[	_"contains %s",		 'artist:s:%s',
-		_"doesn't contain %s",	'-artist:s:%s',
-		_"is %s",		 'artist:~:%s',
-		_"is not %s",		'-artist:~:%s',
-		_"match regexp %r",	 'artist:m:%r',
-		_"doesn't match regexp %r",'-artist:m:%r',
-	],
-	_"Album",
-	[	_"contains %s",		 'album:s:%s',
-		_"doesn't contain %s",	'-album:s:%s',
-		_"is %s",		 'album:e:%s',
-		_"is not %s",		'-album:e:%s',
-		_"match regexp %r",	 'album:m:%r',
-		_"doesn't match regexp %r",'-album:m:%r',
-	],
-	_"Year",
-	[	_"is %n",	'year:e:%n',
-		_"isn't %n",	'-year:e:%n',
-		_"is before %n",'year:<:%n',
-		_"is after %n",	'year:>:%n',
-	],
-	_"Track",
-	[	_"is %n",		'track:e:%n',
-		_"is not %n",		'-track:e:%n',
-		_"is more than %n",	'track:>:%n',
-		_"is less than %n",	'track:<:%n',
-	],
-	_"Disc",
-	[	_"is %n",		'disc:e:%n',
-		_"is not %n",		'-disc:e:%n',
-		_"is more than %n",	'disc:>:%n',
-		_"is less than %n",	'disc:<:%n',
-	],
-	_"Rating",
-	[	_"is %n( %)",		'rating:e:%n',
-		_"is not %n( %)",	'-rating:e:%n',
-		_"is more than %n( %)",	'rating:>:%n',
-		_"is less than %n( %)",	'rating:<:%n',
-		_"is between %n( and )%n( %)",'rating:b:%n %n',
-	],
-	_"Length",
-	[	_"is more than %n( s)",		'length:>:%n',
-		_"is less than %n( s)",		'length:<:%n',
-		_"is between %n( and )%n( s)",	'length:b:%n %n',
-	],
-	_"Size",
-	[	_"is more than %b",		'size:>:%b',
-		_"is less than %b",		'size:<:%b',
-		_"is between %b( and )%b",	'size:b:%b %b',
-	],
-	_"played",
-	[	_"more than %n( times)",	'playcount:>:%n',
-		_"less than %n( times)",	'playcount:<:%n',
-		_"exactly %n( times)",		'playcount:e:%n',
-		_"exactly not %n( times)",	'-playcount:e:%n',
-		_"between %n( and )%n",		'playcount:b:%n %n',
-	],
-	_"skipped",
-	[	_"more than %n( times)",	'skipcount:>:%n',
-		_"less than %n( times)",	'skipcount:<:%n',
-		_"exactly %n( times)",		'skipcount:e:%n',
-		_"exactly not %n( times)",	'-skipcount:e:%n',
-		_"between %n( and )%n",		'skipcount:b:%n %n',
-	],
-	_"last played",
-	[	_"less than %a( ago)",	'lastplay:>:%a',
-		_"more than %a( ago)",	'lastplay:<:%a',
-		_"before %d",		'lastplay:<:%d',
-		_"after %d",		'lastplay:>:%d',
-		_"between %d( and )%d",	'lastplay:b:%d %d',
-		#_"on %d",		'lastplay:o:%d',
-	],
-	_"last skipped",
-	[	_"less than %a( ago)",	'lastskip:>:%a',
-		_"more than %a( ago)",	'lastskip:<:%a',
-		_"before %d",		'lastskip:<:%d',
-		_"after %d",		'lastskip:>:%d',
-		_"between %d( and )%d",	'lastskip:b:%d %d',
-		#_"on %d",		'lastskip:o:%d',
-	],
-	_"modified",
-	[	_"less than %a( ago)",	'modif:>:%a',
-		_"more than %a( ago)",	'modif:<:%a',
-		_"before %d",		'modif:<:%d',
-		_"after %d",		'modif:>:%d',
-		_"between %d( and )%d",	'modif:b:%d %d',
-		#_"on %d",		'modif:o:%d',
-	],
-	_"added",
-	[	_"less than %a( ago)",	'added:>:%a',
-		_"more than %a( ago)",	'added:<:%a',
-		_"before %d",		'added:<:%d',
-		_"after %d",		'added:>:%d',
-		_"between %d( and )%d",	'added:b:%d %d',
-		#_"on %d",		'added:o:%d',
-	],
-	_"The [most/less]",
-	[	_"%n most played",	'playcount:h:%n',
-		_"%n less played",	'playcount:t:%n',
-		_"%n last played",	'lastplay:h:%n',
-		_"%n not played for the longest time",	'lastplay:t:%n', #FIXME description
-		_"%n most skipped",	'skipcount:h:%n',
-		_"%n less skipped",	'skipcount:t:%n',
-		_"%n last skipped",	'lastskip:h:%n',
-		_"%n not skipped for the longest time",	'lastskip:t:%n',
-		_"%n longest",		'length:h:%n',
-		_"%n shortest",		'length:t:%n',
-		_"%n last added",	'added:h:%n',
-		_"%n first added",	'added:t:%n',
-		_"All but the [most/less]%n",
-		[	_"most played",		'-playcount:h:%n',
-			_"less played",		'-playcount:t:%n',
-			_"last played",		'-lastplay:h:%n',
-			_"not played for the longest time",	'-lastplay:t:%n',
-			_"most skipped",	'-skipcount:h:%n',
-			_"less skipped",	'-skipcount:t:%n',
-			_"last skipped",	'-lastskip:h:%n',
-			_"not skipped for the longest time",	'-lastskip:t:%n',
-			_"longest",		'-length:h:%n',
-			_"shortest",		'-length:t:%n',
-			_"last added",		'-added:h:%n',
-			_"first added",		'-added:t:%n',
-		],
-	],
-	_"Genre",
-	[	_"is %g",		'genre:~:%s',
-		_"isn't %g",		'-genre:~:%s',
-		_"contains %s",		'genre:s:%s',
-		_"doesn't contain %s",	'-genre:s:%s',
-		_"(: )none",		'genre:ecount:0',
-		_"(: )has one",		'-genre:ecount:0',
-	],
-	_"Label",
-	[	_"%f is set",		 'label:~:%s',
-		_"%f isn't set",	'-label:~:%s',
-		_"contains %s",		 'label:s:%s',
-		_"doesn't contain %s",	'-label:s:%s',
-		_"(: )none",		'label:ecount:0',
-		_"(: )has one",		'-label:ecount:0',
-	],
-	_"Filename",
-	[	_"contains %s",		 'file:s:%s',
-		_"doesn't contain %s",	'-file:s:%s',
-		_"is %s",		 'file:e:%s',
-		_"is not %s",		'-file:e:%s',
-		_"match regexp %r",		 'file:m:%r',
-		_"doesn't match regexp %r",	'-file:m:%r',
-	],
-	_"Folder",
-	[	_"contains %s",		 'path:s:%s',
-		_"doesn't contain %s",	'-path:s:%s',
-		_"is %s",		 'path:e:%s',
-		_"is not %s",		'-path:e:%s',
-		_"is in %s",		 'path:i:%s',
-		_"is not in %s",	'-path:i:%s',
-		_"match regexp %r",		 'path:m:%r',
-		_"doesn't match regexp %r",	'-path:m:%r',
-	],
-	_"Comment",
-	[	_"contains %s",		 'comment:s:%s',
-		_"doesn't contain %s",	'-comment:s:%s',
-		_"is %s",		 'comment:e:%s',
-		_"is not %s",		'-comment:e:%s',
-		_"match regexp %r",		 'comment:m:%r',
-		_"doesn't match regexp %r",	'-comment:m:%r',
-	],
-	_"Version",
-	[	_"contains %s",		 'version:s:%s',
-		_"doesn't contain %s",	'-version:s:%s',
-		_"is %s",		 'version:e:%s',
-		_"is not %s",		'-version:e:%s',
-		_"match regexp %r",		 'version:m:%r',
-		_"doesn't match regexp %r",	'-version:m:%r',
-	],
-	_"is in list %l",	 ':l:%l',
-	_"is not in list %l",	'-:l:%l',
-	_"file format",
-	[	_"is",
-		[	_"a mp3 file",		'filetype:m:^mp3',
-			_"an ogg file",		'filetype:m:^ogg',
-			_"a flac file",		'filetype:m:^flac',
-			_"a musepack file",	'filetype:m:^mpc',
-			_"a wavepack file",	'filetype:m:^wv',
-			_"an ape file",		'filetype:m:^ape',
-			_"mono",		'channel:e:1',
-			_"stereo",		'channel:e:2',
-		],
-		_"is not",
-		[	_"a mp3 file",		'-filetype:m:^mp3',
-			_"an ogg file",		'-filetype:m:^ogg',
-			_"a flac file",		'-filetype:m:^flac',
-			_"a musepack file",	'-filetype:m:^mpc',
-			_"a wavepack file",	'-filetype:m:^wv',
-			_"an ape file",		'-filetype:m:^ape',
-			_"mono",		'-channel:e:1',
-			_"stereo",		'-channel:e:2',
-		],
-		_"bitrate",
-		[	_"is %n(kbps)",		 'bitrate:e:%n',
-			_"isn't %n(kbps)",	'-bitrate:e:%n',
-			_"is more than %n(kbps)",'bitrate:>:%n',
-			_"is less than %n(kbps)",'bitrate:<:%n',
-		],
-		_"sampling rate",
-		[	_"is %n(Hz)",		 'samprate:e:%n',
-			_"isn't %n(Hz)",	'-samprate:e:%n',
-			_"is more than %n(Hz)",	 'samprate:>:%n',
-			_"is less than %n(Hz)",	 'samprate:<:%n',
-			_"is not 44.1kHz",	'-samprate:e:44100',
-		],
-	],
-  );
-  my @todo=(\@FLIST);
-  my @todopos=('');
-  while (my $ref=shift @todo)
-  {	my $pos=shift @todopos;
-	for (my $i=0; $ref->[$i]; $i+=2)
-	{ if (ref $ref->[$i+1] eq 'ARRAY')
-	  {	push @todo,$ref->[$i+1];
-		push @todopos,$pos.$i.' ';
-	  }
-	  else	#put in %PosRe a regex to find the value(s) and pos
-	  {	my $f=$ref->[$i+1];
-		my ($colcmd,$val)=$f=~m/^(-?\w*:[A-Za-z<>!~]\w*:)(.*)$/;
-		$val=~s/(\W)/\\$1/g;
-		$val=~s/\\%([a-z])/'('.$TYPEREGEX{$1}.')'/ge;
-		push @{ $PosRe{$colcmd} }, [qr/^$val$/, $pos.$i.' '];
-	  }
-	}
-  }
 }
 
 sub new
-{	my ($class,$activatesub,$changesub,$pos,@vals)=@_;#$init,$ao)=@_;
+{	my ($class,$activatesub,$changesub,$filter,@menu_append)=@_;
 	my $self = bless Gtk2::HBox->new, $class;
-#	$self->{init}=shift @$init;
-#	$self->{ao}=$ao;
-#	$self->{more}=$init;
-#	my $menu=$self->make_submenu(\@FLIST);
-#	Selected_cb($self->{item},$self);
-
-	#$self->makemenus;
-#	my ($pos,@vals)=filter2posval(shift @$init);
-	$self->Set($pos,@vals);
+	my ($field,$set)= split /:/,$filter,2;
+	my %fieldhash; $fieldhash{$_}= Songs::FieldName($_) for Songs::Fields_with_filter;
+	my @ordered_field_hash= map { $_,$fieldhash{$_} } ::sorted_keys(\%fieldhash);
+	if (@menu_append)
+	{	push @ordered_field_hash, '','';
+		my $n=0;
+		while (@menu_append)
+		{	my ($text,$sub)= splice @menu_append,0,2;
+			my $key= '@ACTION'.$n++;
+			$self->{$key}= $sub;
+			push @ordered_field_hash, $key,$text;
+		}
+	}
+	#FIXME add unknown $field ?
+	my $combo= TextCombo->new( \@ordered_field_hash, $field, \&field_changed_cb, ordered_hash=>1, separator=>1 );		#FIXME should be updated when fields_reset
+	$self->{fieldcombo}= $combo;
+	$self->pack_start($combo,0,0,0);
+	$self->Set(set=>"$field:$set");
 	$self->{activatesub}=$activatesub;
 	$self->{changesub}=$changesub;
 	return $self;
 }
 
-sub addtomainmenu
-{	my ($self,$label,$sub)=@_;
-	push @{$self->{append}},[$label,$sub];
-}
-
-sub filter2posval
-{	my $f=shift;
-	my ($colcmd,$val)=$f=~m/^(-?\w*:[A-Za-z<>!~]\w*:)(.*)$/;
-	my $aref=$PosRe{$colcmd};
-	for my $aref (@{ $PosRe{$colcmd} })
-	{	my ($re,$pos)=@$aref;
-		if (my @vals=$val=~m/$re/)
-		{	return $pos,@vals;
-		}
+sub field_changed_cb
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+	return if $self->{busy};
+	my $field= $self->{fieldcombo}->get_value;
+	if ($field=~m/^@/) #@ACTION
+	{	$self->{$field}->();
+		$self->{busy}=1;
+		$self->{fieldcombo}->set_value($self->{field});
+		delete $self->{busy};
+		return
 	}
-	return undef;	#not found
+	$self->Set(field=>$field);
 }
-
-sub posval2filter
-{	my ($pos,@vals)=@_;
-	my $ref=\@FLIST;
-	for my $i (split / /,$pos)
-	{	$ref=$ref->[$i+1];
-	}
-	my $filter=$ref;
-	$filter=~s/%[a-z]/shift @vals/ge;
-	return $filter;
-}
-
-sub posval2desc
-{	my ($pos,@vals)=@_;
-	my $string;
-	my $ref=\@FLIST;
-	for my $i (split / /,$pos)
-	{	$string.=$ref->[$i].' ';
-		$ref=$ref->[$i+1];
-	}
-	chop $string;
-	$string=~s/\[[^]]*\]//g;	#remove what is between []
-	$string=~tr/()//d;		#keep what is between ()
-	my $desc;
-	for my $s (split /(%[a-z])/,$string)
-	{	if ($s=~m/^%[a-z]/)
-		{	my $v=shift @vals;
-			if	($s eq '%a') { $v=~s/([smhdwMy])$/' '.$::DATEUNITS{$1}[1]/e }
-			elsif	($s eq '%b') { $v=~s/([bkm])$/    ' '.$::SIZEUNITS{$1}[1]/e }
-			elsif	($s eq '%d') { $v=localtime($v) if $v=~m/^\d+$/ }
-			$desc.=$v;
-		}
-		else {$desc.=$s;}
-	}
-	#$string=~s/%[a-z]/shift @vals/ge;
-	return $desc;
-}
-
-sub makemenu
-{	my ($self,$pos)=@_;
-	my $ref=\@FLIST; $pos=~s/^ //;
-	$ref=$ref->[$_+1] for split / /,$pos;
-	my $menu=Gtk2::Menu->new;
-	for (my $i=0; $ref->[$i]; $i+=2)
-	{	my $name=$ref->[$i];
-		$name=~s/\([^)]*\)//g;	#remove what is between ()
-		$name=~s/ ?%[a-z]//g; $name=~s/^ +//;
-		$name=~tr/[]//d;	#keep what is between []
-		my $item=Gtk2::MenuItem->new($name);
-		$item->{'pos'}=$pos.$i.' ';
-		$menu->append($item);
-		if (ref $ref->[$i+1] eq 'ARRAY')
-		{	my $submenu= $self->makemenu($pos.$i.' ');
-			$item->set_submenu($submenu);
-		}
-		else
-		{	$item->signal_connect(activate => \&Selected_cb,$self);
-		}
-	}
-	if ($pos eq '') #main menu
-	{	for my $aref (@{$self->{append}})
-		{	my ($label,$sub)=@$aref;
-			my $item=Gtk2::MenuItem->new($label);
-			$item->signal_connect(activate => $sub,$self);
-			$menu->append($item);
-		}
-	}
-	return $menu;
-}
-
-sub Selected_cb
-{	#my $self=my $item=$_[0];
-	#until ($self->isa(__PACKAGE__))
-	#{	if ($self->isa('Gtk2::Menu')) {$self=$self->get_attach_widget}
-	#	else {$self=$self->parent}warn $self;
-	#	return unless $self;
-	#}
-	my ($item,$self)=@_;
-	$self->Set($item->{'pos'});
-}
-
-sub Get
-{	my $self=shift;
-	my @vals;
-	push @vals,$_->Get for @{ $self->{entry} };
-	return $self->{'pos'},@vals;
+sub cmd_changed_cb
+{	my ($item,$cmd)=@_;
+	my $self= ::find_ancestor($item,__PACKAGE__);
+	$self->Set(cmd=>$cmd);
 }
 
 sub Set
-{	my ($self,$pos,@vals)=@_;
-	$self->{'pos'}=$pos;
-	if ($self->{entry} && !@vals)
-	{	for my $entry ( @{$self->{entry}} )
-		{ push @vals,$entry->Get };
+{	my ($self,$action,$newvalue)=@_;
+	my %previous;
+	if (my $w=delete $self->{w_invert})
+	{	$previous{inv}= $w->get_active;
 	}
-	$self->{entry}=[];
-	$self->remove($_) for $self->get_children;
-	my $menu='';
-	my $ref=\@FLIST;
-	for my $i (split / /,$pos)
-	{	my $string=$ref->[$i];
-		$string=~s/\[[^]]*\]//g;
-		$string=~tr/()//d;
-		my $first=1;
-		for my $s (split /(%[a-z])/,$string)
-		{	my $widget;
-			if ($s=~m/^%([a-z])$/)
-			{	$widget=$ENTRYTYPE{$1}->new(\&activate,\&changed,(shift @vals),$1);
-				push @{ $self->{entry} },$widget;
-				#$widget->Set( shift @vals ) if @vals;
-			}
-			elsif ($first && $s ne '')
-			{	$widget=Gtk2::Button->new($s);
-				$widget->set_relief('none');
-				$widget->signal_connect( button_press_event => \&button_press_cb,$menu);
-				$first=undef;
-			}
-			else
-			{	$widget=Gtk2::Label->new($s);
-			}
-			$self->pack_start($widget,::FALSE,::FALSE, 0);
+	if (my $w=delete $self->{w_pattern})
+	{	if (ref $w)
+		{	$previous{pattern}= [map $_->Get,@$w];
+			$previous{editwidget}= [map ref, @$w];
 		}
-		$menu.=$i.' ';
-		$ref=$ref->[$i+1];
 	}
+	if (my $w=delete $self->{w_icase})
+	{	$previous{icase}= $w->get_active;
+	}
+	$self->remove($_) for grep $_ != $self->{fieldcombo}, $self->get_children;
+	my ($field,$cmd);
+	if ($action eq 'field')
+	{	$field=$newvalue;
+		my $d1= Songs::Field_property($self->{field},'default_filter');
+		my $d2= Songs::Field_property($field,'default_filter');
+		$cmd= $d1 eq $d2 ? $self->{cmd} : $d2;
+	}
+	elsif ($action eq 'cmd')
+	{	$cmd=$newvalue;
+		$field=$self->{field};
+	}
+	elsif ($action eq 'set')
+	{	%previous=();
+		($field,$cmd)= split /:/,$newvalue,2;
+	}
+	else {return}
+
+	my $filters= Songs::Field_filter_choices($field);
+	my $menu= $self->{cmdmenu}=Gtk2::Menu->new;
+	for my $f (::sorted_keys($filters))
+	{	my $item= Gtk2::MenuItem->new( $filters->{$f} );
+		$item->signal_connect( activate => \&cmd_changed_cb,$f);
+		$menu->append($item);
+	}
+	$menu->attach_to_widget($self,undef);
+
+	($cmd,my $pattern)= split /:/,$cmd,2;
+	$pattern='' unless defined $pattern;
+	my ($basecmd,my $prop)= Songs::filter_properties($field,"$cmd:$pattern");
+	if (!$prop)
+	{	$cmd=  Songs::Field_property($field,'default_filter');
+		($basecmd,$prop)= Songs::filter_properties($field,$cmd);
+		if (!$prop)	# shouldn't happen
+		{	warn "error: can't find default filter '$cmd' for field $field\n";
+			$prop=['',undef,''];
+			$basecmd=$cmd;
+		}
+	}
+	my ($text,undef,$type,%opt)=@$prop;
+	$opt{field}=$field;
+	my @type=split / /,$type;
+	my @pattern= split / /,$pattern,scalar @type;
+
+	if (!$opt{noinv})
+	{	my $button= $self->{w_invert}= Gtk2::ToggleButton->new;
+		$button->add( Gtk2::Image->new_from_stock('gmb-invert','menu') );
+		my $on= $cmd=~s/^-//;
+		$on= $previous{inv} unless $action eq 'set';
+		$button->set_active(1) if $on;
+		$button->signal_connect(toggled=> \&changed);
+		$button->set_tooltip_text(_"Invert filter");
+		$button->set_relief('none');
+		$self->pack_start($button,0,0,0);
+	}
+
+	my $i=0; my $textbutton=0;
+	for my $part (split /\s*(%s)\s*/,$text)
+	{	if ($part eq '%s')
+		{	my $type= shift @type;
+			my $opt2= Songs::Field_property($field,'filterpat:'.$type) || [];
+			my %opt2= (%opt, @$opt2, value_index=>$i++);
+			my $class= $ENTRYTYPE{$type};
+			my $pattern= shift @pattern;
+			next unless $class;
+			if ($previous{pattern})
+			{	my $p= shift @{$previous{pattern}};
+				my $t= shift @{$previous{editwidget}} || '';
+				$pattern=$p if $t eq $class;
+			}
+			$pattern='' unless defined $pattern;
+			my $widget= $class->new($pattern, \%opt2);
+			$self->pack_start($widget,0,0,0);
+			push @{$self->{w_pattern}}, $widget;
+			if ($opt2{icase} && !$self->{w_icase})
+			{	my $button= $self->{w_icase}= Gtk2::ToggleButton->new;
+				$button->add( Gtk2::Image->new_from_stock('gmb-case_sensitive','menu') );
+				my $on= $cmd!~s/i$//;
+				$on= $previous{icase} unless $action eq 'set';
+				$button->set_active(1) if $on;
+				$button->signal_connect(toggled=> \&changed);
+				$button->set_tooltip_text(_"Case sensitive");
+				$button->set_relief('none');
+				$self->pack_start($button,0,0,0);
+			}
+		}
+		elsif ($part ne '')
+		{	my $button= Gtk2::Button->new($part);
+			$button->set_relief('none') if $textbutton++;
+			$button->signal_connect( button_press_event => \&popup_menu_cb);
+			$button->signal_connect( clicked => \&popup_menu_cb);
+			$self->pack_start($button,0,0,0);
+		}
+	}
+
+	$self->{cmd}=$basecmd;
+	$self->{field}=$field;
 	$self->show_all;
 	$self->changed;
 }
+sub Get
+{	my $self=shift;
+	my $cmd= $self->{cmd};
+	if (my $w=$self->{w_invert})
+	{	$cmd=~s/^-//;
+		$cmd= '-'.$cmd if $w->get_active;
+	}
+	if (my $w=$self->{w_icase})
+	{	$cmd=~s/i$//;
+		$cmd.= 'i' unless $w->get_active;
+	}
+	::setlocale(::LC_NUMERIC, 'C');
+	if (my $patterns= $self->{w_pattern})
+	{	$cmd.= ':'. join(' ',map $_->Get, @$patterns);
+	}
+	::setlocale(::LC_NUMERIC, '');
+	my $filter= $self->{field}.':'.$cmd;
+	return $filter;
+}
 
-sub button_press_cb
-{	my ($button,$event,$menu)=@_;
+sub popup_menu_cb
+{	my $button=shift;
+	my $event=Gtk2->get_current_event;
 	my $self=::find_ancestor($button,__PACKAGE__);
-	$menu=$self->makemenu($menu);
+	my $menu= $self->{cmdmenu};
 	$menu->show_all;
-	$menu->popup(undef, undef, \&::menupos, undef, $event->button, $event->time);
+	my $mbutton= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
+	$menu->popup(undef, undef, \&::menupos, undef, $mbutton, $event->time);
+	0;
 }
 
 sub changed
@@ -8303,62 +8103,123 @@ sub activate
 	$self->{activatesub}( $self->Get );
 }
 
-
-package FilterEntryString;
-use Gtk2;
+package GMB::FilterEdit::String;
 use base 'Gtk2::Entry';
-
 sub new
-{	my ($class,$activatesub,$changesub,$init) = @_;
-	my $self = bless Gtk2::Entry->new, $class;
-	$self->set_text($init) if defined $init;
-	$self->signal_connect(changed => $changesub) if $changesub;
-	$self->signal_connect(activate => $activatesub) if $activatesub;
+{	my ($class,$val,$opt)=@_;
+	my $self= bless Gtk2::Entry->new, $class;
+	$self->set_text($val);
+	$self->signal_connect(changed=> \&GMB::FilterBox::changed);
+	$self->signal_connect(activate=> \&GMB::FilterBox::activate);
+	GMB::ListStore::Field::setcompletion($self,$opt->{field}) if $opt->{completion};
 	return $self;
 }
-sub Get { $_[0]->get_text; }
-sub Set { $_[0]->set_text($_[1]); }
+sub Get
+{	$_[0]->get_text;
+}
 
-package FilterEntryNumber;
-use Gtk2;
-use base 'Gtk2::SpinButton';
-
+package GMB::FilterEdit::Combo;
+use base 'GMB::ListStore::Field::Combo';
 sub new
-{	my ($class,$activatesub,$changesub,$init) = @_;
-	my $self = bless Gtk2::SpinButton->new( Gtk2::Adjustment->new($init||0, 0, 99999, 1, 10, 0) ,10,0  ), $class;
-	$self->set_numeric(::TRUE);
-	$self->signal_connect(value_changed => $changesub) if $changesub;
-	$self->signal_connect(activate => $activatesub) if $activatesub;
+{	my ($class,$val,$opt)=@_;
+	my $self= bless GMB::ListStore::Field::Combo->new($opt->{field},$val,\&GMB::FilterBox::changed),$class;
+	#$self->set_size_request(300,-1); #FIXME limit size
 	return $self;
 }
-sub Get { $_[0]->get_adjustment->get_value; }
-sub Set { $_[0]->get_adjustment->set_value($_[1]) if $_[1]=~m/^\d+$/; }
+sub Get { $_[0]->get_value; }
 
-package FilterEntryDate;
-use Gtk2;
-use base 'Gtk2::Button';
-
+package GMB::FilterEdit::SavedListCombo;
+use base 'Gtk2::ComboBox';
+our @ISA;
+BEGIN {unshift @ISA,'TextCombo';}
 sub new
-{	my ($class,$activatesub,$changesub,$init) = @_;
-	my $self = bless Gtk2::Button->new(_"Choose Date"), $class;
-	unless ($init && $init=~m/(\d\d\d\d)-(\d\d?)-(\d\d?)/)
-	{	my $time=$init||'';
-		$time=time unless $time=~m/^\d+$/;
-		my ($y,$m,$d)=(localtime($time))[5,4,3]; $y+=1900; $m++;
-		$init=sprintf '%04d-%02d-%02d',$y,$m,$d;
+{	my ($class,$val,$opt)=@_;
+	my $self= bless TextCombo->new([keys %{$::Options{SavedLists}}],$val,\&GMB::FilterBox::changed),$class;
+	::Watch($self,SavedLists=>\&fill);
+	return $self;
+}
+sub fill { $_[0]->build_store( [keys %{$::Options{SavedLists}}] ); }
+sub Get { $_[0]->get_value; }
+
+package GMB::FilterEdit::Number;
+use base 'Gtk2::Box';
+sub new
+{	my ($class,$val,$opt)=@_;
+	my $self= bless Gtk2::HBox->new, $class;
+
+	my $max=  $opt->{max} || 999999;
+	my $min=  $opt->{min} || $opt->{negative} ? -$max : 0;
+	my $step= $opt->{step}|| 1;
+	my $page= $opt->{page}|| $step*10;
+	my $digits=$opt->{digits}|| 0;
+	$val= $opt->{default_value}||0 if $val eq '';
+	my $unit0;
+	$unit0= $1 if $val=~s/([a-zA-Z]+)$//;
+	::setlocale(::LC_NUMERIC, 'C');
+	$val= $val+0;	#make sure "." is used as the decimal separator
+	::setlocale(::LC_NUMERIC, '');
+	my $spin= $self->{spin}= Gtk2::SpinButton->new( Gtk2::Adjustment->new($val, $min, $max, $step, $page, 0) ,1,$digits );
+	$spin->set_numeric(1);
+	$self->pack_start($spin,0,0,0);
+
+	if (my $unit=$opt->{unit})
+	{	my $extra;
+		if (ref $unit eq 'HASH')
+		{	$unit0 ||= $opt->{default_unit};
+			my @ordered_hash= map { $_ => $unit->{$_}[1] } sort { $unit->{$a}[0] <=> $unit->{$b}[0] } keys %$unit;
+			$extra= $self->{units}= TextCombo->new(\@ordered_hash, $unit0, \&GMB::FilterBox::changed, ordered_hash=>1);
+			$spin->signal_connect(key_press_event => sub	#catch letter key-press to change unit
+				{	my $key=Gtk2::Gdk->keyval_name($_[1]->keyval);
+					if (exists $unit->{$key}) { $extra->set_value($key); return 1 }
+					0;
+				});
+		}
+		elsif (ref $unit eq 'CODE')
+		{	my $init= $unit->($val||0, 1);
+			$extra= Gtk2::Label->new($init);
+			$self->{unit_code}=$unit;
+			$spin->signal_connect(value_changed => sub
+				{	my $self=::find_ancestor($_[0],__PACKAGE__);
+					my $v= $_[0]->get_adjustment->get_value;
+					$extra->set_text( $self->{unit_code}->($v,1) );
+				});
+		}
+		elsif ($unit)	{ $extra= Gtk2::Label->new($unit); }
+		$self->pack_start($extra,0,0,0) if $extra;
 	}
-	$self->{date}=$init;
-	$self->set_label($init);
-	$self->{activatesub}=$activatesub;
-	$self->{changesub}=$changesub;
+
+	$spin->signal_connect(value_changed => \&GMB::FilterBox::changed);
+	$spin->signal_connect(activate => \&GMB::FilterBox::activate);
+	return $self;
+}
+sub Get
+{	my $self=shift;
+	my $value= $self->{spin}->get_adjustment->get_value;
+	if (my $u=$self->{units})
+	{	$value.= $u->get_value;
+	}
+	return $value;
+}
+
+package GMB::FilterEdit::Date;
+use base 'Gtk2::Button';
+sub new
+{	my ($class,$val,$opt)=@_;
+	my $self= bless Gtk2::Button->new;
+	$self->{date}= $val || ::mktime( ( $opt->{value_index} ? (59,59,23) : (0,0,0) ), (localtime)[3,4,5]); # default to today 0:00 or today 23:59
+	$self->set_label( ::strftime2('%c',localtime($self->{date})) );
 	$self->signal_connect (clicked => sub
-	{	my $self=$_[0];
-		if ($self->{popup}) { $self->{popup}->destroy; $self->{popup}=undef; return; }
+	{	my $self=shift;
+		if ($self->{popup}) { $self->destroy_calendar; return; }
 		$self->popup_calendar;
 	});
 	return $self;
 }
+sub Get { $_[0]{date}; }
 
+sub destroy_calendar
+{	if (my $popup=delete $_[0]->{popup}) { $popup->destroy }
+}
 sub popup_calendar
 {	my $self=$_[0];
 	my $popup=Gtk2::Window->new();
@@ -8367,22 +8228,45 @@ sub popup_calendar
 	$self->{popup}=$popup;
 	my $cal=Gtk2::Calendar->new;
 	$popup->set_modal(::TRUE);
-	if ($self->{date}=~m/(\d\d\d\d)-(\d\d?)-(\d\d?)/)
-	{	$cal->select_month($2-1,$1);
-		$cal->select_day($3);
+	my @time=(0,0,0);
+	if (my $date=$self->{date})
+	{	my ($s,$m,$h,$d,$M,$y)= localtime($date);
+		$cal->select_month($M,$y+1900);
+		$cal->select_day($d);
+		@time=($h,$m,$s)
 	}
 	$cal->signal_connect(day_selected_double_click => sub
 		{	my ($y,$m,$d)=$_[0]->get_date;
-			$m++;
-			$self->{date}=sprintf '%04d-%02d-%02d',$y,$m,$d;
-			$self->set_label($self->{date});
-			$popup->destroy;
-			$self->{popup}=undef;
-			$self->{changesub}($self) if $self->{changesub};
-			$self->{activatesub}($self) if $self->{activatesub};
+			$y-=1900;
+			my @time= map $_->get_value, reverse @{$_[0]{timeadjs}};
+			$self->{date}= ::mktime(@time,$d,$m,$y);
+			$self->set_label( ::strftime2('%c',@time,$d,$m,$y) );
+			$self->destroy_calendar;
+			GMB::FilterBox::changed($self);
+			GMB::FilterBox::activate($self);
 		});
+	my $vbox= Gtk2::VBox->new(0,0);
+	my $hbox= Gtk2::HBox->new(0,0);
+	$vbox->add($cal);
+	$vbox->pack_end($hbox,0,0,0);
+	my $arrow0= Gtk2::Button->new; $arrow0->add( Gtk2::Arrow->new('left','none') );
+	my $arrow1= Gtk2::Button->new; $arrow1->add( Gtk2::Arrow->new('right','none') );
+	$_->set_relief('none') for $arrow0,$arrow1;
+	$hbox->pack_start($arrow0,0,0,2);
+	my @timelabels= (_("Time :"),':',':');
+	for my $i (0..2)
+	{	my $adj= Gtk2::Adjustment->new($time[$i], 0, ($i? 59 : 23), 1, ($i? 15 : 8), 0);
+		my $spin= Gtk2::SpinButton->new($adj,1,0);
+		$spin->set_numeric(1);
+		push @{ $cal->{timeadjs} }, $adj;
+		$hbox->pack_start( Gtk2::Label->new($timelabels[$i]),0,0,2 );
+		$hbox->pack_start($spin,0,0,2);
+	}
+	$arrow0->signal_connect(clicked=> sub { $_->set_value($_->lower) for @{ $cal->{timeadjs} }; });
+	$arrow1->signal_connect(clicked=> sub { $_->set_value($_->upper) for @{ $cal->{timeadjs} }; });
+	$hbox->pack_start($arrow1,0,0,2);
 	my $frame=Gtk2::Frame->new;
-	$frame->add($cal);
+	$frame->add($vbox);
 	$frame->set_shadow_type('out');
 	$popup->add($frame);
 
@@ -8395,106 +8279,6 @@ sub popup_calendar
 	#$cal->grab_focus;
 }
 
-sub Get { $_[0]{date} }
-sub Set { $_[0]{date}=$_[1]; $_[0]->set_label($_[1]); }
-
-package FilterEntryUnit;
-use Gtk2;
-use base 'Gtk2::HBox';
-
-my %units;
-INIT
-{%units=
- (	a => ['d',99999,\%::DATEUNITS],
-	b => ['m',99999999,\%::SIZEUNITS],
- );
-}
-
-sub new
-{	my ($class,$activatesub,$changesub,$init,$type) = @_;
-	my $self = bless Gtk2::HBox->new, $class;
-	my ($defunit,$max,$units)=@{$units{$type}};
-	my $valid=join '',keys %$units;
-	my ($val,$unit);
-	($val,$unit)=($init=~m/^(.*)([$valid])$/) if $init;
-	$val=1 unless defined $val;
-	$unit=$defunit unless defined $unit;
-	my $spin=Gtk2::SpinButton->new( Gtk2::Adjustment->new($val||0, 0, $max, 1, 10, 0) ,10,0  );
-	$spin->set_numeric(::TRUE);
-	my $combo=Gtk2::OptionMenu->new;
-	$self->pack_start($spin, ::FALSE,::FALSE, 0);
-	$self->pack_start($combo,::FALSE,::FALSE, 0);
-	$spin->signal_connect(value_changed => $changesub) if $changesub;
-	$spin->signal_connect(activate => $activatesub) if $activatesub;
-	$self->{adj}=$spin->get_adjustment;
-	my $menuCombo=Gtk2::Menu->new;
-	$combo->signal_connect(changed => sub
-		{	$_[0]->parent->{u}=$_[0]->get_menu->get_active->{val};
-			&$changesub if $changesub;
-		});
-	my $h;my $n=0;
-	for my $u (sort { $units->{$a}[0] <=> $units->{$b}[0] } keys %$units)
-	{	$h=$n if ($unit eq $u);
-		my $item=Gtk2::MenuItem->new( $units->{$u}[1] );
-		$item->{val}=$u;
-		$menuCombo->append($item);
-		$n++;
-	}
-	$combo->set_menu($menuCombo);
-	$combo->set_history($h);
-	$self->{u}=$unit;
-	return $self;
-}
-sub Get
-{	my $self=shift;
-	return ($self->{adj}->get_value) . $self->{u};
-}
-#sub Set { $_[0]->get_adjustment->set_value($_[1]) if $_[1]=~m/^\d+$/; }
-
-package FilterEntryCombo;		#FIXME use GMB::ListStore::Field::Combo for genre/label
-use Gtk2;
-use base 'Gtk2::OptionMenu';
-
-my %getlist;
-INIT
-{%getlist=
- (	l => sub {[::GetListOfSavedLists()]},
-	g => \&::GetGenresList,
-	f => \&::SortedLabels,
- );
-}
-
-sub new
-{	my ($class,$activatesub,$changesub,$init,$type) = @_;
-	my $self = bless Gtk2::OptionMenu->new, $class;
-	my $menuCombo=Gtk2::Menu->new;
-	$self->signal_connect(changed => sub
-		{	$_[0]{val}=$_[0]->get_menu->get_active->{val};
-			&$changesub if $changesub;
-			#&$activatesub if $activatesub;
-		});
-	my %hash; my $n=0;
-	my $list= $getlist{$type}();
-	for my $f (sort @$list)
-	{	$hash{$f}=$n;
-		my $item=Gtk2::MenuItem->new_with_label($f);
-		$item->{val}=$f;
-		$menuCombo->append($item);
-		$n++;
-	}
-	$self->set_menu($menuCombo);
-	$self->set_history($hash{$init}) if defined $init && $init ne '';
-	$self->{hash}=\%hash;
-	$self->{val}=$init;
-	return $self;
-}
-sub Get { $_[0]{val}; }
-sub Set
-{	my ($self,$val)=@_;
-	return unless defined $val && defined $self->{hash}{$val};
-	$self->set_history( $self->{hash}{$val} );
-	$self->{val}=$val;
-}
 
 package GMB::Cache;
 my %Cache; my $CacheSize=0;

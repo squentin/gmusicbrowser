@@ -7,6 +7,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 package Songs;
 
@@ -35,8 +36,22 @@ our %timespan_menu=
 		'editwidget:per_id'	=> sub { my $field=$_[0]; GMB::TagEdit::EntryString->new( @_,Field_properties($field,'editwidth','edit_listall') ); },
 		'filter:m'	=> '#display# .=~. m"#VAL#"',			'filter_prep:m'	=> \&Filter::QuoteRegEx,
 		'filter:mi'	=> '#display# .=~. m"#VAL#"i',			'filter_prep:mi'=> \&Filter::QuoteRegEx,
-		'filter:s'	=> 'index( lc(#display#),"#VAL#") .!=. -1',	'filter_prep:s'	=> sub {quotemeta lc($_[0])},
-		'filter:S'	=> 'index(    #display#, "#VAL#") .!=. -1',	'filter_prep:S'	=> sub {quotemeta $_[0]},
+		'filter:si'	=> 'index( lc(#display#),"#VAL#") .!=. -1',	'filter_prep:si'=> sub {quotemeta lc($_[0])},
+		'filter:s'	=> 'index(    #display#, "#VAL#") .!=. -1',	'filter_prep:s'=> sub {quotemeta $_[0]},
+		'filterdesc:mi'	=> [ _"matches regexp %s",_"matches regexp",'regexp',	icase=>1, ],
+		'filterdesc:si'	=> [ _"contains %s",	_"contains",	'substring',	icase=>1, ],
+		'filterdesc:e'	=> [ _"is equal to %s",		_"is equal to",		'string', completion=>1, ],
+		'filterdesc:m'	=> [_"matches regexp %s (case sensitive)",'mi'],
+		'filterdesc:s'	=> [_"contains %s (case sensitive)", 'si'],
+		'filterdesc:-m'	=> _"doesn't match regexp %s (case sensitive)",
+		'filterdesc:-mi'=> _"doesn't match regexp %s",
+		'filterdesc:-s'	=> _"doesn't contain %s (case sensitive)",
+		'filterdesc:-si'=> _"doesn't contain %s",
+		'filterdesc:-e'	=> _"isn't equal to %s",
+		'smartfilter:=' => 'e',
+		'smartfilter::' => 'si s',
+		'smartfilter:~' => 'mi m',
+		default_filter	=> 'si',
 		autofill_re	=> '.+',
 	},
 	unknown	=>
@@ -46,6 +61,7 @@ our %timespan_menu=
 	{	parent	=> 'string',
 #		_	=> '#get#',
 	},
+	special => {},
 	flags	=>
 	{	_		=> '____[#ID#]',
 		init		=> '___name[0]="#none#"; ___iname[0]=::superlc(___name[0]); #sgid_to_gid(VAL=$_)# for #init_namearray#',
@@ -86,8 +102,8 @@ our %timespan_menu=
 		'filter:h~'	=> '.!!. do {my $v=#_#; $v ? ref $v ? grep(exists $hash#VAL#->{$_+0}, @$v) : (exists $hash#VAL#->{#_#+0}) : 0}',
 		'filter:ecount'	=> '#VAL# .==. do {my $v=#_#; $v ? ref $v ? scalar(@$v) : 1 : 0}',
 		#FIXME for filters s,m,mi,h~,  using a list of matching names in ___inames/___names could be better (using a bitstring)
-		'filter:s'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___iname[$_], "#VAL#") .!=. -1 ,@$v) : (index(___iname[$v], "#VAL#") .!=. -1); }',
-		'filter:S'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___name[$_], "#VAL#")  .!=. -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
+		'filter:si'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___iname[$_], "#VAL#") .!=. -1 ,@$v) : (index(___iname[$v], "#VAL#") .!=. -1); }',
+		'filter:s'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___name[$_], "#VAL#")  .!=. -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
 		'filter:m'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___name[$_]  .=~. m"#VAL#"  ,@$v) : ___name[$v]  .=~. m"#VAL#"; }',
 		'filter:mi'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___iname[$_] .=~. m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
 		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
@@ -100,12 +116,29 @@ our %timespan_menu=
 		'editwidget:single'	=> sub { GMB::TagEdit::FlagList->new(@_) },
 		'editwidget:per_id'	=> sub { GMB::TagEdit::FlagList->new(@_) },
 		autofill_re	=> '.+',
+		'filterdesc:~'	=> [ _"%s is set", _"is set",	'combostring', ],
+		'filterdesc:-~'	=> _"%s isn't set",
+		'filterdesc:ecount:0' => _"has none",
+		'filterdesc:-ecount:0'=> _"has at least one",
+		'filterdesc:mi'	=> [ _"matches regexp %s",_"matches regexp",'regexp',	icase=>1, ],
+		'filterdesc:si'	=> [ _"contains %s",	_"contains",	'substring',	icase=>1, ],
+		'filterdesc:m'	=> [_"matches regexp %s (case sensitive)",'mi'],
+		'filterdesc:s'	=> [_"contains %s (case sensitive)", 'si'],
+		'filterdesc:-m'	=> _"doesn't match regexp %s (case sensitive)",
+		'filterdesc:-mi'=> _"doesn't match regexp %s",
+		'filterdesc:-s'	=> _"doesn't contain %s (case sensitive)",
+		'filterdesc:-si'=> _"doesn't contain %s",
+		'smartfilter:=' => '~',
+		'smartfilter::' => 'si s',
+		'smartfilter:~' => 'mi m',
+		default_filter	=> 'si',
 	},
 	artists	=>
 	{	_		=> '____[#ID#]',
 		mainfield	=> 'artist',
 		#plugin		=> 'picture',
-		_name		=> '__#mainfield#_name[#_#]',
+#		_name		=> '__#mainfield#_name[#_#]',
+#		_iname		=> '__#mainfield#_iname[#_#]',
 		get_gid		=> 'my $v=#_#; ref $v ? $v : [$v]',
 		's_sort:gid'	=> '__#mainfield#_name[#GID#]',
 		'si_sort:gid'	=> '__#mainfield#_iname[#GID#]',
@@ -121,11 +154,11 @@ our %timespan_menu=
 			#_# =	@ids==1 ? $ids[0] :
 				@ids==0 ? 0 :
 				(___group{join(" ",map sprintf("%x",$_),@ids)}||= \@ids);',
-		'filter:m'	=> '#_name# .=~. m"#VAL#"',
-		'filter:mi'	=> '#_name# .=~. m"#VAL#"i',
-		'filter:s'	=> 'index( lc(#_name#),"#VAL#") .!=. -1',
-		'filter:S'	=> 'index(    #_name#, "#VAL#") .!=. -1',
-		'filter:e'	=> '#_name# .eq. "#VAL#"',
+		'filter:m'	=> '(ref #_# ?  (grep __#mainfield#_name[$_]  .=~. m"#VAL#",  @{#_#}) : (__#mainfield#_name[#_#]  .=~. m"#VAL#"))',
+		'filter:mi'	=> '(ref #_# ?  (grep __#mainfield#_iname[$_] .=~. m"#VAL#"i, @{#_#}) : (__#mainfield#_iname[#_#] .=~. m"#VAL#"i))',
+		'filter:si'	=> '(ref #_# ?  (grep index( __#mainfield#_name[$_], "#VAL#") .!=. -1, @{#_#}) : (index(__#mainfield#_name[#_#], "#VAL#") .!=. -1))',
+		'filter:s'	=> '(ref #_# ?  (grep index( __#mainfield#_iname[$_],"#VAL#") .!=. -1, @{#_#}) : (index(__#mainfield#_iname[#_#],"#VAL#") .!=. -1))',
+		'filter_prep:si'=> sub { quotemeta ::superlc($_[0])},
 		'filter:~'	=> '(ref #_# ?  (grep $_ .==. #VAL#, @{#_#}) : (#_# .==. #VAL#))',#FIXME use simpler/faster version if perl5.10 (with ~~)
 		'filter_prep:~'	=> '##mainfield#->filter_prep:~#',
 		'filter_prephash:~' => '##mainfield#->filter_prephash:~#',
@@ -139,6 +172,20 @@ our %timespan_menu=
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[keys %{#HVAL#}];',
 		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v}', #FIXME avoid stringification
 		listall		=> '##mainfield#->listall#',
+		'filterdesc:~'	=> [ _"includes artist %s", _"includes artist",	'combostring', ],
+		'filterdesc:-~'	=> _"doesn't include artist %s",
+		'filterdesc:mi'	=> [ _"matches regexp %s",_"matches regexp",'regexp',	icase=>1, ],
+		'filterdesc:si'	=> [ _"contains %s",	_"contains",	'substring',	icase=>1, ],
+		'filterdesc:m'	=> [_"matches regexp %s (case sensitive)",'mi'],
+		'filterdesc:s'	=> [_"contains %s (case sensitive)", 'si'],
+		'filterdesc:-m'	=> _"doesn't match regexp %s (case sensitive)",
+		'filterdesc:-mi'=> _"doesn't match regexp %s",
+		'filterdesc:-s'	=> _"doesn't contain %s (case sensitive)",
+		'filterdesc:-si'=> _"doesn't contain %s",
+		'smartfilter:=' => '~',
+		'smartfilter::' => 'si s',
+		'smartfilter:~' => 'mi m',
+		default_filter	=> 'si',
 	},
 	artist_first =>
 	{	parent	=> 'artist', #FIXME
@@ -162,6 +209,9 @@ our %timespan_menu=
 		load_extra	=> '__#mainfield#_gid{#SGID#} || return;',
 		save_extra	=> 'my %h; while ( my ($sgid,$gid)=each %__#mainfield#_gid ) { $h{$sgid}= [#SUBFIELDS#] } delete $h{""}; return \%h;',
 		#plugin		=> 'picture',
+		'filter:pic'	=> '.!!. __#mainfield#_picture[#_#]',
+		'filterdesc:pic:1'=> _"has a picture",
+		'filterdesc:-pic:1'=> _"doesn't have a picture",
 	},
 	album	=>
 	{	parent		=> 'fewstring',
@@ -192,10 +242,11 @@ our %timespan_menu=
 		#plugin		=> 'picture',
 		load_extra	=> ' __#mainfield#_gid{#SGID#} || return;',
 		save_extra	=> 'my %h; while ( my ($sgid,$gid)=each %__#mainfield#_gid ) { $h{$sgid}= [#SUBFIELDS#] } delete $h{""}; return \%h;',
+		'filter:pic'	=> '.!!. __#mainfield#_picture[#_#]',
+		'filterdesc:pic:1'=> _"has a picture",
+		'filterdesc:-pic:1'=> _"doesn't have a picture",
+		'filterpat:combostring'=> [ display=> sub { my $s=shift; $s=~s/\x00.*//; $s; } ], # could display $album by $album_artist instead
 
-#warn $Songs::Songs_album_picture__[1636];
-#warn Songs::Picture(1636,"album","get");
-#warn Songs::Code('album',"get_picture",GID=>'$_[0]')
 		#load_extra	=> '___pix[ #sgid_to_gid(VAL=$_[0])# ]=$_[1];',
 		#save_extra	=> 'my @res; for my $gid (1..$##_name#) { my $v=___pix[$gid]; next unless length $v; push @res, [#*:gid_to_sgid(GID=$gid)#,$val]; } return \@res;',
 	},
@@ -231,6 +282,7 @@ our %timespan_menu=
 		hash_to_display => '::filename_to_utf8displayname(#VAL#)', #only used by FolderList:: and MassTag::
 		load	=> '#_#=::decode_url(#VAL#)',
 		save	=> 'filename_escape(#_#)',
+		#'filterpat:string'	=> [ display => \&::filename_to_utf8displayname, ],
 	},
 # 	picture =>
 #	{	get_picture	=> '__#mainfield#_picture[#GID#] || $::Options{Default_picture_#mainfield#};',
@@ -294,6 +346,8 @@ our %timespan_menu=
 		edit_listall	=> 1,
 		parent		=> 'generic',
 		maxgid		=> '@#_name#-1',
+		'filterdesc:~'	=> [ _"is %s", _"is",	'combostring', ],
+		'filterdesc:-~'	=> _"isn't %s",
 		#gsummary	=> 'my $gids=Songs::UniqList(#field#,#IDs#); @$gids==1 ? #gid_to_display(GID=$gids->[0])# : #names(count=scalar @$gids)#;',
 	},
 	number	=>
@@ -306,7 +360,11 @@ our %timespan_menu=
 		'filter:e'	=> '#_# .==. #VAL#',
 		'filter:>'	=> '#_# .>. #VAL#',
 		'filter:<'	=> '#_# .<. #VAL#',
-		'filter:b'	=> '#_# .>=. #VAL1#  .&&.  #_# .<. #VAL2#',
+		'filter:b'	=> '#_# .>=. #VAL1#  .&&.  #_# .<=. #VAL2#',
+		'filter_prep:b'	=>  \&filter_prep_numbers,
+		'filter_prep:>'	=>  \&filter_prep_numbers,
+		'filter_prep:<'	=>  \&filter_prep_numbers,
+		'filter_prep:e'	=>  \&filter_prep_numbers,
 		'group'		=> '#_# !=',
 		'stats:range'	=> 'push @{#HVAL#},#_#;  ---- #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
 		'stats:average'	=> 'push @{#HVAL#},#_#;  ---- #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
@@ -318,14 +376,35 @@ our %timespan_menu=
 		get_gid		=> '#_#+0',
 		makefilter	=> '"#field#:e:#GID#"',
 		default		=> '0+0',	#not 0 because it needs to be true :(
-		filter_prep	=>  sub { $_[0]=~m/(\d+(?:\.\d+)?)/; return $1 || 0},
 		autofill_re	=> '\\d+',
+		default_filter	=> '>',
+		'filterdesc:e'	=> [ "= %s", "=", 'value', ],
+		'filterdesc:>'	=> [ "> %s", ">", 'value', noinv=>1 ],
+		'filterdesc:<'	=> [ "< %s", "<", 'value', noinv=>1 ],
+		'filterdesc:-<'	=> [ "≥ %s", "≥", 'value', noinv=>1 ],
+		'filterdesc:->'	=> [ "≤ %s", "≤", 'value', noinv=>1 ],
+		'filterdesc:b'	=> [ _"between %s and %s", _"between", 'value value'],
+		'filterdesc:-b'	=> _"not between %s and %s",
+		'filterdesc:-e'	=> "≠ %s",
+		'filterdesc:h'	=> [ _"in the top %s",	 _"in the top",		'number',],	# "the %s most"  "the most",  ?
+		'filterdesc:t'	=> [ _"in the bottom %s",_"in the bottom",	'number',],	# "the %s least" "the least", ?
+		'filterdesc:-h'	=> _"not in the top %s",
+		'filterdesc:-t'	=> _"not in the bottom %s",
+		'filterpat:substring'	=> [icase => 0],
+		'filterpat:regexp'	=> [icase => 0],
+		'smartfilter:>' => \&Filter::_smartstring_moreless,
+		'smartfilter:<' => \&Filter::_smartstring_moreless,
+		'smartfilter:<='=> \&Filter::_smartstring_moreless,
+		'smartfilter:>='=> \&Filter::_smartstring_moreless,
+		'smartfilter:=' => \&Filter::_smartstring_number,
+		'smartfilter::' => \&Filter::_smartstring_number,
+		'smartfilter:~' => 'm',
 	},
 	'number.div' =>
 	{	group		=> 'int(#_#/#ARG0#) !=',
 		hash		=> 'int(#_#/#ARG0#)',		#hash:minute	=> '60*int(#_#/60)',
 		#makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".(#GID# * #ARG0#)." ".((#GID#+1) * #ARG0#))',
-		makefilter	=> '"#field#:b:".(#GID# * #ARG0#)." ".((#GID#+1) * #ARG0#)',
+		makefilter	=> 'Filter->new_add(1, "#field#:-<:".(#GID# * #ARG0#), "#field#:<:".((#GID#+1) * #ARG0#) )', #FIXME decimal separator must be always "."
 		gid_to_display	=> '#GID# * #ARG0#',
 		get_gid		=> 'int(#_#/#ARG0#)',
 	},
@@ -348,6 +427,9 @@ our %timespan_menu=
 		parent		=> 'number',
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,$Def{$field}{edit_max}); },
 	},
+	'integer.div' =>
+	{	makefilter	=> '"#field#:b:".(#GID# * #ARG0#)." ".(((#GID#+1) * #ARG0#)-1)',
+	},
 	float	=>	#make sure the string doesn't have the utf8 flag, else substr won't work
 	{	_		=> 'unpack("F",substr(____,#ID#<<3,8))',
 		displayformat	=> '%.2f',
@@ -358,6 +440,7 @@ our %timespan_menu=
 		# FIXME make sure that locale is set to C (=> '.' as decimal separator) when needed
 		'editwidget:all'=> sub { GMB::TagEdit::EntryNumber->new(@_,undef,3); },
 		autofill_re	=> '(?:\\d+\\.)?\\.\\d+',
+		'filterpat:value' => [digits => 2, negative=>1, ],
 	},
 	'length' =>
 	{	display	=> 'sprintf("%d:%02d", #_#/60, #_#%60)',
@@ -366,8 +449,11 @@ our %timespan_menu=
 	'length.div' => { gid_to_display	=> 'my $v=#GID# * #ARG0#; sprintf("%d:%02d", $v/60, $v%60);', },
 	size	=>
 	{	display	=> 'sprintf("%.1fM", #_#/1000/1000)',
-		filter_prep	=> \&::ConvertSize,
+		'filter_prep:>'	=> \&::ConvertSize,
+		'filter_prep:<'	=> \&::ConvertSize,
+		'filter_prep:b'	=> \&::ConvertSize,
 		parent	=> 'integer',
+		'filterpat:value' => [ unit=> \%::SIZEUNITS, default_unit=> 'm', default_value=>1, ],
 	},
 	'size.div'   => { gid_to_display	=> 'sprintf("%dM", #GID# * #ARG0#/1000/1000);', },
 	rating	=>
@@ -384,10 +470,16 @@ our %timespan_menu=
 		'stats:average'	=> 'push @{#HVAL#},#_default#;  ---- #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
 		check	=> '#VAL#= #VAL# =~m/^\d+$/ ? (#VAL#>100 ? 100 : #VAL#) : "";',
 		set	=> '{ my $v=#VAL#; #_default#= ($v eq "" ? $::Options{DefaultRating} : $v); #_# = ($v eq "" ? 255 : $v); }',
-		'filter:e'	=> '#_# .==. #VAL#',		'filter_prep:e' =>  sub { $_[0] eq "" ? 255 : $_[0]=~m/(\d+(?:\.\d+)?)/ ? $1 : 0},
+		makefilter	=> '"#field#:~:#GID#"',
+		'filter:~'	=> '#_# .==. #VAL#',
+		'filter:e'	=> '#_default# .==. #VAL#',
 		'filter:>'	=> '#_default# .>. #VAL#',
 		'filter:<'	=> '#_default# .<. #VAL#',
-		'filter:b'	=> '#_default# .>=. #VAL1#  .&&. #_default# .<. #VAL2#',
+		'filter:b'	=> '#_default# .>=. #VAL1#  .&&. #_default# .<=. #VAL2#',
+		'filterdesc:~'	=> [_"set to %s", _"set to", 'value'],
+		'filterdesc:-~'	=> _"not set to %s",,
+		'filterdesc:~:255'=> 'set to default',
+		'filterdesc:-~:255'=>'not set to default',
 		n_sort		=> '#_default#',
 		#array		=> '#_default#',
 		gid_to_display	=> '#GID#==255 ? _"Default" : #GID#',
@@ -401,7 +493,41 @@ our %timespan_menu=
 	{	parent	=> 'integer',
 		display	=> 'Songs::DateString(#_#)',
 		daycount=> 'do { my $t=(time-( #_# ) )/86400; ($t<0)? 0 : $t}', #for random mode
-		filter_prep	=> \&::ConvertTime,
+		'filter_prep:>ago'	=> \&::ConvertTime,
+		'filter_prep:<ago'	=> \&::ConvertTime,
+		'filter_prep:bago'	=> \&::ConvertTime,
+		'filter:>ago'	=> '#_# .<. #VAL#',
+		'filter:<ago'	=> '#_# .>. #VAL#',
+		'filter:bago'	=> '#_# .>=. #VAL1#  .&&.  #_# .<=. #VAL2#',
+		#'filterdesc:e'		=> [_"is equal to %s", _"is equal to", 'date' ],
+		filter_exclude => 'e', # do not show these filters
+		'filterdesc:>ago'	=> [_"more than %s ago",	_"more than",	'ago', ],
+		'filterdesc:<ago'	=> [_"less than %s ago",	_"less than",	'ago', ],
+		'filterdesc:>'		=> [_"after %s",		_"after",	'date', ],
+		'filterdesc:<'		=> [_"before %s",		_"before",	'date', ],
+		'filterdesc:b'		=> [_"between %s and %s",	_"between (absolute dates)", 'date date'],
+		'filterdesc:bago'	=> [_"between %s ago and %s ago", _"between (relative dates)", 'ago ago'],
+		'filterdesc:->ago'	=> _"less than %s ago",
+		'filterdesc:-<ago'	=> _"more than %s ago",
+		'filterdesc:->'		=> _"before %s",
+		'filterdesc:-<'		=> _"after %s",
+		'filterdesc:-b'		=> _"not between %s and %s",
+		'filterdesc:-bago'	=> _"not between %s ago and %s ago",
+		'filterdesc:h'		=> [ _"the %s most recent",	_"the most recent",	'number'],	#"the %s latest" "the latest" ?
+		'filterdesc:t'		=> [ _"the %s least recent",	_"the least recent",	'number'],	#"the %s earliest" "the earliest" ?
+		'filterdesc:-h'		=> _"not the %s most recent",
+		'filterdesc:-t'		=> _"not the %s least recent",
+		'filterpat:ago'		=> [ unit=> \%::DATEUNITS, default_unit=> 'd', ],
+		'filterpat:date'	=> [ display=> sub { my $var=shift; $var= ::strftime2('%c',localtime $var) if $var=~m/^\d+$/; $var; }, ],
+		default_filter		=> '<ago',
+		'smartfilter:>' => \&Filter::_smartstring_date_moreless,
+		'smartfilter:<' => \&Filter::_smartstring_date_moreless,
+		'smartfilter:<='=> \&Filter::_smartstring_date_moreless,
+		'smartfilter:>='=> \&Filter::_smartstring_date_moreless,
+		'smartfilter:=' => \&Filter::_smartstring_date,
+		'smartfilter::' => \&Filter::_smartstring_date,
+		'smartfilter:~' => 'm',
+
 		 #for date.year, date.month, date.day :
 		group	=> '#mktime# !=',
 		get_gid	=> '#_# ? #mktime# : 0',
@@ -429,6 +555,10 @@ our %timespan_menu=
 		check	=> '#VAL#= #VAL# ? 1 : 0;',
 		display	=> "(#_# ? #yes# : #no#)",	yes => '_("Yes")',	no => 'q()',
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryBoolean->new(@_); },
+		'filterdesc:e:0'	=> [_"is false",_"is false",'',noinv=>1],
+		'filterdesc:e:1'	=> [_"is true", _"is true", '',noinv=>1],
+		filter_exclude => 'ALL',	#do not show filters inherited from parents
+		default_filter => 'e:1',
 	},
 	shuffle=>
 	{	n_sort		=> 'Songs::update_shuffle($Songs::LastID) ---- vec($Songs::SHUFFLE,#ID#,32)',
@@ -444,34 +574,38 @@ our %timespan_menu=
 );
 %Def=		#flags : Read Write Editable Sortable Column caseInsensitive sAve List Gettable
 (file	=>
- {	name	=> _"Filename",	width => 400, flags => 'gasc_',	type => 'filename',
+ {	name	=> _"Filename",	width => 400, flags => 'fgasc_',	type => 'filename',
 	'stats:filetoid' => '#HVAL#{ #file->get# }=#ID#',
  },
  path	=>
- {	name	=> _"Folder",	width => 200, flags => 'gasc_',	type => 'filename',
+ {	name	=> _"Folder",	width => 200, flags => 'fgasc_',	type => 'filename',
 	'filter:i'	=> '#_# .=~. m/^#VAL#(?:$::QSLASH|$)/o',
+	'filterdesc:i'	=> [_"is in %s", _"is in", 'string'],
+	'filterdesc:-i'	=> _"isn't in %s",
 	can_group=>1,
  },
  modif	=>
- {	name	=> _"Modification",	width => 160,	flags => 'garsc_',	type => 'date',
+ {	name	=> _"Modification",	width => 160,	flags => 'fgarsc_',	type => 'date',
 	FilterList => {type=>'year',},
 	can_group=>1,
  },
  size	=>
- {	name => _"Size",	width => 80,	flags => 'garsc_',		#32bits => 4G max
+ {	name => _"Size",	width => 80,	flags => 'fgarsc_',		#32bits => 4G max
 	type => 'size',
 	FilterList => {type=>'div.1000000',},
  },
  title	=>
- {	name	=> _"Title",	width	=> 270,		flags	=> 'garwesci',	type => 'istring',
+ {	name	=> _"Title",	width	=> 270,		flags	=> 'fgarwesci',	type => 'istring',
 	id3v1	=> 0,		id3v2	=> 'TIT2',	vorbis	=> 'title',	ape	=> 'Title',	lyrics3	=> 'ETT', ilst => "\xA9nam",
 	'filter:~' => '#_iname# .=~. m"(?:^|/) *#VAL# *(?:[/\(\[]|$)"',		'filter_prep:~'=> \&Filter::SmartTitleRegEx,
 	'filter_simplify:~' => \&Filter::SmartTitleSimplify,
+	'filterdesc:~'	=> [_"is smart equal to %s", _"is smart equal", 'substring'],
+	'filterdesc:-~'	=> _"Isn't smart equal to %s",
 	makefilter_fromID => '"title:~:" . #get#',
 	edit_order=> 10, letter => 't',
  },
  artist =>
- {	name => _"Artist",	width => 200,	flags => 'garwesci',
+ {	name => _"Artist",	width => 200,	flags => 'fgarwesci',
 	type => 'artist',
 	id3v1	=> 1,		id3v2	=> 'TPE1',	vorbis	=> 'artist',	ape	=> 'Artist',	lyrics3	=> 'EAR', ilst => "\xA9ART",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
@@ -483,7 +617,7 @@ our %timespan_menu=
 	#names => '::__("%d artist","%d artists",#count#);'
  },
  first_artist =>
- {	flags => 'g', #CHECKME
+ {	flags => 'fg', #CHECKME
 	type	=> 'artist_first',	depend	=> 'artists',	name => _"Main artist",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
@@ -491,13 +625,13 @@ our %timespan_menu=
 	can_group=>1,
  },
  artists =>
- {	flags => 'l',	type	=> 'artists',	depend	=> 'artist title',	name => _"Artists",
+ {	flags => 'fl',	type	=> 'artists',	depend	=> 'artist title',	name => _"Artists",
 	all_count=> _"All artists",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
  },
  album =>
- {	name => _"Album",	width => 200,	flags => 'garwesci',	type => 'album',
+ {	name => _"Album",	width => 200,	flags => 'fgarwesci',	type => 'album',
 	id3v1	=> 2,		id3v2	=> 'TALB',	vorbis	=> 'album',	ape	=> 'Album',	lyrics3	=> 'EAL', ilst => "\xA9alb",
 	depend	=> 'artist album_artist_raw', #because albums with no names get the name : <Unknown> (artist)
 	all_count=> _"All albums",
@@ -526,7 +660,7 @@ our %timespan_menu=
 	type		=> '_picture',
  },
  album_artist_raw =>
- {	name => _"Album artist",width => 200,	flags => 'garwesci',	type => 'artist',
+ {	name => _"Album artist",width => 200,	flags => 'fgarwesci',	type => 'artist',
 	id3v2	=> 'TPE2',	vorbis	=> 'albumartist|album_artist',	ape	=> 'Album Artist|Album_artist',  ilst => "aART",
 	#FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
@@ -534,37 +668,38 @@ our %timespan_menu=
 	#can_group=>1,
  },
  album_artist =>
- {	name => _"Album artist or artist",width => 200,	flags => 'gcsi',	type => 'artist',
+ {	name => _"Album artist or artist",width => 200,	flags => 'fgcsi',	type => 'artist',
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
 	_ => 'do {my $n=vec(__album_artist_raw__,#ID#,#bits#); $n==1 ? vec(__artist__,#ID#,#bits#) : $n}',
 	can_group=>1,
 	letter => 'A',
+	depend	=> 'album_artist_raw artist album',
  },
  haspicture =>
- {	name	=> _"Embedded picture", width => 20, flags => 'garwsc',	type => 'boolean',
+ {	name	=> _"Embedded picture", width => 20, flags => 'fgarwsc',	type => 'boolean',
 	id3v2 => 'APIC;;;;%v',	ilst => 'covr',		#or just id3v2 => 'APIC', ?
 	disable=>1,
  },
  haslyrics =>
- {	name	=> _"Embedded lyrics", width => 20, flags => 'garwsc',	type => 'boolean',
+ {	name	=> _"Embedded lyrics", width => 20, flags => 'fgarwsc',	type => 'boolean',
 	id3v2 => 'USLT;;;%v',	vorbis	=> 'lyrics',	ape => 'Lyrics', #TESTME
 	disable=>1,
  },
  compilation =>
- {	name	=> _"Compilation", width => 20, flags => 'garwesc',	type => 'boolean',
+ {	name	=> _"Compilation", width => 20, flags => 'fgarwesc',	type => 'boolean',
 	id3v2 => 'TCMP',	vorbis	=> 'compilation',	ape => 'Compilation',	ilst => 'cpil',
 	edit_many=>1,
  },
  grouping =>
- {	name	=> _"Grouping",	width => 100,	flags => 'garwesci',	type => 'fewstring',
+ {	name	=> _"Grouping",	width => 100,	flags => 'fgarwesci',	type => 'fewstring',
 	FilterList => {search=>1},
 	can_group=>1,
 	edit_order=> 55,	edit_many=>1,
 	id3v2 => 'TIT1',	vorbis	=> 'grouping',	ape	=> 'Grouping', ilst => "\xA9grp",
  },
  year =>
- {	name	=> _"Year",	width => 40,	flags => 'garwesc',	type => 'integer',	bits => 16, edit_max=>3000,
+ {	name	=> _"Year",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 16, edit_max=>3000,
 	check	=> '#VAL#= #VAL# =~m/(\d\d\d\d)/ ? $1 : 0;',
 	id3v1	=> 3,		id3v2 => 'TDRC|TYER', 'id3v2.3'=> 'TYER|TDRC',	'id3v2.4'=> 'TDRC|TYER',	vorbis	=> 'date|year',	ape	=> 'Record Date|Year', ilst => "\xA9day",
 	gid_to_display	=> '#GID# ? #GID# : _"None"',
@@ -576,26 +711,26 @@ our %timespan_menu=
 	autofill_re	=> '[12]\\d{3}',
  },
  track =>
- {	name	=> _"Track",	width => 40,	flags => 'garwesc',
+ {	name	=> _"Track",	width => 40,	flags => 'fgarwesc',
 	id3v1	=> 5,		id3v2	=> 'TRCK',	vorbis	=> 'tracknumber',	ape	=> 'Track', ilst => "trkn",
 	type => 'integer',	displayformat => '%02d', bits => 16, edit_max => 65535,
 	edit_order=> 20,	editwidth => 4,		letter => 'n',
  },
  disc =>
- {	name	=> _"Disc",	width => 40,	flags => 'garwesc',	type => 'integer',	bits => 8, edit_max => 255,
+ {	name	=> _"Disc",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 8, edit_max => 255,
 				id3v2	=> 'TPOS',	vorbis	=> 'discnumber',	ape	=> 'discnumber', ilst => "disc",
 	editwidth => 4,
 	edit_order=> 40,	edit_many=>1,	letter => 'd',
 	can_group=>1,
  },
  discname =>
- {	name	=> _"Disc name",	width	=> 100,		flags => 'garwesci',	type => 'fewstring',
+ {	name	=> _"Disc name",	width	=> 100,		flags => 'fgarwesci',	type => 'fewstring',
 	id3v2	=> 'TSST',	vorbis	=> 'discsubtitle',	ape => 'DiscSubtitle',	ilst=> '----DISCSUBTITLE',
 	edit_many=>1,
 	disable=>1,	options => 'disable',
  },
  genre	=>
- {	name		=> _"Genres",	width => 180,	flags => 'garwescil',
+ {	name		=> _"Genres",	width => 180,	flags => 'fgarwescil',
 	 #is_set	=> '(__GENRE__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
 	id3v1	=> 6,		id3v2	=> 'TCON',	vorbis	=> 'genre',	ape	=> 'Genre', ilst => "\xA9gen",
 	read_split	=> qr/\s*;\s*/,
@@ -606,7 +741,7 @@ our %timespan_menu=
 	edit_order=> 70,	edit_many=>1,	letter => 'g',
  },
  label	=>
- {	name		=> _"Labels",	width => 180,	flags => 'gaescil',
+ {	name		=> _"Labels",	width => 180,	flags => 'fgaescil',
 	 #is_set	=> '(__LABEL__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
 	type		=> 'flags',		init_namearray	=> '@{$::Options{Labels}}',
 	iconprefix	=> 'label-',
@@ -619,7 +754,7 @@ our %timespan_menu=
 	edit_order=> 80,	edit_many=>1,	letter => 'L',
  },
  mood	=>
- {	name		=> _"Moods",	width => 180,	flags => 'garwescil',
+ {	name		=> _"Moods",	width => 180,	flags => 'fgarwescil',
 	id3v2	=> 'TMOO',	vorbis	=> 'MOOD',	ape	=> 'Mood', ilst => "----MOOD",
 	read_split	=> qr/\s*;\s*/,
 	type		=> 'flags',
@@ -630,12 +765,12 @@ our %timespan_menu=
 	disable=>1,	options => 'disable',
  },
  comment=>
- {	name	=> _"Comment",	width => 200,	flags => 'garwesci',		type => 'text',
+ {	name	=> _"Comment",	width => 200,	flags => 'fgarwesci',		type => 'text',
 	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3	=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
 	edit_order=> 60,	edit_many=>1,	letter => 'C',
  },
  rating	=>
- {	name	=> _"Rating",		width => 80,	flags => 'gaesc',	type => 'rating',
+ {	name	=> _"Rating",		width => 80,	flags => 'fgaesc',	type => 'rating',
 	id3v2	=> 'TXXX;FMPS_Rating;%v & TXXX;FMPS_Rating_User;%v::%i | percent( TXXX;gmbrating;%v ) | five( TXXX;rating;%v )',
 	vorbis	=> 'FMPS_RATING & FMPS_RATING_USER::%i | percent( gmbrating ) | five( rating )',
 	ape	=> 'FMPS_RATING & FMPS_RATING_USER::%i | percent( gmbrating ) | five( rating )',
@@ -648,6 +783,7 @@ our %timespan_menu=
 	starprefix => 'stars',
 	edit_order=> 90,	edit_many=>1,
 	options	=> 'rw_ userid',
+	'filterpat:value' => [ display => "%d %%", unit => '%', max=>100, default_value=>50, ],
  },
  ratingnumber =>	#same as rating but returns DefaultRating if rating set to default, will be replaced by rating.number or something in the future
  {	type	=> 'virtual',
@@ -656,22 +792,26 @@ our %timespan_menu=
 	get	=> '#rating->_default#',
  },
  added	=>
- {	name	=> _"Added",		width => 100,	flags => 'gasc_',	type => 'date',
+ {	name	=> _"Added",		width => 100,	flags => 'fgasc_',	type => 'date',
 	FilterList => {type=>'year', },
 	can_group=>1,
  },
  lastplay	=>
- {	name	=> _"Last played",	width => 100,	flags => 'gasc',	type => 'date',
+ {	name	=> _"Last played",	width => 100,	flags => 'fgasc',	type => 'date',
 	FilterList => {type=>'year',},
 	can_group=>1,	letter => 'P',
+	'filterdesc:e:0'	=> _"never",
+	'filterdesc:-e:0'	=> _"has been played",	#FIXME better description
  },
  lastskip	=>
- {	name	=> _"Last skipped",	width => 100,	flags => 'gasc',	type => 'date',
+ {	name	=> _"Last skipped",	width => 100,	flags => 'fgasc',	type => 'date',
 	FilterList => {type=>'year',},
 	can_group=>1,	letter => 'K',
+	'filterdesc:e:0'	=> _"never",
+	'filterdesc:-e:0'	=> _"has been skipped",	#FIXME better description
  },
  playcount	=>
- {	name	=> _"Play count",	width => 50,	flags => 'gaesc',	type => 'integer',	letter => 'p',
+ {	name	=> _"Play count",	width => 50,	flags => 'fgaesc',	type => 'integer',	letter => 'p',
 	options => 'rw_ userid',
 	id3v2	=> 'TXXX;FMPS_Playcount;%v&TXXX;FMPS_Playcount_User;%v::%i',
 	vorbis	=> 'FMPS_PLAYCOUNT&FMPS_PLAYCOUNT_USER::%i',
@@ -679,12 +819,12 @@ our %timespan_menu=
 	ilst	=> '----FMPS_Playcount&----FMPS_Playcount_User::%i',
 	postread=> sub { my $v=shift; length $v ? sprintf('%d',$v) : undef },
 	prewrite=> sub { sprintf('%.1f', $_[0]); },
- },
+},
  skipcount	=>
- {	name	=> _"Skip count",	width => 50,	flags => 'gaesc',	type => 'integer',	letter => 'k',
+ {	name	=> _"Skip count",	width => 50,	flags => 'fgaesc',	type => 'integer',	letter => 'k',
  },
  composer =>
- {	name	=> _"Composer",		width	=> 100,		flags => 'garwesci',	type => 'artist',
+ {	name	=> _"Composer",		width	=> 100,		flags => 'fgarwesci',	type => 'artist',
 	id3v2	=> 'TCOM',	vorbis	=> 'composer',		ape => 'Composer',	ilst => "\xA9wrt",
 	apic_id	=> 11,
 	picture_field => 'artist_picture',
@@ -693,7 +833,7 @@ our %timespan_menu=
 	disable=>1,	options => 'disable',
  },
  lyricist =>
- {	name	=> _"Lyricist",		width	=> 100,		flags => 'garwesci',	type => 'artist',
+ {	name	=> _"Lyricist",		width	=> 100,		flags => 'fgarwesci',	type => 'artist',
 	id3v2	=> 'TEXT',	vorbis	=> 'LYRICIST',		ape => 'Lyricist',	ilst => '---LYRICIST',
 	apic_id	=> 12,
 	picture_field => 'artist_picture',
@@ -702,7 +842,7 @@ our %timespan_menu=
 	disable=>1,	options => 'disable',
  },
  conductor =>
- {	name	=> _"Conductor",	width	=> 100,		flags => 'garwesci',	type => 'artist',
+ {	name	=> _"Conductor",	width	=> 100,		flags => 'fgarwesci',	type => 'artist',
 	id3v2	=> 'TPE3',	vorbis	=> 'CONDUCTOR',		ape => 'Conductor',	ilst => '---CONDUCTOR',
 	apic_id	=> 9,
 	picture_field => 'artist_picture',
@@ -711,7 +851,7 @@ our %timespan_menu=
 	disable=>1,	options => 'disable',
  },
  remixer =>
- {	name	=> _"Remixer",	width	=> 100,		flags => 'garwesci',	type => 'artist',
+ {	name	=> _"Remixer",	width	=> 100,		flags => 'fgarwesci',	type => 'artist',
 	id3v2	=> 'TPE4',	vorbis	=> 'REMIXER',		ape => 'MixArtist',	ilst => '---REMIXER',
 	picture_field => 'artist_picture',
 	FilterList => {search=>1},
@@ -719,61 +859,76 @@ our %timespan_menu=
 	disable=>1,	options => 'disable',
  },
  version=> #subtitle ?
- {	name	=> _"Version",	width	=> 150,		flags => 'garwesci',	type => 'fewstring',
+ {	name	=> _"Version",	width	=> 150,		flags => 'fgarwesci',	type => 'fewstring',
 	id3v2	=> 'TIT3',	vorbis	=> 'version|subtitle',			ape => 'Subtitle',	ilst=> '----SUBTITLE',
  },
  bpm	=>
- {	name	=> _"BPM",	width	=> 60,		flags => 'garwesc',	type => 'integer',
+ {	name	=> _"BPM",	width	=> 60,		flags => 'fgarwesc',	type => 'integer',
 	id3v2	=> 'TBPM',	vorbis	=> 'BPM',	ape => 'BPM',		ilst=> 'tmpo',
 	FilterList => {type=>'div.10',},
 	disable=>1,	options => 'disable',
  },
  channel=>
- {	name	=> _"Channels",		width => 50,	flags => 'garsc',	type => 'integer',	bits => 4,	audioinfo => 'channels', },	# are 4 bits needed ? 1bit+1 could be enough ?
- bitrate=>
- {	name	=> _"Bitrate",		width => 70,	flags => 'garsc_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
-	FilterList => {type=>'div.32',},
+ {	name	=> _"Channels",		width => 50,	flags => 'fgarsc',	type => 'integer',	bits => 4,	audioinfo => 'channels',
+	default_filter	 => 'e:2',
+	'filterdesc:e:1' => _"is mono",
+	'filterdesc:-e:1'=> _"isn't mono",
+	'filterdesc:e:2' => _"is stereo",
+	'filterdesc:-e:2'=> _"isn't stereo",
  },
- #samprate=>
- #{	name	=> _"Sampling Rate",	width => 60,	flags => 'gasc',	type => 'integer',	bits => 16,	audioinfo => 'rate', },
+ bitrate=>
+ {	name	=> _"Bitrate",		width => 70,	flags => 'fgarsc_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
+	FilterList => {type=>'div.32',},
+	'filterpat:value' => [ display => "%d kbps", unit => 'kbps', default_value=>192 ],
+ },
  samprate=>
- {	name	=> _"Sampling Rate",	width => 60,	flags => 'garsc',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate',
+ {	name	=> _"Sampling Rate",	width => 60,	flags => 'fgarsc',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate',
 	FilterList => {},
+	'filterdesc:e:44100' => _"is 44.1kHz",
+	'filterpat:value' => [ display => "%d Hz", unit => 'Hz', step=> 100, default_value=>44100 ],
  },
  filetype=>
- {	name	=> _"Type",		width => 80,	flags => 'garsc',	type => 'fewstring',	bits => 8, #could probably fit in 4bit
+ {	name	=> _"File type",		width => 80,	flags => 'fgarsc',	type => 'fewstring',	bits => 8, #could probably fit in 4bit
 	FilterList => {},
+	'filterdesc:m:^mp3' => _"is a mp3 file",
+	'filterdesc:m:^mp4 mp4a' => _"is a m4a file",
+	'filterdesc:m:^ogg' => _"is an ogg file",
+	'filterdesc:m:^flac'=> _"is a flac file",
+	'filterdesc:m:^mpc' => _"is a musepack file",
+	'filterdesc:m:^wv'  => _"is a wavepack file",
+	'filterdesc:m:^ape' => _"is an ape file",
  },
  'length'=>
- {	name	=> _"Length",		width => 50,	flags => 'garsc_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
+ {	name	=> _"Length",		width => 50,	flags => 'fgarsc_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
 	audioinfo => 'seconds',		check	=> '#VAL#= sprintf "%.0f",#VAL#;',
 	FilterList => {type=>'div.60',},
+	'filterpat:value' => [ display => "%d s", unit => 's', default_value=>1 ],	#should 's' be translated ?
 	letter => 'm',
 	rightalign=>1,	#right-align in SongTree and SongList #maybe should be done to all number columns ?
  },
 
  replaygain_track_gain=>
- {	name	=> _"Track gain",	width => 60,	flags => 'grwsca',
+ {	name	=> _"Track gain",	width => 60,	flags => 'fgrwsca',
 	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
 	displayformat	=> '%.2f dB',
 	id3v2	=> 'TXXX;replaygain_track_gain;%v',	vorbis	=> 'replaygain_track_gain',	ape	=> 'replaygain_track_gain', ilst => '----replaygain_track_gain',
 	options => 'disable',
  },
  replaygain_track_peak=>
- {	name	=> _"Track peak",	width => 60,	flags => 'grwsca',
+ {	name	=> _"Track peak",	width => 60,	flags => 'fgrwsca',
 	id3v2	=> 'TXXX;replaygain_track_peak;%v',	vorbis	=> 'replaygain_track_peak',	ape	=> 'replaygain_track_peak', ilst => '----replaygain_track_peak',
 	type	=> 'float',
 	options => 'disable',
  },
  replaygain_album_gain=>
- {	name	=> _"Album gain",	width => 60,	flags => 'grwsca',
+ {	name	=> _"Album gain",	width => 60,	flags => 'fgrwsca',
 	id3v2	=> 'TXXX;replaygain_album_gain;%v',	vorbis	=> 'replaygain_album_gain',	ape	=> 'replaygain_album_gain', ilst => '----replaygain_album_gain',
 	displayformat	=> '%.2f dB',
 	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
 	options => 'disable',
  },
  replaygain_album_peak=>
- {	name	=> _"Album peak",	width => 60,	flags => 'grwsca',
+ {	name	=> _"Album peak",	width => 60,	flags => 'fgrwsca',
 	id3v2	=> 'TXXX;replaygain_album_peak;%v',	vorbis	=> 'replaygain_album_peak',	ape	=> 'replaygain_album_peak', ilst => '----replaygain_album_peak',
 	type	=> 'float',
 	options => 'disable',
@@ -836,19 +991,28 @@ our %timespan_menu=
 			none		=> quotemeta "No tags",	#not translated because made for debugging
 			disable=>1,
 		},
+ list =>
+ {	type=> 'special',
+	flags	=> 'f',
+	name	=> _"Lists",
+	'filterdesc:~'		=> [ _"present in %s", _"present in list", 'listname',],
+	'filterdesc:-~'		=> _"not present in %s",
+	'filter:~'		=> '.!!. do {my $l=$::Options{SavedLists}{q(#VAL#)}; $l ? $l->IsIn(#ID#) : undef}',
+	default_filter		=> '~',
+	 },
 );
 
 our %FieldTemplates=
-(	string	=> { type=>'string',	editname=>_"string",		flags=>'gaesc',	width=> 200,	edit_many =>1,		options=> 'customfield', },
-	text	=> { type=>'text',	editname=>_"multi-lines string",flags=>'gaesc',	width=> 200,	edit_many =>1,		options=> 'customfield', },
-	float	=> { type=>'float',	editname=>_"float",		flags=>'gaesc',	width=> 100,	edit_many =>1,		options=> 'customfield', },
-	boolean	=> { type=>'boolean',	editname=>_"boolean",		flags=>'gaesc',	width=> 20,	edit_many =>1,		options=> 'customfield', },
-	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'gaescil',width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
-	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'gaesci',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', },
-	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'gaesci',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
-	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'gaesc',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
-	integer	=> { type=>'integer',	editname=>_"integer",		flags=>'gaesc',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
-	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'gaesc_',width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid', FilterList=> {},
+(	string	=> { type=>'string',	editname=>_"string",		flags=>'fgaesc',	width=> 200,	edit_many =>1,		options=> 'customfield', },
+	text	=> { type=>'text',	editname=>_"multi-lines string",flags=>'fgaesc',	width=> 200,	edit_many =>1,		options=> 'customfield', },
+	float	=> { type=>'float',	editname=>_"float",		flags=>'fgaesc',	width=> 100,	edit_many =>1,		options=> 'customfield', },
+	boolean	=> { type=>'boolean',	editname=>_"boolean",		flags=>'fgaesc',	width=> 20,	edit_many =>1,		options=> 'customfield', },
+	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
+	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'fgaesci',	width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', },
+	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'fgaesci',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
+	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'fgaesc',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
+	integer	=> { type=>'integer',	editname=>_"integer",		flags=>'fgaesc',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
+	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'fgaesc_',	width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid', FilterList=> {},
 		     postread => \&FMPS_rating_postread,		prewrite => \&FMPS_rating_prewrite,
 		     id3v2 => 'TXXX;FMPS_Rating_User;%v::%i',	vorbis	=> 'FMPS_RATING_USER::%i',	ape => 'FMPS_RATING_USER::%i',	ilst => '----FMPS_Rating_User::%i',
 		     starprefix => 'stars', #FIXME make it an option
@@ -991,20 +1155,61 @@ sub Field_properties
 	return map Field_property($field,$_), @keys;
 }
 
-sub CanDoFilter		#returns true if all @fields can do $op
-{	my ($op,@fields)=@_;
-	return !grep !LookupCode($_,'filter:'.$op), @fields;
+sub Fields_with_filter
+{	return grep $Def{$_}{flags}=~/f/, @Fields;
 }
+sub filter_properties
+{	my ($field,$cmd0)=@_;
+	my ($inv,$cmd,$pat)= $cmd0=~m/^(-?)([^-:]+)(?::(.*))?$/;
+	my @totry= ("$inv$cmd", $cmd);
+	unshift @totry, "$inv$cmd:$pat", "$cmd:$pat" if defined $pat && length $pat;
+	my $prop;
+	for my $c (@totry)
+	{	$prop= Songs::Field_property($field,"filterdesc:$c");
+		next unless $prop;
+		if (!ref $prop && $c=~m/:/ && $c!~m/^-/) { $prop= [$prop,$prop,'']; }
+		next if !ref $prop || @$prop<2;
+		if (@$prop==2) { $c= $prop->[1]; $prop= Songs::Field_property($field,"filterdesc:$c"); }
+		$cmd=$c;
+		last;
+	}
+	return $cmd,$prop;
+}
+sub Field_filter_choices
+{	my $field=shift;
+	my %filters;
+	my $h= $Def{$field};
+	my %exclude;
+	while ($h)
+	{	for my $key (keys %$h)
+		{	next unless $key=~m/^filterdesc:(.+)/ && !$exclude{$1} && !$filters{$1};
+			my $value= $h->{$key};
+			my $f=$1;
+			if (ref $value) { if (@$value<3) { $exclude{$f}=1; next } else { $value=$value->[1]; } }
+			else { unless ($f=~m/:/ && $f!~m/^-/) { $exclude{$f}=1; next} }	# for constant filters eg: filterdesc:e:44100
+			$filters{$f}= $value;
+		}
+		my $type= $h->{parent} || $h->{type};
+		last unless $type;
+		if (my $e= $h->{filter_exclude})	#list of filters from parent to ignore, 'ALL' for all
+		{	last if $e eq 'ALL';
+			$exclude{$_}=1 for split / +/, $e;
+		}
+		$h= $Types{$type};
+	}
+	return \%filters;
+}
+sub filter_prep_numbers { $_[0]=~m/(-?\d+(?:\.\d+)?)/; return $1 || 0 }
 sub FilterCode
 {	my ($field,$cmd,$pat,$inv)=@_;
-	my ($code,$convert)=LookupCode($field, 'filter:'.$cmd, 'filter_prep:'.$cmd.'|filter_prep');
+	my ($code,$convert)=LookupCode($field, "filter:$cmd", "filter_prep:$cmd");
 	unless ($code) { warn "error can't find code for filter $field,$cmd,$pat,$inv\n"; return 1}
 	$convert||=sub {quotemeta $_[0]};
 	unless (ref $convert) { $convert=~s/#PAT#/\$_[0]/g; $convert=eval "sub {$convert}"; }
 	$code=~s/#ID#/\$_/g;
 	if ($inv)	{$code=~s#$Filter::OpRe#$Filter::InvOp{$1}#go}
 	else		{$code=~s#$Filter::OpRe#$1 eq '!!' ? '' : $1#ego}
-	if ($code=~m/#VAL1#/) { my ($p1,$p2)=sort { $a<=>$b } map $convert->($_), split / /,$pat; $code=~s/#VAL1#/$p1/g; $code=~s/#VAL2#/$p2/g; }
+	if ($code=~m/#VAL1#/) { my ($p1,$p2)= map $convert->($_), split / /,$pat; ($p1,$p2)=($p2,$p1) if $p1>$p2; $code=~s/#VAL1#/$p1/g; $code=~s/#VAL2#/$p2/g; }
 	else { my $p=$convert->($pat,$field); $code=~s/#VAL#/$p/g; }
 	return $code;
 }
@@ -1685,7 +1890,7 @@ sub FindID
 }
 
 sub UpdateDefaultRating
-{	my $l=AllFilter('rating:e:');
+{	my $l=AllFilter('rating:~:255');
 	Changed({'rating'},$l) if @$l;
 }
 sub UpdateArtistsRE
@@ -3225,14 +3430,17 @@ sub new
 	my $store= GMB::ListStore::Field::getstore($field);
 	my $self= bless Gtk2::ComboBox->new_with_model($store), $class;
 
-	my $cell=Gtk2::CellRendererText->new;
-	$self->pack_start($cell,1);
-	$self->set_attributes($cell,text=>0);
 	if ($Songs::Def{$field}{icon})
 	{	my $cell=Gtk2::CellRendererPixbuf->new;
+		$cell->set_fixed_size( Gtk2::IconSize->lookup('menu') ); # fixed size => icon or empty space
 		$self->pack_start($cell,0);
 		$self->set_attributes($cell,stock_id=>1);
 	}
+	my $cell=Gtk2::CellRendererText->new;
+	#$cell->set(wrap_width=>500);
+	#$cell->set(ellipsize=>'end');
+	$self->pack_start($cell,1);
+	$self->set_attributes($cell,text=>0);
 	$self->{value}=$init;
 	$self->update if defined $init;
 	$self->{callback}=$callback;
@@ -3291,12 +3499,6 @@ INIT
 			  :    "0..(($pat>@\$tmp)? \$#\$tmp : ".($pat-1).')';
 		return "\$tmp=$lref; Songs::SortList(\$tmp, '".'-'.Songs::SortField($field)."' ); $assign @\$tmp[$inv];";
 	     },
-	l => sub	#is in a saved lists
-	     {	my ($n,$pat,$lref,$assign,$inv)=@_;
-		$inv=$inv ? '!' : '';
-		return '$tmp={}; $$tmp{$_}=undef for @{$::Options{SavedLists}{"'."\Q$pat\E".'"}};'
-			.$assign.'grep '.$inv.'exists $$tmp{$_},@{'.$lref.'};';
-	     },
   );
 }
 
@@ -3317,7 +3519,7 @@ sub new
 {	my ($class,$string,$source) = @_;
 	my $self=bless {}, $class;
 	if	(!defined $string)	  {$string='';}
-	elsif	($string=~m/^-?\w+:~:/) { ($string)=_smart_simplify($string); }
+	elsif	($string=~m/^\w+:-?~:/) { ($string)=_smart_simplify($string); }
 	$self->{string}=$string;
 	$self->{source}=$source;
 	return $self;
@@ -3334,6 +3536,14 @@ sub newadd
 	my @supersets;
 	for my $f (@filters)
 	{	$f='' unless defined $f;
+		if (ref $f && ref $f eq 'ARRAY')	#array format : first value is true(and)/false(or) followed by filters
+		{	while (ref $f)
+			{	if (@$f<2) {$f=undef;last}
+				if (@$f==2) { $f=$f->[1] }
+				else { $f= Filter->newadd(@$f); last }	# FIXME could avoid a recursion
+			}
+			next unless defined $f;
+		}
 		$self->{source} ||= $f->{source} if ref $f;
 		my $string=(ref $f)? $f->{string} : $f;
 		unless ($string)
@@ -3352,7 +3562,7 @@ sub newadd
 		}
 		else
 		{	if ($string=~m/^(-)?(\d+)(\D)(.*)$/) { warn "Old filter $string FIXME\n"; $string=($1||'').Songs::FieldUpgrade($2).":$3:".$4; warn " => $string\n"} #PHASE1
-			push @strings,( ($string=~m/^-?\w+:~:/)
+			push @strings,( ($string=~m/^\w+:-?~:/)
 					? _smart_simplify($string,!$and)
 					: $string
 				      );
@@ -3376,69 +3586,296 @@ sub newadd
 
 	$self->{string}=$sum;
 	warn "Filter->newadd=".$self->{string}."\n" if $::debug;
-	$self->{superset_filters}= \@supersets unless $sum=~m#(?:^|\x1D)-?\w*:[th]:#;	#don't use superset optimization for head/tail filters, as they are not commutative
+	$self->{superset_filters}= \@supersets unless $sum=~m#(?:^|\x1D)\w+:-?[th]:#;	#don't use superset optimization for head/tail filters, as they are not commutative
 	return $self;
 }
 
-sub set_parent	#indicate that this filter will only match songs that match $superset_filter, used for optimization when the result of $superset_filter is cached
-{	my ($self,$superset_filter)=@_;
-	$self->{superset_filters}=[ $superset_filter->{string} ] unless $superset_filter->{string} eq $self->{string};
+sub new_from_smartstring
+{	my (undef,$string,$casesens,$regexp,$fields0)=@_;
+	$fields0 ||= 'title';
+	my $and= [1];
+	my $or= [0,$and];
+	my @parents; my @not; my $notgroup;
+	while ($string=~m/\S/)
+	{	$string=~s/^\s+//;
+		if ($string=~s#^(?:\||OR)\s+##) { push @$or, $and=[1]; next }
+		my $not= ($string=~s/^[-!]\s*// xor $notgroup);
+		if ($string=~s#^\(##)				#open group
+		{	push @not,$notgroup;
+			$notgroup=$not;
+			push @parents, $or; $and=[(1 xor $not)];
+			$or=[(0 xor $not), $and];
+			next;
+		}
+		if ($string=~s#^\)## && @parents)		#close group
+		{	my $prev= $or;
+			$or= pop @parents;
+			$and= $or->[-1];
+			push @$and, $prev;
+			$notgroup=pop @not;
+			next;
+		}
+		$string=~s/^\\(?=[-!O|\(\)])//;	#un-escape escaped negative or OR or ()
+
+		# operator and fields
+		my ($fields,$op);
+		if ($string=~s#^([A-Za-z]\w*(?:\|[A-Za-z]\w*)*)?(<=|>=|[:<>=~])##)
+		{	$fields=$1; $op=$2;
+			if ($fields)
+			{	my @f= grep $Def{$_}, split(/\|/,$fields);
+				if (@f) { $fields= join '|',@f }
+				else { $string= $fields.$op.$string; $op=undef; }	#no recognized field => treat $fields and $op as part of the pattern
+			}
+			$string=~s#^\\([:<>=~])#$1#g unless $op;	#un-escape escaped operators at start of string if no recognized operator
+		}
+		$fields ||= $fields0;
+		$op||= $regexp ? '~' : ':';
+
+		my @patterns;
+		{	if ($string=~s#^(['"])(.+?)(?<!\\)\1((?<!\\)\||\s+|$)##)
+			{	push @patterns,$2;
+				redo if $3 eq '|';
+			}
+			elsif ($string=~s/^(\S.*?)(	(?<!\\)\| |			# ends with | => more than one pattern
+							(?<!\\)(?=\)[\s|)]|\)$) |	# or with closing parenthese followed by space | ) or end-of-string
+							(?<!\\)\s+ | $			# or with spaces or end-of-string
+					)//x)
+			{	push @patterns,$1;
+				redo if $2 eq '|';
+			}
+		}
+		s#\\([ "'|)])#$1#g for @patterns;	#un-escape escaped spaces, quotes, | and )
+
+		# convert smart operator to internal operator and create filter for this level
+		my @filters=(0 xor $notgroup);
+		for my $field (split /\|/, $fields)
+		{	for my $pattern (@patterns)
+			{	my $filter; warn $op;
+				if (my $found= Songs::Field_property($field,'smartfilter:'.$op))
+				{	if (ref $found)
+					{	$filter= $found->($pattern,$op,$casesens,$field);warn $filter;
+					}
+					else
+					{	my @found=split / /,$found;
+						$op= @found>1 ? $found[$casesens ? 1 : 0] : $found;
+						$filter= $op.':'.$pattern;
+					}
+				}
+				next unless $filter;
+				if ($not) { $filter=~s/^-//  or  $filter= '-'.$filter }
+				push @filters, $field.':'.$filter;
+			}
+		}
+		next unless @filters>1;
+		push @$and, @filters>2 ? \@filters : $filters[1];
+	}
+
+	# close opened groups
+	while (@parents)
+	{	my $prev= $or;
+		$or= pop @parents;
+		$and= $or->[-1];
+		push @$and, $prev;
+	}
+	return Filter->newadd(@$or);
+}
+sub _smartstring_moreless
+{	my ($pat,$op,$casesens,$field)=@_;
+	return undef unless $pat=~m/^-?[0-9.]+[a-zA-Z]?$/;	# FIXME could check if support units
+	$op= $op eq '<=' ? '->' : $op eq '>=' ? '-<' : $op;
+	return $op.':'.$pat;
+}
+sub _smartstring_date_moreless
+{	my ($pat,$op,$casesens,$field)=@_;
+	my $suffix='';
+	if ($pat=~m/\d[smhdwMy]/) { $suffix='ago' } #relative date
+	elsif ($pat=~m#^(\d\d\d\d)(?:[-/](\d\d?)(?:[-/](\d\d?)(?:[-T ](\d\d?)(?::(\d\d?)(?::(\d\d?))?)?)?)?)?$#) # yyyy-MM-dd hh:mm:ss
+	{	$pat= ::mktime(($6||0),($5||0),($4||0),($3||1),($2||1)-1,$1-1900);
+	}
+	else {return undef}
+	$op= $op eq '<=' ? '->' : $op eq '>=' ? '-<' : $op;
+	return $op.$suffix.':'.$pat;
+}
+sub _smartstring_number
+{	my ($pat,$op,$casesens,$field)=@_;
+	if ($op ne '=' || $pat!~m/^-[0-9.]+[a-zA-Z]?$/) {$pat=~s/^-/../}	# allow ranges using - unless = with negative number (could also check if field support negative values ?)
+	if ($pat=~m/\.\./)
+	{	my ($s1,$s2)= split /\s*\.\.\s*/,$pat,2;
+		return	(length $s1 && length $s2) ? "b:$s1 $s2":
+			(length $s1 && !length$s2) ? "-<:".$s1	:
+			(!length$s1 && length $s2) ? "->:".$s2	: undef;
+	}
+	return undef unless $pat=~m/^-?[0-9.]+[a-zA-Z]?$/;	# FIXME could check if support units
+	$op= $op eq ':' ? 's' : 'e';
+	return $op.':'.$pat;
 }
 
-sub _between_simplify #not tested enough
-{	my $and=shift;
+sub _smartstring_date
+{	my ($pat,$op,$casesens,$field)=@_;
+	my $suffix='';
+	if ($pat=~m/\d[smhdwMy]/) { $suffix='ago' } #relative date
+	else		# absolute date
+	{	if ($pat!~m/\.\./ && $pat=~m/^[^-]*-[^-]*$/) { $pat=~s/-/../; } # no '..' and only one '-' => replace '-' by '..'
+		my ($s1,$range,$s2)=split /(\s*\.\.\s*)/,$pat,2;
+		$pat='';
+		if ($s1 && $s1=~m#^(\d\d\d\d)(?:[-/](\d\d?)(?:[-/](\d\d?)(?:[-T ](\d\d?)(?::(\d\d?)(?::(\d\d?))?)?)?)?)?$#) # yyyy-MM-dd hh:mm:ss
+		{	$pat= ::mktime(($6||0),($5||0),($4||0),($3||1),($2||1)-1,$1-1900);
+		}
+		elsif ($s1=~m/^\d{5,}$/) {$pat=$s1}
+		$pat.='..' if $range;
+		if ($s2)
+		{	my ($y,$M,$d,$h,$m,$s)= $s2=~m#^(\d\d\d\d)(?:[-/](\d\d?)(?:[-/](\d\d?)(?:[-T ](\d\d?)(?::(\d\d?)(?::(\d\d?))?)?)?)?)?$#; # yyyy-MM-dd hh:mm:ss
+			if ($y)
+			{	for ($s,$m,$h,$d,$M,$y)
+				{	if (defined) { $_++; last; }
+				}
+				$pat.= ::mktime(($s||0),($m||0),($h||0),($d||1),($M||1)-1,$y-1900)-1;
+			}
+			elsif ($s2=~m/^\d{5,}$/) {$pat.=$s2}
+		}
+	}
+	if ($pat=~m/\.\.|-/)
+	{	my ($s1,$s2)= split /\s*\.\.\s*|\s*-\s*/,$pat,2;
+		return	(length $s1 && length $s2) ? "b$suffix:$s1 $s2":
+			(length $s1 && !length$s2) ? "-<$suffix:".$s1	:
+			(!length$s1 && length $s2) ? "->$suffix:".$s2	: undef;
+	}
+	$op= $op eq '=' ? 'e' : $casesens ? 's' : 'si';
+	if ($suffix && $op eq 'e') { return undef } # FIXME =5d could be changed into between 4.5d and 5.5d ?
+	return $op.$suffix.':'.$pat;
+}
+
+sub add_possible_superset	#indicate a possible superset filter that could be used for optimization when the result of $superset_candidate is cached
+{	my $self=shift;
+	my $arrayself= $self->to_array;
+	my $string1= $self->{string};
+	return if $string1=~m#(?:^|\x1D)\w+:-?[th]:#; # ignores filters with head/tail filters
+	for my $superset_candidate (@_)
+	{	my $string2= $superset_candidate->{string};
+		next if $string2=~m#(?:^|\x1D)\w+:-?[th]:#; # ignores filters with head/tail filters
+		next if $string2 eq $string1;
+		push @{ $self->{superset_filters} }, $string2 if _is_subset($superset_candidate->to_array, $arrayself);
+	}
+	#if (my $l=$self->{superset_filters}) { my $s=$self->{string}."\n"; $s.=" superset: ".$_."\n" for @$l; $s=~s/\x1D/**/g;warn $s; } #DEBUG
+}
+
+sub _is_subset		# returns true if $f2 must be a subset of $f1	#$f1 and $f2 must be in array form	#doesn't check for head/tail filters
+{	my ($f1,$f2)=@_;
+	if (!ref $f1 && !ref $f2)
+	{	return 1 if $f1 eq $f2;
+		my ($field1,$op1,$pat1)= split /:/,$f1,3;
+		my ($field2,$op2,$pat2)= split /:/,$f2,3;
+		return 0 if $field1 ne $field2 || $op1 ne $op2;
+		if ($op1 eq 's'|| $op1 eq 'si')		{ return index($pat2,$pat1)!=-1 }	# handle case-i ?
+		elsif ($op1 eq '-s'|| $op1 eq '-si')	{ return index($pat1,$pat2)!=-1 }	# handle case-i ?
+		elsif ($op1 eq '>' || $op1 eq '-<') { return ($pat1."\x00".$pat2) =~m/(-?\d+)(\w*)\x00(-?\d+)\2/ && $3>$1  }
+		elsif ($op1 eq '<' || $op1 eq '->') { return ($pat1."\x00".$pat2) =~m/(-?\d+)(\w*)\x00(-?\d+)\2/ && $3>$1  }
+		# FIXME  check these filters : b bago >ago <ago ?
+		return 0;
+	}
+
+	# at least one is an array of filters
+	$f1= [0,$f1] unless ref$f1;
+	$f2= [0,$f2] unless ref$f2;
+	warn "@$f1 // @$f2\n";
+	if ($f1->[0] && $f2->[0])	# A & B -> C & D	# each from f1 must be a superset of one from f2
+	{	for my $i (1..$#$f1)
+		{	my $in_one;
+			$in_one ||= _is_subset($f1->[$i],$f2->[$_]) for 1..$#$f2;
+			return 0 unless $in_one;
+		}
+		return 1;
+	}
+	elsif ($f1->[0])		# A & B -> C | D	# each from f2 must be a subset of in each from f1
+	{	my $not_in_one=1;
+		for my $i (1..$#$f2)
+		{	$not_in_one ||= ! _is_subset($f1->[$_],$f2->[$i]) for 1..$#$f1;
+		}
+		return !$not_in_one;
+	}
+	elsif ($f2->[0])		# A | B -> C & D	# one from f2 must be a subset of one from f1
+	{	my $in_one;
+		for my $i (1..$#$f2)
+		{	$in_one ||= _is_subset($f1->[$_],$f2->[$i]) for 1..$#$f1;
+		}
+		return $in_one;
+	}
+	else				# A | B -> C | D	# each from f2 must be a subset of one from f1
+	{	for my $i (1..$#$f2)
+		{	my $in_one;
+			$in_one ||= _is_subset($f1->[$_],$f2->[$i]) for 1..$#$f1;
+			return 0 unless $in_one;
+		}
+		return 1;
+	}
+}
+
+sub to_array	#returns an array form of the filter, first value of array is false for OR, true for AND
+{	my $filter=shift;
+	$filter= $filter->{string} if ref $filter;
+	my $current;
+	$current=[0] unless $filter=~m/^\(/;
+	my @parents;
+	for my $part (split /\x1D/,$filter)
+	{	if ($part=~m/^\(/)		# '(|' or '(&'
+		{	my $and= $part eq '(&';
+			push @parents, $current if $current;
+			$current=[$and];
+			next;
+		}
+		if ($part eq ')')
+		{	last unless @parents;
+			$part=$current;
+			$current=pop @parents;
+		}
+		push @$current, $part;
+	}
+	return $current;
+}
+
+sub _combine_ranges
+{	my ($field,$and,@segs)=@_;
+	my $integer=1;	#FIXME assume integer field, set to 0 if float
+	my @out;
+	@segs= sort { $a->[0] <=> $b->[0] } @segs;
+	my ($s1,$s2);
+	while (@segs)
+	{	my ($s3,$s4)= @{shift @segs};
+		if (defined $s1 && $s3>=$s1 && $s3<=$s2+$integer)
+		{	$s2=$s4 if $s2<$s4;
+		}
+		else { push @out, [$s1,$s2] if defined $s1; ($s1,$s2)=($s3,$s4); }
+	}
+	push @out, [$s1,$s2] if defined $s1;
+	return map { "$field:".($and ? '-' : '').'b:'.$_->[0].' '.$_->[1] }  @out;
+}
+sub _between_simplify		#combine ranges of consecutive between filters into fewer ranges if possible
+{	my ($and,@in)=@_;
 	my @strings;
-	my (%between,%max,%min);
-	for my $s (@_)
-	{	if ($s=~m/^(-?\w+):b:(\d+) (\d+)\x1D?$/)
-		{	if ($s!~m/^-/ xor $and)		#=> combine the range
-			{	my $end=$between{$1}{$2};
-				$between{$1}{$2}=$3 unless $end && $end>$3;
-				warn "{$1}{$2}=$3";
-			}
-			else	#=> reduce to common range
-			{	my $max=$max{$1}; my $min=$min{$1};
-				$max{$1}=$3 unless defined $max && $max<$3;
-				$min{$1}=$2 unless defined $min && $min>$2;
+	my ($field,@segs);
+	while (@in)
+	{	my $s=shift @in;
+		if ($s=~m/^(\w+):(-?)b:(\d+) (\d+)\x1D?$/)
+		{	if (!$2 xor $and)
+			{	$field||=$1;
+				if ($field eq $1)
+				{	push @segs, [$3,$4];	#=> combine the range
+					next if @in;
+				}
+				else { unshift @in,$s; }
 			}
 		}
-#FIXME >/< or >=/<= problem
-#		elsif (m/^(\w+):>:(\d+)\x1D?$/ || m/^-(\w+):<:(\d+)\x1D?$/)
-#		{	my $min=$min{$1};
-#			$min{$1}=$2 unless defined $min && ($min>$2 xor $and);
-#		}
-#		elsif (m/^(\w+):<:(\d+)\x1D?$/ || m/^-(\w+):>:(\d+)\x1D?$/)
-#		{	my $max=$max{$1};
-#			$max{$1}=$2 unless defined $max && ($max<$2 xor $and);
-#		}
-		else {push @strings,$s}
-	}
-	for my $s (keys %min)
-	{	my $min=$min{$s};
-		if (exists $max{$s}) { push @strings,"$s:b:$min $max{$s}"; delete $max{$s} }
-		else { push @strings,"$s:>:$min{$s}";warn "FIXME"; }#not used for now, see above >/< or >=/<= problem
-	}
-	for my $s (keys %max)
-	{	push @strings,"$s:<:$max{$s}";warn "FIXME";#not used for now, see above >/< or >=/<= problem
-	}
-	for my $s (keys %between)
-	{	my $h=$between{$s};
-		my @l=sort {$a<=>$b} keys %$h;
-		warn "@l";
-		my @replace; my $i=0;
-		while ($i<=$#l)
-		{	my $start=$l[$i];
-			my $end=$h->{$start};
-			while ($i<$#l && $l[$i+1]<=$end+1) { my $end2=$h->{$l[$i+1]}; $end=$end2 if $end2>$end; $i++ }
-			push @strings,"$s:b:$start $end";
-			#warn " -> $s:b:$start $end";
-			$i++;
+		if (@segs)	#change of filter or no more filters => push combined range
+		{	push @strings, _combine_ranges($field,$and,@segs);
+			@segs=();
 		}
+		else { push @strings, $s; }
+		$field=undef;
 	}
-	s/^(-?\w+):b:(\d+) \2\x1D?$/"$1:e:".($2? $2:'')/e for @strings; #replace :b:5 5 by :e:5
+
+	s/^(\w+):(-?)b:(\d+) \3\x1D?$/"$1:$2e:$3"/e for @strings; #replace :b:5 5 by :e:5
 	return @strings;
 }
-
 
 sub are_equal #FIXME could try harder
 {	my $f1=$_[0]; my $f2=$_[1];
@@ -3449,16 +3886,16 @@ sub are_equal #FIXME could try harder
 
 sub _smart_simplify	#only called for ~ filters
 {	my $s=$_[0]; my $returnlist=$_[1];
-	my ($inv,$field,$pat)= $s=~m/^(-)?(\w+):~:(.*)$/;
+	my ($field,$inv,$pat)= $s=~m/^(\w+):(-?)~:(.*)$/;
 	$inv||='';
 	my $sub=Songs::LookupCode($field,'filter_simplify:~');
 	return $s unless $sub;
 	my @pats=$sub->($pat);
 	if ($returnlist || @pats==1)
-	{	return map $inv.$field.':~:'.$_ , @pats;
+	{	return map "$field:$inv~:$_" , @pats;
 	}
 	else
-	{	return "(|\x1D".join('',map($inv.$field.':~:'.$_."\x1D", @pats)).")\x1D";
+	{	return "(|\x1D".join('',map("$field:$inv~:$_\x1D", @pats)).")\x1D";
 	}
 }
 
@@ -3476,7 +3913,9 @@ sub invert
 	{	s/^\(\&$/(|/ && next;
 		s/^\(\|$/(&/ && next;
 		next if $_ eq ')';
-		$_='-'.$_ unless s/^-//;
+		my ($field,$cmdpat)=split ':',$_,2;
+		$cmdpat='-'.$cmdpat unless $cmdpat=~s/^-//;
+		$_= $field.':'.$cmdpat;
 	}
 	$self->{string}=join "\x1D",@filter;
 	warn 'after invert  : '.$self->{string} if $::debug;
@@ -3557,7 +3996,7 @@ sub _optimize_with_hashes	# optimization for some special cases
 			my $ilist=delete $ilist[$d];
 			while (my ($icc,$h)=each %$vd)
 			{	next unless (keys %$h)>2; #only optimize if more than 2 keys
-				my ($inv,$field,$cmd)=$icc=~m/^(-?)(\w+):([^:]+):$/;
+				my ($field,$inv,$cmd)=$icc=~m/^(\w+):(-?)([^:]+):$/;
 				my ($ok,$prephash)=Songs::LookupCode($field, 'filter:h'.$cmd, 'filter_prephash:'.$cmd, [HREF=> '$_[0]']);
 				next unless $ok;
 				if ($prephash)
@@ -3573,13 +4012,13 @@ sub _optimize_with_hashes	# optimization for some special cases
 				 {push @$l,$first-1,$last+1} #add ( && ) to the removed filters if all those inside are replaced by the hash
 				$filter[$_]=undef for @$l; #remove filters to be replaced by the hash
 				push @$hashes,$h;
-				$filter[$first]="$inv$field:h$cmd:".$#$hashes;
+				$filter[$first]="$field:".$inv."h$cmd:".$#$hashes;
 			}
 			$d--;
 		}
-		elsif ( $s=~m/^(-?)(\w+):([e~]):(.*)$/ && ($or[$d] xor $1) )
-		{	$val[$d]{"$1$2:$3:"}{$4}=undef;		#add key to the hash
-			push @{$ilist[$d]{"$1$2:$3:"}},$i;	#store filter index to remove it later if it is replaced
+		elsif ( $s=~m/^(\w+):(-?)([e~]):(.*)$/ && ($or[$d] xor $1) )
+		{	$val[$d]{"$1:$2$3:"}{$4}=undef;		#add key to the hash
+			push @{$ilist[$d]{"$1:$2$3:"}},$i;	#store filter index to remove it later if it is replaced
 		}
 	}
 	my $filter=join "\x1D", grep defined,@filter; #warn "$_\n" for @filter;
@@ -3590,7 +4029,7 @@ sub singlesong_code
 {	my ($self,$depends,$hashes)=@_;
 	my $filter=$self->{string};
 	return '1' if $filter eq '';
-	return undef if $filter=~m#\x1D^-?\w*:[thal]:#;
+	return undef if $filter=~m#\x1D^\w+:-?[th]:#;
 	($filter)=_optimize_with_hashes($filter,$hashes) if $hashes;
 	my $code=makesub_condition($filter,$depends);
 	return $code;
@@ -3607,7 +4046,7 @@ sub makesub
 
 	my $func;
 	my $depends=$self->{fields}={};
-	if ( $filter=~m#(?:^|\x1D)-?\w*:[thl]:# ) { $func=makesub_Ngrep($filter,$depends) }
+	if ( $filter=~m#(?:^|\x1D)\w+:-?[th]:# ) { $func=makesub_Ngrep($filter,$depends) }
 	else
 	{	$self->{greponly}=1;
 		$func=makesub_condition($filter,$depends);
@@ -3639,7 +4078,7 @@ sub makesub_condition
 		}
 		elsif ($_ eq ')') { $func.=')'; $op=pop @ops; }
 		else
-		{	my ($inv,$field,$cmd,$pat)= m/^(-?)(\w*):([^:]+):(.*)$/;
+		{	my ($field,$inv,$cmd,$pat)= m/^(\w+):(-?)([^:]+):(.*)$/;
 			$depends->{$_}=undef for Songs::Depends($field);
 			$func.=$op unless $first;
 			$func.= Songs::FilterCode($field,$cmd,$pat,$inv);
@@ -3689,7 +4128,7 @@ sub makesub_Ngrep	## non-grep filter
 		}
 	    }
 	    else
-	    {	my ($inv,$field,$cmd,$pat)= $f=~m/^(-?)(\w*):([^:]+):(.*)$/;
+	    {	my ($field,$inv,$cmd,$pat)= $f=~m/^(\w+):(-?)([^:]+):(.*)$/;
 		$depends->{$_}=undef for Songs::Depends($field);
 		unless ($cmd) { warn "Invalid filter : $field $cmd $pat\n"; next; }
 		if (my $sub=$NGrepSubs{$cmd})
@@ -3736,15 +4175,49 @@ sub explain	# return a string describing the filter
 	    }
 	    elsif ($f eq ')') { $depth--; }
 	    else
-	    {   next if $f eq '';
-		my ($pos,@vals)=FilterBox::filter2posval($f);
-		$text.='  'x$depth;
-		if (defined $pos) { $text.=FilterBox::posval2desc($pos,@vals)."\n"; }
-		else { $text.="Unknown filter : '$f'(FIXME)\n"; }
+	    {	next if $f eq '';
+		$text.= '  'x$depth;
+		$text.= _explain_element($f) || _("Unknown filter :")." '$f'";
+		$text.= "\n";
 	    }
 	}
 	chomp $text;	#remove last "\n"
 	return $self->{desc}=$text;
+}
+
+sub _explain_element
+{	my $filter_element=shift;
+	my ($field,$inv,$cmd,$pattern)= $filter_element=~m/^(\w+):(-?)([^:]+):(.*)$/;
+	return unless $cmd;
+	my $text= Songs::Field_property($field,"filterdesc:$inv$cmd:$pattern") || Songs::Field_property($field,"filterdesc:$inv$cmd");
+	(undef,my $prop)= Songs::filter_properties($field,"$inv$cmd:$pattern");
+	return unless $prop && $text;
+	$text=$text->[0] if ref $text;
+	my (undef,undef,$types,%opt)=@$prop;
+	my (@patterns,@types);
+	if ($types)
+	{	@types=split / /,$types;
+		@patterns= split / /,$pattern, scalar @types;
+		push @patterns,('')x(@types-@patterns);
+	}
+
+	for my $pat (@patterns)
+	{	my $type= shift @types;
+		my $opt2= Songs::Field_property($field,'filterpat:'.$type) || [];
+		my %opt2= (%opt, @$opt2);
+		if (my $display= $opt2{display} || $opt2{unit})
+		{	if (ref $display eq 'HASH')
+			{	my $hash= $display; # \%::SIZEUNITS or \%::DATEUNITS
+				if ($pat=~s/([a-zA-Z]+)$// && $hash->{$1}) { $pat.=' '.$hash->{$1}[1] }
+			}
+			elsif (!ref $display) { $pat=sprintf $display,$pat; }
+			else
+			{	$pat= $display->($pat);
+			}
+		}
+	}
+	$text= sprintf $text, @patterns;
+	return Songs::FieldName($field). ' '. $text;
 }
 
 sub SmartTitleSimplify
