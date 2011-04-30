@@ -7111,9 +7111,9 @@ sub new
 	my $butadd= ::NewIconButton('gtk-add',_"Add");
 	my $butadd2=::NewIconButton('gtk-add',_"Add multiple condition");
 	my $butrm=  ::NewIconButton('gtk-remove',_"Remove");
-	$butadd->signal_connect( clicked => \&Add_cb,$self);
-	$butadd2->signal_connect(clicked => \&Add_cb,$self);
-	$butrm->signal_connect(  clicked => \&Rm_cb, $self);
+	$butadd->signal_connect( clicked => \&Add_cb);
+	$butadd2->signal_connect(clicked => \&Add_cb);
+	$butrm->signal_connect(  clicked => \&Rm_cb );
 	$butrm->set_sensitive(FALSE);
 	$butadd->{filter}= DEFAULT_FILTER;
 	$butadd2->{filter}="(\x1D".DEFAULT_FILTER."\x1D)";
@@ -7131,7 +7131,8 @@ sub new
 	$self->pack_start($fbox, FALSE, FALSE, 1);
 	$self->pack_start($bbox, FALSE, FALSE, 1);
 
-	$treeview->signal_connect(cursor_changed => \&cursor_changed_cb, $self);
+	$treeview->signal_connect(cursor_changed => \&cursor_changed_cb);
+	$treeview->signal_connect(key_press_event=> \&key_press_cb);
 
 	::set_drag($treeview,
 	source=>[::DRAG_FILTER,sub
@@ -7189,13 +7190,14 @@ sub new
 }
 
 sub Add_cb
-{	my ($button,$self)=@_;
+{	my $button=shift;
+	my $self= ::find_ancestor($button,__PACKAGE__);
 	my $path=($self->{treeview}->get_cursor)[0];
 	$path||=Gtk2::TreePath->new_first;
 	$self->Set( $button->{filter}, $path);
 }
 sub Rm_cb
-{	my ($button,$self)=@_;
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
 	my $treeview=$self->{treeview};
 	my ($path)=$treeview->get_cursor;
 	return unless $path;
@@ -7221,11 +7223,19 @@ sub Remove_path
 	return $oldpath;
 }
 
+sub key_press_cb
+{	my ($tv,$event)=@_;
+	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
+	if ($key eq 'Delete') { Rm_cb($tv); return 1 }
+	return 0;
+}
+
 sub cursor_changed_cb
-{	my ($treeview,$self)=@_;
+{	my $treeview=shift;
+	my $self= ::find_ancestor($treeview,__PACKAGE__);
 	my $fbox=$self->{fbox};
 	my $store=$treeview->get_model;
-	my ($path,$co)=$_[0]->get_cursor;
+	my ($path,$co)=$treeview->get_cursor;
 	return unless $path;
 	#warn "row : ",$path->to_string," / col : $co\n";
 	$fbox->remove($fbox->child) if $fbox->child;
