@@ -580,8 +580,10 @@ our %timespan_menu=
  path	=>
  {	name	=> _"Folder",	width => 200, flags => 'fgasc_',	type => 'filename',
 	'filter:i'	=> '#_# .=~. m/^#VAL#(?:$::QSLASH|$)/o',
-	'filterdesc:i'	=> [_"is in %s", _"is in", 'string'],
+	'filter_prep:i'	=> sub { quotemeta ::decode_url($_[0]); },
+	'filterdesc:i'	=> [_"is in %s", _"is in", 'filename'],
 	'filterdesc:-i'	=> _"isn't in %s",
+	'filterpat:filename'	=> [ display => sub { ::filename_to_utf8displayname(::decode_url($_[0])); }, ],
 	can_group=>1,
  },
  modif	=>

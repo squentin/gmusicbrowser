@@ -2609,9 +2609,7 @@ sub selection_changed_cb
 }
 
 sub _MakeFolderFilter
-{	my @paths= map ::decode_url($_), @_;
-	s#\\#\\\\#g for @paths;
-	return Filter->newadd(::FALSE,map( 'path:i:'.$_, @paths ));
+{	return Filter->newadd(::FALSE,map( "path:i:$_", @_ ));
 }
 
 sub Activate
