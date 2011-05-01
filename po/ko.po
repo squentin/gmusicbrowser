@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-02-26 08:40+0900\n"
-"PO-Revision-Date: 2011-02-26 17:16+0900\n"
-"Last-Translator: bluealbum <bluealbum@gmail.com>\n"
+"POT-Creation-Date: 2011-05-01 07:16+0900\n"
+"PO-Revision-Date: 2011-05-01 07:54+0900\n"
+"Last-Translator: bluealbum <bluealbumgmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -86,47 +86,11 @@ msgid "%d song selected"
 msgid_plural "%d songs selected"
 msgstr[0] "%d 노래 선택함"
 
-msgid "%f is set"
-msgstr "%f 설정됨"
+msgid "%s is set"
+msgstr "%s 설정됨"
 
-msgid "%f isn't set"
-msgstr "%f 설정 안됨"
-
-msgid "%n first added"
-msgstr "%n 처음 추가한 시간"
-
-msgid "%n last added"
-msgstr "%n 최근 추가한 시간"
-
-msgid "%n last played"
-msgstr "%n 최근 연주한 시간"
-
-msgid "%n last skipped"
-msgstr "%n 최근 건너뛴 시간"
-
-msgid "%n less played"
-msgstr "%n 짧게 재생됨"
-
-msgid "%n less skipped"
-msgstr "%n 짧게 건너뜀"
-
-msgid "%n longest"
-msgstr "%n 가장 길게"
-
-msgid "%n most played"
-msgstr "%n 많이 재생됨"
-
-msgid "%n most skipped"
-msgstr "%n 많이 건너뜀"
-
-msgid "%n not played for the longest time"
-msgstr "%n 가장 긴 시간동안 재생되지 않음"
-
-msgid "%n not skipped for the longest time"
-msgstr "%n 가장 긴 시간동안 건너 뛰지 않음"
-
-msgid "%n shortest"
-msgstr "%n 가장 짧게"
+msgid "%s isn't set"
+msgstr "%s 설정 안됨"
 
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' 이미 존재합니다. 덮어쓸까요?"
@@ -134,12 +98,6 @@ msgstr "'{file}' 이미 존재합니다. 덮어쓸까요?"
 msgid "(%d song excluded)"
 msgid_plural "(%d songs excluded)"
 msgstr[0] "(%d 노래 제외됨)"
-
-msgid "(: )has one"
-msgstr "(: ) 하나를 가짐"
-
-msgid "(: )none"
-msgstr "(: )없음"
 
 msgid "(applied after restart)"
 msgstr "(재시작 후 적용됩니다)"
@@ -337,6 +295,9 @@ msgstr "왼쪽에 앨범과 음악가"
 msgid "Album artist"
 msgstr "앨범 음악가"
 
+msgid "Album artist or artist"
+msgstr "앨범 음악가 또는 음악가"
+
 msgid "Album gain"
 msgstr "앨범 게인"
 
@@ -353,7 +314,7 @@ msgid "Album picture & info"
 msgstr "앨범 사진 & 정보"
 
 msgid "Album shuffle"
-msgstr "앨범 섞기"
+msgstr "앨범 뒤섞기"
 
 msgid "Album with picture"
 msgstr "앨범 사진 포함"
@@ -372,9 +333,6 @@ msgstr "모든 앨범"
 
 msgid "All artists"
 msgstr "모든 음악가"
-
-msgid "All but the [most/less]%n"
-msgstr "모두 그러나 [most/less]%n"
 
 msgid "All files"
 msgstr "모든 파일"
@@ -483,6 +441,9 @@ msgstr "빈 필드만 자동으로 채우기"
 
 msgid "Auto fill queue"
 msgstr "대기열 자동 채우기"
+
+msgid "Auto fill up to"
+msgstr "자동으로 채우기"
 
 msgid "Auto filter"
 msgstr "자동 필터"
@@ -638,9 +599,6 @@ msgstr "이 음악가의 앨범 고르기"
 
 msgid "Choose Artist/Album/Song"
 msgstr "음악가/앨범/노래 고르기"
-
-msgid "Choose Date"
-msgstr "날짜 고르기"
 
 msgid "Choose Picture"
 msgstr "사진 고르기"
@@ -832,8 +790,8 @@ msgstr "기본 글자색"
 msgid "Default text font"
 msgstr "기본 글자 글꼴"
 
-msgid "Delay tray tip popup on mouse over"
-msgstr "마우스상에 있으면 트레이 팁 팝업상자 지연하기"
+msgid "Delay before showing tray tip popup on mouse over :"
+msgstr "마우스 트레이 팁 팝업상자 표시하기 전에 지연 :"
 
 msgid "Delete Selected Songs"
 msgstr "선택한 노래 지우기"
@@ -917,6 +875,9 @@ msgstr "주 창이 보일 때는 알림을 표시하지 않기"
 msgid "Don't submit current song"
 msgstr "현재 노래 제출하지 않기"
 
+msgid "Drag and drop songs here to replace the selection."
+msgstr "선택한 것을 바꾸려면 여기에 노래를 끌어다 놓으세요."
+
 msgid "Edit Current Song Properties"
 msgstr "현재 노래 등록정보 편집"
 
@@ -943,6 +904,9 @@ msgstr "자동-채움 포맷 편집 ..."
 
 msgid "Edit filter"
 msgstr "필터 편집"
+
+msgid "Edit filter..."
+msgstr "필터 편집..."
 
 msgid "Edit grouping ..."
 msgstr "그룹으로 나누기 편집 ..."
@@ -1293,8 +1257,14 @@ msgstr "오디오 싱크 앞에 이 파이프라인 추가하기"
 msgid "Invalid regular expression"
 msgstr "잘못된 정규 표현"
 
+msgid "Invert filter"
+msgstr "필터 적용하지 않기"
+
 msgid "Invisible hot spot"
 msgstr "보이지않는 핫 스팟"
+
+msgid "Isn't smart equal to %s"
+msgstr "%s 와 민감하게 같지 않음"
 
 msgid "Justified"
 msgstr "일반적인 정렬"
@@ -1410,6 +1380,9 @@ msgstr "목록에 있는 노래"
 
 msgid "Listeners: "
 msgstr "청취자: "
+
+msgid "Lists"
+msgstr "목록"
 
 msgid "Lists, Library & Context"
 msgstr "목록, 라이브러리 & 항목"
@@ -1970,6 +1943,9 @@ msgstr "팝업 사용자정의 창"
 msgid "Popup Traytip"
 msgstr "팝업 트레이팁"
 
+msgid "Popup notify window"
+msgstr "팝업 알림 창"
+
 msgid "Popup playlist filter menu"
 msgstr "재생목록 필터 팝업"
 
@@ -2083,6 +2059,9 @@ msgstr "등급 범위:"
 
 msgid "Re-read tags"
 msgstr "태그 다시 읽기"
+
+msgid "Re-shuffle"
+msgstr "다시-뒤섞기"
 
 msgid "Read/write in file tag"
 msgstr "파일 태그 읽기/쓰기"
@@ -2465,6 +2444,9 @@ msgstr "선택 : "
 msgid "Selected songs"
 msgstr "선택한 노래"
 
+msgid "Selected songs to update :"
+msgstr "선택한 노래 업데이트 :"
+
 msgid "Selecting pictures"
 msgstr "사진 고르기"
 
@@ -2568,10 +2550,10 @@ msgid "Show/hide status bar"
 msgstr "상태바 표시/숨기기"
 
 msgid "Shuffle"
-msgstr "섞기"
+msgstr "뒤섞기"
 
 msgid "Shuffle queue"
-msgstr "섞기 대기열"
+msgstr "대기열 뒤섞기"
 
 msgid "Shuffled albums"
 msgstr "섞여진 앨범"
@@ -2705,9 +2687,6 @@ msgstr "사용 항목"
 msgid "Text"
 msgstr "텍스트"
 
-msgid "The [most/less]"
-msgstr "[많게/적게]"
-
 msgid "These fields can be used :"
 msgstr "이들 필드는 사용될 수 있음 :"
 
@@ -2733,6 +2712,9 @@ msgstr "재생한 노래로 인정하는 문턱값 :"
 
 msgid "Thursday"
 msgstr "화요일"
+
+msgid "Time :"
+msgstr "시간 :"
 
 msgid "Timeout :"
 msgstr "시간초과 :"
@@ -2803,9 +2785,6 @@ msgstr "끄기"
 msgid "Turn off computer when queue empty"
 msgstr "대기열이 비워지면 컴퓨터 끄기"
 
-msgid "Type"
-msgstr "형식"
-
 msgid "URL"
 msgstr "URL"
 
@@ -2814,6 +2793,9 @@ msgstr "독특한 파일 인식자"
 
 msgid "Unknown field ({field})"
 msgstr "알려지지 않은 필드 ({field})"
+
+msgid "Unknown filter :"
+msgstr "알 수 없는 필터 :"
 
 msgid "Unlock Album"
 msgstr "잠금이 해제된 앨범"
@@ -2829,6 +2811,12 @@ msgstr "이름없는 필터"
 
 msgid "Untitled"
 msgstr "제목없음"
+
+msgid "Update tags"
+msgstr "태그 업데이트"
+
+msgid "Update tags..."
+msgstr "태그 업데이트..."
 
 msgid "Upper left"
 msgstr "맨위 왼쪽"
@@ -2975,6 +2963,9 @@ msgid ""
 msgstr ""
 "노래를 바꿀때, 이전 노래는 전혀 재생되지 않더라도 최근 목록에 추가됩니다."
 
+msgid "Whole library"
+msgstr "전체 라이브러리"
+
 msgid "Widget name"
 msgstr "위젯 이름"
 
@@ -3001,6 +2992,13 @@ msgstr "다음으로 시작한 단어"
 
 msgid "Write filenames to ..."
 msgstr "파일이름 쓰기 ..."
+
+msgid ""
+"Write value of selected fields in the tags. Useful for fields that were "
+"previously not written to tags, to make sure the current value is written."
+msgstr ""
+"태그에서 선택한 필드 값 쓰기. 현재 값이 쓰여졌는지 확인하기 위해서, 이전 태그"
+"에 쓰여지지 않은 필드에 유용합니다."
 
 msgid "Writing tags"
 msgstr "태그 쓰는중"
@@ -3038,18 +3036,6 @@ msgstr "_정렬"
 msgid "a bright coloured fish"
 msgstr "밝은 색의 물고기"
 
-msgid "a flac file"
-msgstr "FLAC 파일"
-
-msgid "a mp3 file"
-msgstr "MP3 파일"
-
-msgid "a musepack file"
-msgstr "MusePack 파일"
-
-msgid "a wavepack file"
-msgstr "wavepack 파일"
-
 msgid "abort copy"
 msgstr "복사 중지"
 
@@ -3059,26 +3045,20 @@ msgstr "이동 중지"
 msgid "add"
 msgstr "추가"
 
-msgid "added"
-msgstr "추가됨"
-
 msgid "advanced options"
 msgstr "고급 옵션"
 
-msgid "after %d"
-msgstr "%d 이후"
+msgid "after"
+msgstr "이후"
+
+msgid "after %s"
+msgstr "%s 이후"
 
 msgid "alphabetical"
 msgstr "알파벳 순으로"
 
 msgid "amixer control :"
 msgstr "알사 믹서 제어 :"
-
-msgid "an ape file"
-msgstr "ape 파일"
-
-msgid "an ogg file"
-msgstr "ogg 파일"
 
 msgid "another example"
 msgstr "다른 예"
@@ -3113,23 +3093,32 @@ msgstr "밴드"
 msgid "band/artist logotype"
 msgstr "밴드/음악가의 로고"
 
-msgid "before %d"
-msgstr "%d 이전"
+msgid "before"
+msgstr "이전"
 
-msgid "between %d( and )%d"
-msgstr "%d( 그리고 )%d 사이"
+msgid "before %s"
+msgstr "%s 이전"
 
-msgid "between %n( and )%n"
-msgstr "%n( 그리고 )%n 사이"
+msgid "between"
+msgstr "사이"
+
+msgid "between %s ago and %s ago"
+msgstr "%s 이전 그리고 %d 이전 사이"
+
+msgid "between %s and %s"
+msgstr "%s  그리고 %s 사이"
+
+msgid "between (absolute dates)"
+msgstr "사이 (절대 날짜)"
+
+msgid "between (relative dates)"
+msgstr "사이 (상대 날짜)"
 
 msgid "big size"
 msgstr "큰 크기"
 
 msgid "biography"
 msgstr "일대기"
-
-msgid "bitrate"
-msgstr "비트레이트:"
 
 msgid "bonus tracks"
 msgstr "보너스 트랙"
@@ -3197,8 +3186,14 @@ msgstr "연결이 실패했습니다"
 msgid "connection failed."
 msgstr "연결이 실패했습니다"
 
+msgid "contains"
+msgstr "포함하고 있는 문자열"
+
 msgid "contains %s"
-msgstr "%s 포함"
+msgstr "%s 포함하고 있는 문자열"
+
+msgid "contains %s (case sensitive)"
+msgstr "%s 포함하고 있는 문자열 (대소문자 구분)"
 
 msgid "counter"
 msgstr "카운터"
@@ -3243,19 +3238,28 @@ msgid "disc {disc}"
 msgstr "디스크"
 
 msgid "doesn't contain %s"
-msgstr "%s 포함하지 않음"
+msgstr "%s 포함하지 않는 문자열"
 
-msgid "doesn't match regexp %r"
-msgstr "%r 정규표현과 맞지 않음"
+msgid "doesn't contain %s (case sensitive)"
+msgstr "%s 포함하지 않는 문자열 (대소문자 구분)"
+
+msgid "doesn't have a picture"
+msgstr "사진을 가지고 있지 않음"
+
+msgid "doesn't include artist %s"
+msgstr "음악가 %s 포함하지 않음"
+
+msgid "doesn't match regexp %s"
+msgstr "%s 정규표현과 맞지 않는 문자열"
+
+msgid "doesn't match regexp %s (case sensitive)"
+msgstr "%s 정규표현과 맞지 않는 문자열 (대소문자 구분)"
 
 msgid "during performance"
 msgstr "연주 시간"
 
 msgid "during recording"
 msgstr "녹음 시간"
-
-msgid "edit ..."
-msgstr "편집 ..."
 
 msgid "email"
 msgstr "전자메일"
@@ -3274,12 +3278,6 @@ msgstr "이벤트"
 
 msgid "ex :"
 msgstr "예 :"
-
-msgid "exactly %n( times)"
-msgstr "정확히 %n( 번)"
-
-msgid "exactly not %n( times)"
-msgstr "정확지 않게 %n( 번)"
 
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "예제 (selected song) : {score}  ({chances})"
@@ -3302,14 +3300,8 @@ msgstr "거짓"
 msgid "favorite"
 msgstr "즐겨찾기"
 
-msgid "file format"
-msgstr "파일 포맷"
-
 msgid "filters"
 msgstr "필터"
-
-msgid "first added"
-msgstr "처음 추가됨"
 
 msgid "flags"
 msgstr "표시 문자"
@@ -3344,6 +3336,21 @@ msgstr "그룹"
 msgid "half-life : "
 msgstr "반감기 :"
 
+msgid "has a picture"
+msgstr "사진 포함"
+
+msgid "has at least one"
+msgstr "적어도 하나는 가지고 있음"
+
+msgid "has been played"
+msgstr "최근 연주됨"
+
+msgid "has been skipped"
+msgstr "최근 건너 뜀"
+
+msgid "has none"
+msgstr "기록 없음"
+
 msgid "hours"
 msgstr "시간"
 
@@ -3365,6 +3372,24 @@ msgstr "일러스트"
 msgid "imported list"
 msgstr "가져온 목록"
 
+msgid "in the bottom"
+msgstr "맨 아래에"
+
+msgid "in the bottom %s"
+msgstr "%s 맨 아래에"
+
+msgid "in the top"
+msgstr "맨 위에"
+
+msgid "in the top %s"
+msgstr "%s 맨 위에"
+
+msgid "includes artist"
+msgstr "음악가 포함"
+
+msgid "includes artist %s"
+msgstr "%s 음악가 포함"
+
 msgid "info"
 msgstr "정보"
 
@@ -3383,113 +3408,80 @@ msgstr "거꾸로"
 msgid "is"
 msgstr "같음"
 
-msgid "is %g"
-msgstr "%g 와 같음"
-
-msgid "is %n"
-msgstr "%n 와 같음"
-
-msgid "is %n( %)"
-msgstr "%n( %) 와 같음"
-
-msgid "is %n(Hz)"
-msgstr "%n(Hz) 와 같음"
-
-msgid "is %n(kbps)"
-msgstr "%n(kbps) 와 같음"
-
 msgid "is %s"
 msgstr "%s 와 같음"
 
-msgid "is after %n"
-msgstr "%n 이후"
+msgid "is 44.1kHz"
+msgstr "44.1kHz"
 
-msgid "is before %n"
-msgstr "%n 이전"
+msgid "is a flac file"
+msgstr "FLAC 파일"
 
-msgid "is between %b( and )%b"
-msgstr "%b( 그리고 )%b 사이"
+msgid "is a m4a file"
+msgstr "m4a 파일"
 
-msgid "is between %n( and )%n( %)"
-msgstr "%n( 그리고 )%n( %) 사이"
+msgid "is a mp3 file"
+msgstr "MP3 파일"
 
-msgid "is between %n( and )%n( s)"
-msgstr "%n( 그리고 )%n( s) 사이"
+msgid "is a musepack file"
+msgstr "musepack 파일"
+
+msgid "is a wavepack file"
+msgstr "wavepack 파일"
+
+msgid "is an ape file"
+msgstr "ape 파일"
+
+msgid "is an ogg file"
+msgstr "ogg 파일"
+
+msgid "is equal to"
+msgstr "같은 문자열"
+
+msgid "is equal to %s"
+msgstr "%s 같은 문자열"
+
+msgid "is false"
+msgstr "거짓"
+
+msgid "is in"
+msgstr "안에 있음"
 
 msgid "is in %s"
-msgstr "위치 : %s"
+msgstr "%s 안에 있음"
 
-msgid "is in list %l"
-msgstr "%l 목록에 있음"
+msgid "is mono"
+msgstr "모노"
 
-msgid "is less than %b"
-msgstr "%b 보다 적음"
+msgid "is set"
+msgstr "설정"
 
-msgid "is less than %n"
-msgstr "%n 보다 적음"
+msgid "is smart equal"
+msgstr "양식이 같은 문자열"
 
-msgid "is less than %n( %)"
-msgstr "%n( %) 보다 적음"
+msgid "is smart equal to %s"
+msgstr "%s 양식이 같은 문자열"
 
-msgid "is less than %n( s)"
-msgstr "%n( s) 보다 적음"
+msgid "is stereo"
+msgstr "스테레오"
 
-msgid "is less than %n(Hz)"
-msgstr "%n(Hz) 보다 적음"
+msgid "is true"
+msgstr "진실"
 
-msgid "is less than %n(kbps)"
-msgstr "%n(kbps) 보다 적음"
+msgid "isn't %s"
+msgstr "%s 아님"
 
-msgid "is more than %b"
-msgstr "%b 보다 많음"
+msgid "isn't equal to %s"
+msgstr "%s 와 같은 문자열 없음"
 
-msgid "is more than %n"
-msgstr "%n 보다 많음"
+msgid "isn't in %s"
+msgstr "%s에 없음"
 
-msgid "is more than %n( %)"
-msgstr "%n( %) 보다 많음"
+msgid "isn't mono"
+msgstr "모노 아님"
 
-msgid "is more than %n( s)"
-msgstr "%n( s) 보다 많음"
-
-msgid "is more than %n(Hz)"
-msgstr "%n(Hz) 보다 많음"
-
-msgid "is more than %n(kbps)"
-msgstr "%n(kbps) 보다 많음"
-
-msgid "is not"
-msgstr "제외"
-
-msgid "is not %n"
-msgstr "%n 제외"
-
-msgid "is not %n( %)"
-msgstr "%n( %) 제외"
-
-msgid "is not %s"
-msgstr "%s 제외"
-
-msgid "is not 44.1kHz"
-msgstr "44.1kHz 제외"
-
-msgid "is not in %s"
-msgstr "%s에서 제외"
-
-msgid "is not in list %l"
-msgstr "%l 목록에서 제외"
-
-msgid "isn't %g"
-msgstr "%g 제외"
-
-msgid "isn't %n"
-msgstr "%n 제외"
-
-msgid "isn't %n(Hz)"
-msgstr "%n(Hz) 제외"
-
-msgid "isn't %n(kbps)"
-msgstr "%n(kbps) 제외"
+msgid "isn't stereo"
+msgstr "스테레오 아님"
 
 msgid ""
 "itunes doesn't support unsynchronised tags last time I checked, mostly "
@@ -3500,15 +3492,6 @@ msgstr ""
 
 msgid "itunes-like"
 msgstr "아이튠즈 모양"
-
-msgid "last added"
-msgstr "최근 추가한 시간"
-
-msgid "last played"
-msgstr "최근 연주한 시간"
-
-msgid "last skipped"
-msgstr "최근 건너 뛴 시간"
 
 msgid "last.fm"
 msgstr "Last.fm"
@@ -3543,26 +3526,23 @@ msgstr "왼편 필터 패널"
 msgid "length of songs"
 msgstr "노래 길이"
 
-msgid "less played"
-msgstr "적게 재생됨"
+msgid "less than"
+msgstr "보다 적음"
 
-msgid "less skipped"
-msgstr "적게 건너 뜀"
-
-msgid "less than %a( ago)"
-msgstr "%a( 이전) 보다 적음"
-
-msgid "less than %n( times)"
-msgstr "%n( 번) 보다 적음"
-
-msgid "longest"
-msgstr "가장 긴"
+msgid "less than %s ago"
+msgstr "%s 이전 보다 적음"
 
 msgid "lyricist"
 msgstr "작사가"
 
-msgid "match regexp %r"
-msgstr "%r 정규표현에 맞음"
+msgid "matches regexp"
+msgstr "정규표현에 맞는 문자열"
+
+msgid "matches regexp %s"
+msgstr "%s 정규표현에 맞는 문자열"
+
+msgid "matches regexp %s (case sensitive)"
+msgstr "%s 정규표현에 맞는 문자열 (대소문자 구분)"
 
 msgid "maximum font size"
 msgstr "최대 글꼴 크기"
@@ -3582,32 +3562,20 @@ msgstr "최소 글꼴 크기"
 msgid "minutes"
 msgstr "분"
 
-msgid "modified"
-msgstr "수정됨"
-
-msgid "mono"
-msgstr "모노"
-
 msgid "month"
 msgstr "월"
 
 msgid "months"
 msgstr "월"
 
-msgid "more than %a( ago)"
-msgstr "%a( 이전) 보다 더"
+msgid "more than"
+msgstr "보다 많음"
 
-msgid "more than %n( times)"
-msgstr "%n( 번) 보다 더"
+msgid "more than %s ago"
+msgstr "%s 이전 보다 더 많음"
 
 msgid "mosaic mode"
 msgstr "모자이크 모드"
-
-msgid "most played"
-msgstr "대부부 재생됨"
-
-msgid "most skipped"
-msgstr "대부분 건너 뜀"
 
 msgid "move folder"
 msgstr "폴더 이동"
@@ -3669,23 +3637,38 @@ msgstr "표준"
 msgid "normal play when queue empty"
 msgstr "대기열이 비면 표준 재생"
 
+msgid "not between %s ago and %s ago"
+msgstr "%s 이전 그리고 %b 이전 사이 아님"
+
+msgid "not between %s and %s"
+msgstr "%s 그리고 %d 사이 아님"
+
 msgid "not bootleg"
 msgstr "해적판 제외"
 
-msgid "not played for the longest time"
-msgstr "가장 긴 시간동안 재생되지 않음"
+msgid "not in the bottom %s"
+msgstr "%s 맨 아래에 아님"
 
-msgid "not skipped for the longest time"
-msgstr "가장 긴 시간동안 건너 뛰지 않음"
+msgid "not in the top %s"
+msgstr "%s 최고 아님"
+
+msgid "not present in %s"
+msgstr "%s에 표시되지 않음"
+
+msgid "not set to %s"
+msgstr "%s로 설정 안함"
+
+msgid "not the %s least recent"
+msgstr "%s 가장 적게 최근이 아님"
+
+msgid "not the %s most recent"
+msgstr "%s 가장 많이 최근이 아님"
 
 msgid "number of songs"
 msgstr "노래의 수"
 
 msgid "number of songs in filter"
 msgstr "필터에서 노래 수"
-
-msgid "on %d"
-msgstr "%d 상에"
 
 msgid "only show entries with at least n songs"
 msgstr "적어도 입력된 수의 노래를 가진 항목만 표시하기"
@@ -3726,9 +3709,6 @@ msgstr "사진 크기"
 msgid "play count average"
 msgstr "재생 카운터 평균"
 
-msgid "played"
-msgstr "재생함"
-
 msgid "played>4"
 msgstr "5번 이상 재생한 곡"
 
@@ -3737,6 +3717,12 @@ msgstr "포트 :"
 
 msgid "pre-amp"
 msgstr "프리-앰프"
+
+msgid "present in %s"
+msgstr "%s에 표시"
+
+msgid "present in list"
+msgstr "목록에 표시"
 
 msgid "quit"
 msgstr "종료"
@@ -3777,9 +3763,6 @@ msgstr "재시도"
 msgid "retry in {seconds} s"
 msgstr "{seconds} 초에 재시도"
 
-msgid "sampling rate"
-msgstr "샘플 레이트"
-
 msgid "save as '{name}'"
 msgstr "'{name}'로 저장"
 
@@ -3813,8 +3796,11 @@ msgstr "바로 찾기"
 msgid "seconds"
 msgstr "초"
 
-msgid "shortest"
-msgstr "가장 짧게"
+msgid "set to"
+msgstr "설정"
+
+msgid "set to %s"
+msgstr "%s 로 설정"
 
 msgid "show pictures"
 msgstr "사진 표시"
@@ -3834,9 +3820,6 @@ msgstr "스킨 옵션"
 msgid "skip count average"
 msgstr "건너 뛴 수 평균"
 
-msgid "skipped"
-msgstr "건너 뜀"
-
 msgid "small size"
 msgstr "작은 크기"
 
@@ -3845,9 +3828,6 @@ msgstr "정렬"
 
 msgid "static list"
 msgstr "정적인 목록"
-
-msgid "stereo"
-msgstr "스테레오"
 
 msgid "stop"
 msgstr "정지"
@@ -3867,6 +3847,12 @@ msgstr "텍스트 형식"
 msgid "text mode"
 msgstr "텍스트 모드"
 
+msgid "the %s least recent"
+msgstr "%s 가장 적게 최근"
+
+msgid "the %s most recent"
+msgstr "%s 가장 많이 최근"
+
 msgid "the command {name}"
 msgstr "명령 {name}"
 
@@ -3875,6 +3861,12 @@ msgstr "기본값은 ID3v2.3는 utf16이고 ID3v2.4는 utf8입니다."
 
 msgid "the file {name}"
 msgstr "파일 {name}"
+
+msgid "the least recent"
+msgstr "가장 적게 최근"
+
+msgid "the most recent"
+msgstr "가장 많이 최근"
 
 msgid "the {name} perl module"
 msgstr "{name} 펄 모듈"
@@ -4064,6 +4056,51 @@ msgstr "{song} / {artist}"
 msgid "|-separated list of widget names"
 msgstr "|-위젯 이름에서 목록 나누기"
 
+#~ msgid "%n first added"
+#~ msgstr "%n 처음 추가한 시간"
+
+#~ msgid "%n last added"
+#~ msgstr "%n 최근 추가한 시간"
+
+#~ msgid "%n last played"
+#~ msgstr "%n 최근 연주한 시간"
+
+#~ msgid "%n last skipped"
+#~ msgstr "%n 최근 건너뛴 시간"
+
+#~ msgid "%n less played"
+#~ msgstr "%n 짧게 재생됨"
+
+#~ msgid "%n less skipped"
+#~ msgstr "%n 짧게 건너뜀"
+
+#~ msgid "%n longest"
+#~ msgstr "%n 가장 길게"
+
+#~ msgid "%n most played"
+#~ msgstr "%n 많이 재생됨"
+
+#~ msgid "%n most skipped"
+#~ msgstr "%n 많이 건너뜀"
+
+#~ msgid "%n not played for the longest time"
+#~ msgstr "%n 가장 긴 시간동안 재생되지 않음"
+
+#~ msgid "%n not skipped for the longest time"
+#~ msgstr "%n 가장 긴 시간동안 건너 뛰지 않음"
+
+#~ msgid "%n shortest"
+#~ msgstr "%n 가장 짧게"
+
+#~ msgid "(: )none"
+#~ msgstr "(: )없음"
+
+#~ msgid "All but the [most/less]%n"
+#~ msgstr "모두 그러나 [most/less]%n"
+
+#~ msgid "Choose Date"
+#~ msgstr "날짜 고르기"
+
 #~ msgid ""
 #~ "For information on how to use this plugin, please navigate to the <a "
 #~ "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
@@ -4073,6 +4110,168 @@ msgstr "|-위젯 이름에서 목록 나누기"
 #~ "이 플러그인 사용하는 방법에 대한 정보는, <a href='http://gmusicbrowser."
 #~ "org/dokuwiki/doku.php?id=plugins:artistinfo'> 플러그인 위키 페이지</a> <a "
 #~ "href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>."
+
+#~ msgid "The [most/less]"
+#~ msgstr "[많게/적게]"
+
+#~ msgid "Type"
+#~ msgstr "형식"
+
+#~ msgid "added"
+#~ msgstr "추가됨"
+
+#~ msgid "between %n( and )%n"
+#~ msgstr "%n( 그리고 )%n 사이"
+
+#~ msgid "bitrate"
+#~ msgstr "비트레이트:"
+
+#~ msgid "edit ..."
+#~ msgstr "편집 ..."
+
+#~ msgid "exactly %n( times)"
+#~ msgstr "정확히 %n( 번)"
+
+#~ msgid "exactly not %n( times)"
+#~ msgstr "정확지 않게 %n( 번)"
+
+#~ msgid "file format"
+#~ msgstr "파일 포맷"
+
+#~ msgid "first added"
+#~ msgstr "처음 추가됨"
+
+#~ msgid "is %g"
+#~ msgstr "%g 와 같음"
+
+#~ msgid "is %n"
+#~ msgstr "%n 와 같음"
+
+#~ msgid "is %n( %)"
+#~ msgstr "%n( %) 와 같음"
+
+#~ msgid "is %n(Hz)"
+#~ msgstr "%n(Hz) 와 같음"
+
+#~ msgid "is %n(kbps)"
+#~ msgstr "%n(kbps) 와 같음"
+
+#~ msgid "is after %n"
+#~ msgstr "%n 이후"
+
+#~ msgid "is before %n"
+#~ msgstr "%n 이전"
+
+#~ msgid "is between %n( and )%n( %)"
+#~ msgstr "%n( 그리고 )%n( %) 사이"
+
+#~ msgid "is between %n( and )%n( s)"
+#~ msgstr "%n( 그리고 )%n( s) 사이"
+
+#~ msgid "is in list %l"
+#~ msgstr "%l 목록에 있음"
+
+#~ msgid "is less than %n"
+#~ msgstr "%n 보다 적음"
+
+#~ msgid "is less than %n( %)"
+#~ msgstr "%n( %) 보다 적음"
+
+#~ msgid "is less than %n( s)"
+#~ msgstr "%n( s) 보다 적음"
+
+#~ msgid "is less than %n(Hz)"
+#~ msgstr "%n(Hz) 보다 적음"
+
+#~ msgid "is less than %n(kbps)"
+#~ msgstr "%n(kbps) 보다 적음"
+
+#~ msgid "is more than %n"
+#~ msgstr "%n 보다 많음"
+
+#~ msgid "is more than %n( %)"
+#~ msgstr "%n( %) 보다 많음"
+
+#~ msgid "is more than %n( s)"
+#~ msgstr "%n( s) 보다 많음"
+
+#~ msgid "is more than %n(Hz)"
+#~ msgstr "%n(Hz) 보다 많음"
+
+#~ msgid "is more than %n(kbps)"
+#~ msgstr "%n(kbps) 보다 많음"
+
+#~ msgid "is not"
+#~ msgstr "제외"
+
+#~ msgid "is not %n"
+#~ msgstr "%n 제외"
+
+#~ msgid "is not %n( %)"
+#~ msgstr "%n( %) 제외"
+
+#~ msgid "is not %s"
+#~ msgstr "%s 제외"
+
+#~ msgid "isn't %n(Hz)"
+#~ msgstr "%n(Hz) 제외"
+
+#~ msgid "isn't %n(kbps)"
+#~ msgstr "%n(kbps) 제외"
+
+#~ msgid "last added"
+#~ msgstr "최근 추가한 시간"
+
+#~ msgid "last played"
+#~ msgstr "최근 연주한 시간"
+
+#~ msgid "last skipped"
+#~ msgstr "최근 건너 뛴 시간"
+
+#~ msgid "less played"
+#~ msgstr "적게 재생됨"
+
+#~ msgid "less skipped"
+#~ msgstr "적게 건너 뜀"
+
+#~ msgid "less than %n( times)"
+#~ msgstr "%n( 번) 보다 적음"
+
+#~ msgid "longest"
+#~ msgstr "가장 긴"
+
+#~ msgid "modified"
+#~ msgstr "수정됨"
+
+#~ msgid "more than %n( times)"
+#~ msgstr "%n( 번) 보다 더"
+
+#~ msgid "most played"
+#~ msgstr "대부부 재생됨"
+
+#~ msgid "most skipped"
+#~ msgstr "대부분 건너 뜀"
+
+#~ msgid "not played for the longest time"
+#~ msgstr "가장 긴 시간동안 재생되지 않음"
+
+#~ msgid "not skipped for the longest time"
+#~ msgstr "가장 긴 시간동안 건너 뛰지 않음"
+
+#~ msgid "on %d"
+#~ msgstr "%d 상에"
+
+#~ msgid "played"
+#~ msgstr "재생함"
+
+#~ msgid "sampling rate"
+#~ msgstr "샘플 레이트"
+
+#~ msgid "shortest"
+#~ msgstr "가장 짧게"
+
+#~ msgid "skipped"
+#~ msgstr "건너 뜀"
 
 #~ msgid "web"
 #~ msgstr "웹"
