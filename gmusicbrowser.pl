@@ -6812,13 +6812,13 @@ sub SetTrayTipDelay
 sub TrayMenuPopup
 {	my $traytip=$TrayIcon->child->{PoppedUpWindow};
 	$traytip->DestroyNow if $traytip;
-	$TrayIcon->{NoTrayTip}=1;
+	$TrayIcon->{block_popup}=1;
 	my $menu=Gtk2::Menu->new;
-	$menu->signal_connect( selection_done => sub {$TrayIcon->{NoTrayTip}=undef});
+	$menu->signal_connect( selection_done => sub {$TrayIcon->{block_popup}=undef});
 	PopupContextMenu(\@TrayMenu, {usemenupos=>1}, $menu);
 }
 sub ShowTraytip
-{	return 0 if !$TrayIcon || $TrayIcon->{NoTrayTip};
+{	return 0 if !$TrayIcon || $TrayIcon->{block_popup};
 	Layout::Window::Popup::Popup($TrayIcon->child,$_[0]);
 }
 

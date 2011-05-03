@@ -2023,6 +2023,7 @@ sub set_hover
 
 sub PreparePopup
 {	my $widget=shift;	#widget can be a statusicon
+	return 0 if $widget->{block_popup};
 	if (!$widget->{PoppedUpWindow})
 	{	my $delay=$widget->{hover_delay}||1000;
 		if (my $t=delete $widget->{hover_timeout})	{ Glib::Source->remove($t); }
