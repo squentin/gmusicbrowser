@@ -580,8 +580,10 @@ our %timespan_menu=
  path	=>
  {	name	=> _"Folder",	width => 200, flags => 'fgasc_',	type => 'filename',
 	'filter:i'	=> '#_# .=~. m/^#VAL#(?:$::QSLASH|$)/o',
-	'filterdesc:i'	=> [_"is in %s", _"is in", 'string'],
+	'filter_prep:i'	=> sub { quotemeta ::decode_url($_[0]); },
+	'filterdesc:i'	=> [_"is in %s", _"is in", 'filename'],
 	'filterdesc:-i'	=> _"isn't in %s",
+	'filterpat:filename'	=> [ display => sub { ::filename_to_utf8displayname(::decode_url($_[0])); }, ],
 	can_group=>1,
  },
  modif	=>
@@ -3650,15 +3652,15 @@ sub new_from_smartstring
 		my @filters=(0 xor $notgroup);
 		for my $field (split /\|/, $fields)
 		{	for my $pattern (@patterns)
-			{	my $filter; warn $op;
+			{	my $filter;
 				if (my $found= Songs::Field_property($field,'smartfilter:'.$op))
 				{	if (ref $found)
-					{	$filter= $found->($pattern,$op,$casesens,$field);warn $filter;
+					{	$filter= $found->($pattern,$op,$casesens,$field);
 					}
 					else
 					{	my @found=split / /,$found;
-						$op= @found>1 ? $found[$casesens ? 1 : 0] : $found;
-						$filter= $op.':'.$pattern;
+						my $realop= @found>1 ? $found[$casesens ? 1 : 0] : $found;
+						$filter= $realop.':'.$pattern;
 					}
 				}
 				next unless $filter;
@@ -3777,7 +3779,6 @@ sub _is_subset		# returns true if $f2 must be a subset of $f1	#$f1 and $f2 must 
 	# at least one is an array of filters
 	$f1= [0,$f1] unless ref$f1;
 	$f2= [0,$f2] unless ref$f2;
-	warn "@$f1 // @$f2\n";
 	if ($f1->[0] && $f2->[0])	# A & B -> C & D	# each from f1 must be a superset of one from f2
 	{	for my $i (1..$#$f1)
 		{	my $in_one;

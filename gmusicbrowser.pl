@@ -1811,6 +1811,7 @@ sub Filter_new_from_string_with_upgrade	# for versions <=1.1.7
 		if    ($cmd eq 's') {$cmd='si'}
 		elsif ($cmd eq 'S') {$cmd='s'}
 		elsif ($cmd eq 'l') { $field='list'; $cmd='e'; }
+		elsif ($cmd eq 'i') { $pat=~s#([^/\$_.+!*'(),A-Za-z0-9-])#sprintf('%%%02X',ord($1))#seg; }
 		elsif ($field eq 'rating' && $cmd eq 'e') { $cmd='~'}
 		elsif ($cmd=~m/^[b<>]$/ && $field=~m/^-?lastplay$|^-?lastskip$|^-?added$|^-?modif$/)
 		{	if ($pat=~m/[a-zA-Z]/)
@@ -6769,13 +6770,13 @@ sub SetTrayTipDelay
 sub TrayMenuPopup
 {	my $traytip=$TrayIcon->child->{PoppedUpWindow};
 	$traytip->DestroyNow if $traytip;
-	$TrayIcon->{NoTrayTip}=1;
+	$TrayIcon->{block_popup}=1;
 	my $menu=Gtk2::Menu->new;
-	$menu->signal_connect( selection_done => sub {$TrayIcon->{NoTrayTip}=undef});
+	$menu->signal_connect( selection_done => sub {$TrayIcon->{block_popup}=undef});
 	PopupContextMenu(\@TrayMenu, {usemenupos=>1}, $menu);
 }
 sub ShowTraytip
-{	return 0 if !$TrayIcon || $TrayIcon->{NoTrayTip};
+{	return 0 if !$TrayIcon || $TrayIcon->{block_popup};
 	Layout::Window::Popup::Popup($TrayIcon->child,$_[0]);
 }
 
@@ -7865,6 +7866,7 @@ INIT
 	date	=> 'GMB::FilterEdit::Date',
 	ago	=> 'GMB::FilterEdit::Number',
 	listname=> 'GMB::FilterEdit::SavedListCombo',
+	filename=> 'GMB::FilterEdit::Filename',
 	combostring=> 'GMB::FilterEdit::Combo',
   );
 }
@@ -8095,6 +8097,44 @@ sub new
 	return $self;
 }
 sub Get { $_[0]->get_value; }
+
+package GMB::FilterEdit::Filename;
+use base 'Gtk2::Box';
+sub new
+{	my ($class,$val,$opt)=@_;
+	my $self= bless Gtk2::HBox->new(0,0),$class;
+	my $entry= $self->{entry}= Gtk2::Entry->new;
+	my $button= ::NewIconButton('gtk-open');
+	$self->pack_start($entry,1,1,0);
+	$self->pack_start($button,0,0,0);
+	$self->Set($val) if $val;
+	my $busy;
+	$entry->signal_connect( changed => sub
+	{	return if $busy;
+		my $entry=shift;
+		my $self=$entry->parent;
+		$self->{value}= ::url_escape($entry->get_text);
+		GMB::FilterBox::changed($self);
+	});
+	$entry->signal_connect(activate=> \&GMB::FilterBox::activate);
+	$button->signal_connect( clicked => sub
+	{	my $self=$_[0]->parent;
+		my $folder= ::ChooseDir(_"Choose a folder", $self->{value});
+		return unless $folder;
+		$busy=1;
+		$self->Set( ::url_escape($folder) );
+		$busy=0;
+		GMB::FilterBox::changed($self);
+		GMB::FilterBox::activate($self);
+	});
+	return $self;
+}
+sub Set
+{	my ($self,$folder)= @_;
+	$self->{entry}->set_text( ::filename_to_utf8displayname(::decode_url($folder)) );
+	$self->{value}=$folder;
+}
+sub Get { $_[0]{value} }
 
 package GMB::FilterEdit::SavedListCombo;
 use base 'Gtk2::ComboBox';

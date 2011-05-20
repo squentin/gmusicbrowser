@@ -2611,9 +2611,7 @@ sub selection_changed_cb
 }
 
 sub _MakeFolderFilter
-{	my @paths= map ::decode_url($_), @_;
-	s#\\#\\\\#g for @paths;
-	return Filter->newadd(::FALSE,map( 'path:i:'.$_, @paths ));
+{	return Filter->newadd(::FALSE,map( "path:i:$_", @_ ));
 }
 
 sub Activate
@@ -6694,10 +6692,10 @@ sub popup_col_menu
 
 sub button_expose_cb
 {	my ($button,$event)=@_;
-	my $songtree= ::find_ancestor($button,'SongTree');
 	#my $style=Gtk2::Rc->get_style($button->{stylewidget});
-	my $style=Gtk2::Rc->get_style_by_paths($button->get_settings, '.GtkTreeView.GtkButton', '.GtkTreeView.GtkButton','Gtk2::Button');
-	$style=$style->attach($button->window);
+	my $style=Gtk2::Rc->get_style_by_paths($button->get_settings, '.GtkTreeView.GtkButton', '.GtkTreeView.GtkButton','Gtk2::Button')
+		|| Gtk2::Rc->get_style($button->{stylewidget});
+	#$style=$style->attach($button->window);
 	$style->paint_box($button->window,$button->state,'out',$event->area,$button->{stylewidget},'button',$button->allocation->values);
 	$button->propagate_expose($button->child,$event) if $button->child;
 	if ($button->{colid})
