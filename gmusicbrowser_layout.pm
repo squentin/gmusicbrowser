@@ -876,7 +876,7 @@ sub InitLayout
 	}
 
 	my $mainwidget= $self->CreateWidgets($boxes,$opt2);
-	$mainwidget ||= Gtk2::Label->new("Error : empty layout");
+	$mainwidget ||= do { my $l=Gtk2::Label->new("Error : empty layout"); my $hbox=Gtk2::HBox->new; $hbox->add($l); $hbox; };
 	$self->add($mainwidget);
 
 	if (my $name=$boxes->{DefaultFocus})
