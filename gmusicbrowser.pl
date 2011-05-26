@@ -1062,6 +1062,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	ChangeDisplay	=> [\&ChangeDisplay,			_"Change Display",_"Display (:1 or host:0 for example)",qr/:\d/],
 	GoToCurrentSong => [\&Layout::GoToCurrentSong,		_"Select current song"],
 	DeleteSelected	=> [sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; DeleteFiles(\@IDs); },		_"Delete Selected Songs"],
+	QueueInsertSelected=>[sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; QueueInsert(@IDs); },		_"Insert Selected Songs at the top of the queue"],
 	EnqueueSelected => [\&Layout::EnqueueSelected,		_"Enqueue Selected Songs"],
 	EnqueueArtist	=> [sub {EnqueueSame('artist',$SongID)},_"Enqueue Songs from Current Artist"], # or use field 'artists' or 'first_artist' ?
 	EnqueueAlbum	=> [sub {EnqueueSame('album',$SongID)},	_"Enqueue Songs from Current Album"],
