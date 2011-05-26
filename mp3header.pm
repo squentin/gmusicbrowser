@@ -1482,22 +1482,18 @@ sub _ConvertPIC
 	substr($$raw,1,3)=$type."\x00";
 }
 
-sub _genreid	#to convert TCON from id3v2.3 (and from id3v2.2) to id3v2.4
-{  my ($ref,$version)=@_;
-   if ($version!=4)		# -> convert to list
-   {	local $_=$ref->[0];
-   	@$ref=();
-   	while (s#^\(([\d]+|RX|CR)\)##)
-   	{	push @$ref,$1;
-   	}
-   	s#^\(\(#\(#;
-   	push @$ref,$_ if $_ ne '';
-   }
-   for (@$ref)
-   {	$_=$Genres[$_] if m#^(\d+)$# && $_<@Genres;
-	s/^\(RX\)$/Remix/;
-	s/^\(CR\)$/Cover/;
-   }
+sub _genreid	#to convert TCON from id3v2.3 (and from id3v2.2) to id3v2.4, and replace numerical or CR/RX genres by the corresponding string genre
+{	my ($ref,$version)=@_;
+	for my $g (@$ref)
+	{	if ($g=~s#^\((\d+|RX|CR)\)##)		# id3v2.2/3 format (NUMBER) (CR) or (RX), shouldn't use this format in id3v2.4 but support it anyway
+		{	push @$ref, $g if length $g;	# possible second genre following (NUMBER)
+			$g=$1;
+		}
+		elsif ($version!=4) { $g=~s#^\(\(#(#; } # only un-escape '((' into '(' for id3v2.2/3 tags, not supposed to be used in id3v2.4 tags
+		if ($g=~m/^\d+$/ && $g<@Genres) { $g=$Genres[$g] }
+		elsif ($g eq 'RX') { $g='Remix' }
+		elsif ($g eq 'CR') { $g='Cover' }
+	}
 }
 
 
