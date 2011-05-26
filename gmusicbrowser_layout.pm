@@ -1963,7 +1963,8 @@ sub CheckCursor		# StartDestroy if popup is not ancestor of widget under cursor 
 	my ($gdkwin)=Gtk2::Gdk::Window->at_pointer;
 	my $widget= $gdkwin ? Glib::Object->new_from_pointer($gdkwin->get_user_data) : undef;
 	while ($widget)
-	{	$widget= ::find_ancestor($widget,'Layout::Window::Popup');
+	{	last if $widget->isa('Gtk2::StatusIcon');
+		$widget= ::find_ancestor($widget,'Layout::Window::Popup');
 		last unless $widget;
 		return 1 if $widget==$self;	# don't destroy if cursor is over child of self
 		$widget= $widget->{popped_from};# parent popup
