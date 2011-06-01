@@ -35,13 +35,15 @@ sub get_with_cb
 	pipe my($content_fh),my$wfh;
 	pipe my($error_fh),my$ewfh;
 	my $pid=fork;
-	if ($pid==0) #child
+	if (!defined $pid) { warn "simple_http_wget : fork failed : $!\n"; Glib::Idle->add(sub {$callback->(); 0}); return $self }
+	elsif ($pid==0) #child
 	{	close $content_fh; close $error_fh;
+		open my($olderr), ">&", \*STDERR;
 		open \*STDOUT,'>&='.fileno $wfh;
 		open \*STDERR,'>&='.fileno $ewfh;
-		exec @cmd_and_args;
+		exec @cmd_and_args  or print $olderr "launch failed (@cmd_and_args)  : $!\n";
+		POSIX::_exit(1);
 	}
-	elsif (!defined $pid) { warn "fork failed\n" }
 	close $wfh; close $ewfh;
 	$content_fh->blocking(0); #set non-blocking IO
 	$error_fh->blocking(0);

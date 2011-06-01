@@ -149,15 +149,16 @@ sub Play
 	pipe $OUTPUTfh,my$wfh;
 	pipe my($rfh),$CMDfh;
 	$ChildPID=fork;
-	if ($ChildPID==0) #child
+	if (!defined $ChildPID) { warn "gmusicbrowser_123 : fork failed : $!\n"; ::ErrorPlay("Fork failed : $!"); return }
+	elsif ($ChildPID==0) #child
 	{	close $OUTPUTfh; close $CMDfh;
+		open my($olderr), ">&", \*STDERR;
 		open \*STDIN, '<&='.fileno $rfh;
 		open \*STDOUT,'>&='.fileno $wfh;
 		open \*STDERR,'>&='.fileno $wfh;
-		exec @cmd_and_args;
-		die "launch failed : @cmd_and_args\n"; #FIXME never happens
+		exec @cmd_and_args  or print $olderr "launch failed (@cmd_and_args) : $!\n";
+		POSIX::_exit(1);
 	}
-	elsif (!defined $ChildPID) { warn "fork failed\n" } #FIXME never happens
 	close $wfh; close $rfh;
 	if ($RemoteMode)
 	{	$CMDfh->autoflush(1);
