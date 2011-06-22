@@ -2668,7 +2668,7 @@ sub Select_sort {Select('sort' => $_[0])}
 #CHECKME if everything works with sort="",     with source	with empty Library  with !defined $SongID	implement row=> or pos=>
 sub Select	#Set filter, sort order, selected song, playing state, staticlist, source
 {	my %args=@_;
-::callstack(@_);
+#::callstack(@_);
 	my ($filter,$sort,$song,$staticlist,$pos)=@args{qw/filter sort song staticlist position/};
 	$SongID=undef if $song && $song eq 'first';
 	$song=undef if $song && $song=~m/\D/;

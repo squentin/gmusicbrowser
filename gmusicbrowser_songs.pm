@@ -1270,7 +1270,8 @@ sub UpdateFuncs
 	}
 	$Def{$_}{_depended_on_by}=	join ' ',keys %{$_depended_on_by{$_}}	for keys %_depended_on_by;
 	$Def{$_}{_properties}=		join ' ',keys %{$_properties{$_}} 	for keys %_properties;
-warn "\@Fields=@Fields"; $Def{$_}{flags}||='' for @Fields;	#DELME
+	warn "\@Fields=@Fields\n" if $::debug;
+	$Def{$_}{flags}||='' for @Fields;	#DELME
 	{	my $code;
 		for my $f (@Fields)
 		{	$Def{$f}{flags}||='';
@@ -1389,7 +1390,7 @@ sub MakeLoadSub
 		elsif (my $dep=$Def{$field}{depend})
 		{	next if grep !exists $loadedfields{$_}, split / /,$dep;
 			$c=Code($field, 'update', ID => '$LastID'); #FIXME maybe add {} around it, to avoid multiple my at the same level
-			warn "adding update code for $field" if $c;
+			warn "adding update code for $field\n" if $::debug && $c;
 		}
 		$code.=$c.";\n" if $c;
 
@@ -1479,7 +1480,7 @@ sub ReReadFile
 		$values->{modif}=$modif2;
 		my @changed=$DIFFsub->($ID,$values);
 		return unless @changed;
-		warn "Changed fields : @changed" if $::debug;
+		warn "Changed fields : @changed\n" if $::debug;
 		::SongsChanged([$ID],\@changed);
 		my %changed; $changed{$_}=undef for @changed;
 		Changed(\%changed,[$ID]);
@@ -1491,7 +1492,7 @@ sub ReReadFile
 }
 
 sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,field=>newval,...);  ID can be an arrayref
-{	warn "Songs::Set(@_) called from : ".join(':',caller)."\n";
+{	warn "Songs::Set(@_) called from : ".join(':',caller)."\n" if $::debug;
 	my ($IDs,$modif,%opt);
 	if (ref $_[1])	{ ($IDs,$modif,%opt)=@_ }
 	else		{ ($IDs,@$modif)=@_ }
@@ -1521,7 +1522,7 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 
 	if (keys %$changed)
 	{	Changed($changed,$IDs);
-		warn "has changed : ".join(' ',keys %$changed);
+		warn "has changed : ".join(' ',keys %$changed)."\n" if $::debug;
 	}
 	if (@$towrite)
 	{	my $i=0; my $abort;
@@ -1542,7 +1543,7 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 		Glib::Idle->add(sub
 		 {	if ($towrite->[$i])
 			{	FileTag::Write($IDs->[$i], $towrite->[$i], $errorsub);
-				warn "ID=$IDs->[$i] towrite : ".join(' ',@{$towrite->[$i]});
+				warn "ID=$IDs->[$i] towrite : ".join(' ',@{$towrite->[$i]})."\n" if $::debug;
 				::IdleCheck($IDs->[$i]);
 			}
 			$i++;
@@ -1561,7 +1562,7 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 }
 
 sub Changed
-{	my $changed=$_[0]; my $IDs=$_[1]; 		warn "Songs::Changed : IDs=@$IDs fields=".join(' ',keys %$changed)."\n";
+{	my $changed=$_[0]; my $IDs=$_[1]; 		warn "Songs::Changed : IDs=@$IDs fields=".join(' ',keys %$changed)."\n" if $::debug;
 	$IDFromFile=undef if $IDFromFile && exists $changed->{file} || exists $changed->{path};
 	AA::Fields_Changed(keys %$changed) if grep $AA::GHash_Depend{$_}, keys %$changed;
 	my @needupdate;
@@ -1569,7 +1570,7 @@ sub Changed
 	{	if (my $l=$Def{$f}{_depended_on_by}) { push @needupdate, split / /,$l; }
 	}
 	@needupdate= grep !exists $changed->{$_} && $UPDATEsub{$_}, @needupdate;
-	warn "Update : @needupdate";
+	warn "Update : @needupdate" if $::debug;
 	$UPDATEsub{$_}->($IDs) for @needupdate;
 	::SongsChanged($IDs,\@needupdate) if @needupdate;
 }
@@ -1751,7 +1752,7 @@ sub DisplayFromHash_sub	 #not a good name, very specific, only used for $field=p
 sub MakeFilterFromGID
 {	my ($field,$gid)=@_; #warn "MakeFilterFromGID:@_\n";#warn Code($field, 'makefilter', GID => '$_[0]');
 	my $sub=$FuncCache{'makefilter '.$field}||= Makesub($field, 'makefilter', GID => '$_[0]');
-warn "MakeFilterFromGID => ".($sub->($gid));
+warn "MakeFilterFromGID => ".($sub->($gid)) if $::debug;
 	return Filter->new( $sub->($gid) );
 }
 sub MakeFilterFromID	#should support most fields, FIXME check if works for year/artists/labels/genres/...
@@ -2623,7 +2624,7 @@ sub ReplaceFields
 }
 
 sub CreateHash
-{	my ($type,$field)=@_; warn "AA::CreateHash(@_)\n";
+{	my ($type,$field)=@_; warn "AA::CreateHash(@_)\n" if $::debug;
 	my @f=  $Songs::GTypes{$type} ? ($field) : ($type,$field);
 	$GHash_Depend{$_}++ for Songs::Depends(@f);
 	return $GHash{$field}{$type}=Songs::BuildHash($field,$::Library,undef,$type);
@@ -2651,7 +2652,7 @@ sub Fields_Changed
 sub IDs_Changed	#called when songs are added/removed
 {	undef %GHash_Depend;
 	undef %GHash;
-	warn "IDs_Changed\n";
+	warn "IDs_Changed\n" if $::debug;
 }
 sub GetHash
 {	my ($type,$field)=@_;
@@ -2971,7 +2972,7 @@ sub Replace
 	@$self=@$newlist;
 	delete $Presence{$self};
 	$::SelectedFilter=$::PlayFilter=undef;
-	if ($::RandomMode)	{ $::RandomMode->Invalidate; ::red("Invalidate $self ".@$self) }
+	if ($::RandomMode)	{ $::RandomMode->Invalidate; }
 	else			{ $::SortFields=[]; $::Options{Sort}=''; ::QHasChanged('Sort'); }
 	::QHasChanged('Filter');
 	::HasChanged('SongArray',$self,'replace');
@@ -3253,7 +3254,6 @@ sub _filter
 sub _sort
 {	my ($self,$list)=@_;
 	$list||=$self;
-::red(scalar @$list);
 	delete $::ToDo{'8_resort_playlist'};
 	if ($::RandomMode)	{ $::RandomMode->Invalidate; }
 	elsif ($::Options{Sort}){ Songs::SortList($list,$::Options{Sort}); }
@@ -4407,8 +4407,7 @@ sub Draw
 	#my $time=times;
 	#(re)compute scores if invalid or (older than 10 min and time-dependant)
 	if (!$self->{valid} || ($self->{time_computed} && time-$self->{time_computed}>10*60))
-	{	::red( "recompute for list with $self->{lref} ".@{$self->{lref}}." IDs");
-		$self->MakeScoreFunction unless $self->{UpdateIDsScore};
+	{	$self->MakeScoreFunction unless $self->{UpdateIDsScore};
 		$self->{UpdateIDsScore}($self->{lref});
 		$self->{time_computed}=time if $self->{time_computed};
 		$self->{valid}=1;
