@@ -271,7 +271,7 @@ sub write_file
 
 	# __SLOW__ copy if page number must be changed -> and crc recomputed
 	else
-	{	warn "must recompute crc for the whole file, this may take a while...\n";
+	{	warn "must recompute crc for the whole file, this may take a while (install Digest::CRC to make it fast) ...\n" unless $digestcrc;
 		while (my $pageref=_ReadPage($self))	# read each page
 		{	substr $$pageref,18,4,pack('V',$pagenb++); #replace page number
 			_recompute_page_crc($pageref);	#recompute crc
