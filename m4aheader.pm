@@ -236,14 +236,14 @@ sub ParseAtomTree
 		elsif ($name eq 'stsd')
 		{	read($fh,$buffer,$datalength);
 			my ($type,$channels,$bitspersample,$samplerate)=unpack 'x4x4x4A4x16nnx2N',$buffer;
-			if ($type eq 'mp4a' && !$info{traktype}) #ignore if not mp4a, and only read the first one if more than one (can it happen ?)
+			if (($type eq 'mp4a' || $type eq 'alac') && !$info{traktype}) #ignore if non mp4a/alac, and only read the first one if more than one (can it happen ?)
 			{	$info{channels}=$channels;
 				$info{rate}=$samplerate;
 				$info{bitspersample}=$bitspersample;
 				#warn "channel=$channels bitspersample=$bitspersample samplerate=$samplerate\n";
-				$info{bitrate}=unpack 'N',$1 if $buffer=~m/^.{48}esds.{4}\x03(?:\x80\x80\x80)?.{4}\x04(?:\x80\x80\x80)?.{10}(.{4})/s;
-				$info{traktype}=$type;
+				$info{bitrate}=unpack 'N',$1 if $buffer=~m/^.{48}esds.{4}\x03(?:\x80\x80\x80)?.{4}\x04(?:\x80\x80\x80)?.{10}(.{4})/s; # doesn't seem to work for alac files, will use calculated bitrate instead
 			}
+			$info{traktype}||=$type;
 		}
 		elsif ($name eq 'cmov')
 		{	warn "Compressed moov atom found, unsupported"; return;
