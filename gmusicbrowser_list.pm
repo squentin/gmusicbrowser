@@ -6695,7 +6695,7 @@ sub button_expose_cb
 	#my $style=Gtk2::Rc->get_style($button->{stylewidget});
 	my $style=Gtk2::Rc->get_style_by_paths($button->get_settings, '.GtkTreeView.GtkButton', '.GtkTreeView.GtkButton','Gtk2::Button')
 		|| Gtk2::Rc->get_style($button->{stylewidget});
-	#$style=$style->attach($button->window);
+	$style=$style->attach($button->window);
 	$style->paint_box($button->window,$button->state,'out',$event->area,$button->{stylewidget},'button',$button->allocation->values);
 	$button->propagate_expose($button->child,$event) if $button->child;
 	if ($button->{colid})

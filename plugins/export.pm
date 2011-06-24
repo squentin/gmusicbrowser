@@ -184,10 +184,15 @@ sub RunCommand
 		::forksystem(@cmd);
 	}
 	else
-	{	for my $ID (@$IDs)
-		{	my @c=@cmd;
-			$_=::ReplaceFields($ID,$_) for @c;
-			system @c;
+	{	my @todo;
+		for my $ID (@$IDs)
+		{	push @todo, [ map ::ReplaceFields($ID,$_), @cmd ];
+		}
+		my $ChildPID=fork;
+		if (!defined $ChildPID) { warn ::ErrorMessage("export plugin : fork failed : $!"); }
+		elsif ($ChildPID==0) #child
+		{	system @$_ for @todo;
+			POSIX::_exit(0);
 		}
 	}
 }
