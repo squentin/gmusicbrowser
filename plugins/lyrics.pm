@@ -62,7 +62,12 @@ my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 	#lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a',undef,
 	#		sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
 	lyricssongs =>	['lyrics-songs','http://letras.terra.com.br/winamp.php?musica=%s&artista=%a',undef,
-			sub { my $l=html_extract($_[0],div=>'letra'); my $ref=\$_[0]; $$ref=$l ? $l : $notfound; return !!$l }],
+			sub {	my $l=html_extract($_[0],div=>'letra');
+				$l=~s#<div id="cabecalho">.*?</div>##s if $l; #remove header with title and artist links
+				my $ref=\$_[0];
+				$$ref=$l ? $l : $notfound;
+				return ! !$l
+			}],
 	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%s',undef,
 			 sub {	return 0,'http://lyrics.wikia.com/'.$1 if $_[0]=~m#<span class="redirectText"><a href="/([^"]+)"#;
 				$_[0]=~s!.*<div class='lyricbox'>.*?((?:&\#\d+;|<br ?/>){5,}).*!$1!s; #keep only the "lyric box"
