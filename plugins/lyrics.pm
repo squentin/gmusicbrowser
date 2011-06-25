@@ -49,18 +49,18 @@ my @ContextMenuAppend=
 
 my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics can be saved
 (	#lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php','artist=%a&songname=%s'],
-	lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php?artist=%a&songname=%s',undef,sub
-		{	local $_=$_[0];
-			return -1 if m#<a href=[^>]+add[^>]+>(?:[^<]*</?[b-z]\w*)*[^<]*Add a lyric.(?:[^<]*</?[b-z]\w*)*[^<]*</a>#i;
-			return 1 if s#<a href="\#"[^>]+badsong[^>]+>BADSONG</a>##i;
-			return 0;
-		}],
+	#lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php?artist=%a&songname=%s',undef,sub
+	#	{	local $_=$_[0];
+	#		return -1 if m#<a href=[^>]+add[^>]+>(?:[^<]*</?[b-z]\w*)*[^<]*Add a lyric.(?:[^<]*</?[b-z]\w*)*[^<]*</a>#i;
+	#		return 1 if s#<a href="\#"[^>]+badsong[^>]+>BADSONG</a>##i;
+	#		return 0;
+	#	}],
 	#leoslyrics =>	['leolyrics','http://api.leoslyrics.com/api_search.php?artist=%a&songtitle=%s'],
 	#google	=>	['google','http://www.google.com/search?q="%a"+"%s"'],
 	lyriki	=>	['lyriki','http://lyriki.com/index.php?title=%a:%s',undef,
 		sub { my $no= $_[0]=~m/<div class="noarticletext">/s; $_[0]=~s/^.*<!--\s*start content\s*-->(.*?)<!--\s*end content\s*-->.*$/$1/s && !$no; }],
-	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a',undef,
-			sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
+	#lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a',undef,
+	#		sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
 	lyricssongs =>	['lyrics-songs','http://letras.terra.com.br/winamp.php?musica=%s&artista=%a',undef,
 			sub { my $l=html_extract($_[0],div=>'letra'); my $ref=\$_[0]; $$ref=$l ? $l : $notfound; return !!$l }],
 	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%s',undef,
@@ -78,7 +78,7 @@ my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 $::Options{OPT.'Font'} ||= delete $::Options{OPT.'FontSize'};	#for versions <1.1.6
 
 if (my $site=$::Options{OPT.'LyricSite'}) { delete $::Options{OPT.'LyricSite'} unless exists $sites{$site} } #reset selected site if no longer defined
-::SetDefaultOptions(OPT, Font => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyricsplugin');
+::SetDefaultOptions(OPT, Font => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyricssongs');
 
 
 my $lyricswidget=
