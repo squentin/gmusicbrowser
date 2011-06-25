@@ -1573,7 +1573,8 @@ INIT
 	comments	=> [_"Comments",9,'M'],
 	description	=> [_"Description",9,'M'],
 	genre		=> [_"Genre",8],
-	lyrics		=> [_"Lyrics",14,'M'],
+	lyrics		=> [_"Lyrics",14,'L'],
+	fmps_lyrics	=> [_"Lyrics",14,'L'],
 	author		=> [_"Original Artist",40],
 	metadata_block_picture=> [_"Picture",15,'tCTb'],
   };
@@ -1592,6 +1593,7 @@ INIT
 	publicationright=> [_"Publication right",81],
 	year		=> [_"Year",7],
 	'debut album'	=> [_"Debut Album",8],
+	fmps_lyrics	=> [_"Lyrics",14,'L'],
   };
   my $lyrics3v2_types=
   {	LYR => [_"Lyrics",7,'M'],
@@ -1667,6 +1669,7 @@ INIT
 	u => ['EntryBinary'],	#unknown -> binary
 	f => ['EntryBoolean'],
 	p => ['EntryCover'],
+	L => ['EntryLyrics'],
  );
 
 }
@@ -1774,7 +1777,7 @@ sub addrow
 		$type=$DataType{$type}[0] || 'EntrySimple';
 		my $param=$DataType{$type}[1];
 		if ($key eq '') { ($widget,$label)=EntryDouble->new($value); }
-		else	{ $widget=$type->new($value,$param); $label=Gtk2::Label->new($name); }
+		else	{ $widget=$type->new($value,$param); $label=Gtk2::Label->new($name); $label->set_tooltip_text($key); }
 		$table->attach($label,1,2,$row,$row+1,'shrink','shrink',1,1);
 		$table->attach($widget,2,3,$row,$row+1,['fill','expand'],'shrink',1,1);
 		@Todel=($label);
@@ -2070,6 +2073,11 @@ INIT
 				[_"Name",1,1,2],
 				['',2,0,2],
 			],
+		'com.apple.iTunes----FMPS_Lyrics'=>
+		[		[_"Application",0,1,2],
+				[_"Name",1,1,2],
+				['',2,0,2,'EntryLyrics'],
+		],
 	);
 	$SUBTAGPROP{metadata_block_picture}=$SUBTAGPROP{APIC}; #for vorbis pictures
 }
@@ -2080,7 +2088,8 @@ sub new
 	my $self = bless Gtk2::Frame->new($name), $class;
 	my $table=Gtk2::Table->new(1, 4, 0);
 	$self->add($table);
-	my $prop=$SUBTAGPROP{$realkey || $key};
+	my $prop= $SUBTAGPROP{$key};
+	$prop||= $SUBTAGPROP{$realkey} if $realkey;
 	my $row=0;
 	my $subtag=0;
 	for my $t (split //,$type)
