@@ -16,6 +16,11 @@ use constant { EOL => "\015\012" };
 my %ipcache; #FIXME purge %ipcache from time to time
 my $UseCache= *GMB::Cache::add{CODE};
 
+my $gzip_ok;
+BEGIN
+{	eval { require IO::Uncompress::Gunzip; $gzip_ok=1; };
+}
+
 sub get_with_cb
 {	my $self=bless {};
 	my $error;
@@ -83,22 +88,25 @@ sub connecting_cb
 	my $socket=$self->{sock};
 	my $port=$self->{port};
 	my $host=$self->{host};
+	my $params= $self->{params};
 
 	if ($failed)
 	{	warn "Cannot connect to server $host:$port\n";
 		close $socket;
-		$self->{params}{cb}();
+		$params->{cb}();
 		return 0;
 	}
 
 #binmode $socket,':encoding(iso-8859-1)';
-	my $post=$self->{params}{post};
+	my $post=$params->{post};
 	my $method=defined $post ? 'POST' : 'GET';
+	my $useragent= $params->{user_agent} || 'Mozilla/5.0';
+	my $accept= $params->{'accept'} || '';
 	print $socket "$method $self->{file} HTTP/1.0".EOL;
 	print $socket "Host: $host:$port".EOL;
-	print $socket "User-Agent: Mozilla/5.0".EOL;
-	#print $socket "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6".EOL;
-	#print $socket "Accept: */*".EOL;
+	print $socket "User-Agent: $useragent".EOL;
+	print $socket "Accept: $accept".EOL;
+	print $socket "Accept-Encoding: gzip".EOL if $gzip_ok;
 	#print $socket "Connection: Keep-Alive".EOL;
 	if (defined $post)
 	{ print $socket 'Content-Type: application/x-www-form-urlencoded; charset=utf-8'.EOL;
@@ -149,6 +157,18 @@ sub receiving_cb
 	$headers.=EOL;
 	my %headers;
 	$headers{lc $1}=$2 while $headers=~m/([^:]*): (.*?)$EOL/og;
+
+	if (my $enc=$headers{'content-encoding'})
+	{	if ($enc eq 'gzip' && $gzip_ok)
+		{	my $gzipped= $response;
+			IO::Uncompress::Gunzip::gunzip( \$gzipped, \$response )
+				or do {warn "simple_http : gunzip failed: $IO::Uncompress::Gunzip::GunzipError\n"; $result='gunzip error';};
+		}
+		else
+		{	warn "simple_http_wget : can't decode '$enc' encoding\n";
+			$result='gzipped';
+		}
+	}
 	if ($result=~m#^HTTP/1\.\d+ 200 OK#)
 	{	#warn "ok $url\n$callback\n";
 		my $type=$headers{'content-type'};

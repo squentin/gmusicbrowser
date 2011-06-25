@@ -13,6 +13,10 @@ use IO::Handle;
 
 my $UseCache= *GMB::Cache::add{CODE};
 my $orig_proxy=$ENV{http_proxy};
+my $gzip_ok;
+BEGIN
+{	eval { require IO::Uncompress::Gunzip; $gzip_ok=1; };
+}
 
 sub get_with_cb
 {	my $self=bless {};
@@ -29,7 +33,10 @@ sub get_with_cb
 							: $orig_proxy;
 	$ENV{http_proxy}=$proxy;
 
-	my @cmd_and_args=qw/wget --timeout=40 --header=Accept: --user-agent= -S -O -/;
+	my $useragent= $params{user_agent} || 'Mozilla/5.0';
+	my $accept= $params{'accept'} || '';
+	my $gzip= $gzip_ok ? '--header=Accept-Encoding: gzip' : '';
+	my @cmd_and_args= (qw/wget --timeout=40 -S -O -/, $gzip, "--header='Accept: $accept'", "--user-agent='$useragent'");
 	push @cmd_and_args, '--post-data='.$post if $post;	#FIXME not sure if I should escape something
 	push @cmd_and_args, '--',$url;
 	pipe my($content_fh),my$wfh;
@@ -77,6 +84,21 @@ sub receiving_cb
 	$url=$1		while $self->{ebuffer}=~m#^Location: (\w+://[^ ]+)#mg;
 	$type=$1	while $self->{ebuffer}=~m#^  Content-Type: (.*)$#mg;	##
 	$result=$1	while $self->{ebuffer}=~m#^  (HTTP/1\.\d+.*)$#mg;	##
+	#warn $self->{ebuffer};
+
+	my ($enc)= $self->{ebuffer}=~m#^  Content-Encoding:\s*(.*)#mg;
+	if ($enc)
+	{	if ($enc eq 'gzip' && $gzip_ok)
+		{	my $gzipped= $self->{content};
+			IO::Uncompress::Gunzip::gunzip( \$gzipped, \$self->{content} )
+				or do {warn "simple_http_wget : gunzip failed: $IO::Uncompress::Gunzip::GunzipError\n"; $result='gunzip error';};
+		}
+		else
+		{	warn "simple_http_wget : can't decode '$enc' encoding\n";
+			$result='encoded';
+		}
+	}
+
 	if ($result=~m#^HTTP/1\.\d+ 200 OK#)
 	{	my $response=\$self->{content};
 		if ($self->{params}{cache} && defined $$response)
