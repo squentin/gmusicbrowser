@@ -491,8 +491,10 @@ sub loaded #_very_ crude html to gtktextview renderer
 		else {$url=undef}
 	}
 
-	$self->{pixtoload}=\@pixbufs;
-	::IdleDo('8_FetchPix'.$self,100,\&load_pixbuf,$self) if @pixbufs;
+	if (0)
+	{	$self->{pixtoload}=\@pixbufs;
+		::IdleDo('8_FetchPix'.$self,100,\&load_pixbuf,$self) if @pixbufs;
+	}
 	$self->Save_text if $::Options{OPT.'AutoSave'} && $oklyrics && $oklyrics>0;
 }
 
