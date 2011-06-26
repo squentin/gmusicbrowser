@@ -11,6 +11,11 @@ use warnings;
 use AnyEvent::HTTP;
 my $UseCache= *GMB::Cache::add{CODE};
 
+my $gzip_ok;
+BEGIN
+{	eval { require IO::Uncompress::Gunzip; $gzip_ok=1; };
+}
+
 sub get_with_cb
 {	my $self=bless {};
 	my %params=@_;
@@ -28,7 +33,9 @@ sub get_with_cb
 
 	my %headers;
 	$headers{'Content-Type'}= 'application/x-www-form-urlencoded; charset=utf-8' if $post;
-	$headers{$_}=$params{$_} for grep exists $params{$_}, qw/User-Agent Content-Type Referer Accept/;
+	$headers{'User-Agent'}= $params{user_agent} || 'Mozilla/5.0';
+	$headers{Accept}= $params{'accept'} || '';
+	$headers{'Accept-Encoding'}= $gzip_ok ? 'gzip' : '';
 	my $method= $post ? 'POST' : 'GET';
 	my @args;
 	push @args, body => $post if $post;
@@ -47,6 +54,17 @@ sub finished
 	my $callback=	$self->{params}{cb};
 	delete $_[0]{request};
 	#warn "$_=>$headers->{$_}\n" for sort keys %$headers;
+	if (my $enc=$headers->{'content-encoding'})
+	{	if ($enc eq 'gzip' && $gzip_ok)
+		{	my $gzipped= $response;
+			IO::Uncompress::Gunzip::gunzip( \$gzipped, \$response )
+				or do {warn "simple_http : gunzip failed: $IO::Uncompress::Gunzip::GunzipError\n"; $headers->{Status}='gunzip error'; $headers->{Reason}='';};
+		}
+		else
+		{	warn "simple_http : can't decode '$enc' encoding\n";
+			$headers->{Status}='encoded'; $headers->{Reason}='';
+		}
+	}
 	if ($headers->{Reason} eq 'OK') # and $headers->{Status} == 200 ?
 	{	my $type= $headers->{'content-type'};
 		if ($self->{params}{cache} && defined $response)

@@ -509,7 +509,7 @@ sub Sort
 	$self->{array}->Sort($sort);
 }
 sub SetFilter
-{	my ($self,$filter)=@_;	::red($self->{type},' ',($self->{filter} || 'no'), ' ',$filter);::callstack();
+{	my ($self,$filter)=@_;#	::red($self->{type},' ',($self->{filter} || 'no'), ' ',$filter);::callstack();
 	my $list;
 	if ($self->{hideif} eq 'nofilter')
 	{	$self->Hide($filter->is_empty);
@@ -1161,7 +1161,7 @@ sub SongArray_changed_cb
 	#{	$self->{array}->Mirror($array,$action,@extra);
 	#}
 	return unless $self->{array}==$array;
-	warn "SongArray_changed $action,@extra\n";
+	warn "SongArray_changed $action,@extra\n" if $::debug;
 	my $tv=$self->child;
 	my $store=$tv->get_model;
 	my $treesel=$tv->get_selection;

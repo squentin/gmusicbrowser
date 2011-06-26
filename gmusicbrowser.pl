@@ -2436,7 +2436,7 @@ sub QWaitAutoPlay
 
 sub GetNeighbourSongs
 {	my $nb=shift;
-	UpdateSort() if $ToDo{'8_updatesort'};
+	$ListPlay->UpdateSort if $ToDo{'8_resort_playlist'};
 	my $pos=$Position||0;
 	my $begin=$pos-$nb;
 	my $end=$pos+$nb;
@@ -2446,7 +2446,7 @@ sub GetNeighbourSongs
 }
 
 sub PrevSongInPlaylist
-{	UpdateSort() if $ToDo{'8_updatesort'};
+{	$ListPlay->UpdateSort if $ToDo{'8_resort_playlist'};
 	my $pos=$Position;
 	if (!defined $pos) { $pos=0; if ($RandomMode) {} }	#FIXME PHASE1 in case random
 	if ($pos==0)
@@ -2457,7 +2457,7 @@ sub PrevSongInPlaylist
 	SetPosition($pos);
 }
 sub NextSongInPlaylist
-{	UpdateSort() if $ToDo{'8_updatesort'};
+{	$ListPlay->UpdateSort if $ToDo{'8_resort_playlist'};
 	my $pos=$Position;
 	if (!defined $pos) { $pos=0;  if ($RandomMode) {} }	#FIXME PHASE1 in case random
 	if ($pos==$#$ListPlay)
@@ -2484,13 +2484,13 @@ sub GetNextSongs
 		 { $QueueAction=''; HasChanged('QueueAction'); }
 		last;
 	  }
+	  return unless @$ListPlay;
+	  $ListPlay->UpdateSort if $ToDo{'8_resort_playlist'};
 	  if ($RandomMode)
 	  {	push @IDs,_"Random" if $list;
 		push @IDs,$RandomMode->Draw($nb,((defined $SongID && @$ListPlay>1)? [$SongID] : undef));
 		last;
 	  }
-	  return unless @$ListPlay;
-	  UpdateSort() if $ToDo{'8_updatesort'};
 	  my $pos;
 	  $pos=FindPositionSong( $IDs[-1],$ListPlay ) if @IDs;
 	  $pos= defined $Position ? $Position : -1  unless defined $pos;
@@ -2668,7 +2668,7 @@ sub Select_sort {Select('sort' => $_[0])}
 #CHECKME if everything works with sort="",     with source	with empty Library  with !defined $SongID	implement row=> or pos=>
 sub Select	#Set filter, sort order, selected song, playing state, staticlist, source
 {	my %args=@_;
-::callstack(@_);
+#::callstack(@_);
 	my ($filter,$sort,$song,$staticlist,$pos)=@args{qw/filter sort song staticlist position/};
 	$SongID=undef if $song && $song eq 'first';
 	$song=undef if $song && $song=~m/\D/;
