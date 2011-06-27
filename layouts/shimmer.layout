@@ -14,7 +14,7 @@ HBTop		= ABButtons _15VBPlayer 10ABToggle -5ABSettings
 ABButtons	= (yalign=0,yscale=0.0) HBButtons
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= 1Filler0 HBTitle HBTimeSlider
-HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)",yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
+HBTitle		= Title(expand_max=500,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)",yalign=0.5,ellipsize=end) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0,ellipsize=end) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=300,yalign=0.5,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 ABToggle	= (yalign=0,yscale=0.0) HBToggle
 HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=gmb-view-list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=gmb-view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=gmb-view-mosaic,widget=VPMosaic,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=gmb-view-fullscreen,size=large-toolbar,tip="Fullscreen View") 10Filler2 ABSearchBox
@@ -58,7 +58,7 @@ HBTop		= VBButtons _15VBPlayer -5VBSettings
 VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle VBTime
-HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=0,expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -Stars(yalign=0.5)
+HBTitle		= Title(expand_max=300,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5,ellipsize=end) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0,ellipsize=end) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
 VBTime		= _HBTimeSlider _SimpleSearch(suggest=1)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 VBSettings	= HBPrefSearch 5Filler5
@@ -79,18 +79,20 @@ KeyBindings	= c-l SetFocusOn(SimpleSearch)
 Type=T
 VBMain		= HBTime Filler0 VBMain1
 VBMain1		= HBLeft _HBRight
-HBLeft		= _Cover(forceratio=1,default=elementary/no-cover.svg) VBText
+HBLeft		= Cover(forceratio=1,default=elementary/no-cover.svg,maxsize=80) _VBText
 VBText		= 2HBArtist HBAlbum _2HBTitle
 HBButtons	= Prev(size=small-toolbar) Play(size=small-toolbar) Next(size=small-toolbar)
-HBTitle		= LockSong _Title(font=12,interval=75)
-HBArtist	= LockArtist _Artist(font=8)
-HBAlbum		= LockAlbum Album(font=8,minsize=0) Date(font=7,markup=" <b>»</b> %y")
+HBTitle		= LockSong _Title(font=12,tip=_"Title: %t",ellipsize=end)
+HBArtist	= LockArtist _Artist(font=8,tip=_"Artist: %a",ellipsize=end)
+HBAlbum		= LockAlbum _Album(font=8,tip=_"Album: %l",ellipsize=end) Date(font=7,markup=" <b>»</b> %y")
 HBRating	= Filler1  -Stars
 HBTime		= _TimeBar(minheight=7)
 HBRight		= HBButtons _2HBRating
 VSize0		= 3 Filler0
 HSize0		= Filler1 LockArtist LockAlbum LockSong
 HSize1		= Cover HBButtons
+HSize3		= 250 VBMain
+VSize1		= 125 VBMain
 
 # Fullscreen Layouts
 #####################################
