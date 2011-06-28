@@ -5827,9 +5827,10 @@ sub expose_cb
 	my ($exp_x1,$exp_y1,$exp_x2,$exp_y2)=$expose->values;
 	$exp_x2+=$exp_x1; $exp_y2+=$exp_y1;
 	my $window=$view->window;
-	#my $style=Gtk2::Rc->get_style_by_paths($self->{stylewidget}->get_settings, '.GtkTreeView', '.GtkTreeView','Gtk2::TreeView');
-	#$style=$style->attach($window);
-	my $style=$self->get_style;
+	my $style=Gtk2::Rc->get_style_by_paths($self->{stylewidget}->get_settings, '.GtkTreeView', '.GtkTreeView','Gtk2::TreeView')
+		|| Gtk2::Rc->get_style($self->{stylewidget})
+		|| $self->get_style;
+	$style=$style->attach($window);
 	my $nstate= $self->state eq 'insensitive' ? 'insensitive' : 'normal';
 	#my $sstate=$view->has_focus ? 'selected' : 'active';
 	my $sstate='selected';	#Treeview uses only state= normal, insensitive or selected
