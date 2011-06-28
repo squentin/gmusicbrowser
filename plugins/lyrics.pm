@@ -184,10 +184,11 @@ sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save lyrics in :", width=>30);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
-	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works with some lyrics source and when the lyrics tab is displayed");
+	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works with some lyrics source and when the lyrics tab is active");
+	my $alwaysload=::NewPrefCheckButton(OPT.'AlwaysLoad' => _"Load lyrics even if lyrics panel is hidden");
 	my $Bopen=Gtk2::Button->new(_"open context window");
 	$Bopen->signal_connect(clicked => sub { ::ContextWindow; });
-	$vbox->pack_start($_,::FALSE,::FALSE,1) for $entry,$preview,$autosave,$Bopen;
+	$vbox->pack_start($_,::FALSE,::FALSE,1) for $entry,$preview,$autosave,$alwaysload,$Bopen;
 	return $vbox;
 }
 
@@ -261,7 +262,7 @@ sub Refresh_cb
 
 sub SongChanged
 {	my ($self,$ID,$force)=@_;
-	return unless $self->mapped;
+	return unless $self->mapped || $::Options{OPT.'AlwaysLoad'};
 	return unless defined $ID;
 	return if defined $self->{ID} && !$force && ( $ID==$self->{ID} || !$self->{follow} );
 	$self->cancel;	#cancel any lyrics operation in progress on an a previous song
