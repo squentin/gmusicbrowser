@@ -49,20 +49,25 @@ my @ContextMenuAppend=
 
 my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics can be saved
 (	#lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php','artist=%a&songname=%s'],
-	lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php?artist=%a&songname=%s',undef,sub
-		{	local $_=$_[0];
-			return -1 if m#<a href=[^>]+add[^>]+>(?:[^<]*</?[b-z]\w*)*[^<]*Add a lyric.(?:[^<]*</?[b-z]\w*)*[^<]*</a>#i;
-			return 1 if s#<a href="\#"[^>]+badsong[^>]+>BADSONG</a>##i;
-			return 0;
-		}],
+	#lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php?artist=%a&songname=%s',undef,sub
+	#	{	local $_=$_[0];
+	#		return -1 if m#<a href=[^>]+add[^>]+>(?:[^<]*</?[b-z]\w*)*[^<]*Add a lyric.(?:[^<]*</?[b-z]\w*)*[^<]*</a>#i;
+	#		return 1 if s#<a href="\#"[^>]+badsong[^>]+>BADSONG</a>##i;
+	#		return 0;
+	#	}],
 	#leoslyrics =>	['leolyrics','http://api.leoslyrics.com/api_search.php?artist=%a&songtitle=%s'],
 	#google	=>	['google','http://www.google.com/search?q="%a"+"%s"'],
 	lyriki	=>	['lyriki','http://lyriki.com/index.php?title=%a:%s',undef,
 		sub { my $no= $_[0]=~m/<div class="noarticletext">/s; $_[0]=~s/^.*<!--\s*start content\s*-->(.*?)<!--\s*end content\s*-->.*$/$1/s && !$no; }],
-	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a',undef,
-			sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
+	#lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a',undef,
+	#		sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
 	lyricssongs =>	['lyrics-songs','http://letras.terra.com.br/winamp.php?musica=%s&artista=%a',undef,
-			sub { my $l=html_extract($_[0],div=>'letra'); my $ref=\$_[0]; $$ref=$l ? $l : $notfound; return !!$l }],
+			sub {	my $l=html_extract($_[0],div=>'letra');
+				$l=~s#<div id="cabecalho">.*?</div>##s if $l; #remove header with title and artist links
+				my $ref=\$_[0];
+				$$ref=$l ? $l : $notfound;
+				return ! !$l
+			}],
 	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%s',undef,
 			 sub {	return 0,'http://lyrics.wikia.com/'.$1 if $_[0]=~m#<span class="redirectText"><a href="/([^"]+)"#;
 				$_[0]=~s!.*<div class='lyricbox'>.*?((?:&\#\d+;|<br ?/>){5,}).*!$1!s; #keep only the "lyric box"
@@ -78,7 +83,7 @@ my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 $::Options{OPT.'Font'} ||= delete $::Options{OPT.'FontSize'};	#for versions <1.1.6
 
 if (my $site=$::Options{OPT.'LyricSite'}) { delete $::Options{OPT.'LyricSite'} unless exists $sites{$site} } #reset selected site if no longer defined
-::SetDefaultOptions(OPT, Font => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyricsplugin');
+::SetDefaultOptions(OPT, Font => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyricssongs', PreferEmbeddedLyrics=>0);
 
 
 my $lyricswidget=
@@ -182,12 +187,16 @@ sub cancel
 
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save lyrics in :", width=>30);
+	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Lyrics file :", width=>30);
+_"Lyrics file name format",
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
-	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works with some lyrics source and when the lyrics tab is displayed");
+	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works with some lyrics source and when the lyrics tab is active");
+	my $embed=::NewPrefCombo(OPT.'PreferEmbeddedLyrics', { 0=> _"lyrics file", 1=> _"file tag"},
+		text=>_"Prefered place to load and save lyrics :");
+	my $alwaysload=::NewPrefCheckButton(OPT.'AlwaysLoad' => _"Load lyrics even if lyrics panel is hidden");
 	my $Bopen=Gtk2::Button->new(_"open context window");
 	$Bopen->signal_connect(clicked => sub { ::ContextWindow; });
-	$vbox->pack_start($_,::FALSE,::FALSE,1) for $entry,$preview,$autosave,$Bopen;
+	$vbox->pack_start($_,::FALSE,::FALSE,1) for $embed,$entry,$preview,$autosave,$alwaysload,$Bopen;
 	return $vbox;
 }
 
@@ -261,7 +270,7 @@ sub Refresh_cb
 
 sub SongChanged
 {	my ($self,$ID,$force)=@_;
-	return unless $self->mapped;
+	return unless $self->mapped || $::Options{OPT.'AlwaysLoad'};
 	return unless defined $ID;
 	return if defined $self->{ID} && !$force && ( $ID==$self->{ID} || !$self->{follow} );
 	$self->cancel;	#cancel any lyrics operation in progress on an a previous song
@@ -269,13 +278,14 @@ sub SongChanged
 	$self->{time}=undef;
 
 	if (!$force)
-	{	my $file=::pathfilefromformat( $self->{ID}, $::Options{OPT.'PathFile'}, undef,1 );
-		if ($file && -r $file)
-		{	::IdleDo('8_lyrics'.$self,1000,\&load_file,$self,$file);
-			return
-		}
+	{	::IdleDo('8_lyrics'.$self,1000,\&load_from_file,$self);
 	}
+	else { $self->load_from_web; }
+}
 
+sub load_from_web
+{	my $self=shift;
+	my $ID= $self->{ID};
 	my ($title,$artist)= map ::url_escapeall($_), Songs::Get($ID,qw/title artist/);
 	my (undef,$url,$post,$check)=@{$sites{$::Options{OPT.'LyricSite'}}};
 	for my $val ($url,$post)
@@ -491,9 +501,14 @@ sub loaded #_very_ crude html to gtktextview renderer
 		else {$url=undef}
 	}
 
-	$self->{pixtoload}=\@pixbufs;
-	::IdleDo('8_FetchPix'.$self,100,\&load_pixbuf,$self) if @pixbufs;
-	$self->Save_text if $::Options{OPT.'AutoSave'} && $oklyrics && $oklyrics>0;
+	if (0)
+	{	$self->{pixtoload}=\@pixbufs;
+		::IdleDo('8_FetchPix'.$self,100,\&load_pixbuf,$self) if @pixbufs;
+	}
+	if ($oklyrics && $oklyrics>0)
+	{	$self->Save_text if $::Options{OPT.'AutoSave'};
+	}
+	else { $buffer->set_modified(0); }
 }
 
 sub load_pixbuf
@@ -615,21 +630,26 @@ sub update_cursor_cb
 	$textview->get_window('text')->set_cursor(Gtk2::Gdk::Cursor->new($cursor));
 }
 
-sub load_file
-{	my ($self,$file)=@_;
+sub load_from_file
+{	my $self=shift;
+	my $ID= $self->{ID};
+	my $text= $::Options{OPT.'PreferEmbeddedLyrics'} ?
+		FileTag::GetLyrics($ID) || _load_from_lyrics_file($ID) :
+		_load_from_lyrics_file($ID) || FileTag::GetLyrics($ID) ;
+
+	# if no lyrics found, try the web
+	unless ($text)
+	{	$self->load_from_web;
+		return
+	}
+
+	# display the lyrics
 	my $buffer=$self->{buffer};
 	$buffer->delete($buffer->get_bounds);
-	my $text=_("Loading failed.");
-	if (open my$fh,'<',$file)
-	{	local $/=undef; #slurp mode
-		$text=<$fh>;
-		close $fh;
-		if (my $utf8=Encode::decode_utf8($text)) {$text=$utf8}
-	}
         $buffer->set_text($text);
 
 	#make the title and artist bigger and bold
-	my ($title,$artist)= Songs::Get($self->{ID},qw/title artist/);
+	my ($title,$artist)= Songs::Get($ID,qw/title artist/);
 	$title='' if $title!~m/\w\w/;
 	for ($title,$artist)
 	{	if (m/\w\w/) {s#\W+#\\W*#g}
@@ -644,23 +664,43 @@ sub load_file
 	$buffer->set_modified(0);
 }
 
+sub _load_from_lyrics_file
+{	my $ID=shift;
+	my $file=::pathfilefromformat( $ID, $::Options{OPT.'PathFile'}, undef,1 );
+	return unless $file && -e $file;
+	my $text= _"Loading failed.";
+	if (open my$fh,'<',$file)
+	{	local $/=undef; #slurp mode
+		$text=<$fh>;
+		close $fh;
+		if (my $utf8=Encode::decode_utf8($text)) {$text=$utf8}
+	}
+	return $text;
+}
+
 sub Save_text
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $win=$self->get_toplevel;
 	my $buffer=$self->{buffer};
 	my $text= $buffer->get_text($buffer->get_bounds, ::FALSE);
-	my $format=$::Options{OPT.'PathFile'};
-	my ($path,$file)=::pathfilefromformat( $self->{ID}, $format, undef,1 );
-	unless ($path && $file) {::ErrorMessage(_("Error: invalid filename pattern")." : $format",$win); return}
-	my $res=::CreateDir($path,$win);
-	return unless $res eq 'ok';
-	if (open my$fh,'>:utf8',$path.::SLASH.$file)
-	{	print $fh $text;
-		close $fh;
+	if ($::Options{OPT.'PreferEmbeddedLyrics'})
+	{	FileTag::WriteLyrics($self->{ID},$text);
 		$buffer->set_modified(0);
-		warn "Saved lyrics in ".$path.::SLASH.$file."\n" if $::debug;
 	}
-	else {::ErrorMessage(::__x(_("Error saving lyrics in '{file}' :\n{error}"), file => $file, error => $!),$win);}
+	else
+	{	my $format=$::Options{OPT.'PathFile'};
+		my ($path,$file)=::pathfilefromformat( $self->{ID}, $format, undef,1 );
+		unless ($path && $file) {::ErrorMessage(_("Error: invalid filename pattern")." : $format",$win); return}
+		my $res=::CreateDir($path,$win);
+		return unless $res eq 'ok';
+		if (open my$fh,'>:utf8',$path.::SLASH.$file)
+		{	print $fh $text;
+			close $fh;
+			$buffer->set_modified(0);
+			warn "Saved lyrics in ".$path.::SLASH.$file."\n" if $::debug;
+		}
+		else {::ErrorMessage(::__x(_("Error saving lyrics in '{file}' :\n{error}"), file => $file, error => $!),$win);}
+	}
 }
 
 1

@@ -2008,6 +2008,7 @@ sub HoverPopup
 {	my $widget=shift;
 	delete $widget->{hover_timeout};
 	return 0 if $widget->isa('Gtk2::StatusIcon') && !OnStatusIcon($widget);	# for statusicon, don't popup if no longer above icon
+	return 0 if $widget->{block_popup};
 	Popup($widget);
 	0;
 }
