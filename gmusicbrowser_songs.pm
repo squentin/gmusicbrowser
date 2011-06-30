@@ -999,7 +999,7 @@ our %timespan_menu=
 	name	=> _"Lists",
 	'filterdesc:~'		=> [ _"present in %s", _"present in list", 'listname',],
 	'filterdesc:-~'		=> _"not present in %s",
-	'filter:~'		=> '.!!. do {my $l=$::Options{SavedLists}{q(#VAL#)}; $l ? $l->IsIn(#ID#) : undef}',
+	'filter:~'		=> '.!!. do {my $l=$::Options{SavedLists}{#VAL#}; $l ? $l->IsIn(#ID#) : undef}',
 	default_filter		=> '~',
 	 },
 );
