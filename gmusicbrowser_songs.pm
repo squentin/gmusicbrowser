@@ -108,7 +108,7 @@ our %timespan_menu=
 		'filter:mi'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___iname[$_] .=~. m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
 		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}',
-		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v }', #FIXME avoid stringification
+		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v }',
 		'hashm:name'	=> 'do {my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : () }',
 		is_set		=> 'my $gid=___gid{#VAL#}; my $v=#_#; $gid ? ref $v ? (grep $_==$gid, @$v) : $v==$gid : 0;',
 		listall		=> '1..$#___name',
@@ -170,7 +170,7 @@ our %timespan_menu=
 		#group		=> '#_# !=',
 		stats		=> 'do {my $v=#_#; #HVAL#{__#mainfield#_name[$_]}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[keys %{#HVAL#}];',
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[keys %{#HVAL#}];',
-		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v}', #FIXME avoid stringification
+		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v}',
 		listall		=> '##mainfield#->listall#',
 		'filterdesc:~'	=> [ _"includes artist %s", _"includes artist",	'combostring', ],
 		'filterdesc:-~'	=> _"doesn't include artist %s",

@@ -5191,8 +5191,8 @@ sub AutoSelPicture
 
 	my $set;
 	my %pictures_files;
-	for my $m (qw/embbeded guess/)
-	{	if ($m eq 'embbeded')
+	for my $m (qw/embedded guess/)
+	{	if ($m eq 'embedded')
 		{	my @files= grep m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i, Songs::Map('fullfilename',$IDs);
 			if (@files)
 			{	$set= first { FileTag::PixFromMusicFile($_,$field,1) && $_ } @files;
@@ -8151,7 +8151,7 @@ sub new
 	my $button= ::NewIconButton('gtk-open');
 	$self->pack_start($entry,1,1,0);
 	$self->pack_start($button,0,0,0);
-	$self->Set($val) if $val;
+	$self->Set($val);
 	my $busy;
 	$entry->signal_connect( changed => sub
 	{	return if $busy;
@@ -8389,7 +8389,7 @@ sub load
 {	my ($file,$size)=@_;
 	return unless $file;
 
-	my $nb= $file=~s/:(\d+|\w+)$// ? $1 : undef;	#index number for embbeded pictures
+	my $nb= $file=~s/:(\d+|\w+)$// ? $1 : undef;	#index number for embedded pictures
 	unless (-e $file) {warn "$file not found\n"; return undef;}
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;
