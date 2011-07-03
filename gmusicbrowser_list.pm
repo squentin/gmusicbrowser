@@ -7453,8 +7453,8 @@ our %vars2=
 	album	=> ['groupalbum($arg->{groupsongs})',	'album'],
 	artistid=> ['groupartistid($arg->{groupsongs})','artist'],
 	albumid	=> ['groupalbumid($arg->{groupsongs})',	'album'],
-	genres	=> ['groupgenres($arg->{groupsongs},genre)',	'genre'],
-	labels	=> ['groupgenres($arg->{groupsongs},label)',	'label'],
+	genres	=> ['groupgenres($arg->{groupsongs},"genre")',	'genre'],
+	labels	=> ['groupgenres($arg->{groupsongs},"label")',	'label'],
 	gid	=> ['Songs::Get_gid($arg->{groupsongs}[0],$arg->{grouptype})'],	#FIXME PHASE1
 	title	=> ['($arg->{groupsongs} ? Songs::Get_grouptitle($arg->{grouptype},$arg->{groupsongs}) : "")'], #FIXME should the init case ($arg->{groupsongs}==undef) be treated here ?
 	rating_avrg => ['do {my $sum; $sum+= $_ for Songs::Map(ratingnumber=>$arg->{groupsongs}); $sum/@{$arg->{groupsongs}}; }', 'rating'], #FIXME round, int ?
@@ -7754,7 +7754,7 @@ sub groupartist	#FIXME optimize PHASE1
 }
 sub groupgenres
 {	my ($songs,$field,$common)=@_;
-	my $h=Songs::BuildHash($field,$songs);
+	my $h=Songs::BuildHash($field,$songs,'name');
 	delete $h->{''};
 	return join ', ',sort ($common? grep($h->{$_}==@$songs,keys %$h) : keys %$h);
 }
