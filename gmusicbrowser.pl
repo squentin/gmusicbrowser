@@ -3827,8 +3827,10 @@ sub CopyMoveFiles
 
 	my $owrite_all;
 COPYNEXTID:for my $ID (@$IDs)
-	{	$progressbar->set_fraction($done/@$IDs);
+	{	last if $cancel;
+		$progressbar->set_fraction($done/@$IDs);
 		Gtk2->main_iteration while Gtk2->events_pending;
+		last if $cancel;
 		$done++;
 		$abortmsg=undef if $done==@$IDs;
 		my ($olddir,$oldfile)= Songs::Get($ID, qw/path file/);
@@ -3858,7 +3860,7 @@ COPYNEXTID:for my $ID (@$IDs)
 		until ($sub->($old,$new))
 		{	my $res=Retry_Dialog("$errormsg :\n'$old'\n -> '$new'\n$!",$win,$abortmsg);
 			last COPYNEXTID if $res eq 'abort';
-			last unless $res eq 'yes';
+			next COPYNEXTID if $res ne 'yes';
 		}
 		unless ($copy)
 		{	$newdir=~s/$QSLASH+$//o;
@@ -3867,7 +3869,6 @@ COPYNEXTID:for my $ID (@$IDs)
 			push @modif, file => $newfile if $oldfile ne $newfile;
 			Songs::Set($ID, @modif);
 		}
-		last if $cancel;
 	}
 	$win->destroy;
 }
