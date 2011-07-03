@@ -3683,6 +3683,7 @@ sub new_from_smartstring
 }
 sub _smartstring_moreless
 {	my ($pat,$op,$casesens,$field)=@_;
+	$pat=~s/,/./g; #use dot as comma separator
 	return undef unless $pat=~m/^-?[0-9.]+[a-zA-Z]?$/;	# FIXME could check if support units
 	$op= $op eq '<=' ? '->' : $op eq '>=' ? '-<' : $op;
 	return $op.':'.$pat;
@@ -3690,6 +3691,7 @@ sub _smartstring_moreless
 sub _smartstring_date_moreless
 {	my ($pat,$op,$casesens,$field)=@_;
 	my $suffix='';
+	$pat=~s/,/./g; #use dot as comma separator
 	if ($pat=~m/\d[smhdwMy]/) { $suffix='ago' } #relative date
 	elsif ($pat=~m#^(\d\d\d\d)(?:[-/](\d\d?)(?:[-/](\d\d?)(?:[-T ](\d\d?)(?::(\d\d?)(?::(\d\d?))?)?)?)?)?$#) # yyyy-MM-dd hh:mm:ss
 	{	$pat= ::mktime(($6||0),($5||0),($4||0),($3||1),($2||1)-1,$1-1900);
@@ -3700,6 +3702,7 @@ sub _smartstring_date_moreless
 }
 sub _smartstring_number
 {	my ($pat,$op,$casesens,$field)=@_;
+	$pat=~s/,/./g; #use dot as comma separator
 	if ($op ne '=' || $pat!~m/^-[0-9.]+[a-zA-Z]?$/) {$pat=~s/^-/../}	# allow ranges using - unless = with negative number (could also check if field support negative values ?)
 	if ($pat=~m/\.\./)
 	{	my ($s1,$s2)= split /\s*\.\.\s*/,$pat,2;

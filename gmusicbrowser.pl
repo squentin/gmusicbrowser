@@ -731,15 +731,16 @@ our %SIZEUNITS=
 		k => [1000,_"KB"],
 		m => [1000000,_"MB"],
 );
+
 sub ConvertTime	# convert date pattern into nb of seconds
-{	my ($date,$unit)= $_[0]=~m/^\s*(\d*)\s*([a-zA-Z]*)\s*$/;
+{	my ($date,$unit)= $_[0]=~m/^\s*(\d+|\d*?[.]\d+)\s*([a-zA-Z]*)\s*$/;
 	return 0 unless $date;
 	if (my $ref= $DATEUNITS{$unit}) { $date*= $ref->[0] }
 	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
 	return time-$date;
 }
 sub ConvertSize
-{	my ($size,$unit)= $_[0]=~m/^\s*(\d*)\s*([a-zA-Z]*)\s*$/;
+{	my ($size,$unit)= $_[0]=~m/^\s*(\d+|\d*?[.]\d+)\s*([a-zA-Z]*)\s*$/;
 	return 0 unless $size;
 	if (my $ref= $SIZEUNITS{lc$unit}) { $size*= $ref->[0] }
 	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
@@ -8219,7 +8220,9 @@ sub new
 		if (ref $unit eq 'HASH')
 		{	$unit0 ||= $opt->{default_unit};
 			my @ordered_hash= map { $_ => $unit->{$_}[1] } sort { $unit->{$a}[0] <=> $unit->{$b}[0] } keys %$unit;
-			$extra= $self->{units}= TextCombo->new(\@ordered_hash, $unit0, \&GMB::FilterBox::changed, ordered_hash=>1);
+			my $set_digits= sub { $spin->set_digits( $unit->{ $_[0]->get_value }[0]==1 ? 0 : 2 ) }; # no decimals for indivisible units, 2 for others
+			$extra= $self->{units}= TextCombo->new(\@ordered_hash, $unit0, sub { $set_digits->($_[0]); &GMB::FilterBox::changed}, ordered_hash=>1);
+			$set_digits->($extra);
 			$spin->signal_connect(key_press_event => sub	#catch letter key-press to change unit
 				{	my $key=Gtk2::Gdk->keyval_name($_[1]->keyval);
 					if (exists $unit->{$key}) { $extra->set_value($key); return 1 }
@@ -8247,6 +8250,9 @@ sub new
 sub Get
 {	my $self=shift;
 	my $value= $self->{spin}->get_adjustment->get_value;
+	::setlocale(::LC_NUMERIC, 'C');
+	$value="$value"; #make sure "." is used as the decimal separator
+	::setlocale(::LC_NUMERIC, '');
 	if (my $u=$self->{units})
 	{	$value.= $u->get_value;
 	}
