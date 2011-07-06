@@ -5110,7 +5110,10 @@ sub SaveOptions
 sub set_colors
 {	my ($self,$mode)=@_;	#mode : -1 not found, 0 : neutral, 1 : found
 	my $entry=$self->{entry};
-	if ($mode<1)
+	if (*Gtk2::Entry::set_icon_from_stock{CODE})	# requires gtk>=2.16 && perl-Gtk2 version >=1.211
+	{	$entry->set_progress_fraction( $mode<1 ? 0 : 1 );
+	}
+	elsif ($mode<1)
 	{	$entry->modify_base('normal', undef );
 		$entry->modify_text('normal', undef );
 	}
