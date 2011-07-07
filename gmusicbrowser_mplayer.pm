@@ -23,11 +23,12 @@ my $SoftVolume;
 $::PlayPacks{Play_mplayer}=1; #register the package
 
 sub init
-{	$mplayer=undef;
-	for my $path (split /:/, $ENV{PATH})
-	{	if (-x $path.::SLASH.'mplayer')
-		 {$mplayer=$path.::SLASH.'mplayer';last;}
+{	undef %supported;
+	$mplayer= $::Options{mplayer_cmd};
+	if ($mplayer && !-x $mplayer && !(::first { -x $_ } map $_.::SLASH.$mplayer,  split /:/, $ENV{PATH}))
+	{	$mplayer=undef;
 	}
+	$mplayer ||= ::first { -x $_ } map $_.::SLASH.'mplayer',  split /:/, $ENV{PATH};
 
 	return unless $mplayer;
 	return bless {},__PACKAGE__;
@@ -165,8 +166,10 @@ sub error
 
 sub AdvancedOptions
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $hbox0=::NewPrefEntry('mplayeroptions',_"mplayer options :");
-	$vbox->pack_start($hbox0,::FALSE,::FALSE,2);
+	my $sg1=Gtk2::SizeGroup->new('horizontal');
+	my $opt=::NewPrefEntry('mplayeroptions',_"mplayer options :", sizeg1=>$sg1);
+	my $cmd=::NewPrefEntry('mplayer_cmd',_"mplayer executable :", cb=> \&init, tip=>_"Will use default if not found", sizeg1=>$sg1);
+	$vbox->pack_start($_,::FALSE,::FALSE,2), for $cmd,$opt;
 	VolInit() unless defined $SoftVolume;
 	$vbox->pack_start(Play_amixer::make_option_widget(),::FALSE,::FALSE,2) unless $SoftVolume;
 	return $vbox;
