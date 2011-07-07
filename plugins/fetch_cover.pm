@@ -28,6 +28,7 @@ my %Sites=
 (artist =>
  {	googlei => ['google images',"http://images.google.com/images?q=%s&imgsz=medium|large", \&parse_googlei],
 	lastfm => ['last.fm',"http://www.last.fm/music/%a/+images", \&parse_lastfm],
+	discogs => ['discogs.com', "http://api.discogs.com/search?f=xml&type=artists&q=%a", \&parse_discogs],
  },
  album =>
  {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large&imgar=ns", \&parse_googlei],
@@ -36,6 +37,7 @@ my %Sites=
 	#itunesgrabber => ['itunesgrabber',"http://www.thejosher.net/iTunes/index.php?artist=%a&album=%l", \&parse_itunesgrabber],
 	freecovers => ['freecovers.net', "http://www.freecovers.net/api/search/%s", \&parse_freecovers], #could add /Music+CD but then we'd lose /Soundtrack
 	#rateyourmusic=> ['rateyourmusic.com', "http://rateyourmusic.com/search?searchterm=%s&searchtype=l",\&parse_rateyourmusic], # urls results in "403 Forbidden"
+	discogs => ['discogs.com', "http://api.discogs.com/search?f=xml&type=releases&q=%s", \&parse_discogs],
  },
 );
 
@@ -308,6 +310,15 @@ sub parse_googlei
 		$nexturl=~s#&amp;#&#g;
 	}
 	return \@list,$nexturl;
+}
+
+sub parse_discogs
+{	my $result = $_[0];
+	my @list;
+	while ($result =~ m#<thumb>\s*?(.*?)/(A|R)-(\d+)-(.*?)\s*?</thumb>#g)
+	{	push @list, {url => "$1/$2-$4", previewurl => "$1/$2-$3-$4"};
+	}
+	return \@list;
 }
 
 sub searchresults_cb

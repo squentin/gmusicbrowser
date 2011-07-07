@@ -731,15 +731,16 @@ our %SIZEUNITS=
 		k => [1000,_"KB"],
 		m => [1000000,_"MB"],
 );
+
 sub ConvertTime	# convert date pattern into nb of seconds
-{	my ($date,$unit)= $_[0]=~m/^\s*(\d*)\s*([a-zA-Z]*)\s*$/;
+{	my ($date,$unit)= $_[0]=~m/^\s*(\d+|\d*?[.]\d+)\s*([a-zA-Z]*)\s*$/;
 	return 0 unless $date;
 	if (my $ref= $DATEUNITS{$unit}) { $date*= $ref->[0] }
 	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
 	return time-$date;
 }
 sub ConvertSize
-{	my ($size,$unit)= $_[0]=~m/^\s*(\d*)\s*([a-zA-Z]*)\s*$/;
+{	my ($size,$unit)= $_[0]=~m/^\s*(\d+|\d*?[.]\d+)\s*([a-zA-Z]*)\s*$/;
 	return 0 unless $size;
 	if (my $ref= $SIZEUNITS{lc$unit}) { $size*= $ref->[0] }
 	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
@@ -3785,8 +3786,10 @@ sub CopyMoveFiles
 
 	my $owrite_all;
 COPYNEXTID:for my $ID (@$IDs)
-	{	$progressbar->set_fraction($done/@$IDs);
+	{	last if $cancel;
+		$progressbar->set_fraction($done/@$IDs);
 		Gtk2->main_iteration while Gtk2->events_pending;
+		last if $cancel;
 		$done++;
 		$abortmsg=undef if $done==@$IDs;
 		my ($olddir,$oldfile)= Songs::Get($ID, qw/path file/);
@@ -3816,7 +3819,7 @@ COPYNEXTID:for my $ID (@$IDs)
 		until ($sub->($old,$new))
 		{	my $res=Retry_Dialog("$errormsg :\n'$old'\n -> '$new'\n$!",$win,$abortmsg);
 			last COPYNEXTID if $res eq 'abort';
-			last unless $res eq 'yes';
+			next COPYNEXTID if $res ne 'yes';
 		}
 		unless ($copy)
 		{	$newdir=~s/$QSLASH+$//o;
@@ -3825,7 +3828,6 @@ COPYNEXTID:for my $ID (@$IDs)
 			push @modif, file => $newfile if $oldfile ne $newfile;
 			Songs::Set($ID, @modif);
 		}
-		last if $cancel;
 	}
 	$win->destroy;
 }
@@ -5148,8 +5150,8 @@ sub AutoSelPicture
 
 	my $set;
 	my %pictures_files;
-	for my $m (qw/embbeded guess/)
-	{	if ($m eq 'embbeded')
+	for my $m (qw/embedded guess/)
+	{	if ($m eq 'embedded')
 		{	my @files= grep m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i, Songs::Map('fullfilename',$IDs);
 			if (@files)
 			{	$set= first { FileTag::PixFromMusicFile($_,$field,1) && $_ } @files;
@@ -8108,7 +8110,7 @@ sub new
 	my $button= ::NewIconButton('gtk-open');
 	$self->pack_start($entry,1,1,0);
 	$self->pack_start($button,0,0,0);
-	$self->Set($val) if $val;
+	$self->Set($val);
 	my $busy;
 	$entry->signal_connect( changed => sub
 	{	return if $busy;
@@ -8176,7 +8178,9 @@ sub new
 		if (ref $unit eq 'HASH')
 		{	$unit0 ||= $opt->{default_unit};
 			my @ordered_hash= map { $_ => $unit->{$_}[1] } sort { $unit->{$a}[0] <=> $unit->{$b}[0] } keys %$unit;
-			$extra= $self->{units}= TextCombo->new(\@ordered_hash, $unit0, \&GMB::FilterBox::changed, ordered_hash=>1);
+			my $set_digits= sub { $spin->set_digits( $unit->{ $_[0]->get_value }[0]==1 ? 0 : 2 ) }; # no decimals for indivisible units, 2 for others
+			$extra= $self->{units}= TextCombo->new(\@ordered_hash, $unit0, sub { $set_digits->($_[0]); &GMB::FilterBox::changed}, ordered_hash=>1);
+			$set_digits->($extra);
 			$spin->signal_connect(key_press_event => sub	#catch letter key-press to change unit
 				{	my $key=Gtk2::Gdk->keyval_name($_[1]->keyval);
 					if (exists $unit->{$key}) { $extra->set_value($key); return 1 }
@@ -8204,6 +8208,9 @@ sub new
 sub Get
 {	my $self=shift;
 	my $value= $self->{spin}->get_adjustment->get_value;
+	::setlocale(::LC_NUMERIC, 'C');
+	$value="$value"; #make sure "." is used as the decimal separator
+	::setlocale(::LC_NUMERIC, '');
 	if (my $u=$self->{units})
 	{	$value.= $u->get_value;
 	}
@@ -8346,7 +8353,7 @@ sub load
 {	my ($file,$size)=@_;
 	return unless $file;
 
-	my $nb= $file=~s/:(\d+|\w+)$// ? $1 : undef;	#index number for embbeded pictures
+	my $nb= $file=~s/:(\d+|\w+)$// ? $1 : undef;	#index number for embedded pictures
 	unless (-e $file) {warn "$file not found\n"; return undef;}
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;

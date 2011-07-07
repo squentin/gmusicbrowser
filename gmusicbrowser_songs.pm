@@ -108,7 +108,7 @@ our %timespan_menu=
 		'filter:mi'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___iname[$_] .=~. m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
 		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}',
-		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v }', #FIXME avoid stringification
+		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v }',
 		'hashm:name'	=> 'do {my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : () }',
 		is_set		=> 'my $gid=___gid{#VAL#}; my $v=#_#; $gid ? ref $v ? (grep $_==$gid, @$v) : $v==$gid : 0;',
 		listall		=> '1..$#___name',
@@ -170,7 +170,7 @@ our %timespan_menu=
 		#group		=> '#_# !=',
 		stats		=> 'do {my $v=#_#; #HVAL#{__#mainfield#_name[$_]}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[keys %{#HVAL#}];',
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[keys %{#HVAL#}];',
-		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v}', #FIXME avoid stringification
+		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v}',
 		listall		=> '##mainfield#->listall#',
 		'filterdesc:~'	=> [ _"includes artist %s", _"includes artist",	'combostring', ],
 		'filterdesc:-~'	=> _"doesn't include artist %s",
@@ -999,7 +999,7 @@ our %timespan_menu=
 	name	=> _"Lists",
 	'filterdesc:~'		=> [ _"present in %s", _"present in list", 'listname',],
 	'filterdesc:-~'		=> _"not present in %s",
-	'filter:~'		=> '.!!. do {my $l=$::Options{SavedLists}{q(#VAL#)}; $l ? $l->IsIn(#ID#) : undef}',
+	'filter:~'		=> '.!!. do {my $l=$::Options{SavedLists}{"#VAL#"}; $l ? $l->IsIn(#ID#) : undef}',
 	default_filter		=> '~',
 	 },
 );
@@ -3683,6 +3683,7 @@ sub new_from_smartstring
 }
 sub _smartstring_moreless
 {	my ($pat,$op,$casesens,$field)=@_;
+	$pat=~s/,/./g; #use dot as comma separator
 	return undef unless $pat=~m/^-?[0-9.]+[a-zA-Z]?$/;	# FIXME could check if support units
 	$op= $op eq '<=' ? '->' : $op eq '>=' ? '-<' : $op;
 	return $op.':'.$pat;
@@ -3690,6 +3691,7 @@ sub _smartstring_moreless
 sub _smartstring_date_moreless
 {	my ($pat,$op,$casesens,$field)=@_;
 	my $suffix='';
+	$pat=~s/,/./g; #use dot as comma separator
 	if ($pat=~m/\d[smhdwMy]/) { $suffix='ago' } #relative date
 	elsif ($pat=~m#^(\d\d\d\d)(?:[-/](\d\d?)(?:[-/](\d\d?)(?:[-T ](\d\d?)(?::(\d\d?)(?::(\d\d?))?)?)?)?)?$#) # yyyy-MM-dd hh:mm:ss
 	{	$pat= ::mktime(($6||0),($5||0),($4||0),($3||1),($2||1)-1,$1-1900);
@@ -3700,6 +3702,7 @@ sub _smartstring_date_moreless
 }
 sub _smartstring_number
 {	my ($pat,$op,$casesens,$field)=@_;
+	$pat=~s/,/./g; #use dot as comma separator
 	if ($op ne '=' || $pat!~m/^-[0-9.]+[a-zA-Z]?$/) {$pat=~s/^-/../}	# allow ranges using - unless = with negative number (could also check if field support negative values ?)
 	if ($pat=~m/\.\./)
 	{	my ($s1,$s2)= split /\s*\.\.\s*/,$pat,2;

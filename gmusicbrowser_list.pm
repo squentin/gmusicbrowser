@@ -1670,6 +1670,7 @@ our @DefaultOptions=
 	min	=> 1,	# filter out entries with less than $min songs
 	hidebb	=> 0,	# hide button box
 	tabmode	=> 'text', # text, icon or both
+	hscrollbar=>1,
 );
 
 sub new
@@ -1679,7 +1680,7 @@ sub new
 	%$opt=( @DefaultOptions, %$opt );
 	my @pids=split /\|/, $opt->{pages};
 	$self->{$_}=$opt->{$_} for qw/nb group min hidetabs tabmode/, grep(m/^activate\d?$/, keys %$opt);
-	$self->{main_opt}{$_}=$opt->{$_} for qw/group no_typeahead searchbox rules_hint/; #options passed to children
+	$self->{main_opt}{$_}=$opt->{$_} for qw/group no_typeahead searchbox rules_hint hscrollbar/; #options passed to children
 	my $nb=$self->{nb};
 	my $group=$self->{group};
 
@@ -2052,7 +2053,7 @@ sub new
 	my $self = bless Gtk2::VBox->new, $class;
 
 	$opt= { %defaults, %$opt };
-	$self->{$_} = $opt->{$_} for qw/mode noall depth mmarkup mpicsize cloud_min cloud_max cloud_stat no_typeahead rules_hint/;
+	$self->{$_} = $opt->{$_} for qw/mode noall depth mmarkup mpicsize cloud_min cloud_max cloud_stat no_typeahead rules_hint hscrollbar/;
 	$self->{$_} = [ split /\|/, $opt->{$_} ] for qw/sort type lmarkup lpicsize/;
 
 	$self->{type}[0] ||= $field.'.'.(Songs::FilterListProp($field,'type')||''); $self->{type}[0]=~s/\.$//;	#FIXME
@@ -2158,7 +2159,7 @@ sub create_list
 	my $renderer= CellRendererGID->new;
 	my $column=Gtk2::TreeViewColumn->new_with_attributes('',$renderer);
 
-	$renderer->set(prop => [@$self{qw/type lmarkup lpicsize icons/}]);	#=> $renderer->get('prop')->[0] contains $self->{type} (which is a array ref)
+	$renderer->set(prop => [@$self{qw/type lmarkup lpicsize icons hscrollbar/}]);	#=> $renderer->get('prop')->[0] contains $self->{type} (which is a array ref)
 	#$column->add_attribute($renderer, gid => 0);
 	$column->set_cell_data_func($renderer, sub
 		{	my (undef,$cell,$store,$iter)=@_;
@@ -3994,7 +3995,7 @@ properties => [ Glib::ParamSpec->ulong('gid', 'gid', 'group id',		0, 2**32-1, 0,
 		Glib::ParamSpec->scalar('prop', 'prop', '[[field],[markup],[picsize]]',		[qw/readable writable/]),
 		Glib::ParamSpec->int('depth', 'depth', 'depth',			0, 20, 0,	[qw/readable writable/]),
 		];
-use constant { PAD => 2, XPAD => 2, YPAD => 2,		P_FIELD => 0, P_MARKUP =>1, P_PSIZE=>2, P_ICON =>3, };
+use constant { PAD => 2, XPAD => 2, YPAD => 2,		P_FIELD => 0, P_MARKUP =>1, P_PSIZE=>2, P_ICON =>3, P_HORIZON=>4 };
 
 #sub INIT_INSTANCE
 #{	#$_[0]->set(xpad=>2,ypad=>2); #Gtk2::CellRendererText has these padding values as default
@@ -4023,7 +4024,8 @@ sub GET_SIZE
 	my $s= $prop->[P_PSIZE][$depth] || $prop->[P_ICON][$depth];
 	if ($s == -1)	{$s=$h}
 	elsif ($h<$s)	{$h=$s}
-	return (0,0,$w+$s+PAD+XPAD*2,$h+YPAD*2);
+	my $width= $prop->[P_HORIZON] ? $w+$s+PAD+XPAD*2 : 0;
+	return (0,0,$width,$h+YPAD*2);
 }
 
 sub RENDER
@@ -5121,7 +5123,10 @@ sub SaveOptions
 sub set_colors
 {	my ($self,$mode)=@_;	#mode : -1 not found, 0 : neutral, 1 : found
 	my $entry=$self->{entry};
-	if ($mode<1)
+	if (*Gtk2::Entry::set_icon_from_stock{CODE})	# requires gtk>=2.16 && perl-Gtk2 version >=1.211
+	{	$entry->set_progress_fraction( $mode<1 ? 0 : 1 );
+	}
+	elsif ($mode<1)
 	{	$entry->modify_base('normal', undef );
 		$entry->modify_text('normal', undef );
 	}
@@ -7476,8 +7481,8 @@ our %vars2=
 	album	=> ['groupalbum($arg->{groupsongs})',	'album'],
 	artistid=> ['groupartistid($arg->{groupsongs})','artist'],
 	albumid	=> ['groupalbumid($arg->{groupsongs})',	'album'],
-	genres	=> ['groupgenres($arg->{groupsongs},genre)',	'genre'],
-	labels	=> ['groupgenres($arg->{groupsongs},label)',	'label'],
+	genres	=> ['groupgenres($arg->{groupsongs},"genre")',	'genre'],
+	labels	=> ['groupgenres($arg->{groupsongs},"label")',	'label'],
 	gid	=> ['Songs::Get_gid($arg->{groupsongs}[0],$arg->{grouptype})'],	#FIXME PHASE1
 	title	=> ['($arg->{groupsongs} ? Songs::Get_grouptitle($arg->{grouptype},$arg->{groupsongs}) : "")'], #FIXME should the init case ($arg->{groupsongs}==undef) be treated here ?
 	rating_avrg => ['do {my $sum; $sum+= $_ for Songs::Map(ratingnumber=>$arg->{groupsongs}); $sum/@{$arg->{groupsongs}}; }', 'rating'], #FIXME round, int ?
@@ -7777,7 +7782,7 @@ sub groupartist	#FIXME optimize PHASE1
 }
 sub groupgenres
 {	my ($songs,$field,$common)=@_;
-	my $h=Songs::BuildHash($field,$songs);
+	my $h=Songs::BuildHash($field,$songs,'name');
 	delete $h->{''};
 	return join ', ',sort ($common? grep($h->{$_}==@$songs,keys %$h) : keys %$h);
 }
