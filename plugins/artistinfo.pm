@@ -148,8 +148,11 @@ sub new
 	$treeview->signal_connect(button_press_event => \&tv_contextmenu);
 	$treeview->{store}=$store;
 
-	my $togglebox = Gtk2::HBox->new();
-	my $group;
+	my $toolbar=Gtk2::Toolbar->new;
+	$toolbar->set_style( $options->{ToolbarStyle}||'both-horiz' );
+	$toolbar->set_icon_size( $options->{ToolbarSize}||'small-toolbar' );
+	#$toolbar->set_show_arrow(1);
+	my $group; my $menugroup;
 	foreach my $key (sort keys %sites)
 	{	my $item = $sites{$key}[1];
 		$item = Gtk2::RadioButton->new($group,$item);
@@ -160,15 +163,36 @@ sub new
 		$item->set_active( $key eq $self->{site} );
 		$item->signal_connect('toggled' => sub { &toggled_cb($self,$item,$textview); } );
 		$group = $item -> get_group;
-		$togglebox->pack_start($item,1,0,0);
+		my $toolitem=Gtk2::ToolItem->new;
+		$toolitem->add( $item );
+		$toolitem->set_expand(1);
+		$toolbar->insert($toolitem,-1);
+
+# trying to make the radiobuttons overflowable, but no shared groups for radiobuttons and radiomenuitems (group doesn't seem to work for radiomenuitem at all)
+#		my $menuitem=Gtk2::RadioMenuItem->new($menugroup,$sites{$key}[1]);
+#		$menuitem->set_active( $key eq $self->{site} );
+		#$menuitem->set_group($menugroup);
+#		$menuitem->set_draw_as_radio(1);
+#		$menuitem->{key} = $key;
+#		if ($menuitem->get_active) { warn $menuitem->{key}; }
+#		$menuitem->signal_connect('toggled' => sub { &toggled_cb($self,$menuitem,$textview); } );
+#		$toolitem->set_proxy_menu_item($key,$menuitem);
+	}
+	for my $button
+	(	[refresh => 'gtk-refresh', sub { SongChanged($self,'1'); },_"Refresh", _"Refresh",0],
+		[save => 'gtk-save',	\&Save_text,	_"Save",	_"Save artist biography",$::Options{OPT.'AutoSave'}],
+	)
+	{	my ($key,$stock,$cb,$label,$tip,$hide)=@$button;
+		my $item=Gtk2::ToolButton->new_from_stock($stock);
+		$item->signal_connect(clicked => $cb);
+		$item->set_tooltip_text($tip) if $tip;
+		my $menuitem = Gtk2::ImageMenuItem->new ($label);
+		$menuitem->set_image( Gtk2::Image->new_from_stock($stock,'menu') );
+		$item->set_proxy_menu_item($key,$menuitem);
+		$toolbar->insert($item,-1) unless $hide;
 	}
 
-	my $refresh =	::NewIconButton('gtk-refresh',undef, sub { SongChanged($self,'1'); } ,"none",_"Refresh");
-	my $savebutton =::NewIconButton('gtk-save',   undef, \&Save_text,  "none",_"Save artist biography");
-
-	$togglebox->pack_start($refresh,0,0,0);
-	if (!$::Options{OPT.'AutoSave'}) { $togglebox->pack_start($savebutton,0,0,0); }
-	$statbox->pack_start($togglebox,0,0,0);
+	$statbox->pack_start($toolbar,0,0,0);
 	$self->{buffer}=$textview->get_buffer;
 	$self->{store}=$store;
 
