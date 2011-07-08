@@ -350,6 +350,7 @@ our %QActions=		#icon		#short		#long description
 	stop	=> [ 3, 'gtk-media-stop',_"stop",	_"stop when queue empty"],
 	quit	=> [ 4, 'gtk-quit',	_"quit",	_"quit when queue empty"],
 	turnoff => [ 5, 'gmb-turnoff',	_"turn off",	_"turn off computer when queue empty"],
+	'autofill-similar-artists' => [ 6, 'gtk-refresh', _"similar-artists", _"autofill queue with similar artists" ],
 );
 
 our %StockLabel=( 'gmb-turnoff' => _"Turn Off" );
