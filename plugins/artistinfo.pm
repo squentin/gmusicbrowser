@@ -351,14 +351,16 @@ sub apiczoom {
 		$apic->modify_bg('GTK_STATE_SELECTED',Gtk2::Gdk::Color->parse('black'));
 		$apic->add($img);
 		$apic->show_all;
-# use a label instead of a normal menu-item for formatted text
-#		my $item=Gtk2::ImageMenuItem->new;
-#		my $label=Gtk2::Label->new;
-#		$label->set_line_wrap(TRUE);
-#		$label->set_alignment(0,.5);
-#		$label->set_markup( AA::ReplaceFields($key,$format,$field,1) );
-#		$item->add($label);
-#		$menu->attach($item, $colnb, $colnb+1, $row, $row+1); if (++$row>$rows) {$row=0;$colnb++;}
+		my $artist = Songs::Gid_to_Get("artist",$aID);
+		my $item=Gtk2::MenuItem->new;
+		$item->modify_fg('GTK_STATE_SELECTED',Gtk2::Gdk::Color->parse('white'));
+		my $label=Gtk2::Label->new;	# use a label instead of a normal menu-item for formatted text
+		$label->set_line_wrap(1);
+		$label->set_justify('center');
+		$label->set_ellipsize('end');
+		$label->set_markup( "<big><b>$artist</b></big>" );
+		$item->add($label);
+		$item->show_all;
 		$menu->append($apic);
 		$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
 		return 1;
