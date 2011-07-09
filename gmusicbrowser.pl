@@ -343,13 +343,20 @@ BEGIN
 
 my ($browsercmd,$opendircmd);
 
-our %QActions=		#icon		#short		#long description
-(	''	=> [ 0, undef,		_"normal",	_"normal play when queue empty"],
-	autofill=> [ 1, 'gtk-refresh',	_"autofill",	_"autofill queue" ],
-	'wait'	=> [ 2, 'gmb-wait',	_"wait for more",_"wait for more when queue empty"],
-	stop	=> [ 3, 'gtk-media-stop',_"stop",	_"stop when queue empty"],
-	quit	=> [ 4, 'gtk-quit',	_"quit",	_"quit when queue empty"],
-	turnoff => [ 5, 'gmb-turnoff',	_"turn off",	_"turn off computer when queue empty"],
+#changes to %QActions must be followed by a call to Update_QueueActionList()
+# changed : called from Queue or QueueAction changed
+# action : called when queue is empty
+# keep : do not clear mode once empty
+# save : save mode when RememberQueue is on
+# condition : do not show mode if return false
+# order : used to sort modes
+our %QActions=
+(	''	=> {order=>0,				short=> _"normal",		long=> _"Normal mode"},
+	autofill=> {order=>10, icon=>'gtk-refresh',	short=> _"autofill",		long=> _"Auto-fill queue",					changed=>\&QAutoFill,	keep=>1,save=>1, },
+	'wait'	=> {order=>20, icon=>'gmb-wait',	short=> _"wait for more",	long=> _"Wait for more when queue empty",	action=>\&Stop,	changed=>\&QWaitAutoPlay,keep=>1,save=>1, },
+	stop	=> {order=>30, icon=>'gtk-media-stop',	short=> _"stop",		long=> _"Stop when queue empty",		action=>\&Stop},
+	quit	=> {order=>40, icon=>'gtk-quit',	short=> _"quit",		long=> _"Quit when queue empty",		action=>\&Quit},
+	turnoff => {order=>50, icon=>'gmb-turnoff',	short=> _"turn off",		long=> _"Turn off computer when queue empty", 	action=>sub {Stop(); TurnOff();}, condition=> sub { $::Options{Shutdown_cmd} },},
 );
 
 our %StockLabel=( 'gmb-turnoff' => _"Turn Off" );
@@ -1067,7 +1074,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	EnqueueSelected => [\&Layout::EnqueueSelected,		_"Enqueue Selected Songs"],
 	EnqueueArtist	=> [sub {EnqueueSame('artist',$SongID)},_"Enqueue Songs from Current Artist"], # or use field 'artists' or 'first_artist' ?
 	EnqueueAlbum	=> [sub {EnqueueSame('album',$SongID)},	_"Enqueue Songs from Current Album"],
-	EnqueueAction	=> [sub {EnqueueAction($_[1])},		_"Enqueue Action", _"Queue mode" ,sub { TextCombo->new({map {$_ => $QActions{$_}[2]} sort keys %QActions}) }],
+	EnqueueAction	=> [sub {EnqueueAction($_[1])},		_"Enqueue Action", _"Queue mode" ,sub { TextCombo->new({map {$_ => $QActions{$_}{short}} sort keys %QActions}) }],
 	ClearQueue	=> [\&::ClearQueue,			_"Clear queue"],
 	IncVolume	=> [sub {ChangeVol('up')},		_"Increase Volume"],
 	DecVolume	=> [sub {ChangeVol('down')},		_"Decrease Volume"],
@@ -1203,7 +1210,7 @@ if ($CmdLine{UseGnomeSession})
 #-------------INIT-------------
 
 {	Watch(undef, SongArray	=> \&SongArray_changed);
-	Watch(undef, QueueAction=> sub { if ($QueueAction eq 'autofill'){ IdleDo('1_QAuto',10,\&QAutoFill); } });
+	Watch(undef, $_	=> \&QueueChanged) for qw/QueueAction Queue/;
 	Watch(undef, $_	=> \&QueueUpdateNextSongs) for qw/Playlist Queue Sort Pos QueueAction/;
 	Watch(undef, $_ => sub { return unless defined $SongID && $TogPlay; HasChanged('PlayingSong'); }) for qw/CurSongID Playing/;
 	Watch(undef,RecentSongs	=> sub { UpdateRelatedFilter('Recent'); });
@@ -1914,7 +1921,8 @@ sub ReadSavedTags	#load tags _and_ settings
 	$Options{SongArray_Queue}=undef unless $Options{RememberQueue};
 	if ($Options{RememberQueue})
 	{	$QueueAction= $Options{QueueAction} || '';
-		IdleDo('1_QAuto',10,\&EnqueueAction,$QueueAction) if $QueueAction;
+		$QueueAction='' unless $QActions{$QueueAction};
+		QueueChanged() if $QueueAction;
 	}
 	if ($Options{RememberPlayFilter})
 	{	$TogLock=$Options{Lock};
@@ -1953,7 +1961,7 @@ sub SaveTags	#save tags _and_ settings
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
 	$Options{Lock}= $TogLock || '';
 	$Options{SavedSongID}= SongArray->new([$SongID]) if $Options{RememberPlaySong} && defined $SongID;
-	$Options{QueueAction}= ($QueueAction eq 'autofill' || $QueueAction eq 'wait') ? $QueueAction : '';
+	$Options{QueueAction}= $QActions{$QueueAction}{save} ? $QueueAction : '';
 
 	$Options{SavedOn}= time;
 
@@ -2434,6 +2442,27 @@ sub QWaitAutoPlay
 	return if $TogPlay || !@$Queue;
 	Select(song => ($Queue->Shift), play=>1);
 }
+sub QueueChanged
+{	if ($QueueAction && $QActions{$QueueAction})
+	{	my $cb= $QActions{$QueueAction}{changed};
+		IdleDo('1_QAuto',10,$cb) if $cb;
+	}
+}
+sub Update_QueueActionList
+{	if ($QueueAction)	#check if current one is still valid
+	{	my $ok;
+		if (my $prop= $QActions{$QueueAction})
+		{	my $condition= $prop->{condition};
+			$ok=1 if !$condition || $condition->();
+		}
+		EnqueueAction('') unless $ok;
+	}
+	QHasChanged('QueueActionList');
+}
+sub List_QueueActions
+{	my @list= grep { !$QActions{$_}{condition} || $QActions{$_}{condition}() } keys %QActions;
+	return sort {$QActions{$a}{order} <=> $QActions{$b}{order} || $a cmp $b} @list;
+}
 
 sub GetNeighbourSongs
 {	my $nb=shift;
@@ -2480,9 +2509,8 @@ sub GetNextSongs
 		else { push @IDs,@$Queue[0..$nb-1]; last; }
 	  }
 	  if ($QueueAction)
-	  {	push @IDs, $list ? $QActions{$QueueAction}[2] : $QueueAction;
-		unless ($list || $QueueAction eq 'wait')
-		 { $QueueAction=''; HasChanged('QueueAction'); }
+	  {	push @IDs, $list ? $QActions{$QueueAction}{short} : $QueueAction;
+		unless ($list || $QActions{$QueueAction}{keep}) { EnqueueAction('') }
 		last;
 	  }
 	  return unless @$ListPlay;
@@ -2555,10 +2583,7 @@ sub PrevSong
 sub NextSong
 {	my $ID=GetNextSongs();
 	if (!defined $ID)  { Stop(); return; }
-	if ($ID eq 'wait') { Stop(); return; }
-	if ($ID eq 'stop') { Stop(); return; }
-	if ($ID eq 'quit') { Quit(); }
-	if ($ID eq 'turnoff') { Stop(); TurnOff(); return; }
+	if ($ID=~m/^\D/) { my $prop=$QActions{$ID}; $prop->{action}() if $prop && $prop->{action}; return }
 	my $pos=$Position;
 	if ( defined $pos && $pos<$#$ListPlay && $ListPlay->[$pos+1]==$ID ) { SetPosition($pos+1); }
 	else { Select(song => $ID); }
@@ -2652,8 +2677,6 @@ sub SongArray_changed
 {	my (undef,$songarray,$action,@extra)=@_;
 	if ($songarray==$Queue)
 	{	HasChanged('Queue',$action,@extra);
-		if	($QueueAction eq 'wait')	{ IdleDo('1_QAuto',10,\&QWaitAutoPlay) if @$Queue && !$TogPlay; }
-		elsif	($QueueAction eq 'autofill')	{ IdleDo('1_QAuto',10,\&QAutoFill); }
 	}
 	elsif ($songarray==$Recent) { IdleDo('2_RecentSongs',750,\&HasChanged,'RecentSongs'); }
 	elsif ($songarray==$ListPlay)
@@ -3540,7 +3563,7 @@ sub BuildMenu
 			$item->set_draw_as_radio(1) if $m->{radio};
 		}
 		elsif ( my $include=$m->{include} ) #append items made by $include
-		{	$include= $include->($args) if ref $include eq 'CODE';
+		{	$include= $include->($args,$menu) if ref $include eq 'CODE';
 			if (ref $include eq 'ARRAY') { BuildMenu($include,$args,$menu); }
 			next;
 		}
@@ -5729,7 +5752,7 @@ sub PrefMisc
 	my $screensaver=NewPrefCheckButton(StopScreensaver => _"Disable screensaver when fullscreen and playing", tip=>_"requires xdg-screensaver");
 	$screensaver->set_sensitive(0) unless findcmd('xdg-screensaver');
 	#shutdown
-	my $shutentry=NewPrefEntry(Shutdown_cmd => _"Shutdown command :", tip => _"Command used when\n'turn off computer when queue empty'\nis selected");
+	my $shutentry=NewPrefEntry(Shutdown_cmd => _"Shutdown command :", tip => _"Command used when\n'turn off computer when queue empty'\nis selected", cb=> \&Update_QueueActionList);
 
 	#artist splitting
 	my $asplit_label= Gtk2::Label->new(_"Split artist names on :");

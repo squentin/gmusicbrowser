@@ -347,9 +347,6 @@ sub new
 	my $self=bless Gtk2::HBox->new, $class;
 
 	my $action_store=Gtk2::ListStore->new(('Glib::String')x3);
-	for my $action (sort {$::QActions{$a}[0] <=> $::QActions{$b}[0]} keys %::QActions)
-	{	$action_store->set($action_store->append, 0,$::QActions{$action}[1], 1,$::QActions{$action}[2] ,2, $action );
-	}
 
 	$self->{queuecombo}=
 	my $combo=Gtk2::ComboBox->new($action_store);
@@ -378,16 +375,31 @@ sub new
 	$self->pack_start($self->{$_},FALSE,FALSE,2) for qw/eventcombo spin/;
 
 	::Watch($self, QueueAction => \&Update);
-	$self->Update;
+	::Watch($self, QueueActionList => \&Fill);
+	$self->Fill;
 	return $self;
+}
+
+sub Fill
+{	my $self=shift;
+	my $store= $self->{queuecombo}->get_model;
+	$self->{busy}=1;
+	$store->clear;
+	delete $self->{actionindex};
+	my $i=0;
+	for my $action (::List_QueueActions())
+	{	$store->set($store->append, 0,$::QActions{$action}{icon}, 1,$::QActions{$action}{short} ,2, $action );
+		$self->{actionindex}{$action}=$i++;
+	}
+	$self->Update;
 }
 
 sub Update
 {	my $self=$_[0];
 	$self->{busy}=1;
 	my $action=$::QueueAction;
-	$self->{queuecombo}->set_active( $::QActions{$action}[0] );
-	$self->{eventcombo}->set_tooltip_text( $::QActions{$action}[3] );
+	$self->{queuecombo}->set_active( $self->{actionindex}{$action} );
+	$self->{eventcombo}->set_tooltip_text( $::QActions{$action}{long} );
 	my $m=($action eq 'autofill')? 'show' : 'hide';
 	$self->{spin}->$m;
 	$self->{spin}->set_value($::Options{MaxAutoFill});
