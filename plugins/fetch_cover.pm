@@ -296,11 +296,17 @@ sub parse_googlei
 		for my $m (@matches)
 		{	my @fields=split /["\]],["\[]/,$m;
 			next if @fields<3;	#happens if no results
-			my $url=$fields[3];
+			my ($url)= $fields[0]=~m#imgurl\\x3d(http.*?)\\x26#;
+			my $preview=$fields[19];
+			unless ($url)
+			{	next unless $preview=~m/^http/;
+				$url=$preview;
+				$preview='';
+			}
+			s/\\x([0-9A-Fa-f]{2})/chr hex($1)/eg for $url,$preview; #unescape urls
 			my $desc= $fields[6]||''; $desc=~s#\\x([0-9a-f]{2})#chr(hex $1)#gie; $desc=~s#</?b>##g;
 			$desc=Encode::decode('cp1252',$desc); #FIXME not sure of the encoding
 			$desc=::decode_html($desc);
-			my $preview='http://images.google.com/images?q=tbn:'.$fields[2].$url;
 			push @list, {url => $url, previewurl =>$preview, desc => $desc };
 		}
 	}

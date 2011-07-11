@@ -24,12 +24,13 @@ use constant
 our @MenuQueue=
 (	{label => _"Queue album",	code => sub { ::EnqueueSame('album',$_[0]{ID}); } },
 	{label => _"Queue artist",	code => sub { ::EnqueueSame('artist',$_[0]{ID});} },  # or use field 'artists' or 'first_artist' ?
-	{label => _"Normal mode",	code => sub { ::EnqueueAction('')},		radio => sub {!$::QueueAction} },
-	{label => _"Auto fill queue",	code => sub { ::EnqueueAction('autofill')},	radio => sub {$::QueueAction eq 'autofill'} },
-	{label => _"Wait when queue empty",	code => sub {::EnqueueAction('wait')}, radio => sub {$::QueueAction eq 'wait'} },
-	{label => _"Stop when queue empty",	code => sub {::EnqueueAction('stop')}, radio => sub {$::QueueAction eq 'stop'} },
-	{label => _"Quit when queue empty",	code => sub {::EnqueueAction('quit')}, radio => sub {$::QueueAction eq 'quit'} },
-	{label => _"Turn off computer when queue empty",	code => sub {::EnqueueAction('turnoff')}, radio => sub {$::QueueAction eq 'turnoff'}, test => sub { $::Options{Shutdown_cmd}; } },
+	{ include => sub
+		{	my $menu=$_[1];
+			my @modes= map { $_=>$::QActions{$_}{long} } ::List_QueueActions();
+			::BuildChoiceMenu( \@modes, menu=>$menu, ordered_hash=>1, 'reverse'=>1,
+				check=> sub {$::QueueAction}, code=> sub { ::EnqueueAction($_[1]); }, );
+		},
+	},
 	{label => _"Clear queue",	code => \&::ClearQueue,		test => sub{@$::Queue}},
 	{label => _"Shuffle queue",	code => \&::ShuffleQueue,	test => sub{@$::Queue}},
 	{label => _"Auto fill up to",	code => sub { $::Options{MaxAutoFill}=$_[1]; ::HasChanged('QueueAction','maxautofill'); },
@@ -195,10 +196,10 @@ our %Widgets=
 				},
 		stock	=> sub  {$_[0] eq 'queue'  ?	'gmb-queue' :
 				 $_[0] eq 'noqueue'?	'. gmb-queue' :
-							$::QActions{$_[0]}[1] ;
+							$::QActions{$_[0]}{icon} ;
 				},
 		tip	=> sub { ::CalcListLength($::Queue,'queue')
-				.($::QueueAction? "\n". ::__x( _"then {action}", action => $::QActions{$::QueueAction}[2] ) : '');
+				.($::QueueAction? "\n". ::__x( _"then {action}", action => $::QActions{$::QueueAction}{short} ) : '');
 				},
 		text	=> _"Queue",
 		click1	=> 'MenuQueue',
@@ -4004,6 +4005,7 @@ sub update
 	my $title=$prop->{title};
 	my $details=$prop->{details};
 	my $bartext=$prop->{bartext};
+	$bartext=~s/\$(end|current)/$prop->{$1}/g if $bartext;
 	if ($self->{compact})
 	{	$bartext=$title.' ... '.(defined $bartext ? $bartext : '');
 		$bar->set_tooltip_text($details) if $details;

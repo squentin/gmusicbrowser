@@ -343,13 +343,20 @@ BEGIN
 
 my ($browsercmd,$opendircmd);
 
-our %QActions=		#icon		#short		#long description
-(	''	=> [ 0, undef,		_"normal",	_"normal play when queue empty"],
-	autofill=> [ 1, 'gtk-refresh',	_"autofill",	_"autofill queue" ],
-	'wait'	=> [ 2, 'gmb-wait',	_"wait for more",_"wait for more when queue empty"],
-	stop	=> [ 3, 'gtk-media-stop',_"stop",	_"stop when queue empty"],
-	quit	=> [ 4, 'gtk-quit',	_"quit",	_"quit when queue empty"],
-	turnoff => [ 5, 'gmb-turnoff',	_"turn off",	_"turn off computer when queue empty"],
+#changes to %QActions must be followed by a call to Update_QueueActionList()
+# changed : called from Queue or QueueAction changed
+# action : called when queue is empty
+# keep : do not clear mode once empty
+# save : save mode when RememberQueue is on
+# condition : do not show mode if return false
+# order : used to sort modes
+our %QActions=
+(	''	=> {order=>0,				short=> _"normal",		long=> _"Normal mode"},
+	autofill=> {order=>10, icon=>'gtk-refresh',	short=> _"autofill",		long=> _"Auto-fill queue",					changed=>\&QAutoFill,	keep=>1,save=>1, },
+	'wait'	=> {order=>20, icon=>'gmb-wait',	short=> _"wait for more",	long=> _"Wait for more when queue empty",	action=>\&Stop,	changed=>\&QWaitAutoPlay,keep=>1,save=>1, },
+	stop	=> {order=>30, icon=>'gtk-media-stop',	short=> _"stop",		long=> _"Stop when queue empty",		action=>\&Stop},
+	quit	=> {order=>40, icon=>'gtk-quit',	short=> _"quit",		long=> _"Quit when queue empty",		action=>\&Quit},
+	turnoff => {order=>50, icon=>'gmb-turnoff',	short=> _"turn off",		long=> _"Turn off computer when queue empty", 	action=>sub {Stop(); TurnOff();}, condition=> sub { $::Options{Shutdown_cmd} },},
 );
 
 our %StockLabel=( 'gmb-turnoff' => _"Turn Off" );
@@ -780,10 +787,12 @@ my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos CurSong P
 # Picture_#mainfield#
 
 my (%Watched,%WatchedFilt);
-my ($IdleLoop,@ToCheck,@ToReRead,@ToAdd_Files,@ToAdd_IDsBuffer,@ToScan,%FollowedDirs,%AutoPicChooser);
-our ($LengthEstimated);
+my ($IdleLoop,@ToAdd_Files,@ToAdd_IDsBuffer,@ToScan,%FollowedDirs,%AutoPicChooser);
 our %Progress; my $ProgressWindowComing;
-my $Lengthcheck_max=0; my ($ScanProgress_cb,$CheckProgress_cb,$ProgressNBSongs,$ProgressNBFolders);
+my $ToCheck=GMB::JobIDQueue->new(title	=> _"Checking songs",);
+my $ToReRead=GMB::JobIDQueue->new(title	=> _"Re-reading tags",);
+my $ToCheckLength=GMB::JobIDQueue->new(title	=> _"Checking length/bitrate",details	=> _"for files without a VBR header",);
+my ($CheckProgress_cb,$ScanProgress_cb,$ProgressNBSongs,$ProgressNBFolders);
 my %Plugins;
 my $ScanRegex;
 
@@ -839,6 +848,7 @@ our %Options=
 	'TAG_write_id3v2.4'	=> 0,
 	TAG_id3v1_encoding	=> 'iso-8859-1',
 	AutoRemoveCurrentSong	=> 1,
+	LengthCheckMode		=> 'add',
 	CustomKeyBindings	=> {},
 	VolumeStep		=> 10,
 	DateFormat_history	=> ['%c 604800 %A %X 86400 Today %X 60 now'],
@@ -1067,7 +1077,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	EnqueueSelected => [\&Layout::EnqueueSelected,		_"Enqueue Selected Songs"],
 	EnqueueArtist	=> [sub {EnqueueSame('artist',$SongID)},_"Enqueue Songs from Current Artist"], # or use field 'artists' or 'first_artist' ?
 	EnqueueAlbum	=> [sub {EnqueueSame('album',$SongID)},	_"Enqueue Songs from Current Album"],
-	EnqueueAction	=> [sub {EnqueueAction($_[1])},		_"Enqueue Action", _"Queue mode" ,sub { TextCombo->new({map {$_ => $QActions{$_}[2]} sort keys %QActions}) }],
+	EnqueueAction	=> [sub {EnqueueAction($_[1])},		_"Enqueue Action", _"Queue mode" ,sub { TextCombo->new({map {$_ => $QActions{$_}{short}} sort keys %QActions}) }],
 	ClearQueue	=> [\&::ClearQueue,			_"Clear queue"],
 	IncVolume	=> [sub {ChangeVol('up')},		_"Increase Volume"],
 	DecVolume	=> [sub {ChangeVol('down')},		_"Decrease Volume"],
@@ -1203,7 +1213,7 @@ if ($CmdLine{UseGnomeSession})
 #-------------INIT-------------
 
 {	Watch(undef, SongArray	=> \&SongArray_changed);
-	Watch(undef, QueueAction=> sub { if ($QueueAction eq 'autofill'){ IdleDo('1_QAuto',10,\&QAutoFill); } });
+	Watch(undef, $_	=> \&QueueChanged) for qw/QueueAction Queue/;
 	Watch(undef, $_	=> \&QueueUpdateNextSongs) for qw/Playlist Queue Sort Pos QueueAction/;
 	Watch(undef, $_ => sub { return unless defined $SongID && $TogPlay; HasChanged('PlayingSong'); }) for qw/CurSongID Playing/;
 	Watch(undef,RecentSongs	=> sub { UpdateRelatedFilter('Recent'); });
@@ -1273,9 +1283,9 @@ exit;
 
 sub Edittag_mode
 {	my @dirs=@_;
+	$Options{LengthCheckMode}='never';
 	$_=rel2abs($_) for @dirs;
 	IdleScan(@dirs);
-	IdleDo('9_SkipLength',undef,sub {@$LengthEstimated=()});
 	Gtk2->main_iteration while Gtk2->events_pending;
 
 	my $dialog = Gtk2::Dialog->new( _"Editing tags", undef,'modal',
@@ -1703,6 +1713,7 @@ sub ReadOldSavedTags
 	my (%IDforAlbum,%IDforArtist);
 	my @newIDs; SongArray::start_init();
 	my @missing;
+	my $lengthcheck=SongArray->new;
 	while (<$fh>)
 	{	chomp; last if $_ eq '';
 		$oldID++;
@@ -1710,31 +1721,21 @@ sub ReadOldSavedTags
 		s#\\([n\\])#$1 eq "n" ? "\n" : "\\"#ge unless $oldversion<0.9603;
 		my @song=split "\x1D",$_,-1;
 
-		#FIXME PHASE1 do some checks
-		#unless ($song[SONG_UPATH] && ($song[SONG_UFILE] || $song[SONG_UPATH]=~m#^http://#) && $song[SONG_ADDED])
-		#{	warn "skipping invalid song entry : @song\n";
-		#	next;
-		#}
+		next unless $song[0] && $song[1] && $song[2]; # 0=SONG_FILE 1=SONG_PATH 2=SONG_MODIF
 		my $album=$song[11]; my $artist=$song[10];
 		$song[10]=~s/^<Unknown>$//;	#10=SONG_ARTIST
 		$song[11]=~s/^<Unknown>.*//;	#11=SONG_ALBUM
 		$song[12]=~s#/.*$##; 		##12=SONG_DISC
 		#$song[13]=~s#/.*$##; 		##13=SONG_TRACK
 		for ($song[0],$song[1]) { _utf8_off($_); $_=Songs::filename_escape($_) } # file and path
+		my $misc= $song[24]||''; #24=SONG_MISSINGSINCE also used for estimatedlength and radio
+		next if $misc eq 'R'; #skip radios (was never really enabled)
+		$song[24]=0 unless $misc=~m/^\d+$/;
 		my $ID= $newIDs[$oldID]= $loadsong->(@song);
 		$IDforAlbum{$album}=$IDforArtist{$artist}=$ID;
-
-		if (my $m=$song[24]) #FIXME PHASE1		#24=SONG_MISSINGSINCE
-		{	if ($m=~m/^\d+$/) { push @missing,$ID;next}
-			$song[24]=undef;
-			if ($m eq 'l') {push @$LengthEstimated,$ID}
-			elsif ($m eq 'R') {next}#push @Radio,$ID;next}
-		}
-		#elsif (!$song[2]) { push @ToAdd,$ID;next; } #FIXME PHASE1
-		elsif (!$song[2]) { next; }	#2=SONG_MODIF
-
-		push @$Library,$ID;
-		#AA::Add($ID); #Fill %AA::Artist and %AA::Album
+		push @$lengthcheck,$ID if $misc eq 'l';
+		if ($misc=~m/^\d+$/ && $misc>0) { push @missing,$ID }
+		else { push @$Library,$ID };
 	}
 	Songs::AddMissing(\@missing) if @missing;
 	while (<$fh>)
@@ -1798,10 +1799,10 @@ sub ReadOldSavedTags
 	if ($Options{Sort}=~m/random|shuffle/) { $Options{Sort_LastSR}=$Options{Sort} } else { $Options{Sort_LastOrdered}=$Options{Sort}||'path file'; }
 
 	$Options{SongArray_Recent}= SongArray->new_from_string(delete $Options{RecentIDs});
-	#FIXME PHASE1   Missing ?
 	SongArray::updateIDs(\@newIDs);
 	SongArray->new($Library);	#done after SongArray::updateIDs because doesn't use old IDs
-	$Options{SongArray_Estimated}=SongArray->new($LengthEstimated);
+	Songs::Set($_,length_estimated=>1) for @$lengthcheck;
+	$Options{LengthCheckMode}='add';
 }
 
 sub Filter_new_from_string_with_upgrade	# for versions <=1.1.7
@@ -1904,6 +1905,10 @@ sub ReadSavedTags	#load tags _and_ settings
 			}
 		}
 		SongArray::updateIDs(\@newIDs);
+		if (my $l=delete $Options{SongArray_Estimated}) # for $oldversion<1.1008
+		{	Songs::Set($_,length_estimated=>1) for @$l;
+			$Options{LengthCheckMode}='add';
+		}
 		my $mfilter= $Options{MasterFilterOn} && $Options{MasterFilter} || '';
 		my $filter= Filter->newadd(TRUE,'missing:e:0', $mfilter);
 		$Library=[];	#dummy array to avoid a warning when filtering in the next line
@@ -1914,7 +1919,8 @@ sub ReadSavedTags	#load tags _and_ settings
 	$Options{SongArray_Queue}=undef unless $Options{RememberQueue};
 	if ($Options{RememberQueue})
 	{	$QueueAction= $Options{QueueAction} || '';
-		IdleDo('1_QAuto',10,\&EnqueueAction,$QueueAction) if $QueueAction;
+		$QueueAction='' unless $QActions{$QueueAction};
+		QueueChanged() if $QueueAction;
 	}
 	if ($Options{RememberPlayFilter})
 	{	$TogLock=$Options{Lock};
@@ -1924,7 +1930,7 @@ sub ReadSavedTags	#load tags _and_ settings
 	if ($Options{RememberPlaySong} && $Options{RememberPlayTime}) { $PlayTime=delete $Options{SavedPlayTime}; }
 	$Options{LibraryPath}||=[];
 	$Options{LibraryPath}= [ map url_escape($_), split "\x1D", $Options{LibraryPath}] unless ref $Options{LibraryPath}; #for versions <=1.1.1
-	#&launchIdleLoop;
+	&launchIdleLoop;
 
 	setlocale(LC_NUMERIC, '');
 	warn "Reading saved tags in $LoadFile ... done\n";
@@ -1938,8 +1944,8 @@ sub Post_ReadSavedTags
 {	$Library||= SongArray->new;
 	$Recent= $Options{SongArray_Recent}	||= SongArray->new;
 	$Queue=  $Options{SongArray_Queue}	||= SongArray->new;
-	$LengthEstimated=  $Options{SongArray_Estimated}	||= SongArray->new;
 	$Options{LibraryPath}||=[];
+	#CheckLength() if $Options{LengthCheckMode} eq 'add';
 }
 
 sub SaveTags	#save tags _and_ settings
@@ -1953,7 +1959,7 @@ sub SaveTags	#save tags _and_ settings
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
 	$Options{Lock}= $TogLock || '';
 	$Options{SavedSongID}= SongArray->new([$SongID]) if $Options{RememberPlaySong} && defined $SongID;
-	$Options{QueueAction}= ($QueueAction eq 'autofill' || $QueueAction eq 'wait') ? $QueueAction : '';
+	$Options{QueueAction}= $QActions{$QueueAction}{save} ? $QueueAction : '';
 
 	$Options{SavedOn}= time;
 
@@ -2434,6 +2440,27 @@ sub QWaitAutoPlay
 	return if $TogPlay || !@$Queue;
 	Select(song => ($Queue->Shift), play=>1);
 }
+sub QueueChanged
+{	if ($QueueAction && $QActions{$QueueAction})
+	{	my $cb= $QActions{$QueueAction}{changed};
+		IdleDo('1_QAuto',10,$cb) if $cb;
+	}
+}
+sub Update_QueueActionList
+{	if ($QueueAction)	#check if current one is still valid
+	{	my $ok;
+		if (my $prop= $QActions{$QueueAction})
+		{	my $condition= $prop->{condition};
+			$ok=1 if !$condition || $condition->();
+		}
+		EnqueueAction('') unless $ok;
+	}
+	QHasChanged('QueueActionList');
+}
+sub List_QueueActions
+{	my @list= grep { !$QActions{$_}{condition} || $QActions{$_}{condition}() } keys %QActions;
+	return sort {$QActions{$a}{order} <=> $QActions{$b}{order} || $a cmp $b} @list;
+}
 
 sub GetNeighbourSongs
 {	my $nb=shift;
@@ -2480,9 +2507,8 @@ sub GetNextSongs
 		else { push @IDs,@$Queue[0..$nb-1]; last; }
 	  }
 	  if ($QueueAction)
-	  {	push @IDs, $list ? $QActions{$QueueAction}[2] : $QueueAction;
-		unless ($list || $QueueAction eq 'wait')
-		 { $QueueAction=''; HasChanged('QueueAction'); }
+	  {	push @IDs, $list ? $QActions{$QueueAction}{short} : $QueueAction;
+		unless ($list || $QActions{$QueueAction}{keep}) { EnqueueAction('') }
 		last;
 	  }
 	  return unless @$ListPlay;
@@ -2555,10 +2581,7 @@ sub PrevSong
 sub NextSong
 {	my $ID=GetNextSongs();
 	if (!defined $ID)  { Stop(); return; }
-	if ($ID eq 'wait') { Stop(); return; }
-	if ($ID eq 'stop') { Stop(); return; }
-	if ($ID eq 'quit') { Quit(); }
-	if ($ID eq 'turnoff') { Stop(); TurnOff(); return; }
+	if ($ID=~m/^\D/) { my $prop=$QActions{$ID}; $prop->{action}() if $prop && $prop->{action}; return }
 	my $pos=$Position;
 	if ( defined $pos && $pos<$#$ListPlay && $ListPlay->[$pos+1]==$ID ) { SetPosition($pos+1); }
 	else { Select(song => $ID); }
@@ -2652,8 +2675,6 @@ sub SongArray_changed
 {	my (undef,$songarray,$action,@extra)=@_;
 	if ($songarray==$Queue)
 	{	HasChanged('Queue',$action,@extra);
-		if	($QueueAction eq 'wait')	{ IdleDo('1_QAuto',10,\&QWaitAutoPlay) if @$Queue && !$TogPlay; }
-		elsif	($QueueAction eq 'autofill')	{ IdleDo('1_QAuto',10,\&QAutoFill); }
 	}
 	elsif ($songarray==$Recent) { IdleDo('2_RecentSongs',750,\&HasChanged,'RecentSongs'); }
 	elsif ($songarray==$ListPlay)
@@ -2840,18 +2861,26 @@ sub ExplainSort
 
 sub ReReadTags
 {	my $state=Gtk2->get_current_event_state;
-	if ( @_ && $state && $state >= ['shift-mask'] ) { $LengthEstimated->Push(\@_); }
-	elsif (@_) { push @ToReRead,@_; }
-	else	{ unshift @ToReRead,@$Library; }
+	if ( @_ && $state && $state >= ['shift-mask'] ) { $ToCheckLength->add(\@_); }
+	else
+	{	my $ref= @_ ? \@_ : $Library;
+		$ToReRead->add($ref);
+	}
 	&launchIdleLoop;
 }
 sub CheckCurrentSong
 {	return unless defined $::SongID;
-	Songs::ReReadFile($::SongID,0, !$Options{AutoRemoveCurrentSong} );
+	my $lengthcheck= $Options{LengthCheckMode} eq 'current' || $Options{LengthCheckMode} eq 'add' ? 2 : 0;
+	Songs::ReReadFile($::SongID,$lengthcheck, !$Options{AutoRemoveCurrentSong} );
+}
+sub CheckLength
+{	my $ref= @_ ? \@_ : Filter->new('length_estimated:e:1')->filter;
+	$ToCheckLength->add($ref);
+	&launchIdleLoop;
 }
 sub IdleCheck
-{	if (@_) { push @ToCheck,@_; }
-	else	{ unshift @ToCheck,@$Library; }
+{	my $ref= @_ ? \@_ : $Library;
+	$ToCheck->add($ref);
 	&launchIdleLoop;
 }
 sub IdleScan
@@ -2883,23 +2912,22 @@ sub launchIdleLoop
 }
 
 sub IdleLoop
-{	if (@ToCheck)
-	{	unless ($CheckProgress_cb)
-		{	Glib::Timeout->add(500, \&CheckProgress_cb,0);
-			CheckProgress_cb(1);
-		}
-		Songs::ReReadFile(pop @ToCheck);
+{	if (@$ToCheck)
+	{	CheckProgress_cb(1) unless $CheckProgress_cb;
+		Songs::ReReadFile($ToCheck->next);
 	}
-	elsif (@ToReRead){Songs::ReReadFile(pop(@ToReRead),1); }	#FIXME should show progress
+	elsif (@$ToReRead)
+	{	CheckProgress_cb(1) unless $CheckProgress_cb;
+		Songs::ReReadFile($ToReRead->next,1);
+	}
 	elsif (@ToAdd_Files)  { SongAdd(shift @ToAdd_Files); }
 	elsif (@ToAdd_IDsBuffer>1000)	{ SongAdd_now() }
 	elsif (@ToScan) { $ProgressNBFolders++; ScanFolder(shift @ToScan); }
 	elsif (@ToAdd_IDsBuffer)	{ SongAdd_now() }
 	elsif (%ToDo)	{ DoTask( (sort keys %ToDo)[0] ); }
-	elsif (@$LengthEstimated)	 #to replace estimated length/bitrate by real one(for mp3s without VBR header)
-	{	$Lengthcheck_max=@$LengthEstimated if @$LengthEstimated > $Lengthcheck_max;
-		Songs::ReReadFile( $LengthEstimated->Shift, 2);
-		$Lengthcheck_max=0 unless @$LengthEstimated;
+	elsif (@$ToCheckLength)	 #to replace estimated length/bitrate by real one(for mp3s without VBR header)
+	{	CheckProgress_cb(1) unless $CheckProgress_cb;
+		Songs::ReReadFile( $ToCheckLength->next, 3);
 	}
 	else
 	{	$ProgressNBFolders=$ProgressNBSongs=0;
@@ -3498,7 +3526,7 @@ sub BuildMenu
 			$item->set_draw_as_radio(1) if $m->{radio};
 		}
 		elsif ( my $include=$m->{include} ) #append items made by $include
-		{	$include= $include->($args) if ref $include eq 'CODE';
+		{	$include= $include->($args,$menu) if ref $include eq 'CODE';
 			if (ref $include eq 'ARRAY') { BuildMenu($include,$args,$menu); }
 			next;
 		}
@@ -5042,66 +5070,62 @@ sub ScanFolder
 		if (defined $ID)
 		{	next unless Songs::Get($ID,'missing');
 			Songs::Set($ID,missing => 0);
-			push @ToReRead,$ID;	#or @ToCheck ? 
+			$ToReRead->add($ID);	#or $ToCheck ? 
 			push @ToAdd_IDsBuffer,$ID;
 		}
 		else
 		{	#$ID=Songs::New($path_file);
 			push @ToAdd_Files, $path_file;
-			&launchIdleLoop unless defined $IdleLoop;
 		}
 	}
 	unless (@ToScan)
 	{	AbortScan();
 	}
+	&launchIdleLoop unless $IdleLoop;
 }
 
 sub CheckProgress_cb
 {	my $init=$_[0];
-	if (@ToCheck)
- 	{	$CheckProgress_cb=@ToCheck if @ToCheck> ($CheckProgress_cb||0);
-		my $max=$CheckProgress_cb;
- 		my $checked=$max-@ToCheck;
-		::Progress('check',	title	=> _"Checking songs",
-					aborthint=>_"Stop checking",
-					bartext	=> "$checked / $max",
-					current	=> $checked, end=> $max,
-					abortcb	=> sub { @ToCheck=(); },
-			) unless $init;
-		return 1;
- 	}
-	else
-	{	::Progress('check', abort=>1);
-		return $CheckProgress_cb=0;
+	$CheckProgress_cb||=Glib::Timeout->add(500, \&CheckProgress_cb,0);
+	return if $init;
+	my @job_id=qw/check reread lengthcheck/;
+	my $running;
+	for my $jobarray ($ToCheck,$ToReRead,$ToCheckLength)
+	{	my $id=shift @job_id;
+		if (@$jobarray)
+		{	::Progress($id,	aborthint=>_"Stop checking",
+					bartext	=> '$current / $end',
+					abortcb	=> sub { $jobarray->abort; },
+					$jobarray->progress, #returns title, details(optional), current, end
+			);
+			$running=1;
+		}
+		elsif ($Progress{$id}) { ::Progress($id, abort=>1); }
 	}
+	return 1 if $running;
+	return $CheckProgress_cb=0;
 }
+
 sub AbortScan
 {	@ToScan=(); undef %FollowedDirs;
 }
 sub ScanProgress_cb
-{	my ($title,$details,$bartext,$current,$total,$abortcb);
-	if (@ToScan || @ToAdd_Files)
-	{	$title=_"Scanning";
-		$details=__("%d song added","%d songs added", $ProgressNBSongs);
-		$bartext= __("%d folder","%d folders", $ProgressNBFolders);
-		$current=$ProgressNBFolders;
-		$total=@ToScan + $ProgressNBFolders;
-		$abortcb= \&AbortScan;
-	}
-	elsif (@$LengthEstimated)
-	{	$title=_"Checking length/bitrate";
-		$details= _"for files without a VBR header";
-		$Lengthcheck_max=@$LengthEstimated if @$LengthEstimated > $Lengthcheck_max;
-		$current=$Lengthcheck_max-@$LengthEstimated;
-		$total=$Lengthcheck_max;
-		$bartext="$current / $total";
+{	if (@ToScan || @ToAdd_Files)
+	{	my $total= @ToScan + $ProgressNBFolders;
+		Progress('scan',title	=> _"Scanning",
+				details	=> __("%d song added","%d songs added", $ProgressNBSongs),
+				bartext	=>__("%d folder","%d folders", $ProgressNBFolders),
+				current	=> $ProgressNBFolders,
+				end	=>$total,
+				abortcb	=>\&AbortScan,
+				aborthint=> _"Stop scanning",
+			);
+		return 1;
 	}
 	else
 	{	::Progress('scan', abort=>1);
 		return $ScanProgress_cb=0;
 	}
-	Progress('scan', title => $title, details=>$details, current=>$current, end=>$total, abortcb=>$abortcb, aborthint=> _"Stop scanning", bartext=>$bartext );
-	return 1;
 }
 
 sub AutoSelPictures
@@ -5687,7 +5711,7 @@ sub PrefMisc
 	my $screensaver=NewPrefCheckButton(StopScreensaver => _"Disable screensaver when fullscreen and playing", tip=>_"requires xdg-screensaver");
 	$screensaver->set_sensitive(0) unless findcmd('xdg-screensaver');
 	#shutdown
-	my $shutentry=NewPrefEntry(Shutdown_cmd => _"Shutdown command :", tip => _"Command used when\n'turn off computer when queue empty'\nis selected");
+	my $shutentry=NewPrefEntry(Shutdown_cmd => _"Shutdown command :", tip => _"Command used when\n'turn off computer when queue empty'\nis selected", cb=> \&Update_QueueActionList);
 
 	#artist splitting
 	my $asplit_label= Gtk2::Label->new(_"Split artist names on :");
@@ -5970,12 +5994,6 @@ sub PrefLibrary
 	my $BScan= NewIconButton('gtk-refresh',_"scan now", sub { IdleScan();	});
 	my $BCheck=NewIconButton('gtk-refresh',_"check now",sub { IdleCheck();	});
 	my $label=Gtk2::Label->new(_"Folders to search for new songs");
-	my $table=Gtk2::Table->new(2,2,FALSE);
-	$table->attach_defaults($CScan, 0,1,1,2);
-	$table->attach_defaults($BScan, 1,2,1,2);
-	$table->attach_defaults($CCheck,0,1,0,1);
-	$table->attach_defaults($BCheck,1,2,0,1);
-	$table->attach_defaults($Cscanall, 0,2,2,3);
 
 	my $reorg=Gtk2::Button->new(_"Reorganize files and folders");
 	$reorg->signal_connect( clicked => sub
@@ -5984,6 +6002,14 @@ sub PrefLibrary
 	});
 
 	my $autoremove= NewPrefCheckButton( AutoRemoveCurrentSong => _"Automatically remove current song if not found");
+	my $lengthcheck= NewPrefCombo( LengthCheckMode => { never=>_"Never", current=>_"When current song", add=>_"When added", },
+		text=>	_"Check real length of mp3",
+		tip =>	_("mp3 files without a VBR header requires a full scan to check its real length and bitrate")."\n".
+			_('You can force a check for these files by holding shift when selecting "Re-read tags"')
+		);
+	my $Blengthcheck= NewIconButton('gtk-refresh',_"check length now",sub { CheckLength(); });
+	$Blengthcheck->{timeout}= Glib::Timeout->add(1000, \&PrefLibrary_update_checklength_button,$Blengthcheck);#refresh it 1s after creation
+	Watch($Blengthcheck,$_=> sub { my ($button,$IDs,$fields)=@_; $button->{timeout}||= Glib::Timeout->add(2000, \&PrefLibrary_update_checklength_button,$button) if !$fields || grep($_ eq 'length_estimated', @$fields); } ) for qw/SongsAdded SongsChanged/; #refresh it 2s after a change
 
 	my $masterfilter= FilterCombo->new( $Options{MasterFilter}, sub { $Options{MasterFilter}=$_[1]; UpdateMasterFilter(); } );
 	my $masterfiltercheck= NewPrefCheckButton( MasterFilterOn=> _"Use a master filter", widget=>$masterfilter, cb=>\&UpdateMasterFilter, horizontal=>1 );
@@ -5999,11 +6025,16 @@ sub PrefLibrary
 
 		} );
 
+	my $sg1=Gtk2::SizeGroup->new('horizontal');
+	$sg1->add_widget($_) for $BScan,$BCheck,$Blengthcheck;
 	my $vbox=Vpack( 1,$label,
 			'_',$sw,
 			[$addbut,$rmdbut,'-',$reorg],
-			$table,
+			[$CCheck,'-',$BCheck],
+			[$CScan,'-',$BScan],
+			$Cscanall,
 			$autoremove,
+			[$lengthcheck,'-',$Blengthcheck],
 			$masterfiltercheck,
 			$librarysize,
 		      );
@@ -6031,6 +6062,15 @@ sub AddPath
 		$changed=1;
 	}
 	HasChanged(options=>'LibraryPath') if $changed;
+}
+sub PrefLibrary_update_checklength_button
+{	my $button=shift;
+	my $l= Filter->new('length_estimated:e:1')->filter;
+	$button->set_sensitive(@$l>0);
+	my $text= @$l ?	__("%d song","%d songs",scalar @$l) :
+			_"no songs needs checking";
+	$button->set_tooltip_text($text);
+	return $button->{timeout}=0;
 }
 
 sub ToggleLabel #maybe do the toggle in SetLabels #FIXME
@@ -6392,7 +6432,7 @@ sub NewPrefSpinButton
 
 sub NewPrefCombo
 {	my ($key,$list,%opt)=@_;
-	my ($text,$cb0,$sg1,$sg2,$toolitem,$tree)=@opt{qw/text cb sizeg1 sizeg2 toolitem tree/};
+	my ($text,$cb0,$sg1,$sg2,$toolitem,$tree,$tip)=@opt{qw/text cb sizeg1 sizeg2 toolitem tree tip/};
 	my $cb=sub
 		{	SetOption($key,$_[0]->get_value);
 			&$cb0 if $cb0;
@@ -6409,6 +6449,7 @@ sub NewPrefCombo
 		$label->set_alignment(0,.5);
 		$widget=$hbox;
 	}
+	$widget->set_tooltip_text($tip) if defined $tip;
 	if (defined $toolitem)
 	{	$widget= $combo->make_toolitem($toolitem,$key,$widget);
 	}
@@ -8779,5 +8820,65 @@ sub update
 	}
 	$self->set_markup($text);
 	return $self->{queue_update}=undef;
+}
+
+package GMB::JobIDQueue;
+my %Presence;
+my %Properties;
+my @ArrayList;
+
+::Watch(undef, SongsRemoved => \&SongsRemoved_cb);
+
+sub new
+{	my ($package,%properties)=@_;	#possible properties keys : title, details(optional)
+	my $self= bless [],$_[0];
+	push @ArrayList, $self;
+	$Properties{$self}= \%properties;
+	$Properties{$self}{end}=0;
+	::weaken($ArrayList[-1]);
+	return $self;
+}
+
+sub add
+{	my $self=shift;
+	my $IDs= ref $_[0] ? $_[0] : \@_;
+	$Presence{$self}='' unless @$self;
+	my @new= grep !vec($Presence{$self},$_,1), @$IDs; #ignore IDs that are already in the list
+	vec($Presence{$self},$_,1)=1 for @new;
+	$Properties{$self}{end}+= @new;
+	push @$self, @new;
+}
+
+sub progress
+{	my $self=shift;
+	my $prop= $Properties{$self};
+	return current=> ($prop->{end}-scalar(@$self)), %$prop;
+}
+
+sub next
+{	my $self=shift;
+	my $ID=shift @$self;
+	vec($Presence{$self},$ID,1)=0;
+	$self->abort unless @$self;
+	return $ID;
+}
+
+sub abort
+{	my $self=shift;
+	@$self=();
+	delete $Presence{$self};
+	$Properties{$self}{end}=0;
+}
+
+sub SongsRemoved_cb
+{	my $IDs=shift;
+	my $remove='';
+	vec($remove,$_,1)=1 for @$IDs;
+	for my $self (@ArrayList)
+	{	next unless @$self;
+		@$self= grep !vec($remove,$_,1), @$self;
+		vec($Presence{$self},$_,1)=0 for @$IDs;
+		$self->abort unless @$self;
+	}
 }
 
