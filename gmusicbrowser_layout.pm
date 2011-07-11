@@ -3992,6 +3992,7 @@ sub update
 	my $title=$prop->{title};
 	my $details=$prop->{details};
 	my $bartext=$prop->{bartext};
+	$bartext=~s/\$(end|current)/$prop->{$1}/g if $bartext;
 	if ($self->{compact})
 	{	$bartext=$title.' ... '.(defined $bartext ? $bartext : '');
 		$bar->set_tooltip_text($details) if $details;

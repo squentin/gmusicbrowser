@@ -48,10 +48,8 @@ sub Read
 	::setlocale(::LC_NUMERIC, 'C');
 	my @taglist;
 	my %values;	#results will be put in %values
-	my $estimated;
 	if (my $info=$filetag->{info})	#audio properties
-	{	$estimated=$info->{estimated};
-		if ($info->{estimated} && $findlength!=1) { delete $info->{seconds}; delete $info->{bitrate}; }
+	{	if ($findlength!=1 && $info->{estimated}) { delete $info->{$_} for qw/seconds bitrate estimated/; }
 		$formatstring=~s/{(\w+)}/$info->{$1}/g;
 		$values{filetype}=$formatstring;
 		for my $f (grep $Songs::Def{$_}{audioinfo}, @Songs::Fields)
@@ -116,7 +114,7 @@ sub Read
 	}
 	::setlocale(::LC_NUMERIC, '');
 
-	return \%values,$estimated;
+	return \%values;
 }
 
 sub Write

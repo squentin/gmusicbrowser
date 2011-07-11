@@ -1001,7 +1001,12 @@ our %timespan_menu=
 	'filterdesc:-~'		=> _"not present in %s",
 	'filter:~'		=> '.!!. do {my $l=$::Options{SavedLists}{"#VAL#"}; $l ? $l->IsIn(#ID#) : undef}',
 	default_filter		=> '~',
-	 },
+ },
+ length_estimated =>
+ {	type	=> 'boolean',
+	audioinfo=> 'estimated',
+	flags	=> 'gars',
+ },
 );
 
 our %FieldTemplates=
@@ -1448,7 +1453,7 @@ sub New
 	#check already in @Songs#FIXME
 	warn "Reading Tag for $file\n";
 	my ($size,$modif)=(stat $file)[7,9];
-	my ($values,$estimated)= FileTag::Read($file,1);
+	my $values= FileTag::Read($file,1);
 	unless ($values) { warn "Error reading tag for $file\n"; return undef; }
 	my $path=$file;
 	$path=~s/$::QSLASH([^$::QSLASH]+)$//o and $file=$1;
@@ -1457,27 +1462,38 @@ sub New
 			modif=> $modif, size=> $size,
 			added=> time,
 		);
-	if (defined( my $ID=CheckMissing($values) )) { ReReadFile($ID); return $ID; }
+	if (defined( my $ID=CheckMissing($values) ))
+	{	ReReadFile($ID);
+		::CheckLength($ID) if $::Options{LengthCheckMode} eq 'add' && Get($ID,'length_estimated');
+		return $ID;
+	}
 
 	#warn "\nNewSub(LastID=$LastID)\n";warn join("\n",map("$_=>$values->{$_}",sort keys %$values))."\n";
 	my $ID=$NEWsub->($values);#warn $Songs::Songs_title__[-1]." NewSub end\n";
-	push @$::LengthEstimated,$ID if $estimated;
+	if ($values->{length_estimated} && $::Options{LengthCheckMode} eq 'add') { ::CheckLength($ID); }
 	$IDFromFile->{$path}{$file}=$ID if $IDFromFile;
 	return $ID;
 }
 
-sub ReReadFile
+sub ReReadFile		#force values :
+			# 0=>read if file changed (size or date),
+			# 1=>force read tags
+			# 2=> same as 3 if estimated, else same as 0
+			# 3=>force check length (and tags)
 {	my ($ID,$force,$noremove)=@_;
 	my $file= GetFullFilename($ID);
 	if (-e $file)
-	{	my ($size1,$modif1)=Songs::Get($ID,qw/size modif/);
+	{	my ($size1,$modif1,$estimated)=Songs::Get($ID,qw/size modif length_estimated/);
 		my ($size2,$modif2)=(stat $file)[7,9];
-		my $checklength= ($size1!=$size2 || ($force && $force==2)) ? 2 : 0;
+		$force||=0;
+		$force= $estimated ? 3 : 0 if $force==2;
+		my $checklength= ($size1!=$size2 || $force==3) ? 2 : 0;
 		return 1 unless $checklength || $force || $modif1!=$modif2;
-		my ($values,$estimated)=FileTag::Read($file,$checklength);
+		my $values=FileTag::Read($file,$checklength);
 		return unless $values;
 		$values->{size}=$size2;
 		$values->{modif}=$modif2;
+		$values->{length_estimated}||=0 if $estimated;
 		my @changed=$DIFFsub->($ID,$values);
 		return unless @changed;
 		warn "Changed fields : @changed\n" if $::debug;
