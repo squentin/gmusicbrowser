@@ -24,12 +24,12 @@ while (my $file=shift @files)
 
 	while (m/_"([^"]+)"/g)		{ $msgid{$1}.=" $file:$."; }
 	while (m/_\("([^"]+)"\)/g)	{ $msgid{$1}.=" $file:$."; }
-	while (m/_\('([^']+)'\)/g)	{ $msgid{$1}.=" $file:$."; }
+	while (m/_\('([^']+)'\)/g)	{ my $esc=$1; $esc=~s/"/\\"/g; $msgid{$esc}.=" $file:$."; }
 
-	while (m/__\(\s*'([^']+)'\s*,\s*'([^']+)'\s*,/g)	{ $msgid_p{$1}{$2}.=" $file:$."; }
+	while (m/__\(\s*'([^']+)'\s*,\s*'([^']+)'\s*,/g)	{ my ($esc1,$esc2)=($1,$2); $esc1=~s/"/\\"/g for $esc1,$esc2; $msgid_p{$esc1}{$esc2}.=" $file:$."; }
 	while (m/__\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,/g)	{ $msgid_p{$1}{$2}.=" $file:$."; }
-	while (m/__\(\s*'([^']+)'\s*,\s*"([^"]+)"\s*,/g)	{ $msgid_p{$1}{$2}.=" $file:$."; }
-	while (m/__\(\s*"([^"]+)"\s*,\s*'([^']+)'\s*,/g)	{ $msgid_p{$1}{$2}.=" $file:$."; }
+	while (m/__\(\s*'([^']+)'\s*,\s*"([^"]+)"\s*,/g)	{ my $esc=$1; $esc=~s/"/\\"/g; $msgid_p{$esc}{$2}.=" $file:$."; }
+	while (m/__\(\s*"([^"]+)"\s*,\s*'([^']+)'\s*,/g)	{ my $esc=$2; $esc=~s/"/\\"/g; $msgid_p{$1}{$esc}.=" $file:$."; }
 
 	if (m/^=gmbplugin \D\w+/)
 	{	while (<$fh>)
