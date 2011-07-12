@@ -22,7 +22,7 @@ my $handle;
 ::SetDefaultOptions(OPT, minutes => 15);
 
 sub Start
-{	$handle=Glib::Timeout->add($::Options{OPT.'minutes'}*60000,$savesub);
+{	$handle=Glib::Timeout->add($::Options{OPT.'minutes'}*60000,sub {$savesub->(); 1});
 }
 sub Stop
 {	Glib::Source->remove($handle);
