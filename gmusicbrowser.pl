@@ -833,6 +833,7 @@ our %Options=
 #	gst_sink	=> 'alsa',
 	gst_use_equalizer=>0,
 	gst_equalizer	=> '0:0:0:0:0:0:0:0:0:0',
+	gst_equalizer_preamp => 1,
 	gst_rg_limiter	=> 1,
 	gst_rg_preamp	=> 6,
 	gst_rg_fallback	=> 0,

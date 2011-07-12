@@ -233,10 +233,14 @@ sub Play
 		my @elems;
 		$Sink->{EQ}=$useEQ;
 		if ($useEQ)
-		{	my $equalizer=GStreamer::ElementFactory->make('equalizer-10bands' => 'equalizer');
+		{	my $preamp=GStreamer::ElementFactory->make('volume' => 'equalizer-preamp');
+			my $equalizer=GStreamer::ElementFactory->make('equalizer-10bands' => 'equalizer');
 			my @val= split /:/, $::Options{gst_equalizer};
+			::setlocale(::LC_NUMERIC, 'C');
 			$equalizer->set( 'band'.$_ => $val[$_]) for 0..9;
-			push @elems,$equalizer;
+			$preamp->set( volume => $::Options{gst_equalizer_preamp}**3);
+			::setlocale(::LC_NUMERIC, '');
+			push @elems,$preamp,$equalizer;
 		}
 		$Sink->{RG}=$useRG;
 		if ($useRG)
@@ -289,6 +293,12 @@ sub set_file
 	$PlayBin -> set(uri => $f);
 }
 
+sub set_equalizer_preamp
+{	my (undef,$volume)=@_;
+	my $preamp=$PlayBin->get_by_name('equalizer-preamp');
+	$preamp->set( volume => $volume**3) if $preamp;
+	$::Options{gst_equalizer_preamp}=$volume;
+}
 sub set_equalizer
 {	my (undef,$band,$val)=@_;
 	my $equalizer=$PlayBin->get_by_name('equalizer');

@@ -648,9 +648,11 @@ our %Widgets=
 		vertical=>1,
 	},
 	Equalizer =>
-	{	New => \&Layout::Equalizer::new,
-		event => 'Equalizer',
-		update => \&Layout::Equalizer::update,
+	{	New	=> \&Layout::Equalizer::new,
+		event	=> 'Equalizer',
+		update	=> \&Layout::Equalizer::update,
+		preamp	=> 1,
+		labels	=> 'x-small',
 	},
 #	RadioList =>
 #	{	class => 'GMB::RadioList',
@@ -4010,6 +4012,31 @@ package Layout::Equalizer;
 sub new
 {	my $opt=$_[0];
 	my $self=Gtk2::HBox->new(1,0); #homogenous
+	$self->{labels}= $opt->{labels};
+	$self->{labels}=undef if $self->{labels} eq 'none';
+	if ($opt->{preamp})
+	{	my $adj=Gtk2::Adjustment->new(1, 0, 2, .05, .1,0);
+		my $scale=Gtk2::VScale->new($adj);
+		$scale->set_draw_value(0);
+		$scale->set_inverted(1);
+		$scale->add_mark(1,'left',undef);
+		$self->{adj_preamp}=$adj;
+		$adj->signal_connect(value_changed =>
+			sub { $::Play_package->set_equalizer_preamp($_[0]->get_value) unless $_[0]{busy}; ::HasChanged('Equalizer','preamp') });
+		if ($self->{labels})
+		{	my $vbox=Gtk2::VBox->new;
+			my $label0=Gtk2::Label->new;
+			$vbox->pack_start($label0,0,0,0);
+			$self->{Valuelabel_preamp}=$label0;
+			$vbox->add($scale);
+			my $label1=Gtk2::Label->new;
+			$label1->set_markup_with_format(qq(<span size="%s">%s</span>), $self->{labels},_"pre-amp");
+			$vbox->pack_start($label1,0,0,0);
+			$scale=$vbox;
+		}
+		$self->pack_start($scale,1,1,2);
+		$self->pack_start(Gtk2::HBox->new(0,0),1,1,2); #empty space
+	}
 	for my $i (0..9)
 	{	my $adj=Gtk2::Adjustment->new(0, -1, 1, .05, .1,0);
 		my $scale=Gtk2::VScale->new($adj);
@@ -4019,8 +4046,6 @@ sub new
 		$self->{'adj'.$i}=$adj;
 		$adj->signal_connect(value_changed =>
 		sub { $::Play_package->set_equalizer($_[1],$_[0]->get_value) unless $_[0]{busy}; ::HasChanged('Equalizer','value') },$i);
-		$self->{labels}= $opt->{labels} || 'x-small';
-		$self->{labels}=undef if $self->{labels} eq 'none';
 		if ($self->{labels})
 		{	my $vbox=Gtk2::VBox->new;
 			my $label0=Gtk2::Label->new;
@@ -4071,6 +4096,13 @@ sub update
 		delete $adj->{busy};
 		next unless $self->{labels};
 		$self->{'Valuelabel'.$i}->set_markup_with_format(qq(<span size="%s">%.1f%s</span>), $self->{labels},$val,$self->{unit});
+	}
+	if (my $adj= $self->{adj_preamp})
+	{	my $val= $::Options{gst_equalizer_preamp};
+		$adj->{busy}=1;
+		$adj->set_value($val);
+		delete $adj->{busy};
+		$self->{Valuelabel_preamp}->set_markup_with_format(qq(<span size="%s">%d%%</span>), $self->{labels},($val**3)*100) if $self->{Valuelabel_preamp};
 	}
 }
 
