@@ -41,7 +41,7 @@ sub Stop
 
 sub prefbox
 {	my $vbox=Gtk2::VBox->new;
-	my $spin=::NewPrefSpinButton(OPT.'timespan', 1,60*60*24, step=>1, text1=>_"Fade-out in", text2=>_"seconds");
+	my $spin=::NewPrefSpinButton(OPT.'timespan', 1,60*60*24, step=>1, text=>_"Fade-out in %d seconds");
 	my $button=Gtk2::Button->new(_"Fade-out");
 	$button->signal_connect(clicked => \&start_fadeout);
 	my $sg=Gtk2::SizeGroup->new('horizontal');

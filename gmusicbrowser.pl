@@ -5748,7 +5748,7 @@ sub pref_artists_button_cb
 
 sub PrefMisc
 {	#Default rating
-	my $DefRating=NewPrefSpinButton('DefaultRating',0,100, step=>10, page=>20, text1=>_"Default rating :", cb=> sub
+	my $DefRating=NewPrefSpinButton('DefaultRating',0,100, step=>10, page=>20, text=>_"Default rating : %d %", cb=> sub
 		{ IdleDo('0_DefaultRating',500,\&Songs::UpdateDefaultRating);
 		});
 
@@ -5809,14 +5809,14 @@ sub PrefMisc
 	my $datealign=Gtk2::Alignment->new(0,.5,0,0);
 	$datealign->add($datefmt);
 
-	my $volstep= NewPrefSpinButton('VolumeStep',1,100, step=>1, text1=>_"Volume step :", tip=>_"Amount of volume changed by the mouse wheel");
+	my $volstep= NewPrefSpinButton('VolumeStep',1,100, step=>1, text=>_"Volume step :", tip=>_"Amount of volume changed by the mouse wheel");
 	my $always_in_pl=NewPrefCheckButton(AlwaysInPlaylist => _"Current song must always be in the playlist", tip=> _"- When selecting a song, the playlist filter will be reset if the song is not in it\n- Skip to another song when removing the current song from the playlist");
-	my $pixcache= NewPrefSpinButton('PixCacheSize',1,1000, text1=>_"Picture cache :", text2=>_"MB", cb=>\&GMB::Picture::trim);
+	my $pixcache= NewPrefSpinButton('PixCacheSize',1,1000, text=>_"Picture cache : %d MB", cb=>\&GMB::Picture::trim);
 
 	my $recent_include_not_played= NewPrefCheckButton(AddNotPlayedToRecent => _"Recent songs include skipped songs that haven't been played.", tip=> _"When changing songs, the previous song is added to the recent list even if not played at all.");
 
-	my $playedpercent= NewPrefSpinButton('PlayedMinPercent'	,0,100,  text1=>_"Threshold to count a song as played :", text2=>"%");
-	my $playedseconds= NewPrefSpinButton('PlayedMinSeconds'	,0,99999,text1=>_"or", text2=>_"seconds");
+	my $playedpercent= NewPrefSpinButton('PlayedMinPercent'	,0,100,  text=>_"Threshold to count a song as played : %d %");
+	my $playedseconds= NewPrefSpinButton('PlayedMinSeconds'	,0,99999,text=>_"or %d seconds");
 
 	my $vbox= Vpack( $checkR1,$checkR2,$checkR4, $DefRating,$ProxyCheck, [$asplit_label, $asplit],[$atitle_label, $atitle],
 			[0,$datealign,$preview], $screensaver,$shutentry, $always_in_pl,
@@ -5830,11 +5830,11 @@ sub PrefLayouts
 {	my $vbox=Gtk2::VBox->new (FALSE, 2);
 
 	#Tray
-	my $traytiplength=NewPrefSpinButton('TrayTipTimeLength', 0,100000, step=>100, text1=>_"Display tray tip for", text2=>'ms');
+	my $traytiplength=NewPrefSpinButton('TrayTipTimeLength', 0,100000, step=>100, text=>_"Display tray tip for %d ms");
 	my $checkT5=NewPrefCheckButton(StartInTray => _"Start in tray");
 	my $checkT2=NewPrefCheckButton(CloseToTray => _"Close to tray");
 	my $checkT3=NewPrefCheckButton(ShowTipOnSongChange => _"Show tray tip on song change", widget=>$traytiplength);
-	my $checkT4=NewPrefSpinButton('TrayTipDelay', 0,10000, step=>100, text1=> _"Delay before showing tray tip popup on mouse over :", text2=>'ms', cb=>\&SetTrayTipDelay);
+	my $checkT4=NewPrefSpinButton('TrayTipDelay', 0,10000, step=>100, text=> _"Delay before showing tray tip popup on mouse over : %d ms", cb=>\&SetTrayTipDelay);
 	my $checkT1=NewPrefCheckButton( UseTray => _"Show tray icon",
 					cb=> sub { &CreateTrayIcon; },
 					widget=> Vpack($checkT5,$checkT2,$checkT4,$checkT3)
@@ -6462,13 +6462,14 @@ sub NewPrefFileEntry
 }
 sub NewPrefSpinButton
 {	my ($key,$min,$max,%opt)=@_;
-	my ($text1,$text2,$sg1,$sg2,$tip,$sub,$climb_rate,$digits,$stepinc,$pageinc,$wrap)=@opt{qw/text1 text2 sizeg1 sizeg2 tip cb rate digits step page wrap/};
+	my ($text,$text1,$text2,$sg1,$sg2,$tip,$sub,$climb_rate,$digits,$stepinc,$pageinc,$wrap)=@opt{qw/text text1 text2 sizeg1 sizeg2 tip cb rate digits step page wrap/};	#FIXME using text1 and text2 is deprecated and will be removed, use text with %d instead, for example text=>"value : %d seconds"
 	$stepinc||=1;
 	$pageinc||=$stepinc*10;
 	$climb_rate||=1;
 	$digits||=0;
-	$text1=Gtk2::Label->new($text1) if defined $text1;
-	$text2=Gtk2::Label->new($text2) if defined $text2;
+	($text1,$text2)= split /\s*%d\s*/,$text,2 if $text;
+	$text1=Gtk2::Label->new($text1) if defined $text1 && $text1 ne '';
+	$text2=Gtk2::Label->new($text2) if defined $text2 && $text2 ne '';
 	my $adj=Gtk2::Adjustment->new($Options{$key}||=0,$min,$max,$stepinc,$pageinc,0);
 	my $spin=Gtk2::SpinButton->new($adj,$climb_rate,$digits);
 	$spin->set_wrap(1) if $wrap;

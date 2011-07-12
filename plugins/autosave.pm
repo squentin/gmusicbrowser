@@ -33,7 +33,7 @@ sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $spin=::NewPrefSpinButton(OPT.'minutes', 1,60*24, step=>1, page=>15, cb=>sub
 		{ Stop() if $handle; Start();
-		}, text1=>_"Save tags/settings every", text2=>_"minutes");
+		}, text=>_"Save tags/settings every %d minutes");
 	my $button=Gtk2::Button->new(_"Save now");
 	$button->signal_connect(clicked => $savesub);
 	$vbox->pack_start($_,::FALSE,::FALSE,2) for $spin,$button;

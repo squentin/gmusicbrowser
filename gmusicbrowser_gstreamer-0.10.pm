@@ -474,8 +474,8 @@ sub RG_PrefBox
 			my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter", cb=>$update, tip=>_"Used for clipping prevention");
 			my $sg1=Gtk2::SizeGroup->new('horizontal');
 			my $sg2=Gtk2::SizeGroup->new('horizontal');
-			my $preamp=	::NewPrefSpinButton('gst_rg_preamp',   -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, text2=> 'dB', sizeg1=>$sg1, sizeg2=>$sg2, text1=>_"pre-amp", tip=>_"Extra gain");
-			my $fallback=	::NewPrefSpinButton('gst_rg_fallback', -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, text2=> 'dB', sizeg1=>$sg1, sizeg2=>$sg2, text1=>_"fallback-gain", tip=>_"Gain for songs missing replaygain tags");
+			my $preamp=	::NewPrefSpinButton('gst_rg_preamp',   -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"pre-amp : %d dB", tip=>_"Extra gain");
+			my $fallback=	::NewPrefSpinButton('gst_rg_fallback', -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"fallback-gain : %d dB", tip=>_"Gain for songs missing replaygain tags");
 			$RG_dialog->vbox->pack_start($_,0,0,2) for $albummode,$preamp,$fallback,$nolimiter,$songmenu;
 			$RG_dialog->show_all;
 
