@@ -1069,7 +1069,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	Show		=> [sub {ShowHide(1);},			_"Show"],
 	Hide		=> [sub {ShowHide(0);},			_"Hide"],
 	Quit		=> [\&Quit,				_"Quit"],
-	Save		=> [\&SaveTags,				_"Save Tags/Options"],
+	Save		=> [sub {SaveTags(1)},			_"Save Tags/Options"],
 	ChangeDisplay	=> [\&ChangeDisplay,			_"Change Display",_"Display (:1 or host:0 for example)",qr/:\d/],
 	GoToCurrentSong => [\&Layout::GoToCurrentSong,		_"Select current song"],
 	DeleteSelected	=> [sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; DeleteFiles(\@IDs); },		_"Delete Selected Songs"],
@@ -1949,14 +1949,24 @@ sub Post_ReadSavedTags
 }
 
 sub SaveTags	#save tags _and_ settings
-{	HasChanged('Save');
+{	my $fork=shift; #if true, save in a forked process
+	HasChanged('Save');
 	if ($CmdLine{demo}) { warn "-demo option => not saving tags/settings\n"; return }
-	warn "Writing tags in $SaveFile ...\n";
-	setlocale(LC_NUMERIC, 'C');
 	my $savedir=$SaveFile;
 	$savedir=~s/([^$QSLASH]+)$//o;
 	my $savefilename=$1;
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
+	opendir my($dh),$savedir;
+	unlink $savedir.SLASH.$_ for grep m/^\Q$savefilename\E\.new\.\d+$/, readdir $dh; #delete old temporary save files
+	closedir $dh;
+	warn "Writing tags in $SaveFile ...\n";
+	if ($fork)
+	{	my $pid= fork;
+		if (!defined $pid) { $fork=undef; } # error, fallback to saving in current process
+		elsif ($pid) {return}
+	}
+
+	setlocale(LC_NUMERIC, 'C');
 	$Options{Lock}= $TogLock || '';
 	$Options{SavedSongID}= SongArray->new([$SongID]) if $Options{RememberPlaySong} && defined $SongID;
 	$Options{QueueAction}= $QActions{$QueueAction}{save} ? $QueueAction : '';
@@ -1978,7 +1988,8 @@ sub SaveTags	#save tags _and_ settings
 	}
 
 	my $error;
-	open my($fh),'>:utf8',$SaveFile.'.new' or warn "Error opening '$SaveFile.new' for writing : $!";
+	my $tempfile= "$SaveFile.new.$$";
+	open my($fh),'>:utf8',$tempfile or warn "Error opening '$tempfile' for writing : $!";
 	print $fh "# gmbrc version=".VERSION." time=".time."\n"  or $error||=$!;
 
 	my $optionslines=SaveRefToLines(\%Options);
@@ -2008,10 +2019,12 @@ sub SaveTags	#save tags _and_ settings
 	close $fh  or $error||=$!;
 	setlocale(LC_NUMERIC, '');
 	if ($error)
-	{	rename $SaveFile.'.new',$SaveFile.'.error';
+	{	rename $tempfile,$SaveFile.'.error';
 		warn "Writing tags in $SaveFile ... error : $error\n";
+		POSIX::_exit(1) if $fork;
 		return;
 	}
+	if ($fork && !-e $tempfile) { POSIX::_exit(0); } #tempfile disappeared, probably deleted by a subsequent save from another process => ignore
 	if (-e $SaveFile) #keep some old files as backup
 	{	{	last unless -e $SaveFile.'.bak';
 			last unless (open my $file,'<',$SaveFile.'.bak');
@@ -2027,10 +2040,11 @@ sub SaveTags	#save tags _and_ settings
 			splice @files,-5;	#keep the 5 newest versions
 			unlink $_ for @files;
 		}
-		rename $SaveFile,$SaveFile.'.bak';
+		rename $SaveFile,$SaveFile.'.bak'  or warn $!;
 	}
-	rename $SaveFile.'.new',$SaveFile;
+	rename $tempfile,$SaveFile  or warn $!;
 	warn "Writing tags in $SaveFile ... done\n";
+	POSIX::_exit(0) if $fork;
 }
 
 sub ReadRefFromLines	# convert a string written by SaveRefToLines to a hash/array # can only read a small subset of YAML
