@@ -495,20 +495,26 @@ sub loaded
 	my $iter=$buffer->get_start_iter;
 
 	my $fontsize = $self->{fontsize};
+	my $tag_warning = $buffer->create_tag(undef,background=>"#e8c6c6",justification=>'center');
 	my $tag_extra = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'left');
 	my $tag_noresults=$buffer->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
 	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
-	my ($artistinfo_ok,$infoheader);
+	my ($artistinfo_ok,$infoheader,$warning);
 
 	if ($self->{site} eq "biography") {
 		$infoheader = _"Artist Biography";
-		$data =~ m|^.*<url>(.*?)</url>.*<listeners>(.*?)</listeners>.*<playcount>(.*?)</playcount>.*<content><\!\[CDATA\[(.*?)\n.*\]\]></content>|s; # last part of the regexp removes the license-notice (=last line)
-		my $url = $1.'/+wiki/edit';
+		$data =~ m|^.*<name>(.*?)</name>.*<url>(.*?)</url>.*<listeners>(.*?)</listeners>.*<playcount>(.*?)</playcount>.*<content><\!\[CDATA\[(.*?)\n.*\]\]></content>|s; # last part of the regexp removes the license-notice (=last line)
+		my $lfm_artist = $1;
+		my $aID = Songs::Get_gid($::SongID,'artist');
+		my $local_artist = Songs::Gid_to_Get("artist",$aID);
+		if ($lfm_artist ne $local_artist) { $warning = "Redirected to: ".$lfm_artist."\n"; }
+		else { $warning = ""; }
+		my $url = $2.'/+wiki/edit';
 		my $href = $buffer->create_tag(undef,justification=>'left',foreground=>"#4ba3d2",underline=>'single');
 		$href->{url}=$url;
-		my $listeners = $2;
-		my $playcount = $3;
-		$data = $4;
+		my $listeners = $3;
+		my $playcount = $4;
+		$data = $5;
 		for ($data) {
 			s/<br \/>|<\/p>/\n/gi; # never more than one empty line
 			s/\n\n/\n/gi; # never more than one empty line (again)
@@ -521,6 +527,7 @@ sub loaded
 			$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 		} # fallback text if artist-info not found
 		else {	$artistinfo_ok = "1";
+			$buffer->insert_with_tags($iter,$warning,$tag_warning);
 			$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 			$buffer->insert($iter,$data);
 			$buffer->insert_with_tags($iter,"\n\n"._"Edit in the last.fm wiki",$href);
@@ -638,6 +645,7 @@ sub QAutofillSimilarArtists
 	return if $::Options{MaxAutoFill}<=@$::Queue;
 
 	my $aID = Songs::Get_gid($::SongID,'artist');
+	warn " * Master Artist: " . Songs::Gid_to_Get("artist",$aID) ."\n";
 	my $url = GetUrl($sites{similar}[0],$aID);
 	
 	$waiting = Simple_http::get_with_cb(url => $url, cb => sub {
