@@ -6582,7 +6582,10 @@ sub SaveList
 {	my ($name,$val,$newname)=@_;
 	my $saved=$Options{SavedLists};
 	if (defined $newname)	{$saved->{$newname}=delete $saved->{$name}; HasChanged('SavedLists',$name,'renamedto',$newname); $name=$newname; }
-	elsif (defined $val)	{$saved->{$name}= SongArray->new($val);}
+	elsif (defined $val)
+	{	if (my $songarray= $saved->{$name})	{ $songarray->Replace($val); return }
+		else					{ $saved->{$name}= SongArray->new($val); }
+	}
 	else			{delete $saved->{$name}; HasChanged('SavedLists',$name,'remove'); return}
 	HasChanged('SavedLists',$name);
 }
