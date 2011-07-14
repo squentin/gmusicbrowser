@@ -67,6 +67,7 @@ my @similarity=
 			SimilarLimit	=> 15,
 			SimilarRating	=> 50,
 			SimilarLocal	=> 0,
+			SimilarExcludeSeed => 0,
 			Eventformat	=> '%title at %name<br>%startDate<br>%city (%country)<br><br>',
 			Eventformat_history => ['%title<br>%startDate<br><br>','%title on %startDate<br><br>'],
 );
@@ -262,6 +263,7 @@ sub prefbox
 	my $similar_limit=::NewPrefSpinButton(OPT.'SimilarLimit',0,500, step=>1, page=>10, text1=>_"Limit similar artists to the first : ", tip=>_"0 means 'show all'");
 	my $similar_rating=::NewPrefSpinButton(OPT.'SimilarRating',0,100, step=>1, text1=>_"Limit similar artists to a rate of similarity : ", tip=>_"last.fm's similarity categories:\n>90 super\n>70 very high\n>50 high\n>30 medium\n>10 lower");
 	my $similar_local=::NewPrefCheckButton(OPT.'SimilarLocal' => _"Only show similar artists from local library", tip=>_"applied on reload");
+	my $similar_exclude_seed=::NewPrefCheckButton(OPT.'SimilarExcludeSeed' => _"Exclude 'seed'-artist from queue", tip=>_"The artists similar to the 'seed'-artist will be used to populate the queue, but you can decide to exclude the 'seed'-artist him/herself.");
 	my $lastfm=::NewIconButton('plugin-artistinfo-lastfm',undef,sub { ::main::openurl("http://www.last.fm/music/"); },'none',_"Open last.fm website in your browser");
 	my $titlebox=Gtk2::HBox->new(0,0);
 	$titlebox->pack_start($picsize,1,1,0);
@@ -271,7 +273,7 @@ sub prefbox
 	my $frame_events=Gtk2::Frame->new(_"Events");
 	$frame_events->add(::Hpack($eventformat,$eventformat_reset));
 	my $frame_similar=Gtk2::Frame->new(_"Similar Artists");
-	$frame_similar->add(::Vpack($similar_limit,$similar_rating,$similar_local));
+	$frame_similar->add(::Vpack($similar_limit,$similar_rating,$similar_local,$similar_exclude_seed));
 	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$frame_bio,$frame_events,$frame_similar;
 	return $vbox;
 }
@@ -495,7 +497,7 @@ sub loaded
 	my $iter=$buffer->get_start_iter;
 
 	my $fontsize = $self->{fontsize};
-	my $tag_warning = $buffer->create_tag(undef,background=>"#e8c6c6",justification=>'center');
+	my $tag_warning = $buffer->create_tag(undef,foreground=>"#bf6161",justification=>'center',underline=>'single');
 	my $tag_extra = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'left');
 	my $tag_noresults=$buffer->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
 	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
@@ -665,7 +667,7 @@ sub QAutofillSimilarArtists
 			
 		}
 		
-		push (@artist_gids, Songs::Get_gid($::SongID,'artist')); # add currently playing artist as well
+		push (@artist_gids, Songs::Get_gid($::SongID,'artist')) unless $::Options{OPT.'SimilarExcludeSeed'}; # add currently playing artist as well
 		
 		my $filter= Filter->newadd(0, map Songs::MakeFilterFromGID("artist",$_), @artist_gids );
 		my $random= Random->new('random:',$filter->filter);
