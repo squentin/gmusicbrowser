@@ -49,6 +49,10 @@ my %menuitem=
 	test => sub {$_[0]{mainfield} eq 'artist'},	#the menu item is displayed if returns true
 );
 
+my %queuemode=
+(	order=>10, icon=>'gtk-refresh',	short=> _"similar-artists",		long=> _"Auto-fill queue with similar artists (from last.fm)",	changed=>\&QAutofillSimilarArtists,	keep=>1,save=>1,
+);
+
 =dop
 my @similarity=
 (	['super',	'0.9',	'#ff0101'],
@@ -87,12 +91,14 @@ my $handle={}; my $waiting;
 sub Start {
 	Layout::RegisterWidget(PluginArtistinfo => $artistinfowidget);
 	push @::cMenuAA,\%menuitem;
+	$::QActions{'autofill-similar-artists'} = \%queuemode; ::Update_QueueActionList();
 	::Watch($handle, $_, sub { if ($::QueueAction eq 'autofill-similar-artists'){ ::IdleDo('1_QAutofillSimilarArtists',10,\&QAutofillSimilarArtists); } } ) for qw/Queue QueueAction/;
 }
 sub Stop {
 	Layout::RegisterWidget(PluginArtistinfo => undef);
 	@::cMenuAA=  grep $_!=\%menuitem, @::SongCMenu;
-	UnWatch($handle,$_) for qw/Queue QueueAction/;
+	delete $::QActions{'autofill-similar-artists'}; ::Update_QueueActionList();
+	::UnWatch($handle,$_) for qw/Queue QueueAction/;
 }
 
 sub new
