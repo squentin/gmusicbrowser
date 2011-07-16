@@ -28,9 +28,9 @@ use constant
 
 my %sites =
 (
-	biography => ['http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',_"biography",_"Show artist's biography"],
-	events => ['http://ws.audioscrobbler.com/2.0/?method=artist.getevents&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',_"events",_"Show artist's upcoming events"],
-	similar => ['http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1&limit=%l',_"similar",_"Show similar artists"]);
+	biography => ['http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',_"Biography",_"Show artist's biography"],
+	events => ['http://ws.audioscrobbler.com/2.0/?method=artist.getevents&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1',_"Events",_"Show artist's upcoming events"],
+	similar => ['http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=%a&api_key=7aa688c2466dc17263847da16f297835&autocorrect=1&limit=%l',_"Similar",_"Show similar artists"]);
 
 my @External=
 (	['lastfm',	"http://www.last.fm/music/%a",								_"Show Artist page on last.fm"],
@@ -57,6 +57,7 @@ my @similarity=
 	['medium',	'0.3',	'#453e45'],
 	['lower',	'0.1',	'#9a9a9a'],
 );
+
 =cut
 # lastfm api key 7aa688c2466dc17263847da16f297835
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
@@ -66,6 +67,7 @@ my @similarity=
 			SimilarLimit	=> 15,
 			SimilarRating	=> 50,
 			SimilarLocal	=> 0,
+			SimilarExcludeSeed => 0,
 			Eventformat	=> '%title at %name<br>%startDate<br>%city (%country)<br><br>',
 			Eventformat_history => ['%title<br>%startDate<br><br>','%title on %startDate<br><br>'],
 );
@@ -80,13 +82,17 @@ my $artistinfowidget=
 	autoadd_type	=> 'context page text',
 };
 
+my $handle={}; my $waiting;
+
 sub Start {
 	Layout::RegisterWidget(PluginArtistinfo => $artistinfowidget);
 	push @::cMenuAA,\%menuitem;
+	::Watch($handle, $_, sub { if ($::QueueAction eq 'autofill-similar-artists'){ ::IdleDo('1_QAutofillSimilarArtists',10,\&QAutofillSimilarArtists); } } ) for qw/Queue QueueAction/;
 }
 sub Stop {
 	Layout::RegisterWidget(PluginArtistinfo => undef);
 	@::cMenuAA=  grep $_!=\%menuitem, @::SongCMenu;
+	UnWatch($handle,$_) for qw/Queue QueueAction/;
 }
 
 sub new
@@ -98,7 +104,6 @@ sub new
 	my $fontsize=$self->style->font_desc;
 	$self->{fontsize} = $fontsize->get_size / Gtk2::Pango->scale;
 	$self->{artist_esc} = "";
-
 	my $statbox=Gtk2::VBox->new(0,0);
 	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,maxsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0});
 	for my $name (qw/Ltitle Lstats/)
@@ -116,7 +121,7 @@ sub new
 	$stateventbox->signal_connect(button_press_event => sub {my ($stateventbox, $event) = @_; return 0 unless $event->button == 3; my $ID=::GetSelID($stateventbox); ::ArtistContextMenu( Songs::Get_gid($ID,'artists'),{ ID=>$ID, self=> $stateventbox, mode => 'S'}) if defined $ID; return 1; } ); # FIXME: do a proper cm
 
 	my $artistbox = Gtk2::HBox->new(0,0);
-	$artistbox->pack_start($artistpic,1,1,0);
+	$artistbox->pack_start($artistpic,0,1,0);
 	$artistbox->pack_start($stateventbox,1,1,0);
 
 	my $textview=Gtk2::TextView->new;
@@ -137,12 +142,14 @@ sub new
 	my $tc_artist=Gtk2::TreeViewColumn->new_with_attributes( _"Artist",Gtk2::CellRendererText->new,markup=>0);
 	$tc_artist->set_sort_column_id(0);
 	$tc_artist->set_expand(1);
+	$tc_artist->set_resizable(1);
 	$treeview->append_column($tc_artist);
 	my $renderer=Gtk2::CellRendererText->new;
 	my $tc_similar=Gtk2::TreeViewColumn->new_with_attributes( "%",$renderer,text => 1);
 	$tc_similar->set_cell_data_func($renderer, sub { my ($column, $cell, $model, $iter, $func_data) = @_; my $rating = $model->get($iter, 1); $cell->set( text => sprintf '%.1f', $rating ); }, undef); # limit similarity rating to one decimal
 	$tc_similar->set_sort_column_id(1);
 	$tc_similar->set_alignment(1.0);
+	$tc_similar->set_min_width(10);
 	$treeview->append_column($tc_similar);
 	$treeview->set_rules_hint(1);
 	$treeview->signal_connect(button_press_event => \&tv_contextmenu);
@@ -258,16 +265,17 @@ sub prefbox
 	my $similar_limit=::NewPrefSpinButton(OPT.'SimilarLimit',0,500, step=>1, page=>10, text1=>_"Limit similar artists to the first : ", tip=>_"0 means 'show all'");
 	my $similar_rating=::NewPrefSpinButton(OPT.'SimilarRating',0,100, step=>1, text1=>_"Limit similar artists to a rate of similarity : ", tip=>_"last.fm's similarity categories:\n>90 super\n>70 very high\n>50 high\n>30 medium\n>10 lower");
 	my $similar_local=::NewPrefCheckButton(OPT.'SimilarLocal' => _"Only show similar artists from local library", tip=>_"applied on reload");
+	my $similar_exclude_seed=::NewPrefCheckButton(OPT.'SimilarExcludeSeed' => _"Exclude 'seed'-artist from queue", tip=>_"The artists similar to the 'seed'-artist will be used to populate the queue, but you can decide to exclude the 'seed'-artist him/herself.");
 	my $lastfm=::NewIconButton('plugin-artistinfo-lastfm',undef,sub { ::main::openurl("http://www.last.fm/music/"); },'none',_"Open last.fm website in your browser");
 	my $titlebox=Gtk2::HBox->new(0,0);
 	$titlebox->pack_start($picsize,1,1,0);
 	$titlebox->pack_start($lastfm,0,0,5);
-	my $frame_bio=Gtk2::Frame->new(_"biography");
+	my $frame_bio=Gtk2::Frame->new(_"Biography");
 	$frame_bio->add(::Vpack($entry,$preview,$autosave));
-	my $frame_events=Gtk2::Frame->new(_"events");
+	my $frame_events=Gtk2::Frame->new(_"Events");
 	$frame_events->add(::Hpack($eventformat,$eventformat_reset));
-	my $frame_similar=Gtk2::Frame->new(_"similar artists");
-	$frame_similar->add(::Vpack($similar_limit,$similar_rating,$similar_local));
+	my $frame_similar=Gtk2::Frame->new(_"Similar Artists");
+	$frame_similar->add(::Vpack($similar_limit,$similar_rating,$similar_local,$similar_exclude_seed));
 	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$frame_bio,$frame_events,$frame_similar;
 	return $vbox;
 }
@@ -362,6 +370,7 @@ sub apiczoom {
 		$item->add($label);
 		$item->show_all;
 		$menu->append($apic);
+		$menu->append($item);
 		$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
 		return 1;
 	}
@@ -434,10 +443,9 @@ sub ArtistChanged
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($aID,"<big><b>%a</b></big>","artist",1) );
 	$self->{Lstats}->set_markup( AA::ReplaceFields($aID,'%X « %s'."\n<small>%y</small>","artist",1) );
 	for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
-	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
-	my $url= $sites{$self->{site}}[SITEURL];
-	$url=~s/%a/$artist/;
-	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/;
+	
+	my $url = GetUrl($sites{$self->{site}}[SITEURL],$aID);
+	
 	if (!$self->{url} or $url ne $self->{url} or $force == 1) {
 		$self->{url} = $url;
 		if ($self->{site} eq "biography") { # check for local biography file before loading the page
@@ -452,6 +460,14 @@ sub ArtistChanged
 		}
 		::IdleDo('8_artistinfo'.$self,1000,\&load_url,$self,$url);
 	}
+}
+
+sub GetUrl
+{	my ($url,$aID) = @_;
+	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
+	$url=~s/%a/$artist/;
+	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/;
+	return $url;
 }
 
 sub load_url
@@ -482,20 +498,26 @@ sub loaded
 	my $iter=$buffer->get_start_iter;
 
 	my $fontsize = $self->{fontsize};
+	my $tag_warning = $buffer->create_tag(undef,foreground=>"#bf6161",justification=>'center',underline=>'single');
 	my $tag_extra = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'left');
 	my $tag_noresults=$buffer->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
 	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
-	my ($artistinfo_ok,$infoheader);
+	my ($artistinfo_ok,$infoheader,$warning);
 
 	if ($self->{site} eq "biography") {
 		$infoheader = _"Artist Biography";
-		$data =~ m|^.*<url>(.*?)</url>.*<listeners>(.*?)</listeners>.*<playcount>(.*?)</playcount>.*<content><\!\[CDATA\[(.*?)\n.*\]\]></content>|s; # last part of the regexp removes the license-notice (=last line)
-		my $url = $1.'/+wiki/edit';
+		$data =~ m|^.*<name>(.*?)</name>.*<url>(.*?)</url>.*<listeners>(.*?)</listeners>.*<playcount>(.*?)</playcount>.*<content><\!\[CDATA\[(.*?)\n.*\]\]></content>|s; # last part of the regexp removes the license-notice (=last line)
+		my $lfm_artist = $1;
+		my $aID = Songs::Get_gid($::SongID,'artist');
+		my $local_artist = Songs::Gid_to_Get("artist",$aID);
+		if ($lfm_artist ne $local_artist) { $warning = "Redirected to: ".$lfm_artist."\n"; }
+		else { $warning = ""; }
+		my $url = $2.'/+wiki/edit';
 		my $href = $buffer->create_tag(undef,justification=>'left',foreground=>"#4ba3d2",underline=>'single');
 		$href->{url}=$url;
-		my $listeners = $2;
-		my $playcount = $3;
-		$data = $4;
+		my $listeners = $3;
+		my $playcount = $4;
+		$data = $5;
 		for ($data) {
 			s/<br \/>|<\/p>/\n/gi; # never more than one empty line
 			s/\n\n/\n/gi; # never more than one empty line (again)
@@ -508,6 +530,7 @@ sub loaded
 			$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 		} # fallback text if artist-info not found
 		else {	$artistinfo_ok = "1";
+			$buffer->insert_with_tags($iter,$warning,$tag_warning);
 			$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 			$buffer->insert($iter,$data);
 			$buffer->insert_with_tags($iter,"\n\n"._"Edit in the last.fm wiki",$href);
@@ -617,6 +640,44 @@ sub Save_text
 		warn "Saved artistbio in ".$path.$file."\n" if $::debug;
 	}
 	else {::ErrorMessage(::__x(_("Error saving artistbio in '{file}' :\n{error}"), file => $file, error => $!),$win);}
+}
+
+sub QAutofillSimilarArtists
+{	return unless $::QueueAction eq 'autofill-similar-artists';
+	return if $waiting;
+	return if $::Options{MaxAutoFill}<=@$::Queue;
+
+	my $aID = Songs::Get_gid($::SongID,'artist');
+	warn " * Master Artist: " . Songs::Gid_to_Get("artist",$aID) ."\n";
+	my $url = GetUrl($sites{similar}[0],$aID);
+	
+	$waiting = Simple_http::get_with_cb(url => $url, cb => sub {
+		my $data =$_[0];
+		return unless $::QueueAction eq 'autofill-similar-artists'; # re-check queueaction and 
+		my $nb=$::Options{MaxAutoFill}-@$::Queue;
+		return unless $nb>0;
+		my @artist_gids;
+		for my $s_artist (split /<\/artist>/, $data) {
+			my %s_artist;
+			$s_artist{$1} = ::decode_html($2) while $s_artist=~ m#<(\w+)>([^<]*)</\1>#g;
+			next unless $s_artist{name};
+			if ($s_artist{match} >= $::Options{OPT.'SimilarRating'} / 100) {
+				my $aID=Songs::Search_artistid($s_artist{name});
+				push (@artist_gids, $aID) if $aID;
+			}
+			
+		}
+		
+		push (@artist_gids, Songs::Get_gid($::SongID,'artist')) unless $::Options{OPT.'SimilarExcludeSeed'}; # add currently playing artist as well
+		
+		my $filter= Filter->newadd(0, map Songs::MakeFilterFromGID("artist",$_), @artist_gids );
+		my $random= Random->new('random:',$filter->filter);
+		my @IDs=$random->Draw($nb,[@$::Queue,$::SongID]); # add queue and current song to blacklist (won't draw)
+		return unless @IDs;
+		$::Queue->Push(\@IDs);
+		$waiting=undef;
+		} ,
+	);
 }
 
 1
