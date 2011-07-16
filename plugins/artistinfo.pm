@@ -142,12 +142,14 @@ sub new
 	my $tc_artist=Gtk2::TreeViewColumn->new_with_attributes( _"Artist",Gtk2::CellRendererText->new,markup=>0);
 	$tc_artist->set_sort_column_id(0);
 	$tc_artist->set_expand(1);
+	$tc_artist->set_resizable(1);
 	$treeview->append_column($tc_artist);
 	my $renderer=Gtk2::CellRendererText->new;
 	my $tc_similar=Gtk2::TreeViewColumn->new_with_attributes( "%",$renderer,text => 1);
 	$tc_similar->set_cell_data_func($renderer, sub { my ($column, $cell, $model, $iter, $func_data) = @_; my $rating = $model->get($iter, 1); $cell->set( text => sprintf '%.1f', $rating ); }, undef); # limit similarity rating to one decimal
 	$tc_similar->set_sort_column_id(1);
 	$tc_similar->set_alignment(1.0);
+	$tc_similar->set_min_width(10);
 	$treeview->append_column($tc_similar);
 	$treeview->set_rules_hint(1);
 	$treeview->signal_connect(button_press_event => \&tv_contextmenu);
@@ -418,7 +420,6 @@ sub SongChanged
 	my $self=::find_ancestor($widget,__PACKAGE__);
 	my $ID = ::GetSelID($self);
 	$force = 0 unless $force;
-	if ($self->{queue} eq "similar") { return Songs::Get_gid($ID,'artist'); }
 	$self -> ArtistChanged( Songs::Get_gid($ID,'artist'),Songs::Get_gid($ID,'album'),$force);
 }
 
