@@ -2355,7 +2355,7 @@ sub new
 	$self->signal_connect(switch_page => \&SwitchedPage);
 	$self->signal_connect(button_press_event => \&button_press_event_cb);
 	::Watch($self, SavedLists=> \&SavedLists_changed);
-	::Watch($self, Widgets => \&Widgets_changed_cb) if $self->{match};
+	::Watch($self, Widgets => \&Widgets_changed_cb);
 	$self->{groupcount}=0;
 	$self->{SaveOptions}=\&SaveOptions;
 	$self->{widgets}={};
@@ -2605,18 +2605,25 @@ sub make_widget_list
 }
 sub Widgets_changed_cb		#new or removed widgets => check if a widget should be added or removed
 {	my ($self,$changetype,@widgets)=@_;
+	if ($changetype eq 'remove')
+	{	for my $name (@widgets)
+		{	$self->close_tab($_) for grep $name eq $_->{name}, $self->get_children;
+		}
+		return
+	}
+	my $match=$self->{match};
+	return unless $match;
 	@widgets=keys %Layout::Widgets unless @widgets;
 	@widgets=sort grep $Layout::Widgets{$_}{autoadd_type}, @widgets;
-	my $match=$self->{match};
 	for my $name (@widgets)
 	{	my $ref=$Layout::Widgets{$name};
-		my $add= $changetype ne 'remove' ? 1 : 0;
+		my $add;
 		if (my $autoadd= $ref->{autoadd_type})
-		{	next unless $autoadd;
-			#every words in $match must be in $autoadd, except for words starting with - that must not
+		{	#every words in $match must be in $autoadd, except for words starting with - that must not
 			my %h; $h{$_}=1 for split / +/,$autoadd;
 			next if grep !$h{$_}, $match=~m/(?<!-)\b(\w+)\b/g;
 			next if grep  $h{$_}, $match=~m/-(\w+)\b/g;
+			$add=1;
 		}
 		if (my $opt=$ref->{autoadd_option}) { $add=$::Options{$opt} }
 		my @already= grep $name eq $_->{name}, $self->get_children;
@@ -2741,8 +2748,7 @@ sub Widgets_changed_cb		#new or removed widgets => check if a widget should be a
 	{	my $ref=$Layout::Widgets{$name};
 		my $add= $changetype ne 'remove' ? 1 : 0;
 		if (my $autoadd= $ref->{autoadd_type})
-		{	next unless $autoadd;
-			#every words in $match must be in $autoadd, except for words starting with - that must not
+		{	#every words in $match must be in $autoadd, except for words starting with - that must not
 			my %h; $h{$_}=1 for split / +/,$autoadd;
 			next if grep !$h{$_}, $match=~m/(?<!-)\b(\w+)\b/g;
 			next if grep  $h{$_}, $match=~m/-(\w+)\b/g;
