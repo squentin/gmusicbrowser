@@ -233,10 +233,14 @@ sub Play
 		my @elems;
 		$Sink->{EQ}=$useEQ;
 		if ($useEQ)
-		{	my $equalizer=GStreamer::ElementFactory->make('equalizer-10bands' => 'equalizer');
+		{	my $preamp=GStreamer::ElementFactory->make('volume' => 'equalizer-preamp');
+			my $equalizer=GStreamer::ElementFactory->make('equalizer-10bands' => 'equalizer');
 			my @val= split /:/, $::Options{gst_equalizer};
+			::setlocale(::LC_NUMERIC, 'C');
 			$equalizer->set( 'band'.$_ => $val[$_]) for 0..9;
-			push @elems,$equalizer;
+			$preamp->set( volume => $::Options{gst_equalizer_preamp}**3);
+			::setlocale(::LC_NUMERIC, '');
+			push @elems,$preamp,$equalizer;
 		}
 		$Sink->{RG}=$useRG;
 		if ($useRG)
@@ -289,6 +293,12 @@ sub set_file
 	$PlayBin -> set(uri => $f);
 }
 
+sub set_equalizer_preamp
+{	my (undef,$volume)=@_;
+	my $preamp=$PlayBin->get_by_name('equalizer-preamp');
+	$preamp->set( volume => $volume**3) if $preamp;
+	$::Options{gst_equalizer_preamp}=$volume;
+}
 sub set_equalizer
 {	my (undef,$band,$val)=@_;
 	my $equalizer=$PlayBin->get_by_name('equalizer');
@@ -464,8 +474,8 @@ sub RG_PrefBox
 			my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter", cb=>$update, tip=>_"Used for clipping prevention");
 			my $sg1=Gtk2::SizeGroup->new('horizontal');
 			my $sg2=Gtk2::SizeGroup->new('horizontal');
-			my $preamp=	::NewPrefSpinButton('gst_rg_preamp',   -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, text2=> 'dB', sizeg1=>$sg1, sizeg2=>$sg2, text1=>_"pre-amp", tip=>_"Extra gain");
-			my $fallback=	::NewPrefSpinButton('gst_rg_fallback', -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, text2=> 'dB', sizeg1=>$sg1, sizeg2=>$sg2, text1=>_"fallback-gain", tip=>_"Gain for songs missing replaygain tags");
+			my $preamp=	::NewPrefSpinButton('gst_rg_preamp',   -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"pre-amp : %d dB", tip=>_"Extra gain");
+			my $fallback=	::NewPrefSpinButton('gst_rg_fallback', -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"fallback-gain : %d dB", tip=>_"Gain for songs missing replaygain tags");
 			$RG_dialog->vbox->pack_start($_,0,0,2) for $albummode,$preamp,$fallback,$nolimiter,$songmenu;
 			$RG_dialog->show_all;
 

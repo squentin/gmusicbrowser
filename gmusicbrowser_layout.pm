@@ -661,9 +661,11 @@ our %Widgets=
 		vertical=>1,
 	},
 	Equalizer =>
-	{	New => \&Layout::Equalizer::new,
-		event => 'Equalizer',
-		update => \&Layout::Equalizer::update,
+	{	New	=> \&Layout::Equalizer::new,
+		event	=> 'Equalizer',
+		update	=> \&Layout::Equalizer::update,
+		preamp	=> 1,
+		labels	=> 'x-small',
 	},
 #	RadioList =>
 #	{	class => 'GMB::RadioList',
@@ -2366,7 +2368,7 @@ sub new
 	$self->signal_connect(switch_page => \&SwitchedPage);
 	$self->signal_connect(button_press_event => \&button_press_event_cb);
 	::Watch($self, SavedLists=> \&SavedLists_changed);
-	::Watch($self, Widgets => \&Widgets_changed_cb) if $self->{match};
+	::Watch($self, Widgets => \&Widgets_changed_cb);
 	$self->{groupcount}=0;
 	$self->{SaveOptions}=\&SaveOptions;
 	$self->{widgets}={};
@@ -2616,18 +2618,25 @@ sub make_widget_list
 }
 sub Widgets_changed_cb		#new or removed widgets => check if a widget should be added or removed
 {	my ($self,$changetype,@widgets)=@_;
+	if ($changetype eq 'remove')
+	{	for my $name (@widgets)
+		{	$self->close_tab($_) for grep $name eq $_->{name}, $self->get_children;
+		}
+		return
+	}
+	my $match=$self->{match};
+	return unless $match;
 	@widgets=keys %Layout::Widgets unless @widgets;
 	@widgets=sort grep $Layout::Widgets{$_}{autoadd_type}, @widgets;
-	my $match=$self->{match};
 	for my $name (@widgets)
 	{	my $ref=$Layout::Widgets{$name};
-		my $add= $changetype ne 'remove' ? 1 : 0;
+		my $add;
 		if (my $autoadd= $ref->{autoadd_type})
-		{	next unless $autoadd;
-			#every words in $match must be in $autoadd, except for words starting with - that must not
+		{	#every words in $match must be in $autoadd, except for words starting with - that must not
 			my %h; $h{$_}=1 for split / +/,$autoadd;
 			next if grep !$h{$_}, $match=~m/(?<!-)\b(\w+)\b/g;
 			next if grep  $h{$_}, $match=~m/-(\w+)\b/g;
+			$add=1;
 		}
 		if (my $opt=$ref->{autoadd_option}) { $add=$::Options{$opt} }
 		my @already= grep $name eq $_->{name}, $self->get_children;
@@ -2752,8 +2761,7 @@ sub Widgets_changed_cb		#new or removed widgets => check if a widget should be a
 	{	my $ref=$Layout::Widgets{$name};
 		my $add= $changetype ne 'remove' ? 1 : 0;
 		if (my $autoadd= $ref->{autoadd_type})
-		{	next unless $autoadd;
-			#every words in $match must be in $autoadd, except for words starting with - that must not
+		{	#every words in $match must be in $autoadd, except for words starting with - that must not
 			my %h; $h{$_}=1 for split / +/,$autoadd;
 			next if grep !$h{$_}, $match=~m/(?<!-)\b(\w+)\b/g;
 			next if grep  $h{$_}, $match=~m/-(\w+)\b/g;
@@ -4023,6 +4031,31 @@ package Layout::Equalizer;
 sub new
 {	my $opt=$_[0];
 	my $self=Gtk2::HBox->new(1,0); #homogenous
+	$self->{labels}= $opt->{labels};
+	$self->{labels}=undef if $self->{labels} eq 'none';
+	if ($opt->{preamp})
+	{	my $adj=Gtk2::Adjustment->new(1, 0, 2, .05, .1,0);
+		my $scale=Gtk2::VScale->new($adj);
+		$scale->set_draw_value(0);
+		$scale->set_inverted(1);
+		$scale->add_mark(1,'left',undef);
+		$self->{adj_preamp}=$adj;
+		$adj->signal_connect(value_changed =>
+			sub { $::Play_package->set_equalizer_preamp($_[0]->get_value) unless $_[0]{busy}; ::HasChanged('Equalizer','preamp') });
+		if ($self->{labels})
+		{	my $vbox=Gtk2::VBox->new;
+			my $label0=Gtk2::Label->new;
+			$vbox->pack_start($label0,0,0,0);
+			$self->{Valuelabel_preamp}=$label0;
+			$vbox->add($scale);
+			my $label1=Gtk2::Label->new;
+			$label1->set_markup_with_format(qq(<span size="%s">%s</span>), $self->{labels},_"pre-amp");
+			$vbox->pack_start($label1,0,0,0);
+			$scale=$vbox;
+		}
+		$self->pack_start($scale,1,1,2);
+		$self->pack_start(Gtk2::HBox->new(0,0),1,1,2); #empty space
+	}
 	for my $i (0..9)
 	{	my $adj=Gtk2::Adjustment->new(0, -1, 1, .05, .1,0);
 		my $scale=Gtk2::VScale->new($adj);
@@ -4032,8 +4065,6 @@ sub new
 		$self->{'adj'.$i}=$adj;
 		$adj->signal_connect(value_changed =>
 		sub { $::Play_package->set_equalizer($_[1],$_[0]->get_value) unless $_[0]{busy}; ::HasChanged('Equalizer','value') },$i);
-		$self->{labels}= $opt->{labels} || 'x-small';
-		$self->{labels}=undef if $self->{labels} eq 'none';
 		if ($self->{labels})
 		{	my $vbox=Gtk2::VBox->new;
 			my $label0=Gtk2::Label->new;
@@ -4084,6 +4115,13 @@ sub update
 		delete $adj->{busy};
 		next unless $self->{labels};
 		$self->{'Valuelabel'.$i}->set_markup_with_format(qq(<span size="%s">%.1f%s</span>), $self->{labels},$val,$self->{unit});
+	}
+	if (my $adj= $self->{adj_preamp})
+	{	my $val= $::Options{gst_equalizer_preamp};
+		$adj->{busy}=1;
+		$adj->set_value($val);
+		delete $adj->{busy};
+		$self->{Valuelabel_preamp}->set_markup_with_format(qq(<span size="%s">%d%%</span>), $self->{labels},($val**3)*100) if $self->{Valuelabel_preamp};
 	}
 }
 

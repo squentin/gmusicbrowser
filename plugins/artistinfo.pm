@@ -253,7 +253,7 @@ sub prefbox
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>50);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
-	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text1=>_"Artist Picture Size : ", text2=>_"(applied after restart)");
+	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text =>_("Artist Picture Size : %d")._"(applied after restart)");
 	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", width=>80, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'", history=>OPT.'Eventformat_history');
 	my $eventformat_reset=Gtk2::Button->new(_"reset format");
 	$eventformat_reset->{format_combo}=$eventformat;
@@ -431,7 +431,6 @@ sub ArtistChanged
 	return unless defined $aID;
 	$self->cancel;
 	my $rating = AA::Get("rating:average",'artist',$aID);
-	#my $albumID = Songs::Get_gid($aID,'album');
 	$self->{artistratingvalue}= int($rating+0.5);
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
 	$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);

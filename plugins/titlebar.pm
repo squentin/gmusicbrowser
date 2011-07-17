@@ -49,8 +49,8 @@ sub prefbox
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
 	my $layout=::NewPrefLayoutCombo(OPT.'layout'=> 'O', _"Overlay layout :", $sg1,$sg2, \&init);
 	my $refpoint=::NewPrefCombo(OPT.'refpoint'=> \%refpoints, cb=> \&move, text =>_"Reference point :", sizeg1=>$sg1,sizeg2=>$sg2);
-	my $offx=::NewPrefSpinButton(OPT.'offx', -999,999, cb=>\&move, step=>1, page=>5, text1=>_"x offset :", sizeg1=>$sg1);
-	my $offy=::NewPrefSpinButton(OPT.'offy', -999,999, cb=>\&move, step=>1, page=>5, text1=>_"y offset :", sizeg1=>$sg1);
+	my $offx=::NewPrefSpinButton(OPT.'offx', -999,999, cb=>\&move, step=>1, page=>5, text=>_"x offset :", sizeg1=>$sg1);
+	my $offy=::NewPrefSpinButton(OPT.'offy', -999,999, cb=>\&move, step=>1, page=>5, text=>_"y offset :", sizeg1=>$sg1);
 	my $notdialog=::NewPrefCheckButton(OPT.'notdialog',_"Don't add the overlay to dialogs", cb=>\&init);
 
 	my $textcolor= Gtk2::ColorButton->new_with_color( Gtk2::Gdk::Color->parse($::Options{OPT.'textcolor'}) );

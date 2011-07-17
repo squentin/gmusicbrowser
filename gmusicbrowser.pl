@@ -833,6 +833,7 @@ our %Options=
 #	gst_sink	=> 'alsa',
 	gst_use_equalizer=>0,
 	gst_equalizer	=> '0:0:0:0:0:0:0:0:0:0',
+	gst_equalizer_preamp => 1,
 	gst_rg_limiter	=> 1,
 	gst_rg_preamp	=> 6,
 	gst_rg_fallback	=> 0,
@@ -1069,7 +1070,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	Show		=> [sub {ShowHide(1);},			_"Show"],
 	Hide		=> [sub {ShowHide(0);},			_"Hide"],
 	Quit		=> [\&Quit,				_"Quit"],
-	Save		=> [\&SaveTags,				_"Save Tags/Options"],
+	Save		=> [sub {SaveTags(1)},			_"Save Tags/Options"],
 	ChangeDisplay	=> [\&ChangeDisplay,			_"Change Display",_"Display (:1 or host:0 for example)",qr/:\d/],
 	GoToCurrentSong => [\&Layout::GoToCurrentSong,		_"Select current song"],
 	DeleteSelected	=> [sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; DeleteFiles(\@IDs); },		_"Delete Selected Songs"],
@@ -1949,14 +1950,24 @@ sub Post_ReadSavedTags
 }
 
 sub SaveTags	#save tags _and_ settings
-{	HasChanged('Save');
+{	my $fork=shift; #if true, save in a forked process
+	HasChanged('Save');
 	if ($CmdLine{demo}) { warn "-demo option => not saving tags/settings\n"; return }
-	warn "Writing tags in $SaveFile ...\n";
-	setlocale(LC_NUMERIC, 'C');
 	my $savedir=$SaveFile;
 	$savedir=~s/([^$QSLASH]+)$//o;
 	my $savefilename=$1;
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
+	opendir my($dh),$savedir;
+	unlink $savedir.SLASH.$_ for grep m/^\Q$savefilename\E\.new\.\d+$/, readdir $dh; #delete old temporary save files
+	closedir $dh;
+	warn "Writing tags in $SaveFile ...\n";
+	if ($fork)
+	{	my $pid= fork;
+		if (!defined $pid) { $fork=undef; } # error, fallback to saving in current process
+		elsif ($pid) {return}
+	}
+
+	setlocale(LC_NUMERIC, 'C');
 	$Options{Lock}= $TogLock || '';
 	$Options{SavedSongID}= SongArray->new([$SongID]) if $Options{RememberPlaySong} && defined $SongID;
 	$Options{QueueAction}= $QActions{$QueueAction}{save} ? $QueueAction : '';
@@ -1978,7 +1989,8 @@ sub SaveTags	#save tags _and_ settings
 	}
 
 	my $error;
-	open my($fh),'>:utf8',$SaveFile.'.new' or warn "Error opening '$SaveFile.new' for writing : $!";
+	my $tempfile= "$SaveFile.new.$$";
+	open my($fh),'>:utf8',$tempfile or warn "Error opening '$tempfile' for writing : $!";
 	print $fh "# gmbrc version=".VERSION." time=".time."\n"  or $error||=$!;
 
 	my $optionslines=SaveRefToLines(\%Options);
@@ -2008,10 +2020,12 @@ sub SaveTags	#save tags _and_ settings
 	close $fh  or $error||=$!;
 	setlocale(LC_NUMERIC, '');
 	if ($error)
-	{	rename $SaveFile.'.new',$SaveFile.'.error';
+	{	rename $tempfile,$SaveFile.'.error';
 		warn "Writing tags in $SaveFile ... error : $error\n";
+		POSIX::_exit(1) if $fork;
 		return;
 	}
+	if ($fork && !-e $tempfile) { POSIX::_exit(0); } #tempfile disappeared, probably deleted by a subsequent save from another process => ignore
 	if (-e $SaveFile) #keep some old files as backup
 	{	{	last unless -e $SaveFile.'.bak';
 			last unless (open my $file,'<',$SaveFile.'.bak');
@@ -2027,10 +2041,11 @@ sub SaveTags	#save tags _and_ settings
 			splice @files,-5;	#keep the 5 newest versions
 			unlink $_ for @files;
 		}
-		rename $SaveFile,$SaveFile.'.bak';
+		rename $SaveFile,$SaveFile.'.bak'  or warn $!;
 	}
-	rename $SaveFile.'.new',$SaveFile;
+	rename $tempfile,$SaveFile  or warn $!;
 	warn "Writing tags in $SaveFile ... done\n";
+	POSIX::_exit(0) if $fork;
 }
 
 sub ReadRefFromLines	# convert a string written by SaveRefToLines to a hash/array # can only read a small subset of YAML
@@ -4665,26 +4680,17 @@ sub DialogSongsProp
 
 	my $edittag=MassTag->new(@IDs);
 	$dialog->vbox->add($edittag);
-	#my $editlabels=EditLabels(@IDs);
-	#my $rating=SongRating(@IDs);
-	#$notebook->append_page( $edittag ,	Gtk2::Label->new(_"Tag"));
-	#$notebook->append_page( $editlabels,	Gtk2::Label->new(_"Labels"));
-	#$notebook->append_page( $rating,	Gtk2::Label->new(_"Rating"));
 
 	SetWSize($dialog,'MassTag');
 	$dialog->show_all;
 
 	$dialog->signal_connect( response => sub
-		{	#warn "MassTagging response : @_\n" if $debug;
-			my ($dialog,$response)=@_;
+		{	my ($dialog,$response)=@_;
 			if ($response eq 'ok')
 			{ $dialog->action_area->set_sensitive(FALSE);
-			  #$editlabels->{save}();
-			  #$rating->{save}($rating);
 			  $edittag->save( sub {$dialog->destroy;} ); #the closure will be called when tagging finished #FIXME not very nice
 			}
 			else { $dialog->destroy; }
-			#delete $Editing{$ID};
 		});
 }
 
@@ -4701,12 +4707,8 @@ sub DialogSongProp
 	$dialog->vbox->add($notebook);
 
 	my $edittag=EditTagSimple->new($dialog,$ID);
-	#my $editlabels=EditLabels($ID);
-	#my $rating=SongRating($ID);
 	my $songinfo=SongInfo($ID);
 	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Tag"));
-	#$notebook->append_page( $editlabels,	Gtk2::Label->new(_"Labels"));
-	#$notebook->append_page( $rating,	Gtk2::Label->new(_"Rating"));
 	$notebook->append_page( $songinfo,	Gtk2::Label->new(_"Info"));
 
 	SetWSize($dialog,'SongInfo');
@@ -4717,9 +4719,7 @@ sub DialogSongProp
 		my ($dialog,$response)=@_;
 		$songinfo->destroy;
 		if ($response eq 'ok')
-		{	#$editlabels->{save}();
-			#$rating->{save}($rating);
-			$edittag->save;
+		{	$edittag->save;
 			IdleCheck($ID);
 		}
 		delete $Editing{$ID};
@@ -4736,19 +4736,30 @@ sub SongInfo
 	 $sw->add_with_viewport($table);
 	$table->{ID}=$ID;
 	my $row=0;
-	my @fields=Songs::InfoFields;
-	for my $col (@fields)
-	{	my $lab1=Gtk2::Label->new;
-		my $lab2=$table->{$col}=Gtk2::Label->new;
-		#$lab1->set_markup_with_format("<b>%s :</b>", Songs::FieldName($col));
-		$lab1->set_text( Songs::FieldName($col).' :');
-		$lab1->set_padding(5,0);
-		$lab1->set_alignment(1,.5);
-		$lab2->set_alignment(0,.5);
-		$lab2->set_line_wrap(1);
-		$lab2->set_selectable(TRUE);
-		$table->attach_defaults($lab1,0,1,$row,$row+1);
-		$table->attach_defaults($lab2,1,2,$row,$row+1);
+	my @fields;
+	my $treelist=Songs::InfoFields;
+	while (@$treelist)
+	{	my ($cat,$fields)= splice @$treelist,0,2;
+		#category
+		my $label=Gtk2::Label->new($cat);
+		$table->attach($label,0,1,$row,$row+@$fields,'fill','shrink',1,1);
+		#fields
+		push @fields, @$fields;
+		for my $field (@$fields)
+		{	my $lab1=Gtk2::Label->new;
+			my $lab2=$table->{$field}=Gtk2::Label->new;
+			#$lab1->set_markup_with_format("<b>%s :</b>", Songs::FieldName($fieldl));
+			$lab1->set_markup_with_format("<small>%s</small>", Songs::FieldName($field).' :');
+			$lab1->set_padding(5,0);
+			$lab1->set_alignment(1,.5);
+			$lab2->set_alignment(0,.5);
+			$lab2->set_line_wrap(1);
+			$lab2->set_selectable(TRUE);
+			$table->attach($lab1,1,2,$row,$row+1,'fill','shrink',1,1);
+			$table->attach_defaults($lab2,2,3,$row,$row+1);
+			$row++;
+		}
+		$table->attach(Gtk2::HBox->new,0,3,$row,$row+1,[],[],0,5) if @$treelist; #space between categories
 		$row++;
 	}
 	my $fillsub=sub
@@ -4756,7 +4767,7 @@ sub SongInfo
 		my $ID=$table->{ID};
 		return if $IDs && !(grep $_==$ID, @$IDs);
 		#$table->{$_}->set_text(Songs::Display($ID,$_)) for @$fields;
-		$table->{$_}->set_markup('<b>'.Songs::DisplayEsc($ID,$_).'</b>') for grep $table->{$_}, @$fields;
+		$table->{$_}->set_markup('<small><b>'.Songs::DisplayEsc($ID,$_).'</b></small>') for grep $table->{$_}, @$fields;
 	 };
 	Watch($table, SongsChanged=> $fillsub);
 	$fillsub->($table,undef,\@fields);
@@ -5691,7 +5702,7 @@ sub pref_artists_button_cb
 
 sub PrefMisc
 {	#Default rating
-	my $DefRating=NewPrefSpinButton('DefaultRating',0,100, step=>10, page=>20, text1=>_"Default rating :", cb=> sub
+	my $DefRating=NewPrefSpinButton('DefaultRating',0,100, step=>10, page=>20, text=>_"Default rating : %d %", cb=> sub
 		{ IdleDo('0_DefaultRating',500,\&Songs::UpdateDefaultRating);
 		});
 
@@ -5752,14 +5763,14 @@ sub PrefMisc
 	my $datealign=Gtk2::Alignment->new(0,.5,0,0);
 	$datealign->add($datefmt);
 
-	my $volstep= NewPrefSpinButton('VolumeStep',1,100, step=>1, text1=>_"Volume step :", tip=>_"Amount of volume changed by the mouse wheel");
+	my $volstep= NewPrefSpinButton('VolumeStep',1,100, step=>1, text=>_"Volume step :", tip=>_"Amount of volume changed by the mouse wheel");
 	my $always_in_pl=NewPrefCheckButton(AlwaysInPlaylist => _"Current song must always be in the playlist", tip=> _"- When selecting a song, the playlist filter will be reset if the song is not in it\n- Skip to another song when removing the current song from the playlist");
-	my $pixcache= NewPrefSpinButton('PixCacheSize',1,1000, text1=>_"Picture cache :", text2=>_"MB", cb=>\&GMB::Picture::trim);
+	my $pixcache= NewPrefSpinButton('PixCacheSize',1,1000, text=>_"Picture cache : %d MB", cb=>\&GMB::Picture::trim);
 
 	my $recent_include_not_played= NewPrefCheckButton(AddNotPlayedToRecent => _"Recent songs include skipped songs that haven't been played.", tip=> _"When changing songs, the previous song is added to the recent list even if not played at all.");
 
-	my $playedpercent= NewPrefSpinButton('PlayedMinPercent'	,0,100,  text1=>_"Threshold to count a song as played :", text2=>"%");
-	my $playedseconds= NewPrefSpinButton('PlayedMinSeconds'	,0,99999,text1=>_"or", text2=>_"seconds");
+	my $playedpercent= NewPrefSpinButton('PlayedMinPercent'	,0,100,  text=>_"Threshold to count a song as played : %d %");
+	my $playedseconds= NewPrefSpinButton('PlayedMinSeconds'	,0,99999,text=>_"or %d seconds");
 
 	my $vbox= Vpack( $checkR1,$checkR2,$checkR4, $DefRating,$ProxyCheck, [$asplit_label, $asplit],[$atitle_label, $atitle],
 			[0,$datealign,$preview], $screensaver,$shutentry, $always_in_pl,
@@ -5773,11 +5784,11 @@ sub PrefLayouts
 {	my $vbox=Gtk2::VBox->new (FALSE, 2);
 
 	#Tray
-	my $traytiplength=NewPrefSpinButton('TrayTipTimeLength', 0,100000, step=>100, text1=>_"Display tray tip for", text2=>'ms');
+	my $traytiplength=NewPrefSpinButton('TrayTipTimeLength', 0,100000, step=>100, text=>_"Display tray tip for %d ms");
 	my $checkT5=NewPrefCheckButton(StartInTray => _"Start in tray");
 	my $checkT2=NewPrefCheckButton(CloseToTray => _"Close to tray");
 	my $checkT3=NewPrefCheckButton(ShowTipOnSongChange => _"Show tray tip on song change", widget=>$traytiplength);
-	my $checkT4=NewPrefSpinButton('TrayTipDelay', 0,10000, step=>100, text1=> _"Delay before showing tray tip popup on mouse over :", text2=>'ms', cb=>\&SetTrayTipDelay);
+	my $checkT4=NewPrefSpinButton('TrayTipDelay', 0,10000, step=>100, text=> _"Delay before showing tray tip popup on mouse over : %d ms", cb=>\&SetTrayTipDelay);
 	my $checkT1=NewPrefCheckButton( UseTray => _"Show tray icon",
 					cb=> sub { &CreateTrayIcon; },
 					widget=> Vpack($checkT5,$checkT2,$checkT4,$checkT3)
@@ -6405,13 +6416,14 @@ sub NewPrefFileEntry
 }
 sub NewPrefSpinButton
 {	my ($key,$min,$max,%opt)=@_;
-	my ($text1,$text2,$sg1,$sg2,$tip,$sub,$climb_rate,$digits,$stepinc,$pageinc,$wrap)=@opt{qw/text1 text2 sizeg1 sizeg2 tip cb rate digits step page wrap/};
+	my ($text,$text1,$text2,$sg1,$sg2,$tip,$sub,$climb_rate,$digits,$stepinc,$pageinc,$wrap)=@opt{qw/text text1 text2 sizeg1 sizeg2 tip cb rate digits step page wrap/};	#FIXME using text1 and text2 is deprecated and will be removed, use text with %d instead, for example text=>"value : %d seconds"
 	$stepinc||=1;
 	$pageinc||=$stepinc*10;
 	$climb_rate||=1;
 	$digits||=0;
-	$text1=Gtk2::Label->new($text1) if defined $text1;
-	$text2=Gtk2::Label->new($text2) if defined $text2;
+	($text1,$text2)= split /\s*%d\s*/,$text,2 if $text;
+	$text1=Gtk2::Label->new($text1) if defined $text1 && $text1 ne '';
+	$text2=Gtk2::Label->new($text2) if defined $text2 && $text2 ne '';
 	my $adj=Gtk2::Adjustment->new($Options{$key}||=0,$min,$max,$stepinc,$pageinc,0);
 	my $spin=Gtk2::SpinButton->new($adj,$climb_rate,$digits);
 	$spin->set_wrap(1) if $wrap;
@@ -6524,7 +6536,10 @@ sub SaveList
 {	my ($name,$val,$newname)=@_;
 	my $saved=$Options{SavedLists};
 	if (defined $newname)	{$saved->{$newname}=delete $saved->{$name}; HasChanged('SavedLists',$name,'renamedto',$newname); $name=$newname; }
-	elsif (defined $val)	{$saved->{$name}= SongArray->new($val);}
+	elsif (defined $val)
+	{	if (my $songarray= $saved->{$name})	{ $songarray->Replace($val); return }
+		else					{ $saved->{$name}= SongArray->new($val); }
+	}
 	else			{delete $saved->{$name}; HasChanged('SavedLists',$name,'remove'); return}
 	HasChanged('SavedLists',$name);
 }
