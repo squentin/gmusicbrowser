@@ -4722,26 +4722,17 @@ sub DialogSongsProp
 
 	my $edittag=MassTag->new(@IDs);
 	$dialog->vbox->add($edittag);
-	#my $editlabels=EditLabels(@IDs);
-	#my $rating=SongRating(@IDs);
-	#$notebook->append_page( $edittag ,	Gtk2::Label->new(_"Tag"));
-	#$notebook->append_page( $editlabels,	Gtk2::Label->new(_"Labels"));
-	#$notebook->append_page( $rating,	Gtk2::Label->new(_"Rating"));
 
 	SetWSize($dialog,'MassTag');
 	$dialog->show_all;
 
 	$dialog->signal_connect( response => sub
-		{	#warn "MassTagging response : @_\n" if $debug;
-			my ($dialog,$response)=@_;
+		{	my ($dialog,$response)=@_;
 			if ($response eq 'ok')
 			{ $dialog->action_area->set_sensitive(FALSE);
-			  #$editlabels->{save}();
-			  #$rating->{save}($rating);
 			  $edittag->save( sub {$dialog->destroy;} ); #the closure will be called when tagging finished #FIXME not very nice
 			}
 			else { $dialog->destroy; }
-			#delete $Editing{$ID};
 		});
 }
 
@@ -4758,12 +4749,8 @@ sub DialogSongProp
 	$dialog->vbox->add($notebook);
 
 	my $edittag=EditTagSimple->new($dialog,$ID);
-	#my $editlabels=EditLabels($ID);
-	#my $rating=SongRating($ID);
 	my $songinfo=SongInfo($ID);
 	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Tag"));
-	#$notebook->append_page( $editlabels,	Gtk2::Label->new(_"Labels"));
-	#$notebook->append_page( $rating,	Gtk2::Label->new(_"Rating"));
 	$notebook->append_page( $songinfo,	Gtk2::Label->new(_"Info"));
 
 	SetWSize($dialog,'SongInfo');
@@ -4774,9 +4761,7 @@ sub DialogSongProp
 		my ($dialog,$response)=@_;
 		$songinfo->destroy;
 		if ($response eq 'ok')
-		{	#$editlabels->{save}();
-			#$rating->{save}($rating);
-			$edittag->save;
+		{	$edittag->save;
 			IdleCheck($ID);
 		}
 		delete $Editing{$ID};
@@ -4793,19 +4778,30 @@ sub SongInfo
 	 $sw->add_with_viewport($table);
 	$table->{ID}=$ID;
 	my $row=0;
-	my @fields=Songs::InfoFields;
-	for my $col (@fields)
-	{	my $lab1=Gtk2::Label->new;
-		my $lab2=$table->{$col}=Gtk2::Label->new;
-		#$lab1->set_markup_with_format("<b>%s :</b>", Songs::FieldName($col));
-		$lab1->set_text( Songs::FieldName($col).' :');
-		$lab1->set_padding(5,0);
-		$lab1->set_alignment(1,.5);
-		$lab2->set_alignment(0,.5);
-		$lab2->set_line_wrap(1);
-		$lab2->set_selectable(TRUE);
-		$table->attach_defaults($lab1,0,1,$row,$row+1);
-		$table->attach_defaults($lab2,1,2,$row,$row+1);
+	my @fields;
+	my $treelist=Songs::InfoFields;
+	while (@$treelist)
+	{	my ($cat,$fields)= splice @$treelist,0,2;
+		#category
+		my $label=Gtk2::Label->new($cat);
+		$table->attach($label,0,1,$row,$row+@$fields,'fill','shrink',1,1);
+		#fields
+		push @fields, @$fields;
+		for my $field (@$fields)
+		{	my $lab1=Gtk2::Label->new;
+			my $lab2=$table->{$field}=Gtk2::Label->new;
+			#$lab1->set_markup_with_format("<b>%s :</b>", Songs::FieldName($fieldl));
+			$lab1->set_markup_with_format("<small>%s</small>", Songs::FieldName($field).' :');
+			$lab1->set_padding(5,0);
+			$lab1->set_alignment(1,.5);
+			$lab2->set_alignment(0,.5);
+			$lab2->set_line_wrap(1);
+			$lab2->set_selectable(TRUE);
+			$table->attach($lab1,1,2,$row,$row+1,'fill','shrink',1,1);
+			$table->attach_defaults($lab2,2,3,$row,$row+1);
+			$row++;
+		}
+		$table->attach(Gtk2::HBox->new,0,3,$row,$row+1,[],[],0,5) if @$treelist; #space between categories
 		$row++;
 	}
 	my $fillsub=sub
@@ -4813,7 +4809,7 @@ sub SongInfo
 		my $ID=$table->{ID};
 		return if $IDs && !(grep $_==$ID, @$IDs);
 		#$table->{$_}->set_text(Songs::Display($ID,$_)) for @$fields;
-		$table->{$_}->set_markup('<b>'.Songs::DisplayEsc($ID,$_).'</b>') for grep $table->{$_}, @$fields;
+		$table->{$_}->set_markup('<small><b>'.Songs::DisplayEsc($ID,$_).'</b></small>') for grep $table->{$_}, @$fields;
 	 };
 	Watch($table, SongsChanged=> $fillsub);
 	$fillsub->($table,undef,\@fields);

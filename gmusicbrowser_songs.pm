@@ -15,7 +15,7 @@ package Songs;
 our $IDFromFile;
 our ($Artists_split_re,$Artists_title_re);
 my (@Missing,$MissingHash,@MissingKeyFields);
-our (%Def,%Types,%FieldTemplates,@Fields,%GTypes,%HSort);
+our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%GTypes,%HSort);
 my %FuncCache;
 INIT {
 our %timespan_menu=
@@ -24,6 +24,16 @@ our %timespan_menu=
 	day	=> _("day"),
 );
 @MissingKeyFields=qw/size title album artist track/;
+%Categories=
+(	file	=> [_"File properties",10],
+	audio	=> [_"Audio properties",30],
+	basic	=> [_"Basic fields",20],
+	extra	=> [_"Extra fields",50],
+	stats	=> [_"Statistics",40],
+	unknown	=> [_"Other",80],	#fallback category
+	custom	=> [_"Custom",70],
+	replaygain=> [_"Replaygain",60],
+);
 %Types=
 (	generic	=>
 	{	_	=> '____[#ID#]',
@@ -576,6 +586,7 @@ our %timespan_menu=
 (file	=>
  {	name	=> _"Filename",	width => 400, flags => 'fgasc_',	type => 'filename',
 	'stats:filetoid' => '#HVAL#{ #file->get# }=#ID#',
+	category=>'file',
  },
  path	=>
  {	name	=> _"Folder",	width => 200, flags => 'fgasc_',	type => 'filename',
@@ -585,16 +596,19 @@ our %timespan_menu=
 	'filterdesc:-i'	=> _"isn't in %s",
 	'filterpat:filename'	=> [ display => sub { ::filename_to_utf8displayname(::decode_url($_[0])); }, ],
 	can_group=>1,
+	category=>'file',
  },
  modif	=>
  {	name	=> _"Modification",	width => 160,	flags => 'fgarsc_',	type => 'date',
 	FilterList => {type=>'year',},
 	can_group=>1,
+	category=>'file',
  },
  size	=>
  {	name => _"Size",	width => 80,	flags => 'fgarsc_',		#32bits => 4G max
 	type => 'size',
 	FilterList => {type=>'div.1000000',},
+	category=>'file',
  },
  title	=>
  {	name	=> _"Title",	width	=> 270,		flags	=> 'fgarwesci',	type => 'istring',
@@ -605,6 +619,7 @@ our %timespan_menu=
 	'filterdesc:-~'	=> _"Isn't smart equal to %s",
 	makefilter_fromID => '"title:~:" . #get#',
 	edit_order=> 10, letter => 't',
+	category=>'basic',
  },
  artist =>
  {	name => _"Artist",	width => 200,	flags => 'fgarwesci',
@@ -617,6 +632,7 @@ our %timespan_menu=
 	edit_order=> 20,	edit_many=>1,	letter => 'a',
 	can_group=>1,
 	#names => '::__("%d artist","%d artists",#count#);'
+	category=>'basic',
  },
  first_artist =>
  {	flags => 'fg', #CHECKME
@@ -643,6 +659,7 @@ our %timespan_menu=
 	names => '::__("%d album","%d albums",#count#);',
 	edit_order=> 30,	edit_many=>1,	letter => 'l',
 	can_group=>1,
+	category=>'basic',
  },
  album_picture =>
  {	name		=> _"Album picture",
@@ -668,6 +685,7 @@ our %timespan_menu=
 	picture_field => 'artist_picture',
 	edit_order=> 35,	edit_many=>1,
 	#can_group=>1,
+	category=>'basic',
  },
  album_artist =>
  {	name => _"Album artist or artist",width => 200,	flags => 'fgcsi',	type => 'artist',
@@ -677,6 +695,7 @@ our %timespan_menu=
 	can_group=>1,
 	letter => 'A',
 	depend	=> 'album_artist_raw artist album',
+	category=>'basic',
  },
  haspicture =>
  {	name	=> _"Embedded picture", width => 20, flags => 'fgarwsc',	type => 'boolean',
@@ -692,6 +711,7 @@ our %timespan_menu=
  {	name	=> _"Compilation", width => 20, flags => 'fgarwesc',	type => 'boolean',
 	id3v2 => 'TCMP',	vorbis	=> 'compilation',	ape => 'Compilation',	ilst => 'cpil',
 	edit_many=>1,
+	category=>'basic',
  },
  grouping =>
  {	name	=> _"Grouping",	width => 100,	flags => 'fgarwesci',	type => 'fewstring',
@@ -699,6 +719,7 @@ our %timespan_menu=
 	can_group=>1,
 	edit_order=> 55,	edit_many=>1,
 	id3v2 => 'TIT1',	vorbis	=> 'grouping',	ape	=> 'Grouping', ilst => "\xA9grp",
+	category=>'extra',
  },
  year =>
  {	name	=> _"Year",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 16, edit_max=>3000,
@@ -711,12 +732,14 @@ our %timespan_menu=
 	can_group=>1,
 	FilterList => {},
 	autofill_re	=> '[12]\\d{3}',
+	category=>'basic',
  },
  track =>
  {	name	=> _"Track",	width => 40,	flags => 'fgarwesc',
 	id3v1	=> 5,		id3v2	=> 'TRCK',	vorbis	=> 'tracknumber',	ape	=> 'Track', ilst => "trkn",
 	type => 'integer',	displayformat => '%02d', bits => 16, edit_max => 65535,
 	edit_order=> 20,	editwidth => 4,		letter => 'n',
+	category=>'basic',
  },
  disc =>
  {	name	=> _"Disc",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 8, edit_max => 255,
@@ -724,12 +747,14 @@ our %timespan_menu=
 	editwidth => 4,
 	edit_order=> 40,	edit_many=>1,	letter => 'd',
 	can_group=>1,
+	category=>'basic',
  },
  discname =>
  {	name	=> _"Disc name",	width	=> 100,		flags => 'fgarwesci',	type => 'fewstring',
 	id3v2	=> 'TSST',	vorbis	=> 'discsubtitle',	ape => 'DiscSubtitle',	ilst=> '----DISCSUBTITLE',
 	edit_many=>1,
 	disable=>1,	options => 'disable',
+	category=>'extra',
  },
  genre	=>
  {	name		=> _"Genres",	width => 180,	flags => 'fgarwescil',
@@ -741,6 +766,7 @@ our %timespan_menu=
 	all_count	=> _"All genres",
 	FilterList	=> {search=>1},
 	edit_order=> 70,	edit_many=>1,	letter => 'g',
+	category=>'basic',
  },
  label	=>
  {	name		=> _"Labels",	width => 180,	flags => 'fgaescil',
@@ -754,6 +780,7 @@ our %timespan_menu=
 	FilterList	=> {search=>1,icon=>1},
 	icon_edit_string=> _"Choose icon for label {name}",
 	edit_order=> 80,	edit_many=>1,	letter => 'L',
+	category=>'extra',
  },
  mood	=>
  {	name		=> _"Moods",	width => 180,	flags => 'fgarwescil',
@@ -765,11 +792,13 @@ our %timespan_menu=
 	FilterList	=> {search=>1},
 	edit_order=> 71,	edit_many=>1,
 	disable=>1,	options => 'disable',
+	category=>'extra',
  },
  comment=>
  {	name	=> _"Comment",	width => 200,	flags => 'fgarwesci',		type => 'text',
 	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3	=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
 	edit_order=> 60,	edit_many=>1,	letter => 'C',
+	category=>'basic',
  },
  rating	=>
  {	name	=> _"Rating",		width => 80,	flags => 'fgaesc',	type => 'rating',
@@ -786,6 +815,7 @@ our %timespan_menu=
 	edit_order=> 90,	edit_many=>1,
 	options	=> 'rw_ userid',
 	'filterpat:value' => [ display => "%d %%", unit => '%', max=>100, default_value=>50, ],
+	category=>'basic',
  },
  ratingnumber =>	#same as rating but returns DefaultRating if rating set to default, will be replaced by rating.number or something in the future
  {	type	=> 'virtual',
@@ -797,6 +827,7 @@ our %timespan_menu=
  {	name	=> _"Added",		width => 100,	flags => 'fgasc_',	type => 'date',
 	FilterList => {type=>'year', },
 	can_group=>1,
+	category=>'stats',
  },
  lastplay	=>
  {	name	=> _"Last played",	width => 100,	flags => 'fgasc',	type => 'date',
@@ -804,6 +835,7 @@ our %timespan_menu=
 	can_group=>1,	letter => 'P',
 	'filterdesc:e:0'	=> _"never",
 	'filterdesc:-e:0'	=> _"has been played",	#FIXME better description
+	category=>'stats',
  },
  lastskip	=>
  {	name	=> _"Last skipped",	width => 100,	flags => 'fgasc',	type => 'date',
@@ -811,6 +843,7 @@ our %timespan_menu=
 	can_group=>1,	letter => 'K',
 	'filterdesc:e:0'	=> _"never",
 	'filterdesc:-e:0'	=> _"has been skipped",	#FIXME better description
+	category=>'stats',
  },
  playcount	=>
  {	name	=> _"Play count",	width => 50,	flags => 'fgaesc',	type => 'integer',	letter => 'p',
@@ -821,9 +854,11 @@ our %timespan_menu=
 	ilst	=> '----FMPS_Playcount&----FMPS_Playcount_User::%i',
 	postread=> sub { my $v=shift; length $v ? sprintf('%d',$v) : undef },
 	prewrite=> sub { sprintf('%.1f', $_[0]); },
+	category=>'stats',
 },
  skipcount	=>
  {	name	=> _"Skip count",	width => 50,	flags => 'fgaesc',	type => 'integer',	letter => 'k',
+	category=>'stats',
  },
  composer =>
  {	name	=> _"Composer",		width	=> 100,		flags => 'fgarwesci',	type => 'artist',
@@ -833,6 +868,7 @@ our %timespan_menu=
 	FilterList => {search=>1},
 	edit_many=>1,
 	disable=>1,	options => 'disable',
+	category=>'extra',
  },
  lyricist =>
  {	name	=> _"Lyricist",		width	=> 100,		flags => 'fgarwesci',	type => 'artist',
@@ -842,6 +878,7 @@ our %timespan_menu=
 	FilterList => {search=>1},
 	edit_many=>1,
 	disable=>1,	options => 'disable',
+	category=>'extra',
  },
  conductor =>
  {	name	=> _"Conductor",	width	=> 100,		flags => 'fgarwesci',	type => 'artist',
@@ -851,6 +888,7 @@ our %timespan_menu=
 	FilterList => {search=>1},
 	edit_many=>1,
 	disable=>1,	options => 'disable',
+	category=>'extra',
  },
  remixer =>
  {	name	=> _"Remixer",	width	=> 100,		flags => 'fgarwesci',	type => 'artist',
@@ -859,16 +897,19 @@ our %timespan_menu=
 	FilterList => {search=>1},
 	edit_many=>1,
 	disable=>1,	options => 'disable',
+	category=>'extra',
  },
  version=> #subtitle ?
  {	name	=> _"Version",	width	=> 150,		flags => 'fgarwesci',	type => 'fewstring',
 	id3v2	=> 'TIT3',	vorbis	=> 'version|subtitle',			ape => 'Subtitle',	ilst=> '----SUBTITLE',
+	category=>'extra',
  },
  bpm	=>
  {	name	=> _"BPM",	width	=> 60,		flags => 'fgarwesc',	type => 'integer',
 	id3v2	=> 'TBPM',	vorbis	=> 'BPM',	ape => 'BPM',		ilst=> 'tmpo',
 	FilterList => {type=>'div.10',},
 	disable=>1,	options => 'disable',
+	category=>'extra',
  },
  channel=>
  {	name	=> _"Channels",		width => 50,	flags => 'fgarsc',	type => 'integer',	bits => 4,	audioinfo => 'channels',
@@ -877,17 +918,20 @@ our %timespan_menu=
 	'filterdesc:-e:1'=> _"isn't mono",
 	'filterdesc:e:2' => _"is stereo",
 	'filterdesc:-e:2'=> _"isn't stereo",
+	category=>'audio',
  },
  bitrate=>
  {	name	=> _"Bitrate",		width => 70,	flags => 'fgarsc_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
 	FilterList => {type=>'div.32',},
 	'filterpat:value' => [ display => "%d kbps", unit => 'kbps', default_value=>192 ],
+	category=>'audio',
  },
  samprate=>
  {	name	=> _"Sampling Rate",	width => 60,	flags => 'fgarsc',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate',
 	FilterList => {},
 	'filterdesc:e:44100' => _"is 44.1kHz",
 	'filterpat:value' => [ display => "%d Hz", unit => 'Hz', step=> 100, default_value=>44100 ],
+	category=>'audio',
  },
  filetype=>
  {	name	=> _"File type",		width => 80,	flags => 'fgarsc',	type => 'fewstring',	bits => 8, #could probably fit in 4bit
@@ -899,6 +943,7 @@ our %timespan_menu=
 	'filterdesc:m:^mpc' => _"is a musepack file",
 	'filterdesc:m:^wv'  => _"is a wavepack file",
 	'filterdesc:m:^ape' => _"is an ape file",
+	category=>'audio',
  },
  'length'=>
  {	name	=> _"Length",		width => 50,	flags => 'fgarsc_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
@@ -907,6 +952,7 @@ our %timespan_menu=
 	'filterpat:value' => [ display => "%d s", unit => 's', default_value=>1 ],	#should 's' be translated ?
 	letter => 'm',
 	rightalign=>1,	#right-align in SongTree and SongList #maybe should be done to all number columns ?
+	category=>'audio',
  },
 
  replaygain_track_gain=>
@@ -915,12 +961,14 @@ our %timespan_menu=
 	displayformat	=> '%.2f dB',
 	id3v2	=> 'TXXX;replaygain_track_gain;%v',	vorbis	=> 'replaygain_track_gain',	ape	=> 'replaygain_track_gain', ilst => '----replaygain_track_gain',
 	options => 'disable',
+	category=>'replaygain',
  },
  replaygain_track_peak=>
  {	name	=> _"Track peak",	width => 60,	flags => 'fgrwsca',
 	id3v2	=> 'TXXX;replaygain_track_peak;%v',	vorbis	=> 'replaygain_track_peak',	ape	=> 'replaygain_track_peak', ilst => '----replaygain_track_peak',
 	type	=> 'float',
 	options => 'disable',
+	category=>'replaygain',
  },
  replaygain_album_gain=>
  {	name	=> _"Album gain",	width => 60,	flags => 'fgrwsca',
@@ -928,16 +976,19 @@ our %timespan_menu=
 	displayformat	=> '%.2f dB',
 	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
 	options => 'disable',
+	category=>'replaygain',
  },
  replaygain_album_peak=>
  {	name	=> _"Album peak",	width => 60,	flags => 'fgrwsca',
 	id3v2	=> 'TXXX;replaygain_album_peak;%v',	vorbis	=> 'replaygain_album_peak',	ape	=> 'replaygain_album_peak', ilst => '----replaygain_album_peak',
 	type	=> 'float',
 	options => 'disable',
+	category=>'replaygain',
  },
  replaygain_reference_level=>
  {	flags => 'w',	type => 'writeonly',	#only used for writing
 	id3v2	=> 'TXXX;replaygain_reference_level;%v',vorbis	=> 'replaygain_reference_level',	ape => 'replaygain_reference_level', ilst => '----replaygain_reference_level',
+	category=>'replaygain',
  },
  #mp3gain : APE tags,	peak : float 	: 0.787193
  #			gain float dB 	: -1.240000 dB
@@ -1025,6 +1076,7 @@ our %FieldTemplates=
 		     starprefix => 'stars', #FIXME make it an option
 		   },
 );
+$FieldTemplates{$_}{category}||='custom' for keys %FieldTemplates;
 
 our %HSort=
 (	string	=> '$h->{$a} cmp $h->{$b} ||',
@@ -1995,7 +2047,17 @@ sub ColumnAlign
 	return $Def{$_[0]}{rightalign};
 }
 sub InfoFields		#used for song info dialog, currently same fields as ColumnsKeys
-{	sort { ::superlc($Def{$a}{name}) cmp ::superlc($Def{$b}{name}) } grep $Def{$_}{flags}=~m/c/, @Fields;
+{	my %tree;
+	for my $f (grep $Def{$_}{flags}=~m/c/, @Fields)
+	{	my $cat= $Def{$f}{category}||'unknown';
+		push @{ $tree{$cat} }, $f;
+	}
+	my @list;
+	for my $cat ( sort { $Categories{$a}[1] <=> $Categories{$b}[1] } keys %tree )
+	{	my $fields= $tree{$cat};
+		push @list, $Categories{$cat}[0], [::superlc_sort(@$fields)];
+	}
+	return \@list;
 	#FIXME sort according to a number like $Def{$_}{order}
 	#was : (qw/title artist album year track disc version genre rating label playcount lastplay skipcount lastskip added modif comment file path length size bitrate filetype channel samprate/)
 }
