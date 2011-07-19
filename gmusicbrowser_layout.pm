@@ -31,7 +31,7 @@ our @MenuQueue=
 		},
 	},
 	{label => _"Clear queue",	code => \&::ClearQueue,		test => sub{@$::Queue}},
-	{label => _"Shuffle queue",	code => \&::ShuffleQueue,	test => sub{@$::Queue}},
+	{label => _"Shuffle queue",	code => sub {$::Queue->Shuffle},	test => sub{@$::Queue}},
 	{label => _"Auto fill up to",	code => sub { $::Options{MaxAutoFill}=$_[1]; ::HasChanged('QueueAction','maxautofill'); },
 	 				submenu => sub { my $m= ::max(1,$::Options{MaxAutoFill}-5); return [$m..$m+10]; },
 					check => sub {$::Options{MaxAutoFill};},

@@ -2892,6 +2892,13 @@ sub RemoveIDsFromAll		#could probably be improved
 		$self->Remove(\@rows,'removeIDsfromall') if @rows;
 	}
 }
+sub RemoveIDs
+{	my ($self,$IDs_toremove)=@_;
+	my $isin='';
+	vec($isin,$_,1)=1 for @$IDs_toremove;
+	my @rows=grep vec($isin,$self->[$_],1), 0..$#$self;
+	$self->Remove(\@rows) if @rows;
+}
 
 sub Sort
 {	my ($self,$sort)=@_;
@@ -2910,6 +2917,12 @@ sub Replace				#DELME PHASE1 %info not used remove ?
 	@$self= $new ? @$new : ();
 	delete $Presence{$self};
 	::HasChanged('SongArray',$self,'replace',%info);
+}
+sub Shuffle
+{	my $self=shift;
+	my @rand;
+	push @rand,rand for 0..$#$self;
+	$self->Replace([map $self->[$_], sort { $rand[$a] <=> $rand[$b] } 0..$#$self]);
 }
 sub Shift
 {	my $self=$_[0];

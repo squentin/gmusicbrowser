@@ -2404,11 +2404,6 @@ sub ClearQueue
 	$QueueAction='';
 	HasChanged('QueueAction');
 }
-sub ShuffleQueue
-{	my @rand;
-	push @rand,rand for 0..$#$Queue;
-	$Queue->Replace([map $Queue->[$_], sort { $rand[$a] <=> $rand[$b] } 0..$#$Queue]);
-}
 
 sub EnqueueSame
 {	my ($field,$ID)=@_;
