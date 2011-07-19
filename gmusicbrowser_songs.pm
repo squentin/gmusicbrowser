@@ -104,7 +104,7 @@ our %timespan_menu=
 			}',
 		diff		=> 'do {my $v=#_#; my $old=!$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v]; $v=#VAL#; my $new= join "\\x00", sort (ref $v ? @$v : split /\\x00/,$v); $old ne $new; }', #FIXME use simpler/faster version if perl5.10
 		display 	=> 'do { my $v=#_#; !$v ? "" : ref $v ? join ", ",map ___name[$_],@$v : ___name[$v]; }',
-		set_multi	=> 'do {my $c=#_#; my %h=( $c ? ref $c ? map((___name[$_]=>0), @$c) : (___name[$c]=>0) : ()); my $changed; my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
+		set_multi	=> 'do {my $c=#_#; my %h=( $c ? ref $c ? map((___name[$_]=>0), @$c) : (___name[$c]=>0) : ()); my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}= (exists $h{$_} ? -1 : 1) for @$toggle; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
 		makefilter	=> '#GID# ? "#field#:~:".___name[#GID#] : "#field#:ecount:0"',
 		'filter:~'	=> '.!!. do {my $v=#_#; $v ? ref $v ? grep(#VAL#==$_, @$v) : ($v == #VAL#) : 0}', # is flag set #FIXME use simpler/faster version if perl5.10
 		'filter_prep:~'	=> '___gid{#PAT#} ||= #sgid_to_gid(VAL=#PAT#)#;',
@@ -1375,7 +1375,7 @@ sub UpdateFuncs
 				"		if (#diff#) { $set }\n".
 				"	}\n";
 			if ($Def{$f}{flags}=~m/l/)
-			{  $c.=	"	elsif (\$val=\$values->{'+$f'})". # $v must contain [[toset],[torm]] # + toggle ?
+			{  $c.=	"	elsif (\$val=\$values->{'+$f'})". # $v must contain [[toset],[torm],[toggle]]
 				"	{	if (\$val= #set_multi#) { $set }\n". # set_multi return the new arrayref if modified, undef if not changed
 			   	"	}\n";
 			}
@@ -1570,7 +1570,7 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 	{	my $f=shift @$modif;
 		my $val=shift @$modif;
 		my $multi;
-		if ($f=~s/^([-+])//) { $multi=$1 }
+		if ($f=~s/^([-+^])//) { $multi=$1 }
 		my $def= $f=~m/^@(.*)$/ ? $Def{$1} : $Def{$f};
 		if (!$def)	{ warn "Songs::Set : Invalid field $f\n";next }
 		my $flags=$def->{flags};
@@ -1578,9 +1578,9 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 		#if (my $sub=$Def{$f}{check}))
 		# { my $res=$sub->($val); unless ($res) {warn "Songs::Set : Invalid value '$v' for field $f\n"; next} }
 		if ($multi && $flags!~m/l/) { warn "Songs::Set : Field $f doesn't support multiple values\n";next }
-		if ($multi)	#multi eq + or -  => remove or add values (for labels and genres)
-		{	my $array=$values{"+$f"}||=[];
-			my $i= $multi eq '+' ? 0 : 1;
+		if ($multi)	#multi eq + or - or ^  => add or remove or toggle values (for labels and genres)
+		{	my $array=$values{"+$f"}||=[[],[],[]];	#$array contains [[toset],[torm],[toggle]]
+			my $i= $multi eq '+' ? 0 : $multi eq '^' ? 2 : 1;
 			$val=[$val] unless ref $val;
 			$array->[$i]=$val;
 		}
@@ -1915,7 +1915,7 @@ sub GetFullFilename { Get($_[0],'fullfilename') }
 #sub GetURI
 #{	return map 'file://'.::url_escape($_), GetFullFilename(@_);
 #}
-sub IsSet
+sub IsSet	# used only once
 {	my ($ID,$field,$value)=@_;
 	my $sub= $FuncCache{'is_set '.$field}||= Makesub($field, 'is_set', ID=>'$_[0]', VAL=>'$_[1]' );
 	return $sub->($ID,$value);

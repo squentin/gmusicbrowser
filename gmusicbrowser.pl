@@ -1111,7 +1111,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	PopupTrayTip	=> [sub {ShowTraytip($_[1])}, _"Popup Traytip",_"Number of milliseconds",qr/^\d*$/ ],
 	SetSongLabel	=> [sub{ Songs::Set($SongID,'+label' => $_[1]); }, _"Add a label to the current song", _"Label",qr/./],
 	UnsetSongLabel	=> [sub{ Songs::Set($SongID,'-label' => $_[1]); }, _"Remove a label from the current song", _"Label",qr/./],
-	ToggleSongLabel	=> [sub{ ToggleLabel($_[1],$::SongID); }, _"Toggle a label of the current song", _"Label",qr/./],
+	ToggleSongLabel	=> [sub{ Songs::Set($SongID,'^label' => $_[1]); }, _"Toggle a label of the current song", _"Label",qr/./],
 	PlayListed	=> [sub{ my $songlist=GetSonglist($_[0]) or return; Select(song => 'first', play => 1, staticlist => $songlist->{array} ); }, _"Play listed songs"],
 	ClearPlayFilter	=> [sub {Select(filter => '') if defined $ListMode || !$SelectedFilter->is_empty;}, _"Clear playlist filter"],
 	MenuPlayFilter	=> [sub { Layout::FilterMenu(); }, _"Popup playlist filter menu"],
@@ -6124,18 +6124,6 @@ sub PrefLibrary_update_checklength_button
 			_"no songs needs checking";
 	$button->set_tooltip_text($text);
 	return $button->{timeout}=0;
-}
-
-sub ToggleLabel #maybe do the toggle in SetLabels #FIXME
-{	my ($label,$ID,$on)=@_;
-	return unless defined $ID && defined $label;
-	my $add=[]; my $rm=[];
-	unless (defined $on)
-	{	$on= !Songs::IsSet($ID,label => $label);
-	}
-	if ($on) { $add=[$label] }
-	else	 { $rm =[$label] }
-	SetLabels([$ID],$add,$rm);
 }
 
 sub SetLabels	#FIXME move to Songs::
