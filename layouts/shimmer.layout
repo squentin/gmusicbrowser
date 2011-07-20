@@ -26,12 +26,11 @@ SMLibrary	= (label=_"Library") MenuItem00(command="RunPerlCode(::ChooseAddPath(0
 ### main left: artist pane and album-cover ###
 VBLeft		= _VBListCover HBStatus
 VBListCover	= _NBList Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0,maxsize=350)
-NBList		= (tabpos="bottom") VBArtist QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
-HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
-VBAbout		= (tabtitle=_"Info") _PluginArtistinfo
-VBArtist	= (tabtitle=_"Artist") _FilterPane0(nb=2,hidebb=1,pages=artists,page_artists/lmarkup=1,hidetabs=1,lmarkup="<b>%a</b>%Y\x0a<small>%x / %s / <small>%l</small></small>")
-#HBCover		= Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0)
-HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=HBCover,tip=_"Show/Hide Cover")
+NBList		= (tabpos="bottom") QueueList(songtree=1,tabtitle=_"Queue (%n)",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1,hscrollbar=0) HBLyrics VBAlbuminfo VBArtistinfo
+HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
+VBArtistinfo	= (tabtitle="Artist") _PluginArtistinfo
+VBAlbuminfo	= (tabtitle="Album") _PluginAlbuminfo
+HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=Cover,tip=_"Show/Hide Cover")
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
 HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
@@ -39,8 +38,6 @@ HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year le
 VPMosaic	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
 ### bottom: statusbar ### Pref(size=small-toolbar,button=0)
 ### positioning and sizing ###
-#HSize0		= 350 NBList
-#VSize0		= 350 HBCover
 DefaultFocus	= SimpleSearch
 KeyBindings	= c-l SetFocusOn(SimpleSearch)
 
@@ -84,7 +81,7 @@ VBText		= 2HBArtist HBAlbum _2HBTitle
 HBButtons	= Prev(size=small-toolbar) Play(size=small-toolbar) Next(size=small-toolbar)
 HBTitle		= LockSong _Title(font=12,tip=_"Title: %t",ellipsize=end)
 HBArtist	= LockArtist _Artist(font=8,tip=_"Artist: %a",ellipsize=end)
-HBAlbum		= LockAlbum _Album(font=8,tip=_"Album: %l",ellipsize=end) Date(font=7,markup=" <b>»</b> %y")
+HBAlbum		= LockAlbum _Album(font=8,tip=_"Album: %l",ellipsize=end,minsize=0,expand_max=100) Date(font=7,markup=" <b>»</b> %y")
 HBRating	= Filler1  -Stars
 HBTime		= _TimeBar(minheight=7)
 HBRight		= HBButtons _2HBRating
@@ -106,7 +103,7 @@ HBNowPlaying	= HBButtons 15Filler0 _HBTitle
 HBButtons	= Prev Play Next
 HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -ToggleButton1(size=button,relief=none,icon=gtk-find,widget=VBSidebar) -20Stars(yalign=0.5)
 VBSidebar	= 4Filler1 7HBSearch _7HBQueue 4Filler2
-HBQueue		= 14_QueueList(group=1,songtree=1,cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248")
+HBQueue		= 14_QueueList(group=1,songtree=1,cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1)
 HBSearch	= 4Filler3 6Label0(markup='<span size="xx-large" weight="ultrabold">«</span>') _SimpleSearch(suggest=1) 7Filler4
 KeyBindings	= Escape CloseWindow
 
