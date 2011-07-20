@@ -157,6 +157,7 @@ options :
 -server	: send playing song to connected icecast clent
 -port N : listen for connection on port N in icecast server mode
 -debug	: print lots of mostly useless informations
+-backtrace : print a backtrace for every warning
 -nodbus	: do not provide DBus services
 -dbus-id KEY : append .KEY to the DBus service id used by gmusicbrowser (org.gmusicbrowser)
 -nofifo : do not create/use named pipe
@@ -209,6 +210,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-rotags')	{$CmdLine{rotags}=1}
 	elsif($arg eq '-port')		{$CmdLine{port}=shift if $ARGV[0]}
 	elsif($arg eq '-debug')		{$debug=1}
+	elsif($arg eq '-backtrace')	{ $SIG{ __WARN__ } = \&Carp::cluck; $SIG{ __DIE__ } = \&Carp::confess; }
 	elsif($arg eq '-nofifo')	{$FIFOFile=''}
 	elsif($arg eq '-workspace')	{$CmdLine{workspace}=shift if defined $ARGV[0]} #requires Gnome2::Wnck
 	elsif($arg eq '-C' || $arg eq '-cfg')		{$CmdLine{savefile}=shift if $ARGV[0]}

@@ -96,6 +96,9 @@ append .KEY to the DBus service id used by gmusicbrowser (org.gmusicbrowser)
 \fB\-debug\fR
 print lots of useless informations
 .TP
+\fB\-backtrace\fR
+print a backtrace for every warning
+.TP
 \fB\-l NAME\fR, \fB\-layout NAME\fR
 use layout NAME for player window
 .TP
