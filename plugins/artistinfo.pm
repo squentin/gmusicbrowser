@@ -67,9 +67,9 @@ my @similarity=
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
 
 ::SetDefaultOptions(OPT,PathFile	=> "~/.config/gmusicbrowser/bio/%a",
-			ArtistPicSize	=> 100,
+			ArtistPicSize	=> 70,
 			SimilarLimit	=> 15,
-			SimilarRating	=> 50,
+			SimilarRating	=> 20,
 			SimilarLocal	=> 0,
 			SimilarExcludeSeed => 0,
 			Eventformat	=> '%title at %name<br>%startDate<br>%city (%country)<br><br>',
@@ -107,7 +107,7 @@ sub new
 	$self->{fontsize} = $fontsize->get_size / Gtk2::Pango->scale;
 	$self->{artist_esc} = "";
 	my $statbox=Gtk2::VBox->new(0,0);
-	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,maxsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0});
+	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,minsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0});
 	for my $name (qw/Ltitle Lstats/)
 	{	my $l=Gtk2::Label->new('');
 		$self->{$name}=$l;
@@ -116,7 +116,7 @@ sub new
 		$statbox->pack_start($l,0,0,2);
 	}
 	$self->{artistrating} = Gtk2::Image->new;
-	$statbox->pack_start($self->{artistrating},0,0,2);
+	$statbox->pack_start($self->{artistrating},0,0,0);
 	my $stateventbox = Gtk2::EventBox->new;
 	$stateventbox->add($statbox);
 	$stateventbox->{group}= $options->{group};
@@ -200,8 +200,10 @@ sub new
 		$item->set_proxy_menu_item($key,$menuitem);
 		$toolbar->insert($item,-1) unless $hide;
 	}
-
-	$statbox->pack_start($toolbar,0,0,0);
+	my $artistinfobox = Gtk2::VBox->new(0,0);
+	$artistinfobox->pack_start($artistbox,1,1,0);
+	$artistinfobox->pack_start($toolbar,0,0,0);
+	#$statbox->pack_start($toolbar,0,0,0);
 	$self->{buffer}=$textview->get_buffer;
 	$self->{store}=$store;
 
@@ -221,7 +223,7 @@ sub new
 	$self->{sw1} = $sw1;
 	$self->{sw2} = $sw2;
 
-	$self->pack_start($artistbox,0,0,0);
+	$self->pack_start($artistinfobox,0,0,0);
 	$self->pack_start($infobox,1,1,0);
 
 	$self->signal_connect(destroy => \&destroy_event_cb);
