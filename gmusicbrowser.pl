@@ -157,6 +157,7 @@ options :
 -server	: send playing song to connected icecast clent
 -port N : listen for connection on port N in icecast server mode
 -debug	: print lots of mostly useless informations
+-backtrace : print a backtrace for every warning
 -nodbus	: do not provide DBus services
 -dbus-id KEY : append .KEY to the DBus service id used by gmusicbrowser (org.gmusicbrowser)
 -nofifo : do not create/use named pipe
@@ -209,6 +210,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-rotags')	{$CmdLine{rotags}=1}
 	elsif($arg eq '-port')		{$CmdLine{port}=shift if $ARGV[0]}
 	elsif($arg eq '-debug')		{$debug=1}
+	elsif($arg eq '-backtrace')	{ $SIG{ __WARN__ } = \&Carp::cluck; $SIG{ __DIE__ } = \&Carp::confess; }
 	elsif($arg eq '-nofifo')	{$FIFOFile=''}
 	elsif($arg eq '-workspace')	{$CmdLine{workspace}=shift if defined $ARGV[0]} #requires Gnome2::Wnck
 	elsif($arg eq '-C' || $arg eq '-cfg')		{$CmdLine{savefile}=shift if $ARGV[0]}
@@ -1111,7 +1113,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	PopupTrayTip	=> [sub {ShowTraytip($_[1])}, _"Popup Traytip",_"Number of milliseconds",qr/^\d*$/ ],
 	SetSongLabel	=> [sub{ Songs::Set($SongID,'+label' => $_[1]); }, _"Add a label to the current song", _"Label",qr/./],
 	UnsetSongLabel	=> [sub{ Songs::Set($SongID,'-label' => $_[1]); }, _"Remove a label from the current song", _"Label",qr/./],
-	ToggleSongLabel	=> [sub{ ToggleLabel($_[1],$::SongID); }, _"Toggle a label of the current song", _"Label",qr/./],
+	ToggleSongLabel	=> [sub{ Songs::Set($SongID,'^label' => $_[1]); }, _"Toggle a label of the current song", _"Label",qr/./],
 	PlayListed	=> [sub{ my $songlist=GetSonglist($_[0]) or return; Select(song => 'first', play => 1, staticlist => $songlist->{array} ); }, _"Play listed songs"],
 	ClearPlayFilter	=> [sub {Select(filter => '') if defined $ListMode || !$SelectedFilter->is_empty;}, _"Clear playlist filter"],
 	MenuPlayFilter	=> [sub { Layout::FilterMenu(); }, _"Popup playlist filter menu"],
@@ -2403,11 +2405,6 @@ sub ClearQueue
 {	$Queue->Replace();
 	$QueueAction='';
 	HasChanged('QueueAction');
-}
-sub ShuffleQueue
-{	my @rand;
-	push @rand,rand for 0..$#$Queue;
-	$Queue->Replace([map $Queue->[$_], sort { $rand[$a] <=> $rand[$b] } 0..$#$Queue]);
 }
 
 sub EnqueueSame
@@ -6082,18 +6079,6 @@ sub PrefLibrary_update_checklength_button
 			_"no songs needs checking";
 	$button->set_tooltip_text($text);
 	return $button->{timeout}=0;
-}
-
-sub ToggleLabel #maybe do the toggle in SetLabels #FIXME
-{	my ($label,$ID,$on)=@_;
-	return unless defined $ID && defined $label;
-	my $add=[]; my $rm=[];
-	unless (defined $on)
-	{	$on= !Songs::IsSet($ID,label => $label);
-	}
-	if ($on) { $add=[$label] }
-	else	 { $rm =[$label] }
-	SetLabels([$ID],$add,$rm);
 }
 
 sub SetLabels	#FIXME move to Songs::

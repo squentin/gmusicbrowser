@@ -21,7 +21,7 @@ use constant
 
 use Gtk2::Notify -init, ::PROGRAM_NAME;
 
-::SetDefaultOptions(OPT, title => "%t", text => _"<i>by</i> %a\\n<i>from</i> %l", picsize => 50, timeout=>5);
+::SetDefaultOptions(OPT, title => "%S", text => _"<i>by</i> %a\\n<i>from</i> %l", picsize => 50, timeout=>5);
 
 my $notify;
 my ($Daemon_name,$can_actions,$can_body);
@@ -48,7 +48,7 @@ sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	my $replacetext=::MakeReplaceText('talydngLf');
+	my $replacetext=::MakeReplaceText('talydngLfS');
 	my $summary=::NewPrefEntry(OPT.'title',_"Summary :", sizeg1=> $sg1, sizeg2=>$sg2, tip => $replacetext);
 	my $body=   ::NewPrefEntry(OPT.'text', _"Body :",    sizeg1=> $sg1, sizeg2=>$sg2, width=>40, tip => $replacetext."\n\n"._("You can use some markup, eg :\n<b>bold</b> <i>italic</i> <u>underline</u>\nNote that the markup may be ignored by the notification daemon"),);
 	my $size=   ::NewPrefSpinButton(OPT.'picsize', 0,1000, step=>10, page=>40, text=>_"Picture size : %d", sizeg1=>$sg1, tip=> _"Note that some notification daemons resize the displayed picture");
@@ -71,7 +71,8 @@ sub Changed
 	my $size= $::Options{OPT.'picsize'};
 	my $timeout=$::Options{OPT.'timeout'}*1000;
 	return unless $title || $text || $size;
-	$notify->update( ::ReplaceFields($ID,$title), ::ReplaceFieldsAndEsc($ID,$text));
+	$title= ::ReplaceFields($ID,$title) || " ";	#libnotify do not like null summaries
+	$notify->update($title, ::ReplaceFieldsAndEsc($ID,$text) );
 	my $pixbuf;
 	if ($size)
 	{	my $album_gid= Songs::Get_gid($ID,'album');
