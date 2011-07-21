@@ -3999,6 +3999,7 @@ sub update
 	my (undef,$bar,$label)=@$widgets;
 	my $title=$prop->{title};
 	my $details=$prop->{details};
+	$details='' unless defined $details;
 	my $bartext=$prop->{bartext};
 	$bartext=~s/\$(end|current)/$prop->{$1}/g if $bartext;
 	if ($self->{compact})
