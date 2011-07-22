@@ -1425,6 +1425,7 @@ sub Quit
 	$Options{SavedPlayTime}= $PlayTime if $Options{RememberPlayTime};
 	&Stop if defined $TogPlay;
 	@ToScan=@ToAdd_Files=();
+	CloseTrayTip();
 	SaveTags();
 	unlink $FIFOFile if defined $FIFOFile;
 	Gtk2->main_quit;
@@ -6854,18 +6855,20 @@ sub SetTrayTipDelay
 	$TrayIcon->child->{hover_delay}= $Options{TrayTipDelay}||1;
 }
 sub TrayMenuPopup
-{	my $traytip=$TrayIcon->child->{PoppedUpWindow};
-	$traytip->DestroyNow if $traytip;
+{	CloseTrayTip();
 	$TrayIcon->{block_popup}=1;
 	my $menu=Gtk2::Menu->new;
 	$menu->signal_connect( selection_done => sub {$TrayIcon->{block_popup}=undef});
 	PopupContextMenu(\@TrayMenu, {usemenupos=>1}, $menu);
 }
+sub CloseTrayTip
+{	my $traytip=$TrayIcon->child->{PoppedUpWindow};
+	$traytip->DestroyNow if $traytip;
+}
 sub ShowTraytip
 {	return 0 if !$TrayIcon || $TrayIcon->{block_popup};
 	Layout::Window::Popup::Popup($TrayIcon->child,$_[0]);
 }
-
 sub windowpos	# function to position window next to clicked widget ($event can be a widget)
 {	my ($win,$event)=@_;
 	return (0,0) unless $event;
