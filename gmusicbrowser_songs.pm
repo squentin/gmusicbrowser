@@ -1432,9 +1432,13 @@ sub UpdateFuncs
 sub MakeLoadSub
 {	my ($extradata,@loaded_slots)=@_;
 	my %extra_sub;
-	my $code='$LastID++; ';
 	my %loadedfields;
 	$loadedfields{$loaded_slots[$_]}=$_ for 0..$#loaded_slots;
+	# begin with a line that checks if a given path-file has already been loaded into the library
+	my $pathfile_code= '$_['.$loadedfields{path}.'] ."/". $_['.$loadedfields{file}.']';
+	my $code= '$uniq_check{ '.$pathfile_code.' }++ && do { warn qq(warning: file "'.$pathfile_code.'" already in library, skipping.\\n); return };'."\n";
+	# new file, increment $LastID
+	$code.='$LastID++;'."\n";
 	for my $field (@Fields)
 	{	my $i=$loadedfields{$field};
 		my $c;
@@ -1467,7 +1471,7 @@ sub MakeLoadSub
 		}
 	}
 	$code.= '; return $LastID;';
-	my $loadsub= Compile(LoadSub => "sub {$code}");
+	my $loadsub= Compile(LoadSub => "my %uniq_check; sub {$code}");
 	return $loadsub,\%extra_sub;
 }
 sub MakeSaveSub
