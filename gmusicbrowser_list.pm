@@ -2492,7 +2492,7 @@ use base 'Gtk2::ScrolledWindow';
 sub new
 {	my ($class,$col,$opt)=@_;
 	my $self = bless Gtk2::ScrolledWindow->new, $class;
-	$self->set_shadow_type ('etched-in');
+	#$self->set_shadow_type ('etched-in');
 	$self->set_policy ('automatic', 'automatic');
 	::set_biscrolling($self);
 
@@ -2665,7 +2665,7 @@ use base 'Gtk2::ScrolledWindow';
 sub new
 {	my ($class,$col,$opt)=@_;
 	my $self = bless Gtk2::ScrolledWindow->new, $class;
-	$self->set_shadow_type ('etched-in');
+	#$self->set_shadow_type ('etched-in');
 	$self->set_policy ('automatic', 'automatic');
 	::set_biscrolling($self);
 
@@ -2916,7 +2916,7 @@ sub new
 	$selection->signal_connect( changed => \&sel_changed_cb);
 
 	my $sw=Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
+	#$sw->set_shadow_type('etched-in');
 	$sw->set_policy('automatic','automatic');
 	::set_biscrolling($sw);
 	$sw->add($treeview);
