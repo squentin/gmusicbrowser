@@ -5012,7 +5012,7 @@ sub key_press_cb
 	elsif	($key eq 'Page_Up')	{ $j-=$page; }
 	elsif	($key eq 'Page_Down')	{ $j+=$page; }
 	elsif	(lc$key eq 'a' && $ctrl)							#ctrl-a : select-all
-		{ $self->{selected}{$_}=undef for @{ $self->{list} }; $self->queue_draw; return 1; }
+		{ $self->{selected}{$_}=undef for @{ $self->{list} }; $self->queue_draw; $self->{selectsub}($self); return 1; }
 	else {return 0}
 	if	($i<0)		{$j--;$i=$nw-1;}
 	elsif	($i>=$nw)	{$j++;$i=0;}
