@@ -230,7 +230,7 @@ our %timespan_menu=
 		unknown		=> '_("<Unknown>")." "',
 		init		=> '____=""; __#mainfield#_gid{"\\x00"}=1; __#mainfield#_empty=""; vec(__#mainfield#_empty,1,1)=1; #_iname#[1]=::superlc( #_name#[1]=_("<Unknown>") );',
 		findgid		=> 'do{	my $name=#VAL#; my $sgid= $name ."\\x00". ($name eq "" ?	"artist=".#artist->get# :	do {my $a=#album_artist_raw->get#; $a ne "" ?	"album_artist=$a" :	#compilation->get# ?	"compilation=1" : ""}	);
-					__#mainfield#_gid{$sgid}||= do {my $n=@#_name#; if ($name eq "") {vec(__#mainfield#_empty,$n,1)=1; $name=#unknown#.#artist->get#; } push @#_name#,$name; #newval#; $n; }
+					__#mainfield#_gid{$sgid}||= do {my $n=@#_name#; if ($name eq "") {vec(__#mainfield#_empty,$n,1)=1; $name=#unknown#.#artist->get#; } push @#_name#,$name; push @__#mainfield#_sgid,$sgid; #newval#; $n; };
 				    };',
 		#possible sgid : album."\x00".	""				if no album name and no artist
 		#				"artist=".artist		if no album name
@@ -242,9 +242,8 @@ our %timespan_menu=
 		#newval		=> 'push @#_iname#, ::superlc( #_name#[-1] );',
 		get		=> '(#_empty# ? "" : #_name#[#_#])',
 		gid_to_get	=> '(vec(__#mainfield#_empty,#GID#,1) ? "" : #_name#[#GID#])',
-		sgid_to_gid	=> 'do {my $s=#VAL#; __#mainfield#_gid{$s}||= do { my $n=@#_name#; if ($s=~s/\x00(\w+)=(.*)$// && $s eq "" && $1 eq "artist") { $s= #unknown#.$2; vec(__#mainfield#_empty,$n,1)=1;} push @#_name#,$s; #newval#; $n }}',
-		#gid_to_sgid	=> 'vec(__#mainfield#_empty,#GID#,1) ? "\\x00".substr(#_name#[#GID#],length(#unknown#)) : #_name#[#GID#]',
-		gid_to_sgid	=> '::first {$__#mainfield#_gid{$_}==#GID#} keys %__#mainfield#_gid;', #slower but more simple and reliable
+		sgid_to_gid	=> 'do {my $s=#VAL#; __#mainfield#_gid{$s}||= do { my $n=@#_name#; if ($s=~s/\x00(\w+)=(.*)$// && $s eq "" && $1 eq "artist") { $s= #unknown#.$2; vec(__#mainfield#_empty,$n,1)=1;} push @#_name#,$s; push @__#mainfield#_sgid,#VAL#; #newval#; $n }}',
+		gid_to_sgid	=> '$__#mainfield#_sgid[#GID#]',
 		makefilter	=> '"#field#:~:" . #gid_to_sgid#',
 		update		=> 'my $albumname=#get#; #set(VAL=$albumname)#;',
 		listall		=> 'grep !vec(__#mainfield#_empty,$_,1), 2..@#_name#-1',
