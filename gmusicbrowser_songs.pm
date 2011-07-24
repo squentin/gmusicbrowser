@@ -228,7 +228,7 @@ our %timespan_menu=
 		mainfield	=> 'album',
 		_empty		=> 'vec(__#mainfield#_empty,#_#,1)',
 		unknown		=> '_("<Unknown>")." "',
-		init		=> '____=""; __#mainfield#_gid{"\\x00"}=1; __#mainfield#_empty=""; vec(__#mainfield#_empty,1,1)=1; #_iname#[1]=::superlc( #_name#[1]=_("<Unknown>") );',
+		init		=> '____=""; __#mainfield#_gid{"\\x00"}=1; __#mainfield#_empty=""; vec(__#mainfield#_empty,1,1)=1; __#mainfield#_sgid[1]="\\x00"; #_iname#[1]=::superlc( #_name#[1]=_("<Unknown>") );',
 		findgid		=> 'do{	my $name=#VAL#; my $sgid= $name ."\\x00". ($name eq "" ?	"artist=".#artist->get# :	do {my $a=#album_artist_raw->get#; $a ne "" ?	"album_artist=$a" :	#compilation->get# ?	"compilation=1" : ""}	);
 					__#mainfield#_gid{$sgid}||= do {my $n=@#_name#; if ($name eq "") {vec(__#mainfield#_empty,$n,1)=1; $name=#unknown#.#artist->get#; } push @#_name#,$name; push @__#mainfield#_sgid,$sgid; #newval#; $n; };
 				    };',
