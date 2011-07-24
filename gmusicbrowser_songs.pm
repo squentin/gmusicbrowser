@@ -4111,7 +4111,7 @@ sub _optimize_with_hashes	# optimization for some special cases
 			}
 			$d--;
 		}
-		elsif ( $s=~m/^(\w+):(-?)([e~]):(.*)$/ && ($or[$d] xor $1) )
+		elsif ( $s=~m/^(\w+):(-?)([e~]):(.*)$/ && ($or[$d] xor $2) )
 		{	$val[$d]{"$1:$2$3:"}{$4}=undef;		#add key to the hash
 			push @{$ilist[$d]{"$1:$2$3:"}},$i;	#store filter index to remove it later if it is replaced
 		}
