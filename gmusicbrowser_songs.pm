@@ -434,7 +434,7 @@ our %timespan_menu=
 		check		=> '#VAL#= #VAL# =~m/^(\d+)/ && $1<2**#bits# ? $1 : 0;',	# set to 0 if overflow
 		init		=> '____="";',
 		parent		=> 'number',
-		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,$Def{$field}{edit_max}); },
+		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,$Def{$field}{edit_max},0,$Def{$field}{edit_mode}); },
 	},
 	'integer.div' =>
 	{	makefilter	=> '"#field#:b:".(#GID# * #ARG0#)." ".(((#GID#+1) * #ARG0#)-1)',
@@ -721,7 +721,8 @@ our %timespan_menu=
 	category=>'extra',
  },
  year =>
- {	name	=> _"Year",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 16, edit_max=>3000,
+ {	name	=> _"Year",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 16,
+	edit_max=>3000,	edit_mode=> 'year',
 	check	=> '#VAL#= #VAL# =~m/(\d\d\d\d)/ ? $1 : 0;',
 	id3v1	=> 3,		id3v2 => 'TDRC|TYER', 'id3v2.3'=> 'TYER|TDRC',	'id3v2.4'=> 'TDRC|TYER',	vorbis	=> 'date|year',	ape	=> 'Record Date|Year', ilst => "\xA9day",
 	gid_to_display	=> '#GID# ? #GID# : _"None"',
@@ -736,12 +737,14 @@ our %timespan_menu=
  track =>
  {	name	=> _"Track",	width => 40,	flags => 'fgarwesc',
 	id3v1	=> 5,		id3v2	=> 'TRCK',	vorbis	=> 'tracknumber',	ape	=> 'Track', ilst => "trkn",
-	type => 'integer',	displayformat => '%02d', bits => 16, edit_max => 65535,
+	type => 'integer',	displayformat => '%02d', bits => 16,
+	edit_max => 65535, 	edit_mode=> 'nozero',
 	edit_order=> 20,	editwidth => 4,		letter => 'n',
 	category=>'basic',
  },
  disc =>
- {	name	=> _"Disc",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 8, edit_max => 255,
+ {	name	=> _"Disc",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 8,
+	edit_max => 255,	edit_mode=> 'nozero',
 				id3v2	=> 'TPOS',	vorbis	=> 'discnumber',	ape	=> 'discnumber', ilst => "disc",
 	editwidth => 4,
 	edit_order=> 40,	edit_many=>1,	letter => 'd',
