@@ -6805,7 +6805,7 @@ sub Gtk2::StatusIcon::child {$_[0]}
 sub CreateTrayIcon
 {	if ($TrayIcon)
 	{	return if $Options{UseTray};
-		$TrayIcon->destroy;
+		$TrayIcon->destroy unless $TrayIcon->isa('Gtk2::StatusIcon');
 		$TrayIcon=undef;
 		return;
 	}
