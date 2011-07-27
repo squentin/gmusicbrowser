@@ -6862,7 +6862,8 @@ sub TrayMenuPopup
 	PopupContextMenu(\@TrayMenu, {usemenupos=>1}, $menu);
 }
 sub CloseTrayTip
-{	my $traytip=$TrayIcon->child->{PoppedUpWindow};
+{	return unless $TrayIcon;
+	my $traytip=$TrayIcon->child->{PoppedUpWindow};
 	$traytip->DestroyNow if $traytip;
 }
 sub ShowTraytip
