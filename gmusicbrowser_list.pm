@@ -4438,10 +4438,12 @@ sub button_press_cb
 		if (defined $key && !exists $self->{selected}{$key})
 		{	$self->key_selected($event,$i,$j);
 		}
-		my $menu = ::ChooseSongsFromA($key);
-		my $event = Gtk2->get_current_event;
-		$menu->show_all;
-		$menu->popup(undef,undef,undef,undef,$event->button,$event->time);
+		if ($self->{field} eq "album") { # only show popup in album-page of mosaic
+			my $menu = ::ChooseSongsFromA($key);
+			my $event = Gtk2->get_current_event;
+			$menu->show_all;
+			$menu->popup(undef,undef,undef,undef,$event->button,$event->time);
+		}
 	}
 	if ($but==3)
 	{	my ($i,$j,$key)=$self->coord_to_index($event->get_coords);
