@@ -3,7 +3,7 @@ Type=G+
 Title		= "gmusicbrowser"
 DefaultFocus	= SimpleSearch
 Default		= Window(size=1000x750)
-Window		= hidden=HBSongPlaylist|VPMosaic
+Window		= hidden=HBSongPlaylist|VBMosaic|VPMosaicArtist
 Author		= simon@shimmerproject.org
 ### main window containers: top bar, main and statusbar ###
 VBMain		= VBTop _HPMain
@@ -17,7 +17,7 @@ VBPlayer	= 1Filler0 HBTitle HBTimeSlider
 HBTitle		= Title(expand_max=500,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)",yalign=0.5,ellipsize=end) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0,ellipsize=end) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=300,yalign=0.5,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 ABToggle	= (yalign=0,yscale=0.0) HBToggle
-HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=gmb-view-list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=gmb-view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=gmb-view-mosaic,widget=VPMosaic,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=gmb-view-fullscreen,size=large-toolbar,tip="Fullscreen View") 10Filler2 ABSearchBox
+HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=gmb-view-list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=gmb-view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=gmb-view-mosaic,widget=VBMosaic,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=gmb-view-fullscreen,size=large-toolbar,tip="Fullscreen View") 10Filler2 ABSearchBox
 ABSearchBox	= (yalign=0) SimpleSearch(suggest=1)
 ABSettings	= (yalign=0,yscale=0.0) HBSettings
 HBSettings	= ExtraButtons(size=large-toolbar) BMSettings
@@ -25,17 +25,23 @@ BMSettings	= (icon=gtk-preferences,size="large-toolbar") SMLibrary LayoutItem Pl
 SMLibrary	= (label=_"Library") MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Music",icon="gtk-add") MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="gtk-refresh")
 ### main left: artist pane and album-cover ###
 VBLeft		= _VBListCover HBStatus
-VBListCover	= _NBList Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0,maxsize=350)
-NBList		= (tabpos="bottom") QueueList(songtree=1,tabtitle=_"Queue (%n)",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1,hscrollbar=0) HBLyrics VBAlbuminfo VBArtistinfo
+#VBListCover	= _NBList Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0) # uncomment this line to add overlay shadow
+VBListCover	= _NBList 1Cover(default=elementary/no-cover.svg,showcover=0)
+NBList		= (tabpos="bottom") QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1,hscrollbar=0) HBLyrics VBAlbuminfo VBArtistinfo
 HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
 VBArtistinfo	= (tabtitle="Artist") _PluginArtistinfo
 VBAlbuminfo	= (tabtitle="Album") _PluginAlbuminfo
-HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=Cover,tip=_"Show/Hide Cover")
+HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=FRCover,tip=_"Show/Hide Cover")
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
-HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VPMosaic
+HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VBMosaic
 HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
-VPMosaic	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
+VBMosaic	= FRToggleMosaic _VPMosaicAlbum _VPMosaicArtist
+FRToggleMosaic	= (shadow=in) ABToggleMosaic
+ABToggleMosaic	= (xalign=0.5,xscale=0.0) HBToggleMosaic
+HBToggleMosaic	= 3ToggleButton4(widget=VPMosaicAlbum,togglegroup=2,label=" Album ",xalign=0.5,relief=none) 3ToggleButton5(widget=VPMosaicArtist,togglegroup=2,label=" Artist "xalign=0.5,relief=none)
+VPMosaicAlbum	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
+VPMosaicArtist	= _FilterPane3(nb=3,hidebb=1,pages=artist,page_artist/mode=mosaic,page_artist/mmarkup=1,page_artist/mpicsize=96,hidetabs=1)
 ### bottom: statusbar ### Pref(size=small-toolbar,button=0)
 ### positioning and sizing ###
 DefaultFocus	= SimpleSearch
