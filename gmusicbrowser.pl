@@ -606,7 +606,7 @@ sub find_common_parent_folder
 	my $nb=@folders;
 	return $folder if $nb==1;
 	$folder=~s/$QSLASH+$//o;
-	until ($nb==grep m/^$folder(?:$QSLASH|$)/, @folders)
+	until ($nb==grep m/^\Q$folder\E(?:$QSLASH|$)/, @folders)
 	{	$folder='' unless $folder=~m/$QSLASH/o;	#for win32 drives
 		last unless $folder=~s/$QSLASH[^$QSLASH]+$//o;
 	}
