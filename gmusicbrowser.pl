@@ -1967,7 +1967,10 @@ sub SaveTags	#save tags _and_ settings
 	if ($fork)
 	{	my $pid= fork;
 		if (!defined $pid) { $fork=undef; } # error, fallback to saving in current process
-		elsif ($pid) {return}
+		elsif ($pid)
+		{	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
+			return
+		}
 	}
 
 	setlocale(LC_NUMERIC, 'C');
