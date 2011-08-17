@@ -297,7 +297,7 @@ INIT
 {
  @Tools=
  (	{ label=> _"Capitalize",		for_all => sub { ucfirst lc $_[0]; }, },
-	{ label=>_"Capitalize each word",	for_all => sub { join ' ',map ucfirst lc, split / /,$_[0]; }, },
+	{ label=>_"Capitalize each word",	for_all => sub { join '',map ucfirst lc, split /(\W+)/,$_[0]; }, },
  );
  @FORMATS=
  (	['%a - %l - %n - %t',	qr/(.+) - (.+) - (\d+) - (.+)$/],
