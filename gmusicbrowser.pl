@@ -50,6 +50,8 @@ use Fcntl qw/O_NONBLOCK O_WRONLY O_RDWR SEEK_SET/;
 use Encode qw/_utf8_on _utf8_off/;
 use Scalar::Util qw/blessed weaken refaddr/;
 use Unicode::Normalize 'NFKD'; #for accent-insensitive sort and search, only used via superlc()
+use Carp;
+$SIG{INT} = \&Carp::confess;
 
 #use constant SLASH => ($^O  eq 'MSWin32')? '\\' : '/';
 use constant SLASH => '/'; #gtk file chooser use '/' in win32 and perl accepts both '/' and '\'
