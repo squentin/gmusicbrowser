@@ -297,7 +297,7 @@ INIT
 {
  @Tools=
  (	{ label=> _"Capitalize",		for_all => sub { ucfirst lc $_[0]; }, },
-	{ label=>_"Capitalize each word",	for_all => sub { join ' ',map ucfirst lc, split / /,$_[0]; }, },
+	{ label=>_"Capitalize each word",	for_all => sub { join '',map ucfirst lc, split /(\W+)/,$_[0]; }, },
  );
  @FORMATS=
  (	['%a - %l - %n - %t',	qr/(.+) - (.+) - (\d+) - (.+)$/],
@@ -975,7 +975,7 @@ use Gtk2;
 use base 'Gtk2::SpinButton';
 
 sub new
-{	my ($class,$field,$IDs,$max,$digits) = @_;
+{	my ($class,$field,$IDs,$max,$digits,$specialmode) = @_;
 	$max||=10000000;
 	$digits||=0;
 	my $adj=Gtk2::Adjustment->new(0,0,$max,1,10,0);
@@ -990,6 +990,22 @@ sub new
 	}
 	else { $val=Songs::Get($IDs,$field); }
 	$self->set_value($val);
+
+	if ($specialmode)
+	{	if ($specialmode eq 'nozero')
+		{	$self->signal_connect(output=> \&output_nozero);
+		}
+		elsif ($specialmode eq 'year')
+		{	$self->set_wrap(1);
+			# set to current year when increasing or decreasing value from 0
+			$self->signal_connect(value_changed=>sub
+			{	my $v=$_[0]->get_value;
+				$_[0]->set_value( (localtime)[5]+1900 ) if $v==1 || $v>=$max;
+			});
+			$self->signal_connect(output=> \&output_nozero);
+		}
+	}
+
 	return $self;
 }
 sub get_text
@@ -1006,6 +1022,13 @@ sub is_blank
 }
 sub tool
 {	&GMB::TagEdit::EntryString::tool;
+}
+
+sub output_nozero
+{	my $v=$_[0]->get_value;
+	return 0 if $v;
+	Gtk2::Entry::set_text($_[0],'');
+	return 1;
 }
 
 package GMB::TagEdit::EntryBoolean;

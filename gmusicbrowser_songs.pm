@@ -173,7 +173,7 @@ our %timespan_menu=
 		'filter_prep:~'	=> '##mainfield#->filter_prep:~#',
 		'filter_prephash:~' => '##mainfield#->filter_prephash:~#',
 		'filter_simplify:~' => sub { split /$Artists_split_re/,$_[0] },
-		'filter:h~'	=> '(ref #_# ?  (grep .!!. exists $hash#VAL#->{$_+0}, @#_#) : (.!!. exists $hash#VAL#->{#_#+0}))',
+		'filter:h~'	=> '(ref #_# ?  (grep .!!. exists $hash#VAL#->{$_+0}, @{#_#}) : (.!!. exists $hash#VAL#->{#_#+0}))',
 		gid_search	=> '__#mainfield#_name[#GID#] =~ m/#RE#/',
 		gid_isearch	=> '__#mainfield#_iname[#GID#] =~ m/#RE#/',
 		makefilter	=> '"#field#:~:".##mainfield#->gid_to_sgid#',
@@ -228,9 +228,9 @@ our %timespan_menu=
 		mainfield	=> 'album',
 		_empty		=> 'vec(__#mainfield#_empty,#_#,1)',
 		unknown		=> '_("<Unknown>")." "',
-		init		=> '____=""; __#mainfield#_gid{"\\x00"}=1; __#mainfield#_empty=""; vec(__#mainfield#_empty,1,1)=1; #_iname#[1]=::superlc( #_name#[1]=_("<Unknown>") );',
+		init		=> '____=""; __#mainfield#_gid{"\\x00"}=1; __#mainfield#_empty=""; vec(__#mainfield#_empty,1,1)=1; __#mainfield#_sgid[1]="\\x00"; #_iname#[1]=::superlc( #_name#[1]=_("<Unknown>") );',
 		findgid		=> 'do{	my $name=#VAL#; my $sgid= $name ."\\x00". ($name eq "" ?	"artist=".#artist->get# :	do {my $a=#album_artist_raw->get#; $a ne "" ?	"album_artist=$a" :	#compilation->get# ?	"compilation=1" : ""}	);
-					__#mainfield#_gid{$sgid}||= do {my $n=@#_name#; if ($name eq "") {vec(__#mainfield#_empty,$n,1)=1; $name=#unknown#.#artist->get#; } push @#_name#,$name; #newval#; $n; }
+					__#mainfield#_gid{$sgid}||= do {my $n=@#_name#; if ($name eq "") {vec(__#mainfield#_empty,$n,1)=1; $name=#unknown#.#artist->get#; } push @#_name#,$name; push @__#mainfield#_sgid,$sgid; #newval#; $n; };
 				    };',
 		#possible sgid : album."\x00".	""				if no album name and no artist
 		#				"artist=".artist		if no album name
@@ -242,9 +242,8 @@ our %timespan_menu=
 		#newval		=> 'push @#_iname#, ::superlc( #_name#[-1] );',
 		get		=> '(#_empty# ? "" : #_name#[#_#])',
 		gid_to_get	=> '(vec(__#mainfield#_empty,#GID#,1) ? "" : #_name#[#GID#])',
-		sgid_to_gid	=> 'do {my $s=#VAL#; __#mainfield#_gid{$s}||= do { my $n=@#_name#; if ($s=~s/\x00(\w+)=(.*)$// && $s eq "" && $1 eq "artist") { $s= #unknown#.$2; vec(__#mainfield#_empty,$n,1)=1;} push @#_name#,$s; #newval#; $n }}',
-		#gid_to_sgid	=> 'vec(__#mainfield#_empty,#GID#,1) ? "\\x00".substr(#_name#[#GID#],length(#unknown#)) : #_name#[#GID#]',
-		gid_to_sgid	=> '::first {$__#mainfield#_gid{$_}==#GID#} keys %__#mainfield#_gid;', #slower but more simple and reliable
+		sgid_to_gid	=> 'do {my $s=#VAL#; __#mainfield#_gid{$s}||= do { my $n=@#_name#; if ($s=~s/\x00(\w+)=(.*)$// && $s eq "" && $1 eq "artist") { $s= #unknown#.$2; vec(__#mainfield#_empty,$n,1)=1;} push @#_name#,$s; push @__#mainfield#_sgid,#VAL#; #newval#; $n }}',
+		gid_to_sgid	=> '$__#mainfield#_sgid[#GID#]',
 		makefilter	=> '"#field#:~:" . #gid_to_sgid#',
 		update		=> 'my $albumname=#get#; #set(VAL=$albumname)#;',
 		listall		=> 'grep !vec(__#mainfield#_empty,$_,1), 2..@#_name#-1',
@@ -435,7 +434,7 @@ our %timespan_menu=
 		check		=> '#VAL#= #VAL# =~m/^(\d+)/ && $1<2**#bits# ? $1 : 0;',	# set to 0 if overflow
 		init		=> '____="";',
 		parent		=> 'number',
-		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,$Def{$field}{edit_max}); },
+		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,$Def{$field}{edit_max},0,$Def{$field}{edit_mode}); },
 	},
 	'integer.div' =>
 	{	makefilter	=> '"#field#:b:".(#GID# * #ARG0#)." ".(((#GID#+1) * #ARG0#)-1)',
@@ -722,7 +721,8 @@ our %timespan_menu=
 	category=>'extra',
  },
  year =>
- {	name	=> _"Year",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 16, edit_max=>3000,
+ {	name	=> _"Year",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 16,
+	edit_max=>3000,	edit_mode=> 'year',
 	check	=> '#VAL#= #VAL# =~m/(\d\d\d\d)/ ? $1 : 0;',
 	id3v1	=> 3,		id3v2 => 'TDRC|TYER', 'id3v2.3'=> 'TYER|TDRC',	'id3v2.4'=> 'TDRC|TYER',	vorbis	=> 'date|year',	ape	=> 'Record Date|Year', ilst => "\xA9day",
 	gid_to_display	=> '#GID# ? #GID# : _"None"',
@@ -737,12 +737,14 @@ our %timespan_menu=
  track =>
  {	name	=> _"Track",	width => 40,	flags => 'fgarwesc',
 	id3v1	=> 5,		id3v2	=> 'TRCK',	vorbis	=> 'tracknumber',	ape	=> 'Track', ilst => "trkn",
-	type => 'integer',	displayformat => '%02d', bits => 16, edit_max => 65535,
+	type => 'integer',	displayformat => '%02d', bits => 16,
+	edit_max => 65535, 	edit_mode=> 'nozero',
 	edit_order=> 20,	editwidth => 4,		letter => 'n',
 	category=>'basic',
  },
  disc =>
- {	name	=> _"Disc",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 8, edit_max => 255,
+ {	name	=> _"Disc",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 8,
+	edit_max => 255,	edit_mode=> 'nozero',
 				id3v2	=> 'TPOS',	vorbis	=> 'discnumber',	ape	=> 'discnumber', ilst => "disc",
 	editwidth => 4,
 	edit_order=> 40,	edit_many=>1,	letter => 'd',
@@ -1430,9 +1432,13 @@ sub UpdateFuncs
 sub MakeLoadSub
 {	my ($extradata,@loaded_slots)=@_;
 	my %extra_sub;
-	my $code='$LastID++; ';
 	my %loadedfields;
 	$loadedfields{$loaded_slots[$_]}=$_ for 0..$#loaded_slots;
+	# begin with a line that checks if a given path-file has already been loaded into the library
+	my $pathfile_code= '$_['.$loadedfields{path}.'] ."/". $_['.$loadedfields{file}.']';
+	my $code= '$uniq_check{ '.$pathfile_code.' }++ && do { warn qq(warning: file "'.$pathfile_code.'" already in library, skipping.\\n); return };'."\n";
+	# new file, increment $LastID
+	$code.='$LastID++;'."\n";
 	for my $field (@Fields)
 	{	my $i=$loadedfields{$field};
 		my $c;
@@ -1465,7 +1471,7 @@ sub MakeLoadSub
 		}
 	}
 	$code.= '; return $LastID;';
-	my $loadsub= Compile(LoadSub => "sub {$code}");
+	my $loadsub= Compile(LoadSub => "my %uniq_check; sub {$code}");
 	return $loadsub,\%extra_sub;
 }
 sub MakeSaveSub
@@ -4111,7 +4117,7 @@ sub _optimize_with_hashes	# optimization for some special cases
 			}
 			$d--;
 		}
-		elsif ( $s=~m/^(\w+):(-?)([e~]):(.*)$/ && ($or[$d] xor $1) )
+		elsif ( $s=~m/^(\w+):(-?)([e~]):(.*)$/ && ($or[$d] xor $2) )
 		{	$val[$d]{"$1:$2$3:"}{$4}=undef;		#add key to the hash
 			push @{$ilist[$d]{"$1:$2$3:"}},$i;	#store filter index to remove it later if it is replaced
 		}

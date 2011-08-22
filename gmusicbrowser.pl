@@ -50,6 +50,8 @@ use Fcntl qw/O_NONBLOCK O_WRONLY O_RDWR SEEK_SET/;
 use Encode qw/_utf8_on _utf8_off/;
 use Scalar::Util qw/blessed weaken refaddr/;
 use Unicode::Normalize 'NFKD'; #for accent-insensitive sort and search, only used via superlc()
+use Carp;
+$SIG{INT} = \&Carp::confess;
 
 #use constant SLASH => ($^O  eq 'MSWin32')? '\\' : '/';
 use constant SLASH => '/'; #gtk file chooser use '/' in win32 and perl accepts both '/' and '\'
@@ -606,7 +608,7 @@ sub find_common_parent_folder
 	my $nb=@folders;
 	return $folder if $nb==1;
 	$folder=~s/$QSLASH+$//o;
-	until ($nb==grep m/^$folder(?:$QSLASH|$)/, @folders)
+	until ($nb==grep m/^\Q$folder\E(?:$QSLASH|$)/, @folders)
 	{	$folder='' unless $folder=~m/$QSLASH/o;	#for win32 drives
 		last unless $folder=~s/$QSLASH[^$QSLASH]+$//o;
 	}
@@ -1425,6 +1427,7 @@ sub Quit
 	$Options{SavedPlayTime}= $PlayTime if $Options{RememberPlayTime};
 	&Stop if defined $TogPlay;
 	@ToScan=@ToAdd_Files=();
+	CloseTrayTip();
 	SaveTags();
 	unlink $FIFOFile if defined $FIFOFile;
 	Gtk2->main_quit;
@@ -1966,7 +1969,10 @@ sub SaveTags	#save tags _and_ settings
 	if ($fork)
 	{	my $pid= fork;
 		if (!defined $pid) { $fork=undef; } # error, fallback to saving in current process
-		elsif ($pid) {return}
+		elsif ($pid)
+		{	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
+			return
+		}
 	}
 
 	setlocale(LC_NUMERIC, 'C');
@@ -6762,7 +6768,7 @@ sub Gtk2::StatusIcon::child {$_[0]}
 sub CreateTrayIcon
 {	if ($TrayIcon)
 	{	return if $Options{UseTray};
-		$TrayIcon->destroy;
+		$TrayIcon->destroy unless $TrayIcon->isa('Gtk2::StatusIcon');
 		$TrayIcon=undef;
 		return;
 	}
@@ -6812,18 +6818,21 @@ sub SetTrayTipDelay
 	$TrayIcon->child->{hover_delay}= $Options{TrayTipDelay}||1;
 }
 sub TrayMenuPopup
-{	my $traytip=$TrayIcon->child->{PoppedUpWindow};
-	$traytip->DestroyNow if $traytip;
+{	CloseTrayTip();
 	$TrayIcon->{block_popup}=1;
 	my $menu=Gtk2::Menu->new;
 	$menu->signal_connect( selection_done => sub {$TrayIcon->{block_popup}=undef});
 	PopupContextMenu(\@TrayMenu, {usemenupos=>1}, $menu);
 }
+sub CloseTrayTip
+{	return unless $TrayIcon;
+	my $traytip=$TrayIcon->child->{PoppedUpWindow};
+	$traytip->DestroyNow if $traytip;
+}
 sub ShowTraytip
 {	return 0 if !$TrayIcon || $TrayIcon->{block_popup};
 	Layout::Window::Popup::Popup($TrayIcon->child,$_[0]);
 }
-
 sub windowpos	# function to position window next to clicked widget ($event can be a widget)
 {	my ($win,$event)=@_;
 	return (0,0) unless $event;

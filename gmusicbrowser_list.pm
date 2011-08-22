@@ -2494,7 +2494,7 @@ use base 'Gtk2::ScrolledWindow';
 sub new
 {	my ($class,$col,$opt)=@_;
 	my $self = bless Gtk2::ScrolledWindow->new, $class;
-	$self->set_shadow_type ('etched-in');
+	#$self->set_shadow_type ('etched-in');
 	$self->set_policy ('automatic', 'automatic');
 	::set_biscrolling($self);
 
@@ -2667,7 +2667,7 @@ use base 'Gtk2::ScrolledWindow';
 sub new
 {	my ($class,$col,$opt)=@_;
 	my $self = bless Gtk2::ScrolledWindow->new, $class;
-	$self->set_shadow_type ('etched-in');
+	#$self->set_shadow_type ('etched-in');
 	$self->set_policy ('automatic', 'automatic');
 	::set_biscrolling($self);
 
@@ -2918,7 +2918,7 @@ sub new
 	$selection->signal_connect( changed => \&sel_changed_cb);
 
 	my $sw=Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
+	#$sw->set_shadow_type('etched-in');
 	$sw->set_policy('automatic','automatic');
 	::set_biscrolling($sw);
 	$sw->add($treeview);
@@ -5027,7 +5027,7 @@ sub key_press_cb
 	elsif	($key eq 'Page_Up')	{ $j-=$page; }
 	elsif	($key eq 'Page_Down')	{ $j+=$page; }
 	elsif	(lc$key eq 'a' && $ctrl)							#ctrl-a : select-all
-		{ $self->{selected}{$_}=undef for @{ $self->{list} }; $self->queue_draw; return 1; }
+		{ $self->{selected}{$_}=undef for @{ $self->{list} }; $self->queue_draw; $self->{selectsub}($self); return 1; }
 	else {return 0}
 	if	($i<0)		{$j--;$i=$nw-1;}
 	elsif	($i>=$nw)	{$j++;$i=0;}
