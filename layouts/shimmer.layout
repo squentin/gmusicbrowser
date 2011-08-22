@@ -34,14 +34,15 @@ VBAlbuminfo	= (tabtitle="Album") _PluginAlbuminfo
 HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=FRCover,tip=_"Show/Hide Cover")
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
-HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _VBMosaic
+HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
 HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
-VBMosaic	= FRToggleMosaic _VPMosaicAlbum _VPMosaicArtist
-FRToggleMosaic	= (shadow=in) ABToggleMosaic
-ABToggleMosaic	= (xalign=0.5,xscale=0.0) HBToggleMosaic
-HBToggleMosaic	= 3ToggleButton4(widget=VPMosaicAlbum,togglegroup=2,label=" Album ",xalign=0.5,relief=none) 3ToggleButton5(widget=VPMosaicArtist,togglegroup=2,label=" Artist "xalign=0.5,relief=none)
-VPMosaicAlbum	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
-VPMosaicArtist	= _FilterPane3(nb=3,hidebb=1,pages=artist,page_artist/mode=mosaic,page_artist/mmarkup=1,page_artist/mpicsize=96,hidetabs=1)
+#VBMosaic	= FRToggleMosaic _VPMosaicAlbum _VPMosaicArtist
+#FRToggleMosaic	= (shadow=in) HBToggleMosaicClose
+#HBToggleMosaicClose = ABToggleMosaic -ToggleButton6(widget=FRToggleMosaic,label="",icon="gtk-close",tip=_"Hide Artist/Album bar")
+#ABToggleMosaic	= (xalign=0.5,xscale=0.0) HBToggleMosaic
+#HBToggleMosaic	= 3ToggleButton4(widget=VPMosaicAlbum,togglegroup=2,label=" Album ",relief=none) 3ToggleButton5(widget=VPMosaicArtist,togglegroup=2,label=" Artist ",relief=none)
+#VPMosaicAlbum	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
+#VPMosaicArtist	= _FilterPane3(nb=3,hidebb=1,pages=artist,page_artist/mode=mosaic,page_artist/mmarkup=1,page_artist/mpicsize=96,hidetabs=1)
 ### bottom: statusbar ### Pref(size=small-toolbar,button=0)
 ### positioning and sizing ###
 DefaultFocus	= SimpleSearch
