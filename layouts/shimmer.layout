@@ -3,7 +3,7 @@ Type=G+
 Title		= "gmusicbrowser"
 DefaultFocus	= SimpleSearch
 Default		= Window(size=1000x750)
-Window		= hidden=HBSongPlaylist|VBMosaic|VPMosaicArtist
+Window		= hidden=HBSongPlaylist|FilterPane2
 Author		= simon@shimmerproject.org
 ### main window containers: top bar, main and statusbar ###
 VBMain		= VBTop _HPMain
@@ -17,7 +17,7 @@ VBPlayer	= 1Filler0 HBTitle HBTimeSlider
 HBTitle		= Title(expand_max=500,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)",yalign=0.5,ellipsize=end) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0,ellipsize=end) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=300,yalign=0.5,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 ABToggle	= (yalign=0,yscale=0.0) HBToggle
-HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=gmb-view-list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=gmb-view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=gmb-view-mosaic,widget=VBMosaic,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=gmb-view-fullscreen,size=large-toolbar,tip="Fullscreen View") 10Filler2 ABSearchBox
+HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=gmb-view-list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=gmb-view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=gmb-view-mosaic,widget=FilterPane2,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=gmb-view-fullscreen,size=large-toolbar,tip="Fullscreen View") 10Filler2 ABSearchBox
 ABSearchBox	= (yalign=0) SimpleSearch(suggest=1)
 ABSettings	= (yalign=0,yscale=0.0) HBSettings
 HBSettings	= ExtraButtons(size=large-toolbar) BMSettings
