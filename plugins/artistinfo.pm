@@ -50,7 +50,7 @@ my %menuitem=
 );
 
 my %queuemode=
-(	order=>10, icon=>'gtk-refresh',	short=> _"similar-artists",		long=> _"Auto-fill queue with similar artists (from last.fm)",	changed=>\&QAutofillSimilarArtists,	keep=>1,save=>1,
+(	order=>10, icon=>'gtk-refresh',	short=> _"similar-artists",		long=> _"Auto-fill queue with similar artists (from last.fm)",	changed=>\&QAutofillSimilarArtists,	keep=>1,save=>1,autofill=>1,
 );
 
 =dop

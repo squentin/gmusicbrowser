@@ -400,7 +400,7 @@ sub Update
 	my $action=$::QueueAction;
 	$self->{queuecombo}->set_active( $self->{actionindex}{$action} );
 	$self->{eventcombo}->set_tooltip_text( $::QActions{$action}{long} );
-	my $m=($action eq 'autofill')? 'show' : 'hide';
+	my $m= $::QActions{$action}{autofill} ? 'show' : 'hide';
 	$self->{spin}->$m;
 	$self->{spin}->set_value($::Options{MaxAutoFill});
 	delete $self->{busy};
