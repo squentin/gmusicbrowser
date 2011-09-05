@@ -22,8 +22,8 @@ use constant
 };
 
 our @MenuQueue=
-(	{label => _"Queue album",	code => sub { ::EnqueueSame('album',$_[0]{ID}); } },
-	{label => _"Queue artist",	code => sub { ::EnqueueSame('artist',$_[0]{ID});} },  # or use field 'artists' or 'first_artist' ?
+(	{label => _"Queue album",	code => sub { ::EnqueueSame('album',$_[0]{ID}); }, istrue=>'ID', },
+	{label => _"Queue artist",	code => sub { ::EnqueueSame('artist',$_[0]{ID});}, istrue=>'ID', },  # or use field 'artists' or 'first_artist' ?
 	{ include => sub
 		{	my $menu=$_[1];
 			my @modes= map { $_=>$::QActions{$_}{long} } ::List_QueueActions();

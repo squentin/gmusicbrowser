@@ -354,9 +354,10 @@ my ($browsercmd,$opendircmd);
 # save : save mode when RememberQueue is on
 # condition : do not show mode if return false
 # order : used to sort modes
+# autofill : indicate that this mode use the maxautofill value
 our %QActions=
 (	''	=> {order=>0,				short=> _"normal",		long=> _"Normal mode"},
-	autofill=> {order=>10, icon=>'gtk-refresh',	short=> _"autofill",		long=> _"Auto-fill queue",					changed=>\&QAutoFill,	keep=>1,save=>1, },
+	autofill=> {order=>10, icon=>'gtk-refresh',	short=> _"autofill",		long=> _"Auto-fill queue",					changed=>\&QAutoFill,	 keep=>1,save=>1,autofill=>1, },
 	'wait'	=> {order=>20, icon=>'gmb-wait',	short=> _"wait for more",	long=> _"Wait for more when queue empty",	action=>\&Stop,	changed=>\&QWaitAutoPlay,keep=>1,save=>1, },
 	stop	=> {order=>30, icon=>'gtk-media-stop',	short=> _"stop",		long=> _"Stop when queue empty",		action=>\&Stop},
 	quit	=> {order=>40, icon=>'gtk-quit',	short=> _"quit",		long=> _"Quit when queue empty",		action=>\&Quit},
@@ -450,6 +451,7 @@ our @SongCMenu=
 	{ label => _"Edit Lyrics",	code => sub { EditLyrics(	$_[0]{IDs}[0] ); },	mode => 'P' },
 	{ label => _"Lookup in google",	code => sub { Google(		$_[0]{IDs}[0] ); },	mode => 'P' },
 	{ label => _"Open containing folder",	code => sub { openfolder( Songs::Get( $_[0]{IDs}[0], 'path') ); },	onlyone => 'IDs' },
+	{ label => _"Queue options", submenu => \@Layout::MenuQueue, mode => 'Q', }
 );
 our @cMenuAA=
 (	{ label => _"Lock",	code => sub { ToggleLock($_[0]{lockfield}); }, check => sub { $::TogLock && $::TogLock eq $_[0]{lockfield}}, mode => 'P',

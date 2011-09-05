@@ -50,7 +50,7 @@ my %menuitem=
 );
 
 my %queuemode=
-(	order=>10, icon=>'gtk-refresh',	short=> _"similar-artists",		long=> _"Auto-fill queue with similar artists (from last.fm)",	changed=>\&QAutofillSimilarArtists,	keep=>1,save=>1,
+(	order=>10, icon=>'gtk-refresh',	short=> _"similar-artists",		long=> _"Auto-fill queue with similar artists (from last.fm)",	changed=>\&QAutofillSimilarArtists,	keep=>1,save=>1,autofill=>1,
 );
 
 =dop
@@ -446,9 +446,9 @@ sub ArtistChanged
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($aID,"<big><b>%a</b></big>","artist",1) );
 	$self->{Lstats}->set_markup( AA::ReplaceFields($aID,'%X « %s'."\n<small>%y</small>","artist",1) );
 	for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
-	
+
 	my $url = GetUrl($sites{$self->{site}}[SITEURL],$aID);
-	
+
 	if (!$self->{url} or $url ne $self->{url} or $force == 1) {
 		$self->{url} = $url;
 		if ($self->{site} eq "biography") { # check for local biography file before loading the page
@@ -652,7 +652,7 @@ sub QAutofillSimilarArtists
 	my $aID = Songs::Get_gid($::SongID,'artist');
 	warn " * Master Artist: " . Songs::Gid_to_Get("artist",$aID) ."\n";
 	my $url = GetUrl($sites{similar}[0],$aID);
-	
+
 	Simple_http::get_with_cb(url => $url, cb => sub {
 		my $data =$_[0];
 		return unless $::QueueAction eq 'autofill-similar-artists'; # re-check queueaction and 
@@ -667,11 +667,11 @@ sub QAutofillSimilarArtists
 				my $aID=Songs::Search_artistid($s_artist{name});
 				push (@artist_gids, $aID) if $aID;
 			}
-			
+
 		}
-		
+
 		push (@artist_gids, Songs::Get_gid($::SongID,'artist')) unless $::Options{OPT.'SimilarExcludeSeed'}; # add currently playing artist as well
-		
+
 		my $filter= Filter->newadd(0, map Songs::MakeFilterFromGID("artist",$_), @artist_gids );
 		my $random= Random->new('random:',$filter->filter);
 		my @IDs=$random->Draw($nb,[@$::Queue,$::SongID]); # add queue and current song to blacklist (won't draw)

@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1006\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-03-26 14:10+0600\n"
-"PO-Revision-Date: 2011-03-27 19:31+0700\n"
+"POT-Creation-Date: 2011-08-16 10:48+0000\n"
+"PO-Revision-Date: 2011-08-22 21:41+0700\n"
 "Last-Translator: tin <girlwithoutadream@gmail.com>\n"
 "Language-Team: \n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "Plural-Forms: nplurals=3; plural=((((n%10)==1)&&((n%100)!=11))?(0):(((((n%10)"
 ">=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
 "X-Poedit-Language: Russian\n"
@@ -115,47 +115,11 @@ msgstr[0] "%d песня выделена"
 msgstr[1] "%d песни выделены"
 msgstr[2] "%d песен выделено"
 
-msgid "%f is set"
-msgstr "%f установлен"
+msgid "%s is set"
+msgstr "%s установлен"
 
-msgid "%f isn't set"
-msgstr "%f не установлен"
-
-msgid "%n first added"
-msgstr "%n первых добавленных"
-
-msgid "%n last added"
-msgstr "%n последних добавленных"
-
-msgid "%n last played"
-msgstr "%n последних воспроизведённых"
-
-msgid "%n last skipped"
-msgstr "%n последних пропущенных"
-
-msgid "%n less played"
-msgstr "%n наименее воспроизводимых"
-
-msgid "%n less skipped"
-msgstr "%n наименее пропускаемых"
-
-msgid "%n longest"
-msgstr "%n самых длинных"
-
-msgid "%n most played"
-msgstr "%n воспроизводимых больше всех"
-
-msgid "%n most skipped"
-msgstr "%n наиболее пропускаемых"
-
-msgid "%n not played for the longest time"
-msgstr "%n не воспроизводившихся долгое время"
-
-msgid "%n not skipped for the longest time"
-msgstr "%n не пропускавшихся долгое время"
-
-msgid "%n shortest"
-msgstr "%n самых коротких"
+msgid "%s isn't set"
+msgstr "%s не установлен"
 
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' существует. Перезаписать?"
@@ -165,14 +129,6 @@ msgid_plural "(%d songs excluded)"
 msgstr[0] "(%d песня исключена)"
 msgstr[1] "(%d песни исключены)"
 msgstr[2] "(%d песен исключено)"
-
-# ?
-msgid "(: )has one"
-msgstr "(: )есть один"
-
-# ?
-msgid "(: )none"
-msgstr "(: )нет"
 
 msgid "(applied after restart)"
 msgstr "(вступит в силу после перезапуска)"
@@ -392,7 +348,7 @@ msgid "Album picture & info"
 msgstr "Обложка и информация об альбоме"
 
 msgid "Album shuffle"
-msgstr "Перемешивание альбома"
+msgstr "Перемешивание альбомов"
 
 msgid "Album with picture"
 msgstr "Альбом с изображением"
@@ -411,9 +367,6 @@ msgstr "Все альбомы"
 
 msgid "All artists"
 msgstr "Все исполнители"
-
-msgid "All but the [most/less]%n"
-msgstr "Все кроме [наиболее/наименее]%n"
 
 msgid "All files"
 msgstr "Все файлы"
@@ -482,8 +435,8 @@ msgstr "Исполнитель и альбом"
 msgid "Artist Biography"
 msgstr "Биография исполнителя"
 
-msgid "Artist Picture Size : "
-msgstr "Размер изображения исполнителя: "
+msgid "Artist Picture Size : %d"
+msgstr "Размер изображения исполнителя: %d"
 
 msgid "Artist URL"
 msgstr "URL исполнителя"
@@ -515,6 +468,9 @@ msgstr "Спрашивать подтверждение только, если �
 msgid "Audio"
 msgstr "Аудио"
 
+msgid "Audio properties"
+msgstr "Свойства аудио"
+
 msgid "Author"
 msgstr "Автор"
 
@@ -524,14 +480,14 @@ msgstr "Автозаполнение на основе имен файлов ...
 msgid "Auto fill only blank fields"
 msgstr "Автозаполнение только пустых полей"
 
-msgid "Auto fill queue"
-msgstr "Автозаполнение очереди"
-
 msgid "Auto fill up to"
 msgstr "Автозаполнение до"
 
 msgid "Auto filter"
 msgstr "Авто-фильтр"
+
+msgid "Auto-fill queue"
+msgstr "Автозаполнение очереди"
 
 msgid "Auto-increment track numbers"
 msgstr "Автодополнение номеров треков"
@@ -568,6 +524,9 @@ msgstr "Неудачный сеанс"
 
 msgid "Base Folder :"
 msgstr "Базовая папка:"
+
+msgid "Basic fields"
+msgstr "Основные поля"
 
 msgid "Begin with"
 msgstr "Начинается с"
@@ -674,6 +633,9 @@ msgstr "Проверять обновлённые/удалённые песни 
 msgid "Check for updated/removed songs"
 msgstr "Проверить обновлённые/удалённые песни"
 
+msgid "Check real length of mp3"
+msgstr "Проверять реальную длину mp3"
+
 msgid "Checking length/bitrate"
 msgstr "Проверка длины/битрейта"
 
@@ -686,14 +648,14 @@ msgstr "Выбрать альбом этого исполнителя"
 msgid "Choose Artist/Album/Song"
 msgstr "Выбрать Исполнителя/Альбом/Песню"
 
-msgid "Choose Date"
-msgstr "Выбрать дату"
-
 msgid "Choose Picture"
 msgstr "Выбрать изображение"
 
 msgid "Choose Random Album"
 msgstr "Выбрать случайный альбом"
+
+msgid "Choose a folder"
+msgstr "Выбрать папку"
 
 msgid "Choose directory to copy files to"
 msgstr "Выбрать директорию для копирования файлов"
@@ -872,8 +834,8 @@ msgstr "Убавить звук"
 msgid "Default"
 msgstr "По умолчанию"
 
-msgid "Default rating :"
-msgstr "Оценка по умолчанию:"
+msgid "Default rating : %d %"
+msgstr "Оценка по умолчанию: %d %"
 
 msgid "Default text color"
 msgstr "Цвет текста по умолчанию"
@@ -881,8 +843,8 @@ msgstr "Цвет текста по умолчанию"
 msgid "Default text font"
 msgstr "Шрифт текста по умолчанию"
 
-msgid "Delay tray tip popup on mouse over"
-msgstr "Задерживать всплывающее окно при наведении курсора"
+msgid "Delay before showing tray tip popup on mouse over : %d ms"
+msgstr "Задержка перед показом всплывающего окна при наведении курсора: %d мс"
 
 msgid "Delete Selected Songs"
 msgstr "Удалить выделенные песни"
@@ -937,8 +899,8 @@ msgstr "Отобразить действия стоп/дальше"
 msgid "Display synchronized lyrics of the current song"
 msgstr "Показать синхронизированный текст текущей песни"
 
-msgid "Display tray tip for"
-msgstr "Показать всплывающее окно"
+msgid "Display tray tip for %d ms"
+msgstr "Показать всплывающее окно на %d мс"
 
 msgid "Do not add a title row"
 msgstr "Не добавлять строку заголовка"
@@ -977,13 +939,13 @@ msgid "Edit Labels"
 msgstr "Править метки"
 
 msgid "Edit Lyrics"
-msgstr "Править текст"
+msgstr "Править текст песни"
 
 msgid "Edit Lyrics ..."
-msgstr "Править текст..."
+msgstr "Править текст песни..."
 
 msgid "Edit Multiple Songs Properties"
-msgstr "Править свойства нескольких песен"
+msgstr "Правка свойств нескольких песен"
 
 msgid "Edit Rating"
 msgstr "Изменить оценку"
@@ -996,6 +958,9 @@ msgstr "Править формат автозаполнения ..."
 
 msgid "Edit filter"
 msgstr "Править фильтр"
+
+msgid "Edit filter..."
+msgstr "Править фильтр..."
 
 msgid "Edit grouping ..."
 msgstr "Правка группирования..."
@@ -1095,7 +1060,7 @@ msgid ""
 "Error saving lyrics in '{file}' :\n"
 "{error}"
 msgstr ""
-"Ошибка сохранения теста в '{file}':\n"
+"Ошибка сохранения текста в '{file}':\n"
 "{error}"
 
 msgid "Error writing '{file}'"
@@ -1125,6 +1090,9 @@ msgstr "Экспортировать свойства песни в cvs-файл
 msgid "Export to .m3u file"
 msgstr "Экспорт в m3u-файл"
 
+msgid "Extra fields"
+msgstr "Дополнительные поля"
+
 msgid "Extra gain"
 msgstr "Дополнительное усиление"
 
@@ -1134,8 +1102,8 @@ msgstr "Извлекать приглашенного исполнителя и�
 msgid "Fade-out"
 msgstr "Затухание"
 
-msgid "Fade-out in"
-msgstr "Затухание в"
+msgid "Fade-out in %d seconds"
+msgstr "Затухание за %d секунд"
 
 msgid "Fade-out then stop"
 msgstr "Затухнуть, затем остановить"
@@ -1155,6 +1123,9 @@ msgstr "Тип поля"
 
 msgid "Fields"
 msgstr "Поля"
+
+msgid "File properties"
+msgstr "Свойства файла"
 
 msgid "File type"
 msgstr "Тип файла"
@@ -1205,13 +1176,13 @@ msgid "Find a unique filename if file already exists"
 msgstr "Найти уникальное имя файла, если файл уже существует"
 
 msgid "Find songs in same albums"
-msgstr "Найти песни в тех же альбома"
+msgstr "Найти песни в тех же альбомах"
 
 msgid "Find songs with same artists"
 msgstr "Найти песни с тем же исполнителем"
 
 msgid "Find songs with the same names"
-msgstr "Найти песни с такими же именами"
+msgstr "Найти песни с такими же названиями"
 
 msgid "Folder"
 msgstr "Папка"
@@ -1338,6 +1309,9 @@ msgstr "Нечувствительные заголовок-исполнител
 msgid "Insensitive, Song & Cover"
 msgstr "Нечувствительные Песня и Обложка"
 
+msgid "Insert Selected Songs at the top of the queue"
+msgstr "Вставить выделенные песни в начало очереди"
+
 msgid "Insert a list of files/folders at the start of the playlist"
 msgstr "Вставить список файлов/папок в начало списка воспроизведения"
 
@@ -1347,8 +1321,14 @@ msgstr "Вставить этот конвейер перед модулем в�
 msgid "Invalid regular expression"
 msgstr "Неверное регулярное выражение"
 
+msgid "Invert filter"
+msgstr "Обратить фильтр"
+
 msgid "Invisible hot spot"
 msgstr "Невидимый хот-спот"
+
+msgid "Isn't smart equal to %s"
+msgstr "Не соответствует %s"
 
 msgid "Justified"
 msgstr "Выравненно"
@@ -1396,7 +1376,7 @@ msgid "Languages"
 msgstr "Языки"
 
 msgid "Last played"
-msgstr "Послед. воспроизв."
+msgstr "Последнее воспроизведение"
 
 msgid "Last skipped"
 msgstr "Пропущено в последний раз"
@@ -1443,11 +1423,11 @@ msgstr[0] "Размер библиотеки: %d песня"
 msgstr[1] "Размер библиотеки: %d песни"
 msgstr[2] "Размер библиотеки: %d песен"
 
-msgid "Limit similar artists to a rate of similarity : "
-msgstr "Ограничить похожих исполнителей по степени похожести: "
+msgid "Limit similar artists to a rate of similarity : %d"
+msgstr "Ограничить похожих исполнителей степенью схожести: %d"
 
-msgid "Limit similar artists to the first : "
-msgstr "Ограничивать похожих исполнителей первыми: "
+msgid "Limit similar artists to the first : %d"
+msgstr "Ограничить похожих исполнителей первыми: %d"
 
 msgid "List"
 msgstr "Список"
@@ -1467,23 +1447,26 @@ msgstr "Песни в списке"
 msgid "Listeners: "
 msgstr "Слушателей: "
 
+msgid "Lists"
+msgstr "Списки"
+
 msgid "Lists, Library & Context"
 msgstr "Списки, библиотека и контекст"
 
 msgid "Literal search"
 msgstr "Точный поиск"
 
+msgid "Load lyrics even if lyrics panel is hidden"
+msgstr "Загружать тексты песен даже если панель текстов скрыта"
+
 msgid "Load/Save Artist Info in :"
 msgstr "Загрузить/Сохранить информацию в:"
-
-msgid "Load/Save lyrics in :"
-msgstr "Загрузить/Сохранить текст в:"
 
 msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "Загружена %d песня с прошлой сессии"
 msgstr[1] "Загружены %d песни с прошлой сессии"
-msgstr[2] "Загружено %d песни с прошлой сессии"
+msgstr[2] "Загружено %d песен с прошлой сессии"
 
 msgid "Loading failed."
 msgstr "Загрузка не удалась."
@@ -1538,13 +1521,19 @@ msgid "Lyricist"
 msgstr "Автор текста"
 
 msgid "Lyrics"
-msgstr "Текст песни"
+msgstr "Тексты песен"
 
 msgid "Lyrics (requires lyrics plugin)"
-msgstr "Текст песни (требуется плагин текстов песен)"
+msgstr "Тексты песен (требуется плагин текстов песен)"
 
 msgid "Lyrics alignement"
 msgstr "Выравнивание текстов песен"
+
+msgid "Lyrics file :"
+msgstr "Файл текста песни:"
+
+msgid "Lyrics file name format"
+msgstr "Формат имени файлов текстов песен"
 
 msgid "Lyrics for "
 msgstr "Текст песни "
@@ -1649,6 +1638,9 @@ msgstr "Название вида"
 msgid "Name under which the command will appear in the menu"
 msgstr "Название, под которым команда будет отображаться в меню"
 
+msgid "Never"
+msgstr "Никогда"
+
 # Новая?
 msgid "New"
 msgstr "Новый"
@@ -1663,7 +1655,7 @@ msgid "New list"
 msgstr "Новый список"
 
 msgid "New name"
-msgstr "Новое название"
+msgstr "Новое имя"
 
 msgid "Next"
 msgstr "Следующая"
@@ -1703,6 +1695,9 @@ msgstr "Ничего не найдено"
 
 msgid "No songs found"
 msgstr "Не найдено песен"
+
+msgid "No sound menu found"
+msgstr "Меню управления звуком не найдено"
 
 msgid "No web browser found."
 msgstr "Не найден веб-браузер."
@@ -1785,7 +1780,7 @@ msgstr ""
 "ВЫКЛ более вероятно, если метка установлена"
 
 msgid "Old name"
-msgstr "Старое название"
+msgstr "Старое имя"
 
 msgid "On top of other windows instead of below"
 msgstr "Поверх всех окон"
@@ -1884,6 +1879,9 @@ msgstr "Оригинальный год выхода"
 msgid "Originaly from"
 msgstr "Родом из"
 
+msgid "Other"
+msgstr "Другое"
+
 msgid "Output"
 msgstr "Вывод"
 
@@ -1911,8 +1909,8 @@ msgstr "Изображение"
 msgid "Picture Type"
 msgstr "Тип изображения"
 
-msgid "Picture cache :"
-msgstr "Кэш изображений:"
+msgid "Picture cache : %d MB"
+msgstr "Кэш изображений: %d МБ"
 
 msgid "Picture finder"
 msgstr "Поиск изображений"
@@ -1920,8 +1918,8 @@ msgstr "Поиск изображений"
 msgid "Picture finder plugin"
 msgstr "Плагин поиска изображений"
 
-msgid "Picture size :"
-msgstr "Размер изображения:"
+msgid "Picture size : %d"
+msgstr "Размер изображения: %d"
 
 msgid "Pictures and music files"
 msgstr "Изображения и аудиофайлы"
@@ -2052,6 +2050,9 @@ msgstr "Показать меню очереди"
 msgid "Pre-set"
 msgstr "Предустановки"
 
+msgid "Prefered place to load and save lyrics :"
+msgstr "Предпочтительное место для загрузки и сохранения текстов:"
+
 msgid "Prepend"
 msgstr "Присоединение"
 
@@ -2154,6 +2155,9 @@ msgstr "Диапазон оценок:"
 msgid "Re-read tags"
 msgstr "Перечитать теги"
 
+msgid "Re-reading tags"
+msgstr "Перечитываются теги"
+
 msgid "Re-shuffle"
 msgstr "Перемешать"
 
@@ -2161,26 +2165,26 @@ msgid "Read/write in file tag"
 msgstr "Читать/записать в тег файла"
 
 msgid "Recent Filters"
-msgstr "Последние фильтры"
+msgstr "Недавние фильтры"
 
 msgid "Recent albums"
-msgstr "Последние альбомы"
+msgstr "Недавние альбомы"
 
 msgid "Recent artists"
-msgstr "Последние исполнители"
+msgstr "Недавние исполнители"
 
 msgid "Recent songs"
-msgstr "Последние песни"
+msgstr "Недавние песни"
 
 msgid "Recent songs include skipped songs that haven't been played."
 msgstr ""
-"Последние песни, включая пропущенные никогда не воспроизводившиеся песни"
+"Недавние песни, включая пропущенные никогда не воспроизводившиеся песни."
 
 msgid "Recently played"
-msgstr "Последние воспроизведённые"
+msgstr "Недавно воспроизведённые"
 
 msgid "Recently played songs"
-msgstr "Последние воспроизведённые песни"
+msgstr "Недавно воспроизведённые песни"
 
 msgid "Recording Dates"
 msgstr "Дата записи"
@@ -2321,6 +2325,9 @@ msgstr "Заменить..."
 msgid "ReplayGain options"
 msgstr "Настройки ReplayGain"
 
+msgid "Replaygain"
+msgstr "Replaygain"
+
 msgid "Replaygain analysis"
 msgstr "Анализ уровня громкости (ReplayGain)"
 
@@ -2390,8 +2397,8 @@ msgstr "Сохранить сейчас"
 msgid "Save picture as"
 msgstr "Сохранить изображение как"
 
-msgid "Save tags/settings every"
-msgstr "Сохранять теги/настойки каждые"
+msgid "Save tags/settings every %d minutes"
+msgstr "Сохранять теги/настойки каждые %d мин."
 
 msgid "Saved"
 msgstr "Сохранено"
@@ -2476,7 +2483,7 @@ msgid "Search amazon.com for Artist"
 msgstr "Искать исполнителя на Amazon.com"
 
 msgid "Search and display lyrics"
-msgstr "Найти и показать текст песни"
+msgstr "Находит и показывает тексты песен"
 
 msgid "Search discogs for Artist"
 msgstr "Искать исполнителя на Discogs"
@@ -2589,8 +2596,8 @@ msgid ""
 "songs filenames) are available)"
 msgstr ""
 "Консольная команда\n"
-"(доступны некоторые переменные, такие как %f (имя файла текущей песни) или %"
-"F (список имён файлов выделенных песен))"
+"(доступны некоторые переменные, такие как %f (имя файла текущей песни) или "
+"%F (список имён файлов выделенных песен))"
 
 msgid "Shift"
 msgstr "Shift"
@@ -2612,6 +2619,9 @@ msgstr "Показать предстоящие события исполнит�
 
 msgid "Show buttons"
 msgstr "Показать кнопки"
+
+msgid "Show in sound menu"
+msgstr "Показывать в меню управления звуком"
 
 msgid "Show replaygain submenu"
 msgstr "Показать подменю replaygain"
@@ -2717,6 +2727,9 @@ msgstr "Стандартные поля"
 msgid "Start in tray"
 msgstr "Запускаться в трее"
 
+msgid "Statistics"
+msgstr "Статистика"
+
 msgid "Stop"
 msgstr "Остановить"
 
@@ -2786,9 +2799,6 @@ msgstr "Условия использования"
 msgid "Text"
 msgstr "Текст"
 
-msgid "The [most/less]"
-msgstr "[наиболее/наименее]"
-
 msgid "These fields can be used :"
 msgstr "Эти поля могут быть использованы:"
 
@@ -2811,14 +2821,17 @@ msgstr ""
 "Этот плагин извлекает относящуюся к исполнителю информацию (биография, "
 "предстоящие события, похожие исполнители) с last.fm."
 
-msgid "Threshold to count a song as played :"
-msgstr "Порог для подсчёта песни как проигранной:"
+msgid "Threshold to count a song as played : %d %"
+msgstr "Порог для учёта песни как проигранной: %d %"
 
 msgid "Thursday"
 msgstr "Четверг"
 
-msgid "Timeout :"
-msgstr "Оставшееся время:"
+msgid "Time :"
+msgstr "Время:"
+
+msgid "Timeout : %d seconds"
+msgstr "Оставшееся время: %d сек."
 
 msgid "Timespan of the fade-out in seconds"
 msgstr "Время постепенного затихания в секундах"
@@ -2886,9 +2899,6 @@ msgstr "Выключить"
 msgid "Turn off computer when queue empty"
 msgstr "Выключить компьютер, когда очередь пуста"
 
-msgid "Type"
-msgstr "Тип"
-
 msgid "URL"
 msgstr "URL"
 
@@ -2897,6 +2907,9 @@ msgstr "Уникальный идентификатор файла"
 
 msgid "Unknown field ({field})"
 msgstr "Unknown field ({field})"
+
+msgid "Unknown filter :"
+msgstr "Неизвестный фильтр:"
 
 msgid "Unlock Album"
 msgstr "Разблокировать альбом"
@@ -2964,9 +2977,9 @@ msgid ""
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
 "g. '%title taking place at %startDate<br>in %city, %country<br><br>'"
 msgstr ""
-"Используйте теги из XML-страниц last.fm, начинающиеся с % (например, %"
-"headliner), а также переносы строк '<br>' и любой текст, какой хотите, между "
-"ними.\n"
+"Используйте теги из XML-страниц last.fm, начинающиеся с % (например, "
+"%headliner), а также переносы строк '<br>' и любой текст, какой хотите, "
+"между ними.\n"
 "Например, '%title, проходящее %startDate<br>в %city, %country<br><br>'"
 
 msgid "Use the playing filter"
@@ -3025,8 +3038,8 @@ msgstr "Громкость: "
 msgid "Volume step :"
 msgstr "Шаг громкости:"
 
-msgid "Wait when queue empty"
-msgstr "Ждать, когда очередь пуста"
+msgid "Wait for more when queue empty"
+msgstr "Ждать ещё, когда очередь пуста"
 
 msgid ""
 "Warning : these are advanced options, don't change them unless you know what "
@@ -3063,12 +3076,18 @@ msgstr "Среда"
 msgid "Weighted Random"
 msgstr "Взвешенный случайный порядок"
 
+msgid "When added"
+msgstr "При добавлении"
+
 msgid ""
 "When changing songs, the previous song is added to the recent list even if "
 "not played at all."
 msgstr ""
 "При смене песни предыдущая песня добавляется в список последних, даже если "
-"она не воспроизводилась"
+"она не воспроизводилась."
+
+msgid "When current song"
+msgstr "Когда это текущая песня"
 
 msgid "Whole library"
 msgstr "Вся библиотека"
@@ -3091,6 +3110,9 @@ msgstr ""
 "тегов). Вместо этого изменения будут храниться в библиотеке.\n"
 "Предупреждение: изменения для песни будут потеряны, если теги будут "
 "перечитаны."
+
+msgid "Will use default if not found"
+msgstr "Если не найдено, будут использованы настройки по умолчанию"
 
 msgid "Win"
 msgstr "Win"
@@ -3121,6 +3143,13 @@ msgid "Yes"
 msgstr "Да"
 
 msgid ""
+"You can force a check for these files by holding shift when selecting \"Re-"
+"read tags\""
+msgstr ""
+"Можно принудительно проверить эти файлы, удерживая Shift при выборе пункта "
+"\"Перечитать теги\""
+
+msgid ""
 "You can use some markup, eg :\n"
 "<b>bold</b> <i>italic</i> <u>underline</u>\n"
 "Note that the markup may be ignored by the notification daemon"
@@ -3149,18 +3178,6 @@ msgstr "_Сортировать по"
 msgid "a bright coloured fish"
 msgstr "ярко окрашенная рыбка"
 
-msgid "a flac file"
-msgstr "flac-файл"
-
-msgid "a mp3 file"
-msgstr "mp3-файл"
-
-msgid "a musepack file"
-msgstr "musepack-файл"
-
-msgid "a wavepack file"
-msgstr "wavepack-файл"
-
 msgid "abort copy"
 msgstr "прервать копирование"
 
@@ -3170,26 +3187,20 @@ msgstr "прервать перемещение"
 msgid "add"
 msgstr "добавить"
 
-msgid "added"
-msgstr "добавлено"
-
 msgid "advanced options"
 msgstr "расширенные настройки"
 
-msgid "after %d"
-msgstr "после %d"
+msgid "after"
+msgstr "после"
+
+msgid "after %s"
+msgstr "после %s"
 
 msgid "alphabetical"
 msgstr "по алфавиту"
 
 msgid "amixer control :"
 msgstr "контроль amixer:"
-
-msgid "an ape file"
-msgstr "ape-файл"
-
-msgid "an ogg file"
-msgstr "ogg-файл"
 
 msgid "another example"
 msgstr "другой пример"
@@ -3209,9 +3220,6 @@ msgstr "автоопределение"
 msgid "autofill"
 msgstr "автозаполнение"
 
-msgid "autofill queue"
-msgstr "автозаполнение очереди"
-
 msgid "automatic size"
 msgstr "автоматический размер"
 
@@ -3224,23 +3232,32 @@ msgstr "группа"
 msgid "band/artist logotype"
 msgstr "логотип группы/исполнителя"
 
-msgid "before %d"
-msgstr "до %d"
+msgid "before"
+msgstr "до"
 
-msgid "between %d( and )%d"
-msgstr "между %d( and )%d"
+msgid "before %s"
+msgstr "до %s"
 
-msgid "between %n( and )%n"
-msgstr "между %n( and )%n"
+msgid "between"
+msgstr "между"
+
+msgid "between %s ago and %s ago"
+msgstr "между %s и %s назад"
+
+msgid "between %s and %s"
+msgstr "между %s и %s"
+
+msgid "between (absolute dates)"
+msgstr "между (абсолютные даты)"
+
+msgid "between (relative dates)"
+msgstr "между (относительные даты)"
 
 msgid "big size"
 msgstr "большой"
 
 msgid "biography"
 msgstr "биография"
-
-msgid "bitrate"
-msgstr "битрейт"
 
 msgid "bonus tracks"
 msgstr "бонус-трек"
@@ -3282,6 +3299,9 @@ msgstr "по {artist} из {album}"
 msgid "bytes"
 msgstr "байт"
 
+msgid "check length now"
+msgstr "проверить длину сейчас"
+
 msgid "check now"
 msgstr "проверить сейчас"
 
@@ -3310,8 +3330,14 @@ msgstr "соединение разорвано"
 msgid "connection failed."
 msgstr "соединение разорвано."
 
+msgid "contains"
+msgstr "содержит"
+
 msgid "contains %s"
 msgstr "содержит %s"
+
+msgid "contains %s (case sensitive)"
+msgstr "содержит %s (чувствительно к регистру)"
 
 msgid "counter"
 msgstr "счётчик"
@@ -3358,17 +3384,26 @@ msgstr "диск {disc}"
 msgid "doesn't contain %s"
 msgstr "не содержит %s"
 
-msgid "doesn't match regexp %r"
-msgstr "не совпадает с регулярным выражением %r"
+msgid "doesn't contain %s (case sensitive)"
+msgstr "не содержит %s (чувствительно к регистру)"
+
+msgid "doesn't have a picture"
+msgstr "без изображения"
+
+msgid "doesn't include artist %s"
+msgstr "не включает исполнителя %s"
+
+msgid "doesn't match regexp %s"
+msgstr "не совпадает с регулярным выражением %s"
+
+msgid "doesn't match regexp %s (case sensitive)"
+msgstr "не совпадает с регулярным выражением %s (чувствительно к регистру)"
 
 msgid "during performance"
 msgstr "во время исполнения"
 
 msgid "during recording"
 msgstr "во время записи"
-
-msgid "edit ..."
-msgstr "правка..."
 
 msgid "email"
 msgstr "email"
@@ -3388,12 +3423,6 @@ msgstr "события"
 msgid "ex :"
 msgstr "пример:"
 
-msgid "exactly %n( times)"
-msgstr "точно %n( times)"
-
-msgid "exactly not %n( times)"
-msgstr "точно не %n( times)"
-
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "пример (выделенная песня): {score}  ({chances})"
 
@@ -3406,8 +3435,8 @@ msgstr "пример: %s"
 msgid "examples :"
 msgstr "примеры:"
 
-msgid "fallback-gain"
-msgstr "резервное усиление"
+msgid "fallback-gain : %d dB"
+msgstr "резервное усиление: %d дБ"
 
 msgid "false"
 msgstr "неправда"
@@ -3415,14 +3444,11 @@ msgstr "неправда"
 msgid "favorite"
 msgstr "любимое"
 
-msgid "file format"
-msgstr "формат файла"
+msgid "file tag"
+msgstr "тег файла"
 
 msgid "filters"
 msgstr "фильтры"
-
-msgid "first added"
-msgstr "первых добаленных"
 
 msgid "flags"
 msgstr "флаги"
@@ -3457,6 +3483,23 @@ msgstr "группировать по"
 msgid "half-life : "
 msgstr "полупериод: "
 
+msgid "has a picture"
+msgstr "с изображением"
+
+# одна
+# одно
+msgid "has at least one"
+msgstr "есть хотя бы один"
+
+msgid "has been played"
+msgstr "воспроизводилась"
+
+msgid "has been skipped"
+msgstr "была пропущена"
+
+msgid "has none"
+msgstr "нет"
+
 msgid "hours"
 msgstr "часов"
 
@@ -3478,6 +3521,24 @@ msgstr "иллюстрация"
 msgid "imported list"
 msgstr "импортированный список"
 
+msgid "in the bottom"
+msgstr "внизу"
+
+msgid "in the bottom %s"
+msgstr "внизу %s"
+
+msgid "in the top"
+msgstr "вверху"
+
+msgid "in the top %s"
+msgstr "вверху %s"
+
+msgid "includes artist"
+msgstr "включает исполнителя"
+
+msgid "includes artist %s"
+msgstr "включает исполнителя %s"
+
 msgid "info"
 msgstr "информация"
 
@@ -3496,113 +3557,80 @@ msgstr "в обратном порядке"
 msgid "is"
 msgstr "точно"
 
-msgid "is %g"
-msgstr "точно %g"
-
-msgid "is %n"
-msgstr "точно %n"
-
-msgid "is %n( %)"
-msgstr "точно %n( %)"
-
-msgid "is %n(Hz)"
-msgstr "точно %n(Гц)"
-
-msgid "is %n(kbps)"
-msgstr "точно %n(kbps)"
-
 msgid "is %s"
 msgstr "точно %s"
 
-msgid "is after %n"
-msgstr "после %n"
+msgid "is 44.1kHz"
+msgstr "точно 44.1 кГц"
 
-msgid "is before %n"
-msgstr "до %n"
+msgid "is a flac file"
+msgstr "flac-файл"
 
-msgid "is between %b( and )%b"
-msgstr "между %b( и )%b"
+msgid "is a m4a file"
+msgstr "m4a-файл"
 
-msgid "is between %n( and )%n( %)"
-msgstr "между %n( и )%n( %)"
+msgid "is a mp3 file"
+msgstr "mp3-файл"
 
-msgid "is between %n( and )%n( s)"
-msgstr "между %n( и )%n( с)"
+msgid "is a musepack file"
+msgstr "musepack-файл"
+
+msgid "is a wavepack file"
+msgstr "wavepack-файл"
+
+msgid "is an ape file"
+msgstr "ape-файл"
+
+msgid "is an ogg file"
+msgstr "ogg-файл"
+
+msgid "is equal to"
+msgstr "равно"
+
+msgid "is equal to %s"
+msgstr "равно %s"
+
+msgid "is false"
+msgstr "неверно"
+
+msgid "is in"
+msgstr "точно в"
 
 msgid "is in %s"
 msgstr "в %s"
 
-msgid "is in list %l"
-msgstr "в списке %l"
+msgid "is mono"
+msgstr "моно"
 
-msgid "is less than %b"
-msgstr "меньше чем %b"
+msgid "is set"
+msgstr "установлен"
 
-msgid "is less than %n"
-msgstr "меньше чем %n"
+msgid "is smart equal"
+msgstr "соответствует"
 
-msgid "is less than %n( %)"
-msgstr "меньше чем %n( %)"
+msgid "is smart equal to %s"
+msgstr "соответствует %s"
 
-msgid "is less than %n( s)"
-msgstr "меньше чем %n( s)"
+msgid "is stereo"
+msgstr "стерео"
 
-msgid "is less than %n(Hz)"
-msgstr "меньше чем %n(Гц)"
+msgid "is true"
+msgstr "верно"
 
-msgid "is less than %n(kbps)"
-msgstr "меньше чем %n(kbps)"
-
-msgid "is more than %b"
-msgstr "больше чем %b"
-
-msgid "is more than %n"
-msgstr "больше чем %n"
-
-msgid "is more than %n( %)"
-msgstr "больше чем %n( %)"
-
-msgid "is more than %n( s)"
-msgstr "больше чем %n( с)"
-
-msgid "is more than %n(Hz)"
-msgstr "больше чем %n(Гц)"
-
-msgid "is more than %n(kbps)"
-msgstr "больше чем %n(kbps)"
-
-msgid "is not"
-msgstr "точно не"
-
-msgid "is not %n"
-msgstr "точно не %n"
-
-msgid "is not %n( %)"
-msgstr "точно не %n( %)"
-
-msgid "is not %s"
+msgid "isn't %s"
 msgstr "точно не %s"
 
-msgid "is not 44.1kHz"
-msgstr "точно не 44.1 кГц"
+msgid "isn't equal to %s"
+msgstr "не равно %s"
 
-msgid "is not in %s"
+msgid "isn't in %s"
 msgstr "точно не в %s"
 
-msgid "is not in list %l"
-msgstr "не в списке %l"
+msgid "isn't mono"
+msgstr "не моно"
 
-msgid "isn't %g"
-msgstr "точно не %g"
-
-msgid "isn't %n"
-msgstr "точно не %n"
-
-msgid "isn't %n(Hz)"
-msgstr "точно не %n(Гц)"
-
-msgid "isn't %n(kbps)"
-msgstr "не %n(kbps)"
+msgid "isn't stereo"
+msgstr "не стерео"
 
 msgid ""
 "itunes doesn't support unsynchronised tags last time I checked, mostly "
@@ -3613,15 +3641,6 @@ msgstr ""
 
 msgid "itunes-like"
 msgstr "в стиле itunes"
-
-msgid "last added"
-msgstr "последние добавленные"
-
-msgid "last played"
-msgstr "последние воспроизведённых"
-
-msgid "last skipped"
-msgstr "последних пропущенных"
 
 msgid "last.fm"
 msgstr "last.fm"
@@ -3656,26 +3675,26 @@ msgstr "панели фильтра слева"
 msgid "length of songs"
 msgstr "длина песен"
 
-msgid "less played"
-msgstr "наименее воспроизводимые"
+msgid "less than"
+msgstr "меньше чем"
 
-msgid "less skipped"
-msgstr "наименее пропускаемые"
-
-msgid "less than %a( ago)"
-msgstr "менее чем %a( ago)"
-
-msgid "less than %n( times)"
-msgstr "менее чем %n( times)"
-
-msgid "longest"
-msgstr "самых длинных"
+msgid "less than %s ago"
+msgstr "менее чем %s назад"
 
 msgid "lyricist"
 msgstr "автор текста"
 
-msgid "match regexp %r"
-msgstr "совпадает с регулярным выражением %r"
+msgid "lyrics file"
+msgstr "файл текста песни"
+
+msgid "matches regexp"
+msgstr "совпадает с регулярным выражением"
+
+msgid "matches regexp %s"
+msgstr "совпадает с регулярным выражением %s"
+
+msgid "matches regexp %s (case sensitive)"
+msgstr "совпадает с регулярным выражением %s (чувствительно к регистру)"
 
 msgid "maximum font size"
 msgstr "максимальный размер шрифта"
@@ -3695,38 +3714,36 @@ msgstr "минимальный размер шрифта"
 msgid "minutes"
 msgstr "минут"
 
-msgid "modified"
-msgstr "изменено"
-
-msgid "mono"
-msgstr "моно"
-
 msgid "month"
 msgstr "месяц"
 
 msgid "months"
 msgstr "месяцев"
 
-msgid "more than %a( ago)"
-msgstr "больше чем %a( ago)"
+msgid "more than"
+msgstr "больше чем"
 
-msgid "more than %n( times)"
-msgstr "больше чем %n( раз)"
+msgid "more than %s ago"
+msgstr "больше чем %s назад"
 
 msgid "mosaic mode"
 msgstr "режим мозаики"
-
-msgid "most played"
-msgstr "наиболее часто играемых"
-
-msgid "most skipped"
-msgstr "наиболее часто пропускаемых"
 
 msgid "move folder"
 msgstr "переместить папку"
 
 msgid "movie/video screen capture"
 msgstr "захват экрана фильма/видео"
+
+msgid ""
+"mp3 files without a VBR header requires a full scan to check its real length "
+"and bitrate"
+msgstr ""
+"Mp3-файлы без VBR-заголовков требуют полного сканирования для проверки "
+"реальной длины и битрейта."
+
+msgid "mplayer executable :"
+msgstr "исполняемый файл mplayer:"
 
 msgid "mplayer options :"
 msgstr "настройки mplayer:"
@@ -3767,6 +3784,9 @@ msgstr "нет изображений"
 msgid "no plugins found"
 msgstr "плагины не найдены"
 
+msgid "no songs needs checking"
+msgstr "нет песен для проверки"
+
 msgid "no splitting"
 msgstr "не разделять"
 
@@ -3779,17 +3799,32 @@ msgstr "без имени"
 msgid "normal"
 msgstr "нормально"
 
-msgid "normal play when queue empty"
-msgstr "нормальное воспроизведение, когда очередь пуста"
+msgid "not between %s ago and %s ago"
+msgstr "не между %s назад и %s назад"
+
+msgid "not between %s and %s"
+msgstr "не между %s и %s"
 
 msgid "not bootleg"
 msgstr "не бутлег"
 
-msgid "not played for the longest time"
-msgstr "не воспроизводившихся долгое время"
+msgid "not in the bottom %s"
+msgstr "не внизу %s"
 
-msgid "not skipped for the longest time"
-msgstr "не пропускавшихся дольше"
+msgid "not in the top %s"
+msgstr "не в начале %s"
+
+msgid "not present in %s"
+msgstr "не представлена в %s"
+
+msgid "not set to %s"
+msgstr "не установлен на %s"
+
+msgid "not the %s least recent"
+msgstr "не %s самых давних"
+
+msgid "not the %s most recent"
+msgstr "не %s самых давних"
 
 msgid "number of songs"
 msgstr "количество песен"
@@ -3797,19 +3832,16 @@ msgstr "количество песен"
 msgid "number of songs in filter"
 msgstr "количество песен в фильтре"
 
-msgid "on %d"
-msgstr "на %d"
-
 msgid "only show entries with at least n songs"
 msgstr "показывать только записи, где не менее n песен"
 
 msgid "only works when the artist-info tab is displayed"
 msgstr "работает только, когда вкладка отображена"
 
-msgid "only works with some lyrics source and when the lyrics tab is displayed"
+msgid "only works with some lyrics source and when the lyrics tab is active"
 msgstr ""
 "работает только с некоторыми источниками текстов и когда вкладка текстов "
-"отображена"
+"активна"
 
 msgid "open context window"
 msgstr "открыть контекстное окно"
@@ -3817,8 +3849,8 @@ msgstr "открыть контекстное окно"
 msgid "options"
 msgstr "опции"
 
-msgid "or"
-msgstr "или"
+msgid "or %d seconds"
+msgstr "или %d сек."
 
 msgid "other"
 msgstr "другое"
@@ -3841,9 +3873,6 @@ msgstr "размер изображения"
 msgid "play count average"
 msgstr "средний счётчик воспроизведений"
 
-msgid "played"
-msgstr "воспроизв."
-
 msgid "played>4"
 msgstr "воспроизведённые >4"
 
@@ -3853,11 +3882,17 @@ msgstr "порт:"
 msgid "pre-amp"
 msgstr "предусилитель"
 
+msgid "pre-amp : %d dB"
+msgstr "предусилитель: %d дБ"
+
+msgid "present in %s"
+msgstr "представлена в %s"
+
+msgid "present in list"
+msgstr "представлена в списке"
+
 msgid "quit"
 msgstr "выйти"
-
-msgid "quit when queue empty"
-msgstr "выйти, когда очередь пуста"
 
 msgid "quodlibet-like"
 msgstr "в стиле quodlibet"
@@ -3890,10 +3925,7 @@ msgid "retry"
 msgstr "повторить попытку"
 
 msgid "retry in {seconds} s"
-msgstr "повторить попытку через {seconds} сек"
-
-msgid "sampling rate"
-msgstr "частота дискретизации"
+msgstr "повторная попытка через {seconds} с."
 
 msgid "save as '{name}'"
 msgstr "сохранить как '{name}'"
@@ -3928,8 +3960,11 @@ msgstr "искать сейчас"
 msgid "seconds"
 msgstr "секунд"
 
-msgid "shortest"
-msgstr "самые короткие"
+msgid "set to"
+msgstr "установлен"
+
+msgid "set to %s"
+msgstr "установлен на %s"
 
 msgid "show pictures"
 msgstr "показывать изображения"
@@ -3949,9 +3984,6 @@ msgstr "настройки скина"
 msgid "skip count average"
 msgstr "среднее количество пропусков"
 
-msgid "skipped"
-msgstr "пропущено"
-
 msgid "small size"
 msgstr "маленький размер"
 
@@ -3961,14 +3993,8 @@ msgstr "сортировка по"
 msgid "static list"
 msgstr "статический список"
 
-msgid "stereo"
-msgstr "стерео"
-
 msgid "stop"
 msgstr "остановить"
-
-msgid "stop when queue empty"
-msgstr "остановить, когда очередь пуста"
 
 msgid "string"
 msgstr "строка"
@@ -3982,6 +4008,12 @@ msgstr "формат текста"
 msgid "text mode"
 msgstr "текстовый режим"
 
+msgid "the %s least recent"
+msgstr "%s самых давних"
+
+msgid "the %s most recent"
+msgstr "%s самых недавних"
+
 msgid "the command {name}"
 msgstr "команда {name}"
 
@@ -3990,6 +4022,12 @@ msgstr "по умолчанию это utf16 для ID3v2.3 и utf8 для ID3v2
 
 msgid "the file {name}"
 msgstr "файл {name}"
+
+msgid "the least recent"
+msgstr "самые давние"
+
+msgid "the most recent"
+msgstr "самые недавние"
 
 msgid "the {name} perl module"
 msgstr "{name} модуль perl"
@@ -4014,9 +4052,6 @@ msgstr "верно"
 
 msgid "turn off"
 msgstr "выключить"
-
-msgid "turn off computer when queue empty"
-msgstr "выключить компьютер, когда очередь пуста"
 
 msgid "unknown"
 msgstr "неизвестный"
@@ -4063,9 +4098,6 @@ msgstr "используемый скин:"
 
 msgid "wait for more"
 msgstr "ждать ещё"
-
-msgid "wait for more when queue empty"
-msgstr "ждать ещё, когда очередь пуста"
 
 msgid "weeks"
 msgstr "недель"
@@ -4142,19 +4174,19 @@ msgid "{folder} already exists"
 msgstr "{folder} уже существует"
 
 msgid "{hours} hours {min} min {sec} s ({size} M)"
-msgstr "{hours} час {min} мин {sec} сек ({size} M)"
+msgstr "{hours} час {min} мин {sec} с ({size} MБ)"
 
 msgid "{hours}h {min}m {sec}s ({size}M)"
-msgstr "{hours}ч {min}м {sec}с ({size}M)"
+msgstr "{hours}ч {min}м {sec}с ({size}MБ)"
 
 msgid "{hours}h{min}m{sec}s"
 msgstr "{hours}ч{min}м{sec}с"
 
 msgid "{min} min {sec} s ({size} M)"
-msgstr "{min} мин {sec} с ({size} M)"
+msgstr "{min} мин {sec} с ({size} MБ)"
 
 msgid "{min}m {sec}s ({size}M)"
-msgstr "{min}м {sec}с ({size}M)"
+msgstr "{min}м {sec}с ({size}MБ)"
 
 msgid "{min}m{sec}s"
 msgstr "{min}м{sec}с"
@@ -4180,43 +4212,38 @@ msgstr "{song} из {artist}"
 msgid "|-separated list of widget names"
 msgstr "разделённый знаком | список виджетов"
 
-#~ msgid "' & ' and ', ' and ';'"
-#~ msgstr "' & ' и ', ' и ';'"
+#~ msgid "%n first added"
+#~ msgstr "%n первых добавленных"
 
-#~ msgid "Edit ..."
-#~ msgstr "Правка..."
+#~ msgid "%n last added"
+#~ msgstr "%n последних добавленных"
 
-#~ msgid ""
-#~ "For information on how to use this plugin, please navigate to the <a "
-#~ "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
-#~ "artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser."
-#~ "org/dokuwiki/'>gmusicbrowser-wiki</a>."
-#~ msgstr ""
-#~ "Для информации об использовании этого плагина, пожалуйста, перейдите на "
-#~ "<a href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
-#~ "artistinfo'>wiki-страницу плагина</a> на <a href='http://gmusicbrowser."
-#~ "org/dokuwiki/'>gmusicbrowser-wiki</a>."
+#~ msgid "%n last played"
+#~ msgstr "%n последних воспроизведённых"
 
-#~ msgid "Other"
-#~ msgstr "Другое"
+#~ msgid "%n last skipped"
+#~ msgstr "%n последних пропущенных"
 
-#~ msgid "Search the web for artist"
-#~ msgstr "Искать исполнителя в Интернете"
+#~ msgid "%n less played"
+#~ msgstr "%n наименее воспроизводимых"
 
-#~ msgid "next"
-#~ msgstr "следующая"
+#~ msgid "%n less skipped"
+#~ msgstr "%n наименее пропускаемых"
 
-#~ msgid "remove this tab"
-#~ msgstr "удалить эту вкладку"
+#~ msgid "%n longest"
+#~ msgstr "%n самых длинных"
 
-#~ msgid "set"
-#~ msgstr "установить"
+#~ msgid "%n most played"
+#~ msgstr "%n воспроизводимых больше всех"
 
-#~ msgid "show info"
-#~ msgstr "показать информацию"
+#~ msgid "%n most skipped"
+#~ msgstr "%n наиболее пропускаемых"
 
-#~ msgid "web"
-#~ msgstr "web"
+#~ msgid "%n not played for the longest time"
+#~ msgstr "%n не воспроизводившихся долгое время"
 
-#~ msgid "{command} is needed to play this file."
-#~ msgstr "{command} нужна, чтобы воспроизвести этот файл."
+#~ msgid "%n not skipped for the longest time"
+#~ msgstr "%n не пропускавшихся долгое время"
+
+#~ msgid "%n shortest"
+#~ msgstr "%n самых коротких"
