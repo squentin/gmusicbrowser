@@ -1276,6 +1276,8 @@ Play() if $CmdLine{play} && !$PlayTime;
 
 Layout::InitLayouts;
 ActivatePlugin($_,'startup') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
+Update_QueueActionList();
+QueueChanged() if $QueueAction;
 
 CreateMainWindow( $CmdLine{layout}||$Options{Layout} );
 ShowHide(0) if $CmdLine{hide} || ($Options{StartInTray} && $Options{UseTray} && $TrayIconAvailable);
@@ -1926,11 +1928,10 @@ sub ReadSavedTags	#load tags _and_ settings
 	}
 
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};
-	$Options{SongArray_Queue}=undef unless $Options{RememberQueue};
-	if ($Options{RememberQueue})
-	{	$QueueAction= $Options{QueueAction} || '';
-		$QueueAction='' unless $QActions{$QueueAction};
-		QueueChanged() if $QueueAction;
+	$QueueAction= $Options{QueueAction} || '';
+	unless ($Options{RememberQueue})
+	{	$Options{SongArray_Queue}=undef;
+		$QueueAction= '';
 	}
 	if ($Options{RememberPlayFilter})
 	{	$TogLock=$Options{Lock};
