@@ -555,17 +555,19 @@ sub IncSuffix	# increment a number suffix from a string
 
 sub CleanupFileName
 {	local $_=$_[0];
-	s#[[:cntrl:]/:><\*\?\"\\]##g;
+	s#[[:cntrl:]/:><*?"\\^]##g;
 	s#^[- ]+##g;
-	s/ +$//g;
+	$_=substr $_,0,255 if length>255;
+	s/[. ]+$//g;
 	return $_;
 }
 sub CleanupDirName
 {	local $_=$_[0];
-	if ($^O eq 'MSWin32')	{ s#[[:cntrl:]/:><\*\?\"]##g; }
-	else			{ s#[[:cntrl:]:><\*\?\"\\]##g; }
+	if ($^O eq 'MSWin32')	{ s#[[:cntrl:]/:><*?"^]##g; }
+	else			{ s#[[:cntrl:]:><*?"\\^]##g;}
 	s#^[- ]+##g;
-	s/ +$//g;
+	$_=substr $_,0,255 if length>255;
+	s/[. ]+$//g;
 	return $_;
 }
 
