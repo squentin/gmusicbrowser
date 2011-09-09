@@ -36,7 +36,7 @@ our @MenuQueue=
 	 				submenu => sub { my $m= ::max(1,$::Options{MaxAutoFill}-5); return [$m..$m+10]; },
 					check => sub {$::Options{MaxAutoFill};},
 	},
-	{label => _"Edit...",		code => \&::EditQueue},
+	{label => _"Edit...",		code => \&::EditQueue, test => sub { !$_[0]{mode} || $_[0]{mode} ne 'Q' }, },
 );
 
 our @MainMenu=
