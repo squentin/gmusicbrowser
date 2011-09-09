@@ -804,12 +804,12 @@ our %timespan_menu=
  },
  rating	=>
  {	name	=> _"Rating",		width => 80,	flags => 'fgaesc',	type => 'rating',
-	id3v2	=> 'TXXX;FMPS_Rating;%v & TXXX;FMPS_Rating_User;%v::%i | percent( TXXX;gmbrating;%v ) | five( TXXX;rating;%v )',
-	vorbis	=> 'FMPS_RATING & FMPS_RATING_USER::%i | percent( gmbrating ) | five( rating )',
-	ape	=> 'FMPS_RATING & FMPS_RATING_USER::%i | percent( gmbrating ) | five( rating )',
-	ilst	=> '----FMPS_Rating & ----FMPS_Rating_User::%i | percent( ----gmbrating ) | five( ----rating )',
+	id3v2	=> 'TXXX;FMPS_Rating_User;%v::%i & TXXX;FMPS_Rating;%v | percent( TXXX;gmbrating;%v ) | five( TXXX;rating;%v )',
+	vorbis	=> 'FMPS_RATING_USER::%i & FMPS_RATING | percent( gmbrating ) | five( rating )',
+	ape	=> 'FMPS_RATING_USER::%i & FMPS_RATING | percent( gmbrating ) | five( rating )',
+	ilst	=> '----FMPS_Rating_User::%i & ----FMPS_Rating | percent( ----gmbrating ) | five( ----rating )',
 	postread=> \&FMPS_rating_postread,
-	prewrite=> \&FMPS_rating_prewrite, 
+	prewrite=> \&FMPS_rating_prewrite,
 	'postread:five'=> sub { my $v=shift; length $v && $v=~m/^\d+$/ && $v<=5 ? sprintf('%d',$v*20) : undef }, # for reading foobar2000 rating 0..5 ?
 	'postread:percent'=> sub { $_[0] }, # for anyone who used gmbrating
 	FilterList => {},
