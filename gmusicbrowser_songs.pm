@@ -126,8 +126,8 @@ our %timespan_menu=
 		'editwidget:single'	=> sub { GMB::TagEdit::FlagList->new(@_) },
 		'editwidget:per_id'	=> sub { GMB::TagEdit::FlagList->new(@_) },
 		autofill_re	=> '.+',
-		'filterdesc:~'	=> [ _"%s is set", _"is set",	'combostring', ],
-		'filterdesc:-~'	=> _"%s isn't set",
+		'filterdesc:~'	=> [ _"includes %s", _"includes",	'combostring', ],
+		'filterdesc:-~'	=> _"doesn't include %s",
 		'filterdesc:ecount:0' => _"has none",
 		'filterdesc:-ecount:0'=> _"has at least one",
 		'filterdesc:mi'	=> [ _"matches regexp %s",_"matches regexp",'regexp',	icase=>1, ],
@@ -182,7 +182,7 @@ our %timespan_menu=
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[keys %{#HVAL#}];',
 		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v}',
 		listall		=> '##mainfield#->listall#',
-		'filterdesc:~'	=> [ _"includes artist %s", _"includes artist",	'combostring', ],
+		'filterdesc:~'	=> [ _"includes artist %s", _"includes artist",	'menustring', ],
 		'filterdesc:-~'	=> _"doesn't include artist %s",
 		'filterdesc:mi'	=> [ _"matches regexp %s",_"matches regexp",'regexp',	icase=>1, ],
 		'filterdesc:si'	=> [ _"contains %s",	_"contains",	'substring',	icase=>1, ],
@@ -254,7 +254,7 @@ our %timespan_menu=
 		'filter:pic'	=> '.!!. __#mainfield#_picture[#_#]',
 		'filterdesc:pic:1'=> _"has a picture",
 		'filterdesc:-pic:1'=> _"doesn't have a picture",
-		'filterpat:combostring'=> [ display=> sub { my $s=shift; $s=~s/\x00.*//; $s; } ], # could display $album by $album_artist instead
+		'filterpat:menustring'=> [ display=> sub { my $s=shift; $s=~s/\x00.*//; $s; } ], # could display $album by $album_artist instead
 
 		#load_extra	=> '___pix[ #sgid_to_gid(VAL=$_[0])# ]=$_[1];',
 		#save_extra	=> 'my @res; for my $gid (1..$##_name#) { my $v=___pix[$gid]; next unless length $v; push @res, [#*:gid_to_sgid(GID=$gid)#,$val]; } return \@res;',
@@ -355,7 +355,7 @@ our %timespan_menu=
 		edit_listall	=> 1,
 		parent		=> 'generic',
 		maxgid		=> '@#_name#-1',
-		'filterdesc:~'	=> [ _"is %s", _"is",	'combostring', ],
+		'filterdesc:~'	=> [ _"is %s", _"is",	'menustring', ],
 		'filterdesc:-~'	=> _"isn't %s",
 		#gsummary	=> 'my $gids=Songs::UniqList(#field#,#IDs#); @$gids==1 ? #gid_to_display(GID=$gids->[0])# : #names(count=scalar @$gids)#;',
 	},

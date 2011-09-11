@@ -7157,7 +7157,7 @@ sub new
 {	my ($class,$dialog,$init) = @_;
 	my $self = bless Gtk2::VBox->new, $class;
 
-	my $store=Gtk2::TreeStore->new(('Glib::String')x2);
+	my $store=Gtk2::TreeStore->new('Glib::String','Glib::Scalar');
 	$self->{treeview}=
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes(
@@ -7968,6 +7968,7 @@ INIT
 	listname=> 'GMB::FilterEdit::SavedListCombo',
 	filename=> 'GMB::FilterEdit::Filename',
 	combostring=> 'GMB::FilterEdit::Combo',
+	menustring=> 'GMB::FilterEdit::Menu',
   );
 }
 
@@ -8197,6 +8198,35 @@ sub new
 	return $self;
 }
 sub Get { $_[0]->get_value; }
+
+package GMB::FilterEdit::Menu;	# alternative to GMB::FilterEdit::Combo that better handle long list of values, and works with album filters
+use base 'Gtk2::Button';
+sub new
+{	my ($class,$val,$opt)=@_;
+	my $self= bless Gtk2::Button->new,$class;
+	$self->{field}=$opt->{field};
+	$self->{val}=$val;
+	$self->signal_connect(button_press_event => sub
+		{	my $self=$_[0];
+			::PopupAA( $self->{field}, cb=> sub { $self->set_gid($_[1]); } );
+			1;
+		});
+	$self->set_label($val);
+	return $self;
+}
+sub Get { $_[0]{val}; }
+sub set_gid
+{	my ($self,$gid)=@_;
+	my $field= $self->{field};
+	 #ugly way to get the sgid	#FIXME
+	 my $val=Songs::MakeFilterFromGID($field,$gid);
+	 $val=$val->{string};
+	 $val=~s/^$field:~://;
+	$self->{val}=$val;
+	$self->set_label($val);
+	GMB::FilterBox::changed($self);
+	GMB::FilterBox::activate($self);
+}
 
 package GMB::FilterEdit::Filename;
 use base 'Gtk2::Box';
