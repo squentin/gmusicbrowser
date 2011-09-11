@@ -2106,6 +2106,17 @@ sub FieldWidth
 {	my $f=$_[0];
 	return $Def{$f} && $Def{$f}{width} ? $Def{$f}{width} : 100;
 }
+sub FieldEnabled	#check if a field is enabled
+{	!! grep $_[0] eq $_, @Fields;
+}
+sub FieldList		#return list of fields, or list of fields of type $type, these types are not the same necessarily the types are those used in %Def
+{	if (my $type=shift)
+	{	return unless $type eq 'flags'; # only "flags" type supported currently
+		return grep $Def{$_}{type} eq 'flags', @Fields; # currently type flags all have a type=>'flags' in %Def, but might change
+								# maybe should use  $Def{$_}{flags}=~m/l/ && $Def{$_}{flags}=~m/e/  instead
+	}
+	return @Fields;
+}
 sub ListGroupTypes
 {	my @list= grep $Def{$_}{can_group}, @Fields;
 	my @ret;
