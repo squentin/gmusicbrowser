@@ -6694,6 +6694,7 @@ sub AddToFilterHistory
 {	my $filter=$_[0];
 	my $recent=$::Options{RecentFilters}||=[];
 	my $string=$filter->{string};
+	return if $string eq 'null';
 	@$recent=($filter, grep $_->{string} ne $string, @$recent);
 	pop @$recent if @$recent>20;
 }
@@ -6731,7 +6732,7 @@ sub WatchFilter
 	$object->{'UpdateFilter_'.$group}=$sub;
 	if ($group=~m/:[\w.]+$/)
 	{	$Related_FilterWatchers{$group}++;
-		#$Filters{$group}[0]||=$Filters{$group}[1+1]||= Filter->none;#FIXME implement a "none" filter
+		#$Filters{$group}[0]||=$Filters{$group}[1+1]||= Filter->null;
 		#$Filters{$group}[0]||=$Filters{$group}[1+1]||=Filter->new;
 	}
 	IdleDo('1_init_filter'.$group,0, \&InitFilter, $group);
@@ -7335,7 +7336,7 @@ sub cursor_changed_cb
 sub Set
 {	my ($self,$filter,$startpath,$startpos)=@_;
 	$filter=$filter->{string} if ref $filter;
-	$filter='' unless defined $filter;
+	$filter='' if !defined $filter || $filter eq 'null';
 	my $treeview=$self->{treeview};
 	my $store=$treeview->get_model;
 
@@ -7975,6 +7976,7 @@ INIT
 sub new
 {	my ($class,$activatesub,$changesub,$filter,@menu_append)=@_;
 	my $self = bless Gtk2::HBox->new, $class;
+	$filter='' if $filter eq 'null';
 	my ($field,$set)= split /:/,$filter,2;
 	my %fieldhash; $fieldhash{$_}= Songs::FieldName($_) for Songs::Fields_with_filter;
 	my @ordered_field_hash= map { $_,$fieldhash{$_} } ::sorted_keys(\%fieldhash);

@@ -1851,6 +1851,7 @@ warn "MakeFilterFromGID => ".($sub->($gid)) if $::debug;
 }
 sub MakeFilterFromID	#should support most fields, FIXME check if works for year/artists/labels/genres/...
 {	my ($field,$ID)=@_;
+	return Filter->null unless $ID;	# null filter if no ID
 	if (my $code=Code($field, 'makefilter_fromID', ID => '$_[0]'))		#FIXME optimize : don't call this every time, for example check for a flag that would indicate that this field has a gid
 	{	my $sub=$FuncCache{'makefilter_fromID '.$field} ||= Compile('makefilter_fromID '.$field, "sub {$code}"); #FIXME if method doesn't exist
 		return Filter->new( $sub->($ID) );
@@ -3676,9 +3677,17 @@ sub newadd
 		}
 		$self->{source} ||= $f->{source} if ref $f;
 		my $string=(ref $f)? $f->{string} : $f;
-		unless ($string)
+		if (!$string)
 		{	next if $and;			# all and ... = ...
-			return $self->{string}='';	# all or  ... = all
+			$self->{string}='';		# all or  ... = all
+			$self->{desc}=_"All songs";
+			return $self;
+		}
+		elsif ($string eq 'null')
+		{	next if !$and;			# null or ... = ...
+			$self->{string}='null';		# null and  ... = null
+			$self->{desc}=_"No songs";
+			return $self;
 		}
 		if ($string=~s/$re/$1/)			# a & (b & c) => a & b & c
 		{	my $d=0; my $str='';
@@ -3719,6 +3728,8 @@ sub newadd
 	$self->{superset_filters}= \@supersets unless $sum=~m#(?:^|\x1D)\w+:-?[th]:#;	#don't use superset optimization for head/tail filters, as they are not commutative
 	return $self;
 }
+
+sub null { Filter->new('null'); }
 
 sub new_from_smartstring
 {	my (undef,$string,$casesens,$regexp,$fields0)=@_;
@@ -4172,7 +4183,8 @@ sub makesub
 	my $filter=$self->{string};
 	warn "makesub filter=$filter\n" if $::debug;
 	$self->{fields}={};
-	if ($filter eq '') { return $self->{'sub'}=sub {$_[0]}; }
+	if ($filter eq '')		{ return $self->{'sub'}=sub {$_[0]}; }
+	elsif ($filter eq 'null')	{ return $self->{'sub'}=sub { []; }; }
 
 	($filter,my $hashes)=_optimize_with_hashes($filter);
 
