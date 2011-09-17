@@ -3,7 +3,7 @@ Type=G+
 Title		= "gmusicbrowser"
 DefaultFocus	= SimpleSearch
 Default		= Window(size=1000x750)
-Window		= hidden=HBSongPlaylist|FilterPane2
+Window		= hidden=VPSongPlaylist|FilterPane2
 Author		= simon@shimmerproject.org
 ### main window containers: top bar, main and statusbar ###
 VBMain		= VBTop _HPMain
@@ -17,7 +17,7 @@ VBPlayer	= 1Filler0 HBTitle HBTimeSlider
 HBTitle		= Title(expand_max=500,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)",yalign=0.5,ellipsize=end) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0,ellipsize=end) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=300,yalign=0.5,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 ABToggle	= (yalign=0,yscale=0.0) HBToggle
-HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=gmb-view-list,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=gmb-view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=gmb-view-mosaic,widget=FilterPane2,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=gmb-view-fullscreen,size=large-toolbar,tip="Fullscreen View") 10Filler2 ABSearchBox
+HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=gmb-view-list,widget=VPSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=gmb-view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=gmb-view-mosaic,widget=FilterPane2,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=gmb-view-fullscreen,size=large-toolbar,tip="Fullscreen View") 10Filler2 ABSearchBox
 ABSearchBox	= (yalign=0) SimpleSearch(suggest=1)
 ABSettings	= (yalign=0,yscale=0.0) HBSettings
 HBSettings	= ExtraButtons(size=large-toolbar) BMSettings
@@ -34,8 +34,10 @@ VBAlbuminfo	= (tabtitle="Album") _PluginAlbuminfo
 HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=FRCover,tip=_"Show/Hide Cover")
 ### main right: list/tree/mosaic widgets ###
 HPRight		= _HBSongListtree
-HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _HBSongPlaylist _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
-HBSongPlaylist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
+HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _VPSongPlaylist _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
+VPSongPlaylist	= HBFilters _HBSonglist
+HBFilters	= _FilterPane3(nb=2,hidebb=1,page=genre,hidetabs=1) _FilterPane10(nb=3,hidebb=1,page=artists,page_artists/lmarkup="<b>%a</b>%Y\n<small>%x « %s</small>",hidetabs=1) _FilterPane5(nb=4,hidebb=1,page=album,page_album/lpicsize=32,page_album/lmarkup="<b>%a</b>%Y\n<small>%s « %l</small>",hidetabs=1)
+HBSonglist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
 #VBMosaic	= FRToggleMosaic _VPMosaicAlbum _VPMosaicArtist
 #FRToggleMosaic	= (shadow=in) HBToggleMosaicClose
 #HBToggleMosaicClose = ABToggleMosaic -ToggleButton6(widget=FRToggleMosaic,label="",icon="gtk-close",tip=_"Hide Artist/Album bar")
