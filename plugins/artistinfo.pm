@@ -107,7 +107,7 @@ sub new
 	$self->{fontsize} = $fontsize->get_size / Gtk2::Pango->scale;
 	$self->{artist_esc} = "";
 	my $statbox=Gtk2::VBox->new(0,0);
-	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,minsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0});
+	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,minsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0,group=>$options->{group}});
 	for my $name (qw/Ltitle Lstats/)
 	{	my $l=Gtk2::Label->new('');
 		$self->{$name}=$l;
