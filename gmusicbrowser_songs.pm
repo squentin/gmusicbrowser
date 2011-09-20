@@ -126,8 +126,8 @@ our %timespan_menu=
 		'editwidget:single'	=> sub { GMB::TagEdit::FlagList->new(@_) },
 		'editwidget:per_id'	=> sub { GMB::TagEdit::FlagList->new(@_) },
 		autofill_re	=> '.+',
-		'filterdesc:~'	=> [ _"%s is set", _"is set",	'combostring', ],
-		'filterdesc:-~'	=> _"%s isn't set",
+		'filterdesc:~'	=> [ _"includes %s", _"includes",	'combostring', ],
+		'filterdesc:-~'	=> _"doesn't include %s",
 		'filterdesc:ecount:0' => _"has none",
 		'filterdesc:-ecount:0'=> _"has at least one",
 		'filterdesc:mi'	=> [ _"matches regexp %s",_"matches regexp",'regexp',	icase=>1, ],
@@ -182,7 +182,7 @@ our %timespan_menu=
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[keys %{#HVAL#}];',
 		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v}',
 		listall		=> '##mainfield#->listall#',
-		'filterdesc:~'	=> [ _"includes artist %s", _"includes artist",	'combostring', ],
+		'filterdesc:~'	=> [ _"includes artist %s", _"includes artist",	'menustring', ],
 		'filterdesc:-~'	=> _"doesn't include artist %s",
 		'filterdesc:mi'	=> [ _"matches regexp %s",_"matches regexp",'regexp',	icase=>1, ],
 		'filterdesc:si'	=> [ _"contains %s",	_"contains",	'substring',	icase=>1, ],
@@ -254,7 +254,7 @@ our %timespan_menu=
 		'filter:pic'	=> '.!!. __#mainfield#_picture[#_#]',
 		'filterdesc:pic:1'=> _"has a picture",
 		'filterdesc:-pic:1'=> _"doesn't have a picture",
-		'filterpat:combostring'=> [ display=> sub { my $s=shift; $s=~s/\x00.*//; $s; } ], # could display $album by $album_artist instead
+		'filterpat:menustring'=> [ display=> sub { my $s=shift; $s=~s/\x00.*//; $s; } ], # could display $album by $album_artist instead
 
 		#load_extra	=> '___pix[ #sgid_to_gid(VAL=$_[0])# ]=$_[1];',
 		#save_extra	=> 'my @res; for my $gid (1..$##_name#) { my $v=___pix[$gid]; next unless length $v; push @res, [#*:gid_to_sgid(GID=$gid)#,$val]; } return \@res;',
@@ -355,7 +355,7 @@ our %timespan_menu=
 		edit_listall	=> 1,
 		parent		=> 'generic',
 		maxgid		=> '@#_name#-1',
-		'filterdesc:~'	=> [ _"is %s", _"is",	'combostring', ],
+		'filterdesc:~'	=> [ _"is %s", _"is",	'menustring', ],
 		'filterdesc:-~'	=> _"isn't %s",
 		#gsummary	=> 'my $gids=Songs::UniqList(#field#,#IDs#); @$gids==1 ? #gid_to_display(GID=$gids->[0])# : #names(count=scalar @$gids)#;',
 	},
@@ -796,6 +796,26 @@ our %timespan_menu=
 	disable=>1,	options => 'disable',
 	category=>'extra',
  },
+ style	=>
+ {	name	=> _"Styles",	width => 180,	flags => 'fgaescil',
+	type		=> 'flags',
+	all_count	=> _"All styles",
+	none		=> quotemeta _"No styles",
+	FilterList	=> {search=>1,},
+	edit_order=> 72,	edit_many=>1,
+	disable=>1,	options => 'disable',
+	category=>'extra',
+ },
+ theme	=>
+ {	name	=> _"Themes",	width => 180,	flags => 'fgaescil',
+	type		=> 'flags',
+	all_count	=> _"All themes",
+	none		=> quotemeta _"No themes",
+	FilterList	=> {search=>1,},
+	edit_order=> 73,	edit_many=>1,
+	disable=>1,	options => 'disable',
+	category=>'extra',
+ },
  comment=>
  {	name	=> _"Comment",	width => 200,	flags => 'fgarwesci',		type => 'text',
 	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3	=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
@@ -804,12 +824,12 @@ our %timespan_menu=
  },
  rating	=>
  {	name	=> _"Rating",		width => 80,	flags => 'fgaesc',	type => 'rating',
-	id3v2	=> 'TXXX;FMPS_Rating;%v & TXXX;FMPS_Rating_User;%v::%i | percent( TXXX;gmbrating;%v ) | five( TXXX;rating;%v )',
-	vorbis	=> 'FMPS_RATING & FMPS_RATING_USER::%i | percent( gmbrating ) | five( rating )',
-	ape	=> 'FMPS_RATING & FMPS_RATING_USER::%i | percent( gmbrating ) | five( rating )',
-	ilst	=> '----FMPS_Rating & ----FMPS_Rating_User::%i | percent( ----gmbrating ) | five( ----rating )',
+	id3v2	=> 'TXXX;FMPS_Rating_User;%v::%i & TXXX;FMPS_Rating;%v | percent( TXXX;gmbrating;%v ) | five( TXXX;rating;%v )',
+	vorbis	=> 'FMPS_RATING_USER::%i & FMPS_RATING | percent( gmbrating ) | five( rating )',
+	ape	=> 'FMPS_RATING_USER::%i & FMPS_RATING | percent( gmbrating ) | five( rating )',
+	ilst	=> '----FMPS_Rating_User::%i & ----FMPS_Rating | percent( ----gmbrating ) | five( ----rating )',
 	postread=> \&FMPS_rating_postread,
-	prewrite=> \&FMPS_rating_prewrite, 
+	prewrite=> \&FMPS_rating_prewrite,
 	'postread:five'=> sub { my $v=shift; length $v && $v=~m/^\d+$/ && $v<=5 ? sprintf('%d',$v*20) : undef }, # for reading foobar2000 rating 0..5 ?
 	'postread:percent'=> sub { $_[0] }, # for anyone who used gmbrating
 	FilterList => {},
@@ -1831,6 +1851,7 @@ warn "MakeFilterFromGID => ".($sub->($gid)) if $::debug;
 }
 sub MakeFilterFromID	#should support most fields, FIXME check if works for year/artists/labels/genres/...
 {	my ($field,$ID)=@_;
+	return Filter->null unless $ID;	# null filter if no ID
 	if (my $code=Code($field, 'makefilter_fromID', ID => '$_[0]'))		#FIXME optimize : don't call this every time, for example check for a flag that would indicate that this field has a gid
 	{	my $sub=$FuncCache{'makefilter_fromID '.$field} ||= Compile('makefilter_fromID '.$field, "sub {$code}"); #FIXME if method doesn't exist
 		return Filter->new( $sub->($ID) );
@@ -2085,6 +2106,17 @@ sub MainField
 sub FieldWidth
 {	my $f=$_[0];
 	return $Def{$f} && $Def{$f}{width} ? $Def{$f}{width} : 100;
+}
+sub FieldEnabled	#check if a field is enabled
+{	!! grep $_[0] eq $_, @Fields;
+}
+sub FieldList		#return list of fields, or list of fields of type $type, these types are not the same necessarily the types are those used in %Def
+{	if (my $type=shift)
+	{	return unless $type eq 'flags'; # only "flags" type supported currently
+		return grep $Def{$_}{type} eq 'flags', @Fields; # currently type flags all have a type=>'flags' in %Def, but might change
+								# maybe should use  $Def{$_}{flags}=~m/l/ && $Def{$_}{flags}=~m/e/  instead
+	}
+	return @Fields;
 }
 sub ListGroupTypes
 {	my @list= grep $Def{$_}{can_group}, @Fields;
@@ -3645,9 +3677,17 @@ sub newadd
 		}
 		$self->{source} ||= $f->{source} if ref $f;
 		my $string=(ref $f)? $f->{string} : $f;
-		unless ($string)
+		if (!$string)
 		{	next if $and;			# all and ... = ...
-			return $self->{string}='';	# all or  ... = all
+			$self->{string}='';		# all or  ... = all
+			$self->{desc}=_"All songs";
+			return $self;
+		}
+		elsif ($string eq 'null')
+		{	next if !$and;			# null or ... = ...
+			$self->{string}='null';		# null and  ... = null
+			$self->{desc}=_"No songs";
+			return $self;
 		}
 		if ($string=~s/$re/$1/)			# a & (b & c) => a & b & c
 		{	my $d=0; my $str='';
@@ -3688,6 +3728,8 @@ sub newadd
 	$self->{superset_filters}= \@supersets unless $sum=~m#(?:^|\x1D)\w+:-?[th]:#;	#don't use superset optimization for head/tail filters, as they are not commutative
 	return $self;
 }
+
+sub null { Filter->new('null'); }
 
 sub new_from_smartstring
 {	my (undef,$string,$casesens,$regexp,$fields0)=@_;
@@ -4141,7 +4183,8 @@ sub makesub
 	my $filter=$self->{string};
 	warn "makesub filter=$filter\n" if $::debug;
 	$self->{fields}={};
-	if ($filter eq '') { return $self->{'sub'}=sub {$_[0]}; }
+	if ($filter eq '')		{ return $self->{'sub'}=sub {$_[0]}; }
+	elsif ($filter eq 'null')	{ return $self->{'sub'}=sub { []; }; }
 
 	($filter,my $hashes)=_optimize_with_hashes($filter);
 

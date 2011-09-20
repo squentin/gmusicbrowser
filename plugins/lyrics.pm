@@ -153,7 +153,8 @@ sub new
 
 	my $adj= $self->{fontsize_adj}= Gtk2::Adjustment->new(10,4,80,1,5,0);
 	my $zoom=Gtk2::ToolItem->new;
-	$zoom->add( Gtk2::SpinButton->new($adj,1,0) );
+	my $zoom_spin=Gtk2::SpinButton->new($adj,1,0);
+	$zoom->add($zoom_spin);
 	$zoom->set_tooltip_text(_"Font size");
 	my $source=::NewPrefCombo( OPT.'LyricSite', {map {$_=>$sites{$_}[0]} keys %sites} ,cb => \&Refresh_cb, toolitem=> _"Lyrics source");
 	my $scroll=::NewPrefCheckButton( OPT.'AutoScroll', _"Auto-scroll", cb=>\&SetAutoScroll, tip=>_"Scroll with the song", toolitem=>1);
@@ -167,7 +168,7 @@ sub new
 	$self->{buffer}->signal_connect(modified_changed => sub {$_[1]->set_sensitive($_[0]->get_modified);}, $self->{saveb});
 	$self->{backb}->set_sensitive(0);
 	$self->SetFont;
-	$adj->signal_connect(value_changed=> sub { $self->SetFont($_[0]->get_value) });
+	$zoom_spin->signal_connect(value_changed=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->SetFont($_[0]->get_value) });
 	$self->SetToolbarHide($self->{HideToolbar});
 	$self->SetAutoScroll;
 

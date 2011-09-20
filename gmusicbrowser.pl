@@ -555,17 +555,19 @@ sub IncSuffix	# increment a number suffix from a string
 
 sub CleanupFileName
 {	local $_=$_[0];
-	s#[[:cntrl:]/:><\*\?\"\\]##g;
+	s#[[:cntrl:]/:><*?"\\^]##g;
 	s#^[- ]+##g;
-	s/ +$//g;
+	$_=substr $_,0,255 if length>255;
+	s/[. ]+$//g;
 	return $_;
 }
 sub CleanupDirName
 {	local $_=$_[0];
-	if ($^O eq 'MSWin32')	{ s#[[:cntrl:]/:><\*\?\"]##g; }
-	else			{ s#[[:cntrl:]:><\*\?\"\\]##g; }
+	if ($^O eq 'MSWin32')	{ s#[[:cntrl:]/:><*?"^]##g; }
+	else			{ s#[[:cntrl:]:><*?"\\^]##g;}
 	s#^[- ]+##g;
-	s/ +$//g;
+	$_=substr $_,0,255 if length>255;
+	s/[. ]+$//g;
 	return $_;
 }
 
@@ -1274,6 +1276,8 @@ Play() if $CmdLine{play} && !$PlayTime;
 
 Layout::InitLayouts;
 ActivatePlugin($_,'startup') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
+Update_QueueActionList();
+QueueChanged() if $QueueAction;
 
 CreateMainWindow( $CmdLine{layout}||$Options{Layout} );
 ShowHide(0) if $CmdLine{hide} || ($Options{StartInTray} && $Options{UseTray} && $TrayIconAvailable);
@@ -1924,11 +1928,10 @@ sub ReadSavedTags	#load tags _and_ settings
 	}
 
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};
-	$Options{SongArray_Queue}=undef unless $Options{RememberQueue};
-	if ($Options{RememberQueue})
-	{	$QueueAction= $Options{QueueAction} || '';
-		$QueueAction='' unless $QActions{$QueueAction};
-		QueueChanged() if $QueueAction;
+	$QueueAction= $Options{QueueAction} || '';
+	unless ($Options{RememberQueue})
+	{	$Options{SongArray_Queue}=undef;
+		$QueueAction= '';
 	}
 	if ($Options{RememberPlayFilter})
 	{	$TogLock=$Options{Lock};
@@ -6649,6 +6652,7 @@ sub AddToFilterHistory
 {	my $filter=$_[0];
 	my $recent=$::Options{RecentFilters}||=[];
 	my $string=$filter->{string};
+	return if $string eq 'null';
 	@$recent=($filter, grep $_->{string} ne $string, @$recent);
 	pop @$recent if @$recent>20;
 }
@@ -6686,7 +6690,7 @@ sub WatchFilter
 	$object->{'UpdateFilter_'.$group}=$sub;
 	if ($group=~m/:[\w.]+$/)
 	{	$Related_FilterWatchers{$group}++;
-		#$Filters{$group}[0]||=$Filters{$group}[1+1]||= Filter->none;#FIXME implement a "none" filter
+		#$Filters{$group}[0]||=$Filters{$group}[1+1]||= Filter->null;
 		#$Filters{$group}[0]||=$Filters{$group}[1+1]||=Filter->new;
 	}
 	IdleDo('1_init_filter'.$group,0, \&InitFilter, $group);
@@ -7112,7 +7116,7 @@ sub new
 {	my ($class,$dialog,$init) = @_;
 	my $self = bless Gtk2::VBox->new, $class;
 
-	my $store=Gtk2::TreeStore->new(('Glib::String')x2);
+	my $store=Gtk2::TreeStore->new('Glib::String','Glib::Scalar');
 	$self->{treeview}=
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes(
@@ -7290,7 +7294,7 @@ sub cursor_changed_cb
 sub Set
 {	my ($self,$filter,$startpath,$startpos)=@_;
 	$filter=$filter->{string} if ref $filter;
-	$filter='' unless defined $filter;
+	$filter='' if !defined $filter || $filter eq 'null';
 	my $treeview=$self->{treeview};
 	my $store=$treeview->get_model;
 
@@ -7923,12 +7927,14 @@ INIT
 	listname=> 'GMB::FilterEdit::SavedListCombo',
 	filename=> 'GMB::FilterEdit::Filename',
 	combostring=> 'GMB::FilterEdit::Combo',
+	menustring=> 'GMB::FilterEdit::Menu',
   );
 }
 
 sub new
 {	my ($class,$activatesub,$changesub,$filter,@menu_append)=@_;
 	my $self = bless Gtk2::HBox->new, $class;
+	$filter='' if $filter eq 'null';
 	my ($field,$set)= split /:/,$filter,2;
 	my %fieldhash; $fieldhash{$_}= Songs::FieldName($_) for Songs::Fields_with_filter;
 	my @ordered_field_hash= map { $_,$fieldhash{$_} } ::sorted_keys(\%fieldhash);
@@ -8152,6 +8158,35 @@ sub new
 	return $self;
 }
 sub Get { $_[0]->get_value; }
+
+package GMB::FilterEdit::Menu;	# alternative to GMB::FilterEdit::Combo that better handle long list of values, and works with album filters
+use base 'Gtk2::Button';
+sub new
+{	my ($class,$val,$opt)=@_;
+	my $self= bless Gtk2::Button->new,$class;
+	$self->{field}=$opt->{field};
+	$self->{val}=$val;
+	$self->signal_connect(button_press_event => sub
+		{	my $self=$_[0];
+			::PopupAA( $self->{field}, cb=> sub { $self->set_gid($_[1]); } );
+			1;
+		});
+	$self->set_label($val);
+	return $self;
+}
+sub Get { $_[0]{val}; }
+sub set_gid
+{	my ($self,$gid)=@_;
+	my $field= $self->{field};
+	 #ugly way to get the sgid	#FIXME
+	 my $val=Songs::MakeFilterFromGID($field,$gid);
+	 $val=$val->{string};
+	 $val=~s/^$field:~://;
+	$self->{val}=$val;
+	$self->set_label($val);
+	GMB::FilterBox::changed($self);
+	GMB::FilterBox::activate($self);
+}
 
 package GMB::FilterEdit::Filename;
 use base 'Gtk2::Box';
