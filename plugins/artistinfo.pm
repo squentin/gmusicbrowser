@@ -170,7 +170,7 @@ sub new
 		$item -> set_relief("none");
 		$item -> set_tooltip_text($sites{$key}[2]);
 		$item->set_active( $key eq $self->{site} );
-		$item->signal_connect('toggled' => sub { &toggled_cb($self,$item,$textview); } );
+		$item->signal_connect('toggled' => sub { my $self=::find_ancestor($_[0],__PACKAGE__); toggled_cb($self,$item,$textview); } );
 		$group = $item -> get_group;
 		my $toolitem=Gtk2::ToolItem->new;
 		$toolitem->add( $item );
@@ -188,7 +188,7 @@ sub new
 #		$toolitem->set_proxy_menu_item($key,$menuitem);
 	}
 	for my $button
-	(	[refresh => 'gtk-refresh', sub { SongChanged($self,'1'); },_"Refresh", _"Refresh",0],
+	(	[refresh => 'gtk-refresh', sub { my $self=::find_ancestor($_[0],__PACKAGE__); SongChanged($self,'1'); },_"Refresh", _"Refresh",0],
 		[save => 'gtk-save',	\&Save_text,	_"Save",	_"Save artist biography",$::Options{OPT.'AutoSave'}],
 	)
 	{	my ($key,$stock,$cb,$label,$tip,$hide)=@$button;
