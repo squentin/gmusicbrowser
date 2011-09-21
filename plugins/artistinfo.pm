@@ -8,7 +8,7 @@
 =gmbplugin ARTISTINFO
 name	Artistinfo
 title	Artistinfo plugin
-version	0.4
+version	0.5
 author  Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 author  Pasi Lallinaho <pasi@shimmerproject.org>
 desc	This plugin retrieves artist-relevant information (biography, upcoming events, similar artists) from last.fm.
