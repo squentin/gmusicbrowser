@@ -4835,6 +4835,8 @@ sub SongsChanged
 	for my $group (keys %SelID)
 	{	HasChangedSelID($group,$SelID{$group}) if grep $SelID{$group}==$_, @$IDs;
 	}
+	QHasChanged('NextSongs')   if OneInCommon($IDs,\@NextSongs);
+	QHasChanged('RecentSongs') if OneInCommon($IDs,$Recent);
 	HasChanged(SongsChanged=>$IDs,$fields);
 	GMB::ListStore::Field::changed(@$fields);
 }
