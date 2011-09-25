@@ -6588,18 +6588,18 @@ sub Watch
 {	my ($object,$key,$sub)=@_;
 	unless ($object) { push @{$EventWatchers{$key}},$sub; return } #for permanent watch
 	warn "watch $key $object\n" if $debug;
-	if (my $existing=$object->{'WatchUpdate_'.$key})	# object is watching the event with multiple callbacks
-	{	$existing= [$existing] if ref $existing ne 'ARRAY';
+	my $cbkey= 'WatchUpdate_'.$key;		# key used to store the callback(s) in the object's hash
+	if (my $existing=$object->{$cbkey})	# object is watching the event with multiple callbacks
+	{	$object->{$cbkey}= $existing= [$existing] if ref $existing ne 'ARRAY';
 		push @$existing, $sub;
-		$object->{'WatchUpdate_'.$key}=$existing;
 	}
 	else
 	{	push @{$EventWatchers{$key}},$object; weaken($EventWatchers{$key}[-1]);
-		$object->{'WatchUpdate_'.$key}=$sub;
+		$object->{$cbkey}=$sub;
 	}
 	$object->{Watcher_DESTROY}||=$object->signal_connect(destroy => \&UnWatch_all) unless ref $object eq 'HASH' || !$object->isa('Gtk2::Object');
 }
-sub UnWatch
+sub UnWatch		# warning: if one object watch the same event with multiple callbacks, all of them will be removed
 {	my ($object,$key)=@_;
 	warn "unwatch $key $object\n" if $debug;
 	@{$EventWatchers{$key}}=grep defined && $_ != $object, @{$EventWatchers{$key}};
@@ -6618,6 +6618,7 @@ sub QHasChanged
 }
 sub HasChanged
 {	my ($key,@args)=@_;
+	delete $ToDo{"1_HasChanged_$key"};
 	return unless $EventWatchers{$key};
 	my @list=@{$EventWatchers{$key}};
 	warn "HasChanged $key -> updating @list\n" if $debug;
