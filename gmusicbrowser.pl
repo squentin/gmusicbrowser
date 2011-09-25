@@ -1125,6 +1125,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	MenuPlayFilter	=> [sub { Layout::FilterMenu(); }, _"Popup playlist filter menu"],
 	MenuPlayOrder	=> [sub { Layout::SortMenu(); },   _"Popup playlist order menu"],
 	MenuQueue	=> [sub { PopupContextMenu(\@Layout::MenuQueue,{ID=>$SongID, usemenupos=>1}); }, _"Popup queue menu"],
+	ReloadLayouts	=> [ \&Layout::InitLayouts, _"Re-load layouts", ],
 );
 
 sub run_command
@@ -5861,6 +5862,8 @@ sub PrefLayouts
 		my $combo= NewPrefLayoutCombo($key,$type,$text,$sg1,$sg2,$cb);
 		push @layouts_combos, $combo;
 	}
+	my $reloadlayouts=Gtk2::Alignment->new(0,.5,0,0);
+	$reloadlayouts->add( NewIconButton('gtk-refresh',_"Re-load layouts",\&Layout::InitLayouts) );
 
 	#fullscreen button
 	my $fullbutton=NewPrefCheckButton(AddFullscreenButton => _"Add a fullscreen button", cb=>sub { Layout::WidgetChangedAutoAdd('Fullscreen'); }, tip=>_"Add a fullscreen button to layouts that can accept extra buttons");
@@ -5869,7 +5872,7 @@ sub PrefLayouts
 	my $icotheme=NewPrefCombo(IconTheme=> GetIconThemesList(), text =>_"Icon theme :", sizeg1=>$sg1,sizeg2=>$sg2, cb => \&LoadIcons);
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for @layouts_combos,$checkT1,$fullbutton,$icotheme;
+	$vbox->pack_start($_,FALSE,FALSE,1) for @layouts_combos,$reloadlayouts,$checkT1,$fullbutton,$icotheme;
 	return $vbox;
 }
 
@@ -6510,7 +6513,8 @@ sub NewPrefCombo
 
 sub NewPrefLayoutCombo
 {	my ($key,$type,$text,$sg1,$sg2,$cb)=@_;
-	my $combo= NewPrefCombo($key => Layout::get_layout_list($type), text => $text, sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => $cb, );
+	my $buildlist= sub { Layout::get_layout_list($type) };
+	my $combo= NewPrefCombo($key => $buildlist, text => $text, sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => $cb, event=>'Layouts');
 	my $set_tooltip= sub	#show layout author in tooltip
 	 {	return if $_[1] && $_[1] ne $key;
 		my $author= $Layout::Layouts{$Options{$key}}{Author};

@@ -31,7 +31,7 @@ sub Stop
 }
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	$LayoutCombo= TextCombo::Tree->new( Layout::get_layout_list('D'), );
+	$LayoutCombo= TextCombo::Tree->new( sub {Layout::get_layout_list('D')}, undef, undef, event=>'Layouts', );
 	my $layoutlabel= Gtk2::Label->new(_"Layout :");
 	my $add= ::NewIconButton('gtk-add',_"Add", sub { New($LayoutCombo->get_value); });
 

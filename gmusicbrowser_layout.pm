@@ -728,6 +728,7 @@ sub InitLayouts
 		}
 		exit;
 	}
+	::QHasChanged('Layouts');
 }
 
 sub ReadLayoutFile
