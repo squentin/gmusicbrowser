@@ -6484,13 +6484,13 @@ sub NewPrefSpinButton
 
 sub NewPrefCombo
 {	my ($key,$list,%opt)=@_;
-	my ($text,$cb0,$sg1,$sg2,$toolitem,$tree,$tip)=@opt{qw/text cb sizeg1 sizeg2 toolitem tree tip/};
+	my ($text,$cb0,$sg1,$sg2,$toolitem,$tree,$tip,$event)=@opt{qw/text cb sizeg1 sizeg2 toolitem tree tip event/};
 	my $cb=sub
 		{	SetOption($key,$_[0]->get_value);
 			&$cb0 if $cb0;
 		};
 	my $class= $tree ? 'TextCombo::Tree' : 'TextCombo';
-	my $combo= $class->new( $list, $Options{$key}, $cb );
+	my $combo= $class->new( $list, $Options{$key}, $cb, event=>$event );
 	my $widget=$combo;
 	if (defined $text)
 	{	my $label=Gtk2::Label->new($text);
@@ -8656,7 +8656,10 @@ use base 'Gtk2::ComboBox';
 sub new
 {	my ($class,$list,$init,$sub,%opt) = @_;
 	my $self= bless Gtk2::ComboBox->new, $class;
-	$self->build_store($list,%opt);
+	my $buildlist;
+	if (ref $list eq 'CODE') { $buildlist=$list; $list= $buildlist->(); }
+	my $store=$self->build_store($list,%opt);
+	$self->set_model($store);
 	my $renderer=Gtk2::CellRendererText->new;
 	$self->pack_start($renderer,::TRUE);
 	$self->add_attribute($renderer, text => 0);
@@ -8667,15 +8670,29 @@ sub new
 		if $self->get_model->isa('Gtk2::TreeStore');	#hide title of submenus
 	$self->set_value($init);
 	$self->set_value(undef) unless $self->get_active_iter; #in case $init was not found
-	$self->signal_connect( changed => $sub ) if $sub;
+	$self->signal_connect( changed => sub { &$sub unless $_[0]{busy}; } ) if $sub;
+	if ($buildlist && $opt{event})
+	{	::Watch( $self, $_, sub { $_[0]->rebuild_store( $buildlist->() ); } ) for split / /,$opt{event};
+	}
 	return $self;
 }
 
-sub build_store		#FIXME allow rebuilding store while keeping the value (and not calling the changed cb)
+sub rebuild_store
+{	my $self=shift;
+	$self->{busy}=1;
+	my $value= $self->get_value;
+	$self->build_store(@_);
+	$self->set_value($value) if defined $value;
+	delete $self->{busy};
+}
+
+sub build_store
 {	my ($self,$list,%opt)=@_;
-	my $store= Gtk2::ListStore->new('Glib::String','Glib::String');
+	$self->{ordered_hash}=1 if $opt{ordered_hash};	#when called from rebuild_store, must use same options it got at init => save option
+	my $store= $self->get_model || Gtk2::ListStore->new('Glib::String','Glib::String');
+	$store->clear;
 	my $names=$list;
-	if (ref $list eq 'ARRAY' && $opt{ordered_hash})
+	if (ref $list eq 'ARRAY' && $self->{ordered_hash})
 	{	my $i=0;
 		my $array=$list;
 		$list=[]; $names=[];
@@ -8695,7 +8712,6 @@ sub build_store		#FIXME allow rebuilding store while keeping the value (and not 
 	{	my $iter= $store->append;
 		$store->set($iter, 0,$names->[$i], 1,$list->[$i]);
 	}
-	$self->set_model($store);
 	return $store;
 }
 
@@ -8768,7 +8784,8 @@ BEGIN {unshift @ISA,'TextCombo';}
 
 sub build_store
 {	my ($self,$list)=@_;			#$list is a list of label,value pairs, where value can be a sublist
-	my $store= Gtk2::TreeStore->new('Glib::String','Glib::String');
+	my $store= $self->get_model || Gtk2::TreeStore->new('Glib::String','Glib::String');
+	$store->clear;
 	my @todo=(undef,$list);
 	while (@todo)
 	{	my $parent=shift @todo;
@@ -8781,7 +8798,6 @@ sub build_store
 			$store->set($iter, 0,$name, 1,$key);
 		}
 	}
-	$self->set_model($store);
 	return $store;
 }
 
