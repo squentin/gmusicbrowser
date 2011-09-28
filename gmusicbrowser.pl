@@ -264,7 +264,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 		if (-d $save || $isdir) { $HomeDir = $save.SLASH; }
 		else			{ $SaveFile= $save; }
 	}
-	warn "using '$HomeDir' folder for saving/setting folder instead of '$default_home'\n" if $debug;
+	warn "using '$HomeDir' folder for saving/setting folder instead of '$default_home'\n" if $debug && $HomeDir;
 	$HomeDir ||= $default_home;
 	if (!-d $HomeDir)
 	{	warn "Creating folder $HomeDir\n";
