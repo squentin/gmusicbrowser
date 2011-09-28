@@ -148,6 +148,8 @@ sub new
 	$tc_artist->set_expand(1);
 	$tc_artist->set_resizable(1);
 	$treeview->append_column($tc_artist);
+	$treeview->set_has_tooltip(1);
+	$treeview->set_tooltip_text("Middle-click on local artists to set a filter on them, right-click non-local artists to search for them on the web.");
 	my $renderer=Gtk2::CellRendererText->new;
 	my $tc_similar=Gtk2::TreeViewColumn->new_with_attributes( "%",$renderer,text => 1);
 	$tc_similar->set_cell_data_func($renderer, sub { my ($column, $cell, $model, $iter, $func_data) = @_; my $rating = $model->get($iter, 1); $cell->set( text => sprintf '%.1f', $rating ); }, undef); # limit similarity rating to one decimal
