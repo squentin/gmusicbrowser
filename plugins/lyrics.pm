@@ -47,42 +47,43 @@ my @ContextMenuAppend=
 	},
 );
 
-my %sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics can be saved
-(	#lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php','artist=%a&songname=%s'],
-	#lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php?artist=%a&songname=%s',undef,sub
+my %Sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics can be saved
+(	#lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php','artist=%a&songname=%t'],
+	#lyrc	=>	['lyrc','http://lyrc.com.ar/en/tema1en.php?artist=%a&songname=%t',undef,sub
 	#	{	local $_=$_[0];
 	#		return -1 if m#<a href=[^>]+add[^>]+>(?:[^<]*</?[b-z]\w*)*[^<]*Add a lyric.(?:[^<]*</?[b-z]\w*)*[^<]*</a>#i;
 	#		return 1 if s#<a href="\#"[^>]+badsong[^>]+>BADSONG</a>##i;
 	#		return 0;
 	#	}],
-	#leoslyrics =>	['leolyrics','http://api.leoslyrics.com/api_search.php?artist=%a&songtitle=%s'],
-	#google	=>	['google','http://www.google.com/search?q="%a"+"%s"'],
-	lyriki	=>	['lyriki','http://lyriki.com/index.php?title=%a:%s',undef,
+	#leoslyrics =>	['leolyrics','http://api.leoslyrics.com/api_search.php?artist=%a&songtitle=%t'],
+	#google	=>	['google','http://www.google.com/search?q="%a"+"%t"'],
+	lyriki	=>	['lyriki','http://lyriki.com/index.php?title=%a:%t',undef,
 		sub { my $no= $_[0]=~m/<div class="noarticletext">/s; $_[0]=~s/^.*<!--\s*start content\s*-->(.*?)<!--\s*end content\s*-->.*$/$1/s && !$no; }],
-	#lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a',undef,
+	#lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%t&artist=%a',undef,
 	#		sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
-	lyricssongs =>	['lyrics-songs','http://letras.terra.com.br/winamp.php?musica=%s&artista=%a',undef,
+	lyricssongs =>	['lyrics-songs','http://letras.terra.com.br/winamp.php?musica=%t&artista=%a',undef,
 			sub {	my $l=html_extract($_[0],div=>'letra');
 				$l=~s#<div id="cabecalho">.*?</div>##s if $l; #remove header with title and artist links
 				my $ref=\$_[0];
 				$$ref=$l ? $l : $notfound;
 				return ! !$l
 			}],
-	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%s',undef,
+	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%t',undef,
 			 sub {	return 0,'http://lyrics.wikia.com/'.$1 if $_[0]=~m#<span class="redirectText"><a href="/([^"]+)"#;
 				$_[0]=~s!.*<div class='lyricbox'>.*?((?:&\#\d+;|<br ?/>){5,}).*!$1!s; #keep only the "lyric box"
 				return 0 if $_[0]=~m/&#91;&#46;&#46;&#46;&#93;<br/; # truncated lyrics : "[...]" => not auto-saved
 				return !!$1;
 			}],
-	#lyricwikiapi => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%s&fmt=html',undef,
+	#lyricwikiapi => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%t&fmt=html',undef,
 	#	sub { $_[0]!~m#<pre>\W*Not found\W*</pre>#s }],
-	#azlyrics => [ azlyrics => 'http://search.azlyrics.com/cgi-bin/azseek.cgi?q="%a"+"%s"'],
+	#azlyrics => [ azlyrics => 'http://search.azlyrics.com/cgi-bin/azseek.cgi?q="%a"+"%t"'],
 	#Lyricsfly ?
+	AUTO	=> [_"Auto",],	#special mode that search multiple sources
 );
 
 $::Options{OPT.'Font'} ||= delete $::Options{OPT.'FontSize'};	#for versions <1.1.6
 
-if (my $site=$::Options{OPT.'LyricSite'}) { delete $::Options{OPT.'LyricSite'} unless exists $sites{$site} } #reset selected site if no longer defined
+if (my $site=$::Options{OPT.'LyricSite'}) { delete $::Options{OPT.'LyricSite'} unless exists $Sites{$site} } #reset selected site if no longer defined
 ::SetDefaultOptions(OPT, Font => 10, PathFile => "~/.lyrics/%a/%t.lyric", LyricSite => 'lyricssongs', PreferEmbeddedLyrics=>0);
 
 
@@ -156,7 +157,7 @@ sub new
 	my $zoom_spin=Gtk2::SpinButton->new($adj,1,0);
 	$zoom->add($zoom_spin);
 	$zoom->set_tooltip_text(_"Font size");
-	my $source=::NewPrefCombo( OPT.'LyricSite', {map {$_=>$sites{$_}[0]} keys %sites} ,cb => \&Refresh_cb, toolitem=> _"Lyrics source");
+	my $source=::NewPrefCombo( OPT.'LyricSite', { map {$_=>$Sites{$_}[0]} keys %Sites} ,cb => \&Refresh_cb, toolitem=> _"Lyrics source");
 	my $scroll=::NewPrefCheckButton( OPT.'AutoScroll', _"Auto-scroll", cb=>\&SetAutoScroll, tip=>_"Scroll with the song", toolitem=>1);
 	$toolbar->insert($_,-1) for $follow,$zoom,$scroll,$source;
 
@@ -285,16 +286,32 @@ sub SongChanged
 }
 
 sub load_from_web
-{	my $self=shift;
+{	my ($self,$next)=@_;
+	my $site;
+	if ($next)
+	{	$site = shift @{$self->{trynext}};
+		if (!$site)
+		{	$self->{buffer}->set_text(_"Not found.");
+			$self->{buffer}->set_modified(0);
+			return;
+		}
+	}
+	else
+	{	$site = $::Options{OPT.'LyricSite'};
+		delete $self->{trynext};
+		if ($site eq 'AUTO')
+		{	($site,@{$self->{trynext}})= qw/lyricssongs lyricwiki/;	#FIXME make it configurable
+		}
+	}
+	return unless $site;
+	my (undef,$url,$post,$check)=@{$Sites{$site}};
 	my $ID= $self->{ID};
-	my ($title,$artist)= map ::url_escapeall($_), Songs::Get($ID,qw/title artist/);
-	my (undef,$url,$post,$check)=@{$sites{$::Options{OPT.'LyricSite'}}};
 	for my $val ($url,$post)
 	{	next unless defined $val;
-		if (ref $val) { $val= $val->(Songs::Get($ID,qw/title artist/),$ID); }
-		else {	$val=~s/%a/$artist/; $val=~s/%s/$title/; }
+		if (ref $val) { $val= $val->($ID); }
+		else { $val= ::ReplaceFields($ID, $val, \&::url_escapeall); }
 	}
-	#$self->load_url($url,$post);
+	return unless $url;
 	::IdleDo('8_lyrics'.$self,1000,\&load_url,$self,$url,$post,$check);
 }
 
@@ -394,8 +411,9 @@ sub loaded #_very_ crude html to gtktextview renderer
 
 	my $oklyrics;
 	if (my $check=$self->{check})
-	{	($oklyrics,my $redirect)= $check->($data);
+	{	($oklyrics,my $redirect)= $check->($data,$self->{ID});
 		if ($redirect) { $self->load_url($redirect,undef,$check); return; }
+		if ($self->{trynext} && !($oklyrics && $oklyrics>0)) { $self->load_from_web('trynext'); return }
 	}
 	if ($self->{lastokurl})
 	{	my $history=$self->{history}||=[];
