@@ -6,9 +6,8 @@ Default		= Window(size=1000x750)
 Window		= hidden=VPSongPlaylist|FilterPane2
 Author		= simon@shimmerproject.org
 ### main window containers: top bar, main and statusbar ###
-VBMain		= VBTop _HPMain
-HPMain		= VBLeft _HPRight
-VBTop		= HBTop
+VBMain		= HBTop _HPMain
+HPMain		= VBLeft _VPRight
 HBTop		= ABButtons _15VBPlayer 10ABToggle -5ABSettings
 ### top bar from left to right ###
 ABButtons	= (yalign=0,yscale=0.0) HBButtons
@@ -33,7 +32,7 @@ VBArtistinfo	= (tabtitle="Artist") _PluginArtistinfo
 VBAlbuminfo	= (tabtitle="Album") _PluginAlbuminfo
 HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=FRCover,tip=_"Show/Hide Cover")
 ### main right: list/tree/mosaic widgets ###
-HPRight		= _HBSongListtree
+VPRight		= _HBSongListtree Progress
 HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _VPSongPlaylist _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
 VPSongPlaylist	= HBFilters _HBSonglist
 HBFilters	= _FilterPane3(nb=2,hidebb=1,page=genre,hidetabs=1) _FilterPane10(nb=3,hidebb=1,page=artists,page_artists/lmarkup="<b>%a</b>%Y\n<small>%x « %s</small>",hidetabs=1) _FilterPane5(nb=4,hidebb=1,page=album,page_album/lpicsize=32,page_album/lmarkup="<b>%a</b>%Y\n<small>%s « %l</small>",hidetabs=1)
