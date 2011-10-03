@@ -719,14 +719,14 @@ INIT
 	# italicrow & boldrow are special 'playrow', can't be updated via a event key, a redraw is made when CurSong changed if $self->{playrow}
 	italicrow =>
 	{	value => sub
-		{	defined $::SongID && $_[2]==$::SongID && ($_[0]{currentrow}==-1 || $_[0]{currentrow}==$_[1]) ?
+		{	defined $::SongID && $_[2]==$::SongID && (!$_[0]{is_playlist} || !defined $::Position || $::Position==$_[1]) ?
 				'italic' : 'normal';
 		},
 		attrib => 'style',	type => 'Gtk2::Pango::Style',
 	},
 	boldrow =>
 	{	value => sub
-		{	defined $::SongID && $_[2]==$::SongID && ($_[0]{currentrow}==-1 || $_[0]{currentrow}==$_[1]) ?
+		{	defined $::SongID && $_[2]==$::SongID && (!$_[0]{is_playlist} || !defined $::Position || $::Position==$_[1]) ?
 				PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL;
 		},
 		attrib => 'weight',	type => 'Glib::Uint',
@@ -747,7 +747,7 @@ INIT
 	},
 	playandqueue =>
 	{	menu => _('Playing and queue icons'),		title => '',	width => 20,
-		value => sub { ::Get_PPSQ_Icon($_[2], ($_[0]{currentrow}!=-1 && $_[0]{currentrow}!=$_[1])); },
+		value => sub { ::Get_PPSQ_Icon($_[2], !(defined $::SongID && $_[2]==$::SongID && (!$_[0]{is_playlist} || !defined $::Position || $::Position==$_[1]))); },
 		class => 'Gtk2::CellRendererPixbuf',	attrib => 'stock-id',
 		type => 'Glib::String',			noncomp => 'boldrow italicrow',
 		event => 'Playing Queue CurSong',
@@ -842,6 +842,7 @@ sub new
 	$self->{$_}=$opt->{$_} for qw/songypad playrow/;
 
 	my $store=SongStore->new; $store->{array}=$self->{array}; $store->{size}=@{$self->{array}};
+	$store->{is_playlist}= $self->{mode} eq 'playlist';
 	my $tv=Gtk2::TreeView->new($store);
 	$self->add($tv);
 	$self->{store}=$store;
@@ -1014,7 +1015,6 @@ sub expose_cb
 		# draw empty text when no songs
 		$self->DrawEmpty($tv->get_bin_window,$tv->window, $tv->get_hadjustment->value);
 	}
-	$tv->get_model->{currentrow}= ($self->{mode} ne 'playlist' || !defined $::Position) ? -1 : $::Position;
 	return 0;
 }
 
@@ -1121,8 +1121,19 @@ sub ResetModel
 	$self->{store}{size}=@{$self->{array}};
 	$tv->set_model($self->{store});
 	$self->UpdateSortIndicator;
-	$self->Scroll_to_TopEnd();
-	$self->CurSongChanged;
+
+	my $ID=::GetSelID($self);
+	my $songarray=$self->{array};
+	if (defined $ID && $songarray->IsIn($ID))	#scroll to last selected ID if in the list
+	{	my $row= ::first { $songarray->[$_]==$ID } 0..$#$songarray;
+		$row=Gtk2::TreePath->new($row);
+		$tv->get_selection->select_path($row);
+		$tv->scroll_to_cell($row,undef,::TRUE,0,0);
+	}
+	else
+	{	$self->Scroll_to_TopEnd();
+		$self->FollowSong if $self->{follow};
+	}
 }
 
 sub Scroll_to_TopEnd
@@ -1136,14 +1147,8 @@ sub Scroll_to_TopEnd
 
 sub CurSongChanged
 {	my $self=$_[0];
-	$self->check_current_row;
 	$self->queue_draw if $self->{playrow};
 	$self->FollowSong if $self->{follow};
-}
-
-sub check_current_row
-{	my $self=shift;
-	$self->{store}{currentrow}= ($self->{mode} ne 'playlist' || !defined $::Position) ? -1 : $::Position;
 }
 
 sub SongsChanged_cb
@@ -1261,7 +1266,6 @@ sub SongArray_changed_cb
 	}
 	$self->SetSelection(\@selected) if $updateselection;
 	$self->Hide(!scalar @$array) if $self->{hideif} eq 'empty';
-	$self->check_current_row;	
 }
 
 sub FollowSong
@@ -5680,7 +5684,7 @@ sub SongArray_changed_cb
 	#}
 	return unless $self->{array}==$songarray;
 	#warn "SongArray_changed $action,@extra\n";
-	my $reset;
+	my $center;
 	my $selected=\$self->{selected};
 	if ($action eq 'sort')
 	{	my ($sort,$oldarray)=@extra;
@@ -5695,7 +5699,7 @@ sub SongArray_changed_cb
 		$$selected=''; vec($$selected,$_,1)=1 for @selected;
 		$self->{new_expand_state}=0;
 		$self->{lastclick}=$self->{startgrow}=-1;
-		#center on a song ?
+		$center=1;
 	}
 	elsif ($action eq 'update')	#should only happen when in filter mode, so no duplicates IDs
 	{	my $oldarray=$extra[0];
@@ -5782,17 +5786,23 @@ sub SongArray_changed_cb
 	elsif ($action eq 'mode' || $action eq 'proxychange') {return} #the list itself hasn't changed
 	else #'replace' or unknown action
 	{	#FIXME if replace : check if a filter is in $extra[0]
-		$self->{selected}=''; #clear selection
+		$$selected=''; #clear selection
 		$self->{lastclick}=$self->{startgrow}=-1;
 		if ($action eq 'replace')
 		{	$self->{new_expand_state}=0;
-			$reset=1;
+			$center=1;
 		}
 	}
 	$self->BuildTree;
-	if ($reset)
+	if ($center)
 	{	$self->{vadj}->set_value(0);
-		$self->FollowSong if $self->{follow};
+		my $ID=::GetSelID($self);
+		if (defined $ID && $songarray->IsIn($ID))	#scroll to last selected ID if in the list
+		{	my $row= ::first { $songarray->[$_]==$ID } 0..$#$songarray;
+			if ($$selected eq '') {	$self->set_cursor_to_row($row); }	# scroll to row and select it
+			else { $self->scroll_to_row($row,1,1); }			# scroll to row but keep selection
+		}
+		elsif ($self->{follow}) { $self->FollowSong; }
 	}
 	::HasChanged('Selection_'.$self->{group});
 	$self->Hide(!scalar @$songarray) if $self->{hideif} eq 'empty';

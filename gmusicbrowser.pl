@@ -264,7 +264,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 		if (-d $save || $isdir) { $HomeDir = $save.SLASH; }
 		else			{ $SaveFile= $save; }
 	}
-	warn "using '$HomeDir' folder for saving/setting folder instead of '$default_home'\n" if $debug;
+	warn "using '$HomeDir' folder for saving/setting folder instead of '$default_home'\n" if $debug && $HomeDir;
 	$HomeDir ||= $default_home;
 	if (!-d $HomeDir)
 	{	warn "Creating folder $HomeDir\n";
@@ -845,7 +845,7 @@ our %Options=
 	gst_rg_limiter	=> 1,
 	gst_rg_preamp	=> 6,
 	gst_rg_fallback	=> 0,
-	gst_rg_songmenu => 1,
+	gst_rg_songmenu => 0,
 	Icecast_port	=> '8000',
 	UseTray		=> 1,
 	CloseToTray	=> 0,
@@ -1125,6 +1125,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	MenuPlayFilter	=> [sub { Layout::FilterMenu(); }, _"Popup playlist filter menu"],
 	MenuPlayOrder	=> [sub { Layout::SortMenu(); },   _"Popup playlist order menu"],
 	MenuQueue	=> [sub { PopupContextMenu(\@Layout::MenuQueue,{ID=>$SongID, usemenupos=>1}); }, _"Popup queue menu"],
+	ReloadLayouts	=> [ \&Layout::InitLayouts, _"Re-load layouts", ],
 );
 
 sub run_command
@@ -4793,6 +4794,8 @@ sub SongsChanged
 	for my $group (keys %SelID)
 	{	HasChangedSelID($group,$SelID{$group}) if grep $SelID{$group}==$_, @$IDs;
 	}
+	QHasChanged('NextSongs')   if OneInCommon($IDs,\@NextSongs);
+	QHasChanged('RecentSongs') if OneInCommon($IDs,$Recent);
 	HasChanged(SongsChanged=>$IDs,$fields);
 	GMB::ListStore::Field::changed(@$fields);
 }
@@ -5817,6 +5820,8 @@ sub PrefLayouts
 		my $combo= NewPrefLayoutCombo($key,$type,$text,$sg1,$sg2,$cb);
 		push @layouts_combos, $combo;
 	}
+	my $reloadlayouts=Gtk2::Alignment->new(0,.5,0,0);
+	$reloadlayouts->add( NewIconButton('gtk-refresh',_"Re-load layouts",\&Layout::InitLayouts) );
 
 	#fullscreen button
 	my $fullbutton=NewPrefCheckButton(AddFullscreenButton => _"Add a fullscreen button", cb=>sub { Layout::WidgetChangedAutoAdd('Fullscreen'); }, tip=>_"Add a fullscreen button to layouts that can accept extra buttons");
@@ -5825,7 +5830,7 @@ sub PrefLayouts
 	my $icotheme=NewPrefCombo(IconTheme=> GetIconThemesList(), text =>_"Icon theme :", sizeg1=>$sg1,sizeg2=>$sg2, cb => \&LoadIcons);
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for @layouts_combos,$checkT1,$fullbutton,$icotheme;
+	$vbox->pack_start($_,FALSE,FALSE,1) for @layouts_combos,$reloadlayouts,$checkT1,$fullbutton,$icotheme;
 	return $vbox;
 }
 
@@ -6440,13 +6445,13 @@ sub NewPrefSpinButton
 
 sub NewPrefCombo
 {	my ($key,$list,%opt)=@_;
-	my ($text,$cb0,$sg1,$sg2,$toolitem,$tree,$tip)=@opt{qw/text cb sizeg1 sizeg2 toolitem tree tip/};
+	my ($text,$cb0,$sg1,$sg2,$toolitem,$tree,$tip,$event)=@opt{qw/text cb sizeg1 sizeg2 toolitem tree tip event/};
 	my $cb=sub
 		{	SetOption($key,$_[0]->get_value);
 			&$cb0 if $cb0;
 		};
 	my $class= $tree ? 'TextCombo::Tree' : 'TextCombo';
-	my $combo= $class->new( $list, $Options{$key}, $cb );
+	my $combo= $class->new( $list, $Options{$key}, $cb, event=>$event );
 	my $widget=$combo;
 	if (defined $text)
 	{	my $label=Gtk2::Label->new($text);
@@ -6466,7 +6471,8 @@ sub NewPrefCombo
 
 sub NewPrefLayoutCombo
 {	my ($key,$type,$text,$sg1,$sg2,$cb)=@_;
-	my $combo= NewPrefCombo($key => Layout::get_layout_list($type), text => $text, sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => $cb, );
+	my $buildlist= sub { Layout::get_layout_list($type) };
+	my $combo= NewPrefCombo($key => $buildlist, text => $text, sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => $cb, event=>'Layouts');
 	my $set_tooltip= sub	#show layout author in tooltip
 	 {	return if $_[1] && $_[1] ne $key;
 		my $author= $Layout::Layouts{$Options{$key}}{Author};
@@ -6544,18 +6550,18 @@ sub Watch
 {	my ($object,$key,$sub)=@_;
 	unless ($object) { push @{$EventWatchers{$key}},$sub; return } #for permanent watch
 	warn "watch $key $object\n" if $debug;
-	if (my $existing=$object->{'WatchUpdate_'.$key})	# object is watching the event with multiple callbacks
-	{	$existing= [$existing] if ref $existing ne 'ARRAY';
+	my $cbkey= 'WatchUpdate_'.$key;		# key used to store the callback(s) in the object's hash
+	if (my $existing=$object->{$cbkey})	# object is watching the event with multiple callbacks
+	{	$object->{$cbkey}= $existing= [$existing] if ref $existing ne 'ARRAY';
 		push @$existing, $sub;
-		$object->{'WatchUpdate_'.$key}=$existing;
 	}
 	else
 	{	push @{$EventWatchers{$key}},$object; weaken($EventWatchers{$key}[-1]);
-		$object->{'WatchUpdate_'.$key}=$sub;
+		$object->{$cbkey}=$sub;
 	}
 	$object->{Watcher_DESTROY}||=$object->signal_connect(destroy => \&UnWatch_all) unless ref $object eq 'HASH' || !$object->isa('Gtk2::Object');
 }
-sub UnWatch
+sub UnWatch		# warning: if one object watch the same event with multiple callbacks, all of them will be removed
 {	my ($object,$key)=@_;
 	warn "unwatch $key $object\n" if $debug;
 	@{$EventWatchers{$key}}=grep defined && $_ != $object, @{$EventWatchers{$key}};
@@ -6574,6 +6580,7 @@ sub QHasChanged
 }
 sub HasChanged
 {	my ($key,@args)=@_;
+	delete $ToDo{"1_HasChanged_$key"};
 	return unless $EventWatchers{$key};
 	my @list=@{$EventWatchers{$key}};
 	warn "HasChanged $key -> updating @list\n" if $debug;
@@ -8611,7 +8618,10 @@ use base 'Gtk2::ComboBox';
 sub new
 {	my ($class,$list,$init,$sub,%opt) = @_;
 	my $self= bless Gtk2::ComboBox->new, $class;
-	$self->build_store($list,%opt);
+	my $buildlist;
+	if (ref $list eq 'CODE') { $buildlist=$list; $list= $buildlist->(); }
+	my $store=$self->build_store($list,%opt);
+	$self->set_model($store);
 	my $renderer=Gtk2::CellRendererText->new;
 	$self->pack_start($renderer,::TRUE);
 	$self->add_attribute($renderer, text => 0);
@@ -8622,15 +8632,29 @@ sub new
 		if $self->get_model->isa('Gtk2::TreeStore');	#hide title of submenus
 	$self->set_value($init);
 	$self->set_value(undef) unless $self->get_active_iter; #in case $init was not found
-	$self->signal_connect( changed => $sub ) if $sub;
+	$self->signal_connect( changed => sub { &$sub unless $_[0]{busy}; } ) if $sub;
+	if ($buildlist && $opt{event})
+	{	::Watch( $self, $_, sub { $_[0]->rebuild_store( $buildlist->() ); } ) for split / /,$opt{event};
+	}
 	return $self;
 }
 
-sub build_store		#FIXME allow rebuilding store while keeping the value (and not calling the changed cb)
+sub rebuild_store
+{	my $self=shift;
+	$self->{busy}=1;
+	my $value= $self->get_value;
+	$self->build_store(@_);
+	$self->set_value($value) if defined $value;
+	delete $self->{busy};
+}
+
+sub build_store
 {	my ($self,$list,%opt)=@_;
-	my $store= Gtk2::ListStore->new('Glib::String','Glib::String');
+	$self->{ordered_hash}=1 if $opt{ordered_hash};	#when called from rebuild_store, must use same options it got at init => save option
+	my $store= $self->get_model || Gtk2::ListStore->new('Glib::String','Glib::String');
+	$store->clear;
 	my $names=$list;
-	if (ref $list eq 'ARRAY' && $opt{ordered_hash})
+	if (ref $list eq 'ARRAY' && $self->{ordered_hash})
 	{	my $i=0;
 		my $array=$list;
 		$list=[]; $names=[];
@@ -8650,7 +8674,6 @@ sub build_store		#FIXME allow rebuilding store while keeping the value (and not 
 	{	my $iter= $store->append;
 		$store->set($iter, 0,$names->[$i], 1,$list->[$i]);
 	}
-	$self->set_model($store);
 	return $store;
 }
 
@@ -8723,7 +8746,8 @@ BEGIN {unshift @ISA,'TextCombo';}
 
 sub build_store
 {	my ($self,$list)=@_;			#$list is a list of label,value pairs, where value can be a sublist
-	my $store= Gtk2::TreeStore->new('Glib::String','Glib::String');
+	my $store= $self->get_model || Gtk2::TreeStore->new('Glib::String','Glib::String');
+	$store->clear;
 	my @todo=(undef,$list);
 	while (@todo)
 	{	my $parent=shift @todo;
@@ -8736,7 +8760,6 @@ sub build_store
 			$store->set($iter, 0,$name, 1,$key);
 		}
 	}
-	$self->set_model($store);
 	return $store;
 }
 
