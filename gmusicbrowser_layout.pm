@@ -781,7 +781,7 @@ sub ParseLayout
 		if ($2 eq '') {delete $Layouts{$name}{$1};next}
 		$Layouts{$name}{$1}= $2;
 	}
-	for my $key (qw/Name Category/)
+	for my $key (qw/Name Category Title/)
 	{	$Layouts{$name}{$key}=~s/^"(.*)"$/$1/ if $Layouts{$name}{$key};	#remove quotes from layout name and category
 	}
 	$Layouts{$name}{PATH}=$path;
@@ -2073,7 +2073,8 @@ push @ISA,'Layout';
 sub new
 {	my ($class,$opt)=@_;
 	my $layout=$opt->{layout};
-	return undef unless $Layout::Layouts{$layout};
+	my $def= $Layout::Layouts{$layout};
+	return undef unless $def;
 	my $self=bless Gtk2::VBox->new(0,0), $class;
 	$self->{SaveOptions}=\&SaveEmbeddedOptions;
 	$self->{group}=$opt->{group};
@@ -2084,8 +2085,8 @@ sub new
 	}
 	%children_opt=( %children_opt, %{$opt->{children_opt}} ) if $opt->{children_opt};
 	$self->InitLayout($layout,\%children_opt);
-	$self->{tabicon}=  $self->{tabicon}  || $Layout::Layouts{$layout}{stockicon};
-	$self->{tabtitle}= $self->{tabtitle} || $Layout::Layouts{$layout}{Name} || $layout;
+	$self->{tabicon}=  $self->{tabicon}  || $def->{Icon};
+	$self->{tabtitle}= $self->{tabtitle} || $def->{Title} || $def->{Name} || $layout;
 	$self->show_all;
 	return $self;
 }
