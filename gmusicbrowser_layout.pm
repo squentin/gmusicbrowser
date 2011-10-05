@@ -335,7 +335,7 @@ our %Widgets=
 		parent	=> 'TimeBar',
 		cursor	=> undef,
 	},
-	VolBar =>
+	VolumeBar =>
 	{	class	=> 'Layout::Bar',
 		orientation => 'left-to-right',
 		event	=> 'Vol',
@@ -348,7 +348,7 @@ our %Widgets=
 	VolumeSlider =>
 	{	class	=> 'Layout::Bar::Scale',
 		orientation => 'bottom-to-top',
-		parent	=> 'VolBar',
+		parent	=> 'VolumeBar',
 		cursor	=> undef,
 	},
 	Volume =>
@@ -673,6 +673,7 @@ our %Widgets=
 	FBox		=> 'FilterBox',
 	Scale		=> 'TimeSlider',
 	VolSlider	=> 'VolumeSlider',
+	VolBar		=> 'VolumeBar',
 	FPane		=> 'FilterPane',
 	LabelTime	=> 'PlayingTime',
 	#Pos		=> 'PlaylistPosition', 'Position', ?
