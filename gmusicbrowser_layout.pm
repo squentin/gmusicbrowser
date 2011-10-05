@@ -771,7 +771,7 @@ sub ParseLayout
 			return;
 		}
 		$name=$1;
-		if (defined $2) { %{$Layouts{$name}}=%{$Layouts{$2}}; }
+		if (defined $2) { %{$Layouts{$name}}=%{$Layouts{$2}}; delete $Layouts{$name}{Name}; }
 		else { delete $Layouts{$name}; }
 	}
 	else {return}
