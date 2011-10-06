@@ -4348,7 +4348,7 @@ sub Fill	#FIXME should be called when signals ::style-set and ::direction-change
 	::setlocale(::LC_NUMERIC,'');
 	push @lines, $y,$y+$bmax,$line;
 	$y+=YPAD+$bmax;
-	$self->set_size_request(-1,$y);
+	$self->set_size_request(50,$y);
 	$self->queue_draw;
 }
 
@@ -4678,7 +4678,7 @@ sub Fill
 	$nwlast=$nw unless $nwlast;
 	$self->{dim}=[$nw,$nh,$nwlast];
 	$self->{list}=$list;
-	#$self->set_size_request(-1,$nh*($self->{vsize}+2*YPAD));
+	$self->set_size_request($self->{hsize}+2*XPAD,$self->{vsize}+2*YPAD);
 	$self->{viewsize}[1]= $nh*($self->{vsize}+2*YPAD);
 	$self->{viewwindowsize}=[$self->window->get_size];
 	$self->update_scrollbar;
@@ -4699,6 +4699,7 @@ sub update_scrollbar
 	$adj->page_increment($pagesize*.75);
 	my $newval= $oldpos*$adj->upper - $adj->page_size/2;
 	$newval=$adj->upper-$pagesize if $newval > $adj->upper-$pagesize;
+	$newval=0 if $newval<0;
 	$adj->set_value($newval);
 }
 sub scroll_event_cb
@@ -4788,15 +4789,16 @@ sub abort_tooltip
 
 sub configure_cb		## FIXME I think it redraws everything even when it's not needed
 {	my ($self,$event)=@_;
-	return unless $self->{width};
+	return 1 unless $self->{width};
 	$self->{viewwindowsize}=[$event->width,$event->height];
 	my $iw= $self->{hsize}+2*XPAD;
 	if ( int($self->{width}/$iw) == int($event->width/$iw))
 	{	$self->update_scrollbar;
-		return;
+		return 1;
 	}
 	$self->abort_queue;
 	::IdleDo('2_resizecloud'.$self,100,\&Fill,$self,'samelist');
+	return 1;
 }
 
 sub expose_cb
