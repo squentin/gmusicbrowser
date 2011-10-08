@@ -345,7 +345,7 @@ our %Widgets=
 		parent	=> 'TimeBar',
 		cursor	=> undef,
 	},
-	VolBar =>
+	VolumeBar =>
 	{	class	=> 'Layout::Bar',
 		orientation => 'left-to-right',
 		event	=> 'Vol',
@@ -358,7 +358,7 @@ our %Widgets=
 	VolumeSlider =>
 	{	class	=> 'Layout::Bar::Scale',
 		orientation => 'bottom-to-top',
-		parent	=> 'VolBar',
+		parent	=> 'VolumeBar',
 		cursor	=> undef,
 	},
 	Volume =>
@@ -686,6 +686,7 @@ our %Widgets=
 	FBox		=> 'FilterBox',
 	Scale		=> 'TimeSlider',
 	VolSlider	=> 'VolumeSlider',
+	VolBar		=> 'VolumeBar',
 	FPane		=> 'FilterPane',
 	LabelTime	=> 'PlayingTime',
 	#Pos		=> 'PlaylistPosition', 'Position', ?
@@ -783,7 +784,7 @@ sub ParseLayout
 			return;
 		}
 		$name=$1;
-		if (defined $2) { %{$Layouts{$name}}=%{$Layouts{$2}}; }
+		if (defined $2) { %{$Layouts{$name}}=%{$Layouts{$2}}; delete $Layouts{$name}{Name}; }
 		else { delete $Layouts{$name}; }
 	}
 	else {return}
@@ -793,7 +794,7 @@ sub ParseLayout
 		if ($2 eq '') {delete $Layouts{$name}{$1};next}
 		$Layouts{$name}{$1}= $2;
 	}
-	for my $key (qw/Name Category/)
+	for my $key (qw/Name Category Title/)
 	{	$Layouts{$name}{$key}=~s/^"(.*)"$/$1/ if $Layouts{$name}{$key};	#remove quotes from layout name and category
 	}
 	$Layouts{$name}{PATH}=$path;
@@ -2085,7 +2086,8 @@ push @ISA,'Layout';
 sub new
 {	my ($class,$opt)=@_;
 	my $layout=$opt->{layout};
-	return undef unless $Layout::Layouts{$layout};
+	my $def= $Layout::Layouts{$layout};
+	return undef unless $def;
 	my $self=bless Gtk2::VBox->new(0,0), $class;
 	$self->{SaveOptions}=\&SaveEmbeddedOptions;
 	$self->{group}=$opt->{group};
@@ -2096,8 +2098,8 @@ sub new
 	}
 	%children_opt=( %children_opt, %{$opt->{children_opt}} ) if $opt->{children_opt};
 	$self->InitLayout($layout,\%children_opt);
-	$self->{tabicon}=  $self->{tabicon}  || $Layout::Layouts{$layout}{stockicon};
-	$self->{tabtitle}= $self->{tabtitle} || $Layout::Layouts{$layout}{Name} || $layout;
+	$self->{tabicon}=  $self->{tabicon}  || $def->{Icon};
+	$self->{tabtitle}= $self->{tabtitle} || $def->{Title} || $def->{Name} || $layout;
 	$self->show_all;
 	return $self;
 }
@@ -2252,12 +2254,12 @@ sub Paned_size_cb
 		if    ($self->child1_resize && !$self->child2_resize)		{ $size1= ::max($max-$size2,0); $not_enough= $size2>$max; }
 		elsif ($self->child2_resize && !$self->child1_resize)		{ $size1= $max if $not_enough= $size1>$max; }
 		else								{ $size1= $max*$size1/($size1+$size2); }
-		$self->set_position( $size1 );
 		if ($not_enough)	#don't change the saved value if couldn't restore the size properly
 		{	$self->{need_resize}=1;	#  => will retry in a later size_allocate event unless the position is set manually
 		}
-		unless ($not_enough)
-		{	$self->{size1}= $size1;
+		else
+		{	$self->set_position( $size1 );
+			$self->{size1}= $size1;
 			$self->{size2}= $max-$size1;
 			delete $self->{need_resize};
 		}
