@@ -72,8 +72,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1007001',
- VERSIONSTRING => '1.1.7.1',
+ VERSION => '1.1008',
+ VERSIONSTRING => '1.1.8',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
@@ -146,7 +146,7 @@ BEGIN	# in a BEGIN block so that commands for a running instance are sent sooner
 	$default_home=$old;
   }
 
-my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2010 Quentin Sculo
+my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2011 Quentin Sculo
 options :
 -nocheck: don't check for updated/deleted songs on startup
 -noscan	: don't scan folders for songs on startup
@@ -5295,7 +5295,7 @@ sub AutoSelPicture
 sub AboutDialog
 {	my $dialog=Gtk2::AboutDialog->new;
 	$dialog->set_version(VERSIONSTRING);
-	$dialog->set_copyright("Copyright © 2005-2010 Quentin Sculo");
+	$dialog->set_copyright("Copyright © 2005-2011 Quentin Sculo");
 	#$dialog->set_comments();
 	$dialog->set_license("Released under the GNU General Public Licence version 3\n(http://www.gnu.org/copyleft/gpl.html)");
 	$dialog->set_website('http://gmusicbrowser.org');
@@ -5305,12 +5305,13 @@ sub AboutDialog
 		'French : Quentin Sculo, Jonathan Fretin, Frédéric Urbain, Brice Boucard & Hornblende',
 		'Hungarian : Zsombor',
 		'Spanish : Martintxo, Juanjo & Elega',
-		'German : vlad <donvla@users.sourceforge.net> & staubi <staubi@linuxmail.org>',
+		'German : vlad & staubi',
 		'Polish : tizzilzol team',
 		'Swedish : Olle Sandgren',
 		'Chinese : jk',
 		'Czech : Vašek Kovářík',
-		'Portuguese : Gleriston Sampaio <gleriston_sampaio@hotmail.com>',
+		'Portuguese : Sérgio Marques',
+		'Portuguese (Brazillian) : Gleriston Sampaio',
 		'Korean : bluealbum',
 		'Russian : tin',
 		'Italian : Michele Giampaolo',
