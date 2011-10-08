@@ -1,0 +1,31 @@
+[full with buttons]
+Type=T
+Window= borderwidth=5
+HBButtons	= VolumeIcon Prev Stop Play Next OpenBrowser ExtraButtons Pref Quit
+HBIndic		= Sort 10Filter Queue 10Pos -Stars
+HBTitle		= LockSong _Title LabelsIcons
+HBArtist	= LockArtist _Artist
+HBAlbum		= LockAlbum _Album -Year
+HBTime		= Time _TimeBar
+VBmain		= HBButtons HBIndic _VBText -HBTime
+VBText		= 2HBTitle 2HBArtist 2HBAlbum
+HBmain		= _VBmain 2Filler1 -Cover(forceratio=1)
+VolumeScroll	= HBmain
+
+[full] based on full with buttons
+Type=T
+HBButtons =
+VBmain		= HBIndic _VBText -HBTime
+
+[info]
+Type=T
+HBAlbum		= _Album -Year
+VBText		= Title(30) Artist HBAlbum
+HBmain		= _VBText 2Filler1 -Cover(forceratio=1)
+VolumeScroll	= HBmain
+
+[minimaltip]
+Type=T
+Window= borderwidth=0
+HBmain	= Play(size=menu) Next(size=menu) 2_TimeBar(text="%t by %a",minwidth=240) Cover
+Name= _"Minimal tip"

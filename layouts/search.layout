@@ -1,0 +1,24 @@
+[Search]
+Type=S
+Default		= Window(size=320x540)
+Title		= _"Search"
+TBmain		= _"Artist" ArtistSearch(buttons=1) _"Album" AlbumSearch(buttons=1) _"Song" SongSearch(activate=play,buttons=1)
+DefaultFocus	= TBmain
+KeyBindings	= Escape CloseWindow
+
+[Quick Search]
+Type=S
+Title		= _"Search"
+Default		= Window(size=620x540)
+VBmain		= SimpleSearch(activate=SetFocusOn(SongList)) _SongList(activate=play&CloseWindow)
+DefaultFocus	= SimpleSearch
+KeyBindings	= Escape CloseWindow
+
+[Quick Search with SongTree]
+Type=S
+Title		= _"Search"
+Default		= Window(size=620x540)
+VBmain		= SimpleSearch(activate=SetFocusOn(SongTree)) _SongTree(activate=play&CloseWindow)
+DefaultFocus	= SimpleSearch
+KeyBindings	= Escape CloseWindow
+

@@ -1,0 +1,36 @@
+
+#type P layouts : pages that can be added to a TabbedLists
+[same_title]
+Type= P
+Name= _"Same title"
+VBmain = _SongTree(group=Play:title)
+Icon=gmb-song
+Title= _"Title"
+
+[same_album]
+Type= P
+Name= _"Same album"
+VBmain = _SongTree(group=Play:album)
+Icon=gmb-album
+Title= _"Album"
+
+[same_artist]
+Type= P
+Name= _"Same artist"
+VBmain = _SongTree(group=Play:first_artist)
+Icon=gmb-artist
+Title= _"Artist"
+
+[same_year]
+Type= P
+Name= _"Same year"
+VBmain = _SongTree(group=Play:year)
+Title= _"Year"
+
+[search_page]
+Type= P
+Name= _"Search"
+VBmain	 = HBSearch _SongList(group=search)
+ HBSearch= _SimpleSearch(group=search)
+Icon=gtk-find
+

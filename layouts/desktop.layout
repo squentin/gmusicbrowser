@@ -1,0 +1,42 @@
+
+# type D layouts : for desktop widgets
+[D_insens_song_cover]
+Type= D
+Name= _"Insensitive, Song & Cover"
+Window = insensitive=1,transparent=1
+DefaultFontColor= white
+HBTitle		= _Title LabelsIcons
+HBArtist	= _Artist
+HBAlbum		= _Album -Year
+VBText		= 2HBTitle 2HBArtist 2HBAlbum
+VBmain		= VBText _Cover(maxsize=0,xalign=0,yalign=0)
+
+[D_buttons_song_cover]
+Type= D
+Name= _"Buttons, Song & Cover"
+Window =  transparent=1
+DefaultFontColor= white
+HBTitle		= _Title LabelsIcons
+HBArtist	= _Artist
+HBAlbum		= _Album -Year
+HBbuttons	= Prev Stop Play Next
+VBmain		= HBbuttons 2HBTitle 2HBArtist 2HBAlbum -Cover(forceratio=1,maxsize=0)
+
+[D_buttons]
+Type= D
+Name = _"Buttons"
+Window =  transparent=1
+HBbuttons =	Prev Stop Play Next
+
+[D_hotspot]
+Type= D
+Name = _"Invisible hot spot"
+Window =  transparent=1
+HBmain = _EventBox(hover_layout="full with buttons",hover_delay=1)
+
+[D_lyrics]
+Type=D
+Name = _"Lyrics (requires lyrics plugin)"
+Window =  transparent=1
+VBmain = _PluginLyrics(shadow=none,HideToolbar=1)
+
