@@ -1,4 +1,4 @@
-# Copyright (C) 2010 Quentin Sculo <squentin@free.fr> and Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
+# Copyright (C) 2010-2011 Quentin Sculo <squentin@free.fr> and Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -8,7 +8,7 @@
 =gmbplugin ARTISTINFO
 name	Artistinfo
 title	Artistinfo plugin
-version	0.4
+version	0.5
 author  Simon Steinbeiß <simon.steinbeiss@shimmerproject.org>
 author  Pasi Lallinaho <pasi@shimmerproject.org>
 desc	This plugin retrieves artist-relevant information (biography, upcoming events, similar artists) from last.fm.
@@ -48,7 +48,8 @@ my %menuitem=
 	submenu => sub { CreateSearchMenu( Songs::Gid_to_Get('artist',$_[0]{gid}) );  },			#when menu item selected
 	test => sub {$_[0]{mainfield} eq 'artist'},	#the menu item is displayed if returns true
 );
-
+my $nowplayingaID;
+my $queuewaiting;
 my %queuemode=
 (	order=>10, icon=>'gtk-refresh',	short=> _"similar-artists",		long=> _"Auto-fill queue with similar artists (from last.fm)",	changed=>\&QAutofillSimilarArtists,	keep=>1,save=>1,autofill=>1,
 );
@@ -95,6 +96,7 @@ sub Stop {
 	Layout::RegisterWidget(PluginArtistinfo => undef);
 	@::cMenuAA=  grep $_!=\%menuitem, @::SongCMenu;
 	delete $::QActions{'autofill-similar-artists'}; ::Update_QueueActionList();
+	$queuewaiting->abort if $queuewaiting; $queuewaiting=undef;
 }
 
 sub new
@@ -107,7 +109,7 @@ sub new
 	$self->{fontsize} = $fontsize->get_size / Gtk2::Pango->scale;
 	$self->{artist_esc} = "";
 	my $statbox=Gtk2::VBox->new(0,0);
-	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,minsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0});
+	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,minsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0,group=>$options->{group},tip=>_"Click to show fullsize image"});
 	for my $name (qw/Ltitle Lstats/)
 	{	my $l=Gtk2::Label->new('');
 		$self->{$name}=$l;
@@ -146,6 +148,8 @@ sub new
 	$tc_artist->set_expand(1);
 	$tc_artist->set_resizable(1);
 	$treeview->append_column($tc_artist);
+	$treeview->set_has_tooltip(1);
+	$treeview->set_tooltip_text("Middle-click on local artists to set a filter on them, right-click non-local artists to search for them on the web.");
 	my $renderer=Gtk2::CellRendererText->new;
 	my $tc_similar=Gtk2::TreeViewColumn->new_with_attributes( "%",$renderer,text => 1);
 	$tc_similar->set_cell_data_func($renderer, sub { my ($column, $cell, $model, $iter, $func_data) = @_; my $rating = $model->get($iter, 1); $cell->set( text => sprintf '%.1f', $rating ); }, undef); # limit similarity rating to one decimal
@@ -170,7 +174,7 @@ sub new
 		$item -> set_relief("none");
 		$item -> set_tooltip_text($sites{$key}[2]);
 		$item->set_active( $key eq $self->{site} );
-		$item->signal_connect('toggled' => sub { &toggled_cb($self,$item,$textview); } );
+		$item->signal_connect('toggled' => sub { my $self=::find_ancestor($_[0],__PACKAGE__); toggled_cb($self,$item,$textview); } );
 		$group = $item -> get_group;
 		my $toolitem=Gtk2::ToolItem->new;
 		$toolitem->add( $item );
@@ -188,7 +192,7 @@ sub new
 #		$toolitem->set_proxy_menu_item($key,$menuitem);
 	}
 	for my $button
-	(	[refresh => 'gtk-refresh', sub { SongChanged($self,'1'); },_"Refresh", _"Refresh",0],
+	(	[refresh => 'gtk-refresh', sub { my $self=::find_ancestor($_[0],__PACKAGE__); SongChanged($self,'1'); },_"Refresh", _"Refresh",0],
 		[save => 'gtk-save',	\&Save_text,	_"Save",	_"Save artist biography",$::Options{OPT.'AutoSave'}],
 	)
 	{	my ($key,$stock,$cb,$label,$tip,$hide)=@$button;
@@ -448,7 +452,7 @@ sub ArtistChanged
 	for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
 
 	my $url = GetUrl($sites{$self->{site}}[SITEURL],$aID);
-
+	return unless $url;
 	if (!$self->{url} or $url ne $self->{url} or $force == 1) {
 		$self->{url} = $url;
 		if ($self->{site} eq "biography") { # check for local biography file before loading the page
@@ -468,6 +472,7 @@ sub ArtistChanged
 sub GetUrl
 {	my ($url,$aID) = @_;
 	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
+	return unless length $artist;
 	$url=~s/%a/$artist/;
 	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/;
 	return $url;
@@ -646,39 +651,44 @@ sub Save_text
 }
 
 sub QAutofillSimilarArtists
-{	return unless $::QueueAction eq 'autofill-similar-artists';
+{	$queuewaiting->abort if $queuewaiting; $queuewaiting=undef;
+	return unless $::QueueAction eq 'autofill-similar-artists';
 	return if $::Options{MaxAutoFill}<=@$::Queue;
+	return unless $::SongID;
 
-	my $aID = Songs::Get_gid($::SongID,'artist');
-	warn " * Master Artist: " . Songs::Gid_to_Get("artist",$aID) ."\n";
-	my $url = GetUrl($sites{similar}[0],$aID);
+	$nowplayingaID = Songs::Get_gid($::SongID,'artist');
+	return unless Songs::Gid_to_Get("artist",$nowplayingaID);
 
-	Simple_http::get_with_cb(url => $url, cb => sub {
-		my $data =$_[0];
-		return unless $::QueueAction eq 'autofill-similar-artists'; # re-check queueaction and 
-		my $nb=$::Options{MaxAutoFill}-@$::Queue;
-		return unless $nb>0;
-		my @artist_gids;
-		for my $s_artist (split /<\/artist>/, $data) {
-			my %s_artist;
-			$s_artist{$1} = ::decode_html($2) while $s_artist=~ m#<(\w+)>([^<]*)</\1>#g;
-			next unless $s_artist{name};
-			if ($s_artist{match} >= $::Options{OPT.'SimilarRating'} / 100) {
-				my $aID=Songs::Search_artistid($s_artist{name});
-				push (@artist_gids, $aID) if $aID;
-			}
+	my $url = GetUrl($sites{similar}[0],$nowplayingaID);
+	return unless $url;
+	$queuewaiting=Simple_http::get_with_cb(url => $url, cb => \&PopulateQueue );
+}
 
+sub PopulateQueue
+{	$queuewaiting=undef;
+	if ( $nowplayingaID != Songs::Get_gid($::SongID,'artist')) { QAutofillSimilarArtists; return; }
+	my $data = $_[0];
+
+	return unless $::QueueAction eq 'autofill-similar-artists'; # re-check queueaction and 
+	my $nb=$::Options{MaxAutoFill}-@$::Queue;
+	return unless $nb>0;
+	my @artist_gids;
+	for my $s_artist (split /<\/artist>/, $data) {
+		my %s_artist;
+		$s_artist{$1} = ::decode_html($2) while $s_artist=~ m#<(\w+)>([^<]*)</\1>#g;
+		next unless $s_artist{name};
+		if ($s_artist{match} >= $::Options{OPT.'SimilarRating'} / 100) {
+			my $aID=Songs::Search_artistid($s_artist{name});
+			push (@artist_gids, $aID) if $aID;
 		}
+	}
+	push (@artist_gids, Songs::Get_gid($::SongID,'artist')) unless $::Options{OPT.'SimilarExcludeSeed'}; # add currently playing artist as well
 
-		push (@artist_gids, Songs::Get_gid($::SongID,'artist')) unless $::Options{OPT.'SimilarExcludeSeed'}; # add currently playing artist as well
-
-		my $filter= Filter->newadd(0, map Songs::MakeFilterFromGID("artist",$_), @artist_gids );
-		my $random= Random->new('random:',$filter->filter);
-		my @IDs=$random->Draw($nb,[@$::Queue,$::SongID]); # add queue and current song to blacklist (won't draw)
-		return unless @IDs;
-		$::Queue->Push(\@IDs);
-		} ,
-	);
+	my $filter= Filter->newadd(0, map Songs::MakeFilterFromGID("artist",$_), @artist_gids );
+	my $random= Random->new('random:',$filter->filter);
+	my @IDs=$random->Draw($nb,[@$::Queue,$::SongID]); # add queue and current song to blacklist (won't draw)
+	return unless @IDs;
+	$::Queue->Push(\@IDs);
 }
 
 1
