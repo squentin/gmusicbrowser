@@ -3139,7 +3139,14 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 	{	my $disc=''; my @list2;
 		for my $ID (@$list)
 		{	my $d=Songs::Get($ID,'disc');
-			if ($d && $d ne $disc) {push @list2,__x(_"disc {disc}",disc =>$d); $disc=$d;}
+			if ($d && $d ne $disc)
+			{	push @list2,__x(_"disc {disc}",disc =>$d);
+				$disc=$d;
+				if (Songs::FieldEnabled('discname'))
+				{	my $name=Songs::Get($ID,'discname');
+					$list2[-1].=" : $name" if length $name;
+				}
+			}
 			push @list2,$ID;
 		}
 		$list=\@list2;
