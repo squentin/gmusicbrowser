@@ -473,7 +473,7 @@ our @TrayMenu=
 	{ label=> _"Pause",code => \&PlayPause,	test => sub {$::TogPlay},	stockicon => 'gtk-media-pause' },
 	{ label=> _"Stop", code => \&Stop,	stockicon => 'gtk-media-stop' },
 	{ label=> _"Next", code => \&NextSong,	stockicon => 'gtk-media-next' },
-	{ label=> _"Recently played", submenu => sub { my $m=ChooseSongs(undef,GetPrevSongs(5)); }, stockicon => 'gtk-media-previous' },
+	{ label=> _"Recently played", submenu => sub { my $m=ChooseSongs([GetPrevSongs(8)]); }, stockicon => 'gtk-media-previous' },
 	{ label=> sub {$::TogLock && $::TogLock eq 'first_artist'? _"Unlock Artist" : _"Lock Artist"},	code => sub {ToggleLock('first_artist');} },
 	{ label=> sub {$::TogLock && $::TogLock eq 'album' ? _"Unlock Album"  : _"Lock Album"},	code => sub {ToggleLock('album');} },
 	{ label=> _"Windows",	code => \&PresentWindow,	submenu_ordered_hash =>1,
@@ -3127,7 +3127,7 @@ sub ChooseSongsTitle		#Songs with the same title
 	return 0 if @$list<2 || @$list>100;	#probably a problem if it finds >100 matching songs, and making a menu with a huge number of items is slow
 	my @list=grep $_!=$ID,@$list;
 	Songs::SortList(\@list,'artist:i album:i');
-	return ChooseSongs( __x( _"by {artist} from {album}", artist => "<b>%a</b>", album => "%l") ,@list);
+	return ChooseSongs( \@list, markup=> __x( _"by {artist} from {album}", artist => "<b>%a</b>", album => "%l"));
 }
 
 sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>100-200 ?)
@@ -3144,28 +3144,42 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		}
 		$list=\@list2;
 	}
-	my $menu = ChooseSongs('%n %S', @$list);
+	my $menu = ChooseSongs($list, markup=>'%n %S');
 	$menu->show_all;
 	if (1)
 	{	my $h=$menu->size_request->height;
-		my $picsize=$menu->size_request->width/$menu->{nbcols};
-		$picsize=200 if $picsize<200;
-		$picsize=$h if $picsize>$h;
-		if ( my $img= AAPicture::newimg(album=>$album, $picsize) )
-		{	my $item=Gtk2::MenuItem->new;
-			$item->add($img);
-			my $col=$menu->{nbcols};
-			$menu->attach($item, $col, $col+1, 0, scalar @$list);
-			$item->show_all;
+		my $w=$menu->size_request->width;
+		my $maxwidth= $menu->get_screen->get_width;
+		my $cols= $menu->{cols};	#array containing the number of entries in each column of the menu
+		my $nbcols= @$cols;
+		my $height= max(@$cols);
+		my $picsize= $w/$nbcols;
+		if ($maxwidth > $picsize*($nbcols+1))  # check if fits in the screen
+		{	$picsize=200 if $picsize<200 && $maxwidth > 200*($nbcols+1);
+			#$picsize=$h if $picsize>$h;
+			if ( my $img= AAPicture::newimg(album=>$album, $picsize) )
+			{	my $item=Gtk2::MenuItem->new;
+				$item->add($img);
+				my $row0=0;
+				if ($w>$h && $nbcols==1)	# if few songs put the cover below
+				{	$nbcols=0;
+					$row0= $height;
+				}
+				$menu->attach($item, $nbcols, $nbcols+1, $row0, $height+1);
+				$item->signal_connect(enter_notify_event=> sub {1});
+				$item->show_all;
+			}
 		}
 	}
+
+=old tests for cover
 	elsif (0) #TEST not used
 	{	my $picsize=$menu->size_request->height;
 		$picsize=220 if $picsize>220;
 		if ( my $img= AAPicture::newimg(album=>$album, $picsize) )
 		{	my $item=Gtk2::MenuItem->new;
 			$item->add($img);
-			my $col=$menu->{nbcols};
+			my $col= @{$menu->{cols}};
 			#$menu->attach($item, $col, $col+1, 0, scalar @$list);
 			$item->show_all;
 	$menu->signal_connect(size_request => sub {my ($self,$req)=@_;warn $req->width;return if $self->{busy};$self->{busy}=1;my $rw=$self->get_toplevel->size_request->width;$self->get_toplevel->set_size_request($rw+$picsize,-1);$self->{busy}=undef;});
@@ -3216,15 +3230,18 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 			$self->set_size_request($rwidth,-1);
 		});
 	}
+=cut
+
 	if (defined wantarray)	{return $menu}
 	my $event=Gtk2->get_current_event;
 	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
 }
 
 sub ChooseSongs
-{	my ($format,@IDs)=@_;
+{	my ($IDs,%opt)=@_;
+	my @IDs=@$IDs;
 	return unless @IDs;
-	$format||= __x( _"{song} by {artist}", song => "<b>%t</b>", artist => "%a");
+	my $format = $opt{markup} || __x( _"{song} by {artist}", song => "<b>%t</b>", artist => "%a");
 	my $menu = Gtk2::Menu->new;
 	my $activate_callback=sub
 	 {	return if $_[0]->get_submenu;
@@ -3246,33 +3263,90 @@ sub ChooseSongs
 	   return 0;
 	 };
 
-	my $cols= $menu->{nbcols}= (@IDs<40)? 1 : (@IDs<80)? 2 : 3;
-	my $rows=int(@IDs/$cols);
+	my $screen= Gtk2->get_current_event->get_screen;
+	my $item_sample= Gtk2::ImageMenuItem->new('X'x45);
+	#my $maxrows=30; my $maxcols=3;
+	my $maxrows=int(.8*$screen->get_height / $item_sample->size_request->height);
+	my $maxcols=int(.7*$screen->get_width / $item_sample->size_request->width);
+	$maxrows=20 if $maxrows<20;
+	$maxcols=1 if $maxcols<1;
+	my @columns=(0);
+	if (@IDs<=$maxrows)
+	{	@columns=(scalar @IDs);
+	}
+	else
+	{	#create one column for each disc/category
+		for my $i (0..$#IDs)
+		{	if ($IDs[$i]!~m/^\d+$/ && $columns[-1]) { push @columns,0 }
+			$columns[-1]++;
+		}
+		my @new=(0);
+		if (@columns==1)	#one column => split it into multiple columns if too big
+		{	my $rows= shift @columns;
+			my $cols= POSIX::ceil($rows/$maxrows);
+			$cols=$maxcols if $cols>$maxcols; #currently if too many songs, create taller columns, better for scrolling
+			my $part= int($rows/$cols);
+			my $left= $rows % $part;
+			for my $c (1..$cols) { push @columns, $part+($c<=$left ? 1 : 0); }
+		}
+		else	#multiple columns => try to combine them
+		{	my $c=0;
+			my $r= $columns[$c++];
+			while ($r)
+			{	if ($new[-1]> 1.2*@IDs/$maxcols){ push @new,0; }
+				if ($new[-1]+$r<$maxrows*1.1)	{ $new[-1]+=$r; $r=0 }
+				elsif ($r<$maxrows*1.1)		{ push @new,$r; $r=0 }
+				elsif ($new[-1]<$maxrows-2)	{ my $part= $maxrows-$new[-1]; $r-=$part; $new[-1]+=$part; }
+				else { push @new,0; }
+				$r ||= $columns[$c++];
+			}
+			@columns=@new if @new<=$maxcols; #too many columns => forget trying to combine categories, will use a submenu for each
+		}
+	}
 
-	my $row=0; my $col=0;
-	for my $ID (@IDs)
-	{   my $label=Gtk2::Label->new;
-	    my $item;
-	    if ($ID=~m/^\d+$/) #songs
-	    {	$item=Gtk2::ImageMenuItem->new;
-		$item->set_always_show_image(1);
-		$label->set_alignment(0,.5); #left-aligned
-		$label->set_markup( ReplaceFieldsAndEsc($ID,$format) );
-		my $icon=Get_PPSQ_Icon($ID);
-		$item->set_image(Gtk2::Image->new_from_stock($icon, 'menu')) if $icon;
-		$item->signal_connect(activate => $activate_callback, $ID);
-		$item->signal_connect(button_press_event => $click_callback, $ID);
-		#set_drag($item, source => [::DRAG_ID,sub {::DRAG_ID,$ID}]);
-	    }
-	    else	# "title" items
-	    {	$item=Gtk2::MenuItem->new;
-		$label->set_markup_with_format("<b>%s</b>",$ID);
-		$item->can_focus(0);
-		$item->signal_connect(enter_notify_event=> sub {1});
-	    }
-	    $item->add($label);
-	    #$menu->append($item);
-	    $menu->attach($item, $col, $col+1, $row, $row+1); if (++$row>$rows) {$row=0;$col++;}
+	if (@columns>$maxcols) #use submenus if too many columns
+	{	my $row=0;
+		for my $c (@columns)
+		{	my ($title,@songs)= splice @IDs,0,$c;
+			my $item= Gtk2::MenuItem->new;
+			my $label=Gtk2::Label->new_with_format("<b>%s</b>", $title);
+			$label->set_max_width_chars(45);
+			$label->set_ellipsize('end');
+			$item->add($label);
+			my $submenu= ChooseSongs(\@songs,markup=>$format);
+			$item->set_submenu($submenu);
+			$menu->attach($item, 0,1, $row,$row+1); $row++;
+		}
+		$menu->{cols}= [scalar @columns];
+	}
+	else
+	{	my $row=0; my $col=0;
+		for my $ID (@IDs)
+		{   my $label=Gtk2::Label->new;
+		    my $item;
+		    if ($ID=~m/^\d+$/) #songs
+		    {	$item=Gtk2::ImageMenuItem->new;
+			$item->set_always_show_image(1);
+			$label->set_alignment(0,.5); #left-aligned
+			$label->set_markup( ReplaceFieldsAndEsc($ID,$format) );
+			my $icon=Get_PPSQ_Icon($ID);
+			$item->set_image(Gtk2::Image->new_from_stock($icon, 'menu')) if $icon;
+			$item->signal_connect(activate => $activate_callback, $ID);
+			$item->signal_connect(button_press_event => $click_callback, $ID);
+			#set_drag($item, source => [::DRAG_ID,sub {::DRAG_ID,$ID}]);
+		    }
+		    else	# "title" items
+		    {	$item=Gtk2::MenuItem->new;
+			$label->set_markup_with_format("<b>%s</b>",$ID);
+			$item->signal_connect(enter_notify_event=> sub {1});
+		    }
+		    $label->set_max_width_chars(45);
+		    $label->set_ellipsize('end');
+		    $item->add($label);
+		    $menu->attach($item, $col, $col+1, $row, $row+1);
+		    if (++$row>=$columns[$col]) {$row=0;$col++;}
+		}
+		$menu->{cols}= \@columns;
 	}
 	if (defined wantarray)	{return $menu}
 	my $event=Gtk2->get_current_event;
