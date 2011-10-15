@@ -710,7 +710,7 @@ our $Instance;
 
 sub new
 {	my $ID= $_[0]{IDs}[0];
-	if ($Instance) { $Instance->present; $Instance->{ID}=$ID; $Instance->preview_update; return };
+	if ($Instance) { $Instance->force_present; $Instance->{ID}=$ID; $Instance->preview_update; return };
 	my $self = Gtk2::Dialog->new ("Custom auto-fill filename formats", undef, [],  'gtk-close' => 'none');
 	$Instance=bless $self,__PACKAGE__;
 	::SetWSize($self,'AutofillFormats');
@@ -2326,7 +2326,7 @@ sub return_value
 }
 sub edit
 {	my $self=$_[0];
-	if ($self->{dialog}) { $self->{dialog}->present; return }
+	if ($self->{dialog}) { $self->{dialog}->force_present; return }
 	$self->{dialog}=
 	::EditLyricsDialog( $self->get_toplevel, $self->{value},undef, sub
 		{	my $lyrics=shift;

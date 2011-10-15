@@ -464,7 +464,7 @@ sub RG_PrefBox
 	my $opt  =Gtk2::Button->new(_"ReplayGain options");
 	$sg2->add_widget($opt);
 	$opt->signal_connect(clicked => sub
-		{	if ($RG_dialog) {$RG_dialog->present;return}
+		{	if ($RG_dialog) {$RG_dialog->force_present;return}
 			$RG_dialog= Gtk2::Dialog->new (_"ReplayGain options", undef, [], 'gtk-close' => 'close');
 			$RG_dialog->signal_connect(destroy => sub {$RG_dialog=undef});
 			$RG_dialog->signal_connect(response =>sub {$_[0]->destroy});

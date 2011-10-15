@@ -549,6 +549,16 @@ sub Gtk2::Label::set_markup_with_format
 {	my $label=shift;
 	$label->set_markup( MarkupFormat(@_) );
 }
+sub Gtk2::Window::force_present #force bringing the window to the current workspace, $win->present does not always do that
+{	my $win=shift;
+	$win->iconify; $win->deiconify;
+	$win->present;
+}
+sub Gtk2::Dialog::force_present # for dialog use stick/unstick instead of iconify/deiconify
+{	my $win=shift;
+	$win->stick; $win->unstick;
+	$win->present;
+}
 sub IncSuffix	# increment a number suffix from a string
 {	$_[0] =~ s/(?<=\D)(\d*)$/($1||1)+1/e;
 }
@@ -3009,7 +3019,7 @@ sub ToggleFullscreenLayout
 sub WEditList
 {	my $name=$_[0];
 	my ($window)=grep exists $_->{editing_listname} && $_->{editing_listname} eq $name, Gtk2::Window->list_toplevels;
-	if ($window) { $window->present; return; }
+	if ($window) { $window->force_present; return; }
 	$SongList::Common::EditList=$name; #list that will be used by SongList/SongTree in 'editlist' mode
 	$window=Layout::Window->new('EditList', 'pos'=>undef);
 	$SongList::Common::EditList=undef;
@@ -4301,7 +4311,7 @@ sub ErrorMessage
 
 sub EditLyrics
 {	my $ID=$_[0];
-	if (exists $Editing{'L'.$ID}) { $Editing{'L'.$ID}->present; return; }
+	if (exists $Editing{'L'.$ID}) { $Editing{'L'.$ID}->force_present; return; }
 	my $lyrics=FileTag::GetLyrics($ID);
 	$lyrics='' unless defined $lyrics;
 	$Editing{'L'.$ID}=
@@ -4828,7 +4838,7 @@ sub DialogSongsProp
 
 sub DialogSongProp
 {	my $ID=$_[0];
-	if (exists $Editing{$ID}) { $Editing{$ID}->present; return; }
+	if (exists $Editing{$ID}) { $Editing{$ID}->force_present; return; }
 	my $dialog = Gtk2::Dialog->new (_"Song Properties", undef, [],
 				'gtk-save' => 'ok',
 				'gtk-cancel' => 'none');
@@ -5402,7 +5412,7 @@ sub AboutDialog
 }
 
 sub PrefDialog
-{	if ($OptionsDialog) { $OptionsDialog->present; return; }
+{	if ($OptionsDialog) { $OptionsDialog->force_present; return; }
 	$OptionsDialog=my $dialog = Gtk2::Dialog->new (_"Settings", undef,[],
 				'gtk-about' => 1,
 				'gtk-close' => 'close');
@@ -5781,7 +5791,7 @@ sub PrefAudio_makeadv
 		$hbox->pack_start($but,TRUE,TRUE,4);
 		$but->signal_connect(clicked =>	sub #create dialog
 		 {	my $but=$_[0];
-			if ($but->{dialog} && !$but->{dialog}{destroyed}) { $but->{dialog}->present; return; }
+			if ($but->{dialog} && !$but->{dialog}{destroyed}) { $but->{dialog}->force_present; return; }
 			my $d=$but->{dialog}= Gtk2::Dialog->new(__x(_"{outputname} output settings",outputname => $name), undef,[],'gtk-close' => 'close');
 			$d->set_default_response('close');
 			my $box=$package->AdvancedOptions;
@@ -6878,7 +6888,7 @@ sub Progress
 
 sub PresentWindow
 {	my $win=$_[1];
-	$win->present;
+	$win->force_present;
 	$win->set_skip_taskbar_hint(FALSE) unless $win->{skip_taskbar_hint};
 }
 
@@ -7058,7 +7068,7 @@ sub ShowHide
 			$win->set_skip_taskbar_hint(FALSE) unless delete $win->{skip_taskbar_hint};
 			#$win->set_opacity($win->{opacity}) if exists $win->{opacity} && $win->{opacity}!=1; #need to re-set it, is it a gtk bug, metacity bug ?
 		}
-		$MainWindow->present;
+		$MainWindow->force_present;
 	}
 }
 

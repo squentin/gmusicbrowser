@@ -1590,7 +1590,7 @@ sub new
 		if ($window)
 		{	if    ($mode eq 'toggle'  && !$window->{quitonclose})	{ $window->close_window; return }
 			elsif ($mode eq 'replace' && !$window->{quitonclose})	{ $window->close_window; }
-			elsif ($mode eq 'present')			 	{ $window->present; return }
+			elsif ($mode eq 'present')			 	{ $window->force_present; return }
 		}
 	}
 
