@@ -260,7 +260,7 @@ sub prefbox
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
 	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text =>_("Artist Picture Size : %d")._"(applied after restart)");
-	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", width=>80, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'", history=>OPT.'Eventformat_history');
+	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", expand=>1, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'", history=>OPT.'Eventformat_history');
 	my $eventformat_reset=Gtk2::Button->new(_"reset format");
 	$eventformat_reset->{format_combo}=$eventformat;
 	$eventformat_reset->signal_connect(clicked => sub {
@@ -281,7 +281,7 @@ sub prefbox
 	my $frame_bio=Gtk2::Frame->new(_"Biography");
 	$frame_bio->add(::Vpack($entry,$preview,$autosave));
 	my $frame_events=Gtk2::Frame->new(_"Events");
-	$frame_events->add(::Hpack($eventformat,$eventformat_reset));
+	$frame_events->add(::Hpack('_',$eventformat,$eventformat_reset));
 	my $frame_similar=Gtk2::Frame->new(_"Similar Artists");
 	$frame_similar->add(::Vpack($similar_limit,$similar_rating,$similar_local,$similar_exclude_seed));
 	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$frame_bio,$frame_events,$frame_similar;
