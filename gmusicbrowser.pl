@@ -5922,7 +5922,11 @@ sub PrefMisc
 			$recent_include_not_played, $volstep, $pixcache,
 			[ $playedpercent, $playedseconds ],
 		);
-	return $vbox;
+	my $sw = Gtk2::ScrolledWindow->new;
+	$sw->set_shadow_type('etched-in');
+	$sw->set_policy('never','automatic');
+	$sw->add_with_viewport($vbox);
+	return $sw;
 }
 
 sub PrefLayouts
