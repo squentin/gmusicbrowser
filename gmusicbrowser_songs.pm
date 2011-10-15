@@ -3913,7 +3913,7 @@ sub _is_subset		# returns true if $f2 must be a subset of $f1	#$f1 and $f2 must 
 		if ($op1 eq 's'|| $op1 eq 'si')		{ return index($pat2,$pat1)!=-1 }	# handle case-i ?
 		elsif ($op1 eq '-s'|| $op1 eq '-si')	{ return index($pat1,$pat2)!=-1 }	# handle case-i ?
 		elsif ($op1 eq '>' || $op1 eq '-<') { return ($pat1."\x00".$pat2) =~m/(-?\d+)(\w*)\x00(-?\d+)\2/ && $3>$1  }
-		elsif ($op1 eq '<' || $op1 eq '->') { return ($pat1."\x00".$pat2) =~m/(-?\d+)(\w*)\x00(-?\d+)\2/ && $3>$1  }
+		elsif ($op1 eq '<' || $op1 eq '->') { return ($pat1."\x00".$pat2) =~m/(-?\d+)(\w*)\x00(-?\d+)\2/ && $3<$1  }
 		# FIXME  check these filters : b bago >ago <ago ?
 		return 0;
 	}
