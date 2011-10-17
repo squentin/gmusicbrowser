@@ -3282,15 +3282,24 @@ sub ChooseSongs
 	my $format = $opt{markup} || __x( _"{song} by {artist}", song => "<b>%t</b>%V", artist => "%a");
 	my $menu = Gtk2::Menu->new;
 	my $activate_callback=sub
-	 {	return if $_[0]->get_submenu;
-		if ($_[0]{middle}) { Enqueue($_[1]); }
-		else { Select(song => $_[1]); }
+	 {	my $item=shift;
+		return if $item->get_submenu;
+		my $ID=$item->{ID};
+		if ($item->{middle}) { Enqueue($ID); }
+		else { Select(song => $ID); }
 	 };
 	my $click_callback=sub
-	 { my ($mitem,$event)=@_;
-	   if	($event->button == 2) { $mitem->{middle}=1 }
+	 { my ($item,$event)=@_;
+	   if	($event->button == 2)
+	   {	$item->{middle}=1;
+		my $state=Gtk2->get_current_event_state;
+		if ( $state && ($state >= ['shift-mask'] || $state >= ['control-mask']) ) #keep the menu up if ctrl or shift pressed
+		{	$item->parent->{keep_it_up}=1; $activate_callback->($item);
+			return 1;
+		}
+	   }
 	   elsif($event->button == 3)
-	   {	my $submenu=BuildMenu(\@SongCMenu,{mode => 'P', IDs=> [$_[2]]});
+	   {	my $submenu=BuildMenu(\@SongCMenu,{mode => 'P', IDs=> [$item->{ID}]});
 		$submenu->show_all;
 		$_[0]->set_submenu($submenu);
 		#$submenu->signal_connect( selection_done => sub {$menu->popdown});
@@ -3367,10 +3376,10 @@ sub ChooseSongs
 			$item->set_always_show_image(1);
 			$label->set_alignment(0,.5); #left-aligned
 			$label->set_markup( ReplaceFieldsAndEsc($ID,$format) );
-			my $icon=Get_PPSQ_Icon($ID);
-			$item->set_image(Gtk2::Image->new_from_stock($icon, 'menu')) if $icon;
-			$item->signal_connect(activate => $activate_callback, $ID);
-			$item->signal_connect(button_press_event => $click_callback, $ID);
+			$item->{ID}=$ID;
+			$item->signal_connect(activate => $activate_callback);
+			$item->signal_connect(button_press_event => $click_callback);
+			$item->signal_connect(button_release_event => sub { return 1 if delete $_[0]->parent->{keep_it_up}; 0; });
 			#set_drag($item, source => [::DRAG_ID,sub {::DRAG_ID,$ID}]);
 		    }
 		    else	# "title" items
@@ -3386,6 +3395,19 @@ sub ChooseSongs
 		}
 		$menu->{cols}= \@columns;
 	}
+
+	my $update_icons= sub
+	{	for my $item ($_[0]->get_children)
+		{	my $ID=$item->{ID};
+			next unless defined $ID;
+			my $icon= Get_PPSQ_Icon($ID) || '';
+			next unless $icon || $item->get_image;
+			$item->set_image( Gtk2::Image->new_from_stock($icon,'menu') );
+		}
+	};
+	::Watch($menu,$_,$update_icons) for qw/CurSongID Playing Queue/; #update queue/playing icon when needed
+	$update_icons->($menu);
+
 	if (defined wantarray)	{return $menu}
 	my $event=Gtk2->get_current_event;
 	$menu->show_all;
