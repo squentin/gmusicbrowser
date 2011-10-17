@@ -203,10 +203,20 @@ sub new {
 	my $Bcancel = Gtk2::Button->new_from_stock('gtk-cancel');
 	$Bok    ->set_size_request(80, -1);
 	$Bcancel->set_size_request(80, -1);
-	$self->{resultsbox}	= my $resultsbox = Gtk2::VBox->new(0,0);
-	my $scrwin  = Gtk2::ScrolledWindow->new();
+	my $store = Gtk2::ListStore->new('Glib::String','Glib::String','Glib::String','Glib::String','Glib::String');
+	my $treeview = Gtk2::TreeView->new($store);
+	my $id = 0;
+	for (qw(Artist Album Year Label)) {
+		my $column = Gtk2::TreeViewColumn->new_with_attributes(_"$_", Gtk2::CellRendererText->new(), text=>$id);
+		$column->set_sort_column_id($id++); $column->set_expand(1); $column->set_resizable(1); $column->set_reorderable(1);
+		$treeview->append_column($column);
+	}
+	$treeview->set_rules_hint(1);
+	$treeview->signal_connect(row_activated => \&entry_selected_cb);
+	$treeview->{store} = $store;
+	my $scrwin = Gtk2::ScrolledWindow->new();
 	$scrwin->set_policy('automatic', 'automatic');
-	$scrwin->add_with_viewport($resultsbox);
+	$scrwin->add($treeview);
 	$searchview->add( ::Vpack(['_', $search, $Bsearch],
 				  '_',  $scrwin,
 				  '-',  ['-', $Bcancel, $Bok]) );
@@ -231,6 +241,8 @@ sub new {
 
 	# Save elements that will be needed in other methods.
 	$self->{buffer} = $textview->get_buffer();
+	$self->{store} = $store;
+	$self->{treeview} = $treeview;
 	$self->{infoview} = $infoview;
 	$self->{searchview} = $searchview;
 	return $self;
@@ -360,9 +372,10 @@ sub print_review {
 	} else {
 		$buffer->insert_with_tags($iter,"\n"._("No review written.")."\n",$tag_h2);
 	}
+	$buffer->insert($iter, "\n\n");
 	my $tag_a  = $buffer->create_tag(undef, foreground=>"#4ba3d2", underline=>'single');
 	$tag_a->{url} = $fields->{url}; $tag_a->{tip} = $fields->{url};
-	$buffer->insert_with_tags($iter,"\n\n"._"Lookup at allmusic.com",$tag_a);
+	$buffer->insert_with_tags($iter,_"Lookup at allmusic.com",$tag_a);
 	$buffer->set_modified(0);
 }
 
@@ -378,7 +391,6 @@ sub manual_search {
 	$self->{infoview}->hide();
 	$self->{searchview}->show();
 	my $gid = Songs::Get_gid(::GetSelID($self), 'album');
-	my $album = Songs::Gid_to_Get("album",$gid);
 	$self->{search}->set_text(Songs::Gid_to_Get('album', $gid));
 	$self->new_search();
 }
@@ -388,9 +400,6 @@ sub new_search {
 	my $album = $self->{search}->get_text();
 	$album =~ s|^\s+||; $album =~ s|\s+$||; # remove leading and trailing spaces
 	return if $album eq '';
-	$self->{resultsbox}->remove($_) for $self->{resultsbox}->get_children();
-	$self->{resultsbox}->pack_start(Gtk2::Label->new('Loading...'),0,0,20);
-	$self->{resultsbox}->show_all();
 	my $url = "http://allmusic.com/search/album/".::url_escapeall($album);
 	$self->cancel();
 	warn "Albuminfo: fetching AMG search from url $url.\n" if $::debug;
@@ -400,35 +409,23 @@ sub new_search {
 sub print_results {
 	my ($self,$html,$type,$url) = @_;
 	delete $self->{waiting};
-	$self->{resultsbox}->remove($_) for $self->{resultsbox}->get_children();
 	my $result = parse_amg_search_results($html, $type); # result is a ref to an array of hash refs
-	my @radios;
-	if ( $#{$result} + 1 ) {
-		push(@radios, Gtk2::RadioButton->new(undef, "$_->{artist} - $_->{album} ($_->{year}) on $_->{label}")) for @$result;
-		my $group = $radios[0]->get_group();
-		$radios[$_]->set_group($group) for (1 .. $#radios);
-		$self->{resultsbox}->pack_start($_,0,0,0) for @radios;
-	} else {
-		$self->{resultsbox}->pack_start(Gtk2::Label->new(_"No results found."),0,0,20);
+	$self->{store}->clear();
+	for (@$result) {
+		$self->{store}->set($self->{store}->append, 0,$_->{artist}, 1,$_->{album}, 2,$_->{year}, 3,$_->{label}, 4,$_->{url}."/review");
 	}
-	$self->{result} = $result;
-	$self->{radios} = \@radios;
-	$self->{resultsbox}->show_all();
 }
 
 sub entry_selected_cb {
-	my $self = ::find_ancestor($_[0], __PACKAGE__); # $_[0] is the 'OK' button. Ancestor is an albuminfo object.
-	$self->{searchview}->hide();
-	$self->{infoview}->show();
-	return unless ( $#{$self->{result}} + 1 );
-	my $selected;
-	for (0 .. $#{$self->{radios}}) {
-		if (${$self->{radios}}[$_]->get_active()) {$selected = ${$self->{result}}[$_]; last;}
-	}
-	warn "Albuminfo: fetching review from url $selected->{url}\n" if $::debug;
-	$self->{url} = $selected->{url}.'/review';
+	my $self = ::find_ancestor($_[0], __PACKAGE__); # $_[0] may be the TreeView or the 'OK' button. Ancestor is an albuminfo object.
+	my ($path, $column) = $self->{treeview}->get_cursor();
+	unless (defined $path) {$self->{searchview}->hide(); $self->{infoview}->show(); return} # The user may click OK before selecting an album
+	my $store = $self->{treeview}->{store};
+	$self->{url} = $store->get($store->get_iter($path),4);
+	warn "Albuminfo: fetching review from url $self->{url}\n" if $::debug;
 	$self->cancel();
-	$self->{waiting} = Simple_http::get_with_cb(cb=>sub {$self->load_review(::GetSelID($self),@_)}, url=>$self->{url}, cache=>1);
+	$self->{waiting} = Simple_http::get_with_cb(cb=>sub {$self->{searchview}->hide(); $self->{infoview}->show();
+		$self->load_review(::GetSelID($self),@_)}, url=>$self->{url}, cache=>1);
 }
 
 
