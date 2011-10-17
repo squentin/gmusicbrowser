@@ -408,6 +408,7 @@ our %timespan_menu=
 		'smartfilter:=' => \&Filter::_smartstring_number,
 		'smartfilter::' => \&Filter::_smartstring_number,
 		'smartfilter:~' => 'm',
+		rightalign=>1,	#right-align in SongTree and SongList
 	},
 	'number.div' =>
 	{	group		=> 'int(#_#/#ARG0#) !=',
@@ -543,6 +544,7 @@ our %timespan_menu=
 		hash	=> '(#_# ? #mktime# : 0)',	#or use post-hash modification for 0 case
 		subtypes_menu=> \%timespan_menu,
 		grouptitle=> 'my $gid=#get_gid#; #gid_to_display(GID=$gid)#;',
+		rightalign=>0,
 	},
 	'date.year' =>
 	{	mktime	=> '::mktime(0,0,0,1,0,(localtime(#_#))[5])',
@@ -568,6 +570,7 @@ our %timespan_menu=
 		'filterdesc:e:1'	=> [_"is true", _"is true", '',noinv=>1],
 		filter_exclude => 'ALL',	#do not show filters inherited from parents
 		default_filter => 'e:1',
+		rightalign=>0,
 	},
 	shuffle=>
 	{	n_sort		=> 'Songs::update_shuffle($Songs::LastID) ---- vec($Songs::SHUFFLE,#ID#,32)',
@@ -973,7 +976,6 @@ our %timespan_menu=
 	FilterList => {type=>'div.60',},
 	'filterpat:value' => [ display => "%d s", unit => 's', default_value=>1 ],	#should 's' be translated ?
 	letter => 'm',
-	rightalign=>1,	#right-align in SongTree and SongList #maybe should be done to all number columns ?
 	category=>'audio',
  },
 
@@ -1224,6 +1226,7 @@ sub MakeCode		#keep ?
 sub Field_property
 {	my ($field,$key)=@_;
 	my $h= $Def{$field};
+	return undef unless $h;
 	while ($h)
 	{	return $h->{$key} if exists $h->{$key};
 		my $type= $h->{parent} || $h->{type};
@@ -2064,8 +2067,7 @@ sub ColumnsKeys
 {	grep $Def{$_}{flags}=~m/c/, @Fields;
 }
 sub ColumnAlign
-{	return 0 unless $Def{$_[0]};
-	return $Def{$_[0]}{rightalign};
+{	Field_property($_[0],'rightalign') || 0;
 }
 sub InfoFields		#used for song info dialog, currently same fields as ColumnsKeys
 {	my %tree;
