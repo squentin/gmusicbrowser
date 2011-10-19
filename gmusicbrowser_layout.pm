@@ -627,6 +627,7 @@ our %Widgets=
 	},
 	AddLabelEntry =>
 	{	New => \&AddLabelEntry,
+		group	=> 'Play',
 	},
 	LabelToggleButtons =>
 	{	class	=> 'Layout::LabelToggleButtons',
@@ -1528,10 +1529,12 @@ sub AddLabelEntry	#create entry to add a label to the current song
 {	my $entry=Gtk2::Entry->new;
 	$entry->set_tooltip_text(_"Adds labels to the current song");
 	$entry->signal_connect(activate => sub
-	 {	my $label= $_[0]->get_text;
-		return unless defined $::SongID & defined $label;
-		$_[0]->set_text('');
-		::SetLabels([$::SongID],[$label],[]);
+	 {	my $entry=shift;
+		my $label= $entry->get_text;
+		my $ID= ::GetSelID($entry);
+		return unless defined $ID & defined $label;
+		$entry->set_text('');
+		::SetLabels([$ID],[$label],[]);
 	 });
 	GMB::ListStore::Field::setcompletion($entry,'label');
 	return $entry;
