@@ -632,7 +632,7 @@ our %Widgets=
 	LabelToggleButtons =>
 	{	class	=> 'Layout::LabelToggleButtons',
 		group	=> 'Play',
-		schange	=> \&Layout::LabelToggleButtons::update_song,
+		field	=> 'label',
 	},
 	PlayOrderCombo =>
 	{	New	=> \&PlayOrderComboNew,
@@ -3768,8 +3768,15 @@ sub new
 	$self->set_policy('automatic','automatic');
 	$self->{table}=Gtk2::Table->new(1,1,::TRUE);
 	$self->add_with_viewport($self->{table});
-	my $field=$self->{field}= $opt->{field} || 'label'; #FIXME check if correct type
-	#::WatchSelID($self,\&update_song,[$field]);
+	my $field= $opt->{field};
+	if (Songs::FieldType($field) ne 'flags')
+	{	warn "LabelToggleButtons : invalid field $field\n";
+		$field= 'label';
+	}
+	$self->{field}= $field;
+	$self->{$_}= $opt->{$_} for qw/hide_unset group/;
+	my $songchange= $self->{hide_unset} ? sub { my $self=shift; $self->{width}=0; $self->update_columns; $self->update_song } : \&update_song;
+	::WatchSelID($self, $songchange, [$field]);
 	::Watch($self,"newgids_$field",\&update_labels);
 	$self->signal_connect( size_allocate => sub { ::IdleDo( "resize_$self",1000, \&update_columns,$_[0] ); });
 	return $self;
@@ -3787,6 +3794,7 @@ sub update_labels
 }
 sub update_columns
 {	my $self=shift;
+	goto &update_labels unless $self->{checks}; #initialization
 	my $width=$self->child->allocation->width;
 	return unless $width;
 	return if $self->{width} && $width == $self->{width};
@@ -3794,11 +3802,17 @@ sub update_columns
 	my $table=$self->{table};
 	$table->remove($_) for $table->get_children;
 	$table->resize(1,1);
-	my $checks=$self->{checks};
-	my $maxwidth=::max( 10,map 4+$_->size_request->width, values %$checks );
+	my @list;
+	if ($self->{hide_unset})
+	{	my $ID= ::GetSelID($self);
+		@list= Songs::Get_list($ID,$self->{field}) if defined $ID;
+	}
+	else { @list= @{Songs::ListAll($self->{field})} }
+	my @shown= grep defined, map $self->{checks}{$_}, @list;
+	my $maxwidth=::max( 10,map 4+$_->size_request->width, @shown );
 	my $maxcol= int( $width / $maxwidth)||1;
 	my $col=my $row=0;
-	for my $widget (grep defined, map $checks->{$_}, @{Songs::ListAll($self->{field})})
+	for my $widget (@shown)
 	{	$table->attach($widget,$col,$col+1,$row,$row+1,['fill','expand'],'shrink',1,1);
 		if (++$col==$maxcol) {$col=0; $row++;}
 	}
@@ -3820,6 +3834,7 @@ sub update_song
 }
 sub toggled_cb
 {	my ($check,$label)=@_;
+	return unless $check->parent;
 	my $self=::find_ancestor($check,__PACKAGE__);
 	return if $self->{busy};
 	my $field= ($check->get_active ? '+' : '-').$self->{field};

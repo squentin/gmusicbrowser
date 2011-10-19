@@ -2118,6 +2118,11 @@ sub FieldList		#return list of fields, or list of fields of type $type, these ty
 	}
 	return @Fields;
 }
+sub FieldType
+{	my $field=shift;
+	return '' unless grep $field, @Fields;
+	return $Def{$field}{type} eq 'flags'? 'flags' : '';	# only "flags" type supported currently, see FieldList() comments
+}
 sub ListGroupTypes
 {	my @list= grep $Def{$_}{can_group}, @Fields;
 	my @ret;
