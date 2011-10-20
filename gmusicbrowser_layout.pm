@@ -302,8 +302,9 @@ our %Widgets=
 		group	=> 'Play',
 		markup	=> '%s',
 		xalign	=> 1,
-		options	=> 'remaining',
+		options	=> 'remaining markup_stopped',
 		saveoptions => 'remaining',
+		markup_stopped=> '--:--',
 		initsize=> '-XX:XX',
 #		font	=> 'Monospace',
 		event	=> 'Time',
@@ -3105,7 +3106,17 @@ sub set_markup
 sub update_time
 {	my ($self,$time)=@_;
 	my $markup=$self->{time_markup};
-	$time ||= ::TimeString($self->{remaining});
+	$time= $::PlayTime if !defined $time;
+	if (defined $time)
+	{	my $length= Songs::Get($::SongID,'length');
+		my $format= $length<600? '%01d:%02d' : '%02d:%02d';
+		if ($self->{remaining})
+		{	$format= '-'.$format;
+			$time= $length-$time;
+		}
+		$time= sprintf $format, $time/60, $time%60;
+	}
+	else { $time= $self->{markup_stopped} }
 	if ($markup)
 	{	$markup=~s/%s/$time/;
 	}
@@ -3214,10 +3225,9 @@ sub update_preview_Time
 	my @labels= grep $_->isa('Layout::Label::Time'), values %$h; #get list of Layout::Label::Time widgets in the layouts
 
 	my $preview= defined $value ? 1 : 0;
-	my $format=( $self->{max} <600 )? '%01d:%02d' : '%02d:%02d';
 	for my $label (@labels)
 	{	$label->{busy}=$preview;
-		$label->update_time( sprintf $format,int($value/60),$value%60 ) if $preview;
+		$label->update_time($value) if $preview;
 	}
 }
 

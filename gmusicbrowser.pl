@@ -2328,19 +2328,6 @@ sub UpdateTime
 	$PlayTime=$_[0];
 	HasChanged('Time');
 }
-
-sub TimeString
-{	return '--:--' unless defined $PlayTime;
-	my $time=$PlayTime;
-	my $l=Songs::Get($SongID,'length');
-	my $f=($l<600)? '%01d:%02d' : '%02d:%02d';
-	if ($_[0])
-	{	$f='-'.$f;
-		$time= $l-$time;
-	}
-	return sprintf $f,$time/60,$time%60;
-}
-
 sub ResetTime
 {	undef $PlayTime;
 	HasChanged('Time');
