@@ -292,7 +292,18 @@ sub CanControl {1}
 # 'org.mpris.MediaPlayer2.Player','Metadata'
 sub GetMetadata_from
 {	my $ID=shift;
-	return {} unless defined $ID;
+
+	# Net::DBus support for properties is incomplete, the following use undocumented functions to force it to use the correct data types for the returned values
+	my $type=
+	 [ &Net::DBus::Binding::Message::TYPE_DICT_ENTRY,
+		[ &Net::DBus::Binding::Message::TYPE_STRING,
+			[ &Net::DBus::Binding::Message::TYPE_VARIANT,
+				[],
+	 ]]];
+	#my ($type)= Net::DBus::Binding::Introspector->_convert(['dict','string',['variant']]); #works too, not sure which one is best
+
+	return Net::DBus::Binding::Value->new($type,{}) unless defined $ID;
+
 	my %h;
 	$h{$_}=Songs::Get($ID,$_) for qw/title album artist comment length track disc year album_artist uri album_picture rating bitrate samprate genre playcount/;
 	my %r= #return values
@@ -323,14 +334,6 @@ sub GetMetadata_from
 
 	delete $r{$_} for grep !defined $r{$_}, keys %r;
 
-	# Net::DBus support for properties is incomplete, the following use undocumented functions to force it to use the correct data types for the returned values
-	my $type=
-	 [ &Net::DBus::Binding::Message::TYPE_DICT_ENTRY,
-		[ &Net::DBus::Binding::Message::TYPE_STRING,
-			[ &Net::DBus::Binding::Message::TYPE_VARIANT,
-				[],
-	 ]]];
-	#my ($type)= Net::DBus::Binding::Introspector->_convert(['dict','string',['variant']]); #works too, not sure which one is best
 	return Net::DBus::Binding::Value->new($type,\%r);
 }
 
