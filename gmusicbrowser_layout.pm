@@ -1046,6 +1046,7 @@ sub NewWidget
 	$opt1=Parse_opt1($opt1,$ref->{oldopt1}) unless ref $opt1;
 	$opt2||={};
 	my %options= (group=>'', %$ref, %$opt1, %$opt2, name=>$namefull, %$global_opt);
+	$options{font} ||= $global_opt->{DefaultFont} if $global_opt->{DefaultFont};
 	my $group= $options{group};		#FIXME make undef group means parent's group ?
 	my $defaultgroup= $options{default_group} || 'default_group';
 	$options{group}= $defaultgroup.($group=~m/^\w/ ? '-' : '').$group unless $group=~m/^[A-Z]/;	#group local to window unless it begins with uppercase
@@ -2941,8 +2942,8 @@ sub new
 	{	$self->{$_}=$opt->{$_} if exists $opt->{$_};
 	}
 
-	my $font= $opt->{font} || $opt->{DefaultFont};
-	$label->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
+	my $font= $opt->{font} && Gtk2::Pango::FontDescription->from_string($opt->{font});
+	$label->modify_font($font) if $font;
 	if (my $color= $opt->{color} || $opt->{DefaultFontColor})
 	{	$label->modify_fg('normal', Gtk2::Gdk::Color->parse($color) );
 	}
@@ -2958,7 +2959,7 @@ sub new
 	if ($minsize && $minsize=~m/^\d+p?$/)
 	{	unless ($minsize=~s/p$//)
 		{	my $lay=$label->create_pango_layout( 'X' x $minsize );
-			$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
+			$lay->set_font_description($font) if $font;
 			($minsize)=$lay->get_pixel_size;
 		}
 		$self->set_size_request($minsize,-1);
@@ -2976,7 +2977,7 @@ sub new
 	elsif (defined $opt->{initsize})
 	{	#$label->set_size_request($label->create_pango_layout( $opt->{initsize} )->get_pixel_size);
 		my $lay=$label->create_pango_layout( $opt->{initsize} );
-		$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
+		$lay->set_font_description($font) if $font;
 		$label->set_size_request($lay->get_pixel_size);
 		$self->{resize}=1;
 	}
@@ -3135,7 +3136,7 @@ sub new
 	{	$self->{text}=$opt->{text};
 		$self->{text_empty}=$opt->{text_empty};
 		$self->set_ellipsize( $opt->{ellipsize}||'end' );
-		my $font= $opt->{font} || $opt->{DefaultFont};
+		my $font= $opt->{font};
 		$self->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 	}
 	my $orientation= $opt->{vertical} ? 'bottom-to-top' : $opt->{horizontal} ? 'left-to-right' : $opt->{orientation} || 'left-to-right';
