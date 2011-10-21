@@ -2499,7 +2499,7 @@ our %Field_options=
 		{		my $arg=shift;
 				my $show= $arg->{opt}{currentid} && ( $arg->{opt}{template} ne $Def{$arg->{field}}{template} );
 				my $w= $arg->{widget};
-				if ($show) {$w->show} else {$w->hide}
+				$w->set_visible($show);
 				$w->set_no_show_all(1);
 		},
 	},
@@ -2511,7 +2511,7 @@ our %Field_options=
 				my $opt=$arg->{opt};
 				my $show= $opt->{currentid} && ($opt->{disable} || $opt->{remove} );
 				my $w= $arg->{widget};
-				if ($show) {$w->show} else {$w->hide}
+				$w->set_visible($show);
 				$w->set_no_show_all(1);
 		},
 	},
@@ -2522,7 +2522,7 @@ our %Field_options=
 		{		my $arg=shift;
 				my $show= $arg->{opt}{rw} && (!$arg->{opt}{userid} || $arg->{opt}{userid}=~m/^ *$/);
 				my $w= $arg->{widget};
-				if ($show) {$w->show} else {$w->hide}
+				$w->set_visible($show);
 				$w->set_no_show_all(1);
 		},
 	},

@@ -490,8 +490,8 @@ sub add_column
 {	my ($self,$field)=@_;
 	if ($self->{'pfcheck_'.$field})	#if already created -> toggle show/hide
 	{	my @w=( $self->{'pfcheck_'.$field}, @{ $self->{pf_widgets}{$field} } );
-		if ($w[0]->visible)	{ $_->hide for @w; }
-		else			{ $_->show for @w; }
+		my $show= !$w[0]->visible;
+		$_->set_visible($show) for @w;
 		return;
 	}
 	my $table=$self->{perfile_table};
@@ -544,8 +544,8 @@ sub add_column
 sub add_selectfile_column
 {	my $self=$_[0];
 	if (my $l=$self->{'filetoggles'})	#if already created -> toggle show/hide
-	{	if ($l->[0]->visible)	{ $_->hide for @$l; }
-		else			{ $_->show for @$l; }
+	{	my $show= !$l->[0]->visible;
+		$_->set_visible($show) for @$l;
 		return;
 	}
 	my @toggles;

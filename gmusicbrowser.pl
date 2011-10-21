@@ -32,6 +32,7 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  *Gtk2::Label::set_line_wrap_mode=	sub {} unless *Gtk2::Label::set_line_wrap_mode{CODE};	#for gtk2 version <2.9 or perl-Gtk2 <1.131
  *Gtk2::Scale::add_mark=		sub {} unless *Gtk2::Scale::add_mark{CODE};		#for gtk2 version <2.16 or perl-Gtk2 <1.230
  *Gtk2::ImageMenuItem::set_always_show_image= sub {} unless *Gtk2::ImageMenuItem::set_always_show_image{CODE};#for gtk2 version <2.16 or perl-Gtk2 <1.230
+ *Gtk2::Widget::set_visible= sub { my ($w,$v)=@_; if ($v) {$w->show} else {$w->hide} } unless *Gtk2::Widget::set_visible{CODE}; #for gtk2 version <2.18 or perl-Gtk2 <1.231
  unless (*Gtk2::Widget::set_tooltip_text{CODE})		#for Gtk2 version <2.12
  {	my $Tooltips=Gtk2::Tooltips->new;
 	*Gtk2::Widget::set_tooltip_text= sub { $Tooltips->set_tip($_[0],$_[1]); };
@@ -4127,7 +4128,7 @@ sub ChoosePix
 		  my $p=$image->{pixbuf};
 		  if ($p) { $label->set_text($p->get_width.' x '.$p->get_height); }
 		  else { $label->set_text(''); }
-		  if ($max>1) {$more->show; } else {$more->hide;}
+		  $more->set_visible($max>1);
 		  $prev->set_sensitive($nb>0);
 		  $next->set_sensitive($nb<$max-1);
 		  $dialog->set_preview_widget_active($p || $nb);
@@ -6534,7 +6535,7 @@ sub NewPrefFileEntry
 		# could simply $entry->set_text(), but wouldn't work with filenames with broken encoding
 		SetOption( $key, url_escape($file) );
 		$busy=1; $entry->set_text(filename_to_utf8displayname($file)); $busy=undef;
-		if (url_escape($entry->get_text) eq $Options{$key} ) { $enc_warning->hide } else { $enc_warning->show }
+		$enc_warning->set_visible( url_escape($entry->get_text) eq $Options{$key} );
 		&$cb if $cb;
 	});
 	$entry->signal_connect( destroy => sub { PrefSaveHistory($key_history,url_escape($_[0]->get_text)); } ) if $key_history;
