@@ -34,3 +34,10 @@ VBmain	 = HBSearch _SongList(group=search)
  HBSearch= _SimpleSearch(group=search)
 Icon=gtk-find
 
+[song_info]
+Type= P
+Name= _"Song informations"
+Title= _"Info"
+VBmain=  _SongInfo
+Icon= gtk-info
+

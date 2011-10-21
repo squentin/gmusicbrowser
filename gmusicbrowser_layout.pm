@@ -449,6 +449,12 @@ our %Widgets=
 		#these options will be passed to context children :
 		options_for_context => 'group',
 	},
+	SongInfo=>
+	{	class	=> 'Layout::SongInfo',
+		group	=> 'Play',
+		expander=> 1,
+		hide_empty => 1,
+	},
 	AABox	=>
 	{	class	=> 'GMB::AABox',
 		oldopt1	=> sub { 'aa='.( $_[0] ? 'artist' : 'album' ) },
@@ -3851,6 +3857,124 @@ sub toggled_cb
 	my $field= ($check->get_active ? '+' : '-').$self->{field};
 	my $ID= ::GetSelID($self);
 	Songs::Set($ID,$field,[$label]);
+}
+
+package Layout::SongInfo;
+use base 'Gtk2::ScrolledWindow';
+our @default_options= ( markup_cat=>"<u>%s</u>", markup_field=>"<small>%s :</small>", markup_value=>"<small><b>%s</b></small>" );
+sub new
+{	my ($class,$opt)=@_;
+	%$opt=( @default_options, %$opt );
+	my $self= bless Gtk2::ScrolledWindow->new, $class;
+	$self->set_policy('automatic','automatic');
+	$self->{table}=Gtk2::Table->new(1,1,::FALSE);
+	$self->add_with_viewport($self->{table});
+
+	$self->{$_}=$opt->{$_} for qw/group ID markup_cat markup_field markup_value font expander collapsed hide_empty/;
+	if ($opt->{ID}) # for use in SongProperties window
+	{	::Watch($self, SongsChanged=> \&update); #could check which ID changed
+	}
+	else	#use group option to find ID
+	{	::WatchSelID($self, \&update);
+	}
+	$self->{SaveOptions}= \&SaveOptions;
+	::Watch($self,fields_reset=>\&init);
+	$self->init;
+	return $self;
+}
+sub init
+{	my $self=shift;
+	my %collapsed;
+	if ($self->{expander})
+	{	$self->SaveOptions if $self->{cats}; # updates $self->{collapsed}
+		$collapsed{$_}=1 for split / +/, $self->{collapsed}||'';
+	}
+	my $table=$self->{table};
+	$table->remove($_) for $table->get_children;
+	my $labels1=$self->{labels1}={};
+	my $labels2=$self->{labels2}={};
+	my $cats=$self->{cats}={};
+	my @labels;
+	$table->{row}=0;
+	my $treelist=Songs::InfoFields;
+	while (@$treelist)
+	{	my ($cat,$catname,$fields)= splice @$treelist,0,3;
+		#category
+		my $catlabel=Gtk2::Label->new_with_format($self->{markup_cat}, $catname);
+		push @labels, $catlabel;
+		my $table2=$table;
+		if ($self->{expander})
+		{	$table2=Gtk2::Table->new(1,1,::FALSE);
+			$table2->{row}=0;
+			my $expander= Gtk2::Expander->new;
+			$expander->set_label_widget($catlabel);
+			$expander->add($table2);
+			$expander->set_expanded( !$collapsed{$cat} );
+			$catlabel=$expander;
+		}
+		$cats->{$cat}=$catlabel;
+		my $row=$table->{row}++;
+		$table->attach($catlabel,0,1,$row,$row+1,'fill','shrink',1,1);
+		#fields
+		for my $field (@$fields)
+		{	my $lab1=$labels1->{$field}=Gtk2::Label->new_with_format($self->{markup_field}, Songs::FieldName($field));
+			my $lab2=$labels2->{$field}=Gtk2::Label->new;
+			push @labels, $labels1, $labels2;
+			$lab1->set_padding(5,0);
+			$lab1->set_alignment(1,.5);
+			$lab2->set_alignment(0,.5);
+			$lab2->set_line_wrap(1);
+			$lab2->set_selectable(1);
+			my $row=$table2->{row}++;
+			$table2->attach($lab1,0,1,$row,$row+1,'fill','shrink',1,1);
+			$table2->attach($lab2,1,2,$row,$row+1,'fill','shrink',1,1);
+		}
+		$row=$table->{row}++;
+		$table->attach(Gtk2::HBox->new,0,3,$row,$row+1,[],[],0,5) if @$treelist; #space between categories
+	}
+	if (my $font=$self->{font})
+	{	$font= Gtk2::Pango::FontDescription->from_string($font);
+		$_->modify_font($font) for @labels;
+	}
+	if ($self->{expander})
+	{	my $sg= Gtk2::SizeGroup->new('horizontal');
+		$sg->add_widget($_) for values %$labels1;
+	}
+	$table->set_no_show_all(0);
+	$table->show_all;
+	$table->set_no_show_all(1);
+	$self->update;
+}
+sub update
+{	my $self=shift;
+	my $ID= $self->{ID} || ::GetSelID($self);
+	my $labels1= $self->{labels1};
+	my $labels2= $self->{labels2};
+	my $func= defined $ID ? \&Songs::Display : sub {''};
+	my $treelist=Songs::InfoFields;
+	while (@$treelist)
+	{	my ($cat,$catname,$fields)= splice @$treelist,0,3;
+		my $found;
+		for my $field (@$fields)
+		{	my $lab2= $labels2->{$field};
+			next unless $lab2;
+			my $val= $func->($ID,$field);
+			$lab2->set_markup_with_format($self->{markup_value}, $val);
+			if ($self->{hide_empty})
+			{	$_->set_visible($val ne '') for $labels1->{$field},$lab2;
+				$found ||= $val ne '';
+			}
+		}
+		$self->{cats}{$cat}->set_visible($found) if $self->{hide_empty};
+	}
+}
+sub SaveOptions
+{	my $self=shift,
+	my %opt;
+	if (my $cats=$self->{cats})
+	{	$opt{collapsed}= $self->{collapsed}= join ' ', sort grep !$cats->{$_}->get_expanded, keys %$cats;
+	}
+	return %opt;
 }
 
 package GMB::Context;

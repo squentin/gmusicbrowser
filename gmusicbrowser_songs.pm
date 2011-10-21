@@ -2082,7 +2082,7 @@ sub InfoFields		#used for song info dialog, currently same fields as ColumnsKeys
 	my @list;
 	for my $cat ( sort { $Categories{$a}[1] <=> $Categories{$b}[1] } keys %tree )
 	{	my $fields= $tree{$cat};
-		push @list, $Categories{$cat}[0], [::superlc_sort(@$fields)];
+		push @list, $cat, $Categories{$cat}[0], [::superlc_sort(@$fields)];
 	}
 	return \@list;
 	#FIXME sort according to a number like $Def{$_}{order}

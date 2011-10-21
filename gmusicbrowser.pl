@@ -4836,8 +4836,8 @@ sub DialogSongProp
 	$notebook->set_tab_border(4);
 	$dialog->vbox->add($notebook);
 
-	my $edittag=EditTagSimple->new($dialog,$ID);
-	my $songinfo=SongInfo($ID);
+	my $edittag=  EditTagSimple->new($dialog,$ID);
+	my $songinfo= Layout::SongInfo->new({ID=>$ID});
 	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Tag"));
 	$notebook->append_page( $songinfo,	Gtk2::Label->new(_"Info"));
 
@@ -4855,53 +4855,6 @@ sub DialogSongProp
 		delete $Editing{$ID};
 		$dialog->destroy;
 	});
-}
-
-sub SongInfo
-{	my $ID = shift;
-	my $table=Gtk2::Table->new(8,2);
-	my $sw=Gtk2::ScrolledWindow->new;
-	 $sw->set_shadow_type('etched-in');
-	 $sw->set_policy('automatic','automatic');
-	 $sw->add_with_viewport($table);
-	$table->{ID}=$ID;
-	my $row=0;
-	my @fields;
-	my $treelist=Songs::InfoFields;
-	while (@$treelist)
-	{	my ($cat,$fields)= splice @$treelist,0,2;
-		#category
-		my $label=Gtk2::Label->new($cat);
-		$table->attach($label,0,1,$row,$row+@$fields,'fill','shrink',1,1);
-		#fields
-		push @fields, @$fields;
-		for my $field (@$fields)
-		{	my $lab1=Gtk2::Label->new;
-			my $lab2=$table->{$field}=Gtk2::Label->new;
-			#$lab1->set_markup_with_format("<b>%s :</b>", Songs::FieldName($fieldl));
-			$lab1->set_markup_with_format("<small>%s</small>", Songs::FieldName($field).' :');
-			$lab1->set_padding(5,0);
-			$lab1->set_alignment(1,.5);
-			$lab2->set_alignment(0,.5);
-			$lab2->set_line_wrap(1);
-			$lab2->set_selectable(TRUE);
-			$table->attach($lab1,1,2,$row,$row+1,'fill','shrink',1,1);
-			$table->attach_defaults($lab2,2,3,$row,$row+1);
-			$row++;
-		}
-		$table->attach(Gtk2::HBox->new,0,3,$row,$row+1,[],[],0,5) if @$treelist; #space between categories
-		$row++;
-	}
-	my $fillsub=sub
-	 {	my ($table,$IDs,$fields)=@_;
-		my $ID=$table->{ID};
-		return if $IDs && !(grep $_==$ID, @$IDs);
-		#$table->{$_}->set_text(Songs::Display($ID,$_)) for @$fields;
-		$table->{$_}->set_markup('<small><b>'.Songs::DisplayEsc($ID,$_).'</b></small>') for grep $table->{$_}, @$fields;
-	 };
-	Watch($table, SongsChanged=> $fillsub);
-	$fillsub->($table,undef,\@fields);
-	return $sw;
 }
 
 sub SongsChanged
