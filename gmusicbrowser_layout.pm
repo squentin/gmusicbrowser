@@ -714,7 +714,9 @@ sub get_layout_list
 
 sub get_layout_name
 {	my $layout=shift;
-	my $name= $Layouts{$layout}{Name} || _( $layout );
+	my $def= $Layouts{$layout};
+	return sprintf(_"Unknown layout '%s'",$layout) unless $def;
+	my $name= $def->{Name} || _( $layout );
 	return $name;
 }
 
