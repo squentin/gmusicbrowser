@@ -3692,6 +3692,9 @@ sub BuildMenu
 			if ($m->{code}) { $submenu=BuildChoiceMenu($submenu, %$m, args=>$args); }
 			elsif (ref $submenu eq 'ARRAY') { $submenu=BuildMenu($submenu,$args); }
 			next unless $submenu;
+			if (my $append=$m->{append})	#append to submenu
+			{	BuildMenu($append,$args,$submenu);
+			}
 			$item->set_submenu($submenu);
 		}
 		else
