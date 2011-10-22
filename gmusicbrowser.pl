@@ -3734,6 +3734,7 @@ sub BuildChoiceMenu
 	my $tree=		$options{submenu_tree}		|| $options{tree};
 	my $reverse=		$options{submenu_reverse}	|| $options{'reverse'}		|| $tree;
 	my $ordered_hash=	$options{submenu_ordered_hash}	|| $options{ordered_hash}	|| $tree;
+	my $firstkey=		$options{first_key};	#used to put one of the choices on top
 	my (@labels,@values);
 	if ($ordered_hash)
 	{	my $i=0;
@@ -3774,7 +3775,8 @@ sub BuildChoiceMenu
 			$item->signal_connect(activate => $smenu_callback, $options{code} );
 		}
 		$item->child->set_markup( $item->child->get_label ) if $options{submenu_use_markup};
-		$menu->append($item);
+		if (defined $firstkey && $firstkey eq $value) { $menu->prepend($item); }
+		else { $menu->append($item); }
 	}
 	$menu=undef unless @order; #empty submenu
 	return $menu;
