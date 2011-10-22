@@ -4681,7 +4681,7 @@ sub MakeFlagMenu	#FIXME special case for no @keys, maybe a menu with a greyed-ou
 				$item->signal_connect(toggled => $callback,$key);
 			}
 			else
-			{	$item=Gtk2::MenuItem->new($key);
+			{	$item=Gtk2::MenuItem->new_with_label($key);
 				$item->signal_connect(activate => $callback,$key);
 			}
 			$menu->append($item);
