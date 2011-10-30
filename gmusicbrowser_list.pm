@@ -400,8 +400,7 @@ sub Update
 	my $action=$::QueueAction;
 	$self->{queuecombo}->set_active( $self->{actionindex}{$action} );
 	$self->{eventcombo}->set_tooltip_text( $::QActions{$action}{long} );
-	my $m= $::QActions{$action}{autofill} ? 'show' : 'hide';
-	$self->{spin}->$m;
+	$self->{spin}->set_visible($::QActions{$action}{autofill});
 	$self->{spin}->set_value($::Options{MaxAutoFill});
 	delete $self->{busy};
 }
@@ -1571,11 +1570,19 @@ my %sort_menu_album=
 (	%sort_menu,
 	artist => _("artist")
 );
+my @sort_menu_append=
+(	{separator=>1},
+	{ label=> _"reverse order", check=> sub { $_[0]{self}{'sort'}[$_[0]{depth}]=~m/^-/ },
+	  code=> sub { my $self=$_[0]{self}; $self->{'sort'}[$_[0]{depth}]=~s/^(-)?/$1 ? "" : "-"/e; $self->SetOption; }
+	},
+);
 
 our @MenuPageOptions;
 my @MenuSubGroup=
 (	{ label => sub {_("Set subgroup").' '.$_[0]{depth}},	submenu => sub { return {0 => _"None",map {$_=>Songs::FieldName($_)} Songs::FilterListFields()}; },
-		submenu_reverse => 1,	code => sub { $_[0]{self}->SetField($_[1],$_[0]{depth}) },	check => sub { $_[0]{self}{field}[$_[0]{depth}] ||0 },
+	  first_key=> "0",	submenu_reverse => 1,
+	  code	=> sub { $_[0]{self}->SetField($_[1],$_[0]{depth}) },
+	  check	=> sub { $_[0]{self}{field}[$_[0]{depth}] ||0 },
 	},
 	{ label => sub {_("Options for subgroup").' '.$_[0]{depth}},	submenu => \@MenuPageOptions,
 	  test  => sub { $_[0]{depth} <= $_[0]{self}{depth} },
@@ -1611,7 +1618,9 @@ my @MenuSubGroup=
 	  submenu => sub { [::max(10,$_[0]{self}{cloud_min}+1)..40] },  check => sub {$_[0]{self}{cloud_max}}, },
 
 	{ label => _"sort by",		code => sub { my $self=$_[0]{self}; $self->{'sort'}[$_[0]{depth}]=$_[1]; $self->SetOption; },
-	  check => sub {$_[0]{self}{sort}[$_[0]{depth}]}, submenu =>  sub { $_[0]{field} eq 'album' ? \%sort_menu_album : \%sort_menu; }, submenu_reverse => 1 },
+	  check => sub {$_[0]{self}{sort}[$_[0]{depth}]}, submenu =>  sub { $_[0]{field} eq 'album' ? \%sort_menu_album : \%sort_menu; },
+	  submenu_reverse => 1,		append => \@sort_menu_append,
+	},
 	{ label => _"group by",
 	  code	=> sub { my $self=$_[0]{self}; my $d=$_[0]{depth}; $self->{type}[$d]=$self->{field}[$d].'.'.$_[1]; $self->Fill('rehash'); },
 	  check => sub { my $n=$_[0]{self}{type}[$_[0]{depth}]; $n=~s#^[^.]+\.##; $n },
@@ -1758,12 +1767,9 @@ sub new
 		my $pid= $self->{page}= $p->{pid};
 		my $mask=	$Pages{$pid} ? 				$Pages{$pid}[2] :
 				Songs::FilterListProp($pid,'multi') ?	'oni' : 'on';
-		if	($mask=~m/o/)	{$optB->show}
-		else			{$optB->hide}
-		if	($mask=~m/n/)	{$spin->show}
-		else			{$spin->hide}
-		if	($mask=~m/i/)	{$InterB->show}
-		else			{$InterB->hide}
+		$optB->set_visible  ( $mask=~m/o/ );
+		$spin->set_visible  ( $mask=~m/n/ );
+		$InterB->set_visible( $mask=~m/i/ );
 	 });
 
 	$self->add($notebook);

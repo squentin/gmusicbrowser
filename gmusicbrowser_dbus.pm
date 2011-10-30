@@ -116,15 +116,15 @@ sub CopyFields
 
 dbus_signal(SongFieldsChanged => ['uint32']);
 sub SongFieldsChanged
-{	$_[0]->emit_signal(SongFieldsChanged => $::SongID);
+{	$_[0]->emit_signal(SongFieldsChanged => $::SongID||0);
 }
 dbus_signal(SongChanged => ['uint32']);
 sub SongChanged
-{	$_[0]->emit_signal(SongChanged => $::SongID);
+{	$_[0]->emit_signal(SongChanged => $::SongID||0);
 }
 dbus_signal(PlayingSongChanged => ['uint32']);
 sub PlayingSongChanged
-{	$_[0]->emit_signal(PlayingSongChanged => $::SongID);
+{	$_[0]->emit_signal(PlayingSongChanged => $::SongID||0);
 }
 
 package GMB::DBus;

@@ -32,6 +32,7 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  *Gtk2::Label::set_line_wrap_mode=	sub {} unless *Gtk2::Label::set_line_wrap_mode{CODE};	#for gtk2 version <2.9 or perl-Gtk2 <1.131
  *Gtk2::Scale::add_mark=		sub {} unless *Gtk2::Scale::add_mark{CODE};		#for gtk2 version <2.16 or perl-Gtk2 <1.230
  *Gtk2::ImageMenuItem::set_always_show_image= sub {} unless *Gtk2::ImageMenuItem::set_always_show_image{CODE};#for gtk2 version <2.16 or perl-Gtk2 <1.230
+ *Gtk2::Widget::set_visible= sub { my ($w,$v)=@_; if ($v) {$w->show} else {$w->hide} } unless *Gtk2::Widget::set_visible{CODE}; #for gtk2 version <2.18 or perl-Gtk2 <1.231
  unless (*Gtk2::Widget::set_tooltip_text{CODE})		#for Gtk2 version <2.12
  {	my $Tooltips=Gtk2::Tooltips->new;
 	*Gtk2::Widget::set_tooltip_text= sub { $Tooltips->set_tip($_[0],$_[1]); };
@@ -548,6 +549,16 @@ sub Gtk2::Label::new_with_format
 sub Gtk2::Label::set_markup_with_format
 {	my $label=shift;
 	$label->set_markup( MarkupFormat(@_) );
+}
+sub Gtk2::Window::force_present #force bringing the window to the current workspace, $win->present does not always do that
+{	my $win=shift;
+	$win->iconify; $win->deiconify;
+	$win->present;
+}
+sub Gtk2::Dialog::force_present # for dialog use stick/unstick instead of iconify/deiconify
+{	my $win=shift;
+	$win->stick; $win->unstick;
+	$win->present;
 }
 sub IncSuffix	# increment a number suffix from a string
 {	$_[0] =~ s/(?<=\D)(\d*)$/($1||1)+1/e;
@@ -2318,19 +2329,6 @@ sub UpdateTime
 	$PlayTime=$_[0];
 	HasChanged('Time');
 }
-
-sub TimeString
-{	return '--:--' unless defined $PlayTime;
-	my $time=$PlayTime;
-	my $l=Songs::Get($SongID,'length');
-	my $f=($l<600)? '%01d:%02d' : '%02d:%02d';
-	if ($_[0])
-	{	$f='-'.$f;
-		$time= $l-$time;
-	}
-	return sprintf $f,$time/60,$time%60;
-}
-
 sub ResetTime
 {	undef $PlayTime;
 	HasChanged('Time');
@@ -3009,7 +3007,7 @@ sub ToggleFullscreenLayout
 sub WEditList
 {	my $name=$_[0];
 	my ($window)=grep exists $_->{editing_listname} && $_->{editing_listname} eq $name, Gtk2::Window->list_toplevels;
-	if ($window) { $window->present; return; }
+	if ($window) { $window->force_present; return; }
 	$SongList::Common::EditList=$name; #list that will be used by SongList/SongTree in 'editlist' mode
 	$window=Layout::Window->new('EditList', 'pos'=>undef);
 	$SongList::Common::EditList=undef;
@@ -3652,6 +3650,9 @@ sub BuildMenu
 			if ($m->{code}) { $submenu=BuildChoiceMenu($submenu, %$m, args=>$args); }
 			elsif (ref $submenu eq 'ARRAY') { $submenu=BuildMenu($submenu,$args); }
 			next unless $submenu;
+			if (my $append=$m->{append})	#append to submenu
+			{	BuildMenu($append,$args,$submenu);
+			}
 			$item->set_submenu($submenu);
 		}
 		else
@@ -3691,6 +3692,7 @@ sub BuildChoiceMenu
 	my $tree=		$options{submenu_tree}		|| $options{tree};
 	my $reverse=		$options{submenu_reverse}	|| $options{'reverse'}		|| $tree;
 	my $ordered_hash=	$options{submenu_ordered_hash}	|| $options{ordered_hash}	|| $tree;
+	my $firstkey=		$options{first_key};	#used to put one of the choices on top
 	my (@labels,@values);
 	if ($ordered_hash)
 	{	my $i=0;
@@ -3731,7 +3733,8 @@ sub BuildChoiceMenu
 			$item->signal_connect(activate => $smenu_callback, $options{code} );
 		}
 		$item->child->set_markup( $item->child->get_label ) if $options{submenu_use_markup};
-		$menu->append($item);
+		if (defined $firstkey && $firstkey eq $value) { $menu->prepend($item); }
+		else { $menu->append($item); }
 	}
 	$menu=undef unless @order; #empty submenu
 	return $menu;
@@ -4088,7 +4091,7 @@ sub ChoosePix
 		  my $p=$image->{pixbuf};
 		  if ($p) { $label->set_text($p->get_width.' x '.$p->get_height); }
 		  else { $label->set_text(''); }
-		  if ($max>1) {$more->show; } else {$more->hide;}
+		  $more->set_visible($max>1);
 		  $prev->set_sensitive($nb>0);
 		  $next->set_sensitive($nb<$max-1);
 		  $dialog->set_preview_widget_active($p || $nb);
@@ -4259,7 +4262,7 @@ sub ErrorMessage
 
 sub EditLyrics
 {	my $ID=$_[0];
-	if (exists $Editing{'L'.$ID}) { $Editing{'L'.$ID}->present; return; }
+	if (exists $Editing{'L'.$ID}) { $Editing{'L'.$ID}->force_present; return; }
 	my $lyrics=FileTag::GetLyrics($ID);
 	$lyrics='' unless defined $lyrics;
 	$Editing{'L'.$ID}=
@@ -4641,7 +4644,7 @@ sub MakeFlagMenu	#FIXME special case for no @keys, maybe a menu with a greyed-ou
 				$item->signal_connect(toggled => $callback,$key);
 			}
 			else
-			{	$item=Gtk2::MenuItem->new($key);
+			{	$item=Gtk2::MenuItem->new_with_label($key);
 				$item->signal_connect(activate => $callback,$key);
 			}
 			$menu->append($item);
@@ -4786,7 +4789,7 @@ sub DialogSongsProp
 
 sub DialogSongProp
 {	my $ID=$_[0];
-	if (exists $Editing{$ID}) { $Editing{$ID}->present; return; }
+	if (exists $Editing{$ID}) { $Editing{$ID}->force_present; return; }
 	my $dialog = Gtk2::Dialog->new (_"Song Properties", undef, [],
 				'gtk-save' => 'ok',
 				'gtk-cancel' => 'none');
@@ -4796,8 +4799,8 @@ sub DialogSongProp
 	$notebook->set_tab_border(4);
 	$dialog->vbox->add($notebook);
 
-	my $edittag=EditTagSimple->new($dialog,$ID);
-	my $songinfo=SongInfo($ID);
+	my $edittag=  EditTagSimple->new($dialog,$ID);
+	my $songinfo= Layout::SongInfo->new({ID=>$ID});
 	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Tag"));
 	$notebook->append_page( $songinfo,	Gtk2::Label->new(_"Info"));
 
@@ -4815,53 +4818,6 @@ sub DialogSongProp
 		delete $Editing{$ID};
 		$dialog->destroy;
 	});
-}
-
-sub SongInfo
-{	my $ID = shift;
-	my $table=Gtk2::Table->new(8,2);
-	my $sw=Gtk2::ScrolledWindow->new;
-	 $sw->set_shadow_type('etched-in');
-	 $sw->set_policy('automatic','automatic');
-	 $sw->add_with_viewport($table);
-	$table->{ID}=$ID;
-	my $row=0;
-	my @fields;
-	my $treelist=Songs::InfoFields;
-	while (@$treelist)
-	{	my ($cat,$fields)= splice @$treelist,0,2;
-		#category
-		my $label=Gtk2::Label->new($cat);
-		$table->attach($label,0,1,$row,$row+@$fields,'fill','shrink',1,1);
-		#fields
-		push @fields, @$fields;
-		for my $field (@$fields)
-		{	my $lab1=Gtk2::Label->new;
-			my $lab2=$table->{$field}=Gtk2::Label->new;
-			#$lab1->set_markup_with_format("<b>%s :</b>", Songs::FieldName($fieldl));
-			$lab1->set_markup_with_format("<small>%s</small>", Songs::FieldName($field).' :');
-			$lab1->set_padding(5,0);
-			$lab1->set_alignment(1,.5);
-			$lab2->set_alignment(0,.5);
-			$lab2->set_line_wrap(1);
-			$lab2->set_selectable(TRUE);
-			$table->attach($lab1,1,2,$row,$row+1,'fill','shrink',1,1);
-			$table->attach_defaults($lab2,2,3,$row,$row+1);
-			$row++;
-		}
-		$table->attach(Gtk2::HBox->new,0,3,$row,$row+1,[],[],0,5) if @$treelist; #space between categories
-		$row++;
-	}
-	my $fillsub=sub
-	 {	my ($table,$IDs,$fields)=@_;
-		my $ID=$table->{ID};
-		return if $IDs && !(grep $_==$ID, @$IDs);
-		#$table->{$_}->set_text(Songs::Display($ID,$_)) for @$fields;
-		$table->{$_}->set_markup('<small><b>'.Songs::DisplayEsc($ID,$_).'</b></small>') for grep $table->{$_}, @$fields;
-	 };
-	Watch($table, SongsChanged=> $fillsub);
-	$fillsub->($table,undef,\@fields);
-	return $sw;
 }
 
 sub SongsChanged
@@ -5360,7 +5316,7 @@ sub AboutDialog
 }
 
 sub PrefDialog
-{	if ($OptionsDialog) { $OptionsDialog->present; return; }
+{	if ($OptionsDialog) { $OptionsDialog->force_present; return; }
 	$OptionsDialog=my $dialog = Gtk2::Dialog->new (_"Settings", undef,[],
 				'gtk-about' => 1,
 				'gtk-close' => 'close');
@@ -5739,7 +5695,7 @@ sub PrefAudio_makeadv
 		$hbox->pack_start($but,TRUE,TRUE,4);
 		$but->signal_connect(clicked =>	sub #create dialog
 		 {	my $but=$_[0];
-			if ($but->{dialog} && !$but->{dialog}{destroyed}) { $but->{dialog}->present; return; }
+			if ($but->{dialog} && !$but->{dialog}{destroyed}) { $but->{dialog}->force_present; return; }
 			my $d=$but->{dialog}= Gtk2::Dialog->new(__x(_"{outputname} output settings",outputname => $name), undef,[],'gtk-close' => 'close');
 			$d->set_default_response('close');
 			my $box=$package->AdvancedOptions;
@@ -5870,7 +5826,11 @@ sub PrefMisc
 			$recent_include_not_played, $volstep, $pixcache,
 			[ $playedpercent, $playedseconds ],
 		);
-	return $vbox;
+	my $sw = Gtk2::ScrolledWindow->new;
+	$sw->set_shadow_type('etched-in');
+	$sw->set_policy('never','automatic');
+	$sw->add_with_viewport($vbox);
+	return $sw;
 }
 
 sub PrefLayouts
@@ -6491,7 +6451,7 @@ sub NewPrefFileEntry
 		# could simply $entry->set_text(), but wouldn't work with filenames with broken encoding
 		SetOption( $key, url_escape($file) );
 		$busy=1; $entry->set_text(filename_to_utf8displayname($file)); $busy=undef;
-		if (url_escape($entry->get_text) eq $Options{$key} ) { $enc_warning->hide } else { $enc_warning->show }
+		$enc_warning->set_visible( url_escape($entry->get_text) eq $Options{$key} );
 		&$cb if $cb;
 	});
 	$entry->signal_connect( destroy => sub { PrefSaveHistory($key_history,url_escape($_[0]->get_text)); } ) if $key_history;
@@ -6836,7 +6796,7 @@ sub Progress
 
 sub PresentWindow
 {	my $win=$_[1];
-	$win->present;
+	$win->force_present;
 	$win->set_skip_taskbar_hint(FALSE) unless $win->{skip_taskbar_hint};
 }
 
@@ -7016,7 +6976,7 @@ sub ShowHide
 			$win->set_skip_taskbar_hint(FALSE) unless delete $win->{skip_taskbar_hint};
 			#$win->set_opacity($win->{opacity}) if exists $win->{opacity} && $win->{opacity}!=1; #need to re-set it, is it a gtk bug, metacity bug ?
 		}
-		$MainWindow->present;
+		$MainWindow->force_present;
 	}
 }
 

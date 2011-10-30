@@ -2082,7 +2082,7 @@ sub InfoFields		#used for song info dialog, currently same fields as ColumnsKeys
 	my @list;
 	for my $cat ( sort { $Categories{$a}[1] <=> $Categories{$b}[1] } keys %tree )
 	{	my $fields= $tree{$cat};
-		push @list, $Categories{$cat}[0], [::superlc_sort(@$fields)];
+		push @list, $cat, $Categories{$cat}[0], [::superlc_sort(@$fields)];
 	}
 	return \@list;
 	#FIXME sort according to a number like $Def{$_}{order}
@@ -2117,6 +2117,11 @@ sub FieldList		#return list of fields, or list of fields of type $type, these ty
 								# maybe should use  $Def{$_}{flags}=~m/l/ && $Def{$_}{flags}=~m/e/  instead
 	}
 	return @Fields;
+}
+sub FieldType
+{	my $field=shift;
+	return '' unless grep $field, @Fields;
+	return $Def{$field}{type} eq 'flags'? 'flags' : '';	# only "flags" type supported currently, see FieldList() comments
 }
 sub ListGroupTypes
 {	my @list= grep $Def{$_}{can_group}, @Fields;
@@ -2494,7 +2499,7 @@ our %Field_options=
 		{		my $arg=shift;
 				my $show= $arg->{opt}{currentid} && ( $arg->{opt}{template} ne $Def{$arg->{field}}{template} );
 				my $w= $arg->{widget};
-				if ($show) {$w->show} else {$w->hide}
+				$w->set_visible($show);
 				$w->set_no_show_all(1);
 		},
 	},
@@ -2506,7 +2511,7 @@ our %Field_options=
 				my $opt=$arg->{opt};
 				my $show= $opt->{currentid} && ($opt->{disable} || $opt->{remove} );
 				my $w= $arg->{widget};
-				if ($show) {$w->show} else {$w->hide}
+				$w->set_visible($show);
 				$w->set_no_show_all(1);
 		},
 	},
@@ -2517,7 +2522,7 @@ our %Field_options=
 		{		my $arg=shift;
 				my $show= $arg->{opt}{rw} && (!$arg->{opt}{userid} || $arg->{opt}{userid}=~m/^ *$/);
 				my $w= $arg->{widget};
-				if ($show) {$w->show} else {$w->hide}
+				$w->set_visible($show);
 				$w->set_no_show_all(1);
 		},
 	},
@@ -3913,7 +3918,7 @@ sub _is_subset		# returns true if $f2 must be a subset of $f1	#$f1 and $f2 must 
 		if ($op1 eq 's'|| $op1 eq 'si')		{ return index($pat2,$pat1)!=-1 }	# handle case-i ?
 		elsif ($op1 eq '-s'|| $op1 eq '-si')	{ return index($pat1,$pat2)!=-1 }	# handle case-i ?
 		elsif ($op1 eq '>' || $op1 eq '-<') { return ($pat1."\x00".$pat2) =~m/(-?\d+)(\w*)\x00(-?\d+)\2/ && $3>$1  }
-		elsif ($op1 eq '<' || $op1 eq '->') { return ($pat1."\x00".$pat2) =~m/(-?\d+)(\w*)\x00(-?\d+)\2/ && $3>$1  }
+		elsif ($op1 eq '<' || $op1 eq '->') { return ($pat1."\x00".$pat2) =~m/(-?\d+)(\w*)\x00(-?\d+)\2/ && $3<$1  }
 		# FIXME  check these filters : b bago >ago <ago ?
 		return 0;
 	}
@@ -4384,6 +4389,7 @@ sub QuoteRegEx
 {	local $_=$_[0];
 	s#^((?:.*[^\\])?(?:\\\\)*\\)$#$1\\#g; ##escape trailing '\' in impair number
 	s!((?:\G|[^\\])(?:\\\\)*)\\?"!$1\\"!g; #make sure " are escaped (and only once, so that \\\" doesn't become \\\\")
+	if (!eval {qr/$_/;}) { warn "invalid regular expression \"$_[0]\" : $@\n" if $::debug; return quotemeta $_[0]; }  #check if re valid, else quote everything
 	return $_;
 }
 

@@ -312,8 +312,9 @@ our %Widgets=
 		group	=> 'Play',
 		markup	=> '%s',
 		xalign	=> 1,
-		options	=> 'remaining',
+		options	=> 'remaining markup_stopped',
 		saveoptions => 'remaining',
+		markup_stopped=> '--:--',
 		initsize=> '-XX:XX',
 #		font	=> 'Monospace',
 		event	=> 'Time',
@@ -460,6 +461,12 @@ our %Widgets=
 		match	=> 'context page',
 		#these options will be passed to context children :
 		options_for_context => 'group',
+	},
+	SongInfo=>
+	{	class	=> 'Layout::SongInfo',
+		group	=> 'Play',
+		expander=> 1,
+		hide_empty => 1,
 	},
 	AABox	=>
 	{	class	=> 'GMB::AABox',
@@ -640,11 +647,12 @@ our %Widgets=
 	},
 	AddLabelEntry =>
 	{	New => \&AddLabelEntry,
+		group	=> 'Play',
 	},
 	LabelToggleButtons =>
 	{	class	=> 'Layout::LabelToggleButtons',
 		group	=> 'Play',
-		schange	=> \&Layout::LabelToggleButtons::update_song,
+		field	=> 'label',
 	},
 	PlayOrderCombo =>
 	{	New	=> \&PlayOrderComboNew,
@@ -719,7 +727,9 @@ sub get_layout_list
 
 sub get_layout_name
 {	my $layout=shift;
-	my $name= $Layouts{$layout}{Name} || _( $layout );
+	my $def= $Layouts{$layout};
+	return sprintf(_"Unknown layout '%s'",$layout) unless $def;
+	my $name= $def->{Name} || _( $layout );
 	return $name;
 }
 
@@ -1057,6 +1067,7 @@ sub NewWidget
 	$opt1=Parse_opt1($opt1,$ref->{oldopt1}) unless ref $opt1;
 	$opt2||={};
 	my %options= (group=>'', %$ref, %$opt1, %$opt2, name=>$namefull, %$global_opt);
+	$options{font} ||= $global_opt->{DefaultFont} if $global_opt->{DefaultFont};
 	my $group= $options{group};		#FIXME make undef group means parent's group ?
 	my $defaultgroup= $options{default_group} || 'default_group';
 	$options{group}= $defaultgroup.($group=~m/^\w/ ? '-' : '').$group unless $group=~m/^[A-Z]/;	#group local to window unless it begins with uppercase
@@ -1541,10 +1552,12 @@ sub AddLabelEntry	#create entry to add a label to the current song
 {	my $entry=Gtk2::Entry->new;
 	$entry->set_tooltip_text(_"Adds labels to the current song");
 	$entry->signal_connect(activate => sub
-	 {	my $label= $_[0]->get_text;
-		return unless defined $::SongID & defined $label;
-		$_[0]->set_text('');
-		::SetLabels([$::SongID],[$label],[]);
+	 {	my $entry=shift;
+		my $label= $entry->get_text;
+		my $ID= ::GetSelID($entry);
+		return unless defined $ID & defined $label;
+		$entry->set_text('');
+		::SetLabels([$ID],[$label],[]);
 	 });
 	GMB::ListStore::Field::setcompletion($entry,'label');
 	return $entry;
@@ -1603,7 +1616,7 @@ sub new
 		if ($window)
 		{	if    ($mode eq 'toggle'  && !$window->{quitonclose})	{ $window->close_window; return }
 			elsif ($mode eq 'replace' && !$window->{quitonclose})	{ $window->close_window; }
-			elsif ($mode eq 'present')			 	{ $window->present; return }
+			elsif ($mode eq 'present')			 	{ $window->force_present; return }
 		}
 	}
 
@@ -2950,8 +2963,8 @@ sub new
 	{	$self->{$_}=$opt->{$_} if exists $opt->{$_};
 	}
 
-	my $font= $opt->{font} || $opt->{DefaultFont};
-	$label->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
+	my $font= $opt->{font} && Gtk2::Pango::FontDescription->from_string($opt->{font});
+	$label->modify_font($font) if $font;
 	if (my $color= $opt->{color} || $opt->{DefaultFontColor})
 	{	$label->modify_fg('normal', Gtk2::Gdk::Color->parse($color) );
 	}
@@ -2967,7 +2980,7 @@ sub new
 	if ($minsize && $minsize=~m/^\d+p?$/)
 	{	unless ($minsize=~s/p$//)
 		{	my $lay=$label->create_pango_layout( 'X' x $minsize );
-			$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
+			$lay->set_font_description($font) if $font;
 			($minsize)=$lay->get_pixel_size;
 		}
 		$self->set_size_request($minsize,-1);
@@ -2985,7 +2998,7 @@ sub new
 	elsif (defined $opt->{initsize})
 	{	#$label->set_size_request($label->create_pango_layout( $opt->{initsize} )->get_pixel_size);
 		my $lay=$label->create_pango_layout( $opt->{initsize} );
-		$lay->set_font_description(Gtk2::Pango::FontDescription->from_string($font)) if $font;
+		$lay->set_font_description($font) if $font;
 		$label->set_size_request($lay->get_pixel_size);
 		$self->{resize}=1;
 	}
@@ -3115,7 +3128,17 @@ sub set_markup
 sub update_time
 {	my ($self,$time)=@_;
 	my $markup=$self->{time_markup};
-	$time ||= ::TimeString($self->{remaining});
+	$time= $::PlayTime if !defined $time;
+	if (defined $time)
+	{	my $length= Songs::Get($::SongID,'length');
+		my $format= $length<600? '%01d:%02d' : '%02d:%02d';
+		if ($self->{remaining})
+		{	$format= '-'.$format;
+			$time= $length-$time;
+		}
+		$time= sprintf $format, $time/60, $time%60;
+	}
+	else { $time= $self->{markup_stopped} }
 	if ($markup)
 	{	$markup=~s/%s/$time/;
 	}
@@ -3134,7 +3157,7 @@ sub new
 	{	$self->{text}=$opt->{text};
 		$self->{text_empty}=$opt->{text_empty};
 		$self->set_ellipsize( $opt->{ellipsize}||'end' );
-		my $font= $opt->{font} || $opt->{DefaultFont};
+		my $font= $opt->{font};
 		$self->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
 	}
 	my $orientation= $opt->{vertical} ? 'bottom-to-top' : $opt->{horizontal} ? 'left-to-right' : $opt->{orientation} || 'left-to-right';
@@ -3224,10 +3247,9 @@ sub update_preview_Time
 	my @labels= grep $_->isa('Layout::Label::Time'), values %$h; #get list of Layout::Label::Time widgets in the layouts
 
 	my $preview= defined $value ? 1 : 0;
-	my $format=( $self->{max} <600 )? '%01d:%02d' : '%02d:%02d';
 	for my $label (@labels)
 	{	$label->{busy}=$preview;
-		$label->update_time( sprintf $format,int($value/60),$value%60 ) if $preview;
+		$label->update_time($value) if $preview;
 	}
 }
 
@@ -3778,8 +3800,15 @@ sub new
 	$self->set_policy('automatic','automatic');
 	$self->{table}=Gtk2::Table->new(1,1,::TRUE);
 	$self->add_with_viewport($self->{table});
-	my $field=$self->{field}= $opt->{field} || 'label'; #FIXME check if correct type
-	#::WatchSelID($self,\&update_song,[$field]);
+	my $field= $opt->{field};
+	if (Songs::FieldType($field) ne 'flags')
+	{	warn "LabelToggleButtons : invalid field $field\n";
+		$field= 'label';
+	}
+	$self->{field}= $field;
+	$self->{$_}= $opt->{$_} for qw/hide_unset group/;
+	my $songchange= $self->{hide_unset} ? sub { my $self=shift; $self->{width}=0; $self->update_columns; $self->update_song } : \&update_song;
+	::WatchSelID($self, $songchange, [$field]);
 	::Watch($self,"newgids_$field",\&update_labels);
 	$self->signal_connect( size_allocate => sub { ::IdleDo( "resize_$self",1000, \&update_columns,$_[0] ); });
 	return $self;
@@ -3797,6 +3826,7 @@ sub update_labels
 }
 sub update_columns
 {	my $self=shift;
+	goto &update_labels unless $self->{checks}; #initialization
 	my $width=$self->child->allocation->width;
 	return unless $width;
 	return if $self->{width} && $width == $self->{width};
@@ -3804,11 +3834,17 @@ sub update_columns
 	my $table=$self->{table};
 	$table->remove($_) for $table->get_children;
 	$table->resize(1,1);
-	my $checks=$self->{checks};
-	my $maxwidth=::max( 10,map 4+$_->size_request->width, values %$checks );
+	my @list;
+	if ($self->{hide_unset})
+	{	my $ID= ::GetSelID($self);
+		@list= Songs::Get_list($ID,$self->{field}) if defined $ID;
+	}
+	else { @list= @{Songs::ListAll($self->{field})} }
+	my @shown= grep defined, map $self->{checks}{$_}, @list;
+	my $maxwidth=::max( 10,map 4+$_->size_request->width, @shown );
 	my $maxcol= int( $width / $maxwidth)||1;
 	my $col=my $row=0;
-	for my $widget (grep defined, map $checks->{$_}, @{Songs::ListAll($self->{field})})
+	for my $widget (@shown)
 	{	$table->attach($widget,$col,$col+1,$row,$row+1,['fill','expand'],'shrink',1,1);
 		if (++$col==$maxcol) {$col=0; $row++;}
 	}
@@ -3830,11 +3866,130 @@ sub update_song
 }
 sub toggled_cb
 {	my ($check,$label)=@_;
+	return unless $check->parent;
 	my $self=::find_ancestor($check,__PACKAGE__);
 	return if $self->{busy};
 	my $field= ($check->get_active ? '+' : '-').$self->{field};
 	my $ID= ::GetSelID($self);
 	Songs::Set($ID,$field,[$label]);
+}
+
+package Layout::SongInfo;
+use base 'Gtk2::ScrolledWindow';
+our @default_options= ( markup_cat=>"<u>%s</u>", markup_field=>"<small>%s :</small>", markup_value=>"<small><b>%s</b></small>" );
+sub new
+{	my ($class,$opt)=@_;
+	%$opt=( @default_options, %$opt );
+	my $self= bless Gtk2::ScrolledWindow->new, $class;
+	$self->set_policy('automatic','automatic');
+	$self->{table}=Gtk2::Table->new(1,1,::FALSE);
+	$self->add_with_viewport($self->{table});
+
+	$self->{$_}=$opt->{$_} for qw/group ID markup_cat markup_field markup_value font expander collapsed hide_empty/;
+	if ($opt->{ID}) # for use in SongProperties window
+	{	::Watch($self, SongsChanged=> \&update); #could check which ID changed
+	}
+	else	#use group option to find ID
+	{	::WatchSelID($self, \&update);
+	}
+	$self->{SaveOptions}= \&SaveOptions;
+	::Watch($self,fields_reset=>\&init);
+	$self->init;
+	return $self;
+}
+sub init
+{	my $self=shift;
+	my %collapsed;
+	if ($self->{expander})
+	{	$self->SaveOptions if $self->{cats}; # updates $self->{collapsed}
+		$collapsed{$_}=1 for split / +/, $self->{collapsed}||'';
+	}
+	my $table=$self->{table};
+	$table->remove($_) for $table->get_children;
+	my $labels1=$self->{labels1}={};
+	my $labels2=$self->{labels2}={};
+	my $cats=$self->{cats}={};
+	my @labels;
+	$table->{row}=0;
+	my $treelist=Songs::InfoFields;
+	while (@$treelist)
+	{	my ($cat,$catname,$fields)= splice @$treelist,0,3;
+		#category
+		my $catlabel=Gtk2::Label->new_with_format($self->{markup_cat}, $catname);
+		push @labels, $catlabel;
+		my $table2=$table;
+		if ($self->{expander})
+		{	$table2=Gtk2::Table->new(1,1,::FALSE);
+			$table2->{row}=0;
+			my $expander= Gtk2::Expander->new;
+			$expander->set_label_widget($catlabel);
+			$expander->add($table2);
+			$expander->set_expanded( !$collapsed{$cat} );
+			$catlabel=$expander;
+		}
+		$cats->{$cat}=$catlabel;
+		my $row=$table->{row}++;
+		$table->attach($catlabel,0,1,$row,$row+1,'fill','shrink',1,1);
+		#fields
+		for my $field (@$fields)
+		{	my $lab1=$labels1->{$field}=Gtk2::Label->new_with_format($self->{markup_field}, Songs::FieldName($field));
+			my $lab2=$labels2->{$field}=Gtk2::Label->new;
+			push @labels, $labels1, $labels2;
+			$lab1->set_padding(5,0);
+			$lab1->set_alignment(1,.5);
+			$lab2->set_alignment(0,.5);
+			$lab2->set_line_wrap(1);
+			$lab2->set_selectable(1);
+			my $row=$table2->{row}++;
+			$table2->attach($lab1,0,1,$row,$row+1,'fill','shrink',1,1);
+			$table2->attach($lab2,1,2,$row,$row+1,'fill','shrink',1,1);
+		}
+		$row=$table->{row}++;
+		$table->attach(Gtk2::HBox->new,0,3,$row,$row+1,[],[],0,5) if @$treelist; #space between categories
+	}
+	if (my $font=$self->{font})
+	{	$font= Gtk2::Pango::FontDescription->from_string($font);
+		$_->modify_font($font) for @labels;
+	}
+	if ($self->{expander})
+	{	my $sg= Gtk2::SizeGroup->new('horizontal');
+		$sg->add_widget($_) for values %$labels1;
+	}
+	$table->set_no_show_all(0);
+	$table->show_all;
+	$table->set_no_show_all(1);
+	$self->update;
+}
+sub update
+{	my $self=shift;
+	my $ID= $self->{ID} || ::GetSelID($self);
+	my $labels1= $self->{labels1};
+	my $labels2= $self->{labels2};
+	my $func= defined $ID ? \&Songs::Display : sub {''};
+	my $treelist=Songs::InfoFields;
+	while (@$treelist)
+	{	my ($cat,$catname,$fields)= splice @$treelist,0,3;
+		my $found;
+		for my $field (@$fields)
+		{	my $lab2= $labels2->{$field};
+			next unless $lab2;
+			my $val= $func->($ID,$field);
+			$lab2->set_markup_with_format($self->{markup_value}, $val);
+			if ($self->{hide_empty})
+			{	$_->set_visible($val ne '') for $labels1->{$field},$lab2;
+				$found ||= $val ne '';
+			}
+		}
+		$self->{cats}{$cat}->set_visible($found) if $self->{hide_empty};
+	}
+}
+sub SaveOptions
+{	my $self=shift,
+	my %opt;
+	if (my $cats=$self->{cats})
+	{	$opt{collapsed}= $self->{collapsed}= join ' ', sort grep !$cats->{$_}->get_expanded, keys %$cats;
+	}
+	return %opt;
 }
 
 package GMB::Context;

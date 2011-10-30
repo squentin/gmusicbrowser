@@ -490,8 +490,8 @@ sub add_column
 {	my ($self,$field)=@_;
 	if ($self->{'pfcheck_'.$field})	#if already created -> toggle show/hide
 	{	my @w=( $self->{'pfcheck_'.$field}, @{ $self->{pf_widgets}{$field} } );
-		if ($w[0]->visible)	{ $_->hide for @w; }
-		else			{ $_->show for @w; }
+		my $show= !$w[0]->visible;
+		$_->set_visible($show) for @w;
 		return;
 	}
 	my $table=$self->{perfile_table};
@@ -544,8 +544,8 @@ sub add_column
 sub add_selectfile_column
 {	my $self=$_[0];
 	if (my $l=$self->{'filetoggles'})	#if already created -> toggle show/hide
-	{	if ($l->[0]->visible)	{ $_->hide for @$l; }
-		else			{ $_->show for @$l; }
+	{	my $show= !$l->[0]->visible;
+		$_->set_visible($show) for @$l;
 		return;
 	}
 	my @toggles;
@@ -710,7 +710,7 @@ our $Instance;
 
 sub new
 {	my $ID= $_[0]{IDs}[0];
-	if ($Instance) { $Instance->present; $Instance->{ID}=$ID; $Instance->preview_update; return };
+	if ($Instance) { $Instance->force_present; $Instance->{ID}=$ID; $Instance->preview_update; return };
 	my $self = Gtk2::Dialog->new ("Custom auto-fill filename formats", undef, [],  'gtk-close' => 'none');
 	$Instance=bless $self,__PACKAGE__;
 	::SetWSize($self,'AutofillFormats');
@@ -1154,17 +1154,20 @@ sub new
 	my $self = bless Gtk2::HBox->new(0,0), $class;
 	$self->{field}=$field;
 	$self->{ID}=$ID;
+	my $button= Gtk2::Button->new;
+	my $add= ::NewIconButton('gtk-add');
+	my $entry= $self->{entry}= Gtk2::Entry->new;
 	my $label=$self->{label}=Gtk2::Label->new;
 	$label->set_ellipsize('end');
-	my $button= Gtk2::Button->new;
-	my $entry= Gtk2::Entry->new;
 	$entry->set_width_chars(12);
 	$button->add($label);
 	$self->pack_start($button,1,1,0);
 	$self->pack_start($entry,0,0,0);
+	$self->pack_start($add,0,0,0);
+	$add->signal_connect( button_press_event => sub { add_entry_text_cb($_[0]); $_[0]->grab_focus;1; } );
 	$button->signal_connect( clicked => \&popup_menu_cb);
 	$button->signal_connect( button_press_event => sub { popup_menu_cb($_[0]); $_[0]->grab_focus;1; } );
-	$entry->signal_connect( activate => \&entry_activate_cb );
+	$entry->signal_connect( activate => \&add_entry_text_cb );
 	GMB::ListStore::Field::setcompletion($entry,$field);
 
 	$self->{selected}{$_}=1 for Songs::Get_list($ID,$field);
@@ -1173,15 +1176,16 @@ sub new
 	return $self;
 }
 
-sub entry_activate_cb
-{	my $entry=$_[0];
-	my $self=::find_ancestor($entry,__PACKAGE__);
+sub add_entry_text_cb
+{	my $widget=shift;
+	my $self=::find_ancestor($widget,__PACKAGE__);
+	my $entry=$self->{entry};
 	my $text=$entry->get_text;
-	if ($text eq '') { popup_add_menu($self,$entry); return }
-	#return if $text eq '';
-	$self->{selected}{ $text }=1;
-	$self->update;
+	if ($text eq '') { $self->popup_add_menu($widget); return }
+	# split $text ?
+	$self->{selected}{$text}=1;
 	$entry->set_text('');
+	$self->update;
 }
 
 sub popup_add_menu
@@ -1252,7 +1256,7 @@ sub new
 	$self->{field}=$field;
 	my $sg= Gtk2::SizeGroup->new('horizontal');
 	my $entry= $self->{entry}= Gtk2::Entry->new;
-	my $add= ::NewIconButton('gtk-add', undef, \&add_entry_text_cb);
+	my $add= ::NewIconButton('gtk-add');
 	my $removeall= ::NewIconButton('gtk-clear', _"Remove all", \&clear);
 	$add->signal_connect( button_press_event => sub { add_entry_text_cb($_[0]); $_[0]->grab_focus;1; } );
 	for my $ref (['toadd',1,_"Add"],['toremove',-1,_"Remove"])
@@ -2326,7 +2330,7 @@ sub return_value
 }
 sub edit
 {	my $self=$_[0];
-	if ($self->{dialog}) { $self->{dialog}->present; return }
+	if ($self->{dialog}) { $self->{dialog}->force_present; return }
 	$self->{dialog}=
 	::EditLyricsDialog( $self->get_toplevel, $self->{value},undef, sub
 		{	my $lyrics=shift;
