@@ -141,11 +141,11 @@ sub Quit
 }
 
 dbus_property('CanQuit', 'bool', 'read');
-sub CanQuit {1}
+sub CanQuit {dbus_boolean(1)}
 dbus_property('CanRaise', 'bool', 'read');
-sub CanRaise {1}
+sub CanRaise {dbus_boolean(1)}
 dbus_property('HasTrackList', 'bool', 'read');
-sub HasTrackList {0}
+sub HasTrackList {dbus_boolean(0)}
 dbus_property('Identity', 'string', 'read');
 sub Identity { 'gmusicbrowser' }
 dbus_property('DesktopEntry', 'string', 'read');
@@ -237,11 +237,11 @@ sub LoopStatus
 }
 
 dbus_property('Rate', 'double', 'readwrite', 'org.mpris.MediaPlayer2.Player');
-sub Rate {1}
+sub Rate {dbus_double(1)}
 dbus_property('MinimumRate', 'double', 'read', 'org.mpris.MediaPlayer2.Player');
-sub MinimumRate {1}
+sub MinimumRate {dbus_double(1)}
 dbus_property('MaximumRate', 'double', 'read', 'org.mpris.MediaPlayer2.Player');
-sub MaximumRate {1}
+sub MaximumRate {dbus_double(1)}
 
 dbus_property('Shuffle', 'bool', 'readwrite', 'org.mpris.MediaPlayer2.Player');
 sub Shuffle
@@ -263,7 +263,7 @@ sub Volume
 
 dbus_property('Position', 'int64', 'read', 'org.mpris.MediaPlayer2.Player');
 sub Position
-{	return ($::PlayTime||0) *1_000_000;
+{	return dbus_int64( ($::PlayTime||0) *1_000_000 );
 }
 
 dbus_property('CanGoNext', 'bool', 'read', 'org.mpris.MediaPlayer2.Player');
@@ -287,7 +287,7 @@ sub CanSeek
 {	return dbus_boolean( defined $::SongID ); #will need to check if stream when supported
 }
 dbus_property('CanControl', 'bool', 'read', 'org.mpris.MediaPlayer2.Player');
-sub CanControl {1}
+sub CanControl {dbus_boolean(1)}
 
 # 'org.mpris.MediaPlayer2.Player','Metadata'
 sub GetMetadata_from
