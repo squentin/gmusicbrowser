@@ -369,3 +369,112 @@ hreq=text:h
 width=200
 sort= title:i
 text : text(markup=pesc($title).'\n<small>by <i>'.pesc($artist).'</i>\non <i>'.pesc($album).'</i></small>',pad=2)
+
+
+[Audacious]
+Author = aboettger
+Type = G+
+
+Category = "Make it look like"
+
+Title = %n %t (%m) - gmusicbrowser
+Default = Window(size=480x400)
+
+#SkinPath = gmb-art_skins/audacious_skin
+#Skin = background.png::e
+
+KeyBindings = c-Q Quit \
+    P OpenCustom(Audacious_PLM)
+    S ToggleRandom
+    c-P OpenPref \
+    c-E OpenCustom(Equalizer) \
+    cs-M ShowHideWidget(HBMenubar) \
+    cs-P ShowHideWidget(HBPlaylist) \
+    cs-I ShowHideWidget(HBSonginfo) \
+    cs-S ShowHideWidget(HBStatusbar)
+
+VolumeScroll = HBVolume
+
+VBMain = HBMenubar HBToolbar _HBPlaylist HBSonginfo 3HBStatusbar
+
+    HBSonginfo = 10HBCover \
+            VBSongInfo \
+            10Filler10 \
+            2_VBVisuals
+
+                VBVisuals = 2Filler2 _Visuals(minwidth=200,maxwidth=200) 2Filler3
+
+                VBSongInfo = 3Filler4 \
+                    Title(minsize=0,markup="<big><big><big><big>%t</big></big></big></big>",click1="") \
+                    Artist(minsize=0,markup="%a",click1="") \
+                    Album(minsize=1,markup="%l",click1="")
+
+            HBCover = (maxheight=80,minheight=80,minwidth=80,maxwidth=80) \
+                Cover(default=elementary/no-cover.svg,showcover=0,minsize=100,maxsize=100)
+
+    HBMenubar = _MBMenubar
+            MBMenubar = SMMenu1 SMMenu2 SMMenu3 SMMenu5 SMMenu6 SMMenu7
+                SMMenu1 = (label=_"File") \
+#                    MenuItem11(command=,label=_"Open files") \
+                     MenuItem13(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Files ...") \
+#                    SeparatorMenuItem11 \
+                    MenuItem15(command=OpenPref,label=_"Preferences",icon="gtk-preferences") \
+                    MenuItem16(command=Quit,label=_"Quit",icon="gtk-quit")
+
+                SMMenu2 = (label=_"Playback") \
+                    SeparatorMenuItem21 \
+                    MenuItem26(command=PlayPause,label=_"Play",icon="gtk-media-play") \
+                    MenuItem27(command=Stop,label=_"Stop",icon="gtk-media-stop") \
+                    MenuItem28(command=PrevSong,label=_"Previous",icon="gtk-media-previous") \
+                    MenuItem29(command=NextSong,label=_"Next",icon="gtk-media-next") \
+                    SeparatorMenuItem215 \
+                    MenuItem215(command="OpenSongProp",label=_"Show song details",icon="gtk-properties")
+
+                SMMenu3 = (label=_"Playlist") \
+                    LSortItem \
+                    MenuItem32(command=ToggleRandom,label=_"Random Playback",icon="gmb-random") \
+                    SeparatorMenuItem31 \
+                    MenuItem33(command="RunPerlCode(::IdleCheck)",label=_"Refresh",icon="gtk-refresh") \
+                    MenuItem34(command="RunPerlCode(::IdleScan)",label=_"Rescan",icon="gtk-refresh") \
+                    SeparatorMenuItem32 \
+                    MenuItem39(command="OpenCustom(Audacious_PLM)",label=_"Playlists",icon="gmb-playlist")
+
+                SMMenu5 = (label=_"Output") \
+                    MenuItem51(command=OpenCustom(Equalizer),label=_"Equalizer")
+
+                SMMenu6 = (label=_"View") \
+                    LayoutItem \
+                    SeparatorMenuItem61 \
+                    MenuItem61(togglewidget=HBMenubar,label=_"Show main window") \
+                    MenuItem62(togglewidget=HBPlaylist,label=_"Show playlist",resize="v") \
+                    MenuItem63(togglewidget=HBSonginfo,label=_"Show info panel",resize="") \
+                    MenuItem64(togglewidget=HBStatusbar,label=_"Show status bar",resize="")
+
+                SMMenu7 = (label=_"Help") \
+                    MenuItem71(command="RunPerlCode(::AboutDialog)",label=_"About",icon="gtk-about")
+
+
+
+    HBPlaylist = _SongList(mode=playlist,colwidth="track 20 title 380 playandqueue 20 length 50",cols="track title playandqueue length",sort="artist album disc track")
+
+    HBStatusbar = _Progress(maxheight=10) -Total(mode=filter)
+
+    HBPlaytime = \
+        PlayingTime(markup="%s",initsize="XX:XX",xalign=1) Text(markup="/") Length(markup="$length",initsize="XX:XX",xalign=0)
+#       Text(markup='<b>'.$current.'/%m</b>')
+
+    HBToolbar = HBControls 1HBIndicators _HBTimeBar 5Filler1 HBPlaytime -HBVolume
+
+        HBIndicators = Sort(button=1)
+
+        HBVolume = VolumeIcon(button=1)
+
+        HBTimeBar = _TimeSlider(direct_mode=0)
+
+        HBControls = Play Stop Prev Next
+
+[Audacious_PLM]
+Default = Window(size=400x250)
+VBmain = 5_HBMain
+HBMain = 5_FilterPane4(nb=0,hidebb=0,page=savedtree,pages=savedtree)
+Title = _"Playlists"

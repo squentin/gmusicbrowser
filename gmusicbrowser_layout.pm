@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2010 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2011 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -61,7 +61,7 @@ our %Widgets=
 		activate=> \&::PrevSong,
 		options => 'nbsongs',
 		nbsongs	=> 10,
-		click3	=> sub { ::ChooseSongs(undef,::GetPrevSongs($_[0]{nbsongs})); },
+		click3	=> sub { ::ChooseSongs([::GetPrevSongs($_[0]{nbsongs})]); },
 	},
 	Stop =>
 	{	class	=> 'Layout::Button',
@@ -88,7 +88,7 @@ our %Widgets=
 		activate=> \&::NextSong,
 		options => 'nbsongs',
 		nbsongs	=> 10,
-		click3	=> sub { ::ChooseSongs(undef,::GetNextSongs($_[0]{nbsongs})); },
+		click3	=> sub { ::ChooseSongs([::GetNextSongs($_[0]{nbsongs})]); },
 	},
 	OpenBrowser =>
 	{	class	=> 'Layout::Button',
@@ -233,7 +233,7 @@ our %Widgets=
 	{	class	=> 'Layout::Label',
 		group	=> 'Play',
 		initsize=> ::__("%d song in queue","%d songs in queue",99999), #longest string that will be displayed
-		click1	=> sub { ::ChooseSongs(undef,::GetNeighbourSongs(5)) unless $::RandomMode || @$::Queue; },
+		click1	=> sub { ::ChooseSongs([::GetNeighbourSongs(5)]) unless $::RandomMode || @$::Queue; },
 		update	=> sub  { my $t=(@$::ListPlay==0)	?	'':
 					 @$::Queue		?	::__("%d song in queue","%d songs in queue", scalar @$::Queue):
 					!defined $::Position	?	::__("%d song","%d songs",scalar @$::ListPlay):

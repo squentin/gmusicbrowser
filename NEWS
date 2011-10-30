@@ -1,3 +1,32 @@
+v1.1.8
+finally updated the filter edition and description system to the new fields
+cleaned-up included layouts and added a few contributed ones
+lyrics plugin updates, including option to load/save lyrics in the tag
+update artistinfo plugin, which now features a similar-artist queue mode)
+add albuminfo plugin
+use Gtk2::StatusIcon instead of Gtk2::TrayIcon for the trayicon
+add option to specify mplayer executable (for mplayer2)
+cover finder plugin updates
+make length check for mp3 configurable, and changes to song check progress code
+saving tags and options when not quiting is now done in a fork
+add pre-amp to gstreamer's equalizer
+add -backtrace command line option to show the backtrace of every warning
+Capitalize each word tool : now capitalize after every non-letter rather than any space
+create categories for fields and improve song info dialog
+add style and theme as optional fields
+add ReloadLayouts command and button
+simple search syntax improvements
+add QueueInsertSelected command to insert selected songs at the top of the queue
+FilterPanes: add hscrollbar option to deactivate horizontal scrollbar
+mpris2 plugin : add option to remove gmusicbrowser from the ubuntu sound menu
+export plugin: gmusicbrowser no longer freeze while running custom commands and not using $files
+m4a files : small fix for alac-encoded files so that they get audio info
+simple_http : http header clean-ups and support for gzip-encoded content
+
+translations updates : russian korean german portuguese
+new transation : italian
+(many thanks to the translators)
+
 v1.1.7
 loads of small bug fixes and small new features (see git log for more details)
 some highlights :

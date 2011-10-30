@@ -1,4 +1,4 @@
-# Copyright (C) 2010 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2011 Øystein Tråsdahl
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -29,16 +29,16 @@ use constant
 };
 
 my @showfields =
-(	{short => 'label',	long => 'Label',		active => 1,	multi => 0,	defaultshow => 1},
-	{short => 'rec_date',	long => 'Recording date',	active => 1,	multi => 0,	defaultshow => 1},
-	{short => 'rls_date',	long => 'Release date',		active => 1,	multi => 0,	defaultshow => 1},
-	{short => 'type',	long => 'Recording type',	active => 0,	multi => 0,	defaultshow => 0},
-	{short => 'time',	long => 'Running time',		active => 0,	multi => 0,	defaultshow => 0},
-	{short => 'rating',	long => 'Rating',		active => 1,	multi => 0,	defaultshow => 1},
-	{short => 'genre',	long => 'Genres',		active => 1,	multi => 1,	defaultshow => 0},
-	{short => 'mood',	long => 'Moods',		active => 1,	multi => 1,	defaultshow => 0},
-	{short => 'style',	long => 'Styles',		active => 1,	multi => 1,	defaultshow => 0},
-	{short => 'theme',	long => 'Themes',		active => 1,	multi => 1,	defaultshow => 0},
+(	{short => 'label',	long => _"Record label",	active => 1,	multi => 0,	defaultshow => 1},
+	{short => 'rec_date',	long => _"Recording date",	active => 1,	multi => 0,	defaultshow => 1},
+	{short => 'rls_date',	long => _"Release date",	active => 1,	multi => 0,	defaultshow => 1},
+	{short => 'type',	long => _"Recording type",	active => 0,	multi => 0,	defaultshow => 0},
+	{short => 'time',	long => _"Running time",	active => 0,	multi => 0,	defaultshow => 0},
+	{short => 'rating',	long => _"Rating",		active => 1,	multi => 0,	defaultshow => 1},
+	{short => 'genre',	long => _"Genres",		active => 1,	multi => 1,	defaultshow => 0},
+	{short => 'mood',	long => _"Moods",		active => 1,	multi => 1,	defaultshow => 0},
+	{short => 'style',	long => _"Styles",		active => 1,	multi => 1,	defaultshow => 0},
+	{short => 'theme',	long => _"Themes",		active => 1,	multi => 1,	defaultshow => 0},
 );
 
 ::SetDefaultOptions(OPT, PathFile  	=> "~/.config/gmusicbrowser/review/%a - %l.txt",
@@ -98,7 +98,7 @@ sub prefbox {
 	my $frame_layout = Gtk2::Frame->new(_" Context pane layout ");
 	my @chk_show = ();
 	for my $f (@showfields) {
-		push(@chk_show, ::NewPrefCheckButton(OPT.'Show'.$f->{short} => _"$f->{long}")) if $f->{active};
+		push(@chk_show, ::NewPrefCheckButton(OPT.'Show'.$f->{short} => $f->{long})) if $f->{active};
 	}
 	$frame_layout->add(::Hpack(@chk_show));
 	return ::Vpack($hbox_picsize, $frame_review, $frame_fields, $frame_layout);
@@ -301,7 +301,7 @@ sub print_review {
 
 	for my $f (@showfields) {
 		if ($fields->{$f->{short}} && $::Options{OPT.'Show'.$f->{short}} && $f->{active}) {
-			$buffer->insert_with_tags($iter, _"$f->{long}:  ",$tag_b);
+			$buffer->insert_with_tags($iter, "$f->{long}:  ",$tag_b);
 			if ($f->{multi}) { # genres, moods, styles and themes.
 				my @old = Songs::Get_list(::GetSelID($self), $f->{short});
 				my @amg = @{$fields->{$f->{short}}};
@@ -311,7 +311,8 @@ sub print_review {
 						$buffer->insert($iter, $val);
 					} else { # val doesn't exist in local db => create link to save it.
 						my $tag  = $buffer->create_tag(undef, foreground=>"#4ba3d2", underline=>'single');
-						$tag->{field} = $f->{short}; $tag->{val} = $val; $tag->{tip} = _"Add $val to "._(lc($f->{long}))." for all tracks on this album.";
+						$tag->{field} = $f->{short}; $tag->{val} = $val;
+						$tag->{tip} = ::__x( _"Add {value} to {field} for all tracks on this album.", value=>$val, field=> lc($f->{long}));
 						$buffer->insert_with_tags($iter, $val, $tag);
 					}
 					$buffer->insert($iter,", ") if ++$i < scalar(@amg);
@@ -320,7 +321,8 @@ sub print_review {
 				$fields->{rls_date} =~ m|(\d{4})|;
 				if (defined $1 && $1 != Songs::Get(::GetSelID($self), 'year')) { # AMG year differs from local year => create link to correct.
 					my $tag  = $buffer->create_tag(undef, foreground=>"#4ba3d2", underline=>'single');
-					$tag->{field} = 'year'; $tag->{val} = $1; $tag->{tip} = _"Set $1 as year for all tracks on this album.";
+					$tag->{field} = 'year'; $tag->{val} = $1;
+					$tag->{tip} = ::__x( _"Set {year} as year for all tracks on this album.", year=>$1 );
 					$buffer->insert_with_tags($iter, $fields->{rls_date}, $tag);
 				} else {
 					$buffer->insert($iter,"$fields->{rls_date}");
@@ -335,15 +337,15 @@ sub print_review {
 	}
 
 	if ($fields->{review}) {
-		$buffer->insert_with_tags($iter, _"\nReview\n", $tag_h2);
-		$buffer->insert_with_tags($iter, _"by ".$fields->{author}."\n", $tag_i);
+		$buffer->insert_with_tags($iter, "\n"._("Review")."\n", $tag_h2);
+		$buffer->insert_with_tags($iter, ::__x(_"by {author}", author=>$fields->{author})."\n", $tag_i);
 		$buffer->insert($iter,$fields->{review});
 	} else {
-		$buffer->insert_with_tags($iter,_"\nNo review written.\n",$tag_h2);
+		$buffer->insert_with_tags($iter,"\n"._("No review written.")."\n",$tag_h2);
 	}
 	my $tag_a  = $buffer->create_tag(undef, foreground=>"#4ba3d2", underline=>'single');
 	$tag_a->{url} = $fields->{url}; $tag_a->{tip} = $fields->{url};
-	$buffer->insert_with_tags($iter,_"\n\nLookup at allmusic.com",$tag_a);
+	$buffer->insert_with_tags($iter,"\n\n"._"Lookup at allmusic.com",$tag_a);
 	$buffer->set_modified(0);
 }
 
@@ -463,9 +465,9 @@ sub update_titlebox {
 	$self->{rating} = int($rating+0.5);
 	$self->{ratingrange} = AA::Get("rating:range", 'album',$aID);
 	$self->{playcount}   = AA::Get("playcount:sum",'album',$aID);
-	my $tip = join("\n",	_"Average rating:"	.' '.$self->{rating},
-				_"Rating range:"	.' '.$self->{ratingrange},
-				_"Total playcount:"	.' '.$self->{playcount});
+	my $tip = join("\n",	_("Average rating:")	.' '.$self->{rating},
+				_("Rating range:")	.' '.$self->{ratingrange},
+				_("Total playcount:")	.' '.$self->{playcount});
 	$self->{ratingpic}->set_from_pixbuf(Songs::Stars($self->{rating},'rating'));
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($aID,"<big><b>%a</b></big>","album",1) );
 	$self->{Lstats}->set_markup( AA::ReplaceFields($aID,'%b « %y\n%s, %l',"album",1) );
@@ -611,7 +613,7 @@ sub save_review {
 	}
 	my $format = $::Options{OPT.'PathFile'};
 	my ($path,$file) = ::pathfilefromformat( $ID, $format, undef, 1 );
-	unless ($path && $file) {::ErrorMessage(_"Error: invalid filename pattern"." : $format",$::MainWindow); return}
+	unless ($path && $file) {::ErrorMessage(_("Error: invalid filename pattern")." : $format",$::MainWindow); return}
 	return unless ::CreateDir($path,$::MainWindow) eq 'ok';
 	if ( open(my$fh, '>:utf8', $path.$file) ) {
 		print $fh $text;

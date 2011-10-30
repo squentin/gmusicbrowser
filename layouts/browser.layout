@@ -1,0 +1,45 @@
+[Browser]
+Type=B
+Default		= Window(size=1120x820) HPfp(size=180) HPbig(size=780) VPlistAA(size=645) FilterPane0(page=artist) FilterPane1(page=album)
+VBmain		= HBstatus 5_HPbig
+HBstatus	= SimpleSearch 10MBlist ResetFilter Refresh PlayFilter FilterLock -Total
+MBlist		= HistItem LSortItem PlayItem
+HPbig		= _VPlistAA HPfp
+HPfp		= FilterPane0(nb=1) FilterPane1(nb=2)
+VPlistAA	= _SongList HBAA
+HBAA		= _ArtistBox _AlbumBox
+
+
+[Smaller browser]
+Type=B
+Default		= Window(size=1120x820) HPfp(size=180) HPbig(size=780) VPlistAA(size=645) FilterPane0(page=artist) FilterPane1(page=album)
+VBmain		= HBstatus 5_HPbig
+HBstatus	= SimpleSearch 10MBlist ResetFilter Refresh PlayFilter FilterLock
+MBlist		= HistItem LSortItem PlayItem
+HPbig		= _VPlistAA HPfp
+HPfp		= FilterPane0(nb=1) FilterPane1(nb=2)
+VBleft		= Total _SongList
+VPlistAA	= _VBleft HBAA
+HBAA		= _ArtistBox _AlbumBox
+
+
+[Browser with SongTree] based on Browser
+VPlistAA	= _SongTree HBAA
+
+[3 Filter panes] based on Browser
+Type=B
+Default		= Window(size=1120x820) HPfp1(size=125) HPbig(size=750) HPfp2(size=125) VPlistAA(size=655) FilterPane0(page=savedtree) FilterPane1(page=artist) FilterPane2(page=album)
+HPfp		= _FilterPane0(nb=1) HPfp2
+HPfp2		= _FilterPane1(nb=2) FilterPane2(nb=3)
+
+[left-side filter panes] based on Browser
+Default		= Window(size=1120x820) HPfp(size=180) HPbig(size=360) VPlistAA(size=645) FilterPane0(page=artist) FilterPane1(page=album)
+VBmain		= HBstatus 5_HPbig
+HBstatus	= FilterBox 10MBlist ResetFilter Refresh PlayFilter FilterLock -Total
+MBlist		= HistItem LSortItem PlayItem
+HPbig		= HPfp _VPlistAA
+HPfp		= FilterPane0(nb=1) FilterPane1(nb=2)
+VPlistAA	= _SongList HBAA
+HBAA		= _ArtistBox _AlbumBox
+
+

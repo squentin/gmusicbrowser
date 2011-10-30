@@ -1,0 +1,43 @@
+
+[default fullscreen]
+Type=F
+Window		= fullscreen=1,sticky=0
+HBPics		= _ArtistPic(maxsize=0) _Cover(maxsize=0)
+HBButtons1	= Prev(size=dialog) Next(size=dialog)
+HBButtons2	= Stop(size=dialog) Play(size=dialog)
+VBButtons	= (border=20) _HBButtons1 _HBButtons2
+VBVol		= Vol(size=dialog) _VolumeSlider
+HBLower		= VBButtons _VBText 20VBVol
+HBIndic		= 10Sort(size='large_toolbar') 10Filter(size='large_toolbar') Queue(size='large_toolbar') 10Pos -Stars
+HBTitle		= Filler0 _Title
+HBArtist	= LockArtist(size='large_toolbar') _Artist
+HBAlbum		= LockAlbum(size='large_toolbar') _Album -Year
+HBTime		= Time _TimeBar
+VBmain		= (border=20) _HBPics FBLower
+FBLower		= .1,0,.8,0 HBLower
+VBText		= HBIndic 2HBTitle 2HBArtist 2HBAlbum -HBTime
+VolumeScroll	= VBmain
+HSize0		= Filler0 LockArtist LockAlbum
+DefaultFont	= 20
+KeyBindings	= Escape CloseWindow
+
+[Fullscreen simple]
+Type=F
+Window		= fullscreen=1,sticky=0
+HBPics		= _ArtistPic(maxsize=0) _Cover(maxsize=0)
+HBButtons1	= Prev(size=dialog) Next(size=dialog)
+HBButtons2	= Stop(size=dialog) Play(size=dialog)
+VBButtons	= _HBButtons1 _HBButtons2
+HBLower		= VBButtons _VBText
+HBTitle		= Filler0 _Title
+HBArtist	= LockArtist(size='large_toolbar') _Artist
+HBAlbum		= LockAlbum(size='large_toolbar') _Album -Year
+HBTime		= Time _TimeBar
+VBmain		= (border=20) _HBPics FBLower
+FBLower		= .1,0,.8,0 HBLower
+VBText		= 2HBTitle 2HBArtist 2HBAlbum -HBTime
+VolumeScroll	= VBmain
+HSize0		= Filler0 LockArtist LockAlbum
+DefaultFont	= 20
+KeyBindings	= Escape CloseWindow
+

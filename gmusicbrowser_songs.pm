@@ -546,17 +546,17 @@ our %timespan_menu=
 	},
 	'date.year' =>
 	{	mktime	=> '::mktime(0,0,0,1,0,(localtime(#_#))[5])',
-		gid_to_display => '(#GID# ? ::strftime("%Y",localtime(#GID#)) : _"never")',
+		gid_to_display => '(#GID# ? ::strftime2("%Y",localtime(#GID#)) : _"never")',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".(::mktime(0,0,0,1,0,(localtime(#GID#))[5]+1)-1))',
 	},
 	'date.month' =>
 	{	mktime	=> '::mktime(0,0,0,1,(localtime(#_#))[4,5])',
-		gid_to_display => '(#GID# ? ::strftime("%b %Y",localtime(#GID#)) : _"never")',
+		gid_to_display => '(#GID# ? ::strftime2("%b %Y",localtime(#GID#)) : _"never")',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($m,$y)= (localtime(#GID#))[4,5]; ::mktime(0,0,0,1,$m+1,$y)-1})',
 	},
 	'date.day' =>
 	{	mktime	=> '::mktime(0,0,0,(localtime(#_#))[3,4,5])',
-		gid_to_display => '(#GID# ? ::strftime("%x",localtime(#GID#)) : _"never")',
+		gid_to_display => '(#GID# ? ::strftime2("%x",localtime(#GID#)) : _"never")',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($d,$m,$y)= (localtime(#GID#))[3,4,5]; ::mktime(0,0,0,$d+1,$m,$y)-1})',
 	},
 	boolean	=>
