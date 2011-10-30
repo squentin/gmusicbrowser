@@ -98,13 +98,6 @@ HBmain	= OpenBrowser Pref Play Next 5_ABTitle
 ABTitle = (xalign=0,yscale=0) Title_by(minsize=20)
 VolumeScroll	= HBmain
 
-[full] based on Small player
-Type=T
-Category=
-HBButtons =
-VBmain		= HBIndic _VBText -HBTime
-HBmain		= _VBmain 2Filler1 -Cover(forceratio=1)
-
 [with browser]
 Type=G+
 DefaultFocus	= Play
