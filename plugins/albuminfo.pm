@@ -339,9 +339,10 @@ sub cover_popup {
 	my ($self, $event) = @_;
 	my $menu = Gtk2::Menu->new();
 	$menu->modify_bg('GTK_STATE_NORMAL',Gtk2::Gdk::Color->parse('black')); # black bg for the cover-popup
+	my $picsize = 400;
 	my $ID = ::GetSelID($self);
 	my $aID = Songs::Get_gid($ID,'album');
-	if (my $img = Gtk2::Image->new_from_file(AAPicture::GetPicture('album',$aID))) {
+	if (my $img = AAPicture::newimg(album=>$aID,$picsize)) {
 		my $apic = Gtk2::MenuItem->new();
 		$apic->modify_bg('GTK_STATE_SELECTED',Gtk2::Gdk::Color->parse('black'));
 		$apic->add($img);
