@@ -131,7 +131,7 @@ sub new {
 	$self->{fontsize} = $fontsize->get_size() / Gtk2::Pango->scale;
 
 	# Heading: cover and album info.
-	my $cover = Layout::NewWidget("Cover", {group=>$options->{group}, forceratio=>1, maxsize=>$::Options{OPT.'CoverSize'}, xalign=>0, tip=>_"Click to show fullsize image", 
+	my $cover = Layout::NewWidget("Cover", {group=>$options->{group}, forceratio=>1, maxsize=>$::Options{OPT.'CoverSize'}, xalign=>0, tip=>_"Click to show larger image", 
 		click1=>\&cover_popup, click3=>sub {::PopupAAContextMenu({self=>$_[0], field=>'album', ID=>$::SongID, gid=>Songs::Get_gid($::SongID,'album'), mode=>'P'});} });
 	my $statbox = Gtk2::VBox->new(0,0);
 	for my $name (qw/Ltitle Lstats/) {
@@ -322,9 +322,10 @@ sub cover_popup {
 	my ($self, $event) = @_;
 	my $menu = Gtk2::Menu->new();
 	$menu->modify_bg('GTK_STATE_NORMAL',Gtk2::Gdk::Color->parse('black')); # black bg for the cover-popup
+	my $picsize = 400;
 	my $ID = ::GetSelID($self);
 	my $aID = Songs::Get_gid($ID,'album');
-	if (my $img = Gtk2::Image->new_from_file(AAPicture::GetPicture('album',$aID))) {
+	if (my $img = AAPicture::newimg(album=>$aID,$picsize)) {
 		my $apic = Gtk2::MenuItem->new();
 		$apic->modify_bg('GTK_STATE_SELECTED',Gtk2::Gdk::Color->parse('black'));
 		$apic->add($img);
