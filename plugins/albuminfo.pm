@@ -69,6 +69,7 @@ my @ColumnMenu = # The order here must be the same as the order in @columns
 	{ label => _"Label",	check => sub {return $columns[2]->{col}->get_visible},	code => sub {my $c=$columns[2]->{col}; $c->set_visible(!$c->get_visible)}, },
 	{ label => _"Year",	check => sub {return $columns[3]->{col}->get_visible},	code => sub {my $c=$columns[3]->{col}; $c->set_visible(!$c->get_visible)}, },
 );
+my %savebuttons;
 
 sub Start {
 	Layout::RegisterWidget(PluginAlbuminfo => $albuminfowidget);
@@ -92,7 +93,9 @@ sub prefbox {
 		$t = $t ? ::PangoEsc(_("example : ").$t) : "<i>".::PangoEsc(_"invalid pattern")."</i>";
 		return '<small>'.$t.'</small>';
 	});
-	my $chk_autosave = ::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds"); #, tip=>_"Only works when the review tab is displayed");
+	my $chk_autosave = ::NewPrefCheckButton(OPT.'AutoSave'=>_"Auto-save positive finds", cb=>sub {for my $sb (values %savebuttons) {
+		if ($_[0]->get_active)	{$sb->set_no_show_all(1); $sb->hide} 
+		else 			{$sb->set_no_show_all(0); $sb->parent->show_all}}});
 	$frame_review->add(::Vpack($entry_path,$lbl_preview,$chk_autosave));
 
 	my $frame_fields = Gtk2::Frame->new(_" Fields ");
@@ -148,6 +151,7 @@ sub new {
 	my $refreshbutton = ::NewIconButton('gtk-refresh', undef, sub { song_changed(::find_ancestor($_[0],__PACKAGE__),undef,undef,1); }, "none", _"Refresh");
 	my $savebutton	  = ::NewIconButton('gtk-save', undef, sub 
 		{my $self=::find_ancestor($_[0],__PACKAGE__); save_review(::GetSelID($self),$self->{fields})}, "none", _"Save review");
+	$savebuttons{$self} = $savebutton;
 	my $searchbutton = Gtk2::ToggleButton->new();
 	$searchbutton->set_relief('none');
 	$searchbutton->add(Gtk2::Image->new_from_stock('gtk-find','menu'));
@@ -155,7 +159,8 @@ sub new {
 		if ($_[0]->get_active()) {$self->manual_search()} else {$self->song_changed()}});
 	my $buttonbox = Gtk2::HBox->new();
 	$buttonbox->pack_end($searchbutton,0,0,0);
-	$buttonbox->pack_end($savebutton,0,0,0) unless $::Options{OPT.'AutoSave'};
+	$buttonbox->pack_end($savebutton,0,0,0);
+	$savebutton->set_no_show_all(1) if $::Options{OPT.'AutoSave'};
 	$buttonbox->pack_end($refreshbutton,0,0,0);
 	$statbox->pack_end($buttonbox,0,0,0);
 	my $stateventbox = Gtk2::EventBox->new(); # To catch mouse events
@@ -243,7 +248,7 @@ sub new {
 	$self->pack_start($searchview,1,1,0);
 	$searchview->signal_connect(show => sub {$searchbutton->set_active(1)});
 	$searchview->signal_connect(hide => sub {$searchbutton->set_active(0)});
-	$self->signal_connect(destroy => sub {$_[0]->cancel()});
+	$self->signal_connect(destroy => sub {$_[0]->cancel(); delete $savebuttons{$_[0]}});
 
 	# Save elements that will be needed in other methods.
 	$self->{buffer} = $textview->get_buffer();
