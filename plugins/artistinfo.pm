@@ -68,6 +68,7 @@ my @similarity=
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
 
 ::SetDefaultOptions(OPT,PathFile	=> "~/.config/gmusicbrowser/bio/%a",
+			ArtistPicShow	=> 1,
 			ArtistPicSize	=> 70,
 			SimilarLimit	=> 15,
 			SimilarRating	=> 20,
@@ -108,8 +109,12 @@ sub new
 	my $fontsize=$self->style->font_desc;
 	$self->{fontsize} = $fontsize->get_size / Gtk2::Pango->scale;
 	$self->{artist_esc} = "";
+	my $artistbox = Gtk2::HBox->new(0,0);
 	my $statbox=Gtk2::VBox->new(0,0);
-	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,minsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0,group=>$options->{group},tip=>_"Click to show fullsize image"});
+	if ($::Options{OPT.'ArtistPicShow'} == 1 ) {
+		my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,minsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0,group=>$options->{group},tip=>_"Click to show fullsize image"});
+		$artistbox->pack_start($artistpic,0,1,0);
+	}
 	for my $name (qw/Ltitle Lstats/)
 	{	my $l=Gtk2::Label->new('');
 		$self->{$name}=$l;
@@ -117,15 +122,14 @@ sub new
 		if ($name eq 'Ltitle') { $l->set_line_wrap(1);$l->set_ellipsize('end'); }
 		$statbox->pack_start($l,0,0,2);
 	}
+	
 	$self->{artistrating} = Gtk2::Image->new;
 	$statbox->pack_start($self->{artistrating},0,0,0);
 	my $stateventbox = Gtk2::EventBox->new;
 	$stateventbox->add($statbox);
 	$stateventbox->{group}= $options->{group};
 	$stateventbox->signal_connect(button_press_event => sub {my ($stateventbox, $event) = @_; return 0 unless $event->button == 3; my $ID=::GetSelID($stateventbox); ::ArtistContextMenu( Songs::Get_gid($ID,'artists'),{ ID=>$ID, self=> $stateventbox, mode => 'S'}) if defined $ID; return 1; } ); # FIXME: do a proper cm
-
-	my $artistbox = Gtk2::HBox->new(0,0);
-	$artistbox->pack_start($artistpic,0,1,0);
+	
 	$artistbox->pack_start($stateventbox,1,1,0);
 
 	my $textview=Gtk2::TextView->new;
@@ -259,7 +263,8 @@ sub prefbox
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>50);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
-	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text =>_("Artist Picture Size : %d")._"(applied after restart)");
+	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text =>_("Size : %d")._"(applied after restart)");
+	my $picshow=::NewPrefCheckButton(OPT.'ArtistPicShow' => _"Show", tip=>_"applied after restart", widget => ::Vpack($picsize));
 	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", expand=>1, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'", history=>OPT.'Eventformat_history');
 	my $eventformat_reset=Gtk2::Button->new(_"reset format");
 	$eventformat_reset->{format_combo}=$eventformat;
@@ -274,17 +279,18 @@ sub prefbox
 	my $similar_rating=::NewPrefSpinButton(OPT.'SimilarRating',0,100, step=>1, text1=>_"Limit similar artists to a rate of similarity : ", tip=>_"last.fm's similarity categories:\n>90 super\n>70 very high\n>50 high\n>30 medium\n>10 lower");
 	my $similar_local=::NewPrefCheckButton(OPT.'SimilarLocal' => _"Only show similar artists from local library", tip=>_"applied on reload");
 	my $similar_exclude_seed=::NewPrefCheckButton(OPT.'SimilarExcludeSeed' => _"Exclude 'seed'-artist from queue", tip=>_"The artists similar to the 'seed'-artist will be used to populate the queue, but you can decide to exclude the 'seed'-artist him/herself.");
-	my $lastfm=::NewIconButton('plugin-artistinfo-lastfm',undef,sub { ::main::openurl("http://www.last.fm/music/"); },'none',_"Open last.fm website in your browser");
-	my $titlebox=Gtk2::HBox->new(0,0);
-	$titlebox->pack_start($picsize,1,1,0);
-	$titlebox->pack_start($lastfm,0,0,5);
+#	my $lastfm=::NewIconButton('plugin-artistinfo-lastfm',undef,sub { ::main::openurl("http://www.last.fm/music/"); },'none',_"Open last.fm website in your browser");
+#	my $titlebox=Gtk2::HBox->new(0,0);
+#	$titlebox->pack_start($lastfm,0,0,5);
+	my $frame_pic=Gtk2::Frame->new(_"Artist Picture");
+	$frame_pic->add($picshow);
 	my $frame_bio=Gtk2::Frame->new(_"Biography");
 	$frame_bio->add(::Vpack($entry,$preview,$autosave));
 	my $frame_events=Gtk2::Frame->new(_"Events");
 	$frame_events->add(::Hpack('_',$eventformat,$eventformat_reset));
 	my $frame_similar=Gtk2::Frame->new(_"Similar Artists");
 	$frame_similar->add(::Vpack($similar_limit,$similar_rating,$similar_local,$similar_exclude_seed));
-	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$frame_bio,$frame_events,$frame_similar;
+	$vbox->pack_start($_,::FALSE,::FALSE,5) for $frame_pic,$frame_bio,$frame_events,$frame_similar;
 	return $vbox;
 }
 
@@ -438,19 +444,21 @@ sub ArtistChanged
 	$self->cancel;
 	my $rating = AA::Get("rating:average",'artist',$aID);
 	$self->{artistratingvalue}= int($rating+0.5);
-	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
-	$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);
-	$self->{albumplaycount}=AA::Get("playcount:sum",'album',$albumID);
-	my $tip = join "\n",	_("Average rating:")	.' '.$self->{artistratingvalue},
-				_("Rating range:")	.' '.$self->{artistratingrange},
-				_("Artist playcount:")	.' '.$self->{artistplaycount},
-				_("Album playcount:")	.' '.$self->{albumplaycount};
-
+	if ($::Options{OPT.'ArtistPicShow'} eq "1" ) {
+		$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
+		$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);
+		$self->{albumplaycount}=AA::Get("playcount:sum",'album',$albumID);
+		my $tip = join "\n",	_("Average rating:")	.' '.$self->{artistratingvalue},
+					_("Rating range:")	.' '.$self->{artistratingrange},
+					_("Artist playcount:")	.' '.$self->{artistplaycount},
+					_("Album playcount:")	.' '.$self->{albumplaycount};
+		for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
+	}
 	$self->{artistrating}->set_from_pixbuf(Songs::Stars($self->{artistratingvalue},'rating'));
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($aID,"<big><b>%a</b></big>","artist",1) );
 	$self->{Lstats}->set_markup( AA::ReplaceFields($aID,'%X « %s'."\n<small>%y</small>","artist",1) );
-	for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
-
+	
+	
 	my $url = GetUrl($sites{$self->{site}}[SITEURL],$aID);
 	return unless $url;
 	if (!$self->{url} or $url ne $self->{url} or $force == 1) {
