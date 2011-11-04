@@ -611,7 +611,7 @@ our %timespan_menu=
  },
  title	=>
  {	name	=> _"Title",	width	=> 270,		flags	=> 'fgarwesci',	type => 'istring',
-	id3v1	=> 0,		id3v2	=> 'TIT2',	vorbis	=> 'title',	ape	=> 'Title',	lyrics3	=> 'ETT', ilst => "\xA9nam",
+	id3v1	=> 0,		id3v2	=> 'TIT2',	vorbis	=> 'title',	ape	=> 'Title',	lyrics3v2=> 'ETT', ilst => "\xA9nam",
 	'filter:~' => '#_iname# .=~. m"(?:^|/) *#VAL# *(?:[/\(\[]|$)"',		'filter_prep:~'=> \&Filter::SmartTitleRegEx,
 	'filter_simplify:~' => \&Filter::SmartTitleSimplify,
 	'filterdesc:~'	=> [_"is smart equal to %s", _"is smart equal", 'substring'],
@@ -623,7 +623,7 @@ our %timespan_menu=
  artist =>
  {	name => _"Artist",	width => 200,	flags => 'fgarwesci',
 	type => 'artist',
-	id3v1	=> 1,		id3v2	=> 'TPE1',	vorbis	=> 'artist',	ape	=> 'Artist',	lyrics3	=> 'EAR', ilst => "\xA9ART",
+	id3v1	=> 1,		id3v2	=> 'TPE1',	vorbis	=> 'artist',	ape	=> 'Artist',	lyrics3v2=> 'EAR', ilst => "\xA9ART",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	all_count=> _"All artists",
 	apic_id	=> 8,
@@ -649,7 +649,7 @@ our %timespan_menu=
  },
  album =>
  {	name => _"Album",	width => 200,	flags => 'fgarwesci',	type => 'album',
-	id3v1	=> 2,		id3v2	=> 'TALB',	vorbis	=> 'album',	ape	=> 'Album',	lyrics3	=> 'EAL', ilst => "\xA9alb",
+	id3v1	=> 2,		id3v2	=> 'TALB',	vorbis	=> 'album',	ape	=> 'Album',	lyrics3v2=> 'EAL', ilst => "\xA9alb",
 	depend	=> 'artist album_artist_raw', #because albums with no names get the name : <Unknown> (artist)
 	all_count=> _"All albums",
 	FilterList => {search=>1,drag=>::DRAG_ALBUM},
@@ -818,7 +818,7 @@ our %timespan_menu=
  },
  comment=>
  {	name	=> _"Comment",	width => 200,	flags => 'fgarwesci',		type => 'text',
-	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3	=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
+	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3v2=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
 	edit_order=> 60,	edit_many=>1,	letter => 'C',
 	category=>'basic',
  },

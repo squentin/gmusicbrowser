@@ -74,7 +74,7 @@ sub Read
 				 grep $Songs::Def{$_}{flags}=~m/r/, @Songs::Fields;
 	for my $field (@fields)
 	{	for (my $i=0; $i<$#taglist; $i+=2)
-		{	my $id=$taglist[$i]; #$id is type of tag : id3v1 id3v2 ape vorbis lyrics3 ilst
+		{	my $id=$taglist[$i]; #$id is type of tag : id3v1 id3v2 ape vorbis lyrics3v2 ilst
 			my $tag=$taglist[$i+1];
 			my $value;
 			my $def=$Songs::Def{$field};
