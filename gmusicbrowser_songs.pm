@@ -69,7 +69,7 @@ our %timespan_menu=
 	},
 	virtual =>
 	{	parent	=> 'string',
-#		_	=> '#get#',
+		_	=> '#get#',
 	},
 	special => {},
 	flags	=>
