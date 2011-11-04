@@ -745,7 +745,7 @@ our %timespan_menu=
  disc =>
  {	name	=> _"Disc",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 8,
 	edit_max => 255,	edit_mode=> 'nozero',
-				id3v2	=> 'TPOS',	vorbis	=> 'discnumber',	ape	=> 'discnumber', ilst => "disc",
+				id3v2	=> 'TPOS',	vorbis	=> 'discnumber',	ape	=> 'discnumber', ilst => "disk|disc",
 	editwidth => 4,
 	edit_order=> 40,	edit_many=>1,	letter => 'd',
 	can_group=>1,
