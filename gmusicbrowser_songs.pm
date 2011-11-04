@@ -1043,7 +1043,7 @@ our %timespan_menu=
  title_or_file	=> {get => '(#title->get# eq "" ? #file->display# : #title->get#)',	type=> 'virtual',	flags => 'g', depend => 'file title', letter => 'S',},	#why letter S ? :)
 
  missing	=> { flags => 'gan', type => 'integer', bits => 32, }, #FIXME store it using a 8-bit relative number to $::DAYNB
- missingkey	=> { get => 'join "\\x1D",'.map("#$_->get#",join(',',@MissingKeyFields)), depend => "@MissingKeyFields",	type=> 'virtual', },	#used to check if same song
+ missingkey	=> { get => 'join "\\x1D",'.join(',',map("#$_->get#",@MissingKeyFields)), depend => "@MissingKeyFields",	type=> 'virtual', },	#used to check if same song
 
  shuffle	=> { name => _"Shuffle",	type => 'shuffle',	flags => 's', },
  album_shuffle	=> { name => _"Album shuffle",	type => 'gidshuffle',	flags => 's',	mainfield=>'album'	  },
@@ -1736,6 +1736,11 @@ sub CheckMissing
 {	return undef unless @Missing;
 	my $song=$_[0];
 	#my $key=Get($song,'missingkey');
+
+	#ugly fix, clean-up the fields so they can be comapred to those in library, depends on @MissingKeyFields #FIXME
+	$song->{$_}=~s/\s+$// for qw/title album artist/;
+	$song->{track}= $song->{track}=~m/^(\d+)/ ? $1+0 : 0;
+
 	my $key=join "\x1D", @$song{@MissingKeyFields};
 	$MissingHash||= BuildHash('missingkey',\@Missing,undef,'idlist');
 	my $IDs=$MissingHash->{$key};
@@ -1755,7 +1760,7 @@ sub CheckMissing
 		else { delete $MissingHash->{$key}; }
 		@Missing= grep $oldID != $_, @Missing;
 
-		#Set($oldID,missing=>undef);
+		Songs::Set($oldID,file=>$song->{file},path=>$song->{path}, missing=>0);
 
 		########$songref->[$_]=$Songs[$oldID][$_] for SONG_ADDED,SONG_LASTPLAY,SONG_NBPLAY,SONG_LASTSKIP,SONG_NBSKIP,SONG_RATING,SONG_LABELS,SONG_LENGTH; #SONG_LENGTH is copied to avoid the need to check length for mp3 without VBR header
 		return $oldID;
