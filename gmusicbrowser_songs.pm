@@ -1375,7 +1375,6 @@ sub UpdateFuncs
 				" #check#; if (#diff#) { #set#; push \@changed,'$f'; }\n";
 			$code.=MakeCode($f,$c,ID => '$ID', VAL => "\$val");
 		}
-		#$code.='::SongsChanged([$ID],\@changed) if @changed;';
 		$code.=' return @changed;';
 		$DIFFsub= Compile(Diff =>"sub {$code}");
 	}
@@ -1573,11 +1572,7 @@ sub ReReadFile		#force values :
 		$values->{modif}=$modif2;
 		$values->{length_estimated}||=0 if $estimated;
 		my @changed=$DIFFsub->($ID,$values);
-		return unless @changed;
-		warn "Changed fields : @changed\n" if $::debug;
-		::SongsChanged([$ID],\@changed);
-		my %changed; $changed{$_}=undef for @changed;
-		Changed(\%changed,[$ID]);
+		Changed([$ID],@changed) if @changed;
 	}
 	elsif (!$noremove)	#file not found
 	{	warn "can't find file '$file'\n";
@@ -1613,11 +1608,8 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 		else { $values{$f}=$val }
 	}
 	my ($changed,$towrite)= $SETsub->($IDs,\%values);
+	Changed($IDs,$changed) if %$changed;
 
-	if (keys %$changed)
-	{	Changed($changed,$IDs);
-		warn "has changed : ".join(' ',keys %$changed)."\n" if $::debug;
-	}
 	if (@$towrite)
 	{	my $i=0; my $abort;
 		my $pid= ::Progress( undef, end=>scalar(@$IDs), abortcb=>sub {$abort=1}, widget =>$opt{progress}, title=>_"Writing tags");
@@ -1655,26 +1647,23 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 	}
 }
 
-sub Changed
-{	my $changed=$_[0]; my $IDs=$_[1]; 		warn "Songs::Changed : IDs=@$IDs fields=".join(' ',keys %$changed)."\n" if $::debug;
+sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
+{	my $IDs=shift;
+	my $changed= ref $_[0] ? $_[0] : {map( ($_=>undef), @_ )};
+	warn "Songs::Changed : IDs=@$IDs fields=".join(' ',keys %$changed)."\n" if $::debug;
 	$IDFromFile=undef if $IDFromFile && exists $changed->{file} || exists $changed->{path};
-	AA::Fields_Changed(keys %$changed) if grep $AA::GHash_Depend{$_}, keys %$changed;
 	my @needupdate;
 	for my $f (keys %$changed)
-	{	if (my $l=$Def{$f}{_depended_on_by}) { push @needupdate, split / /,$l; }
+	{	if (my $l=$Def{$f}{_depended_on_by}) { push @needupdate,$_ for split / /,$l; }
 	}
-	@needupdate= grep !exists $changed->{$_} && $UPDATEsub{$_}, @needupdate;
-	warn "Update : @needupdate" if $::debug;
-	$UPDATEsub{$_}->($IDs) for @needupdate;
-	::SongsChanged($IDs,\@needupdate) if @needupdate;
+	for my $f (sort @needupdate)
+	{	next if exists $changed->{$f};
+		$changed->{$f}=undef;
+		if (my $update=$UPDATEsub{$f}) { warn "Updating field : $f\n" if $::debug; $update->($IDs); }
+	}
+	AA::Fields_Changed($changed);
+	::SongsChanged($IDs,[keys %$changed]);
 }
-
-#sub SetMany				#DELME
-#{	my ($IDs,$field,$vals)=@_;
-#	for my $n (0..$#$IDs)
-#	{	Set($IDs->[$n], $field => $vals->[$n]);
-#	}
-#}
 
 sub UpdateTags
 {	my ($IDs,$fields,%opt)=@_;
@@ -1994,11 +1983,11 @@ sub FindID
 
 sub UpdateDefaultRating
 {	my $l=AllFilter('rating:~:255');
-	Changed({'rating'},$l) if @$l;
+	Changed($l,'rating') if @$l;
 }
 sub UpdateArtistsRE
 {	CompileArtistsRE();
-	Songs::Changed({artist=>1}, [FIRSTID..$LastID]);
+	Songs::Changed([FIRSTID..$LastID],'artist');
 }
 sub CompileArtistsRE
 {	my $ref1= $::Options{Artists_split_re} ||= ['\s*&\s*', '\s*;\s*', '\s*,\s+', '\s*/\s*'];
@@ -2756,13 +2745,13 @@ sub CreateHash
 	return $GHash{$field}{$type}=Songs::BuildHash($field,$::Library,undef,$type);
 }
 sub Fields_Changed
-{	my %changed;
-	$changed{$_}=undef for @_;
+{	my $changed=shift; #hashref with changed fields as keys
+	return unless grep $AA::GHash_Depend{$_}, keys %$changed;
 	undef %GHash_Depend;
-	delete $GHash{$_} for keys %changed;
+	delete $GHash{$_} for keys %$changed;
 	for my $field (keys %GHash)
 	{	my @d0=Songs::Depends($field);
-		if (grep exists $changed{$_}, @d0)
+		if (grep exists $changed->{$_}, @d0)
 		{	delete $GHash{$field};
 			next;
 		}
@@ -2770,7 +2759,7 @@ sub Fields_Changed
 		for my $type (keys %$subh)
 		{	my @d;
 			@d=Songs::Depends($type) unless $Songs::GTypes{$type};
-			if (grep exists $changed{$_}, @d) { delete $subh->{$type} }
+			if (grep exists $changed->{$_}, @d) { delete $subh->{$type} }
 			else { $GHash_Depend{$_}++ for @d0,@d; }
 		}
 	}
