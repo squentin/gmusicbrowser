@@ -5412,7 +5412,7 @@ sub new
 	if ($self->{showbb}) { # show queue actions in QueueList if option showbb is set
 		my $qactions = Layout::NewWidget("QueueActions");
 		my $clearb = ::NewIconButton('gtk-clear',"",\&::ClearQueue,"none","Clear Queue");
-		my $shuffleb = ::NewIconButton('gmb-shuffle',"",\&::ShuffleQueue,"none","Shuffle Queue");
+		my $shuffleb = ::NewIconButton('gmb-shuffle',"",sub { $::Queue->Shuffle; },"none","Shuffle Queue");
 		my $bbox = Gtk2::HBox->new(0,0);
 		$bbox->pack_start($qactions,0,0,0);
 		$bbox->pack_end($clearb,0,0,0);
