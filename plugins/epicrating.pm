@@ -1,4 +1,4 @@
-# Copyright (C) 2010      Andrew Clunis <andrew@orospakr.ca>
+# Copyright (C) 2010-2011 Andrew Clunis <andrew@orospakr.ca>
 #                         Daniel Rubin <dan@fracturedproject.net>
 #               2005-2009 Quentin Sculo <squentin@free.fr>
 #
@@ -14,8 +14,8 @@ author  Andrew Clunis <andrew@orospakr.ca>
 author  Daniel Rubin <dan@fracturedproject.net>
 desc    Automatic rating updates on configurable listening behaviour events.
 =cut
-
-# dependencies: Text::CSV, libtext-csv-perl  # dependencies removed by Simon Steinbeiß (commented out export function)
+## dependencies removed by Simon Steinbeiß (commented out export function)
+# removed dependencies: Text::CSV, libtext-csv-perl 
 
 package GMB::Plugin::EPICRATING;
 use strict;
@@ -120,8 +120,9 @@ sub SaveRatingScoresCSV {
 		foreach my $song (@sorted_by_lastplay) {
 		    my $rating_score = $used;
 		    my $rating = ::Songs::Get($song, "rating");
+		    my $final_rating = ($rating * 1.0) + ($rating_score - 0.5);
 		    $used += $step;
-		    print RSF $rating . ", " . $rating_score . "\n";
+		    print RSF $rating . ", " . $final_rating . "\n";
 		    warn "Song: " . ::Songs::Get($song, "title") . " gets ratingscore " . $rating_score;
 		}
 	    } else {
@@ -157,7 +158,7 @@ sub ApplyRulesByName {
 }
 
 sub Played {
-    my ($self, $song_id, $finished, $start_time, $started_at, $play_time) = @_;
+    my ($self, $song_id, $finished, $start_time, $play_time, $play_ratio) = @_;
     if(!$finished) {
 	$self->Skipped($song_id, $play_time);
     } else {
@@ -239,6 +240,7 @@ sub Skipped {
 	    warn "wow, um, I missed a case?";
 	}
     }
+
 }
 
 sub Start {
@@ -365,10 +367,12 @@ sub prefbox {
 	    my $all_songs = Filter->new("")->filter;
 	    for my $song_id (@{$all_songs}) {
 		my $rating = ::Songs::Get($song_id, 'rating');
+		my $artist = ::Songs::Get($song_id, 'artist');
 		my $title = ::Songs::Get($song_id, 'title');
+		my $length = ::Songs::Get($song_id, 'length');
 		my $playcount = ::Songs::Get($song_id, 'playcount');
 		my $skipcount = ::Songs::Get($song_id, 'skipcount');
-		$csv->combine(@{[$song_id, $title, $rating, $playcount, $skipcount]});
+		$csv->combine(@{[$song_id, $artist, $title, $length, $rating, $playcount, $skipcount]});
 		print CSVF $csv->string . "\n";
 	    }
 	    close CSVF;
