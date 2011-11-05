@@ -232,7 +232,7 @@ sub Skipped {
 	} elsif($after_exists) {
 	    # only after
 	    # warn "Evaluated skip rule... only after constraint.";
-	    if($play_time => $after) {
+	    if($play_time >= $after) {
 		$self->ApplyRule($skip_rule, $song_id);
 		return;
 	    }
