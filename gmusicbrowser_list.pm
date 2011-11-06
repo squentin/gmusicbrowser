@@ -1033,7 +1033,7 @@ sub query_tooltip_cb
 
 sub PopupContextMenu
 {	my ($self,$tv,$event)=@_;
-	return unless @{$self->{array}}; #no context menu for empty lists
+	#return unless @{$self->{array}}; #no context menu for empty lists
 	my @IDs=$self->GetSelectedIDs;
 	my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $self->{array});
 	::PopupContextMenu(\@::SongCMenu,\%args );
@@ -6357,9 +6357,8 @@ sub button_press_cb
 	my $self=::find_ancestor($view,__PACKAGE__);
 	my $but=$event->button;
 	my $answer=$self->coord_to_path($event->coords);
-	my $row=$answer->{row};
-	my $depth=$answer->{depth};
-	return 0 unless @{$self->{array}}; #empty list
+	my $row=   $answer && $answer->{row};
+	my $depth= $answer && $answer->{depth};
 	if ((my $ref=$self->{action_rectangles}) && 0) #TESTING
 	{	my $x= $event->x + int($self->{hadj}->value);
 		my $y= $event->y + int($self->{vadj}->value);
@@ -6372,17 +6371,17 @@ sub button_press_cb
 		if ($found) {warn "actions : $_ => $found->{$_}" for keys %$found}
 	}
 	if ($event->type eq '2button-press')
-	{	$self->Activate($but);
+	{	return 0 unless $answer; #empty list
+		$self->Activate($but);
 		return 1;
 	}
 	if ($but==3)
-	{	if (!defined $depth && !vec($self->{selected},$row,1))
+	{	if ($answer && !defined $depth && !vec($self->{selected},$row,1))
 		{	$self->song_selected($event,$row);
 		}
 		my @IDs=$self->GetSelectedIDs;
-		my $list= $self->{array};
-		my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $list);
-		::PopupContextMenu(\@::SongCMenu,\%args ) if @$list;
+		my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $self->{array});
+		::PopupContextMenu(\@::SongCMenu,\%args );
 
 		return 1;
 	}
