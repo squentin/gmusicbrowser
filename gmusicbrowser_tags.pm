@@ -928,7 +928,9 @@ sub new
 	my $sw = Gtk2::ScrolledWindow->new;
 	 $sw->set_shadow_type('etched-in');
 	 $sw->set_policy('automatic','automatic');
-	$sw->add( $self->{textview}=Gtk2::TextView->new );
+	my $textview= $self->{textview}= Gtk2::TextView->new;
+	$textview->set_size_request(100,($textview->create_pango_layout("X")->get_pixel_size)[1]*4); #request 4 lines of height
+	$sw->add($textview);
 	$self->add($sw);
 	my $val;
 	if (ref $IDs)
@@ -1939,7 +1941,9 @@ sub new
 	my $self = bless Gtk2::ScrolledWindow->new, $class;
 	 $self->set_shadow_type('etched-in');
 	 $self->set_policy('automatic','automatic');
-	$self->add( $self->{textview}=Gtk2::TextView->new );
+	my $textview= $self->{textview}= Gtk2::TextView->new;
+	$textview->set_size_request(100,($textview->create_pango_layout("X")->get_pixel_size)[1]*4); #request 4 lines of height
+	$self->add($textview);
 	$self->set_text($init);
 	$self->{init}=$self->get_text;
 	return $self;
@@ -2191,6 +2195,7 @@ sub view
 	$sw->set_policy('never', 'automatic');
 	$sw->add($textview);
 	$dialog->vbox->add($sw);
+	$dialog->set_default_size(100,100);
 	$dialog->show_all;
 	$dialog->signal_connect( response => sub { $_[0]->destroy; });
 }

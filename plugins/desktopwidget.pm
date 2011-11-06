@@ -37,6 +37,7 @@ sub prefbox
 
 	my $store=Gtk2::ListStore->new('Glib::String','Glib::Boolean','Glib::String');
 	$Treeview=Gtk2::TreeView->new($store);
+	$Treeview->set_size_request(100,($Treeview->create_pango_layout("X")->get_pixel_size)[1]*5.5); #request 5.5 lines of height (not counting row spacing)
 	$Treeview->set_headers_visible(::FALSE);
 	my $togglerenderer=Gtk2::CellRendererToggle->new;
 	$togglerenderer->signal_connect(toggled => \&toggled);
