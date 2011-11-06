@@ -61,7 +61,7 @@ my %Sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 		sub { my $no= $_[0]=~m/<div class="noarticletext">/s; $_[0]=~s/^.*<!--\s*start content\s*-->(.*?)<!--\s*end content\s*-->.*$/$1/s && !$no; }],
 	#lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%t&artist=%a',undef,
 	#		sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
-	lyricssongs =>	['lyrics-songs','http://letras.terra.com.br/winamp.php?musica=%t&artista=%a',undef,
+	lyricssongs =>	['lyrics-songs',sub {  ::ReplaceFields($_[0], "http://letras.terra.com.br/winamp.php?musica=%t&artista=%a", sub {::url_escapeall(::superlc($_[0]));})  },undef,
 			sub {	my $l=html_extract($_[0],div=>'letra');
 				$l=~s#<div id="cabecalho">.*?</div>##s if $l; #remove header with title and artist links
 				my $ref=\$_[0];
