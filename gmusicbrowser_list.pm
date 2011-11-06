@@ -740,8 +740,8 @@ INIT
 	},
 	titleaa =>
 	{	menu => _('Title - Artist - Album'), title => _('Song'),
-		value => sub { ::ReplaceFieldsAndEsc($_[2],"<b>%t</b>\n<small><i>%a</i> - %l</small>"); },
-		attrib => 'markup', type => 'Glib::String', depend => 'title artist album',
+		value => sub { ::ReplaceFieldsAndEsc($_[2],"<b>%t</b>%V\n<small><i>%a</i> - %l</small>"); },
+		attrib => 'markup', type => 'Glib::String', depend => 'title version artist album',
 		sort => 'title:i',	noncomp => 'boldrow',		width => 200,
 	},
 	playandqueue =>

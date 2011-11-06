@@ -3126,7 +3126,7 @@ sub ChooseSongsTitle		#Songs with the same title
 	return 0 if @$list<2 || @$list>100;	#probably a problem if it finds >100 matching songs, and making a menu with a huge number of items is slow
 	my @list=grep $_!=$ID,@$list;
 	Songs::SortList(\@list,'artist:i album:i');
-	return ChooseSongs( \@list, markup=> __x( _"by {artist} from {album}", artist => "<b>%a</b>", album => "%l"));
+	return ChooseSongs( \@list, markup=> __x( _"by {artist} from {album}", artist => "<b>%a</b>", album => "%l")."<i>%V</i>"); #FIXME show version in a better way
 }
 
 sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>100-200 ?)
@@ -3150,7 +3150,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		}
 		$list=\@list2;
 	}
-	my $menu = ChooseSongs($list, markup=>'%n %S');
+	my $menu = ChooseSongs($list, markup=>'%n %S<small>%V</small>');
 	$menu->show_all;
 	if (1)
 	{	my $h=$menu->size_request->height;
@@ -3247,7 +3247,7 @@ sub ChooseSongs
 {	my ($IDs,%opt)=@_;
 	my @IDs=@$IDs;
 	return unless @IDs;
-	my $format = $opt{markup} || __x( _"{song} by {artist}", song => "<b>%t</b>", artist => "%a");
+	my $format = $opt{markup} || __x( _"{song} by {artist}", song => "<b>%t</b>%V", artist => "%a");
 	my $menu = Gtk2::Menu->new;
 	my $activate_callback=sub
 	 {	return if $_[0]->get_submenu;

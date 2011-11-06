@@ -59,7 +59,7 @@ title = _"Song"
 hreq=text:h
 width=200
 sort= title:i
-text : text(markup='<b>'.pesc($title).'</b>\n<small><i>'.pesc($artist).'</i> - '.pesc($album).'</small>',pad=2)
+text : text(markup='<b>'.pesc($title).'</b>'.pesc($version_or_empty).'\n<small><i>'.pesc($artist).'</i> - '.pesc($album).'</small>',pad=2)
 
 {Column titleandicon}
 title = _"Title & icon"
@@ -67,7 +67,7 @@ sort = title:i
 width = 200
 songbl= text
 hreq = text:h
-text : text(pad=2,markup=playmarkup(pesc($title)),w=-icolabel:w)
+text : text(pad=2,markup=playmarkup(pesc($title).'<small>'.pesc($version_or_empty).'</small>')),w=-icolabel:w)
 icolabel : icon(pad=2,x=text:w,icon=$labelicons)
 
 {Column albumminipic}
