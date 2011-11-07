@@ -3429,6 +3429,8 @@ sub new
 			$self->set_icon_sensitive('secondary',0);
 			$self->signal_connect(changed => \&UpdateClearButton);
 			$self->signal_connect(icon_press => sub { my ($self,$iconpos)=@_; if ($iconpos eq 'primary') {$self->PopupSelectorMenu} else {$self->ClearFilter} });
+			$self->signal_connect(focus_out_event => \&focus_changed_cb);
+			$self->signal_connect(focus_in_event  => \&focus_changed_cb);
 		}
 		else	# old version => use old hackish entry with icons
 		{	$self= SimpleSearch::old->new($opt);
@@ -3436,7 +3438,7 @@ sub new
 	}
 	$self->{$_}=$opt->{$_} for qw/nb fields group searchfb/,keys %Options,keys %Options2;
 	$self->{SaveOptions}=\&SaveOptions;
-	::WatchFilter($self, $self->{group},sub { $_[0]->set_progress_fraction(0); $_[0]->UpdateClearButton;}) unless $opt->{noselector}; #to update background color and clear button
+	::WatchFilter($self, $self->{group},sub { $_[0]->Update_bg(0); $_[0]->UpdateClearButton;}) unless $opt->{noselector}; #to update background color and clear button
 	return $self;
 }
 
@@ -3462,6 +3464,12 @@ sub UpdateClearButton
 {	my $self=shift;
 	my $on= $self->get_text ne '' || !::GetFilter($self)->is_empty;
 	$self->set_icon_sensitive('secondary',$on);
+}
+sub focus_changed_cb { $_[0]->Update_bg; 0; }
+sub Update_bg
+{	my ($self,$on)=@_;
+	$self->{filtered}=$on if defined $on;
+	$self->set_progress_fraction( !$self->has_focus && $self->{filtered} );  #used to set the background color
 }
 
 sub ChangeOption
@@ -3552,12 +3560,12 @@ sub DoFilter
 	if ($self->{searchfb})
 	{	::HasChanged('SearchText_'.$self->{group},$search); #FIXME
 	}
-	$self->set_progress_fraction( !$filter->is_empty );  #used to set the background color
+	$self->Update_bg( !$filter->is_empty );
 }
 
 sub EntryChanged_cb
 {	my $self=shift;
-	$self->set_progress_fraction(0);
+	$self->Update_bg(0);
 	my $l= length($self->get_text);
 	if ($self->{autofilter})
 	{	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
@@ -3801,8 +3809,8 @@ sub new
 	return $self;
 }
 
-sub set_progress_fraction
-{	$_[0]->{filtered}=$_[1];
+sub Update_bg
+{	$_[0]{filtered}=$_[1];
 	$_[0]->queue_draw;
 }
 sub set_text
