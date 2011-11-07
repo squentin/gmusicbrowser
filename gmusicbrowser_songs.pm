@@ -69,7 +69,7 @@ our %timespan_menu=
 	},
 	virtual =>
 	{	parent	=> 'string',
-#		_	=> '#get#',
+		_	=> '#get#',
 	},
 	special => {},
 	flags	=>
@@ -611,7 +611,7 @@ our %timespan_menu=
  },
  title	=>
  {	name	=> _"Title",	width	=> 270,		flags	=> 'fgarwesci',	type => 'istring',
-	id3v1	=> 0,		id3v2	=> 'TIT2',	vorbis	=> 'title',	ape	=> 'Title',	lyrics3	=> 'ETT', ilst => "\xA9nam",
+	id3v1	=> 0,		id3v2	=> 'TIT2',	vorbis	=> 'title',	ape	=> 'Title',	lyrics3v2=> 'ETT', ilst => "\xA9nam",
 	'filter:~' => '#_iname# .=~. m"(?:^|/) *#VAL# *(?:[/\(\[]|$)"',		'filter_prep:~'=> \&Filter::SmartTitleRegEx,
 	'filter_simplify:~' => \&Filter::SmartTitleSimplify,
 	'filterdesc:~'	=> [_"is smart equal to %s", _"is smart equal", 'substring'],
@@ -623,7 +623,7 @@ our %timespan_menu=
  artist =>
  {	name => _"Artist",	width => 200,	flags => 'fgarwesci',
 	type => 'artist',
-	id3v1	=> 1,		id3v2	=> 'TPE1',	vorbis	=> 'artist',	ape	=> 'Artist',	lyrics3	=> 'EAR', ilst => "\xA9ART",
+	id3v1	=> 1,		id3v2	=> 'TPE1',	vorbis	=> 'artist',	ape	=> 'Artist',	lyrics3v2=> 'EAR', ilst => "\xA9ART",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	all_count=> _"All artists",
 	apic_id	=> 8,
@@ -649,7 +649,7 @@ our %timespan_menu=
  },
  album =>
  {	name => _"Album",	width => 200,	flags => 'fgarwesci',	type => 'album',
-	id3v1	=> 2,		id3v2	=> 'TALB',	vorbis	=> 'album',	ape	=> 'Album',	lyrics3	=> 'EAL', ilst => "\xA9alb",
+	id3v1	=> 2,		id3v2	=> 'TALB',	vorbis	=> 'album',	ape	=> 'Album',	lyrics3v2=> 'EAL', ilst => "\xA9alb",
 	depend	=> 'artist album_artist_raw', #because albums with no names get the name : <Unknown> (artist)
 	all_count=> _"All albums",
 	FilterList => {search=>1,drag=>::DRAG_ALBUM},
@@ -818,7 +818,7 @@ our %timespan_menu=
  },
  comment=>
  {	name	=> _"Comment",	width => 200,	flags => 'fgarwesci',		type => 'text',
-	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3	=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
+	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3v2=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
 	edit_order=> 60,	edit_many=>1,	letter => 'C',
 	category=>'basic',
  },
@@ -1043,7 +1043,7 @@ our %timespan_menu=
  title_or_file	=> {get => '(#title->get# eq "" ? #file->display# : #title->get#)',	type=> 'virtual',	flags => 'g', depend => 'file title', letter => 'S',},	#why letter S ? :)
 
  missing	=> { flags => 'gan', type => 'integer', bits => 32, }, #FIXME store it using a 8-bit relative number to $::DAYNB
- missingkey	=> { get => 'join "\\x1D",'.map("#$_->get#",join(',',@MissingKeyFields)), depend => "@MissingKeyFields",	type=> 'virtual', },	#used to check if same song
+ missingkey	=> { get => 'join "\\x1D",'.join(',',map("#$_->get#",@MissingKeyFields)), depend => "@MissingKeyFields",	type=> 'virtual', },	#used to check if same song
 
  shuffle	=> { name => _"Shuffle",	type => 'shuffle',	flags => 's', },
  album_shuffle	=> { name => _"Album shuffle",	type => 'gidshuffle',	flags => 's',	mainfield=>'album'	  },
@@ -1375,7 +1375,6 @@ sub UpdateFuncs
 				" #check#; if (#diff#) { #set#; push \@changed,'$f'; }\n";
 			$code.=MakeCode($f,$c,ID => '$ID', VAL => "\$val");
 		}
-		#$code.='::SongsChanged([$ID],\@changed) if @changed;';
 		$code.=' return @changed;';
 		$DIFFsub= Compile(Diff =>"sub {$code}");
 	}
@@ -1573,11 +1572,7 @@ sub ReReadFile		#force values :
 		$values->{modif}=$modif2;
 		$values->{length_estimated}||=0 if $estimated;
 		my @changed=$DIFFsub->($ID,$values);
-		return unless @changed;
-		warn "Changed fields : @changed\n" if $::debug;
-		::SongsChanged([$ID],\@changed);
-		my %changed; $changed{$_}=undef for @changed;
-		Changed(\%changed,[$ID]);
+		Changed([$ID],@changed) if @changed;
 	}
 	elsif (!$noremove)	#file not found
 	{	warn "can't find file '$file'\n";
@@ -1613,11 +1608,8 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 		else { $values{$f}=$val }
 	}
 	my ($changed,$towrite)= $SETsub->($IDs,\%values);
+	Changed($IDs,$changed) if %$changed;
 
-	if (keys %$changed)
-	{	Changed($changed,$IDs);
-		warn "has changed : ".join(' ',keys %$changed)."\n" if $::debug;
-	}
 	if (@$towrite)
 	{	my $i=0; my $abort;
 		my $pid= ::Progress( undef, end=>scalar(@$IDs), abortcb=>sub {$abort=1}, widget =>$opt{progress}, title=>_"Writing tags");
@@ -1655,26 +1647,23 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 	}
 }
 
-sub Changed
-{	my $changed=$_[0]; my $IDs=$_[1]; 		warn "Songs::Changed : IDs=@$IDs fields=".join(' ',keys %$changed)."\n" if $::debug;
+sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
+{	my $IDs=shift;
+	my $changed= ref $_[0] ? $_[0] : {map( ($_=>undef), @_ )};
+	warn "Songs::Changed : IDs=@$IDs fields=".join(' ',keys %$changed)."\n" if $::debug;
 	$IDFromFile=undef if $IDFromFile && exists $changed->{file} || exists $changed->{path};
-	AA::Fields_Changed(keys %$changed) if grep $AA::GHash_Depend{$_}, keys %$changed;
 	my @needupdate;
 	for my $f (keys %$changed)
-	{	if (my $l=$Def{$f}{_depended_on_by}) { push @needupdate, split / /,$l; }
+	{	if (my $l=$Def{$f}{_depended_on_by}) { push @needupdate,$_ for split / /,$l; }
 	}
-	@needupdate= grep !exists $changed->{$_} && $UPDATEsub{$_}, @needupdate;
-	warn "Update : @needupdate" if $::debug;
-	$UPDATEsub{$_}->($IDs) for @needupdate;
-	::SongsChanged($IDs,\@needupdate) if @needupdate;
+	for my $f (sort @needupdate)
+	{	next if exists $changed->{$f};
+		$changed->{$f}=undef;
+		if (my $update=$UPDATEsub{$f}) { warn "Updating field : $f\n" if $::debug; $update->($IDs); }
+	}
+	AA::Fields_Changed($changed);
+	::SongsChanged($IDs,[keys %$changed]);
 }
-
-#sub SetMany				#DELME
-#{	my ($IDs,$field,$vals)=@_;
-#	for my $n (0..$#$IDs)
-#	{	Set($IDs->[$n], $field => $vals->[$n]);
-#	}
-#}
 
 sub UpdateTags
 {	my ($IDs,$fields,%opt)=@_;
@@ -1736,6 +1725,11 @@ sub CheckMissing
 {	return undef unless @Missing;
 	my $song=$_[0];
 	#my $key=Get($song,'missingkey');
+
+	#ugly fix, clean-up the fields so they can be comapred to those in library, depends on @MissingKeyFields #FIXME
+	$song->{$_}=~s/\s+$// for qw/title album artist/;
+	$song->{track}= $song->{track}=~m/^(\d+)/ ? $1+0 : 0;
+
 	my $key=join "\x1D", @$song{@MissingKeyFields};
 	$MissingHash||= BuildHash('missingkey',\@Missing,undef,'idlist');
 	my $IDs=$MissingHash->{$key};
@@ -1755,7 +1749,7 @@ sub CheckMissing
 		else { delete $MissingHash->{$key}; }
 		@Missing= grep $oldID != $_, @Missing;
 
-		#Set($oldID,missing=>undef);
+		Songs::Set($oldID,file=>$song->{file},path=>$song->{path}, missing=>0);
 
 		########$songref->[$_]=$Songs[$oldID][$_] for SONG_ADDED,SONG_LASTPLAY,SONG_NBPLAY,SONG_LASTSKIP,SONG_NBSKIP,SONG_RATING,SONG_LABELS,SONG_LENGTH; #SONG_LENGTH is copied to avoid the need to check length for mp3 without VBR header
 		return $oldID;
@@ -1989,11 +1983,11 @@ sub FindID
 
 sub UpdateDefaultRating
 {	my $l=AllFilter('rating:~:255');
-	Changed({'rating'},$l) if @$l;
+	Changed($l,'rating') if @$l;
 }
 sub UpdateArtistsRE
 {	CompileArtistsRE();
-	Songs::Changed({artist=>1}, [FIRSTID..$LastID]);
+	Songs::Changed([FIRSTID..$LastID],'artist');
 }
 sub CompileArtistsRE
 {	my $ref1= $::Options{Artists_split_re} ||= ['\s*&\s*', '\s*;\s*', '\s*,\s+', '\s*/\s*'];
@@ -2751,13 +2745,13 @@ sub CreateHash
 	return $GHash{$field}{$type}=Songs::BuildHash($field,$::Library,undef,$type);
 }
 sub Fields_Changed
-{	my %changed;
-	$changed{$_}=undef for @_;
+{	my $changed=shift; #hashref with changed fields as keys
+	return unless grep $AA::GHash_Depend{$_}, keys %$changed;
 	undef %GHash_Depend;
-	delete $GHash{$_} for keys %changed;
+	delete $GHash{$_} for keys %$changed;
 	for my $field (keys %GHash)
 	{	my @d0=Songs::Depends($field);
-		if (grep exists $changed{$_}, @d0)
+		if (grep exists $changed->{$_}, @d0)
 		{	delete $GHash{$field};
 			next;
 		}
@@ -2765,7 +2759,7 @@ sub Fields_Changed
 		for my $type (keys %$subh)
 		{	my @d;
 			@d=Songs::Depends($type) unless $Songs::GTypes{$type};
-			if (grep exists $changed{$_}, @d) { delete $subh->{$type} }
+			if (grep exists $changed->{$_}, @d) { delete $subh->{$type} }
 			else { $GHash_Depend{$_}++ for @d0,@d; }
 		}
 	}

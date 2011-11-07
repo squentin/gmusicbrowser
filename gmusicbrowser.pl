@@ -1937,6 +1937,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		my $filter= Filter->newadd(TRUE,'missing:e:0', $mfilter);
 		$Library=[];	#dummy array to avoid a warning when filtering in the next line
 		$Library= SongArray->new( $filter->filter_all );
+		Songs::AddMissing( Songs::AllFilter('missing:-e:0') );
 	}
 
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};
@@ -2023,7 +2024,7 @@ sub SaveTags	#save tags _and_ settings
 
 	my ($savesub,$fields,$extrasub,$extra_subfields)=Songs::MakeSaveSub();
 	print $fh "[Songs]\n".join("\t",@$fields)."\n"  or $error||=$!;
-	for my $ID (@{ Songs::AllFilter('missing:<:'.($tooold||1)) })
+	for my $ID (@{ Songs::AllFilter('missing:-b:1 '.($tooold||1)) })
 	{	my @vals=$savesub->($ID);
 		s#([\x00-\x1F\\])#sprintf "\\x%02x",ord $1#eg for @vals;
 		my $line= join "\t", $ID, @vals;
