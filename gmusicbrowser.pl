@@ -4664,8 +4664,8 @@ sub LabelEditMenu
 	 for values %$hash;
 	my $menusub_toggled=sub
 	 {	my $f=$_[1];
-		if ($_[0]->get_active)	{ SetLabels($IDs,[$f],undef); }
-		else			{ SetLabels($IDs,undef,[$f]); }
+		if ($_[0]->get_active)	{ Songs::Set($IDs,"+$field",$f); }
+		else			{ Songs::Set($IDs,"-$field",$f); }
 	 };
 	MakeFlagMenu($field,$menusub_toggled,$hash);
 }
@@ -4797,7 +4797,10 @@ sub EditLabels
 			if ($check->get_active) { push @toadd,$label }
 			else			{ push @toremove,$label }
 		}
-		SetLabels(\@IDs,\@toadd,\@toremove);
+		my @args;
+		push @args,"+label",\@toadd if @toadd;
+		push @args,"-label",\@toremove if @toremove;
+		Songs::Set(\@IDs,@args);
 	};
 	return $vbox;
 }
@@ -6182,14 +6185,6 @@ sub PrefLibrary_update_checklength_button
 	return $button->{timeout}=0;
 }
 
-sub SetLabels	#FIXME move to Songs::
-{	my ($IDs,$toadd,$torm)=@_;
-	my @args;
-	push @args,'+label',$toadd if $toadd && @$toadd;
-	push @args,'-label',$torm if $torm  && @$torm;
-	Songs::Set($IDs,@args);
-}
-
 sub RemoveLabel		#FIXME ? label specific
 {	my ($field,$gid)=@_;
 	my $label= Songs::Gid_to_Display($field,$gid);
@@ -6206,7 +6201,7 @@ sub RemoveLabel		#FIXME ? label specific
 		$dialog->show_all;
 		if ($dialog->run ne 'ok') {$dialog->destroy;return;}
 		$dialog->destroy;
-		SetLabels($IDlist,undef,[$label]);
+		Songs::Set($IDlist,'-label',$label);
 	}
 	@{$Options{Labels}}= grep $_ ne $label, @{$Options{Labels}};
 }
@@ -6229,7 +6224,7 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 		#FIXME maybe should rename the icon file if it exist
 		return unless $nb;
 		my $l= Songs::AllFilter( 'label:~:'.$old );
-		SetLabels($l,[$new],[$old]);
+		Songs::Set($l,'+label',$new,'-label',$old);
 	    });
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
 		( '',Gtk2::CellRendererPixbuf->new,'stock-id',2)
@@ -6280,7 +6275,7 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 				$dialog->show_all;
 				if ($dialog->run ne 'ok') {$dialog->destroy;return;}
 				my $l= Songs::AllFilter( 'label:~:'.$label );
-				SetLabels($l,undef,[$label]);
+				Songs::Set($l,'-label',$label);
 				$dialog->destroy;
 			}
 			$store->remove($iter);

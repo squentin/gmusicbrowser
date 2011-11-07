@@ -1544,7 +1544,7 @@ sub AddLabelEntry	#create entry to add a label to the current song
 		my $ID= ::GetSelID($entry);
 		return unless defined $ID & defined $label;
 		$entry->set_text('');
-		::SetLabels([$ID],[$label],[]);
+		Songs::Set($ID,"+label",$label);
 	 });
 	GMB::ListStore::Field::setcompletion($entry,'label');
 	return $entry;
