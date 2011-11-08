@@ -662,7 +662,7 @@ sub ExtractNameAndOptions
 sub ParseOptions
 {	local $_=$_[0]; #warn "$_\n";
 	my %opt;
-	while (m#\G\s*([^= ]+)=#gc)
+	while (m#\G\s*([^= ]+)=\s*#gc)
 	{	my $key=$1;
 		if (m#\G(["'])#gc) #quotted
 		{	my $q= $1 ;
