@@ -552,12 +552,7 @@ sub Gtk2::Label::set_markup_with_format
 }
 sub Gtk2::Window::force_present #force bringing the window to the current workspace, $win->present does not always do that
 {	my $win=shift;
-	$win->iconify; $win->deiconify;
-	$win->present;
-}
-sub Gtk2::Dialog::force_present # for dialog use stick/unstick instead of iconify/deiconify
-{	my $win=shift;
-	$win->stick; $win->unstick;
+	unless ($win->window && ($win->window->get_state >= 'sticky')) { $win->stick; $win->unstick; }
 	$win->present;
 }
 sub IncSuffix	# increment a number suffix from a string
