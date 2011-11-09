@@ -2907,7 +2907,7 @@ sub new
 			my ($name,$rowtype)=$store->get_value( $store->get_iter($path) );
 			if ($type == ::DRAG_ID)
 			{	if ($rowtype eq 'slist')
-				{	$::Options{SavedLists}{$name}->Push(@data);
+				{	$::Options{SavedLists}{$name}->Push(\@data);
 				}
 				else
 				{	$self->CreateNewFL('L',\@data);
