@@ -3125,7 +3125,10 @@ sub update_time
 		}
 		$time= sprintf $format, $time/60, $time%60;
 	}
-	else { $time= $self->{markup_stopped} }
+	else
+	{	$time= $self->{markup_stopped};
+		return unless defined $time; # update_time() can be called before $self->{markup_stopped} is set, ignore
+	}
 	if ($markup)
 	{	$markup=~s/%s/$time/;
 	}
