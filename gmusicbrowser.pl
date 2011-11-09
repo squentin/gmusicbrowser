@@ -6955,11 +6955,6 @@ sub windowpos	# function to position window next to clicked widget ($event can b
 	return $x,$y;
 }
 
-#sub UpdateTrayTip #not used
-#{	my ($song,$artist,$album)=Songs::Display($SongID,qw/title artist album/);
-	#$_[0]->set_tooltip_text( __x( _"{song}\nby {artist}\nfrom {album}", song => $song, artist => $artist, album => $album) );
-#}
-
 sub IsWindowVisible
 {	my $win=shift;
 	my $visible=!$win->{iconified};
