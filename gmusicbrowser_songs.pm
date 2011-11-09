@@ -3093,7 +3093,7 @@ sub Replace
 	$newlist= SongArray->new_copy($newlist);
 	$::Position=undef;  $::ChangedPos=1;
 	my $ID=$::SongID;
-	$ID=undef if defined $ID && !$newlist->IsIn($ID);
+	$ID=undef if defined $ID && $::Options{AlwaysInPlaylist} && !$newlist->IsIn($ID);
 	if (!defined $ID)
 	{	$ID= $self->_FindFirst($newlist);
 	}
@@ -3129,7 +3129,7 @@ sub Remove
 	$self->_staticfy unless $fromlibrary;	#do not staticfy list for songs removed from library
 	$self->SUPER::Remove($rows);
 	$::Options{LastPlayFilter}=$::ListMode=SongArray->new_copy($self)  unless $fromlibrary;
-	if (@$self==0 && $::Options{AlwaysInPlaylist}) { $::Position=$::SongID=undef; _updateID(undef); return; }
+	if (@$self==0 && $::Options{AlwaysInPlaylist}) { $::Position=undef; _updateID(undef); return; }
 	if ($::RandomMode)
 	{	$::RandomMode->RmIDs;
 		$self->Next if defined $::SongID && $::Options{AlwaysInPlaylist} && !$self->IsIn($::SongID); #skip to next song if current not in playlist
@@ -3345,6 +3345,7 @@ sub SetID
 #private functions
 sub _updateID
 {	my $ID=shift;
+	::Stop() unless defined $ID;
 	$::ChangedID=1 if !defined $::SongID || !defined $ID || $ID!=$::SongID;
 	$::SongID=$ID;
 	::UpdateCurrentSong();
