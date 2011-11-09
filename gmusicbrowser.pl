@@ -4507,7 +4507,7 @@ sub DialogMassRename
 	$treeview1->get_selection->signal_connect(changed => $syncsel,$treeview2);
 	$treeview2->get_selection->signal_connect(changed => $syncsel,$treeview1);
 
-	$store->set( $store->append,0, $_ ) for @IDs;
+	$store->set( $store->prepend,0, $_ ) for reverse @IDs; # prepend because filling is a bit faster in reverse
 
 	my $refresh=sub { $treeview2->queue_draw; };
 	$combo->signal_connect(changed => $refresh);

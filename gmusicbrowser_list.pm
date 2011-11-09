@@ -2451,8 +2451,9 @@ sub Fill
 		my ($list)=$self->get_fill_data($opt);
 		$renderer->set('all_count', $self->{all_count});
 		$self->{array_offset}= $self->{noall} ? 0 : 1;	#row number difference between store and $list, needed by interactive search
-		$store->set($store->append(undef),0,GID_ALL) unless $self->{noall};
-		$store->set($store->append(undef),0,$_) for @$list;
+		$store->set($store->prepend(undef),0,$_) for reverse @$list;	# prepend because filling is a bit faster in reverse
+		$store->set($store->prepend(undef),0,GID_ALL) unless $self->{noall};
+
 		if ($self->{field}[1]) # add a chidren to every row
 		{	my $first=$store->get_iter_first;
 			$first=$store->iter_next($first) if $first && $store->get($first,0)==GID_ALL; #skip "all" row
