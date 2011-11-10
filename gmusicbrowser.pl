@@ -552,12 +552,7 @@ sub Gtk2::Label::set_markup_with_format
 }
 sub Gtk2::Window::force_present #force bringing the window to the current workspace, $win->present does not always do that
 {	my $win=shift;
-	$win->iconify; $win->deiconify;
-	$win->present;
-}
-sub Gtk2::Dialog::force_present # for dialog use stick/unstick instead of iconify/deiconify
-{	my $win=shift;
-	$win->stick; $win->unstick;
+	unless ($win->window && ($win->window->get_state >= 'sticky')) { $win->stick; $win->unstick; }
 	$win->present;
 }
 sub IncSuffix	# increment a number suffix from a string
@@ -662,7 +657,7 @@ sub ExtractNameAndOptions
 sub ParseOptions
 {	local $_=$_[0]; #warn "$_\n";
 	my %opt;
-	while (m#\G\s*([^= ]+)=#gc)
+	while (m#\G\s*([^= ]+)=\s*#gc)
 	{	my $key=$1;
 		if (m#\G(["'])#gc) #quotted
 		{	my $q= $1 ;
@@ -3135,7 +3130,7 @@ sub ChooseSongsTitle		#Songs with the same title
 	return 0 if @$list<2 || @$list>100;	#probably a problem if it finds >100 matching songs, and making a menu with a huge number of items is slow
 	my @list=grep $_!=$ID,@$list;
 	Songs::SortList(\@list,'artist:i album:i');
-	return ChooseSongs( \@list, markup=> __x( _"by {artist} from {album}", artist => "<b>%a</b>", album => "%l"));
+	return ChooseSongs( \@list, markup=> __x( _"by {artist} from {album}", artist => "<b>%a</b>", album => "%l")."<i>%V</i>"); #FIXME show version in a better way
 }
 
 sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>100-200 ?)
@@ -3159,7 +3154,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		}
 		$list=\@list2;
 	}
-	my $menu = ChooseSongs($list, markup=>'%n %S');
+	my $menu = ChooseSongs($list, markup=>'%n %S<small>%V</small>');
 	$menu->show_all;
 	if ($showcover)
 	{	my $h=$menu->size_request->height;
@@ -3214,7 +3209,7 @@ sub ChooseSongs
 {	my ($IDs,%opt)=@_;
 	my @IDs=@$IDs;
 	return unless @IDs;
-	my $format = $opt{markup} || __x( _"{song} by {artist}", song => "<b>%t</b>", artist => "%a");
+	my $format = $opt{markup} || __x( _"{song} by {artist}", song => "<b>%t</b>%V", artist => "%a");
 	my $menu = Gtk2::Menu->new;
 	my $activate_callback=sub
 	 {	return if $_[0]->get_submenu;
@@ -4474,7 +4469,7 @@ sub DialogMassRename
 	$treeview1->get_selection->signal_connect(changed => $syncsel,$treeview2);
 	$treeview2->get_selection->signal_connect(changed => $syncsel,$treeview1);
 
-	$store->set( $store->append,0, $_ ) for @IDs;
+	$store->set( $store->prepend,0, $_ ) for reverse @IDs; # prepend because filling is a bit faster in reverse
 
 	my $refresh=sub { $treeview2->queue_draw; };
 	$combo->signal_connect(changed => $refresh);
@@ -4631,8 +4626,8 @@ sub LabelEditMenu
 	 for values %$hash;
 	my $menusub_toggled=sub
 	 {	my $f=$_[1];
-		if ($_[0]->get_active)	{ SetLabels($IDs,[$f],undef); }
-		else			{ SetLabels($IDs,undef,[$f]); }
+		if ($_[0]->get_active)	{ Songs::Set($IDs,"+$field",$f); }
+		else			{ Songs::Set($IDs,"-$field",$f); }
 	 };
 	MakeFlagMenu($field,$menusub_toggled,$hash);
 }
@@ -4764,7 +4759,10 @@ sub EditLabels
 			if ($check->get_active) { push @toadd,$label }
 			else			{ push @toremove,$label }
 		}
-		SetLabels(\@IDs,\@toadd,\@toremove);
+		my @args;
+		push @args,"+label",\@toadd if @toadd;
+		push @args,"-label",\@toremove if @toremove;
+		Songs::Set(\@IDs,@args);
 	};
 	return $vbox;
 }
@@ -6149,14 +6147,6 @@ sub PrefLibrary_update_checklength_button
 	return $button->{timeout}=0;
 }
 
-sub SetLabels	#FIXME move to Songs::
-{	my ($IDs,$toadd,$torm)=@_;
-	my @args;
-	push @args,'+label',$toadd if $toadd && @$toadd;
-	push @args,'-label',$torm if $torm  && @$torm;
-	Songs::Set($IDs,@args);
-}
-
 sub RemoveLabel		#FIXME ? label specific
 {	my ($field,$gid)=@_;
 	my $label= Songs::Gid_to_Display($field,$gid);
@@ -6173,7 +6163,7 @@ sub RemoveLabel		#FIXME ? label specific
 		$dialog->show_all;
 		if ($dialog->run ne 'ok') {$dialog->destroy;return;}
 		$dialog->destroy;
-		SetLabels($IDlist,undef,[$label]);
+		Songs::Set($IDlist,'-label',$label);
 	}
 	@{$Options{Labels}}= grep $_ ne $label, @{$Options{Labels}};
 }
@@ -6196,7 +6186,7 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 		#FIXME maybe should rename the icon file if it exist
 		return unless $nb;
 		my $l= Songs::AllFilter( 'label:~:'.$old );
-		SetLabels($l,[$new],[$old]);
+		Songs::Set($l,'+label',$new,'-label',$old);
 	    });
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
 		( '',Gtk2::CellRendererPixbuf->new,'stock-id',2)
@@ -6247,7 +6237,7 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 				$dialog->show_all;
 				if ($dialog->run ne 'ok') {$dialog->destroy;return;}
 				my $l= Songs::AllFilter( 'label:~:'.$label );
-				SetLabels($l,undef,[$label]);
+				Songs::Set($l,'-label',$label);
 				$dialog->destroy;
 			}
 			$store->remove($iter);
@@ -6931,11 +6921,6 @@ sub windowpos	# function to position window next to clicked widget ($event can b
 	else				{ $y+=$dy; }				# display below the widget
 	return $x,$y;
 }
-
-#sub UpdateTrayTip #not used
-#{	my ($song,$artist,$album)=Songs::Display($SongID,qw/title artist album/);
-	#$_[0]->set_tooltip_text( __x( _"{song}\nby {artist}\nfrom {album}", song => $song, artist => $artist, album => $album) );
-#}
 
 sub IsWindowVisible
 {	my $win=shift;

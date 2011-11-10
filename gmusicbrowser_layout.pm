@@ -1557,7 +1557,7 @@ sub AddLabelEntry	#create entry to add a label to the current song
 		my $ID= ::GetSelID($entry);
 		return unless defined $ID & defined $label;
 		$entry->set_text('');
-		::SetLabels([$ID],[$label],[]);
+		Songs::Set($ID,"+label",$label);
 	 });
 	GMB::ListStore::Field::setcompletion($entry,'label');
 	return $entry;
@@ -3138,7 +3138,10 @@ sub update_time
 		}
 		$time= sprintf $format, $time/60, $time%60;
 	}
-	else { $time= $self->{markup_stopped} }
+	else
+	{	$time= $self->{markup_stopped};
+		return unless defined $time; # update_time() can be called before $self->{markup_stopped} is set, ignore
+	}
 	if ($markup)
 	{	$markup=~s/%s/$time/;
 	}

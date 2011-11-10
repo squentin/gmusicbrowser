@@ -740,8 +740,8 @@ INIT
 	},
 	titleaa =>
 	{	menu => _('Title - Artist - Album'), title => _('Song'),
-		value => sub { ::ReplaceFieldsAndEsc($_[2],"<b>%t</b>\n<small><i>%a</i> - %l</small>"); },
-		attrib => 'markup', type => 'Glib::String', depend => 'title artist album',
+		value => sub { ::ReplaceFieldsAndEsc($_[2],"<b>%t</b>%V\n<small><i>%a</i> - %l</small>"); },
+		attrib => 'markup', type => 'Glib::String', depend => 'title version artist album',
 		sort => 'title:i',	noncomp => 'boldrow',		width => 200,
 	},
 	playandqueue =>
@@ -1039,7 +1039,7 @@ sub query_tooltip_cb
 
 sub PopupContextMenu
 {	my ($self,$tv,$event)=@_;
-	return unless @{$self->{array}}; #no context menu for empty lists
+	#return unless @{$self->{array}}; #no context menu for empty lists
 	my @IDs=$self->GetSelectedIDs;
 	my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $self->{array});
 	::PopupContextMenu(\@::SongCMenu,\%args );
@@ -2459,8 +2459,9 @@ sub Fill
 		my ($list)=$self->get_fill_data($opt);
 		$renderer->set('all_count', $self->{all_count});
 		$self->{array_offset}= $self->{noall} ? 0 : 1;	#row number difference between store and $list, needed by interactive search
-		$store->set($store->append(undef),0,GID_ALL) unless $self->{noall};
-		$store->set($store->append(undef),0,$_) for @$list;
+		$store->set($store->prepend(undef),0,$_) for reverse @$list;	# prepend because filling is a bit faster in reverse
+		$store->set($store->prepend(undef),0,GID_ALL) unless $self->{noall};
+
 		if ($self->{field}[1]) # add a chidren to every row
 		{	my $first=$store->get_iter_first;
 			$first=$store->iter_next($first) if $first && $store->get($first,0)==GID_ALL; #skip "all" row
@@ -2915,7 +2916,7 @@ sub new
 			my ($name,$rowtype)=$store->get_value( $store->get_iter($path) );
 			if ($type == ::DRAG_ID)
 			{	if ($rowtype eq 'slist')
-				{	$::Options{SavedLists}{$name}->Push(@data);
+				{	$::Options{SavedLists}{$name}->Push(\@data);
 				}
 				else
 				{	$self->CreateNewFL('L',\@data);
@@ -3438,6 +3439,8 @@ sub new
 			$self->set_icon_sensitive('secondary',0);
 			$self->signal_connect(changed => \&UpdateClearButton);
 			$self->signal_connect(icon_press => sub { my ($self,$iconpos)=@_; if ($iconpos eq 'primary') {$self->PopupSelectorMenu} else {$self->ClearFilter} });
+			$self->signal_connect(focus_out_event => \&focus_changed_cb);
+			$self->signal_connect(focus_in_event  => \&focus_changed_cb);
 		}
 		else	# old version => use old hackish entry with icons
 		{	$self= SimpleSearch::old->new($opt);
@@ -3445,7 +3448,7 @@ sub new
 	}
 	$self->{$_}=$opt->{$_} for qw/nb fields group searchfb/,keys %Options,keys %Options2;
 	$self->{SaveOptions}=\&SaveOptions;
-	::WatchFilter($self, $self->{group},sub { $_[0]->set_progress_fraction(0); $_[0]->UpdateClearButton;}) unless $opt->{noselector}; #to update background color and clear button
+	::WatchFilter($self, $self->{group},sub { $_[0]->Update_bg(0); $_[0]->UpdateClearButton;}) unless $opt->{noselector}; #to update background color and clear button
 	return $self;
 }
 
@@ -3471,6 +3474,12 @@ sub UpdateClearButton
 {	my $self=shift;
 	my $on= $self->get_text ne '' || !::GetFilter($self)->is_empty;
 	$self->set_icon_sensitive('secondary',$on);
+}
+sub focus_changed_cb { $_[0]->Update_bg; 0; }
+sub Update_bg
+{	my ($self,$on)=@_;
+	$self->{filtered}=$on if defined $on;
+	$self->set_progress_fraction( !$self->has_focus && $self->{filtered} );  #used to set the background color
 }
 
 sub ChangeOption
@@ -3561,12 +3570,12 @@ sub DoFilter
 	if ($self->{searchfb})
 	{	::HasChanged('SearchText_'.$self->{group},$search); #FIXME
 	}
-	$self->set_progress_fraction( !$filter->is_empty );  #used to set the background color
+	$self->Update_bg( !$filter->is_empty );
 }
 
 sub EntryChanged_cb
 {	my $self=shift;
-	$self->set_progress_fraction(0);
+	$self->Update_bg(0);
 	my $l= length($self->get_text);
 	if ($self->{autofilter})
 	{	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
@@ -3810,8 +3819,8 @@ sub new
 	return $self;
 }
 
-sub set_progress_fraction
-{	$_[0]->{filtered}=$_[1];
+sub Update_bg
+{	$_[0]{filtered}=$_[1];
 	$_[0]->queue_draw;
 }
 sub set_text
@@ -6388,9 +6397,8 @@ sub button_press_cb
 	my $self=::find_ancestor($view,__PACKAGE__);
 	my $but=$event->button;
 	my $answer=$self->coord_to_path($event->coords);
-	my $row=$answer->{row};
-	my $depth=$answer->{depth};
-	return 0 unless @{$self->{array}}; #empty list
+	my $row=   $answer && $answer->{row};
+	my $depth= $answer && $answer->{depth};
 	if ((my $ref=$self->{action_rectangles}) && 0) #TESTING
 	{	my $x= $event->x + int($self->{hadj}->value);
 		my $y= $event->y + int($self->{vadj}->value);
@@ -6403,17 +6411,17 @@ sub button_press_cb
 		if ($found) {warn "actions : $_ => $found->{$_}" for keys %$found}
 	}
 	if ($event->type eq '2button-press')
-	{	$self->Activate($but);
+	{	return 0 unless $answer; #empty list
+		$self->Activate($but);
 		return 1;
 	}
 	if ($but==3)
-	{	if (!defined $depth && !vec($self->{selected},$row,1))
+	{	if ($answer && !defined $depth && !vec($self->{selected},$row,1))
 		{	$self->song_selected($event,$row);
 		}
 		my @IDs=$self->GetSelectedIDs;
-		my $list= $self->{array};
-		my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $list);
-		::PopupContextMenu(\@::SongCMenu,\%args ) if @$list;
+		my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $self->{array});
+		::PopupContextMenu(\@::SongCMenu,\%args );
 
 		return 1;
 	}
