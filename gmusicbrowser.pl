@@ -2691,6 +2691,7 @@ sub DoActionForList
 
 sub SongArray_changed
 {	my (undef,$songarray,$action,@extra)=@_;
+	$Filter::CachedList=undef;	#FIXME could be optimized, currently only saved lists can be used as a filter
 	if ($songarray==$Queue)
 	{	HasChanged('Queue',$action,@extra);
 	}
