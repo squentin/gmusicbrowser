@@ -7348,7 +7348,7 @@ sub cursor_changed_cb
 			$b->set_active(1) if $ao eq $state;
 			$b->signal_connect( toggled => sub
 			{	return unless $_[0]->get_active;
-				$store->set($iter,C_NAME,$name,C_FILTER,$ao);
+				_set_row($store, $iter, $ao);
 			});
 			$box->add($b);
 		}
@@ -7359,8 +7359,7 @@ sub cursor_changed_cb
 			sub
 			{	warn "filter : @_\n" if $::debug;
 				my $filter=shift;
-				my $desc= Filter::_explain_element($filter) || _("Unknown filter :")." '$filter'";
-				$store->set($iter, C_NAME, $desc, C_FILTER,$filter);
+				_set_row($store, $iter, $filter);
 			},
 			$store->get($iter,C_FILTER),
 		);
@@ -7382,7 +7381,7 @@ sub Set
 		my $parent=$store->iter_parent($iter);
 		if (!$parent && !$store->iter_has_child($iter)) #add a root
 		{	$parent=$store->prepend(undef);
-			$store->set($parent,C_NAME,_"All of :",C_FILTER,'&');
+			_set_row($store, $parent, '&');
 			my $new=$store->append($parent);
 			$store->set($new,$_,$store->get($iter,$_)) for C_NAME,C_FILTER;
 			$store->remove($iter);
@@ -7414,20 +7413,19 @@ sub Set
 		{	$iter=$store->iter_parent($iter);
 		}
 		elsif ($f=~m/^\(/)	# '(|' or '(&'
-		{	$iter=&$createrowsub($iter);
-			my ($ao,$text)=($f eq '(|')? ('|',_"Any of :") : ('&',_"All of :");
-			$store->set($iter,C_NAME,$text,C_FILTER,$ao);
+		{	$iter= $createrowsub->($iter);
+			my $ao= $f eq '(|' ? '|' : '&';
+			_set_row($store, $iter, $ao);
 		}
 		else
-		{ next if $f eq '';
-		  my $leaf= $createrowsub->($iter);
-		  $firstnewpath=$store->get_path($leaf) unless $firstnewpath;
-		  $store->set($leaf, C_NAME, Filter::_explain_element($f), C_FILTER,$f);
+		{	next if $f eq '';
+			my $leaf= $createrowsub->($iter);
+			$firstnewpath=$store->get_path($leaf) unless $firstnewpath;
+			_set_row($store, $leaf, $f);
 		}
 	}
 	unless ($store->get_iter_first)	#default filter if no/invalid filter
-	{	my $f= DEFAULT_FILTER;
-		$store->set($store->append(undef), C_NAME, Filter::_explain_element($f), C_FILTER,$f);
+	{	_set_row($store, $store->append(undef), DEFAULT_FILTER);
 	}
 
 	$firstnewpath||=Gtk2::TreePath->new_first;
@@ -7435,6 +7433,14 @@ sub Set
 	if ($firstnewpath->get_depth>1)	{ $firstnewpath->up; $treeview->expand_row($firstnewpath,TRUE); }
 	else	{ $treeview->expand_all }
 	$treeview->set_cursor( Gtk2::TreePath->new($path_string) );
+}
+
+sub _set_row
+{	my ($store,$iter,$content)=@_;
+	my $desc=	$content eq '&' ? _"All of :" :
+			$content eq '|' ? _"Any of :" :
+			Filter::_explain_element($content) || _("Unknown filter :")." '$content'";
+	$store->set($iter, C_NAME,$desc, C_FILTER,$content);
 }
 
 sub Result
