@@ -289,8 +289,8 @@ VBMain = HBMenubar HBToolbar VBSliderbar _HPSidebarCenterContext HBStatusbar
 
         HBText = 2Filler0 \
             _Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",yalign=0.5) \
-            ArtistBreadcrumb(expand_max=200,yalign=1,minsize=0,markup=" by <i>%a</i> ") \
-            AlbumBreadcrumb(minsize=1,expand_max=200,yalign=1,minsize=1,markup=" on <i>%l</i>   ",showcover=0) \
+            Artist(expand_max=200,yalign=1,minsize=0,markup=" by <i>%a</i> ") \
+            Album(minsize=1,expand_max=200,yalign=1,minsize=1,markup=" on <i>%l</i>   ",showcover=0) \
             -Time
 
     HPSidebarCenterContext = HPSidebarAndCenter Context
