@@ -1713,7 +1713,7 @@ sub UpdateTags
 }
 
 sub AddMissing	#FIXME if song in EstimatedLength, set length to 0
-{	my $IDs=$_[0];
+{	my ($IDs,$init)=@_;
 	push @Missing,@$IDs;
 	$MissingHash=undef;
 	#if ($MissingHash)
@@ -1722,7 +1722,7 @@ sub AddMissing	#FIXME if song in EstimatedLength, set length to 0
 		#	push @{ $MissingHash->{$key} },$ID;
 		#}
 	#}
-	Set($IDs,missing=>$::DAYNB);
+	Set($IDs,missing=>$::DAYNB) unless $init;
 }
 sub CheckMissing
 {	return undef unless @Missing;

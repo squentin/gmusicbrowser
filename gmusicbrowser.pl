@@ -1932,7 +1932,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		my $filter= Filter->newadd(TRUE,'missing:e:0', $mfilter);
 		$Library=[];	#dummy array to avoid a warning when filtering in the next line
 		$Library= SongArray->new( $filter->filter_all );
-		Songs::AddMissing( Songs::AllFilter('missing:-e:0') );
+		Songs::AddMissing( Songs::AllFilter('missing:-e:0'), 'init' );
 	}
 
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};
