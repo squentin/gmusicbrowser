@@ -764,7 +764,7 @@ our %timespan_menu=
  genre	=>
  {	name		=> _"Genres",	width => 180,	flags => 'fgarwescil',
 	 #is_set	=> '(__GENRE__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
-	id3v1	=> 6,		id3v2	=> 'TCON',	vorbis	=> 'genre',	ape	=> 'Genre', ilst => "\xA9gen",
+	id3v1	=> 6,		id3v2	=> 'TCON',	vorbis	=> 'genre',	ape	=> 'Genre', ilst => "\xA9gen & ----genre",
 	read_split	=> qr/\s*;\s*/,
 	type		=> 'flags',		#init_namearray => '@Tag::MP3::Genres',
 	none		=> quotemeta _"No genre",
@@ -1713,7 +1713,7 @@ sub UpdateTags
 }
 
 sub AddMissing	#FIXME if song in EstimatedLength, set length to 0
-{	my $IDs=$_[0];
+{	my ($IDs,$init)=@_;
 	push @Missing,@$IDs;
 	$MissingHash=undef;
 	#if ($MissingHash)
@@ -1722,7 +1722,7 @@ sub AddMissing	#FIXME if song in EstimatedLength, set length to 0
 		#	push @{ $MissingHash->{$key} },$ID;
 		#}
 	#}
-	Set($IDs,missing=>$::DAYNB);
+	Set($IDs,missing=>$::DAYNB) unless $init;
 }
 sub CheckMissing
 {	return undef unless @Missing;
