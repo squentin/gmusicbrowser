@@ -5856,7 +5856,7 @@ sub PrefMisc
 
 	my $volstep= NewPrefSpinButton('VolumeStep',1,100, step=>1, text=>_"Volume step :", tip=>_"Amount of volume changed by the mouse wheel");
 	my $always_in_pl=NewPrefCheckButton(AlwaysInPlaylist => _"Current song must always be in the playlist", tip=> _"- When selecting a song, the playlist filter will be reset if the song is not in it\n- Skip to another song when removing the current song from the playlist");
-	my $pixcache= NewPrefSpinButton('PixCacheSize',1,1000, text=>_"Picture cache : %d MB", cb=>\&GMB::Picture::trim);
+	my $pixcache= NewPrefSpinButton('PixCacheSize',1,1000, text=>_"Picture cache : %d MB", cb=>\&GMB::Cache::trim);
 
 	my $recent_include_not_played= NewPrefCheckButton(AddNotPlayedToRecent => _"Recent songs include skipped songs that haven't been played.", tip=> _"When changing songs, the previous song is added to the recent list even if not played at all.");
 
@@ -8468,7 +8468,9 @@ sub popup_calendar
 
 
 package GMB::Cache;
-my %Cache; my $CacheSize=0;
+my %Cache; my $CacheSize;
+
+INIT { $CacheSize=0; }
 
 sub drop_file	#drop a file from the cache
 {	my $file=shift;
