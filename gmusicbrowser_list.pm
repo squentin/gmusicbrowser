@@ -521,7 +521,6 @@ sub Sort
 }
 sub SetFilter
 {	my ($self,$filter)=@_;#	::red($self->{type},' ',($self->{filter} || 'no'), ' ',$filter);::callstack();
-	my $list;
 	if ($self->{hideif} eq 'nofilter')
 	{	$self->Hide($filter->is_empty);
 		return if $filter->is_empty;
@@ -529,7 +528,9 @@ sub SetFilter
 	$self->{filter}=$filter;
 	return if $self->{ignoreSetFilter};
 
-	$list=$filter->filter;
+	if ($self->{type} eq 'A') { $self->{array}->SetFilter($filter); return }
+
+	my $list=$filter->filter;
 	Songs::SortList( $list, $self->{sort} ) if exists $self->{sort};
 	$self->{array}->Replace($list,filter=>$filter);
 }

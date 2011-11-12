@@ -203,7 +203,7 @@ VBMain = HBMenu _VBMainContainer
 					    		_HBInfoalbum \
 							_HBInfoGenre
 
-								HBInfoTitre = 2Filler10 _Title(minsize=0,markup="<big><big><big><b>%t</b></big></big></big>",click1="",yalign=0.5) 
+								HBInfoTitre = 2Filler10 _Title(ellipsize="end",minsize=0,markup="<big><big><big><b>%t</b></big></big></big>",click1="",yalign=0.5) 
 								HBInfoArtist = 2Filler11 _Artist(yalign=1,minsize=0,markup=_"<big><big>by %a</big></big>",click1="")
 								HBInfoalbum = 2Filler12 _Album(minsize=1,expand_max=200,yalign=1,markup=_"in %l",click1="") -2Filler13 -Date 
 								HBInfoGenre = -2Filler20 -Title2(yalign=1,minsize=0,markup="<i>%g</i> ",click1="")
@@ -497,7 +497,7 @@ VPMainCenter =  _HBAlbums VBSongtree
 
 	
 [EeePC2]
-Type=G
+Type=G+
 #Title		= "gmusicbrowser joue %t dans l'album %l (%Y) de %a" 
 Title		= _"gmusicbrowser is playing %t from %l (%Y) by %a"
 Category 	= "Garage"
