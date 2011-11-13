@@ -22,7 +22,7 @@ use constant
 {	OPT	=> 'PLUGIN_LYRICS_', # MUST begin by PLUGIN_ followed by the plugin ID / package name
 };
 
-my $notfound=_"Not found";
+my $notfound=_"No lyrics found";
 
 my @justification=
 (	left	=> _"Left aligned",
@@ -257,6 +257,16 @@ sub ChooseFont
 	$dialog->destroy;
 }
 
+sub Set_message
+{	my ($self,$text) = @_;
+	$self->{buffer}->set_text("");
+	my $iter=$self->{buffer}->get_start_iter;
+	my $fontsize=$self->style->font_desc;
+	my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
+	$self->{buffer}->insert_with_tags($iter,"\n$text",$tag_noresults);
+	$self->{buffer}->set_modified(0);
+}
+
 sub Back_cb
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $url=pop @{$self->{history}};
@@ -290,8 +300,7 @@ sub load_from_web
 	if ($next)
 	{	$site = shift @{$self->{trynext}};
 		if (!$site)
-		{	$self->{buffer}->set_text(_"Not found.");
-			$self->{buffer}->set_modified(0);
+		{	$self->Set_message(_"No lyrics found");
 			return;
 		}
 	}
@@ -376,8 +385,7 @@ sub html_extract
 
 sub load_url
 {	my ($self,$url,$post,$check)=@_;
-	$self->{buffer}->set_text(_"Loading...");
-	$self->{buffer}->set_modified(0);
+	$self->Set_message(_"Loading...");
 	$self->cancel;
 	warn "lyrics : loading $url\n";# if $::debug;
 	$self->{url}=$url;
