@@ -8415,6 +8415,8 @@ sub popup_calendar
 	$self->{popup}=$popup;
 	my $cal=Gtk2::Calendar->new;
 	$popup->set_modal(::TRUE);
+	$popup->set_type_hint('dialog');
+	$popup->set_transient_for($self->get_toplevel);
 	my @time=(0,0,0);
 	if (my $date=$self->{date})
 	{	my ($s,$m,$h,$d,$M,$y)= localtime($date);
