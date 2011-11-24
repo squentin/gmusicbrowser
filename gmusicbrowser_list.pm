@@ -528,7 +528,7 @@ sub SetFilter
 	$self->{filter}=$filter;
 	return if $self->{ignoreSetFilter};
 
-	if ($self->{type} eq 'A') { $self->{array}->SetFilter($filter); return }
+	#if ($self->{type} eq 'A') { $self->{array}->SetFilter($filter); return } #FIXME needs a PlayFilter with multiple levels to work correctly
 
 	my $list=$filter->filter;
 	Songs::SortList( $list, $self->{sort} ) if exists $self->{sort};
