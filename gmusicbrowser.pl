@@ -5339,7 +5339,7 @@ sub AboutDialog
 	$dialog->set_authors('Quentin Sculo <squentin@free.fr>');
 	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\nelementary icon theme : Simon Steinbeiß");
 	$dialog->set_translator_credits( join "\n", sort
-		'French : Quentin Sculo, Jonathan Fretin, Frédéric Urbain, Brice Boucard & Hornblende',
+		'French : Quentin Sculo, Jonathan Fretin, Frédéric Urbain, Brice Boucard, Hornblende & mgrubert',
 		'Hungarian : Zsombor',
 		'Spanish : Martintxo, Juanjo & Elega',
 		'German : vlad & staubi',

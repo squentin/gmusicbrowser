@@ -134,9 +134,9 @@ sub Write
 		while ($i<$#$modif)
 		{	my $field=$modif->[$i++];
 			my $val=  $modif->[$i++];
-			my $i=$Songs::Def{$field}{id3v1};
-			next unless defined $i;
-			$id3v1->[$i]= $val;	# for genres $val is a arrayref
+			my $n=$Songs::Def{$field}{id3v1};
+			next unless defined $n;
+			$id3v1->[$n]= $val;	# for genres $val is a arrayref
 		}
 	}
 

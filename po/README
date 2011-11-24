@@ -11,7 +11,7 @@ msginit, msgmerge and msgfmt can be found in the package gettext
  or	http://github.com/squentin/gmusicbrowser/tree/master/po/
 
  The git repository contains the latest translations, but they should NOT be edited
- directly, because the strings they contains are not necessary up to date.
+ directly, because the strings they contain are not necessary up to date.
  So either update them like described below, or use files from http://gmusicbrowser.org/po/
  that should contain the .po updated with the strings from the latest git, ready to be edited.
 
@@ -49,5 +49,5 @@ msginit, msgmerge and msgfmt can be found in the package gettext
   Don't hesitate to ask me if you have any questions.
 
 
-* translation updates will be cleaned-up by "msgattrib --no-location --translated --sort-output"
+* translation updates will be cleaned-up by "msgattrib --no-location --translated --sort-output --no-fuzzy"
   to minimize useless changes in the commit

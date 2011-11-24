@@ -1599,7 +1599,7 @@ my @MenuSubGroup=
 		  		return [ map { AA::ReplaceFields( $gid,$_,$field,::TRUE ), ($_ eq "%a" ? 0 : $_) } @MenuMarkupOptions ];
 	  		},	submenu_ordered_hash => 1, submenu_use_markup => 1,
 	  check => sub { $_[0]{self}{lmarkup}[$_[0]{depth}]}, istrue => 'aa', mode => 'LS', },
-	{ label => _"text mode",	code => sub { my $self=$_[0]{self}; $self->{mmarkup}=$_[1]; $self->SetOption; },
+	{ label => _"text mode",	code => sub { $_[0]{self}->SetOption(mmarkup=>$_[1]); },
 	  submenu => [ 0 => _"None", below => _"Below", right => _"Right side", ], submenu_ordered_hash => 1, submenu_reverse => 1,
 	  check => sub { $_[0]{self}{mmarkup} }, mode => 'M', },
 	{ label => _"picture size",	code => sub { $_[0]{self}->SetOption(mpicsize=>$_[1]);  },
