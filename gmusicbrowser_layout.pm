@@ -2074,7 +2074,7 @@ sub StartDestroy
 sub DestroyNow
 {	my $self=shift;
 	$self->CancelDestroy;
-	$self->destroy;
+	$self->close_window;
 	0;
 }
 
