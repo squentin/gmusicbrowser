@@ -3614,17 +3614,33 @@ sub Breakdown_List
 	my $menu;
 	if (@menus>1)
 	{	$menu=Gtk2::Menu->new;
+		$menu->signal_connect(key_press_event => sub
+		 {	my ($menu,$event)=@_;
+			my $unicode=Gtk2::Gdk->keyval_to_unicode($event->keyval); # 0 if not a character
+			if ($unicode)
+			{	my $chr=uc chr $unicode;
+				for my $item ($menu->get_children)
+				{	if ($chr ge uc$item->{start} && $chr le uc$item->{end})
+					{	$menu->select_item($item);
+						return 1;
+					}
+				}
+			}
+			0;
+		 });
 		for my $ref (@menus)
 		{	my ($start,$end,$c1,$c2)=@$ref;
 			$c1=ucfirst$c1; $c2=ucfirst$c2;
 			$c1.='-'.$c2 if $c2 ne $c1;
 			my $item=Gtk2::MenuItem->new_with_label($c1);
-			my $submenu= &$makemenu($start,$end,$keys,$gids);
+			$item->{start}= substr $c1,0,1;
+			$item->{end}=   substr $c2,0,1;
+			my $submenu= $makemenu->($start,$end,$keys,$gids);
 			$item->set_submenu($submenu);
 			$menu->append($item);
 		}
 	}
-	elsif (@menus==1) { $menu= &$makemenu(0,$#$keys,$keys,$gids); }
+	elsif (@menus==1) { $menu= $makemenu->(0,$#$keys,$keys,$gids); }
 	else {return undef}
 
 	return $menu;
