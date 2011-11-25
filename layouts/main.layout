@@ -3,6 +3,7 @@ Type=G+
 Default		= Window(size=1120x820) VPRight(size=200-550) HPmain(size=400)
 VolumeScroll	= VBplayer
 DefaultFocus	= Play
+Name		= _"Lists, Library & Context"
 
 VBmain		= HBmenu _HPmain Progress
  HBmenu		= _MBmenu
@@ -48,6 +49,7 @@ HBmain		= _VBmain 2Filler1 -Cover
 [with queue] based on Small_player
 Type=G
 Category	= _"Small"
+Name		= _"with queue"
 VBmain2		= HBmain 5_VBQueue
 VBQueue		= _QueueList(group=1,hidewidget=VBQueue,hideif=empty,shrinkonhide=v) HBQueueButtons
 HBQueueButtons	= EditListButtons(group=1) 4QueueActions
@@ -56,12 +58,14 @@ HBButtons	= VolumeIcon Prev Stop Play Next Choose OpenBrowser Pref Quit
 [with search]
 Type=G
 Category	= _"Small"
+Name		= _"with search"
 Default		= Window(size=500x1)
 VBmain		= @Small_player 2HBsearch _SongList(hideif=nofilter,shrinkonhide=v)
 HBsearch	= _SimpleSearch PlayFilter
 
 [with playlist]
 Type=G
+Name		= _"with playlist"
 Default		= Window(size=820x500)
 VBmain		= @Small_player 2HBsearch _PlayList Progress
 HBsearch	= _SimpleSearch ResetFilter
@@ -69,11 +73,13 @@ HBsearch	= _SimpleSearch ResetFilter
 
 [with lists]
 Type=G
+Name		= _"with lists"
 Default		= Window(size=820x500)
 VBmain		= @Small_player 4_TabbedLists(pages="+PlayList +QueueList",match="context page") Progress
 
 [with search and lists]
 Type=G
+Name		= _"with search and lists"
 Default		= Window(size=1000x500)
 VBmain		= _HPmain Progress
  HPmain		= _VBsearch VBright
@@ -83,6 +89,7 @@ VBmain		= _HPmain Progress
 
 [with search and lists 2]
 Type=G
+Name		= _"with search and lists 2"
 Default		= Window(size=1000x500)
 VBmain		= _HPmain Progress
  HPmain		= NBsearch VBright
@@ -91,6 +98,7 @@ VBmain		= _HPmain Progress
 
 [minimal]
 Type=G
+Name	= _"minimal"
 Category= _"Small"
 Default	= Window(sticky=1)
 HBmain	= OpenBrowser Pref Play Next 5_ABTitle
@@ -99,6 +107,7 @@ VolumeScroll	= HBmain
 
 [with browser]
 Type=G+
+Name		= _"with browser"
 DefaultFocus	= Play
 Default		= Window(size=1120x820) HPbig(size=400-700) HPfp(size=140-140) VPlistAA(size=575-150)
 HBIndic		= MBmenu Sort 10Filter Queue 10Pos
@@ -122,9 +131,11 @@ HSize0		= Filler0 LockArtist LockAlbum
 VolumeScroll	= HBupper
 
 [with browser (SongTree)] based on with browser
+Name		= _"with browser (SongTree)"
 VPlistAA	= _SongTree HBAA
 
 [with browser & queue] based on with browser
+Name		= _"with browser & queue"
 Default		= Window(size=1120x820) HPbig(size=400-700) HPfp(size=140-140) VPlistAA(size=575-150) VPBrowserQueue(size=490-210)
 HPbig		= HPfp _VPBrowserQueue
 VPBrowserQueue	= _VPlistAA VBQueue
@@ -133,6 +144,7 @@ HBQueueButtons	= EditListButtons(group=1) 4QueueActions
 
 [Playlist]
 Type=G+
+Name		= _"Playlist"
 Default		= Window(size=1120x820) HPfp0(size=140-140) HPfp_list(size=780-300)
 HBIndic		= MBmenu Sort 10Filter Queue 10Pos
 MBmenu		= MainMenuItem LayoutItem PSortItem PFilterItem QueueItem HistItem PlayItem
@@ -162,11 +174,11 @@ VBox = Volume(xalign=.5) _VolumeSlider(vertical=1)
 [Equalizer]
 Window		= size=300x160,uniqueid=Equalizer,ifexist=replace
 VBmain		= _Equalizer
-Title		= Equalizer
+Title		= _"Equalizer"
 
 [Progress]
 VBmain		= _VProgress(lastclose=1)
-Title		= Progress
+Title		= _"Progress"
 
 [Karaoke]
 Type= K
@@ -175,7 +187,7 @@ Window= pos=50%x100%,size=80%x1,insensitive=1,nodecoration=1,ontop=1
 
 [Context]
 Type=C
-Title=_"Context"
+Title=		_"Context"
 Default		= Window(size=500x300)
 VBmain		= _Context
 

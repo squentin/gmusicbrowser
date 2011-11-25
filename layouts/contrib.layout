@@ -26,6 +26,7 @@ Author = "Satoshi Hayazaki"
 Type=G+
 
 Category = Conz
+Name	= _"Conz Glimm (different controls)"
 
 Default = Window(size=80%x80%)
 
@@ -52,6 +53,7 @@ Author = "Satoshi Hayazaki"
 Type=G
 
 Category = Conz
+Name	= _"Conz Aishi (with Filter Panes)"
 
 Default = Window(size=80%x80%)
 
@@ -609,6 +611,7 @@ VSize1		= 105 VPMosaic
 
 Author= MajorGrubert
 Type=F
+Name	= _"Garage Fullscreen"
 Window  = fullscreen=1
 VBmain  = _HPContentFull -HBReplayButtonsFull
     HBReplayButtonsFull = Prev(size=menu) Play(size=menu) Next(size=menu) 20VSeparator 5_TimeBar(text=_"%t by %a (%m)",minwidth=240) 10-Stars
