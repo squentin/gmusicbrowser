@@ -1657,7 +1657,7 @@ sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
 	$IDFromFile=undef if $IDFromFile && exists $changed->{file} || exists $changed->{path};
 	my @needupdate;
 	for my $f (keys %$changed)
-	{	if (my $l=$Def{$f}{_depended_on_by}) { push @needupdate,$_ for split / /,$l; }
+	{	if (my $l=$Def{$f}{_depended_on_by}) { push @needupdate, split / /,$l; }
 	}
 	for my $f (sort @needupdate)
 	{	next if exists $changed->{$f};

@@ -134,17 +134,20 @@ sub Write
 		while ($i<$#$modif)
 		{	my $field=$modif->[$i++];
 			my $val=  $modif->[$i++];
-			my $i=$Songs::Def{$field}{id3v1};
-			next unless defined $i;
-			$id3v1->[$i]= $val;	# for genres $val is a arrayref
+			my $n=$Songs::Def{$field}{id3v1};
+			next unless defined $n;
+			$id3v1->[$n]= $val;	# for genres $val is a arrayref
 		}
 	}
 
 	my @taglist;
 	if ($maintag eq 'ID3v2' || $tag->{ID3v2})
-	{	my $id3v2 = $tag->{ID3v2} || $tag->new_ID3v2;
-		my ($ver)= $id3v2->{version}=~m/^(\d+)/;
-		push @taglist, ["id3v2.$ver",'id3v2'], $id3v2;
+	{	my @id3tags= ($tag->{ID3v2} || $tag->new_ID3v2);
+		push @id3tags, @{$tag->{ID3v2s}} if $tag->{ID3v2s};
+		for my $id3tag (@id3tags)
+		{	my ($ver)= $id3tag->{version}=~m/^(\d+)/;
+			push @taglist, ["id3v2.$ver",'id3v2'], $id3tag;
+		}
 	}
 	if ($maintag eq 'vorbis' || $maintag eq 'ilst')
 	{	push @taglist, $maintag,$tag;

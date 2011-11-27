@@ -1,5 +1,6 @@
 [full with buttons]
 Type=T
+Name		= _"Normal with buttons"
 Window= borderwidth=5
 HBButtons	= VolumeIcon Prev Stop Play Next OpenBrowser ExtraButtons Pref Quit
 HBIndic		= Sort 10Filter Queue 10Pos -Stars
@@ -14,11 +15,13 @@ VolumeScroll	= HBmain
 
 [full] based on full with buttons
 Type=T
+Name		= _"Normal"
 HBButtons =
 VBmain		= HBIndic _VBText -HBTime
 
 [info]
 Type=T
+Name		= _"Small"
 HBAlbum		= _Album -Year
 VBText		= Title(30) Artist HBAlbum
 HBmain		= _VBText 2Filler1 -Cover(forceratio=1)

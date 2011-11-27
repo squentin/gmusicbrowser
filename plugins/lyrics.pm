@@ -189,8 +189,7 @@ sub cancel
 
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Lyrics file :", width=>30);
-_"Lyrics file name format",
+	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Lyrics file :", width=>30, tip=> _"Lyrics file name format" );
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works with some lyrics source and when the lyrics tab is active");
 	my $embed=::NewPrefCombo(OPT.'PreferEmbeddedLyrics', { 0=> _"lyrics file", 1=> _"file tag"},

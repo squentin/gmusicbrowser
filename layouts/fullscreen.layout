@@ -1,6 +1,7 @@
 
 [default fullscreen]
 Type=F
+Name		= _"Default fullscreen"
 Window		= fullscreen=1,sticky=0
 HBPics		= _ArtistPic(maxsize=0) _Cover(maxsize=0)
 HBButtons1	= Prev(size=dialog) Next(size=dialog)
@@ -23,6 +24,7 @@ KeyBindings	= Escape CloseWindow
 
 [Fullscreen simple]
 Type=F
+Name		= _"Fullscreen simple"
 Window		= fullscreen=1,sticky=0
 HBPics		= _ArtistPic(maxsize=0) _Cover(maxsize=0)
 HBButtons1	= Prev(size=dialog) Next(size=dialog)

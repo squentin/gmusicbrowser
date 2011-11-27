@@ -87,23 +87,41 @@ use constant
 };
 
 sub _ ($) {$_[0]}	#dummy translation functions
+sub _p ($$) {_($_[1])}
 sub __ { sprintf( ($_[2]>1 ? $_[0] : $_[1]), $_[2]); }
+sub __p {shift;&__}
 sub __x { my ($s,%h)=@_; $s=~s/{(\w+)}/$h{$1}/g; $s; }
 BEGIN
 {no warnings 'redefine';
- eval {require Locale::gettext};
- if ($@) { warn "Locale::gettext not found -> no translations\n"; }
- elsif ($Locale::gettext::VERSION<1.04) { warn "Needs at least version 1.04 of Locale::gettext, v$Locale::gettext::VERSION found -> no translations\n" }
- else
- {	my $localedir=$DATADIR;
-	$localedir= $FindBin::RealBin.SLASH.'..'.SLASH.'share' unless -d $localedir.SLASH.'locale';
-	my $d= eval { Locale::gettext->domain('gmusicbrowser'); };
-	if ($@) { warn "Locale::gettext error : $@\n -> no translations\n"; }
+ my $localedir=$DATADIR;
+ $localedir= $FindBin::RealBin.SLASH.'..'.SLASH.'share' unless -d $localedir.SLASH.'locale';
+ $localedir.=SLASH.'locale';
+ my $domain='gmusicbrowser';
+ eval {require Locale::Messages;};
+ if ($@)
+ {	eval {require Locale::gettext};
+	if ($@) { warn "neither Locale::Messages, nor Locale::gettext found -> no translations\n"; }
+	elsif ($Locale::gettext::VERSION<1.04) { warn "Needs at least version 1.04 of Locale::gettext, v$Locale::gettext::VERSION found -> no translations\n" }
 	else
-	{	$d->dir( $localedir.SLASH.'locale' );
-		*_=sub ($) { $d->get($_[0]); };
-		*__=sub { sprintf $d->nget(@_),$_[2]; };
+	{	warn "Locale::Messages not found, using Locale::gettext instead\n" if $::debug;
+		my $d= eval { Locale::gettext->domain($domain); };
+		if ($@) { warn "Locale::gettext error : $@\n -> no translations\n"; }
+		else
+		{	$d->dir($localedir);
+			*_=sub ($) { $d->get($_[0]); };
+			*__=sub { sprintf $d->nget(@_),$_[2]; };
+		}
 	}
+ }
+ else
+ {	Locale::Messages::textdomain($domain);
+	Locale::Messages::bindtextdomain($domain=> $localedir);
+	Locale::Messages::bind_textdomain_codeset($domain=> 'utf-8');
+	Locale::Messages::bind_textdomain_filter($domain=> \&Locale::Messages::turn_utf_8_on);
+	*_  = \&Locale::Messages::gettext;
+	*_p = \&Locale::Messages::pgettext;
+	*__ =sub { sprintf Locale::Messages::ngettext(@_),$_[2]; };
+	*__p=sub { sprintf Locale::Messages::npgettext(@_),$_[3];};
  }
 }
 
@@ -170,6 +188,7 @@ options :
 -l NAME, -layout NAME	: Use layout NAME for player window
 +plugin NAME		: Enable plugin NAME
 -plugin NAME		: Disable plugin NAME
+-noplugins		: Disable all plugins
 -searchpath FOLDER	: Additional FOLDER to look for plugins and layouts
 -use-gnome-session 	: Use gnome libraries to save tags/settings on session logout
 -workspace N		: move initial window to workspace N (requires Gnome2::Wnck)
@@ -192,6 +211,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 -add			: Add them to the library
 
 -tagedit FOLDER_OR_FILE ... : Edittag mode
+-listplugin	: list the available plugins and exit
 -listcmd	: list the available fifo commands and exit
 -listlayout	: list the available layouts and exit
 ";
@@ -222,8 +242,10 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-import')	{ $ImportFile=rel2abs(shift) if $ARGV[0]}
 	elsif($arg eq '-searchpath')	{ push @{ $CmdLine{searchpath} },shift if $ARGV[0]}
 	elsif($arg=~m/^([+-])plugin$/)	{ $CmdLine{plugins}{shift @ARGV}=($1 eq '+') if $ARGV[0]}
+	elsif($arg eq '-noplugins')	{ $CmdLine{noplugins}=1; delete $CmdLine{plugins}; }
 	elsif($arg eq '-geometry')	{ $CmdLine{geometry}=shift if $ARGV[0]; }
 	elsif($arg eq '-tagedit')	{ $CmdLine{tagedit}=1; $ignore=1; last; }
+	elsif($arg eq '-listplugin')	{ $CmdLine{pluginlist}=1; $ignore=1; last; }
 	elsif($arg eq '-listcmd')	{ $CmdLine{cmdlist}=1; $ignore=1; last; }
 	elsif($arg eq '-listlayout')	{ $CmdLine{layoutlist}=1; $ignore=1; last; }
 	elsif($arg eq '-cmd')		{ push @cmd, shift if $ARGV[0]; }
@@ -921,7 +943,11 @@ sub keybinding_longname
 {	my $key=$_[0];
 	return $key unless $key=~s/^([caws]+)-//;
 	my $mod=$1;
-	my %h=(c => _"Ctrl", a => _"Alt", w => _"Win", s => _"Shift");
+	my %h=(	c => _p('Keyboard',"Ctrl"),	#TRANSLATION: Ctrl key
+		a => _p('Keyboard',"Alt"),	#TRANSLATION: Alt key
+		w => _p('Keyboard',"Win"),	#TRANSLATION: Windows key
+		s => _p('Keyboard',"Shift"),	#TRANSLATION: Shift key
+	);
 	my $name=join '',map $h{$_}, split //,$mod;
 	return $name.'-'.$key;
 }
@@ -1242,8 +1268,10 @@ for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_gst
 }
 
 LoadPlugins();
+if ($CmdLine{pluginlist}) { warn "$_ : $Plugins{$_}{name}\n" for sort keys %Plugins; exit; }
 $SIG{HUP} = 'IGNORE';
 ReadSavedTags();
+$Options{AutoRemoveCurrentSong}=0 if $CmdLine{demo};
 
 # global Volume and Mute are used only for gstreamer and mplayer in SoftVolume mode
 our $Volume= $Options{Volume};
@@ -1550,8 +1578,12 @@ sub LoadPlugins
 	}
 }
 sub PluginsInit
-{	my $p=delete $CmdLine{plugins};
-	$Options{'PLUGIN_'.$_}=$p->{$_} for keys %$p;
+{	if (delete $CmdLine{noplugins}) { $Options{'PLUGIN_'.$_}=0 for keys %Plugins; }
+	my $h=delete $CmdLine{plugins};
+	for my $p (keys %$h)
+	{	if (!$Plugins{$p}) { warn "Unknown plugin $p\n";next }
+		$Options{'PLUGIN_'.$p}=$h->{$p};
+	}
 	ActivatePlugin($_,'init') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 }
 
@@ -3581,17 +3613,33 @@ sub Breakdown_List
 	my $menu;
 	if (@menus>1)
 	{	$menu=Gtk2::Menu->new;
+		$menu->signal_connect(key_press_event => sub
+		 {	my ($menu,$event)=@_;
+			my $unicode=Gtk2::Gdk->keyval_to_unicode($event->keyval); # 0 if not a character
+			if ($unicode)
+			{	my $chr=uc chr $unicode;
+				for my $item ($menu->get_children)
+				{	if ($chr ge uc$item->{start} && $chr le uc$item->{end})
+					{	$menu->select_item($item);
+						return 1;
+					}
+				}
+			}
+			0;
+		 });
 		for my $ref (@menus)
 		{	my ($start,$end,$c1,$c2)=@$ref;
 			$c1=ucfirst$c1; $c2=ucfirst$c2;
 			$c1.='-'.$c2 if $c2 ne $c1;
 			my $item=Gtk2::MenuItem->new_with_label($c1);
-			my $submenu= &$makemenu($start,$end,$keys,$gids);
+			$item->{start}= substr $c1,0,1;
+			$item->{end}=   substr $c2,0,1;
+			my $submenu= $makemenu->($start,$end,$keys,$gids);
 			$item->set_submenu($submenu);
 			$menu->append($item);
 		}
 	}
-	elsif (@menus==1) { $menu= &$makemenu(0,$#$keys,$keys,$gids); }
+	elsif (@menus==1) { $menu= $makemenu->(0,$#$keys,$keys,$gids); }
 	else {return undef}
 
 	return $menu;
@@ -5306,7 +5354,7 @@ sub AboutDialog
 	$dialog->set_authors('Quentin Sculo <squentin@free.fr>');
 	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\nelementary icon theme : Simon Steinbeiß");
 	$dialog->set_translator_credits( join "\n", sort
-		'French : Quentin Sculo, Jonathan Fretin, Frédéric Urbain, Brice Boucard & Hornblende',
+		'French : Quentin Sculo, Jonathan Fretin, Frédéric Urbain, Brice Boucard, Hornblende & mgrubert',
 		'Hungarian : Zsombor',
 		'Spanish : Martintxo, Juanjo & Elega',
 		'German : vlad & staubi',
@@ -8382,6 +8430,8 @@ sub popup_calendar
 	$self->{popup}=$popup;
 	my $cal=Gtk2::Calendar->new;
 	$popup->set_modal(::TRUE);
+	$popup->set_type_hint('dialog');
+	$popup->set_transient_for($self->get_toplevel);
 	my @time=(0,0,0);
 	if (my $date=$self->{date})
 	{	my ($s,$m,$h,$d,$M,$y)= localtime($date);
