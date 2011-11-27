@@ -2445,13 +2445,14 @@ sub newtab
 	$self->{widgets}{$name}=$widget;
 	$widget->{tabcanclose}=1;
 	delete $self->{blacklist}{$name};
-	$self->Pack($widget, $setpage);
+	$self->Pack($widget);
 	$widget->show_all;
+	$self->set_current_page( $self->get_n_pages-1 ) if $setpage; #set current page to the new page
 	return $widget;
 }
 
 sub Pack
-{	my ($self,$wg,$setpage)=@_;
+{	my ($self,$wg)=@_;
 	if (delete $self->{chooser_mode}) { $self->remove($_) for $self->get_children; }
 	my $angle= $self->{angle} || 0;
 	my $label= $wg->{tabtitle};
@@ -2485,8 +2486,6 @@ sub Pack
 	$self->append_page($wg,$tab);
 	$self->set_tab_reorderable($wg,1);
 	$tab->show_all;
-
-	$self->set_current_page( $self->get_n_pages-1 ) if $setpage; #set current page to the new page
 }
 
 sub insert_default_page
