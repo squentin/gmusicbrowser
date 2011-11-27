@@ -455,6 +455,18 @@ our %Widgets=
 		expander=> 1,
 		hide_empty => 1,
 	},
+	PictureBrowser=>
+	{	class	=> 'Layout::PictureBrowser',
+		group	=> 'Play',
+		field	=> 'album',
+		options	=> 'field xalign yalign',
+		xalign	=> .5,
+		yalign	=> .5,
+		schange	=> \&Layout::PictureBrowser::Update,
+		autoadd_type	=> 'context page pictures',
+		tabicon		=> 'gmb-picture',
+		tabtitle	=> _"Album pictures",
+	},
 	AABox	=>
 	{	class	=> 'GMB::AABox',
 		oldopt1	=> sub { 'aa='.( $_[0] ? 'artist' : 'album' ) },
@@ -3978,6 +3990,109 @@ sub SaveOptions
 	{	$opt{collapsed}= $self->{collapsed}= join ' ', sort grep !$cats->{$_}->get_expanded, keys %$cats;
 	}
 	return %opt;
+}
+
+package Layout::PictureBrowser;
+use base 'Gtk2::EventBox';
+sub new
+{	my ($class,$opt)=@_;
+	my $self= bless Gtk2::EventBox->new, $class;
+	$self->signal_connect(expose_event => \&expose_cb);
+	$self->signal_connect(size_allocate=> \&size_allocate_cb);
+	$self->signal_connect(button_press_event=> \&button_press_cb);
+	$self->signal_connect(scroll_event => \&scroll_cb);
+	$self->signal_connect(map => \&Update);
+	return $self;
+}
+sub Update
+{	my $self=shift;
+	return unless $self->mapped;
+	my $field= $self->{field};
+	my $ID= ::GetSelID($self);
+	my $gid= Songs::Get_gid($ID,$field);
+	my $path;
+		#taken from ::ChooseAAPicture() FIXME create a function ?
+		my $h=Songs::BuildHash('path', AA::GetIDs($field,$gid));
+		my $min=int(.1*::max(values %$h)); #ignore rare folders
+		$path= ::find_common_parent_folder( grep $h->{$_}>$min,keys %$h );
+		($path)=sort { $h->{$b} <=> $h->{$a} } keys %$h if length $path<5;#take most common if too differents
+	return if ($self->{current_path}||'') eq $path;
+	$self->{current_path}= $path;
+	$self->{current_file}=undef;
+	$self->{pixbuf}=undef;
+	::IdleDo('8_ChangePicture'.$self,800,\&ChangePicture,$self);
+}
+sub ChangePicture
+{	my ($self,$inc)=@_;
+	delete $::ToDo{'8_ChangePicture'.$self};
+	my $path= $self->{current_path};
+	$self->queue_draw; #will clear previous picture if no picture to display
+	return unless $path;
+	opendir my($dh),$path  or do { warn $!; return; };
+	my @files= map $path.::SLASH.$_, sort grep !m/^\./ && m/\.(?:jpe?g|png|bmp)$/i, readdir $dh;
+	closedir $dh;
+	my $file= $self->{current_file};
+	if ($file)
+	{	for my $i (0..$#files)
+		{	if ($files[$i] eq $file)
+			{	$i+=$inc;
+				$i=0 if $i>$#files;
+				$i=$#files if $i<0;
+				$file= $files[$i];
+				last;
+			}
+		}
+		return if $file eq $self->{current_file};
+	}
+	else { $file=$files[0] }
+	$self->{current_file}=$file;
+	$self->{pixbuf}=undef;
+	$self->LoadImg;
+}
+
+sub LoadImg
+{	my $self=shift;
+	delete $::ToDo{'9_LoadImg'.$self};
+	return unless $self->mapped;
+	my $file= $self->{current_file};
+	my $pixbuf= $file && GMB::Picture::pixbuf($file);	#disable cache ?
+	return unless $pixbuf;
+	my ($w,$h)= ($self->window->get_geometry)[2,3];
+	$self->{pixbuf}=GMB::Picture::Scale_with_ratio($pixbuf,$w,$h,1);
+	$self->queue_draw;
+}
+
+sub size_allocate_cb
+{	my $self=shift;
+	::IdleDo('9_LoadImg'.$self,400,\&LoadImg,$self) if $self->mapped && $self->{current_file};
+}
+sub expose_cb
+{	my ($self,$event)=@_;
+	my $pixbuf= $self->{pixbuf};
+	return 1 unless $pixbuf;
+	my ($x,$y,$w,$h)=$self->window->get_geometry;
+	($x,$y)=(0,0) unless $self->no_window;
+	my $pw=$pixbuf->get_width;
+	my $ph=$pixbuf->get_height;
+	$x+= ($w-$pw)*$self->{xalign};
+	$y+= ($h-$ph)*$self->{yalign};
+	my $gc=Gtk2::Gdk::GC->new($self->window);
+	$gc->set_clip_rectangle($event->area);
+	$self->window->draw_pixbuf($gc,$pixbuf,0,0,$x,$y,-1,-1,'none',0,0);
+	1;
+}
+sub button_press_cb
+{	my ($self,$event)=@_;
+	::IdleDo('8_ChangePicture'.$self,500,\&ChangePicture,$self,1) if $self->{current_file};
+	1;
+}
+sub scroll_cb
+{	my ($self,$event)=@_;
+	my $d= $event->direction;
+	if	($d eq 'down'	|| $d eq 'right')	{ $d=1 }
+	elsif	($d eq 'up'	|| $d eq 'left' )	{ $d=-1}
+	else	{ return 0 }
+	# do nothing for now, will probably zoom in/out FIXME #::IdleDo('8_ChangePicture'.$self,500,\&ChangePicture,$self,$d) if $self->{current_file};
 }
 
 package GMB::Context;
