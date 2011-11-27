@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.4\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-11-17 12:51+0100\n"
+"POT-Creation-Date: 2011-11-27 19:17+0100\n"
 "PO-Revision-Date: 2011-11-23 20:08+0100\n"
 "Last-Translator: Major Grubert <david.robert.esteban@gmail.com>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -23,96 +23,116 @@ msgstr "Champs"
 msgid " Review "
 msgstr "Critique"
 
+#, perl-brace-format
 msgid " of {length}"
 msgstr "de {length}"
 
 msgid "# songs"
 msgstr "# chansons"
 
+#, perl-format
 msgid "%S by %a"
 msgstr "%S par %a"
 
+#, perl-format
 msgid "%d Album"
 msgid_plural "%d Albums"
 msgstr[0] "%d Album"
 msgstr[1] "%d Albums"
 
+#, perl-format
 msgid "%d Artist"
 msgid_plural "%d Artists"
 msgstr[0] "%d Artiste"
 msgstr[1] "%d Artistes"
 
+#, perl-format
 msgid "%d Song"
 msgid_plural "%d Songs"
 msgstr[0] "%d Chanson"
 msgstr[1] "%d Chansons"
 
+#, perl-format
 msgid "%d Upcoming Event"
 msgid_plural "%d Upcoming Events"
 msgstr[0] "%d Évènement à venir"
 msgstr[1] "%d Évènements à venir"
 
+#, perl-format
 msgid "%d album"
 msgid_plural "%d albums"
 msgstr[0] "%d album"
 msgstr[1] "%d albums"
 
+#, perl-format
 msgid "%d artist"
 msgid_plural "%d artists"
 msgstr[0] "%d artiste"
 msgstr[1] "%d artistes"
 
+#, perl-format
 msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] "%d fichier"
 msgstr[1] "%d fichiers"
 
+#, perl-format, perl-brace-format
 msgid "%d file in {folder}"
 msgid_plural "%d files in {folder}"
 msgstr[0] "%d fichier dans {folder}"
 msgstr[1] "%d fichiers dans {folder}"
 
+#, perl-format
 msgid "%d folder"
 msgid_plural "%d folders"
 msgstr[0] "%d dossier"
 msgstr[1] "%d dossiers"
 
+#, perl-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d seconde"
 msgstr[1] "%d secondes"
 
+#, perl-format
 msgid "%d song"
 msgid_plural "%d songs"
 msgstr[0] "%d chanson"
 msgstr[1] "%d chansons"
 
+#, perl-format
 msgid "%d song added"
 msgid_plural "%d songs added"
 msgstr[0] "%d chanson ajoutée"
 msgstr[1] "%d chansons ajoutées"
 
+#, perl-format
 msgid "%d song in queue"
 msgid_plural "%d songs in queue"
 msgstr[0] "%d chanson dans la file d'attente"
 msgstr[1] "%d chansons dans la file d'attente"
 
+#, perl-format
 msgid "%d song in the library"
 msgid_plural "%d songs in the library"
 msgstr[0] "%d chanson dans la bibliothèque"
 msgstr[1] "%d chansons dans la bibliothèque"
 
+#, perl-format
 msgid "%d song selected"
 msgid_plural "%d songs selected"
 msgstr[0] "%d chanson sélectionnée"
 msgstr[1] "%d chansons sélectionnées"
 
+#, perl-format
 msgid "%t by %a (%m)"
 msgstr "%t par %a (%m)"
 
+#, perl-brace-format
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' existe déjà. Remplacer ?"
 
+#, perl-format
 msgid "(%d song excluded)"
 msgid_plural "(%d songs excluded)"
 msgstr[0] "(%d chanson exclue)"
@@ -124,6 +144,7 @@ msgstr "(s'appliquera après un redémarrage)"
 msgid "(case insensitive)"
 msgstr "(ignorer la casse)"
 
+#, perl-brace-format
 msgid "(common parent folder : {common})"
 msgstr "(dossier de rang supérieur commun : {common})"
 
@@ -152,6 +173,7 @@ msgstr "0 chance"
 msgid "0 means 'show all'"
 msgstr "0 équivaut à \"tout montrer\""
 
+#, perl-brace-format
 msgid "1 chance in {probability}"
 msgstr "1 chance sur {probability}"
 
@@ -173,6 +195,7 @@ msgstr "Les 50 plus jouées"
 msgid "<Unknown>"
 msgstr "<Inconnu>"
 
+#, perl-format
 msgid ""
 "<b>%t</b>\n"
 "<small><small>by</small> %a\n"
@@ -182,9 +205,11 @@ msgstr ""
 "<small><small>par</small> %a\n"
 "<small>dans</small> %l</small>"
 
+#, perl-format
 msgid "<big><big>by %a</big></big>"
 msgstr "<big><big>par %a</big></big>"
 
+#, perl-format
 msgid "<i>by</i> %a\\n<i>from</i> %l"
 msgstr "<i>par</i> %a\\n<i>dans</i> %l"
 
@@ -203,6 +228,7 @@ msgstr "Annuler le mass-tagging"
 msgid "About"
 msgstr "À propos"
 
+#, perl-brace-format
 msgid ""
 "About to delete {files}\n"
 "Are you sure ?"
@@ -295,6 +321,7 @@ msgstr "Ajouter à la liste de lecture"
 msgid "Add to queue"
 msgstr "Ajouter à la file d'attente"
 
+#, perl-brace-format
 msgid "Add {value} to {field} for all tracks on this album."
 msgstr "Ajouter {value} à {field} pour toutes les chansons de cet album."
 
@@ -377,9 +404,11 @@ msgstr "Album avec pochette"
 msgid "Album year(s)"
 msgstr "Année(s) de l'album"
 
+#, perl-format
 msgid "Album: %l"
 msgstr "Album : %l"
 
+#, perl-format
 msgid "Album: %l (%Y)"
 msgstr "Album : %l (%Y)"
 
@@ -449,6 +478,8 @@ msgstr ""
 "Permet le contrôle de gmusicbrowser par DBus en utilisant le standard MPRIS "
 "v2.0"
 
+#. Alt key
+msgctxt "Keyboard"
 msgid "Alt"
 msgstr "Alt"
 
@@ -470,6 +501,7 @@ msgstr "Ajouter à la liste de lecture"
 msgid "Application"
 msgstr "Application"
 
+#, perl-brace-format
 msgid "Are you sure you want to delete the '{label}' label ?"
 msgstr "Êtes-vous sûr de vouloir effacer l'étiquette '{label}' ?"
 
@@ -488,6 +520,7 @@ msgstr "Artiste (Année - Album)"
 msgid "Artist Biography"
 msgstr "Biographie de l'artiste"
 
+#, perl-format
 msgid "Artist Picture Size : %d"
 msgstr "Taille de l'image de l'artiste : %d"
 
@@ -506,6 +539,7 @@ msgstr "Artiste, Album, Disque, Piste"
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "Artiste, Date, Album, Disque, Piste"
 
+#, perl-format
 msgid "Artist: %a"
 msgstr "Artiste : %a"
 
@@ -523,12 +557,6 @@ msgstr "Ordre de tri ascendant"
 
 msgid "Ask confirmation only if file already exists"
 msgstr "Demander une confirmation seulement si le fichier existe déjà"
-
-msgid "Audacious"
-msgstr "inspiré d'Audacious"
-
-msgid "Audacious_PLM"
-msgstr "Audacious_PLM"
 
 msgid "Audio"
 msgstr "Audio"
@@ -656,6 +684,7 @@ msgstr ""
 "Impossible de régler le volume. Cette sortie audio nécessite amixer (trouvé "
 "dans alsa-utils) pour changer le volume."
 
+#, perl-brace-format
 msgid ""
 "Can't create Folder '{path}' : \n"
 "{error}"
@@ -663,15 +692,18 @@ msgstr ""
 "Ne peut créer le dossier '{path}' : \n"
 "{error}"
 
+#, perl-brace-format
 msgid "Can't create sink '{sink}'"
 msgstr "Impossible de créer la sortie '{sink}'"
 
+#, perl-brace-format
 msgid "Can't play '{file}'."
 msgstr "Ne sait pas jouer {file}"
 
 msgid "Can't read file or invalid file"
 msgstr "Impossible de lire le fichier ou fichier invalide"
 
+#, perl-brace-format
 msgid "Can't write in base folder '{folder}'."
 msgstr "Impossible d'écrire dans le dossier de base : '{folder}'."
 
@@ -762,12 +794,14 @@ msgstr "Choisir une police pour les paroles"
 msgid "Choose font..."
 msgstr "Choisir une police..."
 
+#, perl-brace-format
 msgid "Choose icon for label {name}"
 msgstr "Choisir une icône pour l'étiquette {name}"
 
 msgid "Choose page to open"
 msgstr "Choisir la page à ouvrir"
 
+#, perl-format
 msgid "Choose picture for '%s'"
 msgstr "Choisir une image pour '%s'"
 
@@ -802,7 +836,7 @@ msgid "Close to tray"
 msgstr "Rester dans la zone de notification au lieu de quitter"
 
 msgid "Collection"
-msgstr "Compilation"
+msgstr "Collection"
 
 msgid "Command"
 msgstr "Commande"
@@ -852,9 +886,6 @@ msgstr "Contexte"
 msgid "Control"
 msgstr "Contrôle"
 
-msgid "Conz Aardvark"
-msgstr "Conz Aardvark"
-
 msgid "Conz Aishi (with Filter Panes)"
 msgstr "Conz Aishi (avec filtres)"
 
@@ -876,6 +907,7 @@ msgstr "Copier vers un lecteur portable monté"
 msgid "Copy to portable player"
 msgstr "Copier vers un lecteur portable"
 
+#, perl-format
 msgid "Copying file"
 msgid_plural "Copying %d files"
 msgstr[0] "Copie d'un fichier"
@@ -890,6 +922,8 @@ msgstr "Taille de l'image :"
 msgid "Create ID3v2 tags as ID3v2.4"
 msgstr "Créer les tags ID3v2 comme des tags ID3v2.4"
 
+#. Ctrl key
+msgctxt "Keyboard"
 msgid "Ctrl"
 msgstr "Ctrl"
 
@@ -917,6 +951,9 @@ msgstr "Champs personnalisés"
 msgid "Custom formats"
 msgstr "Formats personnalisés"
 
+msgid "Custom pipeline"
+msgstr "Pipeline personnalisée"
+
 msgid "Custom..."
 msgstr "Personalisé..."
 
@@ -941,6 +978,10 @@ msgstr "Diminuer le volume"
 msgid "Default"
 msgstr "Défaut"
 
+msgid "Default fullscreen"
+msgstr "Mode Plein écran par défaut"
+
+#, perl-format
 msgid "Default rating : %d %"
 msgstr "Note par défaut : %d %"
 
@@ -950,10 +991,11 @@ msgstr "Couleur du texte par défaut"
 msgid "Default text font"
 msgstr "Police par défaut"
 
+#, perl-format
 msgid "Delay before showing tray tip popup on mouse over : %d ms"
 msgstr ""
 "Délai avant l'affichage de la fenêtre d'information quand la souris passe "
-"sur l'icône :"
+"sur l'icône : %d ms"
 
 msgid "Delete"
 msgstr "Effacer"
@@ -1013,6 +1055,7 @@ msgstr "Affiche les actions Stop/Suivant"
 msgid "Display synchronized lyrics of the current song"
 msgstr "Affiche les paroles synchronisées de la chanson jouée"
 
+#, perl-format
 msgid "Display tray tip for %d ms"
 msgstr "Afficher la fenêtre d'information pendant %d ms"
 
@@ -1034,6 +1077,7 @@ msgstr "Ne pas écrire les tags"
 msgid "Don't add the overlay to dialogs"
 msgstr "Ne pas ajouter de sur-couche aux textes"
 
+#, perl-brace-format
 msgid "Don't know how to play files of type {type}"
 msgstr "Ne sait pas comment jouer les fichiers de type {type}"
 
@@ -1100,20 +1144,11 @@ msgstr "Éditer les propriétés de la chanson sélectionnée"
 msgid "Edit..."
 msgstr "Modifier..."
 
-msgid "EditList"
-msgstr "Modification de la liste"
-
 msgid "Editing list : "
 msgstr "Modification de la liste : "
 
 msgid "Editing tags"
 msgstr "Modification des tags"
-
-msgid "EeePC"
-msgstr "EeePC"
-
-msgid "EeePC2"
-msgstr "EeePC2"
 
 msgid "Embedded lyrics"
 msgstr "Paroles intégrées"
@@ -1175,6 +1210,7 @@ msgstr "Égaliseur"
 msgid "Error :"
 msgstr "Erreur :"
 
+#, perl-brace-format
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1183,6 +1219,7 @@ msgstr ""
 "'{file}' :\n"
 "{error}"
 
+#, perl-brace-format
 msgid ""
 "Error saving lyrics in '{file}' :\n"
 "{error}"
@@ -1190,6 +1227,7 @@ msgstr ""
 "Erreur lors de l'écriture des paroles dans '{file}' : \n"
 "{error}"
 
+#, perl-brace-format
 msgid ""
 "Error saving review in '{file}' :\n"
 "{error}"
@@ -1197,6 +1235,7 @@ msgstr ""
 "Erreur lors de la sauvegarde de la critique dans '{file}' : \n"
 "{error}"
 
+#, perl-brace-format
 msgid "Error writing '{file}'"
 msgstr "Erreur en écrivant '{file}'"
 
@@ -1208,9 +1247,6 @@ msgstr "Erreur : format de nom de fichier invalide"
 
 msgid "Events"
 msgstr "Évènements"
-
-msgid "Exaile"
-msgstr "inspiré d'Exaile"
 
 msgid "Example :"
 msgstr "Exemple :"
@@ -1245,12 +1281,14 @@ msgstr "Extraire l'artiste invité à partir du titre :"
 msgid "Fade-out"
 msgstr "Arrêt en fondu"
 
+#, perl-format
 msgid "Fade-out in %d seconds"
 msgstr "Arrêt en fondu en %d secondes"
 
 msgid "Fade-out then stop"
 msgstr "Arrêt en fondu"
 
+#, perl-brace-format
 msgid ""
 "Failed to delete '{file}' :\n"
 "{error}"
@@ -1298,7 +1336,7 @@ msgid "Filter"
 msgstr "Filtre"
 
 msgid "Filter : "
-msgstr "Filtre :"
+msgstr "Filtre : "
 
 msgid "Filter edition"
 msgstr "Édition de filtre"
@@ -1383,12 +1421,6 @@ msgstr "Gain pour les chansons sans tag replaygain"
 
 msgid "Garage Fullscreen"
 msgstr "Garage Fullscreen"
-
-msgid "Garage5"
-msgstr "Garage5"
-
-msgid "Garage6"
-msgstr "Garage6"
 
 msgid "Genre"
 msgstr "Genre"
@@ -1490,6 +1522,9 @@ msgstr "Insérer les chansons sélectionnées en tête de la file d'attente"
 msgid "Insert a list of files/folders at the start of the playlist"
 msgstr "Insérer une liste de fichiers/dossiers au début de la liste de lecture"
 
+msgid "Insert this pipeline before the audio sink"
+msgstr "Insért cette pipeline avant la sortie audio"
+
 msgid "Invalid regular expression"
 msgstr "Expression régulière non valide"
 
@@ -1499,6 +1534,7 @@ msgstr "Inversion du filtre"
 msgid "Invisible hot spot"
 msgstr "Invisible (affiche la fenêtre d'info au survol)"
 
+#, perl-format
 msgid "Isn't smart equal to %s"
 msgstr "n'est pas égal (intelligent) à %s"
 
@@ -1589,6 +1625,7 @@ msgstr ""
 "\n"
 "Pour ajouter des chansons, utilisez la fenêtre de configuration."
 
+#, perl-format
 msgid "Library size : %d song"
 msgid_plural "Library size : %d songs"
 msgstr[0] "La bibliothèque contient %d chanson"
@@ -1635,6 +1672,7 @@ msgstr "Rechercher les paroles même quand le panneau des paroles est masqué"
 msgid "Load/Save Artist Info in :"
 msgstr "Ouvrir/Sauvegarder les informations de l'artiste dans :"
 
+#, perl-format
 msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "%d chanson non-envoyée depuis la session précédente"
@@ -1664,6 +1702,7 @@ msgstr "Artiste verrouillé"
 msgid "Lock on song"
 msgstr "Chanson verrouillée"
 
+#, perl-brace-format
 msgid "Lock on {field}"
 msgstr "{field} verrouillé"
 
@@ -1805,6 +1844,7 @@ msgstr "Échec du déplacement"
 msgid "Move folder to"
 msgstr "Déplacer ce dossier vers"
 
+#, perl-format
 msgid "Moving file"
 msgid_plural "Moving %d files"
 msgstr[0] "Déplacement d'un fichier"
@@ -1909,8 +1949,14 @@ msgstr "Aucun navigateur web trouvé."
 msgid "None"
 msgstr "Aucun"
 
+msgid "Normal"
+msgstr "Normal"
+
 msgid "Normal mode"
 msgstr "Mode normal"
+
+msgid "Normal with buttons"
+msgstr "Normal + boutons"
 
 msgid "Normalize volume (the files must have replaygain tags)"
 msgstr "Normaliser le volume (les fichiers doivent avoir des tags replaygain)"
@@ -2001,6 +2047,7 @@ msgstr "Ancien nom"
 msgid "On top of other windows instead of below"
 msgstr "Par-dessus les autres fenêtres plutôt qu'au-dessous"
 
+#, perl-brace-format
 msgid "One of these commands is required to play files of type {type} : {cmd}"
 msgstr ""
 "Une de ces commandes est nécessaire pour jouer les fichiers de type {type} : "
@@ -2141,6 +2188,7 @@ msgstr "Image"
 msgid "Picture Type"
 msgstr "Type de l'image"
 
+#, perl-format
 msgid "Picture cache : %d MB"
 msgstr "Cache des images : %d Mo"
 
@@ -2150,6 +2198,7 @@ msgstr "Recherche d'images"
 msgid "Picture finder plugin"
 msgstr "Plugin de recherche d'images"
 
+#, perl-format
 msgid "Picture size : %d"
 msgstr "Taille de l'image : %d"
 
@@ -2231,6 +2280,7 @@ msgstr "Titre en lecture"
 msgid "Playing and queue icons"
 msgstr "Icônes de lecture et de file d'attente"
 
+#, perl-brace-format
 msgid "Playing error : {error}"
 msgstr "Erreur de lecture : {error}"
 
@@ -2348,6 +2398,7 @@ msgstr "Éditeur/Studio logo"
 msgid "Queue"
 msgstr "File d'attente"
 
+#, perl-format
 msgid "Queue (%n)"
 msgstr "File d'attente (%n)"
 
@@ -2383,9 +2434,6 @@ msgstr "Quitter"
 
 msgid "Quit when queue empty"
 msgstr "Quitter une fois la file d'attente vide"
-
-msgid "Quodlibet"
-msgstr "inspiré de Quodlibet"
 
 msgid "Radio title"
 msgstr "Titre de la radio"
@@ -2579,6 +2627,7 @@ msgstr "Renommer ce dossier en :"
 msgid "Rename/move files based on these fields :"
 msgstr "Renommer/Déplacer ces fichiers en utilisant ces champs :"
 
+#, perl-brace-format
 msgid ""
 "Renaming {oldname}\n"
 "to {newname}\n"
@@ -2637,9 +2686,6 @@ msgstr "inspiré de Rhythmbox"
 
 msgid "Rhythmbox 2nd queue column"
 msgstr "Rhythmbox : 2nde colonne de la queue"
-
-msgid "Rhythmbox Compact"
-msgstr "inspiré de Rhythmbox (compact)"
 
 msgid "Right aligned"
 msgstr "Aligné à droite"
@@ -2735,6 +2781,7 @@ msgstr ""
 "Sauvegarder les champs sélectionnés pour tous les titres de l'album à chaque "
 "fois que des données sont trouvées sur AMG ou depuis le fichier."
 
+#, perl-format
 msgid "Save tags/settings every %d minutes"
 msgstr "Sauve les tags et la configuration toutes les %d minutes"
 
@@ -2935,6 +2982,7 @@ msgstr "Définir la disposition de la fenêtre de lecture"
 msgid "Set subgroup"
 msgstr "Définir le sous-regroupement"
 
+#, perl-brace-format
 msgid "Set {year} as year for all tracks on this album."
 msgstr "Appliquer {year} à l'année de toutes les chansons de cet album."
 
@@ -2946,6 +2994,7 @@ msgstr ""
 "Les changements de configuration sur cette page ne prendront effet qu'après "
 "un redémarrage"
 
+#, perl-format
 msgid ""
 "Shell command\n"
 "(some variables such as %f (current song filename) or %F (list of selected "
@@ -2955,20 +3004,10 @@ msgstr ""
 "(certaines variables comme %f (nom de fichier de la chanson en cours) ou %F "
 "(liste des noms de fichiers des chansons sélectionnées) sont utilisables)."
 
+#. Shift key
+msgctxt "Keyboard"
 msgid "Shift"
 msgstr "Shift"
-
-msgid "Shimmer Desktop"
-msgstr "Shimmer Desktop"
-
-msgid "Shimmer Netbook"
-msgstr "Shimmer Netbook"
-
-msgid "Shimmer Party"
-msgstr "Shimmer Party"
-
-msgid "Shimmer Traytip"
-msgstr "Shimmer Notifications"
 
 msgid "Show"
 msgstr "Afficher"
@@ -3233,10 +3272,12 @@ msgstr "Thèmes"
 msgid "These fields can be used :"
 msgstr "Ces champs peuvent être utilisés :"
 
+#, perl-brace-format
 msgid "This command is required to play files of type {type} : {cmd}"
 msgstr ""
 "Cette commande est nécessaire pour jouer les fichiers de type {type} : {cmd}"
 
+#, perl-format
 msgid "This label is set for %d song."
 msgid_plural "This label is set for %d songs."
 msgstr[0] "%d chanson a cette étiquette."
@@ -3252,6 +3293,7 @@ msgstr ""
 "Récupère des informations sur l'artiste en cours (biographie, évènements, "
 "artistes similaires) sur Last.fm."
 
+#, perl-format
 msgid "Threshold to count a song as played : %d %"
 msgstr "Seuil pour compter une chanson comme jouée : %d %"
 
@@ -3261,6 +3303,7 @@ msgstr "Jeudi"
 msgid "Time :"
 msgstr "Heure :"
 
+#, perl-format
 msgid "Timeout : %d seconds"
 msgstr "Durée d'affichage : %d secondes"
 
@@ -3279,9 +3322,11 @@ msgstr "Titre & progression"
 msgid "Title - Artist - Album"
 msgstr "Titre - Artiste - Album"
 
+#, perl-format
 msgid "Title: %t"
 msgstr "Titre : %t"
 
+#, perl-format
 msgid "Title: %t (Track No. %n)"
 msgstr "Titre : %t (piste n°%n)"
 
@@ -3298,9 +3343,7 @@ msgid "Toggle Artist Lock"
 msgstr "(Dé)Verrouiller l'artiste"
 
 msgid "Toggle Song Lock"
-msgstr ""
-"(Dé)Verrouiller la chanson\n"
-"(Permet de lire en boucle la chanson)"
+msgstr "(Dé)Verrouiller la chanson"
 
 msgid "Toggle a label of the current song"
 msgstr "Bascule une étiquette de la chanson actuelle"
@@ -3356,12 +3399,14 @@ msgstr "Identificateur de fichier"
 msgid "Unknown album"
 msgstr "Album inconnu"
 
+#, perl-brace-format
 msgid "Unknown field ({field})"
 msgstr "Champ ({field}) inconnu"
 
 msgid "Unknown filter :"
 msgstr "Filtre inconnu : "
 
+#, perl-format
 msgid "Unknown layout '%s'"
 msgstr "Disposition/apparence inconnue '%s'"
 
@@ -3427,6 +3472,7 @@ msgstr "Utiliser gstreamer"
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "Utiliser l'encodage latin1 quand c'est possible pour les tags id3v2"
 
+#, perl-format
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
@@ -3440,12 +3486,15 @@ msgstr ""
 msgid "Use the playing filter"
 msgstr "Utiliser le filtre de lecture"
 
+#, perl-brace-format
 msgid "Use this picture as cover for album '{album}'"
 msgstr "Utiliser cette image comme pochette pour l'album '{album}'"
 
+#, perl-brace-format
 msgid "Use this picture for artist '{artist}'"
 msgstr "Utiliser cette image pour l'artiste '{artist}'"
 
+#, perl-brace-format
 msgid "Use {command} to play {ext} files"
 msgstr "Utiliser {command} pour jouer les fichiers {ext}"
 
@@ -3482,9 +3531,6 @@ msgstr "Voir données binaires"
 
 msgid "View binary data ..."
 msgstr "Voir données binaires..."
-
-msgid "Volume"
-msgstr "Volume"
 
 msgid "Volume : "
 msgstr "Volume : "
@@ -3565,7 +3611,8 @@ msgstr ""
 "Attention, les changements faits pour une chanson seront perdus si le tag "
 "est relu."
 
-# touche windows
+#. Windows key
+msgctxt "Keyboard"
 msgid "Win"
 msgstr "Win"
 
@@ -3651,6 +3698,7 @@ msgstr "options avancées"
 msgid "after"
 msgstr "après"
 
+#, perl-format
 msgid "after %s"
 msgstr "après %s"
 
@@ -3669,6 +3717,7 @@ msgstr "nécessite un redémarrage"
 msgid "apply filter"
 msgstr "appliquer le filtre"
 
+#, perl-brace-format
 msgid "argument {n} :"
 msgstr "argument {n} :"
 
@@ -3696,15 +3745,18 @@ msgstr "logo de l'artiste/groupe"
 msgid "before"
 msgstr "avant"
 
+#, perl-format
 msgid "before %s"
 msgstr "avant %s"
 
 msgid "between"
 msgstr "entre"
 
+#, perl-format
 msgid "between %s ago and %s ago"
 msgstr "entre %s et %s"
 
+#, perl-format
 msgid "between %s and %s"
 msgstr "entre %s et %s"
 
@@ -3750,9 +3802,11 @@ msgstr "selon le nombre de lectures"
 msgid "by rating"
 msgstr "selon la note"
 
+#, perl-brace-format
 msgid "by {artist} from {album}"
 msgstr "par {artist} de {album}"
 
+#, perl-brace-format
 msgid "by {author}"
 msgstr "par {author}"
 
@@ -3792,9 +3846,11 @@ msgstr "erreur de connexion."
 msgid "contains"
 msgstr "contient"
 
+#, perl-format
 msgid "contains %s"
 msgstr "contient %s"
 
+#, perl-format
 msgid "contains %s (case sensitive)"
 msgstr "contient %s (respecter la casse)"
 
@@ -3819,9 +3875,6 @@ msgstr "nom de fichier par défaut"
 msgid "default folder"
 msgstr "dossier par défaut"
 
-msgid "default fullscreen"
-msgstr "Mode Plein écran par défaut"
-
 msgid "delete selected filter"
 msgstr "supprimer le filtre sélectionné"
 
@@ -3837,27 +3890,34 @@ msgstr "supprimer le mode de tri sélectionné"
 msgid "different folders"
 msgstr "dossiers différents"
 
+#, perl-brace-format
 msgid "disc {disc}"
 msgstr "disque {disc}"
 
+#, perl-format
 msgid "doesn't contain %s"
 msgstr "ne contient pas %s"
 
+#, perl-format
 msgid "doesn't contain %s (case sensitive)"
 msgstr "ne contient pas %s (respecter la casse)"
 
 msgid "doesn't have a picture"
 msgstr "n'a pas d'image"
 
+#, perl-format
 msgid "doesn't include %s"
 msgstr "ne contient pas %s"
 
+#, perl-format
 msgid "doesn't include artist %s"
 msgstr "ne contient pas l'artiste %s"
 
+#, perl-format
 msgid "doesn't match regexp %s"
 msgstr "ne correspond pas à l'expression régulière %s"
 
+#, perl-format
 msgid "doesn't match regexp %s (case sensitive)"
 msgstr "ne correspond pas à l'expression régulière %s (respecter la casse)"
 
@@ -3884,18 +3944,21 @@ msgstr "erreur"
 msgid "ex :"
 msgstr "ex :"
 
+#, perl-brace-format
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "exemple (chanson sélectionnée) : {score}  ({chances})"
 
 msgid "example : "
 msgstr "exemple :"
 
+#, perl-format
 msgid "example : %s"
 msgstr "exemple : %s"
 
 msgid "examples :"
 msgstr "exemples :"
 
+#, perl-format
 msgid "fallback-gain : %d dB"
 msgstr "gain par défaut : %d dB"
 
@@ -3926,15 +3989,10 @@ msgstr "pour les fichiers sans en-tête VBR"
 msgid "front cover"
 msgstr "pochette"
 
-msgid "full"
-msgstr "complet"
-
-msgid "full with buttons"
-msgstr "complet + boutons"
-
 msgid "gmusicbrowser"
 msgstr "gmusicbrowser"
 
+#, perl-format
 msgid "gmusicbrowser is playing %t from %l (%Y) by %a"
 msgstr "gmusicbrowser joue %t dans %l (%Y) par %a"
 
@@ -3986,35 +4044,37 @@ msgstr "illustration"
 msgid "imported list"
 msgstr "liste importée"
 
+#, perl-format
 msgid "in %l"
 msgstr "dans %l"
 
 msgid "in the bottom"
 msgstr "les plus bas(ses)"
 
+#, perl-format
 msgid "in the bottom %s"
 msgstr "les %s plus bas(ses)"
 
 msgid "in the top"
 msgstr "les plus haut(e)s"
 
+#, perl-format
 msgid "in the top %s"
 msgstr "les %s plus haut(e)s"
 
 msgid "includes"
 msgstr "inclut"
 
+#, perl-format
 msgid "includes %s"
 msgstr "inclut %s"
 
 msgid "includes artist"
 msgstr "inclut l'artiste"
 
+#, perl-format
 msgid "includes artist %s"
 msgstr "inclut l'artiste %s"
-
-msgid "info"
-msgstr "info"
 
 msgid "integer"
 msgstr "entier"
@@ -4031,6 +4091,7 @@ msgstr "inverse"
 msgid "is"
 msgstr "est"
 
+#, perl-format
 msgid "is %s"
 msgstr "est %s"
 
@@ -4061,6 +4122,7 @@ msgstr "est un fichier ogg"
 msgid "is equal to"
 msgstr "est égal à"
 
+#, perl-format
 msgid "is equal to %s"
 msgstr "est égal à %s"
 
@@ -4070,6 +4132,7 @@ msgstr "est faux"
 msgid "is in"
 msgstr "est dans"
 
+#, perl-format
 msgid "is in %s"
 msgstr "est dans %s"
 
@@ -4079,6 +4142,7 @@ msgstr "est mono"
 msgid "is smart equal"
 msgstr "est égal (intelligent) à"
 
+#, perl-format
 msgid "is smart equal to %s"
 msgstr "est égal (intelligent) à %s"
 
@@ -4088,12 +4152,15 @@ msgstr "est stéréo"
 msgid "is true"
 msgstr "est vrai"
 
+#, perl-format
 msgid "isn't %s"
 msgstr "n'est pas %s"
 
+#, perl-format
 msgid "isn't equal to %s"
 msgstr "est différent de %s"
 
+#, perl-format
 msgid "isn't in %s"
 msgstr "n'est pas dans %s"
 
@@ -4146,6 +4213,7 @@ msgstr "longueur des chansons"
 msgid "less than"
 msgstr "moins de"
 
+#, perl-format
 msgid "less than %s ago"
 msgstr "il y a moins de %s"
 
@@ -4158,9 +4226,11 @@ msgstr "fichier paroles"
 msgid "matches regexp"
 msgstr "correspond à l'expression régulière"
 
+#, perl-format
 msgid "matches regexp %s"
 msgstr "correspond à l'expression régulière %s"
 
+#, perl-format
 msgid "matches regexp %s (case sensitive)"
 msgstr "correspond à l'expression régulière %s (respecter la casse)"
 
@@ -4191,6 +4261,7 @@ msgstr "mois"
 msgid "more than"
 msgstr "est plus que"
 
+#, perl-format
 msgid "more than %s ago"
 msgstr "il y a plus de %s"
 
@@ -4209,6 +4280,9 @@ msgid ""
 msgstr ""
 "les fichiers mp3 sans entête VBR nécessitent une vérification complète pour "
 "obtenir leurs durée et taux réels"
+
+msgid "mplayer executable :"
+msgstr "executable mplayer :"
 
 msgid "mplayer options :"
 msgstr "options pour mplayer :"
@@ -4266,30 +4340,38 @@ msgstr "sans nom"
 msgid "normal"
 msgstr "normal"
 
+#, perl-format
 msgid "not between %s ago and %s ago"
 msgstr "n'est pas entre %s et %s"
 
+#, perl-format
 msgid "not between %s and %s"
 msgstr "n'est pas entre %s et %s"
 
 msgid "not bootleg"
 msgstr "pas un bootleg"
 
+#, perl-format
 msgid "not in the bottom %s"
 msgstr "n'est pas dans les %s plus bas(e)s"
 
+#, perl-format
 msgid "not in the top %s"
 msgstr "n'est pas dans les %s plus hau(es)"
 
+#, perl-format
 msgid "not present in %s"
 msgstr "n'est pas dans %s"
 
+#, perl-format
 msgid "not set to %s"
 msgstr "n'a pas été mis(e) à %s"
 
+#, perl-format
 msgid "not the %s least recent"
 msgstr "n'est pas dans les %s les moins récent(e)s"
 
+#, perl-format
 msgid "not the %s most recent"
 msgstr "n'est pas dans les %s les plus récent(e)s"
 
@@ -4317,6 +4399,7 @@ msgstr "ouvrir la fenêtre Contexte"
 msgid "options"
 msgstr "options"
 
+#, perl-format
 msgid "or %d seconds"
 msgstr "ou %d secondes"
 
@@ -4350,9 +4433,11 @@ msgstr "port :"
 msgid "pre-amp"
 msgstr "pré-amp"
 
+#, perl-format
 msgid "pre-amp : %d dB"
 msgstr "pré-amp : %d dB"
 
+#, perl-format
 msgid "present in %s"
 msgstr "est dans %s"
 
@@ -4374,6 +4459,7 @@ msgstr "lieu d'enregistrement"
 msgid "requires xdg-screensaver"
 msgstr "nécessite xdg-screensaver"
 
+#, perl-brace-format
 msgid "reset filter {nb}"
 msgstr "enlever le filtre {nb}"
 
@@ -4389,12 +4475,14 @@ msgstr "enlever le filtre secondaire"
 msgid "retry"
 msgstr "ré-essayer"
 
+#, perl-brace-format
 msgid "retry in {seconds} s"
 msgstr "ré-essaye dans {seconds} sec."
 
 msgid "reverse order"
 msgstr "inverse l'ordre"
 
+#, perl-brace-format
 msgid "save as '{name}'"
 msgstr "sauver sous le nom '{name}'"
 
@@ -4431,6 +4519,7 @@ msgstr "secondes"
 msgid "set to"
 msgstr "a été mis(e) à"
 
+#, perl-format
 msgid "set to %s"
 msgstr "a été mis(e) à %s"
 
@@ -4473,18 +4562,22 @@ msgstr "format du texte"
 msgid "text mode"
 msgstr "mode du texte"
 
+#, perl-format
 msgid "the %s least recent"
 msgstr "les %s les moins récent(e)s"
 
+#, perl-format
 msgid "the %s most recent"
 msgstr "les %s les plus récent(e)s"
 
+#, perl-brace-format
 msgid "the command {name}"
 msgstr "la commande {name}"
 
 msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
 msgstr "l'encodage par défaut est utf16 pour id3v2.3 et utf8 pour id3v2.4"
 
+#, perl-brace-format
 msgid "the file {name}"
 msgstr "le fichier {name}"
 
@@ -4494,9 +4587,11 @@ msgstr "les moins récent(e)s"
 msgid "the most recent"
 msgstr "les plus récent(e)s"
 
+#, perl-brace-format
 msgid "the {name} perl module"
 msgstr "Le module perl {name}"
 
+#, perl-brace-format
 msgid "then {action}"
 msgstr "puis {action}"
 
@@ -4627,6 +4722,7 @@ msgstr "années"
 msgid "yes to all"
 msgstr "oui pour tous"
 
+#, perl-brace-format
 msgid ""
 "{album}\n"
 "<small>by</small> {artist}"
@@ -4634,33 +4730,43 @@ msgstr ""
 "{album}\n"
 "<small>par</small> {artist}"
 
+#, perl-brace-format
 msgid "{folder} already exists"
 msgstr "{folder} existe déjà"
 
+#, perl-brace-format
 msgid "{hours} hours {min} min {sec} s ({size} M)"
 msgstr "{hours} heures {min} min {sec} sec ({size} M)"
 
+#, perl-brace-format
 msgid "{hours}h {min}m {sec}s ({size}M)"
 msgstr "{hours}h {min}m {sec}s ({size}M)"
 
+#, perl-brace-format
 msgid "{hours}h{min}m{sec}s"
 msgstr "{hours}h{min}m{sec}s"
 
+#, perl-brace-format
 msgid "{min} min {sec} s ({size} M)"
 msgstr "{min} min {sec} sec ({size} M)"
 
+#, perl-brace-format
 msgid "{min}m {sec}s ({size}M)"
 msgstr "{min}m {sec}s ({size}M)"
 
+#, perl-brace-format
 msgid "{min}m{sec}s"
 msgstr "{min}m{sec}s"
 
+#, perl-brace-format
 msgid "{outputname} output settings"
 msgstr "Configuration de la sortie {outputname}"
 
+#, perl-brace-format
 msgid "{songs} by {artists}"
 msgstr "{songs} par {artists}"
 
+#, perl-brace-format
 msgid "{song} by {artist}"
 msgstr "{song} par {artist}"
 
@@ -4676,57 +4782,6 @@ msgstr "liste de widgets séparées par '|'"
 #~ msgid_plural "%d songs added."
 #~ msgstr[0] "%d chanson ajoutée"
 #~ msgstr[1] "%d chansons ajoutées"
-
-#~ msgid "%f is set"
-#~ msgstr "%f est attribué"
-
-#~ msgid "%n first added"
-#~ msgstr "%n premières ajoutées"
-
-#~ msgid "%n last added"
-#~ msgstr "%n dernières ajoutées"
-
-#~ msgid "%n last played"
-#~ msgstr "%n dernières jouées"
-
-#~ msgid "%n last skipped"
-#~ msgstr "%n dernières sautées"
-
-#~ msgid "%n less played"
-#~ msgstr "%n les moins jouées"
-
-#~ msgid "%n less skipped"
-#~ msgstr "%n les moins sautées"
-
-#~ msgid "%n longest"
-#~ msgstr "%n les plus longues"
-
-#~ msgid "%n most played"
-#~ msgstr "%n les plus jouées"
-
-#~ msgid "%n most skipped"
-#~ msgstr "%n les plus sautées"
-
-#~ msgid "%n not played for the longest time"
-#~ msgstr "%n non jouées depuis le plus longtemps"
-
-#~ msgid "%n not skipped for the longest time"
-#~ msgstr "%n non sautées depuis le plus longtemps"
-
-#~ msgid "%n shortest"
-#~ msgstr "%n les plus courtes"
-
-#~ msgid "' & ' and ', '"
-#~ msgstr "' & ' et ', '"
-
-#~ msgid "' & ' and ', ' and ';'"
-#~ msgstr "' & ' and ', ' and ';'"
-
-#~ msgid "(: )none"
-#~ msgstr "(: )aucun"
-
-#~ msgid "All but the [most/less]%n"
-#~ msgstr "Toutes sauf les [plus/moins]%n"
 
 #~ msgid "Auto-check current song for modification"
 #~ msgstr "Vérifier automatiquement si la chanson actuelle a été modifiée"
@@ -4769,10 +4824,6 @@ msgstr "liste de widgets séparées par '|'"
 #~ msgid "Disable wikipedia context tab"
 #~ msgstr "Désactiver l'onglet Wikipédia"
 
-#~ msgid "Display lyrics of the current song using lyrc.com.ar"
-#~ msgstr ""
-#~ "Affiche les paroles de la chanson en cours, en utilisant lyrc.com.ar"
-
 #~ msgid "Edit ..."
 #~ msgstr "Modifier..."
 
@@ -4785,17 +4836,6 @@ msgstr "liste de widgets séparées par '|'"
 
 #~ msgid "Error running amixer"
 #~ msgstr "Erreur en exécutant amixer"
-
-#~ msgid ""
-#~ "For information on how to use this plugin, please navigate to the <a "
-#~ "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
-#~ "artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser."
-#~ "org/dokuwiki/'>gmusicbrowser-wiki</a>."
-#~ msgstr ""
-#~ "Pour plus d'information sur l'utilisation de ce plugin, veuillez "
-#~ "consulter <a href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
-#~ "artistinfo'>la page wiki du plugin</a> dans <a href='http://gmusicbrowser."
-#~ "org/dokuwiki/'>gmusicbrowser-wiki</a>."
 
 #~ msgid "Genres pane"
 #~ msgstr "Panneau genres"
@@ -4816,21 +4856,9 @@ msgstr "liste de widgets séparées par '|'"
 #~ msgstr "Verrouille l'artiste"
 
 #~ msgid ""
-#~ "Makes case insensitive sort puts accented letters right after their "
-#~ "unaccented version.\n"
-#~ "(Significantly slower)"
-#~ msgstr ""
-#~ "Fait que les tris ignorant la casse classeront les lettres accentuées "
-#~ "juste après leur version non-accentuée\n"
-#~ "(beaucoup plus lent)"
-
-#~ msgid ""
 #~ "Makes gmusicbrowser reacts to the Next/Previous/Play/Stop multimedia keys "
 #~ "in gnome."
 #~ msgstr "Connecte les touches multimédia à gmusicbrowser sous gnome"
-
-#~ msgid "Pictures & mp3 files"
-#~ msgstr "Fichiers Images & mp3"
 
 #~ msgid "Play a list of files/folders"
 #~ msgstr "Jouer une liste de fichiers/dossiers"
@@ -4844,8 +4872,14 @@ msgstr "liste de widgets séparées par '|'"
 #~ msgid "Queue, Library & Context"
 #~ msgstr "File d'attente, bibliothèque et contexte"
 
+#~ msgid "Quodlibet"
+#~ msgstr "inspiré de Quodlibet"
+
 #~ msgid "Remove existing"
 #~ msgstr "Effacer ceux existants"
+
+#~ msgid "Rhythmbox Compact"
+#~ msgstr "inspiré de Rhythmbox (compact)"
 
 #~ msgid "Scanned %d folder, "
 #~ msgid_plural "Scanned %d folders, "
@@ -4867,21 +4901,17 @@ msgstr "liste de widgets séparées par '|'"
 #~ msgid "Shell command"
 #~ msgstr "Commande shell"
 
+#~ msgid "Shimmer Traytip"
+#~ msgstr "Shimmer Notifications"
+
 #~ msgid "Split on words"
 #~ msgstr "Séparer les mots"
-
-#~ msgid "The [most/less]"
-#~ msgstr "Les [plus/moins]"
 
 #~ msgid "Type"
 #~ msgstr "Type"
 
-#~ msgid ""
-#~ "Use ID3v2.4 instead of ID3v2.3, ID3v2.3 are probably better supported by "
-#~ "other softwares"
-#~ msgstr ""
-#~ "Utilise des tags ID3v2.4 au lieu de ID3v2.3, ID3v2.3 sont probablement "
-#~ "mieux compris par les autres logiciels"
+#~ msgid "Volume"
+#~ msgstr "Volume"
 
 #~ msgid "Wait when queue empty"
 #~ msgstr "Attendre une fois la file d'attente vide"
@@ -4906,9 +4936,6 @@ msgstr "liste de widgets séparées par '|'"
 #~ msgid "autofill queue"
 #~ msgstr "remplir la file d'attente automatiquement"
 
-#~ msgid "between %n( and )%n"
-#~ msgstr "entre %n( et )%n"
-
 #~ msgid "bitrate"
 #~ msgstr "bitrate"
 
@@ -4924,95 +4951,11 @@ msgstr "liste de widgets séparées par '|'"
 #~ msgid "ex : "
 #~ msgstr "ex.  : "
 
-#~ msgid "exactly %n( times)"
-#~ msgstr "exactement %n( fois)"
-
-#~ msgid "exactly not %n( times)"
-#~ msgstr "différent de %n( fois)"
-
 #~ msgid "first added"
 #~ msgstr "ajoutées en premier"
 
 #~ msgid "folder"
 #~ msgstr "dossier"
-
-#~ msgid "is %g"
-#~ msgstr "est %g"
-
-#~ msgid "is %n"
-#~ msgstr "est %n"
-
-#~ msgid "is %n( %)"
-#~ msgstr "est %n( %)"
-
-#~ msgid "is %n(Hz)"
-#~ msgstr "est %n(Hz)"
-
-#~ msgid "is %n(kbps)"
-#~ msgstr "est %n(kbps)"
-
-#~ msgid "is after %n"
-#~ msgstr "est après %n"
-
-#~ msgid "is before %n"
-#~ msgstr "est avant %n"
-
-#~ msgid "is between %n( and )%n( %)"
-#~ msgstr "est entre %b( et )%b( %)"
-
-#~ msgid "is between %n( and )%n( s)"
-#~ msgstr "est entre %b( et )%b( s)"
-
-#~ msgid "is in list %l"
-#~ msgstr "est dans la liste %l"
-
-#~ msgid "is less than %n"
-#~ msgstr "est moins que %n"
-
-#~ msgid "is less than %n( %)"
-#~ msgstr "est moins que %n( %)"
-
-#~ msgid "is less than %n( s)"
-#~ msgstr "est moins que %n( s)"
-
-#~ msgid "is less than %n(Hz)"
-#~ msgstr "est moins que %n(Hz)"
-
-#~ msgid "is less than %n(kbps)"
-#~ msgstr "est moins que %n(kbps)"
-
-#~ msgid "is more than %n"
-#~ msgstr "est plus que %n"
-
-#~ msgid "is more than %n( %)"
-#~ msgstr "est plus que %n( %)"
-
-#~ msgid "is more than %n( s)"
-#~ msgstr "est plus que %n( s)"
-
-#~ msgid "is more than %n(Hz)"
-#~ msgstr "est plus que %n(Hz)"
-
-#~ msgid "is more than %n(kbps)"
-#~ msgstr "est plus que %n(kbps)"
-
-#~ msgid "is not"
-#~ msgstr "n'est pas"
-
-#~ msgid "is not %n"
-#~ msgstr "n'est pas %n"
-
-#~ msgid "is not %n( %)"
-#~ msgstr "n'est pas %n( %)"
-
-#~ msgid "is not %s"
-#~ msgstr "n'est pas %s"
-
-#~ msgid "isn't %n(Hz)"
-#~ msgstr "n'est pas %n(Hz)"
-
-#~ msgid "isn't %n(kbps)"
-#~ msgstr "n'est pas %n(kbps)"
 
 #~ msgid "itunes-like"
 #~ msgstr "inspiré d'itunes"
@@ -5026,44 +4969,17 @@ msgstr "liste de widgets séparées par '|'"
 #~ msgid "last skipped"
 #~ msgstr "dernière fois sautée"
 
-#~ msgid "less played"
-#~ msgstr "moins jouées"
-
-#~ msgid "less skipped"
-#~ msgstr "moins sautées"
-
-#~ msgid "less than %n( times)"
-#~ msgstr "moins de %n( fois)"
-
-#~ msgid "longest"
-#~ msgstr "les plus longues"
-
 #~ msgid "minimum number of songs"
 #~ msgstr "nombre de chanson minimal"
 
 #~ msgid "modified"
 #~ msgstr "modifiée"
 
-#~ msgid "more than %n( times)"
-#~ msgstr "plus de %n (fois)"
-
-#~ msgid "most played"
-#~ msgstr "plus jouées"
-
-#~ msgid "most skipped"
-#~ msgstr "plus sautées"
-
 #~ msgid "next"
 #~ msgstr "suivant"
 
 #~ msgid "normal play when queue empty"
 #~ msgstr "lecture normale quand la file d'attente est vide"
-
-#~ msgid "not played for the longest time"
-#~ msgstr "pas jouées depuis le plus longtemps"
-
-#~ msgid "not skipped for the longest time"
-#~ msgstr "pas sautées depuis le plus longtemps"
 
 #~ msgid "old filename"
 #~ msgstr "ancien nom de fichier"
@@ -5091,15 +5007,6 @@ msgstr "liste de widgets séparées par '|'"
 #~ msgid "sampling rate"
 #~ msgstr "taux d'échantillonage"
 
-#~ msgid "set"
-#~ msgstr "défini"
-
-#~ msgid "shortest"
-#~ msgstr "les plus courtes"
-
-#~ msgid "skipped"
-#~ msgstr "sautée"
-
 #~ msgid "stop when queue empty"
 #~ msgstr "arrêter quand la file d'attente est vide"
 
@@ -5108,12 +5015,6 @@ msgstr "liste de widgets séparées par '|'"
 
 #~ msgid "unnamed static list"
 #~ msgstr "liste statique sans nom"
-
-#~ msgid "unset"
-#~ msgstr "Enlever"
-
-#~ msgid "web"
-#~ msgstr "web"
 
 #~ msgid "with context"
 #~ msgstr "avec contexte"
