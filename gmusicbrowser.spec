@@ -1,5 +1,5 @@
 Name: gmusicbrowser
-Summary: Jukebox for large collections of mp3/ogg/flac/mpc files
+Summary: Jukebox for large collections of music files
 Version: 1.1.8
 Release: 1
 License: GPL
@@ -10,7 +10,7 @@ Source0: http://gmusicbrowser.org/download/%{name}-%{version}.tar.gz
 Packager: Quentin Sculo <squentin@free.fr>
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch: noarch
-Requires: perl >= 5.8, gtk2 >= 2.6.0, perl-Gtk2, perl(Locale::gettext) >= 1.04, perl-GStreamer, perl-Digest-CRC, perl-Cairo, perl-HTML-Parser perl-IO-Compress, perl-Net-DBus
+Requires: perl >= 5.8, gtk2 >= 2.6.0, perl-Gtk2, perl(Locale::Messages), perl-GStreamer, perl-Digest-CRC, perl-Cairo, perl-HTML-Parser perl-IO-Compress, perl-Net-DBus
 Requires(hint): mpg123, vorbis-tools, alsa-utils, perl-Gtk2-WebKit, perl-Gtk2-MozEmbed, perl-Net-DBus-GLib, gstreamer0.10-lame, gstreamer0.10-plugins-ugly, gstreamer0.10-plugins-bad, perl-Gnome2-Wnck, perl-GStreamer-Interfaces, perl-Gtk2-Notify
 AutoReq: no
 AutoProv: no

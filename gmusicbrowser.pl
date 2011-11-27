@@ -87,23 +87,41 @@ use constant
 };
 
 sub _ ($) {$_[0]}	#dummy translation functions
+sub _p ($$) {_($_[1])}
 sub __ { sprintf( ($_[2]>1 ? $_[0] : $_[1]), $_[2]); }
+sub __p {shift;&__}
 sub __x { my ($s,%h)=@_; $s=~s/{(\w+)}/$h{$1}/g; $s; }
 BEGIN
 {no warnings 'redefine';
- eval {require Locale::gettext};
- if ($@) { warn "Locale::gettext not found -> no translations\n"; }
- elsif ($Locale::gettext::VERSION<1.04) { warn "Needs at least version 1.04 of Locale::gettext, v$Locale::gettext::VERSION found -> no translations\n" }
- else
- {	my $localedir=$DATADIR;
-	$localedir= $FindBin::RealBin.SLASH.'..'.SLASH.'share' unless -d $localedir.SLASH.'locale';
-	my $d= eval { Locale::gettext->domain('gmusicbrowser'); };
-	if ($@) { warn "Locale::gettext error : $@\n -> no translations\n"; }
+ my $localedir=$DATADIR;
+ $localedir= $FindBin::RealBin.SLASH.'..'.SLASH.'share' unless -d $localedir.SLASH.'locale';
+ $localedir.=SLASH.'locale';
+ my $domain='gmusicbrowser';
+ eval {require Locale::Messages;};
+ if ($@)
+ {	eval {require Locale::gettext};
+	if ($@) { warn "neither Locale::Messages, nor Locale::gettext found -> no translations\n"; }
+	elsif ($Locale::gettext::VERSION<1.04) { warn "Needs at least version 1.04 of Locale::gettext, v$Locale::gettext::VERSION found -> no translations\n" }
 	else
-	{	$d->dir( $localedir.SLASH.'locale' );
-		*_=sub ($) { $d->get($_[0]); };
-		*__=sub { sprintf $d->nget(@_),$_[2]; };
+	{	warn "Locale::Messages not found, using Locale::gettext instead\n" if $::debug;
+		my $d= eval { Locale::gettext->domain($domain); };
+		if ($@) { warn "Locale::gettext error : $@\n -> no translations\n"; }
+		else
+		{	$d->dir($localedir);
+			*_=sub ($) { $d->get($_[0]); };
+			*__=sub { sprintf $d->nget(@_),$_[2]; };
+		}
 	}
+ }
+ else
+ {	Locale::Messages::textdomain($domain);
+	Locale::Messages::bindtextdomain($domain=> $localedir);
+	Locale::Messages::bind_textdomain_codeset($domain=> 'utf-8');
+	Locale::Messages::bind_textdomain_filter($domain=> \&Locale::Messages::turn_utf_8_on);
+	*_  = \&Locale::Messages::gettext;
+	*_p = \&Locale::Messages::pgettext;
+	*__ =sub { sprintf Locale::Messages::ngettext(@_),$_[2]; };
+	*__p=sub { sprintf Locale::Messages::npgettext(@_),$_[3];};
  }
 }
 
@@ -921,7 +939,11 @@ sub keybinding_longname
 {	my $key=$_[0];
 	return $key unless $key=~s/^([caws]+)-//;
 	my $mod=$1;
-	my %h=(c => _"Ctrl", a => _"Alt", w => _"Win", s => _"Shift");
+	my %h=(	c => _p('Keyboard',"Ctrl"),	#TRANSLATION: Ctrl key
+		a => _p('Keyboard',"Alt"),	#TRANSLATION: Alt key
+		w => _p('Keyboard',"Win"),	#TRANSLATION: Windows key
+		s => _p('Keyboard',"Shift"),	#TRANSLATION: Shift key
+	);
 	my $name=join '',map $h{$_}, split //,$mod;
 	return $name.'-'.$key;
 }
