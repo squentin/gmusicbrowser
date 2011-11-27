@@ -15,7 +15,7 @@ package Songs;
 our $IDFromFile;
 our ($Artists_split_re,$Artists_title_re);
 my (@Missing,$MissingHash,@MissingKeyFields);
-our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%GTypes,%HSort);
+our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%GTypes,%HSort,%Aliases);
 my %FuncCache;
 INIT {
 our %timespan_menu=
@@ -589,6 +589,7 @@ our %timespan_menu=
  {	name	=> _"Filename",	width => 400, flags => 'fgasc_',	type => 'filename',
 	'stats:filetoid' => '#HVAL#{ #file->get# }=#ID#',
 	category=>'file',
+	alias	=> 'filename',
  },
  path	=>
  {	name	=> _"Folder",	width => 200, flags => 'fgasc_',	type => 'filename',
@@ -599,12 +600,14 @@ our %timespan_menu=
 	'filterpat:filename'	=> [ display => sub { ::filename_to_utf8displayname(::decode_url($_[0])); }, ],
 	can_group=>1,
 	category=>'file',
+	alias	=> 'folder',
  },
  modif	=>
  {	name	=> _"Modification",	width => 160,	flags => 'fgarsc_',	type => 'date',
 	FilterList => {type=>'year',},
 	can_group=>1,
 	category=>'file',
+	alias	=> 'modified',
  },
  size	=>
  {	name => _"Size",	width => 80,	flags => 'fgarsc_',		#32bits => 4G max
@@ -622,6 +625,7 @@ our %timespan_menu=
 	makefilter_fromID => '"title:~:" . #get#',
 	edit_order=> 10, letter => 't',
 	category=>'basic',
+	alias_trans=> ::_p('Field_aliases',"title"),  #TRANSLATION: comma-separated list of field aliases for title, these are in addition to english aliases
  },
  artist =>
  {	name => _"Artist",	width => 200,	flags => 'fgarwesci',
@@ -635,6 +639,8 @@ our %timespan_menu=
 	can_group=>1,
 	#names => '::__("%d artist","%d artists",#count#);'
 	category=>'basic',
+	alias=> 'by',
+	alias_trans=> ::_p('Field_aliases',"artist,by"),  #TRANSLATION: comma-separated list of field aliases for artist, these are in addition to english aliases
  },
  first_artist =>
  {	flags => 'fg', #CHECKME
@@ -662,6 +668,8 @@ our %timespan_menu=
 	edit_order=> 30,	edit_many=>1,	letter => 'l',
 	can_group=>1,
 	category=>'basic',
+	alias=> 'on',
+	alias_trans=> ::_p('Field_aliases',"album,on"),  #TRANSLATION: comma-separated list of field aliases for album, these are in addition to english aliases
  },
  album_picture =>
  {	name		=> _"Album picture",
@@ -753,6 +761,7 @@ our %timespan_menu=
 	edit_order=> 40,	edit_many=>1,	letter => 'd',
 	can_group=>1,
 	category=>'basic',
+	alias	=> 'disk',
  },
  discname =>
  {	name	=> _"Disc name",	width	=> 100,		flags => 'fgarwesci',	type => 'fewstring',
@@ -760,6 +769,7 @@ our %timespan_menu=
 	edit_many=>1,
 	disable=>1,	options => 'disable',
 	category=>'extra',
+	alias	=> 'diskname',
  },
  genre	=>
  {	name		=> _"Genres",	width => 180,	flags => 'fgarwescil',
@@ -841,6 +851,7 @@ our %timespan_menu=
 	options	=> 'rw_ userid',
 	'filterpat:value' => [ display => "%d %%", unit => '%', max=>100, default_value=>50, ],
 	category=>'basic',
+	alias	=> 'stars',
  },
  ratingnumber =>	#same as rating but returns DefaultRating if rating set to default, will be replaced by rating.number or something in the future
  {	type	=> 'virtual',
@@ -861,6 +872,7 @@ our %timespan_menu=
 	'filterdesc:e:0'	=> _"never",
 	'filterdesc:-e:0'	=> _"has been played",	#FIXME better description
 	category=>'stats',
+	alias	=> 'played',
  },
  lastskip	=>
  {	name	=> _"Last skipped",	width => 100,	flags => 'fgasc',	type => 'date',
@@ -869,6 +881,7 @@ our %timespan_menu=
 	'filterdesc:e:0'	=> _"never",
 	'filterdesc:-e:0'	=> _"has been skipped",	#FIXME better description
 	category=>'stats',
+	alias	=> 'skipped',
  },
  playcount	=>
  {	name	=> _"Play count",	width => 50,	flags => 'fgaesc',	type => 'integer',	letter => 'p',
@@ -880,10 +893,12 @@ our %timespan_menu=
 	postread=> sub { my $v=shift; length $v ? sprintf('%d',$v) : undef },
 	prewrite=> sub { sprintf('%.1f', $_[0]); },
 	category=>'stats',
+	alias	=> 'plays',
 },
  skipcount	=>
  {	name	=> _"Skip count",	width => 50,	flags => 'fgaesc',	type => 'integer',	letter => 'k',
 	category=>'stats',
+	alias	=> 'skips',
  },
  composer =>
  {	name	=> _"Composer",		width	=> 100,		flags => 'fgarwesci',	type => 'artist',
@@ -969,6 +984,7 @@ our %timespan_menu=
 	'filterdesc:m:^wv'  => _"is a wavepack file",
 	'filterdesc:m:^ape' => _"is an ape file",
 	category=>'audio',
+	alias	=> 'type',
  },
  'length'=>
  {	name	=> _"Length",		width => 50,	flags => 'fgarsc_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
@@ -1443,7 +1459,26 @@ sub UpdateFuncs
 		$LENGTHsub= Compile(Length =>"sub {$code}");
 	}
 	%::ReplaceFields= map { '%'.$Def{$_}{letter} => $_ } grep $Def{$_}{letter}, @Fields;
-	$::ReplaceFields{'$'.$_}= $::ReplaceFields{'${'.$_.'}'}= $_ for grep $Def{$_}{flags}=~m/g/, @Fields;
+
+
+	my @getfields= grep $Def{$_}{flags}=~m/g/, @Fields;
+	%Aliases= map {$_=>$_} @getfields;
+	for my $field (@getfields)
+	{	$Aliases{$_}=$field for split / +/, ($Def{$field}{alias}||'');
+	}
+	#for my $field (@getfields)	# user-defined aliases
+	#{	for my $alias (split / +/, ($::Options{Fields_options}{$field}{aliases}||''))
+	#	{	$Aliases{ ::superlc($alias) } ||= $field;
+	#	}
+	#}
+	for my $field (@getfields)	#translated aliases
+	{	for my $alias (split /\s*,\s*/, ($Def{$field}{alias_trans}||''))
+		{	$alias=~s/ /_/g;
+			$Aliases{ ::superlc($alias) } ||= $field;
+		}
+	}
+	$::ReplaceFields{'$'.$_}= $::ReplaceFields{'${'.$_.'}'}= $Aliases{$_} for keys %Aliases;
+
 
 	::HasChanged('fields_reset');
 	#FIXME connect them to 'fields_reset' event :
@@ -3765,7 +3800,7 @@ sub new_from_smartstring
 		if ($string=~s#^([A-Za-z]\w*(?:\|[A-Za-z]\w*)*)?(<=|>=|[:<>=~])##)
 		{	$fields=$1; $op=$2;
 			if ($fields)
-			{	my @f= grep $Def{$_}, split(/\|/,$fields);
+			{	my @f= grep $_, map $Songs::Aliases{::superlc($_)}, split(/\|/,$fields);
 				if (@f) { $fields= join '|',@f }
 				else { $string= $fields.$op.$string; $op=undef; }	#no recognized field => treat $fields and $op as part of the pattern
 			}
