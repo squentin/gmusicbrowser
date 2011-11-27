@@ -188,6 +188,7 @@ options :
 -l NAME, -layout NAME	: Use layout NAME for player window
 +plugin NAME		: Enable plugin NAME
 -plugin NAME		: Disable plugin NAME
+-noplugins		: Disable all plugins
 -searchpath FOLDER	: Additional FOLDER to look for plugins and layouts
 -use-gnome-session 	: Use gnome libraries to save tags/settings on session logout
 -workspace N		: move initial window to workspace N (requires Gnome2::Wnck)
@@ -210,6 +211,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 -add			: Add them to the library
 
 -tagedit FOLDER_OR_FILE ... : Edittag mode
+-listplugin	: list the available plugins and exit
 -listcmd	: list the available fifo commands and exit
 -listlayout	: list the available layouts and exit
 ";
@@ -240,8 +242,10 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-import')	{ $ImportFile=rel2abs(shift) if $ARGV[0]}
 	elsif($arg eq '-searchpath')	{ push @{ $CmdLine{searchpath} },shift if $ARGV[0]}
 	elsif($arg=~m/^([+-])plugin$/)	{ $CmdLine{plugins}{shift @ARGV}=($1 eq '+') if $ARGV[0]}
+	elsif($arg eq '-noplugins')	{ $CmdLine{noplugins}=1; delete $CmdLine{plugins}; }
 	elsif($arg eq '-geometry')	{ $CmdLine{geometry}=shift if $ARGV[0]; }
 	elsif($arg eq '-tagedit')	{ $CmdLine{tagedit}=1; $ignore=1; last; }
+	elsif($arg eq '-listplugin')	{ $CmdLine{pluginlist}=1; $ignore=1; last; }
 	elsif($arg eq '-listcmd')	{ $CmdLine{cmdlist}=1; $ignore=1; last; }
 	elsif($arg eq '-listlayout')	{ $CmdLine{layoutlist}=1; $ignore=1; last; }
 	elsif($arg eq '-cmd')		{ push @cmd, shift if $ARGV[0]; }
@@ -1264,8 +1268,10 @@ for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_gst
 }
 
 LoadPlugins();
+if ($CmdLine{pluginlist}) { warn "$_ : $Plugins{$_}{name}\n" for sort keys %Plugins; exit; }
 $SIG{HUP} = 'IGNORE';
 ReadSavedTags();
+$Options{AutoRemoveCurrentSong}=0 if $CmdLine{demo};
 
 # global Volume and Mute are used only for gstreamer and mplayer in SoftVolume mode
 our $Volume= $Options{Volume};
@@ -1572,8 +1578,12 @@ sub LoadPlugins
 	}
 }
 sub PluginsInit
-{	my $p=delete $CmdLine{plugins};
-	$Options{'PLUGIN_'.$_}=$p->{$_} for keys %$p;
+{	if (delete $CmdLine{noplugins}) { $Options{'PLUGIN_'.$_}=0 for keys %Plugins; }
+	my $h=delete $CmdLine{plugins};
+	for my $p (keys %$h)
+	{	if (!$Plugins{$p}) { warn "Unknown plugin $p\n";next }
+		$Options{'PLUGIN_'.$p}=$h->{$p};
+	}
 	ActivatePlugin($_,'init') for grep $Options{'PLUGIN_'.$_}, sort keys %Plugins;
 }
 

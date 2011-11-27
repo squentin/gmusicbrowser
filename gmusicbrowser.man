@@ -108,6 +108,9 @@ deactivate plugin identified by NAME
 \fB\+plugin NAME\fR
 activate plugin identified by NAME
 .TP
+\fB\-noplugins\fR
+deactivate all plugins
+.TP
 \fB\-searchpath FOLDER\fR
 add FOLDER to the list of folders searched for plugins and layouts
 .TP
@@ -138,7 +141,13 @@ To run more than one instance, use a unique fifo and a unique DBus\-id, or deact
 
 .TP
 \fB\-listcmd\fR
-list the available fifo commands and exit
+list the available commands and exit
+.TP
+\fB\-listlayout\fR
+list the available layouts and exit
+.TP
+\fB\-listplugin\fR
+list the available plugins and exit
 .TP
 \fB\-tagedit FOLDER_OR_FILE ...\fR
 Load songs in FOLDER_OR_FILE and display a dialog to edit their tags.
