@@ -8608,9 +8608,10 @@ sub LoadPixData
 
 sub Scale_with_ratio
 {	my ($pix,$w,$h,$q)=@_;
+	my $ratio0= $w/$h;
 	my $ratio=$pix->get_width / $pix->get_height;
-	if    ($ratio>1) {$h=int($w/$ratio);}
-	elsif ($ratio<1) {$w=int($h*$ratio);}
+	if    ($ratio>$ratio0) {$h=int($w/$ratio);}
+	elsif ($ratio<$ratio0) {$w=int($h*$ratio);}
 	$q= $q ? 'bilinear' : 'nearest';
 	return $pix->scale_simple($w, $h, $q);
 }

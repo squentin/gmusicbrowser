@@ -257,7 +257,7 @@ sub ChooseFont
 	$dialog->destroy;
 }
 
-sub Set_buffer
+sub Set_message
 {	my ($self,$text) = @_;
 	$self->{buffer}->set_text("");
 	my $iter=$self->{buffer}->get_start_iter;
@@ -300,7 +300,7 @@ sub load_from_web
 	if ($next)
 	{	$site = shift @{$self->{trynext}};
 		if (!$site)
-		{	$self->Set_buffer(_"No lyrics found");
+		{	$self->Set_message(_"No lyrics found");
 			return;
 		}
 	}
@@ -385,7 +385,7 @@ sub html_extract
 
 sub load_url
 {	my ($self,$url,$post,$check)=@_;
-	$self->Set_buffer(_"Loading...");
+	$self->Set_message(_"Loading...");
 	$self->cancel;
 	warn "lyrics : loading $url\n";# if $::debug;
 	$self->{url}=$url;
