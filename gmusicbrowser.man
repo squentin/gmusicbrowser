@@ -43,7 +43,7 @@ This manual page explains the
 program.
 .PP
 \fBgmusicbrowser\fP can play and manage your songs, currently supports mp3, ogg, flac, mpc file formats.
-see http://gmusicbrowser.sourceforge.net/ for more informations.
+see http://gmusicbrowser.sourceforge.net/ for more information.
 .SH "OPTIONS"
 .B
 .TP
@@ -94,7 +94,7 @@ do not use/create named pipe
 append .KEY to the DBus service id used by gmusicbrowser (org.gmusicbrowser)
 .TP
 \fB\-debug\fR
-print lots of useless informations
+print lots of useless information
 .TP
 \fB\-backtrace\fR
 print a backtrace for every warning
@@ -121,7 +121,7 @@ Use gnome libraries to save tags/settings on session logout (needs the Gnome2 pe
 Move initial window to workspace N (needs the Gnome2::Wnck perl module).
 .TP
 \fB\-cmd CMD\fR
-add CMD to the list of commands to execute. If a running instance of gmusicbrowser is found, these commands will be sent via the fifo file or via DBus. If there is no running instance of gmusicbrowser, the behavior depends on option -ifnotrunning
+add CMD to the list of commands to execute. If a running instance of gmusicbrowser is found, these commands will be sent via the fifo file or via DBus. If there is no running instance of gmusicbrowser, the behavior depends on option \-ifnotrunning
 .TP
 
 \fB\-ifnotrunning MODE\fR
@@ -158,7 +158,7 @@ Load songs in FOLDER_OR_FILE and display a dialog to edit their tags.
 contains songs tags and program options
 .TP
 \fI/usr/share/gmusicbrowser/plugins/\fP, \fI~/.gmusicbrowser/plugins/\fP
-files with extention .pm in these folders are loaded as plugins on startup
+files with extension .pm in these folders are loaded as plugins on startup
 .TP
 \fI/usr/share/gmusicbrowser/layouts/*.layout\fP, \fI~/.gmusicbrowser/layouts/*.layout\fP
 contains layouts definitions

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-10-15 15:34+0900\n"
-"PO-Revision-Date: 2011-10-15 15:34+0900\n"
+"POT-Creation-Date: 2011-11-30 09:05+0900\n"
+"PO-Revision-Date: 2011-11-30 09:16+0900\n"
 "Last-Translator: bluealbum <bluealbum@gmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
 "Language: \n"
@@ -26,81 +26,101 @@ msgstr "필드"
 msgid " Review "
 msgstr "리뷰"
 
+#, perl-brace-format
 msgid " of {length}"
 msgstr "/ {length}"
 
 msgid "# songs"
 msgstr "# 노래들"
 
+#, perl-format
 msgid "%S by %a"
 msgstr "%S - %a"
 
+#, perl-format
 msgid "%d Album"
 msgid_plural "%d Albums"
 msgstr[0] "%d 앨범"
 
+#, perl-format
 msgid "%d Artist"
 msgid_plural "%d Artists"
 msgstr[0] "%d 음악가"
 
+#, perl-format
 msgid "%d Song"
 msgid_plural "%d Songs"
 msgstr[0] "%d 곡"
 
+#, perl-format
 msgid "%d Upcoming Event"
 msgid_plural "%d Upcoming Events"
 msgstr[0] "%d 다가올 이벤트"
 
+#, perl-format
 msgid "%d album"
 msgid_plural "%d albums"
 msgstr[0] "%d 앨범"
 
+#, perl-format
 msgid "%d artist"
 msgid_plural "%d artists"
 msgstr[0] "%d 음악가"
 
+#, perl-format
 msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] "%d 파일"
 
+#, perl-format, perl-brace-format
 msgid "%d file in {folder}"
 msgid_plural "%d files in {folder}"
 msgstr[0] "{folder}의 %d 파일"
 
+#, perl-format
 msgid "%d folder"
 msgid_plural "%d folders"
 msgstr[0] "%d 폴더"
 
+#, perl-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d 초"
 
+#, perl-format
 msgid "%d song"
 msgid_plural "%d songs"
 msgstr[0] "%d 노래"
 
+#, perl-format
 msgid "%d song added"
 msgid_plural "%d songs added"
 msgstr[0] "%d 노래 추가됨"
 
+#, perl-format
 msgid "%d song in queue"
 msgid_plural "%d songs in queue"
 msgstr[0] "%d 노래 대기열에서"
 
+#, perl-format
 msgid "%d song in the library"
 msgid_plural "%d songs in the library"
 msgstr[0] "%d 노래 라이브러리에서"
 
+#, perl-format
 msgid "%d song selected"
 msgid_plural "%d songs selected"
 msgstr[0] "%d 노래 선택함"
 
+#, perl-format
 msgid "%t by %a (%m)"
 msgstr "%t / %a (%m)"
 
+#, perl-brace-format
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' 이미 존재합니다. 덮어쓸까요?"
 
+#, perl-format
 msgid "(%d song excluded)"
 msgid_plural "(%d songs excluded)"
 msgstr[0] "(%d 노래 제외됨)"
@@ -111,6 +131,7 @@ msgstr "(재시작 후 적용됩니다)"
 msgid "(case insensitive)"
 msgstr "(대소문자 구분)"
 
+#, perl-brace-format
 msgid "(common parent folder : {common})"
 msgstr "(일반 부모 폴더 : {common})"
 
@@ -137,6 +158,7 @@ msgstr "0 회"
 msgid "0 means 'show all'"
 msgstr "0 은 '모두 표시'를 의미합니다"
 
+#, perl-brace-format
 msgid "1 chance in {probability}"
 msgstr "{probability}에서 1회"
 
@@ -158,6 +180,7 @@ msgstr "많이 재생한 50곡"
 msgid "<Unknown>"
 msgstr "<알 수 없음>"
 
+#, perl-format
 msgid ""
 "<b>%t</b>\n"
 "<small><small>by</small> %a\n"
@@ -167,9 +190,11 @@ msgstr ""
 "<small><small>/</small> %a\n"
 "<small>의</small> %l</small> 앨범"
 
+#, perl-format
 msgid "<big><big>by %a</big></big>"
 msgstr "<big><big>%a</big></big>"
 
+#, perl-format
 msgid "<i>by</i> %a\\n<i>from</i> %l"
 msgstr "<i>의해</i> %a\\n<i>으로부터</i> %l"
 
@@ -188,6 +213,7 @@ msgstr "많은 파일의-태깅 중지하기"
 msgid "About"
 msgstr "정보"
 
+#, perl-brace-format
 msgid ""
 "About to delete {files}\n"
 "Are you sure ?"
@@ -276,6 +302,7 @@ msgstr "재생목록에 추가하기"
 msgid "Add to queue"
 msgstr "대기열에 추가하기"
 
+#, perl-brace-format
 msgid "Add {value} to {field} for all tracks on this album."
 msgstr "이 앨범상의 모든 트랙을 위해 {field}로 {value}를 추가하기"
 
@@ -346,6 +373,9 @@ msgstr "앨범 사진"
 msgid "Album picture & info"
 msgstr "앨범 사진 & 정보"
 
+msgid "Album pictures"
+msgstr "앨범 사진"
+
 msgid "Album playcount:"
 msgstr "앨범 재생 수:"
 
@@ -358,9 +388,11 @@ msgstr "앨범 사진 포함"
 msgid "Album year(s)"
 msgstr "앨범 연도"
 
+#, perl-format
 msgid "Album: %l"
 msgstr "앨범: %l"
 
+#, perl-format
 msgid "Album: %l (%Y)"
 msgstr "앨범: %l (%Y)"
 
@@ -413,8 +445,8 @@ msgid ""
 "Allmusic uses both Genres and Styles to describe albums. If you use only "
 "Genres, you may want to include Styles in the list of Genres."
 msgstr ""
-"모든음악은 장르와 앨범 설명을 위한 스타일 둘다 사용합니다. 사용자가 장르만 사"
-"용할 경우, 사용자는 장르의 목록에 스타일을 포함하기를 원할 것입니다."
+"모든 음악은 장르와 앨범 설명을 위한 스타일 둘다 사용합니다. 사용자가 장르만 "
+"사용할 경우, 사용자는 장르의 목록에 스타일을 포함하기를 원할 것입니다."
 
 msgid "Allow for scheduling fade-out and stop"
 msgstr "패이드-아웃과 멈추기 스케쥴링을 허용하기"
@@ -425,6 +457,8 @@ msgstr "MPRIS v1.0 표준을 사용하는 DBus를 통해 gmusicbrowser 제어를
 msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v2.0 standard"
 msgstr "MPRIS v2.0 표준을 사용하는 DBus를 통해 gmusicbrowser 제어를 허용합니다"
 
+#. Alt key
+msgctxt "Keyboard"
 msgid "Alt"
 msgstr "Alt"
 
@@ -446,6 +480,7 @@ msgstr "재생목록에 추가하기"
 msgid "Application"
 msgstr "응용프로그램"
 
+#, perl-brace-format
 msgid "Are you sure you want to delete the '{label}' label ?"
 msgstr "'{label}' 라벨을 지우시겠습니까?"
 
@@ -464,6 +499,7 @@ msgstr "음악가 (연도 - 앨범)"
 msgid "Artist Biography"
 msgstr "음악가 일대기"
 
+#, perl-format
 msgid "Artist Picture Size : %d"
 msgstr "음악가 사진 크기 : %d"
 
@@ -482,6 +518,7 @@ msgstr "음악가,앨범,디스크,트랙"
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "음악가,날짜,앨범,디스크,트랙"
 
+#, perl-format
 msgid "Artist: %a"
 msgstr "음악가: %a"
 
@@ -499,12 +536,6 @@ msgstr "오름차순"
 
 msgid "Ask confirmation only if file already exists"
 msgstr "파일이 이미 존재하는지의 여부만 확인 요청하기"
-
-msgid "Audacious"
-msgstr "Audacious"
-
-msgid "Audacious_PLM"
-msgstr "Audacious_PLM"
 
 msgid "Audio"
 msgstr "오디오"
@@ -540,7 +571,7 @@ msgid "Auto-increment track numbers"
 msgstr "트랙 번호 자동 증가"
 
 msgid "Auto-save fields with data from allmusic"
-msgstr "모든음악으로부터 자료를 포함한 필드를 자동으로 저장하기"
+msgstr "모든 음악으로부터 자료를 포함한 필드를 자동으로 저장하기"
 
 msgid "Auto-save positive finds"
 msgstr "맞는 것을 찾으면 자동 저장하기"
@@ -627,6 +658,7 @@ msgstr ""
 "소리를 바꿀 수 없습니다. 이 오디오 백앤드를 사용할 때 소리를 바꾸려면 알사믹"
 "서(amixer (alsa-utils 패키지에 포함됨))를 필요로 합니다."
 
+#, perl-brace-format
 msgid ""
 "Can't create Folder '{path}' : \n"
 "{error}"
@@ -634,15 +666,18 @@ msgstr ""
 "'{path}' 폴더를 만들 수 없습니다 : \n"
 "{error}"
 
+#, perl-brace-format
 msgid "Can't create sink '{sink}'"
 msgstr "'{sink}' 싱크를 만들 수 없습니다"
 
+#, perl-brace-format
 msgid "Can't play '{file}'."
 msgstr "'{file}' 재생할 수 없습니다"
 
 msgid "Can't read file or invalid file"
 msgstr "파일을 읽을 수 없거나 잘못된 파일"
 
+#, perl-brace-format
 msgid "Can't write in base folder '{folder}'."
 msgstr "'{folder}' 기본 폴더에 쓰기를 할 수 없습니다."
 
@@ -733,12 +768,14 @@ msgstr "가사 글꼴 고르기"
 msgid "Choose font..."
 msgstr "글꼴 고르기..."
 
+#, perl-brace-format
 msgid "Choose icon for label {name}"
 msgstr "{name} 라벨 아이콘 고르기"
 
 msgid "Choose page to open"
 msgstr "불러올 페이지 고르기"
 
+#, perl-format
 msgid "Choose picture for '%s'"
 msgstr "'%s' 위한 사진 고르기"
 
@@ -794,7 +831,7 @@ msgid "Command when playing song changed :"
 msgstr "재생중인 노래가 바뀔 때 명령 실행"
 
 msgid "Command when stopped :"
-msgstr "멈출때 명령 :"
+msgstr "멈출 때 명령 :"
 
 msgid "Comment"
 msgstr "주석"
@@ -823,9 +860,6 @@ msgstr "문맥정보"
 msgid "Control"
 msgstr "제어"
 
-msgid "Conz Aardvark"
-msgstr "Conz Aardvark"
-
 msgid "Conz Aishi (with Filter Panes)"
 msgstr "Conz Aishi (필터 패널 포함)"
 
@@ -847,6 +881,7 @@ msgstr "마운트된 포터블 재생기에 복사"
 msgid "Copy to portable player"
 msgstr "포터블 재생기에 복사"
 
+#, perl-format
 msgid "Copying file"
 msgid_plural "Copying %d files"
 msgstr[0] "%d 파일 복사중"
@@ -860,6 +895,8 @@ msgstr "표지 크기 :"
 msgid "Create ID3v2 tags as ID3v2.4"
 msgstr "ID3v2 태그를 ID3v2.4 태그로 만들기"
 
+#. Ctrl key
+msgctxt "Keyboard"
 msgid "Ctrl"
 msgstr "Ctrl"
 
@@ -914,6 +951,10 @@ msgstr "음량 줄이기"
 msgid "Default"
 msgstr "기본 값"
 
+msgid "Default fullscreen"
+msgstr "기본값 전체화면"
+
+#, perl-format
 msgid "Default rating : %d %"
 msgstr "기본 점수 : %d %"
 
@@ -923,6 +964,7 @@ msgstr "기본 글자색"
 msgid "Default text font"
 msgstr "기본 글자 글꼴"
 
+#, perl-format
 msgid "Delay before showing tray tip popup on mouse over : %d ms"
 msgstr "마우스 트레이 팁 팝업상자 표시하기 전에 지연 : %d ms"
 
@@ -981,6 +1023,7 @@ msgstr "정지/다음 동작 표시"
 msgid "Display synchronized lyrics of the current song"
 msgstr "현재 노래의 동기화된 가사 표시하기"
 
+#, perl-format
 msgid "Display tray tip for %d ms"
 msgstr "%d ms 동안 트레이 팁 표시"
 
@@ -1002,6 +1045,7 @@ msgstr "태그 쓰지 않기"
 msgid "Don't add the overlay to dialogs"
 msgstr "대화상자에 오버레이 추가하지 않기"
 
+#, perl-brace-format
 msgid "Don't know how to play files of type {type}"
 msgstr "{type} 형식의 파일 재생 방법을 알 수 없습니다"
 
@@ -1068,20 +1112,11 @@ msgstr "선택한 노래 등록정보 편집"
 msgid "Edit..."
 msgstr "편집..."
 
-msgid "EditList"
-msgstr "편집목록"
-
 msgid "Editing list : "
 msgstr "목록 편집 :"
 
 msgid "Editing tags"
 msgstr "태그 편집"
-
-msgid "EeePC"
-msgstr "EeePC"
-
-msgid "EeePC2"
-msgstr "EeePC2"
 
 msgid "Embedded lyrics"
 msgstr "내장된 가사"
@@ -1143,6 +1178,7 @@ msgstr "이퀄라이저"
 msgid "Error :"
 msgstr "에러 :"
 
+#, perl-brace-format
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
@@ -1150,6 +1186,7 @@ msgstr ""
 "'{file}'에 음악가 일대기 저장 에러 :\n"
 "{error}"
 
+#, perl-brace-format
 msgid ""
 "Error saving lyrics in '{file}' :\n"
 "{error}"
@@ -1157,6 +1194,7 @@ msgstr ""
 "'{file}'에 가사 저장 에러 :\n"
 "{error}"
 
+#, perl-brace-format
 msgid ""
 "Error saving review in '{file}' :\n"
 "{error}"
@@ -1164,6 +1202,7 @@ msgstr ""
 "'{file}'에 리뷰 저장 에러 :\n"
 "{error}"
 
+#, perl-brace-format
 msgid "Error writing '{file}'"
 msgstr " '{file}' 쓰기 에러!"
 
@@ -1176,14 +1215,11 @@ msgstr "에러: 잘못된 파일이름 패턴"
 msgid "Events"
 msgstr "이벤트"
 
-msgid "Exaile"
-msgstr "Exaile"
-
 msgid "Example :"
 msgstr "예 :"
 
 msgid "Exclude 'seed'-artist from queue"
-msgstr "대기열에서 '근원'-음악가는 제외하기"
+msgstr "대기열에서 '시드'-음악가는 제외하기"
 
 msgid "Execute custom command on selected files"
 msgstr "선택한 파일에 사용자 정의 명령 실행"
@@ -1212,12 +1248,14 @@ msgstr "제목에서 손님 음악가를 추출하기 :"
 msgid "Fade-out"
 msgstr "페이드-아웃"
 
+#, perl-format
 msgid "Fade-out in %d seconds"
 msgstr "%d 초 페이드-아웃"
 
 msgid "Fade-out then stop"
 msgstr "페이드-아웃 그런후 정지"
 
+#, perl-brace-format
 msgid ""
 "Failed to delete '{file}' :\n"
 "{error}"
@@ -1351,12 +1389,6 @@ msgstr "리플레이게인 태그가 없는 노래위한 게인"
 msgid "Garage Fullscreen"
 msgstr "Garage 전체화면"
 
-msgid "Garage5"
-msgstr "Garage5"
-
-msgid "Garage6"
-msgstr "Garage6"
-
 msgid "Genre"
 msgstr "장르"
 
@@ -1469,6 +1501,7 @@ msgstr "필터 적용하지 않기"
 msgid "Invisible hot spot"
 msgstr "보이지않는 핫 스팟"
 
+#, perl-format
 msgid "Isn't smart equal to %s"
 msgstr "%s 와 민감하게 같지 않음"
 
@@ -1559,6 +1592,7 @@ msgstr ""
 "\n"
 "음악을 추가하려면 설정 대화상자를 사용하세요."
 
+#, perl-format
 msgid "Library size : %d song"
 msgid_plural "Library size : %d songs"
 msgstr[0] "라이브러리 크기 : %d 노래"
@@ -1602,6 +1636,7 @@ msgstr "가사 패널이 숨겨져 있어도 가사 가져오기"
 msgid "Load/Save Artist Info in :"
 msgstr "음악가 정보 로드/저장 :"
 
+#, perl-format
 msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "이전 세션으로부터 보내지 않은 노래 %d 가져옴"
@@ -1630,6 +1665,7 @@ msgstr "음악가 잠금"
 msgid "Lock on song"
 msgstr "노래 잠금"
 
+#, perl-brace-format
 msgid "Lock on {field}"
 msgstr "{field} 잠금"
 
@@ -1726,6 +1762,13 @@ msgstr "매체 형태"
 msgid "Menu entry name"
 msgstr "메뉴 항목 이름"
 
+msgid ""
+"Middle-click on local artists to set a filter on them, right-click non-local "
+"artists to search for them on the web."
+msgstr ""
+"음악가들 중에서 필터를 설정하려면 로컬 음악가 위에서 중간-클릭, 웹 상에서 음"
+"악가들을 찾으려면 비-로컬 음악가 위에서 오른쪽 클릭을 누르세요."
+
 msgid "Minimal tip"
 msgstr "최소화 팁"
 
@@ -1762,6 +1805,7 @@ msgstr "이동 실패함"
 msgid "Move folder to"
 msgstr "다음으로 폴더 이동 :"
 
+#, perl-format
 msgid "Moving file"
 msgid_plural "Moving %d files"
 msgstr[0] "%d 파일 이동중"
@@ -1829,6 +1873,9 @@ msgstr "라벨 없음"
 msgid "No locked filter"
 msgstr "잠금된 필터 없음"
 
+msgid "No lyrics found"
+msgstr "가사를 찾지 못했습니다"
+
 msgid "No moods"
 msgstr "분위기 사용안함"
 
@@ -1865,17 +1912,20 @@ msgstr "웹 브라우저 발견하지 못함."
 msgid "None"
 msgstr "없음"
 
+msgid "Normal"
+msgstr "표준"
+
 msgid "Normal mode"
 msgstr "표준 모드"
+
+msgid "Normal with buttons"
+msgstr "버튼 포함 표준"
 
 msgid "Normalize volume (the files must have replaygain tags)"
 msgstr "소리 노말라이즈 (파일에 리플레이게인 태그가 있어야합니다)"
 
 msgid "Not found"
 msgstr "찾지 못함"
-
-msgid "Not found."
-msgstr "찾지 못함."
 
 msgid "Note that some notification daemons resize the displayed picture"
 msgstr "일부 알림 데몬은 표시된 사진을 크기 조정해서 알려주기"
@@ -1953,6 +2003,7 @@ msgstr "이전 이름"
 msgid "On top of other windows instead of below"
 msgstr "아래 대신 다른 창의 맨위로"
 
+#, perl-brace-format
 msgid "One of these commands is required to play files of type {type} : {cmd}"
 msgstr ""
 "이 명령어 중 하나가 {type} 형식의 파일을 재생하기 위해 요청됩니다 : {cmd}"
@@ -2090,6 +2141,7 @@ msgstr "사진"
 msgid "Picture Type"
 msgstr "앨범아트 종류"
 
+#, perl-format
 msgid "Picture cache : %d MB"
 msgstr "사진 캐시 : %d MB"
 
@@ -2099,6 +2151,7 @@ msgstr "사진 찾기"
 msgid "Picture finder plugin"
 msgstr "사진 찾기 플러그인"
 
+#, perl-format
 msgid "Picture size : %d"
 msgstr "사진 크기 : %d"
 
@@ -2180,6 +2233,7 @@ msgstr "제목 재생중"
 msgid "Playing and queue icons"
 msgstr "재생중 & 대기열 아이콘"
 
+#, perl-brace-format
 msgid "Playing error : {error}"
 msgstr "재생중 에러 : {error}"
 
@@ -2297,6 +2351,7 @@ msgstr "발행자/스튜디오의 로고"
 msgid "Queue"
 msgstr "대기열"
 
+#, perl-format
 msgid "Queue (%n)"
 msgstr "대기열 (%n)"
 
@@ -2332,9 +2387,6 @@ msgstr "끝내기"
 
 msgid "Quit when queue empty"
 msgstr "대기열이 비면 끝내기"
-
-msgid "Quodlibet"
-msgstr "Quodlibet"
 
 msgid "Radio title"
 msgstr "라디오 제목"
@@ -2525,6 +2577,7 @@ msgstr "이 폴더 이름 바꾸기 :"
 msgid "Rename/move files based on these fields :"
 msgstr "파일의 이름 바꾸기/이동은 아래 필드를 기본으로 합니다 :"
 
+#, perl-brace-format
 msgid ""
 "Renaming {oldname}\n"
 "to {newname}\n"
@@ -2581,9 +2634,6 @@ msgstr "Rhythmbox"
 
 msgid "Rhythmbox 2nd queue column"
 msgstr "Rhythmbox 2nd queue column"
-
-msgid "Rhythmbox Compact"
-msgstr "Rhythmbox 간결하게"
 
 msgid "Right aligned"
 msgstr "오른쪽 정렬"
@@ -2679,6 +2729,7 @@ msgstr ""
 "앨범 자료가 AMG로 부터 또는 파일로 부터 가져올지 여부를 같은 앨범상의 모든 트"
 "랙을 위해 선택한 필드에 저장하기"
 
+#, perl-format
 msgid "Save tags/settings every %d minutes"
 msgstr "%d 분 마다 태그/설정 저장"
 
@@ -2877,6 +2928,7 @@ msgstr "재생기 창 레이아웃 설정"
 msgid "Set subgroup"
 msgstr "서브그룹 설정"
 
+#, perl-brace-format
 msgid "Set {year} as year for all tracks on this album."
 msgstr "이 앨범의 모든 트랙의 연도를 {year}로 설정하기."
 
@@ -2886,6 +2938,7 @@ msgstr "설정"
 msgid "Settings on this page will only take effect after a restart"
 msgstr "이 페이지 상의 설정은 재시작 후 효과가 나타납니다"
 
+#, perl-format
 msgid ""
 "Shell command\n"
 "(some variables such as %f (current song filename) or %F (list of selected "
@@ -2895,20 +2948,10 @@ msgstr ""
 "(%f (현재 노래 파일이름) 또는 %F (선택한 노래 파일이름의 목록) 같은 일부 변수"
 "를 이용할 수 있습니다)"
 
+#. Shift key
+msgctxt "Keyboard"
 msgid "Shift"
 msgstr "Shift"
-
-msgid "Shimmer Desktop"
-msgstr "Shimmer 데스크탑"
-
-msgid "Shimmer Netbook"
-msgstr "Shimmer 노트북"
-
-msgid "Shimmer Party"
-msgstr "Shimmer 파티"
-
-msgid "Shimmer Traytip"
-msgstr "Shimmer 트레이팁"
 
 msgid "Show"
 msgstr "표시"
@@ -3048,6 +3091,9 @@ msgstr "노래"
 msgid "Song Properties"
 msgstr "노래 속성"
 
+msgid "Song informations"
+msgstr "노래 정보"
+
 msgid "Song rating"
 msgstr "노래 점수"
 
@@ -3160,8 +3206,8 @@ msgid ""
 "The artists similar to the 'seed'-artist will be used to populate the queue, "
 "but you can decide to exclude the 'seed'-artist him/herself."
 msgstr ""
-"'근원'-음악가와 비슷한 음악가는 대기열에서 인기있게 사용될 것입니다, 그러나 "
-"사용자는 '근원'-음악가인 그/그녀를 제외하는 것을 결정할 수 있습니다."
+"'시드'-음악가와 비슷한 음악가는 대기열에서 인기있게 사용될 것입니다, 그러나 "
+"사용자는 '시드'-음악가인 그/그녀를 제외하는 것을 결정할 수 있습니다."
 
 msgid "Themes"
 msgstr "테마"
@@ -3169,9 +3215,11 @@ msgstr "테마"
 msgid "These fields can be used :"
 msgstr "이들 필드는 사용될 수 있음 :"
 
+#, perl-brace-format
 msgid "This command is required to play files of type {type} : {cmd}"
 msgstr "이 명령어는 {type} 형식의 파일을 재생하기 위해 요청됩니다 : {cmd}"
 
+#, perl-format
 msgid "This label is set for %d song."
 msgid_plural "This label is set for %d songs."
 msgstr[0] "이 라벨이 %d 노래에 설정됨."
@@ -3186,6 +3234,7 @@ msgstr ""
 "이 플러그인은 last.fm에서 음악가-관련된 정보를 검색합니다 (일대기, 다가올 이"
 "벤트, 비슷한 음악가)."
 
+#, perl-format
 msgid "Threshold to count a song as played : %d %"
 msgstr "재생한 노래로 인정하는 문턱값 : %d %"
 
@@ -3195,6 +3244,7 @@ msgstr "화요일"
 msgid "Time :"
 msgstr "시간 :"
 
+#, perl-format
 msgid "Timeout : %d seconds"
 msgstr "시간초과 : %d 초"
 
@@ -3213,9 +3263,11 @@ msgstr "제목 & 진행"
 msgid "Title - Artist - Album"
 msgstr "제목 - 음악가 - 앨범"
 
+#, perl-format
 msgid "Title: %t"
 msgstr "제목: %t"
 
+#, perl-format
 msgid "Title: %t (Track No. %n)"
 msgstr "제목: %t (트랙 번호. %n)"
 
@@ -3288,11 +3340,16 @@ msgstr "독특한 파일 인식자"
 msgid "Unknown album"
 msgstr "알려지지않은 앨범"
 
+#, perl-brace-format
 msgid "Unknown field ({field})"
 msgstr "알려지지 않은 필드 ({field})"
 
 msgid "Unknown filter :"
 msgstr "알 수 없는 필터 :"
+
+#, perl-format
+msgid "Unknown layout '%s'"
+msgstr "알 수 없는 레이아웃 '%s'"
 
 msgid "Unlock Album"
 msgstr "잠금이 해제된 앨범"
@@ -3355,6 +3412,7 @@ msgstr "gstreamer 사용하기"
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "id3v2 태그가 가능하면 latin1 엔코딩을 사용하기"
 
+#, perl-format
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
@@ -3367,12 +3425,15 @@ msgstr ""
 msgid "Use the playing filter"
 msgstr "재생중 필터 사용"
 
+#, perl-brace-format
 msgid "Use this picture as cover for album '{album}'"
 msgstr "'{album}' 앨범 커버에 이 사진 사용하기"
 
+#, perl-brace-format
 msgid "Use this picture for artist '{artist}'"
 msgstr "'{artist}' 음악가에 이 사진 사용하기"
 
+#, perl-brace-format
 msgid "Use {command} to play {ext} files"
 msgstr "{ext} 파일을 재생하려면 {command}을 사용하세요"
 
@@ -3408,9 +3469,6 @@ msgstr "이진 보기"
 
 msgid "View binary data ..."
 msgstr "이진 자료 보기 ..."
-
-msgid "Volume"
-msgstr "음량"
 
 msgid "Volume : "
 msgstr "음량 :"
@@ -3487,8 +3545,10 @@ msgstr "사용자 정의 명령"
 msgid "Will use default if not found"
 msgstr "찾지 못하면 기본값을 사용할 것입니다."
 
+#. Windows key
+msgctxt "Keyboard"
 msgid "Win"
-msgstr "윈도우즈"
+msgstr "Win"
 
 msgid "Windows"
 msgstr "윈도우즈"
@@ -3570,8 +3630,14 @@ msgstr "고급 옵션"
 msgid "after"
 msgstr "이후"
 
+#, perl-format
 msgid "after %s"
 msgstr "%s 이후"
+
+#. comma-separated list of field aliases for album, these are in addition to english aliases
+msgctxt "Field_aliases"
+msgid "album,on"
+msgstr "앨범,on"
 
 msgid "alphabetical"
 msgstr "알파벳 순으로"
@@ -3588,11 +3654,17 @@ msgstr "다시 가져온 후 적용됩니다"
 msgid "apply filter"
 msgstr "필터 적용"
 
+#, perl-brace-format
 msgid "argument {n} :"
 msgstr "인수 {n} :"
 
 msgid "artist"
 msgstr "음악가"
+
+#. comma-separated list of field aliases for artist, these are in addition to english aliases
+msgctxt "Field_aliases"
+msgid "artist,by"
+msgstr "음악가,by"
 
 msgid "auto detect"
 msgstr "자동 검출"
@@ -3615,17 +3687,20 @@ msgstr "밴드/음악가의 로고"
 msgid "before"
 msgstr "이전"
 
+#, perl-format
 msgid "before %s"
 msgstr "%s 이전"
 
 msgid "between"
 msgstr "사이"
 
+#, perl-format
 msgid "between %s ago and %s ago"
-msgstr "%s 이전 그리고 %d 이전 사이"
+msgstr "%s 이전 그리고 %s 이전 사이"
 
+#, perl-format
 msgid "between %s and %s"
-msgstr "%s  그리고 %s 사이"
+msgstr "%s 그리고 %s 사이"
 
 msgid "between (absolute dates)"
 msgstr "사이 (절대 날짜)"
@@ -3669,9 +3744,11 @@ msgstr "재생 수 순으로"
 msgid "by rating"
 msgstr "점수 순으로"
 
+#, perl-brace-format
 msgid "by {artist} from {album}"
 msgstr "{album} - {artist}"
 
+#, perl-brace-format
 msgid "by {author}"
 msgstr "{author}"
 
@@ -3711,9 +3788,11 @@ msgstr "연결이 실패했습니다"
 msgid "contains"
 msgstr "포함하고 있는 문자열"
 
+#, perl-format
 msgid "contains %s"
 msgstr "%s 포함하고 있는 문자열"
 
+#, perl-format
 msgid "contains %s (case sensitive)"
 msgstr "%s 포함하고 있는 문자열 (대소문자 구분)"
 
@@ -3738,9 +3817,6 @@ msgstr "기본값 파일이름"
 msgid "default folder"
 msgstr "기본값 폴더"
 
-msgid "default fullscreen"
-msgstr "기본값 전체화면"
-
 msgid "delete selected filter"
 msgstr "선택한 필터 지우기"
 
@@ -3756,27 +3832,34 @@ msgstr "선택한 정렬 모드 지우기"
 msgid "different folders"
 msgstr "다른 폴더"
 
+#, perl-brace-format
 msgid "disc {disc}"
-msgstr "디스크"
+msgstr "디스크 {disc}"
 
+#, perl-format
 msgid "doesn't contain %s"
 msgstr "%s 포함하지 않는 문자열"
 
+#, perl-format
 msgid "doesn't contain %s (case sensitive)"
 msgstr "%s 포함하지 않는 문자열 (대소문자 구분)"
 
 msgid "doesn't have a picture"
 msgstr "사진을 가지고 있지 않음"
 
+#, perl-format
 msgid "doesn't include %s"
 msgstr "%s 포함하지 않기"
 
+#, perl-format
 msgid "doesn't include artist %s"
 msgstr "음악가 %s 포함하지 않음"
 
+#, perl-format
 msgid "doesn't match regexp %s"
 msgstr "%s 정규표현과 맞지 않는 문자열"
 
+#, perl-format
 msgid "doesn't match regexp %s (case sensitive)"
 msgstr "%s 정규표현과 맞지 않는 문자열 (대소문자 구분)"
 
@@ -3801,18 +3884,21 @@ msgstr "에러"
 msgid "ex :"
 msgstr "예 :"
 
+#, perl-brace-format
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "예제 (selected song) : {score}  ({chances})"
 
 msgid "example : "
 msgstr "예 :"
 
+#, perl-format
 msgid "example : %s"
-msgstr "예 :"
+msgstr "예 : %s"
 
 msgid "examples :"
 msgstr "예 :"
 
+#, perl-format
 msgid "fallback-gain : %d dB"
 msgstr "폴백-게인 : %d dB"
 
@@ -3843,15 +3929,10 @@ msgstr "VBR 헤더 없는 파일"
 msgid "front cover"
 msgstr "커버 (앞면)"
 
-msgid "full"
-msgstr "전체"
-
-msgid "full with buttons"
-msgstr "버튼 포함 전체"
-
 msgid "gmusicbrowser"
 msgstr "gmusicbrowser"
 
+#, perl-format
 msgid "gmusicbrowser is playing %t from %l (%Y) by %a"
 msgstr "gmusicbrowser is %l (%Y) / %a으로부터 %t를 재생중입니다"
 
@@ -3903,35 +3984,37 @@ msgstr "일러스트"
 msgid "imported list"
 msgstr "가져온 목록"
 
+#, perl-format
 msgid "in %l"
 msgstr "%l 안에 있음"
 
 msgid "in the bottom"
 msgstr "맨 아래에"
 
+#, perl-format
 msgid "in the bottom %s"
 msgstr "%s 맨 아래에"
 
 msgid "in the top"
 msgstr "맨 위에"
 
+#, perl-format
 msgid "in the top %s"
 msgstr "%s 맨 위에"
 
 msgid "includes"
 msgstr "포함"
 
+#, perl-format
 msgid "includes %s"
 msgstr "%s 포함"
 
 msgid "includes artist"
 msgstr "음악가 포함"
 
+#, perl-format
 msgid "includes artist %s"
 msgstr "%s 음악가 포함"
-
-msgid "info"
-msgstr "정보"
 
 msgid "integer"
 msgstr "정수"
@@ -3948,6 +4031,7 @@ msgstr "거꾸로"
 msgid "is"
 msgstr "같음"
 
+#, perl-format
 msgid "is %s"
 msgstr "%s 와 같음"
 
@@ -3978,6 +4062,7 @@ msgstr "ogg 파일"
 msgid "is equal to"
 msgstr "같은 문자열"
 
+#, perl-format
 msgid "is equal to %s"
 msgstr "%s 같은 문자열"
 
@@ -3987,6 +4072,7 @@ msgstr "거짓"
 msgid "is in"
 msgstr "안에 있음"
 
+#, perl-format
 msgid "is in %s"
 msgstr "%s 안에 있음"
 
@@ -3996,6 +4082,7 @@ msgstr "모노"
 msgid "is smart equal"
 msgstr "양식이 같은 문자열"
 
+#, perl-format
 msgid "is smart equal to %s"
 msgstr "%s 양식이 같은 문자열"
 
@@ -4005,12 +4092,15 @@ msgstr "스테레오"
 msgid "is true"
 msgstr "진실"
 
+#, perl-format
 msgid "isn't %s"
 msgstr "%s 아님"
 
+#, perl-format
 msgid "isn't equal to %s"
 msgstr "%s 와 같은 문자열 없음"
 
+#, perl-format
 msgid "isn't in %s"
 msgstr "%s에 없음"
 
@@ -4063,6 +4153,7 @@ msgstr "노래 길이"
 msgid "less than"
 msgstr "보다 적음"
 
+#, perl-format
 msgid "less than %s ago"
 msgstr "%s 이전 보다 적음"
 
@@ -4075,9 +4166,11 @@ msgstr "가사 파일"
 msgid "matches regexp"
 msgstr "정규표현에 맞는 문자열"
 
+#, perl-format
 msgid "matches regexp %s"
 msgstr "%s 정규표현에 맞는 문자열"
 
+#, perl-format
 msgid "matches regexp %s (case sensitive)"
 msgstr "%s 정규표현에 맞는 문자열 (대소문자 구분)"
 
@@ -4108,6 +4201,7 @@ msgstr "월"
 msgid "more than"
 msgstr "보다 많음"
 
+#, perl-format
 msgid "more than %s ago"
 msgstr "%s 이전 보다 더 많음"
 
@@ -4184,30 +4278,38 @@ msgstr "이름없음"
 msgid "normal"
 msgstr "표준"
 
+#, perl-format
 msgid "not between %s ago and %s ago"
-msgstr "%s 이전 그리고 %b 이전 사이 아님"
+msgstr "%s 이전 그리고 %s 이전 사이 아님"
 
+#, perl-format
 msgid "not between %s and %s"
-msgstr "%s 그리고 %d 사이 아님"
+msgstr "%s 그리고 %s 사이 아님"
 
 msgid "not bootleg"
 msgstr "해적판 제외"
 
+#, perl-format
 msgid "not in the bottom %s"
 msgstr "%s 맨 아래에 아님"
 
+#, perl-format
 msgid "not in the top %s"
 msgstr "%s 최고 아님"
 
+#, perl-format
 msgid "not present in %s"
 msgstr "%s에 표시되지 않음"
 
+#, perl-format
 msgid "not set to %s"
 msgstr "%s로 설정 안함"
 
+#, perl-format
 msgid "not the %s least recent"
 msgstr "%s 가장 적게 최근이 아님"
 
+#, perl-format
 msgid "not the %s most recent"
 msgstr "%s 가장 많이 최근이 아님"
 
@@ -4232,6 +4334,7 @@ msgstr "문맥정보 창 열기"
 msgid "options"
 msgstr "옵션"
 
+#, perl-format
 msgid "or %d seconds"
 msgstr "또는 %d 초"
 
@@ -4265,9 +4368,11 @@ msgstr "포트 :"
 msgid "pre-amp"
 msgstr "프리-앰프"
 
+#, perl-format
 msgid "pre-amp : %d dB"
 msgstr "프리-앰프 : %d dB"
 
+#, perl-format
 msgid "present in %s"
 msgstr "%s에 표시"
 
@@ -4289,6 +4394,7 @@ msgstr "녹음 장소"
 msgid "requires xdg-screensaver"
 msgstr "xdg-screensaver가 필요함"
 
+#, perl-brace-format
 msgid "reset filter {nb}"
 msgstr "{nb} 필터 재설정"
 
@@ -4304,9 +4410,14 @@ msgstr "두번째 필터 재설정"
 msgid "retry"
 msgstr "재시도"
 
+#, perl-brace-format
 msgid "retry in {seconds} s"
 msgstr "{seconds} 초에 재시도"
 
+msgid "reverse order"
+msgstr "역순 정렬"
+
+#, perl-brace-format
 msgid "save as '{name}'"
 msgstr "'{name}'로 저장"
 
@@ -4343,6 +4454,7 @@ msgstr "초"
 msgid "set to"
 msgstr "설정"
 
+#, perl-format
 msgid "set to %s"
 msgstr "%s 로 설정"
 
@@ -4385,18 +4497,22 @@ msgstr "텍스트 형식"
 msgid "text mode"
 msgstr "텍스트 모드"
 
+#, perl-format
 msgid "the %s least recent"
 msgstr "%s 가장 적게 최근"
 
+#, perl-format
 msgid "the %s most recent"
 msgstr "%s 가장 많이 최근"
 
+#, perl-brace-format
 msgid "the command {name}"
 msgstr "명령 {name}"
 
 msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
 msgstr "기본값은 ID3v2.3는 utf16이고 ID3v2.4는 utf8입니다."
 
+#, perl-brace-format
 msgid "the file {name}"
 msgstr "파일 {name}"
 
@@ -4406,14 +4522,21 @@ msgstr "가장 적게 최근"
 msgid "the most recent"
 msgstr "가장 많이 최근"
 
+#, perl-brace-format
 msgid "the {name} perl module"
 msgstr "{name} 펄 모듈"
 
+#, perl-brace-format
 msgid "then {action}"
 msgstr "{action} 그런 후"
 
 msgid "times"
 msgstr "번"
+
+#. comma-separated list of field aliases for title, these are in addition to english aliases
+msgctxt "Field_aliases"
+msgid "title"
+msgstr "제목"
 
 msgid "toggle Intersection mode"
 msgstr "교차 모드 토글"
@@ -4539,6 +4662,7 @@ msgstr "연도들"
 msgid "yes to all"
 msgstr "모두 예"
 
+#, perl-brace-format
 msgid ""
 "{album}\n"
 "<small>by</small> {artist}"
@@ -4546,42 +4670,43 @@ msgstr ""
 "{album}\n"
 "<small>/</small> {artist}"
 
+#, perl-brace-format
 msgid "{folder} already exists"
 msgstr "{folder}는 이미 존재합니다"
 
+#, perl-brace-format
 msgid "{hours} hours {min} min {sec} s ({size} M)"
 msgstr "{hours} 시간 {min} 분 {sec} 초 ({size} M)"
 
+#, perl-brace-format
 msgid "{hours}h {min}m {sec}s ({size}M)"
 msgstr "{hours}시 {min}분 {sec}초 ({size}M)"
 
+#, perl-brace-format
 msgid "{hours}h{min}m{sec}s"
 msgstr "{hours}시{min}분{sec}초"
 
+#, perl-brace-format
 msgid "{min} min {sec} s ({size} M)"
 msgstr "{min} 분 {sec} 초 ({size} M)"
 
+#, perl-brace-format
 msgid "{min}m {sec}s ({size}M)"
 msgstr "{min}분 {sec}초 ({size}M)"
 
+#, perl-brace-format
 msgid "{min}m{sec}s"
 msgstr "{min}분{sec}초"
 
+#, perl-brace-format
 msgid "{outputname} output settings"
 msgstr "{outputname} 출력 설정"
 
+#, perl-brace-format
 msgid "{songs} by {artists}"
 msgstr "{songs} / {artists}"
 
-msgid ""
-"{song}\n"
-"by {artist}\n"
-"from {album}"
-msgstr ""
-"{song}\n"
-" {artist}\n"
-" {album}"
-
+#, perl-brace-format
 msgid "{song} by {artist}"
 msgstr "{song} / {artist}"
 
@@ -4636,11 +4761,32 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 #~ msgid "All but the [most/less]%n"
 #~ msgstr "모두 그러나 [most/less]%n"
 
+#~ msgid "Audacious"
+#~ msgstr "Audacious"
+
+#~ msgid "Audacious_PLM"
+#~ msgstr "Audacious_PLM"
+
 #~ msgid "Categories pane"
 #~ msgstr "카테고리 패널"
 
 #~ msgid "Choose Date"
 #~ msgstr "날짜 고르기"
+
+#~ msgid "Conz Aardvark"
+#~ msgstr "Conz Aardvark"
+
+#~ msgid "EditList"
+#~ msgstr "편집목록"
+
+#~ msgid "EeePC"
+#~ msgstr "EeePC"
+
+#~ msgid "EeePC2"
+#~ msgstr "EeePC2"
+
+#~ msgid "Exaile"
+#~ msgstr "Exaile"
 
 #~ msgid ""
 #~ "For information on how to use this plugin, please navigate to the <a "
@@ -4652,6 +4798,12 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 #~ "org/dokuwiki/doku.php?id=plugins:artistinfo'> 플러그인 위키 페이지</a> <a "
 #~ "href='http://gmusicbrowser.org/dokuwiki/'>gmusicbrowser-wiki</a>."
 
+#~ msgid "Garage5"
+#~ msgstr "Garage5"
+
+#~ msgid "Garage6"
+#~ msgstr "Garage6"
+
 #~ msgid "Genres pane"
 #~ msgstr "장르 패널"
 
@@ -4661,11 +4813,20 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 #~ msgid "Load/Save lyrics in :"
 #~ msgstr "가사 로드/저장 :"
 
+#~ msgid "Not found."
+#~ msgstr "찾지 못함."
+
 #~ msgid "Playlist, Library & Context"
 #~ msgstr "재생목록, 라이브러리 & 항목"
 
 #~ msgid "Queue, Library & Context"
 #~ msgstr "대기열, 라이브러리 & 항목"
+
+#~ msgid "Quodlibet"
+#~ msgstr "Quodlibet"
+
+#~ msgid "Rhythmbox Compact"
+#~ msgstr "Rhythmbox 간결하게"
 
 #~ msgid "Search & Playlist"
 #~ msgstr "찾기 & 재생목록"
@@ -4673,11 +4834,26 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 #~ msgid "Search & Queue"
 #~ msgstr "찾기 & 대기열"
 
+#~ msgid "Shimmer Desktop"
+#~ msgstr "Shimmer 데스크탑"
+
+#~ msgid "Shimmer Netbook"
+#~ msgstr "Shimmer 노트북"
+
+#~ msgid "Shimmer Party"
+#~ msgstr "Shimmer 파티"
+
+#~ msgid "Shimmer Traytip"
+#~ msgstr "Shimmer 트레이팁"
+
 #~ msgid "The [most/less]"
 #~ msgstr "[많게/적게]"
 
 #~ msgid "Type"
 #~ msgstr "형식"
+
+#~ msgid "Volume"
+#~ msgstr "음량"
 
 #~ msgid "Wait when queue empty"
 #~ msgstr "대기열이 비면 기다리기"
@@ -4705,6 +4881,12 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 
 #~ msgid "first added"
 #~ msgstr "처음 추가됨"
+
+#~ msgid "full"
+#~ msgstr "전체"
+
+#~ msgid "info"
+#~ msgstr "정보"
 
 #~ msgid "is %g"
 #~ msgstr "%g 와 같음"
@@ -4870,3 +5052,12 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 
 #~ msgid "with tabbedlists"
 #~ msgstr "탭으로된 목록 포함"
+
+#~ msgid ""
+#~ "{song}\n"
+#~ "by {artist}\n"
+#~ "from {album}"
+#~ msgstr ""
+#~ "{song}\n"
+#~ " {artist}\n"
+#~ " {album}"

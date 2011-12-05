@@ -30,7 +30,7 @@ NBList		= (tabpos="bottom") QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon=
 HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
 VBArtistinfo	= (tabtitle="Artist") _PluginArtistinfo
 VBAlbuminfo	= (tabtitle="Album") _PluginAlbuminfo
-HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=FRCover,tip=_"Show/Hide Cover")
+HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=Cover,tip=_"Show/Hide Cover")
 ### main right: list/tree/mosaic widgets ###
 VBRight		= _HBSongListtree Progress
 HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _VPSongPlaylist _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
@@ -162,3 +162,11 @@ width = 20
 sort = track
 ico:	icon(pad=2,icon=$playicon, hide= !$playing && !$queued)
 text:	text(markup=pesc($track.' '.$queued), hide= $playing || $queued)
+
+{Column playandqueueandtracktext}
+menutitle = Playing/Queue indicator or Track (text)
+title = #
+width = 20
+sort = track
+text:	text(markup=if($playing,'▶',$queued,'<b>Q</b>',$track.' '.$queued))
+#,$paused,'▮▮',$stopped,'■',
