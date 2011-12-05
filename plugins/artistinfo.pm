@@ -53,6 +53,7 @@ my $queuewaiting;
 my %queuemode=
 (	order=>10, icon=>'gtk-refresh',	short=> _"similar-artists",		long=> _"Auto-fill queue with similar artists (from last.fm)",	changed=>\&QAutofillSimilarArtists,	keep=>1,save=>1,autofill=>1,
 );
+my %savebuttons; # Needed for dynamically adding/removing the "Save"-button from layout.
 
 =dop
 my @similarity=
@@ -206,7 +207,9 @@ sub new
 		my $menuitem = Gtk2::ImageMenuItem->new ($label);
 		$menuitem->set_image( Gtk2::Image->new_from_stock($stock,'menu') );
 		$item->set_proxy_menu_item($key,$menuitem);
-		$toolbar->insert($item,-1) unless $hide;
+		$toolbar->insert($item,-1);
+		if ($hide) {$item->set_no_show_all(1); $item->hide}
+		$savebuttons{$self} = $item if $key eq 'save';
 	}
 	my $artistinfobox = Gtk2::VBox->new(0,0);
 	$artistinfobox->pack_start($artistbox,1,1,0);
@@ -262,7 +265,9 @@ sub prefbox
 {	my $vbox=Gtk2::VBox->new(0,2);
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>50);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
-	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
+	my $autosave = ::NewPrefCheckButton(OPT.'AutoSave'=>_"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed", 
+		cb=>sub {for my $sb (values %savebuttons) {	if ($_[0]->get_active)	{$sb->set_no_show_all(1); $sb->hide} 
+								else 			{$sb->set_no_show_all(0); $sb->parent->show_all}}});
 	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text =>_("Size : %d")._"(applied after restart)");
 	my $picshow=::NewPrefCheckButton(OPT.'ArtistPicShow' => _"Show", tip=>_"applied after restart", widget => ::Vpack($picsize));
 	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", expand=>1, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'", history=>OPT.'Eventformat_history');
