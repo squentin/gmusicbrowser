@@ -172,8 +172,8 @@ sub FillOptions
 	$ontop->set_active($opt->{ontop});
 	$ontop->signal_connect(toggled=> sub { my $on=$_[0]->get_active; $opt->{ontop}=$on; $opt->{below}=!$on;	CreateWindow($key); });
 
-	my $adjw=Gtk2::Adjustment->new($opt->{w},1,9999,10,50,0);
-	my $adjh=Gtk2::Adjustment->new($opt->{h},1,9999,10,50,0);
+	my $adjw=Gtk2::Adjustment->new($opt->{w},1,::max(2000,$opt->{w},Gtk2::Gdk::Screen->get_default->get_width),10,50,0);
+	my $adjh=Gtk2::Adjustment->new($opt->{h},1,::max(2000,$opt->{h},Gtk2::Gdk::Screen->get_default->get_height),10,50,0);
 	my $spinw=Gtk2::SpinButton->new($adjw,0,0);
 	my $spinh=Gtk2::SpinButton->new($adjh,0,0);
 	$adjw->signal_connect(value_changed => sub { $opt->{w}=$_[0]->get_value; ResizeWindow($key);  });
