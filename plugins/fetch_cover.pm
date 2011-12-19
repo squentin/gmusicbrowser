@@ -5,7 +5,7 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
-=gmbplugin FETCHCOVER
+=for gmbplugin FETCHCOVER
 name	Picture finder
 title	Picture finder plugin
 desc	Adds a menu entry to artist/album context menu, allowing to search the picture/cover in google and save it.

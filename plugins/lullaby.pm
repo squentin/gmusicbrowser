@@ -5,7 +5,7 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
-=gmbplugin LULLABY
+=for gmbplugin LULLABY
 name	Lullaby
 title	Lullaby plugin
 desc	Allow for scheduling fade-out and stop

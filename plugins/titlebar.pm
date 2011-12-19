@@ -5,7 +5,7 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
-=gmbplugin TitleBar
+=for gmbplugin TitleBar
 name	Titlebar
 title	Titlebar overlay plugin
 desc	Display a special layout in or around the titlebar of the focused window

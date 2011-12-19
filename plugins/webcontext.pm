@@ -6,7 +6,7 @@
 # published by the Free Software Foundation
 
 
-=gmbplugin WebContext
+=for gmbplugin WebContext
 name	Web context
 title	Web context plugin
 desc	Provides context views using MozEmbed or WebKit

@@ -46,9 +46,10 @@ while (my $file=shift @files)
 		$comments_p{$ctx}{$str1}{$str2}.= $com;
 	}
 
-	if (m/^=gmbplugin \D\w+/)
+	if (m/^=(?:begin |for )?gmbplugin/)
 	{	while (<$fh>)
-		{	last if m/^=cut/;
+		{	s/\s*[\n\r]+$//;
+			last if $_ eq '=cut' || $_ eq '=end gmbplugin';
 			$msgid{''}{$1}.= " $file:$." if m/^\s*(?:name|title|desc)\s+(.+)/;
 		}
 	}

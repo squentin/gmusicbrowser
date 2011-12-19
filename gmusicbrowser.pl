@@ -1543,14 +1543,16 @@ sub LoadPlugins
 		my ($found,$id);
 		open my$fh,'<:utf8',$file or do {warn "error opening $file : $!\n";next};
 		while (my $line=<$fh>)
-		{	if ($line=~m/^=gmbplugin (\D\w+)/)
+		{	if ($line=~m/^=(?:begin |for )?gmbplugin(?: ([A-Za-z]\w*))?/)
 			{	my $id=$1;
 				my %plug= (version=>0,desc=>'',);
 				while ($line=<$fh>)
-				{	last if $line=~m/^=cut/;
-					my ($key,$val)= $line=~m/^\s*(\w+):?\s+([^\n\r]+)/;
+				{	$line=~s/\s*[\n\r]+$//;
+					last if $line eq '=cut' || $line eq '=end gmbplugin';
+					my ($key,$val)= $line=~m/^\s*(\w+):?\s+(.+)/;
 					next unless $key;
-					if ($key eq 'desc')
+					if ($key eq 'id') { $id=$val }
+					elsif ($key eq 'desc')
 					{	$plug{desc} .= _($val)."\n";
 					}
 					elsif ($key eq 'author')
@@ -1558,6 +1560,7 @@ sub LoadPlugins
 					}
 					else { $plug{$key}=$val; }
 				}
+				last unless $id;
 				last unless $plug{name};
 				chomp $plug{desc};
 				$plug{file}=$file;

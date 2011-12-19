@@ -5,7 +5,7 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
-=gmbplugin Export
+=for gmbplugin Export
 name	Export
 title	Export plugin
 desc	Adds menu entries to song contextual menu

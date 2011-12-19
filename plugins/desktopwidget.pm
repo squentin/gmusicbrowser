@@ -5,7 +5,7 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
-=gmbplugin DesktopWidgets
+=for gmbplugin DesktopWidgets
 name	Desktop widgets
 title	Desktop widgets plugin
 desc	Open special layouts as desktop widgets
