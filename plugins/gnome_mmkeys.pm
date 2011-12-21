@@ -5,7 +5,7 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
-=gmbplugin GMMKEYS
+=for gmbplugin GMMKEYS
 name	Gnome mmkeys
 title	Gnome multimedia keys plugin
 desc	Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in gnome.

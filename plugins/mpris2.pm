@@ -5,7 +5,7 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
-=gmbplugin MPRIS2
+=for gmbplugin MPRIS2
 name	MPRIS v2
 title	MPRIS v2 support
 desc	Allows controlling gmusicbrowser via DBus using the MPRIS v2.0 standard

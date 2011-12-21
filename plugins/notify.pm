@@ -5,7 +5,7 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
-=gmbplugin NOTIFY
+=for gmbplugin NOTIFY
 name	Notify
 title	Notify plugin
 desc	Notify you of the playing song with the system's notification popups

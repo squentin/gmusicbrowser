@@ -6,10 +6,11 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
-=gmbplugin AUDIOSCROBBLER
-name	last.fm/libre.fm
-title	last.fm/libre.fm plugin
-desc	Submit played songs to last.fm/libre.fm
+
+=for gmbplugin AUDIOSCROBBLER
+name	last.fm
+title	last.fm plugin
+desc	Submit played songs to last.fm
 =cut
 
 

@@ -5,7 +5,7 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
-=gmbplugin RIP
+=for gmbplugin RIP
 name	Rip
 title	Rip plugin
 desc	Add a button to rip a CD

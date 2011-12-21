@@ -5,7 +5,7 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
-=gmbplugin FETCHCOVER
+=for gmbplugin FETCHCOVER
 name	Picture finder
 title	Picture finder plugin
 desc	Adds a menu entry to artist/album context menu, allowing to search the picture/cover in google and save it.
@@ -291,29 +291,21 @@ sub parse_sloth
 sub parse_googlei
 {	my $result=$_[0];
 	my @list;
-	if ($result=~m#dyn.setResults\([^)](.*)\)#)	#parse google image results #assumes no unencoded ')' in the array of results
-	{	my @matches=split /\],\["/,$1;	#not very reliable
-		for my $m (@matches)
-		{	my @fields=split /["\]],["\[]/,$m;
-			next if @fields<3;	#happens if no results
-			my ($url)= $fields[0]=~m#imgurl\\x3d(http.*?)\\x26#;
-			my $preview=$fields[19];
-			unless ($url)
-			{	next unless $preview=~m/^http/;
-				$url=$preview;
-				$preview='';
-			}
-			s/\\x([0-9A-Fa-f]{2})/chr hex($1)/eg for $url,$preview; #unescape urls
-			my $desc= $fields[6]||''; $desc=~s#\\x([0-9a-f]{2})#chr(hex $1)#gie; $desc=~s#</?b>##g;
-			$desc=Encode::decode('cp1252',$desc); #FIXME not sure of the encoding
-			$desc=::decode_html($desc);
-			push @list, {url => $url, previewurl =>$preview, desc => $desc };
-		}
+	while ($result=~m#<a [^>]*?href="([^"]+?imgrefurl[^"]+)"[^>]*>[^<]*<img [^>]*?src="([^"]+)">.*?</a>[^<]*<br>(.*?)<br>#g)
+	{	my ($url,$preview,$desc)=($1,$2,$3);
+		next unless $url=~m#imgurl=(.*?)&amp;#;
+		$url= ::decode_html($1);
+		$url=~s/%([0-9A-Fa-f]{2})/chr hex($1)/gie;
+		$desc=~s#</?b>##g;
+		$desc=Encode::decode('cp1252',$desc); #FIXME not sure of the encoding
+		$desc=::decode_html($desc);
+		push @list, {url => $url, previewurl =>$preview, desc => $desc };
 	}
 	my $nexturl;
-	if ($result=~m#<a href="(/images\?[^>"]*)"( [^>]*)?class=pn\b#)
+	while ($result=~m#<a href="(/images\?[^>"]+?start=\d[^>"]*)"#g)
 	{	$nexturl='http://images.google.com'.$1;
 		$nexturl=~s#&amp;#&#g;
+		#will keep only last nexturl found, which should be the real "next" url
 	}
 	return \@list,$nexturl;
 }

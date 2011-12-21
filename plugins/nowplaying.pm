@@ -7,12 +7,12 @@
 
 # the plugin file must have the following block before the first non-comment line,
 # it must be of the format :
-# =gmbplugin PID
+# =for gmbplugin PID
 # name	short name
 # title	long name, the short name is used if empty
 # desc	description, may be multiple lines
 # =cut
-=gmbplugin NOWPLAYING
+=for gmbplugin NOWPLAYING
 name	Now playing
 title	NowPlaying plugin
 desc	Run a command when playing a song
