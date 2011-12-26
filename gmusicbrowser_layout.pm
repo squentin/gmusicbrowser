@@ -504,7 +504,7 @@ our %Widgets=
 			},
 	PlayItem =>	{ New		=> \&Layout::MenuItem::new,
 			  text		=> _"Playing",
-			  updatemenu	=> sub { ::BuildMenu(\@Browser::MenuPlaying, { self => $_[0], songlist => ::GetSonglist($_[0]) }, $_[0]->get_submenu); },
+			  updatemenu	=> sub { my $sl=::GetSonglist($_[0]); unless ($sl) {warn "Error : no associated songlist with $_[0]{name}\n"; return} ::BuildMenu(\@Browser::MenuPlaying, { self => $_[0], songlist => $sl }, $_[0]->get_submenu); },
 			},
 	LSortItem =>	{ New		=> \&Layout::MenuItem::new,
 			  text		=> _"Sort",
