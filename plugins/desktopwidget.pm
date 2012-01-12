@@ -134,17 +134,25 @@ sub FillOptions
 	return unless $OptionsBox;
 	my $opt= $DWlist->{$key};
 	my $layout= $opt->{layout};
-	return unless $Layout::Layouts{$layout};
-	my $name=  $Layout::Layouts{$layout}{Name} || $layout;
-	my $author=$Layout::Layouts{$layout}{Author};
-	my $markup= "<b>%s</b>";
-	if (defined $author)
-	{	$author= _("by").' '.$author;
-		$markup.= "\n<i><small>%s</small></i>";
-	}
 	my $label= Gtk2::Label->new;
-	$label->set_markup_with_format($markup,$name, $author||() );
 	my $remove= ::NewIconButton('gtk-remove',_"Remove this widget", sub { Remove($key) });
+	if ($Layout::Layouts{$layout})
+	{	my $name=  $Layout::Layouts{$layout}{Name} || $layout;
+		my $author=$Layout::Layouts{$layout}{Author};
+		my $markup= "<b>%s</b>";
+		if (defined $author)
+		{	$author= _("by").' '.$author;
+			$markup.= "\n<i><small>%s</small></i>";
+		}
+		$label->set_markup_with_format($markup,$name, $author||() );
+	}
+	else
+	{	$label->set_markup_with_format("<b>%s</b>",_"The layout for this desktop widget is missing.");
+		my $vbox= ::Hpack($label, '-',$remove);
+		$OptionsBox->pack_start($vbox,::FALSE,::FALSE,2);
+		$OptionsBox->show_all;
+		return;
+	}
 
 	my $textcolor= Gtk2::ColorButton->new_with_color( Gtk2::Gdk::Color->parse($opt->{DefaultFontColor}) );
 	$textcolor->signal_connect(color_set=>sub { $opt->{DefaultFontColor}= $_[0]->get_color->to_string; CreateWindow($key); });
