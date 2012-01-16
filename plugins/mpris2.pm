@@ -337,5 +337,60 @@ sub GetMetadata_from
 	return Net::DBus::Binding::Value->new($type,\%r);
 }
 
+
+
+
+
+### patched version of Net::DBus::Object::_dispatch_all_prop_read v1.0.0 to support properties of different types
+### Net::DBus::Object::_dispatch_all_prop_read was added in Net::DBus v1.0.0 to support the org.freedesktop.DBus.Properties.GetAll method
+
+sub Net::DBus::Object::_dispatch_all_prop_read {
+    my $self = shift;
+    my $connection = shift;
+    my $message = shift;
+
+    my $ins = $self->_introspector;
+
+    if (!$ins) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "no introspection data exported for properties");
+    }
+
+    my ($pinterface) = $ins->decode($message, "methods", "Get", "params");
+
+    my %values = ();
+    foreach my $pname ($ins->list_properties($pinterface)) {
+	unless ($ins->is_property_readable($pinterface, $pname)) {
+		next; # skip write-only properties
+	}
+	$values{$pname} = eval {
+	    $self->$pname;
+	};
+	if ($@) {
+	    return $connection->make_error_message($message,
+						   "org.freedesktop.DBus.Error.Failed",
+						   "error reading '$pname' in interface '$pinterface': $@");
+	}
+    }
+
+    my $reply = $connection->make_method_return_message($message);
+
+### patch : force variant type for values
+	my $Vtype=
+	 [ &Net::DBus::Binding::Message::TYPE_DICT_ENTRY,
+		[ &Net::DBus::Binding::Message::TYPE_STRING,
+			[ &Net::DBus::Binding::Message::TYPE_VARIANT,
+				[],
+	 ]]];
+	 my $values= Net::DBus::Binding::Value->new($Vtype,\%values);
+    $self->_introspector->encode($reply, "methods", "Get", "returns", $values);
+###
+### $self->_introspector->encode($reply, "methods", "Get", "returns", %\values);
+### end of patch
+    return $reply;
+}
+
+
 1;
 
