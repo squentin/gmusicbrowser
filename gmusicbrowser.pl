@@ -1960,7 +1960,8 @@ sub ReadSavedTags	#load tags _and_ settings
 		}
 		SongArray::updateIDs(\@newIDs);
 		if (my $l=delete $Options{SongArray_Estimated}) # for $oldversion<1.1008
-		{	Songs::Set($_,length_estimated=>1) for @$l;
+		{	$Recent= SongArray->new; # $Recent is used in SongsChanged() so must exists, will be replaced
+			Songs::Set($_,length_estimated=>1) for @$l;
 			$Options{LengthCheckMode}='add';
 		}
 		my $mfilter= $Options{MasterFilterOn} && $Options{MasterFilter} || '';
