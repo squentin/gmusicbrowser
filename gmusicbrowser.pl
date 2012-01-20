@@ -738,11 +738,11 @@ sub ReplaceFieldsForFilename
 	CleanupFileName($f);
 }
 sub MakeReplaceTable
-{	my $fields=$_[0];
+{	my ($fields,%special)=@_;
 	my $table=Gtk2::Table->new (4, 2, FALSE);
 	my $row=0; my $col=0;
-	for my $tag (map '%'.$_, split //,$fields)
-	{	for my $text ( $tag, Songs::FieldName($ReplaceFields{$tag}) )
+	for my $letter (split //,$fields)
+	{	for my $text ( '%'.$letter, $special{$letter}||Songs::FieldName($ReplaceFields{'%'.$letter}) )
 		{	my $l=Gtk2::Label->new($text);
 			$table->attach($l,$col++,$col,$row,$row+1,'fill','shrink',4,1);
 			$l->set_alignment(0,.5);
@@ -755,8 +755,8 @@ sub MakeReplaceTable
 	return $align;
 }
 sub MakeReplaceText
-{	my $fields=$_[0];
-	my $text=join "\n",map '%'.$_.' : '.Songs::FieldName($ReplaceFields{'%'.$_}), split //,$fields;
+{	my ($fields,%special)=@_;
+	my $text=join "\n", map "%$_ : ". ($special{$_}||Songs::FieldName($ReplaceFields{'%'.$_})), split //,$fields;
 	return $text;
 }
 
