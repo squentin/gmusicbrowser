@@ -1499,10 +1499,8 @@ sub CmdFromFIFO
 }
 
 sub GetActiveWindow
-{	for my $w (Gtk2::Window->list_toplevels)
-	{	return $w if $w->get_focus;
-	}
-	return undef;
+{	my ($win)= sort {$b->{last_focused} <=> $a->{last_focused}} grep $_->{last_focused}, Gtk2::Window->list_toplevels;
+	return $win;
 }
 
 sub SearchPicture	# search for file with a relative path among a few folders, used to find pictures used by layouts

@@ -1649,6 +1649,7 @@ sub new
 		$self->{iconified}=($wstate >= 'iconified');
 		0;
 	 });
+	$self->signal_connect(focus_in_event=> sub { $_[0]{last_focused}=time; });
 	$self->signal_connect(delete_event => \&close_window);
 #	::set_drag($self, dest => [::DRAG_FILE,sub
 #		{	my ($self,$type,@values)=@_;
