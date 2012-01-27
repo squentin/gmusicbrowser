@@ -153,7 +153,7 @@ sub DesktopEntry { 'gmusicbrowser' }
 dbus_property('SupportedUriSchemes', ['array','string'], 'read');
 sub SupportedUriSchemes { return ['file']; }
 dbus_property('SupportedMimeTypes', ['array','string'], 'read');
-sub SupportedMimeTypes { return [qw(audio/mpeg application/ogg audio/x-flac audio/x-musepack audio/x-m4a)]; } #FIXME
+sub SupportedMimeTypes { return [qw(application/ogg audio/flac audio/mpeg audio/ogg audio/x-flac audio/x-m4a audio/x-musepack)]; } #FIXME
 
 dbus_method('Next',	[], [], 'org.mpris.MediaPlayer2.Player', {no_return=>1});
 sub Next	{ ::NextSong(); }
@@ -191,9 +191,11 @@ sub Seek
 	}
 }
 
-dbus_method('SetPosition', [['struct','objectpath','int64']], [], 'org.mpris.MediaPlayer2.Player', {no_return=>1});
+dbus_method('SetPosition', ['objectpath','int64'], [], 'org.mpris.MediaPlayer2.Player', {no_return=>1});
 sub SetPosition
-{	my ($ID,$position)= @{ $_[1] };
+{	my (undef,$ID,$position)= (@_);
+	return unless $ID=~m#^/Song/(\d+)$#;
+	$ID=$1;
 	return unless defined $::SongID && $ID==$::SongID;
 	$position/=1_000_000;
 	my $length= Songs::Get($::SongID,'length');
@@ -257,7 +259,7 @@ sub Metadata
 
 dbus_property('Volume', 'double', 'readwrite', 'org.mpris.MediaPlayer2.Player');
 sub Volume
-{	if (defined $_[1]) { my $v=$_[1]; $v=0 if $v<0; ::ChangeVol($v); }
+{	if (defined $_[1]) { my $v=$_[1]; $v=0 if $v<0; ::ChangeVol(100*$v); }
 	else { return dbus_double($::Volume/100); }
 }
 
@@ -280,6 +282,10 @@ sub CanGoPrevious
 }
 dbus_property('CanPlay', 'bool', 'read', 'org.mpris.MediaPlayer2.Player');
 sub CanPlay
+{	return dbus_boolean( defined $::SongID );
+}
+dbus_property('CanPause', 'bool', 'read', 'org.mpris.MediaPlayer2.Player');
+sub CanPause
 {	return dbus_boolean( defined $::SongID );
 }
 dbus_property('CanSeek', 'bool', 'read', 'org.mpris.MediaPlayer2.Player');
@@ -305,10 +311,10 @@ sub GetMetadata_from
 	return Net::DBus::Binding::Value->new($type,{}) unless defined $ID;
 
 	my %h;
-	$h{$_}=Songs::Get($ID,$_) for qw/title album artist comment length track disc year album_artist uri album_picture rating bitrate samprate genre playcount/;
+	$h{$_}=Songs::Get($ID,$_) for qw/title album artist comment length track disc year album_artist uri album_picture rating bitrate samprate genre playcount/, grep Songs::FieldEnabled($_), qw/composer lyricist bpm/;
 	my %r= #return values
 	(	'mpris:length'		=> dbus_int64($h{'length'}*1_000_000),
-		'mpris:trackid'		=> dbus_string($ID), #FIXME should contain a string that uniquely identifies the track within the scope of the playlist
+		'mpris:trackid'		=> dbus_object_path("/Song/$ID"), #FIXME should contain a string that uniquely identifies the track within the scope of the playlist
 		'xesam:album'		=> dbus_string($h{album}),
 		'xesam:albumArtist'	=> dbus_array([ $h{album_artist} ]),
 		'xesam:artist'		=> dbus_array([ $h{artist} ]),
@@ -321,10 +327,9 @@ sub GetMetadata_from
 		'xesam:trackNumber'	=> ( $h{track} ? dbus_int32($h{track}) : undef),
 		'xesam:url'		=> dbus_string( $h{uri} ),
 		'xesam:useCount'	=> dbus_int32($h{playcount}),
-		# FIXME check if field exists
-		#'xesam:audioBPM'	=>
-		#'xesam:composer'	=> dbus_array([ $h{composer} ]),
-		#'xesam:lyricist',	=> dbus_array([ $h{lyricist} ]),
+		'xesam:audioBPM'	=> ($h{bpm} ? dbus_int32($h{bpm}) : undef),
+		'xesam:composer'	=> ($h{composer}||'' ne '' ? dbus_array([ $h{composer} ]) : undef),
+		'xesam:lyricist',	=> ($h{lyricist}||'' ne '' ? dbus_array([ $h{lyricist} ]) : undef),
 	);
 	my $rating=$h{rating};
 	if (defined $rating && length $rating) { $r{'xesam:userRating'}=dbus_double($rating/100); }
@@ -376,17 +381,9 @@ sub Net::DBus::Object::_dispatch_all_prop_read {
 
     my $reply = $connection->make_method_return_message($message);
 
-### patch : force variant type for values
-	my $Vtype=
-	 [ &Net::DBus::Binding::Message::TYPE_DICT_ENTRY,
-		[ &Net::DBus::Binding::Message::TYPE_STRING,
-			[ &Net::DBus::Binding::Message::TYPE_VARIANT,
-				[],
-	 ]]];
-	 my $values= Net::DBus::Binding::Value->new($Vtype,\%values);
-    $self->_introspector->encode($reply, "methods", "Get", "returns", $values);
-###
-### $self->_introspector->encode($reply, "methods", "Get", "returns", %\values);
+### patch : fix method name, which fix return type
+     $self->_introspector->encode($reply, "methods", "GetAll", "returns", \%values);
+###  $self->_introspector->encode($reply, "methods", "Get", "returns", \%values);
 ### end of patch
     return $reply;
 }
