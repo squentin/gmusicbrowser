@@ -711,6 +711,11 @@ package GMB::Edit::Autofill_formats;
 use base 'Gtk2::Dialog';
 our $Instance;
 
+our %Override;
+INIT
+{	%Override= ('%A'=> '$album_artist_raw');
+}
+
 sub new
 {	my $ID= $_[0]{IDs}[0];
 	if ($Instance) { $Instance->force_present; $Instance->{ID}=$ID; $Instance->preview_update; return };
@@ -743,7 +748,7 @@ sub new
 	$sg->add_widget($_) for $label_format,$label_re;
 	my $bbox= Gtk2::HButtonBox->new;
 	$bbox->add($_) for $button_del, $button_add, $button_new;
-	my $table= ::MakeReplaceTable('taAlCyndgL');	#AutoFillFields
+	my $table= ::MakeReplaceTable('taAlCyndgL', A=>Songs::FieldName('album_artist_raw'));	#AutoFillFields
 	my $hbox= ::Hpack($treeview,'_',[[$label_format,'_',$entry_format],$table,$check_re,[$label_re,'_',$entry_re],$error,$preview,'-',$bbox]);
 	$self->vbox->add($hbox);
 
@@ -863,7 +868,7 @@ sub fill_store
 sub make_format_name
 {	my ($format,$markup)=@_;
 	$format=~s#(\$\w+|%[a-zA-Z]|\$\{\w+\})|([%\$])\2#
-		   $2 || do {	my $f= $::ReplaceFields{$1};
+		   $2 || do {	my $f= $::ReplaceFields{ $Override{$1}||$1 };
 		   		$f=undef if $f && $Songs::Def{$f}{flags}!~m/e/;
 				$f&&= Songs::FieldName($f);
 				$f&&= ::MarkupFormat($markup,$f) if $markup;
@@ -873,14 +878,14 @@ sub make_format_name
 }
 sub find_fields
 {	my $format=shift;
-	my @fields= map $::ReplaceFields{$_}, grep defined, $format=~m/ %% | \$\$ | ( \$\w+ | %[a-zA-Z] | \$\{\w+\} ) /gx;
+	my @fields= map $::ReplaceFields{$Override{$_}||$_}, grep defined, $format=~m/ %% | \$\$ | ( \$\w+ | %[a-zA-Z] | \$\{\w+\} ) /gx;
 	@fields= grep defined && $Songs::Def{$_}{flags}=~m/e/, @fields;
 	return @fields;
 }
 sub make_default_re
 {	my $re=shift;
 	$re=~s#(\$\w+|%[a-zA-Z]|\$\{\w+\})|%(%)|\$(\$)|(%?[-,;\w ]+)|(.)#
-		$1 ? Songs::ReplaceFields_to_re($1) :
+		$1 ? Songs::ReplaceFields_to_re( $Override{$1}||$1 ) :
 		$2 ? $2 : $3 ? '\\'.$3 : defined $4 ? $4 : '\\'.$5 #ge;
 	return $re;
 }

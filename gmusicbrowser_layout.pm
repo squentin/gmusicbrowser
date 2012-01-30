@@ -517,7 +517,7 @@ our %Widgets=
 			},
 	PlayItem =>	{ New		=> \&Layout::MenuItem::new,
 			  text		=> _"Playing",
-			  updatemenu	=> sub { ::BuildMenu(\@Browser::MenuPlaying, { self => $_[0], songlist => ::GetSonglist($_[0]) }, $_[0]->get_submenu); },
+			  updatemenu	=> sub { my $sl=::GetSonglist($_[0]); unless ($sl) {warn "Error : no associated songlist with $_[0]{name}\n"; return} ::BuildMenu(\@Browser::MenuPlaying, { self => $_[0], songlist => $sl }, $_[0]->get_submenu); },
 			},
 	LSortItem =>	{ New		=> \&Layout::MenuItem::new,
 			  text		=> _"Sort",
@@ -1136,7 +1136,7 @@ sub NewWidget
 	   }
 	   else { $widget->{state_tip}=$tip; }
 	}
-	if ($options{hover_layout}) { $widget->{$_}=$options{$_} for qw/hover_layout hover_delay/; Layout::Window::Popup::set_hover($widget); }
+	if ($options{hover_layout}) { $widget->{$_}=$options{$_} for qw/hover_layout hover_delay hover_layout_pos/; Layout::Window::Popup::set_hover($widget); }
 	if (my $schange=$ref->{schange})
 	{	my $fields= $options{fields} || $options{field};
 		$fields= $fields ? [ split / /,$fields ] : undef;
@@ -1662,6 +1662,7 @@ sub new
 		$self->{iconified}=($wstate >= 'iconified');
 		0;
 	 });
+	$self->signal_connect(focus_in_event=> sub { $_[0]{last_focused}=time;0; });
 	$self->signal_connect(delete_event => \&close_window);
 #	::set_drag($self, dest => [::DRAG_FILE,sub
 #		{	my ($self,$type,@values)=@_;
@@ -2029,9 +2030,47 @@ sub Position
 {	my $self=shift;
 	if ( my $widget= delete $self->{options}{popped_from})
 	{	::weaken( $self->{popped_from}=$widget );
+		if (my $pos=$widget->{hover_layout_pos})
+		{	my ($x0,$y0)= split /\s*x\s*/,$pos;
+			my ($width,$height)=$self->get_size;
+			my ($x,$y)=  $widget->window->get_origin;
+			my ($ww,$wh)=$widget->window->get_size;
+			if ($widget->no_window)
+			{	(my$wx,my$wy,$ww,$wh)=$widget->allocation->values;
+				$x+=$wx;$y+=$wy;
+			}
+			$x=$y=0 if $x0=~s/abs:\s*//;
+			my $screen=$widget->get_screen;
+			$x+=_compute_pos($x0,$width, $ww,$screen->get_width);
+			$y+=_compute_pos($y0,$height,$wh,$screen->get_height);
+			return $x,$y;
+		}
 		return ::windowpos($self,$widget);
 	}
 	$self->SUPER::Position;
+}
+
+sub _compute_pos
+{	my ($def,$wp,$ww,$ws)=@_;
+	my %h;
+	$def="+$def" unless $def=~m/^[-+]/;
+	::setlocale(::LC_NUMERIC, 'C'); # so that decimal separator is the dot
+	# can parse strings such as : +3s/2-w-p/2+20
+	for my $v ($def=~m/([-+][^-+]+)/g)
+	{	if ($v=~m#([-+](?:\d*\.)?\d*)([pws])(?:/([0-9]+))?#)
+		{	$h{$2}= ($1 eq '+' ? 1 : $1 eq '-' ? -1 : $1) / ($3||1);
+		}
+		elsif ($v=~m/^[-+]\d+$/) { $h{n}=$v }
+	}
+	::setlocale(::LC_NUMERIC, '');
+	# smart alignment if alignment not specified and only widget or screen relative
+	if (!defined $h{p} && (defined $h{w} xor defined $h{s}) && !$h{n})
+	{	my $ws= $h{w} || $h{s} || 0;
+		$h{p}= $ws==0 ? 0 : $ws==1 ? -1 : -.5;
+	}
+	$h{$_}||=0 for qw/n p w s/;
+	my $x= $h{n} + $h{p}*$wp + $h{w}*$ww + $h{s}*$ws;
+	return $x;
 }
 
 sub HoverPopup

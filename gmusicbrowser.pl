@@ -738,11 +738,11 @@ sub ReplaceFieldsForFilename
 	CleanupFileName($f);
 }
 sub MakeReplaceTable
-{	my $fields=$_[0];
+{	my ($fields,%special)=@_;
 	my $table=Gtk2::Table->new (4, 2, FALSE);
 	my $row=0; my $col=0;
-	for my $tag (map '%'.$_, split //,$fields)
-	{	for my $text ( $tag, Songs::FieldName($ReplaceFields{$tag}) )
+	for my $letter (split //,$fields)
+	{	for my $text ( '%'.$letter, $special{$letter}||Songs::FieldName($ReplaceFields{'%'.$letter}) )
 		{	my $l=Gtk2::Label->new($text);
 			$table->attach($l,$col++,$col,$row,$row+1,'fill','shrink',4,1);
 			$l->set_alignment(0,.5);
@@ -755,8 +755,8 @@ sub MakeReplaceTable
 	return $align;
 }
 sub MakeReplaceText
-{	my $fields=$_[0];
-	my $text=join "\n",map '%'.$_.' : '.Songs::FieldName($ReplaceFields{'%'.$_}), split //,$fields;
+{	my ($fields,%special)=@_;
+	my $text=join "\n", map "%$_ : ". ($special{$_}||Songs::FieldName($ReplaceFields{'%'.$_})), split //,$fields;
 	return $text;
 }
 
@@ -1499,10 +1499,8 @@ sub CmdFromFIFO
 }
 
 sub GetActiveWindow
-{	for my $w (Gtk2::Window->list_toplevels)
-	{	return $w if $w->get_focus;
-	}
-	return undef;
+{	my ($win)= sort {$b->{last_focused} <=> $a->{last_focused}} grep $_->{last_focused}, Gtk2::Window->list_toplevels;
+	return $win;
 }
 
 sub SearchPicture	# search for file with a relative path among a few folders, used to find pictures used by layouts
@@ -1960,7 +1958,8 @@ sub ReadSavedTags	#load tags _and_ settings
 		}
 		SongArray::updateIDs(\@newIDs);
 		if (my $l=delete $Options{SongArray_Estimated}) # for $oldversion<1.1008
-		{	Songs::Set($_,length_estimated=>1) for @$l;
+		{	$Recent= SongArray->new; # $Recent is used in SongsChanged() so must exists, will be replaced
+			Songs::Set($_,length_estimated=>1) for @$l;
 			$Options{LengthCheckMode}='add';
 		}
 		my $mfilter= $Options{MasterFilterOn} && $Options{MasterFilter} || '';

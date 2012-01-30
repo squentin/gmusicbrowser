@@ -70,8 +70,8 @@ my %Sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 			}],
 	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%t',undef,
 			 sub {	return 0,'http://lyrics.wikia.com/'.$1 if $_[0]=~m#<span class="redirectText"><a href="/([^"]+)"#;
-				$_[0]=~s!.*<div class='lyricbox'>.*?((?:&\#\d+;|<br ?/>){5,}).*!$1!s; #keep only the "lyric box"
-				return 0 if $_[0]=~m/&#91;&#46;&#46;&#46;&#93;<br/; # truncated lyrics : "[...]" => not auto-saved
+				$_[0]=~s!.*<div class='lyricbox'>.*?((?:&\#\d+;|<br ?/>|</?[bi]>){5,}).*!$1!s; #keep only the "lyric box"
+				return 0 if $_[0]=~m!&#91;&#46;&#46;&#46;&#93;(?:<br ?/>)*<i>!; # truncated lyrics : "[...]" followed by italic explanation => not auto-saved
 				return !!$1;
 			}],
 	#lyricwikiapi => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%t&fmt=html',undef,
