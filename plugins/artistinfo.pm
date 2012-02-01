@@ -685,7 +685,7 @@ sub PopulateQueue
 	push (@artist_gids, Songs::Get_gid($::SongID,'artist')) unless $::Options{OPT.'SimilarExcludeSeed'}; # add currently playing artist as well
 
 	my $filter= Filter->newadd(0, map Songs::MakeFilterFromGID("artist",$_), @artist_gids );
-	my $random= Random->new('random:',$filter->filter);
+	my $random= Random->new('random:',$filter->filter($::ListPlay));
 	my @IDs=$random->Draw($nb,[@$::Queue,$::SongID]); # add queue and current song to blacklist (won't draw)
 	return unless @IDs;
 	$::Queue->Push(\@IDs);
