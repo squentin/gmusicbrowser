@@ -3799,7 +3799,7 @@ sub new_from_smartstring
 
 		# operator and fields
 		my ($fields,$op);
-		if ($string=~s#^([A-Za-z]\w*(?:\|[A-Za-z]\w*)*)?(<=|>=|[:<>=~])##)
+		if ($string=~s#^(\w+(?:\|\w+)*)?(<=|>=|[:<>=~])##)
 		{	$fields=$1; $op=$2;
 			if ($fields)
 			{	my @f= grep $_, map $Songs::Aliases{::superlc($_)}, split(/\|/,$fields);
