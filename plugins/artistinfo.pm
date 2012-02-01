@@ -669,7 +669,7 @@ sub PopulateQueue
 	if ( $nowplayingaID != Songs::Get_gid($::SongID,'artist')) { QAutofillSimilarArtists; return; }
 	my $data = $_[0];
 
-	return unless $::QueueAction eq 'autofill-similar-artists'; # re-check queueaction and 
+	return unless $::QueueAction eq 'autofill-similar-artists'; # re-check queueaction and
 	my $nb=$::Options{MaxAutoFill}-@$::Queue;
 	return unless $nb>0;
 	my @artist_gids;

@@ -396,7 +396,8 @@ our %Widgets=
 	LabelsIcons =>
 	{	New	=> sub { Gtk2::Table->new(1,1); },
 		group	=> 'Play',
-		fields	=> 'label',
+		field	=> 'label',
+		options	=> 'field',
 		schange	=> \&UpdateLabelsIcon,
 		update	=> \&UpdateLabelsIcon,
 		event	=> 'Icons',
@@ -1538,7 +1539,7 @@ sub UpdateLabelsIcon
 	return unless defined $::SongID;
 	my $row=0; my $col=0;
 	my $count=0;
-	for my $stock ( Songs::Get_icon_list('label',$::SongID) )
+	for my $stock ( Songs::Get_icon_list($table->{field},$::SongID) )
 	{	my $img=Gtk2::Image->new_from_stock($stock,'menu');
 		$count++;
 		$table->attach($img,$col,$col+1,$row,$row+1,'shrink','shrink',1,1);

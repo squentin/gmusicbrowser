@@ -349,6 +349,8 @@ sub GetMetadata_from
 ### patched version of Net::DBus::Object::_dispatch_all_prop_read v1.0.0 to support properties of different types
 ### Net::DBus::Object::_dispatch_all_prop_read was added in Net::DBus v1.0.0 to support the org.freedesktop.DBus.Properties.GetAll method
 
+no warnings 'redefine';
+
 sub Net::DBus::Object::_dispatch_all_prop_read {
     my $self = shift;
     my $connection = shift;

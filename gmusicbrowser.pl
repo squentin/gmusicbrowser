@@ -1146,8 +1146,8 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	InsertFilesInPlaylist=> [sub { DoActionForList('insertplay',Uris_to_IDs($_[1])); }, _"Insert a list of files/folders at the start of the playlist", _"url-encoded list of files/folders",0],
 	EnqueueFiles	=> [sub { DoActionForList('queue',Uris_to_IDs($_[1])); }, _"Enqueue a list of files/folders", _"url-encoded list of files/folders",0],
 	AddToLibrary	=> [sub { AddPath(1,split / /,$_[1]); }, _"Add files/folders to library", _"url-encoded list of files/folders",0],
-	SetFocusOn	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->SetFocusOn($name) if $w;},_"Set focus on a layout widget", _"Widget name",0],
-	ShowHideWidget	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->ShowHide(split / +/,$name,2) if $w;},_"Show/Hide layout widget(s)", _"|-separated list of widget names",0],
+	SetFocusOn	=> [sub { my ($w,$name)=@_;return unless $w; $w=get_layout_widget($w);$w->SetFocusOn($name) if $w;},_"Set focus on a layout widget", _"Widget name",0],
+	ShowHideWidget	=> [sub { my ($w,$name)=@_;return unless $w; $w=get_layout_widget($w);$w->ShowHide(split / +/,$name,2) if $w;},_"Show/Hide layout widget(s)", _"|-separated list of widget names",0],
 	PopupTrayTip	=> [sub {ShowTraytip($_[1])}, _"Popup Traytip",_"Number of milliseconds",qr/^\d*$/ ],
 	SetSongLabel	=> [sub{ Songs::Set($SongID,'+label' => $_[1]); }, _"Add a label to the current song", _"Label",qr/./],
 	UnsetSongLabel	=> [sub{ Songs::Set($SongID,'-label' => $_[1]); }, _"Remove a label from the current song", _"Label",qr/./],
@@ -4974,77 +4974,6 @@ sub UpdateMasterFilter
 }
 
 
-#FIXME check completely replaced then remove
-=toremove
-sub AddMissing #FIXME check completely replaced then remove
-{	my $ID=$_[0];
-	if ($_[1]) { my $ref=\$Songs[$ID][SONG_MISSINGSINCE]; if ($$ref && $$ref eq 'l') {$Songs[$ID][SONG_LENGTH]=''} $$ref=$DAYNB; }
-	my $staat=join "\x1D", grep defined, map $Songs[$ID][$_],@STAAT;
-	push @{ $MissingSTAAT{$staat} },$ID;
-	$MissingCount++;
-}
-sub RemoveMissing #FIXME check completely replaced then remove
-{	my $ID=$_[0];
-	my $staat=join "\x1D", grep defined, map $Songs[$ID][$_],@STAAT;
-	my $aref=$MissingSTAAT{$staat};
-	if (!$aref)	{warn "unregistered missing song";return}
-	elsif (@$aref>1){ @$aref=grep $_ != $ID, @$aref; }
-	else		{ delete $MissingSTAAT{$staat}; }
-	$Songs[$ID][SONG_MISSINGSINCE]=undef;
-	$MissingCount--;
-}
-sub CheckMissing #FIXME check completely replaced then remove
-{	my $songref=$_[0];
-	my $staat=join "\x1D", grep defined, map $songref->[$_],@STAAT;
-	my $IDs=$MissingSTAAT{$staat};
-	return undef unless $IDs;
-	for my $oldID (@$IDs)
-	{	my $m;
-		for my $f (SONG_FILE,SONG_PATH)
-		{	$m++ if $songref->[$f] eq $Songs[$oldID][$f];
-		}
-		next unless $m;	#must have the same path or the same filename
-		# Found -> remove old ID, copy non-written song fields to new ID
-		my $olddir =$Songs[$oldID][SONG_PATH];
-		my $oldfile=$Songs[$oldID][SONG_FILE];
-		warn "Found missing song, formerly '".$olddir.SLASH.$oldfile."'\n";# if $debug;
-		RemoveMissing($oldID);
-		$songref->[$_]=$Songs[$oldID][$_] for SONG_ADDED,SONG_LASTPLAY,SONG_NBPLAY,SONG_LASTSKIP,SONG_NBSKIP,SONG_RATING,SONG_LABELS,SONG_LENGTH; #SONG_LENGTH is copied to avoid the need to check length for mp3 without VBR header
-		if (keys %{ $GetIDFromFile{$olddir} } ==1)
-		{	delete $GetIDFromFile{$olddir};
-		}
-		else { delete $GetIDFromFile{$olddir}{$oldfile} }
-		$Songs[$oldID]=undef;
-		return 1;
-	}
-	return undef;
-}
-
-sub AddRadio
-{	my ($url,$name,$noradiolist)=@_;
-	$name=$url unless defined $name;
-	$url='http://'.$url unless $url=~m#^\w+://#;
-	my ($path,$file)= $url=~m#^(\w+://[^/]+)/?(.*)$#;
-	return unless $path;
-	my @song;
-	$song[SONG_TITLE]=$name;
-	$song[SONG_FILE]=$song[SONG_UFILE]=$file;
-	$song[SONG_PATH]=$song[SONG_UPATH]=$path;
-	$song[SONG_LENGTH]=0;
-	$song[SONG_ARTIST]="radio";
-	$song[SONG_ALBUM]="radio";
-	$song[SONG_ADDED]=time;
-	$song[SONG_MISSINGSINCE]='R'; #could be better, identify track as a radio
-	push @Songs,\@song;
-	my $ID=$#Songs;
-	if ($noradiolist) {$song[SONG_MISSINGSINCE].='T'}
-	else
-	{	push @Radio, $ID;
-		HasChanged('RadioList');
-	}
-	return $ID;
-}
-=cut
 our %playlist_file_parsers;
 INIT
 {%playlist_file_parsers=

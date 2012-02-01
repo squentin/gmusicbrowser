@@ -119,7 +119,7 @@ sub new {
 	$self->{fontsize} = $fontsize->get_size() / Gtk2::Pango->scale;
 
 	# Heading: cover and album info.
-	my $cover = Layout::NewWidget("Cover", {group=>$options->{group}, forceratio=>1, maxsize=>$::Options{OPT.'CoverSize'}, xalign=>0, tip=>_"Click to show fullsize image", 
+	my $cover = Layout::NewWidget("Cover", {group=>$options->{group}, forceratio=>1, maxsize=>$::Options{OPT.'CoverSize'}, xalign=>0, tip=>_"Click to show fullsize image",
 		click1=>\&cover_popup, click3=>sub {::PopupAAContextMenu({self=>$_[0], field=>'album', ID=>$::SongID, gid=>Songs::Get_gid($::SongID,'album'), mode=>'P'});} });
 	my $statbox = Gtk2::VBox->new(0,0);
 	for my $name (qw/Ltitle Lstats/) {
@@ -134,12 +134,12 @@ sub new {
 
 	# "Refresh", "save" and "search" buttons
 	my $refreshbutton = ::NewIconButton('gtk-refresh', undef, sub { song_changed(::find_ancestor($_[0],__PACKAGE__),undef,undef,1); }, "none", _"Refresh");
-	my $savebutton	  = ::NewIconButton('gtk-save', undef, sub 
+	my $savebutton	  = ::NewIconButton('gtk-save', undef, sub
 		{my $self=::find_ancestor($_[0],__PACKAGE__); save_review(::GetSelID($self),$self->{fields})}, "none", _"Save review");
 	my $searchbutton = Gtk2::ToggleButton->new();
 	$searchbutton->set_relief('none');
 	$searchbutton->add(Gtk2::Image->new_from_stock('gtk-find','menu'));
-	$searchbutton->signal_connect(clicked => sub {my $self=::find_ancestor($_[0],__PACKAGE__); 
+	$searchbutton->signal_connect(clicked => sub {my $self=::find_ancestor($_[0],__PACKAGE__);
 		if ($_[0]->get_active()) {$self->manual_search()} else {$self->song_changed()}});
 	my $buttonbox = Gtk2::HBox->new();
 	$buttonbox->pack_end($searchbutton,0,0,0);
@@ -498,7 +498,7 @@ sub load_search_results {
 	} else {
 		$self->{fields} = {};
 		$self->print_warning(_"No review found");
-	}	
+	}
 }
 
 sub load_review {
@@ -567,7 +567,7 @@ sub decode {
 	$html = Encode::decode($encoding,$html) if $encoding;
 	$html = ::decode_html($html) if ($encoding eq 'utf-8');
 	return $html;
-}	
+}
 
 # Load review from file
 sub load_file {
@@ -636,7 +636,7 @@ sub save_fields {
 			} else {
 				push(@updated_fields, '+'.$key, $fields->{$key});
 			}
-		}		
+		}
 	}
 	Songs::Set($IDs, \@updated_fields) if @updated_fields;
 }
