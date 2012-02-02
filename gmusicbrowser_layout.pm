@@ -939,7 +939,7 @@ sub CreateWidgets
 		my $group=$opt1->{group};
 		$opt1->{group}= $defaultgroup.(length $group ? "-$group" : '') unless $group=~m/^[A-Z]/;
 		my $box=$widgets->{$key}= $type->{New}( $opt1 );
-		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle maxwidth maxheight/;
+		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle maxwidth maxheight expand_weight/;
 		if ($opt1->{minwidth} or $opt1->{minheight})
 		{	my ($minwidth,$minheight)=$box->get_size_request;
 			$minwidth=  $opt1->{minwidth}  || $minwidth;
@@ -1076,7 +1076,7 @@ sub NewWidget
 		: $ref->{New}(\%options);
 	return unless $widget;
 	$widget->{$_}= $options{$_} for 'group',split / /, ($ref->{options} || '');
-	$widget->{$_}=$options{$_} for grep exists $options{$_}, qw/tabtitle tabicon tabrename maxwidth maxheight/;
+	$widget->{$_}=$options{$_} for grep exists $options{$_}, qw/tabtitle tabicon tabrename maxwidth maxheight expand_weight/;
 	$widget->{options_to_save}=$ref->{saveoptions} if $ref->{saveoptions};
 
 	$widget->{name}=$namefull;
