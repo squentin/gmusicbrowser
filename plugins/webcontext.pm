@@ -432,7 +432,7 @@ sub addtoolbar
 sub SongChanged
 {	my ($self,$ID,$force)=@_;
 	return unless defined $ID;
-	return if defined $self->{ID} && $ID==$self->{ID} && !$force;
+	return if defined $self->{ID} && !$force && ($ID==$self->{ID} || !$self->{follow});
 	$self->{ID}=$ID;
 	my ($title,$artist)= map ::url_escapeall($_), Songs::Get($ID,qw/title artist/);
 	return if $title eq '';
@@ -480,7 +480,7 @@ sub SongChanged
 	$self->{ID}=$ID;
 	my $artist=Songs::Get($ID,'first_artist'); #FIXME add a way to choose artist ?
 	return if $artist eq '';
-	return if defined $self->{Artist} && $artist eq $self->{Artist} && !$force;
+	return if defined $self->{Artist} && !$force && ($artist eq $self->{Artist} || !$self->{follow});
 	$self->{Artist}=$artist;
 	$artist=::url_escapeall($artist);
 	my $url='http://'.$::Options{OPT.'WikiLocale'}.'.wikipedia.org/wiki/'.$artist;
@@ -521,7 +521,7 @@ sub SongChanged
 	my $url= $self->{baseurl};
 	unless ($url) { warn "no baseurl defined for custom webcontext $self->{name}\n"; return }
 	$url= ::ReplaceFields($ID,$url, \&::url_escapeall);
-	return if $self->{url} && $url eq  $self->{url} && !$force;
+	return if $self->{url} && !$force && ($url eq  $self->{url} || !$self->{follow});
 	warn "loading $url\n";
 	::IdleDo('8_mozcustom'.$self,1000,sub {$self->load_url($url)});
 }
