@@ -314,10 +314,11 @@ Options to change what is done with files/folders passed as arguments (done in r
 		close $fifofh;
 		$running&&= "using '$FIFOFile'";
 	}
-	elsif (!$CmdLine{noDBus})
-	{	eval
-		{	require 'gmusicbrowser_dbus.pm';
-			my $bus= $GMB::DBus::bus || die;
+	if (!$running && !$CmdLine{noDBus})
+	{	eval {require 'gmusicbrowser_dbus.pm'}
+		|| warn "Error loading gmusicbrowser_dbus.pm :\n$@ => controlling gmusicbrowser through DBus won't be possible.\n\n";
+		eval
+		{	my $bus= $GMB::DBus::bus || die;
 			my $service = $bus->get_service($DBus_id) || die;
 			my $object = $service->get_object('/org/gmusicbrowser', 'org.gmusicbrowser') || die;
 			$object->RunCommand($_) for @cmd;
@@ -333,8 +334,6 @@ Options to change what is done with files/folders passed as arguments (done in r
 		@cmd=() if $ifnotrunning eq 'nocmd';
 	}
 	$CmdLine{runcmd}=\@cmd if @cmd;
-
-	unless ($CmdLine{noDBus}) { eval {require 'gmusicbrowser_dbus.pm'} || warn "Error loading Net::DBus :\n$@ => controlling gmusicbrowser through DBus won't be possible.\n\n"; }
    }
 }
 # end of command line handling
