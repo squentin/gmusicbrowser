@@ -3748,7 +3748,10 @@ sub BuildMenu
 			$item->signal_connect (activate => sub
 				{	my ($self,$args)=@_;
 					my $on; $on=$self->get_active if $self->isa('Gtk2::CheckMenuItem');
-					$self->{code}->($args,$on) if $self->{code};
+					if (my $code=$self->{code})
+					{	if (ref $code) { $code->($args,$on); }
+						else { run_command(undef,$code); }
+					}
 				},$args);
 			if (my $submenu3=$m->{submenu3})	# set a submenu on right-click
 			{	$submenu3= BuildMenu($submenu3,$args);
