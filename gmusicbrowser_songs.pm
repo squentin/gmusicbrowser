@@ -2479,7 +2479,18 @@ sub PrefFields	#preference dialog for fields
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('never','automatic');
 	$sw->add($treeview);
-	return ::Vpack( $warning, '_',[ ['0_',$sw,$newcst], '_', $rightbox ] );
+	my $vbox= ::Vpack( $warning, '_',[ ['0_',$sw,$newcst], '_', $rightbox ] );
+
+	$vbox->{gotofunc}=sub	#go to a specific row
+	{	my $field=shift;
+		my $iter= $store->get_iter_from_string(($field=~m/^[A-Z]/ ? 1 : 0).':0'); #1 is the custom fields parent, 0 the standard fields parent
+		while ($iter)
+		{	if ($store->get($iter,0) eq $field) { $treeview->set_cursor($store->get_path($iter)); last; }
+			$iter=$store->iter_next($iter);
+		}
+	};
+
+	return $vbox;
 }
 
 our %Field_options_aliases=

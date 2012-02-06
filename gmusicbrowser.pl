@@ -502,7 +502,7 @@ our @TrayMenu=
 		submenu => sub {  [map { $_->layout_name => $_ } grep $_->isa('Layout::Window'), Gtk2::Window->list_toplevels];  }, },
 	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => sub { ShowHide(); } },
 	{ label=> _"Fullscreen",	code => \&ToggleFullscreenLayout,	stockicon => 'gtk-fullscreen' },
-	{ label=> _"Settings",		code => \&PrefDialog,	stockicon => 'gtk-preferences' },
+	{ label=> _"Settings",		code => 'OpenPref(fields:artist)',	stockicon => 'gtk-preferences' },
 	{ label=> _"Quit",		code => \&Quit,		stockicon => 'gtk-quit' },
 );
 
@@ -1102,7 +1102,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	PopupCustom	=> [sub { PopupLayout($_[1],$_[0]); },		_"Popup Custom window",_"Name of layout", sub { TextCombo::Tree->new( Layout::get_layout_list() ); }],
 	CloseWindow	=> [sub { $_[0]->get_toplevel->close_window if $_[0];}, _"Close Window"],
 	SetPlayerLayout => [sub { SetOption(Layout=>$_[1]); CreateMainWindow(); },_"Set player window layout",_"Name of layout", sub {  TextCombo::Tree->new( Layout::get_layout_list('G') ); }, ],
-	OpenPref	=> [\&PrefDialog,			_"Open Preference window"],
+	OpenPref	=> [sub{ PrefDialog($_[1]); },		_"Open Preference window"],
 	OpenSongProp	=> [sub { DialogSongProp($SongID) if defined $SongID }, _"Edit Current Song Properties"],
 	EditSelectedSongsProperties => [sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; DialogSongsProp(@IDs) if @IDs; },		_"Edit selected song properties"],
 	ShowHide	=> [sub {ShowHide();},			_"Show/Hide"],
@@ -5340,33 +5340,55 @@ sub AboutDialog
 }
 
 sub PrefDialog
-{	if ($OptionsDialog) { $OptionsDialog->force_present; return; }
-	$OptionsDialog=my $dialog = Gtk2::Dialog->new (_"Settings", undef,[],
+{	my $goto= $_[0] || $Options{LastPrefPage} || 'library';
+	if ($OptionsDialog) { $OptionsDialog->force_present; }
+	else
+	{	$OptionsDialog=my $dialog = Gtk2::Dialog->new (_"Settings", undef,[],
 				'gtk-about' => 1,
 				'gtk-close' => 'close');
-	$dialog->set_default_response ('close');
-	SetWSize($dialog,'Pref');
+		$dialog->set_default_response ('close');
+		SetWSize($dialog,'Pref');
 
-	my $notebook = Gtk2::Notebook->new;
-	$notebook->append_page( PrefLibrary()	,Gtk2::Label->new(_"Library"));
-	#$notebook->append_page( PrefLabels()	,Gtk2::Label->new(_"Labels"));
-	$notebook->append_page( PrefAudio()	,Gtk2::Label->new(_"Audio"));
-	$notebook->append_page( PrefLayouts()	,Gtk2::Label->new(_"Layouts"));
-	$notebook->append_page( PrefMisc()	,Gtk2::Label->new(_"Misc."));
-	$notebook->append_page( Songs::PrefFields(),Gtk2::Label->new(_"Fields"));
-	$notebook->append_page( PrefPlugins()	,Gtk2::Label->new(_"Plugins"));
-	$notebook->append_page( PrefKeys()	,Gtk2::Label->new(_"Keys"));
-	$notebook->append_page( PrefTags()	,Gtk2::Label->new(_"Tags"));
+		my $notebook = Gtk2::Notebook->new;
+		for my $pagedef
+		(	[library=>_"Library",	PrefLibrary()],
+			#[labels=>_"Labels",	PrefLabels()],
+			[audio	=>_"Audio",	PrefAudio()],
+			[layouts=>_"Layouts",	PrefLayouts()],
+			[misc	=>_"Misc.",	PrefMisc()],
+			[fields	=>_"Fields",	Songs::PrefFields()],
+			[plugins=>_"Plugins",	PrefPlugins()],
+			[keys	=>_"Keys",	PrefKeys()],
+			[tags	=>_"Tags",	PrefTags()],
 
-	$dialog->vbox->pack_start($notebook,TRUE,TRUE,4);
+		)
+		{	my ($key,$label,$page)=@$pagedef;
+			$notebook->append_page( $page, Gtk2::Label->new($label));
+			$notebook->{pages}{$key}=$page;
+		}
+		$notebook->signal_connect(switch_page=> sub
+		{	my $page=$_[0]->get_nth_page($_[2]);
+			my $h=$_[0]{pages};
+			($Options{LastPrefPage})=grep $h->{$_}==$page, keys %$h;
+		});
+		$dialog->{notebook}=$notebook;
+		$dialog->vbox->pack_start($notebook,TRUE,TRUE,4);
 
-	$dialog->signal_connect( response => sub
+		$dialog->signal_connect( response => sub
 		{	if ($_[1] eq '1') {AboutDialog();return};
 			$OptionsDialog=undef;
 			$_[0]->destroy;
 		});
-	$dialog->show_all;
-	#$dialog->set_position('center-always');
+		$dialog->show_all;
+	}
+
+	# turn to $goto page
+	($goto,my $arg)= split /:/,$goto,2;
+	my $notebook= $OptionsDialog->{notebook};
+	if (my $page=$notebook->{pages}{$goto})
+	{	$notebook->set_current_page($notebook->page_num($page));
+		if ($arg && $page->{gotofunc}) { $page->{gotofunc}->($arg) }
+	}
 }
 
 sub PrefKeys
@@ -5588,6 +5610,14 @@ sub PrefPlugins
 			&$sub_update;
 		});
 
+	$hbox->{gotofunc}=sub	#go to a specific row
+	{	my $plugin=shift;
+		my $iter= $store->get_iter_first;
+		while ($iter)
+		{	if (lc($store->get($iter,0)) eq lc$plugin) { $treeview->set_cursor($store->get_path($iter)); last; }
+			$iter=$store->iter_next($iter);
+		}
+	};
 
 	my $sw=Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');

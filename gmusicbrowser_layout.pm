@@ -41,7 +41,7 @@ our @MenuQueue=
 
 our @MainMenu=
 (	{label => _"Add files or folders",code => sub {::ChooseAddPath(0,1)},	stockicon => 'gtk-add' },
-	{label => _"Settings",		code => \&::PrefDialog,	stockicon => 'gtk-preferences' },
+	{label => _"Settings",		code => 'OpenPref',	stockicon => 'gtk-preferences' },
 	{label => _"Open Browser",	code => \&::OpenBrowser,stockicon => 'gmb-playlist' },
 	{label => _"Open Context window",code => \&::ContextWindow, stockicon => 'gtk-info'},
 	{label => _"Switch to fullscreen mode",code => \&::ToggleFullscreenLayout, stockicon => 'gtk-fullscreen'},
@@ -119,7 +119,7 @@ our %Widgets=
 		stock	=> 'gtk-preferences',
 		tip	=> _"Edit Settings",
 		text	=> _"Settings",
-		activate=> \&::PrefDialog,
+		activate=> 'OpenPref',
 		click3	=> sub {Layout::Window->new($::Options{Layout});}, #mostly for debugging purpose
 		click2	=> \&::AboutDialog,
 	},
