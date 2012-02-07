@@ -127,7 +127,7 @@ MBlist		= HistItem LSortItem PlayItem
 HPbig		= HPfp _VPlistAA
 HPfp		= FilterPane0(nb=1,hidebb=1,page=artists,page_artists/lmarkup=1) FilterPane1(nb=2,hidebb=1,page=album,page_album/lpicsize=32,page_album/lmarkup=1)
 VPlistAA	= _SongList HBAA
-HBAA		= _ArtistBox _AlbumBox        
+HBAA		= _ArtistBox _AlbumBox
 HSize0		= Filler0 LockArtist LockAlbum
 VolumeScroll	= HBupper
 

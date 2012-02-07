@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (C) 2005-2011 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2012 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -73,8 +73,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1008',
- VERSIONSTRING => '1.1.8',
+ VERSION => '1.1009',
+ VERSIONSTRING => '1.1.9',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
@@ -165,7 +165,7 @@ BEGIN	# in a BEGIN block so that commands for a running instance are sent sooner
 	$default_home=$old;
   }
 
-my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2011 Quentin Sculo
+my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2012 Quentin Sculo
 options :
 -nocheck: don't check for updated/deleted songs on startup
 -noscan	: don't scan folders for songs on startup
@@ -314,10 +314,11 @@ Options to change what is done with files/folders passed as arguments (done in r
 		close $fifofh;
 		$running&&= "using '$FIFOFile'";
 	}
-	elsif (!$CmdLine{noDBus})
-	{	eval
-		{	require 'gmusicbrowser_dbus.pm';
-			my $bus= $GMB::DBus::bus || die;
+	if (!$running && !$CmdLine{noDBus})
+	{	eval {require 'gmusicbrowser_dbus.pm'}
+		|| warn "Error loading gmusicbrowser_dbus.pm :\n$@ => controlling gmusicbrowser through DBus won't be possible.\n\n";
+		eval
+		{	my $bus= $GMB::DBus::bus || die;
 			my $service = $bus->get_service($DBus_id) || die;
 			my $object = $service->get_object('/org/gmusicbrowser', 'org.gmusicbrowser') || die;
 			$object->RunCommand($_) for @cmd;
@@ -333,8 +334,6 @@ Options to change what is done with files/folders passed as arguments (done in r
 		@cmd=() if $ifnotrunning eq 'nocmd';
 	}
 	$CmdLine{runcmd}=\@cmd if @cmd;
-
-	unless ($CmdLine{noDBus}) { eval {require 'gmusicbrowser_dbus.pm'} || warn "Error loading Net::DBus :\n$@ => controlling gmusicbrowser through DBus won't be possible.\n\n"; }
    }
 }
 # end of command line handling
@@ -503,7 +502,7 @@ our @TrayMenu=
 		submenu => sub {  [map { $_->layout_name => $_ } grep $_->isa('Layout::Window'), Gtk2::Window->list_toplevels];  }, },
 	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => sub { ShowHide(); } },
 	{ label=> _"Fullscreen",	code => \&ToggleFullscreenLayout,	stockicon => 'gtk-fullscreen' },
-	{ label=> _"Settings",		code => \&PrefDialog,	stockicon => 'gtk-preferences' },
+	{ label=> _"Settings",		code => 'OpenPref(fields:artist)',	stockicon => 'gtk-preferences' },
 	{ label=> _"Quit",		code => \&Quit,		stockicon => 'gtk-quit' },
 );
 
@@ -1103,7 +1102,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	PopupCustom	=> [sub { PopupLayout($_[1],$_[0]); },		_"Popup Custom window",_"Name of layout", sub { TextCombo::Tree->new( Layout::get_layout_list() ); }],
 	CloseWindow	=> [sub { $_[0]->get_toplevel->close_window if $_[0];}, _"Close Window"],
 	SetPlayerLayout => [sub { SetOption(Layout=>$_[1]); CreateMainWindow(); },_"Set player window layout",_"Name of layout", sub {  TextCombo::Tree->new( Layout::get_layout_list('G') ); }, ],
-	OpenPref	=> [\&PrefDialog,			_"Open Preference window"],
+	OpenPref	=> [sub{ PrefDialog($_[1]); },		_"Open Preference window"],
 	OpenSongProp	=> [sub { DialogSongProp($SongID) if defined $SongID }, _"Edit Current Song Properties"],
 	EditSelectedSongsProperties => [sub { my $songlist=GetSonglist($_[0]) or return; my @IDs=$songlist->GetSelectedIDs; DialogSongsProp(@IDs) if @IDs; },		_"Edit selected song properties"],
 	ShowHide	=> [sub {ShowHide();},			_"Show/Hide"],
@@ -1146,8 +1145,8 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	InsertFilesInPlaylist=> [sub { DoActionForList('insertplay',Uris_to_IDs($_[1])); }, _"Insert a list of files/folders at the start of the playlist", _"url-encoded list of files/folders",0],
 	EnqueueFiles	=> [sub { DoActionForList('queue',Uris_to_IDs($_[1])); }, _"Enqueue a list of files/folders", _"url-encoded list of files/folders",0],
 	AddToLibrary	=> [sub { AddPath(1,split / /,$_[1]); }, _"Add files/folders to library", _"url-encoded list of files/folders",0],
-	SetFocusOn	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->SetFocusOn($name) if $w;},_"Set focus on a layout widget", _"Widget name",0],
-	ShowHideWidget	=> [sub { my ($w,$name)=@_;return unless $w; $w=find_ancestor($w,'Layout');$w->ShowHide(split / +/,$name,2) if $w;},_"Show/Hide layout widget(s)", _"|-separated list of widget names",0],
+	SetFocusOn	=> [sub { my ($w,$name)=@_;return unless $w; $w=get_layout_widget($w);$w->SetFocusOn($name) if $w;},_"Set focus on a layout widget", _"Widget name",0],
+	ShowHideWidget	=> [sub { my ($w,$name)=@_;return unless $w; $w=get_layout_widget($w);$w->ShowHide(split / +/,$name,2) if $w;},_"Show/Hide layout widget(s)", _"|-separated list of widget names",0],
 	PopupTrayTip	=> [sub {ShowTraytip($_[1])}, _"Popup Traytip",_"Number of milliseconds",qr/^\d*$/ ],
 	SetSongLabel	=> [sub{ Songs::Set($SongID,'+label' => $_[1]); }, _"Add a label to the current song", _"Label",qr/./],
 	UnsetSongLabel	=> [sub{ Songs::Set($SongID,'-label' => $_[1]); }, _"Remove a label from the current song", _"Label",qr/./],
@@ -3716,7 +3715,10 @@ sub BuildMenu
 			$item->signal_connect (activate => sub
 				{	my ($self,$args)=@_;
 					my $on; $on=$self->get_active if $self->isa('Gtk2::CheckMenuItem');
-					$self->{code}->($args,$on) if $self->{code};
+					if (my $code=$self->{code})
+					{	if (ref $code) { $code->($args,$on); }
+						else { run_command(undef,$code); }
+					}
 				},$args);
 			if (my $submenu3=$m->{submenu3})	# set a submenu on right-click
 			{	$submenu3= BuildMenu($submenu3,$args);
@@ -4941,77 +4943,6 @@ sub UpdateMasterFilter
 }
 
 
-#FIXME check completely replaced then remove
-=toremove
-sub AddMissing #FIXME check completely replaced then remove
-{	my $ID=$_[0];
-	if ($_[1]) { my $ref=\$Songs[$ID][SONG_MISSINGSINCE]; if ($$ref && $$ref eq 'l') {$Songs[$ID][SONG_LENGTH]=''} $$ref=$DAYNB; }
-	my $staat=join "\x1D", grep defined, map $Songs[$ID][$_],@STAAT;
-	push @{ $MissingSTAAT{$staat} },$ID;
-	$MissingCount++;
-}
-sub RemoveMissing #FIXME check completely replaced then remove
-{	my $ID=$_[0];
-	my $staat=join "\x1D", grep defined, map $Songs[$ID][$_],@STAAT;
-	my $aref=$MissingSTAAT{$staat};
-	if (!$aref)	{warn "unregistered missing song";return}
-	elsif (@$aref>1){ @$aref=grep $_ != $ID, @$aref; }
-	else		{ delete $MissingSTAAT{$staat}; }
-	$Songs[$ID][SONG_MISSINGSINCE]=undef;
-	$MissingCount--;
-}
-sub CheckMissing #FIXME check completely replaced then remove
-{	my $songref=$_[0];
-	my $staat=join "\x1D", grep defined, map $songref->[$_],@STAAT;
-	my $IDs=$MissingSTAAT{$staat};
-	return undef unless $IDs;
-	for my $oldID (@$IDs)
-	{	my $m;
-		for my $f (SONG_FILE,SONG_PATH)
-		{	$m++ if $songref->[$f] eq $Songs[$oldID][$f];
-		}
-		next unless $m;	#must have the same path or the same filename
-		# Found -> remove old ID, copy non-written song fields to new ID
-		my $olddir =$Songs[$oldID][SONG_PATH];
-		my $oldfile=$Songs[$oldID][SONG_FILE];
-		warn "Found missing song, formerly '".$olddir.SLASH.$oldfile."'\n";# if $debug;
-		RemoveMissing($oldID);
-		$songref->[$_]=$Songs[$oldID][$_] for SONG_ADDED,SONG_LASTPLAY,SONG_NBPLAY,SONG_LASTSKIP,SONG_NBSKIP,SONG_RATING,SONG_LABELS,SONG_LENGTH; #SONG_LENGTH is copied to avoid the need to check length for mp3 without VBR header
-		if (keys %{ $GetIDFromFile{$olddir} } ==1)
-		{	delete $GetIDFromFile{$olddir};
-		}
-		else { delete $GetIDFromFile{$olddir}{$oldfile} }
-		$Songs[$oldID]=undef;
-		return 1;
-	}
-	return undef;
-}
-
-sub AddRadio
-{	my ($url,$name,$noradiolist)=@_;
-	$name=$url unless defined $name;
-	$url='http://'.$url unless $url=~m#^\w+://#;
-	my ($path,$file)= $url=~m#^(\w+://[^/]+)/?(.*)$#;
-	return unless $path;
-	my @song;
-	$song[SONG_TITLE]=$name;
-	$song[SONG_FILE]=$song[SONG_UFILE]=$file;
-	$song[SONG_PATH]=$song[SONG_UPATH]=$path;
-	$song[SONG_LENGTH]=0;
-	$song[SONG_ARTIST]="radio";
-	$song[SONG_ALBUM]="radio";
-	$song[SONG_ADDED]=time;
-	$song[SONG_MISSINGSINCE]='R'; #could be better, identify track as a radio
-	push @Songs,\@song;
-	my $ID=$#Songs;
-	if ($noradiolist) {$song[SONG_MISSINGSINCE].='T'}
-	else
-	{	push @Radio, $ID;
-		HasChanged('RadioList');
-	}
-	return $ID;
-}
-=cut
 our %playlist_file_parsers;
 INIT
 {%playlist_file_parsers=
@@ -5349,7 +5280,7 @@ sub AutoSelPicture
 sub AboutDialog
 {	my $dialog=Gtk2::AboutDialog->new;
 	$dialog->set_version(VERSIONSTRING);
-	$dialog->set_copyright("Copyright © 2005-2011 Quentin Sculo");
+	$dialog->set_copyright("Copyright © 2005-2012 Quentin Sculo");
 	#$dialog->set_comments();
 	$dialog->set_license("Released under the GNU General Public Licence version 3\n(http://www.gnu.org/copyleft/gpl.html)");
 	$dialog->set_website('http://gmusicbrowser.org');
@@ -5369,39 +5300,62 @@ sub AboutDialog
 		'Korean : bluealbum',
 		'Russian : tin',
 		'Italian : Michele Giampaolo',
+		'Dutch : Gijs Timmers',
 	);
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
 }
 
 sub PrefDialog
-{	if ($OptionsDialog) { $OptionsDialog->force_present; return; }
-	$OptionsDialog=my $dialog = Gtk2::Dialog->new (_"Settings", undef,[],
+{	my $goto= $_[0] || $Options{LastPrefPage} || 'library';
+	if ($OptionsDialog) { $OptionsDialog->force_present; }
+	else
+	{	$OptionsDialog=my $dialog = Gtk2::Dialog->new (_"Settings", undef,[],
 				'gtk-about' => 1,
 				'gtk-close' => 'close');
-	$dialog->set_default_response ('close');
-	SetWSize($dialog,'Pref');
+		$dialog->set_default_response ('close');
+		SetWSize($dialog,'Pref');
 
-	my $notebook = Gtk2::Notebook->new;
-	$notebook->append_page( PrefLibrary()	,Gtk2::Label->new(_"Library"));
-	#$notebook->append_page( PrefLabels()	,Gtk2::Label->new(_"Labels"));
-	$notebook->append_page( PrefAudio()	,Gtk2::Label->new(_"Audio"));
-	$notebook->append_page( PrefLayouts()	,Gtk2::Label->new(_"Layouts"));
-	$notebook->append_page( PrefMisc()	,Gtk2::Label->new(_"Misc."));
-	$notebook->append_page( Songs::PrefFields(),Gtk2::Label->new(_"Fields"));
-	$notebook->append_page( PrefPlugins()	,Gtk2::Label->new(_"Plugins"));
-	$notebook->append_page( PrefKeys()	,Gtk2::Label->new(_"Keys"));
-	$notebook->append_page( PrefTags()	,Gtk2::Label->new(_"Tags"));
+		my $notebook = Gtk2::Notebook->new;
+		for my $pagedef
+		(	[library=>_"Library",	PrefLibrary()],
+			#[labels=>_"Labels",	PrefLabels()],
+			[audio	=>_"Audio",	PrefAudio()],
+			[layouts=>_"Layouts",	PrefLayouts()],
+			[misc	=>_"Misc.",	PrefMisc()],
+			[fields	=>_"Fields",	Songs::PrefFields()],
+			[plugins=>_"Plugins",	PrefPlugins()],
+			[keys	=>_"Keys",	PrefKeys()],
+			[tags	=>_"Tags",	PrefTags()],
 
-	$dialog->vbox->pack_start($notebook,TRUE,TRUE,4);
+		)
+		{	my ($key,$label,$page)=@$pagedef;
+			$notebook->append_page( $page, Gtk2::Label->new($label));
+			$notebook->{pages}{$key}=$page;
+		}
+		$notebook->signal_connect(switch_page=> sub
+		{	my $page=$_[0]->get_nth_page($_[2]);
+			my $h=$_[0]{pages};
+			($Options{LastPrefPage})=grep $h->{$_}==$page, keys %$h;
+		});
+		$dialog->{notebook}=$notebook;
+		$dialog->vbox->pack_start($notebook,TRUE,TRUE,4);
 
-	$dialog->signal_connect( response => sub
+		$dialog->signal_connect( response => sub
 		{	if ($_[1] eq '1') {AboutDialog();return};
 			$OptionsDialog=undef;
 			$_[0]->destroy;
 		});
-	$dialog->show_all;
-	#$dialog->set_position('center-always');
+		$dialog->show_all;
+	}
+
+	# turn to $goto page
+	($goto,my $arg)= split /:/,$goto,2;
+	my $notebook= $OptionsDialog->{notebook};
+	if (my $page=$notebook->{pages}{$goto})
+	{	$notebook->set_current_page($notebook->page_num($page));
+		if ($arg && $page->{gotofunc}) { $page->{gotofunc}->($arg) }
+	}
 }
 
 sub PrefKeys
@@ -5623,6 +5577,14 @@ sub PrefPlugins
 			&$sub_update;
 		});
 
+	$hbox->{gotofunc}=sub	#go to a specific row
+	{	my $plugin=shift;
+		my $iter= $store->get_iter_first;
+		while ($iter)
+		{	if (lc($store->get($iter,0)) eq lc$plugin) { $treeview->set_cursor($store->get_path($iter)); last; }
+			$iter=$store->iter_next($iter);
+		}
+	};
 
 	my $sw=Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');

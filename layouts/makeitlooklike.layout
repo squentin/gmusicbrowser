@@ -3,7 +3,7 @@
 
 [Quodlibet]
 Type=G+
-Category = "Make it look like"
+Category = _"Make it look like"
 Default		= Window(size=700x600,sticky=1) HPbrowser(size=160-600) FilterPane0(artistinfo=1,albumpsize=32,albuminfo=1)
 MBmenu		= MainMenuItem LayoutItem PSortItem PFilterItem QueueItem
 HBButtons1	= Prev Play Next
@@ -27,7 +27,7 @@ VolumeScroll	= HBupper
 [Exaile]
 Author = shimmerproject.org
 Type = G+
-Category = "Make it look like"
+Category = _"Make it look like"
 Title = %t by %a
 Default = Window(size=80%x80%)
 
@@ -174,8 +174,8 @@ VBMain = HBMenubar _HPSidebarCenter HBStatusbar
 
             HBPlayer = (maxheight=100,minheight=100) \
                 HBCover \
-                5VBSongInfo \
-                _VBVolume \
+                5_VBSongInfo \
+                VBVolume \
                 5Filler5
 
                 HBCover = (maxheight=100,minheight=100,minwidth=100,maxwidth=100) \
@@ -187,9 +187,9 @@ VBMain = HBMenubar _HPSidebarCenter HBStatusbar
                         -VolumeIcon(click1=TogMute,size=button,button=1)
 
                 VBSongInfo =  \
-                    _Title(yalign=0.5,minsize=0,markup="<big><big><b>%t</b></big></big>",click1="") \
-                    _Artist(yalign=1,minsize=0,markup="by %a") \
-                    _Album(yalign=1,minsize=0,markup="from %l")\
+                    _Title(yalign=0.5,ellipsize=end,markup="<big><big><b>%t</b></big></big>",click1="") \
+                    _Artist(yalign=1,ellipsize=end,markup="by %a") \
+                    _Album(yalign=1,ellipsize=end,markup="from %l")\
                     100Filler2
 
 
@@ -212,7 +212,7 @@ VBMain = HBMenubar _HPSidebarCenter HBStatusbar
 [Rhythmbox]
 Author = shimmerproject.org
 Type = G+
-Category = "Make it look like"
+Category = _"Make it look like"
 Title = %a - %t
 Default = Window(size=80%x80%) HPSidebarAndCenter(size=200)
 DefaultFocus =
@@ -288,9 +288,9 @@ VBMain = HBMenubar HBToolbar VBSliderbar _HPSidebarCenterContext HBStatusbar
         HBTimeSlider = 5_TimeSlider(direct_mode=0)
 
         HBText = 2Filler0 \
-            _Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",yalign=0.5) \
-            Artist(expand_max=200,yalign=1,minsize=0,markup=" by <i>%a</i> ") \
-            Album(minsize=1,expand_max=200,yalign=1,minsize=1,markup=" on <i>%l</i>   ",showcover=0) \
+            _Title(expand_max=300,ellipsize=end,markup="<big><b>%t</b></big> ",yalign=0.5) \
+            Artist(expand_max=200,yalign=1,ellipsize=end,markup=" by <i>%a</i> ") \
+            Album(expand_max=200,yalign=1,ellipsize=end,markup=" on <i>%l</i>   ",showcover=0) \
             -Time
 
     HPSidebarCenterContext = HPSidebarAndCenter Context
@@ -326,7 +326,7 @@ VBMain = HBMenubar HBToolbar VBSliderbar _HPSidebarCenterContext HBStatusbar
 
 [Rhythmbox Compact] based on Rhythmbox
 Default = Window(size=600x126)
-Category = "Make it look like"
+Category = _"Make it look like"
 VBMain = HBMenubar HBToolbar VBSliderbar
 
     HBMenubar = _MBEdit
@@ -375,7 +375,7 @@ text : text(markup=pesc($title).'\n<small>by <i>'.pesc($artist).'</i>\non <i>'.p
 Author = aboettger
 Type = G+
 
-Category = "Make it look like"
+Category = _"Make it look like"
 
 Title = %n %t (%m) - gmusicbrowser
 Default = Window(size=480x400)
@@ -398,16 +398,14 @@ VolumeScroll = HBVolume
 VBMain = HBMenubar HBToolbar _HBPlaylist HBSonginfo 3HBStatusbar
 
     HBSonginfo = 10HBCover \
-            VBSongInfo \
+            _VBSongInfo \
             10Filler10 \
-            2_VBVisuals
-
-                VBVisuals = 2Filler2 _Visuals(minwidth=200,maxwidth=200) 2Filler3
+            6_Visuals(minwidth=200,maxwidth=200)
 
                 VBSongInfo = 3Filler4 \
-                    Title(minsize=0,markup="<big><big><big><big>%t</big></big></big></big>",click1="") \
-                    Artist(minsize=0,markup="%a",click1="") \
-                    Album(minsize=1,markup="%l",click1="")
+                    Title(minwidth=200,ellipsize=end,markup="<big><big><big><big>%t</big></big></big></big>") \
+                    Artist(ellipsize=end,markup="%a",click1="") \
+                    Album(ellipsize=end,markup="%l",click1="")
 
             HBCover = (maxheight=80,minheight=80,minwidth=80,maxwidth=80) \
                 Cover(default=elementary/no-cover.svg,showcover=0,minsize=100,maxsize=100)
@@ -478,3 +476,36 @@ Default = Window(size=400x250)
 VBmain = 5_HBMain
 HBMain = 5_FilterPane4(nb=0,hidebb=0,page=savedtree,pages=savedtree)
 Title = _"Playlists"
+
+[itunes-like]
+Type=G+
+Name		= "itunes"
+Category	= _"Make it look like"
+Default		= Window(size=1120x820,hidden=QueueList) VPfp_list(size=40) HPfp0(size=300) HPfp_list_src(size=175)
+HBIndic		= MBmenu Sort 10Filter Queue 10Pos
+MBmenu		= MainMenuItem LayoutItem PSortItem PFilterItem QueueItem SMView
+SMView		= (label=_"View") MenuItem0(togglewidget=FilterPane0,label=_"Genres pane")  MenuItem1(togglewidget=HPfp0,label=_"Categories pane") MenuItem2(togglewidget=FilterPane3,label=_"Left pane") MenuItem3(togglewidget=QueueList,label=_"Queue")
+VBleft		= HBIndic _HBButtons
+HBButtons	= Prev Play Next Time _ABtime
+ABtime		= (xalign=0,yscale=0) TimeBar
+HBupper		= VBleft 5_VBright -VBVol
+VBVol		= VolumeIcon _VolumeSlider(1,0)
+HBTitle		= Filler0 _Title -Stars
+HBArtist	= LockArtist _Artist
+HBAlbum		= LockAlbum _Album -Year
+VBright		= 2HBTitle 2HBArtist 2HBAlbum
+VBmain		= HBupper 5_HPfp_list_src
+#VBmain		= HBupper 5_HPfp_list_src HBStatus
+HPfp_list_src	= VBfpane3 _VBbar_fp_list
+VBfpane3	= _FilterPane3(nb=1,hidebb=1,pages=savedtree) VProgress Cover(hover_layout=CoverPopup,hover_delay=100)
+VBbar_fp_list	= HBbar _VPfp_list
+VPfp_list	= HPfp0 VPlists
+VPlists		= _SongList QueueList(group=2)
+HBbar		= SimpleSearch MBlist Refresh ResetFilter PlayFilter -Total
+HPfp0		= FilterPane0(nb=2,hidebb=1,pages=genre) HPfp1
+HPfp1		= FilterPane1(nb=3,hidebb=1,pages=artist) FilterPane2(nb=4,hidebb=1,pages=album)
+#HBStatus	= Total _Progress
+MBlist		= HistItem LSortItem PlayItem
+HSize0		= Filler0 LockArtist LockAlbum
+VSize1		= 50 VolumeSlider
+VolumeScroll	= HBupper

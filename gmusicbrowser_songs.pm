@@ -2479,7 +2479,18 @@ sub PrefFields	#preference dialog for fields
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('never','automatic');
 	$sw->add($treeview);
-	return ::Vpack( $warning, '_',[ ['0_',$sw,$newcst], '_', $rightbox ] );
+	my $vbox= ::Vpack( $warning, '_',[ ['0_',$sw,$newcst], '_', $rightbox ] );
+
+	$vbox->{gotofunc}=sub	#go to a specific row
+	{	my $field=shift;
+		my $iter= $store->get_iter_from_string(($field=~m/^[A-Z]/ ? 1 : 0).':0'); #1 is the custom fields parent, 0 the standard fields parent
+		while ($iter)
+		{	if ($store->get($iter,0) eq $field) { $treeview->set_cursor($store->get_path($iter)); last; }
+			$iter=$store->iter_next($iter);
+		}
+	};
+
+	return $vbox;
 }
 
 our %Field_options_aliases=
@@ -3799,7 +3810,7 @@ sub new_from_smartstring
 
 		# operator and fields
 		my ($fields,$op);
-		if ($string=~s#^([A-Za-z]\w*(?:\|[A-Za-z]\w*)*)?(<=|>=|[:<>=~])##)
+		if ($string=~s#^(\w+(?:\|\w+)*)?(<=|>=|[:<>=~])##)
 		{	$fields=$1; $op=$2;
 			if ($fields)
 			{	my @f= grep $_, map $Songs::Aliases{::superlc($_)}, split(/\|/,$fields);

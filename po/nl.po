@@ -1,0 +1,2741 @@
+#
+# Gijs Timmers <gijzio@hotmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gmusicbrowser 1.1008\n"
+"Report-Msgid-Bugs-To: squentin@free.fr\n"
+"POT-Creation-Date: 2012-01-18 12:16+0100\n"
+"PO-Revision-Date: 2012-02-01 21:36+0100\n"
+"Last-Translator: Gijs Timmers <gijzio@hotmail.com>\n"
+"Language-Team: Nederlands <gijzio@hotmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bits\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+msgid " Context pane layout "
+msgstr "Contextpaneellayout"
+
+msgid " Fields "
+msgstr "Velden"
+
+msgid " Review "
+msgstr "Herziening"
+
+#, perl-brace-format
+msgid " of {length}"
+msgstr "van {length}"
+
+msgid "# songs"
+msgstr "# nummers"
+
+#, perl-format
+msgid "%S by %a"
+msgstr "%S door %a"
+
+#, perl-format
+msgid "%t by %a (%m)"
+msgstr "%t door %a (%m)"
+
+#, perl-brace-format
+msgid "'{file}' exists. Overwrite ?"
+msgstr "'{file}' bestaat al. Wilt u dit bestand overschrijven?"
+
+msgid "(applied after restart)"
+msgstr "(vereist een herstart)"
+
+msgid "(case insensitive)"
+msgstr "(hoofdletterongevoelig)"
+
+#, perl-brace-format
+msgid "(common parent folder : {common})"
+msgstr "(standaardhoofdmap: {common})"
+
+msgid "(other)"
+msgstr "(ander)"
+
+msgid "(see http://www.last.fm)"
+msgstr "(zie http://www.last.fm)"
+
+msgid "(unstable)"
+msgstr "(onstabiel)"
+
+msgid ""
+"- When selecting a song, the playlist filter will be reset if the song is "
+"not in it\n"
+"- Skip to another song when removing the current song from the playlist"
+msgstr ""
+"- Als u een nummer selecteert die niet in de afspeellijst staat, zal de "
+"afspeellijstfilter gereset worden\n"
+"- Spring naar een ander nummer wanneer het huidige nummer verwijderd wordt "
+"uit de afspeellijst"
+
+msgid "0 chance"
+msgstr "0 kans"
+
+msgid "0 means 'show all'"
+msgstr "0 betekent 'toon alles'"
+
+#, perl-brace-format
+msgid "1 chance in {probability}"
+msgstr "1 kans in {probability}"
+
+msgid "3 Filter panes"
+msgstr "3 Filterpaneel"
+
+msgid "32x32 PNG file icon"
+msgstr "Bestandspictogram van 32×32 pixels, in PNG-formaat"
+
+msgid "50 Last Added"
+msgstr "50 laatst toegevoegd"
+
+msgid "50 Last Played"
+msgstr "50 laatst afgespeeld"
+
+msgid "50 Most Played"
+msgstr "50 meest afgespeeld"
+
+msgid "<Unknown>"
+msgstr "<Onbekend>"
+
+#, perl-format
+msgid ""
+"<b>%t</b>\n"
+"<small><small>by</small> %a\n"
+"<small>from</small> %l</small>"
+msgstr ""
+"<b>%t</b>\n"
+"<small><small>door</small> %a\n"
+"<small>van</small> %l</small>"
+
+#, perl-format
+msgid "<big><big>by %a</big></big>"
+msgstr "<big><big>door %a</big></big>"
+
+#, perl-format
+msgid "<i>by</i> %a\\n<i>from</i> %l"
+msgstr "<i>door</i> %a\\n<i>van</i> %l"
+
+msgid "Abort"
+msgstr "Afbreken"
+
+msgid "Abort ReplayGain analysis"
+msgstr "Stop de ReplayGain-analyse"
+
+msgid "Abort all"
+msgstr "Breek alles af"
+
+msgid "Abort mass-tagging"
+msgstr "Breek massatagging af"
+
+msgid "About"
+msgstr "Over"
+
+#, perl-brace-format
+msgid ""
+"About to delete {files}\n"
+"Are you sure ?"
+msgstr "Weet u zeker dat u {files} wilt verwijderen?"
+
+msgid "About to turn off the computer in :"
+msgstr "Zal de computer afsluiten over:"
+
+msgid "Actions are not supported by current notification daemon"
+msgstr ""
+"Deze handelingen worden niet ondersteund door de huidige notificatiedaemon."
+
+msgid "Add"
+msgstr "Voeg toe"
+
+msgid "Add Files ..."
+msgstr "Bestanden toevoegen..."
+
+msgid "Add Music"
+msgstr "Muziek toevoegen"
+
+msgid "Add a button to rip a CD"
+msgstr "Voeg een knop toe om een cd te rippen"
+
+msgid "Add a fullscreen button"
+msgstr "Voeg een knop toe om over te schakelen op volledig scherm"
+
+msgid "Add a fullscreen button to layouts that can accept extra buttons"
+msgstr ""
+"Voeg een volledig scherm-knop toe aan de layouts die het plaatsen van extra "
+"knoppen ondersteunen"
+
+msgid "Add a group"
+msgstr "Groep toevoegen"
+
+msgid "Add a label to the current song"
+msgstr "Label toevoegen aan het huidige titel"
+
+msgid "Add a list of files/folders to the playlist"
+msgstr "Voeg een lijst van bestanden of mappen toe aan de afspeellijst"
+
+msgid "Add a radio"
+msgstr "Radiokanaal toevoegen"
+
+msgid "Add files or folders"
+msgstr "Bestanden of mappen toevoegen"
+
+msgid "Add files/folders to library"
+msgstr "Bestanden of mappen aan de bibliotheek toevoegen"
+
+msgid "Add folder"
+msgstr "Map toevoegen"
+
+msgid "Add folder ..."
+msgstr "Map toevoegen..."
+
+msgid "Add label"
+msgstr "Label toevoegen"
+
+msgid "Add multiple condition"
+msgstr "Meerdere voorwaarden instellen"
+
+msgid "Add new label"
+msgstr "Nieuw label toevoegen"
+
+msgid "Add new radio"
+msgstr "Nieuw radiokanaal toevoegen"
+
+msgid "Add rule : "
+msgstr "Regel toevoegen:"
+
+msgid "Add shorcut key"
+msgstr "Sneltoets toevoegen"
+
+msgid "Add tab"
+msgstr "Tab toevoegen"
+
+msgid "Add to existing values"
+msgstr "Toevoegen aan bestaande waarden"
+
+msgid "Add to list"
+msgstr "Aan lijst toevoegen"
+
+msgid "Add to playlist"
+msgstr "Aan afspeellijst toevoegen"
+
+msgid "Add to queue"
+msgstr "Aan wachtrij toevoegen"
+
+#, perl-brace-format
+msgid "Add {value} to {field} for all tracks on this album."
+msgstr "Zet {value} naar {field} voor alle nummers op dit album."
+
+msgid "Added"
+msgstr "Toegevoegd"
+
+msgid "Added Today"
+msgstr "Vandaag toegevoegd"
+
+msgid "Adding a radio"
+msgstr "Radiokanaal toevoegen"
+
+msgid ""
+"Additionally this format can be used :\n"
+" default number1 format1 number2 format2 ...\n"
+" dates more recent than number1 seconds will use format1, ..."
+msgstr ""
+"Eventueel kan de volgende opmaak gebruikt worden:\n"
+" standaard titel1 opmaak1 titel2 opmaak2...\n"
+" gegevens recenter dan titel1 seconden zullen opmaak1 gebruiken,..."
+
+msgid ""
+"Adds a menu entry to artist/album context menu, allowing to search the "
+"picture/cover in google and save it."
+msgstr ""
+"Voegt een menu-item toe aan het artiest-/albumcontextmenu, welke toelaat om "
+"de afbeelding te zoeken met Google, om deze vervolgens op te slaan."
+
+msgid "Adds labels to the current song"
+msgstr "Voegt een label toe aan het huidige nummer."
+
+msgid "Adds menu entries to song contextual menu"
+msgstr "Voegt menu-items toe aan het contextmenu van het nummer."
+
+msgid "Advanced Search ..."
+msgstr "Geavanceerd zoeken..."
+
+msgid "Advanced Tag Editing"
+msgstr "Geavanceerd tags bewerken"
+
+msgid "Album"
+msgstr "Album"
+
+msgid "Album and artist"
+msgstr "Album en artiest"
+
+msgid "Album and artist on the left side"
+msgstr "Album en artiest aan de linkerzijde"
+
+msgid "Album artist"
+msgstr "Albumartiest"
+
+msgid "Album artist or artist"
+msgstr "Albumartiest of artiest"
+
+msgid "Album gain"
+msgstr "Volumeversterking van het album"
+
+msgid "Album mode"
+msgstr "Albummodus"
+
+msgid "Album peak"
+msgstr "Piekversterking van het album"
+
+msgid "Album picture"
+msgstr "Albumafbeelding"
+
+msgid "Album picture & info"
+msgstr "Albumafbeelding en -informatie"
+
+msgid "Album pictures"
+msgstr "Albumafbeeldingen"
+
+msgid "Album playcount:"
+msgstr "Aantal keer album afgespeeld:"
+
+msgid "Album shuffle"
+msgstr "Album in willekeurige volgorde afspelen"
+
+msgid "Album with picture"
+msgstr "Album met afbeelding"
+
+msgid "Album year(s)"
+msgstr "Albumjaar"
+
+#, perl-format
+msgid "Album: %l"
+msgstr "Album: %l"
+
+#, perl-format
+msgid "Album: %l (%Y)"
+msgstr "Album: %l (%Y)"
+
+msgid "Albuminfo"
+msgstr "Albuminformatie"
+
+msgid "Albuminfo plugin"
+msgstr "Albuminformatieplugin"
+
+msgid "Albums"
+msgstr "Albums"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "All Songs"
+msgstr "Alle titels"
+
+msgid "All albums"
+msgstr "Alle albums"
+
+msgid "All artists"
+msgstr "Alle artiesten"
+
+msgid "All files"
+msgstr "Alle bestanden"
+
+msgid "All genres"
+msgstr "Alle genres"
+
+msgid "All labels"
+msgstr "Alle labels"
+
+msgid "All moods"
+msgstr "Alle stemmingen"
+
+msgid "All of :"
+msgstr "Alles van:"
+
+msgid "All songs"
+msgstr "Alle titels"
+
+msgid "All styles"
+msgstr "Alle stijlen"
+
+msgid "All themes"
+msgstr "Alle thema's"
+
+msgid ""
+"Allmusic uses both Genres and Styles to describe albums. If you use only "
+"Genres, you may want to include Styles in the list of Genres."
+msgstr ""
+"'Alle muziek' gebruikt zowel 'Genres' als 'Stijlen' om albums te "
+"beschrijven. Indien u enkel 'Genres' gebruikt, zou u 'Stijlen' kunnen "
+"toevoegen aan de lijst van 'Genres'."
+
+msgid "Allow for scheduling fade-out and stop"
+msgstr "Geplande fade-out en stoppen toestaan."
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
+msgstr ""
+"Sta toe om gmusicbrowser via DBus te bedienen via de MPRIS v1.0-standaard"
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v2.0 standard"
+msgstr ""
+"Sta toe om gmusicbrowser via DBus te bedienen via de MPRIS v2.0-standaard"
+
+msgid "Amount of volume changed by the mouse wheel"
+msgstr "Stel in hoe sterk het volume wijzigt bij gebruik van het muiswieltje."
+
+msgid "Any of :"
+msgstr "Een van:"
+
+msgid "Append"
+msgstr "Toevoegen"
+
+msgid "Append (only if not already present)"
+msgstr "Toevoegen (behalve als deze al aanwezig is)"
+
+msgid "Append to playlist"
+msgstr "Toevoegen aan afspeellijst"
+
+msgid "Application"
+msgstr "Applicatie"
+
+#, perl-brace-format
+msgid "Are you sure you want to delete the '{label}' label ?"
+msgstr "Weet u zeker dat u de '{label}'-label wilt verwijderen?"
+
+msgid "Arguments"
+msgstr "Argumenten"
+
+msgid "Artist"
+msgstr "Artiest"
+
+msgid "Artist & album"
+msgstr "Artiest en album"
+
+msgid "Artist (Year - Album)"
+msgstr "Artiest (Jaar - Album)"
+
+msgid "Artist Biography"
+msgstr "Artiestbiografie"
+
+#, perl-format
+msgid "Artist Picture Size : %d"
+msgstr "Grootte van de artiestafbeelding: %d"
+
+msgid "Artist URL"
+msgstr "Artiest-URL"
+
+msgid "Artist picture"
+msgstr "Artiestafbeelding"
+
+msgid "Artist playcount:"
+msgstr "Aantal keer artiest afgespeeld:"
+
+msgid "Artist,Album,Disc,Track"
+msgstr "Artiest,Album,Schijf,Nummer"
+
+msgid "Artist,Date,Album,Disc,Track"
+msgstr "Artiest,Datum,Album,Schijf,Nummer"
+
+#, perl-format
+msgid "Artist: %a"
+msgstr "Artiest: %a"
+
+msgid "Artistinfo"
+msgstr "Artiestinfo"
+
+msgid "Artistinfo plugin"
+msgstr "Artiestinfoplugin"
+
+msgid "Artists"
+msgstr "Artiesten"
+
+msgid "Ascending order"
+msgstr "Oplopende volgorde"
+
+msgid "Ask confirmation only if file already exists"
+msgstr "Vraag alleen om bevestiging als het bestand al bestaat"
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Audio properties"
+msgstr "Audio-eigenschappen"
+
+msgid "Author"
+msgstr "Auteur"
+
+msgid "Auto"
+msgstr "Automatisch"
+
+msgid "Auto fill based on filenames ..."
+msgstr "Automatisch invullen op basis van bestandsnamen..."
+
+msgid "Auto fill only blank fields"
+msgstr "Enkel lege velden automatisch invullen"
+
+msgid "Auto fill up to"
+msgstr "Automatisch invullen "
+
+msgid "Auto filter"
+msgstr "Auto-filter"
+
+msgid "Auto-fill queue"
+msgstr "Wachtrij automatisch aanvullen"
+
+msgid "Auto-fill queue with similar artists (from last.fm)"
+msgstr ""
+"Wachtrij automatisch aanvullen met vergelijkbare artiesten (informatie van "
+"last.fm)"
+
+msgid "Auto-increment track numbers"
+msgstr "Tracknummer automatisch invullen"
+
+msgid "Auto-save fields with data from allmusic"
+msgstr "Velden automatisch opslaan met data van allmusic"
+
+msgid "Auto-save positive finds"
+msgstr "Gevonden zoekresultaten automatisch opslaan"
+
+msgid "Auto-scroll"
+msgstr "Automatisch scrollen"
+
+msgid "Auto-select Pictures"
+msgstr "Automatisch afbeeldingen selecteren"
+
+msgid "Automatically remove current song if not found"
+msgstr ""
+"Verwijder de huidige titel uit de afspeellijst indien deze niet gevonden "
+"wordt."
+
+msgid "Autosave"
+msgstr "Automatisch opslaan"
+
+msgid "Autosave plugin"
+msgstr "Automatisch opslaanplugin"
+
+msgid "Available"
+msgstr "Beschikbaar"
+
+msgid "Average rating:"
+msgstr "Gemiddelde waardering:"
+
+msgid "BPM"
+msgstr "BPM"
+
+msgid "Bad session"
+msgstr "Ongeldige sessie"
+
+msgid "Base Folder :"
+msgstr "Standaardmap:"
+
+msgid "Basic fields"
+msgstr "Standaardvelden"
+
+msgid "Begin with"
+msgstr "Begin met"
+
+msgid "Below"
+msgstr "Onder"
+
+msgid "Biography"
+msgstr "Biografie"
+
+msgid "Bitrate"
+msgstr "Bitsnelheid"
+
+msgid "Body :"
+msgstr "Body:"
+
+msgid "Body text is not supported by current notification daemon"
+msgstr "Bodytekst wordt niet ondersteund door de huidige notificatiedaemon."
+
+msgid "Browser"
+msgstr "Browser"
+
+msgid "Browser views"
+msgstr "Browserweergaven"
+
+msgid "Browser window layout :"
+msgstr "Browservensterlayout:"
+
+msgid "Browser with SongTree"
+msgstr "Browser met boomweergave"
+
+msgid "Buttons"
+msgstr "Knoppen"
+
+msgid "Buttons, Song & Cover"
+msgstr "Knoppen, titel en albumafbeelding"
+
+msgid "Can be relative by using + or -"
+msgstr "Kan worden aangepast met + en -"
+
+msgid "Can't change the volume in non-gstreamer iceserver mode"
+msgstr "Kan het volume niet veranderen in non-gstreamer-iceservermodus."
+
+msgid ""
+"Can't change the volume. Needs amixer (packaged in alsa-utils) to change "
+"volume when using this audio backend."
+msgstr ""
+"Kan het volume niet veranderen. amixer (aanwezig in alsa-utils) is nodig om "
+"het volume te veranderen als u deze audiobackend gebruikt."
+
+#, perl-brace-format
+msgid ""
+"Can't create Folder '{path}' : \n"
+"{error}"
+msgstr ""
+"Kan de map '{path}' niet aanmaken: \n"
+"{error}"
+
+#, perl-brace-format
+msgid "Can't create sink '{sink}'"
+msgstr "Kan de bestemming '{sink}' niet aanmaken"
+
+#, perl-brace-format
+msgid "Can't play '{file}'."
+msgstr "Kan '{file}' niet afspelen."
+
+msgid "Can't read file or invalid file"
+msgstr "Het bestand is ongeldig of onleesbaar."
+
+#, perl-brace-format
+msgid "Can't write in base folder '{folder}'."
+msgstr "Kan niet schrijven in de standaardmap '{folder}'"
+
+msgid "Capitalize"
+msgstr "Laat met hoofdletter beginnen"
+
+msgid "Capitalize each word"
+msgstr "Elk woord met hoofdletter beginnen"
+
+msgid "Case insensitive"
+msgstr "Hoofdletterongevoelig"
+
+msgid "Case sensitive"
+msgstr "Hoofdlettergevoelig"
+
+msgid "Case-sensitive"
+msgstr "Hoofdlettergevoelig"
+
+msgid "Centered"
+msgstr "Gecentreerd"
+
+msgid "Centered on"
+msgstr "Gecentreerd op"
+
+msgid "Change Display"
+msgstr "Verander de weergave"
+
+msgid "Change default text color"
+msgstr "Verander de standaardtekstkleur"
+
+msgid "Change default text font and size"
+msgstr "Verander het standaardlettertype en de grootte"
+
+msgid "Change the context visibility"
+msgstr "Verander de zichtbaarheid van de omgeving"
+
+msgid "Channels"
+msgstr "Kanalen"
+
+msgid "Check Collection"
+msgstr "Controleer de verzameling"
+
+msgid "Check for updated/deleted songs on startup"
+msgstr "Controleer op geüpdatete/verwijderde titels bij het opstarten"
+
+msgid "Check for updated/removed songs"
+msgstr "Controleer op geüpdatete/verwijderde titels"
+
+msgid "Check real length of mp3"
+msgstr "Controleer de lengte van het mp3-bestand"
+
+msgid "Checking length/bitrate"
+msgstr "Controleert lengte/bitsnelheid"
+
+msgid "Checking songs"
+msgstr "Controleert titels"
+
+msgid "Choose Album From this Artist"
+msgstr "Kies een album van deze artiest"
+
+msgid "Choose Artist/Album/Song"
+msgstr "Kies een artiest/album/titel"
+
+msgid "Choose Picture"
+msgstr "Kies een afbeelding"
+
+msgid "Choose Random Album"
+msgstr "Kies een willekeurig album"
+
+msgid "Choose a folder"
+msgstr "Kies een map"
+
+msgid "Choose directory to copy files to"
+msgstr "Kies een map als kopieerlocatie voor bestanden"
+
+msgid "Choose directory to move files to"
+msgstr "Kies een map als verplaatslocatie voor bestanden"
+
+msgid "Choose files"
+msgstr "Kies bestanden"
+
+msgid "Choose folder to add"
+msgstr "Kies een map om toe te voegen"
+
+msgid "Choose font for lyrics"
+msgstr "Kies een lettertype voor de songtekst"
+
+msgid "Choose font..."
+msgstr "Kies een lettertype..."
+
+#, perl-brace-format
+msgid "Choose icon for label {name}"
+msgstr "Kies een pictogram voor het {name}-label"
+
+msgid "Choose page to open"
+msgstr "Kies een pagina om te openen"
+
+#, perl-format
+msgid "Choose picture for '%s'"
+msgstr "Kies een afbeelding voor '%s'"
+
+msgid "Choose playlist files to import"
+msgstr "Kies de afspeellijstbestanden die geïmporteerd moeten worden"
+
+msgid "Clear"
+msgstr "Wissen"
+
+msgid "Clear playlist filter"
+msgstr "Afspeellijstfilter wissen"
+
+msgid "Clear queue"
+msgstr "Wachtrij wissen"
+
+msgid "Clear selected fields"
+msgstr "Geselecteerde velden wissen"
+
+msgid "Click to show fullsize image"
+msgstr "Klik om de afbeelding op volledige grootte te zien"
+
+msgid "Client banned, contact gmusicbrowser's developer"
+msgstr "Cliënt verbannen, neem contact op met de maker van gmusicbrowser."
+
+msgid "Close"
+msgstr "Afsluiten"
+
+msgid "Close Window"
+msgstr "Venster sluiten"
+
+msgid "Close to tray"
+msgstr "Afsluiten naar systeemvak"
+
+msgid "Collection"
+msgstr "Verzameling"
+
+msgid "Command"
+msgstr "Opdracht"
+
+msgid "Command to launch when the button is pressed"
+msgstr "Uit te voeren opdracht wanneer de knop wordt ingedrukt"
+
+msgid ""
+"Command used when\n"
+"'turn off computer when queue empty'\n"
+"is selected"
+msgstr ""
+"Gebruikte opdracht wanneer\n"
+"'sluit de computer af zodra de wachrij leeg is'\n"
+"geselecteerd is"
+
+msgid "Command when playing song changed :"
+msgstr "Uit te voeren opdracht zodra de titel die afgespeeld wordt, verandert:"
+
+msgid "Command when stopped :"
+msgstr "Uit te voeren opdracht zodra de titel stopt:"
+
+msgid "Comment"
+msgstr "Opmerking"
+
+msgid "Comments"
+msgstr "Opmerkingen"
+
+msgid "Compilation"
+msgstr "Compilatie"
+
+msgid "Composer"
+msgstr "Componist"
+
+msgid "Conductor"
+msgstr "Documenteerder"
+
+msgid "Connect through a proxy"
+msgstr "Verbind via een proxy"
+
+msgid "Connections from :"
+msgstr "Verbindingen van:"
+
+msgid "Context"
+msgstr "Context"
+
+msgid "Control"
+msgstr "Controle"
+
+msgid "Conz Aishi (with Filter Panes)"
+msgstr "Conz Aishi (met filterpanelen)"
+
+msgid "Conz Glimm (different controls)"
+msgstr "Conz Glimm (andere bediening)"
+
+msgid "Copy"
+msgstr "Kopieer"
+
+msgid "Copy failed"
+msgstr "Kopiëren mislukt"
+
+msgid "Copy link address"
+msgstr "Kopieer URL"
+
+msgid "Copy to mounted portable player"
+msgstr "Kopieer naar de verbonden draagbare mediaspeler"
+
+msgid "Copy to portable player"
+msgstr "Kopieer naar de mediaspeler"
+
+msgid "Copyright"
+msgstr "Copyright"
+
+msgid "Cover Size : "
+msgstr "Albumafmetingen:"
+
+msgid "Create ID3v2 tags as ID3v2.4"
+msgstr "Maak ID3v2 tags als ID3v2.4"
+
+msgid "Current song must always be in the playlist"
+msgstr "Huidige titel moet altijd in de afspeellijst staan"
+
+msgid "Custom"
+msgstr "Gebruikergedefinieerd"
+
+msgid "Custom Text"
+msgstr "Persoonlijke tekst"
+
+msgid "Custom URL"
+msgstr "Persoonlijke URL"
+
+msgid "Custom command :"
+msgstr "Gebruikergedefinieerde opdracht:"
+
+msgid "Custom context pages :"
+msgstr "Gebruikergedefinieerde contextpanelen:"
+
+msgid "Custom fields"
+msgstr "Gebruikergedefinieerde velden"
+
+msgid "Custom formats"
+msgstr "Gebruikergedefinieerde opmaak"
+
+msgid "Custom pipeline"
+msgstr "Gebruikergedefinieerde pipeline"
+
+msgid "Custom..."
+msgstr "Anders..."
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Date format :"
+msgstr "Datumopmaak:"
+
+msgid "Date of purchase"
+msgstr "Datum van aankoop"
+
+msgid "Debut Album"
+msgstr "Debuutalbum"
+
+msgid "Decrease Volume"
+msgstr "Volume verlagen"
+
+msgid "Decrease volume"
+msgstr "Volume verhogen"
+
+msgid "Default"
+msgstr "Standaard"
+
+msgid "Default fullscreen"
+msgstr "Standaard volledig scherm"
+
+#, perl-format
+msgid "Default rating : %d %"
+msgstr "Standaardwaardering: %d %"
+
+msgid "Default text color"
+msgstr "Standaardtekstkleur"
+
+msgid "Default text font"
+msgstr "Standaardlettertype"
+
+#, perl-format
+msgid "Delay before showing tray tip popup on mouse over : %d ms"
+msgstr ""
+"Vertraging voordat een systeemvakpopup getoond wordt wanneer er met de muis "
+"overgezweefd wordt: %d ms"
+
+msgid "Delete"
+msgstr "Verwijderen"
+
+msgid "Delete Selected Songs"
+msgstr "Verwijder de geselecteerde titels"
+
+msgid "Delete list"
+msgstr "Verwijder de lijst"
+
+msgid "Descending order"
+msgstr "Aflopende volgorde"
+
+msgid "Descr."
+msgstr "Beschr."
+
+msgid "Description"
+msgstr "Beschrijving"
+
+msgid "Desktop widgets"
+msgstr "Bureaubladwidgets"
+
+msgid "Desktop widgets plugin"
+msgstr "Bureaubladwidgetsplugin"
+
+msgid "Disable screensaver when fullscreen and playing"
+msgstr ""
+"Schakel de schermbeveiliging uit wanneer een titel afspeelt in volledig "
+"scherm"
+
+msgid "Disabled"
+msgstr "Uitgeschakeld"
+
+msgid "Disc"
+msgstr "Schijf"
+
+msgid "Disc #"
+msgstr "Schijfnr."
+
+msgid "Disc name"
+msgstr "Schijfnaam"
+
+msgid "Display (:1 or host:0 for example)"
+msgstr "Toon (:1 of gastheer:0 bijvoorbeeld)"
+
+msgid "Display Songs"
+msgstr "Toon titels"
+
+msgid ""
+"Display a special layout in or around the titlebar of the focused window"
+msgstr ""
+"Gebruik een speciale layout in of rond de titelbalk van het actieve venster"
+
+msgid "Display stop/next actions"
+msgstr "Toon stop/volgende acties"
+
+msgid "Display synchronized lyrics of the current song"
+msgstr "Toon gesynchroniseerde songtekst van de huidige titel"
+
+#, perl-format
+msgid "Display tray tip for %d ms"
+msgstr "Toon een systeemvaknotificatie gedurende %d ms"
+
+msgid "Do not add a title row"
+msgstr "Geen titelregel toevoegen"
+
+msgid "Do not add songs that can't be played"
+msgstr "Geen titels toevoegen die niet afgespeeld kunnen worden"
+
+msgid "Do not create an id3v1 tag in mp3 files"
+msgstr "Maak geen ID3v1-tag in mp3-bestanden"
+
+msgid "Do not unsynchronise id3v2 tags"
+msgstr "ID3v2-tags niet desynchroniseren"
+
+msgid "Do not write the tags"
+msgstr "Schrijf geen tags"
+
+msgid "Don't add the overlay to dialogs"
+msgstr "Bedekking niet op dialoogvensters gebruiken"
+
+#, perl-brace-format
+msgid "Don't know how to play files of type {type}"
+msgstr "Kan bestanden van het type {type} niet afspelen"
+
+msgid "Don't notify if the main window is visible"
+msgstr "Geen notificaties weergeven indien het hoofdvenster zichtbaar is"
+
+msgid "Don't submit current song"
+msgstr "Huidig nummer niet indienen"
+
+msgid "Drag and drop songs here to replace the selection."
+msgstr "Titels hierheen slepen om de selectie te vervangen"
+
+msgid "Edit"
+msgstr "Bewerken"
+
+msgid "Edit Current Song Properties"
+msgstr "Eigenschappen van de huidige titel bewerken"
+
+msgid "Edit Labels"
+msgstr "Labels bewerken"
+
+msgid "Edit Lyrics"
+msgstr "Songtekst bewerken"
+
+msgid "Edit Lyrics ..."
+msgstr "Songtekst bewerken..."
+
+msgid "Edit Multiple Songs Properties"
+msgstr "Eigenschappen van meerdere titels bewerken"
+
+msgid "Edit Rating"
+msgstr "Waardering bewerken"
+
+msgid "Edit Settings"
+msgstr "Instellingen bewerken"
+
+msgid "Edit auto-fill formats ..."
+msgstr "Automatisch-opvullen-opmaak bewerken..."
+
+msgid "Edit filter"
+msgstr "Filter bewerken"
+
+msgid "Edit filter..."
+msgstr "Filter bewerken..."
+
+msgid "Edit grouping ..."
+msgstr "Groepering bewerken..."
+
+msgid "Edit in the last.fm wiki"
+msgstr "Bewerk in de last.fm-wiki"
+
+msgid "Edit list"
+msgstr "Lijst bewerken"
+
+msgid "Edit ordered modes ..."
+msgstr "Modi voor geordend afspelen bewerken..."
+
+msgid "Edit random modes ..."
+msgstr "Modi voor willekeurig afspelen bewerken..."
+
+msgid "Edit selected song properties"
+msgstr "Eigenschappen van de huidige titel bewerken"
+
+msgid "Edit..."
+msgstr "Bewerken..."
+
+msgid "Editing list : "
+msgstr "Bewerklijst:"
+
+msgid "Editing tags"
+msgstr "Bewerkt tags"
+
+msgid "Embedded lyrics"
+msgstr "Ingebouwde songtekst"
+
+msgid "Embedded picture"
+msgstr "Ingebouwde afbeelding"
+
+msgid "Encapsulated object"
+msgstr "Ingekapseld object"
+
+msgid "Encoded by"
+msgstr "Gecodeerd door"
+
+msgid "Encoded with"
+msgstr "Gecodeerd met"
+
+msgid "Encoder"
+msgstr "Codering"
+
+msgid "Encoding used for id3v1 tags :"
+msgstr "Codering gebruikt voor ID3v1-tags:"
+
+msgid "Enqueue"
+msgstr "In wachtrij plaatsen"
+
+msgid "Enqueue Action"
+msgstr "Actie in wachtrij plaatsen"
+
+msgid "Enqueue Displayed"
+msgstr "Plaats de getoonde in de wachtrij"
+
+msgid "Enqueue Selected"
+msgstr "Plaats de geselecteerde in de wachtrij"
+
+msgid "Enqueue Selected Songs"
+msgstr "Plaats de geselecteerde titels in de wachtrij"
+
+msgid "Enqueue Songs from Current Album"
+msgstr "Titels van het huidige album in de wachtrij plaatsen"
+
+msgid "Enqueue Songs from Current Artist"
+msgstr "Titels van de huidige artiest in de wachtrij plaatsen"
+
+msgid "Enqueue a list of files/folders"
+msgstr "Lijst van bestanden of mappen in de wachtrij plaatsen"
+
+msgid "Enqueue filter"
+msgstr "Filter in de wachtrij plaatsen"
+
+msgid "Enter album name"
+msgstr "Voer een albumnaam in"
+
+msgid "Enter custom event string :"
+msgstr "Gebruikersgedefinieerde gebeurtenistekenreeks invoeren:"
+
+msgid "Equalizer"
+msgstr "Equalizer"
+
+msgid "Error :"
+msgstr "Fout:"
+
+#, perl-brace-format
+msgid ""
+"Error saving artistbio in '{file}' :\n"
+"{error}"
+msgstr ""
+"Fout tijdens het opslaan van de artiestenbiografie in '{file}':\n"
+"{error}"
+
+#, perl-brace-format
+msgid ""
+"Error saving lyrics in '{file}' :\n"
+"{error}"
+msgstr ""
+"Fout tijdens het opslaan van de songtekst in '{file}':\n"
+"{error}"
+
+#, perl-brace-format
+msgid ""
+"Error saving review in '{file}' :\n"
+"{error}"
+msgstr ""
+"Fout tijdens het opslaan van de recensie in '{file}' :\n"
+"{error}"
+
+#, perl-brace-format
+msgid "Error writing '{file}'"
+msgstr "Fout tijdens het schrijven van '{file}'"
+
+msgid "Error writing replaygain tags :\n"
+msgstr "Fout tijdens het schrijven van ReplayGain-tags:\n"
+
+msgid "Error: invalid filename pattern"
+msgstr "Fout: ongeldig bestandsnaampatroon"
+
+msgid "Events"
+msgstr "Gebeurtenissen"
+
+msgid "Example :"
+msgstr "Voorbeeld:"
+
+msgid "Exclude 'seed'-artist from queue"
+msgstr "De auteur niet in de wachtlijst opnemen"
+
+msgid "Execute custom command on selected files"
+msgstr ""
+"Voer een gebruikersgedefinieerde opdracht uit op de geselecteerde bestanden"
+
+msgid "Export"
+msgstr "Exporteren"
+
+msgid "Export plugin"
+msgstr "Plugin exporteren"
+
+msgid "Export song properties to a .csv file"
+msgstr "Titeleigenschappen exporteren naar een .csv-bestand"
+
+msgid "Export to .m3u file"
+msgstr "Exporteren naar een .m3u-bestand"
+
+msgid "Extra fields"
+msgstr "Extra velden"
+
+msgid "Extra gain"
+msgstr "Extra versterking"
+
+msgid "Extract guest artist from title :"
+msgstr "Leid de medewerkende artiest af van de titel:"
+
+msgid "Fade-out"
+msgstr "Fade-out"
+
+#, perl-format
+msgid "Fade-out in %d seconds"
+msgstr "Fade-out binnen %d seconden"
+
+msgid "Fade-out then stop"
+msgstr "Fade-out, daarna stoppen"
+
+#, perl-brace-format
+msgid ""
+"Failed to delete '{file}' :\n"
+"{error}"
+msgstr ""
+"Kon '{file}' niet verwijderen:\n"
+"{error}"
+
+msgid "Field name"
+msgstr "Veldnaam"
+
+msgid "Field type"
+msgstr "Veldtype"
+
+msgid "Fields"
+msgstr "Velden"
+
+msgid "File"
+msgstr "Bestand"
+
+msgid "File properties"
+msgstr "Bestandseigenschappen"
+
+msgid "File type"
+msgstr "Bestandstype"
+
+msgid "Filename"
+msgstr "Bestandsnaam"
+
+msgid "Filename extension"
+msgstr "Bestandsnaamextensie"
+
+msgid "Filename format :"
+msgstr "Bestandsnaamopmaak"
+
+msgid "Filename without extension"
+msgstr "Bestandsnaam zonder extensie"
+
+msgid "Files"
+msgstr "Bestanden"
+
+msgid "Filesystem"
+msgstr "Bestandssysteem"
+
+msgid "Filter"
+msgstr "Filter"
+
+msgid "Filter : "
+msgstr "Filter:"
+
+msgid "Filter edition"
+msgstr "Filterbewerking"
+
+msgid "Filter on playing Album"
+msgstr "Filter op basis van het nu afgespeelde album"
+
+msgid "Filter on playing Artist"
+msgstr "Filter op basis van de nu afgespeelde artiest"
+
+msgid "Filter on playing Song"
+msgstr "Filter op basis van de nu afgespeelde titel"
+
+msgid "Filter on this album"
+msgstr "Filter op basis van dit album"
+
+msgid "Filter on this artist"
+msgstr "Filter op basis van deze artiest"
+
+msgid "Find :"
+msgstr "Zoeken:"
+
+msgid "Find a unique filename if file already exists"
+msgstr "Nieuwe bestandsnaam aanmaken, indien de bestandsnaam al bestaat"
+
+msgid "Find songs in same albums"
+msgstr "Titels in dezelfde albums zoeken"
+
+msgid "Find songs with same artists"
+msgstr "Titels met dezelfde artiesten zoeken"
+
+msgid "Find songs with the same names"
+msgstr "Titels met dezelfde namen zoeken"
+
+msgid "Folder"
+msgstr "Map"
+
+msgid "Folder (right-aligned)"
+msgstr "Map (rechts uitgelijnd)"
+
+msgid "Folder format :"
+msgstr "Mapopmaak:"
+
+msgid "Folder pattern :"
+msgstr "Mappatroon:"
+
+msgid "Folders to search for new songs"
+msgstr "Mappen om te doorzoeken voor nieuwe titels:"
+
+msgid "Follow playing song"
+msgstr "Afgespeelde titel volgen"
+
+msgid "Follow selected song"
+msgstr "Geselecteerde titel volgen"
+
+msgid "Font size"
+msgstr "Lettergrootte"
+
+msgid "Forward"
+msgstr "Volgende"
+
+msgid "Found but not working"
+msgstr "Gevonden, maar werkt niet"
+
+msgid "Friday"
+msgstr "Vrijdag"
+
+msgid "Full screen layout :"
+msgstr "Volledig schermweergave:"
+
+msgid "Fullscreen"
+msgstr "Volledig scherm"
+
+msgid "Fullscreen simple"
+msgstr "Eenvoudige volledig schermweergave"
+
+msgid "GStreamer module not loaded."
+msgstr "GStreamer-module niet ingeladen"
+
+msgid "Gain for songs missing replaygain tags"
+msgstr "Versterking voor titels die geen ReplayGain-tags hebben"
+
+msgid "Garage Fullscreen"
+msgstr "Volledig scherm in Garagemodus"
+
+msgid "Genre"
+msgstr "Genre"
+
+msgid "Genre - Album"
+msgstr "Genre - Album"
+
+msgid "Genre - Artist"
+msgstr "Genre - Artiest"
+
+msgid "Genre is set"
+msgstr "Genre is ingesteld"
+
+msgid "Genres"
+msgstr "Genres"
+
+msgid "Gnome mmkeys"
+msgstr "Gnome-multimediatoetsen"
+
+msgid "Gnome multimedia keys plugin"
+msgstr "Gnome-multimediatoetsenplugin"
+
+msgid "Go to Playing Track"
+msgstr "Naar de huidige titel gaan"
+
+msgid "Go to playing song"
+msgstr "Naar de huidige titel gaan"
+
+msgid "Group by :"
+msgstr "Groeperen op:"
+
+msgid "Grouping"
+msgstr "Groepering"
+
+msgid "Handshake OK"
+msgstr "Verbinding succesvol"
+
+msgid "Handshake failed : "
+msgstr "Verbinding mislukt"
+
+msgid "Hard limiter"
+msgstr "Vaste limiet"
+
+msgid "Help"
+msgstr "Help"
+
+msgid "Hide"
+msgstr "Verbergen"
+
+msgid "Hide Artist/Album bar"
+msgstr "Verberg artiest-/albumpaneel"
+
+msgid "Hide toolbar"
+msgstr "Werkbalk verbergen"
+
+msgid "Icon theme :"
+msgstr "Pictogramthema:"
+
+msgid "Identifier in file tag"
+msgstr "Identificatie in bestandstag"
+
+msgid "Ignore playback errors"
+msgstr "Afspeelfouten negeren"
+
+msgid "Import list"
+msgstr "Lijst importeren"
+
+msgid ""
+"In this case one command by file will be run\n"
+"\n"
+msgstr ""
+"In dit geval zal een opdracht per bestand worden uitgevoerd\n"
+"\n"
+
+msgid "Include Styles in Genres"
+msgstr "Stijlen in Genres opnemen"
+
+msgid "Increase Volume"
+msgstr "Volume verhogen"
+
+msgid "Increase volume"
+msgstr "Volme verlagen"
+
+msgid "Info"
+msgstr "Informatie"
+
+msgid "Insensitive title-artist (left-aligned)"
+msgstr "Titel - Artiest (links uitgelijnd, niet-klikbaar)"
+
+msgid "Insensitive title-artist (right-aligned)"
+msgstr "Titel - Artiest (rechts uitgelijnd, niet-klikbaar)"
+
+msgid "Insensitive, Song & Cover"
+msgstr "Niet-klikbaar, titel en albumhoes"
+
+msgid "Insert Selected Songs at the top of the queue"
+msgstr "Geselecteerde titels bovenaan in de wachtrij plaatsen"
+
+msgid "Insert a list of files/folders at the start of the playlist"
+msgstr "Lijst van bestanden of mappen bovenaan de wachtrij plaatsen"
+
+msgid "Insert this pipeline before the audio sink"
+msgstr "Deze pijplijn invoeren vóór de audosink"
+
+msgid "Invalid regular expression"
+msgstr "Ongeldige reguliere expressie "
+
+msgid "Invert filter"
+msgstr "Filter omkeren"
+
+msgid "Invisible hot spot"
+msgstr "Onzichtbare hotspot"
+
+#, perl-format
+msgid "Isn't smart equal to %s"
+msgstr "Hoort niet bij %s"
+
+msgid "Justified"
+msgstr "Gerechtigd"
+
+msgid "KB"
+msgstr "KB"
+
+msgid "Karaoke"
+msgstr "Karaoke"
+
+msgid "Karaoke plugin"
+msgstr "Karaokeplugin"
+
+msgid "Key"
+msgstr "Toets"
+
+msgid "Keys"
+msgstr "Toetsen"
+
+msgid "Keywords"
+msgstr "Sleutelwoorden"
+
+msgid "Label"
+msgstr "Label"
+
+msgid "Label is set"
+msgstr "Label is ingesteld"
+
+msgid "Label/Publisher"
+msgstr "Label/Uitgever"
+
+msgid "Labels"
+msgstr "Labels"
+
+msgid "Labels' icons"
+msgstr "Labelpictogrammen"
+
+msgid "Lang"
+msgstr "Taal"
+
+msgid "Lang."
+msgstr "Taal"
+
+msgid "Languages"
+msgstr "Talen"
+
+msgid "Last played"
+msgstr "Laatst afgespeeld"
+
+msgid "Last skipped"
+msgstr "Laatst overgeslagen"
+
+msgid "Launch ripping program"
+msgstr "Programma om CD's te rippen starten"
+
+msgid "Layout"
+msgstr "Opmaak"
+
+msgid "Layout :"
+msgstr "Opmaak:"
+
+msgid "Layouts"
+msgstr "Opmaken"
+
+msgid "Left aligned"
+msgstr "Links uitgelijnd"
+
+msgid "Left-clic or scrollwheel to change, right-click to mute"
+msgstr ""
+"Linksklikken of met het scrollwieltje draaien om te wijzigen, rechtsklikken "
+"om te dempen"
+
+msgid "Length"
+msgstr "Lengte"
+
+msgid "Library"
+msgstr "Bibliotheek"
+
+msgid "Library : "
+msgstr "Bibliotheek:"
+
+msgid ""
+"Library empty.\n"
+"\n"
+"Use the settings dialog to add music."
+msgstr ""
+"Bibliotheek is nog leeg.\n"
+"\n"
+"Gebruik het instellingenmenu om muziek toe te voegen."
+
+msgid "Limit similar artists to a rate of similarity : "
+msgstr "Gelijkaardige artiesten begrenzen tot een graad van gelijkaardigheid:"
+
+msgid "Limit similar artists to the first : "
+msgstr "Aantal gelijkaardige artiesten begrenzen op:"
+
+msgid "List"
+msgstr "Lijst"
+
+msgid "List empty"
+msgstr "Lijst leeg"
+
+msgid "List order"
+msgstr "Lijstvolgorde"
+
+msgid "Listed : "
+msgstr "In de lijst opgenomen:"
+
+msgid "Listed songs"
+msgstr "In de lijst opgenomen titels"
+
+msgid "Listeners: "
+msgstr "Luisteraars"
+
+msgid "Lists"
+msgstr "Lijsten"
+
+msgid "Lists, Library & Context"
+msgstr "Lijst, bibliotheek en context"
+
+msgid "Literal search"
+msgstr "Letterlijk zoeken"
+
+msgid "Load lyrics even if lyrics panel is hidden"
+msgstr "Songteksten ook inladen als het songtekstenpaneel verborgen is"
+
+msgid "Load/Save Artist Info in :"
+msgstr "Artiestinfo laden of opslaan in:"
+
+msgid "Loading failed."
+msgstr "Laden mislukt."
+
+msgid "Loading..."
+msgstr "Laden..."
+
+msgid "Lock"
+msgstr "Vergrendel"
+
+msgid "Lock Album"
+msgstr "Album vergrendelen"
+
+msgid "Lock Artist"
+msgstr "Artiest vergrendelen"
+
+msgid "Lock on Album"
+msgstr "Op album vergrendelen"
+
+msgid "Lock on Artist"
+msgstr "Op artiest vergrendelen"
+
+msgid "Lock on song"
+msgstr "Op titel vergrendelen"
+
+#, perl-brace-format
+msgid "Lock on {field}"
+msgstr "Op {field} vergrendelen"
+
+msgid "Locked on :\n"
+msgstr "Vergrendeld op:\n"
+
+msgid "Lookup at allmusic.com"
+msgstr "Opzoeken in allmusic.com"
+
+msgid "Lookup in AMG"
+msgstr "Opzoeken in AMG"
+
+msgid "Lookup in google"
+msgstr "Opzoeken in Google"
+
+msgid "Lower left"
+msgstr "Linksonder"
+
+msgid "Lower right"
+msgstr "Rechtsonder"
+
+msgid "Lullaby"
+msgstr "Slaapliedjeplugin"
+
+msgid "Lullaby plugin"
+msgstr "Slaapliedjeplugin"
+
+msgid "Lyricist"
+msgstr "Auteur"
+
+msgid "Lyrics"
+msgstr "Songtekst"
+
+msgid "Lyrics (requires lyrics plugin)"
+msgstr "Songtekst (vereist songtekstplugin)"
+
+msgid "Lyrics alignement"
+msgstr "Songtekstuitlijning"
+
+msgid "Lyrics file :"
+msgstr "Songtekstbestand"
+
+msgid "Lyrics file name format"
+msgstr "Songtekstnaamopmaak"
+
+msgid "Lyrics for "
+msgstr "Songtekst voor"
+
+msgid "Lyrics plugin"
+msgstr "Songtekstplugin"
+
+msgid "Lyrics source"
+msgstr "Songtekstbron"
+
+msgid "MB"
+msgstr "MB"
+
+msgid "MIME type"
+msgstr "MIME-type"
+
+msgid "MPRIS v1"
+msgstr "MPRIS v1"
+
+msgid "MPRIS v1 support"
+msgstr "MPRIS v1-ondersteuning"
+
+msgid "MPRIS v2"
+msgstr "MPRIS v2"
+
+msgid "MPRIS v2 support"
+msgstr "MPRIS v2-ondersteuning"
+
+msgid "Main"
+msgstr "Hoofd"
+
+msgid "Main artist"
+msgstr "Hoofdartiest"
+
+msgid ""
+"Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
+"gnome."
+msgstr ""
+"Zorgt ervoor dat gmusicbrowser reageert op de Volgende/Vorige/Afspelen/"
+"Stoppen-multimediatoetsen in Gnome."
+
+msgid "Mass Rename"
+msgstr "Massahernoemen"
+
+msgid "Mass Renaming"
+msgstr "Massahernoeming"
+
+msgid "Media type"
+msgstr "Mediatype"
+
+msgid "Menu entry name"
+msgstr "Menu-itemnaam"
+
+msgid ""
+"Middle-click on local artists to set a filter on them, right-click non-local "
+"artists to search for them on the web."
+msgstr ""
+"Middenklik op een in de bibliotheek aanwezige artiest om erop te filteren, "
+"rechtsklik op een niet in de bibliotheek aanwezige artiest om ernaar te "
+"zoeken op het internet."
+
+msgid "Minimal tip"
+msgstr "Minimaal informatievenster"
+
+msgid "Minimum size"
+msgstr "Minimumafmetingen"
+
+msgid "Misc."
+msgstr "Anders"
+
+msgid "Modification"
+msgstr "Wijziging"
+
+msgid "Monday"
+msgstr "Maandag"
+
+msgid "Moods"
+msgstr "Stemmingen"
+
+msgid "More results"
+msgstr "Meer resultaten"
+
+msgid "Mosaic View"
+msgstr "Mozaïekweergave"
+
+msgid "Move"
+msgstr "Verplaatsen"
+
+msgid "Move Files to :"
+msgstr "Bestanden verplaatsen naar:"
+
+msgid "Move failed"
+msgstr "Verplaatsen mislukt"
+
+msgid "Move folder to"
+msgstr "Map verplaatsen naar"
+
+msgid "Music"
+msgstr "Muziek"
+
+msgid "Mute/Unmute"
+msgstr "Demping aan-/uitschakelen"
+
+msgid "Name"
+msgstr "Naam"
+
+msgid "Name of layout"
+msgstr "Opmaaknaam"
+
+msgid "Name under which the command will appear in the menu"
+msgstr "Naam waaronder de opdracht zal verschijnen in het menu"
+
+msgid "Never"
+msgstr "Nooit"
+
+msgid "New"
+msgstr "Nieuw"
+
+msgid "New custom field"
+msgstr "Nieuw gebruikersgedefinieerd veld"
+
+msgid "New filter"
+msgstr "Nieuw filter"
+
+msgid "New list"
+msgstr "Nieuwe lijst"
+
+msgid "New name"
+msgstr "Nieuwe naam"
+
+msgid "Next"
+msgstr "Volgende"
+
+msgid "Next Album"
+msgstr "Volgend album"
+
+msgid "Next Artist"
+msgstr "Volgende artiest"
+
+msgid "Next Song"
+msgstr "Volgende titel"
+
+msgid "Next Song In Playlist"
+msgstr "Volgende titel in afspeellijst"
+
+msgid "No connections"
+msgstr "Geen verbinding"
+
+msgid "No file browser found."
+msgstr "Geen bestandsbeheerder gevonden."
+
+msgid "No genre"
+msgstr "Geen genre"
+
+msgid "No label"
+msgstr "Geen label"
+
+msgid "No locked filter"
+msgstr "Geen vergrendeld filter"
+
+msgid "No lyrics found"
+msgstr "Songtekst niet gevonden"
+
+msgid "No moods"
+msgstr "Geen stemmingen"
+
+msgid "No results found"
+msgstr "Geen resultaten gevonden"
+
+msgid "No results found."
+msgstr "Geen resultaten gevonden."
+
+msgid "No review found"
+msgstr "Geen recensie gevonden"
+
+msgid "No review written."
+msgstr "Geen recensie gevonden."
+
+msgid "No songs"
+msgstr "Geen titels"
+
+msgid "No songs found"
+msgstr "Geen titels gevonden"
+
+msgid "No sound menu found"
+msgstr "Geen geluidsmenu gevonden"
+
+msgid "No styles"
+msgstr "Geen stijlen"
+
+msgid "No themes"
+msgstr "Geen thema's"
+
+msgid "No web browser found."
+msgstr "Geen webbrowser gevonden"
+
+msgid "None"
+msgstr "Geen"
+
+msgid "Normal"
+msgstr "Normaal"
+
+msgid "Normal mode"
+msgstr "Normale modus"
+
+msgid "Normal with buttons"
+msgstr "Normaal met knoppen"
+
+msgid "Normalize volume (the files must have replaygain tags)"
+msgstr "Volume normaliseren (enkel indien de bestanden ReplayGain-tags hebben)"
+
+msgid "Not found"
+msgstr "Niet gevonden"
+
+msgid "Note that some notification daemons resize the displayed picture"
+msgstr ""
+"Merk op dat sommige notificatiedaemons de afmetingen wijzigen van de "
+"getoonde afbeelding"
+
+msgid ""
+"Note: inactive fields must be enabled by the user in the 'Fields' tab in "
+"Settings"
+msgstr ""
+"Merk op dat inactieve velden door de gebruiker moeten worden ingeschakeld "
+"onder de 'Velden'-tab in het Instellingenmenu."
+
+msgid "Notify"
+msgstr "Notificatiepopup"
+
+msgid "Notify plugin"
+msgstr "Notificatieplugin"
+
+msgid "Notify you of the playing song with the system's notification popups"
+msgstr ""
+"Met behulp van de systeemnotificatiedaemon notificatiepopups geven over de "
+"huidige titel"
+
+msgid "Now playing"
+msgstr "U luistert naar"
+
+msgid "NowPlaying plugin"
+msgstr "U luistert naar-plugin"
+
+msgid "Number of days since added"
+msgstr "Aantal dagen sinds toevoeging"
+
+msgid "Number of days since last played"
+msgstr "Aantal dagen sinds voor het laatst afgespeeld"
+
+msgid "Number of days since last skipped"
+msgstr "Aantal dagen sinds voor het laatst overgeslagen"
+
+msgid "Number of days since modified"
+msgstr "Aantal dagen sinds voor het laatst aangepast"
+
+msgid "Number of milliseconds"
+msgstr "Aantal milliseconden"
+
+msgid "Number of seconds"
+msgstr "Aantal seconden"
+
+msgid "Number of times played"
+msgstr "Aantal keer afgespeeld"
+
+msgid "Number of times skipped"
+msgstr "Aantal keer overgeslagen"
+
+msgid ""
+"ON -> smaller means more probable\n"
+"OFF -> bigger means more probable"
+msgstr ""
+"Aan: kleiner = waarschijnlijker\n"
+"Uit: groter = waarschijnlijker"
+
+msgid ""
+"ON less probable if genre is set\n"
+"OFF more probable if genre is set"
+msgstr ""
+"Aan: minder waarschijnlijk indien het genre ingesteld is\n"
+"Uit: waarschijnlijker indien het genre ingesteld is"
+
+msgid ""
+"ON less probable if label is set\n"
+"OFF more probable if label is set"
+msgstr ""
+"Aan: minder waarschijnlijk indien het label ingesteld is\n"
+"Uit: waarschijnlijker indien het label ingesteld is"
+
+msgid "Old name"
+msgstr "Vroegere naam:"
+
+msgid "On top of other windows instead of below"
+msgstr "Op andere vensters plaatsen in plaats van eronder"
+
+#, perl-brace-format
+msgid "One of these commands is required to play files of type {type} : {cmd}"
+msgstr ""
+"Eén van deze opdrachten is nodig om bestanden van het type {type} af te "
+"spelen: {cmd}"
+
+msgid "Only affect mp3 files that do not already have an id3v1 tag"
+msgstr "Alleen mp3-bestanden die nog geen ID3v1-tag hebben aanpassen"
+
+msgid "Only show similar artists from local library"
+msgstr "Alleen gelijkaardige artiesten uit de aanwezige bibliotheek tonen"
+
+msgid "Only works when the review tab is displayed"
+msgstr "Werkt alleen wanneer de recensietab wordt getoond"
+
+msgid "Opacity"
+msgstr "Ondoorzichtigheid"
+
+msgid "Open Browser"
+msgstr "Webbrowser openen"
+
+msgid "Open Browser window"
+msgstr "Webbrowservenster openen"
+
+msgid "Open Context window"
+msgstr "Contextvenster openen"
+
+msgid "Open Custom window"
+msgstr "Gebruikersgedefinieerd venster openen"
+
+msgid "Open Equalizer"
+msgstr "Equalizer openen"
+
+msgid "Open Playlist"
+msgstr "Afspeellijst openen"
+
+msgid "Open Preference window"
+msgstr "Voorkeurenvenster openen"
+
+msgid "Open Queue"
+msgstr "Wachtrij openen"
+
+msgid "Open Queue window"
+msgstr "Wachtrijvenster openen"
+
+msgid "Open Search window"
+msgstr "Zoekvenster openen"
+
+msgid "Open allmusic.com in your web browser"
+msgstr "Allmusic.com in uw browser openen"
+
+msgid "Open containing folder"
+msgstr "Bijbehorende map openen"
+
+msgid "Open context page"
+msgstr "Contextpagina openen"
+
+msgid "Open existing list"
+msgstr "Bestaande lijst openen"
+
+msgid "Open files"
+msgstr "Bestanden openen"
+
+msgid "Open folder"
+msgstr "Map openen"
+
+msgid "Open last.fm website in your browser"
+msgstr "Last.fm openen in de webbrowser"
+
+msgid "Open link in Browser"
+msgstr "Link openen in webbrowser"
+
+msgid "Open page layout"
+msgstr "Paginalayout openen"
+
+msgid "Open special layouts as desktop widgets"
+msgstr "Speciale layouts als desktopwidgets openen"
+
+msgid "Open this page in the web browser"
+msgstr "Deze pagina in de webbrowser openen"
+
+msgid "Options"
+msgstr "Opties"
+
+msgid "Options ..."
+msgstr "Opties..."
+
+msgid "Options for subgroup"
+msgstr "Opties voor subgroep"
+
+msgid ""
+"Or you can use the field $files which will be replaced by the list of files, "
+"and only one command will be run"
+msgstr ""
+"Of u kunt het veld $files gebruiken, welke zal vervangen worden door de "
+"bestandenlijst, en dan zal slechts één opdracht uitgevoerd worden."
+
+msgid "Original Artist"
+msgstr "Oorspronkelijke artiest"
+
+msgid "Original Filename"
+msgstr "Oorspronkelijke bestandsnaam"
+
+msgid "Original release year"
+msgstr "Oorspronkelijk uitgavejaar"
+
+msgid "Originaly from"
+msgstr "Oorspronkelijk van"
+
+msgid "Other"
+msgstr "Andere"
+
+msgid "Output"
+msgstr "Uitvoer"
+
+msgid "Overlay layout :"
+msgstr "Overlaylayout:"
+
+msgid "Owner identifier"
+msgstr "Eigenaarsidentificatie"
+
+msgid "Path,Album,Disc,Track,File"
+msgstr "Pad, Album, Schijf, Nummer, Bestand"
+
+msgid "Path,File"
+msgstr "Pad, Bestand"
+
+msgid "Pattern to find .lrc files :"
+msgstr "Patroon om te zoeken naar .lrc-bestanden:"
+
+msgid "Pause"
+msgstr "Pauze"
+
+msgid "Picture"
+msgstr "Afbeelding"
+
+msgid "Picture Type"
+msgstr "Type afbeelding"
+
+#, perl-format
+msgid "Picture cache : %d MB"
+msgstr "Afbeeldingscache: %d MB"
+
+msgid "Picture finder"
+msgstr "Afbeeldingszoeker"
+
+msgid "Picture finder plugin"
+msgstr "Afbeeldingszoekerplugin"
+
+#, perl-format
+msgid "Picture size : %d"
+msgstr "Afbeeldingsgrootte: %d"
+
+msgid "Pictures and music files"
+msgstr "Afbeeldingen en muziekbestanden"
+
+msgid "Pictures files"
+msgstr "Afbeeldingen"
+
+msgid "Play"
+msgstr "Afspelen"
+
+msgid "Play Only Displayed"
+msgstr "Enkel de getoonde afspelen"
+
+msgid "Play Only Selected"
+msgstr "Enkel de geselecteerde afspelen"
+
+msgid "Play a list of files"
+msgstr "Een lijst van bestanden afspelen"
+
+msgid "Play all songs from this album"
+msgstr "Alle titels van dit album afspelen"
+
+msgid "Play all songs from this artist"
+msgstr "Alle titels van deze artiest afspelen"
+
+msgid "Play button"
+msgstr "Afspeelknop"
+
+msgid "Play count"
+msgstr "Aantal keer afgespeeld"
+
+msgid "Play counter"
+msgstr "Afspeelteller"
+
+msgid "Play filter"
+msgstr "Afspeelfilter"
+
+msgid "Play listed songs"
+msgstr "Titels in de lijst afspelen"
+
+msgid "Play order"
+msgstr "Afspeelvolgorde"
+
+msgid "Play/Pause"
+msgstr "Afspelen/Pauze"
+
+msgid "Playback"
+msgstr "Afspelen"
+
+msgid "Playcount: "
+msgstr "Aantal keer afgespeeld:"
+
+msgid "Played Today"
+msgstr "Vandaag afgespeeld"
+
+msgid "Player mounted on :"
+msgstr "Speler aangekoppeld om:"
+
+msgid "Player window layout :"
+msgstr "Afspeelvensterlayout:"
+
+msgid "Playing"
+msgstr "Spelend"
+
+msgid "Playing Album"
+msgstr "Nu afgespeeld album"
+
+msgid "Playing Artist"
+msgstr "Nu afgespeelde artiest"
+
+msgid "Playing Filter"
+msgstr "Nu afgespeelde filter"
+
+msgid "Playing Title"
+msgstr "Nu afgespeelde titel"
+
+msgid "Playing and queue icons"
+msgstr "Afspeel- en wachtrijpictogrammen"
+
+#, perl-brace-format
+msgid "Playing error : {error}"
+msgstr "Afspeelfout: {error}"
+
+msgid "Playlist"
+msgstr "Afspeellijst"
+
+msgid "Playlist 1"
+msgstr "Afspeellijst 1"
+
+msgid "Playlist Empty"
+msgstr "Afspeellijst leeg"
+
+msgid "Playlist Utilities Bar"
+msgstr "Afspeellijsthulpmiddelenbalk"
+
+msgid "Playlist empty"
+msgstr "Afspeellijst leeg"
+
+msgid "Playlist files"
+msgstr "Afspeellijstbestanden"
+
+msgid "Playlist filter"
+msgstr "Afspeellijstfilter"
+
+msgid "Playlist filter :\n"
+msgstr "Afspeellijstfilter:\n"
+
+msgid "Playlists"
+msgstr "Afspeellijsten"
+
+msgid "Plugin not loaded"
+msgstr "Plugin niet geladen"
+
+msgid "Plugins"
+msgstr "Plugins"
+
+msgid "Popularimeter"
+msgstr "Populariteitsmeter"
+
+msgid "Popup Custom window"
+msgstr "Gebruikersgedefinieerd venster als popup openen"
+
+msgid "Popup Traytip"
+msgstr "Systeemvaknotificatie als popup openen"
+
+msgid "Popup notify window"
+msgstr "Notificatievenster als popup openen"
+
+msgid "Popup playlist filter menu"
+msgstr "Afspeellijstfiltermenu als popup openen"
+
+msgid "Popup playlist order menu"
+msgstr "Afspeellijstvolgordemenu als popup openen"
+
+msgid "Popup queue menu"
+msgstr "Wachtrijmenu als popup openen"
+
+msgid "Pre-set"
+msgstr "Vooraf ingesteld"
+
+msgid "Prefered place to load and save lyrics :"
+msgstr "Lokatie om songteksten te laden en op te slaan:"
+
+msgid "Preferences"
+msgstr "Voorkeuren"
+
+msgid "Prepend"
+msgstr "Ervoor zetten"
+
+msgid "Press a key or a key combination"
+msgstr "Druk op een toets of toetsencombinatie"
+
+msgid "Previous"
+msgstr "Vorige"
+
+msgid "Previous Song"
+msgstr "Vorige titel"
+
+msgid "Previous Song In Playlist"
+msgstr "Vorige titel in afspeellijst"
+
+msgid "Previous page"
+msgstr "Vorige pagina"
+
+msgid "Price paid"
+msgstr "Aankoopprijs"
+
+msgid "Private Data"
+msgstr "Privédata"
+
+msgid "Produced (P)"
+msgstr "Geproduceerd (P)"
+
+msgid "Progress"
+msgstr "Voortgang"
+
+msgid "Properties"
+msgstr "Eigenschappen"
+
+msgid "Provides context views using MozEmbed or WebKit"
+msgstr "Haalt bijbehorende info van het internet via MozEmbed of WebKit"
+
+msgid "Proxy host :"
+msgstr "Proxygastheer:"
+
+msgid "Publication right"
+msgstr "Publicatierecht"
+
+msgid "Publisher"
+msgstr "Uitgever"
+
+msgid "Publisher/Studio logotype"
+msgstr "Uitgever-/Studiologo"
+
+msgid "Queue"
+msgstr "Wachtrij"
+
+#, perl-format
+msgid "Queue (%n)"
+msgstr "Wachtrij (%n)"
+
+msgid "Queue Edit"
+msgstr "Wachtrij aanpassen"
+
+msgid "Queue album"
+msgstr "Album in wachtrij plaatsen"
+
+msgid "Queue artist"
+msgstr "Artiest in wachtrij plaatsen"
+
+msgid "Queue empty"
+msgstr "Wachtrij leeg"
+
+msgid "Queue in Sidebar"
+msgstr "Wachtrij in zijbalk"
+
+msgid "Queue mode"
+msgstr "Wachtrijmodus"
+
+msgid "Queue options"
+msgstr "Wachtrijopties"
+
+msgid "Quick Search"
+msgstr "Snel zoeken"
+
+msgid "Quick Search with SongTree"
+msgstr "Snel zoeken met bestandsboomweergave"
+
+msgid "Quit"
+msgstr "Afsluiten"
+
+msgid "Quit when queue empty"
+msgstr "Afsluiten zodra de wachtrij leeg is"
+
+msgid "Radio title"
+msgstr "Radiotitel"
+
+msgid "Radio url"
+msgstr "Radio-URL"
+
+msgid "Random"
+msgstr "Willekeurig"
+
+msgid "Random Playback"
+msgstr "Willekeurig afspelen"
+
+msgid "Random mode edition"
+msgstr "Willekeurige modus-editie"
+
+msgid "Rating"
+msgstr "Waardering"
+
+msgid "Rating (picture)"
+msgstr "Waardering (afbeelding)"
+
+msgid "Rating between 0 and 100, or empty for default"
+msgstr "Waardering tussen 0 en 100, of niets voor standaardwaardering"
+
+msgid "Rating range:"
+msgstr "Waarderingsbereik:"
+
+msgid "Re-load layouts"
+msgstr "Layouts opnieuw inladen"
+
+msgid "Re-read tags"
+msgstr "Tags opnieuw inlezen"
+
+msgid "Re-reading tags"
+msgstr "Leest nu opnieuw tags in"
+
+msgid "Re-shuffle"
+msgstr "Nieuwe willekeurige volgorde aanmaken"
+
+msgid "Read/write in file tag"
+msgstr "In bestandstag lezen/schrijven"
+
+msgid "Recent Filters"
+msgstr "Recente filters"
+
+msgid "Recent albums"
+msgstr "Recente albums"
+
+msgid "Recent artists"
+msgstr "Recente artiesten"
+
+msgid "Recent songs"
+msgstr "Recente titels"
+
+msgid "Recent songs include skipped songs that haven't been played."
+msgstr ""
+"'Recente titels' bevat ook overgeslagen titels die niet zijn afgespeeld"
+
+msgid "Recently played"
+msgstr "Recent afgespeeld"
+
+msgid "Recently played songs"
+msgstr "Recent afgespeelde titels"
+
+msgid "Record label"
+msgstr "Platenlabel"
+
+msgid "Recording Dates"
+msgstr "Data van opname"
+
+msgid "Recording date"
+msgstr "Datum van opname"
+
+msgid "Recording type"
+msgstr "Opnametype"
+
+msgid "Reference point :"
+msgstr "Referentiepunt:"
+
+msgid "Refresh"
+msgstr "Vernieuwen"
+
+msgid "Refresh list"
+msgstr "Lijst vernieuwen"
+
+msgid "Regular expression"
+msgstr "Reguliere expressie"
+
+msgid "Regular expression :"
+msgstr "Reguliere expressie:"
+
+msgid "Regular expression didn't match"
+msgstr "Reguliere expressie kwam nergens mee overeen"
+
+msgid "Release date"
+msgstr "Uitgavedatum"
+
+msgid "Remember last Filter/Playlist between sessions"
+msgstr ""
+"Laatstgebruikte filter/afspeellijst bewaren tussen verschillende sessies"
+
+msgid "Remember playing position between sessions"
+msgstr "Afspeelpositie bewaren tussen verschillende sessies"
+
+msgid "Remember playing song between sessions"
+msgstr "Afspelende titel bewaren tussen verschillende sessies"
+
+msgid "Remember queue between sessions"
+msgstr "Wachtrij bewaren tussen verschillende sessies"
+
+msgid "Remixer"
+msgstr "Mixer"
+
+msgid "Remove"
+msgstr "Verwijderen"
+
+msgid "Remove a label from the current song"
+msgstr "Een label van de huidige titel verwijderen"
+
+msgid "Remove all"
+msgstr "Alle verwijderen"
+
+msgid "Remove all songs"
+msgstr "Alle titels verwijderen"
+
+msgid "Remove filter"
+msgstr "Filter verwijderen"
+
+msgid "Remove from disk"
+msgstr "Van schijf verwijderen"
+
+msgid "Remove from library"
+msgstr "Uit bibliotheek verwijderen"
+
+msgid "Remove from list"
+msgstr "Uit lijst verwijderen"
+
+msgid "Remove from playlist"
+msgstr "Uit afspeellijst verwijderen"
+
+msgid "Remove from queue"
+msgstr "Uit wachtrij verwijderen"
+
+msgid "Remove header, footer and left column from wikipedia pages"
+msgstr "Koptekst, voettekst en linkerkolom van Wikipedia-pagina's verbergen"
+
+msgid "Remove label"
+msgstr "Label verwijderen"
+
+msgid "Remove list"
+msgstr "Lijst verwijderen"
+
+msgid "Remove selected songs"
+msgstr "Geselecteerde titels verwijderen"
+
+msgid "Remove this field"
+msgstr "Dit veld verwijderen"
+
+msgid "Remove this rule"
+msgstr "Deze regel verwijderen"
+
+msgid "Remove this tab"
+msgstr "Deze tab verwijderen"
+
+msgid "Remove this tag"
+msgstr "Deze tag verwijderen"
+
+msgid "Remove this widget"
+msgstr "Deze widget verwijderen"
+
+msgid "Rename"
+msgstr "Hernoemen"
+
+msgid "Rename File"
+msgstr "Bestand hernoemen"
+
+msgid "Rename file"
+msgstr "Bestand hernoemen"
+
+msgid "Rename files using this pattern :"
+msgstr "Bestanden hernoemen volgens dit patroon:"
+
+msgid "Rename folder"
+msgstr "Map hernoemen"
+
+msgid "Rename this folder to :"
+msgstr "Deze map hernoemen in:"
+
+msgid "Rename/move files based on these fields :"
+msgstr "Bestanden hernoemen/verplaatsen op basis van deze velden:"
+
+#, perl-brace-format
+msgid ""
+"Renaming {oldname}\n"
+"to {newname}\n"
+"failed : {error}"
+msgstr ""
+"Hernoemen van {oldname}\n"
+"in {newname}\n"
+"mislukt: {error}"
+
+msgid "Reorganize files and folders"
+msgstr "Bestanden en mappen reorganiseren"
+
+msgid "Repeat"
+msgstr "Herhalen"
+
+msgid "Replace"
+msgstr "Vervangen"
+
+msgid "Replace existing values"
+msgstr "Bestaande waarden vervangen"
+
+msgid "Replace..."
+msgstr "Vervangen..."
+
+msgid "ReplayGain options"
+msgstr "ReplayGain-opties"
+
+msgid "Replaygain"
+msgstr "ReplayGain"
+
+msgid "Replaygain analysis"
+msgstr "ReplayGain-analyse"
+
+msgid "Rescan"
+msgstr "Opnieuw inlezen"
+
+msgid "Rescan Collection"
+msgstr "Collectie opnieuw inlezen"
+
+msgid "Reset filter"
+msgstr "Filter resetten"
+
+msgid "Retrieves album-relevant information (review etc.) from allmusic.com."
+msgstr "Haalt album-relevante informatie (zoals recensies) van allmusic.com."
+
+msgid "Review"
+msgstr "Recensie"
+
+msgid "Rewind"
+msgstr "Terugspoelen"
+
+msgid "Rhythmbox"
+msgstr "Rhythmbox"
+
+msgid "Rhythmbox 2nd queue column"
+msgstr "Rhythmbox: tweede wachtrijkolom"
+
+msgid "Right aligned"
+msgstr "Rechts uitgelijnd"
+
+msgid "Right side"
+msgstr "Rechterkant"
+
+msgid "Right-click to remove filters"
+msgstr "Rechtsklikken om filters te verwijderen"
+
+msgid "Right-click to toggle shuffle/random"
+msgstr "Rechtsklikken om willekeurig afspelen aan-/ of uit te zetten"
+
+msgid "Rip"
+msgstr "Rippen"
+
+msgid "Rip plugin"
+msgstr "Ripplugin"
+
+msgid "Ripping software :"
+msgstr "Ripprogramma:"
+
+msgid "Run a command when playing a song"
+msgstr "Opdracht uitvoeren wanneer een titel wordt afgespeeld"
+
+msgid "Run perl code"
+msgstr "Perl-code uitvoeren"
+
+msgid "Run system command"
+msgstr "Systeemopdracht uitvoeren"
+
+msgid "Running time"
+msgstr "Afspeeltijd"
+
+msgid "Same Title"
+msgstr "Zelfde titel"
+
+msgid "Same album"
+msgstr "Zelfde album"
+
+msgid "Same artist"
+msgstr "Zelfde artiest"
+
+msgid "Same title"
+msgstr "Zelfde titel"
+
+msgid "Same year"
+msgstr "Zelfde jaar"
+
+msgid "Sampling Rate"
+msgstr "Samplesnelheid"
+
+msgid "Saturday"
+msgstr "Zaterdag"
+
+msgid "Save"
+msgstr "Opslaan"
+
+msgid "Save Tags/Options"
+msgstr "Tags/opties opslaan"
+
+msgid "Save album info in:"
+msgstr "Albuminfo opslaan in:"
+
+msgid "Save artist biography"
+msgstr "Artiestbiografie opslaan"
+
+msgid "Save as..."
+msgstr "Opslaan als..."
+
+msgid "Save current filter as"
+msgstr "Huidig filter opslaan als"
+
+msgid "Save current list as"
+msgstr "Huidige lijst opslaan als"
+
+msgid "Save lyrics"
+msgstr "Songtekst opslaan"
+
+msgid "Save now"
+msgstr "Nu opslaan"
+
+msgid "Save picture as"
+msgstr "Afbeelding opslaan als"
+
+msgid "Save review"
+msgstr "Recensie opslaan"
+
+msgid ""
+"Save selected fields for all tracks on the same album whenever album data is "
+"loaded from AMG or from file."
+msgstr ""
+"Geselecteerde velden opslaan voor alle titels op dat album, zodra de "
+"albumdata geladen wordt vanuit AMG of vanuit een bestand."
+
+#, perl-format
+msgid "Save tags/settings every %d minutes"
+msgstr "Tags/instellingen elke %d minuten opslaan"
+
+msgid "Saved"
+msgstr "Opgeslagen"
+
+msgid "Saved Lists"
+msgstr "Opgeslagen lijsten"
+
+msgid "Saved filters"
+msgstr "Opgeslagen filters"
+
+msgid "Saved lists"
+msgstr "Opgeslagen lijsten"
+
+msgid "Scan Collection"
+msgstr "Collectie inlezen"
+
+msgid "Scan as an album"
+msgstr "Als een album inlezen"
+
+msgid "Scan for new songs"
+msgstr "Controleren op nieuwe titels"
+
+msgid "Scan per-file track gain"
+msgstr "Volumeversterking per bestand bepalen"
+
+msgid "Scan this file"
+msgstr "Dit bestand inlezen"
+
+msgid "Scan using tag-defined album"
+msgstr "Inlezen met gebruik van de albums, gedefinieerd in de tags"
+
+msgid "Scanning"
+msgstr "Inlezen"
+
+msgid "Scroll with song"
+msgstr "Titel volgen"
+
+msgid "Scroll with the song"
+msgstr "Titel volgen"
+
+msgid "Search"
+msgstr "Zoeken"
+
+msgid "Search : "
+msgstr "Zoeken:"
+
+msgid "Search Album"
+msgstr "Album zoeken"
+
+msgid "Search Artist"
+msgstr "Artiest zoeken"
+
+msgid "Search Comment"
+msgstr "Opmerking zoeken"
+
+msgid "Search Genre"
+msgstr "Genre zoeken"
+
+msgid "Search Label"
+msgstr "Label zoeken"
+
+msgid "Search Title"
+msgstr "Titel zoeken"
+
+msgid "Search Title, Artist and Album"
+msgstr "Titel, artiest en album zoeken"
+
+msgid "Search Title, Artist, Album, Comment, Label and Genre"
+msgstr "Titel, artiest, album, opmerking, label en genre zoeken"
+
+msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
+msgstr "Titel, artiest, album, opmerking, label, genre en bestandsnaam zoeken"
+
+msgid "Search album"
+msgstr "Album zoeken"
+
+msgid "Search all fields"
+msgstr "Alle velden doorzoeken"
+
+msgid "Search allmusic for Artist"
+msgstr "Artiest op allmusic.com opzoeken"
+
+msgid "Search amazon.com for Artist"
+msgstr "Artiest op amazon.com opzoeken"
+
+msgid "Search and display lyrics"
+msgstr "Songtekst opzoeken en weergeven"
+
+msgid "Search box type"
+msgstr "Type zoekvak"
+
+msgid "Search discogs for Artist"
+msgstr "Artiest op Discogs opzoeken"

@@ -42,7 +42,7 @@ our @MenuQueue=
 
 our @MainMenu=
 (	{label => _"Add files or folders",code => sub {::ChooseAddPath(0,1)},	stockicon => 'gtk-add' },
-	{label => _"Settings",		code => \&::PrefDialog,	stockicon => 'gtk-preferences' },
+	{label => _"Settings",		code => 'OpenPref',	stockicon => 'gtk-preferences' },
 	{label => _"Open Browser",	code => \&::OpenBrowser,stockicon => 'gmb-playlist' },
 	{label => _"Open Context window",code => \&::ContextWindow, stockicon => 'gtk-info'},
 	{label => _"Switch to fullscreen mode",code => \&::ToggleFullscreenLayout, stockicon => 'gtk-fullscreen'},
@@ -120,7 +120,7 @@ our %Widgets=
 		stock	=> 'gtk-preferences',
 		tip	=> _"Edit Settings",
 		text	=> _"Settings",
-		activate=> \&::PrefDialog,
+		activate=> 'OpenPref',
 		click3	=> sub {Layout::Window->new($::Options{Layout});}, #mostly for debugging purpose
 		click2	=> \&::AboutDialog,
 	},
@@ -409,7 +409,8 @@ our %Widgets=
 	LabelsIcons =>
 	{	New	=> sub { Gtk2::Table->new(1,1); },
 		group	=> 'Play',
-		fields	=> 'label',
+		field	=> 'label',
+		options	=> 'field',
 		schange	=> \&UpdateLabelsIcon,
 		update	=> \&UpdateLabelsIcon,
 		event	=> 'Icons',
@@ -951,7 +952,7 @@ sub CreateWidgets
 		my $group=$opt1->{group};
 		$opt1->{group}= $defaultgroup.(length $group ? "-$group" : '') unless $group=~m/^[A-Z]/;
 		my $box=$widgets->{$key}= $type->{New}( $opt1 );
-		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle maxwidth maxheight/;
+		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle maxwidth maxheight expand_weight/;
 		if ($opt1->{minwidth} or $opt1->{minheight})
 		{	my ($minwidth,$minheight)=$box->get_size_request;
 			$minwidth=  $opt1->{minwidth}  || $minwidth;
@@ -1088,7 +1089,7 @@ sub NewWidget
 		: $ref->{New}(\%options);
 	return unless $widget;
 	$widget->{$_}= $options{$_} for 'group',split / /, ($ref->{options} || '');
-	$widget->{$_}=$options{$_} for grep exists $options{$_}, qw/tabtitle tabicon tabrename maxwidth maxheight/;
+	$widget->{$_}=$options{$_} for grep exists $options{$_}, qw/tabtitle tabicon tabrename maxwidth maxheight expand_weight/;
 	$widget->{options_to_save}=$ref->{saveoptions} if $ref->{saveoptions};
 
 	$widget->{name}=$namefull;
@@ -1551,7 +1552,7 @@ sub UpdateLabelsIcon
 	return unless defined $::SongID;
 	my $row=0; my $col=0;
 	my $count=0;
-	for my $stock ( Songs::Get_icon_list('label',$::SongID) )
+	for my $stock ( Songs::Get_icon_list($table->{field},$::SongID) )
 	{	my $img=Gtk2::Image->new_from_stock($stock,'menu');
 		$count++;
 		$table->attach($img,$col,$col+1,$row,$row+1,'shrink','shrink',1,1);

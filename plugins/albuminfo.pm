@@ -202,13 +202,13 @@ sub new {
 
 	# "Refresh", "save" and "search" buttons
 	my $refreshbutton = ::NewIconButton('gtk-refresh', undef, sub { song_changed(::find_ancestor($_[0],__PACKAGE__),undef,undef,1); }, "none", _"Refresh");
-	my $savebutton	  = ::NewIconButton('gtk-save', undef, sub 
+	my $savebutton	  = ::NewIconButton('gtk-save', undef, sub
 		{my $self=::find_ancestor($_[0],__PACKAGE__); save_review(::GetSelID($self),$self->{fields})}, "none", _"Save review");
 	$savebuttons{$self} = $savebutton;
 	my $searchbutton = Gtk2::ToggleButton->new();
 	$searchbutton->set_relief('none');
 	$searchbutton->add(Gtk2::Image->new_from_stock('gtk-find','menu'));
-	$searchbutton->signal_connect(clicked => sub {my $self=::find_ancestor($_[0],__PACKAGE__); 
+	$searchbutton->signal_connect(clicked => sub {my $self=::find_ancestor($_[0],__PACKAGE__);
 		if ($_[0]->get_active()) {$self->manual_search()} else {$self->song_changed()}});
 	my $buttonbox = Gtk2::HBox->new();
 	$buttonbox->pack_end($searchbutton,0,0,0);
@@ -747,7 +747,7 @@ sub save_fields {
 			} else {
 				push(@updated_fields, '+'.$key, $fields{$key});
 			}
-		}		
+		}
 	}
 	if (@updated_fields) {
 		$save_fields_lock = 1;

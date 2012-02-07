@@ -89,7 +89,7 @@ VBText		= 2HBArtist HBAlbum _2HBTitle
 HBButtons	= Prev(size=small-toolbar) Play(size=small-toolbar) Next(size=small-toolbar)
 HBTitle		= LockSong _Title(font=12,tip=_"Title: %t",ellipsize=end)
 HBArtist	= LockArtist _Artist(font=8,tip=_"Artist: %a",ellipsize=end)
-HBAlbum		= LockAlbum _Album(font=8,tip=_"Album: %l",ellipsize=end,minsize=0,expand_max=100) Date(font=7,markup=" <b>»</b> %y")
+HBAlbum		= LockAlbum _Album(font=8,tip=_"Album: %l",ellipsize=end,expand_max=100) Date(font=7,markup=" <b>»</b> %y")
 HBRating	= Filler1  -Stars
 HBTime		= _TimeBar(minheight=7)
 HBRight		= HBButtons _2HBRating

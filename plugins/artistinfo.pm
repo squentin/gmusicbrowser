@@ -682,7 +682,7 @@ sub PopulateQueue
 	if ( $nowplayingaID != Songs::Get_gid($::SongID,'artist')) { QAutofillSimilarArtists; return; }
 	my $data = $_[0];
 
-	return unless $::QueueAction eq 'autofill-similar-artists'; # re-check queueaction and 
+	return unless $::QueueAction eq 'autofill-similar-artists'; # re-check queueaction and
 	my $nb=$::Options{MaxAutoFill}-@$::Queue;
 	return unless $nb>0;
 	my @artist_gids;
@@ -698,7 +698,7 @@ sub PopulateQueue
 	push (@artist_gids, Songs::Get_gid($::SongID,'artist')) unless $::Options{OPT.'SimilarExcludeSeed'}; # add currently playing artist as well
 
 	my $filter= Filter->newadd(0, map Songs::MakeFilterFromGID("artist",$_), @artist_gids );
-	my $random= Random->new('random:',$filter->filter);
+	my $random= Random->new('random:',$filter->filter($::ListPlay));
 	my @IDs=$random->Draw($nb,[@$::Queue,$::SongID]); # add queue and current song to blacklist (won't draw)
 	return unless @IDs;
 	$::Queue->Push(\@IDs);

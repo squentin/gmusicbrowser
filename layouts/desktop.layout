@@ -40,3 +40,21 @@ Name = _"Lyrics (requires lyrics plugin)"
 Window =  transparent=1
 VBmain = _PluginLyrics(shadow=none,HideToolbar=1)
 
+[D_clementine]
+Type= D
+Name = Clementine
+Window = insensitive=1,transparent=1
+DefaultFontColor= white
+VBmain= Cover(minsize=100,xalign=0) HBartist HBalbum HBtrack HBtitle TimeBar
+ HBartist=Text1(color=grey,text=_"Artist") Artist(markup=" : $artist")
+ HBalbum= Text2(color=grey,text=_"Album") Album(markup=" : $album")
+ HBtrack= Text3(color=grey,text=_"Track") Text5(markup=" : $track")
+ HBtitle= Text4(color=grey,text=_"Title") Title(markup=" : $title_or_file")
+
+[D_screenlet]
+Type=D
+Name = screenlet
+DefaultFont=8
+Window	= size=240x240,transparent=1
+VBmain	= _Cover(forceratio=1,hover_delay=1,hover_layout_pos=.5w x w,hover_layout=play_controls) TimeBar Title(xalign=.5) Artist(xalign=.5) Album(xalign=.5)
+

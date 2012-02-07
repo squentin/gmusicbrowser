@@ -1,3 +1,33 @@
+v1.1.9
+add a few layouts and small fixes to some contributed layouts
+improve songs-from-album menu
+mpris2 plugin fixes
+m4a tags fixes : use disk instead of disc tag, use both "©gen" and "com.apple.iTunes;genre" to save genre
+fix lyrics3v2 tags ignored
+write to all tags when multiple id3v2 tags are present
+fix "presenting" window not working in some cases
+LabelToggleButtons widget : add hide_unset option to hide labels that are not set for the song
+add SongInfo & PictureBrowser widget
+add expand_weight layout option
+add hover_layout_pos option to control position of hover_layout popups (see http://git.gmusicbrowser.org/commit/41b0c69b45)
+song properties dialog : add "plus" button to the widget that edit labels/genres/...
+Filterpanes : add "reverse order" option to the sort submenu
+fix recovering song properties of previously removed songs
+use version field in a few more places
+cover finder plugin : update google image parsing
+make a few scrolledwindows request a minimal height (fix problems with ubuntu scrollbars)
+desktop widgets plugin : make it possible to remove widgets whose layout is missing
+improve the way the default window used by some fifo commands is chosen
+add -noplugins and -listplugins command line options
+add support for field aliases (can be used in search or in format string), example : "by" for "artist"
+create field aliases from translation of "artist", "by", "album", "from", "title"
+small change to gmb plugin header format so that it is a valid POD syntax, old format still supported
+artistinfo plugin: restrict auto-fill-similar mode to songs from playlist
+
+translations updates : Korean, Russian, German, French, Portuguese (Brazilian), Italian
+add beginning of Dutch translation
+(many thanks to the translators)
+
 v1.1.8
 finally updated the filter edition and description system to the new fields
 cleaned-up included layouts and added a few contributed ones
