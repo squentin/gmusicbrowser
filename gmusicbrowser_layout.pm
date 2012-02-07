@@ -4049,6 +4049,7 @@ sub Update
 	return unless $self->mapped;
 	my $field= $self->{field};
 	my $ID= ::GetSelID($self);
+	return unless defined $ID;
 	my $gid= Songs::Get_gid($ID,$field);
 	my $path;
 		#taken from ::ChooseAAPicture() FIXME create a function ?

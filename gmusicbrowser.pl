@@ -8826,7 +8826,7 @@ sub make_toolitem
 	{	$menu->{busy}=1;
 		my $value= $self->get_value;
 		for my $item ($menu->get_children)
-		{	$item->set_active( $item->{value} eq $value );
+		{	$item->set_active( defined $value && $item->{value} eq $value );
 		}
 		delete $menu->{busy};
 	});
