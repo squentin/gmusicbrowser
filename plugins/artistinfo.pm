@@ -69,6 +69,7 @@ my @similarity=
 
 ::SetDefaultOptions(OPT,PathFile	=> "~/.config/gmusicbrowser/bio/%a",
 			ArtistPicSize	=> 70,
+			ArtistPicShow	=> 1,
 			SimilarLimit	=> 15,
 			SimilarRating	=> 20,
 			SimilarLocal	=> 0,
@@ -109,7 +110,7 @@ sub new
 	$self->{fontsize} = $fontsize->get_size / Gtk2::Pango->scale;
 	$self->{artist_esc} = "";
 	my $statbox=Gtk2::VBox->new(0,0);
-	my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,minsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0,group=>$options->{group},tip=>_"Click to show fullsize image"});
+	my $artistpic=Gtk2::HBox->new(0,0);
 	for my $name (qw/Ltitle Lstats/)
 	{	my $l=Gtk2::Label->new('');
 		$self->{$name}=$l;
@@ -127,6 +128,18 @@ sub new
 	my $artistbox = Gtk2::HBox->new(0,0);
 	$artistbox->pack_start($artistpic,0,1,0);
 	$artistbox->pack_start($stateventbox,1,1,0);
+
+	my $group= $options->{group};
+	my $artistpic_create= sub
+	{	my $box=shift;
+		$box->remove($_) for $box->get_children;
+		return unless $::Options{OPT.'ArtistPicShow'};
+		my $child = Layout::NewWidget("ArtistPic",{forceratio=>1,minsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0,group=>$group,tip=>_"Click to show fullsize image"});
+		$child->show_all;
+		$box->add($child);
+	};
+	::Watch($artistpic, plugin_artistinfo_option_pic=> $artistpic_create);
+	$artistpic_create->($artistpic);
 
 	my $textview=Gtk2::TextView->new;
 	$self->signal_connect(map => \&SongChanged);
@@ -165,17 +178,17 @@ sub new
 	$toolbar->set_style( $options->{ToolbarStyle}||'both-horiz' );
 	$toolbar->set_icon_size( $options->{ToolbarSize}||'small-toolbar' );
 	#$toolbar->set_show_arrow(1);
-	my $group; my $menugroup;
+	my $radiogroup; my $menugroup;
 	foreach my $key (sort keys %sites)
 	{	my $item = $sites{$key}[1];
-		$item = Gtk2::RadioButton->new($group,$item);
+		$item = Gtk2::RadioButton->new($radiogroup,$item);
 		$item->{key} = $key;
 		$item -> set_mode(0); # display as togglebutton
 		$item -> set_relief("none");
 		$item -> set_tooltip_text($sites{$key}[2]);
 		$item->set_active( $key eq $self->{site} );
-		$item->signal_connect('toggled' => sub { my $self=::find_ancestor($_[0],__PACKAGE__); toggled_cb($self,$item,$textview); } );
-		$group = $item -> get_group;
+		$item->signal_connect(toggled => sub { my $self=::find_ancestor($_[0],__PACKAGE__); toggled_cb($self,$item,$textview); } );
+		$radiogroup = $item -> get_group;
 		my $toolitem=Gtk2::ToolItem->new;
 		$toolitem->add( $item );
 		$toolitem->set_expand(1);
@@ -267,7 +280,8 @@ sub prefbox
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave = ::NewPrefCheckButton(OPT.'AutoSave'=>_"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed",
 		cb=>sub { ::HasChanged('plugin_artistinfo_option_save'); });
-	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text =>_("Artist Picture Size : %d")._"(applied after restart)");
+	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text =>_("Artist picture size : %d"), cb=>sub { ::HasChanged('plugin_artistinfo_option_pic'); });
+	my $picshow=::NewPrefCheckButton(OPT.'ArtistPicShow' => _"Show artist picture", widget => ::Vpack($picsize), cb=>sub { ::HasChanged('plugin_artistinfo_option_pic'); } );
 	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", expand=>1, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'", history=>OPT.'Eventformat_history');
 	my $eventformat_reset=Gtk2::Button->new(_"reset format");
 	$eventformat_reset->{format_combo}=$eventformat;
@@ -284,7 +298,7 @@ sub prefbox
 	my $similar_exclude_seed=::NewPrefCheckButton(OPT.'SimilarExcludeSeed' => _"Exclude 'seed'-artist from queue", tip=>_"The artists similar to the 'seed'-artist will be used to populate the queue, but you can decide to exclude the 'seed'-artist him/herself.");
 	my $lastfm=::NewIconButton('plugin-artistinfo-lastfm',undef,sub { ::main::openurl("http://www.last.fm/music/"); },'none',_"Open last.fm website in your browser");
 	my $titlebox=Gtk2::HBox->new(0,0);
-	$titlebox->pack_start($picsize,1,1,0);
+	$titlebox->pack_start($picshow,1,1,0);
 	$titlebox->pack_start($lastfm,0,0,5);
 	my $frame_bio=Gtk2::Frame->new(_"Biography");
 	$frame_bio->add(::Vpack($entry,$preview,$autosave));
