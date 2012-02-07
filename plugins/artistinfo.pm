@@ -192,17 +192,24 @@ sub new
 #		$toolitem->set_proxy_menu_item($key,$menuitem);
 	}
 	for my $button
-	(	[refresh => 'gtk-refresh', sub { my $self=::find_ancestor($_[0],__PACKAGE__); SongChanged($self,'1'); },_"Refresh", _"Refresh",0],
+	(	[refresh => 'gtk-refresh', sub { my $self=::find_ancestor($_[0],__PACKAGE__); SongChanged($self,'1'); },_"Refresh", _"Refresh"],
 		[save => 'gtk-save',	\&Save_text,	_"Save",	_"Save artist biography",$::Options{OPT.'AutoSave'}],
 	)
-	{	my ($key,$stock,$cb,$label,$tip,$hide)=@$button;
+	{	my ($key,$stock,$cb,$label,$tip)=@$button;
 		my $item=Gtk2::ToolButton->new_from_stock($stock);
 		$item->signal_connect(clicked => $cb);
 		$item->set_tooltip_text($tip) if $tip;
 		my $menuitem = Gtk2::ImageMenuItem->new ($label);
 		$menuitem->set_image( Gtk2::Image->new_from_stock($stock,'menu') );
 		$item->set_proxy_menu_item($key,$menuitem);
-		$toolbar->insert($item,-1) unless $hide;
+		$toolbar->insert($item,-1);
+		if ($key eq 'save')
+		{	$item->show_all;
+			$item->set_no_show_all(1);
+			my $update= sub { $_[0]->set_visible(!$::Options{OPT.'AutoSave'}); };
+			::Watch($item, plugin_artistinfo_option_save=> $update);
+			$update->($item);
+		}
 	}
 	my $artistinfobox = Gtk2::VBox->new(0,0);
 	$artistinfobox->pack_start($artistbox,1,1,0);
@@ -258,7 +265,8 @@ sub prefbox
 {	my $vbox=Gtk2::VBox->new(0,2);
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>50);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
-	my $autosave=::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed");
+	my $autosave = ::NewPrefCheckButton(OPT.'AutoSave'=>_"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed",
+		cb=>sub { ::HasChanged('plugin_artistinfo_option_save'); });
 	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text =>_("Artist Picture Size : %d")._"(applied after restart)");
 	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", expand=>1, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'", history=>OPT.'Eventformat_history');
 	my $eventformat_reset=Gtk2::Button->new(_"reset format");
