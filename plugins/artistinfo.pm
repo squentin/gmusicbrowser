@@ -379,32 +379,34 @@ sub CreateSearchMenu {
 
 sub apiczoom {
 	my ($self, $event) = @_;
-	my $menu=Gtk2::Menu->new;
-	$menu->modify_bg('GTK_STATE_NORMAL',Gtk2::Gdk::Color->parse('black')); # black bg for the artistpic-popup
-	my $picsize=250;
 	my $ID = ::GetSelID($self);
 	my $aID = Songs::Get_gid($ID,'artist');
-	if (my $img= AAPicture::newimg(artist=>$aID,$picsize)) {
-		my $apic = Gtk2::MenuItem->new;
-		$apic->modify_bg('GTK_STATE_SELECTED',Gtk2::Gdk::Color->parse('black'));
-		$apic->add($img);
-		$apic->show_all;
-		my $artist = Songs::Gid_to_Get("artist",$aID);
-		my $item=Gtk2::MenuItem->new;
-		$item->modify_fg('GTK_STATE_SELECTED',Gtk2::Gdk::Color->parse('white'));
-		my $label=Gtk2::Label->new;	# use a label instead of a normal menu-item for formatted text
-		$label->set_line_wrap(1);
-		$label->set_justify('center');
-		$label->set_ellipsize('end');
-		$label->set_markup( "<big><b>$artist</b></big>" );
-		$item->add($label);
-		$item->show_all;
-		$menu->append($apic);
-		$menu->append($item);
-		$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
-		return 1;
-	}
-	else { return 0; }
+	my $picsize=250;
+	my $img= AAPicture::newimg(artist=>$aID,$picsize);
+	return 0 unless $img;
+
+	my $menu=Gtk2::Menu->new;
+	$menu->modify_bg('normal',Gtk2::Gdk::Color->parse('black')); # black bg for the artistpic-popup
+	my $apic = Gtk2::MenuItem->new;
+	$apic->modify_bg('selected',Gtk2::Gdk::Color->parse('black'));
+	$apic->add($img);
+
+	my $artist = Songs::Gid_to_Get("artist",$aID);
+	my $item=Gtk2::MenuItem->new;
+	my $label=Gtk2::Label->new;	# use a label instead of a normal menu-item for formatted text
+	$item->modify_bg('selected',Gtk2::Gdk::Color->parse('black'));
+	$label->modify_fg($_,Gtk2::Gdk::Color->parse('white')) for qw/normal prelight/;
+	$label->set_line_wrap(1);
+	$label->set_justify('center');
+	$label->set_ellipsize('end');
+	$label->set_markup( "<big><b>$artist</b></big>" );
+	$item->add($label);
+
+	$menu->append($apic);
+	$menu->append($item);
+	$menu->show_all;
+	$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
+	return 1;
 }
 
 sub update_cursor_cb
