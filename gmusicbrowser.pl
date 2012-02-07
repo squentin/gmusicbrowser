@@ -502,7 +502,7 @@ our @TrayMenu=
 		submenu => sub {  [map { $_->layout_name => $_ } grep $_->isa('Layout::Window'), Gtk2::Window->list_toplevels];  }, },
 	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => sub { ShowHide(); } },
 	{ label=> _"Fullscreen",	code => \&ToggleFullscreenLayout,	stockicon => 'gtk-fullscreen' },
-	{ label=> _"Settings",		code => 'OpenPref(fields:artist)',	stockicon => 'gtk-preferences' },
+	{ label=> _"Settings",		code => 'OpenPref',	stockicon => 'gtk-preferences' },
 	{ label=> _"Quit",		code => \&Quit,		stockicon => 'gtk-quit' },
 );
 
