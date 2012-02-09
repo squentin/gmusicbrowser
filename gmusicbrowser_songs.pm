@@ -4572,6 +4572,23 @@ sub make
 #	$self->{lref}=$list;
 #	$self->{valid}=0;;
 #}
+
+#returns a function, that function takes a listref of IDs as argument, and returns a hashref of groupid=>score
+#returns nothing on error
+sub MakeGroupScoreFunction
+{	my ($self,$field)=@_;
+	my ($keycode,$multi)= Songs::LookupCode($field, 'hash','hashm', [ID => '$_']);
+	unless ($keycode || $multi) { warn "MakeGroupScoreFunction error : can't find code for field $field\n"; return } #return dummy sub ?
+	($keycode,my $keyafter)= split / +---- +/,$keycode||$multi,2;
+	if ($keyafter) { warn "MakeGroupScoreFunction with field $field is not supported yet\n"; return } #return dummy sub ?
+	my ($before,$score)=$self->make;
+	my $calcIDscore= $multi ? 'my $IDscore='.$score.'; for my $key ('.$keycode.') {$score{$key}+=$IDscore}' : "\$score\{$keycode}+=$score;";
+	my $code= $before.'; sub { my %score; for (@{$_[0]}) { '.$calcIDscore.' } return \%score; }';
+	my $sub=eval $code;
+	if ($@) { warn "Error in eval '$code' :\n$@"; return }
+	return $sub;
+}
+
 sub MakeScoreFunction
 {	my $self=shift;
 	my @Score;
