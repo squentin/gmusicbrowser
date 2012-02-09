@@ -53,7 +53,6 @@ my $queuewaiting;
 my %queuemode=
 (	order=>10, icon=>'gtk-refresh',	short=> _"similar-artists",		long=> _"Auto-fill queue with similar artists (from last.fm)",	changed=>\&QAutofillSimilarArtists,	keep=>1,save=>1,autofill=>1,
 );
-my %savebuttons; # Needed for dynamically adding/removing the "Save"-button from layout.
 
 =dop
 my @similarity=
@@ -69,8 +68,8 @@ my @similarity=
 # "secret" string: 18cdd008e76705eb5f942892d49a71e2
 
 ::SetDefaultOptions(OPT,PathFile	=> "~/.config/gmusicbrowser/bio/%a",
-			ArtistPicShow	=> 1,
 			ArtistPicSize	=> 70,
+			ArtistPicShow	=> 1,
 			SimilarLimit	=> 15,
 			SimilarRating	=> 20,
 			SimilarLocal	=> 0,
@@ -110,12 +109,8 @@ sub new
 	my $fontsize=$self->style->font_desc;
 	$self->{fontsize} = $fontsize->get_size / Gtk2::Pango->scale;
 	$self->{artist_esc} = "";
-	my $artistbox = Gtk2::HBox->new(0,0);
 	my $statbox=Gtk2::VBox->new(0,0);
-	if ($::Options{OPT.'ArtistPicShow'} == 1 ) {
-		my $artistpic = Layout::NewWidget("ArtistPic",{forceratio=>1,minsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0,group=>$options->{group},tip=>_"Click to show fullsize image"});
-		$artistbox->pack_start($artistpic,0,1,0);
-	}
+	my $artistpic=Gtk2::HBox->new(0,0);
 	for my $name (qw/Ltitle Lstats/)
 	{	my $l=Gtk2::Label->new('');
 		$self->{$name}=$l;
@@ -123,15 +118,28 @@ sub new
 		if ($name eq 'Ltitle') { $l->set_line_wrap(1);$l->set_ellipsize('end'); }
 		$statbox->pack_start($l,0,0,2);
 	}
-	
 	$self->{artistrating} = Gtk2::Image->new;
 	$statbox->pack_start($self->{artistrating},0,0,0);
 	my $stateventbox = Gtk2::EventBox->new;
 	$stateventbox->add($statbox);
 	$stateventbox->{group}= $options->{group};
 	$stateventbox->signal_connect(button_press_event => sub {my ($stateventbox, $event) = @_; return 0 unless $event->button == 3; my $ID=::GetSelID($stateventbox); ::ArtistContextMenu( Songs::Get_gid($ID,'artists'),{ ID=>$ID, self=> $stateventbox, mode => 'S'}) if defined $ID; return 1; } ); # FIXME: do a proper cm
-	
+
+	my $artistbox = Gtk2::HBox->new(0,0);
+	$artistbox->pack_start($artistpic,0,1,0);
 	$artistbox->pack_start($stateventbox,1,1,0);
+
+	my $group= $options->{group};
+	my $artistpic_create= sub
+	{	my $box=shift;
+		$box->remove($_) for $box->get_children;
+		return unless $::Options{OPT.'ArtistPicShow'};
+		my $child = Layout::NewWidget("ArtistPic",{forceratio=>1,minsize=>$::Options{OPT.'ArtistPicSize'},click1=>\&apiczoom,xalign=>0,group=>$group,tip=>_"Click to show fullsize image"});
+		$child->show_all;
+		$box->add($child);
+	};
+	::Watch($artistpic, plugin_artistinfo_option_pic=> $artistpic_create);
+	$artistpic_create->($artistpic);
 
 	my $textview=Gtk2::TextView->new;
 	$self->signal_connect(map => \&SongChanged);
@@ -170,17 +178,17 @@ sub new
 	$toolbar->set_style( $options->{ToolbarStyle}||'both-horiz' );
 	$toolbar->set_icon_size( $options->{ToolbarSize}||'small-toolbar' );
 	#$toolbar->set_show_arrow(1);
-	my $group; my $menugroup;
+	my $radiogroup; my $menugroup;
 	foreach my $key (sort keys %sites)
 	{	my $item = $sites{$key}[1];
-		$item = Gtk2::RadioButton->new($group,$item);
+		$item = Gtk2::RadioButton->new($radiogroup,$item);
 		$item->{key} = $key;
 		$item -> set_mode(0); # display as togglebutton
 		$item -> set_relief("none");
 		$item -> set_tooltip_text($sites{$key}[2]);
 		$item->set_active( $key eq $self->{site} );
-		$item->signal_connect('toggled' => sub { my $self=::find_ancestor($_[0],__PACKAGE__); toggled_cb($self,$item,$textview); } );
-		$group = $item -> get_group;
+		$item->signal_connect(toggled => sub { my $self=::find_ancestor($_[0],__PACKAGE__); toggled_cb($self,$item,$textview); } );
+		$radiogroup = $item -> get_group;
 		my $toolitem=Gtk2::ToolItem->new;
 		$toolitem->add( $item );
 		$toolitem->set_expand(1);
@@ -197,10 +205,10 @@ sub new
 #		$toolitem->set_proxy_menu_item($key,$menuitem);
 	}
 	for my $button
-	(	[refresh => 'gtk-refresh', sub { my $self=::find_ancestor($_[0],__PACKAGE__); SongChanged($self,'1'); },_"Refresh", _"Refresh",0],
+	(	[refresh => 'gtk-refresh', sub { my $self=::find_ancestor($_[0],__PACKAGE__); SongChanged($self,'1'); },_"Refresh", _"Refresh"],
 		[save => 'gtk-save',	\&Save_text,	_"Save",	_"Save artist biography",$::Options{OPT.'AutoSave'}],
 	)
-	{	my ($key,$stock,$cb,$label,$tip,$hide)=@$button;
+	{	my ($key,$stock,$cb,$label,$tip)=@$button;
 		my $item=Gtk2::ToolButton->new_from_stock($stock);
 		$item->signal_connect(clicked => $cb);
 		$item->set_tooltip_text($tip) if $tip;
@@ -208,8 +216,13 @@ sub new
 		$menuitem->set_image( Gtk2::Image->new_from_stock($stock,'menu') );
 		$item->set_proxy_menu_item($key,$menuitem);
 		$toolbar->insert($item,-1);
-		if ($hide) {$item->set_no_show_all(1); $item->hide}
-		$savebuttons{$self} = $item if $key eq 'save';
+		if ($key eq 'save')
+		{	$item->show_all;
+			$item->set_no_show_all(1);
+			my $update= sub { $_[0]->set_visible(!$::Options{OPT.'AutoSave'}); };
+			::Watch($item, plugin_artistinfo_option_save=> $update);
+			$update->($item);
+		}
 	}
 	my $artistinfobox = Gtk2::VBox->new(0,0);
 	$artistinfobox->pack_start($artistbox,1,1,0);
@@ -265,11 +278,10 @@ sub prefbox
 {	my $vbox=Gtk2::VBox->new(0,2);
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>50);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
-	my $autosave = ::NewPrefCheckButton(OPT.'AutoSave'=>_"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed", 
-		cb=>sub {for my $sb (values %savebuttons) {	if ($_[0]->get_active)	{$sb->set_no_show_all(1); $sb->hide} 
-								else 			{$sb->set_no_show_all(0); $sb->parent->show_all}}});
-	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text =>_("Size : %d")._"(applied after restart)");
-	my $picshow=::NewPrefCheckButton(OPT.'ArtistPicShow' => _"Show", tip=>_"applied after restart", widget => ::Vpack($picsize));
+	my $autosave = ::NewPrefCheckButton(OPT.'AutoSave'=>_"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed",
+		cb=>sub { ::HasChanged('plugin_artistinfo_option_save'); });
+	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text =>_("Artist picture size : %d"), cb=>sub { ::HasChanged('plugin_artistinfo_option_pic'); });
+	my $picshow=::NewPrefCheckButton(OPT.'ArtistPicShow' => _"Show artist picture", widget => ::Vpack($picsize), cb=>sub { ::HasChanged('plugin_artistinfo_option_pic'); } );
 	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", expand=>1, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'", history=>OPT.'Eventformat_history');
 	my $eventformat_reset=Gtk2::Button->new(_"reset format");
 	$eventformat_reset->{format_combo}=$eventformat;
@@ -284,18 +296,17 @@ sub prefbox
 	my $similar_rating=::NewPrefSpinButton(OPT.'SimilarRating',0,100, step=>1, text1=>_"Limit similar artists to a rate of similarity : ", tip=>_"last.fm's similarity categories:\n>90 super\n>70 very high\n>50 high\n>30 medium\n>10 lower");
 	my $similar_local=::NewPrefCheckButton(OPT.'SimilarLocal' => _"Only show similar artists from local library", tip=>_"applied on reload");
 	my $similar_exclude_seed=::NewPrefCheckButton(OPT.'SimilarExcludeSeed' => _"Exclude 'seed'-artist from queue", tip=>_"The artists similar to the 'seed'-artist will be used to populate the queue, but you can decide to exclude the 'seed'-artist him/herself.");
-#	my $lastfm=::NewIconButton('plugin-artistinfo-lastfm',undef,sub { ::main::openurl("http://www.last.fm/music/"); },'none',_"Open last.fm website in your browser");
-#	my $titlebox=Gtk2::HBox->new(0,0);
-#	$titlebox->pack_start($lastfm,0,0,5);
-	my $frame_pic=Gtk2::Frame->new(_"Artist Picture");
-	$frame_pic->add($picshow);
+	my $lastfm=::NewIconButton('plugin-artistinfo-lastfm',undef,sub { ::main::openurl("http://www.last.fm/music/"); },'none',_"Open last.fm website in your browser");
+	my $titlebox=Gtk2::HBox->new(0,0);
+	$titlebox->pack_start($picshow,1,1,0);
+	$titlebox->pack_start($lastfm,0,0,5);
 	my $frame_bio=Gtk2::Frame->new(_"Biography");
 	$frame_bio->add(::Vpack($entry,$preview,$autosave));
 	my $frame_events=Gtk2::Frame->new(_"Events");
 	$frame_events->add(::Hpack('_',$eventformat,$eventformat_reset));
 	my $frame_similar=Gtk2::Frame->new(_"Similar Artists");
 	$frame_similar->add(::Vpack($similar_limit,$similar_rating,$similar_local,$similar_exclude_seed));
-	$vbox->pack_start($_,::FALSE,::FALSE,5) for $frame_pic,$frame_bio,$frame_events,$frame_similar;
+	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$frame_bio,$frame_events,$frame_similar;
 	return $vbox;
 }
 
@@ -368,32 +379,34 @@ sub CreateSearchMenu {
 
 sub apiczoom {
 	my ($self, $event) = @_;
-	my $menu=Gtk2::Menu->new;
-	$menu->modify_bg('GTK_STATE_NORMAL',Gtk2::Gdk::Color->parse('black')); # black bg for the artistpic-popup
-	my $picsize=250;
 	my $ID = ::GetSelID($self);
 	my $aID = Songs::Get_gid($ID,'artist');
-	if (my $img= AAPicture::newimg(artist=>$aID,$picsize)) {
-		my $apic = Gtk2::MenuItem->new;
-		$apic->modify_bg('GTK_STATE_SELECTED',Gtk2::Gdk::Color->parse('black'));
-		$apic->add($img);
-		$apic->show_all;
-		my $artist = Songs::Gid_to_Get("artist",$aID);
-		my $item=Gtk2::MenuItem->new;
-		$item->modify_fg('GTK_STATE_SELECTED',Gtk2::Gdk::Color->parse('white'));
-		my $label=Gtk2::Label->new;	# use a label instead of a normal menu-item for formatted text
-		$label->set_line_wrap(1);
-		$label->set_justify('center');
-		$label->set_ellipsize('end');
-		$label->set_markup( "<big><b>$artist</b></big>" );
-		$item->add($label);
-		$item->show_all;
-		$menu->append($apic);
-		$menu->append($item);
-		$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
-		return 1;
-	}
-	else { return 0; }
+	my $picsize=250;
+	my $img= AAPicture::newimg(artist=>$aID,$picsize);
+	return 0 unless $img;
+
+	my $menu=Gtk2::Menu->new;
+	$menu->modify_bg('normal',Gtk2::Gdk::Color->parse('black')); # black bg for the artistpic-popup
+	my $apic = Gtk2::MenuItem->new;
+	$apic->modify_bg('selected',Gtk2::Gdk::Color->parse('black'));
+	$apic->add($img);
+
+	my $artist = Songs::Gid_to_Get("artist",$aID);
+	my $item=Gtk2::MenuItem->new;
+	my $label=Gtk2::Label->new;	# use a label instead of a normal menu-item for formatted text
+	$item->modify_bg('selected',Gtk2::Gdk::Color->parse('black'));
+	$label->modify_fg($_,Gtk2::Gdk::Color->parse('white')) for qw/normal prelight/;
+	$label->set_line_wrap(1);
+	$label->set_justify('center');
+	$label->set_ellipsize('end');
+	$label->set_markup( "<big><b>$artist</b></big>" );
+	$item->add($label);
+
+	$menu->append($apic);
+	$menu->append($item);
+	$menu->show_all;
+	$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
+	return 1;
 }
 
 sub update_cursor_cb
@@ -449,21 +462,19 @@ sub ArtistChanged
 	$self->cancel;
 	my $rating = AA::Get("rating:average",'artist',$aID);
 	$self->{artistratingvalue}= int($rating+0.5);
-	if ($::Options{OPT.'ArtistPicShow'} eq "1" ) {
-		$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
-		$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);
-		$self->{albumplaycount}=AA::Get("playcount:sum",'album',$albumID);
-		my $tip = join "\n",	_("Average rating:")	.' '.$self->{artistratingvalue},
-					_("Rating range:")	.' '.$self->{artistratingrange},
-					_("Artist playcount:")	.' '.$self->{artistplaycount},
-					_("Album playcount:")	.' '.$self->{albumplaycount};
-		for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
-	}
+	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
+	$self->{artistplaycount}=AA::Get("playcount:sum",'artist',$aID);
+	$self->{albumplaycount}=AA::Get("playcount:sum",'album',$albumID);
+	my $tip = join "\n",	_("Average rating:")	.' '.$self->{artistratingvalue},
+				_("Rating range:")	.' '.$self->{artistratingrange},
+				_("Artist playcount:")	.' '.$self->{artistplaycount},
+				_("Album playcount:")	.' '.$self->{albumplaycount};
+
 	$self->{artistrating}->set_from_pixbuf(Songs::Stars($self->{artistratingvalue},'rating'));
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($aID,"<big><b>%a</b></big>","artist",1) );
 	$self->{Lstats}->set_markup( AA::ReplaceFields($aID,'%X « %s'."\n<small>%y</small>","artist",1) );
-	
-	
+	for my $name (qw/Ltitle Lstats artistrating/) { $self->{$name}->set_tooltip_text($tip); }
+
 	my $url = GetUrl($sites{$self->{site}}[SITEURL],$aID);
 	return unless $url;
 	if (!$self->{url} or $url ne $self->{url} or $force == 1) {
@@ -487,7 +498,7 @@ sub GetUrl
 	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
 	return unless length $artist;
 	$url=~s/%a/$artist/;
-	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/ unless ($::Options{OPT.'SimilarLimit'} == 0);
+	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/;
 	return $url;
 }
 

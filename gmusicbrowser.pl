@@ -502,7 +502,7 @@ our @TrayMenu=
 		submenu => sub {  [map { $_->layout_name => $_ } grep $_->isa('Layout::Window'), Gtk2::Window->list_toplevels];  }, },
 	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => sub { ShowHide(); } },
 	{ label=> _"Fullscreen",	code => \&ToggleFullscreenLayout,	stockicon => 'gtk-fullscreen' },
-	{ label=> _"Settings",		code => 'OpenPref(fields:artist)',	stockicon => 'gtk-preferences' },
+	{ label=> _"Settings",		code => 'OpenPref',	stockicon => 'gtk-preferences' },
 	{ label=> _"Quit",		code => \&Quit,		stockicon => 'gtk-quit' },
 );
 
@@ -8793,7 +8793,7 @@ sub make_toolitem
 	{	$menu->{busy}=1;
 		my $value= $self->get_value;
 		for my $item ($menu->get_children)
-		{	$item->set_active( $item->{value} eq $value );
+		{	$item->set_active( defined $value && $item->{value} eq $value );
 		}
 		delete $menu->{busy};
 	});
