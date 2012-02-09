@@ -17,7 +17,7 @@ HBTitle		= Title(expand_max=500,markup="<big><b>%t</b></big> ",click1="",tip=_"T
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 ABToggle	= (yalign=0,yscale=0.0) HBToggle
 HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=gmb-view-list,widget=VPSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=gmb-view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=gmb-view-mosaic,widget=FilterPane2,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=gmb-view-fullscreen,size=large-toolbar,tip="Fullscreen View") 10Filler2 ABSearchBox
-ABSearchBox	= (yalign=0) SimpleSearch(suggest=1)
+ABSearchBox	= (yalign=0) SimpleSearch(suggest=1,nb=0)
 ABSettings	= (yalign=0,yscale=0.0) HBSettings
 HBSettings	= ExtraButtons(size=large-toolbar) BMSettings
 BMSettings	= (icon=gtk-preferences,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(click1=OpenCustom(Equalizer),label=_"Equalizer",icon=gmb-equalizer) SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="gtk-preferences") MenuItem05(command=Quit,label=_"Quit",icon="gtk-quit")
@@ -35,7 +35,7 @@ HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=
 VBRight		= _HBSongListtree Progress
 HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _VPSongPlaylist _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
 VPSongPlaylist	= HBFilters _HBSonglist
-HBFilters	= _FilterPane3(nb=2,hidebb=1,page=genre,hidetabs=1) _FilterPane10(nb=3,hidebb=1,page=artists,page_artists/lmarkup="<b>%a</b>%Y\n<small>%x « %s</small>",hidetabs=1) _FilterPane5(nb=4,hidebb=1,page=album,page_album/lpicsize=32,page_album/lmarkup="<b>%a</b>%Y\n<small>%s « %l</small>",hidetabs=1)
+HBFilters	= _FilterPane3(nb=1,hidebb=1,page=genre,hidetabs=1) _FilterPane10(nb=2,hidebb=1,page=artists,page_artists/lmarkup="<b>%a</b>%Y\n<small>%x « %s</small>",hidetabs=1) _FilterPane5(nb=3,hidebb=1,page=album,page_album/lpicsize=32,page_album/lmarkup="<b>%a</b>%Y\n<small>%s « %l</small>",hidetabs=1)
 HBSonglist	= _SongList(cols="playandqueueandtrack title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueueandtrack 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
 #VBMosaic	= FRToggleMosaic _VPMosaicAlbum _VPMosaicArtist
 #FRToggleMosaic	= (shadow=in) HBToggleMosaicClose
