@@ -42,6 +42,7 @@ my @showfields =
 );
 
 ::SetDefaultOptions(OPT, PathFile  	=> "~/.config/gmusicbrowser/review/%a - %l.txt",
+			 ShowCover	=> 1,
 			 CoverSize	=> 100,
 			 StyleAsGenre	=> 0,
 );
@@ -67,9 +68,12 @@ sub Stop {
 }
 
 sub prefbox {
-	my $spin_picsize = ::NewPrefSpinButton(OPT.'CoverSize',50,500, step=>5, page=>10, text1=>_"Cover Size : ", text2=>_"(applied after restart)");
-	my $btn_amg      = ::NewIconButton('plugin-artistinfo-allmusic',undef, sub {::main::openurl("http://www.allmusic.com/"); },'none',_"Open allmusic.com in your web browser");
-	my $hbox_picsize = ::Hpack($spin_picsize, '-', $btn_amg);
+	my $frame_cover  = Gtk2::Frame->new(_" Album cover ");
+	my $spin_picsize = ::NewPrefSpinButton(OPT.'CoverSize',50,500, step=>5, page=>10, text=>_"Cover Size : ", cb=>sub { ::HasChanged('plugin_albuminfo_option_pic'); } );
+	my $chk_picshow  = ::NewPrefCheckButton(OPT.'ShowCover'=>_"Show", widget => $spin_picsize, cb=>sub { ::HasChanged('plugin_albuminfo_option_pic'); });
+	# my $btn_amg      = ::NewIconButton('plugin-artistinfo-allmusic',undef, sub {::main::openurl("http://www.allmusic.com/"); },'none',_"Open allmusic.com in your web browser");
+	# my $hbox_picsize = ::Hpack($spin_picsize, '-', $btn_amg);
+	$frame_cover->add($chk_picshow);
 
 	my $frame_review = Gtk2::Frame->new(_" Review ");
 	my $entry_path   = ::NewPrefEntry(OPT.'PathFile' => _"Save album info in:", width=>40);
@@ -101,7 +105,7 @@ sub prefbox {
 		push(@chk_show, ::NewPrefCheckButton(OPT.'Show'.$f->{short} => $f->{long})) if $f->{active};
 	}
 	$frame_layout->add(::Hpack(@chk_show));
-	return ::Vpack($hbox_picsize, $frame_review, $frame_fields, $frame_layout);
+	return ::Vpack($frame_cover, $frame_review, $frame_fields, $frame_layout);
 }
 
 
@@ -119,8 +123,21 @@ sub new {
 	$self->{fontsize} = $fontsize->get_size() / Gtk2::Pango->scale;
 
 	# Heading: cover and album info.
-	my $cover = Layout::NewWidget("Cover", {group=>$options->{group}, forceratio=>1, maxsize=>$::Options{OPT.'CoverSize'}, xalign=>0, tip=>_"Click to show fullsize image",
-		click1=>\&cover_popup, click3=>sub {::PopupAAContextMenu({self=>$_[0], field=>'album', ID=>$::SongID, gid=>Songs::Get_gid($::SongID,'album'), mode=>'P'});} });
+	my $cover=Gtk2::HBox->new(0,0);
+	my $group=$options->{group};
+	my $cover_create= sub
+	{	my $box=shift;
+		$box->remove($_) for $box->get_children;
+		return unless $::Options{OPT.'ShowCover'};
+		my $child = Layout::NewWidget("Cover", {group=>$group, forceratio=>1, maxsize=>$::Options{OPT.'CoverSize'},
+			xalign=>0, tip=>_"Click to show larger image", click1=>\&cover_popup,
+			click3=>sub {::PopupAAContextMenu({self=>$_[0], field=>'album', ID=>$::SongID, gid=>Songs::Get_gid($::SongID,'album'), mode=>'P'});} });
+		$child->show_all;
+		$box->add($child);
+	};
+	::Watch($cover, plugin_albuminfo_option_pic=> $cover_create);
+	$cover_create->($cover);
+
 	my $statbox = Gtk2::VBox->new(0,0);
 	for my $name (qw/Ltitle Lstats/) {
 		my $l = Gtk2::Label->new('');
