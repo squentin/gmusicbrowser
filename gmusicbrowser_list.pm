@@ -1766,9 +1766,9 @@ sub new
 		my $pid= $self->{page}= $p->{pid};
 		my $mask=	$Pages{$pid} ? 				$Pages{$pid}[2] :
 				Songs::FilterListProp($pid,'multi') ?	'oni' : 'on';
-		$optB->set_visible  ( $mask=~m/o/ );
-		$spin->set_visible  ( $mask=~m/n/ );
-		$InterB->set_visible( $mask=~m/i/ );
+		$optB->set_visible  ( scalar $mask=~m/o/ );
+		$spin->set_visible  ( scalar $mask=~m/n/ );
+		$InterB->set_visible( scalar $mask=~m/i/ );
 	 });
 
 	$self->add($notebook);
