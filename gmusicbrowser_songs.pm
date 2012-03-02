@@ -1058,7 +1058,11 @@ our %timespan_menu=
  extension =>	   {	name => _"Filename extension",		type=> 'filename',	flags => 'g',
 			get => 'do {my $s=#file->get#; $s=~s#^.*\.##; $s;}',	depend => 'file',
 		   },
- title_or_file	=> {get => '(#title->get# eq "" ? #file->display# : #title->get#)',	type=> 'virtual',	flags => 'g', depend => 'file title', letter => 'S',},	#why letter S ? :)
+ title_or_file	=> {	get => '(#title->get# eq "" ? #file->display# : #title->get#)',
+			type=> 'virtual',	flags => 'gcs',	width	=> 270,
+			name=> _"Title or filename",
+			depend => 'file title', letter => 'S',	#why letter S ? :)
+		   },
 
  missing	=> { flags => 'gan', type => 'integer', bits => 32, }, #FIXME store it using a 8-bit relative number to $::DAYNB
  missingkey	=> { get => 'join "\\x1D",'.join(',',map("#$_->get#",@MissingKeyFields)), depend => "@MissingKeyFields",	type=> 'virtual', },	#used to check if same song
