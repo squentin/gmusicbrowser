@@ -536,7 +536,7 @@ sub loaded #_very_ crude html to gtktextview renderer
 	if ($oklyrics && $oklyrics>0)
 	{	$self->Save_text if $::Options{OPT.'AutoSave'};
 	}
-	else { $buffer->set_modified(0); }
+	#else { $buffer->set_modified(0); }
 }
 
 sub load_pixbuf
