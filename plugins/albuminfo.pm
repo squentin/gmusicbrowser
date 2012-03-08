@@ -47,6 +47,7 @@ my @showfields =
 			 ShowCover	=> 1,
 			 CoverSize	=> 100,
 			 StyleAsGenre	=> 0,
+			 mass_download	=> 'missing',
 );
 ::SetDefaultOptions(OPT, 'Show'.$_->{short} => $_->{defaultshow}) for (@showfields);
 delete $::Options{OPT.'Column'.$_} for 0..3; #remove old column options
@@ -79,7 +80,7 @@ sub Stop {
 }
 
 sub prefbox {
-	my $frame_cover  = Gtk2::Frame->new(_" Album cover ");
+	my $frame_cover  = Gtk2::Frame->new(' '._("Album cover").' ');
 	my $spin_picsize = ::NewPrefSpinButton(OPT.'CoverSize',50,500, step=>5, page=>10, text=>_"Cover Size : ", cb=>sub { ::HasChanged('plugin_albuminfo_option_pic'); } );
 	my $chk_picshow  = ::NewPrefCheckButton(OPT.'ShowCover'=>_"Show", widget => $spin_picsize, cb=>sub { ::HasChanged('plugin_albuminfo_option_pic'); });
 	# my $btn_amg      = ::NewIconButton('plugin-artistinfo-allmusic',undef, sub {::main::openurl("http://www.allmusic.com/"); },'none',_"Open allmusic.com in your web browser");
@@ -386,11 +387,10 @@ sub button_release_cb {
 		if ($tag->{url}) {
 			::main::openurl($tag->{url});
 			last;
-		} elsif ($tag->{field} eq 'year') {
+		} else {
+			my $field= $tag->{field} eq 'year' ? 'year' : '+'.$tag->{field}; # prepend + for multi-value fields : Genre, Mood, Style, Theme
 			my $aID = Songs::Get_gid(::GetSelID($self),'album');
-			Songs::Set(Songs::MakeFilterFromGID('album', $aID)->filter(), [$tag->{field} => $tag->{val}]);
-		} else { # Genre, Mood, Style, Theme
-			Songs::Set(Songs::MakeFilterFromGID('album', Songs::Get_gid(::GetSelID($self),'album'))->filter(), ['+'.$tag->{field} => $tag->{val}]);
+			Songs::Set(Songs::MakeFilterFromGID('album', $aID)->filter(), [$field => $tag->{val}]);
 		}
 	}
 	return ::FALSE;
@@ -610,9 +610,8 @@ sub load_search_results {
 	my $url;
 	for my $entry (@$result) {
 		# Pick the first entry with the right artist and year, or if not: just the right artist.
-		# if (::superlc($entry->{artist}) eq ::superlc($artist)) {
-		if ($entry->{artist} =~ m|$artist|i || $artist =~ m|$entry->{artist}|i) {
-			if (!$url || $year && $entry->{year} && $entry->{year} == $year) {
+		if (::superlc($entry->{artist}) eq ::superlc($artist)) {
+			if (!$url || ($entry->{year} && $entry->{year} == $year)) {
 				warn "Albuminfo: hit in search results: $entry->{album} by $entry->{artist} from $entry->{year} ($entry->{url})\n" if $::debug;
 				$url = $entry->{url}."/review";
 			}
@@ -649,7 +648,11 @@ sub parse_amg_search_results {
 	my @fields = qw/url album artist label year/;
 	my @result;
 	my $i = 0; # Used to sort the hits in manual search
-	push(@result, {%_, order=>$i++}) while (@_{@fields} = splice(@res, 0, 5)); # create an array of hash refs
+	while (@res)
+	{	my %hash= (order=>$i++);
+		@hash{@fields}= splice @res, 0, 5;
+		push @result, \%hash; # create an array of hash refs
+	}
 	return \@result;
 }
 
@@ -763,8 +766,8 @@ sub save_fields {
 	warn "Albuminfo: Saving tracks on $album (".scalar(@towrite)." album".(scalar(@towrite)!=1 ? "s" : "")." in queue).\n" if $::debug;
 	my $IDs = Songs::MakeFilterFromGID('album', Songs::Get_gid($ID,'album'))->filter(); # Songs on this album
 	my @updated_fields;
-	for my $key (keys %fields) {
-		if ($key =~ m/genre|mood|style|theme/ && $::Options{OPT.$key} && $fields{$key}) {
+	for my $key (qw/genre mood style theme/) {
+		if ($::Options{OPT.$key} && $fields{$key}) {
 			if ( $::Options{OPT.'ReplaceFields'} ) {
 				push(@updated_fields, $key, $fields{$key});
 			} else {
