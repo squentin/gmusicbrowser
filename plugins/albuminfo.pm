@@ -49,7 +49,7 @@ my @showfields =
 			 StyleAsGenre	=> 0,
 );
 ::SetDefaultOptions(OPT, 'Show'.$_->{short} => $_->{defaultshow}) for (@showfields);
-
+delete $::Options{OPT.'Column'.$_} for 0..3; #remove old column options
 
 my $albuminfowidget =
 {	class		=> __PACKAGE__,
@@ -60,18 +60,13 @@ my $albuminfowidget =
 	autoadd_type	=> 'context page text',
 };
 
-my @columns = # The order here implies column_sort_id. So Album has id 0, Artist 1 etc.
-(	{title => 'Album',	col => {}},
-	{title => 'Artist',	col => {}},
-	{title => 'Label',	col => {}},
-	{title => 'Year',	col => {}},
+my %Columns=
+(	album	=> { name=> _"Album",				storecol=>0, width=>130, },
+	artist	=> { name=> _"Artist",				storecol=>1, width=>130, },
+	label	=> { name=> ::_p('Record_label',"Label"),	storecol=>2, width=>110, },
+	year	=> { name=> _"Year",				storecol=>3, width=>50, },
 );
-my @ColumnMenu = # The order here must be the same as the order in @columns
-(	{ label => _"Album",	check => sub {return $columns[0]->{col}->get_visible},	code => sub {my $c=$columns[0]->{col}; $c->set_visible(!$c->get_visible)}, },
-	{ label => _"Artist",	check => sub {return $columns[1]->{col}->get_visible},	code => sub {my $c=$columns[1]->{col}; $c->set_visible(!$c->get_visible)}, },
-	{ label => _"Label",	check => sub {return $columns[2]->{col}->get_visible},	code => sub {my $c=$columns[2]->{col}; $c->set_visible(!$c->get_visible)}, },
-	{ label => _"Year",	check => sub {return $columns[3]->{col}->get_visible},	code => sub {my $c=$columns[3]->{col}; $c->set_visible(!$c->get_visible)}, },
-);
+
 my @towrite;              # Needed to avoid progress bar overflow in save_fields when called from mass_download
 my $save_fields_lock = 0; # Needed to avoid progress bar overflow in save_fields when called from mass_download
 
@@ -266,27 +261,28 @@ sub new {
 	$Bok    ->set_size_request(80, -1);
 	$Bcancel->set_size_request(80, -1);
 	# Year is a 'Glib::String' to avoid printing "0" when year is missing. Caveat: will give wrong sort order for albums released before year 1000 or after year 9999 :)
-	my $store = Gtk2::ListStore->new('Glib::String','Glib::String','Glib::String','Glib::String','Glib::String','Glib::UInt'); # Album, Artist, Label, Year, URL, Sort order.
+	my $store = Gtk2::ListStore->new(('Glib::String')x5,'Glib::UInt'); # Album, Artist, Label, Year, URL, Sort order.
 	my $treeview = Gtk2::TreeView->new($store);
-	for (my $id = 0; $id <= $#columns; $id++) {
-		my $column = Gtk2::TreeViewColumn->new_with_attributes(_"$columns[$id]->{title}", Gtk2::CellRendererText->new(), text=>$id);
-		$column->set_sort_column_id($id); $column->set_expand(1); $column->set_resizable(1); $column->set_reorderable(1); 
+	my %coladded;
+	for my $col ( split(/\s+/,$::Options{OPT.'Columns'}||''), qw/album artist label year/ )
+	{	my $coldef= $Columns{$col};
+		next unless $coldef;
+		next if $coladded{$col}++; #only add a column once
+		my $colopt= $::Options{OPT.'Column_'.$col} || {};
+		my $column = Gtk2::TreeViewColumn->new_with_attributes($coldef->{name}, Gtk2::CellRendererText->new(), text=>$coldef->{storecol});
+		$column->{key}=$col;
+		$column->set_sort_column_id($coldef->{storecol}); $column->set_expand(1); $column->set_resizable(1); $column->set_reorderable(1); 
 		$column->set_sizing('fixed');
-		$column->set_fixed_width($::Options{OPT.'Column'.$id}->{width}) if $::Options{OPT.'Column'.$id}->{width};
-		my $visible = defined $::Options{OPT.'Column'.$id}->{visible} ? $::Options{OPT.'Column'.$id}->{visible} : 1;
-		my $order   = defined $::Options{OPT.'Column'.$id}->{order}   ? $::Options{OPT.'Column'.$id}->{order} : $id;
-		$column->set_visible($visible);
-		$treeview->insert_column($column,$order);
-		$columns[$id]->{col} = $column;
+		$column->set_fixed_width( $colopt->{width}||$coldef->{width}||100 );
+		$column->set_visible(!$colopt->{hide});
+		$treeview->append_column($column);
 		# Recreate the header label to be able to catch mouse clicks in column header:
-		my $label = Gtk2::Label->new(_"$columns[$id]->{title}"); $column->set_widget($label); $label->show();
+		my $label = Gtk2::Label->new($coldef->{name}); $column->set_widget($label); $label->show;
 		my $button = $label->get_ancestor('Gtk2::Button'); # The header label is attached to a button by Gtk
-		$button->signal_connect(button_press_event => \&treeview_click_cb, $id) if $button;
+		$button->signal_connect(button_press_event => \&treeview_click_cb, $col) if $button;
 	}
 	$treeview->set_rules_hint(1);
 	$treeview->signal_connect(row_activated => \&entry_selected_cb);
-	$treeview->signal_connect(expose_event => \&expose_event_cb);
-	$treeview->{store} = $store;
 	my $scrwin = Gtk2::ScrolledWindow->new();
 	$scrwin->set_policy('automatic', 'automatic');
 	$scrwin->add($treeview);
@@ -314,22 +310,23 @@ sub new {
 
 	# Save elements that will be needed in other methods.
 	$self->{buffer} = $textview->get_buffer();
-	$self->{store} = $store;
 	$self->{treeview} = $treeview;
 	$self->{infoview} = $infoview;
 	$self->{searchview} = $searchview;
+	$self->{SaveOptions}= \&SaveOptions; #called when widget is removed or when saving options
 	return $self;
 }
 
 
-# Called when the results table in manual search changes (column width, column order etc.)
-sub expose_event_cb {
-	my $tv = $_[0];
-	my $order = 0;
-	for my $column ($tv->get_columns()) {
-		::SetOption(OPT.'Column'.$column->get_sort_column_id() => {order=>$order++, width=>$column->get_width(), visible=>$column->get_visible() || 0});
+sub SaveOptions {
+	my $self = shift;
+	my @cols= $self->{treeview}->get_columns;
+	$::Options{OPT.'Columns'}= join ' ', map $_->{key}, @cols;
+	for my $col (@cols) {
+		my $colopt= $::Options{OPT.'Column_'.$col->{key}}= {};
+		$colopt->{width}= $col->get_width;
+		$colopt->{hide}=1 if !$col->get_visible;
 	}
-	return ::FALSE; # Let Gtk handle it
 }
 
 # Called when headers in the results table in manual search are clicked
@@ -337,13 +334,27 @@ sub treeview_click_cb {
 	my ($button, $event, $colid) = @_;
 	my $treeview = $button->parent;
 	if ($event->button == 1) {
-		my ($sortid,$order) = $treeview->{store}->get_sort_column_id();
-		if ($sortid == $colid && $order eq 'descending') {
-			$treeview->{store}->set_sort_column_id(5,'ascending'); # After third click on column header: return to AMG sort order (default).
+		my ($sortid,$order) = $treeview->get_model->get_sort_column_id();
+		my $storecol= $Columns{$colid}{storecol};
+		if ($sortid == $storecol && $order eq 'descending') {
+			$treeview->get_model->set_sort_column_id(5,'ascending'); # After third click on column header: return to AMG sort order (default).
 			return ::TRUE;
 		}
 	} elsif ($event->button == 3) {
-		::PopupContextMenu( \@ColumnMenu );
+		my $menu=::BuildChoiceMenu( { map { ($_=>$Columns{$_}{name}) } keys %Columns }, #hash of colkey => name
+					reverse=>1,
+					args => {treeview=>$treeview},
+					check=> sub { [map $_->{key}, grep $_->get_visible, $_[0]{treeview}->get_columns]; }, #list of visible columns
+					code => sub {
+						my ($args,$key)=@_;
+						my @cols= $args->{treeview}->get_columns;
+						my ($col)= grep $_->{key} eq $key, @cols;
+						$col->set_visible( !$col->get_visible ) if $col;
+						$cols[0]->set_visible(1) unless grep $_->get_visible, @cols; #make sure one column is visible
+					},
+			);
+		$menu->show_all;
+		$menu->popup(undef,undef,undef,undef,$event->button,$event->time);
 		return ::TRUE;
 	}
 	return ::FALSE; # Let Gtk handle it
@@ -504,7 +515,7 @@ sub new_search {
 	return if $album eq '';
 	my $url = AMG_SEARCH_URL.::url_escapeall($album);
 	$self->cancel();
-	$self->{store}->clear();
+	$self->{treeview}->get_model->clear;
 	warn "Albuminfo: fetching search results from $url.\n" if $::debug;
 	$self->{waiting} = Simple_http::get_with_cb(cb=>sub {$self->print_results(@_)},url=>$url, cache=>1);
 }
@@ -513,9 +524,10 @@ sub print_results {
 	my ($self,$html,$type,$url) = @_;
 	delete $self->{waiting};
 	my $result = parse_amg_search_results($html, $type); # result is a ref to an array of hash refs
-	$self->{store}->set_sort_column_id(5, 'ascending');
+	my $store= $self->{treeview}->get_model;
+	$store->set_sort_column_id(5, 'ascending');
 	for (@$result) {
-		$self->{store}->set($self->{store}->append, 0,$_->{album}, 1,$_->{artist}, 2,$_->{label}, 3,$_->{year}, 4,$_->{url}."/review", 5,$_->{order});
+		$store->set($store->append, 0,$_->{album}, 1,$_->{artist}, 2,$_->{label}, 3,$_->{year}, 4,$_->{url}."/review", 5,$_->{order});
 	}
 }
 
@@ -523,7 +535,7 @@ sub entry_selected_cb {
 	my $self = ::find_ancestor($_[0], __PACKAGE__); # $_[0] may be the TreeView or the 'OK' button. Ancestor is an albuminfo object.
 	my ($path, $column) = $self->{treeview}->get_cursor();
 	unless (defined $path) {$self->{searchview}->hide(); $self->{infoview}->show(); return} # The user may click OK before selecting an album
-	my $store = $self->{treeview}->{store};
+	my $store = $self->{treeview}->get_model;
 	my $url = $store->get($store->get_iter($path),4);
 	warn "Albuminfo: fetching review from $url\n" if $::debug;
 	$self->cancel();
