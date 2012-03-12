@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-11-30 09:05+0900\n"
-"PO-Revision-Date: 2011-11-30 09:16+0900\n"
+"POT-Creation-Date: 2012-02-19 07:22+0900\n"
+"PO-Revision-Date: 2012-03-09 17:26+0900\n"
 "Last-Translator: bluealbum <bluealbum@gmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
 "Language: \n"
@@ -153,14 +153,14 @@ msgstr ""
 "- 재생목록으로부터 현재 노래를 제거하면 다른 노래로 건너뜁니다"
 
 msgid "0 chance"
-msgstr "0 회"
+msgstr "0 기회"
 
 msgid "0 means 'show all'"
 msgstr "0 은 '모두 표시'를 의미합니다"
 
 #, perl-brace-format
 msgid "1 chance in {probability}"
-msgstr "{probability}에서 1회"
+msgstr "{probability}에서 1회 기회"
 
 msgid "3 Filter panes"
 msgstr "3 필터 패널"
@@ -238,6 +238,9 @@ msgstr "음악 추가"
 
 msgid "Add a button to rip a CD"
 msgstr "CD 립 버튼 추가"
+
+msgid "Add a filter"
+msgstr "필터 추가"
 
 msgid "Add a fullscreen button"
 msgstr "전체화면 버튼 추가"
@@ -469,10 +472,10 @@ msgid "Any of :"
 msgstr "어느것 :"
 
 msgid "Append"
-msgstr "적용"
+msgstr "추가"
 
 msgid "Append (only if not already present)"
-msgstr "적용 (이미 존재하지 않을 때만)"
+msgstr "추가 (이미 존재하지 않을 때만)"
 
 msgid "Append to playlist"
 msgstr "재생목록에 추가하기"
@@ -499,15 +502,15 @@ msgstr "음악가 (연도 - 앨범)"
 msgid "Artist Biography"
 msgstr "음악가 일대기"
 
-#, perl-format
-msgid "Artist Picture Size : %d"
-msgstr "음악가 사진 크기 : %d"
-
 msgid "Artist URL"
 msgstr "음악가 주소"
 
 msgid "Artist picture"
 msgstr "음악가 사진"
+
+#, perl-format
+msgid "Artist picture size : %d"
+msgstr "음악가 사진 크기 : %d"
 
 msgid "Artist playcount:"
 msgstr "음악가 재생수:"
@@ -696,6 +699,9 @@ msgstr "대소문자 구분"
 msgid "Case-sensitive"
 msgstr "대소문자 구분"
 
+msgid "Categories pane"
+msgstr "카테고리 패널"
+
 msgid "Centered"
 msgstr "가운데"
 
@@ -805,6 +811,9 @@ msgstr "닫기"
 
 msgid "Close Window"
 msgstr "창 닫기"
+
+msgid "Close a filter"
+msgstr "필터 닫기"
 
 msgid "Close to tray"
 msgstr "트레이 닫기"
@@ -1404,6 +1413,9 @@ msgstr "장르가 설정됨"
 msgid "Genres"
 msgstr "장르"
 
+msgid "Genres pane"
+msgstr "장르 패널"
+
 msgid "Gnome mmkeys"
 msgstr "그놈 mmkeys"
 
@@ -1570,6 +1582,9 @@ msgstr "레이아웃"
 
 msgid "Left aligned"
 msgstr "왼쪽 정렬"
+
+msgid "Left pane"
+msgstr "왼쪽 패널"
 
 msgid "Left-clic or scrollwheel to change, right-click to mute"
 msgstr "음량제거를 하려면 오른쪽 클릭, 왼쪽 클릭 또는 휠 스크롤로 바꾸기"
@@ -1744,6 +1759,9 @@ msgstr "메인"
 msgid "Main artist"
 msgstr "메인 음악가"
 
+msgid "Make it look like"
+msgstr "보기 좋게 만들기"
+
 msgid ""
 "Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
 "gnome."
@@ -1761,6 +1779,9 @@ msgstr "매체 형태"
 
 msgid "Menu entry name"
 msgstr "메뉴 항목 이름"
+
+msgid "Middle-clic for next album"
+msgstr "가운데 클릭을 누르면 다음 앨범으로 가기"
 
 msgid ""
 "Middle-click on local artists to set a filter on them, right-click non-local "
@@ -1786,6 +1807,9 @@ msgstr "월요일"
 
 msgid "Moods"
 msgstr "분위기"
+
+msgid "More info"
+msgstr "자세한 정보"
 
 msgid "More results"
 msgstr "결과"
@@ -2055,6 +2079,9 @@ msgstr "사용자의 웹브라우저에서 allmusic.com 열기"
 
 msgid "Open containing folder"
 msgstr "포함된 폴더 열기"
+
+msgid "Open context & queue panel"
+msgstr "문맥 & 대기열 패널 열기"
 
 msgid "Open context page"
 msgstr "문맥정보 페이지 열기"
@@ -2772,6 +2799,9 @@ msgstr "노래 스크롤하기"
 msgid "Scroll with the song"
 msgstr "노래로 스크롤하기"
 
+msgid "Scrollwheel to change, right-click to mute"
+msgstr "음량 크기는 휠 스크롤로 바꾸고, 음량제거는 오른쪽 클릭하기 "
+
 msgid "Search"
 msgstr "찾기"
 
@@ -2964,6 +2994,9 @@ msgstr "위키페디아 음악가 페이지 벅;"
 
 msgid "Show album"
 msgstr "앨범 표시"
+
+msgid "Show artist picture"
+msgstr "음악가 사진 표시"
 
 msgid "Show artist's biography"
 msgstr "음악가 일대기 보기"
@@ -3208,6 +3241,9 @@ msgid ""
 msgstr ""
 "'시드'-음악가와 비슷한 음악가는 대기열에서 인기있게 사용될 것입니다, 그러나 "
 "사용자는 '시드'-음악가인 그/그녀를 제외하는 것을 결정할 수 있습니다."
+
+msgid "The layout for this desktop widget is missing."
+msgstr "이 데스크탑 위젯을 위한 레이아웃이 없습니다."
 
 msgid "Themes"
 msgstr "테마"
@@ -3471,10 +3507,10 @@ msgid "View binary data ..."
 msgstr "이진 자료 보기 ..."
 
 msgid "Volume : "
-msgstr "음량 :"
+msgstr "음량 : "
 
 msgid "Volume step :"
-msgstr "음량 :"
+msgstr "음량 스텝:"
 
 msgid "Wait for more when queue empty"
 msgstr "대기열이 비면 좀더 기다리세요"
@@ -4767,9 +4803,6 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 #~ msgid "Audacious_PLM"
 #~ msgstr "Audacious_PLM"
 
-#~ msgid "Categories pane"
-#~ msgstr "카테고리 패널"
-
 #~ msgid "Choose Date"
 #~ msgstr "날짜 고르기"
 
@@ -4803,12 +4836,6 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 
 #~ msgid "Garage6"
 #~ msgstr "Garage6"
-
-#~ msgid "Genres pane"
-#~ msgstr "장르 패널"
-
-#~ msgid "Left pane"
-#~ msgstr "왼쪽 패널"
 
 #~ msgid "Load/Save lyrics in :"
 #~ msgstr "가사 로드/저장 :"
@@ -4884,9 +4911,6 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 
 #~ msgid "full"
 #~ msgstr "전체"
-
-#~ msgid "info"
-#~ msgstr "정보"
 
 #~ msgid "is %g"
 #~ msgstr "%g 와 같음"
