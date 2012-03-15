@@ -14,6 +14,7 @@ desc	Search and display lyrics
 package GMB::Plugin::LYRICS;
 use strict;
 use warnings;
+use utf8;
 require $::HTTP_module;
 our @ISA;
 BEGIN {push @ISA,'GMB::Context';}
@@ -62,11 +63,12 @@ my %Sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 	#lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%t&artist=%a',undef,
 	#		sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
 	lyricssongs =>	['lyrics-songs',sub {  ::ReplaceFields($_[0], "http://letras.terra.com.br/winamp.php?musica=%t&artista=%a", sub {::url_escapeall(::superlc($_[0]));})  },undef,
-			sub {	my $l=html_extract($_[0],div=>'letra');
+			sub {	my $is_suggestion= $_[0]=~m#<h3>Provável música</h3>#i;
+				my $l=html_extract($_[0],div=>'letra');
 				$l=~s#<div id="cabecalho">.*?</div>##s if $l; #remove header with title and artist links
 				my $ref=\$_[0];
-				$$ref=$l ? $l : $notfound;
-				return ! !$l
+				$$ref= $l ? $l : $notfound;
+				return $l && !$is_suggestion;
 			}],
 	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%t',undef,
 			 sub {	return 0,'http://lyrics.wikia.com/'.$1 if $_[0]=~m#<span class="redirectText"><a href="/([^"]+)"#;
@@ -534,7 +536,7 @@ sub loaded #_very_ crude html to gtktextview renderer
 	if ($oklyrics && $oklyrics>0)
 	{	$self->Save_text if $::Options{OPT.'AutoSave'};
 	}
-	else { $buffer->set_modified(0); }
+	#else { $buffer->set_modified(0); }
 }
 
 sub load_pixbuf

@@ -47,9 +47,10 @@ my @showfields =
 			 ShowCover	=> 1,
 			 CoverSize	=> 100,
 			 StyleAsGenre	=> 0,
+			 mass_download	=> 'missing',
 );
 ::SetDefaultOptions(OPT, 'Show'.$_->{short} => $_->{defaultshow}) for (@showfields);
-
+delete $::Options{OPT.'Column'.$_} for 0..3; #remove old column options
 
 my $albuminfowidget =
 {	class		=> __PACKAGE__,
@@ -60,22 +61,15 @@ my $albuminfowidget =
 	autoadd_type	=> 'context page text',
 };
 
-my @columns = # The order here implies column_sort_id. So Album has id 0, Artist 1 etc.
-(	{title => 'Album',	col => {}},
-	{title => 'Artist',	col => {}},
-	{title => 'Label',	col => {}},
-	{title => 'Year',	col => {}},
+my %Columns=
+(	album	=> { name=> _"Album",				storecol=>0, width=>130, },
+	artist	=> { name=> _"Artist",				storecol=>1, width=>130, },
+	label	=> { name=> ::_p('Record_label',"Label"),	storecol=>2, width=>110, },
+	year	=> { name=> _"Year",				storecol=>3, width=>50, },
 );
-my @ColumnMenu = # The order here must be the same as the order in @columns
-(	{ label => _"Album",	check => sub {return $columns[0]->{col}->get_visible},	code => sub {my $c=$columns[0]->{col}; $c->set_visible(!$c->get_visible)}, },
-	{ label => _"Artist",	check => sub {return $columns[1]->{col}->get_visible},	code => sub {my $c=$columns[1]->{col}; $c->set_visible(!$c->get_visible)}, },
-	{ label => _"Label",	check => sub {return $columns[2]->{col}->get_visible},	code => sub {my $c=$columns[2]->{col}; $c->set_visible(!$c->get_visible)}, },
-	{ label => _"Year",	check => sub {return $columns[3]->{col}->get_visible},	code => sub {my $c=$columns[3]->{col}; $c->set_visible(!$c->get_visible)}, },
-);
-my %savebuttons;          # Needed for dynamically adding/removing "Save review"-buttons from layout.
+
 my @towrite;              # Needed to avoid progress bar overflow in save_fields when called from mass_download
 my $save_fields_lock = 0; # Needed to avoid progress bar overflow in save_fields when called from mass_download
-
 
 sub Start {
 	Layout::RegisterWidget(PluginAlbuminfo => $albuminfowidget);
@@ -86,9 +80,9 @@ sub Stop {
 }
 
 sub prefbox {
-	my $frame_cover  = Gtk2::Frame->new(_" Album cover ");
-	my $spin_picsize = ::NewPrefSpinButton(OPT.'CoverSize',50,500, step=>5, page=>10, text1=>_"Cover Size : ", text2=>_"(applied after restart)");
-	my $chk_picshow  = ::NewPrefCheckButton(OPT.'ShowCover'=>_"Show", tip=>_"applied after restart", widget => ::Vpack($spin_picsize));
+	my $frame_cover  = Gtk2::Frame->new(' '._("Album cover").' ');
+	my $spin_picsize = ::NewPrefSpinButton(OPT.'CoverSize',50,500, step=>5, page=>10, text=>_"Cover Size : ", cb=>sub { ::HasChanged('plugin_albuminfo_option_pic'); } );
+	my $chk_picshow  = ::NewPrefCheckButton(OPT.'ShowCover'=>_"Show", widget => $spin_picsize, cb=>sub { ::HasChanged('plugin_albuminfo_option_pic'); });
 	# my $btn_amg      = ::NewIconButton('plugin-artistinfo-allmusic',undef, sub {::main::openurl("http://www.allmusic.com/"); },'none',_"Open allmusic.com in your web browser");
 	# my $hbox_picsize = ::Hpack($spin_picsize, '-', $btn_amg);
 	$frame_cover->add($chk_picshow);
@@ -102,9 +96,7 @@ sub prefbox {
 		$t = $t ? ::PangoEsc(_("example : ").$t) : "<i>".::PangoEsc(_"invalid pattern")."</i>";
 		return '<small>'.$t.'</small>';
 	});
-	my $chk_autosave = ::NewPrefCheckButton(OPT.'AutoSave'=>_"Auto-save positive finds", cb=>sub {for my $sb (values %savebuttons) {
-		if ($_[0]->get_active)	{$sb->set_no_show_all(1); $sb->hide} 
-		else 			{$sb->set_no_show_all(0); $sb->parent->show_all}}});
+	my $chk_autosave = ::NewPrefCheckButton(OPT.'AutoSave'=>_"Auto-save positive finds", cb=>sub { ::HasChanged('plugin_albuminfo_option_save'); });
 	$frame_review->add(::Vpack($entry_path,$lbl_preview,$chk_autosave));
 
 	my $frame_fields = Gtk2::Frame->new(_" Fields ");
@@ -183,12 +175,21 @@ sub new {
 	$self->{fontsize} = $fontsize->get_size() / Gtk2::Pango->scale;
 
 	# Heading: cover and album info.
-	my $coverstatbox = Gtk2::HBox->new(0,0);
-	if ($::Options{OPT.'ShowCover'} == 1 ) {
-		my $cover = Layout::NewWidget("Cover", {group=>$options->{group}, forceratio=>1, maxsize=>$::Options{OPT.'CoverSize'}, xalign=>0, tip=>_"Click to show larger image", 
-			click1=>\&cover_popup, click3=>sub {::PopupAAContextMenu({self=>$_[0], field=>'album', ID=>$::SongID, gid=>Songs::Get_gid($::SongID,'album'), mode=>'P'});} });
-		$coverstatbox->pack_start($cover,0,0,0);
-	}
+	my $cover=Gtk2::HBox->new(0,0);
+	my $group=$options->{group};
+	my $cover_create= sub
+	{	my $box=shift;
+		$box->remove($_) for $box->get_children;
+		return unless $::Options{OPT.'ShowCover'};
+		my $child = Layout::NewWidget("Cover", {group=>$group, forceratio=>1, maxsize=>$::Options{OPT.'CoverSize'},
+			xalign=>0, tip=>_"Click to show larger image", click1=>\&cover_popup,
+			click3=>sub {::PopupAAContextMenu({self=>$_[0], field=>'album', ID=>$::SongID, gid=>Songs::Get_gid($::SongID,'album'), mode=>'P'});} });
+		$child->show_all;
+		$box->add($child);
+	};
+	::Watch($cover, plugin_albuminfo_option_pic=> $cover_create);
+	$cover_create->($cover);
+
 	my $statbox = Gtk2::VBox->new(0,0);
 	for my $name (qw/Ltitle Lstats/) {
 		my $l = Gtk2::Label->new('');
@@ -204,7 +205,12 @@ sub new {
 	my $refreshbutton = ::NewIconButton('gtk-refresh', undef, sub { song_changed(::find_ancestor($_[0],__PACKAGE__),undef,undef,1); }, "none", _"Refresh");
 	my $savebutton	  = ::NewIconButton('gtk-save', undef, sub
 		{my $self=::find_ancestor($_[0],__PACKAGE__); save_review(::GetSelID($self),$self->{fields})}, "none", _"Save review");
-	$savebuttons{$self} = $savebutton;
+	$savebutton->show_all;
+	$savebutton->set_no_show_all(1);
+	my $update_savebutton_visible= sub { $_[0]->set_visible( !$::Options{OPT.'AutoSave'} ); };
+	::Watch( $savebutton, plugin_albuminfo_option_save=> $update_savebutton_visible);
+	$update_savebutton_visible->($savebutton);
+
 	my $searchbutton = Gtk2::ToggleButton->new();
 	$searchbutton->set_relief('none');
 	$searchbutton->add(Gtk2::Image->new_from_stock('gtk-find','menu'));
@@ -213,7 +219,6 @@ sub new {
 	my $buttonbox = Gtk2::HBox->new();
 	$buttonbox->pack_end($searchbutton,0,0,0);
 	$buttonbox->pack_end($savebutton,0,0,0);
-	$savebutton->set_no_show_all(1) if $::Options{OPT.'AutoSave'};
 	$buttonbox->pack_end($refreshbutton,0,0,0);
 	$statbox->pack_end($buttonbox,0,0,0);
 	my $stateventbox = Gtk2::EventBox->new(); # To catch mouse events
@@ -221,6 +226,8 @@ sub new {
 	$stateventbox->{group}= $options->{group};
 	$stateventbox->signal_connect(button_press_event => sub {my ($stateventbox, $event) = @_; return 0 unless $event->button == 3; my $ID = ::GetSelID($stateventbox);
 		 ::PopupAAContextMenu({ self=>$stateventbox, mode=>'P', field=>'album', ID=>$ID, gid=>Songs::Get_gid($ID,'album') }) if defined $ID; return 1; } );
+	my $coverstatbox = Gtk2::HBox->new(0,0);
+	$coverstatbox->pack_start($cover,0,0,0);
 	$coverstatbox->pack_end($stateventbox,1,1,5);
 
 	# For the review: a TextView in a ScrolledWindow in a HBox
@@ -255,27 +262,28 @@ sub new {
 	$Bok    ->set_size_request(80, -1);
 	$Bcancel->set_size_request(80, -1);
 	# Year is a 'Glib::String' to avoid printing "0" when year is missing. Caveat: will give wrong sort order for albums released before year 1000 or after year 9999 :)
-	my $store = Gtk2::ListStore->new('Glib::String','Glib::String','Glib::String','Glib::String','Glib::String','Glib::UInt'); # Album, Artist, Label, Year, URL, Sort order.
+	my $store = Gtk2::ListStore->new(('Glib::String')x5,'Glib::UInt'); # Album, Artist, Label, Year, URL, Sort order.
 	my $treeview = Gtk2::TreeView->new($store);
-	for (my $id = 0; $id <= $#columns; $id++) {
-		my $column = Gtk2::TreeViewColumn->new_with_attributes(_"$columns[$id]->{title}", Gtk2::CellRendererText->new(), text=>$id);
-		$column->set_sort_column_id($id); $column->set_expand(1); $column->set_resizable(1); $column->set_reorderable(1); 
+	my %coladded;
+	for my $col ( split(/\s+/,$::Options{OPT.'Columns'}||''), qw/album artist label year/ )
+	{	my $coldef= $Columns{$col};
+		next unless $coldef;
+		next if $coladded{$col}++; #only add a column once
+		my $colopt= $::Options{OPT.'Column_'.$col} || {};
+		my $column = Gtk2::TreeViewColumn->new_with_attributes($coldef->{name}, Gtk2::CellRendererText->new(), text=>$coldef->{storecol});
+		$column->{key}=$col;
+		$column->set_sort_column_id($coldef->{storecol}); $column->set_expand(1); $column->set_resizable(1); $column->set_reorderable(1); 
 		$column->set_sizing('fixed');
-		$column->set_fixed_width($::Options{OPT.'Column'.$id}->{width}) if $::Options{OPT.'Column'.$id}->{width};
-		my $visible = defined $::Options{OPT.'Column'.$id}->{visible} ? $::Options{OPT.'Column'.$id}->{visible} : 1;
-		my $order   = defined $::Options{OPT.'Column'.$id}->{order}   ? $::Options{OPT.'Column'.$id}->{order} : $id;
-		$column->set_visible($visible);
-		$treeview->insert_column($column,$order);
-		$columns[$id]->{col} = $column;
+		$column->set_fixed_width( $colopt->{width}||$coldef->{width}||100 );
+		$column->set_visible(!$colopt->{hide});
+		$treeview->append_column($column);
 		# Recreate the header label to be able to catch mouse clicks in column header:
-		my $label = Gtk2::Label->new(_"$columns[$id]->{title}"); $column->set_widget($label); $label->show();
+		my $label = Gtk2::Label->new($coldef->{name}); $column->set_widget($label); $label->show;
 		my $button = $label->get_ancestor('Gtk2::Button'); # The header label is attached to a button by Gtk
-		$button->signal_connect(button_press_event => \&treeview_click_cb, $id) if $button;
+		$button->signal_connect(button_press_event => \&treeview_click_cb, $col) if $button;
 	}
 	$treeview->set_rules_hint(1);
 	$treeview->signal_connect(row_activated => \&entry_selected_cb);
-	$treeview->signal_connect(expose_event => \&expose_event_cb);
-	$treeview->{store} = $store;
 	my $scrwin = Gtk2::ScrolledWindow->new();
 	$scrwin->set_policy('automatic', 'automatic');
 	$scrwin->add($treeview);
@@ -299,26 +307,27 @@ sub new {
 	$self->pack_start($searchview,1,1,0);
 	$searchview->signal_connect(show => sub {$searchbutton->set_active(1)});
 	$searchview->signal_connect(hide => sub {$searchbutton->set_active(0)});
-	$self->signal_connect(destroy => sub {$_[0]->cancel(); delete $savebuttons{$_[0]}});
+	$self->signal_connect(destroy => sub {$_[0]->cancel()});
 
 	# Save elements that will be needed in other methods.
 	$self->{buffer} = $textview->get_buffer();
-	$self->{store} = $store;
 	$self->{treeview} = $treeview;
 	$self->{infoview} = $infoview;
 	$self->{searchview} = $searchview;
+	$self->{SaveOptions}= \&SaveOptions; #called when widget is removed or when saving options
 	return $self;
 }
 
 
-# Called when the results table in manual search changes (column width, column order etc.)
-sub expose_event_cb {
-	my $tv = $_[0];
-	my $order = 0;
-	for my $column ($tv->get_columns()) {
-		::SetOption(OPT.'Column'.$column->get_sort_column_id() => {order=>$order++, width=>$column->get_width(), visible=>$column->get_visible() || 0});
+sub SaveOptions {
+	my $self = shift;
+	my @cols= $self->{treeview}->get_columns;
+	$::Options{OPT.'Columns'}= join ' ', map $_->{key}, @cols;
+	for my $col (@cols) {
+		my $colopt= $::Options{OPT.'Column_'.$col->{key}}= {};
+		$colopt->{width}= $col->get_width;
+		$colopt->{hide}=1 if !$col->get_visible;
 	}
-	return ::FALSE; # Let Gtk handle it
 }
 
 # Called when headers in the results table in manual search are clicked
@@ -326,13 +335,27 @@ sub treeview_click_cb {
 	my ($button, $event, $colid) = @_;
 	my $treeview = $button->parent;
 	if ($event->button == 1) {
-		my ($sortid,$order) = $treeview->{store}->get_sort_column_id();
-		if ($sortid == $colid && $order eq 'descending') {
-			$treeview->{store}->set_sort_column_id(5,'ascending'); # After third click on column header: return to AMG sort order (default).
+		my ($sortid,$order) = $treeview->get_model->get_sort_column_id();
+		my $storecol= $Columns{$colid}{storecol};
+		if ($sortid == $storecol && $order eq 'descending') {
+			$treeview->get_model->set_sort_column_id(5,'ascending'); # After third click on column header: return to AMG sort order (default).
 			return ::TRUE;
 		}
 	} elsif ($event->button == 3) {
-		::PopupContextMenu( \@ColumnMenu );
+		my $menu=::BuildChoiceMenu( { map { ($_=>$Columns{$_}{name}) } keys %Columns }, #hash of colkey => name
+					reverse=>1,
+					args => {treeview=>$treeview},
+					check=> sub { [map $_->{key}, grep $_->get_visible, $_[0]{treeview}->get_columns]; }, #list of visible columns
+					code => sub {
+						my ($args,$key)=@_;
+						my @cols= $args->{treeview}->get_columns;
+						my ($col)= grep $_->{key} eq $key, @cols;
+						$col->set_visible( !$col->get_visible ) if $col;
+						$cols[0]->set_visible(1) unless grep $_->get_visible, @cols; #make sure one column is visible
+					},
+			);
+		$menu->show_all;
+		$menu->popup(undef,undef,undef,undef,$event->button,$event->time);
 		return ::TRUE;
 	}
 	return ::FALSE; # Let Gtk handle it
@@ -364,11 +387,10 @@ sub button_release_cb {
 		if ($tag->{url}) {
 			::main::openurl($tag->{url});
 			last;
-		} elsif ($tag->{field} eq 'year') {
+		} else {
+			my $field= $tag->{field} eq 'year' ? 'year' : '+'.$tag->{field}; # prepend + for multi-value fields : Genre, Mood, Style, Theme
 			my $aID = Songs::Get_gid(::GetSelID($self),'album');
-			Songs::Set(Songs::MakeFilterFromGID('album', $aID)->filter(), [$tag->{field} => $tag->{val}]);
-		} else { # Genre, Mood, Style, Theme
-			Songs::Set(Songs::MakeFilterFromGID('album', Songs::Get_gid(::GetSelID($self),'album'))->filter(), ['+'.$tag->{field} => $tag->{val}]);
+			Songs::Set(Songs::MakeFilterFromGID('album', $aID)->filter(), [$field => $tag->{val}]);
 		}
 	}
 	return ::FALSE;
@@ -493,7 +515,7 @@ sub new_search {
 	return if $album eq '';
 	my $url = AMG_SEARCH_URL.::url_escapeall($album);
 	$self->cancel();
-	$self->{store}->clear();
+	$self->{treeview}->get_model->clear;
 	warn "Albuminfo: fetching search results from $url.\n" if $::debug;
 	$self->{waiting} = Simple_http::get_with_cb(cb=>sub {$self->print_results(@_)},url=>$url, cache=>1);
 }
@@ -502,9 +524,10 @@ sub print_results {
 	my ($self,$html,$type,$url) = @_;
 	delete $self->{waiting};
 	my $result = parse_amg_search_results($html, $type); # result is a ref to an array of hash refs
-	$self->{store}->set_sort_column_id(5, 'ascending');
+	my $store= $self->{treeview}->get_model;
+	$store->set_sort_column_id(5, 'ascending');
 	for (@$result) {
-		$self->{store}->set($self->{store}->append, 0,$_->{album}, 1,$_->{artist}, 2,$_->{label}, 3,$_->{year}, 4,$_->{url}."/review", 5,$_->{order});
+		$store->set($store->append, 0,$_->{album}, 1,$_->{artist}, 2,$_->{label}, 3,$_->{year}, 4,$_->{url}."/review", 5,$_->{order});
 	}
 }
 
@@ -512,7 +535,7 @@ sub entry_selected_cb {
 	my $self = ::find_ancestor($_[0], __PACKAGE__); # $_[0] may be the TreeView or the 'OK' button. Ancestor is an albuminfo object.
 	my ($path, $column) = $self->{treeview}->get_cursor();
 	unless (defined $path) {$self->{searchview}->hide(); $self->{infoview}->show(); return} # The user may click OK before selecting an album
-	my $store = $self->{treeview}->{store};
+	my $store = $self->{treeview}->get_model;
 	my $url = $store->get($store->get_iter($path),4);
 	warn "Albuminfo: fetching review from $url\n" if $::debug;
 	$self->cancel();
@@ -587,9 +610,8 @@ sub load_search_results {
 	my $url;
 	for my $entry (@$result) {
 		# Pick the first entry with the right artist and year, or if not: just the right artist.
-		# if (::superlc($entry->{artist}) eq ::superlc($artist)) {
-		if ($entry->{artist} =~ m|$artist|i || $artist =~ m|$entry->{artist}|i) {
-			if (!$url || $year && $entry->{year} && $entry->{year} == $year) {
+		if (::superlc($entry->{artist}) eq ::superlc($artist)) {
+			if (!$url || ($entry->{year} && $entry->{year} == $year)) {
 				warn "Albuminfo: hit in search results: $entry->{album} by $entry->{artist} from $entry->{year} ($entry->{url})\n" if $::debug;
 				$url = $entry->{url}."/review";
 			}
@@ -626,7 +648,11 @@ sub parse_amg_search_results {
 	my @fields = qw/url album artist label year/;
 	my @result;
 	my $i = 0; # Used to sort the hits in manual search
-	push(@result, {%_, order=>$i++}) while (@_{@fields} = splice(@res, 0, 5)); # create an array of hash refs
+	while (@res)
+	{	my %hash= (order=>$i++);
+		@hash{@fields}= splice @res, 0, 5;
+		push @result, \%hash; # create an array of hash refs
+	}
 	return \@result;
 }
 
@@ -740,8 +766,8 @@ sub save_fields {
 	warn "Albuminfo: Saving tracks on $album (".scalar(@towrite)." album".(scalar(@towrite)!=1 ? "s" : "")." in queue).\n" if $::debug;
 	my $IDs = Songs::MakeFilterFromGID('album', Songs::Get_gid($ID,'album'))->filter(); # Songs on this album
 	my @updated_fields;
-	for my $key (keys %fields) {
-		if ($key =~ m/genre|mood|style|theme/ && $::Options{OPT.$key} && $fields{$key}) {
+	for my $key (qw/genre mood style theme/) {
+		if ($::Options{OPT.$key} && $fields{$key}) {
 			if ( $::Options{OPT.'ReplaceFields'} ) {
 				push(@updated_fields, $key, $fields{$key});
 			} else {
