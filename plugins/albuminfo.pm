@@ -96,7 +96,7 @@ sub prefbox {
 		$t = $t ? ::PangoEsc(_("example : ").$t) : "<i>".::PangoEsc(_"invalid pattern")."</i>";
 		return '<small>'.$t.'</small>';
 	});
-	my $chk_autosave = ::NewPrefCheckButton(OPT.'AutoSave' => _"Auto-save positive finds"); #, tip=>_"Only works when the review tab is displayed");
+	my $chk_autosave = ::NewPrefCheckButton(OPT.'AutoSave'=>_"Auto-save positive finds", cb=>sub { ::HasChanged('plugin_albuminfo_option_save'); });
 	$frame_review->add(::Vpack($entry_path,$lbl_preview,$chk_autosave));
 
 	my $frame_fields = Gtk2::Frame->new(_" Fields ");
@@ -165,6 +165,12 @@ sub new {
 	my $refreshbutton = ::NewIconButton('gtk-refresh', undef, sub { song_changed(::find_ancestor($_[0],__PACKAGE__),undef,undef,1); }, "none", _"Refresh");
 	my $savebutton	  = ::NewIconButton('gtk-save', undef, sub
 		{my $self=::find_ancestor($_[0],__PACKAGE__); save_review(::GetSelID($self),$self->{fields})}, "none", _"Save review");
+	$savebutton->show_all;
+	$savebutton->set_no_show_all(1);
+	my $update_savebutton_visible= sub { $_[0]->set_visible( !$::Options{OPT.'AutoSave'} ); };
+	::Watch( $savebutton, plugin_albuminfo_option_save=> $update_savebutton_visible);
+	$update_savebutton_visible->($savebutton);
+
 	my $searchbutton = Gtk2::ToggleButton->new();
 	$searchbutton->set_relief('none');
 	$searchbutton->add(Gtk2::Image->new_from_stock('gtk-find','menu'));
@@ -172,7 +178,7 @@ sub new {
 		if ($_[0]->get_active()) {$self->manual_search()} else {$self->song_changed()}});
 	my $buttonbox = Gtk2::HBox->new();
 	$buttonbox->pack_end($searchbutton,0,0,0);
-	$buttonbox->pack_end($savebutton,0,0,0); # unless $::Options{OPT.'AutoSave'};
+	$buttonbox->pack_end($savebutton,0,0,0);
 	$buttonbox->pack_end($refreshbutton,0,0,0);
 	$statbox->pack_end($buttonbox,0,0,0);
 	my $stateventbox = Gtk2::EventBox->new(); # To catch mouse events
