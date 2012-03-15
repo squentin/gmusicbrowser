@@ -1042,6 +1042,9 @@ our %timespan_menu=
  #		ogg : 	peak 0,000115100738184992
  #			gain 64,82
 
+ playedlength	=> {	name=> "Played length", type=>'length', flags=> 'g',
+			get => '#playcount->get# * #length->get#',  _=>'#get#',
+		   },
  version_or_empty	=> { get => 'do {my $v=#version->get#; $v eq "" ? "" : " ($v)"}',	type=> 'virtual',	depend => 'version',	flags => 'g', letter => 'V', },
  album_years	=> { name => _"Album year(s)", get => 'AA::Get("year:range","album",#album->get_gid#)',	type=> 'virtual',	depend => 'album year',	flags => 'g', letter => 'Y', }, #depends on years from other songs too
  uri		=> { get => '"file://".::url_escape(#path->get# .::SLASH. #file->get#)',	type=> 'virtual',	depend => 'file path',	flags => 'g', },
