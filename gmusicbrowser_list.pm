@@ -4112,7 +4112,7 @@ sub RENDER
 		$maxwidth-= 3*XPAD+$psize;
 		$maxwidth=5 if $maxwidth<5;
 		my $width= $hash->{$gid} / $max * $maxwidth;
-		$widget->style->paint_flat_box( $window,$state,'none',$expose_area,$widget,'cell_odd_ruled_last',
+		$widget->style->paint_flat_box( $window,$state,'none',$expose_area,$widget,'cell_odd_ruled',
 			$x+$psize+PAD, $cell_area->y, $width, $cell_area->height );
 	}
 
