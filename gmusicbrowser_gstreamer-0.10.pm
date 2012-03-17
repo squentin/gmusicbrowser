@@ -534,22 +534,14 @@ my $RGA_songmenu=
 push @::SongCMenu,$RGA_songmenu;
 
 sub Analyse_byAlbum
-{	my $IDs=$_[0];
-	Songs::SortList($IDs,'album');
-	my @list; my @album; my $aid0;
-	for my $ID (@$IDs)
-	{	my $aid= Songs::Get($ID,'album');
-		if (defined $aid0)
-		{	if ($aid0 eq $aid) {push @album,$ID;next}	# same album
-			else						# different album
-			{	push @list, (@album>1 ? [@album] : $album[0]);	#add songs from previous album as a group
-				$aid0=undef; @album=undef;
-			}
-		}
-		if ($aid eq '') {push @list,$ID}	# songs with no album -> add song on its own
-		else {$aid0=$aid; @album=($ID)}		# new album
+{	my @IDs= ::uniq(@{ $_[0] });
+	my $hash= Songs::BuildHash('album',\@IDs,undef,'idlist');
+	my @list;
+	for my $aid (keys %$hash)
+	{	my $IDs= $hash->{$aid};
+		if (@$IDs<2 || Songs::Gid_to_Get('album',$aid) eq '') { push @list, @$IDs; } #no album name or only 1 song in album => push as single songs
+		else { push @list, $IDs; } # push as an album
 	}
-	if (defined $aid0) { push @list, (@album>1 ? [@album] : $album[0]); } # add songs from last album as a group
 	Analyse(\@list);
 }
 sub Analyse
