@@ -498,7 +498,10 @@ sub GetUrl
 	my $artist = ::url_escapeall( Songs::Gid_to_Get("artist",$aID) );
 	return unless length $artist;
 	$url=~s/%a/$artist/;
-	$url=~s/%l/$::Options{OPT.'SimilarLimit'}/;
+	my $limit;
+	if ($::Options{OPT.'SimilarLimit'} != "0") { $limit = $::Options{OPT.'SimilarLimit'}; }
+	else { $limit = ""; }
+	$url=~s/%l/$limit/;
 	return $url;
 }
 
