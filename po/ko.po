@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2012-02-19 07:22+0900\n"
-"PO-Revision-Date: 2012-03-09 17:26+0900\n"
+"POT-Creation-Date: 2012-03-18 06:33+0900\n"
+"PO-Revision-Date: 2012-03-18 06:34+0900\n"
 "Last-Translator: bluealbum <bluealbum@gmail.com>\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
 "Language: \n"
@@ -124,9 +124,6 @@ msgstr "'{file}' 이미 존재합니다. 덮어쓸까요?"
 msgid "(%d song excluded)"
 msgid_plural "(%d songs excluded)"
 msgstr[0] "(%d 노래 제외됨)"
-
-msgid "(applied after restart)"
-msgstr "(재시작 후 적용됩니다)"
 
 msgid "(case insensitive)"
 msgstr "(대소문자 구분)"
@@ -361,6 +358,9 @@ msgstr "앨범 음악가"
 msgid "Album artist or artist"
 msgstr "앨범 음악가 또는 음악가"
 
+msgid "Album cover"
+msgstr "앨범 표지"
+
 msgid "Album gain"
 msgstr "앨범 게인"
 
@@ -446,10 +446,11 @@ msgstr "모든 테마"
 
 msgid ""
 "Allmusic uses both Genres and Styles to describe albums. If you use only "
-"Genres, you may want to include Styles in the list of Genres."
+"Genres, you may want to include Styles in allmusic's list of Genres."
 msgstr ""
 "모든 음악은 장르와 앨범 설명을 위한 스타일 둘다 사용합니다. 사용자가 장르만 "
-"사용할 경우, 사용자는 장르의 목록에 스타일을 포함하기를 원할 것입니다."
+"사용할 경우, 사용자는 장르의 모든 음악의 목록에 스타일을 포함하기를 원할 것입"
+"니다."
 
 msgid "Allow for scheduling fade-out and stop"
 msgstr "패이드-아웃과 멈추기 스케쥴링을 허용하기"
@@ -803,6 +804,9 @@ msgstr "선택한 필드 비우기"
 msgid "Click to show fullsize image"
 msgstr "이미지를 전체 크기로 표시하려면 누르세요"
 
+msgid "Click to show larger image"
+msgstr "이미지를 크게 표시하려면 누르세요"
+
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "클라이언트 금지됨, 프로그램 개발자와 접촉하세요"
 
@@ -1064,6 +1068,9 @@ msgstr "주 창이 보일 때는 알림을 표시하지 않기"
 msgid "Don't submit current song"
 msgstr "현재 노래 제출하지 않기"
 
+msgid "Download"
+msgstr "다운로드"
+
 msgid "Drag and drop songs here to replace the selection."
 msgstr "선택한 것을 바꾸려면 여기에 노래를 끌어다 놓으세요."
 
@@ -1272,6 +1279,9 @@ msgstr ""
 "'{file}' 삭제 실패함 :\n"
 "{error}"
 
+msgid "Fetching albuminfo"
+msgstr "앨범정보 가져오는 중"
+
 msgid "Field name"
 msgstr "필드 이름"
 
@@ -1280,6 +1290,14 @@ msgstr "파일 종류"
 
 msgid "Fields"
 msgstr "필드"
+
+msgid ""
+"Fields will be saved according to the settings above. Albuminfo files will "
+"be re-read if there are fields to be saved and you choose 'albums missing "
+"reviews' in the combo box."
+msgstr ""
+"필드는 위의 설정에 따라서 저장될 것입니다. 앨범정보 파일은 필드가 저장되거나 "
+"사용자가 선택 상자에서 '앨범들 누락된 리뷰'를 고르면 다시 읽혀질 것입니다."
 
 msgid "File"
 msgstr "파일"
@@ -1538,6 +1556,10 @@ msgstr "키"
 msgid "Keywords"
 msgstr "키워드"
 
+msgid "Label"
+msgstr "라벨"
+
+msgctxt "Record_label"
 msgid "Label"
 msgstr "라벨"
 
@@ -1906,9 +1928,6 @@ msgstr "분위기 사용안함"
 msgid "No results found"
 msgstr "찾지 못했습니다"
 
-msgid "No results found."
-msgstr "결과를 찾지 못했습니다."
-
 msgid "No review found"
 msgstr "리뷰를 찾지 못했습니다"
 
@@ -2037,9 +2056,6 @@ msgstr "id3v1 태그를 가지지 않은 mp3 파일에만 영향을 줍니다"
 
 msgid "Only show similar artists from local library"
 msgstr "로컬 라이브러리로부터 비슷한 음악가만 표시"
-
-msgid "Only works when the review tab is displayed"
-msgstr "리뷰 탭이 표시될 때에만 동작합니다"
 
 msgid "Opacity"
 msgstr "불투명"
@@ -2479,7 +2495,7 @@ msgid "Recently played songs"
 msgstr "최근 재생한 노래들"
 
 msgid "Record label"
-msgstr "이름 기록하기"
+msgstr "음반 회사"
 
 msgid "Recording Dates"
 msgstr "레코딩 자료"
@@ -2648,7 +2664,7 @@ msgid "Reset filter"
 msgstr "필터 재설정"
 
 msgid "Retrieves album-relevant information (review etc.) from allmusic.com."
-msgstr "allmusic.com로부터 앨범에 관련된 정보 (리뷰 등.)를 검색하기."
+msgstr "allmusic.com 사이트에서 앨범에 관련된 정보 (리뷰 등.)를 검색하기."
 
 msgid "Review"
 msgstr "리뷰"
@@ -2751,9 +2767,9 @@ msgstr "리뷰 저장"
 
 msgid ""
 "Save selected fields for all tracks on the same album whenever album data is "
-"loaded from AMG or from file."
+"loaded from allmusic or from file."
 msgstr ""
-"앨범 자료가 AMG로 부터 또는 파일로 부터 가져올지 여부를 같은 앨범상의 모든 트"
+"앨범 자료가 모든 음악 또는 파일로 부터 가져올지 여부를 같은 앨범상의 모든 트"
 "랙을 위해 선택한 필드에 저장하기"
 
 #, perl-format
@@ -3169,6 +3185,9 @@ msgstr "정지"
 msgid "Stop checking"
 msgstr "검사 중지"
 
+msgid "Stop fetching albuminfo"
+msgstr "앨범정보 가져오기를 중지"
+
 msgid "Stop scanning"
 msgstr "스캐닝 중지"
 
@@ -3298,6 +3317,9 @@ msgstr "제목 & 진행"
 
 msgid "Title - Artist - Album"
 msgstr "제목 - 음악가 - 앨범"
+
+msgid "Title or filename"
+msgstr "제목 또는 파일이름"
 
 #, perl-format
 msgid "Title: %t"
@@ -3670,10 +3692,16 @@ msgstr "이후"
 msgid "after %s"
 msgstr "%s 이후"
 
+msgid "album information now for"
+msgstr "다음을 위한 앨범 정보"
+
 #. comma-separated list of field aliases for album, these are in addition to english aliases
 msgctxt "Field_aliases"
 msgid "album,on"
 msgstr "앨범,on"
+
+msgid "albums missing reviews"
+msgstr "앨범들의 누락된 리뷰"
 
 msgid "alphabetical"
 msgstr "알파벳 순으로"
@@ -3913,6 +3941,9 @@ msgstr "비어 있음"
 
 msgid "enable gapless (experimental)"
 msgstr "갭리스 사용하기 (실험중임)"
+
+msgid "entire collection"
+msgstr "전체 음반"
 
 msgid "error"
 msgstr "에러"
@@ -4494,6 +4525,9 @@ msgstr "설정"
 msgid "set to %s"
 msgstr "%s 로 설정"
 
+msgid "show histogram background"
+msgstr "막대그래프 배경 표시"
+
 msgid "show pictures"
 msgstr "사진 표시"
 
@@ -4794,6 +4828,9 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 #~ msgid "(: )none"
 #~ msgstr "(: )없음"
 
+#~ msgid "(applied after restart)"
+#~ msgstr "(재시작 후 적용됩니다)"
+
 #~ msgid "All but the [most/less]%n"
 #~ msgstr "모두 그러나 [most/less]%n"
 
@@ -4840,8 +4877,14 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 #~ msgid "Load/Save lyrics in :"
 #~ msgstr "가사 로드/저장 :"
 
+#~ msgid "No results found."
+#~ msgstr "결과를 찾지 못했습니다."
+
 #~ msgid "Not found."
 #~ msgstr "찾지 못함."
+
+#~ msgid "Only works when the review tab is displayed"
+#~ msgstr "리뷰 탭이 표시될 때에만 동작합니다"
 
 #~ msgid "Playlist, Library & Context"
 #~ msgstr "재생목록, 라이브러리 & 항목"
