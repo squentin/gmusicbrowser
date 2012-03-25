@@ -4726,7 +4726,12 @@ sub update_scrollbar
 	my $pagesize=$self->{viewwindowsize}[1]||0;
 	my $upper=$self->{viewsize}[1]||0;
 	my $adj=$scroll->get_adjustment;
-	my $oldpos= $adj->upper ? ($adj->page_size/2+$adj->value) / $adj->upper : 0;
+	my $oldpos= $adj->value;
+	my $oldupper=$adj->upper;
+	# calculate the old position in a 0 to 1 scale
+	$oldpos= !($oldupper && $oldpos) ?		0: # at the beginning => stay there
+		 $oldupper<=$oldpos+$adj->page_size ?	1: # at the end => stay there
+							($adj->page_size/2+$oldpos) / $oldupper; #base position on middle of current position
 	$adj->page_size($pagesize);
 	if ($upper>$pagesize)	{$scroll->show; $adj->upper($upper); $scroll->queue_draw; }
 	else			{$scroll->hide; $adj->upper(0);}
