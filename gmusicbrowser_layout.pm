@@ -1260,7 +1260,7 @@ sub GetShowHideState
 
 sub ToggleFullscreen
 {	return unless $_[0];
-	my $win=$_[0]->get_toplevel;
+	my $win= ::get_layout_widget($_[0])->get_toplevel;
 	if ($win->{fullscreen}) {$win->unfullscreen}
 	else {$win->fullscreen} }
 
