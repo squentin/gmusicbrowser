@@ -22,6 +22,7 @@ use utf8;
 package main;
 use Gtk2 '-init';
 use Glib qw/filename_from_unicode filename_to_unicode/;
+use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime _exit/;
 {no warnings 'redefine'; #some work arounds for old versions of perl-Gtk2 and/or gtk2
  *filename_to_utf8displayname=\&Glib::filename_display_name if *Glib::filename_display_name{CODE};
  *PangoEsc=\&Glib::Markup::escape_text if *Glib::Markup::escape_text{CODE}; #needs perl-Gtk2 version >=1.092
@@ -42,8 +43,11 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  }
  my $set_clip_rectangle_orig=\&Gtk2::Gdk::GC::set_clip_rectangle;
  *Gtk2::Gdk::GC::set_clip_rectangle=sub { &$set_clip_rectangle_orig if $_[1]; } if $Gtk2::VERSION <1.102; #work-around $rect can't be undef in old bindings versions
+ if ($POSIX::VERSION<1.18)
+ {	my ($strftime_encoding)= setlocale(LC_TIME)=~m#\.([^@]+)#;
+	*strftime_utf8= sub { $strftime_encoding ? Encode::decode($strftime_encoding, &strftime) : &strftime; };
+ }
 }
-use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime _exit/;
 use List::Util qw/min max sum first/;
 use File::Copy;
 use File::Spec::Functions qw/file_name_is_absolute catfile rel2abs/;
@@ -774,6 +778,10 @@ our %SIZEUNITS=
 		m => [1000000,_"MB"],
 );
 
+sub strftime_utf8
+{	utf8::upgrade($_[0]); &strftime;
+}
+
 sub ConvertTime	# convert date pattern into nb of seconds
 {	my ($date,$unit)= $_[0]=~m/^\s*(\d+|\d*?[.]\d+)\s*([a-zA-Z]*)\s*$/;
 	return 0 unless $date;
@@ -787,11 +795,6 @@ sub ConvertSize
 	if (my $ref= $SIZEUNITS{lc$unit}) { $size*= $ref->[0] }
 	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
 	return $size;
-}
-
-my ($strftime_encoding)= setlocale(LC_TIME)=~m#\.([^@]+)#;
-sub strftime2	# try to return an utf8 value from strftime
-{	$strftime_encoding ? Encode::decode($strftime_encoding, &strftime) : &strftime;
 }
 
 #---------------------------------------------------------------
@@ -5850,7 +5853,7 @@ sub PrefMisc
 	#date format
 	my $dateex= mktime(5,4,3,2,0,(localtime)[5]);
 	my $datetip= join "\n", _"use standard strftime variables",	_"examples :",
-			map( sprintf("%s : %s",$_,strftime2($_,localtime($dateex))), split(/ *\| */,"%a %b %d %H:%M:%S %Y | %A %B %I:%M:%S %p %Y | %d/%m/%y %H:%M | %X %x | %F %r | %c | %s") ),
+			map( sprintf("%s : %s",$_,strftime_utf8($_,localtime($dateex))), split(/ *\| */,"%a %b %d %H:%M:%S %Y | %A %B %I:%M:%S %p %Y | %d/%m/%y %H:%M | %X %x | %F %r | %c | %s") ),
 			'',
 			_"Additionally this format can be used :\n default number1 format1 number2 format2 ...\n dates more recent than number1 seconds will use format1, ...";
 	my $datefmt=NewPrefEntry(DateFormat => _"Date format :", tip => $datetip, history=> 'DateFormat_history');
@@ -8406,7 +8409,7 @@ sub new
 {	my ($class,$val,$opt)=@_;
 	my $self= bless Gtk2::Button->new;
 	$self->{date}= $val || ::mktime( ( $opt->{value_index} ? (59,59,23) : (0,0,0) ), (localtime)[3,4,5]); # default to today 0:00 or today 23:59
-	$self->set_label( ::strftime2('%c',localtime($self->{date})) );
+	$self->set_label( ::strftime_utf8('%c',localtime($self->{date})) );
 	$self->signal_connect (clicked => sub
 	{	my $self=shift;
 		if ($self->{popup}) { $self->destroy_calendar; return; }
@@ -8441,7 +8444,7 @@ sub popup_calendar
 			$y-=1900;
 			my @time= map $_->get_value, reverse @{$_[0]{timeadjs}};
 			$self->{date}= ::mktime(@time,$d,$m,$y);
-			$self->set_label( ::strftime2('%c',@time,$d,$m,$y) );
+			$self->set_label( ::strftime_utf8('%c',@time,$d,$m,$y) );
 			$self->destroy_calendar;
 			GMB::FilterBox::changed($self);
 			GMB::FilterBox::activate($self);

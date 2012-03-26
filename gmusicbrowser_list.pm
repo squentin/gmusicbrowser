@@ -7492,7 +7492,7 @@ no warnings;
 
 our %alias=( 'if' => 'iff', pesc => '::PangoEsc', min =>'::min', max =>'::max', sum =>'::sum',);
 our %functions=
-(	formattime=> ['do {my ($f,$t,$z)=(',		'); !$t && defined $z ? $z : ::strftime2($f,localtime($t)); }'],
+(	formattime=> ['do {my ($f,$t,$z)=(',		'); !$t && defined $z ? $z : ::strftime_utf8($f,localtime($t)); }'],
 	#sum	=>   ['do {my $sum; $sum+=$_ for ',	';$sum}'],
 	average	=>   ['do {my $sum=::sum(',		'); @l ? $sum/@l : undef}'],
 	#max	=>   ['do {my ($max,@l)=(',		'); $_>$max and $max=$_ for @l; $max}'],

@@ -528,7 +528,7 @@ our %timespan_menu=
 		'filterdesc:-h'		=> _"not the %s most recent",
 		'filterdesc:-t'		=> _"not the %s least recent",
 		'filterpat:ago'		=> [ unit=> \%::DATEUNITS, default_unit=> 'd', ],
-		'filterpat:date'	=> [ display=> sub { my $var=shift; $var= ::strftime2('%c',localtime $var) if $var=~m/^\d+$/; $var; }, ],
+		'filterpat:date'	=> [ display=> sub { my $var=shift; $var= ::strftime_utf8('%c',localtime $var) if $var=~m/^\d+$/; $var; }, ],
 		default_filter		=> '<ago',
 		'smartfilter:>' => \&Filter::_smartstring_date_moreless,
 		'smartfilter:<' => \&Filter::_smartstring_date_moreless,
@@ -547,18 +547,19 @@ our %timespan_menu=
 		rightalign=>0,
 	},
 	'date.year' =>
-	{	mktime	=> '::mktime(0,0,0,1,0,(localtime(#_#))[5])',
-		gid_to_display => '(#GID# ? ::strftime2("%Y",localtime(#GID#)) : _"never")',
+	{	mktime		=> '::mktime(0,0,0,1,0,(localtime(#_#))[5])',
+		gid_to_display	=> '(#GID# ? ::strftime_utf8("%Y",localtime(#GID#)) : _"never")',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".(::mktime(0,0,0,1,0,(localtime(#GID#))[5]+1)-1))',
 	},
 	'date.month' =>
-	{	mktime	=> '::mktime(0,0,0,1,(localtime(#_#))[4,5])',
-		gid_to_display => '(#GID# ? ::strftime2("%b %Y",localtime(#GID#)) : _"never")',
+	{	mktime		=> '::mktime(0,0,0,1,(localtime(#_#))[4,5])',
+		gid_to_display	=> '(#GID# ? ::strftime_utf8("%b %Y",localtime(#GID#)) : _"never")',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($m,$y)= (localtime(#GID#))[4,5]; ::mktime(0,0,0,1,$m+1,$y)-1})',
 	},
 	'date.day' =>
-	{	mktime	=> '::mktime(0,0,0,(localtime(#_#))[3,4,5])',
-		gid_to_display => '(#GID# ? ::strftime2("%x",localtime(#GID#)) : _"never")',
+	{	mktime		=> '::mktime(0,0,0,(localtime(#_#))[3,4,5])',
+		gid_to_display	=> '(#GID# ? ::strftime_utf8("%x",localtime(#GID#)) : _"never")',
+		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($d,$m,$y)= (localtime(#GID#))[3,4,5]; ::mktime(0,0,0,$d+1,$m,$y)-1})',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($d,$m,$y)= (localtime(#GID#))[3,4,5]; ::mktime(0,0,0,$d+1,$m,$y)-1})',
 	},
 	boolean	=>
@@ -2060,7 +2061,7 @@ sub DateString
 		last if $diff>$max;
 		$fmt=shift @formats;
 	}
-	::strftime2($fmt,localtime $time);
+	::strftime_utf8($fmt,localtime $time);
 }
 
 #sub Album_Artist #guess album artist
