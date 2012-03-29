@@ -116,7 +116,7 @@ our %timespan_menu=
 		'filter:s'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___name[$_], "#VAL#")  .!=. -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
 		'filter:m'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___name[$_]  .=~. m"#VAL#"  ,@$v) : ___name[$v]  .=~. m"#VAL#"; }',
 		'filter:mi'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___iname[$_] .=~. m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
-		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
+		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ---- AFTER: #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}',
 		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v }',
 		'hashm:name'	=> 'do {my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : () }',
@@ -178,8 +178,8 @@ our %timespan_menu=
 		gid_isearch	=> '__#mainfield#_iname[#GID#] =~ m/#RE#/',
 		makefilter	=> '"#field#:~:".##mainfield#->gid_to_sgid#',
 		#group		=> '#_# !=',
-		stats		=> 'do {my $v=#_#; #HVAL#{__#mainfield#_name[$_]}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[keys %{#HVAL#}];',
-		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[keys %{#HVAL#}];',
+		stats		=> 'do {my $v=#_#; #HVAL#{__#mainfield#_name[$_]}=undef for ref $v ? @$v : $v;}  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
+		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_}=undef for ref $v ? @$v : $v;}  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
 		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v}',
 		listall		=> '##mainfield#->listall#',
 		'filterdesc:~'	=> [ _"includes artist %s", _"includes artist",	'menustring', ],
@@ -247,7 +247,7 @@ our %timespan_menu=
 		makefilter	=> '"#field#:~:" . #gid_to_sgid#',
 		update		=> 'my $albumname=#get#; #set(VAL=$albumname)#;',
 		listall		=> 'grep !vec(__#mainfield#_empty,$_,1), 2..@#_name#-1',
-		'stats:artistsort'	=> '#HVAL#->{ #album_artist->get_gid# }=undef;  ---- #HVAL#=do { my @ar= keys %{#HVAL#}; @ar>1 ? ::superlc(_"Various artists") : __artist_iname[$ar[0]]; }',
+		'stats:artistsort'	=> '#HVAL#->{ #album_artist->get_gid# }=undef;  ---- AFTER: #HVAL#=do { my @ar= keys %{#HVAL#}; @ar>1 ? ::superlc(_"Various artists") : __artist_iname[$ar[0]]; }',
 		#plugin		=> 'picture',
 		load_extra	=> ' __#mainfield#_gid{#SGID#} || return;',
 		save_extra	=> 'my %h; while ( my ($sgid,$gid)=each %__#mainfield#_gid ) { $h{$sgid}= [#SUBFIELDS#] } delete $h{""}; return \%h;',
@@ -268,7 +268,7 @@ our %timespan_menu=
 		'filter:e'	=> '#_# .eq. "#VAL#"',
 		hash		=> '#_#',
 		group		=> '#_# ne',
-		stats		=> '#HVAL#{#_#}=undef;  ---- #HVAL#=[keys %{#HVAL#}];',
+		stats		=> '#HVAL#{#_#}=undef;  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
 	},
 	istring => # _much_ faster with case/accent insensitive operations, at the price of double memory
 	{	parent	=> 'string',
@@ -349,8 +349,8 @@ our %timespan_menu=
 		gid_isearch	=> '#_iname#[#GID#] =~ m/#RE#/',
 		makefilter	=> '"#field#:~:".#_name#[#GID#]',
 		group		=> '#_# !=',
-		stats		=> '#HVAL#{#_name#[#_#]}=undef;  ----  #HVAL#=[keys %{#HVAL#}];',
-		'stats:gid'	=> '#HVAL#{#_#}=undef;  ----  #HVAL#=[keys %{#HVAL#}];',
+		stats		=> '#HVAL#{#_name#[#_#]}=undef;  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
+		'stats:gid'	=> '#HVAL#{#_#}=undef;  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
 		listall		=> '2..@#_name#-1',
 		edit_listall	=> 1,
 		parent		=> 'generic',
@@ -375,8 +375,8 @@ our %timespan_menu=
 		'filter_prep:<'	=>  \&filter_prep_numbers,
 		'filter_prep:e'	=>  \&filter_prep_numbers,
 		'group'		=> '#_# !=',
-		'stats:range'	=> 'push @{#HVAL#},#_#;  ---- #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
-		'stats:average'	=> 'push @{#HVAL#},#_#;  ---- #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
+		'stats:range'	=> 'push @{#HVAL#},#_#;  ---- AFTER: #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
+		'stats:average'	=> 'push @{#HVAL#},#_#;  ---- AFTER: #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
 		'stats:sum'	=> '#HVAL# += #_#;',
 		stats		=> '#HVAL#{#_#+0}=undef;',
 		hash		=> '#_#+0',
@@ -476,8 +476,8 @@ our %timespan_menu=
 		diff	=> '(#VAL# eq "" ? 255 : #VAL#)!=#_#',
 		get	=> '(#_#==255 ? "" : #_#)',
 		display	=> '(#_#==255 ? "" : #_#)',
-		'stats:range'	=> 'push @{#HVAL#},#_default#;  ---- #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
-		'stats:average'	=> 'push @{#HVAL#},#_default#;  ---- #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
+		'stats:range'	=> 'push @{#HVAL#},#_default#;  ---- AFTER: #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
+		'stats:average'	=> 'push @{#HVAL#},#_default#;  ---- AFTER: #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
 		check	=> '#VAL#= #VAL# =~m/^\d+$/ ? (#VAL#>100 ? 100 : #VAL#) : "";',
 		set	=> '{ my $v=#VAL#; #_default#= ($v eq "" ? $::Options{DefaultRating} : $v); #_# = ($v eq "" ? 255 : $v); }',
 		makefilter	=> '"#field#:~:#GID#"',
@@ -745,7 +745,7 @@ our %timespan_menu=
 	check	=> '#VAL#= #VAL# =~m/(\d\d\d\d)/ ? $1 : 0;',
 	id3v1	=> 3,		id3v2 => 'TDRC|TYER', 'id3v2.3'=> 'TYER|TDRC',	'id3v2.4'=> 'TDRC|TYER',	vorbis	=> 'date|year',	ape	=> 'Record Date|Year', ilst => "\xA9day",
 	gid_to_display	=> '#GID# ? #GID# : _"None"',
-	'stats:range'	=> '#HVAL#{#_#}=undef;  ---- delete #HVAL#{0}; #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} keys %{#HVAL#})[0,-1]; !defined $m0 ? "" : $m0==$m1 ? $m0 : "$m0 - $m1"}',
+	'stats:range'	=> '#HVAL#{#_#}=undef;  ---- AFTER: delete #HVAL#{0}; #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} keys %{#HVAL#})[0,-1]; !defined $m0 ? "" : $m0==$m1 ? $m0 : "$m0 - $m1"}',
 	editwidth => 6,
 	edit_order=> 50,	edit_many=>1,	letter => 'y',
 	can_group=>1,
@@ -2329,8 +2329,10 @@ sub BuildHash
 {	my ($field,$IDs,$opt,@types)=@_; #warn "Songs::BuildHash(@_)\n";
 	$opt= $opt? ':'.$opt : '';
 	my ($keycode,$multi)= LookupCode($field, 'hash'.$opt.'|hash', 'hashm'.$opt.'|hashm',[ID => '$ID']);
+	$keycode||=$multi;
 	unless ($keycode || $multi) { warn "BuildHash error : can't find code for field $field\n"; return } #could return empty hashes ?
-	($keycode,my $keyafter)= split / +---- +/,$keycode||$multi,2;
+	my $init=	$keycode=~s/^\s*INIT:(.*?)\s+----\s+//	? "$1;" : '';
+	my $keyafter=	$keycode=~s/----\s+AFTER:(.*)$//	? $1 :'';
 	@types=('id:count') unless @types;
 
 	my $after='';
@@ -2344,7 +2346,9 @@ sub BuildHash
 		$opt= $opt ? 'stats:'.$opt : 'stats';
 		$f||= 'id'; # mostly for :uniq but also :list and :count
 		my $c= LookupCode($f, $opt, [ID=>'$ID', ($arg ? (ARG=>"'$arg'") : () )]);
-		($c,my $af)= split / +---- +/,$c,2;
+		$c=~s/\$\$/'$V'.$i.'_'/ge;	# $$name  => $V5_name  if $i==5
+		$init.=";$1;" if $c=~s/^\s*INIT:(.*?)\s+----\s+//;
+		my $af= $c=~s/----\s+AFTER:(.*)$//		? $1 :'';
 #warn "BuildHash $field  : $f  $opt => $c // $af\n";
 		my $hval= $multi ? '$h'.$i.'{$key}' : "\$h$i\{$keycode}";
 		$code.=  Macro($c, HVAL=> $hval).";\n";
@@ -2355,7 +2359,7 @@ sub BuildHash
 	$code="for my \$ID (@\$lref) {\n  $code\n}\n$after";
 	my $hlist= join ',',map "\%h$_",1..$i;
 	my $hlistref= join ',',map "\\\%h$_",1..$i;
-	$code= "my \$lref=\$_[0]; my ($hlist);\n$code;\nreturn $hlistref;";
+	$code= "my \$lref=\$_[0]; $init; my ($hlist);\n$code;\nreturn $hlistref;";
 
 #warn "BuildHash($field $opt,@types)=>\n$code\n";
 	my $sub= eval "sub { no warnings 'uninitialized'; $code }";
