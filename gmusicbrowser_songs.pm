@@ -562,6 +562,99 @@ our %timespan_menu=
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($d,$m,$y)= (localtime(#GID#))[3,4,5]; ::mktime(0,0,0,$d+1,$m,$y)-1})',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($d,$m,$y)= (localtime(#GID#))[3,4,5]; ::mktime(0,0,0,$d+1,$m,$y)-1})',
 	},
+	dates	=>
+	{	parent		=> 'generic', #? for m mi s si filters
+		_		=> '____[#ID#]',
+		default		=> 'undef',
+		bits		=> 32,	packformat=> 'L', # replace with 64 and Q for 64bits dates
+		bytes		=> '#bits#/8',
+		check		=> ';',
+		get_list	=> 'unpack("#packformat#*",#_#||"")',
+		display		=> 'join("\n",map Songs::DateString($_), reverse #get_list#)',
+		gid_to_get	=> '#GID#',
+		gid_to_display	=> 'Songs::DateString(#GID#)',
+		#n_sort		=> 'unpack("#packformat#*",substr(#_#||"",-#bytes#))', #sort by last date, not used
+		'n_sort:gid'	=> '#GID#',
+		get		=> 'join(" ",#get_list#)',
+		set		=> '{	my $v=#VAL#;
+					my @list= sort { $a <=> $b } (!$v ? () : ref $v ? @$v : split /\D+/,$v);
+					#_#= !@list ? undef : pack("#packformat#*", @list);
+				   }', #use undef instead of '' if no dates to save some memory
+		diff		=> 'do {my $old=#_#||""; my $new=#VAL#; $new= pack "#packformat#*",sort { $a <=> $b } (ref $new ? @$new : split /\D+/,$new); $old ne $new; }',
+		set_multi	=> 'do {my %h; $h{$_}=0 for #get_list#; my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}= (exists $h{$_} ? -1 : 1) for @$toggle; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
+		'filter:ecount'	=> '#VAL# .==. length(#_#)/#bytes#',
+		'stats:count'	=> '#HVAL# += length(#_#)/#bytes#;',
+		#example of use : Songs::BuildHash('artist',$::Library,undef,'playhistory:countrange:DATE1-DATE2'));  where DATE1 and DATE2 are secongs since epoch and DATE1<DATE2
+		'stats:countrange'	=> 'INIT: my ($$date1,$$date2)= #ARG#=~m/(\d+)/g; ---- #HVAL# ++ for grep $$date1<$_ && $$date2>$_, #get_list#;', #count plays between 2 dates (in seconds since epoch)
+		'stats:countafter'	=> '#HVAL# ++ for grep #ARG#<$_, #get_list#;', #count plays after date (in seconds since epoch)
+		'stats:countbefore'	=> '#HVAL# ++ for grep #ARG#>$_, #get_list#;', #count plays before date (in seconds since epoch)
+		stats		=> 'do {#HVAL#{$_}=undef for #get_list#;};',
+		'filter:e'	=> '.!!. do{ grep($_ == #VAL#, #get_list#) }',
+		'filter:>'	=> '.!!. do{ grep($_ > #VAL#, #get_list#) }',
+		'filter:<'	=> '.!!. do{ grep($_ < #VAL#, #get_list#) }',
+		'filter:b'	=> '.!!. do{ grep($_ >= #VAL1# && $_ <= #VAL2#, #get_list#) }',
+		'filter_prep:>'	=>  \&filter_prep_numbers,
+		'filter_prep:<'	=>  \&filter_prep_numbers,
+		'filter_prep:e'	=>  \&filter_prep_numbers,
+		'filter_prep:b'	=>  \&filter_prep_numbers,
+		'filter_prep:>ago'	=> \&::ConvertTime,
+		'filter_prep:<ago'	=> \&::ConvertTime,
+		'filter_prep:bago'	=> \&::ConvertTime,
+		'filter:>ago'	=> '.!!. do{ grep($_ < #VAL#, #get_list#) }',
+		'filter:<ago'	=> '.!!. do{ grep($_ > #VAL#, #get_list#) }',
+		'filter:bago'	=> '.!!. do{ grep($_ >= #VAL1# && $_ <= #VAL2#, #get_list#) }',
+		#copy of filterdesc:* smartfilter:* from date type
+		'filterdesc:>ago'	=> [_"more than %s ago",	_"more than",	'ago', ],
+		'filterdesc:<ago'	=> [_"less than %s ago",	_"less than",	'ago', ],
+		'filterdesc:>'		=> [_"after %s",		_"after",	'date', ],
+		'filterdesc:<'		=> [_"before %s",		_"before",	'date', ],
+		'filterdesc:b'		=> [_"between %s and %s",	_"between (absolute dates)", 'date date'],
+		'filterdesc:bago'	=> [_"between %s ago and %s ago", _"between (relative dates)", 'ago ago'],
+		'filterdesc:->ago'	=> _"less than %s ago",
+		'filterdesc:-<ago'	=> _"more than %s ago",
+		'filterdesc:->'		=> _"before %s",
+		'filterdesc:-<'		=> _"after %s",
+		'filterdesc:-b'		=> _"not between %s and %s",
+		'filterdesc:-bago'	=> _"not between %s ago and %s ago",
+		'filterdesc:h'		=> [ _"the %s most recent",	_"the most recent",	'number'],	#"the %s latest" "the latest" ?
+		'filterdesc:t'		=> [ _"the %s least recent",	_"the least recent",	'number'],	#"the %s earliest" "the earliest" ?
+		'filterdesc:-h'		=> _"not the %s most recent",
+		'filterdesc:-t'		=> _"not the %s least recent",
+		'filterpat:ago'		=> [ unit=> \%::DATEUNITS, default_unit=> 'd', ],
+		'filterpat:date'	=> [ display=> sub { my $var=shift; $var= ::strftime_utf8('%c',localtime $var) if $var=~m/^\d+$/; $var; }, ],
+		default_filter		=> '<ago',
+		'smartfilter:>' => \&Filter::_smartstring_date_moreless,
+		'smartfilter:<' => \&Filter::_smartstring_date_moreless,
+		'smartfilter:<='=> \&Filter::_smartstring_date_moreless,
+		'smartfilter:>='=> \&Filter::_smartstring_date_moreless,
+		'smartfilter:=' => \&Filter::_smartstring_date,
+		'smartfilter::' => \&Filter::_smartstring_date,
+
+		#get_gid		=> '[#get_list#]',
+		#hashm			=> '#get_list#',
+		#mktime			=> '$_',
+		 #for dates.year, dates.month, dates.day :
+		get_gid	=> '[#_# ? (map #mktime#,#get_list#) : 0]',
+		hashm	=> '(#_# ? (map #mktime#,#get_list#) : 0)',	#or use post-hash modification for 0 case
+		subtypes_menu=> \%timespan_menu,
+
+	},
+	#identical to date.*, except #_# is replaced by $_ in mktime, and "e" filter by "ecount"
+	'dates.year' =>
+	{	mktime		=> '::mktime(0,0,0,1,0,(localtime($_))[5])',
+		gid_to_display	=> '(#GID# ? ::strftime_utf8("%Y",localtime(#GID#)) : _"never")',
+		makefilter	=> '"#field#:".(!#GID# ? "ecount:0" : "b:".#GID#." ".(::mktime(0,0,0,1,0,(localtime(#GID#))[5]+1)-1))',
+	},
+	'dates.month' =>
+	{	mktime		=> '::mktime(0,0,0,1,(localtime($_))[4,5])',
+		gid_to_display	=> '(#GID# ? ::strftime_utf8("%b %Y",localtime(#GID#)) : _"never")',
+		makefilter	=> '"#field#:".(!#GID# ? "ecount:0" : "b:".#GID#." ".do{my ($m,$y)= (localtime(#GID#))[4,5]; ::mktime(0,0,0,1,$m+1,$y)-1})',
+	},
+	'dates.day' =>
+	{	mktime		=> '::mktime(0,0,0,(localtime($_))[3,4,5])',
+		gid_to_display	=> '(#GID# ? ::strftime_utf8("%x",localtime(#GID#)) : _"never")',
+		makefilter	=> '"#field#:".(!#GID# ? "ecount:0" : "b:".#GID#." ".do{my ($d,$m,$y)= (localtime(#GID#))[3,4,5]; ::mktime(0,0,0,$d+1,$m,$y)-1})',
+	},
 	boolean	=>
 	{	parent	=> 'integer',	bits => 1,
 		check	=> '#VAL#= #VAL# ? 1 : 0;',
@@ -880,7 +973,16 @@ our %timespan_menu=
 	'filterdesc:e:0'	=> _"never",
 	'filterdesc:-e:0'	=> _"has been played",	#FIXME better description
 	category=>'stats',
+	#alias	=> 'played',
+ },
+ playhistory	=>
+ {	name	=> _"Play history",	flags => 'fgalc',	type => 'dates',
+	FilterList => {type=>'year',},
+	'filterdesc:ecount:0'	=> _"never",
+	'filterdesc:-ecount:0'	=> _"has been played",	#FIXME better description
 	alias	=> 'played',
+	category=>'stats',
+	disable=>0,	options => 'disable',
  },
  lastskip	=>
  {	name	=> _"Last skipped",	width => 100,	flags => 'fgasc',	type => 'date',
@@ -890,6 +992,15 @@ our %timespan_menu=
 	'filterdesc:-e:0'	=> _"has been skipped",	#FIXME better description
 	category=>'stats',
 	alias	=> 'skipped',
+ },
+ skiphistory	=>
+ {	name	=> _"Skip history",	flags => 'fgalc',	type => 'dates',
+	FilterList => {type=>'year',},
+	'filterdesc:ecount:0'	=> _"never",
+	'filterdesc:-ecount:0'	=> _"has been skipped",	#FIXME better description
+	#alias	=> 'skipped',
+	category=>'stats',
+	disable=>1,	options => 'disable',
  },
  playcount	=>
  {	name	=> _"Play count",	width => 50,	flags => 'fgaesc',	type => 'integer',	letter => 'p',
@@ -1621,6 +1732,7 @@ sub ReReadFile		#force values :
 	}
 }
 
+#FIXME check if fields are enabled and add a way (option?) to silently ignore disabled fields
 sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,field=>newval,...);  ID can be an arrayref
 {	warn "Songs::Set(@_) called from : ".join(':',caller)."\n" if $::debug;
 	my ($IDs,$modif,%opt);

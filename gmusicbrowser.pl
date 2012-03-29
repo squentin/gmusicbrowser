@@ -2416,11 +2416,11 @@ sub Played
 
 	if ($partial) #FIXME maybe only count as a skip if played less than ~20% ?
 	{	my $nb= 1+Songs::Get($ID,'skipcount');
-		Songs::Set($ID, skipcount=> $nb, lastskip=> $StartTime);
+		Songs::Set($ID, skipcount=> $nb, lastskip=> $StartTime, '+skiphistory'=>$StartTime);
 	}
 	else
 	{	my $nb= 1+Songs::Get($ID,'playcount');
-		Songs::Set($ID, playcount=> $nb, lastplay=> $StartTime);
+		Songs::Set($ID, playcount=> $nb, lastplay=> $StartTime, '+playhistory'=>$StartTime);
 	}
 }
 
