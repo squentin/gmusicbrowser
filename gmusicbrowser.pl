@@ -5293,7 +5293,7 @@ sub AutoSelPicture
 
 			my $path= Songs::BuildHash('path', $IDs);
 			for my $folder (keys %$path)
-			{	my $count_in_folder= AA::Get('count','path',$folder);
+			{	my $count_in_folder= AA::Get('id:count','path',$folder);
 				#warn " removing $folder $count_in_folder != $path->{$folder}\n" if $count_in_folder != $path->{$folder} if $::debug;
 				delete $path->{$folder} if $count_in_folder != $path->{$folder};
 			}

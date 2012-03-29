@@ -15,7 +15,7 @@ package Songs;
 our $IDFromFile;
 our ($Artists_split_re,$Artists_title_re);
 my (@Missing,$MissingHash,@MissingKeyFields);
-our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%GTypes,%HSort,%Aliases);
+our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%HSort,%Aliases);
 my %FuncCache;
 INIT {
 our %timespan_menu=
@@ -592,6 +592,13 @@ our %timespan_menu=
 	category=>'file',
 	alias	=> 'filename',
  },
+ id	=>
+ {	type=> 'integer',
+	_ => '#ID#',
+	'stats:list'	=> 'push @{#HVAL#}, #ID#',
+	'stats:uniq'	=> '#HVAL#=undef', #doesn't really belong here, but simpler this way
+	'stats:count'	=> '#HVAL#++',
+ },
  path	=>
  {	name	=> _"Folder",	width => 200, flags => 'fgasc_',	type => 'filename',
 	'filter:i'	=> '#_# .=~. m/^#VAL#(?:$::QSLASH|$)/o',
@@ -1130,18 +1137,6 @@ our %HSort=
 (	string	=> '$h->{$a} cmp $h->{$b} ||',
 	number	=> '$h->{$a} <=> $h->{$b} ||',
 	year2	=> 'substr($h->{$a},-4,4) cmp substr($h->{$b},-4,4) ||',
-);
-
-our %GTypes= #FIXME could be better
-(	idlist	=> {code => 'push @{#HVAL#}, #ID#', },
-	#filetoid=> {code => '#HVAL#{ #file->get# }=#ID#',	depend=>'file',	},
-	uniq	=> {code => '#HVAL#=undef'},
-	count	=> {code => '#HVAL#++'},
-	#length	=> {code => '__H__+=__LENGTH__',	depend=>'length',	},
-	#year	=> {code => '__H__{__YEAR__}=undef',	after=>'delete __H__{""}; my @l=sort { $a <=> $b } keys %{__H__}; __H__= @l==0 ? "" : @l==1 ? $l[0] : "$l[0] - $l[-1]";',	depend=>'year',	},
-	#label	=> {code => '__H__{$_}=undef for split /\x00/,__LABEL__;',	after=>'__H__=[keys %{__H__}];',	depend=>'label',	},
-	#album	=> {code => '__H__{__ALBUM__}=undef',	after=>'__H__=[keys %{__H__}];',	depend=>'album',},
-	#artist	=> {code => '__H__{$_}=undef for split /$Artists_split_re/,__ARTIST__;',	after=>'__H__=[keys %{__H__}];',	depend=>'artist',	},
 );
 
 # discname
@@ -1777,7 +1772,7 @@ sub CheckMissing
 	$song->{track}= $song->{track}=~m/^(\d+)/ ? $1+0 : 0;
 
 	my $key=join "\x1D", @$song{@MissingKeyFields};
-	$MissingHash||= BuildHash('missingkey',\@Missing,undef,'idlist');
+	$MissingHash||= BuildHash('missingkey',\@Missing,undef,'id:list');
 	my $IDs=$MissingHash->{$key};
 	return undef unless $IDs;
 	for my $oldID (@$IDs)
@@ -1997,7 +1992,7 @@ sub ListLength
 #FIXME cache the BuildHash sub
 sub UniqList #FIXME same as UniqList2. use "string" (for artist) in this one and not in UniqList2 ?
 {	my ($field,$IDs,$sorted)=@_; #warn "Songs::UniqList(@_)\n";
-	my $h=BuildHash($field,$IDs,undef,'uniq');	#my $h=BuildHash($field,$IDs,'string','uniq'); ??????
+	my $h=BuildHash($field,$IDs,undef,':uniq');	#my $h=BuildHash($field,$IDs,'string',':uniq'); ??????
 	return [keys %$h] unless $sorted;
 	return [sort keys %$h]; #FIXME more sort modes ?
 }
@@ -2289,6 +2284,7 @@ sub Depends
 	my %h;
 	for my $f (grep $_ ne '', @fields)
 	{	$f=~s#[.:].*##;
+		next unless $f;
 		unless ($Def{$f}) {warn "Songs::Depends : Invalid field $f\n";next}
 		$h{$f}=undef;
 		if (my $d= $Def{$f}{depend}) { $h{$_}=undef for split / /,$d; }
@@ -2328,23 +2324,26 @@ sub SetTagValue #rename ?
 	return ::TRUE;	#FIXME could check if it has worked
 }
 
+my %buildhash_deprecated= (idlist=>'id:list',count=>'id:count',uniq=>':uniq');
 sub BuildHash
 {	my ($field,$IDs,$opt,@types)=@_; #warn "Songs::BuildHash(@_)\n";
 	$opt= $opt? ':'.$opt : '';
 	my ($keycode,$multi)= LookupCode($field, 'hash'.$opt.'|hash', 'hashm'.$opt.'|hashm',[ID => '$ID']);
 	unless ($keycode || $multi) { warn "BuildHash error : can't find code for field $field\n"; return } #could return empty hashes ?
 	($keycode,my $keyafter)= split / +---- +/,$keycode||$multi,2;
-	@types=('count') unless @types;
+	@types=('id:count') unless @types;
 
 	my $after='';
 	my $code;
 	my $i;
 	for my $type (@types)
 	{	$i++;
-		my ($f,$opt)=split /:/,$type,2;
+		if ($buildhash_deprecated{$type}) { warn "BuildHash: using '$type' is deprecated, use '$buildhash_deprecated{$type}' instead\n" if ::VERSION>1.1009 || $::debug; $type=$buildhash_deprecated{$type}; }
+		my ($f,$opt,$arg)=split /:/,$type,3;
+		$arg=~y/-A-Z0-9:.,//cd if $arg;
 		$opt= $opt ? 'stats:'.$opt : 'stats';
-		my $c= $GTypes{$f} ? $GTypes{$f}{code} : LookupCode($f, $opt); #FIXME could be better
-		$c=~s/#ID#/\$ID/g;
+		$f||= 'id'; # mostly for :uniq but also :list and :count
+		my $c= LookupCode($f, $opt, [ID=>'$ID', ($arg ? (ARG=>"'$arg'") : () )]);
 		($c,my $af)= split / +---- +/,$c,2;
 #warn "BuildHash $field  : $f  $opt => $c // $af\n";
 		my $hval= $multi ? '$h'.$i.'{$key}' : "\$h$i\{$keycode}";
@@ -2772,15 +2771,15 @@ our %ReplaceFields=
 (	'%'	=>	sub {'%'},
 	a	=>	sub { my $s=Songs::Gid_to_Display($_[0],$_[1]); defined $s ? $s : $_[1]; }, #FIXME PHASE1 Gid_to_Display should return something $_[1] if no gid_to_display
 	l	=>	sub { my $l=Get('length:sum',$_[0],$_[1]); $l=::__x( ($l>=3600 ? _"{hours}h{min}m{sec}s" : _"{min}m{sec}s"), hours => (int $l/3600), min => ($l>=3600 ? sprintf('%02d',$l/60%60) : $l/60%60), sec => sprintf('%02d',$l%60)); },
-	L	=>	sub { ::CalcListLength( Get('idlist',$_[0],$_[1]),'length:sum' ); }, #FIXME is CalcListLength needed ?
+	L	=>	sub { ::CalcListLength( Get('id:list',$_[0],$_[1]),'length:sum' ); }, #FIXME is CalcListLength needed ?
 	y	=>	sub { Get('year:range',$_[0],$_[1]); },
 	Y	=>	sub { my $y=Get('year:range',$_[0],$_[1]); return $y? " ($y)" : '' },
-	s	=>	sub { my $l=Get('idlist',$_[0],$_[1])||[]; ::__('%d song','%d songs',scalar @$l) },
+	s	=>	sub { my $l=Get('id:list',$_[0],$_[1])||[]; ::__('%d song','%d songs',scalar @$l) },
 	x	=>	sub { my $nb=@{GetXRef($_[0],$_[1])}; return $_[0] ne 'album' ? ::__("%d Album","%d Albums",$nb) : ::__("%d Artist","%d Artists",$nb);  },
 	X	=>	sub { my $nb=@{GetXRef($_[0],$_[1])}; return $_[0] ne 'album' ? ::__("%d Album","%d Albums",$nb) : $nb>1 ? ::__("%d Artist","%d Artists",$nb) : '';  },
 	b	=>	sub {	if ($_[0] ne 'album') { my $nb=@{GetXRef($_[0],$_[1])}; return ::__("%d Album","%d Albums",$nb); }
 				else
-				{	my $l=Songs::UniqList('artist', Get('idlist',$_[0],$_[1]));
+				{	my $l=Songs::UniqList('artist', Get('id:list',$_[0],$_[1]));
 					return @$l==1 ? Songs::Gid_to_Display('artist',$l->[0]) : ::__("%d artist","%d artists", scalar(@$l));
 				}
 			    },
@@ -2798,8 +2797,7 @@ sub ReplaceFields
 
 sub CreateHash
 {	my ($type,$field)=@_; warn "AA::CreateHash(@_)\n" if $::debug;
-	my @f=  $Songs::GTypes{$type} ? ($field) : ($type,$field);
-	$GHash_Depend{$_}++ for Songs::Depends(@f);
+	$GHash_Depend{$_}++ for Songs::Depends($type,$field);
 	return $GHash{$field}{$type}=Songs::BuildHash($field,$::Library,undef,$type);
 }
 sub Fields_Changed
@@ -2815,8 +2813,7 @@ sub Fields_Changed
 		}
 		my $subh=$GHash{$field};
 		for my $type (keys %$subh)
-		{	my @d;
-			@d=Songs::Depends($type) unless $Songs::GTypes{$type};
+		{	my @d= Songs::Depends($type);
 			if (grep exists $changed->{$_}, @d) { delete $subh->{$type} }
 			else { $GHash_Depend{$_}++ for @d0,@d; }
 		}
@@ -2838,7 +2835,7 @@ sub Get
 }
 sub GetAAList
 {	my $field=$_[0];
-	CreateHash('idlist',$field) unless $GHash{$field};
+	CreateHash('id:list',$field) unless $GHash{$field};
 	my ($h)= values %{$GHash{$field}};
 	return [keys %$h];
 }
@@ -2849,7 +2846,7 @@ sub GetXRef # get albums/artists from artist/album
 	return Get($x,$field,$key) || [];
 }
 sub GetIDs
-{	return Get('idlist',@_) || [];
+{	return Get('id:list',@_) || [];
 }
 
 sub GrepKeys
@@ -2868,7 +2865,7 @@ sub SortKeys
 	my $h=my $pre=0;
 	$mode||='';
 	if ($mode eq 'songs')
-	{	$h= $hsongs || GetHash('count',$field);
+	{	$h= $hsongs || GetHash('id:count',$field);
 		$pre='number';
 	}
 	elsif ($mode eq 'length')

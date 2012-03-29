@@ -535,7 +535,7 @@ push @::SongCMenu,$RGA_songmenu;
 
 sub Analyse_byAlbum
 {	my @IDs= ::uniq(@{ $_[0] });
-	my $hash= Songs::BuildHash('album',\@IDs,undef,'idlist');
+	my $hash= Songs::BuildHash('album',\@IDs,undef,'id:list');
 	my @list;
 	for my $aid (keys %$hash)
 	{	my $IDs= $hash->{$aid};
