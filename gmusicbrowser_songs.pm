@@ -560,14 +560,13 @@ our %timespan_menu=
 	{	mktime		=> '::mktime(0,0,0,(localtime(#_#))[3,4,5])',
 		gid_to_display	=> '(#GID# ? ::strftime_utf8("%x",localtime(#GID#)) : _"never")',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($d,$m,$y)= (localtime(#GID#))[3,4,5]; ::mktime(0,0,0,$d+1,$m,$y)-1})',
-		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($d,$m,$y)= (localtime(#GID#))[3,4,5]; ::mktime(0,0,0,$d+1,$m,$y)-1})',
 	},
 	dates	=>
-	{	parent		=> 'generic', #? for m mi s si filters
+	{	parent		=> 'generic', # for m mi s si filters
 		_		=> '____[#ID#]',
 		default		=> 'undef',
 		bits		=> 32,	packformat=> 'L', # replace with 64 and Q for 64bits dates
-		bytes		=> '#bits#/8',
+		bytes		=> '(#bits#/8)',
 		check		=> ';',
 		get_list	=> 'unpack("#packformat#*",#_#||"")',
 		display		=> 'join("\n",map Songs::DateString($_), reverse #get_list#)',
@@ -577,7 +576,7 @@ our %timespan_menu=
 		'n_sort:gid'	=> '#GID#',
 		get		=> 'join(" ",#get_list#)',
 		set		=> '{	my $v=#VAL#;
-					my @list= sort { $a <=> $b } (!$v ? () : ref $v ? @$v : split /\D+/,$v);
+					my @list= !$v ? () : sort { $a <=> $b } (ref $v ? @$v : split /\D+/,$v);
 					#_#= !@list ? undef : pack("#packformat#*", @list);
 				   }', #use undef instead of '' if no dates to save some memory
 		diff		=> 'do {my $old=#_#||""; my $new=#VAL#; $new= pack "#packformat#*",sort { $a <=> $b } (ref $new ? @$new : split /\D+/,$new); $old ne $new; }',
@@ -1163,6 +1162,7 @@ our %timespan_menu=
 
  playedlength	=> {	name=> "Played length", type=>'length', flags=> 'g',
 			get => '#playcount->get# * #length->get#',  _=>'#get#',
+			depend=> 'playcount length',
 		   },
  version_or_empty	=> { get => 'do {my $v=#version->get#; $v eq "" ? "" : " ($v)"}',	type=> 'virtual',	depend => 'version',	flags => 'g', letter => 'V', },
  album_years	=> { name => _"Album year(s)", get => 'AA::Get("year:range","album",#album->get_gid#)',	type=> 'virtual',	depend => 'album year',	flags => 'g', letter => 'Y', }, #depends on years from other songs too

@@ -2933,7 +2933,7 @@ sub new
 			$ellip='end' if $ellip eq '1';
 			$label->set_ellipsize($ellip);
 			$self->{string}= $text || $opt->{tip};
-			$self->{markup}= $opt->{markup} || $opt->{size} eq 'menu' ? "<small>%s</small>" : "%s";
+			$self->{markup}= $opt->{markup} || ($opt->{size} eq 'menu' ? "<small>%s</small>" : "%s");
 			$hbox->pack_start($img,0,0,0);
 			$hbox->pack_start($label,1,1,0);
 			$self->add($hbox);
