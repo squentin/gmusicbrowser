@@ -561,6 +561,36 @@ our %timespan_menu=
 		gid_to_display	=> '(#GID# ? ::strftime_utf8("%x",localtime(#GID#)) : _"never")',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($d,$m,$y)= (localtime(#GID#))[3,4,5]; ::mktime(0,0,0,$d+1,$m,$y)-1})',
 	},
+	dates_compact	=>	# ___index_ : binary string containing position (in unit of 1 date => 4 bytes) of the first date in ___values_ for each song
+				# ___nb_ : binary string containing number of dates for each song
+				# ___values_ : binary string containing the actual dates
+				# ___free_ : array containing free positions in ___values_ for each size
+	{	parent		=> 'dates',
+		_		=> 'substr(___values_, #index# * #bytes#, #nb# * #bytes#)',
+		index		=> 'vec(___index_,#ID#,32)',	# => max 2**32 dates in total
+		nb		=> 'vec(___nb_,#ID#,16)',	# => max 2**16 dates per song, could maybe use 8 bits instead
+		get_list	=> 'unpack("#packformat#*", #_#)',
+		init		=> '___index_= ___values_= ___nb_ = "";',
+		set		=> '{	my $v=#VAL#;
+					my @list= !$v ? () : sort { $a <=> $b } (ref $v ? @$v : split /\D+/,$v);
+					if (my $nb=#nb#) { ___free_[$nb].= pack "#packformat#",#index#; } # add previous space to list of free spaces
+					if (@list)
+					{	my $string= pack "#packformat#*", @list;
+						my $nb= #nb#= scalar @list;
+						if (___free_[$nb])	# re-use old space
+						{	#index#= unpack "#packformat#", substr(___free_[$nb],-#bytes#,#bytes#,"");
+							#_#= $string;
+						}
+						else			# use new space
+						{	#index#= length(___values_)/#bytes#;
+							___values_ .= $string;
+						}
+					}
+					else { #index#=0; #nb#=0 }
+				   }',
+		'filter:ecount'	=> '#VAL# .==. #nb#',
+		'stats:count'	=> '#HVAL# += #nb#;',
+	},
 	dates	=>
 	{	parent		=> 'generic', # for m mi s si filters
 		_		=> '____[#ID#]',
@@ -975,7 +1005,7 @@ our %timespan_menu=
 	#alias	=> 'played',
  },
  playhistory	=>
- {	name	=> _"Play history",	flags => 'fgalc',	type => 'dates',
+ {	name	=> _"Play history",	flags => 'fgalc',	type=> 'dates_compact',
 	FilterList => {type=>'year',},
 	'filterdesc:ecount:0'	=> _"never",
 	'filterdesc:-ecount:0'	=> _"has been played",	#FIXME better description
@@ -993,7 +1023,7 @@ our %timespan_menu=
 	alias	=> 'skipped',
  },
  skiphistory	=>
- {	name	=> _"Skip history",	flags => 'fgalc',	type => 'dates',
+ {	name	=> _"Skip history",	flags => 'fgalc',	type=> 'dates_compact',
 	FilterList => {type=>'year',},
 	'filterdesc:ecount:0'	=> _"never",
 	'filterdesc:-ecount:0'	=> _"has been skipped",	#FIXME better description
