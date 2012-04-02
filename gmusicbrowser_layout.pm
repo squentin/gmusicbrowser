@@ -75,7 +75,7 @@ our %Widgets=
 		stock	=> {pause => 'gtk-media-pause', play => 'gtk-media-play' },
 		tip	=> sub {$::TogPlay? _"Pause" : _"Play"},
 		activate=> \&::PlayPause,
-		#click3	=> undef,
+		click3	=> 'Stop',
 		event	=> 'Playing',
 	},
 	Next =>
