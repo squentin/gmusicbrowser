@@ -2749,8 +2749,13 @@ sub Select	#Set filter, sort order, selected song, playing state, staticlist, so
 	my ($filter,$sort,$song,$staticlist,$pos)=@args{qw/filter sort song staticlist position/};
 	$SongID=undef if $song && $song eq 'first';
 	$song=undef if $song && $song=~m/\D/;
-	if (defined $sort) { $ListPlay->Sort($sort) }
-	elsif (defined $filter) { $filter= Filter->new($filter) unless ref $filter; $ListPlay->SetFilter($filter) }
+	if (defined $filter)
+	{	if ($song) { $SongID=$song; $ChangedID=$ChangedPos=1; }
+		$filter= Filter->new($filter) unless ref $filter;
+		$ListPlay->SetFilter($filter);
+		$ListPlay->Sort($sort) if defined $sort;	#FIXME add a function that do both filter and sort
+	}
+	elsif (defined $sort) { $ListPlay->Sort($sort) }
 	elsif ($staticlist)
 	{	if (defined $pos) { $Position=$pos; $SongID=$staticlist->[$pos]; $ChangedID=$ChangedPos=1; }
 		$ListPlay->Replace($staticlist);

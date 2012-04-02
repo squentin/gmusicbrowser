@@ -598,27 +598,21 @@ sub Activate
 	my $aftercmd;
 	$aftercmd=$1 if $activate=~s/&(.*)$//;
 
-	{	if	($activate eq 'playlist')
-		{	if ($self->{filter})
-			{	::Select( filter=>$self->{filter}, song=>$ID, play=>1);
-			}
-			elsif ($self->{type} eq 'L')
-			{	::Select( staticlist=>[@$songarray], position=>$row, play=>1);
-			}
-			else {$activate='play';redo;}
-		}
-		elsif	($activate eq 'remove_and_play')
-		{	$songarray->Remove([$row]);
-			::Select(song=>$ID,play=>1);
-		}
-		elsif	($activate eq 'remove') 	{ $songarray->Remove([$row]); }
-		elsif	($activate eq 'properties')	{ ::DialogSongProp($ID); }
-		elsif	($activate eq 'play')
-		{	if ($self->{type} eq 'A')	{ ::Select(position=>$row,play=>1); }
-			else				{ ::Select(song=>$ID,play=>1); }
-		}
-		else	{ ::DoActionForList($activate,[$ID]); }
+	if	($activate eq 'playlist')	{ ::Select( staticlist=>[@$songarray], position=>$row, play=>1); }
+	elsif	($activate eq 'filter_and_play'){ ::Select(filter=>$self->{filter}, song=>$ID, play=>1); }
+	elsif	($activate eq 'filter_sort_and_play'){ ::Select(sort=>$self->{sort}, filter=>$self->{filter}, song=>$ID, play=>1); }
+	elsif	($activate eq 'remove_and_play')
+	{	$songarray->Remove([$row]);
+		::Select(song=>$ID,play=>1);
 	}
+	elsif	($activate eq 'remove') 	{ $songarray->Remove([$row]); }
+	elsif	($activate eq 'properties')	{ ::DialogSongProp($ID); }
+	elsif	($activate eq 'play')
+	{	if ($self->{type} eq 'A')	{ ::Select(position=>$row,play=>1); }
+		else				{ ::Select(song=>$ID,play=>1); }
+	}
+	else	{ ::DoActionForList($activate,[$ID]); }
+
 	::run_command($self,$aftercmd) if $aftercmd;
 }
 
