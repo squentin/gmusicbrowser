@@ -4023,7 +4023,7 @@ sub new_from_smartstring
 }
 sub _smartstring_moreless
 {	my ($pat,$op,$casesens,$field)=@_;
-	$pat=~s/,/./g; #use dot as comma separator
+	$pat=~s/,/./g; #use dot as decimal separator
 	return undef unless $pat=~m/^-?[0-9.]+[a-zA-Z]?$/;	# FIXME could check if support units
 	$op= $op eq '<=' ? '->' : $op eq '>=' ? '-<' : $op;
 	return $op.':'.$pat;
@@ -4031,18 +4031,18 @@ sub _smartstring_moreless
 sub _smartstring_date_moreless
 {	my ($pat,$op,$casesens,$field)=@_;
 	my $suffix='';
-	$pat=~s/,/./g; #use dot as comma separator
-	if ($pat=~m/\d[smhdwMy]/) { $suffix='ago' } #relative date
-	elsif ($pat=~m#^(\d\d\d\d)(?:[-/](\d\d?)(?:[-/](\d\d?)(?:[-T ](\d\d?)(?::(\d\d?)(?::(\d\d?))?)?)?)?)?$#) # yyyy-MM-dd hh:mm:ss
-	{	$pat= ::mktime(($6||0),($5||0),($4||0),($3||1),($2||1)-1,$1-1900);
+	$pat=~s/,/./g; #use dot as decimal separator
+	if ($pat=~m/\d[smhdwMy]/) { $suffix='ago' } #relative date filter
+	else
+	{	$pat= ::dates_to_timestamps($pat, ($op eq '>' || $op eq '<=')? 1:0);
 	}
-	else {return undef}
+	return undef unless $pat;
 	$op= $op eq '<=' ? '->' : $op eq '>=' ? '-<' : $op;
 	return $op.$suffix.':'.$pat;
 }
 sub _smartstring_number
 {	my ($pat,$op,$casesens,$field)=@_;
-	$pat=~s/,/./g; #use dot as comma separator
+	$pat=~s/,/./g; #use dot as decimal separator
 	if ($op ne '=' || $pat!~m/^-[0-9.]+[a-zA-Z]?$/) {$pat=~s/^-/../}	# allow ranges using - unless = with negative number (could also check if field support negative values ?)
 	if ($pat=~m/\.\./)
 	{	my ($s1,$s2)= split /\s*\.\.\s*/,$pat,2;
@@ -4054,40 +4054,27 @@ sub _smartstring_number
 	$op= $op eq ':' ? 's' : 'e';
 	return $op.':'.$pat;
 }
-
 sub _smartstring_date
 {	my ($pat,$op,$casesens,$field)=@_;
 	my $suffix='';
-	if ($pat=~m/\d[smhdwMy]/) { $suffix='ago' } #relative date
-	else		# absolute date
-	{	if ($pat!~m/\.\./ && $pat=~m/^[^-]*-[^-]*$/) { $pat=~s/-/../; } # no '..' and only one '-' => replace '-' by '..'
-		my ($s1,$range,$s2)=split /(\s*\.\.\s*)/,$pat,2;
-		$pat='';
-		if ($s1 && $s1=~m#^(\d\d\d\d)(?:[-/](\d\d?)(?:[-/](\d\d?)(?:[-T ](\d\d?)(?::(\d\d?)(?::(\d\d?))?)?)?)?)?$#) # yyyy-MM-dd hh:mm:ss
-		{	$pat= ::mktime(($6||0),($5||0),($4||0),($3||1),($2||1)-1,$1-1900);
-		}
-		elsif ($s1=~m/^\d{5,}$/) {$pat=$s1}
-		$pat.='..' if $range;
-		if ($s2)
-		{	my ($y,$M,$d,$h,$m,$s)= $s2=~m#^(\d\d\d\d)(?:[-/](\d\d?)(?:[-/](\d\d?)(?:[-T ](\d\d?)(?::(\d\d?)(?::(\d\d?))?)?)?)?)?$#; # yyyy-MM-dd hh:mm:ss
-			if ($y)
-			{	for ($s,$m,$h,$d,$M,$y)
-				{	if (defined) { $_++; last; }
-				}
-				$pat.= ::mktime(($s||0),($m||0),($h||0),($d||1),($M||1)-1,$y-1900)-1;
-			}
-			elsif ($s2=~m/^\d{5,}$/) {$pat.=$s2}
-		}
+	my $date1= my $date2='';
+	if ($pat=~m#\d# and ($date1,$date2)= $pat=~m#^(\d+[smhdwMy])?(?:\.\.|-)(\d+[smhdwMy])?$#i)	# relative date filter
+	{	$suffix='ago';
 	}
-	if ($pat=~m/\.\.|-/)
-	{	my ($s1,$s2)= split /\s*\.\.\s*|\s*-\s*/,$pat,2;
-		return	(length $s1 && length $s2) ? "b$suffix:$s1 $s2":
-			(length $s1 && !length$s2) ? "-<$suffix:".$s1	:
-			(!length$s1 && length $s2) ? "->$suffix:".$s2	: undef;
+	else						# absolute date filter
+	{	($date1,$date2)= ::dates_to_timestamps($pat,2);
+		#$pat= "$date1..$date2" if $date1.$date2 ne '';
+	}
+	if ($date1.$date2 ne '')
+	{	#my ($s1,$s2)= split /\s*\.\.\s*|\s*-\s*/,$pat,2;
+		return	(length $date1 && length $date2) ? "b$suffix:$date1 $date2":
+			(length $date1 && !length$date2) ? "-<$suffix:".$date1	:
+			(!length$date1 && length $date2) ? "->$suffix:".$date2	: undef;
 	}
 	$op= $op eq '=' ? 'e' : $casesens ? 's' : 'si';
-	if ($suffix && $op eq 'e') { return undef } # FIXME =5d could be changed into between 4.5d and 5.5d ?
-	return $op.$suffix.':'.$pat;
+	#if ($suffix && $op eq 'e') { return undef } # FIXME =5d could be changed into between 4.5d and 5.5d ?
+	#return $op.$suffix.':'.$pat;
+	return $op.':'.$pat;
 }
 
 sub add_possible_superset	#indicate a possible superset filter that could be used for optimization when the result of $superset_candidate is cached

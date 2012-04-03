@@ -782,6 +782,79 @@ sub strftime_utf8
 {	utf8::upgrade($_[0]); &strftime;
 }
 
+# english and localized, full and abbreviated, day names
+my %DAYS=( map( {	::superlc(strftime_utf8('%a',0,0,0,1,0,100,$_))=>$_,
+			::superlc(strftime_utf8('%A',0,0,0,1,0,100,$_))=>$_
+		} 0..6), sun=>0,mon=>1,tue=>2,wed=>3,thu=>4,fri=>5,sat=>6);
+# english and localized, full and abbreviated, month names
+my %MONTHS=( map( {	::superlc(strftime_utf8('%b',0,0,0,1,$_,100))=>$_+1,
+			::superlc(strftime_utf8('%B',0,0,0,1,$_,100))=>$_+1
+		  } 0..11), jan=>1,feb=>2,mar=>3,apr=>4,may=>5,jun=>6,jul=>7,aug=>8,sep=>9,oct=>10,nov=>11,dec=>12);
+for my $h (\%DAYS,\%MONTHS)	#remove "." at the end of some localized day/month names
+{	for my $key (keys %$h) { $h->{$key}= delete $h->{"$key."} if $key=~s/\.$//; }
+}
+sub dates_to_timestamps
+{	my ($dates,$mode)=@_;	#mode : 0: begin date, 1: end date, 2: range
+	if ($mode==2 && $dates!~m/\.\./ && $dates=~m/^[^-]*-[^-]*$/) { $dates=~s/-/../; } # no '..' and only one '-' => replace '-' by '..'
+	my ($date1,$range,$date2)=split /(\s*\.\.\s*)/,$dates,2;
+	if    ($mode==0) { $date2=0; }
+	elsif ($mode==1) { $date2||=$date1; $date1=0; }
+	elsif ($mode==2) { $date2=$date1 unless $range; }
+	my $end=0;
+	for my $date ($date1,$date2)
+	{	if (!$date) {$date='';next}
+		elsif ($date=~m/^\d{9,}$/) {next} #seconds since epoch
+		my $past_step=1;
+		my $past_var;
+		my ($y,$M,$d,$h,$m,$s,$pm);
+		{	($y,$M,$d,$h,$m,$s)= $date=~m#^(\d\d\d\d)(?:[-/.](\d\d?)(?:[-/.](\d\d?)(?:[-T ](\d\d?)(?:[:.](\d\d?)(?:[:.](\d\d?))?)?)?)?)?$# and last; # yyyy/MM/dd hh:mm:ss
+			($h,$m,$s,$pm)=	$date=~m#^(\d\d?)[:](?:(\d\d?)(?:[:](\d\d?))?)?([ap]m?)?$#i and last; #hh:mm:ss or hh:mm or hh:
+			($d,$M,$y)=	$date=~m#^(\d\d?)(?:[-/.](\d\d?)(?:[-/.](\d\d\d\d))?)?$# and last; # dd/MM or dd/MM/yyyy
+			($M,$y)=	$date=~m#^(\d\d?)[-/.](\d\d\d\d)$# and last; # MM/yyyy
+			($y,$M,$d)=	$date=~m#^(\d{4})(\d\d)(\d\d)$# and last; # yyyyMMdd
+			if ($date=~m#^(?:(\d\d?)[-/. ]?)?(\p{Alpha}+)(?:[-/. ]?(\d\d(?:\d\d)?))?$# && (my $month=$MONTHS{::superlc($2)})) # jan or jan99 or 10jan or 10jan12 or jan2012
+			{	($d,$M,$y)=($1,$month,$3);
+				last;
+			}
+			if (defined(my $wday=$DAYS{::superlc$date})) #name of week day
+			{	my ($now_day,$now_wday)= (localtime)[3,6];
+				$d= $now_day - $now_wday + $wday;
+				$past_step=7; $past_var=3; #remove 7days if in future
+				last;
+			}
+			$date='';
+		}
+		next unless $date;
+		if (defined $y)
+		{	$y= $y>100 ? $y-=1900 : $y<70 ? $y+100 : $y;	#>100 => 4digits year, <70 : 2digits 20xx year, else 2digits 19xx year
+		}
+		$M-- if defined $M;
+		$h+=12 if defined $pm && $pm=~m/^pm?$/ && defined $h;
+		my @now= (localtime)[0..5];
+		for ($y,$M,$d,$h,$m,$s)	#complete relative dates with current date
+		{	last if defined;
+			$_= pop @now;
+		}
+		$past_var= scalar @now unless defined $past_var; #unit to change if in the future
+		if ($end)	#if end date increment the smallest defined unit (to get the end of day/month/year/hour/min + 1 sec)
+		{	for ($s,$m,$h,$d,$M,$y)
+			{	if (defined) { $_++; last; }
+			}
+		}
+		my @date= ($s||0,$m||0,$h||0,$d||1,$M||0,$y);
+		$date= ::mktime(@date);
+		if ($past_var<6 && $date>time) #for relative dates, choose between previous and next match (for example, this year's july or previous year's july)
+		{	$date[$past_var]-= $past_step;
+			my $date_past= ::mktime(@date);
+			#use date in the past unless it's an end date and makes more sense relative to the first date
+			$date= $date_past unless $end && $date1 && $date>$date1 && $date_past<=$date1;
+		}
+		$date-- if $end;
+	}
+	continue {$end=1}
+	return $mode==0 ? $date1 : $mode==1 ? $date2 : ($date1,$date2);
+}
+
 sub ConvertTime	# convert date pattern into nb of seconds
 {	my ($date,$unit)= $_[0]=~m/^\s*(\d+|\d*?[.]\d+)\s*([a-zA-Z]*)\s*$/;
 	return 0 unless $date;
