@@ -503,7 +503,7 @@ sub UpdatePlayListFilter
 sub CommonSave
 {	my $self=shift;
 	my $opt= $self->SaveOptions;
-	$opt->{'sort'}= $self->{'sort'};
+	$opt->{$_}= $self->{$_} for qw/sort rowtip/;
 	$opt->{follow}= ! !$self->{follow};
 
 	#save options as default for new SongTree/SongList of same type
@@ -693,6 +693,54 @@ sub DrawEmpty
 	}
 }
 
+sub SetRowTip
+{	my ($self,$tip)=@_;
+	$tip= "<b><big>%t</big></b>\\nby <b>%a</b>\\nfrom <b>%l</b>" if $tip && $tip eq '1';	#for rowtip=1, deprecated
+	$self->{rowtip}=$tip||'';
+	return unless *Gtk2::Widget::set_has_tooltip{CODE};  # since gtk+ 2.12, Gtk2 1.160
+	$self->set_has_tooltip(!!$tip);
+}
+
+sub EditRowTip
+{	my $self=shift;
+	if ($self->{rowtip_edit}) { $self->{rowtip_edit}->force_present; return; }
+	my $dialog = Gtk2::Dialog->new(_"Edit row tip", $self->get_toplevel,
+		[qw/destroy-with-parent/],
+		'gtk-apply' => 'apply',
+		'gtk-ok' => 'ok',
+		'gtk-cancel' => 'none',
+	);
+	::weaken( $self->{rowtip_edit}=$dialog );
+	::SetWSize($dialog,'RowTip');
+	$dialog->set_default_response('ok');
+	my $combo=Gtk2::ComboBoxEntry->new_text;
+	my $hist= $::Options{RowTip_history} ||=[	_("Play count").' : $playcount\\n'._("Last played").' : $lastplay',
+							'<b>$title</b>\\n'._('<i>by</i> %a\\n<i>from</i> %l'),
+							'$title\\n$album\\n$artist\\n<small>$comment</small>',
+							'$comment',
+						];
+	$combo->append_text($_) for @$hist;
+	my $entry=$combo->child;
+	$entry->set_text($self->{rowtip});
+	$entry->set_activates_default(::TRUE);
+	my $preview= Label::Preview->new(event => 'CurSong', wrap=>1, entry=>$entry, noescape=>1,
+		format=>'<small><i>'._("example :")."\n\n</i></small>%s",
+		preview => sub { defined $::SongID ? ::ReplaceFieldsAndEsc($::SongID,$_[0]) : $_[0]; },
+		);
+	$preview->set_alignment(0,.5);
+	$dialog->vbox->pack_start($_,::FALSE,::FALSE,4) for $combo,$preview;
+	$dialog->show_all;
+	$dialog->signal_connect( response => sub
+	 {	my ($dialog,$response)=@_;
+		my $tip=$entry->get_text;
+		if ($response eq 'ok' || $response eq 'apply')
+		{	::PrefSaveHistory(RowTip_history=>$tip) if $tip;
+			$self->SetRowTip($tip);
+		}
+		$dialog->destroy unless $response eq 'apply';
+	 });
+}
+
 package SongList;
 use Glib qw(TRUE FALSE);
 use Gtk2;
@@ -793,6 +841,8 @@ our @ColumnMenu=
 	{ label => sub { _('_Remove this column').' ('. ($SLC_Prop{$_[0]{pos}}{menu} || $SLC_Prop{$_[0]{pos}}{title}).')' },
 	  code	=> sub { $_[0]{self}->ToggleColumn($_[0]{pos},$_[0]{pos}); },	stockicon => 'gtk-remove'
 	},
+	{ label => _("Edit row tip").'...', code => sub { $_[0]{self}->EditRowTip; },
+	},
 	{ label => _"Follow playing song",	code => sub { $_[0]{self}->FollowSong if $_[0]{self}{follow}^=1; },
 	  check => sub { $_[0]{self}{follow} }
 	},
@@ -867,13 +917,8 @@ sub new
 	$tv->signal_connect(row_activated	=> \&row_activated_cb);
 	$tv->get_selection->signal_connect(changed => \&sel_changed_cb);
 	$tv->get_selection->set_mode('multiple');
-
-	if (my $tip=$opt->{rowtip} and *Gtk2::Widget::set_has_tooltip{CODE})  # since gtk+ 2.12, Gtk2 1.160
-	{	$tv->set_has_tooltip(1);
-		$tip= "<b><big>%t</big></b>\\nby <b>%a</b>\\nfrom <b>%l</b>" if $tip eq '1';
-		$self->{rowtip}= $tip;
-		$tv->signal_connect(query_tooltip=> \&query_tooltip_cb);
-	}
+	$tv->signal_connect(query_tooltip=> \&query_tooltip_cb) if *Gtk2::Widget::set_has_tooltip{CODE}; # requires gtk+ 2.12, Gtk2 1.160
+	$self->SetRowTip($opt->{rowtip});
 
 	# used to draw text when treeview empty
 	$tv->signal_connect(expose_event=> \&expose_cb);
@@ -1000,6 +1045,8 @@ sub ToggleColumn
 	$self->AddColumn('title') unless $tv->get_columns; #if removed the last column
 	$self->{cols_to_watch}=undef; #to force update list of columns to watch
 }
+
+sub set_has_tooltip { $_[0]->child->set_has_tooltip($_[1]) }
 
 sub expose_cb
 {	my ($tv,$event)=@_;
@@ -5392,13 +5439,8 @@ sub new
 	$view->signal_connect(drag_leave	=> \&drag_leave_cb);
 	$view->signal_connect(button_press_event=> \&button_press_cb);
 	$view->signal_connect(button_release_event=> \&button_release_cb);
-
-	if (my $tip=$opt->{rowtip} and *Gtk2::Widget::set_has_tooltip{CODE})  # requires gtk+ 2.12, Gtk2 1.160
-	{	$view->set_has_tooltip(1);
-		$tip= "<b><big>%t</big></b>\\nby <b>%a</b>\\nfrom <b>%l</b>" if $tip eq '1';
-		$self->{rowtip}= $tip;
-		$view->signal_connect(query_tooltip=> \&query_tooltip_cb);
-	}
+	$view->signal_connect(query_tooltip=> \&query_tooltip_cb) if *Gtk2::Widget::set_has_tooltip{CODE}; # requires gtk+ 2.12, Gtk2 1.160
+	$self->SetRowTip($opt->{rowtip});
 
 	::Watch($self,	CurSongID	=> \&CurSongChanged);
 	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
@@ -5540,6 +5582,8 @@ sub set_head_columns
 	$self->BuildTree unless $self->{need_init};
 	$self->scroll_to_row($savedpos->{hirow}||0,1) if $savedpos;
 }
+
+sub set_has_tooltip { $_[0]{view}->set_has_tooltip($_[1]) }
 
 sub GetCurrentRow
 {	my $self=shift;
@@ -6585,6 +6629,8 @@ our @ColumnMenu=
 	},
 	{ label=> sub { _('_Remove this column').' ('.($SongTree::STC{$_[0]{colid}}{menutitle}||$SongTree::STC{$_[0]{colid}}{title}).')' },
 	  code => sub { $_[0]{songtree}->remove_column($_[0]{cellnb}) },	stockicon => 'gtk-remove', isdefined => 'colid',
+	},
+	{ label => _("Edit row tip").'...', code => sub { $_[0]{songtree}->EditRowTip; },
 	},
 	{ label => _"Follow playing song",	code => sub { $_[0]{songtree}->FollowSong if $_[0]{songtree}{follow}^=1; },
 	  check => sub { $_[0]{songtree}{follow} }
