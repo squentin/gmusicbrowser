@@ -15,7 +15,7 @@ package Songs;
 our $IDFromFile;
 our ($Artists_split_re,$Artists_title_re);
 my (@Missing,$MissingHash,@MissingKeyFields);
-our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%GTypes,%HSort,%Aliases);
+our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%HSort,%Aliases);
 my %FuncCache;
 INIT {
 our %timespan_menu=
@@ -116,7 +116,7 @@ our %timespan_menu=
 		'filter:s'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___name[$_], "#VAL#")  .!=. -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
 		'filter:m'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___name[$_]  .=~. m"#VAL#"  ,@$v) : ___name[$v]  .=~. m"#VAL#"; }',
 		'filter:mi'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___iname[$_] .=~. m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
-		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
+		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ---- AFTER: #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}',
 		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v }',
 		'hashm:name'	=> 'do {my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : () }',
@@ -178,8 +178,8 @@ our %timespan_menu=
 		gid_isearch	=> '__#mainfield#_iname[#GID#] =~ m/#RE#/',
 		makefilter	=> '"#field#:~:".##mainfield#->gid_to_sgid#',
 		#group		=> '#_# !=',
-		stats		=> 'do {my $v=#_#; #HVAL#{__#mainfield#_name[$_]}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[keys %{#HVAL#}];',
-		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_}=undef for ref $v ? @$v : $v;}  ----  #HVAL#=[keys %{#HVAL#}];',
+		stats		=> 'do {my $v=#_#; #HVAL#{__#mainfield#_name[$_]}=undef for ref $v ? @$v : $v;}  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
+		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_}=undef for ref $v ? @$v : $v;}  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
 		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v}',
 		listall		=> '##mainfield#->listall#',
 		'filterdesc:~'	=> [ _"includes artist %s", _"includes artist",	'menustring', ],
@@ -247,7 +247,7 @@ our %timespan_menu=
 		makefilter	=> '"#field#:~:" . #gid_to_sgid#',
 		update		=> 'my $albumname=#get#; #set(VAL=$albumname)#;',
 		listall		=> 'grep !vec(__#mainfield#_empty,$_,1), 2..@#_name#-1',
-		'stats:artistsort'	=> '#HVAL#->{ #album_artist->get_gid# }=undef;  ---- #HVAL#=do { my @ar= keys %{#HVAL#}; @ar>1 ? ::superlc(_"Various artists") : __artist_iname[$ar[0]]; }',
+		'stats:artistsort'	=> '#HVAL#->{ #album_artist->get_gid# }=undef;  ---- AFTER: #HVAL#=do { my @ar= keys %{#HVAL#}; @ar>1 ? ::superlc(_"Various artists") : __artist_iname[$ar[0]]; }',
 		#plugin		=> 'picture',
 		load_extra	=> ' __#mainfield#_gid{#SGID#} || return;',
 		save_extra	=> 'my %h; while ( my ($sgid,$gid)=each %__#mainfield#_gid ) { $h{$sgid}= [#SUBFIELDS#] } delete $h{""}; return \%h;',
@@ -268,7 +268,7 @@ our %timespan_menu=
 		'filter:e'	=> '#_# .eq. "#VAL#"',
 		hash		=> '#_#',
 		group		=> '#_# ne',
-		stats		=> '#HVAL#{#_#}=undef;  ---- #HVAL#=[keys %{#HVAL#}];',
+		stats		=> '#HVAL#{#_#}=undef;  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
 	},
 	istring => # _much_ faster with case/accent insensitive operations, at the price of double memory
 	{	parent	=> 'string',
@@ -349,8 +349,8 @@ our %timespan_menu=
 		gid_isearch	=> '#_iname#[#GID#] =~ m/#RE#/',
 		makefilter	=> '"#field#:~:".#_name#[#GID#]',
 		group		=> '#_# !=',
-		stats		=> '#HVAL#{#_name#[#_#]}=undef;  ----  #HVAL#=[keys %{#HVAL#}];',
-		'stats:gid'	=> '#HVAL#{#_#}=undef;  ----  #HVAL#=[keys %{#HVAL#}];',
+		stats		=> '#HVAL#{#_name#[#_#]}=undef;  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
+		'stats:gid'	=> '#HVAL#{#_#}=undef;  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
 		listall		=> '2..@#_name#-1',
 		edit_listall	=> 1,
 		parent		=> 'generic',
@@ -375,8 +375,8 @@ our %timespan_menu=
 		'filter_prep:<'	=>  \&filter_prep_numbers,
 		'filter_prep:e'	=>  \&filter_prep_numbers,
 		'group'		=> '#_# !=',
-		'stats:range'	=> 'push @{#HVAL#},#_#;  ---- #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
-		'stats:average'	=> 'push @{#HVAL#},#_#;  ---- #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
+		'stats:range'	=> 'push @{#HVAL#},#_#;  ---- AFTER: #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
+		'stats:average'	=> 'push @{#HVAL#},#_#;  ---- AFTER: #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
 		'stats:sum'	=> '#HVAL# += #_#;',
 		stats		=> '#HVAL#{#_#+0}=undef;',
 		hash		=> '#_#+0',
@@ -476,8 +476,8 @@ our %timespan_menu=
 		diff	=> '(#VAL# eq "" ? 255 : #VAL#)!=#_#',
 		get	=> '(#_#==255 ? "" : #_#)',
 		display	=> '(#_#==255 ? "" : #_#)',
-		'stats:range'	=> 'push @{#HVAL#},#_default#;  ---- #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
-		'stats:average'	=> 'push @{#HVAL#},#_default#;  ---- #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
+		'stats:range'	=> 'push @{#HVAL#},#_default#;  ---- AFTER: #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
+		'stats:average'	=> 'push @{#HVAL#},#_default#;  ---- AFTER: #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
 		check	=> '#VAL#= #VAL# =~m/^\d+$/ ? (#VAL#>100 ? 100 : #VAL#) : "";',
 		set	=> '{ my $v=#VAL#; #_default#= ($v eq "" ? $::Options{DefaultRating} : $v); #_# = ($v eq "" ? 255 : $v); }',
 		makefilter	=> '"#field#:~:#GID#"',
@@ -528,7 +528,7 @@ our %timespan_menu=
 		'filterdesc:-h'		=> _"not the %s most recent",
 		'filterdesc:-t'		=> _"not the %s least recent",
 		'filterpat:ago'		=> [ unit=> \%::DATEUNITS, default_unit=> 'd', ],
-		'filterpat:date'	=> [ display=> sub { my $var=shift; $var= ::strftime2('%c',localtime $var) if $var=~m/^\d+$/; $var; }, ],
+		'filterpat:date'	=> [ display=> sub { my $var=shift; $var= ::strftime_utf8('%c',localtime $var) if $var=~m/^\d+$/; $var; }, ],
 		default_filter		=> '<ago',
 		'smartfilter:>' => \&Filter::_smartstring_date_moreless,
 		'smartfilter:<' => \&Filter::_smartstring_date_moreless,
@@ -547,19 +547,142 @@ our %timespan_menu=
 		rightalign=>0,
 	},
 	'date.year' =>
-	{	mktime	=> '::mktime(0,0,0,1,0,(localtime(#_#))[5])',
-		gid_to_display => '(#GID# ? ::strftime2("%Y",localtime(#GID#)) : _"never")',
+	{	mktime		=> '::mktime(0,0,0,1,0,(localtime(#_#))[5])',
+		gid_to_display	=> '(#GID# ? ::strftime_utf8("%Y",localtime(#GID#)) : _"never")',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".(::mktime(0,0,0,1,0,(localtime(#GID#))[5]+1)-1))',
 	},
 	'date.month' =>
-	{	mktime	=> '::mktime(0,0,0,1,(localtime(#_#))[4,5])',
-		gid_to_display => '(#GID# ? ::strftime2("%b %Y",localtime(#GID#)) : _"never")',
+	{	mktime		=> '::mktime(0,0,0,1,(localtime(#_#))[4,5])',
+		gid_to_display	=> '(#GID# ? ::strftime_utf8("%b %Y",localtime(#GID#)) : _"never")',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($m,$y)= (localtime(#GID#))[4,5]; ::mktime(0,0,0,1,$m+1,$y)-1})',
 	},
 	'date.day' =>
-	{	mktime	=> '::mktime(0,0,0,(localtime(#_#))[3,4,5])',
-		gid_to_display => '(#GID# ? ::strftime2("%x",localtime(#GID#)) : _"never")',
+	{	mktime		=> '::mktime(0,0,0,(localtime(#_#))[3,4,5])',
+		gid_to_display	=> '(#GID# ? ::strftime_utf8("%x",localtime(#GID#)) : _"never")',
 		makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".#GID#." ".do{my ($d,$m,$y)= (localtime(#GID#))[3,4,5]; ::mktime(0,0,0,$d+1,$m,$y)-1})',
+	},
+	dates_compact	=>	# ___index_ : binary string containing position (in unit of 1 date => 4 bytes) of the first date in ___values_ for each song
+				# ___nb_ : binary string containing number of dates for each song
+				# ___values_ : binary string containing the actual dates
+				# ___free_ : array containing free positions in ___values_ for each size
+	{	parent		=> 'dates',
+		_		=> 'substr(___values_, #index# * #bytes#, #nb# * #bytes#)',
+		index		=> 'vec(___index_,#ID#,32)',	# => max 2**32 dates in total
+		nb		=> 'vec(___nb_,#ID#,16)',	# => max 2**16 dates per song, could maybe use 8 bits instead
+		get_list	=> 'unpack("#packformat#*", #_#)',
+		init		=> '___index_= ___values_= ___nb_ = "";',
+		set		=> '{	my $v=#VAL#;
+					my @list= !$v ? () : sort { $a <=> $b } (ref $v ? @$v : split /\D+/,$v);
+					if (my $nb=#nb#) { ___free_[$nb].= pack "#packformat#",#index#; } # add previous space to list of free spaces
+					if (@list)
+					{	my $string= pack "#packformat#*", @list;
+						my $nb= #nb#= scalar @list;
+						if (___free_[$nb])	# re-use old space
+						{	#index#= unpack "#packformat#", substr(___free_[$nb],-#bytes#,#bytes#,"");
+							#_#= $string;
+						}
+						else			# use new space
+						{	#index#= length(___values_)/#bytes#;
+							___values_ .= $string;
+						}
+					}
+					else { #index#=0; #nb#=0 }
+				   }',
+		'filter:ecount'	=> '#VAL# .==. #nb#',
+		'stats:count'	=> '#HVAL# += #nb#;',
+	},
+	dates	=>
+	{	parent		=> 'generic', # for m mi s si filters
+		_		=> '____[#ID#]',
+		default		=> 'undef',
+		bits		=> 32,	packformat=> 'L', # replace with 64 and Q for 64bits dates
+		bytes		=> '(#bits#/8)',
+		check		=> ';',
+		get_list	=> 'unpack("#packformat#*",#_#||"")',
+		display		=> 'join("\n",map Songs::DateString($_), reverse #get_list#)',
+		gid_to_get	=> '#GID#',
+		gid_to_display	=> 'Songs::DateString(#GID#)',
+		#n_sort		=> 'unpack("#packformat#*",substr(#_#||"",-#bytes#))', #sort by last date, not used
+		'n_sort:gid'	=> '#GID#',
+		get		=> 'join(" ",#get_list#)',
+		set		=> '{	my $v=#VAL#;
+					my @list= !$v ? () : sort { $a <=> $b } (ref $v ? @$v : split /\D+/,$v);
+					#_#= !@list ? undef : pack("#packformat#*", @list);
+				   }', #use undef instead of '' if no dates to save some memory
+		diff		=> 'do {my $old=#_#||""; my $new=#VAL#; $new= pack "#packformat#*",sort { $a <=> $b } (ref $new ? @$new : split /\D+/,$new); $old ne $new; }',
+		set_multi	=> 'do {my %h; $h{$_}=0 for #get_list#; my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}= (exists $h{$_} ? -1 : 1) for @$toggle; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
+		'filter:ecount'	=> '#VAL# .==. length(#_#)/#bytes#',
+		'stats:count'	=> '#HVAL# += length(#_#)/#bytes#;',
+		#example of use : Songs::BuildHash('artist',$::Library,undef,'playhistory:countrange:DATE1-DATE2'));  where DATE1 and DATE2 are secongs since epoch and DATE1<DATE2
+		'stats:countrange'	=> 'INIT: my ($$date1,$$date2)= #ARG#=~m/(\d+)/g; ---- #HVAL# ++ for grep $$date1<$_ && $$date2>$_, #get_list#;', #count plays between 2 dates (in seconds since epoch)
+		'stats:countafter'	=> '#HVAL# ++ for grep #ARG#<$_, #get_list#;', #count plays after date (in seconds since epoch)
+		'stats:countbefore'	=> '#HVAL# ++ for grep #ARG#>$_, #get_list#;', #count plays before date (in seconds since epoch)
+		stats		=> 'do {#HVAL#{$_}=undef for #get_list#;};',
+		'filter:e'	=> '.!!. do{ grep($_ == #VAL#, #get_list#) }',
+		'filter:>'	=> '.!!. do{ grep($_ > #VAL#, #get_list#) }',
+		'filter:<'	=> '.!!. do{ grep($_ < #VAL#, #get_list#) }',
+		'filter:b'	=> '.!!. do{ grep($_ >= #VAL1# && $_ <= #VAL2#, #get_list#) }',
+		'filter_prep:>'	=>  \&filter_prep_numbers,
+		'filter_prep:<'	=>  \&filter_prep_numbers,
+		'filter_prep:e'	=>  \&filter_prep_numbers,
+		'filter_prep:b'	=>  \&filter_prep_numbers,
+		'filter_prep:>ago'	=> \&::ConvertTime,
+		'filter_prep:<ago'	=> \&::ConvertTime,
+		'filter_prep:bago'	=> \&::ConvertTime,
+		'filter:>ago'	=> '.!!. do{ grep($_ < #VAL#, #get_list#) }',
+		'filter:<ago'	=> '.!!. do{ grep($_ > #VAL#, #get_list#) }',
+		'filter:bago'	=> '.!!. do{ grep($_ >= #VAL1# && $_ <= #VAL2#, #get_list#) }',
+		#copy of filterdesc:* smartfilter:* from date type
+		'filterdesc:>ago'	=> [_"more than %s ago",	_"more than",	'ago', ],
+		'filterdesc:<ago'	=> [_"less than %s ago",	_"less than",	'ago', ],
+		'filterdesc:>'		=> [_"after %s",		_"after",	'date', ],
+		'filterdesc:<'		=> [_"before %s",		_"before",	'date', ],
+		'filterdesc:b'		=> [_"between %s and %s",	_"between (absolute dates)", 'date date'],
+		'filterdesc:bago'	=> [_"between %s ago and %s ago", _"between (relative dates)", 'ago ago'],
+		'filterdesc:->ago'	=> _"less than %s ago",
+		'filterdesc:-<ago'	=> _"more than %s ago",
+		'filterdesc:->'		=> _"before %s",
+		'filterdesc:-<'		=> _"after %s",
+		'filterdesc:-b'		=> _"not between %s and %s",
+		'filterdesc:-bago'	=> _"not between %s ago and %s ago",
+		'filterdesc:h'		=> [ _"the %s most recent",	_"the most recent",	'number'],	#"the %s latest" "the latest" ?
+		'filterdesc:t'		=> [ _"the %s least recent",	_"the least recent",	'number'],	#"the %s earliest" "the earliest" ?
+		'filterdesc:-h'		=> _"not the %s most recent",
+		'filterdesc:-t'		=> _"not the %s least recent",
+		'filterpat:ago'		=> [ unit=> \%::DATEUNITS, default_unit=> 'd', ],
+		'filterpat:date'	=> [ display=> sub { my $var=shift; $var= ::strftime_utf8('%c',localtime $var) if $var=~m/^\d+$/; $var; }, ],
+		default_filter		=> '<ago',
+		'smartfilter:>' => \&Filter::_smartstring_date_moreless,
+		'smartfilter:<' => \&Filter::_smartstring_date_moreless,
+		'smartfilter:<='=> \&Filter::_smartstring_date_moreless,
+		'smartfilter:>='=> \&Filter::_smartstring_date_moreless,
+		'smartfilter:=' => \&Filter::_smartstring_date,
+		'smartfilter::' => \&Filter::_smartstring_date,
+
+		#get_gid		=> '[#get_list#]',
+		#hashm			=> '#get_list#',
+		#mktime			=> '$_',
+		 #for dates.year, dates.month, dates.day :
+		get_gid	=> '[#_# ? (map #mktime#,#get_list#) : 0]',
+		hashm	=> '(#_# ? (map #mktime#,#get_list#) : 0)',	#or use post-hash modification for 0 case
+		subtypes_menu=> \%timespan_menu,
+
+	},
+	#identical to date.*, except #_# is replaced by $_ in mktime, and "e" filter by "ecount"
+	'dates.year' =>
+	{	mktime		=> '::mktime(0,0,0,1,0,(localtime($_))[5])',
+		gid_to_display	=> '(#GID# ? ::strftime_utf8("%Y",localtime(#GID#)) : _"never")',
+		makefilter	=> '"#field#:".(!#GID# ? "ecount:0" : "b:".#GID#." ".(::mktime(0,0,0,1,0,(localtime(#GID#))[5]+1)-1))',
+	},
+	'dates.month' =>
+	{	mktime		=> '::mktime(0,0,0,1,(localtime($_))[4,5])',
+		gid_to_display	=> '(#GID# ? ::strftime_utf8("%b %Y",localtime(#GID#)) : _"never")',
+		makefilter	=> '"#field#:".(!#GID# ? "ecount:0" : "b:".#GID#." ".do{my ($m,$y)= (localtime(#GID#))[4,5]; ::mktime(0,0,0,1,$m+1,$y)-1})',
+	},
+	'dates.day' =>
+	{	mktime		=> '::mktime(0,0,0,(localtime($_))[3,4,5])',
+		gid_to_display	=> '(#GID# ? ::strftime_utf8("%x",localtime(#GID#)) : _"never")',
+		makefilter	=> '"#field#:".(!#GID# ? "ecount:0" : "b:".#GID#." ".do{my ($d,$m,$y)= (localtime(#GID#))[3,4,5]; ::mktime(0,0,0,$d+1,$m,$y)-1})',
 	},
 	boolean	=>
 	{	parent	=> 'integer',	bits => 1,
@@ -590,6 +713,13 @@ our %timespan_menu=
 	'stats:filetoid' => '#HVAL#{ #file->get# }=#ID#',
 	category=>'file',
 	alias	=> 'filename',
+ },
+ id	=>
+ {	type=> 'integer',
+	_ => '#ID#',
+	'stats:list'	=> 'push @{#HVAL#}, #ID#',
+	'stats:uniq'	=> '#HVAL#=undef', #doesn't really belong here, but simpler this way
+	'stats:count'	=> '#HVAL#++',
  },
  path	=>
  {	name	=> _"Folder",	width => 200, flags => 'fgasc_',	type => 'filename',
@@ -737,7 +867,7 @@ our %timespan_menu=
 	check	=> '#VAL#= #VAL# =~m/(\d\d\d\d)/ ? $1 : 0;',
 	id3v1	=> 3,		id3v2 => 'TDRC|TYER', 'id3v2.3'=> 'TYER|TDRC',	'id3v2.4'=> 'TDRC|TYER',	vorbis	=> 'date|year',	ape	=> 'Record Date|Year', ilst => "\xA9day",
 	gid_to_display	=> '#GID# ? #GID# : _"None"',
-	'stats:range'	=> '#HVAL#{#_#}=undef;  ---- delete #HVAL#{0}; #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} keys %{#HVAL#})[0,-1]; !defined $m0 ? "" : $m0==$m1 ? $m0 : "$m0 - $m1"}',
+	'stats:range'	=> '#HVAL#{#_#}=undef;  ---- AFTER: delete #HVAL#{0}; #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} keys %{#HVAL#})[0,-1]; !defined $m0 ? "" : $m0==$m1 ? $m0 : "$m0 - $m1"}',
 	editwidth => 6,
 	edit_order=> 50,	edit_many=>1,	letter => 'y',
 	can_group=>1,
@@ -872,7 +1002,16 @@ our %timespan_menu=
 	'filterdesc:e:0'	=> _"never",
 	'filterdesc:-e:0'	=> _"has been played",	#FIXME better description
 	category=>'stats',
+	#alias	=> 'played',
+ },
+ playhistory	=>
+ {	name	=> _"Play history",	flags => 'fgalc',	type=> 'dates_compact',
+	FilterList => {type=>'year',},
+	'filterdesc:ecount:0'	=> _"never",
+	'filterdesc:-ecount:0'	=> _"has been played",	#FIXME better description
 	alias	=> 'played',
+	category=>'stats',
+	disable=>0,	options => 'disable',
  },
  lastskip	=>
  {	name	=> _"Last skipped",	width => 100,	flags => 'fgasc',	type => 'date',
@@ -882,6 +1021,15 @@ our %timespan_menu=
 	'filterdesc:-e:0'	=> _"has been skipped",	#FIXME better description
 	category=>'stats',
 	alias	=> 'skipped',
+ },
+ skiphistory	=>
+ {	name	=> _"Skip history",	flags => 'fgalc',	type=> 'dates_compact',
+	FilterList => {type=>'year',},
+	'filterdesc:ecount:0'	=> _"never",
+	'filterdesc:-ecount:0'	=> _"has been skipped",	#FIXME better description
+	#alias	=> 'skipped',
+	category=>'stats',
+	disable=>1,	options => 'disable',
  },
  playcount	=>
  {	name	=> _"Play count",	width => 50,	flags => 'fgaesc',	type => 'integer',	letter => 'p',
@@ -1044,6 +1192,7 @@ our %timespan_menu=
 
  playedlength	=> {	name=> "Played length", type=>'length', flags=> 'g',
 			get => '#playcount->get# * #length->get#',  _=>'#get#',
+			depend=> 'playcount length',
 		   },
  version_or_empty	=> { get => 'do {my $v=#version->get#; $v eq "" ? "" : " ($v)"}',	type=> 'virtual',	depend => 'version',	flags => 'g', letter => 'V', },
  album_years	=> { name => _"Album year(s)", get => 'AA::Get("year:range","album",#album->get_gid#)',	type=> 'virtual',	depend => 'album year',	flags => 'g', letter => 'Y', }, #depends on years from other songs too
@@ -1129,18 +1278,6 @@ our %HSort=
 (	string	=> '$h->{$a} cmp $h->{$b} ||',
 	number	=> '$h->{$a} <=> $h->{$b} ||',
 	year2	=> 'substr($h->{$a},-4,4) cmp substr($h->{$b},-4,4) ||',
-);
-
-our %GTypes= #FIXME could be better
-(	idlist	=> {code => 'push @{#HVAL#}, #ID#', },
-	#filetoid=> {code => '#HVAL#{ #file->get# }=#ID#',	depend=>'file',	},
-	uniq	=> {code => '#HVAL#=undef'},
-	count	=> {code => '#HVAL#++'},
-	#length	=> {code => '__H__+=__LENGTH__',	depend=>'length',	},
-	#year	=> {code => '__H__{__YEAR__}=undef',	after=>'delete __H__{""}; my @l=sort { $a <=> $b } keys %{__H__}; __H__= @l==0 ? "" : @l==1 ? $l[0] : "$l[0] - $l[-1]";',	depend=>'year',	},
-	#label	=> {code => '__H__{$_}=undef for split /\x00/,__LABEL__;',	after=>'__H__=[keys %{__H__}];',	depend=>'label',	},
-	#album	=> {code => '__H__{__ALBUM__}=undef',	after=>'__H__=[keys %{__H__}];',	depend=>'album',},
-	#artist	=> {code => '__H__{$_}=undef for split /$Artists_split_re/,__ARTIST__;',	after=>'__H__=[keys %{__H__}];',	depend=>'artist',	},
 );
 
 # discname
@@ -1625,6 +1762,7 @@ sub ReReadFile		#force values :
 	}
 }
 
+#FIXME check if fields are enabled and add a way (option?) to silently ignore disabled fields
 sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,field=>newval,...);  ID can be an arrayref
 {	warn "Songs::Set(@_) called from : ".join(':',caller)."\n" if $::debug;
 	my ($IDs,$modif,%opt);
@@ -1776,7 +1914,7 @@ sub CheckMissing
 	$song->{track}= $song->{track}=~m/^(\d+)/ ? $1+0 : 0;
 
 	my $key=join "\x1D", @$song{@MissingKeyFields};
-	$MissingHash||= BuildHash('missingkey',\@Missing,undef,'idlist');
+	$MissingHash||= BuildHash('missingkey',\@Missing,undef,'id:list');
 	my $IDs=$MissingHash->{$key};
 	return undef unless $IDs;
 	for my $oldID (@$IDs)
@@ -1996,7 +2134,7 @@ sub ListLength
 #FIXME cache the BuildHash sub
 sub UniqList #FIXME same as UniqList2. use "string" (for artist) in this one and not in UniqList2 ?
 {	my ($field,$IDs,$sorted)=@_; #warn "Songs::UniqList(@_)\n";
-	my $h=BuildHash($field,$IDs,undef,'uniq');	#my $h=BuildHash($field,$IDs,'string','uniq'); ??????
+	my $h=BuildHash($field,$IDs,undef,':uniq');	#my $h=BuildHash($field,$IDs,'string',':uniq'); ??????
 	return [keys %$h] unless $sorted;
 	return [sort keys %$h]; #FIXME more sort modes ?
 }
@@ -2060,7 +2198,7 @@ sub DateString
 		last if $diff>$max;
 		$fmt=shift @formats;
 	}
-	::strftime2($fmt,localtime $time);
+	::strftime_utf8($fmt,localtime $time);
 }
 
 #sub Album_Artist #guess album artist
@@ -2288,6 +2426,7 @@ sub Depends
 	my %h;
 	for my $f (grep $_ ne '', @fields)
 	{	$f=~s#[.:].*##;
+		next unless $f;
 		unless ($Def{$f}) {warn "Songs::Depends : Invalid field $f\n";next}
 		$h{$f}=undef;
 		if (my $d= $Def{$f}{depend}) { $h{$_}=undef for split / /,$d; }
@@ -2327,24 +2466,31 @@ sub SetTagValue #rename ?
 	return ::TRUE;	#FIXME could check if it has worked
 }
 
+my %buildhash_deprecated= (idlist=>'id:list',count=>'id:count',uniq=>':uniq');
 sub BuildHash
 {	my ($field,$IDs,$opt,@types)=@_; #warn "Songs::BuildHash(@_)\n";
 	$opt= $opt? ':'.$opt : '';
 	my ($keycode,$multi)= LookupCode($field, 'hash'.$opt.'|hash', 'hashm'.$opt.'|hashm',[ID => '$ID']);
+	$keycode||=$multi;
 	unless ($keycode || $multi) { warn "BuildHash error : can't find code for field $field\n"; return } #could return empty hashes ?
-	($keycode,my $keyafter)= split / +---- +/,$keycode||$multi,2;
-	@types=('count') unless @types;
+	my $init=	$keycode=~s/^\s*INIT:(.*?)\s+----\s+//	? "$1;" : '';
+	my $keyafter=	$keycode=~s/----\s+AFTER:(.*)$//	? $1 :'';
+	@types=('id:count') unless @types;
 
 	my $after='';
 	my $code;
 	my $i;
 	for my $type (@types)
 	{	$i++;
-		my ($f,$opt)=split /:/,$type,2;
+		if ($buildhash_deprecated{$type}) { warn "BuildHash: using '$type' is deprecated, use '$buildhash_deprecated{$type}' instead\n" if ::VERSION>1.1009 || $::debug; $type=$buildhash_deprecated{$type}; }
+		my ($f,$opt,$arg)=split /:/,$type,3;
+		$arg=~y/-A-Z0-9:.,//cd if $arg;
 		$opt= $opt ? 'stats:'.$opt : 'stats';
-		my $c= $GTypes{$f} ? $GTypes{$f}{code} : LookupCode($f, $opt); #FIXME could be better
-		$c=~s/#ID#/\$ID/g;
-		($c,my $af)= split / +---- +/,$c,2;
+		$f||= 'id'; # mostly for :uniq but also :list and :count
+		my $c= LookupCode($f, $opt, [ID=>'$ID', ($arg ? (ARG=>"'$arg'") : () )]);
+		$c=~s/\$\$/'$V'.$i.'_'/ge;	# $$name  => $V5_name  if $i==5
+		$init.=";$1;" if $c=~s/^\s*INIT:(.*?)\s+----\s+//;
+		my $af= $c=~s/----\s+AFTER:(.*)$//		? $1 :'';
 #warn "BuildHash $field  : $f  $opt => $c // $af\n";
 		my $hval= $multi ? '$h'.$i.'{$key}' : "\$h$i\{$keycode}";
 		$code.=  Macro($c, HVAL=> $hval).";\n";
@@ -2355,7 +2501,7 @@ sub BuildHash
 	$code="for my \$ID (@\$lref) {\n  $code\n}\n$after";
 	my $hlist= join ',',map "\%h$_",1..$i;
 	my $hlistref= join ',',map "\\\%h$_",1..$i;
-	$code= "my \$lref=\$_[0]; my ($hlist);\n$code;\nreturn $hlistref;";
+	$code= "my \$lref=\$_[0]; $init; my ($hlist);\n$code;\nreturn $hlistref;";
 
 #warn "BuildHash($field $opt,@types)=>\n$code\n";
 	my $sub= eval "sub { no warnings 'uninitialized'; $code }";
@@ -2771,15 +2917,15 @@ our %ReplaceFields=
 (	'%'	=>	sub {'%'},
 	a	=>	sub { my $s=Songs::Gid_to_Display($_[0],$_[1]); defined $s ? $s : $_[1]; }, #FIXME PHASE1 Gid_to_Display should return something $_[1] if no gid_to_display
 	l	=>	sub { my $l=Get('length:sum',$_[0],$_[1]); $l=::__x( ($l>=3600 ? _"{hours}h{min}m{sec}s" : _"{min}m{sec}s"), hours => (int $l/3600), min => ($l>=3600 ? sprintf('%02d',$l/60%60) : $l/60%60), sec => sprintf('%02d',$l%60)); },
-	L	=>	sub { ::CalcListLength( Get('idlist',$_[0],$_[1]),'length:sum' ); }, #FIXME is CalcListLength needed ?
+	L	=>	sub { ::CalcListLength( Get('id:list',$_[0],$_[1]),'length:sum' ); }, #FIXME is CalcListLength needed ?
 	y	=>	sub { Get('year:range',$_[0],$_[1]); },
 	Y	=>	sub { my $y=Get('year:range',$_[0],$_[1]); return $y? " ($y)" : '' },
-	s	=>	sub { my $l=Get('idlist',$_[0],$_[1])||[]; ::__('%d song','%d songs',scalar @$l) },
+	s	=>	sub { my $l=Get('id:list',$_[0],$_[1])||[]; ::__('%d song','%d songs',scalar @$l) },
 	x	=>	sub { my $nb=@{GetXRef($_[0],$_[1])}; return $_[0] ne 'album' ? ::__("%d Album","%d Albums",$nb) : ::__("%d Artist","%d Artists",$nb);  },
 	X	=>	sub { my $nb=@{GetXRef($_[0],$_[1])}; return $_[0] ne 'album' ? ::__("%d Album","%d Albums",$nb) : $nb>1 ? ::__("%d Artist","%d Artists",$nb) : '';  },
 	b	=>	sub {	if ($_[0] ne 'album') { my $nb=@{GetXRef($_[0],$_[1])}; return ::__("%d Album","%d Albums",$nb); }
 				else
-				{	my $l=Songs::UniqList('artist', Get('idlist',$_[0],$_[1]));
+				{	my $l=Songs::UniqList('artist', Get('id:list',$_[0],$_[1]));
 					return @$l==1 ? Songs::Gid_to_Display('artist',$l->[0]) : ::__("%d artist","%d artists", scalar(@$l));
 				}
 			    },
@@ -2797,8 +2943,7 @@ sub ReplaceFields
 
 sub CreateHash
 {	my ($type,$field)=@_; warn "AA::CreateHash(@_)\n" if $::debug;
-	my @f=  $Songs::GTypes{$type} ? ($field) : ($type,$field);
-	$GHash_Depend{$_}++ for Songs::Depends(@f);
+	$GHash_Depend{$_}++ for Songs::Depends($type,$field);
 	return $GHash{$field}{$type}=Songs::BuildHash($field,$::Library,undef,$type);
 }
 sub Fields_Changed
@@ -2814,8 +2959,7 @@ sub Fields_Changed
 		}
 		my $subh=$GHash{$field};
 		for my $type (keys %$subh)
-		{	my @d;
-			@d=Songs::Depends($type) unless $Songs::GTypes{$type};
+		{	my @d= Songs::Depends($type);
 			if (grep exists $changed->{$_}, @d) { delete $subh->{$type} }
 			else { $GHash_Depend{$_}++ for @d0,@d; }
 		}
@@ -2837,7 +2981,7 @@ sub Get
 }
 sub GetAAList
 {	my $field=$_[0];
-	CreateHash('idlist',$field) unless $GHash{$field};
+	CreateHash('id:list',$field) unless $GHash{$field};
 	my ($h)= values %{$GHash{$field}};
 	return [keys %$h];
 }
@@ -2848,7 +2992,7 @@ sub GetXRef # get albums/artists from artist/album
 	return Get($x,$field,$key) || [];
 }
 sub GetIDs
-{	return Get('idlist',@_) || [];
+{	return Get('id:list',@_) || [];
 }
 
 sub GrepKeys
@@ -2867,7 +3011,7 @@ sub SortKeys
 	my $h=my $pre=0;
 	$mode||='';
 	if ($mode eq 'songs')
-	{	$h= $hsongs || GetHash('count',$field);
+	{	$h= $hsongs || GetHash('id:count',$field);
 		$pre='number';
 	}
 	elsif ($mode eq 'length')
@@ -3879,7 +4023,7 @@ sub new_from_smartstring
 }
 sub _smartstring_moreless
 {	my ($pat,$op,$casesens,$field)=@_;
-	$pat=~s/,/./g; #use dot as comma separator
+	$pat=~s/,/./g; #use dot as decimal separator
 	return undef unless $pat=~m/^-?[0-9.]+[a-zA-Z]?$/;	# FIXME could check if support units
 	$op= $op eq '<=' ? '->' : $op eq '>=' ? '-<' : $op;
 	return $op.':'.$pat;
@@ -3887,18 +4031,18 @@ sub _smartstring_moreless
 sub _smartstring_date_moreless
 {	my ($pat,$op,$casesens,$field)=@_;
 	my $suffix='';
-	$pat=~s/,/./g; #use dot as comma separator
-	if ($pat=~m/\d[smhdwMy]/) { $suffix='ago' } #relative date
-	elsif ($pat=~m#^(\d\d\d\d)(?:[-/](\d\d?)(?:[-/](\d\d?)(?:[-T ](\d\d?)(?::(\d\d?)(?::(\d\d?))?)?)?)?)?$#) # yyyy-MM-dd hh:mm:ss
-	{	$pat= ::mktime(($6||0),($5||0),($4||0),($3||1),($2||1)-1,$1-1900);
+	$pat=~s/,/./g; #use dot as decimal separator
+	if ($pat=~m/\d[smhdwMy]/) { $suffix='ago' } #relative date filter
+	else
+	{	$pat= ::dates_to_timestamps($pat, ($op eq '>' || $op eq '<=')? 1:0);
 	}
-	else {return undef}
+	return undef unless $pat;
 	$op= $op eq '<=' ? '->' : $op eq '>=' ? '-<' : $op;
 	return $op.$suffix.':'.$pat;
 }
 sub _smartstring_number
 {	my ($pat,$op,$casesens,$field)=@_;
-	$pat=~s/,/./g; #use dot as comma separator
+	$pat=~s/,/./g; #use dot as decimal separator
 	if ($op ne '=' || $pat!~m/^-[0-9.]+[a-zA-Z]?$/) {$pat=~s/^-/../}	# allow ranges using - unless = with negative number (could also check if field support negative values ?)
 	if ($pat=~m/\.\./)
 	{	my ($s1,$s2)= split /\s*\.\.\s*/,$pat,2;
@@ -3910,40 +4054,27 @@ sub _smartstring_number
 	$op= $op eq ':' ? 's' : 'e';
 	return $op.':'.$pat;
 }
-
 sub _smartstring_date
 {	my ($pat,$op,$casesens,$field)=@_;
 	my $suffix='';
-	if ($pat=~m/\d[smhdwMy]/) { $suffix='ago' } #relative date
-	else		# absolute date
-	{	if ($pat!~m/\.\./ && $pat=~m/^[^-]*-[^-]*$/) { $pat=~s/-/../; } # no '..' and only one '-' => replace '-' by '..'
-		my ($s1,$range,$s2)=split /(\s*\.\.\s*)/,$pat,2;
-		$pat='';
-		if ($s1 && $s1=~m#^(\d\d\d\d)(?:[-/](\d\d?)(?:[-/](\d\d?)(?:[-T ](\d\d?)(?::(\d\d?)(?::(\d\d?))?)?)?)?)?$#) # yyyy-MM-dd hh:mm:ss
-		{	$pat= ::mktime(($6||0),($5||0),($4||0),($3||1),($2||1)-1,$1-1900);
-		}
-		elsif ($s1=~m/^\d{5,}$/) {$pat=$s1}
-		$pat.='..' if $range;
-		if ($s2)
-		{	my ($y,$M,$d,$h,$m,$s)= $s2=~m#^(\d\d\d\d)(?:[-/](\d\d?)(?:[-/](\d\d?)(?:[-T ](\d\d?)(?::(\d\d?)(?::(\d\d?))?)?)?)?)?$#; # yyyy-MM-dd hh:mm:ss
-			if ($y)
-			{	for ($s,$m,$h,$d,$M,$y)
-				{	if (defined) { $_++; last; }
-				}
-				$pat.= ::mktime(($s||0),($m||0),($h||0),($d||1),($M||1)-1,$y-1900)-1;
-			}
-			elsif ($s2=~m/^\d{5,}$/) {$pat.=$s2}
-		}
+	my $date1= my $date2='';
+	if ($pat=~m#\d# and ($date1,$date2)= $pat=~m#^(\d+[smhdwMy])?(?:\.\.|-)(\d+[smhdwMy])?$#i)	# relative date filter
+	{	$suffix='ago';
 	}
-	if ($pat=~m/\.\.|-/)
-	{	my ($s1,$s2)= split /\s*\.\.\s*|\s*-\s*/,$pat,2;
-		return	(length $s1 && length $s2) ? "b$suffix:$s1 $s2":
-			(length $s1 && !length$s2) ? "-<$suffix:".$s1	:
-			(!length$s1 && length $s2) ? "->$suffix:".$s2	: undef;
+	else						# absolute date filter
+	{	($date1,$date2)= ::dates_to_timestamps($pat,2);
+		#$pat= "$date1..$date2" if $date1.$date2 ne '';
+	}
+	if ($date1.$date2 ne '')
+	{	#my ($s1,$s2)= split /\s*\.\.\s*|\s*-\s*/,$pat,2;
+		return	(length $date1 && length $date2) ? "b$suffix:$date1 $date2":
+			(length $date1 && !length$date2) ? "-<$suffix:".$date1	:
+			(!length$date1 && length $date2) ? "->$suffix:".$date2	: undef;
 	}
 	$op= $op eq '=' ? 'e' : $casesens ? 's' : 'si';
-	if ($suffix && $op eq 'e') { return undef } # FIXME =5d could be changed into between 4.5d and 5.5d ?
-	return $op.$suffix.':'.$pat;
+	#if ($suffix && $op eq 'e') { return undef } # FIXME =5d could be changed into between 4.5d and 5.5d ?
+	#return $op.$suffix.':'.$pat;
+	return $op.':'.$pat;
 }
 
 sub add_possible_superset	#indicate a possible superset filter that could be used for optimization when the result of $superset_candidate is cached

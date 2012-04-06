@@ -503,7 +503,7 @@ sub UpdatePlayListFilter
 sub CommonSave
 {	my $self=shift;
 	my $opt= $self->SaveOptions;
-	$opt->{'sort'}= $self->{'sort'};
+	$opt->{$_}= $self->{$_} for qw/sort rowtip/;
 	$opt->{follow}= ! !$self->{follow};
 
 	#save options as default for new SongTree/SongList of same type
@@ -598,27 +598,21 @@ sub Activate
 	my $aftercmd;
 	$aftercmd=$1 if $activate=~s/&(.*)$//;
 
-	{	if	($activate eq 'playlist')
-		{	if ($self->{filter})
-			{	::Select( filter=>$self->{filter}, song=>$ID, play=>1);
-			}
-			elsif ($self->{type} eq 'L')
-			{	::Select( staticlist=>[@$songarray], position=>$row, play=>1);
-			}
-			else {$activate='play';redo;}
-		}
-		elsif	($activate eq 'remove_and_play')
-		{	$songarray->Remove([$row]);
-			::Select(song=>$ID,play=>1);
-		}
-		elsif	($activate eq 'remove') 	{ $songarray->Remove([$row]); }
-		elsif	($activate eq 'properties')	{ ::DialogSongProp($ID); }
-		elsif	($activate eq 'play')
-		{	if ($self->{type} eq 'A')	{ ::Select(position=>$row,play=>1); }
-			else				{ ::Select(song=>$ID,play=>1); }
-		}
-		else	{ ::DoActionForList($activate,[$ID]); }
+	if	($activate eq 'playlist')	{ ::Select( staticlist=>[@$songarray], position=>$row, play=>1); }
+	elsif	($activate eq 'filter_and_play'){ ::Select(filter=>$self->{filter}, song=>$ID, play=>1); }
+	elsif	($activate eq 'filter_sort_and_play'){ ::Select(sort=>$self->{sort}, filter=>$self->{filter}, song=>$ID, play=>1); }
+	elsif	($activate eq 'remove_and_play')
+	{	$songarray->Remove([$row]);
+		::Select(song=>$ID,play=>1);
 	}
+	elsif	($activate eq 'remove') 	{ $songarray->Remove([$row]); }
+	elsif	($activate eq 'properties')	{ ::DialogSongProp($ID); }
+	elsif	($activate eq 'play')
+	{	if ($self->{type} eq 'A')	{ ::Select(position=>$row,play=>1); }
+		else				{ ::Select(song=>$ID,play=>1); }
+	}
+	else	{ ::DoActionForList($activate,[$ID]); }
+
 	::run_command($self,$aftercmd) if $aftercmd;
 }
 
@@ -697,6 +691,54 @@ sub DrawEmpty
 		my $gc=$style->text_aa_gc($self->state);
 		$window->draw_layout($gc, $offset+5,5, $layout);
 	}
+}
+
+sub SetRowTip
+{	my ($self,$tip)=@_;
+	$tip= "<b><big>%t</big></b>\\nby <b>%a</b>\\nfrom <b>%l</b>" if $tip && $tip eq '1';	#for rowtip=1, deprecated
+	$self->{rowtip}=$tip||'';
+	return unless *Gtk2::Widget::set_has_tooltip{CODE};  # since gtk+ 2.12, Gtk2 1.160
+	$self->set_has_tooltip(!!$tip);
+}
+
+sub EditRowTip
+{	my $self=shift;
+	if ($self->{rowtip_edit}) { $self->{rowtip_edit}->force_present; return; }
+	my $dialog = Gtk2::Dialog->new(_"Edit row tip", $self->get_toplevel,
+		[qw/destroy-with-parent/],
+		'gtk-apply' => 'apply',
+		'gtk-ok' => 'ok',
+		'gtk-cancel' => 'none',
+	);
+	::weaken( $self->{rowtip_edit}=$dialog );
+	::SetWSize($dialog,'RowTip');
+	$dialog->set_default_response('ok');
+	my $combo=Gtk2::ComboBoxEntry->new_text;
+	my $hist= $::Options{RowTip_history} ||=[	_("Play count").' : $playcount\\n'._("Last played").' : $lastplay',
+							'<b>$title</b>\\n'._('<i>by</i> %a\\n<i>from</i> %l'),
+							'$title\\n$album\\n$artist\\n<small>$comment</small>',
+							'$comment',
+						];
+	$combo->append_text($_) for @$hist;
+	my $entry=$combo->child;
+	$entry->set_text($self->{rowtip});
+	$entry->set_activates_default(::TRUE);
+	my $preview= Label::Preview->new(event => 'CurSong', wrap=>1, entry=>$entry, noescape=>1,
+		format=>'<small><i>'._("example :")."\n\n</i></small>%s",
+		preview => sub { defined $::SongID ? ::ReplaceFieldsAndEsc($::SongID,$_[0]) : $_[0]; },
+		);
+	$preview->set_alignment(0,.5);
+	$dialog->vbox->pack_start($_,::FALSE,::FALSE,4) for $combo,$preview;
+	$dialog->show_all;
+	$dialog->signal_connect( response => sub
+	 {	my ($dialog,$response)=@_;
+		my $tip=$entry->get_text;
+		if ($response eq 'ok' || $response eq 'apply')
+		{	::PrefSaveHistory(RowTip_history=>$tip) if $tip;
+			$self->SetRowTip($tip);
+		}
+		$dialog->destroy unless $response eq 'apply';
+	 });
 }
 
 package SongList;
@@ -805,6 +847,8 @@ our @ColumnMenu=
 	{ label => sub { _('_Remove this column').' ('. ($SLC_Prop{$_[0]{pos}}{menu} || $SLC_Prop{$_[0]{pos}}{title}).')' },
 	  code	=> sub { $_[0]{self}->ToggleColumn($_[0]{pos},$_[0]{pos}); },	stockicon => 'gtk-remove'
 	},
+	{ label => _("Edit row tip").'...', code => sub { $_[0]{self}->EditRowTip; },
+	},
 	{ label => _"Follow playing song",	code => sub { $_[0]{self}->FollowSong if $_[0]{self}{follow}^=1; },
 	  check => sub { $_[0]{self}{follow} }
 	},
@@ -879,13 +923,8 @@ sub new
 	$tv->signal_connect(row_activated	=> \&row_activated_cb);
 	$tv->get_selection->signal_connect(changed => \&sel_changed_cb);
 	$tv->get_selection->set_mode('multiple');
-
-	if (my $tip=$opt->{rowtip} and *Gtk2::Widget::set_has_tooltip{CODE})  # since gtk+ 2.12, Gtk2 1.160
-	{	$tv->set_has_tooltip(1);
-		$tip= "<b><big>%t</big></b>\\nby <b>%a</b>\\nfrom <b>%l</b>" if $tip eq '1';
-		$self->{rowtip}= $tip;
-		$tv->signal_connect(query_tooltip=> \&query_tooltip_cb);
-	}
+	$tv->signal_connect(query_tooltip=> \&query_tooltip_cb) if *Gtk2::Widget::set_has_tooltip{CODE}; # requires gtk+ 2.12, Gtk2 1.160
+	$self->SetRowTip($opt->{rowtip});
 
 	# used to draw text when treeview empty
 	$tv->signal_connect(expose_event=> \&expose_cb);
@@ -1012,6 +1051,8 @@ sub ToggleColumn
 	$self->AddColumn('title') unless $tv->get_columns; #if removed the last column
 	$self->{cols_to_watch}=undef; #to force update list of columns to watch
 }
+
+sub set_has_tooltip { $_[0]->child->set_has_tooltip($_[1]) }
 
 sub expose_cb
 {	my ($tv,$event)=@_;
@@ -4121,7 +4162,7 @@ sub RENDER
 		$maxwidth-= 3*XPAD+$psize;
 		$maxwidth=5 if $maxwidth<5;
 		my $width= $hash->{$gid} / $max * $maxwidth;
-		$widget->style->paint_flat_box( $window,$state,'none',$expose_area,$widget,'cell_odd_ruled_last',
+		$widget->style->paint_flat_box( $window,$state,'none',$expose_area,$widget,'cell_odd_ruled',
 			$x+$psize+PAD, $cell_area->y, $width, $cell_area->height );
 	}
 
@@ -4747,7 +4788,12 @@ sub update_scrollbar
 	my $pagesize=$self->{viewwindowsize}[1]||0;
 	my $upper=$self->{viewsize}[1]||0;
 	my $adj=$scroll->get_adjustment;
-	my $oldpos= $adj->upper ? ($adj->page_size/2+$adj->value) / $adj->upper : 0;
+	my $oldpos= $adj->value;
+	my $oldupper=$adj->upper;
+	# calculate the old position in a 0 to 1 scale
+	$oldpos= !($oldupper && $oldpos) ?		0: # at the beginning => stay there
+		 $oldupper<=$oldpos+$adj->page_size ?	1: # at the end => stay there
+							($adj->page_size/2+$oldpos) / $oldupper; #base position on middle of current position
 	$adj->page_size($pagesize);
 	if ($upper>$pagesize)	{$scroll->show; $adj->upper($upper); $scroll->queue_draw; }
 	else			{$scroll->hide; $adj->upper(0);}
@@ -5414,13 +5460,8 @@ sub new
 	$view->signal_connect(drag_leave	=> \&drag_leave_cb);
 	$view->signal_connect(button_press_event=> \&button_press_cb);
 	$view->signal_connect(button_release_event=> \&button_release_cb);
-
-	if (my $tip=$opt->{rowtip} and *Gtk2::Widget::set_has_tooltip{CODE})  # requires gtk+ 2.12, Gtk2 1.160
-	{	$view->set_has_tooltip(1);
-		$tip= "<b><big>%t</big></b>\\nby <b>%a</b>\\nfrom <b>%l</b>" if $tip eq '1';
-		$self->{rowtip}= $tip;
-		$view->signal_connect(query_tooltip=> \&query_tooltip_cb);
-	}
+	$view->signal_connect(query_tooltip=> \&query_tooltip_cb) if *Gtk2::Widget::set_has_tooltip{CODE}; # requires gtk+ 2.12, Gtk2 1.160
+	$self->SetRowTip($opt->{rowtip});
 
 	::Watch($self,	CurSongID	=> \&CurSongChanged);
 	::Watch($self,	SongArray	=> \&SongArray_changed_cb);
@@ -5572,6 +5613,8 @@ sub set_head_columns
 	$self->BuildTree unless $self->{need_init};
 	$self->scroll_to_row($savedpos->{hirow}||0,1) if $savedpos;
 }
+
+sub set_has_tooltip { $_[0]{view}->set_has_tooltip($_[1]) }
 
 sub GetCurrentRow
 {	my $self=shift;
@@ -6618,6 +6661,8 @@ our @ColumnMenu=
 	{ label=> sub { _('_Remove this column').' ('.($SongTree::STC{$_[0]{colid}}{menutitle}||$SongTree::STC{$_[0]{colid}}{title}).')' },
 	  code => sub { $_[0]{songtree}->remove_column($_[0]{cellnb}) },	stockicon => 'gtk-remove', isdefined => 'colid',
 	},
+	{ label => _("Edit row tip").'...', code => sub { $_[0]{songtree}->EditRowTip; },
+	},
 	{ label => _"Follow playing song",	code => sub { $_[0]{songtree}->FollowSong if $_[0]{songtree}{follow}^=1; },
 	  check => sub { $_[0]{songtree}{follow} }
 	},
@@ -7518,7 +7563,7 @@ no warnings;
 
 our %alias=( 'if' => 'iff', pesc => '::PangoEsc', min =>'::min', max =>'::max', sum =>'::sum',);
 our %functions=
-(	formattime=> ['do {my ($f,$t,$z)=(',		'); !$t && defined $z ? $z : ::strftime2($f,localtime($t)); }'],
+(	formattime=> ['do {my ($f,$t,$z)=(',		'); !$t && defined $z ? $z : ::strftime_utf8($f,localtime($t)); }'],
 	#sum	=>   ['do {my $sum; $sum+=$_ for ',	';$sum}'],
 	average	=>   ['do {my $sum=::sum(',		'); @l ? $sum/@l : undef}'],
 	#max	=>   ['do {my ($max,@l)=(',		'); $_>$max and $max=$_ for @l; $max}'],

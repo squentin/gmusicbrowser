@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1008\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
 "POT-Creation-Date: 2012-02-02 17:04+0100\n"
-"PO-Revision-Date: 2012-03-09 21:12+0100\n"
+"PO-Revision-Date: 2012-03-16 22:35+0100\n"
 "Last-Translator: Gijs Timmers <gijs.timmers@student.kuleuven.be>\n"
 "Language-Team: Nederlands <gijs.timmers@student.kuleuven.be>\n"
 "Language: \n"
@@ -1564,7 +1564,7 @@ msgid "Key"
 msgstr "Toets"
 
 msgid "Keys"
-msgstr "Toetsen"
+msgstr "Sneltoetsen"
 
 msgid "Keywords"
 msgstr "Sleutelwoorden"
@@ -2873,13 +2873,13 @@ msgid "Search Title"
 msgstr "Titel zoeken"
 
 msgid "Search Title, Artist and Album"
-msgstr "Titel, artiest en album zoeken"
+msgstr "Titel, artiest of album zoeken"
 
 msgid "Search Title, Artist, Album, Comment, Label and Genre"
-msgstr "Titel, artiest, album, opmerking, label en genre zoeken"
+msgstr "Titel, artiest, album, opmerking, label of genre zoeken"
 
 msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
-msgstr "Titel, artiest, album, opmerking, label, genre en bestandsnaam zoeken"
+msgstr "Titel, artiest, album, opmerking, label, genre of bestandsnaam zoeken"
 
 msgid "Search album"
 msgstr "Album zoeken"
@@ -3129,7 +3129,7 @@ msgid "Sidebar"
 msgstr "Zijbalk"
 
 msgid "Similar"
-msgstr "Vergelijkbare"
+msgstr "Vergelijkbaar"
 
 msgid "Similar Artists"
 msgstr "Vergelijkbare artiest zoeken"
@@ -4016,7 +4016,7 @@ msgid "float"
 msgstr "drijvend"
 
 msgid "font size depends on"
-msgstr "lettertypegrootte is afhankelijk van"
+msgstr "tekstgrootte is afhankelijk van"
 
 msgid "for files without a VBR header"
 msgstr "voor bestanden zonder VBR-koptekst"
@@ -4082,6 +4082,20 @@ msgstr "geïmporteerde lijst"
 #, perl-format
 msgid "in %l"
 msgstr "in %l"
+
+msgid "in the bottom"
+msgstr "aan de onderzijde"
+
+#, perl-format
+msgid "in the bottom %s"
+msgstr "in de onderste %s"
+
+msgid "in the top"
+msgstr "in de hoogste"
+
+#, perl-format
+msgid "in the top %s"
+msgstr "in de hoogste %s"
 
 msgid "includes"
 msgstr "bevat"
@@ -4161,7 +4175,7 @@ msgid "is mono"
 msgstr "is mono"
 
 msgid "is smart equal"
-msgstr "hoort bij"
+msgstr "is gelijk aan (slimme modus)"
 
 #, perl-format
 msgid "is smart equal to %s"
@@ -4226,5 +4240,576 @@ msgstr "hoofdartiest"
 msgid "leaflet page"
 msgstr "brochurepagina"
 
+msgid "left-side filter panes"
+msgstr "filterpanelen aan de linkerzijde"
+
+msgid "length of songs"
+msgstr "lengte van de titels"
+
+msgid "less than"
+msgstr "minder dan"
+
+#, perl-format
+msgid "less than %s ago"
+msgstr "minder dan %s geleden"
+
+msgid "lyricist"
+msgstr "auteur"
+
+msgid "lyrics file"
+msgstr "songtekstbestand"
+
+msgid "matches regexp"
+msgstr "komt overeen met de reguliere expressie"
+
+#, perl-format
+msgid "matches regexp %s"
+msgstr "komt overeen met reguliere expressie %s"
+
+#, perl-format
+msgid "matches regexp %s (case sensitive)"
+msgstr "komt overeen met reguliere expressie %s (hoofdlettergevoelig)"
+
+msgid "maximum font size"
+msgstr "maximale tekstgrootte"
+
+msgid "media"
+msgstr "media"
+
+msgid "medium size"
+msgstr "gemiddelde grootte"
+
+msgid "minimal"
+msgstr "minimaal"
+
+msgid "minimum font size"
+msgstr "minimale tekstgrootte"
+
+msgid "minutes"
+msgstr "minuten"
+
+msgid "month"
+msgstr "maand"
+
+msgid "months"
+msgstr "maanden"
+
+msgid "more than"
+msgstr "meer dan"
+
+#, perl-format
+msgid "more than %s ago"
+msgstr "meer dan %s geleden "
+
+msgid "mosaic mode"
+msgstr "mozaïekweergave"
+
+msgid "move folder"
+msgstr "map verplaatsen"
+
+msgid "movie/video screen capture"
+msgstr "video-opname"
+
+msgid ""
+"mp3 files without a VBR header requires a full scan to check its real length "
+"and bitrate"
+msgstr ""
+"mp3-bestanden zonder VBR-koptekst moeten volledig gescand worden om hun "
+"lengte en bitrate te bepalen"
+
+msgid "mplayer executable :"
+msgstr "mplayeropdracht:"
+
+msgid "mplayer options :"
+msgstr "mplayeropties:"
+
+msgid "multi-lines string"
+msgstr "tekenreeks met meerdere regels"
+
+msgid "name of the new filter"
+msgstr "nieuwe filternaam"
+
+msgid "name of the new grouping"
+msgstr "nieuwe groepnaam"
+
+msgid "name of the new random mode"
+msgstr "nieuwe shufflemodusnaam"
+
+msgid "name of the new sort mode"
+msgstr "nieuwe sorteermodusnaam"
+
+msgid "never"
+msgstr "nooit"
+
+msgid "never played"
+msgstr "nooit afgespeeld"
+
+msgid "no matches found, you might want to remove some search terms."
+msgstr ""
+"geen overeenkomsten gevonden, verwijder enkele zoekwoorden en zoek opnieuw."
+
+msgid "no order"
+msgstr "geen volgorde"
+
+msgid "no picture"
+msgstr "geen afbeelding"
+
+msgid "no pictures"
+msgstr "geen afbeeldingen"
+
+msgid "no plugins found"
+msgstr "geen plugins gevonden"
+
+msgid "no songs needs checking"
+msgstr "geen enkele titel moet nagekeken worden"
+
+msgid "no splitting"
+msgstr "geen splitsing"
+
+msgid "no to all"
+msgstr "nee op alles"
+
+msgid "noname"
+msgstr "zonder naam"
+
+msgid "normal"
+msgstr "normaal"
+
+#, perl-format
+msgid "not between %s ago and %s ago"
+msgstr "niet tussen %s en %s geleden"
+
+#, perl-format
+msgid "not between %s and %s"
+msgstr "niet tussen %s en %s"
+
+msgid "not bootleg"
+msgstr "niet een bootleg"
+
+#, perl-format
+msgid "not in the bottom %s"
+msgstr "niet in de onderste %s"
+
+#, perl-format
+msgid "not in the top %s"
+msgstr "niet in de bovenste %s"
+
+#, perl-format
+msgid "not present in %s"
+msgstr "is niet aanwezig in %s"
+
+#, perl-format
+msgid "not set to %s"
+msgstr "niet ingesteld op %s"
+
+#, perl-format
+msgid "not the %s least recent"
+msgstr "is niet in de oudste %s"
+
+#, perl-format
+msgid "not the %s most recent"
+msgstr "niet de recentste %s"
+
+msgid "number of songs"
+msgstr "aantal titels"
+
+msgid "number of songs in filter"
+msgstr "aantal titels in filter"
+
+msgid "only show entries with at least n songs"
+msgstr "alleen items tonen met minstens n titels"
+
+msgid "only works when the artist-info tab is displayed"
+msgstr "werkt alleen wanneer de artiestinfotab ingeschakeld is"
+
+msgid "only works with some lyrics source and when the lyrics tab is active"
+msgstr ""
+"werkt alleen met bepaalde songtekstbronnen, en alleen wanneer de "
+"songteksttab geactiveerd is"
+
+msgid "open context window"
+msgstr "contextvenster openen"
+
+msgid "options"
+msgstr "opties"
+
+#, perl-format
+msgid "or %d seconds"
+msgstr "of %d seconden"
+
+msgid "other"
+msgstr "ander"
+
+msgid "other file icon"
+msgstr "ander pictogram"
+
+msgid "output device :"
+msgstr "uitvoerapparaat:"
+
+msgid "password :"
+msgstr "wachtwoord:"
+
+msgid "perl code"
+msgstr "perl-code"
+
+msgid "picture size"
+msgstr "afbeeldingsgrootte"
+
+msgid "play count average"
+msgstr "gemiddeld aantal keer afgespeeld"
+
+msgid "played>4"
+msgstr "afgespeeld>4"
+
+msgid "port :"
+msgstr "poort:"
+
+msgid "pre-amp"
+msgstr "voorversterking"
+
+#, perl-format
+msgid "pre-amp : %d dB"
+msgstr "voorversterking: %d dB"
+
+#, perl-format
+msgid "present in %s"
+msgstr "aanwezig in %s"
+
+msgid "present in list"
+msgstr "aanwezig in lijst"
+
+msgid "quit"
+msgstr "afsluiten"
+
+msgid "rating"
+msgstr "waardering"
+
+msgid "rating average"
+msgstr "gemiddelde waardering"
+
+msgid "recording location"
+msgstr "opnamelocatie"
+
+msgid "requires xdg-screensaver"
+msgstr "vereist xdg-screensaver"
+
+#, perl-brace-format
+msgid "reset filter {nb}"
+msgstr "filter resetten {nb}"
+
+msgid "reset format"
+msgstr "formaat resetten"
+
+msgid "reset primary filter"
+msgstr "hoofdfilter resetten"
+
+msgid "reset secondary filter"
+msgstr "secundair filter resetten"
+
+msgid "retry"
+msgstr "opnieuw proberen"
+
+#, perl-brace-format
+msgid "retry in {seconds} s"
+msgstr "opnieuw proberen over {seconds} s"
+
+msgid "reverse order"
+msgstr "volgorde omkeren"
+
+#, perl-brace-format
+msgid "save as '{name}'"
+msgstr "opslaan als '{name}'"
+
+msgid "save filter as"
+msgstr "filter opslaan als"
+
+msgid "save grouping as"
+msgstr "groepering opslaan als"
+
+msgid "save random mode as"
+msgstr "modus voor willekeurig afspelen opslaan als"
+
+msgid "save sort mode as"
+msgstr "sorteermodus opslaan als"
+
+msgid "saved filters"
+msgstr "opgeslagen filters"
+
+msgid "saved groupings"
+msgstr "opgeslagen groeperingen"
+
+msgid "saved random modes"
+msgstr "opgeslagen modi voor willekeurig afspelen"
+
+msgid "saved sort modes"
+msgstr "opgeslagen sorteermodi"
+
+msgid "scan now"
+msgstr "nu scannen"
+
+msgid "seconds"
+msgstr "seconden"
+
+msgid "set to"
+msgstr "instellen op"
+
+#, perl-format
+msgid "set to %s"
+msgstr "instellen op %s"
+
+msgid "show pictures"
+msgstr "afbeeldingen tonen"
+
+msgid "show the 'All' row"
+msgstr "de 'alles'-rij tonen"
+
+msgid "similar-artists"
+msgstr "vergelijkbare artiesten"
+
+msgid "skin options"
+msgstr "uiterlijkopties"
+
+msgid "skip count average"
+msgstr "gemiddeld aantal keer overgeslagen"
+
+msgid "small size"
+msgstr "kleine grootte"
+
+msgid "sort by"
+msgstr "sorteren op"
+
+msgid "static list"
+msgstr "statische lijst"
+
+msgid "stop"
+msgstr "stoppen"
+
 msgid "string"
 msgstr "tekenreeks"
+
+msgid "supports : "
+msgstr "ondersteunt:"
+
+msgid "text format"
+msgstr "tekstformaat"
+
+msgid "text mode"
+msgstr "tekstmodus"
+
+#, perl-format
+msgid "the %s least recent"
+msgstr "de oudste %s"
+
+#, perl-format
+msgid "the %s most recent"
+msgstr "de recentste %s"
+
+#, perl-brace-format
+msgid "the command {name}"
+msgstr "de opdracht {name}"
+
+msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
+msgstr "de standaardencodering is UTF-16 voor ID3v2.3 en UTF-8 voor ID3v2.4"
+
+#, perl-brace-format
+msgid "the file {name}"
+msgstr "het bestand {name}"
+
+msgid "the least recent"
+msgstr "de oudste"
+
+msgid "the most recent"
+msgstr "de recentste"
+
+#, perl-brace-format
+msgid "the {name} perl module"
+msgstr "de perlmodule {name}"
+
+#, perl-brace-format
+msgid "then {action}"
+msgstr "dan {action}"
+
+msgid "times"
+msgstr "keer"
+
+#. comma-separated list of field aliases for title, these are in addition to english aliases
+msgctxt "Field_aliases"
+msgid "title"
+msgstr "titel"
+
+msgid "toggle Intersection mode"
+msgstr "intersectiemodus aan- of uitschakelen"
+
+msgid "toggle Invert mode"
+msgstr "omkeermodus aan- of uitschakelen"
+
+msgid "tools"
+msgstr "gereecdschap"
+
+msgid "true"
+msgstr "waar"
+
+msgid "turn off"
+msgstr "uitschakelen"
+
+msgid "unknown"
+msgstr "onbekend"
+
+msgid "unknown error"
+msgstr "onbekende fout"
+
+msgid "unnamed random mode"
+msgstr "naamloze modus voor willekeurig afspelen"
+
+msgid "url"
+msgstr "URL"
+
+msgid "url-encoded list of files"
+msgstr "URL-geëncodeerde bestandslijst"
+
+msgid "url-encoded list of files/folders"
+msgstr "URL-geëncodeerde mappen- en bestandslijst"
+
+msgid "use :"
+msgstr "gebruik:"
+
+msgid "use album name"
+msgstr "albumnaam gebruiken"
+
+msgid "use default"
+msgstr "standaardinstelling gebruiken"
+
+msgid "use gnome settings"
+msgstr "Gnome-instellingen gebruiken"
+
+msgid "use song folder"
+msgstr "bijbehorende map van de titel gebruiken"
+
+msgid "use standard strftime variables"
+msgstr "standaard strftimevariabelen gebruiken"
+
+msgid "username :"
+msgstr "gebruikersnaam:"
+
+msgid "using skin :"
+msgstr "gebruikt uiterlijk:"
+
+msgid "wait for more"
+msgstr "op meer wachten"
+
+msgid "weeks"
+msgstr "weken"
+
+msgid "weight :"
+msgstr "gewicht:"
+
+msgid "wikipedia, lyrics, and custom webpages"
+msgstr "Wikipedia, sonteksten en gebruikersgedefinieerde websites"
+
+msgid "with browser"
+msgstr "met browser"
+
+msgid "with browser & queue"
+msgstr "met browser en wachtrij"
+
+msgid "with browser (SongTree)"
+msgstr "met browser (bestandsboom)"
+
+msgid "with lists"
+msgstr "met lijsten"
+
+msgid "with picture"
+msgstr "met afbeelding"
+
+msgid "with playlist"
+msgstr "met afspeellijst"
+
+msgid "with queue"
+msgstr "met wachtrij"
+
+msgid "with search"
+msgstr "met zoeken"
+
+msgid "with search and lists"
+msgstr "met zoeken en lijsten"
+
+msgid "with search and lists 2"
+msgstr "met zoeken en lijsten 2"
+
+msgid ""
+"without gstreamer : one stream per file, one connection at a time\n"
+"with gstreamer : one continuous stream, multiple connection possible"
+msgstr ""
+"zonder gstreamer: één stream per bestand, slechts één verbinding "
+"gelijktijdig\n"
+"met gstreamer: een continue stream, meerdere gelijktijdige verbindingen "
+"mogelijk"
+
+msgid "x offset :"
+msgstr "Horizontale verschuiving:"
+
+msgid "y offset :"
+msgstr "Verticale verschuiving:"
+
+msgid "year"
+msgstr "jaar"
+
+msgid "year (highest)"
+msgstr "jaar (hoogste)"
+
+msgid "years"
+msgstr "jaren"
+
+msgid "yes to all"
+msgstr "ja op alles"
+
+#, perl-brace-format
+msgid ""
+"{album}\n"
+"<small>by</small> {artist}"
+msgstr ""
+"{album}\n"
+"<small>door</small> {artist}"
+
+#, perl-brace-format
+msgid "{folder} already exists"
+msgstr "{folder} bestaat al"
+
+#, perl-brace-format
+msgid "{hours} hours {min} min {sec} s ({size} M)"
+msgstr "{hours} uur {min} min {sec} s ({size} MB)"
+
+#, perl-brace-format
+msgid "{hours}h {min}m {sec}s ({size}M)"
+msgstr "{hours}u {min}m {sec}s ({size}MB)"
+
+#, perl-brace-format
+msgid "{hours}h{min}m{sec}s"
+msgstr "{hours}u{min}m{sec}s"
+
+#, perl-brace-format
+msgid "{min} min {sec} s ({size} M)"
+msgstr "{min} min {sec} s ({size} MB)"
+
+#, perl-brace-format
+msgid "{min}m {sec}s ({size}M)"
+msgstr "{min}m {sec}s ({size}MB)"
+
+#, perl-brace-format
+msgid "{min}m{sec}s"
+msgstr "{min}m{sec}s"
+
+#, perl-brace-format
+msgid "{outputname} output settings"
+msgstr "{outputname}-uitvoerinstellingen"
+
+#, perl-brace-format
+msgid "{songs} by {artists}"
+msgstr "{songs} door {artists}"
+
+#, perl-brace-format
+msgid "{song} by {artist}"
+msgstr "{song} door {artist}"
+
+msgid "|-separated list of widget names"
+msgstr "met '|' gescheide widgetnaamlijst"

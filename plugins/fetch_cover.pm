@@ -263,7 +263,7 @@ sub parse_freecovers #FIXME could use a XML module	#can provide backcover and mo
 sub parse_lastfm
 {	my $result=$_[0];
 	my @list;
-	while ($result=~m#<a href="/music/[^/]+/\+images/\d+"[^>]+?class="pic".+?<img [^>]+?src="([^"]+)"#gs)
+	while ($result=~m#<a\s+href="/music/[^/]+/\+images/\d+"[^>]+?class="pic".+?<img [^>]+?src="([^"]+)"#gs)
 	{	my $url=my $pre=$1;
 		$url=~s#/\w+/(\d+.jpg)$#/_/$1#; ### /126b/123456.jpg -> /_/123456.jpg
 		push @list, {url => $url, previewurl =>$pre,};

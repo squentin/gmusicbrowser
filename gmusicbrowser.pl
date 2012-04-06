@@ -22,6 +22,7 @@ use utf8;
 package main;
 use Gtk2 '-init';
 use Glib qw/filename_from_unicode filename_to_unicode/;
+use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime _exit/;
 {no warnings 'redefine'; #some work arounds for old versions of perl-Gtk2 and/or gtk2
  *filename_to_utf8displayname=\&Glib::filename_display_name if *Glib::filename_display_name{CODE};
  *PangoEsc=\&Glib::Markup::escape_text if *Glib::Markup::escape_text{CODE}; #needs perl-Gtk2 version >=1.092
@@ -42,8 +43,11 @@ use Glib qw/filename_from_unicode filename_to_unicode/;
  }
  my $set_clip_rectangle_orig=\&Gtk2::Gdk::GC::set_clip_rectangle;
  *Gtk2::Gdk::GC::set_clip_rectangle=sub { &$set_clip_rectangle_orig if $_[1]; } if $Gtk2::VERSION <1.102; #work-around $rect can't be undef in old bindings versions
+ if ($POSIX::VERSION<1.18)
+ {	my ($strftime_encoding)= setlocale(LC_TIME)=~m#\.([^@]+)#;
+	*strftime_utf8= sub { $strftime_encoding ? Encode::decode($strftime_encoding, &strftime) : &strftime; };
+ }
 }
-use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime _exit/;
 use List::Util qw/min max sum first/;
 use File::Copy;
 use File::Spec::Functions qw/file_name_is_absolute catfile rel2abs/;
@@ -774,6 +778,83 @@ our %SIZEUNITS=
 		m => [1000000,_"MB"],
 );
 
+sub strftime_utf8
+{	utf8::upgrade($_[0]); &strftime;
+}
+
+# english and localized, full and abbreviated, day names
+my %DAYS=( map( {	::superlc(strftime_utf8('%a',0,0,0,1,0,100,$_))=>$_,
+			::superlc(strftime_utf8('%A',0,0,0,1,0,100,$_))=>$_
+		} 0..6), sun=>0,mon=>1,tue=>2,wed=>3,thu=>4,fri=>5,sat=>6);
+# english and localized, full and abbreviated, month names
+my %MONTHS=( map( {	::superlc(strftime_utf8('%b',0,0,0,1,$_,100))=>$_+1,
+			::superlc(strftime_utf8('%B',0,0,0,1,$_,100))=>$_+1
+		  } 0..11), jan=>1,feb=>2,mar=>3,apr=>4,may=>5,jun=>6,jul=>7,aug=>8,sep=>9,oct=>10,nov=>11,dec=>12);
+for my $h (\%DAYS,\%MONTHS)	#remove "." at the end of some localized day/month names
+{	for my $key (keys %$h) { $h->{$key}= delete $h->{"$key."} if $key=~s/\.$//; }
+}
+sub dates_to_timestamps
+{	my ($dates,$mode)=@_;	#mode : 0: begin date, 1: end date, 2: range
+	if ($mode==2 && $dates!~m/\.\./ && $dates=~m/^[^-]*-[^-]*$/) { $dates=~s/-/../; } # no '..' and only one '-' => replace '-' by '..'
+	my ($date1,$range,$date2)=split /(\s*\.\.\s*)/,$dates,2;
+	if    ($mode==0) { $date2=0; }
+	elsif ($mode==1) { $date2||=$date1; $date1=0; }
+	elsif ($mode==2) { $date2=$date1 unless $range; }
+	my $end=0;
+	for my $date ($date1,$date2)
+	{	if (!$date) {$date='';next}
+		elsif ($date=~m/^\d{9,}$/) {next} #seconds since epoch
+		my $past_step=1;
+		my $past_var;
+		my ($y,$M,$d,$h,$m,$s,$pm);
+		{	($y,$M,$d,$h,$m,$s)= $date=~m#^(\d\d\d\d)(?:[-/.](\d\d?)(?:[-/.](\d\d?)(?:[-T ](\d\d?)(?:[:.](\d\d?)(?:[:.](\d\d?))?)?)?)?)?$# and last; # yyyy/MM/dd hh:mm:ss
+			($h,$m,$s,$pm)=	$date=~m#^(\d\d?)[:](?:(\d\d?)(?:[:](\d\d?))?)?([ap]m?)?$#i and last; #hh:mm:ss or hh:mm or hh:
+			($d,$M,$y)=	$date=~m#^(\d\d?)(?:[-/.](\d\d?)(?:[-/.](\d\d\d\d))?)?$# and last; # dd/MM or dd/MM/yyyy
+			($M,$y)=	$date=~m#^(\d\d?)[-/.](\d\d\d\d)$# and last; # MM/yyyy
+			($y,$M,$d)=	$date=~m#^(\d{4})(\d\d)(\d\d)$# and last; # yyyyMMdd
+			if ($date=~m#^(?:(\d\d?)[-/. ]?)?(\p{Alpha}+)(?:[-/. ]?(\d\d(?:\d\d)?))?$# && (my $month=$MONTHS{::superlc($2)})) # jan or jan99 or 10jan or 10jan12 or jan2012
+			{	($d,$M,$y)=($1,$month,$3);
+				last;
+			}
+			if (defined(my $wday=$DAYS{::superlc$date})) #name of week day
+			{	my ($now_day,$now_wday)= (localtime)[3,6];
+				$d= $now_day - $now_wday + $wday;
+				$past_step=7; $past_var=3; #remove 7days if in future
+				last;
+			}
+			$date='';
+		}
+		next unless $date;
+		if (defined $y)
+		{	$y= $y>100 ? $y-=1900 : $y<70 ? $y+100 : $y;	#>100 => 4digits year, <70 : 2digits 20xx year, else 2digits 19xx year
+		}
+		$M-- if defined $M;
+		$h+=12 if defined $pm && $pm=~m/^pm?$/ && defined $h;
+		my @now= (localtime)[0..5];
+		for ($y,$M,$d,$h,$m,$s)	#complete relative dates with current date
+		{	last if defined;
+			$_= pop @now;
+		}
+		$past_var= scalar @now unless defined $past_var; #unit to change if in the future
+		if ($end)	#if end date increment the smallest defined unit (to get the end of day/month/year/hour/min + 1 sec)
+		{	for ($s,$m,$h,$d,$M,$y)
+			{	if (defined) { $_++; last; }
+			}
+		}
+		my @date= ($s||0,$m||0,$h||0,$d||1,$M||0,$y);
+		$date= ::mktime(@date);
+		if ($past_var<6 && $date>time) #for relative dates, choose between previous and next match (for example, this year's july or previous year's july)
+		{	$date[$past_var]-= $past_step;
+			my $date_past= ::mktime(@date);
+			#use date in the past unless it's an end date and makes more sense relative to the first date
+			$date= $date_past unless $end && $date1 && $date>$date1 && $date_past<=$date1;
+		}
+		$date-- if $end;
+	}
+	continue {$end=1}
+	return $mode==0 ? $date1 : $mode==1 ? $date2 : ($date1,$date2);
+}
+
 sub ConvertTime	# convert date pattern into nb of seconds
 {	my ($date,$unit)= $_[0]=~m/^\s*(\d+|\d*?[.]\d+)\s*([a-zA-Z]*)\s*$/;
 	return 0 unless $date;
@@ -787,11 +868,6 @@ sub ConvertSize
 	if (my $ref= $SIZEUNITS{lc$unit}) { $size*= $ref->[0] }
 	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
 	return $size;
-}
-
-my ($strftime_encoding)= setlocale(LC_TIME)=~m#\.([^@]+)#;
-sub strftime2	# try to return an utf8 value from strftime
-{	$strftime_encoding ? Encode::decode($strftime_encoding, &strftime) : &strftime;
 }
 
 #---------------------------------------------------------------
@@ -2413,11 +2489,11 @@ sub Played
 
 	if ($partial) #FIXME maybe only count as a skip if played less than ~20% ?
 	{	my $nb= 1+Songs::Get($ID,'skipcount');
-		Songs::Set($ID, skipcount=> $nb, lastskip=> $StartTime);
+		Songs::Set($ID, skipcount=> $nb, lastskip=> $StartTime, '+skiphistory'=>$StartTime);
 	}
 	else
 	{	my $nb= 1+Songs::Get($ID,'playcount');
-		Songs::Set($ID, playcount=> $nb, lastplay=> $StartTime);
+		Songs::Set($ID, playcount=> $nb, lastplay=> $StartTime, '+playhistory'=>$StartTime);
 	}
 }
 
@@ -2755,8 +2831,13 @@ sub Select	#Set filter, sort order, selected song, playing state, staticlist, so
 	my ($filter,$sort,$song,$staticlist,$pos)=@args{qw/filter sort song staticlist position/};
 	$SongID=undef if $song && $song eq 'first';
 	$song=undef if $song && $song=~m/\D/;
-	if (defined $sort) { $ListPlay->Sort($sort) }
-	elsif (defined $filter) { $filter= Filter->new($filter) unless ref $filter; $ListPlay->SetFilter($filter) }
+	if (defined $filter)
+	{	if ($song) { $SongID=$song; $ChangedID=$ChangedPos=1; }
+		$filter= Filter->new($filter) unless ref $filter;
+		$ListPlay->SetFilter($filter);
+		$ListPlay->Sort($sort) if defined $sort;	#FIXME add a function that do both filter and sort
+	}
+	elsif (defined $sort) { $ListPlay->Sort($sort) }
 	elsif ($staticlist)
 	{	if (defined $pos) { $Position=$pos; $SongID=$staticlist->[$pos]; $ChangedID=$ChangedPos=1; }
 		$ListPlay->Replace($staticlist);
@@ -3246,15 +3327,24 @@ sub ChooseSongs
 	my $format = $opt{markup} || __x( _"{song} by {artist}", song => "<b>%t</b>%V", artist => "%a");
 	my $menu = Gtk2::Menu->new;
 	my $activate_callback=sub
-	 {	return if $_[0]->get_submenu;
-		if ($_[0]{middle}) { Enqueue($_[1]); }
-		else { Select(song => $_[1], play=>1); }
+	 {	my $item=shift;
+		return if $item->get_submenu;
+		my $ID=$item->{ID};
+		if ($item->{middle}) { Enqueue($ID); }
+		else { Select(song => $ID); }
 	 };
 	my $click_callback=sub
-	 { my ($mitem,$event)=@_;
-	   if	($event->button == 2) { $mitem->{middle}=1 }
+	 { my ($item,$event)=@_;
+	   if	($event->button == 2)
+	   {	$item->{middle}=1;
+		my $state=Gtk2->get_current_event_state;
+		if ( $state && ($state >= ['shift-mask'] || $state >= ['control-mask']) ) #keep the menu up if ctrl or shift pressed
+		{	$item->parent->{keep_it_up}=1; $activate_callback->($item);
+			return 1;
+		}
+	   }
 	   elsif($event->button == 3)
-	   {	my $submenu=BuildMenu(\@SongCMenu,{mode => 'P', IDs=> [$_[2]]});
+	   {	my $submenu=BuildMenu(\@SongCMenu,{mode => 'P', IDs=> [$item->{ID}]});
 		$submenu->show_all;
 		$_[0]->set_submenu($submenu);
 		#$submenu->signal_connect( selection_done => sub {$menu->popdown});
@@ -3331,10 +3421,10 @@ sub ChooseSongs
 			$item->set_always_show_image(1);
 			$label->set_alignment(0,.5); #left-aligned
 			$label->set_markup( ReplaceFieldsAndEsc($ID,$format) );
-			my $icon=Get_PPSQ_Icon($ID);
-			$item->set_image(Gtk2::Image->new_from_stock($icon, 'menu')) if $icon;
-			$item->signal_connect(activate => $activate_callback, $ID);
-			$item->signal_connect(button_press_event => $click_callback, $ID);
+			$item->{ID}=$ID;
+			$item->signal_connect(activate => $activate_callback);
+			$item->signal_connect(button_press_event => $click_callback);
+			$item->signal_connect(button_release_event => sub { return 1 if delete $_[0]->parent->{keep_it_up}; 0; });
 			#set_drag($item, source => [::DRAG_ID,sub {::DRAG_ID,$ID}]);
 		    }
 		    else	# "title" items
@@ -3350,6 +3440,19 @@ sub ChooseSongs
 		}
 		$menu->{cols}= \@columns;
 	}
+
+	my $update_icons= sub
+	{	for my $item ($_[0]->get_children)
+		{	my $ID=$item->{ID};
+			next unless defined $ID;
+			my $icon= Get_PPSQ_Icon($ID) || '';
+			next unless $icon || $item->get_image;
+			$item->set_image( Gtk2::Image->new_from_stock($icon,'menu') );
+		}
+	};
+	::Watch($menu,$_,$update_icons) for qw/CurSongID Playing Queue/; #update queue/playing icon when needed
+	$update_icons->($menu);
+
 	if (defined wantarray)	{return $menu}
 	my $event=Gtk2->get_current_event;
 	$menu->show_all;
@@ -5235,7 +5338,7 @@ sub AutoSelPicture
 
 			my $path= Songs::BuildHash('path', $IDs);
 			for my $folder (keys %$path)
-			{	my $count_in_folder= AA::Get('count','path',$folder);
+			{	my $count_in_folder= AA::Get('id:count','path',$folder);
 				#warn " removing $folder $count_in_folder != $path->{$folder}\n" if $count_in_folder != $path->{$folder} if $::debug;
 				delete $path->{$folder} if $count_in_folder != $path->{$folder};
 			}
@@ -5817,7 +5920,7 @@ sub PrefMisc
 	#date format
 	my $dateex= mktime(5,4,3,2,0,(localtime)[5]);
 	my $datetip= join "\n", _"use standard strftime variables",	_"examples :",
-			map( sprintf("%s : %s",$_,strftime2($_,localtime($dateex))), split(/ *\| */,"%a %b %d %H:%M:%S %Y | %A %B %I:%M:%S %p %Y | %d/%m/%y %H:%M | %X %x | %F %r | %c | %s") ),
+			map( sprintf("%s : %s",$_,strftime_utf8($_,localtime($dateex))), split(/ *\| */,"%a %b %d %H:%M:%S %Y | %A %B %I:%M:%S %p %Y | %d/%m/%y %H:%M | %X %x | %F %r | %c | %s") ),
 			'',
 			_"Additionally this format can be used :\n default number1 format1 number2 format2 ...\n dates more recent than number1 seconds will use format1, ...";
 	my $datefmt=NewPrefEntry(DateFormat => _"Date format :", tip => $datetip, history=> 'DateFormat_history');
@@ -8373,7 +8476,7 @@ sub new
 {	my ($class,$val,$opt)=@_;
 	my $self= bless Gtk2::Button->new;
 	$self->{date}= $val || ::mktime( ( $opt->{value_index} ? (59,59,23) : (0,0,0) ), (localtime)[3,4,5]); # default to today 0:00 or today 23:59
-	$self->set_label( ::strftime2('%c',localtime($self->{date})) );
+	$self->set_label( ::strftime_utf8('%c',localtime($self->{date})) );
 	$self->signal_connect (clicked => sub
 	{	my $self=shift;
 		if ($self->{popup}) { $self->destroy_calendar; return; }
@@ -8408,7 +8511,7 @@ sub popup_calendar
 			$y-=1900;
 			my @time= map $_->get_value, reverse @{$_[0]{timeadjs}};
 			$self->{date}= ::mktime(@time,$d,$m,$y);
-			$self->set_label( ::strftime2('%c',@time,$d,$m,$y) );
+			$self->set_label( ::strftime_utf8('%c',@time,$d,$m,$y) );
 			$self->destroy_calendar;
 			GMB::FilterBox::changed($self);
 			GMB::FilterBox::activate($self);

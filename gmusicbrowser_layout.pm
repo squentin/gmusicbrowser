@@ -76,7 +76,7 @@ our %Widgets=
 		stock	=> {pause => 'gtk-media-pause', play => 'gtk-media-play' },
 		tip	=> sub {$::TogPlay? _"Pause" : _"Play"},
 		activate=> \&::PlayPause,
-		#click3	=> undef,
+		click3	=> 'Stop',
 		event	=> 'Playing',
 	},
 	Next =>
@@ -1273,7 +1273,7 @@ sub GetShowHideState
 
 sub ToggleFullscreen
 {	return unless $_[0];
-	my $win=$_[0]->get_toplevel;
+	my $win= ::get_layout_widget($_[0])->get_toplevel;
 	if ($win->{fullscreen}) {$win->unfullscreen}
 	else {$win->fullscreen} }
 
@@ -2946,7 +2946,7 @@ sub new
 			$ellip='end' if $ellip eq '1';
 			$label->set_ellipsize($ellip);
 			$self->{string}= $text || $opt->{tip};
-			$self->{markup}= $opt->{markup} || $opt->{size} eq 'menu' ? "<small>%s</small>" : "%s";
+			$self->{markup}= $opt->{markup} || ($opt->{size} eq 'menu' ? "<small>%s</small>" : "%s");
 			$hbox->pack_start($img,0,0,0);
 			$hbox->pack_start($label,1,1,0);
 			$self->add($hbox);
