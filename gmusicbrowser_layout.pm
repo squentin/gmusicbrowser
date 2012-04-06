@@ -3976,13 +3976,13 @@ sub init
 			my $lab2=$labels2->{$field}=Gtk2::Label->new;
 			push @labels, $labels1, $labels2;
 			$lab1->set_padding(5,0);
-			$lab1->set_alignment(1,.5);
-			$lab2->set_alignment(0,.5);
+			$lab1->set_alignment(1,0);
+			$lab2->set_alignment(0,0);
 			$lab2->set_line_wrap(1);
 			$lab2->set_selectable(1);
 			my $row=$table2->{row}++;
-			$table2->attach($lab1,0,1,$row,$row+1,'fill','shrink',1,1);
-			$table2->attach($lab2,1,2,$row,$row+1,'fill','shrink',1,1);
+			$table2->attach($lab1,0,1,$row,$row+1,'fill','fill',1,1);
+			$table2->attach($lab2,1,2,$row,$row+1,'fill','fill',1,1);
 		}
 		$row=$table->{row}++;
 		$table->attach(Gtk2::HBox->new,0,3,$row,$row+1,[],[],0,5) if @$treelist; #space between categories
