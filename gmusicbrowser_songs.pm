@@ -4212,7 +4212,7 @@ sub are_equal #FIXME could try harder
 {	my $f1=$_[0]; my $f2=$_[1];
 	($f1,my$s1)=defined $f1 ? ref $f1 ? ($f1->{string},$f1->{source}) : $f1 : '';
 	($f2,my$s2)=defined $f2 ? ref $f2 ? ($f2->{string},$f2->{source}) : $f2 : '';
-	return ($f1 eq $f2) && ((!$s1 && !$s2) || $s1 eq $s2);
+	return ($f1 eq $f2) && ((!$s1 || !$s2) || ($s1 && $s2 && $s1 eq $s2));
 }
 
 sub _smart_simplify	#only called for ~ filters

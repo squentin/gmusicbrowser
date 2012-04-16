@@ -2754,11 +2754,18 @@ sub new
 	my $selection=$treeview->get_selection;
 	$selection->set_mode('multiple');
 	$selection->signal_connect (changed =>\&selection_changed_cb);
-	::set_drag($treeview, source => [::DRAG_FILTER,sub
+	# drag and drop doesn't work with filter using a special source, which is the case here
+#	::set_drag($treeview, source => [::DRAG_FILTER,sub
+#	    {	my @paths=_get_path_selection( $_[0] );
+#		return undef unless @paths;
+#		my $filter=_MakeFolderFilter(@paths);
+#		return ::DRAG_FILTER,($filter? $filter->{string} : undef);
+#	    }]);
+	::set_drag($treeview, source => [::DRAG_ID,sub
 	    {	my @paths=_get_path_selection( $_[0] );
 		return undef unless @paths;
 		my $filter=_MakeFolderFilter(@paths);
-		return ::DRAG_FILTER,($filter? $filter->{string} : undef);
+		return ::DRAG_ID,($filter? @{$filter->filter} : undef);
 	    }]);
 	MultiTreeView::init($treeview,__PACKAGE__);
 	return $self;
