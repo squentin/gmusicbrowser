@@ -2533,12 +2533,13 @@ sub key_press_cb
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
 	my $unicode=Gtk2::Gdk->keyval_to_unicode($event->keyval); # 0 if not a character
 	my $state=$event->get_state;
-	my $ctrl= $state * ['control-mask'];
+	my $ctrl= $state * ['control-mask'] && !($state * [qw/mod1-mask mod4-mask super-mask/]); #ctrl and not alt/super
+	my $mod=  $state * [qw/control-mask mod1-mask mod4-mask super-mask/]; # no modifier ctrl/alt/super
 	my $shift=$state * ['shift-mask'];
 	if	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }	#ctrl-f : search
 	elsif	(lc$key eq 'g' && $ctrl) { $self->{isearchbox}->search($shift ? -1 : 1);}	#ctrl-g : next/prev match
-	elsif	($key eq 'F3')		 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
-	elsif	(!$self->{no_typeahead} && $unicode && !($state * [qw/control-mask mod1-mask mod4-mask/]))
+	elsif	($key eq 'F3' && !$mod)	 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
+	elsif	(!$self->{no_typeahead} && $unicode && $unicode!=32 && !$mod)
 	{	$self->{isearchbox}->begin( chr $unicode );	#begin typeahead search
 	}
 	else	{return 0}
@@ -4566,6 +4567,21 @@ sub set_cursor_to_row
 	}
 }
 
+sub select_all
+{	my $self=shift;
+	my $selected=$self->{selected};
+	my $lines=$self->{lines};
+	for (my $i=0; $i<=$#$lines; $i+=3)
+	{	my $line=$lines->[$i+2];
+		for (my $j=0; $j<=$#$line; $j+=5)
+		{	my $key=$line->[$j+4];
+			$selected->{$key}=undef;
+		}
+	}
+	$self->queue_draw;
+	$self->{selectsub}($self);
+}
+
 sub key_selected
 {	my ($self,$event,$i,$j)=@_;
 	$self->scroll_to_index($i,$j);
@@ -4634,10 +4650,16 @@ sub scroll_to_index
 sub key_press_cb
 {	my ($self,$event)=@_;
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
-	if ( $key eq 'space' || $key eq 'Return' )
+	my $state=$event->get_state;
+	my $ctrl= $state * ['control-mask'] && !($state * [qw/mod1-mask mod4-mask super-mask/]); #ctrl and not alt/super
+	my $mod=  $state * [qw/control-mask mod1-mask mod4-mask super-mask/]; # no modifier ctrl/alt/super
+	my $shift=$state * ['shift-mask'];
+	if (($key eq 'space' || $key eq 'Return') && !$mod && !$shift)
 	{	$self->{activatesub}($self,1);
 		return 1;
 	}
+	elsif (lc$key eq 'a' && $ctrl)	{ $self->select_all; return 1; }	#ctrl-a : select-all
+
 	my ($i,$j)=(0,0);
 	($i,$j)=@{$self->{lastclick}} if $self->{lastclick};
 	my $lines=$self->{lines};
@@ -5085,12 +5107,14 @@ sub scroll_to_row
 sub key_press_cb
 {	my ($self,$event)=@_;
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
-	if ( $key eq 'space' || $key eq 'Return' )
+	my $state=$event->get_state;
+	my $ctrl= $state * ['control-mask'] && !($state * [qw/mod1-mask mod4-mask super-mask/]); #ctrl and not alt/super
+	my $mod=  $state * [qw/control-mask mod1-mask mod4-mask super-mask/]; # no modifier ctrl/alt/super
+	my $shift=$state * ['shift-mask'];
+	if ( ($key eq 'space' || $key eq 'Return') && !$mod && !$shift )
 	{	$self->{activatesub}($self,1);
 		return 1;
 	}
-	my $state=$event->get_state;
-	my $ctrl= $state * ['control-mask'];
 	my $pos=0;
 	$pos=$self->{lastclick} if $self->{lastclick};
 	my ($nw,$nh,$nwlast)=@{$self->{dim}};
@@ -5906,12 +5930,13 @@ sub key_press_cb
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
 	my $unicode=Gtk2::Gdk->keyval_to_unicode($event->keyval); # 0 if not a character
 	my $state=$event->get_state;
-	my $ctrl= $state * ['control-mask'];
+	my $ctrl= $state * ['control-mask'] && !($state * [qw/mod1-mask mod4-mask super-mask/]); #ctrl and not alt/super
+	my $mod=  $state * [qw/control-mask mod1-mask mod4-mask super-mask/]; # no modifier ctrl/alt/super
 	my $shift=$state * ['shift-mask'];
 	my $row= $self->{lastclick};
 	$row=0 if $row<0;
 	my $list=$self->{array};
-	if	($key eq 'space' || $key eq 'Return')
+	if	(($key eq 'space' || $key eq 'Return') && !$mod && !$shift)
 					{ $self->Activate(1); }
 	elsif	($key eq 'Up')		{ $row-- if $row>0;	 $self->song_selected($event,$row); }
 	elsif	($key eq 'Down')	{ $row++ if $row<$#$list;$self->song_selected($event,$row); }
@@ -5926,8 +5951,8 @@ sub key_press_cb
 		{ vec($self->{selected},$_,1)=1 for 0..$#$list; $self->UpdateSelection;}
 	elsif	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }			#ctrl-f : search
 	elsif	(lc$key eq 'g' && $ctrl) { $self->{isearchbox}->search($shift ? -1 : 1);}	#ctrl-g : next/prev match
-	elsif	($key eq 'F3')		 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
-	elsif	(!$self->{no_typeahead} && $unicode && !($state * [qw/control-mask mod1-mask mod4-mask/]))
+	elsif	($key eq 'F3' && !$mod)	 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
+	elsif	(!$self->{no_typeahead} && $unicode && $unicode!=32 && !$mod)			# character except space, no modifier
 	{	$self->{isearchbox}->begin( chr $unicode );	#begin typeahead search
 	}
 	else	{return 0}
