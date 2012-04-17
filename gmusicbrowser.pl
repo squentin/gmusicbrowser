@@ -6218,7 +6218,7 @@ sub PrefLibrary
 	my $BCheck=NewIconButton('gtk-refresh',_"check now",sub { IdleCheck();	});
 	my $label=Gtk2::Label->new(_"Folders to search for new songs");
 
-	my $reorg=Gtk2::Button->new(_"Reorganize files and folders");
+	my $reorg=Gtk2::Button->new(_("Reorganize files and folders").'...');
 	$reorg->signal_connect( clicked => sub
 	{	return unless @$Library;
 		DialogMassRename(@$Library);
