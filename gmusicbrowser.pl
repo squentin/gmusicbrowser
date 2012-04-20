@@ -6159,7 +6159,9 @@ sub MoveFolder #FIXME implement
 sub UpdateFolderNames
 {	my ($oldpath,$newpath)=@_;
 	s/$QSLASH+$//o for $oldpath,$newpath;
-	my $renamed=Songs::AllFilter('path:i:'.$oldpath);
+	my $filter= 'path:i:'.Songs::filename_escape($oldpath);
+	utf8::upgrade($filter); #for unclear reasons, it is needed for non-utf8 folder names. Things should be clearer once the filter code is changed to keep patterns in variables, instead of including them in the eval
+	my $renamed=Songs::AllFilter($filter);
 
 	my $pattern=qr/^\Q$oldpath\E/;
 	my @newpath;
