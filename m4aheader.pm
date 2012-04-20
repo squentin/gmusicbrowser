@@ -270,6 +270,7 @@ sub ParseAtomTree
 		if ($key eq '----')
 		{	$key= substr($data->{mean},4).'----'.substr($data->{name},4);
 			$data=$data->{data};
+			next unless defined $data;
 		}
 		my $val= substr $data,8;
 		my $flag=unpack 'x3C',$data;
