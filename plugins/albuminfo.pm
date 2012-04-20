@@ -118,10 +118,10 @@ sub prefbox {
 	}
 	$frame_layout->add(::Hpack(@chk_show));
 
-	my $btn_download = bless Gtk2::Button->new(_"Download");
+	my $btn_download = Gtk2::Button->new(_"Download");
 	$btn_download->set_tooltip_text(_"Fields will be saved according to the settings above. Albuminfo files will be re-read if there are fields to be saved and you choose 'albums missing reviews' in the combo box.");
 	my $cmb_download = ::NewPrefCombo(OPT.'mass_download',  {all=>_"entire collection", missing=>_"albums missing reviews"}, text=>_"album information now for");
-	$btn_download->signal_connect(clicked => \&mass_download); 
+	$btn_download->signal_connect(clicked => \&mass_download);
 	return ::Vpack($frame_cover, $frame_review, $frame_fields, $frame_layout, [$btn_download,$cmb_download]);
 }
 
@@ -131,7 +131,7 @@ sub mass_download {
 	$self->{end} = scalar(@{$self->{aIDs}});
 	$self->{progress} = 0;
 	$self->{abort} = 0;
-	::Progress('albuminfo', end=>$self->{end}, aborthint=>_"Stop fetching albuminfo", title=>_"Fetching albuminfo", 
+	::Progress('albuminfo', end=>$self->{end}, aborthint=>_"Stop fetching albuminfo", title=>_"Fetching albuminfo",
 		abortcb=>sub {$self->{abort}=1; $self->cancel(); ::Progress('albuminfo', abort=>1)});
 	::IdleDo('9_download_one'.$self, undef, \&download_one, $self);
 }
@@ -272,7 +272,7 @@ sub new {
 		my $colopt= $::Options{OPT.'Column_'.$col} || {};
 		my $column = Gtk2::TreeViewColumn->new_with_attributes($coldef->{name}, Gtk2::CellRendererText->new(), text=>$coldef->{storecol});
 		$column->{key}=$col;
-		$column->set_sort_column_id($coldef->{storecol}); $column->set_expand(1); $column->set_resizable(1); $column->set_reorderable(1); 
+		$column->set_sort_column_id($coldef->{storecol}); $column->set_expand(1); $column->set_resizable(1); $column->set_reorderable(1);
 		$column->set_sizing('fixed');
 		$column->set_fixed_width( $colopt->{width}||$coldef->{width}||100 );
 		$column->set_visible(!$colopt->{hide});

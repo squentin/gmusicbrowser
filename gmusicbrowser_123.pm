@@ -341,7 +341,7 @@ sub init
 sub init_volume
 {	$Volume=-1;
 	return unless $mixer;
-	my @list=get_amixer_SMC_list();;
+	my @list=get_amixer_SMC_list();
 	my %h; $h{$_}=1 for @list;
 	my $c=\$::Options{amixerSMC};
 	if ($$c) { SetVolume(); return if $Volume>=0 || $h{$$c}; $$c=''; }

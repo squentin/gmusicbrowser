@@ -573,12 +573,12 @@ our %timespan_menu=
 		init		=> '___index_= ___values_= ___nb_ = "";',
 		set		=> '{	my $v=#VAL#;
 					my @list= !$v ? () : sort { $a <=> $b } (ref $v ? @$v : split /\D+/,$v);
-					if (my $nb=#nb#) { ___free_[$nb].= pack "#packformat#",#index#; } # add previous space to list of free spaces
+					if (my $nb=#nb#) { ___free_[$nb].= pack "N",#index#; } # add previous space to list of free spaces
 					if (@list)
 					{	my $string= pack "#packformat#*", @list;
 						my $nb= #nb#= scalar @list;
 						if (___free_[$nb])	# re-use old space
-						{	#index#= unpack "#packformat#", substr(___free_[$nb],-#bytes#,#bytes#,"");
+						{	#index#= unpack "N", substr(___free_[$nb],-4,4,"");
 							#_#= $string;
 						}
 						else			# use new space
@@ -1042,7 +1042,7 @@ our %timespan_menu=
 	prewrite=> sub { sprintf('%.1f', $_[0]); },
 	category=>'stats',
 	alias	=> 'plays',
-},
+ },
  skipcount	=>
  {	name	=> _"Skip count",	width => 50,	flags => 'fgaescp',	type => 'integer',	letter => 'k',
 	category=>'stats',
@@ -1664,7 +1664,7 @@ sub MakeLoadSub
 		{	my $code= 'my $gid='.$load_extra.";\n";
 			my $i=1;
 			for my $subfield (split /\t/,$extradata->{$mainfield}[0])
-			{	my $c=LookupCode($subfield,'load_extra',[GID=>'$gid',VAL=>"\$_[$i]"]);;
+			{	my $c=LookupCode($subfield,'load_extra',[GID=>'$gid',VAL=>"\$_[$i]"]);
 				$code.= "\t$c;\n" if $c;
 				$i++;
 			}

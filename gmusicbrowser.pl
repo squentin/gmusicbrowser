@@ -3798,7 +3798,7 @@ sub BuildMenu
 		next if $m->{isdefined}	&& !defined $args->{ $m->{isdefined} };
 		#next if $m->{notdefined}&& defined $args->{ $m->{notdefined} };
 		next if $m->{istrue}	&&   !$args->{ $m->{istrue} };
-		#next if $m->{notstrue}	&&    $args->{ $m->{nottrue} };
+		#next if $m->{nottrue}	&&    $args->{ $m->{nottrue} };
 		next if $m->{empty}	&& (  $args->{ $m->{empty} }	&& @{ $args->{ $m->{empty}   } }!=0 );
 		next if $m->{notempty}	&& ( !$args->{ $m->{notempty} }	|| @{ $args->{ $m->{notempty}} }==0 );
 		next if $m->{onlyone}	&& ( !$args->{ $m->{onlyone}  }	|| @{ $args->{ $m->{onlyone} } }!=1 );

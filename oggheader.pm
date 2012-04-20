@@ -154,7 +154,7 @@ sub new
 }
 
 sub _open
-{	my $self=shift;;
+{	my $self=shift;
 	my $file=$self->{filename};
 	open my$fh,'<',$file or warn "can't open $file : $!\n" and return undef;
 	binmode $fh;

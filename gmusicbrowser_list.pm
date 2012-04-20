@@ -419,6 +419,7 @@ our %Markup_Empty=
 	L => _"List empty",
 	A => _"Playlist empty",
 	B => _"No songs found",
+	S => _"No songs found",
 );
 
 sub new
@@ -2316,7 +2317,7 @@ sub set_text_search
 	return if defined $self->{search} && $self->{search} eq $search;
 	$self->{search}=$search;
 	$self->{valid}=0;
-	$self->Fill if $self->mapped;;
+	$self->Fill if $self->mapped;
 }
 
 sub AAPicture_Changed
@@ -3023,7 +3024,7 @@ sub UpdatePlayingFilters
 	while (@list)
 	{	my $id=shift @list;
 		my $name=shift @list;
-		$store->set($store->append($iter),0,$name,1,'play',3,$id);;
+		$store->set($store->append($iter),0,$name,1,'play',3,$id);
 	}
 	$treeview->expand_to_path($path);
 }
@@ -5905,7 +5906,7 @@ sub update_sorted_column
 				undef;
 		if ($arrow)	{ $cell->{sorted}=$arrow; } # used by SongTree to draw background of cells differently for sorted column
 		else		{ delete $cell->{sorted}; } # and by SongTree::Headers to draw up/down arrow
-	}	
+	}
 }
 
 sub scroll_event_cb
@@ -7725,7 +7726,7 @@ sub parse
 		{	$update->{col}{$_}=undef for Songs::Depends(split / /,$c);
 		}
 		if (defined $e)
-		{	$update->{event}{$_}=undef for split / /,$e;;
+		{	$update->{event}{$_}=undef for split / /,$e;
 		}
 	  }
 	}
