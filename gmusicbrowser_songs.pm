@@ -1569,7 +1569,7 @@ sub UpdateFuncs
 		'	push @changedIDs,$ID if $changed;',
 		'	$i++;',
 		'}',
-		'::SongsChanged(\@changedIDs, [keys %changedfields]) if @changedIDs;',
+		#'::SongsChanged(\@changedIDs, [keys %changedfields]) if @changedIDs;',
 		'return \%changedfields, \@towrite;';
 		$SETsub= Compile(Set =>"sub {$code}");
 	}
@@ -1831,7 +1831,7 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 }
 
 sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
-{	my $IDs=shift;
+{	my $IDs=shift || $::Library;
 	my $changed= ref $_[0] ? $_[0] : {map( ($_=>undef), @_ )};
 	warn "Songs::Changed : IDs=@$IDs fields=".join(' ',keys %$changed)."\n" if $::debug;
 	$IDFromFile=undef if $IDFromFile && exists $changed->{file} || exists $changed->{path};
@@ -3114,12 +3114,7 @@ sub save_to_string
 {	return join ' ',map $_, @{$_[0]};	#map $_ so that the numbers are not stringified => use more memory
 }
 
-sub GetName
-{	my $self=$_[0];
-	my $sl=$::Options{SavedLists};
-	my ($name)= grep $sl->{$_}==$self, keys %$sl;
-	return $name;	#might be undef
-}
+sub GetName {undef}
 
 sub RemoveIDsFromAll		#could probably be improved
 {	my $IDs_toremove=$_[0];
@@ -3242,6 +3237,17 @@ sub Down
 #	@$self=@$songarray;
 #	::HasChanged('SongArray', $self, @args);
 #}
+
+package SongArray::Named;
+use base 'SongArray';
+#just used to easily test if a songarray is a savedlist
+
+sub GetName
+{	my $self=$_[0];
+	my $sl=$::Options{SavedLists};
+	my ($name)= grep $sl->{$_}==$self, keys %$sl;
+	return $name;	#might be undef
+}
 
 package SongArray::PlayList;
 use base 'SongArray';

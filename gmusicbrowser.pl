@@ -1903,7 +1903,7 @@ sub ReadOldSavedTags
 		{	$Options{SavedWRandoms}{$key}=$val;
 		}
 		elsif ($1 eq 'L')
-		{	$Options{SavedLists}{$key}= SongArray->new_from_string($val);
+		{	$Options{SavedLists}{$key}= SongArray::Named->new_from_string($val);
 		}
 		elsif ($1 eq 'G')
 		{	$Options{SavedSTGroupings}{$key}=$val;
@@ -2042,6 +2042,10 @@ sub ReadSavedTags	#load tags _and_ settings
 		$Library=[];	#dummy array to avoid a warning when filtering in the next line
 		$Library= SongArray->new( $filter->filter_all );
 		Songs::AddMissing( Songs::AllFilter('missing:-e:0'), 'init' );
+	}
+
+	if ($oldversion<=1.1009)
+	{	bless $_,'SongArray::Named' for values %{$Options{SavedLists}}; #named lists now use SongArray::Named instead of plain SongArray
 	}
 
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};
@@ -2800,7 +2804,7 @@ sub DoActionForList
 
 sub SongArray_changed
 {	my (undef,$songarray,$action,@extra)=@_;
-	$Filter::CachedList=undef;	#FIXME could be optimized, currently only saved lists can be used as a filter
+	if ($songarray->isa('SongArray::Named')) { Songs::Changed(undef,'list'); } # simulate modifcation of the fake "list" field
 	if ($songarray==$Queue)
 	{	HasChanged('Queue',$action,@extra);
 	}
@@ -6728,13 +6732,17 @@ sub SaveFilter		{ SaveSFRG('SavedFilters',@_);	}
 sub SaveList
 {	my ($name,$val,$newname)=@_;
 	my $saved=$Options{SavedLists};
-	if (defined $newname)	{$saved->{$newname}=delete $saved->{$name}; HasChanged('SavedLists',$name,'renamedto',$newname); $name=$newname; }
+	if (defined $newname)
+	{	$saved->{$newname}=delete $saved->{$name};
+		HasChanged('SavedLists',$name,'renamedto',$newname);
+		HasChanged('SavedLists',$newname);
+	}
 	elsif (defined $val)
 	{	if (my $songarray= $saved->{$name})	{ $songarray->Replace($val); return }
-		else					{ $saved->{$name}= SongArray->new($val); }
+		else					{ $saved->{$name}= SongArray::Named->new($val); HasChanged('SavedLists',$name); }
 	}
-	else			{delete $saved->{$name}; HasChanged('SavedLists',$name,'remove'); return}
-	HasChanged('SavedLists',$name);
+	else	{ delete $saved->{$name}; HasChanged('SavedLists',$name,'remove'); }
+	Songs::Changed(undef,'list'); # simulate modifcation of the fake "list" field
 }
 
 sub Watch
