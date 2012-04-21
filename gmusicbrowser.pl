@@ -3092,6 +3092,9 @@ sub OpenSpecialWindow
 	Layout::Window->new($layout, ifexist => $ifexist, uniqueid=>$type);
 }
 
+sub SetFullScreenMode
+{	ToggleFullscreenLayout() if $_[0] xor $FullscreenWindow;
+}
 sub ToggleFullscreenLayout
 {	if ($FullscreenWindow)
 	{	$FullscreenWindow->close_window;
@@ -3117,6 +3120,7 @@ sub ToggleFullscreenLayout
 			$FullscreenWindow->signal_connect(destroy => sub { UnWatch($h,'Playing'); $h->{destroy}=1; &$sub(); });
 		}
 	}
+	HasChanged('FullScreen',!!$FullscreenWindow);
 }
 
 sub WEditList

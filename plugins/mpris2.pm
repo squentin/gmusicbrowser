@@ -102,6 +102,7 @@ sub new
 	my $self = $class->SUPER::new($service, '/org/mpris/MediaPlayer2');
 	bless $self, $class;
 	::Watch($self, Seek => \&Seeked);
+	::Watch($self, FullScreen=> sub { $self->emit_signal( PropertiesChanged => 'org.mpris.MediaPlayer2', {Fullscreen=> Fullscreen()} ,[] ); });
 
 	#watchers for properties of org.mpris.MediaPlayer2.Player that send PropertiesChanged signal
 	my %events;
@@ -139,6 +140,14 @@ dbus_method('Quit', [], [],{no_return=>1});
 sub Quit
 {	::Quit();
 }
+
+dbus_property('Fullscreen', 'bool', 'readwrite');
+sub Fullscreen
+{	if (defined $_[1]) { ::SetFullScreenMode($_[1]); }
+	else { return dbus_boolean(!!$::FullscreenWindow) }
+}
+dbus_property('CanSetFullscreen', 'bool', 'read');
+sub CanSetFullscreen {dbus_boolean(1)}
 
 dbus_property('CanQuit', 'bool', 'read');
 sub CanQuit {dbus_boolean(1)}
