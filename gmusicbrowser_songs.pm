@@ -116,6 +116,10 @@ our %timespan_menu=
 		'filter:s'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___name[$_], "#VAL#")  .!=. -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
 		'filter:m'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___name[$_]  .=~. m"#VAL#"  ,@$v) : ___name[$v]  .=~. m"#VAL#"; }',
 		'filter:mi'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___iname[$_] .=~. m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
+		'filter_prep:m'	=> \&Filter::QuoteRegEx,
+		'filter_prep:mi'=> \&Filter::QuoteRegEx,
+		'filter_prep:si'=> sub {quotemeta lc($_[0])},
+		'filter_prep:s'=> sub {quotemeta $_[0]},
 		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ---- AFTER: #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}',
 		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v }',
@@ -4066,6 +4070,8 @@ sub _smartstring_date
 	my $date1= my $date2='';
 	if ($pat=~m#\d# and ($date1,$date2)= $pat=~m#^(\d+[smhdwMy])?(?:\.\.|-)(\d+[smhdwMy])?$#i)	# relative date filter
 	{	$suffix='ago';
+		if	($date1 && $date1!~m/[1-9]/) {$date1=''}
+		elsif	($date1 && $date2 && $date2!~m/[1-9]/) {$date2=$date1; $date1=''}
 	}
 	else						# absolute date filter
 	{	($date1,$date2)= ::dates_to_timestamps($pat,2);
@@ -4576,6 +4582,7 @@ sub SmartTitleRegEx
 }
 sub QuoteRegEx
 {	local $_=$_[0];
+	s#((?:\G|[^\\])(?:\\\\)*)([\$@](?:::?)?[0-9a-z])#$1\\$2#gi; #quote variable names if not already quoted
 	s#^((?:.*[^\\])?(?:\\\\)*\\)$#$1\\#g; ##escape trailing '\' in impair number
 	s!((?:\G|[^\\])(?:\\\\)*)\\?"!$1\\"!g; #make sure " are escaped (and only once, so that \\\" doesn't become \\\\")
 	if (!eval {qr/$_/;}) { warn "invalid regular expression \"$_[0]\" : $@\n" if $::debug; return quotemeta $_[0]; }  #check if re valid, else quote everything

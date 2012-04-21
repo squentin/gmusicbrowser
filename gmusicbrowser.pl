@@ -829,7 +829,7 @@ sub dates_to_timestamps
 		{	$y= $y>100 ? $y-=1900 : $y<70 ? $y+100 : $y;	#>100 => 4digits year, <70 : 2digits 20xx year, else 2digits 19xx year
 		}
 		$M-- if defined $M;
-		$h+=12 if defined $pm && $pm=~m/^pm?$/ && defined $h;
+		$h+=( $pm=~m/^pm?$/ ? $h!=12 ? 12 : 0 : $h==12 ? -12 : 0 ) if defined $pm && defined $h;
 		my @now= (localtime)[0..5];
 		for ($y,$M,$d,$h,$m,$s)	#complete relative dates with current date
 		{	last if defined;
