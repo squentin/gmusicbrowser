@@ -1809,6 +1809,7 @@ sub new
 	$notebook->signal_connect( switch_page => sub
 	 {	my $p=$_[0]->get_nth_page($_[2]);
 		my $self=::find_ancestor($_[0],__PACKAGE__);
+		$self->{DefaultFocus}=$p;
 		my $pid= $self->{page}= $p->{pid};
 		my $mask=	$Pages{$pid} ? 				$Pages{$pid}[2] :
 				Songs::FilterListProp($pid,'multi') ?	'oni' : 'on';
