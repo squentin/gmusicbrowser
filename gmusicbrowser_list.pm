@@ -4972,18 +4972,19 @@ sub expose_cb
 				$self->{window}||=$window;
 				$self->{queue}{$i+$j*$nw}=[$x,$y+$dy,$key,$picsize];
 			}
-			elsif (!@markup)
+			elsif (!@markup) # draw text in place of picture if no picture
 			{	my $layout=Gtk2::Pango::Layout->new( $self->create_pango_context );
-				#$layout->set_text($key);
-				#$layout->set_markup('<small>'.::PangoEsc($key).'</small>');
 				$layout->set_markup(AA::ReplaceFields($key,"<small>%a</small>",$field,1));
 				$layout->set_wrap('word-char');
 				$layout->set_width($hsize * Gtk2::Pango->scale);
 				$layout->set_height($vsize * Gtk2::Pango->scale);
+				my $yoffset=0;
+				my $free_height= $vsize - ($layout->get_pixel_extents)[1]{height};
+				if ($free_height>1) { $yoffset= int($free_height/2); }	#center vertically
 				$layout->set_ellipsize('end');
 				$layout->set_alignment('center');
 				$style->paint_layout($window, $state, 1,
-					Gtk2::Gdk::Rectangle->new($x,$y,$hsize,$vsize), $self, undef, $x, $y, $layout);
+					Gtk2::Gdk::Rectangle->new($x,$y,$hsize,$vsize), $self, undef, $x, $y+$yoffset, $layout);
 				next;
 			}
 			my ($xm,$ym,$align)= $self->{markup_pos} eq 'right' ? ($x+$picsize+XPAD,$y,'left') : ($x,$y+$picsize+YPAD,'center');
