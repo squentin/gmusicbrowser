@@ -289,13 +289,13 @@ sub parse_sloth
 sub parse_googlei
 {	my $result=$_[0];
 	my @list;
-	while ($result=~m#<a [^>]*?href="([^"]+?imgrefurl[^"]+)"[^>]*>[^<]*<img [^>]*?src="([^"]+)">.*?</a>[^<]*<br>(.*?)<br>#g)
+	while ($result=~m#<a [^>]*?href="([^"]+?imgurl=[^"]+)"><img [^>]*?src="([^"]+)"[^>]*?>.*?</a>[^<]*<br/?>(.*?)<br/?/?>#g)
 	{	my ($url,$preview,$desc)=($1,$2,$3);
 		next unless $url=~m#imgurl=(.*?)&amp;#;
 		$url= ::decode_html($1);
 		$url=~s/%([0-9A-Fa-f]{2})/chr hex($1)/gie;
 		$desc=~s#</?b>##g;
-		$desc=Encode::decode('cp1252',$desc); #FIXME not sure of the encoding
+		$desc=Encode::decode('utf8',$desc);
 		$desc=::decode_html($desc);
 		push @list, {url => $url, previewurl =>$preview, desc => $desc };
 	}
