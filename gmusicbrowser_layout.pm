@@ -2410,6 +2410,7 @@ sub new
 	{	($tabpos,$self->{angle})= $tabpos=~m/^(left|right|top|bottom)?(90|180|270)?/;
 		$self->set_tab_pos($tabpos) if $tabpos;
 	}
+	$self->set_show_tabs(0) if $opt->{hidetabs};
 	$opt->{typesubmenu}='LPC' unless exists $opt->{typesubmenu};
 	$self->{$_}=$opt->{$_} for qw/group default_child match pages page typesubmenu closebuttons tablist/;
 	for my $class (qw/list context layout/)	# option begining with list_ / context_ / layout_ will be passed to children of this class
