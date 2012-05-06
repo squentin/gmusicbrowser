@@ -1674,7 +1674,7 @@ my @MenuSubGroup=
 	  check => sub {$_[0]{mode} eq 'C'},	notmode => 'S', },
 	{ label => _"mosaic mode",	code => sub { my $self=$_[0]{self}; $self->set_mode(($self->{mode} eq 'mosaic' ? 'list' : 'mosaic'),1);},
 	  check => sub {$_[0]{mode} eq 'M'},	notmode => 'S',
-	  test	=> sub { my $field=Songs::MainField($_[0]{self}{field}[0]); $field eq 'artist' || $field eq 'album' }, #FIXME use more generic test : does it have pictures
+	  test => sub { Songs::FilterListProp($_[0]{field},'picture') },
 	},
 	{ label => _"show the 'All' row",	code => sub { my $self=$_[0]{self}; $self->{noall}^=1; $self->SetOption; },
 	  check => sub { !$_[0]{self}{noall} }, mode => 'L',

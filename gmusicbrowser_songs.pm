@@ -146,6 +146,10 @@ our %timespan_menu=
 		'smartfilter::' => 'si s',
 		'smartfilter:~' => 'mi m',
 		default_filter	=> 'si',
+
+		load_extra	=> '___gid{#SGID#} || return;',
+		save_extra	=> 'my %h; while ( my ($sgid,$gid)=each %___gid ) { $h{$sgid}= [#SUBFIELDS#] } delete $h{""}; return \%h;',
+
 	},
 	artists	=>
 	{	_		=> '____[#ID#]',
@@ -805,6 +809,14 @@ our %timespan_menu=
 	alias=> 'on',
 	alias_trans=> ::_p('Field_aliases',"album,on"),  #TRANSLATION: comma-separated list of field aliases for album, these are in addition to english aliases
  },
+# genre_picture =>
+# {	name		=> "Genre picture",
+#	flags		=> 'g',
+#	depend		=> 'genre',
+#	property_of	=> 'genre',
+#	mainfield	=> 'genre',
+#	type		=> '_picture',
+# },
  album_picture =>
  {	name		=> _"Album picture",
 	flags		=> 'g',
@@ -916,6 +928,7 @@ our %timespan_menu=
 	FilterList	=> {search=>1},
 	edit_order=> 70,	edit_many=>1,	letter => 'g',
 	category=>'basic',
+#	picture_field => 'genre_picture',
  },
  label	=>
  {	name		=> _"Labels",	width => 180,	flags => 'fgaescpil',
@@ -1689,7 +1702,7 @@ sub MakeSaveSub
 		push @saved_fields,$save_as;
 		push @code, Code($field, 'save|get', ID => '$_[0]');
 		my ($mainfield,$save_extra)=LookupCode($field,'mainfield','save_extra');
-		if ($save_extra && ( !$mainfield || $mainfield eq $field ))
+		if ($save_extra && $Def{$field}{_properties} && ( !$mainfield || $mainfield eq $field ))
 		{	my @subfields= split / /, $Def{$field}{_properties};
 			if (@subfields)
 			{	my @extra_code;
