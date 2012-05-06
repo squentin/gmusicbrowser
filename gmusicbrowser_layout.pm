@@ -798,11 +798,13 @@ sub ParseLayout
 		else { delete $Layouts{$name}; }
 	}
 	else {return}
+	my $currentkey;
 	for (@$lines)
 	{	s#_\"([^"]+)"#my $tr=_( $1 ); $tr=~y/"/'/; qq/"$tr"/#ge;	#translation, escaping the " so it is not picked up as a translatable string. Replace any " in translations because they would cause trouble
-		next unless m/^(\w+)\s*=\s*(.*)$/;
-		if ($2 eq '') {delete $Layouts{$name}{$1};next}
-		$Layouts{$name}{$1}= $2;
+		unless (m/^(\w+)\s*=\s*(.*)$/) { $Layouts{$name}{$currentkey} .= ' '.$1 if m/\s*(.*)$/; next } #continuation of previous line if doesn't begin with "word="
+		$currentkey=$1;
+		if ($2 eq '') {delete $Layouts{$name}{$currentkey};next}
+		$Layouts{$name}{$currentkey}= $2;
 	}
 	for my $key (qw/Name Category Title/)
 	{	$Layouts{$name}{$key}=~s/^"(.*)"$/$1/ if $Layouts{$name}{$key};	#remove quotes from layout name and category
