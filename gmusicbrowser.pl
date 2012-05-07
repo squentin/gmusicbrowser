@@ -2522,8 +2522,8 @@ sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, 
 
 sub ClearQueue
 {	$Queue->Replace();
-	$QueueAction='';
-	HasChanged('QueueAction');
+	#$QueueAction='';
+	#HasChanged('QueueAction');
 }
 
 sub EnqueueSame

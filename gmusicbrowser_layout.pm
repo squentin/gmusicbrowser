@@ -202,7 +202,7 @@ our %Widgets=
 				},
 		text	=> _"Queue",
 		click1	=> 'MenuQueue',
-		click3	=> 'ClearQueue',
+		click3	=> sub { ::EnqueueAction(''); ::ClearQueue(); }, #FIXME replace with 2 gmb commands once new command system is done
 		event	=> 'Queue QueueAction',
 		dragdest=> [::DRAG_ID,sub {shift;shift;::Enqueue(@_);}],
 	},
