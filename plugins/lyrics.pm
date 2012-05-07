@@ -93,11 +93,12 @@ my $lyricswidget=
 {	class		=> __PACKAGE__,
 	tabicon		=> 'gmb-lyrics',		# no icon by that name by default
 	tabtitle	=> _"Lyrics",
-	saveoptions	=> 'HideToolbar font follow justification',
+	saveoptions	=> 'HideToolbar font follow justification edit',
 	schange		=> \&SongChanged,
 	group		=> 'Play',
 	autoadd_type	=> 'context page lyrics text',
 	justification	=> 'left',
+	edit		=> 0,
 };
 
 sub Start
@@ -111,7 +112,7 @@ sub new
 {	my ($class,$options)=@_;
 	my $self = bless Gtk2::VBox->new(0,0), $class;
 	$options->{follow}=1 if not exists $options->{follow};
-	$self->{$_}=$options->{$_} for qw/HideToolbar follow group font justification/;
+	$self->{$_}=$options->{$_} for qw/HideToolbar follow group font justification edit/;
 
 	my $textview=Gtk2::TextView->new;
 	$self->signal_connect(map => sub { $_[0]->SongChanged( ::GetSelID($_[0]) ); });
@@ -154,6 +155,10 @@ sub new
 	# create follow toggle button, function from GMB::Context
 	my $follow=$self->new_follow_toolitem;
 
+	$self->{editb}=my $editmode= Gtk2::ToggleToolButton->new_from_stock('gtk-edit');
+	$editmode->signal_connect(toggled=> sub { SetEditable($_[0],$_[0]->get_active); });
+	$editmode->set_tooltip_text(_"Edit mode");
+
 	my $adj= $self->{fontsize_adj}= Gtk2::Adjustment->new(10,4,80,1,5,0);
 	my $zoom=Gtk2::ToolItem->new;
 	my $zoom_spin=Gtk2::SpinButton->new($adj,1,0);
@@ -161,7 +166,7 @@ sub new
 	$zoom->set_tooltip_text(_"Font size");
 	my $source=::NewPrefCombo( OPT.'LyricSite', { map {$_=>$Sites{$_}[0]} keys %Sites} ,cb => \&Refresh_cb, toolitem=> _"Lyrics source");
 	my $scroll=::NewPrefCheckButton( OPT.'AutoScroll', _"Auto-scroll", cb=>\&SetAutoScroll, tip=>_"Scroll with the song", toolitem=>1);
-	$toolbar->insert($_,-1) for $follow,$zoom,$scroll,$source;
+	$toolbar->insert($_,-1) for $editmode,$follow,$zoom,$scroll,$source;
 
 	$self->pack_start($toolbar,0,0,0);
 	$self->add($sw);
@@ -174,6 +179,7 @@ sub new
 	$zoom_spin->signal_connect(value_changed=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->SetFont($_[0]->get_value) });
 	$self->SetToolbarHide($self->{HideToolbar});
 	$self->SetAutoScroll;
+	$self->SetEditable($self->{edit});
 
 	return $self;
 }
@@ -217,6 +223,16 @@ sub SetToolbarHide
 	my $toolbar=$self->{toolbar};
 	if ($self->{HideToolbar})	{$toolbar->set_no_show_all(1); $toolbar->hide}
 	else				{$toolbar->set_no_show_all(0); $toolbar->show_all}
+}
+
+sub SetEditable
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
+	my $on=$_[1];
+	$self->{edit}=$on;
+	my $view=$self->{textview};
+	$view->set_editable($on);
+	$view->set_cursor_visible($on);
+	$self->{editb}->set_active($on) if $self->{editb}->get_active xor $on;
 }
 
 sub SetAutoScroll
