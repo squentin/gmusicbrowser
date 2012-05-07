@@ -5357,7 +5357,7 @@ sub AutoSelPicture
 	{	my $file= AAPicture::GetPicture($field,$gid);
 		if (defined $file)
 		{	return unless $file; # file eq '0' => no picture
-			if ($file=~s/:(\w+)$//) { return if FileTag::PixFromMusicFile($file,$1); }
+			if ($file=~m/\.(?:mp3|flac|m4a|m4b|oga|ogg)(?::(\w+))?$/) { return if FileTag::PixFromMusicFile($file,$1,1); }
 			else { return if -e $file }
 		}
 	}
