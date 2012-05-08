@@ -811,11 +811,13 @@ sub ParseLayout
 		else { delete $Layouts{$name}; }
 	}
 	else {return}
+	my $currentkey;
 	for (@$lines)
 	{	s#_\"([^"]+)"#my $tr=_( $1 ); $tr=~y/"/'/; qq/"$tr"/#ge;	#translation, escaping the " so it is not picked up as a translatable string. Replace any " in translations because they would cause trouble
-		next unless m/^(\w+)\s*=\s*(.*)$/;
-		if ($2 eq '') {delete $Layouts{$name}{$1};next}
-		$Layouts{$name}{$1}= $2;
+		unless (m/^(\w+)\s*=\s*(.*)$/) { $Layouts{$name}{$currentkey} .= ' '.$1 if m/\s*(.*)$/; next } #continuation of previous line if doesn't begin with "word="
+		$currentkey=$1;
+		if ($2 eq '') {delete $Layouts{$name}{$currentkey};next}
+		$Layouts{$name}{$currentkey}= $2;
 	}
 	for my $key (qw/Name Category Title/)
 	{	$Layouts{$name}{$key}=~s/^"(.*)"$/$1/ if $Layouts{$name}{$key};	#remove quotes from layout name and category
@@ -2423,6 +2425,7 @@ sub new
 	{	($tabpos,$self->{angle})= $tabpos=~m/^(left|right|top|bottom)?(90|180|270)?/;
 		$self->set_tab_pos($tabpos) if $tabpos;
 	}
+	$self->set_show_tabs(0) if $opt->{hidetabs};
 	$opt->{typesubmenu}='LPC' unless exists $opt->{typesubmenu};
 	$self->{$_}=$opt->{$_} for qw/group default_child match pages page typesubmenu closebuttons tablist/;
 	for my $class (qw/list context layout/)	# option begining with list_ / context_ / layout_ will be passed to children of this class
@@ -3989,13 +3992,13 @@ sub init
 			my $lab2=$labels2->{$field}=Gtk2::Label->new;
 			push @labels, $labels1, $labels2;
 			$lab1->set_padding(5,0);
-			$lab1->set_alignment(1,.5);
-			$lab2->set_alignment(0,.5);
+			$lab1->set_alignment(1,0);
+			$lab2->set_alignment(0,0);
 			$lab2->set_line_wrap(1);
 			$lab2->set_selectable(1);
 			my $row=$table2->{row}++;
-			$table2->attach($lab1,0,1,$row,$row+1,'fill','shrink',1,1);
-			$table2->attach($lab2,1,2,$row,$row+1,'fill','shrink',1,1);
+			$table2->attach($lab1,0,1,$row,$row+1,'fill','fill',1,1);
+			$table2->attach($lab2,1,2,$row,$row+1,'fill','fill',1,1);
 		}
 		$row=$table->{row}++;
 		$table->attach(Gtk2::HBox->new,0,3,$row,$row+1,[],[],0,5) if @$treelist; #space between categories

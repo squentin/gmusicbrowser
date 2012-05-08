@@ -419,6 +419,7 @@ our %Markup_Empty=
 	L => _"List empty",
 	A => _"Playlist empty",
 	B => _"No songs found",
+	S => _"No songs found",
 );
 
 sub new
@@ -1681,7 +1682,7 @@ my @MenuSubGroup=
 	  check => sub {$_[0]{mode} eq 'C'},	notmode => 'S', },
 	{ label => _"mosaic mode",	code => sub { my $self=$_[0]{self}; $self->set_mode(($self->{mode} eq 'mosaic' ? 'list' : 'mosaic'),1);},
 	  check => sub {$_[0]{mode} eq 'M'},	notmode => 'S',
-	  test	=> sub { my $field=Songs::MainField($_[0]{self}{field}[0]); $field eq 'artist' || $field eq 'album' }, #FIXME use more generic test : does it have pictures
+	  test => sub { Songs::FilterListProp($_[0]{field},'picture') },
 	},
 	{ label => _"show the 'All' row",	code => sub { my $self=$_[0]{self}; $self->{noall}^=1; $self->SetOption; },
 	  check => sub { !$_[0]{self}{noall} }, mode => 'L',
@@ -1816,6 +1817,7 @@ sub new
 	$notebook->signal_connect( switch_page => sub
 	 {	my $p=$_[0]->get_nth_page($_[2]);
 		my $self=::find_ancestor($_[0],__PACKAGE__);
+		$self->{DefaultFocus}=$p;
 		my $pid= $self->{page}= $p->{pid};
 		my $mask=	$Pages{$pid} ? 				$Pages{$pid}[2] :
 				Songs::FilterListProp($pid,'multi') ?	'oni' : 'on';
@@ -2324,7 +2326,7 @@ sub set_text_search
 	return if defined $self->{search} && $self->{search} eq $search;
 	$self->{search}=$search;
 	$self->{valid}=0;
-	$self->Fill if $self->mapped;;
+	$self->Fill if $self->mapped;
 }
 
 sub AAPicture_Changed
@@ -2541,12 +2543,13 @@ sub key_press_cb
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
 	my $unicode=Gtk2::Gdk->keyval_to_unicode($event->keyval); # 0 if not a character
 	my $state=$event->get_state;
-	my $ctrl= $state * ['control-mask'];
+	my $ctrl= $state * ['control-mask'] && !($state * [qw/mod1-mask mod4-mask super-mask/]); #ctrl and not alt/super
+	my $mod=  $state * [qw/control-mask mod1-mask mod4-mask super-mask/]; # no modifier ctrl/alt/super
 	my $shift=$state * ['shift-mask'];
 	if	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }	#ctrl-f : search
 	elsif	(lc$key eq 'g' && $ctrl) { $self->{isearchbox}->search($shift ? -1 : 1);}	#ctrl-g : next/prev match
-	elsif	($key eq 'F3')		 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
-	elsif	(!$self->{no_typeahead} && $unicode && !($state * [qw/control-mask mod1-mask mod4-mask/]))
+	elsif	($key eq 'F3' && !$mod)	 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
+	elsif	(!$self->{no_typeahead} && $unicode && $unicode!=32 && !$mod)
 	{	$self->{isearchbox}->begin( chr $unicode );	#begin typeahead search
 	}
 	else	{return 0}
@@ -2762,11 +2765,18 @@ sub new
 	my $selection=$treeview->get_selection;
 	$selection->set_mode('multiple');
 	$selection->signal_connect (changed =>\&selection_changed_cb);
-	::set_drag($treeview, source => [::DRAG_FILTER,sub
+	# drag and drop doesn't work with filter using a special source, which is the case here
+#	::set_drag($treeview, source => [::DRAG_FILTER,sub
+#	    {	my @paths=_get_path_selection( $_[0] );
+#		return undef unless @paths;
+#		my $filter=_MakeFolderFilter(@paths);
+#		return ::DRAG_FILTER,($filter? $filter->{string} : undef);
+#	    }]);
+	::set_drag($treeview, source => [::DRAG_ID,sub
 	    {	my @paths=_get_path_selection( $_[0] );
 		return undef unless @paths;
 		my $filter=_MakeFolderFilter(@paths);
-		return ::DRAG_FILTER,($filter? $filter->{string} : undef);
+		return ::DRAG_ID,($filter? @{$filter->filter} : undef);
 	    }]);
 	MultiTreeView::init($treeview,__PACKAGE__);
 	return $self;
@@ -3023,7 +3033,7 @@ sub UpdatePlayingFilters
 	while (@list)
 	{	my $id=shift @list;
 		my $name=shift @list;
-		$store->set($store->append($iter),0,$name,1,'play',3,$id);;
+		$store->set($store->append($iter),0,$name,1,'play',3,$id);
 	}
 	$treeview->expand_to_path($path);
 }
@@ -4580,6 +4590,21 @@ sub set_cursor_to_row
 	}
 }
 
+sub select_all
+{	my $self=shift;
+	my $selected=$self->{selected};
+	my $lines=$self->{lines};
+	for (my $i=0; $i<=$#$lines; $i+=3)
+	{	my $line=$lines->[$i+2];
+		for (my $j=0; $j<=$#$line; $j+=5)
+		{	my $key=$line->[$j+4];
+			$selected->{$key}=undef;
+		}
+	}
+	$self->queue_draw;
+	$self->{selectsub}($self);
+}
+
 sub key_selected
 {	my ($self,$event,$i,$j)=@_;
 	$self->scroll_to_index($i,$j);
@@ -4648,10 +4673,16 @@ sub scroll_to_index
 sub key_press_cb
 {	my ($self,$event)=@_;
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
-	if ( $key eq 'space' || $key eq 'Return' )
+	my $state=$event->get_state;
+	my $ctrl= $state * ['control-mask'] && !($state * [qw/mod1-mask mod4-mask super-mask/]); #ctrl and not alt/super
+	my $mod=  $state * [qw/control-mask mod1-mask mod4-mask super-mask/]; # no modifier ctrl/alt/super
+	my $shift=$state * ['shift-mask'];
+	if (($key eq 'space' || $key eq 'Return') && !$mod && !$shift)
 	{	$self->{activatesub}($self,1);
 		return 1;
 	}
+	elsif (lc$key eq 'a' && $ctrl)	{ $self->select_all; return 1; }	#ctrl-a : select-all
+
 	my ($i,$j)=(0,0);
 	($i,$j)=@{$self->{lastclick}} if $self->{lastclick};
 	my $lines=$self->{lines};
@@ -4963,18 +4994,19 @@ sub expose_cb
 				$self->{window}||=$window;
 				$self->{queue}{$i+$j*$nw}=[$x,$y+$dy,$key,$picsize];
 			}
-			elsif (!@markup)
+			elsif (!@markup) # draw text in place of picture if no picture
 			{	my $layout=Gtk2::Pango::Layout->new( $self->create_pango_context );
-				#$layout->set_text($key);
-				#$layout->set_markup('<small>'.::PangoEsc($key).'</small>');
 				$layout->set_markup(AA::ReplaceFields($key,"<small>%a</small>",$field,1));
 				$layout->set_wrap('word-char');
 				$layout->set_width($hsize * Gtk2::Pango->scale);
 				$layout->set_height($vsize * Gtk2::Pango->scale);
+				my $yoffset=0;
+				my $free_height= $vsize - ($layout->get_pixel_extents)[1]{height};
+				if ($free_height>1) { $yoffset= int($free_height/2); }	#center vertically
 				$layout->set_ellipsize('end');
 				$layout->set_alignment('center');
 				$style->paint_layout($window, $state, 1,
-					Gtk2::Gdk::Rectangle->new($x,$y,$hsize,$vsize), $self, undef, $x, $y, $layout);
+					Gtk2::Gdk::Rectangle->new($x,$y,$hsize,$vsize), $self, undef, $x, $y+$yoffset, $layout);
 				next;
 			}
 			my ($xm,$ym,$align)= $self->{markup_pos} eq 'right' ? ($x+$picsize+XPAD,$y,'left') : ($x,$y+$picsize+YPAD,'center');
@@ -5099,12 +5131,14 @@ sub scroll_to_row
 sub key_press_cb
 {	my ($self,$event)=@_;
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
-	if ( $key eq 'space' || $key eq 'Return' )
+	my $state=$event->get_state;
+	my $ctrl= $state * ['control-mask'] && !($state * [qw/mod1-mask mod4-mask super-mask/]); #ctrl and not alt/super
+	my $mod=  $state * [qw/control-mask mod1-mask mod4-mask super-mask/]; # no modifier ctrl/alt/super
+	my $shift=$state * ['shift-mask'];
+	if ( ($key eq 'space' || $key eq 'Return') && !$mod && !$shift )
 	{	$self->{activatesub}($self,1);
 		return 1;
 	}
-	my $state=$event->get_state;
-	my $ctrl= $state * ['control-mask'];
 	my $pos=0;
 	$pos=$self->{lastclick} if $self->{lastclick};
 	my ($nw,$nh,$nwlast)=@{$self->{dim}};
@@ -5905,7 +5939,7 @@ sub update_sorted_column
 				undef;
 		if ($arrow)	{ $cell->{sorted}=$arrow; } # used by SongTree to draw background of cells differently for sorted column
 		else		{ delete $cell->{sorted}; } # and by SongTree::Headers to draw up/down arrow
-	}	
+	}
 }
 
 sub scroll_event_cb
@@ -5930,12 +5964,13 @@ sub key_press_cb
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
 	my $unicode=Gtk2::Gdk->keyval_to_unicode($event->keyval); # 0 if not a character
 	my $state=$event->get_state;
-	my $ctrl= $state * ['control-mask'];
+	my $ctrl= $state * ['control-mask'] && !($state * [qw/mod1-mask mod4-mask super-mask/]); #ctrl and not alt/super
+	my $mod=  $state * [qw/control-mask mod1-mask mod4-mask super-mask/]; # no modifier ctrl/alt/super
 	my $shift=$state * ['shift-mask'];
 	my $row= $self->{lastclick};
 	$row=0 if $row<0;
 	my $list=$self->{array};
-	if	($key eq 'space' || $key eq 'Return')
+	if	(($key eq 'space' || $key eq 'Return') && !$mod && !$shift)
 					{ $self->Activate(1); }
 	elsif	($key eq 'Up')		{ $row-- if $row>0;	 $self->song_selected($event,$row); }
 	elsif	($key eq 'Down')	{ $row++ if $row<$#$list;$self->song_selected($event,$row); }
@@ -5950,8 +5985,8 @@ sub key_press_cb
 		{ vec($self->{selected},$_,1)=1 for 0..$#$list; $self->UpdateSelection;}
 	elsif	(lc$key eq 'f' && $ctrl) { $self->{isearchbox}->begin(); }			#ctrl-f : search
 	elsif	(lc$key eq 'g' && $ctrl) { $self->{isearchbox}->search($shift ? -1 : 1);}	#ctrl-g : next/prev match
-	elsif	($key eq 'F3')		 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
-	elsif	(!$self->{no_typeahead} && $unicode && !($state * [qw/control-mask mod1-mask mod4-mask/]))
+	elsif	($key eq 'F3' && !$mod)	 { $self->{isearchbox}->search($shift ? -1 : 1);}	#F3 : next/prev match
+	elsif	(!$self->{no_typeahead} && $unicode && $unicode!=32 && !$mod)			# character except space, no modifier
 	{	$self->{isearchbox}->begin( chr $unicode );	#begin typeahead search
 	}
 	else	{return 0}
@@ -7724,7 +7759,7 @@ sub parse
 		{	$update->{col}{$_}=undef for Songs::Depends(split / /,$c);
 		}
 		if (defined $e)
-		{	$update->{event}{$_}=undef for split / /,$e;;
+		{	$update->{event}{$_}=undef for split / /,$e;
 		}
 	  }
 	}

@@ -829,7 +829,7 @@ sub dates_to_timestamps
 		{	$y= $y>100 ? $y-=1900 : $y<70 ? $y+100 : $y;	#>100 => 4digits year, <70 : 2digits 20xx year, else 2digits 19xx year
 		}
 		$M-- if defined $M;
-		$h+=12 if defined $pm && $pm=~m/^pm?$/ && defined $h;
+		$h+=( $pm=~m/^pm?$/ ? $h!=12 ? 12 : 0 : $h==12 ? -12 : 0 ) if defined $pm && defined $h;
 		my @now= (localtime)[0..5];
 		for ($y,$M,$d,$h,$m,$s)	#complete relative dates with current date
 		{	last if defined;
@@ -1903,7 +1903,7 @@ sub ReadOldSavedTags
 		{	$Options{SavedWRandoms}{$key}=$val;
 		}
 		elsif ($1 eq 'L')
-		{	$Options{SavedLists}{$key}= SongArray->new_from_string($val);
+		{	$Options{SavedLists}{$key}= SongArray::Named->new_from_string($val);
 		}
 		elsif ($1 eq 'G')
 		{	$Options{SavedSTGroupings}{$key}=$val;
@@ -2042,6 +2042,10 @@ sub ReadSavedTags	#load tags _and_ settings
 		$Library=[];	#dummy array to avoid a warning when filtering in the next line
 		$Library= SongArray->new( $filter->filter_all );
 		Songs::AddMissing( Songs::AllFilter('missing:-e:0'), 'init' );
+	}
+
+	if ($oldversion<=1.1009)
+	{	bless $_,'SongArray::Named' for values %{$Options{SavedLists}}; #named lists now use SongArray::Named instead of plain SongArray
 	}
 
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};
@@ -2809,7 +2813,7 @@ sub DoActionForList
 
 sub SongArray_changed
 {	my (undef,$songarray,$action,@extra)=@_;
-	$Filter::CachedList=undef;	#FIXME could be optimized, currently only saved lists can be used as a filter
+	if ($songarray->isa('SongArray::Named')) { Songs::Changed(undef,'list'); } # simulate modifcation of the fake "list" field
 	if ($songarray==$Queue)
 	{	HasChanged('Queue',$action,@extra);
 	}
@@ -3097,6 +3101,9 @@ sub OpenSpecialWindow
 	Layout::Window->new($layout, ifexist => $ifexist, uniqueid=>$type);
 }
 
+sub SetFullScreenMode
+{	ToggleFullscreenLayout() if $_[0] xor $FullscreenWindow;
+}
 sub ToggleFullscreenLayout
 {	if ($FullscreenWindow)
 	{	$FullscreenWindow->close_window;
@@ -3122,6 +3129,7 @@ sub ToggleFullscreenLayout
 			$FullscreenWindow->signal_connect(destroy => sub { UnWatch($h,'Playing'); $h->{destroy}=1; &$sub(); });
 		}
 	}
+	HasChanged('FullScreen',!!$FullscreenWindow);
 }
 
 sub WEditList
@@ -3761,7 +3769,7 @@ sub BuildMenu
 		next if $m->{isdefined}	&& !defined $args->{ $m->{isdefined} };
 		#next if $m->{notdefined}&& defined $args->{ $m->{notdefined} };
 		next if $m->{istrue}	&&   !$args->{ $m->{istrue} };
-		#next if $m->{notstrue}	&&    $args->{ $m->{nottrue} };
+		#next if $m->{nottrue}	&&    $args->{ $m->{nottrue} };
 		next if $m->{empty}	&& (  $args->{ $m->{empty} }	&& @{ $args->{ $m->{empty}   } }!=0 );
 		next if $m->{notempty}	&& ( !$args->{ $m->{notempty} }	|| @{ $args->{ $m->{notempty}} }==0 );
 		next if $m->{onlyone}	&& ( !$args->{ $m->{onlyone}  }	|| @{ $args->{ $m->{onlyone} } }!=1 );
@@ -6122,7 +6130,9 @@ sub MoveFolder #FIXME implement
 sub UpdateFolderNames
 {	my ($oldpath,$newpath)=@_;
 	s/$QSLASH+$//o for $oldpath,$newpath;
-	my $renamed=Songs::AllFilter('path:i:'.$oldpath);
+	my $filter= 'path:i:'.Songs::filename_escape($oldpath);
+	utf8::upgrade($filter); #for unclear reasons, it is needed for non-utf8 folder names. Things should be clearer once the filter code is changed to keep patterns in variables, instead of including them in the eval
+	my $renamed=Songs::AllFilter($filter);
 
 	my $pattern=qr/^\Q$oldpath\E/;
 	my @newpath;
@@ -6185,7 +6195,7 @@ sub PrefLibrary
 	my $BCheck=NewIconButton('gtk-refresh',_"check now",sub { IdleCheck();	});
 	my $label=Gtk2::Label->new(_"Folders to search for new songs");
 
-	my $reorg=Gtk2::Button->new(_"Reorganize files and folders");
+	my $reorg=Gtk2::Button->new(_("Reorganize files and folders").'...');
 	$reorg->signal_connect( clicked => sub
 	{	return unless @$Library;
 		DialogMassRename(@$Library);
@@ -6695,13 +6705,17 @@ sub SaveFilter		{ SaveSFRG('SavedFilters',@_);	}
 sub SaveList
 {	my ($name,$val,$newname)=@_;
 	my $saved=$Options{SavedLists};
-	if (defined $newname)	{$saved->{$newname}=delete $saved->{$name}; HasChanged('SavedLists',$name,'renamedto',$newname); $name=$newname; }
+	if (defined $newname)
+	{	$saved->{$newname}=delete $saved->{$name};
+		HasChanged('SavedLists',$name,'renamedto',$newname);
+		HasChanged('SavedLists',$newname);
+	}
 	elsif (defined $val)
 	{	if (my $songarray= $saved->{$name})	{ $songarray->Replace($val); return }
-		else					{ $saved->{$name}= SongArray->new($val); }
+		else					{ $saved->{$name}= SongArray::Named->new($val); HasChanged('SavedLists',$name); }
 	}
-	else			{delete $saved->{$name}; HasChanged('SavedLists',$name,'remove'); return}
-	HasChanged('SavedLists',$name);
+	else	{ delete $saved->{$name}; HasChanged('SavedLists',$name,'remove'); }
+	Songs::Changed(undef,'list'); # simulate modifcation of the fake "list" field
 }
 
 sub Watch

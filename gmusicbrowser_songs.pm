@@ -116,6 +116,10 @@ our %timespan_menu=
 		'filter:s'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___name[$_], "#VAL#")  .!=. -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
 		'filter:m'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___name[$_]  .=~. m"#VAL#"  ,@$v) : ___name[$v]  .=~. m"#VAL#"; }',
 		'filter:mi'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___iname[$_] .=~. m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
+		'filter_prep:m'	=> \&Filter::QuoteRegEx,
+		'filter_prep:mi'=> \&Filter::QuoteRegEx,
+		'filter_prep:si'=> sub {quotemeta lc($_[0])},
+		'filter_prep:s'=> sub {quotemeta $_[0]},
 		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ---- AFTER: #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}',
 		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v }',
@@ -142,6 +146,10 @@ our %timespan_menu=
 		'smartfilter::' => 'si s',
 		'smartfilter:~' => 'mi m',
 		default_filter	=> 'si',
+
+		load_extra	=> '___gid{#SGID#} || return;',
+		save_extra	=> 'my %h; while ( my ($sgid,$gid)=each %___gid ) { $h{$sgid}= [#SUBFIELDS#] } delete $h{""}; return \%h;',
+
 	},
 	artists	=>
 	{	_		=> '____[#ID#]',
@@ -573,12 +581,12 @@ our %timespan_menu=
 		init		=> '___index_= ___values_= ___nb_ = "";',
 		set		=> '{	my $v=#VAL#;
 					my @list= !$v ? () : sort { $a <=> $b } (ref $v ? @$v : split /\D+/,$v);
-					if (my $nb=#nb#) { ___free_[$nb].= pack "#packformat#",#index#; } # add previous space to list of free spaces
+					if (my $nb=#nb#) { ___free_[$nb].= pack "N",#index#; } # add previous space to list of free spaces
 					if (@list)
 					{	my $string= pack "#packformat#*", @list;
 						my $nb= #nb#= scalar @list;
 						if (___free_[$nb])	# re-use old space
-						{	#index#= unpack "#packformat#", substr(___free_[$nb],-#bytes#,#bytes#,"");
+						{	#index#= unpack "N", substr(___free_[$nb],-4,4,"");
 							#_#= $string;
 						}
 						else			# use new space
@@ -707,9 +715,9 @@ our %timespan_menu=
 		check=>'',
 	},
 );
-%Def=		#flags : Read Write Editable Sortable Column caseInsensitive sAve List Gettable
+%Def=		#flags : Read Write Editable Sortable Column caseInsensitive sAve List Gettable Properties
 (file	=>
- {	name	=> _"Filename",	width => 400, flags => 'fgasc_',	type => 'filename',
+ {	name	=> _"Filename",	width => 400, flags => 'fgascp_',	type => 'filename',
 	'stats:filetoid' => '#HVAL#{ #file->get# }=#ID#',
 	category=>'file',
 	alias	=> 'filename',
@@ -722,7 +730,7 @@ our %timespan_menu=
 	'stats:count'	=> '#HVAL#++',
  },
  path	=>
- {	name	=> _"Folder",	width => 200, flags => 'fgasc_',	type => 'filename',
+ {	name	=> _"Folder",	width => 200, flags => 'fgascp_',	type => 'filename',
 	'filter:i'	=> '#_# .=~. m/^#VAL#(?:$::QSLASH|$)/o',
 	'filter_prep:i'	=> sub { quotemeta ::decode_url($_[0]); },
 	'filterdesc:i'	=> [_"is in %s", _"is in", 'filename'],
@@ -733,20 +741,20 @@ our %timespan_menu=
 	alias	=> 'folder',
  },
  modif	=>
- {	name	=> _"Modification",	width => 160,	flags => 'fgarsc_',	type => 'date',
+ {	name	=> _"Modification",	width => 160,	flags => 'fgarscp_',	type => 'date',
 	FilterList => {type=>'year',},
 	can_group=>1,
 	category=>'file',
 	alias	=> 'modified',
  },
  size	=>
- {	name => _"Size",	width => 80,	flags => 'fgarsc_',		#32bits => 4G max
+ {	name => _"Size",	width => 80,	flags => 'fgarscp_',		#32bits => 4G max
 	type => 'size',
 	FilterList => {type=>'div.1000000',},
 	category=>'file',
  },
  title	=>
- {	name	=> _"Title",	width	=> 270,		flags	=> 'fgarwesci',	type => 'istring',
+ {	name	=> _"Title",	width	=> 270,		flags	=> 'fgarwescpi',	type => 'istring',
 	id3v1	=> 0,		id3v2	=> 'TIT2',	vorbis	=> 'title',	ape	=> 'Title',	lyrics3v2=> 'ETT', ilst => "\xA9nam",
 	'filter:~' => '#_iname# .=~. m"(?:^|/) *#VAL# *(?:[/\(\[]|$)"',		'filter_prep:~'=> \&Filter::SmartTitleRegEx,
 	'filter_simplify:~' => \&Filter::SmartTitleSimplify,
@@ -758,7 +766,7 @@ our %timespan_menu=
 	alias_trans=> ::_p('Field_aliases',"title"),  #TRANSLATION: comma-separated list of field aliases for title, these are in addition to english aliases
  },
  artist =>
- {	name => _"Artist",	width => 200,	flags => 'fgarwesci',
+ {	name => _"Artist",	width => 200,	flags => 'fgarwescpi',
 	type => 'artist',
 	id3v1	=> 1,		id3v2	=> 'TPE1',	vorbis	=> 'artist',	ape	=> 'Artist',	lyrics3v2=> 'EAR', ilst => "\xA9ART",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
@@ -773,7 +781,7 @@ our %timespan_menu=
 	alias_trans=> ::_p('Field_aliases',"artist,by"),  #TRANSLATION: comma-separated list of field aliases for artist, these are in addition to english aliases
  },
  first_artist =>
- {	flags => 'fg', #CHECKME
+ {	flags => 'fig',
 	type	=> 'artist_first',	depend	=> 'artists',	name => _"Main artist",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
@@ -781,13 +789,13 @@ our %timespan_menu=
 	can_group=>1,
  },
  artists =>
- {	flags => 'fl',	type	=> 'artists',	depend	=> 'artist title',	name => _"Artists",
+ {	flags => 'fil',	type	=> 'artists',	depend	=> 'artist title',	name => _"Artists",
 	all_count=> _"All artists",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
  },
  album =>
- {	name => _"Album",	width => 200,	flags => 'fgarwesci',	type => 'album',
+ {	name => _"Album",	width => 200,	flags => 'fgarwescpi',	type => 'album',
 	id3v1	=> 2,		id3v2	=> 'TALB',	vorbis	=> 'album',	ape	=> 'Album',	lyrics3v2=> 'EAL', ilst => "\xA9alb",
 	depend	=> 'artist album_artist_raw', #because albums with no names get the name : <Unknown> (artist)
 	all_count=> _"All albums",
@@ -801,9 +809,17 @@ our %timespan_menu=
 	alias=> 'on',
 	alias_trans=> ::_p('Field_aliases',"album,on"),  #TRANSLATION: comma-separated list of field aliases for album, these are in addition to english aliases
  },
+# genre_picture =>
+# {	name		=> "Genre picture",
+#	flags		=> 'g',
+#	depend		=> 'genre',
+#	property_of	=> 'genre',
+#	mainfield	=> 'genre',
+#	type		=> '_picture',
+# },
  album_picture =>
  {	name		=> _"Album picture",
-	flags		=> 'g',		#FIXME
+	flags		=> 'g',
 	depend		=> 'album',
 	property_of	=> 'album',
 	mainfield	=> 'album',
@@ -812,14 +828,14 @@ our %timespan_menu=
  },
  artist_picture =>
  {	name		=> _"Artist picture",
-	flags		=> 'g',		#FIXME
+	flags		=> 'g',
 	depend		=> 'artist',
 	property_of	=> 'artist',
 	mainfield	=> 'artist',
 	type		=> '_picture',
  },
  album_artist_raw =>
- {	name => _"Album artist",width => 200,	flags => 'fgarwesci',	type => 'artist',
+ {	name => _"Album artist",width => 200,	flags => 'fgarwescpi',	type => 'artist',
 	id3v2	=> 'TPE2',	vorbis	=> 'albumartist|album_artist',	ape	=> 'Album Artist|Album_artist',  ilst => "aART",
 	#FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
@@ -838,23 +854,23 @@ our %timespan_menu=
 	category=>'basic',
  },
  haspicture =>
- {	name	=> _"Embedded picture", width => 20, flags => 'fgarwsc',	type => 'boolean',
+ {	name	=> _"Embedded picture", width => 20, flags => 'fgarwscp',	type => 'boolean',
 	id3v2 => 'APIC;;;;%v',	ilst => 'covr',		#or just id3v2 => 'APIC', ?
 	disable=>1,
  },
  haslyrics =>
- {	name	=> _"Embedded lyrics", width => 20, flags => 'fgarwsc',	type => 'boolean',
+ {	name	=> _"Embedded lyrics", width => 20, flags => 'fgarwscp',	type => 'boolean',
 	id3v2 => 'USLT;;;%v',	vorbis	=> 'lyrics',	ape => 'Lyrics', #TESTME
 	disable=>1,
  },
  compilation =>
- {	name	=> _"Compilation", width => 20, flags => 'fgarwesc',	type => 'boolean',
+ {	name	=> _"Compilation", width => 20, flags => 'fgarwescp',	type => 'boolean',
 	id3v2 => 'TCMP',	vorbis	=> 'compilation',	ape => 'Compilation',	ilst => 'cpil',
 	edit_many=>1,
 	category=>'basic',
  },
  grouping =>
- {	name	=> _"Grouping",	width => 100,	flags => 'fgarwesci',	type => 'fewstring',
+ {	name	=> _"Grouping",	width => 100,	flags => 'fgarwescpi',	type => 'fewstring',
 	FilterList => {search=>1},
 	can_group=>1,
 	edit_order=> 55,	edit_many=>1,
@@ -862,7 +878,7 @@ our %timespan_menu=
 	category=>'extra',
  },
  year =>
- {	name	=> _"Year",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 16,
+ {	name	=> _"Year",	width => 40,	flags => 'fgarwescp',	type => 'integer',	bits => 16,
 	edit_max=>3000,	edit_mode=> 'year',
 	check	=> '#VAL#= #VAL# =~m/(\d\d\d\d)/ ? $1 : 0;',
 	id3v1	=> 3,		id3v2 => 'TDRC|TYER', 'id3v2.3'=> 'TYER|TDRC',	'id3v2.4'=> 'TDRC|TYER',	vorbis	=> 'date|year',	ape	=> 'Record Date|Year', ilst => "\xA9day",
@@ -876,7 +892,7 @@ our %timespan_menu=
 	category=>'basic',
  },
  track =>
- {	name	=> _"Track",	width => 40,	flags => 'fgarwesc',
+ {	name	=> _"Track",	width => 40,	flags => 'fgarwescp',
 	id3v1	=> 5,		id3v2	=> 'TRCK',	vorbis	=> 'tracknumber',	ape	=> 'Track', ilst => "trkn",
 	type => 'integer',	displayformat => '%02d', bits => 16,
 	edit_max => 65535, 	edit_mode=> 'nozero',
@@ -884,7 +900,7 @@ our %timespan_menu=
 	category=>'basic',
  },
  disc =>
- {	name	=> _"Disc",	width => 40,	flags => 'fgarwesc',	type => 'integer',	bits => 8,
+ {	name	=> _"Disc",	width => 40,	flags => 'fgarwescp',	type => 'integer',	bits => 8,
 	edit_max => 255,	edit_mode=> 'nozero',
 				id3v2	=> 'TPOS',	vorbis	=> 'discnumber',	ape	=> 'discnumber', ilst => "disk|disc",
 	editwidth => 4,
@@ -894,7 +910,7 @@ our %timespan_menu=
 	alias	=> 'disk',
  },
  discname =>
- {	name	=> _"Disc name",	width	=> 100,		flags => 'fgarwesci',	type => 'fewstring',
+ {	name	=> _"Disc name",	width	=> 100,		flags => 'fgarwescpi',	type => 'fewstring',
 	id3v2	=> 'TSST',	vorbis	=> 'discsubtitle',	ape => 'DiscSubtitle',	ilst=> '----DISCSUBTITLE',
 	edit_many=>1,
 	disable=>1,	options => 'disable',
@@ -902,7 +918,7 @@ our %timespan_menu=
 	alias	=> 'diskname',
  },
  genre	=>
- {	name		=> _"Genres",	width => 180,	flags => 'fgarwescil',
+ {	name		=> _"Genres",	width => 180,	flags => 'fgarwescpil',
 	 #is_set	=> '(__GENRE__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
 	id3v1	=> 6,		id3v2	=> 'TCON',	vorbis	=> 'genre',	ape	=> 'Genre', ilst => "\xA9gen & ----genre",
 	read_split	=> qr/\s*;\s*/,
@@ -912,9 +928,10 @@ our %timespan_menu=
 	FilterList	=> {search=>1},
 	edit_order=> 70,	edit_many=>1,	letter => 'g',
 	category=>'basic',
+#	picture_field => 'genre_picture',
  },
  label	=>
- {	name		=> _"Labels",	width => 180,	flags => 'fgaescil',
+ {	name		=> _"Labels",	width => 180,	flags => 'fgaescpil',
 	 #is_set	=> '(__LABEL__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
 	type		=> 'flags',		init_namearray	=> '@{$::Options{Labels}}',
 	iconprefix	=> 'label-',
@@ -928,7 +945,7 @@ our %timespan_menu=
 	category=>'extra',
  },
  mood	=>
- {	name		=> _"Moods",	width => 180,	flags => 'fgarwescil',
+ {	name		=> _"Moods",	width => 180,	flags => 'fgarwescpil',
 	id3v2	=> 'TMOO',	vorbis	=> 'MOOD',	ape	=> 'Mood', ilst => "----MOOD",
 	read_split	=> qr/\s*;\s*/,
 	type		=> 'flags',
@@ -940,7 +957,7 @@ our %timespan_menu=
 	category=>'extra',
  },
  style	=>
- {	name	=> _"Styles",	width => 180,	flags => 'fgaescil',
+ {	name	=> _"Styles",	width => 180,	flags => 'fgaescpil',
 	type		=> 'flags',
 	all_count	=> _"All styles",
 	none		=> quotemeta _"No styles",
@@ -950,7 +967,7 @@ our %timespan_menu=
 	category=>'extra',
  },
  theme	=>
- {	name	=> _"Themes",	width => 180,	flags => 'fgaescil',
+ {	name	=> _"Themes",	width => 180,	flags => 'fgaescpil',
 	type		=> 'flags',
 	all_count	=> _"All themes",
 	none		=> quotemeta _"No themes",
@@ -960,13 +977,13 @@ our %timespan_menu=
 	category=>'extra',
  },
  comment=>
- {	name	=> _"Comment",	width => 200,	flags => 'fgarwesci',		type => 'text',
+ {	name	=> _"Comment",	width => 200,	flags => 'fgarwescpi',		type => 'text',
 	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3v2=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
 	edit_order=> 60,	edit_many=>1,	letter => 'C',
 	category=>'basic',
  },
  rating	=>
- {	name	=> _"Rating",		width => 80,	flags => 'fgaesc',	type => 'rating',
+ {	name	=> _"Rating",		width => 80,	flags => 'fgaescp',	type => 'rating',
 	id3v2	=> 'TXXX;FMPS_Rating_User;%v::%i & TXXX;FMPS_Rating;%v | percent( TXXX;gmbrating;%v ) | five( TXXX;rating;%v )',
 	vorbis	=> 'FMPS_RATING_USER::%i & FMPS_RATING | percent( gmbrating ) | five( rating )',
 	ape	=> 'FMPS_RATING_USER::%i & FMPS_RATING | percent( gmbrating ) | five( rating )',
@@ -990,14 +1007,14 @@ our %timespan_menu=
 	get	=> '#rating->_default#',
  },
  added	=>
- {	name	=> _"Added",		width => 100,	flags => 'fgasc_',	type => 'date',
-	FilterList => {type=>'year', },
+ {	name	=> _"Added",		width => 100,	flags => 'fgascp_',	type => 'date',
+	FilterList => {type=>'month', },
 	can_group=>1,
 	category=>'stats',
  },
  lastplay	=>
- {	name	=> _"Last played",	width => 100,	flags => 'fgasc',	type => 'date',
-	FilterList => {type=>'year',},
+ {	name	=> _"Last played",	width => 100,	flags => 'fgascp',	type => 'date',
+	FilterList => {type=>'month',},
 	can_group=>1,	letter => 'P',
 	'filterdesc:e:0'	=> _"never",
 	'filterdesc:-e:0'	=> _"has been played",	#FIXME better description
@@ -1005,8 +1022,8 @@ our %timespan_menu=
 	#alias	=> 'played',
  },
  playhistory	=>
- {	name	=> _"Play history",	flags => 'fgalc',	type=> 'dates_compact',
-	FilterList => {type=>'year',},
+ {	name	=> _"Play history",	flags => 'fgalp',	type=> 'dates_compact',
+	FilterList => {type=>'month',},
 	'filterdesc:ecount:0'	=> _"never",
 	'filterdesc:-ecount:0'	=> _"has been played",	#FIXME better description
 	alias	=> 'played',
@@ -1014,8 +1031,8 @@ our %timespan_menu=
 	disable=>0,	options => 'disable',
  },
  lastskip	=>
- {	name	=> _"Last skipped",	width => 100,	flags => 'fgasc',	type => 'date',
-	FilterList => {type=>'year',},
+ {	name	=> _"Last skipped",	width => 100,	flags => 'fgascp',	type => 'date',
+	FilterList => {type=>'month',},
 	can_group=>1,	letter => 'K',
 	'filterdesc:e:0'	=> _"never",
 	'filterdesc:-e:0'	=> _"has been skipped",	#FIXME better description
@@ -1023,8 +1040,8 @@ our %timespan_menu=
 	alias	=> 'skipped',
  },
  skiphistory	=>
- {	name	=> _"Skip history",	flags => 'fgalc',	type=> 'dates_compact',
-	FilterList => {type=>'year',},
+ {	name	=> _"Skip history",	flags => 'fgalp',	type=> 'dates_compact',
+	FilterList => {type=>'month',},
 	'filterdesc:ecount:0'	=> _"never",
 	'filterdesc:-ecount:0'	=> _"has been skipped",	#FIXME better description
 	#alias	=> 'skipped',
@@ -1032,7 +1049,7 @@ our %timespan_menu=
 	disable=>1,	options => 'disable',
  },
  playcount	=>
- {	name	=> _"Play count",	width => 50,	flags => 'fgaesc',	type => 'integer',	letter => 'p',
+ {	name	=> _"Play count",	width => 50,	flags => 'fgaescp',	type => 'integer',	letter => 'p',
 	options => 'rw_ userid',
 	id3v2	=> 'TXXX;FMPS_Playcount;%v&TXXX;FMPS_Playcount_User;%v::%i',
 	vorbis	=> 'FMPS_PLAYCOUNT&FMPS_PLAYCOUNT_USER::%i',
@@ -1042,14 +1059,14 @@ our %timespan_menu=
 	prewrite=> sub { sprintf('%.1f', $_[0]); },
 	category=>'stats',
 	alias	=> 'plays',
-},
+ },
  skipcount	=>
- {	name	=> _"Skip count",	width => 50,	flags => 'fgaesc',	type => 'integer',	letter => 'k',
+ {	name	=> _"Skip count",	width => 50,	flags => 'fgaescp',	type => 'integer',	letter => 'k',
 	category=>'stats',
 	alias	=> 'skips',
  },
  composer =>
- {	name	=> _"Composer",		width	=> 100,		flags => 'fgarwesci',	type => 'artist',
+ {	name	=> _"Composer",		width	=> 100,		flags => 'fgarwescpi',	type => 'artist',
 	id3v2	=> 'TCOM',	vorbis	=> 'composer',		ape => 'Composer',	ilst => "\xA9wrt",
 	apic_id	=> 11,
 	picture_field => 'artist_picture',
@@ -1059,7 +1076,7 @@ our %timespan_menu=
 	category=>'extra',
  },
  lyricist =>
- {	name	=> _"Lyricist",		width	=> 100,		flags => 'fgarwesci',	type => 'artist',
+ {	name	=> _"Lyricist",		width	=> 100,		flags => 'fgarwescpi',	type => 'artist',
 	id3v2	=> 'TEXT',	vorbis	=> 'LYRICIST',		ape => 'Lyricist',	ilst => '---LYRICIST',
 	apic_id	=> 12,
 	picture_field => 'artist_picture',
@@ -1069,7 +1086,7 @@ our %timespan_menu=
 	category=>'extra',
  },
  conductor =>
- {	name	=> _"Conductor",	width	=> 100,		flags => 'fgarwesci',	type => 'artist',
+ {	name	=> _"Conductor",	width	=> 100,		flags => 'fgarwescpi',	type => 'artist',
 	id3v2	=> 'TPE3',	vorbis	=> 'CONDUCTOR',		ape => 'Conductor',	ilst => '---CONDUCTOR',
 	apic_id	=> 9,
 	picture_field => 'artist_picture',
@@ -1079,7 +1096,7 @@ our %timespan_menu=
 	category=>'extra',
  },
  remixer =>
- {	name	=> _"Remixer",	width	=> 100,		flags => 'fgarwesci',	type => 'artist',
+ {	name	=> _"Remixer",	width	=> 100,		flags => 'fgarwescpi',	type => 'artist',
 	id3v2	=> 'TPE4',	vorbis	=> 'REMIXER',		ape => 'MixArtist',	ilst => '---REMIXER',
 	picture_field => 'artist_picture',
 	FilterList => {search=>1},
@@ -1088,19 +1105,19 @@ our %timespan_menu=
 	category=>'extra',
  },
  version=> #subtitle ?
- {	name	=> _"Version",	width	=> 150,		flags => 'fgarwesci',	type => 'fewstring',
+ {	name	=> _"Version",	width	=> 150,		flags => 'fgarwescpi',	type => 'fewstring',
 	id3v2	=> 'TIT3',	vorbis	=> 'version|subtitle',			ape => 'Subtitle',	ilst=> '----SUBTITLE',
 	category=>'extra',
  },
  bpm	=>
- {	name	=> _"BPM",	width	=> 60,		flags => 'fgarwesc',	type => 'integer',
+ {	name	=> _"BPM",	width	=> 60,		flags => 'fgarwescp',	type => 'integer',
 	id3v2	=> 'TBPM',	vorbis	=> 'BPM',	ape => 'BPM',		ilst=> 'tmpo',
 	FilterList => {type=>'div.10',},
 	disable=>1,	options => 'disable',
 	category=>'extra',
  },
  channel=>
- {	name	=> _"Channels",		width => 50,	flags => 'fgarsc',	type => 'integer',	bits => 4,	audioinfo => 'channels',
+ {	name	=> _"Channels",		width => 50,	flags => 'fgarscp',	type => 'integer',	bits => 4,	audioinfo => 'channels',
 	default_filter	 => 'e:2',
 	'filterdesc:e:1' => _"is mono",
 	'filterdesc:-e:1'=> _"isn't mono",
@@ -1109,20 +1126,20 @@ our %timespan_menu=
 	category=>'audio',
  },
  bitrate=>
- {	name	=> _"Bitrate",		width => 70,	flags => 'fgarsc_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
+ {	name	=> _"Bitrate",		width => 70,	flags => 'fgarscp_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
 	FilterList => {type=>'div.32',},
 	'filterpat:value' => [ display => "%d kbps", unit => 'kbps', default_value=>192 ],
 	category=>'audio',
  },
  samprate=>
- {	name	=> _"Sampling Rate",	width => 60,	flags => 'fgarsc',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate',
+ {	name	=> _"Sampling Rate",	width => 60,	flags => 'fgarscp',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate',
 	FilterList => {},
 	'filterdesc:e:44100' => _"is 44.1kHz",
 	'filterpat:value' => [ display => "%d Hz", unit => 'Hz', step=> 100, default_value=>44100 ],
 	category=>'audio',
  },
  filetype=>
- {	name	=> _"File type",		width => 80,	flags => 'fgarsc',	type => 'fewstring',	bits => 8, #could probably fit in 4bit
+ {	name	=> _"File type",		width => 80,	flags => 'fgarscp',	type => 'fewstring',	bits => 8, #could probably fit in 4bit
 	FilterList => {},
 	'filterdesc:m:^mp3' => _"is a mp3 file",
 	'filterdesc:m:^mp4 mp4a' => _"is a m4a file",
@@ -1135,7 +1152,7 @@ our %timespan_menu=
 	alias	=> 'type',
  },
  'length'=>
- {	name	=> _"Length",		width => 50,	flags => 'fgarsc_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
+ {	name	=> _"Length",		width => 50,	flags => 'fgarscp_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
 	audioinfo => 'seconds',		check	=> '#VAL#= sprintf "%.0f",#VAL#;',
 	FilterList => {type=>'div.60',},
 	'filterpat:value' => [ display => "%d s", unit => 's', default_value=>1 ],	#should 's' be translated ?
@@ -1144,7 +1161,7 @@ our %timespan_menu=
  },
 
  replaygain_track_gain=>
- {	name	=> _"Track gain",	width => 60,	flags => 'fgrwsca',
+ {	name	=> _"Track gain",	width => 60,	flags => 'fgrwscpa',
 	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
 	displayformat	=> '%.2f dB',
 	id3v2	=> 'TXXX;replaygain_track_gain;%v',	vorbis	=> 'replaygain_track_gain',	ape	=> 'replaygain_track_gain', ilst => '----replaygain_track_gain',
@@ -1152,14 +1169,14 @@ our %timespan_menu=
 	category=>'replaygain',
  },
  replaygain_track_peak=>
- {	name	=> _"Track peak",	width => 60,	flags => 'fgrwsca',
+ {	name	=> _"Track peak",	width => 60,	flags => 'fgrwscpa',
 	id3v2	=> 'TXXX;replaygain_track_peak;%v',	vorbis	=> 'replaygain_track_peak',	ape	=> 'replaygain_track_peak', ilst => '----replaygain_track_peak',
 	type	=> 'float',
 	options => 'disable',
 	category=>'replaygain',
  },
  replaygain_album_gain=>
- {	name	=> _"Album gain",	width => 60,	flags => 'fgrwsca',
+ {	name	=> _"Album gain",	width => 60,	flags => 'fgrwscpa',
 	id3v2	=> 'TXXX;replaygain_album_gain;%v',	vorbis	=> 'replaygain_album_gain',	ape	=> 'replaygain_album_gain', ilst => '----replaygain_album_gain',
 	displayformat	=> '%.2f dB',
 	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
@@ -1167,7 +1184,7 @@ our %timespan_menu=
 	category=>'replaygain',
  },
  replaygain_album_peak=>
- {	name	=> _"Album peak",	width => 60,	flags => 'fgrwsca',
+ {	name	=> _"Album peak",	width => 60,	flags => 'fgrwscpa',
 	id3v2	=> 'TXXX;replaygain_album_peak;%v',	vorbis	=> 'replaygain_album_peak',	ape	=> 'replaygain_album_peak', ilst => '----replaygain_album_peak',
 	type	=> 'float',
 	options => 'disable',
@@ -1257,16 +1274,16 @@ our %timespan_menu=
 );
 
 our %FieldTemplates=
-(	string	=> { type=>'string',	editname=>_"string",		flags=>'fgaesc',	width=> 200,	edit_many =>1,		options=> 'customfield', },
-	text	=> { type=>'text',	editname=>_"multi-lines string",flags=>'fgaesc',	width=> 200,	edit_many =>1,		options=> 'customfield', },
-	float	=> { type=>'float',	editname=>_"float",		flags=>'fgaesc',	width=> 100,	edit_many =>1,		options=> 'customfield', },
-	boolean	=> { type=>'boolean',	editname=>_"boolean",		flags=>'fgaesc',	width=> 20,	edit_many =>1,		options=> 'customfield', },
-	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
-	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'fgaesci',	width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', },
-	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'fgaesci',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
-	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'fgaesc',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
-	integer	=> { type=>'integer',	editname=>_"integer",		flags=>'fgaesc',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
-	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'fgaesc_',	width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid', FilterList=> {},
+(	string	=> { type=>'string',	editname=>_"string",		flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', },
+	text	=> { type=>'text',	editname=>_"multi-lines string",flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', },
+	float	=> { type=>'float',	editname=>_"float",		flags=>'fgaescp',	width=> 100,	edit_many =>1,		options=> 'customfield', },
+	boolean	=> { type=>'boolean',	editname=>_"boolean",		flags=>'fgaescp',	width=> 20,	edit_many =>1,		options=> 'customfield', },
+	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescpil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
+	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'fgaescpi',	width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', },
+	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'fgaescpi',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
+	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
+	integer	=> { type=>'integer',	editname=>_"integer",		flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
+	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'fgaescp_',	width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid', FilterList=> {},
 		     postread => \&FMPS_rating_postread,		prewrite => \&FMPS_rating_prewrite,
 		     id3v2 => 'TXXX;FMPS_Rating_User;%v::%i',	vorbis	=> 'FMPS_RATING_USER::%i',	ape => 'FMPS_RATING_USER::%i',	ilst => '----FMPS_Rating_User::%i',
 		     starprefix => 'stars', #FIXME make it an option
@@ -1569,7 +1586,7 @@ sub UpdateFuncs
 		'	push @changedIDs,$ID if $changed;',
 		'	$i++;',
 		'}',
-		'::SongsChanged(\@changedIDs, [keys %changedfields]) if @changedIDs;',
+		#'::SongsChanged(\@changedIDs, [keys %changedfields]) if @changedIDs;',
 		'return \%changedfields, \@towrite;';
 		$SETsub= Compile(Set =>"sub {$code}");
 	}
@@ -1664,7 +1681,7 @@ sub MakeLoadSub
 		{	my $code= 'my $gid='.$load_extra.";\n";
 			my $i=1;
 			for my $subfield (split /\t/,$extradata->{$mainfield}[0])
-			{	my $c=LookupCode($subfield,'load_extra',[GID=>'$gid',VAL=>"\$_[$i]"]);;
+			{	my $c=LookupCode($subfield,'load_extra',[GID=>'$gid',VAL=>"\$_[$i]"]);
 				$code.= "\t$c;\n" if $c;
 				$i++;
 			}
@@ -1685,7 +1702,7 @@ sub MakeSaveSub
 		push @saved_fields,$save_as;
 		push @code, Code($field, 'save|get', ID => '$_[0]');
 		my ($mainfield,$save_extra)=LookupCode($field,'mainfield','save_extra');
-		if ($save_extra && ( !$mainfield || $mainfield eq $field ))
+		if ($save_extra && $Def{$field}{_properties} && ( !$mainfield || $mainfield eq $field ))
 		{	my @subfields= split / /, $Def{$field}{_properties};
 			if (@subfields)
 			{	my @extra_code;
@@ -1831,7 +1848,7 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 }
 
 sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
-{	my $IDs=shift;
+{	my $IDs=shift || $::Library;
 	my $changed= ref $_[0] ? $_[0] : {map( ($_=>undef), @_ )};
 	warn "Songs::Changed : IDs=@$IDs fields=".join(' ',keys %$changed)."\n" if $::debug;
 	$IDFromFile=undef if $IDFromFile && exists $changed->{file} || exists $changed->{path};
@@ -2251,9 +2268,9 @@ sub ColumnsKeys
 sub ColumnAlign
 {	Field_property($_[0],'rightalign') || 0;
 }
-sub InfoFields		#used for song info dialog, currently same fields as ColumnsKeys
+sub InfoFields
 {	my %tree;
-	for my $f (grep $Def{$_}{flags}=~m/c/, @Fields)
+	for my $f (grep $Def{$_}{flags}=~m/p/, @Fields)
 	{	my $cat= $Def{$f}{category}||'unknown';
 		push @{ $tree{$cat} }, $f;
 	}
@@ -3114,12 +3131,7 @@ sub save_to_string
 {	return join ' ',map $_, @{$_[0]};	#map $_ so that the numbers are not stringified => use more memory
 }
 
-sub GetName
-{	my $self=$_[0];
-	my $sl=$::Options{SavedLists};
-	my ($name)= grep $sl->{$_}==$self, keys %$sl;
-	return $name;	#might be undef
-}
+sub GetName {undef}
 
 sub RemoveIDsFromAll		#could probably be improved
 {	my $IDs_toremove=$_[0];
@@ -3242,6 +3254,17 @@ sub Down
 #	@$self=@$songarray;
 #	::HasChanged('SongArray', $self, @args);
 #}
+
+package SongArray::Named;
+use base 'SongArray';
+#just used to easily test if a songarray is a savedlist
+
+sub GetName
+{	my $self=$_[0];
+	my $sl=$::Options{SavedLists};
+	my ($name)= grep $sl->{$_}==$self, keys %$sl;
+	return $name;	#might be undef
+}
 
 package SongArray::PlayList;
 use base 'SongArray';
@@ -4060,6 +4083,8 @@ sub _smartstring_date
 	my $date1= my $date2='';
 	if ($pat=~m#\d# and ($date1,$date2)= $pat=~m#^(\d+[smhdwMy])?(?:\.\.|-)(\d+[smhdwMy])?$#i)	# relative date filter
 	{	$suffix='ago';
+		if	($date1 && $date1!~m/[1-9]/) {$date1=''}
+		elsif	($date1 && $date2 && $date2!~m/[1-9]/) {$date2=$date1; $date1=''}
 	}
 	else						# absolute date filter
 	{	($date1,$date2)= ::dates_to_timestamps($pat,2);
@@ -4212,7 +4237,7 @@ sub are_equal #FIXME could try harder
 {	my $f1=$_[0]; my $f2=$_[1];
 	($f1,my$s1)=defined $f1 ? ref $f1 ? ($f1->{string},$f1->{source}) : $f1 : '';
 	($f2,my$s2)=defined $f2 ? ref $f2 ? ($f2->{string},$f2->{source}) : $f2 : '';
-	return ($f1 eq $f2) && ((!$s1 && !$s2) || $s1 eq $s2);
+	return ($f1 eq $f2) && ((!$s1 || !$s2) || ($s1 && $s2 && $s1 eq $s2));
 }
 
 sub _smart_simplify	#only called for ~ filters
@@ -4570,6 +4595,7 @@ sub SmartTitleRegEx
 }
 sub QuoteRegEx
 {	local $_=$_[0];
+	s#((?:\G|[^\\])(?:\\\\)*)([\$@](?:::?)?[0-9a-z])#$1\\$2#gi; #quote variable names if not already quoted
 	s#^((?:.*[^\\])?(?:\\\\)*\\)$#$1\\#g; ##escape trailing '\' in impair number
 	s!((?:\G|[^\\])(?:\\\\)*)\\?"!$1\\"!g; #make sure " are escaped (and only once, so that \\\" doesn't become \\\\")
 	if (!eval {qr/$_/;}) { warn "invalid regular expression \"$_[0]\" : $@\n" if $::debug; return quotemeta $_[0]; }  #check if re valid, else quote everything
