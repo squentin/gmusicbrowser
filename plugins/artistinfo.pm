@@ -83,7 +83,7 @@ my $artistinfowidget=
 	tabicon		=> 'plugin-artistinfo',		# no icon by that name by default (yet)
 	tabtitle	=> _"Artistinfo",
 	saveoptions	=> 'site',
-	schange		=> \&SongChanged,
+	schange		=> sub { $_[0]->SongChanged; },
 	group		=> 'Play',
 	autoadd_type	=> 'context page text',
 };
@@ -205,7 +205,7 @@ sub new
 #		$toolitem->set_proxy_menu_item($key,$menuitem);
 	}
 	for my $button
-	(	[refresh => 'gtk-refresh', sub { my $self=::find_ancestor($_[0],__PACKAGE__); SongChanged($self,'1'); },_"Refresh", _"Refresh"],
+	(	[refresh => 'gtk-refresh', sub { my $self=::find_ancestor($_[0],__PACKAGE__); SongChanged($self,'force'); },_"Refresh", _"Refresh"],
 		[save => 'gtk-save',	\&Save_text,	_"Save",	_"Save artist biography",$::Options{OPT.'AutoSave'}],
 	)
 	{	my ($key,$stock,$cb,$label,$tip)=@$button;
@@ -451,7 +451,7 @@ sub SongChanged
 {	my ($widget,$force) = @_;
 	my $self=::find_ancestor($widget,__PACKAGE__);
 	my $ID = ::GetSelID($self);
-	$force = 0 unless $force;
+	return unless defined $ID;
 	$self -> ArtistChanged( Songs::Get_gid($ID,'artist'),Songs::Get_gid($ID,'album'),$force);
 }
 
@@ -477,10 +477,10 @@ sub ArtistChanged
 
 	my $url = GetUrl($sites{$self->{site}}[SITEURL],$aID);
 	return unless $url;
-	if (!$self->{url} or $url ne $self->{url} or $force == 1) {
+	if (!$self->{url} or ($url ne $self->{url}) or $force) {
 		$self->{url} = $url;
 		if ($self->{site} eq "biography") { # check for local biography file before loading the page
-			unless ($force == 1) {
+			unless ($force) {
 			my $file=::pathfilefromformat( ::GetSelID($self), $::Options{OPT.'PathFile'}, undef,1 );
 			if ($file && -r $file)
 				{	::IdleDo('8_artistinfo'.$self,1000,\&load_file,$self,$file);

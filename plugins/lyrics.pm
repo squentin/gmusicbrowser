@@ -94,7 +94,7 @@ my $lyricswidget=
 	tabicon		=> 'gmb-lyrics',		# no icon by that name by default
 	tabtitle	=> _"Lyrics",
 	saveoptions	=> 'HideToolbar font follow justification edit',
-	schange		=> \&SongChanged,
+	schange		=> sub { $_[0]->SongChanged($_[1]); }, #$_[1] is new ID
 	group		=> 'Play',
 	autoadd_type	=> 'context page lyrics text',
 	justification	=> 'left',
@@ -294,7 +294,7 @@ sub Back_cb
 }
 sub Refresh_cb
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
-	$self->SongChanged($self->{ID},1);
+	$self->SongChanged($self->{ID},'force');
 }
 
 sub SongChanged
