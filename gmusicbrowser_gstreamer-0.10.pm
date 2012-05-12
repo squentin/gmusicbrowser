@@ -450,7 +450,7 @@ sub RG_set_options
 	$rgl||=$PlayBin->get_by_name('rglimiter');
 	return unless $rgv && $rgl;
 	$rgl->set(enabled => 0) if $::Options{gst_rg_nolimiter};
-	$rgv->set('album-mode' => 1) if $::Options{gst_rg_albummode};
+	$rgv->set('album-mode' => !!$::Options{gst_rg_albummode});
 	$rgv->set('pre-amp' => $::Options{gst_rg_preamp}||0);
 	$rgv->set('fallback-gain' => $::Options{gst_rg_fallback}||0);
 	#$rgv->set(headroom => $::Options{gst_rg_headroom}||0);
