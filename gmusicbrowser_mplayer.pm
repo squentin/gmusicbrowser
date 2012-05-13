@@ -20,6 +20,7 @@ my $Error;
 my $CMDfh;
 my (%supported,$mplayer);
 my $SoftVolume;
+my $GainFactor=1;
 
 $::PlayPacks{Play_mplayer}=1; #register the package
 
@@ -32,7 +33,7 @@ sub init
 	$mplayer ||= ::first { -x $_ } map $_.::SLASH.'mplayer',  split /:/, $ENV{PATH};
 
 	return unless $mplayer;
-	return bless {},__PACKAGE__;
+	return bless {RG=>1},__PACKAGE__;	#FIXME RG should be 0 if replaygain tags are disabled or if not $SoftVolume
 }
 
 sub supported_formats
@@ -66,9 +67,9 @@ sub Play
 	#-nocache because when using the cache option it spawns a child process, which makes monitoring the mplayer process much harder
 	#-hr-mp3-seek to fix wrong time with some mp3s
 	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -nolirc -hr-mp3-seek -msglevel all=1:statusline=5/);
-	push @cmd_and_args, qw/-softvol -volume/, cubicvolume($::Volume) if $SoftVolume;
+	RG_set_options();
+	push @cmd_and_args, qw/-softvol -volume/, convertvolume($::Volume) if $SoftVolume;
 	warn "@cmd_and_args\n" if $::debug;
-	#push @cmd_and_args,$device_option,$device unless $device eq 'default';
 	push @cmd_and_args,split / /,$::Options{mplayeroptions} if $::Options{mplayeroptions};
 	push @cmd_and_args,'-ss',$sec if $sec;
 	push @cmd_and_args,'-ac','ffwavpack' if $file=~m/\.wvc?$/;
@@ -177,7 +178,8 @@ sub AdvancedOptions
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $opt=::NewPrefEntry('mplayeroptions',_"mplayer options :", sizeg1=>$sg1);
 	my $cmd=::NewPrefEntry('mplayer_cmd',_"mplayer executable :", cb=> \&init, tip=>_"Will use default if not found", sizeg1=>$sg1);
-	$vbox->pack_start($_,::FALSE,::FALSE,2), for $cmd,$opt;
+	my $replaygain= ::NewPrefCheckButton(mplayer_use_replaygain => _"Use ReplayGain", tip=>_"Set options in gstreamer's replaygain dialog");
+	$vbox->pack_start($_,::FALSE,::FALSE,2), for $cmd,$opt,$replaygain;
 	VolInit() unless defined $SoftVolume;
 	$vbox->pack_start(Play_amixer::make_option_widget(),::FALSE,::FALSE,2) unless $SoftVolume;
 	return $vbox;
@@ -196,21 +198,41 @@ sub SetVolume
 	elsif	($set=~m/(\d+)/)	{ $::Volume =$1; }
 	$::Volume=0   if $::Volume<0;
 	$::Volume=100 if $::Volume>100;
-	my $cubicvol= cubicvolume($::Volume);	#use a cubic volume scale
-	print $CMDfh "volume $cubicvol 1\n" if $ChildPID;
+	my $vol= convertvolume($::Volume);	#use a cubic volume scale and apply $GainFactor
+	print $CMDfh "volume $vol 1\n" if $ChildPID;
 	::HasChanged('Vol');
 	$::Options{Volume}=$::Volume;
 	$::Options{Volume_mute}=$::Mute;
 }
 
-sub cubicvolume	#convert a linear volume to cubic volume scale
+sub convertvolume	#convert a linear volume to cubic volume scale and apply $GainFactor
 {	my $vol=$_[0];
 	$vol= 100*($vol/100)**3;
+	$vol*= $GainFactor;
 	# will be sent to mplayer as string, make sure it use a dot as decimal separator
 	::setlocale(::LC_NUMERIC, 'C');
 	$vol="$vol";
 	::setlocale(::LC_NUMERIC, '');
 	return $vol;
+}
+
+sub RG_set_options
+{	return unless $SoftVolume;
+	if ($::Options{gst_use_replaygain})
+	{	my ($gain1,$gain2,$peak1,$peak2)= Songs::Get($::PlayingID, qw/replaygain_track_gain replaygain_album_gain replaygain_track_peak replaygain_album_peak/);
+		($gain1,$gain2,$peak1,$peak2)= ($gain2,$gain1,$peak1,$peak2) if $::Options{gst_rg_albummode};
+		my $gain= ::first { $_ ne '' } $gain1, $gain2, $::Options{gst_rg_fallback};
+		$gain+= $::Options{gst_rg_preamp};
+		$GainFactor= 10**($gain/20);
+		my $peak= $peak1 || $peak2 || 1;
+		my $invpeak= 1/$peak;
+		warn "gain=$gain peak=$peak => scale factor=min($GainFactor,$invpeak)\n" if $::debug;
+		$GainFactor= $invpeak if $invpeak<$GainFactor; #clipping prevention, make it an option ?
+	}
+	else {$GainFactor=1}
+	return unless $ChildPID;
+	my $vol= convertvolume($::Volume);
+	print $CMDfh "volume $vol 1\n";
 }
 
 #sub sendcmd {print $CMDfh "$_[0]\n";} #DEBUG #Play_mplayer::sendcmd('volume 0')

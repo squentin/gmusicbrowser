@@ -953,8 +953,9 @@ our %Options=
 	gst_use_equalizer=>0,
 	gst_equalizer	=> '0:0:0:0:0:0:0:0:0:0',
 	gst_equalizer_preamp => 1,
+	gst_use_replaygain=>1,
 	gst_rg_limiter	=> 1,
-	gst_rg_preamp	=> 6,
+	gst_rg_preamp	=> 0,
 	gst_rg_fallback	=> 0,
 	gst_rg_songmenu => 0,
 	Icecast_port	=> '8000',
@@ -5855,8 +5856,7 @@ sub SetDefaultOptions
 }
 
 sub PrefAudio
-{	my $vbox=Gtk2::VBox->new(FALSE, 2);
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
+{	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
 	my ($radio_gst,$radio_123,$radio_mp,$radio_ice)=NewPrefRadio('AudioOut',
 		[ gstreamer		=> 'Play_GST',
@@ -5887,11 +5887,10 @@ sub PrefAudio
 		$sg2->add_widget($EQbut);
 		my $EQbox=Hpack($EQcheck,$EQbut);
 		$EQbox->set_sensitive(0) unless $PlayPacks{Play_GST} && $PlayPacks{Play_GST}{EQ};
-		my $RGbox= Play_GST::RG_PrefBox($sg1,$sg2);
 		my $adv2=PrefAudio_makeadv('Play_GST','gstreamer');
 		my $albox=Gtk2::Alignment->new(0,0,1,1);
 		$albox->set_padding(0,0,15,0);
-		$albox->add(Vpack($hbox2,$EQbox,$RGbox,$adv2));
+		$albox->add(Vpack($hbox2,$EQbox,$adv2));
 		$vbox_gst->pack_start($_,FALSE,FALSE,2) for $radio_gst,$albox;
 	}
 	else
@@ -5919,12 +5918,23 @@ sub PrefAudio
 	$vbox_mp ->set_sensitive($PlayPacks{Play_mplayer});
 	$usegst->set_sensitive($PlayPacks{Play_GST_server});
 
-	$vbox->pack_start($_,FALSE,FALSE,2) for
-		$vbox_gst, Gtk2::HSeparator->new,
-		$vbox_123, Gtk2::HSeparator->new,
-		$vbox_mp,  Gtk2::HSeparator->new,
-		$vbox_ice, Gtk2::HSeparator->new,
-		NewPrefCheckButton(IgnorePlayError => _"Ignore playback errors", tip=>_"Skip to next song if an error occurs");
+	#replaygain
+	my $rg_check= ::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain", tip=>_"Normalize volume (the files must have replaygain tags)", cb=>\&Set_replaygain );
+	my $rg_cb= sub { my $p=$Options{AudioOut}; $p&&=$PlayPacks{$p}; $_[0]->set_sensitive( $p && $p->{RG} ); };
+	Watch($rg_check, Option=> $rg_cb );
+	$rg_cb->($rg_check);
+	my $rg_opt= Gtk2::Button->new(_"ReplayGain options");
+	$rg_opt->signal_connect(clicked => \&replaygain_options_dialog);
+	$sg1->add_widget($rg_check);
+	$sg2->add_widget($rg_opt);
+
+	my $vbox=Vpack( $vbox_gst, Gtk2::HSeparator->new,
+			$vbox_123, Gtk2::HSeparator->new,
+			$vbox_mp,  Gtk2::HSeparator->new,
+			$vbox_ice, Gtk2::HSeparator->new,
+			[$rg_check,$rg_opt],
+			NewPrefCheckButton(IgnorePlayError => _"Ignore playback errors", tip=>_"Skip to next song if an error occurs"),
+		      );
 	return $vbox;
 }
 
@@ -5964,6 +5974,30 @@ sub PrefAudio_makeadv
 	}
 	return $hbox;
 }
+
+my $RG_dialog;
+sub replaygain_options_dialog
+{	if ($RG_dialog) {$RG_dialog->force_present;return}
+	$RG_dialog= Gtk2::Dialog->new (_"ReplayGain options", undef, [], 'gtk-close' => 'close');
+	$RG_dialog->signal_connect(destroy => sub {$RG_dialog=undef});
+	$RG_dialog->signal_connect(response =>sub {$_[0]->destroy});
+	my $songmenu=::NewPrefCheckButton(gst_rg_songmenu => _("Show replaygain submenu").' '._"(unstable)");
+	my $albummode=::NewPrefCheckButton(gst_rg_albummode => _"Album mode", cb=>\&Set_replaygain, tip=>_"Use album normalization instead of track normalization");
+	my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter", cb=>\&Set_replaygain, tip=>_"Used for clipping prevention");
+	my $sg1=Gtk2::SizeGroup->new('horizontal');
+	my $sg2=Gtk2::SizeGroup->new('horizontal');
+	my $preamp=	::NewPrefSpinButton('gst_rg_preamp',   -60,60, cb=>\&Set_replaygain, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"pre-amp : %d dB", tip=>_"Extra gain");
+	my $fallback=	::NewPrefSpinButton('gst_rg_fallback', -60,60, cb=>\&Set_replaygain, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"fallback-gain : %d dB", tip=>_"Gain for songs missing replaygain tags");
+	$RG_dialog->vbox->pack_start($_,0,0,2) for $albummode,$preamp,$fallback,$nolimiter,$songmenu;
+	$RG_dialog->show_all;
+
+	$songmenu->set_sensitive( $Play_GST::GST_RGA_ok );
+	# nolimiter not available with mplayer
+	my $nolimiter_update= sub { $_[0]->set_sensitive( $Options{AudioOut} ne 'Play_mplayer'); };
+	Watch($nolimiter, Option=> $nolimiter_update );
+	$nolimiter_update->($nolimiter);
+}
+sub Set_replaygain { $Play_package->RG_set_options() if $Play_package->can('RG_set_options'); }
 
 sub pref_artists_update_desc
 {	my $button=shift;

@@ -95,7 +95,7 @@ sub supported_sinks
 sub init
 {	return undef unless $GST_ok;
 	#createPlayBin();
-	return bless { EQ=>$GST_EQ_ok, visuals => $GST_visuals_ok },__PACKAGE__;
+	return bless { EQ=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
 }
 
 sub createPlayBin
@@ -446,56 +446,15 @@ sub Stop
 
 sub RG_set_options
 {	my ($rgv,$rgl)=@_;
+	return unless $::PlayBin;
 	$rgv||=$PlayBin->get_by_name('rgvolume');
 	$rgl||=$PlayBin->get_by_name('rglimiter');
 	return unless $rgv && $rgl;
-	$rgl->set(enabled => 0) if $::Options{gst_rg_nolimiter};
-	$rgv->set('album-mode' => !!$::Options{gst_rg_albummode});
-	$rgv->set('pre-amp' => $::Options{gst_rg_preamp}||0);
-	$rgv->set('fallback-gain' => $::Options{gst_rg_fallback}||0);
+	$rgl->set(enabled	=> !$::Options{gst_rg_nolimiter});
+	$rgv->set('album-mode'	=> !!$::Options{gst_rg_albummode});
+	$rgv->set('pre-amp'	=> $::Options{gst_rg_preamp}||0);
+	$rgv->set('fallback-gain'=>$::Options{gst_rg_fallback}||0);
 	#$rgv->set(headroom => $::Options{gst_rg_headroom}||0);
-}
-
-sub RG_PrefBox
-{	my ($sg1,$sg2)=@_;
-	my $check=::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain", tip=>_"Normalize volume (the files must have replaygain tags)");
-	$sg1->add_widget($check);
-	#my $start=Gtk2::Button->new(_ "Start ReplayGain analysis");
-	my $opt  =Gtk2::Button->new(_"ReplayGain options");
-	$sg2->add_widget($opt);
-	$opt->signal_connect(clicked => sub
-		{	if ($RG_dialog) {$RG_dialog->force_present;return}
-			$RG_dialog= Gtk2::Dialog->new (_"ReplayGain options", undef, [], 'gtk-close' => 'close');
-			$RG_dialog->signal_connect(destroy => sub {$RG_dialog=undef});
-			$RG_dialog->signal_connect(response =>sub {$_[0]->destroy});
-			my $update=sub { RG_set_options() if $::PlayBin; };
-			my $songmenu=::NewPrefCheckButton(gst_rg_songmenu => _("Show replaygain submenu").' '._"(unstable)");
-			my $albummode=::NewPrefCheckButton(gst_rg_albummode => _"Album mode", cb=>$update, tip=>_"Use album normalization instead of track normalization");
-			my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter", cb=>$update, tip=>_"Used for clipping prevention");
-			my $sg1=Gtk2::SizeGroup->new('horizontal');
-			my $sg2=Gtk2::SizeGroup->new('horizontal');
-			my $preamp=	::NewPrefSpinButton('gst_rg_preamp',   -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"pre-amp : %d dB", tip=>_"Extra gain");
-			my $fallback=	::NewPrefSpinButton('gst_rg_fallback', -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"fallback-gain : %d dB", tip=>_"Gain for songs missing replaygain tags");
-			$RG_dialog->vbox->pack_start($_,0,0,2) for $albummode,$preamp,$fallback,$nolimiter,$songmenu;
-			$RG_dialog->show_all;
-
-		});
-	#$start->signal_connect(clicked => sub
-	#	{	my @list; my %done;
-	#		for my $ID (@::Library)
-	#		{	my $albumid=Songs::Get_gid($ID,'album');
-	#			my $l=AA::GetIDs('album',$albumid);
-	#			if (@$l>1 && Songs::Gid_to_get('album',$album) ne '')
-	#			{ push @list,[@$l] unless exists $done{$album}; $done{$aid}=undef; }
-	#			else { push @list,$ID; }
-	#		}
-	#		Analyse(\@list);
-	#	});
-	#$start->signal_connect(clicked => sub { Analyse(\@::Library) });
-	#$start->set_sensitive(0) unless $GST_RGA_ok;
-	my $box=::Hpack($check,$opt);
-	$box->set_sensitive(0) unless $GST_RG_ok;
-	return $box;
 }
 
 sub AdvancedOptions
