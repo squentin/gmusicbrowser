@@ -451,15 +451,23 @@ our %timespan_menu=
 	},
 	float	=>	#make sure the string doesn't have the utf8 flag, else substr won't work
 	{	_		=> 'unpack("F",substr(____,#ID#<<3,8))',
+		display		=> 'do {my $v=#_#; ($v==$v ? sprintf("#displayformat#", $v ) : "")}',	# replace novalue (NaN) with ""
+		get		=> 'do {my $v=#_#; ($v==$v ? sprintf("%g", $v ) : "")}',		#
 		displayformat	=> '%.2f',
 		init		=> '____=" "x8;', #needs init for ID==0
 		parent		=> 'number',
-		set		=> 'substr(____,#ID#<<3,8)=pack("F",#VAL#)',
-		check		=> '#VAL#= #VAL# =~m/^(\d*(?:\.\d+)?)$/ ? $1 : 0;',
+		novalue		=> '"nan"',	#use NaN as novalue
+		default		=> '#novalue#',
+		set		=> 'substr(____,#ID#<<3,8)=pack("F",(length(#VAL#) ? #VAL# : #novalue#))',
+		check		=> '#VAL#= #VAL# =~m/^(-?\d*\.?\d+(?:e[-+]\d+)?)$/i ? $1 : #novalue#;',
 		# FIXME make sure that locale is set to C (=> '.' as decimal separator) when needed
 		'editwidget:all'=> sub { GMB::TagEdit::EntryNumber->new(@_,undef,3); },
 		autofill_re	=> '(?:\\d+\\.)?\\.\\d+',
 		'filterpat:value' => [digits => 2, negative=>1, ],
+		n_sort		=> 'do {my $v=#_#; $v != $v ? "-inf" : $v}',	# use the fact that NaN != NaN
+		'filter:defined'	=> 'do {my $v=#_#; .!!. $v==$v}',	#
+		'filterdesc:defined:1'	=> _"is defined",
+		'filterdesc:-defined:1'	=> _"is not defined",
 	},
 	'length' =>
 	{	display	=> 'sprintf("%d:%02d", #_#/60, #_#%60)',
@@ -1167,7 +1175,7 @@ our %timespan_menu=
 
  replaygain_track_gain=>
  {	name	=> _"Track gain",	width => 60,	flags => 'fgrwscpa',
-	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
+	type	=> 'float',	check => '#VAL#= do{ #VAL# =~m/^([-+]?\d*\.?\d+)\s*(?:dB)?$/i ? $1 : #novalue#};',
 	displayformat	=> '%.2f dB',
 	id3v2	=> 'TXXX;replaygain_track_gain;%v',	vorbis	=> 'replaygain_track_gain',	ape	=> 'replaygain_track_gain', ilst => '----replaygain_track_gain',
 	options => 'disable',
@@ -1182,9 +1190,9 @@ our %timespan_menu=
  },
  replaygain_album_gain=>
  {	name	=> _"Album gain",	width => 60,	flags => 'fgrwscpa',
-	id3v2	=> 'TXXX;replaygain_album_gain;%v',	vorbis	=> 'replaygain_album_gain',	ape	=> 'replaygain_album_gain', ilst => '----replaygain_album_gain',
+	type	=> 'float',	check => '#VAL#= do{ #VAL# =~m/^([-+]?\d*\.?\d+)\s*(?:dB)?$/i ? $1 : #novalue#};',
 	displayformat	=> '%.2f dB',
-	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
+	id3v2	=> 'TXXX;replaygain_album_gain;%v',	vorbis	=> 'replaygain_album_gain',	ape	=> 'replaygain_album_gain', ilst => '----replaygain_album_gain',
 	options => 'disable',
 	category=>'replaygain',
  },
