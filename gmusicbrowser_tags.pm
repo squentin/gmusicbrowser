@@ -985,10 +985,12 @@ use Gtk2;
 use base 'Gtk2::SpinButton';
 
 sub new
-{	my ($class,$field,$IDs,$max,$digits,$specialmode) = @_;
-	$max||=10000000;
-	$digits||=0;
-	my $adj=Gtk2::Adjustment->new(0,0,$max,1,10,0);
+{	my ($class,$field,$IDs,%opt) = @_;	#possible options in %opt : signed digits min max mode
+	my $mode=$opt{mode}||'';
+	my $max= $opt{max} || 10000000;
+	my $min= $opt{min} || ($opt{signed} ? -$max : 0);
+	my $digits= $opt{digits} || 0;
+	my $adj=Gtk2::Adjustment->new(0,$min,$max,1,10,0);
 	my $self = bless Gtk2::SpinButton->new($adj,10,$digits), $class;
 	$self->{noexpand}=1;
 	#$self->{field}=$field;
@@ -999,13 +1001,16 @@ sub new
 		$val=$l[0]; #take the most common value
 	}
 	else { $val=Songs::Get($IDs,$field); }
-	$self->set_value($val);
 
-	if ($specialmode)
-	{	if ($specialmode eq 'nozero')
+	if ($mode)
+	{	if ($mode eq 'nozero')		# 0 is displayed as ""
 		{	$self->signal_connect(output=> \&output_nozero);
 		}
-		elsif ($specialmode eq 'year')
+		elsif ($mode eq 'allow_empty')	# non-numeric values are replaced with "" which is treated as different than 0
+		{	$self->signal_connect(input => sub { my $v=Gtk2::Entry::get_text($_[0]); $_[0]{null}= $v!~/\d/; return 0});
+			$self->signal_connect(output=> sub { my $v=$_[0]->get_value; $_[0]{null}=0 if $v; return 0 if !$_[0]{null}; Gtk2::Entry::set_text($_[0],''); return 1; });
+		}
+		elsif ($mode eq 'year')
 		{	$self->set_wrap(1);
 			# set to current year when increasing or decreasing value from 0
 			$self->signal_connect(value_changed=>sub
@@ -1016,10 +1021,13 @@ sub new
 		}
 	}
 
+	if ($mode eq 'allow_empty' && !length $val) { $self->{null}=1; $self->set_text(''); }
+	else { $self->set_value($val); }
+
 	return $self;
 }
 sub get_text
-{	$_[0]->get_value;
+{	$_[0]{null} ? '' : $_[0]->get_value;
 }
 sub set_text
 {	my $v=$_[1];

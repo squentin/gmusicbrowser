@@ -443,7 +443,7 @@ our %timespan_menu=
 		check		=> '#VAL#= #VAL# =~m/^(\d+)/ && $1<2**#bits# ? $1 : 0;',	# set to 0 if overflow
 		init		=> '____="";',
 		parent		=> 'number',
-		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,$Def{$field}{edit_max},0,$Def{$field}{edit_mode}); },
+		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,min=>$Def{$field}{edit_min},max=>$Def{$field}{edit_max},digits=>0,mode=>$Def{$field}{edit_mode}); },
 		step		=> 1, #minimum difference between 2 values, used to simplify filters
 	},
 	'integer.div' =>
@@ -461,9 +461,9 @@ our %timespan_menu=
 		set		=> 'substr(____,#ID#<<3,8)=pack("F",(length(#VAL#) ? #VAL# : #novalue#))',
 		check		=> '#VAL#= #VAL# =~m/^(-?\d*\.?\d+(?:e[-+]\d+)?)$/i ? $1 : #novalue#;',
 		# FIXME make sure that locale is set to C (=> '.' as decimal separator) when needed
-		'editwidget:all'=> sub { GMB::TagEdit::EntryNumber->new(@_,undef,3); },
+		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,min=>$Def{$field}{edit_min},max=>$Def{$field}{edit_max},signed=>1,digits=>2,mode=>'allow_empty'); },
 		autofill_re	=> '(?:\\d+\\.)?\\.\\d+',
-		'filterpat:value' => [digits => 2, negative=>1, ],
+		'filterpat:value' => [digits => 2, signed=>1, ],
 		n_sort		=> 'do {my $v=#_#; $v != $v ? "-inf" : $v}',	# use the fact that NaN != NaN
 		'filter:defined'	=> 'do {my $v=#_#; .!!. $v==$v}',	#
 		'filterdesc:defined:1'	=> _"is defined",

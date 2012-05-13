@@ -8463,7 +8463,7 @@ sub new
 	my $self= bless Gtk2::HBox->new, $class;
 
 	my $max=  $opt->{max} || 999999;
-	my $min=  $opt->{min} || $opt->{negative} ? -$max : 0;
+	my $min=  $opt->{min} || $opt->{signed} ? -$max : 0;
 	my $step= $opt->{step}|| 1;
 	my $page= $opt->{page}|| $step*10;
 	my $digits=$opt->{digits}|| 0;
