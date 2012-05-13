@@ -1178,12 +1178,16 @@ our %timespan_menu=
  },
 
  replaygain_track_gain=>
- {	name	=> _"Track gain",	width => 60,	flags => 'fgrwscpa',
+ {	name	=> _"Track gain",	width => 70,	flags => 'fgrwscpa',
 	type	=> 'float',	check => '#VAL#= do{ #VAL# =~m/^([-+]?\d*\.?\d+)\s*(?:dB)?$/i ? $1 : #novalue#};',
 	displayformat	=> '%.2f dB',
 	id3v2	=> 'TXXX;replaygain_track_gain;%v',	vorbis	=> 'replaygain_track_gain',	ape	=> 'replaygain_track_gain', ilst => '----replaygain_track_gain',
-	options => 'disable',
+	prewrite=> sub { length($_[0]) && $_[0]==$_[0] ? $_[0]." dB" : undef }, #remove tag if empty string or NaN
+	options => 'disable editable',
 	category=>'replaygain',
+	alias	=> 'track_gain trackgain',
+	edit_max=> 120,
+	edit_order=> 95,
  },
  replaygain_track_peak=>
  {	name	=> _"Track peak",	width => 60,	flags => 'fgrwscpa',
@@ -1193,12 +1197,16 @@ our %timespan_menu=
 	category=>'replaygain',
  },
  replaygain_album_gain=>
- {	name	=> _"Album gain",	width => 60,	flags => 'fgrwscpa',
+ {	name	=> _"Album gain",	width => 70,	flags => 'fgrwscpa',
 	type	=> 'float',	check => '#VAL#= do{ #VAL# =~m/^([-+]?\d*\.?\d+)\s*(?:dB)?$/i ? $1 : #novalue#};',
 	displayformat	=> '%.2f dB',
 	id3v2	=> 'TXXX;replaygain_album_gain;%v',	vorbis	=> 'replaygain_album_gain',	ape	=> 'replaygain_album_gain', ilst => '----replaygain_album_gain',
-	options => 'disable',
+	prewrite=> sub { length($_[0]) && $_[0]==$_[0] ? $_[0]." dB" : undef }, #remove tag if empty string or NaN
+	options => 'disable editable',
 	category=>'replaygain',
+	alias	=> 'album_gain albumgain',
+	edit_max=> 120,
+	edit_order=> 96,
  },
  replaygain_album_peak=>
  {	name	=> _"Album peak",	width => 60,	flags => 'fgrwscpa',
@@ -1212,17 +1220,6 @@ our %timespan_menu=
 	id3v2	=> 'TXXX;replaygain_reference_level;%v',vorbis	=> 'replaygain_reference_level',	ape => 'replaygain_reference_level', ilst => '----replaygain_reference_level',
 	category=>'replaygain',
  },
- #mp3gain : APE tags,	peak : float 	: 0.787193
- #			gain float dB 	: -1.240000 dB
- #vorbisgain :	peak float : 0.00011510 1.01959181
- #		gain +-float dB : -0.55 dB +64.82 dB
- #mp3gain creates APE tags : mp3gain_minmax and mp3gain_album_minmax
- #
- #
- #gstreamer : id3v2 tag replaygain_album_peak 0,787216365337372
- #			replaygain_track_peak 0,787216365337372
- #		ogg : 	peak 0,000115100738184992
- #			gain 64,82
 
  playedlength	=> {	name=> "Played length", type=>'length', flags=> 'g',
 			get => '#playcount->get# * #length->get#',  _=>'#get#',
