@@ -61,7 +61,7 @@ sub Play
 {	(undef,$file,my$sec)=@_;
 	&Stop if $ChildPID;
 	#if ($ChildPID) { print $CMDfh "loadfile $file\n"; print $CMDfh "seek $sec 2\n" if $sec; return}
-	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -nolirc/);
+	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -nolirc -hr-mp3-seek/);
 	push @cmd_and_args, qw/-softvol -volume/, cubicvolume($::Volume) if $SoftVolume;
 	warn "@cmd_and_args\n" if $::debug;
 	#push @cmd_and_args,$device_option,$device unless $device eq 'default';
