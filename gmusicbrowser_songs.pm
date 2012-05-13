@@ -444,6 +444,7 @@ our %timespan_menu=
 		init		=> '____="";',
 		parent		=> 'number',
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,$Def{$field}{edit_max},0,$Def{$field}{edit_mode}); },
+		step		=> 1, #minimum difference between 2 values, used to simplify filters
 	},
 	'integer.div' =>
 	{	makefilter	=> '"#field#:b:".(#GID# * #ARG0#)." ".(((#GID#+1) * #ARG0#)-1)',
@@ -4195,13 +4196,13 @@ sub to_array	#returns an array form of the filter, first value of array is false
 
 sub _combine_ranges
 {	my ($field,$and,@segs)=@_;
-	my $integer=1;	#FIXME assume integer field, set to 0 if float
+	my $step= Songs::Field_property($field,'step') || 0;
 	my @out;
 	@segs= sort { $a->[0] <=> $b->[0] } @segs;
 	my ($s1,$s2);
 	while (@segs)
 	{	my ($s3,$s4)= @{shift @segs};
-		if (defined $s1 && $s3>=$s1 && $s3<=$s2+$integer)
+		if (defined $s1 && $s3>=$s1 && $s3<=$s2+$step)
 		{	$s2=$s4 if $s2<$s4;
 		}
 		else { push @out, [$s1,$s2] if defined $s1; ($s1,$s2)=($s3,$s4); }
@@ -4215,7 +4216,7 @@ sub _between_simplify		#combine ranges of consecutive between filters into fewer
 	my ($field,@segs);
 	while (@in)
 	{	my $s=shift @in;
-		if ($s=~m/^(\w+):(-?)b:(\d+) (\d+)\x1D?$/)
+		if ($s=~m/^(\w+):(-?)b:(-?\d*\.?\d+) (-?\d*\.?\d+)\x1D?$/)
 		{	if (!$2 xor $and)
 			{	$field||=$1;
 				if ($field eq $1)
@@ -4233,7 +4234,7 @@ sub _between_simplify		#combine ranges of consecutive between filters into fewer
 		$field=undef;
 	}
 
-	s/^(\w+):(-?)b:(\d+) \3\x1D?$/"$1:$2e:$3"/e for @strings; #replace :b:5 5 by :e:5
+	s/^(\w+):(-?)b:(-?\d*\.?\d+) \3\x1D?$/"$1:$2e:$3"/e for @strings; #replace :b:5 5 by :e:5
 	return @strings;
 }
 
