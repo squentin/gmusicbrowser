@@ -1068,11 +1068,15 @@ our %timespan_menu=
 	prewrite=> sub { sprintf('%.1f', $_[0]); },
 	category=>'stats',
 	alias	=> 'plays',
+	edit_order=> 90,
+	options	=> 'editable',
  },
  skipcount	=>
  {	name	=> _"Skip count",	width => 50,	flags => 'fgaescp',	type => 'integer',	letter => 'k',
 	category=>'stats',
 	alias	=> 'skips',
+	edit_order=> 91,
+	options	=> 'editable',
  },
  composer =>
  {	name	=> _"Composer",		width	=> 100,		flags => 'fgarwescpi',	type => 'artist',
@@ -2699,6 +2703,12 @@ our %Field_options=
 				$def->{flags}=~s/[rw]//g;
 				$def->{flags}.='rw' if $value;
 		},
+	},
+	editable =>
+	{	widget		=> 'check',
+		label		=> _"Editable in song properties dialog",
+		'default'	=> sub { my $default= $_[0]{flags} || ''; return $default=~m/e/ },
+		apply		=> sub { my ($def,$opt,$value)=@_; $def->{flags}=~s/e//g; $def->{flags}.='e' if $value; },
 	},
 	resetnotag =>
 	{	widget		=> 'check',
