@@ -468,7 +468,7 @@ sub RG_PrefBox
 			$RG_dialog= Gtk2::Dialog->new (_"ReplayGain options", undef, [], 'gtk-close' => 'close');
 			$RG_dialog->signal_connect(destroy => sub {$RG_dialog=undef});
 			$RG_dialog->signal_connect(response =>sub {$_[0]->destroy});
-			my $update=sub { RG_set_options(); };
+			my $update=sub { RG_set_options() if $::PlayBin; };
 			my $songmenu=::NewPrefCheckButton(gst_rg_songmenu => _("Show replaygain submenu").' '._"(unstable)");
 			my $albummode=::NewPrefCheckButton(gst_rg_albummode => _"Album mode", cb=>$update, tip=>_"Use album normalization instead of track normalization");
 			my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter", cb=>$update, tip=>_"Used for clipping prevention");

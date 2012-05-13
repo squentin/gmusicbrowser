@@ -470,7 +470,7 @@ sub CommonInit
 		$self->{sort}= $::RandomMode ? $::Options{Sort_LastOrdered} : $::Options{Sort};
 		$self->UpdatePlayListFilter;
 		::Watch($self,Filter=>  \&UpdatePlayListFilter);
-		$self->{follow}=1 if $type eq 'A' && !defined $self->{follow}; #default to follow current song on new playlists
+		$self->{follow}=1 if !defined $self->{follow}; #default to follow current song on new playlists
 	}
 	elsif ($type eq 'L')
 	{	if (defined $EditList) { $songarray=$EditList; $EditList=undef; } #special case for editing a list via ::WEditList
@@ -485,6 +485,8 @@ sub CommonInit
 	{	::SaveList($songarray,[]) unless $::Options{SavedLists}{$songarray}; #create new list if doesn't exists
 		$songarray=$::Options{SavedLists}{$songarray};
 	}
+	$self->{follow}=0 if !defined $self->{follow};
+
 	$self->{array}= $songarray || SongArray->new;
 
 	$self->RegisterGroup($self->{group});
@@ -5263,7 +5265,7 @@ sub key_press_event_cb	# hide with Escape
 	my $self= ::find_ancestor($entry,__PACKAGE__);
 	my $newfocus= $self->get_parent;
 	$newfocus= $newfocus->{DefaultFocus} while $newfocus->{DefaultFocus};
-	$newfocus->grab_focus; warn $newfocus;
+	$newfocus->grab_focus;
 	$self->hide;
 	return 1;
 }

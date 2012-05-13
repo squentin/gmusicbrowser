@@ -866,7 +866,7 @@ sub SaveWidgetOptions		#Save options for this layout by collecting options of it
 	my %states;
 	for my $widget (@widgets)
 	{	my $key=$widget->{name};
-		return unless $key;
+		unless ($key) { warn "Error: no name for widget $widget\n"; next }
 		my $opt;
 		if (my $sub=$widget->{SaveOptions})
 		{	my @opt=$sub->($widget);
@@ -4653,7 +4653,7 @@ sub _load_skinfile
 		{	my $path= $options->{SkinPath};
 			$file= $path.::SLASH.$file if defined $path;
 			$file= ::SearchPicture($file, $options->{PATH});
-			$pb= GMB::Picture::pixbuf($file);
+			$pb= GMB::Picture::pixbuf($file) if $file;
 		}
 	}
 	return unless $pb;

@@ -4105,6 +4105,8 @@ sub _smartstring_date
 	{	$suffix='ago';
 		if	($date1 && $date1!~m/[1-9]/) {$date1=''}
 		elsif	($date1 && $date2 && $date2!~m/[1-9]/) {$date2=$date1; $date1=''}
+		$date1||='';
+		$date2||='';
 	}
 	else						# absolute date filter
 	{	($date1,$date2)= ::dates_to_timestamps($pat,2);

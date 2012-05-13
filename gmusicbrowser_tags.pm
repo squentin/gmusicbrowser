@@ -98,7 +98,7 @@ sub Read
 					{	@v= map $sub->($_,$id,$key,$field), @v;
 						next unless @v;
 					}
-					if ($join)	{ push @$value, @v; }
+					if ($join)	{ push @$value, grep defined, @v; }
 					else		{ $value= $v[0]; last; }
 				}
 				next unless defined $value;

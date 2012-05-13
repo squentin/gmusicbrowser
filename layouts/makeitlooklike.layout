@@ -384,8 +384,8 @@ Default = Window(size=480x400)
 #Skin = background.png::e
 
 KeyBindings = c-Q Quit \
-    P OpenCustom(Audacious_PLM)
-    S ToggleRandom
+    P OpenCustom(Audacious_PLM) \
+    S ToggleRandom \
     c-P OpenPref \
     c-E OpenCustom(Equalizer) \
     cs-M ShowHideWidget(HBMenubar) \
