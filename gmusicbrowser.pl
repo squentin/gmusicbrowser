@@ -856,14 +856,14 @@ sub dates_to_timestamps
 }
 
 sub ConvertTime	# convert date pattern into nb of seconds
-{	my ($date,$unit)= $_[0]=~m/^\s*(\d+|\d*?[.]\d+)\s*([a-zA-Z]*)\s*$/;
+{	my ($date,$unit)= $_[0]=~m/^\s*(\d*\.?\d+)\s*([a-zA-Z]*)\s*$/;
 	return 0 unless $date;
 	if (my $ref= $DATEUNITS{$unit}) { $date*= $ref->[0] }
 	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
 	return time-$date;
 }
 sub ConvertSize
-{	my ($size,$unit)= $_[0]=~m/^\s*(\d+|\d*?[.]\d+)\s*([a-zA-Z]*)\s*$/;
+{	my ($size,$unit)= $_[0]=~m/^\s*(\d*\.?\d+)\s*([a-zA-Z]*)\s*$/;
 	return 0 unless $size;
 	if (my $ref= $SIZEUNITS{lc$unit}) { $size*= $ref->[0] }
 	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
@@ -7973,7 +7973,7 @@ sub AddRow
 	my $table=$self->{table};
 	my $row=$self->{row}++;
 	my $deleted;
-	my ($inverse,$weight,$type,$extra)=$params=~m/^(-?)([0-9.]+)([a-zA-Z])(.*)$/;
+	my ($inverse,$weight,$type,$extra)=$params=~m/^(-?)(\d*\.?\d+)([a-zA-Z])(.*)$/;
 	return unless $type;
 	my $frame=Gtk2::Frame->new( $Random::ScoreTypes{$type}{desc} );
 	$frame->{type}=$type;

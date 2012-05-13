@@ -432,7 +432,7 @@ our %timespan_menu=
 		bits		=> 16,
 		init		=> '____=""; ___value[0]=undef;',
 		set		=> 'vec(____,#ID#,#bits#) = ___gid{#VAL#}||= do { push(@___value, #VAL#+0)-1; }',
-		check		=> '#VAL#= #VAL# =~m/^(\d*(?:\.\d+)?)$/ ? $1 : 0;',
+		check		=> '#VAL#= #VAL# =~m/^(-?\d*\.?\d+)$/ ? $1 : 0;',
 		displayformat	=> '%d',
 	},
 	integer	=>
@@ -462,7 +462,7 @@ our %timespan_menu=
 		check		=> '#VAL#= #VAL# =~m/^(-?\d*\.?\d+(?:e[-+]\d+)?)$/i ? $1 : #novalue#;',
 		# FIXME make sure that locale is set to C (=> '.' as decimal separator) when needed
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,min=>$Def{$field}{edit_min},max=>$Def{$field}{edit_max},signed=>1,digits=>2,mode=>'allow_empty'); },
-		autofill_re	=> '(?:\\d+\\.)?\\.\\d+',
+		autofill_re	=> '-?\\d*\\.?\\d+',
 		'filterpat:value' => [digits => 2, signed=>1, ],
 		n_sort		=> 'do {my $v=#_#; $v != $v ? "-inf" : $v}',	# use the fact that NaN != NaN
 		'filter:defined'	=> 'do {my $v=#_#; .!!. $v==$v}',	#
@@ -1474,7 +1474,7 @@ sub Field_filter_choices
 	}
 	return \%filters;
 }
-sub filter_prep_numbers { $_[0]=~m/(-?\d+(?:\.\d+)?)/; return $1 || 0 }
+sub filter_prep_numbers { $_[0]=~m/(-?\d*\.?\d+)/; return $1 || 0 }
 sub FilterCode
 {	my ($field,$cmd,$pat,$inv)=@_;
 	my ($code,$convert)=LookupCode($field, "filter:$cmd", "filter_prep:$cmd");
@@ -4067,7 +4067,7 @@ sub new_from_smartstring
 sub _smartstring_moreless
 {	my ($pat,$op,$casesens,$field)=@_;
 	$pat=~s/,/./g; #use dot as decimal separator
-	return undef unless $pat=~m/^-?[0-9.]+[a-zA-Z]?$/;	# FIXME could check if support units
+	return undef unless $pat=~m/^-?\d*\.?\d+[a-zA-Z]?$/;	# FIXME could check if support units
 	$op= $op eq '<=' ? '->' : $op eq '>=' ? '-<' : $op;
 	return $op.':'.$pat;
 }
@@ -4086,14 +4086,14 @@ sub _smartstring_date_moreless
 sub _smartstring_number
 {	my ($pat,$op,$casesens,$field)=@_;
 	$pat=~s/,/./g; #use dot as decimal separator
-	if ($op ne '=' || $pat!~m/^-[0-9.]+[a-zA-Z]?$/) {$pat=~s/^-/../}	# allow ranges using - unless = with negative number (could also check if field support negative values ?)
+	if ($pat!~m#\.\.# && ($op ne '=' || $pat!~m/^-\d*\.?\d+[a-zA-Z]?$/)) {$pat=~s/-($|-|\d*\.?\d+[a-zA-Z]?$)/..$1/}	# allow ranges using - unless = with negative number (could also check if field support negative values ?)
 	if ($pat=~m/\.\./)
 	{	my ($s1,$s2)= split /\s*\.\.\s*/,$pat,2;
 		return	(length $s1 && length $s2) ? "b:$s1 $s2":
 			(length $s1 && !length$s2) ? "-<:".$s1	:
 			(!length$s1 && length $s2) ? "->:".$s2	: undef;
 	}
-	return undef unless $pat=~m/^-?[0-9.]+[a-zA-Z]?$/;	# FIXME could check if support units
+	return undef unless $pat=~m/^-?\d*\.?\d+[a-zA-Z]?$/;	# FIXME could check if support units
 	$op= $op eq ':' ? 's' : 'e';
 	return $op.':'.$pat;
 }
@@ -4101,7 +4101,7 @@ sub _smartstring_date
 {	my ($pat,$op,$casesens,$field)=@_;
 	my $suffix='';
 	my $date1= my $date2='';
-	if ($pat=~m#\d# and ($date1,$date2)= $pat=~m#^(\d+[smhdwMy])?(?:\.\.|-)(\d+[smhdwMy])?$#i)	# relative date filter
+	if ($pat=~m#\d# and ($date1,$date2)= $pat=~m#^(\d*\.?\d+[smhdwMy])?(?:\.\.|-)(\d*\.?\d+[smhdwMy])?$#i)	# relative date filter
 	{	$suffix='ago';
 		if	($date1 && $date1!~m/[1-9]/) {$date1=''}
 		elsif	($date1 && $date2 && $date2!~m/[1-9]/) {$date2=$date1; $date1=''}
@@ -4145,8 +4145,8 @@ sub _is_subset		# returns true if $f2 must be a subset of $f1	#$f1 and $f2 must 
 		return 0 if $field1 ne $field2 || $op1 ne $op2;
 		if ($op1 eq 's'|| $op1 eq 'si')		{ return index($pat2,$pat1)!=-1 }	# handle case-i ?
 		elsif ($op1 eq '-s'|| $op1 eq '-si')	{ return index($pat1,$pat2)!=-1 }	# handle case-i ?
-		elsif ($op1 eq '>' || $op1 eq '-<') { return ($pat1."\x00".$pat2) =~m/(-?\d+)(\w*)\x00(-?\d+)\2/ && $3>$1  }
-		elsif ($op1 eq '<' || $op1 eq '->') { return ($pat1."\x00".$pat2) =~m/(-?\d+)(\w*)\x00(-?\d+)\2/ && $3<$1  }
+		elsif ($op1 eq '>' || $op1 eq '-<') { return ($pat1."\x00".$pat2) =~m/^(-?\d*\.?\d+)(\w*)\x00(-?\d*\.?\d+)\2$/ && $3>$1  }
+		elsif ($op1 eq '<' || $op1 eq '->') { return ($pat1."\x00".$pat2) =~m/^(-?\d*\.?\d+)(\w*)\x00(-?\d*\.?\d+)\2$/ && $3<$1  }
 		# FIXME  check these filters : b bago >ago <ago ?
 		return 0;
 	}
@@ -4709,7 +4709,7 @@ sub make
 	my @scores;
 	::setlocale(::LC_NUMERIC, 'C');
 	for my $s ( split /\x1D/, $self->{string} )
-	{	my ($inverse,$weight,$type,$extra)=$s=~m/^(-?)([0-9.]+)([a-zA-Z])(.*)/;
+	{	my ($inverse,$weight,$type,$extra)=$s=~m/^(-?)(\d*\.?\d+)([a-zA-Z])(.*)/;
 		next unless $type;
 		my $score;
 		if (my $value=$ScoreTypes{$type}{value})
@@ -4906,7 +4906,7 @@ sub CalcScore
 sub MakeExample
 {	my ($class,$string,$ID)=@_;
 	::setlocale(::LC_NUMERIC, 'C');
-	my ($inverse,$weight,$type,$extra)=$string=~m/^(-?)([0-9.]+)([a-zA-Z])(.*)/;
+	my ($inverse,$weight,$type,$extra)=$string=~m/^(-?)(\d*\.?\d+)([a-zA-Z])(.*)/;
 	return 'error' unless $type;
 	my $round=$ScoreTypes{$type}{round}||'%s';
 	my $unit= $ScoreTypes{$type}{unit}||'';

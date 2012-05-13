@@ -2047,7 +2047,7 @@ sub _compute_pos
 	::setlocale(::LC_NUMERIC, 'C'); # so that decimal separator is the dot
 	# can parse strings such as : +3s/2-w-p/2+20
 	for my $v ($def=~m/([-+][^-+]+)/g)
-	{	if ($v=~m#([-+](?:\d*\.)?\d*)([pws])(?:/([0-9]+))?#)
+	{	if ($v=~m#([-+]\d*\.?\d*)([pws])(?:/([0-9]+))?#)
 		{	$h{$2}= ($1 eq '+' ? 1 : $1 eq '-' ? -1 : $1) / ($3||1);
 		}
 		elsif ($v=~m/^[-+]\d+$/) { $h{n}=$v }
