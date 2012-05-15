@@ -1835,6 +1835,7 @@ sub ReadOldSavedTags
 	$Options{FilenameSchema}=	[split /\x1D/,$Options{FilenameSchema}];
 	$Options{FolderSchema}=		[split /\x1D/,$Options{FolderSchema}];
 	$Options{LibraryPath}= delete $Options{Path};
+	$Options{Labels}=delete $Options{Flags} if $oldversion<=0.9571;
 	$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2
 	$Options{Artists_split_re}= [ map { $artistsplit_old_to_new{$_}||$_ } grep $_ ne '$', split /\|/, delete $Options{ArtistSplit} ];
 	$Options{TrayTipDelay}&&=900;
@@ -1871,7 +1872,7 @@ sub ReadOldSavedTags
 		if ($misc=~m/^\d+$/ && $misc>0) { push @missing,$ID }
 		else { push @$Library,$ID };
 	}
-	Songs::AddMissing(\@missing) if @missing;
+	Songs::AddMissing(\@missing, 'init') if @missing;
 	while (<$fh>)
 	{	chomp; last if $_ eq '';
 		my ($key,$p)=split "\x1D";
@@ -1926,7 +1927,6 @@ sub ReadOldSavedTags
 			undef;
 		}
 	}
-	$Options{Labels}=delete $Options{Flags} if $oldversion<=0.9571;
 	s/^r/random:/ || s/([0-9s]+)(i?)/($1 eq 's' ? 'shuffle' : Songs::FieldUpgrade($1)).($2 ? ':i' : '')/ge
 		for values %{$Options{SavedSorts}},values %{$Options{SavedWRandoms}},$Options{Sort},$Options{AltSort};
 	$Options{Sort_LastOrdered}=$Options{Sort_LastSR}= delete $Options{AltSort};
