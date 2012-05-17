@@ -153,6 +153,8 @@ INIT {%Alias_ext=(ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block becaus
 our $debug;
 our %CmdLine;
 our ($HomeDir,$SaveFile,$FIFOFile,$ImportFile,$DBus_id);
+sub find_gmbrc_file { my @f= map $_[0].$_, '','.gz','.xz'; return wantarray ? (grep { -e $_ } @f) : first { -e $_ } @f }
+my $gmbrc_ext_re= qr/\.gz$|\.xz$/;
 
 our $QSLASH;	#quoted SLASH for use in regex
 #FIXME use :		use constant QSLASH => quotemeta SLASH;
@@ -196,6 +198,9 @@ options :
 -searchpath FOLDER	: Additional FOLDER to look for plugins and layouts
 -use-gnome-session 	: Use gnome libraries to save tags/settings on session logout
 -workspace N		: move initial window to workspace N (requires Gnome2::Wnck)
+-gzip			: force not compressing gmbrc
++gzip			: force compressing gmbrc with gzip
++xz			: force compressing gmbrc with xz
 
 -cmd CMD		: add CMD to the list of commands to execute
 -ifnotrunning MODE	: change behavior when no running gmusicbrowser instance is found
@@ -247,6 +252,8 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-searchpath')	{ push @{ $CmdLine{searchpath} },shift if $ARGV[0]}
 	elsif($arg=~m/^([+-])plugin$/)	{ $CmdLine{plugins}{shift @ARGV}=($1 eq '+') if $ARGV[0]}
 	elsif($arg eq '-noplugins')	{ $CmdLine{noplugins}=1; delete $CmdLine{plugins}; }
+	elsif($arg=~m/^([+-])gzip$/)	{ $CmdLine{gzip}= $1 eq '+' ? 'gzip':''}
+	elsif($arg=~m/^([+-])xz$/)	{ $CmdLine{gzip}= $1 eq '+' ? 'xz':''}
 	elsif($arg eq '-geometry')	{ $CmdLine{geometry}=shift if $ARGV[0]; }
 	elsif($arg eq '-tagedit')	{ $CmdLine{tagedit}=1; $ignore=1; last; }
 	elsif($arg eq '-listplugin')	{ $CmdLine{pluginlist}=1; $ignore=1; last; }
@@ -303,7 +310,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 		}
 	}
 	# auto import from old v1.0 tags file if using default savefile, it doesn't exist and old tags file exists
-	if (!$SaveFile && !-e $HomeDir.'gmbrc' && -e $HomeDir.'tags') { $ImportFile||=$HomeDir.'tags'; }
+	if (!$SaveFile && !find_gmbrc_file($HomeDir.'gmbrc') && -e $HomeDir.'tags') { $ImportFile||=$HomeDir.'tags'; }
 
 	$SaveFile||= $HomeDir.'gmbrc';
 	$FIFOFile= $HomeDir.'gmusicbrowser.fifo' if !defined $FIFOFile && $^O ne 'MSWin32';
@@ -1964,20 +1971,27 @@ sub Filter_new_from_string_with_upgrade	# for versions <=1.1.7
 }
 
 sub ReadSavedTags	#load tags _and_ settings
-{	my $LoadFile= $ImportFile || $SaveFile;
-	unless (-r $LoadFile && -s $LoadFile)
-	{	FirstTime();
-		Post_ReadSavedTags();
-		return;
+{	my ($fh,$loadfile,$ext)= Open_gmbrc( $ImportFile || $SaveFile,0);
+	unless ($fh)
+	{	if ($loadfile && -e $loadfile && -s $loadfile)
+		{	die "Can't open '$loadfile', aborting...\n" unless $fh;
+		}
+		else
+		{	FirstTime();
+			Post_ReadSavedTags();
+			return;
+		}
 	}
-	setlocale(LC_NUMERIC, 'C');  # so that '.' is used as a decimal separator when converting numbers into strings
-	warn "Reading saved tags in $LoadFile ...\n";
-	open my($fh),'<:utf8',$LoadFile;
+	warn "Reading saved tags in $loadfile ...\n";
+	$SaveFile.=$1 if $loadfile=~m#($gmbrc_ext_re)# && $SaveFile!~m#$gmbrc_ext_re#; # will use .gz/.xz to save if read from a .gz/.xz gmbrc
 
+	setlocale(LC_NUMERIC, 'C');  # so that '.' is used as a decimal separator when converting numbers into strings
 	# read first line to determine if old version, version >1.1.7 stars with "# gmbrc version=",  version <1.1 starts with a letter, else it's version<=1.1.7 (starts with blank or # (for comments) or [ (section name))
 	my $firstline=<$fh>;
+	unless (defined $firstline) { die "Can't read '$loadfile', aborting...\n" }
 	my $oldversion;
 	if ($firstline=~m/^#?\s*gmbrc version=(\d+\.\d+)/) { $oldversion=$1 }
+	elsif ($ext) { die "Can't find gmbrc header in '$loadfile', aborting...\n" }	# compressed gmbrc not supported with old versions, because can't seek backward in compressed fh
 	elsif ($firstline=~m/^\w/) { seek $fh,0,SEEK_SET; ReadOldSavedTags($fh); $oldversion=1 }
 	else	# version <=1.1.7
 	{	seek $fh,0,SEEK_SET;
@@ -1995,7 +2009,7 @@ sub ReadSavedTags	#load tags _and_ settings
 			push @{$lines{$section}},$_;
 		}
 		close $fh;
-		unless ($lines{Options}) { warn "Can't find Options section in '$LoadFile', it's probably not a gmusicbrowser save file -> aborting\n"; exit 1; }
+		unless ($lines{Options}) { warn "Can't find Options section in '$loadfile', it's probably not a gmusicbrowser save file -> aborting\n"; exit 1; }
 		SongArray::start_init(); #every SongArray read in Options will be updated to new IDs by SongArray::updateIDs later
 		ReadRefFromLines($lines{Options},\%Options);
 		$oldversion||=delete $Options{version} || VERSION;  # for version <=1.1.7
@@ -2069,7 +2083,7 @@ sub ReadSavedTags	#load tags _and_ settings
 	&launchIdleLoop;
 
 	setlocale(LC_NUMERIC, '');
-	warn "Reading saved tags in $LoadFile ... done\n";
+	warn "Reading saved tags in $loadfile ... done\n";
 	Post_ReadSavedTags();
 }
 sub Post_Options_init
@@ -2084,18 +2098,77 @@ sub Post_ReadSavedTags
 	#CheckLength() if $Options{LengthCheckMode} eq 'add';
 }
 
+sub Open_gmbrc
+{	my ($file,$write)=@_;
+	my $encoding='utf8';
+	my ($fh,$ext,@cmd);
+	if ($write)
+	{	my @cmd;
+		if    ($file=~m#\.gz$#)	{ $ext='.gz'; @cmd=qw/gzip/; }
+		elsif ($file=~m#\.xz$#)	{ $ext='.xz'; @cmd=qw/xz -0/; }
+		if (@cmd)
+		{	if (findcmd($cmd[0]))
+			{	open $fh,'|-:'.$encoding,"@cmd > \Q$file\E"  or warn "Failed opening '$file' for writing (using $cmd[0]) : $!\n";
+			}
+			else { $file=~s#\.xz$|\.gz$##; @cmd=(); warn "Can't find $cmd[0], saving without compression\n"; }
+		}
+		if (!@cmd)
+		{	open $fh,'>:'.$encoding,$file  or warn "Failed opening '$file' for writing : $!\n";
+			$ext='';
+		}
+		return ($fh,$file,$ext);
+	}
+	else # open for reading
+	{	unless (-e $file)	#if not found as is try with/without .gz/.xz
+		{	$file=~s#$gmbrc_ext_re##;
+			$file= find_gmbrc_file($file);
+		}
+		return unless $file;
+		my $cmpr;
+		if ($file=~m#(\.gz|\.xz)$#) { $cmpr=$ext=$1; }
+		else
+		{	open $fh,'<',$file  or warn "Failed opening '$file' for reading : $!\n";
+			$cmpr=$ext='';
+
+			# check if file compressed in spite of not having a .gz/.xz extension
+			binmode($fh);	# need to read binary data, so do not set utf8 layer yet
+			read $fh,my($header),6;
+			if    ($header =~m#^\x1f\x8b#)	  { $cmpr='.gz'; } #gzip header : will open it as a .gz file
+			elsif ($header eq "\xFD7zXZ\x00") { $cmpr='.xz'; } #xz header
+			else { seek $fh,0,SEEK_SET; binmode($fh,':utf8'); } #no gzip header, rewind, and set utf8 layer
+		}
+		if    ($cmpr eq '.gz')	{ @cmd=qw/gzip -cd/; }
+		elsif ($cmpr eq '.xz')	{ @cmd=qw/xz -cd/; }
+		if (@cmd)
+		{	close $fh if $fh;	#close compressed files without extension
+			if (findcmd($cmd[0]))
+			{	open $fh,'-|:'.$encoding,"@cmd \Q$file\E"  or warn "Failed opening '$file' for reading (using $cmd[0]) : $!\n";
+			}
+			else { warn "Can't find $cmd[0], you could uncompress '$file' manually\n"; }
+		}
+		return ($fh,$file,$ext,$cmpr);
+	}
+}
+
 sub SaveTags	#save tags _and_ settings
 {	my $fork=shift; #if true, save in a forked process
 	HasChanged('Save');
 	if ($CmdLine{demo}) { warn "-demo option => not saving tags/settings\n"; return }
+
+	my $ext='';
+	my $SaveFile= $SaveFile; #do a local copy to locally remove .gz extension if present
+	$ext=$1 if $SaveFile=~s#($gmbrc_ext_re)$##; #remove .gz/.xz extension from the copy of $SaveFile, put it in $ext
+	if (exists $CmdLine{gzip}) { $ext= $CmdLine{gzip} eq 'gzip' ? '.gz' : $CmdLine{gzip} eq 'xz' ? '.xz' : '' }
+	#else { $ext='.gz' } # use gzip by default
+
 	my $savedir=$SaveFile;
 	$savedir=~s/([^$QSLASH]+)$//o;
 	my $savefilename=$1;
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
 	opendir my($dh),$savedir;
-	unlink $savedir.SLASH.$_ for grep m/^\Q$savefilename\E\.new\.\d+$/, readdir $dh; #delete old temporary save files
+	unlink $savedir.SLASH.$_ for grep m/^\Q$savefilename\E\.new\.\d+(?:$gmbrc_ext_re)?$/, readdir $dh; #delete old temporary save files
 	closedir $dh;
-	warn "Writing tags in $SaveFile ...\n";
+
 	if ($fork)
 	{	my $pid= fork;
 		if (!defined $pid) { $fork=undef; } # error, fallback to saving in current process
@@ -2126,9 +2199,12 @@ sub SaveTags	#save tags _and_ settings
 		elsif	($lastseen->{$key}<$tooold)	{ delete $_->{$key} for $Options{Layouts},$lastseen; }
 	}
 
+	local $SIG{PIPE} = 'DEFAULT';	# default is, for some reason, IGNORE, which causes "gzip: stdout: Broken pipe" after closing $fh when using gzip for unclear reasons
 	my $error;
-	my $tempfile= "$SaveFile.new.$$";
-	open my($fh),'>:utf8',$tempfile or warn "Error opening '$tempfile' for writing : $!";
+	(my$fh,my$tempfile,$ext)= Open_gmbrc("$SaveFile.new.$$"."$ext",1);
+	unless ($fh) { warn "Save aborted\n"; POSIX::_exit(0) if $fork; return; }
+	warn "Writing tags in $SaveFile$ext ...\n";
+
 	print $fh "# gmbrc version=".VERSION." time=".time."\n"  or $error||=$!;
 
 	my $optionslines=SaveRefToLines(\%Options);
@@ -2158,31 +2234,42 @@ sub SaveTags	#save tags _and_ settings
 	close $fh  or $error||=$!;
 	setlocale(LC_NUMERIC, '');
 	if ($error)
-	{	rename $tempfile,$SaveFile.'.error';
-		warn "Writing tags in $SaveFile ... error : $error\n";
+	{	rename $tempfile,$SaveFile.'.error'.$ext;
+		warn "Writing tags in $SaveFile$ext ... error : $error\n";
 		POSIX::_exit(1) if $fork;
 		return;
 	}
 	if ($fork && !-e $tempfile) { POSIX::_exit(0); } #tempfile disappeared, probably deleted by a subsequent save from another process => ignore
-	if (-e $SaveFile) #keep some old files as backup
-	{	{	last unless -e $SaveFile.'.bak';
-			last unless (open my $file,'<',$SaveFile.'.bak');
+	my $previous= $SaveFile.$ext;
+	$previous= find_gmbrc_file($SaveFile) unless -e $previous;
+	if ($previous) #keep some old files as backup
+	{	{	my ($bfh,$previousbak,$ext2,$cmpr)= Open_gmbrc($SaveFile.'.bak'.$ext,0);
+			last unless $bfh;
 			local $_; my $date;
-			while (<$file>) { if (m/^SavedOn:\s*(\d+)/) {$date=$1;last} last if m/^\[(?!Options])/}
-			close $file;
+			while (<$bfh>) { if (m/^SavedOn:\s*(\d+)/) {$date=$1;last} last if m/^\[(?!Options])/}
+			close $bfh;
 			last unless $date;
 			$date=strftime('%Y%m%d',localtime($date));
-			last if -e $SaveFile.'.bak.'.$date;
-			rename $SaveFile.'.bak', $SaveFile.'.bak.'.$date;
-			my @files=FileList(qr/^\Q$savefilename\E\.bak\.\d{8}$/, $savedir);
+			if (find_gmbrc_file($SaveFile.'.bak.'.$date)) { unlink $previousbak; last} #remove .bak if already a backup for that day
+			rename $previousbak, "$SaveFile.bak.$date$ext2"  or warn $!;
+			if (!$cmpr && (!exists $CmdLine{gzip} || $CmdLine{gzip})) #compress old backups unless "-gzip" option is used
+			{	my $cmd= $CmdLine{gzip} || 'xz';
+				$cmd= findcmd($cmd,'xz','gzip');
+				system($cmd,'-1','-f',"$SaveFile.bak.$date") if $cmd;
+			}
+
+			my @files=FileList(qr/^\Q$savefilename\E\.bak\.\d{8}(?:$gmbrc_ext_re)?$/, $savedir);
 			last unless @files>5;
 			splice @files,-5;	#keep the 5 newest versions
-			unlink $_ for @files;
+			unlink @files;
 		}
-		rename $SaveFile,$SaveFile.'.bak'  or warn $!;
+		my $rename= $previous;
+		$rename=~s#($gmbrc_ext_re?)$#.bak$1#;
+		rename $previous, $rename  or warn $!;
+		unlink $_ for find_gmbrc_file($SaveFile); #make sure there is no other old gmbrc without .bak, as they could cause confusion
 	}
-	rename $tempfile,$SaveFile  or warn $!;
-	warn "Writing tags in $SaveFile ... done\n";
+	rename $tempfile,$SaveFile.$ext  or warn $!;
+	warn "Writing tags in $SaveFile$ext ... done\n";
 	POSIX::_exit(0) if $fork;
 }
 
