@@ -5900,7 +5900,7 @@ sub PrefAudio
 	#icecast
 	my $vbox_ice=Gtk2::VBox->new(FALSE, 2);
 	$Options{use_GST_for_server}=0 unless $PlayPacks{Play_GST_server};
-	my $usegst=NewPrefCheckButton(use_GST_for_server => _"Use gstreamer",cb=>sub {$radio_gst->signal_emit('toggled');}, tip=>_"without gstreamer : one stream per file, one connection at a time\nwith gstreamer : one continuous stream, multiple connection possible");
+	my $usegst=NewPrefCheckButton(use_GST_for_server => _"Use gstreamer",cb=>sub {$radio_ice->signal_emit('toggled');}, tip=>_"without gstreamer : one stream per file, one connection at a time\nwith gstreamer : one continuous stream, multiple connection possible");
 	my $hbox3=NewPrefEntry('Icecast_port',_"port :");
 	my $albox=Gtk2::Alignment->new(0,0,1,1);
 	$albox->set_padding(0,0,15,0);
@@ -6544,11 +6544,11 @@ sub NewPrefRadio
 		};
 	my $radio; my @radios;
 	while (defined (my $text=shift @text_val))
-	{	my $val=shift @text_val;
+	{	my $val0=shift @text_val;
 		push @radios, $radio=Gtk2::RadioButton->new($radio,$text);
-		$val=&$val if ref $val;
+		my $val= ref $val0 ? &$val0 : $val0;
 		$radio->set_active(1) if $val eq $init;
-		$radio->signal_connect(toggled => $cb,$val);
+		$radio->signal_connect(toggled => $cb,$val0);
 	}
 	return @radios;
 }
