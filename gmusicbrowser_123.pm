@@ -51,6 +51,13 @@ sub init
 {	my @notfound; my $foundone;
 	for my $cmd (sort {($Commands{$b}{priority}||0) <=> ($Commands{$a}{priority}||0)} keys %Commands)
 	{	my ($found)= grep -x, map $_.::SLASH.$cmd, split /:/, $ENV{PATH};
+		while ($found && -l $found)
+		{	my $real= readlink $found;
+			$real='' if $real eq $found; #avoid endless loop
+			$real=~m#([^/]+)$#;
+			if ($cmd ne $1 && $Commands{$1}) {$found=undef} #ignore symbolic links to other known commands (like a mpg123 that is really a symlinked mpg321)
+			else {$found=$real}
+		}
 		for my $ext (split / /,$Commands{$cmd}{type}) { push @{$Supported{$ext}},$cmd if $found; }
 		$Commands{$cmd}{found}=1 if $found;
 		if ($found)	{$foundone++}
@@ -292,6 +299,7 @@ sub AdvancedOptions
 	{	$i=0; $j++;
 		my $devs= $Commands{$cmd}{devices};
 		my @widgets;
+		$devs='' if ref $devs && !$Commands{$cmd}{found}; #don't try to find dynamic list of devices if command not found, as the function likely requires the command
 		my @devlist= ref $devs ? $devs->() : split / /,$devs;
 		push @widgets,
 			Gtk2::Label->new($cmd),
