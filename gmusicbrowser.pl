@@ -2487,6 +2487,7 @@ sub ErrorPlay
 	$dialog->run;
 	$dialog->destroy;
 	#$dialog->signal_connect( response => sub {$_[0]->destroy});
+	$PlayingID=undef; #will avoid counting the song as played or skipped
 	Stop();
 }
 
@@ -2499,7 +2500,7 @@ sub end_of_file
 {	SwitchPlayPackage() if $PlayNext_package;
 	&Played;
 	ResetTime();
-	&NextSong;
+	&NextSong if $TogPlay;
 }
 
 sub Stop
