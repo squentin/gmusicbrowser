@@ -23,6 +23,7 @@ package main;
 use Gtk2 '-init';
 use Glib qw/filename_from_unicode filename_to_unicode/;
 use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime _exit/;
+use Encode qw/_utf8_on _utf8_off/;
 {no warnings 'redefine'; #some work arounds for old versions of perl-Gtk2 and/or gtk2
  *filename_to_utf8displayname=\&Glib::filename_display_name if *Glib::filename_display_name{CODE};
  *PangoEsc=\&Glib::Markup::escape_text if *Glib::Markup::escape_text{CODE}; #needs perl-Gtk2 version >=1.092
@@ -43,16 +44,17 @@ use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime _exit/;
  }
  my $set_clip_rectangle_orig=\&Gtk2::Gdk::GC::set_clip_rectangle;
  *Gtk2::Gdk::GC::set_clip_rectangle=sub { &$set_clip_rectangle_orig if $_[1]; } if $Gtk2::VERSION <1.102; #work-around $rect can't be undef in old bindings versions
- if ($POSIX::VERSION<1.18)
- {	my ($strftime_encoding)= setlocale(LC_TIME)=~m#\.([^@]+)#;
-	*strftime_utf8= sub { $strftime_encoding ? Encode::decode($strftime_encoding, &strftime) : &strftime; };
+ if ($POSIX::VERSION<1.18) #previously, date strings returned by strftime needed to be decoded by the locale encoding
+ {	my ($encoding)= setlocale(LC_TIME)=~m#\.([^@]+)#;
+	$encoding='cp'.$encoding if $^O eq 'MSWin32' && $encoding=~m/^\d+$/;
+	if (!Encode::resolve_alias($encoding)) {warn "Can't find dates encoding used for dates, (LC_TIME=".setlocale(LC_TIME)."), dates may have wrong encoding\n";$encoding=undef}
+	*strftime_utf8= sub { $encoding ? Encode::decode($encoding, &strftime) : &strftime; };
  }
 }
 use List::Util qw/min max sum first/;
 use File::Copy;
 use File::Spec::Functions qw/file_name_is_absolute catfile rel2abs/;
 use Fcntl qw/O_NONBLOCK O_WRONLY O_RDWR SEEK_SET/;
-use Encode qw/_utf8_on _utf8_off/;
 use Scalar::Util qw/blessed weaken refaddr/;
 use Unicode::Normalize 'NFKD'; #for accent-insensitive sort and search, only used via superlc()
 use Carp;
@@ -314,11 +316,10 @@ Options to change what is done with files/folders passed as arguments (done in r
 
 	$SaveFile||= $HomeDir.'gmbrc';
 	$FIFOFile= $HomeDir.'gmusicbrowser.fifo' if !defined $FIFOFile && $^O ne 'MSWin32';
-	$FIFOFile=undef if $FIFOFile eq '';
 
 	#check if there is an instance already running
 	my $running;
-	if (defined $FIFOFile && -p $FIFOFile)
+	if ($FIFOFile && -p $FIFOFile)
 	{	my @c= @cmd ? @cmd : ('Show');	#fallback to "Show" command
 		sysopen my$fifofh,$FIFOFile, O_NONBLOCK | O_WRONLY;
 		print $fifofh "$_\n" and $running=1 for @c;
@@ -1301,7 +1302,7 @@ if ($CmdLine{cmdlist})
 	exit;
 }
 my $fifofh;
-if (defined $FIFOFile)
+if ($FIFOFile)
 {	if (-e $FIFOFile) { unlink $FIFOFile unless -p $FIFOFile; }
 	else
 	{	#system('mknod',$FIFOFile,'p'); #can't use mknod to create fifo on freeBSD
@@ -1553,7 +1554,7 @@ sub Quit
 	@ToScan=@ToAdd_Files=();
 	CloseTrayTip();
 	SaveTags();
-	unlink $FIFOFile if defined $FIFOFile;
+	unlink $FIFOFile if $FIFOFile;
 	Gtk2->main_quit;
 	exec $Options{Shutdown_cmd} if $turnoff && $Options{Shutdown_cmd};
 	exit;
