@@ -380,9 +380,9 @@ sub prefbox
 	$Bopen->signal_connect(clicked => sub { ::ContextWindow; });
 	my ($radio_wk,$radio_moz)=
 	 ::NewPrefRadio( OPT.'Backend',
-		sub { $check->set_sensitive($::Options{OPT.'Backend'} eq 'MozEmbed'); UpdateBackend(); },
-		_"Use WebKit",		'WebKit',
-		_"Use MozEmbed",	'MozEmbed');
+		[_"Use WebKit",		'WebKit',
+		 _"Use MozEmbed",	'MozEmbed',
+		], cb=> sub { $check->set_sensitive($::Options{OPT.'Backend'} eq 'MozEmbed'); UpdateBackend(); });
 	my $label_wk= $OKWebKit ? '' : _"Not found";
 	my $label_moz= $OKMoz ? '' : $CrashMoz ? _"Found but not working" : _"Not found";
 	$radio_wk ->set_tooltip_text($label_wk)  if $label_wk;

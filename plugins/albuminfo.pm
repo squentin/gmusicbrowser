@@ -106,7 +106,7 @@ sub prefbox {
 		push(@chk_fields, ::NewPrefCheckButton(OPT.$field=>_(ucfirst($field)."s"), tip=>_"Note: inactive fields must be enabled by the user in the 'Fields' tab in Settings"));
 		$chk_fields[-1]->set_sensitive(0) unless Songs::FieldEnabled($field);
 	}
-	my ($radio_add,$radio_rpl) = ::NewPrefRadio(OPT.'ReplaceFields',undef,_"Add to existing values",1,_"Replace existing values",0);
+	my ($radio_add,$radio_rpl) = ::NewPrefRadio(OPT.'ReplaceFields',[_"Add to existing values",1, _"Replace existing values",0]);
 	my $chk_saveflds = ::NewPrefCheckButton(OPT.'SaveFields'=>_"Auto-save fields with data from allmusic", widget=>::Vpack(\@chk_fields, $radio_add, $radio_rpl),
 		tip=>_"Save selected fields for all tracks on the same album whenever album data is loaded from allmusic or from file.");
 	$frame_fields->add(::Vpack($chk_join, $chk_saveflds));

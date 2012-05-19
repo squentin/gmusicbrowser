@@ -5858,22 +5858,21 @@ sub PrefAudio
 {	my $vbox=Gtk2::VBox->new(FALSE, 2);
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	my ($radio_gst,$radio_123,$radio_mp,$radio_ice)=NewPrefRadio('AudioOut', sub
+	my ($radio_gst,$radio_123,$radio_mp,$radio_ice)=NewPrefRadio('AudioOut',
+		[ gstreamer		=> 'Play_GST',
+		  'mpg123/ogg123/...'	=> 'Play_123',
+		  mplayer		=> 'Play_mplayer',
+		  _"icecast server"	=> sub {$Options{use_GST_for_server}? 'Play_GST_server' : 'Play_Server'},
+		], cb=>sub
 		{	my $p=$Options{AudioOut};
 			return if $PlayPacks{$p}==$Play_package;
 			$PlayNext_package=$PlayPacks{$p};
 			SwitchPlayPackage() unless defined $PlayTime;
 			$ScanRegex=undef;
-		},
-		gstreamer		=> 'Play_GST',
-		'mpg123/ogg123/...' => 'Play_123',
-		mplayer			=> 'Play_mplayer',
-		_"icecast server"	=> sub {$Options{use_GST_for_server}? 'Play_GST_server' : 'Play_Server'},
-		);
+		}, markup=> '<b>%s</b>',);
 
 	#123
 	my $vbox_123=Gtk2::VBox->new (FALSE, 2);
-	#my $hbox1=NewPrefCombo(Device => [qw/default oss alsa esd arts sun/], text => _"output device :", sizeg1=>$sg1,sizeg2=> $sg2);
 	my $adv1=PrefAudio_makeadv('Play_123','123');
 	$vbox_123->pack_start($_,FALSE,FALSE,2) for $radio_123,$adv1;
 
@@ -6534,7 +6533,8 @@ sub SetOption
 }
 
 sub NewPrefRadio
-{	my ($key,$sub,@text_val)=@_;
+{	my ($key,$text_val,%opt)=@_;
+	my $sub=$opt{cb};
 	my $init=$Options{$key};
 	$init='' unless defined $init;
 	my $cb=sub
@@ -6544,10 +6544,14 @@ sub NewPrefRadio
 			SetOption($key,$val);
 			&$sub if $sub;
 		};
-	my $radio; my @radios;
-	while (defined (my $text=shift @text_val))
-	{	my $val0=shift @text_val;
-		push @radios, $radio=Gtk2::RadioButton->new($radio,$text);
+	my ($radio,@radios);
+	my $i=0;
+	while ($i<$#$text_val)
+	{	my $text= $text_val->[$i++];
+		my $val0= $text_val->[$i++];
+		push @radios, $radio=Gtk2::RadioButton->new($radio);
+		my $label=Gtk2::Label->new_with_format($opt{markup}||'%s', $text);
+		$radio->add($label);
 		my $val= ref $val0 ? &$val0 : $val0;
 		$radio->set_active(1) if $val eq $init;
 		$radio->signal_connect(toggled => $cb,$val0);
