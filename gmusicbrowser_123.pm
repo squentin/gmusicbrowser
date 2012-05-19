@@ -20,6 +20,7 @@ my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill);
 my ($Paused,$SkipTo);
 my ($CMDfh,$RemoteMode);
 my $alsa09;
+my $Error;
 our %Commands=
 (	mpg321	=> {type => 'mp3', devices => 'oss alsa esd arts sun',	cmdline => \&mpg321_cmdline, },
 	ogg123	=> {type => 'oga flac', devices => 'pulse alsa arts esd oss', cmdline => \&ogg123_cmdline,
@@ -100,7 +101,7 @@ sub mpg321_cmdline
 {	my ($file,$sec,$out,@opt)=@_;
 	unshift @opt,'-o',$out if $out;
 	push @opt,'-k',mp3_sec_to_frame($sec) if $sec;
-	return 'mpg321',@opt,'-v','--',$file;
+	return 'mpg321',@opt,'-vq','--skip-printing-frames=3','--',$file;
 }
 sub ogg123_cmdline
 {	my ($file,$sec,$out,@opt)=@_;
@@ -125,7 +126,7 @@ sub mpg123_cmdline
 sub Play
 {	(undef,$file,my$sec)=@_;
 	&Stop if $ChildPID;
-	$SkipTo=undef;
+	$Error=$SkipTo=undef;
 	@cmd_and_args=();
 	my $device_option;
 	my $device=$::Options{Device};
@@ -142,11 +143,11 @@ sub Play
 	{	$type= $::Alias_ext{$type} if $::Alias_ext{$type};
 		my $re= qr/\b$type\b/;
 		my @hints= grep $Commands{$_}{type}=~m/$re/, sort keys %Commands;
-		my $msg= _("Can't play '{file}'."). "\n";
+		my $msg= _("Can't play this file."). "\n";
 		$msg.=	@hints>1 ?	_"One of these commands is required to play files of type {type} : {cmd}" :
 			@hints   ?	_"This command is required to play files of type {type} : {cmd}" :
 					_"Don't know how to play files of type {type}" ;
-		::ErrorPlay( ::__x($msg, file => $file, type=> $type, cmd=> join(', ',@hints)) );
+		::ErrorPlay( ::__x($msg, type=> $type, cmd=> join(', ',@hints)) );
 		return undef;
 	}
 	$RemoteMode=$Commands{$cmd}{remote};
@@ -181,12 +182,16 @@ sub Play
 }
 
 sub _eos_cb
-{	#close $OUTPUTfh;
+{	_UpdateTime();#parse last lines
+	#close $OUTPUTfh;
+	if ($ChildPID && $ChildPID==waitpid($ChildPID, WNOHANG))
+	{	$Error||=_"Check your audio settings" if $?;
+	}
 	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	Glib::Source->remove($WatchTag);
 	Glib::Source->remove($WatchTag2);
 	$WatchTag=$WatchTag2=$ChildPID=undef;
-	_UpdateTime('check_error') unless $::PlayTime;
+	if ($Error) { ::ErrorPlay($Error,_("Command used :")."\n@cmd_and_args"); }
 	::end_of_file;
 	return 1;
 }
@@ -200,7 +205,7 @@ sub _remotemsg	#used by flac123 and mpg123
 	elsif ($line=~m/^\@F \d+ \d+ (\d+)\.\d\d \d+\.\d\d$/)
 	{	::UpdateTime( $1 );
 	}
-	elsif ($line=~m/^\@E(.*)$/) {print $CMDfh $RemoteMode->{QUIT}."\n";error($1)} #Error
+	elsif ($line=~m/^\@E(.*)$/) { $Error=$1; print $CMDfh $RemoteMode->{QUIT}."\n"; } #Error
 	#else {warn $line."\n"}
 	return 1;
 }
@@ -261,27 +266,18 @@ sub _Kill_timeout	#make sure old children are dead
 }
 
 sub _UpdateTime	#used by ogg123 and mpg321
-{	unless ($ChildPID || $_[0] eq 'check_error')
-	{	::ResetTime();
-		return 0;
+{	my @lines=(<$OUTPUTfh>);
+	for (reverse @lines)
+	{	if (m#\D: +(\d\d):(\d\d)\.(\d\d)#) { ::UpdateTime( $1*60+$2+($3>=50?1:0) ); return 1 }
+		# check if known error message
+		$Error=$1 if	m#(Can't find a suitable libao driver)#	||
+				m#(No such device \w+)#			||
+				m#(Failed to initialize output)#	||
+				m#(Cannot open .+)#			||
+				m#(.+: No such file or directory)#;
 	}
-	#seek $OUTPUTfh,-80,2;
-	my $buf;
-	#$_=$buf while (my $l=sysread($OUTPUTfh,$buf,100) && $l==100);
-	#$_.=$buf;
-	sysread($OUTPUTfh,$buf,10000);
-	my $line=substr $buf,-100;
-	if ($line=~m/\D: +(\d\d):(\d\d).\d\d/)
-	{	::UpdateTime( $1*60+$2 );
-	}
-	elsif ( $buf=~m/(Can't find a suitable libao driver)/	||
-		$buf=~m/(Error: Cannot open device \w+)/	||
-		$buf=~m/(No such device \w+)/)			{error($1);}
+	warn join("123:$_",'',@lines) if $::debug;
 	return 1;
-}
-
-sub error
-{	::ErrorPlay(join(' ',@cmd_and_args)." :\n".$_[0]);
 }
 
 sub AdvancedOptions

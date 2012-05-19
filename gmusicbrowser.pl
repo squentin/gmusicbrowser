@@ -2466,22 +2466,22 @@ sub Play
 }
 
 sub ErrorPlay
-{	my ($error,$critical)=@_;
+{	my ($error,$details)=@_;
 	$error= __x( _"Playing error : {error}", error=> $error );
 	warn $error."\n";
-	return if $Options{IgnorePlayError} && !$critical;
+	return if $Options{IgnorePlayError};
 	my $dialog = Gtk2::MessageDialog->new
 		( undef, [qw/modal destroy-with-parent/],
 		  'error','close','%s',
 		  $error
 		);
-	if ($critical)
-	{ my $button=Gtk2::Button->new('Save tag/settings now');
-	  my $l=Gtk2::Label->new('Warning. This error may cause the program to crash, it could be a good time to save tags/settings now');
-	  $l->set_line_wrap(1);
-	  $button->signal_connect(clicked => sub
-		  { $_[0]->hide;$l->set_text('tags/settings saved');SaveTags(); });
-	  $dialog->vbox->pack_start($_,0,0,4) for $l,$button;
+	if ($details)
+	{	my $expander=Gtk2::Expander->new(_"Error details");
+		$details= Gtk2::Label->new($details);
+		$details->set_line_wrap(1);
+		$details->set_selectable(1);
+		$expander->add($details);
+		$dialog->vbox->pack_start($expander,0,0,2);
 	}
 	$dialog->show_all;
 	$dialog->run;

@@ -16,6 +16,7 @@ use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 #$SIG{CHLD} = sub { while (waitpid(-1, WNOHANG)>0) {} };
 
 my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill,$Kill9);
+my $Error;
 my $CMDfh;
 my (%supported,$mplayer);
 my $SoftVolume;
@@ -60,8 +61,11 @@ sub VolInit
 sub Play
 {	(undef,$file,my$sec)=@_;
 	&Stop if $ChildPID;
+	$Error=undef;
 	#if ($ChildPID) { print $CMDfh "loadfile $file\n"; print $CMDfh "seek $sec 2\n" if $sec; return}
-	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -nolirc -hr-mp3-seek/);
+	#-nocache because when using the cache option it spawns a child process, which makes monitoring the mplayer process much harder
+	#-hr-mp3-seek to fix wrong time with some mp3s
+	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -nolirc -hr-mp3-seek -msglevel all=1:statusline=5/);
 	push @cmd_and_args, qw/-softvol -volume/, cubicvolume($::Volume) if $SoftVolume;
 	warn "@cmd_and_args\n" if $::debug;
 	#push @cmd_and_args,$device_option,$device unless $device eq 'default';
@@ -97,24 +101,32 @@ sub Play
 }
 
 sub _eos_cb
-{	#close $OUTPUTfh;
+{	my $error;
+	_remotemsg();#parse last lines
+	#close $OUTPUTfh;
+	if ($ChildPID && $ChildPID==waitpid($ChildPID, WNOHANG))
+	{	$Error=_"Check your audio settings" if $?;
+	}
 	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	Glib::Source->remove($WatchTag);
 	Glib::Source->remove($WatchTag2);
 	$WatchTag=$WatchTag2=$ChildPID=undef;
+	if ($Error) { ::ErrorPlay($Error,_("Command used :")."\n@cmd_and_args"); }
 	::end_of_file;
 	return 1;
 }
 
+
 sub _remotemsg
-{	my $buf;
-	my @line=(<$OUTPUTfh>);
-	my $line=pop @line; #only read the last line
-	chomp $line;
-	if ($line=~m/^A:\s*(\d+).\d /)
-	{	::UpdateTime( $1 );
+{	my @lines=(<$OUTPUTfh>);
+	for (reverse @lines)
+	{	if (m#^A:\s*(\d+)\.(\d) #) { ::UpdateTime( $1+($2>=5?1:0) ); return 1 }
+		# check if known error message
+		$Error=$1 if	m#(Could not open/initialize audio device)#	||
+				m#(Failed to open .+)#				||
+				m#(Failed to recognize file format)#;
 	}
-	elsif ($::debug) {warn "mplayer:$_\n" for @line,$line}
+	warn join("mplayer:$_",'',@lines) if $::debug;
 	return 1;
 }
 
@@ -158,10 +170,6 @@ sub _Kill_timeout	#make sure old children are dead
 		$Kill9=1;	#use KILL if they are still there next time
 	}
 	return @pidToKill;	#removes the timeout if no more @pidToKill
-}
-
-sub error
-{	::ErrorPlay(join(' ',@cmd_and_args)." :\n".$_[0]);
 }
 
 sub AdvancedOptions
