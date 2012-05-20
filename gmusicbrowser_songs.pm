@@ -18,6 +18,7 @@ my (@Missing,$MissingHash,@MissingKeyFields);
 our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%HSort,%Aliases);
 my %FuncCache;
 INIT {
+our $nan= unpack 'F', pack('F',sin(9**9**9)); # sin 9**9**9 is slighly more portable than $nan="nan", use unpack pack because the nan will be stored that way
 our %timespan_menu=
 (	year 	=> _("year"),
 	month	=> _("month"),
@@ -451,12 +452,16 @@ our %timespan_menu=
 	},
 	float	=>	#make sure the string doesn't have the utf8 flag, else substr won't work
 	{	_		=> 'unpack("F",substr(____,#ID#<<3,8))',
-		display		=> 'do {my $v=#_#; ($v==$v ? sprintf("#displayformat#", $v ) : "")}',	# replace novalue (NaN) with ""
-		get		=> 'do {my $v=#_#; ($v==$v ? sprintf("%g", $v ) : "")}',		#
+		display		=> 'do {my $v=#_#; (#v_is_nan# ? "" : sprintf("#displayformat#", $v ))}',	# replace novalue (NaN) with ""
+		get		=> 'do {my $v=#_#; (#v_is_nan# ? "" : sprintf("%g", $v))}',		#
+		diff		=> ($nan==$nan ? 'do {my $new=#VAL#; $new=#nan# unless length $new; $new!=#_# }' :
+						 'do {my $new=#VAL#; $new=#nan# unless length $new; my $v=#_#; $new!=$v && ($new==$new || ! #v_is_nan#) }'),
 		displayformat	=> '%.2f',
 		init		=> '____=" "x8;', #needs init for ID==0
 		parent		=> 'number',
-		novalue		=> '"nan"',	#use NaN as novalue
+		nan		=> '$Songs::nan',
+		v_is_nan	=> ($nan==$nan ? '($v==#nan#)' : '($v!=$v)'),	#on some system $nan!=$nan, on some not. In case nan==0, 0 will be treated as novalue, could treat novalue as 0 instead
+		novalue		=> '#nan#',	#use NaN as novalue
 		default		=> '#novalue#',
 		set		=> 'substr(____,#ID#<<3,8)=pack("F",(length(#VAL#) ? #VAL# : #novalue#))',
 		check		=> '#VAL#= #VAL# =~m/^(-?\d*\.?\d+(?:e[-+]\d+)?)$/i ? $1 : #novalue#;',
@@ -464,10 +469,11 @@ our %timespan_menu=
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,min=>$Def{$field}{edit_min},max=>$Def{$field}{edit_max},signed=>1,digits=>2,mode=>'allow_empty'); },
 		autofill_re	=> '-?\\d*\\.?\\d+',
 		'filterpat:value' => [digits => 2, signed=>1, ],
-		n_sort		=> 'do {my $v=#_#; $v != $v ? "-inf" : $v}',	# use the fact that NaN != NaN
-		'filter:defined'	=> 'do {my $v=#_#; .!!. $v==$v}',	#
+		n_sort		=> 'do {my $v=#_#; #v_is_nan# ? "-inf" : $v}',
+		'filter:defined'	=> 'do {my $v=#_#; .!. (#v_is_nan#)}',
 		'filterdesc:defined:1'	=> _"is defined",
 		'filterdesc:-defined:1'	=> _"is not defined",
+		'stats:same'=> 'do {my $v1=#HVAL#; my $v2=#_#; if (defined $v1) { #HVAL#=#nan# if $v1!=$v2; } else { #HVAL#= $v2 } }',	#hval=nan if $v1!=$v2 works both if nan==nan or nan!=nan : set hval to nan if either one of them is nan or if they are not equal. That way no need to use #v_is_nan#, which would be complicated as it uses $v
 	},
 	'length' =>
 	{	display	=> 'sprintf("%d:%02d", #_#/60, #_#%60)',
@@ -1207,6 +1213,7 @@ our %timespan_menu=
 	alias	=> 'album_gain albumgain',
 	edit_max=> 120,
 	edit_order=> 96,
+	edit_many=>1,
  },
  replaygain_album_peak=>
  {	name	=> _"Album peak",	width => 60,	flags => 'fgrwscpa',
