@@ -2102,7 +2102,7 @@ sub PopupOpt	#Only for FilterList #FIXME should be moved in FilterList::, and/or
 package FilterList;
 use Gtk2;
 use base 'Gtk2::VBox';
-use constant { GID_ALL => 2**32-1, GID_TYPE => 'Glib::ULong' };
+use constant { GID_ALL => 2**30, GID_TYPE => 'Glib::Long' };
 
 our %defaults=
 (	mode	=> 'list',
@@ -2473,9 +2473,12 @@ sub get_fill_data
 	}
 	AA::SortKeys($type,\@list,$self->{'sort'}[0]);
 
-	my $beforeremoving0=@list;
-	@list= grep $_!=0, @list;
-	unshift @list,0 if $beforeremoving0!=@list;	#could be better
+	my $always_first= Songs::Field_property($type,'always_first_gid');
+	if (defined $always_first)	#special gid that should always appear first
+	{	my $before=@list;
+		@list= grep $_!=$always_first, @list;
+		unshift @list,$always_first if $before!=@list;
+	}
 
 	$self->{array}=\@list; #used for interactive search
 
@@ -4080,7 +4083,7 @@ sub RENDER
 
 package CellRendererGID;
 use Glib::Object::Subclass 'Gtk2::CellRenderer',
-properties => [ Glib::ParamSpec->ulong('gid', 'gid', 'group id',		0, 2**32-1, 0,	[qw/readable writable/]),
+properties => [ Glib::ParamSpec->long('gid', 'gid', 'group id',		-2**31+1, 2**31, 0,	[qw/readable writable/]),
 		Glib::ParamSpec->ulong('all_count', 'all_count', 'all_count',	0, 2**32-1, 0,	[qw/readable writable/]),
 		Glib::ParamSpec->ulong('max', 'max', 'max number of songs',	0, 2**32-1, 0,	[qw/readable writable/]),
 		Glib::ParamSpec->scalar('prop', 'prop', '[[field],[markup],[picsize]]',		[qw/readable writable/]),

@@ -86,6 +86,7 @@ our %timespan_menu=
 		gid_to_display	=> '___name[#GID#]',
 		s_sort		=> '___sort{ sprintf("%x", #_#)}',
 		si_sort		=> '___isort{ sprintf("%x", #_#)}',
+		always_first_gid=> 0,
 		's_sort:gid'	=> '___name[#GID#]',
 		'si_sort:gid'	=> '___iname[#GID#]',
 		get		=> 'do {my $v=#_#; !$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v];}',
@@ -342,6 +343,7 @@ our %timespan_menu=
 		gid_to_get	=> '#_name#[#GID#]',
 		's_sort:gid'	=> '#_name#[#GID#]',
 		'si_sort:gid'	=> '#_iname#[#GID#]',
+		always_first_gid=> 0,
 		gid_to_display	=> '#_name#[#GID#]',
 		'filter:m'	=> '#_name#[#_#]  .=~. m"#VAL#"',
 		'filter:mi'	=> '#_iname#[#_#] .=~. m"#VAL#"i',
@@ -423,7 +425,7 @@ our %timespan_menu=
 	{	group		=> 'int(#_#/#ARG0#) !=',
 		hash		=> 'int(#_#/#ARG0#)',		#hash:minute	=> '60*int(#_#/60)',
 		#makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".(#GID# * #ARG0#)." ".((#GID#+1) * #ARG0#))',
-		makefilter	=> 'Filter->new_add(1, "#field#:-<:".(#GID# * #ARG0#), "#field#:<:".((#GID#+1) * #ARG0#) )', #FIXME decimal separator must be always "."
+		makefilter	=> 'Filter->newadd(1, "#field#:-<:".(#GID# * #ARG0#), "#field#:<:".((#GID#+1) * #ARG0#) )', #FIXME decimal separator must be always "."
 		gid_to_display	=> '#GID# * #ARG0#',
 		get_gid		=> 'int(#_#/#ARG0#)',
 	},
@@ -474,6 +476,19 @@ our %timespan_menu=
 		'filterdesc:defined:1'	=> _"is defined",
 		'filterdesc:-defined:1'	=> _"is not defined",
 		'stats:same'=> 'do {my $v1=#HVAL#; my $v2=#_#; if (defined $v1) { #HVAL#=#nan# if $v1!=$v2; } else { #HVAL#= $v2 } }',	#hval=nan if $v1!=$v2 works both if nan==nan or nan!=nan : set hval to nan if either one of them is nan or if they are not equal. That way no need to use #v_is_nan#, which would be complicated as it uses $v
+	},
+	'float.range'=>
+	{	get_gid		=> 'do {my $v=#_#; #v_is_nan# ? #nan_gid# : int($v/#range_step#) ;}',
+		nan_gid		=> '-2**30', #gid in FilterList are Long, 2**30 is GID_ALL
+		always_first_gid=> -2**30,
+		range_step	=> '1', #default step
+		gid_to_display	=> '( #GID#==#nan_gid# ? _"not defined" : do {my $v= #GID# * #range_step#; "$v .. ".($v+#range_step#)})',
+		gid_to_get	=> '( #GID#==#nan_gid# ? #nan# : #GID# * #range_step#)',
+		hash		=> '#get_gid#',
+		makefilter	=> '#GID#==#nan_gid# ? "#field#:-defined:1" : do { my $v= #GID# * #range_step#; Filter->newadd(1, "#field#:-<:".$v, "#field#:<:".($v + #range_step#)); }', #FIXME decimal separator must be always "."
+		'n_sort:gid'	=> '( do{my $n=#GID#==#nan_gid# ? "-inf" : #GID# * #range_step#;warn "#GID# => $n";$n })',
+		'n_sort:gid'	=> '( #GID#==#nan_gid# ? "-inf" : #GID# * #range_step# )',
+		'n_sort:gid'	=> '#GID#', #  #nan_gid# is already the most negative number, no need to replace it with -inf
 	},
 	'length' =>
 	{	display	=> 'sprintf("%d:%02d", #_#/60, #_#%60)',
@@ -562,6 +577,7 @@ our %timespan_menu=
 		'smartfilter:~' => 'm',
 
 		 #for date.year, date.month, date.day :
+		always_first_gid=> 0,
 		group	=> '#mktime# !=',
 		get_gid	=> '#_# ? #mktime# : 0',
 		hash	=> '(#_# ? #mktime# : 0)',	#or use post-hash modification for 0 case
@@ -686,6 +702,7 @@ our %timespan_menu=
 		#hashm			=> '#get_list#',
 		#mktime			=> '$_',
 		 #for dates.year, dates.month, dates.day :
+		always_first_gid=> 0,
 		get_gid	=> '[#_# ? (map #mktime#,#get_list#) : 0]',
 		hashm	=> '(#_# ? (map #mktime#,#get_list#) : 0)',	#or use post-hash modification for 0 case
 		subtypes_menu=> \%timespan_menu,
@@ -1194,6 +1211,7 @@ our %timespan_menu=
 	alias	=> 'track_gain trackgain',
 	edit_max=> 120,
 	edit_order=> 95,
+	FilterList => {type=>'range',},
  },
  replaygain_track_peak=>
  {	name	=> _"Track peak",	width => 60,	flags => 'fgrwscpa',
@@ -1201,6 +1219,9 @@ our %timespan_menu=
 	type	=> 'float',
 	options => 'disable',
 	category=>'replaygain',
+	alias	=> 'track_peak trackpeak',
+	range_step=> '.1',
+	FilterList => {type=>'range',},
  },
  replaygain_album_gain=>
  {	name	=> _"Album gain",	width => 70,	flags => 'fgrwscpa',
@@ -1214,6 +1235,7 @@ our %timespan_menu=
 	edit_max=> 120,
 	edit_order=> 96,
 	edit_many=>1,
+	FilterList => {type=>'range',},
  },
  replaygain_album_peak=>
  {	name	=> _"Album peak",	width => 60,	flags => 'fgrwscpa',
@@ -1221,6 +1243,9 @@ our %timespan_menu=
 	type	=> 'float',
 	options => 'disable',
 	category=>'replaygain',
+	alias	=> 'album_peak albumpeak',
+	range_step=> '.1',
+	FilterList => {type=>'range',},
  },
  replaygain_reference_level=>
  {	flags => 'w',	type => 'writeonly',	#only used for writing
@@ -1422,7 +1447,8 @@ sub MakeCode		#keep ?
 	return $code;
 }
 sub Field_property
-{	my ($field,$key)=@_;
+{	my ($field_opt,$key)=@_;
+	my ($field,$subtype)=split /\./,$field_opt;
 	my $h= $Def{$field};
 	return undef unless $h;
 	while ($h)
@@ -1430,6 +1456,7 @@ sub Field_property
 		my $type= $h->{parent} || $h->{type};
 		return undef unless $type;
 		$h= $Types{$type};
++		return $Types{"$type.$subtype"}{$key} if $subtype && $Types{"$type.$subtype"} && exists $Types{"$type.$subtype"}{$key};
 	}
 }
 sub Field_properties
@@ -3901,6 +3928,7 @@ sub new
 {	my ($class,$string,$source) = @_;
 	my $self=bless {}, $class;
 	if	(!defined $string)	  {$string='';}
+	elsif	(ref $string && $string->isa('Filter')) {$string=$string->{string}}
 	elsif	($string=~m/^\w+:-?~:/) { ($string)=_smart_simplify($string); }
 	$self->{string}=$string;
 	$self->{source}=$source;
