@@ -1520,6 +1520,7 @@ sub drag_begin_cb
 
 sub button_press_cb
 {	my ($tv,$event)=@_;
+	return 0 if $event->window!=$tv->get_bin_window; #ignore click outside the bin_window (for example the column headers)
 	my $self=::find_ancestor($tv, $tv->{selfpkg} );
 	my $but=$event->button;
 	my $sel=$tv->get_selection;
