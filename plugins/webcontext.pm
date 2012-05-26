@@ -302,6 +302,7 @@ sub new
 	$status->{id}=$status->get_context_id('link');
 	($self->{embed},my $container)= $self->new_embed;
 	$container||=$self->{embed};
+	$self->{embed}->signal_connect(button_press_event=> \&button_press_cb);
 	my $entry=$self->{Entry}=Gtk2::Entry->new;
 	my $back= $self->{BBack}=Gtk2::ToolButton->new_from_stock('gtk-go-back');
 	my $next= $self->{BNext}=Gtk2::ToolButton->new_from_stock('gtk-go-forward');
@@ -333,6 +334,16 @@ sub new
 	$open->signal_connect(clicked => sub { my $url=::find_ancestor($_[0],__PACKAGE__)->get_location; ::openurl($url) if $url=~m#^https?://# });
 	$toolbar->signal_connect('popup-context-menu' => \&popup_toolbar_menu );
 	return $self;
+}
+
+sub button_press_cb
+{	my ($embed,$event)=@_;
+	my $button= $event->button;
+	my $self= ::find_ancestor($embed,__PACKAGE__);
+	if    ($button==8) { $self->go_back; }
+	elsif ($button==9) { $self->go_forward; }
+	else { return 0; }
+	return 1;
 }
 
 sub addtoolbar #default method, overridden by packages that add extra items to the toolbar
