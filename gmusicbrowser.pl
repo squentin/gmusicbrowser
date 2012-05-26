@@ -1202,6 +1202,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	EnqueueAlbum	=> [sub {EnqueueSame('album',$SongID)},	_"Enqueue Songs from Current Album"],
 	EnqueueAction	=> [sub {EnqueueAction($_[1])},		_"Enqueue Action", _"Queue mode" ,sub { TextCombo->new({map {$_ => $QActions{$_}{short}} sort keys %QActions}) }],
 	ClearQueue	=> [\&::ClearQueue,			_"Clear queue"],
+	ClearPlaylist	=> [sub {Select(staticlist=>[])},	_"Clear playlist"],
 	IncVolume	=> [sub {ChangeVol('up')},		_"Increase Volume"],
 	DecVolume	=> [sub {ChangeVol('down')},		_"Decrease Volume"],
 	TogMute		=> [sub {ChangeVol('mute')},		_"Mute/Unmute"],
