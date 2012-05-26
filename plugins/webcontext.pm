@@ -112,6 +112,19 @@ sub new_embed
 	$embed->signal_connect(hovering_over_link => \&link_message_cb);
 	$embed->signal_connect(load_finished => \&net_startstop_cb,0);
 	$embed->signal_connect(load_committed => \&net_startstop_cb,1);
+	$embed->signal_connect(navigation_policy_decision_requested=> sub
+	 {	if ($_[3]->get_button==2) #middle-click on a link
+		{	my $nb=::find_ancestor($_[0],'Layout::NoteBook'); #only works if inside a NB/TabbedLists/Context widget
+			$nb->newtab('PluginWebPage',1,{url=>$_[2]->get_uri}) if $nb; #open the link in a new tab
+			return 1 if $nb;
+		}
+		return 0;
+	 });
+	$embed->signal_connect('notify::title'=> sub
+	 {	my $embed=shift;
+		my $self=::find_ancestor($embed,'GMB::Plugin::WebContext');
+		$self->set_title($embed->get('title')) if $self;
+	 });
 	my $sw= Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('automatic','automatic');
@@ -135,9 +148,12 @@ sub net_startstop_cb
 	$embed->window->set_cursor($cursor) if $embed->window;
 	my $uri=$frame->get_uri;
 	$self->{Entry}->set_text($uri) if $loading;
+	$self->set_title($uri) if $loading;
 	$uri= $uri=~m#^https?://# ? 1 : 0 ;
 	$self->{BOpen}->set_sensitive($uri);
 }
+
+sub set_title {} #ignored unless overridden by the class
 
 sub loaded
 {	my ($self,$data,$type)=@_;
@@ -200,6 +216,12 @@ our %Widgets=
 		schange		=> \&Update,
 		group		=> 'Play',
 		saveoptions	=> 'follow urientry statusbar',
+	},
+	PluginWebPage =>
+	{	class		=> 'GMB::Plugin::WebContext::Page',
+		tabtitle	=> _"Untitled",
+		saveoptions	=> 'url title urientry statusbar',
+		options		=> 'url title',  #load/save the title because page is only loaded when mapped, so we can ask it its title until tab is selected
 	},
 );
 
@@ -405,9 +427,30 @@ sub popup_toolbar_menu
 sub Update
 {	$_[0]->SongChanged( ::GetSelID($_[0]) )  if $_[0]->mapped;
 }
-
 #################################################################################
 
+package GMB::Plugin::WebContext::Page;
+our @ISA=('GMB::Plugin::WebContext');
+
+#only called once, when mapped
+sub SongChanged { $_[0]->load_url($_[0]{url}) if $_[0]{url}; }
+
+sub DynamicTitle	#called by Layout::NoteBook when tab is created
+{	my ($self,$default)=@_;
+	my $title=$self->{title};
+	$title=$default unless length $title;
+	my $label=Gtk2::Label->new($title);
+	$label->set_ellipsize('end');
+	$label->set_max_width_chars(20);
+	$self->{titlelabel}=$label;
+	return $label;
+}
+sub set_title
+{	my ($self,$title)=@_;
+	($title)= $self->{url}=~m#^https?://(?:www\.)?([\w.]+)# unless length $title;
+	$self->{title}=$title;
+	$self->{titlelabel}->set_text($title);
+}
 
 package GMB::Plugin::WebContext::Lyrics;
 our @ISA=('GMB::Plugin::WebContext');
