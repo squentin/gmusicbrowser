@@ -59,6 +59,7 @@ our %timespan_menu=
 		'filterdesc:-s'	=> _"doesn't contain %s (case sensitive)",
 		'filterdesc:-si'=> _"doesn't contain %s",
 		'filterdesc:-e'	=> _"isn't equal to %s",
+		'smartfilter:=empty' => 'e:',
 		'smartfilter:=' => 'e',
 		'smartfilter::' => 'si s',
 		'smartfilter:~' => 'mi m',
@@ -144,6 +145,7 @@ our %timespan_menu=
 		'filterdesc:-mi'=> _"doesn't match regexp %s",
 		'filterdesc:-s'	=> _"doesn't contain %s (case sensitive)",
 		'filterdesc:-si'=> _"doesn't contain %s",
+		'smartfilter:=empty' => 'ecount:0',
 		'smartfilter:=' => '~',
 		'smartfilter::' => 'si s',
 		'smartfilter:~' => 'mi m',
@@ -475,6 +477,7 @@ our %timespan_menu=
 		'filter:defined'	=> 'do {my $v=#_#; .!. (#v_is_nan#)}',
 		'filterdesc:defined:1'	=> _"is defined",
 		'filterdesc:-defined:1'	=> _"is not defined",
+		'smartfilter:=empty' => '-defined:1',
 		'stats:same'=> 'do {my $v1=#HVAL#; my $v2=#_#; if (defined $v1) { #HVAL#=#nan# if $v1!=$v2; } else { #HVAL#= $v2 } }',	#hval=nan if $v1!=$v2 works both if nan==nan or nan!=nan : set hval to nan if either one of them is nan or if they are not equal. That way no need to use #v_is_nan#, which would be complicated as it uses $v
 	},
 	'float.range'=>
@@ -575,6 +578,7 @@ our %timespan_menu=
 		'smartfilter:=' => \&Filter::_smartstring_date,
 		'smartfilter::' => \&Filter::_smartstring_date,
 		'smartfilter:~' => 'm',
+		'smartfilter:=empty' => 'e:0',
 
 		 #for date.year, date.month, date.day :
 		always_first_gid=> 0,
@@ -697,6 +701,7 @@ our %timespan_menu=
 		'smartfilter:>='=> \&Filter::_smartstring_date_moreless,
 		'smartfilter:=' => \&Filter::_smartstring_date,
 		'smartfilter::' => \&Filter::_smartstring_date,
+		'smartfilter:=empty' => 'ecount:0',
 
 		#get_gid		=> '[#get_list#]',
 		#hashm			=> '#get_list#',
@@ -733,6 +738,7 @@ our %timespan_menu=
 		'filterdesc:e:1'	=> [_"is true", _"is true", '',noinv=>1],
 		filter_exclude => 'ALL',	#do not show filters inherited from parents
 		default_filter => 'e:1',
+		'smartfilter:=empty' => 'e:0',
 		rightalign=>0,
 	},
 	shuffle=>
@@ -4044,19 +4050,20 @@ sub new_from_smartstring
 			if ($fields)
 			{	my @f= grep $_, map $Songs::Aliases{::superlc($_)}, split(/\|/,$fields);
 				if (@f) { $fields= join '|',@f }
-				else { $string= $fields.$op.$string; $op=undef; }	#no recognized field => treat $fields and $op as part of the pattern
+				else { $string= $fields.$op.$string; $fields=$op=undef; }	#no recognized field => treat $fields and $op as part of the pattern
 			}
 			$string=~s#^\\([:<>=~])#$1#g unless $op;	#un-escape escaped operators at start of string if no recognized operator
 		}
 		$fields ||= $fields0;
 		$op||= $regexp ? '~' : ':';
 
+
 		my @patterns;
 		{	if ($string=~s#^(['"])(.+?)(?<!\\)\1((?<!\\)\||\s+|$)##)
 			{	push @patterns,$2;
 				redo if $3 eq '|';
 			}
-			elsif ($string=~s/^(\S.*?)(	(?<!\\)\| |			# ends with | => more than one pattern
+			elsif ($string=~s/^(.*?)(	(?<!\\)\| |			# ends with | => more than one pattern
 							(?<!\\)(?=\)[\s|)]|\)$) |	# or with closing parenthese followed by space | ) or end-of-string
 							(?<!\\)\s+ | $			# or with spaces or end-of-string
 					)//x)
@@ -4065,13 +4072,15 @@ sub new_from_smartstring
 			}
 		}
 		s#\\([ "'|)])#$1#g for @patterns;	#un-escape escaped spaces, quotes, | and )
-
 		# convert smart operator to internal operator and create filter for this level
 		my @filters=(0 xor $notgroup);
 		for my $field (split /\|/, $fields)
 		{	for my $pattern (@patterns)
 			{	my $filter;
-				if (my $found= Songs::Field_property($field,'smartfilter:'.$op))
+				if ($pattern eq '')
+				{	$filter= Songs::Field_property($field,'smartfilter:'.$op.'empty'); #must contain operator ':' pattern
+				}
+				elsif (my $found= Songs::Field_property($field,'smartfilter:'.$op))
 				{	if (ref $found)
 					{	$filter= $found->($pattern,$op,$casesens,$field);
 					}
