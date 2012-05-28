@@ -5923,6 +5923,10 @@ sub PrefAudio
 	my $rg_cb= sub { my $p=$Options{AudioOut}; $p&&=$PlayPacks{$p}; $_[0]->set_sensitive( $p && $p->{RG} ); };
 	Watch($rg_check, Option=> $rg_cb );
 	$rg_cb->($rg_check);
+	my $rga_start=Gtk2::Button->new(_"Start ReplayGain analysis");
+	$rga_start->set_tooltip_text(_"Analyse and add replaygain tags for all songs that don't have replaygain tags, or incoherent album replaygain tags");
+	$rga_start->signal_connect(clicked => \&GMB::GST_ReplayGain::Analyse_full);
+	$rga_start->set_sensitive($Play_GST::GST_RGA_ok);
 	my $rg_opt= Gtk2::Button->new(_"ReplayGain options");
 	$rg_opt->signal_connect(clicked => \&replaygain_options_dialog);
 	$sg1->add_widget($rg_check);
@@ -5932,7 +5936,7 @@ sub PrefAudio
 			$vbox_123, Gtk2::HSeparator->new,
 			$vbox_mp,  Gtk2::HSeparator->new,
 			$vbox_ice, Gtk2::HSeparator->new,
-			[$rg_check,$rg_opt],
+			[$rg_check,$rg_opt,($Glib::VERSION >= 1.251 ? $rga_start : ())],
 			NewPrefCheckButton(IgnorePlayError => _"Ignore playback errors", tip=>_"Skip to next song if an error occurs"),
 		      );
 	return $vbox;
@@ -5981,7 +5985,7 @@ sub replaygain_options_dialog
 	$RG_dialog= Gtk2::Dialog->new (_"ReplayGain options", undef, [], 'gtk-close' => 'close');
 	$RG_dialog->signal_connect(destroy => sub {$RG_dialog=undef});
 	$RG_dialog->signal_connect(response =>sub {$_[0]->destroy});
-	my $songmenu=::NewPrefCheckButton(gst_rg_songmenu => _("Show replaygain submenu").' '._"(unstable)");
+	my $songmenu=::NewPrefCheckButton(gst_rg_songmenu => _("Show replaygain submenu").($Glib::VERSION >= 1.251 ? '' : ' '._"(unstable)"));
 	my $albummode=::NewPrefCheckButton(gst_rg_albummode => _"Album mode", cb=>\&Set_replaygain, tip=>_"Use album normalization instead of track normalization");
 	my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter", cb=>\&Set_replaygain, tip=>_"Used for clipping prevention");
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
@@ -7075,7 +7079,7 @@ sub Progress
 	$self->{fraction}= ($self->{current}||=0) / ($self->{end}||1);
 
 	if (my $w=$self->{widget}) { $w->set_fraction( $self->{fraction} ); }
-	delete $Progress{$pid} if $self->{abort} or $self->{current}==$self->{end}; # finished
+	delete $Progress{$pid} if $self->{abort} or $self->{current}>=$self->{end}; # finished
 	HasChanged(Progress =>$pid,$Progress{$pid});
 	if ( $Progress{$pid} && !$self->{widget} && (!$EventWatchers{Progress} || @{$EventWatchers{Progress}}==0))	#if no widget => create progress window
 	{	#create the progress window only after a short timeout to ignore short jobs
