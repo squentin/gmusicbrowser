@@ -4083,7 +4083,7 @@ sub RENDER
 
 package CellRendererGID;
 use Glib::Object::Subclass 'Gtk2::CellRenderer',
-properties => [ Glib::ParamSpec->long('gid', 'gid', 'group id',		-2**31+1, 2**31, 0,	[qw/readable writable/]),
+properties => [ Glib::ParamSpec->long('gid', 'gid', 'group id',		-2**30, 2**30, 0,	[qw/readable writable/]),
 		Glib::ParamSpec->ulong('all_count', 'all_count', 'all_count',	0, 2**32-1, 0,	[qw/readable writable/]),
 		Glib::ParamSpec->ulong('max', 'max', 'max number of songs',	0, 2**32-1, 0,	[qw/readable writable/]),
 		Glib::ParamSpec->scalar('prop', 'prop', '[[field],[markup],[picsize]]',		[qw/readable writable/]),
