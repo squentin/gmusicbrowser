@@ -6881,7 +6881,7 @@ sub SaveList
 	}
 	elsif (defined $val)
 	{	if (my $songarray= $saved->{$name})	{ $songarray->Replace($val); return }
-		else					{ $saved->{$name}= SongArray::Named->new($val); HasChanged('SavedLists',$name); }
+		else					{ $saved->{$name}= SongArray::Named->new_copy($val); HasChanged('SavedLists',$name); }
 	}
 	else	{ delete $saved->{$name}; HasChanged('SavedLists',$name,'remove'); }
 	Songs::Changed(undef,'list'); # simulate modifcation of the fake "list" field

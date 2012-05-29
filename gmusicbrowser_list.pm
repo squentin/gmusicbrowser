@@ -2924,7 +2924,7 @@ INIT
 		mode => 'F',	onlyone => 'names',	stockicon => 'gtk-remove' },
 	{ label => _"Save current filter as",	code => sub { ::EditFilter($_[0]{self},$_[0]{curfilter},''); },
 		 stockicon => 'gtk-save',	isdefined => 'curfilter',	test => sub { ! $_[0]{curfilter}->is_empty; } },
-	{ label => _"Save current list as",	code => sub { $_[0]{self}->CreateNewFL('L',\@{ $_[0]{songlist}{array} }); },
+	{ label => _"Save current list as",	code => sub { $_[0]{self}->CreateNewFL('L',[@{ $_[0]{songlist}{array} }]); },
 		stockicon => 'gtk-save',	isdefined => 'songlist' },
 	{ label => _"Edit list",	code => sub { ::WEditList( $_[0]{names}[0] ); },
 		mode => 'L',	onlyone => 'names' },
