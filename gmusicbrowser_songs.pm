@@ -482,8 +482,8 @@ our %timespan_menu=
 	},
 	'float.range'=>
 	{	get_gid		=> 'do {my $v=#_#; #v_is_nan# ? #nan_gid# : int($v/#range_step#) ;}',
-		nan_gid		=> '-2**30', #gid in FilterList are Long, 2**30 is GID_ALL
-		always_first_gid=> -2**30,
+		nan_gid		=> '-2**31+1', #gid in FilterList are Long, 2**31-1 is GID_ALL
+		always_first_gid=> -2**31+1,
 		range_step	=> '1', #default step
 		gid_to_display	=> '( #GID#==#nan_gid# ? _"not defined" : do {my $v= #GID# * #range_step#; "$v .. ".($v+#range_step#)})',
 		gid_to_get	=> '( #GID#==#nan_gid# ? #nan# : #GID# * #range_step#)',
