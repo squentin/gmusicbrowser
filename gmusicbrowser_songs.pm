@@ -421,6 +421,7 @@ our %timespan_menu=
 		'smartfilter:=' => \&Filter::_smartstring_number,
 		'smartfilter::' => \&Filter::_smartstring_number,
 		'smartfilter:~' => 'm',
+		'smartfilter:=empty' => 'e:0',
 		rightalign=>1,	#right-align in SongTree and SongList
 	},
 	'number.div' =>
@@ -531,6 +532,7 @@ our %timespan_menu=
 		'filterdesc:-~'	=> _"not set to %s",,
 		'filterdesc:~:255'=> 'set to default',
 		'filterdesc:-~:255'=>'not set to default',
+		'smartfilter:=empty' => '~:255',
 		n_sort		=> '#_default#',
 		#array		=> '#_default#',
 		gid_to_display	=> '#GID#==255 ? _"Default" : #GID#',
