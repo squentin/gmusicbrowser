@@ -79,8 +79,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.100901',
- VERSIONSTRING => '1.1.9.1',
+ VERSION => '1.100902',
+ VERSIONSTRING => '1.1.9.2',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
@@ -2065,8 +2065,12 @@ sub ReadSavedTags	#load tags _and_ settings
 	{	bless $_,'SongArray::Named' for values %{$Options{SavedLists}}; #named lists now use SongArray::Named instead of plain SongArray
 		no warnings 'once';
 		for my $floatvector ($Songs::Songs_replaygain_track_gain__,$Songs::Songs_replaygain_track_peak__,$Songs::Songs_replaygain_album_gain__,$Songs::Songs_replaygain_album_peak__)
-		{	$floatvector=  pack "F*",map $_||"inf", unpack("F*",$floatvector) if $floatvector; # undef is now stored as inf rather than 0, upgrade assuming all 0s were undef
+		{	$floatvector=  pack "F*",map $_||"nan", unpack("F*",$floatvector) if $floatvector; # undef is now stored as nan rather than 0, upgrade assuming all 0s were undef
 		}
+	}
+	elsif ($oldversion==1.100901) #fix version 1.1.9.1 mistakenly upgrading by replacing float values of 0 by inf instead of nan
+	{	for my $floatvector ($Songs::Songs_replaygain_track_gain__,$Songs::Songs_replaygain_track_peak__,$Songs::Songs_replaygain_album_gain__,$Songs::Songs_replaygain_album_peak__)
+		{ $floatvector=  pack "F*",map {$_!="inf" ? $_ : "nan"} unpack("F*",$floatvector) if $floatvector; }
 	}
 
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};
