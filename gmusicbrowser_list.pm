@@ -1703,7 +1703,7 @@ our @cMenu=
 	},
 	#songs submenu :
 	{	label	=> sub { my $IDs=$_[0]{filter}->filter; ::__("%d Song","%d Songs",scalar @$IDs); },
-		submenu => sub { ::BuildMenu(\@::SongCMenu, { mode => 'F', IDs=>$_[0]{filter}->filter }); },
+		submenu => sub { ::BuildMenuOptional(\@::SongCMenu, { mode => 'F', IDs=>$_[0]{filter}->filter }); },
 		isdefined => 'filter',
 	},
 	{ label=> _"Rename folder", code => sub { ::AskRenameFolder($_[0]{rawpathlist}[0]); }, onlyone => 'rawpathlist',	test => sub {!$::CmdLine{ro}}, },

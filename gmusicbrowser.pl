@@ -3947,7 +3947,7 @@ sub BuildMenu
 		if (my $submenu=$m->{submenu})
 		{	$submenu=$submenu->($args) if ref $submenu eq 'CODE';
 			if ($m->{code}) { $submenu=BuildChoiceMenu($submenu, %$m, args=>$args); }
-			elsif (ref $submenu eq 'ARRAY') { $submenu=BuildMenu($submenu,$args); }
+			elsif (ref $submenu eq 'ARRAY') { $submenu=BuildMenuOptional($submenu,$args); }
 			next unless $submenu;
 			if (my $append=$m->{append})	#append to submenu
 			{	BuildMenu($append,$args,$submenu);
@@ -3975,6 +3975,10 @@ sub BuildMenu
 		$menu->append($item);
 	}
 	return $menu;
+}
+sub BuildMenuOptional
+{	my $menu= &BuildMenu;
+	return $menu->get_children ? $menu : undef;
 }
 sub PopupContextMenu
 {	my $args=$_[1];
@@ -4980,14 +4984,13 @@ sub SearchSame
 
 sub SongsSubMenuTitle
 {	my $nb=@{ AA::GetIDs($_[0]{field},$_[0]{gid}) };
-	return undef if $nb==0;
 	return __("%d Song","%d Songs",$nb);
 }
 sub SongsSubMenu
 {	my %args=%{$_[0]};
 	$args{mode}='S';
 	$args{IDs}=\@{ AA::GetIDs($args{field},$args{gid}) };
-	BuildMenu(\@SongCMenu,\%args);
+	BuildMenuOptional(\@SongCMenu,\%args);
 }
 
 sub ArtistContextMenu
