@@ -4268,22 +4268,26 @@ COPYNEXTID:for my $ID (@$IDs)
 sub ChooseDir
 {	my ($msg,$path,$extrawidget,$remember_key,$multiple,$allowfiles) = @_;
 	my $mode= $allowfiles ? 'open' : 'select-folder';
-	my $dialog=Gtk2::FileChooserDialog->new($msg,undef,$mode);
-	my $okbutton=$dialog->add_button('gtk-ok' => 'ok');
-	$dialog->add_button('gtk-cancel' => 'none');
-
-	# there is no mode in Gtk2::FileChooserDialog that let you select both files or folders (Bug #136294), so have to work-around by connecting to the ok button and forcing the end of $dialog->run with a $dialog->hide (the dialog will be destroyed after)
-	$okbutton->signal_connect(clicked=> sub { $_[0]->{ok}=1; $dialog->hide; }) if $allowfiles;
+	# there is no mode in Gtk2::FileChooserDialog that let you select both files or folders (Bug #136294), so use Gtk2::FileChooserWidget directly as it doesn't interfere with the ok button (in "open" mode pressing ok in a Gtk2::FileChooserDialog while a folder is selected go inside that folder rather than emiiting the ok response with that folder selected)
+	my $dialog=Gtk2::Dialog->new($msg,undef,[], 'gtk-ok' => 'ok', 'gtk-cancel' => 'none');
+	my $filechooser=Gtk2::FileChooserWidget->new($mode);
+	$dialog->vbox->add($filechooser);
+	$dialog->set_border_width(5);			# mimick the normal open dialog
+	$dialog->get_action_area->set_border_width(5);	#
+	$dialog->vbox->set_border_width(5);		#
+	$dialog->vbox->set_spacing(5);			#
+	::SetWSize($dialog,'ChooseDir','750x580');
 
 	if ($remember_key)	{ $path= $Options{$remember_key}; }
 	elsif ($path)		{ $path= url_escape($path); }
-	$dialog->set_current_folder_uri("file://".$path) if $path;
-	$dialog->set_extra_widget($extrawidget) if $extrawidget;
-	$dialog->set_select_multiple(1) if $multiple;
+	$filechooser->set_current_folder_uri("file://".$path) if $path;
+	$filechooser->set_extra_widget($extrawidget) if $extrawidget;
+	$filechooser->set_select_multiple(1) if $multiple;
 
 	my @paths;
-	if ($dialog->run eq 'ok' || $okbutton->{ok})
-	{	for my $path ($dialog->get_uris)
+	$dialog->show_all;
+	if ($dialog->run eq 'ok')
+	{	for my $path ($filechooser->get_uris)
 		{	next unless $path=~s#^file://##;
 			$path=decode_url($path);
 			next unless -e $path;
@@ -4292,7 +4296,7 @@ sub ChooseDir
 		}
 	}
 	else {@paths=()}
-	if ($remember_key) { my $uri=$dialog->get_current_folder_uri; $uri=~s#^file://##; $Options{$remember_key}= $uri; }
+	if ($remember_key) { my $uri=$filechooser->get_current_folder_uri; $uri=~s#^file://##; $Options{$remember_key}= $uri; }
 	$dialog->destroy;
 	return @paths if $multiple;
 	return $paths[0];
