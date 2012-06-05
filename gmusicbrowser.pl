@@ -2727,25 +2727,26 @@ sub NextSongInPlaylist
 	SetPosition($pos);
 }
 
-sub GetNextSongs
-{	my $nb=shift||1;
-	my $list=($nb>1)? 1 : 0;
+sub GetNextSongs	##if no aguments, returns next song and makes the changes assuming it is to become next song (remove it from queue, ...)
+{	my ($nb,$onlyIDs)=@_; # if $nb is defined : passive query, do not make any change to queue or other things
+	my $passive= defined $nb ? 1 : 0;
+	$nb||=1;
 	my @IDs;
 	{ if (@$Queue)
-	  {	unless ($list) { my $ID=$Queue->Shift; return $ID; }
-		push @IDs,_"Queue";
+	  {	unless ($passive) { my $ID=$Queue->Shift; return $ID; }
+		push @IDs,_"Queue" unless $onlyIDs;
 		if ($nb>@$Queue) { push @IDs,@$Queue; $nb-=@$Queue; }
 		else { push @IDs,@$Queue[0..$nb-1]; last; }
 	  }
 	  if ($QueueAction)
-	  {	push @IDs, $list ? $QActions{$QueueAction}{short} : $QueueAction;
-		unless ($list || $QActions{$QueueAction}{keep}) { EnqueueAction('') }
+	  {	push @IDs, ($passive ? $QActions{$QueueAction}{short} : $QueueAction)  unless $onlyIDs;
+		unless ($passive || $QActions{$QueueAction}{keep}) { EnqueueAction('') }
 		last;
 	  }
 	  return unless @$ListPlay;
 	  $ListPlay->UpdateSort if $ToDo{'8_resort_playlist'};
 	  if ($RandomMode)
-	  {	push @IDs,_"Random" if $list;
+	  {	push @IDs,_"Random" if $passive && !$onlyIDs;
 		push @IDs,$RandomMode->Draw($nb,((defined $SongID && @$ListPlay>1)? [$SongID] : undef));
 		last;
 	  }
@@ -2760,7 +2761,7 @@ sub GetNextSongs
 			$pos=-1 if !defined $pos;
 		}
 	  }
-	  push @IDs,_"Next" if $list;
+	  push @IDs,_"Next" if $passive && !$onlyIDs;
 	  while ($nb)
 	  {	if ( $pos+$nb > $#$ListPlay )
 		{	push @IDs,@$ListPlay[$pos+1..$#$ListPlay];
@@ -2771,13 +2772,13 @@ sub GetNextSongs
 		else { push @IDs,@$ListPlay[$pos+1..$pos+$nb]; last; }
 	  }
 	}
-	return $list ? @IDs : $IDs[0];
+	return wantarray ? @IDs : $IDs[0];
 }
 
 sub PrepNextSongs
 {	if ($RandomMode) { @NextSongs=@$Queue; $#NextSongs=9 if $#NextSongs>9; }
 	else
-	{	@NextSongs= grep /^\d+$/, GetNextSongs(10); # FIXME GetNextSongs needs some changes to return only IDs, and in the GetNextSongs(1) case
+	{	@NextSongs= GetNextSongs(10,'onlyIDs');
 	}
 	my $nextID=$NextSongs[0];
 	$NextFileToPlay= defined $nextID ? Songs::GetFullFilename($nextID) : undef;
