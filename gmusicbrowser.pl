@@ -928,16 +928,6 @@ our %Options=
 	Sort		=> 'shuffle',		#default sort order
 	Sort_LastOrdered=> 'path file',
 	Sort_LastSR	=> 'shuffle',
-	WindowSizes	=>
-	{	Rename		=> '300x180',
-		MassRename	=> '650x550',
-		MassTag		=> '520x560',
-		AdvTag		=> '538x503',
-		SongInfo	=> '420x482',
-		EditSort	=> '600x320',
-		EditFilter	=> '600x260',
-		EditWRandom	=> '600x450',
-	},
 	Sessions	=> '',
 	StartCheck	=> 0,	#check if songs have changed on startup
 	StartScan	=> 0,	#scan @LibraryPath on startup for new songs
@@ -2406,10 +2396,10 @@ sub SaveRefToLines	#convert hash/array into a YAML string readable by ReadRefFro
 }
 
 sub SetWSize
-{	my ($win,$wkey)=@_;
+{	my ($win,$wkey,$default)=@_;
 	$win->set_role($wkey);
 	$win->set_name($wkey);
-	my $prevsize= $Options{WindowSizes}{$wkey};
+	my $prevsize= $Options{WindowSizes}{$wkey} || $default;
 	$win->resize(split 'x',$prevsize,2) if $prevsize;
 	$win->signal_connect(unrealize => sub
 		{ $Options{WindowSizes}{$_[1]}=join 'x',$_[0]->get_size; }
@@ -4720,7 +4710,7 @@ sub DialogMassRename
 			);
 	$dialog->set_border_width(4);
 	$dialog->set_default_response('ok');
-	SetWSize($dialog,'MassRename');
+	SetWSize($dialog,'MassRename','650x550');
 	my $table=MakeReplaceTable('talydnAYo');
 	my $combo=	NewPrefComboText('FilenameSchema');
 	my $comboFolder=NewPrefComboText('FolderSchema');
@@ -4880,7 +4870,7 @@ sub DialogRename
 	my $label_ext=Gtk2::Label->new('.'.$ext);
 	$dialog->vbox->add($table);
 	$dialog->vbox->add(Hpack('_',$entry,0,$label_ext));
-	SetWSize($dialog,'Rename');
+	SetWSize($dialog,'Rename','300x180');
 
 	$dialog->show_all;
 	$dialog->signal_connect( response => sub
@@ -5083,7 +5073,7 @@ sub DialogSongsProp
 	my $edittag=MassTag->new(@IDs);
 	$dialog->vbox->add($edittag);
 
-	SetWSize($dialog,'MassTag');
+	SetWSize($dialog,'MassTag','520x560');
 	$dialog->show_all;
 
 	$dialog->signal_connect( response => sub
@@ -5113,7 +5103,7 @@ sub DialogSongProp
 	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Tag"));
 	$notebook->append_page( $songinfo,	Gtk2::Label->new(_"Info"));
 
-	SetWSize($dialog,'SongInfo');
+	SetWSize($dialog,'SongInfo','420x482');
 	$dialog->show_all;
 
 	$dialog->signal_connect( response => sub
@@ -7292,11 +7282,11 @@ my %refs;
 INIT
 { %refs=
   (	Filter	=> [	_"Filter edition",		'SavedFilters',		_"saved filters",
-			_"name of the new filter",	_"save filter as",	_"delete selected filter"	],
+			_"name of the new filter",	_"save filter as",	_"delete selected filter",	'600x260'],
 	Sort	=> [	_"Sort mode edition",		'SavedSorts',		_"saved sort modes",
-			_"name of the new sort mode",	_"save sort mode as",	_"delete selected sort mode"	],
+			_"name of the new sort mode",	_"save sort mode as",	_"delete selected sort mode",	'600x320'],
 	WRandom	=> [	_"Random mode edition",		'SavedWRandoms',	_"saved random modes",
-			_"name of the new random mode", _"save random mode as", _"delete selected random mode"],
+			_"name of the new random mode", _"save random mode as", _"delete selected random mode",	'600x450'],
 	STGroupings => [_"SongTree groupings edition", 'SavedSTGroupings',	_"saved groupings",
 			_"name of the new grouping",	_"save grouping as",	_"delete selected grouping"],
   );
@@ -7374,7 +7364,7 @@ sub new
 	if ($self->{save_name_entry}) { $editobject->pack_start(::Hpack(Gtk2::Label->new('Save as : '),$self->{save_name_entry}), ::FALSE,::FALSE, 2); $self->{save_name_entry}->set_text($name); }
 	$self->{editobject}=$editobject;
 
-	::SetWSize($self,'Edit'.$type);
+	::SetWSize($self,'Edit'.$type,$typedata->[6]);
 	$self->show_all;
 
 	$treeview->get_selection->unselect_all;

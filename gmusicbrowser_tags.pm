@@ -1460,7 +1460,7 @@ sub advanced_cb
 	my $edittag=EditTag->new($dialog,$ID);
 	unless ($edittag) { ::ErrorMessage(_"Can't read file or invalid file"); return }
 	$dialog->vbox->add($edittag);
-	::SetWSize($dialog,'AdvTag');
+	::SetWSize($dialog,'AdvTag','540x505');
 	$dialog->show_all;
 	$self->{window}->set_sensitive(0);
 	$dialog->signal_connect( response => sub
