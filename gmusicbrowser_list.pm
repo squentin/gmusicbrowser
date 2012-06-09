@@ -3610,7 +3610,7 @@ sub DoFilter
 	{	if ($self->{literal})
 		{	my $op= $self->{regexp} ? ($self->{casesens} ? 'm' : 'mi') : ($self->{casesens} ? 's' : 'si');
 			my $fields=$self->{fields};
-			$filter= Filter->newadd(0, map($_.$op.$search, split /\|/, $self->{fields}) );
+			$filter= Filter->newadd(0, map($_.':'.$op.':'.$search, split /\|/, $self->{fields}) );
 		}
 		else
 		{	$filter= Filter->new_from_smartstring($search,$self->{casesens},$self->{regexp},$self->{fields});
