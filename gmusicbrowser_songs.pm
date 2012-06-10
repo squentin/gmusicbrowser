@@ -383,10 +383,10 @@ our %timespan_menu=
 		'filter:>'	=> '#_# .>. #VAL#',
 		'filter:<'	=> '#_# .<. #VAL#',
 		'filter:b'	=> '#_# .>=. #VAL1#  .&&.  #_# .<=. #VAL2#',
-		'filter_prep:b'	=>  \&filter_prep_numbers,
-		'filter_prep:>'	=>  \&filter_prep_numbers,
-		'filter_prep:<'	=>  \&filter_prep_numbers,
-		'filter_prep:e'	=>  \&filter_prep_numbers,
+		'filter_prep:b'	=> \&filter_prep_numbers_between,
+		'filter_prep:>'	=> \&filter_prep_numbers,
+		'filter_prep:<'	=> \&filter_prep_numbers,
+		'filter_prep:e'	=> \&filter_prep_numbers,
 		'group'		=> '#_# !=',
 		'stats:range'	=> 'push @{#HVAL#},#_#;  ---- AFTER: #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
 		'stats:average'	=> 'push @{#HVAL#},#_#;  ---- AFTER: #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
@@ -503,7 +503,7 @@ our %timespan_menu=
 	{	display	=> 'sprintf("%.1fM", #_#/1000/1000)',
 		'filter_prep:>'	=> \&::ConvertSize,
 		'filter_prep:<'	=> \&::ConvertSize,
-		'filter_prep:b'	=> \&::ConvertSize,
+		'filter_prep:b'	=> sub {sort {$a <=> $b} map ::ConvertSize($_), split / /,$_[0],2},
 		parent	=> 'integer',
 		'filterpat:value' => [ unit=> \%::SIZEUNITS, default_unit=> 'm', default_value=>1, ],
 	},
@@ -548,7 +548,7 @@ our %timespan_menu=
 		daycount=> 'do { my $t=(time-( #_# ) )/86400; ($t<0)? 0 : $t}', #for random mode
 		'filter_prep:>ago'	=> \&::ConvertTime,
 		'filter_prep:<ago'	=> \&::ConvertTime,
-		'filter_prep:bago'	=> \&::ConvertTime,
+		'filter_prep:bago'	=> sub {sort {$a <=> $b} map ::ConvertTime($_), split / /,$_[0],2},
 		'filter:>ago'	=> '#_# .<. #VAL#',
 		'filter:<ago'	=> '#_# .>. #VAL#',
 		'filter:bago'	=> '#_# .>=. #VAL1#  .&&.  #_# .<=. #VAL2#',
@@ -667,13 +667,13 @@ our %timespan_menu=
 		'filter:>'	=> '.!!. do{ grep($_ > #VAL#, #get_list#) }',
 		'filter:<'	=> '.!!. do{ grep($_ < #VAL#, #get_list#) }',
 		'filter:b'	=> '.!!. do{ grep($_ >= #VAL1# && $_ <= #VAL2#, #get_list#) }',
-		'filter_prep:>'	=>  \&filter_prep_numbers,
-		'filter_prep:<'	=>  \&filter_prep_numbers,
-		'filter_prep:e'	=>  \&filter_prep_numbers,
-		'filter_prep:b'	=>  \&filter_prep_numbers,
+		'filter_prep:>'	=> \&filter_prep_numbers,
+		'filter_prep:<'	=> \&filter_prep_numbers,
+		'filter_prep:e'	=> \&filter_prep_numbers,
+		'filter_prep:b'	=> \&filter_prep_numbers_between,
 		'filter_prep:>ago'	=> \&::ConvertTime,
 		'filter_prep:<ago'	=> \&::ConvertTime,
-		'filter_prep:bago'	=> \&::ConvertTime,
+		'filter_prep:bago'	=> sub {sort {$a <=> $b} map ::ConvertTime($_), split / /,$_[0],2},
 		'filter:>ago'	=> '.!!. do{ grep($_ < #VAL#, #get_list#) }',
 		'filter:<ago'	=> '.!!. do{ grep($_ > #VAL#, #get_list#) }',
 		'filter:bago'	=> '.!!. do{ grep($_ >= #VAL1# && $_ <= #VAL2#, #get_list#) }',
@@ -1517,6 +1517,7 @@ sub Field_filter_choices
 	return \%filters;
 }
 sub filter_prep_numbers { $_[0]=~m/(-?\d*\.?\d+)/; return $1 || 0 }
+sub filter_prep_numbers_between { sort {$a <=> $b} map filter_prep_numbers($_), split / /,$_[0],2 }
 sub FilterCode
 {	my ($field,$cmd,$pat,$inv)=@_;
 	my ($code,$convert)=LookupCode($field, "filter:$cmd", "filter_prep:$cmd");
@@ -1526,7 +1527,7 @@ sub FilterCode
 	$code=~s/#ID#/\$_/g;
 	if ($inv)	{$code=~s#$Filter::OpRe#$Filter::InvOp{$1}#go}
 	else		{$code=~s#$Filter::OpRe#$1 eq '!!' ? '' : $1#ego}
-	if ($code=~m/#VAL1#/) { my ($p1,$p2)= map $convert->($_), split / /,$pat; ($p1,$p2)=($p2,$p1) if $p1>$p2; $code=~s/#VAL1#/$p1/g; $code=~s/#VAL2#/$p2/g; }
+	if ($code=~m/#VAL1#/) { my @p= $convert->($pat); $code=~s/#VAL(\d)#/$p[$1-1]/g; }
 	else { my $p=$convert->($pat,$field); $code=~s/#VAL#/$p/g; }
 	return $code;
 }
