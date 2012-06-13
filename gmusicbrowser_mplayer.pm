@@ -178,8 +178,7 @@ sub AdvancedOptions
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $opt=::NewPrefEntry('mplayeroptions',_"mplayer options :", sizeg1=>$sg1);
 	my $cmd=::NewPrefEntry('mplayer_cmd',_"mplayer executable :", cb=> \&init, tip=>_"Will use default if not found", sizeg1=>$sg1);
-	my $replaygain= ::NewPrefCheckButton(mplayer_use_replaygain => _"Use ReplayGain", tip=>_"Set options in gstreamer's replaygain dialog");
-	$vbox->pack_start($_,::FALSE,::FALSE,2), for $cmd,$opt,$replaygain;
+	$vbox->pack_start($_,::FALSE,::FALSE,2), for $cmd,$opt;
 	VolInit() unless defined $SoftVolume;
 	$vbox->pack_start(Play_amixer::make_option_widget(),::FALSE,::FALSE,2) unless $SoftVolume;
 	return $vbox;

@@ -458,7 +458,7 @@ our %timespan_menu=
 	float	=>	#make sure the string doesn't have the utf8 flag, else substr won't work
 	{	_		=> 'unpack("F",substr(____,#ID#<<3,8))',
 		display		=> 'do {my $v=#_#; (#v_is_nan# ? "" : sprintf("#displayformat#", $v ))}',	# replace novalue (NaN) with ""
-		get		=> 'do {my $v=#_#; (#v_is_nan# ? "" : sprintf("%g", $v))}',		#
+		get		=> 'do {my $v=#_#; (#v_is_nan# ? "" : $v ); }',					#
 		diff		=> ($nan==$nan ? 'do {my $new=#VAL#; $new=#nan# unless length $new; $new!=#_# }' :
 						 'do {my $new=#VAL#; $new=#nan# unless length $new; my $v=#_#; $new!=$v && ($new==$new || ! #v_is_nan#) }'),
 		displayformat	=> '%.2f',

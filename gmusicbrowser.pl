@@ -2007,7 +2007,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		ReadRefFromLines($lines{Options},\%Options);
 		$oldversion||=delete $Options{version} || VERSION;  # for version <=1.1.7
 		if ($oldversion>VERSION) { warn "Loading a gmbrc saved with a more recent version of gmusicbrowser, try upgrading gmusicbrowser if there are problems\n"; }
-		if ($oldversion<1.1007) {delete $Options{$_} for qw/Diacritic_sort gst_volume Simplehttp_CacheSize/;} #cleanup old options
+		if ($oldversion<1.10091) {delete $Options{$_} for qw/Diacritic_sort gst_volume Simplehttp_CacheSize mplayer_use_replaygain/;} #cleanup old options
 		$Options{AutoRemoveCurrentSong}= delete $Options{TAG_auto_check_current} if $oldversion<1.1005 && exists $Options{TAG_auto_check_current};
 		$Options{PlayedMinPercent}= 100*delete $Options{PlayedPercent} if exists $Options{PlayedPercent};
 		if ($Options{ArtistSplit}) # for versions <= 1.1.5
