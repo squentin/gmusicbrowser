@@ -616,7 +616,7 @@ sub bus_message_tag
 	if ($::debug)
 	{	warn "done for ID=$cID\n";
 		warn "done for album IDs=".join(' ',@{$RGA_pipeline->{albumIDs}})."\n" if $RGA_pipeline->{albumIDs} && $RGA_pipeline->get_by_name('rganalysis')->get('num-tracks');
-		warn " $_ : @{$tags->{$_}}\n" for keys %$tags;
+		for my $f (sort keys %$tags) { my @v=@{$tags->{$f}}; warn " $f : @v\n" }
 	}
 	if ($RGA_pipeline->{albumIDs})
 	{	$RGA_pipeline->{album_tosave}{ $cID }= [@$tags{'replaygain-track-gain','replaygain-track-peak'}];
