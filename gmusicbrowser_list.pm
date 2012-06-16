@@ -2585,6 +2585,7 @@ sub new
 	$treeview->append_column($column);
 	$self->add($treeview);
 	$self->{treeview}=$treeview;
+	$self->{DefaultFocus}=$treeview;
 
 	$self->signal_connect(map => \&Fill);
 
@@ -2757,6 +2758,7 @@ sub new
 
 	$self->add($treeview);
 	$self->{treeview}=$treeview;
+	$self->{DefaultFocus}=$treeview;
 
 	$self->signal_connect(map => \&Fill);
 
@@ -2947,6 +2949,7 @@ sub new
 	my $self = bless Gtk2::VBox->new(FALSE, 4), $class;
 	my $store=Gtk2::TreeStore->new(('Glib::String')x4,'Glib::Boolean');
 	$self->{treeview}=my $treeview=Gtk2::TreeView->new($store);
+	$self->{DefaultFocus}=$treeview;
 	$treeview->set_headers_visible(FALSE);
 	my $renderer0=Gtk2::CellRendererPixbuf->new;
 	my $renderer1=Gtk2::CellRendererText->new;

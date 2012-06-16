@@ -131,6 +131,7 @@ sub new
 	}
 	$self->{buffer}=$textview->get_buffer;
 	$self->{textview}=$textview;
+	$self->{DefaultFocus}=$textview;
 	my $sw=Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type( $options->{shadow} || 'etched-in');
 	$sw->set_policy('automatic','automatic');

@@ -324,6 +324,7 @@ sub new
 	$status->{id}=$status->get_context_id('link');
 	($self->{embed},my $container)= $self->new_embed;
 	$container||=$self->{embed};
+	$self->{DefaultFocus}=$self->{embed};
 	$self->{embed}->signal_connect(button_press_event=> \&button_press_cb);
 	my $entry=$self->{Entry}=Gtk2::Entry->new;
 	my $back= $self->{BBack}=Gtk2::ToolButton->new_from_stock('gtk-go-back');
