@@ -116,6 +116,7 @@ sub new
 
 	my $textview=Gtk2::TextView->new;
 	$self->signal_connect(map => sub { $_[0]->SongChanged( ::GetSelID($_[0]) ); });
+	$self->signal_connect_after(key_press_event	=> \&key_pressed_cb);
 	$textview->signal_connect(button_release_event	=> \&button_release_cb);
 	$textview->signal_connect(motion_notify_event 	=> \&update_cursor_cb);
 	$textview->signal_connect(visibility_notify_event=>\&update_cursor_cb);
@@ -609,6 +610,23 @@ sub load_pixbuf
 #		else { $buffer->insert($iter, $_);}
 #	}
 #}
+my %zoomkeymap;
+BEGIN { %zoomkeymap=( plus=>1, minus=>-1, KP_Add=>1, KP_Subtract=>-1 ); }
+sub key_pressed_cb
+{	my ($self,$event)=@_;
+	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
+	my $state=$event->get_state;
+	my $ctrl= $state * ['control-mask'] && !($state * [qw/mod1-mask mod4-mask super-mask/]); #ctrl and not alt/super
+	return 0 unless $ctrl; #only ctrl- shortcuts so far
+	if (lc$key eq 'e') { $self->SetEditable(!$self->{edit}); }
+	elsif (exists $zoomkeymap{$key})
+	{	my $size= $self->{fontsize_adj}->get_value;
+		$size+= $zoomkeymap{$key};
+		$self->{fontsize_adj}->set_value($size);
+	}
+	else {return 0}
+	return 1;
+}
 
 sub scroll_cb	#zoom with ctrl-wheel
 {	my ($textview,$event) = @_;
