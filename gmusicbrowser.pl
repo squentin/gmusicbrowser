@@ -2275,12 +2275,12 @@ sub ReadRefFromLines	# convert a string written by SaveRefToLines to a hash/arra
 {	my ($lines,$return)=@_;
 	my @todo;
 	my ($ident,$ref)=(0,$return);
-	my $parentval;
+	my $parentval; my @objects;
 	for my $line (@$lines)
 	{	next if $line=~m/^\s*(?:#|$)/;	#skip comment or empty line
 		my ($d,$array,$key,$val)= $line=~m/^(\s*)(?:(-)|(?:("[^"]*"|\S*)\s*:))\s*(.*)$/;
 		$d= length $d;
-		if ($parentval)
+		if ($parentval)		#first value of new array or hash
 		{	next unless $d>=$ident;
 			push @todo, $ref,$ident;
 			$ident=$d;
@@ -2293,16 +2293,17 @@ sub ReadRefFromLines	# convert a string written by SaveRefToLines to a hash/arra
 		}
 		if (!$array && $key=~s/^"//) { $key=~s/"$//; $key=~s#\\x([0-9a-fA-F]{2})#chr hex $1#ge; }
 		$val=~s/\s+$//;
-		if ($val eq '')
-		{	$parentval= $array ? \$ref->[@$ref] : \$ref->{$key};
+		my $class;
+		if ($val=~m/^!/) #object
+		{	if ($val=~s/^!([^ !]+)\s*//) {$class=$1}
+			else { warn "Unsupported value : '$val'\n"; next }
 		}
-		else
-		{	my $class;
-			if ($val=~m/^!/)
-			{	($class,$val)= $val=~m/^!([^ !]+)\s+(.*)$/;
-				unless ($class) { warn "Unsupported value : '$val'\n"; next }
-			}
-			if ($val eq '~') {$val=undef}
+		if ($val eq '')	#array or hash or object as array/hash
+		{	$parentval= $array ? \$ref->[@$ref] : \$ref->{$key};
+			push @objects, $class,$parentval if $class;
+		}
+		else		#scalar or empty array/hash or object as string
+		{	if ($val eq '~') {$val=undef}
 			elsif ($val=~m/^'(.*)'$/) {$val=$1; $val=~s/''/'/g; }
 			elsif ($val=~m/^"(.*)"$/)
 			{	$val=$1;
@@ -2316,21 +2317,25 @@ sub ReadRefFromLines	# convert a string written by SaveRefToLines to a hash/arra
 			else		{ $ref->{$key}=$val; }
 		}
 	}
+	while (@objects)
+	{	my ($class,$ref)= splice @objects,-2; #start with the end -> if object contain other objects they will be created first
+		$$ref= $class->new_from_string($$ref);
+	}
 	return @todo ? $todo[0] : $ref;
 }
 
 
 sub SaveRefToLines	#convert hash/array into a YAML string readable by ReadRefFromLines
 {	my $ref=$_[0];
-	my (@todo,$keylist);
+	my (@todo,$keylist,$ref_is_array);
 	my $lines='';
 	my $pre='';
 	my $depth=0;
-	if (ref $ref eq 'ARRAY'){ $keylist=0; }
+	if (ref $ref eq 'ARRAY'){ $keylist=0; $ref_is_array=1; }
 	else			{ $keylist=[sort keys %$ref]; }
 	while (1)
 	{	my ($val,$next,$up);
-		if (ref $ref eq 'ARRAY')
+		if ($ref_is_array) #ARRAY
 		{	if ($keylist<@$ref)
 			{	$val=$ref->[$keylist++];
 				$lines.= $pre.'-';
@@ -2353,19 +2358,24 @@ sub SaveRefToLines	#convert hash/array into a YAML string readable by ReadRefFro
 			else {$up=1}
 		}
 		if ($next)
-		{	if (ref $next ne 'ARRAY' && ref $next ne 'HASH')
+		{	my $is_array= ref $next eq 'ARRAY';
+			my $is_string;
+			if (!$is_array && ref $next ne 'HASH') #save object
 			{	$val=$next->save_to_string;
-				$lines.= ' !'.ref($next).' ';
+				$lines.= ' !'.ref($next);
+				if (!ref $val) { $is_string=1 }
+				else { $next=$val; $is_array= UNIVERSAL::isa($val,"ARRAY") ? 1 : 0; }
 			}
-			else
-			{	if (ref $next eq 'ARRAY' && !@$next)		{ $lines.=" []\n";next; }
-				elsif (ref $next eq 'HASH' && !keys(%$next))	{ $lines.=" {}\n";next; }
+			if (!$is_string)
+			{	if    ( $is_array && !@$next)		{ $lines.=" []\n";next; }
+				elsif (!$is_array && !keys(%$next))	{ $lines.=" {}\n";next; }
 				$lines.="\n";
 				$depth++;
 				$pre='  'x$depth;
-				unshift @todo,$ref,$keylist;
+				push @todo,$ref,$ref_is_array,$keylist;
 				$ref=$next;
-				if (ref $ref eq 'ARRAY'){ $keylist=0; }
+				$ref_is_array= $is_array;
+				if ($ref_is_array)	{ $keylist=0; }
 				else			{ $keylist=[sort keys %$ref]; }
 				next;
 			}
@@ -2374,8 +2384,7 @@ sub SaveRefToLines	#convert hash/array into a YAML string readable by ReadRefFro
 		{	if ($depth)
 			{	$depth--;
 				$pre='  'x$depth;
-				$ref=shift @todo;
-				$keylist=shift @todo;
+				($ref,$ref_is_array,$keylist)= splice @todo,-3;
 				next;
 			}
 			else {last}
