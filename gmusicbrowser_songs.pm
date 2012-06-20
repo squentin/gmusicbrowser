@@ -3093,10 +3093,11 @@ sub GetIDs
 }
 
 sub GrepKeys
-{	my ($field,$string,$list)=@_;
+{	my ($field,$string,$is_regexp,$is_casesens,$list)=@_;
 	$list||=GetAAList($field);
 	return [@$list] unless length $string;	# m// use last regular expression used
-	my $re=qr/\Q$string\E/i;
+	$string=quotemeta $string unless $is_regexp;
+	my $re= $is_casesens ? qr/$string/ : qr/$string/i;
 	my $displaysub=Songs::DisplayFromGID_sub($field);
 	my @l=grep $displaysub->($_)=~m/$re/i, @$list;	#FIXME optimize ?
 	return \@l;
