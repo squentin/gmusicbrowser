@@ -56,7 +56,7 @@ my $albuminfowidget =
 {	class		=> __PACKAGE__,
 	tabicon		=> 'plugin-albuminfo',
 	tabtitle	=> _"Albuminfo",
-	schange		=> \&song_changed,
+	schange		=> sub { $_[0]->song_changed },
 	group		=> 'Play',
 	autoadd_type	=> 'context page text',
 };
@@ -106,7 +106,7 @@ sub prefbox {
 		push(@chk_fields, ::NewPrefCheckButton(OPT.$field=>_(ucfirst($field)."s"), tip=>_"Note: inactive fields must be enabled by the user in the 'Fields' tab in Settings"));
 		$chk_fields[-1]->set_sensitive(0) unless Songs::FieldEnabled($field);
 	}
-	my ($radio_add,$radio_rpl) = ::NewPrefRadio(OPT.'ReplaceFields',undef,_"Add to existing values",1,_"Replace existing values",0);
+	my ($radio_add,$radio_rpl) = ::NewPrefRadio(OPT.'ReplaceFields',[_"Add to existing values",1, _"Replace existing values",0]);
 	my $chk_saveflds = ::NewPrefCheckButton(OPT.'SaveFields'=>_"Auto-save fields with data from allmusic", widget=>::Vpack(\@chk_fields, $radio_add, $radio_rpl),
 		tip=>_"Save selected fields for all tracks on the same album whenever album data is loaded from allmusic or from file.");
 	$frame_fields->add(::Vpack($chk_join, $chk_saveflds));
@@ -202,7 +202,7 @@ sub new {
 	$statbox->pack_start($self->{ratingpic},0,0,2);
 
 	# "Refresh", "save" and "search" buttons
-	my $refreshbutton = ::NewIconButton('gtk-refresh', undef, sub { song_changed(::find_ancestor($_[0],__PACKAGE__),undef,undef,1); }, "none", _"Refresh");
+	my $refreshbutton = ::NewIconButton('gtk-refresh', undef, sub { song_changed($_[0],'force'); }, "none", _"Refresh");
 	my $savebutton	  = ::NewIconButton('gtk-save', undef, sub
 		{my $self=::find_ancestor($_[0],__PACKAGE__); save_review(::GetSelID($self),$self->{fields})}, "none", _"Save review");
 	$savebutton->show_all;
@@ -294,9 +294,8 @@ sub new {
 	$Bsearch->signal_connect(clicked  => \&new_search );
 	$Bok    ->signal_connect(clicked  => \&entry_selected_cb );
 	$Bcancel->signal_connect(clicked  => \&song_changed );
-	$scrwin ->signal_connect(key_press_event => sub {entry_selected_cb(::find_ancestor($_[0],__PACKAGE__)) if $_[1]->keyval == $Gtk2::Gdk::Keysyms{Return};});
-	$scrwin ->signal_connect(key_press_event => sub {song_changed(::find_ancestor($_[0],__PACKAGE__))      if $_[1]->keyval == $Gtk2::Gdk::Keysyms{Escape};});
-	$search ->signal_connect(key_press_event => sub {song_changed(::find_ancestor($_[0],__PACKAGE__))      if $_[1]->keyval == $Gtk2::Gdk::Keysyms{Escape};});
+	$scrwin ->signal_connect(key_press_event => sub {entry_selected_cb($_[0]) if $_[1]->keyval == $Gtk2::Gdk::Keysyms{Return};});
+	$scrwin ->signal_connect(key_press_event => sub {song_changed($_[0])      if $_[1]->keyval == $Gtk2::Gdk::Keysyms{Escape};});
 	$searchview->show_all(); # Must call it once now before $searchview->set_no_show_all(1) disables it.
 	$searchview->set_no_show_all(1); # GMB sometimes calls $plugin->show_all(). We then want only infoview to show.
 	$searchview->hide();
@@ -551,12 +550,13 @@ sub entry_selected_cb {
 #
 #####################################################################
 sub song_changed {
-	my ($widget,$tmp,$group,$force) = @_; # $tmp = ::GetSelID($self), but not always. So we don't use it. $group is also not used.
+	my ($widget,$force) = @_;
 	my $self = ::find_ancestor($widget, __PACKAGE__);
 	return unless $self->mapped() || $::Options{OPT.'SaveFields'};
 	$self->{infoview}->show();
 	$self->{searchview}->hide();
 	my $ID = ::GetSelID($self);
+	return unless defined $ID;
 	my $aID = Songs::Get_gid($ID,'album');
 	return unless $aID;
 	if (!$self->{aID} || $aID != $self->{aID} || $force) { # Check if album has changed or a forced update is required.

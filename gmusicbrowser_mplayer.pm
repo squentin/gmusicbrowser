@@ -16,9 +16,11 @@ use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 #$SIG{CHLD} = sub { while (waitpid(-1, WNOHANG)>0) {} };
 
 my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill,$Kill9);
+my $Error;
 my $CMDfh;
 my (%supported,$mplayer);
 my $SoftVolume;
+my $GainFactor=1;
 
 $::PlayPacks{Play_mplayer}=1; #register the package
 
@@ -31,7 +33,7 @@ sub init
 	$mplayer ||= ::first { -x $_ } map $_.::SLASH.'mplayer',  split /:/, $ENV{PATH};
 
 	return unless $mplayer;
-	return bless {},__PACKAGE__;
+	return bless {RG=>1},__PACKAGE__;	#FIXME RG should be 0 if replaygain tags are disabled or if not $SoftVolume
 }
 
 sub supported_formats
@@ -60,11 +62,14 @@ sub VolInit
 sub Play
 {	(undef,$file,my$sec)=@_;
 	&Stop if $ChildPID;
+	$Error=undef;
 	#if ($ChildPID) { print $CMDfh "loadfile $file\n"; print $CMDfh "seek $sec 2\n" if $sec; return}
-	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -nolirc/);
-	push @cmd_and_args, qw/-softvol -volume/, cubicvolume($::Volume) if $SoftVolume;
+	#-nocache because when using the cache option it spawns a child process, which makes monitoring the mplayer process much harder
+	#-hr-mp3-seek to fix wrong time with some mp3s
+	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -nolirc -hr-mp3-seek -msglevel all=1:statusline=5/);
+	RG_set_options();
+	push @cmd_and_args, qw/-softvol -volume/, convertvolume($::Volume) if $SoftVolume;
 	warn "@cmd_and_args\n" if $::debug;
-	#push @cmd_and_args,$device_option,$device unless $device eq 'default';
 	push @cmd_and_args,split / /,$::Options{mplayeroptions} if $::Options{mplayeroptions};
 	push @cmd_and_args,'-ss',$sec if $sec;
 	push @cmd_and_args,'-ac','ffwavpack' if $file=~m/\.wvc?$/;
@@ -97,24 +102,32 @@ sub Play
 }
 
 sub _eos_cb
-{	#close $OUTPUTfh;
+{	my $error;
+	_remotemsg();#parse last lines
+	#close $OUTPUTfh;
+	if ($ChildPID && $ChildPID==waitpid($ChildPID, WNOHANG))
+	{	$Error=_"Check your audio settings" if $?;
+	}
 	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	Glib::Source->remove($WatchTag);
 	Glib::Source->remove($WatchTag2);
 	$WatchTag=$WatchTag2=$ChildPID=undef;
+	if ($Error) { ::ErrorPlay($Error,_("Command used :")."\n@cmd_and_args"); }
 	::end_of_file;
 	return 1;
 }
 
+
 sub _remotemsg
-{	my $buf;
-	my @line=(<$OUTPUTfh>);
-	my $line=pop @line; #only read the last line
-	chomp $line;
-	if ($line=~m/^A:\s*(\d+).\d /)
-	{	::UpdateTime( $1 );
+{	my @lines=(<$OUTPUTfh>);
+	for (reverse @lines)
+	{	if (m#^A:\s*(\d+)\.(\d) #) { ::UpdateTime( $1+($2>=5?1:0) ); return 1 }
+		# check if known error message
+		$Error=$1 if	m#(Could not open/initialize audio device)#	||
+				m#(Failed to open .+)#				||
+				m#(Failed to recognize file format)#;
 	}
-	elsif ($::debug) {warn "mplayer:$_\n" for @line,$line}
+	warn join("mplayer:$_",'',@lines) if $::debug;
 	return 1;
 }
 
@@ -160,10 +173,6 @@ sub _Kill_timeout	#make sure old children are dead
 	return @pidToKill;	#removes the timeout if no more @pidToKill
 }
 
-sub error
-{	::ErrorPlay(join(' ',@cmd_and_args)." :\n".$_[0]);
-}
-
 sub AdvancedOptions
 {	my $vbox=Gtk2::VBox->new(::FALSE, 2);
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
@@ -188,21 +197,41 @@ sub SetVolume
 	elsif	($set=~m/(\d+)/)	{ $::Volume =$1; }
 	$::Volume=0   if $::Volume<0;
 	$::Volume=100 if $::Volume>100;
-	my $cubicvol= cubicvolume($::Volume);	#use a cubic volume scale
-	print $CMDfh "volume $cubicvol 1\n" if $ChildPID;
+	my $vol= convertvolume($::Volume);	#use a cubic volume scale and apply $GainFactor
+	print $CMDfh "volume $vol 1\n" if $ChildPID;
 	::HasChanged('Vol');
 	$::Options{Volume}=$::Volume;
 	$::Options{Volume_mute}=$::Mute;
 }
 
-sub cubicvolume	#convert a linear volume to cubic volume scale
+sub convertvolume	#convert a linear volume to cubic volume scale and apply $GainFactor
 {	my $vol=$_[0];
 	$vol= 100*($vol/100)**3;
+	$vol*= $GainFactor;
 	# will be sent to mplayer as string, make sure it use a dot as decimal separator
 	::setlocale(::LC_NUMERIC, 'C');
 	$vol="$vol";
 	::setlocale(::LC_NUMERIC, '');
 	return $vol;
+}
+
+sub RG_set_options
+{	return unless $SoftVolume;
+	if ($::Options{gst_use_replaygain})
+	{	my ($gain1,$gain2,$peak1,$peak2)= Songs::Get($::PlayingID, qw/replaygain_track_gain replaygain_album_gain replaygain_track_peak replaygain_album_peak/);
+		($gain1,$gain2,$peak1,$peak2)= ($gain2,$gain1,$peak1,$peak2) if $::Options{gst_rg_albummode};
+		my $gain= ::first { $_ ne '' } $gain1, $gain2, $::Options{gst_rg_fallback};
+		$gain+= $::Options{gst_rg_preamp};
+		$GainFactor= 10**($gain/20);
+		my $peak= $peak1 || $peak2 || 1;
+		my $invpeak= 1/$peak;
+		warn "gain=$gain peak=$peak => scale factor=min($GainFactor,$invpeak)\n" if $::debug;
+		$GainFactor= $invpeak if $invpeak<$GainFactor; #clipping prevention, make it an option ?
+	}
+	else {$GainFactor=1}
+	return unless $ChildPID;
+	my $vol= convertvolume($::Volume);
+	print $CMDfh "volume $vol 1\n";
 }
 
 #sub sendcmd {print $CMDfh "$_[0]\n";} #DEBUG #Play_mplayer::sendcmd('volume 0')

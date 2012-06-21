@@ -95,7 +95,7 @@ sub supported_sinks
 sub init
 {	return undef unless $GST_ok;
 	#createPlayBin();
-	return bless { EQ=>$GST_EQ_ok, visuals => $GST_visuals_ok },__PACKAGE__;
+	return bless { EQ=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
 }
 
 sub createPlayBin
@@ -446,56 +446,15 @@ sub Stop
 
 sub RG_set_options
 {	my ($rgv,$rgl)=@_;
+	return unless $::PlayBin;
 	$rgv||=$PlayBin->get_by_name('rgvolume');
 	$rgl||=$PlayBin->get_by_name('rglimiter');
 	return unless $rgv && $rgl;
-	$rgl->set(enabled => 0) if $::Options{gst_rg_nolimiter};
-	$rgv->set('album-mode' => 1) if $::Options{gst_rg_albummode};
-	$rgv->set('pre-amp' => $::Options{gst_rg_preamp}||0);
-	$rgv->set('fallback-gain' => $::Options{gst_rg_fallback}||0);
+	$rgl->set(enabled	=> !$::Options{gst_rg_nolimiter});
+	$rgv->set('album-mode'	=> !!$::Options{gst_rg_albummode});
+	$rgv->set('pre-amp'	=> $::Options{gst_rg_preamp}||0);
+	$rgv->set('fallback-gain'=>$::Options{gst_rg_fallback}||0);
 	#$rgv->set(headroom => $::Options{gst_rg_headroom}||0);
-}
-
-sub RG_PrefBox
-{	my ($sg1,$sg2)=@_;
-	my $check=::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain", tip=>_"Normalize volume (the files must have replaygain tags)");
-	$sg1->add_widget($check);
-	#my $start=Gtk2::Button->new(_ "Start ReplayGain analysis");
-	my $opt  =Gtk2::Button->new(_"ReplayGain options");
-	$sg2->add_widget($opt);
-	$opt->signal_connect(clicked => sub
-		{	if ($RG_dialog) {$RG_dialog->force_present;return}
-			$RG_dialog= Gtk2::Dialog->new (_"ReplayGain options", undef, [], 'gtk-close' => 'close');
-			$RG_dialog->signal_connect(destroy => sub {$RG_dialog=undef});
-			$RG_dialog->signal_connect(response =>sub {$_[0]->destroy});
-			my $update=sub { RG_set_options(); };
-			my $songmenu=::NewPrefCheckButton(gst_rg_songmenu => _("Show replaygain submenu").' '._"(unstable)");
-			my $albummode=::NewPrefCheckButton(gst_rg_albummode => _"Album mode", cb=>$update, tip=>_"Use album normalization instead of track normalization");
-			my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter", cb=>$update, tip=>_"Used for clipping prevention");
-			my $sg1=Gtk2::SizeGroup->new('horizontal');
-			my $sg2=Gtk2::SizeGroup->new('horizontal');
-			my $preamp=	::NewPrefSpinButton('gst_rg_preamp',   -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"pre-amp : %d dB", tip=>_"Extra gain");
-			my $fallback=	::NewPrefSpinButton('gst_rg_fallback', -60,60, cb=>$update, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"fallback-gain : %d dB", tip=>_"Gain for songs missing replaygain tags");
-			$RG_dialog->vbox->pack_start($_,0,0,2) for $albummode,$preamp,$fallback,$nolimiter,$songmenu;
-			$RG_dialog->show_all;
-
-		});
-	#$start->signal_connect(clicked => sub
-	#	{	my @list; my %done;
-	#		for my $ID (@::Library)
-	#		{	my $albumid=Songs::Get_gid($ID,'album');
-	#			my $l=AA::GetIDs('album',$albumid);
-	#			if (@$l>1 && Songs::Gid_to_get('album',$album) ne '')
-	#			{ push @list,[@$l] unless exists $done{$album}; $done{$aid}=undef; }
-	#			else { push @list,$ID; }
-	#		}
-	#		Analyse(\@list);
-	#	});
-	#$start->signal_connect(clicked => sub { Analyse(\@::Library) });
-	#$start->set_sensitive(0) unless $GST_RGA_ok;
-	my $box=::Hpack($check,$opt);
-	$box->set_sensitive(0) unless $GST_RG_ok;
-	return $box;
 }
 
 sub AdvancedOptions
@@ -528,10 +487,29 @@ my $RGA_songmenu=
  [	{ label => _"Scan this file",			code => sub { Analyse ($_[0]{IDs}); },		onlyone => 'IDs', },
 	{ label => _"Scan per-file track gain",		code => sub { Analyse ($_[0]{IDs}); },		onlymany=> 'IDs', },
 	{ label => _"Scan using tag-defined album", 	code => sub { Analyse_byAlbum ($_[0]{IDs}); },	onlymany=> 'IDs', },
-	{ label => _"Scan as an album",			code => sub { Analyse([ $_[0]{IDs} ]); },	onlymany=> 'IDs', },
+	{ label => _"Scan as an album",			code => sub { Analyse(join " ",@{ $_[0]{IDs} }); },	onlymany=> 'IDs', },
  ],
 };
 push @::SongCMenu,$RGA_songmenu;
+
+sub Analyse_full
+{	my $added='';
+	my @todo;
+	my $IDs_in_album=  Filter->new('album:-e:')->filter;	#get songs with an album name
+	my ($again,$apeak,$ids)=Songs::BuildHash('album',$IDs_in_album,undef,'replaygain_album_gain:same','replaygain_album_peak:same','id:list');
+	for my $aid (keys %$again)
+	{	next if @{$ids->{$aid}}<2;	#ignore albums with less than 2 songs
+		my $gain= $again->{$aid};
+		my $peak= $apeak->{$aid};
+		next if $gain==$gain && $peak==$peak;	#NaN : album gain/peak not defined or not the same for all songs from album
+		my $IDs= $ids->{$aid};
+		push @todo,join ' ',@$IDs;
+		vec($added,$_,1)=1 for @$IDs;
+	}
+	my $IDs_no_rg= Filter->newadd(0, 'replaygain_track_gain:-defined:1', 'replaygain_track_peak:-defined:1')->filter;
+	push @todo, grep !vec($added,$_,1), @$IDs_no_rg;
+	Analyse(\@todo) if @todo;
+}
 
 sub Analyse_byAlbum
 {	my @IDs= ::uniq(@{ $_[0] });
@@ -540,12 +518,12 @@ sub Analyse_byAlbum
 	for my $aid (keys %$hash)
 	{	my $IDs= $hash->{$aid};
 		if (@$IDs<2 || Songs::Gid_to_Get('album',$aid) eq '') { push @list, @$IDs; } #no album name or only 1 song in album => push as single songs
-		else { push @list, $IDs; } # push as an album
+		else { push @list, join ' ',$IDs; } # push as an album
 	}
 	Analyse(\@list);
 }
 sub Analyse
-{	my @IDs= ::uniq(@{ $_[0] });
+{	my $IDs= shift;
 	unless ($RGA_pipeline)
 	{	$RGA_pipeline=GStreamer::Pipeline->new('RGA_pipeline');
 		my $audiobin=GStreamer::Bin->new('RGA_audiobin');
@@ -572,9 +550,10 @@ sub Analyse
 		$bus->signal_connect('message::eos' => \&process_next);
 		#FIXME check errors
 	}
-	push @{$RGA_pipeline->{queue}},@IDs;
-	my $nb=@IDs; #warn "@IDs";
-	$nb+=@$_-1 for grep ref, @IDs; #count tracks in album lists
+	my $queue= $RGA_pipeline->{queue}||= [];
+	my $nb=0; for my $q (@$queue) { $nb++ for $q=~m/\d+/g; } #count tracks in album lists
+	@$queue= ::uniq(@$queue,@$IDs); #remove redundant IDs
+	$nb=-$nb; for my $q (@$queue) { $nb++ for $q=~m/\d+/g; } #count nb of added tracks
 	::Progress('replaygain', add=>$nb, abortcb=>\&StopAnalysis, title=>_"Replaygain analysis");
 	process_next() unless $::Progress{replaygain}{current}; #FIXME maybe check if $RGA_pipeline is running instead
 }
@@ -603,10 +582,11 @@ sub process_next
 	$RGA_pipeline->set_state('ready');
 	unless (defined $ID) { $ID=shift @{$RGA_pipeline->{queue}}; };
 	if (defined $ID)
-	{	if (ref $ID) #album mode
-		{	my $list=$RGA_pipeline->{albumIDs}=$ID;
-			$rganalysis->set('num-tracks' => scalar @$list);
-			$ID=$list->[0];
+	{	my @list= split / +/,$ID;
+		if (@list>1) #album mode
+		{	$RGA_pipeline->{albumIDs}= \@list;
+			$rganalysis->set('num-tracks' => scalar @list);
+			$ID=$list[0];
 			$RGA_pipeline->{album_i}=0;
 		}
 		my $f= Songs::Get($ID,'fullfilename_raw');
@@ -636,7 +616,7 @@ sub bus_message_tag
 	if ($::debug)
 	{	warn "done for ID=$cID\n";
 		warn "done for album IDs=".join(' ',@{$RGA_pipeline->{albumIDs}})."\n" if $RGA_pipeline->{albumIDs} && $RGA_pipeline->get_by_name('rganalysis')->get('num-tracks');
-		warn " $_ : @{$tags->{$_}}\n" for keys %$tags;
+		for my $f (sort keys %$tags) { my @v=@{$tags->{$f}}; warn " $f : @v\n" }
 	}
 	if ($RGA_pipeline->{albumIDs})
 	{	$RGA_pipeline->{album_tosave}{ $cID }= [@$tags{'replaygain-track-gain','replaygain-track-peak'}];

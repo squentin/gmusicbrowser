@@ -470,7 +470,7 @@ sub CommonInit
 		$self->{sort}= $::RandomMode ? $::Options{Sort_LastOrdered} : $::Options{Sort};
 		$self->UpdatePlayListFilter;
 		::Watch($self,Filter=>  \&UpdatePlayListFilter);
-		$self->{follow}=1 if $type eq 'A' && !defined $self->{follow}; #default to follow current song on new playlists
+		$self->{follow}=1 if !defined $self->{follow}; #default to follow current song on new playlists
 	}
 	elsif ($type eq 'L')
 	{	if (defined $EditList) { $songarray=$EditList; $EditList=undef; } #special case for editing a list via ::WEditList
@@ -485,6 +485,8 @@ sub CommonInit
 	{	::SaveList($songarray,[]) unless $::Options{SavedLists}{$songarray}; #create new list if doesn't exists
 		$songarray=$::Options{SavedLists}{$songarray};
 	}
+	$self->{follow}=0 if !defined $self->{follow};
+
 	$self->{array}= $songarray || SongArray->new;
 
 	$self->RegisterGroup($self->{group});
@@ -1524,6 +1526,7 @@ sub drag_begin_cb
 
 sub button_press_cb
 {	my ($tv,$event)=@_;
+	return 0 if $event->window!=$tv->get_bin_window; #ignore click outside the bin_window (for example the column headers)
 	my $self=::find_ancestor($tv, $tv->{selfpkg} );
 	my $but=$event->button;
 	my $sel=$tv->get_selection;
@@ -1708,7 +1711,7 @@ our @cMenu=
 	},
 	#songs submenu :
 	{	label	=> sub { my $IDs=$_[0]{filter}->filter; ::__("%d Song","%d Songs",scalar @$IDs); },
-		submenu => sub { ::BuildMenu(\@::SongCMenu, { mode => 'F', IDs=>$_[0]{filter}->filter }); },
+		submenu => sub { ::BuildMenuOptional(\@::SongCMenu, { mode => 'F', IDs=>$_[0]{filter}->filter }); },
 		isdefined => 'filter',
 	},
 	{ label=> _"Rename folder", code => sub { ::AskRenameFolder($_[0]{rawpathlist}[0]); }, onlyone => 'rawpathlist',	test => sub {!$::CmdLine{ro}}, },
@@ -2107,7 +2110,7 @@ sub PopupOpt	#Only for FilterList #FIXME should be moved in FilterList::, and/or
 package FilterList;
 use Gtk2;
 use base 'Gtk2::VBox';
-use constant { GID_ALL => 2**32-1, GID_TYPE => 'Glib::ULong' };
+use constant { GID_ALL => 2**31-1, GID_TYPE => 'Glib::Long' };
 
 our %defaults=
 (	mode	=> 'list',
@@ -2478,9 +2481,12 @@ sub get_fill_data
 	}
 	AA::SortKeys($type,\@list,$self->{'sort'}[0]);
 
-	my $beforeremoving0=@list;
-	@list= grep $_!=0, @list;
-	unshift @list,0 if $beforeremoving0!=@list;	#could be better
+	my $always_first= Songs::Field_property($type,'always_first_gid');
+	if (defined $always_first)	#special gid that should always appear first
+	{	my $before=@list;
+		@list= grep $_!=$always_first, @list;
+		unshift @list,$always_first if $before!=@list;
+	}
 
 	$self->{array}=\@list; #used for interactive search
 
@@ -2587,6 +2593,7 @@ sub new
 	$treeview->append_column($column);
 	$self->add($treeview);
 	$self->{treeview}=$treeview;
+	$self->{DefaultFocus}=$treeview;
 
 	$self->signal_connect(map => \&Fill);
 
@@ -2759,6 +2766,7 @@ sub new
 
 	$self->add($treeview);
 	$self->{treeview}=$treeview;
+	$self->{DefaultFocus}=$treeview;
 
 	$self->signal_connect(map => \&Fill);
 
@@ -2926,7 +2934,7 @@ INIT
 		mode => 'F',	onlyone => 'names',	stockicon => 'gtk-remove' },
 	{ label => _"Save current filter as",	code => sub { ::EditFilter($_[0]{self},$_[0]{curfilter},''); },
 		 stockicon => 'gtk-save',	isdefined => 'curfilter',	test => sub { ! $_[0]{curfilter}->is_empty; } },
-	{ label => _"Save current list as",	code => sub { $_[0]{self}->CreateNewFL('L',\@{ $_[0]{songlist}{array} }); },
+	{ label => _"Save current list as",	code => sub { $_[0]{self}->CreateNewFL('L',[@{ $_[0]{songlist}{array} }]); },
 		stockicon => 'gtk-save',	isdefined => 'songlist' },
 	{ label => _"Edit list",	code => sub { ::WEditList( $_[0]{names}[0] ); },
 		mode => 'L',	onlyone => 'names' },
@@ -2949,6 +2957,7 @@ sub new
 	my $self = bless Gtk2::VBox->new(FALSE, 4), $class;
 	my $store=Gtk2::TreeStore->new(('Glib::String')x4,'Glib::Boolean');
 	$self->{treeview}=my $treeview=Gtk2::TreeView->new($store);
+	$self->{DefaultFocus}=$treeview;
 	$treeview->set_headers_visible(FALSE);
 	my $renderer0=Gtk2::CellRendererPixbuf->new;
 	my $renderer1=Gtk2::CellRendererText->new;
@@ -3613,7 +3622,7 @@ sub DoFilter
 	{	if ($self->{literal})
 		{	my $op= $self->{regexp} ? ($self->{casesens} ? 'm' : 'mi') : ($self->{casesens} ? 's' : 'si');
 			my $fields=$self->{fields};
-			$filter= Filter->newadd(0, map($_.$op.$search, split /\|/, $self->{fields}) );
+			$filter= Filter->newadd(0, map($_.':'.$op.':'.$search, split /\|/, $self->{fields}) );
 		}
 		else
 		{	$filter= Filter->new_from_smartstring($search,$self->{casesens},$self->{regexp},$self->{fields});
@@ -4086,7 +4095,7 @@ sub RENDER
 
 package CellRendererGID;
 use Glib::Object::Subclass 'Gtk2::CellRenderer',
-properties => [ Glib::ParamSpec->ulong('gid', 'gid', 'group id',		0, 2**32-1, 0,	[qw/readable writable/]),
+properties => [ Glib::ParamSpec->long('gid', 'gid', 'group id',		-2**31+1, 2**31-1, 0,	[qw/readable writable/]),
 		Glib::ParamSpec->ulong('all_count', 'all_count', 'all_count',	0, 2**32-1, 0,	[qw/readable writable/]),
 		Glib::ParamSpec->ulong('max', 'max', 'max number of songs',	0, 2**32-1, 0,	[qw/readable writable/]),
 		Glib::ParamSpec->scalar('prop', 'prop', '[[field],[markup],[picsize]]',		[qw/readable writable/]),
@@ -5001,7 +5010,7 @@ sub expose_cb
 				$layout->set_width($hsize * Gtk2::Pango->scale);
 				$layout->set_height($vsize * Gtk2::Pango->scale);
 				my $yoffset=0;
-				my $free_height= $vsize - ($layout->get_pixel_extents)[1]{height};
+				my $free_height= $vsize - ($layout->get_pixel_extents)->[1]{height};
 				if ($free_height>1) { $yoffset= int($free_height/2); }	#center vertically
 				$layout->set_ellipsize('end');
 				$layout->set_alignment('center');
@@ -5284,7 +5293,7 @@ sub key_press_event_cb	# hide with Escape
 	my $self= ::find_ancestor($entry,__PACKAGE__);
 	my $newfocus= $self->get_parent;
 	$newfocus= $newfocus->{DefaultFocus} while $newfocus->{DefaultFocus};
-	$newfocus->grab_focus; warn $newfocus;
+	$newfocus->grab_focus;
 	$self->hide;
 	return 1;
 }

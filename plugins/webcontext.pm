@@ -112,6 +112,19 @@ sub new_embed
 	$embed->signal_connect(hovering_over_link => \&link_message_cb);
 	$embed->signal_connect(load_finished => \&net_startstop_cb,0);
 	$embed->signal_connect(load_committed => \&net_startstop_cb,1);
+	$embed->signal_connect(navigation_policy_decision_requested=> sub
+	 {	if ($_[3]->get_button==2) #middle-click on a link
+		{	my $nb=::find_ancestor($_[0],'Layout::NoteBook'); #only works if inside a NB/TabbedLists/Context widget
+			$nb->newtab('PluginWebPage',1,{url=>$_[2]->get_uri}) if $nb; #open the link in a new tab
+			return 1 if $nb;
+		}
+		return 0;
+	 });
+	$embed->signal_connect('notify::title'=> sub
+	 {	my $embed=shift;
+		my $self=::find_ancestor($embed,'GMB::Plugin::WebContext');
+		$self->set_title($embed->get('title')) if $self;
+	 });
 	my $sw= Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('automatic','automatic');
@@ -135,9 +148,12 @@ sub net_startstop_cb
 	$embed->window->set_cursor($cursor) if $embed->window;
 	my $uri=$frame->get_uri;
 	$self->{Entry}->set_text($uri) if $loading;
+	$self->set_title($uri) if $loading;
 	$uri= $uri=~m#^https?://# ? 1 : 0 ;
 	$self->{BOpen}->set_sensitive($uri);
 }
+
+sub set_title {} #ignored unless overridden by the class
 
 sub loaded
 {	my ($self,$data,$type)=@_;
@@ -200,6 +216,12 @@ our %Widgets=
 		schange		=> \&Update,
 		group		=> 'Play',
 		saveoptions	=> 'follow urientry statusbar',
+	},
+	PluginWebPage =>
+	{	class		=> 'GMB::Plugin::WebContext::Page',
+		tabtitle	=> _"Untitled",
+		saveoptions	=> 'url title urientry statusbar',
+		options		=> 'url title',  #load/save the title because page is only loaded when mapped, so we can ask it its title until tab is selected
 	},
 );
 
@@ -302,6 +324,8 @@ sub new
 	$status->{id}=$status->get_context_id('link');
 	($self->{embed},my $container)= $self->new_embed;
 	$container||=$self->{embed};
+	$self->{DefaultFocus}=$self->{embed};
+	$self->{embed}->signal_connect(button_press_event=> \&button_press_cb);
 	my $entry=$self->{Entry}=Gtk2::Entry->new;
 	my $back= $self->{BBack}=Gtk2::ToolButton->new_from_stock('gtk-go-back');
 	my $next= $self->{BNext}=Gtk2::ToolButton->new_from_stock('gtk-go-forward');
@@ -335,6 +359,16 @@ sub new
 	return $self;
 }
 
+sub button_press_cb
+{	my ($embed,$event)=@_;
+	my $button= $event->button;
+	my $self= ::find_ancestor($embed,__PACKAGE__);
+	if    ($button==8) { $self->go_back; }
+	elsif ($button==9) { $self->go_forward; }
+	else { return 0; }
+	return 1;
+}
+
 sub addtoolbar #default method, overridden by packages that add extra items to the toolbar
 {	return ();
 }
@@ -347,9 +381,9 @@ sub prefbox
 	$Bopen->signal_connect(clicked => sub { ::ContextWindow; });
 	my ($radio_wk,$radio_moz)=
 	 ::NewPrefRadio( OPT.'Backend',
-		sub { $check->set_sensitive($::Options{OPT.'Backend'} eq 'MozEmbed'); UpdateBackend(); },
-		_"Use WebKit",		'WebKit',
-		_"Use MozEmbed",	'MozEmbed');
+		[_"Use WebKit",		'WebKit',
+		 _"Use MozEmbed",	'MozEmbed',
+		], cb=> sub { $check->set_sensitive($::Options{OPT.'Backend'} eq 'MozEmbed'); UpdateBackend(); });
 	my $label_wk= $OKWebKit ? '' : _"Not found";
 	my $label_moz= $OKMoz ? '' : $CrashMoz ? _"Found but not working" : _"Not found";
 	$radio_wk ->set_tooltip_text($label_wk)  if $label_wk;
@@ -394,9 +428,30 @@ sub popup_toolbar_menu
 sub Update
 {	$_[0]->SongChanged( ::GetSelID($_[0]) )  if $_[0]->mapped;
 }
-
 #################################################################################
 
+package GMB::Plugin::WebContext::Page;
+our @ISA=('GMB::Plugin::WebContext');
+
+#only called once, when mapped
+sub SongChanged { $_[0]->load_url($_[0]{url}) if $_[0]{url}; }
+
+sub DynamicTitle	#called by Layout::NoteBook when tab is created
+{	my ($self,$default)=@_;
+	my $title=$self->{title};
+	$title=$default unless length $title;
+	my $label=Gtk2::Label->new($title);
+	$label->set_ellipsize('end');
+	$label->set_max_width_chars(20);
+	$self->{titlelabel}=$label;
+	return $label;
+}
+sub set_title
+{	my ($self,$title)=@_;
+	($title)= $self->{url}=~m#^https?://(?:www\.)?([\w.]+)# unless length $title;
+	$self->{title}=$title;
+	$self->{titlelabel}->set_text($title);
+}
 
 package GMB::Plugin::WebContext::Lyrics;
 our @ISA=('GMB::Plugin::WebContext');

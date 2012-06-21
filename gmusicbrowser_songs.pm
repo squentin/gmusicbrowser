@@ -18,6 +18,7 @@ my (@Missing,$MissingHash,@MissingKeyFields);
 our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%HSort,%Aliases);
 my %FuncCache;
 INIT {
+our $nan= unpack 'F', pack('F',sin(9**9**9)); # sin 9**9**9 is slighly more portable than $nan="nan", use unpack pack because the nan will be stored that way
 our %timespan_menu=
 (	year 	=> _("year"),
 	month	=> _("month"),
@@ -58,6 +59,7 @@ our %timespan_menu=
 		'filterdesc:-s'	=> _"doesn't contain %s (case sensitive)",
 		'filterdesc:-si'=> _"doesn't contain %s",
 		'filterdesc:-e'	=> _"isn't equal to %s",
+		'smartfilter:=empty' => 'e:',
 		'smartfilter:=' => 'e',
 		'smartfilter::' => 'si s',
 		'smartfilter:~' => 'mi m',
@@ -85,6 +87,7 @@ our %timespan_menu=
 		gid_to_display	=> '___name[#GID#]',
 		s_sort		=> '___sort{ sprintf("%x", #_#)}',
 		si_sort		=> '___isort{ sprintf("%x", #_#)}',
+		always_first_gid=> 0,
 		's_sort:gid'	=> '___name[#GID#]',
 		'si_sort:gid'	=> '___iname[#GID#]',
 		get		=> 'do {my $v=#_#; !$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v];}',
@@ -142,6 +145,7 @@ our %timespan_menu=
 		'filterdesc:-mi'=> _"doesn't match regexp %s",
 		'filterdesc:-s'	=> _"doesn't contain %s (case sensitive)",
 		'filterdesc:-si'=> _"doesn't contain %s",
+		'smartfilter:=empty' => 'ecount:0',
 		'smartfilter:=' => '~',
 		'smartfilter::' => 'si s',
 		'smartfilter:~' => 'mi m',
@@ -283,7 +287,7 @@ our %timespan_menu=
 		_iname	=> '___iname[#ID#]',
 		set	=> '#_# = #VAL#; #_iname#= ::superlc(#VAL#);',
 		si_sort	=> '#_iname#',
-		'filter:s'	=> 'index( #_iname#,"#VAL#") .!=. -1',	'filter_prep:s'	=> sub { quotemeta ::superlc($_[0])},
+		'filter:si'	=> 'index( #_iname#,"#VAL#") .!=. -1',			'filter_prep:si'=> sub { quotemeta ::superlc($_[0])},
 	},
 	text =>	#multi-lines string
 	{	parent			=> 'string',
@@ -341,11 +345,12 @@ our %timespan_menu=
 		gid_to_get	=> '#_name#[#GID#]',
 		's_sort:gid'	=> '#_name#[#GID#]',
 		'si_sort:gid'	=> '#_iname#[#GID#]',
+		always_first_gid=> 0,
 		gid_to_display	=> '#_name#[#GID#]',
 		'filter:m'	=> '#_name#[#_#]  .=~. m"#VAL#"',
 		'filter:mi'	=> '#_iname#[#_#] .=~. m"#VAL#"i',
-		'filter:s'	=> 'index( #_iname#[#_#],"#VAL#") .!=. -1',	'filter_prep:s'	=> sub { quotemeta ::superlc($_[0])},
-		'filter:S'	=> 'index( #_name#[#_#], "#VAL#") .!=. -1',
+		'filter:si'	=> 'index( #_iname#[#_#],"#VAL#") .!=. -1',			'filter_prep:si' => sub {quotemeta ::superlc($_[0])},
+		'filter:s'	=> 'index( #_name#[#_#], "#VAL#") .!=. -1',
 		'filter:e'	=> '#_name#[#_#] .eq. "#VAL#"',
 		'filter:~'	=> '#_# .==. #VAL#',				'filter_prep:~' => '#sgid_to_gid(VAL=#PAT#)#',
 				'filter_prephash:~' => 'return {map { #sgid_to_gid(VAL=$_)#,undef} keys %{#HREF#}}',
@@ -378,10 +383,10 @@ our %timespan_menu=
 		'filter:>'	=> '#_# .>. #VAL#',
 		'filter:<'	=> '#_# .<. #VAL#',
 		'filter:b'	=> '#_# .>=. #VAL1#  .&&.  #_# .<=. #VAL2#',
-		'filter_prep:b'	=>  \&filter_prep_numbers,
-		'filter_prep:>'	=>  \&filter_prep_numbers,
-		'filter_prep:<'	=>  \&filter_prep_numbers,
-		'filter_prep:e'	=>  \&filter_prep_numbers,
+		'filter_prep:b'	=> \&filter_prep_numbers_between,
+		'filter_prep:>'	=> \&filter_prep_numbers,
+		'filter_prep:<'	=> \&filter_prep_numbers,
+		'filter_prep:e'	=> \&filter_prep_numbers,
 		'group'		=> '#_# !=',
 		'stats:range'	=> 'push @{#HVAL#},#_#;  ---- AFTER: #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} @{#HVAL#})[0,-1]; $m0==$m1 ? $m0 : "$m0 - $m1"}',
 		'stats:average'	=> 'push @{#HVAL#},#_#;  ---- AFTER: #HVAL#=do { my $s=0; $s+=$_ for @{#HVAL#}; $s/@{#HVAL#}; }',
@@ -416,13 +421,14 @@ our %timespan_menu=
 		'smartfilter:=' => \&Filter::_smartstring_number,
 		'smartfilter::' => \&Filter::_smartstring_number,
 		'smartfilter:~' => 'm',
+		'smartfilter:=empty' => 'e:0',
 		rightalign=>1,	#right-align in SongTree and SongList
 	},
 	'number.div' =>
 	{	group		=> 'int(#_#/#ARG0#) !=',
 		hash		=> 'int(#_#/#ARG0#)',		#hash:minute	=> '60*int(#_#/60)',
 		#makefilter	=> '"#field#:".(!#GID# ? "e:0" : "b:".(#GID# * #ARG0#)." ".((#GID#+1) * #ARG0#))',
-		makefilter	=> 'Filter->new_add(1, "#field#:-<:".(#GID# * #ARG0#), "#field#:<:".((#GID#+1) * #ARG0#) )', #FIXME decimal separator must be always "."
+		makefilter	=> 'Filter->newadd(1, "#field#:-<:".(#GID# * #ARG0#), "#field#:<:".((#GID#+1) * #ARG0#) )', #FIXME decimal separator must be always "."
 		gid_to_display	=> '#GID# * #ARG0#',
 		get_gid		=> 'int(#_#/#ARG0#)',
 	},
@@ -432,7 +438,7 @@ our %timespan_menu=
 		bits		=> 16,
 		init		=> '____=""; ___value[0]=undef;',
 		set		=> 'vec(____,#ID#,#bits#) = ___gid{#VAL#}||= do { push(@___value, #VAL#+0)-1; }',
-		check		=> '#VAL#= #VAL# =~m/^(\d*(?:\.\d+)?)$/ ? $1 : 0;',
+		check		=> '#VAL#= #VAL# =~m/^(-?\d*\.?\d+)$/ ? $1 : 0;',
 		displayformat	=> '%d',
 	},
 	integer	=>
@@ -443,22 +449,50 @@ our %timespan_menu=
 		check		=> '#VAL#= #VAL# =~m/^(\d+)/ && $1<2**#bits# ? $1 : 0;',	# set to 0 if overflow
 		init		=> '____="";',
 		parent		=> 'number',
-		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,$Def{$field}{edit_max},0,$Def{$field}{edit_mode}); },
+		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,min=>$Def{$field}{edit_min},max=>$Def{$field}{edit_max},digits=>0,mode=>$Def{$field}{edit_mode}); },
+		step		=> 1, #minimum difference between 2 values, used to simplify filters
 	},
 	'integer.div' =>
 	{	makefilter	=> '"#field#:b:".(#GID# * #ARG0#)." ".(((#GID#+1) * #ARG0#)-1)',
 	},
 	float	=>	#make sure the string doesn't have the utf8 flag, else substr won't work
 	{	_		=> 'unpack("F",substr(____,#ID#<<3,8))',
+		display		=> 'do {my $v=#_#; (#v_is_nan# ? "" : sprintf("#displayformat#", $v ))}',	# replace novalue (NaN) with ""
+		get		=> 'do {my $v=#_#; (#v_is_nan# ? "" : $v ); }',					#
+		diff		=> ($nan==$nan ? 'do {my $new=#VAL#; $new=#nan# unless length $new; $new!=#_# }' :
+						 'do {my $new=#VAL#; $new=#nan# unless length $new; my $v=#_#; $new!=$v && ($new==$new || ! #v_is_nan#) }'),
 		displayformat	=> '%.2f',
 		init		=> '____=" "x8;', #needs init for ID==0
 		parent		=> 'number',
-		set		=> 'substr(____,#ID#<<3,8)=pack("F",#VAL#)',
-		check		=> '#VAL#= #VAL# =~m/^(\d*(?:\.\d+)?)$/ ? $1 : 0;',
+		nan		=> '$Songs::nan',
+		v_is_nan	=> ($nan==$nan ? '($v==#nan#)' : '($v!=$v)'),	#on some system $nan!=$nan, on some not. In case nan==0, 0 will be treated as novalue, could treat novalue as 0 instead
+		novalue		=> '#nan#',	#use NaN as novalue
+		default		=> '#novalue#',
+		set		=> 'substr(____,#ID#<<3,8)=pack("F",(length(#VAL#) ? #VAL# : #novalue#))',
+		check		=> '#VAL#= #VAL# =~m/^(-?\d*\.?\d+(?:e[-+]\d+)?)$/i ? $1 : #novalue#;',
 		# FIXME make sure that locale is set to C (=> '.' as decimal separator) when needed
-		'editwidget:all'=> sub { GMB::TagEdit::EntryNumber->new(@_,undef,3); },
-		autofill_re	=> '(?:\\d+\\.)?\\.\\d+',
-		'filterpat:value' => [digits => 2, negative=>1, ],
+		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,min=>$Def{$field}{edit_min},max=>$Def{$field}{edit_max},signed=>1,digits=>2,mode=>'allow_empty'); },
+		autofill_re	=> '-?\\d*\\.?\\d+',
+		'filterpat:value' => [digits => 2, signed=>1, ],
+		n_sort		=> 'do {my $v=#_#; #v_is_nan# ? "-inf" : $v}',
+		'filter:defined'	=> 'do {my $v=#_#; .!. (#v_is_nan#)}',
+		'filterdesc:defined:1'	=> _"is defined",
+		'filterdesc:-defined:1'	=> _"is not defined",
+		'smartfilter:=empty' => '-defined:1',
+		'stats:same'=> 'do {my $v1=#HVAL#; my $v2=#_#; if (defined $v1) { #HVAL#=#nan# if $v1!=$v2; } else { #HVAL#= $v2 } }',	#hval=nan if $v1!=$v2 works both if nan==nan or nan!=nan : set hval to nan if either one of them is nan or if they are not equal. That way no need to use #v_is_nan#, which would be complicated as it uses $v
+	},
+	'float.range'=>
+	{	get_gid		=> 'do {my $v=#_#; #v_is_nan# ? #nan_gid# : int($v/#range_step#) ;}',
+		nan_gid		=> '-2**31+1', #gid in FilterList are Long, 2**31-1 is GID_ALL
+		always_first_gid=> -2**31+1,
+		range_step	=> '1', #default step
+		gid_to_display	=> '( #GID#==#nan_gid# ? _"not defined" : do {my $v= #GID# * #range_step#; "$v .. ".($v+#range_step#)})',
+		gid_to_get	=> '( #GID#==#nan_gid# ? #nan# : #GID# * #range_step#)',
+		hash		=> '#get_gid#',
+		makefilter	=> '#GID#==#nan_gid# ? "#field#:-defined:1" : do { my $v= #GID# * #range_step#; Filter->newadd(1, "#field#:-<:".$v, "#field#:<:".($v + #range_step#)); }', #FIXME decimal separator must be always "."
+		'n_sort:gid'	=> '( do{my $n=#GID#==#nan_gid# ? "-inf" : #GID# * #range_step#;warn "#GID# => $n";$n })',
+		'n_sort:gid'	=> '( #GID#==#nan_gid# ? "-inf" : #GID# * #range_step# )',
+		'n_sort:gid'	=> '#GID#', #  #nan_gid# is already the most negative number, no need to replace it with -inf
 	},
 	'length' =>
 	{	display	=> 'sprintf("%d:%02d", #_#/60, #_#%60)',
@@ -469,7 +503,7 @@ our %timespan_menu=
 	{	display	=> 'sprintf("%.1fM", #_#/1000/1000)',
 		'filter_prep:>'	=> \&::ConvertSize,
 		'filter_prep:<'	=> \&::ConvertSize,
-		'filter_prep:b'	=> \&::ConvertSize,
+		'filter_prep:b'	=> sub {sort {$a <=> $b} map ::ConvertSize($_), split / /,$_[0],2},
 		parent	=> 'integer',
 		'filterpat:value' => [ unit=> \%::SIZEUNITS, default_unit=> 'm', default_value=>1, ],
 	},
@@ -498,6 +532,7 @@ our %timespan_menu=
 		'filterdesc:-~'	=> _"not set to %s",,
 		'filterdesc:~:255'=> 'set to default',
 		'filterdesc:-~:255'=>'not set to default',
+		'smartfilter:=empty' => '~:255',
 		n_sort		=> '#_default#',
 		#array		=> '#_default#',
 		gid_to_display	=> '#GID#==255 ? _"Default" : #GID#',
@@ -513,7 +548,7 @@ our %timespan_menu=
 		daycount=> 'do { my $t=(time-( #_# ) )/86400; ($t<0)? 0 : $t}', #for random mode
 		'filter_prep:>ago'	=> \&::ConvertTime,
 		'filter_prep:<ago'	=> \&::ConvertTime,
-		'filter_prep:bago'	=> \&::ConvertTime,
+		'filter_prep:bago'	=> sub {sort {$a <=> $b} map ::ConvertTime($_), split / /,$_[0],2},
 		'filter:>ago'	=> '#_# .<. #VAL#',
 		'filter:<ago'	=> '#_# .>. #VAL#',
 		'filter:bago'	=> '#_# .>=. #VAL1#  .&&.  #_# .<=. #VAL2#',
@@ -545,8 +580,10 @@ our %timespan_menu=
 		'smartfilter:=' => \&Filter::_smartstring_date,
 		'smartfilter::' => \&Filter::_smartstring_date,
 		'smartfilter:~' => 'm',
+		'smartfilter:=empty' => 'e:0',
 
 		 #for date.year, date.month, date.day :
+		always_first_gid=> 0,
 		group	=> '#mktime# !=',
 		get_gid	=> '#_# ? #mktime# : 0',
 		hash	=> '(#_# ? #mktime# : 0)',	#or use post-hash modification for 0 case
@@ -630,13 +667,13 @@ our %timespan_menu=
 		'filter:>'	=> '.!!. do{ grep($_ > #VAL#, #get_list#) }',
 		'filter:<'	=> '.!!. do{ grep($_ < #VAL#, #get_list#) }',
 		'filter:b'	=> '.!!. do{ grep($_ >= #VAL1# && $_ <= #VAL2#, #get_list#) }',
-		'filter_prep:>'	=>  \&filter_prep_numbers,
-		'filter_prep:<'	=>  \&filter_prep_numbers,
-		'filter_prep:e'	=>  \&filter_prep_numbers,
-		'filter_prep:b'	=>  \&filter_prep_numbers,
+		'filter_prep:>'	=> \&filter_prep_numbers,
+		'filter_prep:<'	=> \&filter_prep_numbers,
+		'filter_prep:e'	=> \&filter_prep_numbers,
+		'filter_prep:b'	=> \&filter_prep_numbers_between,
 		'filter_prep:>ago'	=> \&::ConvertTime,
 		'filter_prep:<ago'	=> \&::ConvertTime,
-		'filter_prep:bago'	=> \&::ConvertTime,
+		'filter_prep:bago'	=> sub {sort {$a <=> $b} map ::ConvertTime($_), split / /,$_[0],2},
 		'filter:>ago'	=> '.!!. do{ grep($_ < #VAL#, #get_list#) }',
 		'filter:<ago'	=> '.!!. do{ grep($_ > #VAL#, #get_list#) }',
 		'filter:bago'	=> '.!!. do{ grep($_ >= #VAL1# && $_ <= #VAL2#, #get_list#) }',
@@ -666,11 +703,13 @@ our %timespan_menu=
 		'smartfilter:>='=> \&Filter::_smartstring_date_moreless,
 		'smartfilter:=' => \&Filter::_smartstring_date,
 		'smartfilter::' => \&Filter::_smartstring_date,
+		'smartfilter:=empty' => 'ecount:0',
 
 		#get_gid		=> '[#get_list#]',
 		#hashm			=> '#get_list#',
 		#mktime			=> '$_',
 		 #for dates.year, dates.month, dates.day :
+		always_first_gid=> 0,
 		get_gid	=> '[#_# ? (map #mktime#,#get_list#) : 0]',
 		hashm	=> '(#_# ? (map #mktime#,#get_list#) : 0)',	#or use post-hash modification for 0 case
 		subtypes_menu=> \%timespan_menu,
@@ -701,6 +740,7 @@ our %timespan_menu=
 		'filterdesc:e:1'	=> [_"is true", _"is true", '',noinv=>1],
 		filter_exclude => 'ALL',	#do not show filters inherited from parents
 		default_filter => 'e:1',
+		'smartfilter:=empty' => 'e:0',
 		rightalign=>0,
 	},
 	shuffle=>
@@ -1059,11 +1099,15 @@ our %timespan_menu=
 	prewrite=> sub { sprintf('%.1f', $_[0]); },
 	category=>'stats',
 	alias	=> 'plays',
+	edit_order=> 90,
+	options	=> 'editable',
  },
  skipcount	=>
  {	name	=> _"Skip count",	width => 50,	flags => 'fgaescp',	type => 'integer',	letter => 'k',
 	category=>'stats',
 	alias	=> 'skips',
+	edit_order=> 91,
+	options	=> 'editable',
  },
  composer =>
  {	name	=> _"Composer",		width	=> 100,		flags => 'fgarwescpi',	type => 'artist',
@@ -1141,13 +1185,17 @@ our %timespan_menu=
  filetype=>
  {	name	=> _"File type",		width => 80,	flags => 'fgarscp',	type => 'fewstring',	bits => 8, #could probably fit in 4bit
 	FilterList => {},
-	'filterdesc:m:^mp3' => _"is a mp3 file",
-	'filterdesc:m:^mp4 mp4a' => _"is a m4a file",
-	'filterdesc:m:^ogg' => _"is an ogg file",
-	'filterdesc:m:^flac'=> _"is a flac file",
-	'filterdesc:m:^mpc' => _"is a musepack file",
-	'filterdesc:m:^wv'  => _"is a wavepack file",
-	'filterdesc:m:^ape' => _"is an ape file",
+	'filterdesc:m:^mp3'	=> _"is a mp3 file",
+	'filterdesc:m:^mp4 mp4a'=> _"is an aac file",
+	'filterdesc:m:^mp4 alac'=> _"is an alac file",
+	'filterdesc:m:^mp4'	=> _"is an mp4/m4a file",
+	'filterdesc:m:^vorbis'	=> _"is a vorbis file",
+	'filterdesc:m:^flac'	=> _"is a flac file",
+	'filterdesc:m:^mpc'	=> _"is a musepack file",
+	'filterdesc:m:^wv'	=> _"is a wavepack file",
+	'filterdesc:m:^ape'	=> _"is an ape file",
+	'filterdesc:m:^ape|^flac|^mp4 alac|^wv'	=> _"is a lossless file",
+	'filterdesc:-m:^ape|^flac|^mp4 alac|^wv'=> _"is a lossy file",
 	category=>'audio',
 	alias	=> 'type',
  },
@@ -1161,12 +1209,17 @@ our %timespan_menu=
  },
 
  replaygain_track_gain=>
- {	name	=> _"Track gain",	width => 60,	flags => 'fgrwscpa',
-	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
+ {	name	=> _"Track gain",	width => 70,	flags => 'fgrwscpa',
+	type	=> 'float',	check => '#VAL#= do{ #VAL# =~m/^([-+]?\d*\.?\d+)\s*(?:dB)?$/i ? $1 : #novalue#};',
 	displayformat	=> '%.2f dB',
 	id3v2	=> 'TXXX;replaygain_track_gain;%v',	vorbis	=> 'replaygain_track_gain',	ape	=> 'replaygain_track_gain', ilst => '----replaygain_track_gain',
-	options => 'disable',
+	prewrite=> sub { length($_[0]) && $_[0]==$_[0] ? $_[0]." dB" : undef }, #remove tag if empty string or NaN
+	options => 'disable editable',
 	category=>'replaygain',
+	alias	=> 'track_gain trackgain',
+	edit_max=> 120,
+	edit_order=> 95,
+	FilterList => {type=>'range',},
  },
  replaygain_track_peak=>
  {	name	=> _"Track peak",	width => 60,	flags => 'fgrwscpa',
@@ -1174,14 +1227,23 @@ our %timespan_menu=
 	type	=> 'float',
 	options => 'disable',
 	category=>'replaygain',
+	alias	=> 'track_peak trackpeak',
+	range_step=> '.1',
+	FilterList => {type=>'range',},
  },
  replaygain_album_gain=>
- {	name	=> _"Album gain",	width => 60,	flags => 'fgrwscpa',
-	id3v2	=> 'TXXX;replaygain_album_gain;%v',	vorbis	=> 'replaygain_album_gain',	ape	=> 'replaygain_album_gain', ilst => '----replaygain_album_gain',
+ {	name	=> _"Album gain",	width => 70,	flags => 'fgrwscpa',
+	type	=> 'float',	check => '#VAL#= do{ #VAL# =~m/^([-+]?\d*\.?\d+)\s*(?:dB)?$/i ? $1 : #novalue#};',
 	displayformat	=> '%.2f dB',
-	type	=> 'float',	check => '#VAL#= #VAL# =~m/^((?:\+|-)?\d+(?:\.\d+)?)\s*(?:dB)?$/i ? $1 : 0;',
-	options => 'disable',
+	id3v2	=> 'TXXX;replaygain_album_gain;%v',	vorbis	=> 'replaygain_album_gain',	ape	=> 'replaygain_album_gain', ilst => '----replaygain_album_gain',
+	prewrite=> sub { length($_[0]) && $_[0]==$_[0] ? $_[0]." dB" : undef }, #remove tag if empty string or NaN
+	options => 'disable editable',
 	category=>'replaygain',
+	alias	=> 'album_gain albumgain',
+	edit_max=> 120,
+	edit_order=> 96,
+	edit_many=>1,
+	FilterList => {type=>'range',},
  },
  replaygain_album_peak=>
  {	name	=> _"Album peak",	width => 60,	flags => 'fgrwscpa',
@@ -1189,23 +1251,15 @@ our %timespan_menu=
 	type	=> 'float',
 	options => 'disable',
 	category=>'replaygain',
+	alias	=> 'album_peak albumpeak',
+	range_step=> '.1',
+	FilterList => {type=>'range',},
  },
  replaygain_reference_level=>
  {	flags => 'w',	type => 'writeonly',	#only used for writing
 	id3v2	=> 'TXXX;replaygain_reference_level;%v',vorbis	=> 'replaygain_reference_level',	ape => 'replaygain_reference_level', ilst => '----replaygain_reference_level',
 	category=>'replaygain',
  },
- #mp3gain : APE tags,	peak : float 	: 0.787193
- #			gain float dB 	: -1.240000 dB
- #vorbisgain :	peak float : 0.00011510 1.01959181
- #		gain +-float dB : -0.55 dB +64.82 dB
- #mp3gain creates APE tags : mp3gain_minmax and mp3gain_album_minmax
- #
- #
- #gstreamer : id3v2 tag replaygain_album_peak 0,787216365337372
- #			replaygain_track_peak 0,787216365337372
- #		ogg : 	peak 0,000115100738184992
- #			gain 64,82
 
  playedlength	=> {	name=> "Played length", type=>'length', flags=> 'g',
 			get => '#playcount->get# * #length->get#',  _=>'#get#',
@@ -1401,7 +1455,8 @@ sub MakeCode		#keep ?
 	return $code;
 }
 sub Field_property
-{	my ($field,$key)=@_;
+{	my ($field_opt,$key)=@_;
+	my ($field,$subtype)=split /\./,$field_opt;
 	my $h= $Def{$field};
 	return undef unless $h;
 	while ($h)
@@ -1409,6 +1464,7 @@ sub Field_property
 		my $type= $h->{parent} || $h->{type};
 		return undef unless $type;
 		$h= $Types{$type};
++		return $Types{"$type.$subtype"}{$key} if $subtype && $Types{"$type.$subtype"} && exists $Types{"$type.$subtype"}{$key};
 	}
 }
 sub Field_properties
@@ -1460,7 +1516,8 @@ sub Field_filter_choices
 	}
 	return \%filters;
 }
-sub filter_prep_numbers { $_[0]=~m/(-?\d+(?:\.\d+)?)/; return $1 || 0 }
+sub filter_prep_numbers { $_[0]=~m/(-?\d*\.?\d+)/; return $1 || 0 }
+sub filter_prep_numbers_between { sort {$a <=> $b} map filter_prep_numbers($_), split / /,$_[0],2 }
 sub FilterCode
 {	my ($field,$cmd,$pat,$inv)=@_;
 	my ($code,$convert)=LookupCode($field, "filter:$cmd", "filter_prep:$cmd");
@@ -1470,7 +1527,7 @@ sub FilterCode
 	$code=~s/#ID#/\$_/g;
 	if ($inv)	{$code=~s#$Filter::OpRe#$Filter::InvOp{$1}#go}
 	else		{$code=~s#$Filter::OpRe#$1 eq '!!' ? '' : $1#ego}
-	if ($code=~m/#VAL1#/) { my ($p1,$p2)= map $convert->($_), split / /,$pat; ($p1,$p2)=($p2,$p1) if $p1>$p2; $code=~s/#VAL1#/$p1/g; $code=~s/#VAL2#/$p2/g; }
+	if ($code=~m/#VAL1#/) { my @p= $convert->($pat); $code=~s/#VAL(\d)#/$p[$1-1]/g; }
 	else { my $p=$convert->($pat,$field); $code=~s/#VAL#/$p/g; }
 	return $code;
 }
@@ -2687,6 +2744,12 @@ our %Field_options=
 				$def->{flags}.='rw' if $value;
 		},
 	},
+	editable =>
+	{	widget		=> 'check',
+		label		=> _"Editable in song properties dialog",
+		'default'	=> sub { my $default= $_[0]{flags} || ''; return $default=~m/e/ },
+		apply		=> sub { my ($def,$opt,$value)=@_; $def->{flags}=~s/e//g; $def->{flags}.='e' if $value; },
+	},
 	resetnotag =>
 	{	widget		=> 'check',
 		label		=> 'Reset current value if no tag found in file',
@@ -3874,6 +3937,7 @@ sub new
 {	my ($class,$string,$source) = @_;
 	my $self=bless {}, $class;
 	if	(!defined $string)	  {$string='';}
+	elsif	(ref $string && $string->isa('Filter')) {$string=$string->{string}}
 	elsif	($string=~m/^\w+:-?~:/) { ($string)=_smart_simplify($string); }
 	$self->{string}=$string;
 	$self->{source}=$source;
@@ -3989,19 +4053,20 @@ sub new_from_smartstring
 			if ($fields)
 			{	my @f= grep $_, map $Songs::Aliases{::superlc($_)}, split(/\|/,$fields);
 				if (@f) { $fields= join '|',@f }
-				else { $string= $fields.$op.$string; $op=undef; }	#no recognized field => treat $fields and $op as part of the pattern
+				else { $string= $fields.$op.$string; $fields=$op=undef; }	#no recognized field => treat $fields and $op as part of the pattern
 			}
 			$string=~s#^\\([:<>=~])#$1#g unless $op;	#un-escape escaped operators at start of string if no recognized operator
 		}
 		$fields ||= $fields0;
 		$op||= $regexp ? '~' : ':';
 
+
 		my @patterns;
 		{	if ($string=~s#^(['"])(.+?)(?<!\\)\1((?<!\\)\||\s+|$)##)
 			{	push @patterns,$2;
 				redo if $3 eq '|';
 			}
-			elsif ($string=~s/^(\S.*?)(	(?<!\\)\| |			# ends with | => more than one pattern
+			elsif ($string=~s/^(.*?)(	(?<!\\)\| |			# ends with | => more than one pattern
 							(?<!\\)(?=\)[\s|)]|\)$) |	# or with closing parenthese followed by space | ) or end-of-string
 							(?<!\\)\s+ | $			# or with spaces or end-of-string
 					)//x)
@@ -4010,13 +4075,15 @@ sub new_from_smartstring
 			}
 		}
 		s#\\([ "'|)])#$1#g for @patterns;	#un-escape escaped spaces, quotes, | and )
-
 		# convert smart operator to internal operator and create filter for this level
 		my @filters=(0 xor $notgroup);
 		for my $field (split /\|/, $fields)
 		{	for my $pattern (@patterns)
 			{	my $filter;
-				if (my $found= Songs::Field_property($field,'smartfilter:'.$op))
+				if ($pattern eq '')
+				{	$filter= Songs::Field_property($field,'smartfilter:'.$op.'empty'); #must contain operator ':' pattern
+				}
+				elsif (my $found= Songs::Field_property($field,'smartfilter:'.$op))
 				{	if (ref $found)
 					{	$filter= $found->($pattern,$op,$casesens,$field);
 					}
@@ -4047,7 +4114,7 @@ sub new_from_smartstring
 sub _smartstring_moreless
 {	my ($pat,$op,$casesens,$field)=@_;
 	$pat=~s/,/./g; #use dot as decimal separator
-	return undef unless $pat=~m/^-?[0-9.]+[a-zA-Z]?$/;	# FIXME could check if support units
+	return undef unless $pat=~m/^-?\d*\.?\d+[a-zA-Z]?$/;	# FIXME could check if support units
 	$op= $op eq '<=' ? '->' : $op eq '>=' ? '-<' : $op;
 	return $op.':'.$pat;
 }
@@ -4066,14 +4133,14 @@ sub _smartstring_date_moreless
 sub _smartstring_number
 {	my ($pat,$op,$casesens,$field)=@_;
 	$pat=~s/,/./g; #use dot as decimal separator
-	if ($op ne '=' || $pat!~m/^-[0-9.]+[a-zA-Z]?$/) {$pat=~s/^-/../}	# allow ranges using - unless = with negative number (could also check if field support negative values ?)
+	if ($pat!~m#\.\.# && ($op ne '=' || $pat!~m/^-\d*\.?\d+[a-zA-Z]?$/)) {$pat=~s/-($|-|\d*\.?\d+[a-zA-Z]?$)/..$1/}	# allow ranges using - unless = with negative number (could also check if field support negative values ?)
 	if ($pat=~m/\.\./)
 	{	my ($s1,$s2)= split /\s*\.\.\s*/,$pat,2;
 		return	(length $s1 && length $s2) ? "b:$s1 $s2":
 			(length $s1 && !length$s2) ? "-<:".$s1	:
 			(!length$s1 && length $s2) ? "->:".$s2	: undef;
 	}
-	return undef unless $pat=~m/^-?[0-9.]+[a-zA-Z]?$/;	# FIXME could check if support units
+	return undef unless $pat=~m/^-?\d*\.?\d+[a-zA-Z]?$/;	# FIXME could check if support units
 	$op= $op eq ':' ? 's' : 'e';
 	return $op.':'.$pat;
 }
@@ -4081,10 +4148,12 @@ sub _smartstring_date
 {	my ($pat,$op,$casesens,$field)=@_;
 	my $suffix='';
 	my $date1= my $date2='';
-	if ($pat=~m#\d# and ($date1,$date2)= $pat=~m#^(\d+[smhdwMy])?(?:\.\.|-)(\d+[smhdwMy])?$#i)	# relative date filter
+	if ($pat=~m#\d# and ($date1,$date2)= $pat=~m#^(\d*\.?\d+[smhdwMy])?(?:\.\.|-)(\d*\.?\d+[smhdwMy])?$#i)	# relative date filter
 	{	$suffix='ago';
 		if	($date1 && $date1!~m/[1-9]/) {$date1=''}
 		elsif	($date1 && $date2 && $date2!~m/[1-9]/) {$date2=$date1; $date1=''}
+		$date1||='';
+		$date2||='';
 	}
 	else						# absolute date filter
 	{	($date1,$date2)= ::dates_to_timestamps($pat,2);
@@ -4125,8 +4194,8 @@ sub _is_subset		# returns true if $f2 must be a subset of $f1	#$f1 and $f2 must 
 		return 0 if $field1 ne $field2 || $op1 ne $op2;
 		if ($op1 eq 's'|| $op1 eq 'si')		{ return index($pat2,$pat1)!=-1 }	# handle case-i ?
 		elsif ($op1 eq '-s'|| $op1 eq '-si')	{ return index($pat1,$pat2)!=-1 }	# handle case-i ?
-		elsif ($op1 eq '>' || $op1 eq '-<') { return ($pat1."\x00".$pat2) =~m/(-?\d+)(\w*)\x00(-?\d+)\2/ && $3>$1  }
-		elsif ($op1 eq '<' || $op1 eq '->') { return ($pat1."\x00".$pat2) =~m/(-?\d+)(\w*)\x00(-?\d+)\2/ && $3<$1  }
+		elsif ($op1 eq '>' || $op1 eq '-<') { return ($pat1."\x00".$pat2) =~m/^(-?\d*\.?\d+)(\w*)\x00(-?\d*\.?\d+)\2$/ && $3>$1  }
+		elsif ($op1 eq '<' || $op1 eq '->') { return ($pat1."\x00".$pat2) =~m/^(-?\d*\.?\d+)(\w*)\x00(-?\d*\.?\d+)\2$/ && $3<$1  }
 		# FIXME  check these filters : b bago >ago <ago ?
 		return 0;
 	}
@@ -4191,13 +4260,13 @@ sub to_array	#returns an array form of the filter, first value of array is false
 
 sub _combine_ranges
 {	my ($field,$and,@segs)=@_;
-	my $integer=1;	#FIXME assume integer field, set to 0 if float
+	my $step= Songs::Field_property($field,'step') || 0;
 	my @out;
 	@segs= sort { $a->[0] <=> $b->[0] } @segs;
 	my ($s1,$s2);
 	while (@segs)
 	{	my ($s3,$s4)= @{shift @segs};
-		if (defined $s1 && $s3>=$s1 && $s3<=$s2+$integer)
+		if (defined $s1 && $s3>=$s1 && $s3<=$s2+$step)
 		{	$s2=$s4 if $s2<$s4;
 		}
 		else { push @out, [$s1,$s2] if defined $s1; ($s1,$s2)=($s3,$s4); }
@@ -4211,7 +4280,7 @@ sub _between_simplify		#combine ranges of consecutive between filters into fewer
 	my ($field,@segs);
 	while (@in)
 	{	my $s=shift @in;
-		if ($s=~m/^(\w+):(-?)b:(\d+) (\d+)\x1D?$/)
+		if ($s=~m/^(\w+):(-?)b:(-?\d*\.?\d+) (-?\d*\.?\d+)\x1D?$/)
 		{	if (!$2 xor $and)
 			{	$field||=$1;
 				if ($field eq $1)
@@ -4229,7 +4298,7 @@ sub _between_simplify		#combine ranges of consecutive between filters into fewer
 		$field=undef;
 	}
 
-	s/^(\w+):(-?)b:(\d+) \3\x1D?$/"$1:$2e:$3"/e for @strings; #replace :b:5 5 by :e:5
+	s/^(\w+):(-?)b:(-?\d*\.?\d+) \3\x1D?$/"$1:$2e:$3"/e for @strings; #replace :b:5 5 by :e:5
 	return @strings;
 }
 
@@ -4689,7 +4758,7 @@ sub make
 	my @scores;
 	::setlocale(::LC_NUMERIC, 'C');
 	for my $s ( split /\x1D/, $self->{string} )
-	{	my ($inverse,$weight,$type,$extra)=$s=~m/^(-?)([0-9.]+)([a-zA-Z])(.*)/;
+	{	my ($inverse,$weight,$type,$extra)=$s=~m/^(-?)(\d*\.?\d+)([a-zA-Z])(.*)/;
 		next unless $type;
 		my $score;
 		if (my $value=$ScoreTypes{$type}{value})
@@ -4886,7 +4955,7 @@ sub CalcScore
 sub MakeExample
 {	my ($class,$string,$ID)=@_;
 	::setlocale(::LC_NUMERIC, 'C');
-	my ($inverse,$weight,$type,$extra)=$string=~m/^(-?)([0-9.]+)([a-zA-Z])(.*)/;
+	my ($inverse,$weight,$type,$extra)=$string=~m/^(-?)(\d*\.?\d+)([a-zA-Z])(.*)/;
 	return 'error' unless $type;
 	my $round=$ScoreTypes{$type}{round}||'%s';
 	my $unit= $ScoreTypes{$type}{unit}||'';

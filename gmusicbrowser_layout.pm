@@ -203,7 +203,7 @@ our %Widgets=
 				},
 		text	=> _"Queue",
 		click1	=> 'MenuQueue',
-		click3	=> 'ClearQueue',
+		click3	=> sub { ::EnqueueAction(''); ::ClearQueue(); }, #FIXME replace with 2 gmb commands once new command system is done
 		event	=> 'Queue QueueAction',
 		dragdest=> [::DRAG_ID,sub {shift;shift;::Enqueue(@_);}],
 	},
@@ -879,7 +879,7 @@ sub SaveWidgetOptions		#Save options for this layout by collecting options of it
 	my %states;
 	for my $widget (@widgets)
 	{	my $key=$widget->{name};
-		return unless $key;
+		unless ($key) { warn "Error: no name for widget $widget\n"; next }
 		my $opt;
 		if (my $sub=$widget->{SaveOptions})
 		{	my @opt=$sub->($widget);
@@ -2060,7 +2060,7 @@ sub _compute_pos
 	::setlocale(::LC_NUMERIC, 'C'); # so that decimal separator is the dot
 	# can parse strings such as : +3s/2-w-p/2+20
 	for my $v ($def=~m/([-+][^-+]+)/g)
-	{	if ($v=~m#([-+](?:\d*\.)?\d*)([pws])(?:/([0-9]+))?#)
+	{	if ($v=~m#([-+]\d*\.?\d*)([pws])(?:/([0-9]+))?#)
 		{	$h{$2}= ($1 eq '+' ? 1 : $1 eq '-' ? -1 : $1) / ($3||1);
 		}
 		elsif ($v=~m/^[-+]\d+$/) { $h{n}=$v }
@@ -4666,7 +4666,7 @@ sub _load_skinfile
 		{	my $path= $options->{SkinPath};
 			$file= $path.::SLASH.$file if defined $path;
 			$file= ::SearchPicture($file, $options->{PATH});
-			$pb= GMB::Picture::pixbuf($file);
+			$pb= GMB::Picture::pixbuf($file) if $file;
 		}
 	}
 	return unless $pb;

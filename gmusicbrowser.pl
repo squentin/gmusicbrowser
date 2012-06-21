@@ -23,6 +23,7 @@ package main;
 use Gtk2 '-init';
 use Glib qw/filename_from_unicode filename_to_unicode/;
 use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime _exit/;
+use Encode qw/_utf8_on _utf8_off/;
 {no warnings 'redefine'; #some work arounds for old versions of perl-Gtk2 and/or gtk2
  *filename_to_utf8displayname=\&Glib::filename_display_name if *Glib::filename_display_name{CODE};
  *PangoEsc=\&Glib::Markup::escape_text if *Glib::Markup::escape_text{CODE}; #needs perl-Gtk2 version >=1.092
@@ -43,16 +44,17 @@ use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime _exit/;
  }
  my $set_clip_rectangle_orig=\&Gtk2::Gdk::GC::set_clip_rectangle;
  *Gtk2::Gdk::GC::set_clip_rectangle=sub { &$set_clip_rectangle_orig if $_[1]; } if $Gtk2::VERSION <1.102; #work-around $rect can't be undef in old bindings versions
- if ($POSIX::VERSION<1.18)
- {	my ($strftime_encoding)= setlocale(LC_TIME)=~m#\.([^@]+)#;
-	*strftime_utf8= sub { $strftime_encoding ? Encode::decode($strftime_encoding, &strftime) : &strftime; };
+ if ($POSIX::VERSION<1.18) #previously, date strings returned by strftime needed to be decoded by the locale encoding
+ {	my ($encoding)= setlocale(LC_TIME)=~m#\.([^@]+)#;
+	$encoding='cp'.$encoding if $^O eq 'MSWin32' && $encoding=~m/^\d+$/;
+	if (!Encode::resolve_alias($encoding)) {warn "Can't find dates encoding used for dates, (LC_TIME=".setlocale(LC_TIME)."), dates may have wrong encoding\n";$encoding=undef}
+	*strftime_utf8= sub { $encoding ? Encode::decode($encoding, &strftime) : &strftime; };
  }
 }
 use List::Util qw/min max sum first/;
 use File::Copy;
 use File::Spec::Functions qw/file_name_is_absolute catfile rel2abs/;
 use Fcntl qw/O_NONBLOCK O_WRONLY O_RDWR SEEK_SET/;
-use Encode qw/_utf8_on _utf8_off/;
 use Scalar::Util qw/blessed weaken refaddr/;
 use Unicode::Normalize 'NFKD'; #for accent-insensitive sort and search, only used via superlc()
 use Carp;
@@ -77,8 +79,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1009',
- VERSIONSTRING => '1.1.9',
+ VERSION => '1.100902',
+ VERSIONSTRING => '1.1.9.2',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
@@ -153,6 +155,8 @@ INIT {%Alias_ext=(ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block becaus
 our $debug;
 our %CmdLine;
 our ($HomeDir,$SaveFile,$FIFOFile,$ImportFile,$DBus_id);
+sub find_gmbrc_file { my @f= map $_[0].$_, '','.gz','.xz'; return wantarray ? (grep { -e $_ } @f) : first { -e $_ } @f }
+my $gmbrc_ext_re= qr/\.gz$|\.xz$/;
 
 our $QSLASH;	#quoted SLASH for use in regex
 #FIXME use :		use constant QSLASH => quotemeta SLASH;
@@ -196,6 +200,9 @@ options :
 -searchpath FOLDER	: Additional FOLDER to look for plugins and layouts
 -use-gnome-session 	: Use gnome libraries to save tags/settings on session logout
 -workspace N		: move initial window to workspace N (requires Gnome2::Wnck)
+-gzip			: force not compressing gmbrc
++gzip			: force compressing gmbrc with gzip
++xz			: force compressing gmbrc with xz
 
 -cmd CMD		: add CMD to the list of commands to execute
 -ifnotrunning MODE	: change behavior when no running gmusicbrowser instance is found
@@ -247,6 +254,8 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-searchpath')	{ push @{ $CmdLine{searchpath} },shift if $ARGV[0]}
 	elsif($arg=~m/^([+-])plugin$/)	{ $CmdLine{plugins}{shift @ARGV}=($1 eq '+') if $ARGV[0]}
 	elsif($arg eq '-noplugins')	{ $CmdLine{noplugins}=1; delete $CmdLine{plugins}; }
+	elsif($arg=~m/^([+-])gzip$/)	{ $CmdLine{gzip}= $1 eq '+' ? 'gzip':''}
+	elsif($arg=~m/^([+-])xz$/)	{ $CmdLine{gzip}= $1 eq '+' ? 'xz':''}
 	elsif($arg eq '-geometry')	{ $CmdLine{geometry}=shift if $ARGV[0]; }
 	elsif($arg eq '-tagedit')	{ $CmdLine{tagedit}=1; $ignore=1; last; }
 	elsif($arg eq '-listplugin')	{ $CmdLine{pluginlist}=1; $ignore=1; last; }
@@ -303,15 +312,14 @@ Options to change what is done with files/folders passed as arguments (done in r
 		}
 	}
 	# auto import from old v1.0 tags file if using default savefile, it doesn't exist and old tags file exists
-	if (!$SaveFile && !-e $HomeDir.'gmbrc' && -e $HomeDir.'tags') { $ImportFile||=$HomeDir.'tags'; }
+	if (!$SaveFile && !find_gmbrc_file($HomeDir.'gmbrc') && -e $HomeDir.'tags') { $ImportFile||=$HomeDir.'tags'; }
 
 	$SaveFile||= $HomeDir.'gmbrc';
 	$FIFOFile= $HomeDir.'gmusicbrowser.fifo' if !defined $FIFOFile && $^O ne 'MSWin32';
-	$FIFOFile=undef if $FIFOFile eq '';
 
 	#check if there is an instance already running
 	my $running;
-	if (defined $FIFOFile && -p $FIFOFile)
+	if ($FIFOFile && -p $FIFOFile)
 	{	my @c= @cmd ? @cmd : ('Show');	#fallback to "Show" command
 		sysopen my$fifofh,$FIFOFile, O_NONBLOCK | O_WRONLY;
 		print $fifofh "$_\n" and $running=1 for @c;
@@ -856,14 +864,14 @@ sub dates_to_timestamps
 }
 
 sub ConvertTime	# convert date pattern into nb of seconds
-{	my ($date,$unit)= $_[0]=~m/^\s*(\d+|\d*?[.]\d+)\s*([a-zA-Z]*)\s*$/;
+{	my ($date,$unit)= $_[0]=~m/^\s*(\d*\.?\d+)\s*([a-zA-Z]*)\s*$/;
 	return 0 unless $date;
 	if (my $ref= $DATEUNITS{$unit}) { $date*= $ref->[0] }
 	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
 	return time-$date;
 }
 sub ConvertSize
-{	my ($size,$unit)= $_[0]=~m/^\s*(\d+|\d*?[.]\d+)\s*([a-zA-Z]*)\s*$/;
+{	my ($size,$unit)= $_[0]=~m/^\s*(\d*\.?\d+)\s*([a-zA-Z]*)\s*$/;
 	return 0 unless $size;
 	if (my $ref= $SIZEUNITS{lc$unit}) { $size*= $ref->[0] }
 	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
@@ -920,16 +928,6 @@ our %Options=
 	Sort		=> 'shuffle',		#default sort order
 	Sort_LastOrdered=> 'path file',
 	Sort_LastSR	=> 'shuffle',
-	WindowSizes	=>
-	{	Rename		=> '300x180',
-		MassRename	=> '650x550',
-		MassTag		=> '520x560',
-		AdvTag		=> '538x503',
-		SongInfo	=> '420x482',
-		EditSort	=> '600x320',
-		EditFilter	=> '600x260',
-		EditWRandom	=> '600x450',
-	},
 	Sessions	=> '',
 	StartCheck	=> 0,	#check if songs have changed on startup
 	StartScan	=> 0,	#scan @LibraryPath on startup for new songs
@@ -945,8 +943,9 @@ our %Options=
 	gst_use_equalizer=>0,
 	gst_equalizer	=> '0:0:0:0:0:0:0:0:0:0',
 	gst_equalizer_preamp => 1,
+	gst_use_replaygain=>1,
 	gst_rg_limiter	=> 1,
-	gst_rg_preamp	=> 6,
+	gst_rg_preamp	=> 0,
 	gst_rg_fallback	=> 0,
 	gst_rg_songmenu => 0,
 	Icecast_port	=> '8000',
@@ -1162,7 +1161,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 (	NextSongInPlaylist=> [\&NextSongInPlaylist,		_"Next Song In Playlist"],
 	PrevSongInPlaylist=> [\&PrevSongInPlaylist,		_"Previous Song In Playlist"],
 	NextAlbum	=> [sub {NextDiff('album')},		_"Next Album",],
-	NextArtist	=> [sub {NextDiff('artist_first')},	_"Next Artist",],
+	NextArtist	=> [sub {NextDiff('first_artist')},	_"Next Artist",],
 	NextSong	=> [\&NextSong,				_"Next Song"],
 	PrevSong	=> [\&PrevSong,				_"Previous Song"],
 	PlayPause	=> [\&PlayPause,			_"Play/Pause"],
@@ -1195,6 +1194,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	EnqueueAlbum	=> [sub {EnqueueSame('album',$SongID)},	_"Enqueue Songs from Current Album"],
 	EnqueueAction	=> [sub {EnqueueAction($_[1])},		_"Enqueue Action", _"Queue mode" ,sub { TextCombo->new({map {$_ => $QActions{$_}{short}} sort keys %QActions}) }],
 	ClearQueue	=> [\&::ClearQueue,			_"Clear queue"],
+	ClearPlaylist	=> [sub {Select(staticlist=>[])},	_"Clear playlist"],
 	IncVolume	=> [sub {ChangeVol('up')},		_"Increase Volume"],
 	DecVolume	=> [sub {ChangeVol('down')},		_"Decrease Volume"],
 	TogMute		=> [sub {ChangeVol('mute')},		_"Mute/Unmute"],
@@ -1293,7 +1293,7 @@ if ($CmdLine{cmdlist})
 	exit;
 }
 my $fifofh;
-if (defined $FIFOFile)
+if ($FIFOFile)
 {	if (-e $FIFOFile) { unlink $FIFOFile unless -p $FIFOFile; }
 	else
 	{	#system('mknod',$FIFOFile,'p'); #can't use mknod to create fifo on freeBSD
@@ -1545,7 +1545,7 @@ sub Quit
 	@ToScan=@ToAdd_Files=();
 	CloseTrayTip();
 	SaveTags();
-	unlink $FIFOFile if defined $FIFOFile;
+	unlink $FIFOFile if $FIFOFile;
 	Gtk2->main_quit;
 	exec $Options{Shutdown_cmd} if $turnoff && $Options{Shutdown_cmd};
 	exit;
@@ -1828,6 +1828,7 @@ sub ReadOldSavedTags
 	$Options{FilenameSchema}=	[split /\x1D/,$Options{FilenameSchema}];
 	$Options{FolderSchema}=		[split /\x1D/,$Options{FolderSchema}];
 	$Options{LibraryPath}= delete $Options{Path};
+	$Options{Labels}=delete $Options{Flags} if $oldversion<=0.9571;
 	$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2
 	$Options{Artists_split_re}= [ map { $artistsplit_old_to_new{$_}||$_ } grep $_ ne '$', split /\|/, delete $Options{ArtistSplit} ];
 	$Options{TrayTipDelay}&&=900;
@@ -1864,7 +1865,7 @@ sub ReadOldSavedTags
 		if ($misc=~m/^\d+$/ && $misc>0) { push @missing,$ID }
 		else { push @$Library,$ID };
 	}
-	Songs::AddMissing(\@missing) if @missing;
+	Songs::AddMissing(\@missing, 'init') if @missing;
 	while (<$fh>)
 	{	chomp; last if $_ eq '';
 		my ($key,$p)=split "\x1D";
@@ -1919,7 +1920,6 @@ sub ReadOldSavedTags
 			undef;
 		}
 	}
-	$Options{Labels}=delete $Options{Flags} if $oldversion<=0.9571;
 	s/^r/random:/ || s/([0-9s]+)(i?)/($1 eq 's' ? 'shuffle' : Songs::FieldUpgrade($1)).($2 ? ':i' : '')/ge
 		for values %{$Options{SavedSorts}},values %{$Options{SavedWRandoms}},$Options{Sort},$Options{AltSort};
 	$Options{Sort_LastOrdered}=$Options{Sort_LastSR}= delete $Options{AltSort};
@@ -1964,20 +1964,27 @@ sub Filter_new_from_string_with_upgrade	# for versions <=1.1.7
 }
 
 sub ReadSavedTags	#load tags _and_ settings
-{	my $LoadFile= $ImportFile || $SaveFile;
-	unless (-r $LoadFile && -s $LoadFile)
-	{	FirstTime();
-		Post_ReadSavedTags();
-		return;
+{	my ($fh,$loadfile,$ext)= Open_gmbrc( $ImportFile || $SaveFile,0);
+	unless ($fh)
+	{	if ($loadfile && -e $loadfile && -s $loadfile)
+		{	die "Can't open '$loadfile', aborting...\n" unless $fh;
+		}
+		else
+		{	FirstTime();
+			Post_ReadSavedTags();
+			return;
+		}
 	}
-	setlocale(LC_NUMERIC, 'C');  # so that '.' is used as a decimal separator when converting numbers into strings
-	warn "Reading saved tags in $LoadFile ...\n";
-	open my($fh),'<:utf8',$LoadFile;
+	warn "Reading saved tags in $loadfile ...\n";
+	$SaveFile.=$1 if $loadfile=~m#($gmbrc_ext_re)# && $SaveFile!~m#$gmbrc_ext_re#; # will use .gz/.xz to save if read from a .gz/.xz gmbrc
 
+	setlocale(LC_NUMERIC, 'C');  # so that '.' is used as a decimal separator when converting numbers into strings
 	# read first line to determine if old version, version >1.1.7 stars with "# gmbrc version=",  version <1.1 starts with a letter, else it's version<=1.1.7 (starts with blank or # (for comments) or [ (section name))
 	my $firstline=<$fh>;
+	unless (defined $firstline) { die "Can't read '$loadfile', aborting...\n" }
 	my $oldversion;
 	if ($firstline=~m/^#?\s*gmbrc version=(\d+\.\d+)/) { $oldversion=$1 }
+	elsif ($ext) { die "Can't find gmbrc header in '$loadfile', aborting...\n" }	# compressed gmbrc not supported with old versions, because can't seek backward in compressed fh
 	elsif ($firstline=~m/^\w/) { seek $fh,0,SEEK_SET; ReadOldSavedTags($fh); $oldversion=1 }
 	else	# version <=1.1.7
 	{	seek $fh,0,SEEK_SET;
@@ -1995,11 +2002,12 @@ sub ReadSavedTags	#load tags _and_ settings
 			push @{$lines{$section}},$_;
 		}
 		close $fh;
-		unless ($lines{Options}) { warn "Can't find Options section in '$LoadFile', it's probably not a gmusicbrowser save file -> aborting\n"; exit 1; }
+		unless ($lines{Options}) { warn "Can't find Options section in '$loadfile', it's probably not a gmusicbrowser save file -> aborting\n"; exit 1; }
 		SongArray::start_init(); #every SongArray read in Options will be updated to new IDs by SongArray::updateIDs later
 		ReadRefFromLines($lines{Options},\%Options);
 		$oldversion||=delete $Options{version} || VERSION;  # for version <=1.1.7
-		if ($oldversion<1.1007) {delete $Options{$_} for qw/Diacritic_sort gst_volume Simplehttp_CacheSize/;} #cleanup old options
+		if ($oldversion>VERSION) { warn "Loading a gmbrc saved with a more recent version of gmusicbrowser, try upgrading gmusicbrowser if there are problems\n"; }
+		if ($oldversion<1.10091) {delete $Options{$_} for qw/Diacritic_sort gst_volume Simplehttp_CacheSize mplayer_use_replaygain/;} #cleanup old options
 		$Options{AutoRemoveCurrentSong}= delete $Options{TAG_auto_check_current} if $oldversion<1.1005 && exists $Options{TAG_auto_check_current};
 		$Options{PlayedMinPercent}= 100*delete $Options{PlayedPercent} if exists $Options{PlayedPercent};
 		if ($Options{ArtistSplit}) # for versions <= 1.1.5
@@ -2046,6 +2054,14 @@ sub ReadSavedTags	#load tags _and_ settings
 
 	if ($oldversion<=1.1009)
 	{	bless $_,'SongArray::Named' for values %{$Options{SavedLists}}; #named lists now use SongArray::Named instead of plain SongArray
+		no warnings 'once';
+		for my $floatvector ($Songs::Songs_replaygain_track_gain__,$Songs::Songs_replaygain_track_peak__,$Songs::Songs_replaygain_album_gain__,$Songs::Songs_replaygain_album_peak__)
+		{	$floatvector=  pack "F*",map $_||"nan", unpack("F*",$floatvector) if $floatvector; # undef is now stored as nan rather than 0, upgrade assuming all 0s were undef
+		}
+	}
+	elsif ($oldversion==1.100901) #fix version 1.1.9.1 mistakenly upgrading by replacing float values of 0 by inf instead of nan
+	{	for my $floatvector ($Songs::Songs_replaygain_track_gain__,$Songs::Songs_replaygain_track_peak__,$Songs::Songs_replaygain_album_gain__,$Songs::Songs_replaygain_album_peak__)
+		{ $floatvector=  pack "F*",map {$_!="inf" ? $_ : "nan"} unpack("F*",$floatvector) if $floatvector; }
 	}
 
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};
@@ -2065,7 +2081,7 @@ sub ReadSavedTags	#load tags _and_ settings
 	&launchIdleLoop;
 
 	setlocale(LC_NUMERIC, '');
-	warn "Reading saved tags in $LoadFile ... done\n";
+	warn "Reading saved tags in $loadfile ... done\n";
 	Post_ReadSavedTags();
 }
 sub Post_Options_init
@@ -2080,18 +2096,77 @@ sub Post_ReadSavedTags
 	#CheckLength() if $Options{LengthCheckMode} eq 'add';
 }
 
+sub Open_gmbrc
+{	my ($file,$write)=@_;
+	my $encoding='utf8';
+	my ($fh,$ext,@cmd);
+	if ($write)
+	{	my @cmd;
+		if    ($file=~m#\.gz$#)	{ $ext='.gz'; @cmd=qw/gzip/; }
+		elsif ($file=~m#\.xz$#)	{ $ext='.xz'; @cmd=qw/xz -0/; }
+		if (@cmd)
+		{	if (findcmd($cmd[0]))
+			{	open $fh,'|-:'.$encoding,"@cmd > \Q$file\E"  or warn "Failed opening '$file' for writing (using $cmd[0]) : $!\n";
+			}
+			else { $file=~s#\.xz$|\.gz$##; @cmd=(); warn "Can't find $cmd[0], saving without compression\n"; }
+		}
+		if (!@cmd)
+		{	open $fh,'>:'.$encoding,$file  or warn "Failed opening '$file' for writing : $!\n";
+			$ext='';
+		}
+		return ($fh,$file,$ext);
+	}
+	else # open for reading
+	{	unless (-e $file)	#if not found as is try with/without .gz/.xz
+		{	$file=~s#$gmbrc_ext_re##;
+			$file= find_gmbrc_file($file);
+		}
+		return unless $file;
+		my $cmpr;
+		if ($file=~m#(\.gz|\.xz)$#) { $cmpr=$ext=$1; }
+		else
+		{	open $fh,'<',$file  or warn "Failed opening '$file' for reading : $!\n";
+			$cmpr=$ext='';
+
+			# check if file compressed in spite of not having a .gz/.xz extension
+			binmode($fh);	# need to read binary data, so do not set utf8 layer yet
+			read $fh,my($header),6;
+			if    ($header =~m#^\x1f\x8b#)	  { $cmpr='.gz'; } #gzip header : will open it as a .gz file
+			elsif ($header eq "\xFD7zXZ\x00") { $cmpr='.xz'; } #xz header
+			else { seek $fh,0,SEEK_SET; binmode($fh,':utf8'); } #no gzip header, rewind, and set utf8 layer
+		}
+		if    ($cmpr eq '.gz')	{ @cmd=qw/gzip -cd/; }
+		elsif ($cmpr eq '.xz')	{ @cmd=qw/xz -cd/; }
+		if (@cmd)
+		{	close $fh if $fh;	#close compressed files without extension
+			if (findcmd($cmd[0]))
+			{	open $fh,'-|:'.$encoding,"@cmd \Q$file\E"  or warn "Failed opening '$file' for reading (using $cmd[0]) : $!\n";
+			}
+			else { warn "Can't find $cmd[0], you could uncompress '$file' manually\n"; }
+		}
+		return ($fh,$file,$ext,$cmpr);
+	}
+}
+
 sub SaveTags	#save tags _and_ settings
 {	my $fork=shift; #if true, save in a forked process
 	HasChanged('Save');
 	if ($CmdLine{demo}) { warn "-demo option => not saving tags/settings\n"; return }
+
+	my $ext='';
+	my $SaveFile= $SaveFile; #do a local copy to locally remove .gz extension if present
+	$ext=$1 if $SaveFile=~s#($gmbrc_ext_re)$##; #remove .gz/.xz extension from the copy of $SaveFile, put it in $ext
+	if (exists $CmdLine{gzip}) { $ext= $CmdLine{gzip} eq 'gzip' ? '.gz' : $CmdLine{gzip} eq 'xz' ? '.xz' : '' }
+	#else { $ext='.gz' } # use gzip by default
+
 	my $savedir=$SaveFile;
 	$savedir=~s/([^$QSLASH]+)$//o;
 	my $savefilename=$1;
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
 	opendir my($dh),$savedir;
-	unlink $savedir.SLASH.$_ for grep m/^\Q$savefilename\E\.new\.\d+$/, readdir $dh; #delete old temporary save files
+	unlink $savedir.SLASH.$_ for grep m/^\Q$savefilename\E\.new\.\d+(?:$gmbrc_ext_re)?$/, readdir $dh; #delete old temporary save files
 	closedir $dh;
-	warn "Writing tags in $SaveFile ...\n";
+
 	if ($fork)
 	{	my $pid= fork;
 		if (!defined $pid) { $fork=undef; } # error, fallback to saving in current process
@@ -2122,9 +2197,12 @@ sub SaveTags	#save tags _and_ settings
 		elsif	($lastseen->{$key}<$tooold)	{ delete $_->{$key} for $Options{Layouts},$lastseen; }
 	}
 
+	local $SIG{PIPE} = 'DEFAULT';	# default is, for some reason, IGNORE, which causes "gzip: stdout: Broken pipe" after closing $fh when using gzip for unclear reasons
 	my $error;
-	my $tempfile= "$SaveFile.new.$$";
-	open my($fh),'>:utf8',$tempfile or warn "Error opening '$tempfile' for writing : $!";
+	(my$fh,my$tempfile,$ext)= Open_gmbrc("$SaveFile.new.$$"."$ext",1);
+	unless ($fh) { warn "Save aborted\n"; POSIX::_exit(0) if $fork; return; }
+	warn "Writing tags in $SaveFile$ext ...\n";
+
 	print $fh "# gmbrc version=".VERSION." time=".time."\n"  or $error||=$!;
 
 	my $optionslines=SaveRefToLines(\%Options);
@@ -2154,31 +2232,42 @@ sub SaveTags	#save tags _and_ settings
 	close $fh  or $error||=$!;
 	setlocale(LC_NUMERIC, '');
 	if ($error)
-	{	rename $tempfile,$SaveFile.'.error';
-		warn "Writing tags in $SaveFile ... error : $error\n";
+	{	rename $tempfile,$SaveFile.'.error'.$ext;
+		warn "Writing tags in $SaveFile$ext ... error : $error\n";
 		POSIX::_exit(1) if $fork;
 		return;
 	}
 	if ($fork && !-e $tempfile) { POSIX::_exit(0); } #tempfile disappeared, probably deleted by a subsequent save from another process => ignore
-	if (-e $SaveFile) #keep some old files as backup
-	{	{	last unless -e $SaveFile.'.bak';
-			last unless (open my $file,'<',$SaveFile.'.bak');
+	my $previous= $SaveFile.$ext;
+	$previous= find_gmbrc_file($SaveFile) unless -e $previous;
+	if ($previous) #keep some old files as backup
+	{	{	my ($bfh,$previousbak,$ext2,$cmpr)= Open_gmbrc($SaveFile.'.bak'.$ext,0);
+			last unless $bfh;
 			local $_; my $date;
-			while (<$file>) { if (m/^SavedOn:\s*(\d+)/) {$date=$1;last} last if m/^\[(?!Options])/}
-			close $file;
+			while (<$bfh>) { if (m/^SavedOn:\s*(\d+)/) {$date=$1;last} last if m/^\[(?!Options])/}
+			close $bfh;
 			last unless $date;
 			$date=strftime('%Y%m%d',localtime($date));
-			last if -e $SaveFile.'.bak.'.$date;
-			rename $SaveFile.'.bak', $SaveFile.'.bak.'.$date;
-			my @files=FileList(qr/^\Q$savefilename\E\.bak\.\d{8}$/, $savedir);
+			if (find_gmbrc_file($SaveFile.'.bak.'.$date)) { unlink $previousbak; last} #remove .bak if already a backup for that day
+			rename $previousbak, "$SaveFile.bak.$date$ext2"  or warn $!;
+			if (!$cmpr && (!exists $CmdLine{gzip} || $CmdLine{gzip})) #compress old backups unless "-gzip" option is used
+			{	my $cmd= $CmdLine{gzip} || 'xz';
+				$cmd= findcmd($cmd,'xz','gzip');
+				system($cmd,'-1','-f',"$SaveFile.bak.$date") if $cmd;
+			}
+
+			my @files=FileList(qr/^\Q$savefilename\E\.bak\.\d{8}(?:$gmbrc_ext_re)?$/, $savedir);
 			last unless @files>5;
 			splice @files,-5;	#keep the 5 newest versions
-			unlink $_ for @files;
+			unlink @files;
 		}
-		rename $SaveFile,$SaveFile.'.bak'  or warn $!;
+		my $rename= $previous;
+		$rename=~s#($gmbrc_ext_re?)$#.bak$1#;
+		rename $previous, $rename  or warn $!;
+		unlink $_ for find_gmbrc_file($SaveFile); #make sure there is no other old gmbrc without .bak, as they could cause confusion
 	}
-	rename $tempfile,$SaveFile  or warn $!;
-	warn "Writing tags in $SaveFile ... done\n";
+	rename $tempfile,$SaveFile.$ext  or warn $!;
+	warn "Writing tags in $SaveFile$ext ... done\n";
 	POSIX::_exit(0) if $fork;
 }
 
@@ -2307,10 +2396,10 @@ sub SaveRefToLines	#convert hash/array into a YAML string readable by ReadRefFro
 }
 
 sub SetWSize
-{	my ($win,$wkey)=@_;
+{	my ($win,$wkey,$default)=@_;
 	$win->set_role($wkey);
 	$win->set_name($wkey);
-	my $prevsize= $Options{WindowSizes}{$wkey};
+	my $prevsize= $Options{WindowSizes}{$wkey} || $default;
 	$win->resize(split 'x',$prevsize,2) if $prevsize;
 	$win->signal_connect(unrealize => sub
 		{ $Options{WindowSizes}{$_[1]}=join 'x',$_[0]->get_size; }
@@ -2375,27 +2464,28 @@ sub Play
 }
 
 sub ErrorPlay
-{	my ($error,$critical)=@_;
+{	my ($error,$details)=@_;
 	$error= __x( _"Playing error : {error}", error=> $error );
 	warn $error."\n";
-	return if $Options{IgnorePlayError} && !$critical;
+	return if $Options{IgnorePlayError};
 	my $dialog = Gtk2::MessageDialog->new
 		( undef, [qw/modal destroy-with-parent/],
 		  'error','close','%s',
 		  $error
 		);
-	if ($critical)
-	{ my $button=Gtk2::Button->new('Save tag/settings now');
-	  my $l=Gtk2::Label->new('Warning. This error may cause the program to crash, it could be a good time to save tags/settings now');
-	  $l->set_line_wrap(1);
-	  $button->signal_connect(clicked => sub
-		  { $_[0]->hide;$l->set_text('tags/settings saved');SaveTags(); });
-	  $dialog->vbox->pack_start($_,0,0,4) for $l,$button;
+	if ($details)
+	{	my $expander=Gtk2::Expander->new(_"Error details");
+		$details= Gtk2::Label->new($details);
+		$details->set_line_wrap(1);
+		$details->set_selectable(1);
+		$expander->add($details);
+		$dialog->vbox->pack_start($expander,0,0,2);
 	}
 	$dialog->show_all;
 	$dialog->run;
 	$dialog->destroy;
 	#$dialog->signal_connect( response => sub {$_[0]->destroy});
+	$PlayingID=undef; #will avoid counting the song as played or skipped
 	Stop();
 }
 
@@ -2408,7 +2498,7 @@ sub end_of_file
 {	SwitchPlayPackage() if $PlayNext_package;
 	&Played;
 	ResetTime();
-	&NextSong;
+	&NextSong if $TogPlay;
 }
 
 sub Stop
@@ -2531,8 +2621,8 @@ sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, 
 
 sub ClearQueue
 {	$Queue->Replace();
-	$QueueAction='';
-	HasChanged('QueueAction');
+	#$QueueAction='';
+	#HasChanged('QueueAction');
 }
 
 sub EnqueueSame
@@ -2636,25 +2726,26 @@ sub NextSongInPlaylist
 	SetPosition($pos);
 }
 
-sub GetNextSongs
-{	my $nb=shift||1;
-	my $list=($nb>1)? 1 : 0;
+sub GetNextSongs	##if no aguments, returns next song and makes the changes assuming it is to become next song (remove it from queue, ...)
+{	my ($nb,$onlyIDs)=@_; # if $nb is defined : passive query, do not make any change to queue or other things
+	my $passive= defined $nb ? 1 : 0;
+	$nb||=1;
 	my @IDs;
 	{ if (@$Queue)
-	  {	unless ($list) { my $ID=$Queue->Shift; return $ID; }
-		push @IDs,_"Queue";
+	  {	unless ($passive) { my $ID=$Queue->Shift; return $ID; }
+		push @IDs,_"Queue" unless $onlyIDs;
 		if ($nb>@$Queue) { push @IDs,@$Queue; $nb-=@$Queue; }
 		else { push @IDs,@$Queue[0..$nb-1]; last; }
 	  }
 	  if ($QueueAction)
-	  {	push @IDs, $list ? $QActions{$QueueAction}{short} : $QueueAction;
-		unless ($list || $QActions{$QueueAction}{keep}) { EnqueueAction('') }
+	  {	push @IDs, ($passive ? $QActions{$QueueAction}{short} : $QueueAction)  unless $onlyIDs;
+		unless ($passive || $QActions{$QueueAction}{keep}) { EnqueueAction('') }
 		last;
 	  }
 	  return unless @$ListPlay;
 	  $ListPlay->UpdateSort if $ToDo{'8_resort_playlist'};
 	  if ($RandomMode)
-	  {	push @IDs,_"Random" if $list;
+	  {	push @IDs,_"Random" if $passive && !$onlyIDs;
 		push @IDs,$RandomMode->Draw($nb,((defined $SongID && @$ListPlay>1)? [$SongID] : undef));
 		last;
 	  }
@@ -2669,7 +2760,7 @@ sub GetNextSongs
 			$pos=-1 if !defined $pos;
 		}
 	  }
-	  push @IDs,_"Next" if $list;
+	  push @IDs,_"Next" if $passive && !$onlyIDs;
 	  while ($nb)
 	  {	if ( $pos+$nb > $#$ListPlay )
 		{	push @IDs,@$ListPlay[$pos+1..$#$ListPlay];
@@ -2680,13 +2771,13 @@ sub GetNextSongs
 		else { push @IDs,@$ListPlay[$pos+1..$pos+$nb]; last; }
 	  }
 	}
-	return $list ? @IDs : $IDs[0];
+	return wantarray ? @IDs : $IDs[0];
 }
 
 sub PrepNextSongs
 {	if ($RandomMode) { @NextSongs=@$Queue; $#NextSongs=9 if $#NextSongs>9; }
 	else
-	{	@NextSongs= grep /^\d+$/, GetNextSongs(10); # FIXME GetNextSongs needs some changes to return only IDs, and in the GetNextSongs(1) case
+	{	@NextSongs= GetNextSongs(10,'onlyIDs');
 	}
 	my $nextID=$NextSongs[0];
 	$NextFileToPlay= defined $nextID ? Songs::GetFullFilename($nextID) : undef;
@@ -3814,7 +3905,7 @@ sub BuildMenu
 		if (my $submenu=$m->{submenu})
 		{	$submenu=$submenu->($args) if ref $submenu eq 'CODE';
 			if ($m->{code}) { $submenu=BuildChoiceMenu($submenu, %$m, args=>$args); }
-			elsif (ref $submenu eq 'ARRAY') { $submenu=BuildMenu($submenu,$args); }
+			elsif (ref $submenu eq 'ARRAY') { $submenu=BuildMenuOptional($submenu,$args); }
 			next unless $submenu;
 			if (my $append=$m->{append})	#append to submenu
 			{	BuildMenu($append,$args,$submenu);
@@ -3842,6 +3933,10 @@ sub BuildMenu
 		$menu->append($item);
 	}
 	return $menu;
+}
+sub BuildMenuOptional
+{	my $menu= &BuildMenu;
+	return $menu->get_children ? $menu : undef;
 }
 sub PopupContextMenu
 {	my $args=$_[1];
@@ -4140,22 +4235,26 @@ COPYNEXTID:for my $ID (@$IDs)
 sub ChooseDir
 {	my ($msg,$path,$extrawidget,$remember_key,$multiple,$allowfiles) = @_;
 	my $mode= $allowfiles ? 'open' : 'select-folder';
-	my $dialog=Gtk2::FileChooserDialog->new($msg,undef,$mode);
-	my $okbutton=$dialog->add_button('gtk-ok' => 'ok');
-	$dialog->add_button('gtk-cancel' => 'none');
-
-	# there is no mode in Gtk2::FileChooserDialog that let you select both files or folders (Bug #136294), so have to work-around by connecting to the ok button and forcing the end of $dialog->run with a $dialog->hide (the dialog will be destroyed after)
-	$okbutton->signal_connect(clicked=> sub { $_[0]->{ok}=1; $dialog->hide; }) if $allowfiles;
+	# there is no mode in Gtk2::FileChooserDialog that let you select both files or folders (Bug #136294), so use Gtk2::FileChooserWidget directly as it doesn't interfere with the ok button (in "open" mode pressing ok in a Gtk2::FileChooserDialog while a folder is selected go inside that folder rather than emiiting the ok response with that folder selected)
+	my $dialog=Gtk2::Dialog->new($msg,undef,[], 'gtk-ok' => 'ok', 'gtk-cancel' => 'none');
+	my $filechooser=Gtk2::FileChooserWidget->new($mode);
+	$dialog->vbox->add($filechooser);
+	$dialog->set_border_width(5);			# mimick the normal open dialog
+	$dialog->get_action_area->set_border_width(5);	#
+	$dialog->vbox->set_border_width(5);		#
+	$dialog->vbox->set_spacing(5);			#
+	::SetWSize($dialog,'ChooseDir','750x580');
 
 	if ($remember_key)	{ $path= $Options{$remember_key}; }
 	elsif ($path)		{ $path= url_escape($path); }
-	$dialog->set_current_folder_uri("file://".$path) if $path;
-	$dialog->set_extra_widget($extrawidget) if $extrawidget;
-	$dialog->set_select_multiple(1) if $multiple;
+	$filechooser->set_current_folder_uri("file://".$path) if $path;
+	$filechooser->set_extra_widget($extrawidget) if $extrawidget;
+	$filechooser->set_select_multiple(1) if $multiple;
 
 	my @paths;
-	if ($dialog->run eq 'ok' || $okbutton->{ok})
-	{	for my $path ($dialog->get_uris)
+	$dialog->show_all;
+	if ($dialog->run eq 'ok')
+	{	for my $path ($filechooser->get_uris)
 		{	next unless $path=~s#^file://##;
 			$path=decode_url($path);
 			next unless -e $path;
@@ -4164,7 +4263,7 @@ sub ChooseDir
 		}
 	}
 	else {@paths=()}
-	if ($remember_key) { my $uri=$dialog->get_current_folder_uri; $uri=~s#^file://##; $Options{$remember_key}= $uri; }
+	if ($remember_key) { my $uri=$filechooser->get_current_folder_uri; $uri=~s#^file://##; $Options{$remember_key}= $uri; }
 	$dialog->destroy;
 	return @paths if $multiple;
 	return $paths[0];
@@ -4582,7 +4681,7 @@ sub DialogMassRename
 			);
 	$dialog->set_border_width(4);
 	$dialog->set_default_response('ok');
-	SetWSize($dialog,'MassRename');
+	SetWSize($dialog,'MassRename','650x550');
 	my $table=MakeReplaceTable('talydnAYo');
 	my $combo=	NewPrefComboText('FilenameSchema');
 	my $comboFolder=NewPrefComboText('FolderSchema');
@@ -4742,7 +4841,7 @@ sub DialogRename
 	my $label_ext=Gtk2::Label->new('.'.$ext);
 	$dialog->vbox->add($table);
 	$dialog->vbox->add(Hpack('_',$entry,0,$label_ext));
-	SetWSize($dialog,'Rename');
+	SetWSize($dialog,'Rename','300x180');
 
 	$dialog->show_all;
 	$dialog->signal_connect( response => sub
@@ -4847,14 +4946,13 @@ sub SearchSame
 
 sub SongsSubMenuTitle
 {	my $nb=@{ AA::GetIDs($_[0]{field},$_[0]{gid}) };
-	return undef if $nb==0;
 	return __("%d Song","%d Songs",$nb);
 }
 sub SongsSubMenu
 {	my %args=%{$_[0]};
 	$args{mode}='S';
 	$args{IDs}=\@{ AA::GetIDs($args{field},$args{gid}) };
-	BuildMenu(\@SongCMenu,\%args);
+	BuildMenuOptional(\@SongCMenu,\%args);
 }
 
 sub ArtistContextMenu
@@ -4946,7 +5044,7 @@ sub DialogSongsProp
 	my $edittag=MassTag->new(@IDs);
 	$dialog->vbox->add($edittag);
 
-	SetWSize($dialog,'MassTag');
+	SetWSize($dialog,'MassTag','520x560');
 	$dialog->show_all;
 
 	$dialog->signal_connect( response => sub
@@ -4976,7 +5074,7 @@ sub DialogSongProp
 	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Tag"));
 	$notebook->append_page( $songinfo,	Gtk2::Label->new(_"Info"));
 
-	SetWSize($dialog,'SongInfo');
+	SetWSize($dialog,'SongInfo','420x482');
 	$dialog->show_all;
 
 	$dialog->signal_connect( response => sub
@@ -5324,7 +5422,7 @@ sub AutoSelPicture
 	{	my $file= AAPicture::GetPicture($field,$gid);
 		if (defined $file)
 		{	return unless $file; # file eq '0' => no picture
-			if ($file=~s/:(\w+)$//) { return if FileTag::PixFromMusicFile($file,$1); }
+			if ($file=~m/\.(?:mp3|flac|m4a|m4b|oga|ogg)(?::(\w+))?$/) { return if FileTag::PixFromMusicFile($file,$1,1); }
 			else { return if -e $file }
 		}
 	}
@@ -5728,25 +5826,23 @@ sub SetDefaultOptions
 }
 
 sub PrefAudio
-{	my $vbox=Gtk2::VBox->new(FALSE, 2);
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
+{	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	my ($radio_gst,$radio_123,$radio_mp,$radio_ice)=NewPrefRadio('AudioOut', sub
+	my ($radio_gst,$radio_123,$radio_mp,$radio_ice)=NewPrefRadio('AudioOut',
+		[ gstreamer		=> 'Play_GST',
+		  'mpg123/ogg123/...'	=> 'Play_123',
+		  mplayer		=> 'Play_mplayer',
+		  _"icecast server"	=> sub {$Options{use_GST_for_server}? 'Play_GST_server' : 'Play_Server'},
+		], cb=>sub
 		{	my $p=$Options{AudioOut};
 			return if $PlayPacks{$p}==$Play_package;
 			$PlayNext_package=$PlayPacks{$p};
 			SwitchPlayPackage() unless defined $PlayTime;
 			$ScanRegex=undef;
-		},
-		gstreamer		=> 'Play_GST',
-		'mpg123/ogg123/...' => 'Play_123',
-		mplayer			=> 'Play_mplayer',
-		_"icecast server"	=> sub {$Options{use_GST_for_server}? 'Play_GST_server' : 'Play_Server'},
-		);
+		}, markup=> '<b>%s</b>',);
 
 	#123
 	my $vbox_123=Gtk2::VBox->new (FALSE, 2);
-	#my $hbox1=NewPrefCombo(Device => [qw/default oss alsa esd arts sun/], text => _"output device :", sizeg1=>$sg1,sizeg2=> $sg2);
 	my $adv1=PrefAudio_makeadv('Play_123','123');
 	$vbox_123->pack_start($_,FALSE,FALSE,2) for $radio_123,$adv1;
 
@@ -5761,11 +5857,10 @@ sub PrefAudio
 		$sg2->add_widget($EQbut);
 		my $EQbox=Hpack($EQcheck,$EQbut);
 		$EQbox->set_sensitive(0) unless $PlayPacks{Play_GST} && $PlayPacks{Play_GST}{EQ};
-		my $RGbox= Play_GST::RG_PrefBox($sg1,$sg2);
 		my $adv2=PrefAudio_makeadv('Play_GST','gstreamer');
 		my $albox=Gtk2::Alignment->new(0,0,1,1);
 		$albox->set_padding(0,0,15,0);
-		$albox->add(Vpack($hbox2,$EQbox,$RGbox,$adv2));
+		$albox->add(Vpack($hbox2,$EQbox,$adv2));
 		$vbox_gst->pack_start($_,FALSE,FALSE,2) for $radio_gst,$albox;
 	}
 	else
@@ -5775,7 +5870,7 @@ sub PrefAudio
 	#icecast
 	my $vbox_ice=Gtk2::VBox->new(FALSE, 2);
 	$Options{use_GST_for_server}=0 unless $PlayPacks{Play_GST_server};
-	my $usegst=NewPrefCheckButton(use_GST_for_server => _"Use gstreamer",cb=>sub {$radio_gst->signal_emit('toggled');}, tip=>_"without gstreamer : one stream per file, one connection at a time\nwith gstreamer : one continuous stream, multiple connection possible");
+	my $usegst=NewPrefCheckButton(use_GST_for_server => _"Use gstreamer",cb=>sub {$radio_ice->signal_emit('toggled');}, tip=>_"without gstreamer : one stream per file, one connection at a time\nwith gstreamer : one continuous stream, multiple connection possible");
 	my $hbox3=NewPrefEntry('Icecast_port',_"port :");
 	my $albox=Gtk2::Alignment->new(0,0,1,1);
 	$albox->set_padding(0,0,15,0);
@@ -5793,12 +5888,27 @@ sub PrefAudio
 	$vbox_mp ->set_sensitive($PlayPacks{Play_mplayer});
 	$usegst->set_sensitive($PlayPacks{Play_GST_server});
 
-	$vbox->pack_start($_,FALSE,FALSE,2) for
-		$vbox_gst, Gtk2::HSeparator->new,
-		$vbox_123, Gtk2::HSeparator->new,
-		$vbox_mp,  Gtk2::HSeparator->new,
-		$vbox_ice, Gtk2::HSeparator->new,
-		NewPrefCheckButton(IgnorePlayError => _"Ignore playback errors", tip=>_"Skip to next song if an error occurs");
+	#replaygain
+	my $rg_check= ::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain", tip=>_"Normalize volume (the files must have replaygain tags)", cb=>\&Set_replaygain );
+	my $rg_cb= sub { my $p=$Options{AudioOut}; $p&&=$PlayPacks{$p}; $_[0]->set_sensitive( $p && $p->{RG} ); };
+	Watch($rg_check, Option=> $rg_cb );
+	$rg_cb->($rg_check);
+	my $rga_start=Gtk2::Button->new(_"Start ReplayGain analysis");
+	$rga_start->set_tooltip_text(_"Analyse and add replaygain tags for all songs that don't have replaygain tags, or incoherent album replaygain tags");
+	$rga_start->signal_connect(clicked => \&GMB::GST_ReplayGain::Analyse_full);
+	$rga_start->set_sensitive($Play_GST::GST_RGA_ok);
+	my $rg_opt= Gtk2::Button->new(_"ReplayGain options");
+	$rg_opt->signal_connect(clicked => \&replaygain_options_dialog);
+	$sg1->add_widget($rg_check);
+	$sg2->add_widget($rg_opt);
+
+	my $vbox=Vpack( $vbox_gst, Gtk2::HSeparator->new,
+			$vbox_123, Gtk2::HSeparator->new,
+			$vbox_mp,  Gtk2::HSeparator->new,
+			$vbox_ice, Gtk2::HSeparator->new,
+			[$rg_check,$rg_opt,($Glib::VERSION >= 1.251 ? $rga_start : ())],
+			NewPrefCheckButton(IgnorePlayError => _"Ignore playback errors", tip=>_"Skip to next song if an error occurs"),
+		      );
 	return $vbox;
 }
 
@@ -5838,6 +5948,30 @@ sub PrefAudio_makeadv
 	}
 	return $hbox;
 }
+
+my $RG_dialog;
+sub replaygain_options_dialog
+{	if ($RG_dialog) {$RG_dialog->force_present;return}
+	$RG_dialog= Gtk2::Dialog->new (_"ReplayGain options", undef, [], 'gtk-close' => 'close');
+	$RG_dialog->signal_connect(destroy => sub {$RG_dialog=undef});
+	$RG_dialog->signal_connect(response =>sub {$_[0]->destroy});
+	my $songmenu=::NewPrefCheckButton(gst_rg_songmenu => _("Show replaygain submenu").($Glib::VERSION >= 1.251 ? '' : ' '._"(unstable)"));
+	my $albummode=::NewPrefCheckButton(gst_rg_albummode => _"Album mode", cb=>\&Set_replaygain, tip=>_"Use album normalization instead of track normalization");
+	my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter", cb=>\&Set_replaygain, tip=>_"Used for clipping prevention");
+	my $sg1=Gtk2::SizeGroup->new('horizontal');
+	my $sg2=Gtk2::SizeGroup->new('horizontal');
+	my $preamp=	::NewPrefSpinButton('gst_rg_preamp',   -60,60, cb=>\&Set_replaygain, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"pre-amp : %d dB", tip=>_"Extra gain");
+	my $fallback=	::NewPrefSpinButton('gst_rg_fallback', -60,60, cb=>\&Set_replaygain, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"fallback-gain : %d dB", tip=>_"Gain for songs missing replaygain tags");
+	$RG_dialog->vbox->pack_start($_,0,0,2) for $albummode,$preamp,$fallback,$nolimiter,$songmenu;
+	$RG_dialog->show_all;
+
+	$songmenu->set_sensitive( $Play_GST::GST_RGA_ok );
+	# nolimiter not available with mplayer
+	my $nolimiter_update= sub { $_[0]->set_sensitive( $Options{AudioOut} ne 'Play_mplayer'); };
+	Watch($nolimiter, Option=> $nolimiter_update );
+	$nolimiter_update->($nolimiter);
+}
+sub Set_replaygain { $Play_package->RG_set_options() if $Play_package->can('RG_set_options'); }
 
 sub pref_artists_update_desc
 {	my $button=shift;
@@ -6407,7 +6541,8 @@ sub SetOption
 }
 
 sub NewPrefRadio
-{	my ($key,$sub,@text_val)=@_;
+{	my ($key,$text_val,%opt)=@_;
+	my $sub=$opt{cb};
 	my $init=$Options{$key};
 	$init='' unless defined $init;
 	my $cb=sub
@@ -6417,13 +6552,17 @@ sub NewPrefRadio
 			SetOption($key,$val);
 			&$sub if $sub;
 		};
-	my $radio; my @radios;
-	while (defined (my $text=shift @text_val))
-	{	my $val=shift @text_val;
-		push @radios, $radio=Gtk2::RadioButton->new($radio,$text);
-		$val=&$val if ref $val;
+	my ($radio,@radios);
+	my $i=0;
+	while ($i<$#$text_val)
+	{	my $text= $text_val->[$i++];
+		my $val0= $text_val->[$i++];
+		push @radios, $radio=Gtk2::RadioButton->new($radio);
+		my $label=Gtk2::Label->new_with_format($opt{markup}||'%s', $text);
+		$radio->add($label);
+		my $val= ref $val0 ? &$val0 : $val0;
 		$radio->set_active(1) if $val eq $init;
-		$radio->signal_connect(toggled => $cb,$val);
+		$radio->signal_connect(toggled => $cb,$val0);
 	}
 	return @radios;
 }
@@ -6712,7 +6851,7 @@ sub SaveList
 	}
 	elsif (defined $val)
 	{	if (my $songarray= $saved->{$name})	{ $songarray->Replace($val); return }
-		else					{ $saved->{$name}= SongArray::Named->new($val); HasChanged('SavedLists',$name); }
+		else					{ $saved->{$name}= SongArray::Named->new_copy($val); HasChanged('SavedLists',$name); }
 	}
 	else	{ delete $saved->{$name}; HasChanged('SavedLists',$name,'remove'); }
 	Songs::Changed(undef,'list'); # simulate modifcation of the fake "list" field
@@ -6910,7 +7049,7 @@ sub Progress
 	$self->{fraction}= ($self->{current}||=0) / ($self->{end}||1);
 
 	if (my $w=$self->{widget}) { $w->set_fraction( $self->{fraction} ); }
-	delete $Progress{$pid} if $self->{abort} or $self->{current}==$self->{end}; # finished
+	delete $Progress{$pid} if $self->{abort} or $self->{current}>=$self->{end}; # finished
 	HasChanged(Progress =>$pid,$Progress{$pid});
 	if ( $Progress{$pid} && !$self->{widget} && (!$EventWatchers{Progress} || @{$EventWatchers{Progress}}==0))	#if no widget => create progress window
 	{	#create the progress window only after a short timeout to ignore short jobs
@@ -7114,11 +7253,11 @@ my %refs;
 INIT
 { %refs=
   (	Filter	=> [	_"Filter edition",		'SavedFilters',		_"saved filters",
-			_"name of the new filter",	_"save filter as",	_"delete selected filter"	],
+			_"name of the new filter",	_"save filter as",	_"delete selected filter",	'600x260'],
 	Sort	=> [	_"Sort mode edition",		'SavedSorts',		_"saved sort modes",
-			_"name of the new sort mode",	_"save sort mode as",	_"delete selected sort mode"	],
+			_"name of the new sort mode",	_"save sort mode as",	_"delete selected sort mode",	'600x320'],
 	WRandom	=> [	_"Random mode edition",		'SavedWRandoms',	_"saved random modes",
-			_"name of the new random mode", _"save random mode as", _"delete selected random mode"],
+			_"name of the new random mode", _"save random mode as", _"delete selected random mode",	'600x450'],
 	STGroupings => [_"SongTree groupings edition", 'SavedSTGroupings',	_"saved groupings",
 			_"name of the new grouping",	_"save grouping as",	_"delete selected grouping"],
   );
@@ -7196,7 +7335,7 @@ sub new
 	if ($self->{save_name_entry}) { $editobject->pack_start(::Hpack(Gtk2::Label->new('Save as : '),$self->{save_name_entry}), ::FALSE,::FALSE, 2); $self->{save_name_entry}->set_text($name); }
 	$self->{editobject}=$editobject;
 
-	::SetWSize($self,'Edit'.$type);
+	::SetWSize($self,'Edit'.$type,$typedata->[6]);
 	$self->show_all;
 
 	$treeview->get_selection->unselect_all;
@@ -7936,7 +8075,7 @@ sub AddRow
 	my $table=$self->{table};
 	my $row=$self->{row}++;
 	my $deleted;
-	my ($inverse,$weight,$type,$extra)=$params=~m/^(-?)([0-9.]+)([a-zA-Z])(.*)$/;
+	my ($inverse,$weight,$type,$extra)=$params=~m/^(-?)(\d*\.?\d+)([a-zA-Z])(.*)$/;
 	return unless $type;
 	my $frame=Gtk2::Frame->new( $Random::ScoreTypes{$type}{desc} );
 	$frame->{type}=$type;
@@ -8426,7 +8565,7 @@ sub new
 	my $self= bless Gtk2::HBox->new, $class;
 
 	my $max=  $opt->{max} || 999999;
-	my $min=  $opt->{min} || $opt->{negative} ? -$max : 0;
+	my $min=  $opt->{min} || $opt->{signed} ? -$max : 0;
 	my $step= $opt->{step}|| 1;
 	my $page= $opt->{page}|| $step*10;
 	my $digits=$opt->{digits}|| 0;

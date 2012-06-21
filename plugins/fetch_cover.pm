@@ -71,8 +71,8 @@ sub prefbox
 	my $check2=::NewPrefCheckButton(OPT.'UNIQUE',_"Find a unique filename if file already exists");
 	my $entry1=::NewPrefEntry(OPT.'COVERPATH');
 	my $entry2=::NewPrefEntry(OPT.'COVERFILE');
-	my ($radio1a,$radio1b)=::NewPrefRadio(OPT.'USEPATH',undef,_"use song folder",0,_"use :",1);
-	my ($radio2a,$radio2b)=::NewPrefRadio(OPT.'USEFILE',undef,_"use album name",0,_"use :",1);
+	my ($radio1a,$radio1b)=::NewPrefRadio(OPT.'USEPATH',[_"use song folder",0, _"use :",1]);
+	my ($radio2a,$radio2b)=::NewPrefRadio(OPT.'USEFILE',[_"use album name",0,  _"use :",1]);
 	my $frame1=Gtk2::Frame->new(_"default folder");
 	my $frame2=Gtk2::Frame->new(_"default filename");
 	my $vbox1=::Vpack( $radio1a,[$radio1b,$entry1] );
