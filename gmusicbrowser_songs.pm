@@ -49,6 +49,10 @@ our %timespan_menu=
 		'filter:mi'	=> '#display# .=~. m"#VAL#"i',			'filter_prep:mi'=> \&Filter::QuoteRegEx,
 		'filter:si'	=> 'index( lc(#display#),"#VAL#") .!=. -1',	'filter_prep:si'=> sub {quotemeta lc($_[0])},
 		'filter:s'	=> 'index(    #display#, "#VAL#") .!=. -1',	'filter_prep:s'=> sub {quotemeta $_[0]},
+		'filter:fuzzy'	=> '.!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",lc(#get#))', 'filter_prep:fuzzy'=> sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta lc($arg[1])},
+		'filterpat:fuzzy'=> [ display => "%d %%", unit => '%', min=>20, max=>99, default_value=>65, ],
+		'filterdesc:fuzzy'=> [ _"%s fuzzy match with %s",_"fuzzy match", 'fuzzy string', ],
+		'filterdesc:-fuzzy'=> _"no %s fuzzy match with %s",
 		'filterdesc:mi'	=> [ _"matches regexp %s",_"matches regexp",'regexp',	icase=>1, ],
 		'filterdesc:si'	=> [ _"contains %s",	_"contains",	'substring',	icase=>1, ],
 		'filterdesc:e'	=> [ _"is equal to %s",		_"is equal to",		'string', completion=>1, ],
@@ -61,6 +65,7 @@ our %timespan_menu=
 		'filterdesc:-e'	=> _"isn't equal to %s",
 		'smartfilter:=empty' => 'e:',
 		'smartfilter:=' => 'e',
+		'smartfilter:#' => \&Filter::smartstring_fuzzy,
 		'smartfilter::' => 'si s',
 		'smartfilter:~' => 'mi m',
 		default_filter	=> 'si',
@@ -117,12 +122,14 @@ our %timespan_menu=
 		#FIXME for filters s,m,mi,h~,  using a list of matching names in ___inames/___names could be better (using a bitstring)
 		'filter:si'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___iname[$_], "#VAL#") .!=. -1 ,@$v) : (index(___iname[$v], "#VAL#") .!=. -1); }',
 		'filter:s'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___name[$_], "#VAL#")  .!=. -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
+		'filter:fuzzy'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (.!!. ::first {Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$_])} ,@$v) : .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$v]); }',
 		'filter:m'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___name[$_]  .=~. m"#VAL#"  ,@$v) : ___name[$v]  .=~. m"#VAL#"; }',
 		'filter:mi'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___iname[$_] .=~. m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
 		'filter_prep:m'	=> \&Filter::QuoteRegEx,
 		'filter_prep:mi'=> \&Filter::QuoteRegEx,
-		'filter_prep:si'=> sub {quotemeta lc($_[0])},
-		'filter_prep:s'=> sub {quotemeta $_[0]},
+		'filter_prep:si'=> sub {quotemeta ::superlc($_[0])},
+		'filter_prep:s' => sub {quotemeta $_[0]},
+		'filter_prep:fuzzy'=>sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta ::superlc($arg[1])},
 		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ---- AFTER: #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}',
 		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v }',
@@ -145,10 +152,14 @@ our %timespan_menu=
 		'filterdesc:-mi'=> _"doesn't match regexp %s",
 		'filterdesc:-s'	=> _"doesn't contain %s (case sensitive)",
 		'filterdesc:-si'=> _"doesn't contain %s",
+		'filterdesc:fuzzy'=> [ _"%s fuzzy match with %s",_"fuzzy match", 'fuzzy string', ],
+		'filterdesc:-fuzzy'=> _"no %s fuzzy match with %s",
 		'smartfilter:=empty' => 'ecount:0',
 		'smartfilter:=' => '~',
 		'smartfilter::' => 'si s',
 		'smartfilter:~' => 'mi m',
+		'smartfilter:#' => \&Filter::smartstring_fuzzy,
+		'filterpat:fuzzy'=> [ display => "%d %%", unit => '%', min=>20, max=>99, default_value=>65, ],
 		default_filter	=> 'si',
 
 		load_extra	=> '___gid{#SGID#} || return;',
@@ -288,6 +299,7 @@ our %timespan_menu=
 		set	=> '#_# = #VAL#; #_iname#= ::superlc(#VAL#);',
 		si_sort	=> '#_iname#',
 		'filter:si'	=> 'index( #_iname#,"#VAL#") .!=. -1',			'filter_prep:si'=> sub { quotemeta ::superlc($_[0])},
+		'filter:fuzzy'	=> ' .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",#_iname#)',	'filter_prep:fuzzy'=> sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta ::superlc($arg[1])},
 	},
 	text =>	#multi-lines string
 	{	parent			=> 'string',
@@ -349,6 +361,7 @@ our %timespan_menu=
 		gid_to_display	=> '#_name#[#GID#]',
 		'filter:m'	=> '#_name#[#_#]  .=~. m"#VAL#"',
 		'filter:mi'	=> '#_iname#[#_#] .=~. m"#VAL#"i',
+		'filter:fuzzy'	=> '.!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",#_iname#[#_#])',	'filter_prep:fuzzy'=> sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta ::superlc($arg[1])},
 		'filter:si'	=> 'index( #_iname#[#_#],"#VAL#") .!=. -1',			'filter_prep:si' => sub {quotemeta ::superlc($_[0])},
 		'filter:s'	=> 'index( #_name#[#_#], "#VAL#") .!=. -1',
 		'filter:e'	=> '#_name#[#_#] .eq. "#VAL#"',
@@ -422,6 +435,8 @@ our %timespan_menu=
 		'smartfilter::' => \&Filter::_smartstring_number,
 		'smartfilter:~' => 'm',
 		'smartfilter:=empty' => 'e:0',
+		'smartfilter:#' => undef,
+		filter_exclude	=> 'fuzzy', # do not show these filters
 		rightalign=>1,	#right-align in SongTree and SongList
 	},
 	'number.div' =>
@@ -704,6 +719,8 @@ our %timespan_menu=
 		'smartfilter:=' => \&Filter::_smartstring_date,
 		'smartfilter::' => \&Filter::_smartstring_date,
 		'smartfilter:=empty' => 'ecount:0',
+		'smartfilter:#' => undef,
+		filter_exclude	=> 'fuzzy', # do not show these filters
 
 		#get_gid		=> '[#get_list#]',
 		#hashm			=> '#get_list#',
@@ -4048,14 +4065,14 @@ sub new_from_smartstring
 
 		# operator and fields
 		my ($fields,$op);
-		if ($string=~s#^(\w+(?:\|\w+)*)?(<=|>=|[:<>=~])##)
+		if ($string=~s&^(\w+(?:\|\w+)*)?(<=|>=|[:<>=~]|#+)&&)
 		{	$fields=$1; $op=$2;
 			if ($fields)
 			{	my @f= grep $_, map $Songs::Aliases{::superlc($_)}, split(/\|/,$fields);
 				if (@f) { $fields= join '|',@f }
 				else { $string= $fields.$op.$string; $fields=$op=undef; }	#no recognized field => treat $fields and $op as part of the pattern
 			}
-			$string=~s#^\\([:<>=~])#$1#g unless $op;	#un-escape escaped operators at start of string if no recognized operator
+			$string=~s#^\\([:<>=~\#])#$1#g unless $op;	#un-escape escaped operators at start of string if no recognized operator
 		}
 		$fields ||= $fields0;
 		$op||= $regexp ? '~' : ':';
@@ -4080,10 +4097,11 @@ sub new_from_smartstring
 		for my $field (split /\|/, $fields)
 		{	for my $pattern (@patterns)
 			{	my $filter;
+				my $op1= $op=~m/^#/ ? '#' : $op;	#special case for ## and ### : use the same function as for #
 				if ($pattern eq '')
-				{	$filter= Songs::Field_property($field,'smartfilter:'.$op.'empty'); #must contain operator ':' pattern
+				{	$filter= Songs::Field_property($field,'smartfilter:'.$op1.'empty'); #must contain operator ':' pattern
 				}
-				elsif (my $found= Songs::Field_property($field,'smartfilter:'.$op))
+				elsif (my $found= Songs::Field_property($field,'smartfilter:'.$op1))
 				{	if (ref $found)
 					{	$filter= $found->($pattern,$op,$casesens,$field);
 					}
@@ -4669,6 +4687,53 @@ sub QuoteRegEx
 	s!((?:\G|[^\\])(?:\\\\)*)\\?"!$1\\"!g; #make sure " are escaped (and only once, so that \\\" doesn't become \\\\")
 	if (!eval {qr/$_/;}) { warn "invalid regular expression \"$_[0]\" : $@\n" if $::debug; return quotemeta $_[0]; }  #check if re valid, else quote everything
 	return $_;
+}
+
+sub smartstring_fuzzy
+{	my ($pat,$op,$casesens,$field)=@_;
+	my $threshold= $pat=~s/([<>])(\d?\d)$// ?	($1 eq '>' ? $2 : int(100-100*$2/length($pat))-1) :
+							$op eq '#' ? 80 : $op eq '##' ? 70 : 60;
+	$threshold=20 if $threshold<20;
+	$threshold=99 if $threshold>99;
+	return 'fuzzy:'.$threshold.' '.$pat;
+}
+
+sub _fuzzy_match
+{	my ($min,$string1,$string2)=@_;
+	my $length1= length $string1;
+	return index($string2,$string1)>=0 unless $length1>1;
+	# fast first pass by looking at how many small substrings in common
+	if ($min>.35)
+	{	my @words;
+		for my $l (2,3)
+		{	push @words,map substr($string1,$_,$l), 0..($length1-$l);
+		}
+		my $common= grep index($string2,$_)>=0, @words;
+		return 0 unless $common/@words > ($min-.25);
+		# the main problem of this method is that longer string2 have higher scores, dividing by string2's length is not possible if you want to search sof substrings of string2
+	}
+	# local levenshtein distance (much slower)
+	# note that some strings with low enough distance might have already been discarded because they didn't have enough small substrings in common
+	my @mat=([(0)x (1+length$string2)]);
+	$mat[$_]=[$_] for 1..$length1;
+	for my $j (1..length $string2)
+	{	for my $i (1..$length1)
+		{	#if (substr($string1,$i-1,1) eq substr($string2,$j-1,1))
+			if (substr($string1,$i-1,1) eq substr($string2,$j-1,1) || substr($string1,$i-1,1) eq "'" || substr($string2,$j-1,1) eq "'") # treat single quote as equal to any character
+			{	my $ident= $mat[$i-1][$j-1];
+				if ($i==$length1) { my $ins=$mat[$i][$j-1]; $ident=$ins if $ins<$ident; }
+				$mat[$i][$j]= $ident;
+			}
+			else
+			{	my $del= $mat[$i-1][$j]+1;
+				my $ins= ($i==$length1) ? $mat[$i][$j-1] : $mat[$i][$j-1]+1;
+				my $sub= $mat[$i-1][$j-1]+1;
+				my $min= $del<$ins ? $del : $ins;
+				$mat[$i][$j]= $min < $sub ? $min : $sub;
+			}
+		}
+	}
+	return 1-$mat[-1][-1]/$length1 > $min;
 }
 
 package Random;

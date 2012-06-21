@@ -8285,6 +8285,7 @@ INIT
 	value	=> 'GMB::FilterEdit::Number',
 	date	=> 'GMB::FilterEdit::Date',
 	ago	=> 'GMB::FilterEdit::Number',
+	fuzzy	=> 'GMB::FilterEdit::Number',
 	listname=> 'GMB::FilterEdit::SavedListCombo',
 	filename=> 'GMB::FilterEdit::Filename',
 	combostring=> 'GMB::FilterEdit::Combo',
