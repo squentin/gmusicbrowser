@@ -6758,7 +6758,7 @@ sub NewPrefFileEntry
 		# could simply $entry->set_text(), but wouldn't work with filenames with broken encoding
 		SetOption( $key, url_escape($file) );
 		$busy=1; $entry->set_text(filename_to_utf8displayname($file)); $busy=undef;
-		$enc_warning->set_visible( url_escape($entry->get_text) eq $Options{$key} );
+		$enc_warning->set_visible( url_escape($entry->get_text) ne $Options{$key} );
 		&$cb if $cb;
 	});
 	$entry->signal_connect( destroy => sub { PrefSaveHistory($key_history,url_escape($_[0]->get_text)); } ) if $key_history;
