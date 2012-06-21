@@ -2145,7 +2145,7 @@ sub new
 	::Watch($self,'SearchText_'.$opt->{group},\&set_text_search);
 
 	#interactive search box
-	$self->{isearchbox}=GMB::ISearchBox->new($opt,$field,'nolabel');
+	$self->{isearchbox}=GMB::ISearchBox->new($opt,$self->{type}[0],'nolabel');
 	$self->pack_end( $self->{isearchbox} ,::FALSE,::FALSE,1);
 	$self->signal_connect(key_press_event => \&key_press_cb); #only used for isearchbox
 	$self->signal_connect(map => \&Fill);
@@ -5334,9 +5334,9 @@ sub changed
 	{	$self->get_parent->set_text_search($re,1,$self->{casesens});
 	}
 	else	# #search gid of type $type
-	{	my $action= $self->{casesens} ? 'gid_search' : 'gid_isearch';
-		my $code= Songs::Code($type,$action, GID => '$array->[$row]', RE => $re);
-		$self->{searchsub}= eval 'sub { my $array=$_[0]; my $rows=$_[1]; for my $row (@$rows) { return $row if '.$code.'; } return undef; }';
+	{	my $code= Songs::Code($type,'gid_to_display', GID => '$array->[$row]');
+		$re= $self->{casesens} ? qr/$re/ : qr/$re/i;
+		$self->{searchsub}= eval 'sub { my $array=$_[0]; my $rows=$_[1]; for my $row (@$rows) { return $row if ::superlc('.$code.')=~m/$re/; } return undef; }';
 	}
 	if ($@) { warn "Error compiling search code : $@\n"; $self->{searchsub}=undef; }
 	$self->search(0);
