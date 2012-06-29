@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2012-03-18 06:33+0900\n"
-"PO-Revision-Date: 2012-03-18 06:34+0900\n"
-"Last-Translator: bluealbum <bluealbum@gmail.com>\n"
+"POT-Creation-Date: 2012-06-24 13:53+0900\n"
+"PO-Revision-Date: 2012-06-24 14:42+0900\n"
+"Last-Translator: bluealbum\n"
 "Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -111,6 +111,10 @@ msgstr[0] "%d 노래 라이브러리에서"
 msgid "%d song selected"
 msgid_plural "%d songs selected"
 msgstr[0] "%d 노래 선택함"
+
+#, perl-format
+msgid "%s fuzzy match with %s"
+msgstr "%s는 %s 문자열과 유사하게 일치"
 
 #, perl-format
 msgid "%t by %a (%m)"
@@ -469,8 +473,15 @@ msgstr "Alt"
 msgid "Amount of volume changed by the mouse wheel"
 msgstr "볼륨 크기는 마우스 휠로 바뀌어집니다"
 
+msgid ""
+"Analyse and add replaygain tags for all songs that don't have replaygain "
+"tags, or incoherent album replaygain tags"
+msgstr ""
+"분석해서, 리플레이 게인 태그를 가지지 않았거나, 통일되지 않는 앨범 리플레이게"
+"인 태그의 모든 노래에 리플레이게인 추가하기"
+
 msgid "Any of :"
-msgstr "어느것 :"
+msgstr " 아무것도 :"
 
 msgid "Append"
 msgstr "추가"
@@ -674,9 +685,8 @@ msgstr ""
 msgid "Can't create sink '{sink}'"
 msgstr "'{sink}' 싱크를 만들 수 없습니다"
 
-#, perl-brace-format
-msgid "Can't play '{file}'."
-msgstr "'{file}' 재생할 수 없습니다"
+msgid "Can't play this file."
+msgstr "이 파일을 재생할 수 없습니다."
 
 msgid "Can't read file or invalid file"
 msgstr "파일을 읽을 수 없거나 잘못된 파일"
@@ -736,6 +746,9 @@ msgstr "업데이트/제거된 노래 체크하기"
 msgid "Check real length of mp3"
 msgstr "mp3 파일의 실제 길이 체크하기"
 
+msgid "Check your audio settings"
+msgstr "사용자의 오디오 설정 체크하기"
+
 msgid "Checking length/bitrate"
 msgstr "길이/비트 레이트 체크중"
 
@@ -792,6 +805,9 @@ msgstr "가져올 재생목록 고르기"
 msgid "Clear"
 msgstr "비우기"
 
+msgid "Clear playlist"
+msgstr "재생목록 비우기"
+
 msgid "Clear playlist filter"
 msgstr "재생목록 필터 비우기"
 
@@ -830,6 +846,9 @@ msgstr "명령"
 
 msgid "Command to launch when the button is pressed"
 msgstr "버튼이 눌러지면 실행할 명령"
+
+msgid "Command used :"
+msgstr "사용한 명령 :"
 
 msgid ""
 "Command used when\n"
@@ -1116,17 +1135,26 @@ msgstr "last.fm 위키 편집"
 msgid "Edit list"
 msgstr "목록 편집"
 
+msgid "Edit mode"
+msgstr "편집 모드"
+
 msgid "Edit ordered modes ..."
 msgstr "순서 배열된 모드 편집 ..."
 
 msgid "Edit random modes ..."
 msgstr "랜덤 모드 편집 ..."
 
+msgid "Edit row tip"
+msgstr "줄 도움말 편집"
+
 msgid "Edit selected song properties"
 msgstr "선택한 노래 등록정보 편집"
 
 msgid "Edit..."
 msgstr "편집..."
+
+msgid "Editable in song properties dialog"
+msgstr "노래 등록정보 대화상자에서 편집가능"
 
 msgid "Editing list : "
 msgstr "목록 편집 :"
@@ -1193,6 +1221,9 @@ msgstr "이퀄라이저"
 
 msgid "Error :"
 msgstr "에러 :"
+
+msgid "Error details"
+msgstr "에러 상세 정보"
 
 #, perl-brace-format
 msgid ""
@@ -1469,6 +1500,9 @@ msgstr "숨기기"
 
 msgid "Hide Artist/Album bar"
 msgstr "음악가/앨범 바 숨기기"
+
+msgid "Hide non-matching"
+msgstr "맞지 않는 것을 숨기기"
 
 msgid "Hide toolbar"
 msgstr "도구바 감추기"
@@ -2233,6 +2267,9 @@ msgstr "재생 카운터"
 
 msgid "Play filter"
 msgstr "필터 재생"
+
+msgid "Play history"
+msgstr "재생 이력"
 
 msgid "Play listed songs"
 msgstr "등록된 노래 재생"
@@ -3063,25 +3100,25 @@ msgid "Show tray tip on song change"
 msgstr "노래 바뀔 때 마다 트레이 팁 표시"
 
 msgid "Show/Hide"
-msgstr "표시/숨기기"
+msgstr "보이기/숨기기"
 
 msgid "Show/Hide Browser"
-msgstr "브라우저 표시/숨기기"
+msgstr "브라우저 보이기/숨기기"
 
 msgid "Show/Hide Cover"
-msgstr "표지 표시/숨기기"
+msgstr "표지 보이기/숨기기"
 
 msgid "Show/Hide layout widget(s)"
-msgstr "표시/숨기기 레이아웃 위젯"
+msgstr "레이아웃 위젯 보이기/숨기기"
 
 msgid "Show/Hide lyrics line"
-msgstr "표시/숨기기 가사 줄"
+msgstr " 사 줄 보이기/숨기기"
 
 msgid "Show/hide URI entry"
-msgstr "주소 항목 표시/숨기기"
+msgstr "주소 항목 보이기/숨기기"
 
 msgid "Show/hide status bar"
-msgstr "상태바 표시/숨기기"
+msgstr "상태바 보이기/숨기기"
 
 msgid "Shuffle"
 msgstr "뒤섞기"
@@ -3118,6 +3155,9 @@ msgstr "크기"
 
 msgid "Skip count"
 msgstr "건너 뛴 수"
+
+msgid "Skip history"
+msgstr "이력 건너뛰기"
 
 msgid "Skip to next song if an error occurs"
 msgstr "오류가 발생하면 다음 노래로 건너 뛰기"
@@ -3169,6 +3209,9 @@ msgstr "음악가 이름으로 나누기 :"
 
 msgid "Standard fields"
 msgstr "표준 필드"
+
+msgid "Start ReplayGain analysis"
+msgstr "리플레이게인 분석 시작"
 
 msgid "Start in tray"
 msgstr "시스템 트레이에서 시작"
@@ -3955,6 +3998,9 @@ msgstr "예 :"
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "예제 (selected song) : {score}  ({chances})"
 
+msgid "example :"
+msgstr "예 :"
+
 msgid "example : "
 msgstr "예 :"
 
@@ -3995,6 +4041,9 @@ msgstr "VBR 헤더 없는 파일"
 
 msgid "front cover"
 msgstr "커버 (앞면)"
+
+msgid "fuzzy match"
+msgstr "유사하게 일치"
 
 msgid "gmusicbrowser"
 msgstr "gmusicbrowser"
@@ -4108,8 +4157,11 @@ msgstr "44.1kHz"
 msgid "is a flac file"
 msgstr "FLAC 파일"
 
-msgid "is a m4a file"
-msgstr "m4a 파일"
+msgid "is a lossless file"
+msgstr "무손실 파일입니다"
+
+msgid "is a lossy file"
+msgstr "손실 파일입니다"
 
 msgid "is a mp3 file"
 msgstr "MP3 파일"
@@ -4117,14 +4169,26 @@ msgstr "MP3 파일"
 msgid "is a musepack file"
 msgstr "musepack 파일"
 
+msgid "is a vorbis file"
+msgstr "vorbis 파일입니다"
+
 msgid "is a wavepack file"
 msgstr "wavepack 파일"
+
+msgid "is an aac file"
+msgstr "aac 파일입니다"
+
+msgid "is an alac file"
+msgstr "alac 파일입니다"
 
 msgid "is an ape file"
 msgstr "ape 파일"
 
-msgid "is an ogg file"
-msgstr "ogg 파일"
+msgid "is an mp4/m4a file"
+msgstr "mp4/m4a 파일입니다"
+
+msgid "is defined"
+msgstr "정의됩니다"
 
 msgid "is equal to"
 msgstr "같은 문자열"
@@ -4145,6 +4209,9 @@ msgstr "%s 안에 있음"
 
 msgid "is mono"
 msgstr "모노"
+
+msgid "is not defined"
+msgstr "정의되지 않았습니다"
 
 msgid "is smart equal"
 msgstr "양식이 같은 문자열"
@@ -4315,6 +4382,10 @@ msgstr "없음"
 msgid "never played"
 msgstr "전혀 재생 안한 곡"
 
+#, perl-format
+msgid "no %s fuzzy match with %s"
+msgstr "%s는 %s 문자열과 유사하게 일치하지 않음"
+
 msgid "no matches found, you might want to remove some search terms."
 msgstr "맞는 것을 찾지 못함, 사용자는 일부 찾기 아목을 제거해야할 것입니다."
 
@@ -4355,6 +4426,9 @@ msgstr "%s 그리고 %s 사이 아님"
 
 msgid "not bootleg"
 msgstr "해적판 제외"
+
+msgid "not defined"
+msgstr "정의되지 않았습니다"
 
 #, perl-format
 msgid "not in the bottom %s"
@@ -4904,6 +4978,9 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 #~ msgid "Search & Queue"
 #~ msgstr "찾기 & 대기열"
 
+#~ msgid "Set options in gstreamer's replaygain dialog"
+#~ msgstr "gstreamer의 리플레이게인 대화상자에서 옵션 설정"
+
 #~ msgid "Shimmer Desktop"
 #~ msgstr "Shimmer 데스크탑"
 
@@ -5017,9 +5094,6 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 
 #~ msgid "is not"
 #~ msgstr "제외"
-
-#~ msgid "is not %n"
-#~ msgstr "%n 제외"
 
 #~ msgid "is not %n( %)"
 #~ msgstr "%n( %) 제외"
