@@ -10,6 +10,7 @@
 PLUGIN_LYRICS: 1
 PLUGIN_FETCHCOVER: 1
 PLUGIN_ARTISTINFO: 1
+PLUGIN_ALBUMINFO: 1
 
 Layout: Shimmer Desktop
 IconTheme: elementary
@@ -21,5 +22,13 @@ LayoutF: Shimmer Party
 #Layout: Small player
 # default browser layout
 #LayoutB: Browser with SongTree
+
+# set the default play-order
+Sort: path album disc track file
+Sort_LastOrdered: path album disc track file
+Sort_LastSR: path album disc track file
+
+# remember/restore the last playing song on startup
+RememberPlaySong: 1
 
 # for more possible values, look at the [Options] section of ~/.gmusicbrowser/gmbrc
