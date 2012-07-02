@@ -2153,7 +2153,7 @@ sub new
 	::Watch($self,'SearchText_'.$opt->{group},\&set_text_search);
 
 	#interactive search box
-	$self->{isearchbox}=GMB::ISearchBox->new($opt,$field,'nolabel');
+	$self->{isearchbox}=GMB::ISearchBox->new($opt,$self->{type}[0],'nolabel');
 	$self->pack_end( $self->{isearchbox} ,::FALSE,::FALSE,1);
 	$self->signal_connect(key_press_event => \&key_press_cb); #only used for isearchbox
 	$self->signal_connect(map => \&Fill);
@@ -2207,7 +2207,7 @@ sub set_mode
 	$self->{view}=$view;
 	$self->{DefaultFocus}=$view;
 	$child->{is_a_view}=1;
-	$view->signal_connect(focus_in_event	=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->{isearchbox}->hide; 0; });	#hide isearchbox when focus goes to the view
+	$view->signal_connect(focus_in_event	=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->{isearchbox}->parent_has_focus; 0; });	#hide isearchbox when focus goes to the view
 
 	my $drag_type=	Songs::FilterListProp( $self->{field}[0], 'drag') || ::DRAG_FILTER;
 	::set_drag( $view, source => [$drag_type,\&drag_cb]);
@@ -2316,7 +2316,7 @@ sub make_searchbox
 				{	my $entry=$_[0];
 					my $self=::find_ancestor($entry,__PACKAGE__);
 					my $s=$entry->get_text;
-					$self->set_text_search( $entry->get_text )
+					$self->set_text_search( $entry->get_text, 0,0 )
 				},$_[0]);
 		    });
 	$entry->signal_connect(activate =>
@@ -2325,9 +2325,13 @@ sub make_searchbox
 	return $hbox;
 }
 sub set_text_search
-{	my ($self,$search)=@_;
-	return if defined $self->{search} && $self->{search} eq $search;
+{	my ($self,$search,$is_regexp,$is_casesens)=@_;
+	return if defined $self->{search} && $self->{search} eq $search
+		&& !($self->{search_is_regexp}   xor $is_regexp)
+		&& !($self->{search_is_casesens} xor $is_casesens);
 	$self->{search}=$search;
+	$self->{search_is_regexp}= $is_regexp||0;
+	$self->{search_is_casesens}= $is_casesens||0;
 	$self->{valid}=0;
 	$self->Fill if $self->mapped;
 }
@@ -2477,7 +2481,7 @@ sub get_fill_data
 	}
 	else { @list=keys %$href; }
 	if (defined $search && $search ne '')
-	{	@list= @{ AA::GrepKeys($type,$search,\@list) };
+	{	@list= @{ AA::GrepKeys($type,$search,$self->{search_is_regexp},$self->{search_is_casesens},\@list) };
 	}
 	AA::SortKeys($type,\@list,$self->{'sort'}[0]);
 
@@ -5210,12 +5214,13 @@ use Gtk2;
 use base 'Gtk2::HBox';
 
 our %OptCodes=
-(	casesens => 'i',	onlybegin => 'b',	onlyword => 'w',
+(	casesens => 'i',	onlybegin => 'b',	onlyword => 'w',	hidenomatch => 'h',
 );
 our @OptionsMenu=
 (	{ label => _"Case-sensitive",	code => sub { $_[0]{self}{casesens}^=1; $_[0]{self}->changed; },	check => sub { $_[0]{self}{casesens}; }, },
 	{ label => _"Begin with",	code => sub { $_[0]{self}{onlybegin}^=1; $_[0]{self}{onlyword}=0; $_[0]{self}->changed;},	check => sub { $_[0]{self}{onlybegin}; }, },
 	{ label => _"Words that begin with",	code => sub { $_[0]{self}{onlyword}^=1;$_[0]{self}{onlybegin}=0; $_[0]{self}->changed;},		check => sub { $_[0]{self}{onlyword}; }, },
+	{ label => _"Hide non-matching",	code => sub { $_[0]{self}{hidenomatch}^=1; $_[0]{self}{close_button}->set_visible($_[0]{self}{hidenomatch}); $_[0]{self}->changed;},		check => sub { $_[0]{self}{hidenomatch}; }, test=> sub { $_[0]{self}{type} } },
 	{ label => _"Fields",		submenu => sub { return {map { $_=>Songs::FieldName($_) } Songs::StringFields}; }, submenu_reverse => 1,
 	  check => sub { $_[0]{self}{fields}; },	test => sub { !$_[0]{self}{type} },
 	  code => sub { my $toggle=$_[1]; my $l=$_[0]{self}{fields}; my $n=@$l; @$l=grep $toggle ne $_, @$l; push @$l,$toggle if @$l==$n; @$l=('title') unless @$l; $_[0]{self}->changed; }, #toggle selected field
@@ -5241,6 +5246,7 @@ sub new					##currently the returned widget must be put in ->{isearchbox} of a p
 	my $next=::NewIconButton('gtk-go-down',	($nolabel ? undef : _"Next"),	 \&button_cb,'none');
 	my $prev=::NewIconButton('gtk-go-up',	($nolabel ? undef : _"Previous"),\&button_cb,'none');
 	$prev->{is_previous}=1;
+	my $close= $self->{close_button}= ::NewIconButton('gtk-close', undef, \&close,'none');
 	my $label=Gtk2::Label->new(_"Find :");
 	my $options=Gtk2::Button->new;
 	$options->add(Gtk2::Image->new_from_stock('gtk-preferences','menu'));
@@ -5248,6 +5254,7 @@ sub new					##currently the returned widget must be put in ->{isearchbox} of a p
 	$options->set_relief('none');
 	$options->set_tooltip_text(_"options");
 
+	$self->pack_start($close,0,0,0);
 	$self->pack_start($label,0,0,2) unless $nolabel;
 	$self->add($entry);
 	#$_->set_focus_on_click(0) for $prev,$next,$options;
@@ -5257,6 +5264,8 @@ sub new					##currently the returned widget must be put in ->{isearchbox} of a p
 	$self->show_all;
 	$self->set_no_show_all(1);
 	$self->hide;
+	$close->set_no_show_all(1);
+	$close->hide unless $self->{hidenomatch};
 
 	return $self;
 }
@@ -5294,8 +5303,17 @@ sub key_press_event_cb	# hide with Escape
 	my $newfocus= $self->get_parent;
 	$newfocus= $newfocus->{DefaultFocus} while $newfocus->{DefaultFocus};
 	$newfocus->grab_focus;
-	$self->hide;
+	$self->close;
 	return 1;
+}
+sub close
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+	if ($self->{hidenomatch}) { $self->{entry}->set_text(''); $self->hide; }
+}
+
+sub parent_has_focus
+{	my $self=shift;
+	$self->hide unless length($self->{entry}->get_text) && $self->{hidenomatch};
 }
 
 sub begin
@@ -5312,11 +5330,11 @@ sub begin
 
 sub changed
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
+	$self->{searchsub}=undef;
 	my $entry=$self->{entry};
 	my $text=$entry->get_text;
-	if ($text eq '')
-	{	$self->{searchsub}=undef;
-		$self->set_colors(0);
+	if ($text eq '' && !$self->{hidenomatch})
+	{	$self->set_colors(0);
 		return;
 	}
 	$text=::superlc($text) unless $self->{casesens};
@@ -5333,10 +5351,13 @@ sub changed
 		$self->{searchsub}= eval 'sub { my $array=$_[0]; my $rows=$_[1]; for my $row (@$rows) { local $_=$array->[$row]; return $row if '.$code.'; } return undef; }';
 		#$self->{searchsub}= eval "sub { local \$_=\$_[0]; return $code }";
 	}
+	elsif ($self->{hidenomatch})
+	{	$self->get_parent->set_text_search($re,1,$self->{casesens});
+	}
 	else	# #search gid of type $type
-	{	my $action= $self->{casesens} ? 'gid_search' : 'gid_isearch';
-		my $code= Songs::Code($type,$action, GID => '$array->[$row]', RE => $re);
-		$self->{searchsub}= eval 'sub { my $array=$_[0]; my $rows=$_[1]; for my $row (@$rows) { return $row if '.$code.'; } return undef; }';
+	{	my $code= Songs::Code($type,'gid_to_display', GID => '$array->[$row]');
+		$re= $self->{casesens} ? qr/$re/ : qr/$re/i;
+		$self->{searchsub}= eval 'sub { my $array=$_[0]; my $rows=$_[1]; for my $row (@$rows) { return $row if ::superlc('.$code.')=~m/$re/; } return undef; }';
 	}
 	if ($@) { warn "Error compiling search code : $@\n"; $self->{searchsub}=undef; }
 	$self->search(0);
@@ -5360,6 +5381,7 @@ sub search
 	return unless $search;
 	my $parent= $self->get_parent;
 	my $array= $parent->{array}; 				#FIXME could be better
+	return unless @$array;
 	my $offset=$parent->{array_offset}||0;
 	my $start= $parent->get_cursor_row;
 	$start-= $offset;
@@ -5495,7 +5517,7 @@ sub new
 	$self->signal_connect(key_press_event	=> \&key_press_cb);
 	$self->signal_connect(destroy		=> \&destroy_cb);
 	$view->signal_connect(expose_event	=> \&expose_cb);
-	$view->signal_connect(focus_in_event	=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->{isearchbox}->hide; 0; });
+	$view->signal_connect(focus_in_event	=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->{isearchbox}->parent_has_focus; 0; });
 	$view->signal_connect(focus_in_event	=> \&focus_change);
 	$view->signal_connect(focus_out_event	=> \&focus_change);
 	$view->signal_connect(configure_event	=> \&configure_cb);
