@@ -352,7 +352,7 @@ sub TimeChanged		#scroll the text
 	return unless $range >0;
 	return if $adj->get_value > $adj->upper - $adj->page_size;
 	my $delta=$::PlayTime - ($self->{time} || 0);
-	return if $delta <1;
+	return if abs($delta) <1;
 	my $inc=$delta / Songs::Get($::SongID,'length');
 	$self->{time}=$::PlayTime;
 	$adj->set_value($adj->get_value+$inc*$range);
