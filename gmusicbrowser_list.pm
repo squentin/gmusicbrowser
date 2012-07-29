@@ -797,6 +797,13 @@ INIT
 		type => 'Glib::String',			noncomp => 'boldrow italicrow',
 		event => 'Playing Queue CurSong',
 	},
+	playandqueueandtrack =>
+	{	menu => _('Play, queue or track'),	title => '#', width => 20,
+		value => sub { my $ID=$_[2]; ::Get_PPSQ_Icon($ID, !(defined $::SongID && $ID==$::SongID && (!$_[0]{is_playlist} || !defined $::Position || $::Position==$_[1])),'text') || Songs::Display($ID,'track'); },
+		type => 'Glib::String',			attrib	=> 'markup',	yalign => '0.5',
+		event => 'Playing Queue CurSong',	sort	=> 'track',
+		depend=> 'track',
+	},
 	icolabel =>
 	{	menu => _("Labels' icons"),	title => '',		value => sub { $_[2] },
 		class => 'CellRendererIconList',attrib => 'ID',	type => 'Glib::Uint',

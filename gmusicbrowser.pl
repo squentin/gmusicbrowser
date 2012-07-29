@@ -2606,23 +2606,35 @@ sub Played
 	}
 }
 
+our %PPSQ_Icon;
+INIT
+{ %PPSQ_Icon=
+ (	play	=> ['gtk-media-play', '<span font_family="Sans">▶</span>'],
+	pause	=> ['gtk-media-pause','<span font_family="Sans">▮▮</span>'],
+	stop	=> ['gtk-media-stop', '<span font_family="Sans">■</span>'],
+ );
+}
 sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, or undef if none applies
-{	my ($ID,$notcurrent)=@_;
+{	my ($ID,$notcurrent,$text)=@_;
 	my $currentsong= !$notcurrent && defined $SongID && $ID==$SongID;
-	return
-	 $currentsong ?
-	 (	$TogPlay		? 'gtk-media-play' :
-		defined $TogPlay	? 'gtk-media-pause':
-		'gtk-media-stop'
-	 ) :
-	 @$Queue && $Queue->IsIn($ID) ?
-	 do{	my $n;
-		if ($NBQueueIcons)
-		{	my $max= @$Queue; $max=$NBQueueIcons if $NBQueueIcons < $max;
+	my $status;
+	if ($currentsong)	# playing or paused or stopped
+	{	$status= $TogPlay		? 'play' :
+			 defined $TogPlay	? 'pause':
+						  'stop';
+		$status= $PPSQ_Icon{$status}[$text ? 1 : 0];
+	}
+	elsif (@$Queue && $Queue->IsIn($ID))	#queued
+	{	my $n;
+		if ($NBQueueIcons || $text)
+		{	my $max= $NBQueueIcons||10;
+			$max= @$Queue unless $max < @$Queue;
 			$n= first { $Queue->[$_]==$ID } 0..$max-1;
 		}
-		defined $n ? "gmb-queue".($n+1) : 'gmb-queue0';
-	 } : undef;
+		if ($text) { $status= defined $n ? "<b>Q<sup><small>".($n+1)."</small></sup></b>" : "<b>Q<sup><small>+</small></sup></b>"; }
+		else	   { $status= defined $n ? "gmb-queue".($n+1) : 'gmb-queue0'; }
+	}
+	return $status;
 }
 
 sub ClearQueue
