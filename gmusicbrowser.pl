@@ -411,7 +411,8 @@ our @DRAGTYPES;
 		  DRAG_ARTIST,	sub { @{Songs::UniqList('artist',\@_,1)}; },
 		  DRAG_ALBUM,	sub { @{Songs::UniqList('album',\@_,1)}; },
 		  DRAG_USTRING,	sub { (@_==1)? Songs::Display($_[0],'title') : __("%d song","%d songs",scalar@_) },
-		  DRAG_STRING,	undef, #will use DRAG_USTRING
+		  #DRAG_STRING,	undef, #will use DRAG_USTRING
+		  DRAG_STRING,	sub { Songs::Map('uri',\@_); },
 		  DRAG_FILTER,	sub {Filter->newadd(FALSE,map 'title:~:'.Songs::Get($_,'title'),@_)->{string}},
 		  DRAG_MARKUP,	sub {	return ReplaceFieldsAndEsc($_[0],_"<b>%t</b>\n<small><small>by</small> %a\n<small>from</small> %l</small>") if @_==1;
 					my $nba=@{Songs::UniqList2('artist',\@_)};
@@ -423,20 +424,25 @@ our @DRAGTYPES;
 					)},
 		}],
 	[Artist => {	DRAG_USTRING,	sub { (@_<10)? join("\n",@{Songs::Gid_to_Display('artist',\@_)}) : __("%d artist","%d artists",scalar@_) },
-		  	DRAG_STRING,	undef, #will use DRAG_USTRING
+			#DRAG_STRING,	undef, #will use DRAG_USTRING
+			DRAG_STRING,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('artists',$_),@_)->filter; SortList($l); Songs::Map('uri',$l); },
+			DRAG_FILE,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('artists',$_),@_)->filter; SortList($l); Songs::Map('uri',$l); },
 			DRAG_FILTER,	sub {   Filter->newadd(FALSE,map Songs::MakeFilterFromGID('artists',$_),@_)->{string} },
 			DRAG_ID,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('artists',$_),@_)->filter; SortList($l); @$l; },
 		}],
 	[Album  => {	DRAG_USTRING,	sub { (@_<10)? join("\n",@{Songs::Gid_to_Display('album',\@_)}) : __("%d album","%d albums",scalar@_) },
-		  	DRAG_STRING,	undef, #will use DRAG_USTRING
+			#DRAG_STRING,	undef, #will use DRAG_USTRING
+			DRAG_STRING,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('album',$_),@_)->filter; SortList($l); Songs::Map('uri',$l); },
+			DRAG_FILE,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('album',$_),@_)->filter; SortList($l); Songs::Map('uri',$l); },
 			DRAG_FILTER,	sub {   Filter->newadd(FALSE,map Songs::MakeFilterFromGID('album',$_),@_)->{string} },
 			DRAG_ID,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('album',$_),@_)->filter; SortList($l); @$l; },
 		}],
 	[Filter =>
 		{	DRAG_USTRING,	sub {Filter->new($_[0])->explain},
-		  	DRAG_STRING,	undef, #will use DRAG_USTRING
+			#DRAG_STRING,	undef, #will use DRAG_USTRING
+			DRAG_STRING,	sub { my $l=Filter->new($_[0])->filter; SortList($l); Songs::Map('uri',$l); },
 			DRAG_ID,	sub { my $l=Filter->new($_[0])->filter; SortList($l); @$l; },
-			#DRAG_FILE,	sub { my $l=Filter->new($_[0])->filter; Songs::Map('uri',$l); }, #good idea ?
+			DRAG_FILE,	sub { my $l=Filter->new($_[0])->filter; SortList($l); Songs::Map('uri',$l); },
 		}
 	],
 );
