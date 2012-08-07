@@ -171,7 +171,7 @@ dbus_method('Previous',	[], [], 'org.mpris.MediaPlayer2.Player', {no_return=>1})
 sub Previous	{ ::PrevSong(); }
 
 dbus_method('Pause',	[], [], 'org.mpris.MediaPlayer2.Player', {no_return=>1});
-sub Pause	{ ::Pause(); }
+sub Pause	{ ::Pause() if $::TogPlay; }
 
 dbus_method('PlayPause',[], [], 'org.mpris.MediaPlayer2.Player', {no_return=>1});
 sub PlayPause	{ ::PlayPause(); }
@@ -180,7 +180,7 @@ dbus_method('Stop',	[], [], 'org.mpris.MediaPlayer2.Player', {no_return=>1});
 sub Stop	{ ::Stop(); }
 
 dbus_method('Play',	[], [], 'org.mpris.MediaPlayer2.Player', {no_return=>1});
-sub Play	{ ::Play(); }
+sub Play	{ ::PlayPause() unless $::TogPlay; }
 
 dbus_method('Seek', ['int64'], [], 'org.mpris.MediaPlayer2.Player', {no_return=>1});
 sub Seek
