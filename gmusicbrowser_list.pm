@@ -7630,8 +7630,11 @@ our %vars2=
  group=>
  {	ids	=> ['$arg->{groupsongs}'],
 	year	=> ['groupyear($arg->{groupsongs})',	'year'],
-	artist	=> ['groupartist($arg->{groupsongs})',	'artist'],
-	album	=> ['groupalbum($arg->{groupsongs})',	'album'],
+	artist	=> ['groupartist("artist",$arg->{groupsongs})',	'artist'],
+	album_artist=>  ['groupartist("album_artist",$arg->{groupsongs})',	'album_artist'],
+	album_artistid=>['groupartistid("album_artist",$arg->{groupsongs})',	'album_artist'],
+	album	=> ['groupalbum($arg->{groupsongs},0)',	'album'],
+	albumraw=> ['groupalbum($arg->{groupsongs},1)',	'album'],
 	artistid=> ['groupartistid($arg->{groupsongs})','artist'],
 	albumid	=> ['groupalbumid($arg->{groupsongs})',	'album'],
 	genres	=> ['groupgenres($arg->{groupsongs},"genre")',	'genre'],
@@ -7911,22 +7914,26 @@ sub groupalbumid
 	return @$l==1 ? $l->[0] : $l;
 }
 sub groupartistid		##FIXME PHASE1 use artists instead ?
-{	my $songs=$_[0];
-	my $l= Songs::UniqList('artist',$songs);
+{	my ($field,$songs)=@_;
+	my $l= Songs::UniqList($field,$songs);
 	return @$l==1 ? $l->[0] : $l;
 }
 
 sub groupalbum
-{	my $songs=$_[0];
+{	my ($songs,$raw)=@_;
 	my $l= Songs::UniqList('album',$songs);
-	return Songs::Gid_to_Display('album',$l->[0]) if @$l==1;
+	if (@$l==1)
+	{	my $album= $raw ? Songs::Gid_to_Get('album',$l->[0]) : Songs::Gid_to_Display('album',$l->[0]);
+		$album='' unless defined $album;
+		return $album;
+	}
 	return ::__("%d album","%d albums",scalar @$l);
 }
 sub groupartist	#FIXME optimize PHASE1
-{	my $songs=$_[0];
-	my $h=Songs::BuildHash('artist',$songs);
+{	my ($field,$songs)=@_;
+	my $h=Songs::BuildHash($field,$songs);
 	my $nb=keys %$h;
-	return Songs::Gid_to_Display('artist',(keys %$h)[0]) if $nb==1;
+	return Songs::Gid_to_Display($field,(keys %$h)[0]) if $nb==1;
 	my @l=map split(/$Songs::Artists_split_re/), keys %$h;
 	my %h2; $h2{$_}++ for @l;
 	my @common;
