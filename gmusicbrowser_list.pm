@@ -5000,7 +5000,8 @@ sub expose_cb
 				$layout->set_width($hsize * Gtk2::Pango->scale);
 				$layout->set_height($vsize * Gtk2::Pango->scale);
 				my $yoffset=0;
-				my $free_height= $vsize - ($layout->get_pixel_extents)->[1]{height};
+				my (undef,$logical_rect)= $layout->get_pixel_extents;
+				my $free_height= $vsize - $logical_rect->{height};
 				if ($free_height>1) { $yoffset= int($free_height/2); }	#center vertically
 				$layout->set_ellipsize('end');
 				$layout->set_alignment('center');
