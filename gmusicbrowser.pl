@@ -411,7 +411,8 @@ our @DRAGTYPES;
 		  DRAG_ARTIST,	sub { @{Songs::UniqList('artist',\@_,1)}; },
 		  DRAG_ALBUM,	sub { @{Songs::UniqList('album',\@_,1)}; },
 		  DRAG_USTRING,	sub { (@_==1)? Songs::Display($_[0],'title') : __("%d song","%d songs",scalar@_) },
-		  DRAG_STRING,	undef, #will use DRAG_USTRING
+		  #DRAG_STRING,	undef, #will use DRAG_USTRING
+		  DRAG_STRING,	sub { Songs::Map('uri',\@_); },
 		  DRAG_FILTER,	sub {Filter->newadd(FALSE,map 'title:~:'.Songs::Get($_,'title'),@_)->{string}},
 		  DRAG_MARKUP,	sub {	return ReplaceFieldsAndEsc($_[0],_"<b>%t</b>\n<small><small>by</small> %a\n<small>from</small> %l</small>") if @_==1;
 					my $nba=@{Songs::UniqList2('artist',\@_)};
@@ -423,20 +424,25 @@ our @DRAGTYPES;
 					)},
 		}],
 	[Artist => {	DRAG_USTRING,	sub { (@_<10)? join("\n",@{Songs::Gid_to_Display('artist',\@_)}) : __("%d artist","%d artists",scalar@_) },
-		  	DRAG_STRING,	undef, #will use DRAG_USTRING
+			#DRAG_STRING,	undef, #will use DRAG_USTRING
+			DRAG_STRING,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('artists',$_),@_)->filter; SortList($l); Songs::Map('uri',$l); },
+			DRAG_FILE,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('artists',$_),@_)->filter; SortList($l); Songs::Map('uri',$l); },
 			DRAG_FILTER,	sub {   Filter->newadd(FALSE,map Songs::MakeFilterFromGID('artists',$_),@_)->{string} },
 			DRAG_ID,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('artists',$_),@_)->filter; SortList($l); @$l; },
 		}],
 	[Album  => {	DRAG_USTRING,	sub { (@_<10)? join("\n",@{Songs::Gid_to_Display('album',\@_)}) : __("%d album","%d albums",scalar@_) },
-		  	DRAG_STRING,	undef, #will use DRAG_USTRING
+			#DRAG_STRING,	undef, #will use DRAG_USTRING
+			DRAG_STRING,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('album',$_),@_)->filter; SortList($l); Songs::Map('uri',$l); },
+			DRAG_FILE,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('album',$_),@_)->filter; SortList($l); Songs::Map('uri',$l); },
 			DRAG_FILTER,	sub {   Filter->newadd(FALSE,map Songs::MakeFilterFromGID('album',$_),@_)->{string} },
 			DRAG_ID,	sub { my $l=Filter->newadd(FALSE,map Songs::MakeFilterFromGID('album',$_),@_)->filter; SortList($l); @$l; },
 		}],
 	[Filter =>
 		{	DRAG_USTRING,	sub {Filter->new($_[0])->explain},
-		  	DRAG_STRING,	undef, #will use DRAG_USTRING
+			#DRAG_STRING,	undef, #will use DRAG_USTRING
+			DRAG_STRING,	sub { my $l=Filter->new($_[0])->filter; SortList($l); Songs::Map('uri',$l); },
 			DRAG_ID,	sub { my $l=Filter->new($_[0])->filter; SortList($l); @$l; },
-			#DRAG_FILE,	sub { my $l=Filter->new($_[0])->filter; Songs::Map('uri',$l); }, #good idea ?
+			DRAG_FILE,	sub { my $l=Filter->new($_[0])->filter; SortList($l); Songs::Map('uri',$l); },
 		}
 	],
 );
@@ -2600,32 +2606,35 @@ sub Played
 	}
 }
 
+our %PPSQ_Icon;
+INIT
+{ %PPSQ_Icon=
+ (	play	=> ['gtk-media-play', '<span font_family="Sans">▶</span>'],
+	pause	=> ['gtk-media-pause','<span font_family="Sans">▮▮</span>'],
+	stop	=> ['gtk-media-stop', '<span font_family="Sans">■</span>'],
+ );
+}
 sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, or undef if none applies
 {	my ($ID,$notcurrent,$text)=@_;
-	my %states=
-	(	play => ['gtk-media-play','<span font_family="Sans">▶</span>'],
-		pause => ['gtk-media-pause','<span font_family="Sans">▮▮</span>'],
-		stop => ['gtk-media-stop','<span font_family="Sans">■</span>'],
-		track => ['undef',Songs::Display($ID,'track')],
-	);
-	my $switch = 0;
-	$switch = 1 unless not defined $text;
 	my $currentsong= !$notcurrent && defined $SongID && $ID==$SongID;
-	return
-	 $currentsong ?
-	 (	$TogPlay		? $states{play}[$switch] :
-		defined $TogPlay	? $states{pause}[$switch]:
-		$states{stop}[$switch]
-	 ) :
-	 @$Queue && $Queue->IsIn($ID) ?
-	 do{	my $n;
-		if ($NBQueueIcons)
-		{	my $max= @$Queue; $max=$NBQueueIcons if $NBQueueIcons < $max;
+	my $status;
+	if ($currentsong)	# playing or paused or stopped
+	{	$status= $TogPlay		? 'play' :
+			 defined $TogPlay	? 'pause':
+						  'stop';
+		$status= $PPSQ_Icon{$status}[$text ? 1 : 0];
+	}
+	elsif (@$Queue && $Queue->IsIn($ID))	#queued
+	{	my $n;
+		if ($NBQueueIcons || $text)
+		{	my $max= $NBQueueIcons||10;
+			$max= @$Queue unless $max < @$Queue;
 			$n= first { $Queue->[$_]==$ID } 0..$max-1;
 		}
-		if (defined $text) { defined $n ? "<b>Q<sup><small>".($n+1)."</small></sup></b>" : undef; }
-		else { defined $n ? "gmb-queue".($n+1) : 'gmb-queue0'; }
-	 } : $states{track}[$switch];
+		if ($text) { $status= defined $n ? "<b>Q<sup><small>".($n+1)."</small></sup></b>" : "<b>Q<sup><small>+</small></sup></b>"; }
+		else	   { $status= defined $n ? "gmb-queue".($n+1) : 'gmb-queue0'; }
+	}
+	return $status;
 }
 
 sub ClearQueue

@@ -5,173 +5,164 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2011-01-19 19:22+0100\n"
-"PO-Revision-Date: 2011-01-20 21:07+0100\n"
-"Last-Translator: Vašek Kovářík <L3D9Z6@seznam.cz>\n"
+"POT-Creation-Date: 2012-07-29 23:43+0200\n"
+"PO-Revision-Date: 2012-08-25 22:51+0100\n"
+"Last-Translator: Petr Šimáček <petr.simacek@gmail.com>\n"
 "Language-Team: čeština <L3D9Z6@seznam.cz>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"\n"
-"Language: cs\n"
 
+msgid " Context pane layout "
+msgstr "Rozložení kontextového panelu"
+
+msgid " Fields "
+msgstr "Pole"
+
+msgid " Review "
+msgstr "Recenze"
+
+#, perl-brace-format
 msgid " of {length}"
 msgstr " z {length}"
 
 msgid "# songs"
 msgstr "# skladby"
 
+#, perl-format
 msgid "%S by %a"
 msgstr "%S od %a"
 
+#, perl-format
 msgid "%d Album"
 msgid_plural "%d Albums"
 msgstr[0] "%d Album"
 msgstr[1] "%d Alba"
 msgstr[2] "%d Alb"
 
+#, perl-format
 msgid "%d Artist"
 msgid_plural "%d Artists"
 msgstr[0] "%d Interpret"
 msgstr[1] "%d Interpreti"
 msgstr[2] "%d Interpretů"
 
+#, perl-format
 msgid "%d Song"
 msgid_plural "%d Songs"
 msgstr[0] "%d Skladba"
 msgstr[1] "%d Skladby"
 msgstr[2] "%d Skladeb"
 
+#, perl-format
+msgid "%d Upcoming Event"
+msgid_plural "%d Upcoming Events"
+msgstr[0] "%d nadcházející událost"
+msgstr[1] "%d nadcházející události"
+msgstr[2] "%d nadcházejících událostí"
+
+#, perl-format
 msgid "%d album"
 msgid_plural "%d albums"
 msgstr[0] "%d album"
 msgstr[1] "%d alba"
 msgstr[2] "%d alb"
 
+#, perl-format
 msgid "%d artist"
 msgid_plural "%d artists"
 msgstr[0] "%d interpret"
 msgstr[1] "%d interpreti"
 msgstr[2] "%d interpretů"
 
+#, perl-format
 msgid "%d file"
 msgid_plural "%d files"
 msgstr[0] "%d soubor"
 msgstr[1] "%d soubory"
 msgstr[2] "%d souborů"
 
+#, perl-format, perl-brace-format
 msgid "%d file in {folder}"
 msgid_plural "%d files in {folder}"
 msgstr[0] "%d soubor ve složce {folder}"
 msgstr[1] "%d soubory ve složce {folder}"
 msgstr[2] "%d souborů ve složce {folder}"
 
+#, perl-format
 msgid "%d folder"
 msgid_plural "%d folders"
 msgstr[0] "%d složka"
 msgstr[1] "%d složky"
 msgstr[2] "%d složek"
 
+#, perl-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d vteřina"
 msgstr[1] "%d vteřiny"
 msgstr[2] "%d vteřin"
 
+#, perl-format
 msgid "%d song"
 msgid_plural "%d songs"
 msgstr[0] "%d skladba"
 msgstr[1] "%d skladby"
 msgstr[2] "%d skladeb"
 
+#, perl-format
 msgid "%d song added"
 msgid_plural "%d songs added"
 msgstr[0] "%d skladba přidána"
 msgstr[1] "%d skladby přidány"
 msgstr[2] "%d skladeb přidáno"
 
+#, perl-format
 msgid "%d song in queue"
 msgid_plural "%d songs in queue"
 msgstr[0] "%d skladba ve frontě"
 msgstr[1] "%d skladby ve frontě"
 msgstr[2] "%d skladeb ve frontě"
 
+#, perl-format
 msgid "%d song in the library"
 msgid_plural "%d songs in the library"
 msgstr[0] "%d skladba v knihovně"
 msgstr[1] "%d skladby v knihovně"
 msgstr[2] "%d skladeb v knihovně"
 
+#, perl-format
 msgid "%d song selected"
 msgid_plural "%d songs selected"
 msgstr[0] "%d vybraná skladba"
 msgstr[1] "%d vybrané skladby"
 msgstr[2] "%d vybraných skladeb"
 
-msgid "%f is set"
-msgstr "%f je nastaven"
+#, perl-format
+msgid "%s fuzzy match with %s"
+msgstr "%s se nejasně shoduje %s"
 
-msgid "%f isn't set"
-msgstr "%f není nastaven"
+#, perl-format
+msgid "%t by %a (%m)"
+msgstr "%S od %a"
 
-msgid "%n first added"
-msgstr "%n prvně přidaných"
-
-msgid "%n last added"
-msgstr "%n naposled přidaných"
-
-msgid "%n last played"
-msgstr "%n naposled hraných"
-
-msgid "%n last skipped"
-msgstr "%n naposled přeskočených"
-
-msgid "%n less played"
-msgstr "%n nejméně hraných"
-
-msgid "%n less skipped"
-msgstr "%n nejméně přeskakovaných"
-
-msgid "%n longest"
-msgstr "%n nejdelších"
-
-msgid "%n most played"
-msgstr "%n nejhranější"
-
-msgid "%n most skipped"
-msgstr "%n nejvíce přeskakovaných"
-
-msgid "%n not played for the longest time"
-msgstr "%n dlouho nepřehrávaných"
-
-msgid "%n not skipped for the longest time"
-msgstr "%n dlouho nepřeskakovaných"
-
-msgid "%n shortest"
-msgstr "%n nejkratších"
-
+#, perl-brace-format
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' existuje. Přepsat ?"
 
+#, perl-format
 msgid "(%d song excluded)"
 msgid_plural "(%d songs excluded)"
 msgstr[0] "(%d skladba vyjmuta)"
 msgstr[1] "(%d skladby vyjmuty)"
 msgstr[2] "(%d skladeb vyjmuto)"
 
-msgid "(: )has one"
-msgstr "(: )jakýkoliv"
-
-msgid "(: )none"
-msgstr "(: )žádný"
-
-msgid "(applied after restart)"
-msgstr "(vyžaduje restart)"
-
 msgid "(case insensitive)"
 msgstr "(nedostupné)"
 
+#, perl-brace-format
 msgid "(common parent folder : {common})"
 msgstr "(obvyklá nadřazená složka : {common})"
 
@@ -180,6 +171,9 @@ msgstr "(další)"
 
 msgid "(see http://www.last.fm)"
 msgstr "(navštivte http://www.last.fm)"
+
+msgid "(unstable)"
+msgstr "(nestabilní)"
 
 msgid ""
 "- When selecting a song, the playlist filter will be reset if the song is "
@@ -194,6 +188,10 @@ msgstr ""
 msgid "0 chance"
 msgstr "0 možností"
 
+msgid "0 means 'show all'"
+msgstr "0 znamená 'zobrazit vše'"
+
+#, perl-brace-format
 msgid "1 chance in {probability}"
 msgstr "1 možnost v {probability}"
 
@@ -215,6 +213,7 @@ msgstr "50 nejpřehrávanějších"
 msgid "<Unknown>"
 msgstr "<Unknown>"
 
+#, perl-format
 msgid ""
 "<b>%t</b>\n"
 "<small><small>by</small> %a\n"
@@ -224,6 +223,11 @@ msgstr ""
 "<small><small>od</small> %a\n"
 "<small>z</small> %l</small>"
 
+#, perl-format
+msgid "<big><big>by %a</big></big>"
+msgstr "<big><big>od %a</big></big>"
+
+#, perl-format
 msgid "<i>by</i> %a\\n<i>from</i> %l"
 msgstr "<i>od</i> %a\\n<i>z</i> %l"
 
@@ -242,6 +246,7 @@ msgstr "Zrušit hromadné popisování"
 msgid "About"
 msgstr "O aplikaci"
 
+#, perl-brace-format
 msgid ""
 "About to delete {files}\n"
 "Are you sure ?"
@@ -258,8 +263,17 @@ msgstr "Akce není podporována stávajícím notifikačním démonem"
 msgid "Add"
 msgstr "Přidat"
 
+msgid "Add Files ..."
+msgstr "Přidat soubory ..."
+
+msgid "Add Music"
+msgstr "Přidat hudbu"
+
 msgid "Add a button to rip a CD"
 msgstr "Přidat tlačítko pro CD rip"
+
+msgid "Add a filter"
+msgstr "Přidat filtr"
 
 msgid "Add a fullscreen button"
 msgstr "Přidat tlačítko celoobrazovkového režimu"
@@ -290,6 +304,9 @@ msgstr "Přidat soubory/složky do knihovny"
 msgid "Add folder"
 msgstr "Přidat složku"
 
+msgid "Add folder ..."
+msgstr "Přidat složku ..."
+
 msgid "Add label"
 msgstr "Přidat štítek"
 
@@ -311,8 +328,21 @@ msgstr "Přidat klávesovou zkratku"
 msgid "Add tab"
 msgstr "Přidat záložku"
 
+msgid "Add to existing values"
+msgstr "Přidat do stávajících hodnot"
+
 msgid "Add to list"
 msgstr "Přidat do seznamu"
+
+msgid "Add to playlist"
+msgstr "Přidat do playlistu"
+
+msgid "Add to queue"
+msgstr "Přidat do fronty"
+
+#, perl-brace-format
+msgid "Add {value} to {field} for all tracks on this album."
+msgstr "Přidat {value} do {field} ke všem stopám na tomto albu."
 
 msgid "Added"
 msgstr "Přidáno"
@@ -363,6 +393,12 @@ msgstr "Album a interpret na levé straně"
 msgid "Album artist"
 msgstr "Interpret alba"
 
+msgid "Album artist or artist"
+msgstr "Album umělec nebo umělec"
+
+msgid "Album cover"
+msgstr "Přebal alba"
+
 msgid "Album gain"
 msgstr "Zisk alba"
 
@@ -378,6 +414,12 @@ msgstr "Obrázek alba"
 msgid "Album picture & info"
 msgstr "Obrázek alba & info"
 
+msgid "Album pictures"
+msgstr "Obrázky alba"
+
+msgid "Album playcount:"
+msgstr "Počet přehrání alba:"
+
 msgid "Album shuffle"
 msgstr "Zamíchané album"
 
@@ -386,6 +428,23 @@ msgstr "Album s obrázkem"
 
 msgid "Album year(s)"
 msgstr "Rok alba"
+
+#, perl-format
+msgid "Album: %l"
+msgstr "Album: %l"
+
+#, perl-format
+msgid "Album: %l (%Y)"
+msgstr "Album: %l (%Y)"
+
+msgid "Albuminfo"
+msgstr "Informace o albu"
+
+msgid "Albuminfo plugin"
+msgstr "Zásuvný modul pro Informace o albu"
+
+msgid "Albums"
+msgstr "Alba"
 
 msgid "All"
 msgstr "Vše"
@@ -398,9 +457,6 @@ msgstr "Všechna alba"
 
 msgid "All artists"
 msgstr "Všichni interpreti"
-
-msgid "All but the [most/less]%n"
-msgstr "Vše, ale nej[více/méně]%n"
 
 msgid "All files"
 msgstr "Všechny soubory"
@@ -420,17 +476,42 @@ msgstr "Vše z :"
 msgid "All songs"
 msgstr "Všechny skladby"
 
+msgid "All styles"
+msgstr "Všechny styly"
+
+msgid "All themes"
+msgstr "Všechna témata"
+
+msgid ""
+"Allmusic uses both Genres and Styles to describe albums. If you use only "
+"Genres, you may want to include Styles in allmusic's list of Genres."
+msgstr ""
+"Allmusic užívá Žánry a Styly k popisu alba. Pokud používáte pouze Žánry, "
+"možná budete chtít zahrnout Styly do seznamu stylů v Allmusic."
+
 msgid "Allow for scheduling fade-out and stop"
 msgstr "Umožnit nastavení slábnutí a zastavení"
 
 msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
 msgstr "Umožnit ovládání prostřednictvím DBus za použití standardu MPRIS v1.0"
 
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v2.0 standard"
+msgstr "Ovládat gmusicbrowser přes DBus za použití standardu MPRIS v2.0"
+
+#. Alt key
+msgctxt "Keyboard"
 msgid "Alt"
 msgstr "Alt"
 
 msgid "Amount of volume changed by the mouse wheel"
 msgstr "Velikost kroku změny hlasitosti kolečkem myši"
+
+msgid ""
+"Analyse and add replaygain tags for all songs that don't have replaygain "
+"tags, or incoherent album replaygain tags"
+msgstr ""
+"Analýzovat a přidat replaygain tagy pro všechny písně, které nemají "
+"replaygain značky, nebo nesoudržné replaygain značky alba "
 
 msgid "Any of :"
 msgstr "Cokoliv z :"
@@ -447,6 +528,7 @@ msgstr "Přidat do playlistu"
 msgid "Application"
 msgstr "Aplikace"
 
+#, perl-brace-format
 msgid "Are you sure you want to delete the '{label}' label ?"
 msgstr "Určitě odstranit štítek '{label}' ?"
 
@@ -459,8 +541,11 @@ msgstr "Interpret"
 msgid "Artist & album"
 msgstr "Interpret & album"
 
-msgid "Artist Picture Size : "
-msgstr "Velikost obrázku interpreta :"
+msgid "Artist (Year - Album)"
+msgstr "Umělec (Rok - Album)"
+
+msgid "Artist Biography"
+msgstr "Životopis umělce"
 
 msgid "Artist URL"
 msgstr "URL interpreta"
@@ -468,11 +553,22 @@ msgstr "URL interpreta"
 msgid "Artist picture"
 msgstr "Obrázek interpreta"
 
+#, perl-format
+msgid "Artist picture size : %d"
+msgstr "Velikost obrázku interpreta : %d"
+
+msgid "Artist playcount:"
+msgstr "Počet přehrání interpreta"
+
 msgid "Artist,Album,Disc,Track"
 msgstr "Interpret,album,disk,stopa"
 
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "Interpret,rok,album,disk,stopa"
+
+#, perl-format
+msgid "Artist: %a"
+msgstr "Interpret: %a"
 
 msgid "Artistinfo"
 msgstr "Informace o interpretovi"
@@ -492,8 +588,14 @@ msgstr "Potvrzovat pouze pokud soubor již existuje"
 msgid "Audio"
 msgstr "Audio"
 
+msgid "Audio properties"
+msgstr "Zvukové vlastnosti"
+
 msgid "Author"
 msgstr "Autor"
+
+msgid "Auto"
+msgstr "Automatické"
 
 msgid "Auto fill based on filenames ..."
 msgstr "Automaticky vyplnit dle názvu souboru .."
@@ -501,14 +603,23 @@ msgstr "Automaticky vyplnit dle názvu souboru .."
 msgid "Auto fill only blank fields"
 msgstr "Automaticky vyplnit jen prázdná pole"
 
-msgid "Auto fill queue"
-msgstr "Automaticky vyplnit frontu"
+msgid "Auto fill up to"
+msgstr "Automaticky vyplnit k"
 
 msgid "Auto filter"
 msgstr "Automatický filter"
 
+msgid "Auto-fill queue"
+msgstr "Automaticky vyplnit frontu"
+
+msgid "Auto-fill queue with similar artists (from last.fm)"
+msgstr "Automaticky doplňovat frontu podobným umělci (z last.fm)"
+
 msgid "Auto-increment track numbers"
 msgstr "Automatický nárůst čísla stopy"
+
+msgid "Auto-save fields with data from allmusic"
+msgstr "Automaticky ukládat pole s daty z Allmusic"
 
 msgid "Auto-save positive finds"
 msgstr "Automatické ukládání výsledků hledání"
@@ -531,6 +642,9 @@ msgstr "Zásuvný modul automatického ukládání"
 msgid "Available"
 msgstr "Dostupné"
 
+msgid "Average rating:"
+msgstr "Průměrné hodnocení:"
+
 msgid "BPM"
 msgstr "BPM"
 
@@ -540,11 +654,17 @@ msgstr "Chyba sezení"
 msgid "Base Folder :"
 msgstr "Základní složka :"
 
+msgid "Basic fields"
+msgstr "Základní pole"
+
 msgid "Begin with"
 msgstr "Začít s"
 
 msgid "Below"
 msgstr "Níže"
+
+msgid "Biography"
+msgstr "Životopis"
 
 msgid "Bitrate"
 msgstr "Datový tok"
@@ -557,6 +677,9 @@ msgstr "Text těla není podporován stávajícím notifikačním démonem"
 
 msgid "Browser"
 msgstr "Prohlížeč"
+
+msgid "Browser views"
+msgstr "Zobrazení prohlížeče"
 
 msgid "Browser window layout :"
 msgstr "Styl prohlížeče"
@@ -583,6 +706,7 @@ msgstr ""
 "Nelze změnit hlasitost. Při použití tohoto audio backendu je vyžadován "
 "amixer (obsažen v alsa-utils)."
 
+#, perl-brace-format
 msgid ""
 "Can't create Folder '{path}' : \n"
 "{error}"
@@ -590,15 +714,17 @@ msgstr ""
 "Nelze vytvořit složku '{path}' : \n"
 "{error}"
 
+#, perl-brace-format
 msgid "Can't create sink '{sink}'"
 msgstr "Nelze vytvořit sink '{sink}'"
 
-msgid "Can't play '{file}'."
-msgstr "Nelze přehrát '{file}'."
+msgid "Can't play this file."
+msgstr "Nelze přehrát tento soubor"
 
 msgid "Can't read file or invalid file"
 msgstr "Soubor nelze číst nebo je poškozený"
 
+#, perl-brace-format
 msgid "Can't write in base folder '{folder}'."
 msgstr "Nelze zapisovat do základní složky '{folder}'."
 
@@ -635,14 +761,26 @@ msgstr "Změnit výchozí barvu textu"
 msgid "Change default text font and size"
 msgstr "Změnit výchozí font a velikost písma"
 
+msgid "Change the context visibility"
+msgstr "Změnit viditelnost kontextu"
+
 msgid "Channels"
 msgstr "Kanály"
+
+msgid "Check Collection"
+msgstr "Zkontrolovat kolekci"
 
 msgid "Check for updated/deleted songs on startup"
 msgstr "Kontrolovat přidané/smazané skladby při startu"
 
 msgid "Check for updated/removed songs"
 msgstr "Zkontrolovat přidané/smazané skladby"
+
+msgid "Check real length of mp3"
+msgstr "Zkontrolovat skutečnou délku mp3 souboru"
+
+msgid "Check your audio settings"
+msgstr "Zkontrolovat nastavení zvuku"
 
 msgid "Checking length/bitrate"
 msgstr "Kontrolovat délku/datový tok"
@@ -656,14 +794,14 @@ msgstr "Vybrat album tohoto interpreta"
 msgid "Choose Artist/Album/Song"
 msgstr "Vybrat interpreta/album/skladbu"
 
-msgid "Choose Date"
-msgstr "Vybrat rok"
-
 msgid "Choose Picture"
 msgstr "Vybrat obrázek"
 
 msgid "Choose Random Album"
 msgstr "Vybrat náhodné album"
+
+msgid "Choose a folder"
+msgstr "Vyberte složku"
 
 msgid "Choose directory to copy files to"
 msgstr "Vybrat adresář pro kopírování souborů"
@@ -683,12 +821,14 @@ msgstr "Vybrat typ písma pro texty"
 msgid "Choose font..."
 msgstr "Vybrat typ písma..."
 
+#, perl-brace-format
 msgid "Choose icon for label {name}"
 msgstr "Vybrat ikonu pro štítek {name}"
 
 msgid "Choose page to open"
 msgstr "Vybrat stránku k otevření"
 
+#, perl-format
 msgid "Choose picture for '%s'"
 msgstr "Vybrat obrázek pro.'%s'"
 
@@ -698,11 +838,23 @@ msgstr "Vybrat soubory s playlisty k importu"
 msgid "Clear"
 msgstr "Smazat"
 
+msgid "Clear playlist"
+msgstr "Vyčistit seznam skladeb"
+
+msgid "Clear playlist filter"
+msgstr "Vyčistit filtr seznamu skladeb"
+
 msgid "Clear queue"
 msgstr "Smazat frontu"
 
 msgid "Clear selected fields"
 msgstr "Smazat vybraná pole"
+
+msgid "Click to show fullsize image"
+msgstr "Kliknutím zvětšit obrázek na plnou velikost"
+
+msgid "Click to show larger image"
+msgstr "Kliknutím zvětšit obrázek"
 
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr "Zakázaný klient, kontaktujte vývojáře gmusicbrowser"
@@ -713,14 +865,23 @@ msgstr "Zavřít"
 msgid "Close Window"
 msgstr "Zavřít okno"
 
+msgid "Close a filter"
+msgstr "Vybrat filtr"
+
 msgid "Close to tray"
 msgstr "Zavřít do oznamovací oblasti"
+
+msgid "Collection"
+msgstr "Kolekce"
 
 msgid "Command"
 msgstr "Příkaz"
 
 msgid "Command to launch when the button is pressed"
 msgstr "Při stisknutém tlačítku vykonat příkaz"
+
+msgid "Command used :"
+msgstr "Použitý příkaz :"
 
 msgid ""
 "Command used when\n"
@@ -761,6 +922,15 @@ msgstr "Připojení od :"
 msgid "Context"
 msgstr "Kontext"
 
+msgid "Control"
+msgstr "Ovládání"
+
+msgid "Conz Aishi (with Filter Panes)"
+msgstr "Conz Aishi (s filtry panelů)"
+
+msgid "Conz Glimm (different controls)"
+msgstr "Conz Glimm (různé ovládací prvky)"
+
 msgid "Copy"
 msgstr "Kopírovat"
 
@@ -776,6 +946,7 @@ msgstr "Kopírovat do připojeného přenosného přehrávače"
 msgid "Copy to portable player"
 msgstr "Kopírovat do přenosného přehrávače"
 
+#, perl-format
 msgid "Copying file"
 msgid_plural "Copying %d files"
 msgstr[0] "Kopírování souboru"
@@ -785,9 +956,14 @@ msgstr[2] "Kopírování %d souborů"
 msgid "Copyright"
 msgstr "Autorská práva"
 
+msgid "Cover Size : "
+msgstr "Velikost přebalu:"
+
 msgid "Create ID3v2 tags as ID3v2.4"
 msgstr "Vytvořit ID3v2 popisky jako ID3v2.4"
 
+#. Ctrl key
+msgctxt "Keyboard"
 msgid "Ctrl"
 msgstr "Ctrl"
 
@@ -815,6 +991,9 @@ msgstr "Uživatelská pole"
 msgid "Custom formats"
 msgstr "Obecné formáty"
 
+msgid "Custom pipeline"
+msgstr "Vlastní pipeline"
+
 msgid "Custom..."
 msgstr "Obecné..."
 
@@ -833,11 +1012,18 @@ msgstr "Uvedení alba"
 msgid "Decrease Volume"
 msgstr "Snížit hlasitost"
 
+msgid "Decrease volume"
+msgstr "Snížit hlasitost"
+
 msgid "Default"
 msgstr "Výchozí"
 
-msgid "Default rating :"
-msgstr "Výchozí hodnocení :"
+msgid "Default fullscreen"
+msgstr "Výchozí celá obrazovka"
+
+#, perl-format
+msgid "Default rating : %d %"
+msgstr "Výchozí hodnocení : %d %"
 
 msgid "Default text color"
 msgstr "Výchozí barva textu"
@@ -845,9 +1031,14 @@ msgstr "Výchozí barva textu"
 msgid "Default text font"
 msgstr "Výchozí font textu"
 
-msgid "Delay tray tip popup on mouse over"
+#, perl-format
+msgid "Delay before showing tray tip popup on mouse over : %d ms"
 msgstr ""
-"Prodleva vyskakovacího okna oznamovací oblasti po umístění myši na ikonu"
+"Prodleva vyskakovacího okna oznamovací oblasti po přejetí myší nad ikonou : "
+"%d ms"
+
+msgid "Delete"
+msgstr "Odstranit"
 
 msgid "Delete Selected Songs"
 msgstr "Odstranit vybrané skladby"
@@ -901,8 +1092,9 @@ msgstr "Zobrazit akce zastavit/další"
 msgid "Display synchronized lyrics of the current song"
 msgstr "Zobrazovat texty v souladu se stávající skladbou"
 
-msgid "Display tray tip for"
-msgstr "Zobrazit vyskakovací okno oznamovací oblasti po dobu"
+#, perl-format
+msgid "Display tray tip for %d ms"
+msgstr "Zobrazit vyskakovací okno oznamovací oblasti po %d ms"
 
 msgid "Do not add a title row"
 msgstr "Nepřidávat titulkovou řádku"
@@ -922,6 +1114,7 @@ msgstr "Nezapisovat popisky"
 msgid "Don't add the overlay to dialogs"
 msgstr "Nepřidávat překrytí do dialogů"
 
+#, perl-brace-format
 msgid "Don't know how to play files of type {type}"
 msgstr "Neznámý typ souboru {type}"
 
@@ -930,6 +1123,15 @@ msgstr "Neupozorňovat pokud je hlavní okno viditelné"
 
 msgid "Don't submit current song"
 msgstr "Neodesílat stávající skladbu"
+
+msgid "Download"
+msgstr "Stáhnout"
+
+msgid "Drag and drop songs here to replace the selection."
+msgstr "Přetáhněte songy sem pro nahrazení výběru"
+
+msgid "Edit"
+msgstr "Upravit"
 
 msgid "Edit Current Song Properties"
 msgstr "Upravit vlastnosti stávající skladby"
@@ -958,11 +1160,20 @@ msgstr "Upravit formáty automatického vyplňování ..."
 msgid "Edit filter"
 msgstr "Upravit filter"
 
+msgid "Edit filter..."
+msgstr "Upravit filtr"
+
 msgid "Edit grouping ..."
 msgstr "Upravit seskupení ..."
 
+msgid "Edit in the last.fm wiki"
+msgstr "Upravit v last.fm wiki"
+
 msgid "Edit list"
 msgstr "Upravit seznam"
+
+msgid "Edit mode"
+msgstr "Režim úprav"
 
 msgid "Edit ordered modes ..."
 msgstr "Upravit režimy pořadí"
@@ -970,14 +1181,17 @@ msgstr "Upravit režimy pořadí"
 msgid "Edit random modes ..."
 msgstr "Upravit náhodné režimy"
 
+msgid "Edit row tip"
+msgstr "Upravit řádek Tip"
+
 msgid "Edit selected song properties"
 msgstr "Upravit vlastnosti vybrané skladby"
 
 msgid "Edit..."
 msgstr "Upravit..."
 
-msgid "EditList"
-msgstr "Editace seznamu"
+msgid "Editable in song properties dialog"
+msgstr "Je možno upravit v dialogu vlastností skladby"
 
 msgid "Editing list : "
 msgstr "Úprava seznamu :"
@@ -1033,6 +1247,9 @@ msgstr "Přidat do fronty seznam souborů/složek"
 msgid "Enqueue filter"
 msgstr "Přidat do fronty filtr"
 
+msgid "Enter album name"
+msgstr "Vložit název alba"
+
 msgid "Enter custom event string :"
 msgstr "Vložit uživatelský řetězec události :"
 
@@ -1042,13 +1259,18 @@ msgstr "Ekvalizér"
 msgid "Error :"
 msgstr "Chyba :"
 
+msgid "Error details"
+msgstr "Podrobnosti o chybě"
+
+#, perl-brace-format
 msgid ""
 "Error saving artistbio in '{file}' :\n"
 "{error}"
 msgstr ""
-"Chyba ukládání biografie interpreta do '{file}' :\n"
+"Chyba ukládání životopisu umělce do '{file}' :\n"
 "{error}"
 
+#, perl-brace-format
 msgid ""
 "Error saving lyrics in '{file}' :\n"
 "{error}"
@@ -1056,6 +1278,15 @@ msgstr ""
 "Chyba ukládání textů do '{file}' :\n"
 "{error}"
 
+#, perl-brace-format
+msgid ""
+"Error saving review in '{file}' :\n"
+"{error}"
+msgstr ""
+"Chyba ukládání textů do '{file}' :\n"
+"{error}"
+
+#, perl-brace-format
 msgid "Error writing '{file}'"
 msgstr "Chyba zápisu do '{file}'"
 
@@ -1064,6 +1295,9 @@ msgstr "Chyba zápisu popisků replaygain :\n"
 
 msgid "Error: invalid filename pattern"
 msgstr "Chyba: špatný tvar názvu souboru"
+
+msgid "Events"
+msgstr "Akce"
 
 msgid "Example :"
 msgstr "Příklad :"
@@ -1083,6 +1317,9 @@ msgstr "Exportovat vlastnosti skladby do souboru .csv"
 msgid "Export to .m3u file"
 msgstr "Exportovat do souboru .m3u"
 
+msgid "Extra fields"
+msgstr "Extra pole"
+
 msgid "Extra gain"
 msgstr "Extra zisk"
 
@@ -1092,18 +1329,23 @@ msgstr "Vyčlenit hostujícího interpreta z názvu :"
 msgid "Fade-out"
 msgstr "Slábnout"
 
-msgid "Fade-out in"
-msgstr "Slábnout po dobu"
+#, perl-format
+msgid "Fade-out in %d seconds"
+msgstr "Zeslabit v %d sekundách"
 
 msgid "Fade-out then stop"
 msgstr "Slábnout, pak zastavit"
 
+#, perl-brace-format
 msgid ""
 "Failed to delete '{file}' :\n"
 "{error}"
 msgstr ""
 "Selhání odstranění '{file}' :\n"
 "{error}"
+
+msgid "Fetching albuminfo"
+msgstr "Získávání informací o albu"
 
 msgid "Field name"
 msgstr "Název pole"
@@ -1113,6 +1355,21 @@ msgstr "Typ pole"
 
 msgid "Fields"
 msgstr "Pole"
+
+msgid ""
+"Fields will be saved according to the settings above. Albuminfo files will "
+"be re-read if there are fields to be saved and you choose 'albums missing "
+"reviews' in the combo box."
+msgstr ""
+"Pole budou uloženy podle nastavení výše. Soubory s informacemi o albu se "
+"budou znovu načítat, pokud existují pole k uložení a můžete si vybrat \"alba "
+"s chybějící recenzí\" v poli se seznamem."
+
+msgid "File"
+msgstr "Soubor"
+
+msgid "File properties"
+msgstr "Vlastnosti souboru"
 
 msgid "File type"
 msgstr "Typ souboru"
@@ -1128,6 +1385,9 @@ msgstr "Formát názvu souboru :"
 
 msgid "Filename without extension"
 msgstr "Název souboru bez přípony"
+
+msgid "Files"
+msgstr "Soubory"
 
 msgid "Filesystem"
 msgstr "Souborový systém"
@@ -1195,17 +1455,6 @@ msgstr "Následovat vybranou skladbu"
 msgid "Font size"
 msgstr "Velikost písma"
 
-msgid ""
-"For information on how to use this plugin, please navigate to the <a "
-"href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
-"artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser.org/"
-"dokuwiki/'>gmusicbrowser-wiki</a>."
-msgstr ""
-"Pro návod k použití tohoto zásuvného modulu přejít <a href='http://"
-"gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>wiki stránku "
-"zásuvných modulů</a> v <a href='http://gmusicbrowser.org/"
-"dokuwiki/'>gmusicbrowser-wiki</a>."
-
 msgid "Forward"
 msgstr "Vpřed"
 
@@ -1230,8 +1479,17 @@ msgstr "Modul GStreamer není zaveden"
 msgid "Gain for songs missing replaygain tags"
 msgstr "Výtěžek skladeb bez popisků replaygain"
 
+msgid "Garage Fullscreen"
+msgstr "Celá obrazovka v režimu Garáž"
+
 msgid "Genre"
 msgstr "Žánr"
+
+msgid "Genre - Album"
+msgstr "Žánr - Album"
+
+msgid "Genre - Artist"
+msgstr "Žánr - Album"
 
 msgid "Genre is set"
 msgstr "Žánr je nastaven"
@@ -1247,6 +1505,9 @@ msgstr "Multimediální klávesy Gnome"
 
 msgid "Gnome multimedia keys plugin"
 msgstr "Zásuvný modul multimediálních kláves Gnome"
+
+msgid "Go to Playing Track"
+msgstr "Přejít na přehrávanou skladbu"
 
 msgid "Go to playing song"
 msgstr "Přejít na přehrávanou skladbu"
@@ -1264,10 +1525,19 @@ msgid "Handshake failed : "
 msgstr "Selhání spojení :"
 
 msgid "Hard limiter"
-msgstr "Pevný limit"
+msgstr "Tvrdá omezení"
+
+msgid "Help"
+msgstr "Pomoc"
 
 msgid "Hide"
 msgstr "Skrýt"
+
+msgid "Hide Artist/Album bar"
+msgstr "Skrýt lištu Umělec/Album"
+
+msgid "Hide non-matching"
+msgstr "Skrýt, které se neshodují"
 
 msgid "Hide toolbar"
 msgstr "Skrýt lištu nástrojů"
@@ -1291,8 +1561,14 @@ msgstr ""
 "V tomto případě bude spuštěn jeden příkaz pro soubor\n"
 "\n"
 
+msgid "Include Styles in Genres"
+msgstr "Zahrnout Styly a Žánry"
+
 msgid "Increase Volume"
 msgstr "Zvýšit hlasitost"
+
+msgid "Increase volume"
+msgstr "Zesílit hlasitost"
 
 msgid "Info"
 msgstr "Info"
@@ -1306,11 +1582,20 @@ msgstr "Nedostupné titul-interpret (zarovnáno vpravo)"
 msgid "Insensitive, Song & Cover"
 msgstr "Nedostupné, skladba & přebal"
 
+msgid "Insert Selected Songs at the top of the queue"
+msgstr "Vložit vybrané skladby na začátek fronty"
+
 msgid "Insert a list of files/folders at the start of the playlist"
 msgstr "Vložit seznam souborů/složek na začátek playlistu"
 
+msgid "Insert this pipeline before the audio sink"
+msgstr "Vložit tuto pipeline před audiosink"
+
 msgid "Invalid regular expression"
 msgstr "Chybný výraz"
+
+msgid "Invert filter"
+msgstr "Obrátit filtr"
 
 msgid "Invisible hot spot"
 msgstr "Neviditelný hot spot"
@@ -1336,6 +1621,10 @@ msgstr "Klávesy"
 msgid "Keywords"
 msgstr "Klíčová slova"
 
+msgid "Label"
+msgstr "Štítek"
+
+msgctxt "Record_label"
 msgid "Label"
 msgstr "Štítek"
 
@@ -1384,6 +1673,9 @@ msgstr "Zarovnat vlevo"
 msgid "Left pane"
 msgstr "Levý panel"
 
+msgid "Left-clic or scrollwheel to change, right-click to mute"
+msgstr "Klik levým tlačítkem, nebo rolování kolečkem změní, pravý klik umlčí"
+
 msgid "Length"
 msgstr "Délka"
 
@@ -1402,11 +1694,19 @@ msgstr ""
 "\n"
 "Použijte dialog nastavení pro přidání hudby."
 
+#, perl-format
 msgid "Library size : %d song"
 msgid_plural "Library size : %d songs"
 msgstr[0] "Velikost knihovny : %d skladba"
 msgstr[1] "Velikost knihovny : %d skladby"
 msgstr[2] "Velikost knihovny : %d skladeb"
+
+msgid "Limit similar artists to a rate of similarity : "
+msgstr ""
+"Nastavit míru podobnosti umělců kvůli následnému hodnocení podobnosti :"
+
+msgid "Limit similar artists to the first : "
+msgstr "Nejprve stanovte limit podobnosti umělce"
 
 msgid "List"
 msgstr "Seznam"
@@ -1421,7 +1721,13 @@ msgid "Listed : "
 msgstr "V seznamu:"
 
 msgid "Listed songs"
-msgstr "Skladby v seznamu"
+msgstr "Skladeb v seznamu"
+
+msgid "Listeners: "
+msgstr "Posluchači:"
+
+msgid "Lists"
+msgstr "Seznamy"
 
 msgid "Lists, Library & Context"
 msgstr "Seznamy, knihovna & kontext"
@@ -1429,12 +1735,13 @@ msgstr "Seznamy, knihovna & kontext"
 msgid "Literal search"
 msgstr "Písmenné vyhledávání"
 
+msgid "Load lyrics even if lyrics panel is hidden"
+msgstr "Načíst text písně, i když je panel se slovy skrytý"
+
 msgid "Load/Save Artist Info in :"
 msgstr "Načíst/uložit biografii interpreta do:"
 
-msgid "Load/Save lyrics in :"
-msgstr "Načíst/uložit texty do :"
-
+#, perl-format
 msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
 msgstr[0] "Načtena %d neodeslaná skladba z předchozího sezení"
@@ -1465,11 +1772,15 @@ msgstr "Zamčený interpret"
 msgid "Lock on song"
 msgstr "Zamčená skladba"
 
+#, perl-brace-format
 msgid "Lock on {field}"
 msgstr "Zamknuto {field}"
 
 msgid "Locked on :\n"
 msgstr "Zamknuto :\n"
+
+msgid "Lookup at allmusic.com"
+msgstr "Vyhledávání na allmusic.com"
 
 msgid "Lookup in AMG"
 msgstr "Vyhledat na AMG"
@@ -1501,6 +1812,12 @@ msgstr "Texty (vyžaduje zásuvný modul texty)"
 msgid "Lyrics alignement"
 msgstr "Zarovnání textů"
 
+msgid "Lyrics file :"
+msgstr "Text souboru :"
+
+msgid "Lyrics file name format"
+msgstr "Formát názvu souboru textu"
+
 msgid "Lyrics for "
 msgstr "Text pro"
 
@@ -1522,11 +1839,20 @@ msgstr "MPRIS v1"
 msgid "MPRIS v1 support"
 msgstr "Podpora MPRIS v1"
 
+msgid "MPRIS v2"
+msgstr "MPRIS v2"
+
+msgid "MPRIS v2 support"
+msgstr "Podpora MPRIS v2"
+
 msgid "Main"
 msgstr "Hlavní"
 
 msgid "Main artist"
 msgstr "Hlavní interpret"
+
+msgid "Make it look like"
+msgstr "Vzhled jako "
 
 msgid ""
 "Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
@@ -1547,6 +1873,16 @@ msgstr "Typ média"
 msgid "Menu entry name"
 msgstr "Název položky menu"
 
+msgid "Middle-clic for next album"
+msgstr "Klikem prostředního tlačítka myši přesunout na další album"
+
+msgid ""
+"Middle-click on local artists to set a filter on them, right-click non-local "
+"artists to search for them on the web."
+msgstr ""
+"Klik prostředním tlačítkem na umělce nastaví filtr, pravý klik vyhledá "
+"umělce na internetu"
+
 msgid "Minimal tip"
 msgstr "Minimální"
 
@@ -1565,8 +1901,14 @@ msgstr "Pondělí"
 msgid "Moods"
 msgstr "Nálady"
 
+msgid "More info"
+msgstr "Víc informací"
+
 msgid "More results"
 msgstr "Více výsledků"
+
+msgid "Mosaic View"
+msgstr "Pohled Mozaika"
 
 msgid "Move"
 msgstr "Přesunout"
@@ -1580,11 +1922,15 @@ msgstr "Přesouvání selhalo"
 msgid "Move folder to"
 msgstr "Přesunout složku do"
 
+#, perl-format
 msgid "Moving file"
 msgid_plural "Moving %d files"
 msgstr[0] "Přesouvání souboru"
 msgstr[1] "Přesouvání %d souborů"
 msgstr[2] "Přesouvání %d souborů"
+
+msgid "Music"
+msgstr "Hudba"
 
 msgid "Mute/Unmute"
 msgstr "Ztlumit/zrušit ztlumení"
@@ -1597,6 +1943,9 @@ msgstr "Název rozložení"
 
 msgid "Name under which the command will appear in the menu"
 msgstr "Název pod kterým se příkaz bude objevovat v menu"
+
+msgid "Never"
+msgstr "Nikdy"
 
 msgid "New"
 msgstr "Nový"
@@ -1643,11 +1992,35 @@ msgstr "Žádný štítek"
 msgid "No locked filter"
 msgstr "Žádný zamčený filtr"
 
+msgid "No lyrics found"
+msgstr "Text nebyl nalezen"
+
 msgid "No moods"
 msgstr "Žádné nálady"
 
+msgid "No results found"
+msgstr "Žádné výsledky"
+
+msgid "No review found"
+msgstr "Recenze nenalezena"
+
+msgid "No review written."
+msgstr "Nebyly napsány žádné recenze"
+
+msgid "No songs"
+msgstr "Žádné skladby"
+
 msgid "No songs found"
 msgstr "Žádné skladby nenalezeny"
+
+msgid "No sound menu found"
+msgstr "Zvukové menu nebylo nalezeno"
+
+msgid "No styles"
+msgstr "Žádné styly"
+
+msgid "No themes"
+msgstr "Žádná témata"
 
 msgid "No web browser found."
 msgstr "Webový prohlížeč nenalezen."
@@ -1655,8 +2028,14 @@ msgstr "Webový prohlížeč nenalezen."
 msgid "None"
 msgstr "Žádný"
 
+msgid "Normal"
+msgstr "Normální"
+
 msgid "Normal mode"
 msgstr "Normální režim"
+
+msgid "Normal with buttons"
+msgstr "Normální s tlačítky"
 
 msgid "Normalize volume (the files must have replaygain tags)"
 msgstr "Normalizovat hlasitost (soubory musí mít popisky replaygain)"
@@ -1666,6 +2045,13 @@ msgstr "Nenalezeno"
 
 msgid "Note that some notification daemons resize the displayed picture"
 msgstr "Nějaký notifikační démon změnil velikost zobrazeného obrázku"
+
+msgid ""
+"Note: inactive fields must be enabled by the user in the 'Fields' tab in "
+"Settings"
+msgstr ""
+"Poznámka: neaktivní pole musí být povolena uživatelem v záložce \"Pole\" v "
+"Nastavení"
 
 msgid "Notify"
 msgstr "Oznamování"
@@ -1677,10 +2063,10 @@ msgid "Notify you of the playing song with the system's notification popups"
 msgstr "Upozorňovat na přehrávání skladby systémovým notifikačním oknem"
 
 msgid "Now playing"
-msgstr "NowPlaying"
+msgstr "Právě hraje"
 
 msgid "NowPlaying plugin"
-msgstr "Zásuvný modul NowPlaying"
+msgstr "Zásuvný modul Právě hraje"
 
 msgid "Number of days since added"
 msgstr "Počet dní od přidání"
@@ -1733,12 +2119,16 @@ msgstr "Starý název"
 msgid "On top of other windows instead of below"
 msgstr "Nahoře oken místo dole"
 
+#, perl-brace-format
 msgid "One of these commands is required to play files of type {type} : {cmd}"
 msgstr ""
 "Jeden z těchto příkazů je vyžadován pro přehrání souborů typu {type} : {cmd}"
 
 msgid "Only affect mp3 files that do not already have an id3v1 tag"
 msgstr "Ovlivní pouze mp3 soubory, které ještě nemají ID3v1 popisek"
+
+msgid "Only show similar artists from local library"
+msgstr "Zobrazit pouze podobné umělce z místní knihovny"
 
 msgid "Opacity"
 msgstr "Neprůsvitnost"
@@ -1773,14 +2163,23 @@ msgstr "Otevřít okno fronty"
 msgid "Open Search window"
 msgstr "Otevřít okno vyhledávání"
 
+msgid "Open allmusic.com in your web browser"
+msgstr "Otevřít stránku allmusic.com v internetovém prohlížeči"
+
 msgid "Open containing folder"
 msgstr "Otevřít obsahující složku"
+
+msgid "Open context & queue panel"
+msgstr "Otevřít panel kontextu & fronty"
 
 msgid "Open context page"
 msgstr "Otevřít kontextovou stránku"
 
 msgid "Open existing list"
 msgstr "Otevřít existující seznam"
+
+msgid "Open files"
+msgstr "Otevřít soubory"
 
 msgid "Open folder"
 msgstr "Otevřít složku"
@@ -1801,6 +2200,9 @@ msgid "Open this page in the web browser"
 msgstr "Otevřít tuto stránku ve webovém prohlížeči"
 
 msgid "Options"
+msgstr "Nastavení"
+
+msgid "Options ..."
 msgstr "Nastavení"
 
 msgid "Options for subgroup"
@@ -1824,6 +2226,9 @@ msgstr "Původní rok vydání"
 
 msgid "Originaly from"
 msgstr "Původem z"
+
+msgid "Other"
+msgstr "Jiný"
 
 msgid "Output"
 msgstr "Výstup"
@@ -1852,8 +2257,9 @@ msgstr "Obrázek"
 msgid "Picture Type"
 msgstr "Typ obrázku"
 
-msgid "Picture cache :"
-msgstr "Úložiště obrázku :"
+#, perl-format
+msgid "Picture cache : %d MB"
+msgstr "Cache obrázku : %d MB"
 
 msgid "Picture finder"
 msgstr "Vyhledávač obrázku"
@@ -1861,8 +2267,9 @@ msgstr "Vyhledávač obrázku"
 msgid "Picture finder plugin"
 msgstr "Zásuvný modul vyhledávač obrázků"
 
-msgid "Picture size :"
-msgstr "Velikost obrázku :"
+#, perl-format
+msgid "Picture size : %d"
+msgstr "Velikost obrázku : %d"
 
 msgid "Pictures and music files"
 msgstr "Soubory hudby a obrázků"
@@ -1900,14 +2307,26 @@ msgstr "Počítadlo přehrávání"
 msgid "Play filter"
 msgstr "Přehrát filtr"
 
+msgid "Play history"
+msgstr "Přehrát historii"
+
 msgid "Play listed songs"
 msgstr "Přehrát skladby ze seznamu"
 
 msgid "Play order"
 msgstr "Pořadí přehrávání"
 
+msgid "Play, queue or track"
+msgstr "Přehrát, fronta nebo skladba"
+
 msgid "Play/Pause"
 msgstr "Přehrát/pauza"
+
+msgid "Playback"
+msgstr "Přehrát"
+
+msgid "Playcount: "
+msgstr "Počet přehrání"
 
 msgid "Played Today"
 msgstr "Přehráváno dnes"
@@ -1936,14 +2355,21 @@ msgstr "Přehrávání titulu"
 msgid "Playing and queue icons"
 msgstr "Ikony přehrávání a fronty"
 
+#, perl-brace-format
 msgid "Playing error : {error}"
 msgstr "Chyba přehrávání : {error}"
 
 msgid "Playlist"
 msgstr "Playlist"
 
+msgid "Playlist 1"
+msgstr "Playlist 1"
+
 msgid "Playlist Empty"
 msgstr "Playlist je prázdný"
+
+msgid "Playlist Utilities Bar"
+msgstr "Lišta nástrojů pro playlist"
 
 msgid "Playlist empty"
 msgstr "Playlist je prázdný"
@@ -1957,8 +2383,8 @@ msgstr "Filtr playlistu"
 msgid "Playlist filter :\n"
 msgstr "Filtr playlistu :\n"
 
-msgid "Playlist, Library & Context"
-msgstr "Playlist,knihovna & kontext"
+msgid "Playlists"
+msgstr "Playlisty"
 
 msgid "Plugin not loaded"
 msgstr "Zásuvný modul není zaveden"
@@ -1975,8 +2401,23 @@ msgstr "Vyskakovací uživatelské okno"
 msgid "Popup Traytip"
 msgstr "Vyskakovací okno oznamovací oblasti"
 
+msgid "Popup notify window"
+msgstr "Vyskakovací okno s oznámením"
+
+msgid "Popup playlist filter menu"
+msgstr "Vyskakovací okno filtrovacího menu playlistu"
+
+msgid "Popup queue menu"
+msgstr "Menu fronty ve vyskakovací bublině"
+
 msgid "Pre-set"
 msgstr "Předvolit"
+
+msgid "Prefered place to load and save lyrics :"
+msgstr "Preferované místo pro načítání a ukládání textů:"
+
+msgid "Preferences"
+msgstr "Předvolby"
 
 msgid "Prepend"
 msgstr "Předřadit"
@@ -2008,6 +2449,9 @@ msgstr "Produkce (P)"
 msgid "Progress"
 msgstr "Vývoj"
 
+msgid "Properties"
+msgstr "Vlastnosti"
+
 msgid "Provides context views using MozEmbed or WebKit"
 msgstr "Kontextový pohled pomocí MozEmbed nebo WebKit"
 
@@ -2026,6 +2470,13 @@ msgstr "Vydavatel/logotyp studia"
 msgid "Queue"
 msgstr "Fronta"
 
+#, perl-format
+msgid "Queue (%n)"
+msgstr "Fronta (%n)"
+
+msgid "Queue Edit"
+msgstr "Upravit frontu"
+
 msgid "Queue album"
 msgstr "Fronta alb"
 
@@ -2035,11 +2486,14 @@ msgstr "Fronta interpretů"
 msgid "Queue empty"
 msgstr "Fronta prázdná"
 
+msgid "Queue in Sidebar"
+msgstr "Fronta v postranní liště"
+
 msgid "Queue mode"
 msgstr "Režim fronty"
 
-msgid "Queue, Library & Context"
-msgstr "Fronta, knihovna & kontext"
+msgid "Queue options"
+msgstr "Možnosti fronty"
 
 msgid "Quick Search"
 msgstr "Rychlé hledání"
@@ -2062,6 +2516,9 @@ msgstr "URL rádia"
 msgid "Random"
 msgstr "Náhodné"
 
+msgid "Random Playback"
+msgstr "Náhodné přehrávání"
+
 msgid "Random mode edition"
 msgstr "Editace náhodného režimu"
 
@@ -2074,8 +2531,20 @@ msgstr "Hodnocení (obrázek)"
 msgid "Rating between 0 and 100, or empty for default"
 msgstr "Hodnotit od 0 do 100, prázdné pro výchozí"
 
+msgid "Rating range:"
+msgstr "Rozpětí hodnocení"
+
+msgid "Re-load layouts"
+msgstr "Znovu načíst rozložení"
+
 msgid "Re-read tags"
 msgstr "Znovu načíst popisky"
+
+msgid "Re-reading tags"
+msgstr "Znovu načíst popisky"
+
+msgid "Re-shuffle"
+msgstr "Znovu zamíchat"
 
 msgid "Read/write in file tag"
 msgstr "Číst/zapsat popisek souboru"
@@ -2101,8 +2570,17 @@ msgstr "Nedávno přehrávané"
 msgid "Recently played songs"
 msgstr "Předchozí"
 
+msgid "Record label"
+msgstr "Nahrávací společnost"
+
 msgid "Recording Dates"
 msgstr "Data nahrávky"
+
+msgid "Recording date"
+msgstr "Datum nahrání skladby"
+
+msgid "Recording type"
+msgstr "Typ nahrávky"
 
 msgid "Reference point :"
 msgstr "Místo odkazu :"
@@ -2121,6 +2599,9 @@ msgstr "Správný výraz :"
 
 msgid "Regular expression didn't match"
 msgstr "Výraz neodpovídá"
+
+msgid "Release date"
+msgstr "Datum vydání"
 
 msgid "Remember last Filter/Playlist between sessions"
 msgstr "Zapamatovat si poslední filtr/playlist mezi sezeními"
@@ -2215,6 +2696,7 @@ msgstr "Přejmenovat tuto složku na :"
 msgid "Rename/move files based on these fields :"
 msgstr "Přejmenovat/přesunout soubory v těchto polích :"
 
+#, perl-brace-format
 msgid ""
 "Renaming {oldname}\n"
 "to {newname}\n"
@@ -2233,26 +2715,56 @@ msgstr "Opakovat"
 msgid "Replace"
 msgstr "Přemístit"
 
+msgid "Replace existing values"
+msgstr "Nahradit stávající hodnoty"
+
 msgid "Replace..."
 msgstr "Přemístit..."
 
 msgid "ReplayGain options"
 msgstr "Možnosti ReplayGain"
 
+msgid "Replaygain"
+msgstr "Replaygain"
+
 msgid "Replaygain analysis"
 msgstr "Analýza ReplayGain"
+
+msgid "Rescan"
+msgstr "Zaktualizovat"
+
+msgid "Rescan Collection"
+msgstr "Zaktualizovat kolekci"
 
 msgid "Reset filter"
 msgstr "Vynulovat filtr"
 
+msgid "Retrieves album-relevant information (review etc.) from allmusic.com."
+msgstr "Načte relevantní informace o albu (recenze atd.) z allmusic.com."
+
+msgid "Review"
+msgstr "Recenze"
+
 msgid "Rewind"
 msgstr "Převinout"
+
+msgid "Rhythmbox"
+msgstr "Rhythmbox"
+
+msgid "Rhythmbox 2nd queue column"
+msgstr "Rhythmbox 2 se sloupcem fronty"
 
 msgid "Right aligned"
 msgstr "Zarovnat vpravo"
 
 msgid "Right side"
 msgstr "Vpravo"
+
+msgid "Right-click to remove filters"
+msgstr "Klik pravým tlačítkem myši odstraní filtry"
+
+msgid "Right-click to toggle shuffle/random"
+msgstr "Klikněte pravým tlačítkem myši a přepněte zamíchat/náhodné"
 
 msgid "Rip"
 msgstr "Rip"
@@ -2272,8 +2784,23 @@ msgstr "Spustit kód perl"
 msgid "Run system command"
 msgstr "Spustit systémový příkaz"
 
+msgid "Running time"
+msgstr "Běžící čas"
+
 msgid "Same Title"
 msgstr "Stejný titul"
+
+msgid "Same album"
+msgstr "Stejné album"
+
+msgid "Same artist"
+msgstr "Stejný interpret"
+
+msgid "Same title"
+msgstr "Stejný titul"
+
+msgid "Same year"
+msgstr "Stejný rok"
 
 msgid "Sampling Rate"
 msgstr "Vzorkovací frekvence"
@@ -2286,6 +2813,9 @@ msgstr "Uložit"
 
 msgid "Save Tags/Options"
 msgstr "Uložit popisky/nastavení"
+
+msgid "Save album info in:"
+msgstr "Uložit informace o albu do:"
 
 msgid "Save artist biography"
 msgstr "Uložit biografii interpreta"
@@ -2308,8 +2838,19 @@ msgstr "Uložit nyní"
 msgid "Save picture as"
 msgstr "Uložit obrázek jako"
 
-msgid "Save tags/settings every"
-msgstr "Uložit popisky/nastavení každých"
+msgid "Save review"
+msgstr "Stejná recenze"
+
+msgid ""
+"Save selected fields for all tracks on the same album whenever album data is "
+"loaded from allmusic or from file."
+msgstr ""
+"Uložit vybraná pole pro všechny skladby na stejném albu, pokud jsou "
+"informace o desce stahovány ze souboru allmusic"
+
+#, perl-format
+msgid "Save tags/settings every %d minutes"
+msgstr "Uložit popisky/nastavení každých %d minut"
 
 msgid "Saved"
 msgstr "Uloženo"
@@ -2322,6 +2863,9 @@ msgstr "Uložené filtry"
 
 msgid "Saved lists"
 msgstr "Uložené seznamy"
+
+msgid "Scan Collection"
+msgstr "Prohledat kolekci"
 
 msgid "Scan as an album"
 msgstr "Prohledat jako album"
@@ -2347,14 +2891,11 @@ msgstr "Posunovat se skladbou"
 msgid "Scroll with the song"
 msgstr "Posunovat se skladbou"
 
+msgid "Scrollwheel to change, right-click to mute"
+msgstr "Kolečko na myši pro změnu, pravé tlačítko pro umlčení"
+
 msgid "Search"
 msgstr "Vyhledat"
-
-msgid "Search & Playlist"
-msgstr "Vyhledat & Playlist"
-
-msgid "Search & Queue"
-msgstr "Vyhledat & Fronta"
 
 msgid "Search : "
 msgstr "Vyhledat ."
@@ -2387,6 +2928,12 @@ msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
 msgstr ""
 "Vyhledat titul, interpreta, album, komentář, štítek, žánr a název souboru"
 
+msgid "Search album"
+msgstr "Vyhledat album"
+
+msgid "Search all fields"
+msgstr "Prohledat všechna pole"
+
 msgid "Search allmusic for Artist"
 msgstr "Vyhledat interpreta na stránkách allmusic"
 
@@ -2396,6 +2943,9 @@ msgstr "Vyhledat interpreta na stránkách amazon.com"
 msgid "Search and display lyrics"
 msgstr "Vyhledat a zobrazit texty"
 
+msgid "Search box type"
+msgstr "Typ vyhledávacího pole"
+
 msgid "Search discogs for Artist"
 msgstr "Vyhledat interpreta na stránkách discogs"
 
@@ -2404,6 +2954,9 @@ msgstr "Vyhledat interpreta na stránkách youtube"
 
 msgid "Search for a picture on internet"
 msgstr "Vyhledat obrázek na internetu"
+
+msgid "Search for artist on:"
+msgstr "Vyhledat interpreta na:"
 
 msgid "Search for current album"
 msgstr "Vyhledat stávající album"
@@ -2417,17 +2970,23 @@ msgstr "Vyhledat nové skladby při spuštění"
 msgid "Search google for Artist"
 msgstr "Použít google pro vyhledání interpreta"
 
+msgid "Search on the web"
+msgstr "Vyhledat na internetu"
+
 msgid "Search options"
 msgstr "Možnosti hledání"
 
 msgid "Search pitchfork for Artist"
 msgstr "Vyhledat interpreta na stránkách pitchfork"
 
-msgid "Search the web for artist"
-msgstr "Vyhledat interpreta na internetu"
+msgid "Search title"
+msgstr "Vyhledat titul"
 
 msgid "Search window layout :"
 msgstr "Styl okna hledání :"
+
+msgid "Search:"
+msgstr "Vyhledat:"
 
 msgid "Searching for a picture of : "
 msgstr "Hledání obrázku :"
@@ -2455,6 +3014,9 @@ msgstr "Vybráno :"
 
 msgid "Selected songs"
 msgstr "Vybrané skladby"
+
+msgid "Selected songs to update :"
+msgstr "Vybrané skladby k aktualizaci :"
 
 msgid "Selecting pictures"
 msgstr "Výběr obrázků"
@@ -2489,12 +3051,17 @@ msgstr "Nastavit rozložení okna přehrávače"
 msgid "Set subgroup"
 msgstr "Nastavit podskupinu"
 
+#, perl-brace-format
+msgid "Set {year} as year for all tracks on this album."
+msgstr "Uložit{year} jako rok pro všechny skladby na tomto albu."
+
 msgid "Settings"
 msgstr "Nastavení"
 
 msgid "Settings on this page will only take effect after a restart"
 msgstr "Nastavení na této straně se projeví po restartu"
 
+#, perl-format
 msgid ""
 "Shell command\n"
 "(some variables such as %f (current song filename) or %F (list of selected "
@@ -2504,6 +3071,8 @@ msgstr ""
 "lze využít některé proměnné jako %f (název souboru skladby) nebo %F (seznam "
 "vybraných názvů souborů)"
 
+#. Shift key
+msgctxt "Keyboard"
 msgid "Shift"
 msgstr "Shift"
 
@@ -2516,6 +3085,12 @@ msgstr "Zobrazit stránky interpreta na last.fm"
 msgid "Show Artist page on wikipedia"
 msgstr "Zobrazit stránky interpreta na wikipedii"
 
+msgid "Show album"
+msgstr "Zobrazit album"
+
+msgid "Show artist picture"
+msgstr "Zobrazit obrázek umělce"
+
 msgid "Show artist's biography"
 msgstr "Zobrazit biografii interpreta"
 
@@ -2525,8 +3100,32 @@ msgstr "Zobrazit nadcházející plánované akce interpreta"
 msgid "Show buttons"
 msgstr "Zobrazit tlačítka"
 
+msgid "Show genre"
+msgstr "Zobrazit Žánr"
+
+msgid "Show in sound menu"
+msgstr "Zobrazit v menu zvuku"
+
+msgid "Show info panel"
+msgstr "Zobrazit info panel"
+
+msgid "Show main window"
+msgstr "Zobrazit hlavní okno"
+
+msgid "Show playlist"
+msgstr "Zobrazit seznam skladeb"
+
 msgid "Show replaygain submenu"
 msgstr "Zobrazit podnabídku replaygain"
+
+msgid "Show similar artists"
+msgstr "Zobrazit podobné umělce"
+
+msgid "Show song details"
+msgstr "Zobrazit podrobnosti o skladbě"
+
+msgid "Show status bar"
+msgstr "Zobrazit stavový řádek"
 
 msgid "Show suggestions"
 msgstr "Zobrazit návrhy"
@@ -2542,6 +3141,12 @@ msgstr "Zobrazit okno oznamovací oblasti při změně skladby"
 
 msgid "Show/Hide"
 msgstr "Zobrazit/skrýt"
+
+msgid "Show/Hide Browser"
+msgstr "Zobrazit/skrýt Prohlížeč"
+
+msgid "Show/Hide Cover"
+msgstr "Zobrazit/skrýt Přebal"
 
 msgid "Show/Hide layout widget(s)"
 msgstr "Zobrazit/skrýt pomůcku(y) rozložení"
@@ -2570,6 +3175,18 @@ msgstr "Zamíchaná alba, zamíchané stopy"
 msgid "Shutdown command :"
 msgstr "Příkaz pro vypnutí :"
 
+msgid "Sidebar"
+msgstr "Postranní lišta"
+
+msgid "Similar"
+msgstr "Podobní"
+
+msgid "Similar Artists"
+msgstr "Podobní umělci"
+
+msgid "Simple List View"
+msgstr "Zobrazit jednoduchý seznam"
+
 msgid "Simple title"
 msgstr "Jednoduchý název"
 
@@ -2579,8 +3196,14 @@ msgstr "Velikost"
 msgid "Skip count"
 msgstr "Přeskočit počet"
 
+msgid "Skip history"
+msgstr "Přeskočit historii"
+
 msgid "Skip to next song if an error occurs"
 msgstr "Při chybě přeskočit na další skladbu"
+
+msgid "Small"
+msgstr "Malý"
 
 msgid "Small album picture"
 msgstr "Malý obrázek alba"
@@ -2597,6 +3220,9 @@ msgstr "Skladba"
 msgid "Song Properties"
 msgstr "Vlastnosti skladby"
 
+msgid "Song informations"
+msgstr "Informace o skladbě"
+
 msgid "Song rating"
 msgstr "Hodnocení skladby"
 
@@ -2605,6 +3231,9 @@ msgstr "Edice seskupení stromu skladeb"
 
 msgid "Songs Properties"
 msgstr "Vlastnosti skladeb"
+
+msgid "Songtree View"
+msgstr "Zobrazit jako strom skladeb"
 
 msgid "Sort"
 msgstr "Třídit"
@@ -2621,14 +3250,26 @@ msgstr "Rozdělit jména interpreta na :"
 msgid "Standard fields"
 msgstr "Standardní pole"
 
+msgid "Start ReplayGain analysis"
+msgstr "Začít analýzu ReplayGain"
+
 msgid "Start in tray"
 msgstr "Spustit v oznamovací oblasti"
+
+msgid "Statistics"
+msgstr "Statistika"
+
+msgid "Statusbar"
+msgstr "Stavový řádek"
 
 msgid "Stop"
 msgstr "Zastavit"
 
 msgid "Stop checking"
 msgstr "Zastavit kontrolu"
+
+msgid "Stop fetching albuminfo"
+msgstr "Zastavit načítání informací o albu"
 
 msgid "Stop scanning"
 msgstr "Zastavit prohledávání"
@@ -2650,6 +3291,9 @@ msgstr "Tlačítka Zastavit, Přehrát, Další a Titul/Interpret"
 
 msgid "Strip wikipedia pages"
 msgstr "Pruh stránek Wikipedie"
+
+msgid "Styles"
+msgstr "Styly"
 
 msgid "Submit Now-Playing OK"
 msgstr "Postoupení NowPlaying OK"
@@ -2693,15 +3337,20 @@ msgstr "Podmínky používání"
 msgid "Text"
 msgstr "Text"
 
-msgid "The [most/less]"
-msgstr "Nej[více/méně]"
+msgid "The layout for this desktop widget is missing."
+msgstr "Zobrazení pro tento widget chybí"
+
+msgid "Themes"
+msgstr "Témata vzhledu"
 
 msgid "These fields can be used :"
 msgstr "Tato pole mohou být použita :"
 
+#, perl-brace-format
 msgid "This command is required to play files of type {type} : {cmd}"
 msgstr "K přehrání souborů typu {type} je požadován příkaz : {cmd}"
 
+#, perl-format
 msgid "This label is set for %d song."
 msgid_plural "This label is set for %d songs."
 msgstr[0] "Tento štítek je nastaven pro %d skladbu."
@@ -2713,19 +3362,24 @@ msgstr "Tento zásuvný modul vyžaduje :"
 
 msgid ""
 "This plugin retrieves artist-relevant information (biography, upcoming "
-"events) from last.fm."
+"events, similar artists) from last.fm."
 msgstr ""
-"Tento zásuvný modul vyhledává informace příslušné interpretovi (biografie, "
-"plánované akce) na last.fm"
+"Tento zásuvný modul vyhledává relevantní informace o umělci (životopis, "
+"plánované akce, podobní umělci) z last.fm"
 
-msgid "Threshold to count a song as played :"
-msgstr "Limit počítání skladby jako přehrané :"
+#, perl-format
+msgid "Threshold to count a song as played : %d %"
+msgstr "Limit počítání skladby jako přehrané : %d %"
 
 msgid "Thursday"
 msgstr "Čtvrtek"
 
-msgid "Timeout :"
-msgstr "Po dobu :"
+msgid "Time :"
+msgstr "Čas :"
+
+#, perl-format
+msgid "Timeout : %d seconds"
+msgstr "Timeout : %d sekund"
 
 msgid "Timespan of the fade-out in seconds"
 msgstr "Časová rozteč slábnutí ve vteřinách"
@@ -2741,6 +3395,17 @@ msgstr "Název a stav"
 
 msgid "Title - Artist - Album"
 msgstr "Název - Interpret - Album"
+
+msgid "Title or filename"
+msgstr "Titul nebo název souboru"
+
+#, perl-format
+msgid "Title: %t"
+msgstr "Název: %t"
+
+#, perl-format
+msgid "Title: %t (Track No. %n)"
+msgstr "Titul: %t (Skladba č. %n)"
 
 msgid "Titlebar"
 msgstr "Záhlaví"
@@ -2769,8 +3434,20 @@ msgstr "Celá obrazovka"
 msgid "Toggle the fullscreen layout"
 msgstr "Přepnout celoobrazovkové rozložení"
 
+msgid "Toolbar"
+msgstr "Lišta nástrojů"
+
+msgid "Tools"
+msgstr "Nástroje"
+
+msgid "Total playcount:"
+msgstr "Celkový počet přehrání:"
+
 msgid "Track"
 msgstr "Stopa"
+
+msgid "Track Properties"
+msgstr "Vlastnosti skladby"
 
 msgid "Track gain"
 msgstr "Zisk stopy"
@@ -2790,17 +3467,25 @@ msgstr "Vypnout"
 msgid "Turn off computer when queue empty"
 msgstr "Vypnout počítač po vyprázdnění fronty"
 
-msgid "Type"
-msgstr "Typ"
-
 msgid "URL"
 msgstr "URL"
 
 msgid "Unique file identifier"
 msgstr "Unikátní identifikátor souboru"
 
+msgid "Unknown album"
+msgstr "Neznámé album"
+
+#, perl-brace-format
 msgid "Unknown field ({field})"
 msgstr "Neznámé pole ({field})"
+
+msgid "Unknown filter :"
+msgstr "Neznámý filtr"
+
+#, perl-format
+msgid "Unknown layout '%s'"
+msgstr "Neznámé uspořádání '%s'"
 
 msgid "Unlock Album"
 msgstr "Odemknout album"
@@ -2816,6 +3501,12 @@ msgstr "Nepojmenovaný filtr"
 
 msgid "Untitled"
 msgstr "Neoznačeno"
+
+msgid "Update tags"
+msgstr "Aktualizace popisků"
+
+msgid "Update tags..."
+msgstr "Aktualizace popisků..."
 
 msgid "Upper left"
 msgstr "Nahoře vlevo"
@@ -2857,24 +3548,28 @@ msgstr "Použít gstreamer"
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "U ID3v2 popisků použít kódování latin1 pokud je dostupné "
 
+#, perl-format
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
 "furthermore linebreaks '<br>' and any text you'd like to have in between. E."
 "g. '%title taking place at %startDate<br>in %city, %country<br><br>'"
 msgstr ""
-"Použít popisky ze stránek akcí  XML last.fm s předchozím % (např. %"
-"headliner), dále zalomení řádků '<br>' a libovolný text mezi. Např. '%title "
+"Použít popisky ze stránek akcí  XML last.fm s předchozím % (např. "
+"%headliner), dále zalomení řádků '<br>' a libovolný text mezi. Např. '%title "
 "vystupující dne %startDate<br>v %city, %country<br><br>'"
 
 msgid "Use the playing filter"
 msgstr "Použít přehrávaný filtr"
 
+#, perl-brace-format
 msgid "Use this picture as cover for album '{album}'"
 msgstr "Použít tento obrázek jako přebal pro album '{album}'"
 
+#, perl-brace-format
 msgid "Use this picture for artist '{artist}'"
 msgstr "Použít tento obrázek pro interpreta '{artist}'"
 
+#, perl-brace-format
 msgid "Use {command} to play {ext} files"
 msgstr "Pro přehrání souborů {ext} použít {command}"
 
@@ -2911,17 +3606,14 @@ msgstr "Zobrazit binární"
 msgid "View binary data ..."
 msgstr "Zobrazit binární data ..."
 
-msgid "Volume"
-msgstr "Hlasitost"
-
 msgid "Volume : "
 msgstr "Hlasitost : "
 
 msgid "Volume step :"
 msgstr "Krok nastavení hlasitosti :"
 
-msgid "Wait when queue empty"
-msgstr "Čekat do vyprázdnění fronty"
+msgid "Wait for more when queue empty"
+msgstr "Vyčkejte než se fronta vyprázdní"
 
 msgid ""
 "Warning : these are advanced options, don't change them unless you know what "
@@ -2954,12 +3646,21 @@ msgstr "Středa"
 msgid "Weighted Random"
 msgstr "Náhodný význam"
 
+msgid "When added"
+msgstr "Při přidání"
+
 msgid ""
 "When changing songs, the previous song is added to the recent list even if "
 "not played at all."
 msgstr ""
 "Při změně skladeb bude předchozí přidána do stávajícího seznamu ačkoliv "
 "nebyla přehrána."
+
+msgid "When current song"
+msgstr "Při aktuální skladbě"
+
+msgid "Whole library"
+msgstr "Celá knihovna"
 
 msgid "Widget name"
 msgstr "Název pomůcky"
@@ -2979,6 +3680,11 @@ msgstr ""
 "uloženy v knihovně.\n"
 "Pozor, změny budou ztraceny při opakovaném načtení popisku."
 
+msgid "Will use default if not found"
+msgstr "Použije se defaultní, pokud nebude nalezen"
+
+#. Windows key
+msgctxt "Keyboard"
 msgid "Win"
 msgstr "Win"
 
@@ -2991,14 +3697,34 @@ msgstr "Slova začínající na"
 msgid "Write filenames to ..."
 msgstr "Zapsat názvy souborů do ..."
 
+msgid ""
+"Write value of selected fields in the tags. Useful for fields that were "
+"previously not written to tags, to make sure the current value is written."
+msgstr ""
+"Zapsat vybraná pole do tagu. Užitečné pro pole, která nebyla předtím do tagů "
+"zanesena."
+
 msgid "Writing tags"
 msgstr "Zápis popisků"
 
 msgid "Year"
 msgstr "Rok"
 
+msgid "Year - Album"
+msgstr "Rok - Album"
+
+msgid "Year - Artist"
+msgstr "Rok - Umělec"
+
 msgid "Yes"
 msgstr "Ano"
+
+msgid ""
+"You can force a check for these files by holding shift when selecting \"Re-"
+"read tags\""
+msgstr ""
+"Můžete vynutit  kontrolu těchto souborů držením shiftu když vybererte "
+"\"Znovu přečíst tagy\""
 
 msgid ""
 "You can use some markup, eg :\n"
@@ -3027,18 +3753,6 @@ msgstr "_Třídit dle"
 msgid "a bright coloured fish"
 msgstr "a bright coloured fish"
 
-msgid "a flac file"
-msgstr "soubor flac"
-
-msgid "a mp3 file"
-msgstr "soubor mp3"
-
-msgid "a musepack file"
-msgstr "soubor musepack"
-
-msgid "a wavepack file"
-msgstr "soubor wavepack"
-
 msgid "abort copy"
 msgstr "Zrušit kopírování"
 
@@ -3048,14 +3762,26 @@ msgstr "Zrušit přesouvání"
 msgid "add"
 msgstr "Přidat"
 
-msgid "added"
-msgstr "Přidáno"
-
 msgid "advanced options"
 msgstr "pokročilé volby"
 
-msgid "after %d"
-msgstr "po %d"
+msgid "after"
+msgstr "po"
+
+#, perl-format
+msgid "after %s"
+msgstr "po %s"
+
+msgid "album information now for"
+msgstr "Informace o albu nyní pro"
+
+#. comma-separated list of field aliases for album, these are in addition to english aliases
+msgctxt "Field_aliases"
+msgid "album,on"
+msgstr "album,na"
+
+msgid "albums missing reviews"
+msgstr "alba s chybějícími recenzemi"
 
 msgid "alphabetical"
 msgstr "abecedně"
@@ -3063,32 +3789,32 @@ msgstr "abecedně"
 msgid "amixer control :"
 msgstr "ovládání amixeru :"
 
-msgid "an ape file"
-msgstr "soubor ape"
-
-msgid "an ogg file"
-msgstr "soubor ogg"
-
 msgid "another example"
 msgstr "další příklad"
+
+msgid "applied on reload"
+msgstr "vyžaduje restart"
 
 msgid "apply filter"
 msgstr "použít filtr"
 
+#, perl-brace-format
 msgid "argument {n} :"
 msgstr "argument {n} :"
 
 msgid "artist"
 msgstr "interpret"
 
+#. comma-separated list of field aliases for artist, these are in addition to english aliases
+msgctxt "Field_aliases"
+msgid "artist,by"
+msgstr "umělec, od"
+
 msgid "auto detect"
 msgstr "automatická detekce"
 
 msgid "autofill"
 msgstr "automaticky vyplnit"
-
-msgid "autofill queue"
-msgstr "automaticky vyplnit frontu"
 
 msgid "automatic size"
 msgstr "automatická velikost"
@@ -3102,23 +3828,32 @@ msgstr "skupina"
 msgid "band/artist logotype"
 msgstr "logotyp skupiny/interpreta"
 
-msgid "before %d"
-msgstr "před %d"
+msgid "before"
+msgstr "před"
 
-msgid "between %d( and )%d"
-msgstr "mezi %d( a )%d"
+#, perl-format
+msgid "before %s"
+msgstr "před %s"
 
-msgid "between %n( and )%n"
-msgstr "mezi %n( a )%n"
+msgid "between"
+msgstr "mezi"
+
+#, perl-format
+msgid "between %s ago and %s ago"
+msgstr "mezi %s zpět a %s zpět"
+
+#, perl-format
+msgid "between %s and %s"
+msgstr "mezi %s a %s"
+
+msgid "between (absolute dates)"
+msgstr "mezi (absolutní data)"
+
+msgid "between (relative dates)"
+msgstr "mezi (relativní data)"
 
 msgid "big size"
 msgstr "velká velikost"
-
-msgid "biography"
-msgstr "biografie"
-
-msgid "bitrate"
-msgstr "datový tok"
 
 msgid "bonus tracks"
 msgstr "bonusové stopy"
@@ -3153,11 +3888,19 @@ msgstr "dle počtu přehrání"
 msgid "by rating"
 msgstr "dle hodnocení"
 
+#, perl-brace-format
 msgid "by {artist} from {album}"
 msgstr "od {artist} z {album}"
 
+#, perl-brace-format
+msgid "by {author}"
+msgstr "od {author}"
+
 msgid "bytes"
 msgstr "bytů"
+
+msgid "check length now"
+msgstr "Zkontrolovat délku nyní"
 
 msgid "check now"
 msgstr "kontrolovat nyní"
@@ -3186,8 +3929,16 @@ msgstr "selhání spojení"
 msgid "connection failed."
 msgstr "selhání spojení."
 
+msgid "contains"
+msgstr "obsahuje"
+
+#, perl-format
 msgid "contains %s"
 msgstr "obsahuje %s"
+
+#, perl-format
+msgid "contains %s (case sensitive)"
+msgstr "zahrnuje %s (malá a velká písmena)"
 
 msgid "counter"
 msgstr "počítadlo"
@@ -3210,9 +3961,6 @@ msgstr "výchozí název souboru"
 msgid "default folder"
 msgstr "výchozí složka"
 
-msgid "default fullscreen"
-msgstr "výchozí celá obrazovka"
-
 msgid "delete selected filter"
 msgstr "smazat vybraný filtr"
 
@@ -3228,23 +3976,42 @@ msgstr "smazat vybraný režim třídění"
 msgid "different folders"
 msgstr "rozdílné složky"
 
+#, perl-brace-format
 msgid "disc {disc}"
 msgstr "disk {disc}"
 
+#, perl-format
 msgid "doesn't contain %s"
 msgstr "neobsahuje %s"
 
-msgid "doesn't match regexp %r"
-msgstr "nesouhlasí výraz %r"
+#, perl-format
+msgid "doesn't contain %s (case sensitive)"
+msgstr "nezahrnuje %s (malá a velká písmena)"
+
+msgid "doesn't have a picture"
+msgstr "nemá obrázek"
+
+#, perl-format
+msgid "doesn't include %s"
+msgstr "neobsahuje %s"
+
+#, perl-format
+msgid "doesn't include artist %s"
+msgstr "neobsahuje umělce %s"
+
+#, perl-format
+msgid "doesn't match regexp %s"
+msgstr "Neodpovídá regulárnímu výrazu %s"
+
+#, perl-format
+msgid "doesn't match regexp %s (case sensitive)"
+msgstr "Neodpovídá regulárnímu výrazu %s (malá a velká písmena)"
 
 msgid "during performance"
 msgstr "během produkce"
 
 msgid "during recording"
 msgstr "během nahrávání"
-
-msgid "edit ..."
-msgstr "upravit ..."
 
 msgid "email"
 msgstr "email"
@@ -3255,35 +4022,35 @@ msgstr "prázdné"
 msgid "enable gapless (experimental)"
 msgstr "umožnit přehrávání bez mezer (pokusně)"
 
+msgid "entire collection"
+msgstr "celá kolekce"
+
 msgid "error"
 msgstr "chyba"
-
-msgid "events"
-msgstr "plánované akce"
 
 msgid "ex :"
 msgstr "ex :"
 
-msgid "exactly %n( times)"
-msgstr "přesně %n( krát)"
-
-msgid "exactly not %n( times)"
-msgstr "jinak než %n( krát)"
-
+#, perl-brace-format
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "příklad (vybraná skladba) : {score}  ({chances})"
+
+msgid "example :"
+msgstr "příklad :"
 
 msgid "example : "
 msgstr "příklad :"
 
+#, perl-format
 msgid "example : %s"
 msgstr "příklad : %s"
 
 msgid "examples :"
 msgstr "příklady :"
 
-msgid "fallback-gain"
-msgstr "záložní zisk"
+#, perl-format
+msgid "fallback-gain : %d dB"
+msgstr "nouzový-zisk : %d dB"
 
 msgid "false"
 msgstr "nepravda"
@@ -3291,14 +4058,11 @@ msgstr "nepravda"
 msgid "favorite"
 msgstr "oblíbené"
 
-msgid "file format"
-msgstr "formát souboru"
+msgid "file tag"
+msgstr "Vepsat do tagu"
 
 msgid "filters"
 msgstr "Filtry"
-
-msgid "first added"
-msgstr "prvně přidáno"
 
 msgid "flags"
 msgstr "příznaky"
@@ -3315,11 +4079,15 @@ msgstr "pro soubory bez hlavičky VBR"
 msgid "front cover"
 msgstr "přední přebal"
 
-msgid "full"
-msgstr "úplné"
+msgid "fuzzy match"
+msgstr "nejasná shoda"
 
-msgid "full with buttons"
-msgstr "úplné s tlačítky"
+msgid "gmusicbrowser"
+msgstr "gmusicbrowser"
+
+#, perl-format
+msgid "gmusicbrowser is playing %t from %l (%Y) by %a"
+msgstr "gmusicbrowser právě přehrává %t z %l (%Y) od %a"
 
 msgid "google images"
 msgstr "obrázky z googlu"
@@ -3332,6 +4100,21 @@ msgstr "seskupit s"
 
 msgid "half-life : "
 msgstr "poločas :"
+
+msgid "has a picture"
+msgstr "má obrázek"
+
+msgid "has at least one"
+msgstr "má alespoň jeden"
+
+msgid "has been played"
+msgstr "byl přehrán"
+
+msgid "has been skipped"
+msgstr "byl přerušen"
+
+msgid "has none"
+msgstr "nemá žádný"
 
 msgid "hours"
 msgstr "hodin"
@@ -3354,8 +4137,37 @@ msgstr "ilustrace"
 msgid "imported list"
 msgstr "importovaný seznam"
 
-msgid "info"
-msgstr "info"
+#, perl-format
+msgid "in %l"
+msgstr "v %l"
+
+msgid "in the bottom"
+msgstr "na konci"
+
+#, perl-format
+msgid "in the bottom %s"
+msgstr "na konci %s"
+
+msgid "in the top"
+msgstr "nahoře"
+
+#, perl-format
+msgid "in the top %s"
+msgstr "nahoře %s"
+
+msgid "includes"
+msgstr "zahrnuje"
+
+#, perl-format
+msgid "includes %s"
+msgstr "jzahrnuje %s"
+
+msgid "includes artist"
+msgstr "Zahrnuje umělce"
+
+#, perl-format
+msgid "includes artist %s"
+msgstr "Zahrnuje umělce %s"
 
 msgid "integer"
 msgstr "celé číslo"
@@ -3372,113 +4184,95 @@ msgstr "inverze"
 msgid "is"
 msgstr "je"
 
-msgid "is %g"
-msgstr "je %g"
-
-msgid "is %n"
-msgstr "je %n"
-
-msgid "is %n( %)"
-msgstr "je %n( %)"
-
-msgid "is %n(Hz)"
-msgstr "je %n(Hz)"
-
-msgid "is %n(kbps)"
-msgstr "je %n(kbps)"
-
+#, perl-format
 msgid "is %s"
 msgstr "je %s"
 
-msgid "is after %n"
-msgstr "je po %n"
+msgid "is 44.1kHz"
+msgstr "je 44.1kHz"
 
-msgid "is before %n"
-msgstr "je před %n"
+msgid "is a flac file"
+msgstr "je soubor flac"
 
-msgid "is between %b( and )%b"
-msgstr "je mezi %b( a )%b"
+msgid "is a lossless file"
+msgstr "je bezztrátový soubor"
 
-msgid "is between %n( and )%n( %)"
-msgstr "je mezi %n( a )%n( %)"
+msgid "is a lossy file"
+msgstr "je soubor flac"
 
-msgid "is between %n( and )%n( s)"
-msgstr "je mezi %n( a )%n( s)"
+msgid "is a mp3 file"
+msgstr "je soubor mp3"
 
+msgid "is a musepack file"
+msgstr "je soubor musepack"
+
+msgid "is a vorbis file"
+msgstr "je soubor vorbis"
+
+msgid "is a wavepack file"
+msgstr "je soubor wavepack"
+
+msgid "is an aac file"
+msgstr "je soubor aac"
+
+msgid "is an alac file"
+msgstr "je soubor alac"
+
+msgid "is an ape file"
+msgstr "je soubor ape"
+
+msgid "is an mp4/m4a file"
+msgstr "je soubor mp4/m4a"
+
+msgid "is defined"
+msgstr "je definován"
+
+msgid "is equal to"
+msgstr "se rovná"
+
+#, perl-format
+msgid "is equal to %s"
+msgstr "se rovná %s"
+
+msgid "is false"
+msgstr "je falešný"
+
+msgid "is in"
+msgstr "je v"
+
+#, perl-format
 msgid "is in %s"
 msgstr "je v %s"
 
-msgid "is in list %l"
-msgstr "je v seznamu %l"
+msgid "is mono"
+msgstr "je mono"
 
-msgid "is less than %b"
-msgstr "je méně než %b"
+msgid "is not defined"
+msgstr "není definován"
 
-msgid "is less than %n"
-msgstr "je méně než %n"
+msgid "is stereo"
+msgstr "je stereo"
 
-msgid "is less than %n( %)"
-msgstr "je méně než %n( %)"
+msgid "is true"
+msgstr "je pravda"
 
-msgid "is less than %n( s)"
-msgstr "je méně než %n( s)"
-
-msgid "is less than %n(Hz)"
-msgstr "je méně než %n(Hz)"
-
-msgid "is less than %n(kbps)"
-msgstr "je méně než %n(kbps)"
-
-msgid "is more than %b"
-msgstr "je více než %b"
-
-msgid "is more than %n"
-msgstr "je více než %n"
-
-msgid "is more than %n( %)"
-msgstr "je více než %n( %)"
-
-msgid "is more than %n( s)"
-msgstr "je více než %n( s)"
-
-msgid "is more than %n(Hz)"
-msgstr "je více než %n(Hz)"
-
-msgid "is more than %n(kbps)"
-msgstr "je více než %n(kbps)"
-
-msgid "is not"
-msgstr "není"
-
-msgid "is not %n"
-msgstr "není %n"
-
-msgid "is not %n( %)"
-msgstr "není %n( %)"
-
-msgid "is not %s"
+#, perl-format
+msgid "isn't %s"
 msgstr "není %s"
 
-msgid "is not 44.1kHz"
-msgstr "není 44.1kHz"
+#, perl-format
+msgid "isn't equal to %s"
+msgstr "se nerovná %s"
 
-msgid "is not in %s"
+#, perl-format
+msgid "isn't in %s"
 msgstr "není v %s"
 
-msgid "is not in list %l"
-msgstr "není v seznamu %l"
+msgid "isn't mono"
+msgstr "není mono"
 
-msgid "isn't %g"
-msgstr "není %g"
-
-msgid "isn't %n"
-msgstr "není %n"
-
-msgid "isn't %n(Hz)"
-msgstr "není %n(Hz)"
-
-msgid "isn't %n(kbps)"
-msgstr "není %n(kbps)"
+msgid "isn't stereo"
+msgstr "není stereo"
 
 msgid ""
 "itunes doesn't support unsynchronised tags last time I checked, mostly "
@@ -3487,23 +4281,26 @@ msgstr ""
 "Při posledním ověření itunes nepodporovalo nesynchronizované popisky, patrné "
 "hlavně u popisků s obrázky"
 
-msgid "itunes-like"
-msgstr "styl itunes"
-
-msgid "last added"
-msgstr "naposled přidané"
-
-msgid "last played"
-msgstr "naposled přehrávané"
-
-msgid "last skipped"
-msgstr "naposled přeskočené"
-
 msgid "last.fm"
 msgstr "last.fm"
 
 msgid "last.fm plugin"
 msgstr "zásuvný modul last.fm"
+
+msgid ""
+"last.fm's similarity categories:\n"
+">90 super\n"
+">70 very high\n"
+">50 high\n"
+">30 medium\n"
+">10 lower"
+msgstr ""
+"Kategorie podobností last.fm:\n"
+">90 super\n"
+">70 velmi vysoká\n"
+">50 vysoká\n"
+">30 průměrná\n"
+">10 nízká"
 
 msgid "lead artist"
 msgstr "hlavní interpret"
@@ -3517,26 +4314,29 @@ msgstr "panely s filtry vlevo"
 msgid "length of songs"
 msgstr "délka skladeb"
 
-msgid "less played"
-msgstr "nejméně přehrávané"
+msgid "less than"
+msgstr "méně než"
 
-msgid "less skipped"
-msgstr "nejméně přeskakované"
-
-msgid "less than %a( ago)"
-msgstr "méně než před %a"
-
-msgid "less than %n( times)"
-msgstr "méně než %n( krát)"
-
-msgid "longest"
-msgstr "nejdelší"
+#, perl-format
+msgid "less than %s ago"
+msgstr "méně než před %s zpět"
 
 msgid "lyricist"
 msgstr "textař"
 
-msgid "match regexp %r"
-msgstr "souhlasí výraz %r"
+msgid "lyrics file"
+msgstr "Soubor slov"
+
+msgid "matches regexp"
+msgstr "odpovídá regulárnímu výrazu"
+
+#, perl-format
+msgid "matches regexp %s"
+msgstr "odpovídá regulárnímu výrazu %s"
+
+#, perl-format
+msgid "matches regexp %s (case sensitive)"
+msgstr "odpovídá regulárnímu výrazu %s (malá a velká písmena)"
 
 msgid "maximum font size"
 msgstr "maximální velikost písma"
@@ -3556,38 +4356,37 @@ msgstr "nejmenší velikost písma"
 msgid "minutes"
 msgstr "minut"
 
-msgid "modified"
-msgstr "upraveno"
-
-msgid "mono"
-msgstr "mono"
-
 msgid "month"
 msgstr "měsíc"
 
 msgid "months"
 msgstr "měsíce"
 
-msgid "more than %a( ago)"
-msgstr "více než před %a"
+msgid "more than"
+msgstr "více než"
 
-msgid "more than %n( times)"
-msgstr "více než %n( krát)"
+#, perl-format
+msgid "more than %s ago"
+msgstr "více než %s zpět"
 
 msgid "mosaic mode"
 msgstr "režim mozaika"
-
-msgid "most played"
-msgstr "nevíce přehrávané"
-
-msgid "most skipped"
-msgstr "nejvíce přeskakované"
 
 msgid "move folder"
 msgstr "přesunout složku"
 
 msgid "movie/video screen capture"
 msgstr "filmová/video obrazovka"
+
+msgid ""
+"mp3 files without a VBR header requires a full scan to check its real length "
+"and bitrate"
+msgstr ""
+"mp3 soubory bez VBR vyžadují znovu plné prozkoumání kvůli stanovení skutečné "
+"délky a datového toku"
+
+msgid "mplayer executable :"
+msgstr "mplayer spustitelný:"
 
 msgid "mplayer options :"
 msgstr "možnosti mplayeru"
@@ -3613,6 +4412,10 @@ msgstr "nikdy"
 msgid "never played"
 msgstr "nikdy nepřehrávané"
 
+#, perl-format
+msgid "no %s fuzzy match with %s"
+msgstr "žádná %s nejasná shoda s %s"
+
 msgid "no matches found, you might want to remove some search terms."
 msgstr "žádná shoda nenalezena, zkuste odstranit nějakou podmínku vyhledávání"
 
@@ -3628,6 +4431,9 @@ msgstr "bez obrázků"
 msgid "no plugins found"
 msgstr "zásuvný modul nenalezen"
 
+msgid "no songs needs checking"
+msgstr "songy nepotřebují kontrolu"
+
 msgid "no splitting"
 msgstr "bez dělení"
 
@@ -3640,17 +4446,43 @@ msgstr "bezejmenné"
 msgid "normal"
 msgstr "normální"
 
-msgid "normal play when queue empty"
-msgstr "po vyprázdnění fronty normální přehrávání"
+#, perl-format
+msgid "not between %s ago and %s ago"
+msgstr "ne mezi %s zpět a %s zpět"
+
+#, perl-format
+msgid "not between %s and %s"
+msgstr "ne mezi %s a %s"
 
 msgid "not bootleg"
 msgstr "není bootleg"
 
-msgid "not played for the longest time"
-msgstr "dlouho nepřehrávané"
+msgid "not defined"
+msgstr "není definován"
 
-msgid "not skipped for the longest time"
-msgstr "dlouho nepřeskočené"
+#, perl-format
+msgid "not in the bottom %s"
+msgstr "není v dolní % s"
+
+#, perl-format
+msgid "not in the top %s"
+msgstr "ne nahoře %s"
+
+#, perl-format
+msgid "not present in %s"
+msgstr "není přítomen v %s"
+
+#, perl-format
+msgid "not set to %s"
+msgstr "není nastaven na% s"
+
+#, perl-format
+msgid "not the %s least recent"
+msgstr "v neposlední řadě %s nedávné"
+
+#, perl-format
+msgid "not the %s most recent"
+msgstr "ne %s poslední"
 
 msgid "number of songs"
 msgstr "počet skladeb"
@@ -3658,26 +4490,25 @@ msgstr "počet skladeb"
 msgid "number of songs in filter"
 msgstr "počet skladeb ve filtru"
 
-msgid "on %d"
-msgstr "při %d"
-
 msgid "only show entries with at least n songs"
 msgstr "zobrazit jen položky obsahující minimálně n skladeb"
 
 msgid "only works when the artist-info tab is displayed"
 msgstr "Funkční jen pokud je zobrazena záložka informace o interpretovi"
 
-msgid "only works with some lyrics source and when the lyrics tab is displayed"
-msgstr "Funkční pouze s některými texty a pokud je zobrazena záložka textů"
+msgid "only works with some lyrics source and when the lyrics tab is active"
+msgstr ""
+"Funkční pouze s některými zdroji textů a pokud je zobrazena záložka textů"
 
 msgid "open context window"
-msgstr "otevřít okno kontext"
+msgstr "otevřít okno kontextu"
 
 msgid "options"
 msgstr "nastavit okna"
 
-msgid "or"
-msgstr "nebo"
+#, perl-format
+msgid "or %d seconds"
+msgstr "nebo %d sekund"
 
 msgid "other"
 msgstr "další"
@@ -3700,9 +4531,6 @@ msgstr "velikost obrázku"
 msgid "play count average"
 msgstr "průměrný počet přehrání"
 
-msgid "played"
-msgstr "přehráno"
-
 msgid "played>4"
 msgstr "přehráno>4"
 
@@ -3712,14 +4540,19 @@ msgstr "port :"
 msgid "pre-amp"
 msgstr "předzesilovač"
 
+#, perl-format
+msgid "pre-amp : %d dB"
+msgstr "předzesílení : %d dB"
+
+#, perl-format
+msgid "present in %s"
+msgstr "přítomen v %s"
+
+msgid "present in list"
+msgstr "přítomen v seznamu"
+
 msgid "quit"
 msgstr "ukončit"
-
-msgid "quit when queue empty"
-msgstr "ukončit po vyprázdnění fronty"
-
-msgid "quodlibet-like"
-msgstr "styl quodlibet"
 
 msgid "rating"
 msgstr "hodnocení"
@@ -3733,8 +4566,12 @@ msgstr "nahrávání umístění"
 msgid "requires xdg-screensaver"
 msgstr "je požadován xdg-screensaver"
 
+#, perl-brace-format
 msgid "reset filter {nb}"
 msgstr "vymazat filtr {nb}"
+
+msgid "reset format"
+msgstr "obnovit formát"
 
 msgid "reset primary filter"
 msgstr "vymazat primární filtr"
@@ -3745,12 +4582,14 @@ msgstr "vymazat sekundární filtr"
 msgid "retry"
 msgstr "zkusit znovu"
 
+#, perl-brace-format
 msgid "retry in {seconds} s"
 msgstr "zkusit znovu za {seconds} s"
 
-msgid "sampling rate"
-msgstr "vzorkovací frekvence"
+msgid "reverse order"
+msgstr "Obrátit pořadí"
 
+#, perl-brace-format
 msgid "save as '{name}'"
 msgstr "uložit jako '{name}'"
 
@@ -3784,8 +4623,15 @@ msgstr "vyhledávat nyní"
 msgid "seconds"
 msgstr "vteřin"
 
-msgid "shortest"
-msgstr "nejkratší"
+msgid "set to"
+msgstr "nastavit na"
+
+#, perl-format
+msgid "set to %s"
+msgstr "nastavit na %s"
+
+msgid "show histogram background"
+msgstr "Zobrazit pozadí histogramu"
 
 msgid "show pictures"
 msgstr "zobrazit obrázky"
@@ -3793,14 +4639,14 @@ msgstr "zobrazit obrázky"
 msgid "show the 'All' row"
 msgstr "zobrazit položku 'Vše'"
 
+msgid "similar-artists"
+msgstr "podobný-umělec"
+
 msgid "skin options"
 msgstr "nastavení motivu"
 
 msgid "skip count average"
 msgstr "přeskočit počítadlo průměru"
-
-msgid "skipped"
-msgstr "přeskočeno"
 
 msgid "small size"
 msgstr "malá velikost"
@@ -3811,14 +4657,8 @@ msgstr "třídit podle"
 msgid "static list"
 msgstr "statický seznam"
 
-msgid "stereo"
-msgstr "stereo"
-
 msgid "stop"
 msgstr "zastavit"
-
-msgid "stop when queue empty"
-msgstr "zastavit po vyprázdnění fronty"
 
 msgid "string"
 msgstr "řetězec"
@@ -3832,23 +4672,46 @@ msgstr "formát textu"
 msgid "text mode"
 msgstr "režim textu"
 
+#, perl-format
+msgid "the %s least recent"
+msgstr "%s nejméně nedávné"
+
+#, perl-format
+msgid "the %s most recent"
+msgstr "%s poslední"
+
+#, perl-brace-format
 msgid "the command {name}"
 msgstr "příkaz '{name}'"
 
 msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
 msgstr "výchozí je utf16 pro ID3v2.3 a utf8 pro ID3v2.4"
 
+#, perl-brace-format
 msgid "the file {name}"
 msgstr "soubor {name}"
 
+msgid "the least recent"
+msgstr "nejméně nedávné"
+
+msgid "the most recent"
+msgstr "poslední"
+
+#, perl-brace-format
 msgid "the {name} perl module"
 msgstr "perl režim {name}"
 
+#, perl-brace-format
 msgid "then {action}"
 msgstr "pak {action}"
 
 msgid "times"
 msgstr "krát"
+
+#. comma-separated list of field aliases for title, these are in addition to english aliases
+msgctxt "Field_aliases"
+msgid "title"
+msgstr "název"
 
 msgid "toggle Intersection mode"
 msgstr "přepnout smíšený režim"
@@ -3864,9 +4727,6 @@ msgstr "pravda"
 
 msgid "turn off"
 msgstr "vypnout"
-
-msgid "turn off computer when queue empty"
-msgstr "vypnout počítač po vyprázdnění fronty"
 
 msgid "unknown"
 msgstr "neznámý"
@@ -3913,12 +4773,6 @@ msgstr "použitý motiv :"
 msgid "wait for more"
 msgstr "vyčkat"
 
-msgid "wait for more when queue empty"
-msgstr "vyčkat na vyprázdnění fronty"
-
-msgid "web"
-msgstr "internet"
-
 msgid "weeks"
 msgstr "týdnů"
 
@@ -3937,8 +4791,8 @@ msgstr "s prohlížečem & frontou"
 msgid "with browser (SongTree)"
 msgstr "s prohlížečem (strom skladeb)"
 
-msgid "with context"
-msgstr "s kontextem"
+msgid "with lists"
+msgstr "se seznamy"
 
 msgid "with picture"
 msgstr "s obrázkem"
@@ -3946,17 +4800,17 @@ msgstr "s obrázkem"
 msgid "with playlist"
 msgstr "s playlistem"
 
-msgid "with playlist & context"
-msgstr "s playlistem & kontextem"
-
 msgid "with queue"
 msgstr "s frontou"
 
 msgid "with search"
 msgstr "s vyhledáváním"
 
-msgid "with tabbedlists"
-msgstr "s tabulkovými seznamy"
+msgid "with search and lists"
+msgstr "s vyhledáváním a seznamy"
+
+msgid "with search and lists 2"
+msgstr "s vyhledáváním a seznamy 2"
 
 msgid ""
 "without gstreamer : one stream per file, one connection at a time\n"
@@ -3983,6 +4837,7 @@ msgstr "roky"
 msgid "yes to all"
 msgstr "ano pro vše"
 
+#, perl-brace-format
 msgid ""
 "{album}\n"
 "<small>by</small> {artist}"
@@ -3990,60 +4845,348 @@ msgstr ""
 "{album}\n"
 "<small>od</small> {artist}"
 
+#, perl-brace-format
 msgid "{folder} already exists"
 msgstr "{folder} již existuje"
 
+#, perl-brace-format
 msgid "{hours} hours {min} min {sec} s ({size} M)"
 msgstr "{hours} hodin {min} min {sec} s ({size} M)"
 
+#, perl-brace-format
 msgid "{hours}h {min}m {sec}s ({size}M)"
 msgstr "{hours}h {min}m {sec}s ({size}M)"
 
+#, perl-brace-format
 msgid "{hours}h{min}m{sec}s"
 msgstr "{hours}h{min}m{sec}s"
 
+#, perl-brace-format
 msgid "{min} min {sec} s ({size} M)"
 msgstr "{min} min {sec} s ({size} M)"
 
 # co to je M?
+#, perl-brace-format
 msgid "{min}m {sec}s ({size}M)"
 msgstr "{min}m {sec}s ({size}M)"
 
+#, perl-brace-format
 msgid "{min}m{sec}s"
 msgstr "{min}m{sec}s"
 
+#, perl-brace-format
 msgid "{outputname} output settings"
 msgstr "{outputname} nastavení výstupu"
 
+#, perl-brace-format
 msgid "{songs} by {artists}"
 msgstr "{songs} od {artists}"
 
-msgid ""
-"{song}\n"
-"by {artist}\n"
-"from {album}"
-msgstr ""
-"{song}\n"
-"od {artist}\n"
-"z {album}"
-
+#, perl-brace-format
 msgid "{song} by {artist}"
 msgstr "{song} od {artist}"
 
 msgid "|-separated list of widget names"
 msgstr "|-oddělený seznam názvů pomůcek"
 
+#~ msgid "%f is set"
+#~ msgstr "%f je nastaven"
+
+#~ msgid "%n first added"
+#~ msgstr "%n prvně přidaných"
+
+#~ msgid "%n last added"
+#~ msgstr "%n naposled přidaných"
+
+#~ msgid "%n last played"
+#~ msgstr "%n naposled hraných"
+
+#~ msgid "%n last skipped"
+#~ msgstr "%n naposled přeskočených"
+
+#~ msgid "%n less played"
+#~ msgstr "%n nejméně hraných"
+
+#~ msgid "%n less skipped"
+#~ msgstr "%n nejméně přeskakovaných"
+
+#~ msgid "%n longest"
+#~ msgstr "%n nejdelších"
+
+#~ msgid "%n most played"
+#~ msgstr "%n nejhranější"
+
+#~ msgid "%n most skipped"
+#~ msgstr "%n nejvíce přeskakovaných"
+
+#~ msgid "%n not played for the longest time"
+#~ msgstr "%n dlouho nepřehrávaných"
+
+#~ msgid "%n not skipped for the longest time"
+#~ msgstr "%n dlouho nepřeskakovaných"
+
+#~ msgid "%n shortest"
+#~ msgstr "%n nejkratších"
+
 #~ msgid "' & ' and ', ' and ';'"
 #~ msgstr "' & ' a ', ' a ';'"
+
+#~ msgid "(: )none"
+#~ msgstr "(: )žádný"
+
+#~ msgid "All but the [most/less]%n"
+#~ msgstr "Vše, ale nej[více/méně]%n"
+
+#~ msgid "Choose Date"
+#~ msgstr "Vybrat rok"
+
+#~ msgid "EditList"
+#~ msgstr "Editace seznamu"
+
+#~ msgid ""
+#~ "For information on how to use this plugin, please navigate to the <a "
+#~ "href='http://gmusicbrowser.org/dokuwiki/doku.php?id=plugins:"
+#~ "artistinfo'>plugin's wiki page</a> in the <a href='http://gmusicbrowser."
+#~ "org/dokuwiki/'>gmusicbrowser-wiki</a>."
+#~ msgstr ""
+#~ "Pro návod k použití tohoto zásuvného modulu přejít <a href='http://"
+#~ "gmusicbrowser.org/dokuwiki/doku.php?id=plugins:artistinfo'>wiki stránku "
+#~ "zásuvných modulů</a> v <a href='http://gmusicbrowser.org/"
+#~ "dokuwiki/'>gmusicbrowser-wiki</a>."
+
+#~ msgid "Load/Save lyrics in :"
+#~ msgstr "Načíst/uložit texty do :"
+
+#~ msgid "Playlist, Library & Context"
+#~ msgstr "Playlist,knihovna & kontext"
+
+#~ msgid "Queue, Library & Context"
+#~ msgstr "Fronta, knihovna & kontext"
 
 #~ msgid "Rating picture"
 #~ msgstr "Hodnocení obrázku"
 
-#~ msgid "Search for artist on the web:"
-#~ msgstr "Vyhledat interpreta na stránkách :"
+#~ msgid "Search & Queue"
+#~ msgstr "Vyhledat & Fronta"
+
+#~ msgid "Search the web for artist"
+#~ msgstr "Vyhledat interpreta na internetu"
 
 #~ msgid "Split artist names on (needs restart) :"
 #~ msgstr "Rozdělit název interpreta na (vyžaduje restart) :"
 
-#~ msgid "show info"
-#~ msgstr "zobrazit info"
+#~ msgid "The [most/less]"
+#~ msgstr "Nej[více/méně]"
+
+#~ msgid "Type"
+#~ msgstr "Typ"
+
+#~ msgid "Volume"
+#~ msgstr "Hlasitost"
+
+#~ msgid "Wait when queue empty"
+#~ msgstr "Čekat do vyprázdnění fronty"
+
+#~ msgid "added"
+#~ msgstr "Přidáno"
+
+#~ msgid "an ogg file"
+#~ msgstr "soubor ogg"
+
+#~ msgid "autofill queue"
+#~ msgstr "automaticky vyplnit frontu"
+
+#~ msgid "between %n( and )%n"
+#~ msgstr "mezi %n( a )%n"
+
+#~ msgid "bitrate"
+#~ msgstr "datový tok"
+
+#~ msgid "edit ..."
+#~ msgstr "upravit ..."
+
+#~ msgid "exactly %n( times)"
+#~ msgstr "přesně %n( krát)"
+
+#~ msgid "exactly not %n( times)"
+#~ msgstr "jinak než %n( krát)"
+
+#~ msgid "first added"
+#~ msgstr "prvně přidáno"
+
+#~ msgid "full"
+#~ msgstr "úplné"
+
+#~ msgid "info"
+#~ msgstr "info"
+
+#~ msgid "is %g"
+#~ msgstr "je %g"
+
+#~ msgid "is %n"
+#~ msgstr "je %n"
+
+#~ msgid "is %n( %)"
+#~ msgstr "je %n( %)"
+
+#~ msgid "is %n(Hz)"
+#~ msgstr "je %n(Hz)"
+
+#~ msgid "is %n(kbps)"
+#~ msgstr "je %n(kbps)"
+
+#~ msgid "is after %n"
+#~ msgstr "je po %n"
+
+#~ msgid "is before %n"
+#~ msgstr "je před %n"
+
+#~ msgid "is between %n( and )%n( %)"
+#~ msgstr "je mezi %n( a )%n( %)"
+
+#~ msgid "is between %n( and )%n( s)"
+#~ msgstr "je mezi %n( a )%n( s)"
+
+#~ msgid "is in list %l"
+#~ msgstr "je v seznamu %l"
+
+#~ msgid "is less than %n"
+#~ msgstr "je méně než %n"
+
+#~ msgid "is less than %n( %)"
+#~ msgstr "je méně než %n( %)"
+
+#~ msgid "is less than %n( s)"
+#~ msgstr "je méně než %n( s)"
+
+#~ msgid "is less than %n(Hz)"
+#~ msgstr "je méně než %n(Hz)"
+
+#~ msgid "is less than %n(kbps)"
+#~ msgstr "je méně než %n(kbps)"
+
+#~ msgid "is more than %n"
+#~ msgstr "je více než %n"
+
+#~ msgid "is more than %n( %)"
+#~ msgstr "je více než %n( %)"
+
+#~ msgid "is more than %n( s)"
+#~ msgstr "je více než %n( s)"
+
+#~ msgid "is more than %n(Hz)"
+#~ msgstr "je více než %n(Hz)"
+
+#~ msgid "is more than %n(kbps)"
+#~ msgstr "je více než %n(kbps)"
+
+#~ msgid "is not"
+#~ msgstr "není"
+
+#~ msgid "is not %n( %)"
+#~ msgstr "není %n( %)"
+
+#~ msgid "is not %s"
+#~ msgstr "není %s"
+
+#~ msgid "isn't %n(Hz)"
+#~ msgstr "není %n(Hz)"
+
+#~ msgid "isn't %n(kbps)"
+#~ msgstr "není %n(kbps)"
+
+#~ msgid "itunes-like"
+#~ msgstr "styl itunes"
+
+#~ msgid "last added"
+#~ msgstr "naposled přidané"
+
+#~ msgid "last played"
+#~ msgstr "naposled přehrávané"
+
+#~ msgid "last skipped"
+#~ msgstr "naposled přeskočené"
+
+#~ msgid "less played"
+#~ msgstr "nejméně přehrávané"
+
+#~ msgid "less skipped"
+#~ msgstr "nejméně přeskakované"
+
+#~ msgid "less than %n( times)"
+#~ msgstr "méně než %n( krát)"
+
+#~ msgid "longest"
+#~ msgstr "nejdelší"
+
+#~ msgid "modified"
+#~ msgstr "upraveno"
+
+#~ msgid "more than %n( times)"
+#~ msgstr "více než %n( krát)"
+
+#~ msgid "most played"
+#~ msgstr "nevíce přehrávané"
+
+#~ msgid "most skipped"
+#~ msgstr "nejvíce přeskakované"
+
+#~ msgid "normal play when queue empty"
+#~ msgstr "po vyprázdnění fronty normální přehrávání"
+
+#~ msgid "not played for the longest time"
+#~ msgstr "dlouho nepřehrávané"
+
+#~ msgid "not skipped for the longest time"
+#~ msgstr "dlouho nepřeskočené"
+
+#~ msgid "on %d"
+#~ msgstr "při %d"
+
+#~ msgid "or"
+#~ msgstr "nebo"
+
+#~ msgid "played"
+#~ msgstr "přehráno"
+
+#~ msgid "quit when queue empty"
+#~ msgstr "ukončit po vyprázdnění fronty"
+
+#~ msgid "quodlibet-like"
+#~ msgstr "styl quodlibet"
+
+#~ msgid "sampling rate"
+#~ msgstr "vzorkovací frekvence"
+
+#~ msgid "shortest"
+#~ msgstr "nejkratší"
+
+#~ msgid "skipped"
+#~ msgstr "přeskočeno"
+
+#~ msgid "stop when queue empty"
+#~ msgstr "zastavit po vyprázdnění fronty"
+
+#~ msgid "turn off computer when queue empty"
+#~ msgstr "vypnout počítač po vyprázdnění fronty"
+
+#~ msgid "web"
+#~ msgstr "internet"
+
+#~ msgid "with context"
+#~ msgstr "s kontextem"
+
+#~ msgid "with playlist & context"
+#~ msgstr "s playlistem & kontextem"
+
+#~ msgid "with tabbedlists"
+#~ msgstr "s tabulkovými seznamy"
+
+#~ msgid ""
+#~ "{song}\n"
+#~ "by {artist}\n"
+#~ "from {album}"
+#~ msgstr ""
+#~ "{song}\n"
+#~ "od {artist}\n"
+#~ "z {album}"

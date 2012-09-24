@@ -37,6 +37,7 @@ HPfp		= _FilterPane0(nb=1) HPfp2
 HPfp2		= _FilterPane1(nb=2) FilterPane2(nb=3)
 
 [left-side filter panes]
+Type=B
 Name		= _"left-side filter panes"
 Default		= Window(size=1120x820) HPfp(size=180) HPbig(size=360) VPlistAA(size=645) FilterPane0(page=artist) FilterPane1(page=album)
 VBmain		= HBstatus 5_HPbig

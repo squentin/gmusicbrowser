@@ -798,10 +798,11 @@ INIT
 		event => 'Playing Queue CurSong',
 	},
 	playandqueueandtrack =>
-	{	menu => _('Play/queue-status and tracknumbers'),	title => '#', width => 20,
-		value => sub { ::Get_PPSQ_Icon($_[2], !(defined $::SongID && $_[2]==$::SongID && (!$_[0]{is_playlist} || !defined $::Position || $::Position==$_[1])),1); },
-		type => 'Glib::String',			noncomp => 'boldrow italicrow',		attrib	=> 'markup',	yalign => '0.5',
-		event => 'Playing Queue CurSong',	sort	=> Songs::SortField('track'),
+	{	menu => _('Play, queue or track'),	title => '#', width => 20,
+		value => sub { my $ID=$_[2]; ::Get_PPSQ_Icon($ID, !(defined $::SongID && $ID==$::SongID && (!$_[0]{is_playlist} || !defined $::Position || $::Position==$_[1])),'text') || Songs::Display($ID,'track'); },
+		type => 'Glib::String',			attrib	=> 'markup',	yalign => '0.5',
+		event => 'Playing Queue CurSong',	sort	=> 'track',
+		depend=> 'track',
 	},
 	icolabel =>
 	{	menu => _("Labels' icons"),	title => '',		value => sub { $_[2] },
@@ -5014,7 +5015,8 @@ sub expose_cb
 				$layout->set_width($hsize * Gtk2::Pango->scale);
 				$layout->set_height($vsize * Gtk2::Pango->scale);
 				my $yoffset=0;
-				my $free_height= $vsize - ($layout->get_pixel_extents)->[1]{height};
+				my (undef,$logical_rect)= $layout->get_pixel_extents;
+				my $free_height= $vsize - $logical_rect->{height};
 				if ($free_height>1) { $yoffset= int($free_height/2); }	#center vertically
 				$layout->set_ellipsize('end');
 				$layout->set_alignment('center');
@@ -7654,8 +7656,11 @@ our %vars2=
  group=>
  {	ids	=> ['$arg->{groupsongs}'],
 	year	=> ['groupyear($arg->{groupsongs})',	'year'],
-	artist	=> ['groupartist($arg->{groupsongs})',	'artist'],
-	album	=> ['groupalbum($arg->{groupsongs})',	'album'],
+	artist	=> ['groupartist("artist",$arg->{groupsongs})',	'artist'],
+	album_artist=>  ['groupartist("album_artist",$arg->{groupsongs})',	'album_artist'],
+	album_artistid=>['groupartistid("album_artist",$arg->{groupsongs})',	'album_artist'],
+	album	=> ['groupalbum($arg->{groupsongs},0)',	'album'],
+	albumraw=> ['groupalbum($arg->{groupsongs},1)',	'album'],
 	artistid=> ['groupartistid($arg->{groupsongs})','artist'],
 	albumid	=> ['groupalbumid($arg->{groupsongs})',	'album'],
 	genres	=> ['groupgenres($arg->{groupsongs},"genre")',	'genre'],
@@ -7935,22 +7940,26 @@ sub groupalbumid
 	return @$l==1 ? $l->[0] : $l;
 }
 sub groupartistid		##FIXME PHASE1 use artists instead ?
-{	my $songs=$_[0];
-	my $l= Songs::UniqList('artist',$songs);
+{	my ($field,$songs)=@_;
+	my $l= Songs::UniqList($field,$songs);
 	return @$l==1 ? $l->[0] : $l;
 }
 
 sub groupalbum
-{	my $songs=$_[0];
+{	my ($songs,$raw)=@_;
 	my $l= Songs::UniqList('album',$songs);
-	return Songs::Gid_to_Display('album',$l->[0]) if @$l==1;
+	if (@$l==1)
+	{	my $album= $raw ? Songs::Gid_to_Get('album',$l->[0]) : Songs::Gid_to_Display('album',$l->[0]);
+		$album='' unless defined $album;
+		return $album;
+	}
 	return ::__("%d album","%d albums",scalar @$l);
 }
 sub groupartist	#FIXME optimize PHASE1
-{	my $songs=$_[0];
-	my $h=Songs::BuildHash('artist',$songs);
+{	my ($field,$songs)=@_;
+	my $h=Songs::BuildHash($field,$songs);
 	my $nb=keys %$h;
-	return Songs::Gid_to_Display('artist',(keys %$h)[0]) if $nb==1;
+	return Songs::Gid_to_Display($field,(keys %$h)[0]) if $nb==1;
 	my @l=map split(/$Songs::Artists_split_re/), keys %$h;
 	my %h2; $h2{$_}++ for @l;
 	my @common;

@@ -85,7 +85,7 @@ our %timespan_menu=
 		init_namearray	=> '()',
 		none		=> quotemeta _"None",
 		default		=> '""',
-		check		=> ';',
+		check		=> '#VAL#= do {my $v=#VAL#; my @l; if (ref $v) {@l= @$v} else {@l= split /\x00/,$v} for (@l) { tr/\x00-\x1F//d; s/\s+$//; }; @l=sort @l; \@l }',
 		get_list	=> 'my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : ();',
 		get_gid		=> 'my $v=#_#; ref $v ? $v : [$v]',
 		gid_to_get	=> '(#GID# ? ___name[#GID#] : "")',
@@ -110,8 +110,9 @@ our %timespan_menu=
 			___isort{ sprintf("%x",$val) }||= ::superlc( ___sort{ sprintf("%x",$val) }||= join ";",@list );
 			#_#=$val;
 			}',
-		diff		=> 'do {my $v=#_#; my $old=!$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v]; $v=#VAL#; my $new= join "\\x00", sort (ref $v ? @$v : split /\\x00/,$v); $old ne $new; }', #FIXME use simpler/faster version if perl5.10
+		diff		=> 'do {my $v=#_#; my $old=!$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v]; $v=#VAL#; my $new= join "\\x00", @$v; $old ne $new; }', # #VAL# should be a sorted arrayref, as returned by #check#  FIXME use simpler/faster version if perl5.10
 		display 	=> 'do { my $v=#_#; !$v ? "" : ref $v ? join ", ",map ___name[$_],@$v : ___name[$v]; }',
+		check_multi	=> 'for my $lref (@{#VAL#}) { for (@$lref) {tr/\x00-\x1F//d; s/\s+$//;} }',
 		set_multi	=> 'do {my $c=#_#; my %h=( $c ? ref $c ? map((___name[$_]=>0), @$c) : (___name[$c]=>0) : ()); my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}= (exists $h{$_} ? -1 : 1) for @$toggle; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
 		makefilter	=> '#GID# ? "#field#:~:".___name[#GID#] : "#field#:ecount:0"',
 		'filter:~'	=> '.!!. do {my $v=#_#; $v ? ref $v ? grep(#VAL#==$_, @$v) : ($v == #VAL#) : 0}', # is flag set #FIXME use simpler/faster version if perl5.10
@@ -283,7 +284,7 @@ our %timespan_menu=
 	string	=>
 	{	parent		=> 'generic',
 		default		=> '""',
-		check		=> '#VAL#=~s/\s+$//; #VAL#=~tr/\x1D\x00//d;',	#remove trailing spaces and \x1D\x00
+		check		=> '#VAL#=~tr/\x1D\x00//d; #VAL#=~s/\s+$//;',	#remove trailing spaces and \x1D\x00
 		diff		=> '#_# ne #VAL#',
 		s_sort		=> '#_#',
 		'filter:e'	=> '#_# .eq. "#VAL#"',
@@ -301,6 +302,7 @@ our %timespan_menu=
 	},
 	text =>	#multi-lines string
 	{	parent			=> 'string',
+		check			=> '#VAL#=~tr/\x00-\x09\x0B\x0C\x0E-\x1F//d; #VAL#=~s/\s+$//;',
 		'editwidget:single'	=> sub { GMB::TagEdit::EntryText->new(@_); },
 		'editwidget:many'	=> sub { GMB::TagEdit::EntryText->new(@_); },
 	},
@@ -344,7 +346,7 @@ our %timespan_menu=
 		#newval		=> 'push @#_iname#, ::superlc(#VAL#);',
 		set		=> '#_# = #sgid_to_gid#;',
 		init		=> '____=""; __#mainfield#_gid{""}=1; #_name#[1]=#_iname#[1]="";',
-		check		=> '#VAL#=~s/\s+$//; #VAL#=~tr/\x1D\x00//d;',
+		check		=> '#VAL#=~tr/\x00-\x1F//d; #VAL#=~s/\s+$//;',
 		default		=> '""',
 		get_gid		=> '#_#',
 		get		=> '#_name#[#_#]',
@@ -666,6 +668,7 @@ our %timespan_menu=
 					#_#= !@list ? undef : pack("#packformat#*", @list);
 				   }', #use undef instead of '' if no dates to save some memory
 		diff		=> 'do {my $old=#_#||""; my $new=#VAL#; $new= pack "#packformat#*",sort { $a <=> $b } (ref $new ? @$new : split /\D+/,$new); $old ne $new; }',
+		check_multi	=> 'for my $lref (@{#VAL#}) {@$lref=grep m/^\d+$/, @$lref}',
 		set_multi	=> 'do {my %h; $h{$_}=0 for #get_list#; my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}= (exists $h{$_} ? -1 : 1) for @$toggle; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
 		'filter:ecount'	=> '#VAL# .==. length(#_#)/#bytes#',
 		'stats:count'	=> '#HVAL# += length(#_#)/#bytes#;',
@@ -1638,16 +1641,17 @@ sub UpdateFuncs
 		{	my $set=  ($Def{$f}{flags}=~m/w/ && !$::Options{TAG_nowrite_mode}) ?
 				"push \@{\$towrite[\$i]}, '$f',\$val;" :
 				"#set#; \$changedfields{$f}=undef; \$changed=1;";
-			my $c=	"	\$val=	exists \$values->{$f} ? 	\$values->{$f} :".
-				"		exists \$values->{'\@$f'} ? 	shift \@{\$values->{'\@$f'}} :".
-				"						undef;".
+			my $c=	"	\$val=	exists \$values->{$f} ? 	\$values->{$f} :\n".
+				"		exists \$values->{'\@$f'} ? 	shift \@{\$values->{'\@$f'}} :\n".
+				"						undef;\n".
 				"	if (defined \$val)\n".
 				"	{	#check#;\n".
 				"		if (#diff#) { $set }\n".
 				"	}\n";
 			if ($Def{$f}{flags}=~m/l/)
-			{  $c.=	"	elsif (\$val=\$values->{'+$f'})". # $v must contain [[toset],[torm],[toggle]]
-				"	{	if (\$val= #set_multi#) { $set }\n". # set_multi return the new arrayref if modified, undef if not changed
+			{  $c.=	"	elsif (\$val=\$values->{'+$f'})\n". # $v must contain [[toset],[torm],[toggle]]
+				"	{	#check_multi#\n".
+				"		if (\$val= #set_multi#) { $set }\n". # set_multi return the new arrayref if modified, undef if not changed
 			   	"	}\n";
 			}
 			$code.= MakeCode($f,$c,ID => '$ID', VAL => "\$val");
