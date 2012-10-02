@@ -3712,30 +3712,34 @@ sub PopupAA
 		};
 
 	my $screen= $widget ? $widget->get_screen : $event->get_screen;
-	my $max=($screen->get_height)*.8;
+	my $max= .7*$screen->get_height;
+	my $maxwidth=.15*$screen->get_width;
 	#my $minsize=Gtk2::ImageMenuItem->new('')->size_request->height;
 
 	my $createAAMenu=sub
 	{	my ($start,$end,$names,$keys)=@_;
 		my $nb=$end-$start+1;
-		my $size=32;	$size=64 if 64*$nb < $max;
-		my $row=0; my $rows=($nb<21)? 1 : ($nb<50)? 2 : 3; $rows=int($nb/$rows); my $colnb=0;
-	#	my $size=int($max/$rows);	#my $size=int($max/$nb);
-	#	if ($size<$minsize) {$size=$minsize} elsif ($size>100) {$size=100}
+		my $cols= $nb<$max/32 ? 1 : $nb<$max/32 ? 2 : 3;
+		my $rows=int($nb/$cols);
+		my $size= $max/$rows < 90 ? 32 : $max/$rows < 200 ? 64 : 128; # choose among 3 possible picture sizes, trying to keep the menu height reasonable
+		my $maxwidth= $cols==1 ? $maxwidth*1.5 : $maxwidth;
+		my $row=0; my $col=0;
 		my $menu = Gtk2::Menu->new;
 		for my $i ($start..$end)
 		{	my $key=$keys->[$i];
 			my $item=Gtk2::ImageMenuItem->new;
 			$item->set_always_show_image(1); # to override /desktop/gnome/interface/menus_have_icons gnome setting
 			my $label=Gtk2::Label->new;
-			$label->set_line_wrap(TRUE);
 			$label->set_alignment(0,.5);
 			$label->set_markup( AA::ReplaceFields($key,$format,$field,1) );
+			my $req=$label->size_request->width;
+			if ($label->size_request->width>$maxwidth) { $label->set_size_request($maxwidth,-1); } #FIXME doesn't work as I want, used to force wrapping at a smaller width than default, but result in requesting $maxwidth when the width of the wrapped text may be significantly smaller
+			$label->set_line_wrap(TRUE);
 			$item->add($label);
 			$item->signal_connect(activate => $callback,$key);
 			$item->signal_connect(button_press_event => $altcallback,$key) if $altcallback;
 			#$menu->append($item);
-			$menu->attach($item, $colnb, $colnb+1, $row, $row+1); if (++$row>$rows) {$row=0;$colnb++;}
+			$menu->attach($item, $col, $col+1, $row, $row+1); if (++$row>$rows) {$row=0;$col++;}
 			if ($isaa)
 			{	my $img=AAPicture::newimg($field,$key,$size);
 				$item->set_image($img) if $img;
@@ -8960,7 +8964,8 @@ sub newimg
 }
 sub idle_loadimg_cb
 {	my $img;
-	$img=shift @imgqueue while @imgqueue && !$img;
+	for my $i (0..$#imgqueue) { next unless $imgqueue[$i] && $imgqueue[$i]->mapped; $img=splice @imgqueue,$i,1; last } #prioritize currently mapped images
+	$img||=shift @imgqueue while @imgqueue && !$img;
 	if ($img)
 	{	my $pb=pixbuf( @{delete $img->{params}},1 );
 		$img->set_from_pixbuf($pb) if $pb;
