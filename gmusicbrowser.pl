@@ -3759,13 +3759,14 @@ sub PopupAA
 	Songs::sort_gid_by_name($field,\@keys) unless $nosort;
 	my @names=@{Songs::Gid_to_Display($field,\@keys)}; #convert @keys to list of names
 
-	my $menu=Breakdown_List(\@names,5,20,35,$createAAMenu,\@keys);
+	my @common_args= (widget=>$widget, makemenu=>$createAAMenu, cols=>3, height=>32+2);
+	my $menu=Breakdown_List(\@names, keys=>\@keys, @common_args);
 	return undef unless $menu;
 	if (@keys_minor)
 	{	Songs::sort_gid_by_name($field,\@keys_minor) unless $nosort;
 		my @names=@{Songs::Gid_to_Display($field,\@keys)};
 		my $item=Gtk2::MenuItem->new('minor'); #FIXME
-		my $submenu=Breakdown_List(\@names,5,20,35,$createAAMenu,\@keys_minor);
+		my $submenu=Breakdown_List(\@names, keys=>\@keys_minor, @common_args);
 		$item->set_submenu($submenu);
 		$menu->append($item);
 	}
@@ -3776,15 +3777,50 @@ sub PopupAA
 }
 
 sub Breakdown_List
-{	my ($keys,$min,$opt,$max,$makemenu,$gids)=@_;
+{	my ($names,%options)=@_;
+	my ($min,$opt,$max,$makemenu,$keys,$widget)=@options{qw/min opt max makemenu keys widget/};
+	$widget ||= Gtk2->get_current_event; #used to find current screen
+	my $maxheight= $widget ? $widget->get_screen->get_height : 640; # FIXME is that ok for multi-monitors ?
 
-	if ($#$keys<=$max) { return $makemenu ? &$makemenu(0,$#$keys,$keys,$gids) : [0,$#$keys] }
+
+	if (!$min || !$opt || !$max) #find minimum/optimum/maximum number of entries that the menu/submenus should have
+	{	my $height=$options{height};
+		if (!$height) { my $dummyitem=Gtk2::MenuItem->new("dummy"); $height=$dummyitem->size_request->height; }
+		my $maxnb= $maxheight/$height;
+		$maxnb=10 if $maxnb<10; #probably shouldn't happen, in case number too low assume the screen can fit 10 items
+		my $cols= $options{cols}||1;
+		$max= int($maxnb*.8)*($cols**.9);	# **9 to reduce max height and optimum height when using columns
+		$opt= int($maxnb*.65)*($cols**.9);
+		$min= int($maxnb*.3)*$cols;
+	}
+
+	# short-cut if no need to create sub-menus
+	if ($#$names<=$max) { return $makemenu ? $makemenu->(0,$#$names,$names,$keys) : [0,$#$names] }
+
+	# check if needs more than 1 level of submenus
+	if ($makemenu && !$options{norecurse})
+	{	my $dummyitem=Gtk2::MenuItem->new("dummy");
+		my $height=$dummyitem->size_request->height;
+		my $parentopt= .65*$maxheight/$height;
+		$parentopt=.65*10 if $parentopt<.65*10; #probably shouldn't happen, in case number too low assume the screen can fit 10 items
+		if ($#$names > $parentopt*$opt)
+		{	my @childarg=(%options,min=>$min,opt=>$opt,max=>$max,makemenu=>$makemenu,norecurse=>1);
+			$min*=$parentopt; $max*=$parentopt; $opt*=$parentopt;
+			$makemenu= sub
+			{	my ($start,$end,$names,$keys)=@_;
+				my @names2=@$names[$start..$end];
+				my $keys2;
+				@$keys2= @$keys[$start..$end] if $keys && @$keys;
+				Breakdown_List(\@names2,keys=>$keys2,@childarg);
+			};
+		}
+	}
 
 	my @bounds;
-	for my $start (0..$#$keys)
-	{	my $name1= $start==0 ?  '' : lc $keys->[$start-1];
-		my $name2= lc $keys->[$start];
-		my $name3= $start==$#$keys ?  '' : lc $keys->[$start+1];
+	for my $start (0..$#$names)
+	{	my $name1= $start==0 ?  '' : superlc($names->[$start-1]);
+		my $name2= superlc($names->[$start]);
+		my $name3= $start==$#$names ?  '' : superlc($names->[$start+1]);
 		my ($c1,$c3); my $pos=0;
 		until (defined $c1 && defined $c3)
 		{	my $l2=substr $name2,$pos,1;
@@ -3815,7 +3851,7 @@ sub Breakdown_List
 		{	if ($pos==$#bounds || length $bounds[$pos+1][0]<=$len) {$c=0} else {$c++}
 			if ($toobig[$pos])
 			{	$chunk[$pos]+=$c+1;
-				$toobig[$pos]=0 unless $chunk[$pos]>$max;
+				$toobig[$pos]=0 unless $chunk[$pos]>$max*.4;
 			}
 		}
 		#for my $pos (0..$#bounds)	#DEBUG
@@ -3834,44 +3870,51 @@ sub Breakdown_List
 		push @length,length $bounds[$pos][0];
 		#print "$#length : ".$bounds[$pos-1][1]."->'$bounds[$pos][0]' len=".(length $bounds[$pos][0])." (pos=$pos)\n"; #DEBUG
 	}
-#	push @breakpoints,$#$keys+1; push @length,1;
+#	push @breakpoints,$#$names+1; push @length,1;
 
-	my $istart=0; my @list;
-	while ($istart<$#breakpoints)
-	{	my $best; my $bestpos;
-		for (my $i=$istart+1; $i<=$#breakpoints; $i++)
-		{	my $nb=$breakpoints[$i]-$breakpoints[$istart];
-			my $nbafter=$#$keys-$breakpoints[$i]+1;
+
+	# find best combination of chunks
+	# @todo will contain path that need exploring, put in $final when finished,
+	# as each breakpoint is explored, only the best path is kept among those that used this breakpoint
+	my @todo= ([0]); #start with breakpoint 0
+	my $final;
+	my @bestscore=(0);
+	while (@todo)
+	{	my $path0=shift @todo;
+		my $i0= $path0->[-1];
+		my $score0= $bestscore[$i0];
+		for my $i ($i0+1 .. $#breakpoints)
+		{	my $nb=$breakpoints[$i]-$breakpoints[$i0];
 			next if $nb<$min && $i<$#breakpoints;
-			my $score=$length[$i]*100+abs($nb-$opt)+ ($nbafter==0 ? -10 : $nbafter<8 ? 8-$nbafter : 0);
-#warn "$istart-$i ($breakpoints[$istart]-$breakpoints[$i]): $nb  length=$length[$i]	score=$score  nbafter=$nbafter\n";	#DEBUG
-			if (!defined $best || $best>$score)
-			 {$best=$score; $bestpos=$i;}
+			my $malus=	$nb>$max ? 50*($nb-$max)**2 :
+					$nb<$min ? 20*($min-$nb)**2 : 0;
+			my $score= $score0 + $length[$i]*200 + abs($nb-$opt) + $malus;
+			if ($bestscore[$i]) #if a path already used that breakpoint, compare the score
+			{	next if $bestscore[$i]<$score; # ignore the new path if not better
+				#new path has a better score => remove all paths that used that breakpoint
+				@todo=grep {!grep $_==$i, @$_} @todo; #FIXME use perl 5.10 smart match
+			}
+			$bestscore[$i]=$score;
+			my $path= [@$path0,$i];
+			my $nbafter=$#$names-$breakpoints[$i]+1;
+			if ($nbafter==0) {$final=$path} else {push @todo,$path}
 			last if $nb>$max && $nbafter>$min;
 		}
-#warn " best: $istart-$bestpos ($breakpoints[$istart]-$breakpoints[$bestpos]): score=$best\n";	#DEBUG
-		push @list,$breakpoints[$bestpos];
-		$istart=$bestpos;
 	}
-#	for my $i (0..$#$keys)	#DEBUG
-#	{	my $b=grep $i==$_, @breakpoints;
-#		$b= $b? '->' : ' ';
-#		my $b2=grep $i==$_, @list;
-#		$b2= $b2? '=>' : ' ';
-#		warn "$i\t$b\t$b2\t$bounds[$i][0]\t$bounds[$i][1]\t$keys->[$i]\n";
-#	}
-	@breakpoints=@list;
+	shift  @$final; #remove the starting 0
+	@breakpoints= map $breakpoints[$_], @$final;
+	#warn "min=$min opt=$opt max=$max\n". "sizes: ".join(',',map $breakpoints[$_]-$breakpoints[$_-1], 1..$#breakpoints)."\n";
 
+	# build @menu result with for each item : start and end position, start and end letters
 	my @menus; my $start=0;
 	for my $end (@breakpoints)
 	{	my $c1=$bounds[$start][0];
 		my $c2=$bounds[$end-1][1];
 		for my $i (0..length($c1)-1)
 		{	my $c2i=substr $c2,$i,1;
-			if ($c2i eq '') { $c2.=$c2i= substr $keys->[$end-1],$i,1; }
+			if ($c2i eq '') { $c2.=$c2i= superlc(substr $names->[$end-1],$i,1); }
 			last if substr($c1,$i,1) ne $c2i;
 		}
-		#warn "$c1-$c2\n";
 		push @menus,[$start,$end-1,$c1,$c2];
 		$start=$end;
 	}
@@ -3880,6 +3923,7 @@ sub Breakdown_List
 	my $menu;
 	if (@menus>1)
 	{	$menu=Gtk2::Menu->new;
+		# jump to entry when a letter is pressed
 		$menu->signal_connect(key_press_event => sub
 		 {	my ($menu,$event)=@_;
 			my $unicode=Gtk2::Gdk->keyval_to_unicode($event->keyval); # 0 if not a character
@@ -3894,6 +3938,7 @@ sub Breakdown_List
 			}
 			0;
 		 });
+		# Build menu items and submenus
 		for my $ref (@menus)
 		{	my ($start,$end,$c1,$c2)=@$ref;
 			$c1=ucfirst$c1; $c2=ucfirst$c2;
@@ -3901,12 +3946,22 @@ sub Breakdown_List
 			my $item=Gtk2::MenuItem->new_with_label($c1);
 			$item->{start}= substr $c1,0,1;
 			$item->{end}=   substr $c2,0,1;
-			my $submenu= $makemenu->($start,$end,$keys,$gids);
-			$item->set_submenu($submenu);
+			$item->{menuargs}= [$start,$end,$names,$keys];
+			# only build submenu when the item is selected
+			$item->signal_connect(activate => sub
+				{	my $args=delete $_[0]{menuargs};
+					return unless $args;
+					my $submenu= $makemenu->(@$args);
+					$item->set_submenu($submenu);
+					$submenu->show_all;
+				});
+			#my $submenu= $makemenu->($start,$end,$names,$keys);
+			#$item->set_submenu($submenu);
+			$item->set_submenu(Gtk2::Menu->new);
 			$menu->append($item);
 		}
 	}
-	elsif (@menus==1) { $menu= $makemenu->(0,$#$keys,$keys,$gids); }
+	elsif (@menus==1) { $menu= $makemenu->(0,$#$names,$names,$keys); }
 	else {return undef}
 
 	return $menu;
@@ -4939,7 +4994,7 @@ sub AddToListMenu
 		}
 		return $menu;
 	};
-	my $menu=Breakdown_List(\@keys,5,20,35,$makemenu);
+	my $menu=Breakdown_List(\@keys, makemenu=>$makemenu);
 	return $menu;
 }
 
@@ -4983,7 +5038,7 @@ sub MakeFlagMenu	#FIXME special case for no @keys, maybe a menu with a greyed-ou
 		}
 		return $menu;
 	};
-	my $menu=Breakdown_List(\@keys,5,20,35,$makemenu);
+	my $menu=Breakdown_List(\@keys, makemenu=>$makemenu);
 	return $menu;
 }
 
