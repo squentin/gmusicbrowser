@@ -1579,7 +1579,7 @@ sub PopupSongsFromAlbum
 {	my $ID=::GetSelID($_[0]);
 	return unless defined $ID;
 	my $aid=Songs::Get_gid($ID,'album');
-	::ChooseSongsFromA($aid);
+	::ChooseSongsFromA($aid,nocover=>0);
 }
 
 ####################################

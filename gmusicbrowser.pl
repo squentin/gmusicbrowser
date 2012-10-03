@@ -3366,7 +3366,7 @@ sub ChooseSongsTitle		#Songs with the same title
 }
 
 sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>100-200 ?)
-{	my $album=$_[0];
+{	my ($album,%opt)=@_;
 	return unless defined $album;
 	my $list= AA::GetIDs(album=>$album);
 	Songs::SortList($list,'disc track file');
@@ -3386,9 +3386,9 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		}
 		$list=\@list2;
 	}
-	my $menu = ChooseSongs($list, markup=>'%n %S<small>%V</small>');
+	my $menu = ChooseSongs($list, markup=>'%n %S<small>%V</small>', cb=>$opt{cb});
 	$menu->show_all;
-	if (1)
+	unless ($opt{nocover})
 	{	my $h=$menu->size_request->height;
 		my $w=$menu->size_request->width;
 		my $maxwidth= $menu->get_screen->get_width;
@@ -3484,13 +3484,14 @@ sub ChooseSongs
 	my @IDs=@$IDs;
 	return unless @IDs;
 	my $format = $opt{markup} || __x( _"{song} by {artist}", song => "<b>%t</b>%V", artist => "%a");
+	my $lcallback= $opt{cb} || sub { Select(song => $_[1]) };
 	my $menu = Gtk2::Menu->new;
 	my $activate_callback=sub
 	 {	my $item=shift;
 		return if $item->get_submenu;
 		my $ID=$item->{ID};
 		if ($item->{middle}) { Enqueue($ID); }
-		else { Select(song => $ID); }
+		else { $lcallback->($item,$ID); }
 	 };
 	my $click_callback=sub
 	 { my ($item,$event)=@_;
@@ -3631,7 +3632,7 @@ sub menupos	# function to position popupmenu below clicked widget
 
 sub PopupAA
 {	my ($field,%args)=@_;
-	my ($list,$from,$callback,$format,$widget,$nosort,$nominor)=@args{qw/list from cb format widget nosort nominor/};
+	my ($list,$from,$callback,$format,$widget,$nosort,$nominor,$noalt)=@args{qw/list from cb format widget nosort nominor noalt/};
 	return undef unless @$Library;
 	my $isaa= $field eq 'album' || $field eq 'artist' || $field eq 'artists';
 	$format||="%a"; # "<b>%a</b>%Y\n<small>%s <small>%l</small></small>"
@@ -3660,7 +3661,7 @@ sub PopupAA
 		  {	my $menu=Gtk2::Menu->new;
 			for my $artist (keys %art_keys)
 			{	my $item=Gtk2::MenuItem->new_with_label($artist);
-				$item->set_submenu(PopupAA('album', list=> $art_keys{$artist}));
+				$item->set_submenu(PopupAA('album', %args, list=> $art_keys{$artist}));
 				$menu->append($item);
 			}
 			$menu->show_all;
@@ -3675,7 +3676,7 @@ sub PopupAA
 	else { @keys=@{ AA::GetAAList($field) }; }
 
 #### callbacks
-	$callback||=sub		#jump to first song
+	my $maincallback=sub		#jump to first song
 	   {	my ($item,$key)=@_;
 		return if $item->get_submenu;
 		my $IDs=AA::GetIDs($field,$key);
@@ -3685,21 +3686,23 @@ sub PopupAA
 			Select(song => $ID);
 		}
 	   };
-	my $altcallback= $field eq 'album' ?
+	$maincallback= sub { my ($item,$key)=@_; return if $item->get_submenu; $callback->( {menuitem=>$item,field=>$field,key=>$key,filter=>Songs::MakeFilterFromGID($field,$key)} ); } if $callback;
+	my $songcb= $callback ? sub { my ($item,$ID)=@_; $callback->( {menuitem=>$item,field=>'id',key=>$ID,filter=>Songs::MakeFilterFromID('title',$ID)} ); } : undef;
+	my $altcallback= $field eq 'album' && !$noalt ?
 		sub	#Albums button-press event : set up a songs submenu on right-click, alternate action on middle-click
 		{	my ($item,$event,$key)=@_;
 			if ($event->button==3)
-			{	my $submenu=ChooseSongsFromA($key);
+			{	my $submenu=ChooseSongsFromA($key,nocover=>1,cb=>$songcb);
 				$item->set_submenu($submenu);
 			}
 			elsif ($event->button==2) { $item->{middle}=1; }
 			0; #return 0 so that the item receive the click and popup the submenu
 		}:
-		$isaa ?
+		$isaa && !$noalt ?
 		sub	#Artists button-press event : set up an album submenu on right-click, alternate action on middle-click
 		{	my ($item,$event,$key)=@_;
 			if ($event->button==3)
-			{	my $submenu=PopupAA('album', from=>$key);
+			{	my $submenu=PopupAA('album', from=>$key, cb=>$args{cb});
 				$item->set_submenu($submenu);
 			}
 			elsif ($event->button==2) { $item->{middle}=1; }
@@ -3736,7 +3739,7 @@ sub PopupAA
 			if ($label->size_request->width>$maxwidth) { $label->set_size_request($maxwidth,-1); } #FIXME doesn't work as I want, used to force wrapping at a smaller width than default, but result in requesting $maxwidth when the width of the wrapped text may be significantly smaller
 			$label->set_line_wrap(TRUE);
 			$item->add($label);
-			$item->signal_connect(activate => $callback,$key);
+			$item->signal_connect(activate => $maincallback,$key);
 			$item->signal_connect(button_press_event => $altcallback,$key) if $altcallback;
 			#$menu->append($item);
 			$menu->attach($item, $col, $col+1, $row, $row+1); if (++$row>$rows) {$row=0;$col++;}
@@ -8607,7 +8610,7 @@ sub new
 	$self->{val}=$val;
 	$self->signal_connect(button_press_event => sub
 		{	my $self=$_[0];
-			::PopupAA( $self->{field}, cb=> sub { $self->set_gid($_[1]); } );
+			::PopupAA( $self->{field}, cb=> sub { $self->set_gid($_[0]{key}); }, noalt=>1 );
 			1;
 		});
 	$self->set_label($val);
