@@ -1239,6 +1239,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	MenuPlayOrder	=> [sub { Layout::SortMenu(); },   _"Popup playlist order menu"],
 	MenuQueue	=> [sub { PopupContextMenu(\@Layout::MenuQueue,{ID=>$SongID, usemenupos=>1}); }, _"Popup queue menu"],
 	ReloadLayouts	=> [ \&Layout::InitLayouts, _"Re-load layouts", ],
+	ChooseSongFromAlbum=> [sub {my $ID=GetSelID($_[0]); ChooseSongsFromA( Songs::Get_gid($ID,'album'),nocover=>1 ); }, ],
 );
 
 sub run_command
@@ -1292,9 +1293,11 @@ if ($CmdLine{cmdlist})
 {	print "Available commands (for fifo or layouts) :\n";
 	my ($max)= sort {$b<=>$a} map length, keys %Command;
 	for my $cmd (sort keys %Command)
-	{	my $tip=$Command{$cmd}[2] || '';
+	{	my $short= $Command{$cmd}[1];
+		next unless defined $short;
+		my $tip= $Command{$cmd}[2] || '';
 		if ($tip) { $tip=~s/\n.*//s; $tip=" (argument : $tip)"; }
-		printf "%-${max}s : %s %s\n", $cmd, $Command{$cmd}[1], $tip;
+		printf "%-${max}s : %s %s\n", $cmd, $short, $tip;
 	}
 	exit;
 }
