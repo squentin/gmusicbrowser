@@ -1074,32 +1074,41 @@ sub get_text
 
 package GMB::TagEdit::Combo;
 use Gtk2;
-use base 'Gtk2::Combo';
+use base 'Gtk2::Box';
 
 sub new
 {	my ($class,$field,$IDs,$listall) = @_;
-	my $self= bless Gtk2::Combo->new, $class;
+	my $self= bless Gtk2::HBox->new, $class;
+	my $combo= Gtk2::ComboBoxEntry->new_text;
+	$self->add($combo);
+	$self->{combo}=$combo;
+	my $entry=$self->{entry}=$combo->child;
 	#$self->{field}=$field;
 
 	my $values= Songs::BuildHash($field,$IDs);
 	my @l=sort { $values->{$b} <=> $values->{$a} } keys %$values; #sort values by their frequency
 	my $first=$l[0];
 	@l= @{ Songs::Gid_to_Get($field,\@l) } if Songs::Field_property($field,'gid_to_get');
-	if ($listall) { push @l, @{Songs::ListAll($field)}; }
-	$self->set_case_sensitive(1);
-	$self->set_popdown_strings(@l);
-	$self->set_text('') unless ( $values->{$first} > @$IDs/3 );
+	if ($listall)
+	{	my $cb=sub
+		{	::PopupAA(Songs::MainField($field),noalt=>1, cb=> sub { $entry->set_text( Songs::Gid_to_Get($field,$_[0]{key}) ); });
+		};
+		my $pick= ::NewIconButton('gtk-index',undef,$cb,'none',_"Pick an existing one");
+		$self->pack_end($pick,0,0,0);
+	}
+	$combo->append_text($_) for @l;
+	$entry->set_text($l[0]) if $values->{$first} > @$IDs/3;
 
-	GMB::ListStore::Field::setcompletion($self->entry,$field) if $listall;
+	GMB::ListStore::Field::setcompletion($entry,$field) if $listall;
 
 	return $self;
 }
 
 sub set_text
-{	$_[0]->entry->set_text($_[1]);
+{	$_[0]{entry}->set_text($_[1]);
 }
 sub get_text
-{	$_[0]->entry->get_text;
+{	$_[0]{entry}->get_text;
 }
 sub tool
 {	&GMB::TagEdit::EntryString::tool;
