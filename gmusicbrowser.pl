@@ -3725,6 +3725,7 @@ sub PopupAA
 	my $createAAMenu=sub
 	{	my ($start,$end,$names,$keys)=@_;
 		my $nb=$end-$start+1;
+		return unless $nb;
 		my $cols= $nb<$max/32 ? 1 : $nb<$max/32 ? 2 : 3;
 		my $rows=int($nb/$cols);
 		my $size= $max/$rows < 90 ? 32 : $max/$rows < 200 ? 64 : 128; # choose among 3 possible picture sizes, trying to keep the menu height reasonable
@@ -3817,7 +3818,7 @@ sub Breakdown_List
 				my @names2=@$names[$start..$end];
 				my $keys2;
 				@$keys2= @$keys[$start..$end] if $keys && @$keys;
-				Breakdown_List(\@names2,keys=>$keys2,@childarg);
+				Breakdown_List(\@names2,@childarg,keys=>$keys2);
 			};
 		}
 	}
