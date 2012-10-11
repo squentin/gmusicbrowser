@@ -35,6 +35,8 @@ locale/%/LC_MESSAGES/gmusicbrowser.mo : po/%.po po/gmusicbrowser.pot
 
 locale: $(foreach l,$(LINGUAS),locale/$l/LC_MESSAGES/gmusicbrowser.mo)
 
+checkpo:
+	for lang in $(LINGUAS) ; do msgfmt -c po/$$lang.po -o /dev/null || exit 1 ; done
 
 install: all
 	mkdir -p "$(bindir)"
