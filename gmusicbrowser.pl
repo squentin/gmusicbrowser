@@ -5751,7 +5751,7 @@ sub PrefKeys
 	my $entry_extra=Gtk2::Alignment->new(.5,.5,1,1);
 	my $combo=TextCombo->new( {map {$_ => $Command{$_}[1]}
 					sort {$Command{$a}[1] cmp $Command{$b}[1]}
-					grep !defined $Command{$_}[3] || ref $Command{$_}[3],
+					grep defined $Command{$_}[1] && !defined $Command{$_}[3] || ref $Command{$_}[3],
 					keys %Command
 				  });
 	my $vsg=Gtk2::SizeGroup->new('vertical');

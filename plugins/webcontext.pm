@@ -470,7 +470,7 @@ my %sites=
 	lyricscom => [ 'lyrics.com' => 'http://www.lyrics.com/search.php?keyword=%s+%a&what=all' ],
 );
 
-$::Options{OPT.'LyricSite'}=undef if !exists $sites{$::Options{OPT.'LyricSite'}};
+$::Options{OPT.'LyricSite'}=undef if $::Options{OPT.'LyricSite'} && !$sites{$::Options{OPT.'LyricSite'}};
 ::SetDefaultOptions(OPT, LyricSite => 'google');
 
 sub addtoolbar
