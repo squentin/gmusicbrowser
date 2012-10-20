@@ -938,6 +938,7 @@ our %timespan_menu=
 	edit_max=>3000,	edit_mode=> 'year',
 	check	=> '#VAL#= #VAL# =~m/(\d\d\d\d)/ ? $1 : 0;',
 	id3v1	=> 3,		id3v2 => 'TDRC|TYER', 'id3v2.3'=> 'TYER|TDRC',	'id3v2.4'=> 'TDRC|TYER',	vorbis	=> 'date|year',	ape	=> 'Record Date|Year', ilst => "\xA9day",
+	prewrite=> sub { $_[0] ? $_[0] : undef }, #remove tag if 0
 	gid_to_display	=> '#GID# ? #GID# : _"None"',
 	'stats:range'	=> '#HVAL#{#_#}=undef;  ---- AFTER: delete #HVAL#{0}; #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} keys %{#HVAL#})[0,-1]; !defined $m0 ? "" : $m0==$m1 ? $m0 : "$m0 - $m1"}',
 	editwidth => 6,
@@ -950,6 +951,7 @@ our %timespan_menu=
  track =>
  {	name	=> _"Track",	width => 40,	flags => 'fgarwescp',
 	id3v1	=> 5,		id3v2	=> 'TRCK',	vorbis	=> 'tracknumber',	ape	=> 'Track', ilst => "trkn",
+	prewrite=> sub { $_[0] ? $_[0] : undef }, #remove tag if 0
 	type => 'integer',	displayformat => '%02d', bits => 16,
 	edit_max => 65535, 	edit_mode=> 'nozero',
 	edit_order=> 20,	editwidth => 4,		letter => 'n',
@@ -959,6 +961,7 @@ our %timespan_menu=
  {	name	=> _"Disc",	width => 40,	flags => 'fgarwescp',	type => 'integer',	bits => 8,
 	edit_max => 255,	edit_mode=> 'nozero',
 				id3v2	=> 'TPOS',	vorbis	=> 'discnumber',	ape	=> 'discnumber', ilst => "disk|disc",
+	prewrite=> sub { $_[0] ? $_[0] : undef }, #remove tag if 0
 	editwidth => 4,
 	edit_order=> 40,	edit_many=>1,	letter => 'd',
 	can_group=>1,
