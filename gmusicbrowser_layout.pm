@@ -942,12 +942,8 @@ sub CreateWidgets
 		$opt1->{group}= $defaultgroup.(length $group ? "-$group" : '') unless $group=~m/^[A-Z]/;
 		my $box=$widgets->{$key}= $type->{New}( $opt1 );
 		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle maxwidth maxheight expand_weight/;
-		if ($opt1->{minwidth} or $opt1->{minheight})
-		{	my ($minwidth,$minheight)=$box->get_size_request;
-			$minwidth=  $opt1->{minwidth}  || $minwidth;
-			$minheight= $opt1->{minheight} || $minheight;
-			$box->set_size_request($minwidth,$minheight);
-		}
+		ApplyCommonOptions($box,$opt1);
+
 		$box->{name}=$fullname;
 		$box->set_border_width($opt1->{border}) if $opt1 && exists $opt1->{border} && $box->isa('Gtk2::Container');
 		$box->set_name($key);
@@ -1084,12 +1080,7 @@ sub NewWidget
 	$widget->{name}=$namefull;
 	$widget->set_name($name);
 
-	if ($options{minwidth} or $options{minheight})
-	{	my ($minwidth,$minheight)=$widget->get_size_request;
-		$minwidth=  $options{minwidth}  || $minwidth;
-		$minheight= $options{minheight} || $minheight;
-		$widget->set_size_request($minwidth,$minheight);
-	}
+	ApplyCommonOptions($widget,\%options);
 
 	$widget->{actions}{$_}=$options{$_}  for grep m/^click\d*/, keys %options;
 	$widget->signal_connect(button_press_event => \&Button_press_cb) if $widget->{actions};
@@ -1126,7 +1117,6 @@ sub NewWidget
 	   }
 	   else { $widget->{state_tip}=$tip; }
 	}
-	if ($options{hover_layout}) { $widget->{$_}=$options{$_} for qw/hover_layout hover_delay hover_layout_pos/; Layout::Window::Popup::set_hover($widget); }
 	if (my $schange=$ref->{schange})
 	{	my $fields= $options{fields} || $options{field};
 		$fields= $fields ? [ split / /,$fields ] : undef;
@@ -1142,6 +1132,19 @@ sub NewWidget
 	my $init= delete $widget->{EndInit} || $ref->{EndInit};
 	$init->($widget) if $init;
 	return $widget;
+}
+sub ApplyCommonOptions # apply some options common to both boxes and other widgets
+{	my ($widget,$opt)=@_;
+	if ($opt->{minwidth} or $opt->{minheight})
+	{	my ($minwidth,$minheight)=$widget->get_size_request;
+		$minwidth=  $opt->{minwidth}  || $minwidth;
+		$minheight= $opt->{minheight} || $minheight;
+		$widget->set_size_request($minwidth,$minheight);
+	}
+	if ($opt->{hover_layout})	# only works with widgets/boxes that have their own gdkwindow (put it into a WB box otherwise)
+	{	$widget->{$_}=$opt->{$_} for qw/hover_layout hover_delay hover_layout_pos/;
+		Layout::Window::Popup::set_hover($widget);
+	}
 }
 
 sub RegisterWidget
