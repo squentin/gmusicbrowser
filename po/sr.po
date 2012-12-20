@@ -1,0 +1,4884 @@
+# Саша Петровић <salepetronije@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: gmusicbrowser 1.100902\n"
+"Report-Msgid-Bugs-To: squentin@free.fr\n"
+"POT-Creation-Date: 2012-08-26 16:38+0200\n"
+"PO-Revision-Date: 2012-12-12 07:14+0100\n"
+"Last-Translator: salepetronije <salepetronije@gmail.com>\n"
+"Language-Team: sr\n"
+"Language: sr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Virtaal 0.7.0\n"
+
+msgid " Context pane layout "
+msgstr " Распоред окана објашњења "
+
+msgid " Fields "
+msgstr " Поља "
+
+msgid " Review "
+msgstr " Критика"
+
+#, perl-brace-format
+msgid " of {length}"
+msgstr " од {length}"
+
+msgid "# songs"
+msgstr "# песме"
+
+#, perl-format
+msgid "%S by %a"
+msgstr "%S од %a"
+
+#, perl-format
+msgid "%d Album"
+msgid_plural "%d Albums"
+msgstr[0] "%d албум"
+msgstr[1] "%d албума"
+msgstr[2] "%d албума"
+
+#, perl-format
+msgid "%d Artist"
+msgid_plural "%d Artists"
+msgstr[0] "%d извођач"
+msgstr[1] "%d извођача"
+msgstr[2] "%d извођача"
+
+#, perl-format
+msgid "%d Song"
+msgid_plural "%d Songs"
+msgstr[0] "%d песма"
+msgstr[1] "%d песме"
+msgstr[2] "%d песама"
+
+#, perl-format
+msgid "%d Upcoming Event"
+msgid_plural "%d Upcoming Events"
+msgstr[0] "%d заказан догађај"
+msgstr[1] "%d заказана догађаја"
+msgstr[2] "%d заказаних догађаја"
+
+#, perl-format
+msgid "%d album"
+msgid_plural "%d albums"
+msgstr[0] "%d албум"
+msgstr[1] "%d албума"
+msgstr[2] "%d албума"
+
+#, perl-format
+msgid "%d artist"
+msgid_plural "%d artists"
+msgstr[0] "%d извођач"
+msgstr[1] "%d извођача"
+msgstr[2] "%d извођача"
+
+#, perl-format
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] "%d датотека"
+msgstr[1] "%d датотеке"
+msgstr[2] "%d датотека"
+
+#, perl-format, perl-brace-format
+msgid "%d file in {folder}"
+msgid_plural "%d files in {folder}"
+msgstr[0] "%d датотека у {folder}"
+msgstr[1] "%d датотеке у {folder}"
+msgstr[2] "%d датотека у {folder}"
+
+#, perl-format
+msgid "%d folder"
+msgid_plural "%d folders"
+msgstr[0] "%d фасцикла"
+msgstr[1] "%d фасцикле"
+msgstr[2] "%d фасцикли"
+
+#, perl-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d секунда"
+msgstr[1] "%d секунде"
+msgstr[2] "%d секунди"
+
+#, perl-format
+msgid "%d song"
+msgid_plural "%d songs"
+msgstr[0] "%d песма"
+msgstr[1] "%d песме"
+msgstr[2] "%d песама"
+
+#, perl-format
+msgid "%d song added"
+msgid_plural "%d songs added"
+msgstr[0] "%d песма додата"
+msgstr[1] "%d песме додате"
+msgstr[2] "%d песама додато"
+
+#, perl-format
+msgid "%d song in queue"
+msgid_plural "%d songs in queue"
+msgstr[0] "%d заказана песма"
+msgstr[1] "%d заказане песме"
+msgstr[2] "%d заказаних песама"
+
+#, perl-format
+msgid "%d song in the library"
+msgid_plural "%d songs in the library"
+msgstr[0] "%d песма у збирци"
+msgstr[1] "%d песме у збирци"
+msgstr[2] "%d песама у збирци"
+
+#, perl-format
+msgid "%d song selected"
+msgid_plural "%d songs selected"
+msgstr[0] "изабрана је %d песма"
+msgstr[1] "изабране су %d песме"
+msgstr[2] "изабрано је %d песама"
+
+#, perl-format
+msgid "%s fuzzy match with %s"
+msgstr "%s нејасно преклапање са %s"
+
+#, perl-format
+msgid "%t by %a (%m)"
+msgstr "%t од %a (%m)"
+
+#, perl-brace-format
+msgid "'{file}' exists. Overwrite ?"
+msgstr "„{file}“ постоји. Преписати ?"
+
+#, perl-format
+msgid "(%d song excluded)"
+msgid_plural "(%d songs excluded)"
+msgstr[0] "(одбачена је %d песма)"
+msgstr[1] "(одбачене су %d песме)"
+msgstr[2] "(одбачено је %d песама)"
+
+msgid "(case insensitive)"
+msgstr "(мала и велика слова се не разликују)"
+
+#, perl-brace-format
+msgid "(common parent folder : {common})"
+msgstr "(родитељска фасцикла : {common})"
+
+msgid "(other)"
+msgstr "(остало)"
+
+msgid "(see http://www.last.fm)"
+msgstr "(видите http://www.last.fm)"
+
+msgid "(unstable)"
+msgstr "(нестабилна)"
+
+msgid ""
+"- When selecting a song, the playlist filter will be reset if the song is "
+"not in it\n"
+"- Skip to another song when removing the current song from the playlist"
+msgstr ""
+"- При одабиру песме, услов списка за пуштање ће бити поништен ако песма није "
+"у њему\n"
+"- Скочи на другу песму при уклањању тренутне песме из списка за пуштање"
+
+msgid "0 chance"
+msgstr "вероватноћа 0"
+
+msgid "0 means 'show all'"
+msgstr "0 значи „прикажи све“"
+
+#, perl-brace-format
+msgid "1 chance in {probability}"
+msgstr "вероватноћа 1 у {probability}"
+
+msgid "3 Filter panes"
+msgstr "3 окна услова"
+
+msgid "32x32 PNG file icon"
+msgstr "32x32 ПНГ иконица датотеке"
+
+msgid "50 Last Added"
+msgstr "50 последњих додатих"
+
+msgid "50 Last Played"
+msgstr "50 последњих пуштаних"
+
+msgid "50 Most Played"
+msgstr "50 најчешће пуштаних"
+
+msgid "<Unknown>"
+msgstr "<Непознато>"
+
+#, perl-format
+msgid ""
+"<b>%t</b>\n"
+"<small><small>by</small> %a\n"
+"<small>from</small> %l</small>"
+msgstr ""
+"<b>%t</b>\n"
+"<small><small>од</small> %a\n"
+"<small>из</small> %l</small>"
+
+#, perl-format
+msgid "<big><big>by %a</big></big>"
+msgstr "<big><big>од %a</big></big>"
+
+#, perl-format
+msgid "<i>by</i> %a\\n<i>from</i> %l"
+msgstr "<i>од</i> %a\\n<i>из</i> %l"
+
+msgid "Abort"
+msgstr "Прекини"
+
+msgid "Abort ReplayGain analysis"
+msgstr "Прекини растављање ReplayGain"
+
+msgid "Abort all"
+msgstr "Прекини све"
+
+msgid "Abort mass-tagging"
+msgstr "Прекини вишеструко означавање"
+
+msgid "About"
+msgstr "Прекини"
+
+#, perl-brace-format
+msgid ""
+"About to delete {files}\n"
+"Are you sure ?"
+msgstr ""
+"Брисати {files}\n"
+"да ли сте сигурни ?"
+
+msgid "About to turn off the computer in :"
+msgstr "Искључивање рачунара у :"
+
+msgid "Actions are not supported by current notification daemon"
+msgstr "Радње нису подржане тренутним домаром обавештења"
+
+msgid "Add"
+msgstr "Додаје"
+
+msgid "Add Files ..."
+msgstr "Додаје датотеке ..."
+
+msgid "Add Music"
+msgstr "Додаје музику"
+
+msgid "Add a button to rip a CD"
+msgstr "Додаје дугме за чупање ЦД-а"
+
+msgid "Add a filter"
+msgstr "Додаје услов"
+
+msgid "Add a fullscreen button"
+msgstr "Додаје дугме за постављање преко целог екрана"
+
+msgid "Add a fullscreen button to layouts that can accept extra buttons"
+msgstr ""
+"Додаје дугме за приказ преко целог екрана на распоред који може прихватити "
+"још дугмади"
+
+msgid "Add a group"
+msgstr "Додаје нову врсту"
+
+msgid "Add a label to the current song"
+msgstr "Додаје ознаку тренутној песми"
+
+msgid "Add a list of files/folders to the playlist"
+msgstr "Додаје списак датотека/фасцикли списку за извођење"
+
+msgid "Add a radio"
+msgstr "Додаје радио"
+
+msgid "Add files or folders"
+msgstr "Додаје датотеке и фасцикле"
+
+msgid "Add files/folders to library"
+msgstr "Додаје датотеке/фасцикле бибљотеци"
+
+msgid "Add folder"
+msgstr "Додаје фасциклу"
+
+msgid "Add folder ..."
+msgstr "Додаје фасциклу ..."
+
+msgid "Add label"
+msgstr "Додаје ознаку"
+
+msgid "Add multiple condition"
+msgstr "Додаје вишеструке услове"
+
+msgid "Add new label"
+msgstr "Додаје нову ознаку"
+
+msgid "Add new radio"
+msgstr "Додаје нови радио"
+
+msgid "Add rule : "
+msgstr "Додаје правило : "
+
+msgid "Add shorcut key"
+msgstr "Додаје пречицу"
+
+msgid "Add tab"
+msgstr "Додаје језичак"
+
+msgid "Add to existing values"
+msgstr "Додаје постојеће вредности"
+
+msgid "Add to list"
+msgstr "Додаје списку"
+
+msgid "Add to playlist"
+msgstr "Додаје списку за извођење"
+
+msgid "Add to queue"
+msgstr "Додаје у заказано"
+
+#, perl-brace-format
+msgid "Add {value} to {field} for all tracks on this album."
+msgstr "Додаје {value} на {field} за све нумере на овом албуму."
+
+msgid "Added"
+msgstr "Додато"
+
+msgid "Added Today"
+msgstr "Додато данас"
+
+msgid "Adding a radio"
+msgstr "Додаје радио"
+
+msgid ""
+"Additionally this format can be used :\n"
+" default number1 format1 number2 format2 ...\n"
+" dates more recent than number1 seconds will use format1, ..."
+msgstr ""
+"Додатно, овај облик може бити коришћен :\n"
+" задати број1 облик1 број2 облик2 ...\n"
+" датуми ближи од број1 секунди ће користити облик1, ..."
+
+msgid ""
+"Adds a menu entry to artist/album context menu, allowing to search the "
+"picture/cover in google and save it."
+msgstr ""
+"Додаје ставку изборника приручном изборнику извођача/албума, омогућујући "
+"претрагу слике/корица гуглом, и чување."
+
+msgid "Adds labels to the current song"
+msgstr "Додаје ознакe тренутној песми"
+
+msgid "Adds menu entries to song contextual menu"
+msgstr "Додаје ставке изборника приручном изборнику песме"
+
+msgid "Advanced Search ..."
+msgstr "Напредна претрага ..."
+
+msgid "Advanced Tag Editing"
+msgstr "Напреднo уређивање ознака"
+
+msgid "Album"
+msgstr "Албум"
+
+msgid "Album and artist"
+msgstr "Албум и извођач"
+
+msgid "Album and artist on the left side"
+msgstr "Албум и извођач на левој страни"
+
+msgid "Album artist"
+msgstr "Извођач албума"
+
+msgid "Album artist or artist"
+msgstr "Извођач албума или извођач"
+
+msgid "Album cover"
+msgstr "Корице албума"
+
+msgid "Album gain"
+msgstr "Појачање албума"
+
+msgid "Album mode"
+msgstr "Режим албума"
+
+msgid "Album peak"
+msgstr "Врхунац албума"
+
+msgid "Album picture"
+msgstr "Слика албума"
+
+msgid "Album picture & info"
+msgstr "Слика албума и подаци"
+
+msgid "Album pictures"
+msgstr "Слике албума"
+
+msgid "Album playcount:"
+msgstr "Бројач албума:"
+
+msgid "Album shuffle"
+msgstr "Насумично пуштање албума"
+
+msgid "Album with picture"
+msgstr "Албум са сликом"
+
+msgid "Album year(s)"
+msgstr "Година(е) албума"
+
+#, perl-format
+msgid "Album: %l"
+msgstr "Албум %l"
+
+#, perl-format
+msgid "Album: %l (%Y)"
+msgstr "Album %l (%Y)"
+
+msgid "Albuminfo"
+msgstr "Подаци албума"
+
+msgid "Albuminfo plugin"
+msgstr "Прикључци података албума"
+
+msgid "Albums"
+msgstr "Албуми"
+
+msgid "All"
+msgstr "Све"
+
+msgid "All Songs"
+msgstr "Све песме"
+
+msgid "All albums"
+msgstr "Сви албуми"
+
+msgid "All artists"
+msgstr "Сви извођачи"
+
+msgid "All files"
+msgstr "Све датотеке"
+
+msgid "All genres"
+msgstr "Сви жанрови"
+
+msgid "All labels"
+msgstr "Све ознаке"
+
+msgid "All moods"
+msgstr "Сва расположења"
+
+msgid "All of :"
+msgstr "Сви од :"
+
+msgid "All songs"
+msgstr "Све песме"
+
+msgid "All styles"
+msgstr "Сви начини"
+
+msgid "All themes"
+msgstr "Све теме"
+
+msgid ""
+"Allmusic uses both Genres and Styles to describe albums. If you use only "
+"Genres, you may want to include Styles in allmusic's list of Genres."
+msgstr ""
+"Сва музика користи жанрове и начине за опис албума. Ако користите само "
+"жанрове, можда би желели укучити начине у списку све музике жанрова."
+
+msgid "Allow for scheduling fade-out and stop"
+msgstr "Дозволити лагано ишчезавање и заустављање заказивању"
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
+msgstr ""
+"Дозвољава управљање Гмузичког брстача преко Дбуса користећи МПРИС в1.0 обичај"
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v2.0 standard"
+msgstr ""
+"Дозвољава управљање Гмузичког брстача преко Дбуса користећи МПРИС в2.0 "
+"обичаја"
+
+#. Alt key
+msgctxt "Keyboard"
+msgid "Alt"
+msgstr "Мења"
+
+msgid "Amount of volume changed by the mouse wheel"
+msgstr "Количина појачања мењаног точкићем миша"
+
+msgid ""
+"Analyse and add replaygain tags for all songs that don't have replaygain "
+"tags, or incoherent album replaygain tags"
+msgstr ""
+"Раставља и додаје ознаке појачању извођења свим песмама које немају ознаке "
+"појачања пуштања, или невезане ознаке појачања извођења"
+
+msgid "Any of :"
+msgstr "Сви од :"
+
+msgid "Append"
+msgstr "Прикачи"
+
+msgid "Append (only if not already present)"
+msgstr "Продужи (само ако није већ присутно)"
+
+msgid "Append to playlist"
+msgstr "Додај на списку нумера"
+
+msgid "Application"
+msgstr "Програм"
+
+#, perl-brace-format
+msgid "Are you sure you want to delete the '{label}' label ?"
+msgstr "Да ли сте сигурни да желите избрисати „{label}“ ознаку ?"
+
+msgid "Arguments"
+msgstr "Докази"
+
+msgid "Artist"
+msgstr "Извођач"
+
+msgid "Artist & album"
+msgstr "Извођач и албум"
+
+msgid "Artist (Year - Album)"
+msgstr "извођач (година - албум)"
+
+msgid "Artist Biography"
+msgstr "Животопис извођача"
+
+msgid "Artist URL"
+msgstr "УРЛ адреса извођача"
+
+msgid "Artist picture"
+msgstr "Слика извођача"
+
+#, perl-format
+msgid "Artist picture size : %d"
+msgstr "Величина слике извођача : %d"
+
+msgid "Artist playcount:"
+msgstr "Број извођења извођача:"
+
+msgid "Artist,Album,Disc,Track"
+msgstr "Извођач, албум, диск, нумера"
+
+msgid "Artist,Date,Album,Disc,Track"
+msgstr "Извођач, датум, албум, диск, нумера"
+
+#, perl-format
+msgid "Artist: %a"
+msgstr "Извођач: %a"
+
+msgid "Artistinfo"
+msgstr "Подаци извођача"
+
+msgid "Artistinfo plugin"
+msgstr "Прикључак података извођача"
+
+msgid "Artists"
+msgstr "Извођачи"
+
+msgid "Ascending order"
+msgstr "Силазни распоред"
+
+msgid "Ask confirmation only if file already exists"
+msgstr "Питај за потврду само ако датотека већ постоји"
+
+msgid "Audio"
+msgstr "Звук"
+
+msgid "Audio properties"
+msgstr "Својства звука"
+
+msgid "Author"
+msgstr "Аутор"
+
+msgid "Auto"
+msgstr "Самостално"
+
+msgid "Auto fill based on filenames ..."
+msgstr "Самостална попуна на основу имена датотека ..."
+
+msgid "Auto fill only blank fields"
+msgstr "Самостално попуњава само празна поља"
+
+msgid "Auto fill up to"
+msgstr "Самостално попуњава до"
+
+msgid "Auto filter"
+msgstr "Самостални услов"
+
+msgid "Auto-fill queue"
+msgstr "Заказана самостална попуна"
+
+msgid "Auto-fill queue with similar artists (from last.fm)"
+msgstr "Заказана самостална попуна сличним извођачима (из ласт.фм-а)"
+
+msgid "Auto-increment track numbers"
+msgstr "Самостално увећање бројева нумера"
+
+msgid "Auto-save fields with data from allmusic"
+msgstr "Самостално чување са подацима из све музике"
+
+msgid "Auto-save positive finds"
+msgstr "Потврдни проналасци самосталног чувања"
+
+msgid "Auto-scroll"
+msgstr "Самостално _померај"
+
+msgid "Auto-select Pictures"
+msgstr "Самостално одређује слике"
+
+msgid "Automatically remove current song if not found"
+msgstr "Самостално уклања текућу песм ако није пронађена"
+
+msgid "Autosave"
+msgstr "Самоснимање"
+
+msgid "Autosave plugin"
+msgstr "Прикључак самосталног чувања"
+
+msgid "Available"
+msgstr "Доступан"
+
+msgid "Average rating:"
+msgstr "Просечна процена:"
+
+msgid "BPM"
+msgstr "БПМ"
+
+msgid "Bad session"
+msgstr "Лоша сесија"
+
+msgid "Base Folder :"
+msgstr "Основна фасцикла :"
+
+msgid "Basic fields"
+msgstr "Основна поља"
+
+msgid "Begin with"
+msgstr "Почиње са"
+
+msgid "Below"
+msgstr "Испод"
+
+msgid "Biography"
+msgstr "Биографија"
+
+msgid "Bitrate"
+msgstr "Проток бита"
+
+msgid "Body :"
+msgstr "Тело :"
+
+msgid "Body text is not supported by current notification daemon"
+msgstr "Тело текста није подржано текућим домаром обавештења"
+
+msgid "Browser"
+msgstr "Прегледник"
+
+msgid "Browser views"
+msgstr "Прикази прегледника"
+
+msgid "Browser window layout :"
+msgstr "Распоред прозора прегледника :"
+
+msgid "Browser with SongTree"
+msgstr "Прегледник са стаблом песама"
+
+msgid "Buttons"
+msgstr "Дугмад"
+
+msgid "Buttons, Song & Cover"
+msgstr "Дугмад, песме и корице"
+
+msgid "Can be relative by using + or -"
+msgstr "Може бити односно коришћењем + или -"
+
+msgid "Can't change the volume in non-gstreamer iceserver mode"
+msgstr "Не могу променити гласноћу у режиму ајссервер који није Гстример"
+
+msgid ""
+"Can't change the volume. Needs amixer (packaged in alsa-utils) to change "
+"volume when using this audio backend."
+msgstr ""
+"Не могу променити гласноћу. Потребан је алсамиксер (у пакету  alsa-utils) за "
+"промену гласноће при коришћењу овог звучног позадинског програма."
+
+#, perl-brace-format
+msgid ""
+"Can't create Folder '{path}' : \n"
+"{error}"
+msgstr ""
+"Нисам успео да направим фасциклу „{path}“ : \n"
+"{error}"
+
+#, perl-brace-format
+msgid "Can't create sink '{sink}'"
+msgstr "Нисам успео да направим уливање „{sink}“"
+
+msgid "Can't play this file."
+msgstr "Не могу извести ову датотеку."
+
+msgid "Can't read file or invalid file"
+msgstr "Или је датотека неисправна, или је не могу читати"
+
+#, perl-brace-format
+msgid "Can't write in base folder '{folder}'."
+msgstr "Не могу писати у основну фасциклу „{folder}“."
+
+msgid "Capitalize"
+msgstr "Велика слова"
+
+msgid "Capitalize each word"
+msgstr "Писање великим словима"
+
+msgid "Case insensitive"
+msgstr "Мала и велика слова се не разликују"
+
+msgid "Case sensitive"
+msgstr "Осетљиво на величину знакова"
+
+msgid "Case-sensitive"
+msgstr "Осетљиво на величину знакова"
+
+msgid "Categories pane"
+msgstr "Окно врстa"
+
+msgid "Centered"
+msgstr "Центрирано"
+
+msgid "Centered on"
+msgstr "Центрирано"
+
+msgid "Change Display"
+msgstr "Измени приказ"
+
+msgid "Change default text color"
+msgstr "Измени задату боју текста"
+
+msgid "Change default text font and size"
+msgstr "Измени задати словни лик и величину"
+
+msgid "Change the context visibility"
+msgstr "Измени видљивост садржаја"
+
+msgid "Channels"
+msgstr "Канали"
+
+msgid "Check Collection"
+msgstr "Провери збирку"
+
+msgid "Check for updated/deleted songs on startup"
+msgstr "Провери обновљене/обрисане песме по покретању"
+
+msgid "Check for updated/removed songs"
+msgstr "Провери обновљене/уклоњене песме"
+
+msgid "Check real length of mp3"
+msgstr "Провери стварну дужину мп3"
+
+msgid "Check your audio settings"
+msgstr "Проверите ваше звучне поставке"
+
+msgid "Checking length/bitrate"
+msgstr "Провера дужине/протока битова"
+
+msgid "Checking songs"
+msgstr "Провера песама"
+
+msgid "Choose Album From this Artist"
+msgstr "Одаберите албум овог извођача"
+
+msgid "Choose Artist/Album/Song"
+msgstr "Одаберите извођача/албум/песме"
+
+msgid "Choose Picture"
+msgstr "Одаберите слику"
+
+msgid "Choose Random Album"
+msgstr "Одаберите насумично албум"
+
+msgid "Choose a folder"
+msgstr "Изаберите фасциклу"
+
+msgid "Choose directory to copy files to"
+msgstr "Изаберите фасциклу за умножак датотека"
+
+msgid "Choose directory to move files to"
+msgstr "Одаберите фасциклу за премештање датотека"
+
+msgid "Choose files"
+msgstr "Изаберите датотеке"
+
+msgid "Choose folder to add"
+msgstr "Изаберите фасциклу за додавање"
+
+msgid "Choose font for lyrics"
+msgstr "Изаберите словни лик за стихове"
+
+msgid "Choose font..."
+msgstr "Изаберите словни лик..."
+
+#, perl-brace-format
+msgid "Choose icon for label {name}"
+msgstr "Изаберите икону за ознаку {name}"
+
+msgid "Choose page to open"
+msgstr "Изаберите страницу за отварање"
+
+#, perl-format
+msgid "Choose picture for '%s'"
+msgstr "Изаберите слику за „%s“"
+
+msgid "Choose playlist files to import"
+msgstr "Изаберите списак песама за увоз"
+
+msgid "Clear"
+msgstr "Очисти"
+
+msgid "Clear playlist"
+msgstr "Чисти списак песама"
+
+msgid "Clear playlist filter"
+msgstr "Очисти услов списка песама"
+
+msgid "Clear queue"
+msgstr "Очисти заказано"
+
+msgid "Clear selected fields"
+msgstr "Очисти изабрана поља"
+
+msgid "Click to show fullsize image"
+msgstr "Кликните за приказ слике у пуној величини"
+
+msgid "Click to show larger image"
+msgstr "Кликните за приказ увећане слике"
+
+msgid "Client banned, contact gmusicbrowser's developer"
+msgstr "Клијент је забрањен, обратите се развијачу Гном музичког брстача"
+
+msgid "Close"
+msgstr "Затвори"
+
+msgid "Close Window"
+msgstr "Затвори прозор"
+
+msgid "Close a filter"
+msgstr "Затвори услов"
+
+msgid "Close to tray"
+msgstr "Затвори системску палету"
+
+msgid "Collection"
+msgstr "Збирка"
+
+msgid "Command"
+msgstr "Наредба"
+
+msgid "Command to launch when the button is pressed"
+msgstr "Наредба за покретање по притиску на дугме"
+
+msgid "Command used :"
+msgstr "Наредба која се користи :"
+
+msgid ""
+"Command used when\n"
+"'turn off computer when queue empty'\n"
+"is selected"
+msgstr ""
+"Наредба која се користи кад\n"
+"се означи „Искључи рачунар кад се\n"
+"одсвира заказано"
+
+msgid "Command when playing song changed :"
+msgstr "Наредба за извршавање приликом мењања песама :"
+
+msgid "Command when stopped :"
+msgstr "Наредба приликом заустављања :"
+
+msgid "Comment"
+msgstr "Напомена"
+
+msgid "Comments"
+msgstr "Примедбе"
+
+msgid "Compilation"
+msgstr "Састав"
+
+msgid "Composer"
+msgstr "Композитор"
+
+msgid "Conductor"
+msgstr "Диригент"
+
+msgid "Connect through a proxy"
+msgstr "Повежи се преко посредника"
+
+msgid "Connections from :"
+msgstr "Веза од :"
+
+msgid "Context"
+msgstr "Садржај"
+
+msgid "Control"
+msgstr "Управљање"
+
+msgid "Conz Aishi (with Filter Panes)"
+msgstr "Конз Аиши (Conz Aishi) са окном услова"
+
+msgid "Conz Glimm (different controls)"
+msgstr "Конз Глим (Conz Glimm) са другачијим управљањем"
+
+msgid "Copy"
+msgstr "Умножи"
+
+msgid "Copy failed"
+msgstr "Умножавање није успело"
+
+msgid "Copy link address"
+msgstr "Умножи адресу везе"
+
+msgid "Copy to mounted portable player"
+msgstr "Умножи на прикачени преносни уређај за пуштање музике"
+
+msgid "Copy to portable player"
+msgstr "Умножи на преносни музички уређај"
+
+#, perl-format
+msgid "Copying file"
+msgid_plural "Copying %d files"
+msgstr[0] "Умножавам %d датотеку"
+msgstr[1] "Умножавам %d датотеке"
+msgstr[2] "Умножавам %d датотека"
+
+msgid "Copyright"
+msgstr "Ауторска права"
+
+msgid "Cover Size : "
+msgstr "Величина корица :"
+
+msgid "Create ID3v2 tags as ID3v2.4"
+msgstr "Направи ИД3в2 ознаке као ИД3в2.4"
+
+#. Ctrl key
+msgctxt "Keyboard"
+msgid "Ctrl"
+msgstr "Ктрл"
+
+msgid "Current song must always be in the playlist"
+msgstr "Садашња песма мора увек бити у списку за извођење"
+
+msgid "Custom"
+msgstr "Произвољно"
+
+msgid "Custom Text"
+msgstr "Произвољан текст"
+
+msgid "Custom URL"
+msgstr "Прилагођена УРЛ адреса"
+
+msgid "Custom command :"
+msgstr "Произвона наредба :"
+
+msgid "Custom context pages :"
+msgstr "Прилагођене странице објашњења :"
+
+msgid "Custom fields"
+msgstr "Прилагођена поља"
+
+msgid "Custom formats"
+msgstr "Прилагођени облици"
+
+msgid "Custom pipeline"
+msgstr "Прилагођени цевоводи"
+
+msgid "Custom..."
+msgstr "Прилагођено..."
+
+msgid "Date"
+msgstr "Датум"
+
+msgid "Date format :"
+msgstr "Облик датума :"
+
+msgid "Date of purchase"
+msgstr "Датум куповине"
+
+msgid "Debut Album"
+msgstr "Албум првенац"
+
+msgid "Decrease Volume"
+msgstr "Смањује гласноћу"
+
+msgid "Decrease volume"
+msgstr "Смањује гласноћу"
+
+msgid "Default"
+msgstr "Подразумевано"
+
+msgid "Default fullscreen"
+msgstr "Задато преко целог екрана"
+
+#, perl-format
+msgid "Default rating : %d %"
+msgstr "Задата оцена : %d %"
+
+msgid "Default text color"
+msgstr "Задата боја текста"
+
+msgid "Default text font"
+msgstr "Задати сливни лик текста"
+
+#, perl-format
+msgid "Delay before showing tray tip popup on mouse over : %d ms"
+msgstr ""
+"Задршка пре приказивања искакања облачића из системске палете на прелазак "
+"мишем : %d ms"
+
+msgid "Delete"
+msgstr "Избриши"
+
+msgid "Delete Selected Songs"
+msgstr "Брише означене песме"
+
+msgid "Delete list"
+msgstr "Брише списак"
+
+msgid "Descending order"
+msgstr "Опадајући редослед"
+
+msgid "Descr."
+msgstr "Опис."
+
+msgid "Description"
+msgstr "Опис"
+
+msgid "Desktop widgets"
+msgstr "Справице површи"
+
+msgid "Desktop widgets plugin"
+msgstr "Прикључак справица површи"
+
+msgid "Disable screensaver when fullscreen and playing"
+msgstr "Онемогући чувара екрана при извођењу преко целог екрана"
+
+msgid "Disabled"
+msgstr "Онемогућено"
+
+msgid "Disc"
+msgstr "Диск"
+
+msgid "Disc #"
+msgstr "Диск #"
+
+msgid "Disc name"
+msgstr "Назив диска"
+
+msgid "Display (:1 or host:0 for example)"
+msgstr "Приказ (:1 или host:0 , на пример)"
+
+msgid "Display Songs"
+msgstr "Приказ песама"
+
+msgid ""
+"Display a special layout in or around the titlebar of the focused window"
+msgstr "Приказ нарочитог распореда у, или око траке наслова прозора у жижи"
+
+msgid "Display stop/next actions"
+msgstr "Приказује стој/следећа радњу"
+
+msgid "Display synchronized lyrics of the current song"
+msgstr "Приказује усклађене стихове песама садашње песме"
+
+#, perl-format
+msgid "Display tray tip for %d ms"
+msgstr "Приказује облачић палете кроз %d ms"
+
+msgid "Do not add a title row"
+msgstr "Не додавати насловни ред"
+
+msgid "Do not add songs that can't be played"
+msgstr "Не додавати песме које не могу бити изведене"
+
+msgid "Do not create an id3v1 tag in mp3 files"
+msgstr "Не правити ид3в1 ознаке у мп3 датотекама"
+
+msgid "Do not unsynchronise id3v2 tags"
+msgstr "Не усаклађивати ид3в2 ознаке"
+
+msgid "Do not write the tags"
+msgstr "Не пиши ознаке"
+
+msgid "Don't add the overlay to dialogs"
+msgstr "Не додавати својство заклањања прозорчићима"
+
+#, perl-brace-format
+msgid "Don't know how to play files of type {type}"
+msgstr "Не знам како извести датотеке врсте {type}"
+
+msgid "Don't notify if the main window is visible"
+msgstr "Не обавештавај ако је главни прозор видљив"
+
+msgid "Don't submit current song"
+msgstr "Не излажи садашњу песму"
+
+msgid "Download"
+msgstr "Преузимање"
+
+msgid "Drag and drop songs here to replace the selection."
+msgstr "Превуците и спустите песме овде за замену избора."
+
+msgid "Edit"
+msgstr "Уреди"
+
+msgid "Edit Current Song Properties"
+msgstr "Уређује особине садашње песме"
+
+msgid "Edit Labels"
+msgstr "Уредите натписе"
+
+msgid "Edit Lyrics"
+msgstr "Уреди стихове"
+
+msgid "Edit Lyrics ..."
+msgstr "Уређује стихове ..."
+
+msgid "Edit Multiple Songs Properties"
+msgstr "Уређује особине више песама"
+
+msgid "Edit Rating"
+msgstr "Уреди оцене"
+
+msgid "Edit Settings"
+msgstr "Уређује поставке"
+
+msgid "Edit auto-fill formats ..."
+msgstr "Уређује облике за самосталну попуну ..."
+
+msgid "Edit filter"
+msgstr "Измени услов"
+
+msgid "Edit filter..."
+msgstr "Уреди услов..."
+
+msgid "Edit grouping ..."
+msgstr "Уређује разврставање ..."
+
+msgid "Edit in the last.fm wiki"
+msgstr "Уреди на last.fm викију"
+
+msgid "Edit list"
+msgstr "Уреди списак"
+
+msgid "Edit mode"
+msgstr "Начин уређивања"
+
+msgid "Edit ordered modes ..."
+msgstr "Среди уређене начине ..."
+
+msgid "Edit random modes ..."
+msgstr "Среди насумичне начине ..."
+
+msgid "Edit row tip"
+msgstr "Уреди редове облачића"
+
+msgid "Edit selected song properties"
+msgstr "Уреди својства означене песме"
+
+msgid "Edit..."
+msgstr "Уреди..."
+
+msgid "Editable in song properties dialog"
+msgstr "Уписиво у прозорчићу особина песама"
+
+msgid "Editing list : "
+msgstr "Уређивање списка :"
+
+msgid "Editing tags"
+msgstr "Уређивање ознака"
+
+msgid "Embedded lyrics"
+msgstr "Угњежђени стихови"
+
+msgid "Embedded picture"
+msgstr "Угњжђене слике"
+
+msgid "Encapsulated object"
+msgstr "Затворени предмети"
+
+msgid "Encoded by"
+msgstr "Шифровано од"
+
+msgid "Encoded with"
+msgstr "Шифровано уз помоћ"
+
+msgid "Encoder"
+msgstr "Шифрарник"
+
+msgid "Encoding used for id3v1 tags :"
+msgstr "Кодовање коришћено за ид3в1 ознаке :"
+
+msgid "Enqueue"
+msgstr "Закажи"
+
+msgid "Enqueue Action"
+msgstr "Радња заказивања"
+
+msgid "Enqueue Displayed"
+msgstr "Закажи приказано"
+
+msgid "Enqueue Selected"
+msgstr "Закажи оначено"
+
+msgid "Enqueue Selected Songs"
+msgstr "Закажи означене песме"
+
+msgid "Enqueue Songs from Current Album"
+msgstr "Закажи песме садашњег албума"
+
+msgid "Enqueue Songs from Current Artist"
+msgstr "Закажи песме садашњег извођача"
+
+msgid "Enqueue a list of files/folders"
+msgstr "Заказивање списка датотека/фасцикли"
+
+msgid "Enqueue filter"
+msgstr "Услов за заказивање"
+
+msgid "Enter album name"
+msgstr "Унесите назив албума"
+
+msgid "Enter custom event string :"
+msgstr "Унесите прилагођену ниску појава :"
+
+msgid "Equalizer"
+msgstr "Уједначивач"
+
+msgid "Error :"
+msgstr "Грeшкa :"
+
+msgid "Error details"
+msgstr "Детаљи о грешци"
+
+#, perl-brace-format
+msgid ""
+"Error saving artistbio in '{file}' :\n"
+"{error}"
+msgstr ""
+"Грешка приликом чувања животописа извођача у „{file}“ :\n"
+"{error}"
+
+#, perl-brace-format
+msgid ""
+"Error saving lyrics in '{file}' :\n"
+"{error}"
+msgstr ""
+"Грешка чувања стихова у „{file}“ :\n"
+"{error}"
+
+#, perl-brace-format
+msgid ""
+"Error saving review in '{file}' :\n"
+"{error}"
+msgstr ""
+"Грешка чувања критика у „{file}“ :\n"
+"{error}"
+
+#, perl-brace-format
+msgid "Error writing '{file}'"
+msgstr "Грешка уписа „{file}“"
+
+msgid "Error writing replaygain tags :\n"
+msgstr "Грешка уписа ознака гласноће извођења :\n"
+
+msgid "Error: invalid filename pattern"
+msgstr "Грешка: неисправан образац назива датотеке"
+
+msgid "Events"
+msgstr "Догађаји"
+
+msgid "Example :"
+msgstr "Пример :"
+
+msgid "Execute custom command on selected files"
+msgstr "Извршите прилагођену наредбу над изабраном датотеком"
+
+msgid "Export"
+msgstr "Извези"
+
+msgid "Export plugin"
+msgstr "Прикључак извоза"
+
+msgid "Export song properties to a .csv file"
+msgstr "Извези својства песме у .csv датотеку"
+
+msgid "Export to .m3u file"
+msgstr "Извези у .m3u датотеку"
+
+msgid "Extra fields"
+msgstr "Додатна поља"
+
+msgid "Extra gain"
+msgstr "Додатна гласноћа"
+
+msgid "Extract guest artist from title :"
+msgstr "Извади извођача госта из наслова :"
+
+msgid "Fade-out"
+msgstr "Ишчезавање"
+
+#, perl-format
+msgid "Fade-out in %d seconds"
+msgstr "Изчезавање кроз %d секунди"
+
+msgid "Fade-out then stop"
+msgstr "Ишчезавање и онда стој"
+
+#, perl-brace-format
+msgid ""
+"Failed to delete '{file}' :\n"
+"{error}"
+msgstr ""
+"Нисам успео да избришем „{file}“ :\n"
+"{error}"
+
+msgid "Fetching albuminfo"
+msgstr "Добављање података о албуму"
+
+msgid "Field name"
+msgstr "Назив поља"
+
+msgid "Field type"
+msgstr "Врста поља"
+
+msgid "Fields"
+msgstr "Поља"
+
+msgid ""
+"Fields will be saved according to the settings above. Albuminfo files will "
+"be re-read if there are fields to be saved and you choose 'albums missing "
+"reviews' in the combo box."
+msgstr ""
+"Поља ће бити сачувана сагласно поставкама изнад. Датотеке са подацима о "
+"албуму ће бити опет учитани ако има поља која требају бити сачувана и ви "
+"изаберете „Недостајуће критике албума“ у кућици за унос."
+
+msgid "File"
+msgstr "Датотека"
+
+msgid "File properties"
+msgstr "Својства датотеке"
+
+msgid "File type"
+msgstr "Врста датотеке"
+
+msgid "Filename"
+msgstr "Назив датотеке"
+
+msgid "Filename extension"
+msgstr "Наставак назива датотеке"
+
+msgid "Filename format :"
+msgstr "Облик назива датотеке :"
+
+msgid "Filename without extension"
+msgstr "Назив датотеке без наставка"
+
+msgid "Files"
+msgstr "Датотеке"
+
+msgid "Filesystem"
+msgstr "Систем датотека"
+
+msgid "Filter"
+msgstr "Услов"
+
+msgid "Filter : "
+msgstr "Услов"
+
+msgid "Filter edition"
+msgstr "Издање услова"
+
+msgid "Filter on playing Album"
+msgstr "Услов извођења за албум"
+
+msgid "Filter on playing Artist"
+msgstr "Услов извођења за извођача"
+
+msgid "Filter on playing Song"
+msgstr "Услов за извођење песме"
+
+msgid "Filter on this album"
+msgstr "Услов за овај албум"
+
+msgid "Filter on this artist"
+msgstr "Услов за овог извођача"
+
+msgid "Find :"
+msgstr "Нађи :"
+
+msgid "Find a unique filename if file already exists"
+msgstr "Нађи јединствени назив датотеке ако датотека већ постоји"
+
+msgid "Find songs in same albums"
+msgstr "Пронађи песме са истог албума"
+
+msgid "Find songs with same artists"
+msgstr "Пронађи песме са истим извођачима"
+
+msgid "Find songs with the same names"
+msgstr "Пронађи песме истих назива"
+
+msgid "Folder"
+msgstr "Фасцикла"
+
+msgid "Folder (right-aligned)"
+msgstr "Фасцикла (right-aligned)"
+
+msgid "Folder format :"
+msgstr "Облик фасцикле :"
+
+msgid "Folder pattern :"
+msgstr "Образац фасцикле :"
+
+msgid "Folders to search for new songs"
+msgstr "Фасцикла за претрагу за новим песмама"
+
+msgid "Follow playing song"
+msgstr "Следи песму која се изводи"
+
+msgid "Follow selected song"
+msgstr "Следи изабрану песму"
+
+msgid "Font size"
+msgstr "Величина писма"
+
+msgid "Forward"
+msgstr "Напред"
+
+msgid "Found but not working"
+msgstr "Пронађено, али не ради "
+
+msgid "Friday"
+msgstr "Петак"
+
+msgid "Full screen layout :"
+msgstr "Размештај преко целог екрана :"
+
+msgid "Fullscreen"
+msgstr "Преко целог екана"
+
+msgid "Fullscreen simple"
+msgstr "Преко целог екрана једноставно"
+
+msgid "GStreamer module not loaded."
+msgstr "Гстример модул није учитан."
+
+msgid "Gain for songs missing replaygain tags"
+msgstr "Недостаје гласноћа за недостајуће ознаке гласноће извођења песама"
+
+msgid "Garage Fullscreen"
+msgstr "Преко целог екрана гаража"
+
+msgid "Genre"
+msgstr "Жанр"
+
+msgid "Genre - Album"
+msgstr "Жанр - Албум"
+
+msgid "Genre - Artist"
+msgstr "Жанр - Извођач"
+
+msgid "Genre is set"
+msgstr "Жанр је постављен"
+
+msgid "Genres"
+msgstr "Жанрови"
+
+msgid "Genres pane"
+msgstr "Окно за жанрове"
+
+msgid "Gnome mmkeys"
+msgstr "Гном мултимедија тастери"
+
+msgid "Gnome multimedia keys plugin"
+msgstr "Прикључак за Гном мултимедијалне тастере"
+
+msgid "Go to Playing Track"
+msgstr "Иди на нумеру која се изводи"
+
+msgid "Go to playing song"
+msgstr "Иди на песму која се изводи"
+
+msgid "Group by :"
+msgstr "Разврстај по :"
+
+msgid "Grouping"
+msgstr "Разврставање"
+
+msgid "Handshake OK"
+msgstr "Руковање ОК"
+
+msgid "Handshake failed : "
+msgstr "Руковање неуспело : "
+
+msgid "Hard limiter"
+msgstr "Строги граничник"
+
+msgid "Help"
+msgstr "Помоћ"
+
+msgid "Hide"
+msgstr "Сакриј"
+
+msgid "Hide Artist/Album bar"
+msgstr "Сакриј траку албум/извођач"
+
+msgid "Hide non-matching"
+msgstr "Сакриј без поклапања"
+
+msgid "Hide toolbar"
+msgstr "Сакриј траку алата"
+
+msgid "Icon theme :"
+msgstr "Тема икона :"
+
+msgid "Identifier in file tag"
+msgstr "Указивач у ознаци датотеке"
+
+msgid "Ignore playback errors"
+msgstr "Занемари грешке у извођењу"
+
+msgid "Import list"
+msgstr "Увези списак"
+
+msgid ""
+"In this case one command by file will be run\n"
+"\n"
+msgstr ""
+"У овом случају једна наредба по једној датотеци ће се изводити\n"
+"\n"
+
+msgid "Include Styles in Genres"
+msgstr "Укључи начине у жанровима"
+
+msgid "Increase Volume"
+msgstr "Појачај гласноћу"
+
+msgid "Increase volume"
+msgstr "Појачај звук"
+
+msgid "Info"
+msgstr "Подаци"
+
+msgid "Insensitive title-artist (left-aligned)"
+msgstr "Неосетљиво на назив-извођач (лево поравнање)"
+
+msgid "Insensitive title-artist (right-aligned)"
+msgstr "Неосетљиво на назив-извођач (десно поравнање)"
+
+msgid "Insensitive, Song & Cover"
+msgstr "Неосетљиво, песма и корице"
+
+msgid "Insert Selected Songs at the top of the queue"
+msgstr "Убацује изабране песме на врх заказаног"
+
+msgid "Insert a list of files/folders at the start of the playlist"
+msgstr "Убаци списак датотека/фасцикли на почетку списка за извођење"
+
+msgid "Insert this pipeline before the audio sink"
+msgstr "Унесите овај цевовод пре уливања звука"
+
+msgid "Invalid regular expression"
+msgstr "Неисправан регуларан израз"
+
+msgid "Invert filter"
+msgstr "Обрнути услови"
+
+msgid "Invisible hot spot"
+msgstr "Невидљива приступна тачка"
+
+#, perl-format
+msgid "Isn't smart equal to %s"
+msgstr "Није паметно једнако %s"
+
+msgid "Justified"
+msgstr "Поравнато"
+
+msgid "KB"
+msgstr "KB"
+
+msgid "Karaoke"
+msgstr "Караоке"
+
+msgid "Karaoke plugin"
+msgstr "Прикључак за караоке"
+
+msgid "Key"
+msgstr "Тастер"
+
+msgid "Keys"
+msgstr "Тастери"
+
+msgid "Keywords"
+msgstr "Кључне речи"
+
+msgid "Label"
+msgstr "Натпис"
+
+msgctxt "Record_label"
+msgid "Label"
+msgstr "Натпис"
+
+msgid "Label is set"
+msgstr "Натпис је постављен"
+
+msgid "Label/Publisher"
+msgstr "Натпис/издавач"
+
+msgid "Labels"
+msgstr "Натписи"
+
+msgid "Labels' icons"
+msgstr "Иконе натписа"
+
+msgid "Lang"
+msgstr "Језик"
+
+msgid "Lang."
+msgstr "Језик."
+
+msgid "Languages"
+msgstr "Језици"
+
+msgid "Last played"
+msgstr "Последња извођена"
+
+msgid "Last skipped"
+msgstr "Последња прескочена"
+
+msgid "Launch ripping program"
+msgstr "Покрени програм за чупање"
+
+msgid "Layout"
+msgstr "Распоред"
+
+msgid "Layout :"
+msgstr "Распоред :"
+
+msgid "Layouts"
+msgstr "Распореди"
+
+msgid "Left aligned"
+msgstr "Лево поравнање"
+
+msgid "Left pane"
+msgstr "Лево окно"
+
+msgid "Left-clic or scrollwheel to change, right-click to mute"
+msgstr "Леви клик или точкић миша за измену, десни клик за утишавање"
+
+msgid "Length"
+msgstr "Трајање"
+
+msgid "Library"
+msgstr "Збирка"
+
+msgid "Library : "
+msgstr "Збирка : "
+
+msgid ""
+"Library empty.\n"
+"\n"
+"Use the settings dialog to add music."
+msgstr ""
+"Збирка је празна.\n"
+"\n"
+"Користите прозорче поставки за додавање музике"
+
+#, perl-format
+msgid "Library size : %d song"
+msgid_plural "Library size : %d songs"
+msgstr[0] "Величина песме :  %d песма"
+msgstr[1] "Величина збирке : %d песме"
+msgstr[2] "Величина збирке : %d песама"
+
+msgid "Limit similar artists to a rate of similarity : "
+msgstr "Пореди сличне извођаче мером сличности :"
+
+msgid "Limit similar artists to the first : "
+msgstr "Пореди сличне извођаче са првим:"
+
+msgid "List"
+msgstr "Списак"
+
+msgid "List empty"
+msgstr "Списак је празан"
+
+msgid "List order"
+msgstr "Распоред списка"
+
+msgid "Listed : "
+msgstr "Наведено :"
+
+msgid "Listed songs"
+msgstr "Наведене песме"
+
+msgid "Listeners: "
+msgstr "Ослушкивачи :"
+
+msgid "Lists"
+msgstr "Спискови"
+
+msgid "Literal search"
+msgstr "Дословна претрага"
+
+msgid "Load lyrics even if lyrics panel is hidden"
+msgstr "Учитава стихове чак и ако је окно стихова скривено"
+
+msgid "Load/Save Artist Info in :"
+msgstr "Учитава/чува податке о извођачу у :"
+
+#, perl-format
+msgid "Loaded %d unsent song from previous session"
+msgid_plural "Loaded %d unsent songs from previous session"
+msgstr[0] "Учитана је %d непослата песма из претходне сесије"
+msgstr[1] "Учитане су %d непослате песме из претходне сесије"
+msgstr[2] "Учитано је %d непослатих песма из претходне сесије"
+
+msgid "Loading failed."
+msgstr "Неуспело учитавање."
+
+msgid "Loading..."
+msgstr "Учитавам..."
+
+msgid "Lock"
+msgstr "Закључај"
+
+msgid "Lock Album"
+msgstr "Закључавање албума"
+
+msgid "Lock Artist"
+msgstr "Закључавање извођача"
+
+msgid "Lock on Album"
+msgstr "Праћење албума"
+
+msgid "Lock on Artist"
+msgstr "Праћење извођача"
+
+msgid "Lock on song"
+msgstr "Праћење песме"
+
+#, perl-brace-format
+msgid "Lock on {field}"
+msgstr "Праћење {field}"
+
+msgid "Locked on :\n"
+msgstr "Праћено :\n"
+
+msgid "Lookup at allmusic.com"
+msgstr "Претрага на allmusic.com"
+
+msgid "Lookup in AMG"
+msgstr "Претрага на АМГ"
+
+msgid "Lookup in google"
+msgstr "Претрага гуглом"
+
+msgid "Lower left"
+msgstr "Доле-лево"
+
+msgid "Lower right"
+msgstr "Доле-десно"
+
+msgid "Lullaby"
+msgstr "Успаванка"
+
+msgid "Lullaby plugin"
+msgstr "Прикључак успаванка"
+
+msgid "Lyricist"
+msgstr "Стихописац"
+
+msgid "Lyrics"
+msgstr "Стихови"
+
+msgid "Lyrics (requires lyrics plugin)"
+msgstr "Стихови (захтева прикључак стихова)"
+
+msgid "Lyrics alignement"
+msgstr "Поравнање стихова"
+
+msgid "Lyrics file :"
+msgstr "Датотека стихова :"
+
+msgid "Lyrics file name format"
+msgstr "Облик назива датотеке стихова"
+
+msgid "Lyrics for "
+msgstr "Стихови за"
+
+msgid "Lyrics plugin"
+msgstr "Прикључак за стихове"
+
+msgid "Lyrics source"
+msgstr "Извор стихова"
+
+msgid "MB"
+msgstr "MB"
+
+msgid "MIME type"
+msgstr "МИМЕ врста"
+
+msgid "MPRIS v1"
+msgstr "МПРИС 1"
+
+msgid "MPRIS v1 support"
+msgstr "Подршка за МПРИС 1"
+
+msgid "MPRIS v2"
+msgstr "МПРИС 2"
+
+msgid "MPRIS v2 support"
+msgstr "Подршка за МПРИС 2"
+
+msgid "Main"
+msgstr "Главни"
+
+msgid "Main artist"
+msgstr "Глави извођач"
+
+msgid "Make it look like"
+msgstr "Начини га да изгледа као"
+
+msgid ""
+"Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
+"gnome."
+msgstr ""
+"Чини да Гном музички брстач одговара на следеће/претходно/свирај/стани "
+"мултимеднијалне тастере у гному. "
+
+msgid "Mass Rename"
+msgstr "Групно преименовање"
+
+msgid "Mass Renaming"
+msgstr "Групно преименовање"
+
+msgid "Media type"
+msgstr "Врста медијума"
+
+msgid "Menu entry name"
+msgstr "Назив ставке изборника"
+
+msgid "Middle-clic for next album"
+msgstr "Средњи клик за следећи албум"
+
+msgid ""
+"Middle-click on local artists to set a filter on them, right-click non-local "
+"artists to search for them on the web."
+msgstr ""
+"Средњи клик на месне извођаче за поставку услова на њих, десни клик на "
+"удаљене извођаче за претрагу веба за њима.  "
+
+msgid "Minimal tip"
+msgstr "Најмањи облачић"
+
+msgid "Minimum size"
+msgstr "Најмања величина"
+
+msgid "Misc."
+msgstr "Разно"
+
+msgid "Modification"
+msgstr "Измене"
+
+msgid "Monday"
+msgstr "Понедељак"
+
+msgid "Moods"
+msgstr "Расположења"
+
+msgid "More info"
+msgstr "Још података"
+
+msgid "More results"
+msgstr "Више излаза"
+
+msgid "Mosaic View"
+msgstr "Мозаик преглед"
+
+msgid "Move"
+msgstr "Премести"
+
+msgid "Move Files to :"
+msgstr "Премести датотеке у :"
+
+msgid "Move failed"
+msgstr "Није успело премештање"
+
+msgid "Move folder to"
+msgstr "Премести фасциклу у"
+
+#, perl-format
+msgid "Moving file"
+msgid_plural "Moving %d files"
+msgstr[0] "Премештање %d датотеке"
+msgstr[1] "Премештање %d датотеке"
+msgstr[2] "Премештање %d датотека"
+
+msgid "Music"
+msgstr "Музика"
+
+msgid "Mute/Unmute"
+msgstr "Искључи/укључи звук"
+
+msgid "Name"
+msgstr "Назив"
+
+msgid "Name of layout"
+msgstr "Назив распореда"
+
+msgid "Name under which the command will appear in the menu"
+msgstr "Назив под којим ће се наредба приказивати у изборнку"
+
+msgid "Never"
+msgstr "Никад"
+
+msgid "New"
+msgstr "Ново"
+
+msgid "New custom field"
+msgstr "Ново посебно поље"
+
+msgid "New filter"
+msgstr "Нови услов"
+
+msgid "New list"
+msgstr "Нови списак"
+
+msgid "New name"
+msgstr "Нови назив"
+
+msgid "Next"
+msgstr "Следеће"
+
+msgid "Next Album"
+msgstr "Следећи албум"
+
+msgid "Next Artist"
+msgstr "Следдећи извођач"
+
+msgid "Next Song"
+msgstr "Следећа песма"
+
+msgid "Next Song In Playlist"
+msgstr "Следећа песма у списку за извођење"
+
+msgid "No connections"
+msgstr "Нема успостављених веза"
+
+msgid "No file browser found."
+msgstr "Нисам нашао разгледника датотека"
+
+msgid "No genre"
+msgstr "Без жанра"
+
+msgid "No label"
+msgstr "Bez oznake"
+
+msgid "No locked filter"
+msgstr "Без услова закључавања"
+
+msgid "No lyrics found"
+msgstr "Није нађен текст песме"
+
+msgid "No moods"
+msgstr "Нема расположења"
+
+msgid "No results found"
+msgstr "Нисам пронашао резултате"
+
+msgid "No review found"
+msgstr "Нема пронађених критика"
+
+msgid "No review written."
+msgstr "Нема записаних критика."
+
+msgid "No songs"
+msgstr "Нема песама"
+
+msgid "No songs found"
+msgstr "Нисам пронашао песме"
+
+msgid "No sound menu found"
+msgstr "Нисам пронашао изборник звука"
+
+msgid "No styles"
+msgstr "Нема начина"
+
+msgid "No themes"
+msgstr "Нема тема"
+
+msgid "No web browser found."
+msgstr "Нисам пронашао прегледач веба"
+
+msgid "None"
+msgstr "Ништа"
+
+msgid "Normal"
+msgstr "Обичне"
+
+msgid "Normal mode"
+msgstr "Уобичајени начин"
+
+msgid "Normal with buttons"
+msgstr "Уобичајени са дугмадима"
+
+msgid "Normalize volume (the files must have replaygain tags)"
+msgstr "Уједначава гласноћу (датотеке морају имати ознаке гласноће извођења)"
+
+msgid "Not found"
+msgstr "Нисам пронашао"
+
+msgid "Note that some notification daemons resize the displayed picture"
+msgstr "Знајте да неки домари обавештавања мењају величину приказане слике"
+
+msgid ""
+"Note: inactive fields must be enabled by the user in the 'Fields' tab in "
+"Settings"
+msgstr ""
+"Примедба : корисник мора омогућити неактивна поља  у језичку „Поља“ у "
+"поставкама"
+
+msgid "Notify"
+msgstr "Обавести"
+
+msgid "Notify plugin"
+msgstr "Прикључак обавештења"
+
+msgid "Notify you of the playing song with the system's notification popups"
+msgstr "Обавештава вас о песми која се изводи искакањем системских обавештења"
+
+msgid "Now playing"
+msgstr "Сада пуштам"
+
+msgid "NowPlaying plugin"
+msgstr "Прикључак сада пуштам"
+
+msgid "Number of days since added"
+msgstr "Број дана од додавања"
+
+msgid "Number of days since last played"
+msgstr "Број дана од последњег извођења"
+
+msgid "Number of days since last skipped"
+msgstr "Број дана од последњег прескакања"
+
+msgid "Number of days since modified"
+msgstr "Број дана од последње измене"
+
+msgid "Number of milliseconds"
+msgstr "Број милисекунди"
+
+msgid "Number of seconds"
+msgstr "Број секунди"
+
+msgid "Number of times played"
+msgstr "Број извођења"
+
+msgid "Number of times skipped"
+msgstr "Број прескакања"
+
+msgid ""
+"ON -> smaller means more probable\n"
+"OFF -> bigger means more probable"
+msgstr ""
+"УКЉ -> мање значи вероватније\n"
+"ИСК -> веће значи вероватније"
+
+msgid ""
+"ON less probable if genre is set\n"
+"OFF more probable if genre is set"
+msgstr ""
+"УКЉ мање вероватно ако је жанр постављен\n"
+"ИСК вероватније ако је жанр постављен"
+
+msgid ""
+"ON less probable if label is set\n"
+"OFF more probable if label is set"
+msgstr ""
+"УКЉ мање вероватно ако је ознака постављена\n"
+"ИСК мање вероватно ако је ознака постављена"
+
+msgid "Old name"
+msgstr "Стари назив"
+
+msgid "On top of other windows instead of below"
+msgstr "Изнад осталих прозора уместо испод"
+
+#, perl-brace-format
+msgid "One of these commands is required to play files of type {type} : {cmd}"
+msgstr ""
+"Једна од ових наредби је неопходна за иззвођење датотека врсте {type} : {cmd}"
+
+msgid "Only affect mp3 files that do not already have an id3v1 tag"
+msgstr "Само утиче на мп3 датотеке које немају ид3в1 ознаку"
+
+msgid "Only show similar artists from local library"
+msgstr "Само приказује сличне извођаче из месне збирке"
+
+msgid "Opacity"
+msgstr "Непровидност"
+
+msgid "Open Browser"
+msgstr "Отвори прегледник"
+
+msgid "Open Browser window"
+msgstr "Отвори прозор прегледника"
+
+msgid "Open Context window"
+msgstr "Отвори приручни розор"
+
+msgid "Open Custom window"
+msgstr "Отвори прилагођени прозор"
+
+msgid "Open Equalizer"
+msgstr "Отвори уједначивач"
+
+msgid "Open Playlist"
+msgstr "Отвори списак за извођење"
+
+msgid "Open Preference window"
+msgstr "Отвори прозор поставки"
+
+msgid "Open Queue"
+msgstr "Отвори заказано"
+
+msgid "Open Queue window"
+msgstr "Отвори прозор заказаног"
+
+msgid "Open Search window"
+msgstr "Отвори прозор претраге"
+
+msgid "Open allmusic.com in your web browser"
+msgstr "Отвори allmusic.com у веб прегледнику"
+
+msgid "Open containing folder"
+msgstr "Отвори родитељску фасциклу"
+
+msgid "Open context & queue panel"
+msgstr "Отвори приручна окна и окна заказаног"
+
+msgid "Open context page"
+msgstr "Отвори приручну страну"
+
+msgid "Open existing list"
+msgstr "Отвори постојећи списак"
+
+msgid "Open files"
+msgstr "Отвори датотеке"
+
+msgid "Open folder"
+msgstr "Отвори фасциклу"
+
+msgid "Open last.fm website in your browser"
+msgstr "Отвори у веб прегледнику страну last.fm"
+
+msgid "Open link in Browser"
+msgstr "Отвори везу у веб прегледнику"
+
+msgid "Open page layout"
+msgstr "Отвори распоред стране"
+
+msgid "Open special layouts as desktop widgets"
+msgstr "Отвори нарочите распореде као справице површи"
+
+msgid "Open this page in the web browser"
+msgstr "Отвара ову страницу у веб прегледнику"
+
+msgid "Options"
+msgstr "Могућности"
+
+msgid "Options ..."
+msgstr "Могућности ..."
+
+msgid "Options for subgroup"
+msgstr "Могућности за подврсту"
+
+msgid ""
+"Or you can use the field $files which will be replaced by the list of files, "
+"and only one command will be run"
+msgstr ""
+"Или можете користити поље $files које ће бити замењено списком датотека, и "
+"само једна наредбена линија ће бити коришћена"
+
+msgid "Original Artist"
+msgstr "Изворни извођач"
+
+msgid "Original Filename"
+msgstr "Изворни назив датотеке"
+
+msgid "Original release year"
+msgstr "Изворна година издања"
+
+msgid "Originaly from"
+msgstr "Изворно од"
+
+msgid "Other"
+msgstr "Остало"
+
+msgid "Output"
+msgstr "Излаз"
+
+msgid "Overlay layout :"
+msgstr "Заклањајући распоред :"
+
+msgid "Owner identifier"
+msgstr "Указивач власника"
+
+msgid "Path,Album,Disc,Track,File"
+msgstr "Путања, албум, диск, нумера, датотека"
+
+msgid "Path,File"
+msgstr "Путања, датотека"
+
+msgid "Pattern to find .lrc files :"
+msgstr "Образац за налажење .lrc датотека :"
+
+msgid "Pause"
+msgstr "Застој"
+
+msgid "Picture"
+msgstr "Слика"
+
+msgid "Picture Type"
+msgstr "Врста слике"
+
+#, perl-format
+msgid "Picture cache : %d MB"
+msgstr "Прихватна меморија слике : %d MB"
+
+msgid "Picture finder"
+msgstr "Проналазач слика"
+
+msgid "Picture finder plugin"
+msgstr "Прикључак проналазач слика"
+
+#, perl-format
+msgid "Picture size : %d"
+msgstr "Величина слике : %d"
+
+msgid "Pictures and music files"
+msgstr "Сликовне и музичке датотеке"
+
+msgid "Pictures files"
+msgstr "Сликовне датотеке"
+
+msgid "Play"
+msgstr "Пусти"
+
+msgid "Play Only Displayed"
+msgstr "Изведи само приказано"
+
+msgid "Play Only Selected"
+msgstr "Изведи само изабрано"
+
+msgid "Play a list of files"
+msgstr "Изведи списак датотека"
+
+msgid "Play all songs from this album"
+msgstr "Изведи све песме са овог албума"
+
+msgid "Play all songs from this artist"
+msgstr "Изведи све песме овог извођача"
+
+msgid "Play button"
+msgstr "Дугме за пуштање"
+
+msgid "Play count"
+msgstr "Број извођења"
+
+msgid "Play counter"
+msgstr "Бројач извођења"
+
+msgid "Play filter"
+msgstr "Услов извођења"
+
+msgid "Play history"
+msgstr "Историја извођења"
+
+msgid "Play listed songs"
+msgstr "Изведи наведене песме"
+
+msgid "Play order"
+msgstr "Редослед извођења"
+
+msgid "Play, queue or track"
+msgstr "Пушта, заказује или нумера"
+
+msgid "Play/Pause"
+msgstr "Пусти/пауза"
+
+msgid "Playback"
+msgstr "Пуштање"
+
+msgid "Playcount: "
+msgstr "Број извођења:"
+
+msgid "Played Today"
+msgstr "Данас извођено"
+
+msgid "Player mounted on :"
+msgstr "Извођач накачен на :"
+
+msgid "Player window layout :"
+msgstr "Распоред прозора извођача :"
+
+msgid "Playing"
+msgstr "Извођење"
+
+msgid "Playing Album"
+msgstr "Извођење албума"
+
+msgid "Playing Artist"
+msgstr "Извођач пуштеног"
+
+msgid "Playing Filter"
+msgstr "Услов за пуштање"
+
+msgid "Playing Title"
+msgstr "Наслов извођене нумере"
+
+msgid "Playing and queue icons"
+msgstr "Иконе заказаног и извођења"
+
+#, perl-brace-format
+msgid "Playing error : {error}"
+msgstr "Грешка ори извођењу : {error}"
+
+msgid "Playlist"
+msgstr "Списак за извођење"
+
+msgid "Playlist 1"
+msgstr "Списак за извођењ 1"
+
+msgid "Playlist Empty"
+msgstr "Списак је празан"
+
+msgid "Playlist Utilities Bar"
+msgstr "Трака алатки за сређивање спискова песама"
+
+msgid "Playlist empty"
+msgstr "Списак за извођење је празан"
+
+msgid "Playlist files"
+msgstr "Датотеке списка нумера"
+
+msgid "Playlist filter"
+msgstr "Услов списка за извођење"
+
+msgid "Playlist filter :\n"
+msgstr "Услов списка за извођење:\n"
+
+msgid "Playlists"
+msgstr "Спискови нумера"
+
+msgid "Plugin not loaded"
+msgstr "Прикључак није учитан"
+
+msgid "Plugins"
+msgstr "Прикључци"
+
+msgid "Popularimeter"
+msgstr "Омиљеномер"
+
+msgid "Popup Custom window"
+msgstr "Искакање прилагођеног прозора"
+
+msgid "Popup Traytip"
+msgstr "Искакање облачића системске палете"
+
+msgid "Popup notify window"
+msgstr "Искакање прозора обавештења"
+
+msgid "Popup playlist filter menu"
+msgstr "Искачући изборник услова списака извођења"
+
+msgid "Popup playlist order menu"
+msgstr "Искакање изборника редоследа списка за извођење"
+
+msgid "Popup queue menu"
+msgstr "Искакање изборника заказаног"
+
+msgid "Pre-set"
+msgstr "Задате поставке"
+
+msgid "Prefered place to load and save lyrics :"
+msgstr "Омиљено место за учитавање и  чување стихова :"
+
+msgid "Preferences"
+msgstr "Поставке"
+
+msgid "Prepend"
+msgstr "Предложи"
+
+msgid "Press a key or a key combination"
+msgstr "Притисните дугме или низ тастера"
+
+msgid "Previous"
+msgstr "Претходно"
+
+msgid "Previous Song"
+msgstr "Претходна песма"
+
+msgid "Previous Song In Playlist"
+msgstr "Претходна песма у списку за извођење"
+
+msgid "Previous page"
+msgstr "Претходна страна"
+
+msgid "Price paid"
+msgstr "Исплаћена цена"
+
+msgid "Private Data"
+msgstr "Лични подаци"
+
+msgid "Produced (P)"
+msgstr "Произведен (P)"
+
+msgid "Progress"
+msgstr "Напредак"
+
+msgid "Properties"
+msgstr "Особине"
+
+msgid "Provides context views using MozEmbed or WebKit"
+msgstr "Омогућава приручне прегледе користећи Мозембед или Вебкит"
+
+msgid "Proxy host :"
+msgstr "Домаћин прикучника :"
+
+msgid "Publication right"
+msgstr "Права издавања"
+
+msgid "Publisher"
+msgstr "Издавач"
+
+msgid "Publisher/Studio logotype"
+msgstr "Издавач/студио логотип"
+
+msgid "Queue"
+msgstr "Заказано"
+
+#, perl-format
+msgid "Queue (%n)"
+msgstr "Заказано (%n)"
+
+msgid "Queue Edit"
+msgstr "Уређивање заказаног"
+
+msgid "Queue album"
+msgstr "Закажи албум"
+
+msgid "Queue artist"
+msgstr "Закажи извођача"
+
+msgid "Queue empty"
+msgstr "Заказано је празно"
+
+msgid "Queue in Sidebar"
+msgstr "Заказано у бочну траку"
+
+msgid "Queue mode"
+msgstr "Начин рада заказано"
+
+msgid "Queue options"
+msgstr "Могућности заказаног"
+
+msgid "Quick Search"
+msgstr "Брза претрага"
+
+msgid "Quick Search with SongTree"
+msgstr "Брза претрага стабла песама"
+
+msgid "Quit"
+msgstr "Изађи"
+
+msgid "Quit when queue empty"
+msgstr "Изађи кад се заказано испразни"
+
+msgid "Radio title"
+msgstr "Назив радија"
+
+msgid "Radio url"
+msgstr "Адреса радија"
+
+msgid "Random"
+msgstr "Насумично"
+
+msgid "Random Playback"
+msgstr "Насумично извођење"
+
+msgid "Random mode edition"
+msgstr "Издање насумичног начина"
+
+msgid "Rating"
+msgstr "Оцена"
+
+msgid "Rating (picture)"
+msgstr "Оцена (слика)"
+
+msgid "Rating between 0 and 100, or empty for default"
+msgstr "Оцена између 0 и 100, или празно за задато"
+
+msgid "Rating range:"
+msgstr "Опсег оцена:"
+
+msgid "Re-load layouts"
+msgstr "Учитај поново распоред"
+
+msgid "Re-read tags"
+msgstr "Поново учитај ознаке"
+
+msgid "Re-reading tags"
+msgstr "Поново читавање ознака"
+
+msgid "Re-shuffle"
+msgstr "Поново промешај"
+
+msgid "Read/write in file tag"
+msgstr "Упис/читање у ознакама датотеке"
+
+msgid "Recent Filters"
+msgstr "Скорашњи услови"
+
+msgid "Recent albums"
+msgstr "Скорашњи албуми"
+
+msgid "Recent artists"
+msgstr "Скорашњи извођачи"
+
+msgid "Recent songs"
+msgstr "Скорашње песме"
+
+msgid "Recent songs include skipped songs that haven't been played."
+msgstr "Скрашње песме укључују прескочене песме које нису извођене"
+
+msgid "Recently played"
+msgstr "Скорашње извођено"
+
+msgid "Recently played songs"
+msgstr "Скоро слушане песме"
+
+msgid "Record label"
+msgstr "Сними ознаке"
+
+msgid "Recording Dates"
+msgstr "Снимање датума"
+
+msgid "Recording date"
+msgstr "Датум снимања"
+
+msgid "Recording type"
+msgstr "Врста снимања"
+
+msgid "Reference point :"
+msgstr "Односна тачка :"
+
+msgid "Refresh"
+msgstr "Освежи"
+
+msgid "Refresh list"
+msgstr "Освежава списак"
+
+msgid "Regular expression"
+msgstr "Регуларан израз"
+
+msgid "Regular expression :"
+msgstr "Регуларан израз :"
+
+msgid "Regular expression didn't match"
+msgstr "Регуларан израз се није поклопио"
+
+msgid "Release date"
+msgstr "Датум издања"
+
+msgid "Remember last Filter/Playlist between sessions"
+msgstr "Запамти последњи услов/списак за извођење између сесија"
+
+msgid "Remember playing position between sessions"
+msgstr "Запамти положај извођења између сесија"
+
+msgid "Remember playing song between sessions"
+msgstr "Запамти тренутно извођене песме између сесија"
+
+msgid "Remember queue between sessions"
+msgstr "Запамти заказано између сесија"
+
+msgid "Remixer"
+msgstr "Промешач"
+
+msgid "Remove"
+msgstr "Уклони"
+
+msgid "Remove a label from the current song"
+msgstr "Уклони ознаку из тренутне песме"
+
+msgid "Remove all"
+msgstr "Уклони све"
+
+msgid "Remove all songs"
+msgstr "Уклони све песме"
+
+msgid "Remove filter"
+msgstr "Уклони услов"
+
+msgid "Remove from disk"
+msgstr "Уклони са диска"
+
+msgid "Remove from library"
+msgstr "Уклони из збирке"
+
+msgid "Remove from list"
+msgstr "Уклони са списка"
+
+msgid "Remove from playlist"
+msgstr "Уклони из списка извођења"
+
+msgid "Remove from queue"
+msgstr "Уклони из заказаних"
+
+msgid "Remove header, footer and left column from wikipedia pages"
+msgstr "Уклони заглавље, подножје и леву колону из страница викпедије"
+
+msgid "Remove label"
+msgstr "Уклони ознаку"
+
+msgid "Remove list"
+msgstr "Уклони списак"
+
+msgid "Remove selected songs"
+msgstr "Уклони изабране песме"
+
+msgid "Remove this field"
+msgstr "Уклони ово поље"
+
+msgid "Remove this rule"
+msgstr "Уклони ово правило"
+
+msgid "Remove this tab"
+msgstr "Уклони овај јзичак"
+
+msgid "Remove this tag"
+msgstr "Уклони ову ознаку"
+
+msgid "Remove this widget"
+msgstr "Уклони ову справицу"
+
+msgid "Rename"
+msgstr "Преименуј"
+
+msgid "Rename File"
+msgstr "Преименуј датотеку"
+
+msgid "Rename file"
+msgstr "Преименуј датотеку"
+
+msgid "Rename files using this pattern :"
+msgstr "Преименуј датотеке користећи овај образац :"
+
+msgid "Rename folder"
+msgstr "Преименуј фасциклу"
+
+msgid "Rename this folder to :"
+msgstr "Преименуј ову фасциклу у :"
+
+msgid "Rename/move files based on these fields :"
+msgstr "Преименуј/премести датотеке на основу ових поља :"
+
+#, perl-brace-format
+msgid ""
+"Renaming {oldname}\n"
+"to {newname}\n"
+"failed : {error}"
+msgstr ""
+"Преименовање {oldname}\n"
+"у {newname}\n"
+"није успело : {error}"
+
+msgid "Reorganize files and folders"
+msgstr "Преуреди датотеке и фасцикле"
+
+msgid "Repeat"
+msgstr "Понови"
+
+msgid "Replace"
+msgstr "Замени"
+
+msgid "Replace existing values"
+msgstr "Замени постојеће вредности"
+
+msgid "Replace..."
+msgstr "Замена ..."
+
+msgid "ReplayGain options"
+msgstr "Могућности гласноће извођења"
+
+msgid "Replaygain"
+msgstr "Гласноћа извођења"
+
+msgid "Replaygain analysis"
+msgstr "Раставање гласноће извођења"
+
+msgid "Rescan"
+msgstr "Поново провери"
+
+msgid "Rescan Collection"
+msgstr "Поново провери збирку"
+
+msgid "Reset filter"
+msgstr "Поништи услов"
+
+msgid "Retrieves album-relevant information (review etc.) from allmusic.com."
+msgstr "Добавља битне податке албума (критике итд.) са allmusic.com."
+
+msgid "Review"
+msgstr "Критика"
+
+msgid "Rewind"
+msgstr "Премотавање уназад"
+
+msgid "Rhythmbox"
+msgstr "Музичка кутија"
+
+msgid "Rhythmbox 2nd queue column"
+msgstr "Бочна површ заказаног по угледу на Музичку кутију 2"
+
+msgid "Right aligned"
+msgstr "Десно поравнато"
+
+msgid "Right side"
+msgstr "Десна страна"
+
+msgid "Right-click to remove filters"
+msgstr "Десни клик за уклањање услова"
+
+msgid "Right-click to toggle shuffle/random"
+msgstr "Десни клик за измену мешај/насумично"
+
+msgid "Rip"
+msgstr "Чупај"
+
+msgid "Rip plugin"
+msgstr "Прикључак за чупање"
+
+msgid "Ripping software :"
+msgstr "Програм за чупање :"
+
+msgid "Run a command when playing a song"
+msgstr "Покрени наредбу приликом извођења песме"
+
+msgid "Run perl code"
+msgstr "Покрени перл шифру"
+
+msgid "Run system command"
+msgstr "Покрени наредбу система"
+
+msgid "Running time"
+msgstr "Време рада"
+
+msgid "Same Title"
+msgstr "Исти назив"
+
+msgid "Same album"
+msgstr "Исти албум"
+
+msgid "Same artist"
+msgstr "Исти извођач"
+
+msgid "Same title"
+msgstr "Исти наслов"
+
+msgid "Same year"
+msgstr "Иста година"
+
+msgid "Sampling Rate"
+msgstr "Проток узорковања"
+
+msgid "Saturday"
+msgstr "Субота"
+
+msgid "Save"
+msgstr "Сачувај"
+
+msgid "Save Tags/Options"
+msgstr "Сачувај ознаке/могућности"
+
+msgid "Save album info in:"
+msgstr "Сачувај податке албума у :"
+
+msgid "Save artist biography"
+msgstr "Сачувај животопис извођача"
+
+msgid "Save as..."
+msgstr "Сачувај као..."
+
+msgid "Save current filter as"
+msgstr "Сачувај тренутне услове као"
+
+msgid "Save current list as"
+msgstr "Сачувај тренутни списак као"
+
+msgid "Save lyrics"
+msgstr "Сачувај стихове"
+
+msgid "Save now"
+msgstr "Сачувај сада"
+
+msgid "Save picture as"
+msgstr "Сачувај слику као"
+
+msgid "Save review"
+msgstr "Сачувај критике"
+
+msgid ""
+"Save selected fields for all tracks on the same album whenever album data is "
+"loaded from allmusic or from file."
+msgstr ""
+"Сачувај изабрана поља за све нумере на истом албуму увек када су подаци све "
+"музике из свих датотека учитани."
+
+#, perl-format
+msgid "Save tags/settings every %d minutes"
+msgstr "Сачувај ознаке/поставке сваких %d минута"
+
+msgid "Saved"
+msgstr "Сачувано"
+
+msgid "Saved Lists"
+msgstr "Сачувани спискови"
+
+msgid "Saved filters"
+msgstr "Сачувај услове"
+
+msgid "Saved lists"
+msgstr "Сачувани спискови"
+
+msgid "Scan Collection"
+msgstr "Прегледа збирку"
+
+msgid "Scan as an album"
+msgstr "Прегледа као албум"
+
+msgid "Scan for new songs"
+msgstr "Прегледа за новим песмама"
+
+msgid "Scan per-file track gain"
+msgstr "Прегледа за гласноћом извођења за сваку датотеку засебно"
+
+msgid "Scan this file"
+msgstr "Прегледа ову датотеку"
+
+msgid "Scan using tag-defined album"
+msgstr "Прегледа користећи ознаке албума"
+
+msgid "Scanning"
+msgstr "Преглед"
+
+msgid "Scroll with song"
+msgstr "Премиче са песмом"
+
+msgid "Scroll with the song"
+msgstr "Премиче са песмом"
+
+msgid "Scrollwheel to change, right-click to mute"
+msgstr "Точкић миша за промену, десни клик за утишавање"
+
+msgid "Search"
+msgstr "Претрага"
+
+msgid "Search : "
+msgstr "Претрага : "
+
+msgid "Search Album"
+msgstr "Тражи албум"
+
+msgid "Search Artist"
+msgstr "Тражи извођача"
+
+msgid "Search Comment"
+msgstr "Тражи напомену"
+
+msgid "Search Genre"
+msgstr "Тражи жанр"
+
+msgid "Search Label"
+msgstr "Тражи ознаку"
+
+msgid "Search Title"
+msgstr "Тражи наслов"
+
+msgid "Search Title, Artist and Album"
+msgstr "Тражи наслов, извођача и албум"
+
+msgid "Search Title, Artist, Album, Comment, Label and Genre"
+msgstr "Тражи наслов, извођача, албум, напомену, ознаку и жанр"
+
+msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
+msgstr "Тражи наслов, извођача, албум, напомену, ознаку, жанр и назив датотеке"
+
+msgid "Search album"
+msgstr "Тражи албум"
+
+msgid "Search all fields"
+msgstr "Претражите сва поља"
+
+msgid "Search allmusic for Artist"
+msgstr "Претражује „allmusic“ за извођачем"
+
+msgid "Search amazon.com for Artist"
+msgstr "Претражује „amazon.com“ за извођачем"
+
+msgid "Search and display lyrics"
+msgstr "Тражи и приказује стихове"
+
+msgid "Search box type"
+msgstr "Врста кућице за претрагу"
+
+msgid "Search discogs for Artist"
+msgstr "Претражује „discogs“ за извођачем"
+
+msgid "Search for Artist on youtube"
+msgstr "Претражује „youtube“ за извођачем"
+
+msgid "Search for a picture on internet"
+msgstr "Тражи слику на Интернету"
+
+msgid "Search for artist on:"
+msgstr "Тражи извођача на :"
+
+msgid "Search for current album"
+msgstr "Тражи тренутни албум"
+
+msgid "Search for current artist"
+msgstr "Тражи тренутног извођача"
+
+msgid "Search for new songs on startup"
+msgstr "Тражи нове песме при покретању"
+
+msgid "Search google for Artist"
+msgstr "Тражи Гуглом за звођачем"
+
+msgid "Search on the web"
+msgstr "Претражи веб"
+
+msgid "Search options"
+msgstr "Могућности претраге"
+
+msgid "Search pitchfork for Artist"
+msgstr "Претражује „pitchfork“ за извођечем"
+
+msgid "Search title"
+msgstr "Назив претраге"
+
+msgid "Search window layout :"
+msgstr "Размештај прозора претраге :"
+
+msgid "Search:"
+msgstr "Тражи:"
+
+msgid "Searching for a picture of : "
+msgstr "Претрага за сликом лика :"
+
+msgid "Seek"
+msgstr "Тражи"
+
+msgid "Select current song"
+msgstr "Означи тренутну песму"
+
+msgid "Select fields"
+msgstr "Означи поља"
+
+msgid "Select files"
+msgstr "Изаберите датотеке"
+
+msgid "Select matches"
+msgstr "Означи поклапања"
+
+msgid "Select search fields"
+msgstr "Означи поа претраге"
+
+msgid "Selected : "
+msgstr "Означено : "
+
+msgid "Selected songs"
+msgstr "Означене песме"
+
+# А? :)
+msgid "Selected songs to update :"
+msgstr "Означене песме за надоргадњу "
+
+msgid "Selecting pictures"
+msgstr "Означавање слике"
+
+msgid "Seller"
+msgstr "Продавац"
+
+msgid "Send Title/Artist/Album in standard input"
+msgstr "Шаље наслов/извођача/албум у уобичајени улаз"
+
+msgid "Set Current Song Rating"
+msgstr "Постави оцену садашњој песми"
+
+msgid "Set Picture"
+msgstr "Постави слику"
+
+msgid "Set as primary filter"
+msgstr "Постави као први услов"
+
+msgid "Set focus on a layout widget"
+msgstr "Постави у фокус размештај справица"
+
+msgid "Set grouping"
+msgstr "Разврставај"
+
+msgid "Set icon"
+msgstr "Постави икону"
+
+msgid "Set player window layout"
+msgstr "Постави размештај прозора пуштача"
+
+msgid "Set subgroup"
+msgstr "Постави подврсту"
+
+#, perl-brace-format
+msgid "Set {year} as year for all tracks on this album."
+msgstr "Постави {year} као годину за све нумере на овом албуму."
+
+msgid "Settings"
+msgstr "Подешавања"
+
+msgid "Settings on this page will only take effect after a restart"
+msgstr "Поставке на овој "
+
+#, perl-format
+msgid ""
+"Shell command\n"
+"(some variables such as %f (current song filename) or %F (list of selected "
+"songs filenames) are available)"
+msgstr ""
+"Наредба шкољке\n"
+"(неке променљиве попут %f (тренутни назив датотеке песме) или %F (списак "
+"означених назива песама) су доступни)"
+
+#. Shift key
+msgctxt "Keyboard"
+msgid "Shift"
+msgstr "Више"
+
+msgid "Show"
+msgstr "Прикажи"
+
+msgid "Show Artist page on last.fm"
+msgstr "Прикажи страницу извођача на „last.fm“"
+
+msgid "Show Artist page on wikipedia"
+msgstr "Прикажи страницу извођача на Викпедији"
+
+msgid "Show album"
+msgstr "Прикажи албум"
+
+msgid "Show artist picture"
+msgstr "Прикажи слику извођача"
+
+msgid "Show artist's biography"
+msgstr "Прикажи животопис извођача"
+
+msgid "Show artist's upcoming events"
+msgstr "Прикажи заказане догађаје извођача"
+
+msgid "Show buttons"
+msgstr "Прикажи дугмиће"
+
+msgid "Show genre"
+msgstr "Прикажи жанр"
+
+msgid "Show in sound menu"
+msgstr "Прикажи у изборнику звука"
+
+msgid "Show info panel"
+msgstr "Приказ окна објашњења"
+
+msgid "Show main window"
+msgstr "Прикажи главни прозор"
+
+msgid "Show playlist"
+msgstr "Прикажи списак за извођење"
+
+msgid "Show replaygain submenu"
+msgstr "Прикажи подизборник гласноће извођења"
+
+msgid "Show similar artists"
+msgstr "Прикажи сличе извођаче"
+
+msgid "Show song details"
+msgstr "Прикажи појединости песме"
+
+msgid "Show status bar"
+msgstr "Прикажи траку стања"
+
+msgid "Show suggestions"
+msgstr "Прикажи предлоге"
+
+msgid "Show tabs"
+msgstr "Прикажи језичке"
+
+msgid "Show tray icon"
+msgstr "Прикажи иконицу у системској палети"
+
+msgid "Show tray tip on song change"
+msgstr "Прикажи облачић палете при промени песме"
+
+msgid "Show/Hide"
+msgstr "Прикажи/сакриј"
+
+msgid "Show/Hide Browser"
+msgstr "Прикажи/сакриј прегледник"
+
+msgid "Show/Hide Cover"
+msgstr "Прикажи/сакриј корице"
+
+msgid "Show/Hide layout widget(s)"
+msgstr "Прикажи/Сакриј справицу(е) размештаја"
+
+msgid "Show/Hide lyrics line"
+msgstr "Прикажи/сакриј линију стихова"
+
+msgid "Show/hide URI entry"
+msgstr "Прикажи/сакриј улаз УРИ адресе"
+
+msgid "Show/hide status bar"
+msgstr "Прикажи/сакриј траку стања"
+
+msgid "Shuffle"
+msgstr "Насумично"
+
+msgid "Shuffle queue"
+msgstr "Мешај редослед заказаног"
+
+msgid "Shuffled albums"
+msgstr "Промешани албуми"
+
+msgid "Shuffled albums, shuffled tracks"
+msgstr "Промешани албуми, промешане нумере"
+
+msgid "Shutdown command :"
+msgstr "Наредба гашења :"
+
+msgid "Sidebar"
+msgstr "Бочна површ"
+
+msgid "Similar"
+msgstr "Слично"
+
+msgid "Similar Artists"
+msgstr "Слични извођачи"
+
+msgid "Simple List View"
+msgstr "Једноставан преглед списка"
+
+msgid "Simple title"
+msgstr "Једноставан наслов"
+
+msgid "Size"
+msgstr "Величина"
+
+msgid "Skip count"
+msgstr "Прескочи садржај"
+
+msgid "Skip history"
+msgstr "Прескочи историју"
+
+msgid "Skip to next song if an error occurs"
+msgstr "Прескочи следећу песму у случају грешке"
+
+msgid "Small"
+msgstr "Мале"
+
+msgid "Small album picture"
+msgstr "Мала слика албума"
+
+msgid "Small player"
+msgstr "Мали пуштач"
+
+msgid "Smaller browser"
+msgstr "Мали прегледник"
+
+msgid "Song"
+msgstr "Песма"
+
+msgid "Song Properties"
+msgstr "Особине песме"
+
+msgid "Song informations"
+msgstr "Подаци о песми"
+
+msgid "Song rating"
+msgstr "Оцена врсте"
+
+msgid "SongTree groupings edition"
+msgstr "Издање разврставања са стаблом песама "
+
+msgid "Songs Properties"
+msgstr "Својства песме"
+
+msgid "Songtree View"
+msgstr "Преглед стабла песама"
+
+msgid "Sort"
+msgstr "Разврстај"
+
+msgid "Sort mode edition"
+msgstr "Издање уређеног начина"
+
+msgid "Sort order"
+msgstr "Редослед уређења"
+
+msgid "Split artist names on :"
+msgstr "Подели називе извођача на :"
+
+msgid "Standard fields"
+msgstr "Уобичајена поља"
+
+msgid "Start ReplayGain analysis"
+msgstr "Покрени растављање гласноће извођења"
+
+msgid "Start in tray"
+msgstr "Покрени у палети"
+
+msgid "Statistics"
+msgstr "Статистика"
+
+msgid "Statusbar"
+msgstr "Трака стања"
+
+msgid "Stop"
+msgstr "Заустави"
+
+msgid "Stop checking"
+msgstr "Престани са провером"
+
+msgid "Stop fetching albuminfo"
+msgstr "Престани са добаљањем података албума"
+
+msgid "Stop scanning"
+msgstr "Престани са прегледом"
+
+msgid "Stop selecting pictures"
+msgstr "Престани са означавањем слика"
+
+msgid "Stop when queue empty"
+msgstr "Заустави кад се заказано испразни"
+
+msgid "Stop, Play and Next buttons"
+msgstr "Тастери стој, пусти и сладећи"
+
+msgid "Stop, Play and Next buttons and Time"
+msgstr "Тастери стој, пусти и следећи и време"
+
+msgid "Stop, Play and Next buttons and Title/Artist"
+msgstr "Тастери стој, пусти и следећи и наслов/извођач"
+
+msgid "Strip wikipedia pages"
+msgstr "Скини странице викпедије"
+
+msgid "Styles"
+msgstr "Начини"
+
+msgid "Submit Now-Playing OK"
+msgstr "Излагање тренутно извођене песме је успело"
+
+msgid "Submit OK"
+msgstr "Излагање успело"
+
+msgid "Submit failed : "
+msgstr "Нисам успео да изложим : "
+
+msgid "Submit played songs to last.fm"
+msgstr "Изложи извођене песме на „last.fm“"
+
+msgid "Subtitle"
+msgstr "Поднаслов"
+
+msgid "Summary :"
+msgstr "Збир :"
+
+msgid "Sunday"
+msgstr "Недеља"
+
+msgid "Switch to fullscreen mode"
+msgstr "Покрени преко целог екрана"
+
+msgid "System clock is not close enough to the current time"
+msgstr "Системски часовник није близу тренутном времену"
+
+msgid "System command :"
+msgstr "Наредба система :"
+
+msgid "Tag"
+msgstr "Ознака"
+
+msgid "Tags"
+msgstr "Ознаке"
+
+msgid "Terms of use"
+msgstr "Услови коришћења"
+
+msgid "Text"
+msgstr "Текст"
+
+msgid ""
+"The artists similar to the 'seed'-artist will be used to populate the queue, "
+"but you can decide to exclude the 'seed'-artist him/herself."
+msgstr ""
+"Извођачи слични „сејаном“ -извођачу ће бити коришћни за попуну заказаног, "
+"али, можете одлучити да изузмете „сејаног“ -извођача самог."
+
+msgid "The layout for this desktop widget is missing."
+msgstr "Размештај ове справице површи није доступан"
+
+msgid "Themes"
+msgstr "Теме"
+
+msgid "These fields can be used :"
+msgstr "Ова поља не могу бити коришћена :"
+
+#, perl-brace-format
+msgid "This command is required to play files of type {type} : {cmd}"
+msgstr "Ова наредба је потребна за извођење датотека врсте {type} : {cmd}"
+
+#, perl-format
+msgid "This label is set for %d song."
+msgid_plural "This label is set for %d songs."
+msgstr[0] "Ова ознака је постављена за %d песму"
+msgstr[1] "Ова ознака је постављена за %d песме"
+msgstr[2] "Ова ознака је постављена за %d песама"
+
+msgid "This plugin requires :"
+msgstr "Овај прикључак захтева :"
+
+msgid ""
+"This plugin retrieves artist-relevant information (biography, upcoming "
+"events, similar artists) from last.fm."
+msgstr ""
+"Овај прикључак добавља податке о извођачу (животопис, заказане догађаје, "
+"сличне извођаче) са „last.fm“."
+
+#, perl-format
+msgid "Threshold to count a song as played : %d %"
+msgstr "Задршка за бројач пуштене песме : %d %"
+
+msgid "Thursday"
+msgstr "Четвртак"
+
+msgid "Time :"
+msgstr "Време :"
+
+#, perl-format
+msgid "Timeout : %d seconds"
+msgstr "Време одмора : %d seconds"
+
+msgid "Timespan of the fade-out in seconds"
+msgstr "Трајање ишчезавања у секундама"
+
+msgid "Title"
+msgstr "Наслов"
+
+msgid "Title & icon"
+msgstr "Наслов и икона"
+
+msgid "Title & progress"
+msgstr "Наслов и напредак"
+
+msgid "Title - Artist - Album"
+msgstr "Назив - извођач - албум"
+
+msgid "Title or filename"
+msgstr "Наслов или назив датотеке"
+
+#, perl-format
+msgid "Title: %t"
+msgstr "Наслов: %t"
+
+#, perl-format
+msgid "Title: %t (Track No. %n)"
+msgstr "Наслов: %t (нумера бр. %n)"
+
+msgid "Titlebar"
+msgstr "Трака наслова"
+
+msgid "Titlebar overlay plugin"
+msgstr "Прикључак заклањајуће траке наслова"
+
+msgid "Toggle Album Lock"
+msgstr "Укључује/искључује закључавање албума"
+
+msgid "Toggle Artist Lock"
+msgstr "Укључује/искључује закучавање извођача"
+
+msgid "Toggle Song Lock"
+msgstr "Укључуј/искључује закључавање песме"
+
+msgid "Toggle a label of the current song"
+msgstr "Укључуј/искључује натпис садашње песме"
+
+msgid "Toggle between Random/Shuffle and Ordered"
+msgstr "Укључуј/искључује насумично/мешај и редно"
+
+msgid "Toggle fullscreen mode"
+msgstr "Искључује/укључује приказ преко целог екрана"
+
+msgid "Toggle the fullscreen layout"
+msgstr "Укључуј/искључује размештај преко целог екрана"
+
+msgid "Toolbar"
+msgstr "Трака алата"
+
+msgid "Tools"
+msgstr "Алатке"
+
+msgid "Total playcount:"
+msgstr "Укупан број извођења:"
+
+msgid "Track"
+msgstr "Нумера"
+
+msgid "Track Properties"
+msgstr "Особине нумере"
+
+msgid "Track gain"
+msgstr "Гласноћа нумере"
+
+msgid "Track peak"
+msgstr "Врхунац нумере"
+
+msgid "Tray tip window layout :"
+msgstr "Размештај прозора облачића палете"
+
+msgid "Tuesday"
+msgstr "Уторак"
+
+msgid "Turn Off"
+msgstr "Искључи"
+
+msgid "Turn off computer when queue empty"
+msgstr "Искључи рачунар кад се заказано испразни"
+
+msgid "URL"
+msgstr "УРЛ адреса"
+
+msgid "Unique file identifier"
+msgstr "Јединствени указивач датотеке"
+
+msgid "Unknown album"
+msgstr "Непознат албум"
+
+#, perl-brace-format
+msgid "Unknown field ({field})"
+msgstr "Непознато поље ({field})"
+
+msgid "Unknown filter :"
+msgstr "Непознати услов"
+
+#, perl-format
+msgid "Unknown layout '%s'"
+msgstr "Непознати размештај „%s“"
+
+msgid "Unlock Album"
+msgstr "Откључај албум"
+
+# :D
+msgid "Unlock Artist"
+msgstr "Откључај извођача"
+
+msgid "Unnamed custom command"
+msgstr "Непозната прилагођена нареба"
+
+msgid "Unnamed filter"
+msgstr "Неименовани услов"
+
+msgid "Untitled"
+msgstr "Неименовано"
+
+msgid "Update tags"
+msgstr "Освежи ознаке"
+
+msgid "Update tags..."
+msgstr "Освежава ознаке ..."
+
+msgid "Upper left"
+msgstr "Горе-лево"
+
+msgid "Upper right"
+msgstr "Горе-лесно"
+
+msgid "Use Equalizer"
+msgstr "Користи уједначивач"
+
+msgid ""
+"Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are "
+"probably better supported by other softwares"
+msgstr ""
+"Користи ИД3в2.4 уместо ИД3в2.3 при стварању ИД3в2 ознаке, ИД3в2.3 су можда "
+"боље подржани другим софтвером"
+
+msgid "Use MozEmbed"
+msgstr "Користи МозЕмбед"
+
+msgid "Use ReplayGain"
+msgstr "Користи гласноћу извођења"
+
+msgid "Use WebKit"
+msgstr "Користи Вебкит"
+
+msgid "Use a master filter"
+msgstr "Користи главни услов"
+
+msgid "Use album normalization instead of track normalization"
+msgstr "Користи уједначавање албума уместо уједначавања нумере"
+
+msgid "Use default regular expression"
+msgstr "Користи задати регуларни израз"
+
+msgid "Use gstreamer"
+msgstr "Користи гстример"
+
+msgid "Use latin1 encoding if possible in id3v2 tags"
+msgstr "Користи кодирање латин1 ако је могуће у ИД3в2 ознаке"
+
+msgid "Use the playing filter"
+msgstr "Користи услов у употреби"
+
+#, perl-brace-format
+msgid "Use this picture as cover for album '{album}'"
+msgstr "Користи ову слику као корице за албум „{album}“"
+
+#, perl-brace-format
+msgid "Use this picture for artist '{artist}'"
+msgstr "Користи ову слику за извођача „{artist}“"
+
+#, perl-brace-format
+msgid "Use {command} to play {ext} files"
+msgstr "Користи {command} за пуштање {ext} датотека"
+
+msgid "Used for clipping prevention"
+msgstr "Коришћено за спречавање изобличења"
+
+msgid "Used for the Artists field"
+msgstr "Користи се за поље извођача"
+
+msgid "Used to associate the saved value with a user or a function"
+msgstr "Користи се за придруживање сачуване вредности са корисником или радњом"
+
+msgid "User authentification error"
+msgstr "Грешка при препознавању корисника"
+
+msgid "Value not written in file tag"
+msgstr "Вредност није уписана у ознаци датотеке"
+
+msgid "Value written in file tag"
+msgstr "Вредност је уписана у ознаци датотеке"
+
+msgid "Various artists"
+msgstr "Разни извођачи"
+
+msgid "Version"
+msgstr "Издање"
+
+msgid "View"
+msgstr "Преглед"
+
+msgid "View Binary"
+msgstr "Прегледај бинарне датотеку"
+
+msgid "View binary data ..."
+msgstr "Прегледај бинарне податке"
+
+msgid "Volume : "
+msgstr "Гласноћа : "
+
+msgid "Volume step :"
+msgstr "Корак појачања гласноће"
+
+msgid "Wait for more when queue empty"
+msgstr "Сачекај за још кад је заказано празно"
+
+msgid ""
+"Warning : these are advanced options, don't change them unless you know what "
+"you are doing."
+msgstr ""
+"Упозорење : ово су напредне могућности, не мењајте их осим ако знате шта "
+"радите."
+
+msgid "Warning : using a folder with invalid encoding, you should rename it."
+msgstr ""
+"Упозорење : користите фасциклу са неисправним кодирањем, требате је "
+"преименовати."
+
+msgid "Warning: all existing data for this field will be lost"
+msgstr "Упозорење: сви доступни подаци за ово поље ће бити изгубљени"
+
+msgid "Warning: an identifier is needed"
+msgstr "Упозорење: указивач је потребан"
+
+msgid "Warning: converting existing data to this format may be lossy"
+msgstr ""
+"Упозорење: претварање постојећих података у овај облик може бити са губитком"
+
+msgid "Web context"
+msgstr "Веб објашњење"
+
+msgid "Web context plugin"
+msgstr "Прикључак веба објашњење"
+
+msgid "Wednesday"
+msgstr "Среда"
+
+msgid "Weighted Random"
+msgstr "Умерена насумичност"
+
+msgid "When added"
+msgstr "По додавању"
+
+msgid ""
+"When changing songs, the previous song is added to the recent list even if "
+"not played at all."
+msgstr ""
+"При промени песме, претходна песма се додаје списку скорашњих догађаја чак и "
+"ако није уопште извођена."
+
+msgid "When current song"
+msgstr "При тренутној песми"
+
+msgid "Whole library"
+msgstr "Цела збирка"
+
+msgid "Widget name"
+msgstr "Име елемента"
+
+msgid "Wikipedia"
+msgstr "Викпедија"
+
+msgid "Wikipedia Locale"
+msgstr "Месна Викпедија"
+
+msgid ""
+"Will not write the tags except with the advanced tag editing dialog. The "
+"changes will be kept in the library instead.\n"
+"Warning, the changes for a song will be lost if the tag is re-read."
+msgstr ""
+"Неће се уписивати ознаке осим са прозорчетом напредног уређивача ознака. "
+"Измене ће се уместо тога држати у збирци.\n"
+"Упозорење, измене на песми ће бити изгубљене ако се ознака опет прочита."
+
+msgid "Will use default if not found"
+msgstr "Ако није пронађено, користиће се задато"
+
+#. Windows key
+msgctxt "Keyboard"
+msgid "Win"
+msgstr "Супер Такс"
+
+msgid "Windows"
+msgstr "Прозори"
+
+msgid "Words that begin with"
+msgstr "Реч која почиње са"
+
+msgid "Write filenames to ..."
+msgstr "Уписује називе датотека ..."
+
+msgid ""
+"Write value of selected fields in the tags. Useful for fields that were "
+"previously not written to tags, to make sure the current value is written."
+msgstr ""
+"Уписује вредности означених поа у ознаке. Корисно за поља која претходно "
+"нису била уписана у ознаке, за проверу да ли је садашња вредност уписана."
+
+msgid "Writing tags"
+msgstr "Уписивање ознака"
+
+msgid "Year"
+msgstr "Година"
+
+msgid "Year - Album"
+msgstr "Година - албум"
+
+msgid "Year - Artist"
+msgstr "Година - извођач"
+
+msgid "Yes"
+msgstr "Да"
+
+msgid ""
+"You can force a check for these files by holding shift when selecting \"Re-"
+"read tags\""
+msgstr ""
+"Можете приморати проверу за овим датотекама држећи ВИШЕ при означавању "
+"„поново учитај ознаке“"
+
+msgid "You must specify a base folder"
+msgstr "Морате одредити фасциклу"
+
+msgid "_Insert column"
+msgstr "_Убаците колону"
+
+msgid "_Remove this column"
+msgstr "_Уклоните ову колону"
+
+msgid "_Retry"
+msgstr "_Понови"
+
+msgid "_Sort by"
+msgstr "_Разврстај по"
+
+# А? :)
+msgid "a bright coloured fish"
+msgstr "светла обојена риба"
+
+msgid "abort copy"
+msgstr "откажи умножавање"
+
+msgid "abort move"
+msgstr "откажи премештање"
+
+msgid "add"
+msgstr "додај"
+
+msgid "advanced options"
+msgstr "напредне могућности"
+
+msgid "after"
+msgstr "након"
+
+#, perl-format
+msgid "after %s"
+msgstr "након %s"
+
+msgid "album information now for"
+msgstr "подаци о албуму су сада за"
+
+#. comma-separated list of field aliases for album, these are in addition to english aliases
+msgctxt "Field_aliases"
+msgid "album,on"
+msgstr "албум,на"
+
+msgid "albums missing reviews"
+msgstr "недостајуће критике албума"
+
+msgid "alphabetical"
+msgstr "абецедно"
+
+msgid "amixer control :"
+msgstr "амиксер контрола :"
+
+msgid "another example"
+msgstr "други пример"
+
+msgid "applied on reload"
+msgstr "примењено при поновном учитавању"
+
+msgid "apply filter"
+msgstr "примени услов"
+
+#, perl-brace-format
+msgid "argument {n} :"
+msgstr "аргумент {n} :"
+
+msgid "artist"
+msgstr "извођач"
+
+#. comma-separated list of field aliases for artist, these are in addition to english aliases
+msgctxt "Field_aliases"
+msgid "artist,by"
+msgstr "извођач,од"
+
+msgid "auto detect"
+msgstr "сам препознај"
+
+msgid "autofill"
+msgstr "самопопуна"
+
+msgid "automatic size"
+msgstr "самостално подешава величину"
+
+msgid "back cover"
+msgstr "задње корице"
+
+msgid "band"
+msgstr "група"
+
+msgid "band/artist logotype"
+msgstr "група/извођач логотип"
+
+msgid "before"
+msgstr "пре"
+
+#, perl-format
+msgid "before %s"
+msgstr "пре %s"
+
+msgid "between"
+msgstr "између"
+
+#, perl-format
+msgid "between %s ago and %s ago"
+msgstr "раније, између %s и %s"
+
+#, perl-format
+msgid "between %s and %s"
+msgstr "између %s и %s"
+
+msgid "between (absolute dates)"
+msgstr "између (апсолутни датуми)"
+
+msgid "between (relative dates)"
+msgstr "између (односни датуми)"
+
+msgid "big size"
+msgstr "велико"
+
+msgid "bonus tracks"
+msgstr "додатне нумере"
+
+msgid "boolean"
+msgstr "логичка вредност"
+
+msgid "bootleg"
+msgstr "сара"
+
+msgid "broken"
+msgstr "неисправно"
+
+msgid "by"
+msgstr "од"
+
+msgid "by added"
+msgstr "од додатог"
+
+msgid "by lastplay"
+msgstr "од последњег извођења"
+
+msgid "by lastplay & bootleg"
+msgstr "од последњег извођења и саре"
+
+msgid "by lastplay & play count"
+msgstr "од lastplay и бројача извођења"
+
+msgid "by play count"
+msgstr "од броја пуштања"
+
+msgid "by rating"
+msgstr "према оцени"
+
+#, perl-brace-format
+msgid "by {artist} from {album}"
+msgstr "од {artist} са {album}"
+
+#, perl-brace-format
+msgid "by {author}"
+msgstr "од {author}"
+
+msgid "bytes"
+msgstr "бајта"
+
+msgid "check length now"
+msgstr "провери дужину сада"
+
+msgid "check now"
+msgstr "провери сада"
+
+msgid "cloud mode"
+msgstr "режим облака"
+
+msgid "command :"
+msgstr "наредба :"
+
+msgid "common number"
+msgstr "обичан број"
+
+msgid "common string"
+msgstr "обична ниска"
+
+msgid "composer"
+msgstr "састављач"
+
+msgid "conductor"
+msgstr "диригент"
+
+msgid "connection failed"
+msgstr "повезивање није успело"
+
+msgid "connection failed."
+msgstr "повезивање није успело."
+
+msgid "contains"
+msgstr "садржи"
+
+#, perl-format
+msgid "contains %s"
+msgstr "садржи %s"
+
+#, perl-format
+msgid "contains %s (case sensitive)"
+msgstr "садржи %s (осетиво на величину слова)"
+
+msgid "counter"
+msgstr "бројач"
+
+msgid "custom"
+msgstr "произвољна"
+
+msgid "day"
+msgstr "дан"
+
+msgid "days"
+msgstr "дана"
+
+msgid "default"
+msgstr "основно"
+
+msgid "default filename"
+msgstr "задати назив датотеке"
+
+msgid "default folder"
+msgstr "основна фасцикла"
+
+msgid "delete selected filter"
+msgstr "бриши означени услов"
+
+msgid "delete selected grouping"
+msgstr "избриши одабрано разврставање"
+
+msgid "delete selected random mode"
+msgstr "брише означени насумични начин"
+
+msgid "delete selected sort mode"
+msgstr "брише означени уређени начин"
+
+msgid "different folders"
+msgstr "различите фасцикле"
+
+#, perl-brace-format
+msgid "disc {disc}"
+msgstr "диск {disc}"
+
+#, perl-format
+msgid "doesn't contain %s"
+msgstr "не садржи %s"
+
+#, perl-format
+msgid "doesn't contain %s (case sensitive)"
+msgstr "не садржи %s (осетиво на величину слова)"
+
+msgid "doesn't have a picture"
+msgstr "нема слику"
+
+#, perl-format
+msgid "doesn't include %s"
+msgstr "не укључује %s"
+
+#, perl-format
+msgid "doesn't include artist %s"
+msgstr "не укључује извођача %s"
+
+#, perl-format
+msgid "doesn't match regexp %s"
+msgstr "не одговара уобичајеном изразу %s"
+
+#, perl-format
+msgid "doesn't match regexp %s (case sensitive)"
+msgstr "не одговара уобичајеном изразу %s (осетљиво на величину слова)"
+
+msgid "during performance"
+msgstr "учинак диска"
+
+msgid "during recording"
+msgstr "за време снимања"
+
+msgid "email"
+msgstr "ел. пошта"
+
+msgid "empty"
+msgstr "празно"
+
+msgid "enable gapless (experimental)"
+msgstr "омогући извођење без губитака (gapless, експериментално)"
+
+msgid "entire collection"
+msgstr "цела збирка"
+
+msgid "error"
+msgstr "грешка"
+
+msgid "ex :"
+msgstr "бивша :"
+
+#, perl-brace-format
+msgid "example (selected song) : {score}  ({chances})"
+msgstr "пример (изабрана песма) : {score}  ({chances})"
+
+msgid "example :"
+msgstr "пример :"
+
+msgid "example : "
+msgstr "пример :"
+
+#, perl-format
+msgid "example : %s"
+msgstr "пример : %s"
+
+msgid "examples :"
+msgstr "примери :"
+
+#, perl-format
+msgid "fallback-gain : %d dB"
+msgstr "помоћна гласноћа : %d dB"
+
+msgid "false"
+msgstr "нетачно"
+
+msgid "favorite"
+msgstr "омиљени"
+
+msgid "file tag"
+msgstr "ознака датотеке"
+
+msgid "filters"
+msgstr "услови"
+
+msgid "flags"
+msgstr "одреднице"
+
+msgid "float"
+msgstr "број са покретним зарезом"
+
+msgid "font size depends on"
+msgstr "величина словног лика зависи од"
+
+msgid "for files without a VBR header"
+msgstr "за датотеке без ВБР заглавља"
+
+msgid "front cover"
+msgstr "чеоне корице"
+
+msgid "fuzzy match"
+msgstr "нејасно поклапање"
+
+msgid "gmusicbrowser"
+msgstr "гномов музички брстач"
+
+#, perl-format
+msgid "gmusicbrowser is playing %t from %l (%Y) by %a"
+msgstr "гном музички брстач свира %t из  %l (%Y) од %a"
+
+msgid "google images"
+msgstr "гугл слике"
+
+msgid "google images (hi-res)"
+msgstr "гугл слике (високи квалитет)"
+
+msgid "group by"
+msgstr "разврстај по"
+
+msgid "has a picture"
+msgstr "има слику"
+
+msgid "has at least one"
+msgstr "има најмање једно"
+
+msgid "has been played"
+msgstr "свирано је"
+
+msgid "has been skipped"
+msgstr "прескочено је"
+
+msgid "has none"
+msgstr "нема ништа"
+
+msgid "hours"
+msgstr "сати"
+
+msgid "huge size"
+msgstr "огромна величина"
+
+msgid "id3v1 tag"
+msgstr "ид3в1 ознака"
+
+msgid "ignore title"
+msgstr "занемари назив"
+
+msgid "illustration"
+msgstr "цртеж"
+
+msgid "imported list"
+msgstr "увезени списак"
+
+#, perl-format
+msgid "in %l"
+msgstr "у %l"
+
+msgid "in the bottom"
+msgstr "на дну"
+
+#, perl-format
+msgid "in the bottom %s"
+msgstr "на дну %s"
+
+msgid "in the top"
+msgstr "на врху"
+
+#, perl-format
+msgid "in the top %s"
+msgstr "на врху %s"
+
+msgid "includes"
+msgstr "укључује"
+
+#, perl-format
+msgid "includes %s"
+msgstr "укључује %s"
+
+msgid "includes artist"
+msgstr "укључује извођача"
+
+#, perl-format
+msgid "includes artist %s"
+msgstr "укључује извођача %s"
+
+msgid "integer"
+msgstr "цео број"
+
+msgid "interview"
+msgstr "разговор"
+
+msgid "invalid pattern"
+msgstr "неисправан образац"
+
+msgid "inverse"
+msgstr "Изврнуто"
+
+msgid "is"
+msgstr "је"
+
+#, perl-format
+msgid "is %s"
+msgstr "је %s"
+
+msgid "is 44.1kHz"
+msgstr "је 44.1kHz"
+
+msgid "is a flac file"
+msgstr "је флак датотека"
+
+msgid "is a lossless file"
+msgstr "је звучна датотека без губитака loosles"
+
+msgid "is a lossy file"
+msgstr "је звучна датотека sa губицима loosy"
+
+msgid "is a mp3 file"
+msgstr "је мп3 датотека"
+
+msgid "is a musepack file"
+msgstr "је мјузпак датотека"
+
+msgid "is a vorbis file"
+msgstr "је ворбис датотека"
+
+msgid "is a wavepack file"
+msgstr "је вејв датотека"
+
+msgid "is an aac file"
+msgstr "је аац датотека"
+
+msgid "is an alac file"
+msgstr "је алац датотека"
+
+msgid "is an ape file"
+msgstr "је ејп датотека"
+
+msgid "is an mp4/m4a file"
+msgstr "је пм4/м4а датотека"
+
+msgid "is defined"
+msgstr "је одрђено"
+
+msgid "is equal to"
+msgstr "је једнако са"
+
+#, perl-format
+msgid "is equal to %s"
+msgstr "је једнако са %s"
+
+msgid "is false"
+msgstr "је нетачно"
+
+msgid "is in"
+msgstr "је у"
+
+#, perl-format
+msgid "is in %s"
+msgstr "је у %s"
+
+msgid "is mono"
+msgstr "је моно"
+
+msgid "is not defined"
+msgstr "није одређено"
+
+msgid "is smart equal"
+msgstr "је паметно једнако"
+
+#, perl-format
+msgid "is smart equal to %s"
+msgstr "је паметно једнако са %s"
+
+msgid "is stereo"
+msgstr "је стерео"
+
+msgid "is true"
+msgstr "је тачно"
+
+#, perl-format
+msgid "isn't %s"
+msgstr "није %s"
+
+#, perl-format
+msgid "isn't equal to %s"
+msgstr "је једнако са %s"
+
+#, perl-format
+msgid "isn't in %s"
+msgstr "није у %s"
+
+msgid "isn't mono"
+msgstr "није моно"
+
+msgid "isn't stereo"
+msgstr "није стерео"
+
+msgid ""
+"itunes doesn't support unsynchronised tags last time I checked, mostly "
+"affect tags with pictures"
+msgstr ""
+"на задњој провери ајтјунс није подржавао неусаглашене ознаке, углавном "
+"погађа ознаке са сликама"
+
+msgid "last.fm"
+msgstr "Last.fm"
+
+msgid "last.fm plugin"
+msgstr "прикључак за  last.fm"
+
+msgid ""
+"last.fm's similarity categories:\n"
+">90 super\n"
+">70 very high\n"
+">50 high\n"
+">30 medium\n"
+">10 lower"
+msgstr ""
+"сличне категорије по last.fm:\n"
+">90 одлично\n"
+">70 врло високо\n"
+">50високо\n"
+">30 средње\n"
+">10 ниже"
+
+msgid "lead artist"
+msgstr "водећи извођач"
+
+msgid "leaflet page"
+msgstr "страна летака"
+
+msgid "left-side filter panes"
+msgstr "окно услова леве стране"
+
+msgid "length of songs"
+msgstr "дужина песама"
+
+msgid "less than"
+msgstr "пре мање од"
+
+#, perl-format
+msgid "less than %s ago"
+msgstr "скорије од %s"
+
+msgid "lyricist"
+msgstr "стихописац"
+
+msgid "lyrics file"
+msgstr "датотека стихова"
+
+msgid "matches regexp"
+msgstr "одговара уобичајеном изразу"
+
+#, perl-format
+msgid "matches regexp %s"
+msgstr "одговара уобичајеном изразу %s"
+
+#, perl-format
+msgid "matches regexp %s (case sensitive)"
+msgstr "одговара уобичајеном изразу %s (осетиво на величину слова)"
+
+msgid "maximum font size"
+msgstr "највећа величина словног лика"
+
+msgid "media"
+msgstr "медиј"
+
+msgid "medium size"
+msgstr "средња величина"
+
+msgid "minimal"
+msgstr "најмање"
+
+msgid "minimum font size"
+msgstr "најмања величина словног лика"
+
+msgid "minutes"
+msgstr "минута"
+
+msgid "month"
+msgstr "месец"
+
+msgid "months"
+msgstr "месеци"
+
+msgid "more than"
+msgstr "пре више од"
+
+#, perl-format
+msgid "more than %s ago"
+msgstr "раније од %s"
+
+msgid "mosaic mode"
+msgstr "мозаични начин"
+
+msgid "move folder"
+msgstr "премести фасциклу"
+
+msgid "movie/video screen capture"
+msgstr "узимање слике екрана филма/видеа"
+
+msgid ""
+"mp3 files without a VBR header requires a full scan to check its real length "
+"and bitrate"
+msgstr ""
+"мп3 датотеке без ВБР заглавља захтевају потпуни преглед за проверу њихове "
+"стварне дужине и брзине битова"
+
+msgid "mplayer executable :"
+msgstr "извршна датотека мплејера :"
+
+msgid "mplayer options :"
+msgstr "могућности мплејера :"
+
+msgid "multi-lines string"
+msgstr "иске са више линија"
+
+msgid "name of the new filter"
+msgstr "име новог услова"
+
+msgid "name of the new grouping"
+msgstr "назив новог разврставања"
+
+msgid "name of the new random mode"
+msgstr "име новог насумичног начина"
+
+msgid "name of the new sort mode"
+msgstr "име новог уређеног начина"
+
+msgid "never"
+msgstr "никад"
+
+msgid "never played"
+msgstr "никад није извођено"
+
+#, perl-format
+msgid "no %s fuzzy match with %s"
+msgstr "%s нема нејасно преклапање са %s"
+
+msgid "no matches found, you might want to remove some search terms."
+msgstr "нема преклапања, можда желите уклонити неке изразе из оретраге."
+
+msgid "no order"
+msgstr "нема поретка"
+
+msgid "no picture"
+msgstr "нема слике"
+
+msgid "no pictures"
+msgstr "нема слика"
+
+msgid "no plugins found"
+msgstr "нисам пронашао прикључке"
+
+msgid "no songs needs checking"
+msgstr "нема песам којима је потребна провера"
+
+msgid "no splitting"
+msgstr "нема одвајања"
+
+msgid "no to all"
+msgstr "не свима"
+
+msgid "noname"
+msgstr "безимени"
+
+msgid "normal"
+msgstr "обичан"
+
+#, perl-format
+msgid "not between %s ago and %s ago"
+msgstr "није између %s и %s"
+
+#, perl-format
+msgid "not between %s and %s"
+msgstr "није између %s и %s"
+
+msgid "not defined"
+msgstr "није одређено"
+
+#, perl-format
+msgid "not in the bottom %s"
+msgstr "није на дну %s"
+
+#, perl-format
+msgid "not in the top %s"
+msgstr "није на врху %s"
+
+#, perl-format
+msgid "not present in %s"
+msgstr "није присутно у %s"
+
+#, perl-format
+msgid "not set to %s"
+msgstr "није подешено на %s"
+
+#, perl-format
+msgid "not the %s least recent"
+msgstr "није међу %s скорашњих"
+
+#, perl-format
+msgid "not the %s most recent"
+msgstr "није међу %s скорашњих"
+
+msgid "number of songs"
+msgstr "број песама"
+
+msgid "number of songs in filter"
+msgstr "број песама у услову"
+
+msgid "only show entries with at least n songs"
+msgstr "само прикажи ставке са најмање n песама"
+
+msgid "only works when the artist-info tab is displayed"
+msgstr "само ради кад је приказан језичак подаци о извођачу"
+
+msgid "only works with some lyrics source and when the lyrics tab is active"
+msgstr "ради само са неким изворима стихова и кад је покренут језичак стихова"
+
+msgid "open context window"
+msgstr "отвори приручни розор"
+
+msgid "options"
+msgstr "могућности"
+
+#, perl-format
+msgid "or %d seconds"
+msgstr "или %d секунди"
+
+msgid "other"
+msgstr "остало"
+
+msgid "other file icon"
+msgstr "друга икона датотеке"
+
+msgid "output device :"
+msgstr "излазни урђај :"
+
+msgid "password :"
+msgstr "лозинка :"
+
+msgid "perl code"
+msgstr "перл код"
+
+msgid "picture size"
+msgstr "величина слике"
+
+msgid "play count average"
+msgstr "просек бројача извођења"
+
+msgid "played>4"
+msgstr "извођене>4"
+
+msgid "port :"
+msgstr "прикључник :"
+
+msgid "pre-amp"
+msgstr "претпојачање"
+
+#, perl-format
+msgid "pre-amp : %d dB"
+msgstr "пртпојачање : %d dB"
+
+#, perl-format
+msgid "present in %s"
+msgstr "присутно у %s"
+
+msgid "present in list"
+msgstr "присутно у списку"
+
+msgid "quit"
+msgstr "излаз"
+
+msgid "rating"
+msgstr "оцена"
+
+msgid "rating average"
+msgstr "просечна оцена"
+
+msgid "recording location"
+msgstr "снимање места"
+
+msgid "requires xdg-screensaver"
+msgstr "захтева „xdg-screensaver“"
+
+#, perl-brace-format
+msgid "reset filter {nb}"
+msgstr "поништи услов {nb}"
+
+msgid "reset format"
+msgstr "поништи облик"
+
+msgid "reset primary filter"
+msgstr "поништи први услов"
+
+msgid "reset secondary filter"
+msgstr "поништи другостепени услов"
+
+msgid "retry"
+msgstr "покушај поново"
+
+#, perl-brace-format
+msgid "retry in {seconds} s"
+msgstr "покушај кроз {seconds} s"
+
+msgid "reverse order"
+msgstr "обрнути редослед"
+
+#, perl-brace-format
+msgid "save as '{name}'"
+msgstr "сачувај као „{name}“"
+
+msgid "save filter as"
+msgstr "сачувај услове као"
+
+msgid "save grouping as"
+msgstr "сачувај разврставање као"
+
+msgid "save random mode as"
+msgstr "сачувај насумични начин као"
+
+msgid "save sort mode as"
+msgstr "сачувај уређени начин као"
+
+msgid "saved filters"
+msgstr "сачувани услови"
+
+msgid "saved groupings"
+msgstr "сачувана разврставања"
+
+msgid "saved random modes"
+msgstr "сачувани насумични начини"
+
+msgid "saved sort modes"
+msgstr "сачувани уређени начин"
+
+msgid "scan now"
+msgstr "прегледај сада"
+
+msgid "seconds"
+msgstr "секунди"
+
+msgid "set to"
+msgstr "постави на"
+
+#, perl-format
+msgid "set to %s"
+msgstr "постави на %s"
+
+msgid "show histogram background"
+msgstr "прикажи позадински хистограм"
+
+msgid "show pictures"
+msgstr "прикажи слике"
+
+msgid "show the 'All' row"
+msgstr "прикажи ред „Све“"
+
+msgid "similar-artists"
+msgstr "слични извођачи"
+
+msgid "skin options"
+msgstr "могућности кошуљице"
+
+msgid "skip count average"
+msgstr "прескочи просек бројача"
+
+msgid "small size"
+msgstr "мала величина"
+
+msgid "sort by"
+msgstr "разврстај по"
+
+msgid "static list"
+msgstr "непроменљиви списак"
+
+msgid "stop"
+msgstr "заустави"
+
+msgid "string"
+msgstr "ниска"
+
+msgid "supports : "
+msgstr "подржава : "
+
+msgid "text format"
+msgstr "облик текста"
+
+msgid "text mode"
+msgstr "режим текста"
+
+#, perl-format
+msgid "the %s least recent"
+msgstr "%s најдаљих скорашњих"
+
+#, perl-format
+msgid "the %s most recent"
+msgstr "%s најближих скорашњих"
+
+#, perl-brace-format
+msgid "the command {name}"
+msgstr "наредба {name}"
+
+msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
+msgstr "задатао је утф16 за ИД3в2.3 и утф8 за ИД3в2.4"
+
+#, perl-brace-format
+msgid "the file {name}"
+msgstr "датотека {name}"
+
+msgid "the least recent"
+msgstr "најдаљи скорашњи"
+
+msgid "the most recent"
+msgstr "најближи скорашњи"
+
+#, perl-brace-format
+msgid "the {name} perl module"
+msgstr "{name} перл модул"
+
+#, perl-brace-format
+msgid "then {action}"
+msgstr "онда {action}"
+
+msgid "times"
+msgstr "пута"
+
+#. comma-separated list of field aliases for title, these are in addition to english aliases
+msgctxt "Field_aliases"
+msgid "title"
+msgstr "наслов"
+
+msgid "toggle Intersection mode"
+msgstr "укључује/искљључује начин укрштања"
+
+msgid "toggle Invert mode"
+msgstr "укучује/искључује обрнути начин"
+
+msgid "tools"
+msgstr "прибори"
+
+msgid "true"
+msgstr "тачно"
+
+msgid "turn off"
+msgstr "искључи"
+
+msgid "unknown"
+msgstr "непознато"
+
+msgid "unknown error"
+msgstr "непозната грешка"
+
+msgid "unnamed random mode"
+msgstr "неименовани насумични начин"
+
+msgid "url"
+msgstr "урл адреса"
+
+msgid "url-encoded list of files"
+msgstr "урл кодовани списак датотека"
+
+msgid "url-encoded list of files/folders"
+msgstr "урл кодовани списак датотека/фасцикли"
+
+msgid "use :"
+msgstr "користи :"
+
+msgid "use album name"
+msgstr "користи назив албума"
+
+msgid "use default"
+msgstr "користи основно"
+
+msgid "use gnome settings"
+msgstr "користи гном поставке"
+
+msgid "use song folder"
+msgstr "користи фасциклу песама"
+
+msgid "use standard strftime variables"
+msgstr "користи уобичајену временску променљиву"
+
+msgid "username :"
+msgstr "корисничко име :"
+
+msgid "using skin :"
+msgstr "користи кошуљицу :"
+
+msgid "wait for more"
+msgstr "сачекајте још"
+
+msgid "weeks"
+msgstr "недеље"
+
+msgid "weight :"
+msgstr "сачекајте :"
+
+msgid "wikipedia, lyrics, and custom webpages"
+msgstr "викпедија, стихови, и прилагођене веб странице"
+
+msgid "with browser"
+msgstr "са прегледником"
+
+msgid "with browser & queue"
+msgstr "са разгледачем и заказаним"
+
+msgid "with browser (SongTree)"
+msgstr "са прегледником (стабло песама)"
+
+msgid "with lists"
+msgstr "са списком"
+
+msgid "with picture"
+msgstr "са сликом"
+
+msgid "with playlist"
+msgstr "са списком за извођење"
+
+msgid "with queue"
+msgstr "са заказаним"
+
+msgid "with search"
+msgstr "са претрагом"
+
+msgid "with search and lists"
+msgstr "са претрагом и списковима"
+
+msgid "with search and lists 2"
+msgstr "са претрагом и списковима 2"
+
+msgid ""
+"without gstreamer : one stream per file, one connection at a time\n"
+"with gstreamer : one continuous stream, multiple connection possible"
+msgstr ""
+"Без гстримера : један ток по датотеци, једна текућа веза\n"
+"са гстримером : један уједначени ток, многоструке везе омогућене"
+
+msgid "x offset :"
+msgstr "x одстојање :"
+
+msgid "y offset :"
+msgstr "y одстојање :"
+
+msgid "year"
+msgstr "година"
+
+msgid "year (highest)"
+msgstr "година (највише)"
+
+msgid "years"
+msgstr "године"
+
+msgid "yes to all"
+msgstr "да за све"
+
+#, perl-brace-format
+msgid ""
+"{album}\n"
+"<small>by</small> {artist}"
+msgstr ""
+"{album}\n"
+"<small>од</small> {artist}"
+
+#, perl-brace-format
+msgid "{folder} already exists"
+msgstr "{folder} већ постоји"
+
+#, perl-brace-format
+msgid "{hours} hours {min} min {sec} s ({size} M)"
+msgstr "{hours} сати {min} минута {sec} секунди ({size} M)"
+
+#, perl-brace-format
+msgid "{hours}h {min}m {sec}s ({size}M)"
+msgstr "{hours}h {min}m {sec}s ({size}M)"
+
+#, perl-brace-format
+msgid "{hours}h{min}m{sec}s"
+msgstr "{hours}h{min}m{sec}s"
+
+#, perl-brace-format
+msgid "{min} min {sec} s ({size} M)"
+msgstr "{min} min {sec} s ({size} M)"
+
+#, perl-brace-format
+msgid "{min}m {sec}s ({size}M)"
+msgstr "{min}m {sec}s ({size}M)"
+
+#, perl-brace-format
+msgid "{min}m{sec}s"
+msgstr "{min}m{sec}s"
+
+#, perl-brace-format
+msgid "{outputname} output settings"
+msgstr "{outputname} излазне поставке"
+
+#, perl-brace-format
+msgid "{songs} by {artists}"
+msgstr "{songs} од {artists}"
+
+#, perl-brace-format
+msgid "{song} by {artist}"
+msgstr "{song} од {artist}"
+
+msgid "|-separated list of widget names"
+msgstr "|-одваја списак од назива справица"

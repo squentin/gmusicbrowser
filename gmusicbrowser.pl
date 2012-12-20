@@ -5637,6 +5637,7 @@ sub AboutDialog
 		'Italian : Michele Giampaolo',
 		'Dutch : Gijs Timmers',
 		'Japanese : Sunatomo',
+		'Serbian : Саша Петровић',
 	);
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
