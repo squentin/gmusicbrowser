@@ -2262,6 +2262,7 @@ sub Activate
 {	my ($view,$button)=@_;
 	my $self=::find_ancestor($view,__PACKAGE__);
 	my $filter= $self->get_selected_filters;
+	return unless $filter; #nothing selected
 	FilterPane::Activate($self,$button,$filter);
 }
 
