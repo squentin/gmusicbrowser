@@ -26,15 +26,13 @@ use Gtk2::Gdk::Keysyms;
 use base 'Gtk2::Box';
 use constant
 {	OPT	=> 'PLUGIN_ALBUMINFO_',
-	AMG_SEARCH_URL => 'http://allmusic.com/search/album/',
-	AMG_ALBUM_URL => 'http://allmusic.com/album/',
+	AMG_SEARCH_URL => 'http://www.allmusic.com/search/album/',
+	AMG_ALBUM_URL => 'http://www.allmusic.com/album/',
 };
 
 my @showfields =
-(	{short => 'label',	long => _"Record label",	active => 1,	multi => 0,	defaultshow => 1},
-	{short => 'rec_date',	long => _"Recording date",	active => 1,	multi => 0,	defaultshow => 1},
+(	{short => 'rec_date',	long => _"Recording date",	active => 1,	multi => 0,	defaultshow => 1},
 	{short => 'rls_date',	long => _"Release date",	active => 1,	multi => 0,	defaultshow => 1},
-	{short => 'type',	long => _"Recording type",	active => 0,	multi => 0,	defaultshow => 0},
 	{short => 'time',	long => _"Running time",	active => 0,	multi => 0,	defaultshow => 0},
 	{short => 'rating',	long => _"Rating",		active => 1,	multi => 0,	defaultshow => 1},
 	{short => 'genre',	long => _"Genres",		active => 1,	multi => 1,	defaultshow => 0},
@@ -64,7 +62,7 @@ my $albuminfowidget =
 my %Columns=
 (	album	=> { name=> _"Album",				storecol=>0, width=>130, },
 	artist	=> { name=> _"Artist",				storecol=>1, width=>130, },
-	label	=> { name=> ::_p('Record_label',"Label"),	storecol=>2, width=>110, },
+	genre	=> { name=> _"Genre",				storecol=>2, width=>110, },
 	year	=> { name=> _"Year",				storecol=>3, width=>50, },
 );
 
@@ -265,7 +263,7 @@ sub new {
 	my $store = Gtk2::ListStore->new(('Glib::String')x5,'Glib::UInt'); # Album, Artist, Label, Year, URL, Sort order.
 	my $treeview = Gtk2::TreeView->new($store);
 	my %coladded;
-	for my $col ( split(/\s+/,$::Options{OPT.'Columns'}||''), qw/album artist label year/ )
+	for my $col ( split(/\s+/,$::Options{OPT.'Columns'}||''), qw/album artist genre year/ )
 	{	my $coldef= $Columns{$col};
 		next unless $coldef;
 		next if $coladded{$col}++; #only add a column once
@@ -526,7 +524,7 @@ sub print_results {
 	my $store= $self->{treeview}->get_model;
 	$store->set_sort_column_id(5, 'ascending');
 	for (@$result) {
-		$store->set($store->append, 0,$_->{album}, 1,$_->{artist}, 2,$_->{label}, 3,$_->{year}, 4,$_->{url}."/review", 5,$_->{order});
+		$store->set($store->append, 0,$_->{album}, 1,$_->{artist}, 2,$_->{genre}, 3,$_->{year}, 4,$_->{url}, 5,$_->{order});
 	}
 }
 
@@ -605,7 +603,7 @@ sub update_titlebox {
 sub load_search_results {
 	my ($self,$ID,$md,$cb,$html,$type) = @_; # $md = 1 if mass_download, 0 otherwise. $cb = callback function if mass_download, undef otherwise.
 	delete $self->{waiting};
-	my $result = parse_amg_search_results($html, $type); # $result[$i] = {url, album, artist, label, year}
+	my $result = parse_amg_search_results($html, $type); # $result[$i] = {url, album, artist, genre, year}
 	my ($artist,$year) = ::Songs::Get($ID, qw/artist year/);
 	my $url;
 	for my $entry (@$result) {
@@ -613,7 +611,7 @@ sub load_search_results {
 		if (::superlc($entry->{artist}) eq ::superlc($artist)) {
 			if (!$url || ($entry->{year} && $entry->{year} == $year)) {
 				warn "Albuminfo: hit in search results: $entry->{album} by $entry->{artist} from $entry->{year} ($entry->{url})\n" if $::debug;
-				$url = $entry->{url}."/review";
+				$url = $entry->{url};
 			}
 			last if $year && $entry->{year} && $entry->{year} == $year;
 		}
@@ -644,8 +642,10 @@ sub parse_amg_search_results {
 	$html = decode($html, $type);
 	$html =~ s/\n/ /g;
 	# Parsing the html yields @res = (url1, album1, artist1, label1, year1, url2, album2, ...)
-	my @res = $html =~ m|<a href="(http://allmusic\.com/album.*?)">(.*?)</a></td>\s.*?<td>(.*?)</td>\s.*?<td>(.*?)</td>\s.*?<td>(.*?)</td>|g;
-	my @fields = qw/url album artist label year/;
+	#my @res = $html =~ m|<a href="(http://www\.allmusic\.com/album.*?)">(.*?)</a></td>\s.*?<td>(.*?)</td>\s.*?<td>(.*?)</td>\s.*?<td>(.*?)</td>|g;
+	my @res = $html =~ m|<a href="(http://www\.allmusic\.com/album.*?)" data-tooltip=".*?">(.*?)</a>.*?class="artist">.*?<a href=".*?">(.*?)</a>.*?"info">\s*?(\S*?)\s*?<br/>\s*?(\S.*?)\s*?</div>|g;
+	#my @fields = qw/url album artist label year/;
+	my @fields = qw/url album artist year genre/;
 	my @result;
 	my $i = 0; # Used to sort the hits in manual search
 	while (@res)
@@ -662,28 +662,28 @@ sub parse_amg_album_page {
 	$html =~ s|\n| |g;
 	my $result = {};
 	$result->{url} = $url;
-	$result->{author} = $1 if $html =~ m|<p class="author">by (.*?)</p>|;
-	$result->{review} = $1 if $html =~ m|<p class="text">(.*?)</p>|;
+	$result->{author} = $1 if $html =~ m|class="author">by (.*?)</span>|;
+	$result->{review} = $1 if $html =~ m|<div class="editorial-text.*?>\s*<p>(.*?)</div>\s*</div>\s*</div>|;
 	if ($result->{review}) {
 		$result->{review} =~ s|<br\s.*?/>|\n|gi;      # Replace newline tags by newlines.
-		$result->{review} =~ s|<p\s.*?/>|\n\n|gi;     # Replace paragraph tags by newlines.
+		$result->{review} =~ s|<p>(.*?)</p>|$1\n\n|gi;     # Replace paragraph tags by newlines.
 		$result->{review} =~ s|\n{3,}|\n\n|gi;	      # Never more than one empty line.
-		$result->{review} =~ s|<.*?>(.*?)</.*?>|$1|g; # Remove the rest of the html tags.
+		$result->{review} =~ s|<div.*?>||g;
+		$result->{review} =~ s|</div>||g;
+$result->{review} =~ s|<.*?>(.*?)</.*?>|$1|g; # Remove the rest of the html tags.
 	}
-	$result->{rls_date}	= $1 if $html =~ m|<h3>Release Date</h3>\s*?<p>(.*?)</p>|;
-	$result->{rec_date}	= $1 if $html =~ m|<h3>Recording Date</h3>\s*?<p>(.*?)</p>|;
-	$result->{label}	= $1 if $html =~ m|<h3>Label</h3>\s*?<p>(.*?)</p>|;
-	$result->{type}		= $1 if $html =~ m|<h3>Type</h3>\s*?<p>(.*?)</p>|;
-	$result->{time}		= $1 if $html =~ m|<h3>Time</h3>\s*?<p>(.*?)</p>|;
-	$result->{amgid}	= $1 if $html =~ m|<p class="amgid">(.*?)</p>|; $result->{amgid} =~ s/R\s*/r/;
-	$result->{rating}	= 10*($1+1) if $html =~ m|star_rating\((\d+?)\)|;
-	my ($genrehtml)		= $html =~ m|<h3>Genre</h3>\s*?<ul.*?>(.*?)</ul>|;
-	(@{$result->{genre}})	= $genrehtml =~ m|<li><a.*?>\s.*?(.*?)</a></li>|g if $genrehtml;
-	my ($stylehtml)		= $html =~ m|<h3>Style</h3>\s*?<ul.*?>(.*?)</ul>|;
+	$result->{rls_date}	= $1 if $html =~ m|class="release-date">(.*?)</|;
+	$result->{rec_date}	= $1 if $html =~ m|class="record-date">(.*?)</|;
+	$result->{time}		= $1 if $html =~ m|class="duration">\s*?(.*?)\s|;
+	$result->{amgid}	= $1 if $html =~ m|AMG Pop ID.*?R\s*(.*?)</p>|;
+	$result->{rating}	= 20*$1 if $html =~ m|data-stars="(.*?)"|;
+	my ($genrehtml)		= $html =~ m|class="genres".*?<ul>(.*?)</ul>|;
+	(@{$result->{genre}})	= $genrehtml =~ m|<li><a.*?>(.*?)</a></li>|g if $genrehtml;
+	my ($stylehtml)		= $html =~ m|class="styles".*?<ul>(.*?)</ul>|;
 	(@{$result->{style}})	= $stylehtml =~ m|<li><a.*?>(.*?)</a></li>|g if $stylehtml;
-	my ($moodshtml)		= $html =~ m|<h3>Moods</h3>\s*?<ul.*?>(.*?)</ul>|;
+	my ($moodshtml)		= $html =~ m|class="sidebar-module moods">.*?<ul>(.*?)</ul>|;
 	(@{$result->{mood}})	= $moodshtml =~ m|<li><a.*?>(.*?)</a></li>|g if $moodshtml;
-	my ($themeshtml)	= $html =~ m|<h3>Themes</h3>\s*?<ul.*?>(.*?)</ul>|;
+	my ($themeshtml)	= $html =~ m|class="sidebar-module themes".*?<ul.*?>(.*?)</ul>|;
 	(@{$result->{theme}})	= $themeshtml =~ m|<li><a.*?>(.*?)</a></li>|g if $themeshtml;
 	if ($::Options{OPT.'StyleAsGenre'} && $result->{style}) {@{$result->{genre}} = ::uniq(@{$result->{style}}, @{$result->{genre}})}
 	return $result;
