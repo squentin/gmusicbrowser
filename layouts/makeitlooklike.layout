@@ -17,7 +17,7 @@ VBText		= 2HBTitle 2HBArtist 2HBAlbum
 HBleft		= VBButtons 5_VBText
 HBmenu		= MBmenu 5Sort 5Filter 5Queue 5Pos
 VBleft2		= HBmenu HBleft 3HBTime
-VBVol		= VolumeIcon _VolumeSlider(1,0)
+VBVol		= VolumeIcon _VolumeSlider
 HBupper		= _VBleft2 -VBVol 5-Cover
 HPbrowser	= FilterPane0(nb=1) _SongList
 VBmain		= HBupper 5_HPbrowser
@@ -489,7 +489,7 @@ VBleft		= HBIndic _HBButtons
 HBButtons	= Prev Play Next Time _ABtime
 ABtime		= (xalign=0,yscale=0) TimeBar
 HBupper		= VBleft 5_VBright -VBVol
-VBVol		= VolumeIcon _VolumeSlider(1,0)
+VBVol		= VolumeIcon _VolumeSlider
 HBTitle		= Filler0 _Title -Stars
 HBArtist	= LockArtist _Artist
 HBAlbum		= LockAlbum _Album -Year

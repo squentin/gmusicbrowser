@@ -193,7 +193,7 @@ VBMain = HBMenu _VBMainContainer
 
 			HBSongInfoEtControlsEtTimebarEtVolume = _VBSongInfoEtControlsEtTimebar VBVolume
 
-				VBVolume = VolumeIcon(button=1) _VolumeSlider(1,0)
+				VBVolume = VolumeIcon(button=1) _VolumeSlider
 
 				VBSongInfoEtControlsEtTimebar = -HBControls _VBSongInfoEtTimebar
 
@@ -424,7 +424,7 @@ VBMain = HBMenu 1Filler2 _HBMainContainer 1Filler3
 			-Playlist(size=button,minwidth=34,maxwidth=34) \
 			-Fullscreen(size=button,minwidth=34,maxwidth=34)
 
-		VBVolume = VolumeIcon(button=1) _VolumeSlider(1,0)
+		VBVolume = VolumeIcon(button=1) _VolumeSlider
 
 		HPMainPannel = _VBLeftPanel _VBCenterAndRight
 
@@ -568,7 +568,7 @@ HBQueueActions = -Total3(size="small",group=3)
 VBButtons	= VBPlayingControls _VBVolume VBPanelsControls
 
 VBPlayingControls	= Prev(size=button) Play(size=button) Next(click2=NextAlbum,size=button)
-VBVolume 	= VolumeIcon(button=1,click2=mute,tip=_"Left-clic or scrollwheel to change, right-click to mute") _VolumeSlider(1,0)
+VBVolume 	= VolumeIcon(button=1,click2=mute,tip=_"Left-clic or scrollwheel to change, right-click to mute") _VolumeSlider
 VBPanelsControls = \
 	ToggleButton31(icon=gtk-about,relief=none,size=menu,widget=Context,tip=_"Context") \
 	-Quit2(size=button,minwidth=34,maxwidth=34,tip=_"Quit") \
