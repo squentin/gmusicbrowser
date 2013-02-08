@@ -1,0 +1,2236 @@
+#
+# Translators:
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2012.
+#   <niklas.laxstrom@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: gmusicbrowser\n"
+"Report-Msgid-Bugs-To: http://github.com/squentin/gmusicbrowser/issues\n"
+"POT-Creation-Date: 2012-11-19 19:21+0100\n"
+"PO-Revision-Date: 2012-11-20 19:25+0000\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
+"Language-Team: Finnish (http://www.transifex.com/projects/p/gmusicbrowser/"
+"language/fi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " Fields "
+msgstr " Kentät "
+
+msgid "# songs"
+msgstr "# kappaletta"
+
+#, perl-format
+msgid "%d Album"
+msgid_plural "%d Albums"
+msgstr[0] "%d albumi"
+msgstr[1] "%d albumia"
+
+#, perl-format
+msgid "%d Artist"
+msgid_plural "%d Artists"
+msgstr[0] "%d esittäjä"
+msgstr[1] "%d esittäjää"
+
+#, perl-format
+msgid "%d Song"
+msgid_plural "%d Songs"
+msgstr[0] "%d kappale"
+msgstr[1] "%d kappaletta"
+
+#, perl-format
+msgid "%d Upcoming Event"
+msgid_plural "%d Upcoming Events"
+msgstr[0] "%d tuleva tapahtuma"
+msgstr[1] "%d tulevaa tapahtumaa"
+
+#, perl-format
+msgid "%d album"
+msgid_plural "%d albums"
+msgstr[0] "%d albumi"
+msgstr[1] "%d albumia"
+
+#, perl-format
+msgid "%d artist"
+msgid_plural "%d artists"
+msgstr[0] "%d esittäjä"
+msgstr[1] "%d esittäjää"
+
+#, perl-format
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] "%d tiedosto"
+msgstr[1] "%d tiedostoa"
+
+#, perl-format, perl-brace-format
+msgid "%d file in {folder}"
+msgid_plural "%d files in {folder}"
+msgstr[0] "%d tiedosto kansiossa {folder}"
+msgstr[1] "%d tiedostoa kansiossa {folder}"
+
+#, perl-format
+msgid "%d folder"
+msgid_plural "%d folders"
+msgstr[0] "%d kansio"
+msgstr[1] "%d kansiota"
+
+#, perl-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d sekunti"
+msgstr[1] "%d sekuntia"
+
+#, perl-format
+msgid "%d song"
+msgid_plural "%d songs"
+msgstr[0] "%d kappale"
+msgstr[1] "%d kappaletta"
+
+#, perl-format
+msgid "%d song added"
+msgid_plural "%d songs added"
+msgstr[0] "%d kappale lisätty"
+msgstr[1] "%d kappaletta lisätty"
+
+#, perl-format
+msgid "%d song in queue"
+msgid_plural "%d songs in queue"
+msgstr[0] "%d kappale jonossa"
+msgstr[1] "%d kappaletta jonossa"
+
+#, perl-format
+msgid "%d song in the library"
+msgid_plural "%d songs in the library"
+msgstr[0] "%d kappale kirjastossa"
+msgstr[1] "%d kappaletta kirjastossa"
+
+#, perl-format
+msgid "%d song selected"
+msgid_plural "%d songs selected"
+msgstr[0] "%d kappale valittu"
+msgstr[1] "%d kappaletta valittu"
+
+#, perl-brace-format
+msgid "'{file}' exists. Overwrite ?"
+msgstr "'{file}' on jo olemassa. Korvataanko se?"
+
+msgid "(case insensitive)"
+msgstr "(kirjainkoon huomioiva)"
+
+msgid "(other)"
+msgstr "(muu)"
+
+msgid "(see http://www.last.fm)"
+msgstr "(katso http://www.last.fm)"
+
+msgid "(unstable)"
+msgstr "(epävakaa)"
+
+msgid "0 means 'show all'"
+msgstr "0 tarkoittaa 'näytä kaikki'"
+
+msgid "32x32 PNG file icon"
+msgstr "32×32 PNG-tiedostokuvake"
+
+msgid "50 Last Added"
+msgstr "50 viimeksi lisättyä"
+
+msgid "50 Last Played"
+msgstr "50 viimeksi soitettua"
+
+msgid "50 Most Played"
+msgstr "50 eniten soitettua"
+
+msgid "<Unknown>"
+msgstr "<Tuntematon>"
+
+#, perl-format
+msgid ""
+"<b>%t</b>\n"
+"<small><small>by</small> %a\n"
+"<small>from</small> %l</small>"
+msgstr ""
+"<b>%t</b>\n"
+"<small><small>esittäjä</small> %a\n"
+"<small>albumilta</small> %l</small>"
+
+msgid "Abort"
+msgstr "Keskeytä"
+
+msgid "Abort ReplayGain analysis"
+msgstr "Peru ReplayGain-analyysi"
+
+msgid "About"
+msgstr "Tietoja"
+
+msgid "About to turn off the computer in :"
+msgstr "Aikaa tietokoneen sammumiseen:"
+
+msgid "Actions are not supported by current notification daemon"
+msgstr "Nykyinen ilmoitusjärjestelmä ei tue toimintoja"
+
+msgid "Add"
+msgstr "Lisää"
+
+msgid "Add Files ..."
+msgstr "Lisää tiedostoja..."
+
+msgid "Add Music"
+msgstr "Lisää musiikkia"
+
+msgid "Add a filter"
+msgstr "Lisää suodatin"
+
+msgid "Add a group"
+msgstr "Lisää ryhmä"
+
+msgid "Add a radio"
+msgstr "Lisää radio"
+
+msgid "Add files or folders"
+msgstr "Lisää tiedostoja tai kansioita"
+
+msgid "Add files/folders to library"
+msgstr "Lisää tiedostoja/kansioita kirjastoon"
+
+msgid "Add folder"
+msgstr "Lisää kansio"
+
+msgid "Add folder ..."
+msgstr "Lisää kansio..."
+
+msgid "Add new radio"
+msgstr "Lisää uusi radio"
+
+msgid "Add rule : "
+msgstr "Lisää sääntö: "
+
+msgid "Add shorcut key"
+msgstr "Lisää pikanäppäin"
+
+msgid "Add to playlist"
+msgstr "Lisää soittolistaan"
+
+msgid "Add to queue"
+msgstr "Lisää jonoon"
+
+msgid "Added"
+msgstr "Lisätty"
+
+msgid "Added Today"
+msgstr "Lisätty tänään"
+
+msgid "Advanced Search ..."
+msgstr "Laajennettu haku..."
+
+msgid "Album"
+msgstr "Albumi"
+
+msgid "Album and artist"
+msgstr "Albumi ja esittäjä"
+
+msgid "Album and artist on the left side"
+msgstr "Albumi ja esittäjä vasemalla puolella"
+
+msgid "Album playcount:"
+msgstr "Albumin soittokerrat:"
+
+#, perl-format
+msgid "Album: %l"
+msgstr "Albumi: %l"
+
+#, perl-format
+msgid "Album: %l (%Y)"
+msgstr "Albumi: %l (%Y)"
+
+msgid "Albums"
+msgstr "Albumit"
+
+msgid "All"
+msgstr "Kaikki"
+
+msgid "All Songs"
+msgstr "Kaikki kappaleet"
+
+msgid "All albums"
+msgstr "Kaikki albumit"
+
+msgid "All artists"
+msgstr "Kaikki esittäjät"
+
+msgid "All files"
+msgstr "Kaikki tiedostot"
+
+msgid "All genres"
+msgstr "Kaikki tyylilajit"
+
+msgid "All songs"
+msgstr "Kaikki kappaleet"
+
+msgid "All styles"
+msgstr "Kaikki tyylit"
+
+msgid "All themes"
+msgstr "Kaikki teemat"
+
+#. Alt key
+msgctxt "Keyboard"
+msgid "Alt"
+msgstr "Alt"
+
+msgid "Append to playlist"
+msgstr "Lisää soittolistaan"
+
+msgid "Application"
+msgstr "Sovellus"
+
+msgid "Artist"
+msgstr "Esittäjä"
+
+msgid "Artist & album"
+msgstr "Esittäjä ja albumi"
+
+msgid "Artist (Year - Album)"
+msgstr "Esittäjä (vuosi - albumi)"
+
+msgid "Artist Biography"
+msgstr "Esittäjän biografia"
+
+msgid "Artist picture"
+msgstr "Esittäjän kuva"
+
+msgid "Artist playcount:"
+msgstr "Esittäjän soittokerrat:"
+
+#, perl-format
+msgid "Artist: %a"
+msgstr "Esittäjä: %a"
+
+msgid "Artists"
+msgstr "Esittäjät"
+
+msgid "Ascending order"
+msgstr "Nouseva järjestys"
+
+msgid "Ask confirmation only if file already exists"
+msgstr "Kysy vahvistus, jos tiedosto on jo olemassa"
+
+msgid "Audio"
+msgstr "Ääni"
+
+msgid "Audio properties"
+msgstr "Ääniominaisuudet"
+
+msgid "Author"
+msgstr "Tekijä"
+
+msgid "Automatically remove current song if not found"
+msgstr "Poista automaattisesti nykyinen kappale, jos sitä ei löydy"
+
+msgid "Autosave"
+msgstr "Automaattitallennus"
+
+msgid "Autosave plugin"
+msgstr "Albumit"
+
+msgid "Available"
+msgstr "Saatavilla"
+
+msgid "Basic fields"
+msgstr "Peruskentät"
+
+msgid "Biography"
+msgstr "Biografia"
+
+msgid "Browser views"
+msgstr "x-siirtymä:"
+
+msgid "Buttons"
+msgstr "Painikkeet"
+
+#, perl-brace-format
+msgid ""
+"Can't create Folder '{path}' : \n"
+"{error}"
+msgstr ""
+"Kansion '{path}' luonti epäonnistui: \n"
+"{error}"
+
+msgid "Can't read file or invalid file"
+msgstr "Tiedoston luku ei onnistu tai tiedosto on virheellinen"
+
+msgid "Centered"
+msgstr "Keskitetty"
+
+msgid "Channels"
+msgstr "Kanavat"
+
+msgid "Check Collection"
+msgstr "Tarkista kokoelma"
+
+msgid "Check real length of mp3"
+msgstr "Tarkista mp3-tiedostojen todellinen kesto"
+
+msgid "Check your audio settings"
+msgstr "Tarkista ääniasetuksesi"
+
+msgid "Checking songs"
+msgstr "Tarkistetaan kappaleita"
+
+msgid "Choose Artist/Album/Song"
+msgstr "Valitse esittäjä/albumi/kappale"
+
+msgid "Choose Picture"
+msgstr "Valitse kuva"
+
+msgid "Choose Random Album"
+msgstr "Valitse satunnainen albumi"
+
+msgid "Choose a folder"
+msgstr "Valitse kansio"
+
+msgid "Choose files"
+msgstr "Valitse tiedostot"
+
+msgid "Choose folder to add"
+msgstr "Valitse lisättävä kansio"
+
+msgid "Choose font for lyrics"
+msgstr "Valitse sanoituksissa käytettävä kirjasin"
+
+msgid "Choose font..."
+msgstr "Valitse kirjasin..."
+
+msgid "Choose page to open"
+msgstr "Valitse avattava sivu"
+
+msgid "Choose playlist files to import"
+msgstr "Valitse tuotavat soittolistatiedostot"
+
+msgid "Clear"
+msgstr "Tyhjennä"
+
+msgid "Clear playlist"
+msgstr "Tyhjennä soittolista"
+
+msgid "Clear playlist filter"
+msgstr "Tyhjennä soittolistasuodatin"
+
+msgid "Clear queue"
+msgstr "Tyhjennä jono"
+
+msgid "Clear selected fields"
+msgstr "Tyhjennä valitut kentät"
+
+msgid "Click to show fullsize image"
+msgstr "Napsauta nähdäksesi täysikokoisen kuvan"
+
+msgid "Click to show larger image"
+msgstr "Napsauta nähdäksesi suuremman kuvan"
+
+msgid "Client banned, contact gmusicbrowser's developer"
+msgstr "Sovellus estetty, ota yhteys gmusicbrowserin kehittäjään"
+
+msgid "Close"
+msgstr "Sulje"
+
+msgid "Close Window"
+msgstr "Sulje ikkuna"
+
+msgid "Close a filter"
+msgstr "Sulje suodatin"
+
+msgid "Close to tray"
+msgstr "Sulje ilmoitusalueelle"
+
+msgid "Collection"
+msgstr "Kokoelma"
+
+msgid "Command"
+msgstr "Komento"
+
+msgid "Comment"
+msgstr "Kommentti"
+
+msgid "Comments"
+msgstr "Kommentit"
+
+msgid "Compilation"
+msgstr "Kokoelma"
+
+msgid "Composer"
+msgstr "Säveltäjä"
+
+msgid "Conductor"
+msgstr "Kapellimestari"
+
+msgid "Connect through a proxy"
+msgstr "Yhdistä välityspalvelimen kautta"
+
+msgid "Copy"
+msgstr "Kopioi"
+
+msgid "Copy failed"
+msgstr "Kopiointi epäonnistui"
+
+msgid "Copy link address"
+msgstr "Kopioi linkin osoite"
+
+#, perl-format
+msgid "Copying file"
+msgid_plural "Copying %d files"
+msgstr[0] "Kopioidaan tiedostoa"
+msgstr[1] "Kopioidaan %d tiedostoa"
+
+msgid "Copyright"
+msgstr "Tekijänoikeus"
+
+msgid "Cover Size : "
+msgstr "Kannen koko: "
+
+msgid "Create ID3v2 tags as ID3v2.4"
+msgstr "Luo ID3v2-tunnisteet ID3v2.4-muodossa"
+
+#. Ctrl key
+msgctxt "Keyboard"
+msgid "Ctrl"
+msgstr "Ctrl"
+
+msgid "Current song must always be in the playlist"
+msgstr "Nykyisen kappaleen pitää olla aina soittolistalla"
+
+msgid "Custom"
+msgstr "Oma"
+
+msgid "Custom command :"
+msgstr "Oma komento:"
+
+msgid "Custom fields"
+msgstr "Omat kentät"
+
+msgid "Custom formats"
+msgstr "Saatavilla"
+
+msgid "Custom..."
+msgstr "Oma..."
+
+msgid "Date"
+msgstr "Päiväys"
+
+msgid "Date format :"
+msgstr "Päiväyksen muoto:"
+
+msgid "Date of purchase"
+msgstr "Ostopäivä:"
+
+msgid "Decrease Volume"
+msgstr "Vähennä äänenvoimakkuutta"
+
+msgid "Decrease volume"
+msgstr "Vähennä äänenvoimakkuutta"
+
+msgid "Default"
+msgstr "Oletus"
+
+#, perl-format
+msgid "Default rating : %d %"
+msgstr "Oletusarvostelu: %d %"
+
+msgid "Default text color"
+msgstr "Tekstin oletusväri"
+
+msgid "Default text font"
+msgstr "Tekstin oletuskirjasin"
+
+msgid "Delete"
+msgstr "Poista"
+
+msgid "Delete Selected Songs"
+msgstr "Poista valitut kappaleet"
+
+msgid "Delete list"
+msgstr "Poista lista"
+
+msgid "Descending order"
+msgstr "Laskeva järjestys"
+
+msgid "Description"
+msgstr "Kuvaus"
+
+msgid "Disabled"
+msgstr "Pois käytöstä"
+
+msgid "Disc"
+msgstr "Levy"
+
+msgid "Disc #"
+msgstr "Levy #"
+
+msgid "Disc name"
+msgstr "Levyn nimi"
+
+msgid "Display Songs"
+msgstr "Näytä kappaleet"
+
+msgid "Display synchronized lyrics of the current song"
+msgstr "Tiedoston '{file}' soitto ei onnistu."
+
+msgid "Do not add songs that can't be played"
+msgstr "Älä lisää kappaleita, joita ei voi soittaa"
+
+msgid "Do not create an id3v1 tag in mp3 files"
+msgstr "Älä luo id3v1-tunnisteita mp3-tiedostoihin"
+
+msgid "Do not write the tags"
+msgstr "Älä kirjoita tunnisteita"
+
+msgid "Download"
+msgstr "Lataa"
+
+msgid "Edit"
+msgstr "Muokkaa"
+
+msgid "Edit Current Song Properties"
+msgstr "Muokkaa nykyisen kappaleen ominaisuuksia"
+
+msgid "Edit Lyrics"
+msgstr "Muokkaa sanoituksia"
+
+msgid "Edit Lyrics ..."
+msgstr "Muokkaa sanoituksia..."
+
+msgid "Edit Rating"
+msgstr "Muokkaa arvostelua"
+
+msgid "Edit Settings"
+msgstr "Muokkaa asetuksia"
+
+msgid "Edit filter"
+msgstr "Muokkaa suodatinta"
+
+msgid "Edit filter..."
+msgstr "Muokkaa suodatinta..."
+
+msgid "Edit grouping ..."
+msgstr "Muokkaa ryhmittelyä"
+
+msgid "Edit..."
+msgstr "Muokkaa..."
+
+msgid "Enter album name"
+msgstr "Anna albumin nimi"
+
+msgid "Equalizer"
+msgstr "Taajuuskorjain"
+
+msgid "Error :"
+msgstr "Virhe:"
+
+msgid "Error details"
+msgstr "Virheen tiedot"
+
+msgid "Error writing replaygain tags :\n"
+msgstr "Virhe kirjoittaessa replaygain-tunnisteita:\n"
+
+msgid "Events"
+msgstr "Tapahtumat"
+
+msgid "Example :"
+msgstr "Esimerkki:"
+
+msgid "Export"
+msgstr "Vie"
+
+msgid "Export plugin"
+msgstr "Vientiliitännäinen"
+
+msgid "Export song properties to a .csv file"
+msgstr "Vie kappaleen ominaisuudet .csv-tiedostoon"
+
+msgid "Export to .m3u file"
+msgstr "Vie .m3u-tiedostoksi"
+
+#, perl-brace-format
+msgid ""
+"Failed to delete '{file}' :\n"
+"{error}"
+msgstr ""
+"Tiedoston '{file}' poisto epäonnistui:\n"
+"{error}"
+
+msgid "Field name"
+msgstr "Kentän nimi"
+
+msgid "Field type"
+msgstr "Kentän tyyppi"
+
+msgid "Fields"
+msgstr "Kentät"
+
+msgid "File"
+msgstr "Tiedosto"
+
+msgid "File properties"
+msgstr "Tiedoston ominaisuudet"
+
+msgid "Filename"
+msgstr "Tiedostonimi"
+
+msgid "Filename format :"
+msgstr "Näytä kappaleet"
+
+msgid "Files"
+msgstr "Tiedostot"
+
+msgid "Filesystem"
+msgstr "Tiedostojärjestelmä"
+
+msgid "Filter"
+msgstr "Suodatin"
+
+msgid "Filter : "
+msgstr "Suodatin: "
+
+msgid "Find :"
+msgstr "Etsi:"
+
+msgid "Find songs with same artists"
+msgstr "Etsi saman esittäjän kappaleet"
+
+msgid "Find songs with the same names"
+msgstr "Etsi samannimiset kappaleet"
+
+msgid "Folder"
+msgstr "Kansio"
+
+msgid "Folders to search for new songs"
+msgstr "Kansiot, joista uusia kappaleita etsitään"
+
+msgid "Follow playing song"
+msgstr "Seuraa soitettavaa kappaletta"
+
+msgid "Follow selected song"
+msgstr "Seuraa valittua kappaletta"
+
+msgid "Font size"
+msgstr "Kirjasinkoko"
+
+msgid "Found but not working"
+msgstr "Löytyi, mutta ei toimi"
+
+msgid "Friday"
+msgstr "Perjantai"
+
+msgid "Full screen layout :"
+msgstr "Koko näytön asettelu:"
+
+msgid "Fullscreen"
+msgstr "Koko näyttö"
+
+msgid "Fullscreen simple"
+msgstr "Pelkistetty koko näytön tila"
+
+msgid "GStreamer module not loaded."
+msgstr "GStreamer-moduulia ei ole ladattu."
+
+msgid "Genre"
+msgstr "Tyylilaji"
+
+msgid "Genre is set"
+msgstr "Tyylilaji on asetettu"
+
+msgid "Genres"
+msgstr "Tyylilajit"
+
+msgid "Go to playing song"
+msgstr "Siirry soivaan kappaleeseen"
+
+msgid "Grouping"
+msgstr "Ryhmittely"
+
+msgid "Help"
+msgstr "Ohje"
+
+msgid "Hide"
+msgstr "Piilota"
+
+msgid "Hide toolbar"
+msgstr "Piilota työkalupalkki"
+
+msgid "Icon theme :"
+msgstr "Kuvaketeema:"
+
+msgid "Ignore playback errors"
+msgstr "Jätä huomiotta soittovirheet"
+
+msgid "Import list"
+msgstr "Tuo lista"
+
+msgid "Increase Volume"
+msgstr "Lisää äänenvoimakkuutta"
+
+msgid "Increase volume"
+msgstr "Lisää äänenvoimakkuutta"
+
+msgid "KB"
+msgstr "Kt"
+
+msgid "Karaoke"
+msgstr "Karaoke"
+
+msgid "Karaoke plugin"
+msgstr "Karaokeliitännäinen"
+
+msgid "Keys"
+msgstr "Näppäimet"
+
+msgid "Keywords"
+msgstr "Avainsanat"
+
+msgid "Languages"
+msgstr "Kielet"
+
+msgid "Last played"
+msgstr "Viimeksi soitettu"
+
+msgid "Last skipped"
+msgstr "Viimeksi ohitettu"
+
+msgid "Layout"
+msgstr "Asettelu"
+
+msgid "Layout :"
+msgstr "Asettelu:"
+
+msgid "Layouts"
+msgstr "Asettelut"
+
+msgid "Library"
+msgstr "Kirjasto"
+
+msgid "Library : "
+msgstr "Kirjasto: "
+
+msgid ""
+"Library empty.\n"
+"\n"
+"Use the settings dialog to add music."
+msgstr ""
+"Kirjasto on tyhjä.\n"
+"\n"
+"Lisää musiikkia kirjastoon asetuksista."
+
+#, perl-format
+msgid "Library size : %d song"
+msgid_plural "Library size : %d songs"
+msgstr[0] "Kirjaston koko: %d kappale"
+msgstr[1] "Kirjaston koko: %d kappaletta"
+
+msgid "Listed : "
+msgstr "Listattuna: "
+
+msgid "Listed songs"
+msgstr "Listatut kappaleet"
+
+msgid "Listeners: "
+msgstr "Kuuntelijat: "
+
+msgid "Loading failed."
+msgstr "Lataus epäonnistui."
+
+msgid "Loading..."
+msgstr "Ladataan..."
+
+msgid "Lock"
+msgstr "Lukitse"
+
+msgid "Lock Album"
+msgstr "Lukitse albumi"
+
+msgid "Lock Artist"
+msgstr "Lukitse esittäjä"
+
+msgid "Lock on Album"
+msgstr "Lukitse albumiin"
+
+msgid "Lock on Artist"
+msgstr "Lukitse esittäjään"
+
+msgid "Lock on song"
+msgstr "Lukitse kappaleeseen"
+
+#, perl-brace-format
+msgid "Lock on {field}"
+msgstr "Lukitse kenttään {field}"
+
+msgid "Locked on :\n"
+msgstr "Lukittu:\n"
+
+msgid "Lookup at allmusic.com"
+msgstr "Etsi allmusic.comista"
+
+msgid "Lookup in AMG"
+msgstr "Etsi AMG:stä"
+
+msgid "Lookup in google"
+msgstr "Etsi Googlesta"
+
+msgid "Lyricist"
+msgstr "Sanoittaja"
+
+msgid "Lyrics"
+msgstr "Sanoitukset"
+
+msgid "Lyrics (requires lyrics plugin)"
+msgstr "Sanoitukset (vaatii sanoitusliitännäisen)"
+
+msgid "Lyrics file :"
+msgstr "Sanoitustiedosto:"
+
+msgid "Lyrics plugin"
+msgstr "Sanoitusliitännäinen"
+
+msgid "Lyrics source"
+msgstr "Sanoitusten lähde"
+
+msgid "MB"
+msgstr "Mt"
+
+msgid "MIME type"
+msgstr "MIME-tyyppi"
+
+msgid "MPRIS v1"
+msgstr "MPRIS v1"
+
+msgid "MPRIS v1 support"
+msgstr "MPRIS v1 -tuki"
+
+msgid "MPRIS v2"
+msgstr "MPRIS v2"
+
+msgid "MPRIS v2 support"
+msgstr "MPRIS v2 -tuki"
+
+msgid "Minimum size"
+msgstr "Vähimmäiskoko"
+
+msgid "Monday"
+msgstr "Maanantai"
+
+msgid "More results"
+msgstr "Lisää tuloksia"
+
+msgid "Move"
+msgstr "Avainsanat"
+
+msgid "Move failed"
+msgstr "Siirto epäonnistui"
+
+#, perl-format
+msgid "Moving file"
+msgid_plural "Moving %d files"
+msgstr[0] "Siirretään tiedostoa"
+msgstr[1] "Siirretään %d tiedostoa"
+
+msgid "Music"
+msgstr "Musiikki"
+
+msgid "Mute/Unmute"
+msgstr "Vaimenna/poista vaimennus"
+
+msgid "Name"
+msgstr "Nimi"
+
+msgid "Name of layout"
+msgstr "Asettelun nimi"
+
+msgid "Never"
+msgstr "Ei koskaan"
+
+msgid "New"
+msgstr "Uusi"
+
+msgid "New custom field"
+msgstr "Uusi oma kenttä"
+
+msgid "New filter"
+msgstr "Uusi suodatin"
+
+msgid "New list"
+msgstr "Uusi lista"
+
+msgid "New name"
+msgstr "Uusi nimi"
+
+msgid "Next"
+msgstr "Seuraava"
+
+msgid "Next Album"
+msgstr "Seuraava albumi"
+
+msgid "Next Artist"
+msgstr "Seuraava esittäjä"
+
+msgid "Next Song"
+msgstr "Seuraava kappale"
+
+msgid "Next Song In Playlist"
+msgstr "Soittolistan seuraava kappale"
+
+msgid "No connections"
+msgstr "Ei yhteyksiä"
+
+msgid "No file browser found."
+msgstr "Tiedostoselainta ei löytynyt."
+
+msgid "No genre"
+msgstr "Ei tyylilajia"
+
+msgid "No locked filter"
+msgstr "Ei lukittua suodatinta"
+
+msgid "No lyrics found"
+msgstr "Sanoituksia ei löytynyt"
+
+msgid "No results found"
+msgstr "Tuloksia ei löytynyt"
+
+msgid "No songs"
+msgstr "Ei kappaleita"
+
+msgid "No songs found"
+msgstr "Kappaleita ei löytynyt"
+
+msgid "No sound menu found"
+msgstr "Äänivalikkoa ei löytynyt"
+
+msgid "No styles"
+msgstr "Ei tyylejä"
+
+msgid "No themes"
+msgstr "Ei teemoja"
+
+msgid "No web browser found."
+msgstr "Verkkoselainta ei löytynyt."
+
+msgid "Not found"
+msgstr "Ei löytynyt"
+
+msgid "Now playing"
+msgstr "Nyt soitetaan"
+
+msgid "Number of days since added"
+msgstr "Päiviä siitä, kun lisättiin"
+
+msgid "Number of days since last played"
+msgstr "Päiviä viimeisimmästä soittokerrasta"
+
+msgid "Number of days since last skipped"
+msgstr "Päiviä viimeisimmästä ohituksesta"
+
+msgid "Number of days since modified"
+msgstr "Päiviä viimeisimmästä muokkauksesta"
+
+msgid "Number of times played"
+msgstr "Soittokertojen määrä"
+
+msgid "Number of times skipped"
+msgstr "Ohituskertojen määrä"
+
+msgid "Old name"
+msgstr "Vanha nimi"
+
+msgid "Only affect mp3 files that do not already have an id3v1 tag"
+msgstr ""
+"Vaikuttaa vain niihin mp3-tiedostoihin, joissa ei vielä ole id3v1-tunnistetta"
+
+msgid "Only show similar artists from local library"
+msgstr "Näytä vain samankaltaiset esittäjät paikallisesta kirjastosta"
+
+msgid "Open Browser"
+msgstr "Avaa selain"
+
+msgid "Open Browser window"
+msgstr "Avaa selainikkuna"
+
+msgid "Open Equalizer"
+msgstr "Avaa taajuuskorjain"
+
+msgid "Open Playlist"
+msgstr "Avaa soittolista"
+
+msgid "Open Preference window"
+msgstr "Avaa asetusikkuna"
+
+msgid "Open Queue window"
+msgstr "Avaa jonoikkuna"
+
+msgid "Open Search window"
+msgstr "Avaa hakuikkuna"
+
+msgid "Open allmusic.com in your web browser"
+msgstr "Avaa allmusic.com verkkoselaimessasi"
+
+msgid "Open containing folder"
+msgstr "Avaa sisältävä kansio"
+
+msgid "Open files"
+msgstr "Avaa tiedostot"
+
+msgid "Open folder"
+msgstr "Avaa kansio"
+
+msgid "Open last.fm website in your browser"
+msgstr "Avaa last.fm-sivusto verkkoselaimessa"
+
+msgid "Open link in Browser"
+msgstr "Avaa linkki selaimessa"
+
+msgid "Open this page in the web browser"
+msgstr "Avaa tämä sivu verkkoselaimessa"
+
+msgid "Options"
+msgstr "Valinnat"
+
+msgid "Original Artist"
+msgstr "Alkuperäinen esittäjä"
+
+msgid "Original Filename"
+msgstr "Alkuperäinen tiedostonimi"
+
+msgid "Original release year"
+msgstr "Alkuperäinen julkaisuvuosi"
+
+msgid "Other"
+msgstr "Muu"
+
+msgid "Output"
+msgstr "Ulostulo"
+
+msgid "Pause"
+msgstr "Keskeytä"
+
+msgid "Picture"
+msgstr "Kuva"
+
+msgid "Picture Type"
+msgstr "Kuvan tyyppi"
+
+#, perl-format
+msgid "Picture cache : %d MB"
+msgstr "Kuvavälimuisti: %d Mt"
+
+msgid "Picture finder"
+msgstr "Kuvaetsin"
+
+msgid "Picture finder plugin"
+msgstr "Kuvaetsinliitännäinen"
+
+#, perl-format
+msgid "Picture size : %d"
+msgstr "Kuvan koko: %d"
+
+msgid "Pictures and music files"
+msgstr "Kuva- ja musiikkitiedostot"
+
+msgid "Pictures files"
+msgstr "Kuvatiedostot"
+
+msgid "Play"
+msgstr "Soita"
+
+msgid "Play Only Selected"
+msgstr "Soita vain valitut"
+
+msgid "Play all songs from this album"
+msgstr "Soita kaikki kappaleet tältä albumilta"
+
+msgid "Play all songs from this artist"
+msgstr "Soita kaikki kappaleet tältä esittäjältä"
+
+msgid "Play button"
+msgstr "Soita-painike"
+
+msgid "Play count"
+msgstr "Soittokerrat"
+
+msgid "Play history"
+msgstr "Toistohistoria"
+
+msgid "Play listed songs"
+msgstr "Soita listatut kappaleet"
+
+msgid "Play order"
+msgstr "Soittojärjestys"
+
+msgid "Play/Pause"
+msgstr "Soita/pysäytä"
+
+msgid "Playcount: "
+msgstr "Soittokerrat: "
+
+msgid "Played Today"
+msgstr "Soitettu tänään"
+
+#, perl-brace-format
+msgid "Playing error : {error}"
+msgstr "Soittovirhe: {error}"
+
+msgid "Playlist"
+msgstr "Soittolista"
+
+msgid "Playlist 1"
+msgstr "Soittolista 1"
+
+msgid "Playlist Empty"
+msgstr "Tyhjä soittolista"
+
+msgid "Playlist empty"
+msgstr "Tyhjä soittolista"
+
+msgid "Playlist files"
+msgstr "Soittolistatiedostot"
+
+msgid "Playlist filter"
+msgstr "Soittolistasuodatin"
+
+msgid "Playlist filter :\n"
+msgstr "Soittolistasuodatin:\n"
+
+msgid "Playlists"
+msgstr "Soittolistat"
+
+msgid "Plugin not loaded"
+msgstr "Liitännäistä ei ladattu"
+
+msgid "Plugins"
+msgstr "Liitännäiset"
+
+msgid "Popup queue menu"
+msgstr "Ei löytynyt"
+
+msgid "Press a key or a key combination"
+msgstr "Paina näppäintä tai näppäinyhdistelmää"
+
+msgid "Previous"
+msgstr "Edellinen"
+
+msgid "Previous Song"
+msgstr "Edellinen kappale"
+
+msgid "Previous Song In Playlist"
+msgstr "Soittolistan edellinen kappale"
+
+msgid "Previous page"
+msgstr "Edellinen sivu"
+
+msgid "Properties"
+msgstr "Ominaisuudet"
+
+msgid "Publisher"
+msgstr "Julkaisija"
+
+#, perl-format
+msgid "Queue (%n)"
+msgstr "Jono (%n)"
+
+msgid "Quit"
+msgstr "Lopeta"
+
+msgid "Quit when queue empty"
+msgstr "Lopeta jonon ollessa tyhjä"
+
+msgid "Radio url"
+msgstr "Radion osoite"
+
+msgid "Random"
+msgstr "Satunnainen"
+
+msgid "Rating"
+msgstr "Arvostelu"
+
+msgid "Rating (picture)"
+msgstr "Arvostelu (kuva)"
+
+msgid "Rating range:"
+msgstr "Arvosteluväli:"
+
+msgid "Re-load layouts"
+msgstr "Lataa asettelut uudelleen"
+
+msgid "Re-read tags"
+msgstr "Lue tunnisteet uudelleen"
+
+msgid "Re-reading tags"
+msgstr "Luetaan uudelleen tunnisteita"
+
+msgid "Re-shuffle"
+msgstr "Sekoita uudelleen"
+
+msgid "Recent Filters"
+msgstr "Viimeisimmät suodattimet"
+
+msgid "Recent albums"
+msgstr "Viimeisimmät albumit"
+
+msgid "Recent artists"
+msgstr "Viimeisimmät esittäjät"
+
+msgid "Recent songs"
+msgstr "Viimeisimmät kappaleet"
+
+msgid "Recently played"
+msgstr "Äskettäin soitettu"
+
+msgid "Recently played songs"
+msgstr "Äskettäin soitetut kappaleet"
+
+msgid "Recording date"
+msgstr "Äänityspäivä"
+
+msgid "Refresh"
+msgstr "Päivitä"
+
+msgid "Refresh list"
+msgstr "Päivitä lista"
+
+msgid "Release date"
+msgstr "Julkaisupäivä"
+
+msgid "Remove"
+msgstr "Poista"
+
+msgid "Remove all"
+msgstr "Poista kaikki"
+
+msgid "Remove all songs"
+msgstr "Poista kaikki kappaleet"
+
+msgid "Remove filter"
+msgstr "Poista suodatin"
+
+msgid "Remove from disk"
+msgstr "Poista levyltä"
+
+msgid "Remove from library"
+msgstr "Poista kirjastosta"
+
+msgid "Remove from list"
+msgstr "Poista listasta"
+
+msgid "Remove from playlist"
+msgstr "Poista soittolistasta"
+
+msgid "Remove from queue"
+msgstr "Poista jonosta"
+
+msgid "Remove selected songs"
+msgstr "Poista valitut kappaleet"
+
+msgid "Remove this field"
+msgstr "Poista tämä kenttä"
+
+msgid "Remove this rule"
+msgstr "Poista tämä sääntö"
+
+msgid "Remove this tab"
+msgstr "Liitännäiset"
+
+msgid "Remove this tag"
+msgstr "Poista tämä tunniste"
+
+msgid "Rename"
+msgstr "Nimeä uudelleen"
+
+msgid "Rename File"
+msgstr "Nimeä tiedosto uudelleen"
+
+msgid "Rename file"
+msgstr "Nimeä tiedosto uudelleen"
+
+msgid "Rename folder"
+msgstr "Nimeä kansio uudelleen"
+
+msgid "Repeat"
+msgstr "Kertaa"
+
+msgid "Replace"
+msgstr "Korvaa"
+
+msgid "Replace..."
+msgstr "Korvaa..."
+
+msgid "ReplayGain options"
+msgstr "ReplayGain-valinnat"
+
+msgid "Replaygain"
+msgstr "Replaygain"
+
+msgid "Replaygain analysis"
+msgstr "ReplayGain-analyysi"
+
+msgid "Rescan"
+msgstr "Tutki uudelleen"
+
+msgid "Rescan Collection"
+msgstr "Tutki kokoelma uudelleen"
+
+msgid "Rhythmbox"
+msgstr "Rytmilaatikko"
+
+msgid "Run perl code"
+msgstr "Suorita perl-koodia"
+
+msgid "Run system command"
+msgstr "Suorita järjestelmäkomento"
+
+msgid "Same album"
+msgstr "Sama albumi"
+
+msgid "Same artist"
+msgstr "Sama esittäjä"
+
+msgid "Same title"
+msgstr "Sama nimi"
+
+msgid "Same year"
+msgstr "Sama vuosi"
+
+msgid "Saturday"
+msgstr "Lauantai"
+
+msgid "Save"
+msgstr "Tallenna"
+
+msgid "Save artist biography"
+msgstr "Tallenna esittäjän biografia"
+
+msgid "Save as..."
+msgstr "Tallenna nimellä..."
+
+msgid "Save lyrics"
+msgstr "Tallenna sanoitukset"
+
+msgid "Save now"
+msgstr "Tallenna nyt"
+
+#, perl-format
+msgid "Save tags/settings every %d minutes"
+msgstr "Tallenna tunnisteet/asetukset %d minuutin välein"
+
+msgid "Saved"
+msgstr "Tallennettu"
+
+msgid "Saved Lists"
+msgstr "Tallennetut listat"
+
+msgid "Saved filters"
+msgstr "Tallennetut suodattimet"
+
+msgid "Saved lists"
+msgstr "Tallennetut listat"
+
+msgid "Scan Collection"
+msgstr "Tutki kokoelma"
+
+msgid "Search"
+msgstr "Etsi"
+
+msgid "Search : "
+msgstr "Etsi: "
+
+msgid "Search Comment"
+msgstr "Etsi kommentti"
+
+msgid "Search allmusic for Artist"
+msgstr "Etsi esittäjää Allmusicista"
+
+msgid "Search amazon.com for Artist"
+msgstr "Etsi esittäjää Amazon.comista"
+
+msgid "Search discogs for Artist"
+msgstr "Etsi esittäjää Discogsista"
+
+msgid "Search for Artist on youtube"
+msgstr "Etsi esittäjää YouTubesta"
+
+msgid "Search for a picture on internet"
+msgstr "Etsi kuvaa internetistä"
+
+msgid "Search for new songs on startup"
+msgstr "Etsi uusia kappaleita käynnistyksen yhteydessä"
+
+msgid "Search google for Artist"
+msgstr "Etsi esittäjää Googlesta"
+
+msgid "Search on the web"
+msgstr "Etsi internetistä"
+
+msgid "Search options"
+msgstr "Hakuvalinnat"
+
+msgid "Search:"
+msgstr "Etsi:"
+
+msgid "Select current song"
+msgstr "Valitse nykyinen kappale"
+
+msgid "Select fields"
+msgstr "Valitse kentät"
+
+msgid "Select files"
+msgstr "Valitse tiedostot"
+
+msgid "Select search fields"
+msgstr "Valitse hakukentät"
+
+msgid "Selected : "
+msgstr "Valittu: "
+
+msgid "Selected songs"
+msgstr "Valitut kappaleet"
+
+msgid "Set Current Song Rating"
+msgstr "Korvaa"
+
+msgid "Set Picture"
+msgstr "Aseta kuva"
+
+msgid "Set grouping"
+msgstr "Aseta ryhmittely"
+
+msgid "Set icon"
+msgstr "Aseta kuvake"
+
+msgid "Settings"
+msgstr "Asetukset"
+
+#. Shift key
+msgctxt "Keyboard"
+msgid "Shift"
+msgstr "Shift"
+
+msgid "Show"
+msgstr "Näytä"
+
+msgid "Show Artist page on last.fm"
+msgstr "Näytä esittäjän Last.fm-sivu"
+
+msgid "Show Artist page on wikipedia"
+msgstr "Näytä esittäjän Wikipedia-sivu"
+
+msgid "Show album"
+msgstr "Näytä albumi"
+
+msgid "Show artist's upcoming events"
+msgstr "Näytä esittäjän tulevat tapahtumat"
+
+msgid "Show buttons"
+msgstr "Näytä painikkeet"
+
+msgid "Show genre"
+msgstr "Näytä tyylilaji"
+
+msgid "Show in sound menu"
+msgstr "Näytä äänivalikossa"
+
+msgid "Show main window"
+msgstr "Näytä pääikkuna"
+
+msgid "Show playlist"
+msgstr "Näytä soittolista"
+
+msgid "Show replaygain submenu"
+msgstr "Näytä ReplayGain-alivalikko"
+
+msgid "Show similar artists"
+msgstr "Näytä samankaltaiset esittäjät"
+
+msgid "Show song details"
+msgstr "Näytä kappaleen tiedot"
+
+msgid "Show status bar"
+msgstr "Näytä tilapalkki"
+
+msgid "Show suggestions"
+msgstr "Näytä ehdotukset"
+
+msgid "Show tabs"
+msgstr "Näytä välilehdet"
+
+msgid "Show tray icon"
+msgstr "Näytä ilmoitusalueen kuvake"
+
+msgid "Show/Hide"
+msgstr "Näytä/piilota"
+
+msgid "Show/Hide Browser"
+msgstr "Näytä/piilota selain"
+
+msgid "Show/Hide Cover"
+msgstr "Näytä/piilota kansi"
+
+msgid "Show/hide status bar"
+msgstr "Näytä/piilota tilapalkki"
+
+msgid "Shuffle"
+msgstr "Sekoita"
+
+msgid "Shuffle queue"
+msgstr "Sekoita jono"
+
+msgid "Shuffled albums"
+msgstr "Sekoitetut albumit"
+
+msgid "Shuffled albums, shuffled tracks"
+msgstr "Sekoitetut albumit, sekoitetut kappaleet"
+
+msgid "Shutdown command :"
+msgstr "Sammutuskomento:"
+
+msgid "Sidebar"
+msgstr "Sivupalkki"
+
+msgid "Similar Artists"
+msgstr "Samankaltaiset esittäjät"
+
+msgid "Size"
+msgstr "Koko"
+
+msgid "Skip history"
+msgstr "Ohitushistoria"
+
+msgid "Skip to next song if an error occurs"
+msgstr "Siirry seuraavaan kappaleeseen virheen ilmetessä"
+
+msgid "Small"
+msgstr "Pieni"
+
+msgid "Smaller browser"
+msgstr "Pienempi selain"
+
+msgid "Song"
+msgstr "Kappale"
+
+msgid "Song Properties"
+msgstr "Kappaleen ominaisuudet"
+
+msgid "Song rating"
+msgstr "Kappaleen arvostelu"
+
+msgid "Start ReplayGain analysis"
+msgstr "Käynnistä ReplayGain-analysointi"
+
+msgid "Start in tray"
+msgstr "Käynnistä ilmoitusalueelle"
+
+msgid "Statistics"
+msgstr "Tilastot"
+
+msgid "Statusbar"
+msgstr "Tilapalkki"
+
+msgid "Stop"
+msgstr "Pysäytä"
+
+msgid "Stop when queue empty"
+msgstr "Pysäytä kun jono on tyhjä"
+
+msgid "Styles"
+msgstr "Tyylit"
+
+msgid "Summary :"
+msgstr "Yhteenveto:"
+
+msgid "Sunday"
+msgstr "Sunnuntai"
+
+msgid "Switch to fullscreen mode"
+msgstr "Vaihda koko näytön tilaan"
+
+msgid "System command :"
+msgstr "Järjestelmäkomento:"
+
+msgid "Tag"
+msgstr "Tunniste"
+
+msgid "Tags"
+msgstr "Tunnisteet"
+
+msgid "Terms of use"
+msgstr "Käyttöehdot"
+
+msgid "Text"
+msgstr "Teksti"
+
+msgid "Themes"
+msgstr "Teemat"
+
+msgid "These fields can be used :"
+msgstr "Näitä kenttiä on mahdollista käyttää:"
+
+msgid "This plugin requires :"
+msgstr "Tämä liitännäinen vaatii:"
+
+msgid "Thursday"
+msgstr "Torstai"
+
+msgid "Time :"
+msgstr "Aika:"
+
+#, perl-format
+msgid "Timeout : %d seconds"
+msgstr "Aikakatkaisu: %d sekuntia"
+
+msgid "Title"
+msgstr "Nimi"
+
+msgid "Title & icon"
+msgstr "Nimi ja kuvake"
+
+msgid "Title & progress"
+msgstr "Nimi ja edistyminen"
+
+msgid "Title - Artist - Album"
+msgstr "Nimi - esittäjä - albumi"
+
+msgid "Title or filename"
+msgstr "Nimi tai tiedostonimi"
+
+#, perl-format
+msgid "Title: %t"
+msgstr "Nimi: %t"
+
+#, perl-format
+msgid "Title: %t (Track No. %n)"
+msgstr "Nimi: %t (Kappaleen numero %n)"
+
+msgid "Toolbar"
+msgstr "Työkalupalkki"
+
+msgid "Tools"
+msgstr "Työkalut"
+
+msgid "Track Properties"
+msgstr "Kappaleen ominaisuudet"
+
+msgid "Tuesday"
+msgstr "Tiistai"
+
+msgid "Turn off computer when queue empty"
+msgstr "Sammuta tietokone kun jono on tyhjä"
+
+msgid "URL"
+msgstr "Osoite"
+
+msgid "Unknown album"
+msgstr "Tuntematon albumi"
+
+#, perl-brace-format
+msgid "Unknown field ({field})"
+msgstr "Tuntematon kenttä ({field})"
+
+msgid "Unknown filter :"
+msgstr "Tuntematon suodatin:"
+
+#, perl-format
+msgid "Unknown layout '%s'"
+msgstr "Tuntematon asettelu '%s'"
+
+msgid "Unnamed custom command"
+msgstr "Nimetön oma komento"
+
+msgid "Unnamed filter"
+msgstr "Nimetön suodatin"
+
+msgid "Untitled"
+msgstr "Nimetön"
+
+msgid "Update tags"
+msgstr "Päivitä tunnisteet"
+
+msgid "Update tags..."
+msgstr "Päivitä tunnisteet..."
+
+msgid "Use Equalizer"
+msgstr "Käytä taajuuskorjainta"
+
+msgid "Use ReplayGain"
+msgstr "Käytä ReplayGainia"
+
+msgid "Use gstreamer"
+msgstr "Käytä GStreameria"
+
+#, perl-brace-format
+msgid "Use this picture as cover for album '{album}'"
+msgstr "Käytä tätä kuvaa albumin '{album}' kantena"
+
+msgid "Various artists"
+msgstr "Useita esittäjiä"
+
+msgid "Version"
+msgstr "Versio"
+
+msgid "Volume : "
+msgstr "Äänenvoimakkuus: "
+
+msgid "Wednesday"
+msgstr "Keskiviikko"
+
+msgid "Whole library"
+msgstr "Koko kirjasto"
+
+msgid "Wikipedia"
+msgstr "Wikipedia"
+
+msgid "Will use default if not found"
+msgstr "Käytetään oletusta, jos ei löydy"
+
+msgid "Windows"
+msgstr "Ikkunat"
+
+msgid "Writing tags"
+msgstr "Kirjoitetaan tunnisteita"
+
+msgid "Year"
+msgstr "Vuosi"
+
+msgid "Year - Album"
+msgstr "Vuosi - albumi"
+
+msgid "Year - Artist"
+msgstr "Vuosi - esittäjä"
+
+msgid "Yes"
+msgstr "Kyllä"
+
+msgid "_Insert column"
+msgstr "_Lisää sarake"
+
+msgid "_Remove this column"
+msgstr "_Poista tämä sarake"
+
+msgid "_Retry"
+msgstr "_Yritä uudelleen"
+
+msgid "add"
+msgstr "lisää"
+
+msgid "another example"
+msgstr "toinen esimerkki"
+
+msgid "artist"
+msgstr "esittäjä"
+
+msgid "auto detect"
+msgstr "havaitse automaattisesti"
+
+msgid "automatic size"
+msgstr "automaattinen koko"
+
+msgid "back cover"
+msgstr "takakansi"
+
+msgid "before"
+msgstr "ennen"
+
+msgid "between"
+msgstr "välillä"
+
+msgid "bytes"
+msgstr "tavua"
+
+msgid "check now"
+msgstr "tarkista nyt"
+
+msgid "command :"
+msgstr "komento:"
+
+msgid "connection failed"
+msgstr "yhteys epäonnistui"
+
+msgid "connection failed."
+msgstr "yhteys epäonnistui."
+
+msgid "contains"
+msgstr "sisältää"
+
+#, perl-format
+msgid "contains %s"
+msgstr "sisältää %s"
+
+msgid "day"
+msgstr "päivä"
+
+msgid "days"
+msgstr "päivää"
+
+msgid "default"
+msgstr "oletus"
+
+msgid "default folder"
+msgstr "oletuskansio"
+
+msgid "delete selected filter"
+msgstr "poista valittu suodatin"
+
+msgid "delete selected grouping"
+msgstr "poista valittu ryhmittely"
+
+#, perl-brace-format
+msgid "disc {disc}"
+msgstr "levy {disc}"
+
+#, perl-format
+msgid "doesn't include %s"
+msgstr "ei sisällä %s"
+
+msgid "email"
+msgstr "sähköposti"
+
+msgid "empty"
+msgstr "tyhjä"
+
+msgid "error"
+msgstr "virhe"
+
+msgid "example :"
+msgstr "esimerkki:"
+
+msgid "example : "
+msgstr "esimerkki: "
+
+#, perl-format
+msgid "example : %s"
+msgstr "esimerkki: %s"
+
+msgid "examples :"
+msgstr "esimerkit:"
+
+msgid "false"
+msgstr "epätosi"
+
+msgid "filters"
+msgstr "suodattimet"
+
+msgid "front cover"
+msgstr "etukansi"
+
+msgid "gmusicbrowser"
+msgstr "gmusicbrowser"
+
+msgid "google images"
+msgstr "Google-kuvat"
+
+msgid "google images (hi-res)"
+msgstr "Google-kuvat (korkealaatuinen)"
+
+msgid "has been played"
+msgstr "on soitettu"
+
+msgid "has been skipped"
+msgstr "on ohitettu"
+
+msgid "hours"
+msgstr "tuntia"
+
+msgid "icecast server"
+msgstr "Icecast-palvelin"
+
+msgid "id3v1 tag"
+msgstr "id3v1-tunniste"
+
+msgid "imported list"
+msgstr "tuotu lista"
+
+msgid "includes"
+msgstr "sisältää"
+
+#, perl-format
+msgid "includes %s"
+msgstr "sisältää %s"
+
+msgid "includes artist"
+msgstr "sisältää esittäjän"
+
+#, perl-format
+msgid "includes artist %s"
+msgstr "sisältää esittäjän %s"
+
+msgid "is"
+msgstr "on"
+
+#, perl-format
+msgid "is %s"
+msgstr "on %s"
+
+msgid "is 44.1kHz"
+msgstr "on 44,1 kHz"
+
+msgid "is a flac file"
+msgstr "on flac-tiedosto"
+
+msgid "is a mp3 file"
+msgstr "on mp3-tiedosto"
+
+msgid "is a musepack file"
+msgstr "on musepack-tiedosto"
+
+msgid "is a vorbis file"
+msgstr "on vorbis-tiedosto"
+
+msgid "is a wavepack file"
+msgstr "on wavepack-tiedosto"
+
+msgid "is an aac file"
+msgstr "on aac-tiedosto"
+
+msgid "is an ape file"
+msgstr "on ape-tiedosto"
+
+msgid "is false"
+msgstr "on epätosi"
+
+msgid "is mono"
+msgstr "on mono"
+
+msgid "is stereo"
+msgstr "on stereo"
+
+msgid "is true"
+msgstr "on tosi"
+
+#, perl-format
+msgid "isn't %s"
+msgstr "ei ole %s"
+
+msgid "isn't mono"
+msgstr "ei ole mono"
+
+msgid "isn't stereo"
+msgstr "ei ole stereo"
+
+msgid "last.fm"
+msgstr "last.fm"
+
+msgid "last.fm plugin"
+msgstr "last.fm-liitännäinen"
+
+msgid "less than"
+msgstr "vähemmän kuin"
+
+msgid "lyricist"
+msgstr "sanoittaja"
+
+msgid "lyrics file"
+msgstr "sanoitustiedosto"
+
+msgid "maximum font size"
+msgstr "kirjasimen enimmäiskoko"
+
+msgid "minimum font size"
+msgstr "kirjasimen vähimmäiskoko"
+
+msgid "minutes"
+msgstr "minuuttia"
+
+msgid "month"
+msgstr "kuukausi"
+
+msgid "months"
+msgstr "kuukautta"
+
+msgid "more than"
+msgstr "enemmän kuin"
+
+msgid "move folder"
+msgstr "siirrä kansio"
+
+msgid "mplayer options :"
+msgstr "mplayer-valinnat:"
+
+msgid "name of the new filter"
+msgstr "uuden suodattimen nimi"
+
+msgid "name of the new grouping"
+msgstr "uuden ryhmittelyn nimi"
+
+msgid "never"
+msgstr "ei koskaan"
+
+msgid "never played"
+msgstr "ei koskaan soitettu"
+
+msgid "no picture"
+msgstr "ei kuvaa"
+
+msgid "no pictures"
+msgstr "ei kuvia"
+
+msgid "no plugins found"
+msgstr "liitännäisiä ei löytynyt"
+
+msgid "no to all"
+msgstr "ei kaikkiin"
+
+msgid "options"
+msgstr "valinnat"
+
+#, perl-format
+msgid "or %d seconds"
+msgstr "tai %d sekuntia"
+
+msgid "other"
+msgstr "muu"
+
+msgid "other file icon"
+msgstr "muu tiedostokuvake"
+
+msgid "output device :"
+msgstr "ulostuloon käytettävä laite:"
+
+msgid "password :"
+msgstr "salasana:"
+
+msgid "perl code"
+msgstr "perl-koodi"
+
+msgid "picture size"
+msgstr "kuvan koko"
+
+msgid "played>4"
+msgstr "soitettu > 4"
+
+msgid "port :"
+msgstr "portti:"
+
+msgid "quit"
+msgstr "lopeta"
+
+msgid "rating"
+msgstr "arvostelu"
+
+msgid "requires xdg-screensaver"
+msgstr "vaatii xdg-screensaverin"
+
+msgid "retry"
+msgstr "yritä uudelleen"
+
+#, perl-brace-format
+msgid "retry in {seconds} s"
+msgstr "yritä uudelleen {seconds} sekunnin päästä"
+
+msgid "reverse order"
+msgstr "käänteinen järjestys"
+
+msgid "saved filters"
+msgstr "tallennetut suodattimet"
+
+msgid "saved groupings"
+msgstr "tallennetut ryhmittely"
+
+msgid "seconds"
+msgstr "sekuntia"
+
+msgid "show pictures"
+msgstr "näytä kuvat"
+
+msgid "static list"
+msgstr "staattinen lista"
+
+msgid "stop"
+msgstr "pysäytä"
+
+msgid "supports : "
+msgstr "tukee: "
+
+msgid "text mode"
+msgstr "tekstitila"
+
+msgid "times"
+msgstr "kertaa"
+
+#. comma-separated list of field aliases for title, these are in addition to
+#. english aliases
+msgctxt "Field_aliases"
+msgid "title"
+msgstr "nimi"
+
+msgid "tools"
+msgstr "työkalut"
+
+msgid "true"
+msgstr "tosi"
+
+msgid "unknown"
+msgstr "tuntematon"
+
+msgid "unknown error"
+msgstr "tuntematon virhe"
+
+msgid "unnamed random mode"
+msgstr "nimetön satunnainen tila"
+
+msgid "url"
+msgstr "osoite"
+
+msgid "use album name"
+msgstr "käytä albumin nimeä"
+
+msgid "use default"
+msgstr "käytä oletusta"
+
+msgid "use gnome settings"
+msgstr "Käytä Gnomen asetuksia"
+
+msgid "username :"
+msgstr "käyttäjätunnus:"
+
+msgid "weeks"
+msgstr "viikkoa"
+
+msgid "x offset :"
+msgstr "x-siirtymä:"
+
+msgid "y offset :"
+msgstr "y-siirtymä:"
+
+msgid "year"
+msgstr "vuosi"
+
+msgid "years"
+msgstr "vuotta"
+
+msgid "yes to all"
+msgstr "kyllä kaikkiin"
+
+#, perl-brace-format
+msgid "{folder} already exists"
+msgstr "{folder} on jo olemassa"
+
+#, perl-brace-format
+msgid "{hours} hours {min} min {sec} s ({size} M)"
+msgstr "{hours} tuntia {min} min {sec} s ({size} Mt)"
+
+#, perl-brace-format
+msgid "{hours}h {min}m {sec}s ({size}M)"
+msgstr "{hours} t {min} m {sec} s ({size} Mt)"
+
+#, perl-brace-format
+msgid "{hours}h{min}m{sec}s"
+msgstr "{hours} t {min} m {sec} s"
+
+#, perl-brace-format
+msgid "{min} min {sec} s ({size} M)"
+msgstr "{min} min {sec} s ({size} Mt)"
+
+#, perl-brace-format
+msgid "{min}m {sec}s ({size}M)"
+msgstr "{min} m {sec} s ({size} Mt)"
+
+#, perl-brace-format
+msgid "{min}m{sec}s"
+msgstr "{min} m {sec} s"
