@@ -1,20 +1,20 @@
 #
 # Translators:
-# Sérgio Marques <smarquespt@gmail.com>, 2011, 2012.
+# Sérgio Marques <smarquespt@gmail.com>, 2011-2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
 "Report-Msgid-Bugs-To: http://github.com/squentin/gmusicbrowser/issues\n"
-"POT-Creation-Date: 2012-02-02 17:04+0100\n"
-"PO-Revision-Date: 2012-02-02 17:47+0000\n"
+"POT-Creation-Date: 2012-11-19 19:21+0100\n"
+"PO-Revision-Date: 2012-11-26 13:05+0000\n"
 "Last-Translator: Sérgio Marques <smarquespt@gmail.com>\n"
-"Language-Team: Portuguese (http://www.transifex.net/projects/p/gmusicbrowser/"
-"team/pt/)\n"
+"Language-Team: Portuguese (http://www.transifex.com/projects/p/gmusicbrowser/"
+"language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid " Context pane layout "
 msgstr "Esquema do painel de contexto"
@@ -30,7 +30,7 @@ msgid " of {length}"
 msgstr "de {length}"
 
 msgid "# songs"
-msgstr "# músicas"
+msgstr "# faixas"
 
 #, perl-format
 msgid "%S by %a"
@@ -51,8 +51,8 @@ msgstr[1] "%d artistas"
 #, perl-format
 msgid "%d Song"
 msgid_plural "%d Songs"
-msgstr[0] "%d música"
-msgstr[1] "%d músicas"
+msgstr[0] "%d faixa"
+msgstr[1] "%d faixas"
 
 #, perl-format
 msgid "%d Upcoming Event"
@@ -99,32 +99,36 @@ msgstr[1] "%d segundos"
 #, perl-format
 msgid "%d song"
 msgid_plural "%d songs"
-msgstr[0] "%d música"
-msgstr[1] "%d músicas"
+msgstr[0] "%d faixa"
+msgstr[1] "%d faixas"
 
 #, perl-format
 msgid "%d song added"
 msgid_plural "%d songs added"
-msgstr[0] "%d música adicionada"
-msgstr[1] "%d músicas adicionadas"
+msgstr[0] "%d faixa adicionada"
+msgstr[1] "%d faixas adicionadas"
 
 #, perl-format
 msgid "%d song in queue"
 msgid_plural "%d songs in queue"
-msgstr[0] "%d música na fila"
-msgstr[1] "%d músicas na fila"
+msgstr[0] "%d faixa na fila"
+msgstr[1] "%d faixas na fila"
 
 #, perl-format
 msgid "%d song in the library"
 msgid_plural "%d songs in the library"
-msgstr[0] "%d música na coleção"
-msgstr[1] "%d músicas na coleção"
+msgstr[0] "%d faixa na coleção"
+msgstr[1] "%d faixas na coleção"
 
 #, perl-format
 msgid "%d song selected"
 msgid_plural "%d songs selected"
-msgstr[0] "%d música selecionada"
-msgstr[1] "%d músicas selecionadas "
+msgstr[0] "%d faixa selecionada"
+msgstr[1] "%d faixas selecionadas "
+
+#, perl-format
+msgid "%s fuzzy match with %s"
+msgstr "%s ocorrências aproximadas a %s"
 
 #, perl-format
 msgid "%t by %a (%m)"
@@ -139,9 +143,6 @@ msgid "(%d song excluded)"
 msgid_plural "(%d songs excluded)"
 msgstr[0] "(%d música excluída)"
 msgstr[1] "(%d músicas excluídas)"
-
-msgid "(applied after restart)"
-msgstr "(aplicável após reiniciar)"
 
 msgid "(case insensitive)"
 msgstr "(não respeita capitulares)"
@@ -164,9 +165,8 @@ msgid ""
 "not in it\n"
 "- Skip to another song when removing the current song from the playlist"
 msgstr ""
-"- Ao selecionar uma música, o filtro vai ser restaurado se a música não "
-"existir\n"
-"- Ir para para outra música ao remover  a música atual da lista de reprodução"
+"- Ao selecionar uma faixa, o filtro vai ser restaurado se esta não existir\n"
+"- Ir para outra faixa ao remover  a faixa atual da lista de reprodução"
 
 msgid "0 chance"
 msgstr "0 de hipótese"
@@ -241,7 +241,7 @@ msgid "About to turn off the computer in :"
 msgstr "O computador vai ser desligado em:"
 
 msgid "Actions are not supported by current notification daemon"
-msgstr "Estas ações não são suportados pelo serviço de notificações"
+msgstr "Estas ações não são suportados pelo seu serviço de notificações"
 
 msgid "Add"
 msgstr "Adicionar"
@@ -268,7 +268,7 @@ msgid "Add a group"
 msgstr "Adicionar um grupo"
 
 msgid "Add a label to the current song"
-msgstr "Adicionar uma etiqueta à música atual"
+msgstr "Adicionar uma etiqueta à faixa atual"
 
 msgid "Add a list of files/folders to the playlist"
 msgstr "Adicionar uma lista de ficheiros/pastas à lista de reprodução"
@@ -351,10 +351,10 @@ msgstr ""
 "pesquisa de capas de ábum no google"
 
 msgid "Adds labels to the current song"
-msgstr "Adiciona etiquetas à música atual"
+msgstr "Adiciona etiquetas à faixa atual"
 
 msgid "Adds menu entries to song contextual menu"
-msgstr "Adiciona entradas ao menu de contexto da música"
+msgstr "Adiciona entradas ao menu de contexto da faixa"
 
 msgid "Advanced Search ..."
 msgstr "Procura avançada..."
@@ -376,6 +376,9 @@ msgstr "Artista do álbum"
 
 msgid "Album artist or artist"
 msgstr "Artista do álbum ou artista"
+
+msgid "Album cover"
+msgstr "Capa de álbum"
 
 msgid "Album gain"
 msgstr "Ganho de álbum"
@@ -462,10 +465,10 @@ msgstr "Todos os temas"
 
 msgid ""
 "Allmusic uses both Genres and Styles to describe albums. If you use only "
-"Genres, you may want to include Styles in the list of Genres."
+"Genres, you may want to include Styles in allmusic's list of Genres."
 msgstr ""
 "O Allmusic utiliza géneros e estilos para descrever os álbuns. Se você só "
-"utiliza géneros, deve incluir os estilos na lista de géneros."
+"utiliza géneros, deve incluir os estilos na lista de géneros do Allmusic."
 
 msgid "Allow for scheduling fade-out and stop"
 msgstr "Permite que as músicas terminem gradualmente"
@@ -483,6 +486,13 @@ msgstr "Alt"
 
 msgid "Amount of volume changed by the mouse wheel"
 msgstr "Intensidade de volume alterado com a roda do rato"
+
+msgid ""
+"Analyse and add replaygain tags for all songs that don't have replaygain "
+"tags, or incoherent album replaygain tags"
+msgstr ""
+"Análise e adição de dados Replay Gain para todas as faixas que ainda não as "
+"possuem ou que possuindo sejam inconsistentes"
 
 msgid "Any of :"
 msgstr "Qualquer de:"
@@ -518,15 +528,15 @@ msgstr "Artista (Ano - Álbum)"
 msgid "Artist Biography"
 msgstr "Biografia do artista"
 
-#, perl-format
-msgid "Artist Picture Size : %d"
-msgstr "Dimensão da imagem: %d"
-
 msgid "Artist URL"
 msgstr "URL do artista"
 
 msgid "Artist picture"
 msgstr "Imagem do artista"
+
+#, perl-format
+msgid "Artist picture size : %d"
+msgstr "Dimensão da imagem: %d"
 
 msgid "Artist playcount:"
 msgstr "Reproduções do artista:"
@@ -604,7 +614,7 @@ msgid "Auto-select Pictures"
 msgstr "Seleção automática das imagens"
 
 msgid "Automatically remove current song if not found"
-msgstr "Se a música não for encontrada, remover automaticamente"
+msgstr "Se a faixa não for encontrada, remover automaticamente"
 
 msgid "Autosave"
 msgstr "Gravação automática"
@@ -664,7 +674,7 @@ msgid "Buttons"
 msgstr "Botões"
 
 msgid "Buttons, Song & Cover"
-msgstr "Botões, música e capa"
+msgstr "Botões, faixa e capa"
 
 msgid "Can be relative by using + or -"
 msgstr "Pode ser relativo utilizando + ou -"
@@ -691,9 +701,8 @@ msgstr ""
 msgid "Can't create sink '{sink}'"
 msgstr "Não foi possível criar \"{sink}\""
 
-#, perl-brace-format
-msgid "Can't play '{file}'."
-msgstr "Não foi possível reproduzir \"{file}\"."
+msgid "Can't play this file."
+msgstr "O ficheiro não pode ser reproduzido."
 
 msgid "Can't read file or invalid file"
 msgstr "O ficheiro não pode ser aberto ou é inválido"
@@ -745,25 +754,28 @@ msgid "Check Collection"
 msgstr "Verificar coleção"
 
 msgid "Check for updated/deleted songs on startup"
-msgstr "Ao iniciar, verificar músicas atualizadas/eliminadas"
+msgstr "Ao iniciar, verificar faixa atualizadas ou eliminadas"
 
 msgid "Check for updated/removed songs"
-msgstr "Verificar músicas atualizadas/eliminadas"
+msgstr "Verificar faixa atualizadas ou eliminadas"
 
 msgid "Check real length of mp3"
 msgstr "Verificar duração real do mp3"
+
+msgid "Check your audio settings"
+msgstr "Verifique as suas definições de áudio"
 
 msgid "Checking length/bitrate"
 msgstr "A verificar duração/qualidade"
 
 msgid "Checking songs"
-msgstr "A verificar músicas"
+msgstr "A verificar faixas"
 
 msgid "Choose Album From this Artist"
 msgstr "Escolha o álbum deste artista"
 
 msgid "Choose Artist/Album/Song"
-msgstr "Escolha artista/álbum/música"
+msgstr "Escolha artista/álbum/faixa"
 
 msgid "Choose Picture"
 msgstr "Escolha a imagem"
@@ -809,6 +821,9 @@ msgstr "Escolha os ficheiros a importar"
 msgid "Clear"
 msgstr "Apagar"
 
+msgid "Clear playlist"
+msgstr "Apagar lista de reprodução"
+
 msgid "Clear playlist filter"
 msgstr "Apagar filtro da lista de reprodução"
 
@@ -819,6 +834,9 @@ msgid "Clear selected fields"
 msgstr "Apagar campos selecionados"
 
 msgid "Click to show fullsize image"
+msgstr "Clique para mostrar a imagem em ecrã completo"
+
+msgid "Click to show larger image"
 msgstr "Clique para mostrar a imagem em ecrã completo"
 
 msgid "Client banned, contact gmusicbrowser's developer"
@@ -845,6 +863,9 @@ msgstr "Comando"
 msgid "Command to launch when the button is pressed"
 msgstr "Comando a executar ao premir o botão"
 
+msgid "Command used :"
+msgstr "Comando utilizado:"
+
 msgid ""
 "Command used when\n"
 "'turn off computer when queue empty'\n"
@@ -855,7 +876,7 @@ msgstr ""
 "estiver ativa"
 
 msgid "Command when playing song changed :"
-msgstr "Comando a executar ao alterar a música:"
+msgstr "Comando a executar ao alterar a faixa:"
 
 msgid "Command when stopped :"
 msgstr "Comando se parado:"
@@ -929,7 +950,7 @@ msgid "Ctrl"
 msgstr "Ctrl"
 
 msgid "Current song must always be in the playlist"
-msgstr "A música atual tem que estar na lista de reprodução"
+msgstr "A faixa atual tem que estar na lista de reprodução"
 
 msgid "Custom"
 msgstr "Personalizar"
@@ -1000,7 +1021,7 @@ msgid "Delete"
 msgstr "eliminar"
 
 msgid "Delete Selected Songs"
-msgstr "Eliminar músicas selecionadas"
+msgstr "Eliminar faixas selecionadas"
 
 msgid "Delete list"
 msgstr "Eliminar lista"
@@ -1039,7 +1060,7 @@ msgid "Display (:1 or host:0 for example)"
 msgstr "Exibição (:1 ou host:0, por exemplo)"
 
 msgid "Display Songs"
-msgstr "Exibição de músicas"
+msgstr "Exibição de faixas"
 
 msgid ""
 "Display a special layout in or around the titlebar of the focused window"
@@ -1050,7 +1071,7 @@ msgid "Display stop/next actions"
 msgstr "Exibir ações Parar/Seguinte"
 
 msgid "Display synchronized lyrics of the current song"
-msgstr "Exibe a letra da música em sincronia com a música"
+msgstr "Exibe a letra sincronizada com a faixa"
 
 #, perl-format
 msgid "Display tray tip for %d ms"
@@ -1060,7 +1081,7 @@ msgid "Do not add a title row"
 msgstr "Não adicionar linha de título"
 
 msgid "Do not add songs that can't be played"
-msgstr "Não adicionar músicas que não podem ser reproduzidas"
+msgstr "Não adicionar faixas que não podem ser reproduzidas"
 
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr "Não criar ID3v1 nos ficheiros mp3"
@@ -1082,28 +1103,31 @@ msgid "Don't notify if the main window is visible"
 msgstr "Não notificar se a janela principal estiver visível"
 
 msgid "Don't submit current song"
-msgstr "Não enviar músicas reproduzidas"
+msgstr "Não enviar faixas reproduzidas"
+
+msgid "Download"
+msgstr "Transferir"
 
 msgid "Drag and drop songs here to replace the selection."
-msgstr "Arrate e largue aqui as músicas para substituir a seleção"
+msgstr "Arrate e largue aqui as faixas para substituir a seleção"
 
 msgid "Edit"
 msgstr "Editar"
 
 msgid "Edit Current Song Properties"
-msgstr "Editar propriedades da música atual"
+msgstr "Editar propriedades da faixa atual"
 
 msgid "Edit Labels"
 msgstr "Editar etiquetas"
 
 msgid "Edit Lyrics"
-msgstr "Editar letra musical"
+msgstr "Editar letra das faixas"
 
 msgid "Edit Lyrics ..."
-msgstr "Editar letra musical..."
+msgstr "Editar letra das faixas..."
 
 msgid "Edit Multiple Songs Properties"
-msgstr "Editar propriedades de diversas músicas"
+msgstr "Editar propriedades de diversas faixas"
 
 msgid "Edit Rating"
 msgstr "Editar avaliação"
@@ -1129,17 +1153,26 @@ msgstr "Editar no wiki last.fm"
 msgid "Edit list"
 msgstr "Editar lista"
 
+msgid "Edit mode"
+msgstr "Modo de edição"
+
 msgid "Edit ordered modes ..."
 msgstr "Editar modos de ordenação..."
 
 msgid "Edit random modes ..."
 msgstr "Editar modos aleatórios..."
 
+msgid "Edit row tip"
+msgstr "Editar linhas"
+
 msgid "Edit selected song properties"
-msgstr "Editar propriedades da música selecionada"
+msgstr "Editar propriedades da faixa selecionada"
 
 msgid "Edit..."
 msgstr "Editar..."
+
+msgid "Editable in song properties dialog"
+msgstr "Pode ser editada n diálogo das propriedades das faixas"
 
 msgid "Editing list : "
 msgstr "A editar lista:"
@@ -1181,13 +1214,13 @@ msgid "Enqueue Selected"
 msgstr "Colocar seleção"
 
 msgid "Enqueue Selected Songs"
-msgstr "Colocar músicas selecionadas"
+msgstr "Colocar faixas selecionadas na fila"
 
 msgid "Enqueue Songs from Current Album"
-msgstr "Colocar músicas do álbum atual"
+msgstr "Colocar faixas do álbum atual"
 
 msgid "Enqueue Songs from Current Artist"
-msgstr "Colocar músicas do artista atual"
+msgstr "Colocar faixas do artista atual"
 
 msgid "Enqueue a list of files/folders"
 msgstr "Colocar lista de ficheiros/pastas"
@@ -1206,6 +1239,9 @@ msgstr "Equalizador"
 
 msgid "Error :"
 msgstr "Erro:"
+
+msgid "Error details"
+msgstr "Detalhes do erro"
 
 #, perl-brace-format
 msgid ""
@@ -1292,6 +1328,9 @@ msgstr ""
 "Falha ao eliminar \"{file}\":\n"
 "{error}"
 
+msgid "Fetching albuminfo"
+msgstr "A obter informações do álbum"
+
 msgid "Field name"
 msgstr "Nome do campo"
 
@@ -1300,6 +1339,15 @@ msgstr "Tipo do campo"
 
 msgid "Fields"
 msgstr "Campos"
+
+msgid ""
+"Fields will be saved according to the settings above. Albuminfo files will "
+"be re-read if there are fields to be saved and you choose 'albums missing "
+"reviews' in the combo box."
+msgstr ""
+"Os campos serão gravados de acordo com as definições acima. As informações "
+"serão reanalisadas se existirem campos em branco e caso opte por escolher o "
+"campo \"revisões dos álbuns em falta\""
 
 msgid "File"
 msgstr "Ficheiro"
@@ -1344,7 +1392,7 @@ msgid "Filter on playing Artist"
 msgstr "Filtrar no artista reproduzido"
 
 msgid "Filter on playing Song"
-msgstr "Filtrar na música reproduzida"
+msgstr "Filtrar na faixa reproduzida"
 
 msgid "Filter on this album"
 msgstr "Filtrar neste álbum"
@@ -1359,13 +1407,13 @@ msgid "Find a unique filename if file already exists"
 msgstr "Procurar um nome de ficheiro único, se existente"
 
 msgid "Find songs in same albums"
-msgstr "Procurar músicas nos mesmos álbuns"
+msgstr "Procurar faixas nos mesmos álbuns"
 
 msgid "Find songs with same artists"
-msgstr "Procurar músicas do mesmo artista"
+msgstr "Procurar faixas do mesmo artista"
 
 msgid "Find songs with the same names"
-msgstr "Procurar músicas com o mesmo nome"
+msgstr "Procurar faixas com o mesmo nome"
 
 msgid "Folder"
 msgstr "Pasta"
@@ -1380,13 +1428,13 @@ msgid "Folder pattern :"
 msgstr "Padrão da pasta:"
 
 msgid "Folders to search for new songs"
-msgstr "Pastas a analisar por novas músicas"
+msgstr "Pastas a analisar por novas faixas"
 
 msgid "Follow playing song"
-msgstr "Segue a música reproduzida"
+msgstr "Segue a faixa reproduzida"
 
 msgid "Follow selected song"
-msgstr "Segue a música selecionada"
+msgstr "Segue a faixa selecionada"
 
 msgid "Font size"
 msgstr "Tamanho da letra"
@@ -1413,7 +1461,7 @@ msgid "GStreamer module not loaded."
 msgstr "Módulo gstreamer não carregado."
 
 msgid "Gain for songs missing replaygain tags"
-msgstr "Ganho para músicas sem ReplayGain"
+msgstr "Ganho para faixas sem ReplayGain"
 
 msgid "Garage Fullscreen"
 msgstr "Garage"
@@ -1446,7 +1494,7 @@ msgid "Go to Playing Track"
 msgstr "Ir para a faixa em reprodução"
 
 msgid "Go to playing song"
-msgstr "Ir para a música em reprodução"
+msgstr "Ir para a faixa em reprodução"
 
 msgid "Group by :"
 msgstr "Agrupar por:"
@@ -1471,6 +1519,9 @@ msgstr "Ocultar"
 
 msgid "Hide Artist/Album bar"
 msgstr "Ocultar barra de Artista/álbum"
+
+msgid "Hide non-matching"
+msgstr "Ocultar não coincidentes"
 
 msgid "Hide toolbar"
 msgstr "Ocultar barra de ferramentas"
@@ -1513,10 +1564,10 @@ msgid "Insensitive title-artist (right-aligned)"
 msgstr "Título-artista não sensível (alinhado à direita)"
 
 msgid "Insensitive, Song & Cover"
-msgstr "Não sensível, música e capa"
+msgstr "Não sensível, faixa e capa"
 
 msgid "Insert Selected Songs at the top of the queue"
-msgstr "Inserir músicas selecionadas no início da fila de reprodução"
+msgstr "Inserir faixas selecionadas no início da fila de reprodução"
 
 msgid "Insert a list of files/folders at the start of the playlist"
 msgstr "Inserir uma lista de ficheiros/pastas no início da lista de reprodução"
@@ -1560,6 +1611,10 @@ msgstr "Palavras-chave"
 
 msgid "Label"
 msgstr "Etiqueta"
+
+msgctxt "Record_label"
+msgid "Label"
+msgstr "Editora"
 
 msgid "Label is set"
 msgstr "Etiqueta definida"
@@ -1631,8 +1686,8 @@ msgstr ""
 #, perl-format
 msgid "Library size : %d song"
 msgid_plural "Library size : %d songs"
-msgstr[0] "Coleção: %d música"
-msgstr[1] "Coleção: %d músicas"
+msgstr[0] "Coleção: %d faixa"
+msgstr[1] "Coleção: %d faixas"
 
 msgid "Limit similar artists to a rate of similarity : "
 msgstr "Limitar a uma taxa de semelhança:"
@@ -1653,7 +1708,7 @@ msgid "Listed : "
 msgstr "Listada(s):"
 
 msgid "Listed songs"
-msgstr "Músicas listadas"
+msgstr "Faixas listadas"
 
 msgid "Listeners: "
 msgstr "Ouvintes:"
@@ -1676,8 +1731,8 @@ msgstr "Carregar/gravar informações do artista em:"
 #, perl-format
 msgid "Loaded %d unsent song from previous session"
 msgid_plural "Loaded %d unsent songs from previous session"
-msgstr[0] "%d música não marcada da sessão anterior foi carregada"
-msgstr[1] "%d músicas não marcadas da sessão anterior foram carregadas"
+msgstr[0] "%d faixa não marcada da sessão anterior foi carregada"
+msgstr[1] "%d faixas não marcadas da sessão anterior foram carregadas"
 
 msgid "Loading failed."
 msgstr "Falha ao carregar"
@@ -1701,7 +1756,7 @@ msgid "Lock on Artist"
 msgstr "Bloquear no artista"
 
 msgid "Lock on song"
-msgstr "Bloquear na música"
+msgstr "Bloquear na faixa"
 
 #, perl-brace-format
 msgid "Lock on {field}"
@@ -1902,10 +1957,10 @@ msgid "Next Artist"
 msgstr "Artista seguinte"
 
 msgid "Next Song"
-msgstr "Música seguinte"
+msgstr "Faixa seguinte"
 
 msgid "Next Song In Playlist"
-msgstr "Música seguinte na lista de reprodução"
+msgstr "Faixa seguinte na lista de reprodução"
 
 msgid "No connections"
 msgstr "Sem ligações"
@@ -1931,9 +1986,6 @@ msgstr "Sem disposições"
 msgid "No results found"
 msgstr "Sem resultados"
 
-msgid "No results found."
-msgstr "Nenhum resultado encontrado"
-
 msgid "No review found"
 msgstr "Nenhuma crítica encontrada"
 
@@ -1941,10 +1993,10 @@ msgid "No review written."
 msgstr "Nenhuma crítica escrita"
 
 msgid "No songs"
-msgstr "Sem músicas"
+msgstr "Sem faixas"
 
 msgid "No songs found"
-msgstr "Sem músicas"
+msgstr "Sem faixas"
 
 msgid "No sound menu found"
 msgstr "Sem menu de som"
@@ -1993,7 +2045,7 @@ msgstr "Plugin Notificações"
 
 msgid "Notify you of the playing song with the system's notification popups"
 msgstr ""
-"Alerta-o sobre a alteração das músicas reproduzidas através de notificações"
+"Alerta-o sobre a alteração das faixas reproduzidas através de notificações"
 
 msgid "Now playing"
 msgstr "A reproduzir"
@@ -2062,9 +2114,6 @@ msgstr "Só afeta ficheiros mp3 que não tenham detalhes ID3v1"
 msgid "Only show similar artists from local library"
 msgstr "Mostrar apenas aos artistas semelhantes da coleção"
 
-msgid "Only works when the review tab is displayed"
-msgstr "Só funciona se o separador \"Crítica\" for exibido"
-
 msgid "Opacity"
 msgstr "Opacidade"
 
@@ -2099,7 +2148,7 @@ msgid "Open Search window"
 msgstr "Abrir janela de procura"
 
 msgid "Open allmusic.com in your web browser"
-msgstr "Abrir all.music no navegador web"
+msgstr "Abrir allmusic.com no navegador web"
 
 msgid "Open containing folder"
 msgstr "Abrir pasta correspondente"
@@ -2186,6 +2235,9 @@ msgstr "Padrão para ficheiros .lrc:"
 msgid "Pause"
 msgstr "Pausar"
 
+msgid "Pick an existing one"
+msgstr "Escolher uma existente"
+
 msgid "Picture"
 msgstr "Imagem"
 
@@ -2207,7 +2259,7 @@ msgid "Picture size : %d"
 msgstr "Dimensão da imagem: %d"
 
 msgid "Pictures and music files"
-msgstr "Imagens e ficheiros musicais"
+msgstr "Imagens e ficheiros de música"
 
 msgid "Pictures files"
 msgstr "Imagens"
@@ -2225,10 +2277,10 @@ msgid "Play a list of files"
 msgstr "Reproduzir ficheiros"
 
 msgid "Play all songs from this album"
-msgstr "Reproduzir músicas deste álbum"
+msgstr "Reproduzir faixas deste álbum"
 
 msgid "Play all songs from this artist"
-msgstr "Reproduzir músicas deste artista"
+msgstr "Reproduzir faixas deste artista"
 
 msgid "Play button"
 msgstr "Botão \"Reproduzir\""
@@ -2242,11 +2294,17 @@ msgstr "Contador de reproduções"
 msgid "Play filter"
 msgstr "Reproduzir filtro"
 
+msgid "Play history"
+msgstr "Histórico de reprodução"
+
 msgid "Play listed songs"
-msgstr "Reproduzir músicas listadas"
+msgstr "Reproduzir faixas listadas"
 
 msgid "Play order"
 msgstr "Ordem de reprodução"
+
+msgid "Play, queue or track"
+msgstr "Reproduzir fila de reprodução ou faixa"
 
 msgid "Play/Pause"
 msgstr "Reproduzir/Pausa"
@@ -2361,10 +2419,10 @@ msgid "Previous"
 msgstr "Anterior"
 
 msgid "Previous Song"
-msgstr "Música anterior"
+msgstr "Faixa anterior"
 
 msgid "Previous Song In Playlist"
-msgstr "Música anterior na lista de reprodução"
+msgstr "Faixa anterior na lista de reprodução"
 
 msgid "Previous page"
 msgstr "Página anterior"
@@ -2491,17 +2549,17 @@ msgid "Recent artists"
 msgstr "Artistas recentes"
 
 msgid "Recent songs"
-msgstr "Músicas recentes"
+msgstr "Faixas recentes"
 
 msgid "Recent songs include skipped songs that haven't been played."
 msgstr ""
-"As músicas recentes também incluem as músicas ignoradas e não reproduzidas."
+"As faixas recentes também incluem as faixas ignoradas e não reproduzidas."
 
 msgid "Recently played"
 msgstr "Reproduções recentes"
 
 msgid "Recently played songs"
-msgstr "Músicas reproduzidas recentemente"
+msgstr "Faixas reproduzidas recentemente"
 
 msgid "Record label"
 msgstr "Editora"
@@ -2543,7 +2601,7 @@ msgid "Remember playing position between sessions"
 msgstr "Lembrar posição de reprodução entre as sessões"
 
 msgid "Remember playing song between sessions"
-msgstr "Lembrar música reproduzida entre as sessões"
+msgstr "Lembrar faixa reproduzida entre as sessões"
 
 msgid "Remember queue between sessions"
 msgstr "Lembrar fila de reprodução entre as sessões"
@@ -2555,13 +2613,13 @@ msgid "Remove"
 msgstr "Remover"
 
 msgid "Remove a label from the current song"
-msgstr "Remover etiqueta da música atual"
+msgstr "Remover etiqueta da faixa atual"
 
 msgid "Remove all"
 msgstr "Remover tudo"
 
 msgid "Remove all songs"
-msgstr "Remover todas as músicas"
+msgstr "Remover todas as faixas"
 
 msgid "Remove filter"
 msgstr "Remover filtro"
@@ -2591,7 +2649,7 @@ msgid "Remove list"
 msgstr "Remover lista"
 
 msgid "Remove selected songs"
-msgstr "Remover músicas selecionadas"
+msgstr "Remover faixas selecionadas"
 
 msgid "Remove this field"
 msgstr "Remover este campo"
@@ -2709,7 +2767,7 @@ msgid "Ripping software :"
 msgstr "Programa:"
 
 msgid "Run a command when playing a song"
-msgstr "Executa um comando ao reproduzir uma música"
+msgstr "Executa um comando ao reproduzir uma faixa"
 
 msgid "Run perl code"
 msgstr "Executar código perl"
@@ -2776,10 +2834,10 @@ msgstr "Gravar crítica"
 
 msgid ""
 "Save selected fields for all tracks on the same album whenever album data is "
-"loaded from AMG or from file."
+"loaded from allmusic or from file."
 msgstr ""
 "Gravar campos selecionados para todas as faixas do mesmo álbum se os dados "
-"forem obtidos no AMG ou ficheiro"
+"forem obtidos no allmusic ou no ficheiro."
 
 #, perl-format
 msgid "Save tags/settings every %d minutes"
@@ -2804,7 +2862,7 @@ msgid "Scan as an album"
 msgstr "Analisar por álbum"
 
 msgid "Scan for new songs"
-msgstr "Procurar novas músicas"
+msgstr "Procurar novas faixas"
 
 msgid "Scan per-file track gain"
 msgstr "Analisar por ficheiro"
@@ -2819,10 +2877,10 @@ msgid "Scanning"
 msgstr "A analisar..."
 
 msgid "Scroll with song"
-msgstr "Deslocar com música"
+msgstr "Deslocar com a faixa"
 
 msgid "Scroll with the song"
-msgstr "Deslocar com a música"
+msgstr "Deslocar com a faixa"
 
 msgid "Scrollwheel to change, right-click to mute"
 msgstr "Roda do rato para alterar e botão direito para silenciar"
@@ -2898,7 +2956,7 @@ msgid "Search for current artist"
 msgstr "Procurar artista atual"
 
 msgid "Search for new songs on startup"
-msgstr "Procurar novas músicas ao iniciar"
+msgstr "Procurar novas faixas ao iniciar"
 
 msgid "Search google for Artist"
 msgstr "Procurar artista no google"
@@ -2928,7 +2986,7 @@ msgid "Seek"
 msgstr "Posicionamento"
 
 msgid "Select current song"
-msgstr "Selecionar música atual"
+msgstr "Selecionar faixa atual"
 
 msgid "Select fields"
 msgstr "Selecionar campos"
@@ -2946,10 +3004,10 @@ msgid "Selected : "
 msgstr "Selecionada: "
 
 msgid "Selected songs"
-msgstr "Músicas selecionadas"
+msgstr "Faixas selecionadas"
 
 msgid "Selected songs to update :"
-msgstr "Músicas a atualizar:"
+msgstr "Faixas a atualizar:"
 
 msgid "Selecting pictures"
 msgstr "A selecionar imagens"
@@ -2961,7 +3019,7 @@ msgid "Send Title/Artist/Album in standard input"
 msgstr "Enviar título/artista/álbum na entrada padrão"
 
 msgid "Set Current Song Rating"
-msgstr "Definir avaliação da música atual"
+msgstr "Definir avaliação da faixa atual"
 
 msgid "Set Picture"
 msgstr "Definir imagem"
@@ -3001,8 +3059,8 @@ msgid ""
 "songs filenames) are available)"
 msgstr ""
 "Comando de terminal\n"
-"(algumas variáveis como %f (nome do ficheiro da música atual) ou %F (lista "
-"dos nome de ficheiros das música selecionados) estão disponíveis)"
+"Algumas variáveis como %f (nome do ficheiro da faixa atual) ou %F (lista dos "
+"nome de ficheiros das faixas selecionadas) estão disponíveis"
 
 #. Shift key
 msgctxt "Keyboard"
@@ -3020,6 +3078,9 @@ msgstr "Mostrar artista na wikipedia"
 
 msgid "Show album"
 msgstr "Mostrar álbum"
+
+msgid "Show artist picture"
+msgstr "Mostrar imagem do artista"
 
 msgid "Show artist's biography"
 msgstr "Mostrar biografia do artista"
@@ -3052,7 +3113,7 @@ msgid "Show similar artists"
 msgstr "Mostrar artistas semelhantes"
 
 msgid "Show song details"
-msgstr "Mostrar detalhes da música"
+msgstr "Mostrar detalhes da faixa"
 
 msgid "Show status bar"
 msgstr "Mostrar barra de estado"
@@ -3067,7 +3128,7 @@ msgid "Show tray icon"
 msgstr "Mostrar ícone na bandeja"
 
 msgid "Show tray tip on song change"
-msgstr "Mostrar alerta ao mudar de música"
+msgstr "Mostrar alerta ao mudar de faixa"
 
 msgid "Show/Hide"
 msgstr "Mostrar/ocultar"
@@ -3126,8 +3187,11 @@ msgstr "Tamanho"
 msgid "Skip count"
 msgstr "Contagens ignoradas"
 
+msgid "Skip history"
+msgstr "Histórico de ignoradas"
+
 msgid "Skip to next song if an error occurs"
-msgstr "Ir para música seguinte se ocorrer um erro"
+msgstr "Ir para faixa seguinte se ocorrer um erro"
 
 msgid "Small"
 msgstr "Pequeno"
@@ -3145,19 +3209,19 @@ msgid "Song"
 msgstr "Música"
 
 msgid "Song Properties"
-msgstr "Propriedades da música"
+msgstr "Propriedades da faixa"
 
 msgid "Song informations"
-msgstr "Informações da música"
+msgstr "Informações da faixa"
 
 msgid "Song rating"
-msgstr "Avaliação da música"
+msgstr "Avaliação da faixa"
 
 msgid "SongTree groupings edition"
 msgstr "Edição de agrupamento em árvore"
 
 msgid "Songs Properties"
-msgstr "Propriedades das músicas"
+msgstr "Propriedades das faixas"
 
 msgid "Songtree View"
 msgstr "Exibição em árvore"
@@ -3177,6 +3241,9 @@ msgstr "Dividir nomes em:"
 msgid "Standard fields"
 msgstr "Campos padrão"
 
+msgid "Start ReplayGain analysis"
+msgstr "Iniciar análise Replay Gain"
+
 msgid "Start in tray"
 msgstr "Iniciar na bandeja"
 
@@ -3191,6 +3258,9 @@ msgstr "Parar"
 
 msgid "Stop checking"
 msgstr "Parar verificação"
+
+msgid "Stop fetching albuminfo"
+msgstr "Para obtenção das informações"
 
 msgid "Stop scanning"
 msgstr "Parar análise"
@@ -3226,7 +3296,7 @@ msgid "Submit failed : "
 msgstr "Falha ao enviar:"
 
 msgid "Submit played songs to last.fm"
-msgstr "Enviar músicas para last.fm"
+msgstr "Enviar faixas para last.fm"
 
 msgid "Subtitle"
 msgstr "Subtítulo"
@@ -3281,8 +3351,8 @@ msgstr "Precisa deste comando: {cmd} para reproduzir ficheiros {type}"
 #, perl-format
 msgid "This label is set for %d song."
 msgid_plural "This label is set for %d songs."
-msgstr[0] "Esta etiqueta está definida para % d música."
-msgstr[1] "Estas etiqueta está definida para % d músicas."
+msgstr[0] "Esta etiqueta está definida para %d faixa."
+msgstr[1] "Estas etiqueta está definida para %d faixas."
 
 msgid "This plugin requires :"
 msgstr "Este plugin requer:"
@@ -3323,6 +3393,9 @@ msgstr "Título e evolução"
 msgid "Title - Artist - Album"
 msgstr "Título - Artista - Álbum"
 
+msgid "Title or filename"
+msgstr "Título ou nome de ficheiro"
+
 #, perl-format
 msgid "Title: %t"
 msgstr "Título: %t"
@@ -3344,10 +3417,10 @@ msgid "Toggle Artist Lock"
 msgstr "Trocar bloqueio de artista"
 
 msgid "Toggle Song Lock"
-msgstr "Trocar bloqueio de música"
+msgstr "Trocar bloqueio de faixa"
 
 msgid "Toggle a label of the current song"
-msgstr "Trocar etiqueta da música atual"
+msgstr "Trocar etiqueta da faixa atual"
 
 msgid "Toggle between Random/Shuffle and Ordered"
 msgstr "Trocar entre aleatório, baralhado e ordenado"
@@ -3578,11 +3651,11 @@ msgid ""
 "When changing songs, the previous song is added to the recent list even if "
 "not played at all."
 msgstr ""
-"Ao alterar músicas, a música anterior será adicionada à lista de recentes "
+"Ao alterar a faixa, a faixa anterior será adicionada à lista de recentes, "
 "mesmo que não tenha sido reproduzida."
 
 msgid "When current song"
-msgstr "Se música atual"
+msgstr "Se faixa atual"
 
 msgid "Whole library"
 msgstr "Toda a coleção "
@@ -3602,8 +3675,8 @@ msgid ""
 "Warning, the changes for a song will be lost if the tag is re-read."
 msgstr ""
 "Não grave os detalhes, a não ser com a caixa de diálogo de edição avançada. "
-"As alterações serão mantidas na biblioteca.\n"
-"As alterações da música serão perdidas se os detalhes forem novamente "
+"As alterações serão mantidas na coleção.\n"
+"As alterações à faixa serão perdidas se os detalhes forem novamente "
 "analisados."
 
 msgid "Will use default if not found"
@@ -3698,11 +3771,17 @@ msgstr "após"
 msgid "after %s"
 msgstr "após %s"
 
+msgid "album information now for"
+msgstr "informações do álbum para"
+
 #. comma-separated list of field aliases for album, these are in addition to
 #. english aliases
 msgctxt "Field_aliases"
 msgid "album,on"
 msgstr "álbum, em"
+
+msgid "albums missing reviews"
+msgstr "revisões dos álbuns em falta"
 
 msgid "alphabetical"
 msgstr "ordem alfabética"
@@ -3944,6 +4023,9 @@ msgstr "vazio"
 msgid "enable gapless (experimental)"
 msgstr "ativar \"gapless\" (experimental)"
 
+msgid "entire collection"
+msgstr "toda a coleção"
+
 msgid "error"
 msgstr "erro"
 
@@ -3952,7 +4034,10 @@ msgstr "ex:"
 
 #, perl-brace-format
 msgid "example (selected song) : {score}  ({chances})"
-msgstr "exemplo (música selecionada) : {score}  ({chances})"
+msgstr "exemplo (faixa selecionada) : {score}  ({chances})"
+
+msgid "example :"
+msgstr "exemplo:"
 
 msgid "example : "
 msgstr "exemplo:"
@@ -3994,6 +4079,9 @@ msgstr "para ficheiros sem cabeçalho VBR"
 
 msgid "front cover"
 msgstr "capa frontal"
+
+msgid "fuzzy match"
+msgstr "ocorrências aproximadas"
 
 msgid "gmusicbrowser"
 msgstr "gmusicbrowser"
@@ -4107,8 +4195,11 @@ msgstr "é 44.1kHz"
 msgid "is a flac file"
 msgstr "é flac"
 
-msgid "is a m4a file"
-msgstr "é m4a"
+msgid "is a lossless file"
+msgstr "é um ficheiro com perda reduzida"
+
+msgid "is a lossy file"
+msgstr "é um ficheiro com perda"
 
 msgid "is a mp3 file"
 msgstr "é mp3"
@@ -4116,14 +4207,26 @@ msgstr "é mp3"
 msgid "is a musepack file"
 msgstr "é musepack"
 
+msgid "is a vorbis file"
+msgstr "é um ficheiro vorbis"
+
 msgid "is a wavepack file"
 msgstr "é wavepack"
+
+msgid "is an aac file"
+msgstr "é um ficheiro aac"
+
+msgid "is an alac file"
+msgstr "é um ficheiro alac"
 
 msgid "is an ape file"
 msgstr "é ape"
 
-msgid "is an ogg file"
-msgstr "é ogg"
+msgid "is an mp4/m4a file"
+msgstr "é um ficheiro mp4/m4a"
+
+msgid "is defined"
+msgstr "está definido"
 
 msgid "is equal to"
 msgstr "é igual a"
@@ -4144,6 +4247,9 @@ msgstr "está em %s"
 
 msgid "is mono"
 msgstr "é mono"
+
+msgid "is not defined"
+msgstr "não está definido"
 
 msgid "is smart equal"
 msgstr "igualdade inteligente"
@@ -4214,7 +4320,7 @@ msgid "left-side filter panes"
 msgstr "Painéis de filtro do lado esquerdo"
 
 msgid "length of songs"
-msgstr "duração das músicas"
+msgstr "duração das faixas"
 
 msgid "less than"
 msgstr "menor que"
@@ -4314,6 +4420,10 @@ msgstr "nunca"
 msgid "never played"
 msgstr "Nunca reproduzida"
 
+#, perl-format
+msgid "no %s fuzzy match with %s"
+msgstr "sem %s  ocorrências aproximadas a %s"
+
 msgid "no matches found, you might want to remove some search terms."
 msgstr "nenhum resultado encontrado. Tente remover alguns termos."
 
@@ -4330,7 +4440,7 @@ msgid "no plugins found"
 msgstr "nenhum plugin encontrado"
 
 msgid "no songs needs checking"
-msgstr "as canções não necessitam verificação"
+msgstr "as faixas não necessitam verificação"
 
 msgid "no splitting"
 msgstr "sem divisão"
@@ -4354,6 +4464,9 @@ msgstr "não entre %s e %s"
 
 msgid "not bootleg"
 msgstr "não ilegal"
+
+msgid "not defined"
+msgstr "não definido"
 
 #, perl-format
 msgid "not in the bottom %s"
@@ -4380,13 +4493,13 @@ msgid "not the %s most recent"
 msgstr "não nos últimos %s mais recentes"
 
 msgid "number of songs"
-msgstr "número de músicas"
+msgstr "número de faixas"
 
 msgid "number of songs in filter"
-msgstr "número de músicas no filtro"
+msgstr "número de faixas no filtro"
 
 msgid "only show entries with at least n songs"
-msgstr "mostrar apenas as entradas com um mínimo de X músicas"
+msgstr "mostrar apenas as entradas com um mínimo de X faixas"
 
 msgid "only works when the artist-info tab is displayed"
 msgstr "só funciona se o separador das informações do artista for exibido"
@@ -4526,6 +4639,9 @@ msgstr "definir para"
 msgid "set to %s"
 msgstr "definir para %s"
 
+msgid "show histogram background"
+msgstr "mostrar imagem de fundo do histograma"
+
 msgid "show pictures"
 msgstr "mostrar imagens"
 
@@ -4557,7 +4673,7 @@ msgid "string"
 msgstr "linha"
 
 msgid "supports : "
-msgstr "suporta: "
+msgstr "suporta : "
 
 msgid "text format"
 msgstr "formato de texto"
@@ -4653,7 +4769,7 @@ msgid "use gnome settings"
 msgstr "utilizar definições gnome"
 
 msgid "use song folder"
-msgstr "utilizar pasta de música"
+msgstr "utilizar pasta de faixas"
 
 msgid "use standard strftime variables"
 msgstr "utilizar variáveis strftime padrão"
