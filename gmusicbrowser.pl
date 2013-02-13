@@ -1413,6 +1413,9 @@ exit;
 
 sub Edittag_mode
 {	my @dirs=@_;
+	$Songs::Def{$_}{flags}=~m/w/ || $Songs::Def{$_}{flags}=~s/e// for keys %Songs::Def; #quick hack to remove fields that are not written in the tag from the mass-tagging dialog
+	FirstTime(); Post_ReadSavedTags();
+	LoadIcons(); #for stars edit widget that shouldn't be shown anyway
 	$Options{LengthCheckMode}='never';
 	$_=rel2abs($_) for @dirs;
 	IdleScan(@dirs);
