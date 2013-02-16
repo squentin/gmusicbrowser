@@ -459,7 +459,6 @@ sub ArtistChanged
 {	my ($self,$aID,$albumID,$force)=@_;
 	return unless $self->mapped;
 	return unless defined $aID;
-	$self->cancel;
 	my $rating = AA::Get("rating:average",'artist',$aID);
 	$self->{artistratingvalue}= int($rating+0.5);
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
@@ -478,6 +477,7 @@ sub ArtistChanged
 	my $url = GetUrl($sites{$self->{site}}[SITEURL],$aID);
 	return unless $url;
 	if (!$self->{url} or ($url ne $self->{url}) or $force) {
+		$self->cancel;
 		$self->{url} = $url;
 		if ($self->{site} eq "biography") { # check for local biography file before loading the page
 			unless ($force) {
