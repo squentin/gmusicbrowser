@@ -1595,6 +1595,7 @@ use base 'Gtk2::Window';
 
 sub new
 {	my ($class,$layout,%options)=@_;
+	my @original_args=@_;
 	my $fallback=delete $options{fallback} || 'Lists, Library & Context';
 	my $opt0={};
 	if (my $opt= $layout=~m/^[^(]+\(.*=/)
@@ -1620,7 +1621,7 @@ sub new
 	{	my ($window)=grep $_->isa('Layout::Window') && $_->{uniqueid} eq $uniqueid, Gtk2::Window->list_toplevels;
 		if ($window)
 		{	if    ($mode eq 'toggle'  && !$window->{quitonclose})	{ $window->close_window; return }
-			elsif ($mode eq 'replace' && !$window->{quitonclose})	{ $window->close_window; }
+			elsif ($mode eq 'replace' && !$window->{quitonclose})	{ $window->close_window; return Layout::Window::new(@original_args,ifexists=>0); } # destroying previous window make it save its settings, then restart new() from the start with new $opt2 but the same original arguments, add ifexists=>0 to make sure it doesn't loop
 			elsif ($mode eq 'present')			 	{ $window->force_present; return }
 		}
 	}
