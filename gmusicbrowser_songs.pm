@@ -298,6 +298,7 @@ our %timespan_menu=
 		set	=> '#_# = #VAL#; #_iname#= ::superlc(#VAL#);',
 		si_sort	=> '#_iname#',
 		'filter:si'	=> 'index( #_iname#,"#VAL#") .!=. -1',			'filter_prep:si'=> sub { quotemeta ::superlc($_[0])},
+		'filter:mi'	=> '#_iname# .=~. m"#VAL#"i',			'filter_prep:mi'=> sub { Filter::QuoteRegEx( ::superlc($_[0]) )},
 		'filter:fuzzy'	=> ' .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",#_iname#)',	'filter_prep:fuzzy'=> sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta ::superlc($arg[1])},
 	},
 	text =>	#multi-lines string
