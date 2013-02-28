@@ -4072,7 +4072,7 @@ sub new_from_smartstring
 		if ($string=~s&^(\w+(?:\|\w+)*)?(<=|>=|[:<>=~]|#+)&&)
 		{	$fields=$1; $op=$2;
 			if ($fields)
-			{	my @f= grep $_, map $Songs::Aliases{::superlc($_)}, split(/\|/,$fields);
+			{	my @f= grep $_, map { $Songs::Aliases{$_} || $Songs::Aliases{::superlc($_)} } split(/\|/,$fields);
 				if (@f) { $fields= join '|',@f }
 				else { $string= $fields.$op.$string; $fields=$op=undef; }	#no recognized field => treat $fields and $op as part of the pattern
 			}
