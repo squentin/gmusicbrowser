@@ -1,3 +1,69 @@
+v1.1.10
+finally update the layout doc
+add playhistory and skiphistory fields, these fields hold a list of the dates of plays and skips (skiphistory disabled by default)
+add fuzzy search filter for string fields (see commit 32ddecd64d)
+smarter date parsing in SimpleSearch (see commit a9e84ca131)
+add searching for not-defined/empty in SimpleSearch (see commit ceb42b5e8f)
+set play/pause button default right-click action to "Stop"
+add dialog to edit the row tip in SongTree/SongList (from the column context menu)
+add filterlist option to show histograms in background    only shown for top-level, would require storing song numbers in store to show it in sub-trees
+add "hide non-matching" option to type-ahead search in FilterLists
+masstagging dialog: change the artist/... combobox (speed-ups, differentiate values from selected songs, and those from library )
+improvements to album/artist menus
+songs from album menu: add ctrl/shift-middle click action  (currently, both ctrl-middle click and shift middle-click now enqueue the song without popping down the menu)
+lots of replaygain improvements and fixes, and add support for replaygain with mplayer
+lots of improvements to float fields (used in song/album peak/gain fields) : distinguish 0 and undef, can be used in FilterPanes, better search
+add option to make track/album-gain, playcount and skipcount editable in song properties
+add support for compressed gmbrc, old backups are now compress with xz by default
+add "title or filename" column and sort order
+add "Play, queue or track" column to SongList
+
+plugins:
+picture finder: update to fix google and lastfm search
+artistinfo: update to fix biography loading
+artistinfo: various improvements
+albuminfo: update to fix allmusic loading
+albuminfo: add option to download info for all albums in collection
+albuminfo: various improvements
+lyrics: add toggle button to switch between read-only and editable
+lyrics: add some keyboard shortcuts (ctrl-e ctrl-+ ctrl--)
+lyrics: allow auto-scrolling to go backward
+mpris2: add FullScreen property and fix behavior of Play and Pause
+webcontext: make mouse buttons 8/9 go back/forward
+webcontext: make middle-click open a link in a new tab (webkit only, page must be in a NB/Context/TabbedLists widget)
+
+fixes:
+m4a files: fix error when reading "----" atoms that don't contain a data sub-atom
+mplayer : fix wrong time position on some mp3 by using -hr-mp3-seek option
+FilterPanes: fix search bar not working for genres/labels/number/dates tabs
+various search/filter fixes
+mplayer and 123 backend: small fixes
+fix dragging folders from the filesystem Filterpane tab
+fix renaming folder with non-utf8 encoding
+fix "add files of folders" no longer working when selecting only one folder
+various keybinding fixes in songtree/cloud/mosaic
+fix -tagedit command-line option
+songlist/songtree: fix activate=playlist option and add 2 other modes
+fix malformed non-ascii dates string with perl>=5.11.1
+
+layouts:
+layout definitions: make it easier to split long lines into multiple lines (\ no longer needed in most cases)
+songlist/songtree: fix activate=playlist option and add 2 other values for activate option: filter_and_play and filter_sort_and_play
+add hidetabs=1 options to NB/TabbedLists/Context (meant to be used with SetFocusOn to change the visible page/child)
+make it possible for boxes (at least WB) to use hover_* options
+songtree group skins: add $album_artist $album_artistid and $albumraw
+commands:
+add the ClearPlaylist and ChooseSongFromAlbum command
+extend OpenPref command to make it possible to open a given page example: OpenPref(fields:artist)
+fix ToggleFullScreen command not working from a menu
+fix NextArtist command
+Change "Clear queue" to only clear the queue, and not the queue mode
+
+translation updates : Czech, Dutch, Korean, Portuguese and Russian
+add Chinese(Taiwan), Finnish, Japanese and Serbian translation
+(many thanks to the translators)
+
+
 v1.1.9
 add a few layouts and small fixes to some contributed layouts
 improve songs-from-album menu
