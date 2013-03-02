@@ -15,7 +15,14 @@ liconsdir	= $(iconsdir)/large
 miconsdir	= $(iconsdir)/mini
 
 DOCS=AUTHORS COPYING README NEWS INSTALL layout_doc.html
-LINGUAS=$(shell for l in po/*po; do basename $$l .po; done)
+
+# this triggers correct gettext behavior
+# unset LINGUAS => installs all supported linguas
+# LINGUAS="" => installs none
+# LINGUAS="fr ru" => installs only fr and ru
+SUPPORTED_LINGUAS=$(shell for l in po/*po; do basename $$l .po; done)
+LCMD := if [ -n "$${LINGUAS+x}" ] ; then for f in $(SUPPORTED_LINGUAS) ; do case "$(LINGUAS)" in *$$f*) printf "$$f " ;; esac ; done ; else printf "$(SUPPORTED_LINGUAS)" ; fi
+ACTIVE_LINGUAS = $(shell $(LCMD))
 
 all: locale
 clean:
@@ -33,10 +40,10 @@ locale/%/LC_MESSAGES/gmusicbrowser.mo : po/%.po po/gmusicbrowser.pot
 	mkdir -p locale/$*/LC_MESSAGES/
 	msgfmt --statistics -c -o $@ $<
 
-locale: $(foreach l,$(LINGUAS),locale/$l/LC_MESSAGES/gmusicbrowser.mo)
+locale: $(foreach l,$(ACTIVE_LINGUAS),locale/$l/LC_MESSAGES/gmusicbrowser.mo)
 
 checkpo:
-	for lang in $(LINGUAS) ; do msgfmt -c po/$$lang.po -o /dev/null || exit 1 ; done
+	for lang in $(ACTIVE_LINGUAS) ; do msgfmt -c po/$$lang.po -o /dev/null || exit 1 ; done
 
 install: all
 	mkdir -p "$(bindir)"
@@ -68,7 +75,7 @@ install: all
 	install -pDm 644 pix/gmusicbrowser32x32.png "$(iconsdir)/gmusicbrowser.png"
 	install -pDm 644 pix/gmusicbrowser.png      "$(liconsdir)/gmusicbrowser.png"
 	install -pDm 644 pix/trayicon.png           "$(miconsdir)/gmusicbrowser.png"
-	for lang in $(LINGUAS) ; \
+	for lang in $(ACTIVE_LINGUAS) ; \
 	do \
 		install -pd "$(localedir)/$$lang/LC_MESSAGES/"; \
 		install -pm 644 locale/$$lang/LC_MESSAGES/gmusicbrowser.mo	"$(localedir)/$$lang/LC_MESSAGES/"; \
