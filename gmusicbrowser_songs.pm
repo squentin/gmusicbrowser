@@ -2004,7 +2004,10 @@ sub CheckMissing
 	my $song=$_[0];
 	#my $key=Get($song,'missingkey');
 
-	#ugly fix, clean-up the fields so they can be comapred to those in library, depends on @MissingKeyFields #FIXME
+	return unless defined $song->{title} && length $song->{title} && (defined $song->{album} || defined $song->{artist});
+	for (qw/title album artist track/) { $song->{$_}="" unless defined $song->{$_} }
+	return unless length ($song->{album} . $song->{artist});
+	#ugly fix, clean-up the fields so they can be compared to those in library, depends on @MissingKeyFields #FIXME
 	$song->{$_}=~s/\s+$// for qw/title album artist/;
 	$song->{track}= $song->{track}=~m/^(\d+)/ ? $1+0 : 0;
 
