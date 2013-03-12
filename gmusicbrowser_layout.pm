@@ -2395,7 +2395,7 @@ our @contextmenu=
 		submenu => sub { $_[0]{self}->make_widget_list('context page'); },	submenu_reverse=>1,
 		code	=> sub { $_[0]{self}->newtab($_[1],1); },
 	},
-	{ label => _"Delete list", code => sub { $_[0]{page}->DeleteList; },	type=> 'L',	test => sub { $_[0]{page}{name}=~m/^EditList\d*$/; } },
+	{ label => _"Delete list", code => sub { $_[0]{page}->DeleteList; },	type=> 'L',  istrue=>'page',	test => sub { $_[0]{page}{name}=~m/^EditList\d*$/; } },
 	{ label => _"Rename",	code => \&pagerename_cb,				istrue => 'rename',},
 	{ label => _"Close",	code => sub { $_[0]{self}->close_tab($_[0]{page},1); },	istrue => 'close',	stockicon=> 'gtk-close',},
 );
@@ -2403,6 +2403,7 @@ our @contextmenu=
 our @DefaultOptions=
 (	closebuttons	=> 1,
 	tablist		=> 1,
+	newbutton	=> 'end',
 );
 
 sub new
@@ -2437,6 +2438,15 @@ sub new
 	$self->{widgets_opt}= $opt->{page_opt} ||={};
 	if (my $bl=$opt->{blacklist})
 	{	$self->{blacklist}{$_}=undef for split / +/, $bl;
+	}
+	$opt->{newbutton}=0 unless *Gtk2::Notebook::set_action_widget{CODE}; # Gtk2::Notebook::set_action_widget requires gtk+ >= 2.20 and perl-Gtk2 >= 1.23
+	if ($opt->{typesubmenu} && $opt->{newbutton} && $opt->{newbutton} ne 'none') # add a button next to the tabs to show new-tab menu
+	{	my $button= ::NewIconButton('gtk-add');
+		$button->signal_connect(button_press_event => \&newbutton_cb);
+		$button->signal_connect(clicked => \&newbutton_cb);
+		$button->show_all;
+		my $pos= $opt->{newbutton} eq 'start' ? 'start' : 'end';
+		$self->set_action_widget($button,$pos);
 	}
 	return $self;
 }
@@ -2574,6 +2584,11 @@ sub SavedLists_changed	#remove EditList tab if corresponding list has been delet
 	$self->close_tab($_) for @remove;
 }
 
+sub newbutton_cb
+{	 my $self= ::find_ancestor($_[0],__PACKAGE__);
+	::PopupContextMenu(\@contextmenu, { self=>$self, type=>$self->{typesubmenu}, usemenupos=>1 } );
+	1;
+}
 sub button_press_event_cb
 {	my ($self,$event)=@_;
 	return 0 if $event->button != 3;
