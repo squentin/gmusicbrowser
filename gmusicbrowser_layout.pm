@@ -2532,6 +2532,10 @@ sub Pack
 	$label->set_angle($angle) if $angle;
 	::weaken( $wg->{tab_page_label}=$label ) if $wg->{tabrename};
 
+	# set base gravity to auto so that rotated tabs handle vertical scripts (asian languages) better
+	$label->get_pango_context->set_base_gravity('auto');
+	$label->signal_connect(hierarchy_changed=> sub { $_[0]->get_pango_context->set_base_gravity('auto'); }); # for some reason (gtk bug ?) the setting is reverted when the tab is dragged, so this re-set it
+
 	my $icon= $wg->{tabicon};
 	$icon=Gtk2::Image->new_from_stock($icon,'menu') if defined $icon;
 	my $close;

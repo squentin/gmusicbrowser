@@ -1895,6 +1895,11 @@ sub create_tab
 	my $angle= $self->{angle} || 0;
 	my $label= Gtk2::Label->new( $page->{page_name} );
 	$label->set_angle($angle) if $angle;
+
+	# set base gravity to auto so that rotated tabs handle vertical scripts (asian languages) better
+	$label->get_pango_context->set_base_gravity('auto');
+	$label->signal_connect(hierarchy_changed=> sub { $_[0]->get_pango_context->set_base_gravity('auto'); }); # for some reason (gtk bug ?) the setting is reverted when the tab is dragged, so this re-set it
+
 	if ($self->{tabmode} ne 'text')
 	{	my $icon= "gmb-tab-$pid";
 		$img= Gtk2::Image->new_from_stock($icon,'menu') if Gtk2::IconFactory->lookup_default($icon);
