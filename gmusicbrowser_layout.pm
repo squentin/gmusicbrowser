@@ -2639,8 +2639,11 @@ sub pagerename_cb
 			1;
 		});
 	$entry->signal_connect(activate => sub {$_[0]->set_sensitive(0)}); #trigger the focus-out event
+	$entry->signal_connect(populate_popup => sub { ::weaken($_[0]{popupmenu}=$_[1]); });
 	$entry->signal_connect(focus_out_event => sub
 	 {	my $entry=$_[0];
+		my $popupmenu= delete $entry->{popupmenu};
+		return 0 if $entry->get_display->pointer_is_grabbed && $popupmenu && $popupmenu->mapped; # prevent error when context menu of the entry pops-up
 		my $new=$entry->get_text;
 		$tab->remove($entry);
 		$_->show for $tab->get_children;
