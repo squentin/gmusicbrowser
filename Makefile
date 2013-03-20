@@ -24,11 +24,14 @@ SUPPORTED_LINGUAS=$(shell for l in po/*po; do basename $$l .po; done)
 LCMD := if [ -n "$${LINGUAS+x}" ] ; then for f in $(SUPPORTED_LINGUAS) ; do case "$(LINGUAS)" in *$$f*) printf "$$f " ;; esac ; done ; else printf "$(SUPPORTED_LINGUAS)" ; fi
 ACTIVE_LINGUAS = $(shell $(LCMD))
 
-all: locale
+MARKDOWN= markdown
+
+
+all: locale doc
 clean:
 	rm -rf dist/
 distclean: clean
-	rm -rf locale/
+	rm -rf locale/ layout_doc.html
 
 po/gmusicbrowser.pot : gmusicbrowser.pl *.pm plugins/*.pm layouts/*.layout
 	perl po/create_pot.pl --quiet
@@ -44,6 +47,11 @@ locale: $(foreach l,$(ACTIVE_LINGUAS),locale/$l/LC_MESSAGES/gmusicbrowser.mo)
 
 checkpo:
 	for lang in $(ACTIVE_LINGUAS) ; do msgfmt -c po/$$lang.po -o /dev/null || exit 1 ; done
+
+doc : layout_doc.html
+
+layout_doc.html : layout_doc.mkd
+	${MARKDOWN} layout_doc.mkd > layout_doc.html
 
 install: all
 	mkdir -p "$(bindir)"

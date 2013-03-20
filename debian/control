@@ -3,7 +3,7 @@ Section: sound
 Priority: optional
 Maintainer: Quentin Sculo <squentin@free.fr>
 Homepage: http://gmusicbrowser.org/
-Build-Depends: debhelper (>= 5.0.0)
+Build-Depends: debhelper (>= 5.0.0), markdown
 Standards-Version: 3.7.3
 
 Package: gmusicbrowser
