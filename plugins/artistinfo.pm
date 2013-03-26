@@ -459,7 +459,6 @@ sub ArtistChanged
 {	my ($self,$aID,$albumID,$force)=@_;
 	return unless $self->mapped;
 	return unless defined $aID;
-	$self->cancel;
 	my $rating = AA::Get("rating:average",'artist',$aID);
 	$self->{artistratingvalue}= int($rating+0.5);
 	$self->{artistratingrange}=AA::Get("rating:range",'artist',$aID);
@@ -478,6 +477,7 @@ sub ArtistChanged
 	my $url = GetUrl($sites{$self->{site}}[SITEURL],$aID);
 	return unless $url;
 	if (!$self->{url} or ($url ne $self->{url}) or $force) {
+		$self->cancel;
 		$self->{url} = $url;
 		if ($self->{site} eq "biography") { # check for local biography file before loading the page
 			unless ($force) {
@@ -536,35 +536,31 @@ sub loaded
 	my $tag_extra = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'left');
 	my $tag_noresults=$buffer->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
 	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
-	my ($artistinfo_ok,$infoheader,$warning);
+	my $infoheader;
 
 	if ($self->{site} eq "biography") {
 		$infoheader = _"Artist Biography";
-		$data =~ m|^.*<name>(.*?)</name>.*<url>(.*?)</url>.*<listeners>(.*?)</listeners>.*<playcount>(.*?)</playcount>.*<content><\!\[CDATA\[(.*?)\n.*\]\]></content>|s; # last part of the regexp removes the license-notice (=last line)
-		my $lfm_artist = $1;
-		my $aID = Songs::Get_gid($::SongID,'artist');
-		my $local_artist = Songs::Gid_to_Get("artist",$aID);
-		if ($lfm_artist ne $local_artist) { $warning = "Redirected to: ".$lfm_artist."\n"; }
-		else { $warning = ""; }
-		my $url = $2.'/+wiki/edit';
-		my $href = $buffer->create_tag(undef,justification=>'left',foreground=>"#4ba3d2",underline=>'single');
-		$href->{url}=$url;
-		my $listeners = $3;
-		my $playcount = $4;
-		$data = $5;
-		for ($data) {
-			s/<br \/>|<\/p>/\n/gi; # never more than one empty line
-			s/\n\n/\n/gi; # never more than one empty line (again)
-			s/<(.*?)>//gi; # strip tags
-		}
-		if ($data eq "") {
+		(my($lfm_artist,$url,$listeners,$playcount),$data)=
+			$data =~ m|^.*?<name>([^<]*)</name>.*?<url>([^<]*)</url>.*?<listeners>([^<]*)</listeners>.*?<playcount>([^<]*)</playcount>.*?<content>\W*<\!\[CDATA\[(.*?)\n.*\]\]>\W*</content>|s; # last part of the regexp removes the license-notice (=last line)
+
+		if (!defined $data) {
 			$infoheader = "\n". _"No results found";
-			$artistinfo_ok = "0";
 			$tag_header = $tag_noresults;
 			$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 		} # fallback text if artist-info not found
-		else {	$artistinfo_ok = "1";
-			$buffer->insert_with_tags($iter,$warning,$tag_warning);
+		else {
+			for ($data) {
+				s/<br \/>|<\/p>/\n/gi;
+				s/\n\n*/\n/g; # never more than one empty line
+				s/<([^<]*)>//g; # strip tags
+			}
+			my $href = $buffer->create_tag(undef,justification=>'left',foreground=>"#4ba3d2",underline=>'single');
+			$href->{url}=$url.'/+wiki/edit';
+			my $aID = Songs::Get_gid($::SongID,'artist');
+			my $local_artist = Songs::Gid_to_Get("artist",$aID);
+			my $warning;
+			$warning= "Redirected to: ".$lfm_artist."\n" if $lfm_artist ne $local_artist;
+			$buffer->insert_with_tags($iter,$warning,$tag_warning) if $warning;
 			$buffer->insert_with_tags($iter,$infoheader."\n",$tag_header);
 			$buffer->insert($iter,$data);
 			$buffer->insert_with_tags($iter,"\n\n"._"Edit in the last.fm wiki",$href);
@@ -572,6 +568,7 @@ sub loaded
 			$self->{infoheader}=$infoheader;
 			$self->{biography}=$data;
 			$self->{lfm_url}=$url;
+			$self->Save_text if $::Options{OPT.'AutoSave'};
 		}
 	}
 
@@ -625,7 +622,6 @@ sub loaded
 
 		}
 	}
-	$self->Save_text if $::Options{OPT.'AutoSave'} && $artistinfo_ok && $artistinfo_ok==1;
 }
 
 sub load_file

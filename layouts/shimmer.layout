@@ -27,9 +27,9 @@ VBLeft		= _VBListCover HBStatus
 #VBListCover	= _NBList Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0) # uncomment this line to add overlay shadow
 VBListCover	= _NBList 1Cover(default=elementary/no-cover.svg,showcover=0)
 NBList		= (tabpos="bottom") QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1,hscrollbar=0) HBLyrics VBAlbuminfo VBArtistinfo
-HBLyrics	= (tabtitle="Lyrics") _PluginLyrics
-VBArtistinfo	= (tabtitle="Artist") _PluginArtistinfo
-VBAlbuminfo	= (tabtitle="Album") _PluginAlbuminfo
+HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
+VBArtistinfo	= (tabtitle=_"Artist") _PluginArtistinfo
+VBAlbuminfo	= (tabtitle=_"Album") _PluginAlbuminfo
 HBStatus	= 3Total(format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=Cover,tip=_"Show/Hide Cover")
 ### main right: list/tree/mosaic widgets ###
 VBRight		= _HBSongListtree Progress

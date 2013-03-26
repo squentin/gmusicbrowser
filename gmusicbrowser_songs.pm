@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2011 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2013 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -121,13 +121,13 @@ our %timespan_menu=
 		'filter:h~'	=> '.!!. do {my $v=#_#; $v ? ref $v ? grep(exists $hash#VAL#->{$_+0}, @$v) : (exists $hash#VAL#->{#_#+0}) : 0}',
 		'filter:ecount'	=> '#VAL# .==. do {my $v=#_#; $v ? ref $v ? scalar(@$v) : 1 : 0}',
 		#FIXME for filters s,m,mi,h~,  using a list of matching names in ___inames/___names could be better (using a bitstring)
-		'filter:si'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___iname[$_], "#VAL#") .!=. -1 ,@$v) : (index(___iname[$v], "#VAL#") .!=. -1); }',
-		'filter:s'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep index(___name[$_], "#VAL#")  .!=. -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
-		'filter:fuzzy'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (.!!. ::first {Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$_])} ,@$v) : .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$v]); }',
-		'filter:m'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___name[$_]  .=~. m"#VAL#"  ,@$v) : ___name[$v]  .=~. m"#VAL#"; }',
-		'filter:mi'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (grep ___iname[$_] .=~. m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
+		'filter:s'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (.!!. grep index(___name[$_], "#VAL#")  != -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
+		'filter:si'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (.!!. grep index(___iname[$_], "#VAL#") != -1 ,@$v) : (index(___iname[$v], "#VAL#") .!=. -1); }',
+		'filter:fuzzy'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (.!!. ::first {Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$_])} @$v) : .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$v]); }',
+		'filter:m'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (.!!. grep ___name[$_]  =~ m"#VAL#"  ,@$v) : ___name[$v]  .=~. m"#VAL#"; }',
+		'filter:mi'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (.!!. grep ___iname[$_] =~ m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
 		'filter_prep:m'	=> \&Filter::QuoteRegEx,
-		'filter_prep:mi'=> \&Filter::QuoteRegEx,
+		'filter_prep:mi'=> sub { Filter::QuoteRegEx( ::superlc($_[0]) )},
 		'filter_prep:si'=> sub {quotemeta ::superlc($_[0])},
 		'filter_prep:s' => sub {quotemeta $_[0]},
 		'filter_prep:fuzzy'=>sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta ::superlc($arg[1])},
@@ -173,6 +173,8 @@ our %timespan_menu=
 		#plugin		=> 'picture',
 #		_name		=> '__#mainfield#_name[#_#]',
 #		_iname		=> '__#mainfield#_iname[#_#]',
+		get		=> 'do {my $v=#_#; ref $v ? join "\\x00",map __#mainfield#_name[$_],@$v : __#mainfield#_name[$v];}',
+		display		=> 'do {my $v=#_#; ref $v ? join ", ",   map __#mainfield#_name[$_],@$v : __#mainfield#_name[$v];}',
 		get_gid		=> 'my $v=#_#; ref $v ? $v : [$v]',
 		's_sort:gid'	=> '__#mainfield#_name[#GID#]',
 		'si_sort:gid'	=> '__#mainfield#_iname[#GID#]',
@@ -188,12 +190,17 @@ our %timespan_menu=
 			#_# =	@ids==1 ? $ids[0] :
 				@ids==0 ? 0 :
 				(___group{join(" ",map sprintf("%x",$_),@ids)}||= \@ids);',
-		'filter:m'	=> '(ref #_# ?  (grep __#mainfield#_name[$_]  .=~. m"#VAL#",  @{#_#}) : (__#mainfield#_name[#_#]  .=~. m"#VAL#"))',
-		'filter:mi'	=> '(ref #_# ?  (grep __#mainfield#_iname[$_] .=~. m"#VAL#"i, @{#_#}) : (__#mainfield#_iname[#_#] .=~. m"#VAL#"i))',
-		'filter:si'	=> '(ref #_# ?  (grep index( __#mainfield#_name[$_], "#VAL#") .!=. -1, @{#_#}) : (index(__#mainfield#_name[#_#], "#VAL#") .!=. -1))',
-		'filter:s'	=> '(ref #_# ?  (grep index( __#mainfield#_iname[$_],"#VAL#") .!=. -1, @{#_#}) : (index(__#mainfield#_iname[#_#],"#VAL#") .!=. -1))',
+		'filter:m'	=> '(ref #_# ?  (.!!. grep __#mainfield#_name[$_]  =~ m"#VAL#",  @{#_#}) : (__#mainfield#_name[#_#]  .=~. m"#VAL#"))',
+		'filter:mi'	=> '(ref #_# ?  (.!!. grep __#mainfield#_iname[$_] =~ m"#VAL#"i, @{#_#}) : (__#mainfield#_iname[#_#] .=~. m"#VAL#"i))',
+		'filter:s'	=> '(ref #_# ?  (.!!. grep index( __#mainfield#_name[$_],"#VAL#") != -1, @{#_#}) : (index(__#mainfield#_name[#_#],"#VAL#") .!=. -1))',
+		'filter:si'	=> '(ref #_# ?  (.!!. grep index( __#mainfield#_iname[$_], "#VAL#") != -1, @{#_#}) : (index(__#mainfield#_iname[#_#], "#VAL#") .!=. -1))',
+		'filter:fuzzy'	=> 'do { my $v=#_#; ref $v ? (.!!. ::first {Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",__#mainfield#_iname[$_])} @$v) : .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",__#mainfield#_iname[$v]); }',
+		'filter_prep:m'	=> \&Filter::QuoteRegEx,
+		'filter_prep:mi'=> sub { Filter::QuoteRegEx( ::superlc($_[0]) )},
 		'filter_prep:si'=> sub { quotemeta ::superlc($_[0])},
-		'filter:~'	=> '(ref #_# ?  (grep $_ .==. #VAL#, @{#_#}) : (#_# .==. #VAL#))',#FIXME use simpler/faster version if perl5.10 (with ~~)
+		'filter_prep:s' => sub {quotemeta $_[0]},
+		'filter_prep:fuzzy'=>sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta ::superlc($arg[1])},
+		'filter:~'	=> '(ref #_# ?  (.!!. grep $_ == #VAL#, @{#_#}) : (#_# .==. #VAL#))',#FIXME use simpler/faster version if perl5.10 (with ~~)
 		'filter_prep:~'	=> '##mainfield#->filter_prep:~#',
 		'filter_prephash:~' => '##mainfield#->filter_prephash:~#',
 		'filter_simplify:~' => sub { split /$Artists_split_re/,$_[0] },
@@ -214,9 +221,13 @@ our %timespan_menu=
 		'filterdesc:-mi'=> _"doesn't match regexp %s",
 		'filterdesc:-s'	=> _"doesn't contain %s (case sensitive)",
 		'filterdesc:-si'=> _"doesn't contain %s",
+		'filterdesc:fuzzy'=> [ _"%s fuzzy match with %s",_"fuzzy match", 'fuzzy string', ],
+		'filterdesc:-fuzzy'=> _"no %s fuzzy match with %s",
 		'smartfilter:=' => '~',
 		'smartfilter::' => 'si s',
 		'smartfilter:~' => 'mi m',
+		'smartfilter:#' => \&Filter::smartstring_fuzzy,
+		'filterpat:fuzzy'=> [ display => "%d %%", unit => '%', min=>20, max=>99, default_value=>65, ],
 		default_filter	=> 'si',
 	},
 	artist_first =>
@@ -298,6 +309,7 @@ our %timespan_menu=
 		set	=> '#_# = #VAL#; #_iname#= ::superlc(#VAL#);',
 		si_sort	=> '#_iname#',
 		'filter:si'	=> 'index( #_iname#,"#VAL#") .!=. -1',			'filter_prep:si'=> sub { quotemeta ::superlc($_[0])},
+		'filter:mi'	=> '#_iname# .=~. m"#VAL#"i',			'filter_prep:mi'=> sub { Filter::QuoteRegEx( ::superlc($_[0]) )},
 		'filter:fuzzy'	=> ' .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",#_iname#)',	'filter_prep:fuzzy'=> sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta ::superlc($arg[1])},
 	},
 	text =>	#multi-lines string
@@ -845,7 +857,7 @@ our %timespan_menu=
 	can_group=>1,
  },
  artists =>
- {	flags => 'fil',	type	=> 'artists',	depend	=> 'artist title',	name => _"Artists",
+ {	flags => 'gfil',	type	=> 'artists',	depend	=> 'artist title',	name => _"Artists",
 	all_count=> _"All artists",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
@@ -938,6 +950,7 @@ our %timespan_menu=
 	edit_max=>3000,	edit_mode=> 'year',
 	check	=> '#VAL#= #VAL# =~m/(\d\d\d\d)/ ? $1 : 0;',
 	id3v1	=> 3,		id3v2 => 'TDRC|TYER', 'id3v2.3'=> 'TYER|TDRC',	'id3v2.4'=> 'TDRC|TYER',	vorbis	=> 'date|year',	ape	=> 'Record Date|Year', ilst => "\xA9day",
+	prewrite=> sub { $_[0] ? $_[0] : undef }, #remove tag if 0
 	gid_to_display	=> '#GID# ? #GID# : _"None"',
 	'stats:range'	=> '#HVAL#{#_#}=undef;  ---- AFTER: delete #HVAL#{0}; #HVAL#=do {my ($m0,$m1)=(sort {$a <=> $b} keys %{#HVAL#})[0,-1]; !defined $m0 ? "" : $m0==$m1 ? $m0 : "$m0 - $m1"}',
 	editwidth => 6,
@@ -950,6 +963,7 @@ our %timespan_menu=
  track =>
  {	name	=> _"Track",	width => 40,	flags => 'fgarwescp',
 	id3v1	=> 5,		id3v2	=> 'TRCK',	vorbis	=> 'tracknumber',	ape	=> 'Track', ilst => "trkn",
+	prewrite=> sub { $_[0] ? $_[0] : undef }, #remove tag if 0
 	type => 'integer',	displayformat => '%02d', bits => 16,
 	edit_max => 65535, 	edit_mode=> 'nozero',
 	edit_order=> 20,	editwidth => 4,		letter => 'n',
@@ -959,6 +973,7 @@ our %timespan_menu=
  {	name	=> _"Disc",	width => 40,	flags => 'fgarwescp',	type => 'integer',	bits => 8,
 	edit_max => 255,	edit_mode=> 'nozero',
 				id3v2	=> 'TPOS',	vorbis	=> 'discnumber',	ape	=> 'discnumber', ilst => "disk|disc",
+	prewrite=> sub { $_[0] ? $_[0] : undef }, #remove tag if 0
 	editwidth => 4,
 	edit_order=> 40,	edit_many=>1,	letter => 'd',
 	can_group=>1,
@@ -2000,7 +2015,10 @@ sub CheckMissing
 	my $song=$_[0];
 	#my $key=Get($song,'missingkey');
 
-	#ugly fix, clean-up the fields so they can be comapred to those in library, depends on @MissingKeyFields #FIXME
+	return unless defined $song->{title} && length $song->{title} && (defined $song->{album} || defined $song->{artist});
+	for (qw/title album artist track/) { $song->{$_}="" unless defined $song->{$_} }
+	return unless length ($song->{album} . $song->{artist});
+	#ugly fix, clean-up the fields so they can be compared to those in library, depends on @MissingKeyFields #FIXME
 	$song->{$_}=~s/\s+$// for qw/title album artist/;
 	$song->{track}= $song->{track}=~m/^(\d+)/ ? $1+0 : 0;
 
@@ -2659,7 +2677,7 @@ sub PrefFields	#preference dialog for fields
 	 ( 'field name',$renderer,text => 0, editable => 2, sensitive=>3, strikethrough => 4,
 	 ));
 	my @std= sort grep !$Def{$_}{template} && (!$Def{$_}{disable} || $Def{$_}{options} && $Def{$_}{options}=~m/\bdisable\b/), keys %Def;
-	@std= grep !$Def{$_}{property_of} && $Def{$_}{name} && $Def{$_}{flags}=~m/c/, @std;
+	@std= grep !$Def{$_}{property_of} && $Def{$_}{name} && $Def{$_}{flags}=~m/[pc]/, @std;
 	my @custom= sort grep $::Options{Fields_options}{$_}{template}, keys %{$::Options{Fields_options}};
 	my %sensitive;
 	$sensitive{$_}= ($::Options{Fields_options}{$_} && exists $::Options{Fields_options}{$_}{disable} ? $::Options{Fields_options}{$_}{disable} : $Def{$_}{disable}) ? 0 : 1
@@ -4069,7 +4087,7 @@ sub new_from_smartstring
 		if ($string=~s&^(\w+(?:\|\w+)*)?(<=|>=|[:<>=~]|#+)&&)
 		{	$fields=$1; $op=$2;
 			if ($fields)
-			{	my @f= grep $_, map $Songs::Aliases{::superlc($_)}, split(/\|/,$fields);
+			{	my @f= grep $_, map { $Songs::Aliases{$_} || $Songs::Aliases{::superlc($_)} } split(/\|/,$fields);
 				if (@f) { $fields= join '|',@f }
 				else { $string= $fields.$op.$string; $fields=$op=undef; }	#no recognized field => treat $fields and $op as part of the pattern
 			}

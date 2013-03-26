@@ -1,0 +1,4098 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gmusicbrowser 1.1009\n"
+"Report-Msgid-Bugs-To: squentin@free.fr\n"
+"POT-Creation-Date: 2012-11-13 20:27+0900\n"
+"PO-Revision-Date: 2012-11-12 21:48+0900\n"
+"Last-Translator: Sunatomo Masuda <sunatomo@gmail.com>\n"
+"Language-Team: Japanese\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+msgid " Context pane layout "
+msgstr "コンテキストペインレイアウト"
+
+msgid " Fields "
+msgstr "フィールド"
+
+msgid " Review "
+msgstr "レビュー"
+
+msgid "# songs"
+msgstr "# 楽曲"
+
+#, perl-format
+msgid "%d Album"
+msgid_plural "%d Albums"
+msgstr[0] "%d アルバム"
+msgstr[1] "%d アルバム"
+
+#, perl-format
+msgid "%d Artist"
+msgid_plural "%d Artists"
+msgstr[0] "%d アーティスト"
+msgstr[1] "%d アーティスト"
+
+#, perl-format
+msgid "%d Song"
+msgid_plural "%d Songs"
+msgstr[0] "%d 楽曲"
+msgstr[1] "%d 楽曲"
+
+#, perl-format
+msgid "%d Upcoming Event"
+msgid_plural "%d Upcoming Events"
+msgstr[0] "%d 今後のイベント"
+msgstr[1] "%d 今後のイベント"
+
+#, perl-format
+msgid "%d album"
+msgid_plural "%d albums"
+msgstr[0] "%d アルバム"
+msgstr[1] "%d アルバム"
+
+#, perl-format
+msgid "%d artist"
+msgid_plural "%d artists"
+msgstr[0] "%d アーティスト"
+msgstr[1] "%d アーティスト"
+
+#, perl-format
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] "%d ファイル"
+msgstr[1] "%d ファイル"
+
+#, perl-format, perl-brace-format
+msgid "%d file in {folder}"
+msgid_plural "%d files in {folder}"
+msgstr[0] "%d ファイル {folder} 内"
+msgstr[1] "%d ファイル {folder} 内"
+
+#, perl-format
+msgid "%d folder"
+msgid_plural "%d folders"
+msgstr[0] "%d フォルダ"
+msgstr[1] "%d フォルダ"
+
+#, perl-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d 秒"
+msgstr[1] "%d 秒"
+
+#, perl-format
+msgid "%d song"
+msgid_plural "%d songs"
+msgstr[0] "%d 曲"
+msgstr[1] "%d 曲"
+
+#, perl-format
+msgid "%d song added"
+msgid_plural "%d songs added"
+msgstr[0] "%d 曲追加"
+msgstr[1] "%d 曲追加"
+
+#, perl-format
+msgid "%d song in queue"
+msgid_plural "%d songs in queue"
+msgstr[0] "キュー内に %d 曲"
+msgstr[1] "キュー内に %d 曲"
+
+#, perl-format
+msgid "%d song in the library"
+msgid_plural "%d songs in the library"
+msgstr[0] "ライブラリ内に %d 曲"
+msgstr[1] "ライブラリ内に %d 曲"
+
+#, perl-format
+msgid "%d song selected"
+msgid_plural "%d songs selected"
+msgstr[0] "%d 曲選択"
+msgstr[1] "%d 曲選択"
+
+#, perl-brace-format
+msgid "'{file}' exists. Overwrite ?"
+msgstr "'{file}' は既に存在します。上書しますか ?"
+
+#, perl-format
+msgid "(%d song excluded)"
+msgid_plural "(%d songs excluded)"
+msgstr[0] "(%d 曲処理済)"
+msgstr[1] "(%d 曲処理済)"
+
+msgid "(case insensitive)"
+msgstr "(大文字と小文字を区別しない)"
+
+#, perl-brace-format
+msgid "(common parent folder : {common})"
+msgstr "(共通の親フォルダ : {common})"
+
+msgid "(other)"
+msgstr "(その他)"
+
+msgid "(see http://www.last.fm)"
+msgstr "(http://www.last.fm を確認)"
+
+msgid "(unstable)"
+msgstr "(不安定)"
+
+msgid ""
+"- When selecting a song, the playlist filter will be reset if the song is "
+"not in it\n"
+"- Skip to another song when removing the current song from the playlist"
+msgstr ""
+"- 楽曲が選択されていないとプレイリストフィルタはリセットされます\n"
+"- 現在の楽曲をプレイリストから除くと他の曲にスキップします"
+
+msgid "3 Filter panes"
+msgstr "3 フィルタペイン"
+
+msgid "32x32 PNG file icon"
+msgstr "32x32 PNG ファイルアイコン"
+
+msgid "50 Last Added"
+msgstr "最近追加された50アイテム"
+
+msgid "50 Last Played"
+msgstr "最近再生された50アイテム"
+
+msgid "50 Most Played"
+msgstr "最も再生された50アイテム"
+
+msgid "<Unknown>"
+msgstr "<不明>"
+
+msgid "Abort"
+msgstr "中止"
+
+msgid "Abort ReplayGain analysis"
+msgstr "リプレイゲインの分析中止"
+
+msgid "Abort all"
+msgstr "全て中止"
+
+#, perl-brace-format
+msgid ""
+"About to delete {files}\n"
+"Are you sure ?"
+msgstr ""
+" {files} の削除\n"
+"よろしいですか?"
+
+msgid "Actions are not supported by current notification daemon"
+msgstr "現在の通知デーモンではこの操作はサポートされていません"
+
+msgid "Add"
+msgstr "追加"
+
+msgid "Add Files ..."
+msgstr "ファイルの追加 ..."
+
+msgid "Add Music"
+msgstr "楽曲の追加"
+
+msgid "Add a button to rip a CD"
+msgstr "CDリッピングを行うボタンの追加"
+
+msgid "Add a filter"
+msgstr "フィルタの追加"
+
+msgid "Add a fullscreen button"
+msgstr "フルスクリーンボタンの追加"
+
+msgid "Add a fullscreen button to layouts that can accept extra buttons"
+msgstr "レイアウトにフルスクリーンボタンを追加(ボタンを追加できる場合のみ)"
+
+msgid "Add a group"
+msgstr "グループの追加"
+
+msgid "Add a label to the current song"
+msgstr "現在の楽曲にラベルを追加"
+
+msgid "Add a list of files/folders to the playlist"
+msgstr "プレイリストにファイル/フォルダのリストを追加"
+
+msgid "Add a radio"
+msgstr "ラジオを追加"
+
+msgid "Add files or folders"
+msgstr "ファイル/フォルダの追加"
+
+msgid "Add files/folders to library"
+msgstr "ライブラリにファイル/フォルダを追加"
+
+msgid "Add folder"
+msgstr "フォルダを追加"
+
+msgid "Add folder ..."
+msgstr "フォルダを追加 ..."
+
+msgid "Add label"
+msgstr "ラベルを追加"
+
+msgid "Add new label"
+msgstr "新規ラベルの追加"
+
+msgid "Add new radio"
+msgstr "新規ラジオの追加"
+
+msgid "Add rule : "
+msgstr "ルールを追加 ："
+
+msgid "Add shorcut key"
+msgstr "ショートカットキーの追加"
+
+msgid "Add tab"
+msgstr "タブの追加"
+
+msgid "Add to existing values"
+msgstr "既知の値に追加"
+
+msgid "Add to list"
+msgstr "リストへ追加"
+
+msgid "Add to playlist"
+msgstr "プレイリストへ追加"
+
+msgid "Add to queue"
+msgstr "キューへ追加"
+
+#, perl-brace-format
+msgid "Add {value} to {field} for all tracks on this album."
+msgstr "本アルバムの全トラックへ {field} に{value} を追加"
+
+msgid "Added"
+msgstr "追加済"
+
+msgid "Added Today"
+msgstr "本日追加済"
+
+msgid "Adding a radio"
+msgstr "ラジオ追加中"
+
+msgid ""
+"Additionally this format can be used :\n"
+" default number1 format1 number2 format2 ...\n"
+" dates more recent than number1 seconds will use format1, ..."
+msgstr ""
+"本書式を追加で使用可能です\n"
+" デフォルト ナンバー1 書式1 ナンバー2 書式2 ...\n"
+" ナンバー1より新しい 秒数は 書式1に記載する、 ..."
+
+msgid ""
+"Adds a menu entry to artist/album context menu, allowing to search the "
+"picture/cover in google and save it."
+msgstr ""
+"googleで画像/カバーを検索し保存できるよう、アーティスト/アルバムコンテキスト"
+"メニューにエントリを追加"
+
+msgid "Adds labels to the current song"
+msgstr "現在の楽曲にラベルを追加"
+
+msgid "Adds menu entries to song contextual menu"
+msgstr "楽曲コンテキストメニューにメニューエントリを追加"
+
+msgid "Advanced Search ..."
+msgstr "高度検索 ..."
+
+msgid "Advanced Tag Editing"
+msgstr "高度なタグ編集"
+
+msgid "Album"
+msgstr "アルバム"
+
+msgid "Album and artist"
+msgstr "アルバムとアーティスト"
+
+msgid "Album and artist on the left side"
+msgstr "左側のアルバムとアーティスト"
+
+msgid "Album artist"
+msgstr "アルバムアーティスト"
+
+msgid "Album artist or artist"
+msgstr "アルバムアーティストもしくはアーティスト"
+
+msgid "Album gain"
+msgstr "アルバムゲイン"
+
+msgid "Album mode"
+msgstr "アルバムモード"
+
+msgid "Album peak"
+msgstr "アルバムピーク"
+
+msgid "Album picture"
+msgstr "アルバム画像"
+
+msgid "Album picture & info"
+msgstr "アルバム画像 & 情報"
+
+msgid "Album pictures"
+msgstr "アルバム画像"
+
+msgid "Album playcount:"
+msgstr "アルバム再生数:"
+
+msgid "Album shuffle"
+msgstr "アルバムシャッフル"
+
+msgid "Album with picture"
+msgstr "画像ありアルバム"
+
+msgid "Album year(s)"
+msgstr "アルバム年"
+
+#, perl-format
+msgid "Album: %l"
+msgstr "アルバム: %l"
+
+#, perl-format
+msgid "Album: %l (%Y)"
+msgstr "アルバム: %l (%Y)"
+
+msgid "Albuminfo"
+msgstr "アルバム情報"
+
+msgid "Albuminfo plugin"
+msgstr "アルバム情報プラグイン"
+
+msgid "Albums"
+msgstr "アルバム"
+
+msgid "All"
+msgstr "すべて"
+
+msgid "All Songs"
+msgstr "全楽曲"
+
+msgid "All albums"
+msgstr "全アルバム"
+
+msgid "All artists"
+msgstr "全アーティスト"
+
+msgid "All files"
+msgstr "全ファイル"
+
+msgid "All genres"
+msgstr "全ジャンル"
+
+msgid "All labels"
+msgstr "前ラベル"
+
+msgid "All moods"
+msgstr "全モード"
+
+msgid "All of :"
+msgstr "すべて:"
+
+msgid "All songs"
+msgstr "全楽曲"
+
+msgid "All styles"
+msgstr "全スタイル"
+
+msgid "All themes"
+msgstr "全テーマ"
+
+msgid "Allow for scheduling fade-out and stop"
+msgstr "フェードアウトと停止のスケジューリングを許可"
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
+msgstr "MPRIS v1.0 standardを用いた gmusicbrowser の DBus経由での制御を許可 "
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v2.0 standard"
+msgstr "MPRIS v2.0 standardを用いた gmusicbrowser の DBus経由での制御を許可"
+
+msgid "Amount of volume changed by the mouse wheel"
+msgstr "マウスホイールで変更されたボリューム量"
+
+msgid "Append"
+msgstr "追加"
+
+msgid "Append (only if not already present)"
+msgstr "追加 (存在しない場合のみ)"
+
+msgid "Append to playlist"
+msgstr "プレイリストに追加"
+
+msgid "Application"
+msgstr "アプリケーション"
+
+#, perl-brace-format
+msgid "Are you sure you want to delete the '{label}' label ?"
+msgstr "本当に '{label}' ラベルを削除しますか?"
+
+msgid "Arguments"
+msgstr "引数"
+
+msgid "Artist"
+msgstr "アーティスト"
+
+msgid "Artist & album"
+msgstr "アーティスト & アルバム"
+
+msgid "Artist (Year - Album)"
+msgstr "アーティスト(年 - アルバム)"
+
+msgid "Artist Biography"
+msgstr "アーティストのバイオグラフィー"
+
+msgid "Artist URL"
+msgstr "アーティスト URL"
+
+msgid "Artist picture"
+msgstr "アーティストの画像"
+
+msgid "Artist playcount:"
+msgstr "アーティスト再生回数:"
+
+msgid "Artist,Album,Disc,Track"
+msgstr "アーティスト,楽曲,ディスク,トラック"
+
+msgid "Artist,Date,Album,Disc,Track"
+msgstr "アーティスト,データ,アルバム,ディスク,トラック"
+
+#, perl-format
+msgid "Artist: %a"
+msgstr "アーティスト: %a"
+
+msgid "Artistinfo"
+msgstr "アーティスト情報"
+
+msgid "Artistinfo plugin"
+msgstr "アーティスト情報プラグイン"
+
+msgid "Artists"
+msgstr "アーティスト"
+
+msgid "Ascending order"
+msgstr "昇順"
+
+msgid "Ask confirmation only if file already exists"
+msgstr "ファイルが既に存在する場合のみ確認を求める"
+
+msgid "Audio"
+msgstr "オーディオ"
+
+msgid "Audio properties"
+msgstr "オーディオプロパティ"
+
+msgid "Auto"
+msgstr "自動選択"
+
+msgid "Auto fill based on filenames ..."
+msgstr "ファイル名に基づき自動記載"
+
+msgid "Auto fill only blank fields"
+msgstr "空フィールドのみ自動記載"
+
+msgid "Auto filter"
+msgstr "オートフィルタ"
+
+msgid "Auto-fill queue"
+msgstr "キューを自動記載"
+
+msgid "Auto-fill queue with similar artists (from last.fm)"
+msgstr "類似アーティスト(last.fmからの)でキューを自動記載"
+
+msgid "Auto-increment track numbers"
+msgstr "トラック番号の自動増加"
+
+msgid "Auto-save fields with data from allmusic"
+msgstr "Allmusicからのデータでフィールドを自動保存"
+
+msgid "Auto-scroll"
+msgstr "自動スクロール"
+
+msgid "Automatically remove current song if not found"
+msgstr "見つからない場合自動的に現在の楽曲を削除する"
+
+msgid "Autosave"
+msgstr "自動保存"
+
+msgid "Autosave plugin"
+msgstr "自動保存プラグイン"
+
+msgid "Average rating:"
+msgstr "平均レーティング:"
+
+msgid "Base Folder :"
+msgstr "ベースフォルダ :"
+
+msgid "Biography"
+msgstr "バイオグラフィ"
+
+msgid "Bitrate"
+msgstr "ビットレート"
+
+msgid "Body :"
+msgstr "ボディ :"
+
+msgid "Body text is not supported by current notification daemon"
+msgstr "ボディテキストは現在の通知デーモンではサポートされていません"
+
+msgid "Browser"
+msgstr "ブラウザ"
+
+msgid "Browser views"
+msgstr "ブラウザビュー"
+
+msgid "Browser window layout :"
+msgstr "ブラウザウィンドウレイアウト :"
+
+msgid "Browser with SongTree"
+msgstr "SongTreeのブラウザ"
+
+msgid "Buttons"
+msgstr "ボタン"
+
+msgid "Buttons, Song & Cover"
+msgstr "ボタン, 楽曲 & カバー"
+
+msgid "Can be relative by using + or -"
+msgstr "+ もしくは - を用いて相対パスを指定できます"
+
+msgid "Can't change the volume in non-gstreamer iceserver mode"
+msgstr "gstreamer未使用での iceserverモードではボリュームを変更できません"
+
+msgid ""
+"Can't change the volume. Needs amixer (packaged in alsa-utils) to change "
+"volume when using this audio backend."
+msgstr ""
+"ボリュームを変更できません。このオーディオバックエンドを使用している場合、"
+"amixer(alsa-utilsにパッケージング)が必要です。"
+
+#, perl-brace-format
+msgid ""
+"Can't create Folder '{path}' : \n"
+"{error}"
+msgstr ""
+"フォルダ '{path}' を作成できません : \n"
+"{error}"
+
+#, perl-brace-format
+msgid "Can't create sink '{sink}'"
+msgstr "シンク '{sink}' を作成できません"
+
+msgid "Can't read file or invalid file"
+msgstr "ファイルを読込できないか無効なファイルです。"
+
+#, perl-brace-format
+msgid "Can't write in base folder '{folder}'."
+msgstr "ベースフォルダ '{folder}' を書き込みできません。"
+
+msgid "Capitalize"
+msgstr "大文字に変換"
+
+msgid "Capitalize each word"
+msgstr "各文字列を大文字化する"
+
+msgid "Case insensitive"
+msgstr "大文字小文字を区別しない"
+
+msgid "Case sensitive"
+msgstr "大文字小文字を区別する"
+
+msgid "Case-sensitive"
+msgstr "大文字小文字を区別する"
+
+msgid "Categories pane"
+msgstr "Categories pane"
+
+msgid "Change Display"
+msgstr "デイスプレイの変更"
+
+msgid "Change default text color"
+msgstr "既定のテキスト色を変更"
+
+msgid "Change default text font and size"
+msgstr "既定のテキストフォントとサイズを変更"
+
+msgid "Change the context visibility"
+msgstr "コンテキストの可視性を変更する"
+
+msgid "Channels"
+msgstr "チャンネル"
+
+msgid "Check Collection"
+msgstr "コレクションのチェック"
+
+msgid "Check for updated/deleted songs on startup"
+msgstr "起動時にアップロード/削除された楽曲をチェック"
+
+msgid "Check for updated/removed songs"
+msgstr "アップロード/削除された楽曲をチェック"
+
+msgid "Check real length of mp3"
+msgstr "mp3の実際の長さをチェック"
+
+msgid "Checking length/bitrate"
+msgstr "長さ/ビットレートのチェック中"
+
+msgid "Checking songs"
+msgstr "楽曲のチェック中"
+
+msgid "Choose Album From this Artist"
+msgstr "このアーティストのアルバムを選択"
+
+msgid "Choose Artist/Album/Song"
+msgstr "アーティスト/アルバム/楽曲を選択"
+
+msgid "Choose Picture"
+msgstr "画像を選択"
+
+msgid "Choose Random Album"
+msgstr "アルバムをランダムに選択"
+
+msgid "Choose a folder"
+msgstr "フォルダを選択"
+
+msgid "Choose directory to copy files to"
+msgstr "ファイルをコピーするディレクトリを選択"
+
+msgid "Choose directory to move files to"
+msgstr "ファイルを移動するディレクトリを選択"
+
+msgid "Choose files"
+msgstr "ファイルを選択"
+
+msgid "Choose folder to add"
+msgstr "追加するフォルダを選択"
+
+msgid "Choose font for lyrics"
+msgstr "歌詞のフォントを選択"
+
+msgid "Choose font..."
+msgstr "フォントを選択..."
+
+#, perl-brace-format
+msgid "Choose icon for label {name}"
+msgstr "ラベル {name} のアイコンを選択"
+
+msgid "Choose page to open"
+msgstr "開くページを選択"
+
+#, perl-format
+msgid "Choose picture for '%s'"
+msgstr " '%s' 向けの画像を選択"
+
+msgid "Choose playlist files to import"
+msgstr "インポートするプレイリストファイルを選択"
+
+msgid "Clear"
+msgstr "クリア"
+
+msgid "Clear playlist filter"
+msgstr "プレイリストフィルタのクリア"
+
+msgid "Clear queue"
+msgstr "キューのクリア"
+
+msgid "Clear selected fields"
+msgstr "選択済フィールドのクリア"
+
+msgid "Click to show fullsize image"
+msgstr "クリックしてフルサイズ画像を表示"
+
+msgid "Client banned, contact gmusicbrowser's developer"
+msgstr ""
+"クライアントが不正終了しました。gmusicbrowserの開発者に連絡してください。"
+
+msgid "Close"
+msgstr "閉じる"
+
+msgid "Close Window"
+msgstr "ウィンドウを閉じる"
+
+msgid "Close a filter"
+msgstr "フィルターを閉じる"
+
+msgid "Close to tray"
+msgstr "トレーに閉じる"
+
+msgid "Collection"
+msgstr "コレクション"
+
+msgid "Command"
+msgstr "コマンド"
+
+msgid "Command to launch when the button is pressed"
+msgstr "ボタンが押された時に起動するコマンド"
+
+msgid ""
+"Command used when\n"
+"'turn off computer when queue empty'\n"
+"is selected"
+msgstr ""
+"'キューが空の時PCをシャットダウン'\n"
+"が選択された際に利用されるコマンド"
+
+msgid "Command when playing song changed :"
+msgstr "演奏中の楽曲が変更した際のコマンド :"
+
+msgid "Command when stopped :"
+msgstr "演奏停止時のコマンド :"
+
+msgid "Comment"
+msgstr "コメント"
+
+msgid "Comments"
+msgstr "コメント"
+
+msgid "Compilation"
+msgstr "コンピレーション"
+
+msgid "Composer"
+msgstr "作曲者"
+
+msgid "Conductor"
+msgstr "指揮者"
+
+msgid "Connect through a proxy"
+msgstr "プロキシ経由で接続"
+
+msgid "Connections from :"
+msgstr "接続元 :"
+
+msgid "Context"
+msgstr "コンテキスト"
+
+msgid "Control"
+msgstr "コントロール"
+
+msgid "Conz Aishi (with Filter Panes)"
+msgstr "Conz Aishi (+フィルタペイン)"
+
+msgid "Conz Glimm (different controls)"
+msgstr "Conz Glimm (他のコントロール)"
+
+msgid "Copy"
+msgstr "コピー"
+
+msgid "Copy failed"
+msgstr "コピーに失敗"
+
+msgid "Copy link address"
+msgstr "リンクアドレスのコピー"
+
+msgid "Copy to mounted portable player"
+msgstr "マウント済携帯プレーヤへコピー"
+
+msgid "Copy to portable player"
+msgstr "携帯プレーヤへコピー"
+
+#, perl-format
+msgid "Copying file"
+msgid_plural "Copying %d files"
+msgstr[0] "ファイルコピー中"
+msgstr[1] "%d ファイルコピー中"
+
+msgid "Copyright"
+msgstr "コピーライト"
+
+msgid "Cover Size : "
+msgstr "カバーサイズ :"
+
+msgid "Create ID3v2 tags as ID3v2.4"
+msgstr "ID3v2タグをID3v2.4で作成"
+
+msgid "Current song must always be in the playlist"
+msgstr "現在の楽曲は常にプレイリストにある"
+
+msgid "Custom"
+msgstr "カスタム"
+
+msgid "Custom Text"
+msgstr "カスタムテキスト"
+
+msgid "Custom URL"
+msgstr "カスタムURL"
+
+msgid "Custom command :"
+msgstr "カスタムコマンド :"
+
+msgid "Custom context pages :"
+msgstr "カスタムコンテキストページ :"
+
+msgid "Custom fields"
+msgstr "カスタムフィールド"
+
+msgid "Custom formats"
+msgstr "カスタムフォーマット"
+
+msgid "Custom pipeline"
+msgstr "カスタムパイプライン"
+
+msgid "Custom..."
+msgstr "カスタム..."
+
+msgid "Date"
+msgstr "日付"
+
+msgid "Date format :"
+msgstr "日付書式 :"
+
+msgid "Date of purchase"
+msgstr "購入日付"
+
+msgid "Debut Album"
+msgstr "デビューアルバム"
+
+msgid "Decrease Volume"
+msgstr "音量を下げる"
+
+msgid "Decrease volume"
+msgstr "音量を下げる"
+
+msgid "Default"
+msgstr "既定"
+
+msgid "Default fullscreen"
+msgstr "既定のフルスクリーン"
+
+#, perl-format
+msgid "Default rating : %d %"
+msgstr "既定のレーティング : %d %"
+
+msgid "Default text color"
+msgstr "既定のテキスト色"
+
+msgid "Default text font"
+msgstr "既定のテキストフォント"
+
+#, perl-format
+msgid "Delay before showing tray tip popup on mouse over : %d ms"
+msgstr ""
+"マウスカーソルがアイコン上にある際にトレイチップが表示されるまでの時間 : %d "
+"ms"
+
+msgid "Delete"
+msgstr "削除"
+
+msgid "Delete Selected Songs"
+msgstr "選択楽曲の削除"
+
+msgid "Delete list"
+msgstr "リストの削除"
+
+msgid "Descending order"
+msgstr "降順"
+
+msgid "Descr."
+msgstr "詳細"
+
+msgid "Description"
+msgstr "詳細"
+
+msgid "Desktop widgets"
+msgstr "デスクトップウィジェット"
+
+msgid "Desktop widgets plugin"
+msgstr "デスクトップウィジェットプラグイン"
+
+msgid "Disable screensaver when fullscreen and playing"
+msgstr "フルスクリーン表示＋再生中はスクリーンセーバを無効化"
+
+msgid "Disabled"
+msgstr "無効化"
+
+msgid "Disc"
+msgstr "ディスク"
+
+msgid "Disc #"
+msgstr "ディスク #"
+
+msgid "Disc name"
+msgstr "ディスク名"
+
+msgid "Display (:1 or host:0 for example)"
+msgstr "表示 (:1 もしくは ホスト:0 例えば)"
+
+msgid "Display Songs"
+msgstr "楽曲を表示"
+
+msgid ""
+"Display a special layout in or around the titlebar of the focused window"
+msgstr "フォーカスされたウィンドウのタイトルバー周囲に特別なレイアウトを表示"
+
+msgid "Display stop/next actions"
+msgstr "停止/次へ のアクションを表示"
+
+msgid "Display synchronized lyrics of the current song"
+msgstr "現楽曲の同期された歌詞を表示"
+
+#, perl-format
+msgid "Display tray tip for %d ms"
+msgstr " %d msの間トレイtipを表示"
+
+msgid "Do not add a title row"
+msgstr "タイトル行を追加しない"
+
+msgid "Do not add songs that can't be played"
+msgstr "再生出来ない楽曲を追加しない"
+
+msgid "Do not create an id3v1 tag in mp3 files"
+msgstr "mp3ファイル内にid3v1タグを生成しない"
+
+msgid "Do not unsynchronise id3v2 tags"
+msgstr "id3v2タグを非同期にしない"
+
+msgid "Do not write the tags"
+msgstr "タグを書き込みしない"
+
+msgid "Don't add the overlay to dialogs"
+msgstr "ダイアログをオーバレイ表示しない"
+
+#, perl-brace-format
+msgid "Don't know how to play files of type {type}"
+msgstr "{type} タイプのファイルの再生方法が不明です"
+
+msgid "Don't notify if the main window is visible"
+msgstr "メインウィンドウを表示中は通知しない"
+
+msgid "Don't submit current song"
+msgstr "現在の楽曲をsubmitしない"
+
+msgid "Drag and drop songs here to replace the selection."
+msgstr "選択を置き換えるために楽曲をここへドラッグする"
+
+msgid "Edit"
+msgstr "編集"
+
+msgid "Edit Current Song Properties"
+msgstr "現楽曲のプロパティを編集"
+
+msgid "Edit Labels"
+msgstr "ラベルの編集"
+
+msgid "Edit Lyrics"
+msgstr "歌詞の編集"
+
+msgid "Edit Lyrics ..."
+msgstr "歌詞の編集..."
+
+msgid "Edit Multiple Songs Properties"
+msgstr "複数楽曲のプロパティ編集"
+
+msgid "Edit Rating"
+msgstr "レーティングの編集"
+
+msgid "Edit Settings"
+msgstr "設定の編集"
+
+msgid "Edit auto-fill formats ..."
+msgstr "自動入力書式の編集..."
+
+msgid "Edit filter"
+msgstr "フィルタの編集"
+
+msgid "Edit filter..."
+msgstr "フィルタの編集"
+
+msgid "Edit grouping ..."
+msgstr "グルーピングの編集..."
+
+msgid "Edit in the last.fm wiki"
+msgstr "last.fm wikiの編集"
+
+msgid "Edit list"
+msgstr "リストの編集"
+
+msgid "Edit ordered modes ..."
+msgstr "順番モードの編集..."
+
+msgid "Edit random modes ..."
+msgstr "ランダムモードの編集..."
+
+msgid "Edit selected song properties"
+msgstr "選択楽曲のプロパティを編集"
+
+msgid "Edit..."
+msgstr "編集..."
+
+msgid "Editing list : "
+msgstr "リストの編集 :"
+
+msgid "Editing tags"
+msgstr "タグの編集"
+
+msgid "Embedded lyrics"
+msgstr "埋め込み歌詞"
+
+msgid "Embedded picture"
+msgstr "埋め込み画像"
+
+msgid "Encapsulated object"
+msgstr "埋め込みオブジェクト"
+
+msgid "Encoder"
+msgstr "エンコーダ"
+
+msgid "Encoding used for id3v1 tags :"
+msgstr "id3v1タグで使用されるエンコード :"
+
+msgid "Enqueue"
+msgstr "キューに追加"
+
+msgid "Enqueue Action"
+msgstr "アクションのキュー追加"
+
+msgid "Enqueue Displayed"
+msgstr "表示済項目のキュー追加"
+
+msgid "Enqueue Selected"
+msgstr "選択項目のキュー追加"
+
+msgid "Enqueue Selected Songs"
+msgstr "選択楽曲のキュー追加"
+
+msgid "Enqueue Songs from Current Album"
+msgstr "現在のアルバムをキュー追加"
+
+msgid "Enqueue Songs from Current Artist"
+msgstr "現在のアーティストの楽曲をキュー追加"
+
+msgid "Enqueue a list of files/folders"
+msgstr "ファイル/フォルダリストをキュー追加"
+
+msgid "Enqueue filter"
+msgstr "フィルタのキュー追加"
+
+msgid "Enter album name"
+msgstr "アルバム名を入力"
+
+msgid "Enter custom event string :"
+msgstr "カスタムイベント文字列を入力 :"
+
+msgid "Equalizer"
+msgstr "イコライザ"
+
+msgid "Error :"
+msgstr "エラー :"
+
+#, perl-brace-format
+msgid ""
+"Error saving artistbio in '{file}' :\n"
+"{error}"
+msgstr ""
+"アーティストのバイオグラフィをファイル'{file}' へ保存中にエラー :\n"
+"{error}"
+
+#, perl-brace-format
+msgid ""
+"Error saving lyrics in '{file}' :\n"
+"{error}"
+msgstr ""
+"歌詞をファイル '{file}' へ保存中にエラー :\n"
+"{error}"
+
+#, perl-brace-format
+msgid ""
+"Error saving review in '{file}' :\n"
+"{error}"
+msgstr ""
+"'{file}' へのレビュー保存に失敗 :\n"
+"{error}"
+
+#, perl-brace-format
+msgid "Error writing '{file}'"
+msgstr "'{file}' の書込に失敗"
+
+msgid "Error writing replaygain tags :\n"
+msgstr "リプレイゲインタグの書込に失敗 :\n"
+
+msgid "Error: invalid filename pattern"
+msgstr "エラー: 無効なファイル名パターン"
+
+msgid "Events"
+msgstr "イベント"
+
+msgid "Example :"
+msgstr "例 :"
+
+msgid "Exclude 'seed'-artist from queue"
+msgstr "キューから  'seed'-アーティストを除外する"
+
+msgid "Execute custom command on selected files"
+msgstr "選択ファイルからカスタムコマンドを実行する"
+
+msgid "Export"
+msgstr "エクスポート"
+
+msgid "Export plugin"
+msgstr "エクスポートプラグイン"
+
+msgid "Export song properties to a .csv file"
+msgstr "楽曲プロパティを.csvファイルにエクスポート"
+
+msgid "Export to .m3u file"
+msgstr ".m3uファイルにエクスポート"
+
+msgid "Extra fields"
+msgstr "エキストラフィールド"
+
+msgid "Extra gain"
+msgstr "エキストラゲイン"
+
+msgid "Extract guest artist from title :"
+msgstr "タイトルからゲストアーティストを抽出 :"
+
+msgid "Fade-out"
+msgstr "フェードアウト"
+
+#, perl-format
+msgid "Fade-out in %d seconds"
+msgstr "%d 秒でフェードアウト"
+
+msgid "Fade-out then stop"
+msgstr "停止時にフェードアウト"
+
+#, perl-brace-format
+msgid ""
+"Failed to delete '{file}' :\n"
+"{error}"
+msgstr ""
+"'{file}' を削除できません :\n"
+"{error}"
+
+msgid "Field name"
+msgstr "フィールド名"
+
+msgid "Field type"
+msgstr "フィールドタイプ"
+
+msgid "Fields"
+msgstr "フィールド"
+
+msgid "File"
+msgstr "ファイル"
+
+msgid "File properties"
+msgstr "ファイルプロパティ"
+
+msgid "File type"
+msgstr "ファイルタイプ"
+
+msgid "Filename"
+msgstr "ファイル名"
+
+msgid "Filename extension"
+msgstr "ファイル名拡張子"
+
+msgid "Filename format :"
+msgstr "ファイル名書式 :"
+
+msgid "Filename without extension"
+msgstr "拡張子なしでのファイル名"
+
+msgid "Files"
+msgstr "ファイル"
+
+msgid "Filesystem"
+msgstr "ファイルシステム"
+
+msgid "Filter"
+msgstr "フィルタ"
+
+msgid "Filter : "
+msgstr "フィルタ :"
+
+msgid "Filter edition"
+msgstr "フィルタのエディション"
+
+msgid "Filter on playing Album"
+msgstr "再生中アルバムのフィルタ"
+
+msgid "Filter on playing Artist"
+msgstr "再生中アーティストのフィルタ"
+
+msgid "Filter on playing Song"
+msgstr "再生中楽曲のフィルタ"
+
+msgid "Filter on this album"
+msgstr "本アルバムのフィルタ"
+
+msgid "Filter on this artist"
+msgstr "本アーティストのフィルタ"
+
+msgid "Find :"
+msgstr "検索 :"
+
+msgid "Find a unique filename if file already exists"
+msgstr "ファイルが既に存在する場合ユニークなファイル名を検索"
+
+msgid "Find songs in same albums"
+msgstr "同一アルバムの楽曲を検索"
+
+msgid "Find songs with same artists"
+msgstr "同一アーティストの楽曲を検索"
+
+msgid "Find songs with the same names"
+msgstr "同一名の楽曲を検索"
+
+msgid "Folder"
+msgstr "フォルダ"
+
+msgid "Folder (right-aligned)"
+msgstr "フォルダ(右寄せ)"
+
+msgid "Folder format :"
+msgstr "フォルダ書式 :"
+
+msgid "Folder pattern :"
+msgstr "フォルダパターン :"
+
+msgid "Folders to search for new songs"
+msgstr "新規楽曲を検索するフォルダ"
+
+msgid "Follow playing song"
+msgstr "再生中の楽曲に追従"
+
+msgid "Follow selected song"
+msgstr "選択楽曲に追従"
+
+msgid "Font size"
+msgstr "フォントサイズ"
+
+msgid "Found but not working"
+msgstr "見つけましたが動作しません"
+
+msgid "Friday"
+msgstr "金曜日"
+
+msgid "Full screen layout :"
+msgstr "フルスクリーンレイアウト :"
+
+msgid "Fullscreen"
+msgstr "フルスクリーン"
+
+msgid "GStreamer module not loaded."
+msgstr "GStreamerモジュールが読込できません。"
+
+msgid "Gain for songs missing replaygain tags"
+msgstr "リプレイゲインタグなし楽曲のゲイン"
+
+msgid "Genre"
+msgstr "ジャンル"
+
+msgid "Genre - Album"
+msgstr "ジャンル - アルバム"
+
+msgid "Genre - Artist"
+msgstr "ジャンル - アーティスト"
+
+msgid "Genres"
+msgstr "ジャンル"
+
+msgid "Genres pane"
+msgstr "ジャンルペイン"
+
+msgid "Gnome multimedia keys plugin"
+msgstr "Gnome multimedia keys プラグイン"
+
+msgid "Go to Playing Track"
+msgstr "再生中トラックへ移動"
+
+msgid "Go to playing song"
+msgstr "再生中楽曲へ移動"
+
+msgid "Grouping"
+msgstr "グループ分け中"
+
+msgid "Help"
+msgstr "ヘルプ"
+
+msgid "Hide"
+msgstr "隠す"
+
+msgid "Hide Artist/Album bar"
+msgstr "アーティスト/アルバム バーを隠す"
+
+msgid "Hide toolbar"
+msgstr "ツールバーを隠す"
+
+msgid "Icon theme :"
+msgstr "アイコンテーマ :"
+
+msgid "Identifier in file tag"
+msgstr "タグ上のタグ上の識別子"
+
+msgid "Ignore playback errors"
+msgstr "再生エラーを無視"
+
+msgid "Import list"
+msgstr "リストのインポート"
+
+msgid ""
+"In this case one command by file will be run\n"
+"\n"
+msgstr ""
+"ファイル毎に1コマンドが実行されます\n"
+"\n"
+
+msgid "Include Styles in Genres"
+msgstr "ジャンル内のスタイルを含む"
+
+msgid "Increase Volume"
+msgstr "ボリュームアップ"
+
+msgid "Increase volume"
+msgstr "ボリュームアップ"
+
+msgid "Info"
+msgstr "情報"
+
+msgid "Insensitive title-artist (left-aligned)"
+msgstr "小文字を区別しない タイトル-アーティスト (左揃え)"
+
+msgid "Insensitive title-artist (right-aligned)"
+msgstr "小文字を区別しない タイトル-アーティスト (右揃え)"
+
+msgid "Insensitive, Song & Cover"
+msgstr "小文字を区別しない, 楽曲 & カバー"
+
+msgid "Insert Selected Songs at the top of the queue"
+msgstr "選択済楽曲をキューの最上部に追加"
+
+msgid "Insert a list of files/folders at the start of the playlist"
+msgstr "ファイル/フォルダのリストをプレイリストの先頭に追加"
+
+msgid "Insert this pipeline before the audio sink"
+msgstr "オーディオシンクの前にパイプラインを挿入"
+
+msgid "Invalid regular expression"
+msgstr "無効な正規表現"
+
+msgid "Invert filter"
+msgstr "反転フィルタ"
+
+msgid "Invisible hot spot"
+msgstr "不可視のホットスポット"
+
+msgid "Justified"
+msgstr "両端揃え"
+
+msgid "Karaoke"
+msgstr "カラオケ"
+
+msgid "Karaoke plugin"
+msgstr "カラオケプラグイン"
+
+msgid "Key"
+msgstr "キー"
+
+msgid "Keys"
+msgstr "キー"
+
+msgid "Keywords"
+msgstr "キーワード"
+
+msgid "Label"
+msgstr "ラベル"
+
+msgid "Label/Publisher"
+msgstr "ラベル/発行者"
+
+msgid "Labels"
+msgstr "ラベル"
+
+msgid "Labels' icons"
+msgstr "ラベルアイコン"
+
+msgid "Lang"
+msgstr "言語"
+
+msgid "Lang."
+msgstr "言語"
+
+msgid "Languages"
+msgstr "言語"
+
+msgid "Launch ripping program"
+msgstr "リッピングプログラムを起動"
+
+msgid "Layout"
+msgstr "レイアウト"
+
+msgid "Layout :"
+msgstr "レイアウト:"
+
+msgid "Layouts"
+msgstr "レイアウト"
+
+msgid "Left aligned"
+msgstr "左に配置"
+
+msgid "Left pane"
+msgstr "レフトペイン"
+
+msgid "Length"
+msgstr "長さ"
+
+msgid "Library"
+msgstr "ライブラリ"
+
+msgid "Library : "
+msgstr "ライブラリ :"
+
+msgid ""
+"Library empty.\n"
+"\n"
+"Use the settings dialog to add music."
+msgstr ""
+"ライブラリは空です。\n"
+"\n"
+"設定ダイアログで楽曲を追加してください。"
+
+#, perl-format
+msgid "Library size : %d song"
+msgid_plural "Library size : %d songs"
+msgstr[0] "ライブラリサイズ : %d 曲"
+msgstr[1] "ライブラリサイズ : %d 曲"
+
+msgid "Limit similar artists to a rate of similarity : "
+msgstr "関連アーティストを類似性評価で制限 :"
+
+msgid "Limit similar artists to the first : "
+msgstr "関連アーティストを最初に制限 :"
+
+msgid "List"
+msgstr "リスト"
+
+msgid "List empty"
+msgstr "リストは空"
+
+msgid "List order"
+msgstr "リスト順"
+
+msgid "Listed : "
+msgstr "リスト済"
+
+msgid "Listed songs"
+msgstr "リスト済楽曲"
+
+msgid "Listeners: "
+msgstr "リスナ:"
+
+msgid "Lists"
+msgstr "リスト"
+
+msgid "Lists, Library & Context"
+msgstr "リスト, ライブラリ & コンテキスト"
+
+msgid "Load lyrics even if lyrics panel is hidden"
+msgstr "歌詞パネルが非表示でも歌詞を読み込む"
+
+msgid "Load/Save Artist Info in :"
+msgstr "アーティスト情報の読込/保存:"
+
+#, perl-format
+msgid "Loaded %d unsent song from previous session"
+msgid_plural "Loaded %d unsent songs from previous session"
+msgstr[0] "以前のセッションから未送付曲 %d 曲をロード済"
+msgstr[1] "以前のセッションから未送付曲 %d 曲をロード済"
+
+msgid "Loading failed."
+msgstr "読込に失敗しました。"
+
+msgid "Loading..."
+msgstr "読込中..."
+
+msgid "Lock"
+msgstr "ロック"
+
+msgid "Lock Album"
+msgstr "アルバムのロック"
+
+msgid "Lock Artist"
+msgstr "アーティストのロック"
+
+msgid "Lock on Album"
+msgstr "アルバムのロックオン"
+
+msgid "Lock on Artist"
+msgstr "アーティストのロックオン"
+
+msgid "Lock on song"
+msgstr "楽曲のロックオン"
+
+#, perl-brace-format
+msgid "Lock on {field}"
+msgstr "{field} のロックオン"
+
+msgid "Locked on :\n"
+msgstr "ロックオンしました :\n"
+
+msgid "Lookup at allmusic.com"
+msgstr "allmusic.comで検索"
+
+msgid "Lookup in AMG"
+msgstr "AMGで検索"
+
+msgid "Lookup in google"
+msgstr "Googleで検索"
+
+msgid "Lower left"
+msgstr "左下"
+
+msgid "Lower right"
+msgstr "右下"
+
+msgid "Lullaby"
+msgstr "ララバイ"
+
+msgid "Lullaby plugin"
+msgstr "ララバイプラグイン"
+
+msgid "Lyricist"
+msgstr "作詞家"
+
+msgid "Lyrics"
+msgstr "歌詞"
+
+msgid "Lyrics (requires lyrics plugin)"
+msgstr "歌詞(lyrics pluginが必要)"
+
+msgid "Lyrics alignement"
+msgstr "歌詞の位置"
+
+msgid "Lyrics file :"
+msgstr "歌詞ファイル:"
+
+msgid "Lyrics file name format"
+msgstr "歌詞ファイル名の書式"
+
+msgid "Lyrics plugin"
+msgstr "歌詞プラグイン"
+
+msgid "Lyrics source"
+msgstr "歌詞のソース"
+
+msgid "MIME type"
+msgstr "MIME タイプ"
+
+msgid "MPRIS v1 support"
+msgstr "MPRIS v1 サポート"
+
+msgid "MPRIS v2 support"
+msgstr "MPRIS v2 サポート"
+
+msgid "Main"
+msgstr "メイン"
+
+msgid "Main artist"
+msgstr "メインアーティスト"
+
+msgid ""
+"Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
+"gnome."
+msgstr "gnomeの 次/前/再生/停止 マルチメディアキーに gmusicbrowserが反応する"
+
+msgid "Media type"
+msgstr "メディアタイプ"
+
+msgid "Menu entry name"
+msgstr "メニューエントリ名"
+
+msgid "Minimal tip"
+msgstr "最小のtip"
+
+msgid "Minimum size"
+msgstr "最小サイズ"
+
+msgid "Modification"
+msgstr "変更"
+
+msgid "Monday"
+msgstr "月曜日"
+
+msgid "Moods"
+msgstr "ムード"
+
+msgid "More info"
+msgstr "追加の情報"
+
+msgid "More results"
+msgstr "追加の結果"
+
+msgid "Mosaic View"
+msgstr "モザイクビュー"
+
+msgid "Move"
+msgstr "移動"
+
+msgid "Move Files to :"
+msgstr "ファイルを移動 :"
+
+msgid "Move failed"
+msgstr "移動に失敗"
+
+msgid "Move folder to"
+msgstr "フォルダへ移動"
+
+#, perl-format
+msgid "Moving file"
+msgid_plural "Moving %d files"
+msgstr[0] "ファイルを移動中"
+msgstr[1] "ファイルを %d 個移動中"
+
+msgid "Music"
+msgstr "楽曲"
+
+msgid "Mute/Unmute"
+msgstr "ミュート/ミュート解除"
+
+msgid "Name"
+msgstr "名前"
+
+msgid "Name of layout"
+msgstr "レイアウト名"
+
+msgid "Name under which the command will appear in the menu"
+msgstr "メニュー上で表示されるコマンド名"
+
+msgid "New"
+msgstr "新規"
+
+msgid "New custom field"
+msgstr "新規カスタムフィールド"
+
+msgid "New filter"
+msgstr "新規フィルタ"
+
+msgid "New list"
+msgstr "新規リスト"
+
+msgid "New name"
+msgstr "新規名称"
+
+msgid "Next"
+msgstr "次"
+
+msgid "Next Album"
+msgstr "次のアルバム"
+
+msgid "Next Artist"
+msgstr "次のアーティスト"
+
+msgid "Next Song"
+msgstr "次の曲"
+
+msgid "Next Song In Playlist"
+msgstr "プレイリスト内の次の楽曲"
+
+msgid "No connections"
+msgstr "接続なし"
+
+msgid "No file browser found."
+msgstr "ファイルブラウザが見つかりません。"
+
+msgid "No genre"
+msgstr "ジャンルなし"
+
+msgid "No label"
+msgstr "ラベルなし"
+
+msgid "No locked filter"
+msgstr "ロックされたフィルタなし"
+
+msgid "No lyrics found"
+msgstr "歌詞が見つかりません"
+
+msgid "No moods"
+msgstr "ムードなし"
+
+msgid "No results found"
+msgstr "結果が見つかりません"
+
+msgid "No review found"
+msgstr "レビューが見つかりません"
+
+msgid "No review written."
+msgstr "レビューが書き込まれません。"
+
+msgid "No songs"
+msgstr "楽曲なし"
+
+msgid "No songs found"
+msgstr "楽曲が見つかりません"
+
+msgid "No sound menu found"
+msgstr "楽曲メニューが見つかりません"
+
+msgid "No styles"
+msgstr "スタイルなし"
+
+msgid "No themes"
+msgstr "テーマなし"
+
+msgid "No web browser found."
+msgstr "Webブラウザが見つかりません。"
+
+msgid "None"
+msgstr "なし"
+
+msgid "Normal"
+msgstr "通常"
+
+msgid "Normal mode"
+msgstr "通常モード"
+
+msgid "Normalize volume (the files must have replaygain tags)"
+msgstr "ボリュームの平準化(リプレイゲインタグが必要)"
+
+msgid "Not found"
+msgstr "見つからない"
+
+msgid "Note that some notification daemons resize the displayed picture"
+msgstr "通知デーモンでは表示画像をリサイズします"
+
+msgid ""
+"Note: inactive fields must be enabled by the user in the 'Fields' tab in "
+"Settings"
+msgstr ""
+"注意： 設定の'フィールド'タブ内で非動作のフィールドを有効にする必要があります"
+
+msgid "Notify"
+msgstr "通知"
+
+msgid "Notify plugin"
+msgstr "通知プラグイン"
+
+msgid "Notify you of the playing song with the system's notification popups"
+msgstr "再生中の楽曲についてシステムの通知ポップアップで通知する"
+
+msgid "Now playing"
+msgstr "現在再生中"
+
+msgid "NowPlaying plugin"
+msgstr "現在再生中プラグイン"
+
+msgid "Number of days since added"
+msgstr "最後に追加してからの日数"
+
+msgid "Number of days since last played"
+msgstr "最後に再生してからの日数"
+
+msgid "Number of days since last skipped"
+msgstr "最後にスキップしてからの日数"
+
+msgid "Number of days since modified"
+msgstr "最後に変更してからの日数"
+
+msgid "Number of times played"
+msgstr "再生回数"
+
+msgid "Number of times skipped"
+msgstr "スキップした回数"
+
+msgid ""
+"ON -> smaller means more probable\n"
+"OFF -> bigger means more probable"
+msgstr ""
+"ON -> より小さい可能性\n"
+"OFF -> より大きい可能性"
+
+msgid ""
+"ON less probable if genre is set\n"
+"OFF more probable if genre is set"
+msgstr ""
+"ON ジャンルが設定されている場合、より少ない\n"
+"OFF ジャンルが設定されている場合、より多い"
+
+msgid ""
+"ON less probable if label is set\n"
+"OFF more probable if label is set"
+msgstr ""
+"ON ラベルが設定されている場合、より少ない\n"
+"OFF ラベルが設定されている場合、より多い"
+
+msgid "On top of other windows instead of below"
+msgstr "後ろのウィンドウの代わりに先頭のウィンドウで"
+
+#, perl-brace-format
+msgid "One of these commands is required to play files of type {type} : {cmd}"
+msgstr ""
+"{type} タイプのファイルをを演奏するにはこれらのうちどれかのコマンドが必要で"
+"す : {cmd}"
+
+msgid "Only affect mp3 files that do not already have an id3v1 tag"
+msgstr "ID3v1タグを持たないMP3ファイルのみ有効"
+
+msgid "Only show similar artists from local library"
+msgstr "ローカルライブラリからのみ類似アーティストを表示"
+
+msgid "Opacity"
+msgstr "透明度"
+
+msgid "Open Browser"
+msgstr "ブラウザを開く"
+
+msgid "Open Browser window"
+msgstr "ブラウザウィンドウを開く"
+
+msgid "Open Context window"
+msgstr "コンテキストウィンドウを開く"
+
+msgid "Open Custom window"
+msgstr "カスタムウィンドウを開く"
+
+msgid "Open Equalizer"
+msgstr "イコライザを開く"
+
+msgid "Open Playlist"
+msgstr "プレイリストを開く"
+
+msgid "Open Preference window"
+msgstr "お気に入りウィンドウを開く"
+
+msgid "Open Queue"
+msgstr "キューを開く"
+
+msgid "Open Queue window"
+msgstr "キューウィンドウを開く"
+
+msgid "Open Search window"
+msgstr "検索ウィンドウを開く"
+
+msgid "Open allmusic.com in your web browser"
+msgstr "webブラウザでallmusic.comを開く"
+
+msgid "Open containing folder"
+msgstr "含まれているフォルダを開く"
+
+msgid "Open context & queue panel"
+msgstr "コンテキスト & キューパネルを開く"
+
+msgid "Open context page"
+msgstr "コンテキストページを開く"
+
+msgid "Open existing list"
+msgstr "既存のリストを開く"
+
+msgid "Open files"
+msgstr "ファイルを開く"
+
+msgid "Open folder"
+msgstr "フォルダを開く"
+
+msgid "Open last.fm website in your browser"
+msgstr "ブラウザでlast.fm サイトを開く"
+
+msgid "Open link in Browser"
+msgstr "ブラウザでリンクを開く"
+
+msgid "Open page layout"
+msgstr "ページレイアウトを開く"
+
+msgid "Open special layouts as desktop widgets"
+msgstr "デスクトップウィジェットとして特別なレイアウトを開く"
+
+msgid "Open this page in the web browser"
+msgstr "このページをWebブラウザで開く"
+
+msgid "Options"
+msgstr "オプション"
+
+msgid "Options ..."
+msgstr "オプション..."
+
+msgid "Options for subgroup"
+msgstr "サブグループのオプション"
+
+msgid "Original Artist"
+msgstr "オリジナルのアーティスト"
+
+msgid "Original Filename"
+msgstr "オリジナルのファイル名"
+
+msgid "Original release year"
+msgstr "オリジナルのリリース年"
+
+msgid "Other"
+msgstr "その他"
+
+msgid "Output"
+msgstr "出力"
+
+msgid "Overlay layout :"
+msgstr "オーバレイ レイアウト :"
+
+msgid "Owner identifier"
+msgstr "オーナー識別子"
+
+msgid "Path,Album,Disc,Track,File"
+msgstr "パス,アルバム,ディスク,トラック,ファイル"
+
+msgid "Path,File"
+msgstr "パス,ファイル"
+
+msgid "Pattern to find .lrc files :"
+msgstr ".lrcファイル検索パターン ："
+
+msgid "Pause"
+msgstr "一時停止"
+
+msgid "Picture"
+msgstr "画像"
+
+msgid "Picture Type"
+msgstr "画像タイプ"
+
+#, perl-format
+msgid "Picture cache : %d MB"
+msgstr "画像キャッシュ: %d MB"
+
+msgid "Picture finder"
+msgstr "画像ファインダ"
+
+msgid "Picture finder plugin"
+msgstr "画像ファインダプラグイン"
+
+#, perl-format
+msgid "Picture size : %d"
+msgstr "画像サイズ : %d"
+
+msgid "Pictures and music files"
+msgstr "画像と楽曲ファイル"
+
+msgid "Pictures files"
+msgstr "画像ファイル"
+
+msgid "Play"
+msgstr "再生"
+
+msgid "Play Only Displayed"
+msgstr "表示中の楽曲のみ再生"
+
+msgid "Play Only Selected"
+msgstr "選択中楽曲のみ再生"
+
+msgid "Play a list of files"
+msgstr "ファイルリストの楽曲を再生"
+
+msgid "Play all songs from this album"
+msgstr "アルバムの全楽曲を再生"
+
+msgid "Play all songs from this artist"
+msgstr "アーティストの全楽曲を再生"
+
+msgid "Play button"
+msgstr "再生ボタン"
+
+msgid "Play count"
+msgstr "再生回数"
+
+msgid "Play counter"
+msgstr "再生カウンタ"
+
+msgid "Play filter"
+msgstr "再生フィルタ"
+
+msgid "Play listed songs"
+msgstr "リスト上の楽曲を再生"
+
+msgid "Play order"
+msgstr "再生順"
+
+msgid "Play/Pause"
+msgstr "再生/一時停止"
+
+msgid "Playback"
+msgstr "再生"
+
+msgid "Playcount: "
+msgstr "再生数:"
+
+msgid "Played Today"
+msgstr "本日再生曲"
+
+msgid "Player mounted on :"
+msgstr "プレヤーをマウント ："
+
+msgid "Player window layout :"
+msgstr "プレーヤーウィンドウレイアウト ："
+
+msgid "Playing"
+msgstr "再生中"
+
+msgid "Playing Album"
+msgstr "再生中アルバム"
+
+msgid "Playing Artist"
+msgstr "再生中アーティスト"
+
+msgid "Playing Filter"
+msgstr "再生中フィルタ"
+
+msgid "Playing Title"
+msgstr "再生中タイトル"
+
+msgid "Playing and queue icons"
+msgstr "再生とキューのアイコン"
+
+#, perl-brace-format
+msgid "Playing error : {error}"
+msgstr "再生エラー : {error}"
+
+msgid "Playlist"
+msgstr "プレイリスト"
+
+msgid "Playlist 1"
+msgstr "プレイリスト 1"
+
+msgid "Playlist Empty"
+msgstr "プレイリストは空"
+
+msgid "Playlist Utilities Bar"
+msgstr "プレイリストユーティリティバー"
+
+msgid "Playlist empty"
+msgstr "プレイリストは空"
+
+msgid "Playlist files"
+msgstr "プレイリストファイル"
+
+msgid "Playlist filter"
+msgstr "プレイリストフィルタ"
+
+msgid "Playlist filter :\n"
+msgstr "プレイリストフィルタ :\n"
+
+msgid "Playlists"
+msgstr "プレイリスト"
+
+msgid "Plugin not loaded"
+msgstr "プラグインが読み込まれていません"
+
+msgid "Plugins"
+msgstr "プラグイン"
+
+msgid "Popup Custom window"
+msgstr "カスタムウィンドウのポップアップ"
+
+msgid "Popup Traytip"
+msgstr "トレイチップをポップアップ"
+
+msgid "Popup notify window"
+msgstr "通知ウィンドウをポップアップ"
+
+msgid "Popup playlist filter menu"
+msgstr "プレイリストのフィルタメニューをポップアップ"
+
+msgid "Popup playlist order menu"
+msgstr "プレイリストの並び順メニューをポップアップ"
+
+msgid "Popup queue menu"
+msgstr "キューメニューをポップアップ"
+
+msgid "Pre-set"
+msgstr "プリセット"
+
+msgid "Prefered place to load and save lyrics :"
+msgstr "歌詞の読込と保存の最適な場所 :"
+
+msgid "Preferences"
+msgstr "プリファレンス"
+
+msgid "Prepend"
+msgstr "先頭に追加"
+
+msgid "Previous"
+msgstr "前"
+
+msgid "Previous Song"
+msgstr "前の楽曲"
+
+msgid "Previous Song In Playlist"
+msgstr "プレイリスト内の前楽曲"
+
+msgid "Previous page"
+msgstr "前のページ"
+
+msgid "Private Data"
+msgstr "個人データ"
+
+msgid "Progress"
+msgstr "進捗"
+
+msgid "Properties"
+msgstr "プロパティ"
+
+msgid "Provides context views using MozEmbed or WebKit"
+msgstr "MozEmbed もしくは Webkitを用いたコンテキストビューを提供"
+
+msgid "Proxy host :"
+msgstr "プロキシホスト ："
+
+msgid "Queue"
+msgstr "キュー"
+
+#, perl-format
+msgid "Queue (%n)"
+msgstr "キュー (%n)"
+
+msgid "Queue Edit"
+msgstr "キュの編集"
+
+msgid "Queue album"
+msgstr "アルバムのキュー"
+
+msgid "Queue artist"
+msgstr "アーティストのキュー"
+
+msgid "Queue empty"
+msgstr "キューは空"
+
+msgid "Queue in Sidebar"
+msgstr "サイドバー内のキュー"
+
+msgid "Queue mode"
+msgstr "キューモード"
+
+msgid "Queue options"
+msgstr "キューオプション"
+
+msgid "Quick Search"
+msgstr "高速検索"
+
+msgid "Quick Search with SongTree"
+msgstr "ソングツリーを高速検索"
+
+msgid "Quit"
+msgstr "終了"
+
+msgid "Quit when queue empty"
+msgstr "キューが空の時終了"
+
+msgid "Radio title"
+msgstr "ラジオタイトル"
+
+msgid "Radio url"
+msgstr "ラジオ URL"
+
+msgid "Random"
+msgstr "ランダム"
+
+msgid "Random Playback"
+msgstr "ランダム再生"
+
+msgid "Random mode edition"
+msgstr "ランダムモード編集"
+
+msgid "Rating"
+msgstr "レーティング"
+
+msgid "Rating (picture)"
+msgstr "レーティング (画像)"
+
+msgid "Rating between 0 and 100, or empty for default"
+msgstr "0〜100の間で評価してください。既定では空です"
+
+msgid "Rating range:"
+msgstr "レーティングレンジ ："
+
+msgid "Re-load layouts"
+msgstr "レイアウトの再読込"
+
+msgid "Re-read tags"
+msgstr "タグの再読込"
+
+msgid "Re-reading tags"
+msgstr "タグの再読込中"
+
+msgid "Re-shuffle"
+msgstr "再シャッフル"
+
+msgid "Read/write in file tag"
+msgstr "ファイルタグ内の読込/書出"
+
+msgid "Recent Filters"
+msgstr "最新のフィルタ"
+
+msgid "Recent albums"
+msgstr "最新のアルバム"
+
+msgid "Recent artists"
+msgstr "最新のアーティスト"
+
+msgid "Recent songs"
+msgstr "最新の楽曲"
+
+msgid "Recent songs include skipped songs that haven't been played."
+msgstr "最新の楽曲(未再生の楽曲を含む)"
+
+msgid "Recently played"
+msgstr "最近再生された"
+
+msgid "Recently played songs"
+msgstr "前の曲"
+
+msgid "Record label"
+msgstr "ラベルの記録"
+
+msgid "Recording Dates"
+msgstr "日付の記録"
+
+msgid "Recording date"
+msgstr "日付の記録"
+
+msgid "Recording type"
+msgstr "タイプの記録"
+
+msgid "Reference point :"
+msgstr "参照ポイント :"
+
+msgid "Refresh"
+msgstr "更新"
+
+msgid "Refresh list"
+msgstr "リストの更新"
+
+msgid "Regular expression"
+msgstr "正規表現"
+
+msgid "Regular expression :"
+msgstr "正規表現 :"
+
+msgid "Regular expression didn't match"
+msgstr "正規表現が合致しません"
+
+msgid "Release date"
+msgstr "リリース日時"
+
+msgid "Remember last Filter/Playlist between sessions"
+msgstr "セッション中の最後のフィルタ/プレイリストを記憶"
+
+msgid "Remember playing position between sessions"
+msgstr "セッション中の再生ポジションを記録"
+
+msgid "Remember playing song between sessions"
+msgstr "セッション中の再生楽曲を記録"
+
+msgid "Remember queue between sessions"
+msgstr "セッション中のキューを記録"
+
+msgid "Remixer"
+msgstr "レミキサー"
+
+msgid "Remove"
+msgstr "消去"
+
+msgid "Remove a label from the current song"
+msgstr "現在の楽曲からラベルを消去"
+
+msgid "Remove all"
+msgstr "すべて消去"
+
+msgid "Remove all songs"
+msgstr "全楽曲の消去"
+
+msgid "Remove filter"
+msgstr "フィルタの消去"
+
+msgid "Remove from disk"
+msgstr "ディスクから消去"
+
+msgid "Remove from library"
+msgstr "ライブラリから消去"
+
+msgid "Remove from list"
+msgstr "リストから消去"
+
+msgid "Remove from playlist"
+msgstr "プレイリストから消去"
+
+msgid "Remove from queue"
+msgstr "キューから消去"
+
+msgid "Remove header, footer and left column from wikipedia pages"
+msgstr "wikipediaページからヘッダ,フッタ,左コラムを消去"
+
+msgid "Remove label"
+msgstr "ラベルの消去"
+
+msgid "Remove list"
+msgstr "リストの消去"
+
+msgid "Remove selected songs"
+msgstr "選択楽曲の消去"
+
+msgid "Remove this field"
+msgstr "フィールドの消去"
+
+msgid "Remove this rule"
+msgstr "ルールの消去"
+
+msgid "Remove this tab"
+msgstr "タブの消去"
+
+msgid "Remove this tag"
+msgstr "タグの消去"
+
+msgid "Remove this widget"
+msgstr "ウィジェットの消去"
+
+msgid "Rename"
+msgstr "名前変更"
+
+msgid "Rename File"
+msgstr "ファイルの名前変更"
+
+msgid "Rename file"
+msgstr "ファイルの名前変更"
+
+msgid "Rename files using this pattern :"
+msgstr "本パターンでのファイルの名前変更 :"
+
+msgid "Rename folder"
+msgstr "フォルダの名前変更"
+
+msgid "Rename this folder to :"
+msgstr "このフォルダを名前変更 :"
+
+msgid "Rename/move files based on these fields :"
+msgstr "これらのフィールドに従って名前変更/移動 :"
+
+#, perl-brace-format
+msgid ""
+"Renaming {oldname}\n"
+"to {newname}\n"
+"failed : {error}"
+msgstr ""
+"{oldname} から\n"
+"{newname} への\n"
+"名前変更に失敗: {error}"
+
+msgid "Reorganize files and folders"
+msgstr "ファイルとフォルダの再編成"
+
+msgid "Repeat"
+msgstr "リピート"
+
+msgid "Replace"
+msgstr "書き換え"
+
+msgid "Replace existing values"
+msgstr "既保存値の置き換え"
+
+msgid "Replace..."
+msgstr "置き換え"
+
+msgid "ReplayGain options"
+msgstr "リプレイゲインのオプション"
+
+msgid "Replaygain"
+msgstr "リプレイゲイン"
+
+msgid "Replaygain analysis"
+msgstr "リプレイゲインの解析"
+
+msgid "Rescan"
+msgstr "再スキャン"
+
+msgid "Rescan Collection"
+msgstr "コレクションの再スキャン"
+
+msgid "Reset filter"
+msgstr "フィルタのリセット"
+
+msgid "Retrieves album-relevant information (review etc.) from allmusic.com."
+msgstr "allmusic.com からアルバムの関連情報を取得(レビューほか)"
+
+msgid "Review"
+msgstr "レビュー"
+
+msgid "Rewind"
+msgstr "リワインド"
+
+msgid "Rhythmbox 2nd queue column"
+msgstr "Rhythmbox キュー2列目"
+
+msgid "Right aligned"
+msgstr "右揃え"
+
+msgid "Right side"
+msgstr "右側"
+
+msgid "Right-click to remove filters"
+msgstr "右クリックしフィルタを削除"
+
+msgid "Right-click to toggle shuffle/random"
+msgstr "右クリックしシャッフル/ランダム再生の切替"
+
+msgid "Rip plugin"
+msgstr "Ripプラグイン"
+
+msgid "Ripping software :"
+msgstr "Rippingソフトウェア ："
+
+msgid "Run a command when playing a song"
+msgstr "楽曲再生時にコマンドを実行"
+
+msgid "Run perl code"
+msgstr "perl コードの実行"
+
+msgid "Run system command"
+msgstr "システムコマンドの実行"
+
+msgid "Running time"
+msgstr "実行時間"
+
+msgid "Same Title"
+msgstr "同一タイトル"
+
+msgid "Same album"
+msgstr "同一アルバム"
+
+msgid "Same artist"
+msgstr "同一アーティスト"
+
+msgid "Same title"
+msgstr "同一タイトル"
+
+msgid "Same year"
+msgstr "同一年"
+
+msgid "Sampling Rate"
+msgstr "サンプリングレート"
+
+msgid "Saturday"
+msgstr "土曜日"
+
+msgid "Save"
+msgstr "保存"
+
+msgid "Save Tags/Options"
+msgstr "タグ/オプションの保存"
+
+msgid "Save album info in:"
+msgstr "アルバム情報の保存:"
+
+msgid "Save artist biography"
+msgstr "アーティストのバイオグラフィを保存"
+
+msgid "Save as..."
+msgstr "別名で保存..."
+
+msgid "Save current filter as"
+msgstr "現在のフィルタを保存"
+
+msgid "Save current list as"
+msgstr "現在のリストを保存"
+
+msgid "Save lyrics"
+msgstr "歌詞を保存"
+
+msgid "Save now"
+msgstr "直ちに保存"
+
+msgid "Save picture as"
+msgstr "画像を保存"
+
+msgid "Save review"
+msgstr "レビューを保存"
+
+#, perl-format
+msgid "Save tags/settings every %d minutes"
+msgstr "%d分毎にタグ/設定を保存する"
+
+msgid "Saved"
+msgstr "保存済"
+
+msgid "Saved Lists"
+msgstr "保存済リスト"
+
+msgid "Saved filters"
+msgstr "保存済フィルタ"
+
+msgid "Saved lists"
+msgstr "保存済リスト"
+
+msgid "Scan Collection"
+msgstr "コレクションのスキャン"
+
+msgid "Scan as an album"
+msgstr "1枚のアルバムとしてスキャン"
+
+msgid "Scan for new songs"
+msgstr "新しい楽曲のスキャン"
+
+msgid "Scan per-file track gain"
+msgstr "ファイル毎のトラックゲインをスキャン"
+
+msgid "Scan this file"
+msgstr "このファイルをスキャン"
+
+msgid "Scan using tag-defined album"
+msgstr "タグで定義されたアルバムを用いてスキャン"
+
+msgid "Scanning"
+msgstr "スキャン中"
+
+msgid "Scroll with song"
+msgstr "楽曲と連動してスクロール"
+
+msgid "Scroll with the song"
+msgstr "楽曲と連動してスクロール"
+
+msgid "Search"
+msgstr "検索"
+
+msgid "Search : "
+msgstr "検索 :"
+
+msgid "Search Album"
+msgstr "アルバムの検索"
+
+msgid "Search Artist"
+msgstr "アーティストの検索"
+
+msgid "Search Comment"
+msgstr "コメントの検索"
+
+msgid "Search Genre"
+msgstr "ジャンルの検索"
+
+msgid "Search Label"
+msgstr "ラベルの検索"
+
+msgid "Search Title"
+msgstr "タイトルの検索"
+
+msgid "Search Title, Artist and Album"
+msgstr "タイトル, アーティスト, アルバムの検索"
+
+msgid "Search Title, Artist, Album, Comment, Label and Genre"
+msgstr "タイトル, アーティスト, アルバム, コメント, ラベル, ジャンルの検索"
+
+msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
+msgstr ""
+"タイトル, アーティスト, アルバム, コメント, ラベル, ジャンル, ファイル名の検"
+"索"
+
+msgid "Search album"
+msgstr "アルバムの検索"
+
+msgid "Search all fields"
+msgstr "全フィールドの検索"
+
+msgid "Search allmusic for Artist"
+msgstr "アーティストの全楽曲を検索"
+
+msgid "Search amazon.com for Artist"
+msgstr "アーティストについてamazon.comで検索"
+
+msgid "Search and display lyrics"
+msgstr "検索し歌詞を表示"
+
+msgid "Search box type"
+msgstr "box タイプの検索"
+
+msgid "Search discogs for Artist"
+msgstr "アーティストのディスコグラフィを検索"
+
+msgid "Search for Artist on youtube"
+msgstr "アーティストについてyoutubeで検索"
+
+msgid "Search for a picture on internet"
+msgstr "インターネットで画像を検索"
+
+msgid "Search for artist on:"
+msgstr "アーティストについて検索:"
+
+msgid "Search for current album"
+msgstr "現在のアルバムを検索"
+
+msgid "Search for current artist"
+msgstr "現在のアーティストを検索"
+
+msgid "Search for new songs on startup"
+msgstr "起動時に新しい楽曲を検索"
+
+msgid "Search google for Artist"
+msgstr "アーティストについてGoogleで検索"
+
+msgid "Search on the web"
+msgstr "Webで検索"
+
+msgid "Search options"
+msgstr "検索オプション"
+
+msgid "Search title"
+msgstr "タイトルの検索"
+
+msgid "Search window layout :"
+msgstr "ウィンドウレイアウトの検索 :"
+
+msgid "Search:"
+msgstr "検索:"
+
+msgid "Searching for a picture of : "
+msgstr "画像を検索 :"
+
+msgid "Seek"
+msgstr "シーク"
+
+msgid "Select current song"
+msgstr "現在の楽曲を選択"
+
+msgid "Select fields"
+msgstr "フィールドを選択"
+
+msgid "Select files"
+msgstr "ファイルを選択"
+
+msgid "Select search fields"
+msgstr "検索フィールドを選択"
+
+msgid "Selected : "
+msgstr "選択済 :"
+
+msgid "Selected songs"
+msgstr "選択楽曲"
+
+msgid "Selecting pictures"
+msgstr "画像を選択中"
+
+msgid "Send Title/Artist/Album in standard input"
+msgstr "標準入力にタイトル/アーティスト/アルバムを送信"
+
+msgid "Set Current Song Rating"
+msgstr "現在の楽曲をレーティングする"
+
+msgid "Set Picture"
+msgstr "画像を設定"
+
+msgid "Set as primary filter"
+msgstr "プライマリフィルタに設定"
+
+msgid "Set focus on a layout widget"
+msgstr "レイアウトウィジェットにフォーカスを当てる"
+
+msgid "Settings"
+msgstr "設定"
+
+msgid "Settings on this page will only take effect after a restart"
+msgstr "本ページの設定は再起動後に有効になります"
+
+#, perl-format
+msgid ""
+"Shell command\n"
+"(some variables such as %f (current song filename) or %F (list of selected "
+"songs filenames) are available)"
+msgstr ""
+"シェルコマンド\n"
+"(いくつかの変数 %f(現在の楽曲ファイル名)もしくは %F(選択済楽曲のファイル名リ"
+"スト)が存在します)"
+
+msgid "Show"
+msgstr "表示"
+
+msgid "Show Artist page on last.fm"
+msgstr "last.fm上のアーティストページを表示"
+
+msgid "Show Artist page on wikipedia"
+msgstr "wikipedia上のアーティストページを表示"
+
+msgid "Show album"
+msgstr "アルバムの表示"
+
+msgid "Show artist's biography"
+msgstr "アーティストのバイオグラフィを表示"
+
+msgid "Show artist's upcoming events"
+msgstr "アーティストの今後のイベントを表示"
+
+msgid "Show buttons"
+msgstr "ボタンを表示"
+
+msgid "Show genre"
+msgstr "ジャンルを表示"
+
+msgid "Show in sound menu"
+msgstr "サウンドメニュー内で表示"
+
+msgid "Show info panel"
+msgstr "情報パネルを表示"
+
+msgid "Show main window"
+msgstr "メインウィンドウを表示"
+
+msgid "Show playlist"
+msgstr "プレイリストを表示"
+
+msgid "Show replaygain submenu"
+msgstr "リプレイゲインサブメニューを表示"
+
+msgid "Show similar artists"
+msgstr "類似したアーティストを表示"
+
+msgid "Show song details"
+msgstr "楽曲詳細を表示"
+
+msgid "Show status bar"
+msgstr "ステータスバーを表示"
+
+msgid "Show suggestions"
+msgstr "候補を表示"
+
+msgid "Show tabs"
+msgstr "タブを表示"
+
+msgid "Show tray icon"
+msgstr "トレイアイコンを表示"
+
+msgid "Show tray tip on song change"
+msgstr "楽曲変更時にトレイtipを表示"
+
+msgid "Show/Hide"
+msgstr "表示/隠す"
+
+msgid "Show/Hide Browser"
+msgstr "ブラウザの表示/隠す"
+
+msgid "Show/Hide Cover"
+msgstr "カバーの表示/隠す"
+
+msgid "Show/Hide layout widget(s)"
+msgstr "レイアウトウィジェットの表示/隠す"
+
+msgid "Show/Hide lyrics line"
+msgstr "歌詞ラインの表示/隠す"
+
+msgid "Show/hide URI entry"
+msgstr "URLエントリの表示/隠す"
+
+msgid "Show/hide status bar"
+msgstr "ステータスバーの表示/隠す"
+
+msgid "Shuffle"
+msgstr "シャッフル"
+
+msgid "Shuffle queue"
+msgstr "キュー内シャッフル"
+
+msgid "Shuffled albums"
+msgstr "アルバム内シャッフル"
+
+msgid "Shuffled albums, shuffled tracks"
+msgstr "シャッフル済アルバム, シャッフル済トラック"
+
+msgid "Shutdown command :"
+msgstr "シャットダウンコマンド ："
+
+msgid "Similar"
+msgstr "類似"
+
+msgid "Similar Artists"
+msgstr "類似アーティスト"
+
+msgid "Simple List View"
+msgstr "シンプルなリスト表示"
+
+msgid "Simple title"
+msgstr "シンプルなタイトル"
+
+msgid "Size"
+msgstr "サイズ"
+
+msgid "Skip to next song if an error occurs"
+msgstr "エラーが発生した時次の曲へスキップ"
+
+msgid "Small"
+msgstr "小"
+
+msgid "Small album picture"
+msgstr "小さなアルバム画像"
+
+msgid "Small player"
+msgstr "小さなプレーヤ"
+
+msgid "Smaller browser"
+msgstr "より小さなブラウザ"
+
+msgid "Song"
+msgstr "楽曲"
+
+msgid "Song Properties"
+msgstr "楽曲のプロパティ"
+
+msgid "Song informations"
+msgstr "楽曲の情報"
+
+msgid "Song rating"
+msgstr "楽曲の評価"
+
+msgid "Songs Properties"
+msgstr "楽曲のプロパティ"
+
+msgid "Songtree View"
+msgstr "楽曲ツリービュー"
+
+msgid "Sort"
+msgstr "ソート"
+
+msgid "Sort order"
+msgstr "ソート順"
+
+msgid "Split artist names on :"
+msgstr "アーティストの名前を分割 :"
+
+msgid "Standard fields"
+msgstr "標準フィールド"
+
+msgid "Start in tray"
+msgstr "トレー内で開始"
+
+msgid "Statistics"
+msgstr "統計"
+
+msgid "Statusbar"
+msgstr "ステータスバー"
+
+msgid "Stop"
+msgstr "停止"
+
+msgid "Stop checking"
+msgstr "チェックを停止"
+
+msgid "Stop scanning"
+msgstr "スキャンを停止"
+
+msgid "Stop selecting pictures"
+msgstr "画像選択を停止"
+
+msgid "Stop when queue empty"
+msgstr "キューが空の時停止"
+
+msgid "Stop, Play and Next buttons"
+msgstr "停止, 再生, 次へボタン"
+
+msgid "Stop, Play and Next buttons and Time"
+msgstr "停止, 再生, 次へボタン + 時間"
+
+msgid "Stop, Play and Next buttons and Title/Artist"
+msgstr "ストップ, 再生, 次へボタン + タイトル/アーティスト"
+
+msgid "Styles"
+msgstr "スタイル"
+
+msgid "Submit played songs to last.fm"
+msgstr "last.fmに再生楽曲を提供"
+
+msgid "Subtitle"
+msgstr "サブタイトル"
+
+msgid "Summary :"
+msgstr "要約 :"
+
+msgid "Sunday"
+msgstr "日曜日"
+
+msgid "Switch to fullscreen mode"
+msgstr "フルスクリーンモードへ切替"
+
+msgid "System clock is not close enough to the current time"
+msgstr "システムクロックは現在の時間に対してずれています。"
+
+msgid "System command :"
+msgstr "システムコマンド :"
+
+msgid "Tag"
+msgstr "タグ"
+
+msgid "Tags"
+msgstr "タグ"
+
+msgid "Terms of use"
+msgstr "利用規約"
+
+msgid "Text"
+msgstr "テキスト"
+
+msgid ""
+"The artists similar to the 'seed'-artist will be used to populate the queue, "
+"but you can decide to exclude the 'seed'-artist him/herself."
+msgstr ""
+"キューを生成する際に'シード'アーティストに類似したアーティストが使用されます"
+"が、'シード'アーティストを含まない設定も可能です。"
+
+msgid "The layout for this desktop widget is missing."
+msgstr "デスクトップウィジェットのレイアウトが見つからない。"
+
+msgid "Themes"
+msgstr "テーマ"
+
+msgid "These fields can be used :"
+msgstr "使用可能なフィールド :"
+
+#, perl-brace-format
+msgid "This command is required to play files of type {type} : {cmd}"
+msgstr "{type} タイプの楽曲を演奏するのに必要なコマンド : {cmd}"
+
+#, perl-format
+msgid "This label is set for %d song."
+msgid_plural "This label is set for %d songs."
+msgstr[0] "ラベルは %d 曲にセットします。"
+msgstr[1] "ラベルは %d 曲にセットします。"
+
+msgid "This plugin requires :"
+msgstr "プラグインが必要 :"
+
+msgid ""
+"This plugin retrieves artist-relevant information (biography, upcoming "
+"events, similar artists) from last.fm."
+msgstr ""
+"このプラグインはアーティストの関連情報(バイオグラフィ, 今後のイベント, 類似"
+"アーティスト)を last.fm から取得します。"
+
+#, perl-format
+msgid "Threshold to count a song as played : %d %"
+msgstr "楽曲が演奏される回数のしきい値 : %d %"
+
+msgid "Thursday"
+msgstr "火曜日"
+
+msgid "Time :"
+msgstr "時間 :"
+
+#, perl-format
+msgid "Timeout : %d seconds"
+msgstr "タイムアウト : %d 秒"
+
+msgid "Timespan of the fade-out in seconds"
+msgstr "フェードアウトのタイムスパン(秒指定)"
+
+msgid "Title"
+msgstr "タイトル"
+
+msgid "Title & icon"
+msgstr "タイトル & アイコン"
+
+msgid "Title & progress"
+msgstr "タイトル & 進捗"
+
+msgid "Title - Artist - Album"
+msgstr "タイトル - アーティスト - アルバム"
+
+#, perl-format
+msgid "Title: %t"
+msgstr "タイトル: %t"
+
+#, perl-format
+msgid "Title: %t (Track No. %n)"
+msgstr "タイトル: %t (トラックNo. %n)"
+
+msgid "Titlebar"
+msgstr "タイトルバー"
+
+msgid "Titlebar overlay plugin"
+msgstr "タイトルバーオーバーレイプラグイン"
+
+msgid "Toggle Album Lock"
+msgstr "アルバムロック切替"
+
+msgid "Toggle Artist Lock"
+msgstr "アーティストロック切替"
+
+msgid "Toggle Song Lock"
+msgstr "楽曲ロック切替"
+
+msgid "Toggle a label of the current song"
+msgstr "現在曲のラベル切替"
+
+msgid "Toggle between Random/Shuffle and Ordered"
+msgstr "ランダム/シャッフル/順番 のトグル"
+
+msgid "Toggle fullscreen mode"
+msgstr "フルスクリーンモードの切替"
+
+msgid "Toggle the fullscreen layout"
+msgstr "フルスクリーンレイアウトの切替"
+
+msgid "Toolbar"
+msgstr "ツールバー"
+
+msgid "Tools"
+msgstr "ツール"
+
+msgid "Total playcount:"
+msgstr "合計再生回数:"
+
+msgid "Track"
+msgstr "トラック"
+
+msgid "Track Properties"
+msgstr "トラックのプロパティ"
+
+msgid "Track gain"
+msgstr "トラックのゲイン"
+
+msgid "Track peak"
+msgstr "トラックのピーク"
+
+msgid "Tray tip window layout :"
+msgstr "トレイチップウィンドウのレイアウト :"
+
+msgid "Tuesday"
+msgstr "火曜日"
+
+msgid "Turn Off"
+msgstr "切断"
+
+msgid "Turn off computer when queue empty"
+msgstr "キューが空の時はコンピュータの電源を切る"
+
+msgid "Unique file identifier"
+msgstr "ユニークなファイル識別子"
+
+msgid "Unknown album"
+msgstr "不明なアルバム"
+
+#, perl-brace-format
+msgid "Unknown field ({field})"
+msgstr "不明なフィールド ({field})"
+
+msgid "Unknown filter :"
+msgstr "不明なフィルタ :"
+
+#, perl-format
+msgid "Unknown layout '%s'"
+msgstr "不明なレイアウト '%s'"
+
+msgid "Unlock Album"
+msgstr "アルバムロック解除"
+
+msgid "Unlock Artist"
+msgstr "アーティストロック解除"
+
+msgid "Unnamed custom command"
+msgstr "名前なしカスタムコマンド"
+
+msgid "Unnamed filter"
+msgstr "名前なしフィルタ"
+
+msgid "Untitled"
+msgstr "タイトルなし"
+
+msgid "Update tags"
+msgstr "タグの更新"
+
+msgid "Update tags..."
+msgstr "タグの更新..."
+
+msgid "Upper left"
+msgstr "左上"
+
+msgid "Upper right"
+msgstr "右上"
+
+msgid "Use Equalizer"
+msgstr "イコライザの使用"
+
+msgid ""
+"Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are "
+"probably better supported by other softwares"
+msgstr ""
+"ID3v2タグ作成時にID3v2.3の代わりにID3v2.4を使用する(ID3v2.3は他のソフトウェア"
+"でよりサポートされています)。"
+
+msgid "Use MozEmbed"
+msgstr "MozEmbed を使用"
+
+msgid "Use ReplayGain"
+msgstr "ReplayGain を使用"
+
+msgid "Use WebKit"
+msgstr "WebKit を使用"
+
+msgid "Use a master filter"
+msgstr "マスタフィルタを使用"
+
+msgid "Use album normalization instead of track normalization"
+msgstr "トラック正規化の代わりにアルバム正規化を使用"
+
+msgid "Use default regular expression"
+msgstr "既定の正規表現を使用"
+
+msgid "Use gstreamer"
+msgstr "gstreamer を使用"
+
+msgid "Use latin1 encoding if possible in id3v2 tags"
+msgstr "id3v2タグで可能ならば latin1 エンコードを使用する"
+
+#, perl-format
+msgid ""
+"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
+"furthermore linebreaks '<br>' and any text you'd like to have in between. E."
+"g. '%title taking place at %startDate<br>in %city, %country<br><br>'"
+msgstr ""
+"%で始まり(例えば %headliner)  '<br>' で終了する任意のテキストによる last.fm "
+"XMLイベントページのタグを利用する。例： '%title taking place at "
+"%startDate<br>in %city, %country<br><br>'"
+
+msgid "Use the playing filter"
+msgstr "再生フィルタを使用"
+
+#, perl-brace-format
+msgid "Use this picture as cover for album '{album}'"
+msgstr "アルバム '{album}' のカバーにこの画像を使用する"
+
+#, perl-brace-format
+msgid "Use this picture for artist '{artist}'"
+msgstr "アーティスト '{artist}' にこの画像を使用する"
+
+#, perl-brace-format
+msgid "Use {command} to play {ext} files"
+msgstr "{command} コマンドを使用し、 {ext} ファイルを再生"
+
+msgid "Used for clipping prevention"
+msgstr "クリッピング予防に使用"
+
+msgid "Used for the Artists field"
+msgstr "アーティストフィールドに使用"
+
+msgid "Used to associate the saved value with a user or a function"
+msgstr "ユーザーまたは関数を使用して保存値を関連付けるために使用"
+
+msgid "User authentification error"
+msgstr "ユーザ認証エラー"
+
+msgid "Value not written in file tag"
+msgstr "ファイルタグに書かれていない値"
+
+msgid "Value written in file tag"
+msgstr "ファイルタグに書かれている値"
+
+msgid "Version"
+msgstr "バージョン"
+
+msgid "View"
+msgstr "表示"
+
+msgid "View Binary"
+msgstr "バイナリ表示"
+
+msgid "View binary data ..."
+msgstr "バイナリデータを表示..."
+
+msgid "Volume : "
+msgstr "ボリューム :"
+
+msgid "Volume step :"
+msgstr "ボリュームステップ :"
+
+msgid "Wait for more when queue empty"
+msgstr "キューを空にしている間少々お待ちください"
+
+msgid ""
+"Warning : these are advanced options, don't change them unless you know what "
+"you are doing."
+msgstr ""
+"警告 : これらは高度なオプションです。自分で何をしているか理解できるまでは変更"
+"しないでください。"
+
+msgid "Warning : using a folder with invalid encoding, you should rename it."
+msgstr ""
+"警告 : 無効なエンコーディングでフォルダを使用しています。名前を変更してくださ"
+"い。"
+
+msgid "Warning: all existing data for this field will be lost"
+msgstr "警告 : 本フィールド上の記録済データは失われます。"
+
+msgid "Warning: an identifier is needed"
+msgstr "警告 : 識別子が必要です"
+
+msgid "Warning: converting existing data to this format may be lossy"
+msgstr "警告 : このフォーマットへのコンバートは音質が劣化します"
+
+msgid "Web context"
+msgstr "Web コンテキスト"
+
+msgid "Web context plugin"
+msgstr "Web コンテキストプラグイン"
+
+msgid "Wednesday"
+msgstr "水曜日"
+
+msgid "Weighted Random"
+msgstr "ランダムに重み付け"
+
+msgid "When added"
+msgstr "追加時に"
+
+msgid ""
+"When changing songs, the previous song is added to the recent list even if "
+"not played at all."
+msgstr ""
+"曲の変更時に以前の楽曲が最近のリストに追加されます(一部分の再生の場合でも)。"
+
+msgid "When current song"
+msgstr "現楽曲の時に"
+
+msgid "Whole library"
+msgstr "ライブラリ全体"
+
+msgid "Widget name"
+msgstr "ウィジェット名"
+
+msgid "Wikipedia Locale"
+msgstr "Wikipedia ロケール"
+
+msgid ""
+"Will not write the tags except with the advanced tag editing dialog. The "
+"changes will be kept in the library instead.\n"
+"Warning, the changes for a song will be lost if the tag is re-read."
+msgstr ""
+"高度なタグ編集ダイアログを除いてタグを書き込みません。変更点はライブラリの代"
+"わりに保存されます\n"
+"注意、楽曲の変更点はタグの再読み込みで失われます。"
+
+msgid "Will use default if not found"
+msgstr "見つからない場合、既定で使用"
+
+msgid "Words that begin with"
+msgstr "次の文字で始まる言葉"
+
+msgid "Write filenames to ..."
+msgstr "ファイル名の書込..."
+
+msgid ""
+"Write value of selected fields in the tags. Useful for fields that were "
+"previously not written to tags, to make sure the current value is written."
+msgstr ""
+"タグ内の選択されたフィールドに値を書き込みます。現在の値が書き込まれていない"
+"か確認するために未記入タグを探す際に便利です。"
+
+msgid "Writing tags"
+msgstr "タグを書込中"
+
+msgid "Year"
+msgstr "年"
+
+msgid "Year - Album"
+msgstr "年 - アルバム"
+
+msgid "Year - Artist"
+msgstr "年 - アーティスト"
+
+msgid "Yes"
+msgstr "はい"
+
+msgid ""
+"You can force a check for these files by holding shift when selecting \"Re-"
+"read tags\""
+msgstr ""
+"\"再読込タグ\" を選択中にシフトを押し続けることでこれらのファイルのチェックを"
+"強制できます。"
+
+msgid ""
+"You can use some markup, eg :\n"
+"<b>bold</b> <i>italic</i> <u>underline</u>\n"
+"Note that the markup may be ignored by the notification daemon"
+msgstr ""
+"マークアップを使用出来ます。例 :\n"
+"<b>太字</b> <i>斜体</i> <u>アンダーライン</u>\n"
+"通知デーモンはマークアップを無視します"
+
+msgid "You must specify a base folder"
+msgstr "ベースフォルダを指定してください"
+
+msgid "_Insert column"
+msgstr "列の追加(I)"
+
+msgid "_Remove this column"
+msgstr "選択列を削除(R)"
+
+msgid "_Retry"
+msgstr "再実行(R)"
+
+msgid "_Sort by"
+msgstr "並べ替え(S)"
+
+msgid "abort copy"
+msgstr "複写を中止"
+
+msgid "abort move"
+msgstr "移動を中止"
+
+msgid "add"
+msgstr "追加"
+
+msgid "advanced options"
+msgstr "高度なオプション"
+
+#. comma-separated list of field aliases for album, these are in addition to english aliases
+msgctxt "Field_aliases"
+msgid "album,on"
+msgstr "アルバム,on"
+
+msgid "alphabetical"
+msgstr "アルファベット順"
+
+msgid "amixer control :"
+msgstr "amixer 制御 :"
+
+msgid "another example"
+msgstr "他の例"
+
+msgid "applied on reload"
+msgstr "リロード時に適用"
+
+msgid "apply filter"
+msgstr "フィルタの適用"
+
+#, perl-brace-format
+msgid "argument {n} :"
+msgstr "引数 {n} :"
+
+msgid "artist"
+msgstr "アーティスト"
+
+msgid "auto detect"
+msgstr "自動検出"
+
+msgid "autofill"
+msgstr "自動補完"
+
+msgid "back cover"
+msgstr "バックカバー"
+
+msgid "band"
+msgstr "バンド"
+
+msgid "band/artist logotype"
+msgstr "バンド/アーティスト ロゴタイプ"
+
+msgid "big size"
+msgstr "大きなサイズ"
+
+msgid "bonus tracks"
+msgstr "ボーナストラック"
+
+msgid "boolean"
+msgstr "boolean型"
+
+msgid "check length now"
+msgstr "すぐに長さをチェック"
+
+msgid "check now"
+msgstr "直ちに確認"
+
+msgid "cloud mode"
+msgstr "クラウドモード"
+
+msgid "command :"
+msgstr "コマンド :"
+
+msgid "common number"
+msgstr "一般的な数字"
+
+msgid "common string"
+msgstr "一般的な文字列"
+
+msgid "composer"
+msgstr "作曲者"
+
+msgid "conductor"
+msgstr "指揮者"
+
+msgid "connection failed"
+msgstr "接続失敗"
+
+msgid "connection failed."
+msgstr "接続に失敗しました。"
+
+msgid "contains"
+msgstr "含む"
+
+#, perl-format
+msgid "contains %s"
+msgstr "%s を含む"
+
+#, perl-format
+msgid "contains %s (case sensitive)"
+msgstr "%s を含む(大文字小文字を含まない)"
+
+msgid "counter"
+msgstr "カウンタ"
+
+msgid "custom"
+msgstr "カスタム"
+
+msgid "day"
+msgstr "日"
+
+msgid "days"
+msgstr "日"
+
+msgid "default"
+msgstr "既定"
+
+msgid "default filename"
+msgstr "既定のファイル名"
+
+msgid "default folder"
+msgstr "既定のフォルダ"
+
+msgid "delete selected filter"
+msgstr "選択フィルタの削除"
+
+msgid "delete selected grouping"
+msgstr "選択グループの削除"
+
+msgid "delete selected random mode"
+msgstr "選択ランダムモードの削除"
+
+msgid "delete selected sort mode"
+msgstr "選択ソートモードの削除"
+
+msgid "different folders"
+msgstr "他のフォルダ"
+
+#, perl-brace-format
+msgid "disc {disc}"
+msgstr "ディスク {disc}"
+
+#, perl-format
+msgid "doesn't contain %s"
+msgstr "%s を含まない"
+
+#, perl-format
+msgid "doesn't contain %s (case sensitive)"
+msgstr "%s を含まない(大文字小文字を区別)"
+
+msgid "doesn't have a picture"
+msgstr "画像なし"
+
+#, perl-format
+msgid "doesn't include %s"
+msgstr "%s を含まない"
+
+#, perl-format
+msgid "doesn't include artist %s"
+msgstr "アーティスト %s を含まない"
+
+#, perl-format
+msgid "doesn't match regexp %s"
+msgstr "正規表現 %s に合致しない"
+
+#, perl-format
+msgid "doesn't match regexp %s (case sensitive)"
+msgstr "正規表現 %s に合致しない(大文字小文字を区別)"
+
+msgid "during recording"
+msgstr "録音中"
+
+msgid "empty"
+msgstr "空"
+
+msgid "enable gapless (experimental)"
+msgstr "ギャップレス再生を有効化(実験的)"
+
+msgid "error"
+msgstr "エラー"
+
+msgid "ex :"
+msgstr "例 :"
+
+#, perl-brace-format
+msgid "example (selected song) : {score}  ({chances})"
+msgstr "例 (選択楽曲) : {score}  ({chances})"
+
+msgid "example : "
+msgstr "例 : "
+
+#, perl-format
+msgid "example : %s"
+msgstr "例 : %s"
+
+msgid "examples :"
+msgstr "例 :"
+
+#, perl-format
+msgid "fallback-gain : %d dB"
+msgstr "フォールバックゲイン : %d dB"
+
+msgid "false"
+msgstr "偽"
+
+msgid "favorite"
+msgstr "お気に入り"
+
+msgid "file tag"
+msgstr "ファイルタグ"
+
+msgid "filters"
+msgstr "フィルタ"
+
+msgid "flags"
+msgstr "フラグ"
+
+msgid "float"
+msgstr "fkoat型"
+
+msgid "for files without a VBR header"
+msgstr "VBRヘッダ無しのファイルで"
+
+msgid "front cover"
+msgstr "フロントカバー"
+
+#, perl-format
+msgid "gmusicbrowser is playing %t from %l (%Y) by %a"
+msgstr "gmusicbrowser は %t / %l (%Y) アルバム %a を再生中"
+
+msgid "google images"
+msgstr "Googleイメージ"
+
+msgid "google images (hi-res)"
+msgstr "Googleイメージ(高解像度)"
+
+msgid "has a picture"
+msgstr "画像がある"
+
+msgid "has been played"
+msgstr "再生済"
+
+msgid "hours"
+msgstr "時"
+
+msgid "huge size"
+msgstr "特大サイズ"
+
+msgid "icecast server"
+msgstr "icecast サーバ"
+
+msgid "id3v1 tag"
+msgstr "id3v1 タグ"
+
+msgid "ignore title"
+msgstr "タイトルを無視"
+
+msgid "illustration"
+msgstr "イラストレーション"
+
+msgid "imported list"
+msgstr "インポート済リスト"
+
+msgid "in the bottom"
+msgstr "最下部に"
+
+#, perl-format
+msgid "in the bottom %s"
+msgstr "%s を最下部に"
+
+msgid "in the top"
+msgstr "最上部に"
+
+#, perl-format
+msgid "in the top %s"
+msgstr "%s を最上部に"
+
+msgid "includes"
+msgstr "含む"
+
+#, perl-format
+msgid "includes %s"
+msgstr "%s を含む"
+
+msgid "includes artist"
+msgstr "アーティストを含む"
+
+#, perl-format
+msgid "includes artist %s"
+msgstr "アーティスト %s を含む"
+
+msgid "integer"
+msgstr "integer型"
+
+msgid "interview"
+msgstr "インタビュー"
+
+msgid "invalid pattern"
+msgstr "無効なパターン"
+
+msgid "inverse"
+msgstr "逆の"
+
+msgid "is a flac file"
+msgstr "flacファイル"
+
+msgid "is a mp3 file"
+msgstr "mp3ファイル"
+
+msgid "is a musepack file"
+msgstr "musepackファイル"
+
+msgid "is a wavepack file"
+msgstr "wavepackファイル"
+
+msgid "is an ape file"
+msgstr "apeファイル"
+
+msgid "is equal to"
+msgstr "同じ"
+
+#, perl-format
+msgid "is equal to %s"
+msgstr "%s と同じ"
+
+msgid "is mono"
+msgstr "モノラル"
+
+msgid "is stereo"
+msgstr "ステレオ"
+
+msgid "isn't mono"
+msgstr "非モノラル"
+
+msgid "isn't stereo"
+msgstr "非ステレオ"
+
+msgid ""
+"itunes doesn't support unsynchronised tags last time I checked, mostly "
+"affect tags with pictures"
+msgstr ""
+"itunesは前回起動時に確認した非同期タグ(主に画像に影響を及ぼす)ををサポートし"
+"ません"
+
+msgid "last.fm plugin"
+msgstr "last.fm プラグイン"
+
+msgid "lead artist"
+msgstr "アーティストをリード"
+
+msgid "leaflet page"
+msgstr "リーフレットページ"
+
+msgid "left-side filter panes"
+msgstr "フィルタペインの左側"
+
+msgid "length of songs"
+msgstr "曲長"
+
+msgid "less than"
+msgstr "以前"
+
+#, perl-format
+msgid "less than %s ago"
+msgstr "%s 以前"
+
+msgid "lyricist"
+msgstr "作詞家"
+
+msgid "lyrics file"
+msgstr "歌詞ファイル"
+
+msgid "matches regexp"
+msgstr "正規表現マッチ"
+
+#, perl-format
+msgid "matches regexp %s"
+msgstr "正規表現マッチ %s"
+
+#, perl-format
+msgid "matches regexp %s (case sensitive)"
+msgstr "正規表現マッチ %s (大文字と小文字を区別)"
+
+msgid "maximum font size"
+msgstr "最大フォントサイズ"
+
+msgid "media"
+msgstr "メディア"
+
+msgid "medium size"
+msgstr "中"
+
+msgid "minimal"
+msgstr "最小"
+
+msgid "minimum font size"
+msgstr "最小フォントサイズ"
+
+msgid "minutes"
+msgstr "分"
+
+msgid "month"
+msgstr "月"
+
+msgid "months"
+msgstr "月"
+
+msgid "mosaic mode"
+msgstr "mosaicモード"
+
+msgid "move folder"
+msgstr "フォルダの移動"
+
+msgid "movie/video screen capture"
+msgstr "映画/ビデオ スクリーンキャプチャー"
+
+msgid ""
+"mp3 files without a VBR header requires a full scan to check its real length "
+"and bitrate"
+msgstr ""
+"ＶＢＲヘッダの無いMP3ファイルは曲長とビットレートの確認のためにフルスキャンが"
+"必要です。"
+
+msgid "mplayer executable :"
+msgstr "mplayer のパス :"
+
+msgid "mplayer options :"
+msgstr "mplayer オプション :"
+
+msgid "multi-lines string"
+msgstr "複数行文字列"
+
+msgid "name of the new filter"
+msgstr "新しいフィルタの名前"
+
+msgid "name of the new grouping"
+msgstr "新しいグルーピングの名前"
+
+msgid "name of the new random mode"
+msgstr "新しいランダムモードの名前"
+
+msgid "name of the new sort mode"
+msgstr "新しいソートモードの名前"
+
+msgid "never played"
+msgstr "未再生"
+
+msgid "no matches found, you might want to remove some search terms."
+msgstr "検索結果がありません。検索対象をいくつか削除してください。"
+
+msgid "no order"
+msgstr "順番なし"
+
+msgid "no picture"
+msgstr "画像なし"
+
+msgid "no pictures"
+msgstr "画像なし"
+
+msgid "no plugins found"
+msgstr "プラグインなし"
+
+msgid "no songs needs checking"
+msgstr "チェックの必要な楽曲なし"
+
+msgid "no splitting"
+msgstr "分割なし"
+
+msgid "noname"
+msgstr "名前なし"
+
+msgid "normal"
+msgstr "通常"
+
+msgid "number of songs"
+msgstr "楽曲数"
+
+msgid "number of songs in filter"
+msgstr "フィルタ内の楽曲数"
+
+msgid "only show entries with at least n songs"
+msgstr "最低 n 楽曲分のエントリを表示"
+
+msgid "only works when the artist-info tab is displayed"
+msgstr "アーティスト情報タグが表示状態の時のみ動作"
+
+msgid "only works with some lyrics source and when the lyrics tab is active"
+msgstr "歌詞タブがアクティブの時のみいくつかの歌詞ソースで動作"
+
+msgid "open context window"
+msgstr "コンテキストウィンドウを開く"
+
+msgid "options"
+msgstr "オプション"
+
+msgid "other"
+msgstr "その他"
+
+msgid "other file icon"
+msgstr "他のファイルアイコン"
+
+msgid "output device :"
+msgstr "出力デバイス :"
+
+msgid "password :"
+msgstr "パスワード :"
+
+msgid "perl code"
+msgstr "perl コード"
+
+msgid "picture size"
+msgstr "画像サイズ"
+
+msgid "play count average"
+msgstr "平均再生数"
+
+msgid "port :"
+msgstr "ポート :"
+
+msgid "pre-amp"
+msgstr "プリアンプ"
+
+#, perl-format
+msgid "pre-amp : %d dB"
+msgstr "プリアンプ : %d dB"
+
+#, perl-format
+msgid "present in %s"
+msgstr "%s 内に存在"
+
+msgid "present in list"
+msgstr "リスト内に存在"
+
+msgid "quit"
+msgstr "終了"
+
+msgid "rating"
+msgstr "レーティング"
+
+msgid "rating average"
+msgstr "レーティングの平均"
+
+msgid "recording location"
+msgstr "記録場所"
+
+msgid "requires xdg-screensaver"
+msgstr "xdg-screensaver が必要"
+
+#, perl-brace-format
+msgid "reset filter {nb}"
+msgstr "書式のリセット {nb}"
+
+msgid "reset format"
+msgstr "書式のリセット"
+
+msgid "reset primary filter"
+msgstr "プライマリフィルタをリセット"
+
+msgid "reset secondary filter"
+msgstr "セカンダリフィルタをリセット"
+
+msgid "retry"
+msgstr "再試行"
+
+#, perl-brace-format
+msgid "retry in {seconds} s"
+msgstr "{seconds} 秒以内に再試行"
+
+msgid "reverse order"
+msgstr "逆順"
+
+#, perl-brace-format
+msgid "save as '{name}'"
+msgstr "'{name}' として保存"
+
+msgid "save filter as"
+msgstr "フィルタを保存"
+
+msgid "save grouping as"
+msgstr "グループを保存"
+
+msgid "save random mode as"
+msgstr "ランダムモードを保存"
+
+msgid "save sort mode as"
+msgstr "ソートモードを保存"
+
+msgid "saved filters"
+msgstr "保存済フィルタ"
+
+msgid "saved groupings"
+msgstr "保存済グルーピング"
+
+msgid "saved random modes"
+msgstr "保存済ランダムモード"
+
+msgid "saved sort modes"
+msgstr "保存済ソートモード"
+
+msgid "scan now"
+msgstr "直ちにスキャン"
+
+msgid "seconds"
+msgstr "秒"
+
+msgid "show pictures"
+msgstr "画像を表示"
+
+msgid "show the 'All' row"
+msgstr "'全て'の行を表示"
+
+msgid "similar-artists"
+msgstr "類似アーティスト"
+
+msgid "skin options"
+msgstr "スキンオプション"
+
+msgid "static list"
+msgstr "スタティックリスト"
+
+msgid "stop"
+msgstr "停止"
+
+msgid "string"
+msgstr "文字列"
+
+msgid "supports : "
+msgstr "サポート :"
+
+msgid "text format"
+msgstr "テキスト書式"
+
+msgid "text mode"
+msgstr "テキストモード"
+
+msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
+msgstr "既定はID3v2.3の場合utf16、ID3v2.4の場合utf8です。"
+
+#. comma-separated list of field aliases for title, these are in addition to english aliases
+msgctxt "Field_aliases"
+msgid "title"
+msgstr "タイトル"
+
+msgid "tools"
+msgstr "ツール"
+
+msgid "true"
+msgstr "真"
+
+msgid "unknown"
+msgstr "不明"
+
+msgid "unknown error"
+msgstr "不明なエラー"
+
+msgid "unnamed random mode"
+msgstr "名前なしランダムモード"
+
+msgid "url-encoded list of files"
+msgstr "ファイルのURLエンコード済リスト"
+
+msgid "url-encoded list of files/folders"
+msgstr "ファイル/フォルダのURLエンコード済リスト"
+
+msgid "use :"
+msgstr "使用する :"
+
+msgid "use album name"
+msgstr "アルバム名を使用する"
+
+msgid "use default"
+msgstr "規定値を使用する"
+
+msgid "use gnome settings"
+msgstr "gnome 設定を使用する"
+
+msgid "use song folder"
+msgstr "楽曲フォルダを使用する"
+
+msgid "use standard strftime variables"
+msgstr "標準の strftime 変数を使用する"
+
+msgid "username :"
+msgstr "ユーザ名 :"
+
+msgid "using skin :"
+msgstr "スキンを使用 :"
+
+msgid "weeks"
+msgstr "週"
+
+msgid "weight :"
+msgstr "ウェイト :"
+
+msgid "wikipedia, lyrics, and custom webpages"
+msgstr "wikipedia, 歌詞, カスタムWebページ"
+
+msgid ""
+"without gstreamer : one stream per file, one connection at a time\n"
+"with gstreamer : one continuous stream, multiple connection possible"
+msgstr ""
+"gstreamer非経由 : ファイル毎に一つのストリーム、一度に一つのコネクションの"
+"み\n"
+"gstreamer経由 : 一つの連続ストリーム、可能ならば複数のコネクション"
+
+msgid "year"
+msgstr "年"
+
+msgid "years"
+msgstr "年"
+
+#, perl-brace-format
+msgid "{folder} already exists"
+msgstr "{folder} は既に存在します"
+
+#, perl-brace-format
+msgid "{hours} hours {min} min {sec} s ({size} M)"
+msgstr "{hours} 時 {min} 分 {sec} 秒 ({size} M)"
+
+#, perl-brace-format
+msgid "{hours}h {min}m {sec}s ({size}M)"
+msgstr "{hours}時 {min}分 {sec}秒 ({size}M)"
+
+#, perl-brace-format
+msgid "{hours}h{min}m{sec}s"
+msgstr "{hours}時{min}分{sec}秒"
+
+#, perl-brace-format
+msgid "{min} min {sec} s ({size} M)"
+msgstr "{min} 分 {sec} 秒 ({size} M)"
+
+#, perl-brace-format
+msgid "{min}m {sec}s ({size}M)"
+msgstr "{min}分 {sec}秒 ({size}M)"
+
+#, perl-brace-format
+msgid "{min}m{sec}s"
+msgstr "{min}分{sec}秒"
+
+#, perl-brace-format
+msgid "{outputname} output settings"
+msgstr "{outputname} 出力設定"
+
+#~ msgid "(applied after restart)"
+#~ msgstr "(再起動後に有効)"
+
+#~ msgid ""
+#~ "Allmusic uses both Genres and Styles to describe albums. If you use only "
+#~ "Genres, you may want to include Styles in the list of Genres."
+#~ msgstr ""
+#~ "Allmusicはアルバムの検索にジャンルとスタイルの双方を使用します。ジャンルの"
+#~ "み使用する時、ジャンルのリスト内にスタイルを追加する必要があるでしょう。"
+
+#~ msgid "Artist Picture Size : %d"
+#~ msgstr "アーティスト画像サイズ: %d"
+
+#~ msgid "Can't play '{file}'."
+#~ msgstr " '{file}' を再生できません。"
+
+#~ msgid "No results found."
+#~ msgstr "結果が見つかりません。"
+
+#~ msgid "Only works when the review tab is displayed"
+#~ msgstr "レビュータブが表示された時のみ動作"
+
+#~ msgid ""
+#~ "Save selected fields for all tracks on the same album whenever album data "
+#~ "is loaded from AMG or from file."
+#~ msgstr ""
+#~ "データがAMGもしくはファイルから読み込まれていても同一のアルバム上の全ト"
+#~ "ラックの選択フィールドを保存する"
+
+#~ msgid "is a m4a file"
+#~ msgstr "m4aファイル"
+
+#~ msgid "is an ogg file"
+#~ msgstr "oggファイル"

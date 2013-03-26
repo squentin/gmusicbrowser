@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1005\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2012-07-29 23:43+0200\n"
-"PO-Revision-Date: 2012-08-25 22:51+0100\n"
+"POT-Creation-Date: 2012-08-26 16:38+0200\n"
+"PO-Revision-Date: 2012-10-08 08:52+0100\n"
 "Last-Translator: Petr Šimáček <petr.simacek@gmail.com>\n"
 "Language-Team: čeština <L3D9Z6@seznam.cz>\n"
 "Language: cs\n"
@@ -830,7 +830,7 @@ msgstr "Vybrat stránku k otevření"
 
 #, perl-format
 msgid "Choose picture for '%s'"
-msgstr "Vybrat obrázek pro.'%s'"
+msgstr "Vybrat obrázek pro '%s'"
 
 msgid "Choose playlist files to import"
 msgstr "Vybrat soubory s playlisty k importu"
@@ -1302,6 +1302,9 @@ msgstr "Akce"
 msgid "Example :"
 msgstr "Příklad :"
 
+msgid "Exclude 'seed'-artist from queue"
+msgstr "Vyloučit 'seed'-umělce z fronty"
+
 msgid "Execute custom command on selected files"
 msgstr "Provést uživatelský příkaz na vybraných souborech"
 
@@ -1599,6 +1602,10 @@ msgstr "Obrátit filtr"
 
 msgid "Invisible hot spot"
 msgstr "Neviditelný hot spot"
+
+#, perl-format
+msgid "Isn't smart equal to %s"
+msgstr "není rovný %s"
 
 msgid "Justified"
 msgstr "Do bloku"
@@ -2044,7 +2051,7 @@ msgid "Not found"
 msgstr "Nenalezeno"
 
 msgid "Note that some notification daemons resize the displayed picture"
-msgstr "Nějaký notifikační démon změnil velikost zobrazeného obrázku"
+msgstr "Nějaký notifikační démoni změnili velikost zobrazeného obrázku"
 
 msgid ""
 "Note: inactive fields must be enabled by the user in the 'Fields' tab in "
@@ -2406,6 +2413,9 @@ msgstr "Vyskakovací okno s oznámením"
 
 msgid "Popup playlist filter menu"
 msgstr "Vyskakovací okno filtrovacího menu playlistu"
+
+msgid "Popup playlist order menu"
+msgstr "Vyskakovací okno řazení menu seznamu skladeb"
 
 msgid "Popup queue menu"
 msgstr "Menu fronty ve vyskakovací bublině"
@@ -3131,7 +3141,7 @@ msgid "Show suggestions"
 msgstr "Zobrazit návrhy"
 
 msgid "Show tabs"
-msgstr "Zobrazit tebelátory"
+msgstr "Zobrazit panely"
 
 msgid "Show tray icon"
 msgstr "Zobrazit ikonu v oznamovací oblasti"
@@ -3336,6 +3346,13 @@ msgstr "Podmínky používání"
 
 msgid "Text"
 msgstr "Text"
+
+msgid ""
+"The artists similar to the 'seed'-artist will be used to populate the queue, "
+"but you can decide to exclude the 'seed'-artist him/herself."
+msgstr ""
+"Interpreti podobní 'seed'-umělci naplní frontu, ale můžete se rozhodnout "
+"vyloučit 'seed'-umělce sám/sama."
 
 msgid "The layout for this desktop widget is missing."
 msgstr "Zobrazení pro tento widget chybí"
@@ -3862,7 +3879,7 @@ msgid "boolean"
 msgstr "boolean"
 
 msgid "bootleg"
-msgstr "bootleg"
+msgstr "ilegální"
 
 msgid "broken"
 msgstr "poškozeno"
@@ -4250,6 +4267,13 @@ msgstr "je mono"
 msgid "is not defined"
 msgstr "není definován"
 
+msgid "is smart equal"
+msgstr "je rovný"
+
+#, perl-format
+msgid "is smart equal to %s"
+msgstr "je rovný %s"
+
 msgid "is stereo"
 msgstr "je stereo"
 
@@ -4455,7 +4479,7 @@ msgid "not between %s and %s"
 msgstr "ne mezi %s a %s"
 
 msgid "not bootleg"
-msgstr "není bootleg"
+msgstr "není ilegální"
 
 msgid "not defined"
 msgstr "není definován"

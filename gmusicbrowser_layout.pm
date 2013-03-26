@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2011 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2013 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -955,12 +955,8 @@ sub CreateWidgets
 		$opt1->{group}= $defaultgroup.(length $group ? "-$group" : '') unless $group=~m/^[A-Z]/;
 		my $box=$widgets->{$key}= $type->{New}( $opt1 );
 		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle maxwidth maxheight expand_weight/;
-		if ($opt1->{minwidth} or $opt1->{minheight})
-		{	my ($minwidth,$minheight)=$box->get_size_request;
-			$minwidth=  $opt1->{minwidth}  || $minwidth;
-			$minheight= $opt1->{minheight} || $minheight;
-			$box->set_size_request($minwidth,$minheight);
-		}
+		ApplyCommonOptions($box,$opt1);
+
 		$box->{name}=$fullname;
 		$box->set_border_width($opt1->{border}) if $opt1 && exists $opt1->{border} && $box->isa('Gtk2::Container');
 		$box->set_name($key);
@@ -1097,12 +1093,7 @@ sub NewWidget
 	$widget->{name}=$namefull;
 	$widget->set_name($name);
 
-	if ($options{minwidth} or $options{minheight})
-	{	my ($minwidth,$minheight)=$widget->get_size_request;
-		$minwidth=  $options{minwidth}  || $minwidth;
-		$minheight= $options{minheight} || $minheight;
-		$widget->set_size_request($minwidth,$minheight);
-	}
+	ApplyCommonOptions($widget,\%options);
 
 	$widget->{actions}{$_}=$options{$_}  for grep m/^click\d*/, keys %options;
 	$widget->signal_connect(button_press_event => \&Button_press_cb) if $widget->{actions};
@@ -1139,7 +1130,6 @@ sub NewWidget
 	   }
 	   else { $widget->{state_tip}=$tip; }
 	}
-	if ($options{hover_layout}) { $widget->{$_}=$options{$_} for qw/hover_layout hover_delay hover_layout_pos/; Layout::Window::Popup::set_hover($widget); }
 	if (my $schange=$ref->{schange})
 	{	my $fields= $options{fields} || $options{field};
 		$fields= $fields ? [ split / /,$fields ] : undef;
@@ -1155,6 +1145,19 @@ sub NewWidget
 	my $init= delete $widget->{EndInit} || $ref->{EndInit};
 	$init->($widget) if $init;
 	return $widget;
+}
+sub ApplyCommonOptions # apply some options common to both boxes and other widgets
+{	my ($widget,$opt)=@_;
+	if ($opt->{minwidth} or $opt->{minheight})
+	{	my ($minwidth,$minheight)=$widget->get_size_request;
+		$minwidth=  $opt->{minwidth}  || $minwidth;
+		$minheight= $opt->{minheight} || $minheight;
+		$widget->set_size_request($minwidth,$minheight);
+	}
+	if ($opt->{hover_layout})	# only works with widgets/boxes that have their own gdkwindow (put it into a WB box otherwise)
+	{	$widget->{$_}=$opt->{$_} for qw/hover_layout hover_delay hover_layout_pos/;
+		Layout::Window::Popup::set_hover($widget);
+	}
 }
 
 sub RegisterWidget
@@ -1592,7 +1595,7 @@ sub PopupSongsFromAlbum
 {	my $ID=::GetSelID($_[0]);
 	return unless defined $ID;
 	my $aid=Songs::Get_gid($ID,'album');
-	::ChooseSongsFromA($aid);
+	::ChooseSongsFromA($aid,nocover=>0);
 }
 
 ####################################
@@ -1605,6 +1608,7 @@ use base 'Gtk2::Window';
 
 sub new
 {	my ($class,$layout,%options)=@_;
+	my @original_args=@_;
 	my $fallback=delete $options{fallback} || 'Shimmer Desktop';
 	my $opt0={};
 	if (my $opt= $layout=~m/^[^(]+\(.*=/)
@@ -1630,7 +1634,7 @@ sub new
 	{	my ($window)=grep $_->isa('Layout::Window') && $_->{uniqueid} eq $uniqueid, Gtk2::Window->list_toplevels;
 		if ($window)
 		{	if    ($mode eq 'toggle'  && !$window->{quitonclose})	{ $window->close_window; return }
-			elsif ($mode eq 'replace' && !$window->{quitonclose})	{ $window->close_window; }
+			elsif ($mode eq 'replace' && !$window->{quitonclose})	{ $window->close_window; return Layout::Window::new(@original_args,ifexists=>0); } # destroying previous window make it save its settings, then restart new() from the start with new $opt2 but the same original arguments, add ifexists=>0 to make sure it doesn't loop
 			elsif ($mode eq 'present')			 	{ $window->force_present; return }
 		}
 	}
@@ -2404,7 +2408,7 @@ our @contextmenu=
 		submenu => sub { $_[0]{self}->make_widget_list('context page'); },	submenu_reverse=>1,
 		code	=> sub { $_[0]{self}->newtab($_[1],1); },
 	},
-	{ label => _"Delete list", code => sub { $_[0]{page}->DeleteList; },	type=> 'L',	test => sub { $_[0]{page}{name}=~m/^EditList\d*$/; } },
+	{ label => _"Delete list", code => sub { $_[0]{page}->DeleteList; },	type=> 'L',  istrue=>'page',	test => sub { $_[0]{page}{name}=~m/^EditList\d*$/; } },
 	{ label => _"Rename",	code => \&pagerename_cb,				istrue => 'rename',},
 	{ label => _"Close",	code => sub { $_[0]{self}->close_tab($_[0]{page},1); },	istrue => 'close',	stockicon=> 'gtk-close',},
 );
@@ -2412,6 +2416,7 @@ our @contextmenu=
 our @DefaultOptions=
 (	closebuttons	=> 1,
 	tablist		=> 1,
+	newbutton	=> 'end',
 );
 
 sub new
@@ -2446,6 +2451,15 @@ sub new
 	$self->{widgets_opt}= $opt->{page_opt} ||={};
 	if (my $bl=$opt->{blacklist})
 	{	$self->{blacklist}{$_}=undef for split / +/, $bl;
+	}
+	$opt->{newbutton}=0 unless *Gtk2::Notebook::set_action_widget{CODE}; # Gtk2::Notebook::set_action_widget requires gtk+ >= 2.20 and perl-Gtk2 >= 1.23
+	if ($opt->{typesubmenu} && $opt->{newbutton} && $opt->{newbutton} ne 'none') # add a button next to the tabs to show new-tab menu
+	{	my $button= ::NewIconButton('gtk-add');
+		$button->signal_connect(button_press_event => \&newbutton_cb);
+		$button->signal_connect(clicked => \&newbutton_cb);
+		$button->show_all;
+		my $pos= $opt->{newbutton} eq 'start' ? 'start' : 'end';
+		$self->set_action_widget($button,$pos);
 	}
 	return $self;
 }
@@ -2531,6 +2545,10 @@ sub Pack
 	$label->set_angle($angle) if $angle;
 	::weaken( $wg->{tab_page_label}=$label ) if $wg->{tabrename};
 
+	# set base gravity to auto so that rotated tabs handle vertical scripts (asian languages) better
+	$label->get_pango_context->set_base_gravity('auto');
+	$label->signal_connect(hierarchy_changed=> sub { $_[0]->get_pango_context->set_base_gravity('auto'); }); # for some reason (gtk bug ?) the setting is reverted when the tab is dragged, so this re-set it
+
 	my $icon= $wg->{tabicon};
 	$icon=Gtk2::Image->new_from_stock($icon,'menu') if defined $icon;
 	my $close;
@@ -2583,6 +2601,11 @@ sub SavedLists_changed	#remove EditList tab if corresponding list has been delet
 	$self->close_tab($_) for @remove;
 }
 
+sub newbutton_cb
+{	 my $self= ::find_ancestor($_[0],__PACKAGE__);
+	::PopupContextMenu(\@contextmenu, { self=>$self, type=>$self->{typesubmenu}, usemenupos=>1 } );
+	1;
+}
 sub button_press_event_cb
 {	my ($self,$event)=@_;
 	return 0 if $event->button != 3;
@@ -2633,8 +2656,11 @@ sub pagerename_cb
 			1;
 		});
 	$entry->signal_connect(activate => sub {$_[0]->set_sensitive(0)}); #trigger the focus-out event
+	$entry->signal_connect(populate_popup => sub { ::weaken($_[0]{popupmenu}=$_[1]); });
 	$entry->signal_connect(focus_out_event => sub
 	 {	my $entry=$_[0];
+		my $popupmenu= delete $entry->{popupmenu};
+		return 0 if $entry->get_display->pointer_is_grabbed && $popupmenu && $popupmenu->mapped; # prevent error when context menu of the entry pops-up
 		my $new=$entry->get_text;
 		$tab->remove($entry);
 		$_->show for $tab->get_children;

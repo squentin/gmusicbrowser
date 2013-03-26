@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2011 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2013 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -19,8 +19,8 @@ our @MenuPlaying=
 	{ label => _"Filter on playing Artist",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('artists',$::SongID) )if defined $::SongID; }},
 	{ label => _"Filter on playing Song",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('title',$::SongID) )	if defined $::SongID; }},
 	{ label => _"Use the playing filter",	code => sub { ::SetFilter($_[0]{songlist}, $::PlayFilter ); }, test => sub {::GetSonglist($_[0]{songlist})->{mode} ne 'playlist'}}, #FIXME	if queue use queue, if $ListMode use list
-	{ label => _"Recent albums",		submenu => sub { my $sl=$_[0]{songlist};my @gid= ::uniq( Songs::Map_to_gid('album',$::Recent) ); $#gid=19 if $#gid>19; my $m=::PopupAA('album',nosort=>1,nominor=>1,widget => $_[0]{self}, list=>\@gid, cb=>sub { ::SetFilter($sl, Songs::MakeFilterFromGID('album',$_[1]) ); }); return $m; } },
-	{ label => _"Recent artists",		submenu => sub { my $sl=$_[0]{songlist};my @gid= ::uniq( Songs::Map_to_gid('artist',$::Recent) ); $#gid=19 if $#gid>19; my $m=::PopupAA('artists',nosort=>1,nominor=>1,widget => $_[0]{self}, list=>\@gid, cb=>sub { ::SetFilter($sl, Songs::MakeFilterFromGID('artists',$_[1]) ); }); return $m; } },
+	{ label => _"Recent albums",		submenu => sub { my $sl=$_[0]{songlist};my @gid= ::uniq( Songs::Map_to_gid('album',$::Recent) ); $#gid=19 if $#gid>19; my $m=::PopupAA('album',nosort=>1,nominor=>1,widget => $_[0]{self}, list=>\@gid, cb=>sub { ::SetFilter($sl, $_[0]{filter}); }); return $m; } },
+	{ label => _"Recent artists",		submenu => sub { my $sl=$_[0]{songlist};my @gid= ::uniq( Songs::Map_to_gid('artist',$::Recent) ); $#gid=19 if $#gid>19; my $m=::PopupAA('artists',nosort=>1,nominor=>1,widget => $_[0]{self}, list=>\@gid, cb=>sub { ::SetFilter($sl, $_[0]{filter}); }); return $m; } },
 	{ label => _"Recent songs",		submenu => sub { my @ids=@$::Recent; $#ids=19 if $#ids>19; return [map { $_,Songs::Display($_,'title') } @ids]; },
 	  submenu_ordered_hash => 1,submenu_reverse=>1,		code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('title',$_[1]) ); }, },
 );
@@ -1897,6 +1897,11 @@ sub create_tab
 	my $angle= $self->{angle} || 0;
 	my $label= Gtk2::Label->new( $page->{page_name} );
 	$label->set_angle($angle) if $angle;
+
+	# set base gravity to auto so that rotated tabs handle vertical scripts (asian languages) better
+	$label->get_pango_context->set_base_gravity('auto');
+	$label->signal_connect(hierarchy_changed=> sub { $_[0]->get_pango_context->set_base_gravity('auto'); }); # for some reason (gtk bug ?) the setting is reverted when the tab is dragged, so this re-set it
+
 	if ($self->{tabmode} ne 'text')
 	{	my $icon= "gmb-tab-$pid";
 		$img= Gtk2::Image->new_from_stock($icon,'menu') if Gtk2::IconFactory->lookup_default($icon);
@@ -2264,6 +2269,7 @@ sub Activate
 {	my ($view,$button)=@_;
 	my $self=::find_ancestor($view,__PACKAGE__);
 	my $filter= $self->get_selected_filters;
+	return unless $filter; #nothing selected
 	FilterPane::Activate($self,$button,$filter);
 }
 
@@ -3454,8 +3460,7 @@ sub AlbumListButton_press_cb
 	my $self=::find_ancestor($widget,__PACKAGE__);
 	return unless defined $self->{Sel};
 	::PopupAA('album', from => $self->{Sel}, cb=>sub
-		{	my $key=$_[1];
-			my $filter= Songs::MakeFilterFromGID('album',$key);
+		{	my $filter= $_[0]{filter};
 			::SetFilter( $self, $filter, $self->{filternb}, $self->{group} );
 		});
 	1;
@@ -3825,8 +3830,7 @@ sub SuggestionMenu_item_activated_cb
 sub SuggestionMenu_field_expand
 {	my $item=shift;
 	return 0 if $item->get_submenu;
-	my $field= $item->{field};
-	my $submenu=::PopupAA($field, list=>$item->{list}, format=>$item->{format}, cb => sub { my ($item,$val)=@_; $item->{field}=$field; $item->{val}=$val; SuggestionMenu_item_activated_cb($item); });
+	my $submenu=::PopupAA($item->{field}, list=>$item->{list}, format=>$item->{format}, cb => sub { my $item=$_[0]{menuitem}; $item->{field}=$_[0]{field}; $item->{val}=$_[0]{key}; SuggestionMenu_item_activated_cb($item); });
 	$item->set_submenu($submenu);
 	return 0;
 }

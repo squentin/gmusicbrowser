@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (C) 2005-2012 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2013 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -79,8 +79,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.100902',
- VERSIONSTRING => '1.1.9.2',
+ VERSION => '1.1010',
+ VERSIONSTRING => '1.1.10',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
@@ -173,7 +173,7 @@ BEGIN	# in a BEGIN block so that commands for a running instance are sent sooner
 	$default_home=$old;
   }
 
-my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2012 Quentin Sculo
+my $help=PROGRAM_NAME.' v'.VERSIONSTRING." (c)2005-2013 Quentin Sculo
 options :
 -nocheck: don't check for updated/deleted songs on startup
 -noscan	: don't scan folders for songs on startup
@@ -1239,6 +1239,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	MenuPlayOrder	=> [sub { Layout::SortMenu(); },   _"Popup playlist order menu"],
 	MenuQueue	=> [sub { PopupContextMenu(\@Layout::MenuQueue,{ID=>$SongID, usemenupos=>1}); }, _"Popup queue menu"],
 	ReloadLayouts	=> [ \&Layout::InitLayouts, _"Re-load layouts", ],
+	ChooseSongFromAlbum=> [sub {my $ID=GetSelID($_[0]); ChooseSongsFromA( Songs::Get_gid($ID,'album'),nocover=>1 ); }, ],
 );
 
 sub run_command
@@ -1292,9 +1293,11 @@ if ($CmdLine{cmdlist})
 {	print "Available commands (for fifo or layouts) :\n";
 	my ($max)= sort {$b<=>$a} map length, keys %Command;
 	for my $cmd (sort keys %Command)
-	{	my $tip=$Command{$cmd}[2] || '';
+	{	my $short= $Command{$cmd}[1];
+		next unless defined $short;
+		my $tip= $Command{$cmd}[2] || '';
 		if ($tip) { $tip=~s/\n.*//s; $tip=" (argument : $tip)"; }
-		printf "%-${max}s : %s %s\n", $cmd, $Command{$cmd}[1], $tip;
+		printf "%-${max}s : %s %s\n", $cmd, $short, $tip;
 	}
 	exit;
 }
@@ -1410,6 +1413,9 @@ exit;
 
 sub Edittag_mode
 {	my @dirs=@_;
+	$Songs::Def{$_}{flags}=~m/w/ || $Songs::Def{$_}{flags}=~s/e// for keys %Songs::Def; #quick hack to remove fields that are not written in the tag from the mass-tagging dialog
+	FirstTime(); Post_ReadSavedTags();
+	LoadIcons(); #for stars edit widget that shouldn't be shown anyway
 	$Options{LengthCheckMode}='never';
 	$_=rel2abs($_) for @dirs;
 	IdleScan(@dirs);
@@ -3366,7 +3372,7 @@ sub ChooseSongsTitle		#Songs with the same title
 }
 
 sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>100-200 ?)
-{	my ($album,$showcover)=@_;
+{	my ($album,%opt)=@_;
 	return unless defined $album;
 	my $list= AA::GetIDs(album=>$album);
 	Songs::SortList($list,'disc track file');
@@ -3386,9 +3392,9 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 		}
 		$list=\@list2;
 	}
-	my $menu = ChooseSongs($list, markup=>'%n %S<small>%V</small>');
+	my $menu = ChooseSongs($list, markup=>'%n %S<small>%V</small>', cb=>$opt{cb});
 	$menu->show_all;
-	if ($showcover)
+	unless ($opt{nocover})
 	{	my $h=$menu->size_request->height;
 		my $w=$menu->size_request->width;
 		my $maxwidth= $menu->get_screen->get_width;
@@ -3442,13 +3448,14 @@ sub ChooseSongs
 	my @IDs=@$IDs;
 	return unless @IDs;
 	my $format = $opt{markup} || __x( _"{song} by {artist}", song => "<b>%t</b>%V", artist => "%a");
+	my $lcallback= $opt{cb} || sub { Select(song => $_[1]) };
 	my $menu = Gtk2::Menu->new;
 	my $activate_callback=sub
 	 {	my $item=shift;
 		return if $item->get_submenu;
 		my $ID=$item->{ID};
 		if ($item->{middle}) { Enqueue($ID); }
-		else { Select(song => $ID); }
+		else { $lcallback->($item,$ID); }
 	 };
 	my $click_callback=sub
 	 { my ($item,$event)=@_;
@@ -3589,7 +3596,7 @@ sub menupos	# function to position popupmenu below clicked widget
 
 sub PopupAA
 {	my ($field,%args)=@_;
-	my ($list,$from,$callback,$format,$widget,$nosort,$nominor)=@args{qw/list from cb format widget nosort nominor/};
+	my ($list,$from,$callback,$format,$widget,$nosort,$nominor,$noalt)=@args{qw/list from cb format widget nosort nominor noalt/};
 	return undef unless @$Library;
 	my $isaa= $field eq 'album' || $field eq 'artist' || $field eq 'artists';
 	$format||="%a"; # "<b>%a</b>%Y\n<small>%s <small>%l</small></small>"
@@ -3618,7 +3625,7 @@ sub PopupAA
 		  {	my $menu=Gtk2::Menu->new;
 			for my $artist (keys %art_keys)
 			{	my $item=Gtk2::MenuItem->new_with_label($artist);
-				$item->set_submenu(PopupAA('album', list=> $art_keys{$artist}));
+				$item->set_submenu(PopupAA('album', %args, list=> $art_keys{$artist}));
 				$menu->append($item);
 			}
 			$menu->show_all;
@@ -3633,7 +3640,7 @@ sub PopupAA
 	else { @keys=@{ AA::GetAAList($field) }; }
 
 #### callbacks
-	$callback||=sub		#jump to first song
+	my $maincallback=sub		#jump to first song
 	   {	my ($item,$key)=@_;
 		return if $item->get_submenu;
 		my $IDs=AA::GetIDs($field,$key);
@@ -3643,21 +3650,23 @@ sub PopupAA
 			Select(song => $ID);
 		}
 	   };
-	my $altcallback= $field eq 'album' ?
+	$maincallback= sub { my ($item,$key)=@_; return if $item->get_submenu; $callback->( {menuitem=>$item,field=>$field,key=>$key,filter=>Songs::MakeFilterFromGID($field,$key)} ); } if $callback;
+	my $songcb= $callback ? sub { my ($item,$ID)=@_; $callback->( {menuitem=>$item,field=>'id',key=>$ID,filter=>Songs::MakeFilterFromID('title',$ID)} ); } : undef;
+	my $altcallback= $field eq 'album' && !$noalt ?
 		sub	#Albums button-press event : set up a songs submenu on right-click, alternate action on middle-click
 		{	my ($item,$event,$key)=@_;
 			if ($event->button==3)
-			{	my $submenu=ChooseSongsFromA($key);
+			{	my $submenu=ChooseSongsFromA($key,nocover=>1,cb=>$songcb);
 				$item->set_submenu($submenu);
 			}
 			elsif ($event->button==2) { $item->{middle}=1; }
 			0; #return 0 so that the item receive the click and popup the submenu
 		}:
-		$isaa ?
+		$isaa && !$noalt ?
 		sub	#Artists button-press event : set up an album submenu on right-click, alternate action on middle-click
 		{	my ($item,$event,$key)=@_;
 			if ($event->button==3)
-			{	my $submenu=PopupAA('album', from=>$key);
+			{	my $submenu=PopupAA('album', from=>$key, cb=>$args{cb});
 				$item->set_submenu($submenu);
 			}
 			elsif ($event->button==2) { $item->{middle}=1; }
@@ -3670,30 +3679,35 @@ sub PopupAA
 		};
 
 	my $screen= $widget ? $widget->get_screen : $event->get_screen;
-	my $max=($screen->get_height)*.8;
+	my $max= .7*$screen->get_height;
+	my $maxwidth=.15*$screen->get_width;
 	#my $minsize=Gtk2::ImageMenuItem->new('')->size_request->height;
 
 	my $createAAMenu=sub
 	{	my ($start,$end,$names,$keys)=@_;
 		my $nb=$end-$start+1;
-		my $size=32;	$size=64 if 64*$nb < $max;
-		my $row=0; my $rows=($nb<21)? 1 : ($nb<50)? 2 : 3; $rows=int($nb/$rows); my $colnb=0;
-	#	my $size=int($max/$rows);	#my $size=int($max/$nb);
-	#	if ($size<$minsize) {$size=$minsize} elsif ($size>100) {$size=100}
+		return unless $nb;
+		my $cols= $nb<$max/32 ? 1 : $nb<$max/32 ? 2 : 3;
+		my $rows=int($nb/$cols);
+		my $size= $max/$rows < 90 ? 32 : $max/$rows < 200 ? 64 : 128; # choose among 3 possible picture sizes, trying to keep the menu height reasonable
+		my $maxwidth= $cols==1 ? $maxwidth*1.5 : $maxwidth;
+		my $row=0; my $col=0;
 		my $menu = Gtk2::Menu->new;
 		for my $i ($start..$end)
 		{	my $key=$keys->[$i];
 			my $item=Gtk2::ImageMenuItem->new;
 			$item->set_always_show_image(1); # to override /desktop/gnome/interface/menus_have_icons gnome setting
 			my $label=Gtk2::Label->new;
-			$label->set_line_wrap(TRUE);
 			$label->set_alignment(0,.5);
 			$label->set_markup( AA::ReplaceFields($key,$format,$field,1) );
+			my $req=$label->size_request->width;
+			if ($label->size_request->width>$maxwidth) { $label->set_size_request($maxwidth,-1); } #FIXME doesn't work as I want, used to force wrapping at a smaller width than default, but result in requesting $maxwidth when the width of the wrapped text may be significantly smaller
+			$label->set_line_wrap(TRUE);
 			$item->add($label);
-			$item->signal_connect(activate => $callback,$key);
+			$item->signal_connect(activate => $maincallback,$key);
 			$item->signal_connect(button_press_event => $altcallback,$key) if $altcallback;
 			#$menu->append($item);
-			$menu->attach($item, $colnb, $colnb+1, $row, $row+1); if (++$row>$rows) {$row=0;$colnb++;}
+			$menu->attach($item, $col, $col+1, $row, $row+1); if (++$row>$rows) {$row=0;$col++;}
 			if ($isaa)
 			{	my $img=AAPicture::newimg($field,$key,$size);
 				$item->set_image($img) if $img;
@@ -3713,13 +3727,14 @@ sub PopupAA
 	Songs::sort_gid_by_name($field,\@keys) unless $nosort;
 	my @names=@{Songs::Gid_to_Display($field,\@keys)}; #convert @keys to list of names
 
-	my $menu=Breakdown_List(\@names,5,20,35,$createAAMenu,\@keys);
+	my @common_args= (widget=>$widget, makemenu=>$createAAMenu, cols=>3, height=>32+2);
+	my $menu=Breakdown_List(\@names, keys=>\@keys, @common_args);
 	return undef unless $menu;
 	if (@keys_minor)
 	{	Songs::sort_gid_by_name($field,\@keys_minor) unless $nosort;
 		my @names=@{Songs::Gid_to_Display($field,\@keys)};
 		my $item=Gtk2::MenuItem->new('minor'); #FIXME
-		my $submenu=Breakdown_List(\@names,5,20,35,$createAAMenu,\@keys_minor);
+		my $submenu=Breakdown_List(\@names, keys=>\@keys_minor, @common_args);
 		$item->set_submenu($submenu);
 		$menu->append($item);
 	}
@@ -3730,15 +3745,50 @@ sub PopupAA
 }
 
 sub Breakdown_List
-{	my ($keys,$min,$opt,$max,$makemenu,$gids)=@_;
+{	my ($names,%options)=@_;
+	my ($min,$opt,$max,$makemenu,$keys,$widget)=@options{qw/min opt max makemenu keys widget/};
+	$widget ||= Gtk2->get_current_event; #used to find current screen
+	my $maxheight= $widget ? $widget->get_screen->get_height : 640; # FIXME is that ok for multi-monitors ?
 
-	if ($#$keys<=$max) { return $makemenu ? &$makemenu(0,$#$keys,$keys,$gids) : [0,$#$keys] }
+
+	if (!$min || !$opt || !$max) #find minimum/optimum/maximum number of entries that the menu/submenus should have
+	{	my $height=$options{height};
+		if (!$height) { my $dummyitem=Gtk2::MenuItem->new("dummy"); $height=$dummyitem->size_request->height; }
+		my $maxnb= $maxheight/$height;
+		$maxnb=10 if $maxnb<10; #probably shouldn't happen, in case number too low assume the screen can fit 10 items
+		my $cols= $options{cols}||1;
+		$max= int($maxnb*.8)*($cols**.9);	# **9 to reduce max height and optimum height when using columns
+		$opt= int($maxnb*.65)*($cols**.9);
+		$min= int($maxnb*.3)*$cols;
+	}
+
+	# short-cut if no need to create sub-menus
+	if ($#$names<=$max) { return $makemenu ? $makemenu->(0,$#$names,$names,$keys) : [0,$#$names] }
+
+	# check if needs more than 1 level of submenus
+	if ($makemenu && !$options{norecurse})
+	{	my $dummyitem=Gtk2::MenuItem->new("dummy");
+		my $height=$dummyitem->size_request->height;
+		my $parentopt= .65*$maxheight/$height;
+		$parentopt=.65*10 if $parentopt<.65*10; #probably shouldn't happen, in case number too low assume the screen can fit 10 items
+		if ($#$names > $parentopt*$opt)
+		{	my @childarg=(%options,min=>$min,opt=>$opt,max=>$max,makemenu=>$makemenu,norecurse=>1);
+			$min*=$parentopt; $max*=$parentopt; $opt*=$parentopt;
+			$makemenu= sub
+			{	my ($start,$end,$names,$keys)=@_;
+				my @names2=@$names[$start..$end];
+				my $keys2;
+				@$keys2= @$keys[$start..$end] if $keys && @$keys;
+				Breakdown_List(\@names2,@childarg,keys=>$keys2);
+			};
+		}
+	}
 
 	my @bounds;
-	for my $start (0..$#$keys)
-	{	my $name1= $start==0 ?  '' : lc $keys->[$start-1];
-		my $name2= lc $keys->[$start];
-		my $name3= $start==$#$keys ?  '' : lc $keys->[$start+1];
+	for my $start (0..$#$names)
+	{	my $name1= $start==0 ?  '' : superlc($names->[$start-1]);
+		my $name2= superlc($names->[$start]);
+		my $name3= $start==$#$names ?  '' : superlc($names->[$start+1]);
 		my ($c1,$c3); my $pos=0;
 		until (defined $c1 && defined $c3)
 		{	my $l2=substr $name2,$pos,1;
@@ -3769,7 +3819,7 @@ sub Breakdown_List
 		{	if ($pos==$#bounds || length $bounds[$pos+1][0]<=$len) {$c=0} else {$c++}
 			if ($toobig[$pos])
 			{	$chunk[$pos]+=$c+1;
-				$toobig[$pos]=0 unless $chunk[$pos]>$max;
+				$toobig[$pos]=0 unless $chunk[$pos]>$max*.4;
 			}
 		}
 		#for my $pos (0..$#bounds)	#DEBUG
@@ -3788,44 +3838,51 @@ sub Breakdown_List
 		push @length,length $bounds[$pos][0];
 		#print "$#length : ".$bounds[$pos-1][1]."->'$bounds[$pos][0]' len=".(length $bounds[$pos][0])." (pos=$pos)\n"; #DEBUG
 	}
-#	push @breakpoints,$#$keys+1; push @length,1;
+#	push @breakpoints,$#$names+1; push @length,1;
 
-	my $istart=0; my @list;
-	while ($istart<$#breakpoints)
-	{	my $best; my $bestpos;
-		for (my $i=$istart+1; $i<=$#breakpoints; $i++)
-		{	my $nb=$breakpoints[$i]-$breakpoints[$istart];
-			my $nbafter=$#$keys-$breakpoints[$i]+1;
+
+	# find best combination of chunks
+	# @todo will contain path that need exploring, put in $final when finished,
+	# as each breakpoint is explored, only the best path is kept among those that used this breakpoint
+	my @todo= ([0]); #start with breakpoint 0
+	my $final;
+	my @bestscore=(0);
+	while (@todo)
+	{	my $path0=shift @todo;
+		my $i0= $path0->[-1];
+		my $score0= $bestscore[$i0];
+		for my $i ($i0+1 .. $#breakpoints)
+		{	my $nb=$breakpoints[$i]-$breakpoints[$i0];
 			next if $nb<$min && $i<$#breakpoints;
-			my $score=$length[$i]*100+abs($nb-$opt)+ ($nbafter==0 ? -10 : $nbafter<8 ? 8-$nbafter : 0);
-#warn "$istart-$i ($breakpoints[$istart]-$breakpoints[$i]): $nb  length=$length[$i]	score=$score  nbafter=$nbafter\n";	#DEBUG
-			if (!defined $best || $best>$score)
-			 {$best=$score; $bestpos=$i;}
+			my $malus=	$nb>$max ? 50*($nb-$max)**2 :
+					$nb<$min ? 20*($min-$nb)**2 : 0;
+			my $score= $score0 + $length[$i]*200 + abs($nb-$opt) + $malus;
+			if ($bestscore[$i]) #if a path already used that breakpoint, compare the score
+			{	next if $bestscore[$i]<$score; # ignore the new path if not better
+				#new path has a better score => remove all paths that used that breakpoint
+				@todo=grep {!grep $_==$i, @$_} @todo; #FIXME use perl 5.10 smart match
+			}
+			$bestscore[$i]=$score;
+			my $path= [@$path0,$i];
+			my $nbafter=$#$names-$breakpoints[$i]+1;
+			if ($nbafter==0) {$final=$path} else {push @todo,$path}
 			last if $nb>$max && $nbafter>$min;
 		}
-#warn " best: $istart-$bestpos ($breakpoints[$istart]-$breakpoints[$bestpos]): score=$best\n";	#DEBUG
-		push @list,$breakpoints[$bestpos];
-		$istart=$bestpos;
 	}
-#	for my $i (0..$#$keys)	#DEBUG
-#	{	my $b=grep $i==$_, @breakpoints;
-#		$b= $b? '->' : ' ';
-#		my $b2=grep $i==$_, @list;
-#		$b2= $b2? '=>' : ' ';
-#		warn "$i\t$b\t$b2\t$bounds[$i][0]\t$bounds[$i][1]\t$keys->[$i]\n";
-#	}
-	@breakpoints=@list;
+	shift  @$final; #remove the starting 0
+	@breakpoints= map $breakpoints[$_], @$final;
+	#warn "min=$min opt=$opt max=$max\n". "sizes: ".join(',',map $breakpoints[$_]-$breakpoints[$_-1], 1..$#breakpoints)."\n";
 
+	# build @menu result with for each item : start and end position, start and end letters
 	my @menus; my $start=0;
 	for my $end (@breakpoints)
 	{	my $c1=$bounds[$start][0];
 		my $c2=$bounds[$end-1][1];
 		for my $i (0..length($c1)-1)
 		{	my $c2i=substr $c2,$i,1;
-			if ($c2i eq '') { $c2.=$c2i= substr $keys->[$end-1],$i,1; }
+			if ($c2i eq '') { $c2.=$c2i= superlc(substr $names->[$end-1],$i,1); }
 			last if substr($c1,$i,1) ne $c2i;
 		}
-		#warn "$c1-$c2\n";
 		push @menus,[$start,$end-1,$c1,$c2];
 		$start=$end;
 	}
@@ -3834,6 +3891,7 @@ sub Breakdown_List
 	my $menu;
 	if (@menus>1)
 	{	$menu=Gtk2::Menu->new;
+		# jump to entry when a letter is pressed
 		$menu->signal_connect(key_press_event => sub
 		 {	my ($menu,$event)=@_;
 			my $unicode=Gtk2::Gdk->keyval_to_unicode($event->keyval); # 0 if not a character
@@ -3848,6 +3906,7 @@ sub Breakdown_List
 			}
 			0;
 		 });
+		# Build menu items and submenus
 		for my $ref (@menus)
 		{	my ($start,$end,$c1,$c2)=@$ref;
 			$c1=ucfirst$c1; $c2=ucfirst$c2;
@@ -3855,12 +3914,22 @@ sub Breakdown_List
 			my $item=Gtk2::MenuItem->new_with_label($c1);
 			$item->{start}= substr $c1,0,1;
 			$item->{end}=   substr $c2,0,1;
-			my $submenu= $makemenu->($start,$end,$keys,$gids);
-			$item->set_submenu($submenu);
+			$item->{menuargs}= [$start,$end,$names,$keys];
+			# only build submenu when the item is selected
+			$item->signal_connect(activate => sub
+				{	my $args=delete $_[0]{menuargs};
+					return unless $args;
+					my $submenu= $makemenu->(@$args);
+					$item->set_submenu($submenu);
+					$submenu->show_all;
+				});
+			#my $submenu= $makemenu->($start,$end,$names,$keys);
+			#$item->set_submenu($submenu);
+			$item->set_submenu(Gtk2::Menu->new);
 			$menu->append($item);
 		}
 	}
-	elsif (@menus==1) { $menu= $makemenu->(0,$#$keys,$keys,$gids); }
+	elsif (@menus==1) { $menu= $makemenu->(0,$#$names,$names,$keys); }
 	else {return undef}
 
 	return $menu;
@@ -4893,7 +4962,7 @@ sub AddToListMenu
 		}
 		return $menu;
 	};
-	my $menu=Breakdown_List(\@keys,5,20,35,$makemenu);
+	my $menu=Breakdown_List(\@keys, makemenu=>$makemenu);
 	return $menu;
 }
 
@@ -4937,7 +5006,7 @@ sub MakeFlagMenu	#FIXME special case for no @keys, maybe a menu with a greyed-ou
 		}
 		return $menu;
 	};
-	my $menu=Breakdown_List(\@keys,5,20,35,$makemenu);
+	my $menu=Breakdown_List(\@keys, makemenu=>$makemenu);
 	return $menu;
 }
 
@@ -5507,7 +5576,7 @@ sub AutoSelPicture
 sub AboutDialog
 {	my $dialog=Gtk2::AboutDialog->new;
 	$dialog->set_version(VERSIONSTRING);
-	$dialog->set_copyright("Copyright © 2005-2012 Quentin Sculo");
+	$dialog->set_copyright("Copyright © 2005-2013 Quentin Sculo");
 	#$dialog->set_comments();
 	$dialog->set_license("Released under the GNU General Public Licence version 3\n(http://www.gnu.org/copyleft/gpl.html)");
 	$dialog->set_website('http://gmusicbrowser.org');
@@ -5528,6 +5597,10 @@ sub AboutDialog
 		'Russian : tin',
 		'Italian : Michele Giampaolo',
 		'Dutch : Gijs Timmers',
+		'Japanese : Sunatomo',
+		'Serbian : Саша Петровић',
+		'Finnish : Jiri Grönroos',
+		'Chinese(Taiwan) : Hiunn-hué',
 	);
 	$dialog->signal_connect( response => sub { $_[0]->destroy if $_[1] eq 'cancel'; }); #used to worked without this, see http://mail.gnome.org/archives/gtk-perl-list/2006-November/msg00035.html
 	$dialog->show_all;
@@ -5642,7 +5715,7 @@ sub PrefKeys
 	my $entry_extra=Gtk2::Alignment->new(.5,.5,1,1);
 	my $combo=TextCombo->new( {map {$_ => $Command{$_}[1]}
 					sort {$Command{$a}[1] cmp $Command{$b}[1]}
-					grep !defined $Command{$_}[3] || ref $Command{$_}[3],
+					grep defined $Command{$_}[1] && !defined $Command{$_}[3] || ref $Command{$_}[3],
 					keys %Command
 				  });
 	my $vsg=Gtk2::SizeGroup->new('vertical');
@@ -8506,7 +8579,7 @@ sub new
 	$self->{val}=$val;
 	$self->signal_connect(button_press_event => sub
 		{	my $self=$_[0];
-			::PopupAA( $self->{field}, cb=> sub { $self->set_gid($_[1]); } );
+			::PopupAA( $self->{field}, cb=> sub { $self->set_gid($_[0]{key}); }, noalt=>1 );
 			1;
 		});
 	$self->set_label($val);
@@ -8918,7 +8991,8 @@ sub newimg
 }
 sub idle_loadimg_cb
 {	my $img;
-	$img=shift @imgqueue while @imgqueue && !$img;
+	for my $i (0..$#imgqueue) { next unless $imgqueue[$i] && $imgqueue[$i]->mapped; $img=splice @imgqueue,$i,1; last } #prioritize currently mapped images
+	$img||=shift @imgqueue while @imgqueue && !$img;
 	if ($img)
 	{	my $pb=pixbuf( @{delete $img->{params}},1 );
 		$img->set_from_pixbuf($pb) if $pb;
