@@ -284,10 +284,6 @@ our %Widgets=
 		dragsrc => [::DRAG_ALBUM,\&DragCurrentAlbum],
 		cursor	=> 'hand2',
 	},
-	AlbumBreadcrumb =>
-	{	parent	=> 'Album',
-		click1	=> \&PopupSongsFromAlbum,
-	},
 	Year =>
 	{	class	=> 'Layout::Label',
 		group	=> 'Play',

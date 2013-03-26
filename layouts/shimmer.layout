@@ -13,7 +13,7 @@ HBTop		= ABButtons _15VBPlayer 10ABToggle -5ABSettings
 ABButtons	= (yalign=0,yscale=0.0) HBButtons
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= 1Filler0 HBTitle HBTimeSlider
-HBTitle		= Title(expand_max=500,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)",yalign=0.5,ellipsize=end) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0,ellipsize=end) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=300,yalign=0.5,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
+HBTitle		= Title(expand_max=500,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)",yalign=0.5,ellipsize=end) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") Album(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",click1="ChooseSongFromAlbum",ellipsize=end) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=300,yalign=0.5,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 ABToggle	= (yalign=0,yscale=0.0) HBToggle
 HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=gmb-view-list,widget=VPSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=gmb-view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=gmb-view-mosaic,widget=FilterPane2,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=gmb-view-fullscreen,size=large-toolbar,tip="Fullscreen View") 10Filler2 ABSearchBox
@@ -24,8 +24,8 @@ BMSettings	= (icon=gtk-preferences,size="large-toolbar") SMLibrary LayoutItem Pl
 SMLibrary	= (label=_"Library") MenuItem00(command="RunPerlCode(::ChooseAddPath(1,1))",label=_"Add Music",icon="gtk-add") MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="gtk-refresh")
 ### main left: artist pane and album-cover ###
 VBLeft		= _VBListCover HBStatus
-#VBListCover	= _NBList Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0) # uncomment this line to add overlay shadow
-VBListCover	= _NBList 1Cover(default=elementary/no-cover.svg,showcover=0)
+#VBListCover	= _NBList Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg) # uncomment this line to add overlay shadow
+VBListCover	= _NBList 1Cover(default=elementary/no-cover.svg)
 NBList		= (tabpos="bottom") QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1,hscrollbar=0) HBLyrics VBAlbuminfo VBArtistinfo
 HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
 VBArtistinfo	= (tabtitle=_"Artist") _PluginArtistinfo
@@ -63,7 +63,7 @@ HBTop		= VBButtons _15VBPlayer -5VBSettings
 VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle VBTime
-HBTitle		= Title(expand_max=300,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5,ellipsize=end) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0,ellipsize=end) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
+HBTitle		= Title(expand_max=300,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5,ellipsize=end) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") Album(tip=_"Album: %l (%Y)",expand_max=200,yalign=0.5,markup="<big> </big>%l ",click1="ChooseSongFromAlbum",ellipsize=end) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
 VBTime		= _HBTimeSlider _SimpleSearch(suggest=1)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 VBSettings	= HBPrefSearch 5Filler5
@@ -109,7 +109,7 @@ VBMain		= _HPMain HBNowPlaying
 HPMain		= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=128,hidetabs=1) VBSidebar
 HBNowPlaying	= HBButtons 15Filler0 _HBTitle
 HBButtons	= Prev Play Next
-HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") AlbumBreadcrumb(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",showcover=0) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -ToggleButton1(size=button,relief=none,icon=gtk-find,widget=VBSidebar) -20Stars(yalign=0.5)
+HBTitle		= Title(expand_max=300,minsize=0,markup="<big><b>%t</b></big> ",click1="",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") Album(tip=_"Album: %l (%Y)",minsize=1,expand_max=200,yalign=0.5,minsize=1,markup="<big> </big>%l ",click1="ChooseSongFromAlbum") LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") ArtistBreadcrumb(tip=_"Artist: %a",expand_max=200,yalign=0.5,minsize=0,markup="<big> </big>%a") -ToggleButton1(size=button,relief=none,icon=gtk-find,widget=VBSidebar) -20Stars(yalign=0.5)
 VBSidebar	= 4Filler1 7HBSearch _7HBQueue 4Filler2
 HBQueue		= 14_QueueList(group=1,songtree=1,cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1)
 HBSearch	= 4Filler3 6Label0(markup='<span size="xx-large" weight="ultrabold">«</span>') _SimpleSearch(suggest=1) 7Filler4
