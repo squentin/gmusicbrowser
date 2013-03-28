@@ -1462,11 +1462,8 @@ sub SortMenu
 	$append->($menu,_"Custom...",undef,!$found,sub
 		{	::EditSortOrder(undef,$::Options{Sort},undef, \&::Select_sort );
 		});
-	$menu->show_all;
 	return $menu if $nopopup;
-	my $event=Gtk2->get_current_event;
-	my ($button,$pos)= $event->isa('Gtk2::Gdk::Event::Button') ? ($event->button,\&::menupos) : (0,undef);
-	$menu->popup(undef,undef,$pos,undef,$button,$event->time);
+	::PopupMenu($menu);
 }
 
 sub FilterMenu
@@ -1514,11 +1511,8 @@ sub FilterMenu
 		$sitem->set_submenu($submenu);
 		$menu->prepend($sitem);
 	}
-	$menu->show_all;
 	return $menu if $nopopup;
-	my $event=Gtk2->get_current_event;
-	my ($button,$pos)= $event->isa('Gtk2::Gdk::Event::Button') ? ($event->button,\&::menupos) : (0,undef);
-	$menu->popup(undef,undef,$pos,undef,$button,$event->time);
+	::PopupMenu($menu);
 }
 
 sub VisualsMenu
@@ -1533,9 +1527,7 @@ sub VisualsMenu
 		$item->signal_connect (activate => $cb,$v);
 		$menu->append($item);
 	}
-	$menu->show_all;
-	my $event=Gtk2->get_current_event;
-	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
+	::PopupMenu($menu);
 }
 
 sub UpdateLabelsIcon
@@ -3850,9 +3842,8 @@ sub new
 			{	$menu->remove($_) for $menu->get_children;
 				$self->{updatemenu}($self);
 			}
-			$menu->show_all;
 			$self->set_active(1);
-			$menu->popup (undef, undef, \&::menupos, undef, $event->button, $event->time);
+			::PopupMenu($menu,event=>$event);
 		});
 	$self->{menu}->signal_connect(deactivate => sub { my $self = shift; $self->get_attach_widget->set_active(0); } );
 	return $self;
@@ -4271,8 +4262,7 @@ sub popup
 		$item->signal_connect(activate => $sub, $nb);
 		$menu->append($item);
 	}
-	$menu->show_all;
-	$menu->popup(undef, undef, \&::menupos, undef, $event->button, $event->time);
+	::PopupMenu($menu,event=>$event);
 }
 
 # not really part of Stars::

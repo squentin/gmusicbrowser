@@ -176,8 +176,7 @@ sub button_press_event_cb
 		$item->signal_connect( activate => sub { $self->Set_mode($mode) } );
 		$menu->append($item);
 	 }
-	$menu->show_all;
-	$menu->popup(undef, undef, \&::menupos, undef, $event->button, $event->time);
+	::PopupMenu($menu);
 }
 
 sub QueueUpdateFast
@@ -1975,8 +1974,7 @@ sub button_press_event_cb
 		$menu->append($item);
 	}
 	#::PopupContextMenu(\@MenuTabbedL, { self=>$self, list=>$listname, pagenb=>$pagenb, page=>$page, pagetype=>$page->{tabbed_page_type} } );
-	$menu->show_all;
-	$menu->popup(undef, undef, undef, undef, $event->button, $event->time);
+	::PopupMenu($menu,event=>$event,nomenupos=>1);
 	return 1;
 }
 
@@ -3614,9 +3612,7 @@ sub PopupSelectorMenu
 		{	::EditFilter($self,::GetFilter($self),undef,sub {::SetFilter($self,$_[0]) if defined $_[0]});
 		});
 	$menu->append($item2);
-	$menu->show_all;
-	my $event=Gtk2->get_current_event;
-	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
+	::PopupMenu($menu);
 }
 
 sub DoFilter

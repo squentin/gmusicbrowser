@@ -429,10 +429,8 @@ sub add_per_file_part
 		#my $item=Gtk2::CheckMenuItem->new(_"Select files");
 		#$item->signal_connect(activate => sub { $self->add_selectfile_column });
 		#$menu->append($item);
-		$menu->show_all;
 		$BSelFields->signal_connect( button_press_event => sub
-			{	my $event=$_[1];
-				$menu->popup(undef,undef,\&::menupos,undef,$event->button, $event->time);
+			{	::PopupMenu($menu,event=>$_[1]);
 			});
 		#$self->pack_start($menubar, FALSE, FALSE, 2);
 		#$perfile_table->attach($menubar,7,8,0,1,'fill','shrink',1,1);
@@ -456,10 +454,8 @@ sub add_per_file_part
 			$item->signal_connect(activate => $menu_cb,$ref->{for_all});
 			$menu->append($item) if $ref->{for_all};
 		}
-		$menu->show_all;
 		$Btools->signal_connect( button_press_event => sub
-			{	my $event=$_[1];
-				$menu->popup(undef,undef,\&::menupos,undef,$event->button, $event->time);
+			{	::PopupMenu($menu,event=>$_[1]);
 			});
 	}
 
@@ -1219,10 +1215,7 @@ sub popup_add_menu
 {	my ($self,$widget)=@_;
 	my $cb= sub { $self->{selected}{ $_[1] }= 1; $self->update; };
 	my $menu=::MakeFlagMenu($self->{field},$cb);
-	$menu->show_all;
-	my $event=Gtk2->get_current_event;
-	my $button= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
-	$menu->popup(undef,undef,sub {::windowpos($_[0],$widget)},undef,$button,$event->time);
+	::PopupMenu($menu, posfunction=>sub {::windowpos($_[0],$widget)} );
 }
 
 sub popup_menu_cb
@@ -1238,10 +1231,7 @@ sub popup_menu_cb
 		$item->signal_connect(toggled => $cb,$key);
 		$menu->append($item);
 	}
-	$menu->show_all;
-	my $event=Gtk2->get_current_event;
-	my $button= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
-	$menu->popup(undef,undef,\&::menupos,undef,$button,$event->time);
+	::PopupMenu($menu);
 }
 
 sub update
@@ -1356,10 +1346,7 @@ sub popup_add_menu
 {	my ($self,$widget)=@_;
 	my $cb= sub { $self->{selected}{ $_[1] }= 1; $self->update; };
 	my $menu=::MakeFlagMenu($self->{field},$cb);
-	$menu->show_all;
-	my $event=Gtk2->get_current_event;
-	my $button= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
-	$menu->popup(undef,undef,sub {::windowpos($_[0],$widget)},undef,$button,$event->time);
+	::PopupMenu($menu, posfunction=>sub {::windowpos($_[0],$widget)} );
 }
 
 sub popup_menu_cb
@@ -1377,10 +1364,7 @@ sub popup_menu_cb
 		$item->signal_connect(toggled => $cb,$key);
 		$menu->append($item);
 	}
-	$menu->show_all;
-	my $event=Gtk2->get_current_event;
-	my $button= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
-	$menu->popup(undef,undef,\&::menupos,undef,$button,$event->time);
+	::PopupMenu($menu);
 	1;
 }
 
