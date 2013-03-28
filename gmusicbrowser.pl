@@ -904,7 +904,8 @@ my %Editing; #used to keep track of opened song properties dialog and lyrics dia
 our $PlayTime;
 our ($StartTime,$StartedAt,$PlayingID, @Played_segments);
 our $CurrentDir=$ENV{PWD};
-#$ENV{PULSE_PROP_media.role}='music'; # pulseaudio hint. could set other pulseaudio properties, FIXME doesn't seem to reach pulseaudio
+$ENV{'PULSE_PROP_media.role'}='music';				# role hint for pulseaudio
+$ENV{'PULSE_PROP_application.icon_name'}='gmusicbrowser';	# icon hint for pulseaudio, could also use Gtk2::Window->set_default_icon_name
 
 our (%ToDo,%TimeOut);
 my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos CurSong Playing SavedWRandoms SavedSorts SavedFilters SavedLists Icons Widgets connections
