@@ -1188,6 +1188,7 @@ sub new
 	$self->pack_start($entry,0,0,0);
 	$self->pack_start($add,0,0,0);
 	$add->signal_connect( button_press_event => sub { add_entry_text_cb($_[0]); $_[0]->grab_focus;1; } );
+	$add->signal_connect( clicked => \&add_entry_text_cb );
 	$button->signal_connect( clicked => \&popup_menu_cb);
 	$button->signal_connect( button_press_event => sub { popup_menu_cb($_[0]); $_[0]->grab_focus;1; } );
 	$entry->signal_connect( activate => \&add_entry_text_cb );
@@ -1276,6 +1277,7 @@ sub new
 	my $add= ::NewIconButton('gtk-add');
 	my $removeall= ::NewIconButton('gtk-clear', _"Remove all", \&clear);
 	$add->signal_connect( button_press_event => sub { add_entry_text_cb($_[0]); $_[0]->grab_focus;1; } );
+	$add->signal_connect( clicked => \&add_entry_text_cb );
 	for my $ref (['toadd',1,_"Add"],['toremove',-1,_"Remove"])
 	{	my ($key,$mode,$text)=@$ref;
 		my $label=$self->{$key}=Gtk2::Label->new;
