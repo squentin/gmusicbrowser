@@ -16,6 +16,7 @@ my (%Plugins,%Sinks);
 my ($VSink,$visual_window);
 my $AlreadyNextSong;
 my $RG_dialog;
+my ($VolumeBusy,$VolumeHasChanged);
 
 $::PlayPacks{Play_GST}=1; #register the package
 
@@ -103,9 +104,10 @@ sub createPlayBin
 	my $pb= $playbin2_ok ? 'playbin2' : 'playbin';
 	$PlayBin=GStreamer::ElementFactory->make($pb => 'playbin'); #FIXME only the first one used works
 	$PlayBin->set('flags' => [qw/audio soft-volume/]) if $playbin2_ok;
-	$PlayBin->set(volume => ($::Volume/100)**3); 	#initialize volume, use a cubic volume scale
+	SetVolume(undef,''); #initialize volume
 	my $bus=$PlayBin->get_bus;
 	$bus->add_signal_watch;
+	$PlayBin->signal_connect("notify::volume" => sub { Glib::Idle->add(\&VolumeChanged) unless $VolumeHasChanged++; }) if $Glib::VERSION >= 1.251; #not stable with older version of perl-glib due to bug #620099 (https://bugzilla.gnome.org/show_bug.cgi?id=620099)
 #	$bus->signal_connect('message' => \&bus_message);
 	$bus->signal_connect('message::eos' => \&bus_message_end);
 	$bus->signal_connect('message::error' => \&bus_message_end,1);
@@ -156,10 +158,29 @@ sub SetVolume
 	elsif	($set=~m/(\d+)/)	{ $::Volume =$1; }
 	$::Volume=0   if $::Volume<0;
 	$::Volume=100 if $::Volume>100;
-	$PlayBin->set(volume => ($::Volume/100)**3) if $PlayBin; 	#use a cubic volume scale
-	::HasChanged('Vol');
+	$VolumeBusy=1;
+	$PlayBin->set(volume => ( ($::Mute||$::Volume) /100)**3) if $PlayBin; 	#use a cubic volume scale
+	$PlayBin->set(mute => !!$::Mute) if $PlayBin;
+	$VolumeBusy=0;
 	$::Options{Volume}=$::Volume;
 	$::Options{Volume_mute}=$::Mute;
+	::QHasChanged('Vol');
+}
+sub VolumeChanged
+{	$VolumeHasChanged=0;
+	return 0 if $VolumeBusy;
+	return 0 unless $PlayBin;
+	my $mute= $PlayBin->get('mute');
+	my $volume= $PlayBin->get('volume') ** (1/3) *100; #use a cubic volume scale
+	$volume= sprintf '%d',$volume;
+	$volume=100 if $volume>100;
+	#return 0 unless $volume!=$::Volume || ($mute xor !!$::Mute);
+	if ($mute)	{ $::Mute=$volume; $::Volume=0; }
+	else		{ $::Mute=0; $::Volume=$volume; }
+	$::Options{Volume}=$::Volume;
+	$::Options{Volume_mute}=$::Mute;
+	::QHasChanged('Vol');
+	0; #called from an idle
 }
 
 sub SkipTo
