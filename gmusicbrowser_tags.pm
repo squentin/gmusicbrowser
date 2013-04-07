@@ -1409,7 +1409,12 @@ sub new
 	$labelfile->set_selectable(TRUE);
 	$labelfile->set_line_wrap(TRUE);
 
+	my $sw=Gtk2::ScrolledWindow->new;
+	$sw->set_shadow_type('none');
+	$sw->set_policy('never', 'automatic');
+
 	my $table=Gtk2::Table->new (6, 2, FALSE);
+	$sw->add_with_viewport($table);
 	$self->{table}=$table;
 	$self->fill;
 
@@ -1417,7 +1422,7 @@ sub new
 	$advanced->signal_connect( clicked => \&advanced_cb );
 
 	$self->pack_start($labelfile,FALSE,FALSE,1);
-	$self->pack_start($table, FALSE, TRUE, 2);
+	$self->pack_start($sw, TRUE, TRUE, 2);
 	$self->pack_end($advanced, FALSE, FALSE, 2);
 
 	return $self;

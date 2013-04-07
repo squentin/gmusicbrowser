@@ -5222,7 +5222,7 @@ sub DialogSongProp
 	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Tag"));
 	$notebook->append_page( $songinfo,	Gtk2::Label->new(_"Info"));
 
-	SetWSize($dialog,'SongInfo','420x482');
+	SetWSize($dialog,'SongInfo','420x540');
 	$dialog->show_all;
 
 	$dialog->signal_connect( response => sub
