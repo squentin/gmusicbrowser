@@ -1495,7 +1495,8 @@ sub HVpack
 		next unless defined $w;
 		my $exp=FALSE;
 		unless (ref $w)
-		{	$exp=$w=~m/_/;
+		{	if ($w eq 'compact') { $pad=0; $hbox->set_spacing(0); next }
+			$exp=$w=~m/_/;
 			$end=1 if $w=~m/-/;
 			$pad=$1 if $w=~m/(\d+)/;
 			$w=shift @list;
