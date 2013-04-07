@@ -396,10 +396,19 @@ sub new
 		$table->attach($widget,$col++,$col,$row,$row+1,['fill','expand'],'shrink',3,1);
 	}
 
-	$self->pack_start($table, FALSE, TRUE, 2);
+	my $vpaned= $self->{vpaned}=Gtk2::VPaned->new;
+	$self->add($vpaned);
+	my $sw=Gtk2::ScrolledWindow->new;
+	$sw->set_shadow_type('none');
+	$sw->set_policy('never', 'automatic');
+	$sw->add_with_viewport($table);
+	$sw->show_all;
+	$sw->set_size_request(-1,$table->size_request->height);
+	$vpaned->pack1($sw,FALSE,TRUE);
 
 	# do not add per-file part if LOTS of songs, building the GUI would be too long anyway
 	$self->add_per_file_part unless @IDs>1000;
+	$self->set_size_request(-1,400); #to allow resizing the window to a small height in spite of the height request of $sw
 	return $self;
 }
 
@@ -464,10 +473,21 @@ sub add_per_file_part
 		undef,_"Clear selected fields");
 
 	my $sw = Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
+	$sw->set_shadow_type('none');
 	$sw->set_policy('automatic', 'automatic');
 	$sw->add_with_viewport($perfile_table);
-	$self->pack_start($sw, TRUE, TRUE, 4);
+
+	# expander to hide/show the per-file part
+	my $exp_label=Gtk2::Label->new_with_format("<b>%s</b>",_"Per-song values");
+	my $expander=Gtk2::Expander->new;
+	$expander->set_expanded(TRUE);
+	$expander->set_label_widget($exp_label);
+	$expander->signal_connect(activate=>sub { my $on= !$_[0]->get_expanded; $_->set_visible($on) for $sw,$BSelFields; });
+
+	$self->{vpaned}->pack2( ::Vpack('compact',[$expander,$BSelFields],'_',$sw), TRUE,FALSE);
+	my $vsizegroup=Gtk2::SizeGroup->new('vertical');
+	$vsizegroup->add_widget($_) for $exp_label,$BSelFields; # so that they are aligned
+	$sw->set_size_request(-1,$exp_label->size_request->height); # so that the expander is always visible
 
 	my $store= Gtk2::ListStore->new('Glib::String','Glib::Scalar');
 	$self->{autofill_combo}= my $Bautofill=Gtk2::ComboBox->new($store);
@@ -481,7 +501,7 @@ sub add_per_file_part
 	my $checkOBlank=Gtk2::CheckButton->new(_"Auto fill only blank fields");
 	$self->{AFOBlank}=$checkOBlank;
 	my $hbox=Gtk2::HBox->new;
-	$hbox->pack_start($_, FALSE, FALSE, 0) for $BSelFields,Gtk2::VSeparator->new,$Bautofill,$BClear,$checkOBlank,$Btools,
+	$hbox->pack_start($_, FALSE, FALSE, 0) for Gtk2::VSeparator->new,$Bautofill,$BClear,$checkOBlank,$Btools,
 	$self->pack_start($hbox, FALSE, FALSE, 4);
 }
 

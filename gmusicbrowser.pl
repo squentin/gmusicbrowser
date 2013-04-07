@@ -5192,7 +5192,7 @@ sub DialogSongsProp
 	my $edittag=MassTag->new(@IDs);
 	$dialog->vbox->add($edittag);
 
-	SetWSize($dialog,'MassTag','520x560');
+	SetWSize($dialog,'MassTag','520x650');
 	$dialog->show_all;
 
 	$dialog->signal_connect( response => sub
