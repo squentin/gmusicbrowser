@@ -1438,12 +1438,8 @@ sub new
 	$self->{table}=$table;
 	$self->fill;
 
-	my $advanced=Gtk2::Button->new(_("Advanced Tag Editing").' ...');
-	$advanced->signal_connect( clicked => \&advanced_cb );
-
 	$self->pack_start($labelfile,FALSE,FALSE,1);
 	$self->pack_start($sw, TRUE, TRUE, 2);
-	$self->pack_end($advanced, FALSE, FALSE, 2);
 
 	return $self;
 }
@@ -1469,8 +1465,8 @@ sub fill
 	$table->show_all;
 }
 
-sub advanced_cb
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
+sub advanced
+{	my $self=shift;
 	my $ID=$self->{ID};
 	my $dialog = Gtk2::Dialog->new (_"Advanced Tag Editing", $self->{window},
 		[qw/destroy-with-parent/],

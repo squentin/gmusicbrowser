@@ -5208,9 +5208,14 @@ sub DialogSongsProp
 sub DialogSongProp
 {	my $ID=$_[0];
 	if (exists $Editing{$ID}) { $Editing{$ID}->force_present; return; }
-	my $dialog = Gtk2::Dialog->new (_"Song Properties", undef, [],
-				'gtk-save' => 'ok',
-				'gtk-cancel' => 'none');
+	my $dialog = Gtk2::Dialog->new (_"Song Properties", undef, []);
+	my $advanced_button= NewIconButton('gtk-edit',_("Advanced").'...');
+	$advanced_button->set_tooltip_text(_"Advanced Tag Editing");
+	$dialog->add_action_widget($advanced_button,1);
+	$dialog->add_buttons('gtk-save','ok', 'gtk-cancel','none');
+	my $bb=$advanced_button->parent;
+	if ($bb && $bb->isa('Gtk2::ButtonBox')) { $bb->set_child_secondary($advanced_button,1); }
+
 	$dialog->set_default_response ('ok');
 	$Editing{$ID}=$dialog;
 	my $notebook = Gtk2::Notebook->new;
@@ -5219,7 +5224,7 @@ sub DialogSongProp
 
 	my $edittag=  EditTagSimple->new($dialog,$ID);
 	my $songinfo= Layout::SongInfo->new({ID=>$ID});
-	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Tag"));
+	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Edit"));
 	$notebook->append_page( $songinfo,	Gtk2::Label->new(_"Info"));
 
 	SetWSize($dialog,'SongInfo','420x540');
@@ -5228,6 +5233,7 @@ sub DialogSongProp
 	$dialog->signal_connect( response => sub
 	{	warn "EditTag response : @_\n" if $debug;
 		my ($dialog,$response)=@_;
+		if ($response eq '1') { $edittag->advanced; return; }
 		$songinfo->destroy;
 		if ($response eq 'ok')
 		{	$edittag->save;
