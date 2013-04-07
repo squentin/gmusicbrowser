@@ -5671,9 +5671,11 @@ sub PrefDialog
 {	my $goto= $_[0] || $Options{LastPrefPage} || 'library';
 	if ($OptionsDialog) { $OptionsDialog->force_present; }
 	else
-	{	$OptionsDialog=my $dialog = Gtk2::Dialog->new (_"Settings", undef,[],
-				'gtk-about' => 1,
-				'gtk-close' => 'close');
+	{	$OptionsDialog=my $dialog = Gtk2::Dialog->new (_"Settings", undef,[]);
+		my $about_button=$dialog->add_button('gtk-about',1);
+		$dialog->add_button('gtk-close','close');
+		my $bb=$about_button->parent;
+		if ($bb && $bb->isa('Gtk2::ButtonBox')) { $bb->set_child_secondary($about_button,1); }
 		$dialog->set_default_response ('close');
 		SetWSize($dialog,'Pref');
 
