@@ -3672,8 +3672,11 @@ sub CloseSuggestionMenu
 
 sub UpdateSuggestionMenu
 {	my $self=shift;
-	$self->CloseSuggestionMenu;
-	my $menu= $self->{matchmenu}= Gtk2::Menu->new;
+	if ($self->{matchmenu} && !$self->{matchmenu}->mapped) { $self->CloseSuggestionMenu; }
+	Glib::Source->remove(delete $self->{suggest_timeout}) if $self->{suggest_timeout};
+	my $refresh= !!$self->{matchmenu};
+	my $menu= $self->{matchmenu} ||= Gtk2::Menu->new;
+	if ($refresh) { $menu->remove($_) for $menu->get_children; }
 
 	my $h=$self->size_request->height;
 	my $w=$self->size_request->width;
@@ -3769,15 +3772,23 @@ sub UpdateSuggestionMenu
 		}
 		last if $height<0;
 	}
-	return unless $found;
+	unless ($found)
+	{	$self->CloseSuggestionMenu;
+		return;
+	}
 	$menu->set_size_request($w*2,-1);
-	$menu->attach_to_widget($self, sub {'empty detaching callback'});
 	$menu->show_all;
 	$menu->set_take_focus(0);
-	$menu->signal_connect(key_press_event => \&SuggestionMenu_key_press_cb);
-	$menu->signal_connect(selection_done  => \&CloseSuggestionMenu);
-	$menu->popup(undef,undef,sub { my $menu=shift; $x, ($above ? $y-$menu->size_request->height : $y+$h); },undef,0,Gtk2->get_current_event_time);
-	$menu->parent->resize(1,1);
+	if ($menu->mapped)
+	{	$menu->reposition;
+		$menu->set_active(0);
+	}
+	else
+	{	$menu->attach_to_widget($self, sub {'empty detaching callback'});
+		$menu->signal_connect(key_press_event => \&SuggestionMenu_key_press_cb);
+		$menu->signal_connect(selection_done  => \&CloseSuggestionMenu);
+		$menu->popup(undef,undef,sub { my $menu=shift; $x, ($above ? $y-$menu->size_request->height : $y+$h); },undef,0,Gtk2->get_current_event_time);
+	}
 }
 sub SuggestionMenu_key_press_cb
 {	my ($menu,$event)=@_;
