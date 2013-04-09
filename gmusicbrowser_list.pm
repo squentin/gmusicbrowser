@@ -3701,7 +3701,10 @@ sub UpdateSuggestionMenu
 	for my $field (qw/artists album genre label title/)
 	{	my $list;
 		if ($field eq 'title')
-		{	$list= Filter->new('title:si:'.$text)->filter;
+		{	my $filter= Filter->new('title:si:'.$text);
+			$filter->add_possible_superset($self->{last_suggestion_filter}) if $self->{last_suggestion_filter};
+			$self->{last_suggestion_filter}=$filter;
+			$list= $filter->filter;
 			next unless @$list;
 			Songs::SortList($list,'-rating -playcount -lastplay');
 		}
