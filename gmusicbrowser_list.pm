@@ -3615,9 +3615,8 @@ sub PopupSelectorMenu
 	::PopupMenu($menu);
 }
 
-sub DoFilter
+sub GetFilter
 {	my $self=shift;
-	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
 	my $search= $self->get_text;
 
 	my $filter;
@@ -3636,10 +3635,44 @@ sub DoFilter
 		$self->{last_filter}=$filter;
 	}
 	else { $filter= Filter->new }
+	return $filter;
+}
 
+sub AutoFilter
+{	my ($self,$event,$force)=@_;
+	if ($::debug) { warn "AutoFilter: $event".($force ? ' force':'')."\n" }
+	unless ($event eq 'filter_ready' || $event eq 'time_ready') {warn 'error'; return}
+	$self->{$event}=1;
+	return unless $self->{filter_ready} && $self->{time_ready};
+	my $idlefilter=$self->{idlefilter};
+	if (!$force && $idlefilter && !$idlefilter->is_cached) { warn "AutoFilter: restart\n" if $::debug; $idlefilter->start; return } #for case where filter was finished before first timeout, but since the cache was flushed, retry unless the second timeout has expired
+	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
+	Glib::Source->remove(delete $self->{idlefilter_timeout}) if $self->{idlefilter_timeout};
+	$self->DoFilter if $self->{autofilter};
+}
+
+sub StartIdleFilter
+{	my $self=shift;
+	my $search=$self->get_text;
+	my $previous= delete $self->{idlefilter};
+	my $filter= ::SimulateSetFilter( $self,$self->GetFilter, $self->{nb} );
+	#warn "idle $search\n";
+	my $new= IdleFilter->new($filter,sub { $self->AutoFilter('filter_ready')});
+	$self->{idlefilter}=$new if ref $new;
+	$previous->abort if $previous;
+}
+
+sub DoFilter
+{	my $self=shift;
+	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
+	my $idlefilter= delete $self->{idlefilter};
+	$idlefilter->abort if $idlefilter;
+
+	my $filter= $self->GetFilter;
 	::SetFilter($self,$filter,$self->{nb});
 	if ($self->{searchfb})
-	{	::HasChanged('SearchText_'.$self->{group},$search); #FIXME
+	{	my $search= $self->get_text;
+		::HasChanged('SearchText_'.$self->{group},$search); #FIXME
 	}
 	$self->Update_bg( !$filter->is_empty );
 }
@@ -3648,11 +3681,19 @@ sub EntryChanged_cb
 {	my $self=shift;
 	$self->Update_bg(0);
 	my $l= length($self->get_text);
+	delete $self->{filter_ready};
+	delete $self->{time_ready};
+	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
+	Glib::Source->remove(delete $self->{idlefilter_timeout}) if $self->{idlefilter_timeout};
 	if ($self->{autofilter})
-	{	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
-		my $timeout= $l<2 ? 1000 : $l==2 ? 200 : 100;
-		$self->{changed_timeout}= Glib::Timeout->add($timeout,\&DoFilter,$self);
+	{	# 1st timeout : do not filter before this minimum timeout, even if filter is ready
+		my $timeout= $l<2 ? 800 : 300;
+		$self->{changed_timeout}= Glib::Timeout->add($timeout,sub { $self->AutoFilter('time_ready'); 0 });
+		# 2nd timeout : filter even if idlefilter not finished
+		$timeout= $l<4 ? 3000 : 2000;
+		$self->{idlefilter_timeout}= Glib::Timeout->add($timeout,sub { $self->AutoFilter('filter_ready','force'); 0 });
 	}
+	$self->StartIdleFilter if $self->{autofilter} || ($l>2 && !$self->{suggest});
 	if ($self->{suggest})
 	{	Glib::Source->remove(delete $self->{suggest_timeout}) if $self->{suggest_timeout};
 		my $timeout= $l<2 ? 0 : $l==2 ? 200 : 100;

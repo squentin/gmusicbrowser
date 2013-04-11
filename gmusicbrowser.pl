@@ -7105,6 +7105,16 @@ sub UpdateRelatedFilter
 	}
 }
 
+#doesn't change the filter, but return the filter that would result for the widget
+sub SimulateSetFilter
+{	my ($object,$filter,$level,$group)=@_;
+	$level=1 unless defined $level;
+	$group=$object->{group} unless defined $group;
+	$group=get_layout_widget($object)->{group} unless defined $group;
+	my $filters= $Filters{$group}||=[];	# $filters->[0] is the sum filter, $filters->[$n+1] is filter for level $n
+	$filter=Filter->new($filter) unless defined $filter && ref $filter eq 'Filter';
+	return Filter->newadd(TRUE, map($filters->[$_], 1..$level), $filter);
+}
 sub SetFilter
 {	my ($object,$filter,$level,$group)=@_;
 	$level=1 unless defined $level;
