@@ -4395,11 +4395,16 @@ sub filter
 	my $sub=$self->{'sub'} || $self->makesub;
 	my $on_library= ($listref == $::Library && !$self->{source});
 	if ($self->{nocache}) { return $listref }
-	if ($on_library && !$self->{nocache} && %CachedList)
+	my $already_found;
+	if ($on_library && !$self->{nocache} && (%CachedList || %IdleFilter::InProgress))
 	{	my $string= $self->{string};
 		$CachedTime{$string}=time; # the result will be cached if it is not already => update timestamp now
 		return [unpack 'L*',$CachedList{$string}] if defined $CachedList{$string};
 		#warn "no exact cache for filter\n";
+		if (my $idlefilter= delete $IdleFilter::InProgress{$string})
+		{	$already_found= $idlefilter->{found};
+			$listref= $idlefilter->{todo};
+		}
 		if ($self->{superset_filters})
 		{	my $simplified= $self->simplify_with_superset_cache;
 			#warn "filter: todo=".(scalar @$simplified)." avoided=".(@$::Library-@$simplified)."\n" if $simplified;
@@ -4407,6 +4412,7 @@ sub filter
 		}
 	}
 	my $r=$sub->($listref);
+	$r= [ @$already_found, @$r ] if $already_found;
 	#$time=times-$time; warn "filter $time s ( ".$self->{string}." )\n" if $debug;	#DEBUG
 	if ($on_library && !$self->{nocache})
 	{	$self->cache_result($r);
@@ -4422,6 +4428,10 @@ sub simplify_with_superset_cache
 		#warn " from : ".join(',', grep $CachedList{$_}, @{$self->{superset_filters}})."\n";
 		return [unpack 'L*',(sort { length $a <=> length $b } @supersets)[0] ];	#take the smaller set, could find the intersection instead
 	}
+	# no cached result for superset, look if there is an idlefilter in progress that could be used
+	my ($idlefilter)= sort { @{$a->{todo}} + @{$a->{found}} <=> @{$b->{todo}} + @{$b->{found}} }
+		grep defined, map $IdleFilter::InProgress{$_}, @{$self->{superset_filters}};
+	return [ @{$idlefilter->{todo}}, @{$idlefilter->{found}} ] if $idlefilter;
 	return undef;
 }
 sub cache_result
@@ -4450,6 +4460,7 @@ sub is_cached
 sub clear_cache
 {	%CachedList=%CachedTime=%CachedSize=();
 	$CachedTotal=0;
+	IdleFilter::clear();
 }
 
 sub info
@@ -4789,6 +4800,75 @@ sub _fuzzy_match
 		}
 	}
 	return 1-$mat[-1][-1]/$length1 > $min;
+}
+
+package IdleFilter;
+our %InProgress;
+
+sub clear { %InProgress=(); }
+
+sub new
+{	my ($class,$filter,$callback)=@_;
+	$filter=Filter->new($filter) unless ref $filter;
+	my ($greponly)= $filter->info;
+	return 'non-grep filter' unless $greponly;
+	my $self= bless {filter => $filter, callback=>$callback, started=>time }, $class;
+	$self->start;
+	return $self;
+}
+sub start
+{	my $self=shift;
+	$self->{idle_handle}=Glib::Idle->add(\&filter_some,$self,1000); # 1000 is very low priority (default is 200, Glib::G_PRIORITY_LOW is 300)
+	$self->{count}++;
+}
+sub is_cached { $_[0]{filter}->is_cached; }
+
+sub get_progress
+{	my $self=shift;
+	my $filter=$self->{filter};
+	my $progress= $InProgress{$filter->{string}};
+	unless ($progress)
+	{	return 1 if $filter->is_cached;
+		if ($self->{count}++ >5 || $self->{started}>15+time) # give up if progress reset too many times or if it has been too long
+		{	$self->abort;
+			return 0;
+		}
+		my $todo;
+		$todo= $filter->simplify_with_superset_cache if $filter->{superset_filters};
+		#warn "idlefilter: todo=".(scalar @$todo)." avoided=".(@$::Library-@$todo)."\n" if $todo;
+		#warn "no cache helped\n" unless $todo;
+		$todo ||= [@$::Library];
+		$progress= $InProgress{$filter->{string}}= { found=>[], todo=>$todo };
+	}
+	return $progress;
+}
+
+sub filter_some
+{	my $self=shift;
+	my $filter=$self->{filter};
+	my $progress= $self->get_progress;
+	if (!$progress) { return 0 }# progress is 0 if given up
+	if (ref $progress)
+	{	my $sub=$filter->{'sub'} || $filter->makesub;
+		my $todo= $progress->{todo};
+		my @next= splice @$todo,0,100;
+		push @{$progress->{found}}, @{ $sub->(\@next) };
+		#warn "idlefilter $self found=".scalar(@{$progress->{found}})." todo=".scalar(@$todo)."\n";
+		if (scalar @$todo) { return 1 } # not finished => keep idle
+		# last batch done => put results in cache
+		delete $InProgress{$filter->{string}};
+		$filter->cache_result($progress->{found});
+	}
+
+	# finished
+	$self->{callback}->();
+	0; #remove idle
+}
+
+sub abort
+{	my $self=shift;
+	$self->{aborted}=1;
+	Glib::Source->remove(delete $self->{idle_handle}) if $self->{idle_handle};
 }
 
 package Random;
