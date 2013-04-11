@@ -5247,7 +5247,7 @@ sub DialogSongProp
 sub SongsChanged
 {	warn "SongsChanged @_\n" if $debug;
 	my ($IDs,$fields)=@_;
-	$Filter::CachedList=undef;
+	Filter::clear_cache();
 	if (defined $SongID && (grep $SongID==$_,@$IDs)) # if current song is part of the changed songs
 	{	$ListPlay->UpdateLock if $TogLock && OneInCommon([Songs::Depends($TogLock)],$fields);
 		HasChanged('CurSong',$SongID);
@@ -5272,7 +5272,7 @@ sub SongAdd_now
 	return unless @ToAdd_IDsBuffer;
 	my @IDs=@ToAdd_IDsBuffer; #FIXME remove IDs already in Library	#FIXME check against master filter ?
 	@ToAdd_IDsBuffer=();
-	$Filter::CachedList=undef;
+	Filter::clear_cache();
 	AA::IDs_Changed();
 	$Library->Push(\@IDs);
 	HasChanged(SongsAdded=>\@IDs);
@@ -5280,7 +5280,7 @@ sub SongAdd_now
 }
 sub SongsRemove
 {	my $IDs=$_[0];
-	$Filter::CachedList=undef;
+	Filter::clear_cache();
 	for my $ID (@$IDs, map("L$_", @$IDs)) { $::Editing{$ID}->destroy if exists $::Editing{$ID};}
 	AA::IDs_Changed();
 	SongArray::RemoveIDsFromAll($IDs);
@@ -5298,7 +5298,7 @@ sub UpdateMasterFilter
 	$diff[$_]+=2 for @$newlist;
 	my @toadd= grep $diff[$_]==2, @$newlist;
 	my @toremove= grep $diff[$_] && $diff[$_]==1, 0..$#diff;
-	$Filter::CachedList=undef;
+	Filter::clear_cache();
 	AA::IDs_Changed();
 	$Library->Replace($newlist);
 	HasChanged(SongsRemoved=> \@toremove);

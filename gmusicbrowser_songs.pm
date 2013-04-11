@@ -3932,7 +3932,7 @@ sub get_value { $_[0]{value}; }
 package Filter;
 
 my %NGrepSubs;
-my @CachedStrings; our $CachedList;
+my (%CachedTime,%CachedSize,%CachedList); my $CachedTotal=0;
 our (%InvOp,$OpRe);
 INIT
 {
@@ -4394,26 +4394,62 @@ sub filter
 	$listref||= $self->{source} || $::Library;
 	my $sub=$self->{'sub'} || $self->makesub;
 	my $on_library= ($listref == $::Library && !$self->{source});
-	if ($CachedList && $on_library)
-	{	return [unpack 'L*',$CachedList->{$self->{string}}] if $CachedList->{$self->{string}};
+	if ($self->{nocache}) { return $listref }
+	if ($on_library && !$self->{nocache} && %CachedList)
+	{	my $string= $self->{string};
+		$CachedTime{$string}=time; # the result will be cached if it is not already => update timestamp now
+		return [unpack 'L*',$CachedList{$string}] if defined $CachedList{$string};
 		#warn "no exact cache for filter\n";
 		if ($self->{superset_filters})
-		{	my @supersets= grep defined, map $CachedList->{$_}, @{$self->{superset_filters}};
-			if (@supersets)
-			{	#warn "found supersets : ".join(',', map length $_,@supersets)."\n";
-				#warn " from : ".join(',', grep $CachedList->{$_}, @{$self->{superset_filters}})."\n";
-				$listref= [unpack 'L*',(sort { length $a <=> length $b } @supersets)[0] ];	#take the smaller set, could find the intersection instead
-			}
+		{	my $simplified= $self->simplify_with_superset_cache;
+			#warn "filter: todo=".(scalar @$simplified)." avoided=".(@$::Library-@$simplified)."\n" if $simplified;
+			$listref= $simplified if $simplified;
 		}
 	}
 	my $r=$sub->($listref);
 	#$time=times-$time; warn "filter $time s ( ".$self->{string}." )\n" if $debug;	#DEBUG
-	if ($on_library)
-	{	$CachedList->{$self->{string}}= pack 'L*',@$r;
-		push @CachedStrings,$self->{string};
-		delete $CachedList->{shift @CachedStrings} if @CachedStrings>5;	#keep 5 results max	#FIXME : keep recently used results
+	if ($on_library && !$self->{nocache})
+	{	$self->cache_result($r);
 	}
 	return $r;
+}
+sub simplify_with_superset_cache
+{	my $self=shift;
+	return unless $self->{superset_filters};
+	my @supersets= grep defined, map $CachedList{$_}, @{$self->{superset_filters}};
+	if (@supersets)
+	{	#warn "found supersets : ".join(',', map length $_,@supersets)."\n";
+		#warn " from : ".join(',', grep $CachedList{$_}, @{$self->{superset_filters}})."\n";
+		return [unpack 'L*',(sort { length $a <=> length $b } @supersets)[0] ];	#take the smaller set, could find the intersection instead
+	}
+	return undef;
+}
+sub cache_result
+{	my $string= $_[0]{string};
+	my $result= $_[1];
+	if ($CachedTotal>100) # trim the cache
+	{	my $time=time;
+		my @del_order= sort { ($time-$CachedTime{$b})*$CachedSize{$b} <=> ($time-$CachedTime{$a})*$CachedSize{$a} } keys %CachedSize;
+		while ($CachedTotal>70)
+		{	my $delete=shift @del_order;
+			#warn "removing ".do {my $f=$delete; $f=~s/\x1D+//g; $f}." last used=".localtime($CachedTime{$delete})." size=".$CachedSize{$delete}." score=".(($time-$CachedTime{$delete})*$CachedSize{$delete})."\n";
+			delete $CachedList{$delete};
+			delete $CachedTime{$delete};
+			$CachedTotal-= delete $CachedSize{$delete};
+		}
+
+	}
+	$CachedTotal+= $CachedSize{$string}= 1+(39*@$result/(@$::Library||1));
+	$CachedTime{$string}=time; # also done in filter()
+	$CachedList{$string}= pack 'L*',@$result;
+}
+sub is_cached
+{	my $self=shift;
+	return exists $CachedList{$self->{string}} || $self->{nocache};
+}
+sub clear_cache
+{	%CachedList=%CachedTime=%CachedSize=();
+	$CachedTotal=0;
 }
 
 sub info
@@ -4502,8 +4538,8 @@ sub makesub
 	my $filter=$self->{string};
 	warn "makesub filter=$filter\n" if $::debug;
 	$self->{fields}={};
-	if ($filter eq '')		{ return $self->{'sub'}=sub {$_[0]}; }
-	elsif ($filter eq 'null')	{ return $self->{'sub'}=sub { []; }; }
+	if ($filter eq '')		{ $self->{greponly}=$self->{nocache}=1; return $self->{'sub'}=sub {$_[0]}; }
+	elsif ($filter eq 'null')	{ $self->{greponly}=$self->{nocache}=1; return $self->{'sub'}=sub { []; }; }
 
 	($filter,my $hashes)=_optimize_with_hashes($filter);
 
