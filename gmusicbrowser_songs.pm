@@ -4098,9 +4098,14 @@ sub new_from_smartstring
 
 
 		my @patterns;
-		{	if ($string=~s#^(['"])(.+?)(?<!\\)\1((?<!\\)\||\s+|$)##)
-			{	push @patterns,$2;
-				redo if $3 eq '|';
+		{	if ($string=~s#^(['"])##) #pattern begins with a quote
+			{	my $quote=$1;
+				if ($string=~s#^(.+?)(?<!\\)$quote((?<!\\)[|)]|\s+|$)##) # closing quote followed by "|", ")", space or end of string
+				{	push @patterns,$1;
+					$string= ")".$string if $2 eq ')';
+					redo if $2 eq '|';
+				}
+				else { push @patterns,$string; $string=''; } # quote is never closed => pretend it is closed at the end of the string
 			}
 			elsif ($string=~s/^(.*?)(	(?<!\\)\| |			# ends with | => more than one pattern
 							(?<!\\)(?=\)[\s|)]|\)$) |	# or with closing parenthese followed by space | ) or end-of-string
