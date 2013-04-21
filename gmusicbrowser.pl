@@ -904,7 +904,8 @@ my %Editing; #used to keep track of opened song properties dialog and lyrics dia
 our $PlayTime;
 our ($StartTime,$StartedAt,$PlayingID, @Played_segments);
 our $CurrentDir=$ENV{PWD};
-#$ENV{PULSE_PROP_media.role}='music'; # pulseaudio hint. could set other pulseaudio properties, FIXME doesn't seem to reach pulseaudio
+$ENV{'PULSE_PROP_media.role'}='music';				# role hint for pulseaudio
+$ENV{'PULSE_PROP_application.icon_name'}='gmusicbrowser';	# icon hint for pulseaudio, could also use Gtk2::Window->set_default_icon_name
 
 our (%ToDo,%TimeOut);
 my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos CurSong Playing SavedWRandoms SavedSorts SavedFilters SavedLists Icons Widgets connections
@@ -1239,7 +1240,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	MenuPlayOrder	=> [sub { Layout::SortMenu(); },   _"Popup playlist order menu"],
 	MenuQueue	=> [sub { PopupContextMenu(\@Layout::MenuQueue,{ID=>$SongID, usemenupos=>1}); }, _"Popup queue menu"],
 	ReloadLayouts	=> [ \&Layout::InitLayouts, _"Re-load layouts", ],
-	ChooseSongFromAlbum=> [sub {my $ID=GetSelID($_[0]); ChooseSongsFromA( Songs::Get_gid($ID,'album'),nocover=>1 ); }, ],
+	ChooseSongFromAlbum=> [sub {my $ID= $_[0] ? GetSelID($_[0]) : $::SongID; ChooseSongsFromA( Songs::Get_gid($ID,'album'),nocover=>1 ); }, ],
 );
 
 sub run_command
@@ -1494,7 +1495,8 @@ sub HVpack
 		next unless defined $w;
 		my $exp=FALSE;
 		unless (ref $w)
-		{	$exp=$w=~m/_/;
+		{	if ($w eq 'compact') { $pad=0; $hbox->set_spacing(0); next }
+			$exp=$w=~m/_/;
 			$end=1 if $w=~m/-/;
 			$pad=$1 if $w=~m/(\d+)/;
 			$w=shift @list;
@@ -3439,8 +3441,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 =cut
 
 	if (defined wantarray)	{return $menu}
-	my $event=Gtk2->get_current_event;
-	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
+	PopupMenu($menu,usemenupos=>1);
 }
 
 sub ChooseSongs
@@ -3479,7 +3480,8 @@ sub ChooseSongs
 	   return 0;
 	 };
 
-	my $screen= Gtk2->get_current_event->get_screen;
+	my $event= Gtk2->get_current_event;
+	my $screen= $event ? $event->get_screen : Gtk2::Gdk::Screen->get_default;
 	my $item_sample= Gtk2::ImageMenuItem->new('X'x45);
 	#my $maxrows=30; my $maxcols=3;
 	my $maxrows=int(.8*$screen->get_height / $item_sample->size_request->height);
@@ -3578,20 +3580,7 @@ sub ChooseSongs
 	$update_icons->($menu);
 
 	if (defined wantarray)	{return $menu}
-	my $event=Gtk2->get_current_event;
-	$menu->show_all;
-	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
-}
-
-sub menupos	# function to position popupmenu below clicked widget
-{	my $event=Gtk2->get_current_event;
-	my $h=$_[0]->size_request->height;		# height of menu to position
-	my $ymax=$event->get_screen->get_height;	# height of the screen
-	my ($x,$y)=$event->window->get_origin;		# position of the clicked widget on the screen
-	my $dy=($event->window->get_size)[1];	# height of the clicked widget
-	if ($dy+$y+$h > $ymax)  { $y-=$h; $y=0 if $y<0 }	# display above the widget
-	else			{ $y+=$dy; }			# display below the widget
-	return $x,$y;
+	PopupMenu($menu);
 }
 
 sub PopupAA
@@ -3600,7 +3589,6 @@ sub PopupAA
 	return undef unless @$Library;
 	my $isaa= $field eq 'album' || $field eq 'artist' || $field eq 'artists';
 	$format||="%a"; # "<b>%a</b>%Y\n<small>%s <small>%l</small></small>"
-	my $event=Gtk2->get_current_event;
 
 #### make list of albums/artists
 	my @keys;
@@ -3628,9 +3616,8 @@ sub PopupAA
 				$item->set_submenu(PopupAA('album', %args, list=> $art_keys{$artist}));
 				$menu->append($item);
 			}
-			$menu->show_all;
 			if (defined wantarray) {return $menu}
-			$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
+			PopupMenu($menu);
 			return;
 		  }
 		}
@@ -3678,7 +3665,8 @@ sub PopupAA
 			0;
 		};
 
-	my $screen= $widget ? $widget->get_screen : $event->get_screen;
+	my $event=Gtk2->get_current_event;
+	my $screen= $widget ? $widget->get_screen : $event ? $event->get_screen : Gtk2::Gdk::Screen->get_default;
 	my $max= .7*$screen->get_height;
 	my $maxwidth=.15*$screen->get_width;
 	#my $minsize=Gtk2::ImageMenuItem->new('')->size_request->height;
@@ -3738,17 +3726,18 @@ sub PopupAA
 		$item->set_submenu($submenu);
 		$menu->append($item);
 	}
-	$menu->show_all;
 
+	$menu->show_all;
 	if (defined wantarray) {return $menu}
-	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
+	PopupMenu($menu);
 }
 
 sub Breakdown_List
 {	my ($names,%options)=@_;
 	my ($min,$opt,$max,$makemenu,$keys,$widget)=@options{qw/min opt max makemenu keys widget/};
 	$widget ||= Gtk2->get_current_event; #used to find current screen
-	my $maxheight= $widget ? $widget->get_screen->get_height : 640; # FIXME is that ok for multi-monitors ?
+	my $screen= $widget ? $widget->get_screen : Gtk2::Gdk::Screen->get_default; # FIXME is that ok for multi-monitors ?
+	my $maxheight= $screen->get_height;
 
 
 	if (!$min || !$opt || !$max) #find minimum/optimum/maximum number of entries that the menu/submenus should have
@@ -4028,12 +4017,44 @@ sub BuildMenuOptional
 sub PopupContextMenu
 {	my $args=$_[1];
 	my $menu=BuildMenu(@_);
+	PopupMenu($menu,nomenupos=>!$args->{usemenupos});
+}
+
+sub PopupMenu
+{	my ($menu,%args)=@_;
 	return unless $menu->get_children;
 	$menu->show_all;
-	my $posfunction= $args && $args->{usemenupos} ? \&menupos : undef;
-	my $event=Gtk2->get_current_event;
-	my ($button,$pos)= $event->isa('Gtk2::Gdk::Event::Button') ? ($event->button,$posfunction) : (0,undef);
-	$menu->popup(undef,undef,$pos,undef,$button,$event->time);
+	my $event= $args{event} || Gtk2->get_current_event;
+	my $posfunction= $args{posfunction}; # usually undef
+	my $button=my $time=0;
+	if ($event)
+	{	$time= $event->time;
+		$button= $event->button if $event->isa('Gtk2::Gdk::Event::Button');
+		if (!$posfunction && !$args{nomenupos} && $event->window)
+		{	my (undef,undef,$w,$h)= $event->window->get_geometry;
+			$posfunction=\&menupos if $h<300; #ignore the event's widget if too big, widget can be the whole window if coming from a shortcut key, it makes no sense poping-up a menu next to the whole window
+		}
+	}
+	$menu->popup(undef,undef,$posfunction,undef,$button,$time);
+}
+sub menupos	# function to position popupmenu below clicked widget
+{	my $event=Gtk2->get_current_event;
+	my $w=$_[0]->size_request->width;		# width of menu to position
+	my $h=$_[0]->size_request->height;		# height of menu to position
+	my $ymax=$event->get_screen->get_height;	# height of the screen
+	my ($x,$y)=$event->window->get_origin;		# position of the clicked widget on the screen
+	my ($dw,$dy)=$event->window->get_size;		# width and height of the clicked widget
+	if ($dy+$y+$h > $ymax)  { $y-=$h; $y=0 if $y<0 }	# display above the widget
+	else			{ $y+=$dy; }			# display below the widget
+	if ($event->isa('Gtk2::Gdk::Event::Button'))
+	{	if ($w < $dw && $event->x -$w > 100) # if mouse horizontally far from menu, try to position it closer
+		{	my $newx= $event->x - .5*$w;
+			#$newx= 0 if $newx<0;
+			$newx= $dw-$w if $newx>$dw-$w;
+			$x+=$newx;
+		}
+	}
+	return $x,$y;
 }
 
 sub BuildChoiceMenu
@@ -5054,9 +5075,7 @@ sub ArtistContextMenu
 		$item->set_submenu($submenu);
 		$menu->append($item);
 	}
-	$menu->show_all;
-	my $event=Gtk2->get_current_event;
-	$menu->popup(undef,undef,undef,undef,$event->button,$event->time);
+	PopupMenu($menu,nomenupos=>1);
 }
 
 =deprecated
@@ -5131,7 +5150,7 @@ sub DialogSongsProp
 	my $edittag=MassTag->new(@IDs);
 	$dialog->vbox->add($edittag);
 
-	SetWSize($dialog,'MassTag','520x560');
+	SetWSize($dialog,'MassTag','520x650');
 	$dialog->show_all;
 
 	$dialog->signal_connect( response => sub
@@ -5147,9 +5166,14 @@ sub DialogSongsProp
 sub DialogSongProp
 {	my $ID=$_[0];
 	if (exists $Editing{$ID}) { $Editing{$ID}->force_present; return; }
-	my $dialog = Gtk2::Dialog->new (_"Song Properties", undef, [],
-				'gtk-save' => 'ok',
-				'gtk-cancel' => 'none');
+	my $dialog = Gtk2::Dialog->new (_"Song Properties", undef, []);
+	my $advanced_button= NewIconButton('gtk-edit',_("Advanced").'...');
+	$advanced_button->set_tooltip_text(_"Advanced Tag Editing");
+	$dialog->add_action_widget($advanced_button,1);
+	$dialog->add_buttons('gtk-save','ok', 'gtk-cancel','none');
+	my $bb=$advanced_button->parent;
+	if ($bb && $bb->isa('Gtk2::ButtonBox')) { $bb->set_child_secondary($advanced_button,1); }
+
 	$dialog->set_default_response ('ok');
 	$Editing{$ID}=$dialog;
 	my $notebook = Gtk2::Notebook->new;
@@ -5158,15 +5182,16 @@ sub DialogSongProp
 
 	my $edittag=  EditTagSimple->new($dialog,$ID);
 	my $songinfo= Layout::SongInfo->new({ID=>$ID});
-	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Tag"));
+	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Edit"));
 	$notebook->append_page( $songinfo,	Gtk2::Label->new(_"Info"));
 
-	SetWSize($dialog,'SongInfo','420x482');
+	SetWSize($dialog,'SongInfo','420x540');
 	$dialog->show_all;
 
 	$dialog->signal_connect( response => sub
 	{	warn "EditTag response : @_\n" if $debug;
 		my ($dialog,$response)=@_;
+		if ($response eq '1') { $edittag->advanced; return; }
 		$songinfo->destroy;
 		if ($response eq 'ok')
 		{	$edittag->save;
@@ -5180,7 +5205,7 @@ sub DialogSongProp
 sub SongsChanged
 {	warn "SongsChanged @_\n" if $debug;
 	my ($IDs,$fields)=@_;
-	$Filter::CachedList=undef;
+	Filter::clear_cache();
 	if (defined $SongID && (grep $SongID==$_,@$IDs)) # if current song is part of the changed songs
 	{	$ListPlay->UpdateLock if $TogLock && OneInCommon([Songs::Depends($TogLock)],$fields);
 		HasChanged('CurSong',$SongID);
@@ -5205,7 +5230,7 @@ sub SongAdd_now
 	return unless @ToAdd_IDsBuffer;
 	my @IDs=@ToAdd_IDsBuffer; #FIXME remove IDs already in Library	#FIXME check against master filter ?
 	@ToAdd_IDsBuffer=();
-	$Filter::CachedList=undef;
+	Filter::clear_cache();
 	AA::IDs_Changed();
 	$Library->Push(\@IDs);
 	HasChanged(SongsAdded=>\@IDs);
@@ -5213,7 +5238,7 @@ sub SongAdd_now
 }
 sub SongsRemove
 {	my $IDs=$_[0];
-	$Filter::CachedList=undef;
+	Filter::clear_cache();
 	for my $ID (@$IDs, map("L$_", @$IDs)) { $::Editing{$ID}->destroy if exists $::Editing{$ID};}
 	AA::IDs_Changed();
 	SongArray::RemoveIDsFromAll($IDs);
@@ -5231,7 +5256,7 @@ sub UpdateMasterFilter
 	$diff[$_]+=2 for @$newlist;
 	my @toadd= grep $diff[$_]==2, @$newlist;
 	my @toremove= grep $diff[$_] && $diff[$_]==1, 0..$#diff;
-	$Filter::CachedList=undef;
+	Filter::clear_cache();
 	AA::IDs_Changed();
 	$Library->Replace($newlist);
 	HasChanged(SongsRemoved=> \@toremove);
@@ -5610,9 +5635,11 @@ sub PrefDialog
 {	my $goto= $_[0] || $Options{LastPrefPage} || 'library';
 	if ($OptionsDialog) { $OptionsDialog->force_present; }
 	else
-	{	$OptionsDialog=my $dialog = Gtk2::Dialog->new (_"Settings", undef,[],
-				'gtk-about' => 1,
-				'gtk-close' => 'close');
+	{	$OptionsDialog=my $dialog = Gtk2::Dialog->new (_"Settings", undef,[]);
+		my $about_button=$dialog->add_button('gtk-about',1);
+		$dialog->add_button('gtk-close','close');
+		my $bb=$about_button->parent;
+		if ($bb && $bb->isa('Gtk2::ButtonBox')) { $bb->set_child_secondary($about_button,1); }
 		$dialog->set_default_response ('close');
 		SetWSize($dialog,'Pref');
 
@@ -6100,8 +6127,7 @@ sub pref_artists_button_cb
 		'reverse'=>1,
 		args => {button=>$button},
 	);
-	$menu->show_all;
-	$menu->popup(undef,undef,\&menupos,undef,$event->button,$event->time);
+	PopupMenu(event=>$event);
 	1;
 }
 
@@ -7037,6 +7063,16 @@ sub UpdateRelatedFilter
 	}
 }
 
+#doesn't change the filter, but return the filter that would result for the widget
+sub SimulateSetFilter
+{	my ($object,$filter,$level,$group)=@_;
+	$level=1 unless defined $level;
+	$group=$object->{group} unless defined $group;
+	$group=get_layout_widget($object)->{group} unless defined $group;
+	my $filters= $Filters{$group}||=[];	# $filters->[0] is the sum filter, $filters->[$n+1] is filter for level $n
+	$filter=Filter->new($filter) unless defined $filter && ref $filter eq 'Filter';
+	return Filter->newadd(TRUE, map($filters->[$_], 1..$level), $filter);
+}
 sub SetFilter
 {	my ($object,$filter,$level,$group)=@_;
 	$level=1 unless defined $level;
@@ -8525,12 +8561,9 @@ sub Get
 
 sub popup_menu_cb
 {	my $button=shift;
-	my $event=Gtk2->get_current_event;
 	my $self=::find_ancestor($button,__PACKAGE__);
 	my $menu= $self->{cmdmenu};
-	$menu->show_all;
-	my $mbutton= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
-	$menu->popup(undef, undef, \&::menupos, undef, $mbutton, $event->time);
+	::PopupMenu($menu);
 	0;
 }
 
@@ -8952,8 +8985,7 @@ sub pixbox_button_press_cb	# zoom picture when clicked
 	my $item=Gtk2::MenuItem->new;
 	$item->add($image);
 	$menu->append($item);
-	$menu->show_all;
-	$menu->popup(undef,undef,undef,undef,$event->button,$event->time);
+	::PopupMenu($menu,event=>$event,nomenupos=>1);
 	1;
 }
 

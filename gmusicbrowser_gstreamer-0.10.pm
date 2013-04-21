@@ -11,11 +11,12 @@ use warnings;
 
 my ($GST_ok,$GST_visuals_ok,$GST_EQ_ok,$GST_RG_ok,$playbin2_ok); our $GST_RGA_ok;
 my ($PlayBin,$Sink);
-my ($WatchTag,$Skip);
+my ($WatchTag,$Skip,$StateAfterSkip);
 my (%Plugins,%Sinks);
 my ($VSink,$visual_window);
 my $AlreadyNextSong;
 my $RG_dialog;
+my ($VolumeBusy,$VolumeHasChanged);
 
 $::PlayPacks{Play_GST}=1; #register the package
 
@@ -103,9 +104,10 @@ sub createPlayBin
 	my $pb= $playbin2_ok ? 'playbin2' : 'playbin';
 	$PlayBin=GStreamer::ElementFactory->make($pb => 'playbin'); #FIXME only the first one used works
 	$PlayBin->set('flags' => [qw/audio soft-volume/]) if $playbin2_ok;
-	$PlayBin->set(volume => ($::Volume/100)**3); 	#initialize volume, use a cubic volume scale
+	SetVolume(undef,''); #initialize volume
 	my $bus=$PlayBin->get_bus;
 	$bus->add_signal_watch;
+	$PlayBin->signal_connect("notify::volume" => sub { Glib::Idle->add(\&VolumeChanged) unless $VolumeHasChanged++; }) if $Glib::VERSION >= 1.251; #not stable with older version of perl-glib due to bug #620099 (https://bugzilla.gnome.org/show_bug.cgi?id=620099)
 #	$bus->signal_connect('message' => \&bus_message);
 	$bus->signal_connect('message::eos' => \&bus_message_end);
 	$bus->signal_connect('message::error' => \&bus_message_end,1);
@@ -136,8 +138,21 @@ sub bus_message_end
 	else		{ ::end_of_file(); }
 }
 
-sub bus_message_state_changed
-{	SkipTo(undef,$Skip) if $Skip;
+# when a song starts playing, notify::volume callbacks are called, which causes glib to hang (see https://bugzilla.gnome.org/show_bug.cgi?id=620099#c11) if a skip is done at the same moment
+# using freeze_notify until the skip is done seems to avoid the problem
+# setting state to paused until the skip is done also seems to avoid the problem
+my $StateChanged;
+sub bus_message_state_changed	# used to wait for the right state to do the skip
+{	return unless $Skip;
+	return if $StateChanged;
+	$StateChanged=1;
+	$PlayBin->freeze_notify unless $PlayBin->{notify_frozen}; $PlayBin->{notify_frozen}=1; #freeze notify until skip is done
+	Glib::Idle->add(sub
+	{	SkipTo(undef,$Skip) if $Skip; # this will only skip if the state is right, else will wait for another state change
+		unless ($Skip) { $PlayBin->thaw_notify if delete $PlayBin->{notify_frozen}; } #if skip is done, unfreeze
+		$StateChanged=0;
+		0;
+	});
 }
 
 sub Close
@@ -156,10 +171,28 @@ sub SetVolume
 	elsif	($set=~m/(\d+)/)	{ $::Volume =$1; }
 	$::Volume=0   if $::Volume<0;
 	$::Volume=100 if $::Volume>100;
-	$PlayBin->set(volume => ($::Volume/100)**3) if $PlayBin; 	#use a cubic volume scale
-	::HasChanged('Vol');
+	$VolumeBusy=1;
+	$PlayBin->set(volume => ( ($::Mute||$::Volume) /100)**3, mute => !!$::Mute) if $PlayBin; 	#use a cubic volume scale
+	$VolumeBusy=0;
 	$::Options{Volume}=$::Volume;
 	$::Options{Volume_mute}=$::Mute;
+	::QHasChanged('Vol');
+}
+sub VolumeChanged
+{	$VolumeHasChanged=0;
+	return 0 if $VolumeBusy;
+	return 0 unless $PlayBin;
+	my ($volume,$mute)= $PlayBin->get('volume','mute');
+	$volume= $volume ** (1/3) *100; #use a cubic volume scale
+	$volume= sprintf '%d',$volume;
+	$volume=100 if $volume>100;
+	#return 0 unless $volume!=$::Volume || ($mute xor !!$::Mute);
+	if ($mute)	{ $::Mute=$volume; $::Volume=0; }
+	else		{ $::Mute=0; $::Volume=$volume; }
+	$::Options{Volume}=$::Volume;
+	$::Options{Volume_mute}=$::Mute;
+	::QHasChanged('Vol');
+	0; #called from an idle
 }
 
 sub SkipTo
@@ -168,14 +201,17 @@ sub SkipTo
 	my ($result,$state,$pending)=$PlayBin->get_state(0);
 	return if $result eq 'async'; #when song hasn't started yet, needs to wait until it has started before skipping
 	$PlayBin->seek(1,'time','flush','set', $Skip*1_000_000_000,'none',0);
+	if ($StateAfterSkip) { $PlayBin->set_state($StateAfterSkip); $StateAfterSkip=undef; }
 	$Skip=undef;
 }
 
 sub Pause
 {	$PlayBin->set_state('paused');
+	$StateAfterSkip=undef;
 }
 sub Resume
 {	$PlayBin->set_state('playing');
+	$StateAfterSkip=undef;
 }
 
 sub check_sink
@@ -281,7 +317,9 @@ sub Play
 	}
 	warn "playing $file\n";
 	set_file($file);
-	$PlayBin -> set_state('playing');
+	my $newstate='playing'; $StateAfterSkip=undef;
+	if ($Skip) { $newstate='paused'; $StateAfterSkip='playing'; }
+	$PlayBin->set_state($newstate);
 	$WatchTag=Glib::Timeout->add(500,\&_UpdateTime) unless $WatchTag;
 }
 sub set_file
@@ -441,6 +479,7 @@ sub Stop
 	#warn "stop: state: $result,$state,$pending\n";
 	#return if $state eq 'null' and $pending eq 'void-pending';
 	$PlayBin->set_state('null') if $PlayBin;
+	$StateAfterSkip=undef;
 	#warn "--stop\n";
 }
 

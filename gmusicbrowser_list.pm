@@ -176,8 +176,7 @@ sub button_press_event_cb
 		$item->signal_connect( activate => sub { $self->Set_mode($mode) } );
 		$menu->append($item);
 	 }
-	$menu->show_all;
-	$menu->popup(undef, undef, \&::menupos, undef, $event->button, $event->time);
+	::PopupMenu($menu);
 }
 
 sub QueueUpdateFast
@@ -1977,8 +1976,7 @@ sub button_press_event_cb
 		$menu->append($item);
 	}
 	#::PopupContextMenu(\@MenuTabbedL, { self=>$self, list=>$listname, pagenb=>$pagenb, page=>$page, pagetype=>$page->{tabbed_page_type} } );
-	$menu->show_all;
-	$menu->popup(undef, undef, undef, undef, $event->button, $event->time);
+	::PopupMenu($menu,event=>$event,nomenupos=>1);
 	return 1;
 }
 
@@ -3617,14 +3615,11 @@ sub PopupSelectorMenu
 		{	::EditFilter($self,::GetFilter($self),undef,sub {::SetFilter($self,$_[0]) if defined $_[0]});
 		});
 	$menu->append($item2);
-	$menu->show_all;
-	my $event=Gtk2->get_current_event;
-	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
+	::PopupMenu($menu);
 }
 
-sub DoFilter
+sub GetFilter
 {	my $self=shift;
-	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
 	my $search= $self->get_text;
 
 	my $filter;
@@ -3643,10 +3638,44 @@ sub DoFilter
 		$self->{last_filter}=$filter;
 	}
 	else { $filter= Filter->new }
+	return $filter;
+}
 
+sub AutoFilter
+{	my ($self,$event,$force)=@_;
+	if ($::debug) { warn "AutoFilter: $event".($force ? ' force':'')."\n" }
+	unless ($event eq 'filter_ready' || $event eq 'time_ready') {warn 'error'; return}
+	$self->{$event}=1;
+	return unless $self->{filter_ready} && $self->{time_ready};
+	my $idlefilter=$self->{idlefilter};
+	if (!$force && $idlefilter && !$idlefilter->is_cached) { warn "AutoFilter: restart\n" if $::debug; $idlefilter->start; return } #for case where filter was finished before first timeout, but since the cache was flushed, retry unless the second timeout has expired
+	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
+	Glib::Source->remove(delete $self->{idlefilter_timeout}) if $self->{idlefilter_timeout};
+	$self->DoFilter if $self->{autofilter};
+}
+
+sub StartIdleFilter
+{	my $self=shift;
+	my $search=$self->get_text;
+	my $previous= delete $self->{idlefilter};
+	my $filter= ::SimulateSetFilter( $self,$self->GetFilter, $self->{nb} );
+	#warn "idle $search\n";
+	my $new= IdleFilter->new($filter,sub { $self->AutoFilter('filter_ready')});
+	$self->{idlefilter}=$new if ref $new;
+	$previous->abort if $previous;
+}
+
+sub DoFilter
+{	my $self=shift;
+	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
+	my $idlefilter= delete $self->{idlefilter};
+	$idlefilter->abort if $idlefilter;
+
+	my $filter= $self->GetFilter;
 	::SetFilter($self,$filter,$self->{nb});
 	if ($self->{searchfb})
-	{	::HasChanged('SearchText_'.$self->{group},$search); #FIXME
+	{	my $search= $self->get_text;
+		::HasChanged('SearchText_'.$self->{group},$search); #FIXME
 	}
 	$self->Update_bg( !$filter->is_empty );
 }
@@ -3655,11 +3684,19 @@ sub EntryChanged_cb
 {	my $self=shift;
 	$self->Update_bg(0);
 	my $l= length($self->get_text);
+	delete $self->{filter_ready};
+	delete $self->{time_ready};
+	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
+	Glib::Source->remove(delete $self->{idlefilter_timeout}) if $self->{idlefilter_timeout};
 	if ($self->{autofilter})
-	{	Glib::Source->remove(delete $self->{changed_timeout}) if $self->{changed_timeout};
-		my $timeout= $l<2 ? 1000 : $l==2 ? 200 : 100;
-		$self->{changed_timeout}= Glib::Timeout->add($timeout,\&DoFilter,$self);
+	{	# 1st timeout : do not filter before this minimum timeout, even if filter is ready
+		my $timeout= $l<2 ? 800 : 300;
+		$self->{changed_timeout}= Glib::Timeout->add($timeout,sub { $self->AutoFilter('time_ready'); 0 });
+		# 2nd timeout : filter even if idlefilter not finished
+		$timeout= $l<4 ? 3000 : 2000;
+		$self->{idlefilter_timeout}= Glib::Timeout->add($timeout,sub { $self->AutoFilter('filter_ready','force'); 0 });
 	}
+	$self->StartIdleFilter if $self->{autofilter} || ($l>2 && !$self->{suggest});
 	if ($self->{suggest})
 	{	Glib::Source->remove(delete $self->{suggest_timeout}) if $self->{suggest_timeout};
 		my $timeout= $l<2 ? 0 : $l==2 ? 200 : 100;
@@ -3679,8 +3716,11 @@ sub CloseSuggestionMenu
 
 sub UpdateSuggestionMenu
 {	my $self=shift;
-	$self->CloseSuggestionMenu;
-	my $menu= $self->{matchmenu}= Gtk2::Menu->new;
+	if ($self->{matchmenu} && !$self->{matchmenu}->mapped) { $self->CloseSuggestionMenu; }
+	Glib::Source->remove(delete $self->{suggest_timeout}) if $self->{suggest_timeout};
+	my $refresh= !!$self->{matchmenu};
+	my $menu= $self->{matchmenu} ||= Gtk2::Menu->new;
+	if ($refresh) { $menu->remove($_) for $menu->get_children; }
 
 	my $h=$self->size_request->height;
 	my $w=$self->size_request->width;
@@ -3705,7 +3745,10 @@ sub UpdateSuggestionMenu
 	for my $field (qw/artists album genre label title/)
 	{	my $list;
 		if ($field eq 'title')
-		{	$list= Filter->new('title:si:'.$text)->filter;
+		{	my $filter= Filter->new('title:si:'.$text);
+			$filter->add_possible_superset($self->{last_suggestion_filter}) if $self->{last_suggestion_filter};
+			$self->{last_suggestion_filter}=$filter;
+			$list= $filter->filter;
 			next unless @$list;
 			Songs::SortList($list,'-rating -playcount -lastplay');
 		}
@@ -3776,15 +3819,23 @@ sub UpdateSuggestionMenu
 		}
 		last if $height<0;
 	}
-	return unless $found;
+	unless ($found)
+	{	$self->CloseSuggestionMenu;
+		return;
+	}
 	$menu->set_size_request($w*2,-1);
-	$menu->attach_to_widget($self, sub {'empty detaching callback'});
 	$menu->show_all;
 	$menu->set_take_focus(0);
-	$menu->signal_connect(key_press_event => \&SuggestionMenu_key_press_cb);
-	$menu->signal_connect(selection_done  => \&CloseSuggestionMenu);
-	$menu->popup(undef,undef,sub { my $menu=shift; $x, ($above ? $y-$menu->size_request->height : $y+$h); },undef,0,Gtk2->get_current_event_time);
-	$menu->parent->resize(1,1);
+	if ($menu->mapped)
+	{	$menu->reposition;
+		$menu->set_active(0);
+	}
+	else
+	{	$menu->attach_to_widget($self, sub {'empty detaching callback'});
+		$menu->signal_connect(key_press_event => \&SuggestionMenu_key_press_cb);
+		$menu->signal_connect(selection_done  => \&CloseSuggestionMenu);
+		$menu->popup(undef,undef,sub { my $menu=shift; $x, ($above ? $y-$menu->size_request->height : $y+$h); },undef,0,Gtk2->get_current_event_time);
+	}
 }
 sub SuggestionMenu_key_press_cb
 {	my ($menu,$event)=@_;

@@ -396,10 +396,19 @@ sub new
 		$table->attach($widget,$col++,$col,$row,$row+1,['fill','expand'],'shrink',3,1);
 	}
 
-	$self->pack_start($table, FALSE, TRUE, 2);
+	my $vpaned= $self->{vpaned}=Gtk2::VPaned->new;
+	$self->add($vpaned);
+	my $sw=Gtk2::ScrolledWindow->new;
+	$sw->set_shadow_type('none');
+	$sw->set_policy('never', 'automatic');
+	$sw->add_with_viewport($table);
+	$sw->show_all;
+	$sw->set_size_request(-1,$table->size_request->height);
+	$vpaned->pack1($sw,FALSE,TRUE);
 
 	# do not add per-file part if LOTS of songs, building the GUI would be too long anyway
 	$self->add_per_file_part unless @IDs>1000;
+	$self->set_size_request(-1,400); #to allow resizing the window to a small height in spite of the height request of $sw
 	return $self;
 }
 
@@ -429,10 +438,8 @@ sub add_per_file_part
 		#my $item=Gtk2::CheckMenuItem->new(_"Select files");
 		#$item->signal_connect(activate => sub { $self->add_selectfile_column });
 		#$menu->append($item);
-		$menu->show_all;
 		$BSelFields->signal_connect( button_press_event => sub
-			{	my $event=$_[1];
-				$menu->popup(undef,undef,\&::menupos,undef,$event->button, $event->time);
+			{	::PopupMenu($menu,event=>$_[1]);
 			});
 		#$self->pack_start($menubar, FALSE, FALSE, 2);
 		#$perfile_table->attach($menubar,7,8,0,1,'fill','shrink',1,1);
@@ -456,10 +463,8 @@ sub add_per_file_part
 			$item->signal_connect(activate => $menu_cb,$ref->{for_all});
 			$menu->append($item) if $ref->{for_all};
 		}
-		$menu->show_all;
 		$Btools->signal_connect( button_press_event => sub
-			{	my $event=$_[1];
-				$menu->popup(undef,undef,\&::menupos,undef,$event->button, $event->time);
+			{	::PopupMenu($menu,event=>$_[1]);
 			});
 	}
 
@@ -468,10 +473,21 @@ sub add_per_file_part
 		undef,_"Clear selected fields");
 
 	my $sw = Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
+	$sw->set_shadow_type('none');
 	$sw->set_policy('automatic', 'automatic');
 	$sw->add_with_viewport($perfile_table);
-	$self->pack_start($sw, TRUE, TRUE, 4);
+
+	# expander to hide/show the per-file part
+	my $exp_label=Gtk2::Label->new_with_format("<b>%s</b>",_"Per-song values");
+	my $expander=Gtk2::Expander->new;
+	$expander->set_expanded(TRUE);
+	$expander->set_label_widget($exp_label);
+	$expander->signal_connect(activate=>sub { my $on= !$_[0]->get_expanded; $_->set_visible($on) for $sw,$BSelFields; });
+
+	$self->{vpaned}->pack2( ::Vpack('compact',[$expander,$BSelFields],'_',$sw), TRUE,FALSE);
+	my $vsizegroup=Gtk2::SizeGroup->new('vertical');
+	$vsizegroup->add_widget($_) for $exp_label,$BSelFields; # so that they are aligned
+	$sw->set_size_request(-1,$exp_label->size_request->height); # so that the expander is always visible
 
 	my $store= Gtk2::ListStore->new('Glib::String','Glib::Scalar');
 	$self->{autofill_combo}= my $Bautofill=Gtk2::ComboBox->new($store);
@@ -485,7 +501,7 @@ sub add_per_file_part
 	my $checkOBlank=Gtk2::CheckButton->new(_"Auto fill only blank fields");
 	$self->{AFOBlank}=$checkOBlank;
 	my $hbox=Gtk2::HBox->new;
-	$hbox->pack_start($_, FALSE, FALSE, 0) for $BSelFields,Gtk2::VSeparator->new,$Bautofill,$BClear,$checkOBlank,$Btools,
+	$hbox->pack_start($_, FALSE, FALSE, 0) for Gtk2::VSeparator->new,$Bautofill,$BClear,$checkOBlank,$Btools,
 	$self->pack_start($hbox, FALSE, FALSE, 4);
 }
 
@@ -1192,6 +1208,7 @@ sub new
 	$self->pack_start($entry,0,0,0);
 	$self->pack_start($add,0,0,0);
 	$add->signal_connect( button_press_event => sub { add_entry_text_cb($_[0]); $_[0]->grab_focus;1; } );
+	$add->signal_connect( clicked => \&add_entry_text_cb );
 	$button->signal_connect( clicked => \&popup_menu_cb);
 	$button->signal_connect( button_press_event => sub { popup_menu_cb($_[0]); $_[0]->grab_focus;1; } );
 	$entry->signal_connect( activate => \&add_entry_text_cb );
@@ -1219,10 +1236,7 @@ sub popup_add_menu
 {	my ($self,$widget)=@_;
 	my $cb= sub { $self->{selected}{ $_[1] }= 1; $self->update; };
 	my $menu=::MakeFlagMenu($self->{field},$cb);
-	$menu->show_all;
-	my $event=Gtk2->get_current_event;
-	my $button= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
-	$menu->popup(undef,undef,sub {::windowpos($_[0],$widget)},undef,$button,$event->time);
+	::PopupMenu($menu, posfunction=>sub {::windowpos($_[0],$widget)} );
 }
 
 sub popup_menu_cb
@@ -1238,10 +1252,7 @@ sub popup_menu_cb
 		$item->signal_connect(toggled => $cb,$key);
 		$menu->append($item);
 	}
-	$menu->show_all;
-	my $event=Gtk2->get_current_event;
-	my $button= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
-	$menu->popup(undef,undef,\&::menupos,undef,$button,$event->time);
+	::PopupMenu($menu);
 }
 
 sub update
@@ -1286,6 +1297,7 @@ sub new
 	my $add= ::NewIconButton('gtk-add');
 	my $removeall= ::NewIconButton('gtk-clear', _"Remove all", \&clear);
 	$add->signal_connect( button_press_event => sub { add_entry_text_cb($_[0]); $_[0]->grab_focus;1; } );
+	$add->signal_connect( clicked => \&add_entry_text_cb );
 	for my $ref (['toadd',1,_"Add"],['toremove',-1,_"Remove"])
 	{	my ($key,$mode,$text)=@$ref;
 		my $label=$self->{$key}=Gtk2::Label->new;
@@ -1356,10 +1368,7 @@ sub popup_add_menu
 {	my ($self,$widget)=@_;
 	my $cb= sub { $self->{selected}{ $_[1] }= 1; $self->update; };
 	my $menu=::MakeFlagMenu($self->{field},$cb);
-	$menu->show_all;
-	my $event=Gtk2->get_current_event;
-	my $button= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
-	$menu->popup(undef,undef,sub {::windowpos($_[0],$widget)},undef,$button,$event->time);
+	::PopupMenu($menu, posfunction=>sub {::windowpos($_[0],$widget)} );
 }
 
 sub popup_menu_cb
@@ -1377,10 +1386,7 @@ sub popup_menu_cb
 		$item->signal_connect(toggled => $cb,$key);
 		$menu->append($item);
 	}
-	$menu->show_all;
-	my $event=Gtk2->get_current_event;
-	my $button= $event->isa('Gtk2::Gdk::Event::Button') ? $event->button : 0;
-	$menu->popup(undef,undef,\&::menupos,undef,$button,$event->time);
+	::PopupMenu($menu);
 	1;
 }
 
@@ -1423,16 +1429,17 @@ sub new
 	$labelfile->set_selectable(TRUE);
 	$labelfile->set_line_wrap(TRUE);
 
+	my $sw=Gtk2::ScrolledWindow->new;
+	$sw->set_shadow_type('none');
+	$sw->set_policy('never', 'automatic');
+
 	my $table=Gtk2::Table->new (6, 2, FALSE);
+	$sw->add_with_viewport($table);
 	$self->{table}=$table;
 	$self->fill;
 
-	my $advanced=Gtk2::Button->new(_("Advanced Tag Editing").' ...');
-	$advanced->signal_connect( clicked => \&advanced_cb );
-
 	$self->pack_start($labelfile,FALSE,FALSE,1);
-	$self->pack_start($table, FALSE, TRUE, 2);
-	$self->pack_end($advanced, FALSE, FALSE, 2);
+	$self->pack_start($sw, TRUE, TRUE, 2);
 
 	return $self;
 }
@@ -1458,8 +1465,8 @@ sub fill
 	$table->show_all;
 }
 
-sub advanced_cb
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
+sub advanced
+{	my $self=shift;
 	my $ID=$self->{ID};
 	my $dialog = Gtk2::Dialog->new (_"Advanced Tag Editing", $self->{window},
 		[qw/destroy-with-parent/],

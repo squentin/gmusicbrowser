@@ -769,8 +769,7 @@ sub preset_menu_cb
 		$item->signal_connect(activate => $menu_cb,$preid);
 		$menu->append($item);
 	}
-	$menu->show_all;
-	$menu->popup(undef,undef,\&::menupos,undef,$event->button,$event->time);
+	::PopupMenu($menu);
 }
 
 
