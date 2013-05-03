@@ -764,9 +764,17 @@ sub new
 	$sg->add_widget($_) for $label_format,$label_re;
 	my $bbox= Gtk2::HButtonBox->new;
 	$bbox->add($_) for $button_del, $button_add, $button_new;
+	my $sw=Gtk2::ScrolledWindow->new;
+	 $sw->set_shadow_type('etched-in');
+	 $sw->set_policy('automatic','automatic');
+	 $sw->add($treeview);
+	 $sw->set_size_request(150,-1); #give the list a minimum width
 	my $table= ::MakeReplaceTable('taAlCyndgL', A=>Songs::FieldName('album_artist_raw'));	#AutoFillFields
-	my $hbox= ::Hpack($treeview,'_',[[$label_format,'_',$entry_format],$table,$check_re,[$label_re,'_',$entry_re],$error,$preview,'-',$bbox]);
-	$self->vbox->add($hbox);
+	my $hbox= ::Vpack([$label_format,'_',$entry_format],$table,$check_re,[$label_re,'_',$entry_re],$error,$preview,'-',$bbox);
+	my $hpaned= Gtk2::HPaned->new;
+	 $hpaned->pack1($sw,1,1);
+	 $hpaned->pack2($hbox,1,0);
+	$self->vbox->add($hpaned);
 
 	::set_drag($preview, dest => [::DRAG_ID,\&song_dropped]);
 	$entry_format->signal_connect(changed=> \&entry_changed);
