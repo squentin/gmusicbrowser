@@ -182,20 +182,22 @@ sub ParseAtomTree
 			pop @psize;
 		}
 		my ($length,$name)=unpack 'NA4',$buffer;
-		my $datalength=$length-8;
 		my $offset=tell($fh)-8;
+		my $headsize=8;
 		if ($length==1)	# $length==1 means 64-bit length follow
 		{	read($fh,$buffer,8);
 			my ($length1,$length2)=unpack 'NN',$buffer;
 			if ($length1>0) { warn "atom '$name' has a size >4GB, unsupported => can't read file\n"; return }
 			$length=$length2;
-			$datalength=$length-16;
+			$headsize=16;
 		}
 		#FIXME if length==0 : open-ended, extends to the end of the file
-		elsif ($datalength<0) { warn "error atom '$name' has an invalid size of $datalength bytes";return }
+		if ($length<$headsize) { warn "error atom '$name' has an invalid size of $length bytes";return }
 #warn join('.',@parents,$name)."\n";#warn "left:@left\n";
 		push @toplevels, $name,$offset,$length,$stco=[] unless @parents;
+		if (@left && $length>$left[-1]) { warn "Premature end of atom, parent '$parents[-1]' has only ".$left[-1]." bytes left, but child '$name' says it is $length bytes long\n"; $length=$left[-1]; }
 		$left[-1]-=$length if @left;
+		my $datalength=$length-$headsize;
 		my $isparent= $IsParent{$name};
 		$isparent=0 if @parents && $parents[-1] eq 'ilst';  #0 but defined : children of ilst are parents
 		if (defined $isparent)
