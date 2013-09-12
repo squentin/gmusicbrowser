@@ -384,7 +384,7 @@ sub button_release_cb {
 		if ($tag->{url}) {
 			::main::openurl($tag->{url});
 			last;
-		} else {
+		} elsif ($tag->{field}) {
 			my $field= $tag->{field} eq 'year' ? 'year' : '+'.$tag->{field}; # prepend + for multi-value fields : Genre, Mood, Style, Theme
 			my $aID = Songs::Get_gid(::GetSelID($self),'album');
 			Songs::Set(Songs::MakeFilterFromGID('album', $aID)->filter(), [$field => $tag->{val}]);
@@ -524,7 +524,7 @@ sub print_results {
 	my $store= $self->{treeview}->get_model;
 	$store->set_sort_column_id(5, 'ascending');
 	for (@$result) {
-		$store->set($store->append, 0,$_->{album}, 1,$_->{artist}, 2,$_->{genre}, 3,$_->{year}, 4,$_->{url}, 5,$_->{order});
+		$store->set($store->append, 0,$_->{album}, 1,$_->{artist}, 2,$_->{genres}, 3,$_->{year}, 4,$_->{url}, 5,$_->{order});
 	}
 }
 
@@ -603,7 +603,7 @@ sub update_titlebox {
 sub load_search_results {
 	my ($self,$ID,$md,$cb,$html,$type) = @_; # $md = 1 if mass_download, 0 otherwise. $cb = callback function if mass_download, undef otherwise.
 	delete $self->{waiting};
-	my $result = parse_amg_search_results($html, $type); # $result[$i] = {url, album, artist, genre, year}
+	my $result = parse_amg_search_results($html, $type); # $result[$i] = {url, album, artist, genres, year}
 	my ($artist,$year) = ::Songs::Get($ID, qw/artist year/);
 	my $url;
 	for my $entry (@$result) {
@@ -641,16 +641,20 @@ sub parse_amg_search_results {
 	my ($html,$type) = @_;
 	$html = decode($html, $type);
 	$html =~ s/\n/ /g;
-	# Parsing the html yields @res = (url1, album1, artist1, label1, year1, url2, album2, ...)
-	#my @res = $html =~ m|<a href="(http://www\.allmusic\.com/album.*?)">(.*?)</a></td>\s.*?<td>(.*?)</td>\s.*?<td>(.*?)</td>\s.*?<td>(.*?)</td>|g;
-	my @res = $html =~ m|<a href="(http://www\.allmusic\.com/album.*?)" data-tooltip=".*?">(.*?)</a>.*?class="artist">.*?<a href=".*?">(.*?)</a>.*?"info">\s*?(\S*?)\s*?<br/>\s*?(\S.*?)\s*?</div>|g;
-	#my @fields = qw/url album artist label year/;
-	my @fields = qw/url album artist year genre/;
-	my @result;
+	# Parsing the html yields (url, album, artist, year, genres) for each album
+
 	my $i = 0; # Used to sort the hits in manual search
-	while (@res)
-	{	my %hash= (order=>$i++);
-		@hash{@fields}= splice @res, 0, 5;
+	my @result;
+	for my $info (split /<div class="info"/,$html) {
+		my ($url,$album)= $info=~m#<div class="title".*<a href="(http://www\.allmusic\.com/album/[^"]+)"[^>]*>([^<]+)#i;
+		next unless defined $url;
+		my %hash=( order=>$i++, album=>$album, url=>$url);
+		for my $field (qw/artist year genres/) {
+			my ($value)= $info=~m#<div class="$field"[^>]*>\s*(.*?)\s*</div>#i;
+			next unless defined $value;
+			$value=~s#<[^>]*>\s*##g;
+			$hash{$field}=$value;
+		}
 		push @result, \%hash; # create an array of hash refs
 	}
 	return \@result;
@@ -658,35 +662,49 @@ sub parse_amg_search_results {
 
 sub parse_amg_album_page {
 	my ($url,$html,$type) = @_;
-	$html = decode($html, $type);
-	$html =~ s|\n| |g;
-	my $result = {};
-	$result->{url} = $url;
-	$result->{author} = $1 if $html =~ m|class="author">by (.*?)</span>|;
-	$result->{review} = $1 if $html =~ m|<div class="editorial-text.*?>\s*<p>(.*?)</div>\s*</div>\s*</div>|;
-	if ($result->{review}) {
-		$result->{review} =~ s|<br\s.*?/>|\n|gi;      # Replace newline tags by newlines.
-		$result->{review} =~ s|<p>(.*?)</p>|$1\n\n|gi;     # Replace paragraph tags by newlines.
-		$result->{review} =~ s|\n{3,}|\n\n|gi;	      # Never more than one empty line.
-		$result->{review} =~ s|<div.*?>||g;
-		$result->{review} =~ s|</div>||g;
-$result->{review} =~ s|<.*?>(.*?)</.*?>|$1|g; # Remove the rest of the html tags.
+	$html =~ s|\n||g;
+	my %result;
+	$result{url} = $url;
+	$result{author} = $1 if $html =~ m|class="review-author headline">[^<]*by <span itemprop="author">(.*?)</span>|i;
+	if ($html =~ m|<div class="text" itemprop="reviewBody">(.*?)</div>|i){
+		$result{review} = $1;
+		for ($result{review}) {
+			s/^(?:<p>|\s+)*//i;	# remove leading spaces/newlines
+			s|<br\s.*?/>|\n|gi;	# Replace newline tags by newlines.
+			s|</?p>|\n|gi;		# Replace paragraph tags by newlines.
+			s|\n\n+|\n|gi;		# Never more than one empty line.
+			s|<.*?>(.*?)</.*?>|$1|g; # Remove the rest of the html tags.
+		}
 	}
-	$result->{rls_date}	= $1 if $html =~ m|class="release-date">(.*?)</|;
-	$result->{rec_date}	= $1 if $html =~ m|class="record-date">(.*?)</|;
-	$result->{time}		= $1 if $html =~ m|class="duration">\s*?(.*?)\s|;
-	$result->{amgid}	= $1 if $html =~ m|AMG Pop ID.*?R\s*(.*?)</p>|;
-	$result->{rating}	= 20*$1 if $html =~ m|data-stars="(.*?)"|;
-	my ($genrehtml)		= $html =~ m|class="genres".*?<ul>(.*?)</ul>|;
-	(@{$result->{genre}})	= $genrehtml =~ m|<li><a.*?>(.*?)</a></li>|g if $genrehtml;
-	my ($stylehtml)		= $html =~ m|class="styles".*?<ul>(.*?)</ul>|;
-	(@{$result->{style}})	= $stylehtml =~ m|<li><a.*?>(.*?)</a></li>|g if $stylehtml;
-	my ($moodshtml)		= $html =~ m|class="sidebar-module moods">.*?<ul>(.*?)</ul>|;
-	(@{$result->{mood}})	= $moodshtml =~ m|<li><a.*?>(.*?)</a></li>|g if $moodshtml;
-	my ($themeshtml)	= $html =~ m|class="sidebar-module themes".*?<ul.*?>(.*?)</ul>|;
-	(@{$result->{theme}})	= $themeshtml =~ m|<li><a.*?>(.*?)</a></li>|g if $themeshtml;
-	if ($::Options{OPT.'StyleAsGenre'} && $result->{style}) {@{$result->{genre}} = ::uniq(@{$result->{style}}, @{$result->{genre}})}
-	return $result;
+	$result{rls_date}	= $1 if $html =~ m|class="release-date">\s*<h\d>Release Date</h\d>\s*<span>([^<]+)</span>|i;
+	$result{rec_date}	= $1 if $html =~ m|class="recording-date">\s*<h\d>Recording Date</h\d>\s*<span>([^<]+)</span>|i;
+	$result{time}		= $1 if $html =~ m|class="duration">\s*<h\d>Duration</h\d>\s*<span>([^<]+)</span>|i;
+	$result{amgid}		= $1 if $html =~ m|AMG Pop ID.*?R\s*(\d+)\s*</span>|i;
+	$result{rating}		= 10*$1 if $html =~ m|<div class="allmusic-rating rating-allmusic-7" itemprop="ratingValue">\s*(\d+)\s*</div>|i;
+	my ($genrehtml)		= $html =~ m|class="genres?">\s*<h\d>Genres?</h\d>\s*<div>(.*?)</div>|i;
+	(@{$result{genre}})	= $genrehtml =~ m|<a href="[^"]+">([^<]+)</a>|ig if $genrehtml;
+	my ($stylehtml)		= $html =~ m|class="styles">\s*<h\d>Styles</h\d>\s*<div>(.*?)</div>|i;
+	(@{$result{style}})	= $stylehtml =~ m|<a href="[^"]+">([^<]+)</a>|ig if $stylehtml;
+	my ($moodshtml)		= $html =~ m|class="moods">\s*<h\d>Album Moods</h\d>\s*<div>(.*?)</div>|i;
+	(@{$result{mood}})	= $moodshtml =~ m|<a href="[^"]+">([^<]+)</a>|ig if $moodshtml;
+	my ($themeshtml)	= $html =~ m|class="themes">\s*<h\d>Themes</h\d>\s*<div>(.*?)</div>|i;
+	(@{$result{theme}})	= $themeshtml =~ m|<a href="[^"]+">([^<]+)</a>|ig if $themeshtml;
+
+	#convert values from html
+	for my $value (values %result){
+		if (ref $value) { @$value= map decode($_,$type), @$value; }
+		else { $value=decode($value,$type); }
+	}
+	#DEBUG : print values
+	#for (sort keys %result){
+	#	next if $_ eq 'review';
+	#	my $v=$result{$_};
+	#	if (ref $v) {warn "$_ : ".join(" -- ",@$v)."\n"}
+	#	else {warn "$_ : $v\n"}
+	#}
+
+	if ($::Options{OPT.'StyleAsGenre'} && $result{style}) {@{$result{genre}} = ::uniq(@{$result{style}}, @{$result{genre}})}
+	return \%result;
 }
 
 # Get right encoding of html and decode it
