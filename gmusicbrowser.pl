@@ -1789,8 +1789,8 @@ sub FirstTime
 		_"50 Most Played"	=> 'playcount:h:50',
 		_"50 Last Played"	=> 'lastplay:h:50',
 		_"50 Last Added"	=> 'added:h:50',
-		_"Played Today"		=> 'lastplay:>ago:1d',
-		_"Added Today"		=> 'added:>ago:1d',
+		_"Played Today"		=> 'lastplay:<ago:1d',
+		_"Added Today"		=> 'added:<ago:1d',
 		_"played>4"		=> 'playcount:>:4',
 		_"not bootleg"		=> 'label:-~:bootleg',
 	};
