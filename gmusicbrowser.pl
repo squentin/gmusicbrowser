@@ -6169,7 +6169,7 @@ sub pref_artists_button_cb
 		'reverse'=>1,
 		args => {button=>$button},
 	);
-	PopupMenu(event=>$event);
+	PopupMenu($menu,event=>$event);
 	1;
 }
 
