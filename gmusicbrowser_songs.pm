@@ -2338,7 +2338,7 @@ sub ChooseIcon	 #FIXME add a way to create a colored square/circle/... icon
 	}
 	else
 	{	$destfile.='.png';
-		my $pixbuf= GMB::Picture::load($file,48);
+		my $pixbuf= GMB::Picture::load($file,-48); # -48 means it will be resized to 48x48 if wifth or height bigger than 48
 		return unless $pixbuf;
 		$pixbuf->save($destfile,'png');
 	}
