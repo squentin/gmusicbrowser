@@ -7701,6 +7701,7 @@ our %vars2=
 	'length' => ['do {my (undef,$v)=Songs::ListLength($arg->{groupsongs}); sprintf "%d:%02d",$v/60,$v%60;}', 'length'],
 	nbsongs	=> ['scalar @{$arg->{groupsongs}}'],
 	disc	=> ['groupdisc($arg->{groupsongs})',	'disc'],
+	discname=> ['groupdiscname($arg->{groupsongs})','discname'],
  }
 );
 
@@ -8008,6 +8009,20 @@ sub groupdisc
 	delete $h->{''};
 	if ((keys %$h)==1 && (values %$h)[0]==@$songs) {return (keys %$h)[0]}
 	else {return ''}
+}
+sub groupdiscname
+{	my $songs=$_[0];
+	if (Songs::FieldEnabled('discname'))
+	{	my $h=Songs::BuildHash('discname',$songs);
+		if ((keys %$h)==1 && (values %$h)[0]==@$songs)
+		{	my $name= Songs::Gid_to_Display('discname',(keys %$h)[0]);
+			return $name if length $name;
+		}
+		else { return '' } #no common discname
+	}
+	# if discname field not enabled or no discname, try to make a discname using the disc number
+	my $d=groupdisc($songs);
+	return $d ? ::__x(_"disc {disc}",disc =>$d) : '';
 }
 sub error
 {	warn "unknown function : '$_[0]'\n";
