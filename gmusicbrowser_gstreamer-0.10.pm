@@ -107,7 +107,7 @@ sub createPlayBin
 	SetVolume(undef,''); #initialize volume
 	my $bus=$PlayBin->get_bus;
 	$bus->add_signal_watch;
-	$PlayBin->signal_connect("notify::volume" => sub { Glib::Idle->add(\&VolumeChanged) unless $VolumeHasChanged++; }) if $Glib::VERSION >= 1.251; #not stable with older version of perl-glib due to bug #620099 (https://bugzilla.gnome.org/show_bug.cgi?id=620099)
+	$PlayBin->signal_connect("notify::volume" => sub { Glib::Idle->add(\&VolumeChanged) unless $VolumeHasChanged++; },100000) if $Glib::VERSION >= 1.251 && $::Options{gst_monitor_pa_volume}; #not stable with older version of perl-glib due to bug #620099 (https://bugzilla.gnome.org/show_bug.cgi?id=620099), and still not quite stable
 #	$bus->signal_connect('message' => \&bus_message);
 	$bus->signal_connect('message::eos' => \&bus_message_end);
 	$bus->signal_connect('message::error' => \&bus_message_end,1);
@@ -139,8 +139,9 @@ sub bus_message_end
 }
 
 # when a song starts playing, notify::volume callbacks are called, which causes glib to hang (see https://bugzilla.gnome.org/show_bug.cgi?id=620099#c11) if a skip is done at the same moment
-# using freeze_notify until the skip is done seems to avoid the problem
-# setting state to paused until the skip is done also seems to avoid the problem
+# using freeze_notify until the skip is done mostly avoid the problem
+# setting state to paused until the skip is done also mostly avoid the problem
+# but the hang still happens in some cases, in particular when using the scroll wheel to change the position in the song, and also very rarely when starting a song
 my $StateChanged;
 sub bus_message_state_changed	# used to wait for the right state to do the skip
 {	return unless $Skip;
@@ -503,6 +504,11 @@ sub AdvancedOptions
 	my $gapless= ::NewPrefCheckButton(gst_gapless => _"enable gapless (experimental)", cb=> $modif_cb);
 	$gapless->set_sensitive(0) unless $playbin2_ok;
 	$vbox->pack_start($gapless,::FALSE,::FALSE,2);
+
+	my $monitor_volume= ::NewPrefCheckButton(gst_monitor_pa_volume => _("Monitor the pulseaudio volume").' '._("(unstable)"), cb=> $modif_cb, tip=>_"Makes gmusicbrowser monitor its pulseaudio volume, so that external changes to its volume are known.");
+	$monitor_volume->set_sensitive(0) unless $Glib::VERSION >= 1.251;
+	$vbox->pack_start($monitor_volume,::FALSE,::FALSE,2);
+
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $custom= ::NewPrefEntry(gst_custom => _"Custom pipeline", cb=>$modif_cb, sizeg1 => $sg1, expand => 1, tip => _"Insert this pipeline before the audio sink", history => 'gst_custom_history');
 	$vbox->pack_start($custom,::FALSE,::FALSE,2);
