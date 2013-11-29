@@ -49,7 +49,7 @@ sub new
 	$self->ParseAtomTree;
 	$self->_close;
 
-	unless ($self->{info} && $self->{ilst})
+	unless ($self->{info})
 	{	warn "error, can't read file or not a valid m4a file\n";
 		return undef;
 	}
