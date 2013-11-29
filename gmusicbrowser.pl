@@ -150,7 +150,7 @@ BEGIN
 }
 
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
-INIT {%Alias_ext=(ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
+INIT {%Alias_ext=(ogg=> 'oga', m4b=>'m4a', mp4=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
 
 our $debug;
 our %CmdLine;
@@ -4473,7 +4473,7 @@ sub ChoosePix
 					'gtk-cancel' => 'none');
 
 	for my $aref
-	(	[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b *.ogg *.oga' ],
+	(	[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b *.mp4 *.ogg *.oga' ],
 		[_"Pictures files",'image/*'],
 		[_"All files",undef,'*'],
 	)
@@ -4525,7 +4525,7 @@ sub ChoosePix
 		  $max=0;
 		  $nb=0 unless $lastfile && $lastfile eq $file;
 		  $lastfile=$file;
-		  if ($file=~m/\.(?:mp3|flac|m4a|m4b|oga|ogg)$/i)
+		  if ($file=~m/\.(?:mp3|flac|m4a|m4b|mp4|oga|ogg)$/i)
 		  {	my @pix= FileTag::PixFromMusicFile($file);
 			$max=@pix;
 		  }
@@ -5429,7 +5429,7 @@ sub MakeScanRegex	#FIXME
 		$ext{$_}=1 for grep $ext{$Alias_ext{$_}}, keys %Alias_ext;
 		$s=join '|',keys %ext;
 	}
-	else { $s='mp3|ogg|oga|flac|mpc|ape|wv|m4a|m4b'; } #FIXME find a better way
+	else { $s='mp3|ogg|oga|flac|mpc|ape|wv|m4a|m4b|mp4'; } #FIXME find a better way
 	$ScanRegex=qr/\.(?:$s)$/i;
 }
 
@@ -5576,7 +5576,7 @@ sub AutoSelPicture
 	{	my $file= AAPicture::GetPicture($field,$gid);
 		if (defined $file)
 		{	return unless $file; # file eq '0' => no picture
-			if ($file=~m/\.(?:mp3|flac|m4a|m4b|oga|ogg)(?::(\w+))?$/) { return if FileTag::PixFromMusicFile($file,$1,1); }
+			if ($file=~m/\.(?:mp3|flac|m4a|m4b|mp4|oga|ogg)(?::(\w+))?$/) { return if FileTag::PixFromMusicFile($file,$1,1); }
 			else { return if -e $file }
 		}
 	}
@@ -5588,7 +5588,7 @@ sub AutoSelPicture
 	my %pictures_files;
 	for my $m (qw/embedded guess/)
 	{	if ($m eq 'embedded')
-		{	my @files= grep m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i, Songs::Map('fullfilename',$IDs);
+		{	my @files= grep m/\.(?:mp3|flac|m4a|m4b|mp4|ogg|oga)$/i, Songs::Map('fullfilename',$IDs);
 			if (@files)
 			{	$set= first { FileTag::PixFromMusicFile($_,$field,1) && $_ } @files;
 			}
@@ -8935,7 +8935,7 @@ sub load
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;
 	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
-	if ($file=~m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i)
+	if ($file=~m/\.(?:mp3|flac|m4a|m4b|mp4|ogg|oga)$/i)
 	{	my $data=FileTag::PixFromMusicFile($file,$nb);
 		eval { $loader->write($data) } if defined $data;
 	}
