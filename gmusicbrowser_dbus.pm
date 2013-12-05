@@ -41,8 +41,8 @@ sub CurrentSong
 {	my $self=$_[0];
 	return {} unless defined $::SongID;
 	my %h;
-	$h{$_}=Songs::Get($::SongID,$_) for qw/title album artist length track disc album_artist file path uri album_picture/;
-	#warn "$h{title}\n";
+	$h{$_}=Songs::Get($::SongID,$_) for Songs::PropertyFields(), qw/uri album_picture/;
+	#warn "$_:$h{$_}\n" for sort keys %h;
 	return \%h;
 }
 dbus_method('CurrentSongFields', [['array', 'string']], [['array', 'string']]);
