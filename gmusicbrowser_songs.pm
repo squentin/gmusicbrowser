@@ -1898,42 +1898,67 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 	}
 	my ($changed,$towrite)= $SETsub->($IDs,\%values);
 	Changed($IDs,$changed) if %$changed;
+	Write($IDs,towrite=>$towrite,%opt);
+}
 
-	if (@$towrite)
-	{	my $i=0; my $abort;
-		my $pid= ::Progress( undef, end=>scalar(@$IDs), abortcb=>sub {$abort=1}, widget =>$opt{progress}, title=>_"Writing tags");
-		my $errorsub=sub
-		 {	my $err= shift;
-			$err= $opt{error_prefix}. $err if $opt{error_prefix};
-			my $abortmsg=$opt{abortmsg};
-			$abortmsg||=_"Abort mass-tagging" if (@$IDs-$i)>1;
-			my $ret=::Retry_Dialog($err,$opt{window},$abortmsg);
-			if ($ret eq 'abort')
-			{	$opt{abortcb}() if $opt{abortcb};
-				$abort=1;
-			}
-			return $ret;
-		 };
+sub UpdateTags
+{	my ($IDs,$fields,%opt)=@_;
+	Write($IDs,update=>$fields,%opt);
+}
 
-		Glib::Idle->add(sub
-		 {	if ($towrite->[$i])
-			{	FileTag::Write($IDs->[$i], $towrite->[$i], $errorsub);
-				warn "ID=$IDs->[$i] towrite : ".join(' ',@{$towrite->[$i]})."\n" if $::debug;
-				::IdleCheck($IDs->[$i]);
-			}
-			$i++;
-			if ($abort || $i>=@$IDs)
-			{	::Progress($pid, abort=>1);
-				$opt{callback_finish}() if $opt{callback_finish};
-				return 0;
-			}
-			::Progress( $pid, current=>$i );
-			return 1;
-		 });
-	}
-	else
+sub Write
+{	my ($IDs,%opt)=@_; #%opt must have either update OR towrite
+	my $update=$opt{update};   # [list_of_fields_to_update]
+	my $towrite=$opt{towrite}; # [[modifs_for_first_ID],[...],...]
+
+	if (!@$IDs || ($towrite && !@$towrite)) #nothing to do
 	{	$opt{callback_finish}() if $opt{callback_finish};
+		return
 	}
+
+	my $i=0; my $abort;
+	my $pid= ::Progress( undef, end=>scalar(@$IDs), abortcb=>sub {$abort=1}, widget =>$opt{progress}, title=>_"Writing tags");
+	my $errorsub=sub
+	 {	my $err= shift;
+		$err= $opt{error_prefix}. $err if $opt{error_prefix};
+		my $abortmsg=$opt{abortmsg};
+		$abortmsg||=_"Abort mass-tagging" if (@$IDs-$i)>1;
+		my $res=::Retry_Dialog($err,$opt{window},$abortmsg);
+		if ($res eq 'abort')
+		{	$opt{abortcb}() if $opt{abortcb};
+			$abort=1;
+		}
+		return $res;
+	 };
+
+	Glib::Idle->add(sub
+	 {	my $ID= $IDs->[$i];
+		if (defined $ID)
+		{ 	my $modif;
+			if ($update)
+			{	for my $field (@$update)
+				{	my $v= $Def{$field}{flags}=~m/l/ ? [Get_list($ID,$field)] : Get($ID,$field);
+					push @$modif, $field,$v;
+				}
+			}
+			elsif ($towrite)
+			{	$modif=$towrite->[$i];
+			}
+			if ($modif)
+			{	FileTag::Write($ID, $modif, $errorsub);
+				warn "ID=$ID towrite : ".join(' ',@$modif)."\n" if $::debug;
+				::IdleCheck($ID) unless $update; # not done in update mode
+			}
+		}
+		$i++;
+		if ($abort || $i>=@$IDs)
+		{	::Progress($pid, abort=>1);
+			$opt{callback_finish}() if $opt{callback_finish};
+			return 0;
+		}
+		::Progress( $pid, current=>$i );
+		return 1;
+	 });
 }
 
 sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
@@ -1952,50 +1977,6 @@ sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
 	}
 	AA::Fields_Changed($changed);
 	::SongsChanged($IDs,[keys %$changed]);
-}
-
-sub UpdateTags
-{	my ($IDs,$fields,%opt)=@_;
-	if (@$IDs)
-	{	my $i=0; my $abort;
-		my $pid= ::Progress( undef, end=>scalar(@$IDs), abortcb=>sub {$abort=1}, widget =>$opt{progress}, title=>_"Writing tags");
-		my $errorsub=sub
-		 {	my $err= shift;
-			$err= $opt{error_prefix}. $err if $opt{error_prefix};
-			my $abortmsg=$opt{abortmsg};
-			$abortmsg||=_"Abort mass-tagging" if (@$IDs-$i)>1;
-			my $ret=::Retry_Dialog($err,$opt{window},$abortmsg);
-			if ($ret eq 'abort')
-			{	$opt{abortcb}() if $opt{abortcb};
-				$abort=1;
-			}
-			return $ret;
-		 };
-
-		Glib::Idle->add(sub
-		 {	my $ID= $IDs->[$i];
-			if (defined $ID)
-			{	my @modif;
-				for my $f (@$fields)
-				{	my $v= $Def{$f}{flags}=~m/l/ ? [Get_list($ID,$f)] : Get($ID,$f);
-					push @modif, $f,$v;
-				}
-				FileTag::Write($ID, \@modif, $errorsub);
-				#::IdleCheck($ID);
-			}
-			$i++;
-			if ($abort || $i>=@$IDs)
-			{	::Progress($pid, abort=>1);
-				$opt{callback_finish}() if $opt{callback_finish};
-				return 0;
-			}
-			::Progress( $pid, current=>$i );
-			return 1;
-		 });
-	}
-	else
-	{	$opt{callback_finish}() if $opt{callback_finish};
-	}
 }
 
 sub AddMissing	#FIXME if song in EstimatedLength, set length to 0
