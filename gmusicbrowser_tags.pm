@@ -1502,12 +1502,11 @@ sub advanced
 sub save
 {	my $self=shift;
 	my $ID=$self->{ID};
-	my $errorsub=sub {::Retry_Dialog($_[0],$self->{window});};
 	my @modif;
 	while (my ($field,$entry)=each %{$self->{fields}})
 	{	push @modif,$field,$entry->get_text;
 	}
-	Songs::Set($ID,\@modif,error=>$errorsub) if @modif;
+	Songs::Set($ID,\@modif,window=>$self->{window}) if @modif;
 }
 
 

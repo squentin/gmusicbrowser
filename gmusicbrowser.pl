@@ -1505,13 +1505,13 @@ sub HVpack
 {	my ($vertical,@list)=@_;
 	my $pad=2;
 	my $end=FALSE;
-	my $hbox= $vertical ? Gtk2::VBox->new : Gtk2::HBox->new;
+	my $box= $vertical ? Gtk2::VBox->new : Gtk2::HBox->new;
 	while (@list)
 	{	my $w=shift @list;
 		next unless defined $w;
 		my $exp=FALSE;
 		unless (ref $w)
-		{	if ($w eq 'compact') { $pad=0; $hbox->set_spacing(0); next }
+		{	if ($w eq 'compact') { $pad=0; $box->set_spacing(0); next }
 			$exp=$w=~m/_/;
 			$end=1 if $w=~m/-/;
 			$pad=$1 if $w=~m/(\d+)/;
@@ -1521,10 +1521,10 @@ sub HVpack
 		if (ref $w eq 'ARRAY')
 		{	$w=HVpack(!$vertical,@$w);
 		}
-		if ($end)	{$hbox->pack_end  ($w,$exp,$exp,$pad);}
-		else		{$hbox->pack_start($w,$exp,$exp,$pad);}
+		if ($end)	{$box->pack_end  ($w,$exp,$exp,$pad);}
+		else		{$box->pack_start($w,$exp,$exp,$pad);}
 	}
-	return $hbox;
+	return $box;
 }
 
 sub Hpack { HVpack(0,@_); }
@@ -5245,11 +5245,7 @@ sub DialogSongProp
 	{	warn "EditTag response : @_\n" if $debug;
 		my ($dialog,$response)=@_;
 		if ($response eq '1') { $edittag->advanced; return; }
-		$songinfo->destroy;
-		if ($response eq 'ok')
-		{	$edittag->save;
-			IdleCheck($ID);
-		}
+		$edittag->save if $response eq 'ok';
 		delete $Editing{$ID};
 		$dialog->destroy;
 	});
