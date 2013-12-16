@@ -131,7 +131,10 @@ sub checkvalidpath
 sub Copy
 {	my $IDs=$_[0]{IDs} || $_[0]{filter}->filter;
 	my $path= ::decode_url( $::Options{OPT.'path'} );
-	::CopyMoveFiles($IDs,::TRUE, $path, $::Options{OPT.'folderformat'},$::Options{OPT.'filenameformat'});
+	::CopyMoveFiles($IDs,copy=>1, basedir=>$path,
+		dirformat	=> $::Options{OPT.'folderformat'},
+		filenameformat	=> $::Options{OPT.'filenameformat'},
+	);
 }
 
 sub ToM3U

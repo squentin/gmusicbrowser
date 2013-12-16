@@ -4322,12 +4322,13 @@ sub CopyMoveFilesDialog
 	my $msg=$copy	?	_"Choose directory to copy files to"
 			:	_"Choose directory to move files to";
 	my $newdir=ChooseDir($msg, Songs::Get($IDs->[0],'path').SLASH);
-	CopyMoveFiles($IDs,$copy,$newdir) if defined $newdir;
+	CopyMoveFiles($IDs,copy=>$copy,basedir=>$newdir) if defined $newdir;
 }
 
 #$fnformat=$1 if $dirformat=~s/$QSLASH([^$QSLASH]*%\w[^$QSLASH]*)//o;
 sub CopyMoveFiles
-{	my ($IDs,$copy,$basedir,$dirformat,$fnformat)=@_;
+{	my ($IDs,%options)=@_;
+	my ($copy,$basedir,$dirformat,$fnformat,$parentwindow)= @options{qw/copy basedir dirformat filenameformat parentwindow/};
 	return if !$copy && $CmdLine{ro};
 	my ($sub,$errormsg,$abortmsg)=  $copy	?	(\&copy,_"Copy failed",_"abort copy")
 						:	(\&move,_"Move failed",_"abort move") ;
@@ -4335,19 +4336,17 @@ sub CopyMoveFiles
 	my $action=($copy) ?	__("Copying file","Copying %d files",scalar@$IDs) :
 				__("Moving file", "Moving %d files", scalar@$IDs) ;
 
-	my $win=Gtk2::Window->new('toplevel');
-	$win->set_border_width(3);
+	my $dialog = Gtk2::Dialog->new( $action, $parentwindow, [],
+			'gtk-cancel' => 'none',
+			);
 	my $label=Gtk2::Label->new($action);
 	my $progressbar=Gtk2::ProgressBar->new;
-	my $Bcancel=Gtk2::Button->new_from_stock('gtk-cancel');
 	my $cancel;
 	my $cancelsub=sub {$cancel=1};
-	$win->signal_connect( destroy => $cancelsub);
-	$Bcancel->signal_connect( clicked => $cancelsub);
+	$dialog->signal_connect( response => $cancelsub);
 	my $vbox=Gtk2::VBox->new(FALSE, 2);
-	$vbox->pack_start($_, FALSE, TRUE, 3) for $label,$progressbar,$Bcancel;
-	$win->add($vbox);
-	$win->show_all;
+	$dialog->vbox->pack_start($_, FALSE, TRUE, 3) for $label,$progressbar;
+	$dialog->show_all;
 	my $done=0;
 
 	my $owrite_all;
@@ -4365,7 +4364,7 @@ COPYNEXTID:for my $ID (@$IDs)
 		$dirformat='' unless defined $dirformat;
 		if ($basedir || $dirformat ne '')
 		{	$newdir=pathfromformat($ID,$dirformat,$basedir);
-			my $res=CreateDir($newdir,$win, $abortmsg );
+			my $res=CreateDir($newdir,$dialog, $abortmsg );
 			last if $res eq 'abort';
 			next if $res eq 'no';
 		}
@@ -4378,12 +4377,12 @@ COPYNEXTID:for my $ID (@$IDs)
 		#warn "from $old\n to $new\n";
 		if (-f $new) #if file already exists
 		{	my $ow=$owrite_all;
-			$ow||=OverwriteDialog($win,$new,$abortmsg);
+			$ow||=OverwriteDialog($dialog,$new,$abortmsg);
 			$owrite_all=$ow if $ow=~m/all$/;
 			next if $ow=~m/^no/;
 		}
 		until ($sub->($old,$new))
-		{	my $res=Retry_Dialog("$errormsg :\n'$old'\n -> '$new'\n$!",$win,$abortmsg);
+		{	my $res=Retry_Dialog("$errormsg :\n'$old'\n -> '$new'\n$!",$dialog,$abortmsg);
 			last COPYNEXTID if $res eq 'abort';
 			next COPYNEXTID if $res ne 'yes';
 		}
@@ -4395,7 +4394,7 @@ COPYNEXTID:for my $ID (@$IDs)
 			Songs::Set($ID, @modif);
 		}
 	}
-	$win->destroy;
+	$dialog->destroy;
 }
 
 sub ChooseDir
@@ -4944,11 +4943,11 @@ sub DialogMassRename
 			unless ( -w $base ) { ErrorMessage(__x(_("Can't write in base folder '{folder}'."), folder => filename_to_utf8displayname($base0)),$dialog); return }
 			$dialog->set_sensitive(FALSE);
 			my $folderformat=$comboFolder->get_active_text;
-			CopyMoveFiles(\@IDs,FALSE,$base0,$folderformat,$format);
+			CopyMoveFiles(\@IDs,copy=>FALSE,basedir=>$base0,dirformat=>$folderformat,filenameformat=>$format,parentwindow=>$dialog);
 		  }
 		  elsif ($format)
 		  {	$dialog->set_sensitive(FALSE);
-			CopyMoveFiles(\@IDs,FALSE,undef,undef,$format);
+			CopyMoveFiles(\@IDs,copy=>FALSE,filenameformat=>$format,parentwindow=>$dialog);
 		  }
 		}
 		$dialog->destroy;
