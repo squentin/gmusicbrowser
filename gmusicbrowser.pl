@@ -589,6 +589,22 @@ sub Gtk2::Label::set_markup_with_format
 {	my $label=shift;
 	$label->set_markup( MarkupFormat(@_) );
 }
+sub Gtk2::Dialog::add_button_custom
+{	my ($dialog,$text,$response_id,%args)=@_;
+	my ($icon,$tip,$secondary)=@args{qw/icon tip secondary/};
+	my $button= Gtk2::Button->new;
+	$button->set_image( Gtk2::Image->new_from_stock($icon,'menu') ) if $icon;
+	$button->set_label($text);
+	$button->set_use_underline(1);
+	$button->set_tooltip_text($tip) if defined $tip;
+	$dialog->add_action_widget($button,$response_id);
+	if ($secondary)
+	{	my $bb=$button->parent;
+		if ($bb && $bb->isa('Gtk2::ButtonBox')) { $bb->set_child_secondary($button,1); }
+	}
+	return $button;
+}
+
 sub Gtk2::Window::force_present #force bringing the window to the current workspace, $win->present does not always do that
 {	my $win=shift;
 	unless ($win->window && ($win->window->get_state >= 'sticky')) { $win->stick; $win->unstick; }
@@ -5209,12 +5225,8 @@ sub DialogSongProp
 {	my $ID=$_[0];
 	if (exists $Editing{$ID}) { $Editing{$ID}->force_present; return; }
 	my $dialog = Gtk2::Dialog->new (_"Song Properties", undef, []);
-	my $advanced_button= NewIconButton('gtk-edit',_("Advanced").'...');
-	$advanced_button->set_tooltip_text(_"Advanced Tag Editing");
-	$dialog->add_action_widget($advanced_button,1);
+	my $advanced_button=$dialog->add_button_custom(_("Advanced").'...', 1, icon=>'gtk-edit', tip=>_"Advanced Tag Editing", secondary=>1);
 	$dialog->add_buttons('gtk-save','ok', 'gtk-cancel','none');
-	my $bb=$advanced_button->parent;
-	if ($bb && $bb->isa('Gtk2::ButtonBox')) { $bb->set_child_secondary($advanced_button,1); }
 
 	$dialog->set_default_response ('ok');
 	$Editing{$ID}=$dialog;
