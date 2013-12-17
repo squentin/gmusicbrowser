@@ -2344,6 +2344,9 @@ sub ColumnsKeys
 sub ColumnAlign
 {	Field_property($_[0],'rightalign') || 0;
 }
+sub PropertyFields
+{	grep $Def{$_}{flags}=~m/p/, @Fields;
+}
 sub InfoFields
 {	my %tree;
 	for my $f (grep $Def{$_}{flags}=~m/p/, @Fields)
