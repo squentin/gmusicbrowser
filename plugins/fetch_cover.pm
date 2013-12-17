@@ -476,8 +476,8 @@ sub set_cover
 			unlink $file unless $ok;
 		}
 		unless ($ok)
-		{	my $retry=::Retry_Dialog( ::__x( _"Error writing '{file}'", file => ::filename_to_utf8displayname($file) )." :\n$!." ,$self);
-			redo if $retry eq 'yes';
+		{	my $retry=::Retry_Dialog($!,_"Error saving picture", details=>::__x( _"Error writing '{file}'", file => ::filename_to_utf8displayname($file) ), window=>$self);
+			redo if $retry eq 'retry';
 			return;
 		}
 		close $fh;

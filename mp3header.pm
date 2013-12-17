@@ -341,7 +341,7 @@ sub _openw
 	until (open $fh,$m,$file)
 	{	my $err="Error opening '$file' for writing :\n$!";
 		warn $err."\n";
-		return undef unless $self->{errorsub} && $self->{errorsub}($err) eq 'yes';
+		return undef unless $self->{errorsub} && $self->{errorsub}($!,'openwrite',$file) eq 'retry';
 	}
 	binmode $fh;
 	$self->{fileHandle} = $fh unless $tmp;

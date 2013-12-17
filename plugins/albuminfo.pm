@@ -765,7 +765,7 @@ sub save_review {
 	my $format = $::Options{OPT.'PathFile'};
 	my ($path,$file) = ::pathfilefromformat( $ID, $format, undef, 1 );
 	unless ($path && $file) {::ErrorMessage(_("Error: invalid filename pattern")." : $format",$::MainWindow); return}
-	return unless ::CreateDir($path,$::MainWindow) eq 'ok';
+	return unless ::CreateDir($path,$::MainWindow,_"Error saving review") eq 'ok';
 	if ( open(my$fh, '>:utf8', $path.$file) ) {
 		print $fh $text;
 		close $fh;

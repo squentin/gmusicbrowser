@@ -4301,7 +4301,7 @@ sub set_biscrolling #makes the mouse wheel scroll vertically when the horizontal
 }
 
 sub CreateDir
-{	my ($path,$win,$abortmsg)=@_;
+{	my ($path,$win,$errormsg,$abortmsg,$many)=@_;
 	my $current='';
 	for my $dir (split /$QSLASH/o,$path)
 	{	$dir= CleanupFileName($dir);
@@ -4310,8 +4310,10 @@ sub CreateDir
 		next if -d $current;
 		until (mkdir $current)
 		{	#if (-f $current) { ErrorMessage("Can't create folder '$current' :\na file with that name exists"); return undef }
-			my $ret=Retry_Dialog( __x( _"Can't create Folder '{path}' : \n{error}", path => $current, error=> $!) ,$win,$abortmsg);
-			return $ret unless $ret eq 'yes';
+			my $details= __x( _"Can't create folder: {path}", path => filename_to_utf8displayname($current));
+			$errormsg||= _"Error creating folder";
+			my $ret= Retry_Dialog($!,$errormsg, details=>$details, window=>$win, abortmsg=>$abortmsg, many=>$many);
+			return $ret unless $ret eq 'retry';
 		}
 	}
 	return 'ok';
@@ -4330,9 +4332,8 @@ sub CopyMoveFiles
 {	my ($IDs,%options)=@_;
 	my ($copy,$basedir,$dirformat,$fnformat,$parentwindow)= @options{qw/copy basedir dirformat filenameformat parentwindow/};
 	return if !$copy && $CmdLine{ro};
-	my ($sub,$errormsg,$abortmsg)=  $copy	?	(\&copy,_"Copy failed",_"abort copy")
+	my ($sub,$errormsg0,$abortmsg)=  $copy	?	(\&copy,_"Copy failed",_"abort copy")
 						:	(\&move,_"Move failed",_"abort move") ;
-	$abortmsg=undef unless @$IDs>1;
 	my $action=($copy) ?	__("Copying file","Copying %d files",scalar@$IDs) :
 				__("Moving file", "Moving %d files", scalar@$IDs) ;
 
@@ -4349,14 +4350,15 @@ sub CopyMoveFiles
 	$dialog->show_all;
 	my $done=0;
 
-	my $owrite_all;
+	my ($owrite_all,$skip_all,$createdir_skip_all);
 COPYNEXTID:for my $ID (@$IDs)
 	{	last if $cancel;
 		$progressbar->set_fraction($done/@$IDs);
 		Gtk2->main_iteration while Gtk2->events_pending;
 		last if $cancel;
 		$done++;
-		$abortmsg=undef if $done==@$IDs;
+		my $errormsg= $errormsg0;
+		$errormsg.= " ($done/".@$IDs.')' if @$IDs>1;
 		my ($olddir,$oldfile)= Songs::Get($ID, qw/path file/);
 		my $old=$olddir.SLASH.$oldfile;
 		my $newfile=$oldfile;
@@ -4364,9 +4366,11 @@ COPYNEXTID:for my $ID (@$IDs)
 		$dirformat='' unless defined $dirformat;
 		if ($basedir || $dirformat ne '')
 		{	$newdir=pathfromformat($ID,$dirformat,$basedir);
-			my $res=CreateDir($newdir,$dialog, $abortmsg );
+			my $res= $createdir_skip_all;
+			$res ||= CreateDir($newdir, $dialog, $errormsg, $abortmsg,$done<@$IDs);
+			$createdir_skip_all=$res if $res eq 'skip_all';
 			last if $res eq 'abort';
-			next if $res eq 'no';
+			next unless $res eq 'ok';
 		}
 		if ($fnformat)
 		{	$newfile=filenamefromformat($ID,$fnformat,1);
@@ -4377,14 +4381,18 @@ COPYNEXTID:for my $ID (@$IDs)
 		#warn "from $old\n to $new\n";
 		if (-f $new) #if file already exists
 		{	my $ow=$owrite_all;
-			$ow||=OverwriteDialog($dialog,$new,$abortmsg);
+			$ow||=OverwriteDialog($dialog,$new,$done<@$IDs);
 			$owrite_all=$ow if $ow=~m/all$/;
 			next if $ow=~m/^no/;
 		}
 		until ($sub->($old,$new))
-		{	my $res=Retry_Dialog("$errormsg :\n'$old'\n -> '$new'\n$!",$dialog,$abortmsg);
+		{	my $res= $skip_all;
+			my $details= join "\n", __x(_"Source: {file}",file=> filename_to_utf8displayname($old)), __x(_"Destination: {file}",file=> filename_to_utf8displayname($new));
+			$res ||= Retry_Dialog($!,$errormsg, ID=>$ID, details=> $details, window=>$dialog, abortmsg=>$abortmsg, many=>$done<@$IDs);
+			if (-f $new && -f $old && ((-s $new) - (-s $old) <0)) { unlink $new } #delete partial copy
+			$skip_all=$res if $res eq 'skip_all';
 			last COPYNEXTID if $res eq 'abort';
-			next COPYNEXTID if $res ne 'yes';
+			next COPYNEXTID if $res ne 'retry';
 		}
 		unless ($copy)
 		{	$newdir=~s/$QSLASH+$//o;
@@ -4661,22 +4669,34 @@ sub OverwriteDialog
 	return $ret;
 }
 
-sub Retry_Dialog	#returns 'yes' 'no' or 'abort'
-{	my ($err,$window,$abortmsg)=@_;
-	my $dialog = Gtk2::MessageDialog->new
-	( $window,
-	  [qw/modal destroy-with-parent/],
-	  'error','cancel','%s', $err,
-	);
-	$dialog->add_button(_"_Retry", 2);
-	$dialog->add_button($abortmsg, 1) if $abortmsg;
+my $LastErrorShowDetails;
+sub Retry_Dialog	#returns one of 'retry abort skip skip_all'
+{	my ($syserr,$summary,%args)=@_;		#$summary should say what action lead to this error ie: "Error while writing tag"
+	my ($details,$window,$abortmsg,$many,$ID)=@args{qw/details window abortmsg many ID/};
+	my $dialog = Gtk2::MessageDialog->new($window, [qw/modal destroy-with-parent/], 'error','none','%s', $summary);
+	$dialog->format_secondary_text("%s",$syserr);
+	$dialog->set_title($summary);
+	$dialog->add_button_custom(_"_Retry",    1, icon=>'gtk-refresh');
+	$dialog->add_button_custom(_"_Cancel",   2, icon=>'gtk-cancel', tip=>$abortmsg);
+	$dialog->add_button_custom(_"_Skip",     3, icon=>'gtk-go-forward', tip=>_"Proceed to next item.") if $many;
+	$dialog->add_button_custom(_"Skip _All", 4, tip=>_"Skip this and any further errors.") if $many;
+	my $expander;
+	if ($details)
+	{	my $label= Gtk2::Label->new($details);
+		$label->set_line_wrap(1); #FIXME making the label resize with the dialog would be nice but complicated with gtk2
+		$label->set_selectable(1);
+		$label->set_padding(2,5);
+		$expander=Gtk2::Expander->new(_"Show more error details");
+		$expander->add($label);
+		$dialog->vbox->add($expander);
+		$expander->set_expanded( time-($LastErrorShowDetails||0) <6 );#set expanded if recently showed a error dialog that was left expanded
+	}
 	$dialog->show_all;
 	my $ret=$dialog->run;
+	$LastErrorShowDetails= ($expander->get_expanded ? time : undef) if $expander;
 	$dialog->destroy;
-	$ret=	($ret eq '2')		? 'yes':
-		($ret eq 'cancel')	? 'no' :
-		'abort';
-	return $ret;
+	$ret=0 if $ret!~m/^[1234]$/;
+	return (qw/abort retry abort skip skip_all/)[$ret];
 }
 
 sub ErrorMessage
@@ -4748,15 +4768,20 @@ sub DeleteFiles
 	$dialog->add_button("gtk-delete", 2);
 	$dialog->show_all;
 	if ('2' eq $dialog->run)
-	{ my $abortmsg;
-	  $abortmsg=_"Abort all" if @$IDs>1;
+	{ my $skip_all;
+	  my $done=0;
 	  for my $ID (@$IDs)
 	  {	my $f= Songs::GetFullFilename($ID);
 		unless (unlink $f)
-		{	my $res=::Retry_Dialog(__x(_("Failed to delete '{file}' :\n{error}"), file => $f, error => $!),undef,$abortmsg);
-			redo if $res eq 'yes';
+		{	my $res= $skip_all;
+			my $errormsg= _"Deletion failed";
+			$errormsg.= ' ('.($done+1).'/'.@$IDs.')' if @$IDs>1;
+			$res ||= ::Retry_Dialog($!,$errormsg, ID=>$ID, details=>__x(_("Failed to delete '{file}'"), file => filename_to_utf8displayname($f)), window=>$dialog, many=>(@$IDs-$done)>1);
+			$skip_all=$res if $res eq 'skip_all';
+			redo if $res eq 'retry';
 			last if $res eq 'abort';
 		}
+		$done++;
 		IdleCheck($ID);
 	  }
 	}
@@ -4955,19 +4980,19 @@ sub DialogMassRename
 }
 
 sub RenameFile
-{	my ($ID,$newutf8,$window,$abortmsg)=@_;
+{	my ($ID,$newutf8,$window)=@_;
 	my $new= CleanupFileName(filename_from_unicode($newutf8));
 	my ($dir,$old)= Songs::Get($ID,qw/path file/);
 	{	last if $new eq '';
 		last if $old eq $new;
 		if (-f $dir.SLASH.$new)
-		{	my $res=OverwriteDialog($window,$new); #FIXME support yesall noall ? but not needed because RenameFile is now only used for single file renaming
+		{	my $res=OverwriteDialog($window,$new);
 			return $res unless $res eq 'yes';
 			redo;
 		}
 		elsif (!rename $dir.SLASH.$old, $dir.SLASH.$new)
-		{	my $res=Retry_Dialog( __x( _"Renaming {oldname}\nto {newname}\nfailed : {error}", oldname => Songs::Display($ID,'file'), newname => $newutf8, error => $!),$window,$abortmsg);
-			return $res unless $res eq 'yes';
+		{	my $res= Retry_Dialog($!,_"Renaming failed", ID=>$ID,details=> __x( _"From: {oldname}\nTo: {newname}", oldname => Songs::Display($ID,'file'), newname => $newutf8), window=>$window);
+			return $res unless $res eq 'retry';
 			redo;
 		}
 	}

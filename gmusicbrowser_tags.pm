@@ -284,7 +284,19 @@ sub GetLyrics
 
 sub WriteLyrics
 {	my ($ID,$lyrics)=@_;
-	Write($ID, [embedded_lyrics=>$lyrics], \&::Retry_Dialog);
+	Write($ID, [embedded_lyrics=>$lyrics], sub
+	 {	my ($syserr,$details)= Error_Message(@_);
+		return ::Retry_Dialog($syserr, _"Error writing lyrics", details=>$details, ID=>$ID);
+	 });
+}
+
+#convert error details from tag writing to translated string with utf8 filenames
+sub Error_Message
+{	my ($syserr,$type,$file)=@_;
+	my $details= $type eq 'openwrite' ?
+		::__x(_"Error opening '{file}' for writing.",file=>::filename_to_utf8displayname($file)) :
+		'Unknown error'; #currently $type is always "openwrite"
+	return $syserr,$details;
 }
 
 package MassTag;
@@ -1571,7 +1583,10 @@ sub save
 	for my $box (@{ $self->{boxes} })
 	{  $modified=1 if $box->save;
 	}
-	$self->{filetag}{errorsub}=sub {::Retry_Dialog($_[0],$self->{window});};
+	$self->{filetag}{errorsub}= sub
+	 {	my ($syserr,$details)= FileTag::Error_Message(@_);
+		return ::Retry_Dialog($syserr,_"Error writing tag", details=>$details, window=>$self->{window});
+	 };
 	$self->{filetag}->write_file if $modified && !$::CmdLine{ro} && !$::CmdLine{rotags};
 }
 

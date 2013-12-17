@@ -754,7 +754,7 @@ sub Save_text
 	{	my $format=$::Options{OPT.'PathFile'};
 		my ($path,$file)=::pathfilefromformat( $self->{ID}, $format, undef,1 );
 		unless ($path && $file) {::ErrorMessage(_("Error: invalid filename pattern")." : $format",$win); return}
-		my $res=::CreateDir($path,$win);
+		my $res=::CreateDir($path,$win,_"Error saving lyrics");
 		return unless $res eq 'ok';
 		if (open my$fh,'>:utf8',$path.::SLASH.$file)
 		{	print $fh $text;

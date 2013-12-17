@@ -702,7 +702,7 @@ sub WriteRGtags
 	my $modif=shift @towrite;
 	Songs::Set($ID, $modif,
 		abortmsg	=> _"Abort ReplayGain analysis",
-		error_prefix	=> _"Error writing replaygain tags :\n",
+		errormsg	=> _"Error while writing replaygain data",
 		abortcb		=> \&StopAnalysis,
 		callback_finish	=> \&WriteRGtags,
 	);

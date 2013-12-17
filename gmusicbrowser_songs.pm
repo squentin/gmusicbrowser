@@ -1916,14 +1916,17 @@ sub Write
 		return
 	}
 
-	my $i=0; my $abort;
+	my $i=0; my $abort; my $skip_all;
 	my $pid= ::Progress( undef, end=>scalar(@$IDs), abortcb=>sub {$abort=1}, widget =>$opt{progress}, title=>_"Writing tags");
 	my $errorsub=sub
-	 {	my $err= shift;
-		$err= $opt{error_prefix}. $err if $opt{error_prefix};
+	 {	my ($syserr,$details)= FileTag::Error_Message(@_);
 		my $abortmsg=$opt{abortmsg};
-		$abortmsg||=_"Abort mass-tagging" if (@$IDs-$i)>1;
-		my $res=::Retry_Dialog($err,$opt{window},$abortmsg);
+		$abortmsg||=_"Abort mass-tagging" if @$IDs>1;
+		my $errormsg= $opt{errormsg} || _"Error while writing tag";
+		$errormsg.= ' ('.($i+1).'/'.@$IDs.')' if @$IDs>1;
+		my $res= $skip_all;
+		$res ||= ::Retry_Dialog($syserr,$errormsg, ID=>$IDs->[$i], details=>$details, window=>$opt{window}, abortmsg=>$abortmsg, many=>(@$IDs-$i)>1);
+		$skip_all=$res if $res eq 'skip_all';
 		if ($res eq 'abort')
 		{	$opt{abortcb}() if $opt{abortcb};
 			$abort=1;
@@ -2309,7 +2312,7 @@ sub ChooseIcon	 #FIXME add a way to create a colored square/circle/... icon
 	my $file=::ChoosePix($::CurrentDir.::SLASH, $string, undef,'LastFolder_Icon');
 	return unless defined $file;
 	my $dir=$::HomeDir.'icons';
-	return if ::CreateDir($dir) ne 'ok';
+	return if ::CreateDir($dir,undef,_"Error saving icon") ne 'ok';
 	my $destfile= $dir. ::SLASH. ::url_escape( Picture($gid,$field,'icon') );
 	unlink $destfile.'.svg',$destfile.'.png';
 	if ($file eq '0') {}	#unset icon
