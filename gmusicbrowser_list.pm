@@ -412,6 +412,7 @@ our @DefaultOptions=
 (	'sort'	=> 'path album:i disc track file',
 	hideif	=> '',
 	colwidth=> '',
+	autoupdate=>1,
 );
 our %Markup_Empty=
 (	Q => _"Queue empty",
@@ -431,7 +432,7 @@ sub CommonInit
 {	my ($self,$opt)=@_;
 
 	%$opt=( @DefaultOptions, %$opt );
-	$self->{$_}=$opt->{$_} for qw/mode group follow sort hideif hidewidget shrinkonhide markup_empty markup_library_empty/,grep(m/^activate\d?$/, keys %$opt);
+	$self->{$_}=$opt->{$_} for qw/mode group follow sort hideif hidewidget shrinkonhide markup_empty markup_library_empty autoupdate/,grep(m/^activate\d?$/, keys %$opt);
 	$self->{mode}||='';
 	my $type= $self->{type}=
 				$self->{mode} eq 'playlist' ? 'A' :
@@ -479,6 +480,7 @@ sub CommonInit
 		}
 	}
 	elsif ($type eq 'Q') { $songarray=$::Queue; }
+	elsif ($type eq 'B' || $type eq 'S') { $songarray=SongArray::AutoUpdate->new($self->{autoupdate},$self->{sort}); }
 
 	if ($songarray && !ref $songarray)	#if not a ref, treat it as the name of a saved list
 	{	::SaveList($songarray,[]) unless $::Options{SavedLists}{$songarray}; #create new list if doesn't exists
@@ -486,6 +488,7 @@ sub CommonInit
 	}
 	$self->{follow}=0 if !defined $self->{follow};
 
+	delete $self->{autoupdate} unless $songarray && $songarray->isa('SongArray::AutoUpdate');
 	$self->{array}= $songarray || SongArray->new;
 
 	$self->RegisterGroup($self->{group});
@@ -506,6 +509,7 @@ sub CommonSave
 {	my $self=shift;
 	my $opt= $self->SaveOptions;
 	$opt->{$_}= $self->{$_} for qw/sort rowtip/;
+	$opt->{autoupdate}=$self->{autoupdate} if exists $self->{autoupdate};
 	$opt->{follow}= ! !$self->{follow};
 
 	#save options as default for new SongTree/SongList of same type
@@ -531,10 +535,7 @@ sub SetFilter
 	return if $self->{ignoreSetFilter};
 
 	#if ($self->{type} eq 'A') { $self->{array}->SetFilter($filter); return } #FIXME needs a PlayFilter with multiple levels to work correctly
-
-	my $list=$filter->filter;
-	Songs::SortList( $list, $self->{sort} ) if exists $self->{sort};
-	$self->{array}->Replace($list,filter=>$filter);
+	$self->{array}->SetSortAndFilter($self->{sort},$filter);
 }
 sub Empty
 {	my $self=shift;
@@ -852,6 +853,9 @@ our @ColumnMenu=
 	},
 	{ label => _("Edit row tip").'...', code => sub { $_[0]{self}->EditRowTip; },
 	},
+	{ label => _"Keep list filtered and sorted",	code => sub { $_[0]{self}{array}->SetAutoUpdate( $_[0]{self}{autoupdate}^=1 ); },
+	  check => sub { $_[0]{self}{autoupdate} },	mode => 'B',
+	},
 	{ label => _"Follow playing song",	code => sub { $_[0]{self}->FollowSong if $_[0]{self}{follow}^=1; },
 	  check => sub { $_[0]{self}{follow} }
 	},
@@ -1032,7 +1036,7 @@ sub UpdateSortIndicator
 
 sub SelectColumns
 {	my ($self,$pos)=@_;
-	::PopupContextMenu( \@ColumnMenu, {self=>$self, 'pos' => $pos } );
+	::PopupContextMenu( \@ColumnMenu, {self=>$self, 'pos' => $pos, mode=>$self->{type}, } );
 }
 
 sub ToggleColumn
@@ -1127,6 +1131,8 @@ sub drag_received_cb
 
 sub drag_motion_cb
 {	my ($tv,$context,$x,$y,$time)=@_;# warn "drag_motion_cb @_";
+	my $self=$tv->parent;
+	if ($self->{autoupdate}) { $context->status('default',$time); return } # refuse any drop if autoupdate is on
 	::drag_checkscrolling($tv,$context,$y);
 	return if $x<0 || $y<0;
 	my ($path,$pos)=$tv->get_dest_row_at_pos($x,$y);
@@ -6448,6 +6454,7 @@ sub drag_received_cb
 sub drag_motion_cb
 {	my ($view,$context,$x,$y,$time)=@_;
 	my $self=::find_ancestor($view,__PACKAGE__);
+	if ($self->{autoupdate}) { $context->status('default',$time); return } # refuse any drop if autoupdate is on
 
 	#check scrolling
 	if	($y-$self->{vsizesong}<=0)				{$view->{scroll}='up'}
@@ -6761,6 +6768,9 @@ our @ColumnMenu=
 	},
 	{ label => _("Edit row tip").'...', code => sub { $_[0]{songtree}->EditRowTip; },
 	},
+	{ label => _"Keep list filtered and sorted",	code => sub { $_[0]{songtree}{array}->SetAutoUpdate( $_[0]{songtree}{autoupdate}^=1 ); },
+	  check => sub { $_[0]{songtree}{autoupdate} },	mode => 'B',
+	},
 	{ label => _"Follow playing song",	code => sub { $_[0]{songtree}->FollowSong if $_[0]{songtree}{follow}^=1; },
 	  check => sub { $_[0]{songtree}{follow} }
 	},
@@ -6901,7 +6911,7 @@ sub popup_col_menu
 	my $self= ::find_ancestor($button,__PACKAGE__);
 	my $songtree= ::find_ancestor($self,'SongTree');
 	my $insertpos= exists $button->{cellnb} ? $button->{cellnb}+1 : $button->{insertpos};
-	::PopupContextMenu(\@ColumnMenu, { self => $self, colid => $button->{colid}, cellnb =>$button->{cellnb}, insertpos =>$insertpos, songtree => $songtree });
+	::PopupContextMenu(\@ColumnMenu, { self => $self, colid => $button->{colid}, cellnb =>$button->{cellnb}, insertpos =>$insertpos, songtree => $songtree, mode=>$songtree->{type}, });
 	return 1;
 }
 

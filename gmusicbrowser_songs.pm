@@ -3242,6 +3242,12 @@ sub Sort
 	Songs::SortList($self,$sort);
 	::HasChanged('SongArray',$self,'sort',$sort,\@old);
 }
+sub SetSortAndFilter
+{	my ($self,$sort,$filter)=@_;
+	my $list=$filter->filter;
+	Songs::SortList($list,$sort) if $sort;
+	$self->Replace($list);
+}
 sub SetFilter			#KEEP ?
 {	my ($self,$filter)=@_;
 	$filter||=Filter->new;
@@ -3352,6 +3358,107 @@ sub GetName
 	return $name;	#might be undef
 }
 
+package SongArray::AutoUpdate;
+use base 'SongArray';
+our %Filter;
+our %Sort;
+INIT
+{ ::Watch(undef, SongsChanged	=> \&SongsChanged_cb);
+  ::Watch(undef, SongsAdded	=> \&SongsAdded_cb);
+}
+my @list_of_AutoUpdate;
+
+sub new
+{	my ($class,$auto,$sort,$filter)=@_;
+	if (!defined $filter)	{$filter=Filter->null}
+	elsif (!ref $filter)	{$filter=Filter->new($filter)}
+	my $list= $filter->filter;
+	Songs::SortList($list,$sort) if @$list && $sort;
+	my $self = $class->SUPER::new([@$list]);
+	$Sort{$self}=$sort;
+	$Filter{$self}=$filter;
+	if ($auto)
+	{	push @list_of_AutoUpdate,$self;
+		::weaken($list_of_AutoUpdate[-1]);
+	}
+	return $self;
+}
+sub DESTROY
+{	my $self=$_[0];
+	delete $Filter{$self};
+	delete $Sort{$self};
+	@list_of_AutoUpdate= grep defined, @list_of_AutoUpdate;
+	::weaken($_) for @list_of_AutoUpdate;
+	$self->SUPER::DESTROY;
+}
+sub SetAutoUpdate
+{	my ($self,$auto)=@_;
+	@list_of_AutoUpdate= grep $self!=$_, @list_of_AutoUpdate;
+	push @list_of_AutoUpdate,$self if $auto;
+	::weaken($_) for @list_of_AutoUpdate;
+	if ($auto)
+	{	my $list= $Filter{$self}->filter;
+		Songs::SortList($list,$Sort{$self});
+		my @old=@$self;
+		@$self=@$list;
+		::HasChanged('SongArray',$self,'update',\@old);
+	}
+}
+sub Sort
+{	my ($self,$sort)=@_;
+	$Sort{$self}=$sort;
+	$self->SUPER::Sort($sort);
+}
+sub SetSortAndFilter
+{	my ($self,$sort,$filter)=@_;
+	$Filter{$self}=$filter;
+	$Sort{$self}=$sort;
+	my $list=$filter->filter;
+	Songs::SortList($list,$sort);
+	$self->Replace($list);
+}
+
+sub SongsAdded_cb
+{	my (undef,$IDs)=@_;
+	for my $self (grep defined, @list_of_AutoUpdate)
+	{	my $filter=$Filter{$self};
+		my ($greponly)=$filter->info;
+		if ($greponly)
+		{	my $toadd=$filter->filter($IDs);
+			if ($toadd)
+			{	my @old=@$self;
+				push @$self,@$toadd;
+				if ($Presence{$self}) {vec($Presence{$self}, $_, 1)=1 for @$IDs;}
+				Songs::SortList($self,$Sort{$self});
+				::HasChanged('SongArray',$self,'update',\@old);
+			}
+		}
+		else
+		{	$self->_update_full;
+		}
+	}
+}
+sub _update_full
+{	my $self=shift;
+	my @old=@$self;
+	my $list=$Filter{$self}->filter;
+	Songs::SortList($list,$Sort{$self});
+	@$self=@$list;
+	delete $Presence{$self};
+	::HasChanged('SongArray',$self,'update',\@old);
+}
+sub SongsChanged_cb
+{	my (undef,$IDs,$fields)=@_;
+	for my $self (grep defined, @list_of_AutoUpdate)
+	{	if ($Filter{$self}->changes_may_affect($IDs,$fields,$self))	#re-filter and re-sort
+		{	$self->_update_full;
+		}
+		elsif (::OneInCommon($fields,Songs::SortDepends($Sort{$self}))) #re-sort
+		{	$self->Sort($Sort{$self});
+		}
+	}
+}
+
 package SongArray::PlayList;
 use base 'SongArray';
 
@@ -3388,6 +3495,11 @@ sub Sort
 	}
 	::QHasChanged('Sort');
 	::QHasChanged('Pos');
+}
+sub SetSortAndFilter	#FIXME could be optimized
+{	my ($self,$sort,$filter)=@_;
+	$self->SetFilter($filter);
+	$self->Sort($sort);
 }
 sub Replace
 {	my ($self,$newlist)=@_;
@@ -3755,55 +3867,6 @@ sub _staticfy
 #	::HasChanged('Pos');
 #}
 
-
-#package SongArray::WithFilter	#DELME
-#our base 'SongArray';
-#our %Filter;
-#sub new
-#{	my ($class,$filter)=@_;
-#	my $ref= $filter ? $filter->filter : undef;
-#	my $self = $class->SUPER::new($ref);
-#	$Filter{$self}=$filter;
-#}
-#sub DESTROY
-#{	my $self=$_[0];
-#	warn "SongArray::WithFilter DESTROY\n";
-#	delete $Filter{$self};
-#	$self->SUPER::DESTROY;
-#}
-#sub SetFilter
-#{	my ($self,$filter)=@_;
-#	$Filter{$self}=$filter;
-#	$self->Replace($filter->filter);
-#}
-#sub SongAdded_cb
-#{	my $IDs=shift;
-#	for my $self (grep $_->isa(__PACKAGE__),@list_of_SongArray)
-#	{	my $filter=$Filter{$self};
-#		my ($greponly)=$filter->info;
-#		if ($greponly)
-#		{	my $toadd=$filter->filter($IDs);
-#			$self->Push($toadd);
-#		}
-#		else {queue}
-#	}
-#}
-#sub SongChanged_cb
-#{	my ($IDs,$fields)=@_;
-#	for my $self (grep $_->isa(__PACKAGE__),@list_of_SongArray)
-#	{	my $filter=$Filter{$self};
-#		my ($greponly,$depfields)=$filter->info;
-#		next unless ::OneInCommon($depfields,$fields);
-#		if ($IDs && $greponly)
-#		{	queue
-#			#$self->build_presence unless $Presence{$self};
-#			#my $match=$filter->filter($IDs);
-#			#my @in =grep  vec($Presence{$self},$_,1), @$IDs;
-#			#my @out=grep !vec($Presence{$self},$_,1), @$IDs;
-#		}
-#		else {queue}
-#	}
-#}
 
 package GMB::ListStore::Field;
 use Gtk2;

@@ -2971,8 +2971,8 @@ sub Select	#Set filter, sort order, selected song, playing state, staticlist, so
 	if (defined $filter)
 	{	if ($song) { $SongID=$song; $ChangedID=$ChangedPos=1; }
 		$filter= Filter->new($filter) unless ref $filter;
-		$ListPlay->SetFilter($filter);
-		$ListPlay->Sort($sort) if defined $sort;	#FIXME add a function that do both filter and sort
+		if ($sort) { $ListPlay->SetSortAndFilter($sort,$filter) }
+		else { $ListPlay->SetFilter($filter); }
 	}
 	elsif (defined $sort) { $ListPlay->Sort($sort) }
 	elsif ($staticlist)
