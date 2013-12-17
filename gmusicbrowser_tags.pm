@@ -548,18 +548,20 @@ sub add_column
 		   $_->set_sensitive($active) for @entries;
 		});
 
-	# add auto-increment button to track column
-	if ($field eq 'track' && 1)	#good idea ? make entries a bit large :(
+	# add auto-increment/auto-complete button to track/disc/year columns
+	if ($field eq 'track' || $field eq 'disc' || $field eq 'year')
 	{	#$_->set_alignment(1) for @entries;
-		my $increment=sub
-		 {	my $i=1;
+		my ($increment,$tip)= $field eq 'track' ? (1,_"Auto-increment track numbers") : (0,_"Copy missing values from previous line");
+		my $autosub=sub
+		 {	my $i= $field ne 'year' ? 1 : 0;
 			for my $e (@entries)
 			{	my $here=$e->get_text;
-				if ($here && $here=~m/^\d+$/) { $i=$here; } else { $e->set_text($i) }
-				$i++;
+				if	($here && $here=~m/^\d+$/) { $i=$here; }
+				elsif	($i>0)	{ $e->set_text($i) }
+				$i++ if $increment;
 			}
 		 };
-		my $button=::NewIconButton('gtk-go-down',undef,$increment,'none',_"Auto-increment track numbers");
+		my $button=::NewIconButton('gtk-go-down',undef,$autosub,'none',$tip);
 		$button->set_border_width(0);
 		$button->set_size_request();
 		$check->signal_connect( toggled => sub { $button->set_sensitive($_[0]->get_active) });
