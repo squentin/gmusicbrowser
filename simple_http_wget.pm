@@ -36,7 +36,7 @@ sub get_with_cb
 	my $useragent= $params{user_agent} || 'Mozilla/5.0';
 	my $accept= $params{'accept'} || '';
 	my $gzip= $gzip_ok ? '--header=Accept-Encoding: gzip' : '';
-	my @cmd_and_args= (qw/wget --timeout=40 -S -O -/, $gzip, "--header='Accept: $accept'", "--user-agent='$useragent'");
+	my @cmd_and_args= (qw/wget --timeout=40 -S -O -/, $gzip, "--header=Accept: $accept", "--user-agent=$useragent");
 	push @cmd_and_args, '--post-data='.$post if $post;	#FIXME not sure if I should escape something
 	push @cmd_and_args, '--',$url;
 	pipe my($content_fh),my$wfh;
