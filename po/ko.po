@@ -1,21 +1,19 @@
 # bluealbum, 2009.
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: gmusicbrowser 1.1.10\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2012-12-14 16:30+0900\n"
-"PO-Revision-Date: 2012-12-14 16:38+0900\n"
-"Last-Translator: \n"
-"Language-Team: 한국어 <kde-i18n-doc@kde.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2013-12-29 10:44+0900\n"
+"PO-Revision-Date: 2013-12-29 13:03+0900\n"
+"Last-Translator: bluealbum@gmail.com\n"
+"Language-Team: 한국어\n"
+"Language: ko_KR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Korean\n"
-"X-Poedit-Country: KOREA, REPUBLIC OF\n"
-"X-Generator: Lokalize 1.0\n"
+"X-Generator: Poedit 1.5.4\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SourceCharset: UTF-8\n"
 
 msgid " Context pane layout "
 msgstr "문맥정보 패널 레이아웃"
@@ -205,9 +203,6 @@ msgstr "중단"
 msgid "Abort ReplayGain analysis"
 msgstr "리플레이게인 분석 중지"
 
-msgid "Abort all"
-msgstr "모두 중단"
-
 msgid "Abort mass-tagging"
 msgstr "많은 파일의-태깅 중지하기"
 
@@ -340,6 +335,9 @@ msgstr "현재의 노래에 이름 추가하기"
 
 msgid "Adds menu entries to song contextual menu"
 msgstr "메뉴 항목을 노래 문맥정보 메뉴에 추가하기"
+
+msgid "Advanced"
+msgstr "고급"
 
 msgid "Advanced Search ..."
 msgstr "고급 찾기 ..."
@@ -674,12 +672,8 @@ msgstr ""
 "서(amixer (alsa-utils 패키지에 포함됨))를 필요로 합니다."
 
 #, perl-brace-format
-msgid ""
-"Can't create Folder '{path}' : \n"
-"{error}"
-msgstr ""
-"'{path}' 폴더를 만들 수 없습니다 : \n"
-"{error}"
+msgid "Can't create folder: {path}"
+msgstr "폴더를 만들 수 없음: {path}"
 
 #, perl-brace-format
 msgid "Can't create sink '{sink}'"
@@ -771,10 +765,10 @@ msgid "Choose a folder"
 msgstr "폴더 고르기"
 
 msgid "Choose directory to copy files to"
-msgstr "파일을 복사위한 폴더 고르기"
+msgstr "파일을 복사할 폴더 고르기"
 
 msgid "Choose directory to move files to"
-msgstr "파일을 이동할 폴더를 고르기"
+msgstr "파일을 이동할 폴더 고르기"
 
 msgid "Choose files"
 msgstr "파일 고르기"
@@ -907,6 +901,9 @@ msgstr "복사 실패함"
 msgid "Copy link address"
 msgstr "링크 주소 복사"
 
+msgid "Copy missing values from previous line"
+msgstr "이전 줄로부터 빠뜨린 값을 복사하기"
+
 msgid "Copy to mounted portable player"
 msgstr "마운트된 포터블 재생기에 복사"
 
@@ -1009,6 +1006,9 @@ msgstr "선택한 노래 지우기"
 msgid "Delete list"
 msgstr "목록 지우기"
 
+msgid "Deletion failed"
+msgstr "지우기 실패함"
+
 msgid "Descending order"
 msgstr "내림차순"
 
@@ -1023,6 +1023,10 @@ msgstr "데스크탑 위젯"
 
 msgid "Desktop widgets plugin"
 msgstr "데스크탑 위젯 플로그인"
+
+#, perl-brace-format
+msgid "Destination: {file}"
+msgstr "목적: {file}"
 
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "전체화면과 재생할 때 스크린세이버 사용하지 않기"
@@ -1222,8 +1226,18 @@ msgstr "이퀄라이저"
 msgid "Error :"
 msgstr "에러 :"
 
+msgid "Error creating folder"
+msgstr "폴더 만드는 중 에러"
+
 msgid "Error details"
 msgstr "에러 상세 정보"
+
+#, perl-brace-format
+msgid "Error opening '{file}' for writing."
+msgstr "쓰기 위해  '{file}를 불러오는 중 에러."
+
+msgid "Error saving artistbio"
+msgstr "가수 일대기 저장 중 에러"
 
 #, perl-brace-format
 msgid ""
@@ -1233,6 +1247,12 @@ msgstr ""
 "'{file}'에 음악가 일대기 저장 에러 :\n"
 "{error}"
 
+msgid "Error saving icon"
+msgstr "아이콘 저장 중 에러"
+
+msgid "Error saving lyrics"
+msgstr "가사 저장 중 에러"
+
 #, perl-brace-format
 msgid ""
 "Error saving lyrics in '{file}' :\n"
@@ -1240,6 +1260,12 @@ msgid ""
 msgstr ""
 "'{file}'에 가사 저장 에러 :\n"
 "{error}"
+
+msgid "Error saving picture"
+msgstr "사진 저장 중 에러"
+
+msgid "Error saving review"
+msgstr "미리 보기 저장 중 에러"
 
 #, perl-brace-format
 msgid ""
@@ -1249,12 +1275,21 @@ msgstr ""
 "'{file}'에 리뷰 저장 에러 :\n"
 "{error}"
 
+msgid "Error while writing replaygain data"
+msgstr "리플레이게인 자료 쓰는 동안 에러"
+
+msgid "Error while writing tag"
+msgstr "태그 쓰는 동안 에러"
+
 #, perl-brace-format
 msgid "Error writing '{file}'"
 msgstr " '{file}' 쓰기 에러!"
 
-msgid "Error writing replaygain tags :\n"
-msgstr "리플레이게인 태그 쓰기 에러 :\n"
+msgid "Error writing lyrics"
+msgstr "가사 쓰는 중 에러"
+
+msgid "Error writing tag"
+msgstr "태그 쓰는 중 에러"
 
 msgid "Error: invalid filename pattern"
 msgstr "에러: 잘못된 파일이름 패턴"
@@ -1303,12 +1338,8 @@ msgid "Fade-out then stop"
 msgstr "페이드-아웃 그런후 정지"
 
 #, perl-brace-format
-msgid ""
-"Failed to delete '{file}' :\n"
-"{error}"
-msgstr ""
-"'{file}' 삭제 실패함 :\n"
-"{error}"
+msgid "Failed to delete '{file}'"
+msgstr "'{file}' 지우기 실패함"
 
 msgid "Fetching albuminfo"
 msgstr "앨범정보 가져오는 중"
@@ -1428,6 +1459,14 @@ msgstr "찾았지만 동작하지 않음"
 
 msgid "Friday"
 msgstr "금요일"
+
+#, perl-brace-format
+msgid ""
+"From: {oldname}\n"
+"To: {newname}"
+msgstr ""
+"현재 이름: {oldname}\n"
+"새 이름: {newname}"
 
 msgid "Full screen layout :"
 msgstr "전체 화면 레이아웃 :"
@@ -1563,7 +1602,7 @@ msgid "Invert filter"
 msgstr "필터 적용하지 않기"
 
 msgid "Invisible hot spot"
-msgstr "보이지않는 핫 스팟"
+msgstr "보이지 않는 핫 스팟"
 
 #, perl-format
 msgid "Isn't smart equal to %s"
@@ -1581,6 +1620,9 @@ msgstr "노래방"
 msgid "Karaoke plugin"
 msgstr "노래방 플러그인"
 
+msgid "Keep list filtered and sorted"
+msgstr "필터되고 정렬된 목록 유지하기"
+
 msgid "Key"
 msgstr "키"
 
@@ -1590,10 +1632,6 @@ msgstr "키"
 msgid "Keywords"
 msgstr "키워드"
 
-msgid "Label"
-msgstr "라벨"
-
-msgctxt "Record_label"
 msgid "Label"
 msgstr "라벨"
 
@@ -1819,6 +1857,13 @@ msgid "Make it look like"
 msgstr "보기 좋게 만들기"
 
 msgid ""
+"Makes gmusicbrowser monitor its pulseaudio volume, so that external changes "
+"to its volume are known."
+msgstr ""
+"gmusicbrowser가 pulseaudio 볼륨을 모니터링하게 합니다. 그래서 외부의 볼륨 변"
+"화를 알 수 있습니다."
+
+msgid ""
 "Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
 "gnome."
 msgstr ""
@@ -1860,6 +1905,9 @@ msgstr "수정"
 
 msgid "Monday"
 msgstr "월요일"
+
+msgid "Monitor the pulseaudio volume"
+msgstr "pulseaudio 볼륨을 모니터하기"
 
 msgid "Moods"
 msgstr "분위기"
@@ -2212,6 +2260,9 @@ msgstr ".lrc 파일 찾기 패턴 :"
 msgid "Pause"
 msgstr "멈춤"
 
+msgid "Per-song values"
+msgstr "노래당 값"
+
 msgid "Pick an existing one"
 msgstr "존재하는 하나를 고르기"
 
@@ -2410,6 +2461,9 @@ msgstr "금액 지불"
 msgid "Private Data"
 msgstr "개인 자료"
 
+msgid "Proceed to next item."
+msgstr "다음 항목으로 넘어가기."
+
 msgid "Produced (P)"
 msgstr "제작됨 (P)"
 
@@ -2537,17 +2591,11 @@ msgstr "최근에 연주된 순으로"
 msgid "Recently played songs"
 msgstr "최근 재생한 노래들"
 
-msgid "Record label"
-msgstr "음반 회사"
-
 msgid "Recording Dates"
 msgstr "레코딩 자료"
 
 msgid "Recording date"
 msgstr "레코딩 날짜"
-
-msgid "Recording type"
-msgstr "레코딩 형태"
 
 msgid "Reference point :"
 msgstr "참조 포인트 :"
@@ -2662,6 +2710,9 @@ msgstr "이 폴더 이름 바꾸기 :"
 
 msgid "Rename/move files based on these fields :"
 msgstr "파일의 이름 바꾸기/이동은 아래 필드를 기본으로 합니다 :"
+
+msgid "Renaming failed"
+msgstr "파일 이름 바꾸기 실패함"
 
 #, perl-brace-format
 msgid ""
@@ -3064,7 +3115,7 @@ msgid "Show artist's upcoming events"
 msgstr "음악가의 다가올 이벤트 보기"
 
 msgid "Show buttons"
-msgstr "표시 버튼"
+msgstr "버튼 표시"
 
 msgid "Show genre"
 msgstr "장르 표시"
@@ -3077,6 +3128,9 @@ msgstr "패널 정보 표시"
 
 msgid "Show main window"
 msgstr "메인 창 표시"
+
+msgid "Show more error details"
+msgstr "에러 상세 정보 표시"
 
 msgid "Show playlist"
 msgstr "재생목록 표시"
@@ -3159,11 +3213,17 @@ msgstr "간단한 제목"
 msgid "Size"
 msgstr "크기"
 
+msgid "Skip _All"
+msgstr "모두 건너뛰기(_A)"
+
 msgid "Skip count"
 msgstr "건너 뛴 수"
 
 msgid "Skip history"
 msgstr "이력 건너뛰기"
+
+msgid "Skip this and any further errors."
+msgstr "이 에러와 이 다음의 에러를 건너뛰기."
 
 msgid "Skip to next song if an error occurs"
 msgstr "오류가 발생하면 다음 노래로 건너 뛰기"
@@ -3209,6 +3269,10 @@ msgstr "정렬 모드 편집"
 
 msgid "Sort order"
 msgstr "정렬 순서"
+
+#, perl-brace-format
+msgid "Source: {file}"
+msgstr "소스: {file}"
 
 msgid "Split artist names on :"
 msgstr "음악가 이름으로 나누기 :"
@@ -3290,9 +3354,6 @@ msgstr "시스템 시계가 현재 시간과 충분히 가깝지 않습니다"
 
 msgid "System command :"
 msgstr "시스템 명령어 :"
-
-msgid "Tag"
-msgstr "태그"
 
 msgid "Tags"
 msgstr "태그"
@@ -3707,6 +3768,9 @@ msgstr ""
 msgid "You must specify a base folder"
 msgstr "기본 폴더를 입력해야 합니다"
 
+msgid "_Cancel"
+msgstr "취소(_C)"
+
 msgid "_Insert column"
 msgstr "_컬럼 추가"
 
@@ -3715,6 +3779,9 @@ msgstr "_이 컬럼 제거"
 
 msgid "_Retry"
 msgstr "_다시 시도"
+
+msgid "_Skip"
+msgstr "건너뛰기(_S)"
 
 msgid "_Sort by"
 msgstr "_정렬"
@@ -4911,6 +4978,9 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 #~ msgid "(applied after restart)"
 #~ msgstr "(재시작 후 적용됩니다)"
 
+#~ msgid "Abort all"
+#~ msgstr "모두 중단"
+
 #~ msgid "All but the [most/less]%n"
 #~ msgstr "모두 그러나 [most/less]%n"
 
@@ -4954,6 +5024,10 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 #~ msgid "Garage6"
 #~ msgstr "Garage6"
 
+#~ msgctxt "Record_label"
+#~ msgid "Label"
+#~ msgstr "라벨"
+
 #~ msgid "Load/Save lyrics in :"
 #~ msgstr "가사 로드/저장 :"
 
@@ -4974,6 +5048,12 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 
 #~ msgid "Quodlibet"
 #~ msgstr "Quodlibet"
+
+#~ msgid "Record label"
+#~ msgstr "음반 회사"
+
+#~ msgid "Recording type"
+#~ msgstr "레코딩 형태"
 
 #~ msgid "Rhythmbox Compact"
 #~ msgstr "Rhythmbox 간결하게"
@@ -4998,6 +5078,9 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 
 #~ msgid "Shimmer Traytip"
 #~ msgstr "Shimmer 트레이팁"
+
+#~ msgid "Tag"
+#~ msgstr "태그"
 
 #~ msgid "The [most/less]"
 #~ msgstr "[많게/적게]"
