@@ -33,6 +33,7 @@ sub get_with_cb
 
 	my %headers;
 	$headers{'Content-Type'}= 'application/x-www-form-urlencoded; charset=utf-8' if $post;
+	$headers{'Referer'}= $params{referer} if $params{referer};
 	$headers{'User-Agent'}= $params{user_agent} || 'Mozilla/5.0';
 	$headers{Accept}= $params{'accept'} || '';
 	$headers{'Accept-Encoding'}= $gzip_ok ? 'gzip' : '';

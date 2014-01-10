@@ -105,6 +105,7 @@ sub connecting_cb
 	print $socket "$method $self->{file} HTTP/1.0".EOL;
 	print $socket "Host: $host:$port".EOL;
 	print $socket "User-Agent: $useragent".EOL;
+	print $socket "Referer: $params->{referer}".EOL if $params->{referer};
 	print $socket "Accept: $accept".EOL;
 	print $socket "Accept-Encoding: gzip".EOL if $gzip_ok;
 	#print $socket "Connection: Keep-Alive".EOL;
