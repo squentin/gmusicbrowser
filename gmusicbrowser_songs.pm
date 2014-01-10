@@ -766,6 +766,8 @@ our %timespan_menu=
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryBoolean->new(@_); },
 		'filterdesc:e:0'	=> [_"is false",_"is false",'',noinv=>1],
 		'filterdesc:e:1'	=> [_"is true", _"is true", '',noinv=>1],
+		'filterdesc:-e:0'	=> _"is true",
+		'filterdesc:-e:1'	=> _"is false",
 		filter_exclude => 'ALL',	#do not show filters inherited from parents
 		default_filter => 'e:1',
 		'smartfilter:=empty' => 'e:0',
