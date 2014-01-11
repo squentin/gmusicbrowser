@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2008 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2014 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -19,25 +19,29 @@ use base 'Gtk2::Window';
 use constant
 {	OPT => 'PLUGIN_FETCHCOVER_',
 	RES_LINES => 4,
-	RES_PER_LINE => 5,
+	RES_PER_LINE => 6,
 	PREVIEW_SIZE => 100,
+	GOOGLE_USER_AGENT => 'Mozilla/5.0 Gecko/20100101 Firefox/26.0', #google checks to see if the browser can handle the "standard" image search version, instead of the "basic" version. And as of the end of 2013 the "basic" version doesn't include direct url of the images, so we need to use the "standard" version
 };
 use constant RES_PER_PAGE => RES_PER_LINE*RES_LINES;
 
 my %Sites=
 (artist =>
- {	googlei => ['google images',"http://images.google.com/images?q=%s&imgsz=medium|large", \&parse_googlei],
+ {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large", \&parse_googlei, GOOGLE_USER_AGENT],
 	lastfm => ['last.fm',"http://www.last.fm/music/%a/+images", \&parse_lastfm],
-	discogs => ['discogs.com', "http://api.discogs.com/search?f=xml&type=artists&q=%a", \&parse_discogs],
+	#discogs => ['discogs.com', "http://api.discogs.com/search?f=xml&type=artists&q=%a", \&parse_discogs],
+	bing =>['bing',"http://www.bing.com/images/search?q=%s", \&parse_bing],
+	yahoo =>['yahoo',"http://images.search.yahoo.com/search/images?p=%s&o=js", \&parse_yahoo],
  },
  album =>
- {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large&imgar=ns", \&parse_googlei],
-	googleihi =>[_"google images (hi-res)","http://www.google.com/images?q=%s&imgsz=xlarge|xxlarge&imgar=ns", \&parse_googlei],
+ {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large&imgar=ns", \&parse_googlei, GOOGLE_USER_AGENT],
+	googleihi =>[_"google images (hi-res)","http://www.google.com/images?q=%s&imgsz=xlarge|xxlarge&imgar=ns", \&parse_googlei, GOOGLE_USER_AGENT],
+	yahoo =>['yahoo',"http://images.search.yahoo.com/search/images?p=%s&o=js", \&parse_yahoo],
+	bing =>['bing',"http://www.bing.com/images/async?q=%s&qft=+filterui:aspect-square", \&parse_bing],
 	slothradio => ['slothradio', "http://www.slothradio.com/covers/?artist=%a&album=%l", \&parse_sloth],
-	#itunesgrabber => ['itunesgrabber',"http://www.thejosher.net/iTunes/index.php?artist=%a&album=%l", \&parse_itunesgrabber],
-	freecovers => ['freecovers.net', "http://www.freecovers.net/api/search/%s", \&parse_freecovers], #could add /Music+CD but then we'd lose /Soundtrack
+	#freecovers => ['freecovers.net', "http://www.freecovers.net/api/search/%s", \&parse_freecovers], #could add /Music+CD but then we'd lose /Soundtrack #API doesn't work anymore
 	#rateyourmusic=> ['rateyourmusic.com', "http://rateyourmusic.com/search?searchterm=%s&searchtype=l",\&parse_rateyourmusic], # urls results in "403 Forbidden"
-	discogs => ['discogs.com', "http://api.discogs.com/search?f=xml&type=releases&q=%s", \&parse_discogs],
+	#discogs => ['discogs.com', "http://api.discogs.com/search?f=xml&type=releases&q=%s", \&parse_discogs], #not sure it should be include, request too many big files from the server
  },
 );
 
@@ -182,6 +186,7 @@ sub SearchID
 sub NewSearch
 {	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $url=$Sites{$self->{mainfield}}{$self->{site}}[1];
+	$self->{user_agent}= $Sites{$self->{mainfield}}{$self->{site}}[3];
 	my %letter;
 	for my $l (qw/s a l/)
 	{	next unless $url=~m/\%$l/;
@@ -195,10 +200,13 @@ sub NewSearch
 	$self->{page}=0;
 	$self->InitPage;
 	$url=~s/%([sal])/$letter{$1}/g;
+	$self->{url}= $url;
+	$self->{searchcontext}={}; #hash that the parser can use to store data between searches
 	warn "fetchcover : loading $url\n" if $::debug;
 	$self->{waiting}=Simple_http::get_with_cb
 	 (	cb => sub {$self->searchresults_cb(@_)},
-		url => $url,	cache=>1
+		url => $url,	cache=>1,
+		user_agent => $self->{user_agent},
 	 );
 }
 
@@ -270,12 +278,6 @@ sub parse_lastfm
 	$nexturl='http://www.lastfm.com'.$1 if $result=~m#<a href="([^"]+)" class="nextlink">#;
 	return \@list,$nexturl;
 }
-sub parse_itunesgrabber
-{	my $result=$_[0];
-	my @list;
-	push @list,{url=>$1} if $result=~m#Album art found.*?<a href="([^"]+)"#;
-	return \@list;
-}
 sub parse_sloth
 {	my $result=$_[0];
 	my @list;
@@ -287,32 +289,99 @@ sub parse_sloth
 	return \@list,$nexturl;
 }
 sub parse_googlei
-{	my $result=$_[0];
+{	my ($results,$pageurl,$searchcontext)=@_;
+	$searchcontext->{baseurl}||= $pageurl;
+	$searchcontext->{pagecount}++;
 	my @list;
-	while ($result=~m#<a [^>]*?href="([^"]+?imgurl=[^"]+)"><img [^>]*?src="([^"]+)"[^>]*?>.*?</a>[^<]*<br/?>(.*?)<br/?/?>#g)
-	{	my ($url,$preview,$desc)=($1,$2,$3);
-		next unless $url=~m#imgurl=(.*?)&amp;#;
-		$url= ::decode_html($1);
+	for my $res (split /<div class="rg_di" *>/, $results)
+	{	next unless $res=~m#&amp;imgurl=(.*?)&amp;#;
+		my $url=$1;
 		$url=~s/%([0-9A-Fa-f]{2})/chr hex($1)/gie;
-		$desc=~s#</?b>##g;
-		$desc=Encode::decode('utf8',$desc);
-		$desc=::decode_html($desc);
+		#$searchcontext->{rescount}++;
+		my $preview;
+		$preview=$1 if $res=~m/<img class=rg_i [^>]*?src="([^"]+)"/;
+		my $desc;
+		if ($res=~m/<div class=rg_meta>[^<]*?"pt":"([^"]+)"/)
+		{	$desc= ::decode_html(Encode::decode('utf8',$1));
+			$desc=~s#</?b>##g;
+		}
+		#warn "$url\n$preview\n$desc\n\n";
 		push @list, {url => $url, previewurl =>$preview, desc => $desc };
 	}
-	my $nexturl;
-	while ($result=~m#<a href="(/images\?[^>"]+?start=\d[^>"]*)"#g)
-	{	$nexturl='http://images.google.com'.$1;
-		$nexturl=~s#&amp;#&#g;
-		#will keep only last nexturl found, which should be the real "next" url
+	my $nexturl= $searchcontext->{baseurl}."&ijn=".$searchcontext->{pagecount};
+	$nexturl=undef unless @list;
+	return \@list,$nexturl;
+}
+
+# to get more results than the 35 on the first page, it uses the first= url argument, but it behaves strangely, in particular it includes results from previous pages, so these are ignored. The final results are not exactly those you get from the web page, but it seems good enough
+sub parse_bing
+{	my ($result,$pageurl,$searchcontext)=@_;
+	$searchcontext->{baseurl}||= $pageurl;
+	my $seen= $searchcontext->{seen}||= {};
+	my @list;
+	while ($result=~m/<a href="#" ([^>]+)>(?:<img class="img_hid" src2="([^"]+)")?/g)
+	{	my $picdata=$1;
+		my $preview=$2;
+		my %h;
+		$h{$1}=$2 while $picdata=~m/(\w+)="([^"]+)"/g;
+		my $m=$h{m};
+		next unless $m;
+		$m= ::decode_html($m);
+		my $url;
+		$url=$1 if $m=~m/imgurl:"([^"]+)"/;
+		next unless $url;
+		if ($preview)
+		{	$preview= ::decode_html($preview);
+			$preview=~s/w=\d+&h=\d+//; #remove size parameters for the thumbnail to have the largest size
+		}
+		my $desc=$h{t1};
+		if ($desc)
+		{	$desc=Encode::decode('utf8',$desc);
+			$desc=::decode_html($desc);
+		}
+		#warn "$url\n$preview\n$desc\n\n";
+		#if ($seen->{$url}) { warn "result #".(++$searchcontext->{count})." was already found as #".$seen->{$url}."\n" } #DEBUG
+		next if $seen->{$url};
+		$seen->{$url}= ++$searchcontext->{count};
+		push @list, {url => $url, previewurl =>$preview, desc => $desc };
+	#	print "$url\n";
 	}
+	my $n= ++$searchcontext->{pagecount};
+	my $nexturl= $searchcontext->{baseurl}."&first=".(1+$n*100)."&count=100";
+	$nexturl=undef unless @list;
+	return \@list,$nexturl;
+}
+
+sub parse_yahoo
+{	my ($result,$pageurl,$searchcontext)=@_;
+	$searchcontext->{baseurl}||= $pageurl;
+	my @list;
+	if ($result=~m/^{"html":/) { $result=~s#\\(.)#$1#g; } # with the o=js parameter the result html is in a js file -> un-escape (the data is smaller with o=js)
+	while ($result=~m/<li class="ld ?"([^>]+)><a +(?:target="[^"]*" +)?href=([^>]+)>(?:<img src=['"]([^'"]+)['"])?/g)
+	{	my $href=$2;
+		my $preview=$3;
+		next unless $href=~m/imgurl=([^&"']+)[&"']/;
+		my $url= 'http://'.::decode_url($1);
+		my $desc;
+		if ($href=~m/aria-label=["']([^"']+)["']/)
+		{	$desc=$1;
+			$desc=~s#&lt;/?b&gt;##g; #remove escaped bold markup around matched strings
+			$desc=Encode::decode('utf8',$desc);
+			$desc= ::decode_html(::decode_html($desc));
+		}
+		push @list, {url => $url, previewurl =>$preview, desc => $desc };
+	}
+	my $n= ++$searchcontext->{pagecount};
+	my $nexturl= $searchcontext->{baseurl}."&b=".(1+$n*60)."&iid=Y.$n&spos".($n*12); # no idea what the parameters mean, they don't match the number of results, but it works ...
 	return \@list,$nexturl;
 }
 
 sub parse_discogs
 {	my $result = $_[0];
 	my @list;
-	while ($result =~ m#<thumb>\s*?(.*?)/(A|R)-(\d+)-(.*?)\s*?</thumb>#g)
-	{	push @list, {url => "$1/$2-$4", previewurl => "$1/$2-$3-$4"};
+	while ($result =~ m#<thumb>([^<]+?)/(A|R)-(\d+)-([^<]+?)</thumb>#g)
+	{	my $referer= $2 eq 'R' ? "http://www.discogs.com/viewimages?release=$3" : "";
+		push @list, {url => "$1/$2-$4", previewurl => "$1/$2-$3-$4", referer=> $referer, };
 	}
 	return \@list;
 }
@@ -322,7 +391,7 @@ sub searchresults_cb
 	$self->{waiting}=undef;
 	unless (defined $result) { stop($self,_"connection failed."); return; }
 	my $parse= $Sites{$self->{mainfield}}{$self->{site}}[2];
-	my ($list,$nexturl)=$parse->($result);
+	my ($list,$nexturl)=$parse->($result,$self->{url},$self->{searchcontext});
 	$self->{nexturl}=$nexturl;
 	#$table->set_size_request(110*5,110*int(1+@list/5));
 	push @{$self->{results}}, @$list;
@@ -366,7 +435,15 @@ sub get_next
 	my $end= $start + RES_PER_PAGE -1;
 	if ($#$results<$end && $self->{nexturl})
 	{	#load next page
-		$self->{waiting}=Simple_http::get_with_cb(cb => sub {$self->searchresults_cb(@_)}, url => delete $self->{nexturl}, cache=>1);
+		my $url= $self->{url}= delete $self->{nexturl};
+		$self->{waiting}=Simple_http::get_with_cb
+		 (	cb => sub {$self->searchresults_cb(@_)},
+			url => $url,	cache=>1,
+			user_agent => $self->{user_agent},
+		 );
+	}
+	elsif ($#$results>=$end)
+	{	$self->{Bnext}->set_sensitive(1);
 	}
 	$end=$#$results if $#$results<$end;
 	for my $id ($start .. $end)
@@ -384,7 +461,7 @@ sub get_next
 	return if $waiting && $waiting > 3; #no more than 4 pictures at once
 
 	my $result=$self->{results}[$res_id];
-	$result->{waiting}=Simple_http::get_with_cb(url => $result->{url}, cache=>1, cb =>
+	$result->{waiting}=Simple_http::get_with_cb(url => $result->{url}, referer=>$result->{referer}, cache=>1, cb =>
 	sub
 	{	my $pixdata=$_[0];
 		$result->{waiting}=undef;
@@ -408,9 +485,9 @@ sub get_next
 			$button->add($vbox);
 
 			my $tip='';
-			$tip=$result->{desc}."\n" if $result->{desc};
-			$tip.=$dim."\n".$result->{url};
-			$button->set_tooltip_text($tip);
+			$tip=::PangoEsc($result->{desc})."\n" if $result->{desc};
+			$tip.=$dim."\n".::MarkupFormat("<small>%s</small>",$result->{url});
+			$button->set_tooltip_markup($tip);
 			$button->signal_connect(clicked => \&set_cover);
 			$button->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb,3); # 3 : mouse button 3
 			$button->set_relief('none');
