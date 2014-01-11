@@ -1,13 +1,13 @@
 #
 # Translators:
-# Jiri Grönroos <jiri.gronroos@iki.fi>, 2012.
-#   <niklas.laxstrom@gmail.com>, 2012.
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2012-2013
+# Nikerabbit <niklas.laxstrom@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
-"Report-Msgid-Bugs-To: http://github.com/squentin/gmusicbrowser/issues\n"
-"POT-Creation-Date: 2012-11-19 19:21+0100\n"
-"PO-Revision-Date: 2012-11-20 19:25+0000\n"
+"Report-Msgid-Bugs-To: squentin@free.fr\n"
+"POT-Creation-Date: 2014-01-04 22:57+0100\n"
+"PO-Revision-Date: 2013-12-18 18:13+0000\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
 "Language-Team: Finnish (http://www.transifex.com/projects/p/gmusicbrowser/"
 "language/fi/)\n"
@@ -19,6 +19,10 @@ msgstr ""
 
 msgid " Fields "
 msgstr " Kentät "
+
+#, perl-brace-format
+msgid " of {length}"
+msgstr " / {length}"
 
 msgid "# songs"
 msgstr "# kappaletta"
@@ -184,6 +188,13 @@ msgstr "Lisää musiikkia"
 msgid "Add a filter"
 msgstr "Lisää suodatin"
 
+msgid "Add a fullscreen button"
+msgstr "Lisää koko näytön painike"
+
+msgid "Add a fullscreen button to layouts that can accept extra buttons"
+msgstr ""
+"Lisää koko näytön painike asetteluihin, jotka hyväksyvät lisäpainikkeita"
+
 msgid "Add a group"
 msgstr "Lisää ryhmä"
 
@@ -211,6 +222,12 @@ msgstr "Lisää sääntö: "
 msgid "Add shorcut key"
 msgstr "Lisää pikanäppäin"
 
+msgid "Add tab"
+msgstr "Lisää välilehti"
+
+msgid "Add to existing values"
+msgstr "Lisää olemassa oleviin arvoihin"
+
 msgid "Add to playlist"
 msgstr "Lisää soittolistaan"
 
@@ -234,6 +251,9 @@ msgstr "Albumi ja esittäjä"
 
 msgid "Album and artist on the left side"
 msgstr "Albumi ja esittäjä vasemalla puolella"
+
+msgid "Album mode"
+msgstr "Levytila"
 
 msgid "Album playcount:"
 msgstr "Albumin soittokerrat:"
@@ -345,25 +365,44 @@ msgstr "Peruskentät"
 msgid "Biography"
 msgstr "Biografia"
 
+msgid "Bitrate"
+msgstr "Bittinopeus"
+
+msgid "Browser"
+msgstr "Selain"
+
 msgid "Browser views"
 msgstr "x-siirtymä:"
+
+msgid "Browser window layout :"
+msgstr "Selainikkunan asettelu:"
 
 msgid "Buttons"
 msgstr "Painikkeet"
 
-#, perl-brace-format
-msgid ""
-"Can't create Folder '{path}' : \n"
-"{error}"
-msgstr ""
-"Kansion '{path}' luonti epäonnistui: \n"
-"{error}"
+msgid "Can't play this file."
+msgstr "Tätä tiedostoa ei voi toistaa."
 
 msgid "Can't read file or invalid file"
 msgstr "Tiedoston luku ei onnistu tai tiedosto on virheellinen"
 
+msgid "Case insensitive"
+msgstr "Älä huomioi kirjainkokoa"
+
+msgid "Case sensitive"
+msgstr "Huomioi kirjainkoko"
+
+msgid "Case-sensitive"
+msgstr "Huomioi kirjainkoko"
+
 msgid "Centered"
 msgstr "Keskitetty"
+
+msgid "Change default text color"
+msgstr "Vaihda tekstin oletusväriä"
+
+msgid "Change default text font and size"
+msgstr "Vaihda tekstin oletuskirjastinta ja -kokoa"
 
 msgid "Channels"
 msgstr "Kanavat"
@@ -371,11 +410,20 @@ msgstr "Kanavat"
 msgid "Check Collection"
 msgstr "Tarkista kokoelma"
 
+msgid "Check for updated/deleted songs on startup"
+msgstr "Tarkista käynnistyksen yhteydessä päivitetyt ja poistetut kappaleet"
+
+msgid "Check for updated/removed songs"
+msgstr "Tarkista päivitetyt ja poistetut kappaleet"
+
 msgid "Check real length of mp3"
 msgstr "Tarkista mp3-tiedostojen todellinen kesto"
 
 msgid "Check your audio settings"
 msgstr "Tarkista ääniasetuksesi"
+
+msgid "Checking length/bitrate"
+msgstr "Tarkistetaan kestoa/bittinopeutta"
 
 msgid "Checking songs"
 msgstr "Tarkistetaan kappaleita"
@@ -479,6 +527,12 @@ msgstr "Kopiointi epäonnistui"
 msgid "Copy link address"
 msgstr "Kopioi linkin osoite"
 
+msgid "Copy to mounted portable player"
+msgstr "Kopioi liitettyyn kannettavaan soittimeen"
+
+msgid "Copy to portable player"
+msgstr "Kopioi kannettavaan soittimeen"
+
 #, perl-format
 msgid "Copying file"
 msgid_plural "Copying %d files"
@@ -554,11 +608,17 @@ msgstr "Poista valitut kappaleet"
 msgid "Delete list"
 msgstr "Poista lista"
 
+msgid "Deletion failed"
+msgstr "Poistaminen epäonnistui"
+
 msgid "Descending order"
 msgstr "Laskeva järjestys"
 
 msgid "Description"
 msgstr "Kuvaus"
+
+msgid "Disable screensaver when fullscreen and playing"
+msgstr "Estä näytönsäästäjä soittaessa ja ollessa koko näytössä"
 
 msgid "Disabled"
 msgstr "Pois käytöstä"
@@ -617,8 +677,14 @@ msgstr "Muokkaa suodatinta..."
 msgid "Edit grouping ..."
 msgstr "Muokkaa ryhmittelyä"
 
+msgid "Edit in the last.fm wiki"
+msgstr "Muokkaa Last.fm-wikissä"
+
 msgid "Edit..."
 msgstr "Muokkaa..."
+
+msgid "Encoding used for id3v1 tags :"
+msgstr "id3v1-tunnisteissa käytettävä merkistö:"
 
 msgid "Enter album name"
 msgstr "Anna albumin nimi"
@@ -631,9 +697,6 @@ msgstr "Virhe:"
 
 msgid "Error details"
 msgstr "Virheen tiedot"
-
-msgid "Error writing replaygain tags :\n"
-msgstr "Virhe kirjoittaessa replaygain-tunnisteita:\n"
 
 msgid "Events"
 msgstr "Tapahtumat"
@@ -653,13 +716,15 @@ msgstr "Vie kappaleen ominaisuudet .csv-tiedostoon"
 msgid "Export to .m3u file"
 msgstr "Vie .m3u-tiedostoksi"
 
+msgid "Extra fields"
+msgstr "Lisäkentät"
+
 #, perl-brace-format
-msgid ""
-"Failed to delete '{file}' :\n"
-"{error}"
-msgstr ""
-"Tiedoston '{file}' poisto epäonnistui:\n"
-"{error}"
+msgid "Failed to delete '{file}'"
+msgstr "Tiedoston '{file}' poistaminen epäonnistui"
+
+msgid "Fetching albuminfo"
+msgstr "Noudetaan levytietoja"
 
 msgid "Field name"
 msgstr "Kentän nimi"
@@ -679,8 +744,14 @@ msgstr "Tiedoston ominaisuudet"
 msgid "Filename"
 msgstr "Tiedostonimi"
 
+msgid "Filename extension"
+msgstr "Tiedostonimen pääte"
+
 msgid "Filename format :"
 msgstr "Näytä kappaleet"
+
+msgid "Filename without extension"
+msgstr "Tiedostonimi ilman päätettä"
 
 msgid "Files"
 msgstr "Tiedostot"
@@ -745,6 +816,9 @@ msgstr "Tyylilaji on asetettu"
 msgid "Genres"
 msgstr "Tyylilajit"
 
+msgid "Go to Playing Track"
+msgstr "Siirry toistettavaan kappaleeseen"
+
 msgid "Go to playing song"
 msgstr "Siirry soivaan kappaleeseen"
 
@@ -775,6 +849,9 @@ msgstr "Lisää äänenvoimakkuutta"
 msgid "Increase volume"
 msgstr "Lisää äänenvoimakkuutta"
 
+msgid "Info"
+msgstr "Tiedot"
+
 msgid "KB"
 msgstr "Kt"
 
@@ -783,6 +860,9 @@ msgstr "Karaoke"
 
 msgid "Karaoke plugin"
 msgstr "Karaokeliitännäinen"
+
+msgid "Key"
+msgstr "Näppäin"
 
 msgid "Keys"
 msgstr "Näppäimet"
@@ -807,6 +887,9 @@ msgstr "Asettelu:"
 
 msgid "Layouts"
 msgstr "Asettelut"
+
+msgid "Length"
+msgstr "Kesto"
 
 msgid "Library"
 msgstr "Kirjasto"
@@ -914,8 +997,17 @@ msgstr "MPRIS v2"
 msgid "MPRIS v2 support"
 msgstr "MPRIS v2 -tuki"
 
+msgid "Main"
+msgstr "Päävalikko"
+
+msgid "Make it look like"
+msgstr "Aseta ulkoasuksi"
+
 msgid "Minimum size"
 msgstr "Vähimmäiskoko"
+
+msgid "Misc."
+msgstr "Muu"
 
 msgid "Monday"
 msgstr "Maanantai"
@@ -1016,6 +1108,9 @@ msgstr "Ei teemoja"
 msgid "No web browser found."
 msgstr "Verkkoselainta ei löytynyt."
 
+msgid "Normal mode"
+msgstr "Tavallinen tila"
+
 msgid "Not found"
 msgstr "Ei löytynyt"
 
@@ -1065,6 +1160,9 @@ msgstr "Avaa soittolista"
 msgid "Open Preference window"
 msgstr "Avaa asetusikkuna"
 
+msgid "Open Queue"
+msgstr "Avaa jono"
+
 msgid "Open Queue window"
 msgstr "Avaa jonoikkuna"
 
@@ -1109,6 +1207,9 @@ msgstr "Muu"
 
 msgid "Output"
 msgstr "Ulostulo"
+
+msgid "Owner identifier"
+msgstr "Omistajan tunniste"
 
 msgid "Pause"
 msgstr "Keskeytä"
@@ -1169,11 +1270,20 @@ msgstr "Soittojärjestys"
 msgid "Play/Pause"
 msgstr "Soita/pysäytä"
 
+msgid "Playback"
+msgstr "Toisto"
+
 msgid "Playcount: "
 msgstr "Soittokerrat: "
 
 msgid "Played Today"
 msgstr "Soitettu tänään"
+
+msgid "Player window layout :"
+msgstr "Soitinikkunan asettelu:"
+
+msgid "Playing"
+msgstr "Soittaminen"
 
 #, perl-brace-format
 msgid "Playing error : {error}"
@@ -1212,6 +1322,9 @@ msgstr "Liitännäiset"
 msgid "Popup queue menu"
 msgstr "Ei löytynyt"
 
+msgid "Preferences"
+msgstr "Asetukset"
+
 msgid "Press a key or a key combination"
 msgstr "Paina näppäintä tai näppäinyhdistelmää"
 
@@ -1233,9 +1346,21 @@ msgstr "Ominaisuudet"
 msgid "Publisher"
 msgstr "Julkaisija"
 
+msgid "Queue"
+msgstr "Jono"
+
 #, perl-format
 msgid "Queue (%n)"
 msgstr "Jono (%n)"
+
+msgid "Queue empty"
+msgstr "Jono on tyhjä"
+
+msgid "Queue in Sidebar"
+msgstr "Jono sivupalkissa"
+
+msgid "Queue options"
+msgstr "Jonovalinnat"
 
 msgid "Quit"
 msgstr "Lopeta"
@@ -1248,6 +1373,9 @@ msgstr "Radion osoite"
 
 msgid "Random"
 msgstr "Satunnainen"
+
+msgid "Random Playback"
+msgstr "Satunnaistoisto"
 
 msgid "Rating"
 msgstr "Arvostelu"
@@ -1297,8 +1425,17 @@ msgstr "Päivitä"
 msgid "Refresh list"
 msgstr "Päivitä lista"
 
+msgid "Regular expression"
+msgstr "Säännöllinen lauseke"
+
+msgid "Regular expression :"
+msgstr "Säännöllinen lauseke:"
+
 msgid "Release date"
 msgstr "Julkaisupäivä"
+
+msgid "Remember queue between sessions"
+msgstr "Muista jono käyttökertojen välillä"
 
 msgid "Remove"
 msgstr "Poista"
@@ -1354,6 +1491,12 @@ msgstr "Nimeä tiedosto uudelleen"
 msgid "Rename folder"
 msgstr "Nimeä kansio uudelleen"
 
+msgid "Renaming failed"
+msgstr "Nimen muuttaminen epäonnistui"
+
+msgid "Reorganize files and folders"
+msgstr "Järjestä uudelleen tiedostot ja kansiot"
+
 msgid "Repeat"
 msgstr "Kertaa"
 
@@ -1380,6 +1523,9 @@ msgstr "Tutki kokoelma uudelleen"
 
 msgid "Rhythmbox"
 msgstr "Rytmilaatikko"
+
+msgid "Right-click to remove filters"
+msgstr "Napsauta oikealla poistaaksesi suodattimet"
 
 msgid "Run perl code"
 msgstr "Suorita perl-koodia"
@@ -1472,6 +1618,9 @@ msgstr "Etsi internetistä"
 msgid "Search options"
 msgstr "Hakuvalinnat"
 
+msgid "Search window layout :"
+msgstr "Hakuikkunan asettelu:"
+
 msgid "Search:"
 msgstr "Etsi:"
 
@@ -1505,8 +1654,19 @@ msgstr "Aseta ryhmittely"
 msgid "Set icon"
 msgstr "Aseta kuvake"
 
+msgid "Set player window layout"
+msgstr "Aseta soitinikkunan asettelu"
+
+msgid "Set subgroup"
+msgstr "Aseta aliryhmä"
+
 msgid "Settings"
 msgstr "Asetukset"
+
+msgid "Settings on this page will only take effect after a restart"
+msgstr ""
+"Tällä välilehdellä olevat asetukset tulevat voimaan vain "
+"uudelleenkäynnistyksen jälkeen"
 
 #. Shift key
 msgctxt "Keyboard"
@@ -1539,6 +1699,9 @@ msgstr "Näytä äänivalikossa"
 
 msgid "Show main window"
 msgstr "Näytä pääikkuna"
+
+msgid "Show more error details"
+msgstr "Näytä lisätietoja virheestä"
 
 msgid "Show playlist"
 msgstr "Näytä soittolista"
@@ -1597,17 +1760,32 @@ msgstr "Sivupalkki"
 msgid "Similar Artists"
 msgstr "Samankaltaiset esittäjät"
 
+msgid "Simple List View"
+msgstr "Pelkistetty luettelonäkymä"
+
 msgid "Size"
 msgstr "Koko"
 
+msgid "Skip _All"
+msgstr "Ohita _kaikki"
+
 msgid "Skip history"
 msgstr "Ohitushistoria"
+
+msgid "Skip this and any further errors."
+msgstr "Ohita tämä ja jatkossa ilmenevät virheet."
 
 msgid "Skip to next song if an error occurs"
 msgstr "Siirry seuraavaan kappaleeseen virheen ilmetessä"
 
 msgid "Small"
 msgstr "Pieni"
+
+msgid "Small album picture"
+msgstr "Pieni levykuva"
+
+msgid "Small player"
+msgstr "Pieni soitin"
 
 msgid "Smaller browser"
 msgstr "Pienempi selain"
@@ -1620,6 +1798,13 @@ msgstr "Kappaleen ominaisuudet"
 
 msgid "Song rating"
 msgstr "Kappaleen arvostelu"
+
+msgid "Songtree View"
+msgstr "Kappaleiden puunäkymä"
+
+#, perl-brace-format
+msgid "Source: {file}"
+msgstr "Lähde: {file}"
 
 msgid "Start ReplayGain analysis"
 msgstr "Käynnistä ReplayGain-analysointi"
@@ -1642,6 +1827,9 @@ msgstr "Pysäytä kun jono on tyhjä"
 msgid "Styles"
 msgstr "Tyylit"
 
+msgid "Submit played songs to last.fm"
+msgstr "Lähetä toistettujen kappaleiden tiedot Last.fm:ään"
+
 msgid "Summary :"
 msgstr "Yhteenveto:"
 
@@ -1653,9 +1841,6 @@ msgstr "Vaihda koko näytön tilaan"
 
 msgid "System command :"
 msgstr "Järjestelmäkomento:"
-
-msgid "Tag"
-msgstr "Tunniste"
 
 msgid "Tags"
 msgstr "Tunnisteet"
@@ -1708,11 +1893,17 @@ msgstr "Nimi: %t"
 msgid "Title: %t (Track No. %n)"
 msgstr "Nimi: %t (Kappaleen numero %n)"
 
+msgid "Toggle fullscreen mode"
+msgstr "Koko näytön tila päälle/pois"
+
 msgid "Toolbar"
 msgstr "Työkalupalkki"
 
 msgid "Tools"
 msgstr "Työkalut"
+
+msgid "Total playcount:"
+msgstr "Toistokertoja yhteensä:"
 
 msgid "Track Properties"
 msgstr "Kappaleen ominaisuudet"
@@ -1758,11 +1949,26 @@ msgstr "Päivitä tunnisteet..."
 msgid "Use Equalizer"
 msgstr "Käytä taajuuskorjainta"
 
+msgid "Use MozEmbed"
+msgstr "Käytä MozEmbeddiä"
+
 msgid "Use ReplayGain"
 msgstr "Käytä ReplayGainia"
 
+msgid "Use WebKit"
+msgstr "Käytä WebKitiä"
+
+msgid "Use a master filter"
+msgstr "Käytä pääsuodatinta"
+
 msgid "Use gstreamer"
 msgstr "Käytä GStreameria"
+
+msgid "Use latin1 encoding if possible in id3v2 tags"
+msgstr "Käytä latin1-merkistöä id3v2-tunnisteissa jos mahdollista"
+
+msgid "Use the playing filter"
+msgstr "Käytä soittamissuodatinta"
 
 #, perl-brace-format
 msgid "Use this picture as cover for album '{album}'"
@@ -1774,17 +1980,36 @@ msgstr "Useita esittäjiä"
 msgid "Version"
 msgstr "Versio"
 
+msgid "View"
+msgstr "Näytä"
+
 msgid "Volume : "
 msgstr "Äänenvoimakkuus: "
 
+msgid ""
+"Warning : these are advanced options, don't change them unless you know what "
+"you are doing."
+msgstr ""
+"Varoitus: nämä ovat lisäasetuksia, älä muuta niitä jos et tiedä mitä olet "
+"tekemässä."
+
 msgid "Wednesday"
 msgstr "Keskiviikko"
+
+msgid "When added"
+msgstr "Lisättäessä"
+
+msgid "When current song"
+msgstr "Soitettaessa"
 
 msgid "Whole library"
 msgstr "Koko kirjasto"
 
 msgid "Wikipedia"
 msgstr "Wikipedia"
+
+msgid "Wikipedia Locale"
+msgstr "Wikipedian maa-asetus"
 
 msgid "Will use default if not found"
 msgstr "Käytetään oletusta, jos ei löydy"
@@ -1807,6 +2032,9 @@ msgstr "Vuosi - esittäjä"
 msgid "Yes"
 msgstr "Kyllä"
 
+msgid "_Cancel"
+msgstr "_Peru"
+
 msgid "_Insert column"
 msgstr "_Lisää sarake"
 
@@ -1816,8 +2044,17 @@ msgstr "_Poista tämä sarake"
 msgid "_Retry"
 msgstr "_Yritä uudelleen"
 
+msgid "_Skip"
+msgstr "_Ohita"
+
+msgid "_Sort by"
+msgstr "_Järjestys"
+
 msgid "add"
 msgstr "lisää"
+
+msgid "advanced options"
+msgstr "lisävalinnat"
 
 msgid "another example"
 msgstr "toinen esimerkki"
@@ -1842,6 +2079,9 @@ msgstr "välillä"
 
 msgid "bytes"
 msgstr "tavua"
+
+msgid "check length now"
+msgstr "tarkista kesto nyt"
 
 msgid "check now"
 msgstr "tarkista nyt"
@@ -2019,6 +2259,9 @@ msgstr "last.fm"
 msgid "last.fm plugin"
 msgstr "last.fm-liitännäinen"
 
+msgid "length of songs"
+msgstr "kappaleiden kesto"
+
 msgid "less than"
 msgstr "vähemmän kuin"
 
@@ -2132,11 +2375,17 @@ msgstr "tallennetut suodattimet"
 msgid "saved groupings"
 msgstr "tallennetut ryhmittely"
 
+msgid "scan now"
+msgstr "etsi nyt"
+
 msgid "seconds"
 msgstr "sekuntia"
 
 msgid "show pictures"
 msgstr "näytä kuvat"
+
+msgid "sort by"
+msgstr "järjestys"
 
 msgid "static list"
 msgstr "staattinen lista"
