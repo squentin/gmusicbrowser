@@ -1,13 +1,14 @@
 #
 # Translators:
-#   <hiunnhue108@ymail.com>, 2012.
+# Hiunn_Hue <hiunnhue108@ymail.com>, 2012
+# Hiunn_Hue <hiunnhue108@ymail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
-"Report-Msgid-Bugs-To: http://github.com/squentin/gmusicbrowser/issues\n"
-"POT-Creation-Date: 2012-11-19 19:21+0100\n"
-"PO-Revision-Date: 2012-11-20 08:24+0000\n"
-"Last-Translator: Hiunn_Hue <hiunnhue108@ymail.com>\n"
+"Report-Msgid-Bugs-To: squentin@free.fr\n"
+"POT-Creation-Date: 2014-01-04 22:57+0100\n"
+"PO-Revision-Date: 2013-12-18 08:48+0000\n"
+"Last-Translator: squentin <squentin@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/"
 "gmusicbrowser/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -97,6 +98,12 @@ msgstr "最常播放的前50首"
 msgid "<Unknown>"
 msgstr "<不詳>"
 
+msgid "Abort"
+msgstr "中止"
+
+msgid "Abort ReplayGain analysis"
+msgstr "中止回放增益分析"
+
 msgid "About"
 msgstr "關於"
 
@@ -121,6 +128,12 @@ msgstr "新增資料夾"
 msgid "Add folder ..."
 msgstr "新增歌曲…"
 
+msgid "Add label"
+msgstr "加入標籤"
+
+msgid "Add new label"
+msgstr "加入新標籤"
+
 msgid "Add shorcut key"
 msgstr "新增快速鍵"
 
@@ -132,6 +145,12 @@ msgstr "新增日期"
 
 msgid "Added Today"
 msgstr "今天新增的"
+
+msgid "Advanced"
+msgstr "進階的"
+
+msgid "Advanced Search ..."
+msgstr "進階的搜尋"
 
 msgid "Advanced Tag Editing"
 msgstr "進階編輯標籤"
@@ -183,6 +202,12 @@ msgstr "專輯：%l"
 msgid "Album: %l (%Y)"
 msgstr "專輯：%l (%Y)"
 
+msgid "Albuminfo"
+msgstr "專輯資訊"
+
+msgid "Albuminfo plugin"
+msgstr "專輯資訊外掛程式"
+
 msgid "Albums"
 msgstr "專輯"
 
@@ -198,14 +223,32 @@ msgstr "所有專輯"
 msgid "All artists"
 msgstr "所有演出者"
 
+msgid "All files"
+msgstr "所有檔案"
+
 msgid "All genres"
 msgstr "所有曲風"
+
+msgid "All labels"
+msgstr "所有標籤"
 
 msgid "All songs"
 msgstr "所有歌曲"
 
+msgid "All styles"
+msgstr "所有風格"
+
+msgid "All themes"
+msgstr "所有主題"
+
+msgid "Append"
+msgstr "附加"
+
 msgid "Append to playlist"
 msgstr "加入播放清單"
+
+msgid "Application"
+msgstr "應用"
 
 msgid "Arguments"
 msgstr "參數"
@@ -221,6 +264,9 @@ msgstr "演出者（年份 - 專輯）"
 
 msgid "Artist Biography"
 msgstr "演出者傳記"
+
+msgid "Artist URL"
+msgstr "演出者網址"
 
 msgid "Artist picture"
 msgstr "演出者圖片"
@@ -241,8 +287,14 @@ msgstr "演出者：%a"
 msgid "Artistinfo"
 msgstr "演出者資訊"
 
+msgid "Artistinfo plugin"
+msgstr "演出者資訊外掛程式"
+
 msgid "Artists"
 msgstr "演出者"
+
+msgid "Ask confirmation only if file already exists"
+msgstr "只有當檔案已經存在時，請求確認"
 
 msgid "Audio"
 msgstr "音訊"
@@ -256,6 +308,21 @@ msgstr "作者"
 msgid "Auto"
 msgstr "自動"
 
+msgid "Auto fill based on filenames ..."
+msgstr "根據檔名自動填充..."
+
+msgid "Auto fill only blank fields"
+msgstr "自動填補空白欄位"
+
+msgid "Auto fill up to"
+msgstr "自動填補到"
+
+msgid "Auto filter"
+msgstr "自動過濾器"
+
+msgid "Auto-fill queue"
+msgstr "自動填充佇列"
+
 msgid "Auto-scroll"
 msgstr "自動捲動"
 
@@ -264,6 +331,12 @@ msgstr "自動選擇圖片"
 
 msgid "Automatically remove current song if not found"
 msgstr "自動刪除找不到的歌曲"
+
+msgid "Autosave"
+msgstr "自動儲存"
+
+msgid "Available"
+msgstr "可用的"
 
 msgid "Average rating:"
 msgstr "平均喜好程度："
@@ -289,6 +362,9 @@ msgstr "瀏覽器視窗配置："
 msgid "Categories pane"
 msgstr "分類面板"
 
+msgid "Change the context visibility"
+msgstr "變更背景能見度"
+
 msgid "Channels"
 msgstr "聲道"
 
@@ -307,8 +383,47 @@ msgstr "檢查長度/位元率"
 msgid "Checking songs"
 msgstr "檢查歌曲"
 
+msgid "Choose a folder"
+msgstr "選擇一個資料夾"
+
+msgid "Choose files"
+msgstr "選擇檔案"
+
 msgid "Choose folder to add"
 msgstr "選擇要新增的歌曲"
+
+msgid "Choose font for lyrics"
+msgstr "選擇歌詞使用的字型"
+
+msgid "Choose font..."
+msgstr "選擇字型..."
+
+msgid "Choose playlist files to import"
+msgstr "選擇播放清單檔以匯入"
+
+msgid "Clear"
+msgstr "清除"
+
+msgid "Clear playlist"
+msgstr "清除播放清單"
+
+msgid "Clear playlist filter"
+msgstr "清除播放清單過濾器"
+
+msgid "Clear queue"
+msgstr "清除佇列"
+
+msgid "Clear selected fields"
+msgstr "清除選取的欄位"
+
+msgid "Close"
+msgstr "關閉"
+
+msgid "Close Window"
+msgstr "關閉視窗"
+
+msgid "Close a filter"
+msgstr "關閉一個過濾器"
 
 msgid "Close to tray"
 msgstr "關閉時縮小到系統列"
@@ -337,14 +452,38 @@ msgstr "複製"
 msgid "Copy failed"
 msgstr "複製失敗"
 
+msgid "Copyright"
+msgstr "版權"
+
+msgid "Cover Size : "
+msgstr "封面尺寸："
+
 msgid "Create ID3v2 tags as ID3v2.4"
 msgstr "使用 ID3v2.4 作為 ID3v2 標籤"
+
+msgid "Custom"
+msgstr "自訂"
+
+msgid "Custom Text"
+msgstr "自訂文字"
+
+msgid "Custom URL"
+msgstr "自訂網址"
+
+msgid "Custom command :"
+msgstr "自訂指令："
+
+msgid "Custom formats"
+msgstr "自訂格式"
 
 msgid "Custom..."
 msgstr "自訂…"
 
 msgid "Date"
 msgstr "日期"
+
+msgid "Date format :"
+msgstr "日期格式："
 
 msgid "Decrease Volume"
 msgstr "降低音量"
@@ -355,8 +494,38 @@ msgstr "降低音量"
 msgid "Default"
 msgstr "預設"
 
+msgid "Default fullscreen"
+msgstr "預設全螢幕"
+
+msgid "Default text color"
+msgstr "預設的文字顏色"
+
+msgid "Default text font"
+msgstr "預設的文字字型"
+
+msgid "Delete"
+msgstr "刪除"
+
+msgid "Delete Selected Songs"
+msgstr "刪除選取的歌曲"
+
+msgid "Delete list"
+msgstr "刪除清單"
+
 msgid "Description"
 msgstr "描述"
+
+msgid "Desktop widgets"
+msgstr "桌面小工具"
+
+msgid "Desktop widgets plugin"
+msgstr "桌面小工具外掛程式"
+
+msgid "Disable screensaver when fullscreen and playing"
+msgstr "當全螢幕和播放時，停用螢幕保護程式"
+
+msgid "Disabled"
+msgstr "已禁用"
 
 msgid "Disc"
 msgstr "光碟"
@@ -364,9 +533,24 @@ msgstr "光碟"
 msgid "Disc #"
 msgstr "光碟 #"
 
+msgid "Disc name"
+msgstr "光碟名稱"
+
+msgid "Display Songs"
+msgstr "顯示歌曲"
+
+msgid "Display stop/next actions"
+msgstr "顯示停止/後續動作"
+
+msgid "Display synchronized lyrics of the current song"
+msgstr "同步顯示目前歌曲歌詞"
+
 #, perl-format
 msgid "Display tray tip for %d ms"
 msgstr "顯示 %d 微秒"
+
+msgid "Do not add a title row"
+msgstr "請勿加入標題行"
 
 msgid "Do not add songs that can't be played"
 msgstr "不要新增無法播放的歌曲"
@@ -374,11 +558,35 @@ msgstr "不要新增無法播放的歌曲"
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr "不要在 mp3 檔案中建立 id3v1 標籤"
 
+msgid "Do not write the tags"
+msgstr "不要寫標籤"
+
+msgid "Don't notify if the main window is visible"
+msgstr "不必通知，如果主視窗是可見的"
+
+msgid "Don't submit current song"
+msgstr "不要提交目前歌曲"
+
+msgid "Download"
+msgstr "下載"
+
 msgid "Edit"
 msgstr "編輯"
 
+msgid "Edit Current Song Properties"
+msgstr "編輯目前歌曲屬性"
+
 msgid "Edit Labels"
 msgstr "編輯標記"
+
+msgid "Edit Lyrics"
+msgstr "編輯歌詞"
+
+msgid "Edit Lyrics ..."
+msgstr "編輯歌詞 ..."
+
+msgid "Edit Multiple Songs Properties"
+msgstr "編輯多首歌曲屬性"
 
 msgid "Edit Rating"
 msgstr "編輯喜好程度"
@@ -392,8 +600,32 @@ msgstr "編輯過濾器"
 msgid "Edit filter..."
 msgstr "編輯過濾器…"
 
+msgid "Edit grouping ..."
+msgstr "編輯群組..."
+
+msgid "Edit in the last.fm wiki"
+msgstr "在 last.fm 維基編輯"
+
+msgid "Edit list"
+msgstr "編輯清單"
+
 msgid "Edit mode"
 msgstr "編輯模式"
+
+msgid "Edit..."
+msgstr "編輯..."
+
+msgid "Editing list : "
+msgstr "編輯清單："
+
+msgid "Editing tags"
+msgstr "編輯標籤"
+
+msgid "Embedded lyrics"
+msgstr "嵌入式歌詞"
+
+msgid "Embedded picture"
+msgstr "嵌入式圖片"
 
 msgid "Encoding used for id3v1 tags :"
 msgstr "ID3v1 標籤使用的編碼："
@@ -401,11 +633,36 @@ msgstr "ID3v1 標籤使用的編碼："
 msgid "Equalizer"
 msgstr "等化器"
 
+msgid "Error :"
+msgstr "錯誤："
+
+msgid "Error details"
+msgstr "錯誤的詳細資料"
+
 msgid "Events"
 msgstr "活動"
 
+msgid "Example :"
+msgstr "例如："
+
+msgid "Export"
+msgstr "匯出"
+
+msgid "Export plugin"
+msgstr "匯出外掛程式"
+
 msgid "Extra fields"
 msgstr "額外欄位"
+
+msgid "Fade-out"
+msgstr "淡出"
+
+#, perl-format
+msgid "Fade-out in %d seconds"
+msgstr "在 %d 秒中淡出"
+
+msgid "Fade-out then stop"
+msgstr "淡出然後停止"
 
 msgid "Fields"
 msgstr "欄位"
@@ -653,6 +910,9 @@ msgstr "音樂"
 msgid "Mute/Unmute"
 msgstr "靜音/取消靜音"
 
+msgid "Name"
+msgstr "名稱"
+
 msgid "Never"
 msgstr "永不"
 
@@ -680,11 +940,77 @@ msgstr "下一位演出者"
 msgid "Next Song"
 msgstr "下一首"
 
+msgid "Next Song In Playlist"
+msgstr "在播放清單中的下一首歌曲"
+
+msgid "No connections"
+msgstr "沒有連接"
+
+msgid "No results found"
+msgstr "沒有找到結果"
+
+msgid "No songs"
+msgstr "沒有歌曲"
+
+msgid "No songs found"
+msgstr "沒有找到歌曲"
+
+msgid "No sound menu found"
+msgstr "沒有找到聲音選單"
+
+msgid "No themes"
+msgstr "沒有主題"
+
+msgid "No web browser found."
+msgstr "沒有找到網頁瀏覽器。"
+
+msgid "None"
+msgstr "無"
+
+msgid "Normal"
+msgstr "正常"
+
+msgid "Normal mode"
+msgstr "正常模式"
+
+msgid "Not found"
+msgstr "沒有找到"
+
+msgid "Notify"
+msgstr "通知"
+
+msgid "Notify plugin"
+msgstr "通知外掛程式"
+
 msgid "Now playing"
 msgstr "正在播放"
 
 msgid "NowPlaying plugin"
 msgstr "正在播放外掛"
+
+msgid "Number of days since added"
+msgstr "加入以來的天數"
+
+msgid "Number of days since last played"
+msgstr "自上次播放的天數"
+
+msgid "Number of days since last skipped"
+msgstr "自上次跳過的天數"
+
+msgid "Number of days since modified"
+msgstr "自修改後的天數"
+
+msgid "Number of milliseconds"
+msgstr "毫秒數"
+
+msgid "Number of seconds"
+msgstr "秒數"
+
+msgid "Number of times played"
+msgstr "播放次數"
+
+msgid "Number of times skipped"
+msgstr "跳過次數"
 
 msgid "Old name"
 msgstr "舊名稱"
@@ -692,23 +1018,71 @@ msgstr "舊名稱"
 msgid "Only affect mp3 files that do not already have an id3v1 tag"
 msgstr "只對原本沒有 id3v1 標籤的 mp3 檔案有效"
 
+msgid "Opacity"
+msgstr "不透明度"
+
 msgid "Open Browser"
 msgstr "開啟瀏覽器"
 
 msgid "Open Browser window"
 msgstr "開啟瀏覽器視窗"
 
+msgid "Open Custom window"
+msgstr "開啟自訂視窗"
+
 msgid "Open Equalizer"
 msgstr "開啟等化器"
 
+msgid "Open Playlist"
+msgstr "開啟播放清單"
+
+msgid "Open Preference window"
+msgstr "開啟偏好設定視窗"
+
+msgid "Open Queue"
+msgstr "開啟佇列"
+
+msgid "Open Queue window"
+msgstr "開啟佇列視窗"
+
+msgid "Open Search window"
+msgstr "開啟搜尋視窗"
+
+msgid "Open allmusic.com in your web browser"
+msgstr "在網頁瀏覽器開啟 allmusic.com"
+
 msgid "Open containing folder"
 msgstr "開啟檔案所在的資料夾"
+
+msgid "Open existing list"
+msgstr "開啟現有的清單"
+
+msgid "Open files"
+msgstr "開啟檔案"
+
+msgid "Open folder"
+msgstr "開啟資料夾"
+
+msgid "Open last.fm website in your browser"
+msgstr "在瀏覽器中開啟 last.fm 網站"
+
+msgid "Open link in Browser"
+msgstr "在瀏覽器中開啟連結"
 
 msgid "Options"
 msgstr "選項"
 
 msgid "Options ..."
 msgstr "選項"
+
+msgid "Original Filename"
+msgstr "原始檔名"
+
+msgid "Original release year"
+msgstr "原始發行年份"
+
+msgid "Other"
+msgstr "其他"
 
 msgid "Output"
 msgstr "輸出"
@@ -730,6 +1104,9 @@ msgstr "播放"
 
 msgid "Play count"
 msgstr "播放次數"
+
+msgid "Play history"
+msgstr "播放歷史"
 
 msgid "Play order"
 msgstr "播放順序"
@@ -758,8 +1135,14 @@ msgstr "播放清單"
 msgid "Playlist 1"
 msgstr "播放清單 1"
 
+msgid "Playlist Empty"
+msgstr "播放清單為空的"
+
 msgid "Playlist Utilities Bar"
 msgstr "播放清單工具列"
+
+msgid "Playlist empty"
+msgstr "播放清單為空的"
 
 msgid "Playlist filter"
 msgstr "清單過濾器"
@@ -782,8 +1165,35 @@ msgstr "˙按下任一按鍵或按鍵組合"
 msgid "Previous"
 msgstr "上一首"
 
+msgid "Previous Song"
+msgstr "上一首歌曲"
+
+msgid "Previous Song In Playlist"
+msgstr "在播放清單中的上一首歌曲"
+
+msgid "Previous page"
+msgstr "前一頁"
+
+msgid "Price paid"
+msgstr "支付價格"
+
+msgid "Private Data"
+msgstr "隱私資料"
+
 msgid "Properties"
 msgstr "歌曲屬性"
+
+msgid "Proxy host :"
+msgstr "代理主機："
+
+msgid "Publication right"
+msgstr "出版權"
+
+msgid "Publisher"
+msgstr "出版商"
+
+msgid "Publisher/Studio logotype"
+msgstr "出版商/錄音室標識"
 
 msgid "Queue"
 msgstr "播放佇列"
@@ -792,17 +1202,47 @@ msgstr "播放佇列"
 msgid "Queue (%n)"
 msgstr "播放佇列 (%n)"
 
+msgid "Queue Edit"
+msgstr "佇列編輯"
+
+msgid "Queue album"
+msgstr "佇列專輯"
+
+msgid "Queue artist"
+msgstr "佇列演出者"
+
+msgid "Queue empty"
+msgstr "佇列為空的"
+
 msgid "Queue in Sidebar"
 msgstr "在側邊欄顯示播放佇列"
+
+msgid "Queue mode"
+msgstr "佇列模式"
 
 msgid "Queue options"
 msgstr "播放佇列選項"
 
+msgid "Quick Search"
+msgstr "快速搜尋"
+
+msgid "Quick Search with SongTree"
+msgstr "用歌曲樹快速搜尋"
+
 msgid "Quit"
 msgstr "結束"
 
+msgid "Quit when queue empty"
+msgstr "結束，當佇列為空的時後"
+
+msgid "Random"
+msgstr "隨機"
+
 msgid "Random Playback"
 msgstr "隨機播放"
+
+msgid "Random mode edition"
+msgstr "隨機模式編輯"
 
 msgid "Rating"
 msgstr "喜好程度"
@@ -821,6 +1261,12 @@ msgstr "重新洗牌"
 
 msgid "Recent Filters"
 msgstr "最近的過濾器"
+
+msgid "Recent albums"
+msgstr "最新的專輯"
+
+msgid "Recent artists"
+msgstr "近期的演出者"
 
 msgid "Recently played songs"
 msgstr "最近播放過的歌曲"
@@ -909,11 +1355,35 @@ msgstr "重設過濾器"
 msgid "Right-click to remove filters"
 msgstr "按右鍵移除過濾器"
 
+msgid "Same Title"
+msgstr "同一標題"
+
+msgid "Same album"
+msgstr "同一專輯"
+
+msgid "Same artist"
+msgstr "同一演出者"
+
+msgid "Same title"
+msgstr "同一標題"
+
+msgid "Same year"
+msgstr "同一年"
+
 msgid "Sampling Rate"
 msgstr "取樣率"
 
 msgid "Saturday"
 msgstr "週六"
+
+msgid "Save"
+msgstr "儲存"
+
+msgid "Save Tags/Options"
+msgstr "儲存標籤/選項"
+
+msgid "Save album info in:"
+msgstr "儲存專輯資訊在："
 
 msgid "Save artist biography"
 msgstr "儲存演出者的傳記"
@@ -926,6 +1396,18 @@ msgstr "另存目前的過濾器"
 
 msgid "Save current list as"
 msgstr "另存目前的清單"
+
+msgid "Save lyrics"
+msgstr "儲存歌詞"
+
+msgid "Save now"
+msgstr "立即儲存"
+
+msgid "Save picture as"
+msgstr "圖片另存為"
+
+msgid "Save review"
+msgstr "儲存回顧"
 
 msgid "Saved"
 msgstr "已儲存"
@@ -941,6 +1423,15 @@ msgstr "已儲存的清單"
 
 msgid "Scan Collection"
 msgstr "掃描音樂庫"
+
+msgid "Scan as an album"
+msgstr "掃描作為專輯"
+
+msgid "Scan for new songs"
+msgstr "掃描新的歌曲"
+
+msgid "Scan this file"
+msgstr "掃描此檔案"
 
 msgid "Scanning"
 msgstr "掃描中"
@@ -972,11 +1463,26 @@ msgstr "搜尋標題"
 msgid "Search Title, Artist and Album"
 msgstr "搜尋標題、演出者和專輯"
 
+msgid "Search Title, Artist, Album, Comment, Label and Genre"
+msgstr "搜尋標題，演出者，專輯，評論，標籤和類型"
+
+msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
+msgstr "搜尋標題，演出者，專輯，評論，標籤，類型和檔名"
+
 msgid "Search album"
 msgstr "搜尋專輯"
 
 msgid "Search all fields"
 msgstr "搜尋所有欄位"
+
+msgid "Search allmusic for Artist"
+msgstr "搜尋演出者所有音樂"
+
+msgid "Search amazon.com for Artist"
+msgstr " 在 amazon.com 中搜尋演出者"
+
+msgid "Search and display lyrics"
+msgstr "搜尋和顯示歌詞"
 
 msgid "Search box type"
 msgstr "搜尋窗格類型"
@@ -987,8 +1493,26 @@ msgstr "在 YouTube 搜尋演出者"
 msgid "Search for a picture on internet"
 msgstr "透過網路尋找圖片"
 
+msgid "Search for artist on:"
+msgstr "搜尋演出者在："
+
+msgid "Search for current album"
+msgstr "搜尋目前專輯"
+
+msgid "Search for current artist"
+msgstr "搜尋目前演出者"
+
 msgid "Search for new songs on startup"
 msgstr "啟動時搜尋新歌曲"
+
+msgid "Search google for Artist"
+msgstr "用 Google 搜尋演出者"
+
+msgid "Search on the web"
+msgstr "在網路上搜尋"
+
+msgid "Search options"
+msgstr "搜尋選項"
 
 msgid "Search title"
 msgstr "搜尋標題"
@@ -999,14 +1523,29 @@ msgstr "搜尋視窗配置："
 msgid "Search:"
 msgstr "搜尋："
 
+msgid "Searching for a picture of : "
+msgstr "搜尋圖片："
+
+msgid "Select files"
+msgstr "選擇檔案"
+
 msgid "Selected : "
 msgstr "已選擇："
 
 msgid "Selected songs"
 msgstr "選取的歌曲"
 
+msgid "Seller"
+msgstr "銷售員"
+
 msgid "Set Picture"
 msgstr "設定專輯圖片"
+
+msgid "Set as primary filter"
+msgstr "設定為主過濾器"
+
+msgid "Set icon"
+msgstr "設定圖示"
 
 msgid "Settings"
 msgstr "設定"
@@ -1061,6 +1600,9 @@ msgstr "切換歌曲時顯示氣泡式通知"
 
 msgid "Show/Hide"
 msgstr "顯示/隱藏"
+
+msgid "Show/Hide Browser"
+msgstr "顯示/隱藏瀏覽器"
 
 msgid "Show/Hide Cover"
 msgstr "顯示/隱藏專輯封面"
@@ -1130,9 +1672,6 @@ msgstr "週日"
 
 msgid "Switch to fullscreen mode"
 msgstr "切換到全螢幕模式"
-
-msgid "Tag"
-msgstr "標籤"
 
 msgid "Tags"
 msgstr "標籤"
@@ -1336,6 +1875,9 @@ msgstr "從未"
 msgid "never played"
 msgstr "從未播放過的"
 
+msgid "no order"
+msgstr "沒有順序"
+
 msgid "no picture"
 msgstr "沒有圖片"
 
@@ -1396,8 +1938,14 @@ msgstr "小尺寸"
 msgid "sort by"
 msgstr "排序依據"
 
+msgid "stop"
+msgstr "停止"
+
 msgid "supports : "
 msgstr "支援："
+
+msgid "text format"
+msgstr "文字格式"
 
 msgid "text mode"
 msgstr "文字模式"
@@ -1411,8 +1959,38 @@ msgctxt "Field_aliases"
 msgid "title"
 msgstr "標題"
 
+msgid "toggle Intersection mode"
+msgstr "切換交集模式"
+
+msgid "toggle Invert mode"
+msgstr "切換反轉模式"
+
+msgid "tools"
+msgstr "工具"
+
+msgid "turn off"
+msgstr "關掉"
+
+msgid "unknown"
+msgstr "未知"
+
+msgid "unknown error"
+msgstr "未知錯誤"
+
+msgid "url"
+msgstr "網址"
+
+msgid "use :"
+msgstr "使用："
+
+msgid "use album name"
+msgstr "使用專輯名稱"
+
 msgid "use default"
 msgstr "使用預設值"
+
+msgid "use gnome settings"
+msgstr "使用 Gnome 的設定"
 
 msgid "year"
 msgstr "年份"
