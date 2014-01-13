@@ -568,13 +568,15 @@ All the other widgets which interact with a SongList/TabbedLists/... accept the 
     - songypad : change the default number of pixels between rows
     - no_typeahead : if 1, disable automatic searching when a letter/digit is pressed and the SongList has focus
     - rowtip : default tip to show when the mouse is above a row, can use %-letters and $-words
+    - autoupdate ; if 1 (default) keep list sorted and filtered (ignored in playlist, queue, or static list mode). User can toggle this option, so only affect newly created songlists
  - TabbedLists : Songlists in tabs, can contain playlist, static lists and the queue. layouts of type 'P' can be opened in TabbedLists (use the layout property key `stockicon` to set the tab icon), context pages can also be opened (the Context widget is a TabbedLists with a different set of options)
     - tablist : if 1, show the list of tabs in the tab context-menu
     - closebuttons : if 1, display close buttons in the tab of tabs that can be closed
+    - newbutton : if 1 (default) show a "new page" button next to the tabs
     - tabpos : select tab position (left, right, top, bottom), optionally followed by the rotation angle : 0, 90, 180 or 270, example : `tabpos=left90`
     - default_child : widget type that will be opened by default when closing the last page. default to `PlayList`
     - match : set of keywords that define which dynamic widget should be added automatically? Default to empty, which means nothing will be added automatically. The Context widget has the is option set to `context page`
- - SongTree : Very customizable Songlist replacement. (drag and dropping columns is not yet implemented). See this [wiki page](http://wiki.gmusicbrowser.org/customization/songtree) for some documentation. Many SongList options work, including these : activate activateX headers songxpad songypad rowtip
+ - SongTree : Very customizable Songlist replacement. (drag and dropping columns is not yet implemented). See this [wiki page](http://wiki.gmusicbrowser.org/customization/songtree) for some documentation. Many SongList options work, including these : activate activateX headers songxpad songypad rowtip autoupdate
 
 #### Widgets related to songlists
 (filter# is a number between 0-9, 0 is meant for FilterLock, when a filter is set all filters with a higher number are reset)  
