@@ -1,3 +1,21 @@
+v1.1.11
+improve search responsiveness (improve responsiveness of SimpleSearch)
+add auto-update mode that keeps browser lists sorted and filtered (on by default, can be disabled in the songlist/songtree option menu)
+picture finder plugin: update google image, add bing and yahoo, various small changes
+albuminfo plugin: update and fix parsing of Allmusic's pages
+various improvements to song properties and mass-tagging dialogs
+gstreamer : add option to monitor pulseaudio's volume, off by default as it is unstable due to thread problems with the libraries
+close-to-tray option no longer depends on the use-tray option
+various improvements and small fixes to error dialogs asking to retry
+fix default filters "added today" and "played today" doing the opposite of what they say (only fixed for new users, if you were affected you have to edit them to fix it)
+add a new-page button on TabbedLists/Context/NB (can be disabled with newbutton=0)
+better handling of vertical scripts in vertical tabs
+fix combo boxes for setting artist options in the misc tab of preferences
+fix dialog for selecting label icons up-scaling small icons
+dbus API: make CurrentSong output more fields
+songtree: add $discname group variable
+translation updates: Chinese(Taiwan), Finnish, German, Korean, Russian, Spanish
+
 v1.1.10
 finally update the layout doc
 add playhistory and skiphistory fields, these fields hold a list of the dates of plays and skips (skiphistory disabled by default)
