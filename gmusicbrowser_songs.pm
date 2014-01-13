@@ -3738,6 +3738,10 @@ sub Add		#only called in filter mode
 	elsif (my $s=$::Options{Sort})
 	{	$self->SUPER::Sort($s);
 	}
+	if (!defined $::SongID)
+	{	my $ID= $self->_FindFirst($self);
+		$self->SetID($ID)
+	}
 	::QHasChanged('Pos');
 }
 
