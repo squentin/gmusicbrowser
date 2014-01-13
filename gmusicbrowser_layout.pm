@@ -1717,7 +1717,7 @@ sub close_window
 {	my $self=shift;
 	$self->SaveOptions;
 	unless ($self->{quitonclose}) { $_->destroy for values %{$self->{widgets}}; $self->destroy; return }
-	if ($::Options{UseTray} && $::Options{CloseToTray}) { ::ShowHide(0); return 1}
+	if ($::Options{CloseToTray}) { ::ShowHide(0); return 1}
 	else { &::Quit }
 }
 

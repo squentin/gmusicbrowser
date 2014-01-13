@@ -6301,7 +6301,7 @@ sub PrefLayouts
 	my $checkT4=NewPrefSpinButton('TrayTipDelay', 0,10000, step=>100, text=> _"Delay before showing tray tip popup on mouse over : %d ms", cb=>\&SetTrayTipDelay);
 	my $checkT1=NewPrefCheckButton( UseTray => _"Show tray icon",
 					cb=> sub { &CreateTrayIcon; },
-					widget=> Vpack($checkT5,$checkT2,$checkT4,$checkT3)
+					widget=> Vpack($checkT5,$checkT4,$checkT3)
 					);
 	$checkT1->set_sensitive($TrayIconAvailable);
 
@@ -6329,7 +6329,7 @@ sub PrefLayouts
 	my $icotheme=NewPrefCombo(IconTheme=> GetIconThemesList(), text =>_"Icon theme :", sizeg1=>$sg1,sizeg2=>$sg2, cb => \&LoadIcons);
 
 	#packing
-	$vbox->pack_start($_,FALSE,FALSE,1) for @layouts_combos,$reloadlayouts,$checkT1,$fullbutton,$icotheme;
+	$vbox->pack_start($_,FALSE,FALSE,1) for @layouts_combos,$reloadlayouts,$checkT1,$checkT2,$fullbutton,$icotheme;
 	return $vbox;
 }
 
