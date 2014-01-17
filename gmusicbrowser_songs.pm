@@ -3498,9 +3498,9 @@ sub Sort
 	::QHasChanged('Sort');
 	::QHasChanged('Pos');
 }
-sub SetSortAndFilter	#FIXME could be optimized
+sub SetSortAndFilter	#FIXME could be optimized #FIXME only called from a songtree/songlist for now, and as these calls are usually not about setting the level 0 filter, it doesn't actually change the filter for now, just the list, as it needs multi-level filters to work properly
 {	my ($self,$sort,$filter)=@_;
-	$self->SetFilter($filter);
+	$self->Replace($filter->filter,filter=>$filter); #$self->SetFilter($filter); #FIXME use SetFilter once multi-level filters are implemented
 	$self->Sort($sort);
 }
 sub Replace

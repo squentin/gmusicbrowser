@@ -533,8 +533,6 @@ sub SetFilter
 	}
 	$self->{filter}=$filter;
 	return if $self->{ignoreSetFilter};
-
-	#if ($self->{type} eq 'A') { $self->{array}->SetFilter($filter); return } #FIXME needs a PlayFilter with multiple levels to work correctly
 	$self->{array}->SetSortAndFilter($self->{sort},$filter);
 }
 sub Empty
