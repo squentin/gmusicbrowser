@@ -1192,6 +1192,8 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	Rewind		=> [\&Rewind,				_"Rewind",_"Number of seconds",qr/^\d+$/],
 	Seek		=> [sub {SkipTo($_[1])},		_"Seek",_"Number of seconds",qr/^\d+$/],
 	Stop		=> [\&Stop,				_"Stop"],
+	Pause		=> [sub {Pause() if $TogPlay; },	_"Pause"],
+	Play		=> [sub {PlayPause() unless $TogPlay; },_"Play"],
 	Browser		=> [\&OpenBrowser,			_"Open Browser"],
 	OpenQueue	=> [\&EditQueue,			_"Open Queue window"],
 	OpenSearch	=> [sub { Layout::Window->new($Options{LayoutS}, uniqueid=>'Search'); },	_"Open Search window"],
