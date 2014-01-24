@@ -757,35 +757,36 @@ sub InitLayouts
 
 sub ReadLayoutFile
 {	my $file=shift;
-	my $path=$file; $path=~s#[^/]+$##;
 	return unless -f $file;
 	open my$fh,"<:utf8",$file  or do { warn $!; return };
 	my $first;
+	my $linecount=0; my ($linefirst,$linenext);
 	while (1)
 	{	my ($next,$longline);
 		my @lines=($first);
 		while (local $_=<$fh>)
-	 	{	s#^\s+##;
+		{	$linecount++;
+			s#^\s+##;
 			next if m/^#/;
 			s#\s*[\n\r]+$##;
 			if (s#\\$##) {$longline.=$_;next}
 			next if $_ eq '';
 			if ($longline) {$_=$longline.$_;undef $longline;}
-			if (m#^[{[]#) {$next=$_;last}
+			if (m#^[{[]#) { $next=$_; $linenext=$linecount; last}
 			push @lines,$_;
 		}
 		if ($first)
-		{	if ($first=~m#^\[#) {ParseLayout(\@lines,$path)}
+		{	if ($first=~m#^\[#) {ParseLayout(\@lines,$file,$linefirst)}
 			else		{ParseSongTreeSkin(\@lines)}
 		}
-		$first=$next;
+		$first=$next; $linefirst=$linenext;
 		last unless $first;
 	}
 	close $fh;
 }
 
 sub ParseLayout
-{	my ($lines,$path)=@_;
+{	my ($lines,$file,$line)=@_;
 	my $first=shift @$lines;
 	my $name;
 	if ($first=~m/^\[([^]=]+)\](?:\s*based on (.+))?$/)
@@ -809,7 +810,10 @@ sub ParseLayout
 	for my $key (qw/Name Category Title/)
 	{	$Layouts{$name}{$key}=~s/^"(.*)"$/$1/ if $Layouts{$name}{$key};	#remove quotes from layout name and category
 	}
+	my $path=$file; $path=~s#([^/]+)$##; $file=$1;
 	$Layouts{$name}{PATH}=$path;
+	$Layouts{$name}{FILE}=$file;
+	$Layouts{$name}{LINE}=$line;
 }
 
 sub ParseSongTreeSkin

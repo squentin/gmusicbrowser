@@ -6975,9 +6975,10 @@ sub NewPrefLayoutCombo
 	my $combo= NewPrefCombo($key => $buildlist, text => $text, sizeg1=>$sg1,sizeg2=>$sg2, tree=>1, cb => $cb, event=>'Layouts');
 	my $set_tooltip= sub	#show layout author in tooltip
 	 {	return if $_[1] && $_[1] ne $key;
-		my $author= $Layout::Layouts{$Options{$key}}{Author};
-		$author&&= _("by").' '.$author;
-		$_[0]->set_tooltip_text($author);
+		my $layoutdef= $Layout::Layouts{$Options{$key}};
+		my $tip= $layoutdef->{PATH}.$layoutdef->{FILE}.':'.$layoutdef->{LINE};
+		if (my $author= $layoutdef->{Author}) {	$tip= _("by")." $author\n$tip"; }
+		$_[0]->set_tooltip_text($tip);
 	 };
 	Watch( $combo, Option => $set_tooltip);
 	$set_tooltip->($combo);
