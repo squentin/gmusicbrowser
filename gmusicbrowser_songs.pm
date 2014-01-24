@@ -3364,6 +3364,8 @@ package SongArray::AutoUpdate;
 use base 'SongArray';
 our %Filter;
 our %Sort;
+our %needupdate;
+
 INIT
 { ::Watch(undef, SongsChanged	=> \&SongsChanged_cb);
   ::Watch(undef, SongsAdded	=> \&SongsAdded_cb);
@@ -3389,6 +3391,7 @@ sub DESTROY
 {	my $self=$_[0];
 	delete $Filter{$self};
 	delete $Sort{$self};
+	delete $needupdate{$self};
 	@list_of_AutoUpdate= grep defined, @list_of_AutoUpdate;
 	::weaken($_) for @list_of_AutoUpdate;
 	$self->SUPER::DESTROY;
@@ -3423,7 +3426,8 @@ sub SetSortAndFilter
 sub SongsAdded_cb
 {	my (undef,$IDs)=@_;
 	for my $self (grep defined, @list_of_AutoUpdate)
-	{	my $filter=$Filter{$self};
+	{	next if ($needupdate{$self}||0)>1;
+		my $filter=$Filter{$self};
 		my ($greponly)=$filter->info;
 		if ($greponly)
 		{	my $toadd=$filter->filter($IDs);
@@ -3436,12 +3440,27 @@ sub SongsAdded_cb
 			}
 		}
 		else
-		{	$self->_update_full;
+		{	$needupdate{$self}=2;
+			::IdleDo('7_autoupdate_update'.$self,6000, \&delayed_update_cb,$self);
+		}
+	}
+}
+sub delayed_update_cb
+{	my $self=shift;
+	my $need= delete $needupdate{$self};
+	return unless $need;
+	if ($need>1) { $self->_update_full }
+	else
+	{	my @old=@$self;
+		Songs::SortList($self,$Sort{$self});
+		if ("@old" ne "@$self") #only update if there was a change
+		{	::HasChanged('SongArray',$self,'update',\@old);
 		}
 	}
 }
 sub _update_full
 {	my $self=shift;
+	delete $needupdate{$self};
 	my @old=@$self;
 	my $list=$Filter{$self}->filter;
 	Songs::SortList($list,$Sort{$self});
@@ -3452,12 +3471,19 @@ sub _update_full
 sub SongsChanged_cb
 {	my (undef,$IDs,$fields)=@_;
 	for my $self (grep defined, @list_of_AutoUpdate)
-	{	if ($Filter{$self}->changes_may_affect($IDs,$fields,$self))	#re-filter and re-sort
-		{	$self->_update_full;
+	{	next if ($needupdate{$self}||0)>1;
+		my $delayed;
+		if ($Filter{$self}->changes_may_affect($IDs,$fields,$self))
+		{	#re-filter and re-sort
+			$needupdate{$self}=2;
+			$delayed=1;
 		}
-		elsif (::OneInCommon($fields,Songs::SortDepends($Sort{$self}))) #re-sort
-		{	$self->Sort($Sort{$self});
+		elsif ($self->AreIn($IDs) && ::OneInCommon($fields,Songs::SortDepends($Sort{$self})))
+		{	#re-sort
+			$needupdate{$self}=1;
+			$delayed=1;
 		}
+		::IdleDo('7_autoupdate_update'.$self,6000, \&delayed_update_cb,$self) if $delayed;
 	}
 }
 
