@@ -151,6 +151,7 @@ BEGIN
 
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
 INIT {%Alias_ext=(ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
+our @ScanExt= qw/mp3 ogg oga flac mpc ape wv m4a m4b/;
 
 our $debug;
 our %CmdLine;
@@ -2040,6 +2041,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		$oldversion||=delete $Options{version} || VERSION;  # for version <=1.1.7
 		if ($oldversion>VERSION) { warn "Loading a gmbrc saved with a more recent version of gmusicbrowser, try upgrading gmusicbrowser if there are problems\n"; }
 		if ($oldversion<1.10091) {delete $Options{$_} for qw/Diacritic_sort gst_volume Simplehttp_CacheSize mplayer_use_replaygain/;} #cleanup old options
+		if ($oldversion<=1.1011) {delete $Options{$_} for qw/ScanPlayOnly/;} #cleanup old options
 		$Options{AutoRemoveCurrentSong}= delete $Options{TAG_auto_check_current} if $oldversion<1.1005 && exists $Options{TAG_auto_check_current};
 		$Options{PlayedMinPercent}= 100*delete $Options{PlayedPercent} if exists $Options{PlayedPercent};
 		if ($Options{ArtistSplit}) # for versions <= 1.1.5
@@ -5467,15 +5469,13 @@ sub FolderToIDs
 	return @IDs;
 }
 
-sub MakeScanRegex	#FIXME
-{	my $s;
-	if ($Options{ScanPlayOnly})
-	{	my %ext; $ext{$_}=1 for ($PlayNext_package||$Play_package)->supported_formats;
-		$ext{$_}=1 for grep $ext{$Alias_ext{$_}}, keys %Alias_ext;
-		$s=join '|',keys %ext;
-	}
-	else { $s='mp3|ogg|oga|flac|mpc|ape|wv|m4a|m4b'; } #FIXME find a better way
-	$ScanRegex=qr/\.(?:$s)$/i;
+sub MakeScanRegex
+{	my %ext; $ext{$_}=1 for @ScanExt;
+	my $ignore= $Options{ScanIgnore} || [];
+	delete $ext{$_} for @$ignore;
+	my $re=join '|', sort keys %ext;
+	warn "Scan regular expression is empty\n" unless $re;
+	$ScanRegex=qr/\.(?:$re)$/i;
 }
 
 sub ScanFolder
@@ -6474,7 +6474,10 @@ sub PrefLibrary
 	$sw->set_policy ('automatic', 'automatic');
 	$sw->add($treeview);
 
-	my $Cscanall=NewPrefCheckButton(ScanPlayOnly => _"Do not add songs that can't be played", cb=>sub {$ScanRegex=undef});
+	my $extensions= NewPrefMultiCombo(ScanIgnore => {map {$_=>$_} @ScanExt},
+		text=>_"Ignored file extensions :", tip=>_"Files with these extensions won't be added", empty=>_"none",
+		cb=>sub {$ScanRegex=undef}, );
+
 	my $CScan=NewPrefCheckButton(StartScan => _"Search for new songs on startup");
 	my $CCheck=NewPrefCheckButton(StartCheck => _"Check for updated/deleted songs on startup");
 	my $BScan= NewIconButton('gtk-refresh',_"scan now", sub { IdleScan();	});
@@ -6518,7 +6521,7 @@ sub PrefLibrary
 			[$addbut,$rmdbut,'-',$reorg],
 			[$CCheck,'-',$BCheck],
 			[$CScan,'-',$BScan],
-			$Cscanall,
+			$extensions,
 			$autoremove,
 			[$lengthcheck,'-',$Blengthcheck],
 			$masterfiltercheck,
