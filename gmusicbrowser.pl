@@ -6178,47 +6178,6 @@ sub replaygain_options_dialog
 }
 sub Set_replaygain { $Play_package->RG_set_options() if $Play_package->can('RG_set_options'); }
 
-sub pref_artists_update_desc
-{	my $button=shift;
-	my $hash= $button->{hash};
-	my $key=  $button->{key};
-	my $text= join '  ',map $hash->{$_}||=qq("$_"), @{ $Options{$key} };
-	$text||= $button->{empty};
-	unless ($button->{label})
-	{	my $label= $button->{label}= Gtk2::Label->new;
-		#$label->set_ellipsize('end');
-		my $hbox=Gtk2::HBox->new(0,0);
-		$hbox->pack_start($label,1,1,2);
-		$hbox->pack_start($_,0,0,2) for Gtk2::VSeparator->new, Gtk2::Arrow->new('down','none');
-		$button->add($hbox);
-	}
-	$button->{label}->set_text($text);
-}
-sub pref_artists_change_cb
-{	my $button= $_[0]{button};
-	my $key= $button->{key};
-	my $l= $Options{$key};
-	my $before=@$l;
-	@$l= grep $_ ne $_[1], @$l;
-	push @$l,$_[1] if $before==@$l;
-	@$l= sort @$l;
-	pref_artists_update_desc($button);
-	Songs::UpdateArtistsRE();
-}
-sub pref_artists_button_cb
-{	my ($button,$event)=@_;
-	my $menu=BuildChoiceMenu
-	(	$button->{hash},
-		check=> sub { $Options{$_[0]{button}{key}} },
-		code => \&pref_artists_change_cb,
-		'reverse'=>1,
-		args => {button=>$button},
-	);
-	PopupMenu($menu,event=>$event);
-	1;
-}
-
-
 sub PrefMisc
 {	#Default rating
 	my $DefRating=NewPrefSpinButton('DefaultRating',0,100, step=>10, page=>20, text=>_"Default rating : %d %", cb=> sub
@@ -6244,24 +6203,13 @@ sub PrefMisc
 	my $shutentry=NewPrefEntry(Shutdown_cmd => _"Shutdown command :", tip => _"Command used when\n'turn off computer when queue empty'\nis selected", cb=> \&Update_QueueActionList);
 
 	#artist splitting
-	my $asplit_label= Gtk2::Label->new(_"Split artist names on :");
-	my $asplit=Gtk2::Button->new;
-	$asplit->set_tooltip_text(_"Used for the Artists field");
-	$asplit->{hash}= \%Artists_split;
-	$asplit->{key}= 'Artists_split_re';
-	$asplit->{empty}= _"no splitting";
-	pref_artists_update_desc($asplit);
-	$asplit->signal_connect(button_press_event=> \&pref_artists_button_cb);
-
+	my $asplit= NewPrefMultiCombo( Artists_split_re=>\%Artists_split,
+		text=>_"Split artist names on :", tip=>_"Used for the Artists field", separator=> '  ',
+		empty=>_"no splitting", cb=>\&Songs::UpdateArtistsRE );
 	#artist in title
-	my $atitle_label= Gtk2::Label->new(_"Extract guest artist from title :");
-	my $atitle=Gtk2::Button->new;
-	$atitle->set_tooltip_text(_"Used for the Artists field");
-	$atitle->{hash}= \%Artists_from_title;
-	$atitle->{key}= 'Artists_title_re';
-	$atitle->{empty}= _"ignore title";
-	pref_artists_update_desc($atitle);
-	$atitle->signal_connect(button_press_event=> \&pref_artists_button_cb);
+	my $atitle= NewPrefMultiCombo( Artists_title_re=>\%Artists_from_title,
+		text=>_"Extract guest artist from title :", tip=>_"Used for the Artists field", separator=> '  ',
+		empty=>_"ignore title", cb=>\&Songs::UpdateArtistsRE );
 
 	#date format
 	my $dateex= mktime(5,4,3,2,0,(localtime)[5]);
@@ -6291,7 +6239,7 @@ sub PrefMisc
 	my $playedpercent= NewPrefSpinButton('PlayedMinPercent'	,0,100,  text=>_"Threshold to count a song as played : %d %");
 	my $playedseconds= NewPrefSpinButton('PlayedMinSeconds'	,0,99999,text=>_"or %d seconds");
 
-	my $vbox= Vpack( $checkR1,$checkR2,$checkR4, $DefRating,$ProxyCheck, [$asplit_label, $asplit],[$atitle_label, $atitle],
+	my $vbox= Vpack( $checkR1,$checkR2,$checkR4, $DefRating,$ProxyCheck, $asplit, $atitle,
 			[0,$datealign,$preview], $screensaver,$shutentry, $always_in_pl,
 			$recent_include_not_played, $volstep, $pixcache,
 			[ $playedpercent, $playedseconds ],
@@ -6994,6 +6942,56 @@ sub NewPrefLayoutCombo
 	Watch( $combo, Option => $set_tooltip);
 	$set_tooltip->($combo);
 	return $combo;
+}
+
+sub NewPrefMultiCombo
+{	my ($key,$possible_values_hash,%opt)=@_;
+	my $sep= $opt{separator}|| ', ';
+	my $display_cb= $opt{display} || sub
+	 {	my $values= $Options{$key} || [];
+		return $opt{empty} unless @$values;
+		return join $sep,map $possible_values_hash->{$_}||=qq("$_"), @$values;
+	 };
+	$display_cb= sub {$opt{display}} if !ref $display_cb; # label in the button is a constant
+	my $button= Gtk2::Button->new;
+
+	my $label_value= Gtk2::Label->new;
+	#$label_value->set_ellipsize('end');
+	my $hbox=Gtk2::HBox->new(0,0);
+	$hbox->pack_start($label_value,1,1,2);
+	$hbox->pack_start($_,0,0,2) for Gtk2::VSeparator->new, Gtk2::Arrow->new('down','none');
+	$button->add($hbox);
+	$label_value->set_text( $display_cb->() );
+
+	my $change_cb=sub
+	 {	my $button= $_[0]{button};
+		$Options{$key}= $_[1];
+		$label_value->set_text( $display_cb->() );
+		$opt{cb}->() if $opt{cb};
+	 };
+	my $click_cb=sub
+	 {	my ($button,$event)=@_;
+		my $menu=BuildChoiceMenu
+		(	$possible_values_hash,
+			check=> sub { $Options{$key}||[] },
+			code => $change_cb,
+			'reverse'=>1, return_list=>1,
+			args => {button=>$button},
+		);
+		PopupMenu($menu,event=>$event);
+		1;
+	 };
+
+	$button->signal_connect(button_press_event=> \&$click_cb);
+	my $widget=$button;
+	if (defined $opt{text})
+	{	my $hbox0= Gtk2::HBox->new;
+		my $label= Gtk2::Label->new($opt{text});
+		$hbox0->pack_start($_, FALSE, FALSE, 2) for $label,$button;
+		$widget=$hbox0;
+	}
+	$widget->set_tooltip_text($opt{tip}) if $opt{tip};
+	return $widget;
 }
 
 sub NewIconButton
