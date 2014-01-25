@@ -4433,6 +4433,8 @@ sub ChooseDir
 	$dialog->vbox->set_spacing(5);			#
 	::SetWSize($dialog,'ChooseDir','750x580');
 
+	if (ref $allowfiles) { FileChooser_add_filters($filechooser,@$allowfiles); }
+
 	if ($remember_key)	{ $path= $Options{$remember_key}; }
 	elsif ($path)		{ $path= url_escape($path); }
 	$filechooser->set_current_folder_uri("file://".$path) if $path;
@@ -6529,6 +6531,7 @@ sub PrefLibrary
 }
 sub ChooseAddPath
 {	my ($addtolibrary,$allowfiles)=@_;
+	$allowfiles&&= [ [_"Music files", undef, join(' ',map "*.$_", sort @ScanExt) ], [_"All files",undef,'*']  ];
 	my @dirs=ChooseDir(_"Choose folder to add",undef,undef,'LastFolder_Add',1,$allowfiles);
 	@dirs=map url_escape($_), @dirs;
 	AddPath($addtolibrary,@dirs);
