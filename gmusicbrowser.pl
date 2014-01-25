@@ -4338,7 +4338,7 @@ sub CopyMoveFilesDialog
 {	my ($IDs,$copy)=@_;
 	my $msg=$copy	?	_"Choose directory to copy files to"
 			:	_"Choose directory to move files to";
-	my $newdir=ChooseDir($msg, Songs::Get($IDs->[0],'path').SLASH);
+	my $newdir=ChooseDir($msg, path=>Songs::Get($IDs->[0],'path').SLASH);
 	CopyMoveFiles($IDs,copy=>$copy,basedir=>$newdir) if defined $newdir;
 }
 
@@ -4421,7 +4421,8 @@ COPYNEXTID:for my $ID (@$IDs)
 }
 
 sub ChooseDir
-{	my ($msg,$path,$extrawidget,$remember_key,$multiple,$allowfiles) = @_;
+{	my ($msg,%opt)=@_;
+	my ($path,$extrawidget,$remember_key,$multiple,$allowfiles) = @opt{qw/path extrawidget remember_key multiple allowfiles/};
 	my $mode= $allowfiles ? 'open' : 'select-folder';
 	# there is no mode in Gtk2::FileChooserDialog that let you select both files or folders (Bug #136294), so use Gtk2::FileChooserWidget directly as it doesn't interfere with the ok button (in "open" mode pressing ok in a Gtk2::FileChooserDialog while a folder is selected go inside that folder rather than emiiting the ok response with that folder selected)
 	my $dialog=Gtk2::Dialog->new($msg,undef,[], 'gtk-ok' => 'ok', 'gtk-cancel' => 'none');
@@ -6403,7 +6404,7 @@ sub MoveFolder #FIXME implement
 {	my $parent=shift;
 	$parent=~s/([^$QSLASH]+)$//o;
 	my $folder=$1;
-	my $new=ChooseDir(_"Move folder to",$parent);
+	my $new=ChooseDir(_"Move folder to", path=>$parent);
 	return unless $new;
 	my $old=$parent.$folder.SLASH;
 	$new.=SLASH.$folder.SLASH;
@@ -6532,7 +6533,7 @@ sub PrefLibrary
 sub ChooseAddPath
 {	my ($addtolibrary,$allowfiles)=@_;
 	$allowfiles&&= [ [_"Music files", undef, join(' ',map "*.$_", sort @ScanExt) ], [_"All files",undef,'*']  ];
-	my @dirs=ChooseDir(_"Choose folder to add",undef,undef,'LastFolder_Add',1,$allowfiles);
+	my @dirs=ChooseDir(_"Choose folder to add", remember_key=>'LastFolder_Add', multiple=>1, allowfiles=>$allowfiles);
 	@dirs=map url_escape($_), @dirs;
 	AddPath($addtolibrary,@dirs);
 }
@@ -6867,7 +6868,7 @@ sub NewPrefFileEntry
 		&$cb if $cb;
 	});
 	$button->signal_connect( clicked => sub
-	{	my $file= $folder? ChooseDir($text,$Options{$key}) : undef;
+	{	my $file= $folder? ChooseDir($text, path=>$Options{$key}) : undef;
 		return unless $file;
 		# could simply $entry->set_text(), but wouldn't work with filenames with broken encoding
 		SetOption( $key, url_escape($file) );
@@ -8743,7 +8744,7 @@ sub new
 	$entry->signal_connect(activate=> \&GMB::FilterBox::activate);
 	$button->signal_connect( clicked => sub
 	{	my $self=$_[0]->parent;
-		my $folder= ::ChooseDir(_"Choose a folder", $self->{value});
+		my $folder= ::ChooseDir(_"Choose a folder", path=>$self->{value});
 		return unless $folder;
 		$busy=1;
 		$self->Set( ::url_escape($folder) );
