@@ -4137,12 +4137,26 @@ sub BuildChoiceMenu
 	my @order= 0..$#labels;
 	@order=sort {superlc($labels[$a]) cmp superlc($labels[$b])} @order if ref $choices eq 'HASH' || $tree;
 
+	my $selection;
 	my $smenu_callback=sub
 	 {	my $sub=$_[1];
-		$sub->( $args, $_[0]{selected} );
+		my $selected= $_[0]{selected};
+		if ($selection && $options{return_list})
+		{	$selection->{$selected} ^=1;
+			$selected= [sort grep $selection->{$_}, keys %$selection];
+		}
+		$sub->($args, $selected);
 	 };
-	my $check;
+	my ($check,$radio);
 	$check= $options{check}($args) if $options{check};
+	if (defined $check)
+	{	$selection={};
+		if (ref $check)	{ $selection->{$_}=1 for @$check; }
+		else
+		{	$radio=1;
+			$selection->{$check}=1;
+		}
+	}
 	for my $i (@order)
 	{	my $label=$labels[$i];
 		my $value=$values[$i];
@@ -4153,13 +4167,10 @@ sub BuildChoiceMenu
 			$item->set_submenu($submenu);
 		}
 		else
-		{	if (defined $check)
+		{	if ($selection)
 			{	$item=Gtk2::CheckMenuItem->new_with_label($label);
-				if (ref $check)	{ $item->set_active(1) if grep $_ eq $value, @$check; }
-				else
-				{	$item->set_draw_as_radio(1);
-					$item->set_active(1) if $check eq $value;
-				}
+				$item->set_active(1) if $selection->{$value};
+				$item->set_draw_as_radio(1) if $radio;
 			}
 			$item->{selected}= $value;
 			$item->signal_connect(activate => $smenu_callback, $options{code} );

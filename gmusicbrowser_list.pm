@@ -3564,14 +3564,6 @@ sub ChangeOption
 	$self->{$key}=$value;
 	$self->DoFilter unless $self->get_text eq '';
 }
-sub ToggleField
-{	my ($self,$field)=@_;
-	my @list= split /\|/,$self->{fields};
-	my $nb=@list;
-	@list= grep $_ ne $field, @list; #remove
-	push @list,$field if $nb==@list; #add if not removed
-	$self->ChangeOption(fields=> join '|',@list );
-}
 
 sub PopupSelectorMenu
 {	my $self=shift;
@@ -3588,9 +3580,9 @@ sub PopupSelectorMenu
 	my $item1=Gtk2::MenuItem->new(_"Select search fields");
 	$item1->set_submenu( ::BuildChoiceMenu(
 					{ map { $_=>Songs::FieldName($_) } Songs::StringFields(),qw/file path year/,},
-					'reverse' =>1,
+					'reverse' =>1, return_list=>1,
 					check=> sub { [split /\|/,$self->{fields}]; },
-					code => sub { $self->ToggleField($_[1]); },
+					code => sub { $self->ChangeOption(fields=> join '|',@{$_[1]} ); },
 				) );
 	$menu->append($item1);
 	$menu->append(Gtk2::SeparatorMenuItem->new);
