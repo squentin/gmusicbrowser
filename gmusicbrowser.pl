@@ -4471,6 +4471,17 @@ sub ChooseDir
 #	return $path;
 #}
 
+sub FileChooser_add_filters
+{	my ($filechooser,@patterns)=@_;
+	for my $aref (@patterns)
+	{	my $filter= Gtk2::FileFilter->new;
+		if ($aref->[1])	{ $filter->add_mime_type($_)	for split / /,$aref->[1]; }
+		if ($aref->[2])	{ $filter->add_pattern($_)	for split / /,$aref->[2]; }
+		$filter->set_name($aref->[0]);
+		$filechooser->add_filter($filter);
+	}
+}
+
 sub ChooseFiles
 {	my ($text,$remember_key,@patterns)=@_;
 	$text||=_"Choose files";
@@ -4478,13 +4489,7 @@ sub ChooseFiles
 					'gtk-ok' => 'ok',
 					'gtk-cancel' => 'none');
 	$dialog->set_select_multiple(1);
-	for my $aref (@patterns)
-	{	my $filter= Gtk2::FileFilter->new;
-		if ($aref->[1])	{ $filter->add_mime_type($_)	for split / /,$aref->[1]; }
-		if ($aref->[2])	{ $filter->add_pattern($_)	for split / /,$aref->[2]; }
-		$filter->set_name($aref->[0]);
-		$dialog->add_filter($filter);
-	}
+	FileChooser_add_filters($dialog,@patterns);
 	if ($remember_key)
 	{	my $path= decode_url($Options{$remember_key});
 		$dialog->set_current_folder($path);
@@ -4510,18 +4515,11 @@ sub ChoosePix
 					'gtk-ok' => 'ok',
 					'gtk-cancel' => 'none');
 
-	for my $aref
-	(	[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b *.ogg *.oga' ],
+	FileChooser_add_filters($dialog,
+		[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b *.ogg *.oga' ],
 		[_"Pictures files",'image/*'],
 		[_"All files",undef,'*'],
-	)
-	{	my $filter= Gtk2::FileFilter->new;
-		#$filter->add_mime_type('image/'.$_) for qw/jpeg gif png bmp/;
-		if ($aref->[1])	{ $filter->add_mime_type($_)	for split / /,$aref->[1]; }
-		if ($aref->[2])	{ $filter->add_pattern($_)	for split / /,$aref->[2]; }
-		$filter->set_name($aref->[0]);
-		$dialog->add_filter($filter);
-	}
+	);
 
 	my $preview=Gtk2::VBox->new;
 	my $label=Gtk2::Label->new;
