@@ -18,6 +18,7 @@ gmusicbrowser \- Jukebox for large collections of music files
 [\-cfg FILE]
 [\-fifo FIFO|\-nofifo]
 [\-debug]
+[\-verbose]
 [\-layout NAME]
 [\-plugin NAME]
 [\-searchpath FOLDER]
@@ -93,8 +94,11 @@ do not use/create named pipe
 \fB\-dbus\-id KEY\fR
 append .KEY to the DBus service id used by gmusicbrowser (org.gmusicbrowser)
 .TP
+\fB\-verbose\fR
+print some info, like the file being played
+.TP
 \fB\-debug\fR
-print lots of useless information
+print lots of useless information, implies -verbose
 .TP
 \fB\-backtrace\fR
 print a backtrace for every warning

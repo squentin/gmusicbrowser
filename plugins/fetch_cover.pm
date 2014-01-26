@@ -389,6 +389,7 @@ sub parse_discogs
 sub searchresults_cb
 {	my ($self,$result)=@_;
 	$self->{waiting}=undef;
+	warn "Getting results from $self->{url}\n" if $::Verbose;
 	unless (defined $result) { stop($self,_"connection failed."); return; }
 	my $parse= $Sites{$self->{mainfield}}{$self->{site}}[2];
 	my ($list,$nexturl)=$parse->($result,$self->{url},$self->{searchcontext});

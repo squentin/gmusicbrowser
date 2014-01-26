@@ -316,7 +316,7 @@ sub Play
 	{	$visual_window->realize unless $visual_window->window;
 		if (my $w=$visual_window->window) { $VSink->set_xwindow_id($w->XID); }
 	}
-	warn "playing $file\n";
+	warn "playing $file\n" if $::Verbose;
 	set_file($file);
 	my $newstate='playing'; $StateAfterSkip=undef;
 	if ($Skip) { $newstate='paused'; $StateAfterSkip='playing'; }

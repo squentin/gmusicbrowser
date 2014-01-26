@@ -153,7 +153,7 @@ our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .og
 INIT {%Alias_ext=(ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
 our @ScanExt= qw/mp3 ogg oga flac mpc ape wv m4a m4b/;
 
-our $debug;
+our ($Verbose,$debug);
 our %CmdLine;
 our ($HomeDir,$SaveFile,$FIFOFile,$ImportFile,$DBus_id);
 sub find_gmbrc_file { my @f= map $_[0].$_, '','.gz','.xz'; return wantarray ? (grep { -e $_ } @f) : first { -e $_ } @f }
@@ -186,7 +186,8 @@ options :
 -nogst  : do not use gstreamer
 -server	: send playing song to connected icecast clent
 -port N : listen for connection on port N in icecast server mode
--debug	: print lots of mostly useless informations
+-verbose: print some info, like the file being played
+-debug	: print lots of mostly useless informations, implies -verbose
 -backtrace : print a backtrace for every warning
 -nodbus	: do not provide DBus services
 -dbus-id KEY : append .KEY to the DBus service id used by gmusicbrowser (org.gmusicbrowser)
@@ -244,7 +245,8 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-ro')		{$CmdLine{ro}=$CmdLine{rotags}=1}
 	elsif($arg eq '-rotags')	{$CmdLine{rotags}=1}
 	elsif($arg eq '-port')		{$CmdLine{port}=shift if $ARGV[0]}
-	elsif($arg eq '-debug')		{$debug=1}
+	elsif($arg eq '-verbose')	{$Verbose=1}
+	elsif($arg eq '-debug')		{$debug=$Verbose=4}
 	elsif($arg eq '-backtrace')	{ $SIG{ __WARN__ } = \&Carp::cluck; $SIG{ __DIE__ } = \&Carp::confess; }
 	elsif($arg eq '-nofifo')	{$FIFOFile=''}
 	elsif($arg eq '-workspace')	{$CmdLine{workspace}=shift if defined $ARGV[0]} #requires Gnome2::Wnck
@@ -2185,7 +2187,7 @@ sub Open_gmbrc
 sub SaveTags	#save tags _and_ settings
 {	my $fork=shift; #if true, save in a forked process
 	HasChanged('Save');
-	if ($CmdLine{demo}) { warn "-demo option => not saving tags/settings\n"; return }
+	if ($CmdLine{demo}) { warn "-demo option => not saving tags/settings\n" if $Verbose || !$fork; return }
 
 	my $ext='';
 	my $SaveFile= $SaveFile; #do a local copy to locally remove .gz extension if present
@@ -2235,7 +2237,7 @@ sub SaveTags	#save tags _and_ settings
 	my $error;
 	(my$fh,my$tempfile,$ext)= Open_gmbrc("$SaveFile.new.$$"."$ext",1);
 	unless ($fh) { warn "Save aborted\n"; POSIX::_exit(0) if $fork; return; }
-	warn "Writing tags in $SaveFile$ext ...\n";
+	warn "Writing tags in $SaveFile$ext ...\n" if $Verbose || !$fork;
 
 	print $fh "# gmbrc version=".VERSION." time=".time."\n"  or $error||=$!;
 
@@ -2301,7 +2303,7 @@ sub SaveTags	#save tags _and_ settings
 		unlink $_ for find_gmbrc_file($SaveFile); #make sure there is no other old gmbrc without .bak, as they could cause confusion
 	}
 	rename $tempfile,$SaveFile.$ext  or warn $!;
-	warn "Writing tags in $SaveFile$ext ... done\n";
+	warn "Writing tags in $SaveFile$ext ... done\n" if $Verbose || !$fork;
 	POSIX::_exit(0) if $fork;
 }
 
@@ -5480,7 +5482,7 @@ sub MakeScanRegex
 }
 
 sub ScanFolder
-{	warn "ScanFolder(@_)\n";
+{	warn "Scanning : @_\n" if $Verbose;
 	my $dir=$_[0];
 	$dir=~s#^file://##;
 	MakeScanRegex() unless $ScanRegex;

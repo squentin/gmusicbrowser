@@ -95,7 +95,7 @@ sub Play
 	#SkipTo(undef,$sec) if $sec;
 
 	$OUTPUTfh->blocking(0); #set non-blocking IO
-	warn "playing $file (pid=$ChildPID)\n";
+	warn "playing $file (pid=$ChildPID)\n" if $::Verbose;
 	$WatchTag= Glib::IO->add_watch(fileno($OUTPUTfh),'hup',\&_eos_cb);
 	$WatchTag2=Glib::IO->add_watch(fileno($OUTPUTfh),'in',\&_remotemsg);
 		#Glib::Timeout->add(500,\&_UpdateTime);
