@@ -1493,6 +1493,11 @@ sub filename_to_utf8displayname	#replaced by Glib::filename_display_name if avai
 	return $utf8name;
 }
 
+sub get_event_window
+{	my $widget=shift;
+	$widget||= Gtk2->get_event_widget(Gtk2->get_current_event);
+	return find_ancestor($widget,'Gtk2::Window');
+}
 sub get_layout_widget
 {	find_ancestor($_[0],'Layout');
 }
@@ -2514,7 +2519,7 @@ sub ErrorPlay
 	warn $error."\n";
 	return if $Options{IgnorePlayError};
 	my $dialog = Gtk2::MessageDialog->new
-		( undef, [qw/modal destroy-with-parent/],
+		( $MainWindow, [qw/modal destroy-with-parent/],
 		  'error','close','%s',
 		  $error
 		);
@@ -4081,7 +4086,7 @@ sub BuildMenuOptional
 sub PopupContextMenu
 {	my $args=$_[1];
 	my $menu=BuildMenu(@_);
-	PopupMenu($menu,nomenupos=>!$args->{usemenupos});
+	PopupMenu($menu,nomenupos=>!$args->{usemenupos},self=>$args->{self});
 }
 
 sub PopupMenu
@@ -4089,6 +4094,8 @@ sub PopupMenu
 	return unless $menu->get_children;
 	$menu->show_all;
 	my $event= $args{event} || Gtk2->get_current_event;
+	my $widget= $args{self} || Gtk2->get_event_widget($event);
+	$menu->attach_to_widget($widget,undef) if $widget;
 	my $posfunction= $args{posfunction}; # usually undef
 	my $button=my $time=0;
 	if ($event)
@@ -4778,7 +4785,7 @@ sub DeleteFiles
 	return unless @$IDs;
 	my $text=(@$IDs==1)? "'".Songs::Display($IDs->[0],'file')."'" : __("%d file","%d files",scalar @$IDs);
 	my $dialog = Gtk2::MessageDialog->new
-		( undef,
+		( ::get_event_window(),
 		  'modal',
 		  'warning','cancel','%s',
 		  __x(_("About to delete {files}\nAre you sure ?"), files => $text)
@@ -6573,7 +6580,7 @@ sub RemoveLabel		#FIXME ? label specific
 	my $IDlist= Songs::MakeFilterFromGID($field,$gid)->filter;
 	if (my $nb=@$IDlist)
 	{	my $dialog = Gtk2::MessageDialog->new
-			( undef, #FIXME
+			( ::get_event_window(),
 			  [qw/modal destroy-with-parent/],
 			  'warning','ok-cancel',
 			  __("This label is set for %d song.","This label is set for %d songs.",$nb)."\n".
@@ -6647,7 +6654,7 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 			my ($label,$nb)=$store->get_value($iter);
 			if ($nb)
 			{	my $dialog = Gtk2::MessageDialog->new
-					( undef, #FIXME
+					( $treeview->get_toplevel,
 					  [qw/modal destroy-with-parent/],
 					  'warning','ok-cancel','%s',
 					  __("This label is set for %d song.","This label is set for %d songs.",$nb)."\n".
