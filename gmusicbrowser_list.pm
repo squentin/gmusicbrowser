@@ -562,6 +562,14 @@ sub RemoveSelected
 	$songarray->Remove($self->GetSelectedRows);
 }
 
+sub PopupSongContextMenu
+{	my $self=shift;
+	#return unless @{$self->{array}}; #no context menu for empty lists
+	my @IDs=$self->GetSelectedIDs;
+	my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $self->{array});
+	::PopupContextMenu(\@::SongCMenu,\%args );
+}
+
 sub MoveUpDown
 {	my ($self,$up,$max)=@_;
 	my $songarray=$self->{array};
@@ -1084,14 +1092,6 @@ sub query_tooltip_cb
 	1;
 }
 
-sub PopupContextMenu
-{	my ($self,$tv,$event)=@_;
-	#return unless @{$self->{array}}; #no context menu for empty lists
-	my @IDs=$self->GetSelectedIDs;
-	my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $self->{array});
-	::PopupContextMenu(\@::SongCMenu,\%args );
-}
-
 sub GetCurrentRow
 {	my $self=shift;
 	my $tv=$self->child;
@@ -1554,7 +1554,7 @@ sub button_press_cb
 			#$sel->select_path($path);
 			$tv->set_cursor($path);
 		}
-		$self->PopupContextMenu($tv,$event);
+		$self->PopupSongContextMenu;
 		return 1;
 	}
 	return 0; #let the event propagate
@@ -6577,10 +6577,7 @@ sub button_press_cb
 	{	if ($answer && !defined $depth && !vec($self->{selected},$row,1))
 		{	$self->song_selected($event,$row);
 		}
-		my @IDs=$self->GetSelectedIDs;
-		my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $self->{array});
-		::PopupContextMenu(\@::SongCMenu,\%args );
-
+		$self->PopupSongContextMenu;
 		return 1;
 	}
 	else# ($but==1)
