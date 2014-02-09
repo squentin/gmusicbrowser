@@ -862,6 +862,8 @@ sub GetDefaultLayoutOptions
 		%default= @optlist;
 	}
 	$_=::ParseOptions($_) for values %default;
+	$default{DEFAULT_OPTIONS}=1;
+	$default{Window}{DEFAULT_OPTIONS}=1;
 	return \%default;
 }
 
@@ -1806,6 +1808,9 @@ sub Resize
 	my (undef,undef,$monitorwidth,$monitorheight)=$screen->get_monitor_geometry($monitor)->values;
 	$w= $1*$monitorwidth/100 if $w=~m/(\d+)%/;
 	$h= $1*$monitorheight/100 if $h=~m/(\d+)%/;
+	if ($self->{options}{DEFAULT_OPTIONS}) { $monitorwidth-=40; $monitorheight-=80; } # if using default layout size, reserve some space for potential panels and decorations
+	$w=$monitorwidth if $w>$monitorwidth;
+	$h=$monitorheight if $h>$monitorheight;
 	if ($self->{fixedsize})
 	{	$w=-1 if $w<1;	# -1 => do not override default minimum size
 		$h=-1 if $h<1;
