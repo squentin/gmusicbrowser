@@ -3408,6 +3408,7 @@ sub SetAutoUpdate
 		@$self=@$list;
 		::HasChanged('SongArray',$self,'update',\@old);
 	}
+	else { ::HasChanged('SongArray',$self,'mode'); }
 }
 sub Sort
 {	my ($self,$sort)=@_;

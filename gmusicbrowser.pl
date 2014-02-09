@@ -453,7 +453,7 @@ our %DRAGTYPES;
 $DRAGTYPES{$DRAGTYPES[$_][0]}=$_ for DRAG_FILE,DRAG_USTRING,DRAG_STRING,DRAG_ID,DRAG_ARTIST,DRAG_ALBUM,DRAG_FILTER,DRAG_MARKUP;
 
 our @submenuRemove=
-(	{ label => sub {$_[0]{mode} eq 'Q' ? _"Remove from queue" : $_[0]{mode} eq 'A' ? _"Remove from playlist" : _"Remove from list"},	code => sub { $_[0]{self}->RemoveSelected; }, mode => 'BLQA'},
+(	{ label => sub {$_[0]{mode} eq 'Q' ? _"Remove from queue" : $_[0]{mode} eq 'A' ? _"Remove from playlist" : _"Remove from list"},	code => sub { $_[0]{self}->RemoveSelected; }, mode => 'BLQA', istrue=> 'allowremove', },
 	{ label => _"Remove from library",	code => sub { SongsRemove($_[0]{IDs}); }, },
 	{ label => _"Remove from disk",		code => sub { DeleteFiles($_[0]{IDs}); },	test => sub {!$CmdLine{ro}},	stockicon => 'gtk-delete' },
 );

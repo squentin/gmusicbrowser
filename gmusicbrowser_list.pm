@@ -311,6 +311,8 @@ sub ListChanged
 	my $watchedarray= $songlist && $songlist->{array};
 	return if !$watchedarray || ($array && $watchedarray!=$array);
 	$self->{bclear}->set_sensitive(scalar @$watchedarray);
+	$self->set_sensitive( !$songlist->{autoupdate} );
+	$self->set_visible( !$songlist->{autoupdate} );
 }
 
 sub SelectionChanged
@@ -558,6 +560,7 @@ sub EnqueueSelected##
 }
 sub RemoveSelected
 {	my $self=shift;
+	return if $self->{autoupdate}; #can't remove selection from an always-filtered list
 	my $songarray=$self->{array};
 	$songarray->Remove($self->GetSelectedRows);
 }
@@ -567,6 +570,7 @@ sub PopupSongContextMenu
 	#return unless @{$self->{array}}; #no context menu for empty lists
 	my @IDs=$self->GetSelectedIDs;
 	my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $self->{array});
+	$args{allowremove}=1 unless $self->{autoupdate};
 	::PopupContextMenu(\@::SongCMenu,\%args );
 }
 
