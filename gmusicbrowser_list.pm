@@ -565,13 +565,13 @@ sub RemoveSelected
 	$songarray->Remove($self->GetSelectedRows);
 }
 
-sub PopupSongContextMenu
+sub PopupContextMenu
 {	my $self=shift;
 	#return unless @{$self->{array}}; #no context menu for empty lists
 	my @IDs=$self->GetSelectedIDs;
 	my %args=(self => $self, mode => $self->{type}, IDs => \@IDs, listIDs => $self->{array});
 	$args{allowremove}=1 unless $self->{autoupdate};
-	::PopupContextMenu(\@::SongCMenu,\%args );
+	::PopupContextMenu(\@::SongCMenu,\%args);
 }
 
 sub MoveUpDown
@@ -1558,7 +1558,7 @@ sub button_press_cb
 			#$sel->select_path($path);
 			$tv->set_cursor($path);
 		}
-		$self->PopupSongContextMenu;
+		$self->PopupContextMenu;
 		return 1;
 	}
 	return 0; #let the event propagate
@@ -2097,7 +2097,7 @@ sub Activate
 }
 
 sub PopupContextMenu
-{	my ($page,$event,$hash,$menu)=@_;
+{	my ($page,$hash,$menu)=@_;
 	my $self=::find_ancestor($page,__PACKAGE__);
 	$hash->{filterpane}=$self;
 	$menu||=\@cMenu;
@@ -2105,8 +2105,7 @@ sub PopupContextMenu
 }
 
 sub PopupOpt	#Only for FilterList #FIXME should be moved in FilterList::, and/or use a common function with FilterList::PopupContextMenu
-{	my ($but,$event)=@_;
-	my $self=::find_ancestor($but,__PACKAGE__);
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my $nb=$self->{notebook};
 	my $page=$nb->get_nth_page( $nb->get_current_page );
 	my $field=$page->{field}[0];
@@ -2550,13 +2549,12 @@ sub Fill
 }
 
 sub PopupContextMenu
-{	my ($self,undef,$event)=@_;
-	$self=::find_ancestor($self,__PACKAGE__);
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
 	my ($field,$gidlist)=$self->get_selected_list;
 	my $mainfield=Songs::MainField($field);
 	my $aa= ($mainfield eq 'artist' || $mainfield eq 'album') ? $mainfield : undef; #FIXME
 	my $mode= uc(substr $self->{mode},0,1); # C => cloud, M => mosaic, L => list
-	FilterPane::PopupContextMenu($self,$event,{ self=> $self, filter => $self->get_selected_filters, field => $field, aa => $aa, gidlist =>$gidlist, mode => $mode, subfield => $field, depth =>0 });
+	FilterPane::PopupContextMenu($self,{ self=> $self, filter => $self->get_selected_filters, field => $field, aa => $aa, gidlist =>$gidlist, mode => $mode, subfield => $field, depth =>0 });
 }
 
 sub key_press_cb
@@ -2725,10 +2723,11 @@ sub Activate
 	FilterPane::Activate($self,$button,$filter);
 }
 sub PopupContextMenu
-{	my ($self,$tv,$event)=@_;
+{	my $self=shift;
+	my $tv=$self->{treeview};
 	my @paths=_get_path_selection($tv);
 	my @raw= map ::decode_url($_), @paths;
-	FilterPane::PopupContextMenu($self,$event,{self=>$tv, rawpathlist=> \@raw, pathlist => \@paths, filter => _MakeFolderFilter(@paths) });
+	FilterPane::PopupContextMenu($self,{self=>$tv, rawpathlist=> \@raw, pathlist => \@paths, filter => _MakeFolderFilter(@paths) });
 }
 
 sub _get_path_selection
@@ -2906,10 +2905,11 @@ sub Activate
 	FilterPane::Activate($self,$button,$filter);
 }
 sub PopupContextMenu
-{	my ($self,$tv,$event)=@_;
+{	my $self=$_[0];
+	my $tv=$self->{treeview};
 	my @paths=_get_path_selection($tv);
 	my @raw= map ::decode_url($_), @paths;
-	FilterPane::PopupContextMenu($self,$event,{self=>$tv, rawpathlist=> \@raw, pathlist => \@paths, filter => _MakeFolderFilter(@paths) });
+	FilterPane::PopupContextMenu($self,{self=>$tv, rawpathlist=> \@raw, pathlist => \@paths, filter => _MakeFolderFilter(@paths) });
 }
 
 sub _get_path_selection
@@ -3091,7 +3091,8 @@ sub fill_savednames
 }
 
 sub PopupContextMenu
-{	my ($self,$tv,$event)=@_;
+{	my $self=shift;
+	my $tv=$self->{treeview};
 	my @rows=$tv->get_selection->get_selected_rows;
 	my $store=$tv->get_model;
 	my %sel;
@@ -3111,7 +3112,7 @@ sub PopupContextMenu
 	else { $args{mode}=''; }
 	my $songlist=::GetSonglist($self);
 	$args{songlist}=$songlist if $songlist;
-	FilterPane::PopupContextMenu($self,$event,\%args, [@cMenu,{ separator=>1 },@FilterPane::cMenu] );
+	FilterPane::PopupContextMenu($self,\%args, [@cMenu,{ separator=>1 },@FilterPane::cMenu] );
 }
 
 sub drag_motion_cb
@@ -5445,8 +5446,7 @@ sub get_parent
 }
 
 sub PopupOpt
-{	my ($widget,$event)=@_;
-	my $self=::find_ancestor($widget,__PACKAGE__);
+{	my $self=::find_ancestor($_[0],__PACKAGE__);
 	::PopupContextMenu(\@OptionsMenu, { self=>$self, usemenupos => 1,} );
 	return 1;
 }
@@ -6581,7 +6581,7 @@ sub button_press_cb
 	{	if ($answer && !defined $depth && !vec($self->{selected},$row,1))
 		{	$self->song_selected($event,$row);
 		}
-		$self->PopupSongContextMenu;
+		$self->PopupContextMenu;
 		return 1;
 	}
 	else# ($but==1)
