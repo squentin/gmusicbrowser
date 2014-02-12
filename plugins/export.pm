@@ -145,9 +145,10 @@ sub ToM3U
 	my $content="#EXTM3U\n";
 	for my $ID (@$IDs)
 	{	my ($file,$length,$artist,$title)= Songs::Get($ID,qw/fullfilename length artist title/);
+		::_utf8_on($file); # for file, so it doesn't get converted in utf8
 		$content.= "\n#EXTINF:$length,$artist - $title\n$file\n";
 	}
-	open my$fh,'>',$file or warn "Error opening '$file' for writing : $!\n";
+	open my$fh,'>:utf8',$file or warn "Error opening '$file' for writing : $!\n";
 	print $fh $content   or warn "Error writing to '$file' : $!\n";
 	close $fh;
 }
