@@ -158,12 +158,11 @@ sub ToCSV
 	my $check=::NewPrefCheckButton(OPT.'toCSV_notitlerow',_"Do not add a title row");
 	my $file=::ChooseSaveFile(undef,_"Write filenames to ...",undef,'songs.csv',$check);
 	return unless defined $file;
-	my @fields=qw/file path title artist album year comment track disc length size rating modif added lastplay playcount lastskip skipcount bitrate filetype channel samprate genre label/; #FIXME PHASE1 use a dynamic list of fields
+	my @fields= (qw/file path/,sort grep !m/^file$|^path$/, (Songs::PropertyFields())); #make sure file and path are in position 0 and 1
 	open my$fh,'>:utf8',$file;
 	unless ($::Options{OPT.'toCSV_notitlerow'}) #print a title row
 	{	print $fh join(',',map Songs::FieldName($_), @fields)."\n";
 	}
-	no warnings 'uninitialized';
 	for my $ID (@$IDs)
 	{	my @val;
 		push @val, Songs::Get($ID,@fields);
