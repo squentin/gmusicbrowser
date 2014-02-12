@@ -148,9 +148,11 @@ sub ToM3U
 		::_utf8_on($file); # for file, so it doesn't get converted in utf8
 		$content.= "\n#EXTINF:$length,$artist - $title\n$file\n";
 	}
-	open my$fh,'>:utf8',$file or warn "Error opening '$file' for writing : $!\n";
-	print $fh $content   or warn "Error writing to '$file' : $!\n";
-	close $fh;
+	{	my $fh;
+		open($fh,'>:utf8',$file) && (print $fh $content) && close($fh) && last;
+		my $res= ::Retry_Dialog($!,_"Error writing .m3u file", details=> ::__x( _"file: {filename}", filename=>$file));
+		redo if $res eq 'retry';
+	}
 }
 
 sub ToCSV
@@ -159,22 +161,30 @@ sub ToCSV
 	my $file=::ChooseSaveFile(undef,_"Write filenames to ...",undef,'songs.csv',$check);
 	return unless defined $file;
 	my @fields= (qw/file path/,sort grep !m/^file$|^path$/, (Songs::PropertyFields())); #make sure file and path are in position 0 and 1
-	open my$fh,'>:utf8',$file;
-	unless ($::Options{OPT.'toCSV_notitlerow'}) #print a title row
-	{	print $fh join(',',map Songs::FieldName($_), @fields)."\n";
-	}
-	for my $ID (@$IDs)
-	{	my @val;
-		push @val, Songs::Get($ID,@fields);
-		s/\x00/\t/g for @val; #for genres and labels
-		s/"/""/g for @val;
-		::_utf8_on($val[0]); # for file and path, so it doesn't get converted in utf8
-		::_utf8_on($val[1]); # FIXME find a cleaner way to do that
-		#print STDERR join(',',@val)."\n";
-		print $fh join(',',map '"'.$_.'"', @val)."\n";
-	}
-	close $fh;
 
+	my $retry;
+	{	if ($retry)
+		{	my $res= ::Retry_Dialog($!,_"Error writing .csv file", details=> ::__x( _"file: {filename}", filename=>$file));
+			last unless $res eq 'retry';
+		}
+		$retry=1;
+
+		open my$fh,'>:utf8',$file  or redo;
+		unless ($::Options{OPT.'toCSV_notitlerow'}) #print a title row
+		{	print $fh join(',',map Songs::FieldName($_), @fields)."\n"  or redo;
+		}
+		for my $ID (@$IDs)
+		{	my @val;
+			push @val, Songs::Get($ID,@fields);
+			s/\x00/\t/g for @val; #for genres and labels
+			s/"/""/g for @val;
+			::_utf8_on($val[0]); # for file and path, so it doesn't get converted in utf8
+			::_utf8_on($val[1]); # FIXME find a cleaner way to do that
+			#print STDERR join(',',@val)."\n";
+			print $fh join(',',map '"'.$_.'"', @val)."\n"  or redo;
+		}
+		close $fh  or redo;
+	}
 }
 
 sub RunCommand
