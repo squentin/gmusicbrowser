@@ -2,12 +2,13 @@
 # Translators:
 # Hiunn_Hue <hiunnhue108@ymail.com>, 2012
 # Hiunn_Hue <hiunnhue108@ymail.com>, 2012
+# Hiunn_Hue <hiunnhue108@ymail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2014-01-04 22:57+0100\n"
-"PO-Revision-Date: 2013-12-18 08:48+0000\n"
+"POT-Creation-Date: 2014-02-12 23:51+0100\n"
+"PO-Revision-Date: 2014-02-13 08:49+0000\n"
 "Last-Translator: squentin <squentin@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/"
 "gmusicbrowser/language/zh_TW/)\n"
@@ -522,7 +523,7 @@ msgid "Desktop widgets plugin"
 msgstr "桌面小工具外掛程式"
 
 msgid "Disable screensaver when fullscreen and playing"
-msgstr "當全螢幕和播放時，停用螢幕保護程式"
+msgstr "全螢幕播放時停用螢幕保護程式"
 
 msgid "Disabled"
 msgstr "已禁用"
@@ -551,9 +552,6 @@ msgstr "顯示 %d 微秒"
 
 msgid "Do not add a title row"
 msgstr "請勿加入標題行"
-
-msgid "Do not add songs that can't be played"
-msgstr "不要新增無法播放的歌曲"
 
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr "不要在 mp3 檔案中建立 id3v1 標籤"
@@ -766,6 +764,9 @@ msgstr "圖示主題"
 msgid "Ignore playback errors"
 msgstr "忽略播放錯誤"
 
+msgid "Import list"
+msgstr "匯入清單"
+
 msgid "Increase Volume"
 msgstr "提高音量"
 
@@ -876,6 +877,9 @@ msgstr "MIME 類型"
 
 msgid "Main"
 msgstr "主選單"
+
+msgid "Main artist"
+msgstr "主要演出者"
 
 msgid "Make it look like"
 msgstr "模擬其他播放軟體"
@@ -1268,6 +1272,9 @@ msgstr "最新的專輯"
 msgid "Recent artists"
 msgstr "近期的演出者"
 
+msgid "Recently played"
+msgstr "最近播放過的"
+
 msgid "Recently played songs"
 msgstr "最近播放過的歌曲"
 
@@ -1371,7 +1378,7 @@ msgid "Same year"
 msgstr "同一年"
 
 msgid "Sampling Rate"
-msgstr "取樣率"
+msgstr "採樣率"
 
 msgid "Saturday"
 msgstr "週六"
@@ -1851,6 +1858,9 @@ msgstr "icecast 伺服器"
 msgid "id3v1 tag"
 msgstr "id3v1 標籤"
 
+msgid "imported list"
+msgstr "匯入的清單"
+
 msgid "length of songs"
 msgstr "歌曲長度"
 
@@ -1949,6 +1959,10 @@ msgstr "文字格式"
 
 msgid "text mode"
 msgstr "文字模式"
+
+#, perl-format
+msgid "the %s most recent"
+msgstr "最近的 %s 首"
 
 msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
 msgstr "ID3v2.3 預設使用 UTF-16 編碼，而 ID3v2.4 則使用 UTF-8 編碼"
