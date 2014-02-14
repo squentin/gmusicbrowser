@@ -2259,7 +2259,7 @@ sub SaveTags	#save tags _and_ settings
 	}
 	#save fields properties, like album pictures ...
 	for my $field (sort keys %$extrasub)
-	{	print $fh "\n[$field]\n$extra_subfields->{$field}\n"  or $error++;
+	{	print $fh "\n[$field]\n$extra_subfields->{$field}\n"  or $error||=$!;
 		my $h= $extrasub->{$field}->();
 		for my $key (sort keys %$h)
 		{	my $vals= $h->{$key};

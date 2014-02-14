@@ -566,5 +566,3 @@ sub set_cover
 
 1
 
-__END__
-xml.amazon.com/onca/xml3?t=webservices-20&dev-t=%l&KeywordSearch=%s&mode=music&type=heavy&locale=us&page=1&f=xml

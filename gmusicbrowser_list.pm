@@ -1741,7 +1741,7 @@ our @cMenu=
 	},
 	{ label=> _"Remove label",	stockicon => 'gtk-remove',
 		code => sub { my $gid=$_[0]{gidlist}[0]; ::RemoveLabel($_[0]{field},$gid); },
-		onlyone=> 'gidlist',	test => sub { $_[0]{field} eq 'label' },	#FIXME ? label specific
+		onlyone=> 'gidlist',	test => sub { $_[0]{field} eq 'label' && $_[0]{gidlist}[0] !=0 },	#FIXME make it generic rather than specific to field label ? #FIXME find a better way to chack if gid is special than comparing it to 0
 	},
 #	{ separator=>1 },
 	{ label => _"Options", submenu => \@MenuPageOptions, stock => 'gtk-preferences', isdefined => 'field' },
@@ -3386,6 +3386,7 @@ sub update
 	#return if $self->{Sel} == $key;
 	if (defined $key) { $self->{Sel}=$key; }
 	else		  { $key=$self->{Sel}; }
+	return unless defined $key;
 	my $aa=$self->{aa};
 	$self->pic_update;
 	$self->{Ltitle}->set_markup( AA::ReplaceFields($key,"<big><b>%a</b></big>",$aa,1) );
@@ -3435,6 +3436,7 @@ sub size_allocate_cb
 sub setpic
 {	my $img=shift;
 	my $self= ::find_ancestor($img,__PACKAGE__);
+	return unless defined $self->{SelID};
 	my $file= $img->{filename}= AAPicture::GetPicture($self->{aa},$self->{Sel});
 	my $pixbuf= $file ? GMB::Picture::pixbuf($file,$img->{size}) : undef;
 	$img->set_from_pixbuf($pixbuf);

@@ -2590,7 +2590,7 @@ sub SavedLists_changed	#remove EditList tab if corresponding list has been delet
 }
 
 sub newbutton_cb
-{	 my $self= ::find_ancestor($_[0],__PACKAGE__);
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
 	::PopupContextMenu(\@contextmenu, { self=>$self, type=>$self->{typesubmenu}, usemenupos=>1 } );
 	1;
 }
@@ -4053,7 +4053,7 @@ sub update
 	}
 }
 sub SaveOptions
-{	my $self=shift,
+{	my $self=shift;
 	my %opt;
 	if (my $cats=$self->{cats})
 	{	$opt{collapsed}= $self->{collapsed}= join ' ', sort grep !$cats->{$_}->get_expanded, keys %$cats;
