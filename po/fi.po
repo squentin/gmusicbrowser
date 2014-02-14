@@ -1,13 +1,13 @@
 #
 # Translators:
-# Jiri Grönroos <jiri.gronroos@iki.fi>, 2012-2013
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2012-2014
 # Nikerabbit <niklas.laxstrom@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2014-01-04 22:57+0100\n"
-"PO-Revision-Date: 2013-12-18 18:13+0000\n"
+"POT-Creation-Date: 2014-02-12 23:51+0100\n"
+"PO-Revision-Date: 2014-02-13 12:24+0000\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
 "Language-Team: Finnish (http://www.transifex.com/projects/p/gmusicbrowser/"
 "language/fi/)\n"
@@ -252,6 +252,9 @@ msgstr "Albumi ja esittäjä"
 msgid "Album and artist on the left side"
 msgstr "Albumi ja esittäjä vasemalla puolella"
 
+msgid "Album cover"
+msgstr "Levyn kansi"
+
 msgid "Album mode"
 msgstr "Levytila"
 
@@ -379,6 +382,10 @@ msgstr "Selainikkunan asettelu:"
 
 msgid "Buttons"
 msgstr "Painikkeet"
+
+#, perl-brace-format
+msgid "Can't create folder: {path}"
+msgstr "Kansion luonti ei onnistu: {path}"
 
 msgid "Can't play this file."
 msgstr "Tätä tiedostoa ei voi toistaa."
@@ -617,6 +624,10 @@ msgstr "Laskeva järjestys"
 msgid "Description"
 msgstr "Kuvaus"
 
+#, perl-brace-format
+msgid "Destination: {file}"
+msgstr "Kohde: {file}"
+
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "Estä näytönsäästäjä soittaessa ja ollessa koko näytössä"
 
@@ -637,9 +648,6 @@ msgstr "Näytä kappaleet"
 
 msgid "Display synchronized lyrics of the current song"
 msgstr "Tiedoston '{file}' soitto ei onnistu."
-
-msgid "Do not add songs that can't be played"
-msgstr "Älä lisää kappaleita, joita ei voi soittaa"
 
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr "Älä luo id3v1-tunnisteita mp3-tiedostoihin"
@@ -695,8 +703,17 @@ msgstr "Taajuuskorjain"
 msgid "Error :"
 msgstr "Virhe:"
 
+msgid "Error creating folder"
+msgstr "Virhe kansiota luotaessa"
+
 msgid "Error details"
 msgstr "Virheen tiedot"
+
+msgid "Error writing .csv file"
+msgstr "Virhe kirjoittaessa .csv-tiedostoa"
+
+msgid "Error writing .m3u file"
+msgstr "Virhe kirjoittaessa .m3u-tiedostoa"
 
 msgid "Events"
 msgstr "Tapahtumat"
@@ -755,6 +772,9 @@ msgstr "Tiedostonimi ilman päätettä"
 
 msgid "Files"
 msgstr "Tiedostot"
+
+msgid "Files with these extensions won't be added"
+msgstr "Ilman tiedostopäätettä olevia tiedostoja ei lisätä"
 
 msgid "Filesystem"
 msgstr "Tiedostojärjestelmä"
@@ -1030,6 +1050,9 @@ msgstr[1] "Siirretään %d tiedostoa"
 msgid "Music"
 msgstr "Musiikki"
 
+msgid "Music files"
+msgstr "Musiikkitiedostot"
+
 msgid "Mute/Unmute"
 msgstr "Vaimenna/poista vaimennus"
 
@@ -1192,6 +1215,9 @@ msgstr "Avaa tämä sivu verkkoselaimessa"
 
 msgid "Options"
 msgstr "Valinnat"
+
+msgid "Options ..."
+msgstr "Valinnat.."
 
 msgid "Original Artist"
 msgstr "Alkuperäinen esittäjä"
@@ -2125,6 +2151,10 @@ msgid "disc {disc}"
 msgstr "levy {disc}"
 
 #, perl-format
+msgid "doesn't contain %s"
+msgstr "ei sisällä %s"
+
+#, perl-format
 msgid "doesn't include %s"
 msgstr "ei sisällä %s"
 
@@ -2152,6 +2182,10 @@ msgstr "esimerkit:"
 
 msgid "false"
 msgstr "epätosi"
+
+#, perl-brace-format
+msgid "file: {filename}"
+msgstr "tiedosto: {filename}"
 
 msgid "filters"
 msgstr "suodattimet"
@@ -2228,8 +2262,14 @@ msgstr "on wavepack-tiedosto"
 msgid "is an aac file"
 msgstr "on aac-tiedosto"
 
+msgid "is an alac file"
+msgstr "on alac-tiedosto"
+
 msgid "is an ape file"
 msgstr "on ape-tiedosto"
+
+msgid "is an mp4/m4a file"
+msgstr "on mp4/m4a-tiedosto"
 
 msgid "is false"
 msgstr "on epätosi"
@@ -2291,6 +2331,9 @@ msgstr "enemmän kuin"
 
 msgid "move folder"
 msgstr "siirrä kansio"
+
+msgid "mplayer executable :"
+msgstr "mplayer-suoritustiedosto:"
 
 msgid "mplayer options :"
 msgstr "mplayer-valinnat:"
