@@ -3499,7 +3499,7 @@ our %Options2=
 );
 our @DefaultOptions=
 (	nb	=> 1,
-	fields	=> $SelectorMenu[0][1],
+	fields	=> $SelectorMenu[2][1],
 	autofilter =>1,
 );
 
