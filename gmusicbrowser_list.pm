@@ -9,8 +9,6 @@ use strict;
 use warnings;
 
 package Browser;
-use Gtk2 ;
-
 use constant { TRUE  => 1, FALSE => 0, };
 
 our @MenuPlaying=
@@ -116,8 +114,6 @@ sub fill_history_menu
 }
 
 package LabelTotal;
-use Gtk2;
-
 use base 'Gtk2::Bin';
 
 our %Modes=
@@ -275,8 +271,6 @@ sub library_Update
 
 package EditListButtons;
 use Glib qw(TRUE FALSE);
-use Gtk2;
-
 use base 'Gtk2::Box';
 
 sub new
@@ -339,9 +333,7 @@ sub SelectionChanged
 
 package QueueActions;
 use Glib qw(TRUE FALSE);
-use Gtk2;
-
-use base 'Gtk2::HBox';
+use base 'Gtk2::Box';
 
 sub new
 {	my $class=$_[0];
@@ -756,9 +748,7 @@ sub EditRowTip
 
 package SongList;
 use Glib qw(TRUE FALSE);
-use Gtk2;
 use Gtk2::Pango; #for PANGO_WEIGHT_BOLD, PANGO_WEIGHT_NORMAL
-
 use base 'Gtk2::ScrolledWindow';
 
 our @ISA;
@@ -1382,7 +1372,6 @@ sub SetSelection
 ################################################################################
 package SongStore;
 use Glib qw(TRUE FALSE);
-use Gtk2;
 
 my (%Columns,@Value,@Type);
 
@@ -1577,8 +1566,7 @@ sub button_release_cb #clear selection and select current row only if the press 
 }
 
 package FilterPane;
-use Gtk2;
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 
 use constant { TRUE  => 1, FALSE => 0, };
 
@@ -2117,8 +2105,7 @@ sub PopupOpt	#Only for FilterList #FIXME should be moved in FilterList::, and/or
 }
 
 package FilterList;
-use Gtk2;
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 use constant { GID_ALL => 2**31-1, GID_TYPE => 'Glib::Long' };
 
 our %defaults=
@@ -2576,7 +2563,6 @@ sub key_press_cb
 }
 
 package FolderList;
-use Gtk2;
 use base 'Gtk2::ScrolledWindow';
 
 sub new
@@ -2751,7 +2737,6 @@ sub _treepath_to_foldername
 }
 
 package Filesystem;  #FIXME lots of common code with FolderList => merge it
-use Gtk2;
 use base 'Gtk2::ScrolledWindow';
 
 sub new
@@ -2934,8 +2919,7 @@ sub _treepath_to_foldername
 }
 
 package SavedTree;
-use Gtk2;
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 
 use constant { TRUE  => 1, FALSE => 0, };
 
@@ -3237,8 +3221,7 @@ sub _getplayfilter
 }
 
 package GMB::AABox;
-use Gtk2;
-use base 'Gtk2::EventBox';
+use base 'Gtk2::Bin';
 
 our @DefaultOptions=
 (	aa	=> 'album',
@@ -3887,7 +3870,7 @@ sub SuggestionMenu_field_expand
 }
 
 package SimpleSearch::old;
-use base 'Gtk2::HBox';
+use base 'Gtk2::Box';
 our @ISA;
 BEGIN {unshift @ISA,'SimpleSearch';}
 
@@ -3964,7 +3947,7 @@ sub set_icon_sensitive
 
 
 package SongSearch;
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 
 sub new
 {	my ($class,$opt)=@_;
@@ -4003,7 +3986,7 @@ sub EntryChanged_cb
 }
 
 package AASearch;
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 
 sub new
 {	my ($class,$opt)=@_;
@@ -4410,8 +4393,7 @@ sub get_value
 }
 
 package GMB::Cloud;
-use Gtk2;
-use base 'Gtk2::DrawingArea';
+use base 'Gtk2::Widget';
 
 use constant
 {	XPAD => 2,	YPAD => 2,
@@ -4771,8 +4753,7 @@ sub key_press_cb
 }
 
 package GMB::Mosaic;
-use Gtk2;
-use base 'Gtk2::DrawingArea';
+use base 'Gtk2::Widget';
 
 use constant
 {	XPAD => 2,	YPAD => 2,
@@ -5255,8 +5236,7 @@ sub _drawpix
 }
 
 package GMB::ISearchBox;	#interactive search box (search as you type)
-use Gtk2;
-use base 'Gtk2::HBox';
+use base 'Gtk2::Box';
 
 our %OptCodes=
 (	casesens => 'i',	onlybegin => 'b',	onlyword => 'w',	hidenomatch => 'h',
@@ -5470,8 +5450,7 @@ Gtk2::VBox::,
 
 
 package SongTree;
-use Gtk2;
-use base 'Gtk2::HBox';
+use base 'Gtk2::Box';
 our @ISA;
 our %STC;
 INIT { unshift @ISA, 'SongList::Common'; }
@@ -6737,7 +6716,6 @@ sub query_tooltip_cb
 }
 
 package SongTree::Headers;
-use Gtk2;
 use base 'Gtk2::Viewport';
 use constant TREE_VIEW_DRAG_WIDTH => 6;
 
@@ -7516,8 +7494,7 @@ sub epack
 }
 
 package GMB::Edit::STGroupings;
-use Gtk2;
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 
 my %opt_types=
 (	Text	=> [ sub {my $entry=Gtk2::Entry->new;$entry->set_text($_[0]); return $entry}, sub {$_[0]->get_text},1 ],
@@ -8039,7 +8016,7 @@ sub playmarkup
 
 =toremove
 package GMB::RadioList;
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 
 sub new
 {	my ($class)=@_;

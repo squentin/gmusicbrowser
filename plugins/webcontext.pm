@@ -583,8 +583,7 @@ sub SongChanged
 
 
 package GMB::Plugin::WebContext::Custom::Edition;
-use Gtk2;
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 
 my $CustomPages= $::Options{GMB::Plugin::WebContext::OPT.'Custom'};
 

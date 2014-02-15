@@ -300,10 +300,8 @@ sub Error_Message
 }
 
 package MassTag;
-use Gtk2;
-use constant
-{	TRUE  => 1, FALSE => 0,
-};
+
+use constant { TRUE  => 1, FALSE => 0, };
 
 our @FORMATS;
 our @FORMATS_user;
@@ -363,7 +361,7 @@ INIT
 # @FORMATS=@tmp;
 }
 
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 sub new
 {	my ($class,@IDs) = @_;
 	@IDs= ::uniq(@IDs);
@@ -944,7 +942,6 @@ sub cursor_changed_cb
 
 
 package GMB::TagEdit::EntryString;
-use Gtk2;
 use base 'Gtk2::Entry';
 
 sub new
@@ -965,8 +962,7 @@ sub tool
 }
 
 package GMB::TagEdit::EntryText;
-use Gtk2;
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 
 sub new
 {	my ($class,$field,$IDs) = @_;
@@ -1019,7 +1015,6 @@ sub tool
 }
 
 package GMB::TagEdit::EntryNumber;
-use Gtk2;
 use base 'Gtk2::SpinButton';
 
 sub new
@@ -1088,7 +1083,6 @@ sub output_nozero
 }
 
 package GMB::TagEdit::EntryBoolean;
-use Gtk2;
 use base 'Gtk2::CheckButton';
 
 sub new
@@ -1111,7 +1105,6 @@ sub get_text
 }
 
 package GMB::TagEdit::Combo;
-use Gtk2;
 use base 'Gtk2::Box';
 
 sub new
@@ -1154,8 +1147,7 @@ sub tool
 
 
 package GMB::TagEdit::EntryRating;
-use Gtk2;
-use base 'Gtk2::HBox';
+use base 'Gtk2::Box';
 
 sub new
 {	my ($class,$field,$IDs) = @_;
@@ -1211,7 +1203,6 @@ sub is_blank
 }
 
 package GMB::TagEdit::FlagList;
-use Gtk2;
 use base 'Gtk2::Box';
 
 sub new
@@ -1307,7 +1298,6 @@ sub set_text		# for setting from autofill-from-filename
 }
 
 package GMB::TagEdit::EntryMassList;	#for mass-editing fields with multiple values
-use Gtk2;
 use base 'Gtk2::Box';
 
 sub new
@@ -1435,11 +1425,10 @@ sub set_text		# for setting from autofill-from-filename
 }
 
 package EditTagSimple;
-use Gtk2;
+use base 'Gtk2::Box';
 
 use constant { TRUE  => 1, FALSE => 0, };
 
-use base 'Gtk2::VBox';
 sub new
 {	my ($class,$window,$ID) = @_;
 	my $self = bless Gtk2::VBox->new, $class;
@@ -1527,9 +1516,7 @@ sub save
 ############################## Advanced tag editing ##############################
 
 package EditTag;
-use Gtk2;
-
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 
 sub new
 {	my ($class,$window,$ID) = @_;
@@ -1593,13 +1580,13 @@ sub save
 }
 
 package TagBox;
-use Gtk2;
+use base 'Gtk2::Box';
+
 use constant
 {	TRUE  => 1, FALSE => 0,
 	#contents of types hashes :
 	TAGNAME => 0, TAGORDER => 1, TAGTYPE => 2,
 };
-use base 'Gtk2::VBox';
 
 my %DataType;
 my %tagprop;
@@ -1912,9 +1899,9 @@ sub save
 }
 
 package TagBox_id3v1;
-use Gtk2;
+use base 'Gtk2::Box';
+
 use constant { TRUE  => 1, FALSE => 0 };
-use base 'Gtk2::VBox';
 
 sub new
 {	my ($class,$tag,$option)=@_;
@@ -1968,7 +1955,6 @@ sub save
 }
 
 package EntrySimple;
-use Gtk2;
 use base 'Gtk2::Entry';
 
 sub new
@@ -1989,7 +1975,6 @@ sub return_value
 }
 
 package EntryMultiLines;
-use Gtk2;
 use base 'Gtk2::ScrolledWindow';
 
 sub new
@@ -2021,7 +2006,6 @@ sub return_value
 }
 
 package EntryDouble;
-use Gtk2;
 use base 'Gtk2::Entry';
 
 sub new
@@ -2041,7 +2025,6 @@ sub return_value
 }
 
 package EntryNumber;
-use Gtk2;
 use base 'Gtk2::SpinButton';
 
 sub new
@@ -2060,7 +2043,6 @@ sub return_value
 }
 
 package EntryBoolean;
-use Gtk2;
 use base 'Gtk2::CheckButton';
 
 sub new
@@ -2077,7 +2059,6 @@ sub return_value
 	return $value;
 }
 package EntryCombo;
-use Gtk2;
 use base 'Gtk2::ComboBox';
 
 sub new
@@ -2106,7 +2087,7 @@ sub return_value
 }
 
 package EntryMulti;	#for id3v2 frames containing multiple fields
-use Gtk2;
+use base 'Gtk2::Frame';
 
 my %SUBTAGPROP; my $PICTYPE;
 INIT
@@ -2166,7 +2147,6 @@ INIT
 	);
 	$SUBTAGPROP{metadata_block_picture}=$SUBTAGPROP{APIC}; #for vorbis pictures
 }
-use base 'Gtk2::Frame';
 
 sub new
 {	my ($class,$values,$key,$name,$type,$realkey) = @_;
@@ -2211,7 +2191,6 @@ sub return_value
 }
 
 package EntryBinary;
-use Gtk2;
 use base 'Gtk2::Button';
 
 sub new
@@ -2257,8 +2236,7 @@ sub view
 }
 
 package EntryCover;
-use Gtk2;
-use base 'Gtk2::HBox';
+use base 'Gtk2::Box';
 
 sub new
 {	my $class = shift;
@@ -2374,7 +2352,6 @@ sub _identify_pictype	#used only if $Gtk2::VERSION < 1.092
 }
 
 package EntryLyrics;
-use Gtk2;
 use base 'Gtk2::Button';
 
 sub new

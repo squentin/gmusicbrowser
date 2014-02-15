@@ -3902,7 +3902,6 @@ sub _staticfy
 
 
 package GMB::ListStore::Field;
-use Gtk2;
 use base 'Gtk2::ListStore';
 
 our %ExistingStores;
@@ -3959,7 +3958,6 @@ sub update
 }
 
 package GMB::ListStore::Field::Combo;
-use Gtk2;
 use base 'Gtk2::ComboBox';
 
 sub new

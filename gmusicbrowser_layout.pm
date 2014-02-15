@@ -9,7 +9,6 @@ use strict;
 use warnings;
 
 package Layout;
-use Gtk2;
 
 use constant
 {
@@ -1586,7 +1585,6 @@ sub PopupSongsFromAlbum
 ####################################
 
 package Layout::Window;
-use Gtk2;
 our @ISA;
 BEGIN {push @ISA,'Layout';}
 use base 'Gtk2::Window';
@@ -1948,7 +1946,6 @@ sub resize_skin_cb	#FIXME needs to add a delay to better deal with a burst of re
 }
 
 package Layout::Window::Popup;
-use Gtk2;
 our @ISA;
 BEGIN {push @ISA,'Layout','Layout::Window';}
 
@@ -2170,7 +2167,6 @@ sub SaveEmbeddedOptions
 }
 
 package Layout::Boxes;
-use Gtk2;
 
 our %Boxes=
 (	HB	=>
@@ -2343,7 +2339,6 @@ sub Fixed_pack
 }
 
 package SFixed;
-use Gtk2;
 use Glib::Object::Subclass
 	Gtk2::Fixed::,
 	signals =>
@@ -2379,7 +2374,6 @@ sub size_allocate
 }
 
 package Layout::NoteBook;
-use Gtk2;
 use base 'Gtk2::Notebook';
 
 our @contextmenu=
@@ -2906,7 +2900,6 @@ sub SaveOptions
 }
 
 package Layout::Button;
-use Gtk2;
 use base 'Gtk2::Bin';
 
 our @default_options= (button=>1, relief=>'none', size=> Layout::SIZE_BUTTONS, ellipsize=> 'none', );
@@ -3010,12 +3003,9 @@ sub UpdateStock
 }
 
 package Layout::Label;
-use Gtk2;
-
-use constant	INCR => 1;	#scroll increment in pixels
-
 use base 'Gtk2::EventBox';
 
+use constant	INCR => 1;	#scroll increment in pixels
 our @default_options= ( xalign=>0, yalign=>.5, );
 
 sub new
@@ -3217,7 +3207,6 @@ sub update_time
 }
 
 package Layout::Bar;
-use Gtk2;
 use base 'Gtk2::ProgressBar';
 
 sub new
@@ -3335,7 +3324,6 @@ sub scroll_cb
 }
 
 package Layout::Bar::skin;
-use Gtk2;
 our @ISA=('Layout::Bar');
 use base 'Gtk2::EventBox';
 
@@ -3390,7 +3378,6 @@ sub expose_cb
 }
 
 package Layout::Bar::Scale;
-use Gtk2;
 use base 'Gtk2::Scale';
 
 sub new
@@ -3465,8 +3452,6 @@ sub update_value_direct_mode
 }
 
 package Layout::AAPicture;
-use Gtk2;
-
 use base 'Gtk2::EventBox';
 
 our @default_options= (maxsize=>500, xalign=>.5, yalign=>.5, r_height=>25, r_alpha1=>80, r_alpha2=>0, r_scale=>90);
@@ -3708,9 +3693,8 @@ sub add_overlay
 }
 
 package Layout::TogButton;
-use Gtk2;
-
 use base 'Gtk2::ToggleButton';
+
 sub new
 {	my ($class,$opt)=@_;
 	my $self = bless Gtk2::ToggleButton->new, $class;
@@ -3766,7 +3750,6 @@ sub toggled_cb		#also used by Layout::MenuItem
 }
 
 package Layout::MenuItem;
-use Gtk2;
 
 sub new
 {	my $opt=shift;
@@ -4189,7 +4172,6 @@ sub ToggleFollow
 }
 
 package Stars;
-use Gtk2;
 use base 'Gtk2::EventBox';
 
 sub new_layout_widget
@@ -4458,14 +4440,12 @@ sub update
 
 # SVBox and SHBox are Gtk2::VBox and Gtk2::HBox with a smarter size_allocate function : the normal boxes divide the extra space equally among children with the expand mode. With these boxes the extra space can be allocated to children up to a ratio of their other dimension (expand_to_ratio), or according to a weight (expand_weight)
 package SVBox;
-use Gtk2;
 use Glib::Object::Subclass
 	Gtk2::VBox::,
 	signals =>
 	{	size_allocate => \&SHBox::size_allocate,
 	};
 package SHBox;
-use Gtk2;
 use Glib::Object::Subclass
 	Gtk2::HBox::,
 	signals =>
@@ -4597,7 +4577,6 @@ sub size_allocate
 }
 
 package Skin;
-use Gtk2;
 
 sub new
 {	my ($class,$string,$widget,$options)=@_;

@@ -7472,7 +7472,6 @@ sub ShowHide
 }
 
 package GMB::Edit;
-use Gtk2;
 use base 'Gtk2::Dialog';
 
 my %refs;
@@ -7644,8 +7643,7 @@ sub Result
 
 
 package GMB::Edit::Filter;
-use Gtk2;
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 use constant
 {  TRUE  => 1, FALSE => 0,
    C_NAME => 0,	C_FILTER => 1,
@@ -7935,8 +7933,7 @@ sub Result
 }
 
 package GMB::Edit::Sort;
-use Gtk2;
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 use constant { TRUE  => 1, FALSE => 0, SENSITIVE => 1, INSENSITIVE => 2, };
 sub new
 {	my ($class,$dialog,$init) = @_;
@@ -8151,8 +8148,7 @@ sub Result
 }
 
 package GMB::Edit::WRandom;
-use Gtk2;
-use base 'Gtk2::VBox';
+use base 'Gtk2::Box';
 use constant
 { TRUE  => 1, FALSE => 0,
   NBCOLS	=> 20,
@@ -8456,8 +8452,7 @@ sub Result
 }
 
 package GMB::FilterBox;
-use Gtk2;
-use base 'Gtk2::HBox';
+use base 'Gtk2::Box';
 
 our (%ENTRYTYPE);
 
