@@ -228,12 +228,12 @@ our %Widgets=
 our @default_options= (follow=>1, urientry=>1, statusbar=>0, );
 our @contextmenu=
 (	{	label=> _"Show/hide URI entry",
-		check => sub { $_[0]{self}{urientry} },
-		code => sub { my $w=$_[0]{self}{Entry}; if ($_[0]{self}{urientry}^=1) { $w->set_no_show_all(0); $w->show_all; } else { $w->hide; }  },
+		toggleoption=> 'self/urientry',
+		code => sub { my $w=$_[0]{self}{Entry}; if ($_[0]{self}{urientry}) { $w->set_no_show_all(0); $w->show_all; } else { $w->hide; }  },
 	},
 	{	label=> _"Show/hide status bar",
-		check => sub { $_[0]{self}{statusbar} },
-		code => sub { my $w=$_[0]{self}{Status}; if ($_[0]{self}{statusbar}^=1) { $w->set_no_show_all(0); $w->show_all; } else { $w->hide; }  },
+		toggleoption=> 'self/statusbar',
+		code => sub { my $w=$_[0]{self}{Status}; if ($_[0]{self}{statusbar}) { $w->set_no_show_all(0); $w->show_all; } else { $w->hide; }  },
 	},
 );
 

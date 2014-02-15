@@ -12,7 +12,7 @@ package Browser;
 use constant { TRUE  => 1, FALSE => 0, };
 
 our @MenuPlaying=
-(	{ label => _"Follow playing song",	code => sub { $_[0]{songlist}->FollowSong if $_[0]{songlist}->{follow}^=1; }, check => sub { $_[0]{songlist}->{follow} }, },
+(	{ label => _"Follow playing song",	code => sub { $_[0]{songlist}->FollowSong if $_[0]{songlist}->{follow}; }, toggleoption => 'songlist/follow' },
 	{ label => _"Filter on playing Album",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('album',$::SongID) )	if defined $::SongID; }},
 	{ label => _"Filter on playing Artist",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('artists',$::SongID) )if defined $::SongID; }},
 	{ label => _"Filter on playing Song",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('title',$::SongID) )	if defined $::SongID; }},
@@ -853,11 +853,11 @@ our @ColumnMenu=
 	},
 	{ label => _("Edit row tip").'...', code => sub { $_[0]{self}->EditRowTip; },
 	},
-	{ label => _"Keep list filtered and sorted",	code => sub { $_[0]{self}{array}->SetAutoUpdate( $_[0]{self}{autoupdate}^=1 ); },
-	  check => sub { $_[0]{self}{autoupdate} },	mode => 'B',
+	{ label => _"Keep list filtered and sorted",	code => sub { $_[0]{self}{array}->SetAutoUpdate( $_[0]{self}{autoupdate} ); },
+	  toggleoption => 'self/autoupdate',	mode => 'B',
 	},
-	{ label => _"Follow playing song",	code => sub { $_[0]{self}->FollowSong if $_[0]{self}{follow}^=1; },
-	  check => sub { $_[0]{self}{follow} }
+	{ label => _"Follow playing song",	code => sub { $_[0]{self}->FollowSong if $_[0]{self}{follow}; },
+	  toggleoption => 'self/follow',
 	},
 	{ label => _"Go to playing song",	code => sub { $_[0]{self}->FollowSong; }, },
 );
@@ -1681,11 +1681,9 @@ my @MenuSubGroup=
 	  check => sub {$_[0]{mode} eq 'M'},	notmode => 'S',
 	  test => sub { Songs::FilterListProp($_[0]{field},'picture') },
 	},
-	{ label => _"show the 'All' row",	code => sub { my $self=$_[0]{self}; $self->{noall}^=1; $self->SetOption; },
-	  check => sub { !$_[0]{self}{noall} }, mode => 'L',
+	{ label => _"show the 'All' row",	code => sub { $_[0]{self}->SetOption; },  toggleoption => '!self/noall', mode => 'L',
 	},
-	{ label => _"show histogram background",code => sub { my $self=$_[0]{self}; $self->{histogram}^=1; $self->SetOption; },
-	  check => sub { $_[0]{self}{histogram} }, mode => 'L',
+	{ label => _"show histogram background",code => sub { $_[0]{self}->SetOption; },  toggleoption => 'self/histogram', mode => 'L',
 	},
 );
 
@@ -1733,10 +1731,8 @@ our @cMenu=
 	},
 #	{ separator=>1 },
 	{ label => _"Options", submenu => \@MenuPageOptions, stock => 'gtk-preferences', isdefined => 'field' },
-	{ label => _"Show buttons",	code => sub { my $fp=$_[0]{filterpane}; $fp->{hidebb}^=1; if ($fp->{hidebb}) {$fp->{bottom_buttons}->hide} else {$fp->{bottom_buttons}->show} },
-	  check => sub {!$_[0]{filterpane}{hidebb};} },
-	{ label => _"Show tabs",	code => sub { my $fp=$_[0]{filterpane}; $fp->{hidetabs}^=1; $fp->{notebook}->set_show_tabs( !$fp->{hidetabs} ); },
-	  check => sub {!$_[0]{filterpane}{hidetabs};} },
+	{ label => _"Show buttons",	toggleoption => '!filterpane/hidebb',	code => sub { my $fp=$_[0]{filterpane}; $fp->{bottom_buttons}->set_visible(!$fp->{hidebb}); }, },
+	{ label => _"Show tabs",	toggleoption => '!filterpane/hidetabs',	code => sub { my $fp=$_[0]{filterpane}; $fp->{notebook}->set_show_tabs( !$fp->{hidetabs} ); }, },
 );
 
 our @DefaultOptions=
@@ -5242,10 +5238,10 @@ our %OptCodes=
 (	casesens => 'i',	onlybegin => 'b',	onlyword => 'w',	hidenomatch => 'h',
 );
 our @OptionsMenu=
-(	{ label => _"Case-sensitive",	code => sub { $_[0]{self}{casesens}^=1; $_[0]{self}->changed; },	check => sub { $_[0]{self}{casesens}; }, },
-	{ label => _"Begin with",	code => sub { $_[0]{self}{onlybegin}^=1; $_[0]{self}{onlyword}=0; $_[0]{self}->changed;},	check => sub { $_[0]{self}{onlybegin}; }, },
-	{ label => _"Words that begin with",	code => sub { $_[0]{self}{onlyword}^=1;$_[0]{self}{onlybegin}=0; $_[0]{self}->changed;},		check => sub { $_[0]{self}{onlyword}; }, },
-	{ label => _"Hide non-matching",	code => sub { $_[0]{self}{hidenomatch}^=1; $_[0]{self}{close_button}->set_visible($_[0]{self}{hidenomatch}); $_[0]{self}->changed;},		check => sub { $_[0]{self}{hidenomatch}; }, test=> sub { $_[0]{self}{type} } },
+(	{ label => _"Case-sensitive",	toggleoption => 'self/casesens',	code => sub { $_[0]{self}->changed; }, },
+	{ label => _"Begin with",	toggleoption => 'self/onlybegin',	code => sub { $_[0]{self}{onlyword}=0; $_[0]{self}->changed;}, },
+	{ label => _"Words that begin with",	toggleoption => 'self/onlyword',code => sub { $_[0]{self}{onlybegin}=0; $_[0]{self}->changed;},	},
+	{ label => _"Hide non-matching",toggleoption=> 'self/hidenomatch',	code => sub { $_[0]{self}{close_button}->set_visible($_[0]{self}{hidenomatch}); $_[0]{self}->changed;}, test=> sub { $_[0]{self}{type} } },
 	{ label => _"Fields",		submenu => sub { return {map { $_=>Songs::FieldName($_) } Songs::StringFields}; }, submenu_reverse => 1,
 	  check => sub { $_[0]{self}{fields}; },	test => sub { !$_[0]{self}{type} },
 	  code => sub { my $toggle=$_[1]; my $l=$_[0]{self}{fields}; my $n=@$l; @$l=grep $toggle ne $_, @$l; push @$l,$toggle if @$l==$n; @$l=('title') unless @$l; $_[0]{self}->changed; }, #toggle selected field
@@ -6739,11 +6735,11 @@ our @ColumnMenu=
 	},
 	{ label => _("Edit row tip").'...', code => sub { $_[0]{songtree}->EditRowTip; },
 	},
-	{ label => _"Keep list filtered and sorted",	code => sub { $_[0]{songtree}{array}->SetAutoUpdate( $_[0]{songtree}{autoupdate}^=1 ); },
-	  check => sub { $_[0]{songtree}{autoupdate} },	mode => 'B',
+	{ label => _"Keep list filtered and sorted",	code => sub { $_[0]{songtree}{array}->SetAutoUpdate( $_[0]{songtree}{autoupdate} ); },
+	  toggleoption => 'songtree/autoupdate',	mode => 'B',
 	},
-	{ label => _"Follow playing song",	code => sub { $_[0]{songtree}->FollowSong if $_[0]{songtree}{follow}^=1; },
-	  check => sub { $_[0]{songtree}{follow} }
+	{ label => _"Follow playing song",	code => sub { $_[0]{songtree}->FollowSong if $_[0]{songtree}{follow}; },
+	  toggleoption => 'songtree/follow',
 	},
 	{ label => _"Go to playing song",	code => sub { $_[0]{songtree}->FollowSong; }, },
 );

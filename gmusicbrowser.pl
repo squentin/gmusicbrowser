@@ -3993,6 +3993,18 @@ sub Breakdown_List
 	return $menu;
 }
 
+sub ParseKeyPath
+{	my ($ref,$keypath)=@_;
+	my $not= $keypath=~s/^!//;
+	my @parents= split /\//,$keypath;
+	my $last=pop @parents;
+	for my $key (@parents)
+	{	$ref= $ref->{$key};
+		if (!ref $ref) { $ref={}; warn "ParseKeyPath error keypath=$keypath invalid\n"; last }
+	}
+	return $not, \$ref->{$last};
+}
+
 sub BuildMenu
 {	my ($mref,$args,$menu)=@_;
 	$args ||={};
@@ -4023,6 +4035,12 @@ sub BuildMenu
 		elsif ($m->{stockicon})
 		{	$item=Gtk2::ImageMenuItem->new($label);
 			$item->set_image( Gtk2::Image->new_from_stock($m->{stockicon},'menu') );
+		}
+		elsif (my $keypath=$m->{toggleoption})
+		{	$item=Gtk2::CheckMenuItem->new($label);
+			my ($not,$ref)=ParseKeyPath($args,$keypath);
+			$item->{toggleref}= $ref;
+			$item->set_active(1) if $$ref xor $not;
 		}
 		elsif ( ($m->{check} || $m->{radio}) && !$m->{submenu})
 		{	$item=Gtk2::CheckMenuItem->new($label);
@@ -4061,6 +4079,7 @@ sub BuildMenu
 		{	$item->{code}=$m->{code};
 			$item->signal_connect (activate => sub
 				{	my ($self,$args)=@_;
+					if (my $ref=$self->{toggleref}) { $$ref^=1 }
 					my $on; $on=$self->get_active if $self->isa('Gtk2::CheckMenuItem');
 					if (my $code=$self->{code})
 					{	if (ref $code) { $code->($args,$on); }
