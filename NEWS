@@ -1,3 +1,14 @@
+v1.1.12
+fix not being able to remove filters from lists in playlist mode
+fix performances problems with autoupdated lists
+fix some dialogs appearing below other windows
+fix creating windows bigger than screen
+replace "Do not add songs that can't be played" option by "Ignored file extensions" option
+export plugin: fix wrong encoding of certain file names in .m3u
+export plugin: export more fields in csv files
+don't print messages in normal operation, add -verbose option
+translation updates: Chinese(Taiwan), Finnish
+
 v1.1.11
 improve search responsiveness (improve responsiveness of SimpleSearch)
 add auto-update mode that keeps browser lists sorted and filtered (on by default, can be disabled in the songlist/songtree option menu)

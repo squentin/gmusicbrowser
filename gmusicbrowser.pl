@@ -79,8 +79,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1011',
- VERSIONSTRING => '1.1.11',
+ VERSION => '1.1012',
+ VERSIONSTRING => '1.1.12',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 # PERL510 => $^V ge 'v5.10',
