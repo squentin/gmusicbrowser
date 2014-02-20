@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+use v5.10;
 use strict;
 use warnings;
 use utf8;
@@ -83,7 +84,6 @@ use constant
  VERSIONSTRING => '1.1.12',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
-# PERL510 => $^V ge 'v5.10',
 
  DRAG_STRING	=> 0, DRAG_USTRING	=> 1, DRAG_FILE		=> 2,
  DRAG_ID	=> 3, DRAG_ARTIST	=> 4, DRAG_ALBUM	=> 5,
@@ -3918,7 +3918,7 @@ sub Breakdown_List
 			if ($bestscore[$i]) #if a path already used that breakpoint, compare the score
 			{	next if $bestscore[$i]<$score; # ignore the new path if not better
 				#new path has a better score => remove all paths that used that breakpoint
-				@todo=grep {!grep $_==$i, @$_} @todo; #FIXME use perl 5.10 smart match
+				@todo=grep !($i~~@$_), @todo;
 			}
 			$bestscore[$i]=$score;
 			my $path= [@$path0,$i];
