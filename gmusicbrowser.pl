@@ -6616,7 +6616,7 @@ sub PrefLibrary
 }
 sub ChooseAddPath
 {	my ($addtolibrary,$allowfiles)=@_;
-	$allowfiles&&= [ [_"Music files", undef, join(' ',map "*.$_", sort @ScanExt) ], [_"All files",undef,'*']  ];
+	$allowfiles&&= [ [_"Music files", undef, join(' ',map '*.'.$_, sort @ScanExt) ], [_"All files",undef,'*']  ];
 	my @dirs=ChooseDir(_"Choose folder to add", remember_key=>'LastFolder_Add', multiple=>1, allowfiles=>$allowfiles);
 	@dirs=map url_escape($_), @dirs;
 	AddPath($addtolibrary,@dirs);
