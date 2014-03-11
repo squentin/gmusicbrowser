@@ -8633,7 +8633,6 @@ sub Set
 		$item->signal_connect( activate => \&cmd_changed_cb,$f);
 		$menu->append($item);
 	}
-	$menu->attach_to_widget($self,undef);
 
 	($cmd,my $pattern)= split /:/,$cmd,2;
 	$pattern='' unless defined $pattern;
@@ -9095,7 +9094,7 @@ sub UpdatePixPath
 {	my ($oldpath,$newpath)=@_;
 	$_= pathslash($_) for $oldpath,$newpath; #make sure the path ends with SLASH
 	$oldpath=qr/^\Q$oldpath\E/;
-	s/$oldpath/$newpath/ for grep $_, map @$_, @ArraysOfFiles;
+	for my $ref (@ArraysOfFiles) {s#$oldpath#$newpath# for grep $_, @$ref}
 }
 
 sub PixLoader_callback

@@ -2941,7 +2941,7 @@ INIT
 		stockicon => 'gtk-remove',	mode => 'L', onlyone => 'names', },
 	{ label => _"Rename",	code => sub { my $tv=$_[0]{self}{treeview}; $tv->set_cursor($_[0]{treepaths}[0],$tv->get_column(0),TRUE); },
 		notempty => 'names',	onlyone => 'treepaths' },
-	{ label => _"Import list",	code => sub { ::Choose_and_import_playlist_files(); }, mode => 'L', },
+	{ label => _("Import list").'...',	code => sub { ::Choose_and_import_playlist_files($_[0]{self}); }, mode => 'L', },
   );
 
   %Modes=
