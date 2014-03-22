@@ -23,7 +23,7 @@ use utf8;
 package main;
 use Gtk2 '-init';
 use Glib qw/filename_from_unicode filename_to_unicode/;
-use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime _exit/;
+use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime getcwd _exit/;
 use Encode qw/_utf8_on _utf8_off/;
 {no warnings 'redefine'; #some work arounds for old versions of perl-Gtk2 and/or gtk2
  *filename_to_utf8displayname=\&Glib::filename_display_name if *Glib::filename_display_name{CODE};
@@ -54,7 +54,6 @@ use Encode qw/_utf8_on _utf8_off/;
 }
 use List::Util qw/min max sum first/;
 use File::Copy;
-use File::Spec::Functions qw/file_name_is_absolute catfile rel2abs/;
 use Fcntl qw/O_NONBLOCK O_WRONLY O_RDWR SEEK_SET/;
 use Scalar::Util qw/blessed weaken refaddr/;
 use Unicode::Normalize 'NFKD'; #for accent-insensitive sort and search, only used via superlc()
@@ -131,6 +130,8 @@ BEGIN
  }
 }
 
+our $QSLASH;	#quoted SLASH for use in regex
+
 # %html_entities and decode_html() are only used if HTML::Entities is not found
 my %html_entities=
 (	amp => '&', 'lt' => '<', 'gt' => '>', quot => '"', apos => "'",
@@ -147,6 +148,67 @@ BEGIN
 {	no warnings 'redefine';
 	eval {require HTML::Entities};
 	*decode_html= \&HTML::Entities::decode_entities unless $@;
+	$QSLASH=quotemeta SLASH;
+}
+
+sub file_name_is_absolute
+{	my $path=shift;
+	$^O eq 'MSWin32' ? $path=~m#^\w:$QSLASH#o : $path=~m#^$QSLASH#o;
+}
+sub rel2abs
+{	my ($path,$base)=@_;
+	return $path if file_name_is_absolute($path);
+	$base||= POSIX::getcwd;
+	return catfile($base,$path);
+}
+sub catfile
+{	my $path=join SLASH,@_;
+	$path=~s#$QSLASH{2,}#SLASH#goe;
+	return $path;
+}
+sub pathslash
+{	#return catfile($_[0],'');
+	my $path=shift;
+	$path.=SLASH unless $path=~m/$QSLASH$/o;
+	return $path;
+}
+sub simplify_path
+{	my ($path,$end_with_slash)=@_;
+	1 while $path=~s#$QSLASH+[^$QSLASH]+$QSLASH\.\.(?:$QSLASH+|$)#SLASH#oe;
+	return cleanpath($path,$end_with_slash);
+}
+sub cleanpath	#remove repeated slashes, /./, and make sure it (does or doesn't) end with a slash
+{	my ($path,$end_with_slash)=@_;
+	$path=~s#$QSLASH\.$QSLASH#SLASH#goe;
+	$path=~s#$QSLASH{2,}#SLASH#goe;
+	$path=~s#$QSLASH$##o;
+	$path.=SLASH if $end_with_slash || $path!~m#$QSLASH#o; # $end_with_slash or root folder
+	return $path;
+}
+sub splitpath
+{	my $path=shift;
+	$path=~s#$QSLASH+([^$QSLASH]+)$##o;
+	my $file=$1;
+	$path.=SLASH unless $path=~m#$QSLASH#o; #root folder
+	return $path,$file;
+}
+sub dirname
+{	(&splitpath)[0];
+}
+sub parentdir
+{	my $path=shift;
+	$path=~s#$QSLASH+$##o;
+	return $path=~m#$QSLASH#o ? dirname($path) : undef;
+}
+sub basename
+{	my $file=shift;
+	$file=~m#([^$QSLASH]+)$#o;
+	return $1;
+}
+sub barename #filename without extension
+{	my $file=&basename;
+	$file=~s#\.([^.]*)$##o;
+	return wantarray ? ($file,$1) : $file;
 }
 
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
@@ -159,17 +221,12 @@ our ($HomeDir,$SaveFile,$FIFOFile,$ImportFile,$DBus_id);
 sub find_gmbrc_file { my @f= map $_[0].$_, '','.gz','.xz'; return wantarray ? (grep { -e $_ } @f) : first { -e $_ } @f }
 my $gmbrc_ext_re= qr/\.gz$|\.xz$/;
 
-our $QSLASH;	#quoted SLASH for use in regex
-#FIXME use :		use constant QSLASH => quotemeta SLASH;
-#  ???			and ${\QSLASH} instead of $QSLASH
-
 # Parse command line
 BEGIN	# in a BEGIN block so that commands for a running instance are sent sooner/faster
-{ our $QSLASH=quotemeta SLASH;
-  $DBus_id='org.gmusicbrowser';
+{ $DBus_id='org.gmusicbrowser';
 
-  my $default_home= Glib::get_user_config_dir.SLASH.'gmusicbrowser'.SLASH;
-  if (!-d $default_home && -d (my $old= Glib::get_home_dir.SLASH.'.gmusicbrowser'.SLASH ) )
+  my $default_home= Glib::get_user_config_dir.SLASH.'gmusicbrowser';
+  if (!-d $default_home && -d (my $old= Glib::get_home_dir.SLASH.'.gmusicbrowser' ) )
   {	warn "Using folder $old for configuration, you could move it to $default_home to conform to the XDG Base Directory Specification\n";
 	$default_home=$old;
   }
@@ -300,11 +357,11 @@ Options to change what is done with files/folders passed as arguments (done in r
 	if (defined $save)
 	{	my $isdir= $save=~m#/$#;	## $save is considered a folder if ends with a "/"
 		$save= rel2abs($save);
-		if (-d $save || $isdir) { $HomeDir = $save.SLASH; }
+		if (-d $save || $isdir) { $HomeDir = $save; }
 		else			{ $SaveFile= $save; }
 	}
 	warn "using '$HomeDir' folder for saving/setting folder instead of '$default_home'\n" if $debug && $HomeDir;
-	$HomeDir ||= $default_home;
+	$HomeDir= pathslash(cleanpath($HomeDir || $default_home)); # $HomeDir must end with a slash
 	if (!-d $HomeDir)
 	{	warn "Creating folder $HomeDir\n";
 		my $current='';
@@ -1093,7 +1150,7 @@ sub LoadIcons
 
 	my @dirs=($HomeDir.'icons');
 	if (my $theme=$Options{IconTheme})
-	{	my $dir= $HomeDir.SLASH.'icons'.SLASH.$theme;
+	{	my $dir= $HomeDir.'icons'.SLASH.$theme;
 		$dir=PIXPATH.$theme unless -d $dir;
 		unshift @dirs,$dir;
 	}
@@ -1628,12 +1685,9 @@ sub SearchPicture	# search for file with a relative path among a few folders, us
 	return $file if file_name_is_absolute($file);
 	push @paths, $HomeDir.'layouts', $CmdLine{searchpath}, PIXPATH, $DATADIR.SLASH.'layouts';	#add some default folders
 	@paths= grep defined, map ref() ? @$_ : $_, @paths;
-	-f && s/[^$QSLASH]*$//o for @paths;			#replace files by their folder
-	if (my $found=first { -f $_.SLASH.$file } @paths)
-	{	$found.= SLASH.$file;
-		$found=~s#$QSLASH+\.?$QSLASH+#SLASH#goe;	#cleanup path
-		return $found;
-	}
+	for (@paths) { $_=dirname($_) if -f; }		#replace files by their folder
+	my $found=first { -f $_.SLASH.$file } @paths;
+	return cleanpath($found.SLASH.$file) if $found;
 	warn "Can't find file '$file' (looked in : @paths)\n";
 	return undef;
 }
@@ -2205,9 +2259,7 @@ sub SaveTags	#save tags _and_ settings
 	if (exists $CmdLine{gzip}) { $ext= $CmdLine{gzip} eq 'gzip' ? '.gz' : $CmdLine{gzip} eq 'xz' ? '.xz' : '' }
 	#else { $ext='.gz' } # use gzip by default
 
-	my $savedir=$SaveFile;
-	$savedir=~s/([^$QSLASH]+)$//o;
-	my $savefilename=$1;
+	my ($savedir,$savefilename)= splitpath($SaveFile);
 	unless (-d $savedir) { warn "Creating folder $savedir\n"; mkdir $savedir or warn $!; }
 	opendir my($dh),$savedir;
 	unlink $savedir.SLASH.$_ for grep m/^\Q$savefilename\E\.new\.\d+(?:$gmbrc_ext_re)?$/, readdir $dh; #delete old temporary save files
@@ -4454,7 +4506,7 @@ COPYNEXTID:for my $ID (@$IDs)
 			next COPYNEXTID if $res ne 'retry';
 		}
 		unless ($copy)
-		{	$newdir=~s/$QSLASH+$//o;
+		{	$newdir= cleanpath($newdir);
 			my @modif;
 			push @modif, path => $newdir  if $olddir ne $newdir;
 			push @modif, file => $newfile if $oldfile ne $newfile;
@@ -4867,10 +4919,9 @@ sub pathfromformat
 	{	my $constant=$1;
 		$path.= filename_from_unicode($constant);	# calling filename_from_unicode directly on $1 causes strange bugs afterward (with perl-Glib-1.222)
 	}
-	$path= Songs::Get($ID,'path').SLASH.$path if $path!~m#^~?$QSLASH#o; # use song's path as base for relative paths
 	$path=~s#^~($QSLASH)#$ENV{HOME}$1#o;				# replace leading ~/ by homedir
-	$path=~s#$QSLASH+\.?$QSLASH+#SLASH#goe; 			# remove repeated slashes and /./
-	1 while $path=~s#$QSLASH[^$QSLASH]+$QSLASH\.\.$QSLASH#SLASH#oe;	# handle ..
+	$path= Songs::Get($ID,'path').SLASH.$path if $path!~m#^$QSLASH#o; # use song's path as base for relative paths
+	$path= simplify_path($path,1);
 	for my $f0 (split /$QSLASH+/o,$format)
 	{	my $f= ReplaceFieldsForFilename($ID,$f0);
 		next if $f=~m/^\.\.?$/;
@@ -4879,8 +4930,7 @@ sub pathfromformat
 		}
 		$path.=$f.SLASH;
 	}
-	$path=~s/$QSLASH+/SLASH/oge;	#remove all repeated slashes
-	return $path;
+	return cleanpath($path,1);
 }
 sub pathfilefromformat
 {	my ($ID,$format,$ext,$icase)=@_;	# $format is in utf8
@@ -5024,7 +5074,7 @@ sub DialogMassRename
 		  if ($folders)
 		  {	my $base0= my $base= decode_url( $Options{BaseFolder} );
 			unless ( defined $base ) { ErrorMessage(_("You must specify a base folder"),$dialog); return }
-			until ( -d $base ) { last unless $base=~s/$QSLASH[^$QSLASH]*$//o && $base=~m/$QSLASH/o;  }
+			until ( -d $base ) { last unless $base=parentdir($base);  }
 			unless ( -w $base ) { ErrorMessage(__x(_("Can't write in base folder '{folder}'."), folder => filename_to_utf8displayname($base0)),$dialog); return }
 			$dialog->set_sensitive(FALSE);
 			my $folderformat=$comboFolder->get_active_text;
@@ -5420,7 +5470,8 @@ sub pls_to_files
 
 sub Parse_playlist_file	#return filenames from playlist files (.m3u, .pls, ...)
 {	my $pl_file=shift;
-	my ($basedir,$name,$ext)= $pl_file=~m/^(.*?)([^$QSLASH]+?)\.([^.]*)$/;
+	my ($basedir,$name)= splitpath($pl_file);
+	($name,my $ext)= barename($name);
 	my $sub= $playlist_file_parsers{lc $ext};
 	if (!$sub) { warn "Unsupported playlist format '$name.$ext'\n" }
 	open my($fh),'<',$pl_file  or do {warn "Error reading $pl_file : $!"; return};
@@ -5480,8 +5531,7 @@ sub Uris_to_IDs
 sub FolderToIDs
 {	my ($add,$recurse,@dirs)=@_;
 	s#^file://## for @dirs;
-	s/$QSLASH$//o for @dirs;
-	s/$QSLASH{2,}/$QSLASH/go for @dirs;
+	@dirs= map cleanpath($_), @dirs;
 	my @files;
 	MakeScanRegex() unless $ScanRegex;
 	while (defined(my $dir=shift @dirs))
@@ -5527,6 +5577,7 @@ sub ScanFolder
 {	warn "Scanning : @_\n" if $Verbose;
 	my $dir=$_[0];
 	$dir=~s#^file://##;
+	$dir=cleanpath($dir);
 	MakeScanRegex() unless $ScanRegex;
 	Songs::Build_IDFromFile() unless $Songs::IDFromFile;
 	$ScanProgress_cb ||= Glib::Timeout->add(500,\&ScanProgress_cb);
@@ -5536,11 +5587,13 @@ sub ScanFolder
 		{	@files=readdir $DIRH;
 			closedir $DIRH;
 		}
-		else { warn "Can't open folder $dir : $!\n"; return }
+		else { warn "ScanFolder: can't open folder $dir : $!\n"; return }
 	}
-	elsif (-f $dir && $dir=~s/$QSLASH([^$QSLASH]+)$//o)
-	{	@files=($1);
+	elsif (-f $dir)
+	{	($dir,my $file)=splitpath($dir);
+		@files=($file) if $file;
 	}
+	else {warn "ScanFolder: can't find $dir\n"}
 	#my @toadd;
 	for my $file (@files)
 	{	next if $file=~m#^\.#;		# skip . .. and hidden files/folders
@@ -5549,20 +5602,9 @@ sub ScanFolder
 		if (-d $path_file)
 		{	#next if $notrecursive;
 			# make sure it doesn't look in the same dir twice due to symlinks
-			if (-l $path_file)
-			{	my $real=readlink $path_file;
-				$real= $dir.SLASH.$real unless $real=~m#^$QSLASH#o;
-				$real.=SLASH;				#make it end with a slash to make regexes simpler
-				$real=~s#$QSLASH\.?$QSLASH+#SLASH#goe;					#simplify /./ or //
-				1 while $real=~s#$QSLASH[^$QSLASH]+$QSLASH\.\.$QSLASH#SLASH#oe;		#simplify /folder/../
-				$real=~s#$QSLASH+$##;							#remove trailing slash
-				next if exists $FollowedDirs{$real};
-				$FollowedDirs{$real}=undef;
-			}
-			else
-			{	next if exists $FollowedDirs{$path_file};
-				$FollowedDirs{$path_file}=undef;
-			}
+			my $real= -l $path_file ? simplify_path(rel2abs(readlink($path_file),$dir)) : $path_file;
+			next if exists $FollowedDirs{$real};
+			$FollowedDirs{$real}=undef;
 			push @ToScan,$path_file;
 			next;
 		}
@@ -6410,9 +6452,8 @@ sub UpdateTags
 }
 
 sub AskRenameFolder
-{	my $parent=shift;
-	$parent=~s/([^$QSLASH]+)$//o;
-	my $old=$1;
+{	my ($parent,$old)=splitpath($_[0]);
+	$parent= cleanpath($parent,1);
 	my $dialog=Gtk2::Dialog->new(_"Rename folder", undef,
 			[qw/modal destroy-with-parent/],
 			'gtk-ok' => 'ok',
@@ -6445,9 +6486,8 @@ sub AskRenameFolder
 }
 
 sub MoveFolder #FIXME implement
-{	my $parent=shift;
-	$parent=~s/([^$QSLASH]+)$//o;
-	my $folder=$1;
+{	my ($parent,$folder)=splitpath($_[0]);
+	$parent= cleanpath($parent,1);
 	my $new=ChooseDir(_"Move folder to", path=>$parent);
 	return unless $new;
 	my $old=$parent.$folder.SLASH;
@@ -6460,7 +6500,7 @@ sub MoveFolder #FIXME implement
 
 sub UpdateFolderNames
 {	my ($oldpath,$newpath)=@_;
-	s/$QSLASH+$//o for $oldpath,$newpath;
+	$_=cleanpath($_) for $oldpath,$newpath;
 	my $filter= 'path:i:'.Songs::filename_escape($oldpath);
 	utf8::upgrade($filter); #for unclear reasons, it is needed for non-utf8 folder names. Things should be clearer once the filter code is changed to keep patterns in variables, instead of including them in the eval
 	my $renamed=Songs::AllFilter($filter);
@@ -6587,8 +6627,7 @@ sub AddPath
 	@dirs= grep !m#^\w+://#, @dirs;
 	my $changed;
 	for my $dir (@dirs)
-	{	$dir=~s/$QSLASH$//o unless $dir eq SLASH || $dir=~m/^\w:.$/;
-		my $d=decode_url($dir);
+	{	my $d=cleanpath(decode_url($dir));
 		if (!-d $d) { ScanFolder($d); next }
 		IdleScan($d);
 		next unless $addtolibrary;
@@ -9054,7 +9093,7 @@ sub load_skinfile
 
 sub UpdatePixPath
 {	my ($oldpath,$newpath)=@_;
-	m/$::QSLASH$/o or $_.=::SLASH for $oldpath,$newpath; #make sure the path ends with SLASH
+	$_= pathslash($_) for $oldpath,$newpath; #make sure the path ends with SLASH
 	$oldpath=qr/^\Q$oldpath\E/;
 	s/$oldpath/$newpath/ for grep $_, map @$_, @ArraysOfFiles;
 }

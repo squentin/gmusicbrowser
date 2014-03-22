@@ -1823,8 +1823,7 @@ sub New
 	my ($size,$modif)=(stat $file)[7,9];
 	my $values= FileTag::Read($file,1);
 	unless ($values) { warn "Error reading tag for $file\n"; return undef; }
-	my $path=$file;
-	$path=~s/$::QSLASH([^$::QSLASH]+)$//o and $file=$1;
+	(my $path,$file)=::splitpath($file);
 	%$values=(	%$values,
 			file => $file,	path=> $path,
 			modif=> $modif, size=> $size,
@@ -2245,14 +2244,14 @@ sub Build_IDFromFile
 sub FindID
 {	my $f=$_[0];
 	if ($f=~m/\D/)
-	{	$f=~s#$::QSLASH{2,}#::SLASH#goe; #remove double SLASH
-		if ($f=~s/$::QSLASH([^$::QSLASH]+)$//o)
+	{	my ($dir,$file)= ::splitpath(::simplify_path($f));
+		if (defined $file)
 		{	$IDFromFile||=Build_IDFromFile();
-			return $IDFromFile->{$f}{$1};
-			#return $IDFromFile->{$f}{$1} if $IDFromFile;
-			#my $m=Filter->newadd(1,'file:e:'.$1, 'path:e:'.$f)->filter_all;
+			return $IDFromFile->{$dir}{$file};
+			#return $IDFromFile->{$dir}{$file} if $IDFromFile;
+			#my $m=Filter->newadd(1,'file:e:'.$file, 'path:e:'.$dir)->filter_all;
 			#if (@$m)
-			#{	warn "Error, more than one ID match $f/$1" if @$m>1;
+			#{	warn "Error, more than one ID match $dir/$file" if @$m>1;
 			#	return $m->[0];
 			#}
 		}
