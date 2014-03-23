@@ -2780,7 +2780,10 @@ sub new
 	    {	my @paths=_get_path_selection( $_[0] );
 		return undef unless @paths;
 		my $filter=_MakeFolderFilter(@paths);
-		return ::DRAG_ID,($filter? @{$filter->filter} : undef);
+		return undef unless $filter;
+		my @list= @{$filter->filter};
+		::SortList(\@list);
+		return ::DRAG_ID,@list;
 	    }]);
 	MultiTreeView::init($treeview,__PACKAGE__);
 	return $self;
