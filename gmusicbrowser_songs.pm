@@ -3743,6 +3743,7 @@ sub UpdateSort
 	@old=@$self unless $::RandomMode;
 	$self->_sort;
 	::HasChanged('SongArray',$self,'sort',$::Options{Sort},\@old) unless $::RandomMode;
+	$::Position=undef;  $::ChangedPos=1;
 	_updateID($::SongID);
 }
 sub UpdateLock
@@ -3770,7 +3771,8 @@ sub Add		#only called in filter mode
 	{	my $ID= $self->_FindFirst($self);
 		$self->SetID($ID)
 	}
-	::QHasChanged('Pos');
+	$::ChangedPos=1;
+	::UpdateCurrentSong();
 }
 
 sub SetID
