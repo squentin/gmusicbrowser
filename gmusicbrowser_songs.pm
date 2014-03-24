@@ -1819,10 +1819,10 @@ sub MakeSaveSub
 sub New
 {	my $file=$_[0];
 	#check already in @Songs#FIXME
-	warn "Reading Tag for $file\n";
+	warn "Reading Tag for $file\n" if $::Verbose;
 	my ($size,$modif)=(stat $file)[7,9];
 	my $values= FileTag::Read($file,1);
-	unless ($values) { warn "Error reading tag for $file\n"; return undef; }
+	return unless $values;
 	(my $path,$file)=::splitpath($file);
 	%$values=(	%$values,
 			file => $file,	path=> $path,
@@ -1865,7 +1865,7 @@ sub ReReadFile		#force values :
 		Changed([$ID],@changed) if @changed;
 	}
 	elsif (!$noremove)	#file not found
-	{	warn "can't find file '$file'\n";
+	{	warn "Can't find file '$file'\n";
 		::SongsRemove([$ID]);
 	}
 }

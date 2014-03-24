@@ -44,7 +44,7 @@ sub Read
 	return unless $format;
 	my ($package,$formatstring,$plist)=@$format;
 	my $filetag= eval { $package->new($file,$findlength); }; #filelength==1 -> may return estimated length (mp3 only)
-	unless ($filetag) { warn $@ if $@; warn "can't read tags for $file\n"; return }
+	unless ($filetag) { warn $@ if $@; warn "Can't read tags for $file\n"; return }
 
 	::setlocale(::LC_NUMERIC, 'C');
 	my @taglist;
