@@ -2743,21 +2743,15 @@ sub new
 	$self->set_policy ('automatic', 'automatic');
 	::set_biscrolling($self);
 
-	my $store=Gtk2::TreeStore->new('Glib::String');
+	my $store=Gtk2::TreeStore->new('Glib::String','Glib::Uint');
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->set_headers_visible(::FALSE);
 	$treeview->set_enable_search(!$opt->{no_typeahead});
 	#$treeview->set('fixed-height-mode' => ::TRUE);	#only if fixed-size column
-	$treeview->signal_connect(row_expanded  => \&row_expanded_changed_cb);
-	$treeview->signal_connect(row_collapsed => \&row_expanded_changed_cb);
-	#$treeview->{expanded}={}; #not used
+	$treeview->signal_connect(test_expand_row  => \&row_expand_cb);
 	my $renderer= Gtk2::CellRendererText->new;
 	my $column=Gtk2::TreeViewColumn->new_with_attributes('',$renderer);
-	$column->set_cell_data_func($renderer, sub
-		{	my (undef,$cell,$store,$iter)=@_;
-			my $folder=::decode_url($store->get($iter,0));
-			$cell->set( text=> ::filename_to_utf8displayname($folder) );
-		});
+	$column->set_cell_data_func($renderer, \&cell_data_func_cb);
 	$treeview->append_column($column);
 
 	$self->add($treeview);
@@ -2799,69 +2793,127 @@ sub Fill
 	my $root= ::SLASH;
 	$root='C:' if $^O eq 'MSWin32'; #FIXME Win32 find a way to list the drives
 	$store->set($iter,0, ::url_escape($root));
-	$self->refresh_path($store->get_path($iter));
-	$treeview->expand_to_path($store->get_path($iter));
+	my $treepath= $store->get_path($iter);
 	 #expand to home dir
 	for my $folder (split /$::QSLASH/o, ::url_escape(Glib::get_home_dir))
 	{	next if $folder eq '';
+		$self->refresh_path($treepath,1);
 		$iter=$store->iter_children($iter);
 		while ($iter)
 		{	last if $folder eq $store->get($iter,0);
 			$iter=$store->iter_next($iter);
+			$treepath=$store->get_path($iter);
 		}
 		last unless $iter;
-		$treeview->expand_to_path($store->get_path($iter));
 	}
+	$self->refresh_path($treepath,1);
+	$treeview->expand_to_path($treepath);
 	$self->{valid}=1;
 }
 
-sub row_expanded_changed_cb
+sub cell_data_func_cb
+{	my ($tvcolumn,$cell,$store,$iter)=@_;
+	my $folder=::decode_url($store->get($iter,0));
+	$cell->set( text=> ::filename_to_utf8displayname($folder) );
+	my $treeview= $tvcolumn->get_tree_view;
+	Glib::Timeout->add(10,\&idle_load,$treeview) unless $treeview->{queued_load};
+	push @{$treeview->{queued_load}}, $store->get_path($iter);
+}
+sub idle_load
+{	my $treeview=shift;
+	my $queue=$treeview->{queued_load};
+	return 0 unless $queue;
+	my ($first,$last)= $treeview->get_visible_range;
+	unless ($first && $last) { @$queue=(); return 0 }
+	while (my $path=shift @$queue)
+	{	next unless $path->compare($first)>=0 && $path->compare($last)<=0; # ignore if out of view
+		my $self=::find_ancestor($treeview,__PACKAGE__);
+		my $partial=$self->refresh_path($path);
+		if ($partial) { unshift @$queue,$path; return 1 }
+		last if Gtk2->events_pending;
+	}
+	return 1 if @$queue;
+	delete $treeview->{queued_load};
+	return 0;
+}
+
+sub row_expand_cb
 {	my ($treeview,$iter,$path)=@_;
 	my $self=::find_ancestor($treeview,__PACKAGE__);
-	my $store=$treeview->get_model;
-	my $expanded=$treeview->row_expanded($path);
-	return unless $expanded;
-	return unless $self->refresh_path($path);
-	$iter=$store->get_iter($path);
-	$iter=$store->iter_children($iter);
-	while ($iter)
-	{	my $path=$store->get_path($iter);
-		$self->refresh_path($path);
-		$iter=$store->iter_next($iter);
-	}
+	$self->refresh_path($path,1);
+	return !$treeview->get_model->iter_children($iter);
 }
 
 sub refresh_path
-{	my ($self,$path)=@_;
+{	my ($self,$path,$force)=@_;
 	my $treeview=$self->{treeview};
 	my $store=$treeview->get_model;
-	my $onlyfirst=!$treeview->row_expanded($path);
 	my $parent=$store->get_iter($path);
 	my $folder=_treepath_to_foldername($store,$path);
+	return 0 unless $folder;
 	$folder= ::decode_url($folder);
-	unless (-d $folder)
-	{	$store->remove($parent);
-		return undef;
+	my @subfolders;
+	my $full= $force || $treeview->row_expanded($path);
+	my $continue;
+	if ($self->{in_progress})
+	{	if ($full || $self->{in_progress}{folder} ne $folder) { delete $self->{in_progress}; }
+		else {$continue=1}
 	}
-	my $ok=opendir my($dh),$folder;
-	return 0 unless $ok;
+	my $dh; my $lastmodif;
+	if (!$continue) # check folder is there and if treeview up-to-date
+	{	my $ok=opendir $dh,$folder;
+		unless ($ok) { $store->remove($parent) unless -d $folder; return 0; }
+		$lastmodif= (stat $dh)[9] || 1;# ||1 to ùake sure it isn't 0, as 0 means not read
+		my $lastrefresh=$store->get($parent,1);
+		return 0 if $lastmodif==$lastrefresh && !$force;
+	}
+	if ($full)
+	{	@subfolders= grep !m#^\.# && -d $folder.::SLASH.$_, readdir $dh;
+		close $dh;
+	}
+	else # the content of the folder will be search for subfolders in chunks (-d can sometimes be slow)
+	{	my $progress= $self->{in_progress} ||= { list=>[], found=>[], lastmodif=>$lastmodif, folder=>$folder };
+		my $list=  $progress->{list};
+		my $found= $progress->{found};
+		if (!$continue)
+		{	@$list= grep !m#^\.#, readdir $dh;
+			close $dh;
+		}
+		while (@$list)
+		{	return 1 if Gtk2->events_pending; # continue later
+			my $dir=shift @$list;
+			push @$found,$dir if -d $folder.::SLASH.$dir;
+		}
+		@subfolders=@$found;
+		$lastmodif= $progress->{lastmodif};
+		delete $self->{in_progress};
+	}
+	# got the list of subfolders, update the treeview
+	$store->set($parent,1,$lastmodif);
 	my $iter=$store->iter_children($parent);
-	NEXTDIR: for my $dir (sort grep -d $folder.::SLASH.$_ , readdir $dh)
-	{	next if $dir=~m#^\.#;
-		$dir= ::url_escape($dir);
+	NEXTDIR: for my $dir (sort @subfolders)
+	{	$dir= ::url_escape($dir);
 		while ($iter)
 		{	my $c= $dir cmp $store->get($iter,0);
-			unless ($c) { $iter=$store->iter_next($iter);next NEXTDIR;}
-			last if $c>0;
+			unless ($c) { $iter=$store->iter_next($iter); next NEXTDIR; } #folder already there
+			last if $c<0;
+			# there should be no subfolders before => remove them
 			my $iter2=$store->iter_next($iter);
 			$store->remove($iter);
 			$iter=$iter2;
 		}
+		# add subfolder
 		my $iter2=$store->insert_before($parent,$iter);
-		$store->set($iter2,0,$dir);
-		last if $onlyfirst;
+		$store->set($iter2,0,$dir,1,0);
+		my $dummy=$store->insert_after($iter2,undef);
+		$store->set($dummy,0,"",1,0); #add dummy child
 	}
-	return 1;
+	while ($iter) #no more subfolders => remove any trailing folders
+	{	my $iter2=$store->iter_next($iter);
+		$store->remove($iter);
+		$iter=$iter2;
+	}
+	return 0;
 }
 
 sub selection_changed_cb
