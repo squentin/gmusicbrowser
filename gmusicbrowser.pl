@@ -1002,6 +1002,11 @@ my ($CheckProgress_cb,$ScanProgress_cb,$ProgressNBSongs,$ProgressNBFolders);
 my %Plugins;
 my $ScanRegex;
 
+my %Encoding_pref;
+$Encoding_pref{$_}=-2 for qw/null AdobeZdingbat ascii-ctrl dingbats MacDingbats/; #don't use these
+$Encoding_pref{$_}=-1 for qw/UTF-32BE UTF-32LE/; #these can generate lots of warnings, skip them when trying encodings
+$Encoding_pref{$_}=2 for qw/utf8 cp1252 iso-8859-15/; #use these first when trying encodings
+
 #Default values
 our %Options=
 (	Layout		=> 'Lists, Library & Context',
@@ -4582,13 +4587,15 @@ sub FileChooser_add_filters
 }
 
 sub ChooseFiles
-{	my ($text,$remember_key,@patterns)=@_;
+{	my ($text,%opt)=@_;
 	$text||=_"Choose files";
-	my $dialog=Gtk2::FileChooserDialog->new($text,undef,'open',
+	my ($extrawidget,$remember_key,$patterns,$multiple,$parent) = @opt{qw/extrawidget remember_key patterns multiple parent/};
+	my $dialog=Gtk2::FileChooserDialog->new($text,$parent,'open',
 					'gtk-ok' => 'ok',
 					'gtk-cancel' => 'none');
-	$dialog->set_select_multiple(1);
-	FileChooser_add_filters($dialog,@patterns);
+	$dialog->set_extra_widget($extrawidget) if $extrawidget;
+	$dialog->set_select_multiple(1) if $multiple;
+	FileChooser_add_filters($dialog,@$patterns);
 	if ($remember_key)
 	{	my $path= decode_url($Options{$remember_key});
 		$dialog->set_current_folder($path);
@@ -5477,41 +5484,65 @@ sub Parse_playlist_file	#return filenames from playlist files (.m3u, .pls, ...)
 	open my($fh),'<',$pl_file  or do {warn "Error reading $pl_file : $!"; return};
 	my $content = do { local( $/ ) ; <$fh> } ;
 	close $fh;
-	my @files=$sub->($content);
 	my @list;
-	for my $file (@files)
+	for my $file ($sub->($content))
 	{	if ($file=~s#^file://##) { $file=decode_url($file); }
 		elsif ($file=~m#^http://#) {next} #ignored for now
-		push @list, CaseSensFile( rel2abs($file,$basedir) );
+		#push @list, CaseSensFile( rel2abs($file,$basedir) );
+		push @list,$file;
 	}
-	return @list;
+	if (1) # try hard to find the correct filenames by trying different encodings and case-incensivity
+	{	my @enc= sort { ($Encoding_pref{$b}||0) <=> ($Encoding_pref{$a}||0) } grep {($Encoding_pref{$_}||0) >=0} Encode->encodings(':all');
+		for my $enc (@enc)
+		{	my @found;
+			my @test=@list;
+			eval {	no warnings;
+				for my $file (@test)
+				{	Encode::from_to($file,$enc, 'UTF-8', Encode::FB_CROAK);
+					$file &&= CaseSensFile(rel2abs($file,$basedir));
+					if ($file && -f $file) { push @found,$file } else {last}
+				}
+			};
+			if (@found==@list)
+			{	warn "playlist import: using encoding $enc\n" if $::debug;
+				$Encoding_pref{$enc}||=1; #give some priority to found encoding
+				return @found;
+			}
+		}
+	}
+	return map CaseSensFile(rel2abs($_,$basedir)), @list;
 }
 
 sub Import_playlist_file	#create saved lists from playlist files (.m3u, .pls, ...)
 {	my $pl_file=shift;
-	warn "Importing $pl_file\n";
+	warn "Importing $pl_file\n" if $Verbose;
 	my @files=Parse_playlist_file($pl_file);
 	my @list; my @toadd;
 	for my $file (@files)
 	{	my $ID=Songs::FindID($file);
+		#unless (defined $ID) {warn "Can't find file $file in the library\n"; next}
 		unless (defined $ID)
 		{	$ID=Songs::New($file);
 			push @toadd,$ID if defined $ID;
 		}
-		unless (defined $ID) {warn "Can't add file $file\n"; next}
-		#unless (defined $ID) {warn "Can't find file $file in the library\n"; next}
+		#unless (defined $ID) {warn "Can't add file $file\n"; next}
+		next unless defined $ID;
 		push @list,$ID;
 	}
 	SongAdd_now(@toadd) if @toadd; #add IDs to the Library if needed
-	unless (@list) { warn "No file from '$pl_file' found in the library\n"; return }
-	my ($name)= $pl_file=~m/([^$QSLASH]+?)\.[^.]*$/;
+	if (@list) { printf STDERR "$pl_file lists %d files, %d were found, %d were not already in the library\n",scalar @files, scalar @list, scalar @toadd if $Verbose || @files!=@list; }
+	else { warn "No file from '$pl_file' found in the library\n"; return }
+	my $name= filename_to_unicode(barename($pl_file));
 	$name= _"imported list" unless $name=~m/\S/;
 	::IncSuffix($name) while $Options{SavedLists}{$name}; #find a new name
 	SaveList($name,\@list);
 }
 sub Choose_and_import_playlist_files
-{	my $pattern=join ' ',map "*.$_", sort keys %playlist_file_parsers;
-	my @files=ChooseFiles(_"Choose playlist files to import", 'LastFolder_playlists', [_"Playlist files",undef,$pattern ]);
+{	my $parentwin= $_[0] && $_[0]->get_toplevel;
+	my $pattern=join ' ',map "*.$_", sort keys %playlist_file_parsers;
+	my @files=ChooseFiles(_"Choose playlist files to import",
+		remember_key=>'LastFolder_playlists', multiple=>1, parent=>$parentwin,
+		patterns=>[[_"Playlist files",undef,$pattern ]]);
 	Import_playlist_file($_) for @files;
 }
 
@@ -6397,7 +6428,7 @@ sub PrefTags
 	my $checkv4=NewPrefCheckButton('TAG_write_id3v2.4',_"Create ID3v2 tags as ID3v2.4", tip=>_"Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are probably better supported by other softwares");
 	my $checklatin1=NewPrefCheckButton(TAG_use_latin1_if_possible => _"Use latin1 encoding if possible in id3v2 tags", tip=>_"the default is utf16 for ID3v2.3 and utf8 for ID3v2.4");
 	my $check_unsync=NewPrefCheckButton(TAG_no_desync => _"Do not unsynchronise id3v2 tags", tip=>_"itunes doesn't support unsynchronised tags last time I checked, mostly affect tags with pictures");
-	my @Encodings=grep $_ ne 'null', Encode->encodings(':all');
+	my @Encodings= grep {($Encoding_pref{$_}||0)>=-1} Encode->encodings(':all');
 	my $id3v1encoding=NewPrefCombo(TAG_id3v1_encoding => \@Encodings, text => _"Encoding used for id3v1 tags :");
 	my $nowrite=NewPrefCheckButton(TAG_nowrite_mode => _"Do not write the tags", tip=>_"Will not write the tags except with the advanced tag editing dialog. The changes will be kept in the library instead.\nWarning, the changes for a song will be lost if the tag is re-read.");
 	my $noid3v1=NewPrefCheckButton(TAG_id3v1_noautocreate=> _"Do not create an id3v1 tag in mp3 files", tip=>_"Only affect mp3 files that do not already have an id3v1 tag");
