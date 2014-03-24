@@ -381,7 +381,7 @@ sub Fill
 	$store->clear;
 	delete $self->{actionindex};
 	my $i=0;
-	for my $action (::List_QueueActions())
+	for my $action (::List_QueueActions(0))
 	{	$store->set($store->append, 0,$::QActions{$action}{icon}, 1,$::QActions{$action}{short} ,2, $action );
 		$self->{actionindex}{$action}=$i++;
 	}

@@ -25,7 +25,7 @@ our @MenuQueue=
 	{label => _"Queue artist",	code => sub { ::EnqueueSame('artist',$_[0]{ID});}, istrue=>'ID', },  # or use field 'artists' or 'first_artist' ?
 	{ include => sub
 		{	my $menu=$_[1];
-			my @modes= map { $_=>$::QActions{$_}{long} } ::List_QueueActions();
+			my @modes= map { $_=>$::QActions{$_}{long} } ::List_QueueActions(0);
 			::BuildChoiceMenu( \@modes, menu=>$menu, ordered_hash=>1, 'reverse'=>1,
 				check=> sub {$::QueueAction}, code=> sub { ::EnqueueAction($_[1]); }, );
 		},
@@ -37,6 +37,16 @@ our @MenuQueue=
 					check => sub {$::Options{MaxAutoFill};},
 	},
 	{label => _"Edit...",		code => \&::EditQueue, test => sub { !$_[0]{mode} || $_[0]{mode} ne 'Q' }, },
+	{ separator=>1},
+	{ include => sub
+		{	my $menu=$_[1];
+			my @modes= map { $_=>$::QActions{$_}{long_next} } grep $_ ne '', ::List_QueueActions(1);
+			::BuildChoiceMenu( \@modes, menu=>$menu, ordered_hash=>1, 'reverse'=>1, radio_as_checks=>1,
+				check=> sub {$::NextAction},
+				code=> sub { my $m=$_[1]; $m='' if $m eq $::NextAction; ::SetNextAction($m); }, );
+		},
+	},
+
 );
 
 our @MainMenu=
@@ -67,7 +77,7 @@ our %Widgets=
 		stock	=> 'gtk-media-stop',
 		tip	=> _"Stop",
 		activate=> \&::Stop,
-		click3	=> 'EnqueueAction(stop)',
+		click3	=> 'SetNextAction(stop)',
 	},
 	Play =>
 	{	class	=> 'Layout::Button',
@@ -128,7 +138,7 @@ our %Widgets=
 		stock	=> 'gtk-quit',
 		tip	=> _"Quit",
 		activate=> \&::Quit,
-		click3	=> 'EnqueueAction(quit)',
+		click3	=> 'SetNextAction(quit)',
 	},
 	Lock	=>
 	{	class	=> 'Layout::Button',
@@ -189,7 +199,8 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		button	=> 0,
 		size	=> SIZE_FLAGS,
-		state	=> sub  { @$::Queue?	 'queue' :
+		state	=> sub  { $::NextAction? $::NextAction :
+				  @$::Queue?	 'queue' :
 				  $::QueueAction? $::QueueAction :
 						 'noqueue'
 				},
@@ -197,12 +208,13 @@ our %Widgets=
 				 $_[0] eq 'noqueue'?	'. gmb-queue' :
 							$::QActions{$_[0]}{icon} ;
 				},
-		tip	=> sub { ::CalcListLength($::Queue,'queue')
+		tip	=> sub { if ($::NextAction) { return $::QActions{$::NextAction}{long_next} }
+				 ::CalcListLength($::Queue,'queue')
 				.($::QueueAction? "\n". ::__x( _"then {action}", action => $::QActions{$::QueueAction}{short} ) : '');
 				},
 		text	=> _"Queue",
 		click1	=> 'MenuQueue',
-		click3	=> sub { ::EnqueueAction(''); ::ClearQueue(); }, #FIXME replace with 2 gmb commands once new command system is done
+		click3	=> sub { ::EnqueueAction(''); ::SetNextAction(''); ::ClearQueue(); }, #FIXME replace with 3 gmb commands once new command system is done
 		event	=> 'Queue QueueAction',
 		dragdest=> [::DRAG_ID,sub {shift;shift;::Enqueue(@_);}],
 	},

@@ -392,13 +392,17 @@ my ($browsercmd,$opendircmd);
 # condition : do not show mode if return false
 # order : used to sort modes
 # autofill : indicate that this mode use the maxautofill value
+# can_next : this mode can be use with $NextAction
 our %QActions=
-(	''	=> {order=>0,				short=> _"normal",		long=> _"Normal mode"},
+(	''	=> {order=>0,				short=> _"normal",		long=> _"Normal mode", can_next=>1, },
 	autofill=> {order=>10, icon=>'gtk-refresh',	short=> _"autofill",		long=> _"Auto-fill queue",					changed=>\&QAutoFill,	 keep=>1,save=>1,autofill=>1, },
 	'wait'	=> {order=>20, icon=>'gmb-wait',	short=> _"wait for more",	long=> _"Wait for more when queue empty",	action=>\&Stop,	changed=>\&QWaitAutoPlay,keep=>1,save=>1, },
-	stop	=> {order=>30, icon=>'gtk-media-stop',	short=> _"stop",		long=> _"Stop when queue empty",		action=>\&Stop},
-	quit	=> {order=>40, icon=>'gtk-quit',	short=> _"quit",		long=> _"Quit when queue empty",		action=>\&Quit},
-	turnoff => {order=>50, icon=>'gmb-turnoff',	short=> _"turn off",		long=> _"Turn off computer when queue empty", 	action=>sub {Stop(); TurnOff();}, condition=> sub { $::Options{Shutdown_cmd} },},
+	stop	=> {order=>30, icon=>'gtk-media-stop',	short=> _"stop",		long=> _"Stop when queue empty",		action=>\&Stop,
+			can_next=>1, long_next=>_"Stop after this song", },
+	quit	=> {order=>40, icon=>'gtk-quit',	short=> _"quit",		long=> _"Quit when queue empty",		action=>\&Quit,
+			can_next=>1, long_next=>_"Quit after this song"},
+	turnoff => {order=>50, icon=>'gmb-turnoff',	short=> _"turn off",		long=> _"Turn off computer when queue empty", 	action=>sub {Stop(); TurnOff();},
+			condition=> sub { $::Options{Shutdown_cmd} }, can_next=>1, long_next=>_"Turn off computer after this song"},
 );
 
 our %StockLabel=( 'gmb-turnoff' => _"Turn Off" );
@@ -915,7 +919,7 @@ my $SavedListsWatcher;
 our $ListPlay;
 our ($TogPlay,$TogLock);
 our ($RandomMode,$SortFields,$ListMode);
-our ($SongID,$prevID,$Recent,$RecentPos,$Queue); our $QueueAction='';
+our ($SongID,$prevID,$Recent,$RecentPos,$Queue); our $QueueAction=our $NextAction='';
 our ($Position,$ChangedID,$ChangedPos,@NextSongs,$NextFileToPlay);
 our ($MainWindow,$FullscreenWindow); my $OptionsDialog;
 my $TrayIcon;
@@ -1221,6 +1225,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	EnqueueArtist	=> [sub {EnqueueSame('artist',$SongID)},_"Enqueue Songs from Current Artist"], # or use field 'artists' or 'first_artist' ?
 	EnqueueAlbum	=> [sub {EnqueueSame('album',$SongID)},	_"Enqueue Songs from Current Album"],
 	EnqueueAction	=> [sub {EnqueueAction($_[1])},		_"Enqueue Action", _"Queue mode" ,sub { TextCombo->new({map {$_ => $QActions{$_}{short}} sort keys %QActions}) }],
+	SetNextAction	=> [sub {SetNextAction($_[1])},		_"Set action when song ends", _"Action" ,sub { TextCombo->new({map {$_ => $QActions{$_}{short}} sort grep $QActions{$_}{can_next}, keys %QActions}) }],
 	ClearQueue	=> [\&::ClearQueue,			_"Clear queue"],
 	ClearPlaylist	=> [sub {Select(staticlist=>[])},	_"Clear playlist"],
 	IncVolume	=> [sub {ChangeVol('up')},		_"Increase Volume"],
@@ -2704,6 +2709,10 @@ sub ReplaceQueue
 {	$Queue->Replace();
 	&Enqueue; #keep @_
 }
+sub SetNextAction
+{	$NextAction=shift;
+	HasChanged('QueueAction');
+}
 sub EnqueueAction
 {	$QueueAction=shift;
 	HasChanged('QueueAction');
@@ -2741,7 +2750,9 @@ sub Update_QueueActionList
 	QHasChanged('QueueActionList');
 }
 sub List_QueueActions
-{	my @list= grep { !$QActions{$_}{condition} || $QActions{$_}{condition}() } keys %QActions;
+{	my $nextonly=shift;
+	my @list= grep { !$QActions{$_}{condition} || $QActions{$_}{condition}() } keys %QActions;
+	if ($nextonly) { @list= grep $QActions{$_}{can_next}, @list; }
 	return sort {$QActions{$a}{order} <=> $QActions{$b}{order} || $a cmp $b} @list;
 }
 
@@ -2784,7 +2795,12 @@ sub GetNextSongs	##if no aguments, returns next song and makes the changes assum
 	my $passive= defined $nb ? 1 : 0;
 	$nb||=1;
 	my @IDs;
-	{ if (@$Queue)
+	{ if ($NextAction)
+	  {	push @IDs, ($passive ? $QActions{$NextAction}{short} : $NextAction)  unless $onlyIDs;
+		unless ($passive || $QActions{$NextAction}{keep}) { SetNextAction('') }
+		last;
+	  }
+	  if (@$Queue)
 	  {	unless ($passive) { my $ID=$Queue->Shift; return $ID; }
 		push @IDs,_"Queue" unless $onlyIDs;
 		if ($nb>@$Queue) { push @IDs,@$Queue; $nb-=@$Queue; }
@@ -4183,7 +4199,7 @@ sub BuildChoiceMenu
 	{	$selection={};
 		if (ref $check)	{ $selection->{$_}=1 for @$check; }
 		else
-		{	$radio=1;
+		{	$radio=1 unless $options{radio_as_checks};
 			$selection->{$check}=1;
 		}
 	}
