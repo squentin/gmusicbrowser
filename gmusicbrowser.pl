@@ -5148,24 +5148,32 @@ sub DialogMassRename
 }
 
 sub RenameFile
-{	my ($ID,$newutf8,$window)=@_;
+{	my ($dir,$old,$newutf8,$window)=@_;
 	my $new= CleanupFileName(filename_from_unicode($newutf8));
-	my ($dir,$old)= Songs::Get($ID,qw/path file/);
+	return unless length $new;
 	{	last if $new eq '';
 		last if $old eq $new;
 		if (-f $dir.SLASH.$new)
 		{	my $res=OverwriteDialog($window,$new);
-			return $res unless $res eq 'yes';
+			return unless $res eq 'yes';
 			redo;
 		}
 		elsif (!rename $dir.SLASH.$old, $dir.SLASH.$new)
-		{	my $res= Retry_Dialog($!,_"Renaming failed", ID=>$ID,details=> __x( _"From: {oldname}\nTo: {newname}", oldname => Songs::Display($ID,'file'), newname => $newutf8), window=>$window);
-			return $res unless $res eq 'retry';
+		{	my $res= Retry_Dialog($!,_"Renaming failed", window=>$window, details=>
+				__x( _"From: {oldname}\nTo: {newname}",	oldname => filename_to_utf8displayname($old),
+									newname => filename_to_utf8displayname($new)));
+			return unless $res eq 'retry';
 			redo;
 		}
 	}
-	Songs::Set($ID, file=> $new);
-	return 1;
+	return $new;
+}
+
+sub RenameSongFile
+{	my ($ID,$newutf8,$window)=@_;
+	my ($dir,$old)= Songs::Get($ID,qw/path file/);
+	my $new=RenameFile($dir,$old,$newutf8,$window);
+	Songs::Set($ID, file=> $new) if defined $new;
 }
 
 sub DialogRename
@@ -5206,7 +5214,7 @@ sub DialogRename
 	 {	my ($dialog,$response)=@_;
 		if ($response eq 'ok')
 		{	my $name=$entry->get_text;
-			RenameFile($ID,"$name.$ext",$dialog) if $name=~m/\S/;
+			RenameSongFile($ID,"$name.$ext",$dialog) if $name=~m/\S/;
 		}
 		$dialog->destroy;
 	 });
@@ -9199,6 +9207,17 @@ sub load_skinfile
 		GMB::Cache::add_pb($key,$pixbuf);
 	}
 	return $pixbuf;
+}
+
+sub RenameFile
+{	my ($dir,$old,$newutf8,$window)=@_;
+	my $new= ::RenameFile($dir,$old,$newutf8,$window);
+	return unless defined $new;
+	$dir= ::pathslash($dir); #make sure the path ends with SLASH
+	GMB::Cache::drop_file($dir.$old);
+	$old=qr/^\Q$dir$old\E$/;
+	for my $ref (@ArraysOfFiles) {s#$old#$dir$new# for grep $_, @$ref}
+	return $new;
 }
 
 sub UpdatePixPath
