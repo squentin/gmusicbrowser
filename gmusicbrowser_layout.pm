@@ -1285,8 +1285,12 @@ sub GetShowHideState
 sub ToggleFullscreen
 {	return unless $_[0];
 	my $win= ::get_layout_widget($_[0])->get_toplevel;
-	if ($win->{fullscreen}) {$win->unfullscreen}
-	else {$win->fullscreen} }
+	if ($win->{fullscreen})
+	{	if ($::FullscreenWindow && $win==$::FullscreenWindow) { $win->close_window }
+		else {$win->unfullscreen}
+	}
+	else {$win->fullscreen}
+}
 
 sub KeyPressed
 {	my ($self,$event)=@_;
@@ -1307,6 +1311,7 @@ sub KeyPressed
 	elsif ( exists $::GlobalBoundKeys{$key} )
 	{	$cmd= $::GlobalBoundKeys{$key};
 	}
+	elsif ($self->{fullscreen} && $key eq 'Escape') { $cmd='ToggleFullscreen' }
 	return 0 unless $cmd;
 	if ($self->isa('Gtk2::Window'))	#try to find the focused widget (gmb widget, not gtk one), so that the cmd can act on it
 	{	my $widget=$self->get_focus;
