@@ -281,6 +281,7 @@ sub new
 	bless $self, $class;
 
 	$self->{group}=$opt->{group};
+	$self->{bshuffle}=::NewIconButton('gmb-shuffle',($opt->{small} ? '' : _"Shuffle"),sub {::GetSongArray($self)->Shuffle});
 	$self->{brm}=	::NewIconButton('gtk-remove',	($opt->{small} ? '' : _"Remove"),sub {::GetSonglist($self)->RemoveSelected});
 	$self->{bclear}=::NewIconButton('gtk-clear',	($opt->{small} ? '' : _"Clear"),sub {::GetSonglist($self)->Empty} );
 	$self->{bup}=	::NewIconButton('gtk-go-up',		undef,	sub {::GetSonglist($self)->MoveUpDown(1)});
@@ -291,12 +292,12 @@ sub new
 	$self->{brm}->set_tooltip_text(_"Remove selected songs");
 	$self->{bclear}->set_tooltip_text(_"Remove all songs");
 
-	if (my $r=$opt->{relief}) { $self->{$_}->set_relief($r) for qw/brm bclear bup bdown btop bbot/; }
-	$self->pack_start($self->{$_},FALSE,FALSE,2) for qw/btop bup bdown bbot brm bclear/;
+	if (my $r=$opt->{relief}) { $self->{$_}->set_relief($r) for qw/brm bclear bup bdown btop bbot bshuffle/; }
+	$self->pack_start($self->{$_},FALSE,FALSE,2) for qw/btop bup bdown bbot brm bclear bshuffle/;
 
 	::Watch($self,'Selection_'.$self->{group}, \&SelectionChanged);
 	::Watch($self,SongArray=> \&ListChanged);
-	Glib::Idle->add(sub { $self->SelectionChanged; $self->ListChanged; 0; });
+	$self->{PostInit}= sub { $self->SelectionChanged; $self->ListChanged; };
 
 	return $self;
 }
@@ -306,7 +307,8 @@ sub ListChanged
 	my $songlist=::GetSonglist($self);
 	my $watchedarray= $songlist && $songlist->{array};
 	return if !$watchedarray || ($array && $watchedarray!=$array);
-	$self->{bclear}->set_sensitive(scalar @$watchedarray);
+	$self->{bclear}->set_sensitive(@$watchedarray>0);
+	$self->{bshuffle}->set_sensitive(@$watchedarray>1);
 	$self->set_sensitive( !$songlist->{autoupdate} );
 	$self->set_visible( !$songlist->{autoupdate} );
 }
