@@ -590,6 +590,7 @@ All these widgets accept the option `group` to specify which SongList/TabbedList
     - small : if true(=1) hide the label of the remove and clear buttons
     - orientation : vertical buttons if set to `vertical`
 
+ - EmptyList : empty the list
  - FilterBox : advanced search box (set filter#1)
  - FilterLock : Lock/unlock : current songlist filter is put in filter#0
     - relief
@@ -608,6 +609,7 @@ All these widgets accept the option `group` to specify which SongList/TabbedList
  - QueueFilter : Button to Enqueue current songlist filter
  - Refresh : Button to re-filter songlist
  - ResetFilter : Button to reset songlist filter
+ - ShuffleList : shuffle the list
  - SimpleSearch : search entry, search title/album/artist (set filter#1), support powerful syntax (example title:sometitle and lots more, the documentation has not be written yet, see git logs for examples)
     - noselector : if set to 1 hide the selector icon, not recommended as it makes the widget much less powerful
     - activate : can be used to set a command to run after enter is pressed

@@ -637,6 +637,26 @@ our %Widgets=
 		update	=> sub { my $h=\%Play_GST_server::sockets; my $t=join "\n",map $h->{$_}[2], grep $h->{$_}[1],keys %$h; $t= $t? _("Connections from :")."\n".$t : _("No connections"); $_[0]->child->set_text($t); if ($::Play_package eq 'Play_GST_server') {$_[0]->show; $_[0]->child->show_all} else {$_[0]->hide; $_[0]->set_no_show_all(1)}; },
 		event	=> 'connections',
 	},
+	ShuffleList	=>
+	{	class	=> 'Layout::Button',
+		stock	=> 'gmb-shuffle',
+		size	=> SIZE_FLAGS,
+		tip	=> _"Shuffle list",
+		activate=> sub { my $songarray= ::GetSongArray($_[0]) || return; $songarray->Shuffle; },
+		event	=> 'SongArray',
+		update	=> \&SensitiveIfMoreOneSong,
+		PostInit=> \&SensitiveIfMoreOneSong,
+	},
+	EmptyList	=>
+	{	class	=> 'Layout::Button',
+		stock	=> 'gtk-clear',
+		size	=> SIZE_FLAGS,
+		tip	=> _"Empty list",
+		activate=> sub { my $songarray= ::GetSongArray($_[0]) || return; $songarray->Replace(); },
+		event	=> 'SongArray',
+		update	=> \&SensitiveIfMoreZeroSong,
+		PostInit=> \&SensitiveIfMoreZeroSong,
+	},
 	EditListButtons	=>
 	{	class	=> 'EditListButtons',
 	},
@@ -1025,6 +1045,8 @@ sub CreateWidgets
 	}
 	$self->signal_connect_after(key_press_event => \&KeyPressed);
 
+	for my $widget (values %$widgets) { my $postinit= delete $widget->{PostInit}; $postinit->($widget) if $postinit; }
+
 	$self->{layoutdepth}--;
 	my @noparentboxes=grep m/^(?:[HV][BP]|[AMETNFSW]B|FR)/ && !$widgets->{$_}->parent, keys %$boxes;
 	if	(@noparentboxes==0) {warn "layout empty ('$self->{layout}')\n"; return;}
@@ -1150,6 +1172,7 @@ sub NewWidget
 	::set_drag($widget,source => $ref->{dragsrc}, dest => $ref->{dragdest});
 	my $init= delete $widget->{EndInit} || $ref->{EndInit};
 	$init->($widget) if $init;
+	$widget->{PostInit}||= $ref->{PostInit};
 	return $widget;
 }
 sub ApplyCommonOptions # apply some options common to both boxes and other widgets
@@ -1360,6 +1383,9 @@ sub TurnPagesToWidget #change the current page of all parent notebook so that wi
 		 { $parent->set_current_page($parent->page_num($child)); }
 	}
 }
+
+sub SensitiveIfMoreOneSong	{ my $songarray= ::GetSongArray($_[0]); $_[0]->set_sensitive($songarray && @$songarray>1); }
+sub SensitiveIfMoreZeroSong	{ my $songarray= ::GetSongArray($_[0]); $_[0]->set_sensitive($songarray && @$songarray>0); }
 
 #################################################################################
 
