@@ -138,7 +138,7 @@ sub new
 	}
 	else { $self=Gtk2::EventBox->new; }
 	bless $self,$class;
-	$self->{$_}= $opt->{$_} for qw/size format group/;
+	$self->{$_}= $opt->{$_} for qw/size format group noheader/;
 	$self->add(Gtk2::Label->new);
 	$self->signal_connect( destroy => \&Remove);
 	$self->signal_connect( button_press_event => \&button_press_event_cb);
@@ -192,6 +192,7 @@ sub Update
 {	my $self=shift;
 	delete $::ToDo{'9_Total'.$self};
 	my ($text,$array,$tip)= $Modes{ $self->{mode} }{update}->($self);
+	$text='' if $self->{noheader};
 	if (!$array)	{ $tip=$text=_"error"; }
 	else		{ $text.= ::CalcListLength($array,$self->{format}); }
 	my $format= $self->{size} ? '<span size="'.$self->{size}.'">%s</span>' : '%s';

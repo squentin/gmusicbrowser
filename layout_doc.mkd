@@ -616,6 +616,7 @@ All these widgets accept the option `group` to specify which SongList/TabbedList
     - format : short or long (default)
     - button : default to 1, if 0 a click-able label is used instead of a button
     - relief : relief of the button, default to `none`
+    - noheader : if true, remove the "Library:" part of the text
 
 
 #### MenuItem widgets (can only be put in a MB/SM)
