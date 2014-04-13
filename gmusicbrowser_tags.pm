@@ -246,6 +246,7 @@ sub FMPS_hash_write
 
 sub PixFromMusicFile
 {	my ($file,$nb,$quiet)=@_;
+	if ($file=~s/:(\w+)$//) {$nb=$1} # index can be specified as argument or in the filename
 	my ($h)=Read($file,0,'embedded_pictures');
 	return unless $h;
 	my $pix= $h->{embedded_pictures};

@@ -20,6 +20,7 @@ use constant
 };
 use Net::DBus::Annotation 'dbus_call_async';
 
+my $TEMPCOVERFILE= $::HomeDir.'temp_mpris2_cover'.$::DBus_suffix.'.jpg';
 my $bus=$GMB::DBus::bus;
 die "Requires DBus support to be active\n" unless $bus; #only requires this to use the hack in gmusicbrowser_dbus.pm so that Net::DBus::GLib is not required, else could do just : use Net::DBus::GLib; $bus=Net::DBus::GLib->session;
 
@@ -28,11 +29,13 @@ my @Objects;
 sub Start
 {	my $service= $bus->export_service('org.mpris.MediaPlayer2.gmusicbrowser');
 	push @Objects, GMB::DBus::MPRIS2->new($service);
+	unlink $TEMPCOVERFILE;
 }
 sub Stop
 {	::UnWatch_all($_) for @Objects;
 	$_->disconnect for @Objects;
 	@Objects=();
+	unlink $TEMPCOVERFILE;
 }
 
 sub prefbox
@@ -103,6 +106,7 @@ sub new
 	bless $self, $class;
 	::Watch($self, Seek => \&Seeked);
 	::Watch($self, FullScreen=> sub { $self->emit_signal( PropertiesChanged => 'org.mpris.MediaPlayer2', {Fullscreen=> Fullscreen()} ,[] ); });
+	::Watch($self, Quit=> sub { unlink $TEMPCOVERFILE; });
 
 	#watchers for properties of org.mpris.MediaPlayer2.Player that send PropertiesChanged signal
 	my %events;
@@ -342,8 +346,20 @@ sub GetMetadata_from
 	);
 	my $rating=$h{rating};
 	if (defined $rating && length $rating) { $r{'xesam:userRating'}=dbus_double($rating/100); }
+	unlink $TEMPCOVERFILE;
 	if (my $pic= $h{album_picture}) #FIXME use ~album.picture.uri when available
-	{	$r{'mpris:artUrl'}= dbus_string( 'file://'.::url_escape($pic) ) if $pic=~m/\.(?:jpe?g|png|gif)$/i; # ignore embedded pictures
+	{	if ($pic=~m/\.(?:mp3|flac|m4a|m4b|ogg|oga)(?:\w+)?$/i) #embedded pictures
+		{	my $ok;
+			{	last unless defined($::SongID) && $ID==$::SongID; #only support embedded picture for current song
+				my $data=FileTag::PixFromMusicFile($pic);
+				last unless $data;
+				my $fh;
+				open($fh,'>',$TEMPCOVERFILE) && (print $fh $data) &&	close($fh) && ($ok=1);
+				warn "mpris2 plugin, error writing temporary file '".$TEMPCOVERFILE."' for embedded cover: $!" unless $ok;
+			}
+			$pic= $ok ? $TEMPCOVERFILE : undef;
+		}
+		$r{'mpris:artUrl'}= dbus_string( 'file://'.::url_escape($pic) ) if $pic;
 	}
 
 	delete $r{$_} for grep !defined $r{$_}, keys %r;

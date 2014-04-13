@@ -216,13 +216,13 @@ our @ScanExt= qw/mp3 ogg oga flac mpc ape wv m4a m4b/;
 
 our ($Verbose,$debug);
 our %CmdLine;
-our ($HomeDir,$SaveFile,$FIFOFile,$ImportFile,$DBus_id);
+our ($HomeDir,$SaveFile,$FIFOFile,$ImportFile,$DBus_id,$DBus_suffix);
 sub find_gmbrc_file { my @f= map $_[0].$_, '','.gz','.xz'; return wantarray ? (grep { -e $_ } @f) : first { -e $_ } @f }
 my $gmbrc_ext_re= qr/\.gz$|\.xz$/;
 
 # Parse command line
 BEGIN	# in a BEGIN block so that commands for a running instance are sent sooner/faster
-{ $DBus_id='org.gmusicbrowser';
+{ $DBus_id='org.gmusicbrowser'; $DBus_suffix='';
 
   my $default_home= Glib::get_user_config_dir.SLASH.'gmusicbrowser';
   if (!-d $default_home && -d (my $old= Glib::get_home_dir.SLASH.'.gmusicbrowser' ) )
@@ -323,7 +323,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-cmd')		{ push @cmd, shift if $ARGV[0]; }
 	elsif($arg eq '-ifnotrunning')	{ $ifnotrunning=shift if $ARGV[0]; }
 	elsif($arg eq '-nolaunch')	{ $ifnotrunning='abort'; }
-	elsif($arg eq '-dbus-id')	{ if (my $id=shift) { if ($id=~m/^\w+$/) { $DBus_id.='.'.$id; } else { warn "invalid dbus-id '$id', only letters, numbers and _ allowed\n" }; } }
+	elsif($arg eq '-dbus-id')	{ if (my $id=shift) { if ($id=~m/^\w+$/) { $DBus_id.= $DBus_suffix='.'.$id; } else { warn "invalid dbus-id '$id', only letters, numbers and _ allowed\n" }; } }
 	elsif($arg eq '-add')		{ $filescmd='AddToLibrary'; }
 	elsif($arg eq '-playlist')	{ $filescmd='OpenFiles'; }
 	elsif($arg eq '-enqueue')	{ $filescmd='EnqueueFiles'; }
@@ -1675,6 +1675,7 @@ sub Quit
 	@ToScan=@ToAdd_Files=();
 	CloseTrayTip();
 	SaveTags();
+	HasChanged('Quit');
 	unlink $FIFOFile if $FIFOFile;
 	Gtk2->main_quit;
 	exec $Options{Shutdown_cmd} if $turnoff && $Options{Shutdown_cmd};
@@ -5763,7 +5764,7 @@ sub AutoSelPicture
 	{	my $file= AAPicture::GetPicture($field,$gid);
 		if (defined $file)
 		{	return unless $file; # file eq '0' => no picture
-			if ($file=~m/\.(?:mp3|flac|m4a|m4b|oga|ogg)(?::(\w+))?$/) { return if FileTag::PixFromMusicFile($file,$1,1); }
+			if ($file=~m/\.(?:mp3|flac|m4a|m4b|oga|ogg)(?::\w+)?$/) { return if FileTag::PixFromMusicFile($file,undef,1); }
 			else { return if -e $file }
 		}
 	}
@@ -9110,7 +9111,7 @@ sub load
 {	my ($file,$size)=@_;
 	return unless $file;
 
-	my $nb= $file=~s/:(\d+|\w+)$// ? $1 : undef;	#index number for embedded pictures
+	my $nb= $file=~s/:(\w+)$// ? $1 : undef;	#index number for embedded pictures
 	unless (-e $file) {warn "$file not found\n"; return undef;}
 
 	my $loader=Gtk2::Gdk::PixbufLoader->new;
