@@ -3,21 +3,22 @@
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: gmusicbrowser 0.9621\n"
+"Project-Id-Version: gmusicbrowser 1.1.12\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2013-04-12 06:47+0200\n"
-"PO-Revision-Date: 2013-04-25 11:13+0100\n"
+"POT-Creation-Date: 2014-02-15 01:22+0100\n"
+"PO-Revision-Date: 2014-02-20 15:55+0100\n"
 "Last-Translator: Tino <knirchzwerg@web.de>\n"
-"Language-Team: german <de@li.org>\n"
-"Language: \n"
+"Language-Team: Tino <knirchzwerg@web.de>\n"
+"Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Bookmarks: 1214,-1,-1,-1,-1,-1,-1,-1,-1,-1\n"
+"X-Generator: Poedit 1.6.4\n"
 
 msgid " Context pane layout "
-msgstr " Angezeigte Elemente im Albuminfofenster"
+msgstr " Kontextfenster-Layout"
 
 msgid " Fields "
 msgstr " Felder"
@@ -187,13 +188,13 @@ msgid "32x32 PNG file icon"
 msgstr "32x32 PNG Datei-Icon"
 
 msgid "50 Last Added"
-msgstr "50 zuletzt hinzugefügten"
+msgstr "50 Neuhinzugefügte"
 
 msgid "50 Last Played"
-msgstr "50 zuletzt gespielten"
+msgstr "50 Zuletztgespielte"
 
 msgid "50 Most Played"
-msgstr "50 meist gespielten"
+msgstr "50 Meistgespielte"
 
 msgid "<Unknown>"
 msgstr "<Unknown>"
@@ -222,9 +223,6 @@ msgstr "Abbrechen"
 msgid "Abort ReplayGain analysis"
 msgstr "ReplayGain-Analyse abbrechen"
 
-msgid "Abort all"
-msgstr "Alle abbrechen"
-
 msgid "Abort mass-tagging"
 msgstr "Alle taggen abbrechen"
 
@@ -241,7 +239,7 @@ msgid "About to turn off the computer in :"
 msgstr "Computer wird abgeschaltet in :"
 
 msgid "Actions are not supported by current notification daemon"
-msgstr "Aktion wird nicht von verwendetem Benachrichtigungs-Daemon unterstützt"
+msgstr "Aktion nicht vom verwendeten Benachrichtigungs-System unterstützt"
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -262,9 +260,7 @@ msgid "Add a fullscreen button"
 msgstr "Knopf für Vollbildmodus hinzufügen"
 
 msgid "Add a fullscreen button to layouts that can accept extra buttons"
-msgstr ""
-"Knopf für Vollbildmodus zu Layouts hinzufügen, die Extraknöpfe verwenden "
-"können"
+msgstr "Knopf für Vollbildmodus zu Layouts mit Zusatzknöpfen hinzufügen"
 
 msgid "Add a group"
 msgstr "Füge Gruppe hinzu"
@@ -331,7 +327,7 @@ msgid "Added"
 msgstr "Hinzugefügt"
 
 msgid "Added Today"
-msgstr "Heute hinzugefügt"
+msgstr "Heute Hinzugefügte"
 
 msgid "Adding a radio"
 msgstr "Füge Radio hinzu"
@@ -495,7 +491,7 @@ msgid "Alt"
 msgstr "Alt"
 
 msgid "Amount of volume changed by the mouse wheel"
-msgstr "Schrittgrösse der Lautstärkeregelung durch Mausrad"
+msgstr "Schrittgröße der Lautstärkeregelung durch Mausrad"
 
 msgid ""
 "Analyse and add replaygain tags for all songs that don't have replaygain "
@@ -552,10 +548,10 @@ msgid "Artist playcount:"
 msgstr "Wiedergabeanzahl Interpret:"
 
 msgid "Artist,Album,Disc,Track"
-msgstr "Interpret,Album,Disk,Liednummer"
+msgstr "Interpret/Album/Disk/Liednummer"
 
 msgid "Artist,Date,Album,Disc,Track"
-msgstr "Interpret,Datum,Album,Disk,Liednummer"
+msgstr "Interpret/Datum/Album/Disk/Liednummer"
 
 #, perl-format
 msgid "Artist: %a"
@@ -664,7 +660,8 @@ msgid "Body :"
 msgstr "Text :"
 
 msgid "Body text is not supported by current notification daemon"
-msgstr "Dieser Text ist vom verwendeten Benachrichtigungs-Daemon unterstützt"
+msgstr ""
+"Dieser Text wird vom verwendeten Benachrichtigungs-System nicht unterstützt"
 
 msgid "Browser"
 msgstr "Browser"
@@ -698,12 +695,8 @@ msgstr ""
 "Lautstärke bei verwendetem Audio Backend zu ändern."
 
 #, perl-brace-format
-msgid ""
-"Can't create Folder '{path}' : \n"
-"{error}"
-msgstr ""
-"Kann Ordner nicht erstellen '{path}': \n"
-"{error}"
+msgid "Can't create folder: {path}"
+msgstr "Kann Ordner nicht erstellen: {path}"
 
 #, perl-brace-format
 msgid "Can't create sink '{sink}'"
@@ -750,7 +743,7 @@ msgid "Change default text color"
 msgstr "Ändere Standard Textfarbe"
 
 msgid "Change default text font and size"
-msgstr "Ändere Standard Schriftart und -grösse"
+msgstr "Ändere Standard Schriftart und -größe"
 
 msgid "Change the context visibility"
 msgstr "Ändere die Kontext-Sichtbarkeit"
@@ -931,6 +924,9 @@ msgstr "Kopieren fehlgeschlagen"
 msgid "Copy link address"
 msgstr "Kopiere Linkadresse"
 
+msgid "Copy missing values from previous line"
+msgstr "Kopiere fehlende Werte aus vorheriger Zeile"
+
 msgid "Copy to mounted portable player"
 msgstr "Kopiere auf eingebundenen, tragbaren Player"
 
@@ -1023,7 +1019,8 @@ msgstr "Standard Schriftart"
 
 #, perl-format
 msgid "Delay before showing tray tip popup on mouse over : %d ms"
-msgstr "Verzögerung vor Anzeige Symbolleisteninfo bei Mausberührung : %d ms"
+msgstr ""
+"Verzögerung vor Anzeige der Symbolleisteninfo bei Mausberührung : %d ms"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -1033,6 +1030,9 @@ msgstr "Lösche gewählte Lieder"
 
 msgid "Delete list"
 msgstr "Liste löschen"
+
+msgid "Deletion failed"
+msgstr "Löschen fehlgeschlagen"
 
 msgid "Descending order"
 msgstr "Absteigende Reihenfolge"
@@ -1048,6 +1048,10 @@ msgstr "Arbeitsplatz Widgets"
 
 msgid "Desktop widgets plugin"
 msgstr "Arbeitsplatz Widget-Erweiterung"
+
+#, perl-brace-format
+msgid "Destination: {file}"
+msgstr "Ziel: {file}"
 
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "Deaktiviere Bildschirmschoner bei Vollbildwiedergabe"
@@ -1088,9 +1092,6 @@ msgstr "Zeige Symbolleisteninfo für %d ms"
 
 msgid "Do not add a title row"
 msgstr "Keine Titelzeile hinzufügen"
-
-msgid "Do not add songs that can't be played"
-msgstr "Lieder, die nicht gespielt werden können, weglassen"
 
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr "Erzeuge keinen ID3v1 Tag in MP3 Dateien"
@@ -1249,8 +1250,18 @@ msgstr "Equalizer"
 msgid "Error :"
 msgstr "Fehler :"
 
+msgid "Error creating folder"
+msgstr "Fehler beim Erstellen des Ordners"
+
 msgid "Error details"
 msgstr "Fehlerdetails"
+
+#, perl-brace-format
+msgid "Error opening '{file}' for writing."
+msgstr "Fehler beim Öffner von '{file}' zum Schreiben."
+
+msgid "Error saving artistbio"
+msgstr "Fehler beim Speichern der Interpretenbiographie"
 
 #, perl-brace-format
 msgid ""
@@ -1260,6 +1271,12 @@ msgstr ""
 "Fehler beim Speichern der Interpretenbiographie in '{file}' :\n"
 "{error}"
 
+msgid "Error saving icon"
+msgstr "Fehler beim Speichern des Icons"
+
+msgid "Error saving lyrics"
+msgstr "Fehler beim Speichern des Liedtextes"
+
 #, perl-brace-format
 msgid ""
 "Error saving lyrics in '{file}' :\n"
@@ -1267,6 +1284,12 @@ msgid ""
 msgstr ""
 "Fehler beim Speichern des Liedtextes in '{file}':\n"
 "{error}"
+
+msgid "Error saving picture"
+msgstr "Fehler beim Speichern des Bildes"
+
+msgid "Error saving review"
+msgstr "Fehler beim Speichern der Rezension"
 
 #, perl-brace-format
 msgid ""
@@ -1276,12 +1299,27 @@ msgstr ""
 "Fehler beim Speichern der Rezension in '{file}' :\n"
 "{error}"
 
+msgid "Error while writing replaygain data"
+msgstr "Fehler während des Schreibens der ReplayGain-Daten"
+
+msgid "Error while writing tag"
+msgstr "Fehler während des Schreibens des Tags"
+
 #, perl-brace-format
 msgid "Error writing '{file}'"
 msgstr "Fehler beim Schreiben von '{file}'"
 
-msgid "Error writing replaygain tags :\n"
-msgstr "Fehler beim Schreiben der ReplayGain-Tags :\n"
+msgid "Error writing .csv file"
+msgstr "Fehler beim Schreiben der .csv-Datei"
+
+msgid "Error writing .m3u file"
+msgstr "Fehler beim Schreiben der Playlist (.m3u)"
+
+msgid "Error writing lyrics"
+msgstr "Fehler beim Schreiben der Liedtexte"
+
+msgid "Error writing tag"
+msgstr "Fehler beim Schreiben des Tags"
 
 msgid "Error: invalid filename pattern"
 msgstr "Fehler : ungültiges Dateinamensmuster"
@@ -1317,7 +1355,7 @@ msgid "Extra gain"
 msgstr "ExtraGain"
 
 msgid "Extract guest artist from title :"
-msgstr "Extrahiere Gastmusiker aus Titel :"
+msgstr "Extrahiere Gastmusiker aus Titel bei:"
 
 msgid "Fade-out"
 msgstr "Ausblenden"
@@ -1330,12 +1368,8 @@ msgid "Fade-out then stop"
 msgstr "Ausblenden, dann stoppen"
 
 #, perl-brace-format
-msgid ""
-"Failed to delete '{file}' :\n"
-"{error}"
-msgstr ""
-"Fehler beim Löschen '{file}' :\n"
-"{error}"
+msgid "Failed to delete '{file}'"
+msgstr "Fehler beim Löschen von '{file}'"
 
 msgid "Fetching albuminfo"
 msgstr "Suche Albumkritik"
@@ -1381,6 +1415,9 @@ msgstr "Dateiname ohne Erweiterung"
 
 msgid "Files"
 msgstr "Dateien"
+
+msgid "Files with these extensions won't be added"
+msgstr "Dateien mit diesen Erweiterungen werden nicht hinzugefügt"
 
 msgid "Filesystem"
 msgstr "Dateisystem"
@@ -1456,6 +1493,14 @@ msgstr "Gefunden aber funktioniert nicht"
 
 msgid "Friday"
 msgstr "Freitag"
+
+#, perl-brace-format
+msgid ""
+"From: {oldname}\n"
+"To: {newname}"
+msgstr ""
+"Von: {oldname}\n"
+"Nach: {newname}"
 
 msgid "Full screen layout :"
 msgstr "Vollbildansicht :"
@@ -1544,6 +1589,9 @@ msgstr "Bezeichnung im Dateitag"
 msgid "Ignore playback errors"
 msgstr "Ignoriere Abspielfehler"
 
+msgid "Ignored file extensions :"
+msgstr "Ignorierte Dateinamenserweiterungen:"
+
 msgid "Import list"
 msgstr "Importiere Liste"
 
@@ -1608,6 +1656,9 @@ msgstr "Karaoke"
 
 msgid "Karaoke plugin"
 msgstr "Karaoke Erweiterung"
+
+msgid "Keep list filtered and sorted"
+msgstr "Halte Liste gefiltert und sortiert"
 
 msgid "Key"
 msgstr "Taste"
@@ -1690,7 +1741,7 @@ msgstr ""
 #, perl-format
 msgid "Library size : %d song"
 msgid_plural "Library size : %d songs"
-msgstr[0] "Grösse der Sammlung : %d Lied"
+msgstr[0] "Größe der Sammlung : %d Lied"
 msgstr[1] "Grösse der Sammlung : %d Lieder"
 
 msgid "Limit similar artists to a rate of similarity : "
@@ -1845,6 +1896,13 @@ msgid "Make it look like"
 msgstr "Lass es aussehen wie"
 
 msgid ""
+"Makes gmusicbrowser monitor its pulseaudio volume, so that external changes "
+"to its volume are known."
+msgstr ""
+"Läßt gmusicbrowser die PulseAudio-Lautstärke beobachten, damit Änderungen "
+"von anderen Programmen erkannt werden."
+
+msgid ""
 "Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
 "gnome."
 msgstr ""
@@ -1877,7 +1935,7 @@ msgid "Minimal tip"
 msgstr "minimales Infofenster"
 
 msgid "Minimum size"
-msgstr "Minimale Grösse"
+msgstr "Minimale Größe"
 
 msgid "Misc."
 msgstr "Verschiedenes"
@@ -1887,6 +1945,9 @@ msgstr "Veränderung"
 
 msgid "Monday"
 msgstr "Montag"
+
+msgid "Monitor the pulseaudio volume"
+msgstr "Beobachte PulseAudio Lautstärke"
 
 msgid "Moods"
 msgstr "Stimmungen"
@@ -1920,6 +1981,9 @@ msgstr[1] "Verschiebe %d Dateien"
 
 msgid "Music"
 msgstr "Musik"
+
+msgid "Music files"
+msgstr "Musikdateien"
 
 msgid "Mute/Unmute"
 msgstr "Ton aus/an"
@@ -2033,7 +2097,7 @@ msgid "Not found"
 msgstr "Nicht gefunden"
 
 msgid "Note that some notification daemons resize the displayed picture"
-msgstr "Manche Benachrichtigungs Daemonen ändern die Bildgrösse"
+msgstr "Manche Benachrichtigungs Systeme ändern die Bildgröße"
 
 msgid ""
 "Note: inactive fields must be enabled by the user in the 'Fields' tab in "
@@ -2086,7 +2150,7 @@ msgid ""
 "OFF -> bigger means more probable"
 msgstr ""
 "AN -> kleiner = wahrscheinlicher\n"
-"AUS -> grösser = wahrscheinlicher"
+"AUS -> größer = wahrscheinlicher"
 
 msgid ""
 "ON less probable if genre is set\n"
@@ -2229,10 +2293,10 @@ msgid "Owner identifier"
 msgstr "Besitzeridentifikation"
 
 msgid "Path,Album,Disc,Track,File"
-msgstr "Pfad,Album,Disk,Liednummer,Datei"
+msgstr "Pfad/Album/Disk/Liednummer/Datei"
 
 msgid "Path,File"
-msgstr "Pfad,Datei"
+msgstr "Pfad/Datei"
 
 msgid "Pattern to find .lrc files :"
 msgstr "Muster um .lrc Dateien zu finden"
@@ -2311,6 +2375,9 @@ msgstr "Lieder in Liste wiedergeben"
 msgid "Play order"
 msgstr "Abspielreihenfolge"
 
+msgid "Play, queue or track"
+msgstr "Wiedergabe-, Wartelistensymbol oder Liednummer"
+
 msgid "Play/Pause"
 msgstr "Wiedergabe/Pause"
 
@@ -2321,7 +2388,7 @@ msgid "Playcount: "
 msgstr "Wiedergabeanzahl:"
 
 msgid "Played Today"
-msgstr "Heute gespielt"
+msgstr "Heute Gespielte"
 
 msgid "Player mounted on :"
 msgstr "Player eingebunden in :"
@@ -2437,6 +2504,9 @@ msgstr "Preis bezahlt"
 
 msgid "Private Data"
 msgstr "Private Daten"
+
+msgid "Proceed to next item."
+msgstr "Weiter zum Nächsten."
 
 msgid "Produced (P)"
 msgstr "Produziert (P)"
@@ -2564,7 +2634,7 @@ msgstr ""
 "wurden."
 
 msgid "Recently played"
-msgstr "Kürzlich gespielt"
+msgstr "Kürzlich Gespielte"
 
 msgid "Recently played songs"
 msgstr "Kürzlich gespielte Lieder"
@@ -2689,6 +2759,9 @@ msgstr "Diesen Ordner umbenennen in :"
 msgid "Rename/move files based on these fields :"
 msgstr "Umbenenne/Verschiebe Dateien basierend auf diesen Feldern :"
 
+msgid "Renaming failed"
+msgstr "Umbenennen fehlgeschlagen"
+
 #, perl-brace-format
 msgid ""
 "Renaming {oldname}\n"
@@ -2746,7 +2819,7 @@ msgid "Rhythmbox"
 msgstr "Rhythmbox"
 
 msgid "Rhythmbox 2nd queue column"
-msgstr "Rhythmbox 2te Wartelistenreihe"
+msgstr "Rhythmbox 2. Wartelistenreihe"
 
 msgid "Right aligned"
 msgstr "Rechtsbündig"
@@ -3105,6 +3178,9 @@ msgstr "Zeige Infofenster"
 msgid "Show main window"
 msgstr "Zeige Hauptfenster"
 
+msgid "Show more error details"
+msgstr "Zeige erw. Fehlermeldung"
+
 msgid "Show playlist"
 msgstr "Zeige Wiedergabeliste"
 
@@ -3163,7 +3239,7 @@ msgid "Shuffled albums"
 msgstr "Gemischte Alben"
 
 msgid "Shuffled albums, shuffled tracks"
-msgstr "Gemischte Alben, gemischte Lieder"
+msgstr "Gemischte Alben/gemischte Lieder"
 
 msgid "Shutdown command :"
 msgstr "Befehl zum herunterfahren :"
@@ -3186,11 +3262,17 @@ msgstr "Einfacher Titel"
 msgid "Size"
 msgstr "Größe"
 
+msgid "Skip _All"
+msgstr "Überspringe _Alle"
+
 msgid "Skip count"
 msgstr "Übersprungen"
 
 msgid "Skip history"
 msgstr "Chronik überspringen"
+
+msgid "Skip this and any further errors."
+msgstr "Überspringe diesen und jegliche weitere Fehler."
 
 msgid "Skip to next song if an error occurs"
 msgstr "Zum nächsten Lied springen, falls Fehler auftritt"
@@ -3236,6 +3318,10 @@ msgstr "Sortiermodus-Bearbeitung"
 
 msgid "Sort order"
 msgstr "Sortierordnung"
+
+#, perl-brace-format
+msgid "Source: {file}"
+msgstr "Quelle: {file}"
 
 msgid "Split artist names on :"
 msgstr "Trenne Interpretennamen bei :"
@@ -3734,10 +3820,13 @@ msgid ""
 msgstr ""
 "Ein paar Formatierungen sind möglich, z.B.:\n"
 "<b>fett</b> <i>kursiv</i> <u>unterstrichen</u>\n"
-"Jedoch werden sie evtl. vom Benachrichtigungs Daemon ignoriert"
+"Jedoch werden sie evtl. vom Benachrichtigungs-System ignoriert"
 
 msgid "You must specify a base folder"
 msgstr "Du musst einen Grundordner angeben"
+
+msgid "_Cancel"
+msgstr "_Abbruch"
 
 msgid "_Insert column"
 msgstr "_Füge Spalte ein"
@@ -3747,6 +3836,9 @@ msgstr "_Entferne diese Spalte"
 
 msgid "_Retry"
 msgstr "_Erneut versuchen"
+
+msgid "_Skip"
+msgstr "_Überspringen"
 
 msgid "_Sort by"
 msgstr "_Sortiere nach"
@@ -4061,6 +4153,10 @@ msgstr "Lieblings"
 
 msgid "file tag"
 msgstr "Dateitag"
+
+#, perl-brace-format
+msgid "file: {filename}"
+msgstr "Datei: {filename}"
 
 msgid "filters"
 msgstr "Filter"
@@ -4418,7 +4514,7 @@ msgid "never"
 msgstr "nie"
 
 msgid "never played"
-msgstr "nie gespielten"
+msgstr "Ungespielte"
 
 #, perl-format
 msgid "no %s fuzzy match with %s"
@@ -4450,6 +4546,9 @@ msgstr "nein zu allem"
 
 msgid "noname"
 msgstr "kein Name"
+
+msgid "none"
+msgstr "keins"
 
 msgid "normal"
 msgstr "normal"
@@ -4541,7 +4640,7 @@ msgid "play count average"
 msgstr "Ø Wiedergabeanzahl"
 
 msgid "played>4"
-msgstr "gespielt>4"
+msgstr "Mehr als 4x Gespielte"
 
 msgid "port :"
 msgstr "Port :"
@@ -4961,6 +5060,9 @@ msgstr "|-getrennte Liste von Widgetnamen"
 #~ msgid "(applied after restart)"
 #~ msgstr "(angewendet nach Neustart)"
 
+#~ msgid "Abort all"
+#~ msgstr "Alle abbrechen"
+
 #~ msgid "All but the [most/less]%n"
 #~ msgstr "Alle, ausser die [meist/wenigst]%n"
 
@@ -5039,6 +5141,9 @@ msgstr "|-getrennte Liste von Widgetnamen"
 #~ msgid "Display tray tip for"
 #~ msgstr "Zeige Leistensymbolinfo für"
 
+#~ msgid "Do not add songs that can't be played"
+#~ msgstr "Lieder, die nicht gespielt werden können, weglassen"
+
 #~ msgid "Don't know how to play {file}"
 #~ msgstr "Kann {file} nicht wiedergeben"
 
@@ -5053,13 +5158,6 @@ msgstr "|-getrennte Liste von Widgetnamen"
 
 #~ msgid "EeePC2"
 #~ msgstr "EeePC2"
-
-#~ msgid ""
-#~ "Error creating {folder} :\n"
-#~ "{error}"
-#~ msgstr ""
-#~ "Kann {folder} nicht erstellen  : \n"
-#~ "{error}"
 
 #~ msgid "Error running amixer"
 #~ msgstr "Fehler bei amixer Aufruf"
@@ -5153,9 +5251,6 @@ msgstr "|-getrennte Liste von Widgetnamen"
 
 #~ msgid "Quodlibet"
 #~ msgstr "Quodlibet"
-
-#~ msgid "Rating picture"
-#~ msgstr "Bewertungsbild"
 
 #~ msgid "Record label"
 #~ msgstr "Plattenlabel"
