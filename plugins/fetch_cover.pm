@@ -293,15 +293,15 @@ sub parse_googlei
 	$searchcontext->{baseurl}||= $pageurl;
 	$searchcontext->{pagecount}++;
 	my @list;
-	for my $res (split /<div class="rg_di" *>/, $results)
-	{	next unless $res=~m#&amp;imgurl=(.*?)&amp;#;
+	for my $res (split /<div class="rg_di"[^>]*>/, $results)
+	{	next unless $res=~m#(?:\?|&amp;)imgurl=(.*?)&amp;#;
 		my $url=$1;
 		$url=~s/%([0-9A-Fa-f]{2})/chr hex($1)/gie;
 		#$searchcontext->{rescount}++;
 		my $preview;
-		$preview=$1 if $res=~m/<img class=rg_i [^>]*?src="([^"]+)"/;
+		$preview=$1 if $res=~m/<img class="rg_i" [^>]*?src="([^"]+)"/;
 		my $desc;
-		if ($res=~m/<div class=rg_meta>[^<]*?"pt":"([^"]+)"/)
+		if ($res=~m/<div class="rg_meta">[^<]*?"pt":"([^"]+)"/)
 		{	$desc= ::decode_html(Encode::decode('utf8',$1));
 			$desc=~s#</?b>##g;
 		}
