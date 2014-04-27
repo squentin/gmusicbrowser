@@ -1356,6 +1356,7 @@ sub run_system_cmd
 {	my $syscmd=$_[1];
 	my @cmd= split_with_quotes($syscmd);
 	return unless @cmd;
+	for my $arg (@cmd) { ::_utf8_off($arg) if $arg=~m/^[\x00-\x7f]*$/; } #remove utf8 flag from arguments that don't need it to prevent autoupgrade to utf8  of potentially non-utf8 filenames when replacing %f with a filename
 	if ($syscmd=~m/%F/)
 	{	my @files;
 		if ($_[0] and my $songlist=GetSonglist($_[0])) { @files=map Songs::GetFullFilename($_), $songlist->GetSelectedIDs; }
