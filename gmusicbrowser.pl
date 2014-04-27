@@ -2227,6 +2227,7 @@ sub Open_gmbrc
 			$file= find_gmbrc_file($file);
 		}
 		return unless $file;
+		if (-z $file) { warn "Warning: save file '$file' is empty\n"; return }
 		my $cmpr;
 		if ($file=~m#(\.gz|\.xz)$#) { $cmpr=$ext=$1; }
 		else
