@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.10\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2013-05-11 14:38+0700\n"
-"PO-Revision-Date: 2013-05-11 20:59+0700\n"
+"POT-Creation-Date: 2014-04-15 01:45+0200\n"
+"PO-Revision-Date: 2014-04-26 16:40+0700\n"
 "Last-Translator: tin <girlwithoutadream@gmail.com>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -236,9 +236,6 @@ msgstr "Прервать"
 msgid "Abort ReplayGain analysis"
 msgstr "Прервать анализ ReplayGain"
 
-msgid "Abort all"
-msgstr "Прервать все"
-
 msgid "Abort mass-tagging"
 msgstr "Прервать массовое тегирование"
 
@@ -255,6 +252,9 @@ msgstr ""
 
 msgid "About to turn off the computer in :"
 msgstr "Компьютер выключится через:"
+
+msgid "Action"
+msgstr "Действие"
 
 msgid "Actions are not supported by current notification daemon"
 msgstr "Действие не поддерживается текущей службой уведомления"
@@ -713,12 +713,8 @@ msgstr ""
 "изменения громкости при использовании этого аудио-бэкэнда."
 
 #, perl-brace-format
-msgid ""
-"Can't create Folder '{path}' : \n"
-"{error}"
-msgstr ""
-"Невозможно создать папку '{path}': \n"
-"{error}"
+msgid "Can't create folder: {path}"
+msgstr "Невозможно создать папку: {path}"
 
 #, perl-brace-format
 msgid "Can't create sink '{sink}'"
@@ -946,6 +942,9 @@ msgstr "Копирование не удалось"
 msgid "Copy link address"
 msgstr "Копировать адрес ссылки"
 
+msgid "Copy missing values from previous line"
+msgstr "Копировать недостающие значения из предыдущей строки"
+
 msgid "Copy to mounted portable player"
 msgstr "Копировать на подключенный портативный плеер"
 
@@ -1050,6 +1049,9 @@ msgstr "Удалить выделенные песни"
 msgid "Delete list"
 msgstr "Удалить список"
 
+msgid "Deletion failed"
+msgstr "Удаление не удалось"
+
 msgid "Descending order"
 msgstr "В порядке убыванию"
 
@@ -1064,6 +1066,10 @@ msgstr "Виджеты рабочего стола"
 
 msgid "Desktop widgets plugin"
 msgstr "Плагин виджетов рабочего стола"
+
+#, perl-brace-format
+msgid "Destination: {file}"
+msgstr "Конечный файл: {file}"
 
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "Отключить скринсейвер при полноэкранном воспроизведении"
@@ -1103,9 +1109,6 @@ msgstr "Показать всплывающее окно на %d мс"
 
 msgid "Do not add a title row"
 msgstr "Не добавлять строку заголовка"
-
-msgid "Do not add songs that can't be played"
-msgstr "Не добавлять песни, которые не могут быть воспроизведены"
 
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr "Не создавать id3v1-теги в mp3-файлах"
@@ -1210,6 +1213,9 @@ msgstr "Встроенный текст песни"
 msgid "Embedded picture"
 msgstr "Встроенное изображение"
 
+msgid "Empty list"
+msgstr "Очистить список"
+
 msgid "Encapsulated object"
 msgstr "Инкапсулированный объект"
 
@@ -1264,8 +1270,18 @@ msgstr "Эквалайзер"
 msgid "Error :"
 msgstr "Ошибка:"
 
+msgid "Error creating folder"
+msgstr "Ошибка создания папки"
+
 msgid "Error details"
 msgstr "Сведения об ошибке"
+
+#, perl-brace-format
+msgid "Error opening '{file}' for writing."
+msgstr "Ошибка открытия '{file}' для записи."
+
+msgid "Error saving artistbio"
+msgstr "Ошибка сохранения биографии"
 
 #, perl-brace-format
 msgid ""
@@ -1275,6 +1291,12 @@ msgstr ""
 "Ошибка сохранения биографии в '{file}':\n"
 "{error}"
 
+msgid "Error saving icon"
+msgstr "Ошибка сохранения значка"
+
+msgid "Error saving lyrics"
+msgstr "Ошибка сохранения текста песни"
+
 #, perl-brace-format
 msgid ""
 "Error saving lyrics in '{file}' :\n"
@@ -1282,6 +1304,12 @@ msgid ""
 msgstr ""
 "Ошибка сохранения текста в '{file}':\n"
 "{error}"
+
+msgid "Error saving picture"
+msgstr "Ошибка сохранения изображения"
+
+msgid "Error saving review"
+msgstr "Ошибка сохранения обзора"
 
 #, perl-brace-format
 msgid ""
@@ -1291,12 +1319,27 @@ msgstr ""
 "Ошибка сохранения обзора в '{file}':\n"
 "{error}"
 
+msgid "Error while writing replaygain data"
+msgstr "Ошибка записи данных replaygain"
+
+msgid "Error while writing tag"
+msgstr "Ошибка записи тегов"
+
 #, perl-brace-format
 msgid "Error writing '{file}'"
 msgstr "Ошибка записи '{file}'"
 
-msgid "Error writing replaygain tags :\n"
-msgstr "Ошибка записи тегов replaygain:\n"
+msgid "Error writing .csv file"
+msgstr "Ошибка записи файла .csv"
+
+msgid "Error writing .m3u file"
+msgstr "Ошибка записи файла .m3u"
+
+msgid "Error writing lyrics"
+msgstr "Ошибка записи текста песни"
+
+msgid "Error writing tag"
+msgstr "Ошибка записи тега"
 
 msgid "Error: invalid filename pattern"
 msgstr "Ошибка: неверный шаблон имени файла"
@@ -1320,10 +1363,10 @@ msgid "Export plugin"
 msgstr "Плагин экспорта"
 
 msgid "Export song properties to a .csv file"
-msgstr "Экспортировать свойства песни в cvs-файл"
+msgstr "Экспортировать свойства песни в файл .csv"
 
 msgid "Export to .m3u file"
-msgstr "Экспорт в m3u-файл"
+msgstr "Экспорт в файл .m3u"
 
 msgid "Extra fields"
 msgstr "Дополнительные поля"
@@ -1345,12 +1388,8 @@ msgid "Fade-out then stop"
 msgstr "Затухнуть, затем остановить"
 
 #, perl-brace-format
-msgid ""
-"Failed to delete '{file}' :\n"
-"{error}"
-msgstr ""
-"Не удалось удалить '{file}':\n"
-"{error}"
+msgid "Failed to delete '{file}'"
+msgstr "Не удалось удалить '{file}'"
 
 msgid "Fetching albuminfo"
 msgstr "Получение информации об альбоме"
@@ -1396,6 +1435,9 @@ msgstr "Имя файла без расширения"
 
 msgid "Files"
 msgstr "Файлы"
+
+msgid "Files with these extensions won't be added"
+msgstr "Файлы с этими расширениями не будут добавлены"
 
 msgid "Filesystem"
 msgstr "Файловая система"
@@ -1471,6 +1513,14 @@ msgstr "Найдено, но не работает"
 
 msgid "Friday"
 msgstr "Пятница"
+
+#, perl-brace-format
+msgid ""
+"From: {oldname}\n"
+"To: {newname}"
+msgstr ""
+"Из: {oldname}\n"
+"В: {newname}"
 
 msgid "Full screen layout :"
 msgstr "Полноэкранный вид:"
@@ -1559,6 +1609,9 @@ msgstr "Идентификатора в теге файла"
 msgid "Ignore playback errors"
 msgstr "Игнорировать ошибки воспроизведения"
 
+msgid "Ignored file extensions :"
+msgstr "Игнорируемые расширения файлов:"
+
 msgid "Import list"
 msgstr "Импортировать список"
 
@@ -1623,6 +1676,9 @@ msgstr "Караоке"
 
 msgid "Karaoke plugin"
 msgstr "Плагин караоке"
+
+msgid "Keep list filtered and sorted"
+msgstr "Оставлять список отфильтрованным и сортированным"
 
 msgid "Key"
 msgstr "Клавиша"
@@ -1864,6 +1920,13 @@ msgid "Make it look like"
 msgstr "Сделать похожим на"
 
 msgid ""
+"Makes gmusicbrowser monitor its pulseaudio volume, so that external changes "
+"to its volume are known."
+msgstr ""
+"Позволяет gmusicbrowser следить за громкостью pulseaudio, чтобы знать её "
+"внешние изменения."
+
+msgid ""
 "Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
 "gnome."
 msgstr ""
@@ -1908,6 +1971,9 @@ msgstr "Изменение"
 msgid "Monday"
 msgstr "Понедельник"
 
+msgid "Monitor the pulseaudio volume"
+msgstr "Следить за уровнем громкости pulseaudio"
+
 msgid "Moods"
 msgstr "Настроения"
 
@@ -1941,6 +2007,9 @@ msgstr[2] "Перемещаются %d файлов"
 
 msgid "Music"
 msgstr "Музыка"
+
+msgid "Music files"
+msgstr "Музыкальные файлы"
 
 msgid "Mute/Unmute"
 msgstr "Вкл/выкл звук"
@@ -2378,6 +2447,9 @@ msgstr "Значки воспроизведения и очереди"
 msgid "Playing error : {error}"
 msgstr "Ошибка воспроизведения: {error}"
 
+msgid "Playing/Queue Icon or Track"
+msgstr "Значок воспроизведения/очереди или трек"
+
 msgid "Playlist"
 msgstr "Список воспроизведения"
 
@@ -2465,6 +2537,9 @@ msgstr "Уплаченная цена"
 msgid "Private Data"
 msgstr "Закрытые данные"
 
+msgid "Proceed to next item."
+msgstr "Перейти к следующему пункту."
+
 msgid "Produced (P)"
 msgstr "Продюсер (P)"
 
@@ -2525,6 +2600,9 @@ msgstr "Быстрый поиск с древовидным списком"
 
 msgid "Quit"
 msgstr "Выйти"
+
+msgid "Quit after this song"
+msgstr "Выйти после этой песни"
 
 msgid "Quit when queue empty"
 msgstr "Выйти, когда очередь пуста"
@@ -2714,6 +2792,9 @@ msgstr "Переименовать эту папку в:"
 msgid "Rename/move files based on these fields :"
 msgstr "Переименовать/переместить файлы, основываясь на этих полях:"
 
+msgid "Renaming failed"
+msgstr "Переименование не удалось"
+
 #, perl-brace-format
 msgid ""
 "Renaming {oldname}\n"
@@ -2793,6 +2874,9 @@ msgstr "Плагин копирования CD"
 
 msgid "Ripping software :"
 msgstr "Программа копирования CD:"
+
+msgid "Row number"
+msgstr "Номер строки"
 
 msgid "Run a command when playing a song"
 msgstr "Запускает команду, когда играет песня"
@@ -3052,6 +3136,9 @@ msgstr "Установить оценку текущей песни"
 msgid "Set Picture"
 msgstr "Установить изображение"
 
+msgid "Set action when song ends"
+msgstr "Настройка действия, когда песня кончается"
+
 msgid "Set as primary filter"
 msgstr "Установить в качестве основного фильтра"
 
@@ -3131,6 +3218,9 @@ msgstr "Показать панель информации"
 msgid "Show main window"
 msgstr "Показать главное окно"
 
+msgid "Show more error details"
+msgstr "Показать больше сведений об ошибке"
+
 msgid "Show playlist"
 msgstr "Показать список воспроизведения"
 
@@ -3182,6 +3272,9 @@ msgstr "Показать/Скрыть строку состояния"
 msgid "Shuffle"
 msgstr "Перемешать"
 
+msgid "Shuffle list"
+msgstr "Перемешать список"
+
 msgid "Shuffle queue"
 msgstr "Перемешать очередь"
 
@@ -3212,11 +3305,17 @@ msgstr "Простой заголовок"
 msgid "Size"
 msgstr "Размер"
 
+msgid "Skip _All"
+msgstr "Пропустить все"
+
 msgid "Skip count"
 msgstr "Число пропусков"
 
 msgid "Skip history"
 msgstr "История пропусков"
+
+msgid "Skip this and any further errors."
+msgstr "Пропустить эту и дальнейшие ошибки."
 
 msgid "Skip to next song if an error occurs"
 msgstr "Перейти к следующей песне, если происходит ошибка"
@@ -3263,6 +3362,10 @@ msgstr "Правка режима сортировки"
 msgid "Sort order"
 msgstr "Порядок сортировки"
 
+#, perl-brace-format
+msgid "Source: {file}"
+msgstr "Источник: {file}"
+
 msgid "Split artist names on :"
 msgstr "Разделять имена исполнителей с:"
 
@@ -3283,6 +3386,9 @@ msgstr "Строка состояния"
 
 msgid "Stop"
 msgstr "Остановить"
+
+msgid "Stop after this song"
+msgstr "Остановить после этой песни"
 
 msgid "Stop checking"
 msgstr "Остановить проверку"
@@ -3486,6 +3592,9 @@ msgstr "Вторник"
 
 msgid "Turn Off"
 msgstr "Выключить"
+
+msgid "Turn off computer after this song"
+msgstr "Выключить компьютер после этой песни"
 
 msgid "Turn off computer when queue empty"
 msgstr "Выключить компьютер, когда очередь пуста"
@@ -3770,17 +3879,23 @@ msgstr ""
 msgid "You must specify a base folder"
 msgstr "Вы должны указать базовую папку"
 
+msgid "_Cancel"
+msgstr "Отмена"
+
 msgid "_Insert column"
-msgstr "_Вставить столбец"
+msgstr "Вставить столбец"
 
 msgid "_Remove this column"
-msgstr "_Удалить этот столбец"
+msgstr "Удалить этот столбец"
 
 msgid "_Retry"
-msgstr "_Повторить попытку"
+msgstr "Повторить попытку"
+
+msgid "_Skip"
+msgstr "Пропустить"
 
 msgid "_Sort by"
-msgstr "_Сортировать по"
+msgstr "Сортировать по"
 
 # ?
 msgid "a bright coloured fish"
@@ -4093,6 +4208,10 @@ msgstr "любимое"
 
 msgid "file tag"
 msgstr "тег файла"
+
+#, perl-brace-format
+msgid "file: {filename}"
+msgstr "файл: {filename}"
 
 msgid "filters"
 msgstr "фильтры"
@@ -4484,6 +4603,9 @@ msgstr "нет для всех"
 
 msgid "noname"
 msgstr "без имени"
+
+msgid "none"
+msgstr "ни одного"
 
 msgid "normal"
 msgstr "нормально"
@@ -4931,3 +5053,9 @@ msgstr "{song} из {artist}"
 
 msgid "|-separated list of widget names"
 msgstr "разделённый знаком | список виджетов"
+
+#~ msgid "Abort all"
+#~ msgstr "Прервать все"
+
+#~ msgid "Do not add songs that can't be played"
+#~ msgstr "Не добавлять песни, которые не могут быть воспроизведены"
