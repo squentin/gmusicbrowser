@@ -93,7 +93,7 @@ use constant
 
 sub _ ($) {$_[0]}	#dummy translation functions
 sub _p ($$) {_($_[1])}
-sub __ { sprintf( ($_[2]>1 ? $_[0] : $_[1]), $_[2]); }
+sub __ { sprintf( ($_[2]>1 ? $_[1] : $_[0]), $_[2]); }
 sub __p {shift;&__}
 sub __x { my ($s,%h)=@_; $s=~s/{(\w+)}/$h{$1}/g; $s; }
 BEGIN
