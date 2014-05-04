@@ -73,13 +73,15 @@ sub PlayStop
 	::forksystem(::split_with_quotes($cmd));
 }
 
+# FIXME should simply call run_system_cmd($cmd,[$::SongID],0); but the SENDSTDINPUT option make that difficult
 sub Changed
 {	my $ID=$::SongID;
 	my $cmd= $::Options{OPT.'CMD'};
-	return unless defined $cmd;
+	return unless defined $cmd && $cmd=~m/\S/;
+	$cmd=Encode::encode("utf8", $cmd);
+	my $quotesub= sub { my $s=$_[0]; if (utf8::is_utf8($s)) { $s=Encode::encode("utf8",$s); } $s; };
 	my @cmd= ::split_with_quotes($cmd);
-	return unless @cmd;
-	$_=::ReplaceFields($ID,$_) for @cmd;
+	$_=::ReplaceFields($ID,$_,$quotesub) for @cmd;
 	if ($::Options{OPT.'SENDSTDINPUT'})
 	{	my $string=::ReplaceFields($ID,"Title=%t\nArtist=%a\nAlbum=%l\nLength=%m\nYear=%y\nTrack=%n\n");
 		open my$out,'|-:utf8',@cmd;

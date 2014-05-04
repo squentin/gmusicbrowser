@@ -1293,7 +1293,14 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	IncVolume	=> [sub {ChangeVol('up')},		_"Increase Volume"],
 	DecVolume	=> [sub {ChangeVol('down')},		_"Decrease Volume"],
 	TogMute		=> [sub {ChangeVol('mute')},		_"Mute/Unmute"],
-	RunSysCmd	=> [\&run_system_cmd,			_"Run system command",_"Shell command\n(some variables such as %f (current song filename) or %F (list of selected songs filenames) are available)",qr/./],
+	RunSysCmd	=> [sub {call_run_system_cmd($_[0],$_[1],0,0)},
+		_"Run system command",_("System command")."\n"._("Some variables such as %f (current song filename) are available"),qr/./],
+	RunShellCmd	=> [sub {call_run_system_cmd($_[0],$_[1],0,1)},
+		_"Run shell command",_("Shell command")."\n"._("Some variables such as %f (current song filename) are available"),qr/./],
+	RunSysCmdOnSelected	=> [sub {call_run_system_cmd($_[0],$_[1],1,0)},
+		_"Run system command on selected songs",_("System command")."\n"._("Some variables such as %f (current song filename) are available")."\n"._("One command is used per selected songs, unless \$files is used, which is replaced by the list of selected files"),qr/./],
+	RunShellCmdOnSelected	=> [sub {call_run_system_cmd($_[0],$_[1],1,1)},
+		_"Run shell command on selected songs",_("Shell command")."\n"._("Some variables such as %f (current song filename) are available")."\n"._("One command is used per selected songs, unless \$files is used, which is replaced by the list of selected files"),qr/./],
 	RunPerlCode	=> [sub {eval $_[1]},			_"Run perl code",_"perl code",qr/./],
 	TogArtistLock	=> [sub {ToggleLock('first_artist')},	_"Toggle Artist Lock"],
 	TogAlbumLock	=> [sub {ToggleLock('album')},		_"Toggle Album Lock"],
@@ -1352,29 +1359,45 @@ sub split_with_quotes
 	return @w;
 }
 
-sub run_system_cmd
-{	my $syscmd=$_[1];
-	my @cmd= split_with_quotes($syscmd);
-	return unless @cmd;
-	for my $arg (@cmd) { ::_utf8_off($arg) if $arg=~m/^[\x00-\x7f]*$/; } #remove utf8 flag from arguments that don't need it to prevent autoupgrade to utf8  of potentially non-utf8 filenames when replacing %f with a filename
-	if ($syscmd=~m/%F/)
-	{	my @files;
-		if ($_[0] and my $songlist=GetSonglist($_[0])) { @files=map Songs::GetFullFilename($_), $songlist->GetSelectedIDs; }
-		unless (@files) { warn "Not executing '$syscmd' because no song is selected in the current window\n"; return }
-		@cmd=map { $_ ne '%F' ? $_ : @files } @cmd ;
+sub call_run_system_cmd
+{	my ($widget,$cmd,$use_selected,$use_shell)=@_;
+	my @IDs;
+	if ($use_selected || $cmd=~s#%F\b#\$files#)
+	{	if ($widget and my $songlist=GetSonglist($widget)) { @IDs= $songlist->GetSelectedIDs; }
+		unless (@IDs) { warn "Not executing '$cmd' because no song is selected in the current window\n"; return }
 	}
-	if (defined $SongID) { $_=ReplaceFields($SongID,$_) for @cmd; }
-	forksystem(@cmd);
+	else { @IDs=($SongID) if defined $SongID; }
+	run_system_cmd($cmd,\@IDs,$use_shell);
+}
+sub run_system_cmd
+{	my ($cmd,$IDs,$use_shell)=@_;
+	return unless $cmd=~m/\S/; #check if command is empty
+	$cmd=Encode::encode("utf8", $cmd);
+	my $join=' ';
+	if (!$use_shell) { $join="\x00"; $cmd= join $join,split_with_quotes($cmd); }
+	my $quotesub= sub { my $s=$_[0]; if (utf8::is_utf8($s)) { $s=Encode::encode("utf8",$s); } $use_shell ? quotemeta($s) : $s; };
+	my (@cmds,$files);
+	if ($cmd=~m/\$files\b/) { $files= join $join,map $quotesub->(Songs::GetFullFilename($_)),@$IDs; }
+	if (@$IDs>1 && !$files) { @cmds= map ReplaceFields($_,$cmd,$quotesub), @$IDs; }
+	else { @cmds=( ReplaceFields($IDs->[0],$cmd,$quotesub, {'$files'=>$files}) ); }
+	if ($use_shell) { my $shell= $ENV{SHELL} || 'sh'; @cmds= map [$shell,'-c',$_], @cmds; }
+	else { @cmds= map [split /\x00/,$_], @cmds; }
+	forksystem(@cmds);
 }
 
 sub forksystem
 {	use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
-	my $pid=fork;
-	if ($pid==0) #child
-	{	exec @_;
-		exit;
+	my @cmd=@_; #can be (cmd,arg1,arg2,...) or ([cmd1,arg1,arg2,...],[cmd2,$arg1,arg2,...])
+	if (ref $cmd[0] && @cmd==1) { @cmd=@{$cmd[0]}; } #simplify if only 1 command
+	my $ChildPID=fork;
+	if (!defined $ChildPID) { warn ::ErrorMessage("forksystem : fork failed : $!"); }
+	if ($ChildPID==0) #child
+	{	if (ref $cmd[0])
+		{	system @$_ for @cmd;	#execute multiple commands, one at a time, from the child process
+		}
+		else { exec @cmd; }	#execute one command in the child process
+		POSIX::_exit(0);
 	}
-	#waitpid $pid,0 if $pid;# && kill(0,$pid);
 	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 }
 

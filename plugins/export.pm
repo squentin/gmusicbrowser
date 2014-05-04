@@ -189,25 +189,9 @@ sub ToCSV
 
 sub RunCommand
 {	my $IDs=$_[0]{IDs} || $_[0]{filter}->filter;
-	my @cmd=split / /,$::Options{OPT.'tocmd_cmd'};
-	return unless @cmd;
-	if (grep $_ eq '$files', @cmd)
-	{	my @files=map ::ReplaceFields($_,'%f'), @$IDs;
-		@cmd=map { $_ ne '$files' ?  $_ :  @files } @cmd;
-		::forksystem(@cmd);
-	}
-	else
-	{	my @todo;
-		for my $ID (@$IDs)
-		{	push @todo, [ map ::ReplaceFields($ID,$_), @cmd ];
-		}
-		my $ChildPID=fork;
-		if (!defined $ChildPID) { warn ::ErrorMessage("export plugin : fork failed : $!"); }
-		elsif ($ChildPID==0) #child
-		{	system @$_ for @todo;
-			POSIX::_exit(0);
-		}
-	}
+	my $cmd= $::Options{OPT.'tocmd_cmd'};
+	::run_system_cmd($cmd,$IDs,0);
 }
+
 
 1
