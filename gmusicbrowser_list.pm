@@ -4979,11 +4979,13 @@ sub show_tooltip
 
 	my $screen=$self->get_screen;
 	my $monitor=$screen->get_monitor_at_window($self->window);
-	my (undef,undef,$xmax,$ymax)=$screen->get_monitor_geometry($monitor)->values;
-	$xmax-=$request->width;
-	$ymax-=$request->height;
+	my ($x0,$y0,$xmax,$ymax)=$screen->get_monitor_geometry($monitor)->values;
+	$xmax+= $x0-$request->width;
+	$ymax+= $y0-$request->height;
 	$x=$xmax if $x>$xmax;
 	$y-=$h+$request->height if $y>$ymax;
+	$x=$x0 if $x<$x0;
+	$y=$y0 if $y<$y0;
 
 	my $frame=Gtk2::Frame->new;
 	$frame->add($label);
