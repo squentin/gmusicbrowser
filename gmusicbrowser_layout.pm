@@ -1874,6 +1874,7 @@ sub Position
 	my ($monitor,$x,$xalign,$y,$yalign)= $pos=~m/(?:(\d+)@)?\s*([+-]?\d+%?)(?:([+-]\d+)%)?\s*x\s*([+-]?\d+%?)(?:([+-]\d+)%)?/;
 	my ($w,$h)=$self->get_size; # size of window to position
 	my $screen=$self->get_screen;
+	if (defined $monitor) { $monitor=undef if $monitor>=$screen->get_n_monitors; }
 	if (!defined($monitor) && $x!~m/[-%]/ && $y!~m/[-%]/)
 	{	$monitor=$screen->get_monitor_at_point($x,$y);
 	}

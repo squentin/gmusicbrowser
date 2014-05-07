@@ -118,6 +118,7 @@ sub New
 	(	layout		=> $layout,
 		DefaultFontColor=> $layoutdef->{DefaultFontColor} || 'white',
 		DefaultFont	=> $layoutdef->{DefaultFont} || 'Sans 12',
+		monitor => 0,
 		below	=> 1,
 		opacity	=> 1,
 		x	=> 0,
@@ -172,6 +173,13 @@ sub FillOptions
 	$adjx->signal_connect(value_changed => sub { $opt->{x}=$_[0]->get_value; MoveWindow($key);  });
 	$adjy->signal_connect(value_changed => sub { $opt->{y}=$_[0]->get_value; MoveWindow($key);  });
 
+	my $screen= Gtk2::Gdk::Screen->get_default;
+	my $monitors= $screen->get_n_monitors;
+	my $adj_mon=Gtk2::Adjustment->new($opt->{monitor},0,$monitors-1,1,2,0);
+	my $spin_mon= Gtk2::SpinButton->new($adj_mon,0,0);
+	$spin_mon->set_sensitive(0) if $monitors<2;
+	$adj_mon->signal_connect(value_changed => sub { $opt->{monitor}=$_[0]->get_value; MoveWindow($key);  });
+
 	my $adjo=Gtk2::Adjustment->new($opt->{opacity}*100,0,100,1,10,0);
 	my $spino=Gtk2::SpinButton->new($adjo,0,0);
 	$adjo->signal_connect(value_changed => sub { $opt->{opacity}=$_[0]->get_value/100; my $win=$Displayed{$key}; $win->set_opacity($opt->{opacity}) if $win;  });
@@ -192,6 +200,7 @@ sub FillOptions
 		[ Gtk2::Label->new(_"Default text color"), $textcolor],
 		[ Gtk2::Label->new(_"Default text font"),  $textfont],
 		[ Gtk2::Label->new(_"Centered on"),  '_',$spinx, Gtk2::Label->new('%  x'), '_',$spiny, Gtk2::Label->new('%') ],
+		[ Gtk2::Label->new(_"Monitor"), $spin_mon, ],
 		[ Gtk2::Label->new(_"Minimum size"), $spinw, Gtk2::Label->new('x'), $spinh ],
 		[ Gtk2::Label->new(_"Opacity"),  $spino, Gtk2::Label->new('%') ],
 		 $ontop);
@@ -210,7 +219,7 @@ sub CreateWindow
 	return unless $opt;
 	return if $opt->{dw_inactive};
 	delete $opt->{dw_inactive};
-	my $pos= $opt->{x}.'%x'.$opt->{y}.'%';
+	my $pos= $opt->{monitor}.'@'.$opt->{x}.'%x'.$opt->{y}.'%';
 	my $size= $opt->{w}.'x'.$opt->{h};
 	$Displayed{$key}= Layout::Window->new($opt->{layout}, %$opt, 'pos'=>$pos, size=>$size, uniqueid=>$key, ifexist=>'replace',
 						fallback=> 'NONE', nodecoration=>1, skippager=>1, skiptaskbar=>1, sticky=>1,
@@ -221,7 +230,8 @@ sub MoveWindow
 {	my $key=shift;
 	my $win=$Displayed{$key};
 	return unless $win;
-	$win->{'pos'}= $DWlist->{$key}{x}.'%x'.$DWlist->{$key}{y}.'%';
+	my $opt= $DWlist->{$key};
+	$win->{'pos'}= $opt->{monitor}.'@'.$opt->{x}.'%x'.$opt->{y}.'%';
 	my ($x,$y)=$win->Position;
 	$win->move($x,$y);
 }
