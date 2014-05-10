@@ -676,7 +676,20 @@ sub Gtk2::Window::force_present #force bringing the window to the current worksp
 	$win->present;
 }
 sub IncSuffix	# increment a number suffix from a string
-{	$_[0] =~ s/(?<=\D)(\d*)$/($1||1)+1/e;
+{	$_[0] =~ s/(?<=\D)(\d*)$/sprintf "%0".length($1)."d",($1||1)+1/e;
+}
+my $thousandsep= POSIX::localeconv()->{thousands_sep};
+sub format_integer
+{	my $n=shift;
+	$n =~ s/(?<=\d)(?=(?:\d\d\d)+\b)/$thousandsep/g;
+	$n;
+}
+sub Ellipsize
+{	my ($string,$max)=@_;
+	return length $string>$max+3 ? substr($string,0,$max)."\x{2026}" : $string;
+}
+sub Clamp
+{	$_[0] > $_[2] ? $_[2] : $_[0] < $_[1] ? $_[1] : $_[0];
 }
 
 sub CleanupFileName
@@ -719,6 +732,11 @@ sub sorted_keys		#return keys of $hash sorted by $hash->{$_}{$sort_subkey} or by
 	else
 	{	return sort { superlc($hash->{$a}) cmp superlc($hash->{$b}) } keys %$hash;
 	}
+}
+
+sub WordIn #return true if 1st argument is a word in contained in the 2nd argument (space-separated words)
+{	return 1 if first {$_[0] eq $_} split / +/,$_[1];
+	return 0;
 }
 
 sub OneInCommon	#true if at least one string common to both list
@@ -5963,7 +5981,7 @@ sub PrefKeys
 		$mod.='w' if $event->state >= 'mod4-mask'; # use 'super-mask' ???
 		$mod.='s' if $event->state >= 'shift-mask';
 		#warn "mod=$mod";
-		if (defined $keyname && !grep($_ eq $keyname,qw/Shift_L Control_L Alt_L Super_L ISO_Level3_Shift Multi_key Menu Control_R Shift_R/))
+		if (defined $keyname && !WordIn($keyname,'Shift_L Control_L Alt_L Super_L ISO_Level3_Shift Multi_key Menu Control_R Shift_R'))
 		{	$keyname=$mod.'-'.$keyname if $mod;
 			$entry->{key}=$keyname;
 			$keyname=keybinding_longname($keyname);
