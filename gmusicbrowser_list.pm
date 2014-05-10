@@ -6105,8 +6105,7 @@ sub expose_cb
 		|| $self->get_style;
 	$style=$style->attach($window);
 	my $nstate= $self->state eq 'insensitive' ? 'insensitive' : 'normal';
-	#my $sstate=$view->has_focus ? 'selected' : 'active';
-	my $sstate='selected';	#Treeview uses only state= normal, insensitive or selected
+	my $sstate=$view->has_focus ? 'selected' : 'active';
 	$self->{stylewidget}->has_focus($view->has_focus); #themes engine check if the widget has focus
 	my $selected=	\$self->{selected};
 	my $list=	$self->{array};
