@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use v5.10;
 use strict;
 use warnings;
 use utf8;
@@ -4016,7 +4015,7 @@ sub Breakdown_List
 			if ($bestscore[$i]) #if a path already used that breakpoint, compare the score
 			{	next if $bestscore[$i]<$score; # ignore the new path if not better
 				#new path has a better score => remove all paths that used that breakpoint
-				@todo=grep !($i~~@$_), @todo;
+				@todo=grep {!grep $_==$i, @$_} @todo; # could use smart match but deprecated : @todo=grep !($i~~@$_), @todo;
 			}
 			$bestscore[$i]=$score;
 			my $path= [@$path0,$i];

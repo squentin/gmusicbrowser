@@ -14,7 +14,6 @@ BEGIN
   require 'wvheader.pm';
   require 'm4aheader.pm';
 }
-use v5.10;
 use strict;
 use warnings;
 use utf8;

@@ -8,7 +8,7 @@ Standards-Version: 3.7.3
 
 Package: gmusicbrowser
 Architecture: all
-Depends: perl (>=5.10), libgtk2-perl, libgtk2.0-0 (>= 2.6)
+Depends: perl, libgtk2-perl, libgtk2.0-0 (>= 2.6)
 Recommends: libintl-perl, libnet-dbus-perl, libgstreamer-perl, libdigest-crc-perl, libcairo-perl, libhtml-parser-perl, libio-compress-perl
 Suggests: mplayer, mpg321, vorbis-tools, alsa-utils, libgtk2-mozembed-perl, libgstreamer-interfaces-perl, libgtk2-notify-perl, libgnome2-wnck-perl
 Description: very customizable jukebox for large collections of music files

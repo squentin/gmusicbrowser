@@ -5,7 +5,6 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation.
 
-use v5.10;
 use strict;
 use warnings;
 use utf8;
@@ -116,7 +115,8 @@ our %timespan_menu=
 		check_multi	=> 'for my $lref (@{#VAL#}) { for (@$lref) {tr/\x00-\x1F//d; s/\s+$//;} }',
 		set_multi	=> 'do {my $c=#_#; my %h=( $c ? ref $c ? map((___name[$_]=>0), @$c) : (___name[$c]=>0) : ()); my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}= (exists $h{$_} ? -1 : 1) for @$toggle; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
 		makefilter	=> '#GID# ? "#field#:~:".___name[#GID#] : "#field#:ecount:0"',
-		'filter:~'	=> '.!!. do {my $v=#_#; $v ? #VAL# ~~ $v : 0}', # is flag set
+		'filter:~'	=> '.!!. do {my $v=#_#; $v ? ref $v ? grep(#VAL#==$_, @$v) : ($v == #VAL#) : 0}',
+		#smartmatch version: 'filter:~'	=> '.!!. do {my $v=#_#; $v ? #VAL# ~~ $v : 0}', # is flag set
 		'filter_prep:~'	=> '___gid{#PAT#} ||= #sgid_to_gid(VAL=#PAT#)#;',
 		'filter_prephash:~' => 'return { map { #sgid_to_gid(VAL=$_)#, undef } keys %{#HREF#} }',
 		'filter:h~'	=> '.!!. do {my $v=#_#; $v ? ref $v ? grep(exists $hash#VAL#->{$_+0}, @$v) : (exists $hash#VAL#->{#_#+0}) : 0}',
@@ -136,7 +136,8 @@ our %timespan_menu=
 		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}',
 		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v }',
 		'hashm:name'	=> 'do {my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : () }',
-		is_set		=> 'my $gid=___gid{#VAL#}; my $v=#_#; $gid ? $gid ~~ $v : 0;',
+		is_set		=> 'my $gid=___gid{#VAL#}; my $v=#_#; $gid ? ref $v ? (grep $_==$gid, @$v) : $v==$gid : 0;',
+		#smartmatch version : is_set	=> 'my $gid=___gid{#VAL#}; my $v=#_#; $gid ? $gid ~~ $v : 0;',
 		listall		=> '1..$#___name',
 		'editwidget:many'	=> sub { GMB::TagEdit::EntryMassList->new(@_) },
 		'editwidget:single'	=> sub { GMB::TagEdit::FlagList->new(@_) },
