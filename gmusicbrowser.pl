@@ -7568,7 +7568,6 @@ sub ShowHide
 		for my $win ($MainWindow,@windows)
 		{	next unless $win;
 			$win->{saved_position}=join 'x',$win->get_position;
-			$win->iconify;
 			$win->{skip_taskbar_hint}=$win->get_skip_taskbar_hint;
 			$win->set_skip_taskbar_hint(TRUE);
 			$win->hide;
