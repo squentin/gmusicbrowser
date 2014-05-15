@@ -40,43 +40,9 @@ sub Stop
 
 sub prefbox
 {	my $vbox=Gtk2::VBox->new(0,2);
-	my $blacklist= Gtk2::CheckButton->new(_"Show in sound menu");
-	soundmenu_button_update($blacklist);
-	$blacklist->signal_connect(toggled => \&soundmenu_toggle_cb);
-	$vbox->pack_start($blacklist,0,0,0);
+	my $desc= Gtk2::Label->new(_"This plugin is needed for gmusicbrowser to appear in unity's sound menu.");
+	$vbox->pack_start($desc,0,0,0);
 	return $vbox;
-}
-
-sub soundmenu_button_update
-{	my $check=shift;
-	eval
-	 {	my $service = $bus->get_service('com.canonical.indicators.sound');
-		my $object = $service->get_object('/com/canonical/indicators/sound/service');
-		my $asyncreply=$object->IsBlacklisted(dbus_call_async,'gmusicbrowser');	#called async, because it seems to trigger the calling of gmb DBus methods before replying
-		$check->{busy}=1;
-		$asyncreply->set_notify(sub {  soundmenu_button_set($check, eval {$_[0]->get_result;}) });
-	 };
-	soundmenu_button_set($check,undef) unless $check->{busy};
-}
-sub soundmenu_button_set
-{	my ($check,$on)=@_;
-	$check->set_active(1) if !$on;
-	if (!defined $on)
-	{	$check->set_sensitive(0);
-		$check->set_tooltip_text(_"No sound menu found");
-	}
-	delete $check->{busy};
-}
-sub soundmenu_toggle_cb
-{	my $check=shift;
-	return if $check->{busy};
-	my $on=$check->get_active;
-	eval
-	 {	my $service = $bus->get_service('com.canonical.indicators.sound');
-		my $object = $service->get_object('/com/canonical/indicators/sound/service');
-		$object->BlacklistMediaPlayer('gmusicbrowser',!$on);
-	 };
-	soundmenu_button_update($check);
 }
 
 package GMB::DBus::MPRIS2;
