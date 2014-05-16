@@ -2668,29 +2668,48 @@ sub PrefFields	#preference dialog for fields
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
 	 ( 'field name',$renderer,text => 0, editable => 2, sensitive=>3, strikethrough => 4,
 	 ));
-	my @std= sort grep !$Def{$_}{template} && (!$Def{$_}{disable} || $Def{$_}{options} && $Def{$_}{options}=~m/\bdisable\b/), keys %Def;
-	@std= grep !$Def{$_}{property_of} && $Def{$_}{name} && $Def{$_}{flags}=~m/[pc]/, @std;
-	my @custom= sort grep $::Options{Fields_options}{$_}{template}, keys %{$::Options{Fields_options}};
-	my %sensitive;
-	$sensitive{$_}= ($::Options{Fields_options}{$_} && exists $::Options{Fields_options}{$_}{disable} ? $::Options{Fields_options}{$_}{disable} : $Def{$_}{disable}) ? 0 : 1
-			for @std,@custom;
-	my $parent;
-	$store->set( $parent=$store->append(undef),	0,_"Standard fields", 1,'std', 3,::TRUE);
-	$store->set( $store->append($parent),		0,$_,1,'_std',3, $sensitive{$_} ) for @std;
 
-	$store->set( $parent=$store->append(undef),	0,_"Custom fields", 1,'cst', 3,::TRUE);
-	$store->set( $store->append($parent),		0,$_,1,'_cst',2,::TRUE, 3, $sensitive{$_}, 4,$::Options{Fields_options}{$_}{remove} ) for @custom;
+	my @fields= grep !$Def{$_}{template} && (!$Def{$_}{disable} || $Def{$_}{options} && $Def{$_}{options}=~m/\bdisable\b/), keys %Def;
+	@fields= grep !$Def{$_}{property_of} && $Def{$_}{name} && $Def{$_}{flags}=~m/[pc]/, @fields;
+	#add custom fields
+	push @fields, grep $::Options{Fields_options}{$_}{template}, keys %{$::Options{Fields_options}};
+
+	# create the field tree
+	my %tree= (custom=>{}); #always show custom category, even if empty
+	for my $field (@fields)
+	{	my $opt= $::Options{Fields_options}{$field};
+		my $custom= $opt->{template};
+		my $cat= $custom ? 'custom' : $Def{$field}{category} || 'unknown';
+		my $name= $custom ? $opt->{name} : $Def{$field}{name};
+		$tree{$cat}{$field}=$name;
+	}
+
+	#fill the treestore
+	my $custom_root;
+	for my $cat ( sort { $Categories{$a}[1] <=> $Categories{$b}[1] } keys %tree )
+	{	my $names= $tree{$cat};
+		my $editable= $cat eq 'custom';
+		my $parent= $store->append(undef);
+		$store->set( $parent, 0,$Categories{$cat}[0], 1,'+'.$cat, 3,::TRUE); # category node
+		for my $field (::sorted_keys($names))
+		{	my $opt= $::Options{Fields_options}{$field};
+			my $def= $Def{$field};
+			my $sensitive= exists $opt->{disable} ? $opt->{disable} : $def->{disable} ? 0 : 1;
+			$store->set( $store->append($parent), 0,$names->{$field}, 1,$field, 2,$editable, 3,$sensitive, 4,$opt->{remove} ); #child
+		}
+		$custom_root= $store->get_string_from_iter($parent) if $cat eq 'custom';
+	}
 	$treeview->expand_all;
 
 	$treeview->signal_connect(cursor_changed => sub
 		{	my $treeview=shift;
 			my $path=($treeview->get_cursor)[0];
 			my $store=$treeview->get_model;
-			my ($field,$type)=$store->get( $store->get_iter($path));
+			my ($name,$field)=$store->get( $store->get_iter($path), 0,1 );
 			$rightbox->remove($_) for $rightbox->get_children;
-			if ($type!~m/^_/) {return}
+			if ($field=~m/^\+/) {return} #row is a category
 			return unless $field;
-			my $title=Gtk2::Label->new_with_format("<b>%s</b>",$field);
+			my $title=Gtk2::Label->new_with_format("<b>%s</b>",$name);
 			$rightbox->pack_start($title,::FALSE,::FALSE,2);
 			my $box=Gtk2::VBox->new;
 			::weaken( $box->{store}=$store );
@@ -2700,29 +2719,27 @@ sub PrefFields	#preference dialog for fields
 			$rightbox->show_all;
 		});
 	$renderer->signal_connect(edited => sub
-	    {	my ($cell,$pathstr,$new)=@_;
+	    {	my ($cell,$pathstr,$newname)=@_;
 		my $iter= $store->get_iter_from_string($pathstr);
-		my $old= $store->get($iter,0);
-		$new= ucfirst $new if $new=~m/^[a-z]/;
-		$new=~s/[^a-zA-Z0-9_]//g; $new=~s/_+/_/g; $new=~s/_$//; # custom field names restrictions, might be relaxed in the future
-		if ($new eq '' || $new!~m/^[A-Z]/ || $::Options{Fields_options}{$new} || ($Def{$new} && !$Def{$new}{template}))
-		{	$store->remove($iter) if $old eq '';
-			$treeview->set_cursor(Gtk2::TreePath->new('1')); # 1 is the custom fields parent
+		my ($oldname,$field)= $store->get($iter,0,1);
+		if ($newname eq '')
+		{	$store->remove($iter) if $oldname eq '';
+			$treeview->set_cursor(Gtk2::TreePath->new($custom_root));
 			return;
 		}
-		$::Options{Fields_options}{$new}= delete($::Options{Fields_options}{$old}) || { template => 'string', name => $new, };
-		$Def{$new} ||= { template => 'string', options => $FieldTemplates{string}{options} };
-
-		if (my $id=$::Options{Fields_options}{$new}{currentid})
-		{	$Def{$id}{_renamed_to}=$new;
+		if ($field eq '')
+		{	$field= validate_custom_field_name($newname,1);
+			$::Options{Fields_options}{$field} = { template => 'string', name => $newname, };
+			#$Def{$field}= { template => 'string', options => $FieldTemplates{string}{options}, category=>'custom', name=>$newname };
 		}
-		$store->set($iter,0,$new);
+		$::Options{Fields_options}{$field}{name}= $newname;
+		$store->set($iter, 0,$newname, 1,$field);
 		$treeview->set_cursor($store->get_path($iter));
 	    });
 
 	my $newcst=::NewIconButton('gtk-add', _"New custom field", sub
-		{	my $iter=$store->append($store->iter_nth_child(undef,1));	#1 is the custom fields parent
-			$store->set($iter,0,'',1,'_cst',2,::TRUE);
+		{	my $iter=$store->append($store->get_iter_from_string($custom_root));
+			$store->set($iter,0,'',1,'',2,::TRUE);
 			my $path=$store->get_path($iter);
 			$treeview->expand_to_path($path);
 			$treeview->set_cursor($path, $treeview->get_column(0), ::TRUE);
@@ -2737,18 +2754,37 @@ sub PrefFields	#preference dialog for fields
 
 	$vbox->{gotofunc}=sub	#go to a specific row
 	{	my $field=shift;
-		my $iter= $store->get_iter_from_string(($field=~m/^[A-Z]/ ? 1 : 0).':0'); #1 is the custom fields parent, 0 the standard fields parent
-		while ($iter)
-		{	if ($store->get($iter,0) eq $field) { $treeview->set_cursor($store->get_path($iter)); last; }
-			$iter=$store->iter_next($iter);
+		my $parent= $store->get_iter_first;
+		while ($parent)
+		{	my $child= $store->iter_children($parent);
+			while ($child)
+			{	if ($store->get($child,1) eq $field) { $treeview->set_cursor($store->get_path($child)); return; }
+				$child= $store->iter_next($child);
+			}
+			$parent= $store->iter_next($parent);
 		}
 	};
 
 	return $vbox;
 }
 
+sub validate_custom_field_name
+{	my ($field,$fallback)=@_;
+	$field=~s/[^a-zA-Z0-9_]//g;  $field=~s/^\d+//; $field=~s/_+/_/g; $field=~s/_$//; # custom field id restrictions, might be relaxed in the future
+	$field= ucfirst $field if $field=~m/^[a-z]/;
+	my %used;
+	$used{$_}=undef for keys %Def;
+	$used{$Def{$_}{_renamed_to}}=undef for grep $Def{$_}{_renamed_to}, keys %Def;
+	if (!$field || $field eq '' || exists $used{$field})
+	{	return unless $fallback;
+		$field= 'Custom' if $field eq '';
+		::IncSuffix($field) while $used{$field};
+	}
+	return $field;
+}
+
 our %Field_options_aliases=
-(	customfield	=> 'name template convwarn disable remove datawarn',
+(	customfield	=> 'template convwarn disable remove datawarn',
 	rw_		=> 'rw resetnotag',
 );
 our %Field_options=
@@ -2784,10 +2820,6 @@ our %Field_options=
 		apply		=> sub { my ($def,$opt,$value)=@_; $def->{flags}=~s/_//g; $def->{flags}.='_' if !$value; },
 		update		=> sub { $_[0]{widget}->set_sensitive( $_[0]{opt}{rw} ); }, # set insensitive when tag not read/written
 	},
-	name	=>
-	{	widget		=> 'entry',
-		label		=> _"Field name",
-	},
 	disable	=>
 	{	widget		=> 'check',
 		label		=> _"Disabled",
@@ -2801,7 +2833,7 @@ our %Field_options=
 		label		=> _"Warning: converting existing data to this format may be lossy",
 		update		=> sub			# show only when field to be disabled or removed
 		{		my $arg=shift;
-				my $show= $arg->{opt}{currentid} && ( $arg->{opt}{template} ne $Def{$arg->{field}}{template} );
+				my $show= $arg->{opt}{currentid} && ( $arg->{opt}{template} ne $Def{$arg->{opt}{currentid}}{template} );
 				my $w= $arg->{widget};
 				$w->set_visible($show);
 				$w->set_no_show_all(1);
@@ -2851,17 +2883,15 @@ sub Field_fill_option_box
 	#$vbox->{opt_orig}={%$opt};	#warning : shallow copy, sub-hash/array stay linked
 	$vbox->{field}=$field;
 
-	my $def= $Def{$field} ||= {};
-	my $option_list= $def->{options}||'';
+	my $template=$opt->{template};
+	my $def= $Def{$field};
+	my $option_list= ($template ? $FieldTemplates{$template}{options} : $def->{options}) ||'';
+	my $flags=	 ($template ? $FieldTemplates{$template}{flags} :   $def->{flags})   ||'';
 
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my %widgets; my @topack;
+	$vbox->{FieldProperties}=1; #used to get back to $vbox from one of its (grand)child
 	$vbox->{widget_hash}=\%widgets;
-	#my $varname= '$'.$field;
-	#$varname.= ' , %'.$def->{letter} if $def->{letter};
-	#$varname= Gtk2::Label->new($varname);
-	#$varname->set_selectable(1);
-	#push @topack, $varname;
 	my @options= split /\s+/, $option_list;
 	while (my $option=shift @options)
 	{	if (my $o=$Field_options_aliases{$option})
@@ -2873,7 +2903,7 @@ sub Field_fill_option_box
 		my $label=  $ref->{label};
 		my $widget= $ref->{widget};
 		my $key= $ref->{editkey} || $option;
-		my $base= $opt->{template} ? $FieldTemplates{$opt->{template}} : $def;
+		my $base= $template ? $FieldTemplates{$template} : $def;
 		my $value= exists $opt->{$key} ? $opt->{$key} : Field_option_default($field,$option,$base);
 		my @extra;
 		if ($keep_option && $keep_option eq $option) { ($widget,@extra)= @keep_widgets;  }
@@ -2902,7 +2932,6 @@ sub Field_fill_option_box
 		my $tip= $ref->{tip};
 		$widget->set_tooltip_text($tip) if defined $tip;
 
-		::weaken( $widget->{options_vbox}= $vbox );
 		$widgets{$option}=$widget;
 
 		if (defined $label)
@@ -2912,25 +2941,81 @@ sub Field_fill_option_box
 		}
 		push @topack, $widget,@extra;
 	}
-	unshift @topack, Gtk2::Label->new( _("Field name").' : '. $def->{name} ) unless $widgets{name};
+
+	if ($flags=~m/g/)
+	{	my @idlist= sort grep $Aliases{$_} eq $field, keys %Aliases;
+		my $varnames= join ', ',map '$'.$_, @idlist;
+		$varnames.=', %'.$def->{letter} if $def->{letter};
+		my $label_var=    _("Can be used as a variable with :").' '.$varnames;
+		my $label_search= _("Can be searched with :").' '.join(', ',@idlist);
+		$_= Gtk2::Label->new($_) for $label_var,$label_search;
+		$_->set_selectable(1) , $_->set_alignment(0,.5) , $_->set_line_wrap(1) for $label_var,$label_search;
+		unshift @topack, $label_var if $varnames;
+		unshift @topack, $label_search if @idlist && $flags=~m/f/;
+	}
 	unshift @topack, Gtk2::Label->new( $def->{desc} ) if $def->{desc};
-	unless ($widgets{rw})
-	{	my $f= $def->{flags} || '';
-		my $text= $f=~m/rw/ ? _"Value written in file tag" :
-			  $f!~m/[rw]/ ? _"Value not written in file tag" :
+
+	{	my $hbox= Gtk2::HBox->new;
+		my $label1= Gtk2::Label->new(_("Field identifier").':');
+		my $label_id= Gtk2::Label->new($field);
+		$hbox->pack_start($_,0,0,2) for $label1,$label_id;
+		if ($template) #custom fields can be renamed
+		{	my $entry= Gtk2::Entry->new;
+			my $bedit= Gtk2::Button->new(_"Edit");
+			my $brename= Gtk2::Button->new(_"Rename");
+			my $bcancel= Gtk2::Button->new(_"Cancel");
+			$hbox->pack_start($_,0,0,2) for $entry,$bedit,$brename,$bcancel;
+			my @edit=($entry,$brename,$bcancel);
+			$hbox->{edit}= \@edit;
+			$_->set_no_show_all(1) for @edit;
+			$hbox->{noedit}= [$label_id,$bedit];
+			$hbox->{entry}= $entry;
+			$hbox->{brename}= $brename;
+			$hbox->{label_id}= $label_id;
+			my $toggle_edit=sub
+			{	my ($button,$on)=@_;
+				my $hbox= $button->parent;
+				$_->set_visible($on) for @{$hbox->{edit}};
+				$_->set_visible(!$on) for @{$hbox->{noedit}};
+				my $vbox=$button; $vbox=$vbox->parent until $vbox->{FieldProperties};
+				$hbox->{entry}->set_text($vbox->{field});
+			};
+			$entry->signal_connect(changed => sub { my $t= validate_custom_field_name($_[0]->get_text); $_[0]->parent->{newid}=$t; $_[0]->parent->{brename}->set_sensitive($t && $t ne $field); });
+			$bedit->signal_connect(clicked=> $toggle_edit,1);
+			$bcancel->signal_connect(clicked=> $toggle_edit,0);
+			$brename->signal_connect(clicked=> sub
+			 {	my $button=shift;
+				my $new=$button->parent->{newid};
+				$::Options{Fields_options}{$new}= delete($::Options{Fields_options}{$field});
+				if (my $id=$::Options{Fields_options}{$new}{currentid})
+				{	$Def{$id}{_renamed_to}=$new;
+				}
+				my $vbox=$button; $vbox=$vbox->parent until $vbox->{FieldProperties};
+				$vbox->{field}= $new;
+				$button->parent->{label_id}->set_text($new);
+				$toggle_edit->($button,0);
+				Field_Edit_update($vbox);
+			 });
+		}
+		unshift @topack, $hbox;
+	}
+
+	if (!$widgets{rw})
+	{	my $text= $flags=~m/rw/ ? _"Value written in file tag" :
+			  $flags!~m/[rw]/ ? _"Value not written in file tag" :
 			  undef;
 		$text=undef if $field eq 'path' || $field eq 'file';
 		unshift @topack, Gtk2::Label->new_with_format( '<small>%s</small>', $text ) if $text;
 	}
-	unshift @topack, Gtk2::Label->new( $def->{desc} ) if $def->{desc};
+
 	$vbox->add( ::Vpack(@topack) );
 	$vbox->show_all;
 	Field_Edit_update($vbox);
 }
 
 sub Field_Edit_update
-{	my $vbox_or_child=shift;
-	my $vbox= $vbox_or_child->{options_vbox} || $vbox_or_child;
+{	my $vbox=shift;
+	$vbox=$vbox->parent until $vbox->{FieldProperties};
 	my $field= $vbox->{field};
 	my $opt= $::Options{Fields_options}{$field} ||= {};
 	my $widgets= $vbox->{widget_hash};
@@ -2940,8 +3025,10 @@ sub Field_Edit_update
 		$update->({ vbox=>$vbox, opt=>$opt, field=>$field, widget=>$widgets->{$option}, });
 	}
 	my $store= $vbox->{store};
-	my $sensitive= (exists $opt->{disable} ? $opt->{disable} : $Def{$field}{disable}) ? 0 : 1;
-	$store->set( $store->get_iter($vbox->{path}), 3, $sensitive, 4, $opt->{remove});
+	my $sensitive= (exists $opt->{disable} ? $opt->{disable} : ($Def{$field} && $Def{$field}{disable})) ? 0 : 1;
+	my $iter= $store->get_iter($vbox->{path});
+	$store->set( $iter, 3, $sensitive, 4, $opt->{remove});
+	$store->set( $iter, 0,$opt->{name}, 1,$field) if $opt->{template}; #only for custom fields
 }
 
 sub Field_Edit_template
@@ -2953,6 +3040,7 @@ sub Field_Edit_template
 			my $t=$opt->{template}= $combo->get_value;
 			$Def{$field}{options}= $FieldTemplates{$t}{options};
 			my $focus= $combo->is_focus; #FIXME never true
+			my $vbox=$combo; $vbox=$vbox->parent until $vbox->{FieldProperties};
 			Field_fill_option_box($vbox,$field, template=>$combo); # will reset the option box but keep $combo
 			$combo->grab_focus if $focus;	#reparenting $combo will make it lose focus, so regrab it #FIXME $focus never true
 		});
@@ -2969,7 +3057,7 @@ sub Field_Apply_options
 			next unless $template;	# could remove options of removed standard fields ?
 			my $hash= $FieldTemplates{$template};
 			next unless $hash;
-			$def=$Def{$field}= { %$hash }; #shallow copy of the template hash
+			$def=$Def{$field}= { %$hash, name=>$opt->{name} }; #shallow copy of the template hash
 			$opt->{currentid}=$field;
 		}
 		my @options= split /\s+/, $def->{options}||'';
