@@ -380,10 +380,13 @@ Options to change what is done with files/folders passed as arguments (done in r
 	my $running;
 	if ($FIFOFile && -p $FIFOFile)
 	{	my @c= @cmd ? @cmd : ('Show');	#fallback to "Show" command
-		sysopen my$fifofh,$FIFOFile, O_NONBLOCK | O_WRONLY;
-		print $fifofh "$_\n" and $running=1 for @c;
-		close $fifofh;
-		$running&&= "using '$FIFOFile'";
+		my $ok=sysopen my$fifofh,$FIFOFile, O_NONBLOCK | O_WRONLY;
+		if ($ok)
+		{	print $fifofh "$_\n" and $running=1 for @c;
+			close $fifofh;
+			$running&&= "using '$FIFOFile'";
+		}
+		else {warn "Found orphaned fifo '$FIFOFile' : previous session wasn't closed properly\n"}
 	}
 	if (!$running && !$CmdLine{noDBus})
 	{	eval {require 'gmusicbrowser_dbus.pm'}
