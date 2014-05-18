@@ -1150,7 +1150,7 @@ sub new_from_file
 			warn "v2.4 Data length indicator : frame Data length=$size\n" if $::debug;
 			$rawf=substr $rawf,4;
 		  }
-		  if (($f2 & 0b10) || $tag{unsync} && !($broken24&1))	#Unsynchronisation
+		  if (($f2 & 0b10) || $tag{unsync} && !$broken24)	#Unsynchronisation
 		  {	$rawf=~s/\xff\x00/\xff/g;
 			warn "v2.4 frame unsync\n" if $::debug;
 		  }
