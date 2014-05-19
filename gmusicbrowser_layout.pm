@@ -4085,6 +4085,7 @@ sub update
 		}
 		$self->{cats}{$cat}->set_visible($found) if $self->{hide_empty};
 	}
+	$self->queue_resize; # for unclear reasons (bug in gtk2 ?), labels that were hidden when the widget is was last shown, and then are shown while the widget is hidden, have a row height of 0 (and thus hidden) when the widget is shown, forcing a queue resize fixes it
 }
 sub SaveOptions
 {	my $self=shift;
