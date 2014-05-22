@@ -1303,7 +1303,9 @@ our %timespan_menu=
  version_or_empty	=> { get => 'do {my $v=#version->get#; $v eq "" ? "" : " ($v)"}',	type=> 'virtual',	depend => 'version',	flags => 'g', letter => 'V', },
  album_years	=> { name => _"Album year(s)", get => 'AA::Get("year:range","album",#album->get_gid#)',	type=> 'virtual',	depend => 'album year',	flags => 'g', letter => 'Y', }, #depends on years from other songs too
  uri		=> { get => '"file://".::url_escape(#path->get# .::SLASH. #file->get#)',	type=> 'virtual',	depend => 'file path',	flags => 'g', },
- fullfilename_raw => { get => '#fullfilename->get#', type=> 'virtual',	flags => 'g',	depend => 'file path',	letter => 'f', },
+ fullfilename_raw =>{	name => _"Raw filename with path",	flags => 'g',	letter => 'f',
+			get => '#fullfilename->get#',	type=> 'virtual', depend => 'file path',
+		   },
  fullfilename	=> {	get	=> '#path->get# .::SLASH. #file->get#',
 	 		display => '#path->display# .::SLASH. #file->display#',
 			makefilter_fromID => '"fullfilename:e:" . #get#',
