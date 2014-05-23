@@ -1716,6 +1716,7 @@ sub new
 	$self->init;
 	::HasChanged('HiddenWidgets');
 	$self->set_opacity($self->{opacity}) if exists $self->{opacity} && $self->{opacity}!=1;
+	::QHasChanged('Windows');
 	return $self;
 }
 

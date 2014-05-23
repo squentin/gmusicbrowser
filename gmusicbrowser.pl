@@ -575,16 +575,15 @@ our @cMenuAA=
 );
 
 our @TrayMenu=
-(	{ label=> _"Play", code => \&PlayPause,	test => sub {!$::TogPlay},	stockicon => 'gtk-media-play' },
-	{ label=> _"Pause",code => \&PlayPause,	test => sub {$::TogPlay},	stockicon => 'gtk-media-pause' },
+(	{ label=> sub {$::TogPlay ? _"Pause" : _"Play"}, code => \&PlayPause,	stockicon => sub { $::TogPlay ? 'gtk-media-pause' : 'gtk-media-play'; }, id=>'playpause' },
 	{ label=> _"Stop", code => \&Stop,	stockicon => 'gtk-media-stop' },
-	{ label=> _"Next", code => \&NextSong,	stockicon => 'gtk-media-next' },
+	{ label=> _"Next", code => \&NextSong,	stockicon => 'gtk-media-next', id=>'next', },
 	{ label=> _"Recently played", submenu => sub { my $m=ChooseSongs([GetPrevSongs(8)]); }, stockicon => 'gtk-media-previous' },
 	{ label=> sub {$::TogLock && $::TogLock eq 'first_artist'? _"Unlock Artist" : _"Lock Artist"},	code => sub {ToggleLock('first_artist');} },
 	{ label=> sub {$::TogLock && $::TogLock eq 'album' ? _"Unlock Album"  : _"Lock Album"},	code => sub {ToggleLock('album');} },
 	{ label=> _"Windows",	code => \&PresentWindow,	submenu_ordered_hash =>1,
 		submenu => sub {  [map { $_->layout_name => $_ } grep $_->isa('Layout::Window'), Gtk2::Window->list_toplevels];  }, },
-	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => sub { ShowHide(); } },
+	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => sub { ShowHide(); }, id=>'showhide', },
 	{ label=> _"Fullscreen",	code => \&ToggleFullscreenLayout,	stockicon => 'gtk-fullscreen' },
 	{ label=> _"Settings",		code => 'OpenPref',	stockicon => 'gtk-preferences' },
 	{ label=> _"Quit",		code => \&Quit,		stockicon => 'gtk-quit' },
@@ -1120,7 +1119,7 @@ sub keybinding_longname
 	return $name.'-'.$key;
 }
 
-our ($NBVolIcons,$NBQueueIcons); my %TrayIcon;
+our ($NBVolIcons,$NBQueueIcons); our %TrayIcon;
 my $icon_factory;
 
 my %IconsFallbacks=
@@ -4165,6 +4164,7 @@ sub BuildMenu
 		else	{ $item=Gtk2::MenuItem->new($label); }
 
 		if (my $i=$m->{sensitive}) { $item->set_sensitive(0) unless $i->($args) }
+		if (my $id=$m->{id}) {$item->{id}=$id}
 
 		if (my $submenu=$m->{submenu})
 		{	$submenu=$submenu->($args) if ref $submenu eq 'CODE';
@@ -7441,8 +7441,7 @@ sub UpdateTrayIcon
 	return unless $force || $TrayIcon{play} || $TrayIcon{pause};
 	my $state= !defined $TogPlay ? 'default' : $TogPlay ? 'play' : 'pause';
 	$state='default' unless $TrayIcon{$state};
-	my $pb=$TrayIcon{$state};
-	if (!ref $pb) { $pb=$TrayIcon{$state}= eval {Gtk2::Gdk::Pixbuf->new_from_file($pb)}; }
+	my $pb= $TrayIcon{'PixBuf_'.$state} ||= eval {Gtk2::Gdk::Pixbuf->new_from_file($TrayIcon{$state})};
 	my $widget= $TrayIcon->isa('Gtk2::StatusIcon') ? $TrayIcon : $TrayIcon->child->child;
 	$widget->set_from_pixbuf($pb);
 }
@@ -7601,6 +7600,7 @@ sub ShowHide
 		}
 		$MainWindow->force_present;
 	}
+	QHasChanged('Windows');
 }
 
 package GMB::Edit;
