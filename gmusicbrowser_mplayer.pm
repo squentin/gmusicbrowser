@@ -66,7 +66,7 @@ sub Play
 	#if ($ChildPID) { print $CMDfh "loadfile $file\n"; print $CMDfh "seek $sec 2\n" if $sec; return}
 	#-nocache because when using the cache option it spawns a child process, which makes monitoring the mplayer process much harder
 	#-hr-mp3-seek to fix wrong time with some mp3s
-	@cmd_and_args=($mplayer,qw/-nocache -slave -vo null -nolirc -hr-mp3-seek -msglevel all=1:statusline=5/);
+	@cmd_and_args=($mplayer,qw/-nocache -slave -novideo -nolirc -hr-mp3-seek -msglevel all=1:statusline=5/);
 	RG_set_options();
 	push @cmd_and_args, qw/-softvol -volume/, convertvolume($::Volume) if $SoftVolume;
 	warn "@cmd_and_args\n" if $::debug;

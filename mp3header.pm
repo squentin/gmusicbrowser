@@ -1387,7 +1387,7 @@ sub make
 				$framestring.=chr $val;
 			}
 			elsif ($t eq 'c')	#counter
-			{	my $string;
+			{	my $string='';
 				while ($val>256) { $string.=chr($val&0xff); $val>>=8; }
 				$string.=chr($val).("\x00"x(3-length $string)); #must be at least 4 bytes
 				$framestring.=reverse $string;

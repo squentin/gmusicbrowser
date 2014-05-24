@@ -40,7 +40,8 @@ sub Start
 	$::Command{PopupNotify}=[\&Changed,_"Popup notify window"];
 }
 sub Stop
-{	$notify=undef;
+{	::UnWatch_all($notify);
+	$notify=undef;
 	delete $::Command{PopupNotify};
 }
 

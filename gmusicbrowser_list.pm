@@ -2989,7 +2989,7 @@ INIT
 		 stockicon => 'gtk-save',	isdefined => 'curfilter',	test => sub { ! $_[0]{curfilter}->is_empty; } },
 	{ label => _"Save current list as",	code => sub { $_[0]{self}->CreateNewFL('L',[@{ $_[0]{songlist}{array} }]); },
 		stockicon => 'gtk-save',	isdefined => 'songlist' },
-	{ label => _"Edit list",	code => sub { ::WEditList( $_[0]{names}[0] ); },
+	{ label => _("Edit list").'...',	code => sub { ::WEditList( $_[0]{names}[0] ); },
 		mode => 'L',	onlyone => 'names' },
 	{ label => _"Remove list",	code => sub { ::SaveList($_[0]{names}[0],undef); },
 		stockicon => 'gtk-remove',	mode => 'L', onlyone => 'names', },

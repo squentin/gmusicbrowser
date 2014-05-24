@@ -4938,7 +4938,7 @@ sub filter_some
 {	my $self=shift;
 	my $filter=$self->{filter};
 	my $progress= $self->get_progress;
-	if (!$progress) { return 0 }# progress is 0 if given up
+	if (!$progress) { return $self->{idle_handle}=0 }# progress is 0 if given up
 	if (ref $progress)
 	{	my $sub=$filter->{'sub'} || $filter->makesub;
 		my $todo= $progress->{todo};
@@ -4953,7 +4953,7 @@ sub filter_some
 
 	# finished
 	$self->{callback}->();
-	0; #remove idle
+	return $self->{idle_handle}=0; #remove idle
 }
 
 sub abort

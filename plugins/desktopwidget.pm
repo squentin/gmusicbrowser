@@ -219,6 +219,7 @@ sub CreateWindow
 	return unless $opt;
 	return if $opt->{dw_inactive};
 	delete $opt->{dw_inactive};
+	$opt->{monitor}||=0;
 	my $pos= $opt->{monitor}.'@'.$opt->{x}.'%x'.$opt->{y}.'%';
 	my $size= $opt->{w}.'x'.$opt->{h};
 	$Displayed{$key}= Layout::Window->new($opt->{layout}, %$opt, 'pos'=>$pos, size=>$size, uniqueid=>$key, ifexist=>'replace',

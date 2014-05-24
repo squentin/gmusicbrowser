@@ -1851,7 +1851,7 @@ sub Resize
 	my (undef,undef,$monitorwidth,$monitorheight)=$screen->get_monitor_geometry($monitor)->values;
 	$w= $1*$monitorwidth/100 if $w=~m/(\d+)%/;
 	$h= $1*$monitorheight/100 if $h=~m/(\d+)%/;
-	if ($self->{options}{DEFAULT_OPTIONS}) { $monitorwidth-=40; $monitorheight-=80; } # if using default layout size, reserve some space for potential panels and decorations
+	if ($self->{options}{DEFAULT_OPTIONS}) { $monitorwidth-=40; $monitorheight-=80; } # if using default layout size, reserve some space for potential panels and decorations #FIXME use gdk_screen_get_monitor_workarea once ported to gtk3
 	$w=$monitorwidth if $w>$monitorwidth;
 	$h=$monitorheight if $h>$monitorheight;
 	if ($self->{fixedsize})

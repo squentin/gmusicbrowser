@@ -4215,7 +4215,7 @@ sub PopupMenu
 	$menu->show_all;
 	my $event= $args{event} || Gtk2->get_current_event;
 	my $widget= $args{self} || Gtk2->get_event_widget($event);
-	$menu->attach_to_widget($widget,undef) if $widget;
+	$menu->attach_to_widget($widget,undef) if $widget && !$menu->get_attach_widget;
 	my $posfunction= $args{posfunction}; # usually undef
 	my $button=my $time=0;
 	if ($event)
