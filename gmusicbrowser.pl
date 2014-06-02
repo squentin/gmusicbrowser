@@ -215,6 +215,7 @@ our @ScanExt= qw/mp3 ogg oga flac mpc ape wv m4a m4b/;
 our ($Verbose,$debug);
 our %CmdLine;
 our ($HomeDir,$SaveFile,$FIFOFile,$ImportFile,$DBus_id,$DBus_suffix);
+our $TempDir;
 sub find_gmbrc_file { my @f= map $_[0].$_, '','.gz','.xz'; return wantarray ? (grep { -e $_ } @f) : first { -e $_ } @f }
 my $gmbrc_ext_re= qr/\.gz$|\.xz$/;
 
@@ -421,6 +422,7 @@ $HTTP_module=	-e $DATADIR.SLASH.'simple_http_wget.pm' && (grep -x $_.SLASH.'wget
 		'simple_http.pm';
 #warn "using $HTTP_module for http requests\n";
 #require $HTTP_module;
+$TempDir= Glib::get_tmp_dir.SLASH; _utf8_off($TempDir); #turn utf8 flag off to not auto-utf8-upgrade other filenames in the same strings
 }
 
 our $CairoOK;
@@ -4650,6 +4652,7 @@ sub ChoosePix
 	FileChooser_add_filters($dialog,
 		[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b *.ogg *.oga' ],
 		[_"Pictures files",'image/*'],
+		["Pdf",undef,'*.pdf'],
 		[_"All files",undef,'*'],
 	);
 
@@ -4697,6 +4700,7 @@ sub ChoosePix
 		  {	my @pix= FileTag::PixFromMusicFile($file);
 			$max=@pix;
 		  }
+		  elsif ($file=~m/\.pdf$/i) { $max=GMB::Picture::pdf_pages($file) }
 		  $preview->{set_pic}->();
 		};
 	$dialog->signal_connect(update_preview => $update_preview);
@@ -9099,6 +9103,14 @@ sub get
 package GMB::Picture;
 our @ArraysOfFiles;	#array of filenames that needs updating in case a folder is renamed
 
+my ($pdfinfo,$pdftocairo,$gs);
+our $pdf_ok;
+INIT
+{	$pdfinfo= ::findcmd('pdfinfo');
+	$pdftocairo= ::findcmd('pdftocairo');
+	$pdf_ok= $pdfinfo && ($pdftocairo || ($gs=::findcmd('gs')));
+}
+
 sub pixbuf
 {	my ($file,$size,$cacheonly)=@_;
 	my $key= defined $size ? $size.':'.$file : $file;
@@ -9108,6 +9120,16 @@ sub pixbuf
 		GMB::Cache::add_pb($key,$pb) if $pb;
 	}
 	return $pb;
+}
+
+sub pdf_pages
+{	my $file=quotemeta(shift);
+	my $ref= GMB::Cache::get("$file:pagecount");
+	return $ref->{pagecount} if $ref;
+	my $count=0;
+	for (qx/$pdfinfo $file/) { if (m/Pages:\s*(\d+)/) {$count=$1;last} }  # hiding the warnings messages could be nice
+	GMB::Cache::add("$file:pagecount", {size=>10,pagecount=>$count} ); # using a ref to cache a number is a lot of overhead :(
+	return $count;
 }
 
 sub load
@@ -9122,6 +9144,27 @@ sub load
 	if ($file=~m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i)
 	{	my $data=FileTag::PixFromMusicFile($file,$nb);
 		eval { $loader->write($data) } if defined $data;
+	}
+	elsif ($file=~m/\.pdf$/i && $pdf_ok)
+	{	my $n= 1+($nb||0);
+		my $fh;
+		my $res= (!$size || $size>500) ? 300 : $size>100 ? 150 : 75; #default is usually 150, faster but lower quality # use faster/lower quality for thumbnails
+		my $qfile=quotemeta $file;
+		#if ($pdftocairo) {open $fh,'-|', "pdftocairo -svg -r 150 -f $n -l $n $qfile -";} # pdftocairo with svg, slower but no temp file
+		if ($pdftocairo) # should be able to avoid temp file, but bug in pdftocairo (tries to open fd://0.jpg)
+		{	my $tmp= $TempDir.'gmb_pdftocairo';
+			#system("pdftocairo -jpeg -singlefile -r $res -f $n -l $n $qfile $tmp"); $tmp.='.jpg'; #with jpeg, seems slightly slower than tiff, and loss of quality
+			system("$pdftocairo -tiff -singlefile -r $res -f $n -l $n $qfile ".quotemeta($tmp)); $tmp.='.tif';
+			open $fh,'<',$tmp; binmode $fh;
+			unlink $tmp;
+		}
+		elsif ($gs) # usually slower, lower quality, and accents missing in some pdf
+		{	open $fh,'-|', "$gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -sDEVICE=jpeg -dJPEGQ=95 -r$res"."x$res -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -dFirstPage=$n -dLastPage=$n -sOutputFile=- $qfile";
+		}
+		if ($fh)
+		{	my $buf; eval {$loader->write($buf) while read $fh,$buf,1024*64;};
+			close $fh;
+		}
 	}
 	else	#eval{Gtk2::Gdk::Pixbuf->new_from_file(filename_to_unicode($file))};
 		# work around Gtk2::Gdk::Pixbuf->new_from_file which wants utf8 filename
