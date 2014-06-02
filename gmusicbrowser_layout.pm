@@ -4349,6 +4349,7 @@ sub new_pid
 	my $vbox=Gtk2::VBox->new;
 	my $label;
 	my $bar=Gtk2::ProgressBar->new;
+	$bar->set(ellipsize=>'end');
 	unless ($self->{compact})
 	{	$label=Gtk2::Label->new;
 		$label->set_alignment(0,.5);
@@ -4373,13 +4374,19 @@ sub update
 		if ($self->{lastclose} && !($self->get_children)) { $self->get_toplevel->close_window; }
 		return;
 	}
+	return if $prop->{widget};
 	my $widgets= $self->{pids}{$pid} ||= new_pid($self,$prop);
 	my (undef,$bar,$label)=@$widgets;
 	my $title=$prop->{title};
 	my $details=$prop->{details};
 	$details='' unless defined $details;
 	my $bartext=$prop->{bartext};
-	$bartext=~s/\$(end|current)/$prop->{$1}/g if $bartext;
+	if ($bartext)
+	{	my $c= $prop->{current}+1;
+		$bartext=~s/\$current\b/$c/g;
+		$bartext=~s/\$end\b/$prop->{end}/g;
+	}
+	$bartext .= ' '.$prop->{bartext_append} if $prop->{bartext_append};
 	if ($self->{compact})
 	{	$bartext=$title.' ... '.(defined $bartext ? $bartext : '');
 		$bar->set_tooltip_text($details) if $details;

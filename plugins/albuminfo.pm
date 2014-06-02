@@ -130,13 +130,13 @@ sub mass_download {
 	$self->{progress} = 0;
 	$self->{abort} = 0;
 	::Progress('albuminfo', end=>$self->{end}, aborthint=>_"Stop fetching albuminfo", title=>_"Fetching albuminfo",
-		abortcb=>sub {$self->{abort}=1; $self->cancel(); ::Progress('albuminfo', abort=>1)});
+		abortcb=>sub {$self->cancel}, bartext=>'$current / $end', );
 	::IdleDo('9_download_one'.$self, undef, \&download_one, $self);
 }
 
 sub download_one {
 	my ($self) = @_;
-	::Progress('albuminfo', current=>$self->{progress}, bartext=>($self->{progress}+1)." / $self->{end}");
+	::Progress('albuminfo', current=>$self->{progress}, );
 	return if $self->{progress} >= $self->{end} || $self->{abort};
 	my $aID = $self->{aIDs}->[$self->{progress}++];
 	warn "Albuminfo: mass download in progress... $self->{progress}/$self->{end}\n" if $::debug;
@@ -807,6 +807,8 @@ sub cancel {
 	delete $::ToDo{'9_load_albuminfo'.$self};
 	delete $::ToDo{'9_refresh_albuminfo'.$self};
 	$self->{waiting}->abort() if $self->{waiting};
+	::Progress('albuminfo', abort=>1);
+	$self->{abort}=1;
 }
 
 1

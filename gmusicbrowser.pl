@@ -7396,15 +7396,17 @@ sub Progress
 		$Progress{$pid}=$self;
 	}
 	elsif (!$Progress{$pid})
-	{	$Progress{$pid}=$self;
-		$self->{end}+=delete $self->{add} if $self->{add};
+	{	return if $self->{abort};
+		$Progress{$pid}=$self;
 	}
 	else		#update existing
 	{	$Progress{$pid}{$_}=$self->{$_} for keys %$self;
+		$Progress{$pid}{partial}=0 if $self->{inc} || exists $self->{current};
 		$self= $Progress{$pid};
 	}
+	$self->{end}+=delete $self->{add} if $self->{add};
 	$self->{current}++ if delete $self->{inc};
-	$self->{fraction}= ($self->{current}||=0) / ($self->{end}||1);
+	$self->{fraction}= (($self->{partial}||0) +  ($self->{current}||=0)) / ($self->{end}||1);
 
 	if (my $w=$self->{widget}) { $w->set_fraction( $self->{fraction} ); }
 	delete $Progress{$pid} if $self->{abort} or $self->{current}>=$self->{end}; # finished
