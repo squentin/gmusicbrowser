@@ -23,8 +23,10 @@ sub get_with_cb
 	my ($callback,$url,$post)=@params{qw/cb url post/};
 	delete $params{cache} unless $UseCache;
 	if (my $cached= $params{cache} && GMB::Cache::get($url))
-		{ warn "cached result\n" if $::debug; $callback->( ${$cached->{data}}, $cached->{type} ); return undef; }
-
+	{	warn "cached result\n" if $::debug;
+		Glib::Timeout->add(10,sub { $callback->( ${$cached->{data}}, type=>$cached->{type}, ); 0});
+		return $self;
+	}
 	warn "simple_http_AE : fetching $url\n" if $::debug;
 
 	my $proxy= $::Options{Simplehttp_Proxy} ?	$::Options{Simplehttp_ProxyHost}.':'.($::Options{Simplehttp_ProxyPort}||3128)
@@ -71,17 +73,18 @@ sub finished
 		if ($self->{params}{cache} && defined $response)
 		{	GMB::Cache::add($url,{data=>\$response,type=>$type,size=>length($response)});
 		}
-		$callback->($response,$type,$self->{params}{url});
+		$callback->($response,type=>$type,url=>$self->{params}{url});
 	}
 	else
-	{	warn "Error fetching $url : $headers->{Status} $headers->{Reason}\n";
-		$callback->();
+	{	my $error= $headers->{Status}.' '.$headers->{Reason};
+		warn "Error fetching $url : $error\n";
+		$callback->(undef,error=>$error);
 	}
 }
 
 sub progress
 {	my $self=shift;
-	my $length= $self->{content_length};	warn $length;
+	my $length= $self->{content_length};
 	return $length,0 unless exists $self->{content};
 	my $size= length $self->{content};
 	my $progress;

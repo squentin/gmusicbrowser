@@ -515,11 +515,12 @@ sub load_url
 }
 
 sub loaded
-{	my ($self,$data,$type,$url)=@_;
+{	my ($self,$data,%prop)=@_;
 	delete $self->{waiting};
 	my $buffer=$self->{buffer};
+	my $type=$prop{type};
 	unless ($data) { $data=_("Loading failed.").qq( <a href="$self->{url}">)._("retry").'</a>'; $type="text/html"; }
-	$self->{url}=$url if $url; #for redirections
+	$self->{url}=$prop{url} if $prop{url}; #for redirections
 	$buffer->delete($buffer->get_bounds);
 	my $encoding;
 	if ($type && $type=~m#^text/.*; ?charset=([\w-]+)#) {$encoding=$1}

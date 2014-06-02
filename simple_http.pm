@@ -30,8 +30,10 @@ sub get_with_cb
 	delete $params{cache} unless $UseCache;
 	my ($callback,$url,$post)=@params{qw/cb url post/};
 	if (my $cached= $params{cache} && GMB::Cache::get($url))
-		{ warn "cached result\n" if $::debug; $callback->( ${$cached->{data}}, $cached->{type} ); return undef; }
-
+	{	warn "cached result\n" if $::debug;
+		Glib::Timeout->add(10,sub { $callback->( ${$cached->{data}}, type=>$cached->{type}, ); 0});
+		return $self;
+	}
 	warn "simple_http : fetching $url\n" if $::debug;
 
 	my ($host,$port,$file);
@@ -74,9 +76,10 @@ sub get_with_cb
 	if (defined $error)
 	{	$error="Cannot connect to server $host:$port : $error" if $host;
 		warn "$error\n";
-		$callback->();
-		return undef;
+		Glib::Timeout->add(10,sub { $callback->(undef,error=>$error); 0 });
+		return $self;
 	}
+	$self->{buffer}='';
 	$self->{watch}=Glib::IO->add_watch(fileno($socket),['out','hup'],\&connecting_cb,$self);
 
 	return $self;
@@ -93,7 +96,7 @@ sub connecting_cb
 	if ($failed)
 	{	warn "Cannot connect to server $host:$port\n";
 		close $socket;
-		$params->{cb}();
+		$params->{cb}(undef,error=>"Connection failed");
 		return 0;
 	}
 
@@ -176,7 +179,7 @@ sub receiving_cb
 		if ($self->{params}{cache} && defined $response)
 		{	GMB::Cache::add($url,{data=>\$response,type=>$type,size=>length($response)});
 		}
-		$callback->($response,$type,$self->{params}{url});
+		$callback->($response, type=>$type, url=>$self->{params}{url});
 	}
 	elsif ($result=~m#^HTTP/1\.\d+ 30[123]# && $headers{location}) #redirection
 	{	my $url=$headers{location};
@@ -191,7 +194,7 @@ sub receiving_cb
 	}
 	else
 	{	warn "Error fetching $url : $result\n";
-		$callback->();
+		$callback->(undef,error=>$result);
 	}
 	return 0;
 }

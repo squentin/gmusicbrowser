@@ -74,9 +74,9 @@ sub about_to_load_cb	#called before loading a new uri,
 }
 
 sub loaded
-{	my ($self,$data,$type)=@_;
+{	my ($self,$data,%prop)=@_;
 	my $embed=$self->{embed};
-	$embed->render_data($data,$self->{url},$type)
+	$embed->render_data($data,$self->{url},$prop{type});
 #	$embed->open_stream ($self->{url}, $type);
 #	$embed->append_data ($data);
 #	$embed->close_stream;
@@ -156,9 +156,9 @@ sub net_startstop_cb
 sub set_title {} #ignored unless overridden by the class
 
 sub loaded
-{	my ($self,$data,$type)=@_;
+{	my ($self,$data,%prop)=@_;
 	my $embed=$self->{embed};
-	$embed->load_html_string($data,$self->{url}); #FIXME doesn't check type
+	$embed->load_html_string($data,$self->{url}); #FIXME doesn't check type ($prop{type})
 }
 
 
@@ -560,10 +560,10 @@ sub wikiload	#not used for now
 }
 
 sub wikifilter	#not used for now
-{	my ($self,$data,$type)=@_;
+{	my ($self,$data,%prop)=@_;
 	return unless $data;	#FIXME
 	#$data='<style type="text/css">.firstHeading {display: none}</style>'.$data;
-	$self->loaded($data,$type);
+	$self->loaded($data,%prop);
 }
 
 package GMB::Plugin::WebContext::Custom;

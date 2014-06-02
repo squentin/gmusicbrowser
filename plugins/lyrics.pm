@@ -415,11 +415,12 @@ sub load_url
 }
 
 sub loaded #_very_ crude html to gtktextview renderer
-{	my ($self,$data,$type,$url)=@_;
+{	my ($self,$data,%data_prop)=@_;
 	delete $self->{waiting};
+	my $type=$data_prop{type};
 	my $buffer=$self->{buffer};
 	unless ($data) { $data=_("Loading failed.").qq( <a href="$self->{url}">)._("retry").'</a>'; $type="text/html"; }
-	$self->{url}=$url if $url; #for redirections
+	$self->{url}=$data_prop{url} if $data_prop{url}; #for redirections
 	$buffer->delete($buffer->get_bounds);
 	my $encoding;
 	if ($type && $type=~m#^text/.*; ?charset=([\w-]+)#) {$encoding=$1}

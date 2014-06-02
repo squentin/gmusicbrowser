@@ -25,7 +25,10 @@ sub get_with_cb
 	my ($callback,$url,$post)=@params{qw/cb url post/};
 	delete $params{cache} unless $UseCache;
 	if (my $cached= $params{cache} && GMB::Cache::get($url))
-		{ warn "cached result\n" if $::debug; $callback->( ${$cached->{data}}, $cached->{type} ); return undef; }
+	{	warn "cached result\n" if $::debug;
+		Glib::Timeout->add(10,sub { $callback->( ${$cached->{data}}, type=>$cached->{type}, ); 0});
+		return $self;
+	}
 
 	warn "simple_http_wget : fetching $url\n" if $::debug;
 
@@ -43,7 +46,7 @@ sub get_with_cb
 	pipe my($content_fh),my$wfh;
 	pipe my($error_fh),my$ewfh;
 	my $pid=fork;
-	if (!defined $pid) { warn "simple_http_wget : fork failed : $!\n"; Glib::Idle->add(sub {$callback->(); 0}); return $self }
+	if (!defined $pid) { warn "simple_http_wget : fork failed : $!\n"; Glib::Timeout->add(10,sub {$callback->(); 0}); return $self }
 	elsif ($pid==0) #child
 	{	close $content_fh; close $error_fh;
 		open my($olderr), ">&", \*STDERR;
@@ -105,11 +108,11 @@ sub receiving_cb
 		if ($self->{params}{cache} && defined $$response)
 		{	GMB::Cache::add($url,{data=>$response,type=>$type,size=>length($$response)});
 		}
-		$callback->($$response,$type,$self->{params}{url});
+		$callback->($$response,type=>$type,url=>$self->{params}{url});
 	}
 	else
 	{	warn "Error fetching $url : $result\n";
-		$callback->();
+		$callback->(undef,error=>$result);
 	}
 	return $self->{watch}=0;
 }

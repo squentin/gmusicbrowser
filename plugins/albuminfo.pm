@@ -518,9 +518,9 @@ sub new_search {
 }
 
 sub print_results {
-	my ($self,$html,$type,$url) = @_;
+	my ($self,$html,%prop) = @_;
 	delete $self->{waiting};
-	my $result = parse_amg_search_results($html, $type); # result is a ref to an array of hash refs
+	my $result = parse_amg_search_results($html, $prop{type}); # result is a ref to an array of hash refs
 	my $store= $self->{treeview}->get_model;
 	$store->set_sort_column_id(5, 'ascending');
 	for (@$result) {
@@ -601,9 +601,9 @@ sub update_titlebox {
 }
 
 sub load_search_results {
-	my ($self,$ID,$md,$cb,$html,$type) = @_; # $md = 1 if mass_download, 0 otherwise. $cb = callback function if mass_download, undef otherwise.
+	my ($self,$ID,$md,$cb,$html,%prop) = @_; # $md = 1 if mass_download, 0 otherwise. $cb = callback function if mass_download, undef otherwise.
 	delete $self->{waiting};
-	my $result = parse_amg_search_results($html, $type); # $result[$i] = {url, album, artist, genres, year}
+	my $result = parse_amg_search_results($html, $prop{type}); # $result[$i] = {url, album, artist, genres, year}
 	my ($artist,$year) = ::Songs::Get($ID, qw/artist year/);
 	my $url;
 	for my $entry (@$result) {
@@ -628,9 +628,9 @@ sub load_search_results {
 }
 
 sub load_review {
-	my ($self,$ID,$md,$cb,$url,$html,$type) = @_;
+	my ($self,$ID,$md,$cb,$url,$html,%prop) = @_;
 	delete $self->{waiting};
-	$self->{fields} = parse_amg_album_page($url,$html,$type);
+	$self->{fields} = parse_amg_album_page($url,$html,$prop{type});
 	$self->print_review() unless $md;
 	save_review($ID, $self->{fields}) if $::Options{OPT.'AutoSave'} || $md;
 	if ($::Options{OPT.'SaveFields'}) {push(@towrite, [$ID, %{$self->{fields}}]); save_fields()}
