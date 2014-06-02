@@ -479,6 +479,7 @@ sub get_next
 					  $loader->get_format->{extensions}[0]
 					: ( EntryCover::_identify_pictype($pixdata) )[0];
 			$button->{ext}='jpg' if $button->{ext} eq 'jpeg';
+			$button->{url}= $result->{url};
 			my $vbox=Gtk2::VBox->new(0,0);
 			my $label=Gtk2::Label->new($dim);
 			$vbox->add($image);
@@ -491,6 +492,7 @@ sub get_next
 			$button->set_tooltip_markup($tip);
 			$button->signal_connect(clicked => \&set_cover);
 			$button->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb,3); # 3 : mouse button 3
+			::set_drag($button, source=> [::DRAG_FILE,sub { return ::DRAG_FILE,$_[0]{url} }]);
 			$button->set_relief('none');
 			$button->show_all;
 			my $i= $res_id % RES_PER_PAGE;

@@ -600,7 +600,7 @@ sub add_selectfile_column
 sub scroll_to_entry
 {	my $ent=$_[0];
 	if (my $sw=::find_ancestor($ent,'Gtk2::Viewport'))
-	{	my ($x,$y,$w,$h)=$ent->window->get_geometry;
+	{	my ($x,$y,$w,$h)= $ent->allocation->values;
 		$sw->get_hadjustment->clamp_page($x,$x+$w);
 		$sw->get_vadjustment->clamp_page($y,$y+$h);
 	};
@@ -2298,10 +2298,10 @@ sub set
 	$img->parent->{pixdata}=$self->{value}; #for zoom on click
 }
 sub uri_dropped
-{	my $self=$_[0];
-	my ($file)=split /\x0d\x0a/,$_[2];
-	if ($file=~s#^file://##)
-	{	$self->load_file($file)
+{	my ($self,$type,$uri)=@_;
+	if ($uri=~s#^file://##)
+	{	my $file=::decode_url($uri);
+		$self->load_file($file);
 	}
 	#else #FIXME download http link
 }

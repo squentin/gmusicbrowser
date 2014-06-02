@@ -4236,9 +4236,10 @@ sub BuildMenu
 		if ($m->{separator})
 		{	$item=Gtk2::SeparatorMenuItem->new;
 		}
-		elsif ($m->{stockicon})
+		elsif (my $icon=$m->{stockicon})
 		{	$item=Gtk2::ImageMenuItem->new($label);
-			$item->set_image( Gtk2::Image->new_from_stock($m->{stockicon},'menu') );
+			$icon= $icon->($args) if ref $icon;
+			$item->set_image( Gtk2::Image->new_from_stock($icon,'menu') );
 		}
 		elsif (my $keypath=$m->{toggleoption})
 		{	$item=Gtk2::CheckMenuItem->new($label);
@@ -4326,7 +4327,7 @@ sub PopupMenu
 	{	$time= $event->time;
 		$button= $event->button if $event->isa('Gtk2::Gdk::Event::Button');
 		if (!$posfunction && !$args{nomenupos} && $event->window)
-		{	my (undef,undef,$w,$h)= $event->window->get_geometry;
+		{	my ($w,$h)= $event->window->get_size;
 			$posfunction=\&menupos if $h<300; #ignore the event's widget if too big, widget can be the whole window if coming from a shortcut key, it makes no sense poping-up a menu next to the whole window
 		}
 	}
@@ -4501,6 +4502,7 @@ sub drag_data_received_cb
 	my $ret=my $del=0;
 	if ($data->length >=0 && $data->format==8)
 	{	my @values=split "\x0d\x0a",$data->data;
+		s#file:/(?!/)#file:///# for @values; #some apps send file:/path instead of file:///path
 		_utf8_on($_) for @values;
 		unshift @values,$context->{dest} if $context->{dest} && $context->{dest}[0]==$self;
 		$self->{dragdest} ($self, $::DRAGTYPES{$data->target->name} , @values);
@@ -4939,6 +4941,7 @@ sub Retry_Dialog	#returns one of 'retry abort skip skip_all'
 		$label->set_line_wrap(1); #FIXME making the label resize with the dialog would be nice but complicated with gtk2
 		$label->set_selectable(1);
 		$label->set_padding(2,5);
+		$label->set_alignment(0,.5);
 		$expander=Gtk2::Expander->new(_"Show more error details");
 		$expander->add($label);
 		$dialog->vbox->add($expander);

@@ -4003,7 +4003,7 @@ use base 'Gtk2::Box';
 sub new
 {	my ($class,$opt)=@_;
 	my $self= bless Gtk2::VBox->new, $class;
-	my %sl_opt=( type=>'S', headers=>'off', 'sort'=>'title', cols=>'titleaa', group=>"$self" );
+	my %sl_opt=( type=>'S', headers=>'off', 'sort'=>'title', cols=>'titleaa', group=>"$self", name=>'songsearch' );
 	$sl_opt{$_}= $opt->{$_} for grep m/^activate\d?/, keys %$opt;
 	$sl_opt{activate} ||= 'queue';
 	$self->{songlist}= my $songlist= SongList->new(\%sl_opt);
