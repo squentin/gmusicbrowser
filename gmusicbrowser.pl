@@ -437,6 +437,12 @@ BEGIN
   if ($@) { warn "Cairo perl module not found -> transparent windows and other effects won't be available\n"; }
 }
 
+our $Image_ext_re; # = qr/\.(?:jpe?g|png|gif|bmp)$/i;
+BEGIN
+{ my $re=join '|', sort map @{$_->{extensions}}, Gtk2::Gdk::Pixbuf->get_formats;
+  $Image_ext_re=qr/\.(?:$re)$/i;
+}
+
 ##########
 
 #our $re_spaces_unlessinbrackets=qr/([^( ]+(?:\(.*?\))?)(?: +|$)/; #breaks "widget1(options with spaces) widget2" in "widget1(options with spaces)" and "widget2" #replaced by ExtractNameAndOptions
@@ -5883,7 +5889,7 @@ sub AutoSelPicture
 	{	if ($m eq 'embedded')
 		{	my @files= grep m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i, Songs::Map('fullfilename',$IDs);
 			if (@files)
-			{	$set= first { FileTag::PixFromMusicFile($_,$field,1) && $_ } @files;
+			{	$set= first { FileTag::PixFromMusicFile($_,$field,1) && $_ } sort @files;
 			}
 		}
 		elsif ($m eq 'guess')
@@ -5914,16 +5920,17 @@ sub AutoSelPicture
 			my %found;
 			for my $folder (@folders)
 			{	opendir my($dh), $folder;
-				for my $file (grep m/\.(?:jpe?g|png|gif|bmp)$/i, readdir $dh)
+				for my $file (grep m/$Image_ext_re/, readdir $dh)
 				{	my $score=0;
 					if ($field eq 'album') { $score+=100 if $file=~m/(?:^|[^a-zA-Z])(?:cover|front|folder|thumb|thumbnail)[^a-zA-Z]/i; }
 					elsif ( index($file,$field)!=-1 ) { $score+=10 }
 					#$score-- if $file=~m/\b(?:back|cd|inside|booklet)\b/;
+					$score++ if $file=~m/\.jpe?g$/;
 					$score+=10 for grep index($file,$_)!=-1, @words;
 					$found{ $folder.SLASH.$file }= $score;
 					warn " $file $score\n" if $::debug;
 				}
-				last if %found; #don't look in other folders if found a least a picture
+				last if %found; #don't look in other folders if found at least a picture
 			}
 			($set)= sort { $found{$b} <=> $found{$a} } keys %found;
 		}

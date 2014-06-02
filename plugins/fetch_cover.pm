@@ -528,7 +528,7 @@ sub set_cover
 	$check->set_active(1);
 	my $default_file=	$::Options{OPT.'USEFILE'} ?
 				$::Options{OPT.'COVERFILE'} : $name;
-	$default_file=~s/\.(?:jpe?g|png|gif)$//;
+	$default_file=~s/$::Image_ext_re//;
 	$default_file.='.'.$button->{ext};
 	$default_file=::filename_from_unicode(::CleanupFileName($default_file));
 	my $default_dir=$::Options{OPT.'COVERPATH'} || '';
