@@ -3055,11 +3055,8 @@ sub new
 	$selection->set_mode('multiple');
 	$selection->signal_connect( changed => \&sel_changed_cb);
 
-	my $sw=Gtk2::ScrolledWindow->new;
-	#$sw->set_shadow_type('etched-in');
-	$sw->set_policy('automatic','automatic');
+	my $sw= ::new_scrolledwindow($treeview);
 	::set_biscrolling($sw);
-	$sw->add($treeview);
 	$self->add($sw);
 	$self->{store}=$store;
 
@@ -4045,13 +4042,11 @@ use base 'Gtk2::Box';
 sub new
 {	my ($class,$opt)=@_;
 	my $self= bless Gtk2::VBox->new, $class;
-	my $sw=Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
-	$sw->set_policy('automatic','automatic');
-	::set_biscrolling($sw);
 	my $store=Gtk2::ListStore->new(FilterList::GID_TYPE);
 	my $treeview= $self->{treeview}= Gtk2::TreeView->new($store);
 	$treeview->set_headers_visible(::FALSE);
+	my $sw= ::new_scrolledwindow($treeview,'etched-in');
+	::set_biscrolling($sw);
 	my $renderer= CellRendererGID->new;
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes('', $renderer, gid=>0) );
 	$self->{activate}= $opt->{activate} || 'queue';
@@ -4082,7 +4077,6 @@ sub new
 	$entry->signal_connect(activate=> \&EntryChanged_cb,1);
 	$hbox1->pack_start( Gtk2::Label->new(_"Search : ") , ::FALSE,::FALSE,2);
 	$hbox1->pack_start($entry, ::TRUE,::TRUE,2);
-	$sw->add($treeview);
 	$self->pack_start($hbox1, ::FALSE,::FALSE,2);
 	$self->add($sw);
 	if ($opt->{buttons})
@@ -5574,14 +5568,11 @@ sub new
 
 	$self->{isearchbox}=GMB::ISearchBox->new($opt);
 	my $view=$self->{view}=Gtk2::DrawingArea->new;
-	my $sw=Gtk2::ScrolledWindow->new;
-	$sw->set_policy('automatic','automatic');
-	$sw->set_shadow_type('etched-in');
+	my $vbox=SongTree::ViewVBox->new;
+	my $sw= ::new_scrolledwindow($vbox,'etched-in');
 	::set_biscrolling($sw);
 	$self->CommonInit($opt);
 
-	my $vbox=SongTree::ViewVBox->new;
-	$sw->add($vbox);
 	$self->add($sw);
 	$self->{headers}=SongTree::Headers->new($sw->get_hadjustment) unless $opt->{headers} eq 'off';
 	$self->{vadj}=$sw->get_vadjustment;

@@ -777,10 +777,7 @@ sub new
 	$sg->add_widget($_) for $label_format,$label_re;
 	my $bbox= Gtk2::HButtonBox->new;
 	$bbox->add($_) for $button_del, $button_add, $button_new;
-	my $sw=Gtk2::ScrolledWindow->new;
-	 $sw->set_shadow_type('etched-in');
-	 $sw->set_policy('automatic','automatic');
-	 $sw->add($treeview);
+	my $sw= ::new_scrolledwindow($treeview,'etched-in');
 	 $sw->set_size_request(150,-1); #give the list a minimum width
 	my $table= ::MakeReplaceTable('taAlCyndgL', A=>Songs::FieldName('album_artist_raw'));	#AutoFillFields
 	my $hbox= ::Vpack([$label_format,'_',$entry_format],$table,$check_re,[$label_re,'_',$entry_re],$error,$preview,'-',$bbox);
@@ -968,12 +965,9 @@ use base 'Gtk2::Box';
 sub new
 {	my ($class,$field,$IDs) = @_;
 	my $self = bless Gtk2::VBox->new, $class;
-	my $sw = Gtk2::ScrolledWindow->new;
-	 $sw->set_shadow_type('etched-in');
-	 $sw->set_policy('automatic','automatic');
 	my $textview= $self->{textview}= Gtk2::TextView->new;
 	$textview->set_size_request(100,($textview->create_pango_layout("X")->get_pixel_size)[1]*4); #request 4 lines of height
-	$sw->add($textview);
+	my $sw= ::new_scrolledwindow($textview,'etched-in');
 	$self->add($sw);
 	my $val;
 	if (ref $IDs)

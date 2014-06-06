@@ -1650,6 +1650,15 @@ sub HVpack
 sub Hpack { HVpack(0,@_); }
 sub Vpack { HVpack(1,@_); }
 
+sub new_scrolledwindow
+{	my ($widget,$shadow)=@_;
+	my $sw= Gtk2::ScrolledWindow->new;
+	$sw->set_shadow_type('etched-in') if $shadow;
+	$sw->set_policy('automatic','automatic');
+	$sw->add($widget);
+	return $sw;
+}
+
 sub IsEventInNotebookTabs
 {	my ($nb,$event)=@_;
 	my (@rects)= map $_->allocation, grep $_->mapped, map $nb->get_tab_label($_), $nb->get_children;
@@ -4904,10 +4913,7 @@ sub EditLyricsDialog
 	$buffer->signal_connect( changed => sub { $bsave->set_sensitive( $buffer->get_text($buffer->get_bounds,1) ne $init); });
 	$bsave->set_sensitive(0);
 
-	my $sw=Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
-	$sw->set_policy('automatic','automatic');
-	$sw->add($textview);
+	my $sw= new_scrolledwindow($textview,'etched-in');
 	$dialog->vbox->add($sw);
 	SetWSize($dialog,'Lyrics');
 	$dialog->show_all;
@@ -5074,10 +5080,7 @@ sub DialogMassRename
 		$col->set_resizable(TRUE);
 		$tv->append_column($col);
 		$tv->set('fixed-height-mode' => TRUE);
-		my $sw=Gtk2::ScrolledWindow->new;
-		$sw->set_shadow_type('etched-in');
-		$sw->set_policy('automatic','automatic');
-		$sw->add($tv);
+		my $sw= new_scrolledwindow($tv,'etched-in');
 		$notebook->append_page($sw,$title);
 	}
 	$treeview2->parent->set_vadjustment( $treeview1->parent->get_vadjustment ); #sync vertical scrollbars
@@ -6183,11 +6186,7 @@ sub LogView
 	 ( 'log',Gtk2::CellRendererText->new,text => 0
 	 ));
 	$treeview->set_headers_visible(FALSE);
-	my $sw=Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
-	$sw->set_policy('automatic','automatic');
-	$sw->add($treeview);
-	return $sw;
+	return new_scrolledwindow($treeview,'etched-in');
 }
 sub SetDefaultOptions
 {	my $prefix=shift;
@@ -6633,11 +6632,7 @@ sub PrefLibrary
 		HasChanged(options=>'LibraryPath');
 	});
 
-	my $sw = Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type ('etched-in');
-	$sw->set_policy ('automatic', 'automatic');
-	$sw->add($treeview);
-
+	my $sw= new_scrolledwindow($treeview,'etched-in');
 	my $extensions= NewPrefMultiCombo(ScanIgnore => {map {$_=>$_} @ScanExt},
 		text=>_"Ignored file extensions :", tip=>_"Files with these extensions won't be added", empty=>_"none",
 		cb=>sub {$ScanRegex=undef}, );
@@ -7683,9 +7678,7 @@ sub new
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
 		( $typedata->[2],$renderer,'text',0)
 		);
-	my $sw=Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type ('etched-in');
-	$sw->set_policy ('automatic', 'automatic');
+	my $sw= ::new_scrolledwindow($treeview,'etched-in');
 	my $butrm=::NewIconButton('gtk-remove',_"Remove");
 	$treeview->get_selection->signal_connect( changed => sub
 		{	my $sel=$_[0]->count_selected_rows;
@@ -7710,7 +7703,6 @@ sub new
 	$self->Fill;
 	my $package='GMB::Edit::'.$type;
 	my $editobject=$package->new($self,$init);
-	$sw->add($treeview);
 	$self->vbox->add( ::Hpack( [[0,$NameEntry,$butsave],'_',$sw,$butrm], '_',$editobject) );
 	if ($self->{save_name_entry}) { $editobject->pack_start(::Hpack(Gtk2::Label->new('Save as : '),$self->{save_name_entry}), ::FALSE,::FALSE, 2); $self->{save_name_entry}->set_text($name); }
 	$self->{editobject}=$editobject;
