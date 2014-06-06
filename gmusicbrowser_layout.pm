@@ -467,6 +467,8 @@ our %Widgets=
 		group	=> 'Play',
 		expander=> 1,
 		hide_empty => 1,
+		tabicon	=> 'gtk-info',
+		tabtitle=> _"Song informations",
 	},
 	PictureBrowser=>
 	{	class	=> 'Layout::PictureBrowser',

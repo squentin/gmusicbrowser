@@ -9,7 +9,7 @@ VBmain		= HBmenu _HPmain Progress
  HBmenu		= _MBmenu
   MBmenu	= MainMenuItem LayoutItem PSortItem PFilterItem QueueItem
  HPmain		= VBLeft _TBRight
-  VBLeft	= 5VBplayer _TabbedLists(group=1,pages="+PlayList +QueueList +SongInfo +PictureBrowser")
+  VBLeft	= 5VBplayer _TabbedLists(group=1,pages="+PlayList +QueueList +@song_info +PictureBrowser")
    VBplayer	= HBButtons3 HBText_Cover
     HBButtons3	= 5Sort 5Filter 5Queue 5Pos -Stars
     HBText_Cover= _VBText 5-Cover
