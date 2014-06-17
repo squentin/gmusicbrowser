@@ -186,8 +186,7 @@ sub cleanpath	#remove repeated slashes, /./, and make sure it (does or doesn't) 
 }
 sub splitpath
 {	my $path=shift;
-	$path=~s#$QSLASH+([^$QSLASH]+)$##o;
-	my $file=$1;
+	my $file= $path=~s#$QSLASH+([^$QSLASH]+)$##o ? $1 : '';
 	$path.=SLASH unless $path=~m#$QSLASH#o; #root folder
 	return $path,$file;
 }
@@ -201,13 +200,12 @@ sub parentdir
 }
 sub basename
 {	my $file=shift;
-	$file=~m#([^$QSLASH]+)$#o;
-	return $1;
+	return $file=~m#([^$QSLASH]+)$#o ? $1 : '';
 }
 sub barename #filename without extension
 {	my $file=&basename;
-	$file=~s#\.([^.]*)$##o;
-	return wantarray ? ($file,$1) : $file;
+	my $ext= $file=~s#\.([^.]*)$##o ? $1 : '';
+	return wantarray ? ($file,$ext) : $file;
 }
 
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
