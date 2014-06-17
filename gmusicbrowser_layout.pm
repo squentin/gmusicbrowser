@@ -4567,7 +4567,7 @@ sub update_file
 	{	$self->{view}->reset_zoom if $self->{reset_zoom_on} eq 'file';
 		delete $self->{select_drop};
 	}
-	my $pixbuf= $file && GMB::Picture::pixbuf($file);	#disable cache ?
+	my $pixbuf= $file && GMB::Picture::pixbuf($file,undef,undef,'anim_ok');	#disable cache ?
 	my $info= $file ? ::filename_to_utf8displayname($file) : undef;
 	$self->{view}->set_pixbuf($pixbuf,$info);
 	$self->{loaded_file}= $file;
@@ -4649,6 +4649,7 @@ sub new
 	$self->signal_connect(button_press_event =>  \&button_press_cb);
 	$self->signal_connect(button_release_event=> \&button_release_cb);
 	$self->signal_connect(motion_notify_event => \&motion_notify_cb);
+	$self->signal_connect(destroy => sub {delete $_[0]{pbanim}});
 	$self->{$_}=$opt->{$_} for qw/xalign yalign scroll_zoom show_info oneshot/;
 	$self->{offsetx}= $self->{offsety} =0;
 	$self->{fit}=1; #default to zoom-to-fit
@@ -4660,8 +4661,26 @@ sub set_pixbuf
 {	my ($self,$pixbuf,$info)=@_;
 	$self->{rotate}=0;
 	$self->{pixbuf}=$pixbuf;
-	$self->{info}=$info;
+	delete $self->{pbanim};
+	Glib::Source->remove(delete $self->{anim_timeout}) if $self->{anim_timeout};
+	if ($pixbuf && $pixbuf->isa('Gtk2::Gdk::PixbufAnimation'))
+	{	$self->{pbanim}=$pixbuf;
+		$self->animate;
+	}
+	$self->{info}= $pixbuf ? $info.sprintf " %d x %d",$pixbuf->get_width,$pixbuf->get_height : undef;
 	$self->resize;
+}
+sub animate
+{	my $self=shift;
+	my $anim= $self->{pbanim};
+	return 0 unless $anim;
+	$self->invalidate_gdkwin;
+	my $iter= $anim->{iter} ||= $anim->get_iter;
+	$iter->advance;
+	$self->{pixbuf}=$iter->get_pixbuf;
+	my $ms= $iter->get_delay_time;
+	$self->{anim_timeout}= Glib::Timeout->add($ms,\&animate,$self) if $ms>0;
+	0;
 }
 sub reset_zoom
 {	my $self=shift;

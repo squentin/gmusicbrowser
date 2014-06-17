@@ -9212,12 +9212,12 @@ INIT
 }
 
 sub pixbuf
-{	my ($file,$size,$cacheonly)=@_;
+{	my ($file,$size,$cacheonly,$anim_ok)=@_;
 	my $key= defined $size ? $size.':'.$file : $file;
 	my $pb= GMB::Cache::get($key);
 	unless ($pb || $cacheonly)
-	{	$pb=load($file,$size);
-		GMB::Cache::add_pb($key,$pb) if $pb;
+	{	$pb=load($file,$size,$anim_ok);
+		GMB::Cache::add_pb($key,$pb) if $pb && $pb->isa('Gtk2::Gdk::Pixbuf'); #don't bother caching animation
 	}
 	return $pb;
 }
@@ -9233,7 +9233,7 @@ sub pdf_pages
 }
 
 sub load
-{	my ($file,$size)=@_;
+{	my ($file,$size,$anim_ok)=@_;
 	return unless $file;
 
 	my $nb= $file=~s/:(\w+)$// ? $1 : undef;	#index number for embedded pictures
@@ -9274,6 +9274,10 @@ sub load
 	}
 	eval {$loader->close;};
 	return undef if $@;
+	if ($anim_ok)
+	{	my $anim=$loader->get_animation;
+		return $anim if $anim && !$anim->is_static_image;
+	}
 	return $loader->get_pixbuf;
 }
 
