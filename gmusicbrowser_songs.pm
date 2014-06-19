@@ -869,7 +869,7 @@ our %timespan_menu=
  album =>
  {	name => _"Album",	width => 200,	flags => 'fgarwescpi',	type => 'album',
 	id3v1	=> 2,		id3v2	=> 'TALB',	vorbis	=> 'album',	ape	=> 'Album',	lyrics3v2=> 'EAL', ilst => "\xA9alb",
-	depend	=> 'artist album_artist_raw', #because albums with no names get the name : <Unknown> (artist)
+	depend	=> 'artist album_artist_raw compilation', #because albums with no names get the name : <Unknown> (artist)
 	all_count=> _"All albums",
 	FilterList => {search=>1,drag=>::DRAG_ALBUM},
 	apic_id	=> 3,
@@ -1606,7 +1606,7 @@ sub UpdateFuncs
 	Field_Apply_options();
 	CompileArtistsRE();
 
-	my @todo=grep !$Def{$_}{disable}, keys %Def;
+	my @todo=grep !$Def{$_}{disable}, sort keys %Def;
 	while (@todo)
 	{	my $count=@todo;
 		for my $f (@todo)
