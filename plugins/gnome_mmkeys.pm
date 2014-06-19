@@ -18,16 +18,24 @@ use warnings;
 
 use Net::DBus;
 
+my %Names=
+( gnome	=> 'org.gnome.SettingsDaemon /org/gnome/SettingsDaemon/MediaKeys',
+  ognome=> 'org.gnome.SettingsDaemon /org/gnome/SettingsDaemon',	 # for gnome version until ~2.20  <2.22, I should probably remove it
+  mate	=> 'org.mate.SettingsDaemon  /org/mate/SettingsDaemon/MediaKeys',
+);
+
 my $bus= Net::DBus->find;
-my $service = $bus->get_service('org.gnome.SettingsDaemon');
-my $object = $service->get_object('/org/gnome/SettingsDaemon/MediaKeys');
-eval { $object->connect_to_signal(MediaPlayerKeyPressed => \&callback) };
-if ($@) {	my $error=$@;
-		# try with old path (for gnome version until ~2.20  <2.22)
-		$object=$service->get_object('/org/gnome/SettingsDaemon');
-		eval { $object->connect_to_signal(MediaPlayerKeyPressed => \&callback); };
-		die $error if $@; #die with the original error
-	}
+my ($service,$object);
+for my $desktop (qw/gnome mate ognome/)
+{	my ($name,$path)= split /\s+/, $Names{$desktop};
+	eval
+	{	$service= $bus->get_service($name);
+		$object = $service->get_object($path);
+		$object->connect_to_signal(MediaPlayerKeyPressed => \&callback);
+	};
+	last if $object && !$@;
+}
+die "Can't find the dbus Settings Daemon for gnome or MATE\n" if $@;
 
 my %cmd=
 (	Previous	=> 'PrevSong',
