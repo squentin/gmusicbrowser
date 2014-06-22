@@ -1650,6 +1650,10 @@ sub new
 	}
 	my $opt2=$::Options{Layouts}{$layout};
 	$opt2||= Layout::GetDefaultLayoutOptions($layout);
+	for my $child_key (grep m#./.#, keys %options)
+	{	my ($child,$key)=split "/",$child_key,2;
+		$opt2->{$child}{$key}= delete $options{$child_key};
+	}
 	my $opt1=::ParseOptions( $Layout::Layouts{$layout}{Window}||'' );
 	%options= ( borderwidth=>0, %$opt1, %{$opt2->{Window}||{}}, %options, %$opt0 );
 	#warn "window options (layout=$layout) :\n";warn " $_ => $options{$_}\n" for sort keys %options;
