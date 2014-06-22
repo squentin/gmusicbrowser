@@ -26,7 +26,7 @@ sub get_with_cb
 	delete $params{cache} unless $UseCache;
 	if (my $cached= $params{cache} && GMB::Cache::get($url))
 	{	warn "cached result\n" if $::debug;
-		Glib::Timeout->add(10,sub { $callback->( ${$cached->{data}}, type=>$cached->{type}, ); 0});
+		Glib::Timeout->add(10,sub { $callback->( ${$cached->{data}}, type=>$cached->{type}, filename=>$cached->{filename}, ); 0});
 		return $self;
 	}
 
@@ -90,6 +90,20 @@ sub receiving_cb
 	$result=$1	while $self->{ebuffer}=~m#^  (HTTP/1\.\d+.*)$#mg;	##
 	#warn $self->{ebuffer};
 
+	my $filename;
+	while ($self->{ebuffer}=~m#^  Content-Disposition:\s*\w+\s*;\s*filename(\*)?=(.*)$#mgi)
+	{	$filename=$2; my $rfc5987=$1;
+		#decode filename, not perfectly, but good enough (http://greenbytes.de/tech/tc2231/ is a good reference)
+		$filename=~s#\\(.)#"\x00".ord($1)."\x00"#ge;
+		my $enc='iso-8859-1';
+		if ($rfc5987 && $filename=~s#^([A-Za-z0-9_-]+)'\w*'##) {$enc=$1; $filename=::decode_url($filename)} #RFC5987
+		else
+		{	if ($filename=~s/^"(.*)"$/$1/) { $filename=~s#\x00(\d+)\x00#chr($1)#ge; $filename=~s#\\(.)#"\x00".ord($1)."\x00"#ge; }
+			elsif ($filename=~m#[^A-Za-z0-9_.\x00-]#) {$filename=''}
+		}
+		$filename=~s#\x00(\d+)\x00#chr($1)#ge;
+		$filename= eval {Encode::decode($enc,$filename)};
+	}
 	my ($enc)= $self->{ebuffer}=~m#^  Content-Encoding:\s*(.*)#mg;
 	if ($enc)
 	{	if ($enc eq 'gzip' && $gzip_ok)
@@ -106,9 +120,9 @@ sub receiving_cb
 	if ($result=~m#^HTTP/1\.\d+ 200 OK#)
 	{	my $response=\$self->{content};
 		if ($self->{params}{cache} && defined $$response)
-		{	GMB::Cache::add($url,{data=>$response,type=>$type,size=>length($$response)});
+		{	GMB::Cache::add($url,{data=>$response,type=>$type,size=>length($$response),filename=>$filename});
 		}
-		$callback->($$response,type=>$type,url=>$self->{params}{url});
+		$callback->($$response,type=>$type,url=>$self->{params}{url},filename=>$filename);
 	}
 	else
 	{	warn "Error fetching $url : $result\n";

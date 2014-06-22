@@ -31,7 +31,7 @@ sub get_with_cb
 	my ($callback,$url,$post)=@params{qw/cb url post/};
 	if (my $cached= $params{cache} && GMB::Cache::get($url))
 	{	warn "cached result\n" if $::debug;
-		Glib::Timeout->add(10,sub { $callback->( ${$cached->{data}}, type=>$cached->{type}, ); 0});
+		Glib::Timeout->add(10,sub { $callback->( ${$cached->{data}}, type=>$cached->{type}, filename=>$cached->{filename}, ); 0});
 		return $self;
 	}
 	warn "simple_http : fetching $url\n" if $::debug;
@@ -162,6 +162,20 @@ sub receiving_cb
 	my %headers;
 	$headers{lc $1}=$2 while $headers=~m/([^:]*): (.*?)$EOL/og;
 
+	my $filename;
+	if ($headers{'content-disposition'} && $headers{'content-disposition'}=~m#^\s*\w+\s*;\s*filename(\*)?=(.*)$#mgi)
+	{	$filename=$2; my $rfc5987=$1;
+		#decode filename, not perfectly, but good enough (http://greenbytes.de/tech/tc2231/ is a good reference)
+		$filename=~s#\\(.)#"\x00".ord($1)."\x00"#ge;
+		my $enc='iso-8859-1';
+		if ($rfc5987 && $filename=~s#^([A-Za-z0-9_-]+)'\w*'##) {$enc=$1; $filename=::decode_url($filename)} #RFC5987
+		else
+		{	if ($filename=~s/^"(.*)"$/$1/) { $filename=~s#\x00(\d+)\x00#chr($1)#ge; $filename=~s#\\(.)#"\x00".ord($1)."\x00"#ge; }
+			elsif ($filename=~m#[^A-Za-z0-9_.\x00-]#) {$filename=''}
+		}
+		$filename=~s#\x00(\d+)\x00#chr($1)#ge;
+		$filename= eval {Encode::decode($enc,$filename)};
+	}
 	if (my $enc=$headers{'content-encoding'})
 	{	if ($enc eq 'gzip' && $gzip_ok)
 		{	my $gzipped= $response;
@@ -177,9 +191,9 @@ sub receiving_cb
 	{	#warn "ok $url\n$callback\n";
 		my $type=$headers{'content-type'};
 		if ($self->{params}{cache} && defined $response)
-		{	GMB::Cache::add($url,{data=>\$response,type=>$type,size=>length($response)});
+		{	GMB::Cache::add($url,{data=>\$response,type=>$type,size=>length($response),filename=>$filename});
 		}
-		$callback->($response, type=>$type, url=>$self->{params}{url});
+		$callback->($response, type=>$type, url=>$self->{params}{url}, filename=>$filename);
 	}
 	elsif ($result=~m#^HTTP/1\.\d+ 30[123]# && $headers{location}) #redirection
 	{	my $url=$headers{location};
