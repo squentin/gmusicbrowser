@@ -4120,6 +4120,77 @@ sub Breakdown_List
 	return $menu;
 }
 
+sub BuildToolbar
+{	my ($tbref,%args)=@_;
+	my $toolbar=Gtk2::Toolbar->new;
+	$toolbar->set_style( $args{ToolbarStyle}||'both-horiz' );
+	$toolbar->set_icon_size( $args{ToolbarSize}||'small-toolbar' );
+	$toolbar->{tbref}= $tbref;
+	$toolbar->{getcontext}= $args{getcontext} || sub {};
+	my @update;
+	for my $i (@$tbref)
+	{	my $toggle= $i->{toggle} || $i->{toggleoption};
+		my $item;
+		if (my $stock=$i->{stockicon})
+		{	if ($toggle)	{ $item= Gtk2::ToggleToolButton->new_from_stock($stock); }
+			else		{ $item= Gtk2::ToolButton->new_from_stock($stock); }
+		}
+		elsif (my $widget=$i->{widget})
+		{	$widget= $item= $widget->(\%args);
+			$item= Gtk2::ToolItem->new;
+			$item->add($widget);
+		}
+		next unless $item;
+
+		$item->set_is_important(1) if $i->{important};
+		my $label= $i->{label};
+		$label=$label->(\%args) if ref $label;
+		$item->set_label($label) if $label && $item->isa('Gtk2::ToolButton');
+		my $tip=$i->{tip} || $label;
+		$tip=$tip->(\%args) if ref $tip;
+		$item->set_tooltip_text($tip) if $tip;
+
+		if ($toggle)
+		{	my $active;
+			if (ref $toggle) { $active= $toggle->(\%args); }
+			else
+			{	my ($not,$ref)=ParseKeyPath(\%args,$toggle);
+				$item->{toggleref}= $ref;
+				$item->{togglerefnot}= $not;
+				$active= ($$ref xor $not);
+			}
+			$item->set_active(1) if $active;
+		}
+		if (my $cb=$i->{cb})
+		{	my $sub= sub
+			 {	my $toolbar=$_[0]->parent;
+				return if $toolbar->{busy};
+				if (my $ref=$_[0]->{toggleref}) { $$ref^=1 }
+				$cb->({$toolbar->{getcontext}($toolbar)})
+			 };
+			if ($toggle) { $item->signal_connect(toggled => $sub); }
+			else { $item->signal_connect(clicked => $sub); }
+		}
+		$toolbar->insert($item,-1);
+		if (my $key=$i->{keyid}||="$i") { $toolbar->{$key}=$item; }
+	}
+	return $toolbar;
+}
+sub UpdateToolbar
+{	my $toolbar=shift;
+	my $tbref= $toolbar->{tbref};
+	my $args= {$toolbar->{getcontext}->($toolbar)};
+	$toolbar->{busy}=1;
+	for my $i (@$tbref)
+	{	my $key=$i->{keyid};
+		my $item=$toolbar->{$key};
+		next unless $item;
+		if (my $ref=$item->{toggleref}) { $item->set_active($$ref xor $item->{togglerefnot}); }
+		elsif (my $toggle=$i->{toggle}) { $item->set_active( $toggle->($args) ); }
+	}
+	delete $toolbar->{busy};
+}
+
 sub ParseKeyPath
 {	my ($ref,$keypath)=@_;
 	my $not= $keypath=~s/^!//;
