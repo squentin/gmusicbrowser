@@ -9662,3 +9662,172 @@ sub SongsRemoved_cb
 	}
 }
 
+package GMB::DropURI;
+
+sub new #params : toplevel, cb, cb_end
+{	my ($class,%params)=@_;
+	my $self= bless \%params,$class;
+	return $self;
+}
+
+sub Add_URI #params : is_move, destpath
+{	my ($self,%params)=@_;
+	my $uris= delete $params{uris};
+	return if !$params{destpath} || !@$uris;
+	push @{$self->{todo}}, $_,\%params for @$uris;
+	$self->{total}+= @$uris;
+	::Progress( 'DropURI_'.$self, add=>scalar(@$uris), abortcb=>sub{$self->Abort}, bartext=> _('file $current/$end')." :", title=>"",);
+	Glib::Timeout->add(10,sub {$self->Next; 0});
+}
+
+sub Next
+{	my $self=shift;
+	return if $self->{current};
+	my $todo= $self->{todo};
+	unless (@$todo)
+	{	$self->Abort;
+		return;
+	}
+	my $uri=shift @$todo;
+	my $params= shift @$todo;
+	$self->{current}= { %$params, uri=>$uri };
+	$self->{done}++;
+	$self->{left}= @$todo/2;
+	$uri=~s#^file://##;
+	$self->{current}{display_uri}= ::filename_to_utf8displayname(::decode_url($uri));
+	$self->Start;
+}
+
+sub Start
+{	my $self=shift;
+	my $params= $self->{current};
+	my $uri= $params->{uri};
+	my $display_uri= $params->{display_uri};
+	my $destpath= $params->{destpath};
+	my $progressid= 'DropURI_'.$self;
+	if ($uri=~s#^file://##)
+	{	my $srcfile= ::decode_url($uri);
+		my $is_move= $params->{is_move};
+		warn "".($is_move ? "Copying" : "Moving")." file '$display_uri' to '$destpath'\n" if $::debug;
+		::Progress( $progressid, bartext_append=>$display_uri, title=>($is_move ? _"Moving" : _"Copying"));
+		my ($srcpath,$basename)= ::splitpath($srcfile);
+		my $new= ::catfile($destpath,$basename);
+		if ($srcfile eq $new) { $self->Done; return } # ignore copying file on itself
+		my ($sub,$errormsg,$abortmsg)=  $is_move ? (\&::move,_"Move failed",_"abort move")
+							 : (\&::copy,_"Copy failed",_"abort copy") ;
+		$errormsg.= sprintf " (%d/%d)",$self->{done},$self->{total} if $self->{total} >1;
+		if (-f $new) #if file already exists
+		{	my $ow= $self->{owrite_all};
+			$ow||=::OverwriteDialog($self->{toplevel},$new,$self->{left}>0);
+			$self->{owrite_all}=$ow if $ow=~m/all$/;
+			if ($ow=~m/^no/) { $self->Skip; return }
+			#overwriting
+			GMB::Cache::drop_file($new); # mostly for picture files
+		}
+		until ($sub->($srcfile,$new))
+		{	my $res= $self->{skip_all};
+			my $details= ::__x(_"Destination: {folder}",	folder=> ::filename_to_utf8displayname($destpath))."\n"
+				    .::__x(_"File: {file}",		file  => ::filename_to_utf8displayname($srcfile));
+			$res ||= ::Retry_Dialog($!,$errormsg, details=>$details, window=>$self->{toplevel}, abortmsg=>$abortmsg, many=>$self->{left}>0);
+			$self->{skip_all}=$res if $res eq 'skip_all';
+			if ($res=~m/^skip/)	{ $self->Done; return }
+			if ($res eq 'abort')	{ $self->Abort;return }
+		}
+		$self->{newfile}=$new;
+		$self->Done;
+	}
+	else
+	{	unless (eval {require $::HTTP_module}) {warn "Loading $::HTTP_module failed, can't download $display_uri\n"; $self->Done; return}
+		warn "Downloading '$display_uri' to '$destpath'\n" if $::debug;
+		::Progress( $progressid, bartext_append=>$display_uri, title=>_"Downloading");
+		$self->{waiting}= Simple_http::get_with_cb(url => $uri, cache=>1, progress=>1, cb => sub { $self->Downloaded(@_); });
+		$self->{track_progress} ||= Glib::Timeout->add(200,
+		 sub {	if (my $w= $self->{waiting}) { my ($p,$s)=$w->progress; ::Progress( $progressid, partial=>$p ) if defined $p; }
+			else { $self->{track_progress}=0 }
+			return $self->{track_progress};
+		     });
+		return
+	}
+}
+
+sub Downloaded
+{	my ($self,$content,%content_prop)=@_;
+	delete $self->{waiting};
+	my $type=$content_prop{type};
+	my $params= $self->{current};
+	my $uri= $params->{uri};
+	my $display_uri= $params->{display_uri};
+	my $destpath= $params->{destpath};
+	unless ($content)
+	{	my $error= $content_prop{error}||'';
+		my $res= $self->{skip_all};
+		$res ||= ::Retry_Dialog($error,_"Download failed.", details=>_("url").': '.$display_uri, window=>$self->{toplevel}, abortmsg=>_"abort", many=>$self->{left});
+		$self->{skip_all}=$res if $res eq 'skip_all';
+		if    ($res eq 'abort')	{ $self->Abort; }
+		elsif ($res eq 'retry')	{ $self->Start; }
+		else			{ $self->Done;  } # skip or skip_all
+		return
+	}
+	my ($file,$ext);
+	$uri= ::decode_url($uri);
+	$uri=~s/\?.*//;
+	$file= $content_prop{filename};
+	$file= '' unless defined $file;
+	$file= $1 if $file eq '' && $uri=~m#([^/]+)$#;
+	($file,$ext)= ::barename(::CleanupFileName($file));
+	# if uri doesn't have a file name, try to find a good default name, currently mostly used for pictures, so doesn't try very hard for non-pictures
+	my $is_pic= $type=~m#^image/(gif|jpeg|png|bmp)# ? $1 : 0;
+	if ($ext eq '')
+	{	$ext=	$is_pic ? ($is_pic eq 'jpeg' ? 'jpg' : $is_pic) :
+			$type=~m#^text/html# ? 'html' :
+			$type=~m#^text/plain# ? 'txt' :
+			$type=~m#^application/pdf# ? 'pdf' :
+			'';
+	}
+	if ($file eq '')
+	{	if ($is_pic) { $file= 'picture00' } #default file name for pictures #FIXME translate ?
+		else #not a picture and no name, should maybe ask to confirm
+		{	$file= $uri=~m#^w+://([\w.]+)/# ? $1.'00' : 'file00';
+			$file=~s/\./_/g;
+		}
+		$file= ::CleanupFileName($file);
+	}
+	$ext= $ext eq '' ? '' : ".$ext";
+	$file= ::catfile($destpath,$file);
+	::IncSuffix($file) while -e $file.$ext; #could check if same file exist ?
+	$file.=$ext;
+
+	{	my $fh;
+		open($fh,'>',$file) && (print $fh $content) && close $fh && last;
+		my $res= $self->{skip_all};
+		$res ||= ::Retry_Dialog($!,_"Error writing downloaded file", details=> ::__x( _"file: {filename}", filename=>$file)."\n". _("url").': '.$display_uri,
+						window=>$self->{toplevel}, abortmsg=>_"abort", many=>$self->{left}>0 );
+		$self->{skip_all}=$res if $res eq 'skip_all';
+		if ($res=~m/^skip/)	{ $self->Done; return }
+		if ($res eq 'abort')	{ $self->Abort;return }
+		redo if $res eq 'retry';
+	}
+	$self->{newfile}= $file;
+	$self->Done;
+}
+sub Done # file done, if no $self->{newfile} it means the file has been skipped
+{	my $self=shift;
+	my $current=delete $self->{current};
+	::Progress( 'DropURI_'.$self, inc=>1 );
+
+	if (my $newfile= delete $self->{newfile})
+	{	warn "Dropped file : $newfile\n" if $::debug;
+		$self->{cb}($newfile) if $self->{cb};
+	}
+
+	if (@{$self->{todo}}) { Glib::Timeout->add(10,sub {$self->Next; 0}); }
+	else {$self->Abort}
+}
+sub Abort	# GMB::DropURI object must not be used after that
+{	my $self=shift;
+	$self->{waiting}->abort if $self->{waiting};
+	Glib::Source->remove( $self->{track_progress} ) if $self->{track_progress};
+	::Progress( 'DropURI_'.$self, abort=>1 );
+	$self->{cb_end}() if $self->{cb_end};
+	%$self=();	# content is emptied to prevent reference cycles (memory leak)
+}
