@@ -4500,6 +4500,7 @@ sub drag_data_get_cb
 sub drag_data_received_cb
 {	my ($self,$context,$x,$y,$data,$info,$time)=@_;# warn "drag_data_received_cb @_";
 	my $ret=my $del=0;
+	$self->{dragdest_suggested_action}= $context->suggested_action; #should maybe have been passed in dragdest arguments, but would require editing all existing dragdest functions
 	if ($data->length >=0 && $data->format==8)
 	{	my @values=split "\x0d\x0a",$data->data;
 		s#file:/(?!/)#file:///# for @values; #some apps send file:/path instead of file:///path

@@ -203,3 +203,10 @@ Title=List Edit
 Default		= Window(size=500x300)
 VBmain		= 3_SongList(mode=editlist,activate=playlist) EditListButtons
 
+#used by the "view in new window" of the PictureBrowser
+[PictureBrowser]
+Title=_"Picture Browser"
+Default		= Window(size=600x400)
+VBmain		= _PictureBrowser
+KeyBindings     = q CloseWindow
+

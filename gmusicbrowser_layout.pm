@@ -472,10 +472,20 @@ our %Widgets=
 	{	class	=> 'Layout::PictureBrowser',
 		group	=> 'Play',
 		field	=> 'album',
-		options	=> 'field xalign yalign',
+		options	=> 'field',
 		xalign	=> .5,
 		yalign	=> .5,
-		schange	=> \&Layout::PictureBrowser::Update,
+		follow	=> 1,
+		scroll_zoom  => 1,
+		show_list    => 0,
+		show_folders => 1,
+		show_toolbar => 0,
+		pdf_mode => 1,
+		hpos => 140,
+		vpos => 80,
+		reset_zoom_on=>'folder', #can be group, folder, file or never
+		nowrap	=> 0,
+		schange	=> \&Layout::PictureBrowser::queue_song_changed,
 		autoadd_type	=> 'context page pictures',
 		tabicon		=> 'gmb-picture',
 		tabtitle	=> _"Album pictures",
@@ -4102,107 +4112,854 @@ sub SaveOptions
 }
 
 package Layout::PictureBrowser;
-use base 'Gtk2::EventBox';
+use base 'Gtk2::Box';
+
+our @toolbar=
+(	{ stockicon=> 'gmb-view-list',	label=>_"Show file list",  toggleoption=>'self/show_list',  cb=> sub { $_[0]{self}->update_showhide; }, },
+	{ stockicon=> 'gtk-zoom-in',	label=>_"Zoom in",	cb=> sub { $_[0]{view}->change_zoom('+'); },	},
+	{ stockicon=> 'gtk-zoom-out',	label=>_"Zoom out",	cb=> sub { $_[0]{view}->change_zoom('-'); },	},
+	{ stockicon=> 'gtk-zoom-100',	label=>_"Zoom 1:1",	cb=> sub { $_[0]{view}->change_zoom(1); },	},
+	{ stockicon=> 'gtk-zoom-fit',	label=>_"Zoom to fit",	cb=> sub { $_[0]{view}->set_zoom_fit; },	},
+	{ stockicon=> 'gtk-fullscreen',	label=>_"Fullscreen",	cb=> sub { $_[0]{view}->set_fullscreen(1); },	},
+#	{ stockicon=> 'gtk-go-back',	label=>_"Previous picture",		cb=> sub { $_[0]{self}->change_file(-1); },	},
+#	{ stockicon=> 'gtk-go-forward',	label=>_"Next picture",			cb=> sub { $_[0]{self}->change_file(1); },	},
+#	{ stockicon=> 'gtk-',		label=>_"Rotate clockwise",		cb=> sub { $_[0]{view}->rotate(1); },	},
+#	{ stockicon=> 'gtk-',		label=>_"Rotate counterclockwise",	cb=> sub { $_[0]{view}->rotate(-1); },	},
+	{ stockicon=> 'gtk-jump-to',	label=> sub { $_[0]{self}{group} eq 'Play' ? _"Follow playing song" : _"Follow selected song"; },
+	  toggleoption=>'self/follow',	cb=> sub { $_[0]{self}->queue_song_changed; },
+	},
+);
+
+our @optionsubmenu=
+(	{ label=> sub { $_[0]{self}{group} eq 'Play' ? _"Follow playing song" : _"Follow selected song"; },
+	  code => sub { $_[0]{self}->queue_song_changed; ::UpdateToolbar($_[0]{toolbar}); }, toggleoption=>'self/follow', mode=>'V',
+	},
+
+	{ label=>_"Scroll to zoom",	mode=>'VP',	toggleoption=> 'view/scroll_zoom', },
+
+	{ label=>_"Reset zoom",		mode=>'V',	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{reset_zoom_on}},
+	  submenu=> [ _"when file changes"=>'file', _"when folder changes"=>'folder', _"never"=>'never'],
+	  code => sub { $_[0]{self}{reset_zoom_on}=$_[1] },
+	},
+
+	{ separator=>1, mode=>'V', },
+
+	{ label=>_"Show folder list",	mode=>'VL',	toggleoption=>'self/show_folders',	test=> sub { $_[0]{self}{show_list}, },	  code => sub { $_[0]{self}->update_showhide; },
+	},
+	{ label=>_"Show file list",	mode=>'VL',	toggleoption=>'self/show_list',		code=> sub { $_[0]{self}->update_showhide; },
+	},
+	{ label=>_"Show toolbar",	mode=>'VL',	toggleoption=>'self/show_toolbar',	code=> sub { $_[0]{self}->update_showhide; },
+	},
+	{ label=>_"Show pdf pages",	mode=>'VL',	toggleoption=>'self/pdf_mode',		code=> sub { $_[0]{self}->update; },
+	},
+);
+# mode L is for List, V for View, P for Pixbuf (Layout::PictureBrowser::View without a Layout::PictureBrowser, not used yet)
+our @ContextMenu=
+(	{ label => _"Zoom in",		code => sub { $_[0]{view}->change_zoom('+'); },	defined=>'pixbuf',	stockicon=> 'gtk-zoom-in',  mode=>'PV', },
+	{ label => _"Zoom out",		code => sub { $_[0]{view}->change_zoom('-'); },	defined=>'pixbuf',	stockicon=> 'gtk-zoom-out', mode=>'PV', },
+	{ label => _"Zoom 1:1",		code => sub { $_[0]{view}->change_zoom(1); }, 	defined=>'pixbuf',	stockicon=> 'gtk-zoom-100', mode=>'PV', },
+	{ label => _"Zoom to fit",	code => sub { $_[0]{view}->set_zoom_fit; },	defined=>'pixbuf',	stockicon=> 'gtk-zoom-fit', mode=>'PV', },
+	{ separator=>1, mode=>'V', },
+
+	{ label=> _"View in new window",	istrue=> 'file',	code => sub { $_[0]{self}->view_in_new_window($_[0]{file}); }, mode=>'VL', },
+	{ label=> _"Rename file", code => sub { my $tv=$_[0]{self}{filetv}; $tv->set_cursor($_[0]{treepaths}[0],$tv->get_column(0),::TRUE); },
+	  onlyone => 'treepaths', isfalse=>'ispage', istrue=>'writeable', mode=>'L',
+	},
+	{ label=> _"Delete file",	code => sub { $_[0]{self}->delete_selected },	istrue=>'writeable', isfalse=>'ispage', mode=>'VL', },
+
+	{ label => _"Options", submenu=> \@optionsubmenu, },
+
+	{ label=> sub { my $name=Songs::Gid_to_Display($_[0]{field},$_[0]{gid}); ::__x(_"Set as picture for '{name}'", name=>::Ellipsize($name,30)) },
+	  code => sub { Songs::Picture($_[0]{gid},$_[0]{field},'set',$_[0]{file}); },
+	  test=> sub { $_[0]{file} ne (Songs::Picture($_[0]{gid},$_[0]{field},'get')||''); },	istrue=>'file gid', mode=>'V',
+	  # test => sub { Songs::FilterListProp($_[0]{field},'picture') },
+	},
+
+	{ label=> sub { $_[0]{view}{fullwin} ? _"Exit full screen" : _"Full screen" }, code=>sub { $_[0]{view}->set_fullscreen }, mode=>'VP',
+	  stockicon=> sub { $_[0]{view}{fullwin} ? 'gtk-leave-fullscreen' : 'gtk-fullscreen' },
+	},
+
+);
+
 sub new
 {	my ($class,$opt)=@_;
-	my $self= bless Gtk2::EventBox->new, $class;
-	$self->signal_connect(expose_event => \&expose_cb);
-	$self->signal_connect(size_allocate=> \&size_allocate_cb);
-	$self->signal_connect(button_press_event=> \&button_press_cb);
-	$self->signal_connect(scroll_event => \&scroll_cb);
-	$self->signal_connect(map => \&Update);
+	my $self= bless Gtk2::VBox->new, $class;
+	$self->{$_}= $opt->{$_} for qw/group follow show_list show_folders show_toolbar reset_zoom_on nowrap pdf_mode/;
+
+	my $hbox= Gtk2::HBox->new;
+	my $hpaned= Gtk2::HPaned->new;
+	my $vpaned=	$self->{vpaned}= Gtk2::VPaned->new;
+	my $view=	$self->{view}=   Layout::PictureBrowser::View->new($opt);
+	my $toolbar=	$self->{toolbar}= ::BuildToolbar(\@toolbar, getcontext=>\&toolbarcontext, self=>$self);
+	$self->{dirstore} = Gtk2::ListStore->new('Glib::String','Glib::String');
+	$self->{filestore}= Gtk2::TreeStore->new(qw/Glib::String Glib::String Glib::Boolean Glib::Uint Glib::Uint/);
+	my $treeview1= $self->{foldertv}= Gtk2::TreeView->new($self->{dirstore});
+	my $treeview2= $self->{filetv}=	  Gtk2::TreeView->new($self->{filestore});
+	my $renderer=Gtk2::CellRendererText->new;
+	$renderer->signal_connect(edited => \&filename_edited_cb,$treeview2);
+	$treeview1->insert_column_with_attributes(-1, 'Dir name', Gtk2::CellRendererText->new, text => 0);
+	$treeview2->insert_column_with_attributes(-1, 'File name',$renderer, text => 0, editable=> 2);
+
+	#size and date column
+	my $renderer_s= Gtk2::CellRendererText->new;
+	my $renderer_d= Gtk2::CellRendererText->new;
+	my $column_s=Gtk2::TreeViewColumn->new_with_attributes('size',$renderer_s);
+	my $column_d=Gtk2::TreeViewColumn->new_with_attributes('date',$renderer_d);
+	$renderer_s->set(xalign=>1);
+	$column_s->set_cell_data_func($renderer_s, sub
+		{	my (undef,$cell,$store,$iter)=@_;
+			my $depth=$store->iter_depth($iter);
+			my $size= $depth ? '' : ::format_integer($store->get($iter,3));
+			$cell->set(text=>$size);
+		});
+	$treeview2->append_column($column_s);
+	$renderer_d->set(xalign=>1);
+	$column_d->set_cell_data_func($renderer_d, sub
+		{	my (undef,$cell,$store,$iter)=@_;
+			my $depth=$store->iter_depth($iter);
+			my $date= $depth ? '' : Songs::DateString($store->get($iter,4));
+			$cell->set(text=>$date);
+		});
+	$treeview2->append_column($column_d);
+
+	$treeview1->set_headers_visible(0);
+	$treeview2->set_headers_visible(0);
+	$treeview1->get_selection->signal_connect(changed => \&treeview_selection_changed_cb,'folder');
+	$treeview2->get_selection->signal_connect(changed => \&treeview_selection_changed_cb,'file');
+
+	$vpaned->pack1(::new_scrolledwindow($treeview1), ::FALSE, ::FALSE);
+	$vpaned->pack2(::new_scrolledwindow($treeview2), ::TRUE, ::TRUE);
+	$hpaned->pack1($vpaned, ::FALSE, ::FALSE);
+	$hpaned->add2($view);
+	$hbox->add($hpaned);
+	$self->pack_start($toolbar,0,0,2);
+	$self->add($hbox);
+	$hpaned->set_position($opt->{hpos});
+	$vpaned->set_position($opt->{vpos});
+	$self->{SaveOptions}= \&SaveOptions;
+
+	$_->set_enable_search(0) for $treeview1,$treeview2;
+	$self->signal_connect(key_press_event=> \&key_press_cb);
+	$treeview2->signal_connect(button_press_event=> \&button_press_cb);
+	$self->signal_connect(map => sub {$_[0]->queue_song_changed});
+	::set_drag($view, dest => [::DRAG_ID,::DRAG_FILE,sub
+	 {	my ($view,$type,@values)=@_;
+		my $self= ::find_ancestor($view,__PACKAGE__);
+		if ($type==::DRAG_FILE)
+		{	return unless $self->{current_path};
+			my $is_move= $view->{dragdest_suggested_action} == 'move';
+			$self->{drop_job} ||= GMB::DropURI->new(toplevel=>$self->get_toplevel, cb=>sub{$self->file_dropped($_[0])}, cb_end=>sub{$self->drop_end});
+			$self->{drop_job}->Add_URI(uris=>\@values, is_move=>$is_move, destpath=>$self->{current_path});
+			$self->{select_drop}=1;
+		}
+		else # $type is ID
+		{	$self->queue_song_changed($values[0],'force');
+		}
+	 }],
+	 # motion cb needed to show the help message over the picture when dragging something over it
+	 motion=> sub {	my ($view,$context,$x,$y,$time)=@_;
+			my $datatype;
+			for my $atom ($context->targets)
+			{	my $type= $::DRAGTYPES{$atom->name}||-1;
+				if    ($type==::DRAG_ID)  { $datatype='songid'; last }
+				elsif ($type==::DRAG_FILE){ $datatype= 'uri'; last }
+			}
+			$view->{dnd_message}= $datatype;
+			1;
+		      }
+	 );
+	$view->signal_connect(drag_leave => sub { delete $_[0]{dnd_message}; });
+	::set_drag($treeview2, source=> [::DRAG_FILE,sub
+	 {	my $self= ::find_ancestor($_[0],__PACKAGE__);
+		my $file=$self->{current_file};
+		$file=~s/:\w+$//;
+		return $file ? (::DRAG_FILE,'file://'.::url_escape($file)) : ()
+	 }]);
+	$self->signal_connect(destroy => sub {$_[0]->destroy_cb});
+
+	$_->show_all, $_->set_no_show_all(1) for $vpaned,$toolbar;
+	$self->update_showhide;
+	$vpaned->signal_connect(show=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->refresh_treeviews; $self->update_selection; }); #updating of the file/folder list is disabled whe hidden, so needs to update it when shown
+
+	if    (my $file=$opt->{set_file}) { $self->set_file($file); }
+	elsif (my $pb=$opt->{set_pixbuf}) { $self->{view}->set_pixbuf($pb); $self->{ignore_song}=1; }
 	return $self;
 }
-sub Update
+sub destroy_cb
 {	my $self=shift;
-	return unless $self->mapped;
-	my $field= $self->{field};
-	my $ID= ::GetSelID($self);
-	return unless defined $ID;
-	my $gid= Songs::Get_gid($ID,$field);
-	my $path;
-		#taken from ::ChooseAAPicture() FIXME create a function ?
-		my $h=Songs::BuildHash('path', AA::GetIDs($field,$gid));
-		my $min=int(.1*::max(values %$h)); #ignore rare folders
-		$path= ::find_common_parent_folder( grep $h->{$_}>$min,keys %$h );
-		($path)=sort { $h->{$b} <=> $h->{$a} } keys %$h if length $path<5;#take most common if too differents
-	return if ($self->{current_path}||'') eq $path;
-	$self->{current_path}= $path;
-	$self->{current_file}=undef;
-	$self->{pixbuf}=undef;
-	::IdleDo('8_ChangePicture'.$self,800,\&ChangePicture,$self);
+	$self->{drop_job}->Abort if $self->{drop_job};
 }
-sub ChangePicture
-{	my ($self,$inc)=@_;
-	delete $::ToDo{'8_ChangePicture'.$self};
-	my $path= $self->{current_path};
-	$self->queue_draw; #will clear previous picture if no picture to display
-	return unless $path;
-	opendir my($dh),$path  or do { warn $!; return; };
-	my @files= map $path.::SLASH.$_, sort grep !m/^\./ && m/\.(?:jpe?g|png|bmp)$/i, readdir $dh;
-	closedir $dh;
-	my $file= $self->{current_file};
-	if ($file)
-	{	for my $i (0..$#files)
-		{	if ($files[$i] eq $file)
-			{	$i+=$inc;
-				$i=0 if $i>$#files;
-				$i=$#files if $i<0;
-				$file= $files[$i];
-				last;
+
+sub SaveOptions
+{	my $self=shift;
+	my %opt;
+	my $vpaned= $self->{vpaned};
+	$opt{hpos}= $vpaned->parent->get_position;
+	$opt{vpos}= $vpaned->get_position;
+	$opt{$_}=$self->{view}{$_} for qw/scroll_zoom/;
+	$opt{$_}=$self->{$_} for qw/follow show_list show_folders show_toolbar reset_zoom_on pdf_mode/;
+	return %opt;
+}
+
+sub toolbarcontext
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+	return self=>$self, view=>$self->{view};
+}
+
+sub update_showhide
+{	my $self=shift;
+	my $vpaned= $self->{vpaned};
+	$vpaned->set_visible( $self->{show_list} );
+	$vpaned->child1->set_visible( $self->{show_folders} );
+	my $toolbar= $self->{toolbar};
+	$toolbar->set_visible( $self->{show_toolbar} );
+	::UpdateToolbar($toolbar);
+}
+
+sub view_in_new_window
+{	my ($self,$file)=@_;
+	$file||= $self->{current_file};
+	return unless $file;
+	Layout::Window->new('PictureBrowser', pos=>undef, 'PictureBrowser/follow'=>0,'PictureBrowser/set_file'=>$file);
+}
+
+sub delete_selected
+{	my $self=shift;
+	return if $::CmdLine{ro};
+	my @files= ($self->{current_file});
+	s/:\w+$// for @files;
+	@files= ::uniq(@files);
+	my $text= @files==1 ?	::filename_to_utf8displayname(::basename($files[0])) :
+				__("%d file","%d files",scalar @files);
+	my $dialog = Gtk2::MessageDialog->new
+		( $self->get_toplevel,
+		  'modal',
+		  'warning','cancel','%s',
+		  ::__x(_("About to delete {files}\nAre you sure ?"), files => $text)
+		);
+	$dialog->add_button("gtk-delete", 2);
+	$dialog->show_all;
+	if ('2' eq $dialog->run)
+	{	my $skip_all;
+		my $done=0;
+		for my $file (@files)
+		{	unless (unlink $file)
+			{	my $res= $skip_all;
+				my $errormsg= _"Deletion failed";
+				$errormsg.= ' ('.($done+1).'/'.@files.')' if @files>1;
+				$res ||= ::Retry_Dialog($!,$errormsg, details=>::__x(_("Failed to delete '{file}'"), file => ::filename_to_utf8displayname($file)), window=>$dialog, many=>(@files-$done)>1);
+				$skip_all=$res if $res eq 'skip_all';
+				redo if $res eq 'retry';
+				last if $res eq 'abort';
+			}
+			GMB::Cache::drop_file($file); #drop file from picture cache
+			$done++;
+		}
+		# update selection
+		my $file= $self->{current_file} || '';
+		my $list= $self->{filelist};
+		my $i= ::first { $list->[$_] eq $file } 0..$#$list;
+		if (defined $i)
+		{	for my $j (reverse(0..$i), $i+1 .. $#$list)
+			{	if (-e $list->[$j]) { $self->{current_file}=$list->[$j]; last }
 			}
 		}
-		return if $file eq $self->{current_file};
+		$self->update;
 	}
-	else { $file=$files[0] }
-	$self->{current_file}=$file;
-	$self->{pixbuf}=undef;
-	$self->LoadImg;
+	$dialog->destroy;
+}
+sub filename_edited_cb
+{	my ($cell,$path_string,$newutf8,$tv)= @_;
+	return if $::CmdLine{ro};
+	my $store=$tv->get_model;
+	my $iter=$store->get_iter_from_string($path_string);
+	my $file= ::decode_url($store->get($iter,1));
+	my $suffix= $file=~s/(:\w+)$// ? $1 : '';
+	(my $path,$file)= ::splitpath($file);
+	my $new= GMB::Picture::RenameFile($path, $file, $newutf8, $tv->get_toplevel) if $newutf8=~m/\S/ && $file ne $newutf8;
+	return unless $new;
+	my $self= ::find_ancestor($tv,__PACKAGE__);
+	$self->{current_file}= ::catfile($path,$new.$suffix);
+	$self->update;
+}
+sub key_press_cb
+{	my ($self,$event)=@_;
+	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
+	if (::WordIn($key,'Delete KP_Delete'))	{ $self->delete_selected }
+	elsif (lc$key eq 'l')	{ $self->{show_list}^=1; $self->update_showhide; $self->{view}->grab_focus unless $self->{show_list}; }
+	elsif (lc$key eq 'n')	{ $self->view_in_new_window }
+	elsif ($key eq 'F5')	{ $self->refresh_treeviews }
+	else { return $self->{view}->key_press_cb($event); } #propagate event to the view widget
+	#else {return 0}
+	return 1;
+}
+sub button_press_cb
+{	my ($tv,$event)=@_;
+	my $self= ::find_ancestor($tv,__PACKAGE__);
+	#$self->grab_focus;
+	my $button=$event->button;
+	if ($button == 3)
+	{	my @rows=$tv->get_selection->get_selected_rows;
+		$self->context_menu( mode=>'L', treepaths=>\@rows, );
+	}
+	else {return 0}
+	1;
+}
+sub treeview_selection_changed_cb
+{	my ($selection,$file_or_folder)=@_;
+	my ($store,$iter) = $selection->get_selected;
+	return unless $iter;
+	my $file= ::decode_url($store->get($iter,1));
+	my $self= ::find_ancestor($selection->get_tree_view,__PACKAGE__);
+	return if $self->{busy};
+	if ($file_or_folder eq 'folder'){ $self->set_path($file); }
+	else				{ $self->set_file($file); }
 }
 
-sub LoadImg
+sub file_dropped
+{	my ($self,$file)=@_;
+	return if ::dirname($file) ne ($self->{current_path}||'');
+	#update list and picture
+	if ($self->{select_drop}) #if selection hasn't changed since drop, select the new file
+	{	if ($file!~m/$::Image_ext_re/ && $file!~m/\.pdf$/i) {$file=undef} #do not select the file if not a picture/pdf
+		$self->{current_file}= $file if $file;
+	}
+	$self->update;
+}
+sub drop_end
 {	my $self=shift;
-	delete $::ToDo{'9_LoadImg'.$self};
+	delete $self->{drop_job};
+	delete $self->{select_drop};
+}
+
+sub queue_song_changed
+{	my ($self,$ID,$force)=@_;
+	return if $self->{current_path} && !$self->{follow} && !$force;
+	return if $self->{ignore_song};
 	return unless $self->mapped;
-	my $file= $self->{current_file};
-	my $pixbuf= $file && GMB::Picture::pixbuf($file);	#disable cache ?
-	return unless $pixbuf;
-	my ($w,$h)= ($self->window->get_geometry)[2,3];
-	$self->{pixbuf}=GMB::Picture::Scale_with_ratio($pixbuf,$w,$h,1);
-	$self->queue_draw;
+	::IdleDo('8_ChangePicture'.$self,500,\&SongChanged,$self,$ID);
+}
+sub queue_change_picture
+{	my ($self,$direction)=@_;
+	::IdleDo('8_ChangePicture'.$self,500,\&change_file,$self,$direction);
 }
 
-sub size_allocate_cb
-{	my $self=shift;
-	::IdleDo('9_LoadImg'.$self,400,\&LoadImg,$self) if $self->mapped && $self->{current_file};
+sub SongChanged
+{	my ($self,$ID)=@_;
+	$ID= ::GetSelID($self) unless defined $ID;
+	$self->{ID}=$ID;
+	unless (defined $ID)
+	{	$self->{gid}=undef;
+		$self->set_list([]);
+		return;
+	}
+	$self->{mode}= 'song';
+	my $oldgid= $self->{gid} ||0;
+	$self->{gid}= Songs::Get_gid($ID,$self->{field});
+	$self->{view}->reset_zoom if $self->{reset_zoom_on} eq 'group' && $oldgid==$self->{gid};
+	$self->update;
 }
+sub set_list
+{	my ($self,$list)=@_;
+	$self->{mode}='list';
+	$self->{filelist}=$list;
+	$self->update;
+}
+sub set_path
+{	my ($self,$path)=@_;
+	$self->{mode}='path';
+	$path= ::cleanpath($path) if $path;
+	$self->{current_path}= $path;
+	$self->update;
+}
+
+sub update
+{	my $self=shift;
+	my (@files,@paths,$default_path);
+
+	if ($self->{mode} eq 'song')
+	{	my $field= $self->{field};
+		my $gid= $self->{gid};
+		my $path;
+			#taken from ::ChooseAAPicture() FIXME create a function ?
+			my $h=Songs::BuildHash('path', AA::GetIDs($field,$gid));
+			my $min=int(.1*::max(values %$h)); #ignore rare folders
+			$path= ::find_common_parent_folder( grep $h->{$_}>$min,keys %$h );
+			($path)=sort { $h->{$b} <=> $h->{$a} } keys %$h if length $path<5;#take most common if too differents
+		@paths=($default_path=$path);
+	}
+	elsif ($self->{mode} eq 'path')
+	{	my $path= $self->{current_path};
+		@paths=($default_path=$path)
+	}
+	elsif ($self->{mode} eq 'list') { @files= grep {my $f=$_; $f=~s/:\w+$//; -f $f} @{$self->{filelist}}; }
+
+	my $pdfok= $GMB::Picture::pdf_ok && $self->{pdf_mode};
+	for my $path (@paths)
+	{	opendir my($dh),$path  or do { warn $!; last; };
+		for my $file (map $path.::SLASH.$_, sort grep !m#^\.#, readdir $dh)
+		{	next if -d $file;
+			if    ($file=~m/$::Image_ext_re/) { push @files, $file }
+			elsif ($file=~m/\.pdf$/i && $pdfok) { push @files, $file, map "$file:$_", 1..GMB::Picture::pdf_pages($file)-1; }
+		}
+		closedir $dh;
+	}
+	$self->{filelist}=\@files;
+	my $file=$self->{current_file};
+	unless ($file && (grep $file eq $_, @files))
+	{	$file= $self->{current_file}= $files[0];
+	}
+	my $oldpath= $self->{current_path}||'';
+	$self->{current_path}= $file ? ::dirname($file) : ($default_path||'');
+	$self->{view}->reset_zoom if $self->{reset_zoom_on} eq 'folder' && $oldpath ne $self->{current_path};
+	$self->refresh_treeviews;
+	$self->update_file;
+}
+
+sub refresh_treeviews
+{	my $self=shift;
+	return unless $self->{show_list};
+	my $oldpath= $self->{loaded_path};
+	my $path= $self->{current_path}; # || $oldpath;
+	unless ($path && $oldpath && $oldpath eq $path) #folder has changed, reset scrollbars
+	{	$self->{foldertv}->get_vadjustment->set_value(0);
+		$self->{filetv}->get_vadjustment->set_value(0);
+		$self->{loaded_path}= $path;
+	}
+	my $dirstore= $self->{dirstore};
+	my $filestore=$self->{filestore};
+	$dirstore->clear;
+	$filestore->clear;
+	return unless $path;
+	my $parent= ::parentdir($path);
+	$path= ::pathslash($path); # add a slash at the end
+	$dirstore->set( $dirstore->append,  0,'..', 1,Songs::filename_escape($parent)) if $parent;
+	my $pdfok= $GMB::Picture::pdf_ok && $self->{pdf_mode};
+
+	my $show_expanders;
+	opendir my($dh),$path  or do { warn $!; return; };
+	for my $file (sort grep !m#^\.#, readdir $dh)
+	{	if (-d $path.$file) { $dirstore->set( $dirstore->append, 0,::filename_to_utf8displayname($file), 1,Songs::filename_escape($path.$file)); next }
+
+		my @pages; my $suffix='';
+		if ($file=~m/\.pdf$/i && $pdfok) { @pages= (1..GMB::Picture::pdf_pages($path.$file)-1); $show_expanders=1; }
+		elsif ($file!~m/$::Image_ext_re/) { next }
+
+		my $efile= Songs::filename_escape($path.$file);
+		my $iter= $filestore->append(undef);
+		my ($size,$time)=(stat $path.$file)[7,9];
+		$filestore->set($iter, 0,::filename_to_utf8displayname($file), 1,$efile, 2,!$::CmdLine{ro}, 3,$size, 4,$time);
+		for my $n (@pages)
+		{	$filestore->set($filestore->append($iter), 0, ::__x(_"page {number}",number=>$n+1), 1,"$efile:$n");
+		}
+	}
+	closedir $dh;
+	$self->{filetv}->set_show_expanders($show_expanders);
+	$self->{filetv}->expand_all;
+}
+
+sub update_file
+{	my $self=shift;
+	my $old= $self->{loaded_file}||'';
+	my $file= $self->{current_file};
+	delete $::ToDo{'8_ChangePicture'.$self};
+	if (!$file || $file ne $old) #file changed
+	{	$self->{view}->reset_zoom if $self->{reset_zoom_on} eq 'file';
+		delete $self->{select_drop};
+	}
+	my $pixbuf= $file && GMB::Picture::pixbuf($file);	#disable cache ?
+	my $info= $file ? ::filename_to_utf8displayname($file) : undef;
+	$self->{view}->set_pixbuf($pixbuf,$info);
+	$self->{loaded_file}= $file;
+	if ($file && ::dirname($file) ne ($self->{loaded_path}||''))	{ $self->refresh_treeviews;}
+	$self->update_selection;
+}
+
+sub update_selection
+{	my $self=shift;
+	return unless $self->{show_list};
+	my $treeview= $self->{filetv};
+	my $treesel= $treeview->get_selection;
+	$treesel->unselect_all;
+	my $file=$self->{current_file};
+	return unless $file;
+	my $page= $file=~s/:(\d+)$// ? $1 : undef;
+	$file= Songs::filename_escape($file);
+	$self->{busy}=1;
+	my $store= $self->{filestore};
+	my $iter= $store->get_iter_first;
+	while ($iter)
+	{	if ($store->get($iter,1) eq $file)
+		{	if ($page) { $iter=$store->iter_nth_child($iter,$page-1); }
+			$treesel->select_iter($iter);
+			$treeview->scroll_to_cell($store->get_path($iter),undef,::FALSE,0,0); #scroll to row if needed
+			last;
+		}
+		$iter= $store->iter_next($iter);
+	}
+	delete $self->{busy};
+}
+
+sub change_file
+{	my ($self,$direction)=@_;
+	my $file= $self->{current_file};
+	my $list= $self->{filelist};
+	my $i;
+	if ($file) { $i= ::first { $list->[$_] eq $file } 0..$#$list; }
+	if (defined $i)
+	{	if ($self->{nowrap}) { $i= ::Clamp($i+$direction,0,$#$list); }
+		else { $i= ($i+$direction) % @$list; } # wrap-around
+	}
+	else {$i=0}
+	$self->set_file($list->[$i]);
+}
+
+sub set_file
+{	my ($self,$file)=@_;
+	$self->{current_file}=$file;
+	return unless $file;
+	if ($file && !(grep $file eq $_, @{$self->{filelist}}))	{ $self->set_path(::dirname($file)); }
+	else							{ $self->update_file; }
+}
+
+sub context_menu
+{	my ($self,@extra)=@_;	# at least "mode" comes from extra
+	my $file= $self->{current_file};
+	my $ispage= $file && $file=~m/:\w+$/;
+	::PopupContextMenu(\@ContextMenu,
+	 { self=>$self,	field=>$self->{field}, ID=>$self->{ID}, gid=>$self->{gid}, file=>$file,
+	   ispage=>$ispage,		writeable=> ($file && !$::CmdLine{ro}),
+	   toolbar=>$self->{toolbar},	view=>$self->{view},	@extra,
+	 });
+}
+
+package Layout::PictureBrowser::View;
+use base 'Gtk2::Widget';
+
+sub new
+{	my ($class,$opt)=@_;
+	#my $self= bless Gtk2::EventBox->new, $class;
+	my $self= bless Gtk2::DrawingArea->new, $class;
+	$self->add_events([qw/pointer-motion-mask scroll-mask key-press-mask button-press-mask button-release-mask/]);
+	$self->can_focus(::TRUE);
+	$self->signal_connect(expose_event => \&expose_cb);
+	$self->signal_connect(size_allocate=> \&resize);
+	$self->signal_connect(scroll_event => \&scroll_cb);
+	$self->signal_connect(key_press_event=> \&key_press_cb);
+	$self->signal_connect(button_press_event =>  \&button_press_cb);
+	$self->signal_connect(button_release_event=> \&button_release_cb);
+	$self->signal_connect(motion_notify_event => \&motion_notify_cb);
+	$self->{$_}=$opt->{$_} for qw/xalign yalign scroll_zoom show_info oneshot/;
+	$self->{offsetx}= $self->{offsety} =0;
+	$self->{fit}=1; #default to zoom-to-fit
+	if (my $c=$opt->{bgcolor}) { $self->modify_bg('normal',Gtk2::Gdk::Color->parse($c)); }
+	return $self;
+}
+
+sub set_pixbuf
+{	my ($self,$pixbuf,$info)=@_;
+	$self->{rotate}=0;
+	$self->{pixbuf}=$pixbuf;
+	$self->{info}=$info;
+	$self->resize;
+}
+sub reset_zoom
+{	my $self=shift;
+	$self->{pixbuf}=undef; #force refresh
+	$self->{fit}=1;
+}
+
 sub expose_cb
 {	my ($self,$event)=@_;
 	my $pixbuf= $self->{pixbuf};
 	return 1 unless $pixbuf;
-	my ($x,$y,$w,$h)=$self->window->get_geometry;
-	($x,$y)=(0,0) unless $self->no_window;
-	my $pw=$pixbuf->get_width;
-	my $ph=$pixbuf->get_height;
-	$x+= ($w-$pw)*$self->{xalign};
-	$y+= ($h-$ph)*$self->{yalign};
-	my $gc=Gtk2::Gdk::GC->new($self->window);
-	$gc->set_clip_rectangle($event->area);
-	$self->window->draw_pixbuf($gc,$pixbuf,0,0,$x,$y,-1,-1,'none',0,0);
+	my $scale= $self->{scale};
+	unless ($scale) {$self->resize; return 1}
+	my $pw= $pixbuf->get_width;
+	my $ph= $pixbuf->get_height;
+	my $x= $self->{x1} - $self->{offsetx};
+	my $y= $self->{y1} - $self->{offsety};
+	my $cr= Gtk2::Gdk::Cairo::Context->create($self->gdkwindow);
+	$cr->rectangle($event->area);
+	$cr->clip;
+	$cr->save;
+	$cr->translate($x,$y);
+	$cr->scale($scale,$scale);
+	if (my $angle=$self->{rotate})
+	{	if ($angle %180){ $cr->translate(.5*$ph,.5*$pw); }
+		else		{ $cr->translate(.5*$pw,.5*$ph); }
+		$cr->rotate(::PI*$angle/180);
+		$cr->translate(-.5*$pw,-.5*$ph);
+	}
+	if ($pixbuf->get_has_alpha) # if drawing a transparent image, fill with white first
+	{	$cr->set_source_rgb(1,1,1);
+		$cr->rectangle(0,0,$pw,$ph);
+		$cr->fill;
+	}
+	$cr->set_source_pixbuf($pixbuf,0,0);
+	$cr->paint;
+	if (my $type=$self->{dnd_message}) # display a message when dragging a file/link/song above the picture
+	{	$cr->restore;
+		my $msg= $type eq 'uri' ? _"Drop files in this folder" : _"View pictures from this album's folder"; #FIXME make second message depend on the PictureBrowser's $self->{field};
+		$self->draw_overlay_text($cr,$msg,.5,.5);
+	}
+	elsif ($self->{show_info} && defined $self->{info})
+	{	$cr->restore;
+		$self->draw_overlay_text($cr,$self->{info},.5,1);
+	}
 	1;
+}
+
+sub draw_overlay_text
+{	my ($self,$cr,$text,$x,$y)=@_;
+	my $layout=Gtk2::Pango::Layout->new( $self->create_pango_context );
+	$layout->set_markup($text);
+	my ($tw,$th)= map $_/Gtk2::Pango->scale, $layout->get_size;
+	my ($w,$h)=$self->gdkwindow->get_size;
+	my $pad=8;
+	$x*= $w-$tw-$pad;
+	$y*= $h-$th-$pad;
+	$cr->set_source_rgba(0,0,0,.5);
+	$cr->rectangle($x-$pad, $y-$pad, $tw+2*$pad, $th+2*$pad);
+	$cr->fill;
+	$cr->set_source_rgb(1,1,1);
+	$cr->move_to($x,$y);
+	Pango::Cairo::show_layout($cr,$layout);
+}
+
+sub resize
+{	my $self=shift;
+	my $gdkwin= $self->gdkwindow;
+	return unless $gdkwin;
+	my ($w,$h)=$gdkwin->get_size;
+	my ($x,$y)= $self->no_window ? $gdkwin->get_position : (0,0);
+	$self->invalidate_gdkwin;
+	my $pixbuf= $self->{pixbuf};
+	return unless $pixbuf;
+
+	my $pw= $pixbuf->get_width;
+	my $ph= $pixbuf->get_height;
+	if ($self->{rotate}%180) { ($pw,$ph)=($ph,$pw) }
+	$self->{scale}= ::min($w/$pw, $h/$ph) if $self->{fit};
+	my $scale= $self->{scale}||=1;
+	$pw*=$scale;
+	$ph*=$scale;
+	my ($max_x,$max_y);
+	if ($w>$pw)	{ $max_x= 0;		$self->{x1}= $x+($w-$pw)*$self->{xalign};	$self->{x2}= $pw; }
+	else		{ $max_x= $pw-$w;	$self->{x1}= $x;				$self->{x2}= $w;  }
+	if ($h>$ph)	{ $max_y= 0;		$self->{y1}= $y+($h-$ph)*$self->{yalign};	$self->{y2}= $ph; }
+	else		{ $max_y= $ph-$h;	$self->{y1}= $y;				$self->{y2}= $h;  }
+	$self->{max_x}=$max_x;
+	$self->{max_y}=$max_y;
+	$self->{offsetx}=$max_x if $self->{offsetx}>$max_x;
+	$self->{offsety}=$max_y if $self->{offsety}>$max_y;
+}
+
+sub key_press_cb
+{	my ($self,$event)=@_;
+	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
+	#my $state=$event->get_state;
+	#my $ctrl= $state * ['control-mask'] && !($state * [qw/mod1-mask mod4-mask super-mask/]); #ctrl and not alt/super
+	#my $mod=  $state * [qw/control-mask mod1-mask mod4-mask super-mask/]; # no modifier ctrl/alt/super
+	#my $shift=$state * ['shift-mask'];
+	if    (::WordIn($key,'plus KP_Add Home'))	{ $self->change_zoom('+'); }
+	elsif (::WordIn($key,'minus KP_Subtract End'))	{ $self->change_zoom('-'); }
+	elsif (::WordIn($key,'equal 1 KP_1'))		{ $self->change_zoom(1); }
+	elsif (::WordIn($key,'Return KP_Enter'))	{ $self->set_zoom_fit; }
+	elsif ($key eq 'Left')				{ $self->rotate(-1); }
+	elsif ($key eq 'Right')				{ $self->rotate(1); }
+	elsif (lc$key eq 'i')				{ $self->toggle_info; }
+	elsif ($self->{oneshot})			{ $self->get_toplevel->close_window; } # shortcuts before this point must only change zoom/orientation
+	elsif (lc$key eq 'f')				{ $self->set_fullscreen }
+	elsif ($key eq 'Escape' && $self->{fullwin})	{ $self->set_fullscreen(0) }
+	elsif (::WordIn($key,'Down space Page_Up'))	{ $self->change_picture(1); }
+	elsif (::WordIn($key,'Up BackSpace Page_Down'))	{ $self->change_picture(-1); }
+	else {return 0}
+	return 1;
 }
 sub button_press_cb
 {	my ($self,$event)=@_;
-	::IdleDo('8_ChangePicture'.$self,500,\&ChangePicture,$self,1) if $self->{current_file};
+	$self->grab_focus;
+	my $button=$event->button;
+	if ($button == 3)
+	{	if ($self->{oneshot}) { $self->get_toplevel->close_window; return 1 }
+		my $parent= ::find_ancestor($self,'Layout::PictureBrowser');
+		if ($parent) { $parent->context_menu(mode=>'V'); }
+		else { ::PopupContextMenu( \@Layout::PictureBrowser::ContextMenu, { view=>$self, mode=>'P', } ); }
+	}
+	elsif ($button==9) { $self->change_picture(1); }
+	elsif ($button==8) { $self->change_picture(-1);}
+	elsif ($button!=1 && $event->type eq '2button-press') { $self->set_fullscreen }
+	elsif (!$self->{pressed})
+	{	($self->{last_x},$self->{last_y})=$event->coords;
+		$self->{pressed}=$button;
+	}
 	1;
 }
+sub button_release_cb
+{	my ($self,$event)=@_;
+	my $button=$event->button;
+	if (($self->{pressed}||0)==$button)
+	{	if ($button==1)
+		{	if    ($self->{dragged}) { $event->window->set_cursor(undef) }
+			elsif ($self->{oneshot}) { $self->get_toplevel->close_window; return }
+			else { $self->change_picture(1); }
+		}
+		else
+		{	$self->set_zoom_fit unless $self->{zoomed} || $self->{prevnext};
+			if ($self->{zoomed}) { $event->window->set_cursor(undef) }
+		}
+		$self->{$_}= undef for qw/last_x last_y dragged pressed zoomed prevnext/;
+	}
+	else {return 0}
+	1;
+}
+sub motion_notify_cb
+{	my ($self,$event)=@_;
+	my $button= $self->{pressed};
+	return unless $button;
+	my ($ex,$ey)=$event->coords;
+	if ($button==1 && ($self->{max_x} || $self->{max_y}))
+	{	$event->window->set_cursor(Gtk2::Gdk::Cursor->new('fleur')) unless $self->{dragged};
+		$self->{dragged}=1;
+		# move picture
+		my $x= $self->{offsetx} + $self->{last_x} - $ex;
+		my $y= $self->{offsety} + $self->{last_y} - $ey;
+		$self->{offsetx}= ::Clamp($x,0,$self->{max_x});
+		$self->{offsety}= ::Clamp($y,0,$self->{max_y});
+		($self->{last_x},$self->{last_y})= ($ex,$ey);
+		$self->invalidate_gdkwin; # could be optimized, copy parts, not sure it's worth it
+	}
+	elsif ($button!=1 && !$self->{prevnext}) # zoom or prev/next with other button # only prev/next once by button press
+	{	my $zoom= int(($self->{last_y}-$ey)/20); # vertical movement >=20
+		my $next= int(($self->{last_x}-$ex)/30); # horizontal movement >=30
+		if ($zoom)
+		{	$zoom="+$zoom" if $zoom>0;
+			$self->change_zoom($zoom,$ex,$ey);
+			$self->{last_y}=$ey;
+			$event->window->set_cursor(Gtk2::Gdk::Cursor->new('double_arrow')) unless $self->{zoomed};
+			$self->{zoomed}=1;
+		}
+		elsif ($next && !$self->{zoomed} && !$self->{oneshot})
+		{	$self->change_picture($next>0 ? -1 : 1);
+			$self->{last_x}=$ex;
+			$self->{prevnext}=1;
+		}
+	}
+	else {return 0}
+	1;
+}
+
 sub scroll_cb
 {	my ($self,$event)=@_;
 	my $d= $event->direction;
-	if	($d eq 'down'	|| $d eq 'right')	{ $d=1 }
-	elsif	($d eq 'up'	|| $d eq 'left' )	{ $d=-1}
-	else	{ return 0 }
-	# do nothing for now, will probably zoom in/out FIXME #::IdleDo('8_ChangePicture'.$self,500,\&ChangePicture,$self,$d) if $self->{current_file};
+	my $state=$event->get_state;
+	my $ctrl= $state * ['control-mask'] && !($state * [qw/mod1-mask mod4-mask super-mask/]); #ctrl and not alt/super
+	#my $mod=  $state * [qw/control-mask mod1-mask mod4-mask super-mask/]; # no modifier ctrl/alt/super
+	my $shift=$state * ['shift-mask'];
+	my $updown;
+	if    ($d eq 'down')	{ $d=-1;$updown=1 }
+	elsif ($d eq 'up')	{ $d=1; $updown=1 }
+	elsif ($d eq 'right')	{ $d=1 }
+	elsif ($d eq 'left')	{ $d=-1}
+	else			{return 0}
+	my $button1= ($self->{pressed}||0)==1;
+	$self->{scrolled}=1 if $button1;
+	if ($updown && !$ctrl && ($shift || (!$self->{scroll_zoom} xor $button1))) #ctrl:zoom, shift:prev/next, else depend on scroll_zoom option (button1 inverts it)
+	{	$updown=0; $d*=-1;
+	}
+	if ($updown)	{ $self->change_zoom( ($d>0? '+':'-'), $event->x,$event->y); }
+	else		{ $self->change_picture($d); }
+}
+
+sub change_picture
+{	my ($self,$direction)=@_;
+	if ($self->{oneshot}) { $self->get_toplevel->close_window; return }
+	my $browser= ::find_ancestor($self,'Layout::PictureBrowser');
+	$browser->queue_change_picture($direction) if $browser;
+}
+sub change_zoom
+{	my ($self,$zoom,$x,$y)=@_;
+	return unless $self->{pixbuf};
+	if (defined $x) # translate event coordinates to image coordinates
+	{	$x= $x - $self->{x1}; $x= $self->{x2} if $x>$self->{x2};
+		$y= $y - $self->{y1}; $y= $self->{y2} if $y>$self->{y2};
+	}
+	else # no zoom coordinates => zoom on center
+	{	$x= $self->{x2}/2;
+		$y= $self->{y2}/2;
+	}
+	my $nx= $x+$self->{offsetx};
+	my $ny= $y+$self->{offsety};
+	my $s=$self->{scale};
+	$_/=$s for $nx,$ny;
+	if ($zoom=~m/^\d*?\.?\d+$/) {$s=$zoom}
+	else
+	{	my $change= $zoom=~m/^-(\d*)/ ? -.5 : .5;
+		$change*=$1 if $1;
+		if ($s==1) { if ($s+$change<1) {$s=1/($s-$change)} else {$s+=$change} }
+		elsif ($s<1) { $s=1/$s; $s-=$change; $s=1/$s; $s=1 if $s>1; }
+		else { $s+=$change; $s=1 if $s<1; }
+	}
+	$self->{scale}=$s;
+	$self->{fit}=0;
+	$self->resize;
+
+	$self->{offsetx}= ::Clamp($s*$nx-$x,0,$self->{max_x});
+	$self->{offsety}= ::Clamp($s*$ny-$y,0,$self->{max_y});
+}
+sub toggle_info
+{	my $self=shift;
+	$self->{show_info}^=1;
+	$self->invalidate_gdkwin;
+}
+sub set_zoom_fit
+{	my $self=shift;
+	$self->{fit}=1;
+	$self->resize;
+}
+sub rotate
+{	my ($self,$rotate)=@_;
+	my $r=$self->{rotate}||0;
+	$r+= 90*$rotate;
+	$self->{rotate}= $r % 360;
+	$self->resize;
+}
+sub gdkwindow
+{	$_[0]{fullwin} || $_[0]->window;
+}
+sub invalidate_gdkwin
+{	my $gdkwin= $_[0]->gdkwindow;
+	$gdkwin->invalidate_rect(Gtk2::Gdk::Rectangle->new(0,0,$gdkwin->get_size),0) if $gdkwin;
+}
+sub set_fullscreen
+{	my ($self,$fullscreen)=@_;
+	$fullscreen= !$self->{fullwin} if !defined $fullscreen;
+	return unless $self->{fullwin} xor $fullscreen;
+	if ($fullscreen)
+	{	my $screen=$self->get_screen;
+		my $monitor=$screen->get_monitor_at_window($self->window);
+		my (undef,undef,$monitorwidth,$monitorheight)= $screen->get_monitor_geometry($monitor)->values;
+		my %attr=
+		(	window_type	=> 'toplevel',
+			x		=> 0,
+			y		=> 0,
+			width		=> $monitorwidth,
+			height		=> $monitorheight,
+			event_mask	=> [qw/exposure-mask pointer-motion-mask button-press-mask button-release-mask key-press-mask/],
+		);
+		my $gdkwin= $self->{fullwin}= Gtk2::Gdk::Window->new(undef,\%attr);
+		$gdkwin->set_user_data($self->window->get_user_data);
+		$gdkwin->fullscreen;
+		$gdkwin->show;
+		$self->grab_focus; #make sure we have the focus
+	}
+	else
+	{	my $gdkwin= delete $self->{fullwin};
+		$gdkwin->set_user_data(0); #needed ?
+		$gdkwin->destroy;
+	}
+	$self->resize;
 }
 
 package GMB::Context;
