@@ -532,7 +532,7 @@ my $RGA_songmenu=
  [	{ label => _"Scan this file",			code => sub { Analyse ($_[0]{IDs}); },		onlyone => 'IDs', },
 	{ label => _"Scan per-file track gain",		code => sub { Analyse ($_[0]{IDs}); },		onlymany=> 'IDs', },
 	{ label => _"Scan using tag-defined album", 	code => sub { Analyse_byAlbum ($_[0]{IDs}); },	onlymany=> 'IDs', },
-	{ label => _"Scan as an album",			code => sub { Analyse(join " ",@{ $_[0]{IDs} }); },	onlymany=> 'IDs', },
+	{ label => _"Scan as an album",			code => sub { Analyse([join ' ',@{ $_[0]{IDs} }]); },	onlymany=> 'IDs', },
  ],
 };
 push @::SongCMenu,$RGA_songmenu;
@@ -563,7 +563,7 @@ sub Analyse_byAlbum
 	for my $aid (keys %$hash)
 	{	my $IDs= $hash->{$aid};
 		if (@$IDs<2 || Songs::Gid_to_Get('album',$aid) eq '') { push @list, @$IDs; } #no album name or only 1 song in album => push as single songs
-		else { push @list, join ' ',$IDs; } # push as an album
+		else { push @list, join ' ',@$IDs; } # push as an album
 	}
 	Analyse(\@list);
 }
@@ -637,7 +637,7 @@ sub process_next
 		my $f= Songs::Get($ID,'fullfilename_raw');
 		::_utf8_on($f); # pretend it's utf8 to prevent a conversion to utf8 by the bindings
 		$RGA_pipeline->{ID}=$ID;
-		warn "analysing [$ID] $f\n";
+		warn "Analysing [$ID] $f\n" if $::verbose;
 		$RGA_pipeline->get_by_name('filesrc')->set(location => $f);
 		$rganalysis->set_locked_state(0);
 		$RGA_pipeline->set_state('playing');
