@@ -4141,10 +4141,10 @@ sub BuildMenu
 		next if $m->{type}	&& index($args->{type},	$m->{type})==-1;
 		next if $m->{mode}	&& index($m->{mode},	$args->{mode})==-1;
 		next if $m->{notmode}	&& index($m->{notmode},	$args->{mode})!=-1;
-		next if $m->{isdefined}	&& !defined $args->{ $m->{isdefined} };
-		#next if $m->{notdefined}&& defined $args->{ $m->{notdefined} };
-		next if $m->{istrue}	&&   !$args->{ $m->{istrue} };
-		#next if $m->{nottrue}	&&    $args->{ $m->{nottrue} };
+		next if $m->{isdefined}	&&   grep !defined $args->{$_}, split /\s+/,$m->{isdefined};
+		#next if $m->{notdefined}&&   grep defined $args->{$_}, split /\s+/,$m->{notdefined};
+		next if $m->{istrue}	&&   grep !$args->{$_}, split /\s+/,$m->{istrue};
+		next if $m->{isfalse}	&&   grep $args->{$_},  split /\s+/,$m->{isfalse};
 		next if $m->{empty}	&& (  $args->{ $m->{empty} }	&& @{ $args->{ $m->{empty}   } }!=0 );
 		next if $m->{notempty}	&& ( !$args->{ $m->{notempty} }	|| @{ $args->{ $m->{notempty}} }==0 );
 		next if $m->{onlyone}	&& ( !$args->{ $m->{onlyone}  }	|| @{ $args->{ $m->{onlyone} } }!=1 );
