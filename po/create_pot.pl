@@ -26,7 +26,8 @@ while (my $file=shift @files)
  open my$fh,$file  or die $!;
  $file=~s#^$path/##;
  while (<$fh>)
- {	if (!$version && m/VERSION *=> '([0-9]\.[0-9]+)'/) {$version=$1}
+ {	next if m/^\s*#/;
+	if (!$version && m/VERSION *=> '([0-9]\.[0-9]+)'/) {$version=$1}
 
 	my $com='';
 	if (s/#(xgettext:no-perl-brace-format)//){$com.="$1\n"}
