@@ -217,7 +217,7 @@ sub convertvolume	#convert a linear volume to cubic volume scale and apply $Gain
 
 sub RG_set_options
 {	return unless $SoftVolume;
-	if ($::Options{gst_use_replaygain})
+	if (defined($::PlayingID) && $::Options{gst_use_replaygain})
 	{	my ($gain1,$gain2,$peak1,$peak2)= Songs::Get($::PlayingID, qw/replaygain_track_gain replaygain_album_gain replaygain_track_peak replaygain_album_peak/);
 		($gain1,$gain2,$peak1,$peak2)= ($gain2,$gain1,$peak1,$peak2) if $::Options{gst_rg_albummode};
 		my $gain= ::first { $_ ne '' } $gain1, $gain2, $::Options{gst_rg_fallback};

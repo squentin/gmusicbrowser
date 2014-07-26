@@ -2164,7 +2164,7 @@ sub sort_gid_by_name
 		};
 	$func->($gids,$h);
 }
-sub Get_all_gids	#FIXME add option to filter out walues eq ''
+sub Get_all_gids	#FIXME add option to filter out values eq ''
 {	my $field=$_[0];
 	return UniqList($field,$::Library,1); #FIXME use ___name directly
 }

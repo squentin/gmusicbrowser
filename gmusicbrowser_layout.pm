@@ -802,6 +802,7 @@ sub InitLayouts
 sub ReadLayoutFile
 {	my $file=shift;
 	return unless -f $file;
+	warn "Reading layouts in $file\n" if $::debug;
 	open my$fh,"<:utf8",$file  or do { warn $!; return };
 	my $first;
 	my $linecount=0; my ($linefirst,$linenext);
@@ -2362,7 +2363,7 @@ sub PanedNew
 	{	$self->set_position($self->{size1});
 		$self->set('position-set',1); # in case $self->{size1}==0 'position-set' is not set to true if child1's size is 0 (which is the case here as child1 doesn't exist yet)
 	}
-	$self->{SaveOptions}=sub { ::setlocale(::LC_NUMERIC, 'C'); my $s=$_[0]{size1} .'-'. $_[0]{size2}; ::setlocale(::LC_NUMERIC, ''); return size => $s };
+	$self->{SaveOptions}=sub { ::setlocale(::LC_NUMERIC, 'C'); my $s=$_[0]{size1}; $s.='-'. $_[0]{size2} if $_[0]{size2}; ::setlocale(::LC_NUMERIC, ''); return size => $s };
 	$self->signal_connect(size_allocate => \&Paned_size_cb ); #needed to correctly save/restore the handle position
 	return $self;
 }
@@ -2370,6 +2371,7 @@ sub PanedNew
 sub Paned_size_cb
 {	my $self=shift;
 	my $max=$self->get('max-position');
+	return unless $max;
 	my $size1=$self->{size1};
 	my $size2=$self->{size2};
 	if (defined $size1 && defined $size2 && abs($max-$size1-$size2)>5 || $self->{need_resize})
@@ -4167,7 +4169,7 @@ our @ContextMenu=
 	{ label=> _"Rename file", code => sub { my $tv=$_[0]{self}{filetv}; $tv->set_cursor($_[0]{treepaths}[0],$tv->get_column(0),::TRUE); },
 	  onlyone => 'treepaths', isfalse=>'ispage', istrue=>'writeable', mode=>'L',
 	},
-	{ label=> _"Delete file",	code => sub { $_[0]{self}->delete_selected },	istrue=>'writeable', isfalse=>'ispage', mode=>'VL', },
+	{ label=> _"Delete file",	code => sub { $_[0]{self}->delete_selected },	istrue=>'writeable', isfalse=>'ispage', mode=>'VL', stockicon=>'gtk-delete', },
 
 	{ label => _"Options", submenu=> \@optionsubmenu, },
 
