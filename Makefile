@@ -79,7 +79,7 @@ install: all
 	install -pm 644 pix/tango/*            "$(datadir)/gmusicbrowser/pix/tango/"
 	install -pm 644 pix/oxygen/*           "$(datadir)/gmusicbrowser/pix/oxygen/"
 	install -pDm 644 gmusicbrowser.desktop "$(datadir)/applications/gmusicbrowser.desktop"
-	install -pDm 644 gmusicbrowser.appdata.xml "$(datadir)/appdata/gmusicbrowser.appdata.xml
+	install -pDm 644 gmusicbrowser.appdata.xml "$(datadir)/appdata/gmusicbrowser.appdata.xml"
 	install -pDm 644 gmusicbrowser.menu    "$(menudir)/gmusicbrowser"
 	install -pDm 644 pix/gmusicbrowser32x32.png "$(iconsdir)/gmusicbrowser.png"
 	install -pDm 644 pix/gmusicbrowser.png      "$(liconsdir)/gmusicbrowser.png"
