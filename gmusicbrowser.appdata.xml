@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2014 by Quentin Sculo -->
+<application>
+ <id type="desktop">gmusicbrowser.desktop</id>
+ <licence>GPL-3.0</licence>
+ <name>gmusicbrowser</name>
+ <name xml:lang="fr">gmusicbrowser</name>
+ <summary>Jukebox for large collections of mp3/ogg/flac/mpc files</summary>
+ <summary xml:lang="fr">Jukebox pour de grandes collections de mp3/ogg/flac/mpc</summary>
+ <description>
+  <p>Jukebox for large collections of mp3/ogg/flac/mpc files.
+     Uses gstreamer, mpg123/ogg123  or mplayer for playback.</p>
+  <p>Main features:</p>
+  <ul>
+    <li>customizable window layouts</li>
+    <li>artist/album lock: easily restrict playlist to current artist/album</li>
+    <li>easy access to related songs (same artist/album/title)</li>
+    <li>simple mass-tagging and mass-renaming</li>
+    <li>support multiple genres for each song</li>
+    <li>customizable labels can be set for each song</li>
+    <li>filters with unlimited nesting of conditions</li>
+    <li>customizable weighted random mode</li>
+  </ul>
+
+  <p xml:lang="fr">Jukebox pour de grandes collections de mp3/ogg/flac/mpc.
+    Il peut utiliser gstreamer, mpg123/ogg123 ou mplayer pour la lecture.</p>
+  <p xml:lang="fr">Principales fonctionalités :</p>
+  <ul xml:lang="fr">
+    <li xml:lang="fr">disposition des fenêtres personnalisable</li>
+    <li xml:lang="fr">verrouillage artiste/album : limiter simplement la lecture à l'artiste/album courant</li>
+    <li xml:lang="fr">accès rapide aux chansons liées (même artiste/album/titre)</li>
+    <li xml:lang="fr">étiquetter ou renommer en masse simplement</li>
+    <li xml:lang="fr">support de genres multiples pour chaque chanson</li>
+    <li xml:lang="fr">étiquettes personnalisables pour chaque chanson</li>
+    <li xml:lang="fr">filter avec conditions imbriqués illimitées</li>
+    <li xml:lang="fr">mode aléatoire pondéré configurable.</li>
+  </ul>
+  </description>
+ <url type="homepage">http://gmusicbrowser.org/</url>
+ <screenshots>
+  <screenshot type="default">http://gmusicbrowser.org/screenshots/songtree_example.png</screenshot>
+  <screenshot>http://gmusicbrowser.org/screenshots/SearchAndQueue.png</screenshot>
+  <screenshot>http://gmusicbrowser.org/screenshots/itunelike.png</screenshot>
+  <screenshot>http://gmusicbrowser.org/screenshots/QueueLibraryContext.png</screenshot>
+ </screenshots>
+ <updatecontact>squentin@free.fr</updatecontact>
+</application>
