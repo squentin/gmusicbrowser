@@ -4189,8 +4189,8 @@ sub new
 	$self->{$_}= $opt->{$_} for qw/group follow show_list show_folders show_toolbar reset_zoom_on nowrap pdf_mode/;
 
 	my $hbox= Gtk2::HBox->new;
-	my $hpaned= Gtk2::HPaned->new;
-	my $vpaned=	$self->{vpaned}= Gtk2::VPaned->new;
+	my $hpaned=			Layout::Boxes::PanedNew('Gtk2::HPaned',{size=>$opt->{hpos}});
+	my $vpaned= $self->{vpaned}=	Layout::Boxes::PanedNew('Gtk2::VPaned',{size=>$opt->{vpos}});
 	my $view=	$self->{view}=   Layout::PictureBrowser::View->new($opt);
 	my $toolbar=	$self->{toolbar}= ::BuildToolbar(\@toolbar, getcontext=>\&toolbarcontext, self=>$self);
 	$self->{dirstore} = Gtk2::ListStore->new('Glib::String','Glib::String');
@@ -4236,8 +4236,6 @@ sub new
 	$hbox->add($hpaned);
 	$self->pack_start($toolbar,0,0,2);
 	$self->add($hbox);
-	$hpaned->set_position($opt->{hpos});
-	$vpaned->set_position($opt->{vpos});
 	$self->{SaveOptions}= \&SaveOptions;
 
 	$_->set_enable_search(0) for $treeview1,$treeview2;
@@ -4296,8 +4294,8 @@ sub SaveOptions
 {	my $self=shift;
 	my %opt;
 	my $vpaned= $self->{vpaned};
-	$opt{hpos}= $vpaned->parent->get_position;
-	$opt{vpos}= $vpaned->get_position;
+	$opt{hpos}= ($vpaned->parent->{SaveOptions}($vpaned->parent))[1];	# The SaveOptions function of Layout::Boxes::PanedNew returns (size=>$value),
+	$opt{vpos}= ($vpaned->{SaveOptions}($vpaned))[1];			# we only want the value
 	$opt{$_}=$self->{view}{$_} for qw/scroll_zoom/;
 	$opt{$_}=$self->{$_} for qw/follow show_list show_folders show_toolbar reset_zoom_on pdf_mode/;
 	return %opt;
