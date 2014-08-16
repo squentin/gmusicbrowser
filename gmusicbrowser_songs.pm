@@ -4371,6 +4371,11 @@ sub _smartstring_date
 		$date1||='';
 		$date2||='';
 	}
+	elsif ($op eq '=' and my($n,$u)= $pat=~m#^(\d*\.?\d+)([smhdwMy])$#i) # =5h turned into 4.5h..5.5h
+	{	$suffix='ago';
+		$date1= $n>.5 ? ($n-.5).$u : '';
+		$date2= ($n+.5).$u;
+	}
 	else						# absolute date filter
 	{	($date1,$date2)= ::dates_to_timestamps($pat,2);
 		#$pat= "$date1..$date2" if $date1.$date2 ne '';
@@ -4382,8 +4387,6 @@ sub _smartstring_date
 			(!length$date1 && length $date2) ? "<$suffix:".$date2	: undef;
 	}
 	$op= $op eq '=' ? 'e' : $casesens ? 's' : 'si';
-	#if ($suffix && $op eq 'e') { return undef } # FIXME =5d could be changed into between 4.5d and 5.5d ?
-	#return $op.$suffix.':'.$pat;
 	return $op.':'.$pat;
 }
 
