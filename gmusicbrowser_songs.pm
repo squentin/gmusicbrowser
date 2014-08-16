@@ -712,10 +712,10 @@ our %timespan_menu=
 		'filterdesc:<'		=> [_"before %s",		_"before",	'date', ],
 		'filterdesc:b'		=> [_"between %s and %s",	_"between (absolute dates)", 'date date'],
 		'filterdesc:bago'	=> [_"between %s ago and %s ago", _"between (relative dates)", 'ago ago'],
-		'filterdesc:->ago'	=> _"less than %s ago",
-		'filterdesc:-<ago'	=> _"more than %s ago",
-		'filterdesc:->'		=> _"before %s",
-		'filterdesc:-<'		=> _"after %s",
+		'filterdesc:->ago'	=> _"not more than %s ago",
+		'filterdesc:-<ago'	=> _"not less than %s ago",
+		'filterdesc:->'		=> _"not after %s",
+		'filterdesc:-<'		=> _"not before %s",
 		'filterdesc:-b'		=> _"not between %s and %s",
 		'filterdesc:-bago'	=> _"not between %s ago and %s ago",
 		'filterdesc:h'		=> [ _"the %s most recent",	_"the most recent",	'number'],	#"the %s latest" "the latest" ?
@@ -4343,7 +4343,7 @@ sub _smartstring_date_moreless
 	{	$pat= ::dates_to_timestamps($pat, ($op eq '>' || $op eq '<=')? 1:0);
 	}
 	return undef unless $pat;
-	$op= $op eq '<=' ? '->' : $op eq '>=' ? '-<' : $op;
+	$op= $op eq '<=' ? '<' : $op eq '>=' ? '>' : $op;
 	return $op.$suffix.':'.$pat;
 }
 sub _smartstring_number
@@ -4378,8 +4378,8 @@ sub _smartstring_date
 	if ($date1.$date2 ne '')
 	{	#my ($s1,$s2)= split /\s*\.\.\s*|\s*-\s*/,$pat,2;
 		return	(length $date1 && length $date2) ? "b$suffix:$date1 $date2":
-			(length $date1 && !length$date2) ? "-<$suffix:".$date1	:
-			(!length$date1 && length $date2) ? "->$suffix:".$date2	: undef;
+			(length $date1 && !length$date2) ? ">$suffix:".$date1	:
+			(!length$date1 && length $date2) ? "<$suffix:".$date2	: undef;
 	}
 	$op= $op eq '=' ? 'e' : $casesens ? 's' : 'si';
 	#if ($suffix && $op eq 'e') { return undef } # FIXME =5d could be changed into between 4.5d and 5.5d ?
