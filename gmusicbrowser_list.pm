@@ -3867,7 +3867,7 @@ sub UpdateSuggestionMenu
 	else
 	{	$menu->attach_to_widget($self, sub {'empty detaching callback'});
 		$menu->signal_connect(key_press_event => \&SuggestionMenu_key_press_cb);
-		$menu->signal_connect(selection_done  => \&CloseSuggestionMenu);
+		$menu->signal_connect(selection_done  => sub  {$_[0]->get_attach_widget->CloseSuggestionMenu});
 		$menu->popup(undef,undef,sub { my $menu=shift; $x, ($above ? $y-$menu->size_request->height : $y+$h); },undef,0,Gtk2->get_current_event_time);
 	}
 }
