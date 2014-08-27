@@ -1150,6 +1150,7 @@ my %IconsFallbacks=
 (	'gmb-queue0'	   => 'gmb-queue',
 	'gmb-queue-window' => 'gmb-queue',
 	'gmb-random-album' => 'gmb-random',
+	'gmb-view-fullscreen'=>'gtk-fullscreen',
 );
 
 sub LoadIcons
@@ -1252,7 +1253,7 @@ sub LoadIcons
 			warn $@ if $@;
 		}
 		elsif (my $fallback=$IconsFallbacks{$stock_id})
-		{	$icon_set=$icon_factory->lookup($fallback);
+		{	$icon_set= $icon_factory->lookup($fallback) || Gtk2::IconFactory->lookup_default($fallback);
 		}
 		next unless $icon_set;
 		$icon_factory->add($stock_id,$icon_set);
