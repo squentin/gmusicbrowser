@@ -1075,13 +1075,13 @@ our %Options=
 	TAG_keep_id3v2_ver	=> 0,
 	'TAG_write_id3v2.4'	=> 0,
 	TAG_id3v1_encoding	=> 'iso-8859-1',
-	AutoRemoveCurrentSong	=> 1,
+	AutoRemoveCurrentSong	=> 0,
 	LengthCheckMode		=> 'add',
 	CustomKeyBindings	=> {},
 	VolumeStep		=> 10,
 	DateFormat_history	=> ['%c 604800 %A %X 86400 Today %X 60 now'],
 	AlwaysInPlaylist	=> 1,
-	PixCacheSize		=> 5,	# in MB
+	PixCacheSize		=> 60,	# in MB
 
 	SavedSTGroupings=>
 	{	_"None"			=> '',
