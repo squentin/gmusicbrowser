@@ -1,0 +1,453 @@
+#
+# Translators:
+# Elias <silentvoice37@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: gmusicbrowser\n"
+"Report-Msgid-Bugs-To: squentin@free.fr\n"
+"POT-Creation-Date: 2014-08-28 00:24+0200\n"
+"PO-Revision-Date: 2014-08-28 08:32+0000\n"
+"Last-Translator: squentin <squentin@gmail.com>\n"
+"Language-Team: Greek (http://www.transifex.com/projects/p/gmusicbrowser/"
+"language/el/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, perl-brace-format
+msgid " of {length}"
+msgstr "από {length}"
+
+msgid "# songs"
+msgstr "# τραγούδια"
+
+#, perl-format
+msgid "%S by %a"
+msgstr "%S με %a"
+
+#, perl-brace-format
+msgid "'{file}' exists. Overwrite ?"
+msgstr "'{file}'  υπάρχει. Αντικατάσταση;"
+
+#, perl-brace-format
+msgid "(common parent folder : {common})"
+msgstr "(κοινός αρχικός φάκελος : {common})"
+
+msgid "(other)"
+msgstr "(άλλο)"
+
+msgid "(see http://www.last.fm)"
+msgstr "(δες http://www.last.fm)"
+
+msgid ""
+"- When selecting a song, the playlist filter will be reset if the song is "
+"not in it\n"
+"- Skip to another song when removing the current song from the playlist"
+msgstr ""
+"- Όταν επιλέγεις ένα τραγούδι, τo φίλτρο της λίστας αναπαραγωγής θα "
+"επαναφέρεται αν το τραγούδι δεν είναι σε αυτή.\n"
+"- Πηγαίνετε σε άλλο τραγούδι όταν αφαιρείται το τρέχων τραγούδι από τη λίστα "
+"αναπαραγωγής "
+
+msgid "0 chance"
+msgstr "0 πιθανότητα"
+
+msgid "0 means 'show all'"
+msgstr "0 σημαίνει 'δείξε τα όλα'"
+
+#, perl-brace-format
+msgid "1 chance in {probability}"
+msgstr "1 πιθανότητα στις {probability}"
+
+msgid "3 Filter panes"
+msgstr "3 στήλες φίλτρων"
+
+msgid "32x32 PNG file icon"
+msgstr "32x32 PNG εικονίδιο"
+
+msgid "50 Last Added"
+msgstr "50 προσθέμενα τελευταία  "
+
+msgid "50 Last Played"
+msgstr "50 παιγμένα τελευταία  "
+
+msgid "50 Most Played"
+msgstr "50 περισσότερο παιγμένα"
+
+msgid "<Unknown>"
+msgstr "<Άγνωστο>"
+
+#, perl-format
+msgid ""
+"<b>%t</b>\n"
+"<small><small>by</small> %a\n"
+"<small>from</small> %l</small>"
+msgstr ""
+"<b>%t</b>\n"
+"<small><small>από</small> %a\n"
+"<small>από</small> %l</small>"
+
+#, perl-format
+msgid "<i>by</i> %a\\n<i>from</i> %l"
+msgstr "<i>από</i> %a\\n<i>από</i> %l"
+
+msgid "Abort"
+msgstr "Διακοπή"
+
+msgid "Abort ReplayGain analysis"
+msgstr "Διακοπή ReplayGain ανάλυσης "
+
+msgid "Abort mass-tagging"
+msgstr "Διακοπή πολλαπλών ετικετών"
+
+msgid "About"
+msgstr "Σχετικά"
+
+#, perl-brace-format
+msgid ""
+"About to delete {files}\n"
+"Are you sure ?"
+msgstr ""
+"Θα διαγράψετε τα {files}\n"
+"Είστε σίγουροι;"
+
+msgid "About to turn off the computer in :"
+msgstr "Ο υπολογιστής θα κλείσει σε περίπου:"
+
+msgid "Actions are not supported by current notification daemon"
+msgstr "Οι ενέργειες δεν υποστηρίζονται από τον παρών daemon ειδοποιήσεων "
+
+msgid "Add"
+msgstr "Προσθέστε"
+
+msgid "Add a button to rip a CD"
+msgstr "Προσθέστε ένα κουμπί για να αντιγράψετε ένα CD"
+
+msgid "Add a fullscreen button"
+msgstr "Προσθέστε ένα κουμπί για πλήρη οθόνη"
+
+msgid "Add a fullscreen button to layouts that can accept extra buttons"
+msgstr ""
+"Προσθέστε ένα κουμπί για πλήρη οθόνη σε διατάξεις που μπορούν να δεχθούν "
+"επιπλέον κουμπιά"
+
+msgid "Add a group"
+msgstr "Προσθέστε group"
+
+msgid "Add a label to the current song"
+msgstr "Προσθέστε label στο τρέχων τραγούδι"
+
+msgid "Add a list of files/folders to the playlist"
+msgstr "Προσθέστε μια λίστα αρχείων/φακέλων στην λίστα αναπαραγωγής"
+
+msgid "Add a radio"
+msgstr "Προσθέστε ράδιο"
+
+msgid "Add files or folders"
+msgstr "Προσθέστε αρχεία ή φακέλους"
+
+msgid "Add files/folders to library"
+msgstr "Προσθέστε αρχεία/φακέλους στην βιβλιοθήκη"
+
+msgid "Add folder"
+msgstr "Προσθέστε φάκελο"
+
+msgid "Add label"
+msgstr "Προσθέστε label"
+
+msgid "Add multiple condition"
+msgstr "Προσθέστε πολλαπλή κατάσταση"
+
+msgid "Add new label"
+msgstr "Προσθέστε νέο label"
+
+msgid "Add new radio"
+msgstr "Προσθέστε νέο ράδιο"
+
+msgid "Add rule : "
+msgstr "Προσθέστε κανόνα :"
+
+msgid "Add shorcut key"
+msgstr "Προσθέστε συντόμευση πληκρολογίου"
+
+msgid "Add tab"
+msgstr "Προσθέστε tab"
+
+msgid "Add to list"
+msgstr "Προσθέστε στην λίστα"
+
+msgid "Added"
+msgstr "Προστέθηκε"
+
+msgid "Added Today"
+msgstr "Προστέθηκε Σήμερα"
+
+msgid "Adding a radio"
+msgstr "Προσθέση ράδιου"
+
+msgid ""
+"Adds a menu entry to artist/album context menu, allowing to search the "
+"picture/cover in google and save it."
+msgstr ""
+"Προσθέτει μια καταχώρηση μενού στο καλλιτέχνης/άλμπουμ μενού, επιτρέποντας "
+"την αναζήτηση εικόνας/εξώφυλλου στο google και την αποθήκευσή του "
+
+msgid "Adds labels to the current song"
+msgstr "Προσθέτει label στο τρέχων τραγούδι"
+
+msgid "Adds menu entries to song contextual menu"
+msgstr "Προσθέτει καταχωρήσεις μενού στο μενού τραγουδιού"
+
+msgid "Advanced Search ..."
+msgstr "Προχωρημένη Αναζήτηση"
+
+msgid "Advanced Tag Editing"
+msgstr "Προχωρημένη επεξεργασία ετικέτας"
+
+msgid "Album"
+msgstr "Άλμπουμ"
+
+msgid "Album and artist"
+msgstr "Άλμπουμ και καλλιτέχνης"
+
+msgid "Album and artist on the left side"
+msgstr "Άλμπουμ και καλλιτέχνης στην αριστερή μεριά"
+
+msgid "Album artist"
+msgstr "Άλμπουμ καλλιτέχνης"
+
+msgid "Album artist or artist"
+msgstr "Άλμπουμ καλλιτέχνης ή καλλιτέχνης"
+
+msgid "Album gain"
+msgstr "Άλμπουμ κέρδος"
+
+msgid "Album mode"
+msgstr "Λειτουργία άλμπουμ"
+
+msgid "Album peak"
+msgstr "Κορυφή άλμπουμ"
+
+msgid "Album picture"
+msgstr "Εικόνα άλμπουμ"
+
+msgid "Album picture & info"
+msgstr "Εικόνα άλμπουμ και πληροφορίες"
+
+msgid "Album shuffle"
+msgstr "Τυχαία αναπαραγωγή άλμπουμ"
+
+msgid "Album with picture"
+msgstr "Άλμπουμ με εικόνα"
+
+msgid "Album year(s)"
+msgstr "Έτος άλμπουμ"
+
+msgid "All"
+msgstr "Όλα"
+
+msgid "All Songs"
+msgstr "Όλα τα τραγούδια"
+
+msgid "All albums"
+msgstr "Όλα τα άλμπουμ"
+
+msgid "All artists"
+msgstr "Όλοι οι καλλιτέχνες"
+
+msgid "All files"
+msgstr "Όλα τα αρχεία"
+
+msgid "All genres"
+msgstr "Όλα τα έιδη"
+
+msgid "All labels"
+msgstr "Όλα τα labels"
+
+msgid "All moods"
+msgstr "Όλες οι διαθέσεις "
+
+msgid "All of :"
+msgstr "Όλα από :"
+
+msgid "All songs"
+msgstr "Όλα τα τραγούδια"
+
+msgid "Allow for scheduling fade-out and stop"
+msgstr "Άδεια για κανόνισμα σβησίματος και παύσης "
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
+msgstr ""
+"Επιτρέπει τον έλεγχο του gmusicbrowser μέσω DBus χρησιμοποιώντας το MPRIS "
+"v1.0 standard"
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v2.0 standard"
+msgstr ""
+"Επιτρέπει τον έλεγχο του gmusicbrowser μέσω DBus χρησιμοποιώντας το MPRIS "
+"v2.0 standard"
+
+msgid "Amount of volume changed by the mouse wheel"
+msgstr "Ποσό ήχου που αλλάζει από τη ροδέλα ποντικιού"
+
+msgid "Any of :"
+msgstr "Οποιοδήποτε από:"
+
+msgid "Append"
+msgstr "Προσθήκη"
+
+msgid "Append (only if not already present)"
+msgstr "Προσθήκη (μόνο αν δεν είναι ήδη παρών)"
+
+msgid "Append to playlist"
+msgstr "Προσθήκη στη λίστα αναπαραγωγής"
+
+msgid "Application"
+msgstr "Εφαρμοφή"
+
+#, perl-brace-format
+msgid "Are you sure you want to delete the '{label}' label ?"
+msgstr "Είστε σίγουρος ότι θέλετε να διαγράψετε το '{label}' label ;"
+
+msgid "Artist"
+msgstr "Καλλιτέχνης"
+
+msgid "Artist & album"
+msgstr "Καλλιτέχνης & άλμπουμ"
+
+msgid "Artist Biography"
+msgstr "Βιογραφία καλλιτέχνη"
+
+msgid "Artist URL"
+msgstr "Σύνδεσμος καλλιτέχνη"
+
+msgid "Artist picture"
+msgstr "Εικόνα καλλιτέχνη"
+
+msgid "Artist,Album,Disc,Track"
+msgstr "Καλλιτέχνης, Άλμπουμ, Δίσκος, Κομμάτι"
+
+msgid "Artist,Date,Album,Disc,Track"
+msgstr "Καλλιτέχνης, Ημερομηνία, Άλμπουμ, Δίσκος, Κομμάτι"
+
+msgid "Artistinfo"
+msgstr "Artistinfo"
+
+msgid "Artistinfo plugin"
+msgstr "Artistinfo plugin"
+
+msgid "Artists"
+msgstr "Καλλιτέχνες "
+
+msgid "Ascending order"
+msgstr "Αύξουσα σειρά"
+
+msgid "Ask confirmation only if file already exists"
+msgstr "Ζήτηση επιβεβαίωσης μόνο αν το αρχείο υπάρχει"
+
+msgid "Audio"
+msgstr "Ήχος"
+
+msgid "Audio properties"
+msgstr "Ιδιότητες ήχου"
+
+msgid "Author"
+msgstr "Συγγραφέας"
+
+msgid "Auto fill based on filenames ..."
+msgstr "Αυτόματη συμπλήρωση βασισμένη στα ονόματα αρχείων ..."
+
+msgid "Auto fill only blank fields"
+msgstr "Αυτόματη συμπλήρωση μόνο στα κενά πεδία"
+
+msgid "Auto fill up to"
+msgstr "Αυτόματη συμπλήρωση μέχρι"
+
+msgid "Auto filter"
+msgstr "Αυτόματο φίλτρο"
+
+msgid "Auto-fill queue"
+msgstr "Αυτόματη συμπλήρωση λίστας αναμονής"
+
+msgid "Auto-increment track numbers"
+msgstr "Αυτόματη συμπλήρωση αριθμού κομματιών"
+
+msgid "Auto-save positive finds"
+msgstr "Αυτόματη αποθήκευση ευρημάτων"
+
+msgid "Auto-scroll"
+msgstr "Αυτόματη κύλιση"
+
+msgid "Auto-select Pictures"
+msgstr "Αυτόματη επιλογή Εικόνων "
+
+msgid "Automatically remove current song if not found"
+msgstr "Αυτόματη αφαίρεση τρέχοντος τραγουδιού αν δεν βρεθεί"
+
+msgid "Autosave"
+msgstr "Αυτόματη αποθήκευση"
+
+msgid "Autosave plugin"
+msgstr "Πρόσθετο αυτόματης συμπλήρωσης"
+
+msgid "Available"
+msgstr "Διαθέσιμο"
+
+msgid "Average rating:"
+msgstr "Μέσος όρος βαθμολογίας:"
+
+msgid "BPM"
+msgstr "BPM"
+
+msgid "Base Folder :"
+msgstr "Φάκελος βάσης :"
+
+msgid "Basic fields"
+msgstr "Βασικά πεδία"
+
+msgid "Begin with"
+msgstr "Αρχίζει με"
+
+msgid "Below"
+msgstr "Κάτω"
+
+msgid "Bitrate"
+msgstr "Bitrate"
+
+msgid "Body :"
+msgstr "Κυρίως:"
+
+msgid "Body text is not supported by current notification daemon"
+msgstr "Κυρίως κείμενο δεν υποστηρίζεται από το παρών daemon ειδοποιήσεων "
+
+msgid "Browser"
+msgstr "Περιηγητής"
+
+msgid "Browser window layout :"
+msgstr "Διάταξη παραθύρου περιηγητή"
+
+msgid "Browser with SongTree"
+msgstr "Περιηγητής με SongTree"
+
+msgid "Buttons"
+msgstr "Κουμπιά"
+
+msgid "Buttons, Song & Cover"
+msgstr "Κουμπιά, Κομμάτι & Εξώφυλλο"
+
+msgid "Can be relative by using + or -"
+msgstr "Μπορεί να είναι σχετικό χρησιμοποιώντας + ή -"
+
+msgid "Can't change the volume in non-gstreamer iceserver mode"
+msgstr "Δεν γίνεται να αλλάξει η ένταση σε μη gstreamer iceserver mode"
+
+msgid ""
+"Can't change the volume. Needs amixer (packaged in alsa-utils) to change "
+"volume when using this audio backend."
+msgstr ""
+"Δεν γίνεται να αλλάξει η ένταση. Χρειάζεται amixer (βρίσκεται στα alsa-"
+"utils) για να αλλάξει η ένταση όταν χρησιμοποιείται αύτο το audio"
+
+msgid "Can't read file or invalid file"
+msgstr "Δεν μπορεί να διαβαστεί το αρχείο ή άκυρο αρχείο"
