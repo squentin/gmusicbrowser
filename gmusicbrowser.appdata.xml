@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2014 Quentin Sculo  <squentin@gmusicbrowser.org> -->
+<application>
+ <id type="desktop">gmusicbrowser.desktop</id>
+ <metadata_license>CC0-1.0</metadata_license>
+ <project_license>GPL-3.0</project_license>
+ <name>gmusicbrowser</name>
+ <summary>Jukebox for large collection of music</summary>
+ <description>
+  <p>
+   Very customizable library-based music player designed for huge collections of music (tens of thousand files). With lots of handy features to navigate and use your collection, like album/artist lock, menus to choose songs from album/album from artist, enqueue songs with middle click.
+  </p>
+  <p>Some of the main features:</p>
+  <ul>
+   <li>powerful search (can search any field using regular expression or fuzzy search)</li>
+   <li>use ratings and labels to organize your music</li>
+   <li>weighted random modes (eg. to pick songs based on when they were added and/or played, ...)</li>
+   <li>plugins to visualize lyrics, find cover pictures, retrieve artist or album info, last.fm, ...</li>
+   <li>browse through pictures and pdf in the album's folder</li>
+   <li>replaygain support to normalize the volume across tracks</li>
+  </ul>
+  <p> The windows use a layout system that allows users to completely change the interface. You can use pre-defined layouts or create your own using text files that allows you to pick and choose the widgets you want, their options and their placement. These layouts can be used not only for the main window, but also for extra windows, the tray pop-up, or a desktop widget.
+  </p>
+ </description>
+ <screenshots>
+  <screenshot type="default" width="1280" height="720">http://gmusicbrowser.org/screenshots/appdata/screenshot-1.png</screenshot>
+  <screenshot width="1344" height="756">http://gmusicbrowser.org/screenshots/appdata/screenshot-2.png</screenshot>
+  <screenshot width="1024" height="576">http://gmusicbrowser.org/screenshots/appdata/screenshot-3.png</screenshot>
+  <screenshot width="1440" height="810">http://gmusicbrowser.org/screenshots/appdata/screenshot-4.png</screenshot>
+  <screenshot width="442" height="150">http://gmusicbrowser.org/screenshots/appdata/screenshot-5.png</screenshot>
+ </screenshots>
+ <url type="homepage">http://gmusicbrowser.org</url>
+ <updatecontact>squentin@gmusicbrowser.org</updatecontact>
+</application>
