@@ -1,3 +1,47 @@
+v1.1.13
+add lots of features to PictureBrowser
+add Stop/Quit/Turnoff-after-this-song feature
+various improvements to the fields tab in the preferences dialog
+better handling of encoding when importing playlist files
+improve fullscreen behavior
+filesystem tab: fixes and improve its responsiveness
+make right-click on album widget popup the album context menu
+add basic support for SV8 mpc files
+add support for reading pdf pages as images (requires poppler-utils) (mostly for PictureBrowser)
+add RunShellCmd to run a command by the shell
+add RunSysCmdOnSelected and RunShellCmdOnSelected to run commands on selected songs
+
+layout widgets:
+add noheader option to the Total widget
+add ShuffleList and EmptyList buttons
+add a shuffle button to EditListButtons
+
+plugins:
+add App Indicator plugin
+cover finder plugin: update google-image results parsing
+desktop widget plugin : add monitor setting
+gnome_mmkeys: add support for MATE desktop
+
+fixes:
+fix error when trying to scan album replaygain info
+fix fields sometimes not shown in the song_info tab
+fix searching multi-dates fields with <= or >=
+fix occasional crash when using the suggestion menu of SimpleSearch
+fix RunSysCmd problems with non-utf8 file names
+fix cover-art from embedded pictures ignored in mpris2 plugin
+fix ShowHide not working in unity
+fix playlist's position not always updated when adding songs
+fix songs dragged from a filesystem tab not sorted
+fix mosaic tooltip not positioned on the right monitor
+fix wrong unfocused selected row color with SongTree with some themes
+fix restoring window position on multiple-monitor
+fix occasional loss of cover picture for album with compilation flag
+replace warning by nice message when finding an orphaned fifo
+set name for field fullfilename_raw (used for %f variable)
+
+translation updates: German, Portuguese (Brazilian), Russian, Finnish
+new translation: Greek
+
 v1.1.12
 fix not being able to remove filters from lists in playlist mode
 fix performances problems with autoupdated lists

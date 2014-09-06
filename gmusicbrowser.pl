@@ -78,8 +78,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1012',
- VERSIONSTRING => '1.1.12',
+ VERSION => '1.1013',
+ VERSIONSTRING => '1.1.13',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 
