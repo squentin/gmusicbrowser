@@ -6711,16 +6711,20 @@ sub PrefLibrary
 	my $rmdbut=NewIconButton('gtk-remove',_"Remove");
 
 	my $selection=$treeview->get_selection;
+	$selection->set_mode('multiple');
 	$selection->signal_connect( changed => sub
 		{	my $sel=$_[0]->count_selected_rows;
 			$rmdbut->set_sensitive($sel);
 		});
 	$rmdbut->set_sensitive(FALSE);
 	$rmdbut->signal_connect( clicked => sub
-	{	my $iter=$selection->get_selected;
-		return unless defined $iter;
-		my $s= $store->get($iter,0);
-		@{$Options{LibraryPath}}=grep $_ ne $s, @{$Options{LibraryPath}};
+	{	my @rows= $selection->get_selected_rows;
+		for my $path (@rows)
+		{	my $iter=$store->get_iter($path);
+			next unless $iter;
+			my $s= $store->get($iter,0);
+			@{$Options{LibraryPath}}=grep $_ ne $s, @{$Options{LibraryPath}};
+		}
 		HasChanged(options=>'LibraryPath');
 	});
 
