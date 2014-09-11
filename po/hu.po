@@ -4168,28 +4168,16 @@ msgstr "Ennek a fájlnak a lejátszásához {command}-ra van szükség."
 msgid "{folder} already exists"
 msgstr ""
 
-#: gmusicbrowser.pl:2569
-msgid "{hours} hours {min} min {sec} s ({size} M)"
-msgstr "{hours} óra {min} perc {sec} másodperc ({size} MB)"
+msgid "{hours} hours {min} min {sec} s"
+msgstr "{hours} óra {min} perc {sec} másodperc"
 
-#: gmusicbrowser.pl:2573 gmusicbrowser.pl:2583
-msgid "{hours}h {min}m {sec}s ({size}M)"
-msgstr "{hours}ó {min}p {sec}mp ({size} MB)"
+msgid "{hours}h {min}m {sec}s"
+msgstr "{hours}ó {min}p {sec}mp"
 
-#: gmusicbrowser.pl:2579 gmusicbrowser_songs.pm:1657
-msgid "{hours}h{min}m{sec}s"
-msgstr "{hours}ó:{min}p:{sec}mp"
+msgid "{min} min {sec} s"
+msgstr "{min}p:{sec}mp"
 
-#: gmusicbrowser.pl:2569
-msgid "{min} min {sec} s ({size} M)"
-msgstr "{min}p:{sec}mp ({size} MB)"
-
-#: gmusicbrowser.pl:2573 gmusicbrowser.pl:2583
-msgid "{min}m {sec}s ({size}M)"
-msgstr "{min}p:{sec}mp ({size} MB)"
-
-#: gmusicbrowser.pl:2579 gmusicbrowser_songs.pm:1657
-msgid "{min}m{sec}s"
+msgid "{min}m {sec}s"
 msgstr "{min}p:{sec}mp"
 
 #: gmusicbrowser.pl:5060

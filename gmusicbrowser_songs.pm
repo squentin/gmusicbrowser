@@ -527,14 +527,14 @@ our %timespan_menu=
 	},
 	'length.div' => { gid_to_display	=> 'my $v=#GID# * #ARG0#; sprintf("%d:%02d", $v/60, $v%60);', },
 	size	=>
-	{	display	=> 'sprintf("%.1fM", #_#/1000/1000)',
+	{	display	=> '(sprintf("%.1f", #_#/'.::KB()*::KB().').q( '._"MB".'))',
 		'filter_prep:>'	=> \&::ConvertSize,
 		'filter_prep:<'	=> \&::ConvertSize,
 		'filter_prep:b'	=> sub {sort {$a <=> $b} map ::ConvertSize($_), split / /,$_[0],2},
 		parent	=> 'integer',
 		'filterpat:value' => [ unit=> \%::SIZEUNITS, default_unit=> 'm', default_value=>1, ],
 	},
-	'size.div'   => { gid_to_display	=> 'sprintf("%dM", #GID# * #ARG0#/1000/1000);', },
+	'size.div'   => { gid_to_display	=> 'sprintf("%dM", #GID# * #ARG0#/'.::KB()*::KB().');', },
 	rating	=>
 	{	parent	=> 'integer',
 		bits	=> 8,
@@ -822,7 +822,7 @@ our %timespan_menu=
  size	=>
  {	name => _"Size",	width => 80,	flags => 'fgarscp_',		#32bits => 4G max
 	type => 'size',
-	FilterList => {type=>'div.1000000',},
+	FilterList => {type=>'div.'.::KB()*::KB(),},
 	category=>'file',
  },
  title	=>
@@ -1205,13 +1205,15 @@ our %timespan_menu=
 	category=>'audio',
  },
  bitrate=>
- {	name	=> _"Bitrate",		width => 70,	flags => 'fgarscp_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
+ {	name	=> _"Bitrate",		width => 90,	flags => 'fgarscp_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
+	display	=> '::replace_fnumber("%d kbps",#_#)',
 	FilterList => {type=>'div.32',},
 	'filterpat:value' => [ display => "%d kbps", unit => 'kbps', default_value=>192 ],
 	category=>'audio',
  },
  samprate=>
- {	name	=> _"Sampling Rate",	width => 60,	flags => 'fgarscp',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate',
+ {	name	=> _"Sampling Rate",	width => 90,	flags => 'fgarscp',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate',
+	display	=> '::replace_fnumber("%d Hz",#_#)',
 	FilterList => {},
 	'filterdesc:e:44100' => _"is 44.1kHz",
 	'filterpat:value' => [ display => "%d Hz", unit => 'Hz', step=> 100, default_value=>44100 ],
@@ -3115,7 +3117,7 @@ our %ReplaceFields=
 	L	=>	sub { ::CalcListLength( Get('id:list',$_[0],$_[1]),'length:sum' ); }, #FIXME is CalcListLength needed ?
 	y	=>	sub { Get('year:range',$_[0],$_[1]); },
 	Y	=>	sub { my $y=Get('year:range',$_[0],$_[1]); return $y? " ($y)" : '' },
-	s	=>	sub { my $l=Get('id:list',$_[0],$_[1])||[]; ::__('%d song','%d songs',scalar @$l) },
+	s	=>	sub { my $l=Get('id:list',$_[0],$_[1])||[]; ::__n('%d song','%d songs',scalar @$l) },
 	x	=>	sub { my $nb=@{GetXRef($_[0],$_[1])}; return $_[0] ne 'album' ? ::__("%d Album","%d Albums",$nb) : ::__("%d Artist","%d Artists",$nb);  },
 	X	=>	sub { my $nb=@{GetXRef($_[0],$_[1])}; return $_[0] ne 'album' ? ::__("%d Album","%d Albums",$nb) : $nb>1 ? ::__("%d Artist","%d Artists",$nb) : '';  },
 	b	=>	sub {	if ($_[0] ne 'album') { my $nb=@{GetXRef($_[0],$_[1])}; return ::__("%d Album","%d Albums",$nb); }
@@ -5373,7 +5375,7 @@ sub MakeExample
 	local $_=$ID;	#ID needs to be in $_ for eval
 	my ($v,$s)=eval $func;
 	return 'error' if $@;
-	return sprintf("$round $unit -> %.2f",$v,$s);
+	return sprintf("%s -> %.2f",::format_number(sprintf "$round $unit",$v),$s);
 }
 
 

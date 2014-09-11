@@ -170,7 +170,7 @@ sub Submit
 		{	$Serrors=0;
 			if ($i)
 			{	Log( _("Submit OK") . ' ('.
-				      ($i>1 ?	  ::__("%d song","%d songs",$i)
+				      ($i>1 ?	  ::__n("%d song","%d songs",$i)
 						: ::__x( _"{song} by {artist}", song=> $ToSubmit[0][1], artist => $ToSubmit[0][0]) ) . ')' );
 				splice @ToSubmit,0,$i;
 				::IdleDo("9_".__PACKAGE__,10000,\&Save) if $unsent_saved;

@@ -4732,28 +4732,20 @@ msgid "{folder} already exists"
 msgstr "{folder} existe déjà"
 
 #, perl-brace-format
-msgid "{hours} hours {min} min {sec} s ({size} M)"
-msgstr "{hours} heures {min} min {sec} sec ({size} M)"
+msgid "{hours} hours {min} min {sec} s"
+msgstr "{hours} heures {min} min {sec} sec"
 
 #, perl-brace-format
-msgid "{hours}h {min}m {sec}s ({size}M)"
-msgstr "{hours}h {min}m {sec}s ({size}M)"
+msgid "{hours}h {min}m {sec}s"
+msgstr "{hours}h {min}m {sec}s"
 
 #, perl-brace-format
-msgid "{hours}h{min}m{sec}s"
-msgstr "{hours}h{min}m{sec}s"
+msgid "{min} min {sec} s"
+msgstr "{min} min {sec} sec"
 
 #, perl-brace-format
-msgid "{min} min {sec} s ({size} M)"
-msgstr "{min} min {sec} sec ({size} M)"
-
-#, perl-brace-format
-msgid "{min}m {sec}s ({size}M)"
-msgstr "{min}m {sec}s ({size}M)"
-
-#, perl-brace-format
-msgid "{min}m{sec}s"
-msgstr "{min}m{sec}s"
+msgid "{min}m {sec}s"
+msgstr "{min}m {sec}s"
 
 #, perl-brace-format
 msgid "{outputname} output settings"

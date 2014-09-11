@@ -41,8 +41,8 @@ while (my $file=shift @files)
 		$msgid{$ctx}{$str}   .= " $file:$.";
 		$comments{$ctx}{$str}.= $com;
 	}
-	while (m/\b(__|__p) \(\s* ("[^"]+"|'[^']+') \s*,\s* ("[^"]+"|'[^']+') \s*,\s* (?:,\s* ("[^"]+"|'[^']+') )?/gx)
-	{	my ($ctx,$str1,$str2)=remove_quotes( $1 eq '__p' ? ($2,$3,$4) : ('',$2,$3) );
+	while (m/\b(__|__p|__n|__np) \(\s* ("[^"]+"|'[^']+') \s*,\s* ("[^"]+"|'[^']+') \s*,\s* (?:,\s* ("[^"]+"|'[^']+') )?/gx)
+	{	my ($ctx,$str1,$str2)=remove_quotes( ($1 eq '__p' || $1 eq '__np') ? ($2,$3,$4) : ('',$2,$3) );
 		$msgid_p{$ctx}{$str1}{$str2}  .= " $file:$.";
 		$comments_p{$ctx}{$str1}{$str2}.= $com;
 	}

@@ -242,7 +242,7 @@ sub list_SongArray_changed
 sub list_Update
 {	my $self=shift;
 	my $array=::GetSongArray($self) || return;
-	return _("Listed : "), $array,  ::__('%d song','%d songs',scalar@$array);
+	return _("Listed : "), $array,  ::__n('%d song','%d songs',scalar@$array);
 }
 
 ### selected functions
@@ -255,7 +255,7 @@ sub selected_Update
 	my $songlist=::GetSonglist($self);
 	return unless $songlist;
 	my @list=$songlist->GetSelectedIDs;
-	return _('Selected : '), \@list,  ::__('%d song selected','%d songs selected',scalar@list);
+	return _('Selected : '), \@list,  ::__n('%d song selected','%d songs selected',scalar@list);
 }
 
 ### library functions
@@ -265,7 +265,7 @@ sub library_Set
 	::Watch($self, SongsRemoved	=>\&QueueUpdateSlow);
 }
 sub library_Update
-{	my $tip= ::__('%d song in the library','%d songs in the library',scalar@$::Library);
+{	my $tip= ::__n('%d song in the library','%d songs in the library',scalar@$::Library);
 	return _('Library : '), $::Library, $tip;
 }
 
@@ -1705,7 +1705,7 @@ our @cMenu=
 		test => sub {my $fp=$_[0]{filterpane}; $fp->{nb}>1 && $_[0]{filter};}
 	},
 	#songs submenu :
-	{	label	=> sub { my $IDs=$_[0]{filter}->filter; ::__("%d Song","%d Songs",scalar @$IDs); },
+	{	label	=> sub { my $IDs=$_[0]{filter}->filter; ::__n("%d song","%d songs",scalar @$IDs); },
 		submenu => sub { ::BuildMenuOptional(\@::SongCMenu, { mode => 'F', IDs=>$_[0]{filter}->filter }); },
 		isdefined => 'filter',
 	},

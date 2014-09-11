@@ -5074,28 +5074,20 @@ msgid "{folder} already exists"
 msgstr "{folder}는 이미 존재합니다"
 
 #, perl-brace-format
-msgid "{hours} hours {min} min {sec} s ({size} M)"
-msgstr "{hours} 시간 {min} 분 {sec} 초 ({size} M)"
+msgid "{hours} hours {min} min {sec} s"
+msgstr "{hours} 시간 {min} 분 {sec} 초"
 
 #, perl-brace-format
-msgid "{hours}h {min}m {sec}s ({size}M)"
-msgstr "{hours}시 {min}분 {sec}초 ({size}M)"
+msgid "{hours}h {min}m {sec}s"
+msgstr "{hours}시 {min}분 {sec}초"
 
 #, perl-brace-format
-msgid "{hours}h{min}m{sec}s"
-msgstr "{hours}시{min}분{sec}초"
+msgid "{min} min {sec} s"
+msgstr "{min} 분 {sec} 초"
 
 #, perl-brace-format
-msgid "{min} min {sec} s ({size} M)"
-msgstr "{min} 분 {sec} 초 ({size} M)"
-
-#, perl-brace-format
-msgid "{min}m {sec}s ({size}M)"
-msgstr "{min}분 {sec}초 ({size}M)"
-
-#, perl-brace-format
-msgid "{min}m{sec}s"
-msgstr "{min}분{sec}초"
+msgid "{min}m {sec}s"
+msgstr "{min}분 {sec}초"
 
 #, perl-brace-format
 msgid "{outputname} output settings"

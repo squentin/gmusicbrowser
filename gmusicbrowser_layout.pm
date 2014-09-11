@@ -242,11 +242,11 @@ our %Widgets=
 	Pos =>
 	{	class	=> 'Layout::Label',
 		group	=> 'Play',
-		initsize=> ::__("%d song in queue","%d songs in queue",99999), #longest string that will be displayed
+		initsize=> ::__n("%d song in queue","%d songs in queue",99999), #longest string that will be displayed
 		click1	=> sub { ::ChooseSongs([::GetNeighbourSongs(5)]) unless $::RandomMode || @$::Queue; },
 		update	=> sub  { my $t=(@$::ListPlay==0)	?	'':
-					 @$::Queue		?	::__("%d song in queue","%d songs in queue", scalar @$::Queue):
-					!defined $::Position	?	::__("%d song","%d songs",scalar @$::ListPlay):
+					 @$::Queue		?	::__n("%d song in queue","%d songs in queue", scalar @$::Queue):
+					!defined $::Position	?	::__n("%d song","%d songs",scalar @$::ListPlay):
 									($::Position+1).'/'.@$::ListPlay;
 				  $_[0]->set_markup_with_format( '<small>%s</small>', $t );
 				},
@@ -4213,7 +4213,7 @@ sub new
 	$column_s->set_cell_data_func($renderer_s, sub
 		{	my (undef,$cell,$store,$iter)=@_;
 			my $depth=$store->iter_depth($iter);
-			my $size= $depth ? '' : ::format_integer($store->get($iter,3));
+			my $size= $depth ? '' : ::format_number($store->get($iter,3));
 			$cell->set(text=>$size);
 		});
 	$treeview2->append_column($column_s);
@@ -4332,7 +4332,7 @@ sub delete_selected
 	s/:\w+$// for @files;
 	@files= ::uniq(@files);
 	my $text= @files==1 ?	::filename_to_utf8displayname(::basename($files[0])) :
-				__("%d file","%d files",scalar @files);
+				__n("%d file","%d files",scalar @files);
 	my $dialog = Gtk2::MessageDialog->new
 		( $self->get_toplevel,
 		  'modal',
@@ -4575,7 +4575,7 @@ sub update_file
 	{	my $realfile=$file;
 		$info{page}=$1 if $realfile=~s/:(\w+)$//;
 		$info{filename}= ::filename_to_utf8displayname($realfile);
-		$info{size}= ::format_integer((stat $realfile)[7]);
+		$info{size}= ::format_number((stat $realfile)[7]);
 	}
 	$self->{view}->set_pixbuf($pixbuf,%info);
 	$self->{loaded_file}= $file;

@@ -88,13 +88,17 @@ use constant
  DRAG_FILTER	=> 6, DRAG_MARKUP	=> 7,
 
  PI    => 4 * atan2(1, 1),	#needed for cairo rotation functions
+ KB => 1000, #1024  # bytes in a KB
 };
 
 sub _ ($) {$_[0]}	#dummy translation functions
 sub _p ($$) {_($_[1])}
 sub __ { sprintf( ($_[2]>1 ? $_[1] : $_[0]), $_[2]); }
 sub __p {shift;&__}
+sub __np {shift;&__n}
+sub __n { replace_fnumber( ($_[2]>1 ? $_[1] : $_[0]), $_[2]); }
 sub __x { my ($s,%h)=@_; $s=~s/{(\w+)}/$h{$1}/g; $s; }
+sub replace_fnumber { my $s=$_[0]; $s=~s/%d/format_number($_[1])/e; $s } #replace %d by the formated number, could use sprintf($_[0],$_[1]) instead but would require changing %d to %s
 BEGIN
 {no warnings 'redefine';
  my $localedir=$DATADIR;
@@ -114,6 +118,7 @@ BEGIN
 		{	$d->dir($localedir);
 			*_=sub ($) { $d->get($_[0]); };
 			*__=sub { sprintf $d->nget(@_),$_[2]; };
+			*__n=sub { replace_fnumber($d->nget(@_),$_[2]); };
 		}
 	}
  }
@@ -126,7 +131,19 @@ BEGIN
 	*_p = \&Locale::Messages::pgettext;
 	*__ =sub { sprintf Locale::Messages::ngettext(@_),$_[2]; };
 	*__p=sub { sprintf Locale::Messages::npgettext(@_),$_[3];};
+	*__n =sub { replace_fnumber( Locale::Messages::ngettext(@_),$_[2] );};
+	*__np=sub { replace_fnumber( Locale::Messages::npgettext(@_),$_[3]);};
  }
+}
+
+my $thousandsep;
+BEGIN { $thousandsep= POSIX::localeconv()->{thousands_sep}; }
+sub format_number
+{	my $d=shift;
+	return $d unless $d>=1000 && $d=~s/^(-?\d+)//; # $d now contains the fractional part
+	my $i=$1; # integer part
+	$i =~ s/(?<=\d)(?=(?:\d\d\d)+\b)/$thousandsep/g;
+	return $i.$d;
 }
 
 our $QSLASH;	#quoted SLASH for use in regex
@@ -482,7 +499,7 @@ our @DRAGTYPES;
 		{ DRAG_FILE,	sub { Songs::Map('uri',\@_); },
 		  DRAG_ARTIST,	sub { @{Songs::UniqList('artist',\@_,1)}; },
 		  DRAG_ALBUM,	sub { @{Songs::UniqList('album',\@_,1)}; },
-		  DRAG_USTRING,	sub { (@_==1)? Songs::Display($_[0],'title') : __("%d song","%d songs",scalar@_) },
+		  DRAG_USTRING,	sub { (@_==1)? Songs::Display($_[0],'title') : __n("%d song","%d songs",scalar@_) },
 		  #DRAG_STRING,	undef, #will use DRAG_USTRING
 		  DRAG_STRING,	sub { Songs::Map('uri',\@_); },
 		  DRAG_FILTER,	sub {Filter->newadd(FALSE,map 'title:~:'.Songs::Get($_,'title'),@_)->{string}},
@@ -490,7 +507,7 @@ our @DRAGTYPES;
 					my $nba=@{Songs::UniqList2('artist',\@_)};
 			  		my $artists= ($nba==1)? Songs::DisplayEsc($_[0],'artist') : __("%d artist","%d artists",$nba);
 			  		__x(	_("{songs} by {artists}") . "\n<small>{length}</small>",
-						songs => __("%d song","%d songs",scalar@_),
+						songs => __n("%d song","%d songs",scalar@_),
 						artists => $artists,
 						'length' => CalcListLength(\@_,'length')
 					)},
@@ -683,12 +700,6 @@ sub Gtk2::Window::force_present #force bringing the window to the current worksp
 }
 sub IncSuffix	# increment a number suffix from a string
 {	$_[0] =~ s/(?<=\D)(\d*)$/sprintf "%0".length($1)."d",($1||1)+1/e;
-}
-my $thousandsep= POSIX::localeconv()->{thousands_sep};
-sub format_integer
-{	my $n=shift;
-	$n =~ s/(?<=\d)(?=(?:\d\d\d)+\b)/$thousandsep/g;
-	$n;
 }
 sub Ellipsize
 {	my ($string,$max)=@_;
@@ -893,8 +904,8 @@ our %DATEUNITS=
 );
 our %SIZEUNITS=
 (		b => [1,_"bytes"],
-		k => [1000,_"KB"],
-		m => [1000000,_"MB"],
+		k => [KB(),_"KB"],
+		m => [KB()*KB(),_"MB"],
 );
 
 sub strftime_utf8
@@ -3439,27 +3450,28 @@ sub CalcListLength	#if $return, return formated string (0h00m00s)
 {	my ($listref,$return)=@_;
 	my ($size,$sec)=Songs::ListLength($listref);
 	warn 'ListLength: '.scalar @$listref." Songs, $sec sec, $size bytes\n" if $debug;
-	$size=sprintf '%.0f',$size/1024/1024;
+	$size=sprintf '%.0f',$size/KB()/KB();
 	my $m=int($sec/60); $sec=sprintf '%02d',$sec%60;
 	my $h=int($m/60);     $m=sprintf '%02d',$m%60;
 	my $nb=@$listref;
-	my @values=(hours => $h, min =>$m, sec =>$sec, size => $size);
+	my @values=(hours => format_number($h), min =>$m, sec =>$sec, size => format_number($size));
+	my $MB=_"MB";
 	if ($return eq 'long')
-	{	my $format= $h? _"{hours} hours {min} min {sec} s ({size} M)" : _"{min} min {sec} s ({size} M)";
-		return __("%d Song","%d Songs",$nb) .', '. __x($format, @values);
+	{	my $format= $h? _"{hours} hours {min} min {sec} s" : _"{min} min {sec} s";
+		return __n("%d song","%d songs",$nb) .', '. __x($format." ({size} $MB)", @values);
 	}
 	elsif ($return eq 'short')
-	{	my $format= $h? _"{hours}h {min}m {sec}s ({size}M)" : _"{min}m {sec}s ({size}M)";
-		return __("%d Song","%d Songs",$nb) .', '.__x($format, @values);
+	{	my $format= $h? _"{hours}h {min}m {sec}s" : _"{min}m {sec}s";
+		return __n("%d song","%d songs",$nb) .', '.__x($format." ({size}$MB)", @values);
 	}
 	elsif ($return eq 'queue')
 	{	return _"Queue empty" if $nb==0;
-		my $format= $h? _"{hours}h{min}m{sec}s" : _"{min}m{sec}s";
-		return __("%d song in queue","%d songs in queue",$nb) .' ('. __x($format, @values) . ')';
+		my $format= $h? _"{hours}h {min}m {sec}s" : _"{min}m {sec}s";
+		return __n("%d song in queue","%d songs in queue",$nb) .' ('. __x($format, @values) . ')';
 	}
 	else
-	{	my $format= $h? _"{hours}h {min}m {sec}s ({size}M)" : _"{min}m {sec}s ({size}M)";
-		return __x($format, @values);
+	{	my $format= $h? _"{hours}h {min}m {sec}s" : _"{min}m {sec}s";
+		return __x($format." ({size} $MB)", @values);
 	}
 }
 
@@ -4587,8 +4599,8 @@ sub CopyMoveFiles
 	return if !$copy && $CmdLine{ro};
 	my ($sub,$errormsg0,$abortmsg)=  $copy	?	(\&copy,_"Copy failed",_"abort copy")
 						:	(\&move,_"Move failed",_"abort move") ;
-	my $action=($copy) ?	__("Copying file","Copying %d files",scalar@$IDs) :
-				__("Moving file", "Moving %d files", scalar@$IDs) ;
+	my $action=($copy) ?	__n("Copying file","Copying %d files",scalar@$IDs) :
+				__n("Moving file", "Moving %d files", scalar@$IDs) ;
 
 	my $dialog = Gtk2::Dialog->new( $action, $parentwindow, [],
 			'gtk-cancel' => 'none',
@@ -5014,7 +5026,7 @@ sub DeleteFiles
 {	return if $CmdLine{ro};
 	my $IDs=$_[0];
 	return unless @$IDs;
-	my $text=(@$IDs==1)? "'".Songs::Display($IDs->[0],'file')."'" : __("%d file","%d files",scalar @$IDs);
+	my $text=(@$IDs==1)? "'".Songs::Display($IDs->[0],'file')."'" : __n("%d file","%d files",scalar @$IDs);
 	my $dialog = Gtk2::MessageDialog->new
 		( ::get_event_window(),
 		  'modal',
@@ -5395,7 +5407,7 @@ sub SearchSame
 
 sub SongsSubMenuTitle
 {	my $nb=@{ AA::GetIDs($_[0]{field},$_[0]{gid}) };
-	return __("%d Song","%d Songs",$nb);
+	return __n("%d song","%d songs",$nb);
 }
 sub SongsSubMenu
 {	my %args=%{$_[0]};
@@ -5830,8 +5842,8 @@ sub ScanProgress_cb
 {	if (@ToScan || @ToAdd_Files)
 	{	my $total= @ToScan + $ProgressNBFolders;
 		Progress('scan',title	=> _"Scanning",
-				details	=> __("%d song added","%d songs added", $ProgressNBSongs),
-				bartext	=>__("%d folder","%d folders", $ProgressNBFolders),
+				details	=> __n("%d song added","%d songs added", $ProgressNBSongs),
+				bartext	=> __n("%d folder","%d folders", $ProgressNBFolders),
 				current	=> $ProgressNBFolders,
 				end	=>$total,
 				abortcb	=>\&AbortScan,
@@ -6605,7 +6617,7 @@ sub UpdateTags
 	$dialog->vbox->pack_start($_,FALSE,FALSE,4) for $label1, $table, $label2, $label3;
 	$_->set_line_wrap(1) for $label1, $label2, $label3;
 	$dialog->show_all;
-	::set_drag($dialog, dest => [::DRAG_ID,sub { my ($dialog,$type,@IDs)=@_; $IDs=\@IDs; $dialog->{label}->set_text( ::__('%d song','%d songs',scalar @IDs) ); }]);
+	::set_drag($dialog, dest => [::DRAG_ID,sub { my ($dialog,$type,@IDs)=@_; $IDs=\@IDs; $dialog->{label}->set_text( ::__n('%d song','%d songs',scalar @IDs) ); }]);
 
 	$dialog->signal_connect( response => sub
 		{	my ($dialog,$response)=@_;
@@ -6764,8 +6776,8 @@ sub PrefLibrary
 		{	my $listtotal=Filter->new('missing:e:0')->filter_all;
 			my $lib= scalar @$Library;
 			my $excl= scalar(@$listtotal)-$lib;
-			my $s= __("Library size : %d song","Library size : %d songs",$lib);
-			$s.= ' '. __("(%d song excluded)", "(%d songs excluded)",$excl) if $excl;
+			my $s= __n("Library size : %d song","Library size : %d songs",$lib);
+			$s.= ' '. __n("(%d song excluded)", "(%d songs excluded)",$excl) if $excl;
 			return $s;
 
 		} );
@@ -6812,7 +6824,7 @@ sub PrefLibrary_update_checklength_button
 {	my $button=shift;
 	my $l= Filter->new('length_estimated:e:1')->filter;
 	$button->set_sensitive(@$l>0);
-	my $text= @$l ?	__("%d song","%d songs",scalar @$l) :
+	my $text= @$l ?	__n("%d song","%d songs",scalar @$l) :
 			_"no songs needs checking";
 	$button->set_tooltip_text($text);
 	return $button->{timeout}=0;
@@ -6828,7 +6840,7 @@ sub RemoveLabel		#FIXME ? label specific
 			( ::get_event_window(),
 			  [qw/modal destroy-with-parent/],
 			  'warning','ok-cancel',
-			  __("This label is set for %d song.","This label is set for %d songs.",$nb)."\n".
+			  __n("This label is set for %d song.","This label is set for %d songs.",$nb)."\n".
 			  __x(_"Are you sure you want to delete the '{label}' label ?", label => $label)
 			);
 		$dialog->show_all;
@@ -6902,7 +6914,7 @@ sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
 					( $treeview->get_toplevel,
 					  [qw/modal destroy-with-parent/],
 					  'warning','ok-cancel','%s',
-					  __("This label is set for %d song.","This label is set for %d songs.",$nb)."\n".
+					  __n("This label is set for %d song.","This label is set for %d songs.",$nb)."\n".
 					  __x("Are you sure you want to delete the '{label}' label ?", label => $label)
 					);
 				$dialog->show_all;
@@ -8532,7 +8544,7 @@ sub UpdateTip_timeout
 	my $range=sprintf '%.2f - %.2f',$col/NBCOLS,($col+1)/NBCOLS;
 	#my $sum=$histogram->get_ancestor('Gtk2::VBox')->{sum};
 	#my $prob='between '.join ' and ',map $_? '1 chance in '.sprintf('%.0f',$sum/$_) : 'no chance', $col/NBCOLS,($col+1)/NBCOLS;
-	$histogram->set_tooltip_text( "$range : ".::__('%d song','%d songs',$nb) );
+	$histogram->set_tooltip_text( "$range : ".::__n('%d song','%d songs',$nb) );
 	1;
 }
 
@@ -8670,7 +8682,7 @@ sub UpdateID
 	my $prob;
 	if ($s)
 	{ $prob=$self->{sum}/$s;
-	  $prob= ::__x( _"1 chance in {probability}", probability => sprintf($prob>=10? '%.0f' : '%.1f', $prob) );
+	  $prob= ::__x( _"1 chance in {probability}", probability => ::format_number(sprintf($prob>=10? '%.0f' : '%.1f', $prob) ));
 	}
 	else {$prob=_"0 chance"}
 	$self->{example_label}->set_markup_with_format( '<small><i>%s</i></small>', ::__x( _"example (selected song) : {score}  ({chances})", score =>$v, chances => $prob) );
@@ -9179,7 +9191,7 @@ sub drop_file	#drop a file from the cache
 
 sub trim
 {	my @list= sort {$Cache{$a}{lastuse} <=> $Cache{$b}{lastuse}} keys %Cache;
-	my $max= $::Options{PixCacheSize} *1000*1000 *.9;
+	my $max= $::Options{PixCacheSize} *::KB()*::KB() *.9;
 	warn "Trimming cache\n" if $::debug;
 	while ($CacheSize> $max)
 	{	my $key=shift @list;
@@ -9196,7 +9208,7 @@ sub add
 {	my ($key,$ref)=@_;
 	$ref->{lastuse}=time;
 	$CacheSize+= $ref->{size};
-	::IdleDo('9_CachePurge',undef,\&trim) if $CacheSize > $::Options{PixCacheSize}*1000*1000;
+	::IdleDo('9_CachePurge',undef,\&trim) if $CacheSize > $::Options{PixCacheSize}*::KB()*::KB();
 	$Cache{$key}=$ref;
 }
 sub get

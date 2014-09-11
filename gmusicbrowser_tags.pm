@@ -384,7 +384,7 @@ sub new
 			$folder=_"different folders";
 			$folder.= "\n". ::__x(_"(common parent folder : {common})",common=> $displaysub->($common) ) if length($common)>5;
 		}
-		my $text= ::__("%d file in {folder}","%d files in {folder}",scalar@IDs);
+		my $text= ::__n("%d file in {folder}","%d files in {folder}",scalar@IDs);
 		$text= ::__x($text, folder => ::MarkupFormat('<small>%s</small>', $displaysub->($folder) ) );
 		my $labelfile = Gtk2::Label->new;
 		$labelfile->set_markup($text);
