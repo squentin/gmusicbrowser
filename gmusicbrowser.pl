@@ -5959,7 +5959,7 @@ sub AboutDialog
 		'Hungarian : Zsombor',
 		'Spanish : Martintxo, Juanjo & Elega',
 		'German : vlad & staubi',
-		'Polish : tizzilzol team',
+		'Polish : Robert Wojewódzki, tizzilzol team',
 		'Swedish : Olle Sandgren',
 		'Chinese : jk',
 		'Czech : Vašek Kovářík',
