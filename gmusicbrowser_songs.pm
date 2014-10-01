@@ -2401,7 +2401,7 @@ sub FieldList		#return list of fields, or list of fields of type $type, these ty
 }
 sub FieldType
 {	my $field=shift;
-	return '' unless grep $field, @Fields;
+	return '' unless grep $field eq $_, @Fields;
 	return $Def{$field}{type} eq 'flags'? 'flags' : '';	# only "flags" type supported currently, see FieldList() comments
 }
 sub ListGroupTypes
@@ -2817,7 +2817,7 @@ our %Field_options=
 	},
 	resetnotag =>
 	{	widget		=> 'check',
-		label		=> 'Reset current value if no tag found in file',
+		label		=> _"Reset current value if no tag found in file",
 		'default'	=> sub { my $default= $_[0]{flags} || ''; return $default!~m/_/ },
 		apply		=> sub { my ($def,$opt,$value)=@_; $def->{flags}=~s/_//g; $def->{flags}.='_' if !$value; },
 		update		=> sub { $_[0]{widget}->set_sensitive( $_[0]{opt}{rw} ); }, # set insensitive when tag not read/written

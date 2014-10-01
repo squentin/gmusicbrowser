@@ -2519,7 +2519,7 @@ sub Fill
 		$store->set($store->prepend(undef),0,$_) for reverse @$list;	# prepend because filling is a bit faster in reverse
 		$store->set($store->prepend(undef),0,GID_ALL) unless $self->{noall};
 
-		if ($self->{field}[1]) # add a chidren to every row
+		if ($self->{field}[1]) # add a children to every row
 		{	my $first=$store->get_iter_first;
 			$first=$store->iter_next($first) if $first && $store->get($first,0)==GID_ALL; #skip "all" row
 			for (my $iter=$first; $iter; $iter=$store->iter_next($iter))
