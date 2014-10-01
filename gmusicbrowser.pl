@@ -5354,7 +5354,12 @@ sub LabelEditMenu
 		if ($_[0]->get_active)	{ Songs::Set($IDs,"+$field",$f); }
 		else			{ Songs::Set($IDs,"-$field",$f); }
 	 };
-	MakeFlagMenu($field,$menusub_toggled,$hash);
+	my $menu=MakeFlagMenu($field,$menusub_toggled,$hash);
+	my $item= Gtk2::ImageMenuItem->new(_("Add new label").'...');
+	$item->set_image( Gtk2::Image->new_from_stock('gtk-add','menu') );
+	$item->signal_connect(activate=>sub { AddNewLabel($field,$IDs); });
+	$menu->append($_) for Gtk2::SeparatorMenuItem->new, $item;
+	return $menu;
 }
 
 sub MakeFlagMenu	#FIXME special case for no @keys, maybe a menu with a greyed-out item "no #none#"
@@ -6830,6 +6835,28 @@ sub RenameLabel
 		{	@$persistent_labels= grep $_ ne $old, @$persistent_labels;
 			push @$persistent_labels, $new unless grep $_ eq $new, @$persistent_labels;
 		}
+	}
+	$dialog->destroy;
+}
+
+sub AddNewLabel
+{	my ($field,$IDs)=@_;
+	my $dialog = Gtk2::Dialog->new
+	( "",::get_event_window(),
+	  [qw/modal destroy-with-parent/],
+	  'gtk-ok'     => 'ok',
+	  'gtk-cancel' => 'cancel'
+	);
+	my $label= Gtk2::Label->new(_("New label").":");
+	my $entry= Gtk2::Entry->new;
+	GMB::ListStore::Field::setcompletion($entry,$field);
+	$dialog->get_content_area->pack_start( Hpack($label,$entry) ,0,0,0);
+	$dialog->show_all;
+
+	my $ok= $dialog->run eq 'ok';
+	my $new= $entry->get_text;
+	if ($ok && $new!~m/^\s*$/)
+	{	Songs::Set($IDs,'+'.$field,$new);
 	}
 	$dialog->destroy;
 }
