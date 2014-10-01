@@ -1369,17 +1369,18 @@ our %timespan_menu=
 our %FieldTemplates=
 (	string	=> { type=>'string',	editname=>_"string",		flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', },
 	text	=> { type=>'text',	editname=>_"multi-lines string",flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', },
-	float	=> { type=>'float',	editname=>_"float",		flags=>'fgaescp',	width=> 100,	edit_many =>1,		options=> 'customfield', },
+	float	=> { type=>'float',	editname=>_"float",		flags=>'fgaescp',	width=> 100,	edit_many =>1,		options=> 'customfield', desc => _"For decimal numbers", },
 	boolean	=> { type=>'boolean',	editname=>_"boolean",		flags=>'fgaescp',	width=> 20,	edit_many =>1,		options=> 'customfield', },
-	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescpil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
+	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescpil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1},   desc=>_"Same type as labels" },
 	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'fgaescpi',	width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', },
-	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'fgaescpi',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, },
-	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
-	integer	=> { type=>'integer',	editname=>_"integer",		flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {}, },
+	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'fgaescpi',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, desc=>_"For when values are likely to be repeated" },
+	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {},  desc=>_"For when values are likely to be repeated" },
+	integer	=> { type=>'integer',	editname=>_"integer",		flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {},  desc => _"For integer numbers", },
 	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'fgaescp_',	width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid', FilterList=> {},
 		     postread => \&FMPS_rating_postread,		prewrite => \&FMPS_rating_prewrite,
 		     id3v2 => 'TXXX;FMPS_Rating_User;%v::%i',	vorbis	=> 'FMPS_RATING_USER::%i',	ape => 'FMPS_RATING_USER::%i',	ilst => '----FMPS_Rating_User::%i',
 		     starprefix => 'stars', #FIXME make it an option
+		     desc => _"For alternate ratings",
 		   },
 );
 $FieldTemplates{$_}{category}||='custom' for keys %FieldTemplates;
@@ -3037,16 +3038,22 @@ sub Field_Edit_template
 {	my ($vbox,$opt,$field)=@_;
 	my %templatelist;
 	$templatelist{$_}= $FieldTemplates{$_}{editname} for keys %FieldTemplates;
+	my $label= Gtk2::Label->new;
 	my $combo= TextCombo->new(\%templatelist, $opt->{template}, sub
 		{	my $combo=shift;
 			my $t=$opt->{template}= $combo->get_value;
 			$Def{$field}{options}= $FieldTemplates{$t}{options};
 			my $focus= $combo->is_focus; #FIXME never true
 			my $vbox=$combo; $vbox=$vbox->parent until $vbox->{FieldProperties};
-			Field_fill_option_box($vbox,$field, template=>$combo); # will reset the option box but keep $combo
+			Field_fill_option_box($vbox,$field, template=>$combo,$label); # will reset the option box but keep $combo and $label
 			$combo->grab_focus if $focus;	#reparenting $combo will make it lose focus, so regrab it #FIXME $focus never true
+			my $desc= $FieldTemplates{$t}{desc};
+			if ($desc) {$label->set_markup_with_format("<small><i>%s</i></small>",$desc);$label->show} else {$label->hide}
 		});
-	return $combo;
+	$label->set_no_show_all(1);
+	my $desc= $FieldTemplates{$opt->{template}}{desc};
+	if ($desc) {$label->set_markup_with_format("<small><i>%s</i></small>",$desc);$label->show}
+	return $combo,$label;
 }
 
 sub Field_Apply_options
