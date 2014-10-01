@@ -82,7 +82,7 @@ our %timespan_menu=
 	flags	=>
 	{	_		=> '____[#ID#]',
 		init		=> '___name[0]="#none#"; ___iname[0]=::superlc(___name[0]); #sgid_to_gid(VAL=$_)# for #init_namearray#',
-		init_namearray	=> '()',
+		init_namearray	=> '@{ $::Options{Fields_options}{#field#}{persistent_values} ||= $Def{#field#}{default_persistent_values} || [] }',
 		none		=> quotemeta _"None",
 		default		=> '""',
 		check		=> '#VAL#= do {my $v=#VAL#; my @l; if (ref $v) {@l= @$v} else {@l= split /\x00/,$v} for (@l) { tr/\x00-\x1F//d; s/\s+$//; }; @l=sort @l; \@l }',
@@ -997,7 +997,7 @@ our %timespan_menu=
 	 #is_set	=> '(__GENRE__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
 	id3v1	=> 6,		id3v2	=> 'TCON',	vorbis	=> 'genre',	ape	=> 'Genre', ilst => "\xA9gen & ----genre",
 	read_split	=> qr/\s*;\s*/,
-	type		=> 'flags',		#init_namearray => '@Tag::MP3::Genres',
+	type		=> 'flags',		#default_persistent_values => \@Tag::MP3::Genres,
 	none		=> quotemeta _"No genre",
 	all_count	=> _"All genres",
 	FilterList	=> {search=>1},
@@ -1008,7 +1008,7 @@ our %timespan_menu=
  label	=>
  {	name		=> _"Labels",	width => 180,	flags => 'fgaescpil',
 	 #is_set	=> '(__LABEL__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
-	type		=> 'flags',		init_namearray	=> '@{$::Options{Labels}}',
+	type		=> 'flags',
 	iconprefix	=> 'label-',
 	icon		=> sub { $Def{label}{iconprefix}.$_[0]; }, #FIXME use icon_for_gid
 	icon_for_gid	=> '"#iconprefix#".#gid_to_get#',
@@ -1018,6 +1018,8 @@ our %timespan_menu=
 	icon_edit_string=> _"Choose icon for label {name}",
 	edit_order=> 80,	edit_many=>1,	letter => 'L',
 	category=>'extra',
+	options		=> 'persistent_values',
+	default_persistent_values => [_("favorite"),_("bootleg"),_("broken"),_("bonus tracks"),_("interview"),],
  },
  mood	=>
  {	name		=> _"Moods",	width => 180,	flags => 'fgarwescpil',
@@ -1371,7 +1373,7 @@ our %FieldTemplates=
 	text	=> { type=>'text',	editname=>_"multi-lines string",flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', },
 	float	=> { type=>'float',	editname=>_"float",		flags=>'fgaescp',	width=> 100,	edit_many =>1,		options=> 'customfield', desc => _"For decimal numbers", },
 	boolean	=> { type=>'boolean',	editname=>_"boolean",		flags=>'fgaescp',	width=> 20,	edit_many =>1,		options=> 'customfield', },
-	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescpil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1},   desc=>_"Same type as labels" },
+	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescpil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield persistent_values', FilterList=> {search=>1},   desc=>_"Same type as labels" },
 	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'fgaescpi',	width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', },
 	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'fgaescpi',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, desc=>_"For when values are likely to be repeated" },
 	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {},  desc=>_"For when values are likely to be repeated" },
@@ -2875,6 +2877,18 @@ our %Field_options=
 	{	widget		=> \&Field_Edit_template,
 		label		=> _"Field type",
 	},
+	persistent_values=>
+	{	label		=> _("Persistent values").':',
+		tip		=> _"These values will always be in the list, even if they are not used",
+		default		=> sub { $_[0]{default_persistent_values} },
+		widget		=> sub
+		{		my (undef,$opt,$field)=@_;
+				my $values= FieldType($field) eq 'flags' ? ListAll($field) : []; # check that field is live and live with correct type, else ListAll will not work
+				my %valuesh; $valuesh{$_}=$_ for @$values;
+				::NewPrefMultiCombo(persistent_values=>\%valuesh,opthash=>$opt,ellipsize=>'end');
+		},
+
+	},
 );
 
 sub Field_fill_option_box
@@ -2940,7 +2954,7 @@ sub Field_fill_option_box
 		if (defined $label)
 		{	$label= Gtk2::Label->new($label);
 			$sg1->add_widget($label);
-			$widget= [ $label, $widget ];
+			$widget= [ $label, '_',$widget ];
 		}
 		push @topack, $widget,@extra;
 	}

@@ -1730,7 +1730,11 @@ our @cMenu=
 	},
 	{ label=> _"Remove label",	stockicon => 'gtk-remove',
 		code => sub { my $gid=$_[0]{gidlist}[0]; ::RemoveLabel($_[0]{field},$gid); },
-		onlyone=> 'gidlist',	test => sub { $_[0]{field} eq 'label' && $_[0]{gidlist}[0] !=0 },	#FIXME make it generic rather than specific to field label ? #FIXME find a better way to chack if gid is special than comparing it to 0
+		onlyone=> 'gidlist',	test => sub { $_[0]{field} eq 'label' && $_[0]{gidlist}[0] !=0 },	#FIXME make it generic rather than specific to field label ? #FIXME find a better way to check if gid is special than comparing it to 0
+	},
+	{ label=> _"Rename label",
+		code => sub { my $gid=$_[0]{gidlist}[0]; ::RenameLabel($_[0]{field},$gid); },
+		onlyone=> 'gidlist',	test => sub { $_[0]{field} eq 'label' && $_[0]{gidlist}[0] !=0 },	#FIXME make it generic rather than specific to field label ? #FIXME find a better way to check if gid is special than comparing it to 0
 	},
 #	{ separator=>1 },
 	{ label => _"Options", submenu => \@MenuPageOptions, stock => 'gtk-preferences', isdefined => 'field' },

@@ -78,8 +78,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1013',
- VERSIONSTRING => '1.1.13',
+ VERSION => '1.1013001',
+ VERSIONSTRING => '1.1.13.1',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 
@@ -1059,7 +1059,6 @@ our %Options=
 	Sessions	=> '',
 	StartCheck	=> 0,	#check if songs have changed on startup
 	StartScan	=> 0,	#scan @LibraryPath on startup for new songs
-	Labels		=> [_("favorite"),_("bootleg"),_("broken"),_("bonus tracks"),_("interview"),_("another example")],
 	FilenameSchema	=> ['%a - %l - %n - %t','%l - %n - %t','%n-%t','%d%n-%t'],
 	FolderSchema	=> ['%A/%l','%A','%A/%Y-%l','%A - %l'],
 	PlayedMinPercent=> 80,	# Threshold to count a song as played in percent
@@ -2005,6 +2004,7 @@ sub ReadOldSavedTags
 	$Options{LibraryPath}= delete $Options{Path};
 	$Options{Labels}=delete $Options{Flags} if $oldversion<=0.9571;
 	$Options{Labels}=[ split "\x1D",$Options{Labels} ] unless ref $Options{Labels};	#for version <1.1.2
+	$Options{Fields_options}{label}{persistent_values}= delete $Options{Labels};
 	$Options{Artists_split_re}= [ map { $artistsplit_old_to_new{$_}||$_ } grep $_ ne '$', split /\|/, delete $Options{ArtistSplit} ];
 	$Options{TrayTipDelay}&&=900;
 
@@ -2191,6 +2191,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		}
 		if ($oldversion<1.1007) { for my $re (@{$Options{Artists_split_re}}) { $re='\s*,\s+' if $re eq '\s*,\s*'; } }
 		if ($oldversion<1.1008) { my $d=$Options{TrayTipDelay}||0; $Options{TrayTipDelay}= $d==1 ? 900 : $d; }
+		if ($Options{Labels}) { $Options{Fields_options}{label}{persistent_values}= delete $Options{Labels} }
 
 		Post_Options_init();
 
@@ -5431,64 +5432,6 @@ sub ArtistContextMenu
 	PopupMenu($menu,nomenupos=>1);
 }
 
-=deprecated
-sub EditLabels
-{	my @IDs=@_;
-	my $vbox=Gtk2::VBox->new;
-	my $table=Gtk2::Table->new(int((keys %Labels)/3),3,FALSE);
-	my %checks;
-	my $changed;
-	my $row=0; my $col=0;
-	my $addlabel=sub
-	 {	my $label=$_[0];
-		my $check=Gtk2::CheckButton->new_with_label($label);
-		my $state= @{ Filter->new( 'label:~:'.$label )->filter(\@IDs)};
-		if ($state==@IDs) { $check->set_active(1); }
-		elsif ($state>0)  { $check->set_inconsistent(1); }
-		$check->signal_connect( toggled => sub	{  $_[0]->set_inconsistent(0); $changed=1 });
-		$checks{$label}=$check;
-		if ($col==3) {$col=0; $row++;}
-		$table->attach($check,$col,$col+1,$row,$row+1,['fill','expand'],'shrink',1,1);
-		$col++;
-	 };
-	$addlabel->($_) for @{ Songs::ListAll('label') };
-	my $sw=Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
-	$sw->set_policy('automatic','automatic');
-	$sw->add_with_viewport($table);
-	$vbox->add($sw);
-	my $entry=Gtk2::Entry->new;
-	my $addnew=sub
-	 {	my $label=$entry->get_text;
-		$entry->grab_focus;
-		return unless $label;
-		$entry->set_text('');
-		$addlabel->($label) unless exists $checks{$label};
-		$checks{$label}->set_active(1);
-		$checks{$label}->show_all;
-	 };
-	my $button=NewIconButton('gtk-add',_"Add new label",$addnew);
-	$entry->signal_connect( activate => $addnew );
-	$vbox->pack_end( Hpack($entry,$button), FALSE, FALSE, 2 );
-
-	$vbox->{save}=sub
-	{	return unless $changed;
-		no warnings;
-		my @toremove; my @toadd;
-		while (my ($label,$check)=each %checks)
-		{	next if $check->get_inconsistent;
-			if ($check->get_active) { push @toadd,$label }
-			else			{ push @toremove,$label }
-		}
-		my @args;
-		push @args,"+label",\@toadd if @toadd;
-		push @args,"-label",\@toremove if @toremove;
-		Songs::Set(\@IDs,@args);
-	};
-	return $vbox;
-}
-=cut
-
 sub DialogSongsProp
 {	my @IDs=@_;
 	my $dialog = Gtk2::Dialog->new (_"Edit Multiple Songs Properties", undef,
@@ -6007,7 +5950,6 @@ sub PrefDialog
 		my $notebook = Gtk2::Notebook->new;
 		for my $pagedef
 		(	[library=>_"Library",	PrefLibrary()],
-			#[labels=>_"Labels",	PrefLabels()],
 			[audio	=>_"Audio",	PrefAudio()],
 			[layouts=>_"Layouts",	PrefLayouts()],
 			[misc	=>_"Misc.",	PrefMisc()],
@@ -6832,129 +6774,64 @@ sub PrefLibrary_update_checklength_button
 
 sub RemoveLabel		#FIXME ? label specific
 {	my ($field,$gid)=@_;
-	my $label= Songs::Gid_to_Display($field,$gid);
-	#my $IDlist= Songs::AllFilter( MakeFilterFromGID('label',$gid) );
-	my $IDlist= Songs::MakeFilterFromGID($field,$gid)->filter;
-	if (my $nb=@$IDlist)
-	{	my $dialog = Gtk2::MessageDialog->new
-			( ::get_event_window(),
-			  [qw/modal destroy-with-parent/],
-			  'warning','ok-cancel',
-			  __n("This label is set for %d song.","This label is set for %d songs.",$nb)."\n".
-			  __x(_"Are you sure you want to delete the '{label}' label ?", label => $label)
-			);
-		$dialog->show_all;
-		if ($dialog->run ne 'ok') {$dialog->destroy;return;}
-		$dialog->destroy;
-		Songs::Set($IDlist,'-label',$label);
+	my $label= Songs::Gid_to_Get($field,$gid);
+	my $filter= Songs::MakeFilterFromGID($field,$gid);
+	my $nb= @{ $filter->filter };
+	my $persistent_labels= $Options{Fields_options}{$field}{persistent_values};
+	my $dialog = Gtk2::MessageDialog->new
+		( ::get_event_window(),
+		  [qw/modal destroy-with-parent/],
+		  'warning','ok-cancel',
+		  __n("This label is set for %d song.","This label is set for %d songs.",$nb)."\n".
+		  __x(_"Are you sure you want to delete the '{label}' label ?", label => $label)
+		);
+	my $remove_pers;
+	if (grep $_ eq $label, @$persistent_labels)
+	{	$remove_pers= Gtk2::CheckButton->new(_"Remove from persistent values");
+		$dialog->get_content_area->pack_end($remove_pers,0,0,0);
 	}
-	@{$Options{Labels}}= grep $_ ne $label, @{$Options{Labels}};
+	$dialog->show_all;
+
+	if ($dialog->run eq 'ok')
+	{	if ($remove_pers && $remove_pers->get_active)
+		{	@$persistent_labels= grep $_ ne $label, @$persistent_labels;
+		}
+		my $IDlist= Songs::AllFilter($filter); # use AllFilter to include deleted songs still in DB
+		Songs::Set($IDlist,'-'.$field,$label);
+	}
+	$dialog->destroy;
 }
 
-sub PrefLabels	#DELME PHASE1 move the functionality elsewhere
-{	my $vbox=Gtk2::VBox->new(FALSE,2);
-	my $store=Gtk2::ListStore->new('Glib::String','Glib::Int','Glib::String');
-	my $treeview=Gtk2::TreeView->new($store);
-	my $renderer=Gtk2::CellRendererText->new;
-	$renderer->set(editable => TRUE);
-	$renderer->signal_connect(edited => sub
-	    {	my ($cell,$pathstr,$new)=@_;
-		$new=~s/\x00//g;
-		return if ($new eq '') || exists $::Labels{$new};
-		my $iter=$store->get_iter_from_string($pathstr);
-		my ($old,$nb)=$store->get_value($iter);
-		return if $new eq $old;
-		$store->set($iter,0,$new,2,'label-'.$new);
-		$::Labels{$new}=delete $::Labels{$old};
-		#FIXME maybe should rename the icon file if it exist
-		return unless $nb;
-		my $l= Songs::AllFilter( 'label:~:'.$old );
-		Songs::Set($l,'+label',$new,'-label',$old);
-	    });
-	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
-		( '',Gtk2::CellRendererPixbuf->new,'stock-id',2)
-		);
-	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
-		( _"Label",$renderer,'text',0)
-		);
-	my $renderer_nb=Gtk2::CellRendererText->new;
-	$renderer_nb->set(xalign=>1);
-	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
-		( _"# songs",$renderer_nb,'text',1)
-		);
-	$treeview->append_column(Gtk2::TreeViewColumn->new); #empty, used to prevent the "# songs" column from being too wide
-	my $fillsub=sub
-	    {	delete $ToDo{'9_Labels'};
-		$store->clear;
-		my $set=Songs::BuildHash('label');
-		for my $f (@{ Songs::ListAll('label') })
-		{	$store->set($store->append, 0,$f, 1,$set->{$f}||0, 2,'label-'.$f);
+sub RenameLabel
+{	my ($field,$gid)=@_;
+	my $old= Songs::Gid_to_Get($field,$gid);
+	my $dialog = Gtk2::Dialog->new
+	( "",::get_event_window(),
+	  [qw/modal destroy-with-parent/],
+	  'gtk-ok'     => 'ok',
+	  'gtk-cancel' => 'cancel'
+	);
+	my $label1= Gtk2::Label->new( __x(_"Rename '{label}'",label=>$old) );
+	my $label2= Gtk2::Label->new(_("New name").":");
+	my $entry= Gtk2::Entry->new;
+	$entry->set_text($old);
+	$dialog->get_content_area->pack_start( Vpack($label1,[$label2,$entry]) ,0,0,0);
+	$dialog->show_all;
+
+	my $ok= $dialog->run eq 'ok';
+	my $new= $entry->get_text;
+	if ($ok && $new!~m/^\s*$/ && $new ne $old)
+	{	my $list= Songs::AllFilter( Songs::MakeFilterFromGID($field,$gid) );
+		#rename
+		Songs::Set($list,'+'.$field,$new,'-'.$field,$old);
+		#if it was a persistent value, rename it there too
+		my $persistent_labels= $Options{Fields_options}{$field}{persistent_values};
+		if (grep $_ eq $old, @$persistent_labels)
+		{	@$persistent_labels= grep $_ ne $old, @$persistent_labels;
+			push @$persistent_labels, $new unless grep $_ eq $new, @$persistent_labels;
 		}
-	    };
-	#my $watcher;
-	$vbox->signal_connect(realize => sub
-		{  #warn "realize @_\n" if $debug;
-		   my $sub=sub { IdleDo('9_Labels',3000,$fillsub); };
-		   #$watcher=AddWatcher(undef,'label',$sub);
-		   &$fillsub;
-		 });
-	$vbox->signal_connect(unrealize => sub
-		{  #warn "unrealize @_\n" if $debug;
-		   delete $ToDo{'9_Labels'};
-		   #RemoveWatcher($watcher);
-		});
-
-	my $delbut=NewIconButton('gtk-remove',_"Remove label",sub
-		{	my ($row)=$treeview->get_selection->get_selected_rows;
-			return unless defined $row;
-			my $iter=$store->get_iter($row);
-			my ($label,$nb)=$store->get_value($iter);
-			if ($nb)
-			{	my $dialog = Gtk2::MessageDialog->new
-					( $treeview->get_toplevel,
-					  [qw/modal destroy-with-parent/],
-					  'warning','ok-cancel','%s',
-					  __n("This label is set for %d song.","This label is set for %d songs.",$nb)."\n".
-					  __x("Are you sure you want to delete the '{label}' label ?", label => $label)
-					);
-				$dialog->show_all;
-				if ($dialog->run ne 'ok') {$dialog->destroy;return;}
-				my $l= Songs::AllFilter( 'label:~:'.$label );
-				Songs::Set($l,'-label',$label);
-				$dialog->destroy;
-			}
-			$store->remove($iter);
-			@{$Options{Labels}}= grep $_ ne $label, @{$Options{Labels}};
-		});
-	my $addbut=NewIconButton('gtk-add',_"Add label",sub
-		{	my $iter=$store->append;
-			$store->set($iter,0,'',1,0);
-			$treeview->set_cursor($store->get_path($iter), $treeview->get_column(1), TRUE);
-		});
-#	my $iconbut=NewIconButton('gmb-picture',_"Set icon",sub
-#		{	my ($row)=$treeview->get_selection->get_selected_rows;
-#			return unless defined $row;
-#			my $iter=$store->get_iter($row);
-#			my ($label)=$store->get_value($iter);
-#			Songs::ChooseIcon('label',$gid); 		#needs gid
-#		});
-
-	$delbut->set_sensitive(FALSE);
-	#$iconbut->set_sensitive(FALSE);
-	$treeview->get_selection->signal_connect( changed => sub
-		{	my $s=$_[0]->count_selected_rows;
-			$delbut->set_sensitive($s);
-			#$iconbut->set_sensitive($s);
-		});
-
-	my $sw=Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
-	$sw->set_policy('never','automatic');
-	$sw->add($treeview);
-	$vbox->add($sw);
-	$vbox->pack_start( Hpack($addbut,$delbut) ,FALSE,FALSE,2); #,$iconbut
-
-	return $vbox;
+	}
+	$dialog->destroy;
 }
 
 sub SetOption
@@ -7217,17 +7094,18 @@ sub NewPrefLayoutCombo
 
 sub NewPrefMultiCombo
 {	my ($key,$possible_values_hash,%opt)=@_;
+	my $opthash= $opt{opthash} || \%Options;
 	my $sep= $opt{separator}|| ', ';
 	my $display_cb= $opt{display} || sub
-	 {	my $values= $Options{$key} || [];
+	 {	my $values= $opthash->{$key} || [];
 		return $opt{empty} unless @$values;
-		return join $sep,map $possible_values_hash->{$_}||=qq("$_"), @$values;
+		return join $sep,map $possible_values_hash->{$_}||=qq("$_"), superlc_sort(@$values);
 	 };
 	$display_cb= sub {$opt{display}} if !ref $display_cb; # label in the button is a constant
 	my $button= Gtk2::Button->new;
 
 	my $label_value= Gtk2::Label->new;
-	#$label_value->set_ellipsize('end');
+	$label_value->set_ellipsize($opt{ellipsize}||'none');
 	my $hbox=Gtk2::HBox->new(0,0);
 	$hbox->pack_start($label_value,1,1,2);
 	$hbox->pack_start($_,0,0,2) for Gtk2::VSeparator->new, Gtk2::Arrow->new('down','none');
@@ -7236,7 +7114,7 @@ sub NewPrefMultiCombo
 
 	my $change_cb=sub
 	 {	my $button= $_[0]{button};
-		$Options{$key}= $_[1];
+		$opthash->{$key}= $_[1];
 		$label_value->set_text( $display_cb->() );
 		$opt{cb}->() if $opt{cb};
 	 };
@@ -7244,12 +7122,12 @@ sub NewPrefMultiCombo
 	 {	my ($button,$event)=@_;
 		my $menu=BuildChoiceMenu
 		(	$possible_values_hash,
-			check=> sub { $Options{$key}||[] },
+			check=> sub { $opthash->{$key}||[] },
 			code => $change_cb,
 			'reverse'=>1, return_list=>1,
 			args => {button=>$button},
 		);
-		PopupMenu($menu,event=>$event);
+		PopupMenu($menu,event=>$event) if $menu;
 		1;
 	 };
 
