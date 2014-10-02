@@ -17,8 +17,7 @@ install:
 	dh_testroot
 	dh_clean -k
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/gmusicbrowser \
-          docdir=$(CURDIR)/debian/gmusicbrowser/usr/share/doc/gmusicbrowser \
-          menudir=$(CURDIR)/debian/gmusicbrowser/usr/share/menu
+          docdir=$(CURDIR)/debian/gmusicbrowser/usr/share/doc/gmusicbrowser
 	# menu needs an xpm instead of a png
 	dh_install debian/gmusicbrowser.xpm usr/share/pixmaps
 	# docs are handled in binary-indep

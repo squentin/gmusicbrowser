@@ -35,7 +35,6 @@ Main features :
 %install
 rm -rf %{buildroot}
 %makeinstall prefix=%{buildroot}%{_prefix}
-rm -f %{buildroot}/%{_menudir}/gmusicbrowser
 %find_lang %{name}
 
 %clean
@@ -53,7 +52,6 @@ rm -rf %{buildroot}
 %{_datadir}/applications/gmusicbrowser.desktop
 #%lang(fr) %{_datadir}/locale/fr/LC_MESSAGES/*.mo
 #%{_datadir}/locale/*/LC_MESSAGES/*.mo
-#%{_menudir}/gmusicbrowser
 %{_iconsdir}/gmusicbrowser.png
 %{_liconsdir}/gmusicbrowser.png
 %{_miconsdir}/gmusicbrowser.png
