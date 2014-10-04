@@ -2962,7 +2962,8 @@ sub GetNextSongs	##if no aguments, returns next song and makes the changes assum
 }
 
 sub PrepNextSongs
-{	if ($RandomMode) { @NextSongs=@$Queue; $#NextSongs=9 if $#NextSongs>9; }
+{	if ($NextAction) { @NextSongs=() }
+	elsif ($RandomMode) { @NextSongs=@$Queue; $#NextSongs=9 if $#NextSongs>9; }
 	else
 	{	@NextSongs= GetNextSongs(10,'onlyIDs');
 	}
