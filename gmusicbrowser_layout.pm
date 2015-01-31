@@ -638,14 +638,16 @@ our %Widgets=
 		dragdest=> [::DRAG_FILTER,sub { ::SetFilter($_[0],$_[2]);}],
 	},
 	Visuals		=>
-	{	New	=> sub {my $darea=Gtk2::DrawingArea->new; $darea->set_size_request(200,50); return $darea unless $::PlayPacks{Play_GST} && $::PlayPacks{Play_GST}{visuals}; Play_GST::add_visuals($darea); my $eb=Gtk2::EventBox->new; $eb->add($darea); return $eb},
-		click1	=> sub {Play_GST::set_visual('+');}, #select next visual
+	{	New	=> sub {my $darea=Gtk2::DrawingArea->new; return $darea unless $::Play_package->{visuals}; $::Play_package->add_visuals($darea); my $eb=Gtk2::EventBox->new; $eb->add($darea); return $eb},
+		click1	=> sub {$::Play_package->set_visual('+') if $::Play_package->{visuals};}, #select next visual
 		click2	=> \&ToggleFullscreen, #FIXME use a fullscreen layout instead,
 		click3	=> \&VisualsMenu,
+		minheight=>50,
+		minwidth=>200,
 	},
 	Connections	=>	#FIXME could be better
 	{	class	=> 'Layout::Label',
-		update	=> sub { my $h=\%Play_GST_server::sockets; my $t=join "\n",map $h->{$_}[2], grep $h->{$_}[1],keys %$h; $t= $t? _("Connections from :")."\n".$t : _("No connections"); $_[0]->child->set_text($t); if ($::Play_package eq 'Play_GST_server') {$_[0]->show; $_[0]->child->show_all} else {$_[0]->hide; $_[0]->set_no_show_all(1)}; },
+		update	=> sub { unless ($::Play_package->can('get_connections')) { $_[0]->hide; $_[0]->set_no_show_all(1); return }; $_[0]->show; $_[0]->child->show_all; my @c= $::Play_package->get_connections; my $t= @c? _("Connections from :")."\n".join("\n",@c) : _("No connections"); $_[0]->child->set_text($t); },
 		event	=> 'connections',
 	},
 	ShuffleList	=>
@@ -1579,9 +1581,10 @@ sub FilterMenu
 
 sub VisualsMenu
 {	my $menu=Gtk2::Menu->new;
-	my $cb=sub { Play_GST::set_visual($_[1]); };
-	my @l=Play_GST::list_visuals();
-	my $current=$::Options{gst_visual}||$l[0];
+	my $cb=sub { $::Play_package->set_visual($_[1]) if $::Play_package->{visuals}; };
+	return unless $::Play_package->{visuals};
+	my @l= $::Play_package->list_visuals;
+	my $current= $::Options{gst_visual}||$l[0];
 	for my $v (@l)
 	{	my $item=Gtk2::CheckMenuItem->new_with_label($v);
 		$item->set_draw_as_radio(1);

@@ -35,7 +35,7 @@ sub _eos_cb
 {	Glib::Source->remove($WatchTag) or warn "couldn't remove watcher";
 	undef $WatchTag;
 	undef $ChildPID;
-	::end_of_file_faketime;
+	::end_of_file_faketime();
 	return 1;
 }
 

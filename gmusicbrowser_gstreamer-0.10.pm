@@ -1,15 +1,26 @@
-# Copyright (C) 2005-2014 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2015 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
+BEGIN
+{	require GStreamer;
+	$::gstreamer_version='0.10';
+	die "Needs GStreamer version >= 0.05\n" if GStreamer->VERSION<.05;
+	die "Can't initialize GStreamer.\n" unless GStreamer->init_check;
+	GStreamer->init;
+	my $reg=GStreamer::Registry->get_default;
+	$Play_GST::reg_keep=$reg if GStreamer->CHECK_VERSION(0,10,4); #work-around to keep the register from being finalized in gstreamer<0.10.4 (see http://bugzilla.gnome.org/show_bug.cgi?id=324818)
+	$reg->lookup_feature('playbin') or die "gstreamer plugin 'playbin' not found.\nYou need to install at least gst-plugins-base.\n";
+}
+
 package Play_GST;
 use strict;
 use warnings;
 
-my ($GST_ok,$GST_visuals_ok,$GST_EQ_ok,$GST_RG_ok,$playbin2_ok); our $GST_RGA_ok;
+my ($GST_visuals_ok,$GST_EQ_ok,$GST_RG_ok,$playbin2_ok); our $GST_RGA_ok;
 my ($PlayBin,$Sink);
 my ($WatchTag,$Skip,$StateAfterSkip);
 my (%Plugins,%Sinks);
@@ -20,13 +31,12 @@ my ($VolumeBusy,$VolumeHasChanged);
 
 $::PlayPacks{Play_GST}=1; #register the package
 
-my $reg_keep; #work-around to keep the register from being finalized in gstreamer<0.10.4 (see http://bugzilla.gnome.org/show_bug.cgi?id=324818)
-
 
 BEGIN
 { %Sinks=
   (	autoaudio	=> { name => _"auto detect", },
 	oss		=> { option => 'device' },
+	oss4		=> { option => 'device' },
 	esd		=> { option => 'host'},
 	alsa		=> { option => 'device'},
 	artsd		=> {},
@@ -38,64 +48,49 @@ BEGIN
 	osxaudio	=> {},
 	directsound	=> {},
 	#alsaspdif	=> { name => "alsa S/PDIF", option => 'card' },
-	#oss4		=> {},
 	#nas		=> {},
   );
-  %Plugins=(	mp3	=> 'mad',	oga => 'vorbisdec',	ape => 'ffdec_ape',
-		flac	=> 'flacdec',	mpc => 'musepackdec',	wv => 'wavpackdec',
-		m4a	=> 'faad',
-	);
-  my $error;
-  my $reg;
-  if (grep -f $_.'/GStreamer.pm',@INC)
-  {	eval {require GStreamer};
-	$error="Needs GStreamer version >= 0.05\n" if !$@ && GStreamer->VERSION<.05;
-	if (!$@ && !$error && GStreamer->init_check)
-	{	GStreamer->init;
-		$reg=GStreamer::Registry->get_default;
-		$reg_keep=$reg if GStreamer->CHECK_VERSION(0,10,4);
-		$playbin2_ok= $reg->lookup_feature('playbin2');
-		if ( $playbin2_ok || $reg->lookup_feature('playbin') ) { $GST_ok=1; }
-		else { $error="gstreamer plugin 'playbin' not found\nYou need to install at least gst-plugins-base\n"; }
-	}
-	else { $error=$@? $@ : "Can't initialize GStreamer.\n"; }
-  }
-  else {$error="GStreamer.pm not found\n";}
-  if ($error) {warn "$error -> gstreamer output won't be available.\n"}
-  if ($GST_ok)
-  {	$::Options{gst_sink}||= (grep ($reg->lookup_feature($_.'sink'), qw/autoaudio gconfaudio alsa esd pulse oss/),'alsa')[0]; #find a default sink
-	if ($reg->lookup_feature('equalizer-10bands')) { $GST_EQ_ok=1; }
-	else {warn "gstreamer plugin 'equalizer-10bands' not found -> equalizer not available\n";}
-	if ($reg->lookup_feature('rglimiter') && $reg->lookup_feature('rgvolume')) { $GST_RG_ok=1; }
-	else {warn "gstreamer plugins 'rglimiter' and/or 'rgvolume' not found -> replaygain not available\n";}
-	if ($reg->lookup_feature('rganalysis')) { $GST_RGA_ok=1; }
-	else {warn "gstreamer plugins 'rganalysis' not found -> replaygain analysis not available\n";}
-	$GST_visuals_ok=1;
-	eval {require GStreamer::Interfaces};
-	if ($@) {warn "GStreamer::Interfaces perl module not found -> visuals not available\n"; $GST_visuals_ok=0;}
-	unless ($reg->lookup_feature('ximagesink'))
-	{	warn "gstreamer plugin 'ximagesink' not found -> visuals not available\n"; $GST_visuals_ok=0;
-	}
-  }
+  %Plugins=(	mp3 => 'flump3dec mad mpg123audiodec avdec_mp3',
+		oga => 'vorbisdec',			flac=> 'flacdec',
+		ape => 'avdec_ape ffdec_ape',		wv  => 'wavpackdec',
+		mpc => 'musepackdec avdec_mpc8',	m4a => 'faad',
+  );
 
+  my $reg=GStreamer::Registry->get_default;
+  $playbin2_ok= $reg->lookup_feature('playbin2');
+  if ($reg->lookup_feature('equalizer-10bands')) { $GST_EQ_ok=1; }
+  else {warn "gstreamer plugin 'equalizer-10bands' not found -> equalizer not available\n";}
+  if ($reg->lookup_feature('rglimiter') && $reg->lookup_feature('rgvolume')) { $GST_RG_ok=1; }
+  else {warn "gstreamer plugins 'rglimiter' and/or 'rgvolume' not found -> replaygain not available\n";}
+  if ($reg->lookup_feature('rganalysis')) { $GST_RGA_ok=1; }
+  else {warn "gstreamer plugins 'rganalysis' not found -> replaygain analysis not available\n";}
+  $GST_visuals_ok=1;
+  eval {require GStreamer::Interfaces};
+  if ($@) {warn "GStreamer::Interfaces perl module not found -> visuals not available\n"; $GST_visuals_ok=0;}
+  unless ($reg->lookup_feature('ximagesink'))
+  {	warn "gstreamer plugin 'ximagesink' not found -> visuals not available\n"; $GST_visuals_ok=0;
+  }
 }
 
 sub supported_formats
-{	return '' unless $GST_ok;
-	my $reg=GStreamer::Registry->get_default;
-	return grep $reg->lookup_feature($Plugins{$_}), keys %Plugins;
+{	my $reg=GStreamer::Registry->get_default;
+	my @found;
+	for my $type (keys %Plugins)
+	{	push @found, $type if grep $reg->lookup_feature($_), split / +/, $Plugins{$type};
+	}
+	return @found;
 }
 sub supported_sinks
-{	return {} unless $GST_ok;
-	my $reg=GStreamer::Registry->get_default;
+{	my $reg=GStreamer::Registry->get_default;
 	$Sinks{$_}{ok}= ! !$reg->lookup_feature($_.'sink') for keys %Sinks;
 	#$::Options{gst_sink}='autoaudio' unless $Sinks{$::Options{gst_sink}};
 	return {map { $_ => $Sinks{$_}{name}||$_ } grep $Sinks{$_}{ok}, keys %Sinks};
 }
 
 sub init
-{	return undef unless $GST_ok;
-	#createPlayBin();
+{	my $reg= GStreamer1::Registry::get();
+	$::Options{gst_sink}='' unless $reg->lookup_feature( ($::Options{gst_sink}||'').'sink' );
+	$::Options{gst_sink}||= (grep ($reg->lookup_feature($_.'sink'), qw/autoaudio gconfaudio pulse alsa esd oss oss4/),'autoaudio')[0]; #find a default sink
 	return bless { EQ=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
 }
 
@@ -637,7 +632,7 @@ sub process_next
 		my $f= Songs::Get($ID,'fullfilename_raw');
 		::_utf8_on($f); # pretend it's utf8 to prevent a conversion to utf8 by the bindings
 		$RGA_pipeline->{ID}=$ID;
-		warn "Analysing [$ID] $f\n" if $::verbose;
+		warn "Analysing [$ID] $f\n" if $::Verbose;
 		$RGA_pipeline->get_by_name('filesrc')->set(location => $f);
 		$rganalysis->set_locked_state(0);
 		$RGA_pipeline->set_state('playing');
@@ -719,14 +714,12 @@ use Socket;
 use constant { EOL => "\015\012" };
 our @ISA=('Play_GST');
 
-our %sockets;
-my ($stream,$Server);
+my (%sockets,$stream,$Server);
 
 $::PlayPacks{Play_GST_server}=1; #register the package
 
 sub init
-{	return undef unless $GST_ok;
-	my $ok=1;
+{	my $ok=1;
 	my $reg=GStreamer::Registry->get_default;
 	for my $feature (qw/multifdsink lame audioresample audioconvert/)
 	{	next if $reg->lookup_feature($feature);
@@ -850,5 +843,8 @@ sub Connection
 	return 1;	#keep listening
 }
 
+sub get_connections
+{	return map $sockets{$_}[2], grep $sockets{$_}[1],keys %sockets;
+}
 
 1;

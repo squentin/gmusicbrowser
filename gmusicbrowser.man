@@ -12,7 +12,7 @@ gmusicbrowser \- Jukebox for large collections of music files
 [\-rotags]
 [\-play]
 [\-nodbus]
-[\-gst|\-nogst]
+[\-gst0|\-nogst]
 [\-server]
 [\-port N]
 [\-cfg FILE]
@@ -66,11 +66,11 @@ prevent modifying tags of music files
 \fB\-play\fR
 start playing on startup
 .TP
-\fB\-gst\fR
-use gstreamer
-.TP
 \fB\-nogst\fR
-do not use gstreamer
+do not load any gstreamer librairies
+.TP
+\fB\-gst0\fR
+prefer gstreamer\-0.10 over gstreamer\-1.x if both are available
 .TP
 \fB\-nodbus\fR
 do not use DBus

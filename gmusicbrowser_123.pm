@@ -192,7 +192,7 @@ sub _eos_cb
 	Glib::Source->remove($WatchTag2);
 	$WatchTag=$WatchTag2=$ChildPID=undef;
 	if ($Error) { ::ErrorPlay($Error,_("Command used :")."\n@cmd_and_args"); }
-	::end_of_file;
+	::end_of_file();
 	return 1;
 }
 

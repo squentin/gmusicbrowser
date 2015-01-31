@@ -254,8 +254,8 @@ options :
 -ro	: prevent modifying/renaming/deleting song files
 -rotags	: prevent modifying tags of music files
 -play	: start playing on startup
--gst	: use gstreamer
--nogst  : do not use gstreamer
+-gst0	: prefer gstreamer-0.10 over gstreamer-1.x if both are available
+-nogst  : do not load any gstreamer librairies
 -server	: send playing song to connected icecast clent
 -port N : listen for connection on port N in icecast server mode
 -verbose: print some info, like the file being played
@@ -301,7 +301,6 @@ Options to change what is done with files/folders passed as arguments (done in r
 -listlayout	: list the available layouts and exit
 ";
   unshift @ARGV,'-tagedit' if $0=~m/tagedit/;
-  $CmdLine{gst}=0;
   my (@files,$filescmd,@cmd,$ignore);
   my $ifnotrunning='normal';
    while (defined (my $arg=shift))
@@ -312,8 +311,8 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-hide')		{$CmdLine{hide}=1}
 	elsif($arg eq '-server')	{$CmdLine{server}=1}
 	elsif($arg eq '-nodbus')	{$CmdLine{noDBus}=1}
-	elsif($arg eq '-nogst')		{$CmdLine{gst}=0}
-	elsif($arg eq '-gst')		{$CmdLine{gst}=1}
+	elsif($arg eq '-nogst')		{$CmdLine{nogst}=1}
+	elsif($arg eq '-gst0')		{$CmdLine{gst0}=1} #prefer gstreamer-0.10
 	elsif($arg eq '-ro')		{$CmdLine{ro}=$CmdLine{rotags}=1}
 	elsif($arg eq '-rotags')	{$CmdLine{rotags}=1}
 	elsif($arg eq '-port')		{$CmdLine{port}=shift if $ARGV[0]}
@@ -429,6 +428,7 @@ Options to change what is done with files/folders passed as arguments (done in r
 # end of command line handling
 
 our $HTTP_module;
+our ($Play_package,%PlayPacks); my ($PlayNext_package,$Vol_package);
 BEGIN{
 require 'gmusicbrowser_songs.pm';
 require 'gmusicbrowser_tags.pm';
@@ -439,7 +439,33 @@ $HTTP_module=	-e $DATADIR.SLASH.'simple_http_wget.pm' && (grep -x $_.SLASH.'wget
 		'simple_http.pm';
 #warn "using $HTTP_module for http requests\n";
 #require $HTTP_module;
-$TempDir= Glib::get_tmp_dir.SLASH; _utf8_off($TempDir); #turn utf8 flag off to not auto-utf8-upgrade other filenames in the same strings
+
+ # load gstreamer backend module
+ if (!$CmdLine{nogst})
+ {	my @gst= ('gmusicbrowser_gstreamer-1.x.pm', 'gmusicbrowser_gstreamer-0.10.pm');
+	my $error;
+	@gst= reverse @gst if $CmdLine{gst0};
+	{	my $file= shift @gst;
+		eval { require $file; };	#each file sets $::PlayPacks{PACKAGENAME} to 1 for each of its included playback packages
+		if ($@)
+		{	warn $@ if $::debug;
+			if (@gst) {$error=$@; redo unless $::gstreamer_version} # keep first error message, try next file unless parts already loaded
+			$error=~s/\n.*//s; #only keep first line, others are noise
+			my $error0= "Can't load either gstreamer-1.x (via Glib::Object::Introspection) or gstreamer-0.10 (via GStreamer)";
+			if (@gst) { $error0= "Error loading gstreamer-$::gstreamer_version" }
+			warn "\n$error0 -> gstreamer output won't be available :\n $error\n\n";
+		}
+		warn "Using gstreamer-.$::gstreamer_version.\n" if $::debug;
+	}
+ }
+
+ # load non-gstreamer backend modules
+ for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_server.pm/)
+ {	eval { require $file } || warn $@;	#each file sets $::PlayPacks{PACKAGENAME} to 1 for each of its included playback packages
+ }
+
+
+ $TempDir= Glib::get_tmp_dir.SLASH; _utf8_off($TempDir); #turn utf8 flag off to not auto-utf8-upgrade other filenames in the same strings
 }
 
 our $CairoOK;
@@ -1075,6 +1101,7 @@ our %Options=
 	gst_rg_preamp	=> 0,
 	gst_rg_fallback	=> 0,
 	gst_rg_songmenu => 0,
+	use_GST_for_server=>1,
 	Icecast_port	=> '8000',
 	UseTray		=> 1,
 	CloseToTray	=> 0,
@@ -1495,10 +1522,6 @@ if ($CmdLine{UseGnomeSession})
 	Watch(undef,NextSongs	=> sub { UpdateRelatedFilter('Next'); });
 	Watch(undef,CurSong	=> sub { UpdateRelatedFilter('Play'); });
 }
-our ($Play_package,%PlayPacks); my ($PlayNext_package,$Vol_package);
-for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_gstreamer-0.10.pm gmusicbrowser_server.pm/)
-{	eval { require $file } || warn $@;	#each file sets $::PlayPacks{PACKAGENAME} to 1 for each of its included playback packages
-}
 
 LoadPlugins();
 if ($CmdLine{pluginlist}) { warn "$_ : $Plugins{$_}{name}\n" for sort keys %Plugins; exit; }
@@ -1520,7 +1543,6 @@ LoadIcons();
 
 {	my $pp=$Options{AudioOut};
 	$pp= $Options{use_GST_for_server} ? 'Play_GST_server' : 'Play_Server' if $CmdLine{server};
-	$pp='Play_GST' if $CmdLine{gst};
 	for my $p ($pp, qw/Play_GST Play_123 Play_mplayer Play_GST_server Play_Server/)
 	{	next unless $p && $PlayPacks{$p};
 		$pp=$p;
@@ -6250,8 +6272,10 @@ sub SetDefaultOptions
 sub PrefAudio
 {	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
+	my $gst_string="gstreamer";
+	$gst_string.= ' '.$::gstreamer_version if $::gstreamer_version;
 	my ($radio_gst,$radio_123,$radio_mp,$radio_ice)=NewPrefRadio('AudioOut',
-		[ gstreamer		=> 'Play_GST',
+		[ $gst_string		=> 'Play_GST',
 		  'mpg123/ogg123/...'	=> 'Play_123',
 		  mplayer		=> 'Play_mplayer',
 		  _"icecast server"	=> sub {$Options{use_GST_for_server}? 'Play_GST_server' : 'Play_Server'},
