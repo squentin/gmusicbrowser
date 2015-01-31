@@ -1436,14 +1436,18 @@ sub call_run_system_cmd
 sub run_system_cmd
 {	my ($cmd,$IDs,$use_shell)=@_;
 	return unless $cmd=~m/\S/; #check if command is empty
-	$cmd=Encode::encode("utf8", $cmd);
-	my $join=' ';
-	if (!$use_shell) { $join="\x00"; $cmd= join $join,split_with_quotes($cmd); }
-	my $quotesub= sub { my $s=$_[0]; if (utf8::is_utf8($s)) { $s=Encode::encode("utf8",$s); } $use_shell ? quotemeta($s) : $s; };
+	my $quotesub= sub { my $s=$_[0]; $s=Encode::encode("utf8",$s) if utf8::is_utf8($s); $use_shell ? quotemeta($s) : $s; };
+	my $join= $use_shell ? ' ' : "\x00";
+	if (!ref $cmd && !$use_shell) { $cmd=[split_with_quotes($cmd)] }
+	if (ref $cmd) { ($cmd,my @args)=@$cmd; $cmd=Encode::encode("utf8",$cmd); @args= map $quotesub->($_), @args; $cmd=join $join,$cmd,@args; }
+	else { $cmd= Encode::encode("utf8",$cmd); }
 	my (@cmds,$files);
-	if ($cmd=~m/\$files\b/) { $files= join $join,map $quotesub->(Songs::GetFullFilename($_)),@$IDs; }
-	if (@$IDs>1 && !$files) { @cmds= map ReplaceFields($_,$cmd,$quotesub), @$IDs; }
-	else { @cmds=( ReplaceFields($IDs->[0],$cmd,$quotesub, {'$files'=>$files}) ); }
+	if ($IDs)
+	{	if ($cmd=~m/\$files\b/) { $files= join $join,map $quotesub->(Songs::GetFullFilename($_)),@$IDs; }
+		if (@$IDs>1 && !$files) { @cmds= map ReplaceFields($_,$cmd,$quotesub), @$IDs; }
+		else { @cmds=( ReplaceFields($IDs->[0],$cmd,$quotesub, {'$files'=>$files}) ); }
+	}
+	else { @cmds=($cmd) }
 	if ($use_shell) { my $shell= $ENV{SHELL} || 'sh'; @cmds= map [$shell,'-c',$_], @cmds; }
 	else { @cmds= map [split /\x00/,$_], @cmds; }
 	forksystem(@cmds);
@@ -3535,8 +3539,7 @@ sub openfolder
 	if ($^O eq 'MSWin32') { system qq(start "$dir"); return } #FIXME if $dir contains "
 	$opendircmd||=findcmd($Options{OpenFolder},qw/xdg-open gnome-open nautilus konqueror thunar/);
 	unless ($opendircmd) { ErrorMessage(_"No file browser found."); return }
-	$dir=quotemeta $dir;
-	system "$opendircmd $dir &";
+	run_system_cmd([$opendircmd,$dir],undef,1);
 }
 sub findcmd
 {	for my $cmd (grep defined,@_)
