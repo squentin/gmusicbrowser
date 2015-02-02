@@ -125,13 +125,19 @@ sub create_playbin
 	$self->connect_visuals if $self->{has_visuals};
 }
 
+sub _parse_error
+{	my $msg=shift;
+	my $s=$msg->get_structure;
+	return $s->get_value('gerror')->message, $s->get_string('debug');
+}
+
 sub bus_message_end
 {	my ($msg,$error)=($_[1],$_[2]);
 	my $self=$_[0]{self};
 	#error msg if $error is true, else eos
 	if ($self->{continuous}) { $self->{sink}->set_locked_state(1); $self->{playbin}->set_state('null'); $self->{sink}->set_locked_state(0); }
 	else { $self->{playbin}->set_state('null'); }
-	if ($error)	{ ::ErrorPlay($msg->parse_error); } #FIXME not sure how to use parse_error, can't test as it doesn't seem to work currently : "FIXME - GI_TYPE_TAG_ERROR" (Glib::Object::Introspection-0.027)
+	if ($error)	{ ::ErrorPlay(_parse_error($msg)); } #can't use $msg->parse_error as it doesn't work currently : "FIXME - GI_TYPE_TAG_ERROR" (Glib::Object::Introspection-0.027)
 	else		{ ::end_of_file(); }
 }
 
@@ -641,7 +647,7 @@ sub Analyse
 
 		my $bus=$RGA_pipeline->get_bus;
 		$bus->add_signal_watch;
-		$bus->signal_connect('message::error' => sub { warn "ReplayGain analysis error : ".$_[1]->parse_error."\n"; }); #FIXME  #FIXME not sure how to use parse_error, can't test as it doesn't seem to work currently : "FIXME - GI_TYPE_TAG_ERROR" (Glib::Object::Introspection-0.027)
+		$bus->signal_connect('message::error' => sub { warn "ReplayGain analysis error : ".join(":\n ",Play_GST::_parse_error($_[1]))."\n"; }); #can't use $msg->parse_error as it doesn't work currently : "FIXME - GI_TYPE_TAG_ERROR" (Glib::Object::Introspection-0.027)
 		$bus->signal_connect('message::tag' => \&bus_message_tag);
 		$bus->signal_connect('message::eos' => \&process_next);
 		#FIXME check errors
