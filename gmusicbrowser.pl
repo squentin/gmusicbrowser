@@ -575,7 +575,8 @@ our @submenuQueue=
 	{ label => _"Append",			code => sub {      Enqueue( @{ $_[0]{IDs} } ); }, },
 );
 #modes : S:Search, B:Browser, Q:Queue, L:List, P:Playing song in the player window, F:Filter Panels (submenu "x songs")
-our @SongCMenu=
+our @SongCMenu;
+unshift @SongCMenu,  #unshift instead of "=" because the replaygain submenu (and maybe more in the future) has already been added to @::SongCMenu
 (	{ label => _"Song Properties",	code => sub { DialogSongProp (@{ $_[0]{IDs} }); },	onlyone => 'IDs', stockicon => 'gtk-edit' },
 	{ label => _"Songs Properties",	code => sub { DialogSongsProp(@{ $_[0]{IDs} }); },	onlymany=> 'IDs', stockicon => 'gtk-edit' },
 	{ label => _"Play Only Selected",code => sub { Select(song => 'first', play => 1, staticlist => $_[0]{IDs} ); },
