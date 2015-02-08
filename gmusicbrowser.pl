@@ -1323,7 +1323,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	PlayPause	=> [\&PlayPause,			_"Play/Pause"],
 	Forward		=> [\&Forward,				_"Forward",_"Number of seconds",qr/^\d+$/],
 	Rewind		=> [\&Rewind,				_"Rewind",_"Number of seconds",qr/^\d+$/],
-	Seek		=> [sub {SkipTo($_[1])},		_"Seek",_"Number of seconds",qr/^\d+$/],
+	Seek		=> [sub {SkipTo($_[1])},		_"Seek",_"Number of seconds",qr/^-?\d+$/],
 	Stop		=> [\&Stop,				_"Stop"],
 	Pause		=> [sub {Pause() if $TogPlay; },	_"Pause"],
 	Play		=> [sub {PlayPause() unless $TogPlay; },_"Play"],
@@ -2630,6 +2630,7 @@ sub Forward
 sub SkipTo
 {	return unless defined $SongID;
 	my $sec=shift;
+	if ($sec && $sec<0) { $sec+= Songs::Get($SongID,'length'); $sec=0 if $sec<0; }
 	if (defined $PlayingID && defined $PlayTime) # if song already playing
 	{	push @Played_segments, $StartedAt, $PlayTime;
 		$StartedAt=$sec;
