@@ -173,7 +173,7 @@ VBox = Volume(xalign=.5) _VolumeSlider(vertical=1)
 
 [Equalizer]
 Window		= size=300x160,uniqueid=Equalizer,ifexist=replace
-VBmain		= _Equalizer
+VBmain		= 2EqualizerPresets _Equalizer
 Title		= _"Equalizer"
 
 [Progress]

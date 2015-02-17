@@ -332,6 +332,7 @@ sub set_equalizer_preamp
 	my $preamp=$PlayBin->get_by_name('equalizer-preamp');
 	$preamp->set( volume => $volume**3) if $preamp;
 	$::Options{gst_equalizer_preamp}=$volume;
+	::HasChanged('Equalizer','preamp');
 }
 sub set_equalizer
 {	my (undef,$band,$val)=@_;
@@ -342,6 +343,7 @@ sub set_equalizer
 	::setlocale(::LC_NUMERIC, 'C');
 	$::Options{gst_equalizer}=join ':',@vals;
 	::setlocale(::LC_NUMERIC, '');
+	::HasChanged('Equalizer','value');
 }
 sub EQ_Get_Range
 {	createPlayBin() unless $PlayBin;

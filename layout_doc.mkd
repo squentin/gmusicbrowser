@@ -546,6 +546,12 @@ indicators (Filter Queue Sort ...) and some buttons (Play Next Prev Stop Quit ..
  - Equalizer : Equalizer, only active with gstreamer currently
     - preamp : whether to show the preamp, default to 1
     - labels : pango attribute used to display labels, default to `x-small`
+ - EqualizerPresets : allows selecting and editing equalizer presets
+    - editmode : set default mode, edit (1) or normal (0) (the default)
+    - notoggle : default to 0, if 1 do not display the button that toggles edit mode
+    - open  : default to 0, if 1 add an "Open equalizer" entry to the combobox
+    - onoff : default to 1, if >1 add a "Turn off equalizer" entry to the combobox, if >0 show a "Turn on equalizer" button if it is off
+ - EqualizerPresetsSimple : same as EqualizerPresets with open=1 and notoggle=1
  - Progress : widget to display progress of current operations, hidden if no operations in progress
     - compact: make it more compact, less verbose, default to 1
  - VProgress : same as Progress, but the widget use more vertical space and less horizontal space, and the compact option is 0 (false) by default

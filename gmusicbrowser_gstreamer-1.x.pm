@@ -97,7 +97,7 @@ sub init
 {	my $reg= GStreamer1::Registry::get();
 	$::Options{gst_sink}='' unless $reg->lookup_feature( ($::Options{gst_sink}||'').'sink' );
 	$::Options{gst_sink}||= (grep ($reg->lookup_feature($_.'sink'), qw/autoaudio pulse alsa oss oss4/),'autoaudio')[0]; #find a default sink
-	return bless { EQ=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
+	return bless { EQ=>$GST_EQ_ok, EQpresets=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
 }
 
 
@@ -408,6 +408,7 @@ sub set_equalizer_preamp
 	my $preamp= $self->{playbin}->get_by_name('equalizer-preamp');
 	$preamp->set( volume => $volume**3) if $preamp;
 	$::Options{gst_equalizer_preamp}=$volume;
+	::HasChanged('Equalizer','preamp');
 }
 sub set_equalizer
 {	my ($self,$band,$val)=@_;
@@ -418,7 +419,53 @@ sub set_equalizer
 	::setlocale(::LC_NUMERIC, 'C');
 	$::Options{gst_equalizer}=join ':',@vals;
 	::setlocale(::LC_NUMERIC, '');
+	::HasChanged('Equalizer','value');
+	$::Options{gst_equalizer_preset}='';
+	::HasChanged('Equalizer','preset');
 }
+
+sub get_equalizer
+{	my $self=shift;
+	return $self->{playbin} && $self->{playbin}->get_by_name('equalizer') || GStreamer1::ElementFactory::make('equalizer-10bands' => 'equalizer');
+}
+sub EQ_Get_Presets
+{	my $self=shift;
+	my $equalizer= $self->get_equalizer;
+	my $presets=$equalizer->get_preset_names;
+	return @$presets;
+}
+sub EQ_Load_Preset
+{	my ($self,$name)=@_;
+	my $equalizer= $self->get_equalizer;
+	$equalizer->load_preset($name);
+	$::Options{gst_equalizer_preset}=$name;
+	::setlocale(::LC_NUMERIC, 'C');
+	$::Options{gst_equalizer}= join ":",map $equalizer->get('band'.$_), 0..9;
+	::setlocale(::LC_NUMERIC, '');
+	::HasChanged('Equalizer','value');
+	::HasChanged('Equalizer','preset');
+}
+sub EQ_Save_Preset
+{	my ($self,$name)=@_;
+	my $equalizer= $self->get_equalizer;
+	my @val= split /:/, $::Options{gst_equalizer};
+	::setlocale(::LC_NUMERIC, 'C');
+	$equalizer->set( 'band'.$_ => $val[$_]) for 0..9;
+	::setlocale(::LC_NUMERIC, '');
+	$equalizer->save_preset($name);
+	$::Options{gst_equalizer_preset}=$name;
+	::HasChanged('Equalizer','presetlist');
+	::HasChanged('Equalizer','preset');
+}
+sub EQ_Delete_Preset
+{	my ($self,$name)=@_;
+	my $equalizer= $self->get_equalizer;
+	$equalizer->delete_preset($name);
+	$::Options{gst_equalizer_preset}='';
+	::HasChanged('Equalizer','presetlist');
+	::HasChanged('Equalizer','preset');
+}
+
 
 sub EQ_Get_Range
 {	my $self=shift;
@@ -815,7 +862,7 @@ sub init
 		warn "gstreamer plugin '$feature' not found -> gstreamer-server mode not available\n";
 	}
 	return unless $ok;
-	return bless { EQ=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
+	return bless { EQ=>$GST_EQ_ok, EQpresets=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
 }
 
 sub Close

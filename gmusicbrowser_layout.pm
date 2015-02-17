@@ -721,6 +721,17 @@ our %Widgets=
 		preamp	=> 1,
 		labels	=> 'x-small',
 	},
+	EqualizerPresets =>
+	{	class	=> 'Layout::EqualizerPresets',
+		event	=> 'Equalizer',
+		update	=> \&Layout::EqualizerPresets::update,
+		onoff	=> 1,
+	},
+	EqualizerPresetsSimple =>
+	{	parent => 'EqualizerPresets',
+		open   =>1,
+		notoggle=>1,
+	}
 #	RadioList =>
 #	{	class => 'GMB::RadioList',
 #	},
@@ -5197,6 +5208,195 @@ sub update
 	$bar->set_text( $bartext )	if defined $bartext;
 }
 
+package Layout::EqualizerPresets;
+use base 'Gtk2::Box';
+use constant SEPARATOR => '  '; # must not be a possible name of a preset, use "  " because EqualizerPresets won't let you create names that contain only spaces
+
+sub new
+{	my ($class,$opt)=@_;
+	my $self= bless Gtk2::HBox->new, $class;
+	my $editmode= $self->{editmode}= $opt->{editmode} ? 1 : 0;
+	$self->{open}= $opt->{open} ? 1 : -1;
+	$self->{onoff}= $opt->{onoff}||0;
+	$self->{turnoff}= $self->{onoff}>1 ? 1 : -1;
+
+	my $mainbox= $self->{mainbox}= Gtk2::HBox->new;
+
+	my $combo= $self->{combo}=  Gtk2::ComboBox->new_text;
+	$combo->signal_connect(changed=> \&combo_changed_cb);
+	$combo->set_row_separator_func(sub { my $text=$_[0]->get_value($_[1]); defined $text && $text eq SEPARATOR});
+
+	my $turnon= $self->{turnon}= Gtk2::Button->new(_"Turn equalizer on");
+	$turnon->signal_connect(clicked=> \&button_cb, 'turn_on');
+
+	unless ($opt->{notoggle})
+	{	my $toggle= $self->{toggle}= Gtk2::ToggleButton->new;
+		$toggle->add(Gtk2::Image->new_from_stock('gtk-edit','menu'));
+		$toggle->set_tooltip_text(_"Toggle edit mode");
+		$toggle->set_active(1) if $editmode;
+		$toggle->signal_connect(toggled=>\&button_cb,'toggle_mode');
+		$mainbox->pack_start($toggle,0,0,0);
+	}
+
+	$mainbox->pack_start($combo,0,0,0);
+
+	if (!$opt->{notoggle} || $editmode)
+	{	my $editbox= $self->{editbox}= Gtk2::HBox->new;
+		my $entry  = $self->{entry}=   Gtk2::Entry->new;
+		my $sbutton= $self->{sbutton}= ::NewIconButton('gtk-save',  _"Save");
+		my $rbutton= $self->{rbutton}= ::NewIconButton('gtk-delete');
+		my $completion= Gtk2::EntryCompletion->new;
+		$completion->set_model($combo->get_model);
+		$completion->set_text_column(0);
+		$entry->set_completion($completion);
+		$entry->signal_connect(changed=> \&button_cb, 'entry');
+		$sbutton->signal_connect(clicked=> \&button_cb, 'save');
+		$rbutton->signal_connect(clicked=> \&button_cb, 'delete');
+		$sbutton->set_tooltip_text(_"Save preset");
+		$rbutton->set_tooltip_text(_"Delete preset");
+		$entry->set_tooltip_text(_"Save as...");
+		$editbox->pack_start($_,0,0,0) for $entry,$sbutton,$rbutton;
+		$mainbox->pack_start($editbox,0,0,0);
+		$editbox->show_all;
+		$editbox->set_no_show_all(1);
+		$editbox->set_visible($editmode);
+	}
+
+	for my $w ($turnon,$mainbox)
+	{	$self->pack_start($w,0,0,0);
+		$w->show_all;
+		$w->set_no_show_all(1);
+	}
+	return $self;
+}
+
+sub Turn_Equalizer	#FIXME should become a command
+{	my $on= $_[0] ? 1 : 0;
+	::SetOption(gst_use_equalizer=>$on);
+	::HasChanged('Equalizer');
+}
+
+sub combo_changed_cb
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+	return if $self->{busy};
+	my $current= $self->{combo}->get_active_text;
+	my $index= $self->{combo}->get_active;
+	my $event=Gtk2->get_current_event;
+	if ($index>$self->{lastpreset}) # if an action is selected
+	{	my $action= $event->isa('Gtk2::Gdk::Event::Button');
+		if ($event->isa('Gtk2::Gdk::Event::Key'))
+		{	my $key= Gtk2::Gdk->keyval_name( $event->keyval );
+			$action=1 if grep $key eq $_, qw/space Return KP_Enter/;
+		}
+		#only execute actions if clicked with the mouse, or choose in the popup with the keyboard, not by scrolling
+		if (!$action)
+		{	$self->update('preset'); #reset the combobox to the current preset
+		}
+		elsif ($self->{open}   == $index) { ::OpenSpecialWindow('Equalizer'); $self->update; }
+		elsif ($self->{turnoff}== $index) { Turn_Equalizer(0); }
+		return
+	}
+	$::Play_package->EQ_Load_Preset($current) if $current ne '';
+}
+sub button_cb
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+	my $action= $_[1];
+
+	if ($action eq 'save')
+	{	$::Play_package->EQ_Save_Preset( $self->{entry}->get_text );
+	}
+	elsif ($action eq 'delete')
+	{	$::Play_package->EQ_Delete_Preset( $self->{combo}->get_active_text );
+	}
+	elsif ($action eq 'toggle_mode')
+	{	$self->{editmode}= $self->{toggle}->get_active ? 1 : 0;
+		$self->{editbox}->set_visible($self->{editmode});
+	}
+	elsif ($action eq 'entry')
+	{	$self->update_buttons;
+	}
+	elsif ($action eq 'turn_on')
+	{	Turn_Equalizer(1);
+	}
+}
+
+sub update
+{	my ($self,$event)=@_;
+	my $ok= $::Play_package->{EQpresets} && $::Options{gst_use_equalizer};
+	if (!$::Play_package->{EQpresets})
+	{	$self->{mainbox}->hide;
+		$self->{turnon}->hide;
+	}
+	else
+	{	if ($self->{onoff}>0)
+		{	$self->{mainbox}->set_visible($ok);
+			$self->{turnon}->set_visible(!$ok);
+		}
+		else
+		{	$self->{mainbox}->set_sensitive($ok);
+			$self->{mainbox}->show;
+			$self->{turnon}->hide;
+		}
+	}
+	return unless $ok;
+	my $full= !$event || $event eq 'package' || $event eq 'presetlist'; #first time or package changed or preset_list changed
+	return unless $full || $event eq 'preset';
+	my $set= $::Options{gst_equalizer_preset};
+	$set='' unless defined $set;
+
+	my $changed= $set eq ''; # not a saved preset
+	$full=1 if $changed xor $self->{changed};
+	$full=1 if !$changed && !exists $self->{presets}{$set};
+	$self->{changed}= $changed;
+
+	my $combo= $self->{combo};
+	$self->{busy}=1;
+	if ($full) # (re)fill the list
+	{	$combo->get_model->clear;
+		delete $self->{presets};
+		my $i=0;
+		if ($set eq '')
+		{	$combo->append_text('');
+			$combo->set_active($i);
+			$i++;
+		}
+		for my $name (::superlc_sort($::Play_package->EQ_Get_Presets))
+		{	$combo->append_text($name);
+			$self->{presets}{$name}=$i;
+			$combo->set_active($i) if $name eq $set;
+			$i++;
+		}
+		# add actions
+		$self->{lastpreset}= $i-1;
+		if ($self->{open}>0 || $self->{turnoff}>0)
+		{	$combo->append_text(SEPARATOR);
+			$i++;
+			if ($self->{open}>0)
+			{	$combo->append_text(_"Open equalizer...");
+				$self->{open}=$i++;
+			}
+			if ($self->{turnoff}>0)
+			{	$combo->append_text(_"Turn equalizer off");
+				$self->{turnoff}=$i++;
+			}
+		}
+	}
+	elsif ($set ne '') { $combo->set_active( $self->{presets}{$set} ); }
+	$self->{entry}->set_text($set) if $set ne '' && $self->{entry};
+	$self->{busy}=0;
+	$self->update_buttons;
+}
+sub update_buttons
+{	my $self=shift;
+	if ($self->{entry})
+	{	my $new= $self->{entry}->get_text;
+		my $ok= $new=~m/\S/ && ($self->{changed} || !exists $self->{presets}{$new});
+		$self->{sbutton}->set_sensitive($ok);
+		my $current= $self->{combo}->get_active_text;
+		$self->{rbutton}->set_sensitive(exists $self->{presets}{$current});
+	}
+}
+
 package Layout::Equalizer;
 sub new
 {	my $opt=$_[0];
@@ -5211,7 +5411,7 @@ sub new
 		$scale->add_mark(1,'left',undef);
 		$self->{adj_preamp}=$adj;
 		$adj->signal_connect(value_changed =>
-			sub { $::Play_package->set_equalizer_preamp($_[0]->get_value) unless $_[0]{busy}; ::HasChanged('Equalizer','preamp') });
+			sub { $::Play_package->set_equalizer_preamp($_[0]->get_value) unless $_[0]{busy}; });
 		if ($self->{labels})
 		{	my $vbox=Gtk2::VBox->new;
 			my $label0=Gtk2::Label->new;
@@ -5234,7 +5434,7 @@ sub new
 		$scale->add_mark(0,'left',undef);
 		$self->{'adj'.$i}=$adj;
 		$adj->signal_connect(value_changed =>
-		sub { $::Play_package->set_equalizer($_[1],$_[0]->get_value) unless $_[0]{busy}; ::HasChanged('Equalizer','value') },$i);
+		sub { $::Play_package->set_equalizer($_[1],$_[0]->get_value) unless $_[0]{busy}; },$i);
 		if ($self->{labels})
 		{	my $vbox=Gtk2::VBox->new;
 			my $label0=Gtk2::Label->new;
