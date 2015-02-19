@@ -6486,10 +6486,14 @@ sub PrefMisc
 	my $playedpercent= NewPrefSpinButton('PlayedMinPercent'	,0,100,  text=>_"Threshold to count a song as played : %d %");
 	my $playedseconds= NewPrefSpinButton('PlayedMinSeconds'	,0,99999,text=>_"or %d seconds");
 
+	my $urlcmd= NewPrefEntry(OpenUrl => _"Command to open urls :", tip => _"Will use system's default if blank", history=> 'OpenUrl_history');
+	my $foldercmd= NewPrefEntry(OpenFolder => _"Command to open folders :", tip => _"Will use system's default if blank", history=> 'OpenFolder_history');
+
 	my $vbox= Vpack( $checkR1,$checkR2,$checkR4, $DefRating,$ProxyCheck, $asplit, $atitle,
 			[0,$datealign,$preview], $screensaver,$shutentry, $always_in_pl,
 			$recent_include_not_played, $volstep, $pixcache,
 			[ $playedpercent, $playedseconds ],
+			$urlcmd, $foldercmd,
 		);
 	my $sw = Gtk2::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');
