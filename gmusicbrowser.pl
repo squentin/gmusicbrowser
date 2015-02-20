@@ -4856,7 +4856,7 @@ sub ChoosePix
 	$dialog->set_preview_widget_active(0);
 	if ($remember_key)	{ $path= $Options{$remember_key}; }
 	elsif ($path)		{ $path= url_escape($path); }
-	if ($file && $file=~s/:(\d+)$//) { $nb=$1; $lastfile=$file; }
+	if ($file && $file=~s/:(\w+)$//) { $nb=$1; $lastfile=$file; $nb= FileTag::PixFromMusicFile($file,$nb,1,1)||0 if $nb=~m/\D/; }
 	if ($file && -f $file)	{ $dialog->set_filename($file); $update_preview->($dialog,$file); }
 	elsif ($path)		{ $dialog->set_current_folder_uri( "file://$path" ); }
 
@@ -5880,6 +5880,7 @@ sub AutoSelPicture
 		{	my @files= grep m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i, Songs::Map('fullfilename',$IDs);
 			if (@files)
 			{	$set= first { FileTag::PixFromMusicFile($_,$field,1) && $_ } sort @files;
+				$set.= ':'.$field if $set;
 			}
 		}
 		elsif ($m eq 'guess')

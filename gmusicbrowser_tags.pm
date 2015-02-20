@@ -245,7 +245,7 @@ sub FMPS_hash_write
 }
 
 sub PixFromMusicFile
-{	my ($file,$nb,$quiet)=@_;
+{	my ($file,$nb,$quiet,$return_number)=@_;
 	if ($file=~s/:(\w+)$//) {$nb=$1} # index can be specified as argument or in the filename
 	my ($h)=Read($file,0,'embedded_pictures');
 	return unless $h;
@@ -270,6 +270,7 @@ sub PixFromMusicFile
 	}
 	elsif ($nb>$#$pix) { $nb=0 }
 
+	return $nb if $return_number;
 	return ref $pix->[0] ? $pix->[$nb][3] : $pix->[$nb];
 }
 
