@@ -50,7 +50,7 @@ our %timespan_menu=
 		'filter:si'	=> 'index( lc(#display#),"#VAL#") .!=. -1',	'filter_prep:si'=> sub {quotemeta lc($_[0])},
 		'filter:s'	=> 'index(    #display#, "#VAL#") .!=. -1',	'filter_prep:s'=> sub {quotemeta $_[0]},
 		'filter:fuzzy'	=> '.!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",lc(#get#))', 'filter_prep:fuzzy'=> sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta lc($arg[1])},
-		'filterpat:fuzzy'=> [ display => "%d %%", unit => '%', min=>20, max=>99, default_value=>65, ],
+		'filterpat:fuzzy'=> [ round => "%d", unit => '%', min=>20, max=>99, default_value=>65, ],
 		'filterdesc:fuzzy'=> [ _"%s fuzzy match with %s",_"fuzzy match", 'fuzzy string', ],
 		'filterdesc:-fuzzy'=> _"no %s fuzzy match with %s",
 		'filterdesc:mi'	=> [ _"matches regexp %s",_"matches regexp",'regexp',	icase=>1, ],
@@ -162,7 +162,7 @@ our %timespan_menu=
 		'smartfilter::' => 'si s',
 		'smartfilter:~' => 'mi m',
 		'smartfilter:#' => \&Filter::smartstring_fuzzy,
-		'filterpat:fuzzy'=> [ display => "%d %%", unit => '%', min=>20, max=>99, default_value=>65, ],
+		'filterpat:fuzzy'=> [ round => "%d", unit => '%', min=>20, max=>99, default_value=>65, ],
 		default_filter	=> 'si',
 
 		load_extra	=> '___gid{#SGID#} || return;',
@@ -229,7 +229,7 @@ our %timespan_menu=
 		'smartfilter::' => 'si s',
 		'smartfilter:~' => 'mi m',
 		'smartfilter:#' => \&Filter::smartstring_fuzzy,
-		'filterpat:fuzzy'=> [ display => "%d %%", unit => '%', min=>20, max=>99, default_value=>65, ],
+		'filterpat:fuzzy'=> [ round => "%d", unit => '%', min=>20, max=>99, default_value=>65, ],
 		default_filter	=> 'si',
 	},
 	artist_first =>
@@ -439,10 +439,10 @@ our %timespan_menu=
 		'filterdesc:-t'	=> _"not in the bottom %s",
 		'filterpat:substring'	=> [icase => 0],
 		'filterpat:regexp'	=> [icase => 0],
-		'smartfilter:>' => \&Filter::_smartstring_moreless,
-		'smartfilter:<' => \&Filter::_smartstring_moreless,
-		'smartfilter:<='=> \&Filter::_smartstring_moreless,
-		'smartfilter:>='=> \&Filter::_smartstring_moreless,
+		'smartfilter:>' => \&Filter::_smartstring_number_moreless,
+		'smartfilter:<' => \&Filter::_smartstring_number_moreless,
+		'smartfilter:<='=> \&Filter::_smartstring_number_moreless,
+		'smartfilter:>='=> \&Filter::_smartstring_number_moreless,
 		'smartfilter:=' => \&Filter::_smartstring_number,
 		'smartfilter::' => \&Filter::_smartstring_number,
 		'smartfilter:~' => 'm',
@@ -484,7 +484,7 @@ our %timespan_menu=
 	},
 	float	=>	#make sure the string doesn't have the utf8 flag, else substr won't work
 	{	_		=> 'unpack("F",substr(____,#ID#<<3,8))',
-		display		=> 'do {my $v=#_#; (#v_is_nan# ? "" : sprintf("#displayformat#", $v ))}',	# replace novalue (NaN) with ""
+		display		=> 'do {my $v=#_#; (#v_is_nan# ? "" : ::format_number($v,"#displayformat#"))}',	# replace novalue (NaN) with ""
 		get		=> 'do {my $v=#_#; (#v_is_nan# ? "" : $v ); }',					#
 		diff		=> ($nan==$nan ? 'do {my $new=#VAL#; $new=#nan# unless length $new; $new!=#_# }' :
 						 'do {my $new=#VAL#; $new=#nan# unless length $new; my $v=#_#; $new!=$v && ($new==$new || ! #v_is_nan#) }'),
@@ -500,7 +500,7 @@ our %timespan_menu=
 		# FIXME make sure that locale is set to C (=> '.' as decimal separator) when needed
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,min=>$Def{$field}{edit_min},max=>$Def{$field}{edit_max},signed=>1,digits=>2,mode=>'allow_empty'); },
 		autofill_re	=> '-?\\d*\\.?\\d+',
-		'filterpat:value' => [digits => 2, signed=>1, ],
+		'filterpat:value' => [ digits => 2, signed=>1, round => "%.2f", ],
 		n_sort		=> 'do {my $v=#_#; #v_is_nan# ? "-inf" : $v}',
 		'filter:defined'	=> 'do {my $v=#_#; .!. (#v_is_nan#)}',
 		'filterdesc:defined:1'	=> _"is defined",
@@ -524,17 +524,22 @@ our %timespan_menu=
 	'length' =>
 	{	display	=> 'sprintf("%d:%02d", #_#/60, #_#%60)',
 		parent	=> 'integer',
+		'filter_prep:e'	=> \&::ConvertTimeLength,
+		'filter_prep:>'	=> \&::ConvertTimeLength,
+		'filter_prep:<'	=> \&::ConvertTimeLength,
+		'filter_prep:b'	=> sub {sort {$a <=> $b} map ::ConvertTimeLength($_), split / /,$_[0],2},
 	},
 	'length.div' => { gid_to_display	=> 'my $v=#GID# * #ARG0#; sprintf("%d:%02d", $v/60, $v%60);', },
 	size	=>
-	{	display	=> '(sprintf("%.1f", #_#/'.::KB()*::KB().').q( '._"MB".'))',
+	{	display	=> '( ::format_number( #_#/'. ::MB() .',"%.1f").q('. _"MB" .') )',
+		'filter_prep:e'	=> \&::ConvertSize,
 		'filter_prep:>'	=> \&::ConvertSize,
 		'filter_prep:<'	=> \&::ConvertSize,
 		'filter_prep:b'	=> sub {sort {$a <=> $b} map ::ConvertSize($_), split / /,$_[0],2},
 		parent	=> 'integer',
 		'filterpat:value' => [ unit=> \%::SIZEUNITS, default_unit=> 'm', default_value=>1, ],
 	},
-	'size.div'   => { gid_to_display	=> 'sprintf("%dM", #GID# * #ARG0#/'.::KB()*::KB().');', },
+	'size.div'   => { gid_to_display	=> '( ::format_number( #GID# * #ARG0#/'. ::MB() .',"%d").q( '. _"MB" .') )', },
 	rating	=>
 	{	parent	=> 'integer',
 		bits	=> 8,
@@ -822,7 +827,7 @@ our %timespan_menu=
  size	=>
  {	name => _"Size",	width => 80,	flags => 'fgarscp_',		#32bits => 4G max
 	type => 'size',
-	FilterList => {type=>'div.'.::KB()*::KB(),},
+	FilterList => {type=>'div.'.::MB(),},
 	category=>'file',
  },
  title	=>
@@ -1073,7 +1078,7 @@ our %timespan_menu=
 	starprefix => 'stars',
 	edit_order=> 90,	edit_many=>1,
 	options	=> 'rw_ userid',
-	'filterpat:value' => [ display => "%d %%", unit => '%', max=>100, default_value=>50, ],
+	'filterpat:value' => [ round => "%d", unit => '%', max=>100, default_value=>50, ],
 	category=>'basic',
 	alias	=> 'stars',
  },
@@ -1210,7 +1215,7 @@ our %timespan_menu=
  {	name	=> _"Bitrate",		width => 90,	flags => 'fgarscp_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
 	display	=> '::replace_fnumber("%d kbps",#_#)',
 	FilterList => {type=>'div.32',},
-	'filterpat:value' => [ display => "%d kbps", unit => 'kbps', default_value=>192 ],
+	'filterpat:value' => [ round => "%d", unit => 'kbps', default_value=>192 ],
 	category=>'audio',
  },
  samprate=>
@@ -1218,7 +1223,7 @@ our %timespan_menu=
 	display	=> '::replace_fnumber("%d Hz",#_#)',
 	FilterList => {},
 	'filterdesc:e:44100' => _"is 44.1kHz",
-	'filterpat:value' => [ display => "%d Hz", unit => 'Hz', step=> 100, default_value=>44100 ],
+	'filterpat:value' => [ round => "%d", unit => 'Hz', step=> 100, default_value=>44100 ],
 	category=>'audio',
  },
  filetype=>
@@ -1242,7 +1247,7 @@ our %timespan_menu=
  {	name	=> _"Length",		width => 50,	flags => 'fgarscp_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
 	audioinfo => 'seconds',		check	=> '#VAL#= sprintf "%.0f",#VAL#;',
 	FilterList => {type=>'div.60',},
-	'filterpat:value' => [ display => "%d s", unit => 's', default_value=>1 ],	#should 's' be translated ?
+	'filterpat:value' => [ unit => \%::TIMEUNITS, default_unit=> 's', default_value=>1 ],
 	letter => 'm',
 	category=>'audio',
  },
@@ -4350,10 +4355,31 @@ sub new_from_smartstring
 	}
 	return Filter->newadd(@$or);
 }
-sub _smartstring_moreless
+sub _smartstring_number_check_unit
+{	my ($pat,$field)=@_;
+	return '' unless length $pat;
+	my $opt= { @{ Songs::Field_property($field,'filterpat:value') || [] } };
+	my $unit= $opt->{default_unit} || '';
+	my $uhash= $opt->{unit}; $uhash={} unless $uhash && ref $uhash;
+	if ($pat=~s/([a-zA-Z]+)$//)
+	{	$unit= $uhash->{$1} ? $1 : $uhash->{lc$1} ? lc$1 : $unit;
+	}
+	return 0 if $pat==0;
+	my $unit_value= $uhash->{$unit}[0]||0;
+	return $pat.$unit, $unit_value==1;
+}
+sub _smartstring_round_range # turn 5m into 4.5m..5.5m or 5.2m into 5.15m..5.25m
+{	my ($n,$u)=@_;
+	my $l=index $n,'.';
+	$l= $l>0 ? length($n)-$l-1 : 0;
+	my $delta= .5/(10**$l);
+	return ($n-$delta).$u, ($n+$delta).$u;
+}
+sub _smartstring_number_moreless
 {	my ($pat,$op,$casesens,$field)=@_;
 	$pat=~s/,/./g; #use dot as decimal separator
-	return undef unless $pat=~m/^-?\d*\.?\d+[a-zA-Z]?$/;	# FIXME could check if support units
+	return undef unless $pat=~m/^-?\d*\.?\d+[a-zA-Z]?$/;
+	($pat)= _smartstring_number_check_unit($pat,$field);
 	$op= $op eq '<=' ? '->' : $op eq '>=' ? '-<' : $op;
 	return $op.':'.$pat;
 }
@@ -4375,13 +4401,19 @@ sub _smartstring_number
 	if ($pat!~m#\.\.# && ($op ne '=' || $pat!~m/^-\d*\.?\d+[a-zA-Z]?$/)) {$pat=~s/-($|-|\d*\.?\d+[a-zA-Z]?$)/..$1/}	# allow ranges using - unless = with negative number (could also check if field support negative values ?)
 	if ($pat=~m/\.\./)
 	{	my ($s1,$s2)= split /\s*\.\.\s*/,$pat,2;
+		($_)= _smartstring_number_check_unit($_,$field) for $s1,$s2;
 		return	(length $s1 && length $s2) ? "b:$s1 $s2":
 			(length $s1 && !length$s2) ? "-<:".$s1	:
 			(!length$s1 && length $s2) ? "->:".$s2	: undef;
 	}
-	return undef unless $pat=~m/^-?\d*\.?\d+[a-zA-Z]?$/;	# FIXME could check if support units
-	$op= $op eq ':' ? 's' : 'e';
-	return $op.':'.$pat;
+	return 's:'.$pat if $op eq ':';
+	return undef unless $pat=~m/^-?\d*\.?\d+[a-zA-Z]?$/;
+	($pat,my $is_lowest_unit)= _smartstring_number_check_unit($pat,$field);
+	if (!$is_lowest_unit and my($n,$u)= $pat=~m#^(\d*\.?\d+)([a-zA-Z]+)$#i) # =5m turned into 4.5m..5.5m
+	{	my ($n1,$n2)= _smartstring_round_range($n,$u);
+		return "b:$n1 $n2";
+	}
+	return 'e:'.$pat;
 }
 sub _smartstring_date
 {	my ($pat,$op,$casesens,$field)=@_;
@@ -4396,8 +4428,7 @@ sub _smartstring_date
 	}
 	elsif ($op eq '=' and my($n,$u)= $pat=~m#^(\d*\.?\d+)([smhdwMy])$#i) # =5h turned into 4.5h..5.5h
 	{	$suffix='ago';
-		$date1= $n>.5 ? ($n-.5).$u : '';
-		$date2= ($n+.5).$u;
+		($date1,$date2)= $u eq 's' ? ('','') : _smartstring_round_range($n,$u);
 	}
 	else						# absolute date filter
 	{	($date1,$date2)= ::dates_to_timestamps($pat,2);
@@ -4920,15 +4951,18 @@ sub _explain_element
 	{	my $type= shift @types;
 		my $opt2= Songs::Field_property($field,'filterpat:'.$type) || [];
 		my %opt2= (%opt, @$opt2);
-		if (my $display= $opt2{display} || $opt2{unit})
-		{	if (ref $display eq 'HASH')
-			{	my $hash= $display; # \%::SIZEUNITS or \%::DATEUNITS
-				if ($pat=~s/([a-zA-Z]+)$// && $hash->{$1}) { $pat.=' '.$hash->{$1}[1] }
+		my $unit=$opt2{unit};
+		my $round=$opt2{round};
+		if (my $display= $opt2{display}) { $pat= $display->($pat); }
+		elsif (($unit || $round) && $pat=~m/^(-?\d*\.?\d+)([a-zA-Z]*)$/) #numbers
+		{	my $number=$1;
+			my $letter=$2;
+			if (ref $unit) # \%::SIZEUNITS, \%::DATEUNITS or %::TIMEUNITS
+			{	if ($letter && $unit->{$letter}) { $unit= $unit->{$letter}[1] }
+				else {$unit=undef}
 			}
-			elsif (!ref $display) { $pat=sprintf $display,$pat; }
-			else
-			{	$pat= $display->($pat);
-			}
+			$pat= ::format_number($number,$round);
+			$pat.= " ".$unit if $unit;
 		}
 	}
 	$text= sprintf $text, @patterns;
@@ -5086,11 +5120,13 @@ INIT
 	{	desc	=> _"Label is set",	#depend	=> 'label',
 		default=> '.5f',
 		filter	=> 'label:~:',
+		boolean=>1,
 	},
 	g =>
 	{	desc	=> _"Genre is set",	#depend	=> 'genre',
 		default=> '.5g',
 		filter	=> 'genre:~:',
+		boolean=>1,
 	},
 	l =>
 	{	depend	=> 'lastplay',	desc	=> _"Number of days since last played",	unit	=> _"days",
@@ -5127,7 +5163,7 @@ INIT
 		value	=> 'skipcount:get',
 	},
 	r =>
-	{	depend	=> 'rating',	desc	=> _"Rating",	unit	=> '%%',
+	{	depend	=> 'rating',	desc	=> _"Rating",	unit	=> '%',
 		round	=> '%d',	default=> '1r0_.1_.2_.3_.4_.5_.6_.7_.8_.9_1',
 		value	=> 'rating:percent',	#score	=> sub { my ($value,$extra)=@_;my @l=split /,/,$extra; return undef unless @l==11; return '('.$extra.')[int('.$value.'/10)]' },
 	},
@@ -5372,7 +5408,7 @@ sub MakeExample
 		$value= $filter->singlesong_code();
 	}
 	my $score;
-	if ($type eq 'f' || $type eq 'g')
+	if ($ScoreTypes{$type}{boolean})
 	{	$score=$value;
 		$value="($score)? '"._("true")."' : '"._("false")."'";
 	}
@@ -5396,7 +5432,9 @@ sub MakeExample
 	local $_=$ID;	#ID needs to be in $_ for eval
 	my ($v,$s)=eval $func;
 	return 'error' if $@;
-	return sprintf("%s -> %.2f",::format_number(sprintf "$round $unit",$v),$s);
+	my $string_value= $ScoreTypes{$type}{boolean} ? $v : ::format_number($v,$round)." $unit";
+	my $string_score= ::format_number($s,'%.2f');
+	return "$string_value -> $string_score";
 }
 
 

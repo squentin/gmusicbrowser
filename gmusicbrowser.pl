@@ -90,6 +90,7 @@ use constant
  PI    => 4 * atan2(1, 1),	#needed for cairo rotation functions
  KB => 1000, #1024  # bytes in a KB
 };
+use constant MB => KB()**2;
 
 sub _ ($) {$_[0]}	#dummy translation functions
 sub _p ($$) {_($_[1])}
@@ -98,7 +99,7 @@ sub __p {shift;&__}
 sub __np {shift;&__n}
 sub __n { replace_fnumber( ($_[2]>1 ? $_[1] : $_[0]), $_[2]); }
 sub __x { my ($s,%h)=@_; $s=~s/{(\w+)}/$h{$1}/g; $s; }
-sub replace_fnumber { my $s=$_[0]; $s=~s/%d/format_number($_[1])/e; $s } #replace %d by the formated number, could use sprintf($_[0],$_[1]) instead but would require changing %d to %s
+sub replace_fnumber { my $s=$_[0]; use locale; $s=~s/%d/format_number($_[1])/e; $s } #replace %d by the formated number, could use sprintf($_[0],$_[1]) instead but would require changing %d to %s
 BEGIN
 {no warnings 'redefine';
  my $localedir=$DATADIR;
@@ -139,8 +140,10 @@ BEGIN
 my $thousandsep;
 BEGIN { $thousandsep= POSIX::localeconv()->{thousands_sep}; }
 sub format_number
-{	my $d=shift;
-	return $d unless $d>=1000 && $d=~s/^(-?\d+)//; # $d now contains the fractional part
+{	my ($d,$f)=@_;
+	use locale;
+	$d= $f ? sprintf($f,$d) : ''.($d+0); # ''.($d+0) to force stringification of the number with the locale
+	return $d unless $d=~s/^(-?\d{4,})//; # $d now contains the fractional part
 	my $i=$1; # integer part
 	$i =~ s/(?<=\d)(?=(?:\d\d\d)+\b)/$thousandsep/g;
 	return $i.$d;
@@ -929,10 +932,11 @@ our %DATEUNITS=
 		M => [2592000,_"months"],
 		y => [31536000,_"years"],
 );
+our %TIMEUNITS= ( map { $_=>$DATEUNITS{$_} } qw/s m h/);
 our %SIZEUNITS=
 (		b => [1,_"bytes"],
 		k => [KB(),_"KB"],
-		m => [KB()*KB(),_"MB"],
+		m => [MB(),_"MB"],
 );
 
 sub strftime_utf8
@@ -1012,12 +1016,15 @@ sub dates_to_timestamps
 	return $mode==0 ? $date1 : $mode==1 ? $date2 : ($date1,$date2);
 }
 
-sub ConvertTime	# convert date pattern into nb of seconds
-{	my ($date,$unit)= $_[0]=~m/^\s*(\d*\.?\d+)\s*([a-zA-Z]*)\s*$/;
-	return 0 unless $date;
-	if (my $ref= $DATEUNITS{$unit}) { $date*= $ref->[0] }
+sub ConvertTimeLength	# convert date/time pattern into nb of seconds
+{	my ($number,$unit)= $_[0]=~m/^\s*(\d*\.?\d+)\s*([a-zA-Z]*)\s*$/;
+	return 0 unless $number;
+	if (my $ref= $DATEUNITS{$unit}) { $number*= $ref->[0] }
 	elsif ($unit) { warn "ignoring unknown unit '$unit'\n" }
-	return time-$date;
+	return $number;
+}
+sub ConvertTime	# convert date pattern into nb of seconds since epoch
+{	return time - &ConvertTimeLength;
 }
 sub ConvertSize
 {	my ($size,$unit)= $_[0]=~m/^\s*(\d*\.?\d+)\s*([a-zA-Z]*)\s*$/;
@@ -3479,7 +3486,7 @@ sub CalcListLength	#if $return, return formated string (0h00m00s)
 {	my ($listref,$return)=@_;
 	my ($size,$sec)=Songs::ListLength($listref);
 	warn 'ListLength: '.scalar @$listref." Songs, $sec sec, $size bytes\n" if $debug;
-	$size=sprintf '%.0f',$size/KB()/KB();
+	$size=sprintf '%.0f',$size/MB();
 	my $m=int($sec/60); $sec=sprintf '%02d',$sec%60;
 	my $h=int($m/60);     $m=sprintf '%02d',$m%60;
 	my $nb=@$listref;
@@ -8617,11 +8624,11 @@ sub UpdateID
 	my $r= $self->get_random;
 	return unless defined $::SongID;
 	my $s=$r->CalcScore($::SongID);
-	my $v=sprintf '%.3f', $s;
+	my $v= ::format_number($s,'%.3f');
 	my $prob;
 	if ($s)
 	{ $prob=$self->{sum}/$s;
-	  $prob= ::__x( _"1 chance in {probability}", probability => ::format_number(sprintf($prob>=10? '%.0f' : '%.1f', $prob) ));
+	  $prob= ::__x( _"1 chance in {probability}", probability => ::format_number($prob, ($prob>=10? '%.0f' : '%.1f') ));
 	}
 	else {$prob=_"0 chance"}
 	$self->{example_label}->set_markup_with_format( '<small><i>%s</i></small>', ::__x( _"example (selected song) : {score}  ({chances})", score =>$v, chances => $prob) );
@@ -9130,7 +9137,7 @@ sub drop_file	#drop a file from the cache
 
 sub trim
 {	my @list= sort {$Cache{$a}{lastuse} <=> $Cache{$b}{lastuse}} keys %Cache;
-	my $max= $::Options{PixCacheSize} *::KB()*::KB() *.9;
+	my $max= $::Options{PixCacheSize} *::MB() *.9;
 	warn "Trimming cache\n" if $::debug;
 	while ($CacheSize> $max)
 	{	my $key=shift @list;
@@ -9147,7 +9154,7 @@ sub add
 {	my ($key,$ref)=@_;
 	$ref->{lastuse}=time;
 	$CacheSize+= $ref->{size};
-	::IdleDo('9_CachePurge',undef,\&trim) if $CacheSize > $::Options{PixCacheSize}*::KB()*::KB();
+	::IdleDo('9_CachePurge',undef,\&trim) if $CacheSize > $::Options{PixCacheSize}*::MB();
 	$Cache{$key}=$ref;
 }
 sub get
