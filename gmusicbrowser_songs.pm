@@ -1511,7 +1511,7 @@ sub Field_property
 		my $type= $h->{parent} || $h->{type};
 		return undef unless $type;
 		$h= $Types{$type};
-+		return $Types{"$type.$subtype"}{$key} if $subtype && $Types{"$type.$subtype"} && exists $Types{"$type.$subtype"}{$key};
+		return $Types{"$type.$subtype"}{$key} if $subtype && $Types{"$type.$subtype"} && exists $Types{"$type.$subtype"}{$key};
 	}
 }
 sub Field_properties
@@ -4364,6 +4364,8 @@ sub _smartstring_number_check_unit
 	if ($pat=~s/([a-zA-Z]+)$//)
 	{	$unit= $uhash->{$1} ? $1 : $uhash->{lc$1} ? lc$1 : $unit;
 	}
+	$pat=~m/^(-?\d*\.?\d+)$/;
+	$pat= $1||0;
 	return 0 if $pat==0;
 	my $unit_value= $uhash->{$unit}[0]||0;
 	return $pat.$unit, $unit_value==1;

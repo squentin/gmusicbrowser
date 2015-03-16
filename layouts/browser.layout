@@ -3,7 +3,7 @@ Type=B
 Name		= _"Browser"
 Default		= Window(size=1120x820) HPfp(size=150-150) HPbig(size=780-350) VPlistAA(size=645-140) FilterPane0(page=artist) FilterPane1(page=album)
 VBmain		= HBstatus 5_HPbig
-HBstatus	= SimpleSearch 10MBlist ResetFilter Refresh PlayFilter FilterLock -Total
+HBstatus	= SimpleSearch(maxwidth=250) 10MBlist ResetFilter Refresh PlayFilter FilterLock -Total
 MBlist		= HistItem LSortItem PlayItem
 HPbig		= _VPlistAA HPfp
 HPfp		= FilterPane0(nb=1) FilterPane1(nb=2)

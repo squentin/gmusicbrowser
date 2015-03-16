@@ -773,8 +773,6 @@ sub bus_message_tag
 		$tags{$field}= $firstvalue;
 		#warn "$field: $firstvalue\n";
 	}
-	#FIXME should check if the message comes from the rganalysis element, but not supported by the bindings yet, instead check if any non replaygain tags => will re-write replaygain tags _before_ analysis for files without other tags
-	#return if $msg->src == $RGA_pipeline->get_by_name('rganalysis'); # GST_MESSAGE_SRC() is a macro so not accessible from perl so use another method to check if coming from rganalysis
 	return unless $count && $count == $taglist->n_tags; #if other tags than replaygain => doesn't come from the rganalysis element
 
 	my $cID=$RGA_pipeline->{ID};
