@@ -3563,6 +3563,7 @@ sub new
 			$self->signal_connect(icon_press => sub { my ($self,$iconpos)=@_; if ($iconpos eq 'primary') {$self->PopupSelectorMenu} else {$self->ClearFilter} });
 			$self->signal_connect(focus_out_event => \&focus_changed_cb);
 			$self->signal_connect(focus_in_event  => \&focus_changed_cb);
+			$self->signal_connect(scroll_event    => \&scroll_event_cb);
 		}
 		else	# old version => use old hackish entry with icons
 		{	$self= SimpleSearch::old->new($opt);
@@ -3741,6 +3742,63 @@ sub EntryChanged_cb
 		if ($timeout)	{ $self->{suggest_timeout}= Glib::Timeout->add($timeout,\&UpdateSuggestionMenu,$self); }
 		else		{ $self->CloseSuggestionMenu; }
 	}
+}
+
+sub scroll_event_cb	#increase/decrease numbers when using the wheel over them
+{	my ($self,$event)=@_;
+	my $dir= $event->direction;
+	$dir= $dir eq 'up' ? 1 : $dir eq 'down' ? -1 : 0;
+	return 0 unless $dir;
+	return 0 unless $event->window == $self->get_text_window; #ignore if pointer outside the text area
+	my $text0= $self->get_text;
+	my ($offx,$offy)= $self->get_layout_offsets;
+	my $x= $event->x - $offx;
+	my $layout= $self->get_layout;
+	my ($index,$trailing)=$layout->xy_to_index(Gtk2::Pango->scale *$x,0); #y always 0, as only one line
+	$index= $x<0		? 0 :			# if pointer before the text
+		defined $index	? $self->layout_index_to_text_index($index) :
+				  length($text0)-1;	# if pointer after the text, do as if at the end of text
+	my $pos=0;
+	my $text='';
+	my $found;
+	for my $string (split /(\|| +|(?<=\d)(?=(?:\.\.|[.,]?-)\d))/,$text0)
+	{	my $l= length $string;
+		if (!$found && $pos<=$index && $pos+$l>=$index && $string=~m/\d/)
+		{	$string= _smart_incdec($string,$dir);
+			$found= $pos+length $string;
+		}
+		$pos+= $l;
+		$text.=$string;
+	}
+	if ($found) { $self->set_text($text); $self->set_position($found); return 1; }
+	0;
+}
+sub _smart_incdec # increase/decrease the lowest significant digit in the number of the string
+{	my ($string,$inc)=@_;
+	my @parts= reverse split /(\.\.|\d*[.,]\d+|\d+)/,$string;
+
+	for my $part (@parts)
+	{	if ($part=~m#^(\d*)([.,])(\d+)$#)
+		{	my $d=$3+$inc;
+			my $n=$1;
+			my $l1=length $3;
+			my $l2=length $d;
+			if ($d<0)
+			{	if ($n) { $d="9"x$l1; $n--;}
+				else	{ $d="0"x$l1 }
+			}
+			elsif ($l2>$l1) { $d="0"x$l1; $n++; }
+			elsif ($l2<$l1) { $d="0"x($l1-$l2).$d }
+			$part= $n.$2.$d;
+			last;
+		}
+		elsif ($part=~m#^\d+$#)
+		{	$part+=$inc;
+			$part=0 if $part<0;
+			last;
+		}
+	}
+	return join '',reverse @parts;
 }
 
 sub CloseSuggestionMenu
