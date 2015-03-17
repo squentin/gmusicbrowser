@@ -1,14 +1,14 @@
 #
 # Translators:
-# Jiri Grönroos <jiri.gronroos@iki.fi>, 2012-2014
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2012-2015
 # Nikerabbit <niklas.laxstrom@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2014-08-28 00:24+0200\n"
-"PO-Revision-Date: 2014-08-28 09:38+0000\n"
-"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
+"POT-Creation-Date: 2015-03-12 23:51+0100\n"
+"PO-Revision-Date: 2015-03-13 09:57+0000\n"
+"Last-Translator: squentin <squentin@gmail.com>\n"
 "Language-Team: Finnish (http://www.transifex.com/projects/p/gmusicbrowser/"
 "language/fi/)\n"
 "MIME-Version: 1.0\n"
@@ -24,9 +24,6 @@ msgstr " Kentät "
 msgid " of {length}"
 msgstr " / {length}"
 
-msgid "# songs"
-msgstr "# kappaletta"
-
 #, perl-format
 msgid "%d Album"
 msgid_plural "%d Albums"
@@ -38,12 +35,6 @@ msgid "%d Artist"
 msgid_plural "%d Artists"
 msgstr[0] "%d esittäjä"
 msgstr[1] "%d esittäjää"
-
-#, perl-format
-msgid "%d Song"
-msgid_plural "%d Songs"
-msgstr[0] "%d kappale"
-msgstr[1] "%d kappaletta"
 
 #, perl-format
 msgid "%d Upcoming Event"
@@ -247,6 +238,9 @@ msgstr "Lisää välilehti"
 msgid "Add to existing values"
 msgstr "Lisää olemassa oleviin arvoihin"
 
+msgid "Add to list"
+msgstr "Lisää listalle"
+
 msgid "Add to queue"
 msgstr "Lisää jonoon"
 
@@ -269,13 +263,22 @@ msgid "Album and artist on the left side"
 msgstr "Albumi ja esittäjä vasemalla puolella"
 
 msgid "Album cover"
-msgstr "Levyn kansi"
+msgstr "Albumin kansi"
 
 msgid "Album mode"
-msgstr "Levytila"
+msgstr "Albumitila"
+
+msgid "Album picture"
+msgstr "Albumin kuva"
+
+msgid "Album picture & info"
+msgstr "Albumin kuva ja tiedot"
 
 msgid "Album playcount:"
 msgstr "Albumin soittokerrat:"
+
+msgid "Album with picture"
+msgstr "Albumi kuvalla"
 
 #, perl-format
 msgid "Album: %l"
@@ -284,6 +287,12 @@ msgstr "Albumi: %l"
 #, perl-format
 msgid "Album: %l (%Y)"
 msgstr "Albumi: %l (%Y)"
+
+msgid "Albuminfo"
+msgstr "Albumitiedot"
+
+msgid "Albuminfo plugin"
+msgstr "Albumitietojen liitännäinen"
 
 msgid "Albums"
 msgstr "Albumit"
@@ -320,6 +329,12 @@ msgctxt "Keyboard"
 msgid "Alt"
 msgstr "Alt"
 
+msgid "App Indicator plugin"
+msgstr "Sovellusilmaisimen liitännäinen"
+
+msgid "App indicator"
+msgstr "Sovellusilmaisin"
+
 msgid "Append to playlist"
 msgstr "Lisää soittolistaan"
 
@@ -351,6 +366,12 @@ msgstr "Esittäjän soittokerrat:"
 #, perl-format
 msgid "Artist: %a"
 msgstr "Esittäjä: %a"
+
+msgid "Artistinfo"
+msgstr "Esittäjätiedot"
+
+msgid "Artistinfo plugin"
+msgstr "Esittäjätietojen liitännäinen"
 
 msgid "Artists"
 msgstr "Esittäjät"
@@ -548,6 +569,12 @@ msgstr "Kapellimestari"
 msgid "Connect through a proxy"
 msgstr "Yhdistä välityspalvelimen kautta"
 
+msgid "Context"
+msgstr "Asiayhteys"
+
+msgid "Control"
+msgstr "Hallinta"
+
 msgid "Copy"
 msgstr "Kopioi"
 
@@ -562,6 +589,9 @@ msgstr "Kopioi liitettyyn kannettavaan soittimeen"
 
 msgid "Copy to portable player"
 msgstr "Kopioi kannettavaan soittimeen"
+
+msgid "Copying"
+msgstr "Kopioidaan"
 
 #, perl-format
 msgid "Copying file"
@@ -607,6 +637,9 @@ msgstr "Päiväyksen muoto:"
 msgid "Date of purchase"
 msgstr "Ostopäivä:"
 
+msgid "Debut Album"
+msgstr "Esikoisalbumi"
+
 msgid "Decrease Volume"
 msgstr "Vähennä äänenvoimakkuutta"
 
@@ -615,6 +648,9 @@ msgstr "Vähennä äänenvoimakkuutta"
 
 msgid "Default"
 msgstr "Oletus"
+
+msgid "Default fullscreen"
+msgstr "Koko näytön tilan oletus"
 
 #, perl-format
 msgid "Default rating : %d %"
@@ -701,6 +737,9 @@ msgstr "Lataa"
 msgid "Download failed."
 msgstr "Lataus epäonnistui."
 
+msgid "Downloading"
+msgstr "Ladataan"
+
 msgid "Drop files in this folder"
 msgstr "Pudota tiedostot tähän kansioon"
 
@@ -734,11 +773,20 @@ msgstr "Muokkaa ryhmittelyä"
 msgid "Edit in the last.fm wiki"
 msgstr "Muokkaa Last.fm-wikissä"
 
+msgid "Edit list"
+msgstr "Muokkaa listaa"
+
 msgid "Edit..."
 msgstr "Muokkaa..."
 
+msgid "Empty list"
+msgstr "Tyhjä lista"
+
 msgid "Encoding used for id3v1 tags :"
 msgstr "id3v1-tunnisteissa käytettävä merkistö:"
+
+msgid "Enqueue Songs from Current Album"
+msgstr "Aseta nykyisen albumin kappaleet jonoon"
 
 msgid "Enter album name"
 msgstr "Anna albumin nimi"
@@ -794,12 +842,22 @@ msgstr "Vie .m3u-tiedostoksi"
 msgid "Extra fields"
 msgstr "Lisäkentät"
 
+msgid "Fade-out"
+msgstr "Häivytys"
+
+#, perl-format
+msgid "Fade-out in %d seconds"
+msgstr "Häivitys %d sekunnissa"
+
+msgid "Fade-out then stop"
+msgstr "Häivytä ja pysäytä sitten"
+
 #, perl-brace-format
 msgid "Failed to delete '{file}'"
 msgstr "Tiedoston '{file}' poistaminen epäonnistui"
 
 msgid "Fetching albuminfo"
-msgstr "Noudetaan levytietoja"
+msgstr "Noudetaan albumitietoja"
 
 msgid "Field identifier"
 msgstr "Kentän tunniste"
@@ -815,6 +873,9 @@ msgstr "Tiedosto"
 
 msgid "File properties"
 msgstr "Tiedoston ominaisuudet"
+
+msgid "File type"
+msgstr "Tiedostotyyppi"
 
 #, perl-brace-format
 msgid "File: {file}"
@@ -898,6 +959,12 @@ msgstr "GStreamer-moduulia ei ole ladattu."
 msgid "Genre"
 msgstr "Tyylilaji"
 
+msgid "Genre - Album"
+msgstr "Tyyli - albumi"
+
+msgid "Genre - Artist"
+msgstr "Tyyli - esittäjä"
+
 msgid "Genre is set"
 msgstr "Tyylilaji on asetettu"
 
@@ -934,6 +1001,9 @@ msgstr "Kuvaketeema:"
 msgid "Ignore playback errors"
 msgstr "Jätä huomiotta soittovirheet"
 
+msgid "Ignored file extensions :"
+msgstr "Ohitettavat tiedostopäätteet:"
+
 msgid "Import list"
 msgstr "Tuo lista"
 
@@ -945,6 +1015,9 @@ msgstr "Lisää äänenvoimakkuutta"
 
 msgid "Info"
 msgstr "Tiedot"
+
+msgid "Invert filter"
+msgstr "Käänteinen suodatin"
 
 msgid "KB"
 msgstr "Kt"
@@ -1012,6 +1085,15 @@ msgid_plural "Library size : %d songs"
 msgstr[0] "Kirjaston koko: %d kappale"
 msgstr[1] "Kirjaston koko: %d kappaletta"
 
+msgid "List"
+msgstr "Lista"
+
+msgid "List empty"
+msgstr "Lista on tyhjä"
+
+msgid "List order"
+msgstr "Listajärjestys"
+
 msgid "Listed : "
 msgstr "Listattuna: "
 
@@ -1020,6 +1102,12 @@ msgstr "Listatut kappaleet"
 
 msgid "Listeners: "
 msgstr "Kuuntelijat: "
+
+msgid "Lists"
+msgstr "Listat"
+
+msgid "Lists, Library & Context"
+msgstr "Listat, kirjasto ja asiayhteys"
 
 msgid "Loading failed."
 msgstr "Lataus epäonnistui."
@@ -1211,6 +1299,9 @@ msgstr "Ei teemoja"
 msgid "No web browser found."
 msgstr "Verkkoselainta ei löytynyt."
 
+msgid "Normal"
+msgstr "Tavallinen"
+
 msgid "Normal mode"
 msgstr "Tavallinen tila"
 
@@ -1253,6 +1344,9 @@ msgstr "Avaa selain"
 
 msgid "Open Browser window"
 msgstr "Avaa selainikkuna"
+
+msgid "Open Context window"
+msgstr "Avaa asiayhteysikkuna"
 
 msgid "Open Equalizer"
 msgstr "Avaa taajuuskorjain"
@@ -1525,6 +1619,9 @@ msgstr "Äskettäin soitettu"
 msgid "Recently played songs"
 msgstr "Äskettäin soitetut kappaleet"
 
+msgid "Recording Dates"
+msgstr "Nauhoituspäivät"
+
 msgid "Recording date"
 msgstr "Äänityspäivä"
 
@@ -1572,6 +1669,9 @@ msgstr "Poista soittolistasta"
 
 msgid "Remove from queue"
 msgstr "Poista jonosta"
+
+msgid "Remove list"
+msgstr "Poista lista"
 
 msgid "Remove selected songs"
 msgstr "Poista valitut kappaleet"
@@ -1715,6 +1815,9 @@ msgstr "Etsi esittäjää Allmusicista"
 msgid "Search amazon.com for Artist"
 msgstr "Etsi esittäjää Amazon.comista"
 
+msgid "Search box type"
+msgstr "Hakukentän tyyppi"
+
 msgid "Search discogs for Artist"
 msgstr "Etsi esittäjää Discogsista"
 
@@ -1725,7 +1828,7 @@ msgid "Search for a picture on internet"
 msgstr "Etsi kuvaa internetistä"
 
 msgid "Search for current album"
-msgstr "Etsi nykyistä levyä"
+msgstr "Etsi nykyistä albumia"
 
 msgid "Search for current artist"
 msgstr "Etsi nykyistä esittäjää"
@@ -1836,6 +1939,9 @@ msgstr "Näytä kansioluettelo"
 msgid "Show genre"
 msgstr "Näytä tyylilaji"
 
+msgid "Show info panel"
+msgstr "Näytä tietopaneeli"
+
 msgid "Show main window"
 msgstr "Näytä pääikkuna"
 
@@ -1886,6 +1992,9 @@ msgstr "Näytä/piilota tilapalkki"
 
 msgid "Shuffle"
 msgstr "Sekoita"
+
+msgid "Shuffle list"
+msgstr "Sekoita lista"
 
 msgid "Shuffle queue"
 msgstr "Sekoita jono"
@@ -1946,6 +2055,12 @@ msgstr "Kappaleen arvostelu"
 
 msgid "Songtree View"
 msgstr "Kappaleiden puunäkymä"
+
+msgid "Sort"
+msgstr "Järjestys"
+
+msgid "Sort order"
+msgstr "Järjestys"
 
 #, perl-brace-format
 msgid "Source: {file}"
@@ -2075,6 +2190,9 @@ msgstr "Työkalut"
 
 msgid "Total playcount:"
 msgstr "Toistokertoja yhteensä:"
+
+msgid "Track"
+msgstr "Kappale"
 
 msgid "Track Properties"
 msgstr "Kappaleen ominaisuudet"
@@ -2247,9 +2365,6 @@ msgstr "lisää"
 msgid "advanced options"
 msgstr "lisävalinnat"
 
-msgid "another example"
-msgstr "toinen esimerkki"
-
 msgid "artist"
 msgstr "esittäjä"
 
@@ -2272,9 +2387,12 @@ msgstr "ennen %s"
 msgid "between"
 msgstr "välillä"
 
+msgid "bootleg"
+msgstr "bootleg"
+
 #, perl-brace-format
 msgid "by {artist} from {album}"
-msgstr "esittäjän {artist} levyltä {album}"
+msgstr "esittäjän {artist} albumilta {album}"
 
 msgid "bytes"
 msgstr "tavua"
@@ -2581,8 +2699,20 @@ msgstr "liitännäisiä ei löytynyt"
 msgid "no to all"
 msgstr "ei kaikkiin"
 
+msgid "none"
+msgstr "ei mitään"
+
+msgid "normal"
+msgstr "tavallinen"
+
+msgid "not bootleg"
+msgstr "ei bootleg"
+
 msgid "number of songs"
 msgstr "kappaleiden määrä"
+
+msgid "open context window"
+msgstr "avaa asiayhteysikkuna"
 
 msgid "options"
 msgstr "valinnat"
@@ -2761,7 +2891,7 @@ msgid "{hours} hours {min} min {sec} s"
 msgstr "{hours} tuntia {min} min {sec} s"
 
 #, perl-brace-format
-msgid "{hours}h {min}m {sec}s"
+msgid "{hours}h{min}m{sec}s"
 msgstr "{hours} t {min} m {sec} s"
 
 #, perl-brace-format
@@ -2769,7 +2899,7 @@ msgid "{min} min {sec} s"
 msgstr "{min} min {sec} s"
 
 #, perl-brace-format
-msgid "{min}m {sec}s"
+msgid "{min}m{sec}s"
 msgstr "{min} m {sec} s"
 
 #, perl-brace-format
