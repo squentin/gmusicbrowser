@@ -1,0 +1,5180 @@
+#
+# Translators:
+# abuyop <abuyop@gmail.com>, 2014-2015
+msgid ""
+msgstr ""
+"Project-Id-Version: gmusicbrowser\n"
+"Report-Msgid-Bugs-To: squentin@free.fr\n"
+"POT-Creation-Date: 2015-03-12 23:51+0100\n"
+"PO-Revision-Date: 2015-03-13 09:57+0000\n"
+"Last-Translator: squentin <squentin@gmail.com>\n"
+"Language-Team: Malay (Malaysia) (http://www.transifex.com/projects/p/"
+"gmusicbrowser/language/ms_MY/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ms_MY\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid " Context pane layout "
+msgstr "Bentangan anak tetingkap konteks"
+
+msgid " Fields "
+msgstr "Medan"
+
+msgid " Review "
+msgstr "Ulasan"
+
+#, perl-brace-format
+msgid " of {length}"
+msgstr "bagi {length}"
+
+#, perl-format
+msgid "%S by %a"
+msgstr "%S oleh %a"
+
+#, perl-format
+msgid "%d Album"
+msgid_plural "%d Albums"
+msgstr[0] "%d Album"
+
+#, perl-format
+msgid "%d Artist"
+msgid_plural "%d Artists"
+msgstr[0] "%d Artis"
+
+#, perl-format
+msgid "%d Upcoming Event"
+msgid_plural "%d Upcoming Events"
+msgstr[0] "%d Peristiwa Mendatang"
+
+#, perl-format
+msgid "%d album"
+msgid_plural "%d albums"
+msgstr[0] "%d album"
+
+#, perl-format
+msgid "%d artist"
+msgid_plural "%d artists"
+msgstr[0] "%d artis"
+
+#, perl-format
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] "%d fail"
+
+#, perl-format, perl-brace-format
+msgid "%d file in {folder}"
+msgid_plural "%d files in {folder}"
+msgstr[0] "%d fail dalam {folder}"
+
+#, perl-format
+msgid "%d folder"
+msgid_plural "%d folders"
+msgstr[0] "%d folder"
+
+#, perl-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d saat"
+
+#, perl-format
+msgid "%d song"
+msgid_plural "%d songs"
+msgstr[0] "%d lagu"
+
+#, perl-format
+msgid "%d song added"
+msgid_plural "%d songs added"
+msgstr[0] "%d lagu ditambah"
+
+#, perl-format
+msgid "%d song in queue"
+msgid_plural "%d songs in queue"
+msgstr[0] "%d lagu dalam baris gilir"
+
+#, perl-format
+msgid "%d song in the library"
+msgid_plural "%d songs in the library"
+msgstr[0] "%d lagu dalam pustaka"
+
+#, perl-format
+msgid "%d song selected"
+msgid_plural "%d songs selected"
+msgstr[0] "%d lagu dipilih"
+
+#, perl-format
+msgid "%s fuzzy match with %s"
+msgstr "%s padanan kabur dengan %s"
+
+#, perl-format
+msgid "%t by %a (%m)"
+msgstr "%t oleh %a (%m)"
+
+#, perl-brace-format
+msgid "'{file}' exists. Overwrite ?"
+msgstr "'{file}' wujud. Tulis-ganti ?"
+
+#, perl-format
+msgid "(%d song excluded)"
+msgid_plural "(%d songs excluded)"
+msgstr[0] "(%d lagu diasingkan)"
+
+msgid "(The middle-click action doesn't work correctly in some desktops)"
+msgstr ""
+"(Tindakan klik-tengah tidak berfungsi dengan baik dalam sesetengah desktop)"
+
+msgid "(case insensitive)"
+msgstr "(tidak sensitif kata)"
+
+#, perl-brace-format
+msgid "(common parent folder : {common})"
+msgstr "(folder induk umum : {common})"
+
+msgid "(other)"
+msgstr "(lain-lain)"
+
+msgid "(see http://www.last.fm)"
+msgstr "(lihat http://www.last.fm)"
+
+msgid "(unstable)"
+msgstr "(tidak stabil)"
+
+msgid ""
+"- When selecting a song, the playlist filter will be reset if the song is "
+"not in it\n"
+"- Skip to another song when removing the current song from the playlist"
+msgstr ""
+"- Bila memilih lagu, penapis senarai main akan ditetap semula jika lagu "
+"tiada di dalamnya\n"
+"- Langkau ke lagu lain bila membuang lagu semasa dari senarai main"
+
+msgid "0 chance"
+msgstr "0 peluang"
+
+msgid "0 means 'show all'"
+msgstr "0 bermaksud 'tunjuk semua'"
+
+#, perl-brace-format
+msgid "1 chance in {probability}"
+msgstr "1 peluang dalam {probability}"
+
+msgid "3 Filter panes"
+msgstr "3 anak tetingkap Penapis"
+
+msgid "32x32 PNG file icon"
+msgstr "Ikon fail PNG 32x32"
+
+msgid "50 Last Added"
+msgstr "50 Terakhir Ditambah"
+
+msgid "50 Last Played"
+msgstr "50 Terakhir Dimainkan"
+
+msgid "50 Most Played"
+msgstr "50 Terbanyak Dimainkan"
+
+msgid "<Unknown>"
+msgstr "<Unknown>"
+
+#, perl-format
+msgid ""
+"<b>%t</b>\n"
+"<small><small>by</small> %a\n"
+"<small>from</small> %l</small>"
+msgstr ""
+"<b>%t</b>\n"
+"<small><small>oleh</small> %a\n"
+"<small>daripada</small> %l</small>"
+
+#, perl-format
+msgid "<big><big>by %a</big></big>"
+msgstr "<big><big>oleh %a</big></big>"
+
+#, perl-format
+msgid "<i>by</i> %a\\n<i>from</i> %l"
+msgstr "<i>oleh</i> %a\\n<i>daripada</i> %l"
+
+msgid "Abort"
+msgstr "Henti Paksa"
+
+msgid "Abort ReplayGain analysis"
+msgstr "Henti paksa analisis GandaanMainSemula"
+
+msgid "Abort mass-tagging"
+msgstr "Henti paksa pengetagan-kelompok"
+
+msgid "About"
+msgstr "Perihal"
+
+#, perl-brace-format
+msgid ""
+"About to delete {files}\n"
+"Are you sure ?"
+msgstr ""
+"Hendak memadam {files}\n"
+"Anda pasti ?"
+
+msgid "About to turn off the computer in :"
+msgstr "Hendak matikan komputer dalam tempoh:"
+
+msgid "Action"
+msgstr "Tindakan"
+
+msgid "Actions are not supported by current notification daemon"
+msgstr "Tindakan tidak disokong oleh daemon pemberitahuan semasa"
+
+msgid "Add"
+msgstr "Tambah"
+
+msgid "Add Files ..."
+msgstr "Tambah Fail ..."
+
+msgid "Add Music"
+msgstr "Tambah Muzik"
+
+msgid "Add a button to rip a CD"
+msgstr "Tambah satu butang untuk meretas CD"
+
+msgid "Add a filter"
+msgstr "Tambah satu penapis"
+
+msgid "Add a fullscreen button"
+msgstr "Tambah satu butang skrin penuh"
+
+msgid "Add a fullscreen button to layouts that can accept extra buttons"
+msgstr ""
+"Tambah satu butang skrin penuh ke bentangan yang dapat menerima butang ekstra"
+
+msgid "Add a group"
+msgstr "Tambah satu kumpulan"
+
+msgid "Add a label to the current song"
+msgstr "Tambah satu label ke lagu semasa"
+
+msgid "Add a list of files/folders to the playlist"
+msgstr "Tambah satu senarai fail/folder ke senarai main"
+
+msgid "Add a radio"
+msgstr "Tambah satu radio"
+
+msgid "Add files or folders"
+msgstr "Tambah fail atau folder"
+
+msgid "Add files/folders to library"
+msgstr "Tambah fail/folder ke pustaka"
+
+msgid "Add folder"
+msgstr "Tambah folder"
+
+msgid "Add folder ..."
+msgstr "Tambah folder ..."
+
+msgid "Add multiple condition"
+msgstr "Tambah syarat berbilang"
+
+msgid "Add new label"
+msgstr "Tambah label baharu"
+
+msgid "Add new radio"
+msgstr "Tambah radio baharu"
+
+msgid "Add rule : "
+msgstr "Tambah peraturan :"
+
+msgid "Add shorcut key"
+msgstr "Tambah kekunci pintasan"
+
+msgid "Add tab"
+msgstr "Tambah tab"
+
+msgid "Add to existing values"
+msgstr "Tambah ke nilai sedia ada"
+
+msgid "Add to list"
+msgstr "Tambah ke senarai"
+
+msgid "Add to queue"
+msgstr "Tambah ke baris gilir"
+
+#, perl-brace-format
+msgid "Add {value} to {field} for all tracks on this album."
+msgstr "Tambah {value} ke {field} untuk semua trek dalam album ini."
+
+msgid "Added"
+msgstr "Ditambah"
+
+msgid "Added Today"
+msgstr "Ditambah Hari Ini"
+
+msgid "Adding a radio"
+msgstr "Menambah radio"
+
+msgid ""
+"Additionally this format can be used :\n"
+" default number1 format1 number2 format2 ...\n"
+" dates more recent than number1 seconds will use format1, ..."
+msgstr ""
+"Selain itu format ini boleh digunakan :\n"
+"lalai number1 format1 number2 format2 ...\n"
+"tarikh terkini dari number1 saat akan gunakan format1, ..."
+
+msgid ""
+"Adds a menu entry to artist/album context menu, allowing to search the "
+"picture/cover in google and save it."
+msgstr ""
+"Tambah satu masukan menu ke menu konteks artis/album, membolehkan gelintar "
+"gambar/kulit album dalam goolge dan simpan ia."
+
+msgid "Adds labels to the current song"
+msgstr "Tambah label ke lagu semasa"
+
+msgid "Adds menu entries to song contextual menu"
+msgstr "Tambah masukan menu ke menu konteksual lagu"
+
+msgid "Advanced"
+msgstr "Lanjutan"
+
+msgid "Advanced Search ..."
+msgstr "Gelintar Lanjutan ..."
+
+msgid "Advanced Tag Editing"
+msgstr "Penyuntingan Tag Lanjutan"
+
+msgid "Album"
+msgstr "Album"
+
+msgid "Album and artist"
+msgstr "Album dan artis"
+
+msgid "Album and artist on the left side"
+msgstr "Album dan artis di sebelah kiri"
+
+msgid "Album artist"
+msgstr "Album artis"
+
+msgid "Album artist or artist"
+msgstr "Album artis atau artis"
+
+msgid "Album cover"
+msgstr "Kulit album"
+
+msgid "Album gain"
+msgstr "Gandaan album"
+
+msgid "Album mode"
+msgstr "Mod album"
+
+msgid "Album peak"
+msgstr "Puncak album"
+
+msgid "Album picture"
+msgstr "Gambar album"
+
+msgid "Album picture & info"
+msgstr "Gambar & maklumat album"
+
+msgid "Album pictures"
+msgstr "Gambar album"
+
+msgid "Album playcount:"
+msgstr "Kiraan main album:"
+
+msgid "Album shuffle"
+msgstr "Kocok album"
+
+msgid "Album with picture"
+msgstr "Album dengan gambar"
+
+msgid "Album year(s)"
+msgstr "Tahun album"
+
+#, perl-format
+msgid "Album: %l"
+msgstr "Album: %l"
+
+#, perl-format
+msgid "Album: %l (%Y)"
+msgstr "Album: %l (%Y)"
+
+msgid "Albuminfo"
+msgstr "Albuminfo"
+
+msgid "Albuminfo plugin"
+msgstr "Pemalam Albuminfo"
+
+msgid "Albums"
+msgstr "Album"
+
+msgid "All"
+msgstr "Semua"
+
+msgid "All Songs"
+msgstr "Semua Lagu"
+
+msgid "All albums"
+msgstr "Semua album"
+
+msgid "All artists"
+msgstr "Semua artis"
+
+msgid "All files"
+msgstr "Semua fail"
+
+msgid "All genres"
+msgstr "Semua genre"
+
+msgid "All labels"
+msgstr "Semua label"
+
+msgid "All moods"
+msgstr "Semua suasana"
+
+msgid "All of :"
+msgstr "Semua :"
+
+msgid "All songs"
+msgstr "Semua lagu"
+
+msgid "All styles"
+msgstr "Semua gaya"
+
+msgid "All themes"
+msgstr "Semua tema"
+
+msgid ""
+"Allmusic uses both Genres and Styles to describe albums. If you use only "
+"Genres, you may want to include Styles in allmusic's list of Genres."
+msgstr ""
+"Allmusic gunakan kedua-dua Genre dan Gaya untuk jelaskan album. Jika anda "
+"hanya guna Genre, anda mungkin mahu sertakan Gaya dalam senarai Genre "
+"allmusic."
+
+msgid "Allow for scheduling fade-out and stop"
+msgstr "Benarkan penjadualan pendam-keluar dan henti"
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
+msgstr ""
+"Benarkan pengawalan gmusicbrowser melalui DBus menggunakan MPRIS v1.0 piawai"
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v2.0 standard"
+msgstr ""
+"Benarkan pengawalan gmusicbrowser melalui DBus menggunakan MPRIS v2.0 piawai"
+
+#. Alt key
+msgctxt "Keyboard"
+msgid "Alt"
+msgstr "Alt"
+
+msgid "Amount of volume changed by the mouse wheel"
+msgstr "Amaun volum berubah mengikut roda tetikus"
+
+msgid ""
+"Analyse and add replaygain tags for all songs that don't have replaygain "
+"tags, or incoherent album replaygain tags"
+msgstr ""
+"Analisis dan tambah tag gandaan main semula untuk semua lagu yang tidak "
+"mempunyai tag gandaan main semula, atau tag gandaan semula album tak koheren"
+
+msgid "Any of :"
+msgstr "Mana-mana :"
+
+msgid "App Indicator plugin"
+msgstr "Pemalam penunjuk apl"
+
+msgid "App indicator"
+msgstr "Penunjuk apl"
+
+msgid "Append"
+msgstr "Tambah"
+
+msgid "Append (only if not already present)"
+msgstr "Tambah (hanya jika ia tiada)"
+
+msgid "Append to playlist"
+msgstr "Tambah ke senarai main"
+
+msgid "Application"
+msgstr "Aplikasi"
+
+#, perl-brace-format
+msgid "Are you sure you want to delete the '{label}' label ?"
+msgstr "Anda pasti mahu memadam label '{label}' ?"
+
+msgid "Arguments"
+msgstr "Argumen"
+
+msgid "Artist"
+msgstr "Artis"
+
+msgid "Artist & album"
+msgstr "Artis & album"
+
+msgid "Artist (Year - Album)"
+msgstr "Artis (Tahun - Album)"
+
+msgid "Artist Biography"
+msgstr "Biografi Artis"
+
+msgid "Artist URL"
+msgstr "URL Artis"
+
+msgid "Artist picture"
+msgstr "Gambar artis"
+
+#, perl-format
+msgid "Artist picture size : %d"
+msgstr "Saiz gambar artis : %d"
+
+msgid "Artist playcount:"
+msgstr "Kiraan main artis:"
+
+msgid "Artist,Album,Disc,Track"
+msgstr "Artis,Album,Cakera,Trek"
+
+msgid "Artist,Date,Album,Disc,Track"
+msgstr "Artis,Tarikh,Album,Cakera,Trek"
+
+#, perl-format
+msgid "Artist: %a"
+msgstr "Artis: %a"
+
+msgid "Artistinfo"
+msgstr "Maklumatartis"
+
+msgid "Artistinfo plugin"
+msgstr "Pemalam maklumatartis"
+
+msgid "Artists"
+msgstr "Artis"
+
+msgid "Ascending order"
+msgstr "Tertib menaik"
+
+msgid "Ask confirmation only if file already exists"
+msgstr "Tanya pengesahan jika fail sudah wujud"
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Audio properties"
+msgstr "Sifat audio"
+
+msgid "Author"
+msgstr "Pengarang"
+
+msgid "Auto"
+msgstr "Auto"
+
+msgid "Auto fill based on filenames ..."
+msgstr "Auto isi berdasarkan nama fail ..."
+
+msgid "Auto fill only blank fields"
+msgstr "Auto isi jika medan kosong"
+
+msgid "Auto fill up to"
+msgstr "Auto isi sehingga"
+
+msgid "Auto filter"
+msgstr "Auto tapis"
+
+msgid "Auto-fill queue"
+msgstr "Auto-isi baris gilir"
+
+msgid "Auto-fill queue with similar artists (from last.fm)"
+msgstr "Auto-isi baris gilir dengan artis yang sama (dari last.fm)"
+
+msgid "Auto-increment track numbers"
+msgstr "Auto-tokok nombor trek"
+
+msgid "Auto-save fields with data from allmusic"
+msgstr "Auto-simpan medan dengan data dari allmusic"
+
+msgid "Auto-save positive finds"
+msgstr "Auto-simpan carian positif"
+
+msgid "Auto-scroll"
+msgstr "Auto-tatal"
+
+msgid "Auto-select Pictures"
+msgstr "Auto-pilih Gambar"
+
+msgid "Automatically remove current song if not found"
+msgstr "Buang lagu semasa secara automatik jika tidak ditemui"
+
+msgid "Autosave"
+msgstr "Autosimpan"
+
+msgid "Autosave plugin"
+msgstr "Pemalam autosimpan"
+
+msgid "Available"
+msgstr "Tersedia"
+
+msgid "Average rating:"
+msgstr "Penarafan purata:"
+
+msgid "BPM"
+msgstr "BPM"
+
+msgid "Bad session"
+msgstr "Sesi teruk"
+
+msgid "Base Folder :"
+msgstr "Folder Dasar :"
+
+msgid "Basic fields"
+msgstr "Medan asas"
+
+msgid "Begin with"
+msgstr "Bermula dengan"
+
+msgid "Below"
+msgstr "Di bawah"
+
+msgid "Biography"
+msgstr "Biografi"
+
+msgid "Bitrate"
+msgstr "Kadar bit"
+
+msgid "Body :"
+msgstr "Badan :"
+
+msgid "Body text is not supported by current notification daemon"
+msgstr "Teks badan tidak disokong oleh daemon pemberitahuan semasa"
+
+msgid "Browser"
+msgstr "Pelayar"
+
+msgid "Browser views"
+msgstr "Paparan pelayar"
+
+msgid "Browser window layout :"
+msgstr "Bentangan tetingkap pelayar :"
+
+msgid "Browser with SongTree"
+msgstr "Pelayar dengan PepohonLagu"
+
+msgid "Buttons"
+msgstr "Butang"
+
+msgid "Buttons, Song & Cover"
+msgstr "Butang, Lagu & Kulit Album"
+
+msgid "Can be relative by using + or -"
+msgstr "Boleh relatif dengan menggunakan + atau -"
+
+msgid "Can be searched with :"
+msgstr "Boleh digelintar dengan :"
+
+msgid "Can be used as a variable with :"
+msgstr "Boleh digunakan sebagai pembolehubah dengan :"
+
+msgid "Can't change the volume in non-gstreamer iceserver mode"
+msgstr "Tidak dapat ubah volum dalam mod iceserver bukan-gstreamer"
+
+msgid ""
+"Can't change the volume. Needs amixer (packaged in alsa-utils) to change "
+"volume when using this audio backend."
+msgstr ""
+"Tidak dapat ubah volum. Perlukan amixer (dipakej dalam alsa-utils) untuk "
+"mengubah volum bila menggunakan bahagian belakang audio ini."
+
+#, perl-brace-format
+msgid "Can't create folder: {path}"
+msgstr "Tidak dapat cipta folder: {path}"
+
+#, perl-brace-format
+msgid "Can't create sink '{sink}'"
+msgstr "Tidak dapat cipta sinki '{sink}'"
+
+msgid "Can't play this file."
+msgstr "Tidak dapat main fail ini."
+
+msgid "Can't read file or invalid file"
+msgstr "Tidak dapat baca fail atau fail tidak sah"
+
+#, perl-brace-format
+msgid "Can't write in base folder '{folder}'."
+msgstr "Tidak dapat tulis dalam folder dasar '{folder}'."
+
+msgid "Cancel"
+msgstr "Batal"
+
+msgid "Capitalize"
+msgstr "Huruf besarkan"
+
+msgid "Capitalize each word"
+msgstr "Huruf besarkan setiap perkataan"
+
+msgid "Case insensitive"
+msgstr "Tidak sensitif kata"
+
+msgid "Case sensitive"
+msgstr "Sensitif kata"
+
+msgid "Case-sensitive"
+msgstr "Sensitif-kata"
+
+msgid "Categories pane"
+msgstr "Anak tetingkap kategori"
+
+msgid "Centered"
+msgstr "Ditengahkan"
+
+msgid "Centered on"
+msgstr "Ditengahkan hidup"
+
+msgid "Change Display"
+msgstr "Ubah Paparan"
+
+msgid "Change default text color"
+msgstr "Ubah warna teks lalai"
+
+msgid "Change default text font and size"
+msgstr "Ubah fon dan saiz teks lalai"
+
+msgid "Change the context visibility"
+msgstr "Ubah ketampakan konteks"
+
+msgid "Channels"
+msgstr "Saluran"
+
+msgid "Check Collection"
+msgstr "Semak Koleksi"
+
+msgid "Check for updated/deleted songs on startup"
+msgstr "Semak lagu dikemaskini/dipadam ketika permulaan"
+
+msgid "Check for updated/removed songs"
+msgstr "Semak lagu dikemaskini/dibuang"
+
+msgid "Check real length of mp3"
+msgstr "Semak panjang sebenar mp3"
+
+msgid "Check your audio settings"
+msgstr "Semak tetapan audio anda"
+
+msgid "Checking length/bitrate"
+msgstr "Menyemak panjang/kadar bit"
+
+msgid "Checking songs"
+msgstr "Menyemak lagu"
+
+msgid "Choose Album From this Artist"
+msgstr "Pilih Album Daripada Artis ini"
+
+msgid "Choose Artist/Album/Song"
+msgstr "Pilih Artis/Album/Lagu"
+
+msgid "Choose Picture"
+msgstr "Pilih Gambar"
+
+msgid "Choose Random Album"
+msgstr "Pilih Album Rawak"
+
+msgid "Choose a folder"
+msgstr "Pilih satu folder"
+
+msgid "Choose directory to copy files to"
+msgstr "Pilih direktori untuk menyalin fail"
+
+msgid "Choose directory to move files to"
+msgstr "Pilih direktori untuk mengalih fail"
+
+msgid "Choose files"
+msgstr "Pilih fail"
+
+msgid "Choose folder to add"
+msgstr "Pilih folder untuk ditambah"
+
+msgid "Choose font for lyrics"
+msgstr "Pilih fon untuk lirik"
+
+msgid "Choose font..."
+msgstr "Pilih fon..."
+
+#, perl-brace-format
+msgid "Choose icon for label {name}"
+msgstr "Pilih ikon untuk label {name}"
+
+msgid "Choose page to open"
+msgstr "Pilih halaman untuk dibuka"
+
+#, perl-format
+msgid "Choose picture for '%s'"
+msgstr "Pilih gambar untuk '%s'"
+
+msgid "Choose playlist files to import"
+msgstr "Pilih fail senarai main untuk diimport"
+
+msgid "Clear"
+msgstr "Kosongkan"
+
+msgid "Clear playlist"
+msgstr "Kosongkan senarai main"
+
+msgid "Clear playlist filter"
+msgstr "Kosongkan penapis senarai main"
+
+msgid "Clear queue"
+msgstr "Kosongkan baris gilir"
+
+msgid "Clear selected fields"
+msgstr "Kosongkan medan terpilih"
+
+msgid "Click to show fullsize image"
+msgstr "Klik untuk tunjuk imej saiz penuh"
+
+msgid "Click to show larger image"
+msgstr "Klik untuk tunjuk imej lebih besar"
+
+msgid "Client banned, contact gmusicbrowser's developer"
+msgstr "Klien disekat, hubungan pembangun gmusicbrowser's"
+
+msgid "Close"
+msgstr "Tutup"
+
+msgid "Close Window"
+msgstr "Tutup Tetingkap"
+
+msgid "Close a filter"
+msgstr "Tutup penapis"
+
+msgid "Close to tray"
+msgstr "Tutup ke talam"
+
+msgid "Collection"
+msgstr "Koleksi"
+
+msgid "Command"
+msgstr "Perintah"
+
+msgid "Command to launch when the button is pressed"
+msgstr "Perintah untuk dilancar bila butang ditekan"
+
+msgid "Command used :"
+msgstr "Perintah diguna :"
+
+msgid ""
+"Command used when\n"
+"'turn off computer when queue empty'\n"
+"is selected"
+msgstr ""
+"Perintah digunakan bila\n"
+"'matikan komputer bila baris gilir kosong'\n"
+"dipilih"
+
+msgid "Command when playing song changed :"
+msgstr "Perintah bila lagu yang dimainkan berubah :"
+
+msgid "Command when stopped :"
+msgstr "Perintah bila dihentikan :"
+
+msgid "Comment"
+msgstr "Ulasan"
+
+msgid "Comments"
+msgstr "Ulasan"
+
+msgid "Compilation"
+msgstr "Kompilasi"
+
+msgid "Composer"
+msgstr "Penggubah"
+
+msgid "Conductor"
+msgstr "Konduktor"
+
+msgid "Connect through a proxy"
+msgstr "Sambung melalui proksi"
+
+msgid "Connections from :"
+msgstr "Sambungan dari :"
+
+msgid "Context"
+msgstr "Konteks"
+
+msgid "Control"
+msgstr "Kawalan"
+
+msgid "Conz Aishi (with Filter Panes)"
+msgstr "Conz Aishi (dengan Anak Tetingkap Penapis)"
+
+msgid "Conz Glimm (different controls)"
+msgstr "Conz Glimm (kawalan berbeza)"
+
+msgid "Copy"
+msgstr "Salin"
+
+msgid "Copy failed"
+msgstr "Salin gagal"
+
+msgid "Copy link address"
+msgstr "Salin alamat pautan"
+
+msgid "Copy missing values from previous line"
+msgstr "Salin nilai hilang dari barsi terdahulu"
+
+msgid "Copy to mounted portable player"
+msgstr "Salin ke pemain mudah alih yang dilekap"
+
+msgid "Copy to portable player"
+msgstr "Salin ke pemain mudah alih"
+
+msgid "Copying"
+msgstr "Menyalin"
+
+#, perl-format
+msgid "Copying file"
+msgid_plural "Copying %d files"
+msgstr[0] "Menyalin %d fail"
+
+msgid "Copyright"
+msgstr "Hakcipta"
+
+msgid "Cover Size : "
+msgstr "Saiz Kulit Album :"
+
+msgid "Create ID3v2 tags as ID3v2.4"
+msgstr "Cipta tag ID3v2 sebagai ID3v2.4"
+
+#. Ctrl key
+msgctxt "Keyboard"
+msgid "Ctrl"
+msgstr "Ctrl"
+
+msgid "Current song must always be in the playlist"
+msgstr "Lagu semasa mesti sentiasa dalam senarai main"
+
+msgid "Custom"
+msgstr "Suai"
+
+msgid "Custom Text"
+msgstr "Teks Suai"
+
+msgid "Custom URL"
+msgstr "URL Suai"
+
+msgid "Custom command :"
+msgstr "Perintah suai :"
+
+msgid "Custom context pages :"
+msgstr "Halaman konteks suai :"
+
+msgid "Custom formats"
+msgstr "Format suai"
+
+msgid "Custom pipeline"
+msgstr "Talian paip suai"
+
+msgid "Custom..."
+msgstr "Suai..."
+
+msgid "Date"
+msgstr "Tarikh"
+
+msgid "Date format :"
+msgstr "Format tarikh :"
+
+msgid "Date of purchase"
+msgstr "Tarikh pembelian"
+
+msgid "Debut Album"
+msgstr "Kemunculan Album"
+
+msgid "Decrease Volume"
+msgstr "Kurangkan Volum"
+
+msgid "Decrease volume"
+msgstr "Kurangkan volum"
+
+msgid "Default"
+msgstr "Lalai"
+
+msgid "Default fullscreen"
+msgstr "Skrin penuh lalai"
+
+#, perl-format
+msgid "Default rating : %d %"
+msgstr "Penarafan lalai : %d %"
+
+msgid "Default text color"
+msgstr "Warna teks lalai"
+
+msgid "Default text font"
+msgstr "Fon teks lalai"
+
+#, perl-format
+msgid "Delay before showing tray tip popup on mouse over : %d ms"
+msgstr ""
+"Lengah sebelum menunjuk tip talam timbul bila penuding tetikus di atas : %d "
+"ms"
+
+msgid "Delete"
+msgstr "Padam"
+
+msgid "Delete Selected Songs"
+msgstr "Padam Lagu Terpilih"
+
+msgid "Delete file"
+msgstr "Padam fail"
+
+msgid "Delete list"
+msgstr "Padam senarai"
+
+msgid "Delete preset"
+msgstr "Padam praset"
+
+msgid "Deletion failed"
+msgstr "Pemadaman gagal"
+
+msgid "Descending order"
+msgstr "Tertib menurun"
+
+msgid "Descr."
+msgstr "Keter."
+
+msgid "Description"
+msgstr "Keterangan"
+
+msgid "Desktop widgets"
+msgstr "Widjet desktop"
+
+msgid "Desktop widgets plugin"
+msgstr "Pemalam widjet desktop"
+
+#, perl-brace-format
+msgid "Destination: {file}"
+msgstr "Destinasi: {file}"
+
+#, perl-brace-format
+msgid "Destination: {folder}"
+msgstr "Destinasi: {folder}"
+
+msgid "Disable screensaver when fullscreen and playing"
+msgstr "Lumpuhkan penyelamat skrin bila berskrin penuh dan dimainkan"
+
+msgid "Disabled"
+msgstr "Dilumpuhkan"
+
+msgid "Disc"
+msgstr "Cakera"
+
+msgid "Disc #"
+msgstr "Cakera #"
+
+msgid "Disc name"
+msgstr "Nama cakera"
+
+msgid "Display (:1 or host:0 for example)"
+msgstr "Paparan (:1 atau host:0 contohnya)"
+
+msgid "Display Songs"
+msgstr "Papar Lagu"
+
+msgid ""
+"Display a special layout in or around the titlebar of the focused window"
+msgstr ""
+"Papar bentangan khas dalam atau disekeliling palang tajuk tetingkap berfokus"
+
+msgid "Display stop/next actions"
+msgstr "Papar tindakan henti/berikutnya"
+
+msgid "Display synchronized lyrics of the current song"
+msgstr "Papar lirik bersegerak bagi lagu semasa"
+
+#, perl-format
+msgid "Display tray tip for %d ms"
+msgstr "Papar tip talam selama %d ms"
+
+msgid "Displays a panel indicator in some desktops"
+msgstr "Papar penunjuk panel dalam beberapa dekstop"
+
+msgid "Do not add a title row"
+msgstr "Jangan tambah baris tajuk"
+
+msgid "Do not create an id3v1 tag in mp3 files"
+msgstr "Jangan cipta tag id3v1 dalam fail mp3"
+
+msgid "Do not unsynchronise id3v2 tags"
+msgstr "Jangan nyahsegerakkan tag id3v2"
+
+msgid "Do not write the tags"
+msgstr "Jangan tulis tag"
+
+msgid "Don't add the overlay to dialogs"
+msgstr "Jangan tambahan tindihan atas ke dialog"
+
+#, perl-brace-format
+msgid "Don't know how to play files of type {type}"
+msgstr "Tidak tahu bagaimana hendak main fail bagi jenis {type}"
+
+msgid "Don't notify if the main window is visible"
+msgstr "Jangan maklumkan jika tetingkap utama tampak"
+
+msgid "Don't submit current song"
+msgstr "Jangan serah lagu semasa"
+
+msgid "Download"
+msgstr "Muat turun"
+
+msgid "Download failed."
+msgstr "Muat turun gagal"
+
+msgid "Downloading"
+msgstr "Memuat turun"
+
+msgid "Drag and drop songs here to replace the selection."
+msgstr "Seret dan lepas lagu di sini untuk ganti pemilihan."
+
+msgid "Drop files in this folder"
+msgstr "Lepas fail dalam folder ini"
+
+msgid "Edit"
+msgstr "Sunting"
+
+msgid "Edit Current Song Properties"
+msgstr "Sunting Sifat Lagu Semasa"
+
+msgid "Edit Labels"
+msgstr "Sunting Label"
+
+msgid "Edit Lyrics"
+msgstr "Sunting Lirik"
+
+msgid "Edit Lyrics ..."
+msgstr "Sunting Lirik ..."
+
+msgid "Edit Multiple Songs Properties"
+msgstr "Sunting Sifat Lagu Berbilang"
+
+msgid "Edit Rating"
+msgstr "Sunting Penarafan"
+
+msgid "Edit Settings"
+msgstr "Sunting Tetapan"
+
+msgid "Edit auto-fill formats ..."
+msgstr "Sunting format auto-isi ..."
+
+msgid "Edit filter"
+msgstr "Sunting penapis"
+
+msgid "Edit filter..."
+msgstr "Sunting penapis..."
+
+msgid "Edit grouping ..."
+msgstr "Sunting pengelompokan ..."
+
+msgid "Edit in the last.fm wiki"
+msgstr "Sunting dalam wiki last.fm"
+
+msgid "Edit list"
+msgstr "Sunting senarai"
+
+msgid "Edit mode"
+msgstr "Sunting mod"
+
+msgid "Edit ordered modes ..."
+msgstr "Sunitng mod bertertib ..."
+
+msgid "Edit random modes ..."
+msgstr "Sunting mod rawak ..."
+
+msgid "Edit row tip"
+msgstr "Sunting tip baris"
+
+msgid "Edit selected song properties"
+msgstr "Sunting sifat lagu terpilih"
+
+msgid "Edit..."
+msgstr "Sunting..."
+
+msgid "Editable in song properties dialog"
+msgstr "Boleh disunting dalam dialog sifat lagu"
+
+msgid "Editing list : "
+msgstr "Senarai penyuntingan :"
+
+msgid "Editing tags"
+msgstr "Menyunting tag"
+
+msgid "Embedded lyrics"
+msgstr "Lirik boleh dibenam"
+
+msgid "Embedded picture"
+msgstr "Gambar boleh dibenam"
+
+msgid "Empty list"
+msgstr "Senarai kosong"
+
+msgid "Encapsulated object"
+msgstr "Objek terkurung"
+
+msgid "Encoded by"
+msgstr "Dienkod oleh"
+
+msgid "Encoded with"
+msgstr "Dienkod dengan"
+
+msgid "Encoder"
+msgstr "Pengenkod"
+
+msgid "Encoding used for id3v1 tags :"
+msgstr "Pengekodan digunakan untuk tag id3v1 :"
+
+msgid "Enqueue"
+msgstr "Baris gilir"
+
+msgid "Enqueue Action"
+msgstr "Tindakan Baris Gilir"
+
+msgid "Enqueue Displayed"
+msgstr "Baris Gilir Dipaparkan"
+
+msgid "Enqueue Selected"
+msgstr "Baris Gilir Dipilih"
+
+msgid "Enqueue Selected Songs"
+msgstr "Baris Gilir Lagu Terpilih"
+
+msgid "Enqueue Songs from Current Album"
+msgstr "Baris Gilir Lagu dari Album Semasa"
+
+msgid "Enqueue Songs from Current Artist"
+msgstr "Baris  Gilir Lagu Dari Artis Semasa"
+
+msgid "Enqueue a list of files/folders"
+msgstr "Baris gilir senarai fail/folder"
+
+msgid "Enqueue filter"
+msgstr "Baris gilir penapis"
+
+msgid "Enter album name"
+msgstr "Masukkan nama album"
+
+msgid "Enter custom event string :"
+msgstr "Masukkan rentetan peristiwa suai :"
+
+msgid "Equalizer"
+msgstr "Penyama"
+
+msgid "Error :"
+msgstr "Ralat :"
+
+msgid "Error creating folder"
+msgstr "Ralat mencipta folder"
+
+msgid "Error details"
+msgstr "Perincian ralat"
+
+#, perl-brace-format
+msgid "Error opening '{file}' for writing."
+msgstr "Ralat membuka '{file}' untuk penulisan."
+
+msgid "Error saving artistbio"
+msgstr "Ralat menyimpan artisbio"
+
+#, perl-brace-format
+msgid ""
+"Error saving artistbio in '{file}' :\n"
+"{error}"
+msgstr ""
+"Ralat menyimpan artistbio dalam '{file}' :\n"
+"{error}"
+
+msgid "Error saving icon"
+msgstr "Ralat menyimpan ikon"
+
+msgid "Error saving lyrics"
+msgstr "Ralat menyimpan lirik"
+
+#, perl-brace-format
+msgid ""
+"Error saving lyrics in '{file}' :\n"
+"{error}"
+msgstr ""
+"Ralat menyimpan lirik dalam '{file}' :\n"
+"{error}"
+
+msgid "Error saving picture"
+msgstr "Ralat menyiman gambar"
+
+msgid "Error saving review"
+msgstr "Ralat menyimpan ulasan"
+
+#, perl-brace-format
+msgid ""
+"Error saving review in '{file}' :\n"
+"{error}"
+msgstr ""
+"Ralat menyimpan ulasan dalam '{file}' :\n"
+"{error}"
+
+msgid "Error while writing replaygain data"
+msgstr "Ralat ketika menulis data gandaan main semula"
+
+msgid "Error while writing tag"
+msgstr "Ralat ketika menulis tag"
+
+#, perl-brace-format
+msgid "Error writing '{file}'"
+msgstr "Ralat menulis` '{file}'"
+
+msgid "Error writing .csv file"
+msgstr "Ralat menulis fail .csv"
+
+msgid "Error writing .m3u file"
+msgstr "Ralat menulis fail .m3u"
+
+msgid "Error writing downloaded file"
+msgstr "Ralat menulis fail dimuat turun"
+
+msgid "Error writing lyrics"
+msgstr "Ralat menulis lirik"
+
+msgid "Error writing tag"
+msgstr "Ralat menulis tag"
+
+msgid "Error: invalid filename pattern"
+msgstr "Ralat: corak nama fail tidak sah"
+
+msgid "Events"
+msgstr "Peristiwa"
+
+msgid "Example :"
+msgstr "Contoh :"
+
+msgid "Exclude 'seed'-artist from queue"
+msgstr "Asingkan artis-'seed' dari baris gilir"
+
+msgid "Execute custom command on selected files"
+msgstr "Lakukan perintah suai pada fail terpilih"
+
+msgid "Exit full screen"
+msgstr "Keluar dari skrin penuh"
+
+msgid "Export"
+msgstr "Eksport"
+
+msgid "Export plugin"
+msgstr "Pemalam eksport"
+
+msgid "Export song properties to a .csv file"
+msgstr "Eksport sifat lagu ke fail .csv"
+
+msgid "Export to .m3u file"
+msgstr "Eksport ke fail .m3u"
+
+msgid "Extra fields"
+msgstr "Medan tambahan"
+
+msgid "Extra gain"
+msgstr "Gandaan tambahan"
+
+msgid "Extract guest artist from title :"
+msgstr "Ekstrak artis tetamu dari tajuk :"
+
+msgid "Fade-out"
+msgstr "Pendam-keluar"
+
+#, perl-format
+msgid "Fade-out in %d seconds"
+msgstr "Pendam-keluar dalam tempoh %d saat"
+
+msgid "Fade-out then stop"
+msgstr "Pendam-keluar kemudian henti"
+
+#, perl-brace-format
+msgid "Failed to delete '{file}'"
+msgstr "Gagal memadam '{file}'"
+
+msgid "Fetching albuminfo"
+msgstr "Mendapatkan maklumat album"
+
+msgid "Field identifier"
+msgstr "Pengenalpasti medan"
+
+msgid "Field type"
+msgstr "Jenis medan"
+
+msgid "Fields"
+msgstr "Medan"
+
+msgid ""
+"Fields will be saved according to the settings above. Albuminfo files will "
+"be re-read if there are fields to be saved and you choose 'albums missing "
+"reviews' in the combo box."
+msgstr ""
+"Medan akan disimpan berdasarkan pada tetapan di atas. Fail maklumat album "
+"akan dibaca-semula jika ada medan disimpan dan anda pilih 'album kehilangan "
+"ulasan' dalam kotak kombo."
+
+msgid "File"
+msgstr "Fail"
+
+msgid "File properties"
+msgstr "Sifat fail"
+
+msgid "File type"
+msgstr "Jenis fail"
+
+#, perl-brace-format
+msgid "File: {file}"
+msgstr "Fail: {file}"
+
+msgid "Filename"
+msgstr "Nama fail"
+
+msgid "Filename extension"
+msgstr "Sambungan nama fail"
+
+msgid "Filename format :"
+msgstr "Format nama fail :"
+
+msgid "Filename without extension"
+msgstr "Nama fail tanpa sambungan"
+
+msgid "Files"
+msgstr "Fail"
+
+msgid "Files with these extensions won't be added"
+msgstr "Fail dengan sambungan ini tidak akan ditambah"
+
+msgid "Filesystem"
+msgstr "Sistem fail"
+
+msgid "Filter"
+msgstr "Penapis"
+
+msgid "Filter : "
+msgstr "Penapis :"
+
+msgid "Filter edition"
+msgstr "Edisi penapis"
+
+msgid "Filter on playing Album"
+msgstr "Tapis pada Album yang dimainkan"
+
+msgid "Filter on playing Artist"
+msgstr "Tapi pada Artis yang dimainkan"
+
+msgid "Filter on playing Song"
+msgstr "Tapis pada Lagu yang dimainkan"
+
+msgid "Filter on this album"
+msgstr "Tapis pada album ini"
+
+msgid "Filter on this artist"
+msgstr "Tapis pada artis ini"
+
+msgid "Find :"
+msgstr "Cari :"
+
+msgid "Find a unique filename if file already exists"
+msgstr "Cari nama fail unik jika fail sudah wujud"
+
+msgid "Find songs in same albums"
+msgstr "Cari lagu dalam album yang sama"
+
+msgid "Find songs with same artists"
+msgstr "Cari lagu dengan artis yang sama"
+
+msgid "Find songs with the same names"
+msgstr "Cari lagu dengan nama yang sama"
+
+msgid "Folder"
+msgstr "Folder"
+
+msgid "Folder (right-aligned)"
+msgstr "Folder (dijajar-kanan)"
+
+msgid "Folder format :"
+msgstr "Format folder :"
+
+msgid "Folder pattern :"
+msgstr "Corak folder :"
+
+msgid "Folders to search for new songs"
+msgstr "Folder untuk gelintar lagu baharu"
+
+msgid "Follow playing song"
+msgstr "Ikut lagu yang dimainkan"
+
+msgid "Follow selected song"
+msgstr "Ikut lagu terpilih"
+
+msgid "Font size"
+msgstr "Saiz fon"
+
+msgid "For alternate ratings"
+msgstr "Untuk penarafan alternatif"
+
+msgid "For decimal numbers"
+msgstr "Untuk nombor desimal"
+
+msgid "For integer numbers"
+msgstr "Untuk nombor integer"
+
+msgid "For when values are likely to be repeated"
+msgstr "Bila nilai berkemungkinan diulang"
+
+msgid "Forward"
+msgstr "Maju"
+
+msgid "Found but not working"
+msgstr "Temui tetapi tidak berfungsi"
+
+msgid "Friday"
+msgstr "Jumaat"
+
+#, perl-brace-format
+msgid ""
+"From: {oldname}\n"
+"To: {newname}"
+msgstr ""
+"Dari: {oldname}\n"
+"Ke: {newname}"
+
+msgid "Full screen"
+msgstr "Skrin penuh"
+
+msgid "Full screen layout :"
+msgstr "Bentangan skrin penuh :"
+
+msgid "Fullscreen"
+msgstr "Skrin penuh"
+
+msgid "Fullscreen simple"
+msgstr "Skrin penuh mudah"
+
+msgid "GStreamer module not loaded."
+msgstr "Modul GStreamer tidak dimuatkan."
+
+msgid "Gain for songs missing replaygain tags"
+msgstr "Gandaan untuk lagu yang kehilangan tag gandaan main semula"
+
+msgid "Garage Fullscreen"
+msgstr "Skrin Penuh Garaj"
+
+msgid "Genre"
+msgstr "Genre"
+
+msgid "Genre - Album"
+msgstr "Genre - Album"
+
+msgid "Genre - Artist"
+msgstr "Genre - Artis"
+
+msgid "Genre is set"
+msgstr "Genre ditetapkan"
+
+msgid "Genres"
+msgstr "Genre"
+
+msgid "Genres pane"
+msgstr "Anak tetingkap genre"
+
+msgid "Gnome mmkeys"
+msgstr "mmkeys Gnome"
+
+msgid "Gnome multimedia keys plugin"
+msgstr "Pemalam kekunci multimedia Gnome"
+
+msgid "Go to Playing Track"
+msgstr "Pergi ke Trek Dimainkan"
+
+msgid "Go to playing song"
+msgstr "Pergi ke lagu dimainkan"
+
+msgid "Group by :"
+msgstr "Dikumpul mengikut :"
+
+msgid "Grouping"
+msgstr "Pengelompokan"
+
+msgid "Handshake OK"
+msgstr "Jabat Tangan OK"
+
+msgid "Handshake failed : "
+msgstr "Jabat tangan gagal :"
+
+msgid "Hard limiter"
+msgstr "Pembatas keras"
+
+msgid "Help"
+msgstr "Bantuan"
+
+msgid "Hide"
+msgstr "Sembunyi"
+
+msgid "Hide non-matching"
+msgstr "Sembunyi yang tidak-sepadan"
+
+msgid "Hide toolbar"
+msgstr "Sembunyi palang alat"
+
+msgid "Icon theme :"
+msgstr "Tema ikon :"
+
+msgid "Identifier in file tag"
+msgstr "Pengenalpasti dalam tag fail"
+
+msgid "Ignore playback errors"
+msgstr "Abai ralat main balik"
+
+msgid "Ignored file extensions :"
+msgstr "Sambungan fail diabaikan :"
+
+msgid "Import list"
+msgstr "Senarai import"
+
+msgid ""
+"In this case one command by file will be run\n"
+"\n"
+msgstr ""
+"Dalam situasi ini satu perintah berdasarkan fail akan dijalankan\n"
+"\n"
+
+msgid "Include Styles in Genres"
+msgstr "Sertakan Gaya dalam Genre"
+
+msgid "Increase Volume"
+msgstr "Tingkatkan Volum"
+
+msgid "Increase volume"
+msgstr "Tingkatkan volum"
+
+msgid "Info"
+msgstr "Maklumat"
+
+msgid "Insensitive title-artist (left-aligned)"
+msgstr "Tajuk-artis tak sensitif (dijajar-kiri)"
+
+msgid "Insensitive title-artist (right-aligned)"
+msgstr "Tajuk-artis tak sensitif (dijajar-kanan)"
+
+msgid "Insensitive, Song & Cover"
+msgstr "Tak sensitif, Lagu & Kulit Album"
+
+msgid "Insert Selected Songs at the top of the queue"
+msgstr "Sisip Lagu Terpilih di bahagian teratas baris gilir"
+
+msgid "Insert a list of files/folders at the start of the playlist"
+msgstr "Sisip senarai fail/folder di permulaan senarai main"
+
+msgid "Insert this pipeline before the audio sink"
+msgstr "Sisip talian paip sebelum sinki audio"
+
+msgid "Invalid regular expression"
+msgstr "Ungkapan nalar tidak sah"
+
+msgid "Invert filter"
+msgstr "Tapis songsang"
+
+msgid "Invisible hot spot"
+msgstr "Titik panas halimunan"
+
+#, perl-format
+msgid "Isn't smart equal to %s"
+msgstr "Tidak sama pintar dengan %s"
+
+msgid "Justified"
+msgstr "Diwajarkan"
+
+msgid "KB"
+msgstr "KB"
+
+msgid "Karaoke"
+msgstr "Karaoke"
+
+msgid "Karaoke plugin"
+msgstr "Pemalam Karaoke"
+
+msgid "Keep list filtered and sorted"
+msgstr "Kekalkan senarai ditapis dan diisih"
+
+msgid "Key"
+msgstr "Kekunci"
+
+msgid "Keys"
+msgstr "Kekunci"
+
+msgid "Keywords"
+msgstr "Kata Kunci"
+
+msgid "Label"
+msgstr "Label"
+
+msgid "Label is set"
+msgstr "Label ditetapkan"
+
+msgid "Label/Publisher"
+msgstr "Label/Penerbit"
+
+msgid "Labels"
+msgstr "Label"
+
+msgid "Labels' icons"
+msgstr "Ikon label"
+
+msgid "Lang"
+msgstr "Bah"
+
+msgid "Lang."
+msgstr "Bah."
+
+msgid "Languages"
+msgstr "Bahasa"
+
+msgid "Last played"
+msgstr "Terakhir dimain"
+
+msgid "Last skipped"
+msgstr "Terakhir dilangkau"
+
+msgid "Launch ripping program"
+msgstr "Lancar program peretasan"
+
+msgid "Layout"
+msgstr "Bentangan"
+
+msgid "Layout :"
+msgstr "Bentangan :"
+
+msgid "Layouts"
+msgstr "Bentangan"
+
+msgid "Left aligned"
+msgstr "Dijajar kiri"
+
+msgid "Left pane"
+msgstr "Anak tetingkap kiri"
+
+msgid "Left-clic or scrollwheel to change, right-click to mute"
+msgstr "Klik-kiri atau roda tatal untuk ubah, klik-kanan untuk senyapkan"
+
+msgid "Length"
+msgstr "Panjang"
+
+msgid "Library"
+msgstr "Pustaka"
+
+msgid "Library : "
+msgstr "Pustaka :"
+
+msgid ""
+"Library empty.\n"
+"\n"
+"Use the settings dialog to add music."
+msgstr ""
+"Pustaka kosong.\n"
+"\n"
+"Guna dialog tetapan untuk tambah muzik."
+
+#, perl-format
+msgid "Library size : %d song"
+msgid_plural "Library size : %d songs"
+msgstr[0] "Saiz pustaka : %d lagu"
+
+msgid "Limit similar artists to a rate of similarity : "
+msgstr "Hadkan artis serupa untuk beri penarafan kesamaan :"
+
+msgid "Limit similar artists to the first : "
+msgstr "Hadkan artis serupan kepada pertama :"
+
+msgid "List"
+msgstr "Senarai"
+
+msgid "List empty"
+msgstr "Senarai kosong"
+
+msgid "List order"
+msgstr "Tertib senarai"
+
+msgid "Listed : "
+msgstr "Disenarai :"
+
+msgid "Listed songs"
+msgstr "Lagu disenarai"
+
+msgid "Listeners: "
+msgstr "Pendengar:"
+
+msgid "Lists"
+msgstr "Senarai"
+
+msgid "Lists, Library & Context"
+msgstr "Senarai, Pustaka & Konteks"
+
+msgid "Literal search"
+msgstr "Gelintar harfiah"
+
+msgid "Load lyrics even if lyrics panel is hidden"
+msgstr "Muat lirik walaupun panel lirik tersembunyi"
+
+msgid "Load/Save Artist Info in :"
+msgstr "Muat/Simpan Maklumat Artis dalam :"
+
+#, perl-format
+msgid "Loaded %d unsent song from previous session"
+msgid_plural "Loaded %d unsent songs from previous session"
+msgstr[0] "Memuatkan %d lagu tidak dihantar dari sesi terdahulu"
+
+msgid "Loading failed."
+msgstr "Memuatkan gagal."
+
+msgid "Loading..."
+msgstr "Memuatkan..."
+
+msgid "Lock"
+msgstr "Kunci"
+
+msgid "Lock Album"
+msgstr "Kunci Album"
+
+msgid "Lock Artist"
+msgstr "Kunci Artis"
+
+msgid "Lock on Album"
+msgstr "Kunci pada Album"
+
+msgid "Lock on Artist"
+msgstr "Kunci pada Artis"
+
+msgid "Lock on song"
+msgstr "Kunci pada lagu"
+
+#, perl-brace-format
+msgid "Lock on {field}"
+msgstr "Kunci pada {field}"
+
+msgid "Locked on :\n"
+msgstr "Dikunci pada :\n"
+
+msgid "Lookup at allmusic.com"
+msgstr "Carian pada allmusic.com"
+
+msgid "Lookup in AMG"
+msgstr "Carian dalam AMG"
+
+msgid "Lookup in google"
+msgstr "Carian dalam google"
+
+msgid "Lower left"
+msgstr "Kiri bawah"
+
+msgid "Lower right"
+msgstr "Kanan bawah"
+
+msgid "Lullaby"
+msgstr "Lullaby"
+
+msgid "Lullaby plugin"
+msgstr "Pemalam Lullaby"
+
+msgid "Lyricist"
+msgstr "Penulis lirik"
+
+msgid "Lyrics"
+msgstr "Lirik"
+
+msgid "Lyrics (requires lyrics plugin)"
+msgstr "Lirik (perlukan pemalam lirik)"
+
+msgid "Lyrics alignement"
+msgstr "Jajaran lirik"
+
+msgid "Lyrics file :"
+msgstr "Fail lirik :"
+
+msgid "Lyrics file name format"
+msgstr "Format nama fail lirik"
+
+msgid "Lyrics for "
+msgstr "Lirik untuk"
+
+msgid "Lyrics plugin"
+msgstr "Pemalam lirik"
+
+msgid "Lyrics source"
+msgstr "Sumber lirik"
+
+msgid "MB"
+msgstr "MB"
+
+msgid "MIME type"
+msgstr "Jenis MIME"
+
+msgid "MPRIS v1"
+msgstr "MPRIS v1"
+
+msgid "MPRIS v1 support"
+msgstr "Sokongan MPRIS v1"
+
+msgid "MPRIS v2"
+msgstr "MPRIS v2"
+
+msgid "MPRIS v2 support"
+msgstr "Sokongan MPRIS v2"
+
+msgid "Main"
+msgstr "Utama"
+
+msgid "Main artist"
+msgstr "Artis utama"
+
+msgid "Make it look like"
+msgstr "Jadikannya seperti"
+
+msgid ""
+"Makes gmusicbrowser monitor its pulseaudio volume, so that external changes "
+"to its volume are known."
+msgstr ""
+"Jadikan gmusicbrowser memantau volum pulseaudio, supaya perubahan dalaman "
+"pada volumnya diketahui."
+
+msgid ""
+"Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
+"gnome."
+msgstr ""
+"Jadilan gmusicbrowser bertindak balas dengan kekunci multimedia Berikutnya/"
+"Terdahulu/Main/Henti dalam gnome."
+
+msgid "Mass Rename"
+msgstr "Nama Semula Kelompok"
+
+msgid "Mass Renaming"
+msgstr "Penamaan Semula Kelompok"
+
+msgid "Media type"
+msgstr "Jenis media"
+
+msgid "Menu entry name"
+msgstr "Nama masukan menu"
+
+msgid "Middle-clic for next album"
+msgstr "Klik-tengah untuk album berikutnya"
+
+msgid "Middle-click action :"
+msgstr "Tindakan klik-tengah :"
+
+msgid ""
+"Middle-click on local artists to set a filter on them, right-click non-local "
+"artists to search for them on the web."
+msgstr ""
+"Klik-tengah pada artis tempatan untuk tetapkan penapis pada mereka, klik-"
+"kanan pada artis bukan-tempatan untuk gelintar mereka di sesawang."
+
+msgid "Minimal tip"
+msgstr "Tip minimum"
+
+msgid "Minimum size"
+msgstr "Saiz minimum"
+
+msgid "Misc."
+msgstr "Pelbagai"
+
+msgid "Modification"
+msgstr "Pengubahsuaian"
+
+msgid "Monday"
+msgstr "Isnin"
+
+msgid "Monitor"
+msgstr "Pemantau"
+
+msgid "Monitor the pulseaudio volume"
+msgstr "Pantau volum pulseaudio"
+
+msgid "Moods"
+msgstr "Mood"
+
+msgid "More info"
+msgstr "Lagi maklumat"
+
+msgid "More results"
+msgstr "Lagi keputusan"
+
+msgid "Mosaic View"
+msgstr "Paparan Mozek"
+
+msgid "Move"
+msgstr "Alih"
+
+msgid "Move Files to :"
+msgstr "Alih Fail ke :"
+
+msgid "Move failed"
+msgstr "Alih gagal"
+
+msgid "Move folder to"
+msgstr "Alih folder ke"
+
+msgid "Moving"
+msgstr "Mengalih"
+
+#, perl-format
+msgid "Moving file"
+msgid_plural "Moving %d files"
+msgstr[0] "Mengalih %d fail"
+
+msgid "Music"
+msgstr "Muzik"
+
+msgid "Music files"
+msgstr "Fail muzik"
+
+msgid "Mute/Unmute"
+msgstr "Senyap/Suarakan"
+
+msgid "Name"
+msgstr "Nama"
+
+msgid "Name of layout"
+msgstr "Nama bentangan"
+
+msgid "Name under which the command will appear in the menu"
+msgstr "Nama yang mana perintah akan muncul di dalam menu"
+
+msgid "Never"
+msgstr "Tidak Sesekali"
+
+msgid "New"
+msgstr "Baharu"
+
+msgid "New custom field"
+msgstr "Medan suai baharu"
+
+msgid "New filter"
+msgstr "Penapis baharu"
+
+msgid "New label"
+msgstr "Label baharu"
+
+msgid "New list"
+msgstr "Senarai baharu"
+
+msgid "New name"
+msgstr "Nama baharu"
+
+msgid "Next"
+msgstr "Berikutnya"
+
+msgid "Next Album"
+msgstr "Album Berikutnya"
+
+msgid "Next Artist"
+msgstr "Artis Berikutnya"
+
+msgid "Next Song"
+msgstr "Lagu Berikutnya"
+
+msgid "Next Song In Playlist"
+msgstr "Lagu Berikutnya Dalam Senarai Main"
+
+msgid "No connections"
+msgstr "Tiada sambungan"
+
+msgid "No file browser found."
+msgstr "Tiada pelajar fail ditemui."
+
+msgid "No genre"
+msgstr "Tiada genre"
+
+msgid "No label"
+msgstr "Tiada label"
+
+msgid "No locked filter"
+msgstr "Tiada penapis dikunci"
+
+msgid "No lyrics found"
+msgstr "Tiada lirik ditemui"
+
+msgid "No moods"
+msgstr "Tiada mood"
+
+msgid "No results found"
+msgstr "Tiada keputusan ditemui"
+
+msgid "No review found"
+msgstr "Tiada ulasan ditemui"
+
+msgid "No review written."
+msgstr "Tiada ulasan ditulis."
+
+msgid "No songs"
+msgstr "Tiada lagu"
+
+msgid "No songs found"
+msgstr "Tiada lagu ditemui"
+
+msgid "No styles"
+msgstr "Tiada gaya"
+
+msgid "No themes"
+msgstr "Tiada tema"
+
+msgid "No web browser found."
+msgstr "Tiada pelajar sesawang ditemui."
+
+msgid "None"
+msgstr "Tiada"
+
+msgid "Normal"
+msgstr "Biasa"
+
+msgid "Normal mode"
+msgstr "Mod biasa"
+
+msgid "Normal with buttons"
+msgstr "Biasa dengan butang"
+
+msgid "Normalize volume (the files must have replaygain tags)"
+msgstr "Normalkan volum (fail mesti mempunyai tag gandaan main semula)"
+
+msgid "Not found"
+msgstr "Tidak ditemui"
+
+msgid "Note that some notification daemons resize the displayed picture"
+msgstr ""
+"Perhatian sesetengah daemon pemberitahuan saizkan semula gambar yang "
+"dipaparkan"
+
+msgid ""
+"Note: inactive fields must be enabled by the user in the 'Fields' tab in "
+"Settings"
+msgstr ""
+"Perhatian: medan tidak aktif mesti dibenarkan oleh pengguna di dalam tab "
+"'Medan' di dalam Tetapan"
+
+msgid "Notify"
+msgstr "Makluman"
+
+msgid "Notify plugin"
+msgstr "Pemalam makluman"
+
+msgid "Notify you of the playing song with the system's notification popups"
+msgstr "Maklumkan anda lagu yang dimainkan dengan pemberitahuan timbul sistem"
+
+msgid "Now playing"
+msgstr "Kini dimainkan"
+
+msgid "NowPlaying plugin"
+msgstr "Pemalam KiniDimainkan"
+
+msgid "Number of days since added"
+msgstr "Bilangan hari semenjak ditambah"
+
+msgid "Number of days since last played"
+msgstr "Bilangan hari semenjak terakhir dimain"
+
+msgid "Number of days since last skipped"
+msgstr "Bilangan hari semenjak terakhir dilangkau"
+
+msgid "Number of days since modified"
+msgstr "Bilangan hari semenjak diubahsuai"
+
+msgid "Number of milliseconds"
+msgstr "Bilangan milisaat"
+
+msgid "Number of seconds"
+msgstr "Bilangan saat"
+
+msgid "Number of times played"
+msgstr "Berapa kali dimainkan"
+
+msgid "Number of times skipped"
+msgstr "Berapa kali dilangkau"
+
+msgid ""
+"ON -> smaller means more probable\n"
+"OFF -> bigger means more probable"
+msgstr ""
+"HIDUP -> lebih kecil bermaksud lebih mungkin\n"
+"MATI -> lebih besar bermaksud lebih mungkin"
+
+msgid ""
+"ON less probable if genre is set\n"
+"OFF more probable if genre is set"
+msgstr ""
+"HIDUP lebih mungkin jika genre ditetapkan\n"
+"MATI lebih mungkin jika genre ditetapkan"
+
+msgid ""
+"ON less probable if label is set\n"
+"OFF more probable if label is set"
+msgstr ""
+"HIDUP lebih mungkin jika label ditetapkan\n"
+"MATI lebih mungkin jika label ditetapkan"
+
+msgid "Old name"
+msgstr "Nama lama"
+
+msgid "On top of other windows instead of below"
+msgstr "Berada di ata tetingkap lain selain dari di bawah"
+
+msgid ""
+"One command is used per selected songs, unless $files is used, which is "
+"replaced by the list of selected files"
+msgstr ""
+"Satu perintah digunakan per lagu terpilih, melainkan $files digunakan, yang "
+"diganti dengan senarai fail terpilih"
+
+#, perl-brace-format
+msgid "One of these commands is required to play files of type {type} : {cmd}"
+msgstr ""
+"Salah satu dari perintah ini diperlukan untuk memainkan fail bagi jenis "
+"{type} : {cmd}"
+
+msgid "Only affect mp3 files that do not already have an id3v1 tag"
+msgstr "Hanya mempengaruhi fail mp3 yang tidak mempunyai tag id3v1"
+
+msgid "Only show similar artists from local library"
+msgstr "Hanya tunjuk artis serupa dari pustaka setempat"
+
+msgid "Opacity"
+msgstr "Kelegapan"
+
+msgid "Open Browser"
+msgstr "Bukan Pelayar"
+
+msgid "Open Browser window"
+msgstr "Buka tetingkap Pelayar"
+
+msgid "Open Context window"
+msgstr "Buka tetingkap Konteks"
+
+msgid "Open Custom window"
+msgstr "Buka tetingkap Suai"
+
+msgid "Open Equalizer"
+msgstr "Buka Penyama"
+
+msgid "Open Playlist"
+msgstr "Buka Senarai Main"
+
+msgid "Open Preference window"
+msgstr "Buka tetingkap Keutamaan"
+
+msgid "Open Queue"
+msgstr "Buka Baris Gilir"
+
+msgid "Open Queue window"
+msgstr "Buka tetingkap Baris Gilir"
+
+msgid "Open Search window"
+msgstr "Buka tetingkap Gelintar"
+
+msgid "Open containing folder"
+msgstr "Buka folder dikandungi"
+
+msgid "Open context & queue panel"
+msgstr "Buka panel konteks & baris gilir"
+
+msgid "Open context page"
+msgstr "Buka halaman konteks"
+
+msgid "Open equalizer..."
+msgstr "Buka penyama..."
+
+msgid "Open existing list"
+msgstr "Buka senarai sedia ada"
+
+msgid "Open folder"
+msgstr "Buka folder"
+
+msgid "Open last.fm website in your browser"
+msgstr "Buka laman sesawang last.fm dalam pelayar anda"
+
+msgid "Open link in Browser"
+msgstr "Buka pautan dalam Pelayar"
+
+msgid "Open page layout"
+msgstr "Buka bentangan halaman"
+
+msgid "Open special layouts as desktop widgets"
+msgstr "Bukan bentangan khas sebagai widjet dekstop"
+
+msgid "Open this page in the web browser"
+msgstr "Buka halaman ini di dalam pelayar sesawang"
+
+msgid "Options"
+msgstr "Pilihan"
+
+msgid "Options ..."
+msgstr "Pilihan ..."
+
+msgid "Options for subgroup"
+msgstr "Pilihan untuk subkumpulan"
+
+msgid ""
+"Or you can use the field $files which will be replaced by the list of files, "
+"and only one command will be run"
+msgstr ""
+"Atau anda boleh guna medan &files yang akan diganti dengan senarai fail, dan "
+"hanya satu perintah akan dijalankan"
+
+msgid "Original Artist"
+msgstr "Artis Asal"
+
+msgid "Original Filename"
+msgstr "Nama Fail Asal"
+
+msgid "Original release year"
+msgstr "Tahun keluaran asal"
+
+msgid "Originaly from"
+msgstr "Berasal dari"
+
+msgid "Other"
+msgstr "Lain-lain"
+
+msgid "Output"
+msgstr "Output"
+
+msgid "Overlay layout :"
+msgstr "Bentangan tindihan atas :"
+
+msgid "Owner identifier"
+msgstr "Pengenalpasti pemilik"
+
+msgid "Path,Album,Disc,Track,File"
+msgstr "Laluan,Album,Cakera,Trek,Fail"
+
+msgid "Path,File"
+msgstr "Laluan,Fail"
+
+msgid "Pattern to find .lrc files :"
+msgstr "Corak untuk cari fail .lrc :"
+
+msgid "Pause"
+msgstr "Jeda"
+
+msgid "Per-song values"
+msgstr "Nilai per-lagu"
+
+msgid "Persistent values"
+msgstr "Nilai tekal"
+
+msgid "Pick an existing one"
+msgstr "Ambil yang sedia ada"
+
+msgid "Picture"
+msgstr "Gambar"
+
+msgid "Picture Browser"
+msgstr "Pelayar Gambar"
+
+msgid "Picture Type"
+msgstr "Jenis Gambar"
+
+#, perl-format
+msgid "Picture cache : %d MB"
+msgstr "Cache gambar : %d MB"
+
+msgid "Picture finder"
+msgstr "Pencari gambar"
+
+msgid "Picture finder plugin"
+msgstr "Pemalam pencari gambar"
+
+#, perl-format
+msgid "Picture size : %d"
+msgstr "Saiz gambar : %d"
+
+msgid "Pictures and music files"
+msgstr "Fail gambar dan muzik"
+
+msgid "Pictures files"
+msgstr "Fail gambar"
+
+msgid "Play"
+msgstr "Main"
+
+msgid "Play Only Displayed"
+msgstr "Hanya Main Yang Dipaparkan"
+
+msgid "Play Only Selected"
+msgstr "Hanya Main Yang Terpilih"
+
+msgid "Play a list of files"
+msgstr "Main senarai fail"
+
+msgid "Play all songs from this album"
+msgstr "Main semua lagu dari album ini"
+
+msgid "Play all songs from this artist"
+msgstr "Main semua lagu dari artis ini"
+
+msgid "Play button"
+msgstr "Butang main"
+
+msgid "Play count"
+msgstr "Kiraan main"
+
+msgid "Play counter"
+msgstr "Pengira main"
+
+msgid "Play filter"
+msgstr "Penapis main"
+
+msgid "Play history"
+msgstr "Sejarah main"
+
+msgid "Play listed songs"
+msgstr "Main lagu yang disenaraikan"
+
+msgid "Play order"
+msgstr "Tertib main"
+
+msgid "Play, queue or track"
+msgstr "Main, baris gilir atau trek"
+
+msgid "Play/Pause"
+msgstr "Main/Jeda"
+
+msgid "Playback"
+msgstr "Main balik"
+
+msgid "Playcount: "
+msgstr "Kiraan main:"
+
+msgid "Played Today"
+msgstr "Dimain Hari Ini"
+
+msgid "Player mounted on :"
+msgstr "Pemain dilekap pada :"
+
+msgid "Player window layout :"
+msgstr "Bentangan tetingkap pemain :"
+
+msgid "Playing"
+msgstr "Dimainkan"
+
+msgid "Playing Album"
+msgstr "Album Dimainkan"
+
+msgid "Playing Artist"
+msgstr "Artis Dimainkan"
+
+msgid "Playing Filter"
+msgstr "Penapis Dimainkan"
+
+msgid "Playing Title"
+msgstr "Tajuk Dimainkan"
+
+msgid "Playing and queue icons"
+msgstr "Ikon dimainkan dan baris gilir"
+
+#, perl-brace-format
+msgid "Playing error : {error}"
+msgstr "Ralat dimainkan : {error}"
+
+msgid "Playing/Queue Icon or Track"
+msgstr "Ikon Dimainkan/Baris Gilir atau Trek"
+
+msgid "Playlist"
+msgstr "Senarai main"
+
+msgid "Playlist 1"
+msgstr "Senarai main 1"
+
+msgid "Playlist Empty"
+msgstr "Senarai Main Kosong"
+
+msgid "Playlist Utilities Bar"
+msgstr "Palang Utiliti Senarai Main"
+
+msgid "Playlist empty"
+msgstr "Senarai main kosong"
+
+msgid "Playlist files"
+msgstr "Fail senarai main"
+
+msgid "Playlist filter"
+msgstr "Penapis senarai main"
+
+msgid "Playlist filter :\n"
+msgstr "Penapis senarai main :\n"
+
+msgid "Playlists"
+msgstr "Senarai main"
+
+msgid "Plugin not loaded"
+msgstr "Pemalam tidak dimuatkan"
+
+msgid "Plugins"
+msgstr "Pemalam"
+
+msgid "Popularimeter"
+msgstr "Popularimeter"
+
+msgid "Popup Custom window"
+msgstr "Tetingkap Suai timbul"
+
+msgid "Popup Traytip"
+msgstr "Tip Talam timbul"
+
+msgid "Popup notify window"
+msgstr "Tetingkap makluman timbul"
+
+msgid "Popup playlist filter menu"
+msgstr "Menu penapis senarai main timbul"
+
+msgid "Popup playlist order menu"
+msgstr "Menu tertib senarai main timbul"
+
+msgid "Popup queue menu"
+msgstr "Menu baris gilir timbul"
+
+msgid "Pre-set"
+msgstr "Pra-set"
+
+msgid "Prefered place to load and save lyrics :"
+msgstr "Tempat dikehendaki untuk dimuatkan dan simpan lirik :"
+
+msgid "Preferences"
+msgstr "Keutamaan"
+
+msgid "Prepend"
+msgstr "Tambah"
+
+msgid "Press a key or a key combination"
+msgstr "Tekan satu kekunci atau gabungan kekunci"
+
+msgid "Previous"
+msgstr "Terdahulu"
+
+msgid "Previous Song"
+msgstr "Lagu Terdahulu"
+
+msgid "Previous Song In Playlist"
+msgstr "Lagu Terdahulu Dalam Senarai Main"
+
+msgid "Previous page"
+msgstr "Halaman terdahulu"
+
+msgid "Price paid"
+msgstr "Harga dibayar"
+
+msgid "Private Data"
+msgstr "Data Persendirian"
+
+msgid "Proceed to next item."
+msgstr "Terus ke item berikutnya."
+
+msgid "Produced (P)"
+msgstr "Dikeluarkan (P)"
+
+msgid "Progress"
+msgstr "Kemajuan"
+
+msgid "Properties"
+msgstr "Sifat"
+
+msgid "Provides context views using MozEmbed or WebKit"
+msgstr "Sediakan paparan konteks menggunakan MozEMbed atau WebKit"
+
+msgid "Proxy host :"
+msgstr "Hos proksi :"
+
+msgid "Publication right"
+msgstr "Hak penerbitan"
+
+msgid "Publisher"
+msgstr "Penerbit"
+
+msgid "Publisher/Studio logotype"
+msgstr "Logotip Penerbit/Studio"
+
+msgid "Queue"
+msgstr "Baris gilir"
+
+#, perl-format
+msgid "Queue (%n)"
+msgstr "Baris gilir (%n)"
+
+msgid "Queue Edit"
+msgstr "Sunting Baris Gilir"
+
+msgid "Queue album"
+msgstr "Baris gilir album"
+
+msgid "Queue artist"
+msgstr "Baris gilir artis"
+
+msgid "Queue empty"
+msgstr "Baris gilir kosong"
+
+msgid "Queue in Sidebar"
+msgstr "Baris gilir dalam Palang Sisi"
+
+msgid "Queue mode"
+msgstr "Mod baris gilir"
+
+msgid "Queue options"
+msgstr "Pilih baris gilir"
+
+msgid "Quick Search"
+msgstr "Gelintar Pantas"
+
+msgid "Quick Search with SongTree"
+msgstr "Gelintar Pantas dengan Pepohon Lagu"
+
+msgid "Quit"
+msgstr "Keluar"
+
+msgid "Quit after this song"
+msgstr "Keluar selepas lagu ini"
+
+msgid "Quit when queue empty"
+msgstr "Keluar bila baris gilir kosong"
+
+msgid "Radio title"
+msgstr "Tajuk radio"
+
+msgid "Radio url"
+msgstr "Url radio"
+
+msgid "Random"
+msgstr "Rawak"
+
+msgid "Random Playback"
+msgstr "Main Balik Rawak"
+
+msgid "Random mode edition"
+msgstr "Edisi mod rawak"
+
+msgid "Rating"
+msgstr "Penarafan"
+
+msgid "Rating (picture)"
+msgstr "Penarafan (gambar)"
+
+msgid "Rating between 0 and 100, or empty for default"
+msgstr "Penarafan diantara 0 hingga 100, atau kosongkan untuk lalai"
+
+msgid "Rating range:"
+msgstr "Julat penarafan:"
+
+msgid "Raw filename with path"
+msgstr "Nama fail mentah dengan laluan"
+
+msgid "Re-load layouts"
+msgstr "Muat-semula bentangan"
+
+msgid "Re-read tags"
+msgstr "Baca-semula tag"
+
+msgid "Re-reading tags"
+msgstr "Membaca-semula tag"
+
+msgid "Re-shuffle"
+msgstr "Kocok-semula"
+
+msgid "Read/write in file tag"
+msgstr "Baca/tulis dalam tag fail"
+
+msgid "Recent Filters"
+msgstr "Penapis Baru-Baru Ini"
+
+msgid "Recent albums"
+msgstr "Album baru-baru ini"
+
+msgid "Recent artists"
+msgstr "Artis baru-baru ini"
+
+msgid "Recent songs"
+msgstr "Lagu baru-baru ini"
+
+msgid "Recent songs include skipped songs that haven't been played."
+msgstr ""
+"Lagu baru-baru ini disertakan lagu dilangkau yang belum lagi dimainkan."
+
+msgid "Recently played"
+msgstr "Dimainkan baru-baru ini"
+
+msgid "Recently played songs"
+msgstr "Lagu dimainkan baru-baru ini"
+
+msgid "Recording Dates"
+msgstr "Tarikh Rakaman"
+
+msgid "Recording date"
+msgstr "Tarikh rakaman"
+
+msgid "Reference point :"
+msgstr "Titik rujukan :"
+
+msgid "Refresh"
+msgstr "Segar semula"
+
+msgid "Refresh list"
+msgstr "Segar semula senarai"
+
+msgid "Regular expression"
+msgstr "Ungkapan nalar"
+
+msgid "Regular expression :"
+msgstr "Ungkapan nalar :"
+
+msgid "Regular expression didn't match"
+msgstr "Ungkapan nalar tidak sepadan"
+
+msgid "Release date"
+msgstr "Tarikh keluaran"
+
+msgid "Remember last Filter/Playlist between sessions"
+msgstr "Ingat Penapis/Senarai Main terakhir diantara sesi"
+
+msgid "Remember playing position between sessions"
+msgstr "Ingat kedudukan dimainkan diantara sesi"
+
+msgid "Remember playing song between sessions"
+msgstr "Ingat lagu dimainkan diantara sesi"
+
+msgid "Remember queue between sessions"
+msgstr "Ingat baris gilir diantara sesi"
+
+msgid "Remixer"
+msgstr "Pengadun semula"
+
+msgid "Remove"
+msgstr "Buang"
+
+msgid "Remove a label from the current song"
+msgstr "Buang label dari lagu semasa"
+
+msgid "Remove all"
+msgstr "Buang semua"
+
+msgid "Remove all songs"
+msgstr "Buang semua lagu"
+
+msgid "Remove filter"
+msgstr "Buang penapis"
+
+msgid "Remove from disk"
+msgstr "Buang dari cakera"
+
+msgid "Remove from library"
+msgstr "Buang dari pustaka"
+
+msgid "Remove from list"
+msgstr "Buang dari senarai"
+
+msgid "Remove from persistent values"
+msgstr "Buang dari nilai tekal"
+
+msgid "Remove from playlist"
+msgstr "Buang dari senarai main"
+
+msgid "Remove from queue"
+msgstr "Buang dari baris gilir"
+
+msgid "Remove header, footer and left column from wikipedia pages"
+msgstr "Buang pengepala, pengaki dan lajur kiri dari halaman wikipedia"
+
+msgid "Remove label"
+msgstr "Buang label"
+
+msgid "Remove list"
+msgstr "Buang senarai"
+
+msgid "Remove selected songs"
+msgstr "Buang lagu terpilih"
+
+msgid "Remove this field"
+msgstr "Buang medan ini"
+
+msgid "Remove this rule"
+msgstr "Buang peraturan ini"
+
+msgid "Remove this tab"
+msgstr "Buang tab ini"
+
+msgid "Remove this tag"
+msgstr "Buang tag ini"
+
+msgid "Remove this widget"
+msgstr "Buang widjet ini"
+
+msgid "Rename"
+msgstr "Nama semula"
+
+#, perl-brace-format
+msgid "Rename '{label}'"
+msgstr "Nama semula '{label}'"
+
+msgid "Rename File"
+msgstr "Nama Semula Fail"
+
+msgid "Rename file"
+msgstr "Nama semula fail"
+
+msgid "Rename files using this pattern :"
+msgstr "Nama semula fail menggunakan corak ini :"
+
+msgid "Rename folder"
+msgstr "Nama semula folder"
+
+msgid "Rename label"
+msgstr "Nama semula label"
+
+msgid "Rename this folder to :"
+msgstr "Nama semula folder ini ke :"
+
+msgid "Rename/move files based on these fields :"
+msgstr "Nama semula/alih fail berdasarkan medan ini :"
+
+msgid "Renaming failed"
+msgstr "Penamaan semula gagal"
+
+#, perl-brace-format
+msgid ""
+"Renaming {oldname}\n"
+"to {newname}\n"
+"failed : {error}"
+msgstr ""
+"Penamaan semula {oldname}\n"
+"ke {newname}\n"
+"gagal : {error}"
+
+msgid "Reorganize files and folders"
+msgstr "Susun semula fail dan folder"
+
+msgid "Repeat"
+msgstr "Ulang"
+
+msgid "Replace"
+msgstr "Ganti"
+
+msgid "Replace existing values"
+msgstr "Ganti nilai sedia ada"
+
+msgid "Replace..."
+msgstr "Ganti..."
+
+msgid "ReplayGain options"
+msgstr "Pilihan Gandaan Main Semula"
+
+msgid "Replaygain"
+msgstr "Gandaan Main Semula"
+
+msgid "Replaygain analysis"
+msgstr "Analisis gandaan main semula"
+
+msgid "Rescan"
+msgstr "Imbas semula"
+
+msgid "Rescan Collection"
+msgstr "Imbas Semula Koleksi"
+
+msgid "Reset current value if no tag found in file"
+msgstr "Tetap semula nilai semasa jika tiada tag ditemui di dalam fail"
+
+msgid "Reset filter"
+msgstr "Tetap semula penapis"
+
+msgid "Reset zoom"
+msgstr "Tetap semula zum"
+
+msgid "Retrieves album-relevant information (review etc.) from allmusic.com."
+msgstr "Peroleh maklumat berkenaan-album (ulasan dll.) daripada allmusic.com."
+
+msgid "Review"
+msgstr "Ulasan"
+
+msgid "Rewind"
+msgstr "Mandir"
+
+msgid "Rhythmbox"
+msgstr "Rhythmbox"
+
+msgid "Rhythmbox 2nd queue column"
+msgstr "Lajur baris gilir kedua Rhythmbox"
+
+msgid "Right aligned"
+msgstr "Dijajar kanan"
+
+msgid "Right side"
+msgstr "Sisi kanan"
+
+msgid "Right-click to remove filters"
+msgstr "Klik-kanan untuk buang penapis"
+
+msgid "Right-click to toggle shuffle/random"
+msgstr "Klik-kanan untuk togol kocok/rawak"
+
+msgid "Rip"
+msgstr "Retas"
+
+msgid "Rip plugin"
+msgstr "Pemalam retas"
+
+msgid "Ripping software :"
+msgstr "Perisian peretasan :"
+
+msgid "Row number"
+msgstr "Bilangan baris"
+
+msgid "Run a command when playing a song"
+msgstr "Jalankan perintah bila memainkan lagu"
+
+msgid "Run perl code"
+msgstr "Jalankan kod perl"
+
+msgid "Run shell command"
+msgstr "Jalankan perintah shell"
+
+msgid "Run shell command on selected songs"
+msgstr "Jalankan perintah shell pada lagu terpilih"
+
+msgid "Run system command"
+msgstr "Jalankan perintah sistem"
+
+msgid "Run system command on selected songs"
+msgstr "Jalankan perintah sistem pada lagu terpilih"
+
+msgid "Running time"
+msgstr "Masa berjalan"
+
+msgid "Same Title"
+msgstr "Tajuk Serupa"
+
+msgid "Same album"
+msgstr "Album serupa"
+
+msgid "Same artist"
+msgstr "Artis serupa"
+
+msgid "Same title"
+msgstr "Tajuk serupa"
+
+msgid "Same type as labels"
+msgstr "Jenis sama sebagai label"
+
+msgid "Same year"
+msgstr "Tahun serupa"
+
+msgid "Sampling Rate"
+msgstr "Kadar Persampelan"
+
+msgid "Saturday"
+msgstr "Sabtu"
+
+msgid "Save"
+msgstr "Simpan"
+
+msgid "Save Tags/Options"
+msgstr "Simpan Tag/Pilihan"
+
+msgid "Save album info in:"
+msgstr "Simpan maklumat album di dalam:"
+
+msgid "Save artist biography"
+msgstr "Simpan biografi artis"
+
+msgid "Save as..."
+msgstr "Simpan sebagai..."
+
+msgid "Save current filter as"
+msgstr "Simpan penapis semasa sebagai"
+
+msgid "Save current list as"
+msgstr "Simpan senarai semasa sebagai"
+
+msgid "Save lyrics"
+msgstr "Simpan lirik"
+
+msgid "Save now"
+msgstr "Simpan sekarang"
+
+msgid "Save picture as"
+msgstr "Simpan gambar sebagai"
+
+msgid "Save preset"
+msgstr "Simpan praset"
+
+msgid "Save review"
+msgstr "Simpan ulasan"
+
+msgid ""
+"Save selected fields for all tracks on the same album whenever album data is "
+"loaded from allmusic or from file."
+msgstr ""
+"Simpan medan terpilih dari semua trek pada album yang sama bilamana data "
+"album dimuatkan dari allmusic atau dari fail."
+
+#, perl-format
+msgid "Save tags/settings every %d minutes"
+msgstr "Simpan tag/tetapan setiap %d minit"
+
+msgid "Saved"
+msgstr "Disimpan"
+
+msgid "Saved Lists"
+msgstr "Senarai Disimpan"
+
+msgid "Saved filters"
+msgstr "Penapis disimpan"
+
+msgid "Saved lists"
+msgstr "Senarai disimpan"
+
+msgid "Scan Collection"
+msgstr "Imbas Koleksi"
+
+msgid "Scan as an album"
+msgstr "Imbas sebagai album"
+
+msgid "Scan for new songs"
+msgstr "Imbas lagu baharu"
+
+msgid "Scan per-file track gain"
+msgstr "Imbas gandaan trek per-fail"
+
+msgid "Scan this file"
+msgstr "Imbas fail ini"
+
+msgid "Scan using tag-defined album"
+msgstr "Imbas menggunakan album ditakrif-tag"
+
+msgid "Scanning"
+msgstr "Mengimbas"
+
+msgid "Scroll to zoom"
+msgstr "Tatal untuk zum"
+
+msgid "Scroll with song"
+msgstr "Tatal dengan lagu"
+
+msgid "Scroll with the song"
+msgstr "Tatal dengan lagu"
+
+msgid "Scrollwheel to change, right-click to mute"
+msgstr "Roda tatal untuk ubah, klik-kanan untuk senyapkan"
+
+msgid "Search"
+msgstr "Gelintar"
+
+msgid "Search : "
+msgstr "Gelintar :"
+
+msgid "Search Album"
+msgstr "Gelintar Album"
+
+msgid "Search Artist"
+msgstr "Gelintar Artis"
+
+msgid "Search Comment"
+msgstr "Gelintar Komen"
+
+msgid "Search Genre"
+msgstr "Gelintar Genre"
+
+msgid "Search Label"
+msgstr "Gelintar Label"
+
+msgid "Search Title"
+msgstr "Gelintar Tajuk"
+
+msgid "Search Title, Artist and Album"
+msgstr "Gelintar Tajuk, Artis dan Album"
+
+msgid "Search Title, Artist, Album, Comment, Label and Genre"
+msgstr "Gelintar Tajuk, Artis, Album, Komen, Label dan Genre"
+
+msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
+msgstr "Gelintar Tajuk, Artis, Album, Komen, Label, Genre dan Nama Fail"
+
+msgid "Search album"
+msgstr "Gelintar album"
+
+msgid "Search all fields"
+msgstr "Gelintar semua medan"
+
+msgid "Search allmusic for Artist"
+msgstr "Gelintar allmusic untuk Artis"
+
+msgid "Search amazon.com for Artist"
+msgstr "Gelintar amazon.com untuk Artis"
+
+msgid "Search and display lyrics"
+msgstr "Gelintar dan papar lirik"
+
+msgid "Search box type"
+msgstr "Gelintar jenis kotak"
+
+msgid "Search discogs for Artist"
+msgstr "Gelintar discogs untuk Artis"
+
+msgid "Search for Artist on youtube"
+msgstr "Gelintar Artis di youtube"
+
+msgid "Search for a picture on internet"
+msgstr "Gelintar gambar di internet"
+
+msgid "Search for artist on:"
+msgstr "Gelintar artis di:"
+
+msgid "Search for current album"
+msgstr "Gelintar album semasa"
+
+msgid "Search for current artist"
+msgstr "Gelintar artis semasa"
+
+msgid "Search for new songs on startup"
+msgstr "Gelintar lagu baharu ketika permulaan"
+
+msgid "Search google for Artist"
+msgstr "Gelintar google untuk Artis"
+
+msgid "Search on the web"
+msgstr "Gelintar di sesawang"
+
+msgid "Search options"
+msgstr "Pilihan gelintar"
+
+msgid "Search pitchfork for Artist"
+msgstr "Gelintar pitchfork untuk Artis"
+
+msgid "Search title"
+msgstr "Gelintar tajuk"
+
+msgid "Search window layout :"
+msgstr "Bentangan tetingkap gelintar :"
+
+msgid "Search:"
+msgstr "Gelintar:"
+
+msgid "Searching for a picture of : "
+msgstr "Menggelintar gambar :"
+
+msgid "Seek"
+msgstr "Jangkau"
+
+msgid "Select current song"
+msgstr "Pilih lagu semasa"
+
+msgid "Select fields"
+msgstr "Pilih medan"
+
+msgid "Select matches"
+msgstr "Pilih padanan"
+
+msgid "Select search fields"
+msgstr "Pilih medan gelintar"
+
+msgid "Selected : "
+msgstr "Dipilih :"
+
+msgid "Selected songs"
+msgstr "Lagu terpilih"
+
+msgid "Selected songs to update :"
+msgstr "Lagu terpilih dikemaskini :"
+
+msgid "Selecting pictures"
+msgstr "Memilih gambar"
+
+msgid "Seller"
+msgstr "Penjual"
+
+msgid "Send Title/Artist/Album in standard input"
+msgstr "Hantar Tajuk/Artis/Album dalam input piawai"
+
+msgid "Set Current Song Rating"
+msgstr "Tetapkan Penarafan Lagu Semasa"
+
+msgid "Set Picture"
+msgstr "Tetapkan Gambar"
+
+msgid "Set action when song ends"
+msgstr "Tetapkan tindakan bila lagu berakhir"
+
+#, perl-brace-format
+msgid "Set as picture for '{name}'"
+msgstr "Tetapkan sebagai gambar untuk '{name}'"
+
+msgid "Set as primary filter"
+msgstr "Tetapkan sebagai penapis utama"
+
+msgid "Set focus on a layout widget"
+msgstr "Tetapkan fokus pada widjet bentangan"
+
+msgid "Set grouping"
+msgstr "Tetapkan pengelompokan"
+
+msgid "Set icon"
+msgstr "Tetapkan ikon"
+
+msgid "Set player window layout"
+msgstr "Tetapkan bentangan tetingkap pemain"
+
+msgid "Set subgroup"
+msgstr "Tetapkan subkumpulan"
+
+#, perl-brace-format
+msgid "Set {year} as year for all tracks on this album."
+msgstr "Tetapkan {year} sebagai tahun untuk semua trek dalam album ini."
+
+msgid "Settings"
+msgstr "Tetapan"
+
+msgid "Settings on this page will only take effect after a restart"
+msgstr "Tetapan pada halaman ini hanya berkesan selepas mula semula"
+
+msgid "Shell command"
+msgstr "Perintah shell"
+
+#. Shift key
+msgctxt "Keyboard"
+msgid "Shift"
+msgstr "Shift"
+
+msgid "Show"
+msgstr "Tunjuk"
+
+msgid "Show Artist page on last.fm"
+msgstr "Tunjuk halaman Artis pada last.fm"
+
+msgid "Show Artist page on wikipedia"
+msgstr "Tunjuk halaman Artis pada wikipedia"
+
+msgid "Show album"
+msgstr "Tunjuk album"
+
+msgid "Show artist picture"
+msgstr "Tunjuk gambar artis"
+
+msgid "Show artist's biography"
+msgstr "Tunjuk biografi artis"
+
+msgid "Show artist's upcoming events"
+msgstr "Tunjuk peristiwa akan datang artis"
+
+msgid "Show buttons"
+msgstr "Tunjuk butang"
+
+msgid "Show file list"
+msgstr "Tunjuk senarai fail"
+
+msgid "Show folder list"
+msgstr "Tunjuk senarai folder"
+
+msgid "Show genre"
+msgstr "Tunjuk genre"
+
+msgid "Show info panel"
+msgstr "Tunjuk panel maklumat"
+
+msgid "Show main window"
+msgstr "Tunjuk tetingkap utama"
+
+msgid "Show more error details"
+msgstr "Tunjuk lagi perincian ralat"
+
+msgid "Show pdf pages"
+msgstr "Tunjuk halaman pdf"
+
+msgid "Show playlist"
+msgstr "Tunjuk senarai main"
+
+msgid "Show replaygain submenu"
+msgstr "Tunjuk submenu gandaan main semula"
+
+msgid "Show similar artists"
+msgstr "Tunjuk artis serupa"
+
+msgid "Show song details"
+msgstr "Tunjuk perincian lagu"
+
+msgid "Show status bar"
+msgstr "Tunjuk palang status"
+
+msgid "Show suggestions"
+msgstr "Tunjuk cadangan"
+
+msgid "Show tabs"
+msgstr "Tunjuk tab"
+
+msgid "Show toolbar"
+msgstr "Tunjuk palang alat"
+
+msgid "Show tray icon"
+msgstr "Tunjuk ikon talam"
+
+msgid "Show tray tip on song change"
+msgstr "Tunjuk tip talam bila lagu berubah"
+
+msgid "Show/Hide"
+msgstr "Tunjuk/Sembunyi"
+
+msgid "Show/Hide Browser"
+msgstr "Tunjuk/Sembunyi Pelayar"
+
+msgid "Show/Hide Cover"
+msgstr "Tunjuk/Sembunyi Kulit Album"
+
+msgid "Show/Hide layout widget(s)"
+msgstr "Tunjuk/Sembunyi widjet bentangan"
+
+msgid "Show/Hide lyrics line"
+msgstr "Tunjuk/Sembunyi baris lirik"
+
+msgid "Show/hide URI entry"
+msgstr "Tunjuk/sembunyi masukan URI"
+
+msgid "Show/hide status bar"
+msgstr "Tunjuk/sembunyi palang status"
+
+msgid "Shuffle"
+msgstr "Kocok"
+
+msgid "Shuffle list"
+msgstr "Kocok senarai"
+
+msgid "Shuffle queue"
+msgstr "Kocok baris gilir"
+
+msgid "Shuffled albums"
+msgstr "Album dikocok"
+
+msgid "Shuffled albums, shuffled tracks"
+msgstr "Album dikocok, trek dikocok"
+
+msgid "Shutdown command :"
+msgstr "Perintah matikan :"
+
+msgid "Sidebar"
+msgstr "Palang sisi"
+
+msgid "Similar"
+msgstr "Serupa"
+
+msgid "Similar Artists"
+msgstr "Artis Serupa"
+
+msgid "Simple List View"
+msgstr "Paparan Senarai Ringkas"
+
+msgid "Simple title"
+msgstr "Tajuk ringkas"
+
+msgid "Size"
+msgstr "Saiz"
+
+msgid "Skip _All"
+msgstr "Langkau Semu_a"
+
+msgid "Skip count"
+msgstr "Kiraan langkau"
+
+msgid "Skip history"
+msgstr "Sejarah langkau"
+
+msgid "Skip this and any further errors."
+msgstr "Langkau ini dan mana-mana ralat."
+
+msgid "Skip to next song if an error occurs"
+msgstr "Langaku ke lagu berikutnya jika ada ralat berlaku"
+
+msgid "Small"
+msgstr "Kecil"
+
+msgid "Small album picture"
+msgstr "Gambar album kecil"
+
+msgid "Small player"
+msgstr "Pemain kecil"
+
+msgid "Smaller browser"
+msgstr "Pelayar lebih kecil"
+
+#, perl-format
+msgid "Some variables such as %f (current song filename) are available"
+msgstr ""
+"Sesetengah pembolehubah seperti %f (nama fail lagu semasa) telah tersedia"
+
+msgid "Song"
+msgstr "Lagu"
+
+msgid "Song Properties"
+msgstr "Sifat Lagu"
+
+msgid "Song informations"
+msgstr "Maklumat lagu"
+
+msgid "Song rating"
+msgstr "Penarafan lagu"
+
+msgid "SongTree groupings edition"
+msgstr "Edisi pengelompokan Pepohon Lagu"
+
+msgid "Songs Properties"
+msgstr "Sifat Lagu"
+
+msgid "Songtree View"
+msgstr "Paparan Pepohon Lagu"
+
+msgid "Sort"
+msgstr "Isih"
+
+msgid "Sort mode edition"
+msgstr "Edisi mod isih"
+
+msgid "Sort order"
+msgstr "Tertib isih"
+
+#, perl-brace-format
+msgid "Source: {file}"
+msgstr "Sumber: {file}"
+
+msgid "Split artist names on :"
+msgstr "Pisah nama artis hidup :"
+
+msgid "Start ReplayGain analysis"
+msgstr "Mula analisis Gandaan Main Semula"
+
+msgid "Start in tray"
+msgstr "Mula dalam talam"
+
+msgid "Statistics"
+msgstr "Statistik"
+
+msgid "Statusbar"
+msgstr "Palang Status"
+
+msgid "Stop"
+msgstr "Henti"
+
+msgid "Stop after this song"
+msgstr "Henti selepas lagu ini"
+
+msgid "Stop checking"
+msgstr "Henti memeriksa"
+
+msgid "Stop fetching albuminfo"
+msgstr "Henti mendapatkan maklumat album"
+
+msgid "Stop scanning"
+msgstr "Henti mengimbas"
+
+msgid "Stop selecting pictures"
+msgstr "Henti memilih gambar"
+
+msgid "Stop when queue empty"
+msgstr "Henti bila baris gilir kosong"
+
+msgid "Stop, Play and Next buttons"
+msgstr "Butang Henti, Main dan Berikutnya"
+
+msgid "Stop, Play and Next buttons and Time"
+msgstr "Butang dan Masa Henti, Main dan Berikutnya"
+
+msgid "Stop, Play and Next buttons and Title/Artist"
+msgstr "Butang dan Tajuk/Artis Henti, Main dan Berikutnya"
+
+msgid "Strip wikipedia pages"
+msgstr "Tanggalkan halaman wikipedia"
+
+msgid "Styles"
+msgstr "Gaya"
+
+msgid "Submit Now-Playing OK"
+msgstr "Serah Kini-Dimainkan OK"
+
+msgid "Submit OK"
+msgstr "Serah OK"
+
+msgid "Submit failed : "
+msgstr "Serahan gagal :"
+
+msgid "Submit played songs to last.fm"
+msgstr "Serah lagu dimainkan ke last.fm"
+
+msgid "Subtitle"
+msgstr "Sarikata"
+
+msgid "Summary :"
+msgstr "Ringkasan :"
+
+msgid "Sunday"
+msgstr "Ahad"
+
+msgid "Switch to fullscreen mode"
+msgstr "Tukar ke mod skrin penuh"
+
+msgid "System clock is not close enough to the current time"
+msgstr "Jam sistem tidak menepati masa semasa"
+
+msgid "System command"
+msgstr "Perintah sistem"
+
+msgid "System command :"
+msgstr "Perintah sistem :"
+
+msgid "Tags"
+msgstr "Tag"
+
+msgid "Terms of use"
+msgstr "Terma penggunaan"
+
+msgid "Text"
+msgstr "Teks"
+
+msgid ""
+"The artists similar to the 'seed'-artist will be used to populate the queue, "
+"but you can decide to exclude the 'seed'-artist him/herself."
+msgstr ""
+"Artis seakan artis-'seed' akan digunakan untuk memenuhi baris gilir, tetapi "
+"anda boleh tentukan untuk asingkan artis-'seed'."
+
+msgid "The layout for this desktop widget is missing."
+msgstr "Bentangan untuk widjet desktop ini hilang."
+
+msgid "Themes"
+msgstr "Tema"
+
+msgid "These fields can be used :"
+msgstr "Medan ini boleh digunakan :"
+
+msgid "These values will always be in the list, even if they are not used"
+msgstr ""
+"Nilai ini akan sentiasa di dalam senarai, walaupun jika ia tidak digunakan"
+
+#, perl-brace-format
+msgid "This command is required to play files of type {type} : {cmd}"
+msgstr "Perintah ini diperlukan untuk memainkan fail jenis {type} : {cmd}"
+
+#, perl-format
+msgid "This label is set for %d song."
+msgid_plural "This label is set for %d songs."
+msgstr[0] "Label ini ditetapkan untuk %d lagu."
+
+msgid ""
+"This plugin is needed for gmusicbrowser to appear in unity's sound menu."
+msgstr ""
+"Pemalam ini diperlukan supaya gmusicbrowser muncul dalam menu bunyi unity."
+
+msgid "This plugin requires :"
+msgstr "Pemalam ini memerlukan :"
+
+msgid ""
+"This plugin retrieves artist-relevant information (biography, upcoming "
+"events, similar artists) from last.fm."
+msgstr ""
+"Pemalam ini mendapatkan maklumat berkenaan-artis (biografi, peristiwa akan "
+"datang, artis serupa) dari last.fm."
+
+#, perl-format
+msgid "Threshold to count a song as played : %d %"
+msgstr "Ambang untuk mengira lagu bila dimainkan : %d %"
+
+msgid "Thursday"
+msgstr "Khamis"
+
+msgid "Time :"
+msgstr "Masa :"
+
+#, perl-format
+msgid "Timeout : %d seconds"
+msgstr "Had masa tamat : %d saat"
+
+msgid "Timespan of the fade-out in seconds"
+msgstr "Jangkamasa pendam-keluar dalam saat"
+
+msgid "Title"
+msgstr "Tajuk"
+
+msgid "Title & icon"
+msgstr "Tajuk & ikon"
+
+msgid "Title & progress"
+msgstr "Tajuk & kemajuan"
+
+msgid "Title - Artist - Album"
+msgstr "Tajuk - Artis - Album"
+
+msgid "Title or filename"
+msgstr "Tajuk atau nama fail"
+
+#, perl-format
+msgid "Title: %t"
+msgstr "Tajuk: %t"
+
+#, perl-format
+msgid "Title: %t (Track No. %n)"
+msgstr "Tajuk: %t (No. Trek %n)"
+
+msgid "Titlebar"
+msgstr "Palang tajuk"
+
+msgid "Titlebar overlay plugin"
+msgstr "Pemalam tindihan atas palang tajuk"
+
+msgid "Toggle Album Lock"
+msgstr "Togol Kunci Album"
+
+msgid "Toggle Artist Lock"
+msgstr "Togol Kunci Artis"
+
+msgid "Toggle Song Lock"
+msgstr "Togol Kunci Lagu"
+
+msgid "Toggle a label of the current song"
+msgstr "Togol label lagu semasa"
+
+msgid "Toggle between Random/Shuffle and Ordered"
+msgstr "Togol diantara Rawak/Kocok dan Bertertib"
+
+msgid "Toggle edit mode"
+msgstr "Togol mod sunting"
+
+msgid "Toggle fullscreen mode"
+msgstr "Togol mod skrin penuh"
+
+msgid "Toggle the fullscreen layout"
+msgstr "Togol bentangan skrin penuh"
+
+msgid "Toolbar"
+msgstr "Palang alat"
+
+msgid "Tools"
+msgstr "Alatan"
+
+msgid "Total playcount:"
+msgstr "Jumlah kiraan main:"
+
+msgid "Track"
+msgstr "Trek"
+
+msgid "Track Properties"
+msgstr "Sifat Trek"
+
+msgid "Track gain"
+msgstr "Gandaan trek"
+
+msgid "Track peak"
+msgstr "Puncak trek"
+
+msgid "Tray tip window layout :"
+msgstr "Bentangan tetingkap tip talam :"
+
+msgid "Tuesday"
+msgstr "Selasa"
+
+msgid "Turn Off"
+msgstr "Matikan"
+
+msgid "Turn equalizer off"
+msgstr "Matikan penyama"
+
+msgid "Turn equalizer on"
+msgstr "Hidupkan penyama"
+
+msgid "Turn off computer after this song"
+msgstr "Matikan komputer selepas lagu ini"
+
+msgid "Turn off computer when queue empty"
+msgstr "Matikan komputer bila baris gilir kosong"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Unique file identifier"
+msgstr "Pengenalpasti fail unik"
+
+msgid "Unknown album"
+msgstr "Album tidak diketahui"
+
+#, perl-brace-format
+msgid "Unknown field ({field})"
+msgstr "Medan tidak diketahui ({field})"
+
+msgid "Unknown filter :"
+msgstr "Penapis tidak diketahui :"
+
+#, perl-format
+msgid "Unknown layout '%s'"
+msgstr "Bentangan '%s' tidak diketahui"
+
+msgid "Unlock Album"
+msgstr "Album tidak dikunci"
+
+msgid "Unlock Artist"
+msgstr "Artis tidak dikunci"
+
+msgid "Unnamed custom command"
+msgstr "Perintah suai tidak bernama"
+
+msgid "Unnamed filter"
+msgstr "Penapis tidak bernama"
+
+msgid "Untitled"
+msgstr "Tidak bertajuk"
+
+msgid "Update tags"
+msgstr "Kemaskini tag"
+
+msgid "Update tags..."
+msgstr "Kemaskini tag..."
+
+msgid "Upper left"
+msgstr "Kiri atas"
+
+msgid "Upper right"
+msgstr "Kanan atas"
+
+msgid "Use Equalizer"
+msgstr "Guna Penyama"
+
+msgid ""
+"Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are "
+"probably better supported by other softwares"
+msgstr ""
+"Guna ID3v2.4 selain dari ID3v2.3 bila mencipta tag ID3v2, ID3v2.3 "
+"berkemungkinan disokong lebih baik oleh perisian lain"
+
+msgid "Use MozEmbed"
+msgstr "Guna MozEmbed"
+
+msgid "Use ReplayGain"
+msgstr "Guna Gandaan Main Semula"
+
+msgid "Use WebKit"
+msgstr "Guna WebKit"
+
+msgid "Use a master filter"
+msgstr "Guna penapis master"
+
+msgid "Use album normalization instead of track normalization"
+msgstr "Guna penormalan album selain dari penormalan trek"
+
+msgid "Use default regular expression"
+msgstr "Guna ungkapan nalar lalai"
+
+msgid "Use gstreamer"
+msgstr "Guna gstreamer"
+
+msgid "Use latin1 encoding if possible in id3v2 tags"
+msgstr "Guna pengekodan latin1 jika boleh dalam tag id3v2"
+
+#, perl-format
+msgid ""
+"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
+"furthermore linebreaks '<br>' and any text you'd like to have in between. E."
+"g. '%title taking place at %startDate<br>in %city, %country<br><br>'"
+msgstr ""
+"Guna tag dari halaman peristiwa XML last.fm dengan awalan % (cth. "
+"%headliner), disamping pembatas '<br>' dan mana-mana teks yang anda mahu "
+"diantaranya. Cth. '%title bermula dari %startDate<br>dalam %city, "
+"%country<br><br>'"
+
+msgid "Use the playing filter"
+msgstr "Guna penapis dimainkan"
+
+#, perl-brace-format
+msgid "Use this picture as cover for album '{album}'"
+msgstr "Guna gambar ini sebagai kulit album bagi album '{album}'"
+
+#, perl-brace-format
+msgid "Use this picture for artist '{artist}'"
+msgstr "Guna gambar ini untuk artis '{artist}'"
+
+#, perl-brace-format
+msgid "Use {command} to play {ext} files"
+msgstr "Guna {command} untuk memainkan fail {ext}"
+
+msgid "Used for clipping prevention"
+msgstr "Digunakan untuk sekat pengeratan"
+
+msgid "Used for the Artists field"
+msgstr "Digunakan untuk medan Artis"
+
+msgid "Used to associate the saved value with a user or a function"
+msgstr "Digunakan untuk dikaitkan nilai tersimpan dengan pengguna atau fungsi"
+
+msgid "User authentification error"
+msgstr "Ralat pengesahihan pengguna"
+
+msgid "Value not written in file tag"
+msgstr "Nilai tidak ditulis dalam tag fail"
+
+msgid "Value written in file tag"
+msgstr "Nilai ditulis dalam tag fail"
+
+msgid "Various artists"
+msgstr "Pelbagai artis"
+
+msgid "Version"
+msgstr "Versi"
+
+msgid "View"
+msgstr "Lihat"
+
+msgid "View Binary"
+msgstr "Lihat Binari"
+
+msgid "View binary data ..."
+msgstr "Lihat data binari ..."
+
+msgid "View in new window"
+msgstr "Lihat dalam tetingkap baharu"
+
+msgid "View pictures from this album's folder"
+msgstr "Lihat gambar dari folder album ini"
+
+msgid "Volume : "
+msgstr "Volum :"
+
+msgid "Volume step :"
+msgstr "Langkah volum :"
+
+msgid "Wait for more when queue empty"
+msgstr "Tunggu lagi bila baris gilir kosong"
+
+msgid ""
+"Warning : these are advanced options, don't change them unless you know what "
+"you are doing."
+msgstr ""
+"Amaran : ini adalah pilihan lanjutan, jangan memandai ubah melainkan anda "
+"tahu apa yang anda buat."
+
+msgid "Warning : using a folder with invalid encoding, you should rename it."
+msgstr ""
+"Amaran : menggunakan folder dengan pengekodan tidak sah, anda patut "
+"menamakannya semula."
+
+msgid "Warning: all existing data for this field will be lost"
+msgstr "Amaran : semua data sedia ada untuk medan ini akan hilang"
+
+msgid "Warning: an identifier is needed"
+msgstr "Amaran : pengenalpasti diperlukan"
+
+msgid "Warning: converting existing data to this format may be lossy"
+msgstr "AmaranL menukar data sedia ada ke format ini mungkin menjadi hilang"
+
+msgid "Web context"
+msgstr "Konteks sesawang"
+
+msgid "Web context plugin"
+msgstr "Pemalam konteks sesawang"
+
+msgid "Wednesday"
+msgstr "Rabu"
+
+msgid "Weighted Random"
+msgstr "Rawak Berat"
+
+msgid "When added"
+msgstr "Bila ditambah"
+
+msgid ""
+"When changing songs, the previous song is added to the recent list even if "
+"not played at all."
+msgstr ""
+"Bila menukar lagu, lagu terdahulu ditambah ke senarai baru-baru ini walaupun "
+"tidak dimainkan langsung."
+
+msgid "When current song"
+msgstr "Bila lagu semasa"
+
+msgid "Whole library"
+msgstr "Keseluruhan pustaka"
+
+msgid "Widget name"
+msgstr "Nama widjet"
+
+msgid "Wikipedia"
+msgstr "Wikipedia"
+
+msgid "Wikipedia Locale"
+msgstr "Wikipedia Lokal"
+
+msgid ""
+"Will not write the tags except with the advanced tag editing dialog. The "
+"changes will be kept in the library instead.\n"
+"Warning, the changes for a song will be lost if the tag is re-read."
+msgstr ""
+"Tidak akan tulis tag melainkan dengan dialog penyuntingan tag lanjutan. "
+"Perubahan akan disimpan di dalam pustaka.\n"
+"Amaran, perubahan lagu akan hilang jika tag dibaca-semula."
+
+msgid "Will use default if not found"
+msgstr "Akan guna lalai jika tidak ditemui"
+
+#. Windows key
+msgctxt "Keyboard"
+msgid "Win"
+msgstr "Win"
+
+msgid "Windows"
+msgstr "Windows"
+
+msgid "Words that begin with"
+msgstr "Perkataan yang bermula dengan"
+
+msgid "Write filenames to ..."
+msgstr "Tulis nama fail kepada ..."
+
+msgid ""
+"Write value of selected fields in the tags. Useful for fields that were "
+"previously not written to tags, to make sure the current value is written."
+msgstr ""
+"Tulis nilai bagi medan terpilih di dalam tag. Berguna untk medan yang "
+"sebelum ini tidak ditulis ke tag, untuk memastikan nilai semasa ditulis."
+
+msgid "Writing tags"
+msgstr "Menulis tag"
+
+msgid "Year"
+msgstr "Tahun"
+
+msgid "Year - Album"
+msgstr "Tahun - Album"
+
+msgid "Year - Artist"
+msgstr "Tahun - Artis"
+
+msgid "Yes"
+msgstr "Ya"
+
+msgid ""
+"You can force a check for these files by holding shift when selecting \"Re-"
+"read tags\""
+msgstr ""
+"Anda boleh paksa semak fail ini dengan menahan shift bila memilih \"Baca-"
+"semula tag\""
+
+msgid ""
+"You can use some markup, eg :\n"
+"<b>bold</b> <i>italic</i> <u>underline</u>\n"
+"Note that the markup may be ignored by the notification daemon"
+msgstr ""
+"Anda boleh guna beberapa penanda, cth :\n"
+"<b>tebal</b> <i>condong</i> <u>garis bawah</u>\n"
+"Perhatian penanda mungkin diabaikan oleh daemon pemberitahuan"
+
+msgid "You must specify a base folder"
+msgstr "Anda mesti nyatakan folder tapak"
+
+msgid "Zoom 1:1"
+msgstr "Zum 1:1"
+
+msgid "Zoom in"
+msgstr "Zum masuk"
+
+msgid "Zoom out"
+msgstr "Zum keluar"
+
+msgid "Zoom to fit"
+msgstr "Zum suai muat"
+
+msgid "_Cancel"
+msgstr "_Batal"
+
+msgid "_Insert column"
+msgstr "S_isip lajur"
+
+msgid "_Remove this column"
+msgstr "B_uang lajur ini"
+
+msgid "_Retry"
+msgstr "_Cuba lagi"
+
+msgid "_Skip"
+msgstr "_Langkau"
+
+msgid "_Sort by"
+msgstr "_Isih mengikut"
+
+msgid "a bright coloured fish"
+msgstr "ikan berwarna cerah"
+
+msgid "abort"
+msgstr "henti paksa"
+
+msgid "abort copy"
+msgstr "henti paksa salin"
+
+msgid "abort move"
+msgstr "henti paksa alih"
+
+msgid "add"
+msgstr "tambah"
+
+msgid "advanced options"
+msgstr "pilihan lanjutan"
+
+msgid "after"
+msgstr "selepas"
+
+#, perl-format
+msgid "after %s"
+msgstr "selepas %s"
+
+msgid "album information now for"
+msgstr "maklumat album kini untuk"
+
+#. comma-separated list of field aliases for album, these are in addition to
+#. english aliases
+msgctxt "Field_aliases"
+msgid "album,on"
+msgstr "album,pada"
+
+msgid "albums missing reviews"
+msgstr "ulasan album hilang"
+
+msgid "alphabetical"
+msgstr "abjad"
+
+msgid "amixer control :"
+msgstr "kawalan amixer :"
+
+msgid "applied on reload"
+msgstr "dilaksana bila muat semula"
+
+msgid "apply filter"
+msgstr "laksana penapis"
+
+#, perl-brace-format
+msgid "argument {n} :"
+msgstr "argumen {n} :"
+
+msgid "artist"
+msgstr "artis"
+
+#. comma-separated list of field aliases for artist, these are in addition to
+#. english aliases
+msgctxt "Field_aliases"
+msgid "artist,by"
+msgstr "artis,oleh"
+
+msgid "auto detect"
+msgstr "auto kesan"
+
+msgid "autofill"
+msgstr "auto isi"
+
+msgid "automatic size"
+msgstr "saiz automatik"
+
+msgid "back cover"
+msgstr "kulit album belakang"
+
+msgid "band"
+msgstr "kumpulan"
+
+msgid "band/artist logotype"
+msgstr "logotip kumpulan/artis"
+
+msgid "before"
+msgstr "sebelum"
+
+#, perl-format
+msgid "before %s"
+msgstr "sebelum %s"
+
+msgid "between"
+msgstr "diantara"
+
+#, perl-format
+msgid "between %s ago and %s ago"
+msgstr "diantara %s dan %s yang lalu"
+
+#, perl-format
+msgid "between %s and %s"
+msgstr "diantara %s dan %s"
+
+msgid "between (absolute dates)"
+msgstr "diantara (tarikh mutlak)"
+
+msgid "between (relative dates)"
+msgstr "diantara (tarikh relatif)"
+
+msgid "big size"
+msgstr "saiz besar"
+
+msgid "bonus tracks"
+msgstr "trek bonus"
+
+msgid "boolean"
+msgstr "boolean"
+
+msgid "bootleg"
+msgstr "cetak-rompak"
+
+msgid "broken"
+msgstr "rosak"
+
+msgid "by"
+msgstr "mengikut"
+
+msgid "by added"
+msgstr "mengikut ditambah"
+
+msgid "by lastplay"
+msgstr "mengikut main terakhir"
+
+msgid "by lastplay & bootleg"
+msgstr "mengikut main terakhir & cetak-rompak"
+
+msgid "by lastplay & play count"
+msgstr "mengikut main terakhir & kiraan main"
+
+msgid "by play count"
+msgstr "mengikut kiraan main"
+
+msgid "by rating"
+msgstr "mengikut penarafan"
+
+#, perl-brace-format
+msgid "by {artist} from {album}"
+msgstr "mengikut {artist} dari {album}"
+
+#, perl-brace-format
+msgid "by {author}"
+msgstr "mengikut {author}"
+
+msgid "bytes"
+msgstr "bait"
+
+msgid "check length now"
+msgstr "semak panjang sekarang"
+
+msgid "check now"
+msgstr "semak sekarang"
+
+msgid "cloud mode"
+msgstr "mod awan"
+
+msgid "command :"
+msgstr "perintah :"
+
+msgid "common number"
+msgstr "nombor umum"
+
+msgid "common string"
+msgstr "rentetan umum"
+
+msgid "composer"
+msgstr "penggubah"
+
+msgid "conductor"
+msgstr "konduktor"
+
+msgid "connection failed"
+msgstr "sambungan gagal"
+
+msgid "connection failed."
+msgstr "sambungan gagal."
+
+msgid "contains"
+msgstr "mengandungi"
+
+#, perl-format
+msgid "contains %s"
+msgstr "mengandungi %s"
+
+#, perl-format
+msgid "contains %s (case sensitive)"
+msgstr "mengandungi %s (sensitif kata)"
+
+msgid "counter"
+msgstr "kiraan"
+
+msgid "custom"
+msgstr "suai"
+
+msgid "day"
+msgstr "hari"
+
+msgid "days"
+msgstr "hari"
+
+msgid "default"
+msgstr "lalai"
+
+msgid "default filename"
+msgstr "nama fail lalai"
+
+msgid "default folder"
+msgstr "folder lalai"
+
+msgid "delete selected filter"
+msgstr "padam penapis terpilih"
+
+msgid "delete selected grouping"
+msgstr "padam pengelompokan terpilih"
+
+msgid "delete selected random mode"
+msgstr "padam mod rawak terpilih"
+
+msgid "delete selected sort mode"
+msgstr "padam mod isih terpilih"
+
+msgid "different folders"
+msgstr "folder berlainan"
+
+#, perl-brace-format
+msgid "disc {disc}"
+msgstr "cakera {disc}"
+
+#, perl-format
+msgid "doesn't contain %s"
+msgstr "tidak mengandungi %s"
+
+#, perl-format
+msgid "doesn't contain %s (case sensitive)"
+msgstr "tidak mengandungi %s (sensitif kata)"
+
+msgid "doesn't have a picture"
+msgstr "tidak mempunyai gambar"
+
+#, perl-format
+msgid "doesn't include %s"
+msgstr "tidak sertakan %s"
+
+#, perl-format
+msgid "doesn't include artist %s"
+msgstr "tidak sertakan artis %s"
+
+#, perl-format
+msgid "doesn't match regexp %s"
+msgstr "tidak memadani ungkapan nalar %s"
+
+#, perl-format
+msgid "doesn't match regexp %s (case sensitive)"
+msgstr "tidak memadani ungkapan nalar %s (sensitif kata)"
+
+msgid "during performance"
+msgstr "ketika persembahan"
+
+msgid "during recording"
+msgstr "ketika rakaman"
+
+msgid "email"
+msgstr "emel"
+
+msgid "empty"
+msgstr "kosong"
+
+msgid "enable gapless (experimental)"
+msgstr "benarkan sela (eksperimental)"
+
+msgid "entire collection"
+msgstr "keseluruhan koleksi"
+
+msgid "error"
+msgstr "ralat"
+
+msgid "ex :"
+msgstr "ex :"
+
+#, perl-brace-format
+msgid "example (selected song) : {score}  ({chances})"
+msgstr "contoh (lagu pilihan) : {score}  ({chances})"
+
+msgid "example :"
+msgstr "contoh :"
+
+msgid "example : "
+msgstr "contoh :"
+
+#, perl-format
+msgid "example : %s"
+msgstr "contoh : %s"
+
+msgid "examples :"
+msgstr "contoh :"
+
+#, perl-format
+msgid "fallback-gain : %d dB"
+msgstr "gandaan-jatuhbalik : %d dB"
+
+msgid "false"
+msgstr "palsu"
+
+msgid "favorite"
+msgstr "kegemaran"
+
+msgid "file $current/$end"
+msgstr "fail $current/$end"
+
+msgid "file tag"
+msgstr "tag fail"
+
+#, perl-brace-format
+msgid "file: {filename}"
+msgstr "fail: {filename}"
+
+msgid "filters"
+msgstr "penapis"
+
+msgid "flags"
+msgstr "penanda"
+
+msgid "float"
+msgstr "apung"
+
+msgid "font size depends on"
+msgstr "saiz fon bergantung pada"
+
+msgid "for files without a VBR header"
+msgstr "bagi fail tanpa pengepala VBR"
+
+msgid "front cover"
+msgstr "kulit hadapan"
+
+msgid "fuzzy match"
+msgstr "padanan kabur"
+
+msgid "gmusicbrowser"
+msgstr "gmusicbrowser"
+
+#, perl-format
+msgid "gmusicbrowser is playing %t from %l (%Y) by %a"
+msgstr "gmusicbrowser memainkan %t daripada %l (%Y) oleh %a"
+
+msgid "google images"
+msgstr "google images"
+
+msgid "google images (hi-res)"
+msgstr "google images (res-tinggi)"
+
+msgid "group by"
+msgstr "kumpul mengikut"
+
+msgid "half-life : "
+msgstr "separa-hayat :"
+
+msgid "has a picture"
+msgstr "mempunyai gambar"
+
+msgid "has at least one"
+msgstr "sekurang-kurangnya satu"
+
+msgid "has been played"
+msgstr "telah dimainkan"
+
+msgid "has been skipped"
+msgstr "telah dilangkau"
+
+msgid "has none"
+msgstr "tiada apa-apa"
+
+msgid "hours"
+msgstr "jam"
+
+msgid "huge size"
+msgstr "saiz sangat besar"
+
+msgid "icecast server"
+msgstr "pelayan icecast"
+
+msgid "id3v1 tag"
+msgstr "tag id3v1"
+
+msgid "ignore title"
+msgstr "abai tajuk"
+
+msgid "illustration"
+msgstr "ilustrasi"
+
+msgid "imported list"
+msgstr "senarai diimport"
+
+#, perl-format
+msgid "in %l"
+msgstr "dalam %l"
+
+msgid "in the bottom"
+msgstr "di bahagian terbawah"
+
+#, perl-format
+msgid "in the bottom %s"
+msgstr "di bahagian terbawah %s"
+
+msgid "in the top"
+msgstr "di bahagian teratas"
+
+#, perl-format
+msgid "in the top %s"
+msgstr "di bahagian teratas %s"
+
+msgid "includes"
+msgstr "sertakan"
+
+#, perl-format
+msgid "includes %s"
+msgstr "sertakan %s"
+
+msgid "includes artist"
+msgstr "sertakan artis"
+
+#, perl-format
+msgid "includes artist %s"
+msgstr "sertakan artis %s"
+
+msgid "integer"
+msgstr "integer"
+
+msgid "interview"
+msgstr "wawancara"
+
+msgid "invalid pattern"
+msgstr "corak tidak sah"
+
+msgid "inverse"
+msgstr "songsang"
+
+msgid "is"
+msgstr "adalah"
+
+#, perl-format
+msgid "is %s"
+msgstr "adalah %s"
+
+msgid "is 44.1kHz"
+msgstr "adalah 44.1kHz"
+
+msgid "is a flac file"
+msgstr "adalah fail flac"
+
+msgid "is a lossless file"
+msgstr "adalah fail tak hilang"
+
+msgid "is a lossy file"
+msgstr "adalah fail hilang"
+
+msgid "is a mp3 file"
+msgstr "adalah fail mp3"
+
+msgid "is a musepack file"
+msgstr "adalah fail musepack"
+
+msgid "is a vorbis file"
+msgstr "adalah fail vorbis"
+
+msgid "is a wavepack file"
+msgstr "adalah fail wavepack"
+
+msgid "is an aac file"
+msgstr "adalah fail aac"
+
+msgid "is an alac file"
+msgstr "adalah fail alac"
+
+msgid "is an ape file"
+msgstr "adalah fail ape"
+
+msgid "is an mp4/m4a file"
+msgstr "adalah fail mp4/m4a"
+
+msgid "is defined"
+msgstr "telah ditakrif"
+
+msgid "is equal to"
+msgstr "adalah sama dengan"
+
+#, perl-format
+msgid "is equal to %s"
+msgstr "adalah sama dengan %s"
+
+msgid "is false"
+msgstr "adalah palsu"
+
+msgid "is in"
+msgstr "berada dalam"
+
+#, perl-format
+msgid "is in %s"
+msgstr "berada dalam %s"
+
+msgid "is mono"
+msgstr "adalah mono"
+
+msgid "is not defined"
+msgstr "adalah tidak ditakrif"
+
+msgid "is smart equal"
+msgstr "adalah sama pintar"
+
+#, perl-format
+msgid "is smart equal to %s"
+msgstr "adalah sama pintar dengan %s"
+
+msgid "is stereo"
+msgstr "adalah stereo"
+
+msgid "is true"
+msgstr "adalah benar"
+
+#, perl-format
+msgid "isn't %s"
+msgstr "bukan %s"
+
+#, perl-format
+msgid "isn't equal to %s"
+msgstr "tidak sama dengan %s"
+
+#, perl-format
+msgid "isn't in %s"
+msgstr "bukanlah %s"
+
+msgid "isn't mono"
+msgstr "bukan mono"
+
+msgid "isn't stereo"
+msgstr "bukan stereo"
+
+msgid ""
+"itunes doesn't support unsynchronised tags last time I checked, mostly "
+"affect tags with pictures"
+msgstr ""
+"itunes tidak menyokong tag tidak-disegerak kali terakhir saya memeriksa, "
+"kebanyakannya mempengaruhi tag dengan gambar"
+
+msgid "last.fm"
+msgstr "last.fm"
+
+msgid "last.fm plugin"
+msgstr "pemalam last.fm"
+
+msgid ""
+"last.fm's similarity categories:\n"
+">90 super\n"
+">70 very high\n"
+">50 high\n"
+">30 medium\n"
+">10 lower"
+msgstr ""
+"kategori serupa last.fm:\n"
+">90 super\n"
+">70 sangat tinggi\n"
+">50 tinggi\n"
+">30 sederhana\n"
+">10 lebih rendah"
+
+msgid "lead artist"
+msgstr "artis pendahulu"
+
+msgid "leaflet page"
+msgstr "halaman risalah"
+
+msgid "left-side filter panes"
+msgstr "anak tetingkap penapis sisi kiri"
+
+msgid "length of songs"
+msgstr "jangkamasa lagu"
+
+msgid "less than"
+msgstr "kurang dari"
+
+#, perl-format
+msgid "less than %s ago"
+msgstr "kurang dari %s yang lalu"
+
+msgid "lyricist"
+msgstr "penulis lirik"
+
+msgid "lyrics file"
+msgstr "fail lirik"
+
+msgid "matches regexp"
+msgstr "ungkapan nalar sepadan"
+
+#, perl-format
+msgid "matches regexp %s"
+msgstr "ungkapan nalar %s sepadan"
+
+#, perl-format
+msgid "matches regexp %s (case sensitive)"
+msgstr "ungkapan nalar %s sepadan (sensitif kata)"
+
+msgid "maximum font size"
+msgstr "saiz fon maksimum"
+
+msgid "media"
+msgstr "media"
+
+msgid "medium size"
+msgstr "saiz medium"
+
+msgid "minimal"
+msgstr "minimum"
+
+msgid "minimum font size"
+msgstr "saiz fon minimum"
+
+msgid "minutes"
+msgstr "minit"
+
+msgid "month"
+msgstr "bulan"
+
+msgid "months"
+msgstr "bulan"
+
+msgid "more than"
+msgstr "lebih daripada"
+
+#, perl-format
+msgid "more than %s ago"
+msgstr "lebih daripada %s yang lalu"
+
+msgid "mosaic mode"
+msgstr "mod mozek"
+
+msgid "movie/video screen capture"
+msgstr "tangkapan skrin cereka/video"
+
+msgid ""
+"mp3 files without a VBR header requires a full scan to check its real length "
+"and bitrate"
+msgstr ""
+"fail mp3 tanpa pengepala VBR memerlukan imbas penuh untuk diperiksa panjang "
+"dan kadar bit sebenarnya"
+
+msgid "mplayer executable :"
+msgstr "bolehlaku mplayer :"
+
+msgid "mplayer options :"
+msgstr "pilihan mplayer :"
+
+msgid "multi-lines string"
+msgstr "rentetan baris-berbilang"
+
+msgid "name of the new filter"
+msgstr "nama bagi penapis baharu"
+
+msgid "name of the new grouping"
+msgstr "nama bagi pengelompokan baharu"
+
+msgid "name of the new random mode"
+msgstr "nama bagi mod rawak baharu"
+
+msgid "name of the new sort mode"
+msgstr "nama bagi mod isih baharu"
+
+msgid "never"
+msgstr "tidak sesekali"
+
+msgid "never played"
+msgstr "tidak sesekali dimainkan"
+
+#, perl-format
+msgid "no %s fuzzy match with %s"
+msgstr "tiada padanan kabur %s dengan %s"
+
+msgid "no matches found, you might want to remove some search terms."
+msgstr ""
+"tiada padanan ditemui, anda mungkin mahu buang beberapa terma gelintar."
+
+msgid "no order"
+msgstr "tiada tertib"
+
+msgid "no picture"
+msgstr "tiada gambar"
+
+msgid "no pictures"
+msgstr "tiada gambar"
+
+msgid "no plugins found"
+msgstr "tiada pemalam ditemui"
+
+msgid "no songs needs checking"
+msgstr "tiada lagu memerlukan penyemakan"
+
+msgid "no splitting"
+msgstr "tiada pemisahan"
+
+msgid "no to all"
+msgstr "bukan pada semua"
+
+msgid "noname"
+msgstr "tiadanama"
+
+msgid "none"
+msgstr "tiada"
+
+msgid "normal"
+msgstr "biasa"
+
+#, perl-format
+msgid "not after %s"
+msgstr "bukan selepas %s"
+
+#, perl-format
+msgid "not before %s"
+msgstr "bukan sebelum %s"
+
+#, perl-format
+msgid "not between %s ago and %s ago"
+msgstr "bukan diantara %s dan %s yang lalu"
+
+#, perl-format
+msgid "not between %s and %s"
+msgstr "bukan diantara %s dan %s"
+
+msgid "not bootleg"
+msgstr "bukan cetak-rompak"
+
+msgid "not defined"
+msgstr "tidak ditakrif"
+
+#, perl-format
+msgid "not in the bottom %s"
+msgstr "bukan di bahagian terbawah %s"
+
+#, perl-format
+msgid "not in the top %s"
+msgstr "bukan dibahagian teratas %s"
+
+#, perl-format
+msgid "not less than %s ago"
+msgstr "tidak kurang dari %s yang lalu"
+
+#, perl-format
+msgid "not more than %s ago"
+msgstr "tidak lebih dari %s yang lalu"
+
+#, perl-format
+msgid "not present in %s"
+msgstr "tidak hadir dalam %s"
+
+#, perl-format
+msgid "not set to %s"
+msgstr "tidak ditetapkan pada %s"
+
+#, perl-format
+msgid "not the %s least recent"
+msgstr "bukan %s yang paling kurang terkini"
+
+#, perl-format
+msgid "not the %s most recent"
+msgstr "bukan %s yang paling terkini"
+
+msgid "number of songs"
+msgstr "bilangan lagu"
+
+msgid "number of songs in filter"
+msgstr "bilangan lagu dalam penapis"
+
+msgid "only show entries with at least n songs"
+msgstr "hanya tunjuk masukan dengan sekurang-kurangnya n lagu"
+
+msgid "only works when the artist-info tab is displayed"
+msgstr "hanya berfungsi bila tab maklumat-artis dipaparkan"
+
+msgid "only works with some lyrics source and when the lyrics tab is active"
+msgstr ""
+"hanya berfungsi dengan sesetengah sumber lirik dan bila tab lirik aktif"
+
+msgid "open context window"
+msgstr "buka tetingkap konteks"
+
+msgid "options"
+msgstr "pilihan"
+
+#, perl-format
+msgid "or %d seconds"
+msgstr "atau %d saat"
+
+msgid "other"
+msgstr "lain-lain"
+
+msgid "other file icon"
+msgstr "ikon fail lain"
+
+msgid "output device :"
+msgstr "peranti output :"
+
+#, perl-format
+msgid "page %d"
+msgstr "halaman %d"
+
+#, perl-brace-format
+msgid "page {number}"
+msgstr "halaman {number}"
+
+msgid "password :"
+msgstr "kata laluan :"
+
+msgid "perl code"
+msgstr "kod perl"
+
+msgid "picture size"
+msgstr "saiz gambar"
+
+msgid "play count average"
+msgstr "purata kiraan main"
+
+msgid "played>4"
+msgstr "played>4"
+
+msgid "port :"
+msgstr "port :"
+
+msgid "pre-amp"
+msgstr "pra-amp"
+
+#, perl-format
+msgid "pre-amp : %d dB"
+msgstr "pra-amp : %d dB"
+
+#, perl-format
+msgid "present in %s"
+msgstr "hadir dalam %s"
+
+msgid "present in list"
+msgstr "hadir dalam senarai"
+
+msgid "quit"
+msgstr "keluar"
+
+msgid "rating"
+msgstr "penarafan"
+
+msgid "rating average"
+msgstr "purata penarafan"
+
+msgid "recording location"
+msgstr "lokasi rakaman"
+
+msgid "requires xdg-screensaver"
+msgstr "perlukan xdg-screensaver"
+
+#, perl-brace-format
+msgid "reset filter {nb}"
+msgstr "tetap semula penapis {nb}"
+
+msgid "reset format"
+msgstr "tetap semula format"
+
+msgid "reset primary filter"
+msgstr "tetap semula penapis utama"
+
+msgid "reset secondary filter"
+msgstr "tetap semula penapis kedua"
+
+msgid "retry"
+msgstr "cuba lagi"
+
+#, perl-brace-format
+msgid "retry in {seconds} s"
+msgstr "cuba lagi dalam {seconds} s"
+
+msgid "reverse order"
+msgstr "tertib songsang"
+
+#, perl-brace-format
+msgid "save as '{name}'"
+msgstr "simpan sebagai '{name}'"
+
+msgid "save filter as"
+msgstr "simpan penapis sebagai"
+
+msgid "save grouping as"
+msgstr "simpan pengelompokan sebagai"
+
+msgid "save random mode as"
+msgstr "simpan mod rawak sebagai"
+
+msgid "save sort mode as"
+msgstr "simpan mod isih sebagai"
+
+msgid "saved filters"
+msgstr "penapis disimpan"
+
+msgid "saved groupings"
+msgstr "pengelompokan disimpan"
+
+msgid "saved random modes"
+msgstr "mod rawak disimpan"
+
+msgid "saved sort modes"
+msgstr "mod isih disimpan"
+
+msgid "scan now"
+msgstr "imbas sekarang"
+
+msgid "seconds"
+msgstr "saat"
+
+msgid "set to"
+msgstr "tetapkan ke"
+
+#, perl-format
+msgid "set to %s"
+msgstr "tetapkan ke %s"
+
+msgid "show histogram background"
+msgstr "tunjuk latar belakang histogram"
+
+msgid "show pictures"
+msgstr "tunjuk gambar"
+
+msgid "show the 'All' row"
+msgstr "tunjuk 'Semua' baris"
+
+msgid "similar-artists"
+msgstr "artis-serupa"
+
+msgid "skin options"
+msgstr "pilihan kulit"
+
+msgid "skip count average"
+msgstr "purata kiraan langkau"
+
+msgid "small size"
+msgstr "saiz kecil"
+
+msgid "sort by"
+msgstr "isih mengikut"
+
+msgid "static list"
+msgstr "senarai statik"
+
+msgid "stop"
+msgstr "henti"
+
+msgid "string"
+msgstr "rentetan"
+
+msgid "supports : "
+msgstr "sokongan :"
+
+msgid "text format"
+msgstr "format teks"
+
+msgid "text mode"
+msgstr "mod teks"
+
+#, perl-format
+msgid "the %s least recent"
+msgstr "%s paling kurang terkini"
+
+#, perl-format
+msgid "the %s most recent"
+msgstr "%s paling terkini"
+
+#, perl-brace-format
+msgid "the command {name}"
+msgstr "perintah {name}"
+
+msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
+msgstr "lalai ialah utf16 untuk ID3v2.3 dan utf8 untuk ID3v2.4"
+
+#, perl-brace-format
+msgid "the file {name}"
+msgstr "fail {name}"
+
+msgid "the least recent"
+msgstr "paling kurang terkini"
+
+msgid "the most recent"
+msgstr "paling terkini"
+
+#, perl-brace-format
+msgid "the {name} perl module"
+msgstr "modul perl {name}"
+
+#, perl-brace-format
+msgid "then {action}"
+msgstr "kemudian {action}"
+
+msgid "times"
+msgstr "kali"
+
+#. comma-separated list of field aliases for title, these are in addition to
+#. english aliases
+msgctxt "Field_aliases"
+msgid "title"
+msgstr "tajuk"
+
+msgid "toggle Intersection mode"
+msgstr "togol mod Persilangan"
+
+msgid "toggle Invert mode"
+msgstr "togol mod Songsang"
+
+msgid "tools"
+msgstr "alatan"
+
+msgid "true"
+msgstr "benar"
+
+msgid "turn off"
+msgstr "matikan"
+
+msgid "unknown"
+msgstr "tidak diketahui"
+
+msgid "unknown error"
+msgstr "ralat tidak diketahui"
+
+msgid "unnamed random mode"
+msgstr "mod rawak tidak bernama"
+
+msgid "url"
+msgstr "url"
+
+msgid "url-encoded list of files"
+msgstr "senarai fail terenkod-url"
+
+msgid "url-encoded list of files/folders"
+msgstr "senarai fail/folder terenkod-url"
+
+msgid "use :"
+msgstr "guna :"
+
+msgid "use album name"
+msgstr "guna nama album"
+
+msgid "use default"
+msgstr "guna lalai"
+
+msgid "use gnome settings"
+msgstr "guna tetapan gnome"
+
+msgid "use song folder"
+msgstr "guna folder lagu"
+
+msgid "use standard strftime variables"
+msgstr "guna pembolehubah strftime piawai"
+
+msgid "username :"
+msgstr "nama pengguna :"
+
+msgid "using skin :"
+msgstr "kulit digunakan :"
+
+msgid "wait for more"
+msgstr "tunggu lagi"
+
+msgid "weeks"
+msgstr "minggu"
+
+msgid "weight :"
+msgstr "berat :"
+
+msgid "when file changes"
+msgstr "bila fail berubah"
+
+msgid "when folder changes"
+msgstr "bila folder berubah"
+
+msgid "wikipedia, lyrics, and custom webpages"
+msgstr "wikipedia, lirik, dan laman sesawang suai"
+
+msgid "with browser"
+msgstr "dengan pelayar"
+
+msgid "with browser & queue"
+msgstr "dengan pelayar & baris gilir"
+
+msgid "with browser (SongTree)"
+msgstr "dengan pelayar (PepohonLagu)"
+
+msgid "with lists"
+msgstr "dengan senarai"
+
+msgid "with picture"
+msgstr "dengan gambar"
+
+msgid "with playlist"
+msgstr "dengan senarai main"
+
+msgid "with queue"
+msgstr "dengan baris gilir"
+
+msgid "with search"
+msgstr "dengan gelintar"
+
+msgid "with search and lists"
+msgstr "dengan gelintar dan senarai"
+
+msgid "with search and lists 2"
+msgstr "dengan gelintar dan senarai 2"
+
+msgid ""
+"without gstreamer : one stream per file, one connection at a time\n"
+"with gstreamer : one continuous stream, multiple connection possible"
+msgstr ""
+"tanpa gstreamer : satu strim per fail, satu sambungan pada satu masa\n"
+"dengan gstreamer : satu strim berterusan, sambungan berbilang adalah mungkin"
+
+msgid "x offset :"
+msgstr "ofset x :"
+
+msgid "y offset :"
+msgstr "ofset y :"
+
+msgid "year"
+msgstr "tahun"
+
+msgid "year (highest)"
+msgstr "tahun (tertinggi)"
+
+msgid "years"
+msgstr "tahun"
+
+msgid "yes to all"
+msgstr "tahun untuk semua"
+
+#, perl-brace-format
+msgid ""
+"{album}\n"
+"<small>by</small> {artist}"
+msgstr ""
+"{album}\n"
+"<small>oleh</small> {artist}"
+
+#, perl-brace-format
+msgid "{folder} already exists"
+msgstr "{folder} sudah wujud"
+
+#, perl-brace-format
+msgid "{hours} hours {min} min {sec} s"
+msgstr "{hours} jam {min} min {sec} s"
+
+#, perl-brace-format
+msgid "{hours}h {min}m {sec}s"
+msgstr "{hours}j {min}m {sec}s"
+
+#, perl-brace-format
+msgid "{hours}h{min}m{sec}s"
+msgstr "{hours}j{min}m{sec}s"
+
+#, perl-brace-format
+msgid "{min} min {sec} s"
+msgstr "{min} min {sec} s"
+
+#, perl-brace-format
+msgid "{min}m {sec}s"
+msgstr "{min}m {sec}s"
+
+#, perl-brace-format
+msgid "{min}m{sec}s"
+msgstr "{min}m{sec}s"
+
+#, perl-brace-format
+msgid "{outputname} output settings"
+msgstr "tetapan output {outputname}"
+
+#, perl-brace-format
+msgid "{songs} by {artists}"
+msgstr "{songs} oleh {artists}"
+
+#, perl-brace-format
+msgid "{song} by {artist}"
+msgstr "{song} oleh {artist}"
+
+msgid "|-separated list of widget names"
+msgstr "senarai dipisah-l bagi nama widjet"
