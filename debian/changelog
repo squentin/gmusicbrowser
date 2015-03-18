@@ -1,3 +1,12 @@
+gmusicbrowser (1.1.14) utopic; urgency=low
+
+  * new version
+  * removed libgstreamer-interfaces-perl from suggested packages
+  * moved libgstreamer-perl from recommended to suggested packages
+  * added libglib-object-introspection-perl and gir1.2-gstreamer-1.0 to recommended packages
+
+ -- Quentin Sculo <squentin@free.fr>  Sat, 18 Mar 2015 23:35:00 +0200
+
 gmusicbrowser (1.1.13) trusty; urgency=low
 
   * new version

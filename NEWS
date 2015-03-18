@@ -1,3 +1,26 @@
+v1.1.14
+add support for gstreamer-1.x and small gstreamer updates/improvements
+  gstreamer-1.x requires Glib::Object::Introspection and the gstreamer introspection data (Gst-1.0.typelib)
+  the option -nogst will now disable loading gstreamer entirely
+  the option -gst has been replaced by -gst0 that can force the use of gstreamer-0.10 even if gstreamer-1.0 is found
+  when using gstreamer-1, can now ask the system to install missing plugins
+add EqualizerPresets widget to change/edit equalizer presets (requires gstreamer-1.0)
+  adds EqualizerPresets to the default Equalizer layout
+  also adds EqualizerPresetsSimple widget as an alias for EqualizerPresets(open=1,notoggle=1)
+add way to edit "persistent" labels, and dialog to rename labels
+add "new label" entry to the "edit labels" submenu
+make scroll wheel increase/decrease numbers in the search bar
+add options to override default web browser and file browser
+add thousand separators in most displayed numbers
+various number-related improvements/fixes
+  show unit for bitrate and sampling rate
+  the length field now uses multiple units
+  more consistent size units
+  smarter parsing of units in search strings
+fix auto-selected embedded pictures always showing the first picture (only fix newly autoselected pictures)
+translations updates: Finnish, French, German, Polish, Korean, Serbian
+new translations: Lithuanian, Malay (Malaysia)
+
 v1.1.13
 add lots of features to PictureBrowser
 add Stop/Quit/Turnoff-after-this-song feature
