@@ -1,0 +1,1166 @@
+#
+# Translators:
+# Moo, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: gmusicbrowser\n"
+"Report-Msgid-Bugs-To: squentin@free.fr\n"
+"POT-Creation-Date: 2015-03-12 23:51+0100\n"
+"PO-Revision-Date: 2015-03-14 20:45+0000\n"
+"Last-Translator: Moo\n"
+"Language-Team: Lithuanian (http://www.transifex.com/projects/p/gmusicbrowser/"
+"language/lt/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: lt\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
+"%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid " Fields "
+msgstr "Laukai"
+
+#, perl-brace-format
+msgid " of {length}"
+msgstr " iš {length}"
+
+#, perl-format
+msgid "%d Album"
+msgid_plural "%d Albums"
+msgstr[0] "%d Albumas"
+msgstr[1] "%d Albumai"
+msgstr[2] "%d Albumų"
+
+#, perl-format
+msgid "%d Artist"
+msgid_plural "%d Artists"
+msgstr[0] "%d Atlikėjas"
+msgstr[1] "%d Atlikėjai"
+msgstr[2] "%d Atlikėjų"
+
+#, perl-format
+msgid "%d album"
+msgid_plural "%d albums"
+msgstr[0] "%d albumas"
+msgstr[1] "%d albumai"
+msgstr[2] "%d albumų"
+
+#, perl-format
+msgid "%d artist"
+msgid_plural "%d artists"
+msgstr[0] "%d atlikėjas"
+msgstr[1] "%d atlikėjai"
+msgstr[2] "%d atlikėjų"
+
+#, perl-format
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] "%d failas"
+msgstr[1] "%d failai"
+msgstr[2] "%d failų"
+
+#, perl-format, perl-brace-format
+msgid "%d file in {folder}"
+msgid_plural "%d files in {folder}"
+msgstr[0] "%d failas aplanke {folder}"
+msgstr[1] "%d failai aplanke {folder}"
+msgstr[2] "%d failų aplanke {folder}"
+
+#, perl-format
+msgid "%d folder"
+msgid_plural "%d folders"
+msgstr[0] "%d aplankas"
+msgstr[1] "%d aplankai"
+msgstr[2] "%d aplankų"
+
+#, perl-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d sekundė"
+msgstr[1] "%d sekundės"
+msgstr[2] "%d sekundžių"
+
+#, perl-format
+msgid "%d song"
+msgid_plural "%d songs"
+msgstr[0] "%d daina"
+msgstr[1] "%d dainos"
+msgstr[2] "%d dainų"
+
+#, perl-format
+msgid "%d song added"
+msgid_plural "%d songs added"
+msgstr[0] "pridėta %d daina"
+msgstr[1] "pridėtos %d dainos"
+msgstr[2] "pridėta %d dainų"
+
+#, perl-format
+msgid "%d song in queue"
+msgid_plural "%d songs in queue"
+msgstr[0] "%d daina laukia eilėje"
+msgstr[1] "%d dainos laukia eilėje"
+msgstr[2] "%d dainų laukia eilėje"
+
+#, perl-brace-format
+msgid "'{file}' exists. Overwrite ?"
+msgstr "'{file}' jau yra. Pakeisti ?"
+
+msgid "(see http://www.last.fm)"
+msgstr "(žiūrėkite http://www.last.fm)"
+
+msgid "32x32 PNG file icon"
+msgstr "32x32 PNG failo piktograma"
+
+msgid "50 Last Added"
+msgstr "50 Paskiausiai Pridėtų"
+
+msgid "50 Last Played"
+msgstr "50 Paskiausiai Grotų"
+
+msgid "50 Most Played"
+msgstr "50 Daugiausiai Grotų"
+
+msgid "<Unknown>"
+msgstr "<Nežinoma>"
+
+msgid "About"
+msgstr "Apie"
+
+msgid "Add Files ..."
+msgstr "Pridėti Failus ..."
+
+msgid "Add Music"
+msgstr "Pridėti Muziką"
+
+msgid "Add a filter"
+msgstr "Pridėti filtrą"
+
+msgid "Add a radio"
+msgstr "Pridėti radiją"
+
+msgid "Add files or folders"
+msgstr "Pridėti failus ar aplankus"
+
+msgid "Add files/folders to library"
+msgstr "Pridėti failus/aplankus į biblioteką"
+
+msgid "Add folder"
+msgstr "Pridėti aplanką"
+
+msgid "Add folder ..."
+msgstr "Pridėti aplanką ..."
+
+msgid "Add new radio"
+msgstr "Pridėti naują radiją"
+
+msgid "Added"
+msgstr "Pridėtos"
+
+msgid "Added Today"
+msgstr "Pridėtos Šiandien"
+
+msgid "Album"
+msgstr "Albumas"
+
+msgid "Album artist"
+msgstr "Albumo atlikėjas"
+
+msgid "Album mode"
+msgstr "Albumo veiksena"
+
+msgid "Album picture"
+msgstr "Albumo paveikslas"
+
+msgid "Album pictures"
+msgstr "Albumo paveikslai"
+
+#, perl-format
+msgid "Album: %l"
+msgstr "Albumas: %l"
+
+#, perl-format
+msgid "Album: %l (%Y)"
+msgstr "Albumas: %l (%Y)"
+
+msgid "All albums"
+msgstr "Visi albumai"
+
+msgid "All artists"
+msgstr "Visi atlikėjai"
+
+msgid "All files"
+msgstr "Visi failai"
+
+msgid "All genres"
+msgstr "Visi žanrai"
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
+msgstr "Įgalina gmusicbrowser valdymą per DBus, naudojant MPRIS v1.0 standartą"
+
+msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v2.0 standard"
+msgstr "Įgalina gmusicbrowser valdymą per DBus, naudojant MPRIS v2.0 standartą"
+
+#. Alt key
+msgctxt "Keyboard"
+msgid "Alt"
+msgstr "Alt"
+
+msgid "App Indicator plugin"
+msgstr "Programos Indikatoriaus įskiepis"
+
+msgid "App indicator"
+msgstr "Programos indikatorius"
+
+msgid "Artist"
+msgstr "Atlikėjas"
+
+msgid "Artist & album"
+msgstr "Atlikėjas ir albumas"
+
+msgid "Artist URL"
+msgstr "Atlikėjo URL"
+
+#, perl-format
+msgid "Artist: %a"
+msgstr "Atlikėjas: %a"
+
+msgid "Artists"
+msgstr "Atlikėjai"
+
+msgid "Audio"
+msgstr "Garso įrašai"
+
+msgid "Audio properties"
+msgstr "Garso įrašo savybės"
+
+msgid "Automatically remove current song if not found"
+msgstr "Automatiškai šalinti esamą dainą, jei jos nerandama"
+
+msgid "Autosave plugin"
+msgstr "Automatinio išsaugojimo papildinys"
+
+msgid "Basic fields"
+msgstr "Pagrindiniai laukai"
+
+msgid "Bitrate"
+msgstr "Pralaidumas"
+
+msgid "Browser"
+msgstr "Naršyklė"
+
+msgid "Browser window layout :"
+msgstr "Naršyklės lango išdėstymas :"
+
+msgid "Can't play this file."
+msgstr "Negaliu groti šio failo."
+
+msgid "Cancel"
+msgstr "Atšaukti"
+
+msgid "Change the context visibility"
+msgstr "Keisti konteksto matomumą"
+
+msgid "Channels"
+msgstr "Kanalai"
+
+msgid "Check for updated/deleted songs on startup"
+msgstr "Paleidus programą, tikrinti atnaujintas/ištrintas dainas"
+
+msgid "Check real length of mp3"
+msgstr "Tikrinti tikrąją mp3 failų trukmę"
+
+msgid "Checking length/bitrate"
+msgstr "Tikrinama trukmė/pralaidumas"
+
+msgid "Checking songs"
+msgstr "Tikrinamos dainos"
+
+msgid "Choose folder to add"
+msgstr "Pasirinkite norimą pridėti aplanką"
+
+msgid "Choose page to open"
+msgstr "Pasirinkite norimą atidaryti puslapį"
+
+msgid "Clear"
+msgstr "Išvalyti"
+
+msgid "Clear playlist"
+msgstr "Išvalyti grojaraštį"
+
+msgid "Clear queue"
+msgstr "Išvalyti eilę"
+
+msgid "Close"
+msgstr "Uždaryti"
+
+msgid "Close Window"
+msgstr "Uždaryti Langą"
+
+msgid "Close to tray"
+msgstr "Uždaryti į dėklą"
+
+msgid "Composer"
+msgstr "Kompozitorius"
+
+msgid "Connect through a proxy"
+msgstr "Jungtis per įgaliotąjį serverį"
+
+msgid "Context"
+msgstr "Kontekstas"
+
+msgid "Copy link address"
+msgstr "Kopijuoti nuorodos adresą"
+
+msgid "Cover Size : "
+msgstr "Viršelio Dydis :"
+
+msgid "Create ID3v2 tags as ID3v2.4"
+msgstr "Kurti ID3v2 žymes kaip ID3v2.4"
+
+#. Ctrl key
+msgctxt "Keyboard"
+msgid "Ctrl"
+msgstr "Ctrl"
+
+msgid "Custom..."
+msgstr "Pasirinktinas..."
+
+msgid "Date"
+msgstr "Data"
+
+msgid "Date format :"
+msgstr "Datos formatas :"
+
+msgid "Default text color"
+msgstr "Numatytoji teksto spalva"
+
+msgid "Default text font"
+msgstr "Numatytasis teksto šriftas"
+
+msgid "Description"
+msgstr "Aprašas"
+
+msgid "Desktop widgets"
+msgstr "Darbastalio valdikliai"
+
+msgid "Desktop widgets plugin"
+msgstr "Darbastalio valdiklių papildinys"
+
+msgid "Do not create an id3v1 tag in mp3 files"
+msgstr "Nekurti id3v1 žymės mp3 failuose "
+
+#, perl-brace-format
+msgid "Don't know how to play files of type {type}"
+msgstr "Nežinau kaip groti {type} tipo failus"
+
+msgid "Downloading"
+msgstr "Atsiunčiama"
+
+msgid "Edit Lyrics"
+msgstr "Keisti dainos žodžius"
+
+msgid "Edit Lyrics ..."
+msgstr "Keisti dainos žodžius ..."
+
+msgid "Edit Settings"
+msgstr "Keisti Nustatymus"
+
+msgid "Encoding used for id3v1 tags :"
+msgstr "id3v1 žymėms naudojama koduotė :"
+
+msgid "Error :"
+msgstr "Klaida :"
+
+msgid "Error creating folder"
+msgstr "Klaida, kuriant aplanką"
+
+msgid "Error details"
+msgstr "Išsamiau apie klaidą"
+
+msgid "Events"
+msgstr "Įvykiai"
+
+msgid "Example :"
+msgstr "Pavyzdys :"
+
+msgid "Export to .m3u file"
+msgstr "Eksportuoti į .m3u failą"
+
+msgid "File properties"
+msgstr "Failo savybės"
+
+msgid "File type"
+msgstr "Failo tipas"
+
+#, perl-brace-format
+msgid "File: {file}"
+msgstr "Failas: {file}"
+
+msgid "Filename"
+msgstr "Failo pavadinimas"
+
+msgid "Filename without extension"
+msgstr "Failo pavadinimas be plėtinio"
+
+msgid "Filesystem"
+msgstr "Failų sistema"
+
+msgid "Folder"
+msgstr "Aplankas"
+
+msgid "Folder format :"
+msgstr "Aplanko formatas :"
+
+msgid "Folder pattern :"
+msgstr "Aplanko šablonas :"
+
+msgid "Folders to search for new songs"
+msgstr "Aplankai, kuriuose bus ieškomos naujos dainos"
+
+msgid "Font size"
+msgstr "Šrifto dydis"
+
+msgid "Friday"
+msgstr "Penktadienis"
+
+msgid "Full screen"
+msgstr "Visas ekranas"
+
+msgid "Full screen layout :"
+msgstr "Viso ekrano išdėstymas :"
+
+msgid "Genres"
+msgstr "Žanrai"
+
+msgid "Gnome multimedia keys plugin"
+msgstr "Gnome multimedijos klavišų papildinys"
+
+msgid "Hide"
+msgstr "Slėpti"
+
+msgid "Hide toolbar"
+msgstr "Slėpti įrankių juostą"
+
+msgid "Icon theme :"
+msgstr "Piktogramų tema :"
+
+msgid "Ignore playback errors"
+msgstr "Nepaisyti grojimo klaidų"
+
+msgid "Ignored file extensions :"
+msgstr "Ignoruojami failų plėtiniai :"
+
+msgid "Info"
+msgstr "Informacija"
+
+msgid "Invert filter"
+msgstr "Invertuoti filtrą"
+
+msgid "KB"
+msgstr "KB"
+
+msgid "Karaoke plugin"
+msgstr "Karaoke papildinys"
+
+msgid "Languages"
+msgstr "Kalbos"
+
+msgid "Length"
+msgstr "Trukmė"
+
+msgid "Library"
+msgstr "Biblioteka"
+
+msgid "Library : "
+msgstr "Biblioteka :"
+
+msgid ""
+"Library empty.\n"
+"\n"
+"Use the settings dialog to add music."
+msgstr ""
+"Biblioteka tuščia.\n"
+"Norėdami pridėti muziką, naudokite nustatymų dialogo langa."
+
+#, perl-format
+msgid "Library size : %d song"
+msgid_plural "Library size : %d songs"
+msgstr[0] "Bibliotekos dydis: %d daina"
+msgstr[1] "Bibliotekos dydis: %d dainos"
+msgstr[2] "Bibliotekos dydis: %d dainų"
+
+msgid "Loading..."
+msgstr "Įkeliama..."
+
+msgid "Lock"
+msgstr "Užrakinti"
+
+msgid "Lock Album"
+msgstr "Užrakinti Albumą"
+
+msgid "Lock Artist"
+msgstr "Užrakinti Atlikėją"
+
+msgid "Lullaby plugin"
+msgstr "Lopšinės papildinys"
+
+msgid "Lyrics"
+msgstr "Dainos žodžiai"
+
+msgid "Lyrics (requires lyrics plugin)"
+msgstr "Dainos žodžiai (reikalauja dainos žodžių papildinio)"
+
+msgid "Lyrics file :"
+msgstr "Dainos žodžių failas :"
+
+msgid "Lyrics plugin"
+msgstr "Dainos žodžių papildinys"
+
+msgid "MB"
+msgstr "MB"
+
+msgid "MPRIS v1"
+msgstr "MPRIS v1"
+
+msgid "MPRIS v1 support"
+msgstr "MPRIS v1 palaikymas"
+
+msgid "MPRIS v2"
+msgstr "MPRIS v2"
+
+msgid "MPRIS v2 support"
+msgstr "MPRIS v2 palaikymas"
+
+msgid "Main"
+msgstr "Pradžia"
+
+msgid "Modification"
+msgstr "Modifikacija"
+
+msgid "Monday"
+msgstr "Pirmadienis"
+
+msgid "More info"
+msgstr "Daugiau informacijos"
+
+msgid "More results"
+msgstr "Daugiau rezultatų"
+
+msgid "Move Files to :"
+msgstr "Perkelti Failus į :"
+
+msgid "New custom field"
+msgstr "Naujas pasirinktinas laukas"
+
+msgid "New name"
+msgstr "Naujas pavadinimas"
+
+msgid "Next Album"
+msgstr "Kitas Albumas"
+
+msgid "Next Artist"
+msgstr "Kitas Atlikėjas"
+
+msgid "Next Song"
+msgstr "Kita Daina"
+
+msgid "No file browser found."
+msgstr "Failų tvarkytuvė nerasta."
+
+msgid "No genre"
+msgstr "Be žanro"
+
+msgid "No locked filter"
+msgstr "Nėra užrakinto filtro"
+
+msgid "No web browser found."
+msgstr "Žiniatinklio naršyklė nerasta."
+
+msgid "Old name"
+msgstr "Senas pavadinimas"
+
+msgid "Open Browser"
+msgstr "Atidaryti Naršyklę"
+
+msgid "Open Browser window"
+msgstr "Atidaryti Naršyklės langą"
+
+msgid "Open Context window"
+msgstr "Atidaryti konteksto langą"
+
+msgid "Open Playlist"
+msgstr "Atidaryti Grojaraštį"
+
+msgid "Open Preference window"
+msgstr "Atidaryti Nuostatų langą"
+
+msgid "Open Queue"
+msgstr "Atidaryti Eilę"
+
+msgid "Open Queue window"
+msgstr "Atidaryti Eilės langą"
+
+msgid "Open folder"
+msgstr "Atidaryti aplanką"
+
+msgid "Open last.fm website in your browser"
+msgstr "Atidaryti last.fm svetainę jūsų naršyklėje"
+
+msgid "Open link in Browser"
+msgstr "Atidaryti nuorodą Naršyklėje"
+
+msgid "Open this page in the web browser"
+msgstr "Atidaryti šį puslapį žiniatinklio naršyklėje"
+
+msgid "Options"
+msgstr "Parinktys"
+
+msgid "Options ..."
+msgstr "Parinktys ..."
+
+msgid "Pause"
+msgstr "Pristabdyti"
+
+msgid "Play"
+msgstr "Groti"
+
+msgid "Play a list of files"
+msgstr "Groti failų sąrašą"
+
+msgid "Play all songs from this album"
+msgstr "Groti visas šio albumo dainas"
+
+msgid "Play all songs from this artist"
+msgstr "Groti visas šio atlikėjo dainas"
+
+msgid "Play filter"
+msgstr "Groti filtrą"
+
+msgid "Play order"
+msgstr "Grojimo tvarka"
+
+msgid "Play/Pause"
+msgstr "Groti/Pristabdyti"
+
+msgid "Player window layout :"
+msgstr "Grotuvo lango išdėstymas :"
+
+msgid "Playing"
+msgstr "Grojama"
+
+#, perl-brace-format
+msgid "Playing error : {error}"
+msgstr "Grojimo klaida : {error}"
+
+msgid "Playlist"
+msgstr "Grojaraštis"
+
+msgid "Playlist 1"
+msgstr "Grojaraštis 1"
+
+msgid "Playlist Empty"
+msgstr "Grojaraštis Tuščias"
+
+msgid "Playlist empty"
+msgstr "Grojaraštis tuščias"
+
+msgid "Playlist filter"
+msgstr "Grojaraščio filtras"
+
+msgid "Playlists"
+msgstr "Grojaraščiai"
+
+msgid "Plugin not loaded"
+msgstr "Papildinys neįkeltas"
+
+msgid "Plugins"
+msgstr "Papildiniai"
+
+msgid "Preferences"
+msgstr "Nuostatos"
+
+msgid "Properties"
+msgstr "Savybės"
+
+msgid "Queue"
+msgstr "Eilė"
+
+#, perl-format
+msgid "Queue (%n)"
+msgstr "Eilė (%n)"
+
+msgid "Queue Edit"
+msgstr "Eilės Redagavimas"
+
+msgid "Queue empty"
+msgstr "Eilė tuščia"
+
+msgid "Queue options"
+msgstr "Eilės parinktys"
+
+msgid "Quit"
+msgstr "Baigti"
+
+msgid "Quit after this song"
+msgstr "Baigti po šios dainos"
+
+msgid "Quit when queue empty"
+msgstr "Baigti, kuomet eilė tuščia"
+
+msgid "Recent Filters"
+msgstr "Neseniai naudoti filtrai"
+
+msgid "Refresh"
+msgstr "Įkelti iš naujo"
+
+msgid "Refresh list"
+msgstr "Įkelti sąrašą iš naujo"
+
+msgid "Regular expression"
+msgstr "Reguliari išraiška"
+
+msgid "Regular expression :"
+msgstr "Reguliari išraiška :"
+
+msgid "Remove"
+msgstr "Šalinti"
+
+msgid "Remove all songs"
+msgstr "Šalinti visas dainas"
+
+msgid "Remove filter"
+msgstr "Šalinti filtrą"
+
+msgid "Remove from disk"
+msgstr "Šalinti iš disko"
+
+msgid "Remove from list"
+msgstr "Šalinti iš sąrašo"
+
+msgid "Remove from playlist"
+msgstr "Šalinti iš grojaraščio"
+
+msgid "Remove from queue"
+msgstr "Šalinti iš eilės"
+
+msgid "Remove selected songs"
+msgstr "Šalinti pasirinktas dainas"
+
+msgid "Remove this tag"
+msgstr "Šalinti šią žymę"
+
+msgid "Remove this widget"
+msgstr "Šalinti šį valdiklį"
+
+msgid "Rename"
+msgstr "Pervadinti"
+
+#, perl-brace-format
+msgid "Rename '{label}'"
+msgstr "Pervadinti '{label}'"
+
+msgid "Rename File"
+msgstr "Pervadinti Failą"
+
+msgid "Rename file"
+msgstr "Pervadinti failą"
+
+msgid "Rename files using this pattern :"
+msgstr "Pervadinti failus, naudojant šį šabloną :"
+
+msgid "Rename folder"
+msgstr "Pervadinti aplanką"
+
+msgid "Rename this folder to :"
+msgstr "Pervadinti šį aplanką į :"
+
+msgid "Rename/move files based on these fields :"
+msgstr "Pervadinti/perkelti failus, remiantis šiais laukais :"
+
+msgid "Reorganize files and folders"
+msgstr "Pertvarkyti failus ir aplankus"
+
+msgid "Repeat"
+msgstr "Kartoti"
+
+msgid "Reset filter"
+msgstr "Atstatyti filtrą"
+
+msgid "Rhythmbox"
+msgstr "Rhythmbox"
+
+msgid "Saturday"
+msgstr "Šeštadienis"
+
+msgid "Save"
+msgstr "Išsaugoti"
+
+msgid "Save as..."
+msgstr "Išsaugoti kaip..."
+
+msgid "Save current filter as"
+msgstr "Išsaugoti dabartinį filtrą kaip"
+
+msgid "Save current list as"
+msgstr "Išsaugoti dabartinį sąrašą kaip"
+
+msgid "Save lyrics"
+msgstr "Išsaugoti dainos žodžius"
+
+msgid "Save now"
+msgstr "Išsaugoti dabar"
+
+msgid "Save picture as"
+msgstr "Išsaugoti paveikslą kaip"
+
+msgid "Saved"
+msgstr "Išsaugoti"
+
+msgid "Saved filters"
+msgstr "Išsaugoti filtrai"
+
+msgid "Search for new songs on startup"
+msgstr "Paleidus programą, ieškoti naujų dainų"
+
+msgid "Search on the web"
+msgstr "Ieškoti žiniatinklyje"
+
+msgid "Search options"
+msgstr "Paieškos parinktys"
+
+msgid "Settings"
+msgstr "Nustatymai"
+
+msgid "Settings on this page will only take effect after a restart"
+msgstr ""
+"Šiame puslapyje esantys nustatymai įsigalios tik po to, kai iš naujo "
+"paleisite programą"
+
+#. Shift key
+msgctxt "Keyboard"
+msgid "Shift"
+msgstr "Shift"
+
+msgid "Show buttons"
+msgstr "Rodyti mygtukus"
+
+msgid "Show genre"
+msgstr "Rodyti žanrą"
+
+msgid "Show main window"
+msgstr "Rodyti pagrindinį langą"
+
+msgid "Show pdf pages"
+msgstr "Rodyti pdf puslapius"
+
+msgid "Show playlist"
+msgstr "Rodyti grojaraštį"
+
+msgid "Show status bar"
+msgstr "Rodyti būsenos juostą"
+
+msgid "Show tabs"
+msgstr "Rodyti korteles"
+
+msgid "Show toolbar"
+msgstr "Rodyti įrankių juostą"
+
+msgid "Show tray icon"
+msgstr "Rodyti dėklo piktogramą"
+
+msgid "Show tray tip on song change"
+msgstr "Dainai pasikeitus, rodyti dėkle užuominą"
+
+msgid "Show/Hide"
+msgstr "Rodyti/Slėpti"
+
+msgid "Show/Hide Browser"
+msgstr "Rodyti/Slėpti Naršyklę"
+
+msgid "Show/hide status bar"
+msgstr "Rodyti/Slėpti būsenos juostą"
+
+msgid "Shuffle"
+msgstr "Maišyti"
+
+msgid "Shutdown command :"
+msgstr "Išjungimo komanda:"
+
+msgid "Size"
+msgstr "Dydis"
+
+msgid "Song Properties"
+msgstr "Dainos Savybės"
+
+#, perl-brace-format
+msgid "Source: {file}"
+msgstr "Šaltinis: {file}"
+
+msgid "Start in tray"
+msgstr "Paleisti programą dėkle"
+
+msgid "Statistics"
+msgstr "Statistika"
+
+msgid "Statusbar"
+msgstr "Būsenos juosta"
+
+msgid "Stop"
+msgstr "Stabdyti"
+
+msgid "Stop after this song"
+msgstr "Stabdyti po šios dainos"
+
+msgid "Stop when queue empty"
+msgstr "Stabdyti, kuomet eilė tuščia"
+
+msgid "Summary :"
+msgstr "Suvestinė :"
+
+msgid "Sunday"
+msgstr "Sekmadienis"
+
+msgid "Switch to fullscreen mode"
+msgstr "Perjungti į viso ekrano veikseną"
+
+msgid "Tags"
+msgstr "Žymės"
+
+msgid "Themes"
+msgstr "Temos"
+
+msgid "This plugin requires :"
+msgstr "Šis papildinys reikalauja :"
+
+msgid ""
+"This plugin retrieves artist-relevant information (biography, upcoming "
+"events, similar artists) from last.fm."
+msgstr ""
+"Šis papildinys parsiunčia su atlikėju susijusią informaciją (biografiją, "
+"artėjančius įvykius, panašius atlikėjus) iš last.fm."
+
+msgid "Thursday"
+msgstr "Ketvirtadienis"
+
+msgid "Time :"
+msgstr "Laikas :"
+
+msgid "Title"
+msgstr "Pavadinimas"
+
+#, perl-format
+msgid "Title: %t"
+msgstr "Pavadinimas: %t"
+
+msgid "Toolbar"
+msgstr "Įrankių juosta"
+
+msgid "Tools"
+msgstr "Įrankiai"
+
+msgid "Track"
+msgstr "Takelis"
+
+msgid "Track Properties"
+msgstr "Takelio Savybės"
+
+msgid "Tuesday"
+msgstr "Antradienis"
+
+msgid "Turn off computer after this song"
+msgstr "Išjungti kompiuterį po šios dainos"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Unknown filter :"
+msgstr "Nežinomas filtras :"
+
+msgid "Unlock Album"
+msgstr "Atrakinti Albumą"
+
+msgid "Unlock Artist"
+msgstr "Atrakinti Atlikėją"
+
+msgid "Update tags..."
+msgstr "Atnaujinti žymes..."
+
+msgid "Use default regular expression"
+msgstr "Naudoti numatytą reguliarią išraišką"
+
+msgid "Use gstreamer"
+msgstr "Naudoti gstreamer"
+
+msgid "Use latin1 encoding if possible in id3v2 tags"
+msgstr "Jei įmanoma, id3v2 žymėse naudoti latin1 koduotę"
+
+msgid "Version"
+msgstr "Versija"
+
+msgid "Volume : "
+msgstr "Garsis : "
+
+msgid "Volume step :"
+msgstr "Garsio žingsnis :"
+
+msgid "Wednesday"
+msgstr "Trečiadienis"
+
+msgid "Wikipedia"
+msgstr "Vikipedija"
+
+#. Windows key
+msgctxt "Keyboard"
+msgid "Win"
+msgstr "Win"
+
+msgid "Year"
+msgstr "Metai"
+
+msgid "Yes"
+msgstr "Taip"
+
+msgid "advanced options"
+msgstr "išplėstinės parinktys"
+
+msgid "auto detect"
+msgstr "aptikti automatiškai"
+
+msgid "check length now"
+msgstr "tikrinti trukmę dabar"
+
+msgid "check now"
+msgstr "tikrinti dabar"
+
+msgid "command :"
+msgstr "komanda :"
+
+msgid "default folder"
+msgstr "numatytasis aplankas"
+
+msgid "error"
+msgstr "klaida"
+
+msgid "file $current/$end"
+msgstr "failas $current/$end"
+
+#, perl-brace-format
+msgid "file: {filename}"
+msgstr "failas: {filename}"
+
+msgid "gmusicbrowser"
+msgstr "gmusicbrowser"
+
+msgid "google images"
+msgstr "google vaizdai"
+
+msgid "is"
+msgstr "yra"
+
+#, perl-format
+msgid "is %s"
+msgstr "yra %s"
+
+msgid "is 44.1kHz"
+msgstr "yra 44.1kHz"
+
+msgid "is a flac file"
+msgstr "yra flac failas"
+
+msgid "is a lossless file"
+msgstr "yra nenuostolingasis failas"
+
+msgid "is a lossy file"
+msgstr "yra nuostolingasis failas"
+
+msgid "is a mp3 file"
+msgstr "yra mp3 failas"
+
+msgid "is a musepack file"
+msgstr "yra musepack failas"
+
+msgid "is a vorbis file"
+msgstr "yra vorbis failas"
+
+msgid "is a wavepack file"
+msgstr "yra wavepack failas"
+
+msgid "is an aac file"
+msgstr "yra aac failas"
+
+msgid "is an alac file"
+msgstr "yra alac failas"
+
+msgid "is an ape file"
+msgstr "yra ape failas"
+
+msgid "is an mp4/m4a file"
+msgstr "yra mp4/m4a failas"
+
+#, perl-format
+msgid "isn't %s"
+msgstr "nėra %s"
+
+msgid "last.fm"
+msgstr "last.fm"
+
+msgid "last.fm plugin"
+msgstr "last.fm papildinys"
+
+#, perl-format
+msgid "less than %s ago"
+msgstr "mažiau kaip prieš %s"
+
+#, perl-format
+msgid "more than %s ago"
+msgstr "daugiau kaip prieš %s"
+
+msgid "mplayer options :"
+msgstr "mplayer parinktys :"
+
+msgid "never"
+msgstr "niekada"
+
+msgid "no order"
+msgstr "jokios tvarkos"
+
+msgid "options"
+msgstr "parinktys"
+
+msgid "output device :"
+msgstr "išvesties įrenginys :"
+
+#, perl-brace-format
+msgid "page {number}"
+msgstr "{number} puslapis"
+
+msgid "password :"
+msgstr "slaptažodis :"
+
+msgid "port :"
+msgstr "prievadas :"
+
+msgid "quit"
+msgstr "baigti"
+
+msgid "saved filters"
+msgstr "išsaugoti filtrai"
+
+msgid "supports : "
+msgstr "palaiko :"
+
+msgid "tools"
+msgstr "įrankiai"
+
+msgid "unknown error"
+msgstr "nežinoma klaida"
+
+msgid "use default"
+msgstr "naudoti numatytą"
+
+msgid "username :"
+msgstr "vartotojo vardas :"
+
+#, perl-brace-format
+msgid "{folder} already exists"
+msgstr "{folder} jau yra"
