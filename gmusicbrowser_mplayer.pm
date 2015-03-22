@@ -16,7 +16,6 @@ use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 #$SIG{CHLD} = sub { while (waitpid(-1, WNOHANG)>0) {} };
 
 my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill,$Kill9);
-my $Error;
 my $CMDfh;
 my (%supported,$mplayer);
 my $SoftVolume;
@@ -59,23 +58,13 @@ sub VolInit
 	return Play_amixer::init();	#use methods from Play_amixer
 }
 
-sub Play
-{	(undef,$file,my$sec)=@_;
-	&Stop if $ChildPID;
-	$Error=undef;
-	#if ($ChildPID) { print $CMDfh "loadfile $file\n"; print $CMDfh "seek $sec 2\n" if $sec; return}
+sub launch_mplayer
 	#-nocache because when using the cache option it spawns a child process, which makes monitoring the mplayer process much harder
 	#-hr-mp3-seek to fix wrong time with some mp3s
-	@cmd_and_args=($mplayer,qw/-nocache -slave -novideo -nolirc -hr-mp3-seek -msglevel all=1:statusline=5/);
-	RG_set_options();
-	push @cmd_and_args, qw/-softvol -volume/, convertvolume($::Volume) if $SoftVolume;
-	warn "@cmd_and_args\n" if $::debug;
+	@cmd_and_args=($mplayer,qw/-nocache -idle -slave -novideo -nolirc -hr-mp3-seek -msglevel all=1:statusline=5:global=6/);
+	push @cmd_and_args, qw/-softvol -volume 0/ if $SoftVolume;
 	push @cmd_and_args,split / /,$::Options{mplayeroptions} if $::Options{mplayeroptions};
-	push @cmd_and_args,'-ss',$sec if $sec;
-	push @cmd_and_args,'-ac','ffwavpack' if $file=~m/\.wvc?$/;
-	push @cmd_and_args,'-ac','ffape' if $file=~m/\.ape$/;
-	push @cmd_and_args, '--',$file;
-
+	warn "@cmd_and_args\n" if $::debug;
 	pipe $OUTPUTfh,my$wfh;
 	pipe my($rfh),$CMDfh;
 	$ChildPID=fork;
@@ -91,14 +80,28 @@ sub Play
 	}
 	close $wfh; close $rfh;
 	$CMDfh->autoflush(1);
-	#print $CMDfh "LOAD $file\n";
-	#SkipTo(undef,$sec) if $sec;
-
 	$OUTPUTfh->blocking(0); #set non-blocking IO
-	warn "playing $file (pid=$ChildPID)\n" if $::Verbose;
 	$WatchTag= Glib::IO->add_watch(fileno($OUTPUTfh),'hup',\&_eos_cb);
 	$WatchTag2=Glib::IO->add_watch(fileno($OUTPUTfh),'in',\&_remotemsg);
 		#Glib::Timeout->add(500,\&_UpdateTime);
+	return 1;
+}
+
+sub Play
+{	(undef,$file,my$sec)=@_;
+	launch_mplayer() unless $ChildPID;
+	print $CMDfh "loadfile \"$file\"\n";
+	RG_set_options();
+	SetVolume(undef,$::Volume) if $SoftVolume;
+	$sec = $sec ? $sec : 0;
+	SkipTo(undef,$sec);
+	warn "playing $file (pid=$ChildPID)\n" if $::Verbose;
+}
+
+sub handle_error
+{	my $error=shift;
+	::ErrorPlay($error,_("Command used :")."\n@cmd_and_args");
+	Stop();
 }
 
 sub _eos_cb
@@ -106,14 +109,13 @@ sub _eos_cb
 	_remotemsg();#parse last lines
 	#close $OUTPUTfh;
 	if ($ChildPID && $ChildPID==waitpid($ChildPID, WNOHANG))
-	{	$Error=_"Check your audio settings" if $?;
+	{	$error=_"Check your audio settings" if $?;
 	}
 	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	Glib::Source->remove($WatchTag);
 	Glib::Source->remove($WatchTag2);
 	$WatchTag=$WatchTag2=$ChildPID=undef;
-	if ($Error) { ::ErrorPlay($Error,_("Command used :")."\n@cmd_and_args"); }
-	::end_of_file();
+	handle_error($error) if $error;
 	return 1;
 }
 
@@ -122,8 +124,9 @@ sub _remotemsg
 {	my @lines=(<$OUTPUTfh>);
 	for (reverse @lines)
 	{	if (m#^A:\s*(\d+)\.(\d) #) { ::UpdateTime( $1+($2>=5?1:0) ); return 1 }
+		if (m#^EOF code: (\d)# && ($1 != 2 && $1 !=4) ) {::end_of_file(); return 1 } # eof 4 is for mplayer2
 		# check if known error message
-		$Error=$1 if	m#(Could not open/initialize audio device)#	||
+		handle_error($1) if	m#(Could not open/initialize audio device)#	||
 				m#(Failed to open .+)#				||
 				m#(Failed to recognize file format)#;
 	}
