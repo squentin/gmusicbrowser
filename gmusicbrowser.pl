@@ -6311,17 +6311,10 @@ sub PrefAudio
 	my $vbox_gst=Gtk2::VBox->new (FALSE, 2);
 	if (exists $PlayPacks{Play_GST})
 	{	my $hbox2=NewPrefCombo(gst_sink => Play_GST->supported_sinks, text => _"output device :", sizeg1=>$sg1, sizeg2=> $sg2);
-		my $EQbut=Gtk2::Button->new(_"Open Equalizer");
-		$EQbut->signal_connect(clicked => sub { OpenSpecialWindow('Equalizer'); });
-		my $EQcheck=NewPrefCheckButton(gst_use_equalizer => _"Use Equalizer", cb=>sub { HasChanged('Equalizer'); });
-		$sg1->add_widget($EQcheck);
-		$sg2->add_widget($EQbut);
-		my $EQbox=Hpack($EQcheck,$EQbut);
-		$EQbox->set_sensitive(0) unless $PlayPacks{Play_GST} && $PlayPacks{Play_GST}{EQ};
 		my $adv2=PrefAudio_makeadv('Play_GST','gstreamer');
 		my $albox=Gtk2::Alignment->new(0,0,1,1);
 		$albox->set_padding(0,0,15,0);
-		$albox->add(Vpack($hbox2,$EQbox,$adv2));
+		$albox->add(Vpack($hbox2,$adv2));
 		$vbox_gst->pack_start($_,FALSE,FALSE,2) for $radio_gst,$albox;
 	}
 	else
@@ -6349,6 +6342,17 @@ sub PrefAudio
 	$vbox_mp ->set_sensitive($PlayPacks{Play_mplayer});
 	$usegst->set_sensitive($PlayPacks{Play_GST_server});
 
+	#equalizer
+	my $EQbut=Gtk2::Button->new(_"Open Equalizer");
+	$EQbut->signal_connect(clicked => sub { OpenSpecialWindow('Equalizer'); });
+	my $EQcheck=NewPrefCheckButton(gst_use_equalizer => _"Use Equalizer", cb=>sub { HasChanged('Equalizer'); });
+	$sg1->add_widget($EQcheck);
+	$sg2->add_widget($EQbut);
+	my $EQbox=Hpack($EQcheck,$EQbut);
+	my $eq_cb= sub { my $p=$Options{AudioOut}; $p&&=$PlayPacks{$p}; $_[0]->set_sensitive( $p && $p->{EQ} ); };
+	Watch($EQcheck, Option=> $eq_cb );
+	$eq_cb->($EQcheck);
+
 	#replaygain
 	my $rg_check= ::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain", tip=>_"Normalize volume (the files must have replaygain tags)", cb=>\&Set_replaygain );
 	my $rg_cb= sub { my $p=$Options{AudioOut}; $p&&=$PlayPacks{$p}; $_[0]->set_sensitive( $p && $p->{RG} ); };
@@ -6367,6 +6371,7 @@ sub PrefAudio
 			$vbox_123, Gtk2::HSeparator->new,
 			$vbox_mp,  Gtk2::HSeparator->new,
 			$vbox_ice, Gtk2::HSeparator->new,
+			$EQbox,
 			[$rg_check,$rg_opt,($Glib::VERSION >= 1.251 ? $rga_start : ())],
 			NewPrefCheckButton(IgnorePlayError => _"Ignore playback errors", tip=>_"Skip to next song if an error occurs"),
 		      );

@@ -32,7 +32,7 @@ sub init
 	$mplayer ||= ::first { -x $_ } map $_.::SLASH.'mplayer',  split /:/, $ENV{PATH};
 
 	return unless $mplayer;
-	return bless {RG=>1},__PACKAGE__;	#FIXME RG should be 0 if replaygain tags are disabled or if not $SoftVolume
+	return bless {RG=>1,EQ=>1},__PACKAGE__;	#FIXME RG should be 0 if replaygain tags are disabled or if not $SoftVolume
 }
 
 sub supported_formats
@@ -91,6 +91,7 @@ sub Play
 {	(undef,$file,my$sec)=@_;
 	launch_mplayer() unless $ChildPID;
 	print $CMDfh "loadfile \"$file\"\n";
+	print $CMDfh "af_add equalizer=$::Options{gst_equalizer}\n" if $::Options{gst_use_equalizer};
 	RG_set_options();
 	SetVolume(undef,$::Volume) if $SoftVolume;
 	$sec = $sec ? $sec : 0;
@@ -117,6 +118,28 @@ sub _eos_cb
 	$WatchTag=$WatchTag2=$ChildPID=undef;
 	handle_error($error) if $error;
 	return 1;
+}
+
+sub set_equalizer
+{	my (undef,$band,$val)=@_;
+	my @vals= split /:/, $::Options{gst_equalizer};
+	$vals[$band]=$val;
+	::setlocale(::LC_NUMERIC, 'C');
+	$::Options{gst_equalizer}=join ':',@vals;
+	::setlocale(::LC_NUMERIC, '');
+	print $CMDfh "af_cmdline equalizer ".$::Options{gst_equalizer}."\n";
+	::HasChanged('Equalizer','value');
+}
+
+sub EQ_Get_Range
+{	return (-12,12,'dB');
+}
+sub EQ_Get_Hz
+{	my $i=$_[1];
+	# mplayer and GST equalizers use the same bands, but they are indicated differently
+	# mplayer docs list band center frequences, GST reports band start freqs. Using GST values here for consistency
+	my @bands=(qw/29Hz 59Hz 119Hz 237Hz 474Hz 947Hz 1.9kHz 3.8kHz 7.5kHz 15.0kHz/);
+	return $bands[$i];
 }
 
 
