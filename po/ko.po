@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.20\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2014-09-06 23:14+0200\n"
-"PO-Revision-Date: 2014-10-05 17:55+0900\n"
+"POT-Creation-Date: 2015-03-25 17:35+0900\n"
+"PO-Revision-Date: 2015-03-25 17:48+0900\n"
 "Last-Translator: bluealbum@gmail.com\n"
 "Language-Team: 한국어\n"
 "Language: ko_KR\n"
@@ -28,9 +28,6 @@ msgstr "리뷰"
 msgid " of {length}"
 msgstr "/ {length}"
 
-msgid "# songs"
-msgstr "# 노래들"
-
 #, perl-format
 msgid "%S by %a"
 msgstr "%S - %a"
@@ -44,11 +41,6 @@ msgstr[0] "%d 앨범"
 msgid "%d Artist"
 msgid_plural "%d Artists"
 msgstr[0] "%d 음악가"
-
-#, perl-format
-msgid "%d Song"
-msgid_plural "%d Songs"
-msgstr[0] "%d 곡"
 
 #, perl-format
 msgid "%d Upcoming Event"
@@ -273,9 +265,6 @@ msgstr "폴더 추가"
 
 msgid "Add folder ..."
 msgstr "폴더 추가 ..."
-
-msgid "Add label"
-msgstr "라벨 추가"
 
 msgid "Add multiple condition"
 msgstr "다중 조건 추가"
@@ -859,6 +848,12 @@ msgstr "명령"
 msgid "Command to launch when the button is pressed"
 msgstr "버튼이 눌러지면 실행할 명령"
 
+msgid "Command to open folders :"
+msgstr "폴더 열기 명령 :"
+
+msgid "Command to open urls :"
+msgstr "urls 열기 명령 :"
+
 msgid "Command used :"
 msgstr "사용한 명령 :"
 
@@ -1026,6 +1021,9 @@ msgstr "파일 지우기"
 
 msgid "Delete list"
 msgstr "목록 지우기"
+
+msgid "Delete preset"
+msgstr "프리셋 지우기"
 
 msgid "Deletion failed"
 msgstr "지우기 실패함"
@@ -1506,6 +1504,18 @@ msgstr "다음의 선택한 노래"
 
 msgid "Font size"
 msgstr "글꼴 크기"
+
+msgid "For alternate ratings"
+msgstr "다른 순위"
+
+msgid "For decimal numbers"
+msgstr "십진 수"
+
+msgid "For integer numbers"
+msgstr "정수"
+
+msgid "For when values are likely to be repeated"
+msgstr "값이 반복될 가능성이 있는 경우"
 
 msgid "Forward"
 msgstr "앞으로"
@@ -2036,6 +2046,9 @@ msgstr "새 사용자 정의 필드"
 msgid "New filter"
 msgstr "새 필터"
 
+msgid "New label"
+msgstr "새 라벨"
+
 msgid "New list"
 msgstr "새 목록"
 
@@ -2256,6 +2269,9 @@ msgstr "문맥 & 대기열 패널 열기"
 msgid "Open context page"
 msgstr "문맥정보 페이지 열기"
 
+msgid "Open equalizer..."
+msgstr "이퀄라이저 열기..."
+
 msgid "Open existing list"
 msgstr "존재하는 목록 열기"
 
@@ -2331,6 +2347,9 @@ msgstr "멈춤"
 
 msgid "Per-song values"
 msgstr "노래당 값"
+
+msgid "Persistent values"
+msgstr "지속되는 값"
 
 msgid "Pick an existing one"
 msgstr "존재하는 하나를 고르기"
@@ -2738,6 +2757,9 @@ msgstr "라이브러리에서 제거하기"
 msgid "Remove from list"
 msgstr "목록에서 제거하기"
 
+msgid "Remove from persistent values"
+msgstr "지속되는 값으로부터 제거하기"
+
 msgid "Remove from playlist"
 msgstr "재생목록에서 제거하기"
 
@@ -2774,6 +2796,10 @@ msgstr "이 위젯 제거하기"
 msgid "Rename"
 msgstr "이름 바꾸기"
 
+#, perl-brace-format
+msgid "Rename '{label}'"
+msgstr "'{label}' 바꾸기"
+
 msgid "Rename File"
 msgstr "파일 이름 바꾸기"
 
@@ -2785,6 +2811,9 @@ msgstr "이 패턴을 사용해서 파일 이름 바꾸기 :"
 
 msgid "Rename folder"
 msgstr "폴더 이름 바꾸기"
+
+msgid "Rename label"
+msgstr "라벨 바꾸기"
 
 msgid "Rename this folder to :"
 msgstr "이 폴더 이름 바꾸기 :"
@@ -2834,6 +2863,9 @@ msgstr "다시 스캔"
 
 msgid "Rescan Collection"
 msgstr "수집물 다시 스캔"
+
+msgid "Reset current value if no tag found in file"
+msgstr "파일에서 태그를 찾지 못한 경우 현재 값 재설정"
 
 msgid "Reset filter"
 msgstr "필터 재설정"
@@ -2913,6 +2945,9 @@ msgstr "같은 음악가"
 msgid "Same title"
 msgstr "같은 제목"
 
+msgid "Same type as labels"
+msgstr "라벨과 같은 형식"
+
 msgid "Same year"
 msgstr "같은 연도"
 
@@ -2951,6 +2986,9 @@ msgstr "지금 저장"
 
 msgid "Save picture as"
 msgstr "사진 저장"
+
+msgid "Save preset"
+msgstr "프리셋 저장"
 
 msgid "Save review"
 msgstr "리뷰 저장"
@@ -3495,6 +3533,9 @@ msgstr "테마"
 msgid "These fields can be used :"
 msgstr "이들 필드는 사용될 수 있음 :"
 
+msgid "These values will always be in the list, even if they are not used"
+msgstr "그들이 사용되지 않더라도, 이들 값은 목록에 항상 존재할 것입니다."
+
 #, perl-brace-format
 msgid "This command is required to play files of type {type} : {cmd}"
 msgstr "이 명령어는 {type} 형식의 파일을 재생하기 위해 요청됩니다 : {cmd}"
@@ -3581,6 +3622,9 @@ msgstr "현재 노래의 라벨 토글"
 msgid "Toggle between Random/Shuffle and Ordered"
 msgstr "임의/반복 그리고 순서로 토글"
 
+msgid "Toggle edit mode"
+msgstr "편집 모드 토글"
+
 msgid "Toggle fullscreen mode"
 msgstr "전체화면 모드 토글"
 
@@ -3616,6 +3660,12 @@ msgstr "화요일"
 
 msgid "Turn Off"
 msgstr "끄기"
+
+msgid "Turn equalizer off"
+msgstr "이퀄라이저 끄기"
+
+msgid "Turn equalizer on"
+msgstr "이퀄라이저 켜기"
 
 msgid "Turn off computer after this song"
 msgstr "이 노래 후 컴퓨터 끄기"
@@ -3843,6 +3893,9 @@ msgstr "사용자 정의 명령"
 msgid "Will use default if not found"
 msgstr "찾지 못하면 기본값을 사용할 것입니다."
 
+msgid "Will use system's default if blank"
+msgstr "만약 비어 있으면 기본값을 사용할 것입니다"
+
 #. Windows key
 msgctxt "Keyboard"
 msgid "Win"
@@ -3969,9 +4022,6 @@ msgstr "알파벳 순으로"
 
 msgid "amixer control :"
 msgstr "알사 믹서 제어 :"
-
-msgid "another example"
-msgstr "다른 예"
 
 msgid "applied on reload"
 msgstr "다시 가져온 후 적용됩니다"
@@ -5082,12 +5132,20 @@ msgid "{hours}h {min}m {sec}s"
 msgstr "{hours}시 {min}분 {sec}초"
 
 #, perl-brace-format
+msgid "{hours}h{min}m{sec}s"
+msgstr "{hours}시{min}분{sec}초"
+
+#, perl-brace-format
 msgid "{min} min {sec} s"
-msgstr "{min} 분 {sec} 초"
+msgstr "{min} 분 {sec}초"
 
 #, perl-brace-format
 msgid "{min}m {sec}s"
 msgstr "{min}분 {sec}초"
+
+#, perl-brace-format
+msgid "{min}m{sec}s"
+msgstr "{min}분{sec}초"
 
 #, perl-brace-format
 msgid "{outputname} output settings"
@@ -5103,6 +5161,13 @@ msgstr "{song} / {artist}"
 
 msgid "|-separated list of widget names"
 msgstr "|-위젯 이름으로 나뉘어진 목록"
+
+#~ msgid "# songs"
+#~ msgstr "# 노래들"
+
+#~ msgid "%d Song"
+#~ msgid_plural "%d Songs"
+#~ msgstr[0] "%d 곡"
 
 #~ msgid "%n first added"
 #~ msgstr "%n 처음 추가한 시간"
@@ -5157,6 +5222,9 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 
 #~ msgid "Abort all"
 #~ msgstr "모두 중단"
+
+#~ msgid "Add label"
+#~ msgstr "라벨 추가"
 
 #~ msgid "Add to playlist"
 #~ msgstr "재생목록에 추가하기"
@@ -5303,6 +5371,9 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 
 #~ msgid "added"
 #~ msgstr "추가됨"
+
+#~ msgid "another example"
+#~ msgstr "다른 예"
 
 #~ msgid "autofill queue"
 #~ msgstr "자동채움 대기열"
@@ -5492,6 +5563,15 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 
 #~ msgid "with tabbedlists"
 #~ msgstr "탭으로된 목록 포함"
+
+#~ msgid "{hours}h {min}m {sec}s ({size}M)"
+#~ msgstr "{hours}시 {min}분 {sec}초 ({size}M)"
+
+#~ msgid "{min} min {sec} s ({size} M)"
+#~ msgstr "{min} 분 {sec} 초 ({size} M)"
+
+#~ msgid "{min}m {sec}s ({size}M)"
+#~ msgstr "{min}분 {sec}초 ({size}M)"
 
 #~ msgid ""
 #~ "{song}\n"
