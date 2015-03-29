@@ -76,6 +76,7 @@ our %Widgets=
 		stock	=> 'gtk-media-stop',
 		tip	=> _"Stop",
 		activate=> \&::Stop,
+		click2	=> 'EnqueueAction(stop)',
 		click3	=> 'SetNextAction(stop)',
 	},
 	Play =>
@@ -137,6 +138,7 @@ our %Widgets=
 		stock	=> 'gtk-quit',
 		tip	=> _"Quit",
 		activate=> \&::Quit,
+		click2	=> 'EnqueueAction(quit)',
 		click3	=> 'SetNextAction(quit)',
 	},
 	Lock	=>
@@ -160,11 +162,13 @@ our %Widgets=
 	{	parent	=> 'Lock',
 		field	=> 'first_artist',
 		tip	=> _"Lock on Artist",
+		click2	=> 'EnqueueArtist',
 	},
 	LockAlbum =>
 	{	parent	=> 'Lock',
 		field	=> 'album',
 		tip	=> _"Lock on Album",
+		click2	=> 'EnqueueAlbum',
 	},
 	Sort =>
 	{	class	=> 'Layout::Button',
