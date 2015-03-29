@@ -6349,14 +6349,14 @@ sub PrefAudio
 	$sg1->add_widget($EQcheck);
 	$sg2->add_widget($EQbut);
 	my $EQbox=Hpack($EQcheck,$EQbut);
-	my $eq_cb= sub { my $p=$Options{AudioOut}; $p&&=$PlayPacks{$p}; $_[0]->set_sensitive( $p && $p->{EQ} ); };
-	Watch($EQcheck, Option=> $eq_cb );
+	my $eq_cb= sub { $_[0]->set_sensitive( $Play_package->{EQ} ); };
+	Watch($EQcheck, AudioBackend=> $eq_cb );
 	$eq_cb->($EQcheck);
 
 	#replaygain
 	my $rg_check= ::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain", tip=>_"Normalize volume (the files must have replaygain tags)", cb=>\&Set_replaygain );
-	my $rg_cb= sub { my $p=$Options{AudioOut}; $p&&=$PlayPacks{$p}; $_[0]->set_sensitive( $p && $p->{RG} ); };
-	Watch($rg_check, Option=> $rg_cb );
+	my $rg_cb= sub { $_[0]->set_sensitive( $Play_package->{RG} ); };
+	Watch($rg_check, AudioBackend=> $rg_cb );
 	$rg_cb->($rg_check);
 	my $rga_start=Gtk2::Button->new(_"Start ReplayGain analysis");
 	$rga_start->set_tooltip_text(_"Analyse and add replaygain tags for all songs that don't have replaygain tags, or incoherent album replaygain tags");
@@ -6434,7 +6434,7 @@ sub replaygain_options_dialog
 	$songmenu->set_sensitive( $Play_GST::GST_RGA_ok );
 	# nolimiter not available with mplayer
 	my $nolimiter_update= sub { $_[0]->set_sensitive( $Options{AudioOut} ne 'Play_mplayer'); };
-	Watch($nolimiter, Option=> $nolimiter_update );
+	Watch($nolimiter, AudioBackend=> $nolimiter_update );
 	$nolimiter_update->($nolimiter);
 }
 sub Set_replaygain { $Play_package->RG_set_options() if $Play_package->can('RG_set_options'); }
@@ -6709,7 +6709,7 @@ sub PrefLibrary
 		$store->set($store->append,0,$_,1,filename_to_utf8displayname(decode_url($_))) for sort @{$Options{LibraryPath}};
 	};
 	$refresh->($store);
-	Watch($store, options => $refresh);
+	Watch($store, Option => $refresh);
 	::set_drag($treeview, dest => [::DRAG_FILE,sub
 		{	my ($treeview,$type,@list)=@_;
 			AddPath(1,@list);
@@ -6733,7 +6733,7 @@ sub PrefLibrary
 			my $s= $store->get($iter,0);
 			@{$Options{LibraryPath}}=grep $_ ne $s, @{$Options{LibraryPath}};
 		}
-		HasChanged(options=>'LibraryPath');
+		HasChanged(Option=>'LibraryPath');
 	});
 
 	my $sw= new_scrolledwindow($treeview,'etched-in');
@@ -6813,7 +6813,7 @@ sub AddPath
 		push @{$Options{LibraryPath}},$dir;
 		$changed=1;
 	}
-	HasChanged(options=>'LibraryPath') if $changed;
+	HasChanged(Option=>'LibraryPath') if $changed;
 }
 sub PrefLibrary_update_checklength_button
 {	my $button=shift;
