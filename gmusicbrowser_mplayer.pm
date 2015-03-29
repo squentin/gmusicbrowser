@@ -20,6 +20,7 @@ my $CMDfh;
 my (%supported,$mplayer);
 my $SoftVolume;
 my $GainFactor=1;
+my $playcounter;
 
 $::PlayPacks{Play_mplayer}=1; #register the package
 
@@ -59,6 +60,7 @@ sub VolInit
 }
 
 sub launch_mplayer
+{	$playcounter=0;
 	#-nocache because when using the cache option it spawns a child process, which makes monitoring the mplayer process much harder
 	#-hr-mp3-seek to fix wrong time with some mp3s
 	@cmd_and_args=($mplayer,qw/-nocache -idle -slave -novideo -nolirc -hr-mp3-seek -msglevel all=1:statusline=5:global=6/);
@@ -92,6 +94,7 @@ sub Play
 	launch_mplayer() unless $ChildPID;
 	print $CMDfh "loadfile \"$file\"\n";
 	print $CMDfh "af_add equalizer=$::Options{gst_equalizer}\n" if $::Options{gst_use_equalizer};
+	$playcounter++;
 	RG_set_options();
 	SetVolume(undef,$::Volume) if $SoftVolume;
 	$sec = $sec ? $sec : 0;
@@ -142,18 +145,21 @@ sub EQ_Get_Hz
 	return $bands[$i];
 }
 
-
 sub _remotemsg
-{	my @lines=(<$OUTPUTfh>);
-	for (reverse @lines)
-	{	if (m#^A:\s*(\d+)\.(\d) #) { ::UpdateTime( $1+($2>=5?1:0) ); return 1 }
-		if (m#^EOF code: (\d)# && ($1 != 2 && $1 !=4) ) {::end_of_file(); return 1 } # eof 4 is for mplayer2
-		# check if known error message
-		handle_error($1) if	m#(Could not open/initialize audio device)#	||
-				m#(Failed to open .+)#				||
-				m#(Failed to recognize file format)#;
+{	for (<$OUTPUTfh>)
+	{	if ($playcounter==1 && m#^A:\s*(\d+)\.(\d) #) { ::UpdateTime( $1+($2>=5?1:0) ); next }
+		warn "mplayer:$_" if $::debug;
+		if ($playcounter>0 && m#^EOF code: \d#)
+		{	::end_of_file() unless --$playcounter;
+		}
+		if (	m#^(Could not open/initialize audio device)#	||
+			m#^(Failed to open .+)#				||
+			m#^(Failed to recognize file format)#
+		   )
+		{	handle_error($1);
+			return 1;
+		}
 	}
-	warn join("mplayer:$_",'',@lines) if $::debug;
 	return 1;
 }
 
