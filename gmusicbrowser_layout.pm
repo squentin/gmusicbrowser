@@ -5423,6 +5423,7 @@ sub new
 			$vbox->pack_start($label1,0,0,0);
 			$scale=$vbox;
 		}
+		$self->{preamp_widget}=$scale;
 		$self->pack_start($scale,1,1,2);
 		$self->pack_start(Gtk2::HBox->new(0,0),1,1,2); #empty space
 	}
@@ -5455,6 +5456,7 @@ sub update
 {	my ($self,$event)=@_;
 	my $ok= $::Play_package->{EQ} && $::Options{gst_use_equalizer};
 	$self->set_sensitive($ok);
+	$self->{preamp_widget}->set_sensitive( $ok && $::Play_package->{EQpre} ) if $self->{preamp_widget};
 	if ((!$event || $event eq 'package') && $self->{labels})
 	{	my ($min,$max,$unit)= $::Play_package->{EQ} ? $::Play_package->EQ_Get_Range : (-1,1,'');
 		my $inc=abs($max-$min)/10;

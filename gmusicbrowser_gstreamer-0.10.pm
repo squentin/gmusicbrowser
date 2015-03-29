@@ -91,7 +91,7 @@ sub init
 {	my $reg=GStreamer::Registry->get_default;
 	$::Options{gst_sink}='' unless $reg->lookup_feature( ($::Options{gst_sink}||'').'sink' );
 	$::Options{gst_sink}||= (grep ($reg->lookup_feature($_.'sink'), qw/autoaudio gconfaudio pulse alsa esd oss oss4/),'autoaudio')[0]; #find a default sink
-	return bless { EQ=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
+	return bless { EQ=>$GST_EQ_ok, EQpre=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
 }
 
 sub createPlayBin
