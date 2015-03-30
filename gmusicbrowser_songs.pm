@@ -190,8 +190,8 @@ our %timespan_menu=
 				push @ids,$id;
 			}
 			#_# =	@ids==1 ? $ids[0] :
-				@ids==0 ? 0 :
-				(___group{join(" ",map sprintf("%x",$_),@ids)}||= \@ids);',
+				@ids==0 ? 1 :
+				(___group{join(" ",map sprintf("%x",$_),@ids)}||= \@ids);', # 1 for @ids==0 is the special gid for unknown artists defined in artist's init
 		'filter:m'	=> '(ref #_# ?  (.!!. grep __#mainfield#_name[$_]  =~ m"#VAL#",  @{#_#}) : (__#mainfield#_name[#_#]  .=~. m"#VAL#"))',
 		'filter:mi'	=> '(ref #_# ?  (.!!. grep __#mainfield#_iname[$_] =~ m"#VAL#"i, @{#_#}) : (__#mainfield#_iname[#_#] .=~. m"#VAL#"i))',
 		'filter:s'	=> '(ref #_# ?  (.!!. grep index( __#mainfield#_name[$_],"#VAL#") != -1, @{#_#}) : (index(__#mainfield#_name[#_#],"#VAL#") .!=. -1))',
