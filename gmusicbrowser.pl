@@ -6943,13 +6943,15 @@ sub NewPrefRadio
 }
 sub NewPrefCheckButton
 {	my ($key,$text,%opt)=@_;
-	my ($sub,$tip,$widget,$horizontal,$sizeg,$toolitem)=@opt{qw/cb tip widget horizontal sizegroup toolitem/};
+	my ($sub,$tip,$widget,$horizontal,$sizeg,$toolitem,$watch)=@opt{qw/cb tip widget horizontal sizegroup toolitem watch/};
 	my $init= $Options{$key};
 	my $check=Gtk2::CheckButton->new($text);
 	$sizeg->add_widget($check) if $sizeg;
 	$check->set_active(1) if $init;
+	Watch($check, Option=> sub { return unless $_[1] eq $key; $_[0]{busy}=1; $_[0]->set_active($Options{$key}); $_[0]{busy}=0; }) if $watch;
 	$check->signal_connect( toggled => sub
-	{	my $val=($_[0]->get_active)? 1 : 0;
+	{	return if $_[0]{busy};
+		my $val= $_[0]->get_active ? 1 : 0;
 		SetOption($_[1],$val);
 		$_[0]{dependant_widget}->set_sensitive( $_[0]->get_active )  if $_[0]{dependant_widget};
 		&$sub if $sub;
