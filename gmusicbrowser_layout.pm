@@ -5274,12 +5274,6 @@ sub new
 	return $self;
 }
 
-sub Turn_Equalizer	#FIXME should become a command
-{	my $on= $_[0] ? 1 : 0;
-	::SetOption(gst_use_equalizer=>$on);
-	::HasChanged('Equalizer');
-}
-
 sub combo_changed_cb
 {	my $self= ::find_ancestor($_[0],__PACKAGE__);
 	return if $self->{busy};
@@ -5297,20 +5291,20 @@ sub combo_changed_cb
 		{	$self->update('preset'); #reset the combobox to the current preset
 		}
 		elsif ($self->{open}   == $index) { ::OpenSpecialWindow('Equalizer'); $self->update; }
-		elsif ($self->{turnoff}== $index) { Turn_Equalizer(0); }
+		elsif ($self->{turnoff}== $index) { ::SetEqualizer(active=>0); }
 		return
 	}
-	$::Play_package->EQ_Load_Preset($current) if $current ne '';
+	::SetEqualizer(preset=>$current) if $current ne '';
 }
 sub button_cb
 {	my $self= ::find_ancestor($_[0],__PACKAGE__);
 	my $action= $_[1];
 
 	if ($action eq 'save')
-	{	$::Play_package->EQ_Save_Preset( $self->{entry}->get_text );
+	{	::SetEqualizer(preset_save=> $self->{entry}->get_text );
 	}
 	elsif ($action eq 'delete')
-	{	$::Play_package->EQ_Delete_Preset( $self->{combo}->get_active_text );
+	{	::SetEqualizer(preset_delete=> $self->{combo}->get_active_text );
 	}
 	elsif ($action eq 'toggle_mode')
 	{	$self->{editmode}= $self->{toggle}->get_active ? 1 : 0;
@@ -5320,32 +5314,29 @@ sub button_cb
 	{	$self->update_buttons;
 	}
 	elsif ($action eq 'turn_on')
-	{	Turn_Equalizer(1);
+	{	::SetEqualizer(active=>1);
 	}
 }
 
 sub update
 {	my ($self,$event)=@_;
-	my $ok= $::Play_package->{EQpresets} && $::Options{gst_use_equalizer};
-	if (!$::Play_package->{EQpresets})
+	my $ok= $::Play_package->{EQ} && $::Options{use_equalizer};
+	if (!$::Play_package->{EQ})
 	{	$self->{mainbox}->hide;
 		$self->{turnon}->hide;
 	}
-	else
-	{	if ($self->{onoff}>0)
-		{	$self->{mainbox}->set_visible($ok);
-			$self->{turnon}->set_visible(!$ok);
-		}
-		else
-		{	$self->{mainbox}->set_sensitive($ok);
-			$self->{mainbox}->show;
-			$self->{turnon}->hide;
-		}
+	elsif ($self->{onoff}>0)
+	{	$self->{mainbox}->set_visible($ok);
+		$self->{turnon}->set_visible(!$ok);
 	}
-	return unless $ok;
+	else
+	{	$self->{mainbox}->set_sensitive($ok);
+		$self->{mainbox}->show;
+		$self->{turnon}->hide;
+	}
 	my $full= !$event || $event eq 'package' || $event eq 'presetlist'; #first time or package changed or preset_list changed
 	return unless $full || $event eq 'preset';
-	my $set= $::Options{gst_equalizer_preset};
+	my $set= $::Options{equalizer_preset};
 	$set='' unless defined $set;
 
 	my $changed= $set eq ''; # not a saved preset
@@ -5364,7 +5355,7 @@ sub update
 			$combo->set_active($i);
 			$i++;
 		}
-		for my $name (::superlc_sort($::Play_package->EQ_Get_Presets))
+		for my $name (::GetPresets())
 		{	$combo->append_text($name);
 			$self->{presets}{$name}=$i;
 			$combo->set_active($i) if $name eq $set;
@@ -5397,7 +5388,7 @@ sub update_buttons
 		my $ok= $new=~m/\S/ && ($self->{changed} || !exists $self->{presets}{$new});
 		$self->{sbutton}->set_sensitive($ok);
 		my $current= $self->{combo}->get_active_text;
-		$self->{rbutton}->set_sensitive(exists $self->{presets}{$current});
+		$self->{rbutton}->set_sensitive(defined $current && exists $self->{presets}{$current});
 	}
 }
 
@@ -5415,7 +5406,7 @@ sub new
 		$scale->add_mark(1,'left',undef);
 		$self->{adj_preamp}=$adj;
 		$adj->signal_connect(value_changed =>
-			sub { $::Play_package->set_equalizer_preamp($_[0]->get_value) unless $_[0]{busy}; });
+			sub { ::SetEqualizer(preamp=>$_[0]->get_value) unless $_[0]{busy}; });
 		if ($self->{labels})
 		{	my $vbox=Gtk2::VBox->new;
 			my $label0=Gtk2::Label->new;
@@ -5439,7 +5430,7 @@ sub new
 		$scale->add_mark(0,'left',undef);
 		$self->{'adj'.$i}=$adj;
 		$adj->signal_connect(value_changed =>
-		sub { $::Play_package->set_equalizer($_[1],$_[0]->get_value) unless $_[0]{busy}; },$i);
+		sub { ::SetEqualizer($_[1],$_[0]->get_value) unless $_[0]{busy}; },$i);
 		if ($self->{labels})
 		{	my $vbox=Gtk2::VBox->new;
 			my $label0=Gtk2::Label->new;
@@ -5458,11 +5449,14 @@ sub new
 
 sub update
 {	my ($self,$event)=@_;
-	my $ok= $::Play_package->{EQ} && $::Options{gst_use_equalizer};
-	$self->set_sensitive($ok);
-	$self->{preamp_widget}->set_sensitive( $ok && $::Play_package->{EQpre} ) if $self->{preamp_widget};
-	if ((!$event || $event eq 'package') && $self->{labels})
-	{	my ($min,$max,$unit)= $::Play_package->{EQ} ? $::Play_package->EQ_Get_Range : (-1,1,'');
+	my $doall= !$event || $event eq 'package';
+	if ($doall || $event eq 'active')
+	{	my $ok= $::Play_package->{EQ} && $::Options{use_equalizer};
+		$self->set_sensitive($ok);
+		$self->{preamp_widget}->set_sensitive( $ok && $::Play_package->{EQpre} ) if $self->{preamp_widget};
+	}
+	if ($doall && $self->{labels})
+	{	my ($min,$max,$unit)= $::Play_package->{EQ} ? $::Play_package->EQ_Get_Range : (-12,12,'');
 		my $inc=abs($max-$min)/10;
 		$unit=' '.$unit if $unit;
 		$self->{unit}= $unit;
@@ -5480,20 +5474,22 @@ sub update
 			$adj->page_increment($inc);
 			delete $adj->{busy};
 		}
+		$self->queue_draw;
 	}
-	my @val= split /:/, $::Options{gst_equalizer};
-	#@val=(0)x10 unless $ok;
-	for my $i (0..9)
-	{	my $val=$val[$i];
-		my $adj=$self->{'adj'.$i};
-		$adj->{busy}=1;
-		$adj->set_value($val);
-		delete $adj->{busy};
-		next unless $self->{labels};
-		$self->{'Valuelabel'.$i}->set_markup_with_format(qq(<span size="%s">%.1f%s</span>), $self->{labels},$val,$self->{unit});
+	if ($doall || $event eq 'values')
+	{	my @val= split /:/, $::Options{equalizer};
+		for my $i (0..9)
+		{	my $val=$val[$i];
+			my $adj=$self->{'adj'.$i};
+			$adj->{busy}=1;
+			$adj->set_value($val);
+			delete $adj->{busy};
+			next unless $self->{labels};
+			$self->{'Valuelabel'.$i}->set_markup_with_format(qq(<span size="%s">%.1f%s</span>), $self->{labels},$val,$self->{unit});
+		}
 	}
-	if (my $adj= $self->{adj_preamp})
-	{	my $val= $::Options{gst_equalizer_preamp};
+	if (($doall || $event eq 'preamp') && (my $adj= $self->{adj_preamp}))
+	{	my $val= $::Options{equalizer_preamp};
 		$adj->{busy}=1;
 		$adj->set_value($val);
 		delete $adj->{busy};

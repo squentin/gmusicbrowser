@@ -21,6 +21,7 @@ my (%supported,$mplayer);
 my $SoftVolume;
 my $GainFactor=1;
 my $playcounter;
+my $EQon;
 
 $::PlayPacks{Play_mplayer}=1; #register the package
 
@@ -93,7 +94,8 @@ sub Play
 {	(undef,$file,my$sec)=@_;
 	launch_mplayer() unless $ChildPID;
 	print $CMDfh "loadfile \"$file\"\n";
-	print $CMDfh "af_add equalizer=$::Options{gst_equalizer}\n" if $::Options{gst_use_equalizer};
+	$EQon= $::Options{use_equalizer} ? 1 : 0;
+	print $CMDfh "af_add equalizer=$::Options{equalizer}\n" if $EQon;
 	$playcounter++;
 	RG_set_options();
 	SetVolume(undef,$::Volume) if $SoftVolume;
@@ -124,14 +126,14 @@ sub _eos_cb
 }
 
 sub set_equalizer
-{	my (undef,$band,$val)=@_;
-	my @vals= split /:/, $::Options{gst_equalizer};
-	$vals[$band]=$val;
-	::setlocale(::LC_NUMERIC, 'C');
-	$::Options{gst_equalizer}=join ':',@vals;
-	::setlocale(::LC_NUMERIC, '');
-	print $CMDfh "af_cmdline equalizer ".$::Options{gst_equalizer}."\n";
-	::HasChanged('Equalizer','value');
+{	my (undef,$val)=@_;
+	return unless $ChildPID;
+	return if !$EQon && $val eq '0:0:0:0:0:0:0:0:0:0';
+	# should be able to do either af_add or af_cmdline, but for some reason af_add doesn't
+	# set the equalizer, so do either af_add+af_cmdline or af_cmdline
+	print $CMDfh "af_add equalizer $val\n" unless $EQon;
+	print $CMDfh "af_cmdline equalizer $val\n";
+	$EQon=1;
 }
 
 sub EQ_Get_Range
@@ -249,11 +251,11 @@ sub convertvolume	#convert a linear volume to cubic volume scale and apply $Gain
 
 sub RG_set_options
 {	return unless $SoftVolume;
-	if (defined($::PlayingID) && $::Options{gst_use_replaygain})
+	if (defined($::PlayingID) && $::Options{use_replaygain})
 	{	my ($gain1,$gain2,$peak1,$peak2)= Songs::Get($::PlayingID, qw/replaygain_track_gain replaygain_album_gain replaygain_track_peak replaygain_album_peak/);
-		($gain1,$gain2,$peak1,$peak2)= ($gain2,$gain1,$peak1,$peak2) if $::Options{gst_rg_albummode};
-		my $gain= ::first { $_ ne '' } $gain1, $gain2, $::Options{gst_rg_fallback};
-		$gain+= $::Options{gst_rg_preamp};
+		($gain1,$gain2,$peak1,$peak2)= ($gain2,$gain1,$peak1,$peak2) if $::Options{rg_albummode};
+		my $gain= ::first { $_ ne '' } $gain1, $gain2, $::Options{rg_fallback};
+		$gain+= $::Options{rg_preamp};
 		$GainFactor= 10**($gain/20);
 		my $peak= $peak1 || $peak2 || 1;
 		my $invpeak= 1/$peak;

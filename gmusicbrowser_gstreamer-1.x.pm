@@ -97,7 +97,7 @@ sub init
 {	my $reg= GStreamer1::Registry::get();
 	$::Options{gst_sink}='' unless $reg->lookup_feature( ($::Options{gst_sink}||'').'sink' );
 	$::Options{gst_sink}||= (grep ($reg->lookup_feature($_.'sink'), qw/autoaudio pulse alsa oss oss4/),'autoaudio')[0]; #find a default sink
-	return bless { EQ=>$GST_EQ_ok, EQpresets=>$GST_EQ_ok, EQpre=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
+	return bless { EQ=>$GST_EQ_ok, EQpre=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
 }
 
 
@@ -203,18 +203,18 @@ sub init_sink
 	unless ($sink) { ::ErrorPlay( ::__x(_"Can't create sink '{sink}'", sink => $::Options{gst_sink}) );return }
 
 	my @elems;
-	$sink->{EQ}= $GST_EQ_ok && $::Options{gst_use_equalizer};
+	$sink->{EQ}= $GST_EQ_ok && $::Options{use_equalizer};
 	if ($sink->{EQ})
 	{	my $preamp=   GStreamer1::ElementFactory::make('volume' => 'equalizer-preamp');
 		my $equalizer=GStreamer1::ElementFactory::make('equalizer-10bands' => 'equalizer');
-		my @val= split /:/, $::Options{gst_equalizer};
+		my @val= split /:/, $::Options{equalizer};
 		::setlocale(::LC_NUMERIC, 'C');
 		$equalizer->set( 'band'.$_ => $val[$_]) for 0..9;
-		$preamp->set( volume => $::Options{gst_equalizer_preamp}**3);
+		$preamp->set( volume => $::Options{equalizer_preamp}**3);
 		::setlocale(::LC_NUMERIC, '');
 		push @elems,$preamp,$equalizer;
 	}
-	$sink->{RG}= $GST_RG_ok && $::Options{gst_use_replaygain};
+	$sink->{RG}= $GST_RG_ok && $::Options{use_replaygain};
 	if ($sink->{RG})
 	{	my ($rgv,$rgl,$ac,$ar)=	map GStreamer1::ElementFactory::make($_=>$_),
 				qw/rgvolume rglimiter audioconvert audioresample/;
@@ -272,8 +272,8 @@ sub Play
 	my $sink= $self->{sink};
 	my $keep= $sink && $self->check_sink;
 	if ($keep)
-	{	my $useEQ= $GST_EQ_ok && $::Options{gst_use_equalizer};
-		my $useRG= $GST_RG_ok && $::Options{gst_use_replaygain};
+	{	my $useEQ= $GST_EQ_ok && $::Options{use_equalizer};
+		my $useRG= $GST_RG_ok && $::Options{use_replaygain};
 		$keep=0 if $sink->{EQ} xor $useEQ;
 		$keep=0 if $sink->{RG} xor $useRG;
 		$keep=0 if $self->{modif}; #advanced options changed
@@ -405,67 +405,45 @@ sub VolumeChanged
 
 sub set_equalizer_preamp
 {	my ($self,$volume)=@_;
-	my $preamp= $self->{playbin}->get_by_name('equalizer-preamp');
+	my $preamp= $self->{playbin} && $self->{playbin}->get_by_name('equalizer-preamp');
 	$preamp->set( volume => $volume**3) if $preamp;
-	$::Options{gst_equalizer_preamp}=$volume;
-	::HasChanged('Equalizer','preamp');
 }
 sub set_equalizer
-{	my ($self,$band,$val)=@_;
-	my $equalizer= $self->{playbin}->get_by_name('equalizer');
-	$equalizer->set( 'band'.$band => $val) if $equalizer;
-	my @vals= split /:/, $::Options{gst_equalizer};
-	$vals[$band]=$val;
-	::setlocale(::LC_NUMERIC, 'C');
-	$::Options{gst_equalizer}=join ':',@vals;
-	::setlocale(::LC_NUMERIC, '');
-	::HasChanged('Equalizer','value');
-	$::Options{gst_equalizer_preset}='';
-	::HasChanged('Equalizer','preset');
+{	my ($self,$values)=@_;
+	my $equalizer= $self->{playbin} && $self->{playbin}->get_by_name('equalizer');
+	return unless $equalizer;
+	my @vals= split /:/,$values;
+	$equalizer->set( 'band'.$_ => $vals[$_] ) for 0..9;
 }
 
-sub get_equalizer
-{	my $self=shift;
-	return $self->{playbin} && $self->{playbin}->get_by_name('equalizer') || GStreamer1::ElementFactory::make('equalizer-10bands' => 'equalizer');
+sub _throwaway_equalizer #return false if option to sync is disabled
+{	$::Options{gst_sync_EQpresets} && GStreamer1::ElementFactory::make('equalizer-10bands' => 'equalizer');
 }
-sub EQ_Get_Presets
-{	my $self=shift;
-	my $equalizer= $self->get_equalizer;
-	my $presets=$equalizer->get_preset_names;
-	return @$presets;
-}
-sub EQ_Load_Preset
-{	my ($self,$name)=@_;
-	my $equalizer= $self->get_equalizer;
-	$equalizer->load_preset($name);
-	$::Options{gst_equalizer_preset}=$name;
-	::setlocale(::LC_NUMERIC, 'C');
-	$::Options{gst_equalizer}= join ":",map $equalizer->get('band'.$_), 0..9;
-	::setlocale(::LC_NUMERIC, '');
-	::HasChanged('Equalizer','value');
-	::HasChanged('Equalizer','preset');
+sub EQ_Import_Presets
+{	my $equalizer= _throwaway_equalizer;
+	return unless $equalizer;
+	my $new;
+	for my $name (@{ $equalizer->get_preset_names })
+	{	next if $::Options{equalizer_presets}{$name}; #ignore if one by that name already exist
+		$new++;
+		$equalizer->load_preset($name);
+		$::Options{equalizer_presets}{$name}= join ':',map $equalizer->get('band'.$_), 0..9;
+	}
+	::HasChanged('Equalizer','presetlist') if $new;
 }
 sub EQ_Save_Preset
-{	my ($self,$name)=@_;
-	my $equalizer= $self->get_equalizer;
-	my @val= split /:/, $::Options{gst_equalizer};
-	::setlocale(::LC_NUMERIC, 'C');
-	$equalizer->set( 'band'.$_ => $val[$_]) for 0..9;
-	::setlocale(::LC_NUMERIC, '');
-	$equalizer->save_preset($name);
-	$::Options{gst_equalizer_preset}=$name;
-	::HasChanged('Equalizer','presetlist');
-	::HasChanged('Equalizer','preset');
+{	my (undef,$name,$values)=@_;
+	my $equalizer= _throwaway_equalizer;
+	return unless $equalizer;
+	if ($values)
+	{	my @vals= split /:/,$values;
+		$equalizer->set( 'band'.$_ => $vals[$_]) for 0..9;
+		$equalizer->save_preset($name);
+	}
+	else
+	{	$equalizer->delete_preset($name)
+	}
 }
-sub EQ_Delete_Preset
-{	my ($self,$name)=@_;
-	my $equalizer= $self->get_equalizer;
-	$equalizer->delete_preset($name);
-	$::Options{gst_equalizer_preset}='';
-	::HasChanged('Equalizer','presetlist');
-	::HasChanged('Equalizer','preset');
-}
-
 
 sub EQ_Get_Range
 {	my $self=shift;
@@ -504,10 +482,10 @@ sub RG_set_options
 	$rgv||=$playbin->get_by_name('rgvolume');
 	$rgl||=$playbin->get_by_name('rglimiter');
 	return unless $rgv && $rgl;
-	$rgl->set(enabled	=> $::Options{gst_rg_limiter});
-	$rgv->set('album-mode'	=> !!$::Options{gst_rg_albummode});
-	$rgv->set('pre-amp'	=> $::Options{gst_rg_preamp}||0);
-	$rgv->set('fallback-gain'=>$::Options{gst_rg_fallback}||0);
+	$rgl->set(enabled	=> $::Options{rg_limiter});
+	$rgv->set('album-mode'	=> !!$::Options{rg_albummode});
+	$rgv->set('pre-amp'	=> $::Options{rg_preamp}||0);
+	$rgv->set('fallback-gain'=>$::Options{rg_fallback}||0);
 	#$rgv->set(headroom => $::Options{gst_rg_headroom}||0);
 }
 
@@ -520,6 +498,9 @@ sub AdvancedOptions
 
 	my $monitor_volume= ::NewPrefCheckButton(gst_monitor_pa_volume => _("Monitor the pulseaudio volume").' '._("(unstable)"), cb=> $modif_cb, tip=>_"Makes gmusicbrowser monitor its pulseaudio volume, so that external changes to its volume are known.");
 	$vbox->pack_start($monitor_volume,::FALSE,::FALSE,2);
+
+	my $sync_EQpresets= ::NewPrefCheckButton(gst_sync_EQpresets => _"Synchronize equalizer presets", cb=> sub { EQ_Import_Presets(); $modif_cb->() }, tip=>_"Imports gstreamer presets, and synchronize modifications made with gmusicbrowser");
+	$vbox->pack_start($sync_EQpresets,::FALSE,::FALSE,2);
 
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $custom= ::NewPrefEntry(gst_custom => _"Custom pipeline", cb=>$modif_cb, sizeg1 => $sg1, expand => 1, tip => _"Insert this pipeline before the audio sink", history => 'gst_custom_history');
@@ -860,7 +841,7 @@ sub init
 		warn "gstreamer plugin '$feature' not found -> gstreamer-server mode not available\n";
 	}
 	return unless $ok;
-	return bless { EQ=>$GST_EQ_ok, EQpresets=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
+	return bless { EQ=>$GST_EQ_ok, visuals => $GST_visuals_ok, RG=>$GST_RG_ok },__PACKAGE__;
 }
 
 sub Close

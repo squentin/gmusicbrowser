@@ -243,8 +243,8 @@ sub Play
 	#my ($ext)=$file=~m/\.([^.]*)$/; warn $ext;
 	#::ErrorPlay('not supported') and return undef  unless $Plugins{$ext};
 	my $keep= $Sink && $package->check_sink;
-	my $useEQ= $GST_EQ_ok && $::Options{gst_use_equalizer};
-	my $useRG= $GST_RG_ok && $::Options{gst_use_replaygain};
+	my $useEQ= $GST_EQ_ok && $::Options{use_equalizer};
+	my $useRG= $GST_RG_ok && $::Options{use_replaygain};
 	$keep=0 if $Sink->{EQ} xor $useEQ;
 	$keep=0 if $Sink->{RG} xor $useRG;
 	$keep=0 if $package->{modif}; #advanced options changed
@@ -267,10 +267,10 @@ sub Play
 		if ($useEQ)
 		{	my $preamp=GStreamer::ElementFactory->make('volume' => 'equalizer-preamp');
 			my $equalizer=GStreamer::ElementFactory->make('equalizer-10bands' => 'equalizer');
-			my @val= split /:/, $::Options{gst_equalizer};
+			my @val= split /:/, $::Options{equalizer};
 			::setlocale(::LC_NUMERIC, 'C');
 			$equalizer->set( 'band'.$_ => $val[$_]) for 0..9;
-			$preamp->set( volume => $::Options{gst_equalizer_preamp}**3);
+			$preamp->set( volume => $::Options{equalizer_preamp}**3);
 			::setlocale(::LC_NUMERIC, '');
 			push @elems,$preamp,$equalizer;
 		}
@@ -329,21 +329,15 @@ sub set_file
 
 sub set_equalizer_preamp
 {	my (undef,$volume)=@_;
-	my $preamp=$PlayBin->get_by_name('equalizer-preamp');
+	my $preamp= $PlayBin && $PlayBin->get_by_name('equalizer-preamp');
 	$preamp->set( volume => $volume**3) if $preamp;
-	$::Options{gst_equalizer_preamp}=$volume;
-	::HasChanged('Equalizer','preamp');
 }
 sub set_equalizer
-{	my (undef,$band,$val)=@_;
-	my $equalizer=$PlayBin->get_by_name('equalizer');
-	$equalizer->set( 'band'.$band => $val) if $equalizer;
-	my @vals= split /:/, $::Options{gst_equalizer};
-	$vals[$band]=$val;
-	::setlocale(::LC_NUMERIC, 'C');
-	$::Options{gst_equalizer}=join ':',@vals;
-	::setlocale(::LC_NUMERIC, '');
-	::HasChanged('Equalizer','value');
+{	my (undef,$values)=@_;
+	my $equalizer= $PlayBin && $PlayBin->get_by_name('equalizer');
+	return unless $equalizer;
+	my @vals= split /:/,$values;
+	$equalizer->set( 'band'.$_ => $vals[$_]) for 0..9;
 }
 sub EQ_Get_Range
 {	createPlayBin() unless $PlayBin;
@@ -487,10 +481,10 @@ sub RG_set_options
 	$rgv||=$PlayBin->get_by_name('rgvolume');
 	$rgl||=$PlayBin->get_by_name('rglimiter');
 	return unless $rgv && $rgl;
-	$rgl->set(enabled	=> $::Options{gst_rg_limiter});
-	$rgv->set('album-mode'	=> !!$::Options{gst_rg_albummode});
-	$rgv->set('pre-amp'	=> $::Options{gst_rg_preamp}||0);
-	$rgv->set('fallback-gain'=>$::Options{gst_rg_fallback}||0);
+	$rgl->set(enabled	=> $::Options{rg_limiter});
+	$rgv->set('album-mode'	=> !!$::Options{rg_albummode});
+	$rgv->set('pre-amp'	=> $::Options{rg_preamp}||0);
+	$rgv->set('fallback-gain'=>$::Options{rg_fallback}||0);
 	#$rgv->set(headroom => $::Options{gst_rg_headroom}||0);
 }
 

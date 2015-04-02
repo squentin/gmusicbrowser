@@ -78,8 +78,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1014',
- VERSIONSTRING => '1.1.14',
+ VERSION => '1.101401',
+ VERSIONSTRING => '1.1.14.1',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 
@@ -1101,14 +1101,31 @@ our %Options=
 #	Device		=> 'default',
 #	amixerSMC	=> 'PCM',
 #	gst_sink	=> 'alsa',
-	gst_use_equalizer=>0,
-	gst_equalizer	=> '0:0:0:0:0:0:0:0:0:0',
-	gst_equalizer_preamp => 1,
-	gst_use_replaygain=>1,
-	gst_rg_limiter	=> 1,
-	gst_rg_preamp	=> 0,
-	gst_rg_fallback	=> 0,
+	use_equalizer	=> 0,
+	equalizer	=> '0:0:0:0:0:0:0:0:0:0',
+	equalizer_presets => #taken from gstreamer equalizer plugin
+	{ ballad	=> '4:3.75:2.5:0:-4:-6:-3:0:2.5:9',
+	  classic	=> '0:0:0:0:0:0:-6:-7:-7:-9.5',
+	  club		=> '0:0:8:6:5.5:5:3:0:0:0',
+	  dance		=> '9.6:7:2.5:0:0:-5.6:-7:-7:0:0',
+	  party		=> '7:7:0:0:0:0:0:0:7:7',
+	  pop		=> '-1.6:4.5:7:8:5.6:0:-2.5:-2:-1.6:-1.5',
+	  reggae	=> '0:0:0:-5.5:0:6.5:6.5:0:0:0',
+	  rock		=> '8:5:-5.5:-8:-3:4:8:11:11:11.5',
+	  ska		=> '-2.5:-5:-4:0:4:5.5:8:9:11:9',
+	  soft		=> '5:1.5:0:-2.5:0:4:8:9:11:12',
+	  techno	=> '8:5.5:0:-5.5:-5:0:8:10:10:9',
+	  "more bass"	=> '-8:10:10:5.5:1.5:-4:-8:-10:-11:-11',
+	  "more treble"	=> '-10:-10:-10:-4:2.5:11:12:12:12:12',
+	  "more bass and treble" => '8:5.5:0:-7:-5:1.5:8:11.2:12:12',
+	},
+	equalizer_preamp=> 1,
+	use_replaygain	=> 1,
+	rg_limiter	=> 1,
+	rg_preamp	=> 0,
+	rg_fallback	=> 0,
 	gst_rg_songmenu => 0,
+	gst_sync_EQpresets=>1,
 	use_GST_for_server=>1,
 	Icecast_port	=> '8000',
 	UseTray		=> 1,
@@ -1407,6 +1424,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	MenuQueue	=> [sub { PopupContextMenu(\@Layout::MenuQueue,{ID=>$SongID, usemenupos=>1}); }, _"Popup queue menu"],
 	ReloadLayouts	=> [ \&Layout::InitLayouts, _"Re-load layouts", ],
 	ChooseSongFromAlbum=> [sub {my $ID= $_[0] ? GetSelID($_[0]) : $::SongID; ChooseSongsFromA( Songs::Get_gid($ID,'album'),nocover=>1 ); }, ],
+	SetEqualizer	=> [sub { SetEqualizer(smart=>$_[1]) }, _"Set equalizer", _"pre-set name or 10 numbers between 12 and -12 (-24 for gstreamer) separated by ':', or 0 (for off), or 1 (for on)"],
 );
 
 sub run_command
@@ -1976,6 +1994,76 @@ sub GetMute
 {	$Vol_package->GetMute;
 }
 
+sub SetEqualizer
+{	my ($key,$value)=@_;
+	my ($eq,$preset,$preamp);
+	my $on_off;
+	if ($key eq 'smart') #for SetEqualizer command
+	{	if ($value=~m/^[01]$/) { $key='active' }
+		elsif (exists $::Options{equalizer_presets}{$value}) {$key='preset'}
+		elsif ($value=~m#^(?:(?:-?\d*\.?\d+):){9}(?:-?\d*\.?\d+)$#) {$key='set'}
+		else { warn "SetEqualizer: invalid argument : $value\n" }
+	}
+	if ($key eq 'active')
+	{	::SetOption(use_equalizer => $value ? 1 : 0);
+		$eq= $value ? $::Options{equalizer} : '0:0:0:0:0:0:0:0:0:0';
+		$preamp= $value ? $::Options{equalizer_preamp} : 1;
+		$on_off=1; # set equalizer values and preamp without changing $options
+	}
+	elsif ($key eq 'set' && $value=~m#^(?:(?:-?\d*\.?\d+):){9}(?:-?\d*\.?\d+)$#)
+	{	$eq= $value;
+		$preset='';
+	}
+	elsif ($key eq 'preamp')
+	{	$preamp= $value;
+	}
+	elsif ($key eq 'preset' && exists $::Options{equalizer_presets}{$value})
+	{	$eq= $::Options{equalizer_presets}{$value};
+		$preset= $value;
+	}
+	elsif ($key eq 'preset_save' && $value=~m/\S/)
+	{	$::Options{equalizer_presets}{$value}= $::Options{equalizer};
+		$::Play_package->EQ_Save_Preset($value,$::Options{equalizer}) if $::Play_package->can('EQ_Save_Preset');
+		::HasChanged(Equalizer=>'presetlist');
+		$preset= $value;
+	}
+	elsif ($key eq 'preset_delete')
+	{	delete $::Options{equalizer_presets}{$value};
+		$::Play_package->EQ_Save_Preset($value) if $::Play_package->can('EQ_Save_Preset');
+		::HasChanged(Equalizer=>'presetlist');
+		$preset='';
+	}
+	elsif ($key=~m/^[0-9]$/) #$key is band number 0..9
+	{	my @vals= split /:/, $::Options{equalizer};
+		$vals[$key]=$value;
+		::setlocale(::LC_NUMERIC, 'C');
+		$eq= join ':',@vals;
+		::setlocale(::LC_NUMERIC, '');
+		$preset='';
+	}
+	else {return}
+	unless ($on_off)
+	{	$::Options{equalizer}= $eq if $eq;
+		$::Options{equalizer_preamp}= $preamp if defined $preamp;
+		$::Options{equalizer_preset}= $preset if defined $preset;
+	}
+	if ($::Options{use_equalizer} || $on_off)
+	{	$::Play_package->set_equalizer($eq)		if $eq			&& $::Play_package->{EQ};
+		$::Play_package->set_equalizer_preamp($preamp)	if defined $preamp	&& $::Play_package->{EQpre};
+	}
+	if ($on_off)
+	{	::HasChanged(Equalizer=>'active')
+	}
+	else
+	{	::HasChanged(Equalizer=>'values') if $eq;
+		::HasChanged(Equalizer=>'preamp') if defined $preamp;
+		::HasChanged(Equalizer=>'preset') if defined $preset;
+	}
+}
+sub GetPresets
+{	return ::superlc_sort(keys %{$::Options{equalizer_presets}});
+}
+
 sub FirstTime
 {	#Default filters
 	$Options{SavedFilters}=
@@ -2226,6 +2314,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		if ($oldversion<1.1007) { for my $re (@{$Options{Artists_split_re}}) { $re='\s*,\s+' if $re eq '\s*,\s*'; } }
 		if ($oldversion<1.1008) { my $d=$Options{TrayTipDelay}||0; $Options{TrayTipDelay}= $d==1 ? 900 : $d; }
 		if ($Options{Labels}) { $Options{Fields_options}{label}{persistent_values}= delete $Options{Labels} }
+		if ($oldversion<=1.1014) { $Options{$_}= delete $Options{"gst_$_"} for qw/equalizer use_equalizer equalizer_preset equalizer_preamp use_replaygain rg_albummode rg_fallback rg_preamp rg_limiter/; }
 
 		Post_Options_init();
 
@@ -2738,6 +2827,7 @@ sub SwitchPlayPackage
 	$Play_package->Open if $Play_package->can('Open');
 	$Vol_package=$Play_package;
 	$Vol_package=$Play_package->VolInit||$Play_package if $Play_package->can('VolInit');
+	$Play_package->EQ_Import_Presets if $Play_package->can('EQ_Import_Presets');
 	HasChanged('AudioBackend');
 	HasChanged('Equalizer','package');
 	HasChanged('Vol');
@@ -6345,7 +6435,7 @@ sub PrefAudio
 	#equalizer
 	my $EQbut=Gtk2::Button->new(_"Open Equalizer");
 	$EQbut->signal_connect(clicked => sub { OpenSpecialWindow('Equalizer'); });
-	my $EQcheck=NewPrefCheckButton(gst_use_equalizer => _"Use Equalizer", cb=>sub { HasChanged('Equalizer'); });
+	my $EQcheck=NewPrefCheckButton(use_equalizer => _"Use Equalizer", watch=>1, cb=>sub { SetEqualizer(active=>$::Options{use_equalizer}); });
 	$sg1->add_widget($EQcheck);
 	$sg2->add_widget($EQbut);
 	my $EQbox=Hpack($EQcheck,$EQbut);
@@ -6354,7 +6444,7 @@ sub PrefAudio
 	$eq_cb->($EQcheck);
 
 	#replaygain
-	my $rg_check= ::NewPrefCheckButton(gst_use_replaygain => _"Use ReplayGain", tip=>_"Normalize volume (the files must have replaygain tags)", cb=>\&Set_replaygain );
+	my $rg_check= ::NewPrefCheckButton(use_replaygain => _"Use ReplayGain", tip=>_"Normalize volume (the files must have replaygain tags)", cb=>\&Set_replaygain );
 	my $rg_cb= sub { $_[0]->set_sensitive( $Play_package->{RG} ); };
 	Watch($rg_check, AudioBackend=> $rg_cb );
 	$rg_cb->($rg_check);
@@ -6422,12 +6512,12 @@ sub replaygain_options_dialog
 	$RG_dialog->signal_connect(destroy => sub {$RG_dialog=undef});
 	$RG_dialog->signal_connect(response =>sub {$_[0]->destroy});
 	my $songmenu=::NewPrefCheckButton(gst_rg_songmenu => _("Show replaygain submenu").($Glib::VERSION >= 1.251 ? '' : ' '._"(unstable)"));
-	my $albummode=::NewPrefCheckButton(gst_rg_albummode => _"Album mode", cb=>\&Set_replaygain, tip=>_"Use album normalization instead of track normalization");
-	my $nolimiter=::NewPrefCheckButton(gst_rg_limiter => _"Hard limiter", cb=>\&Set_replaygain, tip=>_"Used for clipping prevention");
+	my $albummode=::NewPrefCheckButton(rg_albummode => _"Album mode", cb=>\&Set_replaygain, tip=>_"Use album normalization instead of track normalization");
+	my $nolimiter=::NewPrefCheckButton(rg_limiter => _"Hard limiter", cb=>\&Set_replaygain, tip=>_"Used for clipping prevention");
 	my $sg1=Gtk2::SizeGroup->new('horizontal');
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
-	my $preamp=	::NewPrefSpinButton('gst_rg_preamp',   -60,60, cb=>\&Set_replaygain, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"pre-amp : %d dB", tip=>_"Extra gain");
-	my $fallback=	::NewPrefSpinButton('gst_rg_fallback', -60,60, cb=>\&Set_replaygain, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"fallback-gain : %d dB", tip=>_"Gain for songs missing replaygain tags");
+	my $preamp=	::NewPrefSpinButton('rg_preamp',   -60,60, cb=>\&Set_replaygain, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"pre-amp : %d dB", tip=>_"Extra gain");
+	my $fallback=	::NewPrefSpinButton('rg_fallback', -60,60, cb=>\&Set_replaygain, digits=>1, rate=>.1, step=>.1, sizeg1=>$sg1, sizeg2=>$sg2, text=>_"fallback-gain : %d dB", tip=>_"Gain for songs missing replaygain tags");
 	$RG_dialog->vbox->pack_start($_,0,0,2) for $albummode,$preamp,$fallback,$nolimiter,$songmenu;
 	$RG_dialog->show_all;
 
