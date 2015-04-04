@@ -6044,11 +6044,10 @@ sub SongArray_changed_cb
 	elsif ($action eq 'remove')
 	{	if (@$songarray)
 		{	my $rows=$extra[0];
-			vec($$selected,$#$songarray,1)||=0;
+			vec($$selected,@$rows+$#$songarray,1)||=0; 	#make sure $$selected has a value for every row, unlike $songarray $selected is not yet updated, so its last_row= @$rows+$#$songarray
 			my $string=unpack 'b*',$$selected;
 			for my $s ($string,@{ $self->buildexpstate })
-			{	my $l= length $s;  # $s might not cover all the rows, there are only 0s after the end of $s, they can be ignored
-				substr($s,$_,1,'') for grep $_<=$l, reverse @$rows;
+			{	substr($s,$_,1,'') for reverse @$rows;
 			}
 			$$selected=pack 'b*',$string;
 			for my $refrow ($self->{lastclick},$self->{startgrow})
