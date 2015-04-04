@@ -6047,7 +6047,8 @@ sub SongArray_changed_cb
 			vec($$selected,$#$songarray,1)||=0;
 			my $string=unpack 'b*',$$selected;
 			for my $s ($string,@{ $self->buildexpstate })
-			{	substr($s,$_,1,'') for reverse @$rows;
+			{	my $l= length $s;  # $s might not cover all the rows, there are only 0s after the end of $s, they can be ignored
+				substr($s,$_,1,'') for grep $_<=$l, reverse @$rows;
 			}
 			$$selected=pack 'b*',$string;
 			for my $refrow ($self->{lastclick},$self->{startgrow})
