@@ -3285,6 +3285,10 @@ my @need_update;
 my $init;
 my %Presence;
 
+INIT
+{ ::Watch(undef, SongsRemoved	=> \&SongsRemoved_cb);
+}
+
 sub DESTROY
 {	my $self=$_[0];
 	@list_of_SongArray= grep defined, @list_of_SongArray;
@@ -3340,8 +3344,8 @@ sub save_to_string
 
 sub GetName {undef}
 
-sub RemoveIDsFromAll		#could probably be improved
-{	my $IDs_toremove=$_[0];
+sub SongsRemoved_cb		#could probably be improved
+{	my (undef,$IDs_toremove)=@_;
 	my $isin='';
 	vec($isin,$_,1)=1 for @$IDs_toremove;
 	for my $self (grep defined, @list_of_SongArray)

@@ -5658,10 +5658,8 @@ sub SongsRemove
 	Filter::clear_cache();
 	for my $ID (@$IDs, map("L$_", @$IDs)) { $::Editing{$ID}->destroy if exists $::Editing{$ID};}
 	AA::IDs_Changed();
-	SongArray::RemoveIDsFromAll($IDs);
-	$RecentPos-- while $RecentPos && $Recent->[$RecentPos-1]!=$SongID; #update RecentPos if needed
-
 	HasChanged(SongsRemoved=>$IDs);
+	$RecentPos-- while $RecentPos && $Recent->[$RecentPos-1]!=$SongID; #update RecentPos if needed
 	Songs::AddMissing($IDs);
 }
 sub UpdateMasterFilter
