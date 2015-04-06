@@ -464,7 +464,7 @@ $HTTP_module=	-e $DATADIR.SLASH.'simple_http_wget.pm' && (grep -x $_.SLASH.'wget
  }
 
  # load non-gstreamer backend modules
- for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_server.pm/)
+ for my $file (qw/gmusicbrowser_123.pm gmusicbrowser_mplayer.pm gmusicbrowser_mpv.pm gmusicbrowser_server.pm/)
  {	eval { require $file } || warn $@;	#each file sets $::PlayPacks{PACKAGENAME} to 1 for each of its included playback packages
  }
 
@@ -1581,7 +1581,7 @@ LoadIcons();
 
 {	my $pp=$Options{AudioOut};
 	$pp= $Options{use_GST_for_server} ? 'Play_GST_server' : 'Play_Server' if $CmdLine{server};
-	for my $p ($pp, qw/Play_GST Play_123 Play_mplayer Play_GST_server Play_Server/)
+	for my $p ($pp, qw/Play_GST Play_123 Play_mplayer Play_mpv Play_GST_server Play_Server/)
 	{	next unless $p && $PlayPacks{$p};
 		$pp=$p;
 		last;
@@ -6386,10 +6386,11 @@ sub PrefAudio
 	my $sg2=Gtk2::SizeGroup->new('horizontal');
 	my $gst_string="gstreamer";
 	$gst_string.= ' '.$::gstreamer_version if $::gstreamer_version;
-	my ($radio_gst,$radio_123,$radio_mp,$radio_ice)=NewPrefRadio('AudioOut',
+	my ($radio_gst,$radio_123,$radio_mp,$radio_mpv,$radio_ice)=NewPrefRadio('AudioOut',
 		[ $gst_string		=> 'Play_GST',
 		  'mpg123/ogg123/...'	=> 'Play_123',
 		  mplayer		=> 'Play_mplayer',
+		  mpv			=> 'Play_mpv',
 		  _"icecast server"	=> sub {$Options{use_GST_for_server}? 'Play_GST_server' : 'Play_Server'},
 		], cb=>sub
 		{	my $p=$Options{AudioOut};
@@ -6433,10 +6434,16 @@ sub PrefAudio
 	my $adv4=PrefAudio_makeadv('Play_mplayer','mplayer');
 	$vbox_mp->pack_start($_,FALSE,FALSE,2) for $radio_mp,$adv4;
 
+	#mpv
+	my $vbox_mpv=Gtk2::VBox->new(FALSE, 2);
+	my $advmpv=PrefAudio_makeadv('Play_mpv','mpv');
+	$vbox_mpv->pack_start($_,FALSE,FALSE,2) for $radio_mpv,$advmpv;
+
 	$vbox_123->set_sensitive($PlayPacks{Play_123});
 	$vbox_gst->set_sensitive($PlayPacks{Play_GST});
 	$vbox_ice->set_sensitive($PlayPacks{Play_Server});
 	$vbox_mp ->set_sensitive($PlayPacks{Play_mplayer});
+	$vbox_mpv->set_sensitive($PlayPacks{Play_mpv});
 	$usegst->set_sensitive($PlayPacks{Play_GST_server});
 
 	#equalizer
@@ -6467,6 +6474,7 @@ sub PrefAudio
 	my $vbox=Vpack( $vbox_gst, Gtk2::HSeparator->new,
 			$vbox_123, Gtk2::HSeparator->new,
 			$vbox_mp,  Gtk2::HSeparator->new,
+			$vbox_mpv, Gtk2::HSeparator->new,
 			$vbox_ice, Gtk2::HSeparator->new,
 			$EQbox,
 			[$rg_check,$rg_opt,($Glib::VERSION >= 1.251 ? $rga_start : ())],
