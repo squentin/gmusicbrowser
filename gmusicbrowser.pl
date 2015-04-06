@@ -798,7 +798,8 @@ sub OneInCommon	#true if at least one string common to both list
 }
 
 sub find_common_parent_folder
-{	my @folders= uniq(@_);
+{	return unless @_;
+	my @folders= uniq(@_);
 	my $folder=$folders[0];
 	my $nb=@folders;
 	return $folder if $nb==1;
@@ -3651,12 +3652,7 @@ sub ChooseAAPicture
 {	my ($ID,$col,$key)=@_;
 	my $path;
 	if (defined $ID) { $path=Songs::Get($ID,'path'); }
-	else
-	{	my $h=Songs::BuildHash('path', AA::GetIDs($col,$key));
-		my $min=int(.1*max(values %$h)); #ignore rare folders
-		$path= ::find_common_parent_folder( grep $h->{$_}>$min,keys %$h );
-		($path)=sort { $h->{$b} <=> $h->{$a} } keys %$h if length $path<5;#take most common if too differents
-	}
+	else { $path= AA::GuessBestCommonfFolder($col,$key); }
 	my $title= sprintf(_"Choose picture for '%s'",Songs::Gid_to_Display($col,$key));
 	my $file=ChoosePix($path,$title, AAPicture::GetPicture($col,$key));
 	AAPicture::SetPicture($col,$key,$file) if defined $file;

@@ -4500,13 +4500,8 @@ sub update
 	if ($self->{mode} eq 'song')
 	{	my $field= $self->{field};
 		my $gid= $self->{gid};
-		my $path;
-			#taken from ::ChooseAAPicture() FIXME create a function ?
-			my $h=Songs::BuildHash('path', AA::GetIDs($field,$gid));
-			my $min=int(.1*::max(values %$h)); #ignore rare folders
-			$path= ::find_common_parent_folder( grep $h->{$_}>$min,keys %$h );
-			($path)=sort { $h->{$b} <=> $h->{$a} } keys %$h if length $path<5;#take most common if too differents
-		@paths=($default_path=$path);
+		my $path= AA::GuessBestCommonfFolder($field,$gid);
+		@paths=($default_path=$path) if $path;
 	}
 	elsif ($self->{mode} eq 'path')
 	{	my $path= $self->{current_path};

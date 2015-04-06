@@ -3259,6 +3259,17 @@ sub SortKeys
 	return $list;
 }
 
+sub GuessBestCommonfFolder
+{	my ($field,$gid)=@_;
+	my $IDs= AA::GetIDs($field,$gid);
+	return unless @$IDs;
+	my $h= Songs::BuildHash('path',$IDs);
+	my $min=int(.1*::max(values %$h)); #ignore rare folders
+	my $path= ::find_common_parent_folder( grep $h->{$_}>$min,keys %$h );
+	($path)=sort { $h->{$b} <=> $h->{$a} } keys %$h if length $path<5;#take most common if too differents
+	return $path;
+}
+
 #package GMB::Filename;
 #use overload ('""' => 'stringify');
 #sub new
