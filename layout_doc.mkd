@@ -258,6 +258,8 @@ Example :
     KeyBindings = Insert OpenSearch c-q EnqueueSelected c-Insert OpenCustom(a_layout_id)
 
   Key names are as shown in the key binding tab in the settings dialog.  
+  Modifiers are one lower case letter : c for ctrl, s for shift, a for alt and w for win/super.  
+  The modifier(s) and key name can be preceded by a '+' to make the shortcut a higher priority than the normal shorcuts for the focused widget (example: "+c-f" for a control-f that overrides the default ctrl-f action of some widgets). Warning: It may breaks some features or the keyboard navigation.  
   Commands can be found by running gmusicbrowser with command-line option `-listcmd`.
 
 #### DefaultFocus  

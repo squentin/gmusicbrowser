@@ -1072,7 +1072,8 @@ sub CreateWidgets
 	{	$widgets->{$_}->signal_connect(scroll_event => \&::ChangeVol)
 			for grep $widgets->{$_}, split /\s+/,$l;
 	}
-	$self->signal_connect_after(key_press_event => \&KeyPressed);
+	$self->signal_connect(key_press_event => \&KeyPressed,0);
+	$self->signal_connect_after(key_press_event => \&KeyPressed,1);
 
 	for my $widget (values %$widgets) { my $postinit= delete $widget->{PostInit}; $postinit->($widget) if $postinit; }
 
@@ -1345,14 +1346,16 @@ sub ToggleFullscreen
 }
 
 sub KeyPressed
-{	my ($self,$event)=@_;
+{	my ($self,$event,$after)=@_;
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
+	my $focused=$self->get_focus;
+	return 0 if !$after && $focused && ($focused->isa('Gtk2::Entry') || $focused->isa('Gtk2::SpinButton'));
 	my $mod;
 	$mod.='c' if $event->state >= 'control-mask';
 	$mod.='a' if $event->state >= 'mod1-mask';
 	$mod.='w' if $event->state >= 'mod4-mask';
 	$mod.='s' if $event->state >= 'shift-mask';
-	$key=$mod.'-'.$key if $mod;
+	$key= ($after? '':'+') . ($mod? "$mod-":'') . lc($key);
 	my ($cmd,$arg);
 	if ( exists $::CustomBoundKeys{$key} )
 	{	$cmd= $::CustomBoundKeys{$key};
@@ -1363,7 +1366,7 @@ sub KeyPressed
 	elsif ( exists $::GlobalBoundKeys{$key} )
 	{	$cmd= $::GlobalBoundKeys{$key};
 	}
-	elsif ($self->{fullscreen} && $key eq 'Escape') { $cmd='ToggleFullscreen' }
+	elsif ($after && $self->{fullscreen} && $key eq 'Escape') { $cmd='ToggleFullscreen' }
 	return 0 unless $cmd;
 	if ($self->isa('Gtk2::Window'))	#try to find the focused widget (gmb widget, not gtk one), so that the cmd can act on it
 	{	my $widget=$self->get_focus;

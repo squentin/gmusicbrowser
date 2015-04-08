@@ -22,6 +22,7 @@ use utf8;
 package main;
 use Gtk2 '-init';
 use Glib qw/filename_from_unicode filename_to_unicode/;
+use Gtk2::Pango; #for PANGO_WEIGHT_BOLD, PANGO_WEIGHT_NORMAL
 use POSIX qw/setlocale LC_NUMERIC LC_MESSAGES LC_TIME strftime mktime getcwd _exit/;
 use Encode qw/_utf8_on _utf8_off/;
 {no warnings 'redefine'; #some work arounds for old versions of perl-Gtk2 and/or gtk2
@@ -1191,11 +1192,11 @@ sub make_keybindingshash
 	while (@list>1)
 	{	my $key=shift @list;
 		my $cmd=shift @list;
-		my $mod='';
-		$mod=$1 if $key=~s/^([caws]+-)//;
-		my @keys=($key);
-		@keys=(lc$key,uc$key) if $key=~m/^[A-Za-z]$/;
-		$h{$mod.$_}=$cmd for @keys;
+		my $priority= $key=~s/^\+//;
+		my $mod= $key=~s/^([caws]+-)//  ? $1 : '';
+		$key= lc $key;
+		$h{$mod.$key}=$cmd;
+		$h{'+'.$mod.$key}=$cmd if $priority;
 	}
 	return \%h;
 }
@@ -6122,10 +6123,10 @@ sub PrefDialog
 
 sub PrefKeys
 {	my $vbox=Gtk2::VBox->new;
-	my $store=Gtk2::ListStore->new(('Glib::String')x3);
+	my $store=Gtk2::ListStore->new(('Glib::String')x3,'Glib::Uint');
 	my $treeview=Gtk2::TreeView->new($store);
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
-	 ( _"Key",Gtk2::CellRendererText->new,text => 0
+	 ( _"Key",Gtk2::CellRendererText->new,text => 0, weight=> 3,
 	 ));
 	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
 	 ( _"Command",Gtk2::CellRendererText->new,text => 1
@@ -6143,8 +6144,9 @@ sub PrefKeys
 		{	my ($cmd,$arg)=  $list->{$key}=~m/^(\w+)(?:\((.*)\))?$/;
 			$cmd=$Command{$cmd}[1];
 			$cmd.="($arg)" if defined $arg;
+			my $weight= $key=~s/^\+// ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL;
 			my $longkey=keybinding_longname($key);
-			$store->set($store->append,0,$longkey,1,$cmd,2,$key);
+			$store->set($store->append, 0,$longkey, 1,$cmd, 2,$key, 3,$weight);
 		}
 		%CustomBoundKeys=%{ make_keybindingshash($Options{CustomKeyBindings}) };
 	 };
@@ -6201,6 +6203,9 @@ sub PrefKeys
 	 };
 	$combo->signal_connect( changed => $combochanged );
 
+	my $priority= Gtk2::CheckButton->new(_"High priority");
+	$priority->set_tooltip_text(_"If checked, the shortcut has higher priority than the default shortcut of widgets. Warning: this can make some features inaccessible");
+
 	my $butadd= ::NewIconButton('gtk-add',_"Add shorcut key",sub
 	 {	my $cmd=$combo->get_value;
 		return unless defined $cmd;
@@ -6210,6 +6215,8 @@ sub PrefKeys
 		{	my $extra= (ref $child eq 'Gtk2::Entry')? $child->get_text : $child->get_value;
 			$cmd.="($extra)" if $extra ne '';
 		}
+		delete $Options{CustomKeyBindings}{$_} for $key,"+$key";
+		$key= "+$key" if $priority->get_active;
 		$Options{CustomKeyBindings}{$key}=$cmd;
 		&$refresh_sub;
 	 });
@@ -6239,8 +6246,8 @@ sub PrefKeys
 	 $vbox->pack_start(
 	   Vpack([	[ 0, Gtk2::Label->new(_"Key") , $key_entry ],
 			[ 0, Gtk2::Label->new(_"Command") , $combo ],
-			[ 0, Gtk2::Label->new(_"Arguments") , $entry_extra ],
-		  ],[$butadd,$butrm]
+			'_',[ 0, Gtk2::Label->new(_"Arguments") , $entry_extra ],
+		  ],[$butadd,$butrm,$priority]
 		),FALSE,FALSE,2);
 	&$refresh_sub;
 	&$combochanged;
