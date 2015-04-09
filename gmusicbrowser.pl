@@ -762,6 +762,12 @@ sub uniq
 	map { $h{$_}++ == 0 ? $_ : () } @_;
 }
 
+sub sort_number_aware #sort (s1 s10 s2) into (s1 s2 s10)
+{	my %h;
+	($h{$_} = $_) =~ s/(\d+)/"0"x(20-length($1)).$1/ge for @_; #format numbers with at least 20 digits, will fail for numbers with more than 20 digits, but probably not interesting anyway
+	return sort {$h{$a} cmp $h{$b}} @_;
+}
+
 sub superlc	##lowercase, normalize and remove accents/diacritics #not sure how good it is
 {	my $s=NFKD($_[0]);
 	$s=~s/\pM//og;	#remove Marks (see perlunicode)

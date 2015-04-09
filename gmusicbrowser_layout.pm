@@ -4512,7 +4512,7 @@ sub update
 	my $pdfok= $GMB::Picture::pdf_ok && $self->{pdf_mode};
 	for my $path (@paths)
 	{	opendir my($dh),$path  or do { warn $!; last; };
-		for my $file (map $path.::SLASH.$_, sort grep !m#^\.#, readdir $dh)
+		for my $file (map $path.::SLASH.$_, ::sort_number_aware(grep !m#^\.#, readdir $dh))
 		{	next if -d $file;
 			if    ($file=~m/$::Image_ext_re/) { push @files, $file }
 			elsif ($file=~m/\.pdf$/i && $pdfok) { push @files, $file, map "$file:$_", 1..GMB::Picture::pdf_pages($file)-1; }
@@ -4553,7 +4553,7 @@ sub refresh_treeviews
 
 	my $show_expanders;
 	opendir my($dh),$path  or do { warn $!; return; };
-	for my $file (sort grep !m#^\.#, readdir $dh)
+	for my $file (::sort_number_aware( grep !m#^\.#, readdir $dh))
 	{	if (-d $path.$file) { $dirstore->set( $dirstore->append, 0,::filename_to_utf8displayname($file), 1,Songs::filename_escape($path.$file)); next }
 
 		my @pages; my $suffix='';
