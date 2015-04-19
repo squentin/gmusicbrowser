@@ -37,8 +37,21 @@ sub init
 	}
 	$mpv ||= ::first { -x $_ } map $_.::SLASH.'mpv',  split /:/, $ENV{PATH};
 
+	$mpv=undef unless $mpv && check_version();
 	return unless $mpv;
 	return bless {RG=>1,EQ=>1},__PACKAGE__;
+}
+
+sub check_version
+{	return unless $mpv;
+	my $output= qx/$mpv -V/;
+	my $ok= $output=~m/mpv\s*(\d+)\.(\d+)(\S+)?/i && ($1>0 || $2>=7) ? 1 : 0; #requires version 0.7 or later
+	if ($::debug)
+	{	if (defined $1) { warn "mpv: found mpv v$1.$2".($3||"")."\n"; }
+		else {warn "mpv: error looking up mpv version\n"}
+	}
+	if (!$ok) { warn "mpv version earlier than 0.7 are not supported -> mpv backend disabled\n" }
+	return $ok;
 }
 
 sub supported_formats
@@ -68,6 +81,7 @@ sub send_cmd
 
 sub launch_mpv
 {	$playcounter=0;
+	$preparednext=undef;
 	@cmd_and_args=($mpv, '--input-unix-socket='.$SOCK, qw/--idle --no-video --no-input-terminal --really-quiet --gapless-audio=weak --softvol-max=100/);
 	push @cmd_and_args,"--volume=".convertvolume($::Volume);
 	push @cmd_and_args,"--af-add=".get_RG_opts() if $::Options{use_replaygain};
@@ -81,11 +95,11 @@ sub launch_mpv
 		POSIX::_exit(1);
 	}
 	#wait for mpv to establish socket as server
-	for (0 .. 20)
+	for (0 .. 200)
 	{	$sockfh = IO::Socket::UNIX->new(Peer => $SOCK, Type => SOCK_STREAM);
 		last if $sockfh || (waitpid($ChildPID, WNOHANG) != 0);
 		warn "gmusicbrowser_mpv: could not connect to socket; retrying\n" if $::debug;
-		sleep 0.1;
+		sleep 0.01;
 	}
 	unless ($sockfh)
 	{	handle_error("failed to connect to socket (probably failed to launch mpv): $!");
@@ -105,12 +119,13 @@ sub launch_mpv
 sub Play
 {	my (undef,$file,$sec)=@_;
 	launch_mpv() unless $ChildPID && $sockfh;
+	return unless $ChildPID;
 	$playcounter++;
 	# gapless - check for non-user-initiated EOF
+	warn "playing $file (pid=$ChildPID)\n" if $::Verbose;
 	return if $preparednext && $preparednext eq $file && $playcounter == 1;
 	$initseek = $sec;
 	send_cmd('loadfile',$file);
-	warn "playing $file (pid=$ChildPID)\n" if $::Verbose;
 }
 
 sub append_next
@@ -131,7 +146,10 @@ sub _remotemsg
 			 { ::UpdateTime($msg->{data}) if $playcounter==1; }
 			elsif ($event eq 'end-file')	{ handle_eof(); }
 			elsif ($event eq 'file-loaded')	{ SkipTo(undef,$initseek) if $initseek; $initseek=undef; }
-			elsif ($event eq 'log-message') { handle_error("[$msg->{prefix}] $msg->{text}") unless $msg->{text}=~m/^mjpeg: overread \d+/; }
+			elsif ($event eq 'log-message')
+			{	handle_error("[$msg->{prefix}] $msg->{text}") unless $msg->{text}=~m/^mjpeg: overread \d+/;
+				last unless $ChildPID;
+			}
 		}
 	}
 	return 1;
