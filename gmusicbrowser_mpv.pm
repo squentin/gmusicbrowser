@@ -249,16 +249,16 @@ sub SetVolume
 	elsif	($set=~m/(\d+)/)	{ $::Volume =$1; }
 	$::Volume=0   if $::Volume<0;
 	$::Volume=100 if $::Volume>100;
-	my $vol= convertvolume($::Volume);	#use a cubic volume scale
+	my $vol= convertvolume($::Volume);
 	send_cmd('set', 'volume', $vol);
 	::HasChanged('Vol');
 	$::Options{Volume}=$::Volume;
 	$::Options{Volume_mute}=$::Mute;
 }
 
-sub convertvolume	#convert a linear volume to cubic volume scale
+sub convertvolume
 {	my $vol=$_[0];
-	$vol= 100*($vol/100)**3;
+	#$vol= 100*($vol/100)**3;	#convert a linear volume to cubic volume scale #doesn't seem to be needed in mpv
 	# will be sent to mpv as string, make sure it use a dot as decimal separator
 	::setlocale(::LC_NUMERIC, 'C');
 	$vol="$vol";
