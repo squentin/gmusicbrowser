@@ -82,7 +82,7 @@ sub send_cmd
 sub launch_mpv
 {	$playcounter=0;
 	$preparednext=undef;
-	@cmd_and_args=($mpv, '--input-unix-socket='.$SOCK, qw/--idle --no-video --no-input-terminal --really-quiet --gapless-audio=weak --softvol-max=100/);
+	@cmd_and_args=($mpv, '--input-unix-socket='.$SOCK, qw/--idle --no-video --no-input-terminal --really-quiet --gapless-audio=weak --softvol-max=100 --mute=no/);
 	push @cmd_and_args,"--volume=".convertvolume($::Volume);
 	push @cmd_and_args,"--af-add=".get_RG_opts() if $::Options{use_replaygain};
 	push @cmd_and_args,"--af-add=\@EQ:equalizer=$::Options{equalizer}" if $::Options{use_equalizer};
