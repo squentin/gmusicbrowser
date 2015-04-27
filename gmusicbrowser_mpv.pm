@@ -82,7 +82,7 @@ sub send_cmd
 sub launch_mpv
 {	$playcounter=0;
 	$preparednext=undef;
-	@cmd_and_args=($mpv, '--input-unix-socket='.$SOCK, qw/--idle --no-video --no-input-terminal --really-quiet --gapless-audio=weak --softvol-max=100 --mute=no/);
+	@cmd_and_args=($mpv, '--input-unix-socket='.$SOCK, qw/--idle --no-video --no-input-terminal --really-quiet --gapless-audio=weak --softvol-max=100 --mute=no --no-sub-auto/);
 	push @cmd_and_args,"--volume=".convertvolume($::Volume);
 	push @cmd_and_args,"--af-add=".get_RG_opts() if $::Options{use_replaygain};
 	push @cmd_and_args,"--af-add=\@EQ:equalizer=$::Options{equalizer}" if $::Options{use_equalizer};
@@ -135,7 +135,8 @@ sub append_next
 }
 
 sub _remotemsg
-{	for my $line (<$sockfh>)
+{	my $ignore_ad_error;
+	for my $line (<$sockfh>)
 	{	my $msg= decode_json($line);
 		warn "mpv raw-output: $line" if $::debug;
 		if (my $error=$msg->{error})
@@ -147,7 +148,18 @@ sub _remotemsg
 			elsif ($event eq 'end-file')	{ handle_eof(); }
 			elsif ($event eq 'file-loaded')	{ SkipTo(undef,$initseek) if $initseek; $initseek=undef; }
 			elsif ($event eq 'log-message')
-			{	handle_error("[$msg->{prefix}] $msg->{text}") unless $msg->{text}=~m/^mjpeg: overread \d+/;
+			{	my $error= "[$msg->{prefix}] $msg->{text}";
+				if (    $error=~m/^.ffmpeg.video. mjpeg: overread/i  		#caused by embedded picture
+				   ||	$error=~m/^.ffmpeg.demuxer. mp3: Failed to uncompress tag/i #in very rare cases when some tag are compressed
+				   ||	$error=~m/^.ffmpeg.audio. mp3: incomplete frame/i	#followed by "[ad] Error decoding audio"
+				   ||	$error=~m/^.ffmpeg.audio. mp3: Header missing/i		#followed by "[ad] Error decoding audio"
+				   #||	$error=~m/^.cplayer. Can not open external file/i	#happens for example if trying to open a .txt of the same name  #shouldn't be a problem with --no-sub-auto
+				   ||   ($ignore_ad_error && $error=~m/^.ad. Error decoding audio/i)
+				   )
+				{	warn "mpv ignored-error: $error\n" if $::Verbose;
+					$ignore_ad_error=1 if $error=~m/^.ffmpeg.audio. mp3/i; #for "incomplete frame" & "Header missing"
+				}
+				else { handle_error($error) }
 				last unless $ChildPID;
 			}
 		}
