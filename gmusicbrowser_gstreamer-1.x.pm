@@ -302,7 +302,7 @@ sub Play
 sub set_file
 {	my ($self,$f)=@_;
 	if ($f!~m#^([a-z]+)://#)
-	{	$f=~s#([^A-Za-z0-9- /\.])#sprintf('%%%02X', ord($1))#seg;
+	{	$f=~s#([^A-Za-z0-9-/\.])#sprintf('%%%02X', ord($1))#seg;
 		$f='file://'.$f;
 	}
 	$self->{playbin}->set(uri => $f);

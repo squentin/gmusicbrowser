@@ -644,7 +644,7 @@ our %timespan_menu=
 				# ___free_ : array containing free positions in ___values_ for each size
 	{	parent		=> 'dates',
 		_		=> 'substr(___values_, #index# * #bytes#, #nb# * #bytes#)',
-		index		=> 'vec(___index_,#ID#,32)',	# => max 2**32 dates in total
+		index		=> 'vec(___index_,#ID#,32)',	# => max 2**32 songs that share the same number of dates, could maybe use 16 bits instead
 		nb		=> 'vec(___nb_,#ID#,16)',	# => max 2**16 dates per song, could maybe use 8 bits instead
 		get_list	=> 'unpack("#packformat#*", #_#)',
 		init		=> '___index_= ___values_= ___nb_ = "";',
@@ -1369,7 +1369,7 @@ our %timespan_menu=
  length_estimated =>
  {	type	=> 'boolean',
 	audioinfo=> 'estimated',
-	flags	=> 'gars',
+	flags	=> 'gar',
  },
 );
 
@@ -1759,7 +1759,7 @@ sub MakeLoadSub
 	$loadedfields{$loaded_slots[$_]}=$_ for 0..$#loaded_slots;
 	# begin with a line that checks if a given path-file has already been loaded into the library
 	my $pathfile_code= '$_['.$loadedfields{path}.'] ."/". $_['.$loadedfields{file}.']';
-	my $code= '$uniq_check{ '.$pathfile_code.' }++ && do { warn qq(warning: file "'.$pathfile_code.'" already in library, skipping.\\n); return };'."\n";
+	my $code= '$uniq_check{ '.$pathfile_code.' }++ && do { warn "warning: file ".'.$pathfile_code.'." already in library, skipping.\\n"; return };'."\n";
 	# new file, increment $LastID
 	$code.='$LastID++;'."\n";
 	for my $field (@Fields)
@@ -3142,7 +3142,7 @@ our %ReplaceFields=
 	a	=>	sub { my $s=Songs::Gid_to_Display($_[0],$_[1]); defined $s ? $s : $_[1]; }, #FIXME PHASE1 Gid_to_Display should return something $_[1] if no gid_to_display
 	l	=>	sub { my $l=Get('length:sum',$_[0],$_[1]); $l=::__x( ($l>=3600 ? _"{hours}h{min}m{sec}s" : _"{min}m{sec}s"), hours => (int $l/3600), min => ($l>=3600 ? sprintf('%02d',$l/60%60) : $l/60%60), sec => sprintf('%02d',$l%60)); },
 	L	=>	sub { ::CalcListLength( Get('id:list',$_[0],$_[1]),'length:sum' ); }, #FIXME is CalcListLength needed ?
-	y	=>	sub { Get('year:range',$_[0],$_[1]); },
+	y	=>	sub { Get('year:range',$_[0],$_[1])||''; },
 	Y	=>	sub { my $y=Get('year:range',$_[0],$_[1]); return $y? " ($y)" : '' },
 	s	=>	sub { my $l=Get('id:list',$_[0],$_[1])||[]; ::__n('%d song','%d songs',scalar @$l) },
 	x	=>	sub { my $nb=@{GetXRef($_[0],$_[1])}; return $_[0] ne 'album' ? ::__("%d Album","%d Albums",$nb) : ::__("%d Artist","%d Artists",$nb);  },

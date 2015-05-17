@@ -39,6 +39,7 @@ INIT
 sub Read
 {	my ($file,$findlength,$fieldlist)=@_;
 	return unless $file=~m/\.([^.]+)$/;
+	warn "Reading tags for $file".($findlength ? " findlength=$findlength" :'').($fieldlist ? " fieldlist=$fieldlist" :'')."\n" if $::debug;
 	my $format=$FORMATS{lc $1};
 	return unless $format;
 	my ($package,$formatstring,$plist)=@$format;

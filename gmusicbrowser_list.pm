@@ -1083,6 +1083,7 @@ sub query_tooltip_cb
 	my ($row)=$path->get_indices;
 	my $self=::find_ancestor($tv,__PACKAGE__);
 	my $ID=$self->{array}[$row];
+	return unless defined $ID;
 	my $markup= ::ReplaceFieldsAndEsc($ID,$self->{rowtip});
 	$tooltip->set_markup($markup);
 	$tv->set_tooltip_row($tooltip,$path);
@@ -6816,6 +6817,7 @@ sub query_tooltip_cb
 	my $row=$path->{row};
 	return 0 unless defined $row;
 	my $ID=$self->{array}[$row];
+	return unless defined $ID;
 	my $markup= ::ReplaceFieldsAndEsc($ID,$self->{rowtip});
 	$tooltip->set_markup($markup);
 	my $rect=$self->row_to_rect($row);
