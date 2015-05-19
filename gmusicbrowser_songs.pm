@@ -3260,7 +3260,7 @@ sub SortKeys
 	return $list;
 }
 
-sub GuessBestCommonfFolder
+sub GuessBestCommonFolder
 {	my ($field,$gid)=@_;
 	my $IDs= AA::GetIDs($field,$gid);
 	return unless @$IDs;

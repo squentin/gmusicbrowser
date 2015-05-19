@@ -3659,7 +3659,7 @@ sub ChooseAAPicture
 {	my ($ID,$col,$key)=@_;
 	my $path;
 	if (defined $ID) { $path=Songs::Get($ID,'path'); }
-	else { $path= AA::GuessBestCommonfFolder($col,$key); }
+	else { $path= AA::GuessBestCommonFolder($col,$key); }
 	my $title= sprintf(_"Choose picture for '%s'",Songs::Gid_to_Display($col,$key));
 	my $file=ChoosePix($path,$title, AAPicture::GetPicture($col,$key));
 	AAPicture::SetPicture($col,$key,$file) if defined $file;

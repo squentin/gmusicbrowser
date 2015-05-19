@@ -4523,7 +4523,7 @@ sub update
 	if ($self->{mode} eq 'song')
 	{	my $field= $self->{field};
 		my $gid= $self->{gid};
-		my $path= AA::GuessBestCommonfFolder($field,$gid);
+		my $path= AA::GuessBestCommonFolder($field,$gid);
 		@paths=($default_path=$path) if $path;
 	}
 	elsif ($self->{mode} eq 'path')
