@@ -5839,9 +5839,15 @@ sub FolderToIDs
 	@dirs= map cleanpath($_), @dirs;
 	my @files;
 	MakeScanRegex() unless $ScanRegex;
+	my %followeddirs;
 	while (defined(my $dir=shift @dirs))
 	{	if (-d $dir)
-		{	if (opendir my($DIRH),$dir)
+		{	# make sure it doesn't look in the same dir twice due to symlinks
+			my $real= -l $dir ? simplify_path(rel2abs(readlink($dir),parentdir($dir))) : $dir;
+			next if exists $followeddirs{$real};
+			$followeddirs{$real}=undef;
+
+			if (opendir my($DIRH),$dir)
 			{	my @list= map $dir.SLASH.$_, grep !m#^\.#, readdir $DIRH;
 				closedir $DIRH;
 				push @files, grep -f && m/$ScanRegex/, @list;
