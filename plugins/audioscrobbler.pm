@@ -26,7 +26,7 @@ require $::HTTP_module;
 our $ignore_current_song;
 
 my $self=bless {},__PACKAGE__;
-my @ToSubmit; my $NowPlaying; my $unsent_saved=0;
+my @ToSubmit; my $NowPlaying; my $NowPlayingID; my $unsent_saved=0;
 my $interval=5; my ($timeout,$waiting);
 my ($HandshakeOK,$submiturl,$nowplayingurl,$sessionid);
 my ($Serrors,$Stop);
@@ -86,6 +86,7 @@ sub SongChanged
 	my ($title,$artist,$album,$track,$length)= Songs::Get($::SongID,qw/title artist album track length/);
 	return if $title eq '' || $artist eq '';
 	$NowPlaying= [ $artist, $title, $album, $length, $track, '' ];
+	$NowPlayingID=$::SongID;
 	Sleep();
 }
 
@@ -157,7 +158,8 @@ sub Submit
 		return unless $i;
 	}
 	elsif ($NowPlaying)
-	{	my @data= map { defined $_ ? ::url_escapeall($_) : "" } @$NowPlaying;
+	{	if (!defined $::PlayingID || $::PlayingID!=$NowPlayingID) { $NowPlaying=undef; return }
+		my @data= map { defined $_ ? ::url_escapeall($_) : "" } @$NowPlaying;
 		$post.= sprintf "&a=%s&t=%s&b=%s&l=%s&n=%s&m=%s", @data;
 		$url=$nowplayingurl;
 	}
