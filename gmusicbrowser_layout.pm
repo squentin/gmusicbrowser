@@ -4249,8 +4249,7 @@ sub new
 
 	$treeview1->set_headers_visible(0);
 	$treeview2->set_headers_visible(0);
-	$treeview1->get_selection->signal_connect(changed => \&treeview_selection_changed_cb,'folder');
-	$treeview2->get_selection->signal_connect(changed => \&treeview_selection_changed_cb,'file');
+	$treeview2->get_selection->signal_connect(changed => \&treeview_selection_changed_cb);
 
 	$vpaned->pack1(::new_scrolledwindow($treeview1), ::FALSE, ::FALSE);
 	$vpaned->pack2(::new_scrolledwindow($treeview2), ::TRUE, ::TRUE);
@@ -4263,7 +4262,9 @@ sub new
 
 	$_->set_enable_search(0) for $treeview1,$treeview2;
 	$self->signal_connect(key_press_event=> \&key_press_cb);
-	$treeview2->signal_connect(button_press_event=> \&button_press_cb);
+	$treeview1->signal_connect(row_activated=> \&folder_activated_cb);
+	$treeview1->signal_connect(button_press_event=> \&folder_button_press_cb);
+	$treeview2->signal_connect(button_press_event=> \&file_button_press_cb);
 	$self->signal_connect(map => sub {$_[0]->queue_song_changed});
 	::set_drag($view, dest => [::DRAG_ID,::DRAG_FILE,sub
 	 {	my ($view,$type,@values)=@_;
@@ -4416,7 +4417,24 @@ sub key_press_cb
 	#else {return 0}
 	return 1;
 }
-sub button_press_cb
+sub folder_activated_cb
+{	my ($tv,$treepath,$tvcol)=@_;
+	my $self= ::find_ancestor($tv,__PACKAGE__);
+	my $store= $tv->get_model;
+	my $iter= $store->get_iter($treepath);
+	return unless $iter;
+	my $folder= ::decode_url($store->get($iter,1));
+	$self->set_path($folder);
+}
+sub folder_button_press_cb
+{	my ($tv,$event)=@_;
+	return 1 if $event->type ne 'button-press'; # ignore double or triple clicks
+	my ($path,$column)=$tv->get_path_at_pos($event->get_coords);
+	return 0 unless $path;
+	$tv->row_activated($path,$column);
+	return 1;
+}
+sub file_button_press_cb
 {	my ($tv,$event)=@_;
 	my $self= ::find_ancestor($tv,__PACKAGE__);
 	#$self->grab_focus;
@@ -4429,14 +4447,13 @@ sub button_press_cb
 	1;
 }
 sub treeview_selection_changed_cb
-{	my ($selection,$file_or_folder)=@_;
+{	my ($selection)=@_;
 	my ($store,$iter) = $selection->get_selected;
 	return unless $iter;
 	my $file= ::decode_url($store->get($iter,1));
 	my $self= ::find_ancestor($selection->get_tree_view,__PACKAGE__);
 	return if $self->{busy};
-	if ($file_or_folder eq 'folder'){ $self->set_path($file); }
-	else				{ $self->set_file($file); }
+	$self->set_file($file);
 }
 
 sub file_dropped
@@ -4539,15 +4556,17 @@ sub refresh_treeviews
 	return unless $self->{show_list};
 	my $oldpath= $self->{loaded_path};
 	my $path= $self->{current_path}; # || $oldpath;
-	unless ($path && $oldpath && $oldpath eq $path) #folder has changed, reset scrollbars
-	{	$self->{foldertv}->get_vadjustment->set_value(0);
-		$self->{filetv}->get_vadjustment->set_value(0);
-		$self->{loaded_path}= $path;
-	}
 	my $dirstore= $self->{dirstore};
 	my $filestore=$self->{filestore};
+	my $filetv= $self->{filetv};
+	my $foldertv= $self->{foldertv};
 	$dirstore->clear;
 	$filestore->clear;
+	unless ($path && $oldpath && $oldpath eq $path) #folder has changed, reset scrollbars
+	{	$foldertv->get_vadjustment->set_value(0);
+		$filetv->get_vadjustment->set_value(0);
+		$self->{loaded_path}= $path;
+	}
 	return unless $path;
 	my $parent= ::parentdir($path);
 	$path= ::pathslash($path); # add a slash at the end
@@ -4555,9 +4574,18 @@ sub refresh_treeviews
 	my $pdfok= $GMB::Picture::pdf_ok && $self->{pdf_mode};
 
 	my $show_expanders;
+	my $folder_center_treepath;
 	opendir my($dh),$path  or do { warn $!; return; };
 	for my $file (::sort_number_aware( grep !m#^\.#, readdir $dh))
-	{	if (-d $path.$file) { $dirstore->set( $dirstore->append, 0,::filename_to_utf8displayname($file), 1,Songs::filename_escape($path.$file)); next }
+	{	if (-d $path.$file)
+		{	my $iter= $dirstore->append;
+			$dirstore->set( $iter, 0,::filename_to_utf8displayname($file), 1,Songs::filename_escape($path.$file));
+			if ($oldpath && $oldpath eq $path.$file)	#select and center on previous folder if there
+			{	$folder_center_treepath= $dirstore->get_path($iter);
+				$foldertv->set_cursor($folder_center_treepath);
+			}
+			next;
+		}
 
 		my @pages; my $suffix='';
 		if ($file=~m/\.pdf$/i && $pdfok) { @pages= (1..GMB::Picture::pdf_pages($path.$file)-1); $show_expanders=1; }
@@ -4572,8 +4600,9 @@ sub refresh_treeviews
 		}
 	}
 	closedir $dh;
-	$self->{filetv}->set_show_expanders($show_expanders);
-	$self->{filetv}->expand_all;
+	$filetv->set_show_expanders($show_expanders);
+	$filetv->expand_all;
+	$foldertv->scroll_to_cell($folder_center_treepath,undef,::TRUE,.5,0) if $folder_center_treepath; #needs to be done once the list is filled
 }
 
 sub update_file
