@@ -4289,7 +4289,9 @@ sub new
 				if    ($type==::DRAG_ID)  { $datatype='songid'; last }
 				elsif ($type==::DRAG_FILE){ $datatype= 'uri'; last }
 			}
-			$view->{dnd_message}= $datatype;
+			$view->{dnd_message}= $datatype eq 'uri' ?
+				_"Drop files in this folder" :
+				_"View pictures from this album's folder"; #FIXME make second message depend $self->{field};
 			1;
 		      }
 	 );
@@ -4621,7 +4623,7 @@ sub update_file
 	{	my $realfile=$file;
 		$info{page}=$1 if $realfile=~s/:(\w+)$//;
 		$info{filename}= ::filename_to_utf8displayname($realfile);
-		$info{size}= ::format_number((stat $realfile)[7]);
+		$info{size}= (stat $realfile)[7];
 	}
 	$self->{view}->set_pixbuf($pixbuf,%info);
 	$self->{loaded_file}= $file;
@@ -4725,7 +4727,7 @@ sub set_pixbuf
 	{	my $dim= sprintf "%d x %d",$pixbuf->get_width,$pixbuf->get_height;
 		my $file= $info{filename};
 		$file.= " (".sprintf(_"page %d",$info{page}).")" if $info{page};
-		my $size= $info{size}.' '._"bytes";
+		my $size= ::format_number($info{size}).' '._"bytes";
 		$self->{info}= ::PangoEsc(sprintf "%s : %s, %s", $file, $dim, $size);
 	}
 	$self->resize;
@@ -4777,9 +4779,8 @@ sub expose_cb
 	}
 	$cr->set_source_pixbuf($pixbuf,0,0);
 	$cr->paint;
-	if (my $type=$self->{dnd_message}) # display a message when dragging a file/link/song above the picture
+	if (my $msg=$self->{dnd_message}) # display a message when dragging a file/link/song above the picture
 	{	$cr->restore;
-		my $msg= $type eq 'uri' ? _"Drop files in this folder" : _"View pictures from this album's folder"; #FIXME make second message depend on the PictureBrowser's $self->{field};
 		$self->draw_overlay_text($cr,::PangoEsc($msg),.5,.5);
 	}
 	elsif ($self->{show_info} && defined $self->{info})
