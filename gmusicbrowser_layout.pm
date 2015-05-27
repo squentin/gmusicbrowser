@@ -1348,7 +1348,7 @@ sub ToggleFullscreen
 sub KeyPressed
 {	my ($self,$event,$after)=@_;
 	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
-	my $focused=$self->get_focus;
+	my $focused=$self->get_toplevel->get_focus;
 	return 0 if !$after && $focused && ($focused->isa('Gtk2::Entry') || $focused->isa('Gtk2::SpinButton'));
 	my $mod;
 	$mod.='c' if $event->state >= 'control-mask';
