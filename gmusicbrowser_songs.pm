@@ -1690,7 +1690,7 @@ sub UpdateFuncs
 				"	{	#check#;\n".
 				"		if (#diff#) { $set }\n".
 				"	}\n";
-			if ($Def{$f}{flags}=~m/l/)
+			if ($Def{$f}{flags}=~m/l/ && !($Def{$f}{flags}!~m/r/ && $Def{$f}{flags}=~m/w/)) # edit mode for multi-value fields, exclude write-only or read-on-demand fields (w without r) as this requires knowing the current values
 			{  $c.=	"	elsif (\$val=\$values->{'+$f'})\n". # $v must contain [[toset],[torm],[toggle]]
 				"	{	#check_multi#\n".
 				"		if (\$val= #set_multi#) { $set }\n". # set_multi return the new arrayref if modified, undef if not changed
@@ -1914,9 +1914,10 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 		#unless ($flags=~m/e/) { warn "Songs::Set : Field $f cannot be edited\n"; next }
 		#if (my $sub=$Def{$f}{check}))
 		# { my $res=$sub->($val); unless ($res) {warn "Songs::Set : Invalid value '$v' for field $f\n"; next} }
-		if ($multi && $flags!~m/l/) { warn "Songs::Set : Field $f doesn't support multiple values\n";next }
 		if ($multi)	#multi eq + or - or ^  => add or remove or toggle values (for labels and genres)
-		{	my $array=$values{"+$f"}||=[[],[],[]];	#$array contains [[toset],[torm],[toggle]]
+		{	if ($flags!~m/l/) { warn "Songs::Set : Field $f doesn't support multiple values\n"; next }
+			elsif ($flags!~m/r/ && $flags=~m/w/) { warn "Songs::Set : Can't add/remove/toggle values of multi-value field $f because it is a write-only or read-on-demand field\n"; next }
+			my $array=$values{"+$f"}||=[[],[],[]];	#$array contains [[toset],[torm],[toggle]]
 			my $i= $multi eq '+' ? 0 : $multi eq '^' ? 2 : 1;
 			$val=[$val] unless ref $val;
 			$array->[$i]=$val;
