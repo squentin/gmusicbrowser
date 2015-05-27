@@ -4247,6 +4247,7 @@ sub new
 			$cell->set(text=>$date);
 		});
 	$treeview2->append_column($column_d);
+	$_->set_sizing('autosize') for $treeview2->get_columns;
 
 	$treeview1->set_headers_visible(0);
 	$treeview2->set_headers_visible(0);
@@ -4883,13 +4884,13 @@ sub button_release_cb
 	{	if ($button==1)
 		{	if    ($self->{dragged}) { $event->window->set_cursor(undef) }
 			elsif ($self->{oneshot}) { $self->get_toplevel->close_window; return }
-			else { $self->change_picture(1); }
+			elsif (!$self->{scrolled}) { $self->change_picture(1); }
 		}
 		else
 		{	$self->set_zoom_fit unless $self->{zoomed} || $self->{prevnext};
 			if ($self->{zoomed}) { $event->window->set_cursor(undef) }
 		}
-		$self->{$_}= undef for qw/last_x last_y dragged pressed zoomed prevnext/;
+		$self->{$_}= undef for qw/last_x last_y dragged pressed zoomed prevnext scrolled/;
 	}
 	else {return 0}
 	1;
@@ -5039,6 +5040,7 @@ sub set_fullscreen
 		$gdkwin->set_user_data(0); #needed ?
 		$gdkwin->destroy;
 	}
+	$self->{pressed}=undef; #reset mouse state, in particular when using double middle button to fullscreen, the mouse could stay in middle-button-pressed mode
 	$self->resize;
 }
 
