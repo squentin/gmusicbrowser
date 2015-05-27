@@ -1963,7 +1963,8 @@ sub Write
 			{	$modif=$towrite->[$i];
 			}
 			if ($modif)
-			{	FileTag::Write($ID, $modif, $errorsub);
+			{	my $file= Songs::GetFullFilename($ID);
+				FileTag::Write($file, $modif, $errorsub);
 				warn "ID=$ID towrite : ".join(' ',@$modif)."\n" if $::debug;
 				::IdleCheck($ID) unless $update; # not done in update mode
 			}

@@ -118,8 +118,7 @@ sub Read
 }
 
 sub Write
-{	my ($ID,$modif,$errorsub)=@_; warn "FileTag::Write($ID,[@$modif],$errorsub)\n" if $::debug;
-	my $file= Songs::GetFullFilename($ID);
+{	my ($file,$modif,$errorsub)=@_; warn "FileTag::Write($file,[@$modif],$errorsub)\n" if $::debug;
 
 	my ($format)= $file=~m/\.([^.]*)$/;
 	return unless $format and $format=$FileTag::FORMATS{lc$format};
