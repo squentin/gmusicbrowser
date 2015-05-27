@@ -9227,7 +9227,6 @@ sub popup_calendar
 {	my $self=$_[0];
 	my $popup=Gtk2::Window->new();
 	$popup->set_decorated(0);
-	$popup->set_border_width(5);
 	$self->{popup}=$popup;
 	my $cal=Gtk2::Calendar->new;
 	$popup->set_modal(::TRUE);
@@ -9240,16 +9239,18 @@ sub popup_calendar
 		$cal->select_day($d);
 		@time=($h,$m,$s)
 	}
-	$cal->signal_connect(day_selected_double_click => sub
-		{	my ($y,$m,$d)=$_[0]->get_date;
-			$y-=1900;
-			my @time= map $_->get_value, reverse @{$_[0]{timeadjs}};
-			$self->{date}= ::mktime(@time,$d,$m,$y);
-			$self->set_label( ::strftime_utf8('%c',@time,$d,$m,$y) );
-			$self->destroy_calendar;
-			GMB::FilterBox::changed($self);
-			GMB::FilterBox::activate($self);
-		});
+	my $activate_sub= sub
+	 {	my ($y,$m,$d)=$_[0]->get_date;
+		$y-=1900;
+		my @time= map $_->get_value, reverse @{$_[0]{timeadjs}};
+		$self->{date}= ::mktime(@time,$d,$m,$y);
+		$self->set_label( ::strftime_utf8('%c',@time,$d,$m,$y) );
+		$self->destroy_calendar;
+		GMB::FilterBox::changed($self);
+		GMB::FilterBox::activate($self);
+	 };
+	$cal->signal_connect(day_selected_double_click => $activate_sub);
+	$cal->signal_connect(key_press_event=>sub { my ($cal,$event)=@_; my $key=Gtk2::Gdk->keyval_name($event->keyval); if (::WordIn($key,'Return KP_Enter')) { $activate_sub->($cal); return 1; } return 0; });
 	my $vbox= Gtk2::VBox->new(0,0);
 	my $hbox= Gtk2::HBox->new(0,0);
 	$vbox->add($cal);
