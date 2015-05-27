@@ -2308,14 +2308,9 @@ sub uri_dropped
 }
 sub load_file
 {	my ($self,$file)=@_;
-	my $size=(stat $file)[7];
-	my $fh; my $buffer;
-	open $fh,'<',$file or return;
-	binmode $fh;
-	$size-=read $fh,$buffer,$size;
-	close $fh;
-	return unless $size==0;
-	$self->{value}=$buffer;
+	my $data= GMB::Picture::load_data($file);
+	return unless $data;
+	$self->{value}=$data;
 	$self->set;
 }
 sub load_cb

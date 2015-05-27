@@ -9295,7 +9295,7 @@ sub pixbuf
 	my $key= defined $size ? $size.':'.$file : $file;
 	my $pb= GMB::Cache::get($key);
 	unless ($pb || $cacheonly)
-	{	$pb=load($file,$size,$anim_ok);
+	{	$pb=load($file,size=>$size,anim_ok=>$anim_ok);
 		GMB::Cache::add_pb($key,$pb) if $pb && $pb->isa('Gtk2::Gdk::Pixbuf'); #don't bother caching animation
 	}
 	return $pb;
@@ -9311,49 +9311,60 @@ sub pdf_pages
 	return $count;
 }
 
+sub load_data
+{	load($_[0],raw_data=>1);
+}
 sub load
-{	my ($file,$size,$anim_ok)=@_;
+{	my ($file,%opt)=@_; #options : size anim_ok raw_data
 	return unless $file;
 
+	my $size= $opt{size};
+	my $raw= $opt{raw_data}; #return picture data instead of pixbuf
 	my $nb= $file=~s/:(\w+)$// ? $1 : undef;	#index number for embedded pictures
 	unless (-e $file) {warn "$file not found\n"; return undef;}
 
-	my $loader=Gtk2::Gdk::PixbufLoader->new;
-	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
+	my ($fh,$data);
 	if ($file=~m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i)
-	{	my $data=FileTag::PixFromMusicFile($file,$nb);
-		eval { $loader->write($data) } if defined $data;
+	{	$data=FileTag::PixFromMusicFile($file,$nb);
 	}
 	elsif ($file=~m/\.pdf$/i && $pdf_ok)
 	{	my $n= 1+($nb||0);
-		my $fh;
 		my $res= (!$size || $size>500) ? 300 : $size>100 ? 150 : 75; #default is usually 150, faster but lower quality # use faster/lower quality for thumbnails
 		my $qfile=quotemeta $file;
 		#if ($pdftocairo) {open $fh,'-|', "pdftocairo -svg -r 150 -f $n -l $n $qfile -";} # pdftocairo with svg, slower but no temp file
 		if ($pdftocairo) # should be able to avoid temp file, but bug in pdftocairo (tries to open fd://0.jpg)
 		{	my $tmp= $TempDir.'gmb_pdftocairo';
-			#system("pdftocairo -jpeg -singlefile -r $res -f $n -l $n $qfile $tmp"); $tmp.='.jpg'; #with jpeg, seems slightly slower than tiff, and loss of quality
-			system("$pdftocairo -tiff -singlefile -r $res -f $n -l $n $qfile ".quotemeta($tmp)); $tmp.='.tif';
-			open $fh,'<',$tmp; binmode $fh;
+			# with jpeg, seems slightly slower than tiff, and loss of quality, so use tiff by default
+			# if $raw_ return jpg version as tiff is way too big
+			my ($fmt,$ext)= $raw ? ('-jpeg','.jpg') : ('-tiff','.tif');
+			system("$pdftocairo $fmt -singlefile -r $res -f $n -l $n $qfile ".quotemeta($tmp));
+			$tmp.=$ext;
+			open $fh,'<',$tmp;
 			unlink $tmp;
 		}
 		elsif ($gs) # usually slower, lower quality, and accents missing in some pdf
 		{	open $fh,'-|', "$gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -sDEVICE=jpeg -dJPEGQ=95 -r$res"."x$res -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -dFirstPage=$n -dLastPage=$n -sOutputFile=- $qfile";
 		}
-		if ($fh)
-		{	my $buf; eval {$loader->write($buf) while read $fh,$buf,1024*64;};
-			close $fh;
-		}
 	}
 	else	#eval{Gtk2::Gdk::Pixbuf->new_from_file(filename_to_unicode($file))};
 		# work around Gtk2::Gdk::Pixbuf->new_from_file which wants utf8 filename
-	{	open my$fh,'<',$file; binmode $fh;
+	{	open $fh,'<',$file;
+	}
+	if ($raw)
+	{	if ($fh) { binmode $fh; my $buf; $data.=$buf while read $fh,$buf,1024*64; close $fh; }
+		return $data;
+	}
+	my $loader= Gtk2::Gdk::PixbufLoader->new;
+	$loader->signal_connect(size_prepared => \&PixLoader_callback,$size) if $size;
+	if ($fh)
+	{	binmode $fh;
 		my $buf; eval {$loader->write($buf) while read $fh,$buf,1024*64;};
 		close $fh;
 	}
+	elsif (defined $data) {	eval { $loader->write($data) }; }
 	eval {$loader->close;};
 	return undef if $@;
-	if ($anim_ok)
+	if ($opt{anim_ok})
 	{	my $anim=$loader->get_animation;
 		return $anim if $anim && !$anim->is_static_image;
 	}
