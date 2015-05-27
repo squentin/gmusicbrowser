@@ -9908,7 +9908,7 @@ sub Start
 	my $params= $self->{current};
 	my $uri= $params->{uri};
 	my $display_uri= $params->{display_uri};
-	my $destpath= $params->{destpath};
+	my $destpath= $params->{destpath}; # can be a scalar ref to get downloaded data into it, not currently supported for local files, and only supported for 1 uri
 	my $progressid= 'DropURI_'.$self;
 	if ($uri=~s#^file://##)
 	{	my $srcfile= ::decode_url($uri);
@@ -9973,6 +9973,7 @@ sub Downloaded
 		else			{ $self->Done;  } # skip or skip_all
 		return
 	}
+	if (ref $destpath) { $$destpath=$content; $self->{newfile}=$destpath; $self->Done; return }
 	my ($file,$ext);
 	$uri= ::decode_url($uri);
 	$uri=~s/\?.*//;
@@ -10023,7 +10024,7 @@ sub Done # file done, if no $self->{newfile} it means the file has been skipped
 
 	if (my $newfile= delete $self->{newfile})
 	{	warn "Dropped file : $newfile\n" if $::debug;
-		$self->{cb}($newfile) if $self->{cb};
+		$self->{cb}($newfile) if $self->{cb}; # $newfile can be a scalar ref if destpath was a scalar ref
 	}
 
 	if (@{$self->{todo}}) { Glib::Timeout->add(10,sub {$self->Next; 0}); }
