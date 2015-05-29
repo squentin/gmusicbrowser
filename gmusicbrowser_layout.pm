@@ -4821,8 +4821,14 @@ sub resize
 	my $pw= $pixbuf->get_width;
 	my $ph= $pixbuf->get_height;
 	if ($self->{rotate}%180) { ($pw,$ph)=($ph,$pw) }
-	$self->{scale}= ::min($w/$pw, $h/$ph) if $self->{fit};
+	my $fit_scale= ::min($w/$pw, $h/$ph);
 	my $scale= $self->{scale}||=1;
+	if ($self->{fit}) { $scale=$fit_scale }
+	elsif ($self->{fit_scale})			# multiply by new image ratio and divide by old image ratio
+	{	$scale*= $fit_scale/$self->{fit_scale};	# to keep the final size constant when changing image
+	}
+	$self->{fit_scale}= $fit_scale;
+	$self->{scale}= $scale;
 	$pw*=$scale;
 	$ph*=$scale;
 	my ($max_x,$max_y);
