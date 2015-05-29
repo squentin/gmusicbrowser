@@ -4734,10 +4734,10 @@ sub set_pixbuf
 	}
 	if ($pixbuf)
 	{	my $dim= sprintf "%d x %d",$pixbuf->get_width,$pixbuf->get_height;
-		my $file= $info{filename};
+		my $file= ::basename($info{filename});
 		$file.= " (".sprintf(_"page %d",$info{page}).")" if $info{page};
 		my $size= ::format_number($info{size}).' '._"bytes";
-		$self->{info}= ::PangoEsc(sprintf "%s : %s, %s", $file, $dim, $size);
+		$self->{info}= ::PangoEsc(sprintf "%s  %s\n%s", $dim, $size, $file);
 	}
 	$self->resize;
 }
