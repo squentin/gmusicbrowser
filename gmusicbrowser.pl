@@ -489,6 +489,7 @@ BEGIN
 { my $re=join '|', sort map @{$_->{extensions}}, Gtk2::Gdk::Pixbuf->get_formats;
   $Image_ext_re=qr/\.(?:$re)$/i;
 }
+our $EmbImage_ext_re= qr/\.(?:mp3|flac|m4a|m4b|ogg|oga)/i; # warning: doesn't force end of string (with a "$") as sometimes needs to include/extract a :\w+ at the end, so need to use it with /$EmbImage_ext_re$/ or /$EmbImage_ext_re(:\w+)?$/
 
 ##########
 
@@ -4945,7 +4946,7 @@ sub ChoosePix
 		  $max=0;
 		  $nb=0 unless $lastfile && $lastfile eq $file;
 		  $lastfile=$file;
-		  if ($file=~m/\.(?:mp3|flac|m4a|m4b|oga|ogg)$/i)
+		  if ($file=~m/$EmbImage_ext_re$/)
 		  {	my @pix= FileTag::PixFromMusicFile($file);
 			$max=@pix;
 		  }
@@ -5966,7 +5967,7 @@ sub AutoSelPicture
 	{	my $file= AAPicture::GetPicture($field,$gid);
 		if (defined $file)
 		{	return unless $file; # file eq '0' => no picture
-			if ($file=~m/\.(?:mp3|flac|m4a|m4b|oga|ogg)(?::\w+)?$/) { return if FileTag::PixFromMusicFile($file,undef,1); }
+			if ($file=~m/$EmbImage_ext_re(?::\w+)?$/) { return if FileTag::PixFromMusicFile($file,undef,1); }
 			else { return if -e $file }
 		}
 	}
@@ -5978,7 +5979,7 @@ sub AutoSelPicture
 	my %pictures_files;
 	for my $m (qw/embedded guess/)
 	{	if ($m eq 'embedded')
-		{	my @files= grep m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i, Songs::Map('fullfilename',$IDs);
+		{	my @files= grep m/$EmbImage_ext_re$/, Songs::Map('fullfilename',$IDs);
 			if (@files)
 			{	$set= first { FileTag::PixFromMusicFile($_,$field,1) && $_ } sort @files;
 				$set.= ':'.$field if $set;
@@ -9324,7 +9325,7 @@ sub load
 	unless (-e $file) {warn "$file not found\n"; return undef;}
 
 	my ($fh,$data);
-	if ($file=~m/\.(?:mp3|flac|m4a|m4b|ogg|oga)$/i)
+	if ($file=~m/$::EmbImage_ext_re$/)
 	{	$data=FileTag::PixFromMusicFile($file,$nb);
 	}
 	elsif ($file=~m/\.pdf$/i && $pdf_ok)

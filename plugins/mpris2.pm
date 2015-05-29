@@ -314,7 +314,7 @@ sub GetMetadata_from
 	if (defined $rating && length $rating) { $r{'xesam:userRating'}=dbus_double($rating/100); }
 	unlink $TEMPCOVERFILE;
 	if (my $pic= $h{album_picture}) #FIXME use ~album.picture.uri when available
-	{	if ($pic=~m/\.(?:mp3|flac|m4a|m4b|ogg|oga)(?:\w+)?$/i) #embedded pictures
+	{	if ($pic=~m/$::EmbImage_ext_re(?:\w+)?$/i) #embedded pictures
 		{	my $ok;
 			{	last unless defined($::SongID) && $ID==$::SongID; #only support embedded picture for current song
 				my $data=FileTag::PixFromMusicFile($pic);
