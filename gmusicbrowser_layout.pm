@@ -4216,12 +4216,13 @@ sub new
 	my $vpaned= $self->{vpaned}=	Layout::Boxes::PanedNew('Gtk2::VPaned',{size=>$opt->{vpos}});
 	my $view=	$self->{view}=   Layout::PictureBrowser::View->new($opt);
 	my $toolbar=	$self->{toolbar}= ::BuildToolbar(\@toolbar, getcontext=>\&toolbarcontext, self=>$self);
-	$self->{dirstore} = Gtk2::ListStore->new('Glib::String','Glib::String');
+	$self->{dirstore} = Gtk2::ListStore->new(qw/Glib::String Glib::String Glib::String/);
 	$self->{filestore}= Gtk2::TreeStore->new(qw/Glib::String Glib::String Glib::Boolean Glib::Uint Glib::Uint/);
 	my $treeview1= $self->{foldertv}= Gtk2::TreeView->new($self->{dirstore});
 	my $treeview2= $self->{filetv}=	  Gtk2::TreeView->new($self->{filestore});
 	my $renderer=Gtk2::CellRendererText->new;
 	$renderer->signal_connect(edited => \&filename_edited_cb,$treeview2);
+	$treeview1->insert_column_with_attributes(-1, 'Dir icon', Gtk2::CellRendererPixbuf->new, stock_id => 2) unless $opt->{no_folder_icons};
 	$treeview1->insert_column_with_attributes(-1, 'Dir name', Gtk2::CellRendererText->new, text => 0);
 	$treeview2->insert_column_with_attributes(-1, 'File name',$renderer, text => 0, editable=> 2);
 
@@ -4570,7 +4571,7 @@ sub refresh_treeviews
 	return unless $path;
 	my $parent= ::parentdir($path);
 	$path= ::pathslash($path); # add a slash at the end
-	$dirstore->set( $dirstore->append,  0,'..', 1,Songs::filename_escape($parent)) if $parent;
+	$dirstore->set( $dirstore->append,  0,'..', 1,Songs::filename_escape($parent), 2,'gtk-go-up') if $parent;
 	my $pdfok= $GMB::Picture::pdf_ok && $self->{pdf_mode};
 
 	my $show_expanders;
@@ -4579,7 +4580,7 @@ sub refresh_treeviews
 	for my $file (::sort_number_aware( grep !m#^\.#, readdir $dh))
 	{	if (-d $path.$file)
 		{	my $iter= $dirstore->append;
-			$dirstore->set( $iter, 0,::filename_to_utf8displayname($file), 1,Songs::filename_escape($path.$file));
+			$dirstore->set( $iter, 0,::filename_to_utf8displayname($file), 1,Songs::filename_escape($path.$file),  2,'gtk-directory');
 			if ($oldpath && $oldpath eq $path.$file)	#select and center on previous folder if there
 			{	$folder_center_treepath= $dirstore->get_path($iter);
 				$foldertv->set_cursor($folder_center_treepath);
