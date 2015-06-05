@@ -293,7 +293,7 @@ sub parse_googlei
 	$searchcontext->{baseurl}||= $pageurl;
 	$searchcontext->{pagecount}++;
 	my @list;
-	for my $res (split /<div class="rg_di"[^>]*>/, $results)
+	for my $res (split /<div class="rg_di[^"]*"[^>]*>/, $results)
 	{	next unless $res=~m#(?:\?|&amp;)imgurl=(.*?)&amp;#;
 		my $url=$1;
 		$url=~s/%([0-9A-Fa-f]{2})/chr hex($1)/gie;
