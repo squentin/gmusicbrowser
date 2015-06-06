@@ -122,11 +122,11 @@ our %timespan_menu=
 		'filter:h~'	=> '.!!. do {my $v=#_#; $v ? ref $v ? grep(exists $hash#VAL#->{$_+0}, @$v) : (exists $hash#VAL#->{#_#+0}) : 0}',
 		'filter:ecount'	=> '#VAL# .==. do {my $v=#_#; $v ? ref $v ? scalar(@$v) : 1 : 0}',
 		#FIXME for filters s,m,mi,h~,  using a list of matching names in ___inames/___names could be better (using a bitstring)
-		'filter:s'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (.!!. grep index(___name[$_], "#VAL#")  != -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
-		'filter:si'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (.!!. grep index(___iname[$_], "#VAL#") != -1 ,@$v) : (index(___iname[$v], "#VAL#") .!=. -1); }',
-		'filter:fuzzy'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (.!!. ::first {Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$_])} @$v) : .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$v]); }',
-		'filter:m'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (.!!. grep ___name[$_]  =~ m"#VAL#"  ,@$v) : ___name[$v]  .=~. m"#VAL#"; }',
-		'filter:mi'	=> 'do { my $v=#_#; !$v ? 0 : ref $v ? (.!!. grep ___iname[$_] =~ m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
+		'filter:s'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. grep index(___name[$_], "#VAL#")  != -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
+		'filter:si'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. grep index(___iname[$_], "#VAL#") != -1 ,@$v) : (index(___iname[$v], "#VAL#") .!=. -1); }',
+		'filter:fuzzy'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. ::first {Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$_])} @$v) : .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$v]); }',
+		'filter:m'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. grep ___name[$_]  =~ m"#VAL#"  ,@$v) : ___name[$v]  .=~. m"#VAL#"; }',
+		'filter:mi'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. grep ___iname[$_] =~ m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
 		'filter_prep:m'	=> \&Filter::QuoteRegEx,
 		'filter_prep:mi'=> sub { Filter::QuoteRegEx( ::superlc($_[0]) )},
 		'filter_prep:si'=> sub {quotemeta ::superlc($_[0])},
@@ -4154,7 +4154,7 @@ my (%CachedTime,%CachedSize,%CachedList); my $CachedTotal=0;
 our (%InvOp,$OpRe);
 INIT
 {
-  my @Oplist= qw( =~ !~   || &&   > <=   < >=   == !=   eq ne  !! ! );	#negated operators for negated filters
+  my @Oplist= qw( =~ !~   || &&   > <=   < >=   == !=   eq ne  !! !   0 1 );	#negated operators for negated filters
   %InvOp= (@Oplist, reverse @Oplist);
   $OpRe=join '|',map quotemeta, keys %InvOp;
   $OpRe=qr/\.($OpRe)\./;
