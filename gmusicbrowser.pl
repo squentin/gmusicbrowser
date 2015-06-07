@@ -2146,7 +2146,6 @@ sub ReadOldSavedTags
 	my ($loadsong)=Songs::MakeLoadSub({},split / /,$Songs::OLD_FIELDS);
 	my (%IDforAlbum,%IDforArtist);
 	my @newIDs; SongArray::start_init();
-	my @missing;
 	my $lengthcheck=SongArray->new;
 	while (<$fh>)
 	{	chomp; last if $_ eq '';
@@ -2168,10 +2167,8 @@ sub ReadOldSavedTags
 		my $ID= $newIDs[$oldID]= $loadsong->(@song);
 		$IDforAlbum{$album}=$IDforArtist{$artist}=$ID;
 		push @$lengthcheck,$ID if $misc eq 'l';
-		if ($misc=~m/^\d+$/ && $misc>0) { push @missing,$ID }
-		else { push @$Library,$ID };
+		unless ($misc=~m/^\d+$/ && $misc>0) { push @$Library,$ID };
 	}
-	Songs::AddMissing(\@missing, 'init') if @missing;
 	while (<$fh>)
 	{	chomp; last if $_ eq '';
 		my ($key,$p)=split "\x1D";
@@ -2358,7 +2355,6 @@ sub ReadSavedTags	#load tags _and_ settings
 		my $filter= Filter->newadd(TRUE,'missing:e:0', $mfilter);
 		$Library=[];	#dummy array to avoid a warning when filtering in the next line
 		$Library= SongArray->new( $filter->filter_all );
-		Songs::AddMissing( Songs::AllFilter('missing:-e:0'), 'init' );
 	}
 
 	if ($oldversion<=1.1009)
@@ -3503,6 +3499,7 @@ sub IdleLoop
 	else
 	{	$ProgressNBFolders=$ProgressNBSongs=0;
 		undef $Songs::IDFromFile;
+		undef $Songs::MissingHash;
 
 		warn "IdleLoop End\n" if $debug;
 		undef $IdleLoop;
@@ -5664,7 +5661,7 @@ sub SongsRemove
 	AA::IDs_Changed();
 	HasChanged(SongsRemoved=>$IDs);
 	$RecentPos-- while $RecentPos && $Recent->[$RecentPos-1]!=$SongID; #update RecentPos if needed
-	Songs::AddMissing($IDs);
+	Songs::Set($IDs,missing=>$::DAYNB); #FIXME if song in EstimatedLength, set length to 0 ???
 }
 sub UpdateMasterFilter
 {	SongAdd_now();	#flush waiting list
@@ -6012,7 +6009,7 @@ sub AutoSelPicture
 
 			my %found;
 			for my $folder (@folders)
-			{	opendir my($dh), $folder;
+			{	next unless opendir my($dh), $folder;
 				for my $file (grep m/$Image_ext_re/, readdir $dh)
 				{	my $score=0;
 					if ($field eq 'album') { $score+=100 if $file=~m/(?:^|[^a-zA-Z])(?:cover|front|folder|thumb|thumbnail)[^a-zA-Z]/i; }

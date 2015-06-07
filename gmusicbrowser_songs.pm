@@ -12,9 +12,9 @@ use utf8;
 package Songs;
 
 #our %Songs;
-our $IDFromFile;
+our ($IDFromFile,$MissingHash); my $KeepIDFromFile;
 our ($Artists_split_re,$Artists_title_re);
-my (@Missing,$MissingHash,@MissingKeyFields);
+my @MissingKeyFields;
 our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%HSort,%Aliases);
 my %FuncCache;
 INIT {
@@ -1842,14 +1842,15 @@ sub New
 			modif=> $modif, size=> $size,
 			added=> time,
 		);
-	if (defined( my $ID=CheckMissing($values) ))
+	my ($ID,$wasmissing)= CheckMissing($values);
+	if (defined $ID)
 	{	ReReadFile($ID);
 		::CheckLength($ID) if $::Options{LengthCheckMode} eq 'add' && Get($ID,'length_estimated');
-		return $ID;
+		return $wasmissing ? $ID : undef;
 	}
 
 	#warn "\nNewSub(LastID=$LastID)\n";warn join("\n",map("$_=>$values->{$_}",sort keys %$values))."\n";
-	my $ID=$NEWsub->($values);#warn $Songs::Songs_title__[-1]." NewSub end\n";
+	$ID=$NEWsub->($values); #warn $Songs::Songs_title__[-1]." NewSub end\n";
 	if ($values->{length_estimated} && $::Options{LengthCheckMode} eq 'add') { ::CheckLength($ID); }
 	$IDFromFile->{$path}{$file}=$ID if $IDFromFile;
 	return $ID;
@@ -1984,7 +1985,8 @@ sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
 {	my $IDs=shift || $::Library;
 	my $changed= ref $_[0] ? $_[0] : {map( ($_=>undef), @_ )};
 	warn "Songs::Changed : IDs=@$IDs fields=".join(' ',keys %$changed)."\n" if $::debug;
-	$IDFromFile=undef if $IDFromFile && exists $changed->{file} || exists $changed->{path};
+	$IDFromFile=undef  if $IDFromFile && !$KeepIDFromFile && (exists $changed->{file} || exists $changed->{path});
+	$MissingHash=undef if $MissingHash && grep(exists $changed->{$_}, @MissingKeyFields);
 	my @needupdate;
 	for my $f (keys %$changed)
 	{	if (my $l=$Def{$f}{_depended_on_by}) { push @needupdate, split / /,$l; }
@@ -1998,55 +2000,77 @@ sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
 	::SongsChanged($IDs,[keys %$changed]);
 }
 
-sub AddMissing	#FIXME if song in EstimatedLength, set length to 0
-{	my ($IDs,$init)=@_;
-	push @Missing,@$IDs;
-	$MissingHash=undef;
-	#if ($MissingHash)
-	#{	#for my $ID (@$IDs)
-		#{	my $key=Get($ID,'missingkey');
-		#	push @{ $MissingHash->{$key} },$ID;
-		#}
-	#}
-	Set($IDs,missing=>$::DAYNB) unless $init;
-}
 sub CheckMissing
-{	return undef unless @Missing;
-	my $song=$_[0];
+{	my $song=$_[0];
 	#my $key=Get($song,'missingkey');
 
 	return unless defined $song->{title} && length $song->{title} && (defined $song->{album} || defined $song->{artist});
 	for (qw/title album artist track/) { $song->{$_}="" unless defined $song->{$_} }
 	return unless length ($song->{album} . $song->{artist});
-	#ugly fix, clean-up the fields so they can be compared to those in library, depends on @MissingKeyFields #FIXME
+	#ugly fix, clean-up the fields so they can be compared to those in library, depends on @MissingKeyFields #FIXME should generate a function using #check# and VAL=>'$song->{$field})'
 	$song->{$_}=~s/\s+$// for qw/title album artist/;
 	$song->{track}= $song->{track}=~m/^(\d+)/ ? $1+0 : 0;
 
 	my $key=join "\x1D", @$song{@MissingKeyFields};
-	$MissingHash||= BuildHash('missingkey',\@Missing,undef,'id:list');
+	$MissingHash||= BuildHash('missingkey',undef,undef,'id:list');
 	my $IDs=$MissingHash->{$key};
-	return undef unless $IDs;
-	for my $oldID (@$IDs)
-	{	my $m;
-		for my $f ('file','path')
-		{	#$m++ if Get($song,$f) eq Get($oldID,$f);
-			$m++ if $song->{$f} eq Get($oldID,$f);
+	return unless $IDs;
+	if (@$IDs>1) #too many candidates, try to find the best one
+	{	my @score;
+		for my $oldID (@$IDs)
+		{	my $m=0;
+			$m+=2 if $song->{file} eq Get($oldID,'file');
+			$m++ if $song->{path} eq Get($oldID,'path');
+			#could do more checks
+			push @score,$m;
 		}
-		next unless $m;	#must have the same path or the same filename
-		# Found -> remove old ID, copy non-written song fields to new ID
-		warn "Found missing song, formerly '".Get($oldID,'fullfilename')."'\n";# if $::debug;
+		my $max= ::max(@score);
+		@$IDs= map $IDs->[$_], grep $score[$_]==$max, 0..$#$IDs;
+		if (@$IDs>1) #still more than 1, abort, maybe could continue anyway, the files must be nearly identical anyway
+		{	warn "CheckMissing: more than 1 (".@$IDs.") possible matches for $song-->{path}/$song->{file}, assume identification is unreliable, considering it a new song.\n";
+			return
+		}
+	}
+	for my $oldID (@$IDs)
+	{	my $wasmissing= Get($oldID,'missing');
+		my $fullfilename= GetFullFilename($oldID);
+		next if !$wasmissing && -e $fullfilename; #if candidate still exists
+		warn "Found missing song, formerly '$fullfilename'\n";
 
-		#remove missing
-		if (@$IDs>1) { $MissingHash->{$key}= [grep $_!=$oldID, @$IDs]; }
-		else { delete $MissingHash->{$key}; }
-		@Missing= grep $oldID != $_, @Missing;
+		my $gid=Songs::Get_gid($oldID,'album');
+		if (my $pic= Picture($gid,'album','get'))
+		{	my $suffix= $pic=~s/(:\w+)$// ? $1 : '';
+			unless (-e $pic)
+			{	my $new;
+				if ($pic eq $fullfilename) # check if cover is embedded picture in this file
+				{	$new= ::catfile( $song->{path}, $song->{file} ).$suffix;
+					warn "setting new picture $new\n";
+				}
+				else
+				{	# if cover was in same folder or a sub-folder, check if there based on new folder
+					$new=$pic;
+					my $oldpath= ::pathslash(::dirname($fullfilename));
+					my $newpath= ::pathslash($song->{path});
+					$new=undef unless $new=~s#^\Q$oldpath\E#$newpath# && -e $new;
+				}
+				Picture($gid,'album','set',$new) if $new;
+			}
+		}
+
+		#remove from MissingHash, not really needed
+		#if (@$IDs>1) { $MissingHash->{$key}= [grep $_!=$oldID, @$IDs]; }
+		#else { delete $MissingHash->{$key}; }
+
+		#update $IDFromFile, and prevent its destruction in Changed(), not very nice #FIXME make hashes that update themselves when possible
+		$KeepIDFromFile=1;
+		$IDFromFile->{$song->{path}}{$song->{file}}= delete $IDFromFile->{Get($oldID,'path')}{Get($oldID,'file')} if $IDFromFile;
 
 		Songs::Set($oldID,file=>$song->{file},path=>$song->{path}, missing=>0);
+		$KeepIDFromFile=0;
 
-		########$songref->[$_]=$Songs[$oldID][$_] for SONG_ADDED,SONG_LASTPLAY,SONG_NBPLAY,SONG_LASTSKIP,SONG_NBSKIP,SONG_RATING,SONG_LABELS,SONG_LENGTH; #SONG_LENGTH is copied to avoid the need to check length for mp3 without VBR header
-		return $oldID;
+		return $oldID,$wasmissing;
 	}
-	return undef;
+	return
 }
 sub Makesub
 {	my $c=&Code;	warn "Songs::Makesub(@_) called from : ".join(':',caller)."\n" unless $c;
