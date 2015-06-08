@@ -32,12 +32,14 @@ my %Sites=
 	#discogs => ['discogs.com', "http://api.discogs.com/search?f=xml&type=artists&q=%a", \&parse_discogs],
 	bing =>['bing',"http://www.bing.com/images/search?q=%s", \&parse_bing],
 	yahoo =>['yahoo',"http://images.search.yahoo.com/search/images?p=%s&o=js", \&parse_yahoo],
+	ddg => ["DuckDuckGo","https://duckduckgo.com/i.js?q=%s&o=json", \&parse_ddg],
  },
  album =>
  {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large&imgar=ns", \&parse_googlei, GOOGLE_USER_AGENT],
 	googleihi =>[_"google images (hi-res)","http://www.google.com/images?q=%s&imgsz=xlarge|xxlarge&imgar=ns", \&parse_googlei, GOOGLE_USER_AGENT],
 	yahoo =>['yahoo',"http://images.search.yahoo.com/search/images?p=%s&o=js", \&parse_yahoo],
 	bing =>['bing',"http://www.bing.com/images/async?q=%s&qft=+filterui:aspect-square", \&parse_bing],
+	ddg => ["DuckDuckGo","https://duckduckgo.com/i.js?q=%s&o=json", \&parse_ddg],
 	slothradio => ['slothradio', "http://www.slothradio.com/covers/?artist=%a&album=%l", \&parse_sloth],
 	#freecovers => ['freecovers.net', "http://www.freecovers.net/api/search/%s", \&parse_freecovers], #could add /Music+CD but then we'd lose /Soundtrack #API doesn't work anymore
 	#rateyourmusic=> ['rateyourmusic.com', "http://rateyourmusic.com/search?searchterm=%s&searchtype=l",\&parse_rateyourmusic], # urls results in "403 Forbidden"
@@ -373,6 +375,27 @@ sub parse_yahoo
 	}
 	my $n= ++$searchcontext->{pagecount};
 	my $nexturl= $searchcontext->{baseurl}."&b=".(1+$n*60)."&iid=Y.$n&spos".($n*12); # no idea what the parameters mean, they don't match the number of results, but it works ...
+	return \@list,$nexturl;
+}
+
+sub parse_ddg
+{	my ($result,$pageurl,$searchcontext)=@_;
+	my (@list,$nexturl);
+	# for some reason next pages return some previous results, use $searchcontext->{seen} to ignore them
+	my $seen= $searchcontext->{seen}||= {};
+	$nexturl= 'https://duckduckgo.com/'.$1 if $result=~m#"next"\s*:\s*"(i.js[^"]+)#;
+	for my $res (split /}\s*,\s*{/,$result)
+	{	my @kv= $res=~m#("[^"]+"|[^:]+)\s*:\s*("[^"]*"|[^,}]*)\s*,?#g;
+		s/^"([^"]*)"$/$1/ for @kv;
+		my %h= @kv;
+		next unless $h{image};
+		$h{title}=~s#\\u(....)#chr(hex($1))#eg;
+		my $url= $h{image};
+		#if ($seen->{$url}) { warn "result #".($searchcontext->{count}+1)." : found previous result $seen->{$url}\n"; }
+		next if $seen->{$url};
+		$seen->{$url}= ++$searchcontext->{count};
+		push @list, {url=> $url, previewurl=> $h{thumbnail}, desc=> $h{title}, referer=> $h{url}, };
+	}
 	return \@list,$nexturl;
 }
 
