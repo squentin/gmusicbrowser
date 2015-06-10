@@ -771,10 +771,15 @@ sub sort_number_aware #sort (s1 s10 s2) into (s1 s2 s10)
 }
 
 sub superlc	##lowercase, normalize and remove accents/diacritics #not sure how good it is
-{	my $s=NFKD($_[0]);
+{	#test if 8th bit set for any character, if not it's pure ascii and we can just return lc
+	use bytes; # test is much faster in bytes mode
+	return lc $_[0] unless $_[0]=~m/[\x80-\xff]/; # lc in bytes mode
+	no bytes;
+
+	my $s=NFKD($_[0]);
 	$s=~s/\pM//og;	#remove Marks (see perlunicode)
 	$s=Unicode::Normalize::compose($s); #probably better to recompose #is it worth it ?
-	return lc $s;
+	return lc $s; # lc NOT in bytes mode
 }
 sub superlc_sort
 {	return sort {superlc($a) cmp superlc($b)} @_;
