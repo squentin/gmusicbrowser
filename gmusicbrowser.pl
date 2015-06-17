@@ -778,7 +778,7 @@ sub superlc	##lowercase, normalize and remove accents/diacritics #not sure how g
 
 	my $s=NFKD($_[0]);
 	$s=~s/\pM//og;	#remove Marks (see perlunicode)
-	$s=Unicode::Normalize::compose($s); #probably better to recompose #is it worth it ?
+	#$s=Unicode::Normalize::compose($s); #almost never change anything and should not change comparison result anyway; so better leave it out as it's rather costly
 	return lc $s; # lc NOT in bytes mode
 }
 sub superlc_sort
