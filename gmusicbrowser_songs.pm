@@ -1086,7 +1086,7 @@ our %timespan_menu=
 	edit_order=> 90,	edit_many=>1,
 	edit_string=> _"Edit rating",
 	editsubmenu=>1,
-	options	=> 'rw_ userid editsubmenu',
+	options	=> 'rw_ userid editsubmenu stars',
 	'filterpat:value' => [ round => "%d", unit => '%', max=>100, default_value=>50, ],
 	category=>'basic',
 	alias	=> 'stars',
@@ -1392,10 +1392,10 @@ our %FieldTemplates=
 	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'fgaescpi',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, desc=>_"For when values are likely to be repeated" },
 	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {},  desc=>_"For when values are likely to be repeated" },
 	integer	=> { type=>'integer',	editname=>_"integer",		flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {},  desc => _"For integer numbers", },
-	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'fgaescp_',	width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid editsubmenu', FilterList=> {},
+	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'fgaescp_',	width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid editsubmenu stars', FilterList=> {},
 		     postread => \&FMPS_rating_postread,		prewrite => \&FMPS_rating_prewrite,
 		     id3v2 => 'TXXX;FMPS_Rating_User;%v::%i',	vorbis	=> 'FMPS_RATING_USER::%i',	ape => 'FMPS_RATING_USER::%i',	ilst => '----FMPS_Rating_User::%i',
-		     starprefix => 'stars', #FIXME make it an option
+		     starprefix => 'stars',
 		     editsubmenu => 1,
 		     desc => _"For alternate ratings",
 		   },
@@ -2721,7 +2721,7 @@ sub PrefFields	#preference dialog for fields
 	 ( 'field name',$renderer,text => 0, editable => 2, sensitive=>3, strikethrough => 4,
 	 ));
 
-	my @fields= grep !$Def{$_}{template} && (!$Def{$_}{disable} || $Def{$_}{options} && $Def{$_}{options}=~m/\bdisable\b/), keys %Def;
+	my @fields= grep !$Def{$_}{template} && (!$Def{$_}{disable} || ($Def{$_}{options} && $Def{$_}{options}=~m/\bdisable\b/)), keys %Def;
 	@fields= grep !$Def{$_}{property_of} && $Def{$_}{name} && $Def{$_}{flags}=~m/[pc]/, @fields;
 	#add custom fields
 	push @fields, grep $::Options{Fields_options}{$_}{template}, keys %{$::Options{Fields_options}};
@@ -2838,6 +2838,7 @@ sub validate_custom_field_name
 our %Field_options_aliases=
 (	customfield	=> 'template convwarn disable remove datawarn',
 	rw_		=> 'rw resetnotag',
+	stars		=> 'starprefix starpreview',
 );
 our %Field_options=
 (	#bits	=>
@@ -2871,6 +2872,27 @@ our %Field_options=
 		'default'	=> sub { my $default= $_[0]{flags} || ''; return $default!~m/_/ },
 		apply		=> sub { my ($def,$opt,$value)=@_; $def->{flags}=~s/_//g; $def->{flags}.='_' if !$value; },
 		update		=> sub { $_[0]{widget}->set_sensitive( $_[0]{opt}{rw} ); }, # set insensitive when tag not read/written
+	},
+	starprefix	=>
+	{	label		=> _"Star images",
+		widget		=> 'combo',
+		combo		=> \&::Find_all_stars,
+		tip		=> ::__x(_"You can make custom stars by putting pictures in {folder}\nThey must be named 'stars', optionally followed by a '-' and a word, followed by a number from 0 to 5 or 10\nExample: stars-custom0.png",folder=>$::HomeDir.'icons'),
+	},
+	starpreview	=>
+	{	widget => sub
+		{	my @img= map Gtk2::Image->new, 0..2;
+			my $box= ::Hpack('-',reverse @img);
+			$box->{img}=\@img;
+			return $box;
+		},
+		update => sub
+		{	my $arg=shift;
+			my @files= ::Find_star_pictures($arg->{opt}{starprefix});
+			my $img= $arg->{widget}{img};
+			my @pix= map GMB::Picture::pixbuf($files[$_]), 0,int($#files/2),$#files;
+			$img->[$_]->set_from_pixbuf($pix[$_]) for 0..2;
+		},
 	},
 	editsubmenu	=>
 	{	widget		=> 'check',

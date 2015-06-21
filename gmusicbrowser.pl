@@ -1235,6 +1235,46 @@ my %IconsFallbacks=
 	'gmb-view-fullscreen'=>'gtk-fullscreen',
 );
 
+sub Find_all_stars #returns a hash used in the combobox of the starprefix option
+{	my @dirs= ($HomeDir.'icons', PIXPATH);
+	my %stars=(''=>_"Default");
+	for my $dir (@dirs)
+	{	$dir.=SLASH;
+		opendir my($dh),$dir  or next;
+		my @themes= ('.', grep -d $dir.$_, grep !m/^\./, readdir $dh);
+		closedir $dh;
+		for my $theme (@themes)
+		{	opendir my($dh),$dir.$theme  or next;
+			for my $file (grep !m/^\./, readdir $dh)
+			{	next unless $file=~m/^(stars(?:-\w+?[a-z])?)0\.(?:png|svg)$/i;
+				my $prefix= "$theme/$1";
+				my $name= $theme eq '.' ? $1 : $prefix;
+				$stars{$prefix}=$name;
+			}
+			closedir $dh;
+		}
+	}
+	return \%stars;
+}
+sub Find_star_pictures
+{	my $prefix= $_[0] || 'stars';
+	unless (file_name_is_absolute($prefix))
+	{	my @dirs= ($HomeDir.'icons'.SLASH, PIXPATH);
+		if ($prefix!~m/$QSLASH/o) # only look into theme subdir if $prefix doesn't contain a slash
+		{	unshift @dirs, grep defined, first { -d $_ } map $_.$Options{IconTheme}.SLASH, @dirs;
+		}
+		for my $path (@dirs)
+		{	next unless -f $path.$prefix.'0.svg' || -f $path.$prefix.'0.png'; #FIXME extension shouldn't be case-sensitive
+			$prefix= $path.$prefix;
+			last;
+		}
+	}
+	my $suffix= (-f $prefix.'0.svg') ? '.svg' : '.png'; #FIXME extension shouldn't be case-sensitive
+	my @files;
+	push @files, $prefix.@files.$suffix while -f $prefix.@files.$suffix;
+	return @files;
+}
+
 sub LoadIcons
 {	my %icons;
 	unless (Gtk2::Stock->lookup('gtk-fullscreen'))	#for gtk version 2.6
@@ -1299,21 +1339,12 @@ sub LoadIcons
 	$NBQueueIcons++ while $icons{'gmb-queue'.($NBQueueIcons+1)};
 
 	# find rating pictures
-	for my $field (keys %Songs::Def)
-	{	my $format= $Songs::Def{$field}{starprefix};
-		next unless $format;
-		if ($format!~m#^/#)
-		{	for my $path (reverse PIXPATH,@dirs)
-			{	next unless -f $path.SLASH.$format.'0.svg' || -f $path.SLASH.$format.'0.png';
-				$format= $path.SLASH.$format;
-				last;
-			}
-		}
-		$format.= (-f $format.'0.svg') ? "%d.svg" : "%d.png";
-		my $max=0;
-		$max++ while -f sprintf($format,$max+1);
-		$Songs::Def{$field}{pixbuf}= [ map eval {Gtk2::Gdk::Pixbuf->new_from_file( sprintf($format,$_) )}, 0..$max ];
-		$Songs::Def{$field}{nbpictures}= $max;
+	for my $field (Songs::FieldList(type=>'rating'))
+	{	my $prefix= $Songs::Def{$field}{starprefix};
+		my @stars= Find_star_pictures($prefix);
+		@stars= Find_star_pictures('stars') unless @stars;
+		$Songs::Def{$field}{pixbuf}= [ map GMB::Picture::pixbuf($_), @stars ];
+		$Songs::Def{$field}{nbpictures}= @stars;
 	}
 
 	$icon_factory->remove_default if $icon_factory;
