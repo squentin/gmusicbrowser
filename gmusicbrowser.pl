@@ -593,8 +593,14 @@ unshift @SongCMenu,  #unshift instead of "=" because the replaygain submenu (and
 	{ label => _"Enqueue Displayed",	code => sub { Enqueue(@{ $_[0]{listIDs} }); },
 		empty => 'IDs',	notempty=> 'listIDs', notmode => 'QP', stockicon => 'gmb-queue' },
 	{ label => _"Add to list",	submenu => \&AddToListMenu,	notempty => 'IDs' },
-	{ label => _"Edit Labels",	submenu => \&LabelEditMenu,	notempty => 'IDs' },
-	{ label => _"Edit Rating",	submenu => sub{ Stars::createmenu('rating',$_[0]{IDs}); },	notempty => 'IDs' },
+	# edit submenu for label-type fields
+	{ label => sub { Songs::Field_Edit_string($_[0]{field}); },	notempty => 'IDs',
+	  submenu=>sub { LabelEditMenu($_[0]{field},$_[0]{IDs}); },
+	  foreach=>sub { 'field', Songs::FieldList(true=>'editsubmenu',type=>'flags'); }, },
+	# edit submenu for rating-type fields
+	{ label => sub { Songs::Field_Edit_string($_[0]{field}); },	notempty => 'IDs',
+	  submenu=>sub { Stars::createmenu($_[0]{field},$_[0]{IDs}); },
+	  foreach=>sub { 'field', Songs::FieldList(true=>'editsubmenu',type=>'rating'); }, },
 	{ label => _"Find songs with the same names",	code => sub { SearchSame('title',$_[0]) },	mode => 'B',	notempty => 'IDs' },
 	{ label => _"Find songs with same artists",	code => sub { SearchSame('artists',$_[0])},	mode => 'B',	notempty => 'IDs' },
 	{ label => _"Find songs in same albums",	code => sub { SearchSame('album',$_[0]) },	mode => 'B',	notempty => 'IDs' },
@@ -4374,6 +4380,27 @@ sub BuildMenu
 		next if $m->{test}	&& !$m->{test}($args);
 
 		if (my $mod=$m->{change_input}) { $args={ %$args, @$mod };next } #modify $args for next menu entries
+		elsif (my $foreach=$m->{foreach} )
+		{	my ($key,@values)= $foreach->($args);
+			my %m2= (%$m, foreach=>undef,);
+			for my $value (@values)
+			{	BuildMenu([\%m2],{%$args,$key,$value,},$menu);
+			}
+			next;
+		}
+		elsif ( my $include=$m->{include} ) #append items made by $include
+		{	$include= $include->($args,$menu) if ref $include eq 'CODE';
+			if (ref $include eq 'ARRAY') { BuildMenu($include,$args,$menu); }
+			next;
+		}
+		elsif ( my $repeat=$m->{repeat} )
+		{	my @menus= $repeat->($args);
+			for my $submenu (@menus)
+			{	my ($menuarray,@extra)=@$submenu;
+				BuildMenu($menuarray,{%$args,@extra},$menu);
+			}
+			next;
+		}
 
 		my $label=$m->{label};
 		$label=$label->($args) if ref $label;
@@ -4397,19 +4424,6 @@ sub BuildMenu
 			my $func= $m->{check} || $m->{radio};
 			$item->set_active(1) if $func->($args);
 			$item->set_draw_as_radio(1) if $m->{radio};
-		}
-		elsif ( my $include=$m->{include} ) #append items made by $include
-		{	$include= $include->($args,$menu) if ref $include eq 'CODE';
-			if (ref $include eq 'ARRAY') { BuildMenu($include,$args,$menu); }
-			next;
-		}
-		elsif ( my $repeat=$m->{repeat} )
-		{	my @menus= $repeat->($args);
-			for my $submenu (@menus)
-			{	my ($menuarray,@extra)=@$submenu;
-				BuildMenu($menuarray,{%$args,@extra},$menu);
-			}
-			next;
 		}
 		else	{ $item=Gtk2::MenuItem->new($label); }
 
@@ -5472,8 +5486,7 @@ sub AddToListMenu
 }
 
 sub LabelEditMenu
-{	my $IDs=$_[0]{IDs};
-	my $field='label';
+{	my ($field,$IDs)= @_;
 	my ($hash)=Songs::BuildHash($field,$IDs,'name');
 	$_=	$_==0	  ? 0 :
 		$_==@$IDs ? 1 :

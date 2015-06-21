@@ -5072,7 +5072,8 @@ use base 'Gtk2::EventBox';
 
 sub new_layout_widget
 {	my $opt=shift;
-	my $field= $opt->{field}; # FIXME check valid rating field
+	my $field= $opt->{field};
+	if (Songs::FieldType($field) ne 'rating') { warn "Stars: invalid field '$field'\n"; $field='rating'; }
 	return Stars->new($field,0, \&set_rating_now_cb, %$opt);
 }
 sub update_layout_widget
@@ -5089,6 +5090,7 @@ sub set_rating_now_cb
 
 sub new
 {	my ($class,$field,$nb,$sub, %opt) = @_;
+	if (Songs::FieldType($field) ne 'rating') { warn "Stars: invalid field '$field'\n"; $field='rating'; }
 	my $self = bless Gtk2::EventBox->new, $class;
 	$self->set_visible_window(0);
 	$self->{field}=$field;
@@ -5154,7 +5156,8 @@ sub popup
 
 # not really part of Stars::
 sub createmenu
-{	my ($field,$IDs)=@_; # FIXME check valid rating field
+{	my ($field,$IDs)=@_;
+	if (Songs::FieldType($field) ne 'rating') { warn "Stars::createmenu : invalid field '$field'\n"; $field='rating'; }
 	my $pixbufs= $Songs::Def{$field}{pixbuf} || $Songs::Def{rating}{pixbuf};
 	my $nbstars= $#$pixbufs;
 	my %set;

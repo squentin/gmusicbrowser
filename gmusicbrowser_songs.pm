@@ -1008,6 +1008,8 @@ our %timespan_menu=
 	FilterList	=> {search=>1},
 	edit_order=> 70,	edit_many=>1,	letter => 'g',
 	category=>'basic',
+	editsubmenu=>0,
+	options	=> 'editsubmenu',
 #	picture_field => 'genre_picture',
  },
  label	=>
@@ -1018,12 +1020,14 @@ our %timespan_menu=
 	icon		=> sub { $Def{label}{iconprefix}.$_[0]; }, #FIXME use icon_for_gid
 	icon_for_gid	=> '"#iconprefix#".#gid_to_get#',
 	all_count	=> _"All labels",
+	edit_string	=> _"Edit labels",
 	none		=> quotemeta _"No label",
 	FilterList	=> {search=>1,icon=>1},
 	icon_edit_string=> _"Choose icon for label {name}",
 	edit_order=> 80,	edit_many=>1,	letter => 'L',
 	category=>'extra',
-	options		=> 'persistent_values',
+	editsubmenu=>1,
+	options		=> 'persistent_values editsubmenu',
 	default_persistent_values => [_("favorite"),_("bootleg"),_("broken"),_("bonus tracks"),_("interview"),],
  },
  mood	=>
@@ -1035,7 +1039,8 @@ our %timespan_menu=
 	all_count	=> _"All moods",
 	FilterList	=> {search=>1},
 	edit_order=> 71,	edit_many=>1,
-	disable=>1,	options => 'disable',
+	disable=>1,	options => 'disable editsubmenu',
+	editsubmenu=>0,
 	category=>'extra',
  },
  style	=>
@@ -1045,7 +1050,8 @@ our %timespan_menu=
 	none		=> quotemeta _"No styles",
 	FilterList	=> {search=>1,},
 	edit_order=> 72,	edit_many=>1,
-	disable=>1,	options => 'disable',
+	disable=>1,	options => 'disable editsubmenu',
+	editsubmenu=>0,
 	category=>'extra',
  },
  theme	=>
@@ -1055,7 +1061,8 @@ our %timespan_menu=
 	none		=> quotemeta _"No themes",
 	FilterList	=> {search=>1,},
 	edit_order=> 73,	edit_many=>1,
-	disable=>1,	options => 'disable',
+	disable=>1,	options => 'disable editsubmenu',
+	editsubmenu=>0,
 	category=>'extra',
  },
  comment=>
@@ -1077,7 +1084,9 @@ our %timespan_menu=
 	FilterList => {},
 	starprefix => 'stars',
 	edit_order=> 90,	edit_many=>1,
-	options	=> 'rw_ userid',
+	edit_string=> _"Edit rating",
+	editsubmenu=>1,
+	options	=> 'rw_ userid editsubmenu',
 	'filterpat:value' => [ round => "%d", unit => '%', max=>100, default_value=>50, ],
 	category=>'basic',
 	alias	=> 'stars',
@@ -1378,15 +1387,16 @@ our %FieldTemplates=
 	text	=> { type=>'text',	editname=>_"multi-lines string",flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', },
 	float	=> { type=>'float',	editname=>_"float",		flags=>'fgaescp',	width=> 100,	edit_many =>1,		options=> 'customfield', desc => _"For decimal numbers", },
 	boolean	=> { type=>'boolean',	editname=>_"boolean",		flags=>'fgaescp',	width=> 20,	edit_many =>1,		options=> 'customfield', },
-	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescpil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield persistent_values', FilterList=> {search=>1},   desc=>_"Same type as labels" },
+	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescpil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield persistent_values editsubmenu', FilterList=> {search=>1},   desc=>_"Same type as labels", editsubmenu => 1, },
 	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'fgaescpi',	width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', },
 	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'fgaescpi',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, desc=>_"For when values are likely to be repeated" },
 	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {},  desc=>_"For when values are likely to be repeated" },
 	integer	=> { type=>'integer',	editname=>_"integer",		flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {},  desc => _"For integer numbers", },
-	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'fgaescp_',	width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid', FilterList=> {},
+	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'fgaescp_',	width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid editsubmenu', FilterList=> {},
 		     postread => \&FMPS_rating_postread,		prewrite => \&FMPS_rating_prewrite,
 		     id3v2 => 'TXXX;FMPS_Rating_User;%v::%i',	vorbis	=> 'FMPS_RATING_USER::%i',	ape => 'FMPS_RATING_USER::%i',	ilst => '----FMPS_Rating_User::%i',
 		     starprefix => 'stars', #FIXME make it an option
+		     editsubmenu => 1,
 		     desc => _"For alternate ratings",
 		   },
 );
@@ -2409,6 +2419,10 @@ sub Field_All_string
 {	my $f=$_[0];
 	return $Def{$f} && exists $Def{$f}{all_count} ? $Def{$f}{all_count} : _"All";
 }
+sub Field_Edit_string
+{	my $f=$_[0];
+	return $Def{$f} && exists $Def{$f}{edit_string} ? $Def{$f}{edit_string} : ucfirst(::__x( _"Edit {field}",field=>Songs::FieldName($f)));
+}
 sub FieldName
 {	my $f=$_[0];
 	return $Def{$f} && exists $Def{$f}{name} ? $Def{$f}{name} : ::__x(_"Unknown field ({field})",field=>$f);
@@ -2424,18 +2438,21 @@ sub FieldWidth
 sub FieldEnabled	#check if a field is enabled
 {	!! grep $_[0] eq $_, @Fields;
 }
-sub FieldList		#return list of fields, or list of fields of type $type, these types are not the same necessarily the types are those used in %Def
-{	if (my $type=shift)
-	{	return unless $type eq 'flags'; # only "flags" type supported currently
-		return grep $Def{$_}{type} eq 'flags', @Fields; # currently type flags all have a type=>'flags' in %Def, but might change
-								# maybe should use  $Def{$_}{flags}=~m/l/ && $Def{$_}{flags}=~m/e/  instead
+sub FieldList		#return list of fields, may be filtered by type and/or a key
+{	my %args=@_; # args may be type=> 'flags' or 'rating'  true=> key_that_must_be_true
+	my @l= @Fields;
+	if (my $type=$args{type})
+	{	@l= grep { ($Def{$_}{fieldtype} || $Def{$_}{type}) eq $type} @l; # currently type flags all have a type=>'flags' in %Def, but might change, so fieldtype can overide it
 	}
-	return @Fields;
+	if (my $true=$args{true})
+	{	@l= grep $Def{$_}{$true}, @l;
+	}
+	return @l;
 }
-sub FieldType
+sub FieldType	#currently used to check "flags" or "rating" types
 {	my $field=shift;
 	return '' unless grep $field eq $_, @Fields;
-	return $Def{$field}{type} eq 'flags'? 'flags' : '';	# only "flags" type supported currently, see FieldList() comments
+	return $Def{$field}{fieldtype} || $Def{$field}{type}; # currently fieldtype is not used but might be useful as $Def{$field}{type} is an implementation detail and not a field property
 }
 sub ListGroupTypes
 {	my @list= grep $Def{$_}{can_group}, @Fields;
@@ -2854,6 +2871,10 @@ our %Field_options=
 		'default'	=> sub { my $default= $_[0]{flags} || ''; return $default!~m/_/ },
 		apply		=> sub { my ($def,$opt,$value)=@_; $def->{flags}=~s/_//g; $def->{flags}.='_' if !$value; },
 		update		=> sub { $_[0]{widget}->set_sensitive( $_[0]{opt}{rw} ); }, # set insensitive when tag not read/written
+	},
+	editsubmenu	=>
+	{	widget		=> 'check',
+		label		=> _"Show edition submenu in song context menu",
 	},
 	disable	=>
 	{	widget		=> 'check',
