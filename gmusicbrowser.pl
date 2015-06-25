@@ -10048,7 +10048,20 @@ sub Downloaded
 	}
 	$ext= $ext eq '' ? '' : ".$ext";
 	$file= ::catfile($destpath,$file);
-	::IncSuffix($file) while -e $file.$ext; #could check if same file exist ?
+	# check if existing file is the same
+	{	my $f= $file.$ext;
+		last unless -e $f;
+		my $s= -s $f;
+		last if $s!=length $content;
+		open my($fh),'<',$f or last;
+		read $fh,my($buf),$s;
+		close $fh;
+		last if $buf ne $content;
+		warn "File '$f' already exists and has same content, so not writing a new file\n" if $::Verbose;
+		$self->Done;
+		return;
+	}
+	::IncSuffix($file) while -e $file.$ext;
 	$file.=$ext;
 
 	{	my $fh;
