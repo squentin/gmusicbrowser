@@ -9969,6 +9969,7 @@ sub Add_URI #params : is_move, destpath
 {	my ($self,%params)=@_;
 	my $uris= delete $params{uris};
 	return if !$params{destpath} || !@$uris;
+	s/^\s+//, s/\s+$// for @$uris;
 	push @{$self->{todo}}, $_,\%params for @$uris;
 	$self->{total}+= @$uris;
 	::Progress( 'DropURI_'.$self, add=>scalar(@$uris), abortcb=>sub{$self->Abort}, bartext=> _('file $current/$end')." :", title=>"",);

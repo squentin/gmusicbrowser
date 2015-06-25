@@ -4200,6 +4200,11 @@ our @ContextMenu=
 	  # test => sub { Songs::FilterListProp($_[0]{field},'picture') },
 	},
 
+	{ label => _"Paste link",
+	  test => sub { return unless $_[0]{self}->can('drop_uris'); $_[0]{clip}= $_[0]{self}->get_clipboard(Gtk2::Gdk::Atom->new('PRIMARY',1))->wait_for_text; $_[0]{clip} && $_[0]{clip}=~m#^\s*\w+://#; },
+	  code=> sub { $_[0]{self}->drop_uris(uris=>[grep m#^\s*\w+://#, split /[\n\r]+/, $_[0]{clip}]); },
+	},
+
 	{ label=> sub { $_[0]{view}{fullwin} ? _"Exit full screen" : _"Full screen" }, code=>sub { $_[0]{view}->set_fullscreen }, mode=>'VP',
 	  stockicon=> sub { $_[0]{view}{fullwin} ? 'gtk-leave-fullscreen' : 'gtk-fullscreen' },
 	},
@@ -4272,13 +4277,9 @@ sub new
 	 {	my ($view,$type,@values)=@_;
 		my $self= ::find_ancestor($view,__PACKAGE__);
 		if ($type==::DRAG_FILE)
-		{	return unless $self->{current_path};
-			my $is_move= $view->{dragdest_suggested_action} == 'move';
-			$self->{drop_job} ||= GMB::DropURI->new(toplevel=>$self->get_toplevel, cb=>sub{$self->file_dropped($_[0])}, cb_end=>sub{$self->drop_end});
-			$self->{drop_job}->Add_URI(uris=>\@values, is_move=>$is_move, destpath=>$self->{current_path});
-			$self->{select_drop}=1;
+		{	$self->Drop_Uris(uris=>\@values, is_move=>$view->{dragdest_suggested_action});
 		}
-		else # $type is ID
+		elsif ($type==::DRAG_ID)
 		{	$self->queue_song_changed($values[0],'force');
 		}
 	 }],
@@ -4458,6 +4459,14 @@ sub treeview_selection_changed_cb
 	my $self= ::find_ancestor($selection->get_tree_view,__PACKAGE__);
 	return if $self->{busy};
 	$self->set_file($file);
+}
+
+sub drop_uris
+{	my ($self,%args)=@_;
+	return unless $self->{current_path};
+	$self->{drop_job} ||= GMB::DropURI->new(toplevel=>$self->get_toplevel, cb=>sub{$self->file_dropped($_[0])}, cb_end=>sub{$self->drop_end});
+	$self->{drop_job}->Add_URI(uris=>$args{uris}, is_move=>$args{is_move}, destpath=>$self->{current_path});
+	$self->{select_drop}=1;
 }
 
 sub file_dropped
