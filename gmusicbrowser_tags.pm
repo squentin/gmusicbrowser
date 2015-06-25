@@ -1426,9 +1426,8 @@ use base 'Gtk2::Box';
 use constant { TRUE  => 1, FALSE => 0, };
 
 sub new
-{	my ($class,$window,$ID) = @_;
+{	my ($class,$ID) = @_;
 	my $self = bless Gtk2::VBox->new, $class;
-	$self->{window}=$window;
 	$self->{ID}=$ID;
 
 	my $labelfile = Gtk2::Label->new;
@@ -1472,42 +1471,260 @@ sub fill
 	$table->show_all;
 }
 
-sub advanced
+sub get_changes
 {	my $self=shift;
-	my $ID=$self->{ID};
-	my $dialog = Gtk2::Dialog->new (_"Advanced Tag Editing", $self->{window},
-		[qw/destroy-with-parent/],
-		'gtk-ok' => 'ok',
-		'gtk-cancel' => 'none');
-	$dialog->set_default_response ('ok');
-	my $edittag=EditTag->new($dialog,$ID);
-	unless ($edittag) { ::ErrorMessage(_"Can't read file or invalid file"); return }
-	$dialog->vbox->add($edittag);
-	::SetWSize($dialog,'AdvTag','540x505');
-	$dialog->show_all;
-	$self->{window}->set_sensitive(0);
-	$dialog->signal_connect( response => sub
-	 {	my ($dialog,$response)=@_;
-		if ($response eq 'ok')
-		{	$edittag->save;
-			Songs::ReReadFile($ID);
-			$self->fill;
-		}
-		$self->{window}->set_sensitive(1);
-		$dialog->destroy;
-	 });
-}
-
-sub save
-{	my $self=shift;
-	my $ID=$self->{ID};
 	my @modif;
 	while (my ($field,$entry)=each %{$self->{fields}})
 	{	push @modif,$field,$entry->get_text;
 	}
-	Songs::Set($ID,\@modif,window=>$self->{window}) if @modif;
+	return @modif;
 }
 
+
+package Edit_Embedded_Picture;
+use base 'Gtk2::Box';
+
+sub new
+{	my ($class,$ID) = @_;
+	my $self = bless Gtk2::VBox->new, $class;
+	$self->{ID}=$ID;
+
+	$self->{store}= Gtk2::ListStore->new(qw/Glib::Uint Glib::String/);
+	my $treeview= $self->{treeview}= Gtk2::TreeView->new($self->{store});
+	$treeview->insert_column_with_attributes(-1, "type",Gtk2::CellRendererText->new, text => 1);
+	$treeview->set_headers_visible(0);
+	$treeview->get_selection->signal_connect(changed => \&selection_changed_cb,$self);
+
+	my $view= $self->{view}= Layout::PictureBrowser::View->new(context_menu_sub=>\&context_menu, xalign=> .5, yalign=>.5, scroll_zoom=>1,);
+	::set_drag($view, dest => [::DRAG_FILE, sub
+	{	my ($view,$type,$uri,@ignored_uris)=@_;
+		my $self= ::find_ancestor($view,__PACKAGE__);
+		if ($uri=~s#^file://##)
+		{	my $file= ::decode_url($uri);
+			my $data= GMB::Picture::load_data($file);
+			$self->drop_data(\$data) if $data;
+		}
+		else
+		{	$self->drop_uris(uris=>[$uri]);
+		}
+	}],
+	motion=> sub {	my ($view,$context,$x,$y,$time)=@_;
+			$view->{dnd_message}= _"Set picture using this file";
+			1;
+		      }
+	);
+	$view->signal_connect(drag_leave => sub { delete $_[0]{dnd_message}; });
+	$self->signal_connect(destroy=> sub { my $self=shift; $self->{drop_job}->Abort if $self->{drop_job}; });
+
+	my $button_del= ::NewIconButton('gtk-remove', _"Remove picture");
+	my $button_set= ::NewIconButton('gtk-open',_"Set picture");
+	my $button_new= $self->{button_new}= ::NewIconButton('gtk-add', _"Add picture");
+	my $combo_type= $self->{combo_type}= Gtk2::ComboBox->new_text;
+	my $entry_desc= $self->{entry_desc}= Gtk2::Entry->new;
+	my $info_label= $self->{info_label}= Gtk2::Label->new;
+	$entry_desc->set_tooltip_text(_"Description");
+	$combo_type->set_tooltip_text(_"Picture type");
+	$combo_type->append_text($_) for @$EntryMulti::PICTYPE;
+	$button_new->signal_connect(clicked=>\&new_picture_cb);
+	$button_del->signal_connect(clicked=>\&remove_selected_cb);
+	$button_set->signal_connect(clicked=>\&set_picture_cb);
+	$combo_type->signal_connect(changed=>\&type_change_cb);
+	$entry_desc->signal_connect(changed=>\&desc_changed_cb);
+	$self->signal_connect(key_press_event=> \&key_press_cb);
+
+	my $hbox= ::Hpack( '_',['_',::new_scrolledwindow($treeview),$button_new], [$combo_type,$entry_desc,$button_set,$button_del] );
+	$self->{editbox}= $combo_type->parent;
+	$self->pack_start($hbox, 0,0,2);
+	$self->pack_start($view, 1,1,2);
+	$self->pack_start($info_label, 0,0,2);
+	$self->signal_connect(map=>sub {$_[0]->load unless $_[0]{loaded}});
+	return $self;
+}
+sub update { $_[0]->load if $_[0]{loaded}; }
+sub load
+{	my $self=shift;
+	$self->{changed}=0;
+	$self->{loaded}=1;
+	my $ID=$self->{ID};
+	my $file= Songs::GetFullFilename($ID);
+	if ($file!~m/$::EmbImage_ext_re$/) { $self->set_sensitive(0); $self->{view}->drag_dest_unset; return }
+	my ($h)= FileTag::Read($file,0,'embedded_pictures',0);
+	$self->{pix}= $h && $h->{embedded_pictures};
+	if ($file=~m/\.(?:m4a|m4b)$/i)
+	{	$self->{m4a_mode}=1;	#only 1 picture, type "front cover", no description
+		$self->{$_}->set_sensitive(0) for qw/combo_type entry_desc/;
+		$self->{pix}= [[undef,3,'',$self->{pix}[0]]] if $self->{pix};
+	}
+	$self->fill;
+}
+
+sub fill
+{	my ($self,$select)=@_;
+	my $store= $self->{store};
+	$store->clear;
+	my $pix= $self->{pix};
+	return unless $pix && @$pix;
+	my $select_path;
+	for my $nb (0..$#$pix)
+	{	next unless $pix->[$nb]; #skip deleted
+		my $iter= $store->append;
+		$store->set($iter, 0,$nb, 1,$self->make_row_text($nb));
+		$select=$nb unless defined $select; #select first by default
+		if (defined $select && $select==$nb) { $select_path=$store->get_path($iter); }
+	}
+	if ($self->{m4a_mode})
+	{	my $count= grep defined,@$pix;
+		$self->{button_new}->set_sensitive($count==0);
+	}
+	if ($select_path)
+	{	$self->{treeview}->scroll_to_cell($select_path);
+		$self->{treeview}->get_selection->select_path($select_path);
+	}
+}
+sub make_row_text
+{	my ($self,$nb)=@_;
+	my ($mime,$typeid,$desc,$data)= @{$self->{pix}[$nb]};
+	my $text= $EntryMulti::PICTYPE->[$typeid] || _"Unknown";
+	if (defined $desc && length $desc) { $text.=": $desc" }
+	return $text;
+}
+
+sub selection_changed_cb
+{	my ($selection,$self)=@_;
+	my ($store,$iter) = $selection->get_selected;
+	unless ($iter)
+	{	$self->{entry_desc}->set_text('');
+		$self->{combo_type}->set_active(0);
+	}
+	$self->{editbox}->set_sensitive(!!$iter);
+	$self->{info_label}->set_text("");
+	my ($pixbuf,%info);
+	{	last unless $iter;
+		(my $nb,$info{filename})= $store->get($iter,0,1);
+		my $apic= $self->{pix}[$nb];
+		my ($mime,$typeid,$desc,$data)= @$apic;
+		$self->{entry_desc}->set_text($desc);
+		$self->{combo_type}->set_active($typeid);
+		last unless $data;
+		$info{size}=length $data;
+		my $loader= GMB::Picture::LoadPixData($data);
+		last unless $loader;
+		if ($Gtk2::VERSION >= 1.092)
+		{	my $h=$loader->get_format;
+			$self->{pix}[$nb][0]= $h->{mime_types}[0];
+		}
+		$pixbuf= $loader->get_pixbuf;
+		my $size= ::format_number($info{size}/::KB(),"%.1f").' '._"KB";
+		my $dim= sprintf "%d x %d",$pixbuf->get_width,$pixbuf->get_height;
+		$self->{info_label}->set_text("($dim) $size");
+	}
+	$self->{view}->reset_zoom;
+	$self->{view}->set_pixbuf($pixbuf,%info);
+}
+
+sub new_picture_cb
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+	my $type=0;
+	$type=3 unless grep $_ && $_->[1]==3, @{$self->{pix}}; # default to 3 (front cover) if no other picture of that type
+	my $new= push @{$self->{pix}}, [undef,$type,'',undef];
+	$self->fill($new-1);
+}
+sub remove_selected_cb
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+	my $nb= $self->get_selected;
+	return unless defined $nb;
+	$self->{changed}=1;
+	$self->{pix}[$nb]=undef;
+	($nb)= grep $self->{pix}[$_],reverse 0..$nb-1; #select previous entry if any
+	$self->fill($nb);
+}
+sub set_picture_cb
+{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+	my $nb= $self->get_selected;
+	return unless defined $nb;
+	my $file=::ChoosePix();
+	return unless defined $file;
+	$self->{changed}=1;
+	my $data= GMB::Picture::load_data($file);
+	$self->{pix}[$nb][3]=$data if $data;
+	$self->fill($nb);
+}
+sub type_change_cb
+{	my $combo=shift;
+	my $self= ::find_ancestor($combo,__PACKAGE__);
+	my $nb= $self->get_selected;
+	return unless defined $nb;
+	$self->{changed}=1;
+	my $type= $combo->get_active;
+	$self->{pix}[$nb][1]= $type;
+	$self->refresh_selected;
+}
+
+sub desc_changed_cb
+{	my $entry=shift;
+	my $self= ::find_ancestor($entry,__PACKAGE__);
+	my $nb= $self->get_selected;
+	return unless defined $nb;
+	$self->{changed}=1;
+	$self->{pix}[$nb][2]= $entry->get_text;
+	$self->refresh_selected;
+}
+
+sub get_selected
+{	my $self=shift;
+	my ($store,$iter) = $self->{treeview}->get_selection->get_selected;
+	return unless $iter;
+	return $store->get($iter,0);
+}
+sub refresh_selected
+{	my $self=shift;
+	my ($store,$iter) = $self->{treeview}->get_selection->get_selected;
+	return unless $iter;
+	my $nb=$store->get($iter,0);
+	$store->set($iter, 1,$self->make_row_text($nb));
+}
+
+sub drop_uris
+{	my ($self,%args)=@_;
+	$self->{drop_job}->Abort if $self->{drop_job};
+	$self->{drop_job}= GMB::DropURI->new(toplevel=>$self->get_toplevel, cb=>sub{$self->drop_data($_[0]); delete $self->{drop_job}; });
+	my $uri= $args{uris}[0]; #only take first one
+	my $data;
+	$self->{drop_job}->Add_URI(uris=>[$uri], destpath=>\$data);
+}
+sub drop_data
+{	my ($self,$dataref)=@_;
+	my $nb= $self->get_selected;
+	unless (defined $nb)
+	{	$self->new_picture_cb;
+		$nb= $self->get_selected;
+		return unless defined $nb;
+	}
+	$self->{changed}=1;
+	$self->{pix}[$nb][3]=$$dataref if $$dataref;
+	$self->fill($nb);
+}
+
+sub context_menu_args
+{	my $self=shift;
+	return self=>$self, mode=>'P';
+}
+sub key_press_cb
+{	my ($self,$event)=@_;
+	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
+	if    (::WordIn($key,'Insert KP_Insert'))	{ $self->new_picture_cb; }
+	elsif (::WordIn($key,'Delete KP_Delete'))	{ $self->remove_selected_cb; }
+	else {return 0}
+	return 1;
+}
+
+sub get_changes
+{	my $self=shift;
+	return () unless $self->{changed};
+	my @apics= grep $_->[3], @{$self->{pix}}; #only keep those that have a picture
+	if ($self->{m4a_mode} && @apics) { @apics=($apics[0][3]); }
+	return embedded_pictures=>\@apics;
+}
 
 ############################## Advanced tag editing ##############################
 
@@ -2085,7 +2302,7 @@ sub return_value
 package EntryMulti;	#for id3v2 frames containing multiple fields
 use base 'Gtk2::Frame';
 
-my %SUBTAGPROP; my $PICTYPE;
+my %SUBTAGPROP; our $PICTYPE;
 INIT
 { $PICTYPE=[_"other",_"32x32 PNG file icon",_"other file icon",_"front cover",_"back cover",_"leaflet page",_"media",_"lead artist",_"artist",_"conductor",_"band",_"composer",_"lyricist",_"recording location",_"during recording",_"during performance",_"movie/video screen capture",_"a bright coloured fish",_"illustration",_"band/artist logotype",_"Publisher/Studio logotype"];
   %SUBTAGPROP=		# [label,row,col_start,col_end,widget,extra_parameter]

@@ -4192,7 +4192,7 @@ our @ContextMenu=
 	},
 	{ label=> _"Delete file",	code => sub { $_[0]{self}->delete_selected },	istrue=>'writeable', isfalse=>'ispage', mode=>'VL', stockicon=>'gtk-delete', },
 
-	{ label => _"Options", submenu=> \@optionsubmenu, },
+	{ label => _"Options", submenu=> \@optionsubmenu, mode=>'VL', },
 
 	{ label=> sub { my $name=Songs::Gid_to_Display($_[0]{field},$_[0]{gid}); ::__x(_"Set as picture for '{name}'", name=>::Ellipsize($name,30)) },
 	  code => sub { Songs::Picture($_[0]{gid},$_[0]{field},'set',$_[0]{file}); },
@@ -4214,7 +4214,7 @@ sub new
 	my $hbox= Gtk2::HBox->new;
 	my $hpaned=			Layout::Boxes::PanedNew('Gtk2::HPaned',{size=>$opt->{hpos}});
 	my $vpaned= $self->{vpaned}=	Layout::Boxes::PanedNew('Gtk2::VPaned',{size=>$opt->{vpos}});
-	my $view=	$self->{view}=   Layout::PictureBrowser::View->new($opt);
+	my $view=	$self->{view}=  Layout::PictureBrowser::View->new(%$opt,mode=>'V');
 	my $toolbar=	$self->{toolbar}= ::BuildToolbar(\@toolbar, getcontext=>\&toolbarcontext, self=>$self);
 	$self->{dirstore} = Gtk2::ListStore->new(qw/Glib::String Glib::String Glib::String/);
 	$self->{filestore}= Gtk2::TreeStore->new(qw/Glib::String Glib::String Glib::Boolean Glib::Uint Glib::Uint/);
@@ -4445,7 +4445,7 @@ sub file_button_press_cb
 	my $button=$event->button;
 	if ($button == 3)
 	{	my @rows=$tv->get_selection->get_selected_rows;
-		$self->context_menu( mode=>'L', treepaths=>\@rows, );
+		::PopupContextMenu( \@ContextMenu, {mode=>'L', treepaths=>\@rows, $self->context_menu_args} );
 	}
 	else {return 0}
 	1;
@@ -4679,22 +4679,20 @@ sub set_file
 	else							{ $self->update_file; }
 }
 
-sub context_menu
-{	my ($self,@extra)=@_;	# at least "mode" comes from extra
+sub context_menu_args
+{	my $self=shift;
 	my $file= $self->{current_file};
 	my $ispage= $file && $file=~m/:\w+$/;
-	::PopupContextMenu(\@ContextMenu,
-	 { self=>$self,	field=>$self->{field}, ID=>$self->{ID}, gid=>$self->{gid}, file=>$file,
-	   ispage=>$ispage,		writeable=> ($file && !$::CmdLine{ro}),
-	   toolbar=>$self->{toolbar},	view=>$self->{view},	@extra,
-	 });
+	return self=>$self, field=>$self->{field}, ID=>$self->{ID}, gid=>$self->{gid},
+		file=>$file,	ispage=>$ispage,writeable=> ($file && !$::CmdLine{ro}),
+		toolbar=>$self->{toolbar},	view=>$self->{view};
 }
 
 package Layout::PictureBrowser::View;
 use base 'Gtk2::Widget';
 
 sub new
-{	my ($class,$opt)=@_;
+{	my ($class,%opt)=@_;
 	#my $self= bless Gtk2::EventBox->new, $class;
 	my $self= bless Gtk2::DrawingArea->new, $class;
 	$self->add_events([qw/pointer-motion-mask scroll-mask key-press-mask button-press-mask button-release-mask/]);
@@ -4707,10 +4705,11 @@ sub new
 	$self->signal_connect(button_release_event=> \&button_release_cb);
 	$self->signal_connect(motion_notify_event => \&motion_notify_cb);
 	$self->signal_connect(destroy => sub {delete $_[0]{pbanim}});
-	$self->{$_}=$opt->{$_} for qw/xalign yalign scroll_zoom show_info oneshot/;
+	$self->{$_}=$opt{$_} for qw/xalign yalign scroll_zoom show_info oneshot/;
+	$self->{mode}= $opt{mode}||'P';
 	$self->{offsetx}= $self->{offsety} =0;
 	$self->{fit}=1; #default to zoom-to-fit
-	if (my $c=$opt->{bgcolor}) { $self->modify_bg('normal',Gtk2::Gdk::Color->parse($c)); }
+	if (my $c=$opt{bgcolor}) { $self->modify_bg('normal',Gtk2::Gdk::Color->parse($c)); }
 	return $self;
 }
 
@@ -4870,9 +4869,10 @@ sub button_press_cb
 	my $button=$event->button;
 	if ($button == 3)
 	{	if ($self->{oneshot}) { $self->get_toplevel->close_window; return 1 }
-		my $parent= ::find_ancestor($self,'Layout::PictureBrowser');
-		if ($parent) { $parent->context_menu(mode=>'V'); }
-		else { ::PopupContextMenu( \@Layout::PictureBrowser::ContextMenu, { view=>$self, mode=>'P', } ); }
+		my @args= ( view=>$self, mode=> $self->{mode}, );
+		my $parent=$self; while ($parent=$parent->get_parent) { last if $parent->{view} && $parent->{view}==$self; }
+		push @args,$parent->context_menu_args if $parent && $parent->can('context_menu_args');
+		::PopupContextMenu( \@Layout::PictureBrowser::ContextMenu, {@args} );
 	}
 	elsif ($button==9) { $self->change_picture(1); }
 	elsif ($button==8) { $self->change_picture(-1);}
@@ -5039,6 +5039,7 @@ sub set_fullscreen
 		$gdkwin->set_user_data($self->window->get_user_data);
 		$gdkwin->fullscreen;
 		$gdkwin->show;
+		$gdkwin->set_transient_for($self->window);
 		$self->grab_focus; #make sure we have the focus
 	}
 	else

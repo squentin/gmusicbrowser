@@ -1349,7 +1349,7 @@ our %timespan_menu=
  shuffle	=> { name => _"Shuffle",	type => 'shuffle',	flags => 's', },
  album_shuffle	=> { name => _"Album shuffle",	type => 'gidshuffle',	flags => 's',	mainfield=>'album'	  },
  embedded_pictures=>
- {	flags => 'l',	type	=> 'virtual',
+ {	flags => 'wl',	type=>'writeonly',
 	id3v2 => 'APIC',	vorbis => 'METADATA_BLOCK_PICTURE',	'ilst' => 'covr',
  },
  embedded_lyrics=>

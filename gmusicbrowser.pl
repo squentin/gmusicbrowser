@@ -5653,10 +5653,14 @@ sub DialogSongProp
 	$notebook->set_tab_border(4);
 	$dialog->vbox->add($notebook);
 
-	my $edittag=  EditTagSimple->new($dialog,$ID);
+	my $edittag=  EditTagSimple->new($ID);
+	my $editpic=  Edit_Embedded_Picture->new($ID);
 	my $songinfo= Layout::SongInfo->new({ID=>$ID});
 	$notebook->append_page( $edittag,	Gtk2::Label->new(_"Edit"));
 	$notebook->append_page( $songinfo,	Gtk2::Label->new(_"Info"));
+	$notebook->append_page( $editpic,	Gtk2::Label->new(_"Embedded Pictures"));
+
+	$dialog->{update}=sub { $edittag->fill; $editpic->update; };
 
 	SetWSize($dialog,'SongInfo','420x540');
 	$dialog->show_all;
@@ -5664,11 +5668,41 @@ sub DialogSongProp
 	$dialog->signal_connect( response => sub
 	{	warn "EditTag response : @_\n" if $debug;
 		my ($dialog,$response)=@_;
-		if ($response eq '1') { $edittag->advanced; return; }
-		$edittag->save if $response eq 'ok';
+		if ($response eq '1') { AdvancedSongProp($dialog,$ID); return; }
+		if ($response eq 'ok')
+		{	my @set;
+			push @set, $edittag->get_changes;
+			push @set, $editpic->get_changes;
+			Songs::Set($ID,\@set,window=>$dialog) if @set;
+		}
 		delete $Editing{$ID};
 		$dialog->destroy;
 	});
+}
+
+sub AdvancedSongProp
+{	my ($base_dialog,$ID)=@_;
+	my $adv_dialog = Gtk2::Dialog->new (_"Advanced Tag Editing", $base_dialog,
+		[qw/destroy-with-parent/],
+		'gtk-ok' => 'ok',
+		'gtk-cancel' => 'none');
+	$adv_dialog->set_default_response ('ok');
+	my $adv_edit=EditTag->new($adv_dialog,$ID);
+	unless ($adv_edit) { ::ErrorMessage(_"Can't read file or invalid file"); return }
+	$adv_dialog->vbox->add($adv_edit);
+	::SetWSize($adv_dialog,'AdvTag','540x505');
+	$adv_dialog->show_all;
+	$base_dialog->set_sensitive(0);
+	$adv_dialog->signal_connect( response => sub
+	 {	my ($adv_dialog,$response)=@_;
+		if ($response eq 'ok')
+		{	$adv_edit->save;
+			Songs::ReReadFile($ID);
+			$base_dialog->{update}->();
+		}
+		$base_dialog->set_sensitive(1);
+		$adv_dialog->destroy;
+	 });
 }
 
 sub SongsChanged
