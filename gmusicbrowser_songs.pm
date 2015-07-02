@@ -1608,7 +1608,7 @@ sub SortCode
 
 sub Compile		#currently return value of the code must be a scalar
 {	my ($name,$code)=@_;
-	if ($::debug) { $::DebugEvaledCode{$name}=$code; $code=~s/^sub {/sub { local *__ANON__ = 'evaled $name';/; }
+	if ($::debug) { $::DebugEvaledCode{$name}=$code; $code=~s/^sub \{/sub { local *__ANON__ = 'evaled $name';/; }
 	my $res=eval $code;
 	if ($@) { warn "** Compilation error in $name\n Code:-------\n$code\n *Error:-------\n$@**\n";}
 	return $res;

@@ -896,7 +896,7 @@ sub UsedFields
 {	my $s=$_[0];
 	my @f= grep defined, map $ReplaceFields{$_}, $s=~m/(%[a-zA-Z])/g;
 	push @f, $s=~m#\$([a-zA-Z]\w*)#g;
-	push @f, ReplaceExprUsedFields($_) for $s=~m#\${(.*?(?<!\\))}#g;
+	push @f, ReplaceExprUsedFields($_) for $s=~m#\$\{(.*?(?<!\\))}#g;
 	return Songs::Depends(@f);
 }
 sub ReplaceFields
@@ -904,7 +904,7 @@ sub ReplaceFields
 	$special||={};
 	my $display= $esc ? ref $esc ? sub { $esc->(Songs::Display(@_)) } : \&Songs::DisplayEsc : \&Songs::Display;
 	$string=~s#(?:\\n|<br>)#\n#g;
-	$string=~s#([%\$]){2}|(%[a-zA-Z]|\$[a-zA-Z\$]\w*)|\${(.*?(?<!\\))}#
+	$string=~s#([%\$]){2}|(%[a-zA-Z]|\$[a-zA-Z\$]\w*)|\$\{(.*?(?<!\\))}#
 		$1			? $1 :
 		defined $3		? ReplaceExpr($3) :
 		exists $special->{$2}	? do {my $s=$special->{$2}; ref $s ? $s->($ID,$2) : $s} :
