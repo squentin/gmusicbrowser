@@ -588,6 +588,8 @@ unshift @SongCMenu,  #unshift instead of "=" because the replaygain submenu (and
 		onlymany => 'IDs', 	stockicon => 'gtk-media-play'},
 	{ label => _"Play Only Displayed",code => sub { Select(song => 'first', play => 1, staticlist => \@{$_[0]{listIDs}} ); },
 		test => sub { @{$_[0]{IDs}}<2 }, notmode => 'A',	onlymany => 'listIDs',	stockicon => 'gtk-media-play' },
+	{ label => _"Append to playlist",code => sub { ::DoActionForList('addplay',$_[0]{IDs}); },
+		notempty => 'IDs',	test => sub { $::ListMode }, },
 	{ label => _"Enqueue Selected",		code => sub { Enqueue(@{ $_[0]{IDs} }); },	submenu3=> \@submenuQueue,
 		notempty => 'IDs', notmode => 'QP', stockicon => 'gmb-queue' },
 	{ label => _"Enqueue Displayed",	code => sub { Enqueue(@{ $_[0]{listIDs} }); },
