@@ -5724,7 +5724,7 @@ sub UpdateMasterFilter
 	Filter::clear_cache();
 	AA::IDs_Changed();
 	$Library->Replace($newlist);
-	HasChanged(SongsRemoved=> \@toremove);
+	HasChanged(SongsHidden=> \@toremove);
 	HasChanged(SongsAdded=> \@toadd);
 }
 
@@ -6924,7 +6924,7 @@ sub PrefLibrary
 	my $masterfilter= FilterCombo->new( $Options{MasterFilter}, sub { $Options{MasterFilter}=$_[1]; UpdateMasterFilter(); } );
 	my $masterfiltercheck= NewPrefCheckButton( MasterFilterOn=> _"Use a master filter", widget=>$masterfilter, cb=>\&UpdateMasterFilter, horizontal=>1 );
 	my $librarysize= Label::Preview->new(
-		event => 'SongsRemoved SongsAdded',
+		event => 'SongsRemoved SongsHidden SongsAdded',
 		preview=> sub
 		{	my $listtotal=Filter->new('missing:e:0')->filter_all;
 			my $lib= scalar @$Library;

@@ -3365,7 +3365,7 @@ my $init;
 my %Presence;
 
 INIT
-{ ::Watch(undef, SongsRemoved	=> \&SongsRemoved_cb);
+{ ::Watch(undef, SongsRemoved	=> sub { RemoveFromArrays($_[1],\@list_of_SongArray); });
 }
 
 sub DESTROY
@@ -3423,15 +3423,17 @@ sub save_to_string
 
 sub GetName {undef}
 
-sub SongsRemoved_cb		#could probably be improved
-{	my (undef,$IDs_toremove)=@_;
+sub RemoveFromArrays		#could probably be improved
+{	my ($IDs_toremove,$list_of_arrays)=@_;
+	$list_of_arrays ||= \@list_of_SongArray;
 	my $isin='';
 	vec($isin,$_,1)=1 for @$IDs_toremove;
-	for my $self (grep defined, @list_of_SongArray)
+	for my $self (grep defined, @$list_of_arrays)
 	{	my @rows=grep vec($isin,$self->[$_],1), 0..$#$self;
 		$self->Remove(\@rows,'removeIDsfromall') if @rows;
 	}
 }
+
 sub RemoveIDs
 {	my ($self,$IDs_toremove)=@_;
 	my $isin='';
@@ -3567,12 +3569,13 @@ use base 'SongArray';
 our %Filter;
 our %Sort;
 our %needupdate;
+my @list_of_AutoUpdate;
 
 INIT
 { ::Watch(undef, SongsChanged	=> \&SongsChanged_cb);
   ::Watch(undef, SongsAdded	=> \&SongsAdded_cb);
+  ::Watch(undef, SongsHidden	=> sub { SongArray::RemoveFromArrays($_[1],\@list_of_AutoUpdate); });
 }
-my @list_of_AutoUpdate;
 
 sub new
 {	my ($class,$auto,$sort,$filter)=@_;
@@ -3706,6 +3709,7 @@ sub init
 
 	::Watch(undef, SongsChanged	=> \&SongsChanged_cb);
 	::Watch(undef, SongsAdded	=> \&SongsAdded_cb);
+	::Watch(undef, SongsHidden	=> sub { SongArray::RemoveFromArrays($_[1],[$::ListPlay]) unless $::ListMode; });
 	::Watch(undef, SongArray	=> \&SongArray_changed_cb);
 	return $::ListPlay;
 }

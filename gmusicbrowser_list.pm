@@ -159,7 +159,7 @@ sub Remove
 	delete $::ToDo{'9_Total'.$self};
 	::UnWatchFilter($self,$self->{group});
 	::UnWatch($self,'Selection_'.$self->{group});
-	::UnWatch($self,$_) for qw/SongArray SongsAdded SongsRemoved/;
+	::UnWatch($self,$_) for qw/SongArray SongsAdded SongsHidden SongsRemoved/;
 }
 
 sub button_press_event_cb
@@ -218,6 +218,7 @@ sub filter_Set
 	::WatchFilter($self,$self->{group},	\&QueueUpdateFast);
 	::Watch($self, SongsAdded	=>	\&SongsChanged_cb);
 	::Watch($self, SongsRemoved	=>	\&SongsChanged_cb);
+	::Watch($self, SongsHidden	=>	\&SongsChanged_cb);
 }
 sub filter_Update
 {	my $self=shift;
@@ -263,6 +264,7 @@ sub library_Set
 {	my $self=shift;
 	::Watch($self, SongsAdded	=>\&QueueUpdateSlow);
 	::Watch($self, SongsRemoved	=>\&QueueUpdateSlow);
+	::Watch($self, SongsHidden	=>\&QueueUpdateSlow);
 }
 sub library_Update
 {	my $tip= ::__n('%d song in the library','%d songs in the library',scalar@$::Library);
@@ -1837,6 +1839,7 @@ sub new
 	::Watch($self, SongsChanged=> \&SongsChanged_cb);
 	::Watch($self, SongsAdded  => \&SongsAdded_cb);
 	::Watch($self, SongsRemoved=> \&SongsRemoved_cb);
+	::Watch($self, SongsHidden => \&SongsRemoved_cb);
 	$self->signal_connect(destroy => \&cleanup);
 	$self->{needupdate}=1;
 	::WatchFilter($self,$opt->{group},\&updatefilter);
@@ -3378,6 +3381,7 @@ sub new
 	::Watch($self, SongsChanged=> \&SongsChanged_or_added_cb);
 	::Watch($self, SongsAdded  => \&SongsChanged_or_added_cb);
 	::Watch($self, SongsRemoved=> \&SongsRemoved_cb);
+	::Watch($self, SongsHidden => \&SongsRemoved_cb);
 	$self->signal_connect(destroy => \&remove);
 	return $self;
 }
