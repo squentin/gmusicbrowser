@@ -661,6 +661,7 @@ our %Artists_split=
 	',?\s+And\s+'		=> "And",
 	'\s+featuring\s+'	=> "featuring",
 	'\s+feat\.\s+'		=> "feat.",
+	'\s+[Vv][Ss]\s+'	=> "VS",
 );
 our %Artists_from_title=
 (	'\(with\s+([^)]+)\)'		=> "(with X)",
@@ -1445,6 +1446,7 @@ our %Command=		#contains sub,description,argument_tip, argument_regex or code re
 	TogAlbumLock	=> [sub {ToggleLock('album')},		_"Toggle Album Lock"],
 	TogSongLock	=> [sub {ToggleLock('fullfilename')},	_"Toggle Song Lock"],
 	ToggleRandom	=> [\&ToggleSort, _"Toggle between Random/Shuffle and Ordered"],
+	Shuffle		=> [\&Shuffle, _"Shuffle or re-shuffle the playlist"],
 	SetSongRating	=> [sub
 	{	return unless defined $SongID && $_[1]=~m/^([-+])?(\d*)$/;
 		my $r=$2;
@@ -3720,7 +3722,7 @@ sub ChooseSongsFromA	#FIXME limit the number of songs if HUGE number of songs (>
 	return unless defined $album;
 	my $list= AA::GetIDs(album=>$album);
 	Songs::SortList($list,'disc track file');
-	if (Songs::Get($list->[0],'disc'))
+	if (1 || Songs::Get($list->[0],'disc'))
 	{	my $disc=''; my @list2;
 		for my $ID (@$list)
 		{	my $d=Songs::Get($ID,'disc');
@@ -3832,7 +3834,7 @@ sub ChooseSongs
 {	my ($IDs,%opt)=@_;
 	my @IDs=@$IDs;
 	return unless @IDs;
-	my $format = $opt{markup} || __x( _"{song} by {artist}", song => "<b>%t</b>%V", artist => "%a");
+	my $format = $opt{markup} || __x( _"{song} by {artist}", song => "<b>%S</b>%V", artist => "%a");
 	my $lcallback= $opt{cb} || sub { Select(song => $_[1]) };
 	my $menu = Gtk2::Menu->new;
 	my $activate_callback=sub

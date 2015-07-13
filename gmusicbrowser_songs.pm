@@ -531,7 +531,7 @@ our %timespan_menu=
 	},
 	'length.div' => { gid_to_display	=> 'my $v=#GID# * #ARG0#; sprintf("%d:%02d", $v/60, $v%60);', },
 	size	=>
-	{	display	=> '( ::format_number( #_#/'. ::MB() .',"%.1f").q('. _"MB" .') )',
+	{	display	=> '( ::format_number( #_#/'. ::MB() .',"%.1f").q( '. _"MB" .') )',
 		'filter_prep:e'	=> \&::ConvertSize,
 		'filter_prep:>'	=> \&::ConvertSize,
 		'filter_prep:<'	=> \&::ConvertSize,
