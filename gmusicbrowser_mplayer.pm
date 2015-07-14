@@ -64,7 +64,7 @@ sub launch_mplayer
 {	$playcounter=0;
 	#-nocache because when using the cache option it spawns a child process, which makes monitoring the mplayer process much harder
 	#-hr-mp3-seek to fix wrong time with some mp3s
-	@cmd_and_args=($mplayer,qw/-nocache -idle -slave -novideo -nolirc -hr-mp3-seek -msglevel all=1:statusline=5:global=6/);
+	@cmd_and_args=($mplayer,qw#-nocache -idle -slave -novideo -nolirc -hr-mp3-seek -msglevel all=1:statusline=5:global=6 --input=nodefault-bindings:conf=/dev/null#);
 	push @cmd_and_args, qw/-softvol -volume 0 --softvol-max=100/ if $SoftVolume;
 	push @cmd_and_args,split / /,$::Options{mplayeroptions} if $::Options{mplayeroptions};
 	warn "@cmd_and_args\n" if $::debug;
