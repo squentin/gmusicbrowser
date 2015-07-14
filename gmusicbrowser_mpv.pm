@@ -21,7 +21,7 @@ my (@cmd_and_args,$ChildPID,$WatchTag,$WatchTag2,@pidToKill,$Kill9);
 my $sockfh;
 my (%supported,$mpv);
 my $preparednext;
-my $playcounter;
+my ($File_is_current,$Called_from_eof,$gmb_file,$mpv_file,$Last_messages);
 my $initseek;
 my $watcher;
 
@@ -73,15 +73,13 @@ sub supported_formats
 sub send_cmd
 {	return unless $sockfh;
 	my @args=@_;
-	#mpv docs say that it prefers UTF8, but if we force that files with non-ASCII filenames don't play
-	my $cmd = JSON::PP->new->encode({command => [@args]});
+	my $cmd = JSON::PP->new->encode({command => \@args});
 	print $sockfh "$cmd\n";
 	warn "MPVCMD: $cmd\n" if $::debug;
 }
 
 sub launch_mpv
-{	$playcounter=0;
-	$preparednext=undef;
+{	$preparednext=undef;
 	@cmd_and_args=($mpv, '--input-unix-socket='.$SOCK, qw/--idle --no-video --no-input-terminal --really-quiet --gapless-audio=weak --softvol-max=100 --mute=no --no-sub-auto/);
 	push @cmd_and_args,"--volume=".convertvolume($::Volume);
 	push @cmd_and_args,"--af-add=".get_RG_opts() if $::Options{use_replaygain};
@@ -112,6 +110,7 @@ sub launch_mpv
 	$watcher = {};
 	::Watch($watcher,'NextSongs', \&append_next);
 	send_cmd('observe_property', 1, 'playback-time');
+	send_cmd('observe_property', 1, 'path');
 	send_cmd('request_log_messages', 'error');
 	return 1;
 }
@@ -120,63 +119,74 @@ sub Play
 {	my (undef,$file,$sec)=@_;
 	launch_mpv() unless $ChildPID && $sockfh;
 	return unless $ChildPID;
-	$playcounter++;
-	# gapless - check for non-user-initiated EOF
+	$Last_messages="";
+	$gmb_file=$file;
 	warn "playing $file (pid=$ChildPID)\n" if $::Verbose;
-	return if $preparednext && $preparednext eq $file && $playcounter == 1;
+	# gapless - check for non-user-initiated EOF
+	if ($Called_from_eof && $preparednext && $preparednext eq $gmb_file && $gmb_file eq $mpv_file)
+	{	$File_is_current=1;
+		return;
+	}
+	$File_is_current=-1;
 	$initseek = $sec;
 	send_cmd('loadfile',$file);
+	send_cmd('playlist_clear');
 }
 
 sub append_next
-{	send_cmd('playlist_clear');
-	send_cmd('loadfile',$::NextFileToPlay,'append') if $::NextFileToPlay;
-	$preparednext=$::NextFileToPlay;
+{	$preparednext=undef;
+	send_cmd('playlist_clear');
+	if ($::NextFileToPlay && $::NextFileToPlay ne $gmb_file)
+	{	send_cmd('loadfile',$::NextFileToPlay,'append');
+		$preparednext= $::NextFileToPlay;
+	}
 }
 
 sub _remotemsg
-{	my $ignore_ad_error;
-	for my $line (<$sockfh>)
+{	my $eof;
+	while (my $line=<$sockfh>)
 	{	my $msg= decode_json($line);
 		warn "mpv raw-output: $line" if $::debug;
 		if (my $error=$msg->{error})
 		{	warn "mpv error: $error" unless $error eq 'success';
 		}
 		elsif (my $event=$msg->{event})
-		{	if ($event eq 'property-change' && $msg->{name} eq 'playback-time' && defined $msg->{data})
-			 { ::UpdateTime($msg->{data}) if $playcounter==1; }
-			elsif ($event eq 'end-file')	{ handle_eof(); }
+		{	if ($event eq 'property-change' && $msg->{name} eq 'path') { $mpv_file= $msg->{data}||""; } # doesn't happen when previous file is same as new file
+			elsif ($event eq 'start-file') { $File_is_current=0 if $File_is_current<1; }
+			elsif ($event eq 'tracks-changed' && $File_is_current>=0)
+			{	$File_is_current= $mpv_file eq $gmb_file;
+				last if $eof; #only do eof now to catch log-message that are only sent after end-file and start-file
+			}
+			elsif ($File_is_current<1) {} #ignore all other events unless file is current
+			elsif ($event eq 'property-change' && $msg->{name} eq 'playback-time' && defined $msg->{data})
+			 { ::UpdateTime($msg->{data}); }
+			elsif ($event eq 'end-file')	{ $eof=1; } # ignore EOF signal on user-initiated track change as $File_is_current is not true in those cases
 			elsif ($event eq 'file-loaded')	{ SkipTo(undef,$initseek) if $initseek; $initseek=undef; }
 			elsif ($event eq 'log-message')
-			{	my $error= "[$msg->{prefix}] $msg->{text}";
-				if (    $error=~m/^.ffmpeg.video. mjpeg: overread/i  		#caused by embedded picture
-				   ||	$error=~m/^.ffmpeg.demuxer. mp3: Failed to uncompress tag/i #in very rare cases when some tag are compressed
-				   ||	$error=~m/^.ffmpeg.audio. mp3: incomplete frame/i	#followed by "[ad] Error decoding audio"
-				   ||	$error=~m/^.ffmpeg.audio. mp3: Header missing/i		#followed by "[ad] Error decoding audio"
-				   #||	$error=~m/^.cplayer. Can not open external file/i	#happens for example if trying to open a .txt of the same name  #shouldn't be a problem with --no-sub-auto
-				   ||   ($ignore_ad_error && $error=~m/^.ad. Error decoding audio/i)
-				   )
-				{	warn "mpv ignored-error: $error\n" if $::Verbose;
-					$ignore_ad_error=1 if $error=~m/^.ffmpeg.audio. mp3/i; #for "incomplete frame" & "Header missing"
-				}
-				else { handle_error($error) }
-				last unless $ChildPID;
+			{	my $error= $msg->{text};
+				chomp $error;
+				my $time= $::PlayTime||0;
+				$Last_messages.= sprintf " %02d:%02d  [%s] %s\n",
+					int($time/60), $time%60, $msg->{prefix}, $error;
 			}
 		}
 	}
+	handle_eof() if $eof;
 	return 1;
 }
 
 sub handle_eof
-{	# ignore EOF signal on user-initiated track change
-	$playcounter--;
-	::end_of_file() if $playcounter == 0;
+{	if ($::PlayTime < Songs::Get($::SongID,'length')-5) { handle_error(_"Playback ended unexpectedly.") }
+	else { $Called_from_eof=1; ::end_of_file(); $Called_from_eof=0; }
 }
 
 sub handle_error
 {	my $error=shift;
 	Stop();
-	::ErrorPlay($error,_("Command used :")."\n@cmd_and_args");
+	my $details=_("File").":\n$gmb_file\n\n";
+	$details.= _("Last messages:")."\n$Last_messages\n" if $Last_messages;
+	$details.= _("Command used:")."\n@cmd_and_args";
+	::ErrorPlay($error,$details);
 }
 
 sub _eos_cb
