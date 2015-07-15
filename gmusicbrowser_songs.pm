@@ -1336,10 +1336,11 @@ our %timespan_menu=
  extension =>	   {	name => _"Filename extension",		type=> 'filename',	flags => 'g',
 			get => 'do {my $s=#file->get#; $s=~s#^.*\.##; $s;}',	depend => 'file',
 		   },
- title_or_file	=> {	get => '(#title->get# eq "" ? #file->display# : #title->get#)',
+ title_or_file	=> {	get => '(#title->get# eq "" ? (#show_ext# ? #file->display# : #barefilename->display#) : #title->get#)',
 			type=> 'virtual',	flags => 'gcs',	width	=> 270,
 			name=> _"Title or filename",
 			depend => 'file title', letter => 'S',	#why letter S ? :)
+			options => 'show_ext', show_ext=>0,
 		   },
 
  missing	=> { flags => 'gan', type => 'integer', bits => 32, }, #FIXME store it using a 8-bit relative number to $::DAYNB
@@ -2960,7 +2961,10 @@ our %Field_options=
 				my %valuesh; $valuesh{$_}=$_ for @$values;
 				::NewPrefMultiCombo(persistent_values=>\%valuesh,opthash=>$opt,ellipsize=>'end');
 		},
-
+	},
+	show_ext =>
+	{	label		=> _"Show file name extension",
+		widget		=> 'check',
 	},
 );
 
@@ -3004,7 +3008,7 @@ sub Field_fill_option_box
 		{	$widget= Gtk2::CheckButton->new($label);
 			undef $label;
 			$widget->set_active($value);
-			$widget->signal_connect(toggled => sub { $opt->{$key}=$_[0]->get_active; &Field_Edit_update });
+			$widget->signal_connect(toggled => sub { $opt->{$key}= $_[0]->get_active ? 1 : 0; &Field_Edit_update });
 		}
 		elsif ($widget eq 'entry')
 		{	$widget= Gtk2::Entry->new;
