@@ -7463,7 +7463,7 @@ sub UnWatch		# warning: if one object watch the same event with multiple callbac
 {	my ($object,$key)=@_;
 	warn "unwatch $key $object\n" if $debug;
 	@{$EventWatchers{$key}}=grep defined && $_ != $object, @{$EventWatchers{$key}};
-	weaken($_) for @{$EventWatchers{$key}}; #re-weaken references (the grep above made them strong again)
+	ref $_ ne 'CODE' && weaken($_) for @{$EventWatchers{$key}}; #re-weaken references (the grep above made them strong again) #do not weaken code ref as they might not be linked to anything else and should be permanent
 	delete $object->{'WatchUpdate_'.$key};
 }
 sub UnWatch_all #for when destructing object (unwatch Watch() AND WatchFilter())
