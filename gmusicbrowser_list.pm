@@ -19,8 +19,9 @@ our @MenuPlaying=
 	{ label => _"Use the playing filter",	code => sub { ::SetFilter($_[0]{songlist}, $::PlayFilter ); }, test => sub {::GetSonglist($_[0]{songlist})->{mode} ne 'playlist'}}, #FIXME	if queue use queue, if $ListMode use list
 	{ label => _"Recent albums",		submenu => sub { my $sl=$_[0]{songlist};my @gid= ::uniq( Songs::Map_to_gid('album',$::Recent) ); $#gid=19 if $#gid>19; my $m=::PopupAA('album',nosort=>1,nominor=>1,widget => $_[0]{self}, list=>\@gid, cb=>sub { ::SetFilter($sl, $_[0]{filter}); }); return $m; } },
 	{ label => _"Recent artists",		submenu => sub { my $sl=$_[0]{songlist};my @gid= ::uniq( Songs::Map_to_gid('artist',$::Recent) ); $#gid=19 if $#gid>19; my $m=::PopupAA('artists',nosort=>1,nominor=>1,widget => $_[0]{self}, list=>\@gid, cb=>sub { ::SetFilter($sl, $_[0]{filter}); }); return $m; } },
-	{ label => _"Recent songs",		submenu => sub { my @ids=@$::Recent; $#ids=19 if $#ids>19; return [map { $_,Songs::Display($_,'title') } @ids]; },
-	  submenu_ordered_hash => 1,submenu_reverse=>1,		code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('title',$_[1]) ); }, },
+	{ label => _"Recent songs", submenu_use_markup => 1, submenu_ordered_hash => 1, submenu_reverse=>1,
+	  submenu => sub { my @ids=@$::Recent; $#ids=19 if $#ids>19; return [map {$_, ::ReplaceFieldsAndEsc($_, ::__x( _"{song} by {artist}", song => "<b>%S</b>%V", artist => "%a"))} @ids]; },
+	  code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('title',$_[1]) ); }, },
 );
 
 sub makeFilterBox
