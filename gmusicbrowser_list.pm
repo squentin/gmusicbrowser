@@ -6668,6 +6668,7 @@ sub button_press_cb
 	}
 	if ($event->type eq '2button-press')
 	{	return 0 unless $answer; #empty list
+		return 0 unless $answer->{area} eq 'songs';
 		$self->Activate($but);
 		return 1;
 	}
