@@ -145,7 +145,7 @@ sub append_next
 sub _remotemsg
 {	my $eof;
 	while (my $line=<$sockfh>)
-	{	my $msg= decode_json($line);
+	{	my $msg= JSON::PP->new->decode($line); # use JSON::PP->new->decode instead of decode_json (equivalent to JSON::PP->new->utf8->decode) because decode_json converts to utf8, which gives error with invalid utf8 filenames (only happens for mpv >0.9.0)
 		warn "mpv raw-output: $line" if $::debug;
 		if (my $error=$msg->{error})
 		{	warn "mpv error: $error" unless $error eq 'success';
