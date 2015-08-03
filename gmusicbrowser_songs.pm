@@ -1266,7 +1266,7 @@ our %timespan_menu=
 	type	=> 'float',	check => '#VAL#= do{ #VAL# =~m/^([-+]?\d*\.?\d+)\s*(?:dB)?$/i ? $1 : #novalue#};',
 	displayformat	=> '%.2f dB',
 	id3v2	=> 'TXXX;replaygain_track_gain;%v',	vorbis	=> 'replaygain_track_gain',	ape	=> 'replaygain_track_gain', ilst => '----replaygain_track_gain',
-	prewrite=> sub { length($_[0]) && $_[0]==$_[0] ? $_[0]." dB" : undef }, #remove tag if empty string or NaN
+	prewrite=> sub { length($_[0]) && $_[0]==$_[0] ? sprintf("%.2f dB",$_[0]) : undef }, #remove tag if empty string or NaN
 	options => 'disable editable',
 	category=>'replaygain',
 	alias	=> 'track_gain trackgain',
@@ -1277,6 +1277,7 @@ our %timespan_menu=
  replaygain_track_peak=>
  {	name	=> _"Track peak",	width => 60,	flags => 'fgrwscpa',
 	id3v2	=> 'TXXX;replaygain_track_peak;%v',	vorbis	=> 'replaygain_track_peak',	ape	=> 'replaygain_track_peak', ilst => '----replaygain_track_peak',
+	prewrite=> sub { length($_[0]) && $_[0]==$_[0] ? sprintf("%.6f",$_[0]) : undef }, #remove tag if empty string or NaN
 	type	=> 'float',
 	options => 'disable',
 	category=>'replaygain',
@@ -1289,7 +1290,7 @@ our %timespan_menu=
 	type	=> 'float',	check => '#VAL#= do{ #VAL# =~m/^([-+]?\d*\.?\d+)\s*(?:dB)?$/i ? $1 : #novalue#};',
 	displayformat	=> '%.2f dB',
 	id3v2	=> 'TXXX;replaygain_album_gain;%v',	vorbis	=> 'replaygain_album_gain',	ape	=> 'replaygain_album_gain', ilst => '----replaygain_album_gain',
-	prewrite=> sub { length($_[0]) && $_[0]==$_[0] ? $_[0]." dB" : undef }, #remove tag if empty string or NaN
+	prewrite=> sub { length($_[0]) && $_[0]==$_[0] ? sprintf("%.2f dB",$_[0]) : undef }, #remove tag if empty string or NaN
 	options => 'disable editable',
 	category=>'replaygain',
 	alias	=> 'album_gain albumgain',
@@ -1301,6 +1302,7 @@ our %timespan_menu=
  replaygain_album_peak=>
  {	name	=> _"Album peak",	width => 60,	flags => 'fgrwscpa',
 	id3v2	=> 'TXXX;replaygain_album_peak;%v',	vorbis	=> 'replaygain_album_peak',	ape	=> 'replaygain_album_peak', ilst => '----replaygain_album_peak',
+	prewrite=> sub { length($_[0]) && $_[0]==$_[0] ? sprintf("%.6f",$_[0]) : undef }, #remove tag if empty string or NaN
 	type	=> 'float',
 	options => 'disable',
 	category=>'replaygain',
