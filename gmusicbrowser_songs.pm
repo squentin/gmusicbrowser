@@ -1926,7 +1926,9 @@ sub Set		#can be called either with (ID,[field=>newval,...],option=>val) or (ID,
 		}
 		else { $values{$f}=$val }
 	}
+	::setlocale(::LC_NUMERIC, 'C');
 	my ($changed,$towrite)= $SETsub->($IDs,\%values);
+	::setlocale(::LC_NUMERIC, '');
 	Changed($IDs,$changed) if %$changed;
 	Write($IDs,towrite=>$towrite,%opt);
 }
