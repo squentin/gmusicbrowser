@@ -838,6 +838,11 @@ INIT
 		type	=> 'Gtk2::Gdk::Pixbuf',		noncomp	=> 'boldrow italicrow',
 		depend	=> 'rating',			sort	=> 'rating',
 	},
+	rownumber=>
+	{	menu => _("Row number"),	title => '#',		width => 50,
+		value => sub { $_[1]+1 },
+		type => 'Glib::String',		attrib	=> 'text',	init => { xalign => 1, },
+	},
   );
   %{$SLC_Prop{albumpicinfo}}=%{$SLC_Prop{albumpic}};
   $SLC_Prop{albumpicinfo}{title}=_"Album picture & info";
