@@ -9,3 +9,34 @@ StartupNotify=true
 Comment[fr]=Jukebox pour de grandes collections de mp3/ogg/flac/mpc
 #MimeType=audio/x-musepack;application/x-musepack;audio/musepack;application/musepack;audio/mpc;audio/x-mpc;audio/x-mp3;audio/mpeg;audio/x-mpeg;audio/x-mpeg-3;audio/mpeg3;application/ogg;application/x-ogg;audio/vorbis;audio/x-vorbis;audio/ogg;audio/x-ogg;audio/x-flac;application/x-flac;audio/flac;
 
+
+Actions=PlayPause;Next;Previous;LockArtist;LockAlbum
+
+[Desktop Action PlayPause]
+Name=Play-Pause
+Exec=gmusicbrowser -cmd PlayPause
+Icon=media-playback-start-symbolic
+OnlyShowIn=Unity;
+
+[Desktop Action Next]
+Name=Next
+Exec=gmusicbrowser -cmd NextSong
+Icon=media-skip-backward-symbolic
+OnlyShowIn=Unity;
+
+[Desktop Action Previous]
+Name=Previous
+Exec=gmusicbrowser -cmd PrevSong
+Icon=media-skip-forward-symbolic
+OnlyShowIn=Unity;
+
+[Desktop Action LockArtist]
+Name=Toggle Artist Lock
+Exec=gmusicbrowser -cmd TogArtistLock
+OnlyShowIn=Unity;
+
+[Desktop Action LockAlbum]
+Name=Toggle Album Lock
+Exec=gmusicbrowser -cmd TogAlbumLock
+OnlyShowIn=Unity;
+
