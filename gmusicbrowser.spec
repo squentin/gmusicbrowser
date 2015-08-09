@@ -41,8 +41,10 @@ rm -rf %{buildroot}
 rm -rf %{buildroot}
 
 %post
+%{update_icon_cache hicolor}
 %{update_menus}
 %postun
+%{clean_icon_cache hicolor}
 %{clean_menus}
 
 %files -f %{name}.lang
@@ -52,9 +54,8 @@ rm -rf %{buildroot}
 %{_datadir}/applications/gmusicbrowser.desktop
 #%lang(fr) %{_datadir}/locale/fr/LC_MESSAGES/*.mo
 #%{_datadir}/locale/*/LC_MESSAGES/*.mo
-%{_iconsdir}/gmusicbrowser.png
-%{_liconsdir}/gmusicbrowser.png
-%{_miconsdir}/gmusicbrowser.png
+%{_iconsdir}/hicolor/scalable/apps/gmusicbrowser.svg
+%{_iconsdir}/hicolor/*/apps/gmusicbrowser.png
 %{_mandir}/man1/*
 %{_docdir}/*
 #%doc AUTHORS COPYING README NEWS layout_doc.html

@@ -15,7 +15,7 @@ clean:
 install:
 	dh_testdir
 	dh_testroot
-	dh_clean -k
+	dh_clean
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/gmusicbrowser \
           docdir=$(CURDIR)/debian/gmusicbrowser/usr/share/doc/gmusicbrowser
 	# menu needs an xpm instead of a png
@@ -32,13 +32,13 @@ binary-indep: install
 	dh_installdocs
 	dh_installmenu
 	dh_installman
-	dh_desktop
 	dh_compress
 	dh_fixperms
 	dh_installdeb
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
+	dh_icons
 
 binary-arch:
 

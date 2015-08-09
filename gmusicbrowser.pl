@@ -1323,8 +1323,12 @@ sub LoadIcons
 		closedir $dh;
 	}
 
-	eval { Gtk2::Window->set_default_icon_from_file( delete $icons{gmusicbrowser} || PIXPATH.'gmusicbrowser.png' ); };
-	warn $@ if $@;
+	$icons{gmusicbrowser}||= PIXPATH.'gmusicbrowser.svg' unless Gtk2::IconTheme->get_default->has_icon('gmusicbrowser');
+	if (my $file=delete $icons{gmusicbrowser})
+	{	eval { Gtk2::Window->set_default_icon_from_file($file); };
+		warn $@ if $@;
+	}
+	else { Gtk2::Window->set_default_icon_name('gmusicbrowser'); }
 
 	#trayicons
 	{	%TrayIcon=();
@@ -6131,7 +6135,11 @@ sub AboutDialog
 	$dialog->set_license("Released under the GNU General Public Licence version 3\n(http://www.gnu.org/copyleft/gpl.html)");
 	$dialog->set_website('http://gmusicbrowser.org');
 	$dialog->set_authors('Quentin Sculo <squentin@free.fr>');
-	$dialog->set_artists("tango icon theme : Jean-Philippe Guillemin\nelementary icon theme : Simon Steinbeiß");
+	$dialog->set_artists(join "\n",
+		"svg icon : zeltak",
+		"tango icon theme : Jean-Philippe Guillemin",
+		"elementary icon theme : Simon Steinbeiß",
+	);
 	$dialog->set_translator_credits( join "\n", sort
 		'French : Quentin Sculo, Jonathan Fretin, Frédéric Urbain, Brice Boucard, Hornblende & mgrubert',
 		'Hungarian : Zsombor',
