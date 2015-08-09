@@ -94,7 +94,7 @@ uninstall:
 	rm -rf "$(datadir)/gmusicbrowser/" "$(docdir)"
 	rm -f "$(liconsdir)/gmusicbrowser.png" "$(miconsdir)/gmusicbrowser.png" "$(iconsdir)/gmusicbrowser.png"
 	rm -f "$(appdir)/gmusicbrowser.desktop" "$(datadir)/appdata/gmusicbrowser.appdata.xml"
-	rm -f "$(mandir)/$(MANS)"
+	rm -f "$(mandir)/man1/gmusicbrowser.1"
 	rm -f "$(localedir)/*/LC_MESSAGES/gmusicbrowser.mo"
 
 prepackage : all
