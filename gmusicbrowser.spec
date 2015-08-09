@@ -12,7 +12,7 @@ Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch: noarch
 BuildRequires: /usr/bin/markdown
 Requires: perl >= 5.8, gtk2 >= 2.6.0, perl-Gtk2, perl(Locale::Messages), perl-Glib-Object-Introspection, typelib-1_0-Gst-1_0, perl-Digest-CRC, perl-Cairo, perl-HTML-Parser, perl-IO-Compress, perl-Net-DBus
-Requires(hint): mpg123, vorbis-tools, alsa-utils, perl-Gtk2-WebKit, perl-Gtk2-MozEmbed, perl-Net-DBus-GLib, gstreamer0.10-lame, gstreamer0.10-plugins-ugly, gstreamer0.10-plugins-bad, perl-Gnome2-Wnck, perl-GStreamer-Interfaces, perl-Gtk2-Notify, poppler-utils, perl-GStreamer
+Requires(hint): mpv, mpg123, vorbis-tools, alsa-utils, perl-Gtk2-WebKit, perl-Gtk2-MozEmbed, perl-Net-DBus-GLib, gstreamer0.10-lame, gstreamer0.10-plugins-ugly, gstreamer0.10-plugins-bad, perl-Gnome2-Wnck, perl-GStreamer-Interfaces, perl-Gtk2-Notify, poppler-utils, perl-GStreamer
 AutoReq: no
 AutoProv: no
 
