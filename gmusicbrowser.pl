@@ -1323,7 +1323,7 @@ sub LoadIcons
 		closedir $dh;
 	}
 
-	$icons{gmusicbrowser}||= PIXPATH.'gmusicbrowser.svg' unless Gtk2::IconTheme->get_default->has_icon('gmusicbrowser');
+	$icons{gmusicbrowser}||= PIXPATH.'gmusicbrowser.svg' unless Gtk2::IconTheme->get_default->get_icon_sizes('gmusicbrowser'); #fallback if no icon named 'gmusicbrowser' is installed
 	if (my $file=delete $icons{gmusicbrowser})
 	{	eval { Gtk2::Window->set_default_icon_from_file($file); };
 		warn $@ if $@;
@@ -6131,6 +6131,7 @@ sub AboutDialog
 {	my $dialog=Gtk2::AboutDialog->new;
 	$dialog->set_version(VERSIONSTRING);
 	$dialog->set_copyright("Copyright © 2005-2015 Quentin Sculo");
+	$dialog->set_logo_icon_name('gmusicbrowser');
 	#$dialog->set_comments();
 	$dialog->set_license("Released under the GNU General Public Licence version 3\n(http://www.gnu.org/copyleft/gpl.html)");
 	$dialog->set_website('http://gmusicbrowser.org');
