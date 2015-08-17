@@ -5,10 +5,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2015-03-12 23:51+0100\n"
-"PO-Revision-Date: 2015-03-13 09:57+0000\n"
-"Last-Translator: squentin <squentin@gmail.com>\n"
-"Language-Team: Malay (Malaysia) (http://www.transifex.com/projects/p/"
+"POT-Creation-Date: 2015-04-05 23:50+0200\n"
+"PO-Revision-Date: 2015-04-19 14:47+0000\n"
+"Last-Translator: abuyop <abuyop@gmail.com>\n"
+"Language-Team: Malay (Malaysia) (http://www.transifex.com/squentin/"
 "gmusicbrowser/language/ms_MY/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -854,6 +854,12 @@ msgstr "Perintah"
 msgid "Command to launch when the button is pressed"
 msgstr "Perintah untuk dilancar bila butang ditekan"
 
+msgid "Command to open folders :"
+msgstr "Perintah untuk membuka folder :"
+
+msgid "Command to open urls :"
+msgstr "Perintah untuk membuka url :"
+
 msgid "Command used :"
 msgstr "Perintah diguna :"
 
@@ -1138,9 +1144,6 @@ msgstr "Sunting"
 msgid "Edit Current Song Properties"
 msgstr "Sunting Sifat Lagu Semasa"
 
-msgid "Edit labels"
-msgstr "Sunting label"
-
 msgid "Edit Lyrics"
 msgstr "Sunting Lirik"
 
@@ -1149,9 +1152,6 @@ msgstr "Sunting Lirik ..."
 
 msgid "Edit Multiple Songs Properties"
 msgstr "Sunting Sifat Lagu Berbilang"
-
-msgid "Edit rating"
-msgstr "Sunting penarafan"
 
 msgid "Edit Settings"
 msgstr "Sunting Tetapan"
@@ -1171,6 +1171,9 @@ msgstr "Sunting pengelompokan ..."
 msgid "Edit in the last.fm wiki"
 msgstr "Sunting dalam wiki last.fm"
 
+msgid "Edit labels"
+msgstr "Sunting label"
+
 msgid "Edit list"
 msgstr "Sunting senarai"
 
@@ -1182,6 +1185,9 @@ msgstr "Sunitng mod bertertib ..."
 
 msgid "Edit random modes ..."
 msgstr "Sunting mod rawak ..."
+
+msgid "Edit rating"
+msgstr "Sunting penarafan"
 
 msgid "Edit row tip"
 msgstr "Sunting tip baris"
@@ -1630,6 +1636,13 @@ msgstr "Sambungan fail diabaikan :"
 
 msgid "Import list"
 msgstr "Senarai import"
+
+msgid ""
+"Imports gstreamer presets, and synchronize modifications made with "
+"gmusicbrowser"
+msgstr ""
+"Import praset gstreamer, dan pengubahsuakan penyegerakan dibuat dengan "
+"gmusicbrowser"
 
 msgid ""
 "In this case one command by file will be run\n"
@@ -3203,6 +3216,9 @@ msgstr "Tetapkan sebagai gambar untuk '{name}'"
 msgid "Set as primary filter"
 msgstr "Tetapkan sebagai penapis utama"
 
+msgid "Set equalizer"
+msgstr "Tetapkan penyama"
+
 msgid "Set focus on a layout widget"
 msgstr "Tetapkan fokus pada widjet bentangan"
 
@@ -3508,6 +3524,9 @@ msgstr "Ahad"
 
 msgid "Switch to fullscreen mode"
 msgstr "Tukar ke mod skrin penuh"
+
+msgid "Synchronize equalizer presets"
+msgstr "Segerak praset penyama"
 
 msgid "System clock is not close enough to the current time"
 msgstr "Jam sistem tidak menepati masa semasa"
@@ -3907,6 +3926,9 @@ msgstr ""
 
 msgid "Will use default if not found"
 msgstr "Akan guna lalai jika tidak ditemui"
+
+msgid "Will use system's default if blank"
+msgstr "Akan guna lalai sistem jika kosong"
 
 #. Windows key
 msgctxt "Keyboard"
@@ -4827,6 +4849,14 @@ msgstr "pra-amp"
 #, perl-format
 msgid "pre-amp : %d dB"
 msgstr "pra-amp : %d dB"
+
+msgid ""
+"pre-set name or 10 numbers between 12 and -12 (-24 for gstreamer) separated "
+"by ':', or 0 (for off), or 1 (for on)"
+msgstr ""
+"pra-set nama atau 10 nombor diantara 12 hingga -12 (-24 untuk gstreamer) "
+"dipisah dengan tanda  ':', atau 0 (untuk dimatikan), atau 1 (untuk "
+"dihidupkan)"
 
 #, perl-format
 msgid "present in %s"
