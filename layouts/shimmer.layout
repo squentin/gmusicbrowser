@@ -85,19 +85,17 @@ Type=T
 VBMain		= HBTime Filler0 VBMain1
 VBMain1		= HBLeft _HBRight
 HBLeft		= Cover(forceratio=1,default=elementary/no-cover.svg,maxsize=80) _VBText
-VBText		= 2HBArtist HBAlbum _2HBTitle
+VBText		= _2HBArtist _HBAlbum _2HBTitle
 HBButtons	= Prev(size=small-toolbar) Play(size=small-toolbar) Next(size=small-toolbar)
-HBTitle		= LockSong _Title(font=12,tip=_"Title: %t",ellipsize=end)
-HBArtist	= LockArtist _Artist(font=8,tip=_"Artist: %a",ellipsize=end)
-HBAlbum		= LockAlbum _Album(font=8,tip=_"Album: %l",ellipsize=end,expand_max=100) Date(font=7,markup=" <b>»</b> %y")
+HBTitle		= LockSong _Title(font=12,tip=_"Title: %t",ellipsize=end,minwidth=200)
+HBArtist	= LockArtist _Artist(font=9,tip=_"Artist: %a",ellipsize=end,minwidth=200)
+HBAlbum		= LockAlbum _Album(font=9,tip=_"Album: %l",ellipsize=end,minwidth=200) Date(font=8,markup=" <b>»</b> %y")
 HBRating	= Filler1  -Stars
 HBTime		= _TimeBar(minheight=7)
 HBRight		= HBButtons _2HBRating
 VSize0		= 3 Filler0
 HSize0		= Filler1 LockArtist LockAlbum LockSong
 HSize1		= Cover HBButtons
-HSize3		= 250 VBMain
-VSize1		= 125 VBMain
 
 # Fullscreen Layouts
 #####################################
