@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2015-03-12 23:51+0100\n"
-"PO-Revision-Date: 2015-03-13 19:43+0000\n"
+"POT-Creation-Date: 2015-08-17 18:49+0200\n"
+"PO-Revision-Date: 2015-08-17 21:21+0000\n"
 "Last-Translator: Yannick Le Guen <leguen.yannick@gmail.com>\n"
-"Language-Team: French (http://www.transifex.com/projects/p/gmusicbrowser/"
+"Language-Team: French (http://www.transifex.com/squentin/gmusicbrowser/"
 "language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -295,6 +295,9 @@ msgstr "Créer une nouvelle étiquette"
 
 msgid "Add new radio"
 msgstr "Ajouter une radio"
+
+msgid "Add picture"
+msgstr "Ajouter une image"
 
 msgid "Add rule : "
 msgstr "Ajouter cette règle : "
@@ -881,6 +884,9 @@ msgstr ""
 "'éteindre l'ordinateur quand la file d'attente est vide'\n"
 "est sélectionné"
 
+msgid "Command used:"
+msgstr "Commande utilisée :"
+
 msgid "Command when playing song changed :"
 msgstr "Commande à lancer lorsque la chanson jouée change :"
 
@@ -1153,9 +1159,6 @@ msgstr "Modifier"
 msgid "Edit Current Song Properties"
 msgstr "Modifier les propriétés de la chanson actuelle"
 
-msgid "Edit labels"
-msgstr "Changer les étiquettes"
-
 msgid "Edit Lyrics"
 msgstr "Modifier les paroles"
 
@@ -1164,9 +1167,6 @@ msgstr "Modifier les paroles..."
 
 msgid "Edit Multiple Songs Properties"
 msgstr "Modifier les propriétés de plusieurs chansons"
-
-msgid "Edit rating"
-msgstr "Modifier la note"
 
 msgid "Edit Settings"
 msgstr "Modifier la configuration"
@@ -1186,6 +1186,9 @@ msgstr "Modifier le regroupement..."
 msgid "Edit in the last.fm wiki"
 msgstr "Éditer le wiki de last.fm"
 
+msgid "Edit labels"
+msgstr "Éditer les étiquettes"
+
 msgid "Edit list"
 msgstr "Modifier cette liste"
 
@@ -1198,11 +1201,18 @@ msgstr "Modifier les ordres de tri..."
 msgid "Edit random modes ..."
 msgstr "Modifier les modes aléatoires..."
 
+msgid "Edit rating"
+msgstr "Éditer la note"
+
 msgid "Edit row tip"
 msgstr "Modifier l'infobulle des lignes"
 
 msgid "Edit selected song properties"
 msgstr "Éditer les propriétés de la chanson sélectionnée"
+
+#, perl-brace-format
+msgid "Edit {field}"
+msgstr "Éditer {field}"
 
 msgid "Edit..."
 msgstr "Modifier..."
@@ -1215,6 +1225,9 @@ msgstr "Modification de la liste : "
 
 msgid "Editing tags"
 msgstr "Modification des tags"
+
+msgid "Embedded Pictures"
+msgstr "Images incorporées"
 
 msgid "Embedded lyrics"
 msgstr "Paroles intégrées"
@@ -1597,6 +1610,9 @@ msgstr "Cacher"
 msgid "Hide toolbar"
 msgstr "Cache la barre d'outils"
 
+msgid "High priority"
+msgstr "Haute priorité"
+
 msgid "Icon theme :"
 msgstr "Thème d'icônes :"
 
@@ -1611,6 +1627,13 @@ msgstr "Extensions de fichier ignorées :"
 
 msgid "Import list"
 msgstr "Importer la liste"
+
+msgid ""
+"Imports gstreamer presets, and synchronize modifications made with "
+"gmusicbrowser"
+msgstr ""
+"Importe les préréglages de gstreamer et synchronise les modifications faites "
+"avec gmusicbrowser"
 
 msgid ""
 "In this case one command by file will be run\n"
@@ -1709,6 +1732,9 @@ msgstr "Lang."
 
 msgid "Languages"
 msgstr "Langues"
+
+msgid "Last messages:"
+msgstr "Derniers messages :"
 
 msgid "Last played"
 msgstr "Dernière lecture"
@@ -2316,6 +2342,9 @@ msgstr "Apparence de la sur-couche :"
 msgid "Owner identifier"
 msgstr "Identifiant du proriétaire"
 
+msgid "Paste link"
+msgstr "Coller le lien"
+
 msgid "Path,Album,Disc,Track,File"
 msgstr "Dossier, Album, Disque, Piste, Fichier"
 
@@ -2356,6 +2385,9 @@ msgstr "Plugin de recherche d'images"
 #, perl-format
 msgid "Picture size : %d"
 msgstr "Taille de l'image : %d"
+
+msgid "Picture type"
+msgstr "Type d'image"
 
 msgid "Pictures and music files"
 msgstr "Fichiers images et musicaux"
@@ -2407,6 +2439,9 @@ msgstr "Lecture/Pause"
 
 msgid "Playback"
 msgstr "Lecture"
+
+msgid "Playback ended unexpectedly."
+msgstr "La lecture s'est terminée de façon inattendue."
 
 msgid "Playcount: "
 msgstr "Joué :"
@@ -2751,6 +2786,9 @@ msgstr "Enlever cette étiquette"
 
 msgid "Remove list"
 msgstr "Oublier cette liste"
+
+msgid "Remove picture"
+msgstr "Supprimer l'image"
 
 msgid "Remove selected songs"
 msgstr "Retirer les chansons sélectionnées"
@@ -3162,6 +3200,9 @@ msgstr "Définir comme pochette pour '{name}'"
 msgid "Set as primary filter"
 msgstr "Sélectionner comme filtre primaire"
 
+msgid "Set equalizer"
+msgstr "Régler l'égaliseur"
+
 msgid "Set focus on a layout widget"
 msgstr "Donner le focus sur un widget de la disposition"
 
@@ -3170,6 +3211,12 @@ msgstr "Choisir le regroupement"
 
 msgid "Set icon"
 msgstr "Choisir une icône"
+
+msgid "Set picture"
+msgstr "Définir l'image"
+
+msgid "Set picture using this file"
+msgstr "Définir l'image en utilisant ce fichier"
 
 msgid "Set player window layout"
 msgstr "Définir la disposition de la fenêtre de lecture"
@@ -3221,8 +3268,14 @@ msgstr "Montrer les évènements à venir de l'artiste"
 msgid "Show buttons"
 msgstr "Afficher les boutons"
 
+msgid "Show edition submenu in song context menu"
+msgstr "Afficher le sous-menu d'édition dans le menu contextuel des chansons"
+
 msgid "Show file list"
 msgstr "Afficher la liste des fichiers"
+
+msgid "Show file name extension"
+msgstr "Afficher l'extension du nom de fichier"
 
 msgid "Show folder list"
 msgstr "Afficher la liste des dossiers"
@@ -3298,6 +3351,9 @@ msgstr "Mélanger"
 
 msgid "Shuffle list"
 msgstr "Mélanger la liste"
+
+msgid "Shuffle or re-shuffle the playlist"
+msgstr "Mélanger ou re-mélanger la liste de lecture"
 
 msgid "Shuffle queue"
 msgstr "Mélanger la file d'attente"
@@ -3399,6 +3455,9 @@ msgstr "Source : {file}"
 msgid "Split artist names on :"
 msgstr "Séparer les noms d'artiste avec :"
 
+msgid "Star images"
+msgstr "Images des étoiles"
+
 msgid "Start in tray"
 msgstr "Démarrer dans la zone de notification"
 
@@ -3464,6 +3523,9 @@ msgstr "Dimanche"
 
 msgid "Switch to fullscreen mode"
 msgstr "Passer en mode plein écran"
+
+msgid "Synchronize equalizer presets"
+msgstr "Synchroniser les préréglages de l'égaliseur"
 
 msgid "System clock is not close enough to the current time"
 msgstr "L'horloge sytème n'est pas à l'heure"
@@ -3590,6 +3652,9 @@ msgstr "Bascule une étiquette de la chanson actuelle"
 msgid "Toggle between Random/Shuffle and Ordered"
 msgstr "Basculer entre Aléatoire/Mélangé et Ordonné"
 
+msgid "Toggle edit mode"
+msgstr "Basculer en mode édition"
+
 msgid "Toggle fullscreen mode"
 msgstr "Mode plein écran on/off"
 
@@ -3643,6 +3708,9 @@ msgstr "URL"
 
 msgid "Unique file identifier"
 msgstr "Identificateur de fichier"
+
+msgid "Unknown"
+msgstr "Inconnu"
 
 msgid "Unknown album"
 msgstr "Album inconnu"
@@ -3783,6 +3851,9 @@ msgstr "Voir données binaires..."
 msgid "View in new window"
 msgstr "Afficher dans une nouvelle fenêtre"
 
+msgid "View pictures from this album's folder"
+msgstr "Voir les images du dossier de cet album"
+
 msgid "Volume : "
 msgstr "Volume : "
 
@@ -3909,6 +3980,19 @@ msgstr ""
 "Vous pouvez forcer la vérification de ces fichiers en maintenant la touche "
 "MAJ  quand vous sélectionnez \"Relire les tags\""
 
+#, perl-brace-format
+msgid ""
+"You can make custom stars by putting pictures in {folder}\n"
+"They must be named 'stars', optionally followed by a '-' and a word, "
+"followed by a number from 0 to 5 or 10\n"
+"Example: stars-custom0.png"
+msgstr ""
+"Vous pouvez définir des étoiles personnalisées en déposant des images dans "
+"{folder}\n"
+"Elles doivent être nommées « stars », optionnellement suivies par un « - » "
+"et un mot, suivies par un nombre entre 0 et 5 ou 10\n"
+"Exemple : stars-custom0.png"
+
 msgid ""
 "You can use some markup, eg :\n"
 "<b>bold</b> <i>italic</i> <u>underline</u>\n"
@@ -4012,7 +4096,7 @@ msgid "automatic size"
 msgstr "taille automatique"
 
 msgid "back cover"
-msgstr "dos de la pochette"
+msgstr "pochette arrière"
 
 msgid "band"
 msgstr "groupe"
@@ -4275,7 +4359,7 @@ msgid "for files without a VBR header"
 msgstr "pour les fichiers sans en-tête VBR"
 
 msgid "front cover"
-msgstr "pochette"
+msgstr "pochette avant"
 
 msgid "gmusicbrowser"
 msgstr "gmusicbrowser"
@@ -4590,6 +4674,9 @@ msgstr "executable mplayer :"
 msgid "mplayer options :"
 msgstr "options pour mplayer :"
 
+msgid "mpv options :"
+msgstr "options mpv :"
+
 msgid "multi-lines string"
 msgstr "chaîne de plusieurs lignes"
 
@@ -4769,6 +4856,13 @@ msgstr "pré-amp"
 #, perl-format
 msgid "pre-amp : %d dB"
 msgstr "pré-amp : %d dB"
+
+msgid ""
+"pre-set name or 10 numbers between 12 and -12 (-24 for gstreamer) separated "
+"by ':', or 0 (for off), or 1 (for on)"
+msgstr ""
+"nom du préréglage ou 10 nombres compris entre 12 et -12 (-24 pour gstreamer) "
+"séparés par « ; », ou 0 (pour la désactivation), ou 1 (pour l'activation)"
 
 #, perl-format
 msgid "present in %s"
