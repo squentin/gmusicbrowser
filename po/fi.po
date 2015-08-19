@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2015-03-12 23:51+0100\n"
-"PO-Revision-Date: 2015-03-13 09:57+0000\n"
-"Last-Translator: squentin <squentin@gmail.com>\n"
-"Language-Team: Finnish (http://www.transifex.com/projects/p/gmusicbrowser/"
+"POT-Creation-Date: 2015-08-17 18:49+0200\n"
+"PO-Revision-Date: 2015-08-17 17:03+0000\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
+"Language-Team: Finnish (http://www.transifex.com/squentin/gmusicbrowser/"
 "language/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -226,6 +226,9 @@ msgstr "Lisää kansio..."
 msgid "Add new radio"
 msgstr "Lisää uusi radio"
 
+msgid "Add picture"
+msgstr "Lisää kuva"
+
 msgid "Add rule : "
 msgstr "Lisää sääntö: "
 
@@ -249,6 +252,9 @@ msgstr "Lisätty"
 
 msgid "Added Today"
 msgstr "Lisätty tänään"
+
+msgid "Advanced"
+msgstr "Lisäasetukset"
 
 msgid "Advanced Search ..."
 msgstr "Laajennettu haku..."
@@ -673,6 +679,9 @@ msgstr "Poista tiedosto"
 
 msgid "Delete list"
 msgstr "Poista lista"
+
+msgid "Delete preset"
+msgstr "Poista esiasetus"
 
 msgid "Deletion failed"
 msgstr "Poistaminen epäonnistui"
@@ -1369,6 +1378,9 @@ msgstr "Avaa hakuikkuna"
 msgid "Open containing folder"
 msgstr "Avaa sisältävä kansio"
 
+msgid "Open equalizer..."
+msgstr "Avaa taajuuskorjain..."
+
 msgid "Open folder"
 msgstr "Avaa kansio"
 
@@ -1404,6 +1416,9 @@ msgstr "Ulostulo"
 
 msgid "Owner identifier"
 msgstr "Omistajan tunniste"
+
+msgid "Paste link"
+msgstr "Liitä linkki"
 
 msgid "Path,File"
 msgstr "Polku,tiedosto"
@@ -1540,6 +1555,9 @@ msgstr "Edellinen sivu"
 msgid "Properties"
 msgstr "Ominaisuudet"
 
+msgid "Publication right"
+msgstr "Julkaisuoikeus"
+
 msgid "Publisher"
 msgstr "Julkaisija"
 
@@ -1673,6 +1691,9 @@ msgstr "Poista jonosta"
 msgid "Remove list"
 msgstr "Poista lista"
 
+msgid "Remove picture"
+msgstr "Poista kuva"
+
 msgid "Remove selected songs"
 msgstr "Poista valitut kappaleet"
 
@@ -1687,6 +1708,9 @@ msgstr "Liitännäiset"
 
 msgid "Remove this tag"
 msgstr "Poista tämä tunniste"
+
+msgid "Remove this widget"
+msgstr "Poista tämä widgetti"
 
 msgid "Rename"
 msgstr "Nimeä uudelleen"
@@ -1886,6 +1910,9 @@ msgstr "Aseta ryhmittely"
 
 msgid "Set icon"
 msgstr "Aseta kuvake"
+
+msgid "Set picture"
+msgstr "Aseta kuva"
 
 msgid "Set player window layout"
 msgstr "Aseta soitinikkunan asettelu"
@@ -2209,6 +2236,9 @@ msgstr "Sammuta tietokone kun jono on tyhjä"
 msgid "URL"
 msgstr "Osoite"
 
+msgid "Unknown"
+msgstr "Tuntematon"
+
 msgid "Unknown album"
 msgstr "Tuntematon albumi"
 
@@ -2296,6 +2326,9 @@ msgstr "Soitettaessa"
 
 msgid "Whole library"
 msgstr "Koko kirjasto"
+
+msgid "Widget name"
+msgstr "Widgetin nimi"
 
 msgid "Wikipedia"
 msgstr "Wikipedia"
@@ -2730,6 +2763,10 @@ msgstr "muu tiedostokuvake"
 msgid "output device :"
 msgstr "ulostuloon käytettävä laite:"
 
+#, perl-format
+msgid "page %d"
+msgstr "sivu %d"
+
 #, perl-brace-format
 msgid "page {number}"
 msgstr "sivu {number}"
@@ -2891,11 +2928,19 @@ msgid "{hours} hours {min} min {sec} s"
 msgstr "{hours} tuntia {min} min {sec} s"
 
 #, perl-brace-format
+msgid "{hours}h {min}m {sec}s"
+msgstr "{hours} t {min} min {sec} s"
+
+#, perl-brace-format
 msgid "{hours}h{min}m{sec}s"
 msgstr "{hours} t {min} m {sec} s"
 
 #, perl-brace-format
 msgid "{min} min {sec} s"
+msgstr "{min} min {sec} s"
+
+#, perl-brace-format
+msgid "{min}m {sec}s"
 msgstr "{min} min {sec} s"
 
 #, perl-brace-format
