@@ -930,15 +930,18 @@ our %timespan_menu=
 	depend	=> 'album_artist_raw artist album',
 	category=>'basic',
  },
- haspicture =>
- {	name	=> _"Embedded picture", width => 20, flags => 'fgarwscp',	type => 'boolean',
-	id3v2 => 'APIC;;;;%v',	ilst => 'covr',		#or just id3v2 => 'APIC', ?
-	disable=>1,
+ has_picture =>
+ {	name	=> _"Embedded picture", width => 20, flags => 'fgarscp',	type => 'boolean',
+	id3v2 => 'APIC',	vorbis => 'METADATA_BLOCK_PICTURE',	'ilst' => 'covr',
+	category=>'extra',
+	disable=>1,	options => 'disable',
  },
- haslyrics =>
- {	name	=> _"Embedded lyrics", width => 20, flags => 'fgarwscp',	type => 'boolean',
-	id3v2 => 'USLT;;;%v',	vorbis	=> 'lyrics',	ape => 'Lyrics', #TESTME
-	disable=>1,
+ has_lyrics =>
+ {	name	=> _"Embedded lyrics", width => 20, flags => 'fgarscp',	type => 'boolean',
+	id3v2 => 'TXXX;FMPS_Lyrics;%v | USLT;;;%v',	vorbis => 'FMPS_LYRICS|lyrics',	ape => 'FMPS_LYRICS|Lyrics',
+	'ilst' => "----FMPS_Lyrics|\xA9lyr",	lyrics3v2 => 'LYR',
+	category=>'extra',
+	disable=>1,	options => 'disable',
  },
  compilation =>
  {	name	=> _"Compilation", width => 20, flags => 'fgarwescp',	type => 'boolean',
