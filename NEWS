@@ -1,3 +1,39 @@
+v1.1.15
+replace gmb icon with the svg icon made by zeltak
+add mpv output
+add "high priority" keyboard shortcuts
+add embedded pictures tab to song property dialog
+when adding a song, check if it is already in the library with an old filename
+PictureBrowser: improve navigation of the folder pane
+PictureBrowser: add folder icons to folder pane
+PictureBrowser: keep scaled size constant when changing picture
+PictureBrowser: add "paste link" to context menu
+activate "accent-insensitive" search on file, folder and comment fields
+optimize function that remove "accents" (diacritic)
+add star pictures option for rating fields
+add option for label-like and rating fields to have a submenu in song context menu
+add option to show/hide extension to title_or_file field (defaults to hide)
+update google image parser
+various equalizer improvements
+use internal equalizer presets rather than gstreamer's (with option to sync with gstreamer's)
+mplayer: use slave mode to improve the transition between songs
+picture finder plugin: add DuckDuckGo search engine
+add Shuffle command
+use title_or_file instead of title for choose-songs menus
+make middle-click on stop and quit button set the after queue action
+make middle-click on Artist and Album Lock enqueue the artist or album
+make filename sorting in PictureBrowser number-aware
+add "Row number" column for SongList
+add "Append to playlist" to song context menu when in list mode
+show artist in addition to title in recent songs menu
+fix setting master filter not working properly
+mplayer: fix "Failed to open ~/.mplayer/input.conf" error
+fix setting replaygain value with decimals not working with perl <5.20 when using locales that don't use dot as decimal separator
+fix songs with no label/genre not matching negative label/genre filters
+fix "0" appearing in "artists" tab for unknown artists
+lastfm plugin: give up sending now-playing when the song is no longer playing
+translations updates: Finnish, French, German, Korean, Malay (Malaysia)
+
 v1.1.14
 add support for gstreamer-1.x and small gstreamer updates/improvements
   gstreamer-1.x requires Glib::Object::Introspection and the gstreamer introspection data (Gst-1.0.typelib)
