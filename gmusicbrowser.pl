@@ -79,8 +79,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.1015',
- VERSIONSTRING => '1.1.15',
+ VERSION => '1.101501',
+ VERSIONSTRING => '1.1.15.1',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 
@@ -2355,6 +2355,15 @@ sub ReadSavedTags	#load tags _and_ settings
 			push @{$lines{$section}},$_;
 		}
 		close $fh;
+		unless ($lines{EOF} || $oldversion<=1.1015)
+		{	my $dialog = Gtk2::MessageDialog->new(undef,'modal','error','none','%s', _"The save file seems incomplete, you may want to use a backup instead.");
+			$dialog->set_title(PROGRAM_NAME);
+			$dialog->add_button_custom(_"Continue anyway",1);
+			$dialog->add_button_custom(_"Exit",2, icon=>'gtk-quit', tip=>__x(_"You can find backups in {folder}",folder=>dirname($SaveFile)));
+			$dialog->show_all;
+			exit unless $dialog->run eq '1';
+			$dialog->destroy;
+		}
 		unless ($lines{Options}) { warn "Can't find Options section in '$loadfile', it's probably not a gmusicbrowser save file -> aborting\n"; exit 1; }
 		SongArray::start_init(); #every SongArray read in Options will be updated to new IDs by SongArray::updateIDs later
 		ReadRefFromLines($lines{Options},\%Options);
@@ -2583,6 +2592,7 @@ sub SaveTags	#save tags _and_ settings
 			print $fh "$key\t$line\n"  or $error||=$!;
 		}
 	}
+	print $fh "\n[EOF]\nEOF\n"  or $error||=$!;
 	close $fh  or $error||=$!;
 	setlocale(LC_NUMERIC, '');
 	if ($error)
