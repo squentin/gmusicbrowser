@@ -1165,6 +1165,7 @@ our %Options=
 	DateFormat_history	=> ['%c 604800 %A %X 86400 Today %X 60 now'],
 	AlwaysInPlaylist	=> 1,
 	PixCacheSize		=> 60,	# in MB
+	Articles		=> 'the a an',
 
 	SavedSTGroupings=>
 	{	_"None"			=> '',
@@ -4117,17 +4118,20 @@ sub PopupAA
 		if (!@keys) {@keys=@keys_minor; undef @keys_minor;}
 	}
 
-	Songs::sort_gid_by_name($field,\@keys) unless $nosort;
-	my @names=@{Songs::Gid_to_Display($field,\@keys)}; #convert @keys to list of names
+	my $rm_articles= !$nosort && $::Options{Remove_articles} && Songs::CanRemoveArticles($field);
+	@keys= @{AA::SortKeys($field,\@keys)} unless $nosort;
+	my $displaynames= Songs::Gid_to_Display($field,\@keys); #convert @keys to list of names
+	my $names= $rm_articles ? [map Songs::remove_articles($_), @$displaynames] : $displaynames;
 
 	my @common_args= (widget=>$widget, makemenu=>$createAAMenu, cols=>3, height=>32+2);
-	my $menu=Breakdown_List(\@names, keys=>\@keys, @common_args);
+	my $menu=Breakdown_List($names, keys=>\@keys, displaynames=>$displaynames, @common_args);
 	return undef unless $menu;
 	if (@keys_minor)
 	{	Songs::sort_gid_by_name($field,\@keys_minor) unless $nosort;
-		my @names=@{Songs::Gid_to_Display($field,\@keys)};
+		my $displaynames= @{AA::SortKeys($field,\@keys_minor)};
+		my $names= $rm_articles ? [map Songs::remove_articles($_), @$displaynames] : $displaynames;
 		my $item=Gtk2::MenuItem->new('minor'); #FIXME
-		my $submenu=Breakdown_List(\@names, keys=>\@keys_minor, @common_args);
+		my $submenu=Breakdown_List($names, keys=>\@keys_minor, displaynames=>$displaynames, @common_args);
 		$item->set_submenu($submenu);
 		$menu->append($item);
 	}
@@ -4139,7 +4143,8 @@ sub PopupAA
 
 sub Breakdown_List
 {	my ($names,%options)=@_;
-	my ($min,$opt,$max,$makemenu,$keys,$widget)=@options{qw/min opt max makemenu keys widget/};
+	my ($min,$opt,$max,$makemenu,$keys,$widget,$displaynames)=@options{qw/min opt max makemenu keys widget displaynames/};
+	$displaynames||=$names;
 	$widget ||= Gtk2->get_current_event; #used to find current screen
 	my $screen= $widget ? $widget->get_screen : Gtk2::Gdk::Screen->get_default; # FIXME is that ok for multi-monitors ?
 	my $maxheight= $screen->get_height;
@@ -4157,7 +4162,7 @@ sub Breakdown_List
 	}
 
 	# short-cut if no need to create sub-menus
-	if ($#$names<=$max) { return $makemenu ? $makemenu->(0,$#$names,$names,$keys) : [0,$#$names] }
+	if ($#$names<=$max) { return $makemenu ? $makemenu->(0,$#$names,$displaynames,$keys) : [0,$#$names] }
 
 	# check if needs more than 1 level of submenus
 	if ($makemenu && !$options{norecurse})
@@ -4171,9 +4176,10 @@ sub Breakdown_List
 			$makemenu= sub
 			{	my ($start,$end,$names,$keys)=@_;
 				my @names2=@$names[$start..$end];
+				my @displaynames2=@$displaynames[$start..$end];
 				my $keys2;
 				@$keys2= @$keys[$start..$end] if $keys && @$keys;
-				Breakdown_List(\@names2,@childarg,keys=>$keys2);
+				Breakdown_List(\@names2,@childarg,keys=>$keys2,displaynames=>\@displaynames2);
 			};
 		}
 	}
@@ -4308,7 +4314,7 @@ sub Breakdown_List
 			my $item=Gtk2::MenuItem->new_with_label($c1);
 			$item->{start}= substr $c1,0,1;
 			$item->{end}=   substr $c2,0,1;
-			$item->{menuargs}= [$start,$end,$names,$keys];
+			$item->{menuargs}= [$start,$end,$displaynames,$keys];
 			# only build submenu when the item is selected
 			$item->signal_connect(activate => sub
 				{	my $args=delete $_[0]{menuargs};
@@ -4323,7 +4329,7 @@ sub Breakdown_List
 			$menu->append($item);
 		}
 	}
-	elsif (@menus==1) { $menu= $makemenu->(0,$#$names,$names,$keys); }
+	elsif (@menus==1) { $menu= $makemenu->(0,$#$names,$displaynames,$keys); }
 	else {return undef}
 
 	return $menu;
@@ -6696,6 +6702,12 @@ sub PrefMisc
 		text=>_"Extract guest artist from title :", tip=>_"Used for the Artists field", separator=> '  ',
 		empty=>_"ignore title", cb=>\&Songs::UpdateArtistsRE );
 
+	#articles
+	my $articles= NewPrefEntry('Articles',undef,cb=> sub { Delayed('UpdateArticleRE',1000,\&Songs::UpdateArticleRE); });
+	my $articles_check= NewPrefCheckButton(Remove_articles=>_"Ignore these words when sorting :",
+		widget=>$articles, cb=> \&Songs::UpdateArticleRE, horizontal=>1,
+		tip=>_"If one of these words is at the start of the string, it will be ignored when sorting most fields" );
+
 	#date format
 	my $dateex= mktime(5,4,3,2,0,(localtime)[5]);
 	my $datetip= join "\n", _"use standard strftime variables",	_"examples :",
@@ -6728,6 +6740,7 @@ sub PrefMisc
 	my $foldercmd= NewPrefEntry(OpenFolder => _"Command to open folders :", tip => _"Will use system's default if blank", history=> 'OpenFolder_history');
 
 	my $vbox= Vpack( $checkR1,$checkR2,$checkR4, $DefRating,$ProxyCheck, $asplit, $atitle,
+			$articles_check,
 			[0,$datealign,$preview], $screensaver,$shutentry, $always_in_pl,
 			$recent_include_not_played, $volstep, $pixcache,
 			[ $playedpercent, $playedseconds ],

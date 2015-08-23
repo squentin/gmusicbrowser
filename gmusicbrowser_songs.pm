@@ -13,7 +13,7 @@ package Songs;
 
 #our %Songs;
 our ($IDFromFile,$MissingHash); my $KeepIDFromFile;
-our ($Artists_split_re,$Artists_title_re);
+our ($Artists_split_re,$Artists_title_re,$Articles_re);
 my @MissingKeyFields;
 our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%HSort,%Aliases);
 my %FuncCache;
@@ -841,6 +841,7 @@ our %timespan_menu=
 	edit_order=> 10, letter => 't',
 	category=>'basic',
 	alias_trans=> ::_p('Field_aliases',"title"),  #TRANSLATION: comma-separated list of field aliases for title, these are in addition to english aliases
+	articles=>1,
  },
  artist =>
  {	name => _"Artist",	width => 200,	flags => 'fgarwescpi',
@@ -856,6 +857,7 @@ our %timespan_menu=
 	category=>'basic',
 	alias=> 'by',
 	alias_trans=> ::_p('Field_aliases',"artist,by"),  #TRANSLATION: comma-separated list of field aliases for artist, these are in addition to english aliases
+	articles=>1,
  },
  first_artist =>
  {	flags => 'fig',
@@ -864,12 +866,14 @@ our %timespan_menu=
 	picture_field => 'artist_picture',
 	sortgroup=>'artist',
 	can_group=>1,
+	articles=>1,
  },
  artists =>
  {	flags => 'gfil',	type	=> 'artists',	depend	=> 'artist title',	name => _"Artists",
 	all_count=> _"All artists",
 	FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
+	articles=>1,
  },
  album =>
  {	name => _"Album",	width => 200,	flags => 'fgarwescpi',	type => 'album',
@@ -885,6 +889,7 @@ our %timespan_menu=
 	category=>'basic',
 	alias=> 'on',
 	alias_trans=> ::_p('Field_aliases',"album,on"),  #TRANSLATION: comma-separated list of field aliases for album, these are in addition to english aliases
+	articles=>1,
  },
 # genre_picture =>
 # {	name		=> "Genre picture",
@@ -929,6 +934,7 @@ our %timespan_menu=
 	letter => 'A',
 	depend	=> 'album_artist_raw artist album',
 	category=>'basic',
+	articles=>1,
  },
  album_has_picture=>
  {	name => _"Album has picture", width => 20, flags => 'fgcs',	type => 'boolean',
@@ -964,6 +970,7 @@ our %timespan_menu=
 	edit_order=> 55,	edit_many=>1,
 	id3v2 => 'TIT1',	vorbis	=> 'grouping',	ape	=> 'Grouping', ilst => "\xA9grp",
 	category=>'extra',
+	articles=>1,
  },
  year =>
  {	name	=> _"Year",	width => 40,	flags => 'fgarwescp',	type => 'integer',	bits => 16,
@@ -1180,6 +1187,7 @@ our %timespan_menu=
 	edit_many=>1,
 	disable=>1,	options => 'disable',
 	category=>'extra',
+	articles=>1,
  },
  lyricist =>
  {	name	=> _"Lyricist",		width	=> 100,		flags => 'fgarwescpi',	type => 'artist',
@@ -1190,6 +1198,7 @@ our %timespan_menu=
 	edit_many=>1,
 	disable=>1,	options => 'disable',
 	category=>'extra',
+	articles=>1,
  },
  conductor =>
  {	name	=> _"Conductor",	width	=> 100,		flags => 'fgarwescpi',	type => 'artist',
@@ -1200,6 +1209,7 @@ our %timespan_menu=
 	edit_many=>1,
 	disable=>1,	options => 'disable',
 	category=>'extra',
+	articles=>1,
  },
  remixer =>
  {	name	=> _"Remixer",	width	=> 100,		flags => 'fgarwescpi',	type => 'artist',
@@ -1209,6 +1219,7 @@ our %timespan_menu=
 	edit_many=>1,
 	disable=>1,	options => 'disable',
 	category=>'extra',
+	articles=>1,
  },
  version=> #subtitle ?
  {	name	=> _"Version",	width	=> 150,		flags => 'fgarwescpi',	type => 'fewstring',
@@ -1354,6 +1365,7 @@ our %timespan_menu=
 			name=> _"Title or filename",
 			depend => 'file title', letter => 'S',	#why letter S ? :)
 			options => 'show_ext', show_ext=>0,
+			articles=>1,
 		   },
 
  missing	=> { flags => 'gan', type => 'integer', bits => 32, }, #FIXME store it using a 8-bit relative number to $::DAYNB
@@ -1397,13 +1409,13 @@ our %timespan_menu=
 );
 
 our %FieldTemplates=
-(	string	=> { type=>'string',	editname=>_"string",		flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', },
+(	string	=> { type=>'string',	editname=>_"string",		flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', articles=>1, },
 	text	=> { type=>'text',	editname=>_"multi-lines string",flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', },
 	float	=> { type=>'float',	editname=>_"float",		flags=>'fgaescp',	width=> 100,	edit_many =>1,		options=> 'customfield', desc => _"For decimal numbers", },
 	boolean	=> { type=>'boolean',	editname=>_"boolean",		flags=>'fgaescp',	width=> 20,	edit_many =>1,		options=> 'customfield', },
 	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescpil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield persistent_values editsubmenu', FilterList=> {search=>1},   desc=>_"Same type as labels", editsubmenu => 1, },
-	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'fgaescpi',	width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', },
-	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'fgaescpi',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, desc=>_"For when values are likely to be repeated" },
+	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'fgaescpi',	width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', articles=>1, },
+	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'fgaescpi',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, desc=>_"For when values are likely to be repeated", articles=>1, },
 	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {},  desc=>_"For when values are likely to be repeated" },
 	integer	=> { type=>'integer',	editname=>_"integer",		flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {},  desc => _"For integer numbers", },
 	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'fgaescp_',	width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid editsubmenu stars', FilterList=> {},
@@ -1610,6 +1622,7 @@ sub SortCode
 	{	$op='cmp';
 		if (!$insensitive)	{ $code=$scode}
 		else			{ $code= $sicode || "::superlc($scode)"; }
+		if ($::Options{Remove_articles} && CanRemoveArticles($field)) { $code="remove_articles($code)"; }
 	}
 	my $init='';
 	$init=$1 if $code=~s/^(.+) +---- +//;
@@ -1618,6 +1631,23 @@ sub SortCode
 	$code2=~s/#(?:GID|ID)#/\$b/g;
 	$code= $inv ? "$code2 $op $code" : "$code $op $code2";
 	return $init,$code;
+}
+sub CompileArticleRE
+{	my @art= split /\s+/, $::Options{Articles};
+	s/_/ /g for @art; #replace _ by spaces to allow multi-word "articles", not sure if it could be useful
+	@art= map quotemeta($_).(m/'$/ ? "" : "\\s+"), @art;
+	my $re= '^(?:' .join('|',@art). ')';
+	$Articles_re= qr/$re/i;
+}
+sub UpdateArticleRE
+{	delete $::Delayed{'UpdateArticleRE'};
+	Songs::CompileArticleRE();
+	%FuncCache=();#FIXME find a better way
+	Songs::Changed(undef,FieldList(true=>'articles'));
+}
+sub CanRemoveArticles { $Def{$_[0]}{articles}; }
+sub remove_articles
+{	my $s=$_[0]; $s=~s/$Articles_re//; $s;
 }
 
 sub Compile		#currently return value of the code must be a scalar
@@ -1639,6 +1669,7 @@ sub UpdateFuncs
 
 	Field_Apply_options();
 	CompileArtistsRE();
+	CompileArticleRE();
 
 	my @todo=grep !$Def{$_}{disable}, sort keys %Def;
 	while (@todo)
@@ -3319,7 +3350,7 @@ sub GrepKeys
 
 sub SortKeys
 {	my ($field,$list,$mode,$hsongs)=@_;
-	my $invert= $mode=~s/^-//;
+	my $invert= $mode && $mode=~s/^-//;
 	my $h=my $pre=0;
 	$mode||='';
 	if ($mode eq 'songs')
