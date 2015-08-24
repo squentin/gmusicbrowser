@@ -1080,7 +1080,7 @@ our $CurrentDir=$ENV{PWD};
 $ENV{'PULSE_PROP_media.role'}='music';				# role hint for pulseaudio
 $ENV{'PULSE_PROP_application.icon_name'}='gmusicbrowser';	# icon hint for pulseaudio, could also use Gtk2::Window->set_default_icon_name
 
-our (%ToDo,%TimeOut);
+our (%ToDo,%TimeOut,%Delayed);
 my %EventWatchers;#for Save Vol Time Queue Lock Repeat Sort Filter Pos CurSong Playing SavedWRandoms SavedSorts SavedFilters SavedLists Icons Widgets connections
 # also used for SearchText_ SelectedID_ followed by group id
 # Picture_#mainfield#
@@ -3516,6 +3516,11 @@ sub IdleScan
 	&launchIdleLoop;
 }
 
+sub Delayed
+{	my ($task_id,$timeout,$cb,@args)=@_;
+	Glib::Source->remove($Delayed{$task_id}) if $Delayed{$task_id};
+	$Delayed{$task_id}= Glib::Timeout->add($timeout,sub { delete $Delayed{$task_id}; $cb->(@args); 0; });
+}
 sub IdleDo
 {	my $task_id=shift;
 	my $timeout=shift;
@@ -6660,7 +6665,7 @@ sub Set_replaygain { $Play_package->RG_set_options() if $Play_package->can('RG_s
 sub PrefMisc
 {	#Default rating
 	my $DefRating=NewPrefSpinButton('DefaultRating',0,100, step=>10, page=>20, text=>_"Default rating : %d %", cb=> sub
-		{ IdleDo('0_DefaultRating',500,\&Songs::UpdateDefaultRating);
+		{ Delayed('DefaultRating',500,\&Songs::UpdateDefaultRating);
 		});
 
 	my $checkR1=NewPrefCheckButton(RememberPlayFilter => _"Remember last Filter/Playlist between sessions");
