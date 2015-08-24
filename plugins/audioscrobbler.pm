@@ -44,7 +44,8 @@ sub Start
 }
 sub Stop
 {	$waiting->abort if $waiting;
-	$waiting=undef;
+	Glib::Source->remove($timeout) if $timeout;
+	$timeout=$waiting=undef;
 	::UnWatch($self,$_) for qw/PlayingSong Played Save/;
 	$self->{on}=undef;
 	$interval=5;
@@ -68,9 +69,29 @@ sub prefbox
 	my $ignore=Gtk2::CheckButton->new(_"Don't submit current song");
 	$ignore->signal_connect(toggled=>sub { return if $_[0]->{busy}; $ignore_current_song= $_[0]->get_active ? $::SongID : undef; ::HasChanged('Lastfm_ignore_current'); });
 	::Watch($ignore,Lastfm_ignore_current => sub { $_[0]->{busy}=1; $_[0]->set_active(defined $ignore_current_song); delete $_[0]->{busy}; } );
-	$vbox->pack_start($_,::FALSE,::FALSE,0) for $label2,$entry1,$entry2,$ignore;
+	my $queue= Gtk2::Label->new;
+	my $sendnow= Gtk2::Button->new(_"Send now");
+	$sendnow->signal_connect(clicked=> \&SendNow);
+	my $qbox= ::Hpack($queue,$sendnow);
+	$vbox->pack_start($_,::FALSE,::FALSE,0) for $label2,$entry1,$entry2,$ignore,$qbox;
 	$vbox->add( ::LogView($Log) );
+	$qbox->{label}=$queue;
+	$qbox->{button}=$sendnow;
+	$qbox->show_all;
+	update_queue_label($qbox);
+	$qbox->set_no_show_all(1);
+	::Watch($qbox,Lastfm_state_change=>\&update_queue_label);
 	return $vbox;
+}
+sub update_queue_label
+{	my $qbox=shift;
+	my $label= $qbox->{label};
+	if (@ToSubmit && (@ToSubmit>1 || (!$waiting && (!$timeout || $interval>10))))
+	{	$label->set_text(::__n("%d song waiting to be sent","%d songs waiting to be sent", scalar @ToSubmit ));
+		$label->parent->show;
+		$qbox->{button}->set_sensitive(!$waiting);
+	}
+	else { $label->parent->hide }
 }
 sub userpass_changed
 {	$HandshakeOK=$Serrors=undef;
@@ -101,6 +122,7 @@ sub Played
 		::IdleDo("9_".__PACKAGE__,10000,\&Save) if @ToSubmit>$unsent_saved;
 		push @ToSubmit,[ $artist,$title,$album,'',$length,$start_time,$track,'P' ];
 		Sleep();
+		::QHasChanged('Lastfm_state_change');
 	}
 }
 
@@ -204,9 +226,16 @@ sub Submit
 	Send($response_cb,$url,$post);
 }
 
+sub SendNow
+{	$interval=5;
+	$Serrors=$Stop=undef;
+	Glib::Source->remove($timeout) if $timeout;
+	Awake();
+}
 sub Sleep
 {	#warn "Sleep\n";
 	return unless $self->{on};
+	::QHasChanged('Lastfm_state_change');
 	return if $Stop || $waiting || $timeout;
 	$timeout=Glib::Timeout->add(1000*$interval,\&Awake) if @ToSubmit || $NowPlaying;
 	#warn "Sleeping $interval seconds\n" if $timeout;
@@ -214,7 +243,7 @@ sub Sleep
 sub Awake
 {	#warn "Awoke\n";
 	$timeout=undef;
-	return 0 unless $self->{on};
+	return 0 if !$self->{on} || $waiting;
 	if ($HandshakeOK)	{ Submit(); }
 	else			{ Handshake(); }
 	Sleep();
@@ -229,6 +258,7 @@ sub Send
 		Sleep();
 	};
 	$waiting=Simple_http::get_with_cb(cb => $cb,url => $url,post => $post);
+	::QHasChanged('Lastfm_state_change');
 }
 
 sub Log
