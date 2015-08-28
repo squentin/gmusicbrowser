@@ -151,6 +151,27 @@ sub init
 	0; #called in an idle, return 0 to run only once
 }
 
+use Net::DBus::Annotation qw(:call);
+sub simple_call #$service_path can be service_and_path separated by space, or the object
+{	my ($service_path,$method,$args,$reply)=@_;
+	my $return= eval
+	{	my $object;
+		if (ref $service_path) { $object=$service_path }
+		else
+		{	my ($name,$path)= split / +/,$service_path,2;
+			my $service= $bus->get_service($name);
+			return $service unless $path;
+			my $interface= $path=~s#^([^/]+)## ? $1 : undef;
+			$object = $service->get_object($path,$interface);
+		}
+		return $object unless $method;
+		$reply&&= $reply eq 'async' ? dbus_call_async :
+			  $reply eq 'noreply' ? dbus_call_noreply : undef;
+		return $object->$method(($reply||()),@$args);
+	};
+	return $@ ? undef : $return;
+}
+
 sub DBus_mainloop_hack
 {	# use Net::DBus internals to connect it to the Glib mainloop, though unlikely, it may break with future version of Net::DBus
 	use Net::DBus::Reactor;

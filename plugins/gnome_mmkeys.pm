@@ -24,16 +24,12 @@ my %Names=
   mate	=> 'org.mate.SettingsDaemon  /org/mate/SettingsDaemon/MediaKeys',
 );
 
-my $bus= Net::DBus->find;
-my ($service,$object);
+my $object;
 for my $desktop (qw/gnome mate ognome/)
-{	my ($name,$path)= split /\s+/, $Names{$desktop};
-	eval
-	{	$service= $bus->get_service($name);
-		$object = $service->get_object($path);
-		$object->connect_to_signal(MediaPlayerKeyPressed => \&callback);
-	};
-	last if $object && !$@;
+{	if ($object= GMB::DBus::simple_call($Names{$desktop}))
+	{	$object->connect_to_signal(MediaPlayerKeyPressed => \&callback);
+		last
+	}
 }
 die "Can't find the dbus Settings Daemon for gnome or MATE\n" if $@;
 

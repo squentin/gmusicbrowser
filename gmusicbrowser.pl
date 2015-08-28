@@ -410,13 +410,11 @@ Options to change what is done with files/folders passed as arguments (done in r
 	if (!$running && !$CmdLine{noDBus})
 	{	eval {require 'gmusicbrowser_dbus.pm'}
 		|| warn "Error loading gmusicbrowser_dbus.pm :\n$@ => controlling gmusicbrowser through DBus won't be possible.\n\n";
-		eval
-		{	my $bus= $GMB::DBus::bus || die;
-			my $service = $bus->get_service($DBus_id) || die;
-			my $object = $service->get_object('/org/gmusicbrowser', 'org.gmusicbrowser') || die;
-			$object->RunCommand($_) for @cmd;
-		};
-		$running="using DBus id=$DBus_id" unless $@;
+		my $object= GMB::DBus::simple_call("$DBus_id org.gmusicbrowser/org/gmusicbrowser");
+		if ($object)
+		{	$object->RunCommand($_) for @cmd;
+			$running="using DBus id=$DBus_id";
+		}
 	}
 	if ($running)
 	{	warn "Found a running instance ($running)\n";
