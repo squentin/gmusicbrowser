@@ -45,11 +45,11 @@ sub init
 sub check_version
 {	return unless $mpv;
 	my $output= qx/$mpv -V/;
-	my $ok= $output=~m/mpv\s*(\d+)\.(\d+)(\S+)?/i && ($1>0 || $2>=7) ? 1 : 0; #requires version 0.7 or later
-	if ($::debug)
-	{	if (defined $1) { warn "mpv: found mpv v$1.$2".($3||"")."\n"; }
-		else {warn "mpv: error looking up mpv version\n"}
-	}
+	my ($ok,$version);
+	if ($output=~m/mpv\s*(\d+)\.(\d+)(\S+)?/i) { $ok= $1>0 || $2>=7; $version= "$1.$2".($3||"") } #requires version 0.7 or later
+	elsif ($output=~m/mpv\s*(git-[[:xdigit:]]+)/i) { $ok=1; $version=$1; } #assume git version is ok
+	else { warn "mpv: error looking up mpv version\n"; }
+	warn "mpv: found mpv version $version\n" if $version && ($::debug || !$ok);
 	if (!$ok) { warn "mpv version earlier than 0.7 are not supported -> mpv backend disabled\n" }
 	return $ok;
 }
