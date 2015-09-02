@@ -6154,7 +6154,7 @@ sub AboutDialog
 	$dialog->set_translator_credits( join "\n", sort
 		'French : Quentin Sculo, Jonathan Fretin, Frédéric Urbain, Brice Boucard, Hornblende & mgrubert',
 		'Hungarian : Zsombor',
-		'Spanish : Martintxo, Juanjo & Elega',
+		'Spanish : Martintxo, Juanjo, Elega, Juan Montoya, Genesis Bustamante',
 		'German : vlad & staubi',
 		'Polish : Robert Wojewódzki, tizzilzol team',
 		'Swedish : Olle Sandgren',
