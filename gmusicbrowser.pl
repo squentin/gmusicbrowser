@@ -6155,7 +6155,7 @@ sub AboutDialog
 		'French : Quentin Sculo, Jonathan Fretin, Frédéric Urbain, Brice Boucard, Hornblende & mgrubert',
 		'Hungarian : Zsombor',
 		'Spanish : Martintxo, Juanjo, Elega, Juan Montoya, Genesis Bustamante',
-		'German : vlad & staubi',
+		'German : vlad, staubi, Tino',
 		'Polish : Robert Wojewódzki, tizzilzol team',
 		'Swedish : Olle Sandgren',
 		'Chinese : jk',

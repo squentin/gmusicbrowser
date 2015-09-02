@@ -3,10 +3,10 @@
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: gmusicbrowser 1.1.14\n"
+"Project-Id-Version: gmusicbrowser 1.1.15\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2015-03-18 23:51+0100\n"
-"PO-Revision-Date: 2015-04-27 15:55+0100\n"
+"POT-Creation-Date: 2015-08-20 01:54+0200\n"
+"PO-Revision-Date: 2015-09-01 16:32+0200\n"
 "Last-Translator: staubi <knirchzwerg@web.de>\n"
 "Language-Team: Tino <knirchzwerg@web.de>\n"
 "Language: de_DE\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Bookmarks: 1214,-1,-1,-1,-1,-1,-1,-1,-1,-1\n"
-"X-Generator: Poedit 1.7.5\n"
+"X-Generator: Poedit 1.8.4\n"
 
 msgid " Context pane layout "
 msgstr " Kontextfenster-Darstellung"
@@ -160,10 +160,10 @@ msgid ""
 "not in it\n"
 "- Skip to another song when removing the current song from the playlist"
 msgstr ""
-"- Bei Auswahl eines Titels, wird der Playlistfilter aufgehoben, wenn der "
-"Titel nicht enthalten ist\n"
+"- Bei Auswahl eines Titels, wird der Wiedergabelistenfilter aufgehoben, wenn "
+"der Titel nicht enthalten ist\n"
 "- Springe zu einem anderen Titel, wenn der abgespielte Titel aus der "
-"Playlist entfernt wird"
+"Wiedergabeliste entfernt wird"
 
 msgid "0 chance"
 msgstr "0 Chance"
@@ -293,6 +293,9 @@ msgstr "Neues Label hinzufügen"
 msgid "Add new radio"
 msgstr "Neues Radio hinzufügen"
 
+msgid "Add picture"
+msgstr "Bild hinzufügen"
+
 msgid "Add rule : "
 msgstr "Neues Suchmuster hinzufügen : "
 
@@ -337,8 +340,8 @@ msgid ""
 "Adds a menu entry to artist/album context menu, allowing to search the "
 "picture/cover in google and save it."
 msgstr ""
-"Fügt einen Menüeintrag im Interpreten/Album-Kontextmenü hinzu mit dem man "
-"mit Google nach dem Cover suchen und dieses speichern kann."
+"Fügt einen Menüeintrag im Interpreten/Album-Kontextmenü hinzu mit dem man im "
+"Internet nach dem Cover suchen und dieses speichern kann."
 
 msgid "Adds labels to the current song"
 msgstr "Fügt Labels zu aktuellem Titel hinzu"
@@ -889,6 +892,9 @@ msgstr ""
 "'Schalte Computer aus,wenn Warteliste leer'\n"
 "markiert ist"
 
+msgid "Command used:"
+msgstr "Verwendeter Befehl:"
+
 msgid "Command when playing song changed :"
 msgstr "Befehl wenn Titel wechselt :"
 
@@ -970,7 +976,7 @@ msgid "Ctrl"
 msgstr "Strg"
 
 msgid "Current song must always be in the playlist"
-msgstr "Aktueller Titel muss immer in Playlist sein"
+msgstr "Aktueller Titel muss immer in Wiedergabeliste sein"
 
 msgid "Custom"
 msgstr "Benutzerdefiniert"
@@ -1022,7 +1028,7 @@ msgstr "Standardvollbild"
 
 #, perl-format
 msgid "Default rating : %d %"
-msgstr "Standard Bewertung : %d %"
+msgstr "Standardbewertung : %d %"
 
 msgid "Default text color"
 msgstr "Standard Textfarbe"
@@ -1046,6 +1052,9 @@ msgstr "Datei löschen"
 
 msgid "Delete list"
 msgstr "Liste löschen"
+
+msgid "Delete preset"
+msgstr "Preset löschen"
 
 msgid "Deletion failed"
 msgstr "Löschen fehlgeschlagen"
@@ -1159,9 +1168,6 @@ msgstr "Bearbeiten"
 msgid "Edit Current Song Properties"
 msgstr "Bearbeite aktuelle Titelinfo"
 
-msgid "Edit labels"
-msgstr "Bearbeite labels"
-
 msgid "Edit Lyrics"
 msgstr "Editiere Liedtext"
 
@@ -1170,9 +1176,6 @@ msgstr "Editiere Liedtext..."
 
 msgid "Edit Multiple Songs Properties"
 msgstr "Bearbeite mehrere Titelinfos"
-
-msgid "Edit rating"
-msgstr "Ändere bewertung"
 
 msgid "Edit Settings"
 msgstr "Bearbeite Einstellungen"
@@ -1192,6 +1195,9 @@ msgstr "Editiere Gruppierung..."
 msgid "Edit in the last.fm wiki"
 msgstr "Bearbeite im Last.fm Wiki"
 
+msgid "Edit labels"
+msgstr "Bearbeite Labels"
+
 msgid "Edit list"
 msgstr "Bearbeite Liste"
 
@@ -1204,11 +1210,18 @@ msgstr "Editiere Sortiermodi..."
 msgid "Edit random modes ..."
 msgstr "Editiere Zufallsmodi..."
 
+msgid "Edit rating"
+msgstr "Ändere Bewertung"
+
 msgid "Edit row tip"
 msgstr "Editiere Reiheninfo"
 
 msgid "Edit selected song properties"
 msgstr "Bearbeite gewählte Titelinfos"
+
+#, perl-brace-format
+msgid "Edit {field}"
+msgstr "{field} bearbeiten"
 
 msgid "Edit..."
 msgstr "Bearbeite..."
@@ -1221,6 +1234,9 @@ msgstr "Bearbeite Liste :"
 
 msgid "Editing tags"
 msgstr "Bearbeite Tags"
+
+msgid "Embedded Pictures"
+msgstr "Eingebettete Bilder"
 
 msgid "Embedded lyrics"
 msgstr "Enthaltene Liedtexte"
@@ -1256,7 +1272,7 @@ msgid "Enqueue Displayed"
 msgstr "Hänge Angezeigte an Warteliste"
 
 msgid "Enqueue Selected"
-msgstr "Hänge Ausgewählte an Warteliste"
+msgstr "Hänge Auswahl an Warteliste"
 
 msgid "Enqueue Selected Songs"
 msgstr "Hänge Ausgewählte Titel an Warteliste"
@@ -1348,7 +1364,7 @@ msgid "Error writing .csv file"
 msgstr "Fehler beim Schreiben der .csv-Datei"
 
 msgid "Error writing .m3u file"
-msgstr "Fehler beim Schreiben der Playlist (.m3u)"
+msgstr "Fehler beim Schreiben der Wiedergabeliste (.m3u)"
 
 msgid "Error writing downloaded file"
 msgstr "Fehler beim Schreiben der heruntergeladenen Datei"
@@ -1498,13 +1514,13 @@ msgid "Find a unique filename if file already exists"
 msgstr "Erstelle anderen Namen, wenn Datei bereits existiert"
 
 msgid "Find songs in same albums"
-msgstr "Finde Titel in gleichen Alben"
+msgstr "Finde Titel in selben Alben"
 
 msgid "Find songs with same artists"
-msgstr "Finde Titel mit gleichen Interpreten"
+msgstr "Finde Titel mit selben Interpreten"
 
 msgid "Find songs with the same names"
-msgstr "Finde Titel mit gleichem Namen"
+msgstr "Finde Titel mit selben Namen"
 
 msgid "Folder"
 msgstr "Ordner"
@@ -1637,11 +1653,21 @@ msgstr "Verstecke nicht-passende"
 msgid "Hide toolbar"
 msgstr "Verberge Werkzeugleiste"
 
+msgid "High priority"
+msgstr "Hohe Priorität"
+
 msgid "Icon theme :"
 msgstr "Iconthema :"
 
 msgid "Identifier in file tag"
 msgstr "Bezeichnung im Dateitag"
+
+msgid ""
+"If checked, the shortcut has higher priority than the default shortcut of "
+"widgets. Warning: this can make some features inaccessible"
+msgstr ""
+"Wenn markiert hat dieses Tastenkürzel eine höhere Priorität als die normalen "
+"Widgetkürzel. Achtung: Dies kann einzelne Features unzugänglich machen!"
 
 msgid "Ignore playback errors"
 msgstr "Ignoriere Abspielfehler"
@@ -1651,6 +1677,13 @@ msgstr "Ignorierte Dateinamenserweiterungen:"
 
 msgid "Import list"
 msgstr "Importiere Liste"
+
+msgid ""
+"Imports gstreamer presets, and synchronize modifications made with "
+"gmusicbrowser"
+msgstr ""
+"Importiert gstreamer Presets und synchronisiert Veränderungen die mit "
+"gmusicbrowser gemacht wurden"
 
 msgid ""
 "In this case one command by file will be run\n"
@@ -1749,6 +1782,9 @@ msgstr "Sprache"
 
 msgid "Languages"
 msgstr "Sprachen"
+
+msgid "Last messages:"
+msgstr "Letzte Nachrichten:"
 
 msgid "Last played"
 msgstr "Zuletzt gespielt"
@@ -2057,6 +2093,9 @@ msgstr "Ton aus/an"
 msgid "Name"
 msgstr "Name"
 
+msgid "Name of layout"
+msgstr "Name des Layouts"
+
 msgid "Name under which the command will appear in the menu"
 msgstr "Name unter dem der Befehl im Menü erscheint"
 
@@ -2359,6 +2398,9 @@ msgstr "Art der Überlagerung :"
 msgid "Owner identifier"
 msgstr "Besitzeridentifikation"
 
+msgid "Paste link"
+msgstr "Link einfügen"
+
 msgid "Path,Album,Disc,Track,File"
 msgstr "Pfad/Album/Disk/Titelnummer/Datei"
 
@@ -2402,6 +2444,9 @@ msgstr "Cover-Such-Erweiterung"
 #, perl-format
 msgid "Picture size : %d"
 msgstr "Bildgröße : %d"
+
+msgid "Picture type"
+msgstr "Bildart"
 
 msgid "Pictures and music files"
 msgstr "Bild- und Musikdateien"
@@ -2456,6 +2501,9 @@ msgstr "Wiedergabe/Pause"
 
 msgid "Playback"
 msgstr "Wiedergabe"
+
+msgid "Playback ended unexpectedly."
+msgstr "Wiedergabe unerwartet beendet."
 
 msgid "Playcount: "
 msgstr "Wiedergabeanzahl:"
@@ -2805,6 +2853,9 @@ msgstr "Entferne Label"
 msgid "Remove list"
 msgstr "Entferne Liste"
 
+msgid "Remove picture"
+msgstr "Bild entfernen"
+
 msgid "Remove selected songs"
 msgstr "Entferne markierte Titel"
 
@@ -3018,6 +3069,9 @@ msgstr "Jetzt speichern"
 msgid "Save picture as"
 msgstr "Speichere Bild unter"
 
+msgid "Save preset"
+msgstr "Als Preset speichern"
+
 msgid "Save review"
 msgstr "Speichere Rezension"
 
@@ -3222,11 +3276,23 @@ msgstr "Als Bild für '{name}' festlegen"
 msgid "Set as primary filter"
 msgstr "Als primären Filter nehmen"
 
+msgid "Set equalizer"
+msgstr "Equalizer auswählen"
+
+msgid "Set focus on a layout widget"
+msgstr "Fokus auf ein Layout-Widget setzen"
+
 msgid "Set grouping"
 msgstr "Setzte Gruppierung"
 
 msgid "Set icon"
 msgstr "Icon auswählen"
+
+msgid "Set picture"
+msgstr "Bild festlegen"
+
+msgid "Set picture using this file"
+msgstr "Diese Datei als Bild festlegen"
 
 msgid "Set player window layout"
 msgstr "Setze Playerfenster-Darstellung"
@@ -3276,8 +3342,14 @@ msgstr "Zeige anstehende Veranstaltungen des Interpreten"
 msgid "Show buttons"
 msgstr "Zeige Knöpfe"
 
+msgid "Show edition submenu in song context menu"
+msgstr "Zeige Editier-Untermenü im Liedkontextmenü"
+
 msgid "Show file list"
 msgstr "Zeige Dateiliste"
+
+msgid "Show file name extension"
+msgstr "Dateinamenserweiterung anzeigen"
 
 msgid "Show folder list"
 msgstr "Zeige Ordnerliste"
@@ -3301,7 +3373,7 @@ msgid "Show playlist"
 msgstr "Zeige Wiedergabeliste"
 
 msgid "Show replaygain submenu"
-msgstr "Zeige ReplayGain-Untermenu"
+msgstr "Zeige ReplayGain-Untermenü"
 
 msgid "Show similar artists"
 msgstr "Zeige ähnliche Interpreten"
@@ -3353,6 +3425,9 @@ msgstr "Mischen"
 
 msgid "Shuffle list"
 msgstr "Liste mischen"
+
+msgid "Shuffle or re-shuffle the playlist"
+msgstr "Wiedergabeliste mischen oder neu mischen"
 
 msgid "Shuffle queue"
 msgstr "Mische Warteliste"
@@ -3453,6 +3528,9 @@ msgstr "Quelle: {file}"
 msgid "Split artist names on :"
 msgstr "Trenne Interpretennamen bei :"
 
+msgid "Star images"
+msgstr "Stern-Bilddateien"
+
 msgid "Start ReplayGain analysis"
 msgstr "Starte ReplayGain-Analyse"
 
@@ -3525,6 +3603,9 @@ msgstr "Sonntag"
 msgid "Switch to fullscreen mode"
 msgstr "Wechsle in Vollbildmodus"
 
+msgid "Synchronize equalizer presets"
+msgstr "Equalizerpresets synchronisieren"
+
 msgid "System clock is not close enough to the current time"
 msgstr "Systemzeit weicht zu stark von aktueller Zeit ab"
 
@@ -3577,7 +3658,7 @@ msgstr[1] "Dieses Label ist für %d Titel gesetzt."
 msgid ""
 "This plugin is needed for gmusicbrowser to appear in unity's sound menu."
 msgstr ""
-"Dieses Plugin wird benötigt um gmusicbrowser im Unity Soundmenu anzuzeigen."
+"Dieses Plugin wird benötigt um gmusicbrowser im Unity Soundmenü anzuzeigen."
 
 msgid "This plugin requires :"
 msgstr "Diese Erweiterung benötigt :"
@@ -3706,6 +3787,9 @@ msgstr "URL"
 
 msgid "Unique file identifier"
 msgstr "Eindeutige Datei Identifikation"
+
+msgid "Unknown"
+msgstr "Unbekannt"
 
 msgid "Unknown album"
 msgstr "Unbekanntes Album"
@@ -3974,6 +4058,18 @@ msgid ""
 msgstr ""
 "Du kannst eine Prüfung für diese Dateien erzwingen, wenn Du die \"Umschalt\"-"
 "Taste beim Auswählen von \"Re-read tags\" hälst"
+
+#, perl-brace-format
+msgid ""
+"You can make custom stars by putting pictures in {folder}\n"
+"They must be named 'stars', optionally followed by a '-' and a word, "
+"followed by a number from 0 to 5 or 10\n"
+"Example: stars-custom0.png"
+msgstr ""
+"Um eigene Sterne zu verwenden, Bilddateien in den Ordner {folder} kopieren\n"
+"Die Dateien müssen nach folgendem Muster benannt werden: stars-<beliebiges "
+"Wort><Zahl von 0 bis 5 oder 10>.png\n"
+"Beispiel: stars-shine0.png"
 
 msgid ""
 "You can use some markup, eg :\n"
@@ -4669,6 +4765,9 @@ msgstr "mplayer Befehl :"
 msgid "mplayer options :"
 msgstr "Mplayer-Optionen :"
 
+msgid "mpv options :"
+msgstr ".mpv Optionen:"
+
 msgid "multi-lines string"
 msgstr "mehrzeilige Zeichenkette"
 
@@ -4849,6 +4948,13 @@ msgstr "Vorverstärkung"
 #, perl-format
 msgid "pre-amp : %d dB"
 msgstr "Vorverstärkung : %d dB"
+
+msgid ""
+"pre-set name or 10 numbers between 12 and -12 (-24 for gstreamer) separated "
+"by ':', or 0 (for off), or 1 (for on)"
+msgstr ""
+"Presetname oder 10 Zahlen zwischen 12 und -12 (bzw. -24 bei gstreamer) "
+"getrennt durch ':', oder 0 (für aus) oder 1 (für an)"
 
 #, perl-format
 msgid "present in %s"
