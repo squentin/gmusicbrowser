@@ -775,7 +775,7 @@ sub uniq
 
 sub sort_number_aware #sort (s1 s10 s2) into (s1 s2 s10)
 {	my %h;
-	($h{$_} = $_) =~ s/(\d+)/"0"x(20-length($1)).$1/ge for @_; #format numbers with at least 20 digits, will fail for numbers with more than 20 digits, but probably not interesting anyway
+	($h{$_} = superlc($_)) =~ s/(\d+)/"0"x(20-length($1)).$1/ge for @_; #format numbers with at least 20 digits, will fail for numbers with more than 20 digits, but probably not interesting anyway
 	return sort {$h{$a} cmp $h{$b}} @_;
 }
 
