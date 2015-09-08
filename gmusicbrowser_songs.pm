@@ -930,6 +930,14 @@ our %timespan_menu=
 	depend	=> 'album_artist_raw artist album',
 	category=>'basic',
  },
+ album_has_picture=>
+ {	name => _"Album has picture", width => 20, flags => 'fgcs',	type => 'boolean',
+	_ => '!!(__#mainfield#_picture[ ##mainfield#->get_gid# ])', mainfield=> 'album',
+ },
+ artist_has_picture=>
+ {	name => _"Artist has picture", width => 20, flags => 'fgcs',	type => 'boolean',
+	_ => '!!(__#mainfield#_picture[ ##mainfield#->get_gid# ])', mainfield=> 'artist',
+ },
  has_picture =>
  {	name	=> _"Embedded picture", width => 20, flags => 'fgarscp',	type => 'boolean',
 	id3v2 => 'APIC',	vorbis => 'METADATA_BLOCK_PICTURE',	'ilst' => 'covr',
