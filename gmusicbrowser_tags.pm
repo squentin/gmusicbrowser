@@ -286,7 +286,7 @@ sub GetLyrics
 
 sub WriteLyrics
 {	my ($ID,$lyrics)=@_;
-	Write($ID, [embedded_lyrics=>$lyrics], sub
+	Write(Songs::GetFullFilename($ID), [embedded_lyrics=>$lyrics], sub
 	 {	my ($syserr,$details)= Error_Message(@_);
 		return ::Retry_Dialog($syserr, _"Error writing lyrics", details=>$details, ID=>$ID);
 	 });

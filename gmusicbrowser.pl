@@ -5185,8 +5185,11 @@ sub EditLyrics
 	$lyrics='' unless defined $lyrics;
 	$Editing{'L'.$ID}=
 	  EditLyricsDialog(undef,$lyrics,_("Lyrics for ").Songs::Display($ID,'fullfilename'),sub
-	   {	delete $Editing{'L'.$ID};
-		FileTag::WriteLyrics($ID,$_[0]) if defined $_[0];
+	   {	my $lyrics=shift;
+		$lyrics=undef unless length $lyrics;
+		FileTag::WriteLyrics($ID,$lyrics);
+		delete $Editing{'L'.$ID};
+		Songs::ReReadFile($ID);
 	   });
 }
 
