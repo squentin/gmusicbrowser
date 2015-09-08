@@ -120,12 +120,12 @@ sub Read
 
 sub Write
 {	my ($file,$modif,$errorsub)=@_; warn "FileTag::Write($file,[@$modif],$errorsub)\n" if $::debug;
-
+	if (!-f $file) { warn "FileTag::Write: can't find file '$file'\n"; return }
 	my ($format)= $file=~m/\.([^.]*)$/;
-	return unless $format and $format=$FileTag::FORMATS{lc$format};
+	unless ($format and $format=$FileTag::FORMATS{lc$format}) { warn "FileTag::Write: unknown file extension for '$file'\n"; return }
 	::setlocale(::LC_NUMERIC, 'C');
 	my $tag= $format->[0]->new($file);
-	unless ($tag) {warn "can't read tags for $file\n";return }
+	unless ($tag) {warn "FileTag::Write: can't read tags for '$file'\n";return }
 
 	my ($maintag)=split / /,$format->[2],2;
 	if (($maintag eq 'ID3v2' && !$::Options{TAG_id3v1_noautocreate}) || $tag->{ID3v1})
