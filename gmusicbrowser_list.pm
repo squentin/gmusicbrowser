@@ -1746,6 +1746,12 @@ our @cMenu=
 		onlyone=> 'gidlist',	test => sub { $_[0]{field} eq 'label' && $_[0]{gidlist}[0] !=0 },	#FIXME make it generic rather than specific to field label ? #FIXME find a better way to check if gid is special than comparing it to 0
 	},
 #	{ separator=>1 },
+	# only 1 option for folderview so don't put it in option menu
+	{ label => _"Simplify tree", code => sub { $_[0]{self}->SetOption(simplify=>$_[1]); },
+	  submenu => [ never=>_"Never", smart=>_"Only whole levels", always=>_"Always" ],
+	  submenu_ordered_hash => 1, submenu_reverse => 1,
+	  check => 'self/simplify',  istrue=>'folderview',
+	},
 	{ label => _"Options", submenu => \@MenuPageOptions, stock => 'gtk-preferences', isdefined => 'field' },
 	{ label => _"Show buttons",	toggleoption => '!filterpane/hidebb',	code => sub { my $fp=$_[0]{filterpane}; $fp->{bottom_buttons}->set_visible(!$fp->{hidebb}); }, },
 	{ label => _"Show tabs",	toggleoption => '!filterpane/hidetabs',	code => sub { my $fp=$_[0]{filterpane}; $fp->{notebook}->set_show_tabs( !$fp->{hidetabs} ); }, },
@@ -1862,7 +1868,7 @@ sub SaveOptions
 		hidetabs=> $self->{hidetabs},
 		pages	=> (join '|', map $_->{pid}, $self->{notebook}->get_children),
 	);
-	for my $page (grep $_->isa('FilterList'), $self->{notebook}->get_children)
+	for my $page (grep $_->can('SaveOptions'), $self->{notebook}->get_children)
 	{	my %pageopt=$page->SaveOptions;
 		push @opt, 'page_'.$page->{pid}, { %pageopt } if keys %pageopt;
 	}
@@ -2577,6 +2583,7 @@ sub key_press_cb
 
 package FolderList;
 use base 'Gtk2::ScrolledWindow';
+use constant { IsExpanded=>1, HasSongs=>2 };
 
 sub new
 {	my ($class,$col,$opt)=@_;
@@ -2619,7 +2626,13 @@ sub new
 		return ::DRAG_FILTER,($filter? $filter->{string} : undef);
 	    }]);
 	MultiTreeView::init($treeview,__PACKAGE__);
+
+	$self->{simplify}= $opt->{simplify} || 'smart';
+
 	return $self;
+}
+sub SaveOptions
+{	return simplify => $_[0]{simplify};
 }
 
 sub search_equal_func
@@ -2631,28 +2644,20 @@ sub search_equal_func
 	index uc($folder), $string;
 }
 
+sub SetOption
+{	my ($self,$key,$value)=@_;
+	$self->{$key}=$value if $key;
+	$self->{valid}=0;
+	delete $self->{hash};
+	$self->Fill;
+}
 sub Fill
 {	warn "filling @_\n" if $::debug;
 	my $self=$_[0];
 	return if $self->{valid};
 	my $treeview=$self->{treeview};
 	my $filterpane=::find_ancestor($self,'FilterPane');
-	my $href=$self->{hash}||= do
-		{ my $h= Songs::BuildHash('path',$filterpane->{list});
-		  my @hier;
-		  while (my ($f,$n)=each %$h)
-		  {	my $ref=\@hier;
-			$ref=$ref->[1]{$_}||=[] and $ref->[0]+=$n   for split /$::QSLASH/o,$f;
-		  }
-		  for my $dir (keys %{$treeview->{expanded}})
-		  {	my $ref=\@hier; my $notfound;
-			$ref=$ref->[1]{$_} or $notfound=1, last  for split /$::QSLASH/o,$dir;
-			if ($notfound)	{delete $treeview->{expanded}{$dir}}
-			else		{ $ref->[2]=1; }
-		  }
-		  $hier[1]{::SLASH}=delete $hier[1]{''} if exists $hier[1]{''};
-		  $hier[1];
-		};
+	my $href=$self->{hash}||= BuildTreeRef($filterpane->{list},$treeview->{expanded},$self->{simplify});
 	my $min=$filterpane->{min};
 	my $store=$treeview->get_model;
 	$self->{busy}=1;
@@ -2664,7 +2669,7 @@ sub Fill
 	while (my ($ref,$name,$iter)=splice @toadd,0,3)
 	{	my $iter=$store->append($iter);
 		$store->set($iter,0, Songs::filename_escape($name));
-		push @toexpand,$store->get_path($iter) if $ref->[2];
+		push @toexpand,$store->get_path($iter) if ($ref->[2]||0) & IsExpanded;
 		if ($ref->[1]) #sub-folders
 		{ push @toadd, $ref->[1]{$_},$_,$iter  for sort grep $ref->[1]{$_}[0]>=$min, keys %{$ref->[1]}; }
 	}
@@ -2681,6 +2686,55 @@ sub Fill
 	$self->{valid}=1;
 }
 
+sub BuildTreeRef
+{	my ($IDs,$expanded,$simplify)=@_;
+	my $h= Songs::BuildHash('path',$IDs);
+	my @hier;
+	# build structure : each folder is [nb_of_songs,children_hash,flags]
+	# children_hash: {child_foldername}= arrayref_of_subfolder
+	# flags: IsExpanded HasSongs
+	while (my ($f,$n)=each %$h)
+	{	my $ref=\@hier;
+		$ref=$ref->[1]{$_}||=[] and $ref->[0]+=$n   for split /$::QSLASH/o,$f;
+		$ref->[2]|= HasSongs;
+	}
+	# restore expanded state
+	for my $dir (keys %$expanded)
+	{	my $ref=\@hier; my $notfound;
+		$ref=$ref->[1]{$_} or $notfound=1, last  for split /$::QSLASH/o,$dir;
+		if ($notfound)	{delete $expanded->{$dir}}
+		else	{ $ref->[2]|= IsExpanded; }
+	}
+	# simplify tree by fusing folders with their sub-folder, if without songs and only one sub-folder
+	if ($simplify ne 'never')
+	{	my @tosimp= (\@hier);
+		while (@tosimp)
+		{	my $parent=shift @tosimp;
+			my (@tofuse,@nofuse);
+			while (my ($path,$ref)=each %{$parent->[1]})
+			{	my @child= keys %{$ref->[1]};
+				# if only one child and no songs of its own
+				if (@child==1 && !(($ref->[2]||0) & HasSongs)) { push @tofuse,$path; }
+				else { push @nofuse,$path }
+			}
+			# 'smart' mode: only simplify if all siblings can be simplified
+			if ($simplify eq 'smart' && @nofuse) { push @nofuse,@tofuse; @tofuse=(); }
+			push @tosimp, map $parent->[1]{$_}, @nofuse;
+			for my $path (@tofuse)
+			{	my $ref= $parent->[1]{$path};
+				my @child= keys %{$ref->[1]};
+				unless (@child==1 && !(($ref->[2]||0) & HasSongs)) { push @tosimp,$ref; next }
+				delete $parent->[1]{$path};
+				$path.= ::SLASH.$child[0];
+				$parent->[1]{$path}= delete $ref->[1]{$child[0]};
+				redo; #fuse until more than one child or songs of its own
+			}
+		}
+	}
+	$hier[1]{::SLASH}=delete $hier[1]{''} if exists $hier[1]{''};
+	return $hier[1];
+}
+
 sub row_expanded_changed_cb	#keep track of which rows are expanded
 {	my ($treeview,$iter,$path)=@_;
 	my $self=::find_ancestor($treeview,__PACKAGE__);
@@ -2690,11 +2744,11 @@ sub row_expanded_changed_cb	#keep track of which rows are expanded
 	my $ref=[undef,$self->{hash}];
 	$ref=$ref->[1]{($_ eq '' ? ::SLASH : $_)}  for split /$::QSLASH/o,$path;
 	if ($expanded)
-	{	$ref->[2]=1;				#for when reusing the hash
+	{	$ref->[2]|= IsExpanded;			#for when reusing the hash
 		$treeview->{expanded}{$path}=undef;	#for when reconstructing the hash
 	}
 	else
-	{	delete $ref->[2];
+	{	$ref->[2]&=~ IsExpanded; # remove IsExpanded flag
 		delete $treeview->{expanded}{$path};
 	}
 }
@@ -2726,7 +2780,7 @@ sub PopupContextMenu
 	my $tv=$self->{treeview};
 	my @paths=_get_path_selection($tv);
 	my @raw= map ::decode_url($_), @paths;
-	FilterPane::PopupContextMenu($self,{self=>$tv, rawpathlist=> \@raw, pathlist => \@paths, filter => _MakeFolderFilter(@paths) });
+	FilterPane::PopupContextMenu($self,{self=>$self, rawpathlist=> \@raw, pathlist => \@paths, filter => _MakeFolderFilter(@paths), folderview=>1, });
 }
 
 sub _get_path_selection
@@ -2962,7 +3016,7 @@ sub PopupContextMenu
 	my $tv=$self->{treeview};
 	my @paths=_get_path_selection($tv);
 	my @raw= map ::decode_url($_), @paths;
-	FilterPane::PopupContextMenu($self,{self=>$tv, rawpathlist=> \@raw, pathlist => \@paths, filter => _MakeFolderFilter(@paths) });
+	FilterPane::PopupContextMenu($self,{self=>$self, rawpathlist=> \@raw, pathlist => \@paths, filter => _MakeFolderFilter(@paths) });
 }
 
 sub _get_path_selection
