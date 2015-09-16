@@ -4595,7 +4595,10 @@ sub BuildChoiceMenu
 		$sub->($args, $selected);
 	 };
 	my ($check,$radio);
-	$check= $options{check}($args) if $options{check};
+	if ($check=$options{check})
+	{	if (ref $check) { $check= $check->($args) }
+		else { my ($not,$ref)=ParseKeyPath($args,$check); $check= $$ref }
+	}
 	if (defined $check)
 	{	$selection={};
 		if (ref $check)	{ $selection->{$_}=1 for @$check; }

@@ -1660,20 +1660,20 @@ my @MenuSubGroup=
 	  check => sub { $_[0]{self}{lmarkup}[$_[0]{depth}]}, istrue => 'aa', mode => 'LS', },
 	{ label => _"text mode",	code => sub { $_[0]{self}->SetOption(mmarkup=>$_[1]); },
 	  submenu => [ 0 => _"None", below => _"Below", right => _"Right side", ], submenu_ordered_hash => 1, submenu_reverse => 1,
-	  check => sub { $_[0]{self}{mmarkup} }, mode => 'M', },
+	  check => 'self/mmarkup', mode => 'M', },
 	{ label => _"picture size",	code => sub { $_[0]{self}->SetOption(mpicsize=>$_[1]);  },
 	  mode => 'M',
-	  submenu => \@mpicsize_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{mpicsize}}, istrue => 'aa' },
+	  submenu => \@mpicsize_menu,	submenu_ordered_hash => 1,  check => 'self/mpicsize', istrue => 'aa' },
 
 	{ label => _"font size depends on",	code => sub { $_[0]{self}->SetOption(cloud_stat=>$_[1]); },
 	  mode => 'C',
-	  submenu => \@cloudstats_menu,	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{cloud_stat}}, },
+	  submenu => \@cloudstats_menu,	submenu_ordered_hash => 1,  check => 'self/cloud_stat', },
 	{ label => _"minimum font size", code => sub { $_[0]{self}->SetOption(cloud_min=>$_[1]); },
 	  mode => 'C',
-	  submenu => sub { [2..::min(20,$_[0]{self}{cloud_max}-1)] },  check => sub {$_[0]{self}{cloud_min}}, },
+	  submenu => sub { [2..::min(20,$_[0]{self}{cloud_max}-1)] },  check => 'self/cloud_min', },
 	{ label => _"maximum font size", code => sub { $_[0]{self}->SetOption(cloud_max=>$_[1]); },
 	  mode => 'C',
-	  submenu => sub { [::max(10,$_[0]{self}{cloud_min}+1)..40] },  check => sub {$_[0]{self}{cloud_max}}, },
+	  submenu => sub { [::max(10,$_[0]{self}{cloud_min}+1)..40] },  check => 'self/cloud_max', },
 
 	{ label => _"sort by",		code => sub { my $self=$_[0]{self}; $self->{'sort'}[$_[0]{depth}]=$_[1]; $self->SetOption; },
 	  check => sub {$_[0]{self}{sort}[$_[0]{depth}]}, submenu =>  sub { $_[0]{field} eq 'album' ? \%sort_menu_album : \%sort_menu; },
@@ -5370,7 +5370,7 @@ our @OptionsMenu=
 	{ label => _"Words that begin with",	toggleoption => 'self/onlyword',code => sub { $_[0]{self}{onlybegin}=0; $_[0]{self}->changed;},	},
 	{ label => _"Hide non-matching",toggleoption=> 'self/hidenomatch',	code => sub { $_[0]{self}{close_button}->set_visible($_[0]{self}{hidenomatch}); $_[0]{self}->changed;}, test=> sub { $_[0]{self}{type} } },
 	{ label => _"Fields",		submenu => sub { return {map { $_=>Songs::FieldName($_) } Songs::StringFields}; }, submenu_reverse => 1,
-	  check => sub { $_[0]{self}{fields}; },	test => sub { !$_[0]{self}{type} },
+	  check => 'self/fields',	test => sub { !$_[0]{self}{type} },
 	  code => sub { my $toggle=$_[1]; my $l=$_[0]{self}{fields}; my $n=@$l; @$l=grep $toggle ne $_, @$l; push @$l,$toggle if @$l==$n; @$l=('title') unless @$l; $_[0]{self}->changed; }, #toggle selected field
 	},
 );
@@ -6843,7 +6843,7 @@ use constant TREE_VIEW_DRAG_WIDTH => 6;
 our @ColumnMenu=
 (	{ label => _"_Sort by",		submenu => sub { Browser::make_sort_menu($_[0]{songtree}); }
 	},
-	{ label => _"Set grouping",	submenu => sub {$::Options{SavedSTGroupings}}, check =>sub { $_[0]{songtree}{grouping} },
+	{ label => _"Set grouping",	submenu => sub {$::Options{SavedSTGroupings}}, check => 'songtree/grouping',
 	  code => sub { $_[0]{songtree}->set_head_columns($_[1]); },
 	},
 	{ label => _"Edit grouping ...",	code => sub { my $songtree=$_[0]{songtree}; ::EditSTGroupings($songtree,$songtree->{grouping},undef,sub{ $songtree->set_head_columns($_[0]) if defined $_[0]; }); },
