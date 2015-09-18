@@ -487,6 +487,7 @@ our %Widgets=
 		show_folders => 1,
 		show_toolbar => 0,
 		pdf_mode => 1,
+		embedded_mode=>0,
 		hpos => 140,
 		vpos => 80,
 		reset_zoom_on=>'folder', #can be group, folder, file or never
@@ -4177,6 +4178,10 @@ our @optionsubmenu=
 	},
 	{ label=>_"Show pdf pages",	mode=>'VL',	toggleoption=>'self/pdf_mode',		code=> sub { $_[0]{self}->update; },
 	},
+	{ label=>_"Show embedded pictures",mode=>'VL',	toggleoption=>'self/embedded_mode',	code=> sub { $_[0]{self}->update; },
+	},
+	{ label=>_"Show all files",mode=>'VL',		toggleoption=>'self/all_mode',		code=> sub { $_[0]{self}->update; },
+	},
 );
 # mode L is for List, V for View, P for Pixbuf (Layout::PictureBrowser::View without a Layout::PictureBrowser, not used yet)
 our @ContextMenu=
@@ -4214,7 +4219,7 @@ our @ContextMenu=
 sub new
 {	my ($class,$opt)=@_;
 	my $self= bless Gtk2::VBox->new, $class;
-	$self->{$_}= $opt->{$_} for qw/group follow show_list show_folders show_toolbar reset_zoom_on nowrap pdf_mode/;
+	$self->{$_}= $opt->{$_} for qw/group follow show_list show_folders show_toolbar reset_zoom_on nowrap pdf_mode embedded_mode all_mode/;
 
 	my $hbox= Gtk2::HBox->new;
 	my $hpaned=			Layout::Boxes::PanedNew('Gtk2::HPaned',{size=>$opt->{hpos}});
@@ -4240,7 +4245,8 @@ sub new
 	$column_s->set_cell_data_func($renderer_s, sub
 		{	my (undef,$cell,$store,$iter)=@_;
 			my $depth=$store->iter_depth($iter);
-			my $size= $depth ? '' : ::format_number($store->get($iter,3));
+			my ($file,$size)= $store->get($iter,1,3);
+			$size= ($depth || !$file) ? '' : ::format_number($size);
 			$cell->set(text=>$size);
 		});
 	$treeview2->append_column($column_s);
@@ -4248,15 +4254,38 @@ sub new
 	$column_d->set_cell_data_func($renderer_d, sub
 		{	my (undef,$cell,$store,$iter)=@_;
 			my $depth=$store->iter_depth($iter);
-			my $date= $depth ? '' : Songs::DateString($store->get($iter,4));
+			my $date= $store->get($iter,4);
+			$date= ($depth || !$date) ? '' : Songs::DateString($date);
 			$cell->set(text=>$date);
 		});
 	$treeview2->append_column($column_d);
 	$_->set_sizing('autosize') for $treeview2->get_columns;
 
+	# draw "Embedded pictures"... text over the correct row (avoid stretching the first column for nothing and emphasize that this is not a regular row) and draw progress line if needed
+	$treeview2->signal_connect_after(expose_event=> sub
+	 {	my ($tv,$event)=@_;
+		my $path= $tv->{embfiles_path};
+		return unless $path;
+		my $rect= $tv->get_cell_area($path,undef);
+		my $vwidth= ($tv->get_bin_window->get_geometry)[2];
+		$rect->width($vwidth-4);
+		if ($rect->intersect($event->area))
+		{	my $layout=Gtk2::Pango::Layout->new( $tv->create_pango_context );
+			my $state= $tv->get_state;
+			if ($self->{embfiles_idle}) #draw progress line
+			{	my $width= ($vwidth * ($tv->{scan_progress}||0))||1;
+				my $gc= $tv->get_style->text_aa_gc($state);
+				$tv->get_bin_window->draw_rectangle($gc,::TRUE, 0,$rect->y,$width,2);
+			}
+			$layout->set_markup($tv->{embfiles_text});
+			$tv->get_style->paint_layout($tv->get_bin_window,$state, 1, $rect, $tv, undef, 4+$rect->x, $rect->y, $layout);
+		}
+	 });
+
 	$treeview1->set_headers_visible(0);
 	$treeview2->set_headers_visible(0);
 	$treeview2->get_selection->signal_connect(changed => \&treeview_selection_changed_cb);
+	$treeview2->get_selection->set_select_function(sub {my ($selection,$store,$treepath)=@_; return $store->get($store->get_iter($treepath),1) ne ''; }); #disable selection of rows without a filename
 
 	$vpaned->pack1(::new_scrolledwindow($treeview1), ::FALSE, ::FALSE);
 	$vpaned->pack2(::new_scrolledwindow($treeview2), ::TRUE, ::TRUE);
@@ -4317,6 +4346,7 @@ sub new
 sub destroy_cb
 {	my $self=shift;
 	$self->{drop_job}->Abort if $self->{drop_job};
+	Glib::Source->remove( $self->{embfiles_idle} ) if $self->{embfiles_idle};
 }
 
 sub SaveOptions
@@ -4326,7 +4356,7 @@ sub SaveOptions
 	$opt{hpos}= ($vpaned->parent->{SaveOptions}($vpaned->parent))[1];	# The SaveOptions function of Layout::Boxes::PanedNew returns (size=>$value),
 	$opt{vpos}= ($vpaned->{SaveOptions}($vpaned))[1];			# we only want the value
 	$opt{$_}=$self->{view}{$_} for qw/scroll_zoom/;
-	$opt{$_}=$self->{$_} for qw/follow show_list show_folders show_toolbar reset_zoom_on pdf_mode/;
+	$opt{$_}=$self->{$_} for qw/follow show_list show_folders show_toolbar reset_zoom_on pdf_mode embedded_mode all_mode/;
 	return %opt;
 }
 
@@ -4349,14 +4379,15 @@ sub view_in_new_window
 {	my ($self,$file)=@_;
 	$file||= $self->{current_file};
 	return unless $file;
-	Layout::Window->new('PictureBrowser', pos=>undef, 'PictureBrowser/follow'=>0,'PictureBrowser/set_file'=>$file);
+	Layout::Window->new('PictureBrowser', pos=>undef, 'PictureBrowser/follow'=>0,'PictureBrowser/set_file'=>$file,'PictureBrowser/embedded_mode'=>$self->{embedded_mode});
 }
 
 sub delete_selected
 {	my $self=shift;
 	return if $::CmdLine{ro};
 	my @files= ($self->{current_file});
-	s/:\w+$// for @files;
+	@files= grep !m/:\w+$/, @files;
+	return unless @files;
 	@files= ::uniq(@files);
 	my $text= @files==1 ?	::filename_to_utf8displayname(::basename($files[0])) :
 				__n("%d file","%d files",scalar @files);
@@ -4528,11 +4559,13 @@ sub set_path
 
 sub update
 {	my $self=shift;
-	my (@files,@paths,$default_path);
+	my (@files,@paths,$default_path,@emb_files);
+	my $emb_ok= $self->{embedded_mode};
 
 	if ($self->{mode} eq 'song')
 	{	my $field= $self->{field};
 		my $gid= $self->{gid};
+		@emb_files= Songs::Map('fullfilename',AA::GetIDs($field,$gid)) if $emb_ok;
 		my $path= AA::GuessBestCommonFolder($field,$gid);
 		@paths=($default_path=$path) if $path;
 	}
@@ -4549,16 +4582,33 @@ sub update
 		{	next if -d $file;
 			if    ($file=~m/$::Image_ext_re/) { push @files, $file }
 			elsif ($file=~m/\.pdf$/i && $pdfok) { push @files, $file, map "$file:$_", 1..GMB::Picture::pdf_pages($file)-1; }
+			else
+			{	if ($emb_ok && $self->{mode} eq 'path') { push @emb_files,$file }
+				if ($self->{all_mode})			{ push @files,$file }
+			}
 		}
 		closedir $dh;
 	}
-	$self->{filelist}=\@files;
+
 	my $file=$self->{current_file};
+	$self->{filelist}=\@files;
+
+	delete $self->{embfiles};
+	delete $self->{filetv}{embfiles_path};
+	if ($emb_ok)
+	{	my $file= $file;
+		$file=~s/:\w+$// if $file;
+		my $now= $file && (grep $file eq $_, @emb_files); # do not scan embedded files in an idle if selected files is one of them
+		$self->scan_embedded_pictures($now,@emb_files);
+	}
+
 	unless ($file && (grep $file eq $_, @files))
 	{	$file= $self->{current_file}= $files[0];
 	}
 	my $oldpath= $self->{current_path}||'';
-	$self->{current_path}= $file ? ::dirname($file) : ($default_path||'');
+	my $path= $default_path||'';
+	if ($file) { my $fpath= ::dirname($file); $path=$fpath if grep $fpath eq $_, @paths; } # make sure the path is in @paths
+	$self->{current_path}= $path;
 	$self->{view}->reset_zoom if $self->{reset_zoom_on} eq 'folder' && $oldpath ne $self->{current_path};
 	$self->refresh_treeviews;
 	$self->update_file;
@@ -4602,7 +4652,7 @@ sub refresh_treeviews
 
 		my @pages; my $suffix='';
 		if ($file=~m/\.pdf$/i && $pdfok) { @pages= (1..GMB::Picture::pdf_pages($path.$file)-1); $show_expanders=1; }
-		elsif ($file!~m/$::Image_ext_re/) { next }
+		elsif ($file!~m/$::Image_ext_re/ && !$self->{all_mode}) { next }
 
 		my $efile= Songs::filename_escape($path.$file);
 		my $iter= $filestore->append(undef);
@@ -4613,9 +4663,83 @@ sub refresh_treeviews
 		}
 	}
 	closedir $dh;
+
+	if ($self->{embfiles})
+	{	my $text= $self->{mode} eq 'path' ? _"Embedded pictures in this folder" :
+			  $self->{mode} eq 'song' && $self->{field} eq 'album' ? _"Embedded pictures for this album" :
+			  _"Embedded pictures";
+		$filestore->set($filestore->append(undef), 0, '', 1,''); #empty separator row
+		my $iter= $filestore->append(undef);
+		$filestore->set($iter, 0, '', 1,''); # empty row where the text will be written
+		$self->{filetv}{embfiles_path}= $filestore->get_path($iter);
+		$self->{filetv}{embfiles_text}= ::MarkupFormat("<u>%s</u>", $text);
+		$self->{filetv}{scan_progress}=0;
+
+		$self->scan_embedded_pictures_update_tv unless $self->{embfiles}{updatetv}; # if scan of embedded files was made immediately
+	}
+
 	$filetv->set_show_expanders($show_expanders);
 	$filetv->expand_all;
 	$foldertv->scroll_to_cell($folder_center_treepath,undef,::TRUE,.5,0) if $folder_center_treepath; #needs to be done once the list is filled
+}
+
+sub scan_embedded_pictures
+{	my $self=shift;
+	my $now=shift;
+	my @files= ::sort_number_aware( ::uniq(grep m/$::EmbImage_ext_re$/,@_) );
+	return unless @files;
+	$self->{embfiles}= { filecount=> scalar @files, toscan=>\@files, pix=> [], updatetv=>!$now};
+	if ($now) { $now= $self->scan_embedded_pictures_idle_cb while $now; }
+	else { $self->{embfiles_idle} ||= Glib::Idle->add(\&scan_embedded_pictures_idle_cb, $self); }
+}
+
+sub scan_embedded_pictures_idle_cb
+{	my $self=shift;
+	return $self->{embfiles_idle}=0 unless $self->{embfiles};
+	my $todo= $self->{embfiles}{toscan};
+	my $pix= $self->{embfiles}{pix};
+	my $file= shift @$todo;
+	my @p= FileTag::PixFromMusicFile($file,undef,1);
+	for my $p (0..$#p)
+	{	next unless $p[$p];
+		my $i= ::first { $p[$p] eq $pix->[$_][1] } 0..$#$pix; #check if already seen that picture
+		unless (defined $i) { $i=@$pix; push @$pix, [ $file.':'.$p, $p[$p]]; } #new picture
+		push @{$pix->[$i][2]}, "$file:$p";
+	}
+	#update progress line in filetv
+	my $tv=$self->{filetv};
+	my $max= $self->{embfiles}{filecount};
+	$tv->{scan_progress}= ($max-@$todo)/$max;
+	if ($self->{show_list} && (my $path=$tv->{embfiles_path}))
+	{	# refresh row where the progress line is drawn
+		my $rect= $tv->get_cell_area($path,undef);
+		$rect->width( ($tv->get_bin_window->get_geometry)[2] );
+		$tv->queue_draw_area($rect->values);
+	}
+	return 1 if @$todo;
+
+	$self->{embfiles_idle}=0;
+	# scanning done => update list
+	return 0 unless @$pix; # nothing to do if no embedded picture found
+	for my $pixi (@$pix)
+	{	push @{$self->{filelist}},$pixi->[0];
+		$pixi->[1]= length $pixi->[1]; # replace picture data by its size
+		$self->{embfiles}{file2ref}{$pixi->[0]}=$pixi;
+	}
+	$self->scan_embedded_pictures_update_tv if $self->{embfiles}{updatetv} && $self->{show_list};
+	$self->set_file($self->{filelist}[0]) unless $self->{current_file};
+	return 0;
+}
+
+sub scan_embedded_pictures_update_tv
+{	my $self=shift;
+	my $pix= $self->{embfiles}{pix};
+	return unless @$pix;
+	my $count= $self->{embfiles}{filecount};
+	my $filestore= $self->{filestore};
+	$filestore->set($filestore->append(undef),
+		0,' '.sprintf(_"in %d/%d files",scalar(@{$_->[2]}),$count),
+		1,Songs::filename_escape($_->[0]), 3,$_->[1])	 for @$pix;
 }
 
 sub update_file
@@ -4634,6 +4758,11 @@ sub update_file
 		$info{page}=$1 if $realfile=~s/:(\w+)$//;
 		$info{filename}= ::filename_to_utf8displayname($realfile);
 		$info{size}= (stat $realfile)[7];
+
+		# check if file is actually an embedded picture, then use the actual picture size rather than the file size
+		if (my $pixi= $self->{embfiles} && $self->{embfiles}{file2ref}{$file})
+		{	$info{size}= $pixi->[1];
+		}
 	}
 	$self->{view}->set_pixbuf($pixbuf,%info);
 	$self->{loaded_file}= $file;
@@ -4649,7 +4778,7 @@ sub update_selection
 	$treesel->unselect_all;
 	my $file=$self->{current_file};
 	return unless $file;
-	my $page= $file=~s/:(\d+)$// ? $1 : undef;
+	my $page= $file=~s/(\.pdf):(\d+)$/$1/i ? $2 : undef;
 	$file= Songs::filename_escape($file);
 	$self->{busy}=1;
 	my $store= $self->{filestore};
@@ -4691,10 +4820,13 @@ sub set_file
 sub context_menu_args
 {	my $self=shift;
 	my $file= $self->{current_file};
+	my $pixi= $file && $self->{embfiles} && $self->{embfiles}{file2ref}{$file};
+	my $embfiles= $pixi && $pixi->[2]; #list of file:n that have the selected picture in tag
 	my $ispage= $file && $file=~m/:\w+$/;
 	return self=>$self, field=>$self->{field}, ID=>$self->{ID}, gid=>$self->{gid},
-		file=>$file,	ispage=>$ispage,writeable=> ($file && !$::CmdLine{ro}),
-		toolbar=>$self->{toolbar},	view=>$self->{view};
+		file=>$file, ispage=>$ispage, writeable=> ($file && !$::CmdLine{ro}),
+		embfiles=>$embfiles,
+		toolbar=>$self->{toolbar}, view=>$self->{view};
 }
 
 package Layout::PictureBrowser::View;
