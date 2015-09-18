@@ -4355,7 +4355,7 @@ sub RENDER
 
 	my $field=$prop->[P_FIELD][$depth];
 	$field=~s/\..*//;
-	my $has_stars= $Songs::Def{$field}{starprefix}; #FIXME shouldn't use Songs::Def directly
+	my $has_stars= Songs::FieldType($field) eq 'rating';
 	if ($gid!=FilterList::GID_ALL && $has_stars)
 	{	if (my $pb= Songs::Stars($gid,$field))
 		{	# FIXME center verticaly or resize ?

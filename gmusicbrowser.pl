@@ -10103,7 +10103,7 @@ sub Downloaded
 	($file,$ext)= ::barename(::CleanupFileName($file));
 	# if uri doesn't have a file name, try to find a good default name, currently mostly used for pictures, so doesn't try very hard for non-pictures
 	my $is_pic= $type=~m#^image/(gif|jpeg|png|bmp)# ? $1 : 0;
-	$ext='' if $is_pic && $ext!~m/^(?:gif|jpe?g|png|bmp)$/; #make sure common picture types have the correct extension
+	$ext='' if $is_pic && $ext!~m/^(?:gif|jpe?g|png|bmp)$/i; #make sure common picture types have the correct extension
 	if ($ext eq '')
 	{	$ext=	$is_pic ? ($is_pic eq 'jpeg' ? 'jpg' : $is_pic) :
 			$type=~m#^text/html# ? 'html' :

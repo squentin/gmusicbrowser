@@ -1495,7 +1495,7 @@ sub new
 	$treeview->set_headers_visible(0);
 	$treeview->get_selection->signal_connect(changed => \&selection_changed_cb,$self);
 
-	my $view= $self->{view}= Layout::PictureBrowser::View->new(context_menu_sub=>\&context_menu, xalign=> .5, yalign=>.5, scroll_zoom=>1,);
+	my $view= $self->{view}= Layout::PictureBrowser::View->new(xalign=> .5, yalign=>.5, scroll_zoom=>1,);
 	::set_drag($view, dest => [::DRAG_FILE, sub
 	{	my ($view,$type,$uri,@ignored_uris)=@_;
 		my $self= ::find_ancestor($view,__PACKAGE__);
