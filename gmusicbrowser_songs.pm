@@ -205,7 +205,7 @@ our %timespan_menu=
 		'filter:~'	=> '(ref #_# ?  (.!!. grep $_ == #VAL#, @{#_#}) : (#_# .==. #VAL#))',#FIXME use simpler/faster version if perl5.10 (with ~~)
 		'filter_prep:~'	=> '##mainfield#->filter_prep:~#',
 		'filter_prephash:~' => '##mainfield#->filter_prephash:~#',
-		'filter_simplify:~' => sub { split /$Artists_split_re/,$_[0] },
+		'filter_simplify:~' => sub { length($_[0]) ? split /$Artists_split_re/,$_[0] : $_[0]; },
 		'filter:h~'	=> '(ref #_# ?  (grep .!!. exists $hash#VAL#->{$_+0}, @{#_#}) : (.!!. exists $hash#VAL#->{#_#+0}))',
 		makefilter	=> '"#field#:~:".##mainfield#->gid_to_sgid#',
 		#group		=> '#_# !=',
