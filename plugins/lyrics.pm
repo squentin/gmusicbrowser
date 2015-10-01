@@ -75,8 +75,17 @@ my %Sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 				$_[0]=~s!.*<div class='lyricbox'>.*?((?:&\#\d+;|<br ?/>|</?[bi]>){5,}).*!$1!s; #keep only the "lyric box"
 				return 0 if $_[0]=~m!&#91;&#46;&#46;&#46;&#93;(?:<br ?/>)*<i>!; # truncated lyrics : "[...]" followed by italic explanation => not auto-saved
 				return !!$1;
-			}],
-	#lyricwikiapi => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%t&fmt=html',undef,
+			}],	
+	musixmatch =>   [musixmatch => 'https://www.musixmatch.com/lyrics/%a/%t', undef,
+                         sub {
+                            if ($_[0] =~ /<span id="lyrics-html"/) {
+                                $_[0] =~ s/.*<span id="lyrics-html".+?>(.+?)<\/span>.*/$1/s;
+                                $_[0] =~ s/[\r\n]/<br>/g;
+                            } else {
+                                $_[0] = $notfound;
+                            }
+                        }],
+       #lyricwikiapi => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%t&fmt=html',undef,
 	#	sub { $_[0]!~m#<pre>\W*Not found\W*</pre>#s }],
 	#azlyrics => [ azlyrics => 'http://search.azlyrics.com/cgi-bin/azseek.cgi?q="%a"+"%t"'],
 	#Lyricsfly ?
