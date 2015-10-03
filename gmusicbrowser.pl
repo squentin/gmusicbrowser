@@ -2002,7 +2002,7 @@ sub CheckPluginRequirement
 		}
 		while ($req=~m/\bexec\((\w+)(?:\s*,\s*([-\.\w ]+))?\)/ig)
 		{	my ($exec,$packages)=($1,$2);
-			if (!grep -x $_.$exec, split /:/, $ENV{PATH})
+			if (!findcmd($exec))
 			{	push @req, __x( _"the command {name}",name=>$exec);
 				push @suggest, $packages;
 			}
