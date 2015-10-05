@@ -337,7 +337,7 @@ sub load_from_web
 	{	$site = $::Options{OPT.'LyricSite'};
 		delete $self->{trynext};
 		if ($site eq 'AUTO')
-		{	($site,@{$self->{trynext}})= qw/lyricssongs lyricwiki/;	#FIXME make it configurable
+		{	($site,@{$self->{trynext}})= qw/lyricssongs lyricwiki musixmatch/; #FIXME make it configurable
 		}
 	}
 	return unless $site;
@@ -428,10 +428,10 @@ sub loaded #_very_ crude html to gtktextview renderer
 	delete $self->{waiting};
 	my $type=$data_prop{type};
 	my $buffer=$self->{buffer};
-	unless ($data) { $data=_("Loading failed.").qq( <a href="$self->{url}">)._("retry").'</a>'; $type="text/html"; }
+       my $encoding;
+	unless ($data) { $data=_("Loading failed.").qq( <a href="$self->{url}">)._("retry").'</a>'; $type="text/html"; $encoding=0; }
 	$self->{url}=$data_prop{url} if $data_prop{url}; #for redirections
 	$buffer->delete($buffer->get_bounds);
-	my $encoding;
 	if ($type && $type=~m#^text/.*; ?charset=([\w-]+)#) {$encoding=$1}
 	if ($type && $type!~m#^text/html#)
 	{	if	($type=~m#^text/#)	{$buffer->set_text($data);}
@@ -443,7 +443,7 @@ sub loaded #_very_ crude html to gtktextview renderer
 	}
 	$encoding=$1 if $data=~m#<meta *http-equiv="Content-Type" *content="text/html; charset=([\w-]+)"#;
 	$encoding='cp1252' if $encoding && $encoding eq 'iso-8859-1'; #microsoft use the superset cp1252 of iso-8859-1 but says it's iso-8859-1
-	$encoding||='cp1252'; #default encoding
+	$encoding//='cp1252'; #default encoding
 	$data=Encode::decode($encoding,$data) if $encoding;
 
 	my $oklyrics;
