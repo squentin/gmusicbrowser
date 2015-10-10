@@ -337,7 +337,7 @@ sub load_from_web
 	{	$site = $::Options{OPT.'LyricSite'};
 		delete $self->{trynext};
 		if ($site eq 'AUTO')
-		{	($site,@{$self->{trynext}})= qw/lyricssongs lyricwiki/;	#FIXME make it configurable
+		{	($site,@{$self->{trynext}})= qw/lyricssongs lyricwiki musixmatch/;	#FIXME make it configurable
 		}
 	}
 	return unless $site;
