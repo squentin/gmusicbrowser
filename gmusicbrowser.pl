@@ -18,6 +18,8 @@
 use strict;
 use warnings;
 use utf8;
+binmode STDERR,':utf8';
+binmode STDOUT,':utf8';
 
 package main;
 use Gtk2 '-init';
