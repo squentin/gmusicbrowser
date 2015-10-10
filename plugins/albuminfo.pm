@@ -124,7 +124,7 @@ sub prefbox {
 }
 
 sub mass_download {
-	my $self = ::find_ancestor($_[0], __PACKAGE__);
+	my $self = bless {}; # the context widget was meant to be used as self in methods of this plugin, but when downloading all there is no gtk widget to use. Using a blessed hash instead should work as well as long as no gtk2 function is used on it
 	$self->{aIDs} = Songs::Get_all_gids('album');
 	$self->{end} = scalar(@{$self->{aIDs}});
 	$self->{progress} = 0;
