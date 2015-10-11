@@ -542,7 +542,7 @@ sub loaded
 	if ($self->{site} eq "biography") {
 		$infoheader = _"Artist Biography";
 		(my($lfm_artist,$url,$listeners,$playcount),$data)=
-			$data =~ m|^.*?<name>([^<]*)</name>.*?<url>([^<]*)</url>.*?<listeners>([^<]*)</listeners>.*?<playcount>([^<]*)</playcount>.*?<content>\W*<\!\[CDATA\[(.*?)\n.*\]\]>\W*</content>|s; # last part of the regexp removes the license-notice (=last line)
+			$data =~ m|^.*?<name>([^<]*)</name>.*?<url>([^<]*)</url>.*?<listeners>([^<]*)</listeners>.*?<playcount>([^<]*)</playcount>.*?<content>(.*?)\n[^\n]*</content>|s; # last part of the regexp removes the license-notice (=last line)
 
 		if (!defined $data) {
 			$infoheader = "\n". _"No results found";
