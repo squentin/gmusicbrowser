@@ -103,20 +103,23 @@ sub new
 
     $self->_FindTags;
     $self->_removeblank;
-    $self->{info}=$self->_FindFirstFrame;
-    return undef unless $self->{info};
-    if ( $findlength && !$self->{info}{frames} && ( $findlength>1 || !$self->{info}{seconds}) )
-    #if (1)
-    	{ warn "No VBR header found, must count all the frames to determine length.\n" if $::debug;
-	  my $tries;
-	  until (_CountFrames($self))
-	  {	warn "** searching another first frame\n" if $::debug;
-		$self->{info}=undef;
-		last if ++$tries>20;
-		last unless $self->{info}=$self->_FindFirstFrame($self->{firstframe}+1);
-	  }
-	  unless ($self->{info}) { warn "Can't determine number of frames, probably not a valid mp3 file.\n"; }
+
+    my $start_at;
+    for my $tries (0..20)
+    {	$self->{info}= $self->_FindFirstFrame($start_at);
+	last unless $self->{info};
+	my $tries;
+	my $count_to=4;
+	if ( $findlength && !$self->{info}{frames} && ( $findlength>1 || !$self->{info}{seconds}) )
+	{	warn "mp3header: No VBR header found, must count all the frames to determine length.\n" if $::debug && !$tries;
+		$count_to=0;
 	}
+	last if _CountFrames($self,$count_to);
+	warn "mp3header: searching another first frame\n" if $::debug;
+	$self->{info}=undef;
+	$start_at= $self->{firstframe}+1;
+    }
+    unless ($self->{info}) { warn "mp3header: Can't find enough valid frames, probably not a valid mp3 file.\n"; }
     $self->_close;
     return $self;
 }
@@ -460,12 +463,12 @@ SEARCH1ST: while ($pos<60000)			#only look in the first 60000 bytes (after tag)
 }
 
 sub _CountFrames		#find and count each frames
-{	my $time=times; #DEBUG
+{	my ($self,$count_to)=@_;
+	my $time= $::debug && times; #DEBUG
 	$MODIFIEDFILE=undef;
-	my $self=shift;
 	my $info=$self->{info};
 	return 0 if $info->{bitrate}==0;		#if unknown bitrate
-	return undef unless $info->{rate};
+	return 0 unless $info->{rate};
 	my $fh=$self->{fileHandle};
 	seek $fh,$self->{firstframe},0;
 	my $frames=0;
@@ -493,6 +496,7 @@ my $count=1000;
 			seek $fh,(($_ & 0b10)?	$size[ $_>>4 ]+$pad:
 						$size[ $_>>4 ]		),1;
 			$frames++;
+			if ($count_to && $frames>3) { return 1 } #only wanted to check if first frame ok
 			unless ($count--) { $count=1000; Gtk2->main_iteration while Gtk2->events_pending; }
 		}
 		else #skip
@@ -500,7 +504,7 @@ my $count=1000;
 			#warn "AAAAAAAA AAABBCCD EEEEFFGH IIJJKLMM\n";		#DEBUG
 			#@_=unpack "B8B8B8B8",$_; warn "@_	doesn't match bytes1_2	frame=$frames\n";		#DEBUG
 			 # assume first frame invalid if can't find 3 first frames without skipping
-			return undef if $frames<4;
+			return 0 if $frames<4;
 			my $skipped=0;
 			my $read; my $pos;
 			while ($read=read $fh,$_,252,4)
@@ -508,16 +512,16 @@ my $count=1000;
 				$skipped+=$read;
 				$_=substr $_,-4;
 			}
-			warn "too much skipping\n" and return undef if $skipcount++>50 && $::debug;
+			if ($skipcount++>50) { warn "mp3header: too much skipping\n" if $::debug; return 0 }
 			last unless $read  &&  tell($fh) < $self->{endaudio};
 			$skipped+=$pos;
-			warn "skipped $skipped bytes (offset=".tell($fh).")\n" if $::debug;
+			warn "mp3header: skipped $skipped bytes (offset=".tell($fh).")\n" if $::debug;
 			seek $fh,$pos-256,1;
 		}
 	}
 	_calclength($info,$frames,$self->{audiodatasize});
 	$info->{estimated}=1 if $MODIFIEDFILE;	#if a file has been rewrote while reading, mark the info as suspicious
-	$time=times-$time; warn "full scan : $time s\n" if $::debug; #DEBUG
+	if ($::debug) { $time=times-$time; warn "mp3header: full scan : $time s\n"; } #DEBUG
 	return 1;
 }
 
