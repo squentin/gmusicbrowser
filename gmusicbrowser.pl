@@ -81,8 +81,8 @@ use constant
 {
  TRUE  => 1,
  FALSE => 0,
- VERSION => '1.101501',
- VERSIONSTRING => '1.1.15.1',
+ VERSION => '1.101502',
+ VERSIONSTRING => '1.1.15.2',
  PIXPATH => $DATADIR.SLASH.'pix'.SLASH,
  PROGRAM_NAME => 'gmusicbrowser',
 
@@ -232,8 +232,8 @@ sub barename #filename without extension
 }
 
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
-INIT {%Alias_ext=(ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
-our @ScanExt= qw/mp3 ogg oga flac mpc ape wv m4a m4b/;
+INIT {%Alias_ext=(mp2=>'mp3', ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
+our @ScanExt= qw/mp3 mp2 ogg oga flac mpc ape wv m4a m4b/;
 
 our ($Verbose,$debug);
 our %CmdLine;
@@ -2427,6 +2427,9 @@ sub ReadSavedTags	#load tags _and_ settings
 	elsif ($oldversion==1.100901) #fix version 1.1.9.1 mistakenly upgrading by replacing float values of 0 by inf instead of nan
 	{	for my $floatvector ($Songs::Songs_replaygain_track_gain__,$Songs::Songs_replaygain_track_peak__,$Songs::Songs_replaygain_album_gain__,$Songs::Songs_replaygain_album_peak__)
 		{ $floatvector=  pack "F*",map {$_!="inf" ? $_ : "nan"} unpack("F*",$floatvector) if $floatvector; }
+	}
+	if ($oldversion<1.101502)
+	{	IdleDo('0_Updatemp3filetype', 10,sub { my $h=Songs::BuildHash('filetype',undef,'','id:list'); while (my ($gid,$IDs)=each %$h) { my $type= Songs::Gid_to_Get('filetype',$gid); $type=~s/2,5/2.5/; $type=~s/^mp3 l(\d)v(\d.*)/mp$1 mpeg-$2 l$1/ && Songs::Set($IDs,filetype=>$type); } });
 	}
 
 	delete $Options{LastPlayFilter} unless $Options{RememberPlayFilter};

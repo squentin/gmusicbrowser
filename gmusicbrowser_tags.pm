@@ -25,7 +25,7 @@ our %FORMATS;
 INIT
 {
  %FORMATS=	    # module		format string			tags to look for (order is important)
- (	mp3	=> ['Tag::MP3',		'mp3 l{layer}v{versionid}',	'ID3v2 APE lyrics3v2 ID3v1',],
+ (	mp3	=> ['Tag::MP3',		'mp{layer} mpeg-{versionid} l{layer}',	'ID3v2 APE lyrics3v2 ID3v1',],
 	oga	=> ['Tag::OGG',		'vorbis v{version}',		'vorbis',],
 	flac	=> ['Tag::Flac',	'flac',				'vorbis',],
 	mpc	=> ['Tag::MPC',		'mpc v{version}',		'APE ID3v2 lyrics3v2 ID3v1',],
