@@ -4306,7 +4306,7 @@ sub new
 	 {	my ($view,$type,@values)=@_;
 		my $self= ::find_ancestor($view,__PACKAGE__);
 		if ($type==::DRAG_FILE)
-		{	$self->Drop_Uris(uris=>\@values, is_move=>$view->{dragdest_suggested_action});
+		{	$self->drop_uris(uris=>\@values, is_move=>$view->{dragdest_suggested_action});
 		}
 		elsif ($type==::DRAG_ID)
 		{	$self->queue_song_changed($values[0],'force');
