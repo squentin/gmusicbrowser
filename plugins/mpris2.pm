@@ -314,17 +314,15 @@ sub GetMetadata_from
 	if (defined $rating && length $rating) { $r{'xesam:userRating'}=dbus_double($rating/100); }
 	unlink $TEMPCOVERFILE;
 	if (my $pic= $h{album_picture}) #FIXME use ~album.picture.uri when available
-	{	if ($pic=~m/$::EmbImage_ext_re(?:\w+)?$/i) #embedded pictures
-		{	my $ok;
-			{	last unless defined($::SongID) && $ID==$::SongID; #only support embedded picture for current song
-				my $data=FileTag::PixFromMusicFile($pic);
-				last unless $data;
-				my $fh;
-				open($fh,'>',$TEMPCOVERFILE) && (print $fh $data) &&	close($fh) && ($ok=1);
-				warn "mpris2 plugin, error writing temporary file '".$TEMPCOVERFILE."' for embedded cover: $!" unless $ok;
-			}
-			$pic= $ok ? $TEMPCOVERFILE : undef;
+	{	my $ok;
+		{	last unless defined($::SongID) && $ID==$::SongID; #only support embedded picture for current song
+			my $data=FileTag::PixFromMusicFile($pic);
+			last unless $data;
+			my $fh;
+			open($fh,'>',$TEMPCOVERFILE) && (print $fh $data) &&	close($fh) && ($ok=1);
+			warn "mpris2 plugin, error writing temporary file '".$TEMPCOVERFILE."' for embedded cover: $!" unless $ok;
 		}
+		$pic= $ok ? $TEMPCOVERFILE : undef;
 		$r{'mpris:artUrl'}= dbus_string( 'file://'.::url_escape($pic) ) if $pic;
 	}
 
