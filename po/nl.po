@@ -6,9 +6,9 @@ msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1008\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
 "POT-Creation-Date: 2015-12-28 17:38+0100\n"
-"PO-Revision-Date: 2015-12-28 22:26+0100\n"
-"Last-Translator: M1dgard\n"
-"Language-Team: Nederlands <gijs.timmers@student.kuleuven.be>\n"
+"PO-Revision-Date: 2015-12-28 23:43+0100\n"
+"Last-Translator: Midgard <@M1dgard on GitHub>\n"
+"Language-Team: Nederlands <@M1dgard on GitHub>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -480,7 +480,7 @@ msgstr ""
 "toevoegen aan de lijst van 'Genres'."
 
 msgid "Allow for scheduling fade-out and stop"
-msgstr "Geplande fade-out en stoppen toestaan."
+msgstr "Geplande fade-out en stoppen mogelijk maken"
 
 msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
 msgstr ""
@@ -705,7 +705,10 @@ msgid "Can be relative by using + or -"
 msgstr "Kan worden aangepast met + en -"
 
 msgid "Can be searched with :"
-msgstr "Kan doorzocht worden met:"
+msgstr "Kan worden gevonden met deze trefwoorden:"
+
+msgid "Can be used as a variable with :"
+msgstr "Kan als variabele worden gebruikt met:"
 
 msgid "Can't change the volume in non-gstreamer iceserver mode"
 msgstr "Kan het volume niet veranderen in non-gstreamer-iceservermodus."
@@ -885,7 +888,7 @@ msgid "Collection"
 msgstr "Verzameling"
 
 msgid "Command"
-msgstr "Commando"
+msgstr "Actie"
 
 msgid "Command to launch when the button is pressed"
 msgstr "Uit te voeren commando wanneer de knop wordt ingedrukt"
@@ -999,7 +1002,7 @@ msgid "Current song must always be in the playlist"
 msgstr "Huidig nummer moet altijd in de afspeellijst staan"
 
 msgid "Custom"
-msgstr "Gebruikergedefinieerd"
+msgstr "Aangepast"
 
 msgid "Custom Text"
 msgstr "Persoonlijke tekst"
@@ -1008,7 +1011,7 @@ msgid "Custom URL"
 msgstr "Persoonlijke URL"
 
 msgid "Custom command :"
-msgstr "Gebruikergedefinieerde opdracht:"
+msgstr "Aangepast commando:"
 
 msgid "Custom context pages :"
 msgstr "Gebruikergedefinieerde contextpanelen:"
@@ -1454,7 +1457,7 @@ msgstr "Fade-out"
 
 #, perl-format
 msgid "Fade-out in %d seconds"
-msgstr "Fade-out binnen %d seconden"
+msgstr "Fade-out gedurende %d seconden"
 
 msgid "Fade-out then stop"
 msgstr "Fade-out, daarna stoppen"
@@ -1570,7 +1573,7 @@ msgid "Folders to search for new songs"
 msgstr "Mappen om in te zoeken naar nieuwe nummers:"
 
 msgid "Follow playing song"
-msgstr "Afgespeeld nummer volgen"
+msgstr "Nummer volgen tijdens afspelen"
 
 msgid "Follow selected song"
 msgstr "Geselecteerd nummer volgen"
@@ -1690,6 +1693,14 @@ msgstr "Pictogramthema:"
 
 msgid "Identifier in file tag"
 msgstr "Identificatie in bestandstag"
+
+msgid ""
+"If checked, the shortcut has higher priority than the default shortcut of "
+"widgets. Warning: this can make some features inaccessible"
+msgstr ""
+"Indien aangevinkt heeft de sneltoets een hogere prioriteit dan de "
+"standaardsneltoets van je computer. Waarschuwing: dit kan bepaalde functies "
+"ontoegankelijk maken"
 
 msgid ""
 "If one of these words is at the start of the string, it will be ignored when "
@@ -2634,7 +2645,7 @@ msgid "Pre-set"
 msgstr "Vooraf ingesteld"
 
 msgid "Prefered place to load and save lyrics :"
-msgstr "Lokatie om songteksten te laden en op te slaan:"
+msgstr "Voorkeurslocatie om songteksten te laden en op te slaan:"
 
 msgid "Preferences"
 msgstr "Voorkeuren"
@@ -2977,6 +2988,9 @@ msgstr "Opnieuw inlezen"
 msgid "Rescan Collection"
 msgstr "Collectie opnieuw inlezen"
 
+msgid "Reset current value if no tag found in file"
+msgstr "Huidige "
+
 msgid "Reset filter"
 msgstr "Filter resetten"
 
@@ -3139,10 +3153,10 @@ msgid "Scan per-file track gain"
 msgstr "Volumeversterking per bestand bepalen"
 
 msgid "Scan this file"
-msgstr "Dit bestand inlezen"
+msgstr "Dit bestand analyseren"
 
 msgid "Scan using tag-defined album"
-msgstr "Inlezen met gebruik van de albums, gedefinieerd in de tags"
+msgstr "Analyseren aan de hand van album"
 
 msgid "Scanning"
 msgstr "Inlezen"
@@ -3298,6 +3312,9 @@ msgstr "Huidig nummer waarderen"
 msgid "Set Picture"
 msgstr "Afbeelding instellen"
 
+msgid "Set action when song ends"
+msgstr "Actie instellen wanneer nummer eindigt"
+
 #, perl-brace-format
 msgid "Set as picture for '{name}'"
 msgstr "Als afbeelding gebruiken voor '{name}' "
@@ -3373,6 +3390,9 @@ msgstr "Komende optredens van artiest tonen"
 
 msgid "Show buttons"
 msgstr "Knoppen tonen"
+
+msgid "Show edition submenu in song context menu"
+msgstr "Toon submenu om veld te bewerken in contextmenu van nummer"
 
 msgid "Show embedded pictures"
 msgstr "Ingesloten afbeeldingen tonen"
@@ -3492,7 +3512,7 @@ msgid "Simplify tree"
 msgstr "Boom vereenvoudigen"
 
 msgid "Size"
-msgstr "Afmeting"
+msgstr "Grootte"
 
 msgid "Skip _All"
 msgstr "_Alles overslaan"
@@ -4147,7 +4167,7 @@ msgid "_Cancel"
 msgstr "_Annuleren"
 
 msgid "_Insert column"
-msgstr "_Kolom invoeren"
+msgstr "_Kolom invoegen"
 
 msgid "_Remove this column"
 msgstr "_Deze kolom verwijderen"
@@ -4185,6 +4205,9 @@ msgstr "na"
 #, perl-format
 msgid "after %s"
 msgstr "na %s"
+
+msgid "album information now for"
+msgstr "albuminformatie nu voor"
 
 #. comma-separated list of field aliases for album, these are in addition to english aliases
 msgctxt "Field_aliases"
@@ -5249,7 +5272,7 @@ msgid "when folder changes"
 msgstr "wanneer map verandert"
 
 msgid "wikipedia, lyrics, and custom webpages"
-msgstr "Wikipedia, sonteksten en gebruikersgedefinieerde websites"
+msgstr "Wikipedia, songteksten en gebruikersgedefinieerde websites"
 
 msgid "with browser"
 msgstr "met browser"
