@@ -6185,7 +6185,7 @@ sub AboutDialog
 		'Korean : bluealbum',
 		'Russian : tin',
 		'Italian : Michele Giampaolo',
-		'Dutch : Gijs Timmers',
+		'Dutch : Gijs Timmers, M1dgard',
 		'Japanese : Sunatomo',
 		'Serbian : Саша Петровић',
 		'Finnish : Jiri Grönroos',
