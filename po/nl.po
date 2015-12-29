@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1008\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
 "POT-Creation-Date: 2015-12-29 15:39+0100\n"
-"PO-Revision-Date: 2015-12-29 16:07+0100\n"
+"PO-Revision-Date: 2015-12-29 16:30+0100\n"
 "Last-Translator: Midgard <@M1dgard on GitHub>\n"
 "Language-Team: Nederlands <@M1dgard on GitHub>\n"
 "Language: nl\n"
@@ -342,7 +342,7 @@ msgid ""
 " dates more recent than number1 seconds will use format1, ..."
 msgstr ""
 "Eventueel kan de volgende opmaak gebruikt worden:\n"
-" standaard getal1 opmaak1 getal2 opmaak2...\n"
+" standaard getal1 opmaak1 getal2 opmaak2 ...\n"
 " gegevens recenter dan getal1 seconden zullen opmaak1 gebruiken, ..."
 
 msgid ""
@@ -605,13 +605,13 @@ msgid "Auto"
 msgstr "Automatisch"
 
 msgid "Auto fill based on filenames ..."
-msgstr "Automatisch invullen op basis van bestandsnamen..."
+msgstr "Automatisch invullen op basis van bestandsnamen ..."
 
 msgid "Auto fill only blank fields"
 msgstr "Enkel lege velden automatisch invullen"
 
 msgid "Auto fill up to"
-msgstr "Automatisch invullen "
+msgstr "Aantal nummers om automatisch aan te vullen"
 
 msgid "Auto filter"
 msgstr "Auto-filter"
@@ -835,7 +835,7 @@ msgid "Choose font for lyrics"
 msgstr "Kies een lettertype voor de songtekst"
 
 msgid "Choose font..."
-msgstr "Kies een lettertype..."
+msgstr "Kies een lettertype ..."
 
 #, perl-brace-format
 msgid "Choose icon for label {name}"
@@ -1212,7 +1212,7 @@ msgid "Edit Settings"
 msgstr "Instellingen bewerken"
 
 msgid "Edit auto-fill formats ..."
-msgstr "Automatisch-opvullen-opmaak bewerken..."
+msgstr "Automatisch-opvullen-opmaak bewerken ..."
 
 msgid "Edit filter"
 msgstr "Filter bewerken"
@@ -1942,7 +1942,7 @@ msgid "Loading failed."
 msgstr "Laden mislukt."
 
 msgid "Loading..."
-msgstr "Laden..."
+msgstr "Laden ..."
 
 msgid "Lock"
 msgstr "Vergrendel"
@@ -2354,6 +2354,9 @@ msgstr "Alleen mp3-bestanden die nog geen ID3v1-tag hebben aanpassen"
 msgid "Only show similar artists from local library"
 msgstr "Alleen gelijkaardige artiesten uit de aanwezige bibliotheek tonen"
 
+msgid "Only whole levels"
+msgstr "Enkel volledige niveaus"
+
 msgid "Opacity"
 msgstr "Ondoorzichtigheid"
 
@@ -2556,6 +2559,9 @@ msgstr "Nummers in de lijst afspelen"
 msgid "Play order"
 msgstr "Afspeelvolgorde"
 
+msgid "Play, queue or track"
+msgstr "Afspelen, wachtrij of tracknummer"
+
 msgid "Play/Pause"
 msgstr "Afspelen/Pauze"
 
@@ -2754,7 +2760,7 @@ msgid "Quit"
 msgstr "Afsluiten"
 
 msgid "Quit after this song"
-msgstr "Stoppen na dit nummer"
+msgstr "Gmusicbrowser afsluiten na dit nummer"
 
 msgid "Quit when queue empty"
 msgstr "Afsluiten zodra de wachtrij leeg is"
@@ -2824,7 +2830,7 @@ msgid "Recently played"
 msgstr "Recent afgespeeld"
 
 msgid "Recently played songs"
-msgstr "Recent afgespeelde nummers"
+msgstr "Laatst afgespeeld nummer"
 
 msgid "Recording Dates"
 msgstr "Data van opname"
@@ -2986,7 +2992,7 @@ msgid "Replace existing values"
 msgstr "Bestaande waarden vervangen"
 
 msgid "Replace..."
-msgstr "Vervangen..."
+msgstr "Vervangen ..."
 
 msgid "ReplayGain options"
 msgstr "ReplayGain-opties"
@@ -3109,7 +3115,7 @@ msgid "Save artist biography"
 msgstr "Artiestbiografie opslaan"
 
 msgid "Save as..."
-msgstr "Opslaan als..."
+msgstr "Opslaan als ..."
 
 msgid "Save current filter as"
 msgstr "Huidig filter opslaan als"
@@ -3898,7 +3904,7 @@ msgid "Update tags"
 msgstr "Tags updaten"
 
 msgid "Update tags..."
-msgstr "Tags updaten..."
+msgstr "Tags updaten ..."
 
 msgid "Upper left"
 msgstr "Linksboven"
@@ -3997,10 +4003,10 @@ msgid "View"
 msgstr "Tonen"
 
 msgid "View Binary"
-msgstr "Binary tonen"
+msgstr "Binair tonen"
 
 msgid "View binary data ..."
-msgstr "Binary-data tonen..."
+msgstr "Binaire data tonen ..."
 
 msgid "View in new window"
 msgstr "Openen in nieuw venster"
@@ -4106,7 +4112,7 @@ msgid "Words that begin with"
 msgstr "Woorden die starten met"
 
 msgid "Write filenames to ..."
-msgstr "Bestandsnamen schrijven naar..."
+msgstr "Bestandsnamen schrijven naar ..."
 
 msgid ""
 "Write value of selected fields in the tags. Useful for fields that were "
