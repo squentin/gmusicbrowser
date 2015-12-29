@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1008\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2015-12-28 17:38+0100\n"
-"PO-Revision-Date: 2015-12-28 23:43+0100\n"
+"POT-Creation-Date: 2015-12-29 15:39+0100\n"
+"PO-Revision-Date: 2015-12-29 16:07+0100\n"
 "Last-Translator: Midgard <@M1dgard on GitHub>\n"
 "Language-Team: Nederlands <@M1dgard on GitHub>\n"
 "Language: nl\n"
@@ -373,6 +373,9 @@ msgstr "Album"
 msgid "Album and artist"
 msgstr "Album en artiest"
 
+msgid "Album and artist breadcrumbs"
+msgstr "Album-en-artiest-broodkruimels"
+
 msgid "Album and artist on the left side"
 msgstr "Album en artiest aan de linkerzijde"
 
@@ -660,7 +663,7 @@ msgid "Bad session"
 msgstr "Ongeldige sessie"
 
 msgid "Base Folder :"
-msgstr "Standaardmap:"
+msgstr "Hoofdmap:"
 
 msgid "Basic fields"
 msgstr "Standaardvelden"
@@ -1123,6 +1126,9 @@ msgstr "Schijfnr."
 msgid "Disc name"
 msgstr "Schijfnaam"
 
+msgid "Disc on the left side"
+msgstr "Schijfnummer aan de linkerzijde"
+
 msgid "Display (:1 or host:0 for example)"
 msgstr "Toon (:1 of host:0 bijvoorbeeld)"
 
@@ -1303,13 +1309,13 @@ msgid "Enqueue Action"
 msgstr "Actie in wachtrij plaatsen"
 
 msgid "Enqueue Displayed"
-msgstr "Plaats de getoonde in de wachtrij"
+msgstr "Getoonde in wachtrij plaatsen"
 
 msgid "Enqueue Selected"
-msgstr "Plaats de geselecteerde in de wachtrij"
+msgstr "Geselecteerde in wachtrij plaatsen"
 
 msgid "Enqueue Selected Songs"
-msgstr "Plaats de geselecteerde nummers in de wachtrij"
+msgstr "De geselecteerde nummers in de wachtrij plaatsen"
 
 msgid "Enqueue Songs from Current Album"
 msgstr "Nummers van het huidige album in de wachtrij plaatsen"
@@ -1573,7 +1579,7 @@ msgid "Folders to search for new songs"
 msgstr "Mappen om in te zoeken naar nieuwe nummers:"
 
 msgid "Follow playing song"
-msgstr "Nummer volgen tijdens afspelen"
+msgstr "Volg steeds nummer dat afgespeeld wordt"
 
 msgid "Follow selected song"
 msgstr "Geselecteerd nummer volgen"
@@ -1589,6 +1595,11 @@ msgstr "Voor kommagetallen"
 
 msgid "For integer numbers"
 msgstr "Voor gehele getallen"
+
+msgid "For when values are likely to be repeated"
+msgstr ""
+"Voor als het waarschijnlijk is dat dezelfde waarden bij veel verschillende "
+"nummers gebruikt worden"
 
 msgid "Forward"
 msgstr "Volgende"
@@ -2413,10 +2424,11 @@ msgid "Options"
 msgstr "Opties"
 
 msgid "Options ..."
-msgstr "Opties..."
+msgstr "Opties ..."
 
-msgid "Options for subgroup"
-msgstr "Opties voor subgroep"
+#, perl-format
+msgid "Options for subgroup %d"
+msgstr "Opties voor subgroep %d"
 
 msgid ""
 "Or you can use the field $files which will be replaced by the list of files, "
@@ -2586,6 +2598,9 @@ msgstr "Afspeel- en wachtrijpictogrammen"
 #, perl-brace-format
 msgid "Playing error : {error}"
 msgstr "Afspeelfout: {error}"
+
+msgid "Playing/Queue Icon or Track"
+msgstr "Nu-aan-het-afspelen/In-wachtrij-pictogram of tracknummer"
 
 msgid "Playlist"
 msgstr "Afspeellijst"
@@ -3343,8 +3358,9 @@ msgstr "Afbeelding instellen met dit bestand"
 msgid "Set player window layout"
 msgstr "Afspeelvensterlayout instellen"
 
-msgid "Set subgroup"
-msgstr "Subgroep instellen"
+#, perl-format
+msgid "Set subgroup %d"
+msgstr "Subgroep %d instellen"
 
 #, perl-brace-format
 msgid "Set {year} as year for all tracks on this album."
@@ -3953,7 +3969,7 @@ msgid "Use {command} to play {ext} files"
 msgstr "{command} gebruiken om {ext}-bestanden af te spelen"
 
 msgid "Used for clipping prevention"
-msgstr "Gebruikt om storing te vermijden"
+msgstr "Vermijdt storing"
 
 msgid "Used for the Artists field"
 msgstr "Gebruikt voor het 'Artiest'-veld"
@@ -4170,7 +4186,7 @@ msgid "_Insert column"
 msgstr "_Kolom invoegen"
 
 msgid "_Remove this column"
-msgstr "_Deze kolom verwijderen"
+msgstr "Kolom _verwijderen"
 
 msgid "_Retry"
 msgstr "_Opnieuw proberen"
@@ -4290,7 +4306,7 @@ msgid "bonus tracks"
 msgstr "bonusnummers"
 
 msgid "boolean"
-msgstr "boolean"
+msgstr "booleaanse waarde (waar/vals)"
 
 msgid "bootleg"
 msgstr "bootleg"
@@ -4343,10 +4359,10 @@ msgid "command :"
 msgstr "opdracht:"
 
 msgid "common number"
-msgstr "algemeen getal"
+msgstr "getal met suggesties van eerdere waarden"
 
 msgid "common string"
-msgstr "algeme tekenreeks"
+msgstr "tekenreeks met suggesties van eerdere waarden"
 
 msgid "composer"
 msgstr "componist"
@@ -4506,7 +4522,7 @@ msgid "flags"
 msgstr "vlaggen"
 
 msgid "float"
-msgstr "drijvend"
+msgstr "kommagetal"
 
 msgid "font size depends on"
 msgstr "tekstgrootte is afhankelijk van"
@@ -4537,7 +4553,7 @@ msgid "group by"
 msgstr "groeperen op"
 
 msgid "half-life : "
-msgstr "halfleven:"
+msgstr "halfwaardetijd:"
 
 msgid "has a picture"
 msgstr "heeft een afbeelding"
@@ -4612,7 +4628,7 @@ msgid "includes artist %s"
 msgstr "bevat artiest %s"
 
 msgid "integer"
-msgstr "getal"
+msgstr "geheel getal"
 
 msgid "interview"
 msgstr "interview"
