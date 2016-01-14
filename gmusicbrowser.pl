@@ -358,6 +358,33 @@ Options to change what is done with files/folders passed as arguments (done in r
 		exit;
 	}
    }
+
+
+   # determine $HomeDir $SaveFile $ImportFile and $FIFOFile
+   my $save= delete $CmdLine{savefile};
+   if (defined $save)
+   {	my $isdir= $save=~m#/$#;	## $save is considered a folder if ends with a "/"
+	$save= rel2abs($save);
+	if (-d $save || $isdir) { $HomeDir = $save; }
+	else			{ $SaveFile= $save; }
+   }
+   warn "using '$HomeDir' folder for saving/setting folder instead of '$default_home'\n" if $debug && $HomeDir;
+   $HomeDir= pathslash(cleanpath($HomeDir || $default_home)); # $HomeDir must end with a slash
+   if (!-d $HomeDir)
+   {	warn "Creating folder $HomeDir\n";
+	my $current='';
+	for my $dir (split /$QSLASH/o,$HomeDir)
+	{	$current.=SLASH.$dir;
+		next if -d $current;
+		die "Can't create folder $HomeDir : $!\n" unless mkdir $current;
+	}
+   }
+   # auto import from old v1.0 tags file if using default savefile, it doesn't exist and old tags file exists
+   if (!$SaveFile && !find_gmbrc_file($HomeDir.'gmbrc') && -e $HomeDir.'tags') { $ImportFile||=$HomeDir.'tags'; }
+
+   $SaveFile||= $HomeDir.'gmbrc';
+   $FIFOFile= $HomeDir.'gmusicbrowser.fifo' if !defined $FIFOFile && $^O ne 'MSWin32';
+
    unless ($ignore)
    {	# filenames given in the command line
 	if (@files)
@@ -371,31 +398,6 @@ Options to change what is done with files/folders passed as arguments (done in r
 		my $cmd="$filescmd(@files)";
 		push @cmd, $cmd;
 	}
-
-	# determine $HomeDir $SaveFile $ImportFile and $FIFOFile
-	my $save= delete $CmdLine{savefile};
-	if (defined $save)
-	{	my $isdir= $save=~m#/$#;	## $save is considered a folder if ends with a "/"
-		$save= rel2abs($save);
-		if (-d $save || $isdir) { $HomeDir = $save; }
-		else			{ $SaveFile= $save; }
-	}
-	warn "using '$HomeDir' folder for saving/setting folder instead of '$default_home'\n" if $debug && $HomeDir;
-	$HomeDir= pathslash(cleanpath($HomeDir || $default_home)); # $HomeDir must end with a slash
-	if (!-d $HomeDir)
-	{	warn "Creating folder $HomeDir\n";
-		my $current='';
-		for my $dir (split /$QSLASH/o,$HomeDir)
-		{	$current.=SLASH.$dir;
-			next if -d $current;
-			die "Can't create folder $HomeDir : $!\n" unless mkdir $current;
-		}
-	}
-	# auto import from old v1.0 tags file if using default savefile, it doesn't exist and old tags file exists
-	if (!$SaveFile && !find_gmbrc_file($HomeDir.'gmbrc') && -e $HomeDir.'tags') { $ImportFile||=$HomeDir.'tags'; }
-
-	$SaveFile||= $HomeDir.'gmbrc';
-	$FIFOFile= $HomeDir.'gmusicbrowser.fifo' if !defined $FIFOFile && $^O ne 'MSWin32';
 
 	#check if there is an instance already running
 	my $running;
@@ -1674,7 +1676,7 @@ exit;
 
 sub Edittag_mode
 {	my @dirs=@_;
-	$Songs::Def{$_}{flags}=~m/w/ || $Songs::Def{$_}{flags}=~s/e// for keys %Songs::Def; #quick hack to remove fields that are not written in the tag from the mass-tagging dialog
+	$Songs::Def{$_}{flags}=~m/w/ || $Songs::Def{$_}{flags}=~s/e// for grep $Songs::Def{$_}{flags}, keys %Songs::Def; #quick hack to remove fields that are not written in the tag from the mass-tagging dialog
 	FirstTime(); Post_ReadSavedTags();
 	LoadIcons(); #for stars edit widget that shouldn't be shown anyway
 	$Options{LengthCheckMode}='never';
