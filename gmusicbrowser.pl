@@ -1616,7 +1616,7 @@ if ($CmdLine{UseGnomeSession})
 }
 
 LoadPlugins();
-if ($CmdLine{pluginlist}) { warn "$_ : $Plugins{$_}{name}\n" for sort keys %Plugins; exit; }
+if ($CmdLine{pluginlist}) { print "$_ : $Plugins{$_}{name}\n" for sort keys %Plugins; exit; }
 $SIG{HUP} = 'IGNORE';
 ReadSavedTags();
 $Options{AutoRemoveCurrentSong}=0 if $CmdLine{demo};
