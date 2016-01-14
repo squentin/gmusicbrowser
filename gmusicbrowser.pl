@@ -1691,10 +1691,14 @@ sub Edittag_mode
 	$dialog->set_default_size(500, 600);
 	my $edittag;
 	if (@$Library==1)
-	{	$edittag=EditTagSimple->new($dialog,$Library->[0]);
+	{	my $ID= $Library->[0];
+		$edittag=EditTagSimple->new($ID);
 		$dialog->signal_connect( response => sub
 		 {	my ($dialog,$response)=@_;
-			$edittag->save if $response eq 'ok';
+			if ($response eq 'ok')
+			{	my @set= $edittag->get_changes;
+				Songs::Set($ID,\@set,window=>$dialog,noidle=>1) if @set;
+			}
 			exit;
 		 });
 	}

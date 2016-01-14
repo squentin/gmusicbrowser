@@ -2008,7 +2008,7 @@ sub Write
 		return $res;
 	 };
 
-	Glib::Idle->add(sub
+	my $write_next= sub
 	 {	my $ID= $IDs->[$i];
 		if (defined $ID)
 		{ 	my $modif;
@@ -2036,7 +2036,8 @@ sub Write
 		}
 		::Progress( $pid, current=>$i );
 		return 1;
-	 });
+	 };
+	 if ($opt{noidle}) { my $c=1; $c=$write_next->() until $c==0; } else { Glib::Idle->add($write_next); }
 }
 
 sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
