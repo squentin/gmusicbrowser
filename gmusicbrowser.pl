@@ -1741,7 +1741,7 @@ sub filename_to_utf8displayname	#replaced by Glib::filename_display_name if avai
 sub get_event_window
 {	my $widget=shift;
 	$widget||= Gtk2->get_event_widget(Gtk2->get_current_event);
-	return find_ancestor($widget,'Gtk2::Window');
+	return $widget && find_ancestor($widget,'Gtk2::Window');
 }
 sub get_layout_widget
 {	find_ancestor($_[0],'Layout');
