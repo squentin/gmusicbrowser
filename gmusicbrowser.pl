@@ -664,12 +664,14 @@ our %Artists_split=
 	',?\s+and\s+'		=> "and",	#case-sensitive because the user might want to use "And" in artist names that should NOT be splitted
 	',?\s+And\s+'		=> "And",
 	'\s+featuring\s+'	=> "featuring",
-	'\s+feat\.\s+'		=> "feat.",
+	'\s+feat\.*\s+'		=> "feat", # feat and feat.
+	'\s+ft\.*\s+'		=> "ft",   # ft and ft.
 	'\s+[Vv][Ss]\s+'	=> "VS",
 );
 our %Artists_from_title=
 (	'\(with\s+([^)]+)\)'		=> "(with X)",
-	'\(feat\.\s+([^)]+)\)'		=> "(feat. X)",
+	'\(ft\.*\s+([^)]+)\)'		=> "(ft X)",   # ft and ft.
+	'\(feat\.*\s+([^)]+)\)'		=> "(feat X)", # feat and feat.
 	'\(featuring\s+([^)]+)\)'	=> "(featuring X)",
 );
 
