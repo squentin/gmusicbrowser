@@ -10,7 +10,6 @@ name	Export
 title	Export plugin
 desc	Adds menu entries to song contextual menu
 =cut
-
 package GMB::Plugin::Export;
 use strict;
 use warnings;
@@ -36,12 +35,6 @@ my %menuentry=
 	code => \&ToCSV,
 	notempty => 'IDs',
  },
- tocmd =>
- {	label => sub { ($::Options{OPT.'tocmd_label'} || _"Unnamed custom command") },
-	code => \&RunCommand,
-	test => sub {my $c=$::Options{OPT.'tocmd_cmd'}; defined $c && $c ne '';},
-	notempty => 'IDs',
- }
 );
 
 my %FLmenuentry=
@@ -87,16 +80,9 @@ sub prefbox
 	my $entry3=::NewPrefEntry(OPT.'filenameformat',_"Filename format :", sizeg1=>$sg1,sizeg2=>$sg2, tip =>_("These fields can be used :")."\n".::MakeReplaceText('talydnAYo'));
 	my $check1=::NewPrefCheckButton(OPT.'topath',_"Copy to mounted portable player", cb=>\&updatemenu, widget=> ::Vpack($entry1,$entry2,$entry3) );
 
-	my $entry4=::NewPrefEntry(OPT.'tocmd_label',_"Menu entry name", sizeg1=> $sg1,sizeg2=>$sg2, tip => _("Name under which the command will appear in the menu"));
-	my $entry5=::NewPrefEntry(OPT.'tocmd_cmd',_"System command :", sizeg1=> $sg1,sizeg2=>$sg2,
-		tip =>  _("These fields can be used :")."\n".::MakeReplaceText('ftalydnAY')."\n".
-			_("In this case one command by file will be run\n\n").
-			_('Or you can use the field $files which will be replaced by the list of files, and only one command will be run'));
-	my $check2=::NewPrefCheckButton(OPT.'tocmd',_"Execute custom command on selected files", cb=>\&updatemenu, widget=> ::Vpack($entry4,$entry5) );
-
 	my $check3=::NewPrefCheckButton(OPT.'tom3u',_"Export to .m3u file", cb=>\&updatemenu);
 	my $check4=::NewPrefCheckButton(OPT.'toCSV',_"Export song properties to a .csv file", cb=>\&updatemenu);
-	$vbox->pack_start($_,::FALSE,::FALSE,2) for $check1,$check2,$check3,$check4;
+	$vbox->pack_start($_,::FALSE,::FALSE,2) for $check1,$check3,$check4;
 	return $vbox;
 }
 
@@ -186,12 +172,5 @@ sub ToCSV
 		close $fh  or redo;
 	}
 }
-
-sub RunCommand
-{	my $IDs=$_[0]{IDs} || $_[0]{filter}->filter;
-	my $cmd= $::Options{OPT.'tocmd_cmd'};
-	::run_system_cmd($cmd,$IDs,0);
-}
-
 
 1
