@@ -8,7 +8,7 @@
 =for gmbplugin Commands
 name	Commands
 title	Commands plugin
-desc	Multiple user commands for execution of custom commands on selected files
+desc	Execution of custom commands on selected files
 =cut
 
 package GMB::Plugin::Commands;
