@@ -670,9 +670,12 @@ our %Artists_split=
 );
 our %Artists_from_title=
 (	'\(with\s+([^)]+)\)'		=> "(with X)",
-	'\([fF]t\.*\s+([^)]+)\)'	=> "(ft X)",   # ft and ft.
-	'\([fF]eat\.*\s+([^)]+)\)'	=> "(feat X)", # feat and feat.
-	'\([fF]eaturing\s+([^)]+)\)'	=> "(featuring X)",
+#	'\([fF]t\.*\s+([^)]+)\)'	=> "(ft X)",   # ft and ft.
+	'[fF]t\.*\s+([^)]+)'		=> "ft X",   # ft and ft.
+#	'\([fF]eat\.*\s+([^)]+)\)'	=> "(feat X)", # feat and feat.
+	'[fF]eat\.*\s+([^)]+)'		=> "feat X", # feat and feat.
+#	'\([fF]eaturing\s+([^)]+)\)'	=> "(featuring X)",
+	'[fF]eaturing\s+([^)]+)'	=> "featuring X",
 );
 
 
