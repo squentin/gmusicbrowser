@@ -3,15 +3,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser 1.1.20\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2015-03-25 17:35+0900\n"
-"PO-Revision-Date: 2015-03-25 17:48+0900\n"
+"POT-Creation-Date: 2016-03-03 12:30+0900\n"
+"PO-Revision-Date: 2016-03-03 12:30+0900\n"
 "Last-Translator: bluealbum@gmail.com\n"
 "Language-Team: 한국어\n"
 "Language: ko_KR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.8.4\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
@@ -101,6 +101,11 @@ msgstr[0] "%d 노래 라이브러리에서"
 msgid "%d song selected"
 msgid_plural "%d songs selected"
 msgstr[0] "%d 노래 선택함"
+
+#, perl-format
+msgid "%d song waiting to be sent"
+msgid_plural "%d songs waiting to be sent"
+msgstr[0] "보내기 위해 %d 노래를 기다리는 중"
 
 #, perl-format
 msgid "%s fuzzy match with %s"
@@ -275,6 +280,9 @@ msgstr "새 이름 추가"
 msgid "Add new radio"
 msgstr "새 라디오 추가"
 
+msgid "Add picture"
+msgstr "사진 추가"
+
 msgid "Add rule : "
 msgstr "규칙 추가: "
 
@@ -357,6 +365,9 @@ msgstr "앨범 표지"
 
 msgid "Album gain"
 msgstr "앨범 게인"
+
+msgid "Album has picture"
+msgstr "앨범 사진 포함"
 
 msgid "Album mode"
 msgstr "앨범 모드"
@@ -460,6 +471,9 @@ msgctxt "Keyboard"
 msgid "Alt"
 msgstr "Alt"
 
+msgid "Always"
+msgstr "항상"
+
 msgid "Amount of volume changed by the mouse wheel"
 msgstr "볼륨 크기는 마우스 휠로 바뀌어집니다"
 
@@ -512,6 +526,9 @@ msgstr "음악가 일대기"
 
 msgid "Artist URL"
 msgstr "음악가 주소"
+
+msgid "Artist has picture"
+msgstr "음악가 사진 포함"
 
 msgid "Artist picture"
 msgstr "음악가 사진"
@@ -866,6 +883,9 @@ msgstr ""
 "선택되었을 때 명령어가\n"
 "사용됨"
 
+msgid "Command used:"
+msgstr "사용한 명령:"
+
 msgid "Command when playing song changed :"
 msgstr "재생중인 노래가 바뀔 때 명령 실행"
 
@@ -895,6 +915,9 @@ msgstr "다음으로 연결 :"
 
 msgid "Context"
 msgstr "문맥정보"
+
+msgid "Continue anyway"
+msgstr "어쨋든 계속하기"
 
 msgid "Control"
 msgstr "제어"
@@ -1135,9 +1158,6 @@ msgstr "편집"
 msgid "Edit Current Song Properties"
 msgstr "현재 노래 등록정보 편집"
 
-msgid "Edit labels"
-msgstr "라벨 편집"
-
 msgid "Edit Lyrics"
 msgstr "가사 편집"
 
@@ -1146,9 +1166,6 @@ msgstr "가사 편집..."
 
 msgid "Edit Multiple Songs Properties"
 msgstr "다중 노래 등록정보 편집"
-
-msgid "Edit rating"
-msgstr "점수 편집"
 
 msgid "Edit Settings"
 msgstr "설정 편집"
@@ -1168,6 +1185,9 @@ msgstr "그룹으로 나누기 편집 ..."
 msgid "Edit in the last.fm wiki"
 msgstr "last.fm 위키 편집"
 
+msgid "Edit labels"
+msgstr "라벨 편집"
+
 msgid "Edit list"
 msgstr "목록 편집"
 
@@ -1180,11 +1200,18 @@ msgstr "순서 배열된 모드 편집 ..."
 msgid "Edit random modes ..."
 msgstr "랜덤 모드 편집 ..."
 
+msgid "Edit rating"
+msgstr "점수 편집"
+
 msgid "Edit row tip"
 msgstr "줄 도움말 편집"
 
 msgid "Edit selected song properties"
 msgstr "선택한 노래 등록정보 편집"
+
+#, perl-brace-format
+msgid "Edit {field}"
+msgstr "편집 {field}"
 
 msgid "Edit..."
 msgstr "편집..."
@@ -1198,11 +1225,23 @@ msgstr "목록 편집 :"
 msgid "Editing tags"
 msgstr "태그 편집"
 
+msgid "Embedded Pictures"
+msgstr "내장된 사진"
+
 msgid "Embedded lyrics"
 msgstr "내장된 가사"
 
 msgid "Embedded picture"
 msgstr "내장된 사진"
+
+msgid "Embedded pictures"
+msgstr "내장된 사진"
+
+msgid "Embedded pictures for this album"
+msgstr "이 앨범을 위한 내장된 사진"
+
+msgid "Embedded pictures in this folder"
+msgstr "이 폴더안에 내장된 사진"
 
 msgid "Empty list"
 msgstr "빈 목록"
@@ -1349,6 +1388,9 @@ msgstr "대기열에서 '시드'-음악가는 제외하기"
 
 msgid "Execute custom command on selected files"
 msgstr "선택한 파일에 사용자 정의 명령 실행"
+
+msgid "Exit"
+msgstr "끝내기"
 
 msgid "Exit full screen"
 msgstr "전체 화면 끝내기"
@@ -1612,20 +1654,46 @@ msgstr "맞지 않는 것을 숨기기"
 msgid "Hide toolbar"
 msgstr "도구바 감추기"
 
+msgid "High priority"
+msgstr "높은 우선 순위"
+
 msgid "Icon theme :"
 msgstr "아이콘 테마 :"
 
 msgid "Identifier in file tag"
 msgstr "파일 태그에 인식자"
 
+msgid ""
+"If checked, the shortcut has higher priority than the default shortcut of "
+"widgets. Warning: this can make some features inaccessible"
+msgstr ""
+"체커되어 있으면, 바로가기는 위젯의 기본값 바로가기보다 높은 우선 순위를 가집"
+"니다. 경고: 이것은 일부 기능에 접속할 수 없게 합니다."
+
+msgid ""
+"If one of these words is at the start of the string, it will be ignored when "
+"sorting most fields"
+msgstr ""
+"이들 문자들 중 하나가 문자열의 시작에 있으면, 대부분의 필드를 정렬할 때 무시"
+"될 것입니다"
+
 msgid "Ignore playback errors"
 msgstr "재생 오류 무시하기"
+
+msgid "Ignore these words when sorting :"
+msgstr "정렬할 때 이들 단어를 무시하기 :"
 
 msgid "Ignored file extensions :"
 msgstr "무시한 파일 확장자 :"
 
 msgid "Import list"
 msgstr "목록 가져오기"
+
+msgid ""
+"Imports gstreamer presets, and synchronize modifications made with "
+"gmusicbrowser"
+msgstr ""
+"gstreamer 프리셋 가져오기, 그리고 gmusicbrowser로 수정된 것을 동기화하기"
 
 msgid ""
 "In this case one command by file will be run\n"
@@ -1724,6 +1792,9 @@ msgstr "언어."
 
 msgid "Languages"
 msgstr "언어"
+
+msgid "Last messages:"
+msgstr "최근 메시지들:"
 
 msgid "Last played"
 msgstr "최근 연주한 시간"
@@ -2227,6 +2298,9 @@ msgstr "id3v1 태그를 가지지 않은 mp3 파일에만 영향을 줍니다"
 msgid "Only show similar artists from local library"
 msgstr "로컬 라이브러리로부터 비슷한 음악가만 표시"
 
+msgid "Only whole levels"
+msgstr "전체 수준에서만"
+
 msgid "Opacity"
 msgstr "불투명"
 
@@ -2333,6 +2407,9 @@ msgstr "오버레이 레이아웃 :"
 msgid "Owner identifier"
 msgstr "소유자 인식자"
 
+msgid "Paste link"
+msgstr "링크 붙여넣기"
+
 msgid "Path,Album,Disc,Track,File"
 msgstr "경로,앨범,디스크,트랙,파일"
 
@@ -2376,6 +2453,9 @@ msgstr "사진 찾기 플러그인"
 #, perl-format
 msgid "Picture size : %d"
 msgstr "사진 크기 : %d"
+
+msgid "Picture type"
+msgstr "사진 형식"
 
 msgid "Pictures and music files"
 msgstr "사진 그리고 음악 파일들"
@@ -2430,6 +2510,9 @@ msgstr "재생/일시정지"
 
 msgid "Playback"
 msgstr "재생"
+
+msgid "Playback ended unexpectedly."
+msgstr "원하지않게 재생이 끝남."
 
 msgid "Playcount: "
 msgstr "재생수:"
@@ -2774,6 +2857,9 @@ msgstr "이름 제거하기"
 
 msgid "Remove list"
 msgstr "목록 제거하기"
+
+msgid "Remove picture"
+msgstr "사진 제거"
 
 msgid "Remove selected songs"
 msgstr "선택한 노래 제거하기"
@@ -3178,6 +3264,9 @@ msgstr "판매자"
 msgid "Send Title/Artist/Album in standard input"
 msgstr "표준 입력으로 제목/음악가/앨범 보내기"
 
+msgid "Send now"
+msgstr "지금 보내기"
+
 msgid "Set Current Song Rating"
 msgstr "현재 노래 점수 설정"
 
@@ -3194,6 +3283,9 @@ msgstr "'{name}' 를 위한 사진 설정하기"
 msgid "Set as primary filter"
 msgstr "기본 필터 설정"
 
+msgid "Set equalizer"
+msgstr "이퀄라이저 설정"
+
 msgid "Set focus on a layout widget"
 msgstr "레이아웃 위젯에 포커스 설정"
 
@@ -3202,6 +3294,12 @@ msgstr "그룹으로 나누기 설정"
 
 msgid "Set icon"
 msgstr "아이콘 설정"
+
+msgid "Set picture"
+msgstr "사진 설정"
+
+msgid "Set picture using this file"
+msgstr "이 파일을 사용해서 사진 설정하기"
 
 msgid "Set player window layout"
 msgstr "재생기 창 레이아웃 설정"
@@ -3239,6 +3337,9 @@ msgstr "위키페디아 음악가 페이지 벅;"
 msgid "Show album"
 msgstr "앨범 표시"
 
+msgid "Show all files"
+msgstr "모든 파일 표시"
+
 msgid "Show artist picture"
 msgstr "음악가 사진 표시"
 
@@ -3251,8 +3352,17 @@ msgstr "음악가의 다가올 이벤트 보기"
 msgid "Show buttons"
 msgstr "버튼 표시"
 
+msgid "Show edition submenu in song context menu"
+msgstr "노래 항목 메뉴에서 서브메뉴 편집 표시"
+
+msgid "Show embedded pictures"
+msgstr "내장된 사진 표시"
+
 msgid "Show file list"
 msgstr "파일 목록 표시"
+
+msgid "Show file name extension"
+msgstr "파일 이름 확장자 표시"
 
 msgid "Show folder list"
 msgstr "폴더 목록 표시"
@@ -3329,6 +3439,9 @@ msgstr "뒤섞기"
 msgid "Shuffle list"
 msgstr "셔플 목록"
 
+msgid "Shuffle or re-shuffle the playlist"
+msgstr "재생목록을 뒤섞기 또는 다시 뒤섞기"
+
 msgid "Shuffle queue"
 msgstr "대기열 뒤섞기"
 
@@ -3355,6 +3468,9 @@ msgstr "간단한 목록 표시"
 
 msgid "Simple title"
 msgstr "간단한 제목"
+
+msgid "Simplify tree"
+msgstr "간략한 트리"
 
 msgid "Size"
 msgstr "크기"
@@ -3426,6 +3542,9 @@ msgstr "소스: {file}"
 
 msgid "Split artist names on :"
 msgstr "음악가 이름으로 나누기 :"
+
+msgid "Star images"
+msgstr "시작 이미지"
 
 msgid "Start ReplayGain analysis"
 msgstr "리플레이게인 분석 시작"
@@ -3499,6 +3618,9 @@ msgstr "일요일"
 msgid "Switch to fullscreen mode"
 msgstr "전체화면 모드 바꾸기"
 
+msgid "Synchronize equalizer presets"
+msgstr "이퀄라이저 프리셋 동기화"
+
 msgid "System clock is not close enough to the current time"
 msgstr "시스템 시계가 현재 시간과 충분히 가깝지 않습니다"
 
@@ -3526,6 +3648,11 @@ msgstr ""
 
 msgid "The layout for this desktop widget is missing."
 msgstr "이 데스크탑 위젯을 위한 레이아웃이 없습니다."
+
+msgid "The save file seems incomplete, you may want to use a backup instead."
+msgstr ""
+"파일 저장이 불완전 한것 같습니다, 사용자는 대신 백업을 사용하길 원할 것입니"
+"다."
 
 msgid "Themes"
 msgstr "테마"
@@ -3678,6 +3805,9 @@ msgstr "URL"
 
 msgid "Unique file identifier"
 msgstr "독특한 파일 인식자"
+
+msgid "Unknown"
+msgstr "알 수 없음"
 
 msgid "Unknown album"
 msgstr "알려지지않은 앨범"
@@ -3932,12 +4062,28 @@ msgstr "연도 - 음악가"
 msgid "Yes"
 msgstr "예"
 
+#, perl-brace-format
+msgid "You can find backups in {folder}"
+msgstr "사용자는 {folder} 안에서 백업을 찾을 수 있습니다"
+
 msgid ""
 "You can force a check for these files by holding shift when selecting \"Re-"
 "read tags\""
 msgstr ""
 "\"태그 다시-읽기\" 를 선택할 때 shift 키를 누르는 것으로 사용자는 이들 파일"
 "을 강제적으로 체크할 수 있습니다."
+
+#, perl-brace-format
+msgid ""
+"You can make custom stars by putting pictures in {folder}\n"
+"They must be named 'stars', optionally followed by a '-' and a word, "
+"followed by a number from 0 to 5 or 10\n"
+"Example: stars-custom0.png"
+msgstr ""
+"사용자는 {folder}에서 사진을 넣어서 맞춤 시작을 만들 수 있습니다\n"
+"그 사진들은 'stars'라는 이름이어야 합니다, 선택적으로 그 다음은 '-' 와 단어, "
+"그 다음은 0 에서 5 또는 10의 수를 넣으면 됩니다.\n"
+"예: stars-custom0.png"
 
 msgid ""
 "You can use some markup, eg :\n"
@@ -4376,6 +4522,10 @@ msgid "imported list"
 msgstr "가져온 목록"
 
 #, perl-format
+msgid "in %d/%d files"
+msgstr "%d/%d 파일들 안에서"
+
+#, perl-format
 msgid "in %l"
 msgstr "%l 안에 있음"
 
@@ -4633,6 +4783,9 @@ msgstr "mplayer 실행파일 :"
 msgid "mplayer options :"
 msgstr "mplayer 옵션 :"
 
+msgid "mpv options :"
+msgstr "mpv 옵션 :"
+
 msgid "multi-lines string"
 msgstr "여러줄 문자열"
 
@@ -4811,6 +4964,13 @@ msgstr "프리-앰프"
 #, perl-format
 msgid "pre-amp : %d dB"
 msgstr "프리-앰프 : %d dB"
+
+msgid ""
+"pre-set name or 10 numbers between 12 and -12 (-24 for gstreamer) separated "
+"by ':', or 0 (for off), or 1 (for on)"
+msgstr ""
+"프리셋 이름,  ':', 또는 0 (사용 안함), 또는 1 (사용중 일 때)로 나뉘어진 12"
+"와  -12 (gstreamer는 -24) 사이의 10개의 수"
 
 #, perl-format
 msgid "present in %s"
@@ -5249,6 +5409,12 @@ msgstr "|-위젯 이름으로 나뉘어진 목록"
 
 #~ msgid "Do not add songs that can't be played"
 #~ msgstr "재생할 수 없는 노래는 추가하지 않기"
+
+#~ msgid "Edit Labels"
+#~ msgstr "라벨 편집"
+
+#~ msgid "Edit Rating"
+#~ msgstr "점수 편집"
 
 #~ msgid "EditList"
 #~ msgstr "편집목록"
