@@ -76,15 +76,28 @@ my %Sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 				return 0 if $_[0]=~m!&#91;&#46;&#46;&#46;&#93;(?:<br ?/>)*<i>!; # truncated lyrics : "[...]" followed by italic explanation => not auto-saved
 				return !!$1;
 			}],	
-	musixmatch =>   [musixmatch => 'https://www.musixmatch.com/lyrics/%a/%t', undef,
+	musixmatch =>   [musixmatch =>
                          sub {
-                            if ($_[0] =~ /<span id="lyrics-html"/) {
-                                $_[0] =~ s/.*<span id="lyrics-html".+?>(.+?)<\/span>.*/$1/s;
-                                $_[0] =~ s/[\r\n]/<br>/g;
-                            } else {
-                                $_[0] = $notfound;
-                            }
-                        }],
+                             ::ReplaceFields($_[0], 'https://www.musixmatch.com/lyrics/%a/%t', sub {
+                                     require Unicode::Normalize;
+                                     import  Unicode::Normalize 'NFKD';
+                                     NFKD($_[0])=~ s/\p{NonspacingMark}//gr # Convert letters with accents, umlauts, etc to their ASCII counterparts
+                                                =~ s/ (&|\*|\-) / /gr
+                                                =~ s/(\'|\,|\.) / /gr
+                                                =~ s/\(.*?\)//gr # remove comments in parenthesis: a.e. (Extended Version), (Chillout Mix), etc
+                                                =~ s/^\s+|\s+$//gr
+                                                =~ s/\s/-/gr
+                                     });
+                         },
+                         undef,
+                         sub {
+                             my $text;
+                             if($_[0] =~ /"body":"(.*?)","/){
+                                $text = $1 =~ s|\\n|<br>|gr =~ s|\\(["'])|$1|gr;
+                                $_[0] = $text || $notfound;
+                             }
+                             return !!$text;
+                         }],
        #lyricwikiapi => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%t&fmt=html',undef,
 	#	sub { $_[0]!~m#<pre>\W*Not found\W*</pre>#s }],
 	#azlyrics => [ azlyrics => 'http://search.azlyrics.com/cgi-bin/azseek.cgi?q="%a"+"%t"'],
