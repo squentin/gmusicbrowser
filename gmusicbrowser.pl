@@ -10070,7 +10070,7 @@ sub Start
 		{	my $ow= $self->{owrite_all};
 			$ow||=::OverwriteDialog($self->{toplevel},$new,$self->{left}>0);
 			$self->{owrite_all}=$ow if $ow=~m/all$/;
-			if ($ow=~m/^no/) { $self->Skip; return }
+			if ($ow=~m/^no/) { $self->Done; return }
 			#overwriting
 			GMB::Cache::drop_file($new); # mostly for picture files
 		}
