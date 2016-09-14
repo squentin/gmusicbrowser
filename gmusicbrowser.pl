@@ -6359,7 +6359,7 @@ sub PrefKeys
 	my $butrm=  ::NewIconButton('gtk-remove',_"Remove",sub
 	 {	my $iter=$treeview->get_selection->get_selected;
 		my $key=$store->get($iter,2);
-		delete $Options{CustomKeyBindings}{$key};
+		delete $Options{CustomKeyBindings}{$_} for $key,"+$key";
 		&$refresh_sub;
 	 });
 
