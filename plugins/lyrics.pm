@@ -79,14 +79,11 @@ my %Sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 	musixmatch =>   [musixmatch =>
                          sub {
                              ::ReplaceFields($_[0], 'https://www.musixmatch.com/lyrics/%a/%t', sub {
-                                     require Unicode::Normalize;
-                                     import  Unicode::Normalize 'NFKD';
-                                     NFKD($_[0])=~ s/\p{NonspacingMark}//gr # Convert letters with accents, umlauts, etc to their ASCII counterparts
-                                                =~ s/ (&|\*|\-) / /gr
-                                                =~ s/(\'|\,|\.) / /gr
-                                                =~ s/\(.*?\)//gr # remove comments in parenthesis: a.e. (Extended Version), (Chillout Mix), etc
-                                                =~ s/^\s+|\s+$//gr
-                                                =~ s/\s/-/gr
+                                     $_[0] =~ s/ (&|\*|\-) / /gr
+                                           =~ s/(\'|\,|\.) / /gr
+                                           =~ s/\(.*?\)//gr # remove comments in parenthesis: a.e. (Extended Version), (Chillout Mix), etc
+                                           =~ s/^\s+|\s+$//gr
+                                           =~ s/\s/-/gr
                                      });
                          },
                          undef,
