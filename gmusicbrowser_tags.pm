@@ -6,13 +6,15 @@
 # published by the Free Software Foundation
 
 BEGIN
-{ require 'oggheader.pm';
-  require 'mp3header.pm';
-  require 'flacheader.pm';
-  require 'mpcheader.pm';
-  require 'apeheader.pm';
-  require 'wvheader.pm';
-  require 'm4aheader.pm';
+{ 
+    require 'oggheader.pm';
+    require 'opusheader.pm';
+    require 'mp3header.pm';
+    require 'flacheader.pm';
+    require 'mpcheader.pm';
+    require 'apeheader.pm';
+    require 'wvheader.pm';
+    require 'm4aheader.pm';
 }
 use strict;
 use warnings;
@@ -24,14 +26,15 @@ our %FORMATS;
 
 INIT
 {
- %FORMATS=	    # module		format string			tags to look for (order is important)
- (	mp3	=> ['Tag::MP3',		'mp{layer} mpeg-{versionid} l{layer}',	'ID3v2 APE lyrics3v2 ID3v1',],
-	oga	=> ['Tag::OGG',		'vorbis v{version}',		'vorbis',],
-	flac	=> ['Tag::Flac',	'flac',				'vorbis',],
-	mpc	=> ['Tag::MPC',		'mpc v{version}',		'APE ID3v2 lyrics3v2 ID3v1',],
-	ape	=> ['Tag::APEfile',	'ape v{version}',		'APE ID3v2 lyrics3v2 ID3v1',],
-	wv	=> ['Tag::WVfile',	'wv v{version}',		'APE ID3v1',],
-	m4a	=> ['Tag::M4A',		'mp4 {traktype}',		'ilst',],
+ %FORMATS=	    # module		format string			                tags to look for (order is important)
+ (	mp3	    => ['Tag::MP3',		'mp{layer} mpeg-{versionid} l{layer}',	'ID3v2 APE lyrics3v2 ID3v1',],
+	oga	    => ['Tag::OGG',		'vorbis v{version}',		            'vorbis',],
+	opus    => ['Tag::Opus',	'opus v{version}',		                'vorbis',],
+	flac    => ['Tag::Flac',	'flac',				                    'vorbis',],
+	mpc	    => ['Tag::MPC',		'mpc v{version}',		                'APE ID3v2 lyrics3v2 ID3v1',],
+	ape	    => ['Tag::APEfile',	'ape v{version}',		                'APE ID3v2 lyrics3v2 ID3v1',],
+	wv	    => ['Tag::WVfile',	'wv v{version}',		                'APE ID3v1',],
+	m4a	    => ['Tag::M4A',		'mp4 {traktype}',		                'ilst',],
 );
  $FORMATS{$_}=$FORMATS{ $::Alias_ext{$_} } for keys %::Alias_ext;
 }
@@ -1938,7 +1941,8 @@ INIT
 			types	=> $ilst_types,
 		},
  );
- $tagprop{Flac}=$tagprop{OGG};
+ $tagprop{Flac} = $tagprop{OGG};
+ $tagprop{Opus} = $tagprop{OGG};
 
  %DataType=
  (	t => ['EntrySimple'],	#text
