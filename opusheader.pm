@@ -20,7 +20,7 @@ use MIME::Base64;
 
 use constant
 { 
-    PACKET_INFO	    => 'OpusHead',
+    PACKET_INFO     => 'OpusHead',
     PACKET_COMMENT  => 'OpusTags',
 };
 
@@ -150,13 +150,16 @@ sub new
 
 	    warn "file truncated or corrupted.\n" unless $self->{end};
 
+
+        # from info_opus.c (opusinfo tool) in the reference implementation
+        # time = (inf->lastgranulepos - inf->firstgranule - inf->oh.preskip) / 48000.;                                                                                                                                                          
         #calulate length
         last unless $self->{info}{rate};# && $self->{end};
         my @granule = unpack 'C*', $self->{granule};
-        my $l = 0;
-        $l= $l * 256 + $_ for reverse @granule;
-        my $s = $l / $self->{info}{rate};
-        $self->{info}{seconds} = $s;
+        my $samples = 0;
+        $samples = $samples * 256 + $_ for reverse @granule;
+        my $seconds = ($samples - $self->{info}{preskip}) / 48000; # XXX subtracting preskip isn't evidently all that important
+        $self->{info}{seconds} = $seconds;
     }
 
     $self->_close;
@@ -218,22 +221,29 @@ sub _close
 
 sub write_file
 {	
-    my $self = shift;
-	my $newcom_packref = _PackComments($self);
-	#warn "old size $self->{commentpack_size}, need : ".length($$newcom_packref)."\n";
+    my $self            = shift;
+	my $newcom_packref  = _PackComments($self);
+
+	warn "old size $self->{commentpack_size}, need : ".length($$newcom_packref)."\n";
+    
 	if ( $self->{commentpack_size} >= length $$newcom_packref)
 	{	
         warn "in place editing.\n";
 		my $left = length $$newcom_packref;
 		my $offset2 = 0;
 		my $fh=$self->_openw or return;
-		_read_packet($self,PACKET_INFO);	#skip first page
+
+		_read_packet($self, PACKET_INFO);	#skip first page
+
 		while ($left)
 		{ 
             my $pos = tell $fh;
-		    my ($pageref,$offset,$size)=_ReadPage($self);
-		    seek $fh,$pos,0;
-		    if ($left<$size) 
+		    
+            my ($pageref, $offset, $size) = _ReadPage($self);
+
+		    seek $fh, $pos, 0;
+
+		    if ($left < $size) 
             {
                 $size = $left; 
                 $left = 0;
@@ -242,7 +252,8 @@ sub write_file
             {
                 $left -= $size
             }
-		    substr $$pageref, $offset, $size, substr($$newcom_packref,$offset2,$size);
+
+		    substr $$pageref, $offset, $size, substr($$newcom_packref, $offset2, $size);
 		    $offset2 += $size;
 		    _recompute_page_crc($pageref);
 		    print $fh $$pageref or warn $!;
@@ -266,12 +277,6 @@ sub write_file
 	#concatenate newly generated comment packet and setup packet from the original file in $data, and compute the segments in @segments
 	my $data;
 	my @segments;
-	# for my $packref ( $newcom_packref , _read_packet($self,PACKET_SETUP) )
-	# {	
-    #     $data.=$$packref;
-	# 	my $size=length $$packref;
-	# 	push @segments, (255)x int($size/255), $size%255;
-	# }
 
 	#separate $data in pages and write them
 	my $data_offset=0;
@@ -326,7 +331,7 @@ sub write_file
 	$self->_close;
 	close $OUTfh;
 	warn "replacing old file with new file.\n";
-	unlink $self->{filename} && rename $self->{filename}.'.TEMP',$self->{filename};
+	unlink $self->{filename} && rename $self->{filename}.'.TEMP', $self->{filename}; # does this even happen?
 	%$self=(); #destroy the object to make sure it is not reused as many of its data are now invalid
 	return 1;
 }
@@ -441,25 +446,31 @@ sub _ReadComments
 		return undef;
 	}
 }
+
 sub _PackComments
 {	
     my $self=$_[0];
 	my @comments;
 	my %count;
 	for my $key ( @{$self->{CommentsOrder}} )
-	{	my $nb=$count{lc$key}++ || 0;
-		my $val=$self->{comments}{lc$key}[$nb];
+	{	
+        my $nb = $count{lc$key}++ || 0;
+		my $val = $self->{comments}{lc$key}[$nb];
 		next unless defined $val;
-		$key=encode('ascii',$key);
-		$key=~tr/\x20-\x7D/?/c; $key=~tr/=/?/; #replace characters that are not allowed by '?'
-		if (uc$key eq 'METADATA_BLOCK_PICTURE' && ref $val)
-		{	$val= Tag::Flac::_PackPicture($val);
+
+		$key = encode('ascii',$key);
+		$key =~ tr/\x20-\x7D/?/c; 
+        $key =~ tr/=/?/; #replace characters that are not allowed by '?'
+
+		if (uc $key eq 'METADATA_BLOCK_PICTURE' && ref $val)
+		{	
+            $val= Tag::Flac::_PackPicture($val);
 			$val= encode_base64($$val);
 		}
-		push @comments,$key.'='.encode('utf8',$val);
+		push @comments, $key . '=' . encode('utf8', $val);
 	}
-	my $packet=pack 'a8 V/a* V (V/a*)*',PACKET_COMMENT,'vorbis',$self->{opus_string},scalar @comments, @comments;
-	$packet.="\x01"; #framing_flag
+
+	my $packet = pack 'a8 V/a* V (V/a*)*', PACKET_COMMENT, 'gmusicbrowser', scalar @comments, @comments;
 	return \$packet;
 }
 
@@ -636,7 +647,7 @@ sub _read_page_header
 	$self->{stream_vers} = $ver;
 	$self->{granule} = $granule;
 	return undef unless read($fh, $buf, $nbseg) == $nbseg;
-	@{ $self->{seg_table} } = unpack 'C*',$buf;
+	@{ $self->{seg_table} } = unpack 'C*', $buf;
 	#warn " seg_table: ".join(' ',@{ $self->{seg_table} })."\n";
 	return 1;
 }
