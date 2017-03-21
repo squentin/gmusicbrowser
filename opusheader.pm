@@ -470,7 +470,7 @@ sub _PackComments
 		push @comments, $key . '=' . encode('utf8', $val);
 	}
 
-	my $packet = pack 'a8 V/a* V (V/a*)*', PACKET_COMMENT, 'gmusicbrowser', scalar @comments, @comments;
+	my $packet = pack 'a8 V/a* V (V/a*)*', PACKET_COMMENT, $self->{opus_string}, scalar @comments, @comments;
 	return \$packet;
 }
 
