@@ -1,4 +1,5 @@
 # Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2017 Roman Hargrave <roman@hargrave.info>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
