@@ -32,14 +32,14 @@ my %Sites=
 	#discogs => ['discogs.com', "http://api.discogs.com/search?f=xml&type=artists&q=%a", \&parse_discogs],
 	bing =>['bing',"http://www.bing.com/images/search?q=%s", \&parse_bing],
 	yahoo =>['yahoo',"http://images.search.yahoo.com/search/images?p=%s&o=js", \&parse_yahoo],
-	ddg => ["DuckDuckGo","https://duckduckgo.com/i.js?q=%s&o=json", \&parse_ddg],
+	ddg => ["DuckDuckGo","https://duckduckgo.com/?q=%s&iax=1&ia=images", \&parse_ddg],
  },
  album =>
  {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large&imgar=ns", \&parse_googlei, GOOGLE_USER_AGENT],
 	googleihi =>[_"google images (hi-res)","http://www.google.com/images?q=%s&imgsz=xlarge|xxlarge&imgar=ns", \&parse_googlei, GOOGLE_USER_AGENT],
 	yahoo =>['yahoo',"http://images.search.yahoo.com/search/images?p=%s&o=js", \&parse_yahoo],
 	bing =>['bing',"http://www.bing.com/images/async?q=%s&qft=+filterui:aspect-square", \&parse_bing],
-	ddg => ["DuckDuckGo","https://duckduckgo.com/i.js?q=%s&o=json", \&parse_ddg],
+	ddg => ["DuckDuckGo","https://duckduckgo.com/?q=%s&iax=1&ia=images", \&parse_ddg],
 	slothradio => ['slothradio', "http://www.slothradio.com/covers/?artist=%a&album=%l", \&parse_sloth],
 	#freecovers => ['freecovers.net', "http://www.freecovers.net/api/search/%s", \&parse_freecovers], #could add /Music+CD but then we'd lose /Soundtrack #API doesn't work anymore
 	#rateyourmusic=> ['rateyourmusic.com', "http://rateyourmusic.com/search?searchterm=%s&searchtype=l",\&parse_rateyourmusic], # urls results in "403 Forbidden"
@@ -377,6 +377,14 @@ sub parse_yahoo
 
 sub parse_ddg
 {	my ($result,$pageurl,$searchcontext)=@_;
+	unless ($searchcontext->{vqd})
+	{	#request to i.js don't work without a vqd number, get it from the first page
+		my $vqd= $result=~m/vqd=(\d+)/ ? $1 : 0;
+		my $q= $result=~m/\?q=([^&"]+)[&"]/ ? $1 : 0;
+		my $url= $vqd && $q ? "https://duckduckgo.com/i.js?o=json&q=$q&vqd=$vqd&p=1" : undef;
+		$searchcontext->{vqd}=$vqd;
+		return [],$url,!!$url; #third return paremeter true means get next url even though no results in this query
+	}
 	my (@list,$nexturl);
 	# for some reason next pages return some previous results, use $searchcontext->{seen} to ignore them
 	my $seen= $searchcontext->{seen}||= {};
@@ -412,13 +420,13 @@ sub searchresults_cb
 	warn "Getting results from $self->{url}\n" if $::Verbose;
 	unless (defined $result) { stop($self,_"connection failed."); return; }
 	my $parse= $Sites{$self->{mainfield}}{$self->{site}}[2];
-	my ($list,$nexturl)=$parse->($result,$self->{url},$self->{searchcontext});
+	my ($list,$nexturl,$ignore0)=$parse->($result,$self->{url},$self->{searchcontext});
 	$self->{nexturl}=$nexturl;
 	#$table->set_size_request(110*5,110*int(1+@list/5));
 	push @{$self->{results}}, @$list;
 	my $more= @{$self->{results}} - ($self->{page}+1) * RES_PER_PAGE;
 	$self->{Bnext}->set_sensitive( $more>0 || $nexturl );
-	unless (@{$self->{results}}) { stop($self,_"no matches found, you might want to remove some search terms."); return; }
+	unless ($ignore0 || @{$self->{results}}) { stop($self,_"no matches found, you might want to remove some search terms."); return; }
 	::IdleDo('8_FetchCovers'.$self,100,\&get_next,$self);
 }
 
