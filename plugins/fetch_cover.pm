@@ -295,20 +295,17 @@ sub parse_googlei
 	$searchcontext->{baseurl}||= $pageurl;
 	$searchcontext->{pagecount}++;
 	my @list;
-	for my $res (split /<div class="rg_di[^"]*"[^>]*>/, $results)
-	{	next unless $res=~m#(?:\?|&amp;)imgurl=(.*?)&amp;#;
+	for my $res (split /<span class="rg_ilmn[^"]*"[^>]*>/, $results)
+	{	$res=~s/(?<!\\)\\"/\\u0022/g; #escape \" to make extraction simpler, not perfect
+		next unless $res=~m#"ou":"(http[^"]+)"#i;
 		my $url=$1;
-		$url=~s/%([0-9A-Fa-f]{2})/chr hex($1)/gie;
+		#$url=~s/%([0-9A-Fa-f]{2})/chr hex($1)/gie;
 		#$searchcontext->{rescount}++;
-		my $preview;
-		$preview=$1 if $res=~m/<img class="rg_i" [^>]*?src="([^"]+)"/;
-		my $desc;
-		if ($res=~m/<div class="rg_meta">[^<]*?"pt":"([^"]+)"/)
-		{	$desc= ::decode_html(Encode::decode('utf8',$1));
-			$desc=~s#</?b>##g;
-		}
-		#warn "$url\n$preview\n$desc\n\n";
-		push @list, {url => $url, previewurl =>$preview, desc => $desc };
+		my $preview= $res=~m/"tu":"([^"]+)"/ ? $1 : undef;
+		my $ref= $res=~m/"ru":"([^"]+)"/ ? $1 : undef;
+		my $desc= $res=~m/"pt":"([^"]+)"/ ? Encode::decode('utf8',$1) : undef;
+		for ($url,$desc,$ref,$preview) { s/\\u([0-9A-F]{4})/chr(hex($1))/eig; } #FIXME maybe use proper json decoding library
+		push @list, {url => $url, previewurl =>$preview, desc => $desc, referer=>$ref };
 	}
 	my $nexturl= $searchcontext->{baseurl}."&ijn=".$searchcontext->{pagecount};
 	$nexturl=undef unless @list;
