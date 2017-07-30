@@ -269,15 +269,17 @@ sub parse_freecovers #FIXME could use a XML module	#can provide backcover and mo
 	return \@list;
 }
 sub parse_lastfm
-{	my $result=$_[0];
+{	my ($results,$pageurl,$searchcontext)=@_;
+	$searchcontext->{baseurl}||= $pageurl;
 	my @list;
-	while ($result=~m#<a\s+href="/music/[^/]+/\+images/\d+"[^>]+?class="pic".+?<img [^>]+?src="([^"]+)"#gs)
+	while ($results=~m#<a\s+href="/music/[^/]+/\+images/[0-9A-F]+"[^>]+?class="image-list-link"[^<]+<img[^>]+?src="([^"]+)"#gis)
 	{	my $url=my $pre=$1;
-		$url=~s#/\w+/(\d+.jpg)$#/_/$1#; ### /126b/123456.jpg -> /_/123456.jpg
+		$url=~s#/i/u/avatar170s/#/i/u/#;
+		$url.='.jpg';
 		push @list, {url => $url, previewurl =>$pre,};
 	}
 	my $nexturl;
-	$nexturl='http://www.lastfm.com'.$1 if $result=~m#<a href="([^"]+)" class="nextlink">#;
+	$nexturl= $searchcontext->{baseurl}.$1 if $results=~m#<a href="(\?page=\d+)">Next</a>#;
 	return \@list,$nexturl;
 }
 sub parse_sloth
