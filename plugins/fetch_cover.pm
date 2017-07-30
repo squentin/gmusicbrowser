@@ -30,7 +30,7 @@ my %Sites=
  {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large", \&parse_googlei, GOOGLE_USER_AGENT],
 	lastfm => ['last.fm',"http://www.last.fm/music/%a/+images", \&parse_lastfm],
 	#discogs => ['discogs.com', "http://api.discogs.com/search?f=xml&type=artists&q=%a", \&parse_discogs],
-	bing =>['bing',"http://www.bing.com/images/search?q=%s", \&parse_bing],
+	bing =>['bing',"http://www.bing.com/images/async?q=%s", \&parse_bing],
 	yahoo =>['yahoo',"http://images.search.yahoo.com/search/images?p=%s&o=js", \&parse_yahoo],
 	ddg => ["DuckDuckGo","https://duckduckgo.com/?q=%s&iax=1&ia=images", \&parse_ddg],
  },
@@ -318,32 +318,18 @@ sub parse_bing
 	$searchcontext->{baseurl}||= $pageurl;
 	my $seen= $searchcontext->{seen}||= {};
 	my @list;
-	while ($result=~m/<a href="#" ([^>]+)>(?:<img class="img_hid" src2="([^"]+)")?/g)
-	{	my $picdata=$1;
-		my $preview=$2;
-		my %h;
-		$h{$1}=$2 while $picdata=~m/(\w+)="([^"]+)"/g;
-		my $m=$h{m};
-		next unless $m;
-		$m= ::decode_html($m);
-		my $url;
-		$url=$1 if $m=~m/imgurl:"([^"]+)"/;
-		next unless $url;
-		if ($preview)
-		{	$preview= ::decode_html($preview);
-			$preview=~s/w=\d+&h=\d+//; #remove size parameters for the thumbnail to have the largest size
-		}
-		my $desc=$h{t1};
-		if ($desc)
-		{	$desc=Encode::decode('utf8',$desc);
-			$desc=::decode_html($desc);
-		}
-		#warn "$url\n$preview\n$desc\n\n";
+	while ($result=~m/\s+m="([^"]+)"/g)
+	{	my $metadata= ::decode_html(Encode::decode('utf8',$1));
+		#warn $metadata;
+		next unless $metadata=~m/"murl":"([^"]+)"/i;
+		my $url=$1;
+		my $purl= $metadata=~m/"purl":"([^"]+)"/i ? $1 : undef;
+		my $turl= $metadata=~m/"turl":"([^"]+)"/i ? $1 : undef;
 		#if ($seen->{$url}) { warn "result #".(++$searchcontext->{count})." was already found as #".$seen->{$url}."\n" } #DEBUG
 		next if $seen->{$url};
 		$seen->{$url}= ++$searchcontext->{count};
-		push @list, {url => $url, previewurl =>$preview, desc => $desc };
-	#	print "$url\n";
+		push @list, { url=>$url, previewurl=>$turl, referer=>$purl };
+		next;
 	}
 	my $n= ++$searchcontext->{pagecount};
 	my $nexturl= $searchcontext->{baseurl}."&first=".(1+$n*100)."&count=100";
