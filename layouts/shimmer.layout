@@ -123,7 +123,7 @@ KeyBindings	= Escape CloseWindow
 #####################################
 
 {Group discleft}
-title=disc on the left side
+title= _"Disc on the left side"
 head=3
 left=width
 vcollapse=head+title:h+line:h+2
@@ -132,7 +132,7 @@ width:	OptionNumber(default=15,min=10,max=100,step=1)
 line: line(x1=1,y1=1,x2=$_w,y2=1,color='#ccc',width=1)
 
 {Group artistalbum_breadcrumbs}
-title=album and artist breadcrumbs
+title= _"Album and artist breadcrumbs"
 head=title:h
 tail=25
 vcollapse=head
