@@ -37,6 +37,7 @@ my %Sites=
  album =>
  {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large&imgar=ns", \&parse_googlei, GOOGLE_USER_AGENT],
 	googleihi =>[_"google images (hi-res)","http://www.google.com/images?q=%s&imgsz=xlarge|xxlarge&imgar=ns", \&parse_googlei, GOOGLE_USER_AGENT],
+  lastfm => ['last.fm',"http://www.last.fm/music/%a/%l/+images", \&parse_lastfm],
 	yahoo =>['yahoo',"http://images.search.yahoo.com/search/images?p=%s&o=js", \&parse_yahoo],
 	bing =>['bing',"http://www.bing.com/images/async?q=%s&qft=+filterui:aspect-square", \&parse_bing],
 	ddg => ["DuckDuckGo","https://duckduckgo.com/?q=%s&iax=1&ia=images", \&parse_ddg],
@@ -269,6 +270,20 @@ sub parse_freecovers #FIXME could use a XML module	#can provide backcover and mo
 	return \@list;
 }
 sub parse_lastfm
+{	my ($results,$pageurl,$searchcontext)=@_;
+	$searchcontext->{baseurl}||= $pageurl;
+	my @list;
+	while ($results=~m#<a\s+href="/music/(?:[^/]+/)+\+images/[0-9A-F]+"[^>]+?class="image-list-link"[^<]+<img[^>]+?src="([^"]+)"#gis)
+	{	my $url=my $pre=$1;
+		$url=~s#/i/u/avatar170s/#/i/u/#;
+		$url.='.jpg';
+		push @list, {url => $url, previewurl =>$pre,};
+	}
+	my $nexturl;
+	$nexturl= $searchcontext->{baseurl}.$1 if $results=~m#<a href="(\?page=\d+)">Next</a>#;
+	return \@list,$nexturl;
+}
+sub parse_lastfm_artist
 {	my ($results,$pageurl,$searchcontext)=@_;
 	$searchcontext->{baseurl}||= $pageurl;
 	my @list;
