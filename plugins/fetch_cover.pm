@@ -283,20 +283,6 @@ sub parse_lastfm
 	$nexturl= $searchcontext->{baseurl}.$1 if $results=~m#<a href="(\?page=\d+)">Next</a>#;
 	return \@list,$nexturl;
 }
-sub parse_lastfm_artist
-{	my ($results,$pageurl,$searchcontext)=@_;
-	$searchcontext->{baseurl}||= $pageurl;
-	my @list;
-	while ($results=~m#<a\s+href="/music/[^/]+/\+images/[0-9A-F]+"[^>]+?class="image-list-link"[^<]+<img[^>]+?src="([^"]+)"#gis)
-	{	my $url=my $pre=$1;
-		$url=~s#/i/u/avatar170s/#/i/u/#;
-		$url.='.jpg';
-		push @list, {url => $url, previewurl =>$pre,};
-	}
-	my $nexturl;
-	$nexturl= $searchcontext->{baseurl}.$1 if $results=~m#<a href="(\?page=\d+)">Next</a>#;
-	return \@list,$nexturl;
-}
 sub parse_sloth
 {	my $result=$_[0];
 	my @list;
