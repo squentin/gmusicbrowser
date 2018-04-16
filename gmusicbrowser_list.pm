@@ -1406,7 +1406,7 @@ sub get_column_number
 sub INIT_INSTANCE {
 	my $self = $_[0];
 	# int to check whether an iter belongs to our model
-	$self->{stamp} = $self+0;#sprintf '%d', rand (1<<31);
+	$self->{stamp}= sprintf '%d',rand(1<<31); #$self & 2**32-1; #needs to be 32 bits, as 64 bits numbers make it crash
 }
 #sub FINALIZE_INSTANCE
 #{	#my $self = $_[0];
