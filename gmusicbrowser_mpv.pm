@@ -24,6 +24,7 @@ my $preparednext;
 my ($File_is_current,$Called_from_eof,$gmb_file,$mpv_file,$Last_messages);
 my $initseek;
 my $watcher;
+my $version;
 
 my $SOCK = $::HomeDir."gmb_mpv_sock";
 
@@ -36,21 +37,32 @@ sub init
 	{	$mpv=undef;
 	}
 	$mpv ||= ::first { -x $_ } map $_.::SLASH.'mpv',  split /:/, $ENV{PATH};
-
-	$mpv=undef unless $mpv && check_version();
+	
+	warn "mpv: found mpv version $version\n" if $version && $::debug;
+	if (!check_version(0, 7))
+	{	$mpv=undef;
+		warn "mpv version earlier than 0.7 are not supported -> mpv backend disabled\n"
+	}
 	return unless $mpv;
 	return bless {RG=>1,EQ=>1},__PACKAGE__;
 }
 
-sub check_version
-{	return unless $mpv;
+sub get_version
+{	return $version if $version;
+	return unless $mpv;
 	my $output= qx/$mpv -V/;
-	my ($ok,$version);
-	if ($output=~m/mpv\s*(\d+)\.(\d+)(\S+)?/i) { $ok= $1>0 || $2>=7; $version= "$1.$2".($3||"") } #requires version 0.7 or later
-	elsif ($output=~m/mpv\s*(git-[[:xdigit:]]+)/i) { $ok=1; $version=$1; } #assume git version is ok
+    my ($v) = ($output =~ /mpv\s*(\S+)\s.*/);
+	return $v;
+}
+
+sub check_version
+{	my ($major,$minor)=@_;
+	my $version=get_version();
+	my $ok;
+	return unless $version;
+	if ($version=~m/^(\d+)\.(\d+)(\S+)?$/i) { $ok= $1>$major || $2>=$minor; }
+	elsif ($version=~m/^git-[[:xdigit:]]+$/i) { $ok=1; } #assume git version is ok
 	else { warn "mpv: error looking up mpv version\n"; }
-	warn "mpv: found mpv version $version\n" if $version && ($::debug || !$ok);
-	if (!$ok) { warn "mpv version earlier than 0.7 are not supported -> mpv backend disabled\n" }
 	return $ok;
 }
 
@@ -82,8 +94,15 @@ sub launch_mpv
 {	$preparednext=undef;
 	@cmd_and_args=($mpv, '--input-unix-socket='.$SOCK, qw/--idle --no-video --no-input-terminal --really-quiet --gapless-audio=weak --softvol-max=100 --mute=no --no-sub-auto/);
 	push @cmd_and_args,"--volume=".convertvolume($::Volume);
-	push @cmd_and_args,"--af-add=".get_RG_opts() if $::Options{use_replaygain};
-	push @cmd_and_args,"--af-add=\@EQ:equalizer=$::Options{equalizer}" if $::Options{use_equalizer};
+	if ($::Options{use_replaygain})
+	{	if(check_version(0,28))
+		{
+			push @cmd_and_args,"--replaygain=".get_RG_mode();
+			push @cmd_and_args,"--replaygain-preamp=".get_RG_preamp();
+			push @cmd_and_args,"--replaygain-clip=".$::Options{rg_limiter} ? 'yes' : 'no';
+		} else { push @cmd_and_args,"--af-add=".get_RG_string(); }
+	}
+	push @cmd_and_args,"--af-add=".get_EQ_string($::Options{equalizer}) if $::Options{use_equalizer};
 	push @cmd_and_args,split / /,$::Options{mpvoptions} if $::Options{mpvoptions};
 	warn "@cmd_and_args\n" if $::debug;
 	$ChildPID=fork;
@@ -288,9 +307,24 @@ sub convertvolume
 	return $vol;
 }
 
+sub get_EQ_string
+{	my $val=shift;
+	if (check_version(0, 28))
+	{	my @freqs = (29, 59, 119, 237, 474, 947, 1900, 3800, 7500, 15000);
+		my @gains = split /:/, $val;
+		my $fireq_string = "gain_entry=";
+		my @entries;
+		for my $i (0 .. $#freqs)
+		{	push @entries, "entry(".$freqs[$i].",".$gains[$i].")";
+		}
+		return "\@EQ:lavfi=[firequalizer=gain_entry='".(join ';', @entries)."']";
+	}
+	else { return '@EQ:equalizer='.$val; }
+}
+
 sub set_equalizer
 {	my (undef,$val)=@_;
-	send_cmd('af','add','@EQ:equalizer='.$val);
+	send_cmd('af', 'add', get_EQ_string($val));
 }
 
 sub EQ_Get_Range
@@ -304,21 +338,39 @@ sub EQ_Get_Hz
 	return $bands[$i];
 }
 
-sub get_RG_opts
-{	my $enable = $::Options{use_replaygain} ? 'yes' : 'no';
-	my $mode = $::Options{rg_albummode} ? 'replaygain-album' : 'replaygain-track';
-	my $clip = $::Options{rg_limiter} ? 'yes' : 'no';
-	my $preamp = $::Options{rg_preamp};
+sub get_RG_preamp
+{	my $preamp = $::Options{rg_preamp};
 	#FIXME: enforce limits in interface
 	$preamp = -15 if $::Options{rg_preamp}<-15;
 	$preamp = 15 if $::Options{rg_preamp}>15;
+	return $preamp;
+}
+
+sub get_RG_mode
+{	return $::Options{rg_albummode} ? 'album' : 'track';
+}
+
+sub get_RG_string
+{	my $enable = $::Options{use_replaygain} ? 'yes' : 'no';
+	my $mode = $::Options{rg_albummode} ? 'replaygain-album' : 'replaygain-track';
+	my $clip = $::Options{rg_limiter} ? 'yes' : 'no';
+	my $preamp = get_RG_preamp();
 	my $RGstring = "\@RG:volume=0:$mode=$enable:replaygain-clip=$clip:replaygain-preamp=$preamp";
 	return $RGstring;
 }
 
 sub RG_set_options
-{	my $RGstring = get_RG_opts();
-	send_cmd('af', 'add', $RGstring);
+{	if (check_version(0, 28))
+	{
+		if (!$::Options{use_replaygain}) { send_cmd('set', 'replaygain', 'no'); return; }
+		send_cmd('set', 'replaygain', get_RG_mode());
+		send_cmd('set', 'replaygain-preamp', get_RG_preamp());
+		send_cmd('set', 'replaygain-clip', $::Options{rg_limiter} ? 'yes' : 'no');
+	} else
+	{
+		my $RGstring = get_RG_string();
+		send_cmd('af', 'add', $RGstring);
+	}
 }
 
 1;
