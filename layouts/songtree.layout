@@ -59,7 +59,7 @@ title = _"Song"
 hreq=text:h
 width=200
 sort= title:i
-text : text(markup='<b>'.pesc($title).'</b>'.pesc($version_or_empty).'\n<small><i>'.pesc($artist).'</i> - '.pesc($album).'</small>',pad=2)
+text : text(markup='<b>'.pesc($title_or_file).'</b>'.pesc($version_or_empty).'\n<small><i>'.pesc($artist).'</i> - '.pesc($album).'</small>',pad=2)
 
 {Column titleandicon}
 title = _"Title & icon"
