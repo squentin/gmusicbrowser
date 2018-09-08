@@ -1697,6 +1697,8 @@ my @MenuSubGroup=
 	},
 	{ label => _"show histogram background",code => sub { $_[0]{self}->SetOption; },  toggleoption => 'self/histogram', mode => 'L',
 	},
+	{ label => _"ignore the 'none' row for histogram",code => sub { $_[0]{self}->SetOption; },  toggleoption => 'self/histogram_ignore_none',  mode => 'L', sensitive=>sub{ $_[0]{self}{histogram} }, test=>sub { Songs::FilterListProp($_[0]{field},'multi'), },
+	},
 );
 
 our @cMenu=
@@ -2136,6 +2138,7 @@ our %defaults=
 	depth	=> 0,
 	noall	=> 0,
 	histogram=>0,
+	histogram_ignore_none=>0,
 	mmarkup => 0,
 	mpicsize=> 64,
 	cloud_min=> 5,
@@ -2148,7 +2151,7 @@ sub new
 	my $self = bless Gtk2::VBox->new, $class;
 
 	$opt= { %defaults, %$opt };
-	$self->{$_} = $opt->{$_} for qw/mode noall histogram depth mmarkup mpicsize cloud_min cloud_max cloud_stat no_typeahead rules_hint hscrollbar/;
+	$self->{$_} = $opt->{$_} for qw/mode noall histogram histogram_ignore_none depth mmarkup mpicsize cloud_min cloud_max cloud_stat no_typeahead rules_hint hscrollbar/;
 	$self->{$_} = [ split /\|/, $opt->{$_} ] for qw/sort type lmarkup lpicsize/;
 
 	$self->{type}[0] ||= $field.'.'.(Songs::FilterListProp($field,'type')||''); $self->{type}[0]=~s/\.$//;	#FIXME
@@ -2181,7 +2184,7 @@ sub SaveOptions
 {	my $self=$_[0];
 	my %opt;
 	$opt{$_} = join '|', @{$self->{$_}} for qw/type lmarkup lpicsize sort/;
-	$opt{$_} = $self->{$_} for qw/mode noall histogram depth mmarkup mpicsize cloud_min cloud_max cloud_stat/;
+	$opt{$_} = $self->{$_} for qw/mode noall histogram histogram_ignore_none depth mmarkup mpicsize cloud_min cloud_max cloud_stat/;
 	for (keys %opt) { delete $opt{$_} if $opt{$_} eq $defaults{$_}; }	#remove options equal to default value
 	delete $opt{type} if $opt{type} eq $self->{pid};			#remove unneeded type options
 	return %opt, $self->{isearchbox}->SaveOptions;
@@ -2533,8 +2536,12 @@ sub Fill
 		$store->clear;	#FIXME keep selection ?   FIXME at least when opt is true (ie lmarkup or lpicsize changed)
 		my ($list,$href)=$self->get_fill_data($opt);
 		$renderer->set('all_count', $self->{all_count});
-		my $max= $self->{histogram} ? ::max(values %$href) : 0;
-		$renderer->set( hash=>$href, max=> $max );
+		my $max=0;
+		if ($self->{histogram})
+		{	$max= ::max( $self->{histogram_ignore_none} ? (map $href->{$_}, grep $_!=0, keys %$href)
+								    : values %$href);
+		}
+		$renderer->set( hash=>$href, max=> $max, ignore_none=>$self->{histogram_ignore_none} );
 		$self->{array_offset}= $self->{noall} ? 0 : 1;	#row number difference between store and $list, needed by interactive search
 		$store->set($store->prepend(undef),0,$_) for reverse @$list;	# prepend because filling is a bit faster in reverse
 		$store->set($store->prepend(undef),0,GID_ALL) unless $self->{noall};
@@ -4319,6 +4326,7 @@ properties => [ Glib::ParamSpec->long('gid', 'gid', 'group id',		-2**31+1, 2**31
 		Glib::ParamSpec->scalar('prop', 'prop', '[[field],[markup],[picsize]]',		[qw/readable writable/]),
 		Glib::ParamSpec->scalar('hash', 'hash', 'gid to song count',			[qw/readable writable/]),
 		Glib::ParamSpec->int('depth', 'depth', 'depth',			0, 20, 0,	[qw/readable writable/]),
+		Glib::ParamSpec->boolean('ignore_none','ignore none','ignore the none row in histogram',0, [qw/readable writable/]),
 		];
 use constant { PAD => 2, XPAD => 2, YPAD => 2,		P_FIELD => 0, P_MARKUP =>1, P_PSIZE=>2, P_ICON =>3, P_HORIZON=>4 };
 
@@ -4357,7 +4365,7 @@ sub RENDER
 {	my ($cell, $window, $widget, $background_area, $cell_area, $expose_area, $flags) = @_;
 	my $x=$cell_area->x+XPAD;
 	my $y=$cell_area->y+YPAD;
-	my ($prop,$gid,$depth,$hash,$max)=$cell->get(qw/prop gid depth hash max/);
+	my ($prop,$gid,$depth,$hash,$max,$ignore_none)=$cell->get(qw/prop gid depth hash max ignore_none/);
 	my $iconfield= $prop->[P_ICON][$depth];
 	my $psize= $iconfield ? (Gtk2::IconSize->lookup('menu'))[0] : $prop->[P_PSIZE][$depth];
 	my $layout=$cell->makelayout($widget);
@@ -4393,7 +4401,7 @@ sub RENDER
 		}
 	}
 
-	if ($max && !$depth && !($flags & 'selected') && $gid!=FilterList::GID_ALL)	#draw histogram only works for depth==0
+	if ($max && !$depth && !($flags & 'selected') && $gid!=FilterList::GID_ALL && !($gid==0 && $ignore_none))	#draw histogram only works for depth==0
 	{	# if parent widget is a scrolledwindow, maxwidth use the visible width instead of the total width of the treeview
 		my $maxwidth= $widget->parent->isa('Gtk2::ScrolledWindow') ? $widget->parent->get_hadjustment->page_size : $cell_area->width;
 		$maxwidth-= 3*XPAD+$psize;
