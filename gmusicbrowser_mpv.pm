@@ -172,15 +172,16 @@ sub _remotemsg
 		elsif (my $event=$msg->{event})
 		{	if ($event eq 'property-change' && $msg->{name} eq 'path') { $mpv_file= $msg->{data}||""; } # doesn't happen when previous file is same as new file
 			elsif ($event eq 'start-file') { $File_is_current=0 if $File_is_current<1; }
-			elsif ($event eq 'tracks-changed' && $File_is_current>=0)
+			elsif ($event eq 'file-loaded')
 			{	$File_is_current= $mpv_file eq $gmb_file;
+				SkipTo(undef,$initseek) if $initseek;
+				$initseek=undef;
 				last if $eof; #only do eof now to catch log-message that are only sent after end-file and start-file
 			}
 			elsif ($File_is_current<1) {} #ignore all other events unless file is current
 			elsif ($event eq 'property-change' && $msg->{name} eq 'playback-time' && defined $msg->{data})
 			 { ::UpdateTime($msg->{data}); }
 			elsif ($event eq 'end-file')	{ $eof=1; } # ignore EOF signal on user-initiated track change as $File_is_current is not true in those cases
-			elsif ($event eq 'file-loaded')	{ SkipTo(undef,$initseek) if $initseek; $initseek=undef; }
 			elsif ($event eq 'log-message')
 			{	my $error= $msg->{text};
 				chomp $error;
