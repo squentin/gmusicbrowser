@@ -21,7 +21,7 @@ my (@cmd_and_args,$ChildPID,$WatchTag,$WatchTag2,@pidToKill,$Kill9);
 my $sockfh;
 my (%supported,$mpv);
 my $preparednext;
-my ($File_is_current,$Called_from_eof,$gmb_file,$mpv_file,$Last_messages);
+my ($Called_from_eof,$gmb_file,$mpv_file,$Last_messages);
 my $initseek;
 my $watcher;
 my $version;
@@ -142,11 +142,8 @@ sub Play
 	$gmb_file=$file;
 	warn "playing $file (pid=$ChildPID)\n" if $::Verbose;
 	# gapless - check for non-user-initiated EOF
-	if ($Called_from_eof && $preparednext && $preparednext eq $gmb_file && $gmb_file eq $mpv_file)
-	{	$File_is_current=1;
-		return;
-	}
-	$File_is_current=-1;
+	return if ($Called_from_eof && $preparednext && $preparednext eq $gmb_file);
+	$mpv_file = "";
 	$initseek = $sec;
 	send_cmd('loadfile',$file);
 	send_cmd('playlist_clear');
@@ -171,17 +168,15 @@ sub _remotemsg
 		}
 		elsif (my $event=$msg->{event})
 		{	if ($event eq 'property-change' && $msg->{name} eq 'path') { $mpv_file= $msg->{data}||""; } # doesn't happen when previous file is same as new file
-			elsif ($event eq 'start-file') { $File_is_current=0 if $File_is_current<1; }
 			elsif ($event eq 'file-loaded')
-			{	$File_is_current= $mpv_file eq $gmb_file;
-				SkipTo(undef,$initseek) if $initseek;
+			{	SkipTo(undef,$initseek) if $initseek;
 				$initseek=undef;
 				last if $eof; #only do eof now to catch log-message that are only sent after end-file and start-file
 			}
-			elsif ($File_is_current<1) {} #ignore all other events unless file is current
+			elsif ($mpv_file ne $gmb_file) {} #ignore all other events unless file is current
 			elsif ($event eq 'property-change' && $msg->{name} eq 'playback-time' && defined $msg->{data})
 			 { ::UpdateTime($msg->{data}); }
-			elsif ($event eq 'end-file')	{ $eof=1; } # ignore EOF signal on user-initiated track change as $File_is_current is not true in those cases
+			elsif ($event eq 'end-file')	{ $eof=1; } # ignore EOF signal on user-initiated track change as $mpv_file and $gmb_file aren't equal in those cases
 			elsif ($event eq 'log-message')
 			{	my $error= $msg->{text};
 				chomp $error;
