@@ -25,6 +25,7 @@ my ($Called_from_eof,$gmb_file,$mpv_file,$Last_messages);
 my $initseek;
 my $watcher;
 my $version;
+my @cmd_queue;
 
 my $SOCK = $::HomeDir."gmb_mpv_sock";
 
@@ -90,6 +91,18 @@ sub send_cmd
 	warn "MPVCMD: $cmd\n" if $::debug;
 }
 
+sub cmd_push
+{	my ($callback,@command)=@_; 
+	push @cmd_queue, $callback;
+	send_cmd(@command);
+}
+
+sub cmd_shift
+{	my $data=shift;
+	my $callback = shift @cmd_queue;
+	if ($callback) { $callback->($data); }
+}
+
 sub launch_mpv
 {	$preparednext=undef;
 	@cmd_and_args=($mpv, '--input-unix-socket='.$SOCK, qw/--idle --no-video --no-input-terminal --really-quiet --gapless-audio=weak --softvol-max=100 --mute=no --no-sub-auto/);
@@ -128,9 +141,8 @@ sub launch_mpv
 	$WatchTag2= Glib::IO->add_watch(fileno($sockfh),'in',\&_remotemsg);
 	$watcher = {};
 	::Watch($watcher,'NextSongs', \&append_next);
-	send_cmd('observe_property', 1, 'playback-time');
-	send_cmd('observe_property', 1, 'path');
-	send_cmd('request_log_messages', 'error');
+	cmd_push(undef, ('observe_property', 1, 'playback-time'));
+	cmd_push(undef, ('request_log_messages', 'error'));
 	return 1;
 }
 
@@ -145,15 +157,15 @@ sub Play
 	return if ($Called_from_eof && $preparednext && $preparednext eq $gmb_file);
 	$mpv_file = "";
 	$initseek = $sec;
-	send_cmd('loadfile',$file);
-	send_cmd('playlist_clear');
+	cmd_push(undef, ('loadfile', $file));
+	cmd_push(undef, 'playlist_clear');
 }
 
 sub append_next
 {	$preparednext=undef;
-	send_cmd('playlist_clear');
+	cmd_push(undef, 'playlist_clear');
 	if ($::NextFileToPlay && $::NextFileToPlay ne $gmb_file)
-	{	send_cmd('loadfile',$::NextFileToPlay,'append');
+	{	cmd_push(undef, ('loadfile', $::NextFileToPlay, 'append'));
 		$preparednext= $::NextFileToPlay;
 	}
 }
@@ -165,12 +177,14 @@ sub _remotemsg
 		warn "mpv raw-output: $line" if $::debug;
 		if (my $error=$msg->{error})
 		{	warn "mpv error: $error" unless $error eq 'success';
+			cmd_shift($msg->{data});
 		}
 		elsif (my $event=$msg->{event})
 		{	if ($event eq 'property-change' && $msg->{name} eq 'path') { $mpv_file= $msg->{data}||""; } # doesn't happen when previous file is same as new file
 			elsif ($event eq 'file-loaded')
 			{	SkipTo(undef,$initseek) if $initseek;
 				$initseek=undef;
+				cmd_push(sub { $mpv_file=shift; }, ('get_property', 'path'));
 				last if $eof; #only do eof now to catch log-message that are only sent after end-file and start-file
 			}
 			elsif ($mpv_file ne $gmb_file) {} #ignore all other events unless file is current
@@ -215,17 +229,17 @@ sub _eos_cb
 }
 
 sub Pause
-{	send_cmd('set', 'pause', 'yes');
+{	cmd_push(undef, ('set', 'pause', 'yes'));
 }
 sub Resume
-{	send_cmd('set', 'pause', 'no');
+{	cmd_push(undef, ('set', 'pause', 'no'));
 }
 
 sub SkipTo
 {	::setlocale(::LC_NUMERIC, 'C');
 	my $sec="$_[1]";
 	::setlocale(::LC_NUMERIC, '');
-	send_cmd('seek', $sec, 'absolute');
+	cmd_push(undef, ('seek', $sec, 'absolute'));
 }
 
 
@@ -236,7 +250,7 @@ sub Stop
 		$WatchTag=$WatchTag2=undef;
 	}
 	if ($ChildPID)
-	{	send_cmd('quit');
+	{	cmd_push(undef, 'quit');
 		Glib::Timeout->add( 100,\&_Kill_timeout ) unless @pidToKill;
 		$Kill9=0;	#_Kill_timeout will first try INT, then KILL
 		push @pidToKill,$ChildPID;
@@ -251,6 +265,10 @@ sub Stop
 	if ($watcher)
 	{	::UnWatch($watcher,'NextSongs');
 		undef $watcher;
+	}
+	if (@cmd_queue)
+	{
+		undef @cmd_queue
 	}
 }
 sub _Kill_timeout	#make sure old children are dead
@@ -287,7 +305,7 @@ sub SetVolume
 	$::Volume=0   if $::Volume<0;
 	$::Volume=100 if $::Volume>100;
 	my $vol= convertvolume($::Volume);
-	send_cmd('set', 'volume', $vol);
+	cmd_push(undef, ('set', 'volume', $vol));
 	::HasChanged('Vol');
 	$::Options{Volume}=$::Volume;
 	$::Options{Volume_mute}=$::Mute;
@@ -320,7 +338,7 @@ sub get_EQ_string
 
 sub set_equalizer
 {	my (undef,$val)=@_;
-	send_cmd('af', 'add', get_EQ_string($val));
+	cmd_push(undef, ('af', 'add', get_EQ_string($val)));
 }
 
 sub EQ_Get_Range
@@ -358,14 +376,14 @@ sub get_RG_string
 sub RG_set_options
 {	if (check_version(0, 28))
 	{
-		if (!$::Options{use_replaygain}) { send_cmd('set', 'replaygain', 'no'); return; }
-		send_cmd('set', 'replaygain', get_RG_mode());
-		send_cmd('set', 'replaygain-preamp', get_RG_preamp());
-		send_cmd('set', 'replaygain-clip', $::Options{rg_limiter} ? 'yes' : 'no');
+		if (!$::Options{use_replaygain}) { cmd_push(undef, ('set', 'replaygain', 'no')); return; }
+		cmd_push(undef, ('set', 'replaygain', get_RG_mode()));
+		cmd_push(undef, ('set', 'replaygain-preamp', get_RG_preamp()));
+		cmd_push(undef, ('set', 'replaygain-clip', $::Options{rg_limiter} ? 'yes' : 'no'));
 	} else
 	{
 		my $RGstring = get_RG_string();
-		send_cmd('af', 'add', $RGstring);
+		cmd_push(undef, ('af', 'add', $RGstring));
 	}
 }
 
