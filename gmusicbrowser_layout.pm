@@ -4163,6 +4163,8 @@ our @optionsubmenu=
 
 	{ label=>_"Scroll to zoom",	mode=>'VP',	toggleoption=> 'view/scroll_zoom', },
 
+	{ label=>_"Reset view position when file changes",	mode=>'V', 	toggleoption=> 'self/reset_offset_on_file_change', },
+
 	{ label=>_"Reset zoom",		mode=>'V',	submenu_ordered_hash => 1,  check => sub {$_[0]{self}{reset_zoom_on}},
 	  submenu=> [ _"when file changes"=>'file', _"when folder changes"=>'folder', _"never"=>'never'],
 	  code => sub { $_[0]{self}{reset_zoom_on}=$_[1] },
@@ -4749,6 +4751,7 @@ sub update_file
 	delete $::ToDo{'8_ChangePicture'.$self};
 	if (!$file || $file ne $old) #file changed
 	{	$self->{view}->reset_zoom if $self->{reset_zoom_on} eq 'file';
+		$self->{view}->reset_offset if $self->{reset_offset_on_file_change};
 		delete $self->{select_drop};
 	}
 	my $pixbuf= $file && GMB::Picture::pixbuf($file,undef,undef,'anim_ok');	#disable cache ?
@@ -4889,6 +4892,10 @@ sub reset_zoom
 {	my $self=shift;
 	$self->{pixbuf}=undef; #force refresh
 	$self->{fit}=1;
+}
+sub reset_offset
+{	my $self=shift;
+	$self->{offsetx}=$self->{offsety}=0;
 }
 
 sub expose_cb
