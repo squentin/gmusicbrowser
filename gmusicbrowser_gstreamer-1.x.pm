@@ -41,6 +41,7 @@ BEGIN
 		oga => 'vorbisdec',			flac=> 'flacdec',
 		ape => 'avdec_ape ffdec_ape',		wv  => 'wavpackdec',
 		mpc => 'musepackdec avdec_mpc8',	m4a => 'faad',
+		opus => 'opusdec',
   );
 
   my $reg= GStreamer1::Registry::get();

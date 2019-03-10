@@ -48,6 +48,7 @@ sub supported_formats
 		elsif	(m/^ffwavpack.*working/){$supported{wv}=undef}
 		elsif	(m/^ffape.*working/)	{$supported{ape}=undef}
 		elsif	(m/^faad.*working/)	{$supported{m4a}=undef}
+		elsif	(m/^ffopus.*working/)	{$supported{opus}=undef}
 	 }
 	}
 	return keys %supported;

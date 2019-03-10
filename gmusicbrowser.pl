@@ -233,7 +233,7 @@ sub barename #filename without extension
 
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
 INIT {%Alias_ext=(mp2=>'mp3', ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
-our @ScanExt= qw/mp3 mp2 ogg oga flac mpc ape wv m4a m4b/;
+our @ScanExt= qw/mp3 mp2 ogg oga opus flac mpc ape wv m4a m4b/;
 
 our ($Verbose,$debug);
 our %CmdLine;
