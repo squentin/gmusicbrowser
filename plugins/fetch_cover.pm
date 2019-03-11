@@ -367,20 +367,20 @@ sub parse_ddg
 {	my ($result,$pageurl,$searchcontext)=@_;
 	unless ($searchcontext->{vqd})
 	{	#request to i.js don't work without a vqd number, get it from the first page
-		my $vqd= $result=~m/vqd=(\d+)/ ? $1 : 0;
+		my $vqd= $result=~m/vqd=([0-9-]+)/ ? $1 : 0;
 		my $q= $result=~m/\?q=([^&"]+)[&"]/ ? $1 : 0;
 		my $url= $vqd && $q ? "https://duckduckgo.com/i.js?o=json&q=$q&vqd=$vqd&p=1" : undef;
 		$searchcontext->{vqd}=$vqd;
-		return [],$url,!!$url; #third return paremeter true means get next url even though no results in this query
+		return [],$url,!!$url; #third return parameter true means get next url even though no results in this query
 	}
 	my (@list,$nexturl);
 	# for some reason next pages return some previous results, use $searchcontext->{seen} to ignore them
 	my $seen= $searchcontext->{seen}||= {};
 	$nexturl= 'https://duckduckgo.com/'.$1 if $result=~m#"next"\s*:\s*"(i.js[^"]+)#;
-	for my $res (split /}\s*,\s*{/,$result)
+	for my $res (split /}\s*,[^{]*{/,$result)
 	{	my @kv= $res=~m#("[^"]+"|[^:]+)\s*:\s*("[^"]*"|[^,}]*)\s*,?#g;
 		s/^"([^"]*)"$/$1/ for @kv;
-		my %h= @kv;
+		my %h= (title=>'', @kv);
 		next unless $h{image};
 		$h{title}=~s#\\u(....)#chr(hex($1))#eg;
 		my $url= $h{image};
