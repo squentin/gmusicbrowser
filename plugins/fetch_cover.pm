@@ -293,11 +293,11 @@ sub parse_sloth
 	return \@list,$nexturl;
 }
 sub parse_googlei
-{	my ($results,$pageurl,$searchcontext)=@_;
+{	my ($result,$pageurl,$searchcontext)=@_;
 	$searchcontext->{baseurl}||= $pageurl;
 	$searchcontext->{pagecount}++;
 	my @list;
-	for my $res (split /<span class="rg_ilmn[^"]*"[^>]*>/, $results)
+	for my $res (split /<div class="rg_meta[^"]*"[^>]*>/, $result)
 	{	$res=~s/(?<!\\)\\"/\\u0022/g; #escape \" to make extraction simpler, not perfect
 		next unless $res=~m#"ou":"(http[^"]+)"#i;
 		my $url=$1;
