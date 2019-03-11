@@ -22,6 +22,7 @@ use constant
 	RES_PER_LINE => 6,
 	PREVIEW_SIZE => 100,
 	GOOGLE_USER_AGENT => 'Mozilla/5.0 Gecko/20100101 Firefox/26.0', #google checks to see if the browser can handle the "standard" image search version, instead of the "basic" version. And as of the end of 2013 the "basic" version doesn't include direct url of the images, so we need to use the "standard" version
+	BING_USER_AGENT => ' ', #for some reason bing returns weird results with the default gmb user agent (Mozilla/5.0)
 };
 use constant RES_PER_PAGE => RES_PER_LINE*RES_LINES;
 
@@ -30,7 +31,7 @@ my %Sites=
  {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large", \&parse_googlei, GOOGLE_USER_AGENT],
 	lastfm => ['last.fm',"http://www.last.fm/music/%a/+images", \&parse_lastfm],
 	#discogs => ['discogs.com', "http://api.discogs.com/search?f=xml&type=artists&q=%a", \&parse_discogs],
-	bing =>['bing',"http://www.bing.com/images/async?q=%s", \&parse_bing],
+	bing =>['bing',"http://www.bing.com/images/async?q=%s", \&parse_bing, BING_USER_AGENT],
 	yahoo =>['yahoo',"http://images.search.yahoo.com/search/images?p=%s&o=js", \&parse_yahoo],
 	ddg => ["DuckDuckGo","https://duckduckgo.com/?q=%s&iax=1&ia=images", \&parse_ddg],
  },
@@ -38,7 +39,7 @@ my %Sites=
  {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large&imgar=ns", \&parse_googlei, GOOGLE_USER_AGENT],
 	googleihi =>[_"google images (hi-res)","http://www.google.com/images?q=%s&imgsz=xlarge|xxlarge&imgar=ns", \&parse_googlei, GOOGLE_USER_AGENT],
 	yahoo =>['yahoo',"http://images.search.yahoo.com/search/images?p=%s&o=js", \&parse_yahoo],
-	bing =>['bing',"http://www.bing.com/images/async?q=%s&qft=+filterui:aspect-square", \&parse_bing],
+	bing =>['bing',"http://www.bing.com/images/async?q=%s&qft=+filterui:aspect-square", \&parse_bing, BING_USER_AGENT],
 	ddg => ["DuckDuckGo","https://duckduckgo.com/?q=%s&iax=1&ia=images", \&parse_ddg],
 	slothradio => ['slothradio', "http://www.slothradio.com/covers/?artist=%a&album=%l", \&parse_sloth],
 	#freecovers => ['freecovers.net', "http://www.freecovers.net/api/search/%s", \&parse_freecovers], #could add /Music+CD but then we'd lose /Soundtrack #API doesn't work anymore
