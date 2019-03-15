@@ -83,18 +83,16 @@ sub supported_formats
 	return keys %supported;
 }
 
-sub send_cmd
+sub cmd_push
 {	return unless $sockfh;
 	my @args=@_;
+	my $callback;
+	# If the first argument is a subroutine, use it as callback
+	if (ref($args[0]) eq 'CODE') { $callback = shift @args; }
+	push @cmd_queue, $callback;
 	my $cmd = JSON::PP->new->encode({command => \@args});
 	print $sockfh "$cmd\n";
 	warn "MPVCMD: $cmd\n" if $::debug;
-}
-
-sub cmd_push
-{	my ($callback,@command)=@_; 
-	push @cmd_queue, $callback;
-	send_cmd(@command);
 }
 
 sub cmd_shift
@@ -141,8 +139,8 @@ sub launch_mpv
 	$WatchTag2= Glib::IO->add_watch(fileno($sockfh),'in',\&_remotemsg);
 	$watcher = {};
 	::Watch($watcher,'NextSongs', \&append_next);
-	cmd_push(undef, ('observe_property', 1, 'playback-time'));
-	cmd_push(undef, ('request_log_messages', 'error'));
+	cmd_push('observe_property', 1, 'playback-time');
+	cmd_push('request_log_messages', 'error');
 	return 1;
 }
 
@@ -157,15 +155,15 @@ sub Play
 	return if ($Called_from_eof && $preparednext && $preparednext eq $gmb_file);
 	$mpv_file = "";
 	$initseek = $sec;
-	cmd_push(undef, ('loadfile', $file));
-	cmd_push(undef, 'playlist_clear');
+	cmd_push('loadfile', $file);
+	cmd_push('playlist_clear');
 }
 
 sub append_next
 {	$preparednext=undef;
-	cmd_push(undef, 'playlist_clear');
+	cmd_push('playlist_clear');
 	if ($::NextFileToPlay && $::NextFileToPlay ne $gmb_file)
-	{	cmd_push(undef, ('loadfile', $::NextFileToPlay, 'append'));
+	{	cmd_push('loadfile', $::NextFileToPlay, 'append');
 		$preparednext= $::NextFileToPlay;
 	}
 }
@@ -229,17 +227,17 @@ sub _eos_cb
 }
 
 sub Pause
-{	cmd_push(undef, ('set', 'pause', 'yes'));
+{	cmd_push('set', 'pause', 'yes');
 }
 sub Resume
-{	cmd_push(undef, ('set', 'pause', 'no'));
+{	cmd_push('set', 'pause', 'no');
 }
 
 sub SkipTo
 {	::setlocale(::LC_NUMERIC, 'C');
 	my $sec="$_[1]";
 	::setlocale(::LC_NUMERIC, '');
-	cmd_push(undef, ('seek', $sec, 'absolute'));
+	cmd_push('seek', $sec, 'absolute');
 }
 
 
@@ -250,7 +248,7 @@ sub Stop
 		$WatchTag=$WatchTag2=undef;
 	}
 	if ($ChildPID)
-	{	cmd_push(undef, 'quit');
+	{	cmd_push('quit');
 		Glib::Timeout->add( 100,\&_Kill_timeout ) unless @pidToKill;
 		$Kill9=0;	#_Kill_timeout will first try INT, then KILL
 		push @pidToKill,$ChildPID;
@@ -305,7 +303,7 @@ sub SetVolume
 	$::Volume=0   if $::Volume<0;
 	$::Volume=100 if $::Volume>100;
 	my $vol= convertvolume($::Volume);
-	cmd_push(undef, ('set', 'volume', $vol));
+	cmd_push('set', 'volume', $vol);
 	::HasChanged('Vol');
 	$::Options{Volume}=$::Volume;
 	$::Options{Volume_mute}=$::Mute;
@@ -338,7 +336,7 @@ sub get_EQ_string
 
 sub set_equalizer
 {	my (undef,$val)=@_;
-	cmd_push(undef, ('af', 'add', get_EQ_string($val)));
+	cmd_push('af', 'add', get_EQ_string($val));
 }
 
 sub EQ_Get_Range
@@ -376,14 +374,14 @@ sub get_RG_string
 sub RG_set_options
 {	if (check_version(0, 28))
 	{
-		if (!$::Options{use_replaygain}) { cmd_push(undef, ('set', 'replaygain', 'no')); return; }
-		cmd_push(undef, ('set', 'replaygain', get_RG_mode()));
-		cmd_push(undef, ('set', 'replaygain-preamp', get_RG_preamp()));
-		cmd_push(undef, ('set', 'replaygain-clip', $::Options{rg_limiter} ? 'yes' : 'no'));
+		if (!$::Options{use_replaygain}) { cmd_push('set', 'replaygain', 'no'); return; }
+		cmd_push('set', 'replaygain', get_RG_mode());
+		cmd_push('set', 'replaygain-preamp', get_RG_preamp());
+		cmd_push('set', 'replaygain-clip', $::Options{rg_limiter} ? 'yes' : 'no');
 	} else
 	{
 		my $RGstring = get_RG_string();
-		cmd_push(undef, ('af', 'add', $RGstring));
+		cmd_push('af', 'add', $RGstring);
 	}
 }
 
