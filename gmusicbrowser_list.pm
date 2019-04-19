@@ -792,8 +792,8 @@ INIT
 	},
 	titleaa =>
 	{	menu => _('Title - Artist - Album'), title => _('Song'),
-		value => sub { ::ReplaceFieldsAndEsc($_[2],"<b>%t</b>%V\n<small><i>%a</i> - %l</small>"); },
-		attrib => 'markup', type => 'Glib::String', depend => 'title version artist album',
+		value => sub { ::ReplaceFieldsAndEsc($_[2],"<b>%S</b>%V\n<small><i>%a</i> - %l</small>"); },
+		attrib => 'markup', type => 'Glib::String', depend => 'title_or_file version artist album',
 		sort => 'title:i',	noncomp => 'boldrow',		width => 200,
 	},
 	playandqueue =>
@@ -1492,7 +1492,7 @@ sub search_equal_func
 	my $ID= $iter->[2][ $iter->[1] ];
 	my $string=uc $_[2];
 	#my $r; for (qw/title album artist/) { $r=index uc(Songs::Display($ID,$_)), $string; last if $r==0 } return $r;
-	index uc(Songs::Display($ID,'title')), $string;
+	index uc(Songs::Display($ID,'title_or_file')), $string;
 }
 
 sub rowremove
@@ -3162,7 +3162,7 @@ sub UpdatePlayingFilters
 	my @list=(	playfilter	=> _"Playing Filter",
 			'f=artists'	=> _"Playing Artist",
 			'f=album'	=> _"Playing Album",
-			'f=title'	=> _"Playing Title",
+			'f=title_or_file'	=> _"Playing Title",
 		 );
 	while (@list)
 	{	my $id=shift @list;
@@ -4167,7 +4167,7 @@ sub EntryChanged_cb
 	my $text=$entry->get_text;
 	my $self=::find_ancestor($entry,__PACKAGE__);
 	if (!$force && 2>length $text) { $self->{songlist}->Empty }
-	else { $self->{songlist}->SetFilter( Filter->new('title:si:'.$text) ); }
+	else { $self->{songlist}->SetFilter( Filter->new('title_or_file:si:'.$text) ); }
 }
 
 package AASearch;
