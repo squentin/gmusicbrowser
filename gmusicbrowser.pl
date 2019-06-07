@@ -6899,13 +6899,14 @@ sub AskRenameFolder
 		$old= $parent.$old.SLASH;
 		$new= $parent.filename_from_unicode($new).SLASH;
 		last if $old eq $new;
-		-d $new and ErrorMessage(__x(_"{folder} already exists",folder=> filename_to_utf8displayname($new) )) and last; #FIXME use an error dialog
-		rename $old,$new
-			or ErrorMessage(__x(_"Renaming {oldname}\nto {newname}\nfailed : {error}",
+		if (-d $new) { ErrorMessage(__x(_"{folder} already exists",folder=> filename_to_utf8displayname($new) )) ; last; } #FIXME use an error dialog
+		unless (rename $old,$new)
+		{	ErrorMessage(__x(_"Renaming {oldname}\nto {newname}\nfailed : {error}",
 				oldname=> filename_to_utf8displayname($old),
 				newname=> filename_to_utf8displayname($new),
-				error=>$!))
-			and last; #FIXME use an error dialog
+				error=>$!));
+			last; #FIXME use an error dialog
+		}
 		UpdateFolderNames($old,$new);
 	}
 	$dialog->destroy;
@@ -9542,7 +9543,7 @@ sub RenameFile
 
 sub UpdatePixPath
 {	my ($oldpath,$newpath)=@_;
-	$_= pathslash($_) for $oldpath,$newpath; #make sure the path ends with SLASH
+	$_= ::pathslash($_) for $oldpath,$newpath; #make sure the path ends with SLASH
 	$oldpath=qr/^\Q$oldpath\E/;
 	for my $ref (@ArraysOfFiles) {s#$oldpath#$newpath# for grep $_, @$ref}
 }
