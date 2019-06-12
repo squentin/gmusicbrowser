@@ -1843,7 +1843,6 @@ sub Quit
 	unlink $FIFOFile if $FIFOFile;
 	Gtk2->main_quit;
 	exec $Options{Shutdown_cmd} if $turnoff && $Options{Shutdown_cmd};
-	exit;
 }
 
 sub CmdFromFIFO
