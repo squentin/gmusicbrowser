@@ -21,7 +21,7 @@ desc	Run a command when playing a song
 # the plugin package must be named GMB::Plugin::PID (replace PID), and must have these sub :
 # Start	: called when the plugin is activated
 # Stop	: called when the plugin is de-activated
-# prefbox : returns a Gtk2::Widget used to describe the plugin and set its options
+# prefbox : returns a Gtk3::Widget used to describe the plugin and set its options
 
 package GMB::Plugin::NOWPLAYING;
 use strict;
@@ -32,7 +32,7 @@ use constant
 my $handle;
 
 sub Start
-{	$handle={};	#the handle to the Watch function must be a hash ref, if it is a Gtk2::Widget, UnWatch will be called when the widget is destroyed
+{	$handle={};	#the handle to the Watch function must be a hash ref, if it is a Gtk3::Widget, UnWatch will be called when the widget is destroyed
 	::Watch($handle, PlayingSong	=> \&Changed);
 	::Watch($handle, Playing	=> \&PlayStop);
 }
@@ -42,8 +42,8 @@ sub Stop
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
+{	my $vbox= Gtk3::VBox->new(::FALSE, 2);
+	my $sg1= Gtk3::SizeGroup->new('horizontal');
 	my $entry=::NewPrefEntry(OPT.'CMD',_"Command when playing song changed :",	expand=>1,sizeg1=>$sg1);
 	my $entry2=::NewPrefEntry(OPT.'StoppedCMD',_"Command when stopped :",		expand=>1,sizeg1=>$sg1);
 	my $preview= Label::Preview->new(preview => \&command_preview, event => 'CurSong Option', noescape=>1);

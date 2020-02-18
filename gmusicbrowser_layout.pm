@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2015 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2020 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -353,7 +353,6 @@ our %Widgets=
 	},
 	VolumeBar =>
 	{	class	=> 'Layout::Bar',
-		orientation => 'left-to-right',
 		event	=> 'Vol',
 		update	=> sub { $_[0]->set_val( ::GetVol() ); },
 		set	=> sub { ::UpdateVol($_[1]) },
@@ -363,7 +362,7 @@ our %Widgets=
 	},
 	VolumeSlider =>
 	{	class	=> 'Layout::Bar::Scale',
-		orientation => 'bottom-to-top',
+		vertical=> 1,
 		parent	=> 'VolumeBar',
 		cursor	=> undef,
 	},
@@ -383,7 +382,7 @@ our %Widgets=
 		cursor	=> 'hand2',
 	},
 	Cover =>
-	{	class	=> 'Layout::AAPicture',
+	{	class2	=> 'Layout::AAPicture',
 		group	=> 'Play',
 		aa	=> 'album',
 		oldopt1 => 'maxsize',
@@ -397,7 +396,7 @@ our %Widgets=
 		fields	=> 'album',
 	},
 	ArtistPic =>
-	{	class	=> 'Layout::AAPicture',
+	{	class2	=> 'Layout::AAPicture',
 		group	=> 'Play',
 		aa	=> 'artist',
 		oldopt1 => 'maxsize',
@@ -410,7 +409,7 @@ our %Widgets=
 		fields	=> 'artist',
 	},
 	LabelsIcons =>
-	{	New	=> sub { Gtk2::Table->new(1,1); },
+	{	New	=> sub { Gtk3::Grid->new; }, # maybe use a Gtk3::FlowBox instead
 		group	=> 'Play',
 		field	=> 'label',
 		options	=> 'field',
@@ -420,7 +419,7 @@ our %Widgets=
 		tip	=> '%L',
 	},
 	Filler =>
-	{	New	=> sub { Gtk2::HBox->new; },
+	{	New	=> sub { Gtk3::HBox->new; },
 	},
 	QueueList =>
 	{	New	=> sub { $_[0]{type}='Q'; SongList::Common->new($_[0]); },
@@ -569,7 +568,7 @@ our %Widgets=
 	MenuItem =>	{ New		=> \&Layout::MenuItem::new,
 			},
 	SeparatorMenuItem=>
-			{ New		=> sub { Gtk2::SeparatorMenuItem->new },
+			{ New		=> sub { Gtk3::SeparatorMenuItem->new },
 			},
 	Refresh =>
 	{	class	=> 'Layout::Button',
@@ -605,10 +604,10 @@ our %Widgets=
 		size	=> 'menu',
 	},
 	HSeparator =>
-	{	New	=> sub {Gtk2::HSeparator->new},
+	{	New	=> sub {Gtk3::Separator->new('horizontal')},
 	},
 	VSeparator =>
-	{	New	=> sub {Gtk2::VSeparator->new},
+	{	New	=> sub {Gtk3::Separator->new('vertical')},
 	},
 	Choose =>
 	{	class	=> 'Layout::Button',
@@ -643,7 +642,7 @@ our %Widgets=
 		dragdest=> [::DRAG_FILTER,sub { ::SetFilter($_[0],$_[2]);}],
 	},
 	Visuals		=>
-	{	New	=> sub {my $darea=Gtk2::DrawingArea->new; return $darea unless $::Play_package->{visuals}; $::Play_package->add_visuals($darea); my $eb=Gtk2::EventBox->new; $eb->add($darea); return $eb},
+	{	New	=> sub {my $darea=Gtk3::DrawingArea->new; return $darea unless $::Play_package->{visuals}; $::Play_package->add_visuals($darea); my $eb=Gtk3::EventBox->new; $eb->add($darea); return $eb},
 		click1	=> sub {$::Play_package->set_visual('+') if $::Play_package->{visuals};}, #select next visual
 		click2	=> \&ToggleFullscreen, #FIXME use a fullscreen layout instead,
 		click3	=> \&VisualsMenu,
@@ -692,7 +691,7 @@ our %Widgets=
 		autoadd_option	=> 'AddFullscreenButton',
 	},
 	Repeat	=>
-	{	New => sub { my $w=Gtk2::CheckButton->new(_"Repeat"); $w->signal_connect(clicked => sub { ::SetRepeat($_[0]->get_active); }); return $w; },
+	{	New => sub { my $w=Gtk3::CheckButton->new(_"Repeat"); $w->signal_connect(clicked => sub { ::SetRepeat($_[0]->get_active); }); return $w; },
 		event	=> 'Repeat Sort',
 		update	=> sub { if ($_[0]->get_active xor $::Options{Repeat}) { $_[0]->set_active($::Options{Repeat});} $_[0]->set_sensitive(!$::RandomMode); },
 	},
@@ -975,7 +974,7 @@ sub InitLayout
 	}
 
 	my $mainwidget= $self->CreateWidgets($boxes,$opt2);
-	$mainwidget ||= do { my $l=Gtk2::Label->new("Error : empty layout"); my $hbox=Gtk2::HBox->new; $hbox->add($l); $hbox; };
+	$mainwidget ||= do { my $l=Gtk3::Label->new("Error : empty layout"); my $hbox=Gtk3::HBox->new; $hbox->add($l); $hbox; };
 	$self->add($mainwidget);
 
 	if (my $name=$boxes->{DefaultFocus})
@@ -1010,11 +1009,11 @@ sub CreateWidgets
 		my $group=$opt1->{group};
 		$opt1->{group}= $defaultgroup.(length $group ? "-$group" : '') unless $group=~m/^[A-Z]/;
 		my $box=$widgets->{$key}= $type->{New}( $opt1 );
-		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle maxwidth maxheight expand_weight/;
+		$box->{$_}=$opt1->{$_} for grep exists $opt1->{$_}, qw/group tabicon tabtitle/;
 		ApplyCommonOptions($box,$opt1);
 
 		$box->{name}=$fullname;
-		$box->set_border_width($opt1->{border}) if $opt1 && exists $opt1->{border} && $box->isa('Gtk2::Container');
+		$box->set_border_width($opt1->{border}) if $opt1 && exists $opt1->{border} && $box->isa('Gtk3::Container');
 		$box->set_name($key);
 		push @boxlist,$key,$line;
 	}
@@ -1041,7 +1040,7 @@ sub CreateWidgets
 				}
 			};
 			if ($widget)
-			{	if ($widget->parent) {warn "layout error: $name already has a parent -> can't put it in $key\n"; next;}
+			{	if ($widget->get_parent) {warn "layout error: $name already has a parent -> can't put it in $key\n"; next;}
 				$type->{Pack}( $box,$widget,$packoptions );
 			}
 			elsif ($placeholder)
@@ -1063,7 +1062,7 @@ sub CreateWidgets
 			$_->set_size_request(@req) for grep defined, map $widgets->{$_}, @names;
 			next if @names==1;
 		}
-		my $sizegroup=Gtk2::SizeGroup->new($mode);
+		my $sizegroup=Gtk3::SizeGroup->new($mode);
 		for my $n (@names)
 		{	if (my $w=$widgets->{$n}) { $sizegroup->add_widget($w); }
 			else { warn "Can't add unknown widget '$n' to sizegroup\n" }
@@ -1079,7 +1078,7 @@ sub CreateWidgets
 	for my $widget (values %$widgets) { my $postinit= delete $widget->{PostInit}; $postinit->($widget) if $postinit; }
 
 	$self->{layoutdepth}--;
-	my @noparentboxes=grep m/^(?:[HV][BP]|[AMETNFSW]B|FR)/ && !$widgets->{$_}->parent, keys %$boxes;
+	my @noparentboxes=grep m/^(?:[HV][BP]|[AMETNFSW]B|FR)/ && !$widgets->{$_}->get_parent, keys %$boxes;
 	if	(@noparentboxes==0) {warn "layout empty ('$self->{layout}')\n"; return;}
 	elsif	(@noparentboxes!=1) {warn "layout error: (@noparentboxes) have no parent -> can't find toplevel box\n"}
 	return $widgets->{ $noparentboxes[0] };
@@ -1141,12 +1140,12 @@ sub NewWidget
 	my $group= $options{group};		#FIXME make undef group means parent's group ?
 	my $defaultgroup= $options{default_group} || 'default_group';
 	$options{group}= $defaultgroup.($group=~m/^\w/ ? '-' : '').$group unless $group=~m/^[A-Z]/;	#group local to window unless it begins with uppercase
-	my $widget= $ref->{class}
-		? $ref->{class}->new(\%options,$ref)
-		: $ref->{New}(\%options);
+	my $widget= $ref->{class}  ? $ref->{class}->new(\%options,$ref) :
+		    $ref->{class2} ? $ref->{class2}->new->after_new(\%options,$ref) :	# for widgets that need to define vfuncs for get_preferred_width_for_height and friends, doesn't work if object created via a perl new() for some reason (bug?)
+		    $ref->{New}(\%options);
 	return unless $widget;
 	$widget->{$_}= $options{$_} for 'group',split / /, ($ref->{options} || '');
-	$widget->{$_}=$options{$_} for grep exists $options{$_}, qw/tabtitle tabicon tabrename maxwidth maxheight expand_weight/;
+	$widget->{$_}=$options{$_} for grep exists $options{$_}, qw/tabtitle tabicon tabrename/;
 	$widget->{options_to_save}=$ref->{saveoptions} if $ref->{saveoptions};
 
 	$widget->{name}=$namefull;
@@ -1160,16 +1159,23 @@ sub NewWidget
 	if (my $cursor=$options{cursor})
 	{	$widget->signal_connect(realize => sub {
 				my ($widget,$cursor)=@_;
-				my $gdkwin= $widget->window;
-				if ($widget->isa('Gtk2::EventBox') && !$widget->get_visible_window)
-				{	# for eventbox using an input-only gdkwindow, $widget->window is actually the parent's gdkwin,
+				my $gdkwin= $widget->get_window;
+				if ($widget->isa('Gtk3::EventBox') && !$widget->get_visible_window)
+				{	# for eventbox using an input-only gdkwindow, $widget->get_window is actually the parent's gdkwin,
 					# the only way to get to the input-only gdkwin is looking at all the children of its parent :(
+					my $alloc= $widget->get_allocation;
 					for my $child ($gdkwin->get_children)
-					{	my $w= Glib::Object->new_from_pointer($child->get_user_data);
-						if ($w && $w==$widget) { $gdkwin=$child; last }
+					{	my $realchild= $child->[0];
+						my ($x,$y)= $realchild->get_position;
+						next unless $x==$alloc->{x} && $y==$alloc->{y};
+						next unless $realchild->get_width ==$alloc->{width};
+						next unless $realchild->get_height==$alloc->{height};
+						# found a child gdkwindow with same position and size as the eventbox, it's probably the right one
+						$gdkwin=$realchild;
+						last
 					}
 				}
-				$gdkwin->set_cursor(Gtk2::Gdk::Cursor->new($cursor));
+				$gdkwin->set_cursor(Gtk3::Gdk::Cursor->new($cursor));
 			},$cursor);
 	}
 
@@ -1276,7 +1282,7 @@ sub UpdateSongTip
 
 sub ShowHide
 {	my ($self,$names,$resize,$show)=@_;
-	$show= !grep $_ && $_->visible, map $self->{widgets}{$_}, split /\|/,$names unless defined $show;
+	$show= !grep $_ && $_->get_visible, map $self->{widgets}{$_}, split /\|/,$names unless defined $show;
 	if ($show)	{ Show($self,$names,$resize); }
 	else		{ Hide($self,$names,$resize); }
 }
@@ -1289,10 +1295,9 @@ sub Hide
 	for my $name ( split /\|/,$names )
 	{	my $widget=$self->{widgets}{$name};
 		$r=shift @resize if @resize;
-		next unless $widget;# && $widget->visible;
-		my $alloc=$widget->allocation;
-		my $w=$alloc->width;
-		my $h=$alloc->height;
+		next unless $widget;# && $widget->get_visible;
+		my $w= $widget->get_allocated_width;
+		my $h= $widget->get_allocated_height;
 		$self->{hidden}{$name}=$w.'x'.$h;
 		if ($r)
 		{	if	($r eq 'v')	{$wh-=$h}
@@ -1310,7 +1315,7 @@ sub Show
 	my ($ww,$wh)=$self->get_size;
 	for my $name ( split /\|/,$names )
 	{	my $widget=$self->{widgets}{$name};
-		next unless $widget && !$widget->visible;
+		next unless $widget && !$widget->get_visible;
 		$widget->show;
 		my $oldsize=delete $self->{hidden}{$name};
 		next unless $oldsize && $oldsize=~m/x/;
@@ -1331,7 +1336,7 @@ sub GetShowHideState
 	for my $name ( split /\|/,$names )
 	{	my $widget=$self->{widgets}{$name};
 		next unless $widget;
-		$hidden++ unless $widget->visible;
+		$hidden++ unless $widget->get_visible;
 	}
 	return !$hidden;
 }
@@ -1348,9 +1353,9 @@ sub ToggleFullscreen
 
 sub KeyPressed
 {	my ($self,$event,$after)=@_;
-	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
+	my $key=Gtk3::Gdk::keyval_name( $event->keyval );
 	my $focused=$self->get_toplevel->get_focus;
-	return 0 if !$after && $focused && ($focused->isa('Gtk2::Entry') || $focused->isa('Gtk2::SpinButton'));
+	return 0 if !$after && $focused && ($focused->isa('Gtk3::Entry') || $focused->isa('Gtk3::SpinButton'));
 	my $mod;
 	$mod.='c' if $event->state >= 'control-mask';
 	$mod.='a' if $event->state >= 'mod1-mask';
@@ -1369,9 +1374,9 @@ sub KeyPressed
 	}
 	elsif ($after && $self->{fullscreen} && $key eq 'Escape') { $cmd='ToggleFullscreen' }
 	return 0 unless $cmd;
-	if ($self->isa('Gtk2::Window'))	#try to find the focused widget (gmb widget, not gtk one), so that the cmd can act on it
+	if ($self->isa('Gtk3::Window'))	#try to find the focused widget (gmb widget, not gtk one), so that the cmd can act on it
 	{	my $widget=$self->get_focus;
-		while ($widget) {last if exists $widget->{group}; $widget=$widget->parent}
+		while ($widget) {last if exists $widget->{group}; $widget=$widget->get_parent}
 		$self=$widget if $widget;
 	}
 	::run_command($self,$cmd);
@@ -1410,9 +1415,9 @@ sub TurnPagesToWidget #change the current page of all parent notebook so that wi
 {	my $parent=$_[0];
 	while (1)
 	{	my $child=$parent;
-		$parent=$child->parent;
+		$parent=$child->get_parent;
 		last unless $parent;
-		if ($parent->isa('Gtk2::Notebook'))
+		if ($parent->isa('Gtk3::Notebook'))
 		 { $parent->set_current_page($parent->page_num($child)); }
 	}
 }
@@ -1424,13 +1429,14 @@ sub SensitiveIfMoreZeroSong	{ my $songarray= ::GetSongArray($_[0]); $_[0]->set_s
 
 sub PlayOrderComboNew
 {	my $opt=$_[0];
-	my $store=Gtk2::ListStore->new(('Glib::String')x3);
-	my $combo=Gtk2::ComboBox->new($store);
-	my $cell=Gtk2::CellRendererPixbuf->new;
-	$cell->set_fixed_size( Gtk2::IconSize->lookup('menu') );
+	my $store= Gtk3::ListStore->new(('Glib::String')x3);
+	my $combo= Gtk3::ComboBox->new_with_model($store);
+	my $cell= Gtk3::CellRendererPixbuf->new;
+	my $size= $::IconSize{menu};
+	$cell->set_fixed_size($size,$size);
 	$combo->pack_start($cell,0);
-	$combo->add_attribute($cell,stock_id => 2);
-	$cell=Gtk2::CellRendererText->new;
+	$combo->add_attribute($cell,icon_name => 2);
+	$cell= Gtk3::CellRendererText->new;
 	$combo->pack_start($cell,1);
 	$combo->add_attribute($cell, text => 0);
 	$combo->signal_connect( changed => sub
@@ -1439,7 +1445,8 @@ sub PlayOrderComboNew
 		my $store=$combo->get_model;
 		my $sort=$store->get($combo->get_active_iter,1);
 		if ($sort=~m/^EDIT (.)$/)
-		{ PlayOrderComboUpdate($combo); #so that the combo doesn't stay on Edit...
+		{	return if Gtk3::get_current_event->isa('Gtk3::Gdk::EventScroll');
+			PlayOrderComboUpdate($combo); #so that the combo doesn't stay on Edit...
 			if ($1 eq 'O')
 			{	::EditSortOrder(undef,$::Options{Sort},undef, \&::Select_sort);
 			}
@@ -1491,7 +1498,7 @@ sub PlayOrderComboUpdate
 
 sub SortMenu
 {	my $nopopup= $_[0];
-	my $menu = $_[0] || Gtk2::Menu->new;
+	my $menu = $_[0] || Gtk3::Menu->new;
 
 	my $return=0;
 	$return=1 unless @_;
@@ -1502,15 +1509,15 @@ sub SortMenu
 	 {	my ($menu,$name,$sort,$true,$cb)=@_;
 		$cb||=$callback;
 		$true=($sort eq $check) unless defined $true;
-		my $item = Gtk2::CheckMenuItem->new_with_label($name);
+		my $item = Gtk3::CheckMenuItem->new_with_label($name);
 		$item->set_draw_as_radio(1);
 		$item->set_active($found=1) if $true;
 		$item->signal_connect (activate => $cb, $sort );
 		$menu->append($item);
 	 };
 
-	my $submenu= Gtk2::Menu->new;
-	my $sitem = Gtk2::MenuItem->new(_"Weighted Random");
+	my $submenu= Gtk3::Menu->new;
+	my $sitem = Gtk3::MenuItem->new(_"Weighted Random");
 	for my $name (sort keys %{$::Options{SavedWRandoms}})
 	{	$append->($submenu,$name, $::Options{SavedWRandoms}{$name} );
 	}
@@ -1524,19 +1531,19 @@ sub SortMenu
 	$append->($menu,_"Shuffle",'shuffle') unless $check eq 'shuffle';
 
 	if ($check=~m/shuffle/)
-	{ my $item=Gtk2::MenuItem->new(_"Re-shuffle");
+	{ my $item=Gtk3::MenuItem->new(_"Re-shuffle");
 	  $item->signal_connect(activate => $callback, $check );
 	  $menu->append($item);
 	}
 
-	{ my $item=Gtk2::CheckMenuItem->new(_"Repeat");
+	{ my $item=Gtk3::CheckMenuItem->new(_"Repeat");
 	  $item->set_active($::Options{Repeat});
 	  $item->set_sensitive(0) if $::RandomMode;
 	  $item->signal_connect(activate => sub { ::SetRepeat($_[0]->get_active); } );
 	  $menu->append($item);
 	}
 
-	$menu->append(Gtk2::SeparatorMenuItem->new); #separator between random and non-random modes
+	$menu->append(Gtk3::SeparatorMenuItem->new); #separator between random and non-random modes
 
 	$append->($menu,_"List order", '' ) if defined $::ListMode;
 	for my $name (sort keys %{$::Options{SavedSorts}})
@@ -1551,13 +1558,13 @@ sub SortMenu
 
 sub FilterMenu
 {	my $nopopup= $_[0];
-	my $menu = $_[0] || Gtk2::Menu->new;
+	my $menu = $_[0] || Gtk3::Menu->new;
 
 	my ($check,$found);
 	$check=$::SelectedFilter->{string} if $::SelectedFilter;
 	my $item_callback=sub { ::Select(filter => $_[1]); };
 
-	my $item0= Gtk2::CheckMenuItem->new(_"All songs");
+	my $item0= Gtk3::CheckMenuItem->new(_"All songs");
 	$item0->set_active($found=1) if !$check && !defined $::ListMode;
 	$item0->set_draw_as_radio(1);
 	$item0->signal_connect ( activate =>  $item_callback ,'' );
@@ -1565,13 +1572,13 @@ sub FilterMenu
 
 	for my $list (sort keys %{$::Options{SavedFilters}})
 	{	my $filt=$::Options{SavedFilters}{$list}->{string};
-		my $item = Gtk2::CheckMenuItem->new_with_label($list);
+		my $item = Gtk3::CheckMenuItem->new_with_label($list);
 		$item->set_draw_as_radio(1);
 		$item->set_active($found=1) if defined $check && $filt eq $check;
 		$item->signal_connect ( activate =>  $item_callback ,$filt );
 		$menu->append($item);
 	}
-	my $item=Gtk2::CheckMenuItem->new(_"Custom...");
+	my $item=Gtk3::CheckMenuItem->new(_"Custom...");
 	$item->set_active(1) if defined $check && !$found;
 	$item->set_draw_as_radio(1);
 	$item->signal_connect ( activate => sub
@@ -1579,17 +1586,17 @@ sub FilterMenu
 		});
 	$menu->append($item);
 	if (my @SavedLists=::GetListOfSavedLists())
-	{	my $submenu=Gtk2::Menu->new;
+	{	my $submenu=Gtk3::Menu->new;
 		my $list_cb=sub { ::Select( staticlist => $_[1] ) };
 		for my $list (@SavedLists)
-		{	my $item = Gtk2::CheckMenuItem->new_with_label($list);
+		{	my $item = Gtk3::CheckMenuItem->new_with_label($list);
 			$item->set_draw_as_radio(1);
 			$item->set_active(1) if defined $::ListMode && $list eq $::ListMode;
 			$item->signal_connect( activate =>  $list_cb, $list );
 			$submenu->append($item);
 		}
-		my $sitem=Gtk2::MenuItem->new(_"Saved Lists");
-		#my $sitem=Gtk2::CheckMenuItem->new('Saved Lists');
+		my $sitem=Gtk3::MenuItem->new(_"Saved Lists");
+		#my $sitem=Gtk3::CheckMenuItem->new('Saved Lists');
 		#$item->set_draw_as_radio(1);
 		$sitem->set_submenu($submenu);
 		$menu->prepend($sitem);
@@ -1599,13 +1606,13 @@ sub FilterMenu
 }
 
 sub VisualsMenu
-{	my $menu=Gtk2::Menu->new;
+{	my $menu=Gtk3::Menu->new;
 	my $cb=sub { $::Play_package->set_visual($_[1]) if $::Play_package->{visuals}; };
 	return unless $::Play_package->{visuals};
 	my @l= $::Play_package->list_visuals;
 	my $current= $::Options{gst_visual}||$l[0];
 	for my $v (@l)
-	{	my $item=Gtk2::CheckMenuItem->new_with_label($v);
+	{	my $item=Gtk3::CheckMenuItem->new_with_label($v);
 		$item->set_draw_as_radio(1);
 		$item->set_active(1) if $current eq $v;
 		$item->signal_connect (activate => $cb,$v);
@@ -1621,16 +1628,16 @@ sub UpdateLabelsIcon
 	my $row=0; my $col=0;
 	my $count=0;
 	for my $stock ( Songs::Get_icon_list($table->{field},$::SongID) )
-	{	my $img=Gtk2::Image->new_from_stock($stock,'menu');
+	{	my $img= Gtk3::Image->new_from_stock($stock,'menu');
 		$count++;
-		$table->attach($img,$col,$col+1,$row,$row+1,'shrink','shrink',1,1);
+		$table->attach($img,$col,$row,1,1);
 		if (++$row>=1) {$row=0; $col++}
 	}
 	$table->show_all;
 }
 
 sub AddLabelEntry	#create entry to add a label to the current song
-{	my $entry=Gtk2::Entry->new;
+{	my $entry= Gtk3::Entry->new;
 	$entry->set_tooltip_text(_"Adds labels to the current song");
 	$entry->signal_connect(activate => sub
 	 {	my $entry=shift;
@@ -1666,7 +1673,7 @@ sub PopupSongsFromAlbum
 package Layout::Window;
 our @ISA;
 BEGIN {push @ISA,'Layout';}
-use base 'Gtk2::Window';
+use base 'Gtk3::Window';
 
 sub new
 {	my ($class,$layout,%options)=@_;
@@ -1697,18 +1704,18 @@ sub new
 		# ifexist=toggle  => if a window with same uniqueid exist it will be closed
 		# ifexist=present => if a window with same uniqueid exist it presented
 	if (my $mode=$options{ifexist})
-	{	my ($window)=grep $_->isa('Layout::Window') && $_->{uniqueid} eq $uniqueid, Gtk2::Window->list_toplevels;
+	{	my ($window)=grep $_->isa('Layout::Window') && $_->{uniqueid} eq $uniqueid, Gtk3::Window::list_toplevels;
 		if ($window)
 		{	if    ($mode eq 'toggle'  && !$window->{quitonclose})	{ $window->close_window; return }
 			elsif ($mode eq 'replace' && !$window->{quitonclose})	{ $window->close_window; return Layout::Window::new(@original_args,ifexists=>0); } # destroying previous window make it save its settings, then restart new() from the start with new $opt2 but the same original arguments, add ifexists=>0 to make sure it doesn't loop
-			elsif ($mode eq 'present')			 	{ $window->force_present; return }
+			elsif ($mode eq 'present')			 	{ $window->present; return }
 		}
 	}
 
 	my $wintype= delete $options{wintype} || 'toplevel';
-	my $self=bless Gtk2::Window->new($wintype), $class;
+	my $self=bless Gtk3::Window->new($wintype), $class;
 	$self->{uniqueid}= $uniqueid;
-	$self->set_role($layout);
+	$self->set_role(::PROGRAM_NAME.':'.($options{uniqueid}||"layout")." - ".$layout);
 	$self->set_type_hint(delete $options{typehint}) if $options{typehint};
 	$self->{options}=\%options;
 	$self->{name}='Window';
@@ -1762,12 +1769,9 @@ sub new
 sub init
 {	my $self=$_[0];
 	if ($self->{options}{transparent})
-	{	if ($::CairoOK)
-		{	make_transparent($self);
-		}
-		else { warn "no Cairo perl module => can't make the window transparent\n" }
+	{	make_transparent($self);
 	}
-	$self->child->show_all;		#needed to get the true size of the window
+	$self->get_child->show_all;		#needed to get the true size of the window
 	$self->realize;
 	$self->Resize if $self->{size};
 	{	my @hidden;
@@ -1791,8 +1795,7 @@ sub init
 	$self->parse_geometry( delete $::CmdLine{geometry} ) if $::CmdLine{geometry};
 	$self->set_workspace( delete $::CmdLine{workspace} ) if exists $::CmdLine{workspace};
 	if ($self->{options}{insensitive})
-	{	my $mask=Gtk2::Gdk::Bitmap->create_from_data(undef,'',1,1);
-		$self->input_shape_combine_mask($mask,0,0);
+	{	$self->input_shape_combine_region( Cairo::Region->create );
 	}
 }
 
@@ -1886,8 +1889,10 @@ sub Resize
 	my ($w,$h)= split 'x',delete $self->{size};
 	return unless defined $h;
 	my $screen=$self->get_screen;
-	my $monitor=$screen->get_monitor_at_window($self->window);
-	my (undef,undef,$monitorwidth,$monitorheight)=$screen->get_monitor_geometry($monitor)->values;
+	my $monitor=$screen->get_monitor_at_window($self->get_window);
+	my $monitor_geometry= $screen->get_monitor_geometry($monitor);
+	my $monitorwidth=  $monitor_geometry->{width};
+	my $monitorheight= $monitor_geometry->{height};
 	$w= $1*$monitorwidth/100 if $w=~m/(\d+)%/;
 	$h= $1*$monitorheight/100 if $h=~m/(\d+)%/;
 	if ($self->{options}{DEFAULT_OPTIONS}) { $monitorwidth-=40; $monitorheight-=80; } # if using default layout size, reserve some space for potential panels and decorations #FIXME use gdk_screen_get_monitor_workarea once ported to gtk3
@@ -1920,9 +1925,10 @@ sub Position
 		$absolute_coords=1;
 	}
 	if (!defined $monitor)
-	{	$monitor=$screen->get_monitor_at_window($self->window);
+	{	$monitor=$screen->get_monitor_at_window($self->get_window);
 	}
-	my ($xmin,$ymin,$monitorwidth,$monitorheight)=$screen->get_monitor_geometry($monitor)->values;
+	my $monitor_geometry= $screen->get_monitor_geometry($monitor);
+	my ($xmin,$ymin,$monitorwidth,$monitorheight)= @$monitor_geometry{qw/x y width height/};
 	$xalign= $x=~m/%/ ? 50 : 0   unless defined $xalign;
 	$yalign= $y=~m/%/ ? 50 : 0   unless defined $yalign;
 	$x= $monitorwidth*$1/100 if $x=~m/(-?\d+)%/;
@@ -1942,47 +1948,34 @@ sub Position
 	return $x,$y;
 }
 
-sub set_workspace	#only works with Gnome2::Wnck
+sub set_workspace
 {	my ($self,$workspace)=@_;
-	eval {require Gnome2::Wnck};
-	if ($@) { warn "Setting workspace : error loading Gnome2::Wnck : $@\n"; return }
-	my $screen= Gnome2::Wnck::Screen->get_default;
+	unless (::Load_Wnck()) { warn "Can't set workspace : Introspection data for Wnck 3.0 not found\n"; return }
+	my $screen= Wnck::Screen::get_default();
 	$screen->force_update;
 	$workspace= $screen->get_workspace($workspace);
 	return unless $workspace;
-	my $xid= $self->window->get_xid;
-	my $w=Gnome2::Wnck::Window->get($xid);
+	my $xid= $self->get_window->get_xid;
+	my $w= Wnck::Window::get($xid);
 	return unless $w;
 	$w->move_to_workspace($workspace);
 }
 
 sub make_transparent
 {	my @children=($_[0]);
-	my $colormap=$children[0]->get_screen->get_rgba_colormap;
-	return unless $colormap;
+	my $visual= $children[0]->get_screen->get_rgba_visual;
+	return unless $visual;
 	while (my $widget=shift @children)
-	{	push @children, $widget->get_children if $widget->isa('Gtk2::Container');
-		unless ($widget->no_window)
-		{	$widget->set_colormap($colormap);
+	{	push @children, $widget->get_children if $widget->isa('Gtk3::Container');
+		if ($widget->get_has_window)
+		{	$widget->set_visual($visual);
 			$widget->set_app_paintable(1);
-			$widget->signal_connect(expose_event => \&transparent_expose_cb);
 		}
-		if ($widget->isa('Gtk2::container'))
+		if ($widget->isa('Gtk3::container'))
 		{	$widget->signal_connect(add => sub { make_transparent($_[1]); } );
 		}
 	}
 }
-sub transparent_expose_cb #use Cairo
-{	my ($w,$event)=@_;
-	my $cr=Gtk2::Gdk::Cairo::Context->create($event->window);
-	$cr->set_operator('source');
-	$cr->set_source_rgba(0, 0, 0, 0);
-	$cr->rectangle($event->area);
-	$cr->fill;
-	if (my $pixbuf=$w->{skinpb}) { $cr->set_source_pixbuf($pixbuf,0,0); $cr->paint; }
-	return 0; #send expose to children
-}
-
 
 sub set_background_skin
 {	my ($self,$skin)=@_;
@@ -1992,45 +1985,32 @@ sub set_background_skin
 	$self->{resizeparam}=$resize;
 	$self->{skinsize}='0x0';
 	$self->signal_connect(size_allocate => \&resize_skin_cb);
-	return if $self->{options}{transparent};
-	# following not needed when using transparency
-
-	$self->signal_connect(style_set => sub {warn "style set : @_" if $::debug;$_[0]->set_style($_[2]);} ,$self->get_style); #FIXME find the cause of these signals, seems related to stock icons
-	my $rc_style= Gtk2::RcStyle->new;
-	#$rc_style->bg_pixmap_name($_,'<parent>') for qw/normal selected prelight insensitive active/;
-	$rc_style->bg_pixmap_name('normal','<parent>');
-	my @children=($self->child);
-	while (my $widget=shift @children)
-	{	push @children, $widget->get_children if $widget->isa('Gtk2::Container');
-		$widget->modify_style($rc_style) unless $widget->no_window;
-	}
 	$self->set_app_paintable(1);
+	$self->signal_connect(draw=>sub
+	{	my ($self,$cr)=@_;
+		my $pb= $self->{skinpb};
+		$cr->set_source_pixbuf($pb,0,0);
+		$cr->paint;
+		0;
+	});
 }
+
 sub resize_skin_cb	#FIXME needs to add a delay to better deal with a burst of resize events
 {	my ($self,$alloc)=@_;
-	my ($w,$h)=($alloc->width,$alloc->height);
-	return unless $self->realized;
+	my ($w,$h)=($alloc->{width},$alloc->{height});
+	return unless $self->get_realized;
 	return if $w.'x'.$h eq $self->{skinsize};
 	my $pb=Skin::_resize($self->{pixbuf},$self->{resizeparam},$w,$h);
 	return unless $pb;
-	if ($self->{options}{transparent})
-	{	$self->{skinpb}=$pb;	#will be used by transparent_expose_cb()
-		if (my $shape= $self->{options}{shape})
-		{	my $mask=Gtk2::Gdk::Pixmap->new(undef,$w,$h,1);
-			$pb->render_threshold_alpha($mask,0,0,0,0,-1,-1, $shape);
-			$self->input_shape_combine_mask($mask,0,0);
-		}
-	}
-	else
-	{	#my ($pixmap,$mask)=$pb->render_pixmap_and_mask(1); #leaks X memory for Gtk2 <1.146 or <1.153
-		# create shape mask
-		my $mask=Gtk2::Gdk::Pixmap->new(undef,$w,$h,1);
-		$pb->render_threshold_alpha($mask,0,0,0,0,-1,-1,1);
-		$self->shape_combine_mask($mask,0,0);
-		# create pixmap background
-		my $pixmap=Gtk2::Gdk::Pixmap->new($self->window,$w,$h,-1);
-		$pb->render_to_drawable($pixmap, Gtk2::Gdk::GC->new($self->window), 0,0,0,0,-1,-1,'none',0,0);
-		$self->window->set_back_pixmap($pixmap,0);
+	$self->{skinpb}=$pb;
+	if (my $shape= $self->{options}{shape})
+	{	warn "shaped windows don't work and crash (tested with gtk 3.24)"; #FIXME investigate and report bug
+		my $surface=Gtk3::Gdk::cairo_surface_create_from_pixbuf($pb,1);
+		#my $surface=Gtk3::Gdk::cairo_surface_create_from_pixbuf($pb,0,$self->get_window);
+		my $region= Gtk3::Gdk::cairo_region_create_from_surface($surface);
+		#$window->input_shape_combine_region($region,0,0);
+		$self->{shape_region}=$region; #keeping region alive prevent crashes on creation, but still crashes when resized and doesn't work
+		$self->input_shape_combine_region($region);
 	}
 	$self->{skinsize}=$w.'x'.$h;
 	$self->queue_draw;
@@ -2045,8 +2025,10 @@ sub new
 	$layout||=$::Options{LayoutT};
 	my $self=Layout::Window::new($class,$layout, wintype=>'popup', 'pos'=>undef, size=>undef, fallback=>'full with buttons', popped_from=>$widget);
 
-	if ($widget)	#warning : widget can be a Gtk2::StatusIcon
+	if ($widget)	#warning : widget can be a Gtk3::StatusIcon
 	{	::weaken( $widget->{PoppedUpWindow}=$self );
+		my $parent_layout_window= !$widget->isa('Gtk3::StatusIcon') && ::get_layout_widget($widget);
+		::weaken( $parent_layout_window->{PoppedUpWindow}=$self ) if $parent_layout_window;
 		$self->set_screen($widget->get_screen);
 		#$self->set_transient_for($widget->get_toplevel);
 		#$self->move( ::windowpos($self,$widget) );
@@ -2057,18 +2039,19 @@ sub new
 
 	return $self;
 }
+
 sub init
 {	my $self=$_[0];
-	#add a frame
-	my $child=$self->child;
-	$self->remove($self->child);
-	my $frame=Gtk2::Frame->new;
-	$self->add($frame);
-	$frame->add($child);
-	my $shadow= $self->{options}{transparent} ? 'none' : 'out';
-	$frame->set_shadow_type($shadow);
-	$child->set_border_width($self->get_border_width);
-	$self->set_border_width(0);
+	# used to add a Frame between the Window and its child, but it seems the Frame doesn't pass the size preferences of its child, which result in the window always resized to its minimum, so just draw a frame instead
+	$self->signal_connect_after(draw => sub
+	 {	my ($self,$cr)=@_;
+		my $style= $self->get_style_context;
+		$style->save;
+		$style->add_class(Gtk3::STYLE_CLASS_FRAME);
+		$style->render_frame($cr,0,0,$self->get_size);
+		$style->restore;
+		0;
+	 }) unless $self->{options}{transparent};
 		##$self->set_type_hint('tooltip'); #TEST
 		##$self->set_type_hint('notification'); #TEST
 		#$self->set_focus_on_map(0);
@@ -2077,6 +2060,7 @@ sub init
 	$self->SUPER::init;
 }
 
+
 sub CheckCursor		# StartDestroy if popup is not ancestor of widget under cursor and cursor isn't grabbed (menu)
 {	my $self=shift;
 	$self->{check_timeout} ||= Glib::Timeout->add(800, \&CheckCursor, $self);
@@ -2084,27 +2068,27 @@ sub CheckCursor		# StartDestroy if popup is not ancestor of widget under cursor 
 	return 1 if $self->get_display->pointer_is_grabbed;	# to prevent destroying while a menu is open
 
 	if (my $sicon=$self->{popped_from})
-	{	return 1 if $sicon->isa('Gtk2::StatusIcon') && OnStatusIcon($sicon);	#check if pointer above statusicon
+	{	return 1 if $sicon->isa('Gtk3::StatusIcon') && OnStatusIcon($sicon);	#check if pointer above statusicon
 	}
-
-	my ($gdkwin)=Gtk2::Gdk::Window->at_pointer;
-	my $widget= $gdkwin ? Glib::Object->new_from_pointer($gdkwin->get_user_data) : undef;
-	while ($widget)
-	{	last if $widget->isa('Gtk2::StatusIcon');
-		$widget= ::find_ancestor($widget,'Layout::Window::Popup');
-		last unless $widget;
-		return 1 if $widget==$self;	# don't destroy if cursor is over child of self
-		$widget= $widget->{popped_from};# parent popup
+	
+	my ($gdkwin)=Gtk3::Gdk::Window::at_pointer;
+	if ($gdkwin)
+	{	$gdkwin= $gdkwin->get_toplevel;
+		my $widget=$self;
+		while ($widget) 
+		{	my $w2=  $widget->get_window->get_toplevel;
+			return 1 if $gdkwin == $w2;  # don't destroy if cursor is over child of self
+			$widget= $widget->{PoppedUpWindow}; #look at child popup of widget
+		}
 	}
-
 	$self->StartDestroy;
 	return 1
 }
 
 sub OnStatusIcon	#return true if pointer is above sicon
 {	my $sicon=shift;
-	my ($screen,$area)= $sicon->get_geometry;
-	my ($x,$y,$w,$h)= $area->values;
+	my (undef,$screen,$area)= $sicon->get_geometry;
+	my ($x,$y,$w,$h)= @$area{qw/x y width height/};
 	my ($pscreen,$px,$py)= $screen->get_display->get_pointer;
 	return $pscreen==$screen && $px>=$x && $px<=$x+$w && $py>=$y && $py<=$y+$h;
 }
@@ -2116,10 +2100,13 @@ sub Position
 		if (my $pos=$widget->{hover_layout_pos})
 		{	my ($x0,$y0)= split /\s*x\s*/,$pos;
 			my ($width,$height)=$self->get_size;
-			my ($x,$y)=  $widget->window->get_origin;
-			my ($ww,$wh)=$widget->window->get_size;
-			if ($widget->no_window)
-			{	(my$wx,my$wy,$ww,$wh)=$widget->allocation->values;
+			my $gdkwin= $widget->get_window;
+			my ($x,$y)= $gdkwin->get_origin;
+			my $ww= $gdkwin->get_width;
+			my $wh= $gdkwin->get_height;
+			unless ($widget->get_has_window)
+			{	my $alloc= $widget->get_allocation;
+				(my$wx,my$wy,$ww,$wh)= @$alloc{qw/x y width height/};
 				$x+=$wx;$y+=$wy;
 			}
 			$x=$y=0 if $x0=~s/abs:\s*//;
@@ -2159,7 +2146,7 @@ sub _compute_pos
 sub HoverPopup
 {	my $widget=shift;
 	delete $widget->{hover_timeout};
-	return 0 if $widget->isa('Gtk2::StatusIcon') && !OnStatusIcon($widget);	# for statusicon, don't popup if no longer above icon
+	return 0 if $widget->isa('Gtk3::StatusIcon') && !OnStatusIcon($widget);	# for statusicon, don't popup if no longer above icon
 	return 0 if $widget->{block_popup};
 	Popup($widget);
 	0;
@@ -2172,13 +2159,13 @@ sub Popup
 	return 0 unless $self;
 	$self->CancelDestroy;
 	$self->{destroy_timeout}=Glib::Timeout->add( $addtimeout,\&DestroyNow,$self) if $addtimeout;
-	$self->{check_timeout} ||= Glib::Timeout->add(400, \&CheckCursor, $self) if $widget->isa('Gtk2::StatusIcon') && !$addtimeout;
+	$self->{check_timeout} ||= Glib::Timeout->add(400, \&CheckCursor, $self) if $widget->isa('Gtk3::StatusIcon') && !$addtimeout;
 	0;
 }
 
 sub set_hover
 {	my $widget=$_[0];
-	if ($widget->isa('Gtk2::StatusIcon'))
+	if ($widget->isa('Gtk3::StatusIcon'))
 	{	$widget->set_has_tooltip(1);
 		$widget->signal_connect(query_tooltip => sub { return if $_[0]{hover_timeout}; &PreparePopup });
 	}
@@ -2226,7 +2213,7 @@ sub DestroyNow
 }
 
 package Layout::Embedded;
-use base 'Gtk2::Container';
+use base 'Gtk3::Container';
 our @ISA;
 push @ISA,'Layout';
 
@@ -2235,7 +2222,7 @@ sub new
 	my $layout=$opt->{layout};
 	my $def= $Layout::Layouts{$layout};
 	return undef unless $def;
-	my $self=bless Gtk2::VBox->new(0,0), $class;
+	my $self=bless Gtk3::VBox->new(0,0), $class;
 	$self->{SaveOptions}=\&SaveEmbeddedOptions;
 	$self->{group}=$opt->{group};
 	my %children_opt;
@@ -2261,24 +2248,22 @@ package Layout::Boxes;
 
 our %Boxes=
 (	HB	=>
-	{	New	=> sub { SHBox->new; },
-		#New	=> sub { Gtk2::HBox->new(::FALSE,0); },
+	{	New	=> sub { Gtk3::Box->new('horizontal',1); },
 		Prefix	=> qr/([-_.0-9]*)/,
-		Pack	=> \&SBoxPack,
+		Pack	=> \&BoxPack,
 	},
 	VB	=>
-	{	New	=> sub { SVBox->new; },
-		#New	=> sub { Gtk2::VBox->new(::FALSE,0); },
+	{	New	=> sub { Gtk3::Box->new('vertical',1); },
 		Prefix	=> qr/([-_.0-9]*)/,
-		Pack	=> \&SBoxPack,
+		Pack	=> \&BoxPack,
 	},
 	HP	=>
-	{	New	=> sub { PanedNew('Gtk2::HPaned',$_[0]); },
+	{	New	=> sub { PanedNew('Gtk3::HPaned',$_[0]); },
 		Prefix	=> qr/([_+]*)/,
 		Pack	=> \&PanedPack,
 	},
 	VP	=>
-	{	New	=> sub { PanedNew('Gtk2::VPaned',$_[0]); },
+	{	New	=> sub { PanedNew('Gtk3::VPaned',$_[0]); },
 		Prefix	=> qr/([_+]*)/,
 		Pack	=> \&PanedPack,
 	},
@@ -2293,11 +2278,11 @@ our %Boxes=
 		EndInit	=> \&Layout::NoteBook::EndInit,
 	},
 	MB	=>
-	{	New	=> sub { Gtk2::MenuBar->new },
+	{	New	=> sub { Gtk3::MenuBar->new },
 		Pack	=> sub { $_[0]->append($_[1]); },
 	},
 	SM	=>	#submenu
-	{	New	=> sub { my $item=Gtk2::MenuItem->new($_[0]{label}); my $menu=Gtk2::Menu->new; $item->set_submenu($menu); return $item; },
+	{	New	=> sub { my $item=Gtk3::MenuItem->new($_[0]{label}); my $menu=Gtk3::Menu->new; $item->set_submenu($menu); return $item; },
 		Pack	=> sub { $_[0]->get_submenu->append($_[1]); },
 	},
 	BM	=>	#button menu
@@ -2305,7 +2290,7 @@ our %Boxes=
 		Pack	=> sub { $_[0]->append($_[1]); },
 	},
 	EB	=>
-	{	New	=> sub { my $self=Gtk2::Expander->new($_[0]{label}); $self->set_expanded($_[0]{expand}); $self->{SaveOptions}=sub { expand=>$_[0]->get_expanded; }; return $self; },
+	{	New	=> sub { my $self=Gtk3::Expander->new($_[0]{label}); $self->set_expanded($_[0]{expand}); $self->{SaveOptions}=sub { expand=>$_[0]->get_expanded; }; return $self; },
 		Pack	=> \&SimpleAdd,
 	},
 	FB	=>
@@ -2314,19 +2299,19 @@ our %Boxes=
 		Pack	=> \&Fixed_pack,
 	},
 	FR	=>
-	{	New	=> sub { my $f=Gtk2::Frame->new($_[0]{label}); $f->set_shadow_type($_[0]{shadow}) if $_[0]{shadow};return $f; },
+	{	New	=> sub { my $f=Gtk3::Frame->new($_[0]{label}); $f->set_shadow_type($_[0]{shadow}) if $_[0]{shadow};return $f; },
 		Pack	=> \&SimpleAdd,
 	},
 	SB	=>
-	{	New	=> sub { my $sw=Gtk2::ScrolledWindow->new; },
-		Pack	=> sub { $_[0]->add_with_viewport($_[1]); },
+	{	New	=> sub { my $sw=Gtk3::ScrolledWindow->new; },
+		Pack	=> sub { $_[0]->add($_[1]); },
 	},
 	AB	=>
-	{	New	=> sub { my %opt=(xalign=>.5, yalign=>.5, xscale=>1, yscale=>1, %{$_[0]}); Gtk2::Alignment->new(@opt{qw/xalign yalign xscale yscale/});},
+	{	New	=> sub { my %opt=(xalign=>.5, yalign=>.5, xscale=>1, yscale=>1, %{$_[0]}); Gtk3::Alignment->new(@opt{qw/xalign yalign xscale yscale/});},
 		Pack	=> \&SimpleAdd,
 	},
 	WB	=>
-	{	New	=> sub { Gtk2::EventBox->new; },
+	{	New	=> sub { Gtk3::EventBox->new; },
 		Pack	=> \&SimpleAdd,
 	},
 );
@@ -2337,7 +2322,7 @@ sub SimpleAdd
 
 sub NewTB
 {	my ($opt)=@_;
-	my $nb=Gtk2::Notebook->new;
+	my $nb=Gtk3::Notebook->new;
 	$nb->set_scrollable(::TRUE);
 	$nb->popup_enable;
 	#$nb->signal_connect( button_press_event => sub {return !::IsEventInNotebookTabs(@_);});
@@ -2349,13 +2334,13 @@ sub NewTB
 sub PackTB
 {	my ($nb,$wg,$title)=@_;
 	$title=~s/^"// && $title=~s/"$//;
-	$nb->append_page($wg, Gtk2::Label->new($title) );
+	$nb->append_page($wg, Gtk3::Label->new($title) );
 	$nb->set_tab_reorderable($wg,::TRUE);
 	my $n=$nb->{SetPage}||0;
 	if ($n==($nb->get_n_pages-1)) {$wg->show; $nb->set_current_page($n); $nb->{DefaultFocus}=$wg; }
 }
 
-sub SBoxPack
+sub BoxPack
 {	my ($box,$wg,$opt)=@_;
 	my $pad= $opt=~m/([0-9]+)/ ? $1 : 0;
 	my $exp= $opt=~m/_/;
@@ -2363,15 +2348,14 @@ sub SBoxPack
 	my $fill=$opt!~m/\./;
 	if ($end)	{ $box->pack_end(   $wg,$exp,$fill,$pad ); }
 	else		{ $box->pack_start( $wg,$exp,$fill,$pad ); }
-	if ($Gtk2::VERSION<1.163 || $Gtk2::VERSION==1.170) { $wg->{SBOX_packoptions}=[$exp,$fill,$pad, ($end ? 'end' : 'start')]; } #to work around memory leak (gnome bug #498334)
 }
 
 sub PanedPack
 {	my ($paned,$wg,$opt)=@_;
 	my $expand= $opt=~m/_/;
 	my $shrink= $opt!~m/\+/;
-	if	(!$paned->child1)	{$paned->pack1($wg,$expand,$shrink);}
-	elsif	(!$paned->child2)	{$paned->pack2($wg,$expand,$shrink);}
+	if	(!$paned->get_child1)	{ $paned->pack1($wg,$expand,$shrink); }
+	elsif	(!$paned->get_child2)	{ $paned->pack2($wg,$expand,$shrink); }
 	else {warn "layout error : trying to pack more than 2 widgets in a paned container\n"}
 }
 
@@ -2398,9 +2382,11 @@ sub Paned_size_cb
 	my $size2=$self->{size2};
 	if (defined $size1 && defined $size2 && abs($max-$size1-$size2)>5 || $self->{need_resize})
 	{	my $not_enough;
-		if    ($self->child1_resize && !$self->child2_resize)		{ $size1= ::max($max-$size2,0); $not_enough= $size2>$max; }
-		elsif ($self->child2_resize && !$self->child1_resize)		{ $size1= $max if $not_enough= $size1>$max; }
-		else								{ $size1= $max*$size1/($size1+$size2); }
+		my $resize1= $self->child_get($self->get_child1,'resize');
+		my $resize2= $self->child_get($self->get_child2,'resize');
+		if    ($resize1 && !$resize2)	{ $size1= ::max($max-$size2,0); $not_enough= $size2>$max; }
+		elsif ($resize2 && !$resize1)	{ $size1= $max if $not_enough= $size1>$max; }
+		else				{ $size1= $max*$size1/($size1+$size2); }
 		if ($not_enough)	#don't change the saved value if couldn't restore the size properly
 		{	$self->{need_resize}=1;	#  => will retry in a later size_allocate event unless the position is set manually
 		}
@@ -2432,18 +2418,18 @@ sub Fixed_pack
 
 package SFixed;
 use Glib::Object::Subclass
-	Gtk2::Fixed::,
+	Gtk3::Fixed::,
 	signals =>
 	{	size_allocate => \&size_allocate,
 	};
 sub size_allocate
 {	my ($self,$alloc)=@_;
-	my ($ox,$oy,$w,$h)=$alloc->values;
+	my ($ox,$oy,$w,$h)= @$alloc{qw/x y width height/};
 	my $border=$self->get_border_width;
 	$ox+=$border; $w-=$border*2;
 	$oy+=$border; $h-=$border*2;
 	for my $child ($self->get_children)
-	{	my ($x,$y)=$self->child_get_property($child,qw/x y/);
+	{	my ($x,$y)=$self->child_get($child,qw/x y/);
 		if (my $ref=$child->{SFixed_dynamic_pos})
 		{	my ($x2,$y2)=@$ref;
 			$x=~m/\./ and $x*=$w;
@@ -2461,12 +2447,12 @@ sub size_allocate
 		}
 		$ww||=$child->size_request->width;
 		$wh||=$child->size_request->height;
-		$child->size_allocate(Gtk2::Gdk::Rectangle->new($ox+$x, $oy+$y, $ww,$wh));
+		$child->size_allocate({x=>$ox+$x, y=>$oy+$y, width=>$ww, height=>$wh});
 	}
 }
 
 package Layout::NoteBook;
-use base 'Gtk2::Notebook';
+use base 'Gtk3::Notebook';
 
 our @contextmenu=
 (	{ label => _"New list",		code => sub { $_[0]{self}->newtab('EditList',1,{songarray=>''}); },	type=> 'L', stockicon => 'gtk-add', },
@@ -2495,11 +2481,9 @@ our @DefaultOptions=
 
 sub new
 {	my ($class,$opt)=@_;
-	my $self= bless Gtk2::Notebook->new, $class;
+	my $self= bless Gtk3::Notebook->new, $class;
 	%$opt=( @DefaultOptions, %$opt );
 	$self->set_scrollable(1);
-	$self->set_tab_hborder(0);
-	$self->set_tab_vborder(0);
 	if (my $tabpos=$opt->{tabpos})
 	{	($tabpos,$self->{angle})= $tabpos=~m/^(left|right|top|bottom)?(90|180|270)?/;
 		$self->set_tab_pos($tabpos) if $tabpos;
@@ -2526,7 +2510,6 @@ sub new
 	if (my $bl=$opt->{blacklist})
 	{	$self->{blacklist}{$_}=undef for split / +/, $bl;
 	}
-	$opt->{newbutton}=0 unless *Gtk2::Notebook::set_action_widget{CODE}; # Gtk2::Notebook::set_action_widget requires gtk+ >= 2.20 and perl-Gtk2 >= 1.23
 	if ($opt->{typesubmenu} && $opt->{newbutton} && $opt->{newbutton} ne 'none') # add a button next to the tabs to show new-tab menu
 	{	my $button= ::NewIconButton('gtk-add');
 		$button->signal_connect(button_press_event => \&newbutton_cb);
@@ -2615,7 +2598,7 @@ sub Pack
 	if (!defined $label)			{ $label= $wg->{name} } #FIXME ? what to do if no tabtitle given
 	elsif (ref $label eq 'CODE')		{ $label= $label->($wg); }
 	elsif ($wg->can('DynamicTitle'))	{ $label= $wg->DynamicTitle($label); }
-	$label=Gtk2::Label->new($label) unless ref $label;
+	$label= Gtk3::Label->new($label) unless ref $label;
 	$label->set_angle($angle) if $angle;
 	::weaken( $wg->{tab_page_label}=$label ) if $wg->{tabrename};
 
@@ -2624,19 +2607,17 @@ sub Pack
 	$label->signal_connect(hierarchy_changed=> sub { $_[0]->get_pango_context->set_base_gravity('auto'); }); # for some reason (gtk bug ?) the setting is reverted when the tab is dragged, so this re-set it
 
 	my $icon= $wg->{tabicon};
-	$icon=Gtk2::Image->new_from_stock($icon,'menu') if defined $icon;
+	$icon= Gtk3::Image->new_from_stock($icon,'menu') if defined $icon;
 	my $close;
 	if ($wg->{tabcanclose} && $self->{closebuttons})
-	{	$close=Gtk2::Button->new;
+	{	$close= Gtk3::Button->new;
 		$close->set_relief('none');
-		$close->can_focus(0);
+		$close->set_can_focus(0);
 		::weaken( $close->{page}=$wg );
-		$close->signal_connect(clicked => sub {my $page=$_[0]{page}; my $self=$page->parent; $self->close_tab($page,1);});
-		$close->add(Gtk2::Image->new_from_file(::PIXPATH.'smallclosetab.png'));
-		$close->set_size_request(Gtk2::IconSize->lookup('menu'));
-		$close->set_border_width(0);
+		$close->signal_connect(clicked => sub {my $page=$_[0]{page}; my $self=$page->get_parent; $self->close_tab($page,1);});
+		$close->add(Gtk3::Image->new_from_file(::PIXPATH.'smallclosetab.png'));
 	}
-	my $tab= $angle%180 ? Gtk2::VBox->new(0,0) : Gtk2::HBox->new(0,0);
+	my $tab= Gtk3::Box->new( ($angle%180 ? 'vertical' : 'horizontal'),0 );
 	my @icons= $angle%180 ? ($close,0,$icon,4) : ($icon,4,$close,0);
 	my ($i,$pad)=splice @icons,0,2;
 	$tab->pack_start($i,0,0,$pad) if $i;
@@ -2676,7 +2657,7 @@ sub SavedLists_changed	#remove EditList tab if corresponding list has been delet
 }
 
 sub newbutton_cb
-{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+{	my $self= $_[0]->GET_ancestor;
 	::PopupContextMenu(\@contextmenu, { self=>$self, type=>$self->{typesubmenu}, usemenupos=>1 } );
 	1;
 }
@@ -2713,18 +2694,17 @@ sub pagerename_cb
 	my $tab=$_[0]{self}->get_tab_label($page);
 	my $renamesub=$_[0]{'rename'};
 	my $label=$page->{tab_page_label};
-	my $entry=Gtk2::Entry->new;
+	my $entry= Gtk3::Entry->new;
 	$entry->set_has_frame(0);
-	$entry->set_inner_border(undef) if *Gtk2::Entry::set_inner_border{CODE}; #Gtk2->CHECK_VERSION(2,10,0);
 	$entry->set_text( $label->get_text );
-	$entry->set_size_request( 20+$label->allocation->width ,-1);
-	$_->hide for grep !$_->isa('Gtk2::Image'), $tab->get_children;
+	$entry->set_size_request( 20+$label->get_allocated_width, -1);
+	$_->hide for grep !$_->isa('Gtk3::Image'), $tab->get_children;
 	$tab->pack_start($entry,::FALSE,::FALSE,2);
 	$entry->grab_focus;
 	$entry->show_all;
 	$entry->signal_connect(key_press_event => sub #abort if escape
 		{	my ($entry,$event)=@_;
-			return 0 unless Gtk2::Gdk->keyval_name( $event->keyval ) eq 'Escape';
+			return 0 unless Gtk3::Gdk::keyval_name( $event->keyval ) eq 'Escape';
 			$entry->set_text('');
 			$entry->set_sensitive(0);  #trigger the focus-out event
 			1;
@@ -2734,7 +2714,7 @@ sub pagerename_cb
 	$entry->signal_connect(focus_out_event => sub
 	 {	my $entry=$_[0];
 		my $popupmenu= delete $entry->{popupmenu};
-		return 0 if $entry->get_display->pointer_is_grabbed && $popupmenu && $popupmenu->mapped; # prevent error when context menu of the entry pops-up
+		return 0 if $entry->get_display->pointer_is_grabbed && $popupmenu && $popupmenu->get_mapped; # prevent error when context menu of the entry pops-up
 		my $new=$entry->get_text;
 		$tab->remove($entry);
 		$_->show for $tab->get_children;
@@ -2752,17 +2732,17 @@ sub create_chooser_page
 	my $list= $self->make_widget_list;
 	return unless keys %$list;
 	$self->{chooser_mode}=1;
-	my $cb=sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->newtab($_[1]); };
-	my $bbox=Gtk2::VButtonBox->new;
+	my $cb=sub { my $self= $_[0]->GET_ancestor; $self->newtab($_[1]); };
+	my $bbox= Gtk3::VButtonBox->new;
 	$bbox->set_layout('start');
 	for my $name (sort { $list->{$a} cmp $list->{$b} } keys %$list)
-	{	my $button=Gtk2::Button->new($list->{$name});
+	{	my $button= Gtk3::Button->new($list->{$name});
 		$button->signal_connect(clicked=> $cb,$name);
 		$bbox->add($button);
 	}
 	$bbox->show_all;
 	$bbox->{name}='';
-	$self->append_page($bbox,_"Choose page to open");
+	$self->append_page($bbox,Gtk3::Label->new(_"Choose page to open"));
 }
 
 sub make_widget_list
@@ -2992,7 +2972,7 @@ sub SaveOptions
 }
 
 package Layout::Button;
-use base 'Gtk2::Bin';
+use base 'Gtk3::Bin';
 
 our @default_options= (button=>1, relief=>'none', size=> Layout::SIZE_BUTTONS, ellipsize=> 'none', );
 
@@ -3003,13 +2983,13 @@ sub new
 	my $self;
 	my $activate= $opt->{activate};
 	if ($isbutton)
-	{	$self=Gtk2::Button->new;
+	{	$self=Gtk3::Button->new;
 		$self->set_relief($opt->{relief});
 		$self->{clicked_cmd}= $activate;
 		$self->signal_connect(clicked => \&clicked_cb);
 	}
 	else
-	{	$self=Gtk2::EventBox->new;
+	{	$self=Gtk3::EventBox->new;
 		$self->set_visible_window(0);
 		$opt->{click} ||= $activate;
 	}
@@ -3029,7 +3009,7 @@ sub new
 	$self->{state}=$ref->{state} if $ref->{state};
 	if ($opt->{skin})
 	{	my $skin=Skin->new($opt->{skin},$self,$opt);
-		$self->signal_connect(expose_event => \&Skin::draw,$skin);
+		$self->signal_connect(draw => \&Skin::draw,$skin);
 		$self->{skin}=1; # will force a repaint on stock state change
 		$self->set_app_paintable(1); #needed ?
 		if (0 && !$isbutton && $opt->{shape}) #mess up button-press cb TESTME
@@ -3039,11 +3019,10 @@ sub new
 	elsif ($stock)
 	{	$self->{stock}=$stock;
 		$self->{size}= $opt->{size};
-		my $img= $self->{img}= Gtk2::Image->new;
-		$img->set_size_request(Gtk2::IconSize->lookup($self->{size})); #so that it always request the same size, even when no icon
+		my $img= $self->{img}= Gtk3::Image->new;
 		if ($opt->{with_text})
-		{	my $hbox=Gtk2::HBox->new(0,2);
-			my $label= $self->{label}= Gtk2::Label->new;
+		{	my $hbox=Gtk3::HBox->new(0,2);
+			my $label= $self->{label}= Gtk3::Label->new;
 			my $ellip= $opt->{ellipsize};
 			$ellip='end' if $ellip eq '1';
 			$label->set_ellipsize($ellip);
@@ -3056,7 +3035,7 @@ sub new
 		else { $self->add($img); }
 		$self->{EndInit}=\&UpdateStock;
 	}
-	elsif (defined $text) { $self->add( Gtk2::Label->new($text) ); }
+	elsif (defined $text) { $self->add( Gtk3::Label->new($text) ); }
 	return $self;
 }
 
@@ -3095,7 +3074,7 @@ sub UpdateStock
 }
 
 package Layout::Label;
-use base 'Gtk2::EventBox';
+use base 'Gtk3::EventBox';
 
 use constant	INCR => 1;	#scroll increment in pixels
 our @default_options= ( xalign=>0, yalign=>.5, );
@@ -3103,37 +3082,37 @@ our @default_options= ( xalign=>0, yalign=>.5, );
 sub new
 {	my ($class,$opt)=@_;
 	%$opt=( @default_options, %$opt );
-	my $self = bless Gtk2::EventBox->new, $class;
-	my $label=Gtk2::Label->new;
+	my $self= bless Gtk3::EventBox->new, $class;
+	my $minsize= $opt->{ellipsize} ? undef : $opt->{minsize};
+	$minsize=undef if $minsize && $minsize!~m/^\d+p?$/;
+	my $label= $minsize ? Layout::ScrollingLabel->new : Gtk3::Label->new;
 	$label->set_alignment($opt->{xalign},$opt->{yalign});
 	$self->set_visible_window(0);
 
-	for (qw/markup markup_empty autoscroll interval/)
-	{	$self->{$_}=$opt->{$_} if exists $opt->{$_};
-	}
+	$self->{$_}= $opt->{$_} for grep exists $opt->{$_}, qw/markup markup_empty autoscroll interval/;
 
-	my $font= $opt->{font} && Gtk2::Pango::FontDescription->from_string($opt->{font});
+	my $font= $opt->{font} && Pango::FontDescription::from_string($opt->{font});
 	$label->modify_font($font) if $font;
 	if (my $color= $opt->{color} || $opt->{DefaultFontColor})
-	{	$label->modify_fg('normal', Gtk2::Gdk::Color->parse($color) );
+	{	$label->override_color( 'normal', Gtk3::Gdk::RGBA::parse($color) );
 	}
 	$self->add($label);
-#$self->signal_connect(enter_notify_event => sub {$_[0]->set_markup('<u>'.$_[0]->child->get_label.'</u>')});
-#$self->signal_connect(leave_notify_event => sub {my $m=$_[0]->child->get_label; $m=~s#^<u>##;$m=~s#</u>$##; $_[0]->set_markup($m)});
-	$self->{expand_max}= $opt->{maxwidth} || -1 if $opt->{expand_max};
-	my $minsize= $opt->{minsize};
+#$self->signal_connect(enter_notify_event => sub {$_[0]->set_markup('<u>'.$_[0]->get_child->get_label.'</u>')}); #TEST underline on hover
+#$self->signal_connect(leave_notify_event => sub {my $m=$_[0]->get_child->get_label; $m=~s#^<u>##;$m=~s#</u>$##; $_[0]->set_markup($m)});
+	$self->{expand_max}= $opt->{expand_max} || $opt->{maxwidth};
 	if (my $el=$opt->{ellipsize})
 	{	$label->set_ellipsize($el);
-		$minsize=undef;
 	}
-	if ($minsize && $minsize=~m/^\d+p?$/)
+	if ($minsize)
 	{	unless ($minsize=~s/p$//)
-		{	my $lay=$label->create_pango_layout( 'X' x $minsize );
-			$lay->set_font_description($font) if $font;
-			($minsize)=$lay->get_pixel_size;
+		{	my $layout= $label->create_pango_layout( 'X' x $minsize );
+			$layout->set_font_description($font) if $font;
+			($minsize)= $layout->get_pixel_size;
 		}
 		$self->set_size_request($minsize,-1);
-		$label->signal_connect(expose_event => \&expose_cb);
+		$label->{minsize}= $minsize;
+		$label->{maxsize}= $self->{expand_max};
+		$label->signal_connect(draw => \&Layout::ScrollingLabel::draw_cb);
 		if ($self->{autoscroll})
 		{	$self->{interval} ||=50;	# default to a scroll every 50ms
 			$self->signal_connect(size_allocate => \&restart_scrollcheck);
@@ -3145,8 +3124,7 @@ sub new
 		}
 	}
 	elsif (defined $opt->{initsize})
-	{	#$label->set_size_request($label->create_pango_layout( $opt->{initsize} )->get_pixel_size);
-		my $lay=$label->create_pango_layout( $opt->{initsize} );
+	{	my $lay=$label->create_pango_layout( $opt->{initsize} );
 		$lay->set_font_description($font) if $font;
 		$label->set_size_request($lay->get_pixel_size);
 		$self->{resize}=1;
@@ -3182,11 +3160,11 @@ sub update_text
 }
 
 sub set_label
-{	my $label=$_[0]->child; $label->set_label($_[1]); $label->{dx}=0;
+{	my $label=$_[0]->get_child; $label->set_label($_[1]); $label->{dx}=0;
 	$_[0]->checksize;
 }
 sub set_markup
-{	my $label=$_[0]->child; $label->set_markup($_[1]); $label->{dx}=0;
+{	my $label=$_[0]->get_child; $label->set_markup($_[1]); $label->{dx}=0;
 	$_[0]->checksize;
 }
 sub set_markup_with_format
@@ -3196,7 +3174,7 @@ sub set_markup_with_format
 sub checksize	#extend the requested size so that the string fit in initsize mode (in case the initsize string is not wide enough)
 {	my $self=$_[0];
 	if ($self->{resize})
-	{	my $label=$self->child;
+	{	my $label=$self->get_child;
 		my ($w,$h)=$label->get_layout->get_pixel_size;
 		my ($w0,$h0)=$label->get_size_request;
 		$w=0 if $w0>$w;
@@ -3205,11 +3183,11 @@ sub checksize	#extend the requested size so that the string fit in initsize mode
 	}
 	elsif (my $emax=$self->{expand_max})
 	{	# make it expand up to min(maxwidth,string_width)
-		my $label=$self->child;
-		$label->get_layout->set_width($emax * Gtk2::Pango->scale) if $label->get_ellipsize ne 'none';
-		my ($w)= $label->get_layout->get_pixel_size;
-		$w=$emax if $emax>0 && $emax < $w;
-		$self->{maxwidth}= $w ||1;
+		my $label=$self->get_child;
+		$label->get_layout->set_width($emax * Pango::SCALE) if $label->get_ellipsize ne 'none';
+		#my ($w)= $label->get_layout->get_pixel_size;
+		#$w=$emax if $emax>0 && $emax < $w;
+		#$self->{maxwidth}= $w ||1;
 	}
 	$self->restart_scrollcheck if $self->{autoscroll};
 }
@@ -3227,34 +3205,19 @@ sub enter_leave_cb
 	$self->{scroll_inc}=$inc;
 	0;
 }
-sub expose_cb #only for scrollable labels
-{	my ($label,$event)=@_;
-	my $layout=$label->get_layout;
-	my ($lw,$lh)=$layout->get_pixel_size;
-	return 1 unless $lw; #empty string -> nothing to draw
-	my ($xoffset,$yoffset,$aw,$ah)=$label->allocation->values;
-	my ($xalign,$yalign)=$label->get_alignment;
-	my ($xpad,$ypad)=$label->get_padding;
-	$xoffset+=$xpad; $aw-=2*$xpad; $aw=0 if $aw<0;
-	$yoffset+=$ypad; $ah-=2*$ypad; $ah=0 if $ah<0;
-	$xoffset+=($aw-$lw)*$xalign if $aw>$lw;
-	$yoffset+=($ah-$lh)*$yalign if $ah>$lh;
-	$label->get_style->paint_layout($label->window, $label->state, ::FALSE, $event->area, $label, 'label', $xoffset-$label->{dx}, $yoffset, $layout);
-	1;
-}
 
 sub Scroll
 {	my $self=$_[0];
-	my $label=$self->child;
+	my $label=$self->get_child;
 	return 0 unless $label;
-	my $aw=$label->allocation->width;
+	my $aw=$label->get_allocated_width;
 	my $max= ($label->get_layout->get_pixel_size)[0] - $aw;
 	my $dx=$label->{dx};
 	$dx+= $self->{scroll_inc};
 	$dx=$max if $max<$dx;
 	$dx=0 if $dx<0 || $max<0;
 	$label->{dx}=$dx;
-	$label->parent->queue_draw;
+	$label->get_parent->queue_draw;
 	my $reached_max= ($max<0) || ($dx==0 && $self->{scroll_inc}<0) || ($dx==$max && $self->{scroll_inc}>0);
 	if ($self->{autoscroll})
 	{	$self->{scroll_inc}=-$self->{scroll_inc} if $reached_max;	# reverse scrolling
@@ -3264,6 +3227,30 @@ sub Scroll
 	{	$self->{scrolltimeout}=0 if $reached_max;
 	}
 	return $self->{scrolltimeout};
+}
+
+package Layout::ScrollingLabel;
+use base 'Gtk3::Label';
+use Glib::Object::Subclass 'Gtk3::Label';
+
+sub GET_REQUEST_MODE { 'width-for-height' }
+sub GET_PREFERRED_WIDTH_FOR_HEIGHT
+{	my ($self,$height)= @_;
+	my $layout= $self->get_layout;
+	my ($max)= $layout->get_pixel_size;
+	my $min= $self->{minsize}||0;
+	$max= $self->{maxsize} if $self->{maxsize} && $self->{maxsize}<$max;
+	$max=$min if $min>$max;
+	return $min,$max;
+}
+
+sub draw_cb
+{	my ($self,$cr)=@_;
+	my $alloc= $self->get_allocation;
+	$cr->rectangle(0,0,$alloc->{width},$alloc->{height});
+	$cr->clip;
+	$cr->translate(-$self->{dx},0);
+	0;
 }
 
 package Layout::Label::Time;
@@ -3299,34 +3286,38 @@ sub update_time
 }
 
 package Layout::Bar;
-use base 'Gtk2::ProgressBar';
+use base 'Gtk3::EventBox';
 
 sub new
 {	my ($class,$opt,$ref)=@_;
-	my $self=bless Gtk2::ProgressBar->new, $class;
+	my $self=bless Gtk3::EventBox->new, $class;
+	my $bar= $self->{bar}= Gtk3::ProgressBar->new;
+	$self->add($bar);
 	if ($opt->{text})
 	{	$self->{text}=$opt->{text};
 		$self->{text_empty}=$opt->{text_empty};
-		$self->set_ellipsize( $opt->{ellipsize}||'end' );
+		$bar->set_ellipsize( $opt->{ellipsize}||'end' );
 		my $font= $opt->{font};
-		$self->modify_font(Gtk2::Pango::FontDescription->from_string($font)) if $font;
+		$bar->modify_font(Pango::FontDescription::from_string($font)) if $font;
+		$bar->set_show_text(1); #FIXME 2TO3 in gtk3 the text is show above the bar, which is useless for layouts as it's easy to do this directly. Maybe reimplement the gtk2 behavior of writing the text inside the bar
 	}
-	my $orientation= $opt->{vertical} ? 'bottom-to-top' : $opt->{horizontal} ? 'left-to-right' : $opt->{orientation} || 'left-to-right';
-	$self->set_orientation($orientation);
+	my $orientation= $opt->{vertical} ? 'vertical' : 'horizontal';
+	$bar->set_orientation($orientation);
 	if ($opt->{skin} && $opt->{handle_skin})
-	{	$self= Layout::Bar::skin->new($opt) || $self;  # warning : replace $self
+	{	$self= Layout::Bar::skin->new($opt);  # warning : replace $self #2TO3 IMPROVE don't replace self now that self is always an eventbox
+		::weaken($self->{bar}=$self); #ugly
 	}
-	$self->add_events([qw/pointer-motion-mask button-press-mask button-release-mask scroll-mask/]);
+	$self->{vertical}= $opt->{vertical} ? 1 : 0;
 	$self->signal_connect(button_press_event	=> \&button_press_cb);
 	$self->signal_connect(button_release_event	=> \&button_release_cb);
 	$self->signal_connect(scroll_event		=> \&scroll_cb);
+	$self->add_events(['scroll-mask']);
 	$self->{left} ||=0;
 	$self->{right}||=0;
 	$self->{max}= $ref->{max} || 1;
 	$self->{scroll}=$ref->{scroll};
 	$self->{set}=$ref->{set};
 	$self->{set_preview}=$ref->{set_preview};
-	$self->{vertical}= $orientation eq 'bottom-to-top';
 	return $self;
 }
 sub set_val
@@ -3342,7 +3333,7 @@ sub update
 	return if $self->{pressed};
 	my $f= ($self->{now}||0) / ($self->{max}||1);
 	$f=0 if $f<0; $f=1 if $f>1;
-	$self->set_fraction($f);
+	$self->{bar}->set_fraction($f);
 	if (my $text=$self->{text})
 	{	$text= $self->{text_empty} if !defined $::SongID && defined $self->{text_empty};
 		my $now=$self->{now}||0;
@@ -3357,21 +3348,21 @@ sub update
 			'$total'	=> $max,
 		);
 		$text=::ReplaceFields( $::SongID,$text,0,\%special );
-		$self->set_text($text);
+		$self->{bar}->set_text($text);
 	}
 }
 sub button_press_cb
 {	my ($self,$event)=@_;
 	$self->{pressed}||=$self->signal_connect(motion_notify_event => \&button_press_cb);
-	my ($x,$w)= $self->{vertical} ?	($event->y, $self->allocation->height):
-					($event->x, $self->allocation->width) ;
+	my ($x,$w)= $self->{vertical} ?	($event->y, $self->get_allocated_height):
+					($event->x, $self->get_allocated_width) ;
 	$w=1 if $w<1;
 	$w-= $self->{left} +$self->{right};
 	$x-= $self->{left};
 	my $f=$x/$w;
 	$f=0 if $f<0; $f=1 if $f>1;
 	$f=1-$f if $self->{vertical};
-	$self->set_fraction($f);
+	$self->{bar}->set_fraction($f);
 
 	my $s= $f*$self->{max};
 	$self->{newpos}=$s;
@@ -3407,21 +3398,26 @@ sub update_preview_Time
 sub scroll_cb
 {	my ($self,$event)=@_;
 	my $d= $event->direction;
+	if ($d eq 'smooth') # for some reason I only get smooth events out of Layout::Bar::Scale
+	{	my ($dx,$dy)= $event->get_scroll_deltas;
+		$d= $dy>0 ? 'down' : $dy<0 ? 'up' :
+		    $dx>0 ? 'right': $dx<0 ? 'left' : 'zero';
+	}
 	if	($d eq 'down'	|| $d eq 'right')	{ $d=1 }
 	elsif	($d eq 'up'	|| $d eq 'left' )	{ $d=0 }
 	else	{ return 0 }
-	$d= !$d if $self->{vertical};
+	$d= !$d if $self->{vertical};;
 	$self->{scroll}->($self,$d);
 	return 1;
 }
 
 package Layout::Bar::skin;
 our @ISA=('Layout::Bar');
-use base 'Gtk2::EventBox';
+use base 'Gtk3::EventBox';
 
 sub new
 {	my ($class,$opt)=@_;
-	my $self=bless Gtk2::EventBox->new,$class;
+	my $self= bless Gtk3::EventBox->new,$class;
 	my $hskin=$self->{handle_skin}=Skin->new($opt->{handle_skin},undef,$opt);
 	my $bskin=$self->{back_skin}=  Skin->new($opt->{skin},undef,$opt);
 	unless ($hskin && $bskin)
@@ -3439,7 +3435,7 @@ sub new
 	$self->{top}=   $top  ||= 0;
 	$self->{bottom}=$bottom||=0;
 	$self->set_size_request($left+$right+$hskin->{minwidth},$top+$bottom+$hskin->{minheight});
-	$self->signal_connect(expose_event=> \&expose_cb);
+	$self->signal_connect(draw=> \&draw_cb);
 	return $self;
 }
 
@@ -3448,40 +3444,38 @@ sub set_fraction
 	$_[0]->queue_draw;
 }
 
-sub expose_cb
-{	my ($self,$event)=@_;
-	Skin::draw($self,$event,$self->{back_skin});
-	my ($w,$h)=($self->allocation->values)[2,3];
+sub draw_cb
+{	my ($self,$cr)=@_;
+	Skin::draw($self,$cr,$self->{back_skin});
+	my $w= $self->get_allocated_width;
+	my $h= $self->get_allocated_height;
 	if ($self->{vertical})
 	{	my $minh=$self->{handle_skin}{minheight};
 		$h-= $self->{top}+$self->{bottom};
 		my $y= $self->{top} + $h *(1-$self->{fraction});
 		$y-= $minh/2;
-		Skin::draw($self,$event,$self->{handle_skin},$self->{left},int($y),$w-$self->{left}-$self->{right},$minh);
+		Skin::draw($self,$cr,$self->{handle_skin},$self->{left},int($y),$w-$self->{left}-$self->{right},$minh);
 	}
 	else
 	{	my $minw=$self->{handle_skin}{minwidth};
 		$w-= $self->{right}+$self->{left};
 		my $x= $self->{left} + $w *$self->{fraction};
 		$x-= $minw/2;
-		Skin::draw($self,$event,$self->{handle_skin},int($x),$self->{top},$minw,$h-$self->{top}-$self->{bottom});
+		Skin::draw($self,$cr,$self->{handle_skin},int($x),$self->{top},$minw,$h-$self->{top}-$self->{bottom});
 	}
 	1;
 }
 
 package Layout::Bar::Scale;
-use base 'Gtk2::Scale';
+use base 'Gtk3::Scale';
 
 sub new
 {	my ($class,$opt,$ref)=@_;
-	my $scale= $opt->{orientation} || 'left-to-right';
-	$scale= 'left-to-right' if $opt->{horizontal};
-	$scale= 'bottom-to-top' if $opt->{vertical};
-	$scale= $scale eq 'left-to-right' ? 'Gtk2::HScale' : 'Gtk2::VScale';
+	my $o= $opt->{vertical} ? 'vertical' : 'horizontal';
 	my $max= $ref->{max} || 1;
-	my $self = bless $scale->new_with_range(0,$max,$max/10), $class;
-	$self->set_inverted(1) if $scale eq 'Gtk2::VScale';
-	$self->{vertical}= $scale eq 'Gtk2::VScale';
+	my $self= bless Gtk3::Scale->new_with_range($o,0,$max,$max/10), $class;
+	$self->{vertical}= $o eq 'vertical';
+	$self->set_inverted(1) if $self->{vertical};
 	$self->{max}= $max;
 	$self->{step_mode}=$opt->{step_mode};
 	$self->set_draw_value(0);
@@ -3496,15 +3490,15 @@ sub set_val
 }
 sub set_max
 {	$_[0]->{max}=$_[1];
-	$_[0]->get_adjustment->upper($_[1]);
+	$_[0]->get_adjustment->set_upper($_[1]);
 }
 
 sub button_press_cb
 {	my ($self,$event)=@_;
-	if (!$self->{step_mode})	# short-circuit normal Gtk2::Scale click behaviour
+	if (!$self->{step_mode})	# short-circuit normal Gtk3::Scale click behaviour
 	{	$self->{pressed}= $self->signal_connect(motion_notify_event  => \&update_value_direct_mode);
 		$self->update_value_direct_mode($event);
-		return 1;		# return 1 so that Gtk2::Scale won't get the mouse click
+		return 1;		# return 1 so that Gtk3::Scale won't get the mouse click
 	}
 	$self->{pressed}= $self->signal_connect(value_changed  => \&value_changed_cb);
 	return 0;
@@ -3532,8 +3526,8 @@ sub value_changed_cb
 
 sub update_value_direct_mode
 {	my ($self,$event)=@_;
-	my ($x,$w)= $self->{vertical} ?	($event->y, $self->allocation->height):
-					($event->x, $self->allocation->width) ;
+	my ($x,$w)= $self->{vertical} ?	($event->y, $self->get_allocated_height):
+					($event->x, $self->get_allocated_width) ;
 	$w=1 if $w<1;
 	my $f=$x/$w;
 	$f=0 if $f<0; $f=1 if $f>1;
@@ -3544,22 +3538,24 @@ sub update_value_direct_mode
 }
 
 package Layout::AAPicture;
-use base 'Gtk2::EventBox';
-
+use base 'Gtk3::EventBox';
+use Glib::Object::Subclass 'Gtk3::EventBox';
 our @default_options= (maxsize=>500, xalign=>.5, yalign=>.5, r_height=>25, r_alpha1=>80, r_alpha2=>0, r_scale=>90);
 
-sub new
-{	my ($class,$opt)=@_;
+
+sub after_new
+{	#my ($class,$opt)=@_;
+	my ($self,$opt)=@_;
 	%$opt=( @default_options, %$opt );
-	my $self = bless Gtk2::EventBox->new, $class;
+	#my $self= bless Gtk3::EventBox->new, $class;
 	$self->set_visible_window(0);
 	$self->{aa}=$opt->{aa};
 	my $minsize=$opt->{minsize};
-	$self->{$_}=$opt->{$_} for qw/maxsize xalign yalign multiple/;
+	$self->{$_}=$opt->{$_} for qw/forceratio minsize maxsize xalign yalign multiple/;
 
 	$self->{usable_w}=$self->{usable_h}=1;
 	my $ratio=1;
-	if ( (my $refl=$opt->{reflection}) && $::CairoOK)
+	if (my $refl=$opt->{reflection})
 	{	$self->{$_}= $opt->{$_}/100 for qw/r_alpha1 r_alpha2 r_scale/;
 		$self->{reflection}= $refl==1 ? $opt->{r_height}/100 : $refl/100;
 		my $height= $self->{reflection} +1;
@@ -3584,20 +3580,14 @@ sub new
 		$self->{usable_h}/= $hs;
 		$self->{overlay}=[$pb, $x/$w, $y/$h, $ws,$hs];
 	}}
-	if ($opt->{forceratio}) { $self->{forceratio}=$ratio; } #not sure it's still needed with the natural_size mode
-	else
-	{	$self->{expand_to_ratio}=$ratio;
-		$self->{expand_weight}=10;
-	}
 	if (my $file=$opt->{'default'})
 	{	$self->{'default'}= ::SearchPicture( $file, $opt->{PATH} );
 	}
 	$self->signal_connect(size_allocate => \&size_allocate_cb);
-	$self->signal_connect(expose_event => \&expose_cb);
+	$self->signal_connect(draw => \&draw_cb);
 	$self->signal_connect(destroy => sub {delete $::ToDo{'8_LoadImg'.$_[0]}});
 	$self->set_size_request($minsize,$minsize) if $minsize;
 	$self->{key}=[];
-	$self->{natural_size}=1 unless $minsize;
 	$self->{ratio}=$ratio;
 	return $self;
 }
@@ -3629,14 +3619,8 @@ sub set
 		::IdleDo('8_LoadImg'.$self,500,\&LoadImg,$self,@files);
 	}
 	else
-	{	$self->hide unless $self->{natural_size};
+	{	$self->hide;
 	}
-	$self->signal_connect('map'=>sub #undo the temporary settings set in size_allocate_cb for the natural_size mode #FIXME should be simpler
-	{	my $self=$_[0];
-		delete $self->{size} unless $self->{pixbuf} || $::ToDo{'8_LoadImg'.$self};
-		$self->set_size_request(-1,-1) unless $self->{forceratio};
-		$self->queue_resize;
-	}) if $self->{natural_size};
 }
 
 sub LoadImg
@@ -3656,11 +3640,33 @@ sub LoadImg
 	$self->hide unless $pix;
 }
 
+#sub GET_PREFERRED_WIDTH {warn "get_preferred_width @_"}
+#sub GET_PREFERRED_HEIGHT {warn "get_preferred_height @_"}
+#sub GET_PREFERRED_SIZE {warn "get_preferred_size @_"}
+
+sub GET_REQUEST_MODE { $_[0]->get_parent->isa('Gtk3::VBox') ? 'height-for-width' : 'width-for-height' } #FIXME could be better
+
+sub GET_PREFERRED_WIDTH_FOR_HEIGHT
+{	$_[0]->get_preferred_wfh_or_hfw($_[1],1);
+}
+sub GET_PREFERRED_HEIGHT_FOR_WIDTH
+{	$_[0]->get_preferred_wfh_or_hfw($_[1],0);
+}
+
+sub get_preferred_wfh_or_hfw
+{	my ($self,$size,$is_wfh)=@_;
+	$size*= $is_wfh ? $self->{ratio} : 1/$self->{ratio};
+	my $max= ::min($self->{maxsize},int $size);
+	my $min= $self->{minsize}||0;
+	$min= $max if $max<$min || $self->{forceratio};
+	return $min,$max;
+}
+
 sub size_allocate_cb
 {	my ($self,$alloc)=@_;
 	my $ratio=$self->{ratio};
-	my $w=$alloc->width;
-	my $h=$alloc->height;
+	my $w=$alloc->{width};
+	my $h=$alloc->{height};
 	if (my $max=$self->{maxsize})
 	{	$w=$max if $w>$max;
 		$h=$max if $h>$max;
@@ -3670,41 +3676,29 @@ sub size_allocate_cb
 	$h= $func->($h, int $w/$ratio);
 	my $size=$w.'x'.$h;
 
-	if (delete $self->{natural_size})#set temporary settings for natural_size mode #FIXME should be simpler
-	{	$self->set_size_request($w,$h) if !defined $self->{size} || $size ne $self->{size};
-		$self->{size}=$size;
-		return;
-	}
-
-	if (!defined $self->{size})
-	{	unless ($self->{pixbuf} || $::ToDo{'8_LoadImg'.$self}) {$self->hide;return};
-	}
-	elsif ($self->{size} eq $size) {return}
+	return if $self->{size} && $self->{size} eq $size;
 	$self->set_size_request($w,$h) if $self->{forceratio};
 	$self->{size}=$size;
 	$self->set( delete $self->{key} ); #force reloading
 }
 
-sub expose_cb
-{	my ($self,$event)=@_;
-	my ($x,$y,$ww,$wh)=$self->allocation->values;
+sub draw_cb
+{	my ($self,$cr)=@_;
 	my $pixbuf= $self->{pixbuf};
 	return 1 unless $pixbuf;
-	my $w=$pixbuf->get_width;
-	my $h=$pixbuf->get_height;
-	$x+= int ($ww-$w)*$self->{xalign};
-	$y+= int ($wh-$h)*$self->{yalign};
+	my $ww= $self->get_allocated_width;
+	my $wh= $self->get_allocated_height;
+	my $w= $pixbuf->get_width;
+	my $h= $pixbuf->get_height;
+	my $x= int ($ww-$w)*$self->{xalign};
+	my $y= int ($wh-$h)*$self->{yalign};
+	$cr->translate($x,$y);
 	if (!$self->{reflection})
-	{	my $gc=Gtk2::Gdk::GC->new($self->window);
-		$gc->set_clip_rectangle($event->area);
-		$self->window->draw_pixbuf($gc,$pixbuf,0,0,$x,$y,-1,-1,'none',0,0);
+	{	$cr->set_source_pixbuf($pixbuf,0,0);
+		$cr->paint;
 	}
 	else
-	{	my $cr= Gtk2::Gdk::Cairo::Context->create($self->window);
-		$cr->rectangle($event->area);
-		$cr->clip;
-		$cr->translate($x,$y);
-		$self->draw_with_reflection($cr,$pixbuf);
+	{	$self->draw_with_reflection($cr,$pixbuf);
 	}
 	1;
 }
@@ -3753,7 +3747,7 @@ sub collage
 		else		{ $h+=$ph; $w=$pw if $pw>$w; }
 	}
 
-	my $pixbuf= Gtk2::Gdk::Pixbuf->new( $pixbufs[0]->get_colorspace, 1,8, $w,$h);
+	my $pixbuf= Gtk3::Gdk::Pixbuf->new( $pixbufs[0]->get_colorspace, 1,8, $w,$h);
 	$pixbuf->fill(0);	 #fill with transparent black
 
 	for my $pb (@pixbufs)
@@ -3777,7 +3771,7 @@ sub add_overlay
 	my $ho= $h*$hs;
 	my $x= $w*$xs;
 	my $y= $h*$ys;
-	my $result= Gtk2::Gdk::Pixbuf->new( $pixbuf->get_colorspace, 1,8, $wo,$ho);
+	my $result= Gtk3::Gdk::Pixbuf->new( $pixbuf->get_colorspace, 1,8, $wo,$ho);
 	$result->fill(0);	 #fill with transparent black
 	$pixbuf->copy_area(0,0, $w,$h, $result, $x,$y);
 	$overlay->composite($result, 0,0, $wo,$ho, 0,0, $wo/$overlay->get_width,$ho/$overlay->get_height, 'bilinear',255);
@@ -3785,16 +3779,16 @@ sub add_overlay
 }
 
 package Layout::TogButton;
-use base 'Gtk2::ToggleButton';
+use base 'Gtk3::ToggleButton';
 
 sub new
 {	my ($class,$opt)=@_;
-	my $self = bless Gtk2::ToggleButton->new, $class;
+	my $self= bless Gtk3::ToggleButton->new, $class;
 	my ($icon,$label);
 	my $text= $opt->{label} || $opt->{text};
 	$self->set_relief($opt->{relief}) if $opt->{relief};
-	$label=Gtk2::Label->new($text) if defined $text;
-	$icon=Gtk2::Image->new_from_stock($opt->{icon},$opt->{size}) if $opt->{icon};
+	$label=Gtk3::Label->new($text) if defined $text;
+	$icon= Gtk3::Image->new_from_stock($opt->{icon},$opt->{size}) if $opt->{icon};
 	my $child= ($label && $icon) ?	::Hpack($icon,$label) :
 					$icon || $label;
 	$self->add($child) if $child;
@@ -3804,7 +3798,7 @@ sub new
 	::Watch($self,'HiddenWidgets',\&UpdateToggleState);
 	if ($opt->{skin})
 	{	my $skin=Skin->new($opt->{skin},$self,$opt);
-		$self->signal_connect(expose_event => \&Skin::draw,$skin);
+		$self->signal_connect(draw => \&Skin::draw,$skin);
 		$self->set_app_paintable(1); #needed ?
 		if (0 && $opt->{shape}) #mess up button-press cb TESTME
 		{	$self->{shape}=1;
@@ -3848,14 +3842,14 @@ sub new
 	if ($opt->{button} && $opt->{updatemenu}) { return Layout::ButtonMenu->new($opt); }
 	my $self;
 	my $label= $opt->{label} || $opt->{text};
-	if ($opt->{togglewidget})	{ $self=Gtk2::CheckMenuItem->new($label); }
-	elsif ($opt->{icon})		{ $self=Gtk2::ImageMenuItem->new($label);
-					  $self->set_image( Gtk2::Image->new_from_stock($opt->{icon}, 'menu'));
+	if ($opt->{togglewidget})	{ $self= Gtk3::CheckMenuItem->new($label); }
+	elsif ($opt->{icon})		{ $self= Gtk3::ImageMenuItem->new($label);
+					  $self->set_image( Gtk3::Image->new_from_stock($opt->{icon}, 'menu'));
 				  	}
-	else				{ $self=Gtk2::MenuItem->new($label); }
+	else				{ $self=Gtk3::MenuItem->new($label); }
 	if ($opt->{updatemenu})
 	{	$self->{updatemenu}=$opt->{updatemenu};
-		my $submenu=Gtk2::Menu->new;
+		my $submenu= Gtk3::Menu->new;
 		$self->set_submenu($submenu);
 		$self->signal_connect( activate=>\&UpdateSubMenu );
 		::IdleDo( '9_UpdateSubMenu_'.$self, undef, \&UpdateSubMenu,$self);	# (delayed) initial filling of the menu, not needed but makes the menu work better with gnome2-globalmenu
@@ -3877,14 +3871,6 @@ sub new
 	return $self;
 }
 
-sub get_player_window
-{	my $menu=$_[0]->parent;
-	while (ref $menu eq 'Gtk2::Menu')
-	{	$menu=$menu->get_attach_widget->parent;
-	}
-	return ::get_layout_widget($menu);
-}
-
 sub UpdateSubMenu
 {	my $self=shift;
 	my $menu=$self->get_submenu;
@@ -3895,19 +3881,19 @@ sub UpdateSubMenu
 }
 
 package Layout::ButtonMenu;
-use base 'Gtk2::ToggleButton';
+use base 'Gtk3::ToggleButton';
 
 sub new
 {	my ($class,$opt0)=@_;
 	my %opt= ( relief=>'none', size=> 'menu', text=>'', %$opt0 );
-	my $self= bless Gtk2::ToggleButton->new, $class;
+	my $self= bless Gtk3::ToggleButton->new, $class;
 	my $child;
 	my $label= $opt{label} || $opt{text};
-	$child=Gtk2::Label->new($label) if length $label;
+	$child= Gtk3::Label->new($label) if length $label;
 	if ($opt{icon})
-	{	my $img= Gtk2::Image->new_from_stock($opt{icon},$opt{size});
+	{	my $img= Gtk3::Image->new_from_stock($opt{icon},$opt{size});
 		if ($child)
-		{	my $hbox= Gtk2::HBox->new(0,4);
+		{	my $hbox= Gtk3::HBox->new(0,4);
 			$hbox->pack_start($img,0,0,2);
 			$hbox->pack_start($child,0,0,2);
 			$child=$hbox;
@@ -3916,7 +3902,7 @@ sub new
 	}
 	$self->add($child) if $child;
 	$self->set_relief($opt{relief});
-	$self->{menu}=Gtk2::Menu->new;
+	$self->{menu}= Gtk3::Menu->new;
 	$self->{menu}->attach_to_widget($self,undef);
 	$self->{updatemenu}=$opt{updatemenu};
 	$self->signal_connect(button_press_event => sub
@@ -3936,14 +3922,14 @@ sub append { $_[0]{menu}->append($_[1]) }
 sub get_submenu { $_[0]{menu} }
 
 package Layout::LabelToggleButtons;
-use base 'Gtk2::ScrolledWindow';
+use base 'Gtk3::ScrolledWindow';
 sub new
 {	my ($class,$opt)=@_;
-	my $self= bless Gtk2::ScrolledWindow->new, $class;
+	my $self= bless Gtk3::ScrolledWindow->new, $class;
 	$self->set_shadow_type('etched-in');
 	$self->set_policy('automatic','automatic');
-	$self->{table}=Gtk2::Table->new(1,1,::TRUE);
-	$self->add_with_viewport($self->{table});
+	$self->{flowbox}= Gtk3::FlowBox->new;
+	$self->add($self->{flowbox});
 	my $field= $opt->{field};
 	if (Songs::FieldType($field) ne 'flags')
 	{	warn "LabelToggleButtons : invalid field $field\n";
@@ -3954,14 +3940,13 @@ sub new
 	my $songchange= $self->{hide_unset} ? sub { my $self=shift; $self->{width}=0; $self->update_columns; $self->update_song } : \&update_song;
 	::WatchSelID($self, $songchange, [$field]);
 	::Watch($self,"newgids_$field",\&update_labels);
-	$self->signal_connect( size_allocate => sub { ::IdleDo( "resize_$self",1000, \&update_columns,$_[0] ); });
 	return $self;
 }
 sub update_labels
 {	my $self=shift;
 	my %checks; $self->{checks}=\%checks;
 	for my $label ( @{Songs::ListAll($self->{field})} )
-	{	my $check= $checks{$label}= Gtk2::CheckButton->new_with_label($label);
+	{	my $check= $checks{$label}= Gtk3::CheckButton->new_with_label($label);
 		$check->signal_connect(toggled => \&toggled_cb,$label);
 	}
 	$self->{width}=0;
@@ -3970,14 +3955,9 @@ sub update_labels
 }
 sub update_columns
 {	my $self=shift;
-	goto &update_labels unless $self->{checks}; #initialization
-	my $width=$self->child->allocation->width;
-	return unless $width;
-	return if $self->{width} && $width == $self->{width};
-	$self->{width}=$width;
-	my $table=$self->{table};
-	$table->remove($_) for $table->get_children;
-	$table->resize(1,1);
+	$self->update_labels unless $self->{checks}; #initialization
+	my $flowbox= $self->{flowbox};
+	$flowbox->remove($_) for $flowbox->get_children;
 	my @list;
 	if ($self->{hide_unset})
 	{	my $ID= ::GetSelID($self);
@@ -3985,21 +3965,15 @@ sub update_columns
 	}
 	else { @list= @{Songs::ListAll($self->{field})} }
 	my @shown= grep defined, map $self->{checks}{$_}, @list;
-	my $maxwidth=::max( 10,map 4+$_->size_request->width, @shown );
-	my $maxcol= int( $width / $maxwidth)||1;
-	my $col=my $row=0;
-	for my $widget (@shown)
-	{	$table->attach($widget,$col,$col+1,$row,$row+1,['fill','expand'],'shrink',1,1);
-		if (++$col==$maxcol) {$col=0; $row++;}
-	}
-	$table->show_all;
+	$flowbox->add($_) for @shown;
+	$flowbox->show_all;
 }
 
 sub update_song
 {	my $self=shift;
 	$self->{busy}=1;
 	my $ID= ::GetSelID($self);
-	$self->{table}->set_sensitive(defined $ID);
+	$self->{flowbox}->set_sensitive(defined $ID);
 	my $checks=$self->{checks};
 	for my $label (keys %$checks)
 	{	my $check=$checks->{$label};
@@ -4010,8 +3984,8 @@ sub update_song
 }
 sub toggled_cb
 {	my ($check,$label)=@_;
-	return unless $check->parent;
-	my $self=::find_ancestor($check,__PACKAGE__);
+	return unless $check->get_parent;
+	my $self= $check->GET_ancestor;
 	return if $self->{busy};
 	my $field= ($check->get_active ? '+' : '-').$self->{field};
 	my $ID= ::GetSelID($self);
@@ -4019,15 +3993,15 @@ sub toggled_cb
 }
 
 package Layout::SongInfo;
-use base 'Gtk2::ScrolledWindow';
+use base 'Gtk3::ScrolledWindow';
 our @default_options= ( markup_cat=>"<u>%s</u>", markup_field=>"<small>%s :</small>", markup_value=>"<small><b>%s</b></small>" );
+
 sub new
 {	my ($class,$opt)=@_;
 	%$opt=( @default_options, %$opt );
-	my $self= bless Gtk2::ScrolledWindow->new, $class;
-	$self->set_policy('automatic','automatic');
-	$self->{table}=Gtk2::Table->new(1,1,::FALSE);
-	$self->add_with_viewport($self->{table});
+	my $self= bless Gtk3::ScrolledWindow->new, $class;
+	$self->{grid}= Gtk3::Grid->new;
+	$self->add($self->{grid});
 
 	$self->{$_}=$opt->{$_} for qw/group ID markup_cat markup_field markup_value font expander collapsed hide_empty/;
 	if ($opt->{ID}) # for use in SongProperties window
@@ -4048,60 +4022,63 @@ sub init
 	{	$self->SaveOptions if $self->{cats}; # updates $self->{collapsed}
 		$collapsed{$_}=1 for split / +/, $self->{collapsed}||'';
 	}
-	my $table=$self->{table};
-	$table->remove($_) for $table->get_children;
+	my $grid=$self->{grid};
+	$grid->remove($_) for $grid->get_children;
 	my $labels1=$self->{labels1}={};
 	my $labels2=$self->{labels2}={};
 	my $cats=$self->{cats}={};
 	my @labels;
-	$table->{row}=0;
+	$grid->{row}=0;
 	my $treelist=Songs::InfoFields;
 	while (@$treelist)
 	{	my ($cat,$catname,$fields)= splice @$treelist,0,3;
 		#category
-		my $catlabel=Gtk2::Label->new_with_format($self->{markup_cat}, $catname);
+		my $catlabel= Gtk3::Label->new_with_format($self->{markup_cat}, $catname);
 		push @labels, $catlabel;
-		my $table2=$table;
+		my $grid2=$grid;
 		if ($self->{expander})
-		{	$table2=Gtk2::Table->new(1,1,::FALSE);
-			$table2->{row}=0;
-			my $expander= Gtk2::Expander->new;
+		{	$grid2= Gtk3::Grid->new;
+			$grid2->{row}=0;
+			my $expander= Gtk3::Expander->new;
 			$expander->set_label_widget($catlabel);
-			$expander->add($table2);
+			$expander->add($grid2);
 			$expander->set_expanded( !$collapsed{$cat} );
 			$catlabel=$expander;
 		}
+		$grid->set_row_spacing(1);
 		$cats->{$cat}=$catlabel;
-		my $row=$table->{row}++;
-		$table->attach($catlabel,0,1,$row,$row+1,'fill','shrink',1,1);
+		my $row=$grid->{row}++;
+		$grid->attach($catlabel,0,$row,1,1);
+		$catlabel->set(margin_top=>8) if $row>1; #put some empty space between categories
 		#fields
 		for my $field (@$fields)
-		{	my $lab1=$labels1->{$field}=Gtk2::Label->new_with_format($self->{markup_field}, Songs::FieldName($field));
-			my $lab2=$labels2->{$field}=Gtk2::Label->new;
-			push @labels, $labels1, $labels2;
+		{	my $lab1=$labels1->{$field}=Gtk3::Label->new_with_format($self->{markup_field}, Songs::FieldName($field));
+			my $lab2=$labels2->{$field}=Gtk3::Label->new;
+			push @labels, $lab1, $lab2;
 			$lab1->set_padding(5,0);
 			$lab1->set_alignment(1,0);
 			$lab2->set_alignment(0,0);
 			$lab2->set_line_wrap(1);
 			$lab2->set_selectable(1);
-			my $row=$table2->{row}++;
-			$table2->attach($lab1,0,1,$row,$row+1,'fill','fill',1,1);
-			$table2->attach($lab2,1,2,$row,$row+1,'fill','fill',1,1);
+			my $row=$grid2->{row}++;
+			$grid2->attach($lab1,0,$row,1,1);
+			$grid2->attach($lab2,1,$row,1,1);
 		}
-		$row=$table->{row}++;
-		$table->attach(Gtk2::HBox->new,0,3,$row,$row+1,[],[],0,5) if @$treelist; #space between categories
+		$row=$grid->{row}++;
+
 	}
 	if (my $font=$self->{font})
-	{	$font= Gtk2::Pango::FontDescription->from_string($font);
+	{	$font= Pango::FontDescription::from_string($font);
 		$_->modify_font($font) for @labels;
 	}
 	if ($self->{expander})
-	{	my $sg= Gtk2::SizeGroup->new('horizontal');
+	{	#set field name labels to same width across categories
+		my $sg= Gtk3::SizeGroup->new('horizontal');
 		$sg->add_widget($_) for values %$labels1;
 	}
-	$table->set_no_show_all(0);
-	$table->show_all;
-	$table->set_no_show_all(1);
+	$grid->set_no_show_all(0);
+	$grid->show_all;
+	$grid->set_no_show_all(1);
 	$self->update;
 }
 sub update
@@ -4126,7 +4103,6 @@ sub update
 		}
 		$self->{cats}{$cat}->set_visible($found) if $self->{hide_empty};
 	}
-	$self->queue_resize; # for unclear reasons (bug in gtk2 ?), labels that were hidden when the widget is was last shown, and then are shown while the widget is hidden, have a row height of 0 (and thus hidden) when the widget is shown, forcing a queue resize fixes it
 }
 sub SaveOptions
 {	my $self=shift;
@@ -4138,7 +4114,7 @@ sub SaveOptions
 }
 
 package Layout::PictureBrowser;
-use base 'Gtk2::Box';
+use base 'Gtk3::Box';
 
 our @toolbar=
 (	{ stockicon=> 'gmb-view-list',	label=>_"Show file list",  toggleoption=>'self/show_list',  cb=> sub { $_[0]{self}->update_showhide; }, },
@@ -4208,7 +4184,7 @@ our @ContextMenu=
 	},
 
 	{ label => _"Paste link",
-	  test => sub { return unless $_[0]{self}->can('drop_uris'); $_[0]{clip}= $_[0]{self}->get_clipboard(Gtk2::Gdk::Atom->new('PRIMARY',1))->wait_for_text; $_[0]{clip} && $_[0]{clip}=~m#^\s*\w+://#; },
+	  test => sub { return unless $_[0]{self}->can('drop_uris'); my $c= $_[0]{self}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'));  $_[0]{clip}=$c->wait_for_text; $_[0]{clip} && $_[0]{clip}=~m#^\s*\w+://#; },
 	  code=> sub { $_[0]{self}->drop_uris(uris=>[grep m#^\s*\w+://#, split /[\n\r]+/, $_[0]{clip}]); },
 	},
 
@@ -4220,29 +4196,29 @@ our @ContextMenu=
 
 sub new
 {	my ($class,$opt)=@_;
-	my $self= bless Gtk2::VBox->new, $class;
+	my $self= bless Gtk3::VBox->new, $class;
 	$self->{$_}= $opt->{$_} for qw/group follow show_list show_folders show_toolbar reset_zoom_on nowrap pdf_mode embedded_mode all_mode/;
 
-	my $hbox= Gtk2::HBox->new;
-	my $hpaned=			Layout::Boxes::PanedNew('Gtk2::HPaned',{size=>$opt->{hpos}});
-	my $vpaned= $self->{vpaned}=	Layout::Boxes::PanedNew('Gtk2::VPaned',{size=>$opt->{vpos}});
+	my $hbox= Gtk3::HBox->new;
+	my $hpaned=			Layout::Boxes::PanedNew('Gtk3::HPaned',{size=>$opt->{hpos}});
+	my $vpaned= $self->{vpaned}=	Layout::Boxes::PanedNew('Gtk3::VPaned',{size=>$opt->{vpos}});
 	my $view=	$self->{view}=  Layout::PictureBrowser::View->new(%$opt,mode=>'V');
 	my $toolbar=	$self->{toolbar}= ::BuildToolbar(\@toolbar, getcontext=>\&toolbarcontext, self=>$self);
-	$self->{dirstore} = Gtk2::ListStore->new(qw/Glib::String Glib::String Glib::String/);
-	$self->{filestore}= Gtk2::TreeStore->new(qw/Glib::String Glib::String Glib::Boolean Glib::Uint Glib::Uint/);
-	my $treeview1= $self->{foldertv}= Gtk2::TreeView->new($self->{dirstore});
-	my $treeview2= $self->{filetv}=	  Gtk2::TreeView->new($self->{filestore});
-	my $renderer=Gtk2::CellRendererText->new;
+	$self->{dirstore} = Gtk3::ListStore->new(qw/Glib::String Glib::String Glib::String/);
+	$self->{filestore}= Gtk3::TreeStore->new(qw/Glib::String Glib::String Glib::Boolean Glib::Uint Glib::Uint/);
+	my $treeview1= $self->{foldertv}= Gtk3::TreeView->new($self->{dirstore});
+	my $treeview2= $self->{filetv}=	  Gtk3::TreeView->new($self->{filestore});
+	my $renderer=Gtk3::CellRendererText->new;
 	$renderer->signal_connect(edited => \&filename_edited_cb,$treeview2);
-	$treeview1->insert_column_with_attributes(-1, 'Dir icon', Gtk2::CellRendererPixbuf->new, stock_id => 2) unless $opt->{no_folder_icons};
-	$treeview1->insert_column_with_attributes(-1, 'Dir name', Gtk2::CellRendererText->new, text => 0);
+	$treeview1->insert_column_with_attributes(-1, 'Dir icon', Gtk3::CellRendererPixbuf->new, stock_id => 2) unless $opt->{no_folder_icons};
+	$treeview1->insert_column_with_attributes(-1, 'Dir name', Gtk3::CellRendererText->new, text => 0);
 	$treeview2->insert_column_with_attributes(-1, 'File name',$renderer, text => 0, editable=> 2);
 
 	#size and date column
-	my $renderer_s= Gtk2::CellRendererText->new;
-	my $renderer_d= Gtk2::CellRendererText->new;
-	my $column_s=Gtk2::TreeViewColumn->new_with_attributes('size',$renderer_s);
-	my $column_d=Gtk2::TreeViewColumn->new_with_attributes('date',$renderer_d);
+	my $renderer_s= Gtk3::CellRendererText->new;
+	my $renderer_d= Gtk3::CellRendererText->new;
+	my $column_s=Gtk3::TreeViewColumn->new_with_attributes('size',$renderer_s);
+	my $column_d=Gtk3::TreeViewColumn->new_with_attributes('date',$renderer_d);
 	$renderer_s->set(xalign=>1);
 	$column_s->set_cell_data_func($renderer_s, sub
 		{	my (undef,$cell,$store,$iter)=@_;
@@ -4264,23 +4240,29 @@ sub new
 	$_->set_sizing('autosize') for $treeview2->get_columns;
 
 	# draw "Embedded pictures"... text over the correct row (avoid stretching the first column for nothing and emphasize that this is not a regular row) and draw progress line if needed
-	$treeview2->signal_connect_after(expose_event=> sub
-	 {	my ($tv,$event)=@_;
+	$treeview2->signal_connect_after(draw=> sub
+	 {	my ($tv,$cr)=@_;
 		my $path= $tv->{embfiles_path};
 		return unless $path;
 		my $rect= $tv->get_cell_area($path,undef);
-		my $vwidth= ($tv->get_bin_window->get_geometry)[2];
-		$rect->width($vwidth-4);
-		if ($rect->intersect($event->area))
-		{	my $layout=Gtk2::Pango::Layout->new( $tv->create_pango_context );
-			my $state= $tv->get_state;
+		my $vwidth= $tv->get_bin_window->get_width;
+		$rect->{width}= $vwidth-4;
+		$cr->gdk_rectangle($rect);
+		$cr->clip;
+		my $intersect= $cr->get_clip_rectangle;
+		if ($intersect->{width} && $intersect->{height})
+		{	$cr->translate($rect->{x},$rect->{y});
+			my $layout= $tv->create_pango_layout;
+			my $style= $tv->get_style_context;
 			if ($self->{embfiles_idle}) #draw progress line
 			{	my $width= ($vwidth * ($tv->{scan_progress}||0))||1;
-				my $gc= $tv->get_style->text_aa_gc($state);
-				$tv->get_bin_window->draw_rectangle($gc,::TRUE, 0,$rect->y,$width,2);
+				my $color= $style->get_color($tv->get_state);
+				$cr->set_source_gdk_rgba($color);
+				$cr->rectangle(0,0,$width,2);
+				$cr->fill;
 			}
 			$layout->set_markup($tv->{embfiles_text});
-			$tv->get_style->paint_layout($tv->get_bin_window,$state, 1, $rect, $tv, undef, 4+$rect->x, $rect->y, $layout);
+			$style->render_layout($cr,4,0,$layout);
 		}
 	 });
 
@@ -4306,7 +4288,7 @@ sub new
 	$self->signal_connect(map => sub {$_[0]->queue_song_changed});
 	::set_drag($view, dest => [::DRAG_ID,::DRAG_FILE,sub
 	 {	my ($view,$type,@values)=@_;
-		my $self= ::find_ancestor($view,__PACKAGE__);
+		my $self= $view->GET_ancestor;
 		if ($type==::DRAG_FILE)
 		{	$self->drop_uris(uris=>\@values, is_move=>$view->{dragdest_suggested_action});
 		}
@@ -4330,7 +4312,7 @@ sub new
 	 );
 	$view->signal_connect(drag_leave => sub { delete $_[0]{dnd_message}; });
 	::set_drag($treeview2, source=> [::DRAG_FILE,sub
-	 {	my $self= ::find_ancestor($_[0],__PACKAGE__);
+	 {	my $self= $_[0]->GET_ancestor;
 		my $file=$self->{current_file};
 		$file=~s/:\w+$//;
 		return $file ? (::DRAG_FILE,'file://'.::url_escape($file)) : ()
@@ -4339,7 +4321,7 @@ sub new
 
 	$_->show_all, $_->set_no_show_all(1) for $vpaned,$toolbar;
 	$self->update_showhide;
-	$vpaned->signal_connect(show=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->refresh_treeviews; $self->update_selection; }); #updating of the file/folder list is disabled whe hidden, so needs to update it when shown
+	$vpaned->signal_connect(show=> sub { my $self= $_[0]->GET_ancestor; $self->refresh_treeviews; $self->update_selection; }); #updating of the file/folder list is disabled when hidden, so needs to update it when shown
 
 	if    (my $file=$opt->{set_file}) { $self->set_file($file); }
 	elsif (my $pb=$opt->{set_pixbuf}) { $self->{view}->set_pixbuf($pb); $self->{ignore_song}=1; }
@@ -4355,15 +4337,16 @@ sub SaveOptions
 {	my $self=shift;
 	my %opt;
 	my $vpaned= $self->{vpaned};
-	$opt{hpos}= ($vpaned->parent->{SaveOptions}($vpaned->parent))[1];	# The SaveOptions function of Layout::Boxes::PanedNew returns (size=>$value),
-	$opt{vpos}= ($vpaned->{SaveOptions}($vpaned))[1];			# we only want the value
+	my $hpaned= $vpaned->get_parent;
+	$opt{hpos}= ($hpaned->{SaveOptions}($hpaned))[1];	# The SaveOptions function of Layout::Boxes::PanedNew returns (size=>$value),
+	$opt{vpos}= ($vpaned->{SaveOptions}($vpaned))[1];	# we only want the value
 	$opt{$_}=$self->{view}{$_} for qw/scroll_zoom/;
 	$opt{$_}=$self->{$_} for qw/follow show_list show_folders show_toolbar reset_zoom_on pdf_mode embedded_mode all_mode/;
 	return %opt;
 }
 
 sub toolbarcontext
-{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+{	my $self= $_[0]->GET_ancestor;
 	return self=>$self, view=>$self->{view};
 }
 
@@ -4371,7 +4354,7 @@ sub update_showhide
 {	my $self=shift;
 	my $vpaned= $self->{vpaned};
 	$vpaned->set_visible( $self->{show_list} );
-	$vpaned->child1->set_visible( $self->{show_folders} );
+	$vpaned->get_child1->set_visible( $self->{show_folders} );
 	my $toolbar= $self->{toolbar};
 	$toolbar->set_visible( $self->{show_toolbar} );
 	::UpdateToolbar($toolbar);
@@ -4393,7 +4376,7 @@ sub delete_selected
 	@files= ::uniq(@files);
 	my $text= @files==1 ?	::filename_to_utf8displayname(::basename($files[0])) :
 				__n("%d file","%d files",scalar @files);
-	my $dialog = Gtk2::MessageDialog->new
+	my $dialog = Gtk3::MessageDialog->new
 		( $self->get_toplevel,
 		  'modal',
 		  'warning','cancel','%s',
@@ -4440,13 +4423,13 @@ sub filename_edited_cb
 	(my $path,$file)= ::splitpath($file);
 	my $new= GMB::Picture::RenameFile($path, $file, $newutf8, $tv->get_toplevel) if $newutf8=~m/\S/ && $file ne $newutf8;
 	return unless $new;
-	my $self= ::find_ancestor($tv,__PACKAGE__);
+	my $self= $tv->GET_ancestor;
 	$self->{current_file}= ::catfile($path,$new.$suffix);
 	$self->update;
 }
 sub key_press_cb
 {	my ($self,$event)=@_;
-	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
+	my $key= Gtk3::Gdk::keyval_name( $event->keyval );
 	if (::WordIn($key,'Delete KP_Delete'))	{ $self->delete_selected }
 	elsif (lc$key eq 'l')	{ $self->{show_list}^=1; $self->update_showhide; $self->{view}->grab_focus unless $self->{show_list}; }
 	elsif (lc$key eq 'n')	{ $self->view_in_new_window }
@@ -4457,7 +4440,7 @@ sub key_press_cb
 }
 sub folder_activated_cb
 {	my ($tv,$treepath,$tvcol)=@_;
-	my $self= ::find_ancestor($tv,__PACKAGE__);
+	my $self= $tv->GET_ancestor;
 	my $store= $tv->get_model;
 	my $iter= $store->get_iter($treepath);
 	return unless $iter;
@@ -4474,12 +4457,12 @@ sub folder_button_press_cb
 }
 sub file_button_press_cb
 {	my ($tv,$event)=@_;
-	my $self= ::find_ancestor($tv,__PACKAGE__);
+	my $self= $tv->GET_ancestor;
 	#$self->grab_focus;
 	my $button=$event->button;
 	if ($button == 3)
-	{	my @rows=$tv->get_selection->get_selected_rows;
-		::PopupContextMenu( \@ContextMenu, {mode=>'L', treepaths=>\@rows, $self->context_menu_args} );
+	{	my ($rows)= $tv->get_selection->get_selected_rows;
+		::PopupContextMenu( \@ContextMenu, {mode=>'L', treepaths=>$rows, $self->context_menu_args} );
 	}
 	else {return 0}
 	1;
@@ -4489,7 +4472,7 @@ sub treeview_selection_changed_cb
 	my ($store,$iter) = $selection->get_selected;
 	return unless $iter;
 	my $file= ::decode_url($store->get($iter,1));
-	my $self= ::find_ancestor($selection->get_tree_view,__PACKAGE__);
+	my $self= $selection->get_tree_view->GET_ancestor;
 	return if $self->{busy};
 	$self->set_file($file);
 }
@@ -4522,7 +4505,7 @@ sub queue_song_changed
 {	my ($self,$ID,$force)=@_;
 	return if $self->{current_path} && !$self->{follow} && !$force;
 	return if $self->{ignore_song};
-	return unless $self->mapped;
+	return unless $self->get_mapped;
 	::IdleDo('8_ChangePicture'.$self,500,\&SongChanged,$self,$ID);
 }
 sub queue_change_picture
@@ -4577,7 +4560,7 @@ sub update
 	}
 	elsif ($self->{mode} eq 'list') { @files= grep {my $f=$_; $f=~s/:\w+$//; -f $f} @{$self->{filelist}}; }
 
-	my $pdfok= $GMB::Picture::pdf_ok && $self->{pdf_mode};
+	my $pdfok= $self->{pdf_mode} && GMB::Picture::pdf_ok();
 	for my $path (@paths)
 	{	opendir my($dh),$path  or do { warn $!; last; };
 		for my $file (map $path.::SLASH.$_, ::sort_number_aware(grep !m#^\.#, readdir $dh))
@@ -4625,6 +4608,7 @@ sub refresh_treeviews
 	my $filestore=$self->{filestore};
 	my $filetv= $self->{filetv};
 	my $foldertv= $self->{foldertv};
+	$self->{busy}=1;
 	$dirstore->clear;
 	$filestore->clear;
 	unless ($path && $oldpath && $oldpath eq $path) #folder has changed, reset scrollbars
@@ -4632,11 +4616,12 @@ sub refresh_treeviews
 		$filetv->get_vadjustment->set_value(0);
 		$self->{loaded_path}= $path;
 	}
+	$self->{busy}=0;
 	return unless $path;
 	my $parent= ::parentdir($path);
 	$path= ::pathslash($path); # add a slash at the end
 	$dirstore->set( $dirstore->append,  0,'..', 1,Songs::filename_escape($parent), 2,'gtk-go-up') if $parent;
-	my $pdfok= $GMB::Picture::pdf_ok && $self->{pdf_mode};
+	my $pdfok= $self->{pdf_mode} && GMB::Picture::pdf_ok();
 
 	my $show_expanders;
 	my $folder_center_treepath;
@@ -4647,7 +4632,7 @@ sub refresh_treeviews
 			$dirstore->set( $iter, 0,::filename_to_utf8displayname($file), 1,Songs::filename_escape($path.$file),  2,'gtk-directory');
 			if ($oldpath && $oldpath eq $path.$file)	#select and center on previous folder if there
 			{	$folder_center_treepath= $dirstore->get_path($iter);
-				$foldertv->set_cursor($folder_center_treepath);
+				$foldertv->set_cursor($folder_center_treepath,undef,0);
 			}
 			next;
 		}
@@ -4715,8 +4700,8 @@ sub scan_embedded_pictures_idle_cb
 	if ($self->{show_list} && (my $path=$tv->{embfiles_path}))
 	{	# refresh row where the progress line is drawn
 		my $rect= $tv->get_cell_area($path,undef);
-		$rect->width( ($tv->get_bin_window->get_geometry)[2] );
-		$tv->queue_draw_area($rect->values);
+		$rect->{width}= $tv->get_bin_window->get_width;
+		$tv->queue_draw_area( @$rect{qw/x y width height/} );
 	}
 	return 1 if @$todo;
 
@@ -4833,15 +4818,14 @@ sub context_menu_args
 }
 
 package Layout::PictureBrowser::View;
-use base 'Gtk2::Widget';
+use base 'Gtk3::Widget';
 
 sub new
 {	my ($class,%opt)=@_;
-	#my $self= bless Gtk2::EventBox->new, $class;
-	my $self= bless Gtk2::DrawingArea->new, $class;
+	my $self= bless Gtk3::DrawingArea->new, $class;
 	$self->add_events([qw/pointer-motion-mask scroll-mask key-press-mask button-press-mask button-release-mask/]);
-	$self->can_focus(::TRUE);
-	$self->signal_connect(expose_event => \&expose_cb);
+	$self->set_can_focus(::TRUE);
+	$self->signal_connect(draw => \&draw_cb);
 	$self->signal_connect(size_allocate=> \&resize);
 	$self->signal_connect(scroll_event => \&scroll_cb);
 	$self->signal_connect(key_press_event=> \&key_press_cb);
@@ -4853,7 +4837,7 @@ sub new
 	$self->{mode}= $opt{mode}||'P';
 	$self->{offsetx}= $self->{offsety} =0;
 	$self->{fit}=1; #default to zoom-to-fit
-	if (my $c=$opt{bgcolor}) { $self->modify_bg('normal',Gtk2::Gdk::Color->parse($c)); }
+	if (my $c=$opt{bgcolor}) { $self->{bgcolor}=Gtk3::Gdk::RGBA::parse($c); }
 	return $self;
 }
 
@@ -4863,7 +4847,7 @@ sub set_pixbuf
 	$self->{pixbuf}=$pixbuf;
 	delete $self->{pbanim};
 	Glib::Source->remove(delete $self->{anim_timeout}) if $self->{anim_timeout};
-	if ($pixbuf && $pixbuf->isa('Gtk2::Gdk::PixbufAnimation'))
+	if ($pixbuf && $pixbuf->isa('Gtk3::Gdk::PixbufAnimation'))
 	{	$self->{pbanim}=$pixbuf;
 		$self->animate;
 	}
@@ -4898,8 +4882,14 @@ sub reset_offset
 	$self->{offsetx}=$self->{offsety}=0;
 }
 
-sub expose_cb
-{	my ($self,$event)=@_;
+sub draw_cb
+{	my ($self,$cr)=@_;
+	if (my $c=$self->{bgcolor})
+	{	$cr->set_source_gdk_rgba($c);
+		my $gdkw= $self->gdkwindow;
+		$cr->rectangle(0,0,$gdkw->get_width,$gdkw->get_height);
+		$cr->fill;
+	}
 	my $pixbuf= $self->{pixbuf};
 	return 1 unless $pixbuf;
 	my $scale= $self->{scale};
@@ -4908,9 +4898,6 @@ sub expose_cb
 	my $ph= $pixbuf->get_height;
 	my $x= $self->{x1} - $self->{offsetx};
 	my $y= $self->{y1} - $self->{offsety};
-	my $cr= Gtk2::Gdk::Cairo::Context->create($self->gdkwindow);
-	$cr->rectangle($event->area);
-	$cr->clip;
 	$cr->save;
 	$cr->translate($x,$y);
 	$cr->scale($scale,$scale);
@@ -4925,25 +4912,30 @@ sub expose_cb
 		$cr->rectangle(0,0,$pw,$ph);
 		$cr->fill;
 	}
-	$cr->set_source_pixbuf($pixbuf,0,0);
-	$cr->paint;
+	if ($pixbuf->isa('Poppler::Page'))
+	{	$pixbuf->render($cr);
+	}
+	else
+	{	$cr->set_source_pixbuf($pixbuf,0,0);
+		$cr->paint;
+	}
+	$cr->restore;
 	if (my $msg=$self->{dnd_message}) # display a message when dragging a file/link/song above the picture
-	{	$cr->restore;
-		$self->draw_overlay_text($cr,::PangoEsc($msg),.5,.5);
+	{	$self->draw_overlay_text($cr,::PangoEsc($msg),.5,.5);
 	}
 	elsif ($self->{show_info} && defined $self->{info})
-	{	$cr->restore;
-		$self->draw_overlay_text($cr,$self->{info},.5,1);
+	{	$self->draw_overlay_text($cr,$self->{info},.5,1);
 	}
 	1;
 }
 
 sub draw_overlay_text
 {	my ($self,$cr,$text,$x,$y)=@_;
-	my $layout=Gtk2::Pango::Layout->new( $self->create_pango_context );
+	my $layout= $self->create_pango_layout;
 	$layout->set_markup($text);
-	my ($tw,$th)= map $_/Gtk2::Pango->scale, $layout->get_size;
-	my ($w,$h)=$self->gdkwindow->get_size;
+	my ($tw,$th)= map $_/Pango::SCALE, $layout->get_size;
+	my $w= $self->gdkwindow->get_width;
+	my $h= $self->gdkwindow->get_height;
 	my $pad=8;
 	$x*= $w-$tw-$pad;
 	$y*= $h-$th-$pad;
@@ -4952,15 +4944,16 @@ sub draw_overlay_text
 	$cr->fill;
 	$cr->set_source_rgb(1,1,1);
 	$cr->move_to($x,$y);
-	Pango::Cairo::show_layout($cr,$layout);
+	$cr->show_layout($layout);
 }
 
 sub resize
 {	my $self=shift;
 	my $gdkwin= $self->gdkwindow;
 	return unless $gdkwin;
-	my ($w,$h)=$gdkwin->get_size;
-	my ($x,$y)= $self->no_window ? $gdkwin->get_position : (0,0);
+	my $w= $gdkwin->get_width;
+	my $h= $gdkwin->get_height;
+	my ($x,$y)= $self->get_has_window ? (0,0) : $gdkwin->get_position;
 	$self->invalidate_gdkwin;
 	my $pixbuf= $self->{pixbuf};
 	return unless $pixbuf;
@@ -4991,7 +4984,7 @@ sub resize
 
 sub key_press_cb
 {	my ($self,$event)=@_;
-	my $key=Gtk2::Gdk->keyval_name( $event->keyval );
+	my $key= Gtk3::Gdk::keyval_name( $event->keyval );
 	#my $state=$event->get_state;
 	#my $ctrl= $state * ['control-mask'] && !($state * [qw/mod1-mask mod4-mask super-mask/]); #ctrl and not alt/super
 	#my $mod=  $state * [qw/control-mask mod1-mask mod4-mask super-mask/]; # no modifier ctrl/alt/super
@@ -5026,7 +5019,7 @@ sub button_press_cb
 	elsif ($button==8) { $self->change_picture(-1);}
 	elsif ($button!=1 && $event->type eq '2button-press') { $self->set_fullscreen }
 	elsif (!$self->{pressed})
-	{	($self->{last_x},$self->{last_y})=$event->coords;
+	{	($self->{last_x},$self->{last_y})=$event->get_coords;
 		$self->{pressed}=$button;
 	}
 	1;
@@ -5036,13 +5029,13 @@ sub button_release_cb
 	my $button=$event->button;
 	if (($self->{pressed}||0)==$button)
 	{	if ($button==1)
-		{	if    ($self->{dragged}) { $event->window->set_cursor(undef) }
+		{	if    ($self->{dragged}) { $event->get_window->set_cursor(undef) }
 			elsif ($self->{oneshot}) { $self->get_toplevel->close_window; return }
 			elsif (!$self->{scrolled}) { $self->change_picture(1); }
 		}
 		else
 		{	$self->set_zoom_fit unless $self->{zoomed} || $self->{prevnext};
-			if ($self->{zoomed}) { $event->window->set_cursor(undef) }
+			if ($self->{zoomed}) { $event->get_window->set_cursor(undef) }
 		}
 		$self->{$_}= undef for qw/last_x last_y dragged pressed zoomed prevnext scrolled/;
 	}
@@ -5053,9 +5046,9 @@ sub motion_notify_cb
 {	my ($self,$event)=@_;
 	my $button= $self->{pressed};
 	return unless $button;
-	my ($ex,$ey)=$event->coords;
+	my ($ex,$ey)=$event->get_coords;
 	if ($button==1 && ($self->{max_x} || $self->{max_y}))
-	{	$event->window->set_cursor(Gtk2::Gdk::Cursor->new('fleur')) unless $self->{dragged};
+	{	$event->get_window->set_cursor(Gtk3::Gdk::Cursor->new('fleur')) unless $self->{dragged};
 		$self->{dragged}=1;
 		# move picture
 		my $x= $self->{offsetx} + $self->{last_x} - $ex;
@@ -5072,7 +5065,7 @@ sub motion_notify_cb
 		{	$zoom="+$zoom" if $zoom>0;
 			$self->change_zoom($zoom,$ex,$ey);
 			$self->{last_y}=$ey;
-			$event->window->set_cursor(Gtk2::Gdk::Cursor->new('double_arrow')) unless $self->{zoomed};
+			$event->get_window->set_cursor(Gtk3::Gdk::Cursor->new('double_arrow')) unless $self->{zoomed};
 			$self->{zoomed}=1;
 		}
 		elsif ($next && !$self->{zoomed} && !$self->{oneshot})
@@ -5110,7 +5103,7 @@ sub scroll_cb
 sub change_picture
 {	my ($self,$direction)=@_;
 	if ($self->{oneshot}) { $self->get_toplevel->close_window; return }
-	my $browser= ::find_ancestor($self,'Layout::PictureBrowser');
+	my $browser= $self->GET_ancestor('Layout::PictureBrowser');
 	$browser->queue_change_picture($direction) if $browser;
 }
 sub change_zoom
@@ -5161,11 +5154,11 @@ sub rotate
 	$self->resize;
 }
 sub gdkwindow
-{	$_[0]{fullwin} || $_[0]->window;
+{	$_[0]{fullwin} || $_[0]->get_window;
 }
 sub invalidate_gdkwin
-{	my $gdkwin= $_[0]->gdkwindow;
-	$gdkwin->invalidate_rect(Gtk2::Gdk::Rectangle->new(0,0,$gdkwin->get_size),0) if $gdkwin;
+{	my $w= $_[0]->gdkwindow;
+	$w->invalidate_rect({ x=>0, y=>0, width=>$w->get_width, height=>$w->get_height },0) if $w;
 }
 sub set_fullscreen
 {	my ($self,$fullscreen)=@_;
@@ -5173,27 +5166,32 @@ sub set_fullscreen
 	return unless $self->{fullwin} xor $fullscreen;
 	if ($fullscreen)
 	{	my $screen=$self->get_screen;
-		my $monitor=$screen->get_monitor_at_window($self->window);
-		my (undef,undef,$monitorwidth,$monitorheight)= $screen->get_monitor_geometry($monitor)->values;
+		my $monitor= $screen->get_monitor_at_window($self->get_window);
+		my $monitor_geometry= $screen->get_monitor_geometry($monitor);
+		my ($monitorwidth,$monitorheight)= @$monitor_geometry{qw/width height/};
 		my %attr=
 		(	window_type	=> 'toplevel',
 			x		=> 0,
 			y		=> 0,
 			width		=> $monitorwidth,
 			height		=> $monitorheight,
-			event_mask	=> [qw/exposure-mask pointer-motion-mask button-press-mask button-release-mask key-press-mask/],
+		#	event_mask	=> [qw/exposure-mask pointer-motion-mask scroll-mask key-press-mask button-press-mask button-release-mask/], #seems to be ignored in gtk3 (and a random event mask set for some reason ??), so set after with set_events
 		);
-		my $gdkwin= $self->{fullwin}= Gtk2::Gdk::Window->new(undef,\%attr);
-		$gdkwin->set_user_data($self->window->get_user_data);
+		my $gdkwin= $self->{fullwin}= Gtk3::Gdk::Window->new(undef,\%attr);
+		$gdkwin->set_events([qw/exposure-mask pointer-motion-mask scroll-mask key-press-mask button-press-mask button-release-mask/]);
+		#warn $_ for $gdkwin->get_events;
+		$self->register_window($gdkwin);
 		$gdkwin->fullscreen;
 		$gdkwin->show;
-		$gdkwin->set_transient_for($self->window);
+		$gdkwin->set_transient_for($self->get_window);
 		$self->grab_focus; #make sure we have the focus
 	}
 	else
 	{	my $gdkwin= delete $self->{fullwin};
-		$gdkwin->set_user_data(0); #needed ?
+		$self->unregister_window($gdkwin);
 		$gdkwin->destroy;
+		$self->get_window->focus(Gtk3::get_current_event->get_time); # get "g_object_unref: assertion 'G_IS_OBJECT (object)' failed" without this, unless a menu has been popped up in fullscreen. Maybe could be done better
+		$self->grab_focus;
 	}
 	$self->{pressed}=undef; #reset mouse state, in particular when using double middle button to fullscreen, the mouse could stay in middle-button-pressed mode
 	$self->resize;
@@ -5203,7 +5201,7 @@ package GMB::Context;
 
 sub new_follow_toolitem
 {	my $self=shift;
-	my $follow=Gtk2::ToggleToolButton->new_from_stock('gtk-jump-to');
+	my $follow= Gtk3::ToggleToolButton->new_from_stock('gtk-jump-to');
 	$follow->set_active($self->{follow});
 	my $follow_text= $self->{group} eq 'Play' ? _"Follow playing song" : _"Follow selected song";
 	$follow->set_label($follow_text);
@@ -5211,19 +5209,19 @@ sub new_follow_toolitem
 	$follow->signal_connect(clicked => \&ToggleFollow);
 	::set_drag($follow, dest => [::DRAG_ID,sub
 		{	my ($follow,$type,@IDs)=@_;
-			my $self=::find_ancestor($_[0],'GMB::Context');
+			my $self= $_[0]->GET_ancestor('GMB::Context');
 			$self->SongChanged($IDs[0],1);
 		}]);
 	return $follow;
 }
 sub ToggleFollow
-{	my $self=::find_ancestor($_[0],'GMB::Context');
+{	my $self= $_[0]->GET_ancestor('GMB::Context');
 	$self->{follow}^=1;
 	$self->SongChanged( ::GetSelID($self) ) if $self->{follow};
 }
 
 package Stars;
-use base 'Gtk2::EventBox';
+use base 'Gtk3::EventBox';
 
 sub new_layout_widget
 {	my $opt=shift;
@@ -5246,12 +5244,12 @@ sub set_rating_now_cb
 sub new
 {	my ($class,$field,$nb,$sub, %opt) = @_;
 	if (Songs::FieldType($field) ne 'rating') { warn "Stars: invalid field '$field'\n"; $field='rating'; }
-	my $self = bless Gtk2::EventBox->new, $class;
+	my $self = bless Gtk3::EventBox->new, $class;
 	$self->set_visible_window(0);
 	$self->{field}=$field;
 	$self->{callback}=$sub;
 	%opt=(xalign=>.5, yalign=>.5,%opt);
-	my $image=$self->{image}=Gtk2::Image->new;
+	my $image=$self->{image}=Gtk3::Image->new;
 	$image->set_alignment($opt{xalign},$opt{yalign});
 	$self->add($image);
 	$self->set($nb);
@@ -5278,10 +5276,10 @@ sub get { shift->{nb}; }
 sub click
 {	my ($self,$event)=@_;
 	if ($event->button == 3) { $self->popup($event); return 1 }
-	my ($xalign)=$self->child->get_alignment;
-	my $walloc= $self->allocation->width;
+	my ($xalign)=$self->get_child->get_alignment;
+	my $walloc= $self->get_allocated_width;
 	my $width= $self->{width};
-	my ($x)=$event->coords;
+	my ($x)=$event->get_coords;
 	$x-= $xalign*($walloc-$width);
 	$x/=$width;
 	$x=0 if $x<0;
@@ -5296,11 +5294,11 @@ sub click
 
 sub popup
 {	my ($self,$event)=@_;
-	my $menu=Gtk2::Menu->new;
+	my $menu=Gtk3::Menu->new;
 	my $set=$self->{nb}; $set='' unless defined $set;
 	my $sub=sub { $self->callback($_[1]); };
 	for my $nb (0,10,20,30,40,50,60,70,80,90,100,'')
-	{	my $item=Gtk2::CheckMenuItem->new( ($nb eq '' ? _"default" : $nb) );
+	{	my $item=Gtk3::CheckMenuItem->new( ($nb eq '' ? _"default" : $nb) );
 		$item->set_draw_as_radio(1);
 		$item->set_active(1) if $set eq $nb;
 		$item->signal_connect(activate => $sub, $nb);
@@ -5319,11 +5317,11 @@ sub createmenu
 	$set{$_}++ for Songs::Map($field,$IDs);
 	my $set= (keys %set ==1) ? each %set : 'undef';
 	my $cb=sub { Songs::Set($IDs,$field => $_[1]); };
-	my $menu=Gtk2::Menu->new;
+	my $menu=Gtk3::Menu->new;
 	for my $nb ('',0..$nbstars)
-	{	my $item=Gtk2::CheckMenuItem->new;
-		my ($child,$rating)= $nb eq ''	? (Gtk2::Label->new(_"default"),'')
-						: (Gtk2::Image->new_from_pixbuf($pixbufs->[$nb]),$nb*100/$nbstars);
+	{	my $item=Gtk3::CheckMenuItem->new;
+		my ($child,$rating)= $nb eq ''	? (Gtk3::Label->new(_"default"),'')
+						: (Gtk3::Image->new_from_pixbuf($pixbufs->[$nb]),$nb*100/$nbstars);
 		$item->add($child);
 		$item->set_draw_as_radio(1);
 		$item->set_active(1) if $set eq $rating;
@@ -5337,7 +5335,7 @@ sub createmenu
 package Layout::Progress;
 sub new
 {	my ($class,$opt,$ref)=@_;
-	my $self= $opt->{vertical} ? Gtk2::VBox->new : Gtk2::HBox->new;
+	my $self= Gtk3::Box->new( ($opt->{vertical} ? 'vertical' : 'horizontal'),0 );
 	::Watch($self,Progress=>\&update);
 	update($self,$_,$::Progress{$_}) for keys %::Progress;
 	$self->{lastclose}=$opt->{lastclose};
@@ -5346,13 +5344,13 @@ sub new
 }
 sub new_pid
 {	my ($self,$prop)=@_;
-	my $hbox=Gtk2::HBox->new(0,2);
-	my $vbox=Gtk2::VBox->new;
+	my $hbox= Gtk3::HBox->new(0,2);
+	my $vbox= Gtk3::VBox->new;
 	my $label;
-	my $bar=Gtk2::ProgressBar->new;
+	my $bar= Gtk3::ProgressBar->new;
 	$bar->set(ellipsize=>'end');
 	unless ($self->{compact})
-	{	$label=Gtk2::Label->new;
+	{	$label= Gtk3::Label->new;
 		$label->set_alignment(0,.5);
 		$vbox->pack_start($label,0,0,2);
 	}
@@ -5387,6 +5385,7 @@ sub update
 		$bartext=~s/\$current\b/$c/g;
 		$bartext=~s/\$end\b/$prop->{end}/g;
 	}
+	# 2TO3 seems some text is not being shown CHECKME
 	$bartext .= ' '.$prop->{bartext_append} if $prop->{bartext_append};
 	if ($self->{compact})
 	{	$bartext=$title.' ... '.(defined $bartext ? $bartext : '');
@@ -5395,36 +5394,36 @@ sub update
 	else
 	{	my $format= '<b>%s</b>';
 		$format.= "\n%s" if $details;
-		$label->set_markup_with_format( $format, $title, $details );
+		$label->set_markup_with_format( $format, $title, $details||() );
 	}
 	$bar->set_fraction( $prop->{fraction} );
-	$bar->set_text( $bartext )	if defined $bartext;
+	$bar->set_text( $bartext )	if defined $bartext; #2TO3 maybe re-implement old way of printing it inside the bar ?
 }
 
 package Layout::EqualizerPresets;
-use base 'Gtk2::Box';
+use base 'Gtk3::Box';
 use constant SEPARATOR => '  '; # must not be a possible name of a preset, use "  " because EqualizerPresets won't let you create names that contain only spaces
 
 sub new
 {	my ($class,$opt)=@_;
-	my $self= bless Gtk2::HBox->new, $class;
+	my $self= bless Gtk3::HBox->new, $class;
 	my $editmode= $self->{editmode}= $opt->{editmode} ? 1 : 0;
 	$self->{open}= $opt->{open} ? 1 : -1;
 	$self->{onoff}= $opt->{onoff}||0;
 	$self->{turnoff}= $self->{onoff}>1 ? 1 : -1;
 
-	my $mainbox= $self->{mainbox}= Gtk2::HBox->new;
+	my $mainbox= $self->{mainbox}= Gtk3::HBox->new;
 
-	my $combo= $self->{combo}=  Gtk2::ComboBox->new_text;
+	my $combo= $self->{combo}=  Gtk3::ComboBoxText->new;
 	$combo->signal_connect(changed=> \&combo_changed_cb);
-	$combo->set_row_separator_func(sub { my $text=$_[0]->get_value($_[1]); defined $text && $text eq SEPARATOR});
+	$combo->set_row_separator_func(sub { my $text=$_[0]->get_value($_[1],0); defined $text && $text eq SEPARATOR});
 
-	my $turnon= $self->{turnon}= Gtk2::Button->new(_"Turn equalizer on");
+	my $turnon= $self->{turnon}= Gtk3::Button->new(_"Turn equalizer on");
 	$turnon->signal_connect(clicked=> \&button_cb, 'turn_on');
 
 	unless ($opt->{notoggle})
-	{	my $toggle= $self->{toggle}= Gtk2::ToggleButton->new;
-		$toggle->add(Gtk2::Image->new_from_stock('gtk-edit','menu'));
+	{	my $toggle= $self->{toggle}= Gtk3::ToggleButton->new;
+		$toggle->add(Gtk3::Image->new_from_stock('gtk-edit','menu'));
 		$toggle->set_tooltip_text(_"Toggle edit mode");
 		$toggle->set_active(1) if $editmode;
 		$toggle->signal_connect(toggled=>\&button_cb,'toggle_mode');
@@ -5434,11 +5433,11 @@ sub new
 	$mainbox->pack_start($combo,0,0,0);
 
 	if (!$opt->{notoggle} || $editmode)
-	{	my $editbox= $self->{editbox}= Gtk2::HBox->new;
-		my $entry  = $self->{entry}=   Gtk2::Entry->new;
+	{	my $editbox= $self->{editbox}= Gtk3::HBox->new;
+		my $entry  = $self->{entry}=   Gtk3::Entry->new;
 		my $sbutton= $self->{sbutton}= ::NewIconButton('gtk-save',  _"Save");
 		my $rbutton= $self->{rbutton}= ::NewIconButton('gtk-delete');
-		my $completion= Gtk2::EntryCompletion->new;
+		my $completion= Gtk3::EntryCompletion->new;
 		$completion->set_model($combo->get_model);
 		$completion->set_text_column(0);
 		$entry->set_completion($completion);
@@ -5464,15 +5463,15 @@ sub new
 }
 
 sub combo_changed_cb
-{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+{	my $self= $_[0]->GET_ancestor;
 	return if $self->{busy};
 	my $current= $self->{combo}->get_active_text;
 	my $index= $self->{combo}->get_active;
-	my $event=Gtk2->get_current_event;
+	my $event= Gtk3::get_current_event;
 	if ($index>$self->{lastpreset}) # if an action is selected
-	{	my $action= $event->isa('Gtk2::Gdk::Event::Button');
-		if ($event->isa('Gtk2::Gdk::Event::Key'))
-		{	my $key= Gtk2::Gdk->keyval_name( $event->keyval );
+	{	my $action= $event->isa('Gtk3::Gdk::EventButton');
+		if ($event->isa('Gtk3::Gdk::EventKey'))
+		{	my $key= Gtk3::Gdk->keyval_name( $event->keyval );
 			$action=1 if grep $key eq $_, qw/space Return KP_Enter/;
 		}
 		#only execute actions if clicked with the mouse, or choose in the popup with the keyboard, not by scrolling
@@ -5486,7 +5485,7 @@ sub combo_changed_cb
 	::SetEqualizer(preset=>$current) if $current ne '';
 }
 sub button_cb
-{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+{	my $self= $_[0]->GET_ancestor;
 	my $action= $_[1];
 
 	if ($action eq 'save')
@@ -5584,12 +5583,12 @@ sub update_buttons
 package Layout::Equalizer;
 sub new
 {	my $opt=$_[0];
-	my $self=Gtk2::HBox->new(1,0); #homogenous
+	my $self=Gtk3::HBox->new(1,0); #homogenous
 	$self->{labels}= $opt->{labels};
 	$self->{labels}=undef if $self->{labels} eq 'none';
 	if ($opt->{preamp})
-	{	my $adj=Gtk2::Adjustment->new(1, 0, 2, .05, .1,0);
-		my $scale=Gtk2::VScale->new($adj);
+	{	my $adj=Gtk3::Adjustment->new(1, 0, 2, .05, .1,0);
+		my $scale=Gtk3::VScale->new($adj);
 		$scale->set_draw_value(0);
 		$scale->set_inverted(1);
 		$scale->add_mark(1,'left',undef);
@@ -5597,23 +5596,23 @@ sub new
 		$adj->signal_connect(value_changed =>
 			sub { ::SetEqualizer(preamp=>$_[0]->get_value) unless $_[0]{busy}; });
 		if ($self->{labels})
-		{	my $vbox=Gtk2::VBox->new;
-			my $label0=Gtk2::Label->new;
+		{	my $vbox=Gtk3::VBox->new;
+			my $label0=Gtk3::Label->new;
 			$vbox->pack_start($label0,0,0,0);
 			$self->{Valuelabel_preamp}=$label0;
 			$vbox->add($scale);
-			my $label1=Gtk2::Label->new;
+			my $label1=Gtk3::Label->new;
 			$label1->set_markup_with_format(qq(<span size="%s">%s</span>), $self->{labels},_"pre-amp");
 			$vbox->pack_start($label1,0,0,0);
 			$scale=$vbox;
 		}
 		$self->{preamp_widget}=$scale;
 		$self->pack_start($scale,1,1,2);
-		$self->pack_start(Gtk2::HBox->new(0,0),1,1,2); #empty space
+		$self->pack_start(Gtk3::HBox->new(0,0),1,1,2); #empty space
 	}
 	for my $i (0..9)
-	{	my $adj=Gtk2::Adjustment->new(0, -1, 1, .05, .1,0);
-		my $scale=Gtk2::VScale->new($adj);
+	{	my $adj=Gtk3::Adjustment->new(0, -1, 1, .05, .1,0);
+		my $scale=Gtk3::VScale->new($adj);
 		$scale->set_draw_value(0);
 		$scale->set_inverted(1);
 		$scale->add_mark(0,'left',undef);
@@ -5621,12 +5620,12 @@ sub new
 		$adj->signal_connect(value_changed =>
 		sub { ::SetEqualizer($_[1],$_[0]->get_value) unless $_[0]{busy}; },$i);
 		if ($self->{labels})
-		{	my $vbox=Gtk2::VBox->new;
-			my $label0=Gtk2::Label->new;
+		{	my $vbox=Gtk3::VBox->new;
+			my $label0=Gtk3::Label->new;
 			$vbox->pack_start($label0,0,0,0);
 			$self->{'Valuelabel'.$i}=$label0;
 			$vbox->add($scale);
-			my $label1=Gtk2::Label->new;
+			my $label1=Gtk3::Label->new;
 			$vbox->pack_start($label1,0,0,0);
 			$self->{'Hzlabel'.$i}=$label1;
 			$scale=$vbox;
@@ -5657,10 +5656,10 @@ sub update
 			}
 			my $adj=$self->{'adj'.$i};
 			$adj->{busy}=1;
-			$adj->lower($min);
-			$adj->upper($max);
-			$adj->step_increment($inc/10);
-			$adj->page_increment($inc);
+			$adj->set_lower($min);
+			$adj->set_upper($max);
+			$adj->set_step_increment($inc/10);
+			$adj->set_page_increment($inc);
 			delete $adj->{busy};
 		}
 		$self->queue_draw;
@@ -5686,143 +5685,6 @@ sub update
 	}
 }
 
-# SVBox and SHBox are Gtk2::VBox and Gtk2::HBox with a smarter size_allocate function : the normal boxes divide the extra space equally among children with the expand mode. With these boxes the extra space can be allocated to children up to a ratio of their other dimension (expand_to_ratio), or according to a weight (expand_weight)
-package SVBox;
-use Glib::Object::Subclass
-	Gtk2::VBox::,
-	signals =>
-	{	size_allocate => \&SHBox::size_allocate,
-	};
-package SHBox;
-use Glib::Object::Subclass
-	Gtk2::HBox::,
-	signals =>
-	{	size_allocate => \&size_allocate,
-	};
-
-sub size_allocate
-{	my ($self,$alloc)=@_;
-	my $vertical= $self->isa('Gtk2::VBox');
-	my $max_key= $vertical ? 'maxheight' : 'maxwidth';
-	my ($x,$y,$bwidth,$bheight)=$alloc->values;
-	my $olda=$self->allocation;
-	 $olda->x($x); $olda->y($y);
-	 $olda->width($bwidth); $olda->height($bheight);
-	($y,$x,$bheight,$bwidth)=($x,$y,$bwidth,$bheight) if $vertical;
-	my $border=$self->get_border_width;
-	$x+=$border;  $bwidth-=$border*2;
-	$y+=$border; $bheight-=$border*2;
-	my $total_xreq=0; my $weightsum=my $ecount=0;
-	my $spacing=$self->get_spacing;
-	my @children;
-	for my $child ($self->get_children)
-	{	next unless $child->visible;
-		my $xreq=$vertical ? $child->size_request->height : $child->size_request->width;
-		my ($expand,$fill,$pad,$type)=	($Gtk2::VERSION<1.163 || $Gtk2::VERSION==1.170) ?	 #work around memory leak in query_child_packing (gnome bug #498334)
-			@{$child->{SBOX_packoptions}} : $self->query_child_packing($child);
-		$total_xreq+=$pad*2+$xreq;
-		my $eweight= $child->{expand_weight} || 1;
-		my $max;
-		my @attrib;
-		if (my $r=$child->{expand_to_ratio})	{$max=$r*$bheight}
-		else					{$max=$child->{$max_key}}
-		if	($max)
-		{	$max-=$xreq;
-			if ($max>0)	{ $expand=$eweight; }
-			else		{ $expand=$max=0; }
-		}
-		if	($expand)	{ $ecount++; $weightsum+=$eweight; $expand=$eweight; }
-		my $end= $type eq 'end';
-		@attrib= ($child,$expand,$fill,$pad,$end,$xreq,$max);
-		if ($end)	{unshift @children,\@attrib} #to keep the same order as a HBox
-		else		{push @children,\@attrib}
-	}
-	my $total_spacing=0;
-	if (@children>1)
-	{	$total_spacing= $#children*$spacing;
-		if ($bwidth<$total_spacing) { $total_spacing=$bwidth; $spacing=$total_spacing/$#children }
-		$total_xreq+= $total_spacing;
-	}
-	my $xend=$x+$bwidth;
-	my $homogeneous;
-	if ($self->get_homogeneous && @children)
-	{	$homogeneous=($bwidth-$total_spacing)/@children;
-	}
-	elsif ($total_xreq<$bwidth && $ecount)	# if enough room for all, and some have expand attribute
-	{	my $w=$bwidth-$total_xreq;
-		my $i=0;
-		while ($ecount && $w>$ecount)
-		{	my $part= $w/$weightsum;
-			# [1] is expand, [6] is max, [7] is extra space given
-			for my $child (grep $_->[1], @children)	#children that want to expand
-			{	my $max=    $child->[6];
-				my $expand= $child->[1];
-				my $wpart= int($part*$expand);
-				if ($max && $wpart>=$max)	# enough to fill its max
-				{	$child->[7]+= $max;	# give it its max
-					$w-= $max;
-					$child->[1]=0;		# no longer want to expand
-					$weightsum-=$expand;
-					$ecount--;
-				}
-				elsif ($wpart>0)		# give it its part
-				{	$child->[7]+= $wpart;
-					$child->[6]-= $wpart if $max;
-					$w-= $wpart;
-				}
-			}
-		}
-		if ($w>0 && $ecount)		# less than one pixel by widget left
-		{	for my $child (sort {$b->[1] <=> $a->[1] } grep $_->[1], @children)	# start with highest weight
-			{	$child->[7]++;		# give 1 pixel to each widget
-				last unless --$w;	# until no more pixels
-			}
-			# note that weightsum, ecount, max and expand are not updated here as they are no longer used
-		}
-	}
-	elsif ($total_xreq>$bwidth && @children)	#not enough room for requested width
-	{	my $w=$bwidth-$total_spacing;
-		# [5] is request [3] is padding
-		my @tofit= sort { $a->[5]+$a->[3]*2 <=> $b->[5]+$b->[3]*2 } @children; # sort from smallest to largest
-		while (my $child= shift @tofit)
-		{	my $give= int($w/(1+@tofit));	# space available for each child left
-			$give=0 if $give<0;
-			my $padding=$child->[3]*2;
-			my $needed= $child->[5]+$padding;
-			if ($give >= $needed)			# need less than available
-			{	$give= $needed;			# give it its request
-			}
-			elsif ($give >= $padding)	# space available more than padding
-			{	$child->[5]= $give - $padding; # reduce request to fit
-			}
-			else	# not even enough space for padding
-			{	$child->[5]=0;			# set request to 0
-				$child->[3]= $give/2;		# give as much padding as available
-			}
-			$w-= $give;				# remove given space
-		}
-	}
-	for my $ref (@children)
-	{	my ($child,undef,$fill,$pad,$end,$ww,undef,$extra)=@$ref;
-		my $wwf= $ww;
-		$wwf+=$extra if $extra;	# space given by expand
-		if (defined $homogeneous)
-		{	$wwf=$homogeneous-$pad*2;
-			$wwf=0   if $wwf<0;
-			$ww=$wwf if $ww>$wwf;
-		}
-		$ww=$wwf if $fill;
-		my $wx;
-		my $totalw=$pad*2+$wwf+$spacing;
-		$pad+=($wwf-$ww)/2;
-		if ($end)	{ $wx=$xend-$pad-$ww;   $xend-=$totalw; }
-		else		{ $wx=$x+$pad;		   $x+=$totalw; }
-		my $wa= $vertical ?
-			Gtk2::Gdk::Rectangle->new($y, $wx, $bheight, $ww):
-			Gtk2::Gdk::Rectangle->new($wx, $y, $ww, $bheight);
-		$child->size_allocate($wa);
-	}
-}
 
 package Skin;
 
@@ -5849,23 +5711,29 @@ sub new
 }
 
 sub draw
-{	my ($widget,$event,$self,$x,$y,$w,$h)=@_;
+{	my ($widget,$cr,$self,$x,$y,$w,$h)=@_;
 	return 0 unless $self;
 	unless ($h)
-	{	($x,$y,$w,$h)=$widget->allocation->values;
-		$x=$y=0 unless $widget->no_window; #x and y are relative to the parent window, so are only useful if the widget use the parent window
+	{	$w= $widget->get_allocated_width;
+		$h= $widget->get_allocated_height;
 	}
-	my $state1=$widget->state;
+	my $state1=$widget->get_state_flags;
+	$state1= $state1 & 'active'  ?	'active' :
+		 $state1 & 'prelight'?	'prelight':
+					'normal';
 	my $state2=$widget->{state};
-	my $state='normal';
+	my $state;
 	if (my $states=$self->{states})
-	{	my @l= ($state1,'normal');
+	{	my @l= ($state1);
+		push @l,'normal' if $state1 ne 'normal';
 		if ($state2)
-		{	$state2=&$state2;
-			unshift @l, $state2.'_'.$state1, $state2.'_normal';
+		{	$state2= &$state2;
+			unshift @l, map $state2.'_'.$_, @l;
 		}
-		for (@l)
-		{	if (exists $states->{$_}) { $state=$_; last }
+		$state= ::first { exists $states->{$_} } @l;
+		unless ($state)
+		{	warn "Can't find any of (@l) in skin states (".join(' ',sort keys %$states).") for widget $widget->{name}\n";
+			$state= 'notfound';
 		}
 	}
 	my $pb=$self->{pb}{$state};
@@ -5878,16 +5746,16 @@ sub draw
 	my $pbh=$pb->get_height;
 	$x+=int ($w-$pbw)/2;
 	$y+=int ($h-$pbh)/2;
-	my $style=$widget->get_style;
-	my $gc=Gtk2::Gdk::GC->new($widget->window);
-	$gc->set_clip_rectangle($event->area);
-	$widget->window->draw_pixbuf($gc,$pb,0,0,$x,$y,$pbw,$pbh,'none',0,0);
-	$style->paint_focus($widget->window, $state1, $event->area, $widget, undef, $x,$y,$pbw,$pbh) if $widget->has_focus;
+	$cr->translate($x,$y);
+	$cr->set_source_pixbuf($pb,0,0);
+	$cr->paint;
+	$widget->get_style_context->render_focus($cr,0,0,$pbw,$pbh) if $widget->has_focus;
 	if ($widget->{shape}) #not sure it's a good idea
-	{	#my (undef,$mask)=$pb->render_pixmap_and_mask(1); #leaks X memory for Gtk2 <1.146 or <1.153
-		my $mask=Gtk2::Gdk::Pixmap->new(undef,$pbw,$pbh,1);
-		$pb->render_threshold_alpha($mask,0,0,0,0,-1,-1,1);
-		$widget->parent->shape_combine_mask($mask,$x,$y);
+	{	# untested, probably doesn't work and crash as with shaped windows
+		#my $surface=Gtk3::Gdk::cairo_surface_create_from_pixbuf($pb,1);
+		my $surface=Gtk3::Gdk::cairo_surface_create_from_pixbuf($pb,0,$widget->get_window);
+		my $region= Gtk3::Gdk::cairo_region_create_from_surface($surface);
+		$self->input_shape_combine_region($region);
 	}
 	1;
 }
@@ -5896,7 +5764,7 @@ sub _load_skinfile
 {	my ($file,$crop,$options)=@_;
 	my $pb;
 	if (ref $file)
-	{	$pb=$file if ref $file eq 'Gtk2::Gdk::Pixbuf';
+	{	$pb=$file if ref $file eq 'Gtk3::Gdk::Pixbuf';
 	}
 	else
 	{	$options||={};
@@ -5922,7 +5790,7 @@ sub makepixbuf
 	return undef unless $pb;
 	if (my $states=$self->{states})
 	{	my $w= $pb->get_width / keys %$states;
-		my $x= $states->{$state}*$w;
+		my $x= ($states->{$state}||0)*$w;
 		$pb=$pb->new_subpixbuf($x,0,$w,$pb->get_height);
 	}
 	my $resize=$self->{resize};
@@ -5955,7 +5823,7 @@ sub _resize
 	my $wi=$w -($left||=0) -($right||=0); my $dwi=$width -$left -$right;
 	my $hi=$h -($top||=0) -($bottom||=0); my $dhi=$height -$top -$bottom;
 
-	my $dest=Gtk2::Gdk::Pixbuf->new($src->get_colorspace, $src->get_has_alpha, $src->get_bits_per_sample, $width, $height);
+	my $dest= Gtk3::Gdk::Pixbuf->new($src->get_colorspace, $src->get_has_alpha, $src->get_bits_per_sample, $width, $height);
 
 	#4 corners
 	$src->copy_area(0,0, $left,$top, $dest, 0,0) if $left && $top;

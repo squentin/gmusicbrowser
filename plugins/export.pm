@@ -78,9 +78,9 @@ sub Stop
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
-	my $sg2=Gtk2::SizeGroup->new('horizontal');
+{	my $vbox=Gtk3::VBox->new(::FALSE, 2);
+	my $sg1= Gtk3::SizeGroup->new('horizontal');
+	my $sg2= Gtk3::SizeGroup->new('horizontal');
 
 	my $entry1=::NewPrefFileEntry(OPT.'path',_"Player mounted on :",folder=>1, sizeg1=>$sg1,sizeg2=>$sg2);
 	my $entry2=::NewPrefEntry(OPT.'folderformat',_"Folder format :", sizeg1=>$sg1,sizeg2=>$sg2, tip =>_("These fields can be used :")."\n".::MakeReplaceText('talydnAY'));

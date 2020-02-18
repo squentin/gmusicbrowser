@@ -9,144 +9,71 @@
 =for gmbplugin WebContext
 name	Web context
 title	Web context plugin
-desc	Provides context views using MozEmbed or WebKit
+desc	Provides context views using WebKit
 desc	wikipedia, lyrics, and custom webpages
+req	gir(WebKit2-4.0, gir1.2-webkit2-4.0 webkit2gtk3)
 =cut
-
-my ($OKMoz,$OKWebKit,$CrashMoz);
-BEGIN
-{	{	last unless (grep -f $_.'/Gtk2/MozEmbed.pm',@INC);
-		# test if mozembed is working
-		system(q(GNOME_DISABLE_CRASH_DIALOG=1 perl -e 'use Gtk2 "-init"; use Gtk2::MozEmbed;$w=Gtk2::Window->new;my $e=Gtk2::MozEmbed->new; $w->add($e);$w->show_all; exit 0')); #this segfault when mozembed doesn't find its libs
-		#if (($? & 127) ==11) {die "Error : mozembed libraries not found. You need to add the mozilla path in /etc/ld.so.conf and run ldconfig (as root) or add the mozilla libraries path to the LD_LIBRARY_PATH environment variable.\n"}
-		if ($?) { warn "Gtk2::MozEmbed found but not working.\n"; $CrashMoz=1; last; } #crash or fail to load
-		$OKMoz=1;
-	}
-	$OKWebKit=1 if grep -f $_.'/Gtk2/WebKit.pm',@INC;
-}
 
 use strict;
 use warnings;
 use utf8;
 
-package GMB::Plugin::WebContext::MozEmbed;
-#use Gtk2::MozEmbed;
+Glib::Object::Introspection->setup(basename => 'WebKit2', version => '4.0', package => 'WebKit2');
+push @GMB::Plugin::WebContext::ISA, 'GMB::Plugin::WebContext::WebKit';
 
-our $Embed;
-sub init
-{	Gtk2::MozEmbed->set_profile_path ($::HomeDir,'mozilla_profile');
-	if ($Gtk2::MozEmbed::VERSION>=0.06) {Gtk2::MozEmbed->push_startup}
-	else {$Embed||=Gtk2::MozEmbed->new;} #needed to keep a Gtk2::MozEmbed to prevent xpcom from shutting down with the last gtkmozembed
-}
+WebKit2::WebContext->get_default->get_cookie_manager->set_persistent_storage($::HomeDir.'cookies','sqlite'); #or 'text' ? #add option to disable saving cookies ?
 
-sub new_embed
-{	my $embed=Gtk2::MozEmbed->new;
-	$embed->signal_connect(link_message => \&link_message_cb);
-	$embed->signal_connect(net_stop => \&net_startstop_cb,0);
-	$embed->signal_connect(net_start => \&net_startstop_cb,1);
-	$embed->signal_connect(open_uri => \&about_to_load_cb); #called before loading a new uri, must return false
-	return $embed;
-}
-
-sub link_message_cb
-{	my $embed=$_[0];
-	my $self=::find_ancestor($embed,__PACKAGE__);
-	$self->link_message( $embed->get_link_message );
-}
-
-sub net_startstop_cb
-{	my ($embed,$loading)=@_;
-	my $self=::find_ancestor($embed,__PACKAGE__);
-	$self->{BStop}->set_sensitive( $loading );
-	$self->{BBack}->set_sensitive( $embed->can_go_back );
-	$self->{BNext}->set_sensitive( $embed->can_go_forward );
-	my $cursor= $loading ? Gtk2::Gdk::Cursor->new('watch') : undef;
-	$embed->window->set_cursor($cursor) if $embed->window;
-}
-
-sub about_to_load_cb	#called before loading a new uri,
-{	my ($embed,$uri)=@_;
-	my $self=::find_ancestor($embed,__PACKAGE__);
-	$self->{Entry}->set_text($uri);		#update location entry
-	my $http= $uri=~m#^https?://# ? 1 : 0 ;
-	$self->{BOpen}->set_sensitive($http);
-	0;	#must return false, else won't be loaded
-}
-
-sub loaded
-{	my ($self,$data,%prop)=@_;
-	my $embed=$self->{embed};
-	$embed->render_data($data,$self->{url},$prop{type});
-#	$embed->open_stream ($self->{url}, $type);
-#	$embed->append_data ($data);
-#	$embed->close_stream;
-}
-
-sub go_back	{ $_[0]{embed}->go_back }
-sub go_forward	{ $_[0]{embed}->go_forward }
-sub stop_load	{ $_[0]{embed}->stop_load }
-sub get_location{ $_[0]{embed}->get_location }
-sub Open	{ $_[0]{embed}->load_url($_[1]); }
-
-sub set_stripped_wiki	#FIXME use print version of the wikipedia page instead ?
-{	my $stripped=$_[0];
-	my $content='';
-	if ($stripped)
-	{ $content="/*@-moz-document domain(wikipedia.org) { */
-.portlet {display: none !important;}
-#f-list {display: none !important;}
-#footer {display: none !important;}
-#content {margin: 0 0 0 0 !important;}
-/* } */	";
-	}
-	open my $fh,'>',join(::SLASH,$::HomeDir,'mozilla_profile','chrome','userContent.css') or return;
-	print $fh $content;
-	close $fh;
-}
 
 package GMB::Plugin::WebContext::WebKit;
-#use Gtk2::WebKit;
 
 sub new_embed
-{	my $embed=Gtk2::WebKit::WebView->new;
-	$embed->signal_connect(hovering_over_link => \&link_message_cb);
-	$embed->signal_connect(load_finished => \&net_startstop_cb,0);
-	$embed->signal_connect(load_committed => \&net_startstop_cb,1);
-	$embed->signal_connect(navigation_policy_decision_requested=> sub
-	 {	if ($_[3]->get_button==2) #middle-click on a link
-		{	my $nb=::find_ancestor($_[0],'Layout::NoteBook'); #only works if inside a NB/TabbedLists/Context widget
-			$nb->newtab('PluginWebPage',1,{url=>$_[2]->get_uri}) if $nb; #open the link in a new tab
-			return 1 if $nb;
-		}
-		return 0;
-	 });
+{	my $embed= WebKit2::WebView->new;
+	$embed->signal_connect(mouse_target_changed => \&mouse_target_changed_cb);
+	$embed->signal_connect(load_changed => \&net_startstop_cb);
+	$embed->signal_connect(button_press_event=> \&button_press_event_cb);
 	$embed->signal_connect('notify::title'=> sub
 	 {	my $embed=shift;
-		my $self=::find_ancestor($embed,'GMB::Plugin::WebContext');
+		my $self= $embed->GET_ancestor('GMB::Plugin::WebContext');
 		$self->set_title($embed->get('title')) if $self;
 	 });
-	my $sw= Gtk2::ScrolledWindow->new;
+	my $sw= Gtk3::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('automatic','automatic');
 	$sw->add($embed);
 	return $embed,$sw;
 }
 
-sub link_message_cb
-{	my ($embed,undef,$msg)=@_;
-	my $self=::find_ancestor($embed,__PACKAGE__);
-	$self->link_message($msg);
+sub button_press_event_cb
+{	my ($embed,$event)=@_;
+	{	last unless $event->get_button==2; # for middle-click
+		my $uri= $embed->{mouse_uri};
+		last unless $uri;		# need link under mouse
+		my $nb= $_[0]->GET_ancestor('Layout::NoteBook');
+		last unless $nb; # only works if inside a NB/TabbedLists/Context widget
+		$nb->newtab('PluginWebPage',1,{url=>$uri}) if $nb; #open the link in a new tab
+		return 1;
+	}
+	return 0;
+}
+
+sub mouse_target_changed_cb
+{	my ($embed,$hittest,$modif)=@_;
+	my $uri= $hittest->context_is_link ? $hittest->get_link_uri : '';
+	$embed->{mouse_uri}=$uri;
+	my $self= $embed->GET_ancestor;
+	$self->link_message($uri);
 }
 
 sub net_startstop_cb
-{	my ($embed,$frame,$loading)=@_;
-	my $self=::find_ancestor($embed,__PACKAGE__);
+{	my ($embed,$event)=@_;
+	my $loading= $event ne 'finished';
+	my $self= $embed->GET_ancestor;
 	$self->{BStop}->set_sensitive( $loading );
 	$self->{BBack}->set_sensitive( $embed->can_go_back );
 	$self->{BNext}->set_sensitive( $embed->can_go_forward );
-	my $cursor= $loading ? Gtk2::Gdk::Cursor->new('watch') : undef;
-	$embed->window->set_cursor($cursor) if $embed->window;
-	my $uri=$frame->get_uri;
+	my $cursor= $loading ? Gtk3::Gdk::Cursor->new('watch') : undef;
+	$embed->get_window->set_cursor($cursor) if $embed->get_window;
+	my $uri=$embed->get_uri;
 	$self->{Entry}->set_text($uri) if $loading;
 	$self->set_title($uri) if $loading;
 	$uri= $uri=~m#^https?://# ? 1 : 0 ;
@@ -158,23 +85,22 @@ sub set_title {} #ignored unless overridden by the class
 sub loaded
 {	my ($self,$data,%prop)=@_;
 	my $embed=$self->{embed};
-	$embed->load_html_string($data,$self->{url}); #FIXME doesn't check type ($prop{type})
+	$embed->load_html($data,$self->{url}); #FIXME doesn't check type ($prop{type})
 }
 
 
 sub go_back	{ $_[0]{embed}->go_back }
 sub go_forward	{ $_[0]{embed}->go_forward }
 sub stop_load	{ $_[0]{embed}->stop_loading }
-sub get_location{ $_[0]{embed}->get_focused_frame->get_uri }
+sub get_location{ $_[0]{embed}->get_uri }
+#sub get_location{ $_[0]{embed}->get_focused_frame->get_uri }
 sub Open	{ $_[0]{embed}->load_uri($_[1]); }
 
-sub set_stripped_wiki {}	#FIXME use print version of the wikipedia page instead ?
-# $::Options{OPT.'StrippedWiki'}
 
 package GMB::Plugin::WebContext;
 our @ISA;
 BEGIN {push @ISA,'GMB::Context';}
-use base 'Gtk2::VBox';
+use base 'Gtk3::VBox';
 use constant
 {	OPT => 'PLUGIN_WebContext_',
 };
@@ -186,7 +112,7 @@ our %Predefined =
 	lastfm	=> { tabtitle => 'last.fm',	baseurl => 'http://www.last.fm/music/%a', },
 	discogs	=> { tabtitle => 'discogs',	baseurl => 'http://www.discogs.com/artist/%a', },
 	youtube	=> { tabtitle => 'youtube',	baseurl => 'http://www.youtube.com/results?search_query="%a"', },
-	pollstar=> { tabtitle => 'pollstar',	baseurl => 'http://www.pollstar.com/eventSearch.aspx?SearchBy=%a', },
+	pollstar=> { tabtitle => 'pollstar',	baseurl => 'https://www.pollstar.com/global-search?q=%a', },
 	songfacts=>{ tabtitle => 'songfacts',	baseurl => 'http://www.songfacts.com/search_fact.php?title=%t', },
     rateyourmusic=>{ tabtitle => 'rateyourmusic',baseurl=> 'http://rateyourmusic.com/search?searchterm=%a&searchtype=a', },
 );
@@ -238,42 +164,13 @@ our @contextmenu=
 );
 
 my $active;
-::SetDefaultOptions(OPT, StrippedWiki => 1, Custom => { map {$_=>{ %{$Predefined{$_}} } } qw/lastfm amgartist youtube/ });
-UpdateBackend();
+#::SetDefaultOptions(OPT, StrippedWiki => 1, Custom => { map {$_=>{ %{$Predefined{$_}} } } qw/lastfm amgartist youtube/ }); #FIXME 2TO3
 UpdateCustom($_) for sort keys %{ $::Options{OPT.'Custom'} };
 
 
-sub UpdateBackend
-{	my $backend= $::Options{OPT.'Backend'} || '';
-	$backend='' if		!$OKMoz && $backend eq 'MozEmbed'
-			||	!$OKWebKit && $backend eq 'WebKit';
-	unless ($backend)
-	{	if ($OKWebKit) {$backend='WebKit'}
-		elsif ($OKMoz) {$backend='MozEmbed'}
-	}
-	$::Options{OPT.'Backend'}=$backend;
-
-	my $was_active=$active;
-	Stop() if $active;
-	if ($OKMoz && $backend eq 'MozEmbed')
-	{	require Gtk2::MozEmbed; Gtk2::MozEmbed->import;
-		GMB::Plugin::WebContext::MozEmbed::init();
-		@ISA= grep $_ ne 'GMB::Plugin::WebContext::WebKit', @ISA;
-		push @ISA, 'GMB::Plugin::WebContext::MozEmbed';
-	}
-	elsif ($OKWebKit)
-	{	require Gtk2::WebKit; Gtk2::WebKit->import;
-		@ISA= grep $_ ne 'GMB::Plugin::WebContext::MozEmbed', @ISA;
-		push @ISA, 'GMB::Plugin::WebContext::WebKit';
-	}
-	Start() if $was_active;
-}
-
 sub Start
-{	return unless $OKMoz or $OKWebKit;
-	$active=1;
+{	$active=1;
 	Layout::RegisterWidget($_ => $Widgets{$_}) for keys %Widgets;
-	&set_stripped_wiki;
 }
 sub Stop
 {	$active=0;
@@ -313,30 +210,30 @@ sub RemoveCustom
 
 sub new
 {	my ($class,$opt)=@_;
-	my $self = bless Gtk2::VBox->new(0,0), $class;
+	my $self= bless Gtk3::VBox->new(0,0), $class;
 	%$opt=( @default_options, %$opt );
 	$self->{$_}=$opt->{$_} for qw/follow group urientry statusbar baseurl/;
 
-	my $toolbar=Gtk2::Toolbar->new;
+	my $toolbar= Gtk3::Toolbar->new;
 	$toolbar->set_style( $opt->{ToolbarStyle}||'both-horiz' );
 	$toolbar->set_icon_size( $opt->{ToolbarSize}||'small-toolbar' );
-	my $status=$self->{Status}=Gtk2::Statusbar->new;
+	my $status= $self->{Status}= Gtk3::Statusbar->new;
 	$status->{id}=$status->get_context_id('link');
 	($self->{embed},my $container)= $self->new_embed;
 	$container||=$self->{embed};
 	$self->{DefaultFocus}=$self->{embed};
 	$self->{embed}->signal_connect(button_press_event=> \&button_press_cb);
-	my $entry=$self->{Entry}=Gtk2::Entry->new;
-	my $back= $self->{BBack}=Gtk2::ToolButton->new_from_stock('gtk-go-back');
-	my $next= $self->{BNext}=Gtk2::ToolButton->new_from_stock('gtk-go-forward');
-	my $stop= $self->{BStop}=Gtk2::ToolButton->new_from_stock('gtk-stop');
-	my $open= $self->{BOpen}=Gtk2::ToolButton->new_from_stock('gtk-open');
+	my $entry=$self->{Entry}= Gtk3::Entry->new;
+	my $back= $self->{BBack}= Gtk3::ToolButton->new_from_stock('gtk-go-back');
+	my $next= $self->{BNext}= Gtk3::ToolButton->new_from_stock('gtk-go-forward');
+	my $stop= $self->{BStop}= Gtk3::ToolButton->new_from_stock('gtk-stop');
+	my $open= $self->{BOpen}= Gtk3::ToolButton->new_from_stock('gtk-open');
 	$open->set_tooltip_text(_"Open this page in the web browser");
 	#$open->set_use_drag_window(1);
 	#::set_drag($open,source=>[::DRAG_FILE,sub {$embed->get_location;}]);
 	$self->{$_}->set_sensitive(0) for qw/BBack BNext BStop BOpen/;
 
-	my $entryitem=Gtk2::ToolItem->new;
+	my $entryitem= Gtk3::ToolItem->new;
 	$entryitem->add($entry);
 	$entryitem->set_expand(1);
 
@@ -350,11 +247,11 @@ sub new
 	$entry->set_no_show_all(!$self->{urientry});
 	$status->set_no_show_all(!$self->{statusbar});
 	$self->signal_connect(map => \&Update);
-	$entry->signal_connect(activate => sub { ::find_ancestor($_[0],__PACKAGE__)->load_url($_[0]->get_text); });
-	$back->signal_connect(clicked => sub { ::find_ancestor($_[0],__PACKAGE__)->go_back });
-	$next->signal_connect(clicked => sub { ::find_ancestor($_[0],__PACKAGE__)->go_forward });
-	$stop->signal_connect(clicked => sub { ::find_ancestor($_[0],__PACKAGE__)->stop_load });
-	$open->signal_connect(clicked => sub { my $url=::find_ancestor($_[0],__PACKAGE__)->get_location; ::openurl($url) if $url=~m#^https?://# });
+	$entry->signal_connect(activate => sub { $_[0]->GET_ancestor->load_url($_[0]->get_text); });
+	$back->signal_connect(clicked => sub { $_[0]->GET_ancestor->go_back });
+	$next->signal_connect(clicked => sub { $_[0]->GET_ancestor->go_forward });
+	$stop->signal_connect(clicked => sub { $_[0]->GET_ancestor->stop_load });
+	$open->signal_connect(clicked => sub { my $url= $_[0]->GET_ancestor->get_location; ::openurl($url) if $url=~m#^https?://# });
 	$toolbar->signal_connect('popup-context-menu' => \&popup_toolbar_menu );
 	return $self;
 }
@@ -362,7 +259,7 @@ sub new
 sub button_press_cb
 {	my ($embed,$event)=@_;
 	my $button= $event->button;
-	my $self= ::find_ancestor($embed,__PACKAGE__);
+	my $self= $embed->GET_ancestor;
 	if    ($button==8) { $self->go_back; }
 	elsif ($button==9) { $self->go_forward; }
 	else { return 0; }
@@ -374,26 +271,12 @@ sub addtoolbar #default method, overridden by packages that add extra items to t
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
+{	my $vbox= Gtk3::VBox->new(::FALSE, 2);
 	#my $combo=::NewPrefCombo(OPT.'Site',[sort keys %sites],'site : ',sub {$ID=undef;&Changed;});
-	my $check=::NewPrefCheckButton(OPT.'StrippedWiki',_"Strip wikipedia pages", cb=>\&set_stripped_wiki, tip=>_"Remove header, footer and left column from wikipedia pages");
-	my $Bopen=Gtk2::Button->new(_"open context window");
+	my $Bopen= Gtk3::Button->new(_"open context window");
 	$Bopen->signal_connect(clicked => sub { ::ContextWindow; });
-	my ($radio_wk,$radio_moz)=
-	 ::NewPrefRadio( OPT.'Backend',
-		[_"Use WebKit",		'WebKit',
-		 _"Use MozEmbed",	'MozEmbed',
-		], cb=> sub { $check->set_sensitive($::Options{OPT.'Backend'} eq 'MozEmbed'); UpdateBackend(); });
-	my $label_wk= $OKWebKit ? '' : _"Not found";
-	my $label_moz= $OKMoz ? '' : $CrashMoz ? _"Found but not working" : _"Not found";
-	$radio_wk ->set_tooltip_text($label_wk)  if $label_wk;
-	$radio_moz->set_tooltip_text($label_moz) if $label_moz;
-	$radio_wk->set_sensitive($OKWebKit);
-	$radio_moz->set_sensitive($OKMoz);
-	$check->set_sensitive($::Options{OPT.'Backend'} eq 'MozEmbed');
-	$vbox->pack_start($_,::FALSE,::FALSE,1) for $radio_wk,$radio_moz,Gtk2::VSeparator->new,$check,$Bopen;
+	$vbox->pack_start($_,::FALSE,::FALSE,1) for $Bopen;
 	$vbox->pack_start( GMB::Plugin::WebContext::Custom::Edition->new, ::TRUE,::TRUE,8 );
-	$vbox->set_sensitive( $OKMoz || $OKWebKit );
 	return $vbox;
 }
 
@@ -415,18 +298,16 @@ sub link_message
 	$statusbar->push( $statusbar->{id}, $msg );
 }
 
-sub set_stripped_wiki { GMB::Plugin::WebContext::MozEmbed::set_stripped_wiki( $::Options{OPT.'StrippedWiki'} ); } #FIXME
-
 sub popup_toolbar_menu
 {	my ($toolbar,$x,$y,$button)=@_;
-	my $args= { self=> ::find_ancestor($toolbar,__PACKAGE__), };
+	my $args= { self=> $toolbar->GET_ancestor, };
 	my $menu=::BuildMenu(\@contextmenu,$args);
 	$menu->show_all;
 	$menu->popup(undef,undef,sub {$x,$y},undef,$button,0);
 }
 
 sub Update
-{	$_[0]->SongChanged( ::GetSelID($_[0]) )  if $_[0]->mapped;
+{	$_[0]->SongChanged( ::GetSelID($_[0]) )  if $_[0]->get_mapped;
 }
 #################################################################################
 
@@ -440,8 +321,9 @@ sub DynamicTitle	#called by Layout::NoteBook when tab is created
 {	my ($self,$default)=@_;
 	my $title=$self->{title};
 	$title=$default unless length $title;
-	my $label=Gtk2::Label->new($title);
+	my $label= Gtk3::Label->new($title);
 	$label->set_ellipsize('end');
+	$label->set(hexpand=>1);
 	$label->set_max_width_chars(20);
 	$self->{titlelabel}=$label;
 	return $label;
@@ -461,13 +343,11 @@ use constant
 };
 
 my %sites=
-(	lyrc => ['lyrc','http://lyrc.com.ar/en/tema1en.php?artist=%a&songname=%s'],
-	#leoslyrics => ['leolyrics','http://api.leoslyrics.com/api_search.php?artist=%a&songtitle=%s'],
-	google  => ['google','http://www.google.com/search?q="%a"+"%s"'],
+(	google  => ['google','http://www.google.com/search?q="%a"+"%s"'],
 	lyriki  => ['lyriki','http://lyriki.com/index.php?title=%a:%s'],
 	lyricwiki => [lyricwiki => 'http://lyrics.wikia.com/%a:%s'],
-	lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a'],
-	lyricscom => [ 'lyrics.com' => 'http://www.lyrics.com/search.php?keyword=%s+%a&what=all' ],
+	#lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%s&artist=%a'],
+	lyricscom => [ 'lyrics.com' => 'http://www.lyrics.com/serp.php?st=%s&stype=1' ],
 );
 
 $::Options{OPT.'LyricSite'}=undef if $::Options{OPT.'LyricSite'} && !$sites{$::Options{OPT.'LyricSite'}};
@@ -477,7 +357,7 @@ sub addtoolbar
 {	#my $self=$_[0];
 	my %h= map {$_=>$sites{$_}[0]} keys %sites;
 	my $cb=sub
-	 {	my $self=::find_ancestor($_[0],__PACKAGE__);
+	 {	my $self= $_[0]->GET_ancestor;
 		$self->SongChanged($self->{ID},1);
 	 };
 	my $combo=::NewPrefCombo( OPT.'LyricSite', \%h, cb => $cb, toolitem => _"Lyrics source");
@@ -522,7 +402,7 @@ my %locales=
 sub addtoolbar
 {	#my $self=$_[0];
 	my $cb=sub
-	 {	my $self=::find_ancestor($_[0],__PACKAGE__);
+	 {	my $self= $_[0]->GET_ancestor;
 		$self->SongChanged($self->{ID},1);
 	 };
 	my $combo=::NewPrefCombo( OPT.'WikiLocale', \%locales, cb => $cb, toolitem => _"Wikipedia Locale");
@@ -538,7 +418,7 @@ sub SongChanged
 	return if defined $self->{Artist} && !$force && ($artist eq $self->{Artist} || !$self->{follow});
 	$self->{Artist}=$artist;
 	$artist=::url_escapeall($artist);
-	my $url='http://'.$::Options{OPT.'WikiLocale'}.'.wikipedia.org/wiki/'.$artist;
+	my $url='http://'.$::Options{OPT.'WikiLocale'}.'.m.wikipedia.org/wiki/'.$artist;
 	#my $url='http://'.$::Options{OPT.'WikiLocale'}.'.wikipedia.org/w/index.php?title='.$artist.'&action=render';
 	::IdleDo('8_mozpedia'.$self,1000,sub {$self->load_url($url)});
 	#::IdleDo('8_mozpedia'.$self,1000,sub {$self->wikiload});
@@ -547,7 +427,7 @@ sub SongChanged
 sub wikiload	#not used for now
 {	my $self=$_[0];
 	my $url=::url_escapeall($self->{Artist});
-	$url='http://'.$::Options{OPT.'WikiLocale'}.'.wikipedia.org/wiki/'.$url;
+	$url='http://'.$::Options{OPT.'WikiLocale'}.'.m.wikipedia.org/wiki/'.$url;
 	#$url='http://google.com/search?q='.$url;
 	$self->{url}=$url;
 	Simple_http::get_with_cb(cb => sub
@@ -583,33 +463,33 @@ sub SongChanged
 
 
 package GMB::Plugin::WebContext::Custom::Edition;
-use base 'Gtk2::Box';
+use base 'Gtk3::Box';
 
 my $CustomPages= $::Options{GMB::Plugin::WebContext::OPT.'Custom'};
 
 sub new
 {	my $class=shift;
-	my $self=bless Gtk2::VBox->new, $class;
-	my $store=Gtk2::ListStore->new('Glib::String','Glib::String');
-	my $treeview=Gtk2::TreeView->new($store);
-	my $renderer=Gtk2::CellRendererText->new;
+	my $self= bless Gtk3::VBox->new, $class;
+	my $store= Gtk3::ListStore->new('Glib::String','Glib::String');
+	my $treeview= Gtk3::TreeView->new($store);
+	my $renderer= Gtk3::CellRendererText->new;
 	$renderer->set(editable => 1);
 	$renderer->signal_connect_swapped(edited => \&rename_cb,$store);
-	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes( '', $renderer, text => 1 ));
+	$treeview->append_column( Gtk3::TreeViewColumn->new_with_attributes( '', $renderer, text => 1 ));
 	$treeview->set_headers_visible(::FALSE);
 	$treeview->get_selection->signal_connect(changed => \&selchanged_cb);
-	my $sw=Gtk2::ScrolledWindow->new;
+	my $sw= Gtk3::ScrolledWindow->new;
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('automatic','automatic');
 	$sw->add($treeview);
-	my $hbox=Gtk2::HBox->new;
-	my $editbox=Gtk2::VBox->new;
+	my $hbox= Gtk3::HBox->new;
+	my $editbox= Gtk3::VBox->new;
 	$self->{editbox}=$editbox;
 	$self->{store}=$store;
 	$self->{treeview}=$treeview;
 	$hbox->pack_start($sw,::FALSE,::FALSE,2);
 	$hbox->add($editbox);
-	my $label=Gtk2::Label->new;
+	my $label= Gtk3::Label->new;
 	$label->set_markup_with_format('<b>%s</b>',_"Custom context pages :");
 	$label->set_alignment(0,.5);
 	$self->pack_start($label,::FALSE,::FALSE,2);
@@ -620,19 +500,19 @@ sub new
 	my $save=  ::NewIconButton('gtk-save',	_"Save");
 	my $remove=::NewIconButton('gtk-remove',_"Remove");
 	my $preset=::NewIconButton('gtk-add',	_"Pre-set");
-	$preset->child->add(Gtk2::Arrow->new('down','none'));
-	$new	->signal_connect( clicked=> sub { my $self=::find_ancestor($_[0],__PACKAGE__); $self->fill_editbox; });
+	$preset->get_child->add(Gtk3::Arrow->new('down','none'));
+	$new	->signal_connect( clicked=> sub { my $self= $_[0]->GET_ancestor; $self->fill_editbox; });
 	$save	->signal_connect( clicked=> \&save_cb);
 	$remove	->signal_connect( clicked=> \&remove_cb);
 	$preset ->signal_connect(button_press_event=>\&preset_menu_cb);
-	my $bbox=Gtk2::HButtonBox->new;
+	my $bbox=Gtk3::HButtonBox->new;
 	$bbox->set_layout('start');
 	$bbox->add($_) for $remove, $new, $preset, $save;
 	$self->pack_end($bbox,::FALSE,::FALSE,0);
 	$self->{button_save}=$save;
 	$self->{button_remove}=$remove;
 
-	my $sg=Gtk2::SizeGroup->new('horizontal');
+	my $sg= Gtk3::SizeGroup->new('horizontal');
 	$sg->add_widget($_) for $sw, $remove, $new, $preset, $save;
 
 	fill_list($self->{store});
@@ -652,8 +532,8 @@ sub fill_editbox		#if $id => fill entries with existing properties, if $hash => 
 	$editbox->remove($_) for $editbox->get_children;
 	$self->{button_save}  ->set_sensitive(defined $hash);
 	$self->{button_remove}->set_sensitive(defined $id);
-	$editbox->{entry_title}= my $entry_title=Gtk2::Entry->new;
-	$editbox->{entry_url}=   my $entry_url=  Gtk2::Entry->new;
+	$editbox->{entry_title}= my $entry_title=Gtk3::Entry->new;
+	$editbox->{entry_url}=   my $entry_url=  Gtk3::Entry->new;
 	$editbox->{id}=$id;
 	my $preview=Label::Preview->new
 	(	entry	=> $entry_url,	format => ::MarkupFormat('<small>%s</small>', _"example : %s"),
@@ -668,9 +548,9 @@ sub fill_editbox		#if $id => fill entries with existing properties, if $hash => 
 		$entry_title->set_text($hash->{tabtitle});
 		$entry_url  ->set_text($hash->{baseurl});
 	}
-	my $sg=Gtk2::SizeGroup->new('horizontal');
-	my $label_title=Gtk2::Label->new(_"Title");
-	my $label_url=Gtk2::Label->new(_"url");
+	my $sg= Gtk3::SizeGroup->new('horizontal');
+	my $label_title= Gtk3::Label->new(_"Title");
+	my $label_url=   Gtk3::Label->new(_"url");
 	$sg->add_widget($_) for $label_title, $label_url;
 	my $box= ::Vpack( [$label_title,'_',$entry_title], [$label_url,'_',$entry_url], $preview );
 
@@ -682,13 +562,13 @@ sub fill_editbox		#if $id => fill entries with existing properties, if $hash => 
 }
 
 sub entry_changed_cb
-{	my $self= ::find_ancestor($_[0],__PACKAGE__);
+{	my $self= $_[0]->GET_ancestor;
 	my $editbox= $self->{editbox};
 	$self->{button_save}->set_sensitive( $editbox->{entry_title}->get_text ne '' && $editbox->{entry_url}->get_text ne '' );
 }
 
 sub update_selection
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
+{	my $self= $_[0]->GET_ancestor;
 	my $editbox= $self->{editbox};
 	my $title= $editbox->{entry_title}->get_text;
 	my $newid;
@@ -719,7 +599,7 @@ sub update_selection
 sub selchanged_cb
 {	my $treesel=shift;
 	my $treeview=$treesel->get_tree_view;
-	my $self=::find_ancestor($treeview,__PACKAGE__);
+	my $self= $treeview->GET_ancestor;
 	return if $self->{editbox}{busy};
 	my $iter=$treesel->get_selected;
 	my $id;
@@ -737,7 +617,7 @@ sub rename_cb
 	fill_list($store);
 }
 sub remove_cb
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
+{	my $self= $_[0]->GET_ancestor;
 	my $editbox= $self->{editbox};
 	my $id=$editbox->{id};
 	return unless defined $id;
@@ -747,7 +627,7 @@ sub remove_cb
 sub save_cb
 {	my $button=shift;
 	$button->set_sensitive(0);
-	my $self=::find_ancestor($button,__PACKAGE__);
+	my $self= $button->GET_ancestor;
 	my $editbox= $self->{editbox};
 	my $hash= { tabtitle=> $editbox->{entry_title}->get_text, baseurl=> $editbox->{entry_url}->get_text, };
 	my $id=$editbox->{id};
@@ -759,12 +639,12 @@ sub save_cb
 }
 sub preset_menu_cb
 {	my ($button,$event)=@_;
-	my $self=::find_ancestor($button,__PACKAGE__);
-	my $menu=Gtk2::Menu->new;
+	my $self= $button->GET_ancestor;
+	my $menu= Gtk3::Menu->new;
 	my $predef= \%GMB::Plugin::WebContext::Predefined;
 	my $menu_cb= sub { my $preid=$_[1]; $self->fill_editbox(undef,$predef->{$preid}); $self->update_selection; };
 	for my $preid ( ::sorted_keys($predef,'tabtitle') )
-	{	my $item=Gtk2::MenuItem->new( $predef->{$preid}{tabtitle} );
+	{	my $item= Gtk3::MenuItem->new( $predef->{$preid}{tabtitle} );
 		$item->signal_connect(activate => $menu_cb,$preid);
 		$menu->append($item);
 	}

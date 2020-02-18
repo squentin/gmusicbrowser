@@ -10,7 +10,7 @@
 name	App indicator
 title	App Indicator plugin
 desc	Displays a panel indicator in some desktops
-req	perl(Gtk2::AppIndicator, libgtk2-appindicator-perl perl-Gtk2-AppIndicator)
+req	gir(AppIndicator3-0.1, gir1.2-appindicator3-0.1 libappindicator-gtk3)
 =cut
 
 package GMB::Plugin::AppIndicator;
@@ -19,8 +19,6 @@ use warnings;
 use constant
 {	OPT	=> 'PLUGIN_AppIndicator_',
 };
-
-use Gtk2::AppIndicator;
 
 ::SetDefaultOptions(OPT, MiddleClick=>'playpause');
 
@@ -31,8 +29,10 @@ my %mactions= # action when middle-clicking on icon, must correspond to an id in
 );
 my ($indicator,$iconpath);
 
+Glib::Object::Introspection->setup( basename => 'AppIndicator3', version => '0.1', package => 'AppIndicator');
+
 sub Start
-{	$indicator||=Gtk2::AppIndicator->new(::PROGRAM_NAME,'gmusicbrowser','application-status');
+{	$indicator ||= AppIndicator::Indicator->new(::PROGRAM_NAME,'gmusicbrowser','application-status');
 	# events that requires updating the traymenu :
 	::Watch($indicator, $_=> \&QueueUpdate) for qw/Lock Playing Windows/;
 	#::Watch($indicator, $_=> \&UpdateIcon) for qw/Playing Icons/; #FIXME needs initialization #deactivated because it can't work for now
@@ -41,13 +41,13 @@ sub Start
 sub Stop
 {	::UnWatch_all($indicator);
 	$indicator->get_menu->destroy;
-	$indicator->set_passive; #can't find how to destroy it, so hide it and reuse it if plugin reactivated
+	$indicator->set_status('passive'); #can't find how to destroy it, so hide it and reuse it if plugin reactivated
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
+{	my $vbox= Gtk3::VBox->new(::FALSE, 2);
 	my $middleclick= ::NewPrefCombo(OPT.'MiddleClick', \%mactions, text => _"Middle-click action :", cb=>\&Update);
-	my $warning= Gtk2::Label->new_with_format("<i>%s</i>",_"(The middle-click action doesn't work correctly in some desktops)");
+	my $warning= Gtk3::Label->new_with_format("<i>%s</i>",_"(The middle-click action doesn't work correctly in some desktops)");
 	$vbox->pack_start($_,::FALSE,::FALSE,2) for $middleclick,$warning;
 	return $vbox;
 }
@@ -60,13 +60,13 @@ sub Update
 	return unless $indicator;
 	my $menu= ::BuildMenu(\@::TrayMenu);
 	$menu->show_all;
-	$indicator->set_active;
+	$indicator->set_status('active');
 	$indicator->set_menu($menu);
 	my ($menuentry)= grep $_->{id} && $_->{id} eq $::Options{OPT.'MiddleClick'}, $menu->get_children;
 	$indicator->set_secondary_activate_target($menuentry) if $menuentry;
 }
 
-#doesn't work, needs gmb to switch the standard icon system first
+#doesn't work, needs gmb to switch the standard icon system first #2TO3 could it work now ?
 sub UpdateIcon
 {	my $state= !defined $::TogPlay ? 'default' : $::TogPlay ? 'play' : 'pause';
 	$state='default' unless $::TrayIcon{$state};
@@ -74,15 +74,6 @@ sub UpdateIcon
 	my $name= ::barename($::TrayIcon{$state});
 	$indicator->set_icon_theme_path($iconpath=$path) if $iconpath && $iconpath ne $path;
 	$indicator->set_icon_name_active($name);
-}
-
-#patch for typo in Gtk2::AppIndicator
-package Gtk2::AppIndicator;
-sub set_secondary_activate_target {
-        my $self=shift;
-        my $widget=shift;
-        $self->{secondary}=$widget;
-        appindicator_set_secondary_activate_target($self->{ind},$widget);
 }
 
 

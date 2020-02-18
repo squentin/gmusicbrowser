@@ -22,8 +22,7 @@ use strict;
 use warnings;
 use utf8;
 require $::HTTP_module;
-use Gtk2::Gdk::Keysyms;
-use base 'Gtk2::Box';
+use base 'Gtk3::Box';
 use constant
 {	OPT	=> 'PLUGIN_ALBUMINFO_',
 	AMG_SEARCH_URL => 'http://www.allmusic.com/search/album/',
@@ -78,14 +77,14 @@ sub Stop {
 }
 
 sub prefbox {
-	my $frame_cover  = Gtk2::Frame->new(' '._("Album cover").' ');
+	my $frame_cover  = Gtk3::Frame->new(' '._("Album cover").' ');
 	my $spin_picsize = ::NewPrefSpinButton(OPT.'CoverSize',50,500, step=>5, page=>10, text=>_"Cover Size : ", cb=>sub { ::HasChanged('plugin_albuminfo_option_pic'); } );
 	my $chk_picshow  = ::NewPrefCheckButton(OPT.'ShowCover'=>_"Show", widget => $spin_picsize, cb=>sub { ::HasChanged('plugin_albuminfo_option_pic'); });
 	# my $btn_amg      = ::NewIconButton('plugin-artistinfo-allmusic',undef, sub {::main::openurl("http://www.allmusic.com/"); },'none',_"Open allmusic.com in your web browser");
 	# my $hbox_picsize = ::Hpack($spin_picsize, '-', $btn_amg);
 	$frame_cover->add($chk_picshow);
 
-	my $frame_review = Gtk2::Frame->new(_" Review ");
+	my $frame_review = Gtk3::Frame->new(_" Review ");
 	my $entry_path   = ::NewPrefEntry(OPT.'PathFile' => _"Save album info in:", width=>40);
 	my $lbl_preview  = Label::Preview->new(event=>'CurSong Option', noescape=>1, wrap=>1, preview=>sub
 	{	return '' unless defined $::SongID;
@@ -97,7 +96,7 @@ sub prefbox {
 	my $chk_autosave = ::NewPrefCheckButton(OPT.'AutoSave'=>_"Auto-save positive finds", cb=>sub { ::HasChanged('plugin_albuminfo_option_save'); });
 	$frame_review->add(::Vpack($entry_path,$lbl_preview,$chk_autosave));
 
-	my $frame_fields = Gtk2::Frame->new(_" Fields ");
+	my $frame_fields = Gtk3::Frame->new(_" Fields ");
 	my $chk_join = ::NewPrefCheckButton(OPT.'StyleAsGenre' => _"Include Styles in Genres", tip=>_"Allmusic uses both Genres and Styles to describe albums. If you use only Genres, you may want to include Styles in allmusic's list of Genres.");
 	my @chk_fields;
 	for my $field (qw(genre mood style theme)) {
@@ -109,14 +108,14 @@ sub prefbox {
 		tip=>_"Save selected fields for all tracks on the same album whenever album data is loaded from allmusic or from file.");
 	$frame_fields->add(::Vpack($chk_join, $chk_saveflds));
 
-	my $frame_layout = Gtk2::Frame->new(_" Context pane layout ");
+	my $frame_layout = Gtk3::Frame->new(_" Context pane layout ");
 	my @chk_show = ();
 	for my $f (@showfields) {
 		push(@chk_show, ::NewPrefCheckButton(OPT.'Show'.$f->{short} => $f->{long})) if $f->{active};
 	}
 	$frame_layout->add(::Hpack(@chk_show));
 
-	my $btn_download = Gtk2::Button->new(_"Download");
+	my $btn_download = Gtk3::Button->new(_"Download");
 	$btn_download->set_tooltip_text(_"Fields will be saved according to the settings above. Albuminfo files will be re-read if there are fields to be saved and you choose 'albums missing reviews' in the combo box.");
 	my $cmb_download = ::NewPrefCombo(OPT.'mass_download',  {all=>_"entire collection", missing=>_"albums missing reviews"}, text=>_"album information now for");
 	$btn_download->signal_connect(clicked => \&mass_download);
@@ -167,13 +166,13 @@ sub download_one {
 #####################################################################
 sub new {
 	my ($class,$options) = @_;
-	my $self = bless(Gtk2::VBox->new(0,0), $class);
+	my $self= bless Gtk3::VBox->new(0,0), $class;
 	$self->{$_} = $options->{$_} for qw/group/;
-	my $fontsize = $self->style->font_desc;
-	$self->{fontsize} = $fontsize->get_size() / Gtk2::Pango->scale;
+	$self->{fontsize}= 12;		#FIXME 2TO3 find a way to get default size
+	$self->{alt_color}= 'grey';	#FIXME 2TO3 find a way to get a good color
 
 	# Heading: cover and album info.
-	my $cover=Gtk2::HBox->new(0,0);
+	my $cover= Gtk3::HBox->new(0,0);
 	my $group=$options->{group};
 	my $cover_create= sub
 	{	my $box=shift;
@@ -188,48 +187,48 @@ sub new {
 	::Watch($cover, plugin_albuminfo_option_pic=> $cover_create);
 	$cover_create->($cover);
 
-	my $statbox = Gtk2::VBox->new(0,0);
+	my $statbox= Gtk3::VBox->new(0,0);
 	for my $name (qw/Ltitle Lstats/) {
-		my $l = Gtk2::Label->new('');
+		my $l= Gtk3::Label->new('');
 		$self->{$name} = $l;
 		$l->set_justify('center');
 		if ($name eq 'Ltitle') { $l->set_line_wrap(1); $l->set_ellipsize('end'); }
 		$statbox->pack_start($l,0,0,2);
 	}
-	$self->{ratingpic} = Gtk2::Image->new();
+	$self->{ratingpic}= Gtk3::Image->new;
 	$statbox->pack_start($self->{ratingpic},0,0,2);
 
 	# "Refresh", "save" and "search" buttons
 	my $refreshbutton = ::NewIconButton('gtk-refresh', undef, sub { song_changed($_[0],'force'); }, "none", _"Refresh");
 	my $savebutton	  = ::NewIconButton('gtk-save', undef, sub
-		{my $self=::find_ancestor($_[0],__PACKAGE__); save_review(::GetSelID($self),$self->{fields})}, "none", _"Save review");
+		{my $self= $_[0]->GET_ancestor; save_review(::GetSelID($self),$self->{fields})}, "none", _"Save review");
 	$savebutton->show_all;
 	$savebutton->set_no_show_all(1);
 	my $update_savebutton_visible= sub { $_[0]->set_visible( !$::Options{OPT.'AutoSave'} ); };
 	::Watch( $savebutton, plugin_albuminfo_option_save=> $update_savebutton_visible);
 	$update_savebutton_visible->($savebutton);
 
-	my $searchbutton = Gtk2::ToggleButton->new();
+	my $searchbutton= Gtk3::ToggleButton->new;
 	$searchbutton->set_relief('none');
-	$searchbutton->add(Gtk2::Image->new_from_stock('gtk-find','menu'));
-	$searchbutton->signal_connect(clicked => sub {my $self=::find_ancestor($_[0],__PACKAGE__);
+	$searchbutton->add(Gtk3::Image->new_from_stock('gtk-find','menu'));
+	$searchbutton->signal_connect(clicked => sub {my $self= $_[0]->GET_ancestor;
 		if ($_[0]->get_active()) {$self->manual_search()} else {$self->song_changed()}});
-	my $buttonbox = Gtk2::HBox->new();
+	my $buttonbox= Gtk3::HBox->new;
 	$buttonbox->pack_end($searchbutton,0,0,0);
 	$buttonbox->pack_end($savebutton,0,0,0);
 	$buttonbox->pack_end($refreshbutton,0,0,0);
 	$statbox->pack_end($buttonbox,0,0,0);
-	my $stateventbox = Gtk2::EventBox->new(); # To catch mouse events
+	my $stateventbox= Gtk3::EventBox->new; # To catch mouse events
 	$stateventbox->add($statbox);
 	$stateventbox->{group}= $options->{group};
 	$stateventbox->signal_connect(button_press_event => sub {my ($stateventbox, $event) = @_; return 0 unless $event->button == 3; my $ID = ::GetSelID($stateventbox);
 		 ::PopupAAContextMenu({ self=>$stateventbox, mode=>'P', field=>'album', ID=>$ID, gid=>Songs::Get_gid($ID,'album') }) if defined $ID; return 1; } );
-	my $coverstatbox = Gtk2::HBox->new(0,0);
+	my $coverstatbox= Gtk3::HBox->new(0,0);
 	$coverstatbox->pack_start($cover,0,0,0);
 	$coverstatbox->pack_end($stateventbox,1,1,5);
 
 	# For the review: a TextView in a ScrolledWindow in a HBox
-	my $textview = Gtk2::TextView->new();
+	my $textview= Gtk3::TextView->new;
 	$self->signal_connect(map => \&song_changed);
 	$textview->set_cursor_visible(0);
 	$textview->set_wrap_mode('word');
@@ -241,34 +240,34 @@ sub new {
 	$textview->signal_connect(motion_notify_event	  => \&update_cursor_cb);
 	$textview->signal_connect(visibility_notify_event => \&update_cursor_cb);
 	$textview->signal_connect(query_tooltip		  => \&update_cursor_cb);
-	my $sw = Gtk2::ScrolledWindow->new();
+	my $sw= Gtk3::ScrolledWindow->new;
 	$sw->add($textview);
 	$sw->set_shadow_type('none');
 	$sw->set_policy('automatic','automatic');
-	my $infoview = Gtk2::HBox->new();
+	my $infoview= Gtk3::HBox->new;
 	$infoview->set_spacing(0);
 	$infoview->pack_start($sw,1,1,0);
 	$infoview->show_all();
 
 	# Manual search layout
-	my $searchview = Gtk2::VBox->new();
-	$self->{search} = my $search  = Gtk2::Entry->new();
+	my $searchview= Gtk3::VBox->new;
+	$self->{search}= my $search  = Gtk3::Entry->new;
 	$search->set_tooltip_text(_"Enter album name");
 	my $Bsearch = ::NewIconButton('gtk-find', _"Search");
-	my $Bok     = Gtk2::Button->new_from_stock('gtk-ok');
-	my $Bcancel = Gtk2::Button->new_from_stock('gtk-cancel');
+	my $Bok     = Gtk3::Button->new_from_stock('gtk-ok');
+	my $Bcancel = Gtk3::Button->new_from_stock('gtk-cancel');
 	$Bok    ->set_size_request(80, -1);
 	$Bcancel->set_size_request(80, -1);
 	# Year is a 'Glib::String' to avoid printing "0" when year is missing. Caveat: will give wrong sort order for albums released before year 1000 or after year 9999 :)
-	my $store = Gtk2::ListStore->new(('Glib::String')x5,'Glib::UInt'); # Album, Artist, Label, Year, URL, Sort order.
-	my $treeview = Gtk2::TreeView->new($store);
+	my $store= Gtk3::ListStore->new(('Glib::String')x5,'Glib::UInt'); # Album, Artist, Label, Year, URL, Sort order.
+	my $treeview= Gtk3::TreeView->new($store);
 	my %coladded;
 	for my $col ( split(/\s+/,$::Options{OPT.'Columns'}||''), qw/album artist genre year/ )
 	{	my $coldef= $Columns{$col};
 		next unless $coldef;
 		next if $coladded{$col}++; #only add a column once
 		my $colopt= $::Options{OPT.'Column_'.$col} || {};
-		my $column = Gtk2::TreeViewColumn->new_with_attributes($coldef->{name}, Gtk2::CellRendererText->new(), text=>$coldef->{storecol});
+		my $column= Gtk3::TreeViewColumn->new_with_attributes($coldef->{name}, Gtk3::CellRendererText->new, text=>$coldef->{storecol});
 		$column->{key}=$col;
 		$column->set_sort_column_id($coldef->{storecol}); $column->set_expand(1); $column->set_resizable(1); $column->set_reorderable(1);
 		$column->set_sizing('fixed');
@@ -276,13 +275,13 @@ sub new {
 		$column->set_visible(!$colopt->{hide});
 		$treeview->append_column($column);
 		# Recreate the header label to be able to catch mouse clicks in column header:
-		my $label = Gtk2::Label->new($coldef->{name}); $column->set_widget($label); $label->show;
-		my $button = $label->get_ancestor('Gtk2::Button'); # The header label is attached to a button by Gtk
+		my $label= Gtk3::Label->new($coldef->{name}); $column->set_widget($label); $label->show;
+		my $button= $label->get_ancestor('Gtk3::Button'); # The header label is attached to a button by Gtk
 		$button->signal_connect(button_press_event => \&treeview_click_cb, $col) if $button;
 	}
 	$treeview->set_rules_hint(1);
 	$treeview->signal_connect(row_activated => \&entry_selected_cb);
-	my $scrwin = Gtk2::ScrolledWindow->new();
+	my $scrwin= Gtk3::ScrolledWindow->new;
 	$scrwin->set_policy('automatic', 'automatic');
 	$scrwin->add($treeview);
 	$searchview->add( ::Vpack(['_', $search, $Bsearch],
@@ -292,8 +291,12 @@ sub new {
 	$Bsearch->signal_connect(clicked  => \&new_search );
 	$Bok    ->signal_connect(clicked  => \&entry_selected_cb );
 	$Bcancel->signal_connect(clicked  => \&song_changed );
-	$scrwin ->signal_connect(key_press_event => sub {entry_selected_cb($_[0]) if $_[1]->keyval == $Gtk2::Gdk::Keysyms{Return};});
-	$scrwin ->signal_connect(key_press_event => sub {song_changed($_[0])      if $_[1]->keyval == $Gtk2::Gdk::Keysyms{Escape};});
+	$scrwin ->signal_connect(key_press_event => sub {
+		my ($scrwin,$event)=@_;
+		my $key= Gtk3::Gdk::keyval_name( $event->keyval );
+		if ($key eq 'Return') { entry_selected_cb($scrwin) }
+		elsif ($key eq 'Escape') { song_changed($scrwin) }
+		});
 	$searchview->show_all(); # Must call it once now before $searchview->set_no_show_all(1) disables it.
 	$searchview->set_no_show_all(1); # GMB sometimes calls $plugin->show_all(). We then want only infoview to show.
 	$searchview->hide();
@@ -330,7 +333,7 @@ sub SaveOptions {
 # Called when headers in the results table in manual search are clicked
 sub treeview_click_cb {
 	my ($button, $event, $colid) = @_;
-	my $treeview = $button->parent;
+	my $treeview = $button->get_parent;
 	if ($event->button == 1) {
 		my ($sortid,$order) = $treeview->get_model->get_sort_column_id();
 		my $storecol= $Columns{$colid}{storecol};
@@ -360,7 +363,7 @@ sub treeview_click_cb {
 
 sub update_cursor_cb {
 	my $textview = $_[0];
-	my (undef,$wx,$wy,undef) = $textview->window->get_pointer();
+	my (undef,$wx,$wy,undef) = $textview->get_window('text')->get_pointer();
 	my ($x,$y) = $textview->window_to_buffer_coords('widget',$wx,$wy);
 	my $iter = $textview->get_iter_at_location($x,$y);
 	my $cursor = 'xterm';
@@ -370,13 +373,13 @@ sub update_cursor_cb {
 	}
 	return if ($textview->{cursor} || '') eq $cursor;
 	$textview->{cursor} = $cursor;
-	$textview->get_window('text')->set_cursor(Gtk2::Gdk::Cursor->new($cursor));
+	$textview->get_window('text')->set_cursor(Gtk3::Gdk::Cursor->new($cursor));
 }
 
 # Mouse button pressed in textview. If link: open url in browser.
 sub button_release_cb {
 	my ($textview,$event) = @_;
-	my $self = ::find_ancestor($textview,__PACKAGE__);
+	my $self = $textview->GET_ancestor;
 	return ::FALSE unless $event->button == 1;
 	my ($x,$y) = $textview->window_to_buffer_coords('widget',$event->x, $event->y);
 	my $iter = $textview->get_iter_at_location($x,$y);
@@ -394,23 +397,18 @@ sub button_release_cb {
 }
 
 sub cover_popup {
-	my ($self, $event) = @_;
-	my $menu = Gtk2::Menu->new();
-	$menu->modify_bg('GTK_STATE_NORMAL',Gtk2::Gdk::Color->parse('black')); # black bg for the cover-popup
+	my ($self,$event)= @_;
 	my $picsize = 400;
 	my $ID = ::GetSelID($self);
 	my $aID = Songs::Get_gid($ID,'album');
 	if (my $img = AAPicture::newimg(album=>$aID,$picsize)) {
-		my $apic = Gtk2::MenuItem->new();
-		$apic->modify_bg('GTK_STATE_SELECTED',Gtk2::Gdk::Color->parse('black'));
-		$apic->add($img);
-		$apic->show_all();
-		$menu->append($apic);
-		$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
-		return 1;
-	} else {
-		return 0;
+		$img->override_background_color('normal', Gtk3::Gdk::RGBA::parse('black'));
+		$img->show;
+		my $popover= Gtk3::Popover->new($self);
+		$popover->add($img);
+		$popover->popup;
 	}
+	return 1;
 }
 
 # Print warnings in the text buffer
@@ -420,7 +418,7 @@ sub print_warning {
 	$buffer->set_text("");
 	my $iter = $buffer->get_start_iter();
 	my $fontsize = $self->{fontsize};
-	my $tag_noresults = $buffer->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
+	my $tag_noresults = $buffer->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground=>$self->{alt_color});
 	$buffer->insert_with_tags($iter,"\n$text",$tag_noresults);
 	$buffer->set_modified(0);
 }
@@ -433,8 +431,8 @@ sub print_review {
 	my $fields = $self->{fields};
 	$buffer->set_text("");
 	my $fontsize = $self->{fontsize};
-	my $tag_h2 = $buffer->create_tag(undef, font=>$fontsize+1, weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
-	my $tag_b  = $buffer->create_tag(undef, weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
+	my $tag_h2 = $buffer->create_tag(undef, font=>$fontsize+1, weight=>::PANGO_WEIGHT_BOLD);
+	my $tag_b  = $buffer->create_tag(undef, weight=>::PANGO_WEIGHT_BOLD);
 	my $tag_i  = $buffer->create_tag(undef, style=>'italic');
 	my $iter = $buffer->get_start_iter();
 
@@ -506,7 +504,7 @@ sub manual_search {
 }
 
 sub new_search {
-	my $self = ::find_ancestor($_[0], __PACKAGE__); # $_[0] can be a button or gtk-entry. Ancestor is an albuminfo object.
+	my $self = $_[0]->GET_ancestor; # $_[0] can be a button or gtk-entry. Ancestor is an albuminfo object.
 	my $album = $self->{search}->get_text();
 	$album =~ s|^\s+||; $album =~ s|\s+$||; # remove leading and trailing spaces
 	return if $album eq '';
@@ -529,7 +527,7 @@ sub print_results {
 }
 
 sub entry_selected_cb {
-	my $self = ::find_ancestor($_[0], __PACKAGE__); # $_[0] may be the TreeView or the 'OK' button. Ancestor is an albuminfo object.
+	my $self = $_[0]->GET_ancestor; # $_[0] may be the TreeView or the 'OK' button. Ancestor is an albuminfo object.
 	my ($path, $column) = $self->{treeview}->get_cursor();
 	unless (defined $path) {$self->{searchview}->hide(); $self->{infoview}->show(); return} # The user may click OK before selecting an album
 	my $store = $self->{treeview}->get_model;
@@ -549,8 +547,8 @@ sub entry_selected_cb {
 #####################################################################
 sub song_changed {
 	my ($widget,$force) = @_;
-	my $self = ::find_ancestor($widget, __PACKAGE__);
-	return unless $self->mapped() || $::Options{OPT.'SaveFields'};
+	my $self = $widget->GET_ancestor;
+	return unless $self->get_mapped || $::Options{OPT.'SaveFields'};
 	$self->{infoview}->show();
 	$self->{searchview}->hide();
 	my $ID = ::GetSelID($self);

@@ -283,8 +283,8 @@ sub _Kill_timeout	#make sure old children are dead
 }
 
 sub AdvancedOptions
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
+{	my $vbox=Gtk3::VBox->new(::FALSE, 2);
+	my $sg1=Gtk3::SizeGroup->new('horizontal');
 	my $opt=::NewPrefEntry('mpvoptions',_"mpv options :", sizeg1=>$sg1);
 	$vbox->pack_start($_,::FALSE,::FALSE,2), for $opt;
 	return $vbox;

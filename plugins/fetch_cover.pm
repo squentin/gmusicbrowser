@@ -15,7 +15,7 @@ package GMB::Plugin::FETCHCOVER;
 use strict;
 use warnings;
 require $::HTTP_module;
-use base 'Gtk2::Window';
+use base 'Gtk3::Window';
 use constant
 {	OPT => 'PLUGIN_FETCHCOVER_',
 	RES_LINES => 4,
@@ -78,8 +78,8 @@ sub prefbox
 	my $entry2=::NewPrefEntry(OPT.'COVERFILE');
 	my ($radio1a,$radio1b)=::NewPrefRadio(OPT.'USEPATH',[_"use song folder",0, _"use :",1]);
 	my ($radio2a,$radio2b)=::NewPrefRadio(OPT.'USEFILE',[_"use album name",0,  _"use :",1]);
-	my $frame1=Gtk2::Frame->new(_"default folder");
-	my $frame2=Gtk2::Frame->new(_"default filename");
+	my $frame1= Gtk3::Frame->new(_"default folder");
+	my $frame2= Gtk3::Frame->new(_"default filename");
 	my $vbox1=::Vpack( $radio1a,[$radio1b,$entry1] );
 	my $vbox2=::Vpack( $radio2a,[$radio2b,$entry2] );
 	$frame1->add($vbox1);
@@ -90,34 +90,33 @@ sub prefbox
 sub Fetch
 {	my ($field,$gid,$ID)=@_;
 	my $mainfield=Songs::MainField($field);	#'artist' or 'album'
-	my $self=bless Gtk2::Window->new;
+	my $self= bless Gtk3::Window->new;
 	$self->set_border_width(4);
 	my $Bsearch=::NewIconButton('gtk-find',_"Search");
-	my $Bcur=Gtk2::Button->new($mainfield eq 'artist' ? _"Search for current artist" : _"Search for current album");
+	my $Bcur= Gtk3::Button->new($mainfield eq 'artist' ? _"Search for current artist" : _"Search for current album");
 	::set_drag($Bcur, dest =>	[::DRAG_ID, sub { $_[0]->get_toplevel->SearchID(undef,$_[2]); }], );
-	my $Bclose=Gtk2::Button->new_from_stock('gtk-close');
+	my $Bclose= Gtk3::Button->new_from_stock('gtk-close');
 	my @entry;
-	push @entry, $self->{"searchentry_$_"}=Gtk2::Entry->new for qw/s a l/;
+	push @entry, $self->{"searchentry_$_"}= Gtk3::Entry->new for qw/s a l/;
 	$self->{searchentry_s}->set_tooltip_text(_"Keywords");
 	$self->{searchentry_a}->set_tooltip_text(_"Artist");
 	$self->{searchentry_l}->set_tooltip_text(_"Album");
 	my $source=::NewPrefCombo( OPT.'PictureSite_'.$mainfield, {map {$_=>$Sites{$mainfield}{$_}[0]} keys %{$Sites{$mainfield}}} , cb => \&combo_changed_cb);
 	#$self->{Bnext}=	my $Bnext=::NewIconButton('gtk-go-forward',"More");
-	$self->{Bnext}=		my $Bnext=Gtk2::Button->new(_"More results");
-	$self->{Bstop}=		my $Bstop=Gtk2::Button->new_from_stock('gtk-stop');
-	$self->{progress}=	my $pbar =Gtk2::ProgressBar->new;
-	$self->{table}=		my $table=Gtk2::Table->new(RES_LINES,RES_PER_LINE,::TRUE);
+	$self->{Bnext}=		my $Bnext= Gtk3::Button->new(_"More results");
+	$self->{Bstop}=		my $Bstop= Gtk3::Button->new_from_stock('gtk-stop');
+	$self->{progress}=	my $pbar = Gtk3::ProgressBar->new;
+	$self->{table}=		my $table= Gtk3::Table->new(RES_LINES,RES_PER_LINE,::TRUE);
 	$self->add( ::Vpack
 			(	[map( {('_',$_)} @entry), $Bsearch, $Bstop, $source],
 				'_',$table,
 				'-', ['_',$pbar , '-', $Bclose,$Bnext,$Bcur]
 			) );
+	$self->show_all;
 	for (@entry)
 	{	$_->signal_connect(  activate => \&NewSearch );
-		$_->show_all;
 		$_->set_no_show_all(1);
 	}
-	$self->show_all;
 	$Bsearch->signal_connect( clicked => \&NewSearch );
 	$Bstop->signal_connect( clicked => sub {$_[0]->get_toplevel->stop });
 	$Bclose->signal_connect(clicked => sub {$_[0]->get_toplevel->destroy});
@@ -154,7 +153,7 @@ sub UpdateSite
 
 sub SearchID
 {	my ($self,$gid,$ID)=@_;	#only one of $gid and $ID needs to be defined
-	$self=::find_ancestor($_[0],__PACKAGE__);
+	$self= $_[0]->GET_ancestor;
 	my $field= $self->{field};
 	if (!defined $ID)
 	{	return unless defined $gid;
@@ -187,7 +186,7 @@ sub SearchID
 }
 
 sub NewSearch
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
+{	my $self= $_[0]->GET_ancestor;
 	my $url=$Sites{$self->{mainfield}}{$self->{site}}[1];
 	$self->{user_agent}= $Sites{$self->{mainfield}}{$self->{site}}[3];
 	my %letter;
@@ -438,7 +437,7 @@ sub stop
 	#$self->{progress}->set_fraction(1);
 	$self->{progress}->hide;
 	if ($error)
-	{	my $l=Gtk2::Label->new($error);
+	{	my $l= Gtk3::Label->new($error);
 		$l->show;
 		$self->{table}->attach($l,0,5,0,1,'fill','fill',1,1);
 	}
@@ -489,16 +488,14 @@ sub get_next
 		{	my $dim=$loader->{w}.' x '.$loader->{h};
 			my $table=$self->{table};
 			my $pixbuf=$loader->get_pixbuf;
-			my $image=Gtk2::Image->new_from_pixbuf($pixbuf);
-			my $button=Gtk2::Button->new;
+			my $image= Gtk3::Image->new_from_pixbuf($pixbuf);
+			my $button=Gtk3::Button->new;
 			$button->{pixdata}=$pixdata;
-			$button->{ext}=	($Gtk2::VERSION >= 1.092)?
-					  $loader->get_format->{extensions}[0]
-					: ( EntryCover::_identify_pictype($pixdata) )[0];
+			$button->{ext}=	$loader->get_format->get_extensions->[0];
 			$button->{ext}='jpg' if $button->{ext} eq 'jpeg';
 			$button->{url}= $result->{url};
-			my $vbox=Gtk2::VBox->new(0,0);
-			my $label=Gtk2::Label->new($dim);
+			my $vbox= Gtk3::VBox->new(0,0);
+			my $label=Gtk3::Label->new($dim);
 			$vbox->add($image);
 			$vbox->pack_end($label,0,0,0);
 			$button->add($vbox);
@@ -532,7 +529,7 @@ sub get_next
 
 sub set_cover
 {	my $button=$_[0];
-	my $self=::find_ancestor($button,__PACKAGE__);
+	my $self= $button->GET_ancestor;
 	my $field=$self->{field};
 	my $gid=  $self->{gid};
 	my $name= Songs::Gid_to_Get($field,$gid);
@@ -543,7 +540,7 @@ sub set_cover
 	else
 	{	$text=::__x(_"Use this picture for artist '{artist}'", artist => $name);
 	}
-	my $check=Gtk2::CheckButton->new( $text );
+	my $check= Gtk3::CheckButton->new( $text );
 	$check->set_active(1);
 	my $default_file=	$::Options{OPT.'USEFILE'} ?
 				$::Options{OPT.'COVERFILE'} : $name;

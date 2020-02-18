@@ -497,7 +497,7 @@ my $count=1000;
 						$size[ $_>>4 ]		),1;
 			$frames++;
 			if ($count_to && $frames>3) { return 1 } #only wanted to check if first frame ok
-			unless ($count--) { $count=1000; Gtk2->main_iteration while Gtk2->events_pending; }
+			unless ($count--) { $count=1000; Gtk3::main_iteration while Gtk3::events_pending; }
 		}
 		else #skip
 		{	#@_=unpack "B8B8",$byte1_2; warn "@_ ".tell($fh)."\n";	#DEBUG
