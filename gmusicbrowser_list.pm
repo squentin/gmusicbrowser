@@ -2755,7 +2755,7 @@ sub row_expanded_changed_cb	#keep track of which rows are expanded
 		$treeview->{expanded}{$path}=undef;	#for when reconstructing the hash
 	}
 	else
-	{	$ref->[2]&=~ IsExpanded; # remove IsExpanded flag
+	{	$ref->[2]&=~ IsExpanded if $ref->[2]; # remove IsExpanded flag
 		delete $treeview->{expanded}{$path};
 	}
 }
