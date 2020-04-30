@@ -111,6 +111,7 @@ sub launch_mpv
 			push @cmd_and_args,"--replaygain=".get_RG_mode();
 			push @cmd_and_args,"--replaygain-preamp=".get_RG_preamp();
 			push @cmd_and_args,"--replaygain-clip=".$::Options{rg_limiter} ? 'yes' : 'no';
+			push @cmd_and_args,"--replaygain-fallback=".($::Options{rg_fallback} || 0);
 		} else { push @cmd_and_args,"--af-add=".get_RG_string(); }
 	}
 	push @cmd_and_args,"--af-add=".get_EQ_string($::Options{equalizer}) if $::Options{use_equalizer};
@@ -378,6 +379,7 @@ sub RG_set_options
 		cmd_push('set', 'replaygain', get_RG_mode());
 		cmd_push('set', 'replaygain-preamp', get_RG_preamp());
 		cmd_push('set', 'replaygain-clip', $::Options{rg_limiter} ? 'yes' : 'no');
+		cmd_push('set', 'replaygain-fallback', $::Options{rg_fallback} || 0);
 	} else
 	{
 		my $RGstring = get_RG_string();
