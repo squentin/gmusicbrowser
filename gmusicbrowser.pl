@@ -3150,8 +3150,8 @@ INIT
  );
 }
 sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, or undef if none applies
-{	my ($ID,$current,$text)=@_;
-	my $currentsong= $current && defined $SongID && $ID==$SongID;
+{	my ($ID,$notcurrent,$text)=@_;
+	my $currentsong= !$notcurrent && defined $SongID && $ID==$SongID;
 	my $status;
 	if ($currentsong)	# playing or paused or stopped
 	{	$status= $TogPlay		? 'play' :
