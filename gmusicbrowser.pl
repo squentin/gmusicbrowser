@@ -1428,6 +1428,8 @@ sub LoadIcons		#FIXME 2TO3 move gtk-fullscreen.png to gnome-classic folder
 	$TrayIcon{$_}= get_icon_filename('trayicon-'.$_) for qw/play pause/;
 	UpdateTrayIcon(1);
 
+	Gtk3::Window::set_default_icon_from_file(get_icon_filename('gmusicbrowser'));
+
 	$_->queue_draw for Gtk3::Window::list_toplevels; #needed ? probably for songtree and songlist, others ? CHECKME 2TO3
 	HasChanged('Icons');
 }
