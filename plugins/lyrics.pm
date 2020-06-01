@@ -356,9 +356,9 @@ sub TimeChanged		#scroll the text
 	return unless defined $::SongID && defined $self->{ID} && $self->{ID} eq $::SongID;
 	return unless defined $::PlayTime;
 	my $adj=($self->get_children)[1]->get_vadjustment;
-	my $range=($adj->upper - $adj->lower - $adj->page_size);
+	my $range=($adj->get_upper - $adj->get_lower - $adj->get_page_size);
 	return unless $range >0;
-	return if $adj->get_value > $adj->upper - $adj->page_size;
+	return if $adj->get_value > $adj->get_upper - $adj->get_page_size;
 	my $delta=$::PlayTime - ($self->{time} || 0);
 	return if abs($delta) <1;
 	my $inc=$delta / Songs::Get($::SongID,'length');
