@@ -566,7 +566,7 @@ our %QActions=
 	'wait'	=> {order=>20, icon=>'preferences-system-time-symbolic',	short=> _"wait for more",	long=> _"Wait for more when queue empty",	action=>\&Stop,	changed=>\&QWaitAutoPlay,keep=>1,save=>1, },
 	stop	=> {order=>30, icon=>'media-playback-stop-symbolic',	short=> _"stop",		long=> _"Stop when queue empty",		action=>\&Stop,
 			can_next=>1, long_next=>_"Stop after this song", },
-	quit	=> {order=>40, icon=>'application-exit-symbolic',		short=> _"quit",		long=> _"Quit when queue empty",		action=>\&Quit,
+	quit	=> {order=>40, icon=>'system-shutdown-symbolic',		short=> _"quit",		long=> _"Quit when queue empty",		action=>\&Quit,
 			can_next=>1, long_next=>_"Quit after this song"},
 	turnoff => {order=>50, icon=>'system-shutdown-symbolic',		short=> _"turn off",		long=> _"Turn off computer when queue empty", 	action=>sub {Stop(); TurnOff();},
 			condition=> sub { $::Options{Shutdown_cmd} }, can_next=>1, long_next=>_"Turn off computer after this song"},
