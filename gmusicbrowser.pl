@@ -561,14 +561,14 @@ my ($browsercmd,$opendircmd);
 # autofill : indicate that this mode use the maxautofill value
 # can_next : this mode can be use with $NextAction
 our %QActions=
-(	''	=> {order=>0,				short=> _"normal",		long=> _"Normal mode", can_next=>1, },
-	autofill=> {order=>10, icon=>'gtk-refresh',	short=> _"autofill",		long=> _"Auto-fill queue",					changed=>\&QAutoFill,	 keep=>1,save=>1,autofill=>1, },
-	'wait'	=> {order=>20, icon=>'gmb-wait',	short=> _"wait for more",	long=> _"Wait for more when queue empty",	action=>\&Stop,	changed=>\&QWaitAutoPlay,keep=>1,save=>1, },
-	stop	=> {order=>30, icon=>'gtk-media-stop',	short=> _"stop",		long=> _"Stop when queue empty",		action=>\&Stop,
+(	''	=> {order=>0,						short=> _"normal",		long=> _"Normal mode", can_next=>1, },
+	autofill=> {order=>10, icon=>'view-refresh-symbolic',		short=> _"autofill",		long=> _"Auto-fill queue",					changed=>\&QAutoFill,	 keep=>1,save=>1,autofill=>1, },
+	'wait'	=> {order=>20, icon=>'preferences-system-time-symbolic',	short=> _"wait for more",	long=> _"Wait for more when queue empty",	action=>\&Stop,	changed=>\&QWaitAutoPlay,keep=>1,save=>1, },
+	stop	=> {order=>30, icon=>'media-playback-stop-symbolic',	short=> _"stop",		long=> _"Stop when queue empty",		action=>\&Stop,
 			can_next=>1, long_next=>_"Stop after this song", },
-	quit	=> {order=>40, icon=>'gtk-quit',	short=> _"quit",		long=> _"Quit when queue empty",		action=>\&Quit,
+	quit	=> {order=>40, icon=>'application-exit-symbolic',		short=> _"quit",		long=> _"Quit when queue empty",		action=>\&Quit,
 			can_next=>1, long_next=>_"Quit after this song"},
-	turnoff => {order=>50, icon=>'gmb-turnoff',	short=> _"turn off",		long=> _"Turn off computer when queue empty", 	action=>sub {Stop(); TurnOff();},
+	turnoff => {order=>50, icon=>'system-shutdown-symbolic',		short=> _"turn off",		long=> _"Turn off computer when queue empty", 	action=>sub {Stop(); TurnOff();},
 			condition=> sub { $::Options{Shutdown_cmd} }, can_next=>1, long_next=>_"Turn off computer after this song"},
 );
 
@@ -637,15 +637,15 @@ unshift @SongCMenu,  #unshift instead of "=" because the replaygain submenu (and
 (	{ label => _"Song Properties",	code => sub { DialogSongProp (@{ $_[0]{IDs} }); },	onlyone => 'IDs', stockicon => 'gtk-edit' },
 	{ label => _"Songs Properties",	code => sub { DialogSongsProp(@{ $_[0]{IDs} }); },	onlymany=> 'IDs', stockicon => 'gtk-edit' },
 	{ label => _"Play Only Selected",code => sub { Select(song => 'first', play => 1, staticlist => $_[0]{IDs} ); },
-		onlymany => 'IDs', 	stockicon => 'gtk-media-play'},
+		onlymany => 'IDs', 	stockicon => 'media-playback-start-symbolic'},
 	{ label => _"Play Only Displayed",code => sub { Select(song => 'first', play => 1, staticlist => \@{$_[0]{listIDs}} ); },
 		test => sub { @{$_[0]{IDs}}<2 }, notmode => 'A',	onlymany => 'listIDs',	stockicon => 'gtk-media-play' },
 	{ label => _"Append to playlist",code => sub { ::DoActionForList('addplay',$_[0]{IDs}); },
 		notempty => 'IDs',	test => sub { $::ListMode }, },
 	{ label => _"Enqueue Selected",		code => sub { Enqueue(@{ $_[0]{IDs} }); },	submenu3=> \@submenuQueue,
-		notempty => 'IDs', notmode => 'QP', stockicon => 'gmb-queue' },
+		notempty => 'IDs', notmode => 'QP', stockicon => 'format-indent-more-symbolic' },
 	{ label => _"Enqueue Displayed",	code => sub { Enqueue(@{ $_[0]{listIDs} }); },
-		empty => 'IDs',	notempty=> 'listIDs', notmode => 'QP', stockicon => 'gmb-queue' },
+		empty => 'IDs',	notempty=> 'listIDs', notmode => 'QP', stockicon => 'format-indent-more-symbolic' },
 	{ label => _"Add to list",	submenu => \&AddToListMenu,	notempty => 'IDs' },
 	# edit submenu for label-type fields
 	{ label => sub { Songs::Field_Edit_string($_[0]{field}); },	notempty => 'IDs',
@@ -681,12 +681,12 @@ our @cMenuAA=
 	{ label => _"Lookup in AMG",	code => sub { AMGLookup( $_[0]{mainfield}, $_[0]{aaname} ); },
 	  test => sub { $_[0]{mainfield} =~m/^album$|^artist$|^title$/; },
 	},
-	{ label => _"Filter",		code => sub { Select(filter => Songs::MakeFilterFromGID($_[0]{field},$_[0]{gid})); },	stockicon => 'gmb-filter', mode => 'P' },
+	{ label => _"Filter",		code => sub { Select(filter => Songs::MakeFilterFromGID($_[0]{field},$_[0]{gid})); },	stockicon => 'view-filter-symbolic', mode => 'P' },
 	{ label => \&SongsSubMenuTitle,		submenu => \&SongsSubMenu, },
 	{ label => sub {$_[0]{mode} eq 'P' ? _"Display Songs" : _"Filter"},	code => \&FilterOnAA,
 		test => sub { GetSonglist( $_[0]{self} ) }, },
 	{ label => _"Set Picture",	code => sub { ChooseAAPicture($_[0]{ID},$_[0]{mainfield},$_[0]{gid}); },
-		stockicon => 'gmb-picture' },
+		stockicon => 'folder-pictures-symbolic' },
 );
 
 our @TrayMenu=
@@ -1280,11 +1280,11 @@ our ($NBVolIcons,$NBQueueIcons); our %TrayIcon;
 my $icon_factory;
 
 my %IconsFallbacks=
-(	'gmb-queue0'	   => 'gmb-queue',
-	'gmb-queue-window' => 'gmb-queue',
-	'gmb-random-album' => 'gmb-random',
-	'gmb-view-fullscreen'=>'gtk-fullscreen',
-	#'gmb-media-skip-forward'=> 'media-skip-forward',
+(	'gmb-queue0'	   => 'format-indent-more-symbolic',
+	'gmb-queue-window' => 'format-indent-more-symbolic',
+	'gmb-random-album' => 'media-playlist-shuffle-symbolic',
+	'gmb-view-fullscreen'=>'view-fullscreen-symbolic',
+	#'gmb-media-skip-forward'=> 'media-skip-forward-symbolic',
 );
 our %IconsFallbacksCache;
 sub check_icon_name
@@ -1967,7 +1967,7 @@ sub TurnOff
 		'warning','none',''
 	);
 	$dialog->add_button('gtk-cancel' => 2);
-	my $button1= Gtk3::Button->new_from_icon_name('gmb-turnoff','button');
+	my $button1= Gtk3::Button->new_from_icon_name('system-shutdown-symbolic','button');
 	$button1->set_label(_"Turn Off");
 	$dialog->add_action_widget($button1=> 1);
 	my $sec=21;
@@ -2528,7 +2528,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		{	my $dialog = Gtk3::MessageDialog->new(undef,'modal','error','none','%s', _"The save file seems incomplete, you may want to use a backup instead.");
 			$dialog->set_title(PROGRAM_NAME);
 			$dialog->add_button_custom(_"Continue anyway",1);
-			$dialog->add_button_custom(_"Exit",2, icon=>'gtk-quit', tip=>__x(_"You can find backups in {folder}",folder=>dirname($SaveFile)));
+			$dialog->add_button_custom(_"Exit",2, icon=>'application-exit-symbolic', tip=>__x(_"You can find backups in {folder}",folder=>dirname($SaveFile)));
 			$dialog->show_all;
 			exit unless $dialog->run eq '1';
 			$dialog->destroy;
@@ -5101,8 +5101,8 @@ sub ChoosePix
 	$eventbox->add($image);
 	$eventbox->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb);
 	my $max=my $nb=0; my $lastfile;
-	my $prev= NewIconButton('gtk-go-back',   undef, sub { $_[0]->get_parent->get_parent->{set_pic}->(-1); });
-	my $next= NewIconButton('gtk-go-forward',undef, sub { $_[0]->get_parent->get_parent->{set_pic}->(1); });
+	my $prev= NewIconButton('go-previous-symbolic',   undef, sub { $_[0]->get_parent->get_parent->{set_pic}->(-1); });
+	my $next= NewIconButton('go-next-symbolic',	undef, sub { $_[0]->get_parent->get_parent->{set_pic}->(1); });
 	my $more= Gtk3::HButtonBox->new;
 	$more->add($_) for $prev,$next;
 	$preview->pack_start($_,FALSE,FALSE,2) for $more,$eventbox,$label;
@@ -5310,7 +5310,7 @@ sub DeleteFiles
 		  'warning','cancel','%s',
 		  __x(_("About to delete {files}\nAre you sure ?"), files => $text)
 		);
-	$dialog->add_button("gtk-delete", 2);
+	$dialog->add_button("edit-delete-symbolic", 2);
 	$dialog->show_all;
 	if ('2' eq $dialog->run)
 	{ my $skip_all;
@@ -5633,7 +5633,7 @@ sub LabelEditMenu
 	 };
 	my $menu=MakeFlagMenu($field,$menusub_toggled,$hash);
 	my $item= Gtk3::ImageMenuItem->new(_("Add new label").'...');
-	$item->set_image( Gtk3::Image->new_from_stock('gtk-add','menu') );
+	$item->set_image( Gtk3::Image->new_from_stock('list-add-symbolic','menu') );
 	$item->signal_connect(activate=>sub { AddNewLabel($field,$IDs); });
 	$menu->append($_) for Gtk3::SeparatorMenuItem->new, $item;
 	return $menu;
@@ -6401,7 +6401,7 @@ sub PrefKeys
 	my $priority= Gtk3::CheckButton->new(_"High priority");
 	$priority->set_tooltip_text(_"If checked, the shortcut has higher priority than the default shortcut of widgets. Warning: this can make some features inaccessible");
 
-	my $butadd= ::NewIconButton('gtk-add',_"Add shorcut key",sub
+	my $butadd= ::NewIconButton('list-add-symbolic',_"Add shorcut key",sub
 	 {	my $cmd=$combo->get_value;
 		return unless defined $cmd;
 		my $key=$key_entry->{key};
@@ -6415,7 +6415,7 @@ sub PrefKeys
 		$Options{CustomKeyBindings}{$key}=$cmd;
 		&$refresh_sub;
 	 });
-	my $butrm=  ::NewIconButton('gtk-remove',_"Remove",sub
+	my $butrm=  ::NewIconButton('list-remove-symbolic',_"Remove",sub
 	 {	my $iter=$treeview->get_selection->get_selected;
 		my $key=$store->get($iter,2);
 		delete $Options{CustomKeyBindings}{$_} for $key,"+$key";
@@ -6852,7 +6852,7 @@ sub PrefLayouts
 		push @layouts_combos, $combo;
 	}
 	my $reloadlayouts=Gtk3::Alignment->new(0,.5,0,0);
-	$reloadlayouts->add( NewIconButton('gtk-refresh',_"Re-load layouts",\&Layout::InitLayouts) );
+	$reloadlayouts->add( NewIconButton('view-refresh-symbolic',_"Re-load layouts",\&Layout::InitLayouts) );
 
 	#fullscreen button
 	my $fullbutton=NewPrefCheckButton(AddFullscreenButton => _"Add a fullscreen button", cb=>sub { Layout::WidgetChangedAutoAdd('Fullscreen'); }, tip=>_"Add a fullscreen button to layouts that can accept extra buttons");
@@ -7024,8 +7024,8 @@ sub PrefLibrary
 			AddPath(1,@list);
 		}]);
 
-	my $addbut=NewIconButton('gtk-add',_"Add folder", sub { ChooseAddPath(1); });
-	my $rmdbut=NewIconButton('gtk-remove',_"Remove");
+	my $addbut=NewIconButton('folder-new-symbolic',_"Add folder", sub { ChooseAddPath(1); });
+	my $rmdbut=NewIconButton('list-remove-symbolic',_"Remove");
 
 	my $selection=$treeview->get_selection;
 	$selection->set_mode('multiple');
@@ -7052,8 +7052,8 @@ sub PrefLibrary
 
 	my $CScan=NewPrefCheckButton(StartScan => _"Search for new songs on startup");
 	my $CCheck=NewPrefCheckButton(StartCheck => _"Check for updated/deleted songs on startup");
-	my $BScan= NewIconButton('gtk-refresh',_"scan now", sub { IdleScan();	});
-	my $BCheck=NewIconButton('gtk-refresh',_"check now",sub { IdleCheck();	});
+	my $BScan= NewIconButton('view-refresh-symbolic',_"scan now", sub { IdleScan();	});
+	my $BCheck=NewIconButton('view-refresh-symbolic',_"check now",sub { IdleCheck();	});
 	my $label= Gtk3::Label->new(_"Folders to search for new songs");
 
 	my $reorg= Gtk3::Button->new(_("Reorganize files and folders").'...');
@@ -7068,7 +7068,7 @@ sub PrefLibrary
 		tip =>	_("mp3 files without a VBR header requires a full scan to check its real length and bitrate")."\n".
 			_('You can force a check for these files by holding shift when selecting "Re-read tags"')
 		);
-	my $Blengthcheck= NewIconButton('gtk-refresh',_"check length now",sub { CheckLength(); });
+	my $Blengthcheck= NewIconButton('view-refresh-symbolic',_"check length now",sub { CheckLength(); });
 	$Blengthcheck->{timeout}= Glib::Timeout->add(1000, \&PrefLibrary_update_checklength_button,$Blengthcheck);#refresh it 1s after creation
 	Watch($Blengthcheck,$_=> sub { my ($button,$IDs,$fields)=@_; $button->{timeout}||= Glib::Timeout->add(2000, \&PrefLibrary_update_checklength_button,$button) if !$fields || grep($_ eq 'length_estimated', @$fields); } ) for qw/SongsAdded SongsChanged/; #refresh it 2s after a change
 
@@ -7372,7 +7372,7 @@ sub NewPrefFileEntry
 		my $hist= $Options{$key_history} || [];
 		$store->set($store->append,0,decode_url($_)) for grep length, @$hist; #won't work with filenames with broken encoding
 	}
-	my $button=NewIconButton('gtk-open');
+	my $button=NewIconButton('document-open-symbolic');
 	my $hbox= Gtk3::HBox->new;
 	my $hbox2=Gtk3::HBox->new(FALSE,0);
 	$hbox2->pack_start($widget,TRUE,TRUE,0);
@@ -7999,7 +7999,7 @@ sub new
 	my $self= bless Gtk3::Dialog->new( $typedata->[0], $window,[qw/destroy-with-parent/]), $class;
 	$self->add_button('gtk-cancel' => 'none');
 	if (defined $name && $name ne '')
-	{	my $button=::NewIconButton('gtk-save', ::__x( _"save as '{name}'", name => $name) );
+	{	my $button=::NewIconButton('document-save-symbolic', ::__x( _"save as '{name}'", name => $name) );
 		$button->can_default(::TRUE);
 		$self->add_action_widget( $button,'ok' );
 		$self->{save_name}=$name;
@@ -8033,14 +8033,14 @@ sub new
 		( $typedata->[2],$renderer,'text',0)
 		);
 	my $sw= ::new_scrolledwindow($treeview,'etched-in');
-	my $butrm=::NewIconButton('gtk-remove',_"Remove");
+	my $butrm=::NewIconButton('list-remove-symbolic',_"Remove");
 	$treeview->get_selection->signal_connect( changed => sub
 		{	my $sel=$_[0]->count_selected_rows;
 			$butrm->set_sensitive($sel);
 		});
 	$butrm->set_sensitive(0);
 	$butrm->signal_connect(clicked => \&Remove_cb,$self);
-	my $butsave=::NewIconButton('gtk-save');
+	my $butsave=::NewIconButton('document-save-symbolic');
 	my $NameEntry= Gtk3::Entry->new;
 	$NameEntry->signal_connect(changed => sub { $butsave->set_sensitive(length $_[0]->get_text); });
 	$butsave->signal_connect(  clicked  => sub {$self->Save});
@@ -8164,9 +8164,9 @@ sub new
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('never','automatic');
 
-	my $butadd= ::NewIconButton('gtk-add',_"Add");
-	my $butadd2=::NewIconButton('gtk-add',_"Add multiple condition");
-	my $butrm=  ::NewIconButton('gtk-remove',_"Remove");
+	my $butadd= ::NewIconButton('list-add-symbolic',_"Add");
+	my $butadd2=::NewIconButton('list-add-symbolic',_"Add multiple condition");
+	my $butrm=  ::NewIconButton('list-remove-symbolic',_"Remove");
 	$butadd->signal_connect( clicked => \&Add_cb);
 	$butadd2->signal_connect(clicked => \&Add_cb);
 	$butrm->signal_connect(  clicked => \&Rm_cb );
@@ -8450,11 +8450,11 @@ sub new
 	$treeview2->set_reorderable(TRUE);
 	my $order_column= Gtk3::TreeViewColumn->new_with_attributes( 'Order',Gtk3::CellRendererPixbuf->new,'stock-id',2 );
 	$treeview2->append_column($order_column);
-	my $butadd=	$self->{butadd}=	::NewIconButton('gtk-add',	_"Add",		sub {$self->Add_selected});
-	my $butrm=	$self->{butrm}=		::NewIconButton('gtk-remove',	_"Remove",	sub {$self->Del_selected});
-	my $butclear=	$self->{butclear}=	::NewIconButton('gtk-clear',	_"Clear",	sub { $self->Set(''); });
-	my $butup=	$self->{butup}=		::NewIconButton('gtk-go-up',	undef,		sub { $self->Move_Selected(1,0); });
-	my $butdown=	$self->{butdown}=	::NewIconButton('gtk-go-down',	undef,		sub { $self->Move_Selected(0,0); });
+	my $butadd=	$self->{butadd}=	::NewIconButton('list-add-symbolic',	_"Add",		sub {$self->Add_selected});
+	my $butrm=	$self->{butrm}=		::NewIconButton('list-remove-symbolic',	_"Remove",	sub {$self->Del_selected});
+	my $butclear=	$self->{butclear}=	::NewIconButton('edit-clear-symbolic',	_"Clear",	sub { $self->Set(''); });
+	my $butup=	$self->{butup}=		::NewIconButton('go-up-symbolic',	undef,		sub { $self->Move_Selected(1,0); });
+	my $butdown=	$self->{butdown}=	::NewIconButton('go-down-symbolic',	undef,		sub { $self->Move_Selected(0,0); });
 
 	$treeview1->get_selection->signal_connect (changed => sub{$self->Buttons_update;});
 	$treeview2->get_selection->signal_connect (changed => sub{$self->Buttons_update;});
@@ -8492,7 +8492,7 @@ sub new
 	$case_column->set_cell_data_func($caserenderer,	sub
 	 {	my ($column,$cell,$store2,$iter)=@_;
 		my $i=$store2->get_value($iter,3);
-		my $stock= !$i ? undef : $i==SENSITIVE ? 'gmb-case_sensitive' : 'gmb-case_insensitive';
+		my $stock= !$i ? undef : $i==SENSITIVE ? 'format-text-larger-symbolic' : 'format-text-larger-symbolic';
 		$cell->set(stock_id => $stock);
 	 });
 	$treeview2->set_has_tooltip(1);
@@ -8668,7 +8668,7 @@ sub new
 	$self->add($sw);
 
 	my $addlist=TextCombo->new({map {$_ => $Random::ScoreTypes{$_}{desc}} keys %Random::ScoreTypes}, (keys %Random::ScoreTypes)[0] );
-	my $addbut=::NewIconButton('gtk-add',_"Add");
+	my $addbut=::NewIconButton('list-add-symbolic',_"Add");
 	my $addhbox= Gtk3::HBox->new(FALSE, 8);
 	$addhbox->pack_start($_,FALSE,FALSE,0) for Gtk3::Label->new(_"Add rule : "), $addlist, $addbut;
 
@@ -8809,7 +8809,7 @@ sub AddRow
 	my $exlabel= $frame->{label}= Gtk3::Label->new;
 	$frame->{unit}=$Random::ScoreTypes{$type}{unit};
 	$frame->{round}=$Random::ScoreTypes{$type}{round};
-	my $button=::NewIconButton('gtk-remove',undef,sub
+	my $button=::NewIconButton('list-remove-symbolic',undef,sub
 		{ my $button=$_[0];
 		  my $self= $button->GET_ancestor;
 		  $_->get_parent->remove($_) for $button,$frame;
@@ -9080,7 +9080,7 @@ sub Set
 
 	if (!$opt{noinv})
 	{	my $button= $self->{w_invert}= Gtk3::ToggleButton->new;
-		$button->add( Gtk3::Image->new_from_stock('gmb-invert','menu') );
+		$button->add( Gtk3::Image->new_from_stock('media-playlist-repeat-symbolic','menu') );
 		my $on= $cmd=~s/^-//;
 		$on= $previous{inv} unless $action eq 'set';
 		$button->set_active(1) if $on;
@@ -9110,7 +9110,7 @@ sub Set
 			push @{$self->{w_pattern}}, $widget;
 			if ($opt2{icase} && !$self->{w_icase})
 			{	my $button= $self->{w_icase}= Gtk3::ToggleButton->new;
-				$button->add( Gtk3::Image->new_from_stock('gmb-case_sensitive','menu') );
+				$button->add( Gtk3::Image->new_from_stock('format-text-larger-symbolic','menu') );
 				my $on= $cmd!~s/i$//;
 				$on= $previous{icase} unless $action eq 'set';
 				$button->set_active(1) if $on;
@@ -9233,7 +9233,7 @@ sub new
 {	my ($class,$val,$opt)=@_;
 	my $self= bless Gtk3::HBox->new(0,0),$class;
 	my $entry= $self->{entry}= Gtk3::Entry->new;
-	my $button= ::NewIconButton('gtk-open');
+	my $button= ::NewIconButton('folder-open-symbolic');
 	$self->pack_start($entry,1,1,0);
 	$self->pack_start($button,0,0,0);
 	$self->Set($val);
@@ -9923,11 +9923,11 @@ sub fill_store
 {	my $self=shift;
 	my $store= $self->get_model;
 	$store->clear;
-	$store->set($store->append, 0,_"All songs", 1,Filter->new, 2,'gmb-library');
+	$store->set($store->append, 0,_"All songs", 1,Filter->new, 2,'application-add-symbolic');
 	my $hash=$Options{SavedFilters};
 	my @names= sort {::superlc($a) cmp ::superlc($b)} keys %$hash;
 	$store->set($store->append, 0,$_, 1,$hash->{$_}) for @names;
-	$store->set($store->append, 0,_"Edit...", 1,undef, 2,'gtk-preferences');
+	$store->set($store->append, 0,_"Edit...", 1,undef, 2,'preferences-system-symbolic');
 }
 
 sub set_value

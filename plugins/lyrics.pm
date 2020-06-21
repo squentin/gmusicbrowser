@@ -149,9 +149,9 @@ sub new
 	$toolbar->set_style( $options->{ToolbarStyle}||'both-horiz' );
 	$toolbar->set_icon_size( $options->{ToolbarSize}||'small-toolbar' );
 	for my $aref
-	(	[backb => 'gtk-go-back',\&Back_cb,	_"Previous page"],
-		[saveb => 'gtk-save',	\&Save_text,	_"Save",	_"Save lyrics"],
-		[undef, 'gtk-refresh',	\&Refresh_cb,	_"Refresh"],
+	(	[backb => 'go-previous-symbolic',	\&Back_cb,	_"Previous page"],
+		[saveb => 'document-save-symbolic',	\&Save_text,	_"Save",	_"Save lyrics"],
+		[undef, 'view-refresh-symbolic',		\&Refresh_cb,	_"Refresh"],
 	)
 	{	my ($key,$stock,$cb,$label,$tip)=@$aref;
 		my $item= Gtk3::ToolButton->new_from_stock($stock);
@@ -166,7 +166,7 @@ sub new
 	# create follow toggle button, function from GMB::Context
 	my $follow=$self->new_follow_toolitem;
 
-	$self->{editb}= my $editmode= Gtk3::ToggleToolButton->new_from_stock('gtk-edit');
+	$self->{editb}= my $editmode= Gtk3::ToggleToolButton->new_from_stock('document-edit-symbolic');
 	$editmode->signal_connect(toggled=> sub { SetEditable($_[0],$_[0]->get_active); });
 	$editmode->set_tooltip_text(_"Edit mode");
 

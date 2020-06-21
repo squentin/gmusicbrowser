@@ -4,21 +4,21 @@
 Type= P
 Name= _"Same title"
 VBmain = _SongTree(group=Play:title)
-Icon=gmb-song
+Icon=folder-music-symbolic
 Title= _"Title"
 
 [same_album]
 Type= P
 Name= _"Same album"
 VBmain = _SongTree(group=Play:album)
-Icon=gmb-album
+Icon=media-optical-symbolic
 Title= _"Album"
 
 [same_artist]
 Type= P
 Name= _"Same artist"
 VBmain = _SongTree(group=Play:first_artist)
-Icon=gmb-artist
+Icon=system-users-symbolic
 Title= _"Artist"
 
 [same_year]
@@ -32,12 +32,12 @@ Type= P
 Name= _"Search"
 VBmain	 = HBSearch _SongList(group=search)
  HBSearch= _SimpleSearch(group=search)
-Icon=gtk-find
+Icon=edit-find-symbolic
 
 [song_info]
 Type= P
 Name= _"Song informations"
 Title= _"Info"
 VBmain=  _SongInfo
-Icon= gtk-info
+Icon= help-info-symbolic
 

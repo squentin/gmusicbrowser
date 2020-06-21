@@ -44,7 +44,7 @@ sub makeLockToggle
 {	my $opt=$_[0];
 	my $toggle= Gtk3::ToggleButton->new;
 	$toggle->set_relief( $opt->{relief} ) if $opt->{relief};
-	$toggle->add(Gtk3::Image->new_from_stock('gmb-lock','menu'));
+	$toggle->add(Gtk3::Image->new_from_stock('channel-secure-symbolic','menu'));
 	#$toggle->set_active(1) if $self->{Filter0};
 	$toggle->signal_connect( clicked =>sub
 		{	my $self=$_[0];
@@ -88,7 +88,7 @@ sub make_sort_menu
 	    $menu->append($item);
 	}
 	my $itemEditSort= Gtk3::ImageMenuItem->new(_"Custom...");
-	$itemEditSort->set_image( Gtk3::Image->new_from_stock('gtk-preferences','menu') );
+	$itemEditSort->set_image( Gtk3::Image->new_from_stock('preferences-system-symbolic','menu') );
 	$itemEditSort->signal_connect (activate => sub
 	{	my $sort=::EditSortOrder($selfitem,$songlist->{sort});
 		$songlist->Sort($sort) if $sort;
@@ -283,13 +283,13 @@ sub new
 	bless $self, $class;
 
 	$self->{group}=$opt->{group};
-	$self->{bshuffle}=::NewIconButton('gmb-shuffle',($opt->{small} ? '' : _"Shuffle"),sub {::GetSongArray($self)->Shuffle});
-	$self->{brm}=	::NewIconButton('gtk-remove',	($opt->{small} ? '' : _"Remove"),sub {::GetSonglist($self)->RemoveSelected});
-	$self->{bclear}=::NewIconButton('gtk-clear',	($opt->{small} ? '' : _"Clear"),sub {::GetSonglist($self)->Empty} );
-	$self->{bup}=	::NewIconButton('gtk-go-up',		undef,	sub {::GetSonglist($self)->MoveUpDown(1)});
-	$self->{bdown}=	::NewIconButton('gtk-go-down',		undef,	sub {::GetSonglist($self)->MoveUpDown(0)});
-	$self->{btop}=	::NewIconButton('gtk-goto-top',		undef,	sub {::GetSonglist($self)->MoveUpDown(1,1)});
-	$self->{bbot}=	::NewIconButton('gtk-goto-bottom',	undef,	sub {::GetSonglist($self)->MoveUpDown(0,1)});
+	$self->{bshuffle}=::NewIconButton('media-playback-shuffle-symbolic',($opt->{small} ? '' : _"Shuffle"),sub {::GetSongArray($self)->Shuffle});
+	$self->{brm}=	::NewIconButton('list-remove-symbolic',	($opt->{small} ? '' : _"Remove"),sub {::GetSonglist($self)->RemoveSelected});
+	$self->{bclear}=::NewIconButton('edit-clear-symbolic',	($opt->{small} ? '' : _"Clear"),sub {::GetSonglist($self)->Empty} );
+	$self->{bup}=	::NewIconButton('go-up-symbolic',		undef,	sub {::GetSonglist($self)->MoveUpDown(1)});
+	$self->{bdown}=	::NewIconButton('go-down-symbolic',		undef,	sub {::GetSonglist($self)->MoveUpDown(0)});
+	$self->{btop}=	::NewIconButton('go-top-symbolic',		undef,	sub {::GetSonglist($self)->MoveUpDown(1,1)});
+	$self->{bbot}=	::NewIconButton('go-bottom-symbolic',	undef,	sub {::GetSonglist($self)->MoveUpDown(0,1)});
 
 	$self->{brm}->set_tooltip_text(_"Remove selected songs");
 	$self->{bclear}->set_tooltip_text(_"Remove all songs");
@@ -1706,7 +1706,7 @@ our @cMenu=
 		isdefined => 'filter',	stockicon => 'gtk-add',	id => 'addplay',
 	},
 	{ label=> _"Enqueue",	code => sub { ::EnqueueFilter($_[0]{filter}); },
-		isdefined => 'filter',	stockicon => 'gmb-queue',	id => 'enqueue',
+		isdefined => 'filter',	stockicon => 'format-indent-more-symbolic',	id => 'enqueue',
 	},
 	{ label=> _"Set as primary filter",
 		code => sub {my $fp=$_[0]{filterpane}; ::SetFilter( $_[0]{self}, $_[0]{filter}, 1, $fp->{group} ); },
@@ -1724,15 +1724,15 @@ our @cMenu=
 		notempty => 'rawpathlist' },
 	{ label=> _"Check for updated/removed songs", code => sub { ::IdleCheck(  @{ $_[0]{filter}->filter } ); },
 		isdefined => 'filter', stockicon => 'gtk-refresh', istrue => 'pathlist' }, #doesn't really need pathlist, but makes less sense for non-folder pages
-	{ label=> _"Set Picture",	stockicon => 'gmb-picture',
+	{ label=> _"Set Picture",	stockicon => 'folder-pictures-symbolic',
 		code => sub { my $gid=$_[0]{gidlist}[0]; ::ChooseAAPicture(undef,$_[0]{field},$gid); },
 		onlyone=> 'gidlist',	test => sub { Songs::FilterListProp($_[0]{field},'picture') && $_[0]{gidlist}[0]>0; },
 	},
 	{ label => _"Auto-select Pictures",	code => sub { ::AutoSelPictures( $_[0]{field}, @{ $_[0]{gidlist} } ); },
 		onlymany=> 'gidlist',	test => sub { $_[0]{field} eq 'album' }, #test => sub { Songs::FilterListProp($_[0]{field},'picture'); },
-		stockicon => 'gmb-picture',
+		stockicon => 'folder-pictures-symbolic',
 	},
-	{ label=> _"Set icon",		stockicon => 'gmb-picture',
+	{ label=> _"Set icon",		stockicon => 'folder-pictures-symbolic',
 		code => sub { my $gid=$_[0]{gidlist}[0]; Songs::ChooseIcon($_[0]{field},$gid); },
 		onlyone=> 'gidlist',	test => sub { Songs::FilterListProp($_[0]{field},'icon') && $_[0]{gidlist}[0]>0; },
 	},
@@ -1786,8 +1786,8 @@ sub new
 	$InterB->add($InterBL);
 	my $InvertB= Gtk3::ToggleButton->new;
 	my $optB= Gtk3::Button->new;
-	$InvertB->add(Gtk3::Image->new_from_stock('gmb-invert','menu'));
-	$optB->add(Gtk3::Image->new_from_stock('gtk-preferences','menu'));
+	$InvertB->add(Gtk3::Image->new_from_stock('media-playlist-repeat-symbolic','menu'));
+	$optB->add(Gtk3::Image->new_from_stock('view-filter-symbolic','menu'));
 	$InvertB->signal_connect( toggled => sub {$self->{invert}=$_[0]->get_active;} );
 	$InterB->signal_connect(  toggled => sub {$self->{inter} =$_[0]->get_active;} );
 	$optB->signal_connect( button_press_event => \&PopupOpt );
@@ -3063,9 +3063,9 @@ INIT
   );
 
   %Modes=
-  (	F => [_"Saved filters",	'sfilter',	'SavedFilters',	\&UpdateSavedFilters,	'gmb-filter'	,\&::SaveFilter, 'filter000'],
-	L => [_"Saved lists",	'slist',	'SavedLists',	\&UpdateSavedLists,	'gmb-list'	,\&::SaveList, 'list000'],
-	P => [_"Playing",	'play',		undef,		\&UpdatePlayingFilters,	'gtk-media-play'	],
+  (	F => [_"Saved filters",	'sfilter',	'SavedFilters',	\&UpdateSavedFilters,	'view-filter-symbolic'	,\&::SaveFilter, 'filter000'],
+	L => [_"Saved lists",	'slist',	'SavedLists',	\&UpdateSavedLists,	'view-list-symbolic'	,\&::SaveList, 'list000'],
+	P => [_"Playing",	'play',		undef,		\&UpdatePlayingFilters,	'media-playback-start-symbolic'	],
   );
 }
 
@@ -3381,8 +3381,8 @@ sub new
 	$img->signal_connect(button_press_event => \&GMB::Picture::pixbox_button_press_cb,1); # 1 : mouse button 1
 
 	my $buttonbox= Gtk3::VBox->new;
-	my $Bfilter=::NewIconButton('gmb-filter',undef,sub { my $self= $_[0]->GET_ancestor; $self->filter },'none');
-	my $Bplay=::NewIconButton('gtk-media-play',undef,sub
+	my $Bfilter=::NewIconButton('view-filter-symbolic',undef,sub { my $self= $_[0]->GET_ancestor; $self->filter },'none');
+	my $Bplay=::NewIconButton('media-playback-start-symbolic',undef,sub
 		{	my $self= $_[0]->GET_ancestor;
 			return unless defined $self->{SelID};
 			my $filter=Songs::MakeFilterFromGID($self->{aa},$self->{Sel});
@@ -3407,7 +3407,7 @@ sub new
 	{	$self->{'index'}=0;
 		$self->signal_connect(scroll_event => \&AABox_scroll_event_cb);
 		$self->add_events(['scroll-mask']);
-		my $BAlblist=::NewIconButton('gmb-playlist',undef,undef,'none');
+		my $BAlblist=::NewIconButton('media-optical-symbolic',undef,undef,'none');
 		$BAlblist->signal_connect(button_press_event => \&AlbumListButton_press_cb);
 		$BAlblist->set_tooltip_text(_"Choose Album From this Artist");
 		$buttonbox->pack_start($BAlblist, ::FALSE, ::FALSE, 0);
@@ -4100,9 +4100,9 @@ sub new
 	$self->pack_start($songlist, ::TRUE,::TRUE,0);
 	if ($opt->{buttons})
 	{	my $hbox2= Gtk3::HBox->new;
-		my $Bqueue=::NewIconButton('gmb-queue',		_"Enqueue",	sub { $songlist->EnqueueSelected; });
-		my $Bplay= ::NewIconButton('gtk-media-play',	_"Play",	sub { $songlist->PlaySelected; });
-		my $Bclose=::NewIconButton('gtk-close',		_"Close",	sub {$self->get_toplevel->close_window});
+		my $Bqueue=::NewIconButton('format-indent-more-symbolic',		_"Enqueue",	sub { $songlist->EnqueueSelected; });
+		my $Bplay= ::NewIconButton('media-playback-start-symbolic',	_"Play",	sub { $songlist->PlaySelected; });
+		my $Bclose=::NewIconButton('close-symbolic',			_"Close",	sub {$self->get_toplevel->close_window});
 		$hbox2->pack_end($_, ::FALSE,::FALSE,4) for $Bclose,$Bplay,$Bqueue;
 		$self->pack_end($hbox2, ::FALSE,::FALSE,0);
 	}
@@ -4164,9 +4164,9 @@ sub new
 	$self->pack_start($sw, ::TRUE,::TRUE,0);
 	if ($opt->{buttons})
 	{	my $hbox2= Gtk3::HBox->new;
-		my $Bqueue=::NewIconButton('gmb-queue',     _"Enqueue",	\&Enqueue);
-		my $Bplay= ::NewIconButton('gtk-media-play',_"Play",	\&Play);
-		my $Bclose=::NewIconButton('gtk-close',     _"Close",	sub {$self->get_toplevel->close_window});
+		my $Bqueue=::NewIconButton('format-indent-more-symbolic',		_"Enqueue",	\&Enqueue);
+		my $Bplay= ::NewIconButton('media-playback-start-symbolic',	_"Play",	\&Play);
+		my $Bclose=::NewIconButton('clost-symbolic',			_"Close",	sub {$self->get_toplevel->close_window});
 		$hbox2->pack_end($_, ::FALSE,::FALSE,4) for $Bclose,$Bplay,$Bqueue;
 		$self->pack_end($hbox2, ::FALSE,::FALSE,0);
 	}

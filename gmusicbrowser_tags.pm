@@ -767,9 +767,9 @@ sub new
 	$self->{check_re}=	my $check_re=	Gtk3::CheckButton->new(_"Use default regular expression");
 	$self->{error}=		my $error=	Gtk3::Label->new;
 	$self->{preview}=	my $preview=	Gtk3::Label->new;
-	$self->{remove_button}=	my $button_del= ::NewIconButton('gtk-remove',_"Remove");
-	$self->{add_button}=	my $button_add= ::NewIconButton('gtk-save',_"Save");
-	my $button_new= ::NewIconButton('gtk-new', _"New");
+	$self->{remove_button}=	my $button_del= ::NewIconButton('list-remove-symbolic',_"Remove");
+	$self->{add_button}=	my $button_add= ::NewIconButton('document-save-symbolic',_"Save");
+	my $button_new= ::NewIconButton('list-add-symbolic', _"New");
 	$button_del->signal_connect(clicked=>\&button_cb,'remove');
 	$button_add->signal_connect(clicked=>\&button_cb,'save');
 	$button_new->signal_connect(clicked=>\&button_cb,'new');

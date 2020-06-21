@@ -258,9 +258,9 @@ group
 		-HSeparator2 \
 		#-MBLayouts \
 		-HSeparator3 \
-		-Button1(click1="RunPerlCode(::ChooseAddPath(0,1))",stock=gtk-add,size=button,minwidth=34,maxwidth=34,tip=_"Add folder ...") \
-		-Button2(click1="RunPerlCode(::IdleCheck)",stock=gtk-refresh,size=button,minwidth=34,maxwidth=34,tip=_"check now") \
-		-Button3(click1="RunPerlCode(::IdleScan)",stock=gtk-zoom-in,size=button,minwidth=34,maxwidth=34,tip=_"scan now")
+		-Button1(click1="RunPerlCode(::ChooseAddPath(0,1))",stock=folder-new-symbolic,size=button,minwidth=34,maxwidth=34,tip=_"Add folder ...") \
+		-Button2(click1="RunPerlCode(::IdleCheck)",stock=view-refresh-symbolic,size=button,minwidth=34,maxwidth=34,tip=_"check now") \
+		-Button3(click1="RunPerlCode(::IdleScan)",stock=zoom-in-symbolic,size=button,minwidth=34,maxwidth=34,tip=_"scan now")
 
 
 [Garage6]
@@ -317,9 +317,9 @@ BMSettings	= (icon=gtk-preferences,size="large-toolbar") \
 	MenuItem14(command=OpenPref,label=_"Settings",icon="gtk-preferences") \
 	MenuItem05(command=Quit,label=_"Quit",icon="gtk-quit")
 SMLibrary	= (label=_"Library") \
-	MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Music",icon="gtk-add") \
-	MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Scan Collection",icon="gtk-refresh") \
-	MenuItem33(command="RunPerlCode(::IdleCheck)",label=_"Check Collection",icon="gtk-zoom-in")
+	MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Music",icon="folder-new-symbolic") \
+	MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Scan Collection",icon="view-refresh-symbolic") \
+	MenuItem33(command="RunPerlCode(::IdleCheck)",label=_"Check Collection",icon="zoom-in-symbolic")
 
 ### main : Filter1, Artist, Songlist, Queue, Context ###
 HBMain		= VBLeft VBArtist _VBSongStatus VBQueue Context
@@ -414,9 +414,9 @@ VBMain = HBMenu 1Filler2 _HBMainContainer 1Filler3
 
 			-Quit(size=button,minwidth=34,maxwidth=34,tip=_"Quit") \
 			-Pref(stock=gtk-preferences,size=button,minwidth=34,maxwidth=34) \
-			-Button1(click1="RunPerlCode(::ChooseAddPath(0,1))",stock=gtk-add,size=button,minwidth=34,maxwidth=34,tip=_"Add folder ...") \
-			-Button2(click1="RunPerlCode(::IdleCheck)",stock=gtk-refresh,size=button,minwidth=34,maxwidth=34,tip=_"check now") \
-			-Button3(click1="RunPerlCode(::IdleScan)",stock=gtk-zoom-in,size=button,minwidth=34,maxwidth=34,tip=_"scan now")	\
+			-Button1(click1="RunPerlCode(::ChooseAddPath(0,1))",stock=folder-new-symbolic,size=button,minwidth=34,maxwidth=34,tip=_"Add folder ...") \
+			-Button2(click1="RunPerlCode(::IdleCheck)",stock=view-refresh-symbolic,size=button,minwidth=34,maxwidth=34,tip=_"check now") \
+			-Button3(click1="RunPerlCode(::IdleScan)",stock=zoom-in-symbolic,size=button,minwidth=34,maxwidth=34,tip=_"scan now")	\
 			-Queue(size=button,minwidth=34,maxwidth=34)  \
 			-10Filter(size=button,minwidth=34,maxwidth=34)  \
 			-Sort(size=button,minwidth=34,maxwidth=34) \
@@ -585,9 +585,9 @@ BMSettings	= (icon=gtk-preferences,size="button") \
 	MenuItem12(command=OpenPref,label=_"Settings",icon="gtk-preferences") \
 	MenuItem13(command=Quit,label=_"Quit",icon="gtk-quit")
 SMLibrary	= (label=_"Library") \
-	MenuItem21(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Music",icon="gtk-add") \
-	MenuItem22(command="RunPerlCode(::IdleScan)",label=_"Scan Collection",icon="gtk-refresh") \
-	MenuItem23(command="RunPerlCode(::IdleCheck)",label=_"Check Collection",icon="gtk-zoom-in")
+	MenuItem21(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Music",icon="folder-new-symbolic") \
+	MenuItem22(command="RunPerlCode(::IdleScan)",label=_"Scan Collection",icon="view-refresh-symbolic") \
+	MenuItem23(command="RunPerlCode(::IdleCheck)",label=_"Check Collection",icon="zoom-in-symbolic")
 SMViews = (label="Show/Hide") \
 			     MenuItem31(togglewidget=HBLeft,label=_"Library",icon="gmb-library") \
 			    MenuItem32(togglewidget=VBQueue,label=_"Queue",icon="gmb-queue") \
@@ -661,12 +661,12 @@ VBLeft 		= _HPLeft1 HBStatus
 		-HBButtomMore1 \
 		-HBButtomMore2 \
 		-HBButtomMore3
-    HBButtomLess2 = ToggleButton11(relief=none,togglegroup=40,size=menu,icon=gtk-clear,widget=HBButtomMore1,tip=_"Close a filter")
-    HBButtomLess3 = ToggleButton12(relief=none,togglegroup=40,size=menu,icon=gtk-clear,widget=HPLeft2|HBButtomMore2|HBButtomLess2,tip=_"Close a filter")
-    HBButtomLess4 = ToggleButton13(relief=none,togglegroup=40,size=menu,icon=gtk-clear,widget=HPLeft3|HPLeft2|HBButtomMore3|HBButtomLess3,tip=_"Close a filter")
-    HBButtomMore1 = ToggleButton14(relief=none,togglegroup=40,size=menu,icon=gtk-add,widget=HPLeft2|HBButtomLess2|HBButtomMore2,tip=_"Add a filter")
-    HBButtomMore2 = ToggleButton15(relief=none,togglegroup=40,size=menu,icon=gtk-add,widget=HPLeft3|HPLeft2|HBButtomLess3|HBButtomMore3,tip=_"Add a filter")
-    HBButtomMore3 = ToggleButton16(relief=none,togglegroup=40,size=menu,icon=gtk-add,widget=HPLeft3|HPLeft2|VBAlbum|HBButtomLess4,tip=_"Add a filter")
+    HBButtomLess2 = ToggleButton11(relief=none,togglegroup=40,size=menu,icon=edit-clear-symbolic,widget=HBButtomMore1,tip=_"Close a filter")
+    HBButtomLess3 = ToggleButton12(relief=none,togglegroup=40,size=menu,icon=edit-clear-symbolic,widget=HPLeft2|HBButtomMore2|HBButtomLess2,tip=_"Close a filter")
+    HBButtomLess4 = ToggleButton13(relief=none,togglegroup=40,size=menu,icon=edit-clear-symbolic,widget=HPLeft3|HPLeft2|HBButtomMore3|HBButtomLess3,tip=_"Close a filter")
+    HBButtomMore1 = ToggleButton14(relief=none,togglegroup=40,size=menu,icon=folder-new-symbolic,widget=HPLeft2|HBButtomLess2|HBButtomMore2,tip=_"Add a filter")
+    HBButtomMore2 = ToggleButton15(relief=none,togglegroup=40,size=menu,icon=folder-new-symbolic,widget=HPLeft3|HPLeft2|HBButtomLess3|HBButtomMore3,tip=_"Add a filter")
+    HBButtomMore3 = ToggleButton16(relief=none,togglegroup=40,size=menu,icon=folder-new-symbolic,widget=HPLeft3|HPLeft2|VBAlbum|HBButtomLess4,tip=_"Add a filter")
 #### Library filter
 VBLibrary 	= ABSearchBox _FilterPane0(nb=2,hidebb=1,hidetabs=0,tabpos=left90,\
 		pages=savedtree|folder,\
@@ -727,18 +727,18 @@ HBTop		=  HBCover VBButtons _15VBPlayer(yalign=0.5) VBSettings(yalign=0.5)
 		LayoutItem \
 		PlayItem \
 		SeparatorMenuItem02 \
-		MenuItem03(click1=OpenCustom(Equalizer),label=_"Equalizer",icon=gmb-equalizer) \
+		MenuItem03(click1=OpenCustom(Equalizer),label=_"Equalizer",icon=media-eq-symbolic) \
 		SeparatorMenuItem03 \
-		MenuItem04(command=OpenPref,label=_"Settings",icon="gtk-preferences")
+		MenuItem04(command=OpenPref,label=_"Settings",icon="preferences-system-symbolic")
 	SMLibrary = (label=_"Library") \
-		MenuItem10(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Music",icon="gtk-add") \
-		MenuItem11(command="RunPerlCode(::IdleScan)",label=_"Scan Collection",icon="gtk-refresh") \
-		MenuItem12(command="RunPerlCode(::IdleCheck)",label=_"Check Collection",icon="gtk-zoom-in")
+		MenuItem10(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Music",icon="folder-new-symbolic") \
+		MenuItem11(command="RunPerlCode(::IdleScan)",label=_"Scan Collection",icon="view-refresh-sybolic") \
+		MenuItem12(command="RunPerlCode(::IdleCheck)",label=_"Check Collection",icon="zoom-in-symbolic")
 
 #### Right main panel
 HPRight 	= _VBSongStatus _NBContextMain
 ##### Library
-VBSongStatus 	= (tabtitle=_"Library",tabicon="gmb-library") _VBMosaicSongList HBTotal
+VBSongStatus 	= (tabtitle=_"Library",tabicon="application-add-symbolic") _VBMosaicSongList HBTotal
   VBMosaicSongList = _HBSongListtree
     HBSongListtree =  \
 		_SongTree(cols="playandqueueandtrack title length playcount genre",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 title 344 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") \
@@ -748,9 +748,9 @@ VBSongStatus 	= (tabtitle=_"Library",tabicon="gmb-library") _VBMosaicSongList HB
       HBMosaic = _FilterPane4(nb=4,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=72,hidetabs=1)
       HBTotal = _HBToggle HBStatutSongList
 	HBToggle = \
-		ToggleButton30(relief=none,size=menu,icon=gmb-view-list,widget=HBSongPlaylist,togglegroup=30,tip=_"Simple List View") \
-		ToggleButton31(relief=none,size=menu,icon=gmb-view-tree,widget=SongTree,togglegroup=30,tip=_"Songtree View") \
-		ToggleButton32(relief=none,size=menu,icon=gmb-view-mosaic,widget=HBMosaic,togglegroup=30,tip=_"Mosaic View") \
+		ToggleButton30(relief=none,size=menu,icon=view-list-symbolic,widget=HBSongPlaylist,togglegroup=30,tip=_"Simple List View") \
+		ToggleButton31(relief=none,size=menu,icon=view-list-compact-symbolic,widget=SongTree,togglegroup=30,tip=_"Songtree View") \
+		ToggleButton32(relief=none,size=menu,icon=view-grid-symbolic,widget=HBMosaic,togglegroup=30,tip=_"Mosaic View") \
 		VSeparator30 \
 		Sort(button=1,size=menu,tip=_"Right-click to toggle shuffle/random") \
 		2Filter35(button=1,size=menu,tip=_"Right-click to remove filters") \
