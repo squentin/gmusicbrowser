@@ -44,29 +44,29 @@ VBMain = HBMenubar _HPSidebarCenter HBStatusbar
     HBMenubar = _MBEdit
         MBEdit = SMMusic0 SMEdit1 SMView2 SMControl3 SMHelp4
             SMMusic0 = (label=_"File") \
-                MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add folder ...",icon="gtk-add") \
+                MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add folder ...",icon="folder-add-symbolic") \
                 SeparatorMenuItem01 \
-                MenuItem02(command=Quit,label=_"Quit",icon="gtk-quit")
+                MenuItem02(command=Quit,label=_"Quit",icon="application-exit-symbolic")
             SMEdit1 = (label=_"Edit") \
-                MenuItem10(command=EnqueueSelected,label=_"Queue",icon="gmb-queue") \
+                MenuItem10(command=EnqueueSelected,label=_"Queue",icon="format-indent-more-symbolic") \
                 # MenuItem11(command=,label=_"Add to playlist") \ \
                 SeparatorMenuItem10 \
-                MenuItem14(command=OpenPref,label=_"Preferences",icon="gtk-preferences")
+                MenuItem14(command=OpenPref,label=_"Preferences",icon="preferences-system-symbolic")
 
             # SMView menu for common mode
             SMView2 = (label=_"View") \
-                MenuItem25(command=GoToCurrentSong,label=_"Go to Playing Track",icon="go-jump") \
+                MenuItem25(command=GoToCurrentSong,label=_"Go to Playing Track",icon="go-jump-symbolic") \
                 SeparatorMenuItem21 \
                 LayoutItem \
                 MenuItem24(togglewidget=HBSearchAndToolbar,label=_"Playlist Utilities Bar")
 
             SMControl3 = (label=_"Tools") \
-                MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="gtk-refresh") \
-                MenuItem33(command="OpenSongProp",label=_"Track Properties",icon="gtk-properties") \
+                MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="view-refresh-symbolic") \
+                MenuItem33(command="OpenSongProp",label=_"Track Properties",icon="preferences-system-symbolic") \
                 MenuItem34(click1=OpenCustom(Equalizer),label=_"Equalizer")
 
             SMHelp4 = (label=_"Help") \
-                MenuItem41(command="RunPerlCode(::AboutDialog)",label=_"About",icon="gtk-about")
+                MenuItem41(command="RunPerlCode(::AboutDialog)",label=_"About",icon="help-about-symbolic")
 
     HPSidebarCenter = VBSidebar VBCenter
 
@@ -170,7 +170,7 @@ VBMain = HBMenubar _HPSidebarCenter HBStatusbar
             HBSongLists = _NBSongLists \
                 3Filler7
 
-                NBSongLists = (typesubmenu='L') SongList(tabtitle=_"Playlist 1",mode=playlist,tabicon="gmb-list",cols="playandqueue track title album artist length")
+                NBSongLists = (typesubmenu='L') SongList(tabtitle=_"Playlist 1",mode=playlist,tabicon="view-list-symbolic",cols="playandqueue track title album artist length")
 
             HBPlayer = (maxheight=100,minheight=100) \
                 HBCover \
@@ -272,13 +272,13 @@ VBMain = HBMenubar HBToolbar VBSliderbar _HPSidebarCenterContext HBStatusbar
                 MenuItem34(command=DecVolume,label=_"Decrease volume")
 
             SMHelp4 = (label=_"Help") \
-                MenuItem41(command="RunPerlCode(::AboutDialog)",label=_"About",icon="gtk-about")
+                MenuItem41(command="RunPerlCode(::AboutDialog)",label=_"About",icon="help-about-symbolic")
 
     HBToolbar = Play Prev Next \
         3VSeparator1 \
         Sort(button=1,relief=none,minwidth=35) \
-        ToggleButton4(relief=none,minwidth=35,size=button,icon=gtk-find,widget=HBFilters,tip=_"Show/Hide Browser") \
-        ToggleButton5(relief=none,minwidth=35,size=button,icon=gtk-info,widget=Context,tip=_"Change the context visibility") \
+        ToggleButton4(relief=none,minwidth=35,size=button,icon=edit-find-symbolic,widget=HBFilters,tip=_"Show/Hide Browser") \
+        ToggleButton5(relief=none,minwidth=35,size=button,icon=help-info-symbolic,widget=Context,tip=_"Change the context visibility") \
         -HBVolume
 
         HBVolume = VolumeIcon(size=menu,button=1)
@@ -416,26 +416,26 @@ VBMain = HBMenubar HBToolbar _HBPlaylist HBSonginfo 3HBStatusbar
 #                    MenuItem11(command=,label=_"Open files") \
                      MenuItem13(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Files ...") \
 #                    SeparatorMenuItem11 \
-                    MenuItem15(command=OpenPref,label=_"Preferences",icon="gtk-preferences") \
-                    MenuItem16(command=Quit,label=_"Quit",icon="gtk-quit")
+                    MenuItem15(command=OpenPref,label=_"Preferences",icon="preferences-system-symbolic") \
+                    MenuItem16(command=Quit,label=_"Quit",icon="application-exit-symbolic")
 
                 SMMenu2 = (label=_"Playback") \
                     SeparatorMenuItem21 \
-                    MenuItem26(command=PlayPause,label=_"Play",icon="gtk-media-play") \
-                    MenuItem27(command=Stop,label=_"Stop",icon="gtk-media-stop") \
-                    MenuItem28(command=PrevSong,label=_"Previous",icon="gtk-media-previous") \
-                    MenuItem29(command=NextSong,label=_"Next",icon="gtk-media-next") \
+                    MenuItem26(command=PlayPause,label=_"Play",icon="media-playback-start-symbolic") \
+                    MenuItem27(command=Stop,label=_"Stop",icon="media-playback-stop-symbolic") \
+                    MenuItem28(command=PrevSong,label=_"Previous",icon="media-skip-backward-symbolic") \
+                    MenuItem29(command=NextSong,label=_"Next",icon="media-skip-forward-symbolic") \
                     SeparatorMenuItem215 \
-                    MenuItem215(command="OpenSongProp",label=_"Show song details",icon="gtk-properties")
+                    MenuItem215(command="OpenSongProp",label=_"Show song details",icon="preferences-system-symbolic")
 
                 SMMenu3 = (label=_"Playlist") \
                     LSortItem \
-                    MenuItem32(command=ToggleRandom,label=_"Random Playback",icon="gmb-random") \
+                    MenuItem32(command=ToggleRandom,label=_"Random Playback",icon="media-playlist-shuffle-symbolic") \
                     SeparatorMenuItem31 \
-                    MenuItem33(command="RunPerlCode(::IdleCheck)",label=_"Refresh",icon="gtk-refresh") \
-                    MenuItem34(command="RunPerlCode(::IdleScan)",label=_"Rescan",icon="gtk-refresh") \
+                    MenuItem33(command="RunPerlCode(::IdleCheck)",label=_"Refresh",icon="view-refresh-symbolic") \
+                    MenuItem34(command="RunPerlCode(::IdleScan)",label=_"Rescan",icon="view-refresh-symbolic") \
                     SeparatorMenuItem32 \
-                    MenuItem39(command="OpenCustom(Audacious_PLM)",label=_"Playlists",icon="gmb-playlist")
+                    MenuItem39(command="OpenCustom(Audacious_PLM)",label=_"Playlists",icon="view-list-symbolic")
 
                 SMMenu5 = (label=_"Output") \
                     MenuItem51(command=OpenCustom(Equalizer),label=_"Equalizer")
@@ -449,7 +449,7 @@ VBMain = HBMenubar HBToolbar _HBPlaylist HBSonginfo 3HBStatusbar
                     MenuItem64(togglewidget=HBStatusbar,label=_"Show status bar",resize="")
 
                 SMMenu7 = (label=_"Help") \
-                    MenuItem71(command="RunPerlCode(::AboutDialog)",label=_"About",icon="gtk-about")
+                    MenuItem71(command="RunPerlCode(::AboutDialog)",label=_"About",icon="help-about-symbolic")
 
 
 

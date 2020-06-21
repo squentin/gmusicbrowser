@@ -100,7 +100,7 @@ if (my $site=$::Options{OPT.'LyricSite'}) { delete $::Options{OPT.'LyricSite'} u
 
 my $lyricswidget=
 {	class		=> __PACKAGE__,
-	tabicon		=> 'gmb-lyrics',		# no icon by that name by default
+	tabicon		=> 'format-text-bold-symbolic',
 	tabtitle	=> _"Lyrics",
 	saveoptions	=> 'HideToolbar font follow justification edit',
 	schange		=> sub { $_[0]->SongChanged($_[1]); }, #$_[1] is new ID

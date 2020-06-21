@@ -55,7 +55,7 @@ our @MainMenu=
 	{label => _"Open Context window",code => \&::ContextWindow, stockicon => 'help-info-symbolic'},
 	{label => _"Switch to fullscreen mode",code => \&::ToggleFullscreenLayout, stockicon => 'view-fullscreen-symbolic'},
 	{label => _"About",		code => \&::AboutDialog,stockicon => 'help-about-symbolic' },
-	{label => _"Quit",		code => \&::Quit,	stockicon => 'window-close-symbolic' },
+	{label => _"Quit",		code => \&::Quit,	stockicon => 'application-exit-symbolic' },
 );
 
 our %Widgets=
@@ -430,7 +430,7 @@ our %Widgets=
 	PlayList =>
 	{	New	=> sub { $_[0]{type}='A'; SongList::Common->new($_[0]); },
 		tabtitle=> _"Playlist",
-		tabicon	=> 'media-playback-play-symbolic',
+		tabicon	=> 'view-list-compact-symbolic',
 		issonglist=>1,
 	},
 	SongList =>

@@ -847,7 +847,7 @@ our @ColumnMenu=
 			delete $names{$_->{colid}} for $_[0]{self}->get_child->get_columns;
 			return \%names;
 		},	submenu_reverse =>1,
-	  code	=> sub { $_[0]{self}->ToggleColumn($_[1],$_[0]{pos}); },	stockicon => 'gtk-add'
+	  code	=> sub { $_[0]{self}->ToggleColumn($_[1],$_[0]{pos}); },	stockicon => 'list-add-symbolic'
 	},
 	{ label => sub { _('_Remove this column').' ('. ($SLC_Prop{$_[0]{pos}}{menu} || $SLC_Prop{$_[0]{pos}}{title}).')' },
 	  code	=> sub { $_[0]{self}->ToggleColumn($_[0]{pos},$_[0]{pos}); },	stockicon => 'gtk-remove'
@@ -1700,10 +1700,10 @@ my @MenuSubGroup=
 
 our @cMenu=
 (	{ label=> _"Play",	code => sub { ::Select(filter=>$_[0]{filter},song=>'first',play=>1); },
-		isdefined => 'filter',	stockicon => 'gtk-media-play',	id => 'play'
+		isdefined => 'filter',	stockicon => 'media-playback-start-symbolic',	id => 'play'
 	},
 	{ label=> _"Append to playlist",	code => sub { ::DoActionForList('addplay',$_[0]{filter}->filter); },
-		isdefined => 'filter',	stockicon => 'gtk-add',	id => 'addplay',
+		isdefined => 'filter',	stockicon => 'list-add-symbolic',	id => 'addplay',
 	},
 	{ label=> _"Enqueue",	code => sub { ::EnqueueFilter($_[0]{filter}); },
 		isdefined => 'filter',	stockicon => 'format-indent-more-symbolic',	id => 'enqueue',
@@ -1723,7 +1723,7 @@ our @cMenu=
 	{ label=> _"Scan for new songs", code => sub { ::IdleScan( @{$_[0]{rawpathlist}} ); },
 		notempty => 'rawpathlist' },
 	{ label=> _"Check for updated/removed songs", code => sub { ::IdleCheck(  @{ $_[0]{filter}->filter } ); },
-		isdefined => 'filter', stockicon => 'gtk-refresh', istrue => 'pathlist' }, #doesn't really need pathlist, but makes less sense for non-folder pages
+		isdefined => 'filter', stockicon => 'view-refresh-symbolic', istrue => 'pathlist' }, #doesn't really need pathlist, but makes less sense for non-folder pages
 	{ label=> _"Set Picture",	stockicon => 'folder-pictures-symbolic',
 		code => sub { my $gid=$_[0]{gidlist}[0]; ::ChooseAAPicture(undef,$_[0]{field},$gid); },
 		onlyone=> 'gidlist',	test => sub { Songs::FilterListProp($_[0]{field},'picture') && $_[0]{gidlist}[0]>0; },
@@ -1968,7 +1968,7 @@ sub button_press_event_cb
 
 	if (keys %pages)
 	{	my $new= Gtk3::ImageMenuItem->new(_"Add tab");
-		$new->set_image( Gtk3::Image->new_from_stock('gtk-add','menu') );
+		$new->set_image( Gtk3::Image->new_from_stock('tab-new-symbolic','menu') );
 		my $submenu= Gtk3::Menu->new;
 		for my $pid (sort {$pages{$a} cmp $pages{$b}} keys %pages)
 		{	my $item= Gtk3::ImageMenuItem->new_with_label($pages{$pid});
@@ -3044,11 +3044,11 @@ use constant { TRUE  => 1, FALSE => 0, COL_name=>0, COL_type=>1, COL_icon=>2, CO
 our @cMenu; our %Modes;
 INIT
 { @cMenu=
-  (	{ label => _"New filter",	code => sub { ::EditFilter($_[0]{self},undef,''); },	stockicon => 'gtk-add' },
+  (	{ label => _"New filter",	code => sub { ::EditFilter($_[0]{self},undef,''); },	stockicon => 'list-add-symbolic' },
 	{ label => _"Edit filter",	code => sub { ::EditFilter($_[0]{self},undef,$_[0]{names}[0]); },
 		mode => 'F',	onlyone => 'names' },
 	{ label => _"Remove filter",	code => sub { ::SaveFilter($_[0]{names}[0],undef); },
-		mode => 'F',	onlyone => 'names',	stockicon => 'gtk-remove' },
+		mode => 'F',	onlyone => 'names',	stockicon => 'list-remove-symbolic' },
 	{ label => _"Save current filter as",	code => sub { ::EditFilter($_[0]{self},$_[0]{curfilter},''); },
 		 stockicon => 'gtk-save',	isdefined => 'curfilter',	test => sub { ! $_[0]{curfilter}->is_empty; } },
 	{ label => _"Save current list as",	code => sub { $_[0]{self}->CreateNewFL('L',[@{ $_[0]{songlist}{array} }]); },
@@ -6908,7 +6908,7 @@ our @ColumnMenu=
 			delete $names{$_->{colid}} for grep $_->{colid}, map $_->get_button, $_[0]{self}->get_columns;
 			return \%names;
 		},	submenu_reverse =>1,
-		code => sub { $_[0]{songtree}->AddColumn($_[1],$_[0]{insertpos}); }, stockicon => 'gtk-add',
+		code => sub { $_[0]{songtree}->AddColumn($_[1],$_[0]{insertpos}); }, stockicon => 'list-add-symbolic',
 	},
 	{ label=> sub { _('_Remove this column').' ('.($SongTree::STC{$_[0]{colid}}{menutitle}||$SongTree::STC{$_[0]{colid}}{title}).')' },
 	  code => sub { $_[0]{songtree}->remove_column($_[0]{cellnb}) },	stockicon => 'gtk-remove', isdefined => 'colid',
@@ -7698,7 +7698,7 @@ sub new
 	$sw->set_policy('never','automatic');
 	$sw->add($vbox);
 	$self->{vbox}=$vbox;
-	my $badd= ::NewIconButton('gtk-add',_"Add a group",sub {$_[0]->get_parent->AddRow('album|default');} );
+	my $badd= ::NewIconButton('list-add-symbolic',_"Add a group",sub {$_[0]->get_parent->AddRow('album|default');} );
 	$self->add($sw);
 	$self->pack_start($badd,0,0,2);
 	$self->Set($init);

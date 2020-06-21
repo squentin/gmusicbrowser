@@ -624,7 +624,7 @@ $DRAGTYPES{$DRAGTYPES[$_][0]}=$_ for DRAG_FILE,DRAG_USTRING,DRAG_STRING,DRAG_ID,
 our @submenuRemove=
 (	{ label => sub {$_[0]{mode} eq 'Q' ? _"Remove from queue" : $_[0]{mode} eq 'A' ? _"Remove from playlist" : _"Remove from list"},	code => sub { $_[0]{self}->RemoveSelected; }, mode => 'BLQA', istrue=> 'allowremove', },
 	{ label => _"Remove from library",	code => sub { SongsRemove($_[0]{IDs}); }, },
-	{ label => _"Remove from disk",		code => sub { DeleteFiles($_[0]{IDs}); },	test => sub {!$CmdLine{ro}},	stockicon => 'gtk-delete' },
+	{ label => _"Remove from disk",		code => sub { DeleteFiles($_[0]{IDs}); },	test => sub {!$CmdLine{ro}},	stockicon => 'edit-delete-symbolic' },
 );
 our @submenuQueue=
 (	{ label => _"Prepend",			code => sub {  QueueInsert( @{ $_[0]{IDs} } ); }, },
@@ -634,12 +634,12 @@ our @submenuQueue=
 #modes : S:Search, B:Browser, Q:Queue, L:List, P:Playing song in the player window, F:Filter Panels (submenu "x songs")
 our @SongCMenu;
 unshift @SongCMenu,  #unshift instead of "=" because the replaygain submenu (and maybe more in the future) has already been added to @::SongCMenu
-(	{ label => _"Song Properties",	code => sub { DialogSongProp (@{ $_[0]{IDs} }); },	onlyone => 'IDs', stockicon => 'gtk-edit' },
-	{ label => _"Songs Properties",	code => sub { DialogSongsProp(@{ $_[0]{IDs} }); },	onlymany=> 'IDs', stockicon => 'gtk-edit' },
+(	{ label => _"Song Properties...",	code => sub { DialogSongProp (@{ $_[0]{IDs} }); },	onlyone => 'IDs', stockicon => 'document-edit-symbolic' },
+	{ label => _"Songs Properties...",	code => sub { DialogSongsProp(@{ $_[0]{IDs} }); },	onlymany=> 'IDs', stockicon => 'document-edit-symbolic' },
 	{ label => _"Play Only Selected",code => sub { Select(song => 'first', play => 1, staticlist => $_[0]{IDs} ); },
 		onlymany => 'IDs', 	stockicon => 'media-playback-start-symbolic'},
 	{ label => _"Play Only Displayed",code => sub { Select(song => 'first', play => 1, staticlist => \@{$_[0]{listIDs}} ); },
-		test => sub { @{$_[0]{IDs}}<2 }, notmode => 'A',	onlymany => 'listIDs',	stockicon => 'gtk-media-play' },
+		test => sub { @{$_[0]{IDs}}<2 }, notmode => 'A',	onlymany => 'listIDs',	stockicon => 'media-playback-start-symbolic' },
 	{ label => _"Append to playlist",code => sub { ::DoActionForList('addplay',$_[0]{IDs}); },
 		notempty => 'IDs',	test => sub { $::ListMode }, },
 	{ label => _"Enqueue Selected",		code => sub { Enqueue(@{ $_[0]{IDs} }); },	submenu3=> \@submenuQueue,
@@ -648,30 +648,28 @@ unshift @SongCMenu,  #unshift instead of "=" because the replaygain submenu (and
 		empty => 'IDs',	notempty=> 'listIDs', notmode => 'QP', stockicon => 'format-indent-more-symbolic' },
 	{ label => _"Add to list",	submenu => \&AddToListMenu,	notempty => 'IDs' },
 	# edit submenu for label-type fields
-	{ label => sub { Songs::Field_Edit_string($_[0]{field}); },	notempty => 'IDs',
+	{ label => sub { Songs::Field_Edit_string($_[0]{field}); },	stockicon => 'edit-symbolic',	notempty => 'IDs',
 	  submenu=>sub { LabelEditMenu($_[0]{field},$_[0]{IDs}); },
 	  foreach=>sub { 'field', Songs::FieldList(true=>'editsubmenu',type=>'flags'); }, },
 	# edit submenu for rating-type fields
-	{ label => sub { Songs::Field_Edit_string($_[0]{field}); },	notempty => 'IDs',
+	{ label => sub { Songs::Field_Edit_string($_[0]{field}); },	stockicon => 'edit-symbolic',	notempty => 'IDs',
 	  submenu=>sub { Stars::createmenu($_[0]{field},$_[0]{IDs}); },
 	  foreach=>sub { 'field', Songs::FieldList(true=>'editsubmenu',type=>'rating'); }, },
-	{ label => _"Find songs with the same names",	code => sub { SearchSame('title',$_[0]) },	mode => 'B',	notempty => 'IDs' },
-	{ label => _"Find songs with same artists",	code => sub { SearchSame('artists',$_[0])},	mode => 'B',	notempty => 'IDs' },
-	{ label => _"Find songs in same albums",	code => sub { SearchSame('album',$_[0]) },	mode => 'B',	notempty => 'IDs' },
-	{ label => _"Rename file",	code => sub { DialogRename(	@{ $_[0]{IDs} }); },	onlyone => 'IDs',	test => sub {!$CmdLine{ro}}, },
-	{ label => _"Mass Rename",	code => sub { DialogMassRename(	@{ $_[0]{IDs} }); },	onlymany=> 'IDs',	test => sub {!$CmdLine{ro}}, },
-	{ label => _"Copy",	code => sub { CopyMoveFilesDialog($_[0]{IDs},TRUE); },
-		notempty => 'IDs',	stockicon => 'gtk-copy', notmode => 'P' },
-	{ label => _"Move",	code => sub { CopyMoveFilesDialog($_[0]{IDs},FALSE); },
-		notempty => 'IDs',	notmode => 'P',	test => sub {!$CmdLine{ro}}, },
-	#{ label => sub {'Remove from '.($_[0]{mode} eq 'Q' ? 'queue' : 'this list')}, code => sub { $_[0]{self}->RemoveSelected; },	stockicon => 'gtk-remove',	notempty => 'IDs', mode => 'LQ' }, #FIXME
-	{ label => _"Remove",	submenu => \@submenuRemove,	stockicon => 'gtk-remove',	notempty => 'IDs',	notmode => 'P' },
-	{ label => _"Re-read tags",	code => sub { ReReadTags(@{ $_[0]{IDs} }); },
-		notempty => 'IDs',	notmode => 'P',	stockicon => 'gtk-refresh' },
+	{ label => _"Find songs with the same names",	code => sub { SearchSame('title',$_[0]) },	stockicon => 'edit-find-symbolic',	mode => 'B',	notempty => 'IDs' },
+	{ label => _"Find songs with same artists",	code => sub { SearchSame('artists',$_[0])},	stockicon => 'edit-find-symbolic',	mode => 'B',	notempty => 'IDs' },
+	{ label => _"Find songs in same albums",	code => sub { SearchSame('album',$_[0]) },	stockicon => 'edit-find-symbolic',	mode => 'B',	notempty => 'IDs' },
+	{ label => _"Rename file...",	code => sub { DialogRename(	@{ $_[0]{IDs} }); },	stockicon => 'edit-symbolic',	onlyone => 'IDs',	test => sub {!$CmdLine{ro}}, },
+	{ label => _"Mass Rename...",	code => sub { DialogMassRename(	@{ $_[0]{IDs} }); },	stockicon => 'edit-symbolic',	onlymany=> 'IDs',	test => sub {!$CmdLine{ro}}, },
+	{ label => _"Copy...",	code => sub { CopyMoveFilesDialog($_[0]{IDs},TRUE); },
+		notempty => 'IDs',	stockicon => 'edit-copy-symbolic', notmode => 'P' },
+	{ label => _"Move...",	code => sub { CopyMoveFilesDialog($_[0]{IDs},FALSE); },	stockicon => 'edit-cut-symbolic',	notempty => 'IDs',	notmode => 'P',	test => sub {!$CmdLine{ro}}, },
+	#{ label => sub {'Remove from '.($_[0]{mode} eq 'Q' ? 'queue' : 'this list')}, code => sub { $_[0]{self}->RemoveSelected; },	stockicon => 'list-remove-symbolic',	notempty => 'IDs', mode => 'LQ' }, #FIXME
+	{ label => _"Remove",	submenu => \@submenuRemove,	stockicon => 'list-remove-symbolic',	notempty => 'IDs',	notmode => 'P' },
+	{ label => _"Re-read tags",	code => sub { ReReadTags(@{ $_[0]{IDs} }); },	stockicon => 'view-refresh-symbolic',		notempty => 'IDs',	notmode => 'P',	notmode => 'P'},
 	{ label => _"Same Title",     submenu => sub { ChooseSongsTitle(	$_[0]{IDs}[0] ); },	mode => 'P' },
 	{ label => _"Edit Lyrics",	code => sub { EditLyrics(	$_[0]{IDs}[0] ); },	mode => 'P' },
 	{ label => _"Lookup in google",	code => sub { Google(		$_[0]{IDs}[0] ); },	mode => 'P' },
-	{ label => _"Open containing folder",	code => sub { openfolder( Songs::Get( $_[0]{IDs}[0], 'path') ); },	onlyone => 'IDs' },
+	{ label => _"Open containing folder",	stockicon => 'folder-open-symbolic',	code => sub { openfolder( Songs::Get( $_[0]{IDs}[0], 'path') ); },	onlyone => 'IDs' },
 	{ label => _"Queue options", submenu => \@Layout::MenuQueue, mode => 'Q', }
 );
 our @cMenuAA=
@@ -3144,9 +3142,9 @@ sub Played
 our %PPSQ_Icon;
 INIT
 { %PPSQ_Icon=
- (	play	=> ['gtk-media-play', '<span font_family="Sans">▶</span>'],
-	pause	=> ['gtk-media-pause','<span font_family="Sans">▮▮</span>'],
-	stop	=> ['gtk-media-stop', '<span font_family="Sans">■</span>'],
+ (	play	=> ['media-playback-start-symbolic', '<span font_family="Sans">▶</span>'],
+	pause	=> ['media-playback-pause-symbolic','<span font_family="Sans">▮▮</span>'],
+	stop	=> ['media-playback-stop-symbolic', '<span font_family="Sans">■</span>'],
  );
 }
 sub Get_PPSQ_Icon	#for a given ID, returns the Play, Pause, Stop or Queue icon, or undef if none applies
@@ -5220,9 +5218,9 @@ sub Retry_Dialog	#returns one of 'retry abort skip skip_all'
 	my $dialog = Gtk3::MessageDialog->new($window, [qw/modal destroy-with-parent/], 'error','none','%s', $summary);
 	$dialog->format_secondary_text("%s",$syserr);
 	$dialog->set_title($summary);
-	$dialog->add_button_custom(_"_Retry",    1, icon=>'gtk-refresh');
+	$dialog->add_button_custom(_"_Retry",    1, icon=>'view-refresh-symbolic');
 	$dialog->add_button_custom(_"_Cancel",   2, icon=>'gtk-cancel', tip=>$abortmsg);
-	$dialog->add_button_custom(_"_Skip",     3, icon=>'gtk-go-forward', tip=>_"Proceed to next item.") if $many;
+	$dialog->add_button_custom(_"_Skip",     3, icon=>'go-next-symbolic', tip=>_"Proceed to next item.") if $many;
 	$dialog->add_button_custom(_"Skip _All", 4, tip=>_"Skip this and any further errors.") if $many;
 	my $expander;
 	if ($details)
