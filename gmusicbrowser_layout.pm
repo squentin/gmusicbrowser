@@ -55,7 +55,7 @@ our @MainMenu=
 	{label => _"Open Context window",code => \&::ContextWindow, stockicon => 'dialog-information-symbolic'},
 	{label => _"Switch to fullscreen mode",code => \&::ToggleFullscreenLayout, stockicon => 'view-fullscreen-symbolic'},
 	{label => _"About",		code => \&::AboutDialog,stockicon => 'help-about-symbolic' },
-	{label => _"Quit",		code => \&::Quit,	stockicon => 'window-close-symbolic' },
+	{label => _"Quit",		code => \&::Quit,	stockicon => 'system-shutdown-symbolic' },
 );
 
 our %Widgets=
@@ -135,7 +135,7 @@ our %Widgets=
 	},
 	Quit =>
 	{	class	=> 'Layout::Button',
-		stock	=> 'window-close-symbolic',
+		stock	=> 'system-shutdown-symbolic',
 		tip	=> _"Quit",
 		activate=> \&::Quit,
 		click2	=> 'EnqueueAction(quit)',

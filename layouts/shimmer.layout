@@ -20,13 +20,13 @@ HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=view-list-symbolic,
 ABSearchBox	= (yalign=0) SimpleSearch(suggest=1)
 ABSettings	= (yalign=0,yscale=0.0) HBSettings
 HBSettings	= ExtraButtons(size=large-toolbar) BMSettings
-BMSettings	= (icon=gtk-preferences,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(command=OpenCustom(Equalizer),label=_"Equalizer",icon=media-eq-symbolic) SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="gtk-preferences") MenuItem05(command=Quit,label=_"Quit",icon="gtk-quit")
-SMLibrary	= (label=_"Library") MenuItem00(command="RunPerlCode(::ChooseAddPath(1,1))",label=_"Add Music",icon="gtk-add") MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="gtk-refresh")
+BMSettings	= (icon=preferences-system-symbolic,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(command=OpenCustom(Equalizer),label=_"Equalizer",icon=media-eq-symbolic) SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="preferences-system-symbolic") MenuItem05(command=Quit,label=_"Quit",icon="system-shutdown-symbolic")
+SMLibrary	= (label=_"Library") MenuItem00(command="RunPerlCode(::ChooseAddPath(1,1))",label=_"Add Music",icon="list-add-symbolic") MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="view-refresh-symbolic")
 ### main left: artist pane and album-cover ###
 VBLeft		= _VBListCover HBStatus
 #VBListCover	= _NBList Cover(overlay=6x6:350x350:elementary/overlay.png,default=elementary/no-cover.svg,showcover=0) # uncomment this line to add overlay shadow
 VBListCover	= _NBList 1Cover(default=elementary/no-cover.svg,showcover=0)
-NBList		= (tabpos="bottom") QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1,hscrollbar=0) HBLyrics VBAlbuminfo VBArtistinfo
+NBList		= (tabpos="bottom") QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="format-indent-more-symbolic",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1,hscrollbar=0) HBLyrics VBAlbuminfo VBArtistinfo
 HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
 VBArtistinfo	= (tabtitle=_"Artist") _PluginArtistinfo
 VBAlbuminfo	= (tabtitle=_"Album") _PluginAlbuminfo
@@ -39,7 +39,7 @@ HBFilters	= _FilterPane3(nb=2,hidebb=1,page=genre,hidetabs=1) _FilterPane10(nb=3
 HBSonglist	= _SongList(cols="playandqueue track title artist album year length playcount",sort=artist,colwidth="album 200 artist 200 file 400 lastplay 100 length 41 path 413 playandqueue 24 playcount 96 rating 80 title 270 track 21 year 31",follow=1,sort="year album disc track")
 #VBMosaic	= FRToggleMosaic _VPMosaicAlbum _VPMosaicArtist
 #FRToggleMosaic	= (shadow=in) HBToggleMosaicClose
-#HBToggleMosaicClose = ABToggleMosaic -ToggleButton6(widget=FRToggleMosaic,label="",icon="gtk-close",tip=_"Hide Artist/Album bar")
+#HBToggleMosaicClose = ABToggleMosaic -ToggleButton6(widget=FRToggleMosaic,label="",icon="sidebar-hide-symbolic",tip=_"Hide Artist/Album bar")
 #ABToggleMosaic	= (xalign=0.5,xscale=0.0) HBToggleMosaic
 #HBToggleMosaic	= 3ToggleButton4(widget=VPMosaicAlbum,togglegroup=2,label=" Album ",relief=none) 3ToggleButton5(widget=VPMosaicArtist,togglegroup=2,label=" Artist ",relief=none)
 #VPMosaicAlbum	= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
@@ -67,10 +67,10 @@ HBTitle		= Title(expand_max=300,markup="<big><b>%t</b></big> ",tip=_"Title: %t (
 VBTime		= _HBTimeSlider _SimpleSearch(suggest=1)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 VBSettings	= HBPrefSearch 5Filler5
-HBPrefSearch	= ToggleButton0(size=large-toolbar,relief=none,icon=gtk-find,widget=SimpleSearch) ExtraButtons BMSettings
-BMSettings	= (icon=gtk-preferences,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(command=OpenCustom(Equalizer),label=_"Equalizer") SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="gtk-preferences") MenuItem05(command=Quit,label=_"Quit",icon="gtk-quit")
-SMLibrary	= (label=_"Library") MenuItem00(command="RunPerlCode(::ChooseAddPath(1,1))",label=_"Add Music",icon="gtk-add") MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="gtk-refresh")
-NBList		= (tabpos="bottom") HBSongListtree QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
+HBPrefSearch	= ToggleButton0(size=large-toolbar,relief=none,icon=edit-find-symbolic,widget=SimpleSearch) ExtraButtons BMSettings
+BMSettings	= (icon=preferences-system-symbolic,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(command=OpenCustom(Equalizer),label=_"Equalizer",icon="media-eq-symbolic") SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="preferences-system-symbolic") MenuItem05(command=Quit,label=_"Quit",icon="system-shutdown-symbolic")
+SMLibrary	= (label=_"Library") MenuItem00(command="RunPerlCode(::ChooseAddPath(1,1))",label=_"Add Music",icon="list-add-symbolic") MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="view-refresh-symbolic")
+NBList		= (tabpos="bottom") HBSongListtree QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="format-indent-more-symbolic",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
 HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
 VBAbout		= (tabtitle=_"Info") _PluginArtistinfo
 HBSongListtree	= (tabtitle=_"Playlist") _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|Compact(picsize=50)|disc|discleft(width=15)",follow=1,sort="year album disc track")
@@ -112,7 +112,7 @@ HBTitle		= Title(expand_max=300,ellipsize=end,markup="<big><b>%t</b></big> ",tip
 		  Album(tip=_"Album: %l (%Y)",ellipsize=end,expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0) \
 		  LockArtist(stock="on:channel-secure-symbolic channel-secure-symbolic off:gmb-breadcrumb channel-secure-symbolic") \
 		  Artist(tip=_"Artist: %a",expand_max=200,yalign=0.5,ellipsize=end,markup="<big> </big>%a") \
-		  -ToggleButton1(size=button,relief=none,icon=gtk-find,widget=VBSidebar) \
+		  -ToggleButton1(size=button,relief=none,icon=edit-find-symbolic,widget=VBSidebar) \
 		  -20Stars(yalign=0.5)
 VBSidebar	= 4Filler1 7HBSearch _7HBQueue 4Filler2
 HBQueue		= 14_QueueList(group=1,songtree=1,cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1)
