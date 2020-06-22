@@ -595,7 +595,7 @@ our %Widgets=
 	ResetFilter =>
 	{	class	=> 'Layout::Button',
 		size	=> 'menu',
-		stock	=> 'edit-clear-symbolic',
+		stock	=> 'edit-clear-all-symbolic',
 		tip	=> _"Reset filter",
 		activate=> sub { ::SetFilter($_[0],undef); },
 	},
