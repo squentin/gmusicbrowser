@@ -16,11 +16,11 @@ VBPlayer	= 1Filler0 HBTitle HBTimeSlider
 HBTitle		= _Title(expand_max=500,markup="<big><b>%t</b></big> ",tip=_"Title: %t (Track No. %n)",yalign=0.5,ellipsize=end) LockAlbum(stock="on:channel-secure-symbolic channel-secure-symbolic off:gmb-breadcrumb channel-secure-symbolic") Album(tip=_"Album: %l (%Y)",expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0,ellipsize=end) LockArtist(stock="on:channel-secure-symbolic channel-secure-symbolic off:gmb-breadcrumb channel-secure-symbolic") Artist(tip=_"Artist: %a",expand_max=300,yalign=0.5,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 ABToggle	= (yalign=0,yscale=0.0) HBToggle
-HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=view-list-symbolic,widget=VPSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=sidebar-tree-symbolic,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=view-grid-symbolic,widget=FilterPane2,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=view-fullscreen-symbolic,size=large-toolbar) 10Filler2 ABSearchBox
+HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=view-dual-symbolic,widget=VPSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=view-list-symbolic,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=view-grid-symbolic,widget=FilterPane2,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=view-fullscreen-symbolic,size=large-toolbar) 10Filler2 ABSearchBox
 ABSearchBox	= (yalign=0) SimpleSearch(suggest=1)
 ABSettings	= (yalign=0,yscale=0.0) HBSettings
 HBSettings	= ExtraButtons(size=large-toolbar) BMSettings
-BMSettings	= (icon=preferences-system-symbolic,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(command=OpenCustom(Equalizer),label=_"Equalizer",icon=media-eq-symbolic) SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="preferences-system-symbolic") MenuItem05(command=Quit,label=_"Quit",icon="system-shutdown-symbolic")
+BMSettings	= (icon=open-menu-symbolic,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(command=OpenCustom(Equalizer),label=_"Equalizer",icon=media-eq-symbolic) SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="emblem-system-symbolic") MenuItem05(command=Quit,label=_"Quit",icon="system-shutdown-symbolic")
 SMLibrary	= (label=_"Library") MenuItem00(command="RunPerlCode(::ChooseAddPath(1,1))",label=_"Add Music",icon="list-add-symbolic") MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="view-refresh-symbolic")
 ### main left: artist pane and album-cover ###
 VBLeft		= _VBListCover HBStatus
@@ -68,7 +68,7 @@ VBTime		= _HBTimeSlider _SimpleSearch(suggest=1)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 VBSettings	= HBPrefSearch 5Filler5
 HBPrefSearch	= ToggleButton0(size=large-toolbar,relief=none,icon=edit-find-symbolic,widget=SimpleSearch) ExtraButtons BMSettings
-BMSettings	= (icon=preferences-system-symbolic,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(command=OpenCustom(Equalizer),label=_"Equalizer",icon="media-eq-symbolic") SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="preferences-system-symbolic") MenuItem05(command=Quit,label=_"Quit",icon="system-shutdown-symbolic")
+BMSettings	= (icon=open-menu-symbolic,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(command=OpenCustom(Equalizer),label=_"Equalizer",icon="media-eq-symbolic") SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="emblem-system-symbolic") MenuItem05(command=Quit,label=_"Quit",icon="system-shutdown-symbolic")
 SMLibrary	= (label=_"Library") MenuItem00(command="RunPerlCode(::ChooseAddPath(1,1))",label=_"Add Music",icon="list-add-symbolic") MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="view-refresh-symbolic")
 NBList		= (tabpos="bottom") HBSongListtree QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon="format-indent-more-symbolic",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) HBLyrics VBAbout
 HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics

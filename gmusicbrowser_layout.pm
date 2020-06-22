@@ -50,9 +50,9 @@ our @MenuQueue=
 
 our @MainMenu=
 (	{label => _"Add files or folders",code => sub {::ChooseAddPath(0,1)},	stockicon => 'list-add-symbolic' },
-	{label => _"Settings",		code => 'OpenPref',	stockicon => 'preferences-system-symbolic' },
-	{label => _"Open Browser",	code => \&::OpenBrowser,stockicon => 'window-new-symbolic' },
-	{label => _"Open Context window",code => \&::ContextWindow, stockicon => 'dialog-information-symbolic'},
+	{label => _"Settings",		code => 'OpenPref',	stockicon => 'emblem-system-symbolic' },
+	{label => _"Open Browser",	code => \&::OpenBrowser,stockicon => 'view-dual-symbolic' },
+	{label => _"Open Context window",code => \&::ContextWindow, stockicon => 'view-dual-symbolic'},
 	{label => _"Switch to fullscreen mode",code => \&::ToggleFullscreenLayout, stockicon => 'view-fullscreen-symbolic'},
 	{label => _"About",		code => \&::AboutDialog,stockicon => 'help-about-symbolic' },
 	{label => _"Quit",		code => \&::Quit,	stockicon => 'system-shutdown-symbolic' },
@@ -103,7 +103,7 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		oldopt1 => 'toggle',
 		options => 'toggle',
-		stock	=> 'window-new-symbolic',
+		stock	=> 'view-dual-symbolic',
 		tip	=> _"Open Browser window",
 		activate=> sub { ::OpenSpecialWindow('Browser',$_[0]{toggle}); },
 		click3	=> sub { ::OpenSpecialWindow('Browser'); },
@@ -112,7 +112,7 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		oldopt1 => 'toggle',
 		options => 'toggle',
-		stock	=> 'dialog-information-symbolic',
+		stock	=> 'help-about-symbolic',
 		tip	=> _"Open Context window",
 		activate=> sub { ::OpenSpecialWindow('Context',$_[0]{toggle}); },
 		click3	=> sub { ::OpenSpecialWindow('Context'); },
@@ -126,7 +126,7 @@ our %Widgets=
 	},
 	Pref =>
 	{	class	=> 'Layout::Button',
-		stock	=> 'preferences-system-symbolic',
+		stock	=> 'emblem-system-symbolic',
 		tip	=> _"Edit Settings",
 		text	=> _"Settings",
 		activate=> 'OpenPref',
@@ -470,7 +470,7 @@ our %Widgets=
 		group	=> 'Play',
 		expander=> 1,
 		hide_empty => 1,
-		tabicon	=> 'dialog-information-symbolic',
+		tabicon	=> 'help-about-symbolic',
 		tabtitle=> _"Song informations",
 	},
 	PictureBrowser=>

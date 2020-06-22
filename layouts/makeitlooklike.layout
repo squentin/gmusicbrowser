@@ -51,7 +51,7 @@ VBMain = HBMenubar _HPSidebarCenter HBStatusbar
                 MenuItem10(command=EnqueueSelected,label=_"Queue",icon="format-indent-more-symbolic") \
                 # MenuItem11(command=,label=_"Add to playlist") \ \
                 SeparatorMenuItem10 \
-                MenuItem14(command=OpenPref,label=_"Preferences",icon="preferences-system-symbolic")
+                MenuItem14(command=OpenPref,label=_"Preferences",icon="emblem-system-symbolic")
 
             # SMView menu for common mode
             SMView2 = (label=_"View") \
@@ -62,11 +62,11 @@ VBMain = HBMenubar _HPSidebarCenter HBStatusbar
 
             SMControl3 = (label=_"Tools") \
                 MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="view-refresh-symbolic") \
-                MenuItem33(command="OpenSongProp",label=_"Track Properties",icon="preferences-system-symbolic") \
+                MenuItem33(command="OpenSongProp",label=_"Track Properties",icon="emblem-system-symbolic") \
                 MenuItem34(click1=OpenCustom(Equalizer),label=_"Equalizer")
 
             SMHelp4 = (label=_"Help") \
-                MenuItem41(command="RunPerlCode(::AboutDialog)",label=_"About",icon="dialog-information-symbolic")
+                MenuItem41(command="RunPerlCode(::AboutDialog)",label=_"About",icon="help-about-symbolic")
 
     HPSidebarCenter = VBSidebar VBCenter
 
@@ -272,13 +272,13 @@ VBMain = HBMenubar HBToolbar VBSliderbar _HPSidebarCenterContext HBStatusbar
                 MenuItem34(command=DecVolume,label=_"Decrease volume")
 
             SMHelp4 = (label=_"Help") \
-                MenuItem41(command="RunPerlCode(::AboutDialog)",label=_"About",icon="dialog-information-symbolic")
+                MenuItem41(command="RunPerlCode(::AboutDialog)",label=_"About",icon="help-about-symbolic")
 
     HBToolbar = Play Prev Next \
         3VSeparator1 \
         Sort(button=1,relief=none,minwidth=35) \
         ToggleButton4(relief=none,minwidth=35,size=button,icon=edit-find-symbolic,widget=HBFilters,tip=_"Show/Hide Browser") \
-        ToggleButton5(relief=none,minwidth=35,size=button,icon=dialog-information-symbolic,widget=Context,tip=_"Change the context visibility") \
+        ToggleButton5(relief=none,minwidth=35,size=button,icon=help-about-symbolic,widget=Context,tip=_"Change the context visibility") \
         -HBVolume
 
         HBVolume = VolumeIcon(size=menu,button=1)
@@ -416,7 +416,7 @@ VBMain = HBMenubar HBToolbar _HBPlaylist HBSonginfo 3HBStatusbar
 #                    MenuItem11(command=,label=_"Open files") \
                      MenuItem13(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Files ...") \
 #                    SeparatorMenuItem11 \
-                    MenuItem15(command=OpenPref,label=_"Preferences",icon="preferences-system-symbolic") \
+                    MenuItem15(command=OpenPref,label=_"Preferences",icon="emblem-system-symbolic") \
                     MenuItem16(command=Quit,label=_"Quit",icon="window-close-symbolic")
 
                 SMMenu2 = (label=_"Playback") \
@@ -426,7 +426,7 @@ VBMain = HBMenubar HBToolbar _HBPlaylist HBSonginfo 3HBStatusbar
                     MenuItem28(command=PrevSong,label=_"Previous",icon="media-skip-backward-symbolic") \
                     MenuItem29(command=NextSong,label=_"Next",icon="media-skip-forward-symbolic") \
                     SeparatorMenuItem215 \
-                    MenuItem215(command="OpenSongProp",label=_"Show song details",icon="preferences-system-symbolic")
+                    MenuItem215(command="OpenSongProp",label=_"Show song details",icon="emblem-system-symbolic")
 
                 SMMenu3 = (label=_"Playlist") \
                     LSortItem \
@@ -449,7 +449,7 @@ VBMain = HBMenubar HBToolbar _HBPlaylist HBSonginfo 3HBStatusbar
                     MenuItem64(togglewidget=HBStatusbar,label=_"Show status bar",resize="")
 
                 SMMenu7 = (label=_"Help") \
-                    MenuItem71(command="RunPerlCode(::AboutDialog)",label=_"About",icon="dialog-information-symbolic")
+                    MenuItem71(command="RunPerlCode(::AboutDialog)",label=_"About",icon="help-about-symbolic")
 
 
 

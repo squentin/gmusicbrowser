@@ -14,7 +14,7 @@ HPmain		= _HPpart
 HPpart		= VBpart2 NBpart3
 VBpart2		= HBSearch _VPcenter
 NBpart3		= PluginLyrics(shadow=none,HideToolbar=1) QueueList(hideif=empty,songtree=1,cols="albumminipic titleaa length") PluginArtistinfo(tabtitle="Artist Info") VPAlbum
-VPAlbum		= (tabtitle="Album") AABox(aa=album) _SongTree1(group=Play:artist)
+VPAlbum		= (tabtitle="Album",tabicon="folder-pictures-symbolic") AABox(aa=album) _SongTree1(group=Play:artist)
 VPcenter	= _VBcenterdown
 VBcenterdown	= _SongTree(grouping="artist|pic(myfont=Arial%20Italic%2018,picsize=20,showyear=)|album|pic(myfont=Arial%20Bold%2018,picsize=250,showyear=1)")
 HBSearch	= SimpleSearch -Total
@@ -41,7 +41,7 @@ HBtimebar		= Time(markup=%s,initsize="-XX:XX") _Scale LabelTime(markup='%m ')
 HPmain		= _HPpart
 HPpart			= VBpart2 NBpart3
 VBpart2			= HBSearch _VPcenter
-NBpart3			= PluginLyrics(shadow=none,HideToolbar=1) QueueList(hideif=empty,songtree=1,cols="albumminipic titleaa length") PluginArtistinfo(tabtitle="Artist Info") VPAlbum
+NBpart3			= PluginLyrics(shadow=none,HideToolbar=1) QueueList(hideif=empty,songtree=1,cols="albumminipic titleaa length") PluginArtistinfo(tabtitle="Artist Info",tabicon="folder-pictures-symbolic") VPAlbum
 VPAlbum			= (tabtitle='Album') AABox(aa=album) _SongTree1(group=Play:artist)
 VPcenter	= _VBcenterdown
 VBcenterdown    = _SongTree(grouping="artist|pic(myfont=Arial%20Italic%2018,picsize=20,showyear=)|album|pic(myfont=Arial%20Bold%2018,picsize=600,showyear=1)" cols="Spacer playandqueueandtrack titleartist year length" )
@@ -254,7 +254,7 @@ group
 		Queue(size=button,minwidth=34,maxwidth=34)  \
 
 		-Quit(size=button,minwidth=34,maxwidth=34,tip=_"Quit") \
-		-Pref(stock=preferences-system-symbolic,size=button,minwidth=34,maxwidth=34) \
+		-Pref(stock=emblem-system-symbolic,size=button,minwidth=34,maxwidth=34) \
 		-HSeparator2 \
 		#-MBLayouts \
 		-HSeparator3 \
@@ -302,19 +302,19 @@ HBSettings	= \
 	ToggleButton11(relief=none,size=menu,icon=media-optical-symbolic,widget=VBLeft,tip=_"Library") \
 	ToggleButton12(relief=none,size=menu,icon=system-users-symbolic,widget=VBArtist,tip=_"Artists") \
 	ToggleButton13(relief=none,size=menu,icon=format-indent-more-symbolic,widget=VBQueue,tip=_"Queue") \
-	ToggleButton14(relief=none,size=menu,icon=dialog-information-symbolic,widget=Context,tip=_"Context") \
+	ToggleButton14(relief=none,size=menu,icon=help-about-symbolic,widget=Context,tip=_"Context") \
 	VSeparator4 \
 	ExtraButtons(size=large-toolbar) \
 	BMSettings \
 	Quit2(size=large-toolbar,minwidth=34,maxwidth=34,tip=_"Quit")
-BMSettings	= (icon=preferences-system-symbolic,size="large-toolbar") \
+BMSettings	= (icon=emblem-system-symbolic,size="large-toolbar") \
 	SMLibrary \
 	LayoutItem \
 	PlayItem \
 	SeparatorMenuItem01 \
 	MenuItem34(command=OpenCustom(Equalizer),label=_"Equalizer",icon=media-eq-symbolic) \
 	SeparatorMenuItem20 \
-	MenuItem14(command=OpenPref,label=_"Settings",icon="preferences-system-symbolic") \
+	MenuItem14(command=OpenPref,label=_"Settings",icon="emblem-system-symbolic") \
 	MenuItem05(command=Quit,label=_"Quit",icon="window-close-symbolic")
 SMLibrary	= (label=_"Library") \
 	MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Music",icon="folder-new-symbolic") \
@@ -352,8 +352,8 @@ ABToggle	= (yalign=0,yscale=0.0) HBToggle
 HBToggle	= \
 	ToggleButton31(relief=none,size=menu,icon=folder-pictures-symbolic,widget=VPMosaic,tip=_"Albums") \
 	VSeparator5 \
-	ToggleButton32(relief=none,size=menu,icon=view-list-symbolic,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") \
-	ToggleButton33(relief=none,size=menu,icon=sidebar-tree-symbolic,widget=SongTree,togglegroup=1,tip=_"Songtree View") \
+	ToggleButton32(relief=none,size=menu,icon=view-dual-symbolic,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") \
+	ToggleButton33(relief=none,size=menu,icon=view-list-symbolic,widget=SongTree,togglegroup=1,tip=_"Songtree View") \
 	VSeparator6 \
 	ToggleButton34(relief=none,size=menu,icon=edit-find-symbolic,widget=ABSearchBox2,tip=_"Search") \
 	_ABSearchBox2 \
@@ -413,7 +413,7 @@ VBMain = HBMenu 1Filler2 _HBMainContainer 1Filler3
 			_VBVolume \
 
 			-Quit(size=button,minwidth=34,maxwidth=34,tip=_"Quit") \
-			-Pref(stock=preferences-system-symbolic,size=button,minwidth=34,maxwidth=34) \
+			-Pref(stock=emblem-system-symbolic,size=button,minwidth=34,maxwidth=34) \
 			-Button1(click1="RunPerlCode(::ChooseAddPath(0,1))",stock=folder-new-symbolic,size=button,minwidth=34,maxwidth=34,tip=_"Add folder ...") \
 			-Button2(click1="RunPerlCode(::IdleCheck)",stock=view-refresh-symbolic,size=button,minwidth=34,maxwidth=34,tip=_"check now") \
 			-Button3(click1="RunPerlCode(::IdleScan)",stock=zoom-in-symbolic,size=button,minwidth=34,maxwidth=34,tip=_"scan now")	\
@@ -570,11 +570,11 @@ VBButtons	= VBPlayingControls _VBVolume VBPanelsControls
 VBPlayingControls	= Prev(size=button) Play(size=button) Next(click2=NextAlbum,size=button)
 VBVolume 	= VolumeIcon(button=1,click2=mute,tip=_"Left-clic or scrollwheel to change, right-click to mute") _VolumeSlider
 VBPanelsControls = \
-	ToggleButton31(icon=dialog-information-symbolic,relief=none,size=menu,widget=Context,tip=_"Context") \
+	ToggleButton31(icon=help-about-symbolic,relief=none,size=menu,widget=Context,tip=_"Context") \
 	-Quit2(size=button,minwidth=34,maxwidth=34,tip=_"Quit") \
 	-BMSettings \
 	-ExtraButtons(size=button)
-BMSettings	= (icon=preferences-system-symbolic,size="button") \
+BMSettings	= (icon=emblem-system-symbolic,size="button") \
 	SMLibrary \
 	LayoutItem \
 	PlayItem \
@@ -589,7 +589,7 @@ SMLibrary	= (label=_"Library") \
 	MenuItem22(command="RunPerlCode(::IdleScan)",label=_"Scan Collection",icon="view-refresh-symbolic") \
 	MenuItem23(command="RunPerlCode(::IdleCheck)",label=_"Check Collection",icon="zoom-in-symbolic")
 SMViews = (label="Show/Hide") \
-			     MenuItem31(togglewidget=HBLeft,label=_"Library",icon="window-new-symbolic") \
+			     MenuItem31(togglewidget=HBLeft,label=_"Library",icon="view-dual-symbolic") \
 			    MenuItem32(togglewidget=VBQueue,label=_"Queue",icon="format-indent-more-symbolic") \
 			    MenuItem34(togglewidget=VPMosaic,label=_"Albums",icon="folder-pictures-symbolic") \
 			    MenuItem35(togglewidget=ABSearchBox,label=_"Search",icon="edit-find-symbolic")
@@ -721,15 +721,15 @@ HBTop		=  HBCover VBButtons _15VBPlayer(yalign=0.5) VBSettings(yalign=0.5)
 		_Filler91
       HBVolume	= VolumeIcon(button=1,size=large-toolbar,click2=mute,tip=_"Scrollwheel to change, right-click to mute")
 
-      HBButtonContext = ToggleButton24(relief=none,size=menu,icon=dialog-information-symbolic,widget=NBContextMain,tip=_"Open context & queue panel")
-      BMSettings = (icon=preferences-system-symbolic,size=large-toolbar) \
+      HBButtonContext = ToggleButton24(relief=none,size=menu,icon=help-about-symbolic,widget=NBContextMain,tip=_"Open context & queue panel")
+      BMSettings = (icon=emblem-system-symbolic,size=large-toolbar) \
 		SMLibrary \
 		LayoutItem \
 		PlayItem \
 		SeparatorMenuItem02 \
 		MenuItem03(click1=OpenCustom(Equalizer),label=_"Equalizer",icon=media-eq-symbolic) \
 		SeparatorMenuItem03 \
-		MenuItem04(command=OpenPref,label=_"Settings",icon="preferences-system-symbolic")
+		MenuItem04(command=OpenPref,label=_"Settings",icon="emblem-system-symbolic")
 	SMLibrary = (label=_"Library") \
 		MenuItem10(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Music",icon="folder-new-symbolic") \
 		MenuItem11(command="RunPerlCode(::IdleScan)",label=_"Scan Collection",icon="view-refresh-sybolic") \
@@ -738,7 +738,7 @@ HBTop		=  HBCover VBButtons _15VBPlayer(yalign=0.5) VBSettings(yalign=0.5)
 #### Right main panel
 HPRight 	= _VBSongStatus _NBContextMain
 ##### Library
-VBSongStatus 	= (tabtitle=_"Library",tabicon="window-new-symbolic") _VBMosaicSongList HBTotal
+VBSongStatus 	= (tabtitle=_"Library",tabicon="view-dual-symbolic") _VBMosaicSongList HBTotal
   VBMosaicSongList = _HBSongListtree
     HBSongListtree =  \
 		_SongTree(cols="playandqueueandtrack title length playcount genre",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 title 344 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") \
@@ -748,8 +748,8 @@ VBSongStatus 	= (tabtitle=_"Library",tabicon="window-new-symbolic") _VBMosaicSon
       HBMosaic = _FilterPane4(nb=4,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=72,hidetabs=1)
       HBTotal = _HBToggle HBStatutSongList
 	HBToggle = \
-		ToggleButton30(relief=none,size=menu,icon=view-list-symbolic,widget=HBSongPlaylist,togglegroup=30,tip=_"Simple List View") \
-		ToggleButton31(relief=none,size=menu,icon=sidebar-tree-symbolic,widget=SongTree,togglegroup=30,tip=_"Songtree View") \
+		ToggleButton30(relief=none,size=menu,icon=view-dual-symbolic,widget=HBSongPlaylist,togglegroup=30,tip=_"Simple List View") \
+		ToggleButton31(relief=none,size=menu,icon=view-list-symbolic,widget=SongTree,togglegroup=30,tip=_"Songtree View") \
 		ToggleButton32(relief=none,size=menu,icon=view-grid-symbolic,widget=HBMosaic,togglegroup=30,tip=_"Mosaic View") \
 		VSeparator30 \
 		Sort(button=1,size=menu,tip=_"Right-click to toggle shuffle/random") \
@@ -772,7 +772,7 @@ VBQueue 	= (tabtitle=_"Queue",tabicon="format-indent-more-symbolic")  \
 
 ##### Other context
 
-NBContext	= (tabtitle=_"More info",tabicon="dialog-information-symbolic",tabpos=left90) @same_artist @song_info
+NBContext	= (tabtitle=_"More info",tabicon="help-about-symbolic",tabpos=left90) @same_artist @song_info
 
 
 

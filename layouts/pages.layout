@@ -25,6 +25,7 @@ Title= _"Artist"
 Type= P
 Name= _"Same year"
 VBmain = _SongTree(group=Play:year)
+Icon=alarm-symbolic
 Title= _"Year"
 
 [search_page]
@@ -39,5 +40,5 @@ Type= P
 Name= _"Song informations"
 Title= _"Info"
 VBmain=  _SongInfo
-Icon=dialog-information-symbolic
+Icon=help-about-symbolic
 

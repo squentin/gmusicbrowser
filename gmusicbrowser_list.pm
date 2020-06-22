@@ -88,7 +88,7 @@ sub make_sort_menu
 	    $menu->append($item);
 	}
 	my $itemEditSort= Gtk3::ImageMenuItem->new(_"Custom...");
-	$itemEditSort->set_image( Gtk3::Image->new_from_stock('preferences-system-symbolic','menu') );
+	$itemEditSort->set_image( Gtk3::Image->new_from_stock('emblem-system-symbolic','menu') );
 	$itemEditSort->signal_connect (activate => sub
 	{	my $sort=::EditSortOrder($selfitem,$songlist->{sort});
 		$songlist->Sort($sort) if $sort;
@@ -1751,7 +1751,7 @@ our @cMenu=
 	  submenu_ordered_hash => 1, submenu_reverse => 1,
 	  check => 'self/simplify',  istrue=>'folderview',
 	},
-	{ label => _"Options", submenu => \@MenuPageOptions, stock => 'preferences-system-symbolic', isdefined => 'field' },
+	{ label => _"Options", submenu => \@MenuPageOptions, stock => 'emblem-system-symbolic', isdefined => 'field' },
 	{ label => _"Show buttons",	toggleoption => '!filterpane/hidebb',	code => sub { my $fp=$_[0]{filterpane}; $fp->{bottom_buttons}->set_visible(!$fp->{hidebb}); }, },
 	{ label => _"Show tabs",	toggleoption => '!filterpane/hidetabs',	code => sub { my $fp=$_[0]{filterpane}; $fp->{notebook}->set_show_tabs( !$fp->{hidetabs} ); }, },
 );
@@ -5398,7 +5398,7 @@ sub new					##currently the returned widget must be put in ->{isearchbox} of a p
 	my $close= $self->{close_button}= ::NewIconButton('window-close-symbolic', undef, \&close,'none');
 	my $label= Gtk3::Label->new(_"Find :");
 	my $options=Gtk3::Button->new;
-	$options->add(Gtk3::Image->new_from_stock('preferences-system-symbolic','menu'));
+	$options->add(Gtk3::Image->new_from_stock('emblem-system-symbolic','menu'));
 	$options->signal_connect( button_press_event => \&PopupOpt );
 	$options->set_relief('none');
 	$options->set_tooltip_text(_"options");

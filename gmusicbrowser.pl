@@ -698,7 +698,7 @@ our @TrayMenu=
 		submenu => sub {  [map { $_->layout_name => $_ } grep $_->isa('Layout::Window'), Gtk3::Window::list_toplevels];  }, },
 	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => sub { ShowHide(); }, id=>'showhide', },
 	{ label=> _"Fullscreen",	code => \&ToggleFullscreenLayout,	stockicon => 'view-fullscreen-symbolic' },
-	{ label=> _"Settings",		code => 'OpenPref',	stockicon => 'preferences-system-symbolic' },
+	{ label=> _"Settings",		code => 'OpenPref',	stockicon => 'emblem-system-symbolic' },
 	{ label=> _"Quit",		code => \&Quit,		stockicon => 'system-shutdown-symbolic' },
 );
 
@@ -1279,7 +1279,7 @@ my $icon_factory;
 
 my %IconsFallbacks=
 (	'gmb-queue0'	   => 'format-indent-more-symbolic',
-	'gmb-queue-window' => 'window-new-symbolic',
+	'gmb-queue-window' => 'view-grid-symbolic',
 	'gmb-random-album' => 'media-playlist-shuffle-symbolic',
 	'gmb-view-fullscreen'=>'view-fullscreen-symbolic',
 	#'gmb-media-skip-forward'=> 'media-skip-forward-symbolic',
@@ -9921,11 +9921,11 @@ sub fill_store
 {	my $self=shift;
 	my $store= $self->get_model;
 	$store->clear;
-	$store->set($store->append, 0,_"All songs", 1,Filter->new, 2,'window-new-symbolic');
+	$store->set($store->append, 0,_"All songs", 1,Filter->new, 2,'view-dual-symbolic');
 	my $hash=$Options{SavedFilters};
 	my @names= sort {::superlc($a) cmp ::superlc($b)} keys %$hash;
 	$store->set($store->append, 0,$_, 1,$hash->{$_}) for @names;
-	$store->set($store->append, 0,_"Edit...", 1,undef, 2,'preferences-system-symbolic');
+	$store->set($store->append, 0,_"Edit...", 1,undef, 2,'emblem-system-symbolic');
 }
 
 sub set_value
