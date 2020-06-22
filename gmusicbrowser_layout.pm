@@ -51,11 +51,11 @@ our @MenuQueue=
 our @MainMenu=
 (	{label => _"Add files or folders",code => sub {::ChooseAddPath(0,1)},	stockicon => 'list-add-symbolic' },
 	{label => _"Settings",		code => 'OpenPref',	stockicon => 'preferences-system-symbolic' },
-	{label => _"Open Browser",	code => \&::OpenBrowser,stockicon => 'application-add-symbolic' },
-	{label => _"Open Context window",code => \&::ContextWindow, stockicon => 'help-info-symbolic'},
+	{label => _"Open Browser",	code => \&::OpenBrowser,stockicon => 'window-new-symbolic' },
+	{label => _"Open Context window",code => \&::ContextWindow, stockicon => 'dialog-information-symbolic'},
 	{label => _"Switch to fullscreen mode",code => \&::ToggleFullscreenLayout, stockicon => 'view-fullscreen-symbolic'},
 	{label => _"About",		code => \&::AboutDialog,stockicon => 'help-about-symbolic' },
-	{label => _"Quit",		code => \&::Quit,	stockicon => 'application-exit-symbolic' },
+	{label => _"Quit",		code => \&::Quit,	stockicon => 'window-close-symbolic' },
 );
 
 our %Widgets=
@@ -103,7 +103,7 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		oldopt1 => 'toggle',
 		options => 'toggle',
-		stock	=> 'application-add-symbolic',
+		stock	=> 'window-new-symbolic',
 		tip	=> _"Open Browser window",
 		activate=> sub { ::OpenSpecialWindow('Browser',$_[0]{toggle}); },
 		click3	=> sub { ::OpenSpecialWindow('Browser'); },
@@ -112,7 +112,7 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		oldopt1 => 'toggle',
 		options => 'toggle',
-		stock	=> 'help-info-symbolic',
+		stock	=> 'dialog-information-symbolic',
 		tip	=> _"Open Context window",
 		activate=> sub { ::OpenSpecialWindow('Context',$_[0]{toggle}); },
 		click3	=> sub { ::OpenSpecialWindow('Context'); },
@@ -135,7 +135,7 @@ our %Widgets=
 	},
 	Quit =>
 	{	class	=> 'Layout::Button',
-		stock	=> 'application-exit',
+		stock	=> 'window-close-symbolic',
 		tip	=> _"Quit",
 		activate=> \&::Quit,
 		click2	=> 'EnqueueAction(quit)',
@@ -188,7 +188,7 @@ our %Widgets=
 		size	=> SIZE_FLAGS,
 		state	=> sub { defined $::ListMode ? 'list'
 			: $::SelectedFilter->is_empty ? 'library' : 'filter'; },
-		stock	=> { list => 'view-filter-symbolic', library => 'view-filter-symbolic', filter => 'view-filter-symbolic' },
+		stock	=> { list => 'view-list-symbolic', library => 'view-list-symbolic', filter => 'view-list-symbolic' },
 		tip	=> sub
 			{ defined $::ListMode	? _"static list"
 						: _("Playlist filter :\n").$::SelectedFilter->explain;
@@ -430,7 +430,7 @@ our %Widgets=
 	PlayList =>
 	{	New	=> sub { $_[0]{type}='A'; SongList::Common->new($_[0]); },
 		tabtitle=> _"Playlist",
-		tabicon	=> 'view-list-compact-symbolic',
+		tabicon	=> 'view-list-symbolic',
 		issonglist=>1,
 	},
 	SongList =>
@@ -470,7 +470,7 @@ our %Widgets=
 		group	=> 'Play',
 		expander=> 1,
 		hide_empty => 1,
-		tabicon	=> 'help-info-symbolic',
+		tabicon	=> 'dialog-information-symbolic',
 		tabtitle=> _"Song informations",
 	},
 	PictureBrowser=>
@@ -580,7 +580,7 @@ our %Widgets=
 	PlayFilter =>
 	{	class	=> 'Layout::Button',
 		size	=> 'menu',
-		stock	=> 'view-filter-symbolic',
+		stock	=> 'media-playback-start-symbolic',
 		tip	=> _"Play filter",
 		activate=> sub { ::Select( filter => ::GetFilter($_[0]), song=> 'trykeep', play =>1 ); },
 		click2	=> sub { ::EnqueueFilter( ::GetFilter($_[0]) ); },
@@ -2470,7 +2470,7 @@ our @contextmenu=
 	},
 	{ label => _"Delete list", code => sub { $_[0]{page}->DeleteList; },	type=> 'L',  istrue=>'page',	test => sub { $_[0]{page}{name}=~m/^EditList\d*$/; } },
 	{ label => _"Rename",	code => \&pagerename_cb,				istrue => 'rename',},
-	{ label => _"Close",	code => sub { $_[0]{self}->close_tab($_[0]{page},1); },	istrue => 'close',	stockicon=> 'application-exit-symbolic',},
+	{ label => _"Close",	code => sub { $_[0]{self}->close_tab($_[0]{page},1); },	istrue => 'close',	stockicon=> 'window-close-symbolic',},
 );
 
 our @DefaultOptions=
@@ -2615,7 +2615,7 @@ sub Pack
 		$close->set_can_focus(0);
 		::weaken( $close->{page}=$wg );
 		$close->signal_connect(clicked => sub {my $page=$_[0]{page}; my $self=$page->get_parent; $self->close_tab($page,1);});
-		$close->add(Gtk3::Image->new_from_stock('close-symbolic','menu'));
+		$close->add(Gtk3::Image->new_from_stock('window-close-symbolic','menu'));
 	}
 	my $tab= Gtk3::Box->new( ($angle%180 ? 'vertical' : 'horizontal'),0 );
 	my @icons= $angle%180 ? ($close,0,$icon,4) : ($icon,4,$close,0);

@@ -679,7 +679,7 @@ our @cMenuAA=
 	{ label => _"Lookup in AMG",	code => sub { AMGLookup( $_[0]{mainfield}, $_[0]{aaname} ); },
 	  test => sub { $_[0]{mainfield} =~m/^album$|^artist$|^title$/; },
 	},
-	{ label => _"Filter",		code => sub { Select(filter => Songs::MakeFilterFromGID($_[0]{field},$_[0]{gid})); },	stockicon => 'view-filter-symbolic', mode => 'P' },
+	{ label => _"Filter",		code => sub { Select(filter => Songs::MakeFilterFromGID($_[0]{field},$_[0]{gid})); },	stockicon => 'view-list-symbolic', mode => 'P' },
 	{ label => \&SongsSubMenuTitle,		submenu => \&SongsSubMenu, },
 	{ label => sub {$_[0]{mode} eq 'P' ? _"Display Songs" : _"Filter"},	code => \&FilterOnAA,
 		test => sub { GetSonglist( $_[0]{self} ) }, },
@@ -2526,7 +2526,7 @@ sub ReadSavedTags	#load tags _and_ settings
 		{	my $dialog = Gtk3::MessageDialog->new(undef,'modal','error','none','%s', _"The save file seems incomplete, you may want to use a backup instead.");
 			$dialog->set_title(PROGRAM_NAME);
 			$dialog->add_button_custom(_"Continue anyway",1);
-			$dialog->add_button_custom(_"Exit",2, icon=>'application-exit-symbolic', tip=>__x(_"You can find backups in {folder}",folder=>dirname($SaveFile)));
+			$dialog->add_button_custom(_"Exit",2, icon=>'window-close-symbolic', tip=>__x(_"You can find backups in {folder}",folder=>dirname($SaveFile)));
 			$dialog->show_all;
 			exit unless $dialog->run eq '1';
 			$dialog->destroy;
@@ -7997,7 +7997,7 @@ sub new
 	my $self= bless Gtk3::Dialog->new( $typedata->[0], $window,[qw/destroy-with-parent/]), $class;
 	$self->add_button('gtk-cancel' => 'none');
 	if (defined $name && $name ne '')
-	{	my $button=::NewIconButton('document-save-symbolic', ::__x( _"save as '{name}'", name => $name) );
+	{	my $button=::NewIconButton('document-save-as-symbolic', ::__x( _"save as '{name}'", name => $name) );
 		$button->can_default(::TRUE);
 		$self->add_action_widget( $button,'ok' );
 		$self->{save_name}=$name;
@@ -9921,7 +9921,7 @@ sub fill_store
 {	my $self=shift;
 	my $store= $self->get_model;
 	$store->clear;
-	$store->set($store->append, 0,_"All songs", 1,Filter->new, 2,'application-add-symbolic');
+	$store->set($store->append, 0,_"All songs", 1,Filter->new, 2,'window-new-symbolic');
 	my $hash=$Options{SavedFilters};
 	my @names= sort {::superlc($a) cmp ::superlc($b)} keys %$hash;
 	$store->set($store->append, 0,$_, 1,$hash->{$_}) for @names;

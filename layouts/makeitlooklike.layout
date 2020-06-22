@@ -44,9 +44,9 @@ VBMain = HBMenubar _HPSidebarCenter HBStatusbar
     HBMenubar = _MBEdit
         MBEdit = SMMusic0 SMEdit1 SMView2 SMControl3 SMHelp4
             SMMusic0 = (label=_"File") \
-                MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add folder ...",icon="folder-add-symbolic") \
+                MenuItem00(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add folder ...",icon="folder-new-symbolic") \
                 SeparatorMenuItem01 \
-                MenuItem02(command=Quit,label=_"Quit",icon="application-exit-symbolic")
+                MenuItem02(command=Quit,label=_"Quit",icon="window-close-symbolic")
             SMEdit1 = (label=_"Edit") \
                 MenuItem10(command=EnqueueSelected,label=_"Queue",icon="format-indent-more-symbolic") \
                 # MenuItem11(command=,label=_"Add to playlist") \ \
@@ -66,7 +66,7 @@ VBMain = HBMenubar _HPSidebarCenter HBStatusbar
                 MenuItem34(click1=OpenCustom(Equalizer),label=_"Equalizer")
 
             SMHelp4 = (label=_"Help") \
-                MenuItem41(command="RunPerlCode(::AboutDialog)",label=_"About",icon="help-about-symbolic")
+                MenuItem41(command="RunPerlCode(::AboutDialog)",label=_"About",icon="dialog-information-symbolic")
 
     HPSidebarCenter = VBSidebar VBCenter
 
@@ -272,13 +272,13 @@ VBMain = HBMenubar HBToolbar VBSliderbar _HPSidebarCenterContext HBStatusbar
                 MenuItem34(command=DecVolume,label=_"Decrease volume")
 
             SMHelp4 = (label=_"Help") \
-                MenuItem41(command="RunPerlCode(::AboutDialog)",label=_"About",icon="help-about-symbolic")
+                MenuItem41(command="RunPerlCode(::AboutDialog)",label=_"About",icon="dialog-information-symbolic")
 
     HBToolbar = Play Prev Next \
         3VSeparator1 \
         Sort(button=1,relief=none,minwidth=35) \
         ToggleButton4(relief=none,minwidth=35,size=button,icon=edit-find-symbolic,widget=HBFilters,tip=_"Show/Hide Browser") \
-        ToggleButton5(relief=none,minwidth=35,size=button,icon=help-info-symbolic,widget=Context,tip=_"Change the context visibility") \
+        ToggleButton5(relief=none,minwidth=35,size=button,icon=dialog-information-symbolic,widget=Context,tip=_"Change the context visibility") \
         -HBVolume
 
         HBVolume = VolumeIcon(size=menu,button=1)
@@ -417,7 +417,7 @@ VBMain = HBMenubar HBToolbar _HBPlaylist HBSonginfo 3HBStatusbar
                      MenuItem13(command="RunPerlCode(::ChooseAddPath(0,1))",label=_"Add Files ...") \
 #                    SeparatorMenuItem11 \
                     MenuItem15(command=OpenPref,label=_"Preferences",icon="preferences-system-symbolic") \
-                    MenuItem16(command=Quit,label=_"Quit",icon="application-exit-symbolic")
+                    MenuItem16(command=Quit,label=_"Quit",icon="window-close-symbolic")
 
                 SMMenu2 = (label=_"Playback") \
                     SeparatorMenuItem21 \
@@ -449,7 +449,7 @@ VBMain = HBMenubar HBToolbar _HBPlaylist HBSonginfo 3HBStatusbar
                     MenuItem64(togglewidget=HBStatusbar,label=_"Show status bar",resize="")
 
                 SMMenu7 = (label=_"Help") \
-                    MenuItem71(command="RunPerlCode(::AboutDialog)",label=_"About",icon="help-about-symbolic")
+                    MenuItem71(command="RunPerlCode(::AboutDialog)",label=_"About",icon="dialog-information-symbolic")
 
 
 
