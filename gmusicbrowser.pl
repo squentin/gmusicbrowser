@@ -688,18 +688,18 @@ our @cMenuAA=
 );
 
 our @TrayMenu=
-(	{ label=> sub {$::TogPlay ? _"Pause" : _"Play"}, code => \&PlayPause,	stockicon => sub { $::TogPlay ? 'gtk-media-pause' : 'gtk-media-play'; }, id=>'playpause' },
-	{ label=> _"Stop", code => \&Stop,	stockicon => 'gtk-media-stop' },
-	{ label=> _"Next", code => \&NextSong,	stockicon => 'gtk-media-next', id=>'next', },
-	{ label=> _"Recently played", submenu => sub { my $m=ChooseSongs([GetPrevSongs(8)]); }, stockicon => 'gtk-media-previous' },
+(	{ label=> sub {$::TogPlay ? _"Pause" : _"Play"}, code => \&PlayPause,	stockicon => sub { $::TogPlay ? 'media-playback-pause-symbolic' : 'media-playback-start-symbolic'; }, id=>'playpause' },
+	{ label=> _"Stop", code => \&Stop,	stockicon => 'media-playback-stop-symbolic' },
+	{ label=> _"Next", code => \&NextSong,	stockicon => 'media-skip-forward-symbolic', id=>'next', },
+	{ label=> _"Recently played", submenu => sub { my $m=ChooseSongs([GetPrevSongs(8)]); }, stockicon => 'media-skip-backward-symbolic' },
 	{ label=> sub {$::TogLock && $::TogLock eq 'first_artist'? _"Unlock Artist" : _"Lock Artist"},	code => sub {ToggleLock('first_artist');} },
 	{ label=> sub {$::TogLock && $::TogLock eq 'album' ? _"Unlock Album"  : _"Lock Album"},	code => sub {ToggleLock('album');} },
 	{ label=> _"Windows",	code => \&PresentWindow,	submenu_ordered_hash =>1,
 		submenu => sub {  [map { $_->layout_name => $_ } grep $_->isa('Layout::Window'), Gtk3::Window::list_toplevels];  }, },
 	{ label=> sub { IsWindowVisible($::MainWindow) ? _"Hide": _"Show"}, code => sub { ShowHide(); }, id=>'showhide', },
-	{ label=> _"Fullscreen",	code => \&ToggleFullscreenLayout,	stockicon => 'gtk-fullscreen' },
-	{ label=> _"Settings",		code => 'OpenPref',	stockicon => 'gtk-preferences' },
-	{ label=> _"Quit",		code => \&Quit,		stockicon => 'gtk-quit' },
+	{ label=> _"Fullscreen",	code => \&ToggleFullscreenLayout,	stockicon => 'view-fullscreen-symbolic' },
+	{ label=> _"Settings",		code => 'OpenPref',	stockicon => 'preferences-system-symbolic' },
+	{ label=> _"Quit",		code => \&Quit,		stockicon => 'system-shutdown-symbolic' },
 );
 
 our %Artists_split=
