@@ -188,7 +188,7 @@ our %Widgets=
 		size	=> SIZE_FLAGS,
 		state	=> sub { defined $::ListMode ? 'list'
 			: $::SelectedFilter->is_empty ? 'library' : 'filter'; },
-		stock	=> { list => 'view-list-symbolic', library => 'view-list-symbolic', filter => 'view-list-symbolic' },
+		stock	=> { list => 'media-optical-symbolic', library => 'view-list-symbolic', filter => 'view-list-symbolic' },
 		tip	=> sub
 			{ defined $::ListMode	? _"static list"
 						: _("Playlist filter :\n").$::SelectedFilter->explain;
@@ -2458,7 +2458,7 @@ our @contextmenu=
 (	{ label => _"New list",		code => sub { $_[0]{self}->newtab('EditList',1,{songarray=>''}); },	type=> 'L', stockicon => 'list-add-symbolic', },
 	{ label => _"Open Queue",	code => sub { $_[0]{self}->newtab('QueueList',1); },			type=> 'L', stockicon => 'view-list-symbolic',
 		test => sub { !grep $_->{name} eq 'QueueList', $_[0]{self}->get_children } },
-	{ label => _"Open Playlist",	code => sub { $_[0]{self}->newtab('PlayList',1); },			type=> 'L', stockicon => 'media-playback-play-symbolic',
+	{ label => _"Open Playlist",	code => sub { $_[0]{self}->newtab('PlayList',1); },			type=> 'L', stockicon => 'media-playback-start-symbolic',
 		test => sub { !grep $_->{name} eq 'PlayList', $_[0]{self}->get_children } },
 	{ label => _"Open existing list", code => sub { $_[0]{self}->newtab('EditList',1, {songarray=>$_[1]}); },	type=> 'L',
 		submenu => sub { my %h; $h{ $_->{array}->GetName }=1 for grep $_->{name}=~m/^EditList\d*$/, $_[0]{self}->get_children; return [grep !$h{$_}, ::GetListOfSavedLists()]; } },

@@ -13,14 +13,14 @@ HBTop		= ABButtons _15VBPlayer 10ABToggle -5ABSettings
 ABButtons	= (yalign=0,yscale=0.0) HBButtons
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= 1Filler0 HBTitle HBTimeSlider
-HBTitle		= _Title(expand_max=500,markup="<big><b>%t</b></big> ",tip=_"Title: %t (Track No. %n)",yalign=0.5,ellipsize=end) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") Album(tip=_"Album: %l (%Y)",expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0,ellipsize=end) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") Artist(tip=_"Artist: %a",expand_max=300,yalign=0.5,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
+HBTitle		= _Title(expand_max=500,markup="<big><b>%t</b></big> ",tip=_"Title: %t (Track No. %n)",yalign=0.5,ellipsize=end) LockAlbum(stock="on:channel-secure-symbolic channel-secure-symbolic off:gmb-breadcrumb channel-secure-symbolic") Album(tip=_"Album: %l (%Y)",expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0,ellipsize=end) LockArtist(stock="on:channel-secure-symbolic channel-secure-symbolic off:gmb-breadcrumb channel-secure-symbolic") Artist(tip=_"Artist: %a",expand_max=300,yalign=0.5,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 ABToggle	= (yalign=0,yscale=0.0) HBToggle
-HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=gmb-view-list,widget=VPSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=gmb-view-tree,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=gmb-view-mosaic,widget=FilterPane2,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=gmb-view-fullscreen,size=large-toolbar) 10Filler2 ABSearchBox
+HBToggle	= ToggleButton0(relief=none,size=large-toolbar,icon=view-list-symbolic,widget=VPSongPlaylist,togglegroup=1,tip=_"Simple List View") ToggleButton1(relief=none,size=large-toolbar,icon=sidebar-tree-symbolic,widget=SongTree,togglegroup=1,tip=_"Songtree View") ToggleButton2(relief=none,size=large-toolbar,icon=view-grid-symbolic,widget=FilterPane2,togglegroup=1,tip=_"Mosaic View") Fullscreen(stock=view-fullscreen-symbolic,size=large-toolbar) 10Filler2 ABSearchBox
 ABSearchBox	= (yalign=0) SimpleSearch(suggest=1)
 ABSettings	= (yalign=0,yscale=0.0) HBSettings
 HBSettings	= ExtraButtons(size=large-toolbar) BMSettings
-BMSettings	= (icon=gtk-preferences,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(command=OpenCustom(Equalizer),label=_"Equalizer",icon=gmb-equalizer) SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="gtk-preferences") MenuItem05(command=Quit,label=_"Quit",icon="gtk-quit")
+BMSettings	= (icon=gtk-preferences,size="large-toolbar") SMLibrary LayoutItem PlayItem SeparatorMenuItem01 MenuItem34(command=OpenCustom(Equalizer),label=_"Equalizer",icon=media-eq-symbolic) SeparatorMenuItem20 MenuItem14(command=OpenPref,label=_"Settings",icon="gtk-preferences") MenuItem05(command=Quit,label=_"Quit",icon="gtk-quit")
 SMLibrary	= (label=_"Library") MenuItem00(command="RunPerlCode(::ChooseAddPath(1,1))",label=_"Add Music",icon="gtk-add") MenuItem32(command="RunPerlCode(::IdleScan)",label=_"Rescan Collection",icon="gtk-refresh")
 ### main left: artist pane and album-cover ###
 VBLeft		= _VBListCover HBStatus
@@ -30,7 +30,7 @@ NBList		= (tabpos="bottom") QueueList(songtree=1,tabtitle=_"Queue (%n)",tabicon=
 HBLyrics	= (tabtitle=_"Lyrics") _PluginLyrics
 VBArtistinfo	= (tabtitle=_"Artist") _PluginArtistinfo
 VBAlbuminfo	= (tabtitle=_"Album") _PluginAlbuminfo
-HBStatus	= 3Total(noheader=1,format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=gmb-picture,relief=none,size=menu,widget=Cover,tip=_"Show/Hide Cover")
+HBStatus	= 3Total(noheader=1,format=short,relief=none,button=1,mode=library) -2Sort(button=1,tip=_"Right-click to toggle shuffle/random") -2Filter(button=1,tip=_"Right-click to remove filters") -2ToggleButton3(icon=folder-pictures-symbolic,relief=none,size=menu,widget=Cover,tip=_"Show/Hide Cover")
 ### main right: list/tree/mosaic widgets ###
 VBRight		= _HBSongListtree Progress
 HBSongListtree	= _SongTree(cols="playandqueueandtrack title length ratingpic",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 ratingpic 100 title 390 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") _VPSongPlaylist _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_album/mmarkup=1,page_album/mpicsize=96,hidetabs=1)
@@ -63,7 +63,7 @@ HBTop		= VBButtons _15VBPlayer -5VBSettings
 VBButtons	= HBButtons 3Filler4
 HBButtons	= Prev Play Next(click2=NextAlbum)
 VBPlayer	= HBTitle VBTime
-HBTitle		= Title(expand_max=300,markup="<big><b>%t</b></big> ",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5,ellipsize=end) LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") Album(tip=_"Album: %l (%Y)",expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0,ellipsize=end) LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") Artist(tip=_"Artist: %a",expand_max=200,yalign=0.5,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
+HBTitle		= Title(expand_max=300,markup="<big><b>%t</b></big> ",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5,ellipsize=end) LockAlbum(stock="on:channel-secure-symbolic channel-secure-symbolic off:gmb-breadcrumb channel-secure-symbolic") Album(tip=_"Album: %l (%Y)",expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0,ellipsize=end) LockArtist(stock="on:channel-secure-symbolic channel-secure-symbolic off:gmb-breadcrumb channel-secure-symbolic") Artist(tip=_"Artist: %a",expand_max=200,yalign=0.5,markup="<big> </big>%a",ellipsize=end) -Stars(yalign=0.5)
 VBTime		= _HBTimeSlider _SimpleSearch(suggest=1)
 HBTimeSlider	= PlayingTime(markup="%s",initsize="XX:XX",xalign=0) _TimeSlider(direct_mode=1) -Length(markup="$length",initsize="XX:XX",xalign=1)
 VBSettings	= HBPrefSearch 5Filler5
@@ -108,9 +108,9 @@ HPMain		= _FilterPane2(nb=3,hidebb=1,pages=album,page_album/mode=mosaic,page_alb
 HBNowPlaying	= HBButtons 15Filler0 _HBTitle
 HBButtons	= Prev Play Next
 HBTitle		= Title(expand_max=300,ellipsize=end,markup="<big><b>%t</b></big> ",tip=_"Title: %t (Track No. %n)".if($track,pesc($track)),yalign=0.5) \
-		  LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") \
+		  LockAlbum(stock="on:channel-secure-symbolic channel-secure-symbolic off:gmb-breadcrumb channel-secure-symbolic") \
 		  Album(tip=_"Album: %l (%Y)",ellipsize=end,expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0) \
-		  LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") \
+		  LockArtist(stock="on:channel-secure-symbolic channel-secure-symbolic off:gmb-breadcrumb channel-secure-symbolic") \
 		  Artist(tip=_"Artist: %a",expand_max=200,yalign=0.5,ellipsize=end,markup="<big> </big>%a") \
 		  -ToggleButton1(size=button,relief=none,icon=gtk-find,widget=VBSidebar) \
 		  -20Stars(yalign=0.5)

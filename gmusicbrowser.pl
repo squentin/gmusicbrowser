@@ -1279,7 +1279,7 @@ my $icon_factory;
 
 my %IconsFallbacks=
 (	'gmb-queue0'	   => 'format-indent-more-symbolic',
-	'gmb-queue-window' => 'format-indent-more-symbolic',
+	'gmb-queue-window' => 'window-new-symbolic',
 	'gmb-random-album' => 'media-playlist-shuffle-symbolic',
 	'gmb-view-fullscreen'=>'view-fullscreen-symbolic',
 	#'gmb-media-skip-forward'=> 'media-skip-forward-symbolic',

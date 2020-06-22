@@ -254,7 +254,7 @@ group
 		Queue(size=button,minwidth=34,maxwidth=34)  \
 
 		-Quit(size=button,minwidth=34,maxwidth=34,tip=_"Quit") \
-		-Pref(stock=gtk-preferences,size=button,minwidth=34,maxwidth=34) \
+		-Pref(stock=preferences-system-symbolic,size=button,minwidth=34,maxwidth=34) \
 		-HSeparator2 \
 		#-MBLayouts \
 		-HSeparator3 \
@@ -288,9 +288,9 @@ HBVolume	= (yalign=0,yscale=0.0) VolumeIcon(button=1,click2=mute,tip=_"Left-clic
 VBPlayer	= 1Filler0 HBTitle HBTimeSlider
 HBTitle		= \
 	Title(expand_max=300,ellipsize=end,markup="<big><b>%t</b></big> ",tip=_"Title: %t (Track No. %n)",yalign=0.5) \
-	LockAlbum(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") \
+	LockAlbum(stock="on:channel-secure-symbolic channel-secure-symbolic off:gmb-breadcrumb channel-secure-symbolic") \
 	Album(tip=_"Album: %l (%Y)",ellipsize=end,expand_max=200,yalign=0.5,markup="<big> </big>%l ",showcover=0) \
-	LockArtist(stock="on:gmb-lock gmb-lockopen off:gmb-breadcrumb gmb-locklight") \
+	LockArtist(stock="on:channel-secure-symbolic channel-secure-symbolic off:gmb-breadcrumb channel-secure-symbolic") \
 	Artist(tip=_"Artist: %a",expand_max=200,yalign=0.5,ellipsize=end,markup="<big> </big>%a") \
 	-Stars(yalign=0.5)
 HBTimeSlider	= \
@@ -299,10 +299,10 @@ HBTimeSlider	= \
 	-Length(markup="$length",initsize="XX:XX",xalign=1)
 
 HBSettings	= \
-	ToggleButton11(relief=none,size=menu,icon=gmb-library,widget=VBLeft,tip=_"Library") \
-	ToggleButton12(relief=none,size=menu,icon=gmb-artist,widget=VBArtist,tip=_"Artists") \
-	ToggleButton13(icon=format-indent-more-symbolic,relief=none,size=menu,widget=VBQueue,tip=_"Queue") \
-	ToggleButton14(icon=dialog-information-symbolic,relief=none,size=menu,widget=Context,tip=_"Context") \
+	ToggleButton11(relief=none,size=menu,icon=media-optical-symbolic,widget=VBLeft,tip=_"Library") \
+	ToggleButton12(relief=none,size=menu,icon=system-users-symbolic,widget=VBArtist,tip=_"Artists") \
+	ToggleButton13(relief=none,size=menu,icon=format-indent-more-symbolic,widget=VBQueue,tip=_"Queue") \
+	ToggleButton14(relief=none,size=menu,icon=dialog-information-symbolic,widget=Context,tip=_"Context") \
 	VSeparator4 \
 	ExtraButtons(size=large-toolbar) \
 	BMSettings \
@@ -353,7 +353,7 @@ HBToggle	= \
 	ToggleButton31(relief=none,size=menu,icon=folder-pictures-symbolic,widget=VPMosaic,tip=_"Albums") \
 	VSeparator5 \
 	ToggleButton32(relief=none,size=menu,icon=view-list-symbolic,widget=HBSongPlaylist,togglegroup=1,tip=_"Simple List View") \
-	ToggleButton33(relief=none,size=menu,icon=view-list-view-list-symbolic,widget=SongTree,togglegroup=1,tip=_"Songtree View") \
+	ToggleButton33(relief=none,size=menu,icon=sidebar-tree-symbolic,widget=SongTree,togglegroup=1,tip=_"Songtree View") \
 	VSeparator6 \
 	ToggleButton34(relief=none,size=menu,icon=edit-find-symbolic,widget=ABSearchBox2,tip=_"Search") \
 	_ABSearchBox2 \
@@ -373,7 +373,7 @@ HBTotal = -Total2(size=small)
 ### Queue
 VBQueue 	= \
 	EditListButtons(group=3,small=1,relief=none) \
-	_QueueList(group=3,songtree=1,tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) \
+	_QueueList(group=3,songtree=1,tabicon="format-indent-more-symbolic",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) \
 	HBQueueActions
 HBQueueActions = -Total3(size="small",group=3)
 
@@ -560,7 +560,7 @@ HBTotal = \
 ### Queue
 VBQueue 	= \
 	EditListButtons(group=3,small=1,relief=none) \
-	_QueueList(group=3,songtree=1,tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) \
+	_QueueList(group=3,songtree=1,tabicon="format-indent-more-symbolic",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) \
 	HBQueueActions
 HBQueueActions = -Total3(size="small",group=3)
 
@@ -738,7 +738,7 @@ HBTop		=  HBCover VBButtons _15VBPlayer(yalign=0.5) VBSettings(yalign=0.5)
 #### Right main panel
 HPRight 	= _VBSongStatus _NBContextMain
 ##### Library
-VBSongStatus 	= (tabtitle=_"Library",tabicon="application-add-symbolic") _VBMosaicSongList HBTotal
+VBSongStatus 	= (tabtitle=_"Library",tabicon="window-new-symbolic") _VBMosaicSongList HBTotal
   VBMosaicSongList = _HBSongListtree
     HBSongListtree =  \
 		_SongTree(cols="playandqueueandtrack title length playcount genre",colwidth="artist 124 lastplay 107 length 49 playandqueue 19 playandqueueandtrack 20 playcount 22 title 344 titleaa 397 track 21",grouping="album|artistalbum_breadcrumbs(picsize=100)|disc|discleft(width=15)",follow=1,sort="year album disc track") \
@@ -749,7 +749,7 @@ VBSongStatus 	= (tabtitle=_"Library",tabicon="application-add-symbolic") _VBMosa
       HBTotal = _HBToggle HBStatutSongList
 	HBToggle = \
 		ToggleButton30(relief=none,size=menu,icon=view-list-symbolic,widget=HBSongPlaylist,togglegroup=30,tip=_"Simple List View") \
-		ToggleButton31(relief=none,size=menu,icon=view-list-symbolic,widget=SongTree,togglegroup=30,tip=_"Songtree View") \
+		ToggleButton31(relief=none,size=menu,icon=sidebar-tree-symbolic,widget=SongTree,togglegroup=30,tip=_"Songtree View") \
 		ToggleButton32(relief=none,size=menu,icon=view-grid-symbolic,widget=HBMosaic,togglegroup=30,tip=_"Mosaic View") \
 		VSeparator30 \
 		Sort(button=1,size=menu,tip=_"Right-click to toggle shuffle/random") \
@@ -765,7 +765,7 @@ HBLyrics 	= (tabtitle=_"Lyrics",tabicon="window-close-symbolic") _PluginLyrics
 ##### Queue tab
 VBQueue 	= (tabtitle=_"Queue",tabicon="format-indent-more-symbolic")  \
 		HBQueueActions  \
-		_QueueList(group=3,songtree=1,tabicon="",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) \
+		_QueueList(group=3,songtree=1,tabicon="format-indent-more-symbolic",cols="queuenumber titleaa",colwidth="queuenumber 20 titleaa 248",showbb=1) \
 		HBQueueStatut
   HBQueueActions = VSeparator40 EditListButtons(group=3,small=1,relief=none)
   HBQueueStatut =  QueueActions -Total3(size="small",group=3)
