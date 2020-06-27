@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use utf8;
 require $::HTTP_module;
-use base 'Gtk2::Box';
+use base 'Gtk3::Box';
 use constant
 {	OPT	=> 'PLUGIN_ARTISTINFO_', # MUST begin by PLUGIN_ followed by the plugin ID / package name
 	SITEURL => 0,
@@ -102,30 +102,30 @@ sub Stop {
 
 sub new
 {	my ($class,$options)=@_;
-	my $self = bless Gtk2::VBox->new(0,0), $class;
+	my $self= bless Gtk3::VBox->new(0,0), $class;
 	$self->{$_}=$options->{$_} for qw/site/;
 	delete $self->{site} if $self->{site} && !$sites{$self->{site}}[SITEURL]; #reset selected site if no longer defined
 	$self->{site} ||= 'biography';	# biography is the default site
-	my $fontsize=$self->style->font_desc;
-	$self->{fontsize} = $fontsize->get_size / Gtk2::Pango->scale;
+	$self->{fontsize}= 12;		#FIXME 2TO3 find a way to get default size
+	$self->{alt_color}= 'grey';	#FIXME 2TO3 find a way to get a good color
 	$self->{artist_esc} = "";
-	my $statbox=Gtk2::VBox->new(0,0);
-	my $artistpic=Gtk2::HBox->new(0,0);
+	my $statbox=  Gtk3::VBox->new(0,0);
+	my $artistpic=Gtk3::HBox->new(0,0);
 	for my $name (qw/Ltitle Lstats/)
-	{	my $l=Gtk2::Label->new('');
+	{	my $l= Gtk3::Label->new('');
 		$self->{$name}=$l;
 		$l->set_justify('center');
 		if ($name eq 'Ltitle') { $l->set_line_wrap(1);$l->set_ellipsize('end'); }
 		$statbox->pack_start($l,0,0,2);
 	}
-	$self->{artistrating} = Gtk2::Image->new;
+	$self->{artistrating}= Gtk3::Image->new;
 	$statbox->pack_start($self->{artistrating},0,0,0);
-	my $stateventbox = Gtk2::EventBox->new;
+	my $stateventbox= Gtk3::EventBox->new;
 	$stateventbox->add($statbox);
 	$stateventbox->{group}= $options->{group};
 	$stateventbox->signal_connect(button_press_event => sub {my ($stateventbox, $event) = @_; return 0 unless $event->button == 3; my $ID=::GetSelID($stateventbox); ::ArtistContextMenu( Songs::Get_gid($ID,'artists'),{ ID=>$ID, self=> $stateventbox, mode => 'S'}) if defined $ID; return 1; } ); # FIXME: do a proper cm
 
-	my $artistbox = Gtk2::HBox->new(0,0);
+	my $artistbox= Gtk3::HBox->new(0,0);
 	$artistbox->pack_start($artistpic,0,1,0);
 	$artistbox->pack_start($stateventbox,1,1,0);
 
@@ -141,7 +141,7 @@ sub new
 	::Watch($artistpic, plugin_artistinfo_option_pic=> $artistpic_create);
 	$artistpic_create->($artistpic);
 
-	my $textview=Gtk2::TextView->new;
+	my $textview= Gtk3::TextView->new;
 	$self->signal_connect(map => \&SongChanged);
 	$textview->set_cursor_visible(0);
 	$textview->set_wrap_mode('word');
@@ -154,17 +154,17 @@ sub new
 	$textview->signal_connect(visibility_notify_event=>\&update_cursor_cb);
 	$textview->signal_connect(query_tooltip => \&update_cursor_cb);
 
-	my $store=Gtk2::ListStore->new('Glib::String','Glib::Double','Glib::String','Glib::UInt','Glib::String');
-	my $treeview=Gtk2::TreeView->new($store);
-	my $tc_artist=Gtk2::TreeViewColumn->new_with_attributes( _"Artist",Gtk2::CellRendererText->new,markup=>0);
+	my $store= Gtk3::ListStore->new('Glib::String','Glib::Double','Glib::String','Glib::UInt','Glib::String');
+	my $treeview= Gtk3::TreeView->new($store);
+	my $tc_artist=Gtk3::TreeViewColumn->new_with_attributes( _"Artist",Gtk3::CellRendererText->new,markup=>0);
 	$tc_artist->set_sort_column_id(0);
 	$tc_artist->set_expand(1);
 	$tc_artist->set_resizable(1);
 	$treeview->append_column($tc_artist);
 	$treeview->set_has_tooltip(1);
 	$treeview->set_tooltip_text(_"Middle-click on local artists to set a filter on them, right-click non-local artists to search for them on the web.");
-	my $renderer=Gtk2::CellRendererText->new;
-	my $tc_similar=Gtk2::TreeViewColumn->new_with_attributes( "%",$renderer,text => 1);
+	my $renderer= Gtk3::CellRendererText->new;
+	my $tc_similar= Gtk3::TreeViewColumn->new_with_attributes( "%",$renderer,text => 1);
 	$tc_similar->set_cell_data_func($renderer, sub { my ($column, $cell, $model, $iter, $func_data) = @_; my $rating = $model->get($iter, 1); $cell->set( text => sprintf '%.1f', $rating ); }, undef); # limit similarity rating to one decimal
 	$tc_similar->set_sort_column_id(1);
 	$tc_similar->set_alignment(1.0);
@@ -174,28 +174,28 @@ sub new
 	$treeview->signal_connect(button_press_event => \&tv_contextmenu);
 	$treeview->{store}=$store;
 
-	my $toolbar=Gtk2::Toolbar->new;
+	my $toolbar= Gtk3::Toolbar->new;
 	$toolbar->set_style( $options->{ToolbarStyle}||'both-horiz' );
 	$toolbar->set_icon_size( $options->{ToolbarSize}||'small-toolbar' );
 	#$toolbar->set_show_arrow(1);
 	my $radiogroup; my $menugroup;
 	foreach my $key (sort keys %sites)
 	{	my $item = $sites{$key}[1];
-		$item = Gtk2::RadioButton->new($radiogroup,$item);
+		$item = Gtk3::RadioButton->new_with_label_from_widget($radiogroup,$item);
 		$item->{key} = $key;
 		$item -> set_mode(0); # display as togglebutton
 		$item -> set_relief("none");
 		$item -> set_tooltip_text($sites{$key}[2]);
 		$item->set_active( $key eq $self->{site} );
-		$item->signal_connect(toggled => sub { my $self=::find_ancestor($_[0],__PACKAGE__); toggled_cb($self,$item,$textview); } );
-		$radiogroup = $item -> get_group;
-		my $toolitem=Gtk2::ToolItem->new;
+		$item->signal_connect(toggled => sub { my $self= $_[0]->GET_ancestor; toggled_cb($self,$item,$textview); } );
+		$radiogroup ||= $item;
+		my $toolitem= Gtk3::ToolItem->new;
 		$toolitem->add( $item );
 		$toolitem->set_expand(1);
 		$toolbar->insert($toolitem,-1);
 
 # trying to make the radiobuttons overflowable, but no shared groups for radiobuttons and radiomenuitems (group doesn't seem to work for radiomenuitem at all)
-#		my $menuitem=Gtk2::RadioMenuItem->new($menugroup,$sites{$key}[1]);
+#		my $menuitem= Gtk3::RadioMenuItem->new($menugroup,$sites{$key}[1]);
 #		$menuitem->set_active( $key eq $self->{site} );
 		#$menuitem->set_group($menugroup);
 #		$menuitem->set_draw_as_radio(1);
@@ -205,15 +205,15 @@ sub new
 #		$toolitem->set_proxy_menu_item($key,$menuitem);
 	}
 	for my $button
-	(	[refresh => 'gtk-refresh', sub { my $self=::find_ancestor($_[0],__PACKAGE__); SongChanged($self,'force'); },_"Refresh", _"Refresh"],
+	(	[refresh => 'gtk-refresh', sub { my $self= $_[0]->GET_ancestor; SongChanged($self,'force'); },_"Refresh", _"Refresh"],
 		[save => 'gtk-save',	\&Save_text,	_"Save",	_"Save artist biography",$::Options{OPT.'AutoSave'}],
 	)
 	{	my ($key,$stock,$cb,$label,$tip)=@$button;
-		my $item=Gtk2::ToolButton->new_from_stock($stock);
+		my $item= Gtk3::ToolButton->new_from_stock($stock);
 		$item->signal_connect(clicked => $cb);
 		$item->set_tooltip_text($tip) if $tip;
-		my $menuitem = Gtk2::ImageMenuItem->new ($label);
-		$menuitem->set_image( Gtk2::Image->new_from_stock($stock,'menu') );
+		my $menuitem= Gtk3::ImageMenuItem->new ($label);
+		$menuitem->set_image( Gtk3::Image->new_from_stock($stock,'menu') );
 		$item->set_proxy_menu_item($key,$menuitem);
 		$toolbar->insert($item,-1);
 		if ($key eq 'save')
@@ -224,17 +224,17 @@ sub new
 			$update->($item);
 		}
 	}
-	my $artistinfobox = Gtk2::VBox->new(0,0);
+	my $artistinfobox= Gtk3::VBox->new(0,0);
 	$artistinfobox->pack_start($artistbox,1,1,0);
 	$artistinfobox->pack_start($toolbar,0,0,0);
 	#$statbox->pack_start($toolbar,0,0,0);
 	$self->{buffer}=$textview->get_buffer;
 	$self->{store}=$store;
 
-	my $infobox = Gtk2::HBox->new;
+	my $infobox= Gtk3::HBox->new;
 	$infobox->set_spacing(0);
-	my $sw1=Gtk2::ScrolledWindow->new;
-	my $sw2=Gtk2::ScrolledWindow->new;
+	my $sw1= Gtk3::ScrolledWindow->new;
+	my $sw2= Gtk3::ScrolledWindow->new;
 	$sw1->add($textview);
 	$sw2->add($treeview);
 	for ($sw1,$sw2) {
@@ -275,7 +275,7 @@ sub cancel
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(0,2);
+{	my $vbox= Gtk3::VBox->new(0,2);
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Load/Save Artist Info in :", width=>50);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1,wrap=>1);
 	my $autosave = ::NewPrefCheckButton(OPT.'AutoSave'=>_"Auto-save positive finds", tip=>_"only works when the artist-info tab is displayed",
@@ -283,13 +283,13 @@ sub prefbox
 	my $picsize=::NewPrefSpinButton(OPT.'ArtistPicSize',50,500, step=>5, page=>10, text =>_("Artist picture size : %d"), cb=>sub { ::HasChanged('plugin_artistinfo_option_pic'); });
 	my $picshow=::NewPrefCheckButton(OPT.'ArtistPicShow' => _"Show artist picture", widget => ::Vpack($picsize), cb=>sub { ::HasChanged('plugin_artistinfo_option_pic'); } );
 	my $eventformat=::NewPrefEntry(OPT.'Eventformat' => _"Enter custom event string :", expand=>1, tip => _"Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), furthermore linebreaks '<br>' and any text you'd like to have in between. E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'", history=>OPT.'Eventformat_history');
-	my $eventformat_reset=Gtk2::Button->new(_"reset format");
+	my $eventformat_reset= Gtk3::Button->new(_"reset format");
 	$eventformat_reset->{format_combo}=$eventformat;
 	$eventformat_reset->signal_connect(clicked => sub {
 		my $self = shift;
 		my $prefentry = $self->{format_combo};
-		my ($combo) = grep $_->isa("Gtk2::ComboBoxEntry"), $prefentry->get_children;
-		$combo->child->set_text('%title at %name<br>%startDate<br>%city (%country)<br><br>');
+		my ($combo) = grep $_->isa("Gtk3::ComboBox"), $prefentry->get_children;
+		$combo->get_child->set_text('%title at %name<br>%startDate<br>%city (%country)<br><br>');
 		$::Options{OPT.'Eventformat'} = '%title at %name<br>%startDate<br>%city (%country)<br><br>';
 	});
 	my $similar_limit=::NewPrefSpinButton(OPT.'SimilarLimit',0,500, step=>1, page=>10, text1=>_"Limit similar artists to the first : ", tip=>_"0 means 'show all'");
@@ -297,14 +297,14 @@ sub prefbox
 	my $similar_local=::NewPrefCheckButton(OPT.'SimilarLocal' => _"Only show similar artists from local library", tip=>_"applied on reload");
 	my $similar_exclude_seed=::NewPrefCheckButton(OPT.'SimilarExcludeSeed' => _"Exclude 'seed'-artist from queue", tip=>_"The artists similar to the 'seed'-artist will be used to populate the queue, but you can decide to exclude the 'seed'-artist him/herself.");
 	my $lastfm=::NewIconButton('plugin-artistinfo-lastfm',undef,sub { ::main::openurl("http://www.last.fm/music/"); },'none',_"Open last.fm website in your browser");
-	my $titlebox=Gtk2::HBox->new(0,0);
+	my $titlebox= Gtk3::HBox->new(0,0);
 	$titlebox->pack_start($picshow,1,1,0);
 	$titlebox->pack_start($lastfm,0,0,5);
-	my $frame_bio=Gtk2::Frame->new(_"Biography");
+	my $frame_bio= Gtk3::Frame->new(_"Biography");
 	$frame_bio->add(::Vpack($entry,$preview,$autosave));
-	my $frame_events=Gtk2::Frame->new(_"Events");
+	my $frame_events= Gtk3::Frame->new(_"Events");
 	$frame_events->add(::Hpack('_',$eventformat,$eventformat_reset));
-	my $frame_similar=Gtk2::Frame->new(_"Similar Artists");
+	my $frame_similar= Gtk3::Frame->new(_"Similar Artists");
 	$frame_similar->add(::Vpack($similar_limit,$similar_rating,$similar_local,$similar_exclude_seed));
 	$vbox->pack_start($_,::FALSE,::FALSE,5) for $titlebox,$frame_bio,$frame_events,$frame_similar;
 	return $vbox;
@@ -323,7 +323,7 @@ sub set_buffer
 	$self->{buffer}->set_text("");
 	my $iter=$self->{buffer}->get_start_iter;
 	my $fontsize=$self->{fontsize};
-	my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
+	my $tag_noresults=$self->{buffer}->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground=>$self->{alt_color});
 	$self->{buffer}->insert_with_tags($iter,"\n$text",$tag_noresults);
 	$self->{buffer}->set_modified(0);
 }
@@ -351,7 +351,7 @@ sub tv_contextmenu {
 	}
 	else {
 		my $menu = CreateSearchMenu($artist,$url);
-		my $title=Gtk2::MenuItem->new(_"Search for artist on:");
+		my $title= Gtk3::MenuItem->new(_"Search for artist on:");
 		$menu->prepend($title);
 		$menu->show_all;
 		$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
@@ -364,13 +364,13 @@ sub tv_contextmenu {
 sub CreateSearchMenu {
 	my($artist,$lastfm_url)=@_;
 	$artist=::url_escapeall($artist);
-	my $menu=Gtk2::Menu->new;
+	my $menu= Gtk3::Menu->new;
 	for my $item (@External) {
 			my ($key,$url,$text)=@$item;
 			if ($key eq "lastfm" && $lastfm_url) { $url='http://'.$lastfm_url; }
 			else { $url=~s/%a/$artist/; }
-			my $menuitem = Gtk2::ImageMenuItem->new ($key);
-			$menuitem->set_image( Gtk2::Image->new_from_stock('plugin-artistinfo-'.$key,'menu') );
+			my $menuitem= Gtk3::ImageMenuItem->new ($key);
+			$menuitem->set_image( Gtk3::Image->new_from_stock('plugin-artistinfo-'.$key,'menu') );
 			$menuitem->signal_connect(activate => sub { ::main::openurl($url) if $url; return 0; });
 			$menu->append($menuitem);
 		}
@@ -383,35 +383,30 @@ sub apiczoom {
 	my $aID = Songs::Get_gid($ID,'artist');
 	my $picsize=250;
 	my $img= AAPicture::newimg(artist=>$aID,$picsize);
-	return 0 unless $img;
+	return 1 unless $img;
 
-	my $menu=Gtk2::Menu->new;
-	$menu->modify_bg('normal',Gtk2::Gdk::Color->parse('black')); # black bg for the artistpic-popup
-	my $apic = Gtk2::MenuItem->new;
-	$apic->modify_bg('selected',Gtk2::Gdk::Color->parse('black'));
-	$apic->add($img);
-
-	my $artist = Songs::Gid_to_Get("artist",$aID);
-	my $item=Gtk2::MenuItem->new;
-	my $label=Gtk2::Label->new;	# use a label instead of a normal menu-item for formatted text
-	$item->modify_bg('selected',Gtk2::Gdk::Color->parse('black'));
-	$label->modify_fg($_,Gtk2::Gdk::Color->parse('white')) for qw/normal prelight/;
+	$img->override_background_color('normal', Gtk3::Gdk::RGBA::parse('black'));
+	my $artist= Songs::Gid_to_Get("artist",$aID);
+	my $label= Gtk3::Label->new_with_format("<big><b>%s</b></big>",$artist);
+	$label->override_background_color('normal', Gtk3::Gdk::RGBA::parse('black'));
+	$label->override_color('normal', Gtk3::Gdk::RGBA::parse('white'));
 	$label->set_line_wrap(1);
 	$label->set_justify('center');
 	$label->set_ellipsize('end');
-	$label->set_markup( "<big><b>$artist</b></big>" );
-	$item->add($label);
+	my $vbox= Gtk3::VBox->new;
+	$vbox->add($img);
+	$vbox->add($label);
+	$vbox->show_all;
 
-	$menu->append($apic);
-	$menu->append($item);
-	$menu->show_all;
-	$menu->popup (undef, undef, undef, undef, $event->button, $event->time);
+	my $popover= Gtk3::Popover->new($self);
+	$popover->add($vbox);
+	$popover->popup;
 	return 1;
 }
 
 sub update_cursor_cb
 {	my $textview=$_[0];
-	my (undef,$wx,$wy,undef)=$textview->window->get_pointer;
+	my (undef,$wx,$wy,undef)=$textview->get_window('text')->get_pointer;
 	my ($x,$y)=$textview->window_to_buffer_coords('widget',$wx,$wy);
 	my $iter=$textview->get_iter_at_location($x,$y);
 	my $cursor='xterm';
@@ -423,12 +418,12 @@ sub update_cursor_cb
 	}
 	return if ($textview->{cursor}||'') eq $cursor;
 	$textview->{cursor}=$cursor;
-	$textview->get_window('text')->set_cursor(Gtk2::Gdk::Cursor->new($cursor));
+	$textview->get_window('text')->set_cursor(Gtk3::Gdk::Cursor->new($cursor));
 }
 
 sub button_release_cb
 {	my ($textview,$event) = @_;
-	my $self=::find_ancestor($textview,__PACKAGE__);
+	my $self= $textview->GET_ancestor;
 	return ::FALSE unless $event->button == 1;
 	my ($x,$y)=$textview->window_to_buffer_coords('widget',$event->x, $event->y);
 	my $url=$self->url_at_coords($x,$y,$textview);
@@ -449,7 +444,7 @@ sub url_at_coords
 
 sub SongChanged
 {	my ($widget,$force) = @_;
-	my $self=::find_ancestor($widget,__PACKAGE__);
+	my $self= $widget->GET_ancestor;
 	my $ID = ::GetSelID($self);
 	return unless defined $ID;
 	$self -> ArtistChanged( Songs::Get_gid($ID,'artist'),Songs::Get_gid($ID,'album'),$force);
@@ -457,7 +452,7 @@ sub SongChanged
 
 sub ArtistChanged
 {	my ($self,$aID,$albumID,$force)=@_;
-	return unless $self->mapped;
+	return unless $self->get_mapped;
 	return unless defined $aID;
 	my $rating = AA::Get("rating:average",'artist',$aID);
 	$self->{artistratingvalue}= int($rating+0.5);
@@ -534,9 +529,9 @@ sub loaded
 
 	my $fontsize = $self->{fontsize};
 	my $tag_warning = $buffer->create_tag(undef,foreground=>"#bf6161",justification=>'center',underline=>'single');
-	my $tag_extra = $buffer->create_tag(undef,foreground_gdk=>$self->style->text_aa("normal"),justification=>'left');
-	my $tag_noresults=$buffer->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground_gdk=>$self->style->text_aa("normal"));
-	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
+	my $tag_extra = $buffer->create_tag(undef,foreground=>$self->{alt_color},justification=>'left');
+	my $tag_noresults=$buffer->create_tag(undef,justification=>'center',font=>$fontsize*2,foreground=>$self->{alt_color});
+	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>::PANGO_WEIGHT_BOLD);
 	my $infoheader;
 
 	if ($self->{site} eq "biography") {
@@ -609,8 +604,8 @@ sub loaded
 			if ($s_artist{match} >= $::Options{OPT.'SimilarRating'} / 100) {
 				my $aID=Songs::Search_artistid($s_artist{name});
 				my $stats='';
-				my $color=$self->style->text_aa("normal")->to_string;
-				my $fgcolor = substr($color,0,3).substr($color,5,2).substr($color,9,2);
+				my $fgcolor= $self->{alt_color};
+				#my $fgcolor = substr($color,0,3).substr($color,5,2).substr($color,9,2); #FIXME 2TO3
 				if ($aID) {
 					$stats=AA::ReplaceFields($aID,' <span foreground="'.$fgcolor.'">(%X « %s)</span>',"artist",1);
 					$s_artist{url} = "local";
@@ -638,7 +633,7 @@ sub load_file
 	}
 	my $fontsize=$self->{fontsize};
 	my $href = $buffer->create_tag(undef,justification=>'left',foreground=>"#4ba3d2",underline=>'single');
-	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>Gtk2::Pango::PANGO_WEIGHT_BOLD);
+	my $tag_header = $buffer->create_tag(undef,justification=>'left',font=>$fontsize+1,weight=>::PANGO_WEIGHT_BOLD);
 	my ($infoheader,$url);
 	if ($text =~ m/<title>(.*?)<\/title>(.*?)<url>(.*?)<\/url>/s) {
 		$infoheader = $1; $url = $3; $text = $2;
@@ -655,7 +650,7 @@ sub load_file
 }
 
 sub Save_text
-{	my $self=::find_ancestor($_[0],__PACKAGE__);
+{	my $self= $_[0]->GET_ancestor;
 	my $win=$self->get_toplevel;
 	my $buffer=$self->{buffer};
 	my $text = "<title>".$self->{infoheader}."</title>\n".$self->{biography}."\n\n<url>".$self->{lfm_url}."</url>";

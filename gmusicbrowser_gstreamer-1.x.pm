@@ -9,7 +9,7 @@ BEGIN
 {	require Glib::Object::Introspection;
 	warn "Using Glib::Object::Introspection version ".Glib::Object::Introspection->VERSION."\n" if $::debug;
 	Glib::Object::Introspection->setup(basename => 'Gst', version => '1.0', package => 'GStreamer1');
-	$::gstreamer_version='1.x';
+	$::gstreamer_version= GStreamer1::version_string();
 	GStreamer1::init_check([ $0, @ARGV ]) or die "Can't initialize gstreamer-1.x\n";
 	my $reg= GStreamer1::Registry::get();
 	$reg->lookup_feature('playbin') or die "gstreamer-1.x plugin 'playbin' not found.\n";
@@ -491,7 +491,7 @@ sub RG_set_options
 
 sub AdvancedOptions
 {	my $self=shift;
-	my $vbox=Gtk2::VBox->new(::FALSE, 2);
+	my $vbox=Gtk3::VBox->new(::FALSE, 2);
 	my $modif_cb= sub { $self->{modif}=1 };
 	my $gapless= ::NewPrefCheckButton(gst_gapless => _"enable gapless (experimental)", cb=> $modif_cb);
 	$vbox->pack_start($gapless,::FALSE,::FALSE,2);
@@ -502,7 +502,7 @@ sub AdvancedOptions
 	my $sync_EQpresets= ::NewPrefCheckButton(gst_sync_EQpresets => _"Synchronize equalizer presets", cb=> sub { EQ_Import_Presets(); $modif_cb->() }, tip=>_"Imports gstreamer presets, and synchronize modifications made with gmusicbrowser");
 	$vbox->pack_start($sync_EQpresets,::FALSE,::FALSE,2);
 
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
+	my $sg1=Gtk3::SizeGroup->new('horizontal');
 	my $custom= ::NewPrefEntry(gst_custom => _"Custom pipeline", cb=>$modif_cb, sizeg1 => $sg1, expand => 1, tip => _"Insert this pipeline before the audio sink", history => 'gst_custom_history');
 	$vbox->pack_start($custom,::FALSE,::FALSE,2);
 	for my $s (sort grep $Sinks{$_}{ok} && $Sinks{$_}{option}, keys %Sinks)
@@ -522,16 +522,18 @@ sub add_visuals
 	$self->{has_visuals}++;
 	$window->set_double_buffered(0);
 	$window->signal_connect(unrealize => sub { my $self=$_[0]{playobject}; $self->remove_visuals($_[0]) if $self; });
-	$window->signal_connect(expose_event => sub
+	$window->signal_connect(draw => sub
 	 {	my $self=$_[0]{playobject};
 		if ($self && $_[0]{visuals_on} && defined $::TogPlay) { $self->{playbin}->expose }
 		else #not connected or stopped -> draw black background
-		{	my ($widget,$event)=@_;
-			$widget->window->draw_rectangle($widget->style->black_gc,::TRUE,$event->area->values);
+		{	my ($widget,$cr)=@_;
+			$cr->set_source_rgb(0,0,0);
+			$cr->rectangle(0,0,$widget->get_allocated_width,$widget->get_allocated_height);
+			$cr->fill;
 		}
 		1;
 	 });
-	if ($window->window) { $self->connect_visuals }
+	if ($window->get_window) { $self->connect_visuals }
 	else
 	{	$window->signal_connect(realize => sub { my $self=$_[0]{playobject}; $self->connect_visuals if $self; });
 	}
@@ -539,13 +541,13 @@ sub add_visuals
 
 sub connect_visuals
 {	my $self=shift;
-	my ($window)= grep $_ && $_->window, @{$self->{visual_windows}};
+	my ($window)= grep $_ && $_->get_window, @{$self->{visual_windows}};
 	return unless $window && $self->{playbin};
 	if (my $w=$self->{visual_window}) { return if $w==$window; $w->{visuals_on}=0; $w->queue_draw; }
 	$self->{visual_window}= $window;
 	$window->{visuals_on}=1;
 	$self->create_playbin unless $self->{playbin};
-	$self->{playbin}->set_window_handle($window->window->XID);
+	$self->{playbin}->set_window_handle($window->get_window->get_xid);
 	$self->{playbin}->set('flags' => [qw/audio soft-volume vis/]);
 	$self->{playbin}->set('force-aspect-ratio',0);
 	$self->set_visual;
@@ -559,7 +561,7 @@ sub remove_visuals
 	return unless $window->{visuals_on};
 	$window->{visuals_on}=0;
 	my $new= $wlist->[0];
-	if ($new && $new->window) { $self->connect_visuals($new) }
+	if ($new && $new->get_window) { $self->connect_visuals($new) }
 	elsif ($self->{playbin})
 	{	$self->{playbin}->set('flags' => [qw/audio soft-volume/]);
 		$self->{playbin}->set_window_handle(0);

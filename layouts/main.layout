@@ -25,7 +25,7 @@ VBmain		= HBmenu _HPmain Progress
      HPfp1	= FilterPane1(nb=2,hidebb=1,page=artist,page_artist/lmarkup=1) \
 		  FilterPane2(nb=3,hidebb=1,page=album,page_album/lpicsize=32,page_album/lmarkup=1)
     VBSongList	= HBSongList _SongList
-     HBSongList	= SimpleSearch(maxwidth=250) -FilterLock -PlayFilter -Refresh -ResetFilter -MBlist
+     HBSongList	= SimpleSearch(maxwidthchar=40) -FilterLock -PlayFilter -Refresh -ResetFilter -MBlist
       MBlist 	= HistItem LSortItem PlayItem
 
 [Small_player]
@@ -41,9 +41,9 @@ HBmain		= _VBmain 2Filler1 -Cover
   HBButtons	= VolumeIcon Prev Stop Play Next OpenBrowser ExtraButtons Pref Quit
   HBIndic	= Sort 10Filter Queue 10Pos -Stars
   VBText	= 2HBTitle 2HBArtist 2HBAlbum
-   HBTitle	= LockSong _Title LabelsIcons
-   HBArtist	= LockArtist _Artist
-   HBAlbum	= LockAlbum _Album -Year
+   HBTitle	= LockSong _Title(maxwidth=300) LabelsIcons
+   HBArtist	= LockArtist _Artist(maxwidth=300)
+   HBAlbum	= LockAlbum _Album(maxwidth=300) -Year
   HBTime	= Time _TimeBar
 
 [with queue] based on Small_player
@@ -170,13 +170,15 @@ VolumeScroll	= HBupper
 [Volume]
 VSize= 100 VolumeSlider
 VBox = Volume(xalign=.5) _VolumeSlider(vertical=1)
+Window		= typehint=menu
 
 [Equalizer]
-Window		= size=300x160,uniqueid=Equalizer,ifexist=replace
+Window		= size=300x160,uniqueid=Equalizer,ifexist=replace,typehint=utility
 VBmain		= 2EqualizerPresets _Equalizer
 Title		= _"Equalizer"
 
 [Progress]
+Window		= typehint=dialog
 VBmain		= _VProgress(lastclose=1)
 Title		= _"Progress"
 

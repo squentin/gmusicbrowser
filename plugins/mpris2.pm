@@ -39,8 +39,8 @@ sub Stop
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(0,2);
-	my $desc= Gtk2::Label->new(_"This plugin is needed for gmusicbrowser to appear in unity's sound menu.");
+{	my $vbox= Gtk3::VBox->new(0,2);
+	my $desc= Gtk3::Label->new(_"This plugin is needed for gmusicbrowser to appear in unity's sound menu.");
 	$vbox->pack_start($desc,0,0,0);
 	return $vbox;
 }

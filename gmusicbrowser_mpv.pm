@@ -21,9 +21,11 @@ my (@cmd_and_args,$ChildPID,$WatchTag,$WatchTag2,@pidToKill,$Kill9);
 my $sockfh;
 my (%supported,$mpv);
 my $preparednext;
-my ($File_is_current,$Called_from_eof,$gmb_file,$mpv_file,$Last_messages);
+my ($Called_from_eof,$gmb_file,$mpv_file,$Last_messages);
 my $initseek;
 my $watcher;
+my $version;
+my @cmd_queue;
 
 my $SOCK = $::HomeDir."gmb_mpv_sock";
 
@@ -36,21 +38,32 @@ sub init
 	{	$mpv=undef;
 	}
 	$mpv ||= ::first { -x $_ } map $_.::SLASH.'mpv',  split /:/, $ENV{PATH};
-
-	$mpv=undef unless $mpv && check_version();
+	
+	warn "mpv: found mpv version $version\n" if $version && $::debug;
+	if (!check_version(0, 7))
+	{	$mpv=undef;
+		warn "mpv version earlier than 0.7 are not supported -> mpv backend disabled\n"
+	}
 	return unless $mpv;
 	return bless {RG=>1,EQ=>1},__PACKAGE__;
 }
 
-sub check_version
-{	return unless $mpv;
+sub get_version
+{	return $version if $version;
+	return unless $mpv;
 	my $output= qx/$mpv -V/;
-	my ($ok,$version);
-	if ($output=~m/mpv\s*(\d+)\.(\d+)(\S+)?/i) { $ok= $1>0 || $2>=7; $version= "$1.$2".($3||"") } #requires version 0.7 or later
-	elsif ($output=~m/mpv\s*(git-[[:xdigit:]]+)/i) { $ok=1; $version=$1; } #assume git version is ok
+    my ($v) = ($output =~ /mpv\s*(\S+)\s.*/);
+	return $v;
+}
+
+sub check_version
+{	my ($major,$minor)=@_;
+	my $version=get_version();
+	my $ok;
+	return unless $version;
+	if ($version=~m/^(\d+)\.(\d+)(\S+)?$/i) { $ok= $1>$major || $2>=$minor; }
+	elsif ($version=~m/^git-[[:xdigit:]]+$/i) { $ok=1; } #assume git version is ok
 	else { warn "mpv: error looking up mpv version\n"; }
-	warn "mpv: found mpv version $version\n" if $version && ($::debug || !$ok);
-	if (!$ok) { warn "mpv version earlier than 0.7 are not supported -> mpv backend disabled\n" }
 	return $ok;
 }
 
@@ -70,20 +83,38 @@ sub supported_formats
 	return keys %supported;
 }
 
-sub send_cmd
+sub cmd_push
 {	return unless $sockfh;
 	my @args=@_;
+	my $callback;
+	# If the first argument is a subroutine, use it as callback
+	if (ref($args[0]) eq 'CODE') { $callback = shift @args; }
+	push @cmd_queue, $callback;
 	my $cmd = JSON::PP->new->encode({command => \@args});
 	print $sockfh "$cmd\n";
 	warn "MPVCMD: $cmd\n" if $::debug;
+}
+
+sub cmd_shift
+{	my $data=shift;
+	my $callback = shift @cmd_queue;
+	if ($callback) { $callback->($data); }
 }
 
 sub launch_mpv
 {	$preparednext=undef;
 	@cmd_and_args=($mpv, '--input-unix-socket='.$SOCK, qw/--idle --no-video --no-input-terminal --really-quiet --gapless-audio=weak --softvol-max=100 --mute=no --no-sub-auto/);
 	push @cmd_and_args,"--volume=".convertvolume($::Volume);
-	push @cmd_and_args,"--af-add=".get_RG_opts() if $::Options{use_replaygain};
-	push @cmd_and_args,"--af-add=\@EQ:equalizer=$::Options{equalizer}" if $::Options{use_equalizer};
+	if ($::Options{use_replaygain})
+	{	if(check_version(0,28))
+		{
+			push @cmd_and_args,"--replaygain=".get_RG_mode();
+			push @cmd_and_args,"--replaygain-preamp=".get_RG_preamp();
+			push @cmd_and_args,"--replaygain-clip=".$::Options{rg_limiter} ? 'yes' : 'no';
+			push @cmd_and_args,"--replaygain-fallback=".($::Options{rg_fallback} || 0);
+		} else { push @cmd_and_args,"--af-add=".get_RG_string(); }
+	}
+	push @cmd_and_args,"--af-add=".get_EQ_string($::Options{equalizer}) if $::Options{use_equalizer};
 	push @cmd_and_args,split / /,$::Options{mpvoptions} if $::Options{mpvoptions};
 	warn "@cmd_and_args\n" if $::debug;
 	$ChildPID=fork;
@@ -109,9 +140,8 @@ sub launch_mpv
 	$WatchTag2= Glib::IO->add_watch(fileno($sockfh),'in',\&_remotemsg);
 	$watcher = {};
 	::Watch($watcher,'NextSongs', \&append_next);
-	send_cmd('observe_property', 1, 'playback-time');
-	send_cmd('observe_property', 1, 'path');
-	send_cmd('request_log_messages', 'error');
+	cmd_push('observe_property', 1, 'playback-time');
+	cmd_push('request_log_messages', 'error');
 	return 1;
 }
 
@@ -123,21 +153,18 @@ sub Play
 	$gmb_file=$file;
 	warn "playing $file (pid=$ChildPID)\n" if $::Verbose;
 	# gapless - check for non-user-initiated EOF
-	if ($Called_from_eof && $preparednext && $preparednext eq $gmb_file && $gmb_file eq $mpv_file)
-	{	$File_is_current=1;
-		return;
-	}
-	$File_is_current=-1;
+	return if ($Called_from_eof && $preparednext && $preparednext eq $gmb_file);
+	$mpv_file = "";
 	$initseek = $sec;
-	send_cmd('loadfile',$file);
-	send_cmd('playlist_clear');
+	cmd_push('loadfile', $file);
+	cmd_push('playlist_clear');
 }
 
 sub append_next
 {	$preparednext=undef;
-	send_cmd('playlist_clear');
+	cmd_push('playlist_clear');
 	if ($::NextFileToPlay && $::NextFileToPlay ne $gmb_file)
-	{	send_cmd('loadfile',$::NextFileToPlay,'append');
+	{	cmd_push('loadfile', $::NextFileToPlay, 'append');
 		$preparednext= $::NextFileToPlay;
 	}
 }
@@ -149,19 +176,20 @@ sub _remotemsg
 		warn "mpv raw-output: $line" if $::debug;
 		if (my $error=$msg->{error})
 		{	warn "mpv error: $error" unless $error eq 'success';
+			cmd_shift($msg->{data});
 		}
 		elsif (my $event=$msg->{event})
 		{	if ($event eq 'property-change' && $msg->{name} eq 'path') { $mpv_file= $msg->{data}||""; } # doesn't happen when previous file is same as new file
-			elsif ($event eq 'start-file') { $File_is_current=0 if $File_is_current<1; }
-			elsif ($event eq 'tracks-changed' && $File_is_current>=0)
-			{	$File_is_current= $mpv_file eq $gmb_file;
+			elsif ($event eq 'file-loaded')
+			{	SkipTo(undef,$initseek) if $initseek;
+				$initseek=undef;
+				cmd_push(sub { $mpv_file=shift; }, ('get_property', 'path'));
 				last if $eof; #only do eof now to catch log-message that are only sent after end-file and start-file
 			}
-			elsif ($File_is_current<1) {} #ignore all other events unless file is current
+			elsif ($mpv_file ne $gmb_file) {} #ignore all other events unless file is current
 			elsif ($event eq 'property-change' && $msg->{name} eq 'playback-time' && defined $msg->{data})
 			 { ::UpdateTime($msg->{data}); }
-			elsif ($event eq 'end-file')	{ $eof=1; } # ignore EOF signal on user-initiated track change as $File_is_current is not true in those cases
-			elsif ($event eq 'file-loaded')	{ SkipTo(undef,$initseek) if $initseek; $initseek=undef; }
+			elsif ($event eq 'end-file')	{ $eof=1; } # ignore EOF signal on user-initiated track change as $mpv_file and $gmb_file aren't equal in those cases
 			elsif ($event eq 'log-message')
 			{	my $error= $msg->{text};
 				chomp $error;
@@ -200,17 +228,17 @@ sub _eos_cb
 }
 
 sub Pause
-{	send_cmd('set', 'pause', 'yes');
+{	cmd_push('set', 'pause', 'yes');
 }
 sub Resume
-{	send_cmd('set', 'pause', 'no');
+{	cmd_push('set', 'pause', 'no');
 }
 
 sub SkipTo
 {	::setlocale(::LC_NUMERIC, 'C');
 	my $sec="$_[1]";
 	::setlocale(::LC_NUMERIC, '');
-	send_cmd('seek', $sec, 'absolute');
+	cmd_push('seek', $sec, 'absolute');
 }
 
 
@@ -221,7 +249,7 @@ sub Stop
 		$WatchTag=$WatchTag2=undef;
 	}
 	if ($ChildPID)
-	{	send_cmd('quit');
+	{	cmd_push('quit');
 		Glib::Timeout->add( 100,\&_Kill_timeout ) unless @pidToKill;
 		$Kill9=0;	#_Kill_timeout will first try INT, then KILL
 		push @pidToKill,$ChildPID;
@@ -237,6 +265,10 @@ sub Stop
 	{	::UnWatch($watcher,'NextSongs');
 		undef $watcher;
 	}
+	if (@cmd_queue)
+	{
+		undef @cmd_queue
+	}
 }
 sub _Kill_timeout	#make sure old children are dead
 {	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
@@ -251,8 +283,8 @@ sub _Kill_timeout	#make sure old children are dead
 }
 
 sub AdvancedOptions
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
+{	my $vbox=Gtk3::VBox->new(::FALSE, 2);
+	my $sg1=Gtk3::SizeGroup->new('horizontal');
 	my $opt=::NewPrefEntry('mpvoptions',_"mpv options :", sizeg1=>$sg1);
 	$vbox->pack_start($_,::FALSE,::FALSE,2), for $opt;
 	return $vbox;
@@ -272,7 +304,7 @@ sub SetVolume
 	$::Volume=0   if $::Volume<0;
 	$::Volume=100 if $::Volume>100;
 	my $vol= convertvolume($::Volume);
-	send_cmd('set', 'volume', $vol);
+	cmd_push('set', 'volume', $vol);
 	::HasChanged('Vol');
 	$::Options{Volume}=$::Volume;
 	$::Options{Volume_mute}=$::Mute;
@@ -288,9 +320,24 @@ sub convertvolume
 	return $vol;
 }
 
+sub get_EQ_string
+{	my $val=shift;
+	if (check_version(0, 28))
+	{	my @freqs = (29, 59, 119, 237, 474, 947, 1900, 3800, 7500, 15000);
+		my @gains = split /:/, $val;
+		my $fireq_string = "gain_entry=";
+		my @entries;
+		for my $i (0 .. $#freqs)
+		{	push @entries, "entry(".$freqs[$i].",".$gains[$i].")";
+		}
+		return "\@EQ:lavfi=[firequalizer=gain_entry='".(join ';', @entries)."']";
+	}
+	else { return '@EQ:equalizer='.$val; }
+}
+
 sub set_equalizer
 {	my (undef,$val)=@_;
-	send_cmd('af','add','@EQ:equalizer='.$val);
+	cmd_push('af', 'add', get_EQ_string($val));
 }
 
 sub EQ_Get_Range
@@ -304,21 +351,40 @@ sub EQ_Get_Hz
 	return $bands[$i];
 }
 
-sub get_RG_opts
-{	my $enable = $::Options{use_replaygain} ? 'yes' : 'no';
-	my $mode = $::Options{rg_albummode} ? 'replaygain-album' : 'replaygain-track';
-	my $clip = $::Options{rg_limiter} ? 'yes' : 'no';
-	my $preamp = $::Options{rg_preamp};
+sub get_RG_preamp
+{	my $preamp = $::Options{rg_preamp};
 	#FIXME: enforce limits in interface
 	$preamp = -15 if $::Options{rg_preamp}<-15;
 	$preamp = 15 if $::Options{rg_preamp}>15;
+	return $preamp;
+}
+
+sub get_RG_mode
+{	return $::Options{rg_albummode} ? 'album' : 'track';
+}
+
+sub get_RG_string
+{	my $enable = $::Options{use_replaygain} ? 'yes' : 'no';
+	my $mode = $::Options{rg_albummode} ? 'replaygain-album' : 'replaygain-track';
+	my $clip = $::Options{rg_limiter} ? 'yes' : 'no';
+	my $preamp = get_RG_preamp();
 	my $RGstring = "\@RG:volume=0:$mode=$enable:replaygain-clip=$clip:replaygain-preamp=$preamp";
 	return $RGstring;
 }
 
 sub RG_set_options
-{	my $RGstring = get_RG_opts();
-	send_cmd('af', 'add', $RGstring);
+{	if (check_version(0, 28))
+	{
+		if (!$::Options{use_replaygain}) { cmd_push('set', 'replaygain', 'no'); return; }
+		cmd_push('set', 'replaygain', get_RG_mode());
+		cmd_push('set', 'replaygain-preamp', get_RG_preamp());
+		cmd_push('set', 'replaygain-clip', $::Options{rg_limiter} ? 'yes' : 'no');
+		cmd_push('set', 'replaygain-fallback', $::Options{rg_fallback} || 0);
+	} else
+	{
+		my $RGstring = get_RG_string();
+		cmd_push('af', 'add', $RGstring);
+	}
 }
 
 1;
