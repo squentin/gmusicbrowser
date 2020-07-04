@@ -4,6 +4,8 @@
     "runtime-version": "3.36",
     "sdk": "org.gnome.Sdk",
     "rename-appdata-file": "gmusicbrowser.appdata.xml",
+    "rename-desktop-file": "gmusicbrowser.desktop",
+    "rename-icon": "gmusicbrowser",
     "command": "gmusicbrowser",
     "finish-args": [
         "--share=ipc", 
