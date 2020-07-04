@@ -3,18 +3,17 @@
     "runtime": "org.gnome.Platform",
     "runtime-version": "3.36",
     "sdk": "org.gnome.Sdk",
+    "command": "gmusicbrowser",
     "rename-appdata-file": "gmusicbrowser.appdata.xml",
     "rename-desktop-file": "gmusicbrowser.desktop",
     "rename-icon": "gmusicbrowser",
-    "command": "gmusicbrowser",
     "finish-args": [
         "--share=ipc", 
-        "--socket=x11",
+        "--socket=fallback-x11",
         "--socket=wayland",
         "--share=network",
         "--filesystem=xdg-music",
         "--socket=pulseaudio",
-        "--socket=session-bus",
         "--env=PERL5LIB=/app/lib"
     ],
     "build-options" : {
@@ -27,6 +26,8 @@
             "name": "gmusicbrowser",
             "buildsystem": "simple",
             "build-commands": [
+                "sed -i '7i\ <content_rating type="oars-1.1" />' gmusicbrowser.appdata.xml",
+                "sed -i '34i\ <releases>\n  <release date="2020-06-01" version="git-547b631"/>\n </releases>' gmusicbrowser.appdata.xml",
                 "sed -i 's|#!/usr/bin/perl|#!/bin/env perl|g' gmusicbrowser.pl",                
                 "make install prefix='/app'"
             ],
