@@ -4,6 +4,7 @@
  <id type="desktop">gmusicbrowser.desktop</id>
  <metadata_license>CC0-1.0</metadata_license>
  <project_license>GPL-3.0</project_license>
+ <content_rating type="oars-1.1" />
  <name>gmusicbrowser</name>
  <summary>Jukebox for large collection of music</summary>
  <description>
@@ -29,6 +30,9 @@
   <screenshot width="1440" height="810">http://gmusicbrowser.org/screenshots/appdata/screenshot-4.png</screenshot>
   <screenshot width="442" height="150">http://gmusicbrowser.org/screenshots/appdata/screenshot-5.png</screenshot>
  </screenshots>
+   <releases>
+    <release date="2020-06-01" version="git-547b631"/>
+  </releases>
  <url type="homepage">http://gmusicbrowser.org</url>
  <updatecontact>squentin@gmusicbrowser.org</updatecontact>
 </application>
