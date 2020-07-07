@@ -1,4 +1,4 @@
-#!/bin/env perl
+#!/usr/bin/env perl
 
 # Copyright (C) 2005-2020 Quentin Sculo <squentin@free.fr>
 #
