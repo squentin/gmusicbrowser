@@ -72,8 +72,10 @@
                 "perl Makefile.PL PREFIX=/app LIB=/app/lib",
                 "make",
                 "make test",
-                "make install",
-                "chmod 755 /app/lib/x86_64-linux/auto/Glib/Glib.so"
+                "make install"
+            ],
+            "post-install": [
+                "find ${FLATPAK_DEST}/lib/ -name \\*.so -exec chmod u+w {} \\;"
             ],
             "sources": [{
                 "type": "archive",
@@ -88,8 +90,10 @@
                 "perl Makefile.PL PREFIX=/app LIB=/app/lib",
                 "make",
                 "make test",
-                "make install",
-                "chmod 755 /app/lib/x86_64-linux/auto/Glib/Object/Introspection/Introspection.so"
+                "make install"
+            ],
+            "post-install": [
+                "find ${FLATPAK_DEST}/lib/ -name \\*.so -exec chmod u+w {} \\;"
             ],
             "sources": [{
                 "type": "archive",
@@ -104,8 +108,10 @@
                 "perl Makefile.PL PREFIX=/app LIB=/app/lib",
                 "make",
                 "make test",
-                "make install",
-                "chmod 755 /app/lib/x86_64-linux/auto/Cairo/Cairo.so"
+                "make install"
+            ],
+            "post-install": [
+                "find ${FLATPAK_DEST}/lib/ -name \\*.so -exec chmod u+w {} \\;"
             ],
             "sources": [{
                 "type": "archive",
@@ -119,8 +125,10 @@
             "build-commands": [
                 "perl Makefile.PL PREFIX=/app LIB=/app/lib",
                 "make",
-                "make install",
-                "chmod 755 /app/lib/x86_64-linux/auto/Cairo/GObject/GObject.so"
+                "make install"
+            ],
+            "post-install": [
+                "find ${FLATPAK_DEST}/lib/ -name \\*.so -exec chmod u+w {} \\;"
             ],
             "sources": [{
                 "type": "archive",
@@ -135,8 +143,10 @@
                 "perl Makefile.PL PREFIX=/app LIB=/app/lib",
                 "make",
                 "make test",
-                "make install",
-                "chmod 755 /app/lib/x86_64-linux/auto/Pango/Pango.so"
+                "make install"
+            ],
+	    "post-install": [
+                "find ${FLATPAK_DEST}/lib/ -name \\*.so -exec chmod u+w {} \\;"
             ],
             "sources": [{
                 "type": "archive",
@@ -164,8 +174,10 @@
             "build-commands": [
                 "perl Makefile.PL PREFIX=/app LIB=/app/lib",
                 "make",
-                "make install",
-                "chmod 755 /app/lib/x86_64-linux/auto/Net/DBus/DBus.so"
+                "make install"
+            ],
+            "post-install": [
+                "find ${FLATPAK_DEST}/lib/ -name \\*.so -exec chmod u+w {} \\;"
             ],
             "sources": [{
                 "type": "archive",
@@ -193,8 +205,10 @@
             "build-commands": [
                 "perl Makefile.PL PREFIX=/app LIB=/app/lib",
                 "make",
-                "make install",
-                "chmod 755 /app/lib/x86_64-linux/auto/XML/Parser/Expat/Expat.so"
+                "make install"
+            ],
+            "post-install": [
+                "find ${FLATPAK_DEST}/lib/ -name \\*.so -exec chmod u+w {} \\;"
             ],
             "sources": [{
                 "type": "archive",
