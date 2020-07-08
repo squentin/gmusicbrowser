@@ -1069,8 +1069,25 @@ sub CreateWidgets
 		}
 	}
 	if (my $l=$boxes->{VolumeScroll})
-	{	$widgets->{$_}->signal_connect(scroll_event => \&::ChangeVol)
-			for grep $widgets->{$_}, split /\s+/,$l;
+	{	for my $widget (grep defined, map $widgets->{$_}, split /\s+/,$l)
+		{	# with gtk3, we can't get scroll events on widgets that don't have their own gdkwindow
+			if ($widget->get_has_window)
+			{	$widget->add_events(['scroll-mask']);
+				$widget->signal_connect(scroll_event => \&::ChangeVol);
+			}
+			# if the VolumeScroll widget doesn't have its own gdkwindow try to use the toplevel layout widget (usually the gtkwindow) and check if coordinates of the event are within the VolumeScroll widget
+			elsif ($self->get_has_window)
+			{	$self->add_events(['scroll-mask']);
+				$self->signal_connect(scroll_event => sub
+				{	my ($ok,$x,$y)= $self->translate_coordinates($widget,$_[1]->x,$_[1]->y);
+					return 0 unless $ok;
+					my $alloc= $widget->get_allocation;
+					my ($x1,$y1,$w,$h)= @$alloc{qw/x y width height/};
+					return 0 if $x<$x1 || $x>$x1+$w || $y<$y1 || $y>$y1+$h;
+					&::ChangeVol;
+				});
+			}
+		}
 	}
 	$self->signal_connect(key_press_event => \&KeyPressed,0);
 	$self->signal_connect_after(key_press_event => \&KeyPressed,1);
