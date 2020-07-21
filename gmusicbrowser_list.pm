@@ -3098,7 +3098,7 @@ sub new
 		 {	my ($treeview,$type,$dest,@data)=@_;
 			my $self= $treeview->GET_ancestor;
 			my (undef,$path)=@$dest;
-			my ($name,$rowtype)=$store->get_value( $store->get_iter($path) );
+			my ($name,$rowtype)=$store->get( $store->get_iter($path), 0,1 );
 			if ($type == ::DRAG_ID)
 			{	if ($rowtype eq 'slist')
 				{	$::Options{SavedLists}{$name}->Push(\@data);
@@ -3223,8 +3223,8 @@ sub drag_motion_cb
 	{	last if !$path || $treeview->{drag_is_source};
 		my $type=$store->get_value( $store->get_iter($path) ,1);
 		last unless $type;
-		my $target_id=[$::DRAGTYPES[::DRAG_ID][0],'same-app',::DRAG_ID];
-		my $target_filter=[$::DRAGTYPES[::DRAG_FILTER][0],[],::DRAG_FILTER];
+		my $target_id=     Gtk3::TargetEntry->new($::DRAGTYPES[::DRAG_ID][0],    'same-app',::DRAG_ID);
+		my $target_filter= Gtk3::TargetEntry->new($::DRAGTYPES[::DRAG_FILTER][0],[],        ::DRAG_FILTER);
 		my $lookfor; my @targets;
 		if ($type eq 'root-sfilter')
 		{	$lookfor=::DRAG_FILTER;
@@ -3236,9 +3236,9 @@ sub drag_motion_cb
 		}
 		else {last}
 
-		if ($lookfor && grep $::DRAGTYPES{$_->name} ==$lookfor, $context->targets)
+		if ($lookfor && grep $::DRAGTYPES{$_->name} == $lookfor, $context->list_targets )
 		{	$status='copy';
-			$treeview->drag_dest_set_target_list(Gtk3::TargetList->new( @targets ));
+			$treeview->drag_dest_set_target_list(Gtk3::TargetList->new( \@targets ));
 		}
 	}
 	unless ($status) { $status='default'; $path=undef; }

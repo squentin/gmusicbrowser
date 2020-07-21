@@ -72,7 +72,11 @@ sub Load_Wnck
   {	my $tags= Glib::Object::Introspection->invoke( 'Gtk', 'TextIter', 'get_tags', $_[0]);
 	return $tags ? @$tags : ();
   }
-  #fix for cuurent Gtk3 bindings
+  sub Gtk3::Gdk::DragContext::list_targets
+  {	my $targets= Glib::Object::Introspection->invoke( 'Gdk', 'DragContext', 'list_targets', $_[0]);
+	return $targets ? @$targets : ();
+  }
+  #fix for curent Gtk3 bindings
   sub Gtk3::Dialog::new
   {	my ($class, $title, $parent, $flags, @rest) = @_;
 	my $dialog= Glib::Object::Introspection->invoke('Gtk', 'Dialog', 'new', $class);
