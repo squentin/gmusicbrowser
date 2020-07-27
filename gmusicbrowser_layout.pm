@@ -49,20 +49,20 @@ our @MenuQueue=
 );
 
 our @MainMenu=
-(	{label => _"Add files or folders",code => sub {::ChooseAddPath(0,1)},	stockicon => 'gtk-add' },
-	{label => _"Settings",		code => 'OpenPref',	stockicon => 'gtk-preferences' },
-	{label => _"Open Browser",	code => \&::OpenBrowser,stockicon => 'gmb-playlist' },
-	{label => _"Open Context window",code => \&::ContextWindow, stockicon => 'gtk-info'},
-	{label => _"Switch to fullscreen mode",code => \&::ToggleFullscreenLayout, stockicon => 'gtk-fullscreen'},
-	{label => _"About",		code => \&::AboutDialog,stockicon => 'gtk-about' },
-	{label => _"Quit",		code => \&::Quit,	stockicon => 'gtk-quit' },
+(	{label => _"Add files or folders",code => sub {::ChooseAddPath(0,1)},	stockicon => 'list-add-symbolic' },
+	{label => _"Settings",		code => 'OpenPref',	stockicon => 'emblem-system-symbolic' },
+	{label => _"Open Browser",	code => \&::OpenBrowser,stockicon => 'view-dual-symbolic' },
+	{label => _"Open Context window",code => \&::ContextWindow, stockicon => 'view-dual-symbolic'},
+	{label => _"Switch to fullscreen mode",code => \&::ToggleFullscreenLayout, stockicon => 'view-fullscreen-symbolic'},
+	{label => _"About",		code => \&::AboutDialog,stockicon => 'help-about-symbolic' },
+	{label => _"Quit",		code => \&::Quit,	stockicon => 'system-shutdown-symbolic' },
 );
 
 our %Widgets=
 (	Prev =>
 	{	class	=> 'Layout::Button',
 		#size	=> SIZE_BUTTONS,
-		stock	=> 'gtk-media-previous',
+		stock	=> 'media-skip-backward-symbolic',
 		tip	=> _"Recently played songs",
 		text	=> _"Previous",
 		group	=> 'Recent',
@@ -73,7 +73,7 @@ our %Widgets=
 	},
 	Stop =>
 	{	class	=> 'Layout::Button',
-		stock	=> 'gtk-media-stop',
+		stock	=> 'media-playback-stop-symbolic',
 		tip	=> _"Stop",
 		activate=> \&::Stop,
 		click2	=> 'EnqueueAction(stop)',
@@ -82,7 +82,7 @@ our %Widgets=
 	Play =>
 	{	class	=> 'Layout::Button',
 		state	=> sub {$::TogPlay? 'pause' : 'play'},
-		stock	=> {pause => 'gtk-media-pause', play => 'gtk-media-play' },
+		stock	=> {pause => 'media-playback-pause-symbolic', play => 'media-playback-start-symbolic' },
 		tip	=> sub {$::TogPlay? _"Pause" : _"Play"},
 		activate=> \&::PlayPause,
 		click3	=> 'Stop',
@@ -90,7 +90,7 @@ our %Widgets=
 	},
 	Next =>
 	{	class	=> 'Layout::Button',
-		stock	=> 'gtk-media-next',
+		stock	=> 'media-skip-forward-symbolic',
 		tip	=> _"Next Song",
 		text	=> _"Next",
 		group	=> 'Next',
@@ -103,7 +103,7 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		oldopt1 => 'toggle',
 		options => 'toggle',
-		stock	=> 'gmb-playlist',
+		stock	=> 'view-dual-symbolic',
 		tip	=> _"Open Browser window",
 		activate=> sub { ::OpenSpecialWindow('Browser',$_[0]{toggle}); },
 		click3	=> sub { ::OpenSpecialWindow('Browser'); },
@@ -112,21 +112,21 @@ our %Widgets=
 	{	class	=> 'Layout::Button',
 		oldopt1 => 'toggle',
 		options => 'toggle',
-		stock	=> 'gtk-info',
+		stock	=> 'help-about-symbolic',
 		tip	=> _"Open Context window",
 		activate=> sub { ::OpenSpecialWindow('Context',$_[0]{toggle}); },
 		click3	=> sub { ::OpenSpecialWindow('Context'); },
 	},
 	OpenQueue	=>
 	{	class	=> 'Layout::Button',
-		stock	=> 'gmb-queue-window',
+		stock	=> 'view-list-symbolic',
 		tip	=> _"Open Queue window",
 		options => 'toggle',
 		activate=> sub { ::OpenSpecialWindow('Queue',$_[0]{toggle}); },
 	},
 	Pref =>
 	{	class	=> 'Layout::Button',
-		stock	=> 'gtk-preferences',
+		stock	=> 'emblem-system-symbolic',
 		tip	=> _"Edit Settings",
 		text	=> _"Settings",
 		activate=> 'OpenPref',
@@ -135,7 +135,7 @@ our %Widgets=
 	},
 	Quit =>
 	{	class	=> 'Layout::Button',
-		stock	=> 'gtk-quit',
+		stock	=> 'system-shutdown-symbolic',
 		tip	=> _"Quit",
 		activate=> \&::Quit,
 		click2	=> 'EnqueueAction(quit)',
@@ -148,7 +148,7 @@ our %Widgets=
 		options	=> 'field',
 		field	=> 'fullfilename',	#default field to make sure it's defined
 		state	=> sub { ($::TogLock && $::TogLock eq $_[0]{field})? 'on' : 'off' },
-		stock	=> { on => 'gmb-lock', off => '. gmb-locklight' },
+		stock	=> { on => 'channel-secure-symbolic', off => '. channel-secure-symbolic' },
 		tip	=> sub { ::__x(_"Lock on {field}", field=> Songs::FieldName($_[0]{field})) },
 		click1	=> sub {::ToggleLock($_[0]{field});},
 		event	=> 'Lock',
@@ -175,7 +175,7 @@ our %Widgets=
 		button	=> 0,
 		size	=> SIZE_FLAGS,
 		state	=> sub { my $s=$::Options{'Sort'};($s=~m/^random:/)? 'random' : ($s eq 'shuffle')? 'shuffle' : 'sorted'; },
-		stock	=> { random => 'gmb-random', shuffle => 'gmb-shuffle', sorted => 'gtk-sort-ascending' },
+		stock	=> { random => 'view-grid-symbolic', shuffle => 'media-playlist-shuffle-symbolic', sorted => 'media-playlist-consecutive-symbolic' },
 		tip	=> sub { _("Play order") ." :\n". ::ExplainSort($::Options{Sort}); },
 		text	=> sub { ::ExplainSort($::Options{Sort},1); },
 		click1	=> 'MenuPlayOrder',
@@ -188,7 +188,7 @@ our %Widgets=
 		size	=> SIZE_FLAGS,
 		state	=> sub { defined $::ListMode ? 'list'
 			: $::SelectedFilter->is_empty ? 'library' : 'filter'; },
-		stock	=> { list => 'gmb-list', library => 'gmb-library', filter => 'gmb-filter' },
+		stock	=> { list => 'media-optical-symbolic', library => 'view-list-symbolic', filter => 'view-list-symbolic' },
 		tip	=> sub
 			{ defined $::ListMode	? _"static list"
 						: _("Playlist filter :\n").$::SelectedFilter->explain;
@@ -207,8 +207,8 @@ our %Widgets=
 				  $::QueueAction? $::QueueAction :
 						 'noqueue'
 				},
-		stock	=> sub  {$_[0] eq 'queue'  ?	'gmb-queue' :
-				 $_[0] eq 'noqueue'?	'. gmb-queue' :
+		stock	=> sub  {$_[0] eq 'queue'  ?	'format-indent-more-symbolic' :
+				 $_[0] eq 'noqueue'?	'format-indent-more-symbolic' :
 							$::QActions{$_[0]}{icon} ;
 				},
 		tip	=> sub { if ($::NextAction) { return $::QActions{$::NextAction}{long_next} }
@@ -424,13 +424,13 @@ our %Widgets=
 	QueueList =>
 	{	New	=> sub { $_[0]{type}='Q'; SongList::Common->new($_[0]); },
 		tabtitle=> _"Queue",
-		tabicon	=> 'gmb-queue',
+		tabicon	=> 'format-indent-more-symbolic',
 		issonglist=>1,
 	},
 	PlayList =>
 	{	New	=> sub { $_[0]{type}='A'; SongList::Common->new($_[0]); },
 		tabtitle=> _"Playlist",
-		tabicon	=> 'gtk-media-play',
+		tabicon	=> 'view-list-symbolic',
 		issonglist=>1,
 	},
 	SongList =>
@@ -446,7 +446,7 @@ our %Widgets=
 	{	New 	=> sub { $_[0]{type}='L'; SongList::Common->new($_[0]); },
 		tabtitle=> \&SongList::Common::MakeTitleLabel,
 		tabrename=>\&SongList::Common::RenameTitleLabel,
-		tabicon	=> 'gmb-list',
+		tabicon	=> 'view-list-symbolic',
 		issonglist=>1,
 	},
 	TabbedLists =>
@@ -470,7 +470,7 @@ our %Widgets=
 		group	=> 'Play',
 		expander=> 1,
 		hide_empty => 1,
-		tabicon	=> 'gtk-info',
+		tabicon	=> 'help-about-symbolic',
 		tabtitle=> _"Song informations",
 	},
 	PictureBrowser=>
@@ -493,7 +493,7 @@ our %Widgets=
 		nowrap	=> 0,
 		schange	=> \&Layout::PictureBrowser::queue_song_changed,
 		autoadd_type	=> 'context page pictures',
-		tabicon		=> 'gmb-picture',
+		tabicon		=> 'folder-pictures-symbolic',
 		tabtitle	=> _"Album pictures",
 	},
 	AABox	=>
@@ -573,14 +573,14 @@ our %Widgets=
 	Refresh =>
 	{	class	=> 'Layout::Button',
 		size	=> 'menu',
-		stock	=> 'gtk-refresh',
+		stock	=> 'view-refresh-symbolic',
 		tip	=> _"Refresh list",
 		activate=> sub { ::RefreshFilters($_[0]); },
 	},
 	PlayFilter =>
 	{	class	=> 'Layout::Button',
 		size	=> 'menu',
-		stock	=> 'gtk-media-play',
+		stock	=> 'media-playback-start-symbolic',
 		tip	=> _"Play filter",
 		activate=> sub { ::Select( filter => ::GetFilter($_[0]), song=> 'trykeep', play =>1 ); },
 		click2	=> sub { ::EnqueueFilter( ::GetFilter($_[0]) ); },
@@ -588,14 +588,14 @@ our %Widgets=
 	QueueFilter =>
 	{	class	=> 'Layout::Button',
 		size	=> 'menu',
-		stock	=> 'gmb-queue',
+		stock	=> 'view-list-symbolic',
 		tip	=> _"Enqueue filter",
 		activate=> sub { ::EnqueueFilter( ::GetFilter($_[0]) ); },
 	},
 	ResetFilter =>
 	{	class	=> 'Layout::Button',
 		size	=> 'menu',
-		stock	=> 'gtk-clear',
+		stock	=> 'edit-clear-all-symbolic',
 		tip	=> _"Reset filter",
 		activate=> sub { ::SetFilter($_[0],undef); },
 	},
@@ -611,13 +611,13 @@ our %Widgets=
 	},
 	Choose =>
 	{	class	=> 'Layout::Button',
-		stock	=> 'gtk-add',
+		stock	=> 'list-add-symbolic',
 		tip	=> _"Choose Artist/Album/Song",
 		activate=> sub { Layout::Window->new('Search'); },
 	},
 	ChooseRandAlbum =>
 	{	class	=> 'Layout::Button',
-		stock	=> 'gmb-random-album',
+		stock	=> 'media-playlist-shuffle-symbolic',
 		tip	=> _"Choose Random Album",
 		options => 'action',
 		activate=> sub { my $al=AA::GetAAList('album'); my $r=int rand(@$al); my $key=$al->[$r]; my $list=AA::GetIDs('album',$key); if (my $ac=$_[0]{action}) { ::DoActionForList($ac,$list); } else { my $ID=::FindFirstInListPlay($list); ::Select( song => $ID)}; },
@@ -656,7 +656,7 @@ our %Widgets=
 	},
 	ShuffleList	=>
 	{	class	=> 'Layout::Button',
-		stock	=> 'gmb-shuffle',
+		stock	=> 'media-playlist-shuffle-symbolic',
 		size	=> SIZE_FLAGS,
 		tip	=> _"Shuffle list",
 		activate=> sub { my $songarray= ::GetSongArray($_[0]) || return; $songarray->Shuffle; },
@@ -666,7 +666,7 @@ our %Widgets=
 	},
 	EmptyList	=>
 	{	class	=> 'Layout::Button',
-		stock	=> 'gtk-clear',
+		stock	=> 'edit-clear-symbolic',
 		size	=> SIZE_FLAGS,
 		tip	=> _"Empty list",
 		activate=> sub { my $songarray= ::GetSongArray($_[0]) || return; $songarray->Replace(); },
@@ -682,7 +682,7 @@ our %Widgets=
 	},
 	Fullscreen	=>
 	{	class	=> 'Layout::Button',
-		stock	=> 'gtk-fullscreen',
+		stock	=> 'view-fullscreen-symbolic',
 		tip	=> _"Toggle fullscreen mode",
 		text	=> _"Fullscreen",
 		activate=> \&::ToggleFullscreenLayout,
@@ -2472,10 +2472,10 @@ package Layout::NoteBook;
 use base 'Gtk3::Notebook';
 
 our @contextmenu=
-(	{ label => _"New list",		code => sub { $_[0]{self}->newtab('EditList',1,{songarray=>''}); },	type=> 'L', stockicon => 'gtk-add', },
-	{ label => _"Open Queue",	code => sub { $_[0]{self}->newtab('QueueList',1); },			type=> 'L', stockicon => 'gmb-queue',
+(	{ label => _"New list",		code => sub { $_[0]{self}->newtab('EditList',1,{songarray=>''}); },	type=> 'L', stockicon => 'list-add-symbolic', },
+	{ label => _"Open Queue",	code => sub { $_[0]{self}->newtab('QueueList',1); },			type=> 'L', stockicon => 'view-list-symbolic',
 		test => sub { !grep $_->{name} eq 'QueueList', $_[0]{self}->get_children } },
-	{ label => _"Open Playlist",	code => sub { $_[0]{self}->newtab('PlayList',1); },			type=> 'L', stockicon => 'gtk-media-play',
+	{ label => _"Open Playlist",	code => sub { $_[0]{self}->newtab('PlayList',1); },			type=> 'L', stockicon => 'media-playback-start-symbolic',
 		test => sub { !grep $_->{name} eq 'PlayList', $_[0]{self}->get_children } },
 	{ label => _"Open existing list", code => sub { $_[0]{self}->newtab('EditList',1, {songarray=>$_[1]}); },	type=> 'L',
 		submenu => sub { my %h; $h{ $_->{array}->GetName }=1 for grep $_->{name}=~m/^EditList\d*$/, $_[0]{self}->get_children; return [grep !$h{$_}, ::GetListOfSavedLists()]; } },
@@ -2487,7 +2487,7 @@ our @contextmenu=
 	},
 	{ label => _"Delete list", code => sub { $_[0]{page}->DeleteList; },	type=> 'L',  istrue=>'page',	test => sub { $_[0]{page}{name}=~m/^EditList\d*$/; } },
 	{ label => _"Rename",	code => \&pagerename_cb,				istrue => 'rename',},
-	{ label => _"Close",	code => sub { $_[0]{self}->close_tab($_[0]{page},1); },	istrue => 'close',	stockicon=> 'gtk-close',},
+	{ label => _"Close",	code => sub { $_[0]{self}->close_tab($_[0]{page},1); },	istrue => 'close',	stockicon=> 'window-close-symbolic',},
 );
 
 our @DefaultOptions=
@@ -2528,7 +2528,7 @@ sub new
 	{	$self->{blacklist}{$_}=undef for split / +/, $bl;
 	}
 	if ($opt->{typesubmenu} && $opt->{newbutton} && $opt->{newbutton} ne 'none') # add a button next to the tabs to show new-tab menu
-	{	my $button= ::NewIconButton('gtk-add');
+	{	my $button= ::NewIconButton('tab-new-symbolic');
 		$button->signal_connect(button_press_event => \&newbutton_cb);
 		$button->signal_connect(clicked => \&newbutton_cb);
 		$button->show_all;
@@ -2632,7 +2632,7 @@ sub Pack
 		$close->set_can_focus(0);
 		::weaken( $close->{page}=$wg );
 		$close->signal_connect(clicked => sub {my $page=$_[0]{page}; my $self=$page->get_parent; $self->close_tab($page,1);});
-		$close->add(Gtk3::Image->new_from_file(::PIXPATH.'smallclosetab.png'));
+		$close->add(Gtk3::Image->new_from_stock('window-close-symbolic','menu'));
 	}
 	my $tab= Gtk3::Box->new( ($angle%180 ? 'vertical' : 'horizontal'),0 );
 	my @icons= $angle%180 ? ($close,0,$icon,4) : ($icon,4,$close,0);
@@ -4134,17 +4134,17 @@ package Layout::PictureBrowser;
 use base 'Gtk3::Box';
 
 our @toolbar=
-(	{ stockicon=> 'gmb-view-list',	label=>_"Show file list",  toggleoption=>'self/show_list',  cb=> sub { $_[0]{self}->update_showhide; }, },
-	{ stockicon=> 'gtk-zoom-in',	label=>_"Zoom in",	cb=> sub { $_[0]{view}->change_zoom('+'); },	},
-	{ stockicon=> 'gtk-zoom-out',	label=>_"Zoom out",	cb=> sub { $_[0]{view}->change_zoom('-'); },	},
-	{ stockicon=> 'gtk-zoom-100',	label=>_"Zoom 1:1",	cb=> sub { $_[0]{view}->change_zoom(1); },	},
-	{ stockicon=> 'gtk-zoom-fit',	label=>_"Zoom to fit",	cb=> sub { $_[0]{view}->set_zoom_fit; },	},
-	{ stockicon=> 'gtk-fullscreen',	label=>_"Fullscreen",	cb=> sub { $_[0]{view}->set_fullscreen(1); },	},
-#	{ stockicon=> 'gtk-go-back',	label=>_"Previous picture",		cb=> sub { $_[0]{self}->change_file(-1); },	},
-#	{ stockicon=> 'gtk-go-forward',	label=>_"Next picture",			cb=> sub { $_[0]{self}->change_file(1); },	},
-#	{ stockicon=> 'gtk-',		label=>_"Rotate clockwise",		cb=> sub { $_[0]{view}->rotate(1); },	},
-#	{ stockicon=> 'gtk-',		label=>_"Rotate counterclockwise",	cb=> sub { $_[0]{view}->rotate(-1); },	},
-	{ stockicon=> 'gtk-jump-to',	label=> sub { $_[0]{self}{group} eq 'Play' ? _"Follow playing song" : _"Follow selected song"; },
+(	{ stockicon=> 'view-list-symbolic',		label=>_"Show file list",  toggleoption=>'self/show_list',  cb=> sub { $_[0]{self}->update_showhide; }, },
+	{ stockicon=> 'zoom-in-symbolic',		label=>_"Zoom in",	cb=> sub { $_[0]{view}->change_zoom('+'); },	},
+	{ stockicon=> 'zoom-out-symbolic',		label=>_"Zoom out",	cb=> sub { $_[0]{view}->change_zoom('-'); },	},
+	{ stockicon=> 'zoom-original-symbolic',		label=>_"Zoom 1:1",	cb=> sub { $_[0]{view}->change_zoom(1); },	},
+	{ stockicon=> 'zoom-fit-best-symbolic',		label=>_"Zoom to fit",	cb=> sub { $_[0]{view}->set_zoom_fit; },	},
+	{ stockicon=> 'view-fullscreen-symbolic',	label=>_"Fullscreen",	cb=> sub { $_[0]{view}->set_fullscreen(1); },	},
+#	{ stockicon=> 'go-last-symbolic',		label=>_"Previous picture",		cb=> sub { $_[0]{self}->change_file(-1); },	},
+#	{ stockicon=> 'go-next-symbolic',		label=>_"Next picture",			cb=> sub { $_[0]{self}->change_file(1); },	},
+#	{ stockicon=> 'object-rotate-right-symbolic',	label=>_"Rotate clockwise",		cb=> sub { $_[0]{view}->rotate(1); },	},
+#	{ stockicon=> 'object-rotate-left-symbolic',	label=>_"Rotate counterclockwise",	cb=> sub { $_[0]{view}->rotate(-1); },	},
+	{ stockicon=> 'go-jump-symbolic',		label=> sub { $_[0]{self}{group} eq 'Play' ? _"Follow playing song" : _"Follow selected song"; },
 	  toggleoption=>'self/follow',	cb=> sub { $_[0]{self}->queue_song_changed; },
 	},
 );

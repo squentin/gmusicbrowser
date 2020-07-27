@@ -767,9 +767,9 @@ sub new
 	$self->{check_re}=	my $check_re=	Gtk3::CheckButton->new(_"Use default regular expression");
 	$self->{error}=		my $error=	Gtk3::Label->new;
 	$self->{preview}=	my $preview=	Gtk3::Label->new;
-	$self->{remove_button}=	my $button_del= ::NewIconButton('gtk-remove',_"Remove");
-	$self->{add_button}=	my $button_add= ::NewIconButton('gtk-save',_"Save");
-	my $button_new= ::NewIconButton('gtk-new', _"New");
+	$self->{remove_button}=	my $button_del= ::NewIconButton('list-remove-symbolic',_"Remove");
+	$self->{add_button}=	my $button_add= ::NewIconButton('document-save-symbolic',_"Save");
+	my $button_new= ::NewIconButton('list-add-symbolic', _"New");
 	$button_del->signal_connect(clicked=>\&button_cb,'remove');
 	$button_add->signal_connect(clicked=>\&button_cb,'save');
 	$button_new->signal_connect(clicked=>\&button_cb,'new');
@@ -1210,7 +1210,7 @@ sub new
 	$self->{field}=$field;
 	$self->{ID}=$ID;
 	my $button= Gtk3::Button->new;
-	my $add= ::NewIconButton('gtk-add');
+	my $add= ::NewIconButton('list-add-symbolic');
 	my $entry= $self->{entry}= Gtk3::Entry->new;
 	my $label= $self->{label}= Gtk3::Label->new;
 	$label->set_ellipsize('end');
@@ -1305,7 +1305,7 @@ sub new
 	$self->{field}=$field;
 	my $sg= Gtk3::SizeGroup->new('horizontal');
 	my $entry= $self->{entry}= Gtk3::Entry->new;
-	my $add= ::NewIconButton('gtk-add');
+	my $add= ::NewIconButton('list-add-symbolic');
 	my $removeall= ::NewIconButton('gtk-clear', _"Remove all", \&clear);
 	$add->signal_connect( button_press_event => sub { add_entry_text_cb($_[0]); $_[0]->grab_focus;1; } );
 	$add->signal_connect( clicked => \&add_entry_text_cb );
@@ -1521,9 +1521,9 @@ sub new
 	$view->signal_connect(drag_leave => sub { delete $_[0]{dnd_message}; });
 	$self->signal_connect(destroy=> sub { my $self=shift; $self->{drop_job}->Abort if $self->{drop_job}; });
 
-	my $button_del= ::NewIconButton('gtk-remove', _"Remove picture");
-	my $button_set= ::NewIconButton('gtk-open',_"Set picture");
-	my $button_new= $self->{button_new}= ::NewIconButton('gtk-add', _"Add picture");
+	my $button_del= ::NewIconButton('list-remove-symbolic', _"Remove picture");
+	my $button_set= ::NewIconButton('folder-pictures-symbolic',_"Set picture");
+	my $button_new= $self->{button_new}= ::NewIconButton('list-add-symbolic', _"Add picture");
 	my $combo_type= $self->{combo_type}= Gtk3::ComboBoxText->new;
 	my $entry_desc= $self->{entry_desc}= Gtk3::Entry->new;
 	my $info_label= $self->{info_label}= Gtk3::Label->new;
@@ -1989,7 +1989,7 @@ sub new
 	$self->add($sw);
 
 	if (my $list=$tagtype->{addlist})
-	{	my $addbut=::NewIconButton('gtk-add',_"add");
+	{	my $addbut=::NewIconButton('list-add-symbolic',_"add");
 		my $addlist= Gtk3::ComboBoxText->new;
 		my $hbox= Gtk3::HBox->new(FALSE,8);
 		$hbox->pack_start($_,FALSE,FALSE,0) for $addlist,$addbut;
@@ -2074,7 +2074,7 @@ sub addrow
 
 	my $delbut= Gtk3::Button->new;
 	$delbut->set_relief('none');
-	$delbut->add(Gtk3::Image->new_from_stock('gtk-remove','menu'));
+	$delbut->add(Gtk3::Image->new_from_stock('list-remove-symbolic','menu'));
 	$table->attach($delbut,0,1,$row,$row+1,'shrink','shrink',1,1);
 	$delbut->signal_connect( clicked => sub
 		{ $widget->{deleted}=1;

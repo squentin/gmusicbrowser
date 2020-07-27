@@ -2838,7 +2838,7 @@ sub PrefFields	#preference dialog for fields
 		$treeview->set_cursor($store->get_path($iter));
 	    });
 
-	my $newcst=::NewIconButton('gtk-add', _"New custom field", sub
+	my $newcst=::NewIconButton('list-add-symbolic', _"New custom field", sub
 		{	my $iter=$store->append($store->get_iter_from_string($custom_root));
 			$store->set($iter,0,'',1,'',2,::TRUE);
 			my $path=$store->get_path($iter);

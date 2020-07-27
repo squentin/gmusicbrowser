@@ -199,8 +199,8 @@ sub new {
 	$statbox->pack_start($self->{ratingpic},0,0,2);
 
 	# "Refresh", "save" and "search" buttons
-	my $refreshbutton = ::NewIconButton('gtk-refresh', undef, sub { song_changed($_[0],'force'); }, "none", _"Refresh");
-	my $savebutton	  = ::NewIconButton('gtk-save', undef, sub
+	my $refreshbutton = ::NewIconButton('view-refresh-symbolic', undef, sub { song_changed($_[0],'force'); }, "none", _"Refresh");
+	my $savebutton	  = ::NewIconButton('document-save-symbolic', undef, sub
 		{my $self= $_[0]->GET_ancestor; save_review(::GetSelID($self),$self->{fields})}, "none", _"Save review");
 	$savebutton->show_all;
 	$savebutton->set_no_show_all(1);
@@ -210,7 +210,7 @@ sub new {
 
 	my $searchbutton= Gtk3::ToggleButton->new;
 	$searchbutton->set_relief('none');
-	$searchbutton->add(Gtk3::Image->new_from_stock('gtk-find','menu'));
+	$searchbutton->add(Gtk3::Image->new_from_stock('edit-find-symbolic','menu'));
 	$searchbutton->signal_connect(clicked => sub {my $self= $_[0]->GET_ancestor;
 		if ($_[0]->get_active()) {$self->manual_search()} else {$self->song_changed()}});
 	my $buttonbox= Gtk3::HBox->new;
@@ -253,9 +253,9 @@ sub new {
 	my $searchview= Gtk3::VBox->new;
 	$self->{search}= my $search  = Gtk3::Entry->new;
 	$search->set_tooltip_text(_"Enter album name");
-	my $Bsearch = ::NewIconButton('gtk-find', _"Search");
-	my $Bok     = Gtk3::Button->new_from_stock('gtk-ok');
-	my $Bcancel = Gtk3::Button->new_from_stock('gtk-cancel');
+	my $Bsearch = ::NewIconButton('edit-find-symbolic', _"Search");
+	my $Bok     = Gtk3::Button->new_from_stock('dialog-ok');
+	my $Bcancel = Gtk3::Button->new_from_stock('dialog-cancel');
 	$Bok    ->set_size_request(80, -1);
 	$Bcancel->set_size_request(80, -1);
 	# Year is a 'Glib::String' to avoid printing "0" when year is missing. Caveat: will give wrong sort order for albums released before year 1000 or after year 9999 :)
