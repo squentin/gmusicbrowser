@@ -109,11 +109,11 @@ prepackage : all
 	mkdir -p dist/
 
 dist: prepackage
-	tar -czf dist/$(PACKAGE)-$(VERSION).tar.gz . --transform=s/^[.]/$(PACKAGE)-$(VERSION)/ --exclude=\*~ --exclude=.git\* --exclude=.\*swp --exclude=./dist && echo wrote dist/$(PACKAGE)-$(VERSION).tar.gz
+	tar -czf dist/$(PACKAGE)-$(VERSION).tar.gz --transform=s/^[.]/$(PACKAGE)-$(VERSION)/ --exclude=\*~ --exclude=.git\* --exclude=.\*swp --exclude=./dist . && echo wrote dist/$(PACKAGE)-$(VERSION).tar.gz
 
 # release : same as dist, but exclude debian/ folder
 release: prepackage
-	tar -czf dist/$(PACKAGE)-$(VERSION).tar.gz . --transform=s/^[.]/$(PACKAGE)-$(VERSION)/ --exclude=\*~ --exclude=.git\* --exclude=.\*swp --exclude=./dist --exclude=./debian && echo wrote dist/$(PACKAGE)-$(VERSION).tar.gz
+	tar -czf dist/$(PACKAGE)-$(VERSION).tar.gz --transform=s/^[.]/$(PACKAGE)-$(VERSION)/ --exclude=\*~ --exclude=.git\* --exclude=.\*swp --exclude=./dist --exclude=./debian . && echo wrote dist/$(PACKAGE)-$(VERSION).tar.gz
 
 
 update_icon_cache = gtk-update-icon-cache -f -t $(iconsdir)
