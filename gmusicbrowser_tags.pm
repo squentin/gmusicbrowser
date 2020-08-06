@@ -1882,7 +1882,7 @@ INIT
 	fmps_lyrics	=> [_"Lyrics",14,'L'],
   };
   my $lyrics3v2_types=
-  {	LYR => [_"Lyrics",7,'M'],
+  {	LYR => [_"Lyrics",7,'L'],
 	INF => [_"Info",6,'M'],
 	AUT => [_"Author",5],
 	EAL => [_"Album",4],
@@ -1897,7 +1897,7 @@ INIT
 	"\xA9cmt" => [_"Comment",12,'M'],
 	"\xA9gen" => [_"Genre",10],
 	"\xA9wrt" => [_"Author",14],
-	"\xA9lyr" => [_"Lyrics",50],
+	"\xA9lyr" => [_"Lyrics",50,'L'],
 	"\xA9too" => [_"Encoder",51],
 	'----'	  => [_"Custom",52,'ttt'],
 	trkn	  => [_"Track",6],
