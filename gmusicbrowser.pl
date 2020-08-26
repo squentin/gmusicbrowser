@@ -8004,7 +8004,7 @@ sub new
 	$self->add_button('gtk-cancel' => 'none');
 	if (defined $name && $name ne '')
 	{	my $button=::NewIconButton('gtk-save', ::__x( _"save as '{name}'", name => $name) );
-		$button->can_default(::TRUE);
+		$button->set_can_default(::TRUE);
 		$self->add_action_widget( $button,'ok' );
 		$self->{save_name}=$name;
 	}
