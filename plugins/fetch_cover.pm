@@ -297,17 +297,23 @@ sub parse_googlei
 	$searchcontext->{baseurl}||= $pageurl;
 	$searchcontext->{pagecount}++;
 	my @list;
-	for my $res (split /<div class="rg_meta[^"]*"[^>]*>/, $result)
-	{	$res=~s/(?<!\\)\\"/\\u0022/g; #escape \" to make extraction simpler, not perfect
-		next unless $res=~m#"ou":"(http[^"]+)"#i;
-		my $url=$1;
-		#$url=~s/%([0-9A-Fa-f]{2})/chr hex($1)/gie;
-		#$searchcontext->{rescount}++;
-		my $preview= $res=~m/"tu":"([^"]+)"/ ? $1 : undef;
-		my $ref= $res=~m/"ru":"([^"]+)"/ ? $1 : undef;
-		my $desc= $res=~m/"pt":"([^"]+)"/ ? Encode::decode('utf8',$1) : undef;
-		for ($url,$desc,$ref,$preview) { s/\\u([0-9A-F]{4})/chr(hex($1))/eig; } #FIXME maybe use proper json decoding library
-		push @list, {url => $url, previewurl =>$preview, desc => $desc, referer=>$ref };
+#	for my $res (split /<div class="rg_meta[^"]*"[^>]*>/, $result)
+#	{	$res=~s/(?<!\\)\\"/\\u0022/g; #escape \" to make extraction simpler, not perfect
+#		next unless $res=~m#"ou":"(http[^"]+)"#i;
+#		my $url=$1;
+#		#$url=~s/%([0-9A-Fa-f]{2})/chr hex($1)/gie;
+#		#$searchcontext->{rescount}++;
+#		my $preview= $res=~m/"tu":"([^"]+)"/ ? $1 : undef;
+#		my $ref= $res=~m/"ru":"([^"]+)"/ ? $1 : undef;
+#		my $desc= $res=~m/"pt":"([^"]+)"/ ? Encode::decode('utf8',$1) : undef;
+#		push @list, {url => $url, previewurl =>$preview, desc => $desc, referer=>$ref };
+#	}
+	$result=~s/\n//g;
+	while ($result=~m#"(https://encrypted-tbn\d.gstatic.com/images\?q[^"]+)",\d+,\d+\],\["(http[^"]+)".+?"(http[^"]+)","([^"]+)"#g)
+	{	my ($preview,$url,$ref,$desc)=($1,$2,$3,$4);
+		for ($url,$preview,$desc,$ref) { s/\\u([0-9A-F]{4})/chr(hex($1))/eig; } #FIXME maybe use proper json decoding library
+		# $desc should be decoded properly, but Encode::decode('utf8',$desc) sometimes complain about wide characters, not that important anyway
+		push @list, {url => $url, previewurl =>$preview, desc => $desc, referer=>$ref  };
 	}
 	my $nexturl= $searchcontext->{baseurl}."&ijn=".$searchcontext->{pagecount};
 	$nexturl=undef unless @list;
