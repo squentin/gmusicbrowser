@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2009 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2009,2020 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -7,6 +7,10 @@
 
 #http://xiph.org/vorbis/doc/framing.html
 #http://xiph.org/vorbis/doc/v-comment.html
+#opus:
+# https://tools.ietf.org/html/rfc7845.html
+# https://wiki.xiph.org/OggOpus
+
 
 package Tag::OGG;
 
@@ -109,9 +113,10 @@ INIT
 # comments	-> hash of arrays (lowercase keys)
 # CommentsOrder -> list of keys (mixed-case keys)
 # commentpack_size
-# vorbis_string
+# vendor_string
 # stream_vers
 # end
+# is_opus
 
 
 sub new
@@ -137,17 +142,24 @@ sub new
     	_read_packet($self,0) unless $self->{end};
 	warn "file truncated or corrupted.\n" unless $self->{end};
 
-	#calulate length
+	# calculate length
 	last unless $self->{info}{rate};# && $self->{end};
 	my @granule=unpack 'C*',$self->{granule};
-	my $l=0;
-	$l=$l*256+$_ for reverse @granule;
-	$self->{info}{seconds}=my$s=$l/$self->{info}{rate};
+	my $samples=0;
+	$samples= $samples*256+$_ for reverse @granule;
+	$samples-= $self->{info}{preskip} if $self->{is_opus};
+	#FIXME should substract firstgranule (though it's usually 0)
+	my $rate= $self->{is_opus} ? 48000 : $self->{info}{rate}; # opus always uses 48000Hz for granule position
+	$self->{info}{seconds}= $samples / $rate;
+
+	# calculate bitrate, excluding the metadata packet
+	my $audiosize= (-s $file) - $self->{commentpack_size};
+	$self->{info}{bitrate_calculated}= 8*$audiosize / $self->{info}{seconds};
     }
 
     $self->_close;
     unless ($self->{info} && $self->{comments})
-    {	warn "error, can't read file or not a valid ogg file\n";
+    {	warn "error, can't read file or not a valid ogg or opus file\n";
 	return undef;
     }
     return $self;
@@ -191,6 +203,7 @@ sub write_file
 {	my $self=shift;
 	my $newcom_packref=_PackComments($self);
 	#warn "old size $self->{commentpack_size}, need : ".length($$newcom_packref)."\n";
+	# 1. if enough room: write in-place
 	if ( $self->{commentpack_size} >= length $$newcom_packref)
 	{	warn "in place editing.\n";
 		my $left=length $$newcom_packref;
@@ -211,6 +224,8 @@ sub write_file
 		$self->_close;
 		return;
 	}
+
+	# 2. if not enough room: create new file and replace old file
 	my $INfh=$self->_open or return;
 	my $OUTfh=$self->_openw(1) or return;	#open .TEMP file
 
@@ -227,7 +242,13 @@ sub write_file
 	#concatenate newly generated comment packet and setup packet from the original file in $data, and compute the segments in @segments
 	my $data;
 	my @segments;
-	for my $packref ( $newcom_packref , _read_packet($self,PACKET_SETUP) )
+	my @packets= ($newcom_packref);
+	unless ($self->{is_opus})
+	{	my $setup= _read_packet($self,PACKET_SETUP);
+		die "ogg error: can't find setup packet\n" unless $setup;
+		push @packets, $setup;
+	}
+	for my $packref (@packets)
 	{	$data.=$$packref;
 		my $size=length $$packref;
 		push @segments, (255)x int($size/255), $size%255;
@@ -307,18 +328,36 @@ sub _ReadPage
 sub _ReadInfo
 {	my $self=shift;
 	#$self->{startaudio}=0;
-	# 1) [vorbis_version] = read 32 bits as unsigned integer
-	# 2) [audio_channels] = read 8 bit integer as unsigned
-	# 3) [audio_sample_rate] = read 32 bits as unsigned integer
-	# 4) [bitrate_maximum] = read 32 bits as signed integer
-	# 5) [bitrate_nominal] = read 32 bits as signed integer
-	# 6) [bitrate_minimum] = read 32 bits as signed integer
-	# 7) [blocksize_0] = 2 exponent (read 4 bits as unsigned integer)
-	# 8) [blocksize_1] = 2 exponent (read 4 bits as unsigned integer)
-	# 9) [framing_flag] = read one bit
 	if ( my $packref=_read_packet($self,PACKET_INFO) )
 	{	my %info;
-		@info{qw/version channels rate bitrate_upper bitrate_nominal bitrate_lower/}= unpack 'x7 VCV V3 C',$$packref;
+		if ($self->{is_opus})
+		{	@info{qw/version channels preskip rate gain/} = unpack 'x8 C C v V s<', $$packref; # s< force little-endian on s
+			if ($info{version}>15) { warn "opus version '$info{version}' too high: error or probably incompatible, aborting.\n"; return undef } # "SHOULD assume any stream with a version number '16' or greater is incompatible"
+
+			#1.  Magic Signature 'OpusHead'
+			#2.  Version (8 bits, unsigned)
+			#3.  Output Channel Count 'C' (8 bits, unsigned)
+			#4.  Pre-skip (16 bits, unsigned, little endian)
+			#5.  Input Sample Rate (32 bits, unsigned, little endian)
+			#6.  Output Gain (16 bits, signed, little endian)
+			#7.  Channel Mapping Family (8 bits, unsigned)
+			#8.  Channel Mapping Table
+		}
+		else
+		{	@info{qw/version channels rate bitrate_upper bitrate_nominal bitrate_lower/}= unpack 'x7 VCV V3 C',$$packref;
+			if ($info{version}>0) { warn "ogg version '$info{version}' unknown, might not work\n" }
+
+			# 1) [vorbis_version] = read 32 bits as unsigned integer
+			# 2) [audio_channels] = read 8 bit integer as unsigned
+			# 3) [audio_sample_rate] = read 32 bits as unsigned integer
+			# 4) [bitrate_maximum] = read 32 bits as signed integer
+			# 5) [bitrate_nominal] = read 32 bits as signed integer
+			# 6) [bitrate_minimum] = read 32 bits as signed integer
+			# 7) [blocksize_0] = 2 exponent (read 4 bits as unsigned integer)
+			# 8) [blocksize_1] = 2 exponent (read 4 bits as unsigned integer)
+			# 9) [framing_flag] = read one bit
+
+		}
 		return \%info;
 	}
 	else
@@ -331,16 +370,19 @@ sub _ReadComments
 {	my $self=$_[0];
 	if ( my $packref= _read_packet($self,PACKET_COMMENT) )
 	{	$self->{commentpack_size}=length $$packref;
-		my ($vstring,@comlist)=eval { unpack 'x7 V/a V/(V/a)',$$packref; };
+		my $idlength= $self->{is_opus} ? 8 : 7;
+		my ($vstring,@comlist)=eval { unpack "x$idlength V/a V/(V/a)",$$packref; };
 		if ($@) { warn "Comments corrupted\n"; return undef; }
 		# Comments vendor strings I have found
 		# 'Xiph.Org libVorbis I 20030909' : 1.0.1
 		# 'Xiph.Org libVorbis I 20020717' : 1.0 release of libvorbis
 		# 'Xiphophorus libVorbis I 200xxxxx' : 1.0_beta1 to 1.0_rc3
 		# 'AO; aoTuV b3 [20041120] (based on Xiph.Org's libVorbis)'
-		$self->{vorbis_string}=$vstring;
-		if ($::debug && $vstring!~m/^Xiph.* libVorbis I (\d{8})/)
-		 { warn "unknown comments vendor string : $vstring\n"; }
+		$self->{vendor_string}=$vstring;
+		if ($::debug)
+		{	warn "unknown comments vendor string : $vstring\n" if !$self->{is_opus} && $vstring!~m/^Xiph.* libVorbis I (\d{8})/
+									   or  $self->{is_opus} && $vstring!~m/^libopus/;
+		}
 		my %comments;
 		my @order;
 		$self->{CommentsOrder}=\@order;
@@ -382,12 +424,13 @@ sub _PackComments
 		$key=~tr/\x20-\x7D/?/c; $key=~tr/=/?/; #replace characters that are not allowed by '?'
 		if (uc$key eq 'METADATA_BLOCK_PICTURE' && ref $val)
 		{	$val= Tag::Flac::_PackPicture($val);
-			$val= encode_base64($$val);
+			$val= encode_base64($$val,''); #'' so that it doesn't insert line breaks and add one at the end (opusinfo complains about it)
 		}
 		push @comments,$key.'='.encode('utf8',$val);
 	}
-	my $packet=pack 'Ca6 V/a* V (V/a*)*',PACKET_COMMENT,'vorbis',$self->{vorbis_string},scalar @comments, @comments;
-	$packet.="\x01"; #framing_flag
+	my $packet= $self->{is_opus} ? 'OpusTags' : pack('C',PACKET_COMMENT).'vorbis';
+	$packet.= pack 'V/a* V (V/a*)*', $self->{vendor_string},scalar @comments, @comments;
+	$packet.="\x01" unless $self->{is_opus}; #framing_flag, only for ogg
 	return \$packet;
 }
 
@@ -455,7 +498,7 @@ sub _read_packet
 	my $packet;
 	do
 	{ my $lpacket=0;
-	  my $seg_table=$self->{seg_table};
+	  my $seg_table=$self->{seg_table}; # Page segment table
 	  my $lastseg;
 	  until ($lastseg)
 	  {	my $size;
@@ -471,10 +514,29 @@ sub _read_packet
 	  }
 
 	} until ($wantedtype || $self->{end});
-	my ($type,$vorbis)=unpack 'Ca6',$packet;
-	warn "read packet : $type $vorbis length=".length($packet)."\n" if $::debug;
-	if ( $type==$wantedtype && $vorbis eq 'vorbis')	{ return \$packet; }
-	else { return undef; }
+
+	if ($wantedtype)
+	{	return undef unless unpack "b",$packet; #audio packets have first bit as 0, if that's the case return as wantedtype are not audio packets
+		if (!defined $self->{is_opus})
+		{	# determine if file is ogg or opus
+			$self->{is_opus}= my $opus=	$packet=~m/^[\x01\x03\x05]vorbis/ ? 0 :
+							$packet=~m/^Opus(?:Head|Tags)/    ? 1 : undef;
+			return unless defined $opus;
+		}
+		if ($self->{is_opus})
+		{	return undef unless $packet=~m/^Opus(Head|Tags)/;
+			warn "read packet : ".substr($packet,0,8)." length=".length($packet)."\n" if $::debug;
+			return \$packet if $wantedtype==PACKET_INFO    && $1 eq 'Head'
+					or $wantedtype==PACKET_COMMENT && $1 eq 'Tags';
+		}
+		else
+		{	my ($type,$vorbis)=unpack 'Ca6',$packet;
+			warn "read packet : $type $vorbis length=".length($packet)."\n" if $::debug;
+			return \$packet if $type==$wantedtype && $vorbis eq 'vorbis';
+		}
+		return undef;
+
+	}
 }
 
 sub _read_page_header
