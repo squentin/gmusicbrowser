@@ -1243,7 +1243,7 @@ our %timespan_menu=
 	category=>'audio',
  },
  bitrate=>
- {	name	=> _"Bitrate",		width => 90,	flags => 'fgarscp_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
+ {	name	=> _"Bitrate",		width => 90,	flags => 'fgarscp_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal|bitrate_calculated',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
 	display	=> '::replace_fnumber("%d kbps",#_#)',
 	FilterList => {type=>'div.32',},
 	'filterpat:value' => [ round => "%d", unit => 'kbps', default_value=>192 ],

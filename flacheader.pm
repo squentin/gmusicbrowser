@@ -67,7 +67,7 @@ sub new
     {	warn "error, can't read file or not a valid flac file\n";
 	return undef;
     }
-    $self->{info}{bitrate}= $self->{info}{seconds} ? $audiosize*8/$self->{info}{seconds} : 0;
+    $self->{info}{bitrate_calculated}= $self->{info}{seconds} ? $audiosize*8/$self->{info}{seconds} : 0;
     unless ($self->{comments})
     {	$self->{vorbis_string}='gmusicbrowser'; #FIXME
 	$self->{CommentsOrder}=[];
