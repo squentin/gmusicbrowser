@@ -304,7 +304,7 @@ sub barename #filename without extension
 
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
 INIT {%Alias_ext=(mp2=>'mp3', ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
-our @ScanExt= qw/mp3 mp2 ogg oga flac mpc ape wv m4a m4b/;
+our @ScanExt= qw/mp3 mp2 ogg oga flac mpc ape wv m4a m4b opus/;
 
 our ($Verbose,$debug);
 our %CmdLine;
@@ -547,7 +547,7 @@ BEGIN
 {	my $re=join '|', sort map @{ $_->get_extensions }, Gtk3::Gdk::Pixbuf::get_formats();
 	$Image_ext_re=qr/\.(?:$re)$/i;
 }
-our $EmbImage_ext_re= qr/\.(?:mp3|flac|m4a|m4b|ogg|oga)/i; # warning: doesn't force end of string (with a "$") as sometimes needs to include/extract a :\w+ at the end, so need to use it with /$EmbImage_ext_re$/ or /$EmbImage_ext_re(:\w+)?$/
+our $EmbImage_ext_re= qr/\.(?:mp3|flac|m4a|m4b|ogg|oga|opus)/i; # warning: doesn't force end of string (with a "$") as sometimes needs to include/extract a :\w+ at the end, so need to use it with /$EmbImage_ext_re$/ or /$EmbImage_ext_re(:\w+)?$/
 
 ##########
 
@@ -5092,7 +5092,7 @@ sub ChoosePix
 					'gtk-cancel' => 'none');
 
 	FileChooser_add_filters($dialog,
-		[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b *.ogg *.oga' ],
+		[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b *.ogg *.oga *.opus' ],
 		[_"Pictures files",'image/*'],
 		#["Pdf",undef,'*.pdf'],
 		[_"All files",undef,'*'],
