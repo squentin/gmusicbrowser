@@ -344,8 +344,9 @@ sub _ReadInfo
 			#8.  Channel Mapping Table
 		}
 		else
-		{	@info{qw/version channels rate bitrate_upper bitrate_nominal bitrate_lower/}= unpack 'x7 VCV V3 C',$$packref;
+		{	@info{qw/version channels rate bitrate_upper bitrate_nominal bitrate_lower/}= unpack 'x7 VCV l<3 C',$$packref;
 			if ($info{version}>0) { warn "ogg version '$info{version}' unknown, might not work\n" }
+			for (qw/bitrate_upper bitrate_nominal bitrate_lower/) { $info{$_}=undef if $info{$_}<=0; }; # "The fields are meaningful only when greater than zero"
 
 			# 1) [vorbis_version] = read 32 bits as unsigned integer
 			# 2) [audio_channels] = read 8 bit integer as unsigned
