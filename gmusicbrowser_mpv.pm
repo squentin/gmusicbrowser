@@ -71,14 +71,14 @@ sub supported_formats
 {	return () unless $mpv;
 	unless (keys %supported)
 	{for (qx($mpv --ad=help))
-	 {	if	(m/:mp3\s/)	{$supported{mp3}=undef}
-		elsif	(m/:vorbis\s/)	{$supported{oga}=undef}
-		elsif	(m/:mpc\d/)	{$supported{mpc}=undef}
-		elsif	(m/:flac\s/)	{$supported{flac}=undef}
-		elsif	(m/:wavpack\s/) {$supported{wv}=undef}
-		elsif	(m/:ape\s/)	{$supported{ape}=undef}
-		elsif	(m/:aac\s/)	{$supported{m4a}=undef}
-		elsif	(m/opus\s/)	{$supported{opus}=undef}
+	 {	if	(m/\Wmp3\W/i)	{$supported{mp3}=undef}
+		elsif	(m/\Wvorbis\W/i){$supported{oga}=undef}
+		elsif	(m/\Wopus\W/i)	{$supported{opus}=undef}
+		elsif	(m/mpc\d/)	{$supported{mpc}=undef}
+		elsif	(m/flac\s/)	{$supported{flac}=undef}
+		elsif	(m/wavpack\s/)	{$supported{wv}=undef}
+		elsif	(m/ape\s/)	{$supported{ape}=undef}
+		elsif	(m/\Waac\W/i)	{$supported{m4a}=undef}
 	 }
 	}
 	return keys %supported;
