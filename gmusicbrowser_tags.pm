@@ -1585,7 +1585,8 @@ sub fill
 sub make_row_text
 {	my ($self,$nb)=@_;
 	my ($mime,$typeid,$desc,$data)= @{$self->{pix}[$nb]};
-	my $text= $EntryMulti::PICTYPE->[$typeid] || _"Unknown";
+	my $text= $typeid<0 || $typeid>@EntryMulti::PICTYPE ? _"Unknown":
+		  $EntryMulti::PICTYPE->[$typeid];
 	if (defined $desc && length $desc) { $text.=": $desc" }
 	return $text;
 }
