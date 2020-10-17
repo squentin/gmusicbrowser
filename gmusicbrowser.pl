@@ -76,6 +76,10 @@ sub Load_Wnck
   {	my $targets= Glib::Object::Introspection->invoke( 'Gdk', 'DragContext', 'list_targets', $_[0]);
 	return $targets ? @$targets : ();
   }
+  # make 2nd & 3rd arguments optionals
+  sub Gtk3::TreeView::set_cursor
+  {	Glib::Object::Introspection->invoke( 'Gtk', 'TreeView', 'set_cursor', $_[0], $_[1], $_[2] || undef, $_[3] || 0);
+  }
   #fix for curent Gtk3 bindings
   sub Gtk3::Dialog::new
   {	my ($class, $title, $parent, $flags, @rest) = @_;
@@ -8399,7 +8403,7 @@ sub Set
 	if ($firstnewpath->get_depth>1)	{ $firstnewpath->up; $treeview->expand_row($firstnewpath,TRUE); }
 	else	{ $treeview->expand_all }
 	$self->{busy}=0;
-	$treeview->set_cursor( Gtk3::TreePath->new($path_string),undef,FALSE );
+	$treeview->set_cursor( Gtk3::TreePath->new($path_string) );
 }
 
 sub _set_row

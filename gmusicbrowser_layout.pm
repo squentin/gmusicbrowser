@@ -4649,7 +4649,7 @@ sub refresh_treeviews
 			$dirstore->set( $iter, 0,::filename_to_utf8displayname($file), 1,Songs::filename_escape($path.$file),  2,'gtk-directory');
 			if ($oldpath && $oldpath eq $path.$file)	#select and center on previous folder if there
 			{	$folder_center_treepath= $dirstore->get_path($iter);
-				$foldertv->set_cursor($folder_center_treepath,undef,0);
+				$foldertv->set_cursor($folder_center_treepath);
 			}
 			next;
 		}

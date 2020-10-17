@@ -1335,7 +1335,7 @@ sub FollowSong
 		my $afterfirst= !$first || $first->to_string < $rowplaying;
 		my $beforelast= !$last  || $rowplaying < $last->to_string;
 		$tv->scroll_to_cell($path,undef,TRUE,.5,.5) unless $afterfirst && $beforelast;
-		$tv->set_cursor($path,undef,FALSE);
+		$tv->set_cursor($path);
 	}
 	elsif (defined $::SongID)	#Set the song ID even if the song isn't in the list
 	{ ::HasChangedSelID($self->{group},$::SongID); }
@@ -1554,7 +1554,7 @@ sub button_press_cb
 		if ($path && !$sel->path_is_selected($path))
 		{	$sel->unselect_all unless $ctrl_shift;
 			#$sel->select_path($path);
-			$tv->set_cursor($path,undef,::FALSE);
+			$tv->set_cursor($path);
 		}
 		$self->PopupContextMenu;
 		return 1;
@@ -2313,7 +2313,7 @@ sub get_cursor_row
 sub set_cursor_to_row
 {	my ($self,$row)=@_;
 	if ($self->{mode} eq 'list')
-	{	$self->{view}->set_cursor(Gtk3::TreePath->new_from_indices($row),undef,::FALSE);
+	{	$self->{view}->set_cursor(Gtk3::TreePath->new_from_indices($row));
 	}
 	else { $self->{view}->set_cursor_to_row($row); }
 }
