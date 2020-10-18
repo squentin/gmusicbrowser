@@ -1159,7 +1159,7 @@ our %timespan_menu=
  },
  playcount	=>
  {	name	=> _"Play count",	width => 50,	flags => 'fgaescp',	type => 'integer',	letter => 'p',
-	options => 'rw_ userid',
+	options => 'rw_ userid editable',
 	id3v2	=> 'TXXX;FMPS_Playcount;%v&TXXX;FMPS_Playcount_User;%v::%i',
 	vorbis	=> 'FMPS_PLAYCOUNT&FMPS_PLAYCOUNT_USER::%i',
 	ape	=> 'FMPS_PLAYCOUNT&FMPS_PLAYCOUNT_USER::%i',
@@ -1169,7 +1169,6 @@ our %timespan_menu=
 	category=>'stats',
 	alias	=> 'plays',
 	edit_order=> 90,
-	options	=> 'editable',
  },
  skipcount	=>
  {	name	=> _"Skip count",	width => 50,	flags => 'fgaescp',	type => 'integer',	letter => 'k',
