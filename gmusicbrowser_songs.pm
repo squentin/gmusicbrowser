@@ -344,7 +344,7 @@ our %timespan_menu=
 		group		=> '#_# ne',
 		stats		=> '#HVAL#{#_#}=undef;  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
 	},
-	istring => # _much_ faster with case/accent insensitive operations, at the price of double memory
+	istring => # faster with case/accent insensitive operations, at the price of double memory
 	{	parent	=> 'string',
 		_iname	=> '___iname[#ID#]',
 		set	=> '#_# = #VAL#; #_iname#= ::superlc(#VAL#);',
@@ -606,7 +606,7 @@ our %timespan_menu=
 	},
 	'length.div' => { gid_to_display	=> 'my $v=#GID# * #ARG0#; sprintf("%d:%02d", $v/60, $v%60);', },
 	size	=>
-	{	display	=> '( ::format_number( #_#/'. ::MB() .',"%.1f").q( '. _"MB" .') )',
+	{	display	=> '( ::format_number( #_#/'. ::MB() .',"%.1f").q( '. _("MB") .') )',
 		'filter_prep:e'	=> \&::ConvertSize,
 		'filter_prep:>'	=> \&::ConvertSize,
 		'filter_prep:<'	=> \&::ConvertSize,
@@ -719,7 +719,7 @@ our %timespan_menu=
 				# ___free_ : array containing free positions in ___values_ for each size
 	{	parent		=> 'dates',
 		_		=> 'substr(___values_, #index# * #bytes#, #nb# * #bytes#)',
-		index		=> 'vec(___index_,#ID#,32)',	# => max 2**32 songs that share the same number of dates, could maybe use 16 bits instead
+		index		=> 'vec(___index_,#ID#,32)',	# => max 2**32 dates
 		nb		=> 'vec(___nb_,#ID#,16)',	# => max 2**16 dates per song, could maybe use 8 bits instead
 		get_list	=> 'unpack("#packformat#*", #_#)',
 		init		=> '___index_= ___values_= ___nb_ = "";',
@@ -3611,10 +3611,10 @@ sub new_from_string
 sub start_init {$init=1}
 sub updateIDs	#update IDs coming from an older session
 {	my $newIDs=shift;
-	$init=undef;
-	while (my $l=shift @need_update)
+	for my $l (@need_update)
 	{	@$l= grep $_,map $newIDs->[$_], @$l; #IDs start at 1, removed songs get ID=undef and are then removed by the grep $_
 	}
+	$init=undef; @need_update=undef;
 }
 sub build_presence
 {	my $self=$_[0];
@@ -4465,7 +4465,7 @@ INIT
 #Filter object contains :
 # - string :	string notation of the filter
 # - sub    :	ref to a sub which takes a ref to an array of IDs as argument and returns a ref to the filtered array
-# - greponly :	set to 1 if the sub dosn't need to filter the whole list each times -> ID can be tested individualy
+# - greponly :	set to 1 if the sub doesn't need to filter the whole list each times -> ID can be tested individually
 # - fields :	ref to a list of the columns used by the filter
 
 sub new_from_string		#same as ->new, but don't try to _smart_simplify, as it shouldn't be needed, and require fields to be initialized

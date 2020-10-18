@@ -870,7 +870,7 @@ sub sorted_keys		#return keys of $hash sorted by $hash->{$_}{$sort_subkey} or by
 	}
 }
 
-sub WordIn #return true if 1st argument is a word in contained in the 2nd argument (space-separated words)
+sub WordIn #return true if 1st argument is a word contained in the 2nd argument (space-separated words)
 {	return 1 if first {$_[0] eq $_} split / +/,$_[1];
 	return 0;
 }
@@ -2120,7 +2120,7 @@ sub LoadPlugins
 				if ($Plugins{$id})
 				{	last if $Plugins{$id}{loaded} || $Plugins{$id}{version}>=$plug{version};
 				}
-				warn "found plugin $id ($plug{name})\n" if $::debug;
+				warn "found plugin $id ($plug{name}) v$plug{version} in $plug{file}\n" if $::debug;
 				$Plugins{$id}=\%plug;
 				last;
 			}
@@ -4168,7 +4168,7 @@ sub PopupAA
 		  }
 		  else	#multiple artists -> create a submenu for each artist
 		  {	my $menu=Gtk3::Menu->new;
-			for my $artist (keys %art_keys)
+			for my $artist (superlc_sort(keys %art_keys))
 			{	my $item=Gtk3::MenuItem->new_with_label($artist);
 				$item->set_submenu(PopupAA('album', %args, list=> $art_keys{$artist}));
 				$menu->append($item);
@@ -6351,7 +6351,7 @@ sub PrefDialog
 	# turn to $goto page
 	($goto,my $arg)= split /:/,$goto,2;
 	my $notebook= $OptionsDialog->{notebook};
-	if (my $page=$notebook->{pages}{$goto})
+	if (my $page=$notebook->{pages}{lc $goto})
 	{	$notebook->set_current_page($notebook->page_num($page));
 		if ($arg && $page->{gotofunc}) { $page->{gotofunc}->($arg) }
 	}
@@ -7182,11 +7182,11 @@ sub PrefLibrary
 
 	my $sg1=Gtk3::SizeGroup->new('horizontal');
 	$sg1->add_widget($_) for $BScan,$BCheck,$Blengthcheck;
-	my $vbox=Vpack( 1,$label,
+	my $vbox=Vpack( 2,$label,
 			'_',$sw,
 			[$addbut,$rmdbut,'-',$reorg],
-			[$CCheck,'-',$BCheck],
-			[$CScan,'-',$BScan],
+			[0,$CCheck,'-',$BCheck],
+			[0,$CScan,'-',$BScan],
 			$SelectExt,
 			$autoremove,
 			[$lengthcheck,'-',$Blengthcheck],
