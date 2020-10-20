@@ -90,8 +90,8 @@ our %timespan_menu=
 		get_gid		=> 'my $v=#_#; ref $v ? $v : [$v]',
 		gid_to_get	=> '(#GID# ? ___name[#GID#] : "")',
 		gid_to_display	=> '___name[#GID#]',
-		s_sort		=> '___sort{ sprintf("%x", #_#)}',
-		si_sort		=> '___isort{ sprintf("%x", #_#)}',
+		s_sort		=> '___sort{ pack("w", #_#)}',
+		si_sort		=> '___isort{ pack("w", #_#)}',
 		always_first_gid=> 0,
 		's_sort:gid'	=> '___name[#GID#]',
 		'si_sort:gid'	=> '___iname[#GID#]',
@@ -106,8 +106,8 @@ our %timespan_menu=
 				push @ids,$id;
 			}
 			my $val=	@ids<2 ? $ids[0]||0 :
-				(___group{join(" ",map sprintf("%x",$_),@ids)}||= \@ids);
-			___isort{ sprintf("%x",$val) }||= ::superlc( ___sort{ sprintf("%x",$val) }||= join ";",@list );
+				(___group{ pack("w*",@ids) }||= \@ids);
+			___isort{ pack("w",$val) }||= ::superlc( ___sort{ pack("w",$val) }||= join ";",@list );
 			#_#=$val;
 			}',
 		diff		=> 'do {my $v=#_#; my $old=!$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v]; $v=#VAL#; my $new= join "\\x00", @$v; $old ne $new; }', # #VAL# should be a sorted arrayref, as returned by #check#
