@@ -61,9 +61,10 @@ sub Load_Wnck
 }
 
 {no warnings 'redefine';
-  sub Gtk3::Gdk::PixbufLoader::write  # fix for binding not handling gdk_pixbuf_loader_write properly # needs to send patch
-  {	return Glib::Object::Introspection->invoke( 'GdkPixbuf', 'PixbufLoader', 'write', $_[0], [unpack 'C*', $_[1]] );
-  }
+  # fix for binding not handling gdk_pixbuf_loader_write properly prior to Glib::Object::Introspection::VERSION 0.049
+  *Gtk3::Gdk::PixbufLoader::write= sub { return Glib::Object::Introspection->invoke( 'GdkPixbuf', 'PixbufLoader', 'write', $_[0], [unpack 'C*', $_[1]] ); }
+	if $Glib::Object::Introspection::VERSION<0.049;
+
   sub Gtk3::ComboBox::get_active_iter
   {	my ($ok,$iter)= Glib::Object::Introspection->invoke( 'Gtk', 'ComboBox', 'get_active_iter', $_[0]);
 	return $ok ? $iter : undef;
@@ -9534,7 +9535,7 @@ sub load
 		my $pdfpage= $popplerdoc->get_page($n);
 		return $pdfpage;
 	}
-	elsif (!$raw && !($opt{anim_ok} && $size)) # avoid Gtk3::Gdk::PixbufLoader::write if possible as the bindings make it _very_ slow
+	elsif (!$raw && !($opt{anim_ok} && $size)) # avoid Gtk3::Gdk::PixbufLoader::write if possible as the bindings (prior to Glib::Object::Introspection::VERSION 0.049)) made it _very_ slow
 	{	if ($opt{anim_ok})
 		{	my $pic= eval{ Gtk3::Gdk::PixbufAnimation->new_from_file($file); };
 			$pic= $pic->get_static_image if $pic && $pic->is_static_image;
