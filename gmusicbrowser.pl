@@ -76,6 +76,10 @@ sub Load_Wnck
   {	my $targets= Glib::Object::Introspection->invoke( 'Gdk', 'DragContext', 'list_targets', $_[0]);
 	return $targets ? @$targets : ();
   }
+  sub Gtk3::FileChooserWidget::get_uris
+  {	my $uris= Glib::Object::Introspection->invoke( 'Gtk', 'FileChooser', 'get_uris', $_[0]);
+	return $uris ? @$uris : ();
+  }
   # make 2nd & 3rd arguments optionals
   sub Gtk3::TreeView::set_cursor
   {	Glib::Object::Introspection->invoke( 'Gtk', 'TreeView', 'set_cursor', $_[0], $_[1], $_[2] || undef, $_[3] || 0);
@@ -5033,9 +5037,10 @@ sub ChooseDir
 	my @paths;
 	$dialog->show_all;
 	if ($dialog->run eq 'ok')
-	{	for my $path (@{$filechooser->get_uris})
-		{	warn $path;
-			next unless $path=~s#^file://##;
+	{	my @uris= $filechooser->get_uris;
+		@uris= ($filechooser->get_current_folder_uri) unless @uris;
+		for my $path (@uris)
+		{	next unless $path=~s#^file://##;
 			$path=decode_url($path);
 			next unless -e $path;
 			next unless $allowfiles or -d $path;
