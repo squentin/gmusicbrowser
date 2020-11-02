@@ -2794,7 +2794,7 @@ sub PrefFields	#preference dialog for fields
 		for my $field (::sorted_keys($names))
 		{	my $opt= $::Options{Fields_options}{$field};
 			my $def= $Def{$field};
-			my $sensitive= exists $opt->{disable} ? $opt->{disable} : $def->{disable} ? 0 : 1;
+			my $sensitive= exists $opt->{disable} ? !$opt->{disable} : $def->{disable} ? 0 : 1;
 			$store->set( $store->append($parent), 0,$names->{$field}, 1,$field, 2,$editable, 3,$sensitive, 4,$opt->{remove} ); #child
 		}
 		$custom_root= $store->get_string_from_iter($parent) if $cat eq 'custom';
