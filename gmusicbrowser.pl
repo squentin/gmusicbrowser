@@ -7500,6 +7500,7 @@ sub NewPrefLayoutCombo
 sub NewPrefMultiCombo
 {	my ($key,$possible_values_hash,%opt)=@_;
 	my $opthash= $opt{opthash} || \%Options;
+	$opt{empty} //='';
 	my $sep= $opt{separator}|| ', ';
 	my $display_cb= $opt{display} || sub
 	 {	my $values= $opthash->{$key} || [];
