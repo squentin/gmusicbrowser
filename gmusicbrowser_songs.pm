@@ -3152,7 +3152,9 @@ sub Field_fill_option_box
 
 	$vbox->add( ::Vpack(@topack) );
 	$vbox->show_all;
+	$vbox->{skip_update_row}=1;
 	Field_Edit_update($vbox);
+	delete $vbox->{skip_update_row};
 }
 
 sub Field_Edit_update
@@ -3166,6 +3168,7 @@ sub Field_Edit_update
 		next unless $update;
 		$update->({ vbox=>$vbox, opt=>$opt, field=>$field, widget=>$widgets->{$option}, });
 	}
+	return if $vbox->{skip_update_row}; #skip updating treestore, as not needed and cause issues with row-editing not ending, not sure why
 	my $store= $vbox->{store};
 	my $sensitive= (exists $opt->{disable} ? $opt->{disable} : ($Def{$field} && $Def{$field}{disable})) ? 0 : 1;
 	my $iter= $store->get_iter($vbox->{path});
