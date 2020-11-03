@@ -2840,10 +2840,10 @@ sub PrefFields	#preference dialog for fields
 
 	my $newcst=::NewIconButton('gtk-add', _"New custom field", sub
 		{	my $iter=$store->append($store->get_iter_from_string($custom_root));
-			$store->set($iter,PF_NAME,'',PF_ID,'',PF_EDIT,::TRUE);
+			$store->set($iter,PF_NAME,'',PF_ID,'',PF_EDIT,::TRUE, PF_ENABLE,::TRUE);
 			my $path=$store->get_path($iter);
 			$treeview->expand_to_path($path);
-			$treeview->set_cursor($path, $treeview->get_column(0), ::TRUE); #2TO3 FIXME FIXME edit doesn't work
+			$treeview->set_cursor($path, $treeview->get_column(0), ::TRUE);
 		} );
 	my $warning=Gtk3::Label->new;
 	$warning->set_markup('<b>'.::PangoEsc(_"Settings on this page will only take effect after a restart").'</b>');
