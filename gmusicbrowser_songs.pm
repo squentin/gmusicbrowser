@@ -2759,6 +2759,7 @@ sub GroupSub
 	 };
 }
 
+use constant { PF_NAME=>0, PF_ID=>1, PF_EDIT=>2, PF_ENABLE=>3, PF_DELETE=>4 };
 sub PrefFields	#preference dialog for fields
 {	my $store=Gtk3::TreeStore->new('Glib::String','Glib::String','Glib::Boolean','Glib::Boolean','Glib::Boolean');
 	my $treeview=Gtk3::TreeView->new($store);
@@ -2766,7 +2767,7 @@ sub PrefFields	#preference dialog for fields
 	my $rightbox=Gtk3::VBox->new;
 	my $renderer=Gtk3::CellRendererText->new;
 	$treeview->append_column( Gtk3::TreeViewColumn->new_with_attributes
-	 ( 'field name',$renderer,text => 0, editable => 2, sensitive=>3, strikethrough => 4,
+	 ( 'field name',$renderer,text => PF_NAME, 'editable' => PF_EDIT, sensitive=>PF_ENABLE, strikethrough => PF_DELETE,
 	 ));
 
 	my @fields= grep !$Def{$_}{template} && (!$Def{$_}{disable} || ($Def{$_}{options} && $Def{$_}{options}=~m/\bdisable\b/)), keys %Def;
@@ -2790,12 +2791,12 @@ sub PrefFields	#preference dialog for fields
 	{	my $names= $tree{$cat};
 		my $editable= $cat eq 'custom';
 		my $parent= $store->append(undef);
-		$store->set( $parent, 0,$Categories{$cat}[0], 1,'+'.$cat, 3,::TRUE); # category node
+		$store->set( $parent, PF_NAME,$Categories{$cat}[0], PF_ID,'+'.$cat, PF_ENABLE,::TRUE); # category node
 		for my $field (::sorted_keys($names))
 		{	my $opt= $::Options{Fields_options}{$field};
 			my $def= $Def{$field};
 			my $sensitive= exists $opt->{disable} ? !$opt->{disable} : $def->{disable} ? 0 : 1;
-			$store->set( $store->append($parent), 0,$names->{$field}, 1,$field, 2,$editable, 3,$sensitive, 4,$opt->{remove} ); #child
+			$store->set( $store->append($parent), PF_NAME,$names->{$field}, PF_ID,$field, PF_EDIT,$editable, PF_ENABLE,$sensitive, PF_DELETE,$opt->{remove} ); #child
 		}
 		$custom_root= $store->get_string_from_iter($parent) if $cat eq 'custom';
 	}
@@ -2805,7 +2806,7 @@ sub PrefFields	#preference dialog for fields
 		{	my $treeview=shift;
 			my $path=($treeview->get_cursor)[0];
 			my $store=$treeview->get_model;
-			my ($name,$field)=$store->get( $store->get_iter($path), 0,1 );
+			my ($name,$field)=$store->get( $store->get_iter($path), PF_NAME,PF_ID );
 			$rightbox->remove($_) for $rightbox->get_children;
 			if ($field=~m/^\+/) {return} #row is a category
 			return unless $field;
@@ -2821,7 +2822,7 @@ sub PrefFields	#preference dialog for fields
 	$renderer->signal_connect(edited => sub
 	    {	my ($cell,$pathstr,$newname)=@_;
 		my $iter= $store->get_iter_from_string($pathstr);
-		my ($oldname,$field)= $store->get($iter,0,1);
+		my ($oldname,$field)= $store->get($iter,PF_NAME,PF_ID);
 		if ($newname eq '')
 		{	$store->remove($iter) if $oldname eq '';
 			$treeview->set_cursor(Gtk3::TreePath->new($custom_root));
@@ -2833,13 +2834,13 @@ sub PrefFields	#preference dialog for fields
 			#$Def{$field}= { template => 'string', options => $FieldTemplates{string}{options}, category=>'custom', name=>$newname };
 		}
 		$::Options{Fields_options}{$field}{name}= $newname;
-		$store->set($iter, 0,$newname, 1,$field);
+		$store->set($iter, PF_NAME,$newname, PF_ID,$field);
 		$treeview->set_cursor($store->get_path($iter));
 	    });
 
 	my $newcst=::NewIconButton('gtk-add', _"New custom field", sub
 		{	my $iter=$store->append($store->get_iter_from_string($custom_root));
-			$store->set($iter,0,'',1,'',2,::TRUE);
+			$store->set($iter,PF_NAME,'',PF_ID,'',PF_EDIT,::TRUE);
 			my $path=$store->get_path($iter);
 			$treeview->expand_to_path($path);
 			$treeview->set_cursor($path, $treeview->get_column(0), ::TRUE); #2TO3 FIXME FIXME edit doesn't work
@@ -2858,7 +2859,7 @@ sub PrefFields	#preference dialog for fields
 		while ($parent)
 		{	my $child= $store->iter_children($parent);
 			while ($child)
-			{	if ($store->get($child,1) eq $field) { $treeview->set_cursor($store->get_path($child)); return; }
+			{	if ($store->get($child,PF_ID) eq $field) { $treeview->set_cursor($store->get_path($child)); return; }
 				$child= $store->iter_next($child);
 			}
 			$parent= $store->iter_next($parent);
@@ -3168,8 +3169,8 @@ sub Field_Edit_update
 	my $store= $vbox->{store};
 	my $sensitive= (exists $opt->{disable} ? $opt->{disable} : ($Def{$field} && $Def{$field}{disable})) ? 0 : 1;
 	my $iter= $store->get_iter($vbox->{path});
-	$store->set( $iter, 3, $sensitive, 4, $opt->{remove});
-	$store->set( $iter, 0,$opt->{name}, 1,$field) if $opt->{template}; #only for custom fields
+	$store->set( $iter, PF_ENABLE, $sensitive, PF_DELETE, $opt->{remove});
+	$store->set( $iter, PF_NAME,$opt->{name}, PF_ID,$field) if $opt->{template}; #only for custom fields
 }
 
 sub Field_Edit_template
