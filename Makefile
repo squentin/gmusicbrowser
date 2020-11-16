@@ -76,7 +76,7 @@ install: all
 	install -pm 644 pix/tango/*            "$(datadir)/gmusicbrowser/pix/tango/"
 	install -pm 644 pix/oxygen/*           "$(datadir)/gmusicbrowser/pix/oxygen/"
 	install -pDm 644 gmusicbrowser.desktop "$(appdir)/gmusicbrowser.desktop"
-	install -pDm 644 gmusicbrowser.appdata.xml "$(datadir)/appdata/gmusicbrowser.appdata.xml"
+	install -pDm 644 org.gmusicbrowser.metainfo.xml "$(datadir)/metainfo/org.gmusicbrowser.metainfo.xml"
 	install -pDm 644 pix/gmusicbrowser.svg      "$(iconsdir)/scalable/apps/gmusicbrowser.svg"
 	install -pDm 644 pix/gmusicbrowser16x16.png "$(iconsdir)/16x16/apps/gmusicbrowser.png"
 	install -pDm 644 pix/trayicon.png           "$(iconsdir)/20x20/apps/gmusicbrowser.png"
@@ -99,7 +99,7 @@ uninstall:
 		"$(iconsdir)/32x32/apps/gmusicbrowser.png" \
 		"$(iconsdir)/48x48/apps/gmusicbrowser.png" \
 		"$(iconsdir)/64x64/apps/gmusicbrowser.png"
-	rm -f "$(appdir)/gmusicbrowser.desktop" "$(datadir)/appdata/gmusicbrowser.appdata.xml"
+	rm -f "$(appdir)/gmusicbrowser.desktop" "$(datadir)/metainfo/org.gmusicbrowser.metainfo.xml"
 	rm -f "$(mandir)/man1/gmusicbrowser.1"
 	rm -f "$(localedir)/*/LC_MESSAGES/gmusicbrowser.mo"
 	$(MAKE) update-icon-cache
