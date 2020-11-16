@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2020 Quentin Sculo  <squentin@gmusicbrowser.org> -->
+<application>
+ <id type="desktop">gmusicbrowser.desktop</id>
+ <metadata_license>CC0-1.0</metadata_license>
+ <project_license>GPL-3.0</project_license>
+ <content_rating type="oars-1.1" />
+ <translation type="gettext">gmusicbrowser</translation>
+ <name>gmusicbrowser</name>
+ <summary>Jukebox for large collection of music</summary>
+ <description>
+  <p>
+   Very customizable library-based music player designed for huge collections of music (tens of thousand files). With lots of handy features to navigate and use your collection, like album/artist lock, menus to choose songs from album/album from artist, enqueue songs with middle click.
+  </p>
+  <p>Some of the main features:</p>
+  <ul>
+   <li>Powerful search (can search any field using regular expression or fuzzy search)</li>
+   <li>Use ratings and labels to organize your music</li>
+   <li>Weighted random modes (eg. to pick songs based on their rating, labels, added date, last played date, ...)</li>
+   <li>Plugins to visualize lyrics, find cover pictures, retrieve artist or album info, last.fm, ...</li>
+   <li>Browse through pictures and pdf in the album's folder</li>
+   <li>Replaygain support to normalize the volume across tracks</li>
+  </ul>
+  <p> The windows use a layout system that allows users to completely change the interface. You can use pre-defined layouts or create your own using text files that allows you to pick and choose the widgets you want, their options and their placement. These layouts can be used not only for the main window, but also for extra windows, the tray pop-up, or a desktop widget.
+  </p>
+ </description>
+ <screenshots>
+  <screenshot type="default">
+    <caption>Main window with default layout</caption>
+      <image type="source" width="1280" height="720">http://gmusicbrowser.org/screenshots/appdata/screenshot-1.png</image>
+  </screenshot>
+  <screenshot>
+    <caption>Main window with alternate layout</caption>
+      <image type="source" width="1344" height="756">http://gmusicbrowser.org/screenshots/appdata/screenshot-2.png</image>
+  </screenshot>
+  <screenshot>
+    <caption>Another alternate layout</caption>
+      <image type="source" width="1024" height="576">http://gmusicbrowser.org/screenshots/appdata/screenshot-3.png</image>
+  </screenshot>
+  <screenshot>
+    <caption>Another alternate layout</caption>
+      <image type="source" width="1440" height="810">http://gmusicbrowser.org/screenshots/appdata/screenshot-4.png</image>
+  </screenshot>
+  <screenshot>
+    <caption>Default tray pop-up window</caption>
+      <image type="source" width="442" height="150">http://gmusicbrowser.org/screenshots/appdata/screenshot-5.png</image>
+  </screenshot>
+ </screenshots>
+ <url type="homepage">http://gmusicbrowser.org</url>
+ <url type="bugtracker">https://github.com/squentin/gmusicbrowser/issues</url>
+ <url type="faq">http://gmusicbrowser.org/faq.html</url>
+ <url type="translate">http://gmusicbrowser.org/translations.html</url>
+ <url type="donation">http://gmusicbrowser.org/#donate</url>
+ <update_contact>squentin@gmusicbrowser.org</update_contact>
+</application>
