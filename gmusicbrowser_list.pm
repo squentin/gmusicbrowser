@@ -16,6 +16,9 @@ our @MenuPlaying=
 	{ label => _"Filter on playing Album",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('album',$::SongID) )	if defined $::SongID; }},
 	{ label => _"Filter on playing Artist",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('artists',$::SongID) )if defined $::SongID; }},
 	{ label => _"Filter on playing Song",	code => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID('title',$::SongID) )	if defined $::SongID; }},
+	{ label => sub { ::__x(_"Filter on playing {field}", field=>Songs::FieldName($_[0]{field})); },
+	  code  => sub { ::SetFilter($_[0]{songlist}, Songs::MakeFilterFromID($_[0]{field},$::SongID) ) if defined $::SongID; },
+	  foreach=>sub { 'field', Songs::FieldList(true=>'samemenu',); }, },
 	{ label => _"Use the playing filter",	code => sub { ::SetFilter($_[0]{songlist}, $::PlayFilter ); }, test => sub {::GetSonglist($_[0]{songlist})->{mode} ne 'playlist'}}, #FIXME	if queue use queue, if $ListMode use list
 	{ label => _"Recent albums",		submenu => sub { my $sl=$_[0]{songlist};my @gid= ::uniq( Songs::Map_to_gid('album',$::Recent) ); $#gid=19 if $#gid>19; my $m=::PopupAA('album',nosort=>1,nominor=>1,widget => $_[0]{self}, list=>\@gid, cb=>sub { ::SetFilter($sl, $_[0]{filter}); }); return $m; } },
 	{ label => _"Recent artists",		submenu => sub { my $sl=$_[0]{songlist};my @gid= ::uniq( Songs::Map_to_gid('artist',$::Recent) ); $#gid=19 if $#gid>19; my $m=::PopupAA('artists',nosort=>1,nominor=>1,widget => $_[0]{self}, list=>\@gid, cb=>sub { ::SetFilter($sl, $_[0]{filter}); }); return $m; } },
