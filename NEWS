@@ -1,3 +1,40 @@
+v1.1.16
+(Most of these changes have been in git for a long time since I didn't make a release in all this time)
+fix not working with perl >=5.24 (remove 2 superfluous "my")
+add support for .opus files
+add option to simplify tree in folder pane
+add option to ignore articles when sorting
+add has_picture and has_lyrics optional fields
+add artist_has_picture and album_has_picture virtual fields
+PictureBrowser: add embedded picture mode (+ all files mode)
+PictureBrowser: add "Reset view position when file changes" option
+add option to some fields to show a "find songs with same ..." menu item
+FilterPanes: add option to ignore 'none' row for histogram
+restore mistakenly lost option to write playcount to tag
+mpv: fix replaygain, equalizer & gapless playback with versions >= 0.28.0
+mplayer: fix mplayer2/mpv-style options not working with mplayer1
+fix crash when using search-as-you-type in SongList
+fix removal of high-priority shortcuts not working
+fix writing embedded lyrics not working
+fix PictureBrowser not using case-insensitive sort
+fix filtering on artists "" (displayed as <Unknown>) not working
+fix dropping a url in PictureBrowser not working
+fix error when renaming folder
+fix crashing on exit
+fix -tagedit not working when only 1 file
+fix Makefile issue on openbsd
+fix very wrong bitrate for some ogg files
+mp3 files: try harder to find a good first frame even if not in length-check mode
+add support for mp2 extension and change mp3 filetype
+update AppStream metadata
+picture finder plugin: update picture sources
+audioscrobbler plugin: add a line showing number of plays waiting and button to send them now
+lyrics plugin: add musixmatch.com source
+artistinfo plugin: update parsing of artist biography
+translations updates: Chinese (China), Czech, German, Greek, Hungarian, Japanese, Korean, Lithuanian,
+	Malay (Malaysia), Polish, Portuguese, Portuguese (Brazil), Russian, Serbian, Spanish, Swedish
+new translations: Estonian, Turkish
+
 v1.1.15
 replace gmb icon with the svg icon made by zeltak
 add mpv output
