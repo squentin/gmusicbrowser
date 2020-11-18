@@ -76,13 +76,17 @@ my %Sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 				return 0 if $_[0]=~m!&#91;&#46;&#46;&#46;&#93;(?:<br ?/>)*<i>!; # truncated lyrics : "[...]" followed by italic explanation => not auto-saved
 				return !!$1;
 			}],	
-	musixmatch =>   [musixmatch => 'https://www.musixmatch.com/lyrics/%a/%t', undef,
+	musixmatch =>   [musixmatch => sub {  ::ReplaceFields($_[0], "http://www.musixmatch.com/lyrics/%a/%t", sub { my $s=::url_escapeall($_[0]); $s=~s/%20/-/g; $s }) }, undef,
                          sub {
-                            if ($_[0] =~ /<span id="lyrics-html"/) {
-                                $_[0] =~ s/.*<span id="lyrics-html".+?>(.+?)<\/span>.*/$1/s;
+                            if ($_[0] =~ m/<span class="lyrics__content__\w+">/) {
+                                $_[0] =~ s/.*<span class="lyrics__content__\w+">(.+?)<\/span>.*/$1/s;
                                 $_[0] =~ s/[\r\n]/<br>/g;
+				return 1;
                             } else {
+				# FIXME try searching with "http://www.musixmatch.com/search/%a %t" and take best result ?
+				# FIXME or try searching again after cleaning title and artist for things like "(live)" ?
                                 $_[0] = $notfound;
+				return 0;
                             }
                         }],
        #lyricwikiapi => [lyricwiki => 'http://lyricwiki.org/api.php?artist=%a&song=%t&fmt=html',undef,
