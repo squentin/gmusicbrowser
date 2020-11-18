@@ -1,14 +1,14 @@
 #
 # Translators:
-# Sérgio Marques <smarquespt@gmail.com>, 2011-2012.
+# Sérgio Marques <smarquespt@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
-"Report-Msgid-Bugs-To: http://github.com/squentin/gmusicbrowser/issues\n"
-"POT-Creation-Date: 2012-11-19 19:21+0100\n"
-"PO-Revision-Date: 2012-11-26 13:05+0000\n"
-"Last-Translator: Sérgio Marques <smarquespt@gmail.com>\n"
-"Language-Team: Portuguese (http://www.transifex.com/projects/p/gmusicbrowser/"
+"Report-Msgid-Bugs-To: squentin@free.fr\n"
+"POT-Creation-Date: 2015-08-17 18:49+0200\n"
+"PO-Revision-Date: 2017-09-19 10:29+0000\n"
+"Last-Translator: squentin <squentin@gmail.com>\n"
+"Language-Team: Portuguese (http://www.transifex.com/squentin/gmusicbrowser/"
 "language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,9 +29,6 @@ msgstr "Críticas"
 msgid " of {length}"
 msgstr "de {length}"
 
-msgid "# songs"
-msgstr "# faixas"
-
 #, perl-format
 msgid "%S by %a"
 msgstr "%S de %a"
@@ -47,12 +44,6 @@ msgid "%d Artist"
 msgid_plural "%d Artists"
 msgstr[0] "%d artista"
 msgstr[1] "%d artistas"
-
-#, perl-format
-msgid "%d Song"
-msgid_plural "%d Songs"
-msgstr[0] "%d faixa"
-msgstr[1] "%d faixas"
 
 #, perl-format
 msgid "%d Upcoming Event"
@@ -220,9 +211,6 @@ msgstr "Abortar"
 msgid "Abort ReplayGain analysis"
 msgstr "Abortar análise ReplayGain"
 
-msgid "Abort all"
-msgstr "Abortar tudo"
-
 msgid "Abort mass-tagging"
 msgstr "Abortar edição em série"
 
@@ -288,9 +276,6 @@ msgstr "Adicionar pasta"
 msgid "Add folder ..."
 msgstr "Adicionar pasta..."
 
-msgid "Add label"
-msgstr "Adicionar etiqueta"
-
 msgid "Add multiple condition"
 msgstr "Adicionar condições múltiplas"
 
@@ -314,9 +299,6 @@ msgstr "Adicionar aos valores existentes"
 
 msgid "Add to list"
 msgstr "Adicionar à lista"
-
-msgid "Add to playlist"
-msgstr "Adicionar à lista de reprodução"
 
 msgid "Add to queue"
 msgstr "Adicionar à fila de reprodução"
@@ -355,6 +337,9 @@ msgstr "Adiciona etiquetas à faixa atual"
 
 msgid "Adds menu entries to song contextual menu"
 msgstr "Adiciona entradas ao menu de contexto da faixa"
+
+msgid "Advanced"
+msgstr "Avançado"
 
 msgid "Advanced Search ..."
 msgstr "Procura avançada..."
@@ -431,7 +416,7 @@ msgid "All"
 msgstr "Tudo"
 
 msgid "All Songs"
-msgstr "Todas as músicas"
+msgstr "Todas as faixas"
 
 msgid "All albums"
 msgstr "Todos os álbuns"
@@ -455,7 +440,7 @@ msgid "All of :"
 msgstr "Tudo de:"
 
 msgid "All songs"
-msgstr "Todas as músicas"
+msgstr "Todas as faixas"
 
 msgid "All styles"
 msgstr "Todos os estilos"
@@ -688,14 +673,6 @@ msgid ""
 msgstr ""
 "Não é possível alterar o volume. Necessita do amixer (pacote alsa-utils) "
 "para alterar o volume nesta estrutura."
-
-#, perl-brace-format
-msgid ""
-"Can't create Folder '{path}' : \n"
-"{error}"
-msgstr ""
-"Não foi possível criar a pasta em \"{path}\":\n"
-"{error}"
 
 #, perl-brace-format
 msgid "Can't create sink '{sink}'"
@@ -967,9 +944,6 @@ msgstr "Comando:"
 msgid "Custom context pages :"
 msgstr "Páginas de contexto:"
 
-msgid "Custom fields"
-msgstr "Campos"
-
 msgid "Custom formats"
 msgstr "Formatos"
 
@@ -1080,9 +1054,6 @@ msgstr "Exibir alerta da bandeja por %d ms"
 msgid "Do not add a title row"
 msgstr "Não adicionar linha de título"
 
-msgid "Do not add songs that can't be played"
-msgstr "Não adicionar faixas que não podem ser reproduzidas"
-
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr "Não criar ID3v1 nos ficheiros mp3"
 
@@ -1117,9 +1088,6 @@ msgstr "Editar"
 msgid "Edit Current Song Properties"
 msgstr "Editar propriedades da faixa atual"
 
-msgid "Edit labels"
-msgstr "Editar etiquetas"
-
 msgid "Edit Lyrics"
 msgstr "Editar letra das faixas"
 
@@ -1128,9 +1096,6 @@ msgstr "Editar letra das faixas..."
 
 msgid "Edit Multiple Songs Properties"
 msgstr "Editar propriedades de diversas faixas"
-
-msgid "Edit rating"
-msgstr "Editar avaliação"
 
 msgid "Edit Settings"
 msgstr "Editar definições"
@@ -1271,9 +1236,6 @@ msgstr ""
 msgid "Error writing '{file}'"
 msgstr "Erro ao gravar \"{file}\""
 
-msgid "Error writing replaygain tags :\n"
-msgstr "Erro ao gravar detalhes ReplayGain:\n"
-
 msgid "Error: invalid filename pattern"
 msgstr "Erro: padrão inválido"
 
@@ -1320,19 +1282,8 @@ msgstr "Silenciar em %d segundos"
 msgid "Fade-out then stop"
 msgstr "Silêncio progressivo e parar"
 
-#, perl-brace-format
-msgid ""
-"Failed to delete '{file}' :\n"
-"{error}"
-msgstr ""
-"Falha ao eliminar \"{file}\":\n"
-"{error}"
-
 msgid "Fetching albuminfo"
 msgstr "A obter informações do álbum"
-
-msgid "Field name"
-msgstr "Nome do campo"
 
 msgid "Field type"
 msgstr "Tipo do campo"
@@ -1517,9 +1468,6 @@ msgstr "Ajuda"
 msgid "Hide"
 msgstr "Ocultar"
 
-msgid "Hide Artist/Album bar"
-msgstr "Ocultar barra de Artista/álbum"
-
 msgid "Hide non-matching"
 msgstr "Ocultar não coincidentes"
 
@@ -1611,10 +1559,6 @@ msgstr "Palavras-chave"
 
 msgid "Label"
 msgstr "Etiqueta"
-
-msgctxt "Record_label"
-msgid "Label"
-msgstr "Editora"
 
 msgid "Label is set"
 msgstr "Etiqueta definida"
@@ -1998,9 +1942,6 @@ msgstr "Sem faixas"
 msgid "No songs found"
 msgstr "Sem faixas"
 
-msgid "No sound menu found"
-msgstr "Sem menu de som"
-
 msgid "No styles"
 msgstr "Sem estilos"
 
@@ -2147,9 +2088,6 @@ msgstr "Abrir janela da fila de reprodução"
 msgid "Open Search window"
 msgstr "Abrir janela de procura"
 
-msgid "Open allmusic.com in your web browser"
-msgstr "Abrir allmusic.com no navegador web"
-
 msgid "Open containing folder"
 msgstr "Abrir pasta correspondente"
 
@@ -2161,9 +2099,6 @@ msgstr "Abrir página de contexto"
 
 msgid "Open existing list"
 msgstr "Abrir lista existente"
-
-msgid "Open files"
-msgstr "Abrir ficheiros"
 
 msgid "Open folder"
 msgstr "Abrir pasta"
@@ -2234,6 +2169,9 @@ msgstr "Padrão para ficheiros .lrc:"
 
 msgid "Pause"
 msgstr "Pausar"
+
+msgid "Per-song values"
+msgstr "Valor por faixa"
 
 msgid "Pick an existing one"
 msgstr "Escolher uma existente"
@@ -2561,17 +2499,11 @@ msgstr "Reproduções recentes"
 msgid "Recently played songs"
 msgstr "Faixas reproduzidas recentemente"
 
-msgid "Record label"
-msgstr "Editora"
-
 msgid "Recording Dates"
 msgstr "Datas de gravação"
 
 msgid "Recording date"
 msgstr "Data de gravação"
-
-msgid "Recording type"
-msgstr "Tipo de gravação"
 
 msgid "Reference point :"
 msgstr "Ponto de referência:"
@@ -2991,9 +2923,6 @@ msgstr "Selecionar faixa atual"
 msgid "Select fields"
 msgstr "Selecionar campos"
 
-msgid "Select files"
-msgstr "Selecionar ficheiros"
-
 msgid "Select matches"
 msgstr "Selecionar resultados"
 
@@ -3052,16 +2981,6 @@ msgstr "Definições"
 msgid "Settings on this page will only take effect after a restart"
 msgstr "As definições desta página produzirão efeito após reiniciar"
 
-#, perl-format
-msgid ""
-"Shell command\n"
-"(some variables such as %f (current song filename) or %F (list of selected "
-"songs filenames) are available)"
-msgstr ""
-"Comando de terminal\n"
-"Algumas variáveis como %f (nome do ficheiro da faixa atual) ou %F (lista dos "
-"nome de ficheiros das faixas selecionadas) estão disponíveis"
-
 #. Shift key
 msgctxt "Keyboard"
 msgid "Shift"
@@ -3093,9 +3012,6 @@ msgstr "Mostrar botões"
 
 msgid "Show genre"
 msgstr "Mostrar género"
-
-msgid "Show in sound menu"
-msgstr "Mostrar no menu de som"
 
 msgid "Show info panel"
 msgstr "Mostrar informações"
@@ -3238,9 +3154,6 @@ msgstr "Ordem"
 msgid "Split artist names on :"
 msgstr "Dividir nomes em:"
 
-msgid "Standard fields"
-msgstr "Campos padrão"
-
 msgid "Start ReplayGain analysis"
 msgstr "Iniciar análise Replay Gain"
 
@@ -3315,9 +3228,6 @@ msgstr "O relógio do sistema não está igual à hora atual"
 
 msgid "System command :"
 msgstr "Comando do sistema:"
-
-msgid "Tag"
-msgstr "Detalhe"
 
 msgid "Tags"
 msgstr "Detalhes"
@@ -3788,9 +3698,6 @@ msgstr "ordem alfabética"
 
 msgid "amixer control :"
 msgstr "controlo amixer:"
-
-msgid "another example"
-msgstr "outro exemplo"
 
 msgid "applied on reload"
 msgstr "aplicável ao reiniciar"
@@ -4380,9 +4287,6 @@ msgstr "mais que %s atrás"
 msgid "mosaic mode"
 msgstr "mosaico"
 
-msgid "move folder"
-msgstr "mover pasta"
-
 msgid "movie/video screen capture"
 msgstr "captura de filmes/vídeos"
 
@@ -4673,7 +4577,7 @@ msgid "string"
 msgstr "linha"
 
 msgid "supports : "
-msgstr "suporta : "
+msgstr "suporta:  "
 
 msgid "text format"
 msgstr "formato de texto"
@@ -4860,24 +4764,8 @@ msgid "{folder} already exists"
 msgstr "{folder} já existe"
 
 #, perl-brace-format
-msgid "{hours} hours {min} min {sec} s ({size} M)"
-msgstr "{hours} horas {min} min {sec} s ({size} M)"
-
-#, perl-brace-format
-msgid "{hours}h {min}m {sec}s ({size}M)"
-msgstr "{hours} h {min} m {sec} s ({size} M)"
-
-#, perl-brace-format
 msgid "{hours}h{min}m{sec}s"
 msgstr "{hours} h {min} m {sec} s"
-
-#, perl-brace-format
-msgid "{min} min {sec} s ({size} M)"
-msgstr "{min} min {sec} s ({size} M)"
-
-#, perl-brace-format
-msgid "{min}m {sec}s ({size}M)"
-msgstr "{min} m {sec} s ({size} M)"
 
 #, perl-brace-format
 msgid "{min}m{sec}s"
