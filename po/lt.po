@@ -1,12 +1,13 @@
 #
 # Translators:
 # Moo, 2015
+# Moo, 2015-2016,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
 "POT-Creation-Date: 2015-08-17 18:49+0200\n"
-"PO-Revision-Date: 2015-08-19 11:05+0000\n"
+"PO-Revision-Date: 2018-06-24 17:51+0000\n"
 "Last-Translator: Moo\n"
 "Language-Team: Lithuanian (http://www.transifex.com/squentin/gmusicbrowser/"
 "language/lt/)\n"
@@ -14,14 +15,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: lt\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
-"%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
+"1 : n % 1 != 0 ? 2: 3);\n"
 
 msgid " Context pane layout "
-msgstr "Konteksto polangio išdėstymas"
+msgstr " Konteksto polangio išdėstymas "
 
 msgid " Fields "
 msgstr "Laukai"
+
+msgid " Review "
+msgstr "Apžvalga"
 
 #, perl-brace-format
 msgid " of {length}"
@@ -34,16 +39,18 @@ msgstr "%a atliekama daina %S"
 #, perl-format
 msgid "%d Album"
 msgid_plural "%d Albums"
-msgstr[0] "%d Albumas"
-msgstr[1] "%d Albumai"
-msgstr[2] "%d Albumų"
+msgstr[0] "%d albumas"
+msgstr[1] "%d albumai"
+msgstr[2] "%d albumų"
+msgstr[3] "%d albumų"
 
 #, perl-format
 msgid "%d Artist"
 msgid_plural "%d Artists"
-msgstr[0] "%d Atlikėjas"
-msgstr[1] "%d Atlikėjai"
-msgstr[2] "%d Atlikėjų"
+msgstr[0] "%d atlikėjas"
+msgstr[1] "%d atlikėjai"
+msgstr[2] "%d atlikėjų"
+msgstr[3] "%d atlikėjų"
 
 #, perl-format
 msgid "%d album"
@@ -51,6 +58,7 @@ msgid_plural "%d albums"
 msgstr[0] "%d albumas"
 msgstr[1] "%d albumai"
 msgstr[2] "%d albumų"
+msgstr[3] "%d albumų"
 
 #, perl-format
 msgid "%d artist"
@@ -58,6 +66,7 @@ msgid_plural "%d artists"
 msgstr[0] "%d atlikėjas"
 msgstr[1] "%d atlikėjai"
 msgstr[2] "%d atlikėjų"
+msgstr[3] "%d atlikėjų"
 
 #, perl-format
 msgid "%d file"
@@ -65,6 +74,7 @@ msgid_plural "%d files"
 msgstr[0] "%d failas"
 msgstr[1] "%d failai"
 msgstr[2] "%d failų"
+msgstr[3] "%d failų"
 
 #, perl-format, perl-brace-format
 msgid "%d file in {folder}"
@@ -72,6 +82,7 @@ msgid_plural "%d files in {folder}"
 msgstr[0] "%d failas aplanke {folder}"
 msgstr[1] "%d failai aplanke {folder}"
 msgstr[2] "%d failų aplanke {folder}"
+msgstr[3] "%d failų aplanke {folder}"
 
 #, perl-format
 msgid "%d folder"
@@ -79,6 +90,7 @@ msgid_plural "%d folders"
 msgstr[0] "%d aplankas"
 msgstr[1] "%d aplankai"
 msgstr[2] "%d aplankų"
+msgstr[3] "%d aplankų"
 
 #, perl-format
 msgid "%d second"
@@ -86,6 +98,7 @@ msgid_plural "%d seconds"
 msgstr[0] "%d sekundė"
 msgstr[1] "%d sekundės"
 msgstr[2] "%d sekundžių"
+msgstr[3] "%d sekundžių"
 
 #, perl-format
 msgid "%d song"
@@ -93,6 +106,7 @@ msgid_plural "%d songs"
 msgstr[0] "%d daina"
 msgstr[1] "%d dainos"
 msgstr[2] "%d dainų"
+msgstr[3] "%d dainų"
 
 #, perl-format
 msgid "%d song added"
@@ -100,6 +114,7 @@ msgid_plural "%d songs added"
 msgstr[0] "pridėta %d daina"
 msgstr[1] "pridėtos %d dainos"
 msgstr[2] "pridėta %d dainų"
+msgstr[3] "pridėta %d dainų"
 
 #, perl-format
 msgid "%d song in queue"
@@ -107,6 +122,7 @@ msgid_plural "%d songs in queue"
 msgstr[0] "%d daina laukia eilėje"
 msgstr[1] "%d dainos laukia eilėje"
 msgstr[2] "%d dainų laukia eilėje"
+msgstr[3] "%d dainų laukia eilėje"
 
 #, perl-format
 msgid "%d song in the library"
@@ -114,6 +130,7 @@ msgid_plural "%d songs in the library"
 msgstr[0] "Bibliotekoje yra %d daina"
 msgstr[1] "Bibliotekoje yra %d dainos"
 msgstr[2] "Bibliotekoje yra %d dainų"
+msgstr[3] "Bibliotekoje yra %d dainų"
 
 #, perl-format
 msgid "%d song selected"
@@ -121,6 +138,7 @@ msgid_plural "%d songs selected"
 msgstr[0] "Pasirinkta %d daina"
 msgstr[1] "Pasirinktos %d dainos"
 msgstr[2] "Pasirinkta %d dainų"
+msgstr[3] "Pasirinkta %d dainų"
 
 #, perl-brace-format
 msgid "'{file}' exists. Overwrite ?"
@@ -154,13 +172,13 @@ msgid "32x32 PNG file icon"
 msgstr "32x32 PNG failo piktograma"
 
 msgid "50 Last Added"
-msgstr "50 Paskiausiai Pridėtų"
+msgstr "50 paskiausiai pridėtų"
 
 msgid "50 Last Played"
-msgstr "50 Paskiausiai Grotų"
+msgstr "50 paskiausiai grotų"
 
 msgid "50 Most Played"
-msgstr "50 Daugiausiai Grotų"
+msgstr "50 daugiausiai grotų"
 
 msgid "<Unknown>"
 msgstr "<Nežinoma>"
@@ -199,10 +217,13 @@ msgid "Add"
 msgstr "Pridėti"
 
 msgid "Add Files ..."
-msgstr "Pridėti Failus ..."
+msgstr "Pridėti failus ..."
 
 msgid "Add Music"
-msgstr "Pridėti Muziką"
+msgstr "Pridėti muziką"
+
+msgid "Add a button to rip a CD"
+msgstr "Pridėti perrašymo į CD mygtuką"
 
 msgid "Add a filter"
 msgstr "Pridėti filtrą"
@@ -213,6 +234,9 @@ msgstr "Pridėti viso ekrano mygtuką"
 msgid "Add a fullscreen button to layouts that can accept extra buttons"
 msgstr ""
 "Pridėti viso ekrano mygtuką prie išdėstymų, kurie palaiko papildomus mygtukus"
+
+msgid "Add a group"
+msgstr "Pridėti grupę"
 
 msgid "Add a label to the current song"
 msgstr "Pridėti esamai dainai etiketę"
@@ -235,11 +259,17 @@ msgstr "Pridėti aplanką"
 msgid "Add folder ..."
 msgstr "Pridėti aplanką ..."
 
+msgid "Add multiple condition"
+msgstr "Pridėti kelias sąlygas"
+
 msgid "Add new label"
 msgstr "Pridėti naują etiketę"
 
 msgid "Add new radio"
 msgstr "Pridėti naują radiją"
+
+msgid "Add picture"
+msgstr "Pridėti paveikslą"
 
 msgid "Add rule : "
 msgstr "Pridėti taisyklę :"
@@ -263,7 +293,7 @@ msgid "Added"
 msgstr "Pridėta"
 
 msgid "Added Today"
-msgstr "Šiandien Pridėtos"
+msgstr "Šiandien pridėtos"
 
 msgid "Adding a radio"
 msgstr "Pridedamas radijas"
@@ -285,10 +315,10 @@ msgid "Advanced"
 msgstr "Išplėstiniai"
 
 msgid "Advanced Search ..."
-msgstr "Išplėstinė Paieška ..."
+msgstr "Išplėstinė paieška ..."
 
 msgid "Advanced Tag Editing"
-msgstr "Išplėstinis Žymių Redagavimas"
+msgstr "Išplėstinis žymių redagavimas"
 
 msgid "Album"
 msgstr "Albumas"
@@ -347,7 +377,7 @@ msgid "All"
 msgstr "Visi"
 
 msgid "All Songs"
-msgstr "Visos Dainos"
+msgstr "Visos dainos"
 
 msgid "All albums"
 msgstr "Visi albumai"
@@ -386,16 +416,20 @@ msgstr "Įgalina gmusicbrowser valdymą per DBus, naudojant MPRIS v1.0 standart�
 msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v2.0 standard"
 msgstr "Įgalina gmusicbrowser valdymą per DBus, naudojant MPRIS v2.0 standartą"
 
-#. Alt key
-msgctxt "Keyboard"
-msgid "Alt"
-msgstr "Alt"
+msgid "Amount of volume changed by the mouse wheel"
+msgstr "Garsio kiekis keičiamas pasukus pelės ratuką"
 
 msgid "App Indicator plugin"
 msgstr "Programos Indikatoriaus papildinys"
 
 msgid "App indicator"
 msgstr "Programos indikatorius"
+
+msgid "Append to playlist"
+msgstr "Pridėti į grojaraštį"
+
+msgid "Application"
+msgstr "Programa"
 
 #, perl-brace-format
 msgid "Are you sure you want to delete the '{label}' label ?"
@@ -414,7 +448,7 @@ msgid "Artist (Year - Album)"
 msgstr "Atlikėjas (Metai - Albumas)"
 
 msgid "Artist Biography"
-msgstr "Atlikėjo Biografija"
+msgstr "Atlikėjo biografija"
 
 msgid "Artist URL"
 msgstr "Atlikėjo URL"
@@ -484,14 +518,23 @@ msgstr "Automatiškai slinkti"
 msgid "Automatically remove current song if not found"
 msgstr "Automatiškai šalinti esamą dainą, jei jos nerandama"
 
+msgid "Autosave"
+msgstr "Automatinis išsaugojimas"
+
 msgid "Autosave plugin"
 msgstr "Automatinio išsaugojimo papildinys"
 
 msgid "Available"
 msgstr "Prieinama"
 
+msgid "BPM"
+msgstr "BPM"
+
+msgid "Bad session"
+msgstr "Blogas seansas"
+
 msgid "Base Folder :"
-msgstr "Bazinis Aplankas:"
+msgstr "Bazinis aplankas:"
 
 msgid "Basic fields"
 msgstr "Pagrindiniai laukai"
@@ -521,13 +564,13 @@ msgid "Browser window layout :"
 msgstr "Naršyklės lango išdėstymas :"
 
 msgid "Browser with SongTree"
-msgstr "Naršyklė su Dainų Medžiu"
+msgstr "Naršyklė su dainų medžiu"
 
 msgid "Buttons"
 msgstr "Mygtukai"
 
 msgid "Buttons, Song & Cover"
-msgstr "Mygtukai, Daina ir Viršelis"
+msgstr "Mygtukai, daina ir viršelis"
 
 msgid "Can be searched with :"
 msgstr "Gali būti ieškoma, naudojant :"
@@ -557,6 +600,18 @@ msgstr "Kategorijų polangis"
 msgid "Centered"
 msgstr "Centre"
 
+msgid "Centered on"
+msgstr "Vieta, kurioje centruoti"
+
+msgid "Change Display"
+msgstr "Keisti ekraną"
+
+msgid "Change default text color"
+msgstr "Keisti numatytąją teksto spalvą"
+
+msgid "Change default text font and size"
+msgstr "Keisti numatytąjį teksto šriftą ir dydį"
+
 msgid "Change the context visibility"
 msgstr "Keisti konteksto matomumą"
 
@@ -564,10 +619,13 @@ msgid "Channels"
 msgstr "Kanalai"
 
 msgid "Check Collection"
-msgstr "Patikrinti Kolekciją"
+msgstr "Patikrinti kolekciją"
 
 msgid "Check for updated/deleted songs on startup"
 msgstr "Paleidus programą, tikrinti ar yra atnaujintų/ištrintų dainų"
+
+msgid "Check for updated/removed songs"
+msgstr "Tikrinti atnaujintas/pašalintas dainas"
 
 msgid "Check real length of mp3"
 msgstr "Tikrinti tikrąją mp3 failų trukmę"
@@ -580,6 +638,9 @@ msgstr "Tikrinama trukmė/pralaidumas"
 
 msgid "Checking songs"
 msgstr "Tikrinamos dainos"
+
+msgid "Choose Picture"
+msgstr "Pasirinkite paveikslą"
 
 msgid "Choose directory to copy files to"
 msgstr "Pasirinkite katalogą į kurį kopijuoti failus"
@@ -597,7 +658,11 @@ msgid "Choose font..."
 msgstr "Pasirinkti šriftą..."
 
 msgid "Choose page to open"
-msgstr "Pasirinkite norimą atidaryti puslapį"
+msgstr "Pasirinkite norimą atverti puslapį"
+
+#, perl-format
+msgid "Choose picture for '%s'"
+msgstr "Pasirinkite \"%s\" paveikslą"
 
 msgid "Choose playlist files to import"
 msgstr "Pasirinkite norimus importuoti grojaraščio failus"
@@ -624,13 +689,16 @@ msgid "Click to show larger image"
 msgstr "Spustelėkite, norėdami rodyti didesnį paveikslą"
 
 msgid "Close"
-msgstr "Uždaryti"
+msgstr "Užverti"
 
 msgid "Close Window"
-msgstr "Uždaryti Langą"
+msgstr "Užverti langą"
+
+msgid "Close a filter"
+msgstr "Užverti filtrą"
 
 msgid "Close to tray"
-msgstr "Uždaryti į dėklą"
+msgstr "Užverti į dėklą"
 
 msgid "Collection"
 msgstr "Kolekcija"
@@ -639,10 +707,10 @@ msgid "Command"
 msgstr "Komanda"
 
 msgid "Command to open folders :"
-msgstr "Komanda, skirta atidaryti aplankus :"
+msgstr "Komanda, skirta atverti aplankus :"
 
 msgid "Command to open urls :"
-msgstr "Komanda, skirta atidaryti url :"
+msgstr "Komanda, skirta atverti url :"
 
 msgid "Command used :"
 msgstr "Naudojama komanda :"
@@ -656,6 +724,15 @@ msgstr ""
 "kai bus pasirinkta\n"
 "\"išjungti kompiuterį, kai ištuštės eilė\""
 
+msgid "Command used:"
+msgstr "Naudojama komanda:"
+
+msgid "Command when playing song changed :"
+msgstr "Komanda, kai pasikeičia grojama daina :"
+
+msgid "Command when stopped :"
+msgstr "Komanda, kai sustabdoma :"
+
 msgid "Comment"
 msgstr "Komentaras"
 
@@ -663,10 +740,13 @@ msgid "Comments"
 msgstr "Komentarai"
 
 msgid "Compilation"
-msgstr "Kompiliacija"
+msgstr "Rinkinys"
 
 msgid "Composer"
 msgstr "Kompozitorius"
+
+msgid "Conductor"
+msgstr "Dirigentas"
 
 msgid "Connect through a proxy"
 msgstr "Jungtis per įgaliotąjį serverį"
@@ -678,7 +758,7 @@ msgid "Control"
 msgstr "Valdymas"
 
 msgid "Conz Aishi (with Filter Panes)"
-msgstr "Conz Aishi (su Filtro Polangiais)"
+msgstr "Conz Aishi (su filtro polangiais)"
 
 msgid "Conz Glimm (different controls)"
 msgstr "Conz Glimm (kitokie valdikliai)"
@@ -692,14 +772,31 @@ msgstr "Kopijavimas nepavyko"
 msgid "Copy link address"
 msgstr "Kopijuoti nuorodos adresą"
 
+msgid "Copy missing values from previous line"
+msgstr "Kopijuoti trūkstamas reikšmes iš ankstesnės eilutės"
+
 msgid "Copy to mounted portable player"
 msgstr "Kopijuoti į prijungtą nešiojamąjį grotuvą"
 
+msgid "Copy to portable player"
+msgstr "Kopijuoti į nešiojamąjį grotuvą"
+
+msgid "Copying"
+msgstr "Kopijuojama"
+
+#, perl-format
+msgid "Copying file"
+msgid_plural "Copying %d files"
+msgstr[0] "Kopijuojamas %d failas"
+msgstr[1] "Kopijuojami %d failai"
+msgstr[2] "Kopijuojama %d failų"
+msgstr[3] "Kopijuojama %d failų"
+
 msgid "Copyright"
-msgstr "Autorinės Teisės"
+msgstr "Autorių Teisės"
 
 msgid "Cover Size : "
-msgstr "Viršelio Dydis :"
+msgstr "Viršelio dydis :"
 
 msgid "Create ID3v2 tags as ID3v2.4"
 msgstr "Kurti ID3v2 žymes kaip ID3v2.4"
@@ -712,8 +809,17 @@ msgstr "Ctrl"
 msgid "Current song must always be in the playlist"
 msgstr "Esama daina visada privalo būti grojaraštyje"
 
+msgid "Custom Text"
+msgstr "Tinkintas tekstas"
+
+msgid "Custom URL"
+msgstr "Tinkintas URL"
+
 msgid "Custom command :"
 msgstr "Tinkinta komanda :"
+
+msgid "Custom formats"
+msgstr "Tinkinti formatai"
 
 msgid "Custom..."
 msgstr "Tinkintas..."
@@ -726,6 +832,9 @@ msgstr "Datos formatas :"
 
 msgid "Date of purchase"
 msgstr "Įsigijimo data"
+
+msgid "Debut Album"
+msgstr "Debiutinis albumas"
 
 msgid "Decrease Volume"
 msgstr "Tildyti"
@@ -754,13 +863,19 @@ msgid "Delete"
 msgstr "Ištrinti"
 
 msgid "Delete Selected Songs"
-msgstr "Ištrinti Pasirinktas Dainas"
+msgstr "Ištrinti pasirinktas dainas"
 
 msgid "Delete file"
 msgstr "Ištrinti failą"
 
 msgid "Delete list"
 msgstr "Ištrinti sąrašą"
+
+msgid "Deletion failed"
+msgstr "Ištrynimas nepavyko"
+
+msgid "Descr."
+msgstr "Apraš."
 
 msgid "Description"
 msgstr "Aprašas"
@@ -782,14 +897,25 @@ msgstr "Paskirtis: {folder}"
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "Išjungti ekrano užsklandą, kai visas ekranas ir grojama"
 
+msgid "Disabled"
+msgstr "Išjungta"
+
 msgid "Disc"
 msgstr "Diskas"
 
 msgid "Disc #"
-msgstr "Disko #"
+msgstr "Disko nr."
 
 msgid "Disc name"
 msgstr "Disko pavadinimas"
+
+msgid "Display (:1 or host:0 for example)"
+msgstr "Ekranas (pavyzdžiui, :1 arba host:0)"
+
+msgid ""
+"Display a special layout in or around the titlebar of the focused window"
+msgstr ""
+"Rodyti specialų išdėstymą fokusuoto lango antraštės juostoje arba aplink ją"
 
 msgid "Display stop/next actions"
 msgstr "Rodyti stabdymo/kitos dainos veiksmus"
@@ -805,7 +931,10 @@ msgid "Displays a panel indicator in some desktops"
 msgstr "Kai kuriuose darbalaukiuose rodo skydelio indikatorių"
 
 msgid "Do not create an id3v1 tag in mp3 files"
-msgstr "Nekurti id3v1 žymės mp3 failuose "
+msgstr "Nekurti id3v1 žymes mp3 failuose "
+
+msgid "Do not unsynchronise id3v2 tags"
+msgstr "Neišsinchronizuoti id3v2 žymes"
 
 msgid "Do not write the tags"
 msgstr "Nerašyti žymių"
@@ -836,7 +965,7 @@ msgid "Edit"
 msgstr "Redaguoti"
 
 msgid "Edit Current Song Properties"
-msgstr "Redaguoti Esamos Dainos Savybes"
+msgstr "Redaguoti esamos dainos savybes"
 
 msgid "Edit Lyrics"
 msgstr "Keisti dainos žodžius"
@@ -845,7 +974,7 @@ msgid "Edit Lyrics ..."
 msgstr "Keisti dainos žodžius ..."
 
 msgid "Edit Settings"
-msgstr "Keisti Nustatymus"
+msgstr "Keisti nustatymus"
 
 msgid "Edit labels"
 msgstr "Redaguoti etiketes"
@@ -865,8 +994,32 @@ msgstr "Redaguoti pasirinktos dainos savybes"
 msgid "Edit..."
 msgstr "Keisti..."
 
+msgid "Editable in song properties dialog"
+msgstr "Redaguojama dainos savybių dialoge"
+
 msgid "Editing list : "
 msgstr "Redaguojamas sąrašas :"
+
+msgid "Embedded Pictures"
+msgstr "Įtaisyti paveikslai"
+
+msgid "Embedded lyrics"
+msgstr "Įtaisyti dainos žodžiai"
+
+msgid "Embedded picture"
+msgstr "Įtaisytas paveikslas"
+
+msgid "Empty list"
+msgstr "Tuščias sąrašas"
+
+msgid "Encapsulated object"
+msgstr "Uždarasis objektas"
+
+msgid "Encoded by"
+msgstr "Kodavo"
+
+msgid "Encoder"
+msgstr "Koduotuvas"
 
 msgid "Encoding used for id3v1 tags :"
 msgstr "id3v1 žymėms naudojama koduotė :"
@@ -880,6 +1033,9 @@ msgstr "Siųsti rodomas dainas į eilę"
 msgid "Enqueue Selected"
 msgstr "Siųsti pažymėtas dainas į eilę"
 
+msgid "Enter album name"
+msgstr "Įveskite albumo pavadinimą"
+
 msgid "Equalizer"
 msgstr "Glodintuvas"
 
@@ -892,17 +1048,54 @@ msgstr "Klaida, kuriant aplanką"
 msgid "Error details"
 msgstr "Išsamiau apie klaidą"
 
+#, perl-brace-format
+msgid "Error opening '{file}' for writing."
+msgstr "Klaida, atveriant įrašymui '{file}'."
+
+msgid "Error saving artistbio"
+msgstr "Klaida išsaugant atlikėjo biografiją"
+
+#, perl-brace-format
+msgid ""
+"Error saving artistbio in '{file}' :\n"
+"{error}"
+msgstr ""
+"Klaida, išsaugant atlikėjo biografiją į '{file}' :\n"
+"{error}"
+
 msgid "Error saving icon"
 msgstr "Klaida, išsaugant piktogramą"
 
 msgid "Error saving lyrics"
 msgstr "Klaida, išsaugant dainos žodžius"
 
+#, perl-brace-format
+msgid ""
+"Error saving lyrics in '{file}' :\n"
+"{error}"
+msgstr ""
+"Klaida, išsaugant dainos žodžius į '{file}' :\n"
+"{error}"
+
 msgid "Error saving picture"
 msgstr "Klaida, išsaugant paveikslą"
 
+msgid "Error saving review"
+msgstr "Klaida, įrašant apžvalgą"
+
+#, perl-brace-format
+msgid ""
+"Error saving review in '{file}' :\n"
+"{error}"
+msgstr ""
+"Klaida, įrašant apžvalgą į \"{file}\" :\n"
+"{error}"
+
 msgid "Error while writing replaygain data"
 msgstr "Klaida, įrašant replaygain duomenis"
+
+msgid "Error while writing tag"
+msgstr "Klaida, įrašant žymę"
 
 #, perl-brace-format
 msgid "Error writing '{file}'"
@@ -919,6 +1112,9 @@ msgstr "Klaida, įrašant atsisiųstą failą"
 
 msgid "Error writing lyrics"
 msgstr "Klaida, įrašant dainos žodžius"
+
+msgid "Error writing tag"
+msgstr "Klaida, rašant žymę"
 
 msgid "Error: invalid filename pattern"
 msgstr "Klaida: neteisingas failo pavadinimo šablonas"
@@ -1001,6 +1197,9 @@ msgstr "Failo pavadinimo formatas :"
 msgid "Filename without extension"
 msgstr "Failo pavadinimas be plėtinio"
 
+msgid "Files"
+msgstr "Failai"
+
 msgid "Files with these extensions won't be added"
 msgstr "Failai su šiais plėtiniais nebus pridedami"
 
@@ -1034,6 +1233,9 @@ msgstr "Filtruoti pagal šį atlikėją"
 msgid "Find :"
 msgstr "Rasti :"
 
+msgid "Find a unique filename if file already exists"
+msgstr "Rasti unikalų failo pavadinimą tuo atveju, jei failas jau yra"
+
 msgid "Find songs in same albums"
 msgstr "Rasti dainas tame pačiame albume"
 
@@ -1064,8 +1266,19 @@ msgstr "Sekti pasirinktą dainą"
 msgid "Font size"
 msgstr "Šrifto dydis"
 
+msgid "Forward"
+msgstr "Pervynioti pirmyn"
+
 msgid "Friday"
 msgstr "Penktadienis"
+
+#, perl-brace-format
+msgid ""
+"From: {oldname}\n"
+"To: {newname}"
+msgstr ""
+"Iš: {oldname}\n"
+"Į: {newname}"
 
 msgid "Full screen"
 msgstr "Visas ekranas"
@@ -1083,7 +1296,7 @@ msgid "GStreamer module not loaded."
 msgstr "Neįkeltas GStreamer modulis."
 
 msgid "Garage Fullscreen"
-msgstr "Garage Visas ekranas"
+msgstr "Garage visas ekranas"
 
 msgid "Genre"
 msgstr "Žanras"
@@ -1103,11 +1316,14 @@ msgstr "Žanrai"
 msgid "Genres pane"
 msgstr "Žanrų polangis"
 
+msgid "Gnome mmkeys"
+msgstr "Gnome mmklavišai"
+
 msgid "Gnome multimedia keys plugin"
 msgstr "Gnome multimedijos klavišų papildinys"
 
 msgid "Go to Playing Track"
-msgstr "Pereiti prie Grojamo Takelio"
+msgstr "Pereiti prie grojamo takelio"
 
 msgid "Go to playing song"
 msgstr "Pereiti prie grojamos dainos"
@@ -1127,8 +1343,22 @@ msgstr "Slėpti"
 msgid "Hide toolbar"
 msgstr "Slėpti įrankių juostą"
 
+msgid "High priority"
+msgstr "Aukšta pirmenybė"
+
 msgid "Icon theme :"
 msgstr "Piktogramų tema :"
+
+msgid "Identifier in file tag"
+msgstr "Identifikatorius failo žymėje"
+
+msgid ""
+"If checked, the shortcut has higher priority than the default shortcut of "
+"widgets. Warning: this can make some features inaccessible"
+msgstr ""
+"Jei pažymėta, spartusis klavišas turi aukštesnę pirmenybę negu valdiklio "
+"numatytasis spartusis klavišas. Įspėjimas: tai gali padaryti kai kurias "
+"ypatybes neprieinamas"
 
 msgid "Ignore playback errors"
 msgstr "Nepaisyti grojimo klaidų"
@@ -1140,7 +1370,7 @@ msgid "Import list"
 msgstr "Importuoti sąrašą"
 
 msgid "Include Styles in Genres"
-msgstr "Įtraukti Stilius į Žanrus"
+msgstr "Įtraukti stilius į žanrus"
 
 msgid "Increase Volume"
 msgstr "Pagarsinti"
@@ -1151,14 +1381,26 @@ msgstr "Pagarsinti"
 msgid "Info"
 msgstr "Informacija"
 
+msgid "Insensitive title-artist (left-aligned)"
+msgstr "Nejautrus pavadinimas-atlikėjas (lygiuotas kairėje)"
+
+msgid "Insensitive title-artist (right-aligned)"
+msgstr "Nejautrus pavadinimas-atlikėjas (lygiuotas dešinėje)"
+
+msgid "Insensitive, Song & Cover"
+msgstr "Nejautrus, daina ir viršelis"
+
 msgid "Insert Selected Songs at the top of the queue"
-msgstr "Įterpti Pasirinktas Dainas į eilės pradžią"
+msgstr "Įterpti pasirinktas dainas į eilės pradžią"
 
 msgid "Invalid regular expression"
-msgstr "Neteisinga reguliari išraiška"
+msgstr "Neteisinga reguliarusis reiškinys"
 
 msgid "Invert filter"
 msgstr "Invertuoti filtrą"
+
+msgid "Invisible hot spot"
+msgstr "Nematomas karštasis taškas"
 
 msgid "Justified"
 msgstr "Abipusė lygiuotė"
@@ -1187,8 +1429,17 @@ msgstr "Etiketė"
 msgid "Label is set"
 msgstr "Etiketė yra nustatyta"
 
+msgid "Label/Publisher"
+msgstr "Įrašų bendrovė/Leidėjas"
+
 msgid "Labels"
 msgstr "Etiketės"
+
+msgid "Lang"
+msgstr "Kalba"
+
+msgid "Lang."
+msgstr "Kalba"
 
 msgid "Languages"
 msgstr "Kalbos"
@@ -1198,6 +1449,9 @@ msgstr "Paskiausiai grota"
 
 msgid "Last skipped"
 msgstr "Paskiausiai praleista"
+
+msgid "Launch ripping program"
+msgstr "Paleisti perrašymo programą"
 
 msgid "Layout"
 msgstr "Išdėstymas"
@@ -1242,6 +1496,13 @@ msgid_plural "Library size : %d songs"
 msgstr[0] "Bibliotekos dydis: %d daina"
 msgstr[1] "Bibliotekos dydis: %d dainos"
 msgstr[2] "Bibliotekos dydis: %d dainų"
+msgstr[3] "Bibliotekos dydis: %d dainų"
+
+msgid "Limit similar artists to a rate of similarity : "
+msgstr "Apriboti panašius atlikėjus iki panašumo vertės : "
+
+msgid "Limit similar artists to the first : "
+msgstr "Apriboti panašius atlikėjus iki pirmųjų : "
 
 msgid "List"
 msgstr "Sąrašas"
@@ -1265,7 +1526,7 @@ msgid "Lists"
 msgstr "Sąrašai"
 
 msgid "Lists, Library & Context"
-msgstr "Sąrašai, Biblioteka ir Kontekstas"
+msgstr "Sąrašai, biblioteka ir kontekstas"
 
 msgid "Literal search"
 msgstr "Pažodinė paieška"
@@ -1274,7 +1535,15 @@ msgid "Load lyrics even if lyrics panel is hidden"
 msgstr "Įkelti dainos žodžius netgi jei dainos žodžių skydelis yra paslėptas"
 
 msgid "Load/Save Artist Info in :"
-msgstr "Įkelti/Išsaugoti Atlikėjo Informaciją į :"
+msgstr "Įkelti/Išsaugoti atlikėjo informaciją į :"
+
+#, perl-format
+msgid "Loaded %d unsent song from previous session"
+msgid_plural "Loaded %d unsent songs from previous session"
+msgstr[0] "Įkelta %d neišsiųsta daina iš ankstesnio seanso"
+msgstr[1] "Įkeltos %d neišsiųstos dainos iš ankstesnio seanso"
+msgstr[2] "Įkelta %d neišsiųstų dainų iš ankstesnio seanso"
+msgstr[3] "Įkelta %d neišsiųstų dainų iš ankstesnio seanso"
 
 msgid "Loading failed."
 msgstr "Įkėlimas nepavyko."
@@ -1286,16 +1555,16 @@ msgid "Lock"
 msgstr "Užrakinti"
 
 msgid "Lock Album"
-msgstr "Užrakinti Albumą"
+msgstr "Užrakinti albumą"
 
 msgid "Lock Artist"
-msgstr "Užrakinti Atlikėją"
+msgstr "Užrakinti atlikėją"
 
 msgid "Lock on Album"
-msgstr "Užrakinti ties Albumu"
+msgstr "Užrakinti ties albumu"
 
 msgid "Lock on Artist"
-msgstr "Užrakinti ties Atlikėju"
+msgstr "Užrakinti ties atlikėju"
 
 msgid "Lock on song"
 msgstr "Užrakinti ties daina"
@@ -1303,6 +1572,18 @@ msgstr "Užrakinti ties daina"
 #, perl-brace-format
 msgid "Lock on {field}"
 msgstr "Užrakinti ties {field}"
+
+msgid "Locked on :\n"
+msgstr "Užrakinta ties :\n"
+
+msgid "Lookup at allmusic.com"
+msgstr "Ieškoti allmusic.com puslapyje"
+
+msgid "Lookup in AMG"
+msgstr "Ieškoti AMG puslapyje"
+
+msgid "Lookup in google"
+msgstr "Ieškoti google puslapyje"
 
 msgid "Lower left"
 msgstr "Apačioje kairėje"
@@ -1316,6 +1597,9 @@ msgstr "Lopšinė"
 msgid "Lullaby plugin"
 msgstr "Lopšinės papildinys"
 
+msgid "Lyricist"
+msgstr "Žodžių autorius"
+
 msgid "Lyrics"
 msgstr "Dainos žodžiai"
 
@@ -1327,6 +1611,12 @@ msgstr "Dainos žodžių lygiavimas"
 
 msgid "Lyrics file :"
 msgstr "Dainos žodžių failas :"
+
+msgid "Lyrics file name format"
+msgstr "Dainos žodžių failo pavadinimo formatas"
+
+msgid "Lyrics for "
+msgstr "Dainos žodžiai, skirti "
 
 msgid "Lyrics plugin"
 msgstr "Dainos žodžių papildinys"
@@ -1361,11 +1651,18 @@ msgstr "Pagrindinis atlikėjas"
 msgid "Make it look like"
 msgstr "Padaryti, kad atrodytų kaip"
 
+msgid ""
+"Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
+"gnome."
+msgstr ""
+"Priverčia gmusicbrowser reaguoti į Kitas/Ankstesnis/Groti/Stabdyti "
+"multimedijos klavišus gnome aplinkoje."
+
 msgid "Mass Rename"
-msgstr "Masiškai Pervadinti"
+msgstr "Masiškai pervadinti"
 
 msgid "Mass Renaming"
-msgstr "Masinis Pervadinimas"
+msgstr "Masinis pervadinimas"
 
 msgid "Menu entry name"
 msgstr "Meniu įrašo pavadinimas"
@@ -1379,6 +1676,9 @@ msgstr "Vidurinio pelės mygtuko nuspaudimo veiksmas :"
 msgid "Minimal tip"
 msgstr "Minimali užuomina"
 
+msgid "Minimum size"
+msgstr "Mažiausias dydis"
+
 msgid "Misc."
 msgstr "Įvairūs"
 
@@ -1387,6 +1687,9 @@ msgstr "Modifikacija"
 
 msgid "Monday"
 msgstr "Pirmadienis"
+
+msgid "Monitor"
+msgstr "Monitorius"
 
 msgid "Monitor the pulseaudio volume"
 msgstr "Stebėti pulseaudio garsį"
@@ -1401,16 +1704,30 @@ msgid "More results"
 msgstr "Daugiau rezultatų"
 
 msgid "Mosaic View"
-msgstr "Mozaikos Rodinys"
+msgstr "Mozaikos rodinys"
 
 msgid "Move"
 msgstr "Perkelti"
 
 msgid "Move Files to :"
-msgstr "Perkelti Failus į :"
+msgstr "Perkelti failus į :"
 
 msgid "Move failed"
 msgstr "Perkėlimas nepavyko"
+
+msgid "Move folder to"
+msgstr "Perkelti aplanką į"
+
+msgid "Moving"
+msgstr "Perkeliama"
+
+#, perl-format
+msgid "Moving file"
+msgid_plural "Moving %d files"
+msgstr[0] "Perkeliamas %d failas"
+msgstr[1] "Perkeliami %d failai"
+msgstr[2] "Perkeliama %d failų"
+msgstr[3] "Perkeliama %d failų"
 
 msgid "Music"
 msgstr "Muzika"
@@ -1420,6 +1737,9 @@ msgstr "Muzikiniai failai"
 
 msgid "Mute/Unmute"
 msgstr "Nutildyti/Įjungti garsą"
+
+msgid "Name"
+msgstr "Pavadinimas"
 
 msgid "Name of layout"
 msgstr "Išdėstymo pavadinimas"
@@ -1446,16 +1766,16 @@ msgid "Next"
 msgstr "Kita"
 
 msgid "Next Album"
-msgstr "Kitas Albumas"
+msgstr "Kitas albumas"
 
 msgid "Next Artist"
-msgstr "Kitas Atlikėjas"
+msgstr "Kitas atlikėjas"
 
 msgid "Next Song"
-msgstr "Kita Daina"
+msgstr "Kita daina"
 
 msgid "Next Song In Playlist"
-msgstr "Kita Daina Grojaraštyje"
+msgstr "Kita daina grojaraštyje"
 
 msgid "No file browser found."
 msgstr "Failų tvarkytuvė nerasta."
@@ -1475,11 +1795,14 @@ msgstr "Dainos žodžių nerasta"
 msgid "No results found"
 msgstr "Nerasta jokių rezultatų"
 
+msgid "No review found"
+msgstr "Apžvalgos nerasta"
+
 msgid "No songs found"
 msgstr "Nerasta jokių dainų"
 
 msgid "No web browser found."
-msgstr "Žiniatinklio naršyklė nerasta."
+msgstr "Saityno naršyklė nerasta."
 
 msgid "None"
 msgstr "Nėra"
@@ -1493,8 +1816,16 @@ msgstr "Normali veiksena"
 msgid "Normal with buttons"
 msgstr "Normalus su mygtukais"
 
+msgid "Normalize volume (the files must have replaygain tags)"
+msgstr "Normalizuoti garsį (failai privalo turėti replaygain žymes)"
+
 msgid "Not found"
 msgstr "Nerasta"
+
+msgid "Note that some notification daemons resize the displayed picture"
+msgstr ""
+"Turėkite omenyje, kad kai kurios pranešimų tarnybos keičia rodomų paveikslų "
+"dydžius"
 
 msgid "Notify"
 msgstr "Pranešimai"
@@ -1507,6 +1838,9 @@ msgstr "Praneša apie grojama dainą per iškylančiuosius sistemos pranešimus"
 
 msgid "Now playing"
 msgstr "Dabar grojama"
+
+msgid "NowPlaying plugin"
+msgstr "DabarGrojama papildinys"
 
 msgid "Number of days since added"
 msgstr "Dienų skaičius nuo pridėjimo"
@@ -1559,6 +1893,9 @@ msgstr "Senas pavadinimas"
 msgid "On top of other windows instead of below"
 msgstr "Rodyti virš visų kitų langų, vietoj rodymo po jais"
 
+msgid "Only affect mp3 files that do not already have an id3v1 tag"
+msgstr "Įtakoja mp3 failus, kurie dar neturi id3v1 žymės"
+
 msgid "Only show similar artists from local library"
 msgstr "Rodyti panašius atlikėjus tik iš vietinės bibliotekos"
 
@@ -1566,58 +1903,64 @@ msgid "Opacity"
 msgstr "Nepermatomumas"
 
 msgid "Open Browser"
-msgstr "Atidaryti Naršyklę"
+msgstr "Atverti naršyklę"
 
 msgid "Open Browser window"
-msgstr "Atidaryti Naršyklės langą"
+msgstr "Atverti naršyklės langą"
 
 msgid "Open Context window"
-msgstr "Atidaryti konteksto langą"
+msgstr "Atverti konteksto langą"
 
 msgid "Open Custom window"
-msgstr "Atidaryti Tinkintą langą"
+msgstr "Atverti tinkintą langą"
 
 msgid "Open Equalizer"
-msgstr "Atidaryti Glodintuvą"
+msgstr "Atverti glodintuvą"
 
 msgid "Open Playlist"
-msgstr "Atidaryti Grojaraštį"
+msgstr "Atverti grojaraštį"
 
 msgid "Open Preference window"
-msgstr "Atidaryti Nuostatų langą"
+msgstr "Atverti nuostatų langą"
 
 msgid "Open Queue"
-msgstr "Atidaryti Eilę"
+msgstr "Atverti eilę"
 
 msgid "Open Queue window"
-msgstr "Atidaryti Eilės langą"
+msgstr "Atverti eilės langą"
 
 msgid "Open Search window"
-msgstr "Atidaryti Paieškos langą"
+msgstr "Atverti paieškos langą"
 
 msgid "Open containing folder"
-msgstr "Atidaryti vidinį aplanką"
+msgstr "Atverti vidinį aplanką"
 
 msgid "Open context page"
-msgstr "Atidaryti konteksto puslapį"
+msgstr "Atverti konteksto puslapį"
 
 msgid "Open equalizer..."
-msgstr "Atidaryti glodintuvą..."
+msgstr "Atverti glodintuvą..."
+
+msgid "Open existing list"
+msgstr "Atverti esamą sąrašą"
 
 msgid "Open folder"
-msgstr "Atidaryti aplanką"
+msgstr "Atverti aplanką"
 
 msgid "Open last.fm website in your browser"
-msgstr "Atidaryti last.fm svetainę jūsų naršyklėje"
+msgstr "Atverti last.fm svetainę jūsų naršyklėje"
 
 msgid "Open link in Browser"
-msgstr "Atidaryti nuorodą Naršyklėje"
+msgstr "Atverti nuorodą naršyklėje"
 
 msgid "Open page layout"
-msgstr "Atidaryti puslapio išdėstymą"
+msgstr "Atverti puslapio išdėstymą"
+
+msgid "Open special layouts as desktop widgets"
+msgstr "Atverti specialius išdėstymus kaip darbalaukio valdiklius"
 
 msgid "Open this page in the web browser"
-msgstr "Atidaryti šį puslapį žiniatinklio naršyklėje"
+msgstr "Atverti šį puslapį saityno naršyklėje"
 
 msgid "Options"
 msgstr "Parinktys"
@@ -1628,6 +1971,9 @@ msgstr "Parinktys ..."
 msgid "Options for subgroup"
 msgstr "Parinktys, skirtos pogrupiui"
 
+msgid "Original Artist"
+msgstr "Pradinis atlikėjas"
+
 msgid "Other"
 msgstr "Kita"
 
@@ -1636,6 +1982,9 @@ msgstr "Išvestis"
 
 msgid "Overlay layout :"
 msgstr "Perdangos išdėstymas :"
+
+msgid "Paste link"
+msgstr "Įdėti nuorodą"
 
 msgid "Path,Album,Disc,Track,File"
 msgstr "Kelias,Albumas,Diskas,Takelis,Failas"
@@ -1649,8 +1998,14 @@ msgstr "Šablonas, skirtas rasti .lrc failus :"
 msgid "Pause"
 msgstr "Pristabdyti"
 
+msgid "Persistent values"
+msgstr "Nuolatinės reikšmės"
+
 msgid "Picture"
 msgstr "Paveikslas"
+
+msgid "Picture Type"
+msgstr "Paveikslo tipas"
 
 #, perl-format
 msgid "Picture cache : %d MB"
@@ -1666,6 +2021,9 @@ msgstr "Paveikslų ieškiklio papildinys"
 msgid "Picture size : %d"
 msgstr "Paveikslo dydis : %d"
 
+msgid "Picture type"
+msgstr "Paveikslo tipas"
+
 msgid "Pictures and music files"
 msgstr "Paveikslai ir muzikos failai"
 
@@ -1676,10 +2034,10 @@ msgid "Play"
 msgstr "Groti"
 
 msgid "Play Only Displayed"
-msgstr "Groti Tik Rodomus"
+msgstr "Groti tik rodomus"
 
 msgid "Play Only Selected"
-msgstr "Groti Tik Pasirinktas"
+msgstr "Groti tik pasirinktas"
 
 msgid "Play a list of files"
 msgstr "Groti failų sąrašą"
@@ -1714,11 +2072,14 @@ msgstr "Groti/Pristabdyti"
 msgid "Playback"
 msgstr "Grojimas"
 
+msgid "Playback ended unexpectedly."
+msgstr "Grojimas netikėtai užsibaigė."
+
 msgid "Playcount: "
 msgstr "Grojimų skaičius:"
 
 msgid "Played Today"
-msgstr "Šiandien Grotos"
+msgstr "Šiandien grotos"
 
 msgid "Player mounted on :"
 msgstr "Grotuvas prijungtas ties :"
@@ -1728,6 +2089,15 @@ msgstr "Grotuvo lango išdėstymas :"
 
 msgid "Playing"
 msgstr "Grojimas"
+
+msgid "Playing Album"
+msgstr "Grojamas albumas"
+
+msgid "Playing Artist"
+msgstr "Grojamas atlikėjas"
+
+msgid "Playing Filter"
+msgstr "Grojamas filtras"
 
 #, perl-brace-format
 msgid "Playing error : {error}"
@@ -1740,10 +2110,10 @@ msgid "Playlist 1"
 msgstr "Grojaraštis 1"
 
 msgid "Playlist Empty"
-msgstr "Grojaraštis Tuščias"
+msgstr "Grojaraštis tuščias"
 
 msgid "Playlist Utilities Bar"
-msgstr "Grojaraščio Paslaugų Juosta"
+msgstr "Grojaraščio paslaugų juosta"
 
 msgid "Playlist empty"
 msgstr "Grojaraštis tuščias"
@@ -1763,11 +2133,14 @@ msgstr "Papildinys neįkeltas"
 msgid "Plugins"
 msgstr "Papildiniai"
 
+msgid "Popularimeter"
+msgstr "Populiarometras"
+
 msgid "Popup Custom window"
-msgstr "Iškelti Tinkintą langą"
+msgstr "Iškelti tinkintą langą"
 
 msgid "Popup Traytip"
-msgstr "Iškelti Dėklo užuominą"
+msgstr "Iškelti dėklo užuominą"
 
 msgid "Popup notify window"
 msgstr "Iškelti pranešimo langą"
@@ -1787,26 +2160,38 @@ msgstr "Pageidautina vieta įkelti ir išsaugoti dainos žodžius :"
 msgid "Preferences"
 msgstr "Nuostatos"
 
+msgid "Press a key or a key combination"
+msgstr "Paspauskite klavišą ar klavišų kombinaciją"
+
 msgid "Previous"
 msgstr "Ankstesnė"
 
 msgid "Previous Song"
-msgstr "Ankstesnė Daina"
+msgstr "Ankstesnė daina"
 
 msgid "Previous Song In Playlist"
-msgstr "Ankstesnė Daina Grojaraštyje"
+msgstr "Ankstesnė daina grojaraštyje"
 
 msgid "Previous page"
 msgstr "Ankstesnis puslapis"
 
 msgid "Private Data"
-msgstr "Privatūs Duomenys"
+msgstr "Privatūs duomenys"
 
 msgid "Properties"
 msgstr "Savybės"
 
+msgid "Provides context views using MozEmbed or WebKit"
+msgstr "Pateikia kontekstinius rodinius, naudojant MozEmbed ar WebKit"
+
 msgid "Proxy host :"
 msgstr "Įgaliotasis serveris :"
+
+msgid "Publisher"
+msgstr "Leidėjas"
+
+msgid "Publisher/Studio logotype"
+msgstr "Leidėjo/Studijos logotipas"
 
 msgid "Queue"
 msgstr "Eilė"
@@ -1816,7 +2201,7 @@ msgid "Queue (%n)"
 msgstr "Eilė (%n)"
 
 msgid "Queue Edit"
-msgstr "Eilės Redagavimas"
+msgstr "Eilės redagavimas"
 
 msgid "Queue album"
 msgstr "Siųsti albumą į eilę"
@@ -1828,16 +2213,16 @@ msgid "Queue empty"
 msgstr "Eilė tuščia"
 
 msgid "Queue in Sidebar"
-msgstr "Eilė Šoninėje juostoje"
+msgstr "Eilė šoninėje juostoje"
 
 msgid "Queue options"
 msgstr "Eilės parinktys"
 
 msgid "Quick Search"
-msgstr "Greita Paieška"
+msgstr "Greita paieška"
 
 msgid "Quick Search with SongTree"
-msgstr "Greita Paieška su Dainų Medžiu"
+msgstr "Greita paieška su dainų medžiu"
 
 msgid "Quit"
 msgstr "Baigti"
@@ -1848,14 +2233,23 @@ msgstr "Baigti po šios dainos"
 msgid "Quit when queue empty"
 msgstr "Baigti, kuomet eilė tuščia"
 
+msgid "Radio title"
+msgstr "Radijo pavadinimas"
+
+msgid "Radio url"
+msgstr "Radijo url"
+
 msgid "Random Playback"
-msgstr "Atsitiktinis Grojimas"
+msgstr "Atsitiktinis grojimas"
 
 msgid "Random mode edition"
 msgstr "Atsitiktinės veiksenos redagavimas"
 
 msgid "Rating"
 msgstr "Įvertinimas"
+
+msgid "Raw filename with path"
+msgstr "Neapdorotas failo pavadinimas ir kelias"
 
 msgid "Re-load layouts"
 msgstr "Iš naujo įkelti išdėstymus"
@@ -1903,10 +2297,10 @@ msgid "Refresh list"
 msgstr "Įkelti sąrašą iš naujo"
 
 msgid "Regular expression"
-msgstr "Reguliari išraiška"
+msgstr "Reguliarusis reiškinys"
 
 msgid "Regular expression :"
-msgstr "Reguliari išraiška :"
+msgstr "Reguliarusis reiškinys :"
 
 msgid "Release date"
 msgstr "Išleidimo data"
@@ -1923,8 +2317,14 @@ msgstr "Tarp seansų prisiminti grojamą dainą"
 msgid "Remember queue between sessions"
 msgstr "Tarp seansų prisiminti eilę"
 
+msgid "Remixer"
+msgstr "Išmaišiklis"
+
 msgid "Remove"
 msgstr "Šalinti"
+
+msgid "Remove a label from the current song"
+msgstr "Šalinti etiketę iš esamos dainos"
 
 msgid "Remove all songs"
 msgstr "Šalinti visas dainas"
@@ -1940,6 +2340,9 @@ msgstr "Šalinti iš bibliotekos"
 
 msgid "Remove from list"
 msgstr "Šalinti iš sąrašo"
+
+msgid "Remove from persistent values"
+msgstr "Šalinti iš nuolatinių reikšmių"
 
 msgid "Remove from playlist"
 msgstr "Šalinti iš grojaraščio"
@@ -1961,6 +2364,9 @@ msgstr "Šalinti pasirinktas dainas"
 
 msgid "Remove this field"
 msgstr "Šalinti šį lauką"
+
+msgid "Remove this rule"
+msgstr "Šalinti šią taisyklę"
 
 msgid "Remove this tab"
 msgstr "Šalinti šią kortelę"
@@ -2002,14 +2408,30 @@ msgstr "Pervadinti/perkelti failus, remiantis šiais laukais :"
 msgid "Renaming failed"
 msgstr "Pervadinimas nepavyko"
 
+#, perl-brace-format
+msgid ""
+"Renaming {oldname}\n"
+"to {newname}\n"
+"failed : {error}"
+msgstr ""
+"Pervadinti {oldname}\n"
+"į {newname}\n"
+"nepavyko : {error}"
+
 msgid "Reorganize files and folders"
 msgstr "Pertvarkyti failus ir aplankus"
 
 msgid "Repeat"
 msgstr "Kartoti"
 
+msgid "Replace"
+msgstr "Pakeisti"
+
 msgid "Replace existing values"
 msgstr "Pakeisti esamas reikšmes"
+
+msgid "Replace..."
+msgstr "Pakeisti..."
 
 msgid "ReplayGain options"
 msgstr "ReplayGain parinktys"
@@ -2024,7 +2446,10 @@ msgid "Rescan"
 msgstr "Iš naujo peržiūrėti"
 
 msgid "Rescan Collection"
-msgstr "Iš naujo peržiūrėti Kolekciją"
+msgstr "Iš naujo peržiūrėti kolekciją"
+
+msgid "Reset current value if no tag found in file"
+msgstr "Atstatyti esamą reikšmę, jei faile nerasta jokios žymės"
 
 msgid "Reset filter"
 msgstr "Atstatyti filtrą"
@@ -2036,6 +2461,9 @@ msgid "Retrieves album-relevant information (review etc.) from allmusic.com."
 msgstr ""
 "Parsiunčia su albumais susijusią informaciją (apžvalgas ir t. t.) iš "
 "puslapio allmusic.com"
+
+msgid "Rewind"
+msgstr "Pervynioti atgal"
 
 msgid "Rhythmbox"
 msgstr "Rhythmbox"
@@ -2053,6 +2481,15 @@ msgid "Right-click to toggle shuffle/random"
 msgstr ""
 "Spustelėkite dešinįjį pelės mygtuką, kad perjungtumėte maišytą/atsitiktinį "
 "grojimą"
+
+msgid "Rip"
+msgstr "Perrašyti"
+
+msgid "Rip plugin"
+msgstr "Perrašymo papildinys"
+
+msgid "Ripping software :"
+msgstr "Perrašymo programinė įranga :"
 
 msgid "Run a command when playing a song"
 msgstr "Vykdyti komandą, kai grojama daina"
@@ -2079,7 +2516,7 @@ msgid "Same year"
 msgstr "Tie patys metai"
 
 msgid "Sampling Rate"
-msgstr "Skaitmeninimo Dažnis"
+msgstr "Skaitmeninimo dažnis"
 
 msgid "Saturday"
 msgstr "Šeštadienis"
@@ -2088,7 +2525,10 @@ msgid "Save"
 msgstr "Išsaugoti"
 
 msgid "Save Tags/Options"
-msgstr "Išsaugoti Žymes/Parinktis"
+msgstr "Išsaugoti žymes/parinktis"
+
+msgid "Save album info in:"
+msgstr "Išsaugoti albumo informaciją į:"
 
 msgid "Save artist biography"
 msgstr "Išsaugoti atlikėjo biografiją"
@@ -2111,6 +2551,9 @@ msgstr "Išsaugoti dabar"
 msgid "Save picture as"
 msgstr "Išsaugoti paveikslą kaip"
 
+msgid "Save review"
+msgstr "Išsaugoti apžvalgą"
+
 #, perl-format
 msgid "Save tags/settings every %d minutes"
 msgstr "Išsaugoti žymes/nustatymus kas %d minučių"
@@ -2119,7 +2562,7 @@ msgid "Saved"
 msgstr "Išsaugoti"
 
 msgid "Saved Lists"
-msgstr "Išsaugoti Sąrašai"
+msgstr "Išsaugoti sąrašai"
 
 msgid "Saved filters"
 msgstr "Išsaugoti filtrai"
@@ -2128,7 +2571,7 @@ msgid "Saved lists"
 msgstr "Išsaugoti sąrašai"
 
 msgid "Scan Collection"
-msgstr "Peržiūrėti Kolekciją"
+msgstr "Peržiūrėti kolekciją"
 
 msgid "Scroll to zoom"
 msgstr "Slinkti, norint didinti/mažinti"
@@ -2139,6 +2582,10 @@ msgstr "Slinkti kartu su daina"
 msgid "Scroll with the song"
 msgstr "Slinkti kartu su daina"
 
+msgid "Scrollwheel to change, right-click to mute"
+msgstr ""
+"Pelės ratukas, kad keistumėte, dešinysis pelės mygtukas, kad nutildytumėte"
+
 msgid "Search"
 msgstr "Paieška"
 
@@ -2146,32 +2593,32 @@ msgid "Search : "
 msgstr "Ieškoti : "
 
 msgid "Search Album"
-msgstr "Ieškoti Albumo"
+msgstr "Ieškoti albumo"
 
 msgid "Search Artist"
-msgstr "Ieškoti Atlikėjo"
+msgstr "Ieškoti atlikėjo"
 
 msgid "Search Comment"
-msgstr "Ieškoti Komentaro"
+msgstr "Ieškoti komentaro"
 
 msgid "Search Genre"
-msgstr "Ieškoti Žanro"
+msgstr "Ieškoti žanro"
 
 msgid "Search Label"
-msgstr "Ieškoti Etiketės"
+msgstr "Ieškoti etiketės"
 
 msgid "Search Title"
-msgstr "Ieškoti Pavadinimo"
+msgstr "Ieškoti pavadinimo"
 
 msgid "Search Title, Artist and Album"
-msgstr "Ieškoti Pavadinimo, Atlikėjo ir Albumo"
+msgstr "Ieškoti pavadinimo, atlikėjo ir albumo"
 
 msgid "Search Title, Artist, Album, Comment, Label and Genre"
-msgstr "Ieškoti Pavadinimo, Atlikėjo, Albumo, Komentaro, Etiketės ir Žanro"
+msgstr "Ieškoti pavadinimo, atlikėjo, albumo, komentaro, etiketės ir žanro"
 
 msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
 msgstr ""
-"Ieškoti Pavadinimo, Atlikėjo, Albumo, Komentaro, Etiketės, Žanro ir Failo "
+"Ieškoti pavadinimo, atlikėjo, albumo, komentaro, etiketės, žanro ir failo "
 "pavadinimo"
 
 msgid "Search album"
@@ -2186,11 +2633,17 @@ msgstr "Paieškos langelio tipas"
 msgid "Search for a picture on internet"
 msgstr "Ieškoti paveikslo internete"
 
+msgid "Search for current album"
+msgstr "Ieškoti esamam albumui"
+
+msgid "Search for current artist"
+msgstr "Ieškoti esamam atlikėjui"
+
 msgid "Search for new songs on startup"
 msgstr "Paleidus programą, ieškoti naujų dainų"
 
 msgid "Search on the web"
-msgstr "Ieškoti žiniatinklyje"
+msgstr "Ieškoti saityne"
 
 msgid "Search options"
 msgstr "Paieškos parinktys"
@@ -2216,20 +2669,33 @@ msgstr "Pasirinkta : "
 msgid "Selected songs"
 msgstr "Pasirinktos dainos"
 
+msgid "Send Title/Artist/Album in standard input"
+msgstr "Siųsti Pavadinimą/Atlikėją/Albumą standartinėje įvestyje"
+
 msgid "Set Current Song Rating"
-msgstr "Nustatyti Esamos Dainos Įvertinimą"
+msgstr "Nustatyti esamos dainos įvertinimą"
 
 msgid "Set Picture"
-msgstr "Nustatyti Paveikslą"
+msgstr "Nustatyti paveikslą"
 
 msgid "Set action when song ends"
 msgstr "Nustatyti veiksmą, kai pasibaigia daina"
 
+#, perl-brace-format
+msgid "Set as picture for '{name}'"
+msgstr "Nustatyti kaip \"{name}\" paveikslą"
+
 msgid "Set as primary filter"
 msgstr "Nustatyti kaip pirminį filtrą"
 
+msgid "Set equalizer"
+msgstr "Nustatyti glodintuvą"
+
 msgid "Set icon"
 msgstr "Nustatyti piktogramą"
+
+msgid "Set picture"
+msgstr "Nustatyti paveikslą"
 
 msgid "Set player window layout"
 msgstr "Nustatyti grotuvo lango išdėstymą"
@@ -2261,10 +2727,10 @@ msgid "Show"
 msgstr "Rodyti"
 
 msgid "Show Artist page on last.fm"
-msgstr "Rodyti Atlikėjo puslapį last.fm puslapyje"
+msgstr "Rodyti atlikėjo puslapį last.fm puslapyje"
 
 msgid "Show Artist page on wikipedia"
-msgstr "Rodyti Atlikėjo puslapį Vikipedijoje"
+msgstr "Rodyti atlikėjo puslapį vikipedijoje"
 
 msgid "Show album"
 msgstr "Rodyti albumą"
@@ -2283,6 +2749,9 @@ msgstr "Rodyti mygtukus"
 
 msgid "Show file list"
 msgstr "Rodyti failų sąrašą"
+
+msgid "Show file name extension"
+msgstr "Rodyti failo pavadinimo plėtinį"
 
 msgid "Show folder list"
 msgstr "Rodyti aplankų sąrašą"
@@ -2336,13 +2805,19 @@ msgid "Show/Hide"
 msgstr "Rodyti/Slėpti"
 
 msgid "Show/Hide Browser"
-msgstr "Rodyti/Slėpti Naršyklę"
+msgstr "Rodyti/Slėpti naršyklę"
 
 msgid "Show/Hide Cover"
-msgstr "Rodyti/Slėpti Viršelį"
+msgstr "Rodyti/Slėpti viršelį"
+
+msgid "Show/Hide layout widget(s)"
+msgstr "Rodyti/Slėpti išdėstymo valdiklį(-ius)"
 
 msgid "Show/Hide lyrics line"
 msgstr "Rodyti/Slėpti dainos žodžių eilutę"
+
+msgid "Show/hide URI entry"
+msgstr "Rodyti/slėpti URI įrašą"
 
 msgid "Show/hide status bar"
 msgstr "Rodyti/Slėpti būsenos juostą"
@@ -2352,6 +2827,9 @@ msgstr "Maišyti"
 
 msgid "Shuffle list"
 msgstr "Maišyti sąrašą"
+
+msgid "Shuffle or re-shuffle the playlist"
+msgstr "Maišyti ar iš naujo išmaišyti grojaraštį"
 
 msgid "Shuffle queue"
 msgstr "Maišyti eilę"
@@ -2372,10 +2850,13 @@ msgid "Similar"
 msgstr "Panašūs"
 
 msgid "Similar Artists"
-msgstr "Panašūs Atlikėjai"
+msgstr "Panašūs atlikėjai"
 
 msgid "Simple List View"
-msgstr "Paprasto Sąrašo Rodinys"
+msgstr "Paprasto sąrašo rodinys"
+
+msgid "Simple title"
+msgstr "Paprastas pavadinimas"
 
 msgid "Size"
 msgstr "Dydis"
@@ -2388,6 +2869,12 @@ msgstr "Praleisti šią ir visas tolimesnes klaidas."
 
 msgid "Skip to next song if an error occurs"
 msgstr "Įvykus klaidai, pereiti prie kitos dainos"
+
+msgid "Small"
+msgstr "Mažas"
+
+msgid "Small album picture"
+msgstr "Mažas albumo paveikslas"
 
 msgid "Small player"
 msgstr "Mažas grotuvas"
@@ -2405,7 +2892,7 @@ msgid "Song"
 msgstr "Daina"
 
 msgid "Song Properties"
-msgstr "Dainos Savybės"
+msgstr "Dainos savybės"
 
 msgid "Song informations"
 msgstr "Dainos informacija"
@@ -2414,10 +2901,10 @@ msgid "Song rating"
 msgstr "Dainos įvertinimas"
 
 msgid "Songs Properties"
-msgstr "Dainų Savybės"
+msgstr "Dainų savybės"
 
 msgid "Songtree View"
-msgstr "Dainų Medžio Rodinys"
+msgstr "Dainų medžio rodinys"
 
 msgid "Sort"
 msgstr "Rikiavimas"
@@ -2434,6 +2921,9 @@ msgstr "Šaltinis: {file}"
 
 msgid "Split artist names on :"
 msgstr "Atskirti atlikėjų vardus ties :"
+
+msgid "Star images"
+msgstr "Žvaigždučių paveikslai"
 
 msgid "Start ReplayGain analysis"
 msgstr "Pradėti ReplayGain analizę"
@@ -2460,13 +2950,13 @@ msgid "Stop when queue empty"
 msgstr "Stabdyti, kuomet eilė tuščia"
 
 msgid "Stop, Play and Next buttons"
-msgstr "Mygtukai Stabdyti, Groti ir Kita daina"
+msgstr "Mygtukai stabdyti, groti ir kita daina"
 
 msgid "Stop, Play and Next buttons and Time"
-msgstr "Mygtukai Stabdyti, Groti ir Kita daina bei Laikas"
+msgstr "Mygtukai stabdyti, groti ir kita daina bei laikas"
 
 msgid "Stop, Play and Next buttons and Title/Artist"
-msgstr "Mygtukai Stabdyti, Groti ir Kita daina bei Pavadinimas/Atlikėjas"
+msgstr "Mygtukai stabdyti, groti ir kita daina bei pavadinimas/atlikėjas"
 
 msgid "Styles"
 msgstr "Stiliai"
@@ -2508,12 +2998,19 @@ msgid "These values will always be in the list, even if they are not used"
 msgstr ""
 "Šios reikšmės visada bus sąraše, netgi tuomet, kai jos nebus naudojamos"
 
+#, perl-brace-format
+msgid "This command is required to play files of type {type} : {cmd}"
+msgstr ""
+"Ši komanda yra reikalinga, norint groti failus, kurių tipas yra {type} : "
+"{cmd}"
+
 #, perl-format
 msgid "This label is set for %d song."
 msgid_plural "This label is set for %d songs."
 msgstr[0] "Ši etiketė yra nustatyta %d dainai."
 msgstr[1] "Ši etiketė yra nustatyta %d dainoms."
 msgstr[2] "Ši etiketė yra nustatyta %d dainų."
+msgstr[3] "Ši etiketė yra nustatyta %d dainų."
 
 msgid ""
 "This plugin is needed for gmusicbrowser to appear in unity's sound menu."
@@ -2550,6 +3047,9 @@ msgstr "Laipsniško nutildymo laiko periodas, sekundėmis"
 msgid "Title"
 msgstr "Pavadinimas"
 
+msgid "Title - Artist - Album"
+msgstr "Pavadinimas - Atlikėjas - Albumas"
+
 msgid "Title or filename"
 msgstr "Dainos arba failo pavadinimas"
 
@@ -2559,25 +3059,28 @@ msgstr "Pavadinimas: %t"
 
 #, perl-format
 msgid "Title: %t (Track No. %n)"
-msgstr "Pavadinimas: %t (Takelio Nr. %n)"
+msgstr "Pavadinimas: %t (Takelio nr. %n)"
+
+msgid "Titlebar"
+msgstr "Antraštės juosta"
 
 msgid "Titlebar overlay plugin"
-msgstr "Pavadinimo juostos perdangos papildinys"
+msgstr "Antraštės juostos perdangos papildinys"
 
 msgid "Toggle Album Lock"
-msgstr "Perjungti Albumo Užraktą"
+msgstr "Perjungti albumo užraktą"
 
 msgid "Toggle Artist Lock"
-msgstr "Perjungti Atlikėjo Užraktą"
+msgstr "Perjungti atlikėjo užraktą"
 
 msgid "Toggle Song Lock"
-msgstr "Perjungti Dainos Užraktą"
+msgstr "Perjungti dainos užraktą"
 
 msgid "Toggle a label of the current song"
 msgstr "Perjungti esamos dainos etiketę"
 
 msgid "Toggle between Random/Shuffle and Ordered"
-msgstr "Perjungti tarp Atsitiktinio/Maišyto ir Sutvarkyto grojimo"
+msgstr "Perjungti tarp atsitiktinio/maišyto ir sutvarkyto grojimo"
 
 msgid "Toggle edit mode"
 msgstr "Perjungti redagavimo veikseną"
@@ -2594,11 +3097,14 @@ msgstr "Įrankių juosta"
 msgid "Tools"
 msgstr "Įrankiai"
 
+msgid "Total playcount:"
+msgstr "Bendras grojimų skaičius:"
+
 msgid "Track"
 msgstr "Takelis"
 
 msgid "Track Properties"
-msgstr "Takelio Savybės"
+msgstr "Takelio savybės"
 
 msgid "Track gain"
 msgstr "Takelio stiprinimas"
@@ -2630,6 +3136,9 @@ msgstr "Išjungti kompiuterį, kai ištuštės eilė"
 msgid "URL"
 msgstr "URL"
 
+msgid "Unknown"
+msgstr "Nežinoma"
+
 msgid "Unknown album"
 msgstr "Nežinomas albumas"
 
@@ -2645,10 +3154,10 @@ msgid "Unknown layout '%s'"
 msgstr "Nežinomas išdėstymas '%s'"
 
 msgid "Unlock Album"
-msgstr "Atrakinti Albumą"
+msgstr "Atrakinti albumą"
 
 msgid "Unlock Artist"
-msgstr "Atrakinti Atlikėją"
+msgstr "Atrakinti atlikėją"
 
 msgid "Unnamed filter"
 msgstr "Filtras be pavadinimo"
@@ -2669,7 +3178,14 @@ msgid "Upper right"
 msgstr "Viršuje dešinėje"
 
 msgid "Use Equalizer"
-msgstr "Naudoti Glodintuvą"
+msgstr "Naudoti glodintuvą"
+
+msgid ""
+"Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are "
+"probably better supported by other softwares"
+msgstr ""
+"Kuriant ID3v2 žymę, vietoj ID3v2.3, naudoti ID3v2.4, ID3v2.3 tikriausiai yra "
+"geriau palaikoma kitų programinių įrangų"
 
 msgid "Use MozEmbed"
 msgstr "Naudoti MozEmbed"
@@ -2684,7 +3200,7 @@ msgid "Use a master filter"
 msgstr "Naudoti pagrindinį filtrą"
 
 msgid "Use default regular expression"
-msgstr "Naudoti numatytą reguliarią išraišką"
+msgstr "Naudoti numatytąją reguliarųjį reiškinį"
 
 msgid "Use gstreamer"
 msgstr "Naudoti gstreamer"
@@ -2704,10 +3220,16 @@ msgid "Use this picture for artist '{artist}'"
 msgstr "Naudoti šį paveikslą atlikėjui '{artist}'"
 
 msgid "Used for the Artists field"
-msgstr "Naudojama Atlikėjų laukui"
+msgstr "Naudojama atlikėjų laukui"
 
 msgid "User authentification error"
-msgstr "Vartotojo tapatybės nustatymo klaida"
+msgstr "Naudotojo tapatybės nustatymo klaida"
+
+msgid "Value not written in file tag"
+msgstr "Reikšmė neįrašyta į failo žymę"
+
+msgid "Value written in file tag"
+msgstr "Reikšmė įrašyta į failo žymę"
 
 msgid "Version"
 msgstr "Versija"
@@ -2739,11 +3261,17 @@ msgstr ""
 msgid "Warning: all existing data for this field will be lost"
 msgstr "Įspėjimas: visi esami šio lauko duomenys bus prarasti"
 
+msgid "Web context"
+msgstr "Saityno kontekstas"
+
+msgid "Web context plugin"
+msgstr "Saityno konteksto papildinys"
+
 msgid "Wednesday"
 msgstr "Trečiadienis"
 
 msgid "Weighted Random"
-msgstr "Svertinis Atsitiktinis Grojimas"
+msgstr "Svertinis atsitiktinis grojimas"
 
 msgid "When added"
 msgstr "Pridėjus"
@@ -2769,6 +3297,9 @@ msgctxt "Keyboard"
 msgid "Win"
 msgstr "Win"
 
+msgid "Windows"
+msgstr "Langai"
+
 msgid "Year"
 msgstr "Metai"
 
@@ -2788,6 +3319,18 @@ msgstr ""
 "Priverstinį šių failų patikrinimą galite atlikti, laikydami Shift klavišą ir "
 "nuspausdami \"Iš naujo skaityti žymes\""
 
+#, perl-brace-format
+msgid ""
+"You can make custom stars by putting pictures in {folder}\n"
+"They must be named 'stars', optionally followed by a '-' and a word, "
+"followed by a number from 0 to 5 or 10\n"
+"Example: stars-custom0.png"
+msgstr ""
+"Jūs galite sukurti tinkintas žvaigždutes patalpindami paveikslus į {folder}\n"
+"Jie privalo būti pavadinti \"stars\", o po jų pasirinktinai turi sekti \"-\" "
+"ir žodis, po kurio turi sekti skaičius nuo 0 iki 5 ar 10\n"
+"Pavyzdys: stars-custom0.png"
+
 msgid "You must specify a base folder"
 msgstr "Jūs privalote nurodyti bazinį aplanką"
 
@@ -2802,6 +3345,27 @@ msgstr "Mažinti"
 
 msgid "Zoom to fit"
 msgstr "Mastelis toks, kad tilptų"
+
+msgid "_Cancel"
+msgstr "_Atsisakyti"
+
+msgid "_Insert column"
+msgstr "Įterpt_i stulpelį"
+
+msgid "_Remove this column"
+msgstr "Šalinti šį s_tulpelį"
+
+msgid "_Retry"
+msgstr "_Bandyti vėl"
+
+msgid "_Skip"
+msgstr "Pralei_sti"
+
+msgid "_Sort by"
+msgstr "_Rikiuoti pagal"
+
+msgid "abort"
+msgstr "nutraukti"
 
 msgid "add"
 msgstr "pridėti"
@@ -2821,6 +3385,10 @@ msgstr "abėcėlė"
 msgid "applied on reload"
 msgstr "taikoma, įkėlus iš naujo"
 
+#, perl-brace-format
+msgid "argument {n} :"
+msgstr "argumentas {n} :"
+
 msgid "artist"
 msgstr "atlikėjas"
 
@@ -2833,8 +3401,21 @@ msgstr "automatiškai užpildoma"
 msgid "automatic size"
 msgstr "automatinis dydis"
 
+msgid "back cover"
+msgstr "galinis viršelis"
+
+msgid "band"
+msgstr "grupė"
+
+msgid "band/artist logotype"
+msgstr "grupės/atlikėjo logotipas"
+
 msgid "between"
 msgstr "tarp"
+
+#, perl-format
+msgid "between %s and %s"
+msgstr "tarp %s ir %s"
 
 msgid "big size"
 msgstr "didelis dydis"
@@ -2844,6 +3425,9 @@ msgstr "papildomi takeliai"
 
 msgid "broken"
 msgstr "klaidinga"
+
+msgid "by"
+msgstr "pagal"
 
 msgid "by added"
 msgstr "pagal pridėtas"
@@ -2860,6 +3444,10 @@ msgstr "pagal grojimų skaičių"
 msgid "by rating"
 msgstr "pagal įvertinimą"
 
+#, perl-brace-format
+msgid "by {author}"
+msgstr "pagal {author}"
+
 msgid "check length now"
 msgstr "tikrinti trukmę dabar"
 
@@ -2875,8 +3463,20 @@ msgstr "komanda :"
 msgid "composer"
 msgstr "kompozitorius"
 
+msgid "conductor"
+msgstr "dirigentas"
+
+msgid "day"
+msgstr "diena"
+
 msgid "days"
 msgstr "dienų"
+
+msgid "default"
+msgstr "pagal numatymą"
+
+msgid "default filename"
+msgstr "numatytasis failo pavadinimas"
 
 msgid "default folder"
 msgstr "numatytasis aplankas"
@@ -2887,6 +3487,12 @@ msgstr "ištrinti pasirinktą atsitiktinę veikseną"
 #, perl-brace-format
 msgid "disc {disc}"
 msgstr "diskas {disc}"
+
+msgid "during performance"
+msgstr "pasirodymo metu"
+
+msgid "during recording"
+msgstr "įrašymo metu"
 
 msgid "entire collection"
 msgstr "visai kolekcijai"
@@ -2927,8 +3533,14 @@ msgstr "failo žymė"
 msgid "file: {filename}"
 msgstr "failas: {filename}"
 
+msgid "filters"
+msgstr "filtrai"
+
 msgid "font size depends on"
 msgstr "šrifto dydis priklauso nuo"
+
+msgid "front cover"
+msgstr "priekinis viršelis"
 
 msgid "gmusicbrowser"
 msgstr "gmusicbrowser"
@@ -2941,10 +3553,19 @@ msgid "google images"
 msgstr "google vaizdai"
 
 msgid "google images (hi-res)"
-msgstr "google vaizdai (didelės skyros)"
+msgstr "google vaizdai (didelės raiškos)"
+
+msgid "group by"
+msgstr "grupuoti pagal"
 
 msgid "huge size"
 msgstr "didžiulis dydis"
+
+msgid "icecast server"
+msgstr "icecast serveris"
+
+msgid "illustration"
+msgstr "iliustracija"
 
 msgid "interview"
 msgstr "interviu"
@@ -3014,6 +3635,13 @@ msgstr "nėra mono"
 msgid "isn't stereo"
 msgstr "nėra stereo"
 
+msgid ""
+"itunes doesn't support unsynchronised tags last time I checked, mostly "
+"affect tags with pictures"
+msgstr ""
+"paskutinį kartą kai tikrinau, itunes nepalaikė išsinchronizuotų žymių, tai "
+"daugiausiai įtakoja žymes su paveikslais"
+
 msgid "last.fm"
 msgstr "last.fm"
 
@@ -3035,6 +3663,12 @@ msgstr ""
 ">30 vidutinis\n"
 ">10 mažesnis"
 
+msgid "lead artist"
+msgstr "vedantysis atlikėjas"
+
+msgid "leaflet page"
+msgstr "leidinio puslapis"
+
 msgid "left-side filter panes"
 msgstr "kairėje pusėje filtro polangiai"
 
@@ -3045,6 +3679,9 @@ msgstr "dainų trukmė"
 msgid "less than %s ago"
 msgstr "mažiau kaip prieš %s"
 
+msgid "lyricist"
+msgstr "Žodžių autorius"
+
 msgid "lyrics file"
 msgstr "dainos žodžių failas"
 
@@ -3054,8 +3691,14 @@ msgstr "didžiausias šrifto dydis"
 msgid "medium size"
 msgstr "vidutinis dydis"
 
+msgid "minimal"
+msgstr "minimalus"
+
 msgid "minimum font size"
 msgstr "mažiausias šrifto dydis"
+
+msgid "month"
+msgstr "mėnesis"
 
 #, perl-format
 msgid "more than %s ago"
@@ -3063,6 +3706,9 @@ msgstr "daugiau kaip prieš %s"
 
 msgid "mosaic mode"
 msgstr "mozaikos veiksena"
+
+msgid "movie/video screen capture"
+msgstr "filmo/vaizdo įrašo ekrano kopija"
 
 msgid ""
 "mp3 files without a VBR header requires a full scan to check its real length "
@@ -3092,11 +3738,21 @@ msgstr "niekada"
 msgid "never played"
 msgstr "niekada negrotos"
 
+msgid "no matches found, you might want to remove some search terms."
+msgstr ""
+"atitikimų nerasta, galbūt, norėsite pašalinti kai kuriuos paieškos žodžius."
+
 msgid "no order"
 msgstr "jokios tvarkos"
 
+msgid "no picture"
+msgstr "be paveikslo"
+
 msgid "no pictures"
 msgstr "be paveikslų"
+
+msgid "no plugins found"
+msgstr "jokių papildinių nerasta"
 
 msgid "no songs needs checking"
 msgstr "patikrinimo reikalaujančių dainų nėra"
@@ -3116,8 +3772,13 @@ msgstr "filtre esančių dainų skaičius"
 msgid "only works when the artist-info tab is displayed"
 msgstr "veikia tik tada, kai yra rodoma atlikėjo informacijos kortelė"
 
+msgid "only works with some lyrics source and when the lyrics tab is active"
+msgstr ""
+"veikia tik su kai kuriais dainos žodžių šaltiniais ir tuomet, kai dainos "
+"žodžių kortelė yra aktyvi"
+
 msgid "open context window"
-msgstr "atidaryti konteksto langą"
+msgstr "atverti konteksto langą"
 
 msgid "options"
 msgstr "parinktys"
@@ -3126,8 +3787,18 @@ msgstr "parinktys"
 msgid "or %d seconds"
 msgstr "arba %d sekundžių"
 
+msgid "other"
+msgstr "kita"
+
+msgid "other file icon"
+msgstr "kita failo piktograma"
+
 msgid "output device :"
 msgstr "išvesties įrenginys :"
+
+#, perl-format
+msgid "page %d"
+msgstr "puslapis %d"
 
 #, perl-brace-format
 msgid "page {number}"
@@ -3151,8 +3822,14 @@ msgstr "prievadas :"
 msgid "quit"
 msgstr "baigti"
 
+msgid "recording location"
+msgstr "įrašymo vieta"
+
 msgid "requires xdg-screensaver"
 msgstr "reikalauja xdg-screensaver"
+
+msgid "reset format"
+msgstr "atstatyti formatą"
 
 msgid "reverse order"
 msgstr "atgalinė tvarka"
@@ -3174,6 +3851,9 @@ msgstr "išsaugoti grupavimai"
 
 msgid "saved random modes"
 msgstr "išsaugotos atsitiktinės veiksenos"
+
+msgid "saved sort modes"
+msgstr "išsaugotos rikiavimo veiksenos"
 
 msgid "scan now"
 msgstr "peržiūrėti dabar"
@@ -3208,6 +3888,9 @@ msgstr "teksto formatas"
 msgid "text mode"
 msgstr "teksto veiksena"
 
+msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
+msgstr "numatytoji yra utf16, kuri skirta ID3v2.3, o utf8 yra skirta ID3v2.4"
+
 msgid "times"
 msgstr "kartų"
 
@@ -3236,7 +3919,7 @@ msgid "use album name"
 msgstr "naudoti albumo pavadinimą"
 
 msgid "use default"
-msgstr "naudoti numatytą"
+msgstr "naudoti numatytąjį"
 
 msgid "use gnome settings"
 msgstr "naudoti gnome nustatymus"
@@ -3244,8 +3927,11 @@ msgstr "naudoti gnome nustatymus"
 msgid "use song folder"
 msgstr "naudoti dainos aplanką"
 
+msgid "use standard strftime variables"
+msgstr "naudokite standartinius strftime kintamuosius"
+
 msgid "username :"
-msgstr "vartotojo vardas :"
+msgstr "naudotojos vardas :"
 
 msgid "using skin :"
 msgstr "naudojamas apipavidalinimas :"
@@ -3259,6 +3945,9 @@ msgstr "kai pasikeičia failas"
 msgid "when folder changes"
 msgstr "kai pasikeičia aplankas"
 
+msgid "wikipedia, lyrics, and custom webpages"
+msgstr "vikipediją, dainos žodžius, bei tinkintus tinklalapius"
+
 msgid "with browser"
 msgstr "su naršykle"
 
@@ -3266,7 +3955,28 @@ msgid "with browser & queue"
 msgstr "su naršykle ir eile"
 
 msgid "with browser (SongTree)"
-msgstr "su naršykle (Dainų Medis)"
+msgstr "su naršykle (Dainų medis)"
+
+msgid "with lists"
+msgstr "su sąrašais"
+
+msgid "with picture"
+msgstr "su paveikslu"
+
+msgid "with playlist"
+msgstr "su grojaraščiu"
+
+msgid "with queue"
+msgstr "su eile"
+
+msgid "with search"
+msgstr "su paieška"
+
+msgid "with search and lists"
+msgstr "su paieška ir sąrašais"
+
+msgid "with search and lists 2"
+msgstr "su paieška ir sąrašais 2"
 
 msgid "x offset :"
 msgstr "x poslinkis :"
@@ -3281,10 +3991,6 @@ msgid "year (highest)"
 msgstr "metai (vėliausi)"
 
 #, perl-brace-format
-msgid "{folder} already exists"
-msgstr "{folder} jau yra"
-
-#, perl-brace-format
 msgid "{hours} hours {min} min {sec} s"
 msgstr "{hours} valandų {min} min. {sec} sek."
 
@@ -3295,6 +4001,18 @@ msgstr "{hours}val. {min}min. {sec}sek."
 #, perl-brace-format
 msgid "{hours}h{min}m{sec}s"
 msgstr "{hours}val.{min}min.{sec}sek."
+
+#, perl-brace-format
+msgid "{min} min {sec} s"
+msgstr "{min} min. {sec} sek."
+
+#, perl-brace-format
+msgid "{min}m {sec}s"
+msgstr "{min}min. {sec}sek."
+
+#, perl-brace-format
+msgid "{min}m{sec}s"
+msgstr "{min}min.{sec}sek."
 
 #, perl-brace-format
 msgid "{outputname} output settings"

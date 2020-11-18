@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2015-04-05 23:50+0200\n"
-"PO-Revision-Date: 2015-04-19 14:47+0000\n"
+"POT-Creation-Date: 2015-08-17 18:49+0200\n"
+"PO-Revision-Date: 2017-09-20 12:54+0000\n"
 "Last-Translator: abuyop <abuyop@gmail.com>\n"
 "Language-Team: Malay (Malaysia) (http://www.transifex.com/squentin/"
 "gmusicbrowser/language/ms_MY/)\n"
@@ -278,6 +278,9 @@ msgstr "Tambah label baharu"
 
 msgid "Add new radio"
 msgstr "Tambah radio baharu"
+
+msgid "Add picture"
+msgstr "Tambah gambar"
 
 msgid "Add rule : "
 msgstr "Tambah peraturan :"
@@ -872,6 +875,9 @@ msgstr ""
 "'matikan komputer bila baris gilir kosong'\n"
 "dipilih"
 
+msgid "Command used:"
+msgstr "Perintah diguna :"
+
 msgid "Command when playing song changed :"
 msgstr "Perintah bila lagu yang dimainkan berubah :"
 
@@ -1195,6 +1201,10 @@ msgstr "Sunting tip baris"
 msgid "Edit selected song properties"
 msgstr "Sunting sifat lagu terpilih"
 
+#, perl-brace-format
+msgid "Edit {field}"
+msgstr "Sunting {field}"
+
 msgid "Edit..."
 msgstr "Sunting..."
 
@@ -1206,6 +1216,9 @@ msgstr "Senarai penyuntingan :"
 
 msgid "Editing tags"
 msgstr "Menyunting tag"
+
+msgid "Embedded Pictures"
+msgstr "Gambar Terbenam"
 
 msgid "Embedded lyrics"
 msgstr "Lirik boleh dibenam"
@@ -1622,11 +1635,21 @@ msgstr "Sembunyi yang tidak-sepadan"
 msgid "Hide toolbar"
 msgstr "Sembunyi palang alat"
 
+msgid "High priority"
+msgstr "Keutamaan tinggi"
+
 msgid "Icon theme :"
 msgstr "Tema ikon :"
 
 msgid "Identifier in file tag"
 msgstr "Pengenalpasti dalam tag fail"
+
+msgid ""
+"If checked, the shortcut has higher priority than the default shortcut of "
+"widgets. Warning: this can make some features inaccessible"
+msgstr ""
+"Jika ditanda, pintasan mempunyai keutamaan lebih tinggi berbanding pintasan "
+"lalai widjet. Amaran: ia boleh menyebabkan beberapa fitur tidak boleh dicapai"
 
 msgid "Ignore playback errors"
 msgstr "Abai ralat main balik"
@@ -1741,6 +1764,9 @@ msgstr "Bah."
 
 msgid "Languages"
 msgstr "Bahasa"
+
+msgid "Last messages:"
+msgstr "Mesej terakhir:"
 
 msgid "Last played"
 msgstr "Terakhir dimain"
@@ -2354,6 +2380,9 @@ msgstr "Bentangan tindihan atas :"
 msgid "Owner identifier"
 msgstr "Pengenalpasti pemilik"
 
+msgid "Paste link"
+msgstr "Tampal pautan"
+
 msgid "Path,Album,Disc,Track,File"
 msgstr "Laluan,Album,Cakera,Trek,Fail"
 
@@ -2397,6 +2426,9 @@ msgstr "Pemalam pencari gambar"
 #, perl-format
 msgid "Picture size : %d"
 msgstr "Saiz gambar : %d"
+
+msgid "Picture type"
+msgstr "Jenis gambar"
 
 msgid "Pictures and music files"
 msgstr "Fail gambar dan muzik"
@@ -2451,6 +2483,9 @@ msgstr "Main/Jeda"
 
 msgid "Playback"
 msgstr "Main balik"
+
+msgid "Playback ended unexpectedly."
+msgstr "Main balik tamat tanpa dijangka."
 
 msgid "Playcount: "
 msgstr "Kiraan main:"
@@ -2796,6 +2831,9 @@ msgstr "Buang label"
 
 msgid "Remove list"
 msgstr "Buang senarai"
+
+msgid "Remove picture"
+msgstr "Buang gambar"
 
 msgid "Remove selected songs"
 msgstr "Buang lagu terpilih"
@@ -3228,6 +3266,12 @@ msgstr "Tetapkan pengelompokan"
 msgid "Set icon"
 msgstr "Tetapkan ikon"
 
+msgid "Set picture"
+msgstr "Tetapkan gambar"
+
+msgid "Set picture using this file"
+msgstr "Tetapkan gambar menggunakan fail ini"
+
 msgid "Set player window layout"
 msgstr "Tetapkan bentangan tetingkap pemain"
 
@@ -3276,8 +3320,14 @@ msgstr "Tunjuk peristiwa akan datang artis"
 msgid "Show buttons"
 msgstr "Tunjuk butang"
 
+msgid "Show edition submenu in song context menu"
+msgstr "Tunjuk submenu edisi dalam menu konteksual lagu"
+
 msgid "Show file list"
 msgstr "Tunjuk senarai fail"
+
+msgid "Show file name extension"
+msgstr "Tunjuk sambungan nama fail"
 
 msgid "Show folder list"
 msgstr "Tunjuk senarai folder"
@@ -3353,6 +3403,9 @@ msgstr "Kocok"
 
 msgid "Shuffle list"
 msgstr "Kocok senarai"
+
+msgid "Shuffle or re-shuffle the playlist"
+msgstr "Kocok atau kocok semula senarai main"
 
 msgid "Shuffle queue"
 msgstr "Kocok baris gilir"
@@ -3452,6 +3505,9 @@ msgstr "Sumber: {file}"
 
 msgid "Split artist names on :"
 msgstr "Pisah nama artis hidup :"
+
+msgid "Star images"
+msgstr "Imej bintang"
 
 msgid "Start ReplayGain analysis"
 msgstr "Mula analisis Gandaan Main Semula"
@@ -3707,6 +3763,9 @@ msgstr "URL"
 
 msgid "Unique file identifier"
 msgstr "Pengenalpasti fail unik"
+
+msgid "Unknown"
+msgstr "Tidak diketahui"
 
 msgid "Unknown album"
 msgstr "Album tidak diketahui"
@@ -3972,6 +4031,18 @@ msgid ""
 msgstr ""
 "Anda boleh paksa semak fail ini dengan menahan shift bila memilih \"Baca-"
 "semula tag\""
+
+#, perl-brace-format
+msgid ""
+"You can make custom stars by putting pictures in {folder}\n"
+"They must be named 'stars', optionally followed by a '-' and a word, "
+"followed by a number from 0 to 5 or 10\n"
+"Example: stars-custom0.png"
+msgstr ""
+"Anda boleh buat bintang suai dengan meletak gambar di dalam {folder}\n"
+"Ia mesti dinamakan 'stars', secara  pilihan diikuti dengan tanda '-' dan "
+"perkataan, diikuti dengan nombor dari 0 hingga 5 atau 10\n"
+"Contoh: stars-suai0.png"
 
 msgid ""
 "You can use some markup, eg :\n"
@@ -4668,6 +4739,9 @@ msgstr "bolehlaku mplayer :"
 
 msgid "mplayer options :"
 msgstr "pilihan mplayer :"
+
+msgid "mpv options :"
+msgstr "pilihan mpv :"
 
 msgid "multi-lines string"
 msgstr "rentetan baris-berbilang"

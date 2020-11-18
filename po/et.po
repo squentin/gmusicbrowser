@@ -1,0 +1,646 @@
+#
+# Translators:
+# kallep65 <kallep65@hot.ee>, 2015
+# Rivo Zängov <eraser@eraser.ee>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: gmusicbrowser\n"
+"Report-Msgid-Bugs-To: squentin@free.fr\n"
+"POT-Creation-Date: 2015-08-17 18:49+0200\n"
+"PO-Revision-Date: 2017-09-19 10:29+0000\n"
+"Last-Translator: Rivo Zängov <eraser@eraser.ee>\n"
+"Language-Team: Estonian (http://www.transifex.com/squentin/gmusicbrowser/"
+"language/et/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: et\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " Fields "
+msgstr "Väljad"
+
+#, perl-format
+msgid "%d album"
+msgid_plural "%d albums"
+msgstr[0] "%d album"
+msgstr[1] "%d albumit"
+
+#, perl-format
+msgid "%d artist"
+msgid_plural "%d artists"
+msgstr[0] "%d esitaja"
+msgstr[1] "%d esitajat"
+
+#, perl-format
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] "%d fail"
+msgstr[1] "%d faili"
+
+#, perl-format
+msgid "%d folder"
+msgid_plural "%d folders"
+msgstr[0] "%d kaust"
+msgstr[1] "%d kausta"
+
+#, perl-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d sekund"
+msgstr[1] "%d sekundit"
+
+#, perl-format
+msgid "%d song"
+msgid_plural "%d songs"
+msgstr[0] "%d laul"
+msgstr[1] "%d laulu"
+
+msgid "50 Last Added"
+msgstr "50 viimati lisatud"
+
+msgid "50 Last Played"
+msgstr "50 viimati esitatud"
+
+msgid "50 Most Played"
+msgstr "50 enim esitatud"
+
+msgid "<Unknown>"
+msgstr "<Tundmatu>"
+
+msgid "About"
+msgstr "Programmist"
+
+msgid "Action"
+msgstr "Toiming"
+
+msgid "Add"
+msgstr "Lisa"
+
+msgid "Add Files ..."
+msgstr "Lisa failid ..."
+
+msgid "Add Music"
+msgstr "Lisa muusika"
+
+msgid "Add a filter"
+msgstr "Lisa filter"
+
+msgid "Add a group"
+msgstr "Lisa grupp"
+
+msgid "Add a radio"
+msgstr "Lisa raadio"
+
+msgid "Add files or folders"
+msgstr "Lisa failid või kaustad"
+
+msgid "Add folder"
+msgstr "Lisa kaust"
+
+msgid "Add folder ..."
+msgstr "Lisa kaust ..."
+
+msgid "Add multiple condition"
+msgstr "Lisa mitu tingimust"
+
+msgid "Add new label"
+msgstr "Lisa uus silt"
+
+msgid "Add new radio"
+msgstr "Lisa uus raadio"
+
+msgid "Add picture"
+msgstr "Lisa pilt"
+
+msgid "Add rule : "
+msgstr "Lisa reegel : "
+
+msgid "Add tab"
+msgstr "Lisa vahekaart"
+
+msgid "Add to list"
+msgstr "Lisa nimekirja"
+
+msgid "Add to queue"
+msgstr "Lisa järjekorda"
+
+msgid "Added"
+msgstr "Lisatud"
+
+msgid "Album"
+msgstr "Album"
+
+msgid "Album and artist"
+msgstr "Album ja esitaja"
+
+msgid "Album artist"
+msgstr "Albumi esitaja"
+
+msgid "Album artist or artist"
+msgstr "Albumi esitaja või esitaja"
+
+msgid "Album cover"
+msgstr "Albumi kaanepilt"
+
+msgid "Album mode"
+msgstr "Albumi režiim"
+
+msgid "Album picture"
+msgstr "Albumi pilt"
+
+msgid "Album pictures"
+msgstr "Albumi pildid"
+
+msgid "Album year(s)"
+msgstr "Albumi aasta(d)"
+
+#, perl-format
+msgid "Album: %l"
+msgstr "Album: %l"
+
+#, perl-format
+msgid "Album: %l (%Y)"
+msgstr "Album: %l (%Y)"
+
+msgid "Albuminfo"
+msgstr "Albumi info"
+
+msgid "Albums"
+msgstr "Albumid"
+
+msgid "All"
+msgstr "Kõik"
+
+msgid "All Songs"
+msgstr "Kõik laulud"
+
+msgid "All albums"
+msgstr "Kõik albumid"
+
+msgid "All artists"
+msgstr "Kõik esitajad"
+
+msgid "All files"
+msgstr "Kõik failid"
+
+msgid "All genres"
+msgstr "Kõik žanrid"
+
+msgid "All labels"
+msgstr "Kõik sildid"
+
+msgid "All moods"
+msgstr "Kõik tujud"
+
+msgid "All of :"
+msgstr "Kõik :"
+
+msgid "All songs"
+msgstr "Kõik lood"
+
+msgid "All styles"
+msgstr "Kõik stiilid"
+
+msgid "All themes"
+msgstr "Kõik teemad"
+
+#. Alt key
+msgctxt "Keyboard"
+msgid "Alt"
+msgstr "Alt"
+
+msgid "Artist"
+msgstr "Esitaja"
+
+msgid "Artist (Year - Album)"
+msgstr "Esitaja (Aasta - Album)"
+
+msgid "Artist URL"
+msgstr "Esitaja URL"
+
+#, perl-format
+msgid "Artist: %a"
+msgstr "Esitaja: %a"
+
+msgid "Artists"
+msgstr "Esitajad"
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Author"
+msgstr "Autor"
+
+msgid "Average rating:"
+msgstr "Keskmine hinnang:"
+
+msgid "BPM"
+msgstr "BPM"
+
+msgid "Basic fields"
+msgstr "Põhiväljad"
+
+msgid "Bitrate"
+msgstr "Bitikiirus"
+
+msgid "Channels"
+msgstr "Kanalid"
+
+msgid "Choose Picture"
+msgstr "Vali pilt"
+
+msgid "Choose Random Album"
+msgstr "Vali juhuslik album"
+
+msgid "Choose a folder"
+msgstr "Vali kaust"
+
+msgid "Choose font..."
+msgstr "Vali font..."
+
+msgid "Close"
+msgstr "Sulge"
+
+msgid "Comment"
+msgstr "Kommentaar"
+
+msgid "Comments"
+msgstr "Kommentaarid"
+
+msgid "Compilation"
+msgstr "Kogumik"
+
+msgid "Composer"
+msgstr "Helilooja"
+
+msgid "Conductor"
+msgstr "Dirigent"
+
+msgid "Copying"
+msgstr "Kopeerimine"
+
+msgid "Copyright"
+msgstr "Autoriõigus"
+
+#. Ctrl key
+msgctxt "Keyboard"
+msgid "Ctrl"
+msgstr "Ctrl"
+
+msgid "Date"
+msgstr "Kuupäev"
+
+msgid "Date format :"
+msgstr "Kuupäeva vorming :"
+
+msgid "Default"
+msgstr "Vaikimisi"
+
+msgid "Delete"
+msgstr "Kustuta"
+
+msgid "Delete file"
+msgstr "Kustuta fail"
+
+msgid "Description"
+msgstr "Kirjeldus"
+
+msgid "Encoder"
+msgstr "Kodeerija"
+
+msgid "Equalizer"
+msgstr "Ekvalaiser"
+
+msgid "Error :"
+msgstr "Viga :"
+
+msgid "Error details"
+msgstr "Vea üksikasjad"
+
+msgid "Events"
+msgstr "Sündmused"
+
+msgid "Field type"
+msgstr "Välja tüüp"
+
+msgid "Fields"
+msgstr "Väljad"
+
+msgid "File"
+msgstr "Fail"
+
+msgid "File type"
+msgstr "Faili tüüp"
+
+#, perl-brace-format
+msgid "File: {file}"
+msgstr "Fail: {file}"
+
+msgid "Files"
+msgstr "Failid"
+
+msgid "Filesystem"
+msgstr "Failisüsteem"
+
+msgid "Filter"
+msgstr "Filter"
+
+msgid "Filter : "
+msgstr "Filter : "
+
+msgid "Folder"
+msgstr "Kaust"
+
+msgid "Folder format :"
+msgstr "Kausta vorming :"
+
+msgid "Folder pattern :"
+msgstr "Kausta muster :"
+
+msgid "Font size"
+msgstr "Fondi suurus"
+
+msgid "Forward"
+msgstr "Edasi"
+
+msgid "Friday"
+msgstr "Reede"
+
+msgid "Full screen"
+msgstr "Täisekraan"
+
+msgid "Full screen layout :"
+msgstr "Täisekraani paigutus :"
+
+msgid "Genre"
+msgstr "Žanr"
+
+msgid "Genre - Album"
+msgstr "Žanr - Album"
+
+msgid "Genre - Artist"
+msgstr "Žanr - Esitaja"
+
+msgid "Genres"
+msgstr "Žanrid"
+
+msgid "Help"
+msgstr "Abi"
+
+msgid "Hide"
+msgstr "Peida"
+
+msgid "Hide toolbar"
+msgstr "Peida tööriistariba"
+
+msgid "Icon theme :"
+msgstr "Ikooniteema :"
+
+msgid "Info"
+msgstr "Info"
+
+msgid "KB"
+msgstr "KB"
+
+msgid "Karaoke"
+msgstr "Karaoke"
+
+msgid "Keywords"
+msgstr "Võtmesõnad"
+
+msgid "Label"
+msgstr "Silt"
+
+msgid "Label is set"
+msgstr "Silt on määratud"
+
+msgid "Lang"
+msgstr "Keel"
+
+msgid "Lang."
+msgstr "Keel"
+
+msgid "Languages"
+msgstr "Keeled"
+
+msgid "Last played"
+msgstr "Viimati esitatud"
+
+msgid "Layout"
+msgstr "Paigutus"
+
+msgid "Layout :"
+msgstr "Paigutus :"
+
+msgid "Layouts"
+msgstr "Paigutused"
+
+msgid "Left aligned"
+msgstr "Vasakule joondatud"
+
+msgid "Left pane"
+msgstr "Vasak paneel"
+
+msgid "Length"
+msgstr "Pikkus"
+
+msgid "Library"
+msgstr "Teek"
+
+msgid "Library : "
+msgstr "Teek"
+
+msgid "List"
+msgstr "Nimekiri"
+
+msgid "List order"
+msgstr "Nimekirja järjekord"
+
+msgid "Listeners: "
+msgstr "Kuulajad:"
+
+msgid "Lists"
+msgstr "Nimekirjad"
+
+msgid "Loading..."
+msgstr "Laadimine..."
+
+msgid "Lyrics"
+msgstr "Sõnad"
+
+msgid "Lyrics file :"
+msgstr "Sõnade fail :"
+
+msgid "MB"
+msgstr "MB"
+
+msgid "MPRIS v1"
+msgstr "MPRIS v1"
+
+msgid "MPRIS v2"
+msgstr "MPRIS v2"
+
+msgid "Main"
+msgstr "Peamine"
+
+msgid "Misc."
+msgstr "Varia"
+
+msgid "Monday"
+msgstr "Esmaspäev"
+
+msgid "Move"
+msgstr "Liiguta"
+
+msgid "New"
+msgstr "Uus"
+
+msgid "Next"
+msgstr "Järgmine"
+
+msgid "Next Album"
+msgstr "Järgmine album"
+
+msgid "Next Artist"
+msgstr "Järgmine esitaja"
+
+msgid "Next Song"
+msgstr "Järgmine laul"
+
+msgid "Previous"
+msgstr "Eelmine"
+
+msgid "Previous Song"
+msgstr "Eelmine laul"
+
+msgid "Publisher"
+msgstr "Kirjastaja"
+
+msgid "Refresh"
+msgstr "Värskenda"
+
+msgid "Regular expression"
+msgstr "Regulaaravaldis"
+
+msgid "Regular expression :"
+msgstr "Regulaaravaldis :"
+
+msgid "Remove"
+msgstr "Eemalda"
+
+msgid "Remove all"
+msgstr "Eemalda kõik"
+
+msgid "Remove all songs"
+msgstr "Eemalda kõik laulud"
+
+msgid "Remove filter"
+msgstr "Eemalda filter"
+
+msgid "Remove picture"
+msgstr "Eemalda pilt"
+
+msgid "Replace"
+msgstr "Asenda"
+
+msgid "Replace..."
+msgstr "Asenda..."
+
+msgid "Rhythmbox"
+msgstr "Rhythmbox"
+
+msgid "Same album"
+msgstr "Sama album"
+
+msgid "Same artist"
+msgstr "Sama esitaja"
+
+msgid "Same year"
+msgstr "Sama aasta"
+
+msgid "Saturday"
+msgstr "Laupäev"
+
+msgid "Save"
+msgstr "Salvesta"
+
+msgid "Saved"
+msgstr "Salvestatud"
+
+#. Shift key
+msgctxt "Keyboard"
+msgid "Shift"
+msgstr "Shift"
+
+msgid "Size"
+msgstr "Suurus"
+
+msgid "Small"
+msgstr "Väike"
+
+msgid "Song"
+msgstr "Laul"
+
+msgid "Statistics"
+msgstr "Statistika"
+
+msgid "Sunday"
+msgstr "Pühapäev"
+
+msgid "Text"
+msgstr "Tekst"
+
+msgid "Thursday"
+msgstr "Neljapäev"
+
+msgid "Time :"
+msgstr "Aeg :"
+
+msgid "Tuesday"
+msgstr "Teisipäev"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Unknown"
+msgstr "Tundmatu"
+
+msgid "Unknown filter :"
+msgstr "Tundmatu filter :"
+
+msgid "Various artists"
+msgstr "Erinevad esitajad"
+
+msgid "Version"
+msgstr "Versioon"
+
+msgid "Wednesday"
+msgstr "Kolmapäev"
+
+msgid "Wikipedia"
+msgstr "Wikipedia"
+
+msgid "Year"
+msgstr "Aasta"
+
+msgid "Year - Album"
+msgstr "Aasta - Album"
+
+msgid "Year - Artist"
+msgstr "Aasta - Esitaja"
+
+msgid "Yes"
+msgstr "Jah"
+
+msgid "unknown"
+msgstr "tundmatu"
+
+msgid "unknown error"
+msgstr "tundmatu viga"
+
+msgid "year"
+msgstr "aasta"
+
+msgid "years"
+msgstr "aastad"
