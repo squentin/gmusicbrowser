@@ -1922,20 +1922,22 @@ sub UpdateFuncs
 
 	my @getfields= grep $Def{$_}{flags}=~m/g/, @Fields;
 	%Aliases= map {$_=>$_} @getfields;
-	for my $field (@getfields)
-	{	$Aliases{$_}=$field for split / +/, ($Def{$field}{alias}||'');
+	for my $field (@getfields)	# user-defined aliases
+	{	my $user= $::Options{Fields_options}{$field}{aliases}||'';
+		for my $alias ($user=~m/(\w+)/g)
+		{	$Aliases{ $alias } ||= $field;
+		}
 	}
-	#for my $field (@getfields)	# user-defined aliases
-	#{	for my $alias (split / +/, ($::Options{Fields_options}{$field}{aliases}||''))
-	#	{	$Aliases{ ::superlc($alias) } ||= $field;
-	#	}
-	#}
+	for my $field (@getfields)	# default aliases
+	{	$Aliases{$_} ||= $field for split / +/, ($Def{$field}{alias}||'');
+	}
 	for my $field (@getfields)	#translated aliases
 	{	for my $alias (split /\s*,\s*/, ($Def{$field}{alias_trans}||''))
 		{	$alias=~s/ /_/g;
-			$Aliases{ ::superlc($alias) } ||= $field;
+			$Aliases{ $_ } ||= $field for $alias,::superlc($alias);
 		}
 	}
+	$Aliases{lc $_} ||= $_ for @getfields; # lowercase alias for custom fields
 	$::ReplaceFields{'$'.$_}= $::ReplaceFields{'${'.$_.'}'}= $Aliases{$_} for keys %Aliases;
 
 
@@ -3173,6 +3175,11 @@ our %Field_options=
 	{	label		=> _"Show file name extension",
 		widget		=> 'check',
 	},
+	aliases		=>
+	{	widget		=> 'entry',
+		label		=> _"Custom aliases",
+		tip		=> _"Words that can be used in place of the identifier",
+	},
 );
 
 sub Field_fill_option_box
@@ -3194,6 +3201,7 @@ sub Field_fill_option_box
 	$vbox->{FieldProperties}=1; #used to get back to $vbox from one of its (grand)child
 	$vbox->{widget_hash}=\%widgets;
 	my @options= split /\s+/, $option_list;
+	unshift @options, 'aliases'; # add 'aliases' option to every field
 	while (my $option=shift @options)
 	{	if (my $o=$Field_options_aliases{$option})
 		{	unshift @options,split /\s+/,$o;
