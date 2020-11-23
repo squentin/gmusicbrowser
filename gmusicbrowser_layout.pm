@@ -5366,6 +5366,7 @@ sub new_pid
 	my $label;
 	my $bar= Gtk3::ProgressBar->new;
 	$bar->set(ellipsize=>'end');
+	$bar->set_show_text(1);
 	unless ($self->{compact})
 	{	$label= Gtk3::Label->new;
 		$label->set_alignment(0,.5);
@@ -5402,7 +5403,6 @@ sub update
 		$bartext=~s/\$current\b/$c/g;
 		$bartext=~s/\$end\b/$prop->{end}/g;
 	}
-	# 2TO3 seems some text is not being shown CHECKME
 	$bartext .= ' '.$prop->{bartext_append} if $prop->{bartext_append};
 	if ($self->{compact})
 	{	$bartext=$title.' ... '.(defined $bartext ? $bartext : '');
