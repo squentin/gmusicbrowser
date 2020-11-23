@@ -3768,6 +3768,7 @@ sub IdleLoop
 	{	$ProgressNBFolders=$ProgressNBSongs=0;
 		undef $Songs::IDFromFile;
 		undef $Songs::MissingHash;
+		undef $Songs::MissingHash_ro;
 
 		warn "IdleLoop End\n" if $debug;
 		undef $IdleLoop;
