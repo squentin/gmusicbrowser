@@ -12,9 +12,9 @@ use utf8;
 package Songs;
 
 #our %Songs;
-our ($IDFromFile,$MissingHash); my $KeepIDFromFile;
+our ($IDFromFile,$MissingHash,$MissingHash_ro); my $KeepIDFromFile;
 our ($Artists_split_re,$Artists_title_re,$Articles_re);
-my @MissingKeyFields;
+my (@MissingKeyFields,@MissingKeyFields_ro);
 our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%HSort,%Aliases);
 my %FuncCache;
 INIT {
@@ -25,6 +25,7 @@ our %timespan_menu=
 	day	=> _("day"),
 );
 @MissingKeyFields=qw/size title album artist track/;
+@MissingKeyFields_ro=qw/size modif/;
 %Categories=
 (	file	=> [_"File properties",10],
 	audio	=> [_"Audio properties",30],
@@ -1370,8 +1371,9 @@ our %timespan_menu=
 			articles=>1,
 		   },
 
- missing	=> { flags => 'gan', type => 'integer', bits => 32, }, #FIXME store it using a 8-bit relative number to $::DAYNB
+ missing	=> { flags => 'gan', type => 'fewnumber', bits => 8, },
  missingkey	=> { get => 'join "\\x1D",'.join(',',map("#$_->get#",@MissingKeyFields)), depend => "@MissingKeyFields",	type=> 'virtual', },	#used to check if same song
+ missingkey_ro	=> { get => 'join "\\x1D",'.join(',',map("#$_->get#",@MissingKeyFields_ro)), depend => "@MissingKeyFields_ro",	type=> 'virtual', },	#used to check if same song (alternate mode)
 
  shuffle	=> { name => _"Shuffle",	type => 'shuffle',	flags => 's', },
  album_shuffle	=> { name => _"Album shuffle",	type => 'gidshuffle',	flags => 's',	mainfield=>'album'	  },
@@ -2059,7 +2061,8 @@ sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
 	my $changed= ref $_[0] ? $_[0] : {map( ($_=>undef), @_ )};
 	warn "Songs::Changed : IDs=@$IDs fields=".join(' ',keys %$changed)."\n" if $::debug;
 	$IDFromFile=undef  if $IDFromFile && !$KeepIDFromFile && (exists $changed->{file} || exists $changed->{path});
-	$MissingHash=undef if $MissingHash && grep(exists $changed->{$_}, @MissingKeyFields);
+	$MissingHash=   undef if $MissingHash    && grep(exists $changed->{$_}, @MissingKeyFields);
+	$MissingHash_ro=undef if $MissingHash_ro && grep(exists $changed->{$_}, @MissingKeyFields_ro);
 	my @needupdate;
 	for my $f (keys %$changed)
 	{	if (my $l=$Def{$f}{_depended_on_by}) { push @needupdate, split / /,$l; }
@@ -2075,19 +2078,34 @@ sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
 
 sub CheckMissing
 {	my $song=$_[0];
-	#my $key=Get($song,'missingkey');
 
-	return unless defined $song->{title} && length $song->{title} && (defined $song->{album} || defined $song->{artist});
-	for (qw/title album artist track/) { $song->{$_}="" unless defined $song->{$_} }
-	return unless length ($song->{album} . $song->{artist});
-	#ugly fix, clean-up the fields so they can be compared to those in library, depends on @MissingKeyFields #FIXME should generate a function using #check# and VAL=>'$song->{$field})'
-	$song->{$_}=~s/\s+$// for qw/title album artist/;
-	$song->{track}= $song->{track}=~m/^(\d+)/ ? $1+0 : 0;
+	# different rules for read-only files as you can only use fields that can't be edited: should still be the same in file and in gmb
+	my $ro_mode= FileTag::Is_ReadOnly($song->{file});  # currently ony use the extension to determine if ro, so need to send path
 
-	my $key=join "\x1D", @$song{@MissingKeyFields};
-	$MissingHash||= BuildHash('missingkey',undef,undef,'id:list');
-	my $IDs=$MissingHash->{$key};
+	if (!$ro_mode)
+	{	# fallback to ro_mode if fields too empty
+		$ro_mode=1 unless defined $song->{title} && length $song->{title} && (defined $song->{album} || defined $song->{artist});
+		for (qw/title album artist track/) { $song->{$_}="" unless defined $song->{$_} }
+		$ro_mode=1 unless length ($song->{album} . $song->{artist});
+		#ugly fix, clean-up the fields so they can be compared to those in library, depends on @MissingKeyFields #FIXME should generate a function using #check# and VAL=>'$song->{$field})'
+		$song->{$_}=~s/\s+$// for qw/title album artist/;
+		$song->{track}= $song->{track}=~m/^(\d+)/ ? $1+0 : 0;
+	}
+
+	my $IDs;
+	if ($ro_mode)
+	{	return unless $song->{modif} && $song->{size}; # unlikely, but make sure they are not 0
+		my $key=join "\x1D", @$song{@MissingKeyFields_ro};
+		$MissingHash_ro||= BuildHash('missingkey_ro',undef,undef,'id:list');
+		$IDs= $MissingHash_ro->{$key};
+	}
+	else
+	{	my $key=join "\x1D", @$song{@MissingKeyFields};
+		$MissingHash||= BuildHash('missingkey',undef,undef,'id:list');
+		$IDs= $MissingHash->{$key};
+	}
 	return unless $IDs;
+
 	if (@$IDs>1) #too many candidates, try to find the best one
 	{	my @score;
 		for my $oldID (@$IDs)
