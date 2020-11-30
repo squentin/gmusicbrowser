@@ -1096,7 +1096,7 @@ our %Progress; my $ProgressWindowComing;
 my $ToCheck=GMB::JobIDQueue->new(title	=> _"Checking songs",);
 my $ToReRead=GMB::JobIDQueue->new(title	=> _"Re-reading tags",);
 my $ToCheckLength=GMB::JobIDQueue->new(title	=> _"Checking length/bitrate",details	=> _"for files without a VBR header",);
-my ($CheckProgress_cb,$ScanProgress_cb,$ProgressNBSongs,$ProgressNBFolders);
+my ($CheckProgress_cb,$ScanProgress_cb,$ProgressNBSongs,$ProgressNBFolders,$ProgressFolder_started);
 my %Plugins;
 my $ScanRegex;
 
@@ -5972,6 +5972,7 @@ sub ScanFolder
 	MakeScanRegex() unless $ScanRegex;
 	Songs::Build_IDFromFile() unless $Songs::IDFromFile;
 	$ScanProgress_cb ||= Glib::Timeout->add(500,\&ScanProgress_cb);
+	$ProgressFolder_started= $ProgressNBSongs; # value of $ProgressNBSongs when we added that folder, used to track progress of added files from that folder
 	my @files;
 	if (-d $dir)
 	{	if (opendir my($DIRH),$dir)
@@ -6047,10 +6048,15 @@ sub AbortScan
 sub ScanProgress_cb
 {	if (@ToScan || @ToAdd_Files)
 	{	my $total= @ToScan + $ProgressNBFolders;
+		my $current= $ProgressNBFolders;
+		if (@ToAdd_Files)  # count last folder as (songs_added / songs_in_folder) rather than 1
+		{	my $songsadded= $ProgressNBSongs - $ProgressFolder_started;
+			$current -= @ToAdd_Files / (@ToAdd_Files + $songsadded);
+		}
 		Progress('scan',title	=> _"Scanning",
 				details	=> __n("%d song added","%d songs added", $ProgressNBSongs),
 				bartext	=> __n("%d folder","%d folders", $ProgressNBFolders),
-				current	=> $ProgressNBFolders,
+				current	=> $current,
 				end	=>$total,
 				abortcb	=>\&AbortScan,
 				aborthint=> _"Stop scanning",
