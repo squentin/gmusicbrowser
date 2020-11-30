@@ -140,6 +140,7 @@ use Scalar::Util qw/blessed weaken refaddr/;
 use Unicode::Normalize 'NFKD'; #for accent-insensitive sort and search, only used via superlc()
 use Carp;
 $SIG{INT} = \&Carp::confess;
+$SIG{CHLD}= 'IGNORE'; # to get rid of zombie child processes
 
 #use constant SLASH => ($^O  eq 'MSWin32')? '\\' : '/';
 use constant SLASH => '/'; #gtk file chooser use '/' in win32 and perl accepts both '/' and '\'
@@ -1718,7 +1719,6 @@ sub forksystem
 		else { exec @cmd; }	#execute one command in the child process
 		POSIX::_exit(0);
 	}
-	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 }
 
 
@@ -2723,10 +2723,7 @@ sub SaveTags	#save tags _and_ settings
 	if ($fork)
 	{	my $pid= fork;
 		if (!defined $pid) { $fork=undef; } # error, fallback to saving in current process
-		elsif ($pid)
-		{	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
-			return
-		}
+		elsif ($pid) { return }
 	}
 
 	setlocale(LC_NUMERIC, 'C');
