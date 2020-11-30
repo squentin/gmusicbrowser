@@ -13,8 +13,6 @@ use IO::Handle;
 use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 #use IPC::Open3;		#for open3 to read STDERR from ogg123 / mpg321 in Play function
 
-#$SIG{CHLD} = 'IGNORE';  # to make sure there are no zombies #cause crash after displaying a file dialog and then runnning an external command with mandriva's gtk2
-#$SIG{CHLD} = sub { while (waitpid(-1, WNOHANG)>0) {} };
 
 my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill);
 my ($Paused,$SkipTo);
@@ -187,7 +185,6 @@ sub _eos_cb
 	if ($ChildPID && $ChildPID==waitpid($ChildPID, WNOHANG))
 	{	$Error||=_"Check your audio settings" if $?;
 	}
-	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	Glib::Source->remove($WatchTag);
 	Glib::Source->remove($WatchTag2);
 	$WatchTag=$WatchTag2=$ChildPID=undef;
@@ -261,7 +258,6 @@ sub _Kill_timeout	#make sure old children are dead
 	  kill KILL=>@pidToKill;
 	  undef @pidToKill;
 	}
-	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	return 0;
 }
 

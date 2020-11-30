@@ -14,9 +14,6 @@ use Time::HiRes 'sleep';
 
 use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 
-#$SIG{CHLD} = 'IGNORE';  # to make sure there are no zombies #cause crash after displaying a file dialog and then runnning an external command with mandriva's gtk2
-#$SIG{CHLD} = sub { while (waitpid(-1, WNOHANG)>0) {} };
-
 my (@cmd_and_args,$ChildPID,$WatchTag,$WatchTag2,@pidToKill,$Kill9);
 my $sockfh;
 my (%supported,$mpv);
@@ -223,7 +220,6 @@ sub _eos_cb
 	if ($ChildPID && $ChildPID==waitpid($ChildPID, WNOHANG))
 	{	$error=_"Check your audio settings" if $?;
 	}
-	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	handle_error ($error or "mpv process closed unexpectedly.");
 	return 1;
 }
@@ -272,8 +268,7 @@ sub Stop
 	}
 }
 sub _Kill_timeout	#make sure old children are dead
-{	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
-	@pidToKill=grep kill(0,$_), @pidToKill; #checks to see which ones are still there
+{	@pidToKill=grep kill(0,$_), @pidToKill; #checks to see which ones are still there
 	if (@pidToKill)
 	{	warn "Sending ".($Kill9 ? 'KILL' : 'INT')." signal to @pidToKill\n" if $::debug;
 		if ($Kill9)	{kill KILL=>@pidToKill;}

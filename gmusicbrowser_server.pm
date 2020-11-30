@@ -60,7 +60,6 @@ sub _Kill_timeout	#make sure old children are dead
 	  kill KILL => @pidToKill;
 	  undef @pidToKill;
 	}
-	#while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	return 0;
 }
 
