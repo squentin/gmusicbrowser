@@ -60,7 +60,7 @@ use Fcntl qw/O_NONBLOCK O_WRONLY O_RDWR SEEK_SET/;
 use Scalar::Util qw/blessed weaken refaddr/;
 use Unicode::Normalize 'NFKD'; #for accent-insensitive sort and search, only used via superlc()
 use Carp;
-$SIG{INT} = \&Carp::confess;
+$SIG{INT} = sub {&Carp::cluck; exit 2};
 $SIG{CHLD}= 'IGNORE'; # to get rid of zombie child processes
 
 #use constant SLASH => ($^O  eq 'MSWin32')? '\\' : '/';
