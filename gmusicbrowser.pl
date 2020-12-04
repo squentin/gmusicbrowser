@@ -9507,7 +9507,7 @@ sub pdf_pages
 {	my $file= shift;
 	my $ref= GMB::Cache::get("$file:pagecount");
 	return $ref->{pagecount} if $ref;
-	my $popplerdoc= Poppler::Document->new_from_file("file://".$file);
+	my $popplerdoc= Poppler::Document->new_from_file("file://".::url_escape($file));
 	my $count= $popplerdoc->get_n_pages;
 	GMB::Cache::add("$file:pagecount", {size=>10,pagecount=>$count} ); # using a ref to cache a number is a lot of overhead :(
 	return $count;
@@ -9531,7 +9531,7 @@ sub load
 	}
 	elsif ($file=~m/\.pdf$/i && !$raw && pdf_ok())
 	{	my $n= $nb||0;
-		my $popplerdoc= Poppler::Document->new_from_file("file://".$file);
+		my $popplerdoc= Poppler::Document->new_from_file("file://".::url_escape($file));
 		my $pdfpage= $popplerdoc->get_page($n);
 		return $pdfpage;
 	}
