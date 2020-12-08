@@ -480,6 +480,12 @@ our %timespan_menu=
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,min=>$Def{$field}{edit_min},max=>$Def{$field}{edit_max},digits=>0,mode=>$Def{$field}{edit_mode}); },
 		step		=> 1, #minimum difference between 2 values, used to simplify filters
 	},
+	# allow overflowing values, stored in a hash, better if 0 isn't a common value as slightly less efficient
+	integer_overflow =>
+	{	_		=> '(vec(____,#ID#,#bits#) || $___overflow{#ID#} || 0)',
+		check		=> '#VAL#= #VAL# =~m/^(\d+)$/ ? $1 : 0;',
+		set		=> 'do { if (#VAL# < 2**#bits#) { (vec(____,#ID#,#bits#)= #VAL#) || delete $___overflow{#ID#}; } else { $___overflow{#ID#}= #VAL# ; vec(____,#ID#,#bits#)= 0 } }',
+		parent		=> 'integer',
 	'integer.div' =>
 	{	makefilter	=> '"#field#:b:".(#GID# * #ARG0#)." ".(((#GID#+1) * #ARG0#)-1)',
 	},
@@ -537,7 +543,7 @@ our %timespan_menu=
 		'filter_prep:>'	=> \&::ConvertSize,
 		'filter_prep:<'	=> \&::ConvertSize,
 		'filter_prep:b'	=> sub {sort {$a <=> $b} map ::ConvertSize($_), split / /,$_[0],2},
-		parent	=> 'integer',
+		parent	=> 'integer_overflow',
 		'filterpat:value' => [ unit=> \%::SIZEUNITS, default_unit=> 'm', default_value=>1, ],
 	},
 	'size.div'   => { gid_to_display	=> '( ::format_number( #GID# * #ARG0#/'. ::MB() .',"%d").q( '. _"MB" .') )', },
