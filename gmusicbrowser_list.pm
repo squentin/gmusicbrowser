@@ -1739,13 +1739,13 @@ our @cMenu=
 		code => sub { my $gid=$_[0]{gidlist}[0]; Songs::ChooseIcon($_[0]{field},$gid); },
 		onlyone=> 'gidlist',	test => sub { Songs::FilterListProp($_[0]{field},'icon') && $_[0]{gidlist}[0]>0; },
 	},
-	{ label=> _"Remove label",	stockicon => 'gtk-remove',
+	{ label=> _"Remove",	stockicon => 'gtk-remove',
 		code => sub { my $gid=$_[0]{gidlist}[0]; ::RemoveLabel($_[0]{field},$gid); },
-		onlyone=> 'gidlist',	test => sub { $_[0]{field} eq 'label' && $_[0]{gidlist}[0] !=0 },	#FIXME make it generic rather than specific to field label ? #FIXME find a better way to check if gid is special than comparing it to 0
+		onlyone=> 'gidlist',	test => sub { Songs::FieldType($_[0]{field}) eq 'flags' && $_[0]{gidlist}[0] !=0 }, #FIXME find a better way to check if gid is special than comparing it to 0
 	},
-	{ label=> _"Rename label",
+	{ label=> _"Rename",
 		code => sub { my $gid=$_[0]{gidlist}[0]; ::RenameLabel($_[0]{field},$gid); },
-		onlyone=> 'gidlist',	test => sub { $_[0]{field} eq 'label' && $_[0]{gidlist}[0] !=0 },	#FIXME make it generic rather than specific to field label ? #FIXME find a better way to check if gid is special than comparing it to 0
+		onlyone=> 'gidlist',	test => sub { Songs::FieldType($_[0]{field}) eq 'flags' && $_[0]{gidlist}[0] !=0 }, #FIXME find a better way to check if gid is special than comparing it to 0
 	},
 #	{ separator=>1 },
 	# only 1 option for folderview so don't put it in option menu
