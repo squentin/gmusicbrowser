@@ -26,6 +26,7 @@ gmusicbrowser \- Jukebox for large collections of music files
 [\-workspace N]
 [\-cmd CMD]
 [\-ifnotrunning MODE]
+[\-id\-id ID]
 [\-dbus\-id KEY]
 FOLDER_OR_FILE ...
 .br
@@ -69,14 +70,14 @@ start playing on startup
 \fB\-nogst\fR
 do not load any gstreamer librairies
 .TP
-\fB\-nodbus\fR
-do not use DBus
-.TP
 \fB\-server\fR
 send playing song to connected icecast client
 .TP
 \fB\-port N\fR
 listen for connection on port N in icecast server mode
+.TP
+\fB\-id ID\fR
+append \-ID to strings identifying the application (window roles, application name, DBus id) and to default gmbrc and fifo files.
 .TP
 \fB\-C FILE\fR, \fB\-cfg FILE\fR
 use FILE as configuration file (instead of 'gmbrc' in default folder),
@@ -87,6 +88,9 @@ use FIFO as named pipe to receive commans (instead of 'gmusicbrowser.fifo' in de
 .TP
 \fB\-nofifo\fR
 do not use/create named pipe
+.TP
+\fB\-nodbus\fR
+do not use DBus
 .TP
 \fB\-dbus\-id KEY\fR
 append .KEY to the DBus service id used by gmusicbrowser (org.gmusicbrowser)

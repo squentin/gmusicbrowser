@@ -328,6 +328,7 @@ my $gmbrc_ext_re= qr/\.gz$|\.xz$/;
 # Parse command line
 BEGIN	# in a BEGIN block so that commands for a running instance are sent sooner/faster
 { $DBus_id='org.gmusicbrowser'; $DBus_suffix='';
+  $CmdLine{id}='';
 
   my $default_home= Glib::get_user_config_dir.SLASH.'gmusicbrowser';
   if (!-d $default_home && -d (my $old= Glib::get_home_dir.SLASH.'.gmusicbrowser' ) )
@@ -349,6 +350,7 @@ options :
 -verbose: print some info, like the file being played
 -debug	: print lots of mostly useless informations, implies -verbose
 -backtrace : print a backtrace for every warning
+-id ID :  append -ID to strings identifying the application (window roles, application name, DBus id) and to default gmbrc and fifo files.
 -nodbus	: do not provide DBus services
 -dbus-id KEY : append .KEY to the DBus service id used by gmusicbrowser (org.gmusicbrowser)
 -nofifo : do not create/use named pipe
@@ -425,7 +427,8 @@ Options to change what is done with files/folders passed as arguments (done in r
 	elsif($arg eq '-cmd')		{ push @cmd, shift if $ARGV[0]; }
 	elsif($arg eq '-ifnotrunning')	{ $ifnotrunning=shift if $ARGV[0]; }
 	elsif($arg eq '-nolaunch')	{ $ifnotrunning='abort'; }
-	elsif($arg eq '-dbus-id')	{ if (my $id=shift) { if ($id=~m/^\w+$/) { $DBus_id.= $DBus_suffix='.'.$id; } else { warn "invalid dbus-id '$id', only letters, numbers and _ allowed\n" }; } }
+	elsif($arg eq '-id')		{ if (my $id=shift) { if ($id=~m/^\w+$/) { $CmdLine{id}="-$id"; $DBus_suffix=".$id"; } else { warn "invalid id '$id', only letters, numbers and _ allowed\n" }; } }
+	elsif($arg eq '-dbus-id')	{ if (my $id=shift) { if ($id=~m/^\w+$/) { $DBus_suffix=".$id"; } else { warn "invalid dbus-id '$id', only letters, numbers and _ allowed\n" }; } }
 	elsif($arg eq '-add')		{ $filescmd='AddToLibrary'; }
 	elsif($arg eq '-playlist')	{ $filescmd='OpenFiles'; }
 	elsif($arg eq '-enqueue')	{ $filescmd='EnqueueFiles'; }
@@ -460,11 +463,12 @@ Options to change what is done with files/folders passed as arguments (done in r
 		die "Can't create folder $HomeDir : $!\n" unless mkdir $current;
 	}
    }
+   my $id= $CmdLine{id};
    # auto import from old v1.0 tags file if using default savefile, it doesn't exist and old tags file exists
-   if (!$SaveFile && !find_gmbrc_file($HomeDir.'gmbrc') && -e $HomeDir.'tags') { $ImportFile||=$HomeDir.'tags'; }
+   if (!$SaveFile && !find_gmbrc_file($HomeDir.'gmbrc'.$id) && !$id && -e $HomeDir.'tags') { $ImportFile||=$HomeDir.'tags'; }
 
-   $SaveFile||= $HomeDir.'gmbrc';
-   $FIFOFile= $HomeDir.'gmusicbrowser.fifo' if !defined $FIFOFile && $^O ne 'MSWin32';
+   $SaveFile||= $HomeDir.'gmbrc'.$id;
+   $FIFOFile= $HomeDir."gmusicbrowser$id.fifo" if !defined $FIFOFile && $^O ne 'MSWin32';
 
    unless ($ignore)
    {	# filenames given in the command line
@@ -495,10 +499,10 @@ Options to change what is done with files/folders passed as arguments (done in r
 	if (!$running && !$CmdLine{noDBus})
 	{	eval {require 'gmusicbrowser_dbus.pm'}
 		|| warn "Error loading gmusicbrowser_dbus.pm :\n$@ => controlling gmusicbrowser through DBus won't be possible.\n\n";
-		my $object= GMB::DBus::simple_call("$DBus_id org.gmusicbrowser/org/gmusicbrowser");
+		my $object= GMB::DBus::simple_call("$DBus_id$DBus_suffix org.gmusicbrowser/org/gmusicbrowser");
 		if ($object)
 		{	$object->RunCommand($_) for @cmd;
-			$running="using DBus id=$DBus_id";
+			$running="using DBus id=$DBus_id$DBus_suffix";
 		}
 	}
 	if ($running)
@@ -1764,7 +1768,7 @@ if ($FIFOFile)
 	}
 }
 
-Glib::set_application_name(PROGRAM_NAME);
+Glib::set_application_name(PROGRAM_NAME.$CmdLine{id});
 
 Edittag_mode(@ARGV) if $CmdLine{tagedit};
 
@@ -2973,7 +2977,7 @@ sub SaveRefToLines	#convert hash/array into a YAML string readable by ReadRefFro
 
 sub SetWSize
 {	my ($win,$wkey,$default)=@_;
-	$win->set_role(::PROGRAM_NAME.":$wkey");
+	$win->set_role(::PROGRAM_NAME.$CmdLine{id}.":$wkey");
 	$win->set_name($wkey);
 	my $prevsize= $Options{WindowSizes}{$wkey} || $default;
 	$win->resize(split 'x',$prevsize,2) if $prevsize;

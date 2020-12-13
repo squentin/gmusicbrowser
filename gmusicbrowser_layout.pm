@@ -1732,7 +1732,7 @@ sub new
 	my $wintype= delete $options{wintype} || 'toplevel';
 	my $self=bless Gtk3::Window->new($wintype), $class;
 	$self->{uniqueid}= $uniqueid;
-	$self->set_role(::PROGRAM_NAME.':'.($options{uniqueid}||"layout")." - ".$layout);
+	$self->set_role(::PROGRAM_NAME.$::CmdLine{id}.':'.($options{uniqueid}||"layout")." - ".$layout);
 	$self->set_type_hint(delete $options{typehint}) if $options{typehint};
 	$self->{options}=\%options;
 	$self->{name}='Window';
