@@ -29,6 +29,7 @@ our %timespan_menu=
 %Categories=
 (	file	=> [_"File properties",10],
 	audio	=> [_"Audio properties",30],
+	video	=> [_"Video properties",35],
 	basic	=> [_"Basic fields",20],
 	extra	=> [_"Extra fields",50],
 	stats	=> [_"Statistics",40],
@@ -486,12 +487,13 @@ our %timespan_menu=
 		check		=> '#VAL#= #VAL# =~m/^(\d+)$/ ? $1 : 0;',
 		set		=> 'do { if (#VAL# < 2**#bits#) { (vec(____,#ID#,#bits#)= #VAL#) || delete $___overflow{#ID#}; } else { $___overflow{#ID#}= #VAL# ; vec(____,#ID#,#bits#)= 0 } }',
 		parent		=> 'integer',
+	},
 	'integer.div' =>
 	{	makefilter	=> '"#field#:b:".(#GID# * #ARG0#)." ".(((#GID#+1) * #ARG0#)-1)',
 	},
 	float	=>	#make sure the string doesn't have the utf8 flag, else substr won't work
 	{	_		=> 'unpack("F",substr(____,#ID#<<3,8))',
-		display		=> 'do {my $v=#_#; (#v_is_nan# ? "" : ::format_number($v,"#displayformat#"))}',	# replace novalue (NaN) with ""
+		display		=> 'do {my $v=#_#; (#v_is_nan# ? #nan_display# : ::format_number($v,"#displayformat#"))}',	# replace novalue (NaN) with ""
 		get		=> 'do {my $v=#_#; (#v_is_nan# ? "" : $v ); }',					#
 		diff		=> ($nan==$nan ? 'do {my $new=#VAL#; $new=#nan# unless length $new; $new!=#_# }' :
 						 'do {my $new=#VAL#; $new=#nan# unless length $new; my $v=#_#; $new!=$v && ($new==$new || ! #v_is_nan#) }'),
@@ -501,6 +503,7 @@ our %timespan_menu=
 		nan		=> '$Songs::nan',
 		v_is_nan	=> ($nan==$nan ? '($v==#nan#)' : '($v!=$v)'),	#on some system $nan!=$nan, on some not. In case nan==0, 0 will be treated as novalue, could treat novalue as 0 instead
 		novalue		=> '#nan#',	#use NaN as novalue
+		nan_display	=> '""',
 		default		=> '#novalue#',
 		set		=> 'substr(____,#ID#<<3,8)=pack("F",(length(#VAL#) ? #VAL# : #novalue#))',
 		check		=> '#VAL#= #VAL# =~m/^(-?\d*\.?\d+(?:e[-+]\d+)?)$/i ? $1 : #novalue#;',
@@ -524,9 +527,24 @@ our %timespan_menu=
 		gid_to_get	=> '( #GID#==#nan_gid# ? #nan# : #GID# * #range_step#)',
 		hash		=> '#get_gid#',
 		makefilter	=> '#GID#==#nan_gid# ? "#field#:-defined:1" : do { my $v= #GID# * #range_step#; Filter->newadd(1, "#field#:-<:".$v, "#field#:<:".($v + #range_step#)); }', #FIXME decimal separator must be always "."
-		'n_sort:gid'	=> '( do{my $n=#GID#==#nan_gid# ? "-inf" : #GID# * #range_step#;warn "#GID# => $n";$n })',
-		'n_sort:gid'	=> '( #GID#==#nan_gid# ? "-inf" : #GID# * #range_step# )',
+		#'n_sort:gid'	=> '( do{my $n=#GID#==#nan_gid# ? "-inf" : #GID# * #range_step#;warn "#GID# => $n";$n })',
+		#'n_sort:gid'	=> '( #GID#==#nan_gid# ? "-inf" : #GID# * #range_step# )',
 		'n_sort:gid'	=> '#GID#', #  #nan_gid# is already the most negative number, no need to replace it with -inf
+	},
+	integerfloat =>		#floats that can be stored as integers
+	{	parent		=> 'float',
+		_		=> 'vec(____,#ID#,#bits#)/#div#',
+		div		=> 100, #default: 1.23 => stored as 123, with 16bits can store values from 0 to 655.35
+		bits		=> 16,
+		check		=> '#VAL#= #VAL# =~m/^(-?\d*\.?\d+(?:e[-+]\d+)?)$/i && $1<2**#bits#/#div# ? $1 : 0;', # set to 0 if overflow
+		set		=> 'vec(____,#ID#,#bits#)= #div# * (#VAL# || 0)',
+		get_gid		=> 'vec(____,#ID#,#bits#)',
+		hash		=> '#get_gid#',
+		#zero_display	=> '::format_number(0,"#displayformat#")',
+		zero_display	=> '""',
+		display		=> 'do {my $v=#_#; $v == 0 ? #zero_display# : ::format_number($v,"#displayformat#") }',
+		gid_to_display	=> 'do {my $v=#GID#; $v == 0 ? #zero_display# : ::format_number($v/#div#,"#displayformat#") }',
+		makefilter	=> '"#field#:e:".(#GID#/#div#)',
 	},
 	'length' =>
 	{	display	=> 'sprintf("%d:%02d", #_#/60, #_#%60)',
@@ -1250,11 +1268,19 @@ our %timespan_menu=
 	category=>'audio',
  },
  bitrate=>
- {	name	=> _"Bitrate",		width => 90,	flags => 'fgarscp_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal|bitrate_calculated',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
+ {	name	=> _"Audio bitrate",	width => 90,	flags => 'fgarscp_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal|bitrate_calculated',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
 	display	=> '::replace_fnumber("%d kbps",#_#)',
 	FilterList => {type=>'div.32',},
 	'filterpat:value' => [ round => "%d", unit => 'kbps', default_value=>192 ],
 	category=>'audio',
+ },
+ videobitrate=>
+ {	name	=> _"Video bitrate",	width => 90,	flags => 'fgarscp_',	type => 'integer_overflow',	bits => 16,	audioinfo => 'video_bitrate',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
+	display	=> '::replace_fnumber("%d kbps",#_#)',
+	FilterList => {type=>'div.128',},
+	'filterpat:value' => [ round => "%d", unit => 'kbps', default_value=>1024 ],
+	disable=>1,	options => 'disable',
+	category=>'video',
  },
  samprate=>
  {	name	=> _"Sampling Rate",	width => 90,	flags => 'fgarscp',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate',
@@ -1283,6 +1309,48 @@ our %timespan_menu=
 	category=>'audio',
 	alias	=> 'type format audiotype audioformat',
  },
+ container=>
+ {	name	=> _"Container format",		width => 80,	flags => 'fgarscp',	type => 'fewstring',	bits => 8,
+	FilterList => {},
+	disable=>1,	options => 'disable',
+	audioinfo => 'container_format',
+	category=>'video',
+ },
+ videoformat=>
+ {	name	=> _"Video format",		width => 80,	flags => 'fgarscp',	type => 'fewstring',	bits => 8,
+	FilterList => {},
+	disable=>1,	options => 'disable',
+	audioinfo => 'video_format',
+	category=>'video',
+	alias	=> 'video videotype',
+ },
+ framerate=>
+ {	name	=> _"Frame rate",	width => 90,	flags => 'fgarscp',	type => 'integerfloat',	audioinfo => 'framerate',
+	FilterList => {},
+	disable=>1,	options => 'disable',
+	category=>'video',
+ },
+ videoratio=>
+ {	name	=> _"Video ratio",	width => 90,	flags => 'fgarscp',	type => 'integerfloat',	audioinfo => 'video_ratio',
+	FilterList => {},
+	disable=>1,	options => 'disable',
+	category=>'video',
+	alias	=> 'ratio',
+ },
+ videowidth=>
+ {	name	=> _"Video width",	width => 90,	flags => 'fgarscp',	type => 'integer',	bits => 16,	audioinfo => 'video_width',
+	FilterList => {},
+	disable=>1,	options => 'disable',
+	category=>'video',
+	alias	=> 'width',
+ },
+ videoheight=>
+ {	name	=> _"Video height",	width => 90,	flags => 'fgarscp',	type => 'integer',	bits => 16,	audioinfo => 'video_height',
+	FilterList => {},
+	disable=>1,	options => 'disable',
+	category=>'video',
+	alias	=> 'height',
+ },
  'length'=>
  {	name	=> _"Length",		width => 50,	flags => 'fgarscp_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
 	audioinfo => 'seconds',		check	=> '#VAL#= sprintf "%.0f",#VAL#;',
@@ -1291,7 +1359,6 @@ our %timespan_menu=
 	letter => 'm',
 	category=>'audio',
  },
-
  replaygain_track_gain=>
  {	name	=> _"Track gain",	width => 70,	flags => 'fgrwscpa',
 	type	=> 'float',	check => '#VAL#= do{ #VAL# =~m/^([-+]?\d*\.?\d+)\s*(?:dB)?$/i ? $1 : #novalue#};',
