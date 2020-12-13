@@ -13,6 +13,8 @@ BEGIN
   require 'apeheader.pm';
   require 'wvheader.pm';
   require 'm4aheader.pm';
+  require 'generic_metadata_reader_gstreamer.pm';
+  require 'generic_metadata_reader_mediainfo.pm';
 }
 use strict;
 use warnings;
@@ -20,31 +22,58 @@ use utf8;
 
 package FileTag;
 
-our %FORMATS;
+our (%FORMATS,$GenericOK,@GenericReaders);
 
 INIT
-{
- %FORMATS=	    # module		format string			tags to look for (order is important)
- (	mp3	=> ['Tag::MP3',		'mp{layer} mpeg-{versionid} l{layer}',	'ID3v2 APE lyrics3v2 ID3v1',],
-	oga	=> ['Tag::OGG',		'vorbis v{version}',		'vorbis',],
-	opus	=> ['Tag::OGG',		'opus v{version}',		'vorbis',],
-	flac	=> ['Tag::Flac',	'flac',				'vorbis',],
-	mpc	=> ['Tag::MPC',		'mpc v{version}',		'APE ID3v2 lyrics3v2 ID3v1',],
-	ape	=> ['Tag::APEfile',	'ape v{version}',		'APE ID3v2 lyrics3v2 ID3v1',],
-	wv	=> ['Tag::WVfile',	'wv v{version}',		'APE ID3v1',],
-	m4a	=> ['Tag::M4A',		'mp4 {traktype}',		'ilst',],
-);
- $FORMATS{$_}=$FORMATS{ $::Alias_ext{$_} } for keys %::Alias_ext;
+{# module: perl module to use
+ # format: string used for filetype field
+ # tags: tags to look for (order is important)
+ # image: 1 if embedded picture supported
+ # ro: 1 for limited support formats, will be read-only
+ %FORMATS=
+ (	mp3	=> {module=>'Tag::MP3', format=> 'mp{layer} mpeg-{versionid} l{layer}',	tags=>'ID3v2 APE lyrics3v2 ID3v1',	image=>1, },
+	oga	=> {module=>'Tag::OGG',		format=> 'vorbis v{version}',		tags=>'vorbis',				image=>1, },
+	opus	=> {module=>'Tag::OGG',		format=> 'opus v{version}',		tags=>'vorbis',				image=>1, },
+	flac	=> {module=>'Tag::Flac',	format=> 'flac',			tags=>'vorbis',				image=>1, },
+	mpc	=> {module=>'Tag::MPC',		format=> 'mpc v{version}',		tags=>'APE ID3v2 lyrics3v2 ID3v1', },
+	ape	=> {module=>'Tag::APEfile',	format=> 'ape v{version}',		tags=>'APE ID3v2 lyrics3v2 ID3v1', },
+	wv	=> {module=>'Tag::WVfile',	format=> 'wv v{version}',		tags=>'APE ID3v1',			image=>1, },
+	m4a	=> {module=>'Tag::M4A',		format=> 'mp4 {traktype}',		tags=>'ilst',				image=>1, },
+ );
+ # copy FORMATS for aliased extensions
+ for my $ext (keys %::Alias_ext) { my $f= $FORMATS{ $::Alias_ext{$ext} };  $FORMATS{$ext}=$f if $f; }
+
+ $GenericOK= $Tag::Generic::GStreamer::OK || $Tag::Generic::Mediainfo::OK;
+ push @GenericReaders, { module=>'Tag::Generic::GStreamer', tags=>'vorbis', ro=>1, } if $Tag::Generic::GStreamer::OK;
+ push @GenericReaders, { module=>'Tag::Generic::Mediainfo', tags=>'vorbis', ro=>1, } if $Tag::Generic::Mediainfo::OK;
+}
+
+sub Is_ReadOnly
+{	my $file=$_[0]; # can be filename without path
+	$file=~m/\.([^.]+)$/ or return 1;
+	my $format= $FileTag::FORMATS{lc $1};
+	return !$format || $format->{ro};
 }
 
 sub Read
-{	my ($file,$findlength,$fieldlist)=@_;
+{	my ($file,%options)=@_; #possible options: findlength, fields, notags
 	return unless $file=~m/\.([^.]+)$/;
-	warn "Reading tags for $file".($findlength ? " findlength=$findlength" :'').($fieldlist ? " fieldlist=$fieldlist" :'')."\n" if $::debug;
-	my $format=$FORMATS{lc $1};
-	return unless $format;
-	my ($package,$formatstring,$plist)=@$format;
-	my $filetag= eval { $package->new($file,$findlength); }; #filelength==1 -> may return estimated length (mp3 only)
+	warn "Reading tags for $file (options: ".join(',',%options).")\n" if $::debug;
+	my $format= $FORMATS{lc $1};
+	my @readers;
+	push @readers, $format if $format;
+	if (!$format || $format->{ro})	#not currently possible to use a fallback if format is rw as the extension determine if ro or rw
+	{	push @readers, @GenericReaders;
+	}
+	return unless @readers;
+
+	my $findlength= $options{findlength}||0;
+	my $filetag;
+	for my $reader (@readers)
+	{	$format=$reader;
+		$filetag= eval { $reader->{module}->new($file,$findlength); }; #filelength==1 -> may return estimated length (mp3 only)
+		last if $filetag;
+	}
 	unless ($filetag) { warn $@ if $@; warn "Can't read tags for $file\n"; return }
 
 	::setlocale(::LC_NUMERIC, 'C');
@@ -52,8 +81,10 @@ sub Read
 	my %values;	#results will be put in %values
 	if (my $info=$filetag->{info})	#audio properties
 	{	if ($findlength!=1 && $info->{estimated}) { delete $info->{$_} for qw/seconds bitrate estimated/; }
-		$formatstring=~s/{(\w+)}/$info->{$1}/g;
-		$values{filetype}=$formatstring;
+		if (my $string= $format->{format})
+		{	$string=~s/{(\w+)}/$info->{$1}/g;
+			$info->{audio_format}= $string;
+		}
 		for my $f (grep $Songs::Def{$_}{audioinfo}, @Songs::Fields)
 		{	for my $key (split /\|/,$Songs::Def{$f}{audioinfo})
 			{	my $v=$info->{$key};
@@ -61,7 +92,7 @@ sub Read
 			}
 		}
 	}
-	for my $tag (split / /,$plist)
+	for my $tag (split ' ', $format->{tags})
 	{	if ($tag eq 'vorbis' || $tag eq 'ilst')
 		{	push @taglist, $tag => $filetag;
 		}
@@ -72,8 +103,12 @@ sub Read
 			}
 		}
 	}
+
+	my $fieldlist= $options{fields};
 	my @fields= $fieldlist ? split /\s+/, $fieldlist :
 				 grep $Songs::Def{$_}{flags}=~m/r/, @Songs::Fields;
+	@fields=() if $options{notags}; # don't read tags, used for not reading changed tags from readonly files
+
 	for my $field (@fields)
 	{	for (my $i=0; $i<$#taglist; $i+=2)
 		{	my $id=$taglist[$i]; #$id is type of tag : id3v1 id3v2 ape vorbis lyrics3v2 ilst
@@ -124,11 +159,12 @@ sub Write
 	if (!-f $file) { warn "FileTag::Write: can't find file '$file'\n"; return }
 	my ($format)= $file=~m/\.([^.]*)$/;
 	unless ($format and $format=$FileTag::FORMATS{lc$format}) { warn "FileTag::Write: unknown file extension for '$file'\n"; return }
+	if ($format->{ro}) { warn "Error: cannot write tags in this file type\n"; return }
 	::setlocale(::LC_NUMERIC, 'C');
-	my $tag= $format->[0]->new($file);
+	my $tag= $format->{module}->new($file);
 	unless ($tag) {warn "FileTag::Write: can't read tags for '$file'\n";return }
 
-	my ($maintag)=split / /,$format->[2],2;
+	my ($maintag)=split ' ',$format->{tags},2;
 	if (($maintag eq 'ID3v2' && !$::Options{TAG_id3v1_noautocreate}) || $tag->{ID3v1})
 	{	my $id3v1 = $tag->{ID3v1} ||= $tag->new_ID3v1;
 		my $i=0;
@@ -248,7 +284,7 @@ sub FMPS_hash_write
 sub PixFromMusicFile
 {	my ($file,$nb,$quiet,$return_number)=@_;
 	if ($file=~s/:(\w+)$//) {$nb=$1} # index can be specified as argument or in the filename
-	my ($h)=Read($file,0,'embedded_pictures');
+	my ($h)=Read($file, fields=>'embedded_pictures');
 	return unless $h;
 	my $pix= $h->{embedded_pictures};
 	unless ($pix && @$pix)	{warn "no picture found in $file\n" unless $quiet;return;}
@@ -278,7 +314,7 @@ sub PixFromMusicFile
 sub GetLyrics
 {	my $ID=shift;
 	my $file= Songs::GetFullFilename($ID);
-	my ($h)=Read($file,0,'embedded_lyrics');
+	my ($h)=Read($file, fields=>'embedded_lyrics');
 	return unless $h;
 	my $lyrics= $h->{embedded_lyrics};
 	warn "no lyrics found in $file\n" unless $lyrics;
@@ -1549,7 +1585,7 @@ sub load
 	my $ID=$self->{ID};
 	my $file= Songs::GetFullFilename($ID);
 	if ($file!~m/$::EmbImage_ext_re$/) { $self->set_sensitive(0); $self->{view}->drag_dest_unset; return }
-	my ($h)= FileTag::Read($file,0,'embedded_pictures',0);
+	my ($h)= FileTag::Read($file, fields=>'embedded_pictures');
 	$self->{pix}= $h && $h->{embedded_pictures};
 	if ($file=~m/\.(?:m4a|m4b)$/i)
 	{	$self->{m4a_mode}=1;	#only 1 picture, type "front cover", no description
@@ -1749,12 +1785,12 @@ sub new
 
 	my ($format)= $file=~m/\.([^.]*)$/;
 	return undef unless $format and $format=$FileTag::FORMATS{lc$format};
-	$self->{filetag}=my $filetag= $format->[0]->new($file);
+	$self->{filetag}=my $filetag= $format->{module}->new($file);
 	unless ($filetag) {warn "can't read tags for $file\n";return undef;}
 
 	my @boxes; $self->{boxes}=\@boxes;
 	my @tags;
-	for my $t (split / /,$format->[2])
+	for my $t (split / /,$format->{tags})
 	{	if ($t eq 'vorbis' || $t eq 'ilst')	{push @tags,$filetag;}
 		elsif ($t eq 'APE')
 		{	if ($filetag->{APE})	{ push @tags,$filetag->{APE}; }

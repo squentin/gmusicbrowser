@@ -235,6 +235,8 @@ sub barename #filename without extension
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
 INIT {%Alias_ext=(mp2=>'mp3', ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
 our @ScanExt= qw/mp3 mp2 ogg oga flac mpc ape wv m4a m4b opus/;
+our @ScanExtOther= qw/aac wav wma/;
+our @ScanExtVideo= qw/mp4 mkv avi wmv flv webm mov mpg mpeg m4v ogv asf rmvb/;
 
 our ($Verbose,$debug);
 our %CmdLine;
@@ -492,7 +494,8 @@ BEGIN
 { my $re=join '|', sort map @{$_->{extensions}}, Gtk2::Gdk::Pixbuf->get_formats;
   $Image_ext_re=qr/\.(?:$re)$/i;
 }
-our $EmbImage_ext_re= qr/\.(?:mp3|flac|m4a|m4b|ogg|oga|opus)/i; # warning: doesn't force end of string (with a "$") as sometimes needs to include/extract a :\w+ at the end, so need to use it with /$EmbImage_ext_re$/ or /$EmbImage_ext_re(:\w+)?$/
+our $EmbImage_ext_re= join '|', sort grep $FileTag::FORMATS{$_}{image}, keys %FileTag::FORMATS;
+$EmbImage_ext_re= qr/\.(?:$EmbImage_ext_re)/i; # warning: doesn't force end of string (with a "$") as sometimes needs to include/extract a :\w+ at the end, so need to use it with /$EmbImage_ext_re$/ or /$EmbImage_ext_re(:\w+)?$/
 
 ##########
 
@@ -823,6 +826,17 @@ sub OneInCommon	#true if at least one string common to both list
 	$h{$_}=undef for @$l1;
 	return 1 if defined first { exists $h{$_} } @$l2;
 	return 0;
+}
+
+sub ListInCommon
+{	my ($l1,$l2)=@_;
+	my %l1; $l1{$_}=undef for @$l1;
+	grep exists $l1{$_}, @$l2;
+}
+sub ListNotIn
+{	my ($l1,$l2)=@_;
+	my %l1; $l1{$_}=undef for @$l1;
+	grep !exists $l1{$_}, @$l2;
 }
 
 sub find_common_parent_folder
@@ -1201,6 +1215,7 @@ our %Options=
 		_"Shuffled albums"		=> 'album_shuffle disc track file',
 		_"Shuffled albums, shuffled tracks"		=> 'album_shuffle shuffle',
 	},
+	ScanCustom=>'',
 );
 
 our $GlobalKeyBindings='Insert OpenSearch c-q Quit a-q EnqueueSelected p PlayPause c OpenContext q OpenQueue ca-f ToggleFullscreenLayout F11 ToggleFullscreen';
@@ -4987,7 +5002,7 @@ sub ChoosePix
 					'gtk-cancel' => 'none');
 
 	FileChooser_add_filters($dialog,
-		[_"Pictures and music files",'image/*','*.mp3 *.flac *.m4a *.m4b *.ogg *.oga *.opus' ],
+		[_"Pictures and music files",'image/*', map("*.$_", sort grep $FileTag::FORMATS{$_}{image}, keys %FileTag::FORMATS) ],
 		[_"Pictures files",'image/*'],
 		["Pdf",undef,'*.pdf'],
 		[_"All files",undef,'*'],
@@ -5685,7 +5700,7 @@ sub DialogSongProp
 {	my $ID=$_[0];
 	if (exists $Editing{$ID}) { $Editing{$ID}->force_present; return; }
 	my $dialog = Gtk2::Dialog->new (_"Song Properties", undef, []);
-	my $advanced_button=$dialog->add_button_custom(_("Advanced").'...', 1, icon=>'gtk-edit', tip=>_"Advanced Tag Editing", secondary=>1);
+	my $advanced_button=$dialog->add_button_custom(_("Advanced").'...', 1, icon=>'gtk-edit', tip=>_"Advanced Tag Editing", secondary=>1) unless FileTag::Is_ReadOnly(Songs::GetFullFilename($ID));
 	$dialog->add_buttons('gtk-save','ok', 'gtk-cancel','none');
 
 	$dialog->set_default_response ('ok');
@@ -5953,9 +5968,14 @@ sub FolderToIDs
 }
 
 sub MakeScanRegex
-{	my %ext; $ext{$_}=1 for @ScanExt;
-	my $ignore= $Options{ScanIgnore} || [];
-	delete $ext{$_} for @$ignore;
+{	my %ext;
+	$ext{$_}=1 for @ScanExt;
+	if ($FileTag::GenericOK)
+	{	if ($Options{ScanVideo}) { $ext{$_}=1 for @ScanExtVideo; }
+		if ($Options{ScanOther}) { $ext{$_}=1 for @ScanExtOther; }
+		if ($Options{ScanCustom}){ $ext{$_}=1 for $Options{ScanCustom}=~m/\w+/g; }
+	}
+	delete $ext{$_} for @{ $Options{ScanIgnore} };
 	my $re=join '|', sort keys %ext;
 	warn "Scan regular expression is empty\n" unless $re;
 	$ScanRegex=qr/\.(?:$re)$/i;
@@ -6949,6 +6969,55 @@ sub UpdateFolderNames
 	GMB::Picture::UpdatePixPath($oldpath,$newpath);
 }
 
+my $Extensions_dialog;
+sub ExtensionsDialog
+{	if ($Extensions_dialog) {$Extensions_dialog->present;return}
+	$Extensions_dialog= Gtk2::Dialog->new(_"Select which file types are added", undef,[],'gtk-close' => 'close');
+	$Extensions_dialog->signal_connect(destroy => sub {$Extensions_dialog=undef});
+	$Extensions_dialog->signal_connect(response =>sub {$_[0]->destroy});
+
+	my $table= Gtk2::Table->new(1,1,::FALSE);
+	my $row=0; my $maxcol=5;
+	my $ignorelist= $Options{ScanIgnore}||=[];
+	my $update=sub { for my $child ($table->get_children) { my $key= $child->{key}; $child->set_sensitive($Options{$key}) if $key; $ScanRegex=undef; } };
+
+	for my $cat (	[\@ScanExt, _"Fully supported audio extensions"],
+			[\@ScanExtOther, _"Partially supported audio extensions", 'ScanOther'],
+			[\@ScanExtVideo, _"Partially supported video extensions", 'ScanVideo'])
+	{	my ($list,$text,$key)=@$cat;
+		my $widget;
+		if ($key)
+		{	$widget= NewPrefCheckButton($key=>$text, cb=>$update,  tip=>_"These files are only partially supported and will be read-only: no metadata will be written in the file");
+			$widget->set_sensitive(0) unless $FileTag::GenericOK;
+		}
+		else { $widget= Gtk2::Label->new($text); $widget->set(xalign=>0); }
+		$table->attach_defaults($widget,0,$maxcol+1,$row++,$row);
+		my $col=1;
+		for my $ext (sort @$list)
+		{	my $check= Gtk2::CheckButton->new($ext);
+			$table->attach_defaults($check,$col++,$col,$row,$row+1);
+			if ($col>$maxcol) {$row++; $col=1}
+			$check->{key}= $key;
+			$check->set_active(1) if !(grep $ext eq $_, @$ignorelist);
+			$check->signal_connect(toggled=> sub { my $ext=$_[1]; @$ignorelist= grep $ext ne $_, @$ignorelist; push @$ignorelist,$ext unless $_[0]->get_active; $ScanRegex=undef; }, $ext);
+		}
+		$row+=2;
+	}
+	$update->();
+
+	my $ScanCustom= NewPrefEntry(ScanCustom=> _"Try to add these extensions:", tip=> _"Will try to add these files in partially supported mode and read-only: no metadata will be written in the file", expand=>1, cb=> sub { $ScanRegex=undef; });
+	$ScanCustom->set_sensitive(0) unless $FileTag::GenericOK;
+	$table->attach_defaults($ScanCustom,0,$maxcol+1,$row++,$row);
+
+	#force size of first column to create indentation
+	my $firstcolspace= Gtk2::HBox->new;
+	$table->attach_defaults($firstcolspace,0,1,$row++,$row);
+	$firstcolspace->set_size_request(22,1);
+
+	$Extensions_dialog->vbox->add($table);
+	$Extensions_dialog->show_all;
+}
+
 sub PrefLibrary
 {	my $store=Gtk2::ListStore->new('Glib::String','Glib::String');
 	my $treeview=Gtk2::TreeView->new($store);
@@ -6991,9 +7060,9 @@ sub PrefLibrary
 	});
 
 	my $sw= new_scrolledwindow($treeview,'etched-in');
-	my $extensions= NewPrefMultiCombo(ScanIgnore => {map {$_=>$_} @ScanExt},
-		text=>_"Ignored file extensions :", tip=>_"Files with these extensions won't be added", empty=>_"none",
-		cb=>sub {$ScanRegex=undef}, );
+
+	my $SelectExt= Gtk2::Button->new(_("Select which file types are added")."...");
+	$SelectExt->signal_connect(clicked=> \&ExtensionsDialog);
 
 	my $CScan=NewPrefCheckButton(StartScan => _"Search for new songs on startup");
 	my $CCheck=NewPrefCheckButton(StartCheck => _"Check for updated/deleted songs on startup");
@@ -7038,7 +7107,7 @@ sub PrefLibrary
 			[$addbut,$rmdbut,'-',$reorg],
 			[$CCheck,'-',$BCheck],
 			[$CScan,'-',$BScan],
-			$extensions,
+			[$SelectExt],
 			$autoremove,
 			[$lengthcheck,'-',$Blengthcheck],
 			$masterfiltercheck,
@@ -7048,7 +7117,19 @@ sub PrefLibrary
 }
 sub ChooseAddPath
 {	my ($addtolibrary,$allowfiles)=@_;
-	$allowfiles&&= [ [_"Music files", undef, join(' ',map '*.'.$_, sort @ScanExt) ], [_"All files",undef,'*']  ];
+	if ($allowfiles)
+	{	$allowfiles=[];
+		my @music= @ScanExt;
+		push @music, @ScanExtOther if $FileTag::GenericOK && $Options{ScanOther};
+		my @enabled= @music;
+		push @enabled, @ScanExtVideo if $FileTag::GenericOK && $Options{ScanVideo};
+		push @enabled, $Options{ScanCustom}=~m/\w+/g if $FileTag::GenericOK;
+		@enabled= ListNotIn($Options{ScanIgnore}, \@enabled);
+		push @$allowfiles, [_"Enabled files",	undef, join(' ',map '*.'.$_, sort @enabled) ] if "@enabled" ne "@music";
+		push @$allowfiles, [_"Music files",	undef, join(' ',map '*.'.$_, sort @music) ];
+		push @$allowfiles, [_"Video files",	undef, join(' ',map '*.'.$_, sort @ScanExtVideo) ] if $FileTag::GenericOK && $Options{ScanVideo};
+		push @$allowfiles, [_"All files",	undef,'*'];
+	}
 	my @dirs=ChooseDir(_"Choose folder to add", remember_key=>'LastFolder_Add', multiple=>1, allowfiles=>$allowfiles);
 	@dirs=map url_escape($_), @dirs;
 	AddPath($addtolibrary,@dirs);

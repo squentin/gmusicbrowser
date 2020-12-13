@@ -1258,12 +1258,13 @@ our %timespan_menu=
 	category=>'audio',
  },
  filetype=>
- {	name	=> _"File type",		width => 80,	flags => 'fgarscp',	type => 'fewstring',	bits => 8, #could probably fit in 4bit
+ {	name	=> _"Audio format",		width => 80,	flags => 'fgarscp',	type => 'fewstring',	bits => 8, #could probably fit in 4bit
 	FilterList => {},
 	'filterdesc:m:^mp3'	=> _"is a mp3 file",
 	'filterdesc:m:^mp4 mp4a'=> _"is an aac file",
 	'filterdesc:m:^mp4 alac'=> _"is an alac file",
 	'filterdesc:m:^mp4'	=> _"is an mp4/m4a file",
+	'filterdesc:m:^opus'	=> _"is an opus file",
 	'filterdesc:m:^vorbis'	=> _"is a vorbis file",
 	'filterdesc:m:^flac'	=> _"is a flac file",
 	'filterdesc:m:^mpc'	=> _"is a musepack file",
@@ -1271,8 +1272,9 @@ our %timespan_menu=
 	'filterdesc:m:^ape'	=> _"is an ape file",
 	'filterdesc:m:^ape|^flac|^mp4 alac|^wv'	=> _"is a lossless file",
 	'filterdesc:-m:^ape|^flac|^mp4 alac|^wv'=> _"is a lossy file",
+	audioinfo => 'audio_format',
 	category=>'audio',
-	alias	=> 'type',
+	alias	=> 'type format audiotype audioformat',
  },
  'length'=>
  {	name	=> _"Length",		width => 50,	flags => 'fgarscp_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
@@ -1704,14 +1706,19 @@ sub UpdateFuncs
 	}
 
 	# create DIFF sub
-	{	my $code='my $ID=$_[0]; my $values=$_[1]; my $val; my @changed;'."\n";
+	{	my $code='my ($ID,$values,$skip_missing)= @_; my $val; my @changed;'."\n";
 		for my $f (grep $Def{$_}{flags}=~m/r/, @Fields)
 		{	my $c= $Def{$f}{flags}=~m/_/ ?
-				"if (exists \$values->{$f}) { \$val=\$values->{$f}; #check#;\n".
-				" if (#diff#) { #set#; push \@changed,'$f'; } }\n"
+				"if (exists \$values->{$f})".
+				"{	\$val=\$values->{$f}; #check#;\n".
+				"	if (#diff#) { #set#; push \@changed,'$f'; }".
+				"}\n"
 				:
-				"\$val= (exists \$values->{$f} ? \$values->{$f} : #default#);\n".
-				" #check#; if (#diff#) { #set#; push \@changed,'$f'; }\n";
+				"if (!\$skip_missing || exists \$values->{$f} )\n".
+				"{	\$val= (exists \$values->{$f} ? \$values->{$f} : #default#);\n".
+				"	#check#;".
+				"	if (#diff#) { #set#; push \@changed,'$f'; }\n".
+				"}";
 			$code.=MakeCode($f,$c,ID => '$ID', VAL => "\$val");
 		}
 		$code.=' return @changed;';
@@ -1721,18 +1728,24 @@ sub UpdateFuncs
 	# create SET sub
 	{	my $code=join "\n",
 		'my $IDs=$_[0]; my $values=$_[1]; my %onefieldchanged; my @towrite; my %changedfields; my @changedIDs; my $i=0; my $val;',
+		'my $couldneedwriting; for my $f (keys %$values) { $f=~s/^[+@]//; if ($Def{$f}{flags}=~m/w/) { $couldneedwriting=1; last; } }',
 		'for my $ID (@$IDs)',
-		'{	my $changed;';
+		'{	my $changed;',
+		'	my $readonly=1; if ($couldneedwriting && !$::Options{TAG_nowrite_mode})',
+		'	{	'.MakeCode('extension','my $format= $FileTag::FORMATS{lc(#get#)}; $readonly= !$format || $format->{ro};',ID => '$ID'),
+		"	}\n\n";
 		for my $f (grep $Def{$_}{flags}=~m/[aw]/, @Fields)
-		{	my $set=  ($Def{$f}{flags}=~m/w/ && !$::Options{TAG_nowrite_mode}) ?
-				"push \@{\$towrite[\$i]}, '$f',\$val;" :
-				"#set#; \$changedfields{$f}=undef; \$changed=1;";
-			my $c=	"	\$val=	exists \$values->{$f} ? 	\$values->{$f} :\n".
-				"		exists \$values->{'\@$f'} ? 	shift \@{\$values->{'\@$f'}} :\n".
-				"						undef;\n".
-				"	if (defined \$val)\n".
-				"	{	#check#;\n".
-				"		if (#diff#) { $set }\n".
+		{	my $ro_set= "#set#; \$changedfields{$f}=undef; \$changed=1;";
+			my $set= $Def{$f}{flags}=~m/w/ ?
+				"if (\$readonly) { $ro_set } else { push \@{\$towrite[\$i]}, '$f',\$val; }":
+				$ro_set;
+			my $c= join "\n",
+				"	\$val=	exists \$values->{$f} ? 	\$values->{$f} :",
+				"		exists \$values->{'\@$f'} ? 	shift \@{\$values->{'\@$f'}} :",
+				"						undef;",
+				"	if (defined \$val)",
+				"	{	#check#;",
+				"		if (#diff#) { $set }",
 				"	}\n";
 			if ($Def{$f}{flags}=~m/l/ && !($Def{$f}{flags}!~m/r/ && $Def{$f}{flags}=~m/w/)) # edit mode for multi-value fields, exclude write-only or read-on-demand fields (w without r) as this requires knowing the current values
 			{  $c.=	"	elsif (\$val=\$values->{'+$f'})\n". # $v must contain [[toset],[torm],[toggle]]
@@ -1889,7 +1902,7 @@ sub New
 	#check already in @Songs#FIXME
 	warn "Reading Tag for $file\n" if $::Verbose;
 	my ($size,$modif)=(stat $file)[7,9];
-	my $values= FileTag::Read($file,1);
+	my $values= FileTag::Read($file,findlength=>1);
 	return unless $values;
 	(my $path,$file)=::splitpath($file);
 	%$values=(	%$values,
@@ -1925,12 +1938,13 @@ sub ReReadFile		#force values :
 		$force= $estimated ? 3 : 0 if $force==2;
 		my $checklength= ($size1!=$size2 || $force==3) ? 2 : 0;
 		return 1 unless $checklength || $force || $modif1!=$modif2;
-		my $values=FileTag::Read($file,$checklength);
+		my $notagupdate_mode= $force!=3 && FileTag::Is_ReadOnly($file); #unless forced, files in ro mode won't update values from tags
+		my $values= FileTag::Read($file,findlength=>$checklength, notags=> $notagupdate_mode);
 		return unless $values;
 		$values->{size}=$size2;
 		$values->{modif}=$modif2;
 		$values->{length_estimated}||=0 if $estimated;
-		my @changed=$DIFFsub->($ID,$values);
+		my @changed=$DIFFsub->($ID,$values,$notagupdate_mode);
 		Changed([$ID],@changed) if @changed;
 	}
 	elsif (!$noremove)	#file not found
