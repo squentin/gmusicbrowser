@@ -81,65 +81,102 @@ our %timespan_menu=
 		_	=> '#get#',
 	},
 	special => {},
-	flags	=>
-	{	_		=> '____[#ID#]',
+	flags	=>		# ___index_ : binary string containing position of the data in ___values_ for each song, or 0 for no value
+				# ___values_ : binary string containing the actual data (packed with w/w: number of values followed by id values)
+				# ___name & ___iname : arrays containing string for each id
+				# ___gid : hash containing if for each string
+				# ___free_ : array containing for each size a binary sting with the free positions in ___values_
+				# when there is too much unused free space, the used parts of ___values_ are copied into a new ___values_
+	{	_		=> 'do { my $i= #index#; $i ? [unpack "x".$i."w/w",___values_] : 0 }',
+		index		=> 'vec(___index_,#ID#,32)',
 		init		=> '___name[0]="#none#"; ___iname[0]=::superlc(___name[0]); #sgid_to_gid(VAL=$_)# for #init_namearray#',
+		init		=> '___name[0]="#none#"; ___iname[0]=::superlc(___name[0]); #sgid_to_gid(VAL=$_)# for #init_namearray#; ___index_="" ;___values_="\x00";',
 		init_namearray	=> '@{ $::Options{Fields_options}{#field#}{persistent_values} ||= $Def{#field#}{default_persistent_values} || [] }',
 		none		=> quotemeta _"None",
 		default		=> '""',
 		check		=> '#VAL#= do {my $v=#VAL#; my @l; if (ref $v) {@l= @$v} else {@l= split /\x00/,$v} for (@l) { tr/\x00-\x1F//d; s/\s+$//; }; @l=sort @l; \@l }',
-		get_list	=> 'my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : ();',
-		get_gid		=> 'my $v=#_#; ref $v ? $v : [$v]',
+		get_list_gid	=> 'do { my $i= #index#; $i ? (unpack "x".$i."w/w",___values_) : () }',
+		get_list	=> 'do { my $i= #index#; $i ? (map ___name[$_], unpack "x".$i."w/w",___values_) : () }',
+		get_gid		=> '[#get_list_gid#]',
 		gid_to_get	=> '(#GID# ? ___name[#GID#] : "")',
 		gid_to_display	=> '___name[#GID#]',
-		s_sort		=> '___sort{ pack("w", #_#)}',
-		si_sort		=> '___isort{ pack("w", #_#)}',
+		s_sort		=> '(join ":", map ___name[$_],  #get_list_gid# )',
+		si_sort		=> '(join ":", map ___iname[$_], #get_list_gid# )',
 		always_first_gid=> 0,
 		's_sort:gid'	=> '___name[#GID#]',
 		'si_sort:gid'	=> '___iname[#GID#]',
-		get		=> 'do {my $v=#_#; !$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v];}',
+		get		=> '(join "\\x00", #get_list#)',
+		display		=> '(join ", ",    #get_list#)',
 		newval		=> 'push @___iname, ::superlc(___name[-1]); ::IdleDo("newgids_#field#",1000,sub {  ___new=0; ::HasChanged("newgids_#field#"); }) unless ___new++;',
 		sgid_to_gid	=> '___gid{#VAL#}||= do { my $i=push(@___name, #VAL#); #newval#; $i-1; }',
-		set => '{my $v=#VAL#;
-			my @list= sort (ref $v ? @$v : split /\\x00/,$v);
-			my @ids;
-			for my $name (@list)
-			{	my $id= #sgid_to_gid(VAL=$name)#;
-				push @ids,$id;
-			}
-			my $val=	@ids<2 ? $ids[0]||0 :
-				(___group{ pack("w*",@ids) }||= \@ids);
-			___isort{ pack("w",$val) }||= ::superlc( ___sort{ pack("w",$val) }||= join ";",@list );
-			#_#=$val;
+		set => '{	my $v=#VAL#;
+				my @list= ref $v ? @$v : split /\\x00/,$v;
+				if (my $i= #index#)	# add previous space to list of free spaces
+				{	my $size= length pack "w/w",unpack("x".$i."w/w",___values_);
+					___free_[$size].= pack "N",$i;
+					if ((___freecount_+=$size) >10_000) #if more than 10k free, schedule a cleanup
+					{ ___freecount_*= -100;
+					  ::IdleDo("1_reclaimfree_#field#",10_000,
+					  sub
+					  {	@___free_=();
+						___freecount_=0;
+						my $new_values="\x00";
+						for my $id (FIRSTID..$Songs::LastID)
+						{	if (my $i= vec(___index_,$id,32))
+							{	vec(___index_,$id,32)= length $new_values;
+								$new_values.= pack "w/w", unpack "x".$i."w/w",___values_;
+							}
+						}
+						___values_= $new_values;
+					  });
+					}
+				}
+				# set new values
+				if (@list)
+				{	my @ids;
+					for my $name (sort @list)
+					{	my $id= #sgid_to_gid(VAL=$name)#;
+						push @ids,$id;
+					}
+					my $string= pack "w/w", @ids;
+					my $size= length $string;
+					if (___free_[$size])	# re-use old space
+					{	my $i= #index#= unpack "N", substr(___free_[$size],-4,4,"");
+						substr ___values_, $i, $size, $string;
+						___freecount_-=$size;
+					}
+					else			# use new space
+					{	#index#= length(___values_);
+						___values_ .= $string;
+					}
+				}
+				else { #index#=0; }
 			}',
-		diff		=> 'do {my $v=#_#; my $old=!$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v]; $v=#VAL#; my $new= join "\\x00", @$v; $old ne $new; }', # #VAL# should be a sorted arrayref, as returned by #check#
-		display 	=> 'do { my $v=#_#; !$v ? "" : ref $v ? join ", ",map ___name[$_],@$v : ___name[$v]; }',
+		diff		=> 'do {my $old=#get#; my $v=#VAL#; my $new= join "\\x00", @$v; $old ne $new; }', # #VAL# should be a sorted arrayref, as returned by #check#
 		check_multi	=> 'for my $lref (@{#VAL#}) { for (@$lref) {tr/\x00-\x1F//d; s/\s+$//;} }',
-		set_multi	=> 'do {my $c=#_#; my %h=( $c ? ref $c ? map((___name[$_]=>0), @$c) : (___name[$c]=>0) : ()); my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}= (exists $h{$_} ? -1 : 1) for @$toggle; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
+		set_multi	=> 'do { my %h=( map(($_=>0), #get_list#)); my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}= (exists $h{$_} ? -1 : 1) for @$toggle; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
 		makefilter	=> '#GID# ? "#field#:~:".___name[#GID#] : "#field#:ecount:0"',
-		'filter:~'	=> '.!!. do {my $v=#_#; $v ? ref $v ? grep(#VAL#==$_, @$v) : ($v == #VAL#) : 0}',
-		#smartmatch version: 'filter:~'	=> '.!!. do {my $v=#_#; $v ? #VAL# ~~ $v : 0}', # is flag set
+		'filter:~'	=> '.!!. do { grep(#VAL#==$_, #get_list_gid#)}',
 		'filter_prep:~'	=> '___gid{#PAT#} ||= #sgid_to_gid(VAL=#PAT#)#;',
 		'filter_prephash:~' => 'return { map { #sgid_to_gid(VAL=$_)#, undef } keys %{#HREF#} }',
-		'filter:h~'	=> '.!!. do {my $v=#_#; $v ? ref $v ? grep(exists $hash#VAL#->{$_+0}, @$v) : (exists $hash#VAL#->{#_#+0}) : 0}',
-		'filter:ecount'	=> '#VAL# .==. do {my $v=#_#; $v ? ref $v ? scalar(@$v) : 1 : 0}',
+		'filter:h~'	=> '.!!. do {my $v=#_#; $v ? grep(exists $hash#VAL#->{$_+0}, @$v) : 0}',
+		'filter:ecount'	=> '#VAL# .==. do {my $v=#_#; $v ? scalar(@$v) : 0}',
 		#FIXME for filters s,m,mi,h~,  using a list of matching names in ___inames/___names could be better (using a bitstring)
-		'filter:s'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. grep index(___name[$_], "#VAL#")  != -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
-		'filter:si'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. grep index(___iname[$_], "#VAL#") != -1 ,@$v) : (index(___iname[$v], "#VAL#") .!=. -1); }',
-		'filter:fuzzy'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. ::first {Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$_])} @$v) : .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$v]); }',
-		'filter:m'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. grep ___name[$_]  =~ m"#VAL#"  ,@$v) : ___name[$v]  .=~. m"#VAL#"; }',
-		'filter:mi'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. grep ___iname[$_] =~ m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
+		'filter:s'	=> 'do { my $v=#_#; !$v ? .0. : (.!!. grep index(___name[$_], "#VAL#")  != -1 ,@$v); }',
+		'filter:si'	=> 'do { my $v=#_#; !$v ? .0. : (.!!. grep index(___iname[$_], "#VAL#") != -1 ,@$v); }',
+		'filter:fuzzy'	=> 'do { my $v=#_#; !$v ? .0. : (.!!. ::first {Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$_])} @$v); }',
+		'filter:m'	=> 'do { my $v=#_#; !$v ? .0. : (.!!. grep ___name[$_]  =~ m"#VAL#"  ,@$v); }',
+		'filter:mi'	=> 'do { my $v=#_#; !$v ? .0. : (.!!. grep ___iname[$_] =~ m"#VAL#"i ,@$v); }',
 		'filter_prep:m'	=> \&Filter::QuoteRegEx,
 		'filter_prep:mi'=> sub { Filter::QuoteRegEx( ::superlc($_[0]) )},
 		'filter_prep:si'=> sub {quotemeta ::superlc($_[0])},
 		'filter_prep:s' => sub {quotemeta $_[0]},
 		'filter_prep:fuzzy'=>sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta ::superlc($arg[1])},
-		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ---- AFTER: #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
-		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}',
-		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v }',
-		'hashm:name'	=> 'do {my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : () }',
-		is_set		=> 'my $gid=___gid{#VAL#}; my $v=#_#; $gid ? ref $v ? (grep $_==$gid, @$v) : $v==$gid : 0;',
-		#smartmatch version : is_set	=> 'my $gid=___gid{#VAL#}; my $v=#_#; $gid ? $gid ~~ $v : 0;',
+		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for $v ? @$v : 0;}  ---- AFTER: #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
+		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for $v ? @$v : 0;}',
+		hashm		=> 'do {my $v=#_#; $v ? @$v : 0 }',
+		'hashm:name'	=> 'do {my $v=#_#; $v ? map(___name[$_], @$v) : () }',
+		is_set		=> 'my $gid=___gid{#VAL#}; my $v=#_#; $gid && $v ? (grep $_==$gid, @$v) : 0;',
 		listall		=> '1..$#___name',
 		'editwidget:many'	=> sub { GMB::TagEdit::EntryMassList->new(@_) },
 		'editwidget:single'	=> sub { GMB::TagEdit::FlagList->new(@_) },
