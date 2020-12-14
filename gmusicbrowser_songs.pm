@@ -370,6 +370,19 @@ our %timespan_menu=
 		save	=> 'filename_escape(#_#)',
 		#'filterpat:string'	=> [ display => \&::filename_to_utf8displayname, ],
 	},
+	fewpath=>
+	{	parent	=> 'filename',
+		gid	=> 'vec(____,#ID#,#bits#)',
+		bits	=> 32,	#16 bits would limit it to 65k paths
+		init	=> '____=""; ___gid{""}=1; ___name[1]="";',
+		_	=> '___name[#gid#]',
+		get	=> '___name[#gid#]',
+		set	=> '#gid# = #path_to_gid#;',
+		path_to_gid	=> 'do {my $v=#VAL#; ::_utf8_off($v); ___gid{$v}||= push(@___name, $v) -1; }',
+		url_to_gid	=> 'do {my $v=::decode_url(#VAL#);    ___gid{$v}||= push(@___name, $v) -1; }',
+		load	=> '#gid# = #url_to_gid#',
+		save	=> 'filename_escape(#get#)',
+	},
 # 	picture =>
 #	{	get_picture	=> '__#mainfield#_picture[#GID#] || $::Options{Default_picture_#mainfield#};',
 #		get_pixbuf	=> 'my $file= #get_picture#; GMB::Picture::pixbuf($file);',
@@ -869,7 +882,7 @@ our %timespan_menu=
 	'stats:count'	=> '#HVAL#++',
  },
  path	=>
- {	name	=> _"Folder",	width => 200, flags => 'fgascp_',	type => 'filename',
+ {	name	=> _"Folder",	width => 200, flags => 'fgascp_',	type => 'fewpath',
 	'filter:i'	=> '#_# .=~. m/^#VAL#(?:$::QSLASH|$)/o',
 	'filter_prep:i'	=> sub { quotemeta ::decode_url($_[0]); },
 	'filterdesc:i'	=> [_"is in %s", _"is in", 'filename'],
