@@ -81,6 +81,7 @@ sub Load_Wnck
   {	my $uris= Glib::Object::Introspection->invoke( 'Gtk', 'FileChooser', 'get_uris', $_[0]);
 	return $uris ? @$uris : ();
   }
+  { no warnings 'once'; *Gtk3::FileChooserDialog::get_uris= \&Gtk3::FileChooserWidget::get_uris; }
   # make 2nd & 3rd arguments optionals
   sub Gtk3::TreeView::set_cursor
   {	Glib::Object::Introspection->invoke( 'Gtk', 'TreeView', 'set_cursor', $_[0], $_[1], $_[2] || undef, $_[3] || 0);
@@ -5097,18 +5098,18 @@ sub ChooseFiles
 	$dialog->set_select_multiple(1) if $multiple;
 	FileChooser_add_filters($dialog,@$patterns);
 	if ($remember_key)
-	{	my $path= decode_url($Options{$remember_key});
-		$dialog->set_current_folder($path);
+	{	my $path= $Options{$remember_key};
+		$dialog->set_current_folder_uri($path);
 	}
 
 	my $response=$dialog->run;
 	my @files;
 	if ($response eq 'ok')
-	{	@files=$dialog->get_filenames;
-		eval { $_=filename_from_unicode($_); } for @files;
-		_utf8_off($_) for @files;# filenames that failed filename_from_unicode still have their uft8 flag on
+	{	@files= $dialog->get_uris;
+		s#^file://## for @files;
+		$_=decode_url($_) for @files;
 	}
-	if ($remember_key) { $Options{$remember_key}= url_escape($dialog->get_current_folder); }
+	if ($remember_key) { $Options{$remember_key}= $dialog->get_current_folder_uri; }
 	$dialog->destroy;
 	return @files;
 }
