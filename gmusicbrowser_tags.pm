@@ -13,6 +13,7 @@ BEGIN
   require 'apeheader.pm';
   require 'wvheader.pm';
   require 'm4aheader.pm';
+  require 'modheader.pm';
   require 'generic_metadata_reader_gstreamer.pm';
   require 'generic_metadata_reader_mediainfo.pm';
 }
@@ -39,6 +40,7 @@ INIT
 	ape	=> {module=>'Tag::APEfile',	format=> 'ape v{version}',		tags=>'APE ID3v2 lyrics3v2 ID3v1', },
 	wv	=> {module=>'Tag::WVfile',	format=> 'wv v{version}',		tags=>'APE ID3v1',			image=>1, },
 	m4a	=> {module=>'Tag::M4A',		format=> 'mp4 {traktype}',		tags=>'ilst',				image=>1, },
+        mod	=> {module=>'Tag::Modfile',	format=> 'mod',				tags=>'vorbis',				image=>0,	ro=>1, },
  );
  # copy FORMATS for aliased extensions
  for my $ext (keys %::Alias_ext) { my $f= $FORMATS{ $::Alias_ext{$ext} };  $FORMATS{$ext}=$f if $f; }

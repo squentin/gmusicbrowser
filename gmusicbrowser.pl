@@ -233,8 +233,11 @@ sub barename #filename without extension
 }
 
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
-INIT {%Alias_ext=(mp2=>'mp3', ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
-our @ScanExt= qw/mp3 mp2 ogg oga flac mpc ape wv m4a m4b opus/;
+INIT { %Alias_ext=(
+           mp2=>'mp3', ogg=> 'oga', m4b=>'m4a',
+           it=>'mod', s3m=>'mod', xm=>'mod', mtm=>'mod', dmf=>'mod', 669=>'mod',
+           );} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
+our @ScanExt= qw/mp3 mp2 ogg oga flac mpc ape wv m4a m4b opus mod it s3m xm mtm dmf 669/;
 our @ScanExtOther= qw/aac wav wma/;
 our @ScanExtVideo= qw/mp4 mkv avi wmv flv webm mov mpg mpeg m4v ogv asf rmvb/;
 
@@ -7010,7 +7013,7 @@ sub ExtensionsDialog
 	}
 	$update->();
 
-	my $ScanCustom= NewPrefEntry(ScanCustom=> _"Try to add these extensions:", tip=> _"Will try to add these files in partially supported mode and read-only: no metadata will be written in the file", expand=>1, cb=> sub { $ScanRegex=undef; });
+	my $ScanCustom= NewPrefEntry(ScanCustom=> _"Try to add these extensions:", tip=> _"Will try to add these files in partially supported mode and read-only: no metadata will be written in the file (list extensions separated by white space without leading period)", expand=>1, cb=> sub { $ScanRegex=undef; });
 	$ScanCustom->set_sensitive(0) unless $FileTag::GenericOK;
 	$table->attach_defaults($ScanCustom,0,$maxcol+1,$row++,$row);
 
