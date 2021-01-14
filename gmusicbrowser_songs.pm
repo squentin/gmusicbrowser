@@ -2921,6 +2921,7 @@ sub PrefFields	#preference dialog for fields
 	my $treeview=Gtk3::TreeView->new($store);
 	$treeview->set_headers_visible(0);
 	my $rightbox=Gtk3::VBox->new;
+	$rightbox->set_border_width(::WINDOW_PADDING);
 	my $renderer=Gtk3::CellRendererText->new;
 	$treeview->append_column( Gtk3::TreeViewColumn->new_with_attributes
 	 ( 'field name',$renderer,text => PF_NAME, 'editable' => PF_EDIT, sensitive=>PF_ENABLE, strikethrough => PF_DELETE,

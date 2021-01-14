@@ -174,6 +174,7 @@ use constant
 
  PI    => 4 * atan2(1, 1),	#needed for cairo rotation functions
  KB => 1000, #1024  # bytes in a KB
+ WINDOW_PADDING => 18,
 };
 use constant MB => KB()**2;
 
@@ -6509,6 +6510,8 @@ sub PrefPlugins
 	my $plugdesc= Gtk3::Label->new;
 	$plugdesc->set_line_wrap(1);
 	$plugtitle->set_justify('center');
+	$rightbox->set_border_width(18);
+	$hbox->set_spacing(0);
 	my $plug_box;
 	my $plugin;
 
@@ -6720,6 +6723,7 @@ sub PrefAudio
 			[$rg_check,$rg_opt,($Glib::VERSION >= 1.251 ? $rga_start : ())],
 			NewPrefCheckButton(IgnorePlayError => _"Ignore playback errors", tip=>_"Skip to next song if an error occurs"),
 		      );
+	$vbox->set_border_width(WINDOW_PADDING);
 	return $vbox;
 }
 
@@ -6865,6 +6869,7 @@ sub PrefMisc
 	$sw->set_shadow_type('etched-in');
 	$sw->set_policy('never','automatic');
 	$sw->add($vbox);
+	$vbox->set_border_width(WINDOW_PADDING);
 	return $sw;
 }
 
@@ -6908,6 +6913,7 @@ sub PrefLayouts
 
 	#packing
 	$vbox->pack_start($_,FALSE,FALSE,1) for @layouts_combos,$reloadlayouts,$checkT1,$checkT2,$fullbutton,$icotheme;
+	$vbox->set_border_width(WINDOW_PADDING);
 	return $vbox;
 }
 
@@ -6937,6 +6943,7 @@ sub PrefTags
 	$updatetags_box->pack_start($updatetags,FALSE,FALSE,2);
 
 	$vbox->pack_start($_,FALSE,FALSE,1) for $warning,$checkv4,$checklatin1,$check_unsync,$id3v1encoding,$noid3v1,$nowrite,$updatetags_box;
+	$vbox->set_border_width(WINDOW_PADDING);
 	return $vbox;
 }
 
@@ -7153,7 +7160,8 @@ sub PrefLibrary
 	my $CCheck=NewPrefCheckButton(StartCheck => _"Check for updated/deleted songs on startup");
 	my $BScan= NewIconButton('gtk-refresh',_"scan now", sub { IdleScan();	});
 	my $BCheck=NewIconButton('gtk-refresh',_"check now",sub { IdleCheck();	});
-	my $label= Gtk3::Label->new(_"Folders to search for new songs");
+	my $folderlist_label= Gtk3::Label->new(_"Folders to search for new songs");
+	$folderlist_label->set_halign('start');
 
 	my $reorg= Gtk3::Button->new(_("Reorganize files and folders").'...');
 	$reorg->signal_connect( clicked => sub
@@ -7187,7 +7195,7 @@ sub PrefLibrary
 
 	my $sg1=Gtk3::SizeGroup->new('horizontal');
 	$sg1->add_widget($_) for $BScan,$BCheck,$Blengthcheck;
-	my $vbox=Vpack( 2,$label,
+	my $vbox=Vpack( 2,$folderlist_label,
 			'_',$sw,
 			[$addbut,$rmdbut,'-',$reorg],
 			[0,$CCheck,'-',$BCheck],
@@ -7198,6 +7206,7 @@ sub PrefLibrary
 			$masterfiltercheck,
 			$librarysize,
 		      );
+	$vbox->set_border_width(WINDOW_PADDING);
 	return $vbox;
 }
 sub ChooseAddPath
