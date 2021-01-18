@@ -3005,10 +3005,10 @@ sub PrefFields	#preference dialog for fields
 	my $warning=Gtk3::Label->new;
 	$warning->set_markup('<b>'.::PangoEsc(_"Settings on this page will only take effect after a restart").'</b>');
 	my $sw=Gtk3::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
+	$sw->set_shadow_type('none');
 	$sw->set_policy('never','automatic');
 	$sw->add($treeview);
-	my $vbox= ::Vpack( $warning, '_',[ ['0_',$sw,$newcst], '_', $rightbox ] );
+	my $vbox= ::Vpack( $warning, 0, Gtk3::Separator->new('horizontal'), '_',[ 0, ['0_',$sw,$newcst], Gtk3::Separator->new('vertical'), '_', $rightbox ] );
 
 	$vbox->{gotofunc}=sub	#go to a specific row
 	{	my $field=shift;

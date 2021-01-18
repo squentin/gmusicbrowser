@@ -6600,10 +6600,12 @@ sub PrefPlugins
 	};
 
 	my $sw=Gtk3::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
+	$sw->set_shadow_type('none');
+	$sw->set_border_width(8);
 	$sw->set_policy('never','automatic');
 	$sw->add($treeview);
-	$hbox->pack_start($sw,FALSE,FALSE,2);
+	$hbox->pack_start($sw,FALSE,FALSE,0);
+	$hbox->pack_start(Gtk3::Separator->new('vertical'),FALSE,FALSE,0);
 	$rightbox->pack_start($plugtitle,FALSE,FALSE,2);
 	$rightbox->pack_start($plugdesc,FALSE,FALSE,2);
 	$hbox->add($rightbox);
