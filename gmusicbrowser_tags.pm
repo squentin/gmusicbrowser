@@ -140,7 +140,7 @@ sub Read
 				}
 				next unless defined $value;
 				if (defined $joinwith)	{ $value= join $joinwith,@$value; }
-				elsif (defined $split)	{ $value= [map split($split,$_), @$value]; }
+				elsif (defined $split)	{ $value= [::uniq(map split($split,$_), @$value)]; }
 			}
 			elsif (my $sub=$def->{"$id:read"}) #special cases with custom function
 			{	$values{$field}= $sub->($tag);
