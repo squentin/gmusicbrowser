@@ -1097,8 +1097,15 @@ sub CreateWidgets
 	$self->{layoutdepth}--;
 	my @noparentboxes=grep m/^(?:[HV][BP]|[AMETNFSW]B|FR)/ && !$widgets->{$_}->get_parent, keys %$boxes;
 	if	(@noparentboxes==0) {warn "layout empty ('$self->{layout}')\n"; return;}
-	elsif	(@noparentboxes!=1) {warn "layout error: (@noparentboxes) have no parent -> can't find toplevel box\n"}
-	return $widgets->{ $noparentboxes[0] };
+	if (@noparentboxes==1) { return $widgets->{ $noparentboxes[0] }; }
+
+	# error: more than one top level box, puth them in a notebook with an error message
+	my $nb= Gtk3::Notebook->new;
+	for my $name (@noparentboxes)
+	{	$nb->append_page( $widgets->{$name}, Gtk3::Label->new($name) );
+	}
+	warn "layout error: (@noparentboxes) have no parent -> can't find toplevel box\n";
+	return ::Vpack(Gtk3::Label->new_with_format('<big><b>%s</b></big>',"Layout error: these boxes have no parent, don't know which one is toplevel:"),$nb);
 }
 
 sub Parse_opt1
