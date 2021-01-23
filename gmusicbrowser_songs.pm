@@ -3246,7 +3246,7 @@ sub Field_fill_option_box
 		if (defined $label)
 		{	$label= Gtk2::Label->new($label);
 			$sg1->add_widget($label);
-			$widget= [ $label, '_',$widget ];
+			$widget= [ $label, $widget ];
 		}
 		push @topack, $widget,@extra;
 	}
