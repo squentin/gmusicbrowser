@@ -796,6 +796,26 @@ sub Gtk3::Label::set_markup_with_format
 {	my $label=shift;
 	$label->set_markup( MarkupFormat(@_) );
 }
+sub Gtk3::Entry::enable_autoexpand
+{	my $entry=shift;
+	my $enabled;
+	my $check_length= sub
+	 {	return unless $enabled;
+		my $l= $_[0]->get_width_chars;
+		$l=20 if $l<1;
+		return unless length($_[0]->get_text) > $l-2;
+		$_[0]->get_parent->child_set($_[0],$_=>1) for qw/expand fill/;
+		$enabled=0;
+	 };
+	my $check_parent= sub
+	 {	my $parent=$_[0]->get_parent;
+		$enabled= $parent && $parent->isa('Gtk3::Box') && $parent->get_orientation eq 'horizontal';
+		$check_length->($_[0]);
+	 };
+	$entry->signal_connect(changed => $check_length);
+	$entry->signal_connect(parent_set => $check_parent);
+	$check_parent->($entry)
+}
 sub Gtk3::Dialog::add_button_custom
 {	my ($dialog,$text,$response_id,%args)=@_;
 	my ($icon,$tip,$secondary)=@args{qw/icon tip secondary/};

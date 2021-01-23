@@ -3229,6 +3229,7 @@ sub Field_fill_option_box
 		}
 		elsif ($widget eq 'entry')
 		{	$widget= Gtk3::Entry->new;
+			$widget->enable_autoexpand;
 			$widget->set_text($value);
 			$widget->signal_connect(changed => sub { my $t=$_[0]->get_text; if ($t=~m/^\s*$/) {delete $opt->{$key};} else {$opt->{$key}=$t;} &Field_Edit_update });
 		}
@@ -3248,7 +3249,7 @@ sub Field_fill_option_box
 		if (defined $label)
 		{	$label= Gtk3::Label->new($label);
 			$sg1->add_widget($label);
-			$widget= [ $label, '_',$widget ];
+			$widget= [ $label, $widget ];
 		}
 		push @topack, $widget,@extra;
 	}
