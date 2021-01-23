@@ -5592,7 +5592,7 @@ sub LabelEditMenu
 		else			{ Songs::Set($IDs,"-$field",$f); }
 	 };
 	my $menu=MakeFlagMenu($field,$menusub_toggled,$hash);
-	my $item= Gtk2::ImageMenuItem->new(_("Add new label").'...');
+	my $item= Gtk2::ImageMenuItem->new(_("Add new").'...');
 	$item->set_image( Gtk2::Image->new_from_stock('gtk-add','menu') );
 	$item->signal_connect(activate=>sub { AddNewLabel($field,$IDs); });
 	$menu->append($_) for Gtk2::SeparatorMenuItem->new, $item;
@@ -7165,7 +7165,7 @@ sub PrefLibrary_update_checklength_button
 	return $button->{timeout}=0;
 }
 
-sub RemoveLabel		#FIXME ? label specific
+sub RemoveLabel
 {	my ($field,$gid)=@_;
 	my $label= Songs::Gid_to_Get($field,$gid);
 	my $filter= Songs::MakeFilterFromGID($field,$gid);
@@ -7175,8 +7175,8 @@ sub RemoveLabel		#FIXME ? label specific
 		( ::get_event_window(),
 		  [qw/modal destroy-with-parent/],
 		  'warning','ok-cancel',
-		  __n("This label is set for %d song.","This label is set for %d songs.",$nb)."\n".
-		  __x(_"Are you sure you want to delete the '{label}' label ?", label => $label)
+		  __x(__n("'{label}' is set for %d song.","'{label}' is set for %d songs.",$nb), label => $label)."\n".
+		  _"Are you sure you want to remove it ?"
 		);
 	my $remove_pers;
 	if (grep $_ eq $label, @$persistent_labels)
@@ -7199,16 +7199,18 @@ sub RenameLabel
 {	my ($field,$gid)=@_;
 	my $old= Songs::Gid_to_Get($field,$gid);
 	my $dialog = Gtk2::Dialog->new
-	( "",::get_event_window(),
+	( _"Rename",::get_event_window(),
 	  [qw/modal destroy-with-parent/],
 	  'gtk-ok'     => 'ok',
 	  'gtk-cancel' => 'cancel'
 	);
 	my $label1= Gtk2::Label->new( __x(_"Rename '{label}'",label=>$old) );
 	my $label2= Gtk2::Label->new(_("New name").":");
-	my $entry= Gtk2::Entry->new;
+	my $IDs= Songs::MakeFilterFromGID($field,$gid)->filter;
+	my $label3= Gtk2::Label->new(__n("This will affect %d song.","This will affect %d songs.",scalar @$IDs)) if @$IDs;
+	my $entry=  Gtk2::Entry->new;
 	$entry->set_text($old);
-	$dialog->get_content_area->pack_start( Vpack($label1,[$label2,$entry]) ,0,0,0);
+	$dialog->get_content_area->pack_start( Vpack($label1,[$label2,$entry],[$label3]) ,0,0,0);
 	$dialog->show_all;
 
 	my $ok= $dialog->run eq 'ok';
@@ -7229,16 +7231,19 @@ sub RenameLabel
 
 sub AddNewLabel
 {	my ($field,$IDs)=@_;
+	my $fieldname= Songs::FieldName($field);
 	my $dialog = Gtk2::Dialog->new
-	( "",::get_event_window(),
+	( __x(_("New value for {field}"),field=>$fieldname),::get_event_window(),
 	  [qw/modal destroy-with-parent/],
 	  'gtk-ok'     => 'ok',
 	  'gtk-cancel' => 'cancel'
 	);
-	my $label= Gtk2::Label->new(_("New label").":");
+	my $label1= Gtk2::Label->new(__x(_("Field: {field}"),field=>$fieldname));
+	my $label2= Gtk2::Label->new(_("New value").":");
+	my $label3= Gtk2::Label->new(__n("This value will be set for %d song.","This value will be set for %d songs.",scalar @$IDs));
 	my $entry= Gtk2::Entry->new;
 	GMB::ListStore::Field::setcompletion($entry,$field);
-	$dialog->get_content_area->pack_start( Hpack($label,$entry) ,0,0,0);
+	$dialog->get_content_area->pack_start( Vpack([$label1],[$label2,$entry],[$label3]) ,0,0,0);
 	$dialog->show_all;
 
 	my $ok= $dialog->run eq 'ok';
