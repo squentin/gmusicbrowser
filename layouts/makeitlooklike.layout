@@ -324,9 +324,18 @@ VBMain = HBMenubar HBToolbar VBSliderbar _HPSidebarCenterContext HBStatusbar
 
     HBStatusbar = Total(mode=filter) -Progress(maxheight=1)
 
-[Rhythmbox Compact] based on Rhythmbox
-Default = Window(size=600x126)
+[Rhythmbox Compact]
+Author = shimmerproject.org
+Type = G+
 Category = _"Make it look like"
+Title = %a - %t
+Default = Window(size=600x126)
+DefaultFocus = PlayPause
+
+KeyBindings = a-Return OpenSongProp c-space PlayPause a-Left PrevSong a-Right NextSong c-Down DecVolume c-Up IncVolume
+
+VolumeScroll = HBVolume
+
 VBMain = HBMenubar HBToolbar VBSliderbar
 
     HBMenubar = _MBEdit
@@ -361,6 +370,17 @@ VBMain = HBMenubar HBToolbar VBSliderbar
         -HBVolume
 
         HBVolume = VolumeIcon(size=menu,button=1)
+
+    VBSliderbar = 5HBText 1HBTimeSlider
+
+        HBTimeSlider = 5_TimeSlider(direct_mode=0)
+
+        HBText = 2Filler0 \
+            _Title(expand_max=300,ellipsize=end,markup="<big><b>%t</b></big> ",yalign=0.5) \
+            Artist(expand_max=200,yalign=1,ellipsize=end,markup=" by <i>%a</i> ") \
+            Album(expand_max=200,yalign=1,ellipsize=end,markup=" on <i>%l</i>   ",showcover=0) \
+            -Time
+
 
 {Column RhythmboxQueue}
 menutitle = _"Rhythmbox 2nd queue column"
