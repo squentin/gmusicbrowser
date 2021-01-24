@@ -1007,8 +1007,10 @@ sub new
 {	my ($class,$field,$IDs) = @_;
 	my $self= bless Gtk3::VBox->new, $class;
 	my $textview= $self->{textview}= Gtk3::TextView->new;
-	$textview->set_size_request(100,($textview->create_pango_layout("X")->get_pixel_size)[1]*4); #request 4 lines of height
+	$textview->set_wrap_mode('word-char');
 	my $sw= ::new_scrolledwindow($textview,'etched-in');
+	$sw->set_min_content_height(($textview->create_pango_layout("X")->get_pixel_size)[1]*3); #request 3 lines of height
+	$sw->set_propagate_natural_height(1);
 	$self->add($sw);
 	my $val;
 	if (ref $IDs)
@@ -1508,6 +1510,7 @@ sub fill
 			$grid->attach($label,$col,$row,1,1);
 		}
 		$grid->attach($widget,$col+1,$row,1,1);
+		$widget->set_hexpand(1) unless $widget->{noexpand};
 		$self->{fields}{$field}=$widget;
 	}
 	$grid->show_all;
