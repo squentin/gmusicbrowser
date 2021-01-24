@@ -337,12 +337,12 @@ our %timespan_menu=
 	{	parent		=> 'generic',
 		default		=> '""',
 		check		=> '#VAL#=~tr/\x1D\x00//d; #VAL#=~s/\s+$//;',	#remove trailing spaces and \x1D\x00
-		diff		=> '#_# ne #VAL#',
-		s_sort		=> '#_#',
-		'filter:e'	=> '#_# .eq. "#VAL#"',
-		hash		=> '#_#',
-		group		=> '#_# ne',
-		stats		=> '#HVAL#{#_#}=undef;  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
+		diff		=> '#get# ne #VAL#',
+		s_sort		=> '#get#',
+		'filter:e'	=> '#get# .eq. "#VAL#"',
+		hash		=> '#get#',
+		group		=> '#get# ne',
+		stats		=> '#HVAL#{#get#}=undef;  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
 	},
 	istring => # faster with case/accent insensitive operations, at the price of double memory
 	{	parent	=> 'string',
@@ -353,11 +353,25 @@ our %timespan_menu=
 		'filter:mi'	=> '#_iname# .=~. m"#VAL#"i',			'filter_prep:mi'=> sub { Filter::QuoteRegEx( ::superlc($_[0]) )},
 		'filter:fuzzy'	=> ' .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",#_iname#)',	'filter_prep:fuzzy'=> sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta ::superlc($arg[1])},
 	},
-	text =>	#multi-lines string
+	text =>#multi-lines string
 	{	parent			=> 'string',
 		check			=> '#VAL#=~tr/\x00-\x09\x0B\x0C\x0E-\x1F//d; #VAL#=~s/\s+$//;',
 		'editwidget:single'	=> sub { GMB::TagEdit::EntryText->new(@_); },
 		'editwidget:many'	=> sub { GMB::TagEdit::EntryText->new(@_); },
+	},
+	text_compressed => #not used #for multi-lines strings, sometimes long
+	{	parent	=> 'text',
+		get	=> 'do {my $v=#_#; !defined($v) ? "" : (substr($v,0,1) ne "\x00") ? $v : do { $v= Compress::Zlib::uncompress(substr($v,1)); ::_utf8_on($v); $v; }}',
+		set	=> 'do {my $v=#VAL#; #_#= $v eq "" ? undef : length($v)>99 ? do { ::_utf8_off($v); "\x00".Compress::Zlib::compress($v) }  : "$v"};',
+	},
+	text_compact =>	#for multi-lines strings, often empty, sometimes long
+	{	parent		=> 'text',
+		_		=> 'vec(____,#ID#,#bits#)', #store index to value in ___value, or 0 for empty
+		bits		=> 32,	#32 bits for 2**32 non-empty comments
+		compress	=> (require Compress::Zlib ? 1 : 0),
+		init		=> '____=""; ___value[0]=undef;',
+		get		=> 'do { my $v=#_#; if (!$v) { "" } else { $v=___value[$v]; if (#compress# && (substr($v,0,1) eq "\x00")) { $v= Compress::Zlib::uncompress(substr($v,1)); ::_utf8_on($v); } $v; } }',
+		set		=> 'do { my $v=#VAL#; my $i=#_#; if (!$i && $v eq "") { #_#=0 } else { if (#compress# && length($v)>99) { ::_utf8_off($v); $v= "\x00".Compress::Zlib::compress($v); } if ($i) { $___value[$i]="$v"; } else { #_#= push(@___value,"$v")-1; } } }',
 	},
 	filename=>
 	{	parent	=> 'string',
@@ -1159,7 +1173,7 @@ our %timespan_menu=
 	category=>'extra',
  },
  comment=>
- {	name	=> _"Comment",	width => 200,	flags => 'fgarwescpi',		type => 'text',
+ {	name	=> _"Comment",	width => 200,	flags => 'fgarwescpi',		type => 'text_compact',
 	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3v2=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
 	edit_order=> 60,	edit_many=>1,	letter => 'C',
 	category=>'basic',
@@ -1537,7 +1551,7 @@ our %timespan_menu=
 
 our %FieldTemplates=
 (	string	=> { type=>'string',	editname=>_"string",		flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', articles=>1, },
-	text	=> { type=>'text',	editname=>_"multi-lines string",flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', },
+	text	=> { type=>'text_compact',editname=>_"multi-lines string",flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', },
 	float	=> { type=>'float',	editname=>_"float",		flags=>'fgaescp',	width=> 100,	edit_many =>1,		options=> 'customfield', desc => _"For decimal numbers", },
 	boolean	=> { type=>'boolean',	editname=>_"boolean",		flags=>'fgaescp',	width=> 20,	edit_many =>1,		options=> 'customfield', },
 	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescpil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield persistent_values editsubmenu samemenu', FilterList=> {search=>1},   desc=>_"Same type as labels", editsubmenu => 1, },
