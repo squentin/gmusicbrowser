@@ -1290,7 +1290,7 @@ sub remove_all
 			for my $j (0..$#extra)
 			{	my $extra= $extra[$j];
 				next if $extra eq '%v' || $extra eq '';
-				$keep=1 if $extra ne $ref->[$i][$j];
+				$keep=1 if uc$extra ne uc$ref->[$i][$j];
 			}
 			push @toremove,$i unless $keep;
 		}
@@ -1311,14 +1311,14 @@ sub get_values
 	return unless $v;
 	my @values= grep defined, @$v;
 	return unless @values;
-	if (@extra && ref $v->[0]) #for multi fields (COMM for example)
+	if (@extra && ref $values[0]) #for multi fields (COMM for example)
 	{	@values= map
 		 {	my $v_ok; my $notok;
 			for my $j (0..$#extra)
 			{	my $p=$extra[$j];
 				my $vj=$_->[$j];
 				if ($p eq '%v') { $v_ok=$vj; }
-				elsif ($p ne '' && $p ne $vj) {$notok=1;last}
+				elsif ($p ne '' && uc$p ne uc$vj) {$notok=1;last}
 			}
 			$notok ? () : ($v_ok);
 		 } @values;
