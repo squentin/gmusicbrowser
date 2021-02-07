@@ -5383,7 +5383,7 @@ sub DeleteFiles
 			last if $res eq 'abort';
 		}
 		$done++;
-		IdleCheck($ID);
+		SongsRemove([$ID]);
 	  }
 	}
 	$dialog->destroy;
