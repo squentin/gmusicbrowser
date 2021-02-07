@@ -125,6 +125,7 @@ sub Read
 						next unless defined $userid && length $userid;
 						$key=~s#%i#$userid#;
 					}
+					$key=~s/^\?\s*//; # remove leading "?" (for ifexist mode) doesn't affect reading
 					my $func='postread';
 					$func.=":$1" if $key=~s/^(\w+)\(\s*([^)]+?)\s*\)$/$2/; #for tag-specific postread function
 					my $fpms_id; $fpms_id=$1 if $key=~m/FMPS_/ && $key=~s/::(.+)$//;
@@ -221,6 +222,7 @@ sub Write
 			push @keys, split /\s*&\s*/, $wkey;	#these keys will be updated (first one and ones separated by &)
 			for my $key (@keys)
 			{	if ($key=~m/%i/) { next unless defined $userid && length $userid; $key=~s#%i#$userid#g }
+				my $ifexist= $key=~s/^\?\s*//; #check and remove leading "?" for ifexist mode: if true, only write this tag if tag already in the file
 				my $func='prewrite';
 				$func.=":$1" if $key=~s/^(\w+)\(\s*([^)]+?)\s*\)$/$2/; #for tag-specific prewrite function  "function( TAG )"
 				my $sub= $def->{$func} || $def->{'prewrite'};
@@ -233,7 +235,9 @@ sub Write
 				{	my $v= FMPS_hash_write( $tag, $key, $1, $v[0] );
 					@v= $v eq '' ? () : ($v);
 				}
+				my $write= $ifexist ? $tag->get_values($key) : 1;
 				$tag->remove_all($key);
+				next unless $write;
 				$tag->insert($key,$_) for reverse grep defined, @v;
 			}
 		}
