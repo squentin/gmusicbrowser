@@ -5,8 +5,8 @@
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation
 
-#http://xiph.org/vorbis/doc/framing.html
-#http://xiph.org/vorbis/doc/v-comment.html
+# https://xiph.org/ogg/doc/framing.html
+# https://xiph.org/vorbis/doc/v-comment.html
 #opus:
 # https://tools.ietf.org/html/rfc7845.html
 # https://wiki.xiph.org/OggOpus
@@ -154,7 +154,7 @@ sub new
 
 	# calculate bitrate, excluding the metadata packet
 	my $audiosize= (-s $file) - $self->{commentpack_size};
-	$self->{info}{bitrate_calculated}= 8*$audiosize / $self->{info}{seconds};
+	$self->{info}{bitrate_calculated}= 8*$audiosize / $self->{info}{seconds} if $self->{info}{seconds};
     }
 
     $self->_close;
@@ -203,29 +203,43 @@ sub write_file
 {	my $self=shift;
 	my $newcom_packref=_PackComments($self);
 	#warn "old size $self->{commentpack_size}, need : ".length($$newcom_packref)."\n";
-	# 1. if enough room: write in-place
-	if ( $self->{commentpack_size} >= length $$newcom_packref)
+	# case 1. if enough room and not too much room: write in-place
+	my $enough= $self->{commentpack_size} - length $$newcom_packref;
+	if ($enough>=0 && $enough<2048)
 	{	warn "in place editing.\n";
 		my $left=length $$newcom_packref;
 		my $offset2=0;
 		my $fh=$self->_openw or return;
-		_read_packet($self,PACKET_INFO);	#skip first page
-		while ($left)
-		{ my $pos=tell $fh;
-		  my ($pageref,$offset,$size)=_ReadPage($self);
-		  seek $fh,$pos,0;
-		  if ($left<$size) {$size=$left; $left=0;}
-		  else		   {$left-=$size}
-		  substr $$pageref,$offset,$size,substr($$newcom_packref,$offset2,$size);
-		  $offset2+=$size;
-		  _recompute_page_crc($pageref);
-		  print $fh $$pageref or warn $!;
+		my $towrite;
+		my $error;
+
+		unless (_read_packet($self,PACKET_INFO)) #skip first page
+		{	$error="Can't find info packet"; $left=0;
 		}
+		my $startwrite= tell $fh;
+		# read previous comments pages, replace the comments
+		while ($left)
+		{	my ($pageref,$offset,$size)=_ReadPage($self);
+			unless ($pageref) { $error="error reading comment page"; last; }
+			if ($left<$size) {$size=$left; $left=0;}
+			else		 {$left-=$size}
+			substr $$pageref,$offset,$size,substr($$newcom_packref,$offset2,$size);
+			$offset2+=$size;
+			_recompute_page_crc($pageref);
+			$towrite.= $$pageref;
+		}
+		# write new comments
+		seek $fh,$startwrite,0;
+		unless ($error) { print $fh $towrite or $error=$!; }
 		$self->_close;
-		return;
+		if ($error)
+		{	warn "oggheader: error writing tag in $self->{filename}: $error\n";
+			return 0;
+		}
+		return 1;
 	}
 
-	# 2. if not enough room: create new file and replace old file
+	# case 2. if not enough room: create new file and replace old file
 	my $INfh=$self->_open or return;
 	my $OUTfh=$self->_openw(1) or return;	#open .TEMP file
 
@@ -271,7 +285,8 @@ sub write_file
 		#warn unpack('C*',$segments),"\n";
 		#warn "$size ",length($data)-$data_offset,"\n";
 		warn "writing page $pagenb\n" if $::debug;
-		my $page=pack('a4aa x8 a4 V x4 C','OggS',$version,$continued,$serial,$pagenb++,$nbseg).$segments.substr($data,$data_offset,$size);
+		my $granule= $seg==255 ? "\xff"x8 : "\x00"x8; # 0 if packet ends on this page, -1 if not
+		my $page=pack('a4aa a8 a4 V x4 C','OggS',$version,$continued,$granule,$serial,$pagenb++,$nbseg).$segments.substr($data,$data_offset,$size);
 		_recompute_page_crc(\$page);
 		print $OUTfh $page or warn $!;
 		$data_offset+=$size;
@@ -285,10 +300,10 @@ sub write_file
 	my $pos=tell $INfh; read $INfh,$data,27; seek $INfh,$pos,0;
 	#warn "first audio data on page ".unpack('x18V',$data)."\n";
 	# fast raw copy by 1M chunks if page numbers haven't changed
-	if ( substr($data,0,4) eq 'OggS' && unpack('x18V',$data) eq $pagenb)
-		{ my $buffer;
-		  print $OUTfh $buffer  or warn $! while read $INfh,$buffer,1048576;
-		}
+	if (substr($data,0,4) eq 'OggS' && unpack('x18V',$data) == $pagenb)
+	{	my $buffer;
+		print $OUTfh $buffer  or warn $! while read $INfh,$buffer,1048576;
+	}
 
 	# __SLOW__ copy if page number must be changed -> and crc recomputed
 	else
@@ -297,6 +312,15 @@ sub write_file
 		{	substr $$pageref,18,4,pack('V',$pagenb++); #replace page number
 			_recompute_page_crc($pageref);	#recompute crc
 			print $OUTfh $$pageref or warn $!;	#write page
+		}
+		# if we didn't reach end of file, something went wrong, abort
+		unless (eof($self->{fileHandle}))
+		{	warn "oggheader: error reading pages of $self->{filename} while copying audio data, aborting write\n";
+			$self->_close;
+			close $OUTfh;
+			unlink $self->{filename}.'.TEMP';
+			%$self=(); #destroy the object to make sure it is not reused as many of its data are now invalid
+			return 0;
 		}
 	}
 
@@ -546,7 +570,7 @@ sub _read_page_header
 	my $buf;
 	my $r=read $fh,$buf,27;
 	return 0 unless $r==27;
-	#http://www.xiph.org/ogg/vorbis/doc/framing.html
+	# https://xiph.org/ogg/doc/framing.html
 	# 'OggS' 4 bytes	capture_pattern			0
 	# 0x00	 1 byte		stream_structure_version	1
 	#	 1 byte		header_type_flag		2
