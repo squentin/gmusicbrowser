@@ -1379,7 +1379,7 @@ sub KeyPressed
 {	my ($self,$event,$after)=@_;
 	my $key=Gtk3::Gdk::keyval_name( $event->keyval );
 	my $focused=$self->get_toplevel->get_focus;
-	return 0 if !$after && $focused && ($focused->isa('Gtk3::Entry') || $focused->isa('Gtk3::SpinButton'));
+	return 0 if !$after && $focused && ($focused->isa('Gtk3::Entry') || $focused->isa('Gtk3::TextView') || $focused->isa('Gtk3::SpinButton'));
 	my $mod;
 	$mod.='c' if $event->state >= 'control-mask';
 	$mod.='a' if $event->state >= 'mod1-mask';
