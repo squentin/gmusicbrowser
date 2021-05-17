@@ -4730,6 +4730,7 @@ sub PopupMenu
 			$posfunction=\&menupos if $h<300; #ignore the event's widget if too big, widget can be the whole window if coming from a shortcut key, it makes no sense poping-up a menu next to the whole window
 		}
 	}
+	$menu->signal_connect(selection_done=> \&Gtk3::Widget::destroy); # destroy menu after use, not sure which signal is best to use, hide signal is fired before executing action so would require a delayed destroy
 	$menu->popup(undef,undef,$posfunction,undef,$button,$time);
 }
 sub menupos	# function to position popupmenu below clicked widget
