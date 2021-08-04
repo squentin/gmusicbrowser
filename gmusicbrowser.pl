@@ -142,12 +142,13 @@ BEGIN
 }
 
 my $thousandsep;
-BEGIN { $thousandsep= POSIX::localeconv()->{thousands_sep}; }
+BEGIN { $thousandsep= POSIX::localeconv()->{thousands_sep} // ''; }
 sub format_number
 {	my ($d,$f)=@_;
 	use locale;
 	$d= $f ? sprintf($f,$d) : ''.($d+0); # ''.($d+0) to force stringification of the number with the locale
 	return $d unless $d=~s/^(-?\d{4,})//; # $d now contains the fractional part
+	return $d unless $thousandsep;
 	my $i=$1; # integer part
 	$i =~ s/(?<=\d)(?=(?:\d\d\d)+\b)/$thousandsep/g;
 	return $i.$d;
