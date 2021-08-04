@@ -5121,7 +5121,9 @@ sub ChooseFiles
 	FileChooser_add_filters($dialog,@$patterns);
 	if ($remember_key)
 	{	my $path= $Options{$remember_key};
-		$dialog->set_current_folder_uri($path);
+		if ($path) {
+			$dialog->set_current_folder_uri($path);	
+		}
 	}
 
 	my $response=$dialog->run;
