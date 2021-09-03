@@ -108,7 +108,7 @@ sub launch_mpv
 		{
 			push @cmd_and_args,"--replaygain=".get_RG_mode();
 			push @cmd_and_args,"--replaygain-preamp=".get_RG_preamp();
-			push @cmd_and_args,"--replaygain-clip=".$::Options{rg_limiter} ? 'yes' : 'no';
+			push @cmd_and_args,"--replaygain-clip=".($::Options{rg_limiter} ? 'yes' : 'no');
 			push @cmd_and_args,"--replaygain-fallback=".($::Options{rg_fallback} || 0);
 		} else { push @cmd_and_args,"--af-add=".get_RG_string(); }
 	}
