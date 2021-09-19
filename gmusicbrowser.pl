@@ -316,10 +316,17 @@ sub barename #filename without extension
 }
 
 our %Alias_ext;	#define alternate file extensions (ie: .ogg files treated as .oga files)
-INIT {%Alias_ext=(mp2=>'mp3', ogg=> 'oga', m4b=>'m4a');} #needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
+INIT
+{  # needs to be in a INIT block because used in a INIT block in gmusicbrowser_tags.pm
+   %Alias_ext=
+   (       mp2=>'mp3', ogg=> 'oga', m4b=>'m4a',
+           it=>'mod', s3m=>'mod', xm=>'mod', mtm=>'mod', dmf=>'mod', 669=>'mod',
+   );
+}
 our @ScanExt= qw/mp3 mp2 ogg oga flac mpc ape wv m4a m4b opus/;
 our @ScanExtOther= qw/aac wav wma/;
 our @ScanExtVideo= qw/mp4 mkv avi wmv flv webm mov mpg mpeg m4v ogv asf rmvb/;
+our @ScanExtMod= qw/mod it s3m xm mtm dmf 669/;
 
 our ($Verbose,$debug);
 our %CmdLine;
@@ -6079,6 +6086,7 @@ sub MakeScanRegex
 		if ($Options{ScanOther}) { $ext{$_}=1 for @ScanExtOther; }
 		if ($Options{ScanCustom}){ $ext{$_}=1 for $Options{ScanCustom}=~m/\w+/g; }
 	}
+	if ($FileTag::ModsOK && $Options{ScanMod})	 { $ext{$_}=1 for @ScanExtMod; }
 	delete $ext{$_} for @{ $Options{ScanIgnore} };
 	my $re=join '|', sort keys %ext;
 	warn "Scan regular expression is empty\n" unless $re;
@@ -7096,13 +7104,14 @@ sub ExtensionsDialog
 	my $update=sub { for my $child ($grid->get_children) { my $key= $child->{key}; $child->set_sensitive($Options{$key}) if $key; $ScanRegex=undef; } };
 
 	for my $cat (	[\@ScanExt, _"Fully supported audio extensions"],
-			[\@ScanExtOther, _"Partially supported audio extensions", 'ScanOther'],
-			[\@ScanExtVideo, _"Partially supported video extensions", 'ScanVideo'])
-	{	my ($list,$text,$key)=@$cat;
+			[\@ScanExtOther, _"Partially supported audio extensions", 'ScanOther', $FileTag::GenericOK],
+			[\@ScanExtMod,   _"Partially supported module extensions", 'ScanMod',$FileTag::ModsOK],
+			[\@ScanExtVideo, _"Partially supported video extensions", 'ScanVideo', $FileTag::GenericOK])
+	{	my ($list,$text,$key,$ok)=@$cat;
 		my $widget;
 		if ($key)
 		{	$widget= NewPrefCheckButton($key=>$text, cb=>$update,  tip=>_"These files are only partially supported and will be read-only: no metadata will be written in the file");
-			$widget->set_sensitive(0) unless $FileTag::GenericOK;
+			$widget->set_sensitive($ok);
 		}
 		else { $widget= Gtk3::Label->new($text); $widget->set(xalign=>0); }
 		$widget->set(margin_top=>10);
@@ -7120,7 +7129,7 @@ sub ExtensionsDialog
 	}
 	$update->();
 
-	my $ScanCustom= NewPrefEntry(ScanCustom=> _"Try to add these extensions:", tip=> _"Will try to add these files in partially supported mode and read-only: no metadata will be written in the file", expand=>1, cb=> sub { $ScanRegex=undef; });
+	my $ScanCustom= NewPrefEntry(ScanCustom=> _"Try to add these extensions:", tip=> _"Will try to add these files in partially supported mode and read-only: no metadata will be written in the file. List extensions separated by spaces.", expand=>1, cb=> sub { $ScanRegex=undef; });
 	$ScanCustom->set(hexpand=>1);
 	$ScanCustom->set(margin_top=>10);
 	$ScanCustom->set_sensitive(0) unless $FileTag::GenericOK;
@@ -7242,12 +7251,14 @@ sub ChooseAddPath
 		my @music= @ScanExt;
 		push @music, @ScanExtOther if $FileTag::GenericOK && $Options{ScanOther};
 		my @enabled= @music;
+		push @enabled, @ScanExtMod   if $FileTag::ModsOK    && $Options{ScanMod};
 		push @enabled, @ScanExtVideo if $FileTag::GenericOK && $Options{ScanVideo};
 		push @enabled, $Options{ScanCustom}=~m/\w+/g if $FileTag::GenericOK;
 		@enabled= ListNotIn($Options{ScanIgnore}, \@enabled);
 		push @$allowfiles, [_"Enabled files",	undef, join(' ',map '*.'.$_, sort @enabled) ] if "@enabled" ne "@music";
 		push @$allowfiles, [_"Music files",	undef, join(' ',map '*.'.$_, sort @music) ];
 		push @$allowfiles, [_"Video files",	undef, join(' ',map '*.'.$_, sort @ScanExtVideo) ] if $FileTag::GenericOK && $Options{ScanVideo};
+		push @$allowfiles, [_"Module files",	undef, join(' ',map '*.'.$_, sort @ScanExtMod) ] if $FileTag::ModsOK && $Options{ScanMod};
 		push @$allowfiles, [_"All files",	undef,'*'];
 	}
 	my @dirs=ChooseDir(_"Choose folder to add", remember_key=>'LastFolder_Add', multiple=>1, allowfiles=>$allowfiles);
