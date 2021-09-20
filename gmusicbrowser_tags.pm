@@ -23,7 +23,7 @@ use utf8;
 
 package FileTag;
 
-our (%FORMATS,$GenericOK,@GenericReaders);
+our (%FORMATS,$GenericOK,$ModsOK,@GenericReaders);
 
 INIT
 {# module: perl module to use
@@ -40,7 +40,7 @@ INIT
 	ape	=> {module=>'Tag::APEfile',	format=> 'ape v{version}',		tags=>'APE ID3v2 lyrics3v2 ID3v1', },
 	wv	=> {module=>'Tag::WVfile',	format=> 'wv v{version}',		tags=>'APE ID3v1',			image=>1, },
 	m4a	=> {module=>'Tag::M4A',		format=> 'mp4 {traktype}',		tags=>'ilst',				image=>1, },
-        mod	=> {module=>'Tag::Modfile',	format=> 'mod',				tags=>'vorbis',				image=>0,	ro=>1, },
+        mod	=> {module=>'Tag::Modfile',	format=> '{audio_format}',		tags=>'vorbis',				ro=>1, },
  );
  # copy FORMATS for aliased extensions
  for my $ext (keys %::Alias_ext) { my $f= $FORMATS{ $::Alias_ext{$ext} };  $FORMATS{$ext}=$f if $f; }
@@ -48,6 +48,8 @@ INIT
  $GenericOK= $Tag::Generic::GStreamer::OK || $Tag::Generic::Mediainfo::OK;
  push @GenericReaders, { module=>'Tag::Generic::GStreamer', tags=>'vorbis', ro=>1, } if $Tag::Generic::GStreamer::OK;
  push @GenericReaders, { module=>'Tag::Generic::Mediainfo', tags=>'vorbis', ro=>1, } if $Tag::Generic::Mediainfo::OK;
+
+ $ModsOK= $Tag::Modfile::OK;
 }
 
 sub Is_ReadOnly

@@ -11,15 +11,20 @@ package Tag::Modfile;
 use strict;
 use warnings;
 
-use File::Basename;
-use lib dirname (__FILE__);
-use ModFileMetadata;
+our $OK;
 
-# Use gstreamer code to read lengths
-BEGIN{ require 'generic_metadata_reader_gstreamer.pm' }
+BEGIN { $OK= eval {
+	require 'ModFileMetadata.pm';
+	require 'generic_metadata_reader_gstreamer.pm'; # Use gstreamer code to read lengths
+	};
+}
+
+
 
 # if called from command line, useful for testing
 if (!caller && @ARGV) {
+    # in a string eval so that it has no effect when called from gmb
+    eval 'use FindBin; use lib $FindBin::RealBin; use ModFileMetadata;';
     my $self= Tag::Modfile->new($ARGV[0]);
     my $info= $self->{info};
     my $tags= $self->{tag};
@@ -29,7 +34,6 @@ if (!caller && @ARGV) {
     print "tag:\n";
     print "  $_: $tags->{$_}\n" for sort grep defined $tags->{$_}, keys %$tags;
 }
-
 
 sub new {
     my ($class,$file)=@_;
@@ -53,7 +57,7 @@ sub new {
     }
 
     # If we got anything, read gst metadata too
-    if(defined $self){
+    if(defined $self && $Tag::Generic::GStreamer::OK){
         # query gst
         my $gst_tags = Tag::Generic::GStreamer->new($file);
         $self->{gst_tags} = $gst_tags if defined $gst_tags;
@@ -61,8 +65,8 @@ sub new {
 
     # Store info
     #$self->{filename}               = $file; Not needed?
-    $self->{info}{container_format} = 'MOD';
-    $self->{info}{audio_format} = $mod_info->type if defined $mod_info->type;
+    #$self->{info}{container_format} = 'MOD';
+    $self->{info}{audio_format} = $mod_info->typeVerbose if defined $mod_info->typeVerbose;
     $self->{tag}{title}    = $mod_info->title     if defined $mod_info->title;
     $self->{tag}{artist}   = $mod_info->artist    if defined $mod_info->artist;
     $self->{tag}{comment}  = $mod_info->message   if defined $mod_info->message;
@@ -76,7 +80,6 @@ sub new {
     return $self;
 }
 
-# Do I need this?, Guess so.
 sub get_values {
     my ($self,$field)=@_;
     return exists($self->{tag}{$field})? $self->{tag}{$field} : undef
