@@ -54,7 +54,8 @@ our %GenericTag= # keys use vorbis comment name standard for simplicity
 );
 
 if (!caller && @ARGV) # if called from command line, useful for testing
-{	use HTML::Entities;
+{	# in a string eval so that gmb doesn't require HTML::Entities
+	eval 'use HTML::Entities;';
 	*::decode_html= \&HTML::Entities::decode_entities;
 	my $self= Tag::Generic::Mediainfo->new($ARGV[0]);
 	my $info= $self->{info};
