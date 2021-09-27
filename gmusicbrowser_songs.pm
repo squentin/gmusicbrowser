@@ -1139,7 +1139,8 @@ our %timespan_menu=
  },
  mood	=>
  {	name		=> _"Moods",	width => 180,	flags => 'fgarwescpil',
-	id3v2	=> 'TMOO',	vorbis	=> 'MOOD',	ape	=> 'Mood', ilst => "----MOOD",
+	id3v2		=> 'TMOO &? TXXX;Mood;%v',	vorbis	=> 'MOOD',	ape	=> 'Mood', ilst => "----MOOD",
+	'id3v2.3'	=> 'TXXX;Mood;%v &? TMOO', # TMOO doesn't officially exist in id3v2.3
 	read_split	=> qr/\s*;\s*/,
 	type		=> 'flags',
 	none		=> quotemeta _"No moods",
