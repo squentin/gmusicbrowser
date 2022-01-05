@@ -7073,7 +7073,7 @@ sub update_sort_indicators
 
 package GMB::Cell;
 
-my $drawpix=	['pixbuf_draw','draw = pixbuf xd yd wd hd'];
+my $drawpix=	['pixbuf_draw','draw = pixbuf xd yd wd hd opacity'];
 my $padandalignx=['pad_and_align', 'xd wd = x xpad pad xalign wr w'];
 my $padandaligny=['pad_and_align', 'yd hd = y ypad pad yalign hr h'];
 my $optpad=	['optpad', 'xpad ypad = pad'];
@@ -7114,7 +7114,7 @@ our %GraphElem=
 			 $drawpix,$padandalignx,$padandaligny,
 		    ],
 		    defaults =>
-		    	'x=0,y=0,w=___picsize+2*___xpad,h=___picsize+2*___ypad,xpad=xpad,ypad=ypad,xalign=.5,yalign=.5,aanb=0,aa=$_grouptype,ids=$ids,picsize=min(___w+2*___xpad,___h+2*___ypad)',
+			'x=0,y=0,w=___picsize+2*___xpad,h=___picsize+2*___ypad,xpad=xpad,ypad=ypad,xalign=.5,yalign=.5,aanb=0,aa=$_grouptype,ids=$ids,picsize=min(___w+2*___xpad,___h+2*___ypad),opacity=1',
 		    optional =>
 		    [	$optpad,
 		    ],
@@ -7124,7 +7124,7 @@ our %GraphElem=
 		    	['pic_size','pixbuf wr hr = cached file crop hide'],
 		    	$drawpix,$padandalignx,$padandaligny,
 		    ],
-		    defaults => 'x=0,y=0,xalign=.5,yalign=.5,resize=0,w=0,h=0,crop=0,xpad=xpad,ypad=ypad,w=___wr+2*___xpad,h=___hr+2*___ypad',
+		    defaults => 'x=0,y=0,xalign=.5,yalign=.5,resize=0,w=0,h=0,crop=0,xpad=xpad,ypad=ypad,w=___wr+2*___xpad,h=___hr+2*___ypad,opacity=1',
 		    optional =>
 		    [	$optpad,
 		    ],
@@ -7595,7 +7595,7 @@ sub aapic_size
 	return $pixbuf,$pixbuf->get_width,$pixbuf->get_height;
 }
 sub pixbuf_draw
-{	my ($arg,$pixbuf,$x,$y,$w,$h)=@_;
+{	my ($arg,$pixbuf,$x,$y,$w,$h,$opacity)=@_;
 	return unless $pixbuf;
 	$x+=$arg->{x};
 	$y+=$arg->{y};
@@ -7607,7 +7607,8 @@ sub pixbuf_draw
 	if ($intersect->{width} && $intersect->{height})
 	{	$cr->translate($x,$y);
 		$cr->set_source_pixbuf($pixbuf,0,0);
-		$cr->paint;
+		if ($opacity<1) { $cr->paint_with_alpha($opacity); }
+		else		{ $cr->paint; }
 	}
 	$cr->restore;
 }
