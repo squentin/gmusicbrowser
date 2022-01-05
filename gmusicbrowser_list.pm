@@ -6207,6 +6207,9 @@ sub draw_cb
 	my $songs_x= $x+$self->{songxoffset};
 	my $songs_width=$self->{songswidth};
 
+	my $widget_width= $self->{hadj}->get_page_size;
+	my $widget_height= $self->{vadj}->get_page_size - $headerheight;
+
 	my $maxy=$self->{viewsize}[1]-$yadj;
 	$exp_y2=$maxy if $exp_y2>$maxy; #don't try to draw past the end
 
@@ -6239,6 +6242,7 @@ sub draw_cb
 				cr	=> $cr,		state	=> $nstate,
 				depth	=> $depth,	expanded=> $expanded,
 				vx	=> $xadj+$x+$cell->{x},		vy	=> $yadj+$y,
+				ww	=> $widget_width,		wh	=> $widget_height,
 				x	=> $x+$cell->{x},		y	=> $y,
 				w	=> $cell->{width},		h	=> $bh,
 				grouptype => $cell->{grouptype},
