@@ -3937,7 +3937,7 @@ sub new
 				$self->{updatemenu}($self);
 			}
 			$self->set_active(1);
-			::PopupMenu($menu,event=>$event);
+			::PopupMenu($menu,event=>$event, no_destroy_on_close=>1);
 		});
 	$self->{menu}->signal_connect(deactivate => sub { my $self = shift; $self->get_attach_widget->set_active(0); } );
 	return $self;
