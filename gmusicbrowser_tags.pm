@@ -499,7 +499,7 @@ sub add_per_file_part
 		#$item->signal_connect(activate => sub { $self->add_selectfile_column });
 		#$menu->append($item);
 		$BSelFields->signal_connect( button_press_event => sub
-			{	::PopupMenu($menu,event=>$_[1]);
+			{	::PopupMenu($menu, event=>$_[1], no_destroy_on_close=>1);
 			});
 		#$self->pack_start($menubar, FALSE, FALSE, 2);
 		#$perfile_table->attach($menubar,7,8,0,1,'fill','shrink',1,1);
@@ -524,7 +524,7 @@ sub add_per_file_part
 			$menu->append($item) if $ref->{for_all};
 		}
 		$Btools->signal_connect( button_press_event => sub
-			{	::PopupMenu($menu,event=>$_[1]);
+			{	::PopupMenu($menu,event=>$_[1], no_destroy_on_close=>1);
 			});
 	}
 
