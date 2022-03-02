@@ -5285,7 +5285,7 @@ sub Retry_Dialog	#returns one of 'retry abort skip skip_all'
 {	my ($syserr,$summary,%args)=@_;		#$summary should say what action lead to this error ie: "Error while writing tag"
 	my ($details,$window,$abortmsg,$many,$ID)=@args{qw/details window abortmsg many ID/};
 	my $dialog = Gtk3::MessageDialog->new($window, [qw/modal destroy-with-parent/], 'error','none','%s', $summary);
-	$dialog->format_secondary_text("%s",$syserr);
+	$dialog->set(secondary_text=>$syserr);
 	$dialog->set_title($summary);
 	$dialog->add_button_custom(_"_Retry",    1, icon=>'gtk-refresh');
 	$dialog->add_button_custom(_"_Cancel",   2, icon=>'gtk-cancel', tip=>$abortmsg);
