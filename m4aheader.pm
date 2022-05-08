@@ -259,7 +259,6 @@ sub ParseAtomTree
 	if (!$info{audiodatasize}) { warn "Error reading m4a file : no mdat atom found\n"; return }
 	$self->{toplevels}=\@toplevels;
 	$info{bitrate_calculated}= 8*$info{audiodatasize}/$info{seconds};
-	$info{bitrate}||=$info{bitrate_calculated};
 	$self->{info}=\%info;
 
 	#warn "$_ => $info{$_}\n" for sort keys %info;

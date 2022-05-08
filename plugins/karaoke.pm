@@ -14,7 +14,7 @@ desc	Display synchronized lyrics of the current song
 package GMB::Plugin::Karaoke;
 use strict;
 use warnings;
-use base 'Gtk2::Label';
+use base 'Gtk3::Label';
 use constant
 {	OPT	=> 'PLUGIN_Karaoke_', # MUST begin by PLUGIN_ followed by the plugin ID / package name
 };
@@ -38,10 +38,10 @@ sub Stop
 {	Layout::RegisterWidget(PluginKaraoke => undef);
 }
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
+{	my $vbox= Gtk3::VBox->new(::FALSE, 2);
 	my $entry=::NewPrefEntry(OPT.'PathFile' => _"Pattern to find .lrc files :", width=>30);
 	my $preview= Label::Preview->new(preview => \&filename_preview, event => 'CurSong Option', noescape=>1, wrap=>1);
-	my $showbutton= Gtk2::Button->new(_"Show/Hide lyrics line");
+	my $showbutton= Gtk3::Button->new(_"Show/Hide lyrics line");
 	$showbutton->signal_connect(clicked=> sub { ::OpenSpecialWindow('Karaoke',1); });
 	$vbox->pack_start($_,::FALSE,::FALSE,1) for $entry,$preview,$showbutton;
 	return $vbox;
@@ -50,8 +50,8 @@ sub prefbox
 
 sub new
 {	my ($class,$opt)=@_;
-	my $self = bless Gtk2::Label->new, $class;
-	$self->modify_font(Gtk2::Pango::FontDescription->from_string($opt->{font})) if $opt->{font};
+	my $self= bless Gtk3::Label->new, $class;
+	$self->modify_font(Pango::FontDescription::from_string($opt->{font})) if $opt->{font};
 	$self->{attr}= $opt->{attr};
 	$self->{after}=  $opt->{after} || $opt->{context};
 	$self->{before}= $opt->{before}|| $opt->{context};

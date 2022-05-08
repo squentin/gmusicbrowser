@@ -9,7 +9,7 @@
 name	Notify
 title	Notify plugin
 desc	Notify you of the playing song with the system's notification popups
-req	perl(Gtk2::Notify, libgtk2-notify-perl perl-Gtk2-Notify)
+req	gir(Notify-0.7, gir1.2-notify-0.7 libnotify-0.7)
 =cut
 
 package GMB::Plugin::NOTIFY;
@@ -19,20 +19,25 @@ use constant
 {	OPT	=> 'PLUGIN_NOTIFY_',
 };
 
-use Gtk2::Notify -init, ::PROGRAM_NAME;
-
 ::SetDefaultOptions(OPT, title => "%S", text => _"<i>by</i> %a\\n<i>from</i> %l", picsize => 50, timeout=>5);
 
 my $notify;
 my ($Daemon_name,$can_actions,$can_body);
 
+Glib::Object::Introspection->setup( basename => 'Notify', version => '0.7', package => 'Notify',
+		flatten_array_ref_return_for => [qw/Notify::get_server_caps/]);
+
+sub Init
+{	Notify::init(::PROGRAM_NAME);
+}
+
 sub Start
-{	$notify=Gtk2::Notify->new('empty','empty');
-	#$notify->set_urgency('low');
+{	$notify= Notify::Notification->new('empty');
+	$notify->set_urgency('low');
 	#$notify->set_category('music'); #is there a standard category for that ?
-	my ($name, $vendor, $version, $spec_version)= Gtk2::Notify->get_server_info;
+	my ($name, $vendor, $version, $spec_version)= Notify::get_server_info();
 	$Daemon_name= "$name $version ($vendor)";
-	my @caps = Gtk2::Notify->get_server_caps;
+	my @caps = Notify::get_server_caps();
 	$can_body=	grep $_ eq 'body',	@caps;
 	$can_actions=	grep $_ eq 'actions',	@caps;
 	set_actions();
@@ -46,9 +51,9 @@ sub Stop
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
-	my $sg2=Gtk2::SizeGroup->new('horizontal');
+{	my $vbox=Gtk3::VBox->new(::FALSE, 2);
+	my $sg1= Gtk3::SizeGroup->new('horizontal');
+	my $sg2= Gtk3::SizeGroup->new('horizontal');
 	my $replacetext=::MakeReplaceText('talydngLfS');
 	my $summary=::NewPrefEntry(OPT.'title',_"Summary :", sizeg1=> $sg1, sizeg2=>$sg2, tip => $replacetext);
 	my $body=   ::NewPrefEntry(OPT.'text', _"Body :",    sizeg1=> $sg1, sizeg2=>$sg2, width=>40, tip => $replacetext."\n\n"._("You can use some markup, eg :\n<b>bold</b> <i>italic</i> <u>underline</u>\nNote that the markup may be ignored by the notification daemon"),);
@@ -79,8 +84,8 @@ sub Changed
 	{	my $album_gid= Songs::Get_gid($ID,'album');
 		$pixbuf=AAPicture::pixbuf('album', $album_gid, $size, 1);
 	}
-	$pixbuf ||= Gtk2::Gdk::Pixbuf->new_from_xpm_data('1 1 1 1','a c none','a'); #1x1 transparent pixbuf to remove previous pixbuf
-	$notify->set_icon_from_pixbuf($pixbuf);
+	$pixbuf ||= Gtk3::Gdk::Pixbuf->new_from_xpm_data('1 1 1 1','a c none','a'); #1x1 transparent pixbuf to remove previous pixbuf
+	$notify->set_image_from_pixbuf($pixbuf);
 	$notify->set_timeout($timeout);
 	$notify->show;
 	set_actions();

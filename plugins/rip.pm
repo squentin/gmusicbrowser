@@ -43,9 +43,9 @@ sub Stop
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
-	my $sg2=Gtk2::SizeGroup->new('horizontal');
+{	my $vbox=Gtk3::VBox->new(::FALSE, 2);
+	my $sg1= Gtk3::SizeGroup->new('horizontal');
+	my $sg2= Gtk3::SizeGroup->new('horizontal');
 	my $entry=::NewPrefEntry(OPT.'custom', _"Custom command :", sizeg1=>$sg1,sizeg2=>$sg2, tip =>_('Command to launch when the button is pressed'));
 	my %list= map {$_,$Programs{$_}[0]} keys %Programs;
 	my $combo= ::NewPrefCombo

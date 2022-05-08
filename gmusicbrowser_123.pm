@@ -13,8 +13,6 @@ use IO::Handle;
 use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 #use IPC::Open3;		#for open3 to read STDERR from ogg123 / mpg321 in Play function
 
-#$SIG{CHLD} = 'IGNORE';  # to make sure there are no zombies #cause crash after displaying a file dialog and then runnning an external command with mandriva's gtk2
-#$SIG{CHLD} = sub { while (waitpid(-1, WNOHANG)>0) {} };
 
 my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill);
 my ($Paused,$SkipTo);
@@ -72,9 +70,9 @@ sub init
 	}
 	$Supported{$_}=$Supported{$::Alias_ext{$_}} for grep $Supported{$::Alias_ext{$_}}, keys %::Alias_ext;
 	my @missing= grep !$Supported{$_}, qw/mp3 oga flac/;
-	if (@missing)
+	if (@missing && $::Verbose)
 	{	warn "These commands were not found : ".join(', ',@notfound)."\n";
-		warn " => these file types won't be played by the 123 output : ".join(', ',@missing)."\n"; #FIXME include aliases
+		warn " => these file types won't be played by the 123 output : ".join(', ',@missing)."\n";
 	}
 
 	return unless $foundone;
@@ -187,7 +185,6 @@ sub _eos_cb
 	if ($ChildPID && $ChildPID==waitpid($ChildPID, WNOHANG))
 	{	$Error||=_"Check your audio settings" if $?;
 	}
-	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	Glib::Source->remove($WatchTag);
 	Glib::Source->remove($WatchTag2);
 	$WatchTag=$WatchTag2=$ChildPID=undef;
@@ -261,7 +258,6 @@ sub _Kill_timeout	#make sure old children are dead
 	  kill KILL=>@pidToKill;
 	  undef @pidToKill;
 	}
-	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	return 0;
 }
 
@@ -281,16 +277,16 @@ sub _UpdateTime	#used by ogg123 and mpg321
 }
 
 sub AdvancedOptions
-{	my $vbox=Gtk2::VBox->new;
-	my $table=Gtk2::Table->new(1,1,::FALSE);
+{	my $vbox=Gtk3::VBox->new;
+	my $grid=Gtk3::Grid->new;
 	my %ext; my %extgroup;
 	$ext{$_}=undef for map split(/ /,$Commands{$_}{type}), keys %Commands;
 	my @ext=sort keys %ext;
 	for my $e (@ext) { $ext{$e}= join '/', $e, sort grep $::Alias_ext{$_} eq $e,keys %::Alias_ext; }
 	my $i=my $j=0;
-	$table->attach_defaults(Gtk2::Label->new($_), $i++,$i,$j,$j+1) for (_"Command", _"Output", _"Options",map " $ext{$_} ", @ext);
-	my $hsize= Gtk2::SizeGroup->new('vertical');
-	$hsize->add_widget($_) for $table->get_children;
+	$grid->attach(Gtk3::Label->new($_), $i++,$j,1,1) for (_"Command", _"Output", _"Options",map " $ext{$_} ", @ext);
+	my $hsize= Gtk3::SizeGroup->new('vertical');
+	$hsize->add_widget($_) for $grid->get_children;
 	for my $cmd (sort keys %Commands)
 	{	$i=0; $j++;
 		my $devs= $Commands{$cmd}{devices};
@@ -298,18 +294,19 @@ sub AdvancedOptions
 		$devs='' if ref $devs && !$Commands{$cmd}{found}; #don't try to find dynamic list of devices if command not found, as the function likely requires the command
 		my @devlist= ref $devs ? $devs->() : split / /,$devs;
 		push @widgets,
-			Gtk2::Label->new($cmd),
+			Gtk3::Label->new($cmd),
 			::NewPrefCombo('123device_'.$cmd => ['default',@devlist]),
 			::NewPrefEntry('123options_'.$cmd);
 		$hsize->add_widget($_) for @widgets;
 		my %cando; $cando{$_}=undef for split / /,$Commands{$cmd}{type};
-		$table->attach_defaults($_, $i++,$i,$j,$j+1) for @widgets;
+		$grid->attach($_, $i++,$j,1,1) for @widgets;
 		for my $ext (@ext)
 		{	if (exists $cando{$ext})
-			{	my $w=Gtk2::RadioButton->new($extgroup{$ext});
+			{	my $w=Gtk3::RadioButton->new($extgroup{$ext});
 				$w->set_tooltip_text( ::__x(_"Use {command} to play {ext} files",command=>$cmd, ext=>$ext{$ext}) );
 				$extgroup{$ext}||=$w;
-				$table->attach($w, $i,$i+1,$j,$j+1,'expand','expand',0,0);
+				$grid->attach($w, $i,$j,1,1);
+				$w->set_halign('center');
 				push @widgets,$w;
 				$w->set_active(1) if $cmd eq ($Supported{$ext} || '');
 				$w->signal_connect(toggled => sub { return unless $_[0]->get_active; $Supported{$ext}=$::Options{'123priority_'.$ext}=$cmd; $Supported{$_}=$Supported{$ext} for grep $::Alias_ext{$_} eq $ext, keys %::Alias_ext; });
@@ -318,7 +315,7 @@ sub AdvancedOptions
 		}
 		unless ($Commands{$cmd}{found}) {$_->set_sensitive(0) for @widgets;}
 	}
-	$vbox->pack_start($table,::FALSE,::FALSE,2);
+	$vbox->pack_start($grid,::FALSE,::FALSE,2);
 	my $hbox=Play_amixer->make_option_widget;
 
 	$vbox->pack_start($hbox,::FALSE,::FALSE,2);

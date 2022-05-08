@@ -18,7 +18,7 @@ sub init
 }
 
 sub supported_formats
-{ qw/flac mp3 mpc oga wv ape m4a/;
+{ qw/flac mp3 mpc oga wv ape m4a opus/;
 }
 
 sub Close {}
@@ -60,7 +60,6 @@ sub _Kill_timeout	#make sure old children are dead
 	  kill KILL => @pidToKill;
 	  undef @pidToKill;
 	}
-	#while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	return 0;
 }
 

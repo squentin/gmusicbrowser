@@ -30,7 +30,7 @@ my @ToSubmit; my $NowPlaying; my $NowPlayingID; my $unsent_saved=0;
 my $interval=5; my ($timeout,$waiting);
 my ($HandshakeOK,$submiturl,$nowplayingurl,$sessionid);
 my ($Serrors,$Stop);
-my $Log=Gtk2::ListStore->new('Glib::String');
+my $Log= Gtk3::ListStore->new('Glib::String');
 Load();
 
 sub Start
@@ -53,12 +53,12 @@ sub Stop
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
-	my $sg2=Gtk2::SizeGroup->new('horizontal');
+{	my $vbox= Gtk3::VBox->new(::FALSE, 2);
+	my $sg1= Gtk3::SizeGroup->new('horizontal');
+	my $sg2= Gtk3::SizeGroup->new('horizontal');
 	my $entry1=::NewPrefEntry(OPT.'USER',_"username :", cb => \&userpass_changed, sizeg1 => $sg1,sizeg2=>$sg2);
 	my $entry2=::NewPrefEntry(OPT.'PASS',_"password :", cb => \&userpass_changed, sizeg1 => $sg1,sizeg2=>$sg2, hide => 1);
-	my $label2=Gtk2::Button->new(_"(see http://www.last.fm)");
+	my $label2= Gtk3::Button->new(_"(see http://www.last.fm)");
 	$label2->set_relief('none');
 	$label2->signal_connect(clicked => sub
 		{	my $url='http://www.last.fm';
@@ -66,11 +66,11 @@ sub prefbox
 			$url.="/user/$user/" if defined $user && $user ne '';
 			::openurl($url);
 		});
-	my $ignore=Gtk2::CheckButton->new(_"Don't submit current song");
+	my $ignore= Gtk3::CheckButton->new(_"Don't submit current song");
 	$ignore->signal_connect(toggled=>sub { return if $_[0]->{busy}; $ignore_current_song= $_[0]->get_active ? $::SongID : undef; ::HasChanged('Lastfm_ignore_current'); });
 	::Watch($ignore,Lastfm_ignore_current => sub { $_[0]->{busy}=1; $_[0]->set_active(defined $ignore_current_song); delete $_[0]->{busy}; } );
-	my $queue= Gtk2::Label->new;
-	my $sendnow= Gtk2::Button->new(_"Send now");
+	my $queue= Gtk3::Label->new;
+	my $sendnow= Gtk3::Button->new(_"Send now");
 	$sendnow->signal_connect(clicked=> \&SendNow);
 	my $qbox= ::Hpack($queue,$sendnow);
 	$vbox->pack_start($_,::FALSE,::FALSE,0) for $label2,$entry1,$entry2,$ignore,$qbox;
@@ -88,10 +88,10 @@ sub update_queue_label
 	my $label= $qbox->{label};
 	if (@ToSubmit && (@ToSubmit>1 || (!$waiting && (!$timeout || $interval>10))))
 	{	$label->set_text(::__n("%d song waiting to be sent","%d songs waiting to be sent", scalar @ToSubmit ));
-		$label->parent->show;
+		$label->get_parent->show;
 		$qbox->{button}->set_sensitive(!$waiting);
 	}
-	else { $label->parent->hide }
+	else { $label->get_parent->hide }
 }
 sub userpass_changed
 {	$HandshakeOK=$Serrors=undef;

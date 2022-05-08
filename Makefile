@@ -57,13 +57,13 @@ install: all
 	mkdir -p "$(mandir)/man1/"
 	install -pm 644 $(DOCS) "$(docdir)"
 	install -pm 644 gmusicbrowser.man "$(mandir)/man1/gmusicbrowser.1"
-	install -pd "$(datadir)/gmusicbrowser/pix/"
-	install -pd "$(datadir)/gmusicbrowser/pix/elementary/"
-	install -pd "$(datadir)/gmusicbrowser/pix/gnome-classic/"
-	install -pd "$(datadir)/gmusicbrowser/pix/tango/"
-	install -pd "$(datadir)/gmusicbrowser/pix/oxygen/"
-	install -pd "$(datadir)/gmusicbrowser/plugins/"
-	install -pd "$(datadir)/gmusicbrowser/layouts/"
+	install -d "$(datadir)/gmusicbrowser/pix/"
+	install -d "$(datadir)/gmusicbrowser/pix/elementary/"
+	install -d "$(datadir)/gmusicbrowser/pix/gnome-classic/"
+	install -d "$(datadir)/gmusicbrowser/pix/tango/"
+	install -d "$(datadir)/gmusicbrowser/pix/oxygen/"
+	install -d "$(datadir)/gmusicbrowser/plugins/"
+	install -d "$(datadir)/gmusicbrowser/layouts/"
 	install -pDm 755 gmusicbrowser.pl "$(bindir)/gmusicbrowser"
 	install -pm 755 iceserver.pl      "$(datadir)/gmusicbrowser/iceserver.pl"
 	install -pm 644 *.pm		  "$(datadir)/gmusicbrowser/"
@@ -76,7 +76,7 @@ install: all
 	install -pm 644 pix/tango/*            "$(datadir)/gmusicbrowser/pix/tango/"
 	install -pm 644 pix/oxygen/*           "$(datadir)/gmusicbrowser/pix/oxygen/"
 	install -pDm 644 gmusicbrowser.desktop "$(appdir)/gmusicbrowser.desktop"
-	install -pDm 644 gmusicbrowser.appdata.xml "$(datadir)/appdata/gmusicbrowser.appdata.xml"
+	install -pDm 644 org.gmusicbrowser.metainfo.xml "$(datadir)/metainfo/org.gmusicbrowser.metainfo.xml"
 	install -pDm 644 pix/gmusicbrowser.svg      "$(iconsdir)/scalable/apps/gmusicbrowser.svg"
 	install -pDm 644 pix/gmusicbrowser16x16.png "$(iconsdir)/16x16/apps/gmusicbrowser.png"
 	install -pDm 644 pix/trayicon.png           "$(iconsdir)/20x20/apps/gmusicbrowser.png"
@@ -99,7 +99,7 @@ uninstall:
 		"$(iconsdir)/32x32/apps/gmusicbrowser.png" \
 		"$(iconsdir)/48x48/apps/gmusicbrowser.png" \
 		"$(iconsdir)/64x64/apps/gmusicbrowser.png"
-	rm -f "$(appdir)/gmusicbrowser.desktop" "$(datadir)/appdata/gmusicbrowser.appdata.xml"
+	rm -f "$(appdir)/gmusicbrowser.desktop" "$(datadir)/metainfo/org.gmusicbrowser.metainfo.xml"
 	rm -f "$(mandir)/man1/gmusicbrowser.1"
 	rm -f "$(localedir)/*/LC_MESSAGES/gmusicbrowser.mo"
 	$(MAKE) update-icon-cache
@@ -109,11 +109,11 @@ prepackage : all
 	mkdir -p dist/
 
 dist: prepackage
-	tar -czf dist/$(PACKAGE)-$(VERSION).tar.gz . --transform=s/^[.]/$(PACKAGE)-$(VERSION)/ --exclude=\*~ --exclude=.git\* --exclude=.\*swp --exclude=./dist && echo wrote dist/$(PACKAGE)-$(VERSION).tar.gz
+	tar -czf dist/$(PACKAGE)-$(VERSION).tar.gz --transform=s/^[.]/$(PACKAGE)-$(VERSION)/ --exclude=\*~ --exclude=.git\* --exclude=.\*swp --exclude=./dist . && echo wrote dist/$(PACKAGE)-$(VERSION).tar.gz
 
 # release : same as dist, but exclude debian/ folder
 release: prepackage
-	tar -czf dist/$(PACKAGE)-$(VERSION).tar.gz . --transform=s/^[.]/$(PACKAGE)-$(VERSION)/ --exclude=\*~ --exclude=.git\* --exclude=.\*swp --exclude=./dist --exclude=./debian && echo wrote dist/$(PACKAGE)-$(VERSION).tar.gz
+	tar -czf dist/$(PACKAGE)-$(VERSION).tar.gz --transform=s/^[.]/$(PACKAGE)-$(VERSION)/ --exclude=\*~ --exclude=.git\* --exclude=.\*swp --exclude=./dist --exclude=./debian . && echo wrote dist/$(PACKAGE)-$(VERSION).tar.gz
 
 
 update_icon_cache = gtk-update-icon-cache -f -t $(iconsdir)

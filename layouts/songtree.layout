@@ -108,3 +108,17 @@ title:	text(markup='<b><big>'.pesc($album).'</big></b> ' . if($year,'<small>('.p
 pic:	+aapic(y=title:h+title:y+4,picsize=picsize,ypad=2,aa='album')
 picsize : OptionNumber(default=100,min=20,max=1000,step=10)
 
+{Group bgpic}
+title= _"with picture as background"
+head=title:h
+vcollapse=head
+vmin=head
+title:	text(pad=2, markup='<span font_desc="'.myfont.'">'.pesc($title).\
+		if(showyear && $year,' <small>('.pesc($year).')</small>').'</span>',\
+		init_markup='<span font_desc="'.myfont.'"> </span>',)
+pic:	+aapic(y=title:h+title:y+4,picsize=$_ww,yalign=0,opacity=opacity/100)
+
+myfont : OptionFont(default='Arial Bold 18',name='font')
+showyear : OptionBoolean(default=1,name='show year')
+opacity : OptionNumber(default=30,min=1,max=100,step=5,name='opacity')
+

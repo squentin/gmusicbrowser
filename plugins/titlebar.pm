@@ -9,16 +9,18 @@
 name	Titlebar
 title	Titlebar overlay plugin
 desc	Display a special layout in or around the titlebar of the focused window
-req	perl(Gnome2::Wnck, libgnome2-wnck-perl perl-Gnome2-Wnck)
+req	gir(Wnck-3.0, gir1.2-wnck-3.0 libwnck3)
 =cut
+
 
 package GMB::Plugin::TitleBar;
 use strict;
 use warnings;
-use Gnome2::Wnck;
 use constant
 {	OPT	=> 'PLUGIN_TITLEBAR_',
 };
+
+die "Introspection data for Wnck 3.0 not found -> Titlebar plugin won't work\n" unless ::Load_Wnck();
 
 ::SetDefaultOptions(OPT, offy=>4, offx=>24, refpoint=>'upper_left', layout=>'O_play', textcolor=>'white', textfont=>'Sans 7', set_textfont=>1);
 
@@ -32,7 +34,7 @@ my %refpoints=
 );
 
 sub Start
-{	$Screen=Gnome2::Wnck::Screen->get_default;
+{	$Screen= Wnck::Screen::get_default();
 	$Handle= $Screen->signal_connect(active_window_changed=> \&window_changed);
 	init();
 }
@@ -44,20 +46,20 @@ sub Stop
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
-	my $sg2=Gtk2::SizeGroup->new('horizontal');
+{	my $vbox=Gtk3::VBox->new(::FALSE, 2);
+	my $sg1= Gtk3::SizeGroup->new('horizontal');
+	my $sg2= Gtk3::SizeGroup->new('horizontal');
 	my $layout=::NewPrefLayoutCombo(OPT.'layout'=> 'O', _"Overlay layout :", $sg1,$sg2, \&init);
 	my $refpoint=::NewPrefCombo(OPT.'refpoint'=> \%refpoints, cb=> \&move, text =>_"Reference point :", sizeg1=>$sg1,sizeg2=>$sg2);
 	my $offx=::NewPrefSpinButton(OPT.'offx', -999,999, cb=>\&move, step=>1, page=>5, text=>_"x offset :", sizeg1=>$sg1);
 	my $offy=::NewPrefSpinButton(OPT.'offy', -999,999, cb=>\&move, step=>1, page=>5, text=>_"y offset :", sizeg1=>$sg1);
 	my $notdialog=::NewPrefCheckButton(OPT.'notdialog',_"Don't add the overlay to dialogs", cb=>\&init);
 
-	my $textcolor= Gtk2::ColorButton->new_with_color( Gtk2::Gdk::Color->parse($::Options{OPT.'textcolor'}) );
+	my $textcolor= Gtk3::ColorButton->new_with_rgba( Gtk3::Gdk::RGBA::parse($::Options{OPT.'textcolor'}) );
 	$textcolor->signal_connect(color_set=>sub { $::Options{OPT.'textcolor'}=$_[0]->get_color->to_string; init(); });
 	my $set_textcolor= ::NewPrefCheckButton(OPT.'set_textcolor',_"Change default text color", cb=>\&init, widget=>$textcolor, horizontal=>1);
 
-	my $font= Gtk2::FontButton->new_with_font( $::Options{OPT.'textfont'} );
+	my $font= Gtk3::FontButton->new_with_font( $::Options{OPT.'textfont'} );
 	$font->signal_connect(font_set=>sub { $::Options{OPT.'textfont'}=$_[0]->get_font_name; init(); });
 	my $set_font= ::NewPrefCheckButton(OPT.'set_textfont',_"Change default text font and size", cb=>\&init, widget=>$font, horizontal=>1);
 
@@ -82,7 +84,7 @@ sub init
 sub move
 {	return unless $Popupwin && $ActiveWindow;
 	my ($x,$y,$w,$h) = $ActiveWindow->get_geometry;
-	my (undef,undef,$pw,$ph)=$Popupwin->window->get_geometry;
+	my (undef,undef,$pw,$ph)=$Popupwin->get_window->get_geometry;
 	my $ref= $::Options{OPT.'refpoint'};
 	my $offx=$::Options{OPT.'offx'};
 	my $offy=$::Options{OPT.'offy'};

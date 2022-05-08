@@ -51,7 +51,7 @@ sub _ReadHeader
 	{	seek $fh,$offset+4,0;
 		$self->readV8packets;
 		my $info= $self->{info};
-		$info->{bitrate}=( $self->{endaudio}-$self->{startaudio} )*8/$info->{seconds} if $info && $info->{seconds};
+		$info->{bitrate_calculated}=( $self->{endaudio}-$self->{startaudio} )*8/$info->{seconds} if $info && $info->{seconds};
 		return;
 	}
 	elsif ($buf=~m/^MP\+/)	#SV7, SV7.1 or SV8? (I've found doc describing SV8 format like that (MP+ instead of MPCK), but not sure such files exist)
@@ -71,7 +71,7 @@ sub _ReadHeader
 		$info{rate}=44100;
 	}
 	$info{seconds}=$info{frames}*1152/$info{rate};
-	$info{bitrate}=( $self->{endaudio}-$self->{startaudio} )*8/$info{seconds};
+	$info{bitrate_calculated}=( $self->{endaudio}-$self->{startaudio} )*8/$info{seconds};
 #	warn "$_=$info{$_}\n" for keys %info;
 	$self->{info}=\%info;
 }

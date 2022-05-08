@@ -39,8 +39,8 @@ sub Stop
 }
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new(0,2);
-	my $desc= Gtk2::Label->new(_"This plugin is needed for gmusicbrowser to appear in unity's sound menu.");
+{	my $vbox= Gtk3::VBox->new(0,2);
+	my $desc= Gtk3::Label->new(_"This plugin is needed for gmusicbrowser to appear in unity's sound menu.");
 	$vbox->pack_start($desc,0,0,0);
 	return $vbox;
 }
@@ -314,7 +314,7 @@ sub GetMetadata_from
 	if (defined $rating && length $rating) { $r{'xesam:userRating'}=dbus_double($rating/100); }
 	unlink $TEMPCOVERFILE;
 	if (my $pic= $h{album_picture}) #FIXME use ~album.picture.uri when available
-	{	if ($pic=~m/$::EmbImage_ext_re(?:\w+)?$/i) #embedded pictures
+	{	if ($pic=~m/$::EmbImage_ext_re(?::\w+)?$/i) #embedded pictures
 		{	my $ok;
 			{	last unless defined($::SongID) && $ID==$::SongID; #only support embedded picture for current song
 				my $data=FileTag::PixFromMusicFile($pic);

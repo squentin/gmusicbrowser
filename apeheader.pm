@@ -72,7 +72,7 @@ sub _ReadHeader
 		frames		=> $nbframes,
 		rate		=> $freq,
 		seconds		=> $seconds,
-		bitrate		=> $bitrate,
+		bitrate_calculated=> $bitrate,
 		compression	=> $compression{$compression} || $compression,
 	);
 	#warn "$_=$info{$_}\n" for keys %info;

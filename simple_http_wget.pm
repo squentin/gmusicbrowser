@@ -73,14 +73,12 @@ sub receiving_e_cb
 {	my $self=$_[2];
 	return 1 if read $self->{error_fh},$self->{ebuffer},1024,length($self->{ebuffer});
 	close $self->{error_fh};
-	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	return $self->{ewatch}=0;
 }
 sub receiving_cb
 {	my $self=$_[2];
 	return 1 if read $self->{content_fh},$self->{content},1024,length($self->{content});
 	close $self->{content_fh};
-	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	$self->{pid}=$self->{sock}=$self->{watch}=undef;
 	my $url=	$self->{params}{url};
 	my $callback=	$self->{params}{cb};
@@ -152,7 +150,6 @@ sub abort
 	kill INT=>$self->{pid} if $self->{pid};
 	close $self->{content_fh} if defined $self->{content_fh};
 	close $self->{error_fh} if defined $self->{error_fh};
-	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	$self->{pid}=$self->{content_fh}=$self->{error_fh}=$self->{watch}=$self->{ewatch}=undef;
 }
 

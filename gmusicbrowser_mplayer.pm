@@ -12,9 +12,6 @@ use IO::Handle;
 
 use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 
-#$SIG{CHLD} = 'IGNORE';  # to make sure there are no zombies #cause crash after displaying a file dialog and then runnning an external command with mandriva's gtk2
-#$SIG{CHLD} = sub { while (waitpid(-1, WNOHANG)>0) {} };
-
 my (@cmd_and_args,$file,$ChildPID,$WatchTag,$WatchTag2,$OUTPUTfh,@pidToKill,$Kill9);
 my $CMDfh;
 my (%supported,$mplayer);
@@ -48,6 +45,7 @@ sub supported_formats
 		elsif	(m/^ffwavpack.*working/){$supported{wv}=undef}
 		elsif	(m/^ffape.*working/)	{$supported{ape}=undef}
 		elsif	(m/^faad.*working/)	{$supported{m4a}=undef}
+		elsif	(m/^ff(?:lib)?opus.*working/)	{$supported{opus}=undef}
 	 }
 	}
 	return keys %supported;
@@ -117,7 +115,6 @@ sub _eos_cb
 	if ($ChildPID && $ChildPID==waitpid($ChildPID, WNOHANG))
 	{	$error=_"Check your audio settings" if $?;
 	}
-	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
 	Glib::Source->remove($WatchTag);
 	Glib::Source->remove($WatchTag2);
 	$WatchTag=$WatchTag2=$ChildPID=undef;
@@ -196,8 +193,7 @@ sub Stop
 	}
 }
 sub _Kill_timeout	#make sure old children are dead
-{	while (waitpid(-1, WNOHANG)>0) {}	#reap dead children
-	@pidToKill=grep kill(0,$_), @pidToKill; #checks to see which ones are still there
+{	@pidToKill=grep kill(0,$_), @pidToKill; #checks to see which ones are still there
 	if (@pidToKill)
 	{	warn "Sending ".($Kill9 ? 'KILL' : 'INT')." signal to @pidToKill\n" if $::debug;
 		if ($Kill9)	{kill KILL=>@pidToKill;}
@@ -208,8 +204,8 @@ sub _Kill_timeout	#make sure old children are dead
 }
 
 sub AdvancedOptions
-{	my $vbox=Gtk2::VBox->new(::FALSE, 2);
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
+{	my $vbox=Gtk3::VBox->new(::FALSE, 2);
+	my $sg1=Gtk3::SizeGroup->new('horizontal');
 	my $opt=::NewPrefEntry('mplayeroptions',_"mplayer options :", sizeg1=>$sg1);
 	my $cmd=::NewPrefEntry('mplayer_cmd',_"mplayer executable :", cb=> \&init, tip=>_"Will use default if not found", sizeg1=>$sg1);
 	$vbox->pack_start($_,::FALSE,::FALSE,2), for $cmd,$opt;

@@ -1,16 +1,19 @@
+#
+# Translators:
 msgid ""
 msgstr ""
-"Project-Id-Version: gmusicbrowser 1.1009\n"
+"Project-Id-Version: gmusicbrowser\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2012-11-13 20:27+0900\n"
-"PO-Revision-Date: 2012-11-12 21:48+0900\n"
-"Last-Translator: Sunatomo Masuda <sunatomo@gmail.com>\n"
-"Language-Team: Japanese\n"
-"Language: \n"
+"POT-Creation-Date: 2015-08-17 18:49+0200\n"
+"PO-Revision-Date: 2017-09-19 23:13+0000\n"
+"Last-Translator: squentin <squentin@gmail.com>\n"
+"Language-Team: Japanese (http://www.transifex.com/squentin/gmusicbrowser/"
+"language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid " Context pane layout "
 msgstr "コンテキストペインレイアウト"
@@ -21,108 +24,9 @@ msgstr "フィールド"
 msgid " Review "
 msgstr "レビュー"
 
-msgid "# songs"
-msgstr "# 楽曲"
-
-#, perl-format
-msgid "%d Album"
-msgid_plural "%d Albums"
-msgstr[0] "%d アルバム"
-msgstr[1] "%d アルバム"
-
-#, perl-format
-msgid "%d Artist"
-msgid_plural "%d Artists"
-msgstr[0] "%d アーティスト"
-msgstr[1] "%d アーティスト"
-
-#, perl-format
-msgid "%d Song"
-msgid_plural "%d Songs"
-msgstr[0] "%d 楽曲"
-msgstr[1] "%d 楽曲"
-
-#, perl-format
-msgid "%d Upcoming Event"
-msgid_plural "%d Upcoming Events"
-msgstr[0] "%d 今後のイベント"
-msgstr[1] "%d 今後のイベント"
-
-#, perl-format
-msgid "%d album"
-msgid_plural "%d albums"
-msgstr[0] "%d アルバム"
-msgstr[1] "%d アルバム"
-
-#, perl-format
-msgid "%d artist"
-msgid_plural "%d artists"
-msgstr[0] "%d アーティスト"
-msgstr[1] "%d アーティスト"
-
-#, perl-format
-msgid "%d file"
-msgid_plural "%d files"
-msgstr[0] "%d ファイル"
-msgstr[1] "%d ファイル"
-
-#, perl-format, perl-brace-format
-msgid "%d file in {folder}"
-msgid_plural "%d files in {folder}"
-msgstr[0] "%d ファイル {folder} 内"
-msgstr[1] "%d ファイル {folder} 内"
-
-#, perl-format
-msgid "%d folder"
-msgid_plural "%d folders"
-msgstr[0] "%d フォルダ"
-msgstr[1] "%d フォルダ"
-
-#, perl-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d 秒"
-msgstr[1] "%d 秒"
-
-#, perl-format
-msgid "%d song"
-msgid_plural "%d songs"
-msgstr[0] "%d 曲"
-msgstr[1] "%d 曲"
-
-#, perl-format
-msgid "%d song added"
-msgid_plural "%d songs added"
-msgstr[0] "%d 曲追加"
-msgstr[1] "%d 曲追加"
-
-#, perl-format
-msgid "%d song in queue"
-msgid_plural "%d songs in queue"
-msgstr[0] "キュー内に %d 曲"
-msgstr[1] "キュー内に %d 曲"
-
-#, perl-format
-msgid "%d song in the library"
-msgid_plural "%d songs in the library"
-msgstr[0] "ライブラリ内に %d 曲"
-msgstr[1] "ライブラリ内に %d 曲"
-
-#, perl-format
-msgid "%d song selected"
-msgid_plural "%d songs selected"
-msgstr[0] "%d 曲選択"
-msgstr[1] "%d 曲選択"
-
 #, perl-brace-format
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' は既に存在します。上書しますか ?"
-
-#, perl-format
-msgid "(%d song excluded)"
-msgid_plural "(%d songs excluded)"
-msgstr[0] "(%d 曲処理済)"
-msgstr[1] "(%d 曲処理済)"
 
 msgid "(case insensitive)"
 msgstr "(大文字と小文字を区別しない)"
@@ -171,9 +75,6 @@ msgstr "中止"
 
 msgid "Abort ReplayGain analysis"
 msgstr "リプレイゲインの分析中止"
-
-msgid "Abort all"
-msgstr "全て中止"
 
 #, perl-brace-format
 msgid ""
@@ -231,9 +132,6 @@ msgstr "フォルダを追加"
 msgid "Add folder ..."
 msgstr "フォルダを追加 ..."
 
-msgid "Add label"
-msgstr "ラベルを追加"
-
 msgid "Add new label"
 msgstr "新規ラベルの追加"
 
@@ -254,9 +152,6 @@ msgstr "既知の値に追加"
 
 msgid "Add to list"
 msgstr "リストへ追加"
-
-msgid "Add to playlist"
-msgstr "プレイリストへ追加"
 
 msgid "Add to queue"
 msgstr "キューへ追加"
@@ -569,14 +464,6 @@ msgstr ""
 "amixer(alsa-utilsにパッケージング)が必要です。"
 
 #, perl-brace-format
-msgid ""
-"Can't create Folder '{path}' : \n"
-"{error}"
-msgstr ""
-"フォルダ '{path}' を作成できません : \n"
-"{error}"
-
-#, perl-brace-format
 msgid "Can't create sink '{sink}'"
 msgstr "シンク '{sink}' を作成できません"
 
@@ -787,12 +674,6 @@ msgstr "マウント済携帯プレーヤへコピー"
 msgid "Copy to portable player"
 msgstr "携帯プレーヤへコピー"
 
-#, perl-format
-msgid "Copying file"
-msgid_plural "Copying %d files"
-msgstr[0] "ファイルコピー中"
-msgstr[1] "%d ファイルコピー中"
-
 msgid "Copyright"
 msgstr "コピーライト"
 
@@ -819,9 +700,6 @@ msgstr "カスタムコマンド :"
 
 msgid "Custom context pages :"
 msgstr "カスタムコンテキストページ :"
-
-msgid "Custom fields"
-msgstr "カスタムフィールド"
 
 msgid "Custom formats"
 msgstr "カスタムフォーマット"
@@ -934,9 +812,6 @@ msgstr " %d msの間トレイtipを表示"
 msgid "Do not add a title row"
 msgstr "タイトル行を追加しない"
 
-msgid "Do not add songs that can't be played"
-msgstr "再生出来ない楽曲を追加しない"
-
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr "mp3ファイル内にid3v1タグを生成しない"
 
@@ -968,9 +843,6 @@ msgstr "編集"
 msgid "Edit Current Song Properties"
 msgstr "現楽曲のプロパティを編集"
 
-msgid "Edit labels"
-msgstr "ラベルの編集"
-
 msgid "Edit Lyrics"
 msgstr "歌詞の編集"
 
@@ -979,9 +851,6 @@ msgstr "歌詞の編集..."
 
 msgid "Edit Multiple Songs Properties"
 msgstr "複数楽曲のプロパティ編集"
-
-msgid "Edit rating"
-msgstr "レーティングの編集"
 
 msgid "Edit Settings"
 msgstr "設定の編集"
@@ -1104,9 +973,6 @@ msgstr ""
 msgid "Error writing '{file}'"
 msgstr "'{file}' の書込に失敗"
 
-msgid "Error writing replaygain tags :\n"
-msgstr "リプレイゲインタグの書込に失敗 :\n"
-
 msgid "Error: invalid filename pattern"
 msgstr "エラー: 無効なファイル名パターン"
 
@@ -1152,17 +1018,6 @@ msgstr "%d 秒でフェードアウト"
 
 msgid "Fade-out then stop"
 msgstr "停止時にフェードアウト"
-
-#, perl-brace-format
-msgid ""
-"Failed to delete '{file}' :\n"
-"{error}"
-msgstr ""
-"'{file}' を削除できません :\n"
-"{error}"
-
-msgid "Field name"
-msgstr "フィールド名"
 
 msgid "Field type"
 msgstr "フィールドタイプ"
@@ -1311,9 +1166,6 @@ msgstr "ヘルプ"
 msgid "Hide"
 msgstr "隠す"
 
-msgid "Hide Artist/Album bar"
-msgstr "アーティスト/アルバム バーを隠す"
-
 msgid "Hide toolbar"
 msgstr "ツールバーを隠す"
 
@@ -1450,12 +1302,6 @@ msgstr ""
 "\n"
 "設定ダイアログで楽曲を追加してください。"
 
-#, perl-format
-msgid "Library size : %d song"
-msgid_plural "Library size : %d songs"
-msgstr[0] "ライブラリサイズ : %d 曲"
-msgstr[1] "ライブラリサイズ : %d 曲"
-
 msgid "Limit similar artists to a rate of similarity : "
 msgstr "関連アーティストを類似性評価で制限 :"
 
@@ -1491,12 +1337,6 @@ msgstr "歌詞パネルが非表示でも歌詞を読み込む"
 
 msgid "Load/Save Artist Info in :"
 msgstr "アーティスト情報の読込/保存:"
-
-#, perl-format
-msgid "Loaded %d unsent song from previous session"
-msgid_plural "Loaded %d unsent songs from previous session"
-msgstr[0] "以前のセッションから未送付曲 %d 曲をロード済"
-msgstr[1] "以前のセッションから未送付曲 %d 曲をロード済"
 
 msgid "Loading failed."
 msgstr "読込に失敗しました。"
@@ -1636,12 +1476,6 @@ msgstr "移動に失敗"
 msgid "Move folder to"
 msgstr "フォルダへ移動"
 
-#, perl-format
-msgid "Moving file"
-msgid_plural "Moving %d files"
-msgstr[0] "ファイルを移動中"
-msgstr[1] "ファイルを %d 個移動中"
-
 msgid "Music"
 msgstr "楽曲"
 
@@ -1722,9 +1556,6 @@ msgstr "楽曲なし"
 
 msgid "No songs found"
 msgstr "楽曲が見つかりません"
-
-msgid "No sound menu found"
-msgstr "楽曲メニューが見つかりません"
 
 msgid "No styles"
 msgstr "スタイルなし"
@@ -1861,9 +1692,6 @@ msgstr "キューウィンドウを開く"
 msgid "Open Search window"
 msgstr "検索ウィンドウを開く"
 
-msgid "Open allmusic.com in your web browser"
-msgstr "webブラウザでallmusic.comを開く"
-
 msgid "Open containing folder"
 msgstr "含まれているフォルダを開く"
 
@@ -1875,9 +1703,6 @@ msgstr "コンテキストページを開く"
 
 msgid "Open existing list"
 msgstr "既存のリストを開く"
-
-msgid "Open files"
-msgstr "ファイルを開く"
 
 msgid "Open folder"
 msgstr "フォルダを開く"
@@ -2234,17 +2059,11 @@ msgstr "最近再生された"
 msgid "Recently played songs"
 msgstr "前の曲"
 
-msgid "Record label"
-msgstr "ラベルの記録"
-
 msgid "Recording Dates"
 msgstr "日付の記録"
 
 msgid "Recording date"
 msgstr "日付の記録"
-
-msgid "Recording type"
-msgstr "タイプの記録"
 
 msgid "Reference point :"
 msgstr "参照ポイント :"
@@ -2646,9 +2465,6 @@ msgstr "現在の楽曲を選択"
 msgid "Select fields"
 msgstr "フィールドを選択"
 
-msgid "Select files"
-msgstr "ファイルを選択"
-
 msgid "Select search fields"
 msgstr "検索フィールドを選択"
 
@@ -2682,16 +2498,6 @@ msgstr "設定"
 msgid "Settings on this page will only take effect after a restart"
 msgstr "本ページの設定は再起動後に有効になります"
 
-#, perl-format
-msgid ""
-"Shell command\n"
-"(some variables such as %f (current song filename) or %F (list of selected "
-"songs filenames) are available)"
-msgstr ""
-"シェルコマンド\n"
-"(いくつかの変数 %f(現在の楽曲ファイル名)もしくは %F(選択済楽曲のファイル名リ"
-"スト)が存在します)"
-
 msgid "Show"
 msgstr "表示"
 
@@ -2715,9 +2521,6 @@ msgstr "ボタンを表示"
 
 msgid "Show genre"
 msgstr "ジャンルを表示"
-
-msgid "Show in sound menu"
-msgstr "サウンドメニュー内で表示"
 
 msgid "Show info panel"
 msgstr "情報パネルを表示"
@@ -2845,9 +2648,6 @@ msgstr "ソート順"
 msgid "Split artist names on :"
 msgstr "アーティストの名前を分割 :"
 
-msgid "Standard fields"
-msgstr "標準フィールド"
-
 msgid "Start in tray"
 msgstr "トレー内で開始"
 
@@ -2905,9 +2705,6 @@ msgstr "システムクロックは現在の時間に対してずれています
 msgid "System command :"
 msgstr "システムコマンド :"
 
-msgid "Tag"
-msgstr "タグ"
-
 msgid "Tags"
 msgstr "タグ"
 
@@ -2936,12 +2733,6 @@ msgstr "使用可能なフィールド :"
 #, perl-brace-format
 msgid "This command is required to play files of type {type} : {cmd}"
 msgstr "{type} タイプの楽曲を演奏するのに必要なコマンド : {cmd}"
-
-#, perl-format
-msgid "This label is set for %d song."
-msgid_plural "This label is set for %d songs."
-msgstr[0] "ラベルは %d 曲にセットします。"
-msgstr[1] "ラベルは %d 曲にセットします。"
 
 msgid "This plugin requires :"
 msgstr "プラグインが必要 :"
@@ -3329,7 +3120,8 @@ msgstr "追加"
 msgid "advanced options"
 msgstr "高度なオプション"
 
-#. comma-separated list of field aliases for album, these are in addition to english aliases
+#. comma-separated list of field aliases for album, these are in addition to
+#. english aliases
 msgctxt "Field_aliases"
 msgid "album,on"
 msgstr "アルバム,on"
@@ -3339,9 +3131,6 @@ msgstr "アルファベット順"
 
 msgid "amixer control :"
 msgstr "amixer 制御 :"
-
-msgid "another example"
-msgstr "他の例"
 
 msgid "applied on reload"
 msgstr "リロード時に適用"
@@ -3729,9 +3518,6 @@ msgstr "月"
 msgid "mosaic mode"
 msgstr "mosaicモード"
 
-msgid "move folder"
-msgstr "フォルダの移動"
-
 msgid "movie/video screen capture"
 msgstr "映画/ビデオ スクリーンキャプチャー"
 
@@ -3957,7 +3743,8 @@ msgstr "テキストモード"
 msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
 msgstr "既定はID3v2.3の場合utf16、ID3v2.4の場合utf8です。"
 
-#. comma-separated list of field aliases for title, these are in addition to english aliases
+#. comma-separated list of field aliases for title, these are in addition to
+#. english aliases
 msgctxt "Field_aliases"
 msgid "title"
 msgstr "タイトル"
@@ -4035,56 +3822,13 @@ msgid "{folder} already exists"
 msgstr "{folder} は既に存在します"
 
 #, perl-brace-format
-msgid "{hours} hours {min} min {sec} s"
-msgstr "{hours} 時 {min} 分 {sec} 秒"
+msgid "{hours}h{min}m{sec}s"
+msgstr "{hours}時{min}分{sec}秒"
 
 #, perl-brace-format
-msgid "{hours}h {min}m {sec}s"
-msgstr "{hours}時 {min}分 {sec}秒"
-
-#, perl-brace-format
-msgid "{min} min {sec} s"
-msgstr "{min} 分 {sec} 秒"
-
-#, perl-brace-format
-msgid "{min}m {sec}s"
-msgstr "{min}分 {sec}秒"
+msgid "{min}m{sec}s"
+msgstr "{min}分{sec}秒"
 
 #, perl-brace-format
 msgid "{outputname} output settings"
 msgstr "{outputname} 出力設定"
-
-#~ msgid "(applied after restart)"
-#~ msgstr "(再起動後に有効)"
-
-#~ msgid ""
-#~ "Allmusic uses both Genres and Styles to describe albums. If you use only "
-#~ "Genres, you may want to include Styles in the list of Genres."
-#~ msgstr ""
-#~ "Allmusicはアルバムの検索にジャンルとスタイルの双方を使用します。ジャンルの"
-#~ "み使用する時、ジャンルのリスト内にスタイルを追加する必要があるでしょう。"
-
-#~ msgid "Artist Picture Size : %d"
-#~ msgstr "アーティスト画像サイズ: %d"
-
-#~ msgid "Can't play '{file}'."
-#~ msgstr " '{file}' を再生できません。"
-
-#~ msgid "No results found."
-#~ msgstr "結果が見つかりません。"
-
-#~ msgid "Only works when the review tab is displayed"
-#~ msgstr "レビュータブが表示された時のみ動作"
-
-#~ msgid ""
-#~ "Save selected fields for all tracks on the same album whenever album data "
-#~ "is loaded from AMG or from file."
-#~ msgstr ""
-#~ "データがAMGもしくはファイルから読み込まれていても同一のアルバム上の全ト"
-#~ "ラックの選択フィールドを保存する"
-
-#~ msgid "is a m4a file"
-#~ msgstr "m4aファイル"
-
-#~ msgid "is an ogg file"
-#~ msgstr "oggファイル"

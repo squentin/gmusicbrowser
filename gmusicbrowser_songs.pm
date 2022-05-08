@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2015 Quentin Sculo <squentin@free.fr>
+# Copyright (C) 2005-2020 Quentin Sculo <squentin@free.fr>
 #
 # This file is part of Gmusicbrowser.
 # Gmusicbrowser is free software; you can redistribute it and/or modify
@@ -12,9 +12,9 @@ use utf8;
 package Songs;
 
 #our %Songs;
-our ($IDFromFile,$MissingHash); my $KeepIDFromFile;
+our ($IDFromFile,$MissingHash,$MissingHash_ro); my $KeepIDFromFile;
 our ($Artists_split_re,$Artists_title_re,$Articles_re);
-my @MissingKeyFields;
+my (@MissingKeyFields,@MissingKeyFields_ro);
 our (%Def,%Types,%Categories,%FieldTemplates,@Fields,%HSort,%Aliases);
 my %FuncCache;
 INIT {
@@ -25,9 +25,11 @@ our %timespan_menu=
 	day	=> _("day"),
 );
 @MissingKeyFields=qw/size title album artist track/;
+@MissingKeyFields_ro=qw/size modif/;
 %Categories=
 (	file	=> [_"File properties",10],
 	audio	=> [_"Audio properties",30],
+	video	=> [_"Video properties",35],
 	basic	=> [_"Basic fields",20],
 	extra	=> [_"Extra fields",50],
 	stats	=> [_"Statistics",40],
@@ -79,65 +81,102 @@ our %timespan_menu=
 		_	=> '#get#',
 	},
 	special => {},
-	flags	=>
-	{	_		=> '____[#ID#]',
+	flags	=>		# ___index_ : binary string containing position of the data in ___values_ for each song, or 0 for no value
+				# ___values_ : binary string containing the actual data (packed with w/w: number of values followed by id values)
+				# ___name & ___iname : arrays containing string for each id
+				# ___gid : hash containing if for each string
+				# ___free_ : array containing for each size a binary sting with the free positions in ___values_
+				# when there is too much unused free space, the used parts of ___values_ are copied into a new ___values_
+	{	_		=> 'do { my $i= #index#; $i ? [unpack "x".$i."w/w",___values_] : 0 }',
+		index		=> 'vec(___index_,#ID#,32)',
 		init		=> '___name[0]="#none#"; ___iname[0]=::superlc(___name[0]); #sgid_to_gid(VAL=$_)# for #init_namearray#',
+		init		=> '___name[0]="#none#"; ___iname[0]=::superlc(___name[0]); #sgid_to_gid(VAL=$_)# for #init_namearray#; ___index_="" ;___values_="\x00";',
 		init_namearray	=> '@{ $::Options{Fields_options}{#field#}{persistent_values} ||= $Def{#field#}{default_persistent_values} || [] }',
 		none		=> quotemeta _"None",
 		default		=> '""',
 		check		=> '#VAL#= do {my $v=#VAL#; my @l; if (ref $v) {@l= @$v} else {@l= split /\x00/,$v} for (@l) { tr/\x00-\x1F//d; s/\s+$//; }; @l=sort @l; \@l }',
-		get_list	=> 'my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : ();',
-		get_gid		=> 'my $v=#_#; ref $v ? $v : [$v]',
+		get_list_gid	=> 'do { my $i= #index#; $i ? (unpack "x".$i."w/w",___values_) : () }',
+		get_list	=> 'do { my $i= #index#; $i ? (map ___name[$_], unpack "x".$i."w/w",___values_) : () }',
+		get_gid		=> '[#get_list_gid#]',
 		gid_to_get	=> '(#GID# ? ___name[#GID#] : "")',
 		gid_to_display	=> '___name[#GID#]',
-		s_sort		=> '___sort{ sprintf("%x", #_#)}',
-		si_sort		=> '___isort{ sprintf("%x", #_#)}',
+		s_sort		=> '(join ":", map ___name[$_],  #get_list_gid# )',
+		si_sort		=> '(join ":", map ___iname[$_], #get_list_gid# )',
 		always_first_gid=> 0,
 		's_sort:gid'	=> '___name[#GID#]',
 		'si_sort:gid'	=> '___iname[#GID#]',
-		get		=> 'do {my $v=#_#; !$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v];}',
+		get		=> '(join "\\x00", #get_list#)',
+		display		=> '(join ", ",    #get_list#)',
 		newval		=> 'push @___iname, ::superlc(___name[-1]); ::IdleDo("newgids_#field#",1000,sub {  ___new=0; ::HasChanged("newgids_#field#"); }) unless ___new++;',
 		sgid_to_gid	=> '___gid{#VAL#}||= do { my $i=push(@___name, #VAL#); #newval#; $i-1; }',
-		set => '{my $v=#VAL#;
-			my @list= sort (ref $v ? @$v : split /\\x00/,$v);
-			my @ids;
-			for my $name (@list)
-			{	my $id= #sgid_to_gid(VAL=$name)#;
-				push @ids,$id;
-			}
-			my $val=	@ids<2 ? $ids[0]||0 :
-				(___group{join(" ",map sprintf("%x",$_),@ids)}||= \@ids);
-			___isort{ sprintf("%x",$val) }||= ::superlc( ___sort{ sprintf("%x",$val) }||= join ";",@list );
-			#_#=$val;
+		set => '{	my $v=#VAL#;
+				my @list= ref $v ? @$v : split /\\x00/,$v;
+				if (my $i= #index#)	# add previous space to list of free spaces
+				{	my $size= length pack "w/w",unpack("x".$i."w/w",___values_);
+					___free_[$size].= pack "N",$i;
+					if ((___freecount_+=$size) >10_000) #if more than 10k free, schedule a cleanup
+					{ ___freecount_*= -100;
+					  ::IdleDo("1_reclaimfree_#field#",10_000,
+					  sub
+					  {	@___free_=();
+						___freecount_=0;
+						my $new_values="\x00";
+						for my $id (FIRSTID..$Songs::LastID)
+						{	if (my $i= vec(___index_,$id,32))
+							{	vec(___index_,$id,32)= length $new_values;
+								$new_values.= pack "w/w", unpack "x".$i."w/w",___values_;
+							}
+						}
+						___values_= $new_values;
+					  });
+					}
+				}
+				# set new values
+				if (@list)
+				{	my @ids;
+					for my $name (sort @list)
+					{	my $id= #sgid_to_gid(VAL=$name)#;
+						push @ids,$id;
+					}
+					my $string= pack "w/w", @ids;
+					my $size= length $string;
+					if (___free_[$size])	# re-use old space
+					{	my $i= #index#= unpack "N", substr(___free_[$size],-4,4,"");
+						substr ___values_, $i, $size, $string;
+						___freecount_-=$size;
+					}
+					else			# use new space
+					{	#index#= length(___values_);
+						___values_ .= $string;
+					}
+				}
+				else { #index#=0; }
 			}',
-		diff		=> 'do {my $v=#_#; my $old=!$v ? "" : ref $v ? join "\\x00",map ___name[$_],@$v : ___name[$v]; $v=#VAL#; my $new= join "\\x00", @$v; $old ne $new; }', # #VAL# should be a sorted arrayref, as returned by #check#
-		display 	=> 'do { my $v=#_#; !$v ? "" : ref $v ? join ", ",map ___name[$_],@$v : ___name[$v]; }',
+		diff		=> 'do {my $old=#get#; my $v=#VAL#; my $new= join "\\x00", @$v; $old ne $new; }', # #VAL# should be a sorted arrayref, as returned by #check#
 		check_multi	=> 'for my $lref (@{#VAL#}) { for (@$lref) {tr/\x00-\x1F//d; s/\s+$//;} }',
-		set_multi	=> 'do {my $c=#_#; my %h=( $c ? ref $c ? map((___name[$_]=>0), @$c) : (___name[$c]=>0) : ()); my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}= (exists $h{$_} ? -1 : 1) for @$toggle; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
+		set_multi	=> 'do { my %h=( map(($_=>0), #get_list#)); my ($toadd,$torm,$toggle)=@{#VAL#}; $h{$_}= (exists $h{$_} ? -1 : 1) for @$toggle; $h{$_}++ for @$toadd; $h{$_}-- for @$torm; (scalar grep $h{$_}!=0, keys %h) ? [grep $h{$_}>=0, keys %h] : undef; }',
 		makefilter	=> '#GID# ? "#field#:~:".___name[#GID#] : "#field#:ecount:0"',
-		'filter:~'	=> '.!!. do {my $v=#_#; $v ? ref $v ? grep(#VAL#==$_, @$v) : ($v == #VAL#) : 0}',
-		#smartmatch version: 'filter:~'	=> '.!!. do {my $v=#_#; $v ? #VAL# ~~ $v : 0}', # is flag set
+		'filter:~'	=> '.!!. do { grep(#VAL#==$_, #get_list_gid#)}',
 		'filter_prep:~'	=> '___gid{#PAT#} ||= #sgid_to_gid(VAL=#PAT#)#;',
 		'filter_prephash:~' => 'return { map { #sgid_to_gid(VAL=$_)#, undef } keys %{#HREF#} }',
-		'filter:h~'	=> '.!!. do {my $v=#_#; $v ? ref $v ? grep(exists $hash#VAL#->{$_+0}, @$v) : (exists $hash#VAL#->{#_#+0}) : 0}',
-		'filter:ecount'	=> '#VAL# .==. do {my $v=#_#; $v ? ref $v ? scalar(@$v) : 1 : 0}',
+		'filter:h~'	=> '.!!. do {my $v=#_#; $v ? grep(exists $hash#VAL#->{$_+0}, @$v) : 0}',
+		'filter:ecount'	=> '#VAL# .==. do {my $v=#_#; $v ? scalar(@$v) : 0}',
 		#FIXME for filters s,m,mi,h~,  using a list of matching names in ___inames/___names could be better (using a bitstring)
-		'filter:s'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. grep index(___name[$_], "#VAL#")  != -1 ,@$v) : (index(___name[$v], "#VAL#")  .!=. -1); }',
-		'filter:si'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. grep index(___iname[$_], "#VAL#") != -1 ,@$v) : (index(___iname[$v], "#VAL#") .!=. -1); }',
-		'filter:fuzzy'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. ::first {Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$_])} @$v) : .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$v]); }',
-		'filter:m'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. grep ___name[$_]  =~ m"#VAL#"  ,@$v) : ___name[$v]  .=~. m"#VAL#"; }',
-		'filter:mi'	=> 'do { my $v=#_#; !$v ? .0. : ref $v ? (.!!. grep ___iname[$_] =~ m"#VAL#"i ,@$v) : ___iname[$v] .=~. m"#VAL#"i; }',
+		'filter:s'	=> 'do { my $v=#_#; !$v ? .0. : (.!!. grep index(___name[$_], "#VAL#")  != -1 ,@$v); }',
+		'filter:si'	=> 'do { my $v=#_#; !$v ? .0. : (.!!. grep index(___iname[$_], "#VAL#") != -1 ,@$v); }',
+		'filter:fuzzy'	=> 'do { my $v=#_#; !$v ? .0. : (.!!. ::first {Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",___iname[$_])} @$v); }',
+		'filter:m'	=> 'do { my $v=#_#; !$v ? .0. : (.!!. grep ___name[$_]  =~ m"#VAL#"  ,@$v); }',
+		'filter:mi'	=> 'do { my $v=#_#; !$v ? .0. : (.!!. grep ___iname[$_] =~ m"#VAL#"i ,@$v); }',
 		'filter_prep:m'	=> \&Filter::QuoteRegEx,
 		'filter_prep:mi'=> sub { Filter::QuoteRegEx( ::superlc($_[0]) )},
 		'filter_prep:si'=> sub {quotemeta ::superlc($_[0])},
 		'filter_prep:s' => sub {quotemeta $_[0]},
 		'filter_prep:fuzzy'=>sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta ::superlc($arg[1])},
-		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}  ---- AFTER: #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
-		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for ref $v ? @$v : $v;}',
-		hashm		=> 'do {my $v=#_#; ref $v ? @$v : $v }',
-		'hashm:name'	=> 'do {my $v=#_#; ref $v ? map(___name[$_], @$v) : $v ? ___name[$v] : () }',
-		is_set		=> 'my $gid=___gid{#VAL#}; my $v=#_#; $gid ? ref $v ? (grep $_==$gid, @$v) : $v==$gid : 0;',
-		#smartmatch version : is_set	=> 'my $gid=___gid{#VAL#}; my $v=#_#; $gid ? $gid ~~ $v : 0;',
+		stats		=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for $v ? @$v : 0;}  ---- AFTER: #HVAL#=[map ___name[$_], keys %{#HVAL#}];',
+		'stats:gid'	=> 'do {my $v=#_#; #HVAL#{$_+0}=undef for $v ? @$v : 0;}',
+		hashm		=> 'do {my $v=#_#; $v ? @$v : 0 }',
+		'hashm:name'	=> 'do {my $v=#_#; $v ? map(___name[$_], @$v) : () }',
+		is_set		=> 'my $gid=___gid{#VAL#}; my $v=#_#; $gid && $v ? (grep $_==$gid, @$v) : 0;',
 		listall		=> '1..$#___name',
 		'editwidget:many'	=> sub { GMB::TagEdit::EntryMassList->new(@_) },
 		'editwidget:single'	=> sub { GMB::TagEdit::FlagList->new(@_) },
@@ -298,14 +337,14 @@ our %timespan_menu=
 	{	parent		=> 'generic',
 		default		=> '""',
 		check		=> '#VAL#=~tr/\x1D\x00//d; #VAL#=~s/\s+$//;',	#remove trailing spaces and \x1D\x00
-		diff		=> '#_# ne #VAL#',
-		s_sort		=> '#_#',
-		'filter:e'	=> '#_# .eq. "#VAL#"',
-		hash		=> '#_#',
-		group		=> '#_# ne',
-		stats		=> '#HVAL#{#_#}=undef;  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
+		diff		=> '#get# ne #VAL#',
+		s_sort		=> '#get#',
+		'filter:e'	=> '#get# .eq. "#VAL#"',
+		hash		=> '#get#',
+		group		=> '#get# ne',
+		stats		=> '#HVAL#{#get#}=undef;  ---- AFTER: #HVAL#=[keys %{#HVAL#}];',
 	},
-	istring => # _much_ faster with case/accent insensitive operations, at the price of double memory
+	istring => # faster with case/accent insensitive operations, at the price of double memory
 	{	parent	=> 'string',
 		_iname	=> '___iname[#ID#]',
 		set	=> '#_# = #VAL#; #_iname#= ::superlc(#VAL#);',
@@ -314,11 +353,25 @@ our %timespan_menu=
 		'filter:mi'	=> '#_iname# .=~. m"#VAL#"i',			'filter_prep:mi'=> sub { Filter::QuoteRegEx( ::superlc($_[0]) )},
 		'filter:fuzzy'	=> ' .!!. Filter::_fuzzy_match(#VAL1#/100,"#VAL2#",#_iname#)',	'filter_prep:fuzzy'=> sub {my @arg=split / /,$_[0],2; $arg[0],quotemeta ::superlc($arg[1])},
 	},
-	text =>	#multi-lines string
+	text =>#multi-lines string
 	{	parent			=> 'string',
 		check			=> '#VAL#=~tr/\x00-\x09\x0B\x0C\x0E-\x1F//d; #VAL#=~s/\s+$//;',
 		'editwidget:single'	=> sub { GMB::TagEdit::EntryText->new(@_); },
 		'editwidget:many'	=> sub { GMB::TagEdit::EntryText->new(@_); },
+	},
+	text_compressed => #not used #for multi-lines strings, sometimes long
+	{	parent	=> 'text',
+		get	=> 'do {my $v=#_#; !defined($v) ? "" : (substr($v,0,1) ne "\x00") ? $v : do { $v= Compress::Zlib::uncompress(substr($v,1)); ::_utf8_on($v); $v; }}',
+		set	=> 'do {my $v=#VAL#; #_#= $v eq "" ? undef : length($v)>99 ? do { ::_utf8_off($v); "\x00".Compress::Zlib::compress($v) }  : "$v"};',
+	},
+	text_compact =>	#for multi-lines strings, often empty, sometimes long
+	{	parent		=> 'text',
+		_		=> 'vec(____,#ID#,#bits#)', #store index to value in ___value, or 0 for empty
+		bits		=> 32,	#32 bits for 2**32 non-empty comments
+		compress	=> (require Compress::Zlib ? 1 : 0),
+		init		=> '____=""; ___value[0]=undef;',
+		get		=> 'do { my $v=#_#; if (!$v) { "" } else { $v=___value[$v]; if (#compress# && (substr($v,0,1) eq "\x00")) { $v= Compress::Zlib::uncompress(substr($v,1)); ::_utf8_on($v); } $v; } }',
+		set		=> 'do { my $v=#VAL#; my $i=#_#; if (!$i && $v eq "") { #_#=0 } else { if (#compress# && length($v)>99) { ::_utf8_off($v); $v= "\x00".Compress::Zlib::compress($v); } if ($i) { $___value[$i]="$v"; } else { #_#= push(@___value,"$v")-1; } } }',
 	},
 	filename=>
 	{	parent	=> 'string',
@@ -330,6 +383,19 @@ our %timespan_menu=
 		load	=> '#_#=::decode_url(#VAL#)',
 		save	=> 'filename_escape(#_#)',
 		#'filterpat:string'	=> [ display => \&::filename_to_utf8displayname, ],
+	},
+	fewpath=>
+	{	parent	=> 'filename',
+		gid	=> 'vec(____,#ID#,#bits#)',
+		bits	=> 32,	#16 bits would limit it to 65k paths
+		init	=> '____=""; ___gid{""}=1; ___name[1]="";',
+		_	=> '___name[#gid#]',
+		get	=> '___name[#gid#]',
+		set	=> '#gid# = #path_to_gid#;',
+		path_to_gid	=> 'do {my $v=#VAL#; ::_utf8_off($v); ___gid{$v}||= push(@___name, $v) -1; }',
+		url_to_gid	=> 'do {my $v=::decode_url(#VAL#);    ___gid{$v}||= push(@___name, $v) -1; }',
+		load	=> '#gid# = #url_to_gid#',
+		save	=> 'filename_escape(#get#)',
 	},
 # 	picture =>
 #	{	get_picture	=> '__#mainfield#_picture[#GID#] || $::Options{Default_picture_#mainfield#};',
@@ -479,12 +545,19 @@ our %timespan_menu=
 		'editwidget:all'=> sub { my $field=$_[0]; GMB::TagEdit::EntryNumber->new(@_,min=>$Def{$field}{edit_min},max=>$Def{$field}{edit_max},digits=>0,mode=>$Def{$field}{edit_mode}); },
 		step		=> 1, #minimum difference between 2 values, used to simplify filters
 	},
+	# allow overflowing values, stored in a hash, better if 0 isn't a common value as slightly less efficient
+	integer_overflow =>
+	{	_		=> '(vec(____,#ID#,#bits#) || $___overflow{#ID#} || 0)',
+		check		=> '#VAL#= #VAL# =~m/^(\d+)$/ ? $1 : 0;',
+		set		=> 'do { if (#VAL# < 2**#bits#) { (vec(____,#ID#,#bits#)= #VAL#) || delete $___overflow{#ID#}; } else { $___overflow{#ID#}= #VAL# ; vec(____,#ID#,#bits#)= 0 } }',
+		parent		=> 'integer',
+	},
 	'integer.div' =>
 	{	makefilter	=> '"#field#:b:".(#GID# * #ARG0#)." ".(((#GID#+1) * #ARG0#)-1)',
 	},
 	float	=>	#make sure the string doesn't have the utf8 flag, else substr won't work
 	{	_		=> 'unpack("F",substr(____,#ID#<<3,8))',
-		display		=> 'do {my $v=#_#; (#v_is_nan# ? "" : ::format_number($v,"#displayformat#"))}',	# replace novalue (NaN) with ""
+		display		=> 'do {my $v=#_#; (#v_is_nan# ? #nan_display# : ::format_number($v,"#displayformat#"))}',	# replace novalue (NaN) with ""
 		get		=> 'do {my $v=#_#; (#v_is_nan# ? "" : $v ); }',					#
 		diff		=> ($nan==$nan ? 'do {my $new=#VAL#; $new=#nan# unless length $new; $new!=#_# }' :
 						 'do {my $new=#VAL#; $new=#nan# unless length $new; my $v=#_#; $new!=$v && ($new==$new || ! #v_is_nan#) }'),
@@ -494,6 +567,7 @@ our %timespan_menu=
 		nan		=> '$Songs::nan',
 		v_is_nan	=> ($nan==$nan ? '($v==#nan#)' : '($v!=$v)'),	#on some system $nan!=$nan, on some not. In case nan==0, 0 will be treated as novalue, could treat novalue as 0 instead
 		novalue		=> '#nan#',	#use NaN as novalue
+		nan_display	=> '""',
 		default		=> '#novalue#',
 		set		=> 'substr(____,#ID#<<3,8)=pack("F",(length(#VAL#) ? #VAL# : #novalue#))',
 		check		=> '#VAL#= #VAL# =~m/^(-?\d*\.?\d+(?:e[-+]\d+)?)$/i ? $1 : #novalue#;',
@@ -517,9 +591,24 @@ our %timespan_menu=
 		gid_to_get	=> '( #GID#==#nan_gid# ? #nan# : #GID# * #range_step#)',
 		hash		=> '#get_gid#',
 		makefilter	=> '#GID#==#nan_gid# ? "#field#:-defined:1" : do { my $v= #GID# * #range_step#; Filter->newadd(1, "#field#:-<:".$v, "#field#:<:".($v + #range_step#)); }', #FIXME decimal separator must be always "."
-		'n_sort:gid'	=> '( do{my $n=#GID#==#nan_gid# ? "-inf" : #GID# * #range_step#;warn "#GID# => $n";$n })',
-		'n_sort:gid'	=> '( #GID#==#nan_gid# ? "-inf" : #GID# * #range_step# )',
+		#'n_sort:gid'	=> '( do{my $n=#GID#==#nan_gid# ? "-inf" : #GID# * #range_step#;warn "#GID# => $n";$n })',
+		#'n_sort:gid'	=> '( #GID#==#nan_gid# ? "-inf" : #GID# * #range_step# )',
 		'n_sort:gid'	=> '#GID#', #  #nan_gid# is already the most negative number, no need to replace it with -inf
+	},
+	integerfloat =>		#floats that can be stored as integers
+	{	parent		=> 'float',
+		_		=> 'vec(____,#ID#,#bits#)/#div#',
+		div		=> 100, #default: 1.23 => stored as 123, with 16bits can store values from 0 to 655.35
+		bits		=> 16,
+		check		=> '#VAL#= #VAL# =~m/^(-?\d*\.?\d+(?:e[-+]\d+)?)$/i && $1<2**#bits#/#div# ? $1 : 0;', # set to 0 if overflow
+		set		=> 'vec(____,#ID#,#bits#)= #div# * (#VAL# || 0)',
+		get_gid		=> 'vec(____,#ID#,#bits#)',
+		hash		=> '#get_gid#',
+		#zero_display	=> '::format_number(0,"#displayformat#")',
+		zero_display	=> '""',
+		display		=> 'do {my $v=#_#; $v == 0 ? #zero_display# : ::format_number($v,"#displayformat#") }',
+		gid_to_display	=> 'do {my $v=#GID#; $v == 0 ? #zero_display# : ::format_number($v/#div#,"#displayformat#") }',
+		makefilter	=> '"#field#:e:".(#GID#/#div#)',
 	},
 	'length' =>
 	{	display	=> 'sprintf("%d:%02d", #_#/60, #_#%60)',
@@ -531,12 +620,12 @@ our %timespan_menu=
 	},
 	'length.div' => { gid_to_display	=> 'my $v=#GID# * #ARG0#; sprintf("%d:%02d", $v/60, $v%60);', },
 	size	=>
-	{	display	=> '( ::format_number( #_#/'. ::MB() .',"%.1f").q( '. _"MB" .') )',
+	{	display	=> '( ::format_number( #_#/'. ::MB() .',"%.1f").q( '. _("MB") .') )',
 		'filter_prep:e'	=> \&::ConvertSize,
 		'filter_prep:>'	=> \&::ConvertSize,
 		'filter_prep:<'	=> \&::ConvertSize,
 		'filter_prep:b'	=> sub {sort {$a <=> $b} map ::ConvertSize($_), split / /,$_[0],2},
-		parent	=> 'integer',
+		parent	=> 'integer_overflow',
 		'filterpat:value' => [ unit=> \%::SIZEUNITS, default_unit=> 'm', default_value=>1, ],
 	},
 	'size.div'   => { gid_to_display	=> '( ::format_number( #GID# * #ARG0#/'. ::MB() .',"%d").q( '. _"MB" .') )', },
@@ -644,7 +733,7 @@ our %timespan_menu=
 				# ___free_ : array containing free positions in ___values_ for each size
 	{	parent		=> 'dates',
 		_		=> 'substr(___values_, #index# * #bytes#, #nb# * #bytes#)',
-		index		=> 'vec(___index_,#ID#,32)',	# => max 2**32 songs that share the same number of dates, could maybe use 16 bits instead
+		index		=> 'vec(___index_,#ID#,32)',	# => max 2**32 dates
 		nb		=> 'vec(___nb_,#ID#,16)',	# => max 2**16 dates per song, could maybe use 8 bits instead
 		get_list	=> 'unpack("#packformat#*", #_#)',
 		init		=> '___index_= ___values_= ___nb_ = "";',
@@ -807,7 +896,7 @@ our %timespan_menu=
 	'stats:count'	=> '#HVAL#++',
  },
  path	=>
- {	name	=> _"Folder",	width => 200, flags => 'fgascp_',	type => 'filename',
+ {	name	=> _"Folder",	width => 200, flags => 'fgascp_',	type => 'fewpath',
 	'filter:i'	=> '#_# .=~. m/^#VAL#(?:$::QSLASH|$)/o',
 	'filter_prep:i'	=> sub { quotemeta ::decode_url($_[0]); },
 	'filterdesc:i'	=> [_"is in %s", _"is in", 'filename'],
@@ -918,7 +1007,7 @@ our %timespan_menu=
  },
  album_artist_raw =>
  {	name => _"Album artist",width => 200,	flags => 'fgarwescpi',	type => 'artist',
-	id3v2	=> 'TPE2',	vorbis	=> 'albumartist|album_artist',	ape	=> 'Album Artist|Album_artist',  ilst => "aART",
+	id3v2	=> 'TPE2 &? TXXX;Album Artist;%v',	vorbis	=> 'albumartist|album_artist',	ape	=> 'Album Artist|Album_artist',  ilst => "aART",
 	#FilterList => {search=>1,drag=>::DRAG_ARTIST},
 	picture_field => 'artist_picture',
 	edit_order=> 35,	edit_many=>1,
@@ -1027,7 +1116,7 @@ our %timespan_menu=
 	edit_order=> 70,	edit_many=>1,	letter => 'g',
 	category=>'basic',
 	editsubmenu=>0,
-	options	=> 'editsubmenu',
+	options	=> 'editsubmenu samemenu',
 #	picture_field => 'genre_picture',
  },
  label	=>
@@ -1035,7 +1124,7 @@ our %timespan_menu=
 	 #is_set	=> '(__LABEL__=~m/(?:^|\x00)__QVAL__(?:$|\x00)/)? 1 : 0', #for random mode
 	type		=> 'flags',
 	iconprefix	=> 'label-',
-	icon		=> sub { $Def{label}{iconprefix}.$_[0]; }, #FIXME use icon_for_gid
+	icon		=> sub { $Def{label}{iconprefix}.$_[0]; }, #FIXME use icon_for_gid #FIXME 2TO3 return '' if no icon file exist
 	icon_for_gid	=> '"#iconprefix#".#gid_to_get#',
 	all_count	=> _"All labels",
 	edit_string	=> _"Edit labels",
@@ -1045,19 +1134,20 @@ our %timespan_menu=
 	edit_order=> 80,	edit_many=>1,	letter => 'L',
 	category=>'extra',
 	editsubmenu=>1,
-	options		=> 'persistent_values editsubmenu',
+	options		=> 'persistent_values editsubmenu samemenu',
 	default_persistent_values => [_("favorite"),_("bootleg"),_("broken"),_("bonus tracks"),_("interview"),],
  },
  mood	=>
  {	name		=> _"Moods",	width => 180,	flags => 'fgarwescpil',
-	id3v2	=> 'TMOO',	vorbis	=> 'MOOD',	ape	=> 'Mood', ilst => "----MOOD",
+	id3v2		=> 'TMOO &? TXXX;Mood;%v',	vorbis	=> 'MOOD',	ape	=> 'Mood', ilst => "----MOOD",
+	'id3v2.3'	=> 'TXXX;Mood;%v &? TMOO', # TMOO doesn't officially exist in id3v2.3
 	read_split	=> qr/\s*;\s*/,
 	type		=> 'flags',
 	none		=> quotemeta _"No moods",
 	all_count	=> _"All moods",
 	FilterList	=> {search=>1},
 	edit_order=> 71,	edit_many=>1,
-	disable=>1,	options => 'disable editsubmenu',
+	disable=>1,	options => 'disable editsubmenu samemenu',
 	editsubmenu=>0,
 	category=>'extra',
  },
@@ -1068,7 +1158,7 @@ our %timespan_menu=
 	none		=> quotemeta _"No styles",
 	FilterList	=> {search=>1,},
 	edit_order=> 72,	edit_many=>1,
-	disable=>1,	options => 'disable editsubmenu',
+	disable=>1,	options => 'disable editsubmenu samemenu',
 	editsubmenu=>0,
 	category=>'extra',
  },
@@ -1079,12 +1169,12 @@ our %timespan_menu=
 	none		=> quotemeta _"No themes",
 	FilterList	=> {search=>1,},
 	edit_order=> 73,	edit_many=>1,
-	disable=>1,	options => 'disable editsubmenu',
+	disable=>1,	options => 'disable editsubmenu samemenu',
 	editsubmenu=>0,
 	category=>'extra',
  },
  comment=>
- {	name	=> _"Comment",	width => 200,	flags => 'fgarwescpi',		type => 'text',
+ {	name	=> _"Comment",	width => 200,	flags => 'fgarwescpi',		type => 'text_compact',
 	id3v1	=> 4,		id3v2	=> 'COMM;;;%v',	vorbis	=> 'description|comment|comments',	ape	=> 'Comment',	lyrics3v2=> 'INF', ilst => "\xA9cmt",	join_with => "\n",
 	edit_order=> 60,	edit_many=>1,	letter => 'C',
 	category=>'basic',
@@ -1159,7 +1249,7 @@ our %timespan_menu=
  },
  playcount	=>
  {	name	=> _"Play count",	width => 50,	flags => 'fgaescp',	type => 'integer',	letter => 'p',
-	options => 'rw_ userid',
+	options => 'rw_ userid editable',
 	id3v2	=> 'TXXX;FMPS_Playcount;%v&TXXX;FMPS_Playcount_User;%v::%i',
 	vorbis	=> 'FMPS_PLAYCOUNT&FMPS_PLAYCOUNT_USER::%i',
 	ape	=> 'FMPS_PLAYCOUNT&FMPS_PLAYCOUNT_USER::%i',
@@ -1169,7 +1259,6 @@ our %timespan_menu=
 	category=>'stats',
 	alias	=> 'plays',
 	edit_order=> 90,
-	options	=> 'editable',
  },
  skipcount	=>
  {	name	=> _"Skip count",	width => 50,	flags => 'fgaescp',	type => 'integer',	letter => 'k',
@@ -1185,9 +1274,10 @@ our %timespan_menu=
 	picture_field => 'artist_picture',
 	FilterList => {search=>1},
 	edit_many=>1,
-	disable=>1,	options => 'disable',
+	disable=>1,	options => 'disable samemenu',
 	category=>'extra',
 	articles=>1,
+	samemenu=>1,
  },
  lyricist =>
  {	name	=> _"Lyricist",		width	=> 100,		flags => 'fgarwescpi',	type => 'artist',
@@ -1207,7 +1297,7 @@ our %timespan_menu=
 	picture_field => 'artist_picture',
 	FilterList => {search=>1},
 	edit_many=>1,
-	disable=>1,	options => 'disable',
+	disable=>1,	options => 'disable samemenu',
 	category=>'extra',
 	articles=>1,
  },
@@ -1217,7 +1307,7 @@ our %timespan_menu=
 	picture_field => 'artist_picture',
 	FilterList => {search=>1},
 	edit_many=>1,
-	disable=>1,	options => 'disable',
+	disable=>1,	options => 'disable samemenu',
 	category=>'extra',
 	articles=>1,
  },
@@ -1243,11 +1333,19 @@ our %timespan_menu=
 	category=>'audio',
  },
  bitrate=>
- {	name	=> _"Bitrate",		width => 90,	flags => 'fgarscp_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
+ {	name	=> _"Audio bitrate",	width => 90,	flags => 'fgarscp_',	type => 'integer',	bits => 16,	audioinfo => 'bitrate|bitrate_nominal|bitrate_calculated',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
 	display	=> '::replace_fnumber("%d kbps",#_#)',
 	FilterList => {type=>'div.32',},
 	'filterpat:value' => [ round => "%d", unit => 'kbps', default_value=>192 ],
 	category=>'audio',
+ },
+ videobitrate=>
+ {	name	=> _"Video bitrate",	width => 90,	flags => 'fgarscp_',	type => 'integer_overflow',	bits => 16,	audioinfo => 'video_bitrate',		check	=> '#VAL#= sprintf "%.0f",#VAL#/1000;',
+	display	=> '::replace_fnumber("%d kbps",#_#)',
+	FilterList => {type=>'div.128',},
+	'filterpat:value' => [ round => "%d", unit => 'kbps', default_value=>1024 ],
+	disable=>1,	options => 'disable',
+	category=>'video',
  },
  samprate=>
  {	name	=> _"Sampling Rate",	width => 90,	flags => 'fgarscp',	type => 'fewnumber',	bits => 8,	audioinfo => 'rate',
@@ -1258,12 +1356,13 @@ our %timespan_menu=
 	category=>'audio',
  },
  filetype=>
- {	name	=> _"File type",		width => 80,	flags => 'fgarscp',	type => 'fewstring',	bits => 8, #could probably fit in 4bit
+ {	name	=> _"Audio format",		width => 80,	flags => 'fgarscp',	type => 'fewstring',	bits => 8, #could probably fit in 4bit
 	FilterList => {},
 	'filterdesc:m:^mp3'	=> _"is a mp3 file",
 	'filterdesc:m:^mp4 mp4a'=> _"is an aac file",
 	'filterdesc:m:^mp4 alac'=> _"is an alac file",
 	'filterdesc:m:^mp4'	=> _"is an mp4/m4a file",
+	'filterdesc:m:^opus'	=> _"is an opus file",
 	'filterdesc:m:^vorbis'	=> _"is a vorbis file",
 	'filterdesc:m:^flac'	=> _"is a flac file",
 	'filterdesc:m:^mpc'	=> _"is a musepack file",
@@ -1271,8 +1370,51 @@ our %timespan_menu=
 	'filterdesc:m:^ape'	=> _"is an ape file",
 	'filterdesc:m:^ape|^flac|^mp4 alac|^wv'	=> _"is a lossless file",
 	'filterdesc:-m:^ape|^flac|^mp4 alac|^wv'=> _"is a lossy file",
+	audioinfo => 'audio_format',
 	category=>'audio',
-	alias	=> 'type',
+	alias	=> 'type format audiotype audioformat',
+ },
+ container=>
+ {	name	=> _"Container format",		width => 80,	flags => 'fgarscp',	type => 'fewstring',	bits => 8,
+	FilterList => {},
+	disable=>1,	options => 'disable',
+	audioinfo => 'container_format',
+	category=>'video',
+ },
+ videoformat=>
+ {	name	=> _"Video format",		width => 80,	flags => 'fgarscp',	type => 'fewstring',	bits => 8,
+	FilterList => {},
+	disable=>1,	options => 'disable',
+	audioinfo => 'video_format',
+	category=>'video',
+	alias	=> 'video videotype',
+ },
+ framerate=>
+ {	name	=> _"Frame rate",	width => 90,	flags => 'fgarscp',	type => 'integerfloat',	audioinfo => 'framerate',
+	FilterList => {},
+	disable=>1,	options => 'disable',
+	category=>'video',
+ },
+ videoratio=>
+ {	name	=> _"Video ratio",	width => 90,	flags => 'fgarscp',	type => 'integerfloat',	audioinfo => 'video_ratio',
+	FilterList => {},
+	disable=>1,	options => 'disable',
+	category=>'video',
+	alias	=> 'ratio',
+ },
+ videowidth=>
+ {	name	=> _"Video width",	width => 90,	flags => 'fgarscp',	type => 'integer',	bits => 16,	audioinfo => 'video_width',
+	FilterList => {},
+	disable=>1,	options => 'disable',
+	category=>'video',
+	alias	=> 'width',
+ },
+ videoheight=>
+ {	name	=> _"Video height",	width => 90,	flags => 'fgarscp',	type => 'integer',	bits => 16,	audioinfo => 'video_height',
+	FilterList => {},
+	disable=>1,	options => 'disable',
+	category=>'video',
+	alias	=> 'height',
  },
  'length'=>
  {	name	=> _"Length",		width => 50,	flags => 'fgarscp_',	type => 'length',	bits => 16, # 16 bits limit length to ~18.2 hours
@@ -1282,7 +1424,6 @@ our %timespan_menu=
 	letter => 'm',
 	category=>'audio',
  },
-
  replaygain_track_gain=>
  {	name	=> _"Track gain",	width => 70,	flags => 'fgrwscpa',
 	type	=> 'float',	check => '#VAL#= do{ #VAL# =~m/^([-+]?\d*\.?\d+)\s*(?:dB)?$/i ? $1 : #novalue#};',
@@ -1368,8 +1509,9 @@ our %timespan_menu=
 			articles=>1,
 		   },
 
- missing	=> { flags => 'gan', type => 'integer', bits => 32, }, #FIXME store it using a 8-bit relative number to $::DAYNB
+ missing	=> { flags => 'gan', type => 'fewnumber', bits => 8, },
  missingkey	=> { get => 'join "\\x1D",'.join(',',map("#$_->get#",@MissingKeyFields)), depend => "@MissingKeyFields",	type=> 'virtual', },	#used to check if same song
+ missingkey_ro	=> { get => 'join "\\x1D",'.join(',',map("#$_->get#",@MissingKeyFields_ro)), depend => "@MissingKeyFields_ro",	type=> 'virtual', },	#used to check if same song (alternate mode)
 
  shuffle	=> { name => _"Shuffle",	type => 'shuffle',	flags => 's', },
  album_shuffle	=> { name => _"Album shuffle",	type => 'gidshuffle',	flags => 's',	mainfield=>'album'	  },
@@ -1410,12 +1552,12 @@ our %timespan_menu=
 
 our %FieldTemplates=
 (	string	=> { type=>'string',	editname=>_"string",		flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', articles=>1, },
-	text	=> { type=>'text',	editname=>_"multi-lines string",flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', },
+	text	=> { type=>'text_compact',editname=>_"multi-lines string",flags=>'fgaescp',	width=> 200,	edit_many =>1,		options=> 'customfield', },
 	float	=> { type=>'float',	editname=>_"float",		flags=>'fgaescp',	width=> 100,	edit_many =>1,		options=> 'customfield', desc => _"For decimal numbers", },
 	boolean	=> { type=>'boolean',	editname=>_"boolean",		flags=>'fgaescp',	width=> 20,	edit_many =>1,		options=> 'customfield', },
-	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescpil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield persistent_values editsubmenu', FilterList=> {search=>1},   desc=>_"Same type as labels", editsubmenu => 1, },
-	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'fgaescpi',	width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', articles=>1, },
-	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'fgaescpi',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {search=>1}, desc=>_"For when values are likely to be repeated", articles=>1, },
+	flags	=> { type=>'flags', 	editname=>_"flags",		flags=>'fgaescpil',	width=> 180,	edit_many =>1, can_group=>1, options=> 'customfield persistent_values editsubmenu samemenu', FilterList=> {search=>1},   desc=>_"Same type as labels", editsubmenu => 1, },
+	artist	=> { type=>'artist',	editname=>_"artist",		flags=>'fgaescpi',	width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield samemenu', FilterList=> {search=>1,drag=>::DRAG_ARTIST}, picture_field => 'artist_picture', articles=>1, },
+	fewstring=>{ type=>'fewstring',	editname=>_"common string",	flags=>'fgaescpi',width=> 200,	edit_many =>1, can_group=>1, options=> 'customfield  samemenu', FilterList=> {search=>1}, desc=>_"For when values are likely to be repeated", articles=>1, },
 	fewnumber=>{ type=>'fewnumber',	editname=>_"common number",	flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {},  desc=>_"For when values are likely to be repeated" },
 	integer	=> { type=>'integer',	editname=>_"integer",		flags=>'fgaescp',	width=> 100,	edit_many =>1, can_group=>1, options=> 'customfield', FilterList=> {},  desc => _"For integer numbers", },
 	rating	=> { type=>'rating',	editname=>_"rating",		flags=>'fgaescp_',	width=> 80,	edit_many =>1, can_group=>1, options=> 'customfield rw_ useridwarn userid editsubmenu stars', FilterList=> {},
@@ -1704,14 +1846,19 @@ sub UpdateFuncs
 	}
 
 	# create DIFF sub
-	{	my $code='my $ID=$_[0]; my $values=$_[1]; my $val; my @changed;'."\n";
+	{	my $code='my ($ID,$values,$skip_missing)= @_; my $val; my @changed;'."\n";
 		for my $f (grep $Def{$_}{flags}=~m/r/, @Fields)
 		{	my $c= $Def{$f}{flags}=~m/_/ ?
-				"if (exists \$values->{$f}) { \$val=\$values->{$f}; #check#;\n".
-				" if (#diff#) { #set#; push \@changed,'$f'; } }\n"
+				"if (exists \$values->{$f})".
+				"{	\$val=\$values->{$f}; #check#;\n".
+				"	if (#diff#) { #set#; push \@changed,'$f'; }".
+				"}\n"
 				:
-				"\$val= (exists \$values->{$f} ? \$values->{$f} : #default#);\n".
-				" #check#; if (#diff#) { #set#; push \@changed,'$f'; }\n";
+				"if (!\$skip_missing || exists \$values->{$f} )\n".
+				"{	\$val= (exists \$values->{$f} ? \$values->{$f} : #default#);\n".
+				"	#check#;".
+				"	if (#diff#) { #set#; push \@changed,'$f'; }\n".
+				"}";
 			$code.=MakeCode($f,$c,ID => '$ID', VAL => "\$val");
 		}
 		$code.=' return @changed;';
@@ -1721,18 +1868,24 @@ sub UpdateFuncs
 	# create SET sub
 	{	my $code=join "\n",
 		'my $IDs=$_[0]; my $values=$_[1]; my %onefieldchanged; my @towrite; my %changedfields; my @changedIDs; my $i=0; my $val;',
+		'my $couldneedwriting; for my $f (keys %$values) { $f=~s/^[+@]//; if ($Def{$f}{flags}=~m/w/) { $couldneedwriting=1; last; } }',
 		'for my $ID (@$IDs)',
-		'{	my $changed;';
+		'{	my $changed;',
+		'	my $readonly=1; if ($couldneedwriting && !$::Options{TAG_nowrite_mode})',
+		'	{	'.MakeCode('extension','my $format= $FileTag::FORMATS{lc(#get#)}; $readonly= !$format || $format->{ro};',ID => '$ID'),
+		"	}\n\n";
 		for my $f (grep $Def{$_}{flags}=~m/[aw]/, @Fields)
-		{	my $set=  ($Def{$f}{flags}=~m/w/ && !$::Options{TAG_nowrite_mode}) ?
-				"push \@{\$towrite[\$i]}, '$f',\$val;" :
-				"#set#; \$changedfields{$f}=undef; \$changed=1;";
-			my $c=	"	\$val=	exists \$values->{$f} ? 	\$values->{$f} :\n".
-				"		exists \$values->{'\@$f'} ? 	shift \@{\$values->{'\@$f'}} :\n".
-				"						undef;\n".
-				"	if (defined \$val)\n".
-				"	{	#check#;\n".
-				"		if (#diff#) { $set }\n".
+		{	my $ro_set= "#set#; \$changedfields{$f}=undef; \$changed=1;";
+			my $set= $Def{$f}{flags}=~m/w/ ?
+				"if (\$readonly) { $ro_set } else { push \@{\$towrite[\$i]}, '$f',\$val; }":
+				$ro_set;
+			my $c= join "\n",
+				"	\$val=	exists \$values->{$f} ? 	\$values->{$f} :",
+				"		exists \$values->{'\@$f'} ? 	shift \@{\$values->{'\@$f'}} :",
+				"						undef;",
+				"	if (defined \$val)",
+				"	{	#check#;",
+				"		if (#diff#) { $set }",
 				"	}\n";
 			if ($Def{$f}{flags}=~m/l/ && !($Def{$f}{flags}!~m/r/ && $Def{$f}{flags}=~m/w/)) # edit mode for multi-value fields, exclude write-only or read-on-demand fields (w without r) as this requires knowing the current values
 			{  $c.=	"	elsif (\$val=\$values->{'+$f'})\n". # $v must contain [[toset],[torm],[toggle]]
@@ -1784,20 +1937,22 @@ sub UpdateFuncs
 
 	my @getfields= grep $Def{$_}{flags}=~m/g/, @Fields;
 	%Aliases= map {$_=>$_} @getfields;
-	for my $field (@getfields)
-	{	$Aliases{$_}=$field for split / +/, ($Def{$field}{alias}||'');
+	for my $field (@getfields)	# user-defined aliases
+	{	my $user= $::Options{Fields_options}{$field}{aliases}||'';
+		for my $alias ($user=~m/(\w+)/g)
+		{	$Aliases{ $alias } ||= $field;
+		}
 	}
-	#for my $field (@getfields)	# user-defined aliases
-	#{	for my $alias (split / +/, ($::Options{Fields_options}{$field}{aliases}||''))
-	#	{	$Aliases{ ::superlc($alias) } ||= $field;
-	#	}
-	#}
+	for my $field (@getfields)	# default aliases
+	{	$Aliases{$_} ||= $field for split / +/, ($Def{$field}{alias}||'');
+	}
 	for my $field (@getfields)	#translated aliases
 	{	for my $alias (split /\s*,\s*/, ($Def{$field}{alias_trans}||''))
 		{	$alias=~s/ /_/g;
-			$Aliases{ ::superlc($alias) } ||= $field;
+			$Aliases{ $_ } ||= $field for $alias,::superlc($alias);
 		}
 	}
+	$Aliases{lc $_} ||= $_ for @getfields; # lowercase alias for custom fields
 	$::ReplaceFields{'$'.$_}= $::ReplaceFields{'${'.$_.'}'}= $Aliases{$_} for keys %Aliases;
 
 
@@ -1889,7 +2044,7 @@ sub New
 	#check already in @Songs#FIXME
 	warn "Reading Tag for $file\n" if $::Verbose;
 	my ($size,$modif)=(stat $file)[7,9];
-	my $values= FileTag::Read($file,1);
+	my $values= FileTag::Read($file,findlength=>1);
 	return unless $values;
 	(my $path,$file)=::splitpath($file);
 	%$values=(	%$values,
@@ -1925,12 +2080,13 @@ sub ReReadFile		#force values :
 		$force= $estimated ? 3 : 0 if $force==2;
 		my $checklength= ($size1!=$size2 || $force==3) ? 2 : 0;
 		return 1 unless $checklength || $force || $modif1!=$modif2;
-		my $values=FileTag::Read($file,$checklength);
+		my $notagupdate_mode= $force!=3 && FileTag::Is_ReadOnly($file); #unless forced, files in ro mode won't update values from tags
+		my $values= FileTag::Read($file,findlength=>$checklength, notags=> $notagupdate_mode);
 		return unless $values;
 		$values->{size}=$size2;
 		$values->{modif}=$modif2;
 		$values->{length_estimated}||=0 if $estimated;
-		my @changed=$DIFFsub->($ID,$values);
+		my @changed=$DIFFsub->($ID,$values,$notagupdate_mode);
 		Changed([$ID],@changed) if @changed;
 	}
 	elsif (!$noremove)	#file not found
@@ -2045,7 +2201,8 @@ sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
 	my $changed= ref $_[0] ? $_[0] : {map( ($_=>undef), @_ )};
 	warn "Songs::Changed : IDs=@$IDs fields=".join(' ',keys %$changed)."\n" if $::debug;
 	$IDFromFile=undef  if $IDFromFile && !$KeepIDFromFile && (exists $changed->{file} || exists $changed->{path});
-	$MissingHash=undef if $MissingHash && grep(exists $changed->{$_}, @MissingKeyFields);
+	$MissingHash=   undef if $MissingHash    && grep(exists $changed->{$_}, @MissingKeyFields);
+	$MissingHash_ro=undef if $MissingHash_ro && grep(exists $changed->{$_}, @MissingKeyFields_ro);
 	my @needupdate;
 	for my $f (keys %$changed)
 	{	if (my $l=$Def{$f}{_depended_on_by}) { push @needupdate, split / /,$l; }
@@ -2061,19 +2218,34 @@ sub Changed	# 2nd arg contains list of changed fields as a list or a hash ref
 
 sub CheckMissing
 {	my $song=$_[0];
-	#my $key=Get($song,'missingkey');
 
-	return unless defined $song->{title} && length $song->{title} && (defined $song->{album} || defined $song->{artist});
-	for (qw/title album artist track/) { $song->{$_}="" unless defined $song->{$_} }
-	return unless length ($song->{album} . $song->{artist});
-	#ugly fix, clean-up the fields so they can be compared to those in library, depends on @MissingKeyFields #FIXME should generate a function using #check# and VAL=>'$song->{$field})'
-	$song->{$_}=~s/\s+$// for qw/title album artist/;
-	$song->{track}= $song->{track}=~m/^(\d+)/ ? $1+0 : 0;
+	# different rules for read-only files as you can only use fields that can't be edited: should still be the same in file and in gmb
+	my $ro_mode= FileTag::Is_ReadOnly($song->{file});  # currently ony use the extension to determine if ro, so need to send path
 
-	my $key=join "\x1D", @$song{@MissingKeyFields};
-	$MissingHash||= BuildHash('missingkey',undef,undef,'id:list');
-	my $IDs=$MissingHash->{$key};
+	if (!$ro_mode)
+	{	# fallback to ro_mode if fields too empty
+		$ro_mode=1 unless defined $song->{title} && length $song->{title} && (defined $song->{album} || defined $song->{artist});
+		for (qw/title album artist track/) { $song->{$_}="" unless defined $song->{$_} }
+		$ro_mode=1 unless length ($song->{album} . $song->{artist});
+		#ugly fix, clean-up the fields so they can be compared to those in library, depends on @MissingKeyFields #FIXME should generate a function using #check# and VAL=>'$song->{$field})'
+		$song->{$_}=~s/\s+$// for qw/title album artist/;
+		$song->{track}= $song->{track}=~m/^(\d+)/ ? $1+0 : 0;
+	}
+
+	my $IDs;
+	if ($ro_mode)
+	{	return unless $song->{modif} && $song->{size}; # unlikely, but make sure they are not 0
+		my $key=join "\x1D", @$song{@MissingKeyFields_ro};
+		$MissingHash_ro||= BuildHash('missingkey_ro',undef,undef,'id:list');
+		$IDs= $MissingHash_ro->{$key};
+	}
+	else
+	{	my $key=join "\x1D", @$song{@MissingKeyFields};
+		$MissingHash||= BuildHash('missingkey',undef,undef,'id:list');
+		$IDs= $MissingHash->{$key};
+	}
 	return unless $IDs;
+
 	if (@$IDs>1) #too many candidates, try to find the best one
 	{	my @score;
 		for my $oldID (@$IDs)
@@ -2195,7 +2367,7 @@ sub Get_list	#rarely used, keep ?
 }
 sub Get_icon_list
 {	my ($field,$ID)=@_;
-	my $func= $FuncCache{"icon_list $field"} ||= Compile("icon_list $field", MakeCode($field,'sub {grep Gtk2::IconFactory->lookup_default($_), map #icon_for_gid#, @{#get_gid#}; }',ID=>'$_[0]', GID=>'$_'));	#FIXME simplify the code-making process
+	my $func= $FuncCache{"icon_list $field"} ||= Compile("icon_list $field", MakeCode($field,'sub {my $theme=Gtk3::IconTheme::get_default; grep $theme->lookup_icon($_,32,[]), map #icon_for_gid#, @{#get_gid#}; }',ID=>'$_[0]', GID=>'$_'));	#FIXME simplify the code-making process
 	return $func->($ID);
 }
 sub Gid_to_Display	#convert a gid from a Get_gid to a displayable value
@@ -2760,14 +2932,16 @@ sub GroupSub
 	 };
 }
 
+use constant { PF_NAME=>0, PF_ID=>1, PF_EDIT=>2, PF_ENABLE=>3, PF_DELETE=>4 };
 sub PrefFields	#preference dialog for fields
-{	my $store=Gtk2::TreeStore->new('Glib::String','Glib::String','Glib::Boolean','Glib::Boolean','Glib::Boolean');
-	my $treeview=Gtk2::TreeView->new($store);
+{	my $store=Gtk3::TreeStore->new('Glib::String','Glib::String','Glib::Boolean','Glib::Boolean','Glib::Boolean');
+	my $treeview=Gtk3::TreeView->new($store);
 	$treeview->set_headers_visible(0);
-	my $rightbox=Gtk2::VBox->new;
-	my $renderer=Gtk2::CellRendererText->new;
-	$treeview->append_column( Gtk2::TreeViewColumn->new_with_attributes
-	 ( 'field name',$renderer,text => 0, editable => 2, sensitive=>3, strikethrough => 4,
+	my $rightbox=Gtk3::VBox->new;
+	$rightbox->set_border_width(::WINDOW_PADDING);
+	my $renderer=Gtk3::CellRendererText->new;
+	$treeview->append_column( Gtk3::TreeViewColumn->new_with_attributes
+	 ( 'field name',$renderer,text => PF_NAME, 'editable' => PF_EDIT, sensitive=>PF_ENABLE, strikethrough => PF_DELETE,
 	 ));
 
 	my @fields= grep !$Def{$_}{template} && (!$Def{$_}{disable} || ($Def{$_}{options} && $Def{$_}{options}=~m/\bdisable\b/)), keys %Def;
@@ -2791,12 +2965,12 @@ sub PrefFields	#preference dialog for fields
 	{	my $names= $tree{$cat};
 		my $editable= $cat eq 'custom';
 		my $parent= $store->append(undef);
-		$store->set( $parent, 0,$Categories{$cat}[0], 1,'+'.$cat, 3,::TRUE); # category node
+		$store->set( $parent, PF_NAME,$Categories{$cat}[0], PF_ID,'+'.$cat, PF_ENABLE,::TRUE); # category node
 		for my $field (::sorted_keys($names))
 		{	my $opt= $::Options{Fields_options}{$field};
 			my $def= $Def{$field};
-			my $sensitive= exists $opt->{disable} ? $opt->{disable} : $def->{disable} ? 0 : 1;
-			$store->set( $store->append($parent), 0,$names->{$field}, 1,$field, 2,$editable, 3,$sensitive, 4,$opt->{remove} ); #child
+			my $sensitive= exists $opt->{disable} ? !$opt->{disable} : $def->{disable} ? 0 : 1;
+			$store->set( $store->append($parent), PF_NAME,$names->{$field}, PF_ID,$field, PF_EDIT,$editable, PF_ENABLE,$sensitive, PF_DELETE,$opt->{remove} ); #child
 		}
 		$custom_root= $store->get_string_from_iter($parent) if $cat eq 'custom';
 	}
@@ -2806,13 +2980,13 @@ sub PrefFields	#preference dialog for fields
 		{	my $treeview=shift;
 			my $path=($treeview->get_cursor)[0];
 			my $store=$treeview->get_model;
-			my ($name,$field)=$store->get( $store->get_iter($path), 0,1 );
+			my ($name,$field)=$store->get( $store->get_iter($path), PF_NAME,PF_ID );
 			$rightbox->remove($_) for $rightbox->get_children;
 			if ($field=~m/^\+/) {return} #row is a category
 			return unless $field;
-			my $title=Gtk2::Label->new_with_format("<b>%s</b>",$name);
+			my $title=Gtk3::Label->new_with_format("<b>%s</b>",$name);
 			$rightbox->pack_start($title,::FALSE,::FALSE,2);
-			my $box=Gtk2::VBox->new;
+			my $box=Gtk3::VBox->new;
 			::weaken( $box->{store}=$store );
 			$box->{path}=$path;
 			Field_fill_option_box($box,$field);
@@ -2822,10 +2996,10 @@ sub PrefFields	#preference dialog for fields
 	$renderer->signal_connect(edited => sub
 	    {	my ($cell,$pathstr,$newname)=@_;
 		my $iter= $store->get_iter_from_string($pathstr);
-		my ($oldname,$field)= $store->get($iter,0,1);
+		my ($oldname,$field)= $store->get($iter,PF_NAME,PF_ID);
 		if ($newname eq '')
 		{	$store->remove($iter) if $oldname eq '';
-			$treeview->set_cursor(Gtk2::TreePath->new($custom_root));
+			$treeview->set_cursor(Gtk3::TreePath->new($custom_root));
 			return;
 		}
 		if ($field eq '')
@@ -2834,24 +3008,24 @@ sub PrefFields	#preference dialog for fields
 			#$Def{$field}= { template => 'string', options => $FieldTemplates{string}{options}, category=>'custom', name=>$newname };
 		}
 		$::Options{Fields_options}{$field}{name}= $newname;
-		$store->set($iter, 0,$newname, 1,$field);
+		$store->set($iter, PF_NAME,$newname, PF_ID,$field);
 		$treeview->set_cursor($store->get_path($iter));
 	    });
 
 	my $newcst=::NewIconButton('gtk-add', _"New custom field", sub
 		{	my $iter=$store->append($store->get_iter_from_string($custom_root));
-			$store->set($iter,0,'',1,'',2,::TRUE);
+			$store->set($iter,PF_NAME,'',PF_ID,'',PF_EDIT,::TRUE, PF_ENABLE,::TRUE);
 			my $path=$store->get_path($iter);
 			$treeview->expand_to_path($path);
 			$treeview->set_cursor($path, $treeview->get_column(0), ::TRUE);
 		} );
-	my $warning=Gtk2::Label->new;
+	my $warning=Gtk3::Label->new;
 	$warning->set_markup('<b>'.::PangoEsc(_"Settings on this page will only take effect after a restart").'</b>');
-	my $sw=Gtk2::ScrolledWindow->new;
-	$sw->set_shadow_type('etched-in');
+	my $sw=Gtk3::ScrolledWindow->new;
+	$sw->set_shadow_type('none');
 	$sw->set_policy('never','automatic');
 	$sw->add($treeview);
-	my $vbox= ::Vpack( $warning, '_',[ ['0_',$sw,$newcst], '_', $rightbox ] );
+	my $vbox= ::Vpack( $warning, 0, Gtk3::Separator->new('horizontal'), '_',[ 0, ['0_',$sw,$newcst], Gtk3::Separator->new('vertical'), '_', $rightbox ] );
 
 	$vbox->{gotofunc}=sub	#go to a specific row
 	{	my $field=shift;
@@ -2859,7 +3033,7 @@ sub PrefFields	#preference dialog for fields
 		while ($parent)
 		{	my $child= $store->iter_children($parent);
 			while ($child)
-			{	if ($store->get($child,1) eq $field) { $treeview->set_cursor($store->get_path($child)); return; }
+			{	if ($store->get($child,PF_ID) eq $field) { $treeview->set_cursor($store->get_path($child)); return; }
 				$child= $store->iter_next($child);
 			}
 			$parent= $store->iter_next($parent);
@@ -2930,7 +3104,7 @@ our %Field_options=
 	},
 	starpreview	=>
 	{	widget => sub
-		{	my @img= map Gtk2::Image->new, 0..2;
+		{	my @img= map Gtk3::Image->new, 0..2;
 			my $box= ::Hpack('-',reverse @img);
 			$box->{img}=\@img;
 			return $box;
@@ -2946,6 +3120,10 @@ our %Field_options=
 	editsubmenu	=>
 	{	widget		=> 'check',
 		label		=> _"Show edition submenu in song context menu",
+	},
+	samemenu	=>
+	{	widget		=> 'check',
+		label		=> _"Show menu items to find songs with same value",
 	},
 	disable	=>
 	{	widget		=> 'check',
@@ -2993,7 +3171,7 @@ our %Field_options=
 	{	widget		=> 'entry',
 		label		=> _"Identifier in file tag",
 		tip		=> _"Used to associate the saved value with a user or a function",
-		update		=> sub { $_[0]{widget}->parent->set_sensitive( $_[0]{opt}{rw} ); }, # set insensitive when tag not read/written
+		update		=> sub { $_[0]{widget}->get_parent->set_sensitive( $_[0]{opt}{rw} ); }, # set insensitive when tag not read/written
 	},
 	template=>
 	{	widget		=> \&Field_Edit_template,
@@ -3014,11 +3192,16 @@ our %Field_options=
 	{	label		=> _"Show file name extension",
 		widget		=> 'check',
 	},
+	aliases		=>
+	{	widget		=> 'entry',
+		label		=> _"Custom aliases",
+		tip		=> _"Words that can be used in place of the identifier",
+	},
 );
 
 sub Field_fill_option_box
 {	my ($vbox,$field, $keep_option, @keep_widgets)=@_;
-	$_->parent->remove($_) for @keep_widgets;
+	$_->get_parent->remove($_) for @keep_widgets;
 	$vbox->remove($_) for $vbox->get_children;
 
 	my $opt= $::Options{Fields_options}{$field} ||= {};
@@ -3030,11 +3213,12 @@ sub Field_fill_option_box
 	my $option_list= ($template ? $FieldTemplates{$template}{options} : $def->{options}) ||'';
 	my $flags=	 ($template ? $FieldTemplates{$template}{flags} :   $def->{flags})   ||'';
 
-	my $sg1=Gtk2::SizeGroup->new('horizontal');
+	my $sg1=Gtk3::SizeGroup->new('horizontal');
 	my %widgets; my @topack;
 	$vbox->{FieldProperties}=1; #used to get back to $vbox from one of its (grand)child
 	$vbox->{widget_hash}=\%widgets;
 	my @options= split /\s+/, $option_list;
+	unshift @options, 'aliases'; # add 'aliases' option to every field
 	while (my $option=shift @options)
 	{	if (my $o=$Field_options_aliases{$option})
 		{	unshift @options,split /\s+/,$o;
@@ -3053,13 +3237,14 @@ sub Field_fill_option_box
 		{	($widget,@extra) = $widget->( $vbox, $opt, $field );
 		}
 		elsif ($widget eq 'check')
-		{	$widget= Gtk2::CheckButton->new($label);
+		{	$widget= Gtk3::CheckButton->new($label);
 			undef $label;
 			$widget->set_active($value);
 			$widget->signal_connect(toggled => sub { $opt->{$key}= $_[0]->get_active ? 1 : 0; &Field_Edit_update });
 		}
 		elsif ($widget eq 'entry')
-		{	$widget= Gtk2::Entry->new;
+		{	$widget= Gtk3::Entry->new;
+			$widget->enable_autoexpand;
 			$widget->set_text($value);
 			$widget->signal_connect(changed => sub { my $t=$_[0]->get_text; if ($t=~m/^\s*$/) {delete $opt->{$key};} else {$opt->{$key}=$t;} &Field_Edit_update });
 		}
@@ -3067,7 +3252,7 @@ sub Field_fill_option_box
 		{	$widget= TextCombo->new( $ref->{combo}, $value, sub { $opt->{$key}=$_[0]->get_value; &Field_Edit_update });
 		}
 		elsif ($widget eq 'label')
-		{	$widget= Gtk2::Label->new($label);
+		{	$widget= Gtk3::Label->new($label);
 			undef $label;
 		}
 		next unless $widget;
@@ -3077,9 +3262,9 @@ sub Field_fill_option_box
 		$widgets{$option}=$widget;
 
 		if (defined $label)
-		{	$label= Gtk2::Label->new($label);
+		{	$label= Gtk3::Label->new($label);
 			$sg1->add_widget($label);
-			$widget= [ $label, '_',$widget ];
+			$widget= [ $label, $widget ];
 		}
 		push @topack, $widget,@extra;
 	}
@@ -3090,22 +3275,22 @@ sub Field_fill_option_box
 		$varnames.=', %'.$def->{letter} if $def->{letter};
 		my $label_var=    _("Can be used as a variable with :").' '.$varnames;
 		my $label_search= _("Can be searched with :").' '.join(', ',@idlist);
-		$_= Gtk2::Label->new($_) for $label_var,$label_search;
+		$_= Gtk3::Label->new($_) for $label_var,$label_search;
 		$_->set_selectable(1) , $_->set_alignment(0,.5) , $_->set_line_wrap(1) for $label_var,$label_search;
 		unshift @topack, $label_var if $varnames;
 		unshift @topack, $label_search if @idlist && $flags=~m/f/;
 	}
-	unshift @topack, Gtk2::Label->new( $def->{desc} ) if $def->{desc};
+	unshift @topack, Gtk3::Label->new( $def->{desc} ) if $def->{desc};
 
-	{	my $hbox= Gtk2::HBox->new;
-		my $label1= Gtk2::Label->new(_("Field identifier").':');
-		my $label_id= Gtk2::Label->new($field);
+	{	my $hbox= Gtk3::HBox->new;
+		my $label1= Gtk3::Label->new(_("Field identifier").':');
+		my $label_id= Gtk3::Label->new($field);
 		$hbox->pack_start($_,0,0,2) for $label1,$label_id;
 		if ($template) #custom fields can be renamed
-		{	my $entry= Gtk2::Entry->new;
-			my $bedit= Gtk2::Button->new(_"Edit");
-			my $brename= Gtk2::Button->new(_"Rename");
-			my $bcancel= Gtk2::Button->new(_"Cancel");
+		{	my $entry= Gtk3::Entry->new;
+			my $bedit= Gtk3::Button->new(_"Edit");
+			my $brename= Gtk3::Button->new(_"Rename");
+			my $bcancel= Gtk3::Button->new(_"Cancel");
 			$hbox->pack_start($_,0,0,2) for $entry,$bedit,$brename,$bcancel;
 			my @edit=($entry,$brename,$bcancel);
 			$hbox->{edit}= \@edit;
@@ -3116,25 +3301,25 @@ sub Field_fill_option_box
 			$hbox->{label_id}= $label_id;
 			my $toggle_edit=sub
 			{	my ($button,$on)=@_;
-				my $hbox= $button->parent;
+				my $hbox= $button->get_parent;
 				$_->set_visible($on) for @{$hbox->{edit}};
 				$_->set_visible(!$on) for @{$hbox->{noedit}};
-				my $vbox=$button; $vbox=$vbox->parent until $vbox->{FieldProperties};
+				my $vbox=$button; $vbox=$vbox->get_parent until $vbox->{FieldProperties};
 				$hbox->{entry}->set_text($vbox->{field});
 			};
-			$entry->signal_connect(changed => sub { my $t= validate_custom_field_name($_[0]->get_text); $_[0]->parent->{newid}=$t; $_[0]->parent->{brename}->set_sensitive($t && $t ne $field); });
+			$entry->signal_connect(changed => sub { my $t= validate_custom_field_name($_[0]->get_text); $_[0]->get_parent->{newid}=$t; $_[0]->get_parent->{brename}->set_sensitive($t && $t ne $field); });
 			$bedit->signal_connect(clicked=> $toggle_edit,1);
 			$bcancel->signal_connect(clicked=> $toggle_edit,0);
 			$brename->signal_connect(clicked=> sub
 			 {	my $button=shift;
-				my $new=$button->parent->{newid};
+				my $new=$button->get_parent->{newid};
 				$::Options{Fields_options}{$new}= delete($::Options{Fields_options}{$field});
 				if (my $id=$::Options{Fields_options}{$new}{currentid})
 				{	$Def{$id}{_renamed_to}=$new;
 				}
-				my $vbox=$button; $vbox=$vbox->parent until $vbox->{FieldProperties};
+				my $vbox=$button; $vbox=$vbox->get_parent until $vbox->{FieldProperties};
 				$vbox->{field}= $new;
-				$button->parent->{label_id}->set_text($new);
+				$button->get_parent->{label_id}->set_text($new);
 				$toggle_edit->($button,0);
 				Field_Edit_update($vbox);
 			 });
@@ -3147,17 +3332,19 @@ sub Field_fill_option_box
 			  $flags!~m/[rw]/ ? _"Value not written in file tag" :
 			  undef;
 		$text=undef if $field eq 'path' || $field eq 'file';
-		unshift @topack, Gtk2::Label->new_with_format( '<small>%s</small>', $text ) if $text;
+		unshift @topack, Gtk3::Label->new_with_format( '<small>%s</small>', $text ) if $text;
 	}
 
 	$vbox->add( ::Vpack(@topack) );
 	$vbox->show_all;
+	$vbox->{skip_update_row}=1;
 	Field_Edit_update($vbox);
+	delete $vbox->{skip_update_row};
 }
 
 sub Field_Edit_update
 {	my $vbox=shift;
-	$vbox=$vbox->parent until $vbox->{FieldProperties};
+	$vbox=$vbox->get_parent until $vbox->{FieldProperties};
 	my $field= $vbox->{field};
 	my $opt= $::Options{Fields_options}{$field} ||= {};
 	my $widgets= $vbox->{widget_hash};
@@ -3166,24 +3353,25 @@ sub Field_Edit_update
 		next unless $update;
 		$update->({ vbox=>$vbox, opt=>$opt, field=>$field, widget=>$widgets->{$option}, });
 	}
+	return if $vbox->{skip_update_row}; #skip updating treestore, as not needed and cause issues with row-editing not ending, not sure why
 	my $store= $vbox->{store};
 	my $sensitive= (exists $opt->{disable} ? $opt->{disable} : ($Def{$field} && $Def{$field}{disable})) ? 0 : 1;
 	my $iter= $store->get_iter($vbox->{path});
-	$store->set( $iter, 3, $sensitive, 4, $opt->{remove});
-	$store->set( $iter, 0,$opt->{name}, 1,$field) if $opt->{template}; #only for custom fields
+	$store->set( $iter, PF_ENABLE, $sensitive, PF_DELETE, $opt->{remove});
+	$store->set( $iter, PF_NAME,$opt->{name}, PF_ID,$field) if $opt->{template}; #only for custom fields
 }
 
 sub Field_Edit_template
 {	my ($vbox,$opt,$field)=@_;
 	my %templatelist;
 	$templatelist{$_}= $FieldTemplates{$_}{editname} for keys %FieldTemplates;
-	my $label= Gtk2::Label->new;
+	my $label= Gtk3::Label->new;
 	my $combo= TextCombo->new(\%templatelist, $opt->{template}, sub
 		{	my $combo=shift;
 			my $t=$opt->{template}= $combo->get_value;
 			$Def{$field}{options}= $FieldTemplates{$t}{options};
 			my $focus= $combo->is_focus; #FIXME never true
-			my $vbox=$combo; $vbox=$vbox->parent until $vbox->{FieldProperties};
+			my $vbox=$combo; $vbox=$vbox->get_parent until $vbox->{FieldProperties};
 			Field_fill_option_box($vbox,$field, template=>$combo,$label); # will reset the option box but keep $combo and $label
 			$combo->grab_focus if $focus;	#reparenting $combo will make it lose focus, so regrab it #FIXME $focus never true
 			my $desc= $FieldTemplates{$t}{desc};
@@ -3448,10 +3636,10 @@ sub new_from_string
 sub start_init {$init=1}
 sub updateIDs	#update IDs coming from an older session
 {	my $newIDs=shift;
-	$init=undef;
-	while (my $l=shift @need_update)
+	for my $l (@need_update)
 	{	@$l= grep $_,map $newIDs->[$_], @$l; #IDs start at 1, removed songs get ID=undef and are then removed by the grep $_
 	}
+	$init=undef; @need_update=undef;
 }
 sub build_presence
 {	my $self=$_[0];
@@ -4162,36 +4350,37 @@ sub _staticfy
 
 
 package GMB::ListStore::Field;
-use base 'Gtk2::ListStore';
+use base 'Gtk3::ListStore';
 
 our %ExistingStores;
 
 sub new
-{	my ($class,$field)=@_; #warn "creating new store for $field\n";
+{	my ($class,$field,$noturgent)=@_; #warn "creating new store for $field\n";
 	my @cols=('Glib::String');
 	push @cols, 'Glib::String' if $Songs::Def{$field}{icon}; #FIXME
-	my $self= bless Gtk2::ListStore->new(@cols), $class;
+	my $self= bless Gtk3::ListStore->new(@cols), $class;
 	$ExistingStores{$field}= $self;
 	::weaken $ExistingStores{$field};
-	::IdleDo("9_ListStore_$field",500,\&update,$field);
+	if ($noturgent) { ::IdleDo("9_ListStore_$field",500,\&update,$field); }
+	else { update($field) }
 	::Watch($self,fields_reset=>\&changed);
 	return $self;
 }
 
 sub getstore
-{	my $field=$_[0];
-	return $ExistingStores{$field} || new(__PACKAGE__,$field);
+{	my ($field,$noturgent)= @_; #noturgent is used for completion where the store can be filled later
+	return $ExistingStores{$field} || new(__PACKAGE__,$field,$noturgent);
 }
 sub setcompletion
 {	my ($entry,$field)=@_;
-	my $completion=Gtk2::EntryCompletion->new;
+	my $completion=Gtk3::EntryCompletion->new;
 	$completion->set_text_column(0);
 	if ($Songs::Def{$field}{icon}) #FIXME
-	{	my $cell=Gtk2::CellRendererPixbuf->new;
+	{	my $cell=Gtk3::CellRendererPixbuf->new;
 		$completion->pack_start($cell,0);
-		$completion->add_attribute($cell,'stock-id',1);
+		$completion->add_attribute($cell,'icon-name',1);
 	}
-	$completion->set_model( getstore($field) );
+	$completion->set_model( getstore($field,1) );
 	$entry->set_completion($completion);
 }
 
@@ -4218,26 +4407,27 @@ sub update
 }
 
 package GMB::ListStore::Field::Combo;
-use base 'Gtk2::ComboBox';
+use base 'Gtk3::ComboBox';
 
 sub new
 {	my ($class,$field,$init,$callback)=@_;
 	my $store= GMB::ListStore::Field::getstore($field);
-	my $self= bless Gtk2::ComboBox->new_with_model($store), $class;
+	my $self= bless Gtk3::ComboBox->new_with_model($store), $class;
 
 	if ($Songs::Def{$field}{icon})
-	{	my $cell=Gtk2::CellRendererPixbuf->new;
-		$cell->set_fixed_size( Gtk2::IconSize->lookup('menu') ); # fixed size => icon or empty space
+	{	my $cell= Gtk3::CellRendererPixbuf->new;
+		# FIXME 2TO3 try to make "Gtk3::IconSize::lookup('menu')" work instead of 16,16
+		$cell->set_fixed_size(16,16); # fixed size => icon or empty space
 		$self->pack_start($cell,0);
-		$self->set_attributes($cell,stock_id=>1);
+		$self->set_attributes($cell,'icon-name'=>1);
 	}
-	my $cell=Gtk2::CellRendererText->new;
+	my $cell= Gtk3::CellRendererText->new;
 	#$cell->set(wrap_width=>500);
 	#$cell->set(ellipsize=>'end');
 	$self->pack_start($cell,1);
 	$self->set_attributes($cell,text=>0);
 	$self->{value}=$init;
-	$self->update if defined $init;
+	$self->update;
 	$self->{callback}=$callback;
 	$self->signal_connect( changed => \&changed_cb );
 	::Watch($self,"ListStore_$field",\&update);
@@ -4300,7 +4490,7 @@ INIT
 #Filter object contains :
 # - string :	string notation of the filter
 # - sub    :	ref to a sub which takes a ref to an array of IDs as argument and returns a ref to the filtered array
-# - greponly :	set to 1 if the sub dosn't need to filter the whole list each times -> ID can be tested individualy
+# - greponly :	set to 1 if the sub doesn't need to filter the whole list each times -> ID can be tested individually
 # - fields :	ref to a list of the columns used by the filter
 
 sub new_from_string		#same as ->new, but don't try to _smart_simplify, as it shouldn't be needed, and require fields to be initialized

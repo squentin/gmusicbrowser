@@ -40,16 +40,16 @@ sub Stop
 
 
 sub prefbox
-{	my $vbox=Gtk2::VBox->new;
+{	my $vbox= Gtk3::VBox->new;
 	my $spin=::NewPrefSpinButton(OPT.'timespan', 1,60*60*24, step=>1, text=>_"Fade-out in %d seconds");
-	my $button=Gtk2::Button->new(_"Fade-out");
+	my $button= Gtk3::Button->new(_"Fade-out");
 	$button->signal_connect(clicked => \&start_fadeout);
-	my $sg=Gtk2::SizeGroup->new('horizontal');
+	my $sg= Gtk3::SizeGroup->new('horizontal');
 	my @hours;
 	for my $wd (0..6)
 	{	my $min= ::NewPrefSpinButton(OPT."day${wd}m", 0,59, cb=>\&update_alarm, step=>1, page=>5, wrap=>1);
 		my $hour=::NewPrefSpinButton(OPT."day${wd}h", 0,23, cb=>\&update_alarm, step=>1, page=>4, wrap=>1);
-		my $timeentry=::Hpack($hour,Gtk2::Label->new(':'),$min);
+		my $timeentry=::Hpack($hour,Gtk3::Label->new(':'),$min);
 		my $check=::NewPrefCheckButton(OPT."day$wd",$dayname[$wd], cb=>\&update_alarm, widget=>$timeentry, horizontal=>1, sizegroup=>$sg);
 		push @hours,$check;
 	}

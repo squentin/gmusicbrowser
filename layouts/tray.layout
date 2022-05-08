@@ -4,13 +4,13 @@ Name		= _"Normal with buttons"
 Window= borderwidth=5
 HBButtons	= VolumeIcon Prev Stop Play Next OpenBrowser ExtraButtons Pref Quit
 HBIndic		= Sort 10Filter Queue 10Pos -Stars
-HBTitle		= LockSong _Title LabelsIcons
-HBArtist	= LockArtist _Artist
-HBAlbum		= LockAlbum _Album -Year
+HBTitle		= LockSong _Title(maxwidth=300) LabelsIcons
+HBArtist	= LockArtist _Artist(maxwidth=300)
+HBAlbum		= LockAlbum _Album(maxwidth=300) -Year
 HBTime		= Time _TimeBar
 VBmain		= HBButtons HBIndic _VBText -HBTime
 VBText		= 2HBTitle 2HBArtist 2HBAlbum
-HBmain		= _VBmain 2Filler1 -Cover(forceratio=1)
+HBmain		= _VBmain 2Filler1 -Cover
 VolumeScroll	= HBmain
 
 [full] based on full with buttons
@@ -24,8 +24,9 @@ Type=T
 Name		= _"Small"
 HBAlbum		= _Album -Year
 VBText		= Title(30) Artist HBAlbum
-HBmain		= _VBText 2Filler1 -Cover(forceratio=1)
+HBmain		= _VBText 2Filler1 -Cover
 VolumeScroll	= HBmain
+Window= borderwidth=5
 
 [minimaltip]
 Type=T

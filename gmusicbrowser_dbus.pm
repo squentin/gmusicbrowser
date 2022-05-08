@@ -145,7 +145,7 @@ Glib::Idle->add(\&init); #initialize once the main gmb init is finished
 
 sub init
 {	#my $bus = Net::DBus->session;
-	my $service= $bus->export_service($::DBus_id);	# $::DBus_id is 'org.gmusicbrowser' by default
+	my $service= $bus->export_service($::DBus_id.$::DBus_suffix);	# $::DBus_id is 'org.gmusicbrowser' by default
 	my $object = GMB::DBus::Object->new($service);
 	DBus_mainloop_hack() if $not_glib_dbus;
 	0; #called in an idle, return 0 to run only once
