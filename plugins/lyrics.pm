@@ -73,6 +73,7 @@ my %Sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%t',undef,
 			 sub {	return 0,'http://lyrics.wikia.com/'.$1 if $_[0]=~m#<span class="redirectText"><a href="/([^"]+)"#;
 				$_[0]=~s!.*<div class='lyricbox'>.*?((?:&\#\d+;|<br ?/>|</?[bi]>){5,}).*!$1!s; #keep only the "lyric box"
+				return $notfound if $_[0]=~m!This is a list of songs not being assigned to an artist yet!;
 				return 0 if $_[0]=~m!&#91;&#46;&#46;&#46;&#93;(?:<br ?/>)*<i>!; # truncated lyrics : "[...]" followed by italic explanation => not auto-saved
 				return !!$1;
 			}],	
