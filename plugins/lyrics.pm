@@ -62,20 +62,20 @@ my %Sites=	# id => [name,url,?post?,function]	if the function return 1 => lyrics
 		sub { my $no= $_[0]=~m/<div class="noarticletext">/s; $_[0]=~s/^.*<!--\s*start content\s*-->(.*?)<!--\s*end content\s*-->.*$/$1/s && !$no; }],
 	#lyricsplugin => [lyricsplugin => 'http://www.lyricsplugin.com/winamp03/plugin/?title=%t&artist=%a',undef,
 	#		sub { my $ok=$_[0]=~m#<div id="lyrics">.*\w\n.*\w.*</div>#s; $_[0]=~s/<div id="admin".*$//s if $ok; return $ok; }],
-	lyricssongs =>	['lyrics-songs',sub {  ::ReplaceFields($_[0], "http://letras.terra.com.br/winamp.php?musica=%t&artista=%a", sub {::url_escapeall(::superlc($_[0]));})  },undef,
-			sub {	my $is_suggestion= $_[0]=~m#<h3>Provável música</h3>#i;
-				my $l=html_extract($_[0],div=>'letra');
-				$l=~s#<div id="cabecalho">.*?</div>##s if $l; #remove header with title and artist links
-				my $ref=\$_[0];
-				$$ref= $l ? $l : $notfound;
-				return $l && !$is_suggestion;
-			}],
-	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%t',undef,
-			 sub {	return 0,'http://lyrics.wikia.com/'.$1 if $_[0]=~m#<span class="redirectText"><a href="/([^"]+)"#;
-				$_[0]=~s!.*<div class='lyricbox'>.*?((?:&\#\d+;|<br ?/>|</?[bi]>){5,}).*!$1!s; #keep only the "lyric box"
-				return 0 if $_[0]=~m!&#91;&#46;&#46;&#46;&#93;(?:<br ?/>)*<i>!; # truncated lyrics : "[...]" followed by italic explanation => not auto-saved
-				return !!$1;
-			}],	
+#	lyricssongs =>	['lyrics-songs',sub {  ::ReplaceFields($_[0], "http://letras.terra.com.br/winamp.php?musica=%t&artista=%a", sub {::url_escapeall(::superlc($_[0]));})  },undef,
+#			sub {	my $is_suggestion= $_[0]=~m#<h3>Provável música</h3>#i;
+#				my $l=html_extract($_[0],div=>'letra');
+#				$l=~s#<div id="cabecalho">.*?</div>##s if $l; #remove header with title and artist links
+#				my $ref=\$_[0];
+#				$$ref= $l ? $l : $notfound;
+#				return $l && !$is_suggestion;
+#			}],
+#	lyricwiki =>	[lyricwiki => 'http://lyrics.wikia.com/%a:%t',undef,
+#			 sub {	return 0,'http://lyrics.wikia.com/'.$1 if $_[0]=~m#<span class="redirectText"><a href="/([^"]+)"#;
+#				$_[0]=~s!.*<div class='lyricbox'>.*?((?:&\#\d+;|<br ?/>|</?[bi]>){5,}).*!$1!s; #keep only the "lyric box"
+#				return 0 if $_[0]=~m!&#91;&#46;&#46;&#46;&#93;(?:<br ?/>)*<i>!; # truncated lyrics : "[...]" followed by italic explanation => not auto-saved
+#				return !!$1;
+#			}],
 	musixmatch =>   [musixmatch => sub {  ::ReplaceFields($_[0], "http://www.musixmatch.com/lyrics/%a/%t", sub { my $s=::url_escapeall($_[0]); $s=~s/%20/-/g; $s }) }, undef,
                          sub {
                             if ($_[0] =~ m/<span class="lyrics__content__\w+">/) {
@@ -341,7 +341,7 @@ sub load_from_web
 	{	$site = $::Options{OPT.'LyricSite'};
 		delete $self->{trynext};
 		if ($site eq 'AUTO')
-		{	($site,@{$self->{trynext}})= qw/lyricssongs lyricwiki musixmatch/;	#FIXME make it configurable
+		{	($site,@{$self->{trynext}})= qw/musixmatch/;	#FIXME make it configurable
 		}
 	}
 	return unless $site;
