@@ -5645,7 +5645,20 @@ sub DialogRename
 	my $entry= Gtk3::Entry->new;
 	$entry->set_activates_default(TRUE);
 	$entry->set_text($name);
-	my $label_ext= Gtk3::Label->new('.'.$ext);
+	my $label_ext= Gtk3::Button->new_with_label('.'.$ext);
+	$label_ext->set_tooltip_text(_"Click to rename the extension too");
+	$label_ext->set_relief('none');
+	$label_ext->signal_connect(clicked => sub
+		{	$entry->grab_focus;
+			$_[0]->hide;
+			$entry->{includes_ext}=1;
+			my $string=$entry->get_text;
+			my $l1=length($string)+1;
+			$string.= '.'.$ext;
+			my $l2=length($string);
+			$entry->set_text($string);
+			$entry->select_region($l1,$l2); #select the extension
+		});
 	my $hbox= Hpack('_',$entry,0,$label_ext);
 	$dialog->get_content_area->add($_) for $grid,$hbox;
 	SetWSize($dialog,'Rename','300x180');
@@ -5655,7 +5668,11 @@ sub DialogRename
 	 {	my ($dialog,$response)=@_;
 		if ($response eq 'ok')
 		{	my $name=$entry->get_text;
-			RenameSongFile($ID,"$name.$ext",$dialog) if $name=~m/\S/;
+			if ($name=~m/\S/)
+			{	$name.='.'.$ext unless $entry->{includes_ext};
+				#FIXME should add check extension is valid if $entry->{includes_ext}
+				RenameSongFile($ID,$name,$dialog);
+			}
 		}
 		$dialog->destroy;
 	 });
