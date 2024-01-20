@@ -58,7 +58,7 @@ sub check_version
 	my $version=get_version();
 	my $ok;
 	return unless $version;
-	if ($version=~m/^(\d+)\.(\d+)(\S+)?$/i) { $ok= $1>$major || $2>=$minor; }
+	if ($version=~m/^v?(\d+)\.(\d+)(\S+)?$/i) { $ok= $1>$major || $2>=$minor; }
 	elsif ($version=~m/^git-[[:xdigit:]]+$/i) { $ok=1; } #assume git version is ok
 	else { warn "mpv: error looking up mpv version\n"; }
 	return $ok;
