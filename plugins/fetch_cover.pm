@@ -38,6 +38,7 @@ my %Sites=
  album =>
  {	googlei => [_"google images","http://images.google.com/images?q=%s&imgsz=medium|large&imgar=ns", \&parse_googlei, GOOGLE_USER_AGENT],
 	googleihi =>[_"google images (hi-res)","http://www.google.com/images?q=%s&imgsz=xlarge|xxlarge&imgar=ns", \&parse_googlei, GOOGLE_USER_AGENT],
+ 	lastfm => ['last.fm',"http://www.last.fm/music/%a/%l/+images", \&parse_lastfm],
 	yahoo =>['yahoo',"http://images.search.yahoo.com/search/images?p=%s&o=js", \&parse_yahoo],
 	bing =>['bing',"http://www.bing.com/images/async?q=%s&qft=+filterui:aspect-square", \&parse_bing, BING_USER_AGENT],
 	ddg => ["DuckDuckGo","https://duckduckgo.com/?q=%s&iax=1&ia=images", \&parse_ddg],
@@ -272,7 +273,7 @@ sub parse_lastfm
 {	my ($results,$pageurl,$searchcontext)=@_;
 	$searchcontext->{baseurl}||= $pageurl;
 	my @list;
-	while ($results=~m#<a\s+href="/music/[^/]+/\+images/[0-9A-F]+"[^>]+?class="image-list-link"[^<]+<img[^>]+?src="([^"]+)"#gis)
+	while ($results=~m#<a\s+href="/music/(?:[^/]+/)+\+images/[0-9A-F]+"[^>]+?class="image-list-link"[^<]+<img[^>]+?src="([^"]+)"#gis)
 	{	my $url=my $pre=$1;
 		$url=~s#/i/u/avatar170s/#/i/u/#;
 		$url.='.jpg';
