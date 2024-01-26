@@ -747,14 +747,19 @@ our %Artists_split=
 	'\s*,\s+'		=> ", ",
 	',?\s+and\s+'		=> "and",	#case-sensitive because the user might want to use "And" in artist names that should NOT be splitted
 	',?\s+And\s+'		=> "And",
-	'\s+featuring\s+'	=> "featuring",
-	'\s+feat\.\s+'		=> "feat.",
+	'\s+[fF]eaturing\s+'	=> "featuring",
+	'\s+[fF]eat\.*\s+'	=> "feat",
+	'\s+[fF]t\.*\s+'	=> "ft",
 	'\s+[Vv][Ss]\s+'	=> "VS",
 );
 our %Artists_from_title=
 (	'\(with\s+([^)]+)\)'		=> "(with X)",
-	'\(feat\.\s+([^)]+)\)'		=> "(feat. X)",
-	'\(featuring\s+([^)]+)\)'	=> "(featuring X)",
+#	'\([fF]t\.*\s+([^)]+)\)'	=> "(ft X)",   # ft and ft.
+	'[fF]t\.*\s+([^)]+)'		=> "ft X",   # ft and ft.
+#	'\([fF]eat\.*\s+([^)]+)\)'	=> "(feat X)", # feat and feat.
+	'[fF]eat\.*\s+([^)]+)'		=> "feat X", # feat and feat.
+#	'\([fF]eaturing\s+([^)]+)\)'	=> "(featuring X)",
+	'[fF]eaturing\s+([^)]+)'	=> "featuring X",
 );
 
 
@@ -6152,7 +6157,7 @@ sub ScanFolder
 		if (defined $ID)
 		{	next unless Songs::Get($ID,'missing');
 			Songs::Set($ID,missing => 0);
-			$ToReRead->add($ID);	#or $ToCheck ? 
+			$ToReRead->add($ID);	#or $ToCheck ?
 			push @ToAdd_IDsBuffer,$ID;
 		}
 		else
