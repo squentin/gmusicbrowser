@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2022-05-08 23:25+10:00\n"
+"POT-Creation-Date: 2025-09-14 14:41+10:00\n"
 "PO-Revision-Date: 2017-09-20 12:54+0000\n"
 "Last-Translator: abuyop <abuyop@gmail.com>\n"
 "Language-Team: Malay (Malaysia) (http://www.transifex.com/squentin/"
@@ -40,14 +40,14 @@ msgstr "bagi {length}"
 msgid "%S by %a"
 msgstr "%S oleh %a"
 
-#: gmusicbrowser_songs.pm:3455 gmusicbrowser_songs.pm:3456
-#: gmusicbrowser_songs.pm:3457
+#: gmusicbrowser_songs.pm:3465 gmusicbrowser_songs.pm:3466
+#: gmusicbrowser_songs.pm:3467
 #, perl-format
 msgid "%d Album"
 msgid_plural "%d Albums"
 msgstr[0] "%d Album"
 
-#: gmusicbrowser_songs.pm:3455 gmusicbrowser_songs.pm:3456
+#: gmusicbrowser_songs.pm:3465 gmusicbrowser_songs.pm:3466
 #, perl-format
 msgid "%d Artist"
 msgid_plural "%d Artists"
@@ -59,14 +59,14 @@ msgid "%d Upcoming Event"
 msgid_plural "%d Upcoming Events"
 msgstr[0] "%d Peristiwa Mendatang"
 
-#: gmusicbrowser.pl:636 gmusicbrowser_list.pm:8146 gmusicbrowser_songs.pm:975
+#: gmusicbrowser.pl:636 gmusicbrowser_list.pm:8146 gmusicbrowser_songs.pm:985
 #, perl-format
 msgid "%d album"
 msgid_plural "%d albums"
 msgstr[0] "%d album"
 
 #: gmusicbrowser.pl:622 gmusicbrowser.pl:629 gmusicbrowser_list.pm:8157
-#: gmusicbrowser_songs.pm:3460
+#: gmusicbrowser_songs.pm:3470
 #, perl-format
 msgid "%d artist"
 msgid_plural "%d artists"
@@ -100,7 +100,7 @@ msgstr[0] "%d saat"
 #: gmusicbrowser.pl:3900 gmusicbrowser.pl:5760 gmusicbrowser.pl:7010
 #: gmusicbrowser.pl:7288 gmusicbrowser.pl:8955 gmusicbrowser_layout.pm:253
 #: gmusicbrowser_list.pm:250 gmusicbrowser_list.pm:1719
-#: gmusicbrowser_songs.pm:3454 plugins/audioscrobbler.pm:197
+#: gmusicbrowser_songs.pm:3464 plugins/audioscrobbler.pm:197
 #, perl-format
 msgid "%d song"
 msgid_plural "%d songs"
@@ -268,7 +268,7 @@ msgstr "Henti Paksa"
 msgid "Abort ReplayGain analysis"
 msgstr "Henti paksa analisis GandaanMainSemula"
 
-#: gmusicbrowser_songs.pm:2154
+#: gmusicbrowser_songs.pm:2164
 msgid "Abort mass-tagging"
 msgstr "Henti paksa pengetagan-kelompok"
 
@@ -402,7 +402,7 @@ msgstr "Tambah ke baris gilir"
 msgid "Add {value} to {field} for all tracks on this album."
 msgstr "Tambah {value} ke {field} untuk semua trek dalam album ini."
 
-#: gmusicbrowser_songs.pm:1209
+#: gmusicbrowser_songs.pm:1219
 msgid "Added"
 msgstr "Ditambah"
 
@@ -448,7 +448,7 @@ msgstr "Gelintar Lanjutan ..."
 msgid "Advanced Tag Editing"
 msgstr "Penyuntingan Tag Lanjutan"
 
-#: gmusicbrowser.pl:1288 gmusicbrowser_songs.pm:968 gmusicbrowser_tags.pm:1866
+#: gmusicbrowser.pl:1288 gmusicbrowser_songs.pm:978 gmusicbrowser_tags.pm:1866
 #: gmusicbrowser_tags.pm:1904 gmusicbrowser_tags.pm:1919
 #: gmusicbrowser_tags.pm:1937 gmusicbrowser_tags.pm:1944
 #: gmusicbrowser_tags.pm:2190 plugins/albuminfo.pm:62
@@ -466,12 +466,12 @@ msgstr "Album dan artis"
 msgid "Album and artist on the left side"
 msgstr "Album dan artis di sebelah kiri"
 
-#: gmusicbrowser_songs.pm:1009 gmusicbrowser_tags.pm:1865
+#: gmusicbrowser_songs.pm:1019 gmusicbrowser_tags.pm:1865
 #: gmusicbrowser_tags.pm:1954
 msgid "Album artist"
 msgstr "Album artis"
 
-#: gmusicbrowser_songs.pm:1018
+#: gmusicbrowser_songs.pm:1028
 msgid "Album artist or artist"
 msgstr "Album artis atau artis"
 
@@ -479,11 +479,11 @@ msgstr "Album artis atau artis"
 msgid "Album cover"
 msgstr "Kulit album"
 
-#: gmusicbrowser_songs.pm:1452
+#: gmusicbrowser_songs.pm:1462
 msgid "Album gain"
 msgstr "Gandaan album"
 
-#: gmusicbrowser_songs.pm:1029
+#: gmusicbrowser_songs.pm:1039
 msgid "Album has picture"
 msgstr ""
 
@@ -491,11 +491,11 @@ msgstr ""
 msgid "Album mode"
 msgstr "Mod album"
 
-#: gmusicbrowser_songs.pm:1466
+#: gmusicbrowser_songs.pm:1476
 msgid "Album peak"
 msgstr "Puncak album"
 
-#: gmusicbrowser_list.pm:810 gmusicbrowser_songs.pm:992
+#: gmusicbrowser_list.pm:810 gmusicbrowser_songs.pm:1002
 msgid "Album picture"
 msgstr "Gambar album"
 
@@ -511,7 +511,7 @@ msgstr "Gambar album"
 msgid "Album playcount:"
 msgstr "Kiraan main album:"
 
-#: gmusicbrowser_songs.pm:1517
+#: gmusicbrowser_songs.pm:1527
 msgid "Album shuffle"
 msgstr "Kocok album"
 
@@ -519,7 +519,7 @@ msgstr "Kocok album"
 msgid "Album with picture"
 msgstr "Album dengan gambar"
 
-#: gmusicbrowser_songs.pm:1487
+#: gmusicbrowser_songs.pm:1497
 msgid "Album year(s)"
 msgstr "Tahun album"
 
@@ -546,20 +546,20 @@ msgstr "Pemalam Albuminfo"
 msgid "Albums"
 msgstr "Album"
 
-#: gmusicbrowser_songs.pm:2641 gmusicbrowser_songs.pm:5245
+#: gmusicbrowser_songs.pm:2651 gmusicbrowser_songs.pm:5255
 #: layouts/makeitlooklike.layout:314
 msgid "All"
 msgstr "Semua"
 
-#: gmusicbrowser_songs.pm:5234
+#: gmusicbrowser_songs.pm:5244
 msgid "All Songs"
 msgstr "Semua Lagu"
 
-#: gmusicbrowser_songs.pm:971
+#: gmusicbrowser_songs.pm:981
 msgid "All albums"
 msgstr "Semua album"
 
-#: gmusicbrowser_songs.pm:940 gmusicbrowser_songs.pm:962
+#: gmusicbrowser_songs.pm:950 gmusicbrowser_songs.pm:972
 msgid "All artists"
 msgstr "Semua artis"
 
@@ -567,32 +567,32 @@ msgstr "Semua artis"
 msgid "All files"
 msgstr "Semua fail"
 
-#: gmusicbrowser_songs.pm:1114
+#: gmusicbrowser_songs.pm:1124
 msgid "All genres"
 msgstr "Semua genre"
 
-#: gmusicbrowser_songs.pm:1129
+#: gmusicbrowser_songs.pm:1139
 msgid "All labels"
 msgstr "Semua label"
 
-#: gmusicbrowser_songs.pm:1147
+#: gmusicbrowser_songs.pm:1157
 msgid "All moods"
 msgstr "Semua suasana"
 
-#: gmusicbrowser.pl:8469 gmusicbrowser.pl:8566 gmusicbrowser_songs.pm:5250
+#: gmusicbrowser.pl:8469 gmusicbrowser.pl:8566 gmusicbrowser_songs.pm:5260
 msgid "All of :"
 msgstr "Semua :"
 
 #: gmusicbrowser.pl:10089 gmusicbrowser_layout.pm:1591
-#: gmusicbrowser_songs.pm:4538
+#: gmusicbrowser_songs.pm:4548
 msgid "All songs"
 msgstr "Semua lagu"
 
-#: gmusicbrowser_songs.pm:1157
+#: gmusicbrowser_songs.pm:1167
 msgid "All styles"
 msgstr "Semua gaya"
 
-#: gmusicbrowser_songs.pm:1168
+#: gmusicbrowser_songs.pm:1178
 msgid "All themes"
 msgstr "Semua tema"
 
@@ -641,7 +641,7 @@ msgstr ""
 "Analisis dan tambah tag gandaan main semula untuk semua lagu yang tidak "
 "mempunyai tag gandaan main semula, atau tag gandaan semula album tak koheren"
 
-#: gmusicbrowser.pl:8469 gmusicbrowser.pl:8567 gmusicbrowser_songs.pm:5250
+#: gmusicbrowser.pl:8469 gmusicbrowser.pl:8567 gmusicbrowser_songs.pm:5260
 msgid "Any of :"
 msgstr "Mana-mana :"
 
@@ -677,7 +677,7 @@ msgstr ""
 msgid "Arguments"
 msgstr "Argumen"
 
-#: gmusicbrowser_songs.pm:936 gmusicbrowser_tags.pm:1864
+#: gmusicbrowser_songs.pm:946 gmusicbrowser_tags.pm:1864
 #: gmusicbrowser_tags.pm:1903 gmusicbrowser_tags.pm:1918
 #: gmusicbrowser_tags.pm:1938 gmusicbrowser_tags.pm:1943
 #: gmusicbrowser_tags.pm:2190 plugins/albuminfo.pm:63 plugins/artistinfo.pm:159
@@ -703,11 +703,11 @@ msgstr "Biografi Artis"
 msgid "Artist URL"
 msgstr "URL Artis"
 
-#: gmusicbrowser_songs.pm:1033
+#: gmusicbrowser_songs.pm:1043
 msgid "Artist has picture"
 msgstr ""
 
-#: gmusicbrowser_list.pm:818 gmusicbrowser_songs.pm:1001
+#: gmusicbrowser_list.pm:818 gmusicbrowser_songs.pm:1011
 msgid "Artist picture"
 msgstr "Gambar artis"
 
@@ -743,7 +743,7 @@ msgstr "Maklumatartis"
 msgid "Artistinfo plugin"
 msgstr "Pemalam maklumatartis"
 
-#: gmusicbrowser_songs.pm:961 layouts/contrib.layout:303
+#: gmusicbrowser_songs.pm:971 layouts/contrib.layout:303
 #: layouts/contrib.layout:339 layouts/contrib.layout:537
 msgid "Artists"
 msgstr "Artis"
@@ -760,11 +760,11 @@ msgstr "Tanya pengesahan jika fail sudah wujud"
 msgid "Audio"
 msgstr "Audio"
 
-#: gmusicbrowser_songs.pm:1336
+#: gmusicbrowser_songs.pm:1346
 msgid "Audio bitrate"
 msgstr ""
 
-#: gmusicbrowser_songs.pm:1359
+#: gmusicbrowser_songs.pm:1369
 msgid "Audio format"
 msgstr ""
 
@@ -844,7 +844,7 @@ msgstr "Tersedia"
 msgid "Average rating:"
 msgstr "Penarafan purata:"
 
-#: gmusicbrowser_songs.pm:1320
+#: gmusicbrowser_songs.pm:1330
 msgid "BPM"
 msgstr "BPM"
 
@@ -908,11 +908,11 @@ msgstr "Butang, Lagu & Kulit Album"
 msgid "Can be relative by using + or -"
 msgstr "Boleh relatif dengan menggunakan + atau -"
 
-#: gmusicbrowser_songs.pm:3277
+#: gmusicbrowser_songs.pm:3287
 msgid "Can be searched with :"
 msgstr "Boleh digelintar dengan :"
 
-#: gmusicbrowser_songs.pm:3276
+#: gmusicbrowser_songs.pm:3286
 msgid "Can be used as a variable with :"
 msgstr "Boleh digunakan sebagai pembolehubah dengan :"
 
@@ -951,7 +951,7 @@ msgstr "Tidak dapat baca fail atau fail tidak sah"
 msgid "Can't write in base folder '{folder}'."
 msgstr "Tidak dapat tulis dalam folder dasar '{folder}'."
 
-#: gmusicbrowser_songs.pm:3293
+#: gmusicbrowser_songs.pm:3303
 msgid "Cancel"
 msgstr "Batal"
 
@@ -1003,7 +1003,7 @@ msgstr "Ubah fon dan saiz teks lalai"
 msgid "Change the context visibility"
 msgstr "Ubah ketampakan konteks"
 
-#: gmusicbrowser_songs.pm:1327
+#: gmusicbrowser_songs.pm:1337
 msgid "Channels"
 msgstr "Saluran"
 
@@ -1081,7 +1081,7 @@ msgstr "Pilih fon untuk lirik"
 msgid "Choose font..."
 msgstr "Pilih fon..."
 
-#: gmusicbrowser_songs.pm:1133
+#: gmusicbrowser_songs.pm:1143
 #, perl-brace-format
 msgid "Choose icon for label {name}"
 msgstr "Pilih ikon untuk label {name}"
@@ -1195,7 +1195,7 @@ msgstr "Perintah bila lagu yang dimainkan berubah :"
 msgid "Command when stopped :"
 msgstr "Perintah bila dihentikan :"
 
-#: gmusicbrowser_songs.pm:1177 gmusicbrowser_tags.pm:1926
+#: gmusicbrowser_songs.pm:1187 gmusicbrowser_tags.pm:1926
 #: gmusicbrowser_tags.pm:1946 gmusicbrowser_tags.pm:2190
 msgid "Comment"
 msgstr "Ulasan"
@@ -1204,17 +1204,17 @@ msgstr "Ulasan"
 msgid "Comments"
 msgstr "Ulasan"
 
-#: gmusicbrowser_songs.pm:1050 gmusicbrowser_tags.pm:1898
+#: gmusicbrowser_songs.pm:1060 gmusicbrowser_tags.pm:1898
 #: gmusicbrowser_tags.pm:1956
 msgid "Compilation"
 msgstr "Kompilasi"
 
-#: gmusicbrowser_songs.pm:1271 gmusicbrowser_tags.pm:1886
+#: gmusicbrowser_songs.pm:1281 gmusicbrowser_tags.pm:1886
 #: gmusicbrowser_tags.pm:1925
 msgid "Composer"
 msgstr "Penggubah"
 
-#: gmusicbrowser_songs.pm:1294 gmusicbrowser_tags.pm:1922
+#: gmusicbrowser_songs.pm:1304 gmusicbrowser_tags.pm:1922
 msgid "Conductor"
 msgstr "Konduktor"
 
@@ -1226,7 +1226,7 @@ msgstr "Sambung melalui proksi"
 msgid "Connections from :"
 msgstr "Sambungan dari :"
 
-#: gmusicbrowser_songs.pm:1378
+#: gmusicbrowser_songs.pm:1388
 msgid "Container format"
 msgstr ""
 
@@ -1319,7 +1319,7 @@ msgstr "Teks Suai"
 msgid "Custom URL"
 msgstr "URL Suai"
 
-#: gmusicbrowser_songs.pm:3197
+#: gmusicbrowser_songs.pm:3207
 msgid "Custom aliases"
 msgstr ""
 
@@ -1456,11 +1456,11 @@ msgstr "Destinasi: {folder}"
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "Lumpuhkan penyelamat skrin bila berskrin penuh dan dimainkan"
 
-#: gmusicbrowser_songs.pm:3130
+#: gmusicbrowser_songs.pm:3140
 msgid "Disabled"
 msgstr "Dilumpuhkan"
 
-#: gmusicbrowser_songs.pm:1089
+#: gmusicbrowser_songs.pm:1099
 msgid "Disc"
 msgstr "Cakera"
 
@@ -1469,7 +1469,7 @@ msgstr "Cakera"
 msgid "Disc #"
 msgstr "Cakera #"
 
-#: gmusicbrowser_songs.pm:1100
+#: gmusicbrowser_songs.pm:1110
 msgid "Disc name"
 msgstr "Nama cakera"
 
@@ -1557,7 +1557,7 @@ msgstr "Seret dan lepas lagu di sini untuk ganti pemilihan."
 msgid "Drop files in this folder"
 msgstr "Lepas fail dalam folder ini"
 
-#: gmusicbrowser.pl:5824 gmusicbrowser_songs.pm:3291
+#: gmusicbrowser.pl:5824 gmusicbrowser_songs.pm:3301
 #: layouts/makeitlooklike.layout:50 layouts/makeitlooklike.layout:235
 #: layouts/makeitlooklike.layout:349
 msgid "Edit"
@@ -1603,7 +1603,7 @@ msgstr "Sunting pengelompokan ..."
 msgid "Edit in the last.fm wiki"
 msgstr "Sunting dalam wiki last.fm"
 
-#: gmusicbrowser_songs.pm:1130
+#: gmusicbrowser_songs.pm:1140
 msgid "Edit labels"
 msgstr "Sunting label"
 
@@ -1623,7 +1623,7 @@ msgstr "Sunitng mod bertertib ..."
 msgid "Edit random modes ..."
 msgstr "Sunting mod rawak ..."
 
-#: gmusicbrowser_songs.pm:1195
+#: gmusicbrowser_songs.pm:1205
 msgid "Edit rating"
 msgstr "Sunting penarafan"
 
@@ -1636,7 +1636,7 @@ msgstr "Sunting tip baris"
 msgid "Edit selected song properties"
 msgstr "Sunting sifat lagu terpilih"
 
-#: gmusicbrowser_songs.pm:2645
+#: gmusicbrowser_songs.pm:2655
 #, perl-brace-format
 msgid "Edit {field}"
 msgstr "Sunting {field}"
@@ -1645,7 +1645,7 @@ msgstr "Sunting {field}"
 msgid "Edit..."
 msgstr "Sunting..."
 
-#: gmusicbrowser_songs.pm:3088
+#: gmusicbrowser_songs.pm:3098
 msgid "Editable in song properties dialog"
 msgstr "Boleh disunting dalam dialog sifat lagu"
 
@@ -1661,11 +1661,11 @@ msgstr "Menyunting tag"
 msgid "Embedded Pictures"
 msgstr "Gambar Terbenam"
 
-#: gmusicbrowser_songs.pm:1043
+#: gmusicbrowser_songs.pm:1053
 msgid "Embedded lyrics"
 msgstr "Lirik boleh dibenam"
 
-#: gmusicbrowser_songs.pm:1037
+#: gmusicbrowser_songs.pm:1047
 msgid "Embedded picture"
 msgstr "Gambar boleh dibenam"
 
@@ -1791,7 +1791,7 @@ msgstr ""
 "Ralat menyimpan artistbio dalam '{file}' :\n"
 "{error}"
 
-#: gmusicbrowser_songs.pm:2586
+#: gmusicbrowser_songs.pm:2596
 msgid "Error saving icon"
 msgstr "Ralat menyimpan ikon"
 
@@ -1829,7 +1829,7 @@ msgstr ""
 msgid "Error while writing replaygain data"
 msgstr "Ralat ketika menulis data gandaan main semula"
 
-#: gmusicbrowser_songs.pm:2155
+#: gmusicbrowser_songs.pm:2165
 msgid "Error while writing tag"
 msgstr "Ralat ketika menulis tag"
 
@@ -1937,11 +1937,11 @@ msgstr "Gagal memadam '{file}'"
 msgid "Fetching albuminfo"
 msgstr "Mendapatkan maklumat album"
 
-#: gmusicbrowser_songs.pm:3286
+#: gmusicbrowser_songs.pm:3296
 msgid "Field identifier"
 msgstr "Pengenalpasti medan"
 
-#: gmusicbrowser_songs.pm:3178
+#: gmusicbrowser_songs.pm:3188
 msgid "Field type"
 msgstr "Jenis medan"
 
@@ -1986,7 +1986,7 @@ msgstr "Fail: {file}"
 msgid "Filename"
 msgstr "Nama fail"
 
-#: gmusicbrowser_songs.pm:1501
+#: gmusicbrowser_songs.pm:1511
 msgid "Filename extension"
 msgstr "Sambungan nama fail"
 
@@ -1994,7 +1994,7 @@ msgstr "Sambungan nama fail"
 msgid "Filename format :"
 msgstr "Format nama fail :"
 
-#: gmusicbrowser_songs.pm:1498
+#: gmusicbrowser_songs.pm:1508
 msgid "Filename without extension"
 msgstr "Nama fail tanpa sambungan"
 
@@ -2107,19 +2107,19 @@ msgstr "Ikut lagu terpilih"
 msgid "Font size"
 msgstr "Saiz fon"
 
-#: gmusicbrowser_songs.pm:1568
+#: gmusicbrowser_songs.pm:1578
 msgid "For alternate ratings"
 msgstr "Untuk penarafan alternatif"
 
-#: gmusicbrowser_songs.pm:1556
+#: gmusicbrowser_songs.pm:1566
 msgid "For decimal numbers"
 msgstr "Untuk nombor desimal"
 
-#: gmusicbrowser_songs.pm:1562
+#: gmusicbrowser_songs.pm:1572
 msgid "For integer numbers"
 msgstr "Untuk nombor integer"
 
-#: gmusicbrowser_songs.pm:1560 gmusicbrowser_songs.pm:1561
+#: gmusicbrowser_songs.pm:1570 gmusicbrowser_songs.pm:1571
 msgid "For when values are likely to be repeated"
 msgstr "Bila nilai berkemungkinan diulang"
 
@@ -2127,7 +2127,7 @@ msgstr "Bila nilai berkemungkinan diulang"
 msgid "Forward"
 msgstr "Maju"
 
-#: gmusicbrowser_songs.pm:1393
+#: gmusicbrowser_songs.pm:1403
 msgid "Frame rate"
 msgstr ""
 
@@ -2192,11 +2192,11 @@ msgstr "Genre - Album"
 msgid "Genre - Artist"
 msgstr "Genre - Artis"
 
-#: gmusicbrowser_songs.pm:5457
+#: gmusicbrowser_songs.pm:5467
 msgid "Genre is set"
 msgstr "Genre ditetapkan"
 
-#: gmusicbrowser_songs.pm:1108 plugins/albuminfo.pm:37
+#: gmusicbrowser_songs.pm:1118 plugins/albuminfo.pm:37
 msgid "Genres"
 msgstr "Genre"
 
@@ -2224,7 +2224,7 @@ msgstr "Pergi ke lagu dimainkan"
 msgid "Group by :"
 msgstr "Dikumpul mengikut :"
 
-#: gmusicbrowser_songs.pm:1056 gmusicbrowser_tags.pm:1887
+#: gmusicbrowser_songs.pm:1066 gmusicbrowser_tags.pm:1887
 msgid "Grouping"
 msgstr "Pengelompokan"
 
@@ -2265,7 +2265,7 @@ msgstr "Keutamaan tinggi"
 msgid "Icon theme :"
 msgstr "Tema ikon :"
 
-#: gmusicbrowser_songs.pm:3172
+#: gmusicbrowser_songs.pm:3182
 msgid "Identifier in file tag"
 msgstr "Pengenalpasti dalam tag fail"
 
@@ -2364,7 +2364,7 @@ msgstr "Tapis songsang"
 msgid "Invisible hot spot"
 msgstr "Titik panas halimunan"
 
-#: gmusicbrowser_songs.pm:928
+#: gmusicbrowser_songs.pm:938
 #, perl-format
 msgid "Isn't smart equal to %s"
 msgstr "Tidak sama pintar dengan %s"
@@ -2405,7 +2405,7 @@ msgstr "Kata Kunci"
 msgid "Label"
 msgstr "Label"
 
-#: gmusicbrowser_songs.pm:5451
+#: gmusicbrowser_songs.pm:5461
 msgid "Label is set"
 msgstr "Label ditetapkan"
 
@@ -2413,7 +2413,7 @@ msgstr "Label ditetapkan"
 msgid "Label/Publisher"
 msgstr "Label/Penerbit"
 
-#: gmusicbrowser_songs.pm:1123
+#: gmusicbrowser_songs.pm:1133
 msgid "Labels"
 msgstr "Label"
 
@@ -2437,11 +2437,11 @@ msgstr "Bahasa"
 msgid "Last messages:"
 msgstr "Mesej terakhir:"
 
-#: gmusicbrowser.pl:1303 gmusicbrowser_list.pm:724 gmusicbrowser_songs.pm:1215
+#: gmusicbrowser.pl:1303 gmusicbrowser_list.pm:724 gmusicbrowser_songs.pm:1225
 msgid "Last played"
 msgstr "Terakhir dimain"
 
-#: gmusicbrowser_songs.pm:1233
+#: gmusicbrowser_songs.pm:1243
 msgid "Last skipped"
 msgstr "Terakhir dilangkau"
 
@@ -2473,7 +2473,7 @@ msgstr "Anak tetingkap kiri"
 msgid "Left-clic or scrollwheel to change, right-click to mute"
 msgstr "Klik-kiri atau roda tatal untuk ubah, klik-kanan untuk senyapkan"
 
-#: gmusicbrowser_songs.pm:1420
+#: gmusicbrowser_songs.pm:1430
 msgid "Length"
 msgstr "Panjang"
 
@@ -2538,7 +2538,7 @@ msgstr "Lagu disenarai"
 msgid "Listeners: "
 msgstr "Pendengar:"
 
-#: gmusicbrowser_songs.pm:1540
+#: gmusicbrowser_songs.pm:1550
 msgid "Lists"
 msgstr "Senarai"
 
@@ -2634,7 +2634,7 @@ msgstr "Lullaby"
 msgid "Lullaby plugin"
 msgstr "Pemalam Lullaby"
 
-#: gmusicbrowser_songs.pm:1283
+#: gmusicbrowser_songs.pm:1293
 msgid "Lyricist"
 msgstr "Penulis lirik"
 
@@ -2703,7 +2703,7 @@ msgstr "Sokongan MPRIS v2"
 msgid "Main"
 msgstr "Utama"
 
-#: gmusicbrowser_songs.pm:953
+#: gmusicbrowser_songs.pm:963
 msgid "Main artist"
 msgstr "Artis utama"
 
@@ -2793,7 +2793,7 @@ msgstr "Pemantau"
 msgid "Monitor the pulseaudio volume"
 msgstr "Pantau volum pulseaudio"
 
-#: gmusicbrowser_songs.pm:1141 plugins/albuminfo.pm:38
+#: gmusicbrowser_songs.pm:1151 plugins/albuminfo.pm:38
 msgid "Moods"
 msgstr "Mood"
 
@@ -2867,7 +2867,7 @@ msgstr "Tidak Sesekali"
 msgid "New"
 msgstr "Baharu"
 
-#: gmusicbrowser_songs.pm:3015
+#: gmusicbrowser_songs.pm:3025
 msgid "New custom field"
 msgstr "Medan suai baharu"
 
@@ -2923,11 +2923,11 @@ msgstr "Tiada sambungan"
 msgid "No file browser found."
 msgstr "Tiada pelajar fail ditemui."
 
-#: gmusicbrowser_songs.pm:1113
+#: gmusicbrowser_songs.pm:1123
 msgid "No genre"
 msgstr "Tiada genre"
 
-#: gmusicbrowser_songs.pm:1131
+#: gmusicbrowser_songs.pm:1141
 msgid "No label"
 msgstr "Tiada label"
 
@@ -2939,7 +2939,7 @@ msgstr "Tiada penapis dikunci"
 msgid "No lyrics found"
 msgstr "Tiada lirik ditemui"
 
-#: gmusicbrowser_songs.pm:1146
+#: gmusicbrowser_songs.pm:1156
 msgid "No moods"
 msgstr "Tiada mood"
 
@@ -2955,7 +2955,7 @@ msgstr "Tiada ulasan ditemui"
 msgid "No review written."
 msgstr "Tiada ulasan ditulis."
 
-#: gmusicbrowser_songs.pm:4544
+#: gmusicbrowser_songs.pm:4554
 msgid "No songs"
 msgstr "Tiada lagu"
 
@@ -2963,11 +2963,11 @@ msgstr "Tiada lagu"
 msgid "No songs found"
 msgstr "Tiada lagu ditemui"
 
-#: gmusicbrowser_songs.pm:1158
+#: gmusicbrowser_songs.pm:1168
 msgid "No styles"
 msgstr "Tiada gaya"
 
-#: gmusicbrowser_songs.pm:1169
+#: gmusicbrowser_songs.pm:1179
 msgid "No themes"
 msgstr "Tiada tema"
 
@@ -2976,7 +2976,7 @@ msgid "No web browser found."
 msgstr "Tiada pelajar sesawang ditemui."
 
 #: gmusicbrowser.pl:1285 gmusicbrowser_list.pm:1640 gmusicbrowser_list.pm:1662
-#: gmusicbrowser_songs.pm:95 gmusicbrowser_songs.pm:1070
+#: gmusicbrowser_songs.pm:95 gmusicbrowser_songs.pm:1080
 msgid "None"
 msgstr "Tiada"
 
@@ -3030,19 +3030,19 @@ msgstr "Kini dimainkan"
 msgid "NowPlaying plugin"
 msgstr "Pemalam KiniDimainkan"
 
-#: gmusicbrowser_songs.pm:5475
+#: gmusicbrowser_songs.pm:5485
 msgid "Number of days since added"
 msgstr "Bilangan hari semenjak ditambah"
 
-#: gmusicbrowser_songs.pm:5463
+#: gmusicbrowser_songs.pm:5473
 msgid "Number of days since last played"
 msgstr "Bilangan hari semenjak terakhir dimain"
 
-#: gmusicbrowser_songs.pm:5469
+#: gmusicbrowser_songs.pm:5479
 msgid "Number of days since last skipped"
 msgstr "Bilangan hari semenjak terakhir dilangkau"
 
-#: gmusicbrowser_songs.pm:5481
+#: gmusicbrowser_songs.pm:5491
 msgid "Number of days since modified"
 msgstr "Bilangan hari semenjak diubahsuai"
 
@@ -3054,11 +3054,11 @@ msgstr "Bilangan milisaat"
 msgid "Number of seconds"
 msgstr "Bilangan saat"
 
-#: gmusicbrowser_songs.pm:5487
+#: gmusicbrowser_songs.pm:5497
 msgid "Number of times played"
 msgstr "Berapa kali dimainkan"
 
-#: gmusicbrowser_songs.pm:5492
+#: gmusicbrowser_songs.pm:5502
 msgid "Number of times skipped"
 msgstr "Berapa kali dilangkau"
 
@@ -3298,7 +3298,7 @@ msgstr "Jeda"
 msgid "Per-song values"
 msgstr "Nilai per-lagu"
 
-#: gmusicbrowser_songs.pm:3181
+#: gmusicbrowser_songs.pm:3191
 msgid "Persistent values"
 msgstr "Nilai tekal"
 
@@ -3380,7 +3380,7 @@ msgstr "Main semua lagu dari artis ini"
 msgid "Play button"
 msgstr "Butang main"
 
-#: gmusicbrowser_list.pm:724 gmusicbrowser_songs.pm:1251
+#: gmusicbrowser_list.pm:724 gmusicbrowser_songs.pm:1261
 msgid "Play count"
 msgstr "Kiraan main"
 
@@ -3392,7 +3392,7 @@ msgstr "Pengira main"
 msgid "Play filter"
 msgstr "Penapis main"
 
-#: gmusicbrowser_songs.pm:1224
+#: gmusicbrowser_songs.pm:1234
 msgid "Play history"
 msgstr "Sejarah main"
 
@@ -3710,8 +3710,8 @@ msgstr "Main Balik Rawak"
 msgid "Random mode edition"
 msgstr "Edisi mod rawak"
 
-#: gmusicbrowser_list.pm:825 gmusicbrowser_songs.pm:1183
-#: gmusicbrowser_songs.pm:5497 gmusicbrowser_tags.pm:2386
+#: gmusicbrowser_list.pm:825 gmusicbrowser_songs.pm:1193
+#: gmusicbrowser_songs.pm:5507 gmusicbrowser_tags.pm:2386
 #: plugins/albuminfo.pm:36 layouts/songtree.layout:81
 msgid "Rating"
 msgstr "Penarafan"
@@ -3728,7 +3728,7 @@ msgstr "Penarafan diantara 0 hingga 100, atau kosongkan untuk lalai"
 msgid "Rating range:"
 msgstr "Julat penarafan:"
 
-#: gmusicbrowser_songs.pm:1489
+#: gmusicbrowser_songs.pm:1499
 msgid "Raw filename with path"
 msgstr "Nama fail mentah dengan laluan"
 
@@ -3748,7 +3748,7 @@ msgstr "Membaca-semula tag"
 msgid "Re-shuffle"
 msgstr "Kocok-semula"
 
-#: gmusicbrowser_songs.pm:3074
+#: gmusicbrowser_songs.pm:3084
 msgid "Read/write in file tag"
 msgstr "Baca/tulis dalam tag fail"
 
@@ -3834,7 +3834,7 @@ msgstr "Ingat lagu dimainkan diantara sesi"
 msgid "Remember queue between sessions"
 msgstr "Ingat baris gilir diantara sesi"
 
-#: gmusicbrowser_songs.pm:1305
+#: gmusicbrowser_songs.pm:1315
 msgid "Remixer"
 msgstr "Pengadun semula"
 
@@ -3898,7 +3898,7 @@ msgstr "Buang gambar"
 msgid "Remove selected songs"
 msgstr "Buang lagu terpilih"
 
-#: gmusicbrowser_songs.pm:3134
+#: gmusicbrowser_songs.pm:3144
 msgid "Remove this field"
 msgstr "Buang medan ini"
 
@@ -3920,7 +3920,7 @@ msgstr "Buang widjet ini"
 
 #: gmusicbrowser.pl:7328 gmusicbrowser_layout.pm:2496
 #: gmusicbrowser_list.pm:1746 gmusicbrowser_list.pm:3063
-#: gmusicbrowser_songs.pm:3292
+#: gmusicbrowser_songs.pm:3302
 msgid "Rename"
 msgstr "Nama semula"
 
@@ -4009,7 +4009,7 @@ msgstr "Imbas semula"
 msgid "Rescan Collection"
 msgstr "Imbas Semula Koleksi"
 
-#: gmusicbrowser_songs.pm:3094
+#: gmusicbrowser_songs.pm:3104
 msgid "Reset current value if no tag found in file"
 msgstr "Tetap semula nilai semasa jika tiada tag ditemui di dalam fail"
 
@@ -4123,7 +4123,7 @@ msgstr "Artis serupa"
 msgid "Same title"
 msgstr "Tajuk serupa"
 
-#: gmusicbrowser_songs.pm:1558
+#: gmusicbrowser_songs.pm:1568
 msgid "Same type as labels"
 msgstr "Jenis sama sebagai label"
 
@@ -4131,7 +4131,7 @@ msgstr "Jenis sama sebagai label"
 msgid "Same year"
 msgstr "Tahun serupa"
 
-#: gmusicbrowser_songs.pm:1351
+#: gmusicbrowser_songs.pm:1361
 msgid "Sampling Rate"
 msgstr "Kadar Persampelan"
 
@@ -4512,7 +4512,7 @@ msgstr "Tetapkan {year} sebagai tahun untuk semua trek dalam album ini."
 msgid "Settings"
 msgstr "Tetapan"
 
-#: gmusicbrowser_songs.pm:3023
+#: gmusicbrowser_songs.pm:3033
 msgid "Settings on this page will only take effect after a restart"
 msgstr "Tetapan pada halaman ini hanya berkesan selepas mula semula"
 
@@ -4562,7 +4562,7 @@ msgstr "Tunjuk peristiwa akan datang artis"
 msgid "Show buttons"
 msgstr "Tunjuk butang"
 
-#: gmusicbrowser_songs.pm:3122
+#: gmusicbrowser_songs.pm:3132
 msgid "Show edition submenu in song context menu"
 msgstr "Tunjuk submenu edisi dalam menu konteksual lagu"
 
@@ -4574,7 +4574,7 @@ msgstr ""
 msgid "Show file list"
 msgstr "Tunjuk senarai fail"
 
-#: gmusicbrowser_songs.pm:3192
+#: gmusicbrowser_songs.pm:3202
 msgid "Show file name extension"
 msgstr "Tunjuk sambungan nama fail"
 
@@ -4594,7 +4594,7 @@ msgstr "Tunjuk panel maklumat"
 msgid "Show main window"
 msgstr "Tunjuk tetingkap utama"
 
-#: gmusicbrowser_songs.pm:3126
+#: gmusicbrowser_songs.pm:3136
 msgid "Show menu items to find songs with same value"
 msgstr ""
 
@@ -4676,7 +4676,7 @@ msgid "Show/hide status bar"
 msgstr "Tunjuk/sembunyi palang status"
 
 #: gmusicbrowser_layout.pm:1503 gmusicbrowser_layout.pm:1555
-#: gmusicbrowser_list.pm:289 gmusicbrowser_songs.pm:1516
+#: gmusicbrowser_list.pm:289 gmusicbrowser_songs.pm:1526
 msgid "Shuffle"
 msgstr "Kocok"
 
@@ -4729,7 +4729,7 @@ msgstr "Tajuk ringkas"
 msgid "Simplify tree"
 msgstr ""
 
-#: gmusicbrowser_songs.pm:917
+#: gmusicbrowser_songs.pm:927
 msgid "Size"
 msgstr "Saiz"
 
@@ -4737,11 +4737,11 @@ msgstr "Saiz"
 msgid "Skip _All"
 msgstr "Langkau Semu_a"
 
-#: gmusicbrowser_songs.pm:1264
+#: gmusicbrowser_songs.pm:1274
 msgid "Skip count"
 msgstr "Kiraan langkau"
 
-#: gmusicbrowser_songs.pm:1242
+#: gmusicbrowser_songs.pm:1252
 msgid "Skip history"
 msgstr "Sejarah langkau"
 
@@ -4828,7 +4828,7 @@ msgstr "Sumber: {file}"
 msgid "Split artist names on :"
 msgstr "Pisah nama artis hidup :"
 
-#: gmusicbrowser_songs.pm:3100
+#: gmusicbrowser_songs.pm:3110
 msgid "Star images"
 msgstr "Imej bintang"
 
@@ -4890,7 +4890,7 @@ msgstr "Butang dan Masa Henti, Main dan Berikutnya"
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr "Butang dan Tajuk/Artis Henti, Main dan Berikutnya"
 
-#: gmusicbrowser_songs.pm:1155 plugins/albuminfo.pm:39
+#: gmusicbrowser_songs.pm:1165 plugins/albuminfo.pm:39
 msgid "Styles"
 msgstr "Gaya"
 
@@ -4970,7 +4970,7 @@ msgstr "Bentangan untuk widjet desktop ini hilang."
 msgid "The save file seems incomplete, you may want to use a backup instead."
 msgstr ""
 
-#: gmusicbrowser_songs.pm:1166 plugins/albuminfo.pm:40
+#: gmusicbrowser_songs.pm:1176 plugins/albuminfo.pm:40
 msgid "Themes"
 msgstr "Tema"
 
@@ -4984,7 +4984,7 @@ msgid ""
 "will be written in the file"
 msgstr ""
 
-#: gmusicbrowser_songs.pm:3182
+#: gmusicbrowser_songs.pm:3192
 msgid "These values will always be in the list, even if they are not used"
 msgstr ""
 "Nilai ini akan sentiasa di dalam senarai, walaupun jika ia tidak digunakan"
@@ -5046,7 +5046,7 @@ msgstr "Had masa tamat : %d saat"
 msgid "Timespan of the fade-out in seconds"
 msgstr "Jangkamasa pendam-keluar dalam saat"
 
-#: gmusicbrowser.pl:1302 gmusicbrowser_songs.pm:923 gmusicbrowser_tags.pm:1862
+#: gmusicbrowser.pl:1302 gmusicbrowser_songs.pm:933 gmusicbrowser_tags.pm:1862
 #: gmusicbrowser_tags.pm:1901 gmusicbrowser_tags.pm:1917
 #: gmusicbrowser_tags.pm:1939 gmusicbrowser_tags.pm:1942
 #: gmusicbrowser_tags.pm:2190 plugins/webcontext.pm:552
@@ -5066,7 +5066,7 @@ msgstr "Tajuk & kemajuan"
 msgid "Title - Artist - Album"
 msgstr "Tajuk - Artis - Album"
 
-#: gmusicbrowser_songs.pm:1506
+#: gmusicbrowser_songs.pm:1516
 msgid "Title or filename"
 msgstr "Tajuk atau nama fail"
 
@@ -5134,7 +5134,7 @@ msgstr "Alatan"
 msgid "Total playcount:"
 msgstr "Jumlah kiraan main:"
 
-#: gmusicbrowser_songs.pm:1080 gmusicbrowser_tags.pm:1868
+#: gmusicbrowser_songs.pm:1090 gmusicbrowser_tags.pm:1868
 #: gmusicbrowser_tags.pm:1906 gmusicbrowser_tags.pm:1923
 #: gmusicbrowser_tags.pm:1952 gmusicbrowser_tags.pm:2190
 #: layouts/desktop.layout:51
@@ -5145,11 +5145,11 @@ msgstr "Trek"
 msgid "Track Properties"
 msgstr "Sifat Trek"
 
-#: gmusicbrowser_songs.pm:1428
+#: gmusicbrowser_songs.pm:1438
 msgid "Track gain"
 msgstr "Gandaan trek"
 
-#: gmusicbrowser_songs.pm:1441
+#: gmusicbrowser_songs.pm:1451
 msgid "Track peak"
 msgstr "Puncak trek"
 
@@ -5201,12 +5201,12 @@ msgstr "Tidak diketahui"
 msgid "Unknown album"
 msgstr "Album tidak diketahui"
 
-#: gmusicbrowser_songs.pm:2649
+#: gmusicbrowser_songs.pm:2659
 #, perl-brace-format
 msgid "Unknown field ({field})"
 msgstr "Medan tidak diketahui ({field})"
 
-#: gmusicbrowser.pl:8568 gmusicbrowser_songs.pm:5257
+#: gmusicbrowser.pl:8568 gmusicbrowser_songs.pm:5267
 msgid "Unknown filter :"
 msgstr "Penapis tidak diketahui :"
 
@@ -5227,7 +5227,7 @@ msgstr "Artis tidak dikunci"
 msgid "Unnamed custom command"
 msgstr "Perintah suai tidak bernama"
 
-#: gmusicbrowser.pl:10111 gmusicbrowser_songs.pm:5238
+#: gmusicbrowser.pl:10111 gmusicbrowser_songs.pm:5248
 msgid "Unnamed filter"
 msgstr "Penapis tidak bernama"
 
@@ -5292,8 +5292,8 @@ msgstr "Guna pengekodan latin1 jika boleh dalam tag id3v2"
 #, perl-format
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
-"furthermore linebreaks '<br>' and any text you'd like to have in between. E."
-"g. '%title taking place at %startDate<br>in %city, %country<br><br>'"
+"furthermore linebreaks '<br>' and any text you'd like to have in between. "
+"E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'"
 msgstr ""
 "Guna tag dari halaman peristiwa XML last.fm dengan awalan % (cth. "
 "%headliner), disamping pembatas '<br>' dan mana-mana teks yang anda mahu "
@@ -5327,7 +5327,7 @@ msgstr "Digunakan untuk sekat pengeratan"
 msgid "Used for the Artists field"
 msgstr "Digunakan untuk medan Artis"
 
-#: gmusicbrowser_songs.pm:3173
+#: gmusicbrowser_songs.pm:3183
 msgid "Used to associate the saved value with a user or a function"
 msgstr "Digunakan untuk dikaitkan nilai tersimpan dengan pengguna atau fungsi"
 
@@ -5335,11 +5335,11 @@ msgstr "Digunakan untuk dikaitkan nilai tersimpan dengan pengguna atau fungsi"
 msgid "User authentification error"
 msgstr "Ralat pengesahihan pengguna"
 
-#: gmusicbrowser_songs.pm:3332
+#: gmusicbrowser_songs.pm:3342
 msgid "Value not written in file tag"
 msgstr "Nilai tidak ditulis dalam tag fail"
 
-#: gmusicbrowser_songs.pm:3331
+#: gmusicbrowser_songs.pm:3341
 msgid "Value written in file tag"
 msgstr "Nilai ditulis dalam tag fail"
 
@@ -5347,12 +5347,12 @@ msgstr "Nilai ditulis dalam tag fail"
 msgid "Various artists"
 msgstr "Pelbagai artis"
 
-#: gmusicbrowser_songs.pm:1315 gmusicbrowser_tags.pm:1863
+#: gmusicbrowser_songs.pm:1325 gmusicbrowser_tags.pm:1863
 #: gmusicbrowser_tags.pm:1902
 msgid "Version"
 msgstr "Versi"
 
-#: gmusicbrowser_songs.pm:1343
+#: gmusicbrowser_songs.pm:1353
 msgid "Video bitrate"
 msgstr ""
 
@@ -5360,11 +5360,11 @@ msgstr ""
 msgid "Video files"
 msgstr ""
 
-#: gmusicbrowser_songs.pm:1385
+#: gmusicbrowser_songs.pm:1395
 msgid "Video format"
 msgstr ""
 
-#: gmusicbrowser_songs.pm:1413
+#: gmusicbrowser_songs.pm:1423
 msgid "Video height"
 msgstr ""
 
@@ -5372,11 +5372,11 @@ msgstr ""
 msgid "Video properties"
 msgstr ""
 
-#: gmusicbrowser_songs.pm:1399
+#: gmusicbrowser_songs.pm:1409
 msgid "Video ratio"
 msgstr ""
 
-#: gmusicbrowser_songs.pm:1406
+#: gmusicbrowser_songs.pm:1416
 msgid "Video width"
 msgstr ""
 
@@ -5428,15 +5428,15 @@ msgstr ""
 "Amaran : menggunakan folder dengan pengekodan tidak sah, anda patut "
 "menamakannya semula."
 
-#: gmusicbrowser_songs.pm:3149
+#: gmusicbrowser_songs.pm:3159
 msgid "Warning: all existing data for this field will be lost"
 msgstr "Amaran : semua data sedia ada untuk medan ini akan hilang"
 
-#: gmusicbrowser_songs.pm:3161
+#: gmusicbrowser_songs.pm:3171
 msgid "Warning: an identifier is needed"
 msgstr "Amaran : pengenalpasti diperlukan"
 
-#: gmusicbrowser_songs.pm:3138
+#: gmusicbrowser_songs.pm:3148
 msgid "Warning: converting existing data to this format may be lossy"
 msgstr "AmaranL menukar data sedia ada ke format ini mungkin menjadi hilang"
 
@@ -5526,7 +5526,7 @@ msgstr "Windows"
 msgid "Words that begin with"
 msgstr "Perkataan yang bermula dengan"
 
-#: gmusicbrowser_songs.pm:3198
+#: gmusicbrowser_songs.pm:3208
 msgid "Words that can be used in place of the identifier"
 msgstr ""
 
@@ -5542,11 +5542,11 @@ msgstr ""
 "Tulis nilai bagi medan terpilih di dalam tag. Berguna untk medan yang "
 "sebelum ini tidak ditulis ke tag, untuk memastikan nilai semasa ditulis."
 
-#: gmusicbrowser_songs.pm:2150
+#: gmusicbrowser_songs.pm:2160
 msgid "Writing tags"
 msgstr "Menulis tag"
 
-#: gmusicbrowser_songs.pm:1065 gmusicbrowser_tags.pm:1929
+#: gmusicbrowser_songs.pm:1075 gmusicbrowser_tags.pm:1929
 #: gmusicbrowser_tags.pm:1945 gmusicbrowser_tags.pm:2190
 #: plugins/albuminfo.pm:65 layouts/pages.layout:28
 msgid "Year"
@@ -5577,7 +5577,7 @@ msgstr ""
 "Anda boleh paksa semak fail ini dengan menahan shift bila memilih \"Baca-"
 "semula tag\""
 
-#: gmusicbrowser_songs.pm:3103
+#: gmusicbrowser_songs.pm:3113
 #, perl-brace-format
 msgid ""
 "You can make custom stars by putting pictures in {folder}\n"
@@ -5683,7 +5683,7 @@ msgid "album information now for"
 msgstr "maklumat album kini untuk"
 
 #. comma-separated list of field aliases for album, these are in addition to english aliases
-#: gmusicbrowser_songs.pm:980
+#: gmusicbrowser_songs.pm:990
 msgctxt "Field_aliases"
 msgid "album,on"
 msgstr "album,pada"
@@ -5713,13 +5713,13 @@ msgstr "laksana penapis"
 msgid "argument {n} :"
 msgstr "argumen {n} :"
 
-#: gmusicbrowser_list.pm:1629 gmusicbrowser_songs.pm:1559
+#: gmusicbrowser_list.pm:1629 gmusicbrowser_songs.pm:1569
 #: gmusicbrowser_tags.pm:2359
 msgid "artist"
 msgstr "artis"
 
 #. comma-separated list of field aliases for artist, these are in addition to english aliases
-#: gmusicbrowser_songs.pm:948
+#: gmusicbrowser_songs.pm:958
 msgctxt "Field_aliases"
 msgid "artist,by"
 msgstr "artis,oleh"
@@ -5785,19 +5785,19 @@ msgstr "diantara (tarikh relatif)"
 msgid "big size"
 msgstr "saiz besar"
 
-#: gmusicbrowser_songs.pm:1138
+#: gmusicbrowser_songs.pm:1148
 msgid "bonus tracks"
 msgstr "trek bonus"
 
-#: gmusicbrowser_songs.pm:1557
+#: gmusicbrowser_songs.pm:1567
 msgid "boolean"
 msgstr "boolean"
 
-#: gmusicbrowser_songs.pm:1138
+#: gmusicbrowser_songs.pm:1148
 msgid "bootleg"
 msgstr "cetak-rompak"
 
-#: gmusicbrowser_songs.pm:1138
+#: gmusicbrowser_songs.pm:1148
 msgid "broken"
 msgstr "rosak"
 
@@ -5859,11 +5859,11 @@ msgstr "mod awan"
 msgid "command :"
 msgstr "perintah :"
 
-#: gmusicbrowser_songs.pm:1561
+#: gmusicbrowser_songs.pm:1571
 msgid "common number"
 msgstr "nombor umum"
 
-#: gmusicbrowser_songs.pm:1560
+#: gmusicbrowser_songs.pm:1570
 msgid "common string"
 msgstr "rentetan umum"
 
@@ -5912,9 +5912,9 @@ msgstr "suai"
 msgid "day"
 msgstr "hari"
 
-#: gmusicbrowser.pl:1065 gmusicbrowser_songs.pm:5463
-#: gmusicbrowser_songs.pm:5469 gmusicbrowser_songs.pm:5475
-#: gmusicbrowser_songs.pm:5481
+#: gmusicbrowser.pl:1065 gmusicbrowser_songs.pm:5473
+#: gmusicbrowser_songs.pm:5479 gmusicbrowser_songs.pm:5485
+#: gmusicbrowser_songs.pm:5491
 msgid "days"
 msgstr "hari"
 
@@ -6054,11 +6054,11 @@ msgstr "contoh :"
 msgid "fallback-gain : %d dB"
 msgstr "gandaan-jatuhbalik : %d dB"
 
-#: gmusicbrowser_songs.pm:5744
+#: gmusicbrowser_songs.pm:5754
 msgid "false"
 msgstr "palsu"
 
-#: gmusicbrowser_songs.pm:1138
+#: gmusicbrowser_songs.pm:1148
 msgid "favorite"
 msgstr "kegemaran"
 
@@ -6079,11 +6079,11 @@ msgstr "fail: {filename}"
 msgid "filters"
 msgstr "penapis"
 
-#: gmusicbrowser_songs.pm:1558
+#: gmusicbrowser_songs.pm:1568
 msgid "flags"
 msgstr "penanda"
 
-#: gmusicbrowser_songs.pm:1556
+#: gmusicbrowser_songs.pm:1566
 msgid "float"
 msgstr "apung"
 
@@ -6137,11 +6137,11 @@ msgstr "mempunyai gambar"
 msgid "has at least one"
 msgstr "sekurang-kurangnya satu"
 
-#: gmusicbrowser_songs.pm:1219 gmusicbrowser_songs.pm:1227
+#: gmusicbrowser_songs.pm:1229 gmusicbrowser_songs.pm:1237
 msgid "has been played"
 msgstr "telah dimainkan"
 
-#: gmusicbrowser_songs.pm:1237 gmusicbrowser_songs.pm:1245
+#: gmusicbrowser_songs.pm:1247 gmusicbrowser_songs.pm:1255
 msgid "has been skipped"
 msgstr "telah dilangkau"
 
@@ -6227,11 +6227,11 @@ msgstr "sertakan artis"
 msgid "includes artist %s"
 msgstr "sertakan artis %s"
 
-#: gmusicbrowser_songs.pm:1562
+#: gmusicbrowser_songs.pm:1572
 msgid "integer"
 msgstr "integer"
 
-#: gmusicbrowser_songs.pm:1138
+#: gmusicbrowser_songs.pm:1148
 msgid "interview"
 msgstr "wawancara"
 
@@ -6253,55 +6253,55 @@ msgstr "adalah"
 msgid "is %s"
 msgstr "adalah %s"
 
-#: gmusicbrowser_songs.pm:1354
+#: gmusicbrowser_songs.pm:1364
 msgid "is 44.1kHz"
 msgstr "adalah 44.1kHz"
 
-#: gmusicbrowser_songs.pm:1367
+#: gmusicbrowser_songs.pm:1377
 msgid "is a flac file"
 msgstr "adalah fail flac"
 
-#: gmusicbrowser_songs.pm:1371
+#: gmusicbrowser_songs.pm:1381
 msgid "is a lossless file"
 msgstr "adalah fail tak hilang"
 
-#: gmusicbrowser_songs.pm:1372
+#: gmusicbrowser_songs.pm:1382
 msgid "is a lossy file"
 msgstr "adalah fail hilang"
 
-#: gmusicbrowser_songs.pm:1361
+#: gmusicbrowser_songs.pm:1371
 msgid "is a mp3 file"
 msgstr "adalah fail mp3"
 
-#: gmusicbrowser_songs.pm:1368
+#: gmusicbrowser_songs.pm:1378
 msgid "is a musepack file"
 msgstr "adalah fail musepack"
 
-#: gmusicbrowser_songs.pm:1366
+#: gmusicbrowser_songs.pm:1376
 msgid "is a vorbis file"
 msgstr "adalah fail vorbis"
 
-#: gmusicbrowser_songs.pm:1369
+#: gmusicbrowser_songs.pm:1379
 msgid "is a wavepack file"
 msgstr "adalah fail wavepack"
 
-#: gmusicbrowser_songs.pm:1362
+#: gmusicbrowser_songs.pm:1372
 msgid "is an aac file"
 msgstr "adalah fail aac"
 
-#: gmusicbrowser_songs.pm:1363
+#: gmusicbrowser_songs.pm:1373
 msgid "is an alac file"
 msgstr "adalah fail alac"
 
-#: gmusicbrowser_songs.pm:1370
+#: gmusicbrowser_songs.pm:1380
 msgid "is an ape file"
 msgstr "adalah fail ape"
 
-#: gmusicbrowser_songs.pm:1364
+#: gmusicbrowser_songs.pm:1374
 msgid "is an mp4/m4a file"
 msgstr "adalah fail mp4/m4a"
 
-#: gmusicbrowser_songs.pm:1365
+#: gmusicbrowser_songs.pm:1375
 msgid "is an opus file"
 msgstr ""
 
@@ -6331,7 +6331,7 @@ msgstr "berada dalam"
 msgid "is in %s"
 msgstr "berada dalam %s"
 
-#: gmusicbrowser_songs.pm:1329
+#: gmusicbrowser_songs.pm:1339
 msgid "is mono"
 msgstr "adalah mono"
 
@@ -6339,16 +6339,16 @@ msgstr "adalah mono"
 msgid "is not defined"
 msgstr "adalah tidak ditakrif"
 
-#: gmusicbrowser_songs.pm:927
+#: gmusicbrowser_songs.pm:937
 msgid "is smart equal"
 msgstr "adalah sama pintar"
 
-#: gmusicbrowser_songs.pm:927
+#: gmusicbrowser_songs.pm:937
 #, perl-format
 msgid "is smart equal to %s"
 msgstr "adalah sama pintar dengan %s"
 
-#: gmusicbrowser_songs.pm:1331
+#: gmusicbrowser_songs.pm:1341
 msgid "is stereo"
 msgstr "adalah stereo"
 
@@ -6371,11 +6371,11 @@ msgstr "tidak sama dengan %s"
 msgid "isn't in %s"
 msgstr "bukanlah %s"
 
-#: gmusicbrowser_songs.pm:1330
+#: gmusicbrowser_songs.pm:1340
 msgid "isn't mono"
 msgstr "bukan mono"
 
-#: gmusicbrowser_songs.pm:1332
+#: gmusicbrowser_songs.pm:1342
 msgid "isn't stereo"
 msgstr "bukan stereo"
 
@@ -6524,7 +6524,7 @@ msgstr "pilihan mplayer :"
 msgid "mpv options :"
 msgstr "pilihan mpv :"
 
-#: gmusicbrowser_songs.pm:1555
+#: gmusicbrowser_songs.pm:1565
 msgid "multi-lines string"
 msgstr "rentetan baris-berbilang"
 
@@ -6547,9 +6547,9 @@ msgstr "nama bagi mod isih baharu"
 #: gmusicbrowser_layout.pm:4169 gmusicbrowser_songs.pm:717
 #: gmusicbrowser_songs.pm:722 gmusicbrowser_songs.pm:727
 #: gmusicbrowser_songs.pm:845 gmusicbrowser_songs.pm:850
-#: gmusicbrowser_songs.pm:855 gmusicbrowser_songs.pm:1218
-#: gmusicbrowser_songs.pm:1226 gmusicbrowser_songs.pm:1236
-#: gmusicbrowser_songs.pm:1244 gmusicbrowser_songs.pm:2557
+#: gmusicbrowser_songs.pm:855 gmusicbrowser_songs.pm:1228
+#: gmusicbrowser_songs.pm:1236 gmusicbrowser_songs.pm:1246
+#: gmusicbrowser_songs.pm:1254 gmusicbrowser_songs.pm:2567
 msgid "never"
 msgstr "tidak sesekali"
 
@@ -6653,7 +6653,7 @@ msgstr "tidak kurang dari %s yang lalu"
 msgid "not more than %s ago"
 msgstr "tidak lebih dari %s yang lalu"
 
-#: gmusicbrowser_songs.pm:1542
+#: gmusicbrowser_songs.pm:1552
 #, perl-format
 msgid "not present in %s"
 msgstr "tidak hadir dalam %s"
@@ -6771,12 +6771,12 @@ msgstr ""
 "dipisah dengan tanda  ':', atau 0 (untuk dimatikan), atau 1 (untuk "
 "dihidupkan)"
 
-#: gmusicbrowser_songs.pm:1541
+#: gmusicbrowser_songs.pm:1551
 #, perl-format
 msgid "present in %s"
 msgstr "hadir dalam %s"
 
-#: gmusicbrowser_songs.pm:1541
+#: gmusicbrowser_songs.pm:1551
 msgid "present in list"
 msgstr "hadir dalam senarai"
 
@@ -6784,7 +6784,7 @@ msgstr "hadir dalam senarai"
 msgid "quit"
 msgstr "keluar"
 
-#: gmusicbrowser_songs.pm:1563
+#: gmusicbrowser_songs.pm:1573
 msgid "rating"
 msgstr "penarafan"
 
@@ -6930,7 +6930,7 @@ msgstr "senarai statik"
 msgid "stop"
 msgstr "henti"
 
-#: gmusicbrowser_songs.pm:1554
+#: gmusicbrowser_songs.pm:1564
 msgid "string"
 msgstr "rentetan"
 
@@ -6993,12 +6993,12 @@ msgstr "modul perl {name}"
 msgid "then {action}"
 msgstr "kemudian {action}"
 
-#: gmusicbrowser_songs.pm:5487 gmusicbrowser_songs.pm:5492
+#: gmusicbrowser_songs.pm:5497 gmusicbrowser_songs.pm:5502
 msgid "times"
 msgstr "kali"
 
 #. comma-separated list of field aliases for title, these are in addition to english aliases
-#: gmusicbrowser_songs.pm:932
+#: gmusicbrowser_songs.pm:942
 msgctxt "Field_aliases"
 msgid "title"
 msgstr "tajuk"
@@ -7015,7 +7015,7 @@ msgstr "togol mod Songsang"
 msgid "tools"
 msgstr "alatan"
 
-#: gmusicbrowser_songs.pm:5744
+#: gmusicbrowser_songs.pm:5754
 msgid "true"
 msgstr "benar"
 
@@ -7200,7 +7200,7 @@ msgstr "{hours} jam {min} min {sec} s"
 msgid "{hours}h {min}m {sec}s"
 msgstr "{hours}j {min}m {sec}s"
 
-#: gmusicbrowser_songs.pm:3450
+#: gmusicbrowser_songs.pm:3460
 #, perl-brace-format
 msgid "{hours}h{min}m{sec}s"
 msgstr "{hours}j{min}m{sec}s"
@@ -7215,7 +7215,7 @@ msgstr "{min} min {sec} s"
 msgid "{min}m {sec}s"
 msgstr "{min}m {sec}s"
 
-#: gmusicbrowser_songs.pm:3450
+#: gmusicbrowser_songs.pm:3460
 #, perl-brace-format
 msgid "{min}m{sec}s"
 msgstr "{min}m{sec}s"
