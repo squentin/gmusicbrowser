@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+use locale qw/ :numeric /;    # fix arithmetic broken by Gtk3 -init setting LC_NUMERIC to user locale (see github #253)
 use strict;
 use warnings;
 use utf8;
