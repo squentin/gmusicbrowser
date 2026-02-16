@@ -3638,8 +3638,8 @@ sub new
 	$self->set_max_width_chars($opt->{minwidthchar}) if $opt->{minwidthchar};
 	$self->set_max_width_chars($opt->{maxwidthchar}) if $opt->{maxwidthchar};
 	unless ($opt->{noselector})
-	{	$self->set_icon_from_stock('primary','gtk-find');
-		$self->set_icon_from_stock('secondary','gtk-clear');
+	{	$self->set_icon_from_icon_name( 'primary',   ::check_icon_name('gtk-find')  || 'edit-find' );
+		$self->set_icon_from_icon_name( 'secondary', ::check_icon_name('gtk-clear') || 'edit-clear' );
 		$self->set_icon_activatable($_,1) for qw/primary secondary/;
 		$self->set_icon_tooltip_text('primary',_"Search options");
 		$self->set_icon_tooltip_text('secondary',_"Reset filter");
