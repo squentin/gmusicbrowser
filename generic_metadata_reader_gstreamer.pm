@@ -184,6 +184,7 @@ sub launch_and_parse
 	{	push @output, $_;
 	}
 	close $content_fh;
+	waitpid($pid,0) if $pid; #reap child to avoid zombies (SIGCHLD is not set to IGNORE)
 	::ReadRefFromLines(\@output,$self);
 }
 

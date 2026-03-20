@@ -79,6 +79,7 @@ sub receiving_cb
 {	my $self=$_[2];
 	return 1 if read $self->{content_fh},$self->{content},1024,length($self->{content});
 	close $self->{content_fh};
+	waitpid($self->{pid},0) if $self->{pid}; #reap child to avoid zombies (SIGCHLD is not set to IGNORE)
 	$self->{pid}=$self->{sock}=$self->{watch}=undef;
 	my $url=	$self->{params}{url};
 	my $callback=	$self->{params}{cb};
@@ -147,7 +148,7 @@ sub abort
 {	my $self=$_[0];
 	Glib::Source->remove($self->{watch}) if $self->{watch};
 	Glib::Source->remove($self->{ewatch}) if $self->{ewatch};
-	kill INT=>$self->{pid} if $self->{pid};
+	if ($self->{pid}) { kill INT=>$self->{pid}; waitpid($self->{pid},0); } #reap child to avoid zombies
 	close $self->{content_fh} if defined $self->{content_fh};
 	close $self->{error_fh} if defined $self->{error_fh};
 	$self->{pid}=$self->{content_fh}=$self->{error_fh}=$self->{watch}=$self->{ewatch}=undef;

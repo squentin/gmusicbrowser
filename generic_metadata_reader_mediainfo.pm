@@ -103,6 +103,7 @@ sub new
 		}
 	}
 	close $content_fh;
+	waitpid($pid,0) if $pid; #reap child to avoid zombies (SIGCHLD is not set to IGNORE)
 	if ($xml{'General/Duration'}) # ignore file if we don't have a duration
 	{	if (my $menu=$xml{Menu})
 		{	my @toc;

@@ -7,6 +7,7 @@
 package Play_Server;
 use strict;
 use warnings;
+use POSIX ':sys_wait_h';	#for WNOHANG in waitpid
 
 my ($ChildPID,$WatchTag,$fh,@pidToKill);
 my $cmd=$::DATADIR.::SLASH.'iceserver.pl';
@@ -34,6 +35,7 @@ sub Play
 sub _eos_cb
 {	Glib::Source->remove($WatchTag) or warn "couldn't remove watcher";
 	undef $WatchTag;
+	waitpid($ChildPID, WNOHANG) if $ChildPID; #reap child
 	undef $ChildPID;
 	::end_of_file_faketime();
 	return 1;
@@ -54,7 +56,7 @@ sub Stop
 	}
 }
 sub _Kill_timeout	#make sure old children are dead
-{	@pidToKill=grep kill(0,$_), @pidToKill;
+{	@pidToKill=grep { waitpid($_,WNOHANG)==0 && kill(0,$_) } @pidToKill; #reap finished children and check which are still running
 	if (@pidToKill)
 	{ warn "killing -9 @pidToKill\n" if $::debug;
 	  kill KILL => @pidToKill;

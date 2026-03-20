@@ -142,7 +142,8 @@ use Scalar::Util qw/blessed weaken refaddr/;
 use Unicode::Normalize 'NFKD'; #for accent-insensitive sort and search, only used via superlc()
 use Carp;
 $SIG{INT} = sub {&Carp::cluck; exit 2};
-$SIG{CHLD}= 'IGNORE'; # to get rid of zombie child processes
+# don't set SIGCHLD to IGNORE: gdk-pixbuf >=2.44 Glycin needs SIGCHLD to manage its sandbox subprocesses via GLib
+# reaping of our own child processes (forksystem etc) is handled by GLib's child watch or by waitpid in the backends
 
 #use constant SLASH => ($^O  eq 'MSWin32')? '\\' : '/';
 use constant SLASH => '/'; #gtk file chooser use '/' in win32 and perl accepts both '/' and '\'
@@ -1761,7 +1762,7 @@ sub forksystem
 	my @cmd=@_; #can be (cmd,arg1,arg2,...) or ([cmd1,arg1,arg2,...],[cmd2,$arg1,arg2,...])
 	if (ref $cmd[0] && @cmd==1) { @cmd=@{$cmd[0]}; } #simplify if only 1 command
 	my $ChildPID=fork;
-	if (!defined $ChildPID) { warn ::ErrorMessage("forksystem : fork failed : $!"); }
+	if (!defined $ChildPID) { warn ::ErrorMessage("forksystem : fork failed : $!"); return }
 	if ($ChildPID==0) #child
 	{	if (ref $cmd[0])
 		{	system @$_ for @cmd;	#execute multiple commands, one at a time, from the child process
@@ -1769,6 +1770,7 @@ sub forksystem
 		else { exec @cmd; }	#execute one command in the child process
 		POSIX::_exit(0);
 	}
+	Glib::Child->watch_add($ChildPID, sub {}, undef, Glib::G_PRIORITY_LOW) if $ChildPID; #reap child via GLib to avoid zombies
 }
 
 
@@ -2773,7 +2775,7 @@ sub SaveTags	#save tags _and_ settings
 	if ($fork)
 	{	my $pid= fork;
 		if (!defined $pid) { $fork=undef; } # error, fallback to saving in current process
-		elsif ($pid) { return }
+		elsif ($pid) { Glib::Child->watch_add($pid, sub {}, undef, Glib::G_PRIORITY_LOW); return } #reap child via GLib to avoid zombies
 	}
 
 	setlocale(LC_NUMERIC, 'C');

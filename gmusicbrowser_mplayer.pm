@@ -193,7 +193,7 @@ sub Stop
 	}
 }
 sub _Kill_timeout	#make sure old children are dead
-{	@pidToKill=grep kill(0,$_), @pidToKill; #checks to see which ones are still there
+{	@pidToKill=grep { waitpid($_,WNOHANG)==0 && kill(0,$_) } @pidToKill; #reap finished children and check which are still running
 	if (@pidToKill)
 	{	warn "Sending ".($Kill9 ? 'KILL' : 'INT')." signal to @pidToKill\n" if $::debug;
 		if ($Kill9)	{kill KILL=>@pidToKill;}
