@@ -913,6 +913,16 @@ our %timespan_menu=
 	category=>'file',
 	alias	=> 'modified',
  },
+ moddate =>
+ {
+        name => 'MOD DATE',
+	width => 20,
+	type => 'virtual',
+	flags => 'cgs',
+	depend => 'modif',
+	sortgroup => 'album',
+	get	=> 'sprintf("%d%s%03d%03d", #modif->get# / (60*60*24), #album->get#, 1000-#disc->get#, 1000-#track->get#)'
+ },
  size	=>
  {	name => _"Size",	width => 80,	flags => 'fgarscp_',		#32bits => 4G max
 	type => 'size',

@@ -4,46 +4,192 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gmusicbrowser\n"
 "Report-Msgid-Bugs-To: squentin@free.fr\n"
-"POT-Creation-Date: 2015-08-17 18:49+0200\n"
+"POT-Creation-Date: 2025-09-14 14:41+10:00\n"
 "PO-Revision-Date: 2017-09-19 23:13+0000\n"
 "Last-Translator: squentin <squentin@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/squentin/gmusicbrowser/"
 "language/ja/)\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+#: plugins/albuminfo.pm:111
 msgid " Context pane layout "
 msgstr "コンテキストペインレイアウト"
 
+#: plugins/albuminfo.pm:99
 msgid " Fields "
 msgstr "フィールド"
 
+#: plugins/albuminfo.pm:87
 msgid " Review "
 msgstr "レビュー"
 
+#: gmusicbrowser_layout.pm:310 gmusicbrowser_layout.pm:311
+#: gmusicbrowser_layout.pm:312 gmusicbrowser_layout.pm:332
+#: gmusicbrowser_layout.pm:333 gmusicbrowser_layout.pm:334
+#, perl-brace-format
+msgid " of {length}"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:1891
+#, perl-format
+msgid "%S by %a"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:3465 gmusicbrowser_songs.pm:3466
+#: gmusicbrowser_songs.pm:3467
+#, perl-format
+msgid "%d Album"
+msgid_plural "%d Albums"
+msgstr[0] ""
+
+#: gmusicbrowser_songs.pm:3465 gmusicbrowser_songs.pm:3466
+#, perl-format
+msgid "%d Artist"
+msgid_plural "%d Artists"
+msgstr[0] ""
+
+#: plugins/artistinfo.pm:575
+#, perl-format
+msgid "%d Upcoming Event"
+msgid_plural "%d Upcoming Events"
+msgstr[0] ""
+
+#: gmusicbrowser.pl:636 gmusicbrowser_list.pm:8146 gmusicbrowser_songs.pm:985
+#, perl-format
+msgid "%d album"
+msgid_plural "%d albums"
+msgstr[0] ""
+
+#: gmusicbrowser.pl:622 gmusicbrowser.pl:629 gmusicbrowser_list.pm:8157
+#: gmusicbrowser_songs.pm:3470
+#, perl-format
+msgid "%d artist"
+msgid_plural "%d artists"
+msgstr[0] ""
+
+#: gmusicbrowser.pl:5373 gmusicbrowser_layout.pm:4402
+#, perl-format
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] ""
+
+#: gmusicbrowser_tags.pm:435
+#, perl-format, perl-brace-format
+msgid "%d file in {folder}"
+msgid_plural "%d files in {folder}"
+msgstr[0] ""
+
+#: gmusicbrowser.pl:6187
+#, perl-format
+msgid "%d folder"
+msgid_plural "%d folders"
+msgstr[0] ""
+
+#: gmusicbrowser.pl:2041
+#, perl-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] ""
+
+#: gmusicbrowser.pl:616 gmusicbrowser.pl:624 gmusicbrowser.pl:3896
+#: gmusicbrowser.pl:3900 gmusicbrowser.pl:5760 gmusicbrowser.pl:7010
+#: gmusicbrowser.pl:7288 gmusicbrowser.pl:8955 gmusicbrowser_layout.pm:253
+#: gmusicbrowser_list.pm:250 gmusicbrowser_list.pm:1719
+#: gmusicbrowser_songs.pm:3464 plugins/audioscrobbler.pm:197
+#, perl-format
+msgid "%d song"
+msgid_plural "%d songs"
+msgstr[0] ""
+
+#: gmusicbrowser.pl:6186
+#, perl-format
+msgid "%d song added"
+msgid_plural "%d songs added"
+msgstr[0] ""
+
+#: gmusicbrowser.pl:3905 gmusicbrowser_layout.pm:249
+#: gmusicbrowser_layout.pm:252
+#, perl-format
+msgid "%d song in queue"
+msgid_plural "%d songs in queue"
+msgstr[0] ""
+
+#: gmusicbrowser_list.pm:274
+#, perl-format
+msgid "%d song in the library"
+msgid_plural "%d songs in the library"
+msgstr[0] ""
+
+#: gmusicbrowser_list.pm:263
+#, perl-format
+msgid "%d song selected"
+msgid_plural "%d songs selected"
+msgstr[0] ""
+
+#: plugins/audioscrobbler.pm:90
+#, perl-format
+msgid "%d song waiting to be sent"
+msgid_plural "%d songs waiting to be sent"
+msgstr[0] ""
+
+#: gmusicbrowser_songs.pm:56 gmusicbrowser_songs.pm:197
+#: gmusicbrowser_songs.pm:265
+#, perl-format
+msgid "%s fuzzy match with %s"
+msgstr ""
+
+#: layouts/contrib.layout:615
+#, perl-format
+msgid "%t by %a (%m)"
+msgstr ""
+
+#: gmusicbrowser.pl:5266
 #, perl-brace-format
 msgid "'{file}' exists. Overwrite ?"
 msgstr "'{file}' は既に存在します。上書しますか ?"
 
+#: gmusicbrowser.pl:7304
+#, perl-format, perl-brace-format
+msgid "'{label}' is set for %d song."
+msgid_plural "'{label}' is set for %d songs."
+msgstr[0] ""
+
+#: gmusicbrowser.pl:7226
+#, perl-format
+msgid "(%d song excluded)"
+msgid_plural "(%d songs excluded)"
+msgstr[0] ""
+
+#: plugins/appindicator.pm:50
+msgid "(The middle-click action doesn't work correctly in some desktops)"
+msgstr ""
+
+#: gmusicbrowser.pl:3720
 msgid "(case insensitive)"
 msgstr "(大文字と小文字を区別しない)"
 
+#: gmusicbrowser_tags.pm:433
 #, perl-brace-format
 msgid "(common parent folder : {common})"
 msgstr "(共通の親フォルダ : {common})"
 
+#: gmusicbrowser_tags.pm:2048
 msgid "(other)"
 msgstr "(その他)"
 
+#: plugins/audioscrobbler.pm:61
 msgid "(see http://www.last.fm)"
 msgstr "(http://www.last.fm を確認)"
 
+#: gmusicbrowser_gstreamer-1.x.pm:500
 msgid "(unstable)"
 msgstr "(不安定)"
 
+#: gmusicbrowser.pl:6884
 msgid ""
 "- When selecting a song, the playlist filter will be reset if the song is "
 "not in it\n"
@@ -52,30 +198,80 @@ msgstr ""
 "- 楽曲が選択されていないとプレイリストフィルタはリセットされます\n"
 "- 現在の楽曲をプレイリストから除くと他の曲にスキップします"
 
+#: gmusicbrowser.pl:9096
+msgid "0 chance"
+msgstr ""
+
+#: plugins/artistinfo.pm:295
+msgid "0 means 'show all'"
+msgstr ""
+
+#: gmusicbrowser.pl:9094
+#, perl-brace-format
+msgid "1 chance in {probability}"
+msgstr ""
+
+#: layouts/browser.layout:34
 msgid "3 Filter panes"
 msgstr "3 フィルタペイン"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "32x32 PNG file icon"
 msgstr "32x32 PNG ファイルアイコン"
 
+#: gmusicbrowser.pl:2366
 msgid "50 Last Added"
 msgstr "最近追加された50アイテム"
 
+#: gmusicbrowser.pl:2365
 msgid "50 Last Played"
 msgstr "最近再生された50アイテム"
 
+#: gmusicbrowser.pl:2364
 msgid "50 Most Played"
 msgstr "最も再生された50アイテム"
 
+#: gmusicbrowser_songs.pm:284 gmusicbrowser_songs.pm:304
+#: gmusicbrowser_songs.pm:305
 msgid "<Unknown>"
 msgstr "<不明>"
 
+#: gmusicbrowser.pl:620
+#, perl-format
+msgid ""
+"<b>%t</b>\n"
+"<small><small>by</small> %a\n"
+"<small>from</small> %l</small>"
+msgstr ""
+
+#: layouts/contrib.layout:209
+#, perl-format
+msgid "<big><big>by %a</big></big>"
+msgstr ""
+
+#: gmusicbrowser_list.pm:725 plugins/notify.pm:22
+#, perl-format
+msgid "<i>by</i> %a\\n<i>from</i> %l"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:5386
 msgid "Abort"
 msgstr "中止"
 
+#: gmusicbrowser_gstreamer-1.x.pm:807
 msgid "Abort ReplayGain analysis"
 msgstr "リプレイゲインの分析中止"
 
+#: gmusicbrowser_songs.pm:2164
+msgid "Abort mass-tagging"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:57 layouts/makeitlooklike.layout:69
+#: layouts/makeitlooklike.layout:275 layouts/makeitlooklike.layout:472
+msgid "About"
+msgstr ""
+
+#: gmusicbrowser.pl:5378 gmusicbrowser_layout.pm:4407
 #, perl-brace-format
 msgid ""
 "About to delete {files}\n"
@@ -84,91 +280,130 @@ msgstr ""
 " {files} の削除\n"
 "よろしいですか?"
 
+#: gmusicbrowser.pl:2041
+msgid "About to turn off the computer in :"
+msgstr ""
+
+#: gmusicbrowser.pl:1655
+msgid "Action"
+msgstr ""
+
+#: plugins/notify.pm:64
 msgid "Actions are not supported by current notification daemon"
 msgstr "現在の通知デーモンではこの操作はサポートされていません"
 
+#: gmusicbrowser.pl:8330 gmusicbrowser.pl:8616 gmusicbrowser.pl:8834
+#: gmusicbrowser_tags.pm:1359 plugins/desktopwidget.pm:36
 msgid "Add"
 msgstr "追加"
 
+#: layouts/makeitlooklike.layout:437
 msgid "Add Files ..."
 msgstr "ファイルの追加 ..."
 
+#: layouts/contrib.layout:320 layouts/contrib.layout:588
+#: layouts/contrib.layout:734 layouts/shimmer.layout:24
+#: layouts/shimmer.layout:72
 msgid "Add Music"
 msgstr "楽曲の追加"
 
+#: plugins/rip.pm:11
 msgid "Add a button to rip a CD"
 msgstr "CDリッピングを行うボタンの追加"
 
+#: layouts/contrib.layout:667 layouts/contrib.layout:668
+#: layouts/contrib.layout:669
 msgid "Add a filter"
 msgstr "フィルタの追加"
 
+#: gmusicbrowser.pl:6943
 msgid "Add a fullscreen button"
 msgstr "フルスクリーンボタンの追加"
 
+#: gmusicbrowser.pl:6943
 msgid "Add a fullscreen button to layouts that can accept extra buttons"
 msgstr "レイアウトにフルスクリーンボタンを追加(ボタンを追加できる場合のみ)"
 
+#: gmusicbrowser_list.pm:7709
 msgid "Add a group"
 msgstr "グループの追加"
 
+#: gmusicbrowser.pl:1695
 msgid "Add a label to the current song"
 msgstr "現在の楽曲にラベルを追加"
 
+#: gmusicbrowser.pl:1688
 msgid "Add a list of files/folders to the playlist"
 msgstr "プレイリストにファイル/フォルダのリストを追加"
 
-msgid "Add a radio"
-msgstr "ラジオを追加"
-
+#: gmusicbrowser_layout.pm:52
 msgid "Add files or folders"
 msgstr "ファイル/フォルダの追加"
 
+#: gmusicbrowser.pl:1691
 msgid "Add files/folders to library"
 msgstr "ライブラリにファイル/フォルダを追加"
 
+#: gmusicbrowser.pl:7167
 msgid "Add folder"
 msgstr "フォルダを追加"
 
+#: layouts/contrib.layout:261 layouts/contrib.layout:417
+#: layouts/makeitlooklike.layout:47 layouts/makeitlooklike.layout:230
+#: layouts/makeitlooklike.layout:344
 msgid "Add folder ..."
 msgstr "フォルダを追加 ..."
 
-msgid "Add new label"
-msgstr "新規ラベルの追加"
+#: gmusicbrowser.pl:8331
+msgid "Add multiple condition"
+msgstr ""
 
-msgid "Add new radio"
-msgstr "新規ラジオの追加"
+#: gmusicbrowser.pl:5702
+msgid "Add new"
+msgstr ""
 
+#: gmusicbrowser_tags.pm:1574
+msgid "Add picture"
+msgstr ""
+
+#: gmusicbrowser.pl:8836
 msgid "Add rule : "
 msgstr "ルールを追加 ："
 
+#: gmusicbrowser.pl:6483
 msgid "Add shorcut key"
 msgstr "ショートカットキーの追加"
 
+#: gmusicbrowser_list.pm:1973
 msgid "Add tab"
 msgstr "タブの追加"
 
+#: plugins/albuminfo.pm:106
 msgid "Add to existing values"
 msgstr "既知の値に追加"
 
+#: gmusicbrowser.pl:680
 msgid "Add to list"
 msgstr "リストへ追加"
 
+#: layouts/makeitlooklike.layout:236
 msgid "Add to queue"
 msgstr "キューへ追加"
 
+#: plugins/albuminfo.pm:452
 #, perl-brace-format
 msgid "Add {value} to {field} for all tracks on this album."
 msgstr "本アルバムの全トラックへ {field} に{value} を追加"
 
+#: gmusicbrowser_songs.pm:1219
 msgid "Added"
 msgstr "追加済"
 
+#: gmusicbrowser.pl:2368
 msgid "Added Today"
 msgstr "本日追加済"
 
-msgid "Adding a radio"
-msgstr "ラジオ追加中"
-
+#: gmusicbrowser.pl:6869
 msgid ""
 "Additionally this format can be used :\n"
 " default number1 format1 number2 format2 ...\n"
@@ -178,6 +413,7 @@ msgstr ""
 " デフォルト ナンバー1 書式1 ナンバー2 書式2 ...\n"
 " ナンバー1より新しい 秒数は 書式1に記載する、 ..."
 
+#: plugins/fetch_cover.pm:11
 msgid ""
 "Adds a menu entry to artist/album context menu, allowing to search the "
 "picture/cover in google and save it."
@@ -185,277 +421,492 @@ msgstr ""
 "googleで画像/カバーを検索し保存できるよう、アーティスト/アルバムコンテキスト"
 "メニューにエントリを追加"
 
+#: gmusicbrowser_layout.pm:1665
 msgid "Adds labels to the current song"
 msgstr "現在の楽曲にラベルを追加"
 
+#: plugins/export.pm:11
 msgid "Adds menu entries to song contextual menu"
 msgstr "楽曲コンテキストメニューにメニューエントリを追加"
 
+#: gmusicbrowser.pl:5813
+msgid "Advanced"
+msgstr ""
+
+#: gmusicbrowser_list.pm:3734
 msgid "Advanced Search ..."
 msgstr "高度検索 ..."
 
+#: gmusicbrowser.pl:5813 gmusicbrowser.pl:5852
 msgid "Advanced Tag Editing"
 msgstr "高度なタグ編集"
 
+#: gmusicbrowser.pl:1288 gmusicbrowser_songs.pm:978 gmusicbrowser_tags.pm:1866
+#: gmusicbrowser_tags.pm:1904 gmusicbrowser_tags.pm:1919
+#: gmusicbrowser_tags.pm:1937 gmusicbrowser_tags.pm:1944
+#: gmusicbrowser_tags.pm:2190 plugins/albuminfo.pm:62
+#: plugins/fetch_cover.pm:103 layouts/desktop.layout:50 layouts/main.layout:96
+#: layouts/makeitlooklike.layout:94 layouts/makeitlooklike.layout:316
+#: layouts/pages.layout:15 layouts/search.layout:6 layouts/shimmer.layout:32
 msgid "Album"
 msgstr "アルバム"
 
+#: layouts/songtree.layout:99
 msgid "Album and artist"
 msgstr "アルバムとアーティスト"
 
+#: layouts/songtree.layout:28
 msgid "Album and artist on the left side"
 msgstr "左側のアルバムとアーティスト"
 
+#: gmusicbrowser_songs.pm:1019 gmusicbrowser_tags.pm:1865
+#: gmusicbrowser_tags.pm:1954
 msgid "Album artist"
 msgstr "アルバムアーティスト"
 
+#: gmusicbrowser_songs.pm:1028
 msgid "Album artist or artist"
 msgstr "アルバムアーティストもしくはアーティスト"
 
+#: plugins/albuminfo.pm:80
+msgid "Album cover"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1462
 msgid "Album gain"
 msgstr "アルバムゲイン"
 
+#: gmusicbrowser_songs.pm:1039
+msgid "Album has picture"
+msgstr ""
+
+#: gmusicbrowser.pl:6808
 msgid "Album mode"
 msgstr "アルバムモード"
 
+#: gmusicbrowser_songs.pm:1476
 msgid "Album peak"
 msgstr "アルバムピーク"
 
+#: gmusicbrowser_list.pm:810 gmusicbrowser_songs.pm:1002
 msgid "Album picture"
 msgstr "アルバム画像"
 
+#: gmusicbrowser_list.pm:838
 msgid "Album picture & info"
 msgstr "アルバム画像 & 情報"
 
+#: gmusicbrowser_layout.pm:497
 msgid "Album pictures"
 msgstr "アルバム画像"
 
+#: plugins/artistinfo.pm:465
 msgid "Album playcount:"
 msgstr "アルバム再生数:"
 
+#: gmusicbrowser_songs.pm:1527
 msgid "Album shuffle"
 msgstr "アルバムシャッフル"
 
+#: gmusicbrowser.pl:1287
 msgid "Album with picture"
 msgstr "画像ありアルバム"
 
+#: gmusicbrowser_songs.pm:1497
 msgid "Album year(s)"
 msgstr "アルバム年"
 
+#: layouts/shimmer.layout:92
 #, perl-format
 msgid "Album: %l"
 msgstr "アルバム: %l"
 
+#: layouts/contrib.layout:292 layouts/shimmer.layout:16
+#: layouts/shimmer.layout:66 layouts/shimmer.layout:112
 #, perl-format
 msgid "Album: %l (%Y)"
 msgstr "アルバム: %l (%Y)"
 
+#: plugins/albuminfo.pm:9 plugins/albuminfo.pm:55
 msgid "Albuminfo"
 msgstr "アルバム情報"
 
+#: plugins/albuminfo.pm:10
 msgid "Albuminfo plugin"
 msgstr "アルバム情報プラグイン"
 
+#: layouts/contrib.layout:353 layouts/contrib.layout:594
 msgid "Albums"
 msgstr "アルバム"
 
+#: gmusicbrowser_songs.pm:2651 gmusicbrowser_songs.pm:5255
+#: layouts/makeitlooklike.layout:314
 msgid "All"
 msgstr "すべて"
 
+#: gmusicbrowser_songs.pm:5244
 msgid "All Songs"
 msgstr "全楽曲"
 
+#: gmusicbrowser_songs.pm:981
 msgid "All albums"
 msgstr "全アルバム"
 
+#: gmusicbrowser_songs.pm:950 gmusicbrowser_songs.pm:972
 msgid "All artists"
 msgstr "全アーティスト"
 
+#: gmusicbrowser.pl:5161 gmusicbrowser.pl:7262
 msgid "All files"
 msgstr "全ファイル"
 
+#: gmusicbrowser_songs.pm:1124
 msgid "All genres"
 msgstr "全ジャンル"
 
+#: gmusicbrowser_songs.pm:1139
 msgid "All labels"
 msgstr "前ラベル"
 
+#: gmusicbrowser_songs.pm:1157
 msgid "All moods"
 msgstr "全モード"
 
+#: gmusicbrowser.pl:8469 gmusicbrowser.pl:8566 gmusicbrowser_songs.pm:5260
 msgid "All of :"
 msgstr "すべて:"
 
+#: gmusicbrowser.pl:10089 gmusicbrowser_layout.pm:1591
+#: gmusicbrowser_songs.pm:4548
 msgid "All songs"
 msgstr "全楽曲"
 
+#: gmusicbrowser_songs.pm:1167
 msgid "All styles"
 msgstr "全スタイル"
 
+#: gmusicbrowser_songs.pm:1178
 msgid "All themes"
 msgstr "全テーマ"
 
+#: plugins/albuminfo.pm:100
+msgid ""
+"Allmusic uses both Genres and Styles to describe albums. If you use only "
+"Genres, you may want to include Styles in allmusic's list of Genres."
+msgstr ""
+
+#: plugins/lullaby.pm:11
 msgid "Allow for scheduling fade-out and stop"
 msgstr "フェードアウトと停止のスケジューリングを許可"
 
+#: plugins/mpris1.pm:11
 msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v1.0 standard"
 msgstr "MPRIS v1.0 standardを用いた gmusicbrowser の DBus経由での制御を許可 "
 
+#: plugins/mpris2.pm:11
 msgid "Allows controlling gmusicbrowser via DBus using the MPRIS v2.0 standard"
 msgstr "MPRIS v2.0 standardを用いた gmusicbrowser の DBus経由での制御を許可"
 
+#. Alt key
+#: gmusicbrowser.pl:1337
+msgctxt "Keyboard"
+msgid "Alt"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1753
+msgid "Always"
+msgstr ""
+
+#: gmusicbrowser.pl:6883
 msgid "Amount of volume changed by the mouse wheel"
 msgstr "マウスホイールで変更されたボリューム量"
 
+#: gmusicbrowser.pl:6743
+msgid ""
+"Analyse and add replaygain tags for all songs that don't have replaygain "
+"tags, or incoherent album replaygain tags"
+msgstr ""
+
+#: gmusicbrowser.pl:8469 gmusicbrowser.pl:8567 gmusicbrowser_songs.pm:5260
+msgid "Any of :"
+msgstr ""
+
+#: plugins/appindicator.pm:11
+msgid "App Indicator plugin"
+msgstr ""
+
+#: plugins/appindicator.pm:10
+msgid "App indicator"
+msgstr ""
+
+#: gmusicbrowser.pl:663
 msgid "Append"
 msgstr "追加"
 
+#: gmusicbrowser_tags.pm:1030
 msgid "Append (only if not already present)"
 msgstr "追加 (存在しない場合のみ)"
 
+#: gmusicbrowser.pl:674 gmusicbrowser_list.pm:1708
 msgid "Append to playlist"
 msgstr "プレイリストに追加"
 
+#: gmusicbrowser_tags.pm:2403 gmusicbrowser_tags.pm:2408
 msgid "Application"
 msgstr "アプリケーション"
 
-#, perl-brace-format
-msgid "Are you sure you want to delete the '{label}' label ?"
-msgstr "本当に '{label}' ラベルを削除しますか?"
+#: gmusicbrowser.pl:7305
+msgid "Are you sure you want to remove it ?"
+msgstr ""
 
+#: gmusicbrowser.pl:6523
 msgid "Arguments"
 msgstr "引数"
 
+#: gmusicbrowser_songs.pm:946 gmusicbrowser_tags.pm:1864
+#: gmusicbrowser_tags.pm:1903 gmusicbrowser_tags.pm:1918
+#: gmusicbrowser_tags.pm:1938 gmusicbrowser_tags.pm:1943
+#: gmusicbrowser_tags.pm:2190 plugins/albuminfo.pm:63 plugins/artistinfo.pm:159
+#: plugins/fetch_cover.pm:102 layouts/desktop.layout:49 layouts/main.layout:96
+#: layouts/makeitlooklike.layout:81 layouts/makeitlooklike.layout:315
+#: layouts/pages.layout:22 layouts/search.layout:6 layouts/shimmer.layout:31
 msgid "Artist"
 msgstr "アーティスト"
 
+#: gmusicbrowser.pl:1286
 msgid "Artist & album"
 msgstr "アーティスト & アルバム"
 
+#: layouts/makeitlooklike.layout:154
 msgid "Artist (Year - Album)"
 msgstr "アーティスト(年 - アルバム)"
 
+#: plugins/artistinfo.pm:538
 msgid "Artist Biography"
 msgstr "アーティストのバイオグラフィー"
 
+#: gmusicbrowser_tags.pm:1877
 msgid "Artist URL"
 msgstr "アーティスト URL"
 
+#: gmusicbrowser_songs.pm:1043
+msgid "Artist has picture"
+msgstr ""
+
+#: gmusicbrowser_list.pm:818 gmusicbrowser_songs.pm:1011
 msgid "Artist picture"
 msgstr "アーティストの画像"
 
+#: plugins/artistinfo.pm:283
+#, perl-format
+msgid "Artist picture size : %d"
+msgstr ""
+
+#: plugins/artistinfo.pm:464
 msgid "Artist playcount:"
 msgstr "アーティスト再生回数:"
 
+#: gmusicbrowser.pl:1304
 msgid "Artist,Album,Disc,Track"
 msgstr "アーティスト,楽曲,ディスク,トラック"
 
+#: gmusicbrowser.pl:1305
 msgid "Artist,Date,Album,Disc,Track"
 msgstr "アーティスト,データ,アルバム,ディスク,トラック"
 
+#: layouts/contrib.layout:294 layouts/shimmer.layout:16
+#: layouts/shimmer.layout:66 layouts/shimmer.layout:91
+#: layouts/shimmer.layout:114
 #, perl-format
 msgid "Artist: %a"
 msgstr "アーティスト: %a"
 
+#: plugins/artistinfo.pm:9 plugins/artistinfo.pm:84
 msgid "Artistinfo"
 msgstr "アーティスト情報"
 
+#: plugins/artistinfo.pm:10
 msgid "Artistinfo plugin"
 msgstr "アーティスト情報プラグイン"
 
+#: gmusicbrowser_songs.pm:971 layouts/contrib.layout:303
+#: layouts/contrib.layout:339 layouts/contrib.layout:537
 msgid "Artists"
 msgstr "アーティスト"
 
+#: gmusicbrowser.pl:8677
 msgid "Ascending order"
 msgstr "昇順"
 
+#: plugins/fetch_cover.pm:75
 msgid "Ask confirmation only if file already exists"
 msgstr "ファイルが既に存在する場合のみ確認を求める"
 
+#: gmusicbrowser.pl:6360
 msgid "Audio"
 msgstr "オーディオ"
 
+#: gmusicbrowser_songs.pm:1346
+msgid "Audio bitrate"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1369
+msgid "Audio format"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:31
 msgid "Audio properties"
 msgstr "オーディオプロパティ"
 
+#: gmusicbrowser_tags.pm:1936 gmusicbrowser_tags.pm:1948
+msgid "Author"
+msgstr ""
+
+#: plugins/lyrics.pm:96
 msgid "Auto"
 msgstr "自動選択"
 
+#: gmusicbrowser_tags.pm:661
 msgid "Auto fill based on filenames ..."
 msgstr "ファイル名に基づき自動記載"
 
+#: gmusicbrowser_tags.pm:560
 msgid "Auto fill only blank fields"
 msgstr "空フィールドのみ自動記載"
 
+#: gmusicbrowser_layout.pm:34
+msgid "Auto fill up to"
+msgstr ""
+
+#: gmusicbrowser_list.pm:3620
 msgid "Auto filter"
 msgstr "オートフィルタ"
 
+#: gmusicbrowser.pl:596
 msgid "Auto-fill queue"
 msgstr "キューを自動記載"
 
+#: plugins/artistinfo.pm:54
 msgid "Auto-fill queue with similar artists (from last.fm)"
 msgstr "類似アーティスト(last.fmからの)でキューを自動記載"
 
+#: gmusicbrowser_tags.pm:601
 msgid "Auto-increment track numbers"
 msgstr "トラック番号の自動増加"
 
+#: plugins/albuminfo.pm:107
 msgid "Auto-save fields with data from allmusic"
 msgstr "Allmusicからのデータでフィールドを自動保存"
 
+#: plugins/albuminfo.pm:96 plugins/artistinfo.pm:281 plugins/lyrics.pm:217
+msgid "Auto-save positive finds"
+msgstr ""
+
+#: plugins/lyrics.pm:183
 msgid "Auto-scroll"
 msgstr "自動スクロール"
 
+#: gmusicbrowser_list.pm:1734
+msgid "Auto-select Pictures"
+msgstr ""
+
+#: gmusicbrowser.pl:7207
 msgid "Automatically remove current song if not found"
 msgstr "見つからない場合自動的に現在の楽曲を削除する"
 
+#: plugins/autosave.pm:9
 msgid "Autosave"
 msgstr "自動保存"
 
+#: plugins/autosave.pm:10
 msgid "Autosave plugin"
 msgstr "自動保存プラグイン"
 
+#: gmusicbrowser.pl:8631
+msgid "Available"
+msgstr ""
+
+#: plugins/albuminfo.pm:592 plugins/artistinfo.pm:462
 msgid "Average rating:"
 msgstr "平均レーティング:"
 
+#: gmusicbrowser_songs.pm:1330
+msgid "BPM"
+msgstr ""
+
+#: plugins/audioscrobbler.pm:209
+msgid "Bad session"
+msgstr ""
+
+#: gmusicbrowser.pl:5540
 msgid "Base Folder :"
 msgstr "ベースフォルダ :"
 
+#: gmusicbrowser_songs.pm:33
+msgid "Basic fields"
+msgstr ""
+
+#: gmusicbrowser_list.pm:5373
+msgid "Begin with"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1662
+msgid "Below"
+msgstr ""
+
+#: plugins/artistinfo.pm:31 plugins/artistinfo.pm:303
 msgid "Biography"
 msgstr "バイオグラフィ"
 
-msgid "Bitrate"
-msgstr "ビットレート"
-
+#: plugins/notify.pm:59
 msgid "Body :"
 msgstr "ボディ :"
 
+#: plugins/notify.pm:66
 msgid "Body text is not supported by current notification daemon"
 msgstr "ボディテキストは現在の通知デーモンではサポートされていません"
 
+#: layouts/browser.layout:3
 msgid "Browser"
 msgstr "ブラウザ"
 
+#: layouts/makeitlooklike.layout:257
 msgid "Browser views"
 msgstr "ブラウザビュー"
 
+#: gmusicbrowser.pl:6930
 msgid "Browser window layout :"
 msgstr "ブラウザウィンドウレイアウト :"
 
+#: layouts/browser.layout:30
 msgid "Browser with SongTree"
 msgstr "SongTreeのブラウザ"
 
+#: layouts/desktop.layout:27
 msgid "Buttons"
 msgstr "ボタン"
 
+#: layouts/desktop.layout:16
 msgid "Buttons, Song & Cover"
 msgstr "ボタン, 楽曲 & カバー"
 
+#: gmusicbrowser.pl:1684
 msgid "Can be relative by using + or -"
 msgstr "+ もしくは - を用いて相対パスを指定できます"
 
+#: gmusicbrowser_songs.pm:3287
+msgid "Can be searched with :"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:3286
+msgid "Can be used as a variable with :"
+msgstr ""
+
+#: gmusicbrowser_server.pm:72
 msgid "Can't change the volume in non-gstreamer iceserver mode"
 msgstr "gstreamer未使用での iceserverモードではボリュームを変更できません"
 
+#: gmusicbrowser_123.pm:359
 msgid ""
 "Can't change the volume. Needs amixer (packaged in alsa-utils) to change "
 "volume when using this audio backend."
@@ -463,155 +914,253 @@ msgstr ""
 "ボリュームを変更できません。このオーディオバックエンドを使用している場合、"
 "amixer(alsa-utilsにパッケージング)が必要です。"
 
+#: gmusicbrowser.pl:4976
+#, perl-brace-format
+msgid "Can't create folder: {path}"
+msgstr ""
+
+#: gmusicbrowser_gstreamer-1.x.pm:204
 #, perl-brace-format
 msgid "Can't create sink '{sink}'"
 msgstr "シンク '{sink}' を作成できません"
 
+#: gmusicbrowser_123.pm:144
+msgid "Can't play this file."
+msgstr ""
+
+#: gmusicbrowser.pl:5858
 msgid "Can't read file or invalid file"
 msgstr "ファイルを読込できないか無効なファイルです。"
 
+#: gmusicbrowser.pl:5576
 #, perl-brace-format
 msgid "Can't write in base folder '{folder}'."
 msgstr "ベースフォルダ '{folder}' を書き込みできません。"
 
+#: gmusicbrowser_songs.pm:3303
+msgid "Cancel"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:359
 msgid "Capitalize"
 msgstr "大文字に変換"
 
+#: gmusicbrowser_tags.pm:360
 msgid "Capitalize each word"
 msgstr "各文字列を大文字化する"
 
+#: gmusicbrowser.pl:8673
 msgid "Case insensitive"
 msgstr "大文字小文字を区別しない"
 
+#: gmusicbrowser.pl:8673 gmusicbrowser.pl:9281 gmusicbrowser_list.pm:3615
 msgid "Case sensitive"
 msgstr "大文字小文字を区別する"
 
+#: gmusicbrowser_list.pm:5372
 msgid "Case-sensitive"
 msgstr "大文字小文字を区別する"
 
+#: layouts/makeitlooklike.layout:507
 msgid "Categories pane"
 msgstr "Categories pane"
 
+#: plugins/lyrics.pm:30
+msgid "Centered"
+msgstr ""
+
+#: plugins/desktopwidget.pm:202
+msgid "Centered on"
+msgstr ""
+
+#: gmusicbrowser.pl:1647
 msgid "Change Display"
 msgstr "デイスプレイの変更"
 
+#: plugins/titlebar.pm:60
 msgid "Change default text color"
 msgstr "既定のテキスト色を変更"
 
+#: plugins/titlebar.pm:64
 msgid "Change default text font and size"
 msgstr "既定のテキストフォントとサイズを変更"
 
+#: layouts/makeitlooklike.layout:281
 msgid "Change the context visibility"
 msgstr "コンテキストの可視性を変更する"
 
+#: gmusicbrowser_songs.pm:1337
 msgid "Channels"
 msgstr "チャンネル"
 
+#: layouts/contrib.layout:322 layouts/contrib.layout:590
+#: layouts/contrib.layout:736
 msgid "Check Collection"
 msgstr "コレクションのチェック"
 
+#: gmusicbrowser.pl:7195
 msgid "Check for updated/deleted songs on startup"
 msgstr "起動時にアップロード/削除された楽曲をチェック"
 
+#: gmusicbrowser_list.pm:1728
 msgid "Check for updated/removed songs"
 msgstr "アップロード/削除された楽曲をチェック"
 
+#: gmusicbrowser.pl:7209
 msgid "Check real length of mp3"
 msgstr "mp3の実際の長さをチェック"
 
+#: gmusicbrowser_123.pm:186 gmusicbrowser_mplayer.pm:116
+#: gmusicbrowser_mpv.pm:221
+msgid "Check your audio settings"
+msgstr ""
+
+#: gmusicbrowser.pl:1205
 msgid "Checking length/bitrate"
 msgstr "長さ/ビットレートのチェック中"
 
+#: gmusicbrowser.pl:1203
 msgid "Checking songs"
 msgstr "楽曲のチェック中"
 
+#: gmusicbrowser_list.pm:3415
 msgid "Choose Album From this Artist"
 msgstr "このアーティストのアルバムを選択"
 
+#: gmusicbrowser_layout.pm:615
 msgid "Choose Artist/Album/Song"
 msgstr "アーティスト/アルバム/楽曲を選択"
 
+#: gmusicbrowser.pl:5151
 msgid "Choose Picture"
 msgstr "画像を選択"
 
+#: gmusicbrowser_layout.pm:621
 msgid "Choose Random Album"
 msgstr "アルバムをランダムに選択"
 
+#: gmusicbrowser.pl:9414
 msgid "Choose a folder"
 msgstr "フォルダを選択"
 
+#: gmusicbrowser.pl:4987
 msgid "Choose directory to copy files to"
 msgstr "ファイルをコピーするディレクトリを選択"
 
+#: gmusicbrowser.pl:4988
 msgid "Choose directory to move files to"
 msgstr "ファイルを移動するディレクトリを選択"
 
+#: gmusicbrowser.pl:5122
 msgid "Choose files"
 msgstr "ファイルを選択"
 
+#: gmusicbrowser.pl:7264
 msgid "Choose folder to add"
 msgstr "追加するフォルダを選択"
 
+#: plugins/lyrics.pm:284
 msgid "Choose font for lyrics"
 msgstr "歌詞のフォントを選択"
 
+#: plugins/lyrics.pm:42
 msgid "Choose font..."
 msgstr "フォントを選択..."
 
+#: gmusicbrowser_songs.pm:1143
 #, perl-brace-format
 msgid "Choose icon for label {name}"
 msgstr "ラベル {name} のアイコンを選択"
 
+#: gmusicbrowser_layout.pm:2769
 msgid "Choose page to open"
 msgstr "開くページを選択"
 
+#: gmusicbrowser.pl:3964
 #, perl-format
 msgid "Choose picture for '%s'"
 msgstr " '%s' 向けの画像を選択"
 
+#: gmusicbrowser.pl:6020
 msgid "Choose playlist files to import"
 msgstr "インポートするプレイリストファイルを選択"
 
+#: gmusicbrowser.pl:8618 gmusicbrowser_list.pm:291
 msgid "Clear"
 msgstr "クリア"
 
+#: gmusicbrowser.pl:1657
+msgid "Clear playlist"
+msgstr ""
+
+#: gmusicbrowser.pl:1699
 msgid "Clear playlist filter"
 msgstr "プレイリストフィルタのクリア"
 
+#: gmusicbrowser.pl:1656 gmusicbrowser_layout.pm:32
 msgid "Clear queue"
 msgstr "キューのクリア"
 
+#: gmusicbrowser_tags.pm:533
 msgid "Clear selected fields"
 msgstr "選択済フィールドのクリア"
 
+#: plugins/artistinfo.pm:137
 msgid "Click to show fullsize image"
 msgstr "クリックしてフルサイズ画像を表示"
 
+#: plugins/albuminfo.pm:182
+msgid "Click to show larger image"
+msgstr ""
+
+#: plugins/audioscrobbler.pm:146
 msgid "Client banned, contact gmusicbrowser's developer"
 msgstr ""
 "クライアントが不正終了しました。gmusicbrowserの開発者に連絡してください。"
 
+#: gmusicbrowser_layout.pm:2497 gmusicbrowser_list.pm:4108
+#: gmusicbrowser_list.pm:4172
 msgid "Close"
 msgstr "閉じる"
 
+#: gmusicbrowser.pl:1637
 msgid "Close Window"
 msgstr "ウィンドウを閉じる"
 
+#: layouts/contrib.layout:664 layouts/contrib.layout:665
+#: layouts/contrib.layout:666
 msgid "Close a filter"
 msgstr "フィルターを閉じる"
 
+#: gmusicbrowser.pl:6916
 msgid "Close to tray"
 msgstr "トレーに閉じる"
 
+#: layouts/makeitlooklike.layout:80
 msgid "Collection"
 msgstr "コレクション"
 
+#: gmusicbrowser.pl:6406 gmusicbrowser.pl:6522 gmusicbrowser_123.pm:287
 msgid "Command"
 msgstr "コマンド"
 
+#: plugins/rip.pm:49
 msgid "Command to launch when the button is pressed"
 msgstr "ボタンが押された時に起動するコマンド"
 
+#: gmusicbrowser.pl:6893
+msgid "Command to open folders :"
+msgstr ""
+
+#: gmusicbrowser.pl:6892
+msgid "Command to open urls :"
+msgstr ""
+
+#: gmusicbrowser_123.pm:191 gmusicbrowser_mplayer.pm:107
+msgid "Command used :"
+msgstr ""
+
+#: gmusicbrowser.pl:6847
 msgid ""
 "Command used when\n"
 "'turn off computer when queue empty'\n"
@@ -620,331 +1169,605 @@ msgstr ""
 "'キューが空の時PCをシャットダウン'\n"
 "が選択された際に利用されるコマンド"
 
+#: gmusicbrowser_mpv.pm:214
+msgid "Command used:"
+msgstr ""
+
+#: plugins/nowplaying.pm:47
 msgid "Command when playing song changed :"
 msgstr "演奏中の楽曲が変更した際のコマンド :"
 
+#: plugins/nowplaying.pm:48
 msgid "Command when stopped :"
 msgstr "演奏停止時のコマンド :"
 
+#: gmusicbrowser_songs.pm:1187 gmusicbrowser_tags.pm:1926
+#: gmusicbrowser_tags.pm:1946 gmusicbrowser_tags.pm:2190
 msgid "Comment"
 msgstr "コメント"
 
+#: gmusicbrowser_tags.pm:1870 gmusicbrowser_tags.pm:1908
 msgid "Comments"
 msgstr "コメント"
 
+#: gmusicbrowser_songs.pm:1060 gmusicbrowser_tags.pm:1898
+#: gmusicbrowser_tags.pm:1956
 msgid "Compilation"
 msgstr "コンピレーション"
 
+#: gmusicbrowser_songs.pm:1281 gmusicbrowser_tags.pm:1886
+#: gmusicbrowser_tags.pm:1925
 msgid "Composer"
 msgstr "作曲者"
 
+#: gmusicbrowser_songs.pm:1304 gmusicbrowser_tags.pm:1922
 msgid "Conductor"
 msgstr "指揮者"
 
+#: gmusicbrowser.pl:6837
 msgid "Connect through a proxy"
 msgstr "プロキシ経由で接続"
 
+#: gmusicbrowser_layout.pm:654
 msgid "Connections from :"
 msgstr "接続元 :"
 
+#: gmusicbrowser_songs.pm:1388
+msgid "Container format"
+msgstr ""
+
+#: layouts/contrib.layout:305 layouts/contrib.layout:573 layouts/main.layout:22
+#: layouts/main.layout:192
 msgid "Context"
 msgstr "コンテキスト"
 
+#: gmusicbrowser.pl:2595
+msgid "Continue anyway"
+msgstr ""
+
+#: layouts/makeitlooklike.layout:265 layouts/makeitlooklike.layout:358
 msgid "Control"
 msgstr "コントロール"
 
+#: layouts/contrib.layout:56
 msgid "Conz Aishi (with Filter Panes)"
 msgstr "Conz Aishi (+フィルタペイン)"
 
+#: layouts/contrib.layout:29
 msgid "Conz Glimm (different controls)"
 msgstr "Conz Glimm (他のコントロール)"
 
+#: gmusicbrowser.pl:697
 msgid "Copy"
 msgstr "コピー"
 
+#: gmusicbrowser.pl:4998 gmusicbrowser.pl:10269
 msgid "Copy failed"
 msgstr "コピーに失敗"
 
+#: plugins/lyrics.pm:382
 msgid "Copy link address"
 msgstr "リンクアドレスのコピー"
 
+#: gmusicbrowser_tags.pm:601
+msgid "Copy missing values from previous line"
+msgstr ""
+
+#: plugins/export.pm:88
 msgid "Copy to mounted portable player"
 msgstr "マウント済携帯プレーヤへコピー"
 
+#: plugins/export.pm:24 plugins/export.pm:49
 msgid "Copy to portable player"
 msgstr "携帯プレーヤへコピー"
 
+#: gmusicbrowser.pl:10264
+msgid "Copying"
+msgstr ""
+
+#: gmusicbrowser.pl:5000
+#, perl-format
+msgid "Copying file"
+msgid_plural "Copying %d files"
+msgstr[0] ""
+
+#: gmusicbrowser_tags.pm:1884 gmusicbrowser_tags.pm:1927
 msgid "Copyright"
 msgstr "コピーライト"
 
+#: plugins/albuminfo.pm:81
 msgid "Cover Size : "
 msgstr "カバーサイズ :"
 
+#: gmusicbrowser.pl:6967
 msgid "Create ID3v2 tags as ID3v2.4"
 msgstr "ID3v2タグをID3v2.4で作成"
 
+#. Ctrl key
+#: gmusicbrowser.pl:1336
+msgctxt "Keyboard"
+msgid "Ctrl"
+msgstr ""
+
+#: gmusicbrowser.pl:6884
 msgid "Current song must always be in the playlist"
 msgstr "現在の楽曲は常にプレイリストにある"
 
+#: gmusicbrowser_songs.pm:37 gmusicbrowser_tags.pm:1951
 msgid "Custom"
 msgstr "カスタム"
 
+#: gmusicbrowser_tags.pm:1876
 msgid "Custom Text"
 msgstr "カスタムテキスト"
 
+#: gmusicbrowser_tags.pm:1878
 msgid "Custom URL"
 msgstr "カスタムURL"
 
+#: gmusicbrowser_songs.pm:3207
+msgid "Custom aliases"
+msgstr ""
+
+#: plugins/rip.pm:49
 msgid "Custom command :"
 msgstr "カスタムコマンド :"
 
+#: plugins/webcontext.pm:493
 msgid "Custom context pages :"
 msgstr "カスタムコンテキストページ :"
 
+#: gmusicbrowser_tags.pm:804
 msgid "Custom formats"
 msgstr "カスタムフォーマット"
 
+#: gmusicbrowser_gstreamer-1.x.pm:507
 msgid "Custom pipeline"
 msgstr "カスタムパイプライン"
 
+#: gmusicbrowser_layout.pm:1549 gmusicbrowser_layout.pm:1576
+#: gmusicbrowser_layout.pm:1605 gmusicbrowser_list.pm:93
 msgid "Custom..."
 msgstr "カスタム..."
 
+#: gmusicbrowser.pl:1301 gmusicbrowser_tags.pm:1869 gmusicbrowser_tags.pm:1907
 msgid "Date"
 msgstr "日付"
 
+#: gmusicbrowser.pl:6870
 msgid "Date format :"
 msgstr "日付書式 :"
 
+#: gmusicbrowser_tags.pm:2393
 msgid "Date of purchase"
 msgstr "購入日付"
 
+#: gmusicbrowser_tags.pm:1930
 msgid "Debut Album"
 msgstr "デビューアルバム"
 
+#: gmusicbrowser.pl:1659
 msgid "Decrease Volume"
 msgstr "音量を下げる"
 
+#: layouts/makeitlooklike.layout:272 layouts/makeitlooklike.layout:365
 msgid "Decrease volume"
 msgstr "音量を下げる"
 
+#: gmusicbrowser.pl:1393 gmusicbrowser_songs.pm:659
 msgid "Default"
 msgstr "既定"
 
+#: layouts/fullscreen.layout:4
 msgid "Default fullscreen"
 msgstr "既定のフルスクリーン"
 
+#: gmusicbrowser.pl:6827
 #, perl-format
 msgid "Default rating : %d %"
 msgstr "既定のレーティング : %d %"
 
+#: plugins/desktopwidget.pm:200
 msgid "Default text color"
 msgstr "既定のテキスト色"
 
+#: plugins/desktopwidget.pm:201
 msgid "Default text font"
 msgstr "既定のテキストフォント"
 
+#: gmusicbrowser.pl:6918
 #, perl-format
 msgid "Delay before showing tray tip popup on mouse over : %d ms"
 msgstr ""
 "マウスカーソルがアイコン上にある際にトレイチップが表示されるまでの時間 : %d "
 "ms"
 
+#: layouts/makeitlooklike.layout:240
 msgid "Delete"
 msgstr "削除"
 
+#: gmusicbrowser.pl:1649
 msgid "Delete Selected Songs"
 msgstr "選択楽曲の削除"
 
+#: gmusicbrowser_layout.pm:4200
+msgid "Delete file"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:2495
 msgid "Delete list"
 msgstr "リストの削除"
 
+#: gmusicbrowser_layout.pm:5472
+msgid "Delete preset"
+msgstr ""
+
+#: gmusicbrowser.pl:5389 gmusicbrowser_layout.pm:4417
+msgid "Deletion failed"
+msgstr ""
+
+#: gmusicbrowser.pl:8677
 msgid "Descending order"
 msgstr "降順"
 
+#: gmusicbrowser_tags.pm:2362 gmusicbrowser_tags.pm:2366
+#: gmusicbrowser_tags.pm:2379 gmusicbrowser_tags.pm:2382
 msgid "Descr."
 msgstr "詳細"
 
+#: gmusicbrowser_tags.pm:1578 gmusicbrowser_tags.pm:1909
+#: gmusicbrowser_tags.pm:2371 gmusicbrowser_tags.pm:2376
 msgid "Description"
 msgstr "詳細"
 
+#: plugins/desktopwidget.pm:9
 msgid "Desktop widgets"
 msgstr "デスクトップウィジェット"
 
+#: plugins/desktopwidget.pm:10
 msgid "Desktop widgets plugin"
 msgstr "デスクトップウィジェットプラグイン"
 
+#: gmusicbrowser.pl:5053
+#, perl-brace-format
+msgid "Destination: {file}"
+msgstr ""
+
+#: gmusicbrowser.pl:10281
+#, perl-brace-format
+msgid "Destination: {folder}"
+msgstr ""
+
+#: gmusicbrowser.pl:6844
 msgid "Disable screensaver when fullscreen and playing"
 msgstr "フルスクリーン表示＋再生中はスクリーンセーバを無効化"
 
+#: gmusicbrowser_songs.pm:3140
 msgid "Disabled"
 msgstr "無効化"
 
+#: gmusicbrowser_songs.pm:1099
 msgid "Disc"
 msgstr "ディスク"
 
+#: gmusicbrowser_tags.pm:1867 gmusicbrowser_tags.pm:1905
+#: gmusicbrowser_tags.pm:1953
 msgid "Disc #"
 msgstr "ディスク #"
 
+#: gmusicbrowser_songs.pm:1110
 msgid "Disc name"
 msgstr "ディスク名"
 
+#: gmusicbrowser.pl:1647
 msgid "Display (:1 or host:0 for example)"
 msgstr "表示 (:1 もしくは ホスト:0 例えば)"
 
+#: gmusicbrowser.pl:720
 msgid "Display Songs"
 msgstr "楽曲を表示"
 
+#: plugins/titlebar.pm:11
 msgid ""
 "Display a special layout in or around the titlebar of the focused window"
 msgstr "フォーカスされたウィンドウのタイトルバー周囲に特別なレイアウトを表示"
 
+#: plugins/notify.pm:62
 msgid "Display stop/next actions"
 msgstr "停止/次へ のアクションを表示"
 
+#: plugins/karaoke.pm:11
 msgid "Display synchronized lyrics of the current song"
 msgstr "現楽曲の同期された歌詞を表示"
 
+#: gmusicbrowser.pl:6914
 #, perl-format
 msgid "Display tray tip for %d ms"
 msgstr " %d msの間トレイtipを表示"
 
+#: plugins/appindicator.pm:12
+msgid "Displays a panel indicator in some desktops"
+msgstr ""
+
+#: plugins/export.pm:160
 msgid "Do not add a title row"
 msgstr "タイトル行を追加しない"
 
+#: gmusicbrowser.pl:6973
 msgid "Do not create an id3v1 tag in mp3 files"
 msgstr "mp3ファイル内にid3v1タグを生成しない"
 
+#: gmusicbrowser.pl:6969
 msgid "Do not unsynchronise id3v2 tags"
 msgstr "id3v2タグを非同期にしない"
 
+#: gmusicbrowser.pl:6972
 msgid "Do not write the tags"
 msgstr "タグを書き込みしない"
 
+#: plugins/titlebar.pm:56
 msgid "Don't add the overlay to dialogs"
 msgstr "ダイアログをオーバレイ表示しない"
 
+#: gmusicbrowser_123.pm:147
 #, perl-brace-format
 msgid "Don't know how to play files of type {type}"
 msgstr "{type} タイプのファイルの再生方法が不明です"
 
+#: plugins/notify.pm:67
 msgid "Don't notify if the main window is visible"
 msgstr "メインウィンドウを表示中は通知しない"
 
+#: plugins/audioscrobbler.pm:69
 msgid "Don't submit current song"
 msgstr "現在の楽曲をsubmitしない"
 
+#: plugins/albuminfo.pm:118
+msgid "Download"
+msgstr ""
+
+#: gmusicbrowser.pl:10316
+msgid "Download failed."
+msgstr ""
+
+#: gmusicbrowser.pl:10294
+msgid "Downloading"
+msgstr ""
+
+#: gmusicbrowser.pl:7003
 msgid "Drag and drop songs here to replace the selection."
 msgstr "選択を置き換えるために楽曲をここへドラッグする"
 
+#: gmusicbrowser_layout.pm:4332
+msgid "Drop files in this folder"
+msgstr ""
+
+#: gmusicbrowser.pl:5824 gmusicbrowser_songs.pm:3301
+#: layouts/makeitlooklike.layout:50 layouts/makeitlooklike.layout:235
+#: layouts/makeitlooklike.layout:349
 msgid "Edit"
 msgstr "編集"
 
+#: gmusicbrowser.pl:1640
 msgid "Edit Current Song Properties"
 msgstr "現楽曲のプロパティを編集"
 
+#: gmusicbrowser.pl:706 gmusicbrowser.pl:5345
 msgid "Edit Lyrics"
 msgstr "歌詞の編集"
 
+#: gmusicbrowser_tags.pm:2614
 msgid "Edit Lyrics ..."
 msgstr "歌詞の編集..."
 
+#: gmusicbrowser.pl:5786
 msgid "Edit Multiple Songs Properties"
 msgstr "複数楽曲のプロパティ編集"
 
+#: gmusicbrowser_layout.pm:130
 msgid "Edit Settings"
 msgstr "設定の編集"
 
+#: gmusicbrowser_tags.pm:671
 msgid "Edit auto-fill formats ..."
 msgstr "自動入力書式の編集..."
 
+#: gmusicbrowser_list.pm:3051
 msgid "Edit filter"
 msgstr "フィルタの編集"
 
+#: gmusicbrowser_list.pm:36
 msgid "Edit filter..."
 msgstr "フィルタの編集"
 
+#: gmusicbrowser_list.pm:6911
 msgid "Edit grouping ..."
 msgstr "グルーピングの編集..."
 
+#: plugins/artistinfo.pm:562 plugins/artistinfo.pm:647
 msgid "Edit in the last.fm wiki"
 msgstr "last.fm wikiの編集"
 
+#: gmusicbrowser_songs.pm:1140
+msgid "Edit labels"
+msgstr ""
+
+#: gmusicbrowser_list.pm:3059
 msgid "Edit list"
 msgstr "リストの編集"
 
+#: plugins/lyrics.pm:175
+msgid "Edit mode"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:1518
 msgid "Edit ordered modes ..."
 msgstr "順番モードの編集..."
 
+#: gmusicbrowser_layout.pm:1502
 msgid "Edit random modes ..."
 msgstr "ランダムモードの編集..."
 
+#: gmusicbrowser_songs.pm:1205
+msgid "Edit rating"
+msgstr ""
+
+#: gmusicbrowser_list.pm:714 gmusicbrowser_list.pm:858
+#: gmusicbrowser_list.pm:6923
+msgid "Edit row tip"
+msgstr ""
+
+#: gmusicbrowser.pl:1641
 msgid "Edit selected song properties"
 msgstr "選択楽曲のプロパティを編集"
 
+#: gmusicbrowser_songs.pm:2655
+#, perl-brace-format
+msgid "Edit {field}"
+msgstr ""
+
+#: gmusicbrowser.pl:10093 gmusicbrowser_layout.pm:38
 msgid "Edit..."
 msgstr "編集..."
 
+#: gmusicbrowser_songs.pm:3098
+msgid "Editable in song properties dialog"
+msgstr ""
+
+#: gmusicbrowser.pl:3874 gmusicbrowser.pl:3881
 msgid "Editing list : "
 msgstr "リストの編集 :"
 
+#: gmusicbrowser.pl:1901
 msgid "Editing tags"
 msgstr "タグの編集"
 
+#: gmusicbrowser.pl:5826
+msgid "Embedded Pictures"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1053
 msgid "Embedded lyrics"
 msgstr "埋め込み歌詞"
 
+#: gmusicbrowser_songs.pm:1047
 msgid "Embedded picture"
 msgstr "埋め込み画像"
 
+#: gmusicbrowser_layout.pm:4681
+msgid "Embedded pictures"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4680
+msgid "Embedded pictures for this album"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4679
+msgid "Embedded pictures in this folder"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:671
+msgid "Empty list"
+msgstr ""
+
+#: gmusicbrowser.pl:7258
+msgid "Enabled files"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1881
 msgid "Encapsulated object"
 msgstr "埋め込みオブジェクト"
 
+#: gmusicbrowser_tags.pm:1888
+msgid "Encoded by"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1889
+msgid "Encoded with"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1950
 msgid "Encoder"
 msgstr "エンコーダ"
 
+#: gmusicbrowser.pl:6971
 msgid "Encoding used for id3v1 tags :"
 msgstr "id3v1タグで使用されるエンコード :"
 
+#: gmusicbrowser_list.pm:1711 gmusicbrowser_list.pm:4106
+#: gmusicbrowser_list.pm:4170
 msgid "Enqueue"
 msgstr "キューに追加"
 
+#: gmusicbrowser.pl:1654
 msgid "Enqueue Action"
 msgstr "アクションのキュー追加"
 
+#: gmusicbrowser.pl:678
 msgid "Enqueue Displayed"
 msgstr "表示済項目のキュー追加"
 
+#: gmusicbrowser.pl:676
 msgid "Enqueue Selected"
 msgstr "選択項目のキュー追加"
 
+#: gmusicbrowser.pl:1651
 msgid "Enqueue Selected Songs"
 msgstr "選択楽曲のキュー追加"
 
+#: gmusicbrowser.pl:1653
 msgid "Enqueue Songs from Current Album"
 msgstr "現在のアルバムをキュー追加"
 
+#: gmusicbrowser.pl:1652
 msgid "Enqueue Songs from Current Artist"
 msgstr "現在のアーティストの楽曲をキュー追加"
 
+#: gmusicbrowser.pl:1690
 msgid "Enqueue a list of files/folders"
 msgstr "ファイル/フォルダリストをキュー追加"
 
+#: gmusicbrowser_layout.pm:592
 msgid "Enqueue filter"
 msgstr "フィルタのキュー追加"
 
+#: plugins/albuminfo.pm:255
 msgid "Enter album name"
 msgstr "アルバム名を入力"
 
+#: plugins/artistinfo.pm:285
 msgid "Enter custom event string :"
 msgstr "カスタムイベント文字列を入力 :"
 
+#: layouts/contrib.layout:315 layouts/contrib.layout:583
+#: layouts/contrib.layout:730 layouts/main.layout:178
+#: layouts/makeitlooklike.layout:66 layouts/makeitlooklike.layout:461
+#: layouts/shimmer.layout:23 layouts/shimmer.layout:71
 msgid "Equalizer"
 msgstr "イコライザ"
 
+#: gmusicbrowser.pl:6581
 msgid "Error :"
 msgstr "エラー :"
 
+#: gmusicbrowser.pl:4977
+msgid "Error creating folder"
+msgstr ""
+
+#: gmusicbrowser.pl:3088
+msgid "Error details"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:344
+#, perl-brace-format
+msgid "Error opening '{file}' for writing."
+msgstr ""
+
+#: plugins/artistinfo.pm:660
+msgid "Error saving artistbio"
+msgstr ""
+
+#: plugins/artistinfo.pm:668
 #, perl-brace-format
 msgid ""
 "Error saving artistbio in '{file}' :\n"
@@ -953,6 +1776,15 @@ msgstr ""
 "アーティストのバイオグラフィをファイル'{file}' へ保存中にエラー :\n"
 "{error}"
 
+#: gmusicbrowser_songs.pm:2596
+msgid "Error saving icon"
+msgstr ""
+
+#: plugins/lyrics.pm:770
+msgid "Error saving lyrics"
+msgstr ""
+
+#: plugins/lyrics.pm:778
 #, perl-brace-format
 msgid ""
 "Error saving lyrics in '{file}' :\n"
@@ -961,6 +1793,15 @@ msgstr ""
 "歌詞をファイル '{file}' へ保存中にエラー :\n"
 "{error}"
 
+#: plugins/fetch_cover.pm:579
+msgid "Error saving picture"
+msgstr ""
+
+#: plugins/albuminfo.pm:766
+msgid "Error saving review"
+msgstr ""
+
+#: plugins/albuminfo.pm:772
 #, perl-brace-format
 msgid ""
 "Error saving review in '{file}' :\n"
@@ -969,218 +1810,476 @@ msgstr ""
 "'{file}' へのレビュー保存に失敗 :\n"
 "{error}"
 
+#: gmusicbrowser_gstreamer-1.x.pm:808
+msgid "Error while writing replaygain data"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:2165
+msgid "Error while writing tag"
+msgstr ""
+
+#: plugins/fetch_cover.pm:579
 #, perl-brace-format
 msgid "Error writing '{file}'"
 msgstr "'{file}' の書込に失敗"
 
+#: plugins/export.pm:167
+msgid "Error writing .csv file"
+msgstr ""
+
+#: plugins/export.pm:153
+msgid "Error writing .m3u file"
+msgstr ""
+
+#: gmusicbrowser.pl:10370
+msgid "Error writing downloaded file"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:336
+msgid "Error writing lyrics"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1842
+msgid "Error writing tag"
+msgstr ""
+
+#: plugins/albuminfo.pm:765 plugins/artistinfo.pm:659 plugins/lyrics.pm:769
 msgid "Error: invalid filename pattern"
 msgstr "エラー: 無効なファイル名パターン"
 
+#: plugins/artistinfo.pm:32 plugins/artistinfo.pm:305
 msgid "Events"
 msgstr "イベント"
 
+#: gmusicbrowser_tags.pm:897
 msgid "Example :"
 msgstr "例 :"
 
+#: plugins/artistinfo.pm:298
 msgid "Exclude 'seed'-artist from queue"
 msgstr "キューから  'seed'-アーティストを除外する"
 
+#: plugins/export.pm:95
 msgid "Execute custom command on selected files"
 msgstr "選択ファイルからカスタムコマンドを実行する"
 
+#: gmusicbrowser.pl:2596
+msgid "Exit"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4215
+msgid "Exit full screen"
+msgstr ""
+
+#: plugins/export.pm:9
 msgid "Export"
 msgstr "エクスポート"
 
+#: plugins/export.pm:10
 msgid "Export plugin"
 msgstr "エクスポートプラグイン"
 
+#: plugins/export.pm:35 plugins/export.pm:98
 msgid "Export song properties to a .csv file"
 msgstr "楽曲プロパティを.csvファイルにエクスポート"
 
+#: plugins/export.pm:30 plugins/export.pm:55 plugins/export.pm:64
+#: plugins/export.pm:97
 msgid "Export to .m3u file"
 msgstr ".m3uファイルにエクスポート"
 
+#: gmusicbrowser_songs.pm:34
 msgid "Extra fields"
 msgstr "エキストラフィールド"
 
+#: gmusicbrowser.pl:6812
 msgid "Extra gain"
 msgstr "エキストラゲイン"
 
+#: gmusicbrowser.pl:6855
 msgid "Extract guest artist from title :"
 msgstr "タイトルからゲストアーティストを抽出 :"
 
+#: plugins/lullaby.pm:45
 msgid "Fade-out"
 msgstr "フェードアウト"
 
+#: plugins/lullaby.pm:44
 #, perl-format
 msgid "Fade-out in %d seconds"
 msgstr "%d 秒でフェードアウト"
 
+#: plugins/lullaby.pm:32
 msgid "Fade-out then stop"
 msgstr "停止時にフェードアウト"
 
+#: gmusicbrowser.pl:5391 gmusicbrowser_layout.pm:4419
+#, perl-brace-format
+msgid "Failed to delete '{file}'"
+msgstr ""
+
+#: plugins/albuminfo.pm:131
+msgid "Fetching albuminfo"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:3296
+msgid "Field identifier"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:3188
 msgid "Field type"
 msgstr "フィールドタイプ"
 
+#: gmusicbrowser.pl:7367
+#, perl-brace-format
+msgid "Field: {field}"
+msgstr ""
+
+#: gmusicbrowser.pl:6363 gmusicbrowser_list.pm:5376
 msgid "Fields"
 msgstr "フィールド"
 
+#: plugins/albuminfo.pm:119
+msgid ""
+"Fields will be saved according to the settings above. Albuminfo files will "
+"be re-read if there are fields to be saved and you choose 'albums missing "
+"reviews' in the combo box."
+msgstr ""
+
+#: gmusicbrowser_mpv.pm:212 layouts/makeitlooklike.layout:46
+#: layouts/makeitlooklike.layout:435
 msgid "File"
 msgstr "ファイル"
 
+#: gmusicbrowser_songs.pm:30
 msgid "File properties"
 msgstr "ファイルプロパティ"
 
+#: gmusicbrowser_tags.pm:1891
 msgid "File type"
 msgstr "ファイルタイプ"
 
+#: gmusicbrowser.pl:10282
+#, perl-brace-format
+msgid "File: {file}"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:886 gmusicbrowser_tags.pm:2375
 msgid "Filename"
 msgstr "ファイル名"
 
+#: gmusicbrowser_songs.pm:1511
 msgid "Filename extension"
 msgstr "ファイル名拡張子"
 
+#: gmusicbrowser_tags.pm:808 plugins/export.pm:87
 msgid "Filename format :"
 msgstr "ファイル名書式 :"
 
+#: gmusicbrowser_songs.pm:1508
 msgid "Filename without extension"
 msgstr "拡張子なしでのファイル名"
 
+#: layouts/makeitlooklike.layout:78
 msgid "Files"
 msgstr "ファイル"
 
+#: gmusicbrowser_list.pm:1590
 msgid "Filesystem"
 msgstr "ファイルシステム"
 
+#: gmusicbrowser.pl:718 gmusicbrowser.pl:720 gmusicbrowser_list.pm:125
+#: gmusicbrowser_list.pm:1586 layouts/contrib.layout:335
+#: layouts/contrib.layout:534
 msgid "Filter"
 msgstr "フィルタ"
 
+#: gmusicbrowser_list.pm:231
 msgid "Filter : "
 msgstr "フィルタ :"
 
+#: gmusicbrowser.pl:8147
 msgid "Filter edition"
 msgstr "フィルタのエディション"
 
+#: gmusicbrowser_list.pm:16
 msgid "Filter on playing Album"
 msgstr "再生中アルバムのフィルタ"
 
+#: gmusicbrowser_list.pm:17
 msgid "Filter on playing Artist"
 msgstr "再生中アーティストのフィルタ"
 
+#: gmusicbrowser_list.pm:18
 msgid "Filter on playing Song"
 msgstr "再生中楽曲のフィルタ"
 
+#: gmusicbrowser_list.pm:19
+#, perl-brace-format
+msgid "Filter on playing {field}"
+msgstr ""
+
+#: gmusicbrowser_list.pm:3401
 msgid "Filter on this album"
 msgstr "本アルバムのフィルタ"
 
+#: gmusicbrowser_list.pm:3401
 msgid "Filter on this artist"
 msgstr "本アーティストのフィルタ"
 
+#: gmusicbrowser_list.pm:5402
 msgid "Find :"
 msgstr "検索 :"
 
+#: plugins/fetch_cover.pm:76
 msgid "Find a unique filename if file already exists"
 msgstr "ファイルが既に存在する場合ユニークなファイル名を検索"
 
+#: gmusicbrowser.pl:691
 msgid "Find songs in same albums"
 msgstr "同一アルバムの楽曲を検索"
 
+#: gmusicbrowser.pl:690
 msgid "Find songs with same artists"
 msgstr "同一アーティストの楽曲を検索"
 
+#: gmusicbrowser.pl:689
 msgid "Find songs with the same names"
 msgstr "同一名の楽曲を検索"
 
+#: gmusicbrowser.pl:692
+#, perl-brace-format
+msgid "Find songs with the same {field}"
+msgstr ""
+
+#: gmusicbrowser.pl:1289 gmusicbrowser_list.pm:776 gmusicbrowser_list.pm:1589
+#: gmusicbrowser_songs.pm:899 layouts/contrib.layout:337
+#: layouts/songtree.layout:91
 msgid "Folder"
 msgstr "フォルダ"
 
+#: gmusicbrowser_list.pm:776 layouts/songtree.layout:90
 msgid "Folder (right-aligned)"
 msgstr "フォルダ(右寄せ)"
 
+#: plugins/export.pm:86
 msgid "Folder format :"
 msgstr "フォルダ書式 :"
 
+#: gmusicbrowser.pl:5541
 msgid "Folder pattern :"
 msgstr "フォルダパターン :"
 
+#: gmusicbrowser.pl:7152 gmusicbrowser.pl:7198
 msgid "Folders to search for new songs"
 msgstr "新規楽曲を検索するフォルダ"
 
+#: gmusicbrowser_layout.pm:4154 gmusicbrowser_layout.pm:4160
+#: gmusicbrowser_layout.pm:5230 gmusicbrowser_list.pm:15
+#: gmusicbrowser_list.pm:863 gmusicbrowser_list.pm:6928
 msgid "Follow playing song"
 msgstr "再生中の楽曲に追従"
 
+#: gmusicbrowser_layout.pm:4154 gmusicbrowser_layout.pm:4160
+#: gmusicbrowser_layout.pm:5230
 msgid "Follow selected song"
 msgstr "選択楽曲に追従"
 
+#: plugins/lyrics.pm:181
 msgid "Font size"
 msgstr "フォントサイズ"
 
-msgid "Found but not working"
-msgstr "見つけましたが動作しません"
+#: gmusicbrowser_songs.pm:1578
+msgid "For alternate ratings"
+msgstr ""
 
+#: gmusicbrowser_songs.pm:1566
+msgid "For decimal numbers"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1572
+msgid "For integer numbers"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1570 gmusicbrowser_songs.pm:1571
+msgid "For when values are likely to be repeated"
+msgstr ""
+
+#: gmusicbrowser.pl:1625
+msgid "Forward"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1403
+msgid "Frame rate"
+msgstr ""
+
+#: plugins/lullaby.pm:27
 msgid "Friday"
 msgstr "金曜日"
 
+#: gmusicbrowser.pl:5603
+#, perl-brace-format
+msgid ""
+"From: {oldname}\n"
+"To: {newname}"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4215
+msgid "Full screen"
+msgstr ""
+
+#: gmusicbrowser.pl:6932
 msgid "Full screen layout :"
 msgstr "フルスクリーンレイアウト :"
 
+#: gmusicbrowser.pl:736 gmusicbrowser_layout.pm:687
+#: gmusicbrowser_layout.pm:4149
 msgid "Fullscreen"
 msgstr "フルスクリーン"
 
+#: layouts/fullscreen.layout:27
+msgid "Fullscreen simple"
+msgstr ""
+
+#: gmusicbrowser.pl:7106
+msgid "Fully supported audio extensions"
+msgstr ""
+
+#: gmusicbrowser.pl:6696
 msgid "GStreamer module not loaded."
 msgstr "GStreamerモジュールが読込できません。"
 
+#: gmusicbrowser.pl:6813
 msgid "Gain for songs missing replaygain tags"
 msgstr "リプレイゲインタグなし楽曲のゲイン"
 
+#: layouts/contrib.layout:612
+msgid "Garage Fullscreen"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1871 gmusicbrowser_tags.pm:1910
+#: gmusicbrowser_tags.pm:1924 gmusicbrowser_tags.pm:1947
+#: gmusicbrowser_tags.pm:2200 plugins/albuminfo.pm:64
+#: layouts/contrib.layout:338 layouts/contrib.layout:536
 msgid "Genre"
 msgstr "ジャンル"
 
+#: layouts/makeitlooklike.layout:115
 msgid "Genre - Album"
 msgstr "ジャンル - アルバム"
 
+#: layouts/makeitlooklike.layout:102
 msgid "Genre - Artist"
 msgstr "ジャンル - アーティスト"
 
+#: gmusicbrowser_songs.pm:5467
+msgid "Genre is set"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1118 plugins/albuminfo.pm:37
 msgid "Genres"
 msgstr "ジャンル"
 
+#: layouts/makeitlooklike.layout:507
 msgid "Genres pane"
 msgstr "ジャンルペイン"
 
+#: plugins/gnome_mmkeys.pm:9
+msgid "Gnome mmkeys"
+msgstr ""
+
+#: plugins/gnome_mmkeys.pm:10
 msgid "Gnome multimedia keys plugin"
 msgstr "Gnome multimedia keys プラグイン"
 
+#: layouts/makeitlooklike.layout:58
 msgid "Go to Playing Track"
 msgstr "再生中トラックへ移動"
 
+#: gmusicbrowser_list.pm:866 gmusicbrowser_list.pm:6931
 msgid "Go to playing song"
 msgstr "再生中楽曲へ移動"
 
+#: gmusicbrowser_list.pm:7741
+msgid "Group by :"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1066 gmusicbrowser_tags.pm:1887
 msgid "Grouping"
 msgstr "グループ分け中"
 
+#: plugins/audioscrobbler.pm:164
+msgid "Handshake OK"
+msgstr ""
+
+#: plugins/audioscrobbler.pm:157
+msgid "Handshake failed : "
+msgstr ""
+
+#: gmusicbrowser.pl:6809
+msgid "Hard limiter"
+msgstr ""
+
+#: layouts/makeitlooklike.layout:68 layouts/makeitlooklike.layout:274
+#: layouts/makeitlooklike.layout:471
 msgid "Help"
 msgstr "ヘルプ"
 
+#: gmusicbrowser.pl:735 gmusicbrowser.pl:1644
 msgid "Hide"
 msgstr "隠す"
 
+#: gmusicbrowser_list.pm:5375
+msgid "Hide non-matching"
+msgstr ""
+
+#: plugins/lyrics.pm:39
 msgid "Hide toolbar"
 msgstr "ツールバーを隠す"
 
+#: gmusicbrowser.pl:6480
+msgid "High priority"
+msgstr ""
+
+#: gmusicbrowser.pl:6946
 msgid "Icon theme :"
 msgstr "アイコンテーマ :"
 
+#: gmusicbrowser_songs.pm:3182
 msgid "Identifier in file tag"
 msgstr "タグ上のタグ上の識別子"
 
+#: gmusicbrowser.pl:6481
+msgid ""
+"If checked, the shortcut has higher priority than the default shortcut of "
+"widgets. Warning: this can make some features inaccessible"
+msgstr ""
+
+#: gmusicbrowser.pl:6862
+msgid ""
+"If one of these words is at the start of the string, it will be ignored when "
+"sorting most fields"
+msgstr ""
+
+#: gmusicbrowser.pl:6758
 msgid "Ignore playback errors"
 msgstr "再生エラーを無視"
 
+#: gmusicbrowser.pl:6860
+msgid "Ignore these words when sorting :"
+msgstr ""
+
+#: gmusicbrowser_list.pm:3065
 msgid "Import list"
 msgstr "リストのインポート"
 
+#: gmusicbrowser_gstreamer-1.x.pm:503
+msgid ""
+"Imports gstreamer presets, and synchronize modifications made with "
+"gmusicbrowser"
+msgstr ""
+
+#: plugins/export.pm:93
 msgid ""
 "In this case one command by file will be run\n"
 "\n"
@@ -1188,111 +2287,185 @@ msgstr ""
 "ファイル毎に1コマンドが実行されます\n"
 "\n"
 
+#: plugins/albuminfo.pm:100
 msgid "Include Styles in Genres"
 msgstr "ジャンル内のスタイルを含む"
 
+#: gmusicbrowser.pl:1658
 msgid "Increase Volume"
 msgstr "ボリュームアップ"
 
+#: layouts/makeitlooklike.layout:271 layouts/makeitlooklike.layout:364
 msgid "Increase volume"
 msgstr "ボリュームアップ"
 
+#: gmusicbrowser.pl:5825 gmusicbrowser_tags.pm:1935 layouts/pages.layout:40
+#: layouts/shimmer.layout:75
 msgid "Info"
 msgstr "情報"
 
+#: layouts/titlebar.layout:25
 msgid "Insensitive title-artist (left-aligned)"
 msgstr "小文字を区別しない タイトル-アーティスト (左揃え)"
 
+#: layouts/titlebar.layout:31
 msgid "Insensitive title-artist (right-aligned)"
 msgstr "小文字を区別しない タイトル-アーティスト (右揃え)"
 
+#: layouts/desktop.layout:5
 msgid "Insensitive, Song & Cover"
 msgstr "小文字を区別しない, 楽曲 & カバー"
 
+#: gmusicbrowser.pl:1650
 msgid "Insert Selected Songs at the top of the queue"
 msgstr "選択済楽曲をキューの最上部に追加"
 
+#: gmusicbrowser.pl:1689
 msgid "Insert a list of files/folders at the start of the playlist"
 msgstr "ファイル/フォルダのリストをプレイリストの先頭に追加"
 
+#: gmusicbrowser_gstreamer-1.x.pm:507
 msgid "Insert this pipeline before the audio sink"
 msgstr "オーディオシンクの前にパイプラインを挿入"
 
+#: gmusicbrowser_tags.pm:889
 msgid "Invalid regular expression"
 msgstr "無効な正規表現"
 
+#: gmusicbrowser.pl:9251
 msgid "Invert filter"
 msgstr "反転フィルタ"
 
+#: layouts/desktop.layout:33
 msgid "Invisible hot spot"
 msgstr "不可視のホットスポット"
 
+#: gmusicbrowser_songs.pm:938
+#, perl-format
+msgid "Isn't smart equal to %s"
+msgstr ""
+
+#: plugins/lyrics.pm:32
 msgid "Justified"
 msgstr "両端揃え"
 
+#: gmusicbrowser.pl:1073 gmusicbrowser_tags.pm:1668
+msgid "KB"
+msgstr ""
+
+#: plugins/karaoke.pm:9
 msgid "Karaoke"
 msgstr "カラオケ"
 
+#: plugins/karaoke.pm:10
 msgid "Karaoke plugin"
 msgstr "カラオケプラグイン"
 
+#: gmusicbrowser_list.pm:860 gmusicbrowser_list.pm:6925
+msgid "Keep list filtered and sorted"
+msgstr ""
+
+#: gmusicbrowser.pl:6403 gmusicbrowser.pl:6521
 msgid "Key"
 msgstr "キー"
 
+#: gmusicbrowser.pl:6365
 msgid "Keys"
 msgstr "キー"
 
+#: plugins/fetch_cover.pm:101
 msgid "Keywords"
 msgstr "キーワード"
 
+#: gmusicbrowser.pl:1695 gmusicbrowser.pl:1696 gmusicbrowser.pl:1697
 msgid "Label"
 msgstr "ラベル"
 
+#: gmusicbrowser_songs.pm:5461
+msgid "Label is set"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1895
 msgid "Label/Publisher"
 msgstr "ラベル/発行者"
 
+#: gmusicbrowser_songs.pm:1133
 msgid "Labels"
 msgstr "ラベル"
 
+#: gmusicbrowser_list.pm:803 layouts/songtree.layout:51
 msgid "Labels' icons"
 msgstr "ラベルアイコン"
 
+#: gmusicbrowser_tags.pm:2365 gmusicbrowser_tags.pm:2389
 msgid "Lang"
 msgstr "言語"
 
+#: gmusicbrowser_tags.pm:2361
 msgid "Lang."
 msgstr "言語"
 
+#: gmusicbrowser_tags.pm:1872
 msgid "Languages"
 msgstr "言語"
 
+#: gmusicbrowser_mpv.pm:213
+msgid "Last messages:"
+msgstr ""
+
+#: gmusicbrowser.pl:1303 gmusicbrowser_list.pm:724 gmusicbrowser_songs.pm:1225
+msgid "Last played"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1243
+msgid "Last skipped"
+msgstr ""
+
+#: plugins/rip.pm:33
 msgid "Launch ripping program"
 msgstr "リッピングプログラムを起動"
 
+#: gmusicbrowser_layout.pm:555
 msgid "Layout"
 msgstr "レイアウト"
 
+#: plugins/desktopwidget.pm:35
 msgid "Layout :"
 msgstr "レイアウト:"
 
+#: gmusicbrowser.pl:6361
 msgid "Layouts"
 msgstr "レイアウト"
 
+#: plugins/lyrics.pm:29
 msgid "Left aligned"
 msgstr "左に配置"
 
+#: layouts/makeitlooklike.layout:507
 msgid "Left pane"
 msgstr "レフトペイン"
 
+#: layouts/contrib.layout:286 layouts/contrib.layout:571
+msgid "Left-clic or scrollwheel to change, right-click to mute"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1430
 msgid "Length"
 msgstr "長さ"
 
+#: gmusicbrowser.pl:6359 gmusicbrowser_list.pm:126 layouts/contrib.layout:302
+#: layouts/contrib.layout:319 layouts/contrib.layout:587
+#: layouts/contrib.layout:592 layouts/contrib.layout:733
+#: layouts/contrib.layout:741 layouts/main.layout:22 layouts/shimmer.layout:24
+#: layouts/shimmer.layout:72
 msgid "Library"
 msgstr "ライブラリ"
 
+#: gmusicbrowser_list.pm:275
 msgid "Library : "
 msgstr "ライブラリ :"
 
+#: gmusicbrowser_list.pm:452
 msgid ""
 "Library empty.\n"
 "\n"
@@ -1302,327 +2475,561 @@ msgstr ""
 "\n"
 "設定ダイアログで楽曲を追加してください。"
 
+#: gmusicbrowser.pl:7225
+#, perl-format
+msgid "Library size : %d song"
+msgid_plural "Library size : %d songs"
+msgstr[0] ""
+
+#: plugins/artistinfo.pm:296
 msgid "Limit similar artists to a rate of similarity : "
 msgstr "関連アーティストを類似性評価で制限 :"
 
+#: plugins/artistinfo.pm:295
 msgid "Limit similar artists to the first : "
 msgstr "関連アーティストを最初に制限 :"
 
+#: gmusicbrowser_list.pm:1587 layouts/contrib.layout:336
+#: layouts/contrib.layout:535
 msgid "List"
 msgstr "リスト"
 
+#: gmusicbrowser_list.pm:422
 msgid "List empty"
 msgstr "リストは空"
 
+#: gmusicbrowser_layout.pm:1506 gmusicbrowser_layout.pm:1572
 msgid "List order"
 msgstr "リスト順"
 
+#: gmusicbrowser_list.pm:250
 msgid "Listed : "
 msgstr "リスト済"
 
+#: gmusicbrowser_list.pm:124
 msgid "Listed songs"
 msgstr "リスト済楽曲"
 
+#: plugins/artistinfo.pm:563
 msgid "Listeners: "
 msgstr "リスナ:"
 
+#: gmusicbrowser_songs.pm:1550
 msgid "Lists"
 msgstr "リスト"
 
+#: layouts/main.layout:6
 msgid "Lists, Library & Context"
 msgstr "リスト, ライブラリ & コンテキスト"
 
+#: gmusicbrowser_list.pm:3616
+msgid "Literal search"
+msgstr ""
+
+#: plugins/lyrics.pm:220
 msgid "Load lyrics even if lyrics panel is hidden"
 msgstr "歌詞パネルが非表示でも歌詞を読み込む"
 
+#: plugins/artistinfo.pm:279
 msgid "Load/Save Artist Info in :"
 msgstr "アーティスト情報の読込/保存:"
 
+#: plugins/audioscrobbler.pm:280
+#, perl-format
+msgid "Loaded %d unsent song from previous session"
+msgid_plural "Loaded %d unsent songs from previous session"
+msgstr[0] ""
+
+#: plugins/artistinfo.pm:517 plugins/artistinfo.pm:627 plugins/lyrics.pm:435
+#: plugins/lyrics.pm:747
 msgid "Loading failed."
 msgstr "読込に失敗しました。"
 
+#: plugins/albuminfo.pm:574 plugins/artistinfo.pm:504 plugins/lyrics.pm:420
 msgid "Loading..."
 msgstr "読込中..."
 
+#: gmusicbrowser.pl:712
 msgid "Lock"
 msgstr "ロック"
 
+#: gmusicbrowser.pl:732
 msgid "Lock Album"
 msgstr "アルバムのロック"
 
+#: gmusicbrowser.pl:731
 msgid "Lock Artist"
 msgstr "アーティストのロック"
 
+#: gmusicbrowser_layout.pm:170
 msgid "Lock on Album"
 msgstr "アルバムのロックオン"
 
+#: gmusicbrowser_layout.pm:164
 msgid "Lock on Artist"
 msgstr "アーティストのロックオン"
 
+#: gmusicbrowser_layout.pm:159
 msgid "Lock on song"
 msgstr "楽曲のロックオン"
 
+#: gmusicbrowser_layout.pm:152
 #, perl-brace-format
 msgid "Lock on {field}"
 msgstr "{field} のロックオン"
 
+#: gmusicbrowser_list.pm:74
 msgid "Locked on :\n"
 msgstr "ロックオンしました :\n"
 
+#: plugins/albuminfo.pm:486
 msgid "Lookup at allmusic.com"
 msgstr "allmusic.comで検索"
 
+#: gmusicbrowser.pl:715
 msgid "Lookup in AMG"
 msgstr "AMGで検索"
 
+#: gmusicbrowser.pl:707
 msgid "Lookup in google"
 msgstr "Googleで検索"
 
+#: plugins/titlebar.pm:32
 msgid "Lower left"
 msgstr "左下"
 
+#: plugins/titlebar.pm:33
 msgid "Lower right"
 msgstr "右下"
 
+#: plugins/lullaby.pm:9
 msgid "Lullaby"
 msgstr "ララバイ"
 
+#: plugins/lullaby.pm:10
 msgid "Lullaby plugin"
 msgstr "ララバイプラグイン"
 
+#: gmusicbrowser_songs.pm:1293
 msgid "Lyricist"
 msgstr "作詞家"
 
+#: gmusicbrowser_tags.pm:1873 gmusicbrowser_tags.pm:1911
+#: gmusicbrowser_tags.pm:1912 gmusicbrowser_tags.pm:1931
+#: gmusicbrowser_tags.pm:1934 gmusicbrowser_tags.pm:1949 plugins/lyrics.pm:9
+#: plugins/lyrics.pm:108 plugins/webcontext.pm:124 layouts/contrib.layout:764
+#: layouts/shimmer.layout:30 layouts/shimmer.layout:74
 msgid "Lyrics"
 msgstr "歌詞"
 
+#: layouts/desktop.layout:39
 msgid "Lyrics (requires lyrics plugin)"
 msgstr "歌詞(lyrics pluginが必要)"
 
+#: plugins/lyrics.pm:45
 msgid "Lyrics alignement"
 msgstr "歌詞の位置"
 
+#: plugins/lyrics.pm:215
 msgid "Lyrics file :"
 msgstr "歌詞ファイル:"
 
+#: plugins/lyrics.pm:215
 msgid "Lyrics file name format"
 msgstr "歌詞ファイル名の書式"
 
+#: gmusicbrowser.pl:5334
+msgid "Lyrics for "
+msgstr ""
+
+#: plugins/lyrics.pm:10
 msgid "Lyrics plugin"
 msgstr "歌詞プラグイン"
 
+#: plugins/lyrics.pm:182 plugins/webcontext.pm:363
 msgid "Lyrics source"
 msgstr "歌詞のソース"
 
+#: gmusicbrowser.pl:1074 gmusicbrowser.pl:3893 gmusicbrowser_songs.pm:623
+#: gmusicbrowser_songs.pm:631
+msgid "MB"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:2369 gmusicbrowser_tags.pm:2374
 msgid "MIME type"
 msgstr "MIME タイプ"
 
+#: plugins/mpris1.pm:9
+msgid "MPRIS v1"
+msgstr ""
+
+#: plugins/mpris1.pm:10
 msgid "MPRIS v1 support"
 msgstr "MPRIS v1 サポート"
 
+#: plugins/mpris2.pm:9
+msgid "MPRIS v2"
+msgstr ""
+
+#: plugins/mpris2.pm:10
 msgid "MPRIS v2 support"
 msgstr "MPRIS v2 サポート"
 
+#: gmusicbrowser_layout.pm:565
 msgid "Main"
 msgstr "メイン"
 
+#: gmusicbrowser_songs.pm:963
 msgid "Main artist"
 msgstr "メインアーティスト"
 
+#: layouts/makeitlooklike.layout:6 layouts/makeitlooklike.layout:30
+#: layouts/makeitlooklike.layout:215 layouts/makeitlooklike.layout:330
+#: layouts/makeitlooklike.layout:398 layouts/makeitlooklike.layout:503
+msgid "Make it look like"
+msgstr ""
+
+#: gmusicbrowser_gstreamer-1.x.pm:500
+msgid ""
+"Makes gmusicbrowser monitor its pulseaudio volume, so that external changes "
+"to its volume are known."
+msgstr ""
+
+#: plugins/gnome_mmkeys.pm:11
 msgid ""
 "Makes gmusicbrowser react to the Next/Previous/Play/Stop multimedia keys in "
 "gnome."
 msgstr "gnomeの 次/前/再生/停止 マルチメディアキーに gmusicbrowserが反応する"
 
+#: gmusicbrowser.pl:696
+msgid "Mass Rename"
+msgstr ""
+
+#: gmusicbrowser.pl:5477
+msgid "Mass Renaming"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1890
 msgid "Media type"
 msgstr "メディアタイプ"
 
+#: plugins/export.pm:90
 msgid "Menu entry name"
 msgstr "メニューエントリ名"
 
+#: layouts/contrib.layout:702
+msgid "Middle-clic for next album"
+msgstr ""
+
+#: plugins/appindicator.pm:49
+msgid "Middle-click action :"
+msgstr ""
+
+#: plugins/artistinfo.pm:165
+msgid ""
+"Middle-click on local artists to set a filter on them, right-click non-local "
+"artists to search for them on the web."
+msgstr ""
+
+#: layouts/tray.layout:35
 msgid "Minimal tip"
 msgstr "最小のtip"
 
+#: plugins/desktopwidget.pm:204
 msgid "Minimum size"
 msgstr "最小サイズ"
 
+#: gmusicbrowser.pl:6362
+msgid "Misc."
+msgstr ""
+
+#: gmusicbrowser_songs.pm:910
 msgid "Modification"
 msgstr "変更"
 
+#: gmusicbrowser.pl:7261
+msgid "Module files"
+msgstr ""
+
+#: plugins/lullaby.pm:27
 msgid "Monday"
 msgstr "月曜日"
 
+#: plugins/desktopwidget.pm:203
+msgid "Monitor"
+msgstr ""
+
+#: gmusicbrowser_gstreamer-1.x.pm:500
+msgid "Monitor the pulseaudio volume"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1151 plugins/albuminfo.pm:38
 msgid "Moods"
 msgstr "ムード"
 
+#: layouts/contrib.layout:775
 msgid "More info"
 msgstr "追加の情報"
 
+#: plugins/fetch_cover.pm:106
 msgid "More results"
 msgstr "追加の結果"
 
+#: layouts/contrib.layout:753 layouts/shimmer.layout:19
 msgid "Mosaic View"
 msgstr "モザイクビュー"
 
+#: gmusicbrowser.pl:699
 msgid "Move"
 msgstr "移動"
 
+#: gmusicbrowser.pl:5546
 msgid "Move Files to :"
 msgstr "ファイルを移動 :"
 
+#: gmusicbrowser.pl:4999 gmusicbrowser.pl:10268
 msgid "Move failed"
 msgstr "移動に失敗"
 
+#: gmusicbrowser.pl:7065
 msgid "Move folder to"
 msgstr "フォルダへ移動"
 
+#: gmusicbrowser.pl:10264
+msgid "Moving"
+msgstr ""
+
+#: gmusicbrowser.pl:5001
+#, perl-format
+msgid "Moving file"
+msgid_plural "Moving %d files"
+msgstr[0] ""
+
+#: layouts/makeitlooklike.layout:229 layouts/makeitlooklike.layout:343
 msgid "Music"
 msgstr "楽曲"
 
+#: gmusicbrowser.pl:7259
+msgid "Music files"
+msgstr ""
+
+#: gmusicbrowser.pl:1660
 msgid "Mute/Unmute"
 msgstr "ミュート/ミュート解除"
 
+#: gmusicbrowser_tags.pm:2404 gmusicbrowser_tags.pm:2409
 msgid "Name"
 msgstr "名前"
 
+#: gmusicbrowser.pl:1635 gmusicbrowser.pl:1636 gmusicbrowser.pl:1638
 msgid "Name of layout"
 msgstr "レイアウト名"
 
+#: plugins/export.pm:90
 msgid "Name under which the command will appear in the menu"
 msgstr "メニュー上で表示されるコマンド名"
 
+#: gmusicbrowser.pl:7208 gmusicbrowser_list.pm:1753
+msgid "Never"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:817 plugins/webcontext.pm:499
 msgid "New"
 msgstr "新規"
 
+#: gmusicbrowser_songs.pm:3025
 msgid "New custom field"
 msgstr "新規カスタムフィールド"
 
+#: gmusicbrowser_list.pm:3050
 msgid "New filter"
 msgstr "新規フィルタ"
 
+#: gmusicbrowser_layout.pm:2482
 msgid "New list"
 msgstr "新規リスト"
 
+#: gmusicbrowser.pl:5512 gmusicbrowser.pl:7334
 msgid "New name"
 msgstr "新規名称"
 
+#: gmusicbrowser.pl:7368
+msgid "New value"
+msgstr ""
+
+#: gmusicbrowser.pl:7362
+#, perl-brace-format
+msgid "New value for {field}"
+msgstr ""
+
+#: gmusicbrowser.pl:729 gmusicbrowser.pl:3389 gmusicbrowser_layout.pm:95
+#: gmusicbrowser_list.pm:5398 plugins/appindicator.pm:28 plugins/notify.pm:99
+#: layouts/makeitlooklike.layout:269 layouts/makeitlooklike.layout:362
+#: layouts/makeitlooklike.layout:447
 msgid "Next"
 msgstr "次"
 
+#: gmusicbrowser.pl:1620
 msgid "Next Album"
 msgstr "次のアルバム"
 
+#: gmusicbrowser.pl:1621
 msgid "Next Artist"
 msgstr "次のアーティスト"
 
+#: gmusicbrowser.pl:1622 gmusicbrowser_layout.pm:94 layouts/contrib.layout:220
 msgid "Next Song"
 msgstr "次の曲"
 
+#: gmusicbrowser.pl:1618
 msgid "Next Song In Playlist"
 msgstr "プレイリスト内の次の楽曲"
 
+#: gmusicbrowser_layout.pm:654
 msgid "No connections"
 msgstr "接続なし"
 
+#: gmusicbrowser.pl:3947
 msgid "No file browser found."
 msgstr "ファイルブラウザが見つかりません。"
 
+#: gmusicbrowser_songs.pm:1123
 msgid "No genre"
 msgstr "ジャンルなし"
 
+#: gmusicbrowser_songs.pm:1141
 msgid "No label"
 msgstr "ラベルなし"
 
+#: gmusicbrowser_list.pm:74
 msgid "No locked filter"
 msgstr "ロックされたフィルタなし"
 
+#: plugins/lyrics.pm:26 plugins/lyrics.pm:335
 msgid "No lyrics found"
 msgstr "歌詞が見つかりません"
 
+#: gmusicbrowser_songs.pm:1156
 msgid "No moods"
 msgstr "ムードなし"
 
+#: plugins/artistinfo.pm:543 plugins/artistinfo.pm:574
 msgid "No results found"
 msgstr "結果が見つかりません"
 
+#: plugins/albuminfo.pm:429 plugins/albuminfo.pm:623 plugins/albuminfo.pm:747
 msgid "No review found"
 msgstr "レビューが見つかりません"
 
+#: plugins/albuminfo.pm:481
 msgid "No review written."
 msgstr "レビューが書き込まれません。"
 
+#: gmusicbrowser_songs.pm:4554
 msgid "No songs"
 msgstr "楽曲なし"
 
+#: gmusicbrowser_list.pm:424 gmusicbrowser_list.pm:425
 msgid "No songs found"
 msgstr "楽曲が見つかりません"
 
+#: gmusicbrowser_songs.pm:1168
 msgid "No styles"
 msgstr "スタイルなし"
 
+#: gmusicbrowser_songs.pm:1179
 msgid "No themes"
 msgstr "テーマなし"
 
+#: gmusicbrowser.pl:3939
 msgid "No web browser found."
 msgstr "Webブラウザが見つかりません。"
 
+#: gmusicbrowser.pl:1285 gmusicbrowser_list.pm:1640 gmusicbrowser_list.pm:1662
+#: gmusicbrowser_songs.pm:95 gmusicbrowser_songs.pm:1080
 msgid "None"
 msgstr "なし"
 
+#: layouts/tray.layout:18
 msgid "Normal"
 msgstr "通常"
 
+#: gmusicbrowser.pl:595
 msgid "Normal mode"
 msgstr "通常モード"
 
+#: layouts/tray.layout:3
+msgid "Normal with buttons"
+msgstr ""
+
+#: gmusicbrowser.pl:6738
 msgid "Normalize volume (the files must have replaygain tags)"
 msgstr "ボリュームの平準化(リプレイゲインタグが必要)"
 
-msgid "Not found"
-msgstr "見つからない"
-
+#: plugins/notify.pm:60
 msgid "Note that some notification daemons resize the displayed picture"
 msgstr "通知デーモンでは表示画像をリサイズします"
 
+#: plugins/albuminfo.pm:103
 msgid ""
 "Note: inactive fields must be enabled by the user in the 'Fields' tab in "
 "Settings"
 msgstr ""
 "注意： 設定の'フィールド'タブ内で非動作のフィールドを有効にする必要があります"
 
+#: plugins/notify.pm:9
 msgid "Notify"
 msgstr "通知"
 
+#: plugins/notify.pm:10
 msgid "Notify plugin"
 msgstr "通知プラグイン"
 
+#: plugins/notify.pm:11
 msgid "Notify you of the playing song with the system's notification popups"
 msgstr "再生中の楽曲についてシステムの通知ポップアップで通知する"
 
+#: plugins/nowplaying.pm:16
 msgid "Now playing"
 msgstr "現在再生中"
 
+#: plugins/nowplaying.pm:17
 msgid "NowPlaying plugin"
 msgstr "現在再生中プラグイン"
 
+#: gmusicbrowser_songs.pm:5485
 msgid "Number of days since added"
 msgstr "最後に追加してからの日数"
 
+#: gmusicbrowser_songs.pm:5473
 msgid "Number of days since last played"
 msgstr "最後に再生してからの日数"
 
+#: gmusicbrowser_songs.pm:5479
 msgid "Number of days since last skipped"
 msgstr "最後にスキップしてからの日数"
 
+#: gmusicbrowser_songs.pm:5491
 msgid "Number of days since modified"
 msgstr "最後に変更してからの日数"
 
+#: gmusicbrowser.pl:1694
+msgid "Number of milliseconds"
+msgstr ""
+
+#: gmusicbrowser.pl:1625 gmusicbrowser.pl:1626 gmusicbrowser.pl:1627
+msgid "Number of seconds"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:5497
 msgid "Number of times played"
 msgstr "再生回数"
 
+#: gmusicbrowser_songs.pm:5502
 msgid "Number of times skipped"
 msgstr "スキップした回数"
 
+#: gmusicbrowser.pl:9013 gmusicbrowser.pl:9037
 msgid ""
 "ON -> smaller means more probable\n"
 "OFF -> bigger means more probable"
@@ -1630,6 +3037,7 @@ msgstr ""
 "ON -> より小さい可能性\n"
 "OFF -> より大きい可能性"
 
+#: gmusicbrowser.pl:9005
 msgid ""
 "ON less probable if genre is set\n"
 "OFF more probable if genre is set"
@@ -1637,6 +3045,7 @@ msgstr ""
 "ON ジャンルが設定されている場合、より少ない\n"
 "OFF ジャンルが設定されている場合、より多い"
 
+#: gmusicbrowser.pl:8998
 msgid ""
 "ON less probable if label is set\n"
 "OFF more probable if label is set"
@@ -1644,541 +3053,873 @@ msgstr ""
 "ON ラベルが設定されている場合、より少ない\n"
 "OFF ラベルが設定されている場合、より多い"
 
+#: gmusicbrowser.pl:5512
+msgid "Old name"
+msgstr ""
+
+#: plugins/desktopwidget.pm:187
 msgid "On top of other windows instead of below"
 msgstr "後ろのウィンドウの代わりに先頭のウィンドウで"
 
+#: gmusicbrowser.pl:1666 gmusicbrowser.pl:1668
+msgid ""
+"One command is used per selected songs, unless $files is used, which is "
+"replaced by the list of selected files"
+msgstr ""
+
+#: gmusicbrowser_123.pm:145
 #, perl-brace-format
 msgid "One of these commands is required to play files of type {type} : {cmd}"
 msgstr ""
 "{type} タイプのファイルをを演奏するにはこれらのうちどれかのコマンドが必要で"
 "す : {cmd}"
 
+#: gmusicbrowser.pl:6973
 msgid "Only affect mp3 files that do not already have an id3v1 tag"
 msgstr "ID3v1タグを持たないMP3ファイルのみ有効"
 
+#: plugins/artistinfo.pm:297
 msgid "Only show similar artists from local library"
 msgstr "ローカルライブラリからのみ類似アーティストを表示"
 
+#: gmusicbrowser_list.pm:1753
+msgid "Only whole levels"
+msgstr ""
+
+#: plugins/desktopwidget.pm:205
 msgid "Opacity"
 msgstr "透明度"
 
+#: gmusicbrowser.pl:1631 gmusicbrowser_layout.pm:54
 msgid "Open Browser"
 msgstr "ブラウザを開く"
 
+#: gmusicbrowser_layout.pm:107
 msgid "Open Browser window"
 msgstr "ブラウザウィンドウを開く"
 
+#: gmusicbrowser.pl:1634 gmusicbrowser_layout.pm:55 gmusicbrowser_layout.pm:116
 msgid "Open Context window"
 msgstr "コンテキストウィンドウを開く"
 
+#: gmusicbrowser.pl:1635
 msgid "Open Custom window"
 msgstr "カスタムウィンドウを開く"
 
+#: gmusicbrowser.pl:6727
 msgid "Open Equalizer"
 msgstr "イコライザを開く"
 
+#: gmusicbrowser_layout.pm:2485
 msgid "Open Playlist"
 msgstr "プレイリストを開く"
 
+#: gmusicbrowser.pl:1639
 msgid "Open Preference window"
 msgstr "お気に入りウィンドウを開く"
 
+#: gmusicbrowser_layout.pm:2483
 msgid "Open Queue"
 msgstr "キューを開く"
 
+#: gmusicbrowser.pl:1632 gmusicbrowser_layout.pm:123
 msgid "Open Queue window"
 msgstr "キューウィンドウを開く"
 
+#: gmusicbrowser.pl:1633
 msgid "Open Search window"
 msgstr "検索ウィンドウを開く"
 
+#: gmusicbrowser.pl:708
 msgid "Open containing folder"
 msgstr "含まれているフォルダを開く"
 
+#: layouts/contrib.layout:724
 msgid "Open context & queue panel"
 msgstr "コンテキスト & キューパネルを開く"
 
+#: gmusicbrowser_layout.pm:2491
 msgid "Open context page"
 msgstr "コンテキストページを開く"
 
+#: gmusicbrowser_layout.pm:5582
+msgid "Open equalizer..."
+msgstr ""
+
+#: gmusicbrowser_layout.pm:2487
 msgid "Open existing list"
 msgstr "既存のリストを開く"
 
+#: gmusicbrowser_list.pm:1724
 msgid "Open folder"
 msgstr "フォルダを開く"
 
+#: plugins/artistinfo.pm:299
 msgid "Open last.fm website in your browser"
 msgstr "ブラウザでlast.fm サイトを開く"
 
+#: plugins/lyrics.pm:380
 msgid "Open link in Browser"
 msgstr "ブラウザでリンクを開く"
 
+#: gmusicbrowser_layout.pm:2489
 msgid "Open page layout"
 msgstr "ページレイアウトを開く"
 
+#: plugins/desktopwidget.pm:11
 msgid "Open special layouts as desktop widgets"
 msgstr "デスクトップウィジェットとして特別なレイアウトを開く"
 
+#: plugins/webcontext.pm:231
 msgid "Open this page in the web browser"
 msgstr "このページをWebブラウザで開く"
 
+#: gmusicbrowser_123.pm:287 gmusicbrowser_layout.pm:4202
+#: gmusicbrowser_list.pm:1757
 msgid "Options"
 msgstr "オプション"
 
+#: layouts/makeitlooklike.layout:242 layouts/makeitlooklike.layout:350
 msgid "Options ..."
 msgstr "オプション..."
 
+#: gmusicbrowser_list.pm:1645
 msgid "Options for subgroup"
 msgstr "サブグループのオプション"
 
+#: plugins/export.pm:94
+msgid ""
+"Or you can use the field $files which will be replaced by the list of files, "
+"and only one command will be run"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1875 gmusicbrowser_tags.pm:1913
 msgid "Original Artist"
 msgstr "オリジナルのアーティスト"
 
+#: gmusicbrowser_tags.pm:1893
 msgid "Original Filename"
 msgstr "オリジナルのファイル名"
 
+#: gmusicbrowser_tags.pm:1894
 msgid "Original release year"
 msgstr "オリジナルのリリース年"
 
+#: gmusicbrowser_tags.pm:1892
+msgid "Originaly from"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:36
 msgid "Other"
 msgstr "その他"
 
+#: gmusicbrowser_123.pm:287 layouts/makeitlooklike.layout:460
 msgid "Output"
 msgstr "出力"
 
+#: plugins/titlebar.pm:52
 msgid "Overlay layout :"
 msgstr "オーバレイ レイアウト :"
 
+#: gmusicbrowser_tags.pm:2396 gmusicbrowser_tags.pm:2399
 msgid "Owner identifier"
 msgstr "オーナー識別子"
 
+#: gmusicbrowser.pl:7107
+msgid "Partially supported audio extensions"
+msgstr ""
+
+#: gmusicbrowser.pl:7108
+msgid "Partially supported module extensions"
+msgstr ""
+
+#: gmusicbrowser.pl:7109
+msgid "Partially supported video extensions"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4210
+msgid "Paste link"
+msgstr ""
+
+#: gmusicbrowser.pl:1306
 msgid "Path,Album,Disc,Track,File"
 msgstr "パス,アルバム,ディスク,トラック,ファイル"
 
+#: gmusicbrowser.pl:1300
 msgid "Path,File"
 msgstr "パス,ファイル"
 
+#: plugins/karaoke.pm:42
 msgid "Pattern to find .lrc files :"
 msgstr ".lrcファイル検索パターン ："
 
+#: gmusicbrowser.pl:727 gmusicbrowser.pl:1629 gmusicbrowser_layout.pm:86
 msgid "Pause"
 msgstr "一時停止"
 
+#: gmusicbrowser_tags.pm:540
+msgid "Per-song values"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:3191
+msgid "Persistent values"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1173
+msgid "Pick an existing one"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1874 gmusicbrowser_tags.pm:1914
+#: gmusicbrowser_tags.pm:1955
 msgid "Picture"
 msgstr "画像"
 
+#: layouts/main.layout:210
+msgid "Picture Browser"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:2370
 msgid "Picture Type"
 msgstr "画像タイプ"
 
+#: gmusicbrowser.pl:6885
 #, perl-format
 msgid "Picture cache : %d MB"
 msgstr "画像キャッシュ: %d MB"
 
+#: plugins/fetch_cover.pm:9
 msgid "Picture finder"
 msgstr "画像ファインダ"
 
+#: plugins/fetch_cover.pm:10
 msgid "Picture finder plugin"
 msgstr "画像ファインダプラグイン"
 
+#: plugins/notify.pm:60
 #, perl-format
 msgid "Picture size : %d"
 msgstr "画像サイズ : %d"
 
+#: gmusicbrowser_tags.pm:1579
+msgid "Picture type"
+msgstr ""
+
+#: gmusicbrowser.pl:5158
 msgid "Pictures and music files"
 msgstr "画像と楽曲ファイル"
 
+#: gmusicbrowser.pl:5159
 msgid "Pictures files"
 msgstr "画像ファイル"
 
+#: gmusicbrowser.pl:727 gmusicbrowser.pl:1630 gmusicbrowser_layout.pm:86
+#: gmusicbrowser_list.pm:1705 gmusicbrowser_list.pm:4107
+#: gmusicbrowser_list.pm:4171 layouts/makeitlooklike.layout:266
+#: layouts/makeitlooklike.layout:359 layouts/makeitlooklike.layout:444
 msgid "Play"
 msgstr "再生"
 
+#: gmusicbrowser.pl:672
 msgid "Play Only Displayed"
 msgstr "表示中の楽曲のみ再生"
 
+#: gmusicbrowser.pl:670
 msgid "Play Only Selected"
 msgstr "選択中楽曲のみ再生"
 
+#: gmusicbrowser.pl:1687
 msgid "Play a list of files"
 msgstr "ファイルリストの楽曲を再生"
 
+#: gmusicbrowser_list.pm:3402
 msgid "Play all songs from this album"
 msgstr "アルバムの全楽曲を再生"
 
+#: gmusicbrowser_list.pm:3402
 msgid "Play all songs from this artist"
 msgstr "アーティストの全楽曲を再生"
 
+#: layouts/titlebar.layout:5
 msgid "Play button"
 msgstr "再生ボタン"
 
+#: gmusicbrowser_list.pm:724 gmusicbrowser_songs.pm:1261
 msgid "Play count"
 msgstr "再生回数"
 
+#: gmusicbrowser_tags.pm:1879
 msgid "Play counter"
 msgstr "再生カウンタ"
 
+#: gmusicbrowser_layout.pm:584
 msgid "Play filter"
 msgstr "再生フィルタ"
 
+#: gmusicbrowser_songs.pm:1234
+msgid "Play history"
+msgstr ""
+
+#: gmusicbrowser.pl:1698
 msgid "Play listed songs"
 msgstr "リスト上の楽曲を再生"
 
+#: gmusicbrowser_layout.pm:179 gmusicbrowser_layout.pm:543
 msgid "Play order"
 msgstr "再生順"
 
+#: gmusicbrowser_list.pm:796
+msgid "Play, queue or track"
+msgstr ""
+
+#: gmusicbrowser.pl:1624 plugins/appindicator.pm:26 layouts/contrib.layout:218
 msgid "Play/Pause"
 msgstr "再生/一時停止"
 
+#: layouts/makeitlooklike.layout:442
 msgid "Playback"
 msgstr "再生"
 
+#: gmusicbrowser_mpv.pm:205
+msgid "Playback ended unexpectedly."
+msgstr ""
+
+#: plugins/artistinfo.pm:563
 msgid "Playcount: "
 msgstr "再生数:"
 
+#: gmusicbrowser.pl:2367
 msgid "Played Today"
 msgstr "本日再生曲"
 
+#: plugins/export.pm:85
 msgid "Player mounted on :"
 msgstr "プレヤーをマウント ："
 
+#: gmusicbrowser.pl:6929
 msgid "Player window layout :"
 msgstr "プレーヤーウィンドウレイアウト ："
 
+#: gmusicbrowser_layout.pm:535 gmusicbrowser_list.pm:3071
 msgid "Playing"
 msgstr "再生中"
 
+#: gmusicbrowser_list.pm:3157
 msgid "Playing Album"
 msgstr "再生中アルバム"
 
+#: gmusicbrowser_list.pm:3156
 msgid "Playing Artist"
 msgstr "再生中アーティスト"
 
+#: gmusicbrowser_list.pm:3155
 msgid "Playing Filter"
 msgstr "再生中フィルタ"
 
+#: gmusicbrowser_list.pm:3158
 msgid "Playing Title"
 msgstr "再生中タイトル"
 
+#: gmusicbrowser_list.pm:789 layouts/songtree.layout:46
 msgid "Playing and queue icons"
 msgstr "再生とキューのアイコン"
 
+#: gmusicbrowser.pl:3079
 #, perl-brace-format
 msgid "Playing error : {error}"
 msgstr "再生エラー : {error}"
 
+#: layouts/shimmer.layout:163
+msgid "Playing/Queue Icon or Track"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:432 layouts/contrib.layout:242
+#: layouts/contrib.layout:350 layouts/contrib.layout:495
+#: layouts/contrib.layout:545 layouts/contrib.layout:631
+#: layouts/main.layout:147 layouts/makeitlooklike.layout:451
+#: layouts/shimmer.layout:76
 msgid "Playlist"
 msgstr "プレイリスト"
 
+#: layouts/makeitlooklike.layout:173
 msgid "Playlist 1"
 msgstr "プレイリスト 1"
 
+#: gmusicbrowser_layout.pm:264 gmusicbrowser_layout.pm:1906
 msgid "Playlist Empty"
 msgstr "プレイリストは空"
 
+#: layouts/makeitlooklike.layout:61
 msgid "Playlist Utilities Bar"
 msgstr "プレイリストユーティリティバー"
 
+#: gmusicbrowser_list.pm:423
 msgid "Playlist empty"
 msgstr "プレイリストは空"
 
+#: gmusicbrowser.pl:6022
 msgid "Playlist files"
 msgstr "プレイリストファイル"
 
+#: gmusicbrowser_layout.pm:547
 msgid "Playlist filter"
 msgstr "プレイリストフィルタ"
 
+#: gmusicbrowser_layout.pm:194
 msgid "Playlist filter :\n"
 msgstr "プレイリストフィルタ :\n"
 
+#: layouts/makeitlooklike.layout:77 layouts/makeitlooklike.layout:458
+#: layouts/makeitlooklike.layout:498
 msgid "Playlists"
 msgstr "プレイリスト"
 
+#: gmusicbrowser.pl:6592
 msgid "Plugin not loaded"
 msgstr "プラグインが読み込まれていません"
 
+#: gmusicbrowser.pl:6364
 msgid "Plugins"
 msgstr "プラグイン"
 
+#: gmusicbrowser_tags.pm:1880
+msgid "Popularimeter"
+msgstr ""
+
+#: gmusicbrowser.pl:1636
 msgid "Popup Custom window"
 msgstr "カスタムウィンドウのポップアップ"
 
+#: gmusicbrowser.pl:1694
 msgid "Popup Traytip"
 msgstr "トレイチップをポップアップ"
 
+#: plugins/notify.pm:45
 msgid "Popup notify window"
 msgstr "通知ウィンドウをポップアップ"
 
+#: gmusicbrowser.pl:1700
 msgid "Popup playlist filter menu"
 msgstr "プレイリストのフィルタメニューをポップアップ"
 
+#: gmusicbrowser.pl:1701
 msgid "Popup playlist order menu"
 msgstr "プレイリストの並び順メニューをポップアップ"
 
+#: gmusicbrowser.pl:1702
 msgid "Popup queue menu"
 msgstr "キューメニューをポップアップ"
 
+#: plugins/webcontext.pm:502
 msgid "Pre-set"
 msgstr "プリセット"
 
+#: plugins/lyrics.pm:219
 msgid "Prefered place to load and save lyrics :"
 msgstr "歌詞の読込と保存の最適な場所 :"
 
+#: layouts/makeitlooklike.layout:54 layouts/makeitlooklike.layout:439
 msgid "Preferences"
 msgstr "プリファレンス"
 
+#: gmusicbrowser.pl:661
 msgid "Prepend"
 msgstr "先頭に追加"
 
+#: gmusicbrowser.pl:6431
+msgid "Press a key or a key combination"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:67 gmusicbrowser_list.pm:5399
+#: layouts/makeitlooklike.layout:268 layouts/makeitlooklike.layout:361
+#: layouts/makeitlooklike.layout:446
 msgid "Previous"
 msgstr "前"
 
+#: gmusicbrowser.pl:1623 layouts/contrib.layout:217
 msgid "Previous Song"
 msgstr "前の楽曲"
 
+#: gmusicbrowser.pl:1619
 msgid "Previous Song In Playlist"
 msgstr "プレイリスト内の前楽曲"
 
+#: plugins/lyrics.pm:156
 msgid "Previous page"
 msgstr "前のページ"
 
+#: gmusicbrowser_tags.pm:2392
+msgid "Price paid"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1882
 msgid "Private Data"
 msgstr "個人データ"
 
+#: gmusicbrowser.pl:5292
+msgid "Proceed to next item."
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1885
+msgid "Produced (P)"
+msgstr ""
+
+#: layouts/main.layout:183
 msgid "Progress"
 msgstr "進捗"
 
+#: layouts/makeitlooklike.layout:346
 msgid "Properties"
 msgstr "プロパティ"
 
-msgid "Provides context views using MozEmbed or WebKit"
-msgstr "MozEmbed もしくは Webkitを用いたコンテキストビューを提供"
+#: plugins/webcontext.pm:12
+msgid "Provides context views using WebKit"
+msgstr ""
 
+#: gmusicbrowser.pl:6838
 msgid "Proxy host :"
 msgstr "プロキシホスト ："
 
+#: gmusicbrowser_tags.pm:1928
+msgid "Publication right"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1921
+msgid "Publisher"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:2359
+msgid "Publisher/Studio logotype"
+msgstr ""
+
+#: gmusicbrowser.pl:3362 gmusicbrowser_layout.pm:218
+#: gmusicbrowser_layout.pm:426 gmusicbrowser_layout.pm:551
+#: layouts/contrib.layout:235 layouts/contrib.layout:304
+#: layouts/contrib.layout:487 layouts/contrib.layout:593
+#: layouts/contrib.layout:624 layouts/contrib.layout:766
+#: layouts/makeitlooklike.layout:51 layouts/makeitlooklike.layout:387
+#: layouts/makeitlooklike.layout:507
 msgid "Queue"
 msgstr "キュー"
 
+#: layouts/shimmer.layout:29 layouts/shimmer.layout:73
 #, perl-format
 msgid "Queue (%n)"
 msgstr "キュー (%n)"
 
+#: layouts/main.layout:198
 msgid "Queue Edit"
 msgstr "キュの編集"
 
+#: gmusicbrowser_layout.pm:23
 msgid "Queue album"
 msgstr "アルバムのキュー"
 
+#: gmusicbrowser_layout.pm:24
 msgid "Queue artist"
 msgstr "アーティストのキュー"
 
+#: gmusicbrowser.pl:3903 gmusicbrowser_list.pm:421
 msgid "Queue empty"
 msgstr "キューは空"
 
+#: layouts/makeitlooklike.layout:252
 msgid "Queue in Sidebar"
 msgstr "サイドバー内のキュー"
 
+#: gmusicbrowser.pl:1654
 msgid "Queue mode"
 msgstr "キューモード"
 
+#: gmusicbrowser.pl:709
 msgid "Queue options"
 msgstr "キューオプション"
 
+#: layouts/search.layout:12
 msgid "Quick Search"
 msgstr "高速検索"
 
+#: layouts/search.layout:21
 msgid "Quick Search with SongTree"
 msgstr "ソングツリーを高速検索"
 
+#: gmusicbrowser.pl:738 gmusicbrowser.pl:1645 gmusicbrowser_layout.pm:58
+#: gmusicbrowser_layout.pm:139 layouts/contrib.layout:256
+#: layouts/contrib.layout:309 layouts/contrib.layout:318
+#: layouts/contrib.layout:415 layouts/contrib.layout:574
+#: layouts/contrib.layout:586 layouts/contrib.layout:717
+#: layouts/makeitlooklike.layout:49 layouts/makeitlooklike.layout:234
+#: layouts/makeitlooklike.layout:348 layouts/makeitlooklike.layout:440
+#: layouts/shimmer.layout:23 layouts/shimmer.layout:71
 msgid "Quit"
 msgstr "終了"
 
+#: gmusicbrowser.pl:601
+msgid "Quit after this song"
+msgstr ""
+
+#: gmusicbrowser.pl:600
 msgid "Quit when queue empty"
 msgstr "キューが空の時終了"
 
-msgid "Radio title"
-msgstr "ラジオタイトル"
-
-msgid "Radio url"
-msgstr "ラジオ URL"
-
+#: gmusicbrowser.pl:3374
 msgid "Random"
 msgstr "ランダム"
 
+#: layouts/makeitlooklike.layout:453
 msgid "Random Playback"
 msgstr "ランダム再生"
 
+#: gmusicbrowser.pl:8151
 msgid "Random mode edition"
 msgstr "ランダムモード編集"
 
+#: gmusicbrowser_list.pm:825 gmusicbrowser_songs.pm:1193
+#: gmusicbrowser_songs.pm:5507 gmusicbrowser_tags.pm:2386
+#: plugins/albuminfo.pm:36 layouts/songtree.layout:81
 msgid "Rating"
 msgstr "レーティング"
 
+#: gmusicbrowser_list.pm:825 layouts/songtree.layout:82
 msgid "Rating (picture)"
 msgstr "レーティング (画像)"
 
+#: gmusicbrowser.pl:1684
 msgid "Rating between 0 and 100, or empty for default"
 msgstr "0〜100の間で評価してください。既定では空です"
 
+#: plugins/albuminfo.pm:593 plugins/artistinfo.pm:463
 msgid "Rating range:"
 msgstr "レーティングレンジ ："
 
+#: gmusicbrowser_songs.pm:1499
+msgid "Raw filename with path"
+msgstr ""
+
+#: gmusicbrowser.pl:1703 gmusicbrowser.pl:6940
 msgid "Re-load layouts"
 msgstr "レイアウトの再読込"
 
+#: gmusicbrowser.pl:703
 msgid "Re-read tags"
 msgstr "タグの再読込"
 
+#: gmusicbrowser.pl:1204
 msgid "Re-reading tags"
 msgstr "タグの再読込中"
 
+#: gmusicbrowser_layout.pm:1558
 msgid "Re-shuffle"
 msgstr "再シャッフル"
 
+#: gmusicbrowser_songs.pm:3084
 msgid "Read/write in file tag"
 msgstr "ファイルタグ内の読込/書出"
 
+#: gmusicbrowser_layout.pm:531
 msgid "Recent Filters"
 msgstr "最新のフィルタ"
 
+#: gmusicbrowser_list.pm:23
 msgid "Recent albums"
 msgstr "最新のアルバム"
 
+#: gmusicbrowser_list.pm:24
 msgid "Recent artists"
 msgstr "最新のアーティスト"
 
+#: gmusicbrowser_list.pm:25
 msgid "Recent songs"
 msgstr "最新の楽曲"
 
+#: gmusicbrowser.pl:6887
 msgid "Recent songs include skipped songs that haven't been played."
 msgstr "最新の楽曲(未再生の楽曲を含む)"
 
+#: gmusicbrowser.pl:730 gmusicbrowser.pl:3423
 msgid "Recently played"
 msgstr "最近再生された"
 
+#: gmusicbrowser_layout.pm:66
 msgid "Recently played songs"
 msgstr "前の曲"
 
+#: gmusicbrowser_tags.pm:1896
 msgid "Recording Dates"
 msgstr "日付の記録"
 
+#: plugins/albuminfo.pm:33
 msgid "Recording date"
 msgstr "日付の記録"
 
+#: plugins/titlebar.pm:53
 msgid "Reference point :"
 msgstr "参照ポイント :"
 
+#: plugins/albuminfo.pm:202 plugins/artistinfo.pm:208 plugins/lyrics.pm:158
+#: layouts/makeitlooklike.layout:455
 msgid "Refresh"
 msgstr "更新"
 
+#: gmusicbrowser_layout.pm:577
 msgid "Refresh list"
 msgstr "リストの更新"
 
+#: gmusicbrowser_list.pm:3617
 msgid "Regular expression"
 msgstr "正規表現"
 
+#: gmusicbrowser_tags.pm:809
 msgid "Regular expression :"
 msgstr "正規表現 :"
 
+#: gmusicbrowser_tags.pm:904
 msgid "Regular expression didn't match"
 msgstr "正規表現が合致しません"
 
+#: plugins/albuminfo.pm:34
 msgid "Release date"
 msgstr "リリース日時"
 
+#: gmusicbrowser.pl:6831
 msgid "Remember last Filter/Playlist between sessions"
 msgstr "セッション中の最後のフィルタ/プレイリストを記憶"
 
+#: gmusicbrowser.pl:6832
 msgid "Remember playing position between sessions"
 msgstr "セッション中の再生ポジションを記録"
 
+#: gmusicbrowser.pl:6833
 msgid "Remember playing song between sessions"
 msgstr "セッション中の再生楽曲を記録"
 
+#: gmusicbrowser.pl:6834
 msgid "Remember queue between sessions"
 msgstr "セッション中のキューを記録"
 
+#: gmusicbrowser_songs.pm:1315
 msgid "Remixer"
 msgstr "レミキサー"
 
+#: gmusicbrowser.pl:702 gmusicbrowser.pl:6497 gmusicbrowser.pl:7168
+#: gmusicbrowser.pl:8199 gmusicbrowser.pl:8332 gmusicbrowser.pl:8617
+#: gmusicbrowser_list.pm:290 gmusicbrowser_list.pm:1742
+#: gmusicbrowser_tags.pm:815 gmusicbrowser_tags.pm:1359
+#: plugins/webcontext.pm:501
 msgid "Remove"
 msgstr "消去"
 
+#: gmusicbrowser.pl:1696
 msgid "Remove a label from the current song"
 msgstr "現在の楽曲からラベルを消去"
 
+#: gmusicbrowser_tags.pm:1356
 msgid "Remove all"
 msgstr "すべて消去"
 
+#: gmusicbrowser_list.pm:298
 msgid "Remove all songs"
 msgstr "全楽曲の消去"
 
+#: gmusicbrowser_list.pm:3053
 msgid "Remove filter"
 msgstr "フィルタの消去"
 
+#: gmusicbrowser.pl:658
 msgid "Remove from disk"
 msgstr "ディスクから消去"
 
+#: gmusicbrowser.pl:657
 msgid "Remove from library"
 msgstr "ライブラリから消去"
 
+#: gmusicbrowser.pl:656
 msgid "Remove from list"
 msgstr "リストから消去"
 
+#: gmusicbrowser.pl:7309
+msgid "Remove from persistent values"
+msgstr ""
+
+#: gmusicbrowser.pl:656
 msgid "Remove from playlist"
 msgstr "プレイリストから消去"
 
+#: gmusicbrowser.pl:656
 msgid "Remove from queue"
 msgstr "キューから消去"
 
-msgid "Remove header, footer and left column from wikipedia pages"
-msgstr "wikipediaページからヘッダ,フッタ,左コラムを消去"
-
-msgid "Remove label"
-msgstr "ラベルの消去"
-
+#: gmusicbrowser_list.pm:3061
 msgid "Remove list"
 msgstr "リストの消去"
 
+#: gmusicbrowser_tags.pm:1572
+msgid "Remove picture"
+msgstr ""
+
+#: gmusicbrowser_list.pm:297
 msgid "Remove selected songs"
 msgstr "選択楽曲の消去"
 
+#: gmusicbrowser_songs.pm:3144
 msgid "Remove this field"
 msgstr "フィールドの消去"
 
+#: gmusicbrowser.pl:8983
 msgid "Remove this rule"
 msgstr "ルールの消去"
 
+#: gmusicbrowser_list.pm:1986
 msgid "Remove this tab"
 msgstr "タブの消去"
 
+#: gmusicbrowser_tags.pm:2030 gmusicbrowser_tags.pm:2180
 msgid "Remove this tag"
 msgstr "タグの消去"
 
+#: plugins/desktopwidget.pm:139
 msgid "Remove this widget"
 msgstr "ウィジェットの消去"
 
+#: gmusicbrowser.pl:7328 gmusicbrowser_layout.pm:2496
+#: gmusicbrowser_list.pm:1746 gmusicbrowser_list.pm:3063
+#: gmusicbrowser_songs.pm:3302
 msgid "Rename"
 msgstr "名前変更"
 
+#: gmusicbrowser.pl:7333
+#, perl-brace-format
+msgid "Rename '{label}'"
+msgstr ""
+
+#: gmusicbrowser.pl:5622
 msgid "Rename File"
 msgstr "ファイルの名前変更"
 
+#: gmusicbrowser.pl:695 gmusicbrowser_layout.pm:4197
 msgid "Rename file"
 msgstr "ファイルの名前変更"
 
+#: gmusicbrowser.pl:5545
 msgid "Rename files using this pattern :"
 msgstr "本パターンでのファイルの名前変更 :"
 
+#: gmusicbrowser.pl:7030 gmusicbrowser_list.pm:1723
 msgid "Rename folder"
 msgstr "フォルダの名前変更"
 
+#: gmusicbrowser.pl:7039
 msgid "Rename this folder to :"
 msgstr "このフォルダを名前変更 :"
 
+#: gmusicbrowser.pl:5543
 msgid "Rename/move files based on these fields :"
 msgstr "これらのフィールドに従って名前変更/移動 :"
 
+#: gmusicbrowser.pl:5602
+msgid "Renaming failed"
+msgstr ""
+
+#: gmusicbrowser.pl:7051
 #, perl-brace-format
 msgid ""
 "Renaming {oldname}\n"
@@ -2189,531 +3930,992 @@ msgstr ""
 "{newname} への\n"
 "名前変更に失敗: {error}"
 
+#: gmusicbrowser.pl:7201
 msgid "Reorganize files and folders"
 msgstr "ファイルとフォルダの再編成"
 
+#: gmusicbrowser_layout.pm:694 gmusicbrowser_layout.pm:1563
 msgid "Repeat"
 msgstr "リピート"
 
+#: gmusicbrowser.pl:662
 msgid "Replace"
 msgstr "書き換え"
 
+#: plugins/albuminfo.pm:106
 msgid "Replace existing values"
 msgstr "既保存値の置き換え"
 
+#: gmusicbrowser_tags.pm:2516
 msgid "Replace..."
 msgstr "置き換え"
 
+#: gmusicbrowser.pl:6746 gmusicbrowser.pl:6804
 msgid "ReplayGain options"
 msgstr "リプレイゲインのオプション"
 
+#: gmusicbrowser_songs.pm:38
 msgid "Replaygain"
 msgstr "リプレイゲイン"
 
+#: gmusicbrowser_gstreamer-1.x.pm:623 gmusicbrowser_gstreamer-1.x.pm:690
 msgid "Replaygain analysis"
 msgstr "リプレイゲインの解析"
 
+#: layouts/makeitlooklike.layout:456
 msgid "Rescan"
 msgstr "再スキャン"
 
+#: layouts/makeitlooklike.layout:64 layouts/shimmer.layout:24
+#: layouts/shimmer.layout:72
 msgid "Rescan Collection"
 msgstr "コレクションの再スキャン"
 
+#: gmusicbrowser_songs.pm:3104
+msgid "Reset current value if no tag found in file"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:599 gmusicbrowser_list.pm:3645
 msgid "Reset filter"
 msgstr "フィルタのリセット"
 
+#: gmusicbrowser_layout.pm:4166
+msgid "Reset view position when file changes"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4168
+msgid "Reset zoom"
+msgstr ""
+
+#: plugins/albuminfo.pm:13
 msgid "Retrieves album-relevant information (review etc.) from allmusic.com."
 msgstr "allmusic.com からアルバムの関連情報を取得(レビューほか)"
 
+#: plugins/albuminfo.pm:477
 msgid "Review"
 msgstr "レビュー"
 
+#: gmusicbrowser.pl:1626
 msgid "Rewind"
 msgstr "リワインド"
 
+#: layouts/makeitlooklike.layout:263
+msgid "Rhythmbox"
+msgstr ""
+
+#: layouts/makeitlooklike.layout:386
 msgid "Rhythmbox 2nd queue column"
 msgstr "Rhythmbox キュー2列目"
 
+#: plugins/lyrics.pm:31
 msgid "Right aligned"
 msgstr "右揃え"
 
+#: gmusicbrowser_list.pm:1662
 msgid "Right side"
 msgstr "右側"
 
+#: layouts/contrib.layout:361 layouts/contrib.layout:556
+#: layouts/contrib.layout:756 layouts/shimmer.layout:33
 msgid "Right-click to remove filters"
 msgstr "右クリックしフィルタを削除"
 
+#: layouts/contrib.layout:360 layouts/contrib.layout:555
+#: layouts/contrib.layout:755 layouts/shimmer.layout:33
 msgid "Right-click to toggle shuffle/random"
 msgstr "右クリックしシャッフル/ランダム再生の切替"
 
+#: plugins/rip.pm:9
+msgid "Rip"
+msgstr ""
+
+#: plugins/rip.pm:10
 msgid "Rip plugin"
 msgstr "Ripプラグイン"
 
+#: plugins/rip.pm:53
 msgid "Ripping software :"
 msgstr "Rippingソフトウェア ："
 
+#: gmusicbrowser_list.pm:832 layouts/shimmer.layout:157
+msgid "Row number"
+msgstr ""
+
+#: plugins/nowplaying.pm:18
 msgid "Run a command when playing a song"
 msgstr "楽曲再生時にコマンドを実行"
 
+#: gmusicbrowser.pl:1669
 msgid "Run perl code"
 msgstr "perl コードの実行"
 
+#: gmusicbrowser.pl:1664
+msgid "Run shell command"
+msgstr ""
+
+#: gmusicbrowser.pl:1668
+msgid "Run shell command on selected songs"
+msgstr ""
+
+#: gmusicbrowser.pl:1662
 msgid "Run system command"
 msgstr "システムコマンドの実行"
 
+#: gmusicbrowser.pl:1666
+msgid "Run system command on selected songs"
+msgstr ""
+
+#: plugins/albuminfo.pm:35
 msgid "Running time"
 msgstr "実行時間"
 
+#: gmusicbrowser.pl:705
 msgid "Same Title"
 msgstr "同一タイトル"
 
+#: layouts/pages.layout:12
 msgid "Same album"
 msgstr "同一アルバム"
 
+#: layouts/pages.layout:19
 msgid "Same artist"
 msgstr "同一アーティスト"
 
+#: layouts/pages.layout:5
 msgid "Same title"
 msgstr "同一タイトル"
 
+#: gmusicbrowser_songs.pm:1568
+msgid "Same type as labels"
+msgstr ""
+
+#: layouts/pages.layout:26
 msgid "Same year"
 msgstr "同一年"
 
+#: gmusicbrowser_songs.pm:1361
 msgid "Sampling Rate"
 msgstr "サンプリングレート"
 
+#: plugins/lullaby.pm:27
 msgid "Saturday"
 msgstr "土曜日"
 
+#: gmusicbrowser_layout.pm:5462 gmusicbrowser_tags.pm:816
+#: plugins/artistinfo.pm:209 plugins/lyrics.pm:157 plugins/webcontext.pm:500
 msgid "Save"
 msgstr "保存"
 
+#: gmusicbrowser.pl:1646
 msgid "Save Tags/Options"
 msgstr "タグ/オプションの保存"
 
+#: plugins/albuminfo.pm:88
 msgid "Save album info in:"
 msgstr "アルバム情報の保存:"
 
+#: plugins/artistinfo.pm:209
 msgid "Save artist biography"
 msgstr "アーティストのバイオグラフィを保存"
 
+#: gmusicbrowser_layout.pm:5473 gmusicbrowser_tags.pm:2517
 msgid "Save as..."
 msgstr "別名で保存..."
 
+#: gmusicbrowser_list.pm:3055
 msgid "Save current filter as"
 msgstr "現在のフィルタを保存"
 
+#: gmusicbrowser_list.pm:3057
 msgid "Save current list as"
 msgstr "現在のリストを保存"
 
+#: plugins/lyrics.pm:157
 msgid "Save lyrics"
 msgstr "歌詞を保存"
 
+#: plugins/autosave.pm:37
 msgid "Save now"
 msgstr "直ちに保存"
 
+#: gmusicbrowser_tags.pm:2588 plugins/fetch_cover.pm:565
 msgid "Save picture as"
 msgstr "画像を保存"
 
+#: gmusicbrowser_layout.pm:5471
+msgid "Save preset"
+msgstr ""
+
+#: plugins/albuminfo.pm:204
 msgid "Save review"
 msgstr "レビューを保存"
 
+#: plugins/albuminfo.pm:108
+msgid ""
+"Save selected fields for all tracks on the same album whenever album data is "
+"loaded from allmusic or from file."
+msgstr ""
+
+#: plugins/autosave.pm:36
 #, perl-format
 msgid "Save tags/settings every %d minutes"
 msgstr "%d分毎にタグ/設定を保存する"
 
+#: gmusicbrowser_list.pm:1588
 msgid "Saved"
 msgstr "保存済"
 
+#: gmusicbrowser_layout.pm:1622
 msgid "Saved Lists"
 msgstr "保存済リスト"
 
+#: gmusicbrowser_list.pm:3069
 msgid "Saved filters"
 msgstr "保存済フィルタ"
 
+#: gmusicbrowser_list.pm:3070
 msgid "Saved lists"
 msgstr "保存済リスト"
 
+#: layouts/contrib.layout:321 layouts/contrib.layout:589
+#: layouts/contrib.layout:735
 msgid "Scan Collection"
 msgstr "コレクションのスキャン"
 
+#: gmusicbrowser_gstreamer-1.x.pm:628
 msgid "Scan as an album"
 msgstr "1枚のアルバムとしてスキャン"
 
+#: gmusicbrowser_list.pm:1726
 msgid "Scan for new songs"
 msgstr "新しい楽曲のスキャン"
 
+#: gmusicbrowser_gstreamer-1.x.pm:626
 msgid "Scan per-file track gain"
 msgstr "ファイル毎のトラックゲインをスキャン"
 
+#: gmusicbrowser_gstreamer-1.x.pm:625
 msgid "Scan this file"
 msgstr "このファイルをスキャン"
 
+#: gmusicbrowser_gstreamer-1.x.pm:627
 msgid "Scan using tag-defined album"
 msgstr "タグで定義されたアルバムを用いてスキャン"
 
+#: gmusicbrowser.pl:6185
 msgid "Scanning"
 msgstr "スキャン中"
 
+#: gmusicbrowser_layout.pm:4164
+msgid "Scroll to zoom"
+msgstr ""
+
+#: plugins/lyrics.pm:36
 msgid "Scroll with song"
 msgstr "楽曲と連動してスクロール"
 
+#: plugins/lyrics.pm:183
 msgid "Scroll with the song"
 msgstr "楽曲と連動してスクロール"
 
+#: layouts/contrib.layout:722
+msgid "Scrollwheel to change, right-click to mute"
+msgstr ""
+
+#: plugins/albuminfo.pm:256 plugins/fetch_cover.pm:95
+#: layouts/contrib.layout:358 layouts/contrib.layout:595
+#: layouts/makeitlooklike.layout:253 layouts/pages.layout:32
+#: layouts/search.layout:4 layouts/search.layout:5 layouts/search.layout:13
+#: layouts/search.layout:22
 msgid "Search"
 msgstr "検索"
 
+#: gmusicbrowser_list.pm:4100 gmusicbrowser_list.pm:4164
 msgid "Search : "
 msgstr "検索 :"
 
+#: gmusicbrowser_list.pm:3608
 msgid "Search Album"
 msgstr "アルバムの検索"
 
+#: gmusicbrowser_list.pm:3607 layouts/makeitlooklike.layout:315
 msgid "Search Artist"
 msgstr "アーティストの検索"
 
+#: gmusicbrowser_list.pm:3609
 msgid "Search Comment"
 msgstr "コメントの検索"
 
+#: gmusicbrowser_list.pm:3611
 msgid "Search Genre"
 msgstr "ジャンルの検索"
 
+#: gmusicbrowser_list.pm:3610
 msgid "Search Label"
 msgstr "ラベルの検索"
 
+#: gmusicbrowser_list.pm:3606
 msgid "Search Title"
 msgstr "タイトルの検索"
 
+#: gmusicbrowser_list.pm:3603
 msgid "Search Title, Artist and Album"
 msgstr "タイトル, アーティスト, アルバムの検索"
 
+#: gmusicbrowser_list.pm:3604
 msgid "Search Title, Artist, Album, Comment, Label and Genre"
 msgstr "タイトル, アーティスト, アルバム, コメント, ラベル, ジャンルの検索"
 
+#: gmusicbrowser_list.pm:3605
 msgid "Search Title, Artist, Album, Comment, Label, Genre and Filename"
 msgstr ""
 "タイトル, アーティスト, アルバム, コメント, ラベル, ジャンル, ファイル名の検"
 "索"
 
+#: layouts/makeitlooklike.layout:316
 msgid "Search album"
 msgstr "アルバムの検索"
 
+#: layouts/makeitlooklike.layout:314
 msgid "Search all fields"
 msgstr "全フィールドの検索"
 
+#: plugins/artistinfo.pm:41
 msgid "Search allmusic for Artist"
 msgstr "アーティストの全楽曲を検索"
 
+#: plugins/artistinfo.pm:39
 msgid "Search amazon.com for Artist"
 msgstr "アーティストについてamazon.comで検索"
 
+#: plugins/lyrics.pm:11
 msgid "Search and display lyrics"
 msgstr "検索し歌詞を表示"
 
+#: layouts/makeitlooklike.layout:261
 msgid "Search box type"
 msgstr "box タイプの検索"
 
+#: plugins/artistinfo.pm:43
 msgid "Search discogs for Artist"
 msgstr "アーティストのディスコグラフィを検索"
 
+#: plugins/artistinfo.pm:38
 msgid "Search for Artist on youtube"
 msgstr "アーティストについてyoutubeで検索"
 
+#: plugins/fetch_cover.pm:52 plugins/fetch_cover.pm:57
 msgid "Search for a picture on internet"
 msgstr "インターネットで画像を検索"
 
+#: plugins/artistinfo.pm:354
 msgid "Search for artist on:"
 msgstr "アーティストについて検索:"
 
+#: plugins/fetch_cover.pm:96
 msgid "Search for current album"
 msgstr "現在のアルバムを検索"
 
+#: plugins/fetch_cover.pm:96
 msgid "Search for current artist"
 msgstr "現在のアーティストを検索"
 
+#: gmusicbrowser.pl:7194
 msgid "Search for new songs on startup"
 msgstr "起動時に新しい楽曲を検索"
 
+#: plugins/artistinfo.pm:40
 msgid "Search google for Artist"
 msgstr "アーティストについてGoogleで検索"
 
+#: plugins/artistinfo.pm:47
 msgid "Search on the web"
 msgstr "Webで検索"
 
+#: gmusicbrowser_list.pm:3644
 msgid "Search options"
 msgstr "検索オプション"
 
+#: plugins/artistinfo.pm:42
+msgid "Search pitchfork for Artist"
+msgstr ""
+
+#: layouts/makeitlooklike.layout:317
 msgid "Search title"
 msgstr "タイトルの検索"
 
+#: gmusicbrowser.pl:6933
 msgid "Search window layout :"
 msgstr "ウィンドウレイアウトの検索 :"
 
+#: layouts/makeitlooklike.layout:197 layouts/makeitlooklike.layout:306
+#: layouts/makeitlooklike.layout:308
 msgid "Search:"
 msgstr "検索:"
 
+#: plugins/fetch_cover.pm:181
 msgid "Searching for a picture of : "
 msgstr "画像を検索 :"
 
+#: gmusicbrowser.pl:1627
 msgid "Seek"
 msgstr "シーク"
 
+#: gmusicbrowser.pl:1648
 msgid "Select current song"
 msgstr "現在の楽曲を選択"
 
+#: gmusicbrowser_tags.pm:487
 msgid "Select fields"
 msgstr "フィールドを選択"
 
+#: gmusicbrowser_list.pm:5397
+msgid "Select matches"
+msgstr ""
+
+#: gmusicbrowser_list.pm:3708
 msgid "Select search fields"
 msgstr "検索フィールドを選択"
 
+#: gmusicbrowser.pl:7097 gmusicbrowser.pl:7190
+msgid "Select which file types are added"
+msgstr ""
+
+#: gmusicbrowser_list.pm:263
 msgid "Selected : "
 msgstr "選択済 :"
 
+#: gmusicbrowser_list.pm:127
 msgid "Selected songs"
 msgstr "選択楽曲"
 
+#: gmusicbrowser.pl:7001
+msgid "Selected songs to update :"
+msgstr ""
+
+#: gmusicbrowser.pl:6225
 msgid "Selecting pictures"
 msgstr "画像を選択中"
 
+#: gmusicbrowser_tags.pm:2394
+msgid "Seller"
+msgstr ""
+
+#: plugins/nowplaying.pm:50
 msgid "Send Title/Artist/Album in standard input"
 msgstr "標準入力にタイトル/アーティスト/アルバムを送信"
 
+#: plugins/audioscrobbler.pm:73
+msgid "Send now"
+msgstr ""
+
+#: gmusicbrowser.pl:1684
 msgid "Set Current Song Rating"
 msgstr "現在の楽曲をレーティングする"
 
+#: gmusicbrowser.pl:722 gmusicbrowser_list.pm:1730
 msgid "Set Picture"
 msgstr "画像を設定"
 
+#: gmusicbrowser.pl:1655
+msgid "Set action when song ends"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4204
+#, perl-brace-format
+msgid "Set as picture for '{name}'"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1714
 msgid "Set as primary filter"
 msgstr "プライマリフィルタに設定"
 
+#: gmusicbrowser.pl:1705
+msgid "Set equalizer"
+msgstr ""
+
+#: gmusicbrowser.pl:1692
 msgid "Set focus on a layout widget"
 msgstr "レイアウトウィジェットにフォーカスを当てる"
 
+#: gmusicbrowser_list.pm:6908
+msgid "Set grouping"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1738
+msgid "Set icon"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1573
+msgid "Set picture"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1565
+msgid "Set picture using this file"
+msgstr ""
+
+#: gmusicbrowser.pl:1638
+msgid "Set player window layout"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1640
+msgid "Set subgroup"
+msgstr ""
+
+#: plugins/albuminfo.pm:462
+#, perl-brace-format
+msgid "Set {year} as year for all tracks on this album."
+msgstr ""
+
+#: gmusicbrowser.pl:737 gmusicbrowser.pl:6349 gmusicbrowser_layout.pm:53
+#: gmusicbrowser_layout.pm:131 layouts/contrib.layout:317
+#: layouts/contrib.layout:585 layouts/contrib.layout:732
+#: layouts/shimmer.layout:23 layouts/shimmer.layout:71
 msgid "Settings"
 msgstr "設定"
 
+#: gmusicbrowser_songs.pm:3033
 msgid "Settings on this page will only take effect after a restart"
 msgstr "本ページの設定は再起動後に有効になります"
 
+#: gmusicbrowser.pl:1664 gmusicbrowser.pl:1668
+msgid "Shell command"
+msgstr ""
+
+#. Shift key
+#: gmusicbrowser.pl:1339
+msgctxt "Keyboard"
+msgid "Shift"
+msgstr ""
+
+#: gmusicbrowser.pl:735 gmusicbrowser.pl:1643 plugins/albuminfo.pm:82
 msgid "Show"
 msgstr "表示"
 
+#: plugins/artistinfo.pm:36
 msgid "Show Artist page on last.fm"
 msgstr "last.fm上のアーティストページを表示"
 
+#: plugins/artistinfo.pm:37
 msgid "Show Artist page on wikipedia"
 msgstr "wikipedia上のアーティストページを表示"
 
+#: layouts/makeitlooklike.layout:259
 msgid "Show album"
 msgstr "アルバムの表示"
 
+#: gmusicbrowser_layout.pm:4185
+msgid "Show all files"
+msgstr ""
+
+#: plugins/artistinfo.pm:284
+msgid "Show artist picture"
+msgstr ""
+
+#: plugins/artistinfo.pm:31
 msgid "Show artist's biography"
 msgstr "アーティストのバイオグラフィを表示"
 
+#: plugins/artistinfo.pm:32
 msgid "Show artist's upcoming events"
 msgstr "アーティストの今後のイベントを表示"
 
+#: gmusicbrowser_list.pm:1758
 msgid "Show buttons"
 msgstr "ボタンを表示"
 
+#: gmusicbrowser_songs.pm:3132
+msgid "Show edition submenu in song context menu"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4183
+msgid "Show embedded pictures"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4144 gmusicbrowser_layout.pm:4177
+msgid "Show file list"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:3202
+msgid "Show file name extension"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4175
+msgid "Show folder list"
+msgstr ""
+
+#: layouts/makeitlooklike.layout:258
 msgid "Show genre"
 msgstr "ジャンルを表示"
 
+#: layouts/makeitlooklike.layout:468
 msgid "Show info panel"
 msgstr "情報パネルを表示"
 
+#: layouts/makeitlooklike.layout:466
 msgid "Show main window"
 msgstr "メインウィンドウを表示"
 
+#: gmusicbrowser_songs.pm:3136
+msgid "Show menu items to find songs with same value"
+msgstr ""
+
+#: gmusicbrowser.pl:5301
+msgid "Show more error details"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4181
+msgid "Show pdf pages"
+msgstr ""
+
+#: layouts/makeitlooklike.layout:467
 msgid "Show playlist"
 msgstr "プレイリストを表示"
 
+#: gmusicbrowser.pl:6807
 msgid "Show replaygain submenu"
 msgstr "リプレイゲインサブメニューを表示"
 
+#: plugins/artistinfo.pm:33
 msgid "Show similar artists"
 msgstr "類似したアーティストを表示"
 
+#: layouts/makeitlooklike.layout:449
 msgid "Show song details"
 msgstr "楽曲詳細を表示"
 
+#: layouts/makeitlooklike.layout:469
 msgid "Show status bar"
 msgstr "ステータスバーを表示"
 
+#: gmusicbrowser_list.pm:3621
 msgid "Show suggestions"
 msgstr "候補を表示"
 
+#: gmusicbrowser_list.pm:1759
 msgid "Show tabs"
 msgstr "タブを表示"
 
+#: gmusicbrowser_layout.pm:4179
+msgid "Show toolbar"
+msgstr ""
+
+#: gmusicbrowser.pl:6919
 msgid "Show tray icon"
 msgstr "トレイアイコンを表示"
 
+#: gmusicbrowser.pl:6917
 msgid "Show tray tip on song change"
 msgstr "楽曲変更時にトレイtipを表示"
 
+#: gmusicbrowser.pl:1642 plugins/appindicator.pm:27
 msgid "Show/Hide"
 msgstr "表示/隠す"
 
+#: layouts/makeitlooklike.layout:280
 msgid "Show/Hide Browser"
 msgstr "ブラウザの表示/隠す"
 
+#: layouts/contrib.layout:343 layouts/contrib.layout:541
+#: layouts/shimmer.layout:33
 msgid "Show/Hide Cover"
 msgstr "カバーの表示/隠す"
 
+#: gmusicbrowser.pl:1693
 msgid "Show/Hide layout widget(s)"
 msgstr "レイアウトウィジェットの表示/隠す"
 
+#: plugins/karaoke.pm:44
 msgid "Show/Hide lyrics line"
 msgstr "歌詞ラインの表示/隠す"
 
+#: plugins/webcontext.pm:156
 msgid "Show/hide URI entry"
 msgstr "URLエントリの表示/隠す"
 
+#: plugins/webcontext.pm:160
 msgid "Show/hide status bar"
 msgstr "ステータスバーの表示/隠す"
 
+#: gmusicbrowser_layout.pm:1503 gmusicbrowser_layout.pm:1555
+#: gmusicbrowser_list.pm:289 gmusicbrowser_songs.pm:1526
 msgid "Shuffle"
 msgstr "シャッフル"
 
+#: gmusicbrowser_layout.pm:661
+msgid "Shuffle list"
+msgstr ""
+
+#: gmusicbrowser.pl:1674
+msgid "Shuffle or re-shuffle the playlist"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:33
 msgid "Shuffle queue"
 msgstr "キュー内シャッフル"
 
+#: gmusicbrowser.pl:1307
 msgid "Shuffled albums"
 msgstr "アルバム内シャッフル"
 
+#: gmusicbrowser.pl:1308
 msgid "Shuffled albums, shuffled tracks"
 msgstr "シャッフル済アルバム, シャッフル済トラック"
 
+#: gmusicbrowser.pl:6847
 msgid "Shutdown command :"
 msgstr "シャットダウンコマンド ："
 
+#: layouts/makeitlooklike.layout:251
+msgid "Sidebar"
+msgstr ""
+
+#: plugins/artistinfo.pm:33
 msgid "Similar"
 msgstr "類似"
 
+#: plugins/artistinfo.pm:307
 msgid "Similar Artists"
 msgstr "類似アーティスト"
 
+#: layouts/contrib.layout:355 layouts/contrib.layout:553
+#: layouts/contrib.layout:751 layouts/shimmer.layout:19
 msgid "Simple List View"
 msgstr "シンプルなリスト表示"
 
+#: layouts/songtree.layout:21
 msgid "Simple title"
 msgstr "シンプルなタイトル"
 
+#: gmusicbrowser_list.pm:1752
+msgid "Simplify tree"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:927
 msgid "Size"
 msgstr "サイズ"
 
+#: gmusicbrowser.pl:5293
+msgid "Skip _All"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1274
+msgid "Skip count"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1252
+msgid "Skip history"
+msgstr ""
+
+#: gmusicbrowser.pl:5293
+msgid "Skip this and any further errors."
+msgstr ""
+
+#: gmusicbrowser.pl:6758
 msgid "Skip to next song if an error occurs"
 msgstr "エラーが発生した時次の曲へスキップ"
 
+#: layouts/main.layout:33 layouts/main.layout:51 layouts/main.layout:60
+#: layouts/main.layout:102 layouts/tray.layout:24
 msgid "Small"
 msgstr "小"
 
+#: layouts/songtree.layout:74
 msgid "Small album picture"
 msgstr "小さなアルバム画像"
 
+#: layouts/main.layout:34
 msgid "Small player"
 msgstr "小さなプレーヤ"
 
+#: layouts/browser.layout:16
 msgid "Smaller browser"
 msgstr "より小さなブラウザ"
 
+#: gmusicbrowser.pl:1662 gmusicbrowser.pl:1664 gmusicbrowser.pl:1666
+#: gmusicbrowser.pl:1668
+#, perl-format
+msgid "Some variables such as %f (current song filename) are available"
+msgstr ""
+
+#: gmusicbrowser_list.pm:783 layouts/main.layout:96 layouts/search.layout:6
+#: layouts/songtree.layout:58
 msgid "Song"
 msgstr "楽曲"
 
+#: gmusicbrowser.pl:668 gmusicbrowser.pl:5811 layouts/makeitlooklike.layout:232
 msgid "Song Properties"
 msgstr "楽曲のプロパティ"
 
+#: gmusicbrowser_layout.pm:474 layouts/pages.layout:39
 msgid "Song informations"
 msgstr "楽曲の情報"
 
+#: gmusicbrowser_layout.pm:5293
 msgid "Song rating"
 msgstr "楽曲の評価"
 
+#: gmusicbrowser.pl:8153
+msgid "SongTree groupings edition"
+msgstr ""
+
+#: gmusicbrowser.pl:669
 msgid "Songs Properties"
 msgstr "楽曲のプロパティ"
 
+#: layouts/contrib.layout:356 layouts/contrib.layout:554
+#: layouts/contrib.layout:752 layouts/shimmer.layout:19
 msgid "Songtree View"
 msgstr "楽曲ツリービュー"
 
+#: gmusicbrowser_layout.pm:539
 msgid "Sort"
 msgstr "ソート"
 
+#: gmusicbrowser.pl:8149
+msgid "Sort mode edition"
+msgstr ""
+
+#: gmusicbrowser.pl:8631
 msgid "Sort order"
 msgstr "ソート順"
 
+#: gmusicbrowser.pl:5053
+#, perl-brace-format
+msgid "Source: {file}"
+msgstr ""
+
+#: gmusicbrowser.pl:6851
 msgid "Split artist names on :"
 msgstr "アーティストの名前を分割 :"
 
+#: gmusicbrowser_songs.pm:3110
+msgid "Star images"
+msgstr ""
+
+#: gmusicbrowser.pl:6742
+msgid "Start ReplayGain analysis"
+msgstr ""
+
+#: gmusicbrowser.pl:6915
 msgid "Start in tray"
 msgstr "トレー内で開始"
 
+#: gmusicbrowser_songs.pm:35
 msgid "Statistics"
 msgstr "統計"
 
+#: layouts/makeitlooklike.layout:254
 msgid "Statusbar"
 msgstr "ステータスバー"
 
+#: gmusicbrowser.pl:728 gmusicbrowser.pl:1628 gmusicbrowser_layout.pm:77
+#: plugins/notify.pm:98 layouts/contrib.layout:219
+#: layouts/makeitlooklike.layout:445
 msgid "Stop"
 msgstr "停止"
 
+#: gmusicbrowser.pl:599
+msgid "Stop after this song"
+msgstr ""
+
+#: gmusicbrowser.pl:6161
 msgid "Stop checking"
 msgstr "チェックを停止"
 
+#: plugins/albuminfo.pm:131
+msgid "Stop fetching albuminfo"
+msgstr ""
+
+#: gmusicbrowser.pl:6191
 msgid "Stop scanning"
 msgstr "スキャンを停止"
 
+#: gmusicbrowser.pl:6225
 msgid "Stop selecting pictures"
 msgstr "画像選択を停止"
 
+#: gmusicbrowser.pl:598
 msgid "Stop when queue empty"
 msgstr "キューが空の時停止"
 
+#: layouts/titlebar.layout:10
 msgid "Stop, Play and Next buttons"
 msgstr "停止, 再生, 次へボタン"
 
+#: layouts/titlebar.layout:15
 msgid "Stop, Play and Next buttons and Time"
 msgstr "停止, 再生, 次へボタン + 時間"
 
+#: layouts/titlebar.layout:20
 msgid "Stop, Play and Next buttons and Title/Artist"
 msgstr "ストップ, 再生, 次へボタン + タイトル/アーティスト"
 
+#: gmusicbrowser_songs.pm:1165 plugins/albuminfo.pm:39
 msgid "Styles"
 msgstr "スタイル"
 
+#: plugins/audioscrobbler.pm:203
+msgid "Submit Now-Playing OK"
+msgstr ""
+
+#: plugins/audioscrobbler.pm:196
+msgid "Submit OK"
+msgstr ""
+
+#: plugins/audioscrobbler.pm:221
+msgid "Submit failed : "
+msgstr ""
+
+#: plugins/audioscrobbler.pm:11
 msgid "Submit played songs to last.fm"
 msgstr "last.fmに再生楽曲を提供"
 
+#: gmusicbrowser_tags.pm:1920
 msgid "Subtitle"
 msgstr "サブタイトル"
 
+#: plugins/notify.pm:58
 msgid "Summary :"
 msgstr "要約 :"
 
+#: plugins/lullaby.pm:27
 msgid "Sunday"
 msgstr "日曜日"
 
+#: gmusicbrowser_layout.pm:56
 msgid "Switch to fullscreen mode"
 msgstr "フルスクリーンモードへ切替"
 
+#: gmusicbrowser_gstreamer-1.x.pm:503
+msgid "Synchronize equalizer presets"
+msgstr ""
+
+#: plugins/audioscrobbler.pm:147
 msgid "System clock is not close enough to the current time"
 msgstr "システムクロックは現在の時間に対してずれています。"
 
+#: gmusicbrowser.pl:1662 gmusicbrowser.pl:1666
+msgid "System command"
+msgstr ""
+
+#: plugins/export.pm:91
 msgid "System command :"
 msgstr "システムコマンド :"
 
+#: gmusicbrowser.pl:6366
 msgid "Tags"
 msgstr "タグ"
 
+#: gmusicbrowser_tags.pm:2390
 msgid "Terms of use"
 msgstr "利用規約"
 
+#: gmusicbrowser_tags.pm:2380
 msgid "Text"
 msgstr "テキスト"
 
+#: plugins/artistinfo.pm:298
 msgid ""
 "The artists similar to the 'seed'-artist will be used to populate the queue, "
 "but you can decide to exclude the 'seed'-artist him/herself."
@@ -2721,22 +4923,47 @@ msgstr ""
 "キューを生成する際に'シード'アーティストに類似したアーティストが使用されます"
 "が、'シード'アーティストを含まない設定も可能です。"
 
+#: plugins/desktopwidget.pm:151
 msgid "The layout for this desktop widget is missing."
 msgstr "デスクトップウィジェットのレイアウトが見つからない。"
 
+#: gmusicbrowser.pl:2593
+msgid "The save file seems incomplete, you may want to use a backup instead."
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1176 plugins/albuminfo.pm:40
 msgid "Themes"
 msgstr "テーマ"
 
+#: plugins/export.pm:86 plugins/export.pm:87 plugins/export.pm:92
 msgid "These fields can be used :"
 msgstr "使用可能なフィールド :"
 
+#: gmusicbrowser.pl:7113
+msgid ""
+"These files are only partially supported and will be read-only: no metadata "
+"will be written in the file"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:3192
+msgid "These values will always be in the list, even if they are not used"
+msgstr ""
+
+#: gmusicbrowser_123.pm:146
 #, perl-brace-format
 msgid "This command is required to play files of type {type} : {cmd}"
 msgstr "{type} タイプの楽曲を演奏するのに必要なコマンド : {cmd}"
 
+#: plugins/mpris2.pm:43
+msgid ""
+"This plugin is needed for gmusicbrowser to appear in unity's sound menu."
+msgstr ""
+
+#: gmusicbrowser.pl:2253
 msgid "This plugin requires :"
 msgstr "プラグインが必要 :"
 
+#: plugins/artistinfo.pm:14
 msgid ""
 "This plugin retrieves artist-relevant information (biography, upcoming "
 "events, similar artists) from last.fm."
@@ -2744,150 +4971,251 @@ msgstr ""
 "このプラグインはアーティストの関連情報(バイオグラフィ, 今後のイベント, 類似"
 "アーティスト)を last.fm から取得します。"
 
+#: gmusicbrowser.pl:7369
+#, perl-format
+msgid "This value will be set for %d song."
+msgid_plural "This value will be set for %d songs."
+msgstr[0] ""
+
+#: gmusicbrowser.pl:7336
+#, perl-format
+msgid "This will affect %d song."
+msgid_plural "This will affect %d songs."
+msgstr[0] ""
+
+#: gmusicbrowser.pl:6889
 #, perl-format
 msgid "Threshold to count a song as played : %d %"
 msgstr "楽曲が演奏される回数のしきい値 : %d %"
 
+#: plugins/lullaby.pm:27
 msgid "Thursday"
 msgstr "火曜日"
 
+#: gmusicbrowser.pl:9563
 msgid "Time :"
 msgstr "時間 :"
 
+#: plugins/notify.pm:61
 #, perl-format
 msgid "Timeout : %d seconds"
 msgstr "タイムアウト : %d 秒"
 
+#: plugins/lullaby.pm:32
 msgid "Timespan of the fade-out in seconds"
 msgstr "フェードアウトのタイムスパン(秒指定)"
 
+#: gmusicbrowser.pl:1302 gmusicbrowser_songs.pm:933 gmusicbrowser_tags.pm:1862
+#: gmusicbrowser_tags.pm:1901 gmusicbrowser_tags.pm:1917
+#: gmusicbrowser_tags.pm:1939 gmusicbrowser_tags.pm:1942
+#: gmusicbrowser_tags.pm:2190 plugins/webcontext.pm:552
+#: layouts/desktop.layout:52 layouts/pages.layout:8
 msgid "Title"
 msgstr "タイトル"
 
+#: layouts/songtree.layout:65
 msgid "Title & icon"
 msgstr "タイトル & アイコン"
 
+#: layouts/songtree.layout:37
 msgid "Title & progress"
 msgstr "タイトル & 進捗"
 
+#: gmusicbrowser_list.pm:783 layouts/songtree.layout:57
 msgid "Title - Artist - Album"
 msgstr "タイトル - アーティスト - アルバム"
 
+#: gmusicbrowser_songs.pm:1516
+msgid "Title or filename"
+msgstr ""
+
+#: layouts/shimmer.layout:90
 #, perl-format
 msgid "Title: %t"
 msgstr "タイトル: %t"
 
+#: layouts/contrib.layout:65 layouts/contrib.layout:290
+#: layouts/contrib.layout:705 layouts/shimmer.layout:16
+#: layouts/shimmer.layout:66 layouts/shimmer.layout:110
 #, perl-format
 msgid "Title: %t (Track No. %n)"
 msgstr "タイトル: %t (トラックNo. %n)"
 
+#: plugins/titlebar.pm:9
 msgid "Titlebar"
 msgstr "タイトルバー"
 
+#: plugins/titlebar.pm:10
 msgid "Titlebar overlay plugin"
 msgstr "タイトルバーオーバーレイプラグイン"
 
+#: gmusicbrowser.pl:1671
 msgid "Toggle Album Lock"
 msgstr "アルバムロック切替"
 
+#: gmusicbrowser.pl:1670
 msgid "Toggle Artist Lock"
 msgstr "アーティストロック切替"
 
+#: gmusicbrowser.pl:1672
 msgid "Toggle Song Lock"
 msgstr "楽曲ロック切替"
 
+#: gmusicbrowser.pl:1697
 msgid "Toggle a label of the current song"
 msgstr "現在曲のラベル切替"
 
+#: gmusicbrowser.pl:1673
 msgid "Toggle between Random/Shuffle and Ordered"
 msgstr "ランダム/シャッフル/順番 のトグル"
 
+#: gmusicbrowser_layout.pm:5451
+msgid "Toggle edit mode"
+msgstr ""
+
+#: gmusicbrowser.pl:1685 gmusicbrowser_layout.pm:686
 msgid "Toggle fullscreen mode"
 msgstr "フルスクリーンモードの切替"
 
+#: gmusicbrowser.pl:1686
 msgid "Toggle the fullscreen layout"
 msgstr "フルスクリーンレイアウトの切替"
 
+#: layouts/makeitlooklike.layout:255 layouts/makeitlooklike.layout:356
 msgid "Toolbar"
 msgstr "ツールバー"
 
+#: layouts/makeitlooklike.layout:63
 msgid "Tools"
 msgstr "ツール"
 
+#: plugins/albuminfo.pm:594
 msgid "Total playcount:"
 msgstr "合計再生回数:"
 
+#: gmusicbrowser_songs.pm:1090 gmusicbrowser_tags.pm:1868
+#: gmusicbrowser_tags.pm:1906 gmusicbrowser_tags.pm:1923
+#: gmusicbrowser_tags.pm:1952 gmusicbrowser_tags.pm:2190
+#: layouts/desktop.layout:51
 msgid "Track"
 msgstr "トラック"
 
+#: layouts/makeitlooklike.layout:65
 msgid "Track Properties"
 msgstr "トラックのプロパティ"
 
+#: gmusicbrowser_songs.pm:1438
 msgid "Track gain"
 msgstr "トラックのゲイン"
 
+#: gmusicbrowser_songs.pm:1451
 msgid "Track peak"
 msgstr "トラックのピーク"
 
+#: gmusicbrowser.pl:6931
 msgid "Tray tip window layout :"
 msgstr "トレイチップウィンドウのレイアウト :"
 
+#: gmusicbrowser.pl:7132
+msgid "Try to add these extensions:"
+msgstr ""
+
+#: plugins/lullaby.pm:27
 msgid "Tuesday"
 msgstr "火曜日"
 
+#: gmusicbrowser.pl:2036
 msgid "Turn Off"
 msgstr "切断"
 
+#: gmusicbrowser_layout.pm:5586
+msgid "Turn equalizer off"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:5445
+msgid "Turn equalizer on"
+msgstr ""
+
+#: gmusicbrowser.pl:603
+msgid "Turn off computer after this song"
+msgstr ""
+
+#: gmusicbrowser.pl:602
 msgid "Turn off computer when queue empty"
 msgstr "キューが空の時はコンピュータの電源を切る"
 
+#: gmusicbrowser_tags.pm:2383
+msgid "URL"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:1883
 msgid "Unique file identifier"
 msgstr "ユニークなファイル識別子"
 
+#: gmusicbrowser_tags.pm:1640
+msgid "Unknown"
+msgstr ""
+
+#: plugins/albuminfo.pm:563 plugins/albuminfo.pm:572
 msgid "Unknown album"
 msgstr "不明なアルバム"
 
+#: gmusicbrowser_songs.pm:2659
 #, perl-brace-format
 msgid "Unknown field ({field})"
 msgstr "不明なフィールド ({field})"
 
+#: gmusicbrowser.pl:8568 gmusicbrowser_songs.pm:5267
 msgid "Unknown filter :"
 msgstr "不明なフィルタ :"
 
+#: gmusicbrowser_layout.pm:792
 #, perl-format
 msgid "Unknown layout '%s'"
 msgstr "不明なレイアウト '%s'"
 
+#: gmusicbrowser.pl:732
 msgid "Unlock Album"
 msgstr "アルバムロック解除"
 
+#: gmusicbrowser.pl:731
 msgid "Unlock Artist"
 msgstr "アーティストロック解除"
 
+#: plugins/export.pm:40
 msgid "Unnamed custom command"
 msgstr "名前なしカスタムコマンド"
 
+#: gmusicbrowser.pl:10111 gmusicbrowser_songs.pm:5248
 msgid "Unnamed filter"
 msgstr "名前なしフィルタ"
 
+#: plugins/webcontext.pm:141 plugins/webcontext.pm:148
+#: plugins/webcontext.pm:196
 msgid "Untitled"
 msgstr "タイトルなし"
 
+#: gmusicbrowser.pl:6985
 msgid "Update tags"
 msgstr "タグの更新"
 
+#: gmusicbrowser.pl:6974
 msgid "Update tags..."
 msgstr "タグの更新..."
 
+#: plugins/titlebar.pm:30
 msgid "Upper left"
 msgstr "左上"
 
+#: plugins/titlebar.pm:31
 msgid "Upper right"
 msgstr "右上"
 
+#: gmusicbrowser.pl:6729
 msgid "Use Equalizer"
 msgstr "イコライザの使用"
 
+#: gmusicbrowser.pl:6967
 msgid ""
 "Use ID3v2.4 instead of ID3v2.3 when creating an ID3v2 tag, ID3v2.3 are "
 "probably better supported by other softwares"
@@ -2895,94 +5223,156 @@ msgstr ""
 "ID3v2タグ作成時にID3v2.3の代わりにID3v2.4を使用する(ID3v2.3は他のソフトウェア"
 "でよりサポートされています)。"
 
-msgid "Use MozEmbed"
-msgstr "MozEmbed を使用"
-
+#: gmusicbrowser.pl:6738
 msgid "Use ReplayGain"
 msgstr "ReplayGain を使用"
 
-msgid "Use WebKit"
-msgstr "WebKit を使用"
-
+#: gmusicbrowser.pl:7218
 msgid "Use a master filter"
 msgstr "マスタフィルタを使用"
 
+#: gmusicbrowser.pl:6808
 msgid "Use album normalization instead of track normalization"
 msgstr "トラック正規化の代わりにアルバム正規化を使用"
 
+#: gmusicbrowser_tags.pm:812
 msgid "Use default regular expression"
 msgstr "既定の正規表現を使用"
 
+#: gmusicbrowser.pl:6702
 msgid "Use gstreamer"
 msgstr "gstreamer を使用"
 
+#: gmusicbrowser.pl:6968
 msgid "Use latin1 encoding if possible in id3v2 tags"
 msgstr "id3v2タグで可能ならば latin1 エンコードを使用する"
 
+#: plugins/artistinfo.pm:285
 #, perl-format
 msgid ""
 "Use tags from last.fm's XML event pages with a leading % (e.g. %headliner), "
-"furthermore linebreaks '<br>' and any text you'd like to have in between. E."
-"g. '%title taking place at %startDate<br>in %city, %country<br><br>'"
+"furthermore linebreaks '<br>' and any text you'd like to have in between. "
+"E.g. '%title taking place at %startDate<br>in %city, %country<br><br>'"
 msgstr ""
 "%で始まり(例えば %headliner)  '<br>' で終了する任意のテキストによる last.fm "
 "XMLイベントページのタグを利用する。例： '%title taking place at "
 "%startDate<br>in %city, %country<br><br>'"
 
+#: gmusicbrowser_list.pm:22
 msgid "Use the playing filter"
 msgstr "再生フィルタを使用"
 
+#: plugins/fetch_cover.pm:544
 #, perl-brace-format
 msgid "Use this picture as cover for album '{album}'"
 msgstr "アルバム '{album}' のカバーにこの画像を使用する"
 
+#: plugins/fetch_cover.pm:547
 #, perl-brace-format
 msgid "Use this picture for artist '{artist}'"
 msgstr "アーティスト '{artist}' にこの画像を使用する"
 
+#: gmusicbrowser_123.pm:306
 #, perl-brace-format
 msgid "Use {command} to play {ext} files"
 msgstr "{command} コマンドを使用し、 {ext} ファイルを再生"
 
+#: gmusicbrowser.pl:6809
 msgid "Used for clipping prevention"
 msgstr "クリッピング予防に使用"
 
+#: gmusicbrowser.pl:6851 gmusicbrowser.pl:6855
 msgid "Used for the Artists field"
 msgstr "アーティストフィールドに使用"
 
+#: gmusicbrowser_songs.pm:3183
 msgid "Used to associate the saved value with a user or a function"
 msgstr "ユーザーまたは関数を使用して保存値を関連付けるために使用"
 
+#: plugins/audioscrobbler.pm:145
 msgid "User authentification error"
 msgstr "ユーザ認証エラー"
 
+#: gmusicbrowser_songs.pm:3342
 msgid "Value not written in file tag"
 msgstr "ファイルタグに書かれていない値"
 
+#: gmusicbrowser_songs.pm:3341
 msgid "Value written in file tag"
 msgstr "ファイルタグに書かれている値"
 
+#: gmusicbrowser_songs.pm:324
+msgid "Various artists"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1325 gmusicbrowser_tags.pm:1863
+#: gmusicbrowser_tags.pm:1902
 msgid "Version"
 msgstr "バージョン"
 
+#: gmusicbrowser_songs.pm:1353
+msgid "Video bitrate"
+msgstr ""
+
+#: gmusicbrowser.pl:7260
+msgid "Video files"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1395
+msgid "Video format"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1423
+msgid "Video height"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:32
+msgid "Video properties"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1409
+msgid "Video ratio"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1416
+msgid "Video width"
+msgstr ""
+
+#: layouts/contrib.layout:102 layouts/makeitlooklike.layout:57
+#: layouts/makeitlooklike.layout:245 layouts/makeitlooklike.layout:353
+#: layouts/makeitlooklike.layout:463 layouts/makeitlooklike.layout:507
 msgid "View"
 msgstr "表示"
 
+#: gmusicbrowser_tags.pm:2475
 msgid "View Binary"
 msgstr "バイナリ表示"
 
+#: gmusicbrowser_tags.pm:2463
 msgid "View binary data ..."
 msgstr "バイナリデータを表示..."
 
+#: gmusicbrowser_layout.pm:4196
+msgid "View in new window"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4333
+msgid "View pictures from this album's folder"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:229
 msgid "Volume : "
 msgstr "ボリューム :"
 
+#: gmusicbrowser.pl:6883
 msgid "Volume step :"
 msgstr "ボリュームステップ :"
 
+#: gmusicbrowser.pl:597
 msgid "Wait for more when queue empty"
 msgstr "キューを空にしている間少々お待ちください"
 
+#: gmusicbrowser.pl:6965
 msgid ""
 "Warning : these are advanced options, don't change them unless you know what "
 "you are doing."
@@ -2990,53 +5380,72 @@ msgstr ""
 "警告 : これらは高度なオプションです。自分で何をしているか理解できるまでは変更"
 "しないでください。"
 
+#: gmusicbrowser.pl:7545
 msgid "Warning : using a folder with invalid encoding, you should rename it."
 msgstr ""
 "警告 : 無効なエンコーディングでフォルダを使用しています。名前を変更してくださ"
 "い。"
 
+#: gmusicbrowser_songs.pm:3159
 msgid "Warning: all existing data for this field will be lost"
 msgstr "警告 : 本フィールド上の記録済データは失われます。"
 
+#: gmusicbrowser_songs.pm:3171
 msgid "Warning: an identifier is needed"
 msgstr "警告 : 識別子が必要です"
 
+#: gmusicbrowser_songs.pm:3148
 msgid "Warning: converting existing data to this format may be lossy"
 msgstr "警告 : このフォーマットへのコンバートは音質が劣化します"
 
+#: plugins/webcontext.pm:10
 msgid "Web context"
 msgstr "Web コンテキスト"
 
+#: plugins/webcontext.pm:11
 msgid "Web context plugin"
 msgstr "Web コンテキストプラグイン"
 
+#: plugins/lullaby.pm:27
 msgid "Wednesday"
 msgstr "水曜日"
 
+#: gmusicbrowser_layout.pm:1544
 msgid "Weighted Random"
 msgstr "ランダムに重み付け"
 
+#: gmusicbrowser.pl:7208
 msgid "When added"
 msgstr "追加時に"
 
+#: gmusicbrowser.pl:6887
 msgid ""
 "When changing songs, the previous song is added to the recent list even if "
 "not played at all."
 msgstr ""
 "曲の変更時に以前の楽曲が最近のリストに追加されます(一部分の再生の場合でも)。"
 
+#: gmusicbrowser.pl:7208
 msgid "When current song"
 msgstr "現楽曲の時に"
 
+#: gmusicbrowser.pl:7003
 msgid "Whole library"
 msgstr "ライブラリ全体"
 
+#: gmusicbrowser.pl:1692
 msgid "Widget name"
 msgstr "ウィジェット名"
 
+#: plugins/webcontext.pm:133
+msgid "Wikipedia"
+msgstr ""
+
+#: plugins/webcontext.pm:408
 msgid "Wikipedia Locale"
 msgstr "Wikipedia ロケール"
 
+#: gmusicbrowser.pl:6972
 msgid ""
 "Will not write the tags except with the advanced tag editing dialog. The "
 "changes will be kept in the library instead.\n"
@@ -3046,15 +5455,43 @@ msgstr ""
 "わりに保存されます\n"
 "注意、楽曲の変更点はタグの再読み込みで失われます。"
 
+#: gmusicbrowser.pl:7132
+msgid ""
+"Will try to add these files in partially supported mode and read-only: no "
+"metadata will be written in the file. List extensions separated by spaces."
+msgstr ""
+
+#: gmusicbrowser_mplayer.pm:210
 msgid "Will use default if not found"
 msgstr "見つからない場合、既定で使用"
 
+#: gmusicbrowser.pl:6892 gmusicbrowser.pl:6893
+msgid "Will use system's default if blank"
+msgstr ""
+
+#. Windows key
+#: gmusicbrowser.pl:1338
+msgctxt "Keyboard"
+msgid "Win"
+msgstr ""
+
+#: gmusicbrowser.pl:733
+msgid "Windows"
+msgstr ""
+
+#: gmusicbrowser_list.pm:5374
 msgid "Words that begin with"
 msgstr "次の文字で始まる言葉"
 
+#: gmusicbrowser_songs.pm:3208
+msgid "Words that can be used in place of the identifier"
+msgstr ""
+
+#: plugins/export.pm:143 plugins/export.pm:161
 msgid "Write filenames to ..."
 msgstr "ファイル名の書込..."
 
+#: gmusicbrowser.pl:7000
 msgid ""
 "Write value of selected fields in the tags. Useful for fields that were "
 "previously not written to tags, to make sure the current value is written."
@@ -3062,21 +5499,34 @@ msgstr ""
 "タグ内の選択されたフィールドに値を書き込みます。現在の値が書き込まれていない"
 "か確認するために未記入タグを探す際に便利です。"
 
+#: gmusicbrowser_songs.pm:2160
 msgid "Writing tags"
 msgstr "タグを書込中"
 
+#: gmusicbrowser_songs.pm:1075 gmusicbrowser_tags.pm:1929
+#: gmusicbrowser_tags.pm:1945 gmusicbrowser_tags.pm:2190
+#: plugins/albuminfo.pm:65 layouts/pages.layout:28
 msgid "Year"
 msgstr "年"
 
+#: layouts/makeitlooklike.layout:141
 msgid "Year - Album"
 msgstr "年 - アルバム"
 
+#: layouts/makeitlooklike.layout:128
 msgid "Year - Artist"
 msgstr "年 - アーティスト"
 
+#: gmusicbrowser_songs.pm:861
 msgid "Yes"
 msgstr "はい"
 
+#: gmusicbrowser.pl:2596
+#, perl-brace-format
+msgid "You can find backups in {folder}"
+msgstr ""
+
+#: gmusicbrowser.pl:7211
 msgid ""
 "You can force a check for these files by holding shift when selecting \"Re-"
 "read tags\""
@@ -3084,6 +5534,16 @@ msgstr ""
 "\"再読込タグ\" を選択中にシフトを押し続けることでこれらのファイルのチェックを"
 "強制できます。"
 
+#: gmusicbrowser_songs.pm:3113
+#, perl-brace-format
+msgid ""
+"You can make custom stars by putting pictures in {folder}\n"
+"They must be named 'stars', optionally followed by a '-' and a word, "
+"followed by a number from 0 to 5 or 10\n"
+"Example: stars-custom0.png"
+msgstr ""
+
+#: plugins/notify.pm:59
 msgid ""
 "You can use some markup, eg :\n"
 "<b>bold</b> <i>italic</i> <u>underline</u>\n"
@@ -3093,434 +5553,905 @@ msgstr ""
 "<b>太字</b> <i>斜体</i> <u>アンダーライン</u>\n"
 "通知デーモンはマークアップを無視します"
 
+#: gmusicbrowser.pl:5574
 msgid "You must specify a base folder"
 msgstr "ベースフォルダを指定してください"
 
+#: gmusicbrowser_layout.pm:4147 gmusicbrowser_layout.pm:4192
+msgid "Zoom 1:1"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4145 gmusicbrowser_layout.pm:4190
+msgid "Zoom in"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4146 gmusicbrowser_layout.pm:4191
+msgid "Zoom out"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4148 gmusicbrowser_layout.pm:4193
+msgid "Zoom to fit"
+msgstr ""
+
+#: gmusicbrowser.pl:5291
+msgid "_Cancel"
+msgstr ""
+
+#: gmusicbrowser_list.pm:848 gmusicbrowser_list.pm:6913
 msgid "_Insert column"
 msgstr "列の追加(I)"
 
+#: gmusicbrowser_list.pm:855 gmusicbrowser_list.pm:6920
 msgid "_Remove this column"
 msgstr "選択列を削除(R)"
 
+#: gmusicbrowser.pl:5290
 msgid "_Retry"
 msgstr "再実行(R)"
 
+#: gmusicbrowser.pl:5292
+msgid "_Skip"
+msgstr ""
+
+#: gmusicbrowser_list.pm:847 gmusicbrowser_list.pm:6906
 msgid "_Sort by"
 msgstr "並べ替え(S)"
 
+#: gmusicbrowser_tags.pm:2359
+msgid "a bright coloured fish"
+msgstr ""
+
+#: gmusicbrowser.pl:10316 gmusicbrowser.pl:10371
+msgid "abort"
+msgstr ""
+
+#: gmusicbrowser.pl:4998 gmusicbrowser.pl:10269
 msgid "abort copy"
 msgstr "複写を中止"
 
+#: gmusicbrowser.pl:4999 gmusicbrowser.pl:10268
 msgid "abort move"
 msgstr "移動を中止"
 
+#: gmusicbrowser_tags.pm:2041
 msgid "add"
 msgstr "追加"
 
+#: gmusicbrowser.pl:6782
 msgid "advanced options"
 msgstr "高度なオプション"
 
-#. comma-separated list of field aliases for album, these are in addition to
-#. english aliases
+#: gmusicbrowser_songs.pm:680 gmusicbrowser_songs.pm:805
+msgid "after"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:680 gmusicbrowser_songs.pm:687
+#: gmusicbrowser_songs.pm:805
+#, perl-format
+msgid "after %s"
+msgstr ""
+
+#: plugins/albuminfo.pm:120
+msgid "album information now for"
+msgstr ""
+
+#. comma-separated list of field aliases for album, these are in addition to english aliases
+#: gmusicbrowser_songs.pm:990
 msgctxt "Field_aliases"
 msgid "album,on"
 msgstr "アルバム,on"
 
+#: plugins/albuminfo.pm:120
+msgid "albums missing reviews"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1623
 msgid "alphabetical"
 msgstr "アルファベット順"
 
+#: gmusicbrowser_123.pm:388
 msgid "amixer control :"
 msgstr "amixer 制御 :"
 
+#: plugins/artistinfo.pm:297
 msgid "applied on reload"
 msgstr "リロード時に適用"
 
+#: gmusicbrowser_list.pm:40
 msgid "apply filter"
 msgstr "フィルタの適用"
 
+#: plugins/nowplaying.pm:63
 #, perl-brace-format
 msgid "argument {n} :"
 msgstr "引数 {n} :"
 
+#: gmusicbrowser_list.pm:1629 gmusicbrowser_songs.pm:1569
+#: gmusicbrowser_tags.pm:2359
 msgid "artist"
 msgstr "アーティスト"
 
+#. comma-separated list of field aliases for artist, these are in addition to english aliases
+#: gmusicbrowser_songs.pm:958
+msgctxt "Field_aliases"
+msgid "artist,by"
+msgstr ""
+
+#: gmusicbrowser_gstreamer-1.x.pm:30
 msgid "auto detect"
 msgstr "自動検出"
 
+#: gmusicbrowser.pl:596
 msgid "autofill"
 msgstr "自動補完"
 
+#: gmusicbrowser_list.pm:1602
+msgid "automatic size"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:2359
 msgid "back cover"
 msgstr "バックカバー"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "band"
 msgstr "バンド"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "band/artist logotype"
 msgstr "バンド/アーティスト ロゴタイプ"
 
+#: gmusicbrowser_songs.pm:681 gmusicbrowser_songs.pm:806
+msgid "before"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:681 gmusicbrowser_songs.pm:686
+#: gmusicbrowser_songs.pm:806
+#, perl-format
+msgid "before %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:499
+msgid "between"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:683 gmusicbrowser_songs.pm:808
+#, perl-format
+msgid "between %s ago and %s ago"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:499 gmusicbrowser_songs.pm:682
+#: gmusicbrowser_songs.pm:807
+#, perl-format
+msgid "between %s and %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:682 gmusicbrowser_songs.pm:807
+msgid "between (absolute dates)"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:683 gmusicbrowser_songs.pm:808
+msgid "between (relative dates)"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1605 gmusicbrowser_list.pm:1610
 msgid "big size"
 msgstr "大きなサイズ"
 
+#: gmusicbrowser_songs.pm:1148
 msgid "bonus tracks"
 msgstr "ボーナストラック"
 
+#: gmusicbrowser_songs.pm:1567
 msgid "boolean"
 msgstr "boolean型"
 
+#: gmusicbrowser_songs.pm:1148
+msgid "bootleg"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1148
+msgid "broken"
+msgstr ""
+
+#: gmusicbrowser.pl:6557 gmusicbrowser.pl:7641 plugins/desktopwidget.pm:145
+msgid "by"
+msgstr ""
+
+#: gmusicbrowser.pl:1295
+msgid "by added"
+msgstr ""
+
+#: gmusicbrowser.pl:1294
+msgid "by lastplay"
+msgstr ""
+
+#: gmusicbrowser.pl:1297
+msgid "by lastplay & bootleg"
+msgstr ""
+
+#: gmusicbrowser.pl:1296
+msgid "by lastplay & play count"
+msgstr ""
+
+#: gmusicbrowser.pl:1293
+msgid "by play count"
+msgstr ""
+
+#: gmusicbrowser.pl:1292
+msgid "by rating"
+msgstr ""
+
+#: gmusicbrowser.pl:3976
+#, perl-brace-format
+msgid "by {artist} from {album}"
+msgstr ""
+
+#: plugins/albuminfo.pm:478
+#, perl-brace-format
+msgid "by {author}"
+msgstr ""
+
+#: gmusicbrowser.pl:1072 gmusicbrowser_layout.pm:4882
+msgid "bytes"
+msgstr ""
+
+#: gmusicbrowser.pl:7213
 msgid "check length now"
 msgstr "すぐに長さをチェック"
 
+#: gmusicbrowser.pl:7197 layouts/contrib.layout:262 layouts/contrib.layout:418
 msgid "check now"
 msgstr "直ちに確認"
 
+#: gmusicbrowser_list.pm:1690
 msgid "cloud mode"
 msgstr "クラウドモード"
 
+#: plugins/nowplaying.pm:64
 msgid "command :"
 msgstr "コマンド :"
 
+#: gmusicbrowser_songs.pm:1571
 msgid "common number"
 msgstr "一般的な数字"
 
+#: gmusicbrowser_songs.pm:1570
 msgid "common string"
 msgstr "一般的な文字列"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "composer"
 msgstr "作曲者"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "conductor"
 msgstr "指揮者"
 
+#: plugins/audioscrobbler.pm:142 plugins/audioscrobbler.pm:192
 msgid "connection failed"
 msgstr "接続失敗"
 
+#: plugins/fetch_cover.pm:415
 msgid "connection failed."
 msgstr "接続に失敗しました。"
 
+#: gmusicbrowser_songs.pm:59 gmusicbrowser_songs.pm:190
+#: gmusicbrowser_songs.pm:258
 msgid "contains"
 msgstr "含む"
 
+#: gmusicbrowser_songs.pm:59 gmusicbrowser_songs.pm:190
+#: gmusicbrowser_songs.pm:258
 #, perl-format
 msgid "contains %s"
 msgstr "%s を含む"
 
+#: gmusicbrowser_songs.pm:62 gmusicbrowser_songs.pm:192
+#: gmusicbrowser_songs.pm:260
 #, perl-format
 msgid "contains %s (case sensitive)"
 msgstr "%s を含む(大文字小文字を含まない)"
 
+#: gmusicbrowser_tags.pm:2387
 msgid "counter"
 msgstr "カウンタ"
 
+#: plugins/rip.pm:27
 msgid "custom"
 msgstr "カスタム"
 
+#: gmusicbrowser_songs.pm:25
 msgid "day"
 msgstr "日"
 
+#: gmusicbrowser.pl:1065 gmusicbrowser_songs.pm:5473
+#: gmusicbrowser_songs.pm:5479 gmusicbrowser_songs.pm:5485
+#: gmusicbrowser_songs.pm:5491
 msgid "days"
 msgstr "日"
 
+#: gmusicbrowser.pl:1605 gmusicbrowser_layout.pm:5325
+#: gmusicbrowser_layout.pm:5347
 msgid "default"
 msgstr "既定"
 
+#: plugins/fetch_cover.pm:82
 msgid "default filename"
 msgstr "既定のファイル名"
 
+#: plugins/fetch_cover.pm:81
 msgid "default folder"
 msgstr "既定のフォルダ"
 
+#: gmusicbrowser.pl:8148
 msgid "delete selected filter"
 msgstr "選択フィルタの削除"
 
+#: gmusicbrowser.pl:8154
 msgid "delete selected grouping"
 msgstr "選択グループの削除"
 
+#: gmusicbrowser.pl:8152
 msgid "delete selected random mode"
 msgstr "選択ランダムモードの削除"
 
+#: gmusicbrowser.pl:8150
 msgid "delete selected sort mode"
 msgstr "選択ソートモードの削除"
 
+#: gmusicbrowser_tags.pm:432
 msgid "different folders"
 msgstr "他のフォルダ"
 
+#: gmusicbrowser.pl:3989 gmusicbrowser_list.pm:8184
 #, perl-brace-format
 msgid "disc {disc}"
 msgstr "ディスク {disc}"
 
+#: gmusicbrowser_songs.pm:66 gmusicbrowser_songs.pm:196
+#: gmusicbrowser_songs.pm:264
 #, perl-format
 msgid "doesn't contain %s"
 msgstr "%s を含まない"
 
+#: gmusicbrowser_songs.pm:65 gmusicbrowser_songs.pm:195
+#: gmusicbrowser_songs.pm:263
 #, perl-format
 msgid "doesn't contain %s (case sensitive)"
 msgstr "%s を含まない(大文字小文字を区別)"
 
+#: gmusicbrowser_songs.pm:298 gmusicbrowser_songs.pm:330
 msgid "doesn't have a picture"
 msgstr "画像なし"
 
+#: gmusicbrowser_songs.pm:186
 #, perl-format
 msgid "doesn't include %s"
 msgstr "%s を含まない"
 
+#: gmusicbrowser_songs.pm:256
 #, perl-format
 msgid "doesn't include artist %s"
 msgstr "アーティスト %s を含まない"
 
+#: gmusicbrowser_songs.pm:64 gmusicbrowser_songs.pm:194
+#: gmusicbrowser_songs.pm:262
 #, perl-format
 msgid "doesn't match regexp %s"
 msgstr "正規表現 %s に合致しない"
 
+#: gmusicbrowser_songs.pm:63 gmusicbrowser_songs.pm:193
+#: gmusicbrowser_songs.pm:261
 #, perl-format
 msgid "doesn't match regexp %s (case sensitive)"
 msgstr "正規表現 %s に合致しない(大文字小文字を区別)"
 
+#: gmusicbrowser_tags.pm:2359
+msgid "during performance"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:2359
 msgid "during recording"
 msgstr "録音中"
 
+#: gmusicbrowser_tags.pm:2385
+msgid "email"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:2544
 msgid "empty"
 msgstr "空"
 
+#: gmusicbrowser_gstreamer-1.x.pm:497
 msgid "enable gapless (experimental)"
 msgstr "ギャップレス再生を有効化(実験的)"
 
+#: plugins/albuminfo.pm:120
+msgid "entire collection"
+msgstr ""
+
+#: gmusicbrowser_list.pm:199 gmusicbrowser_tags.pm:2548
 msgid "error"
 msgstr "エラー"
 
+#: gmusicbrowser.pl:9079
 msgid "ex :"
 msgstr "例 :"
 
+#: gmusicbrowser.pl:9097
 #, perl-brace-format
 msgid "example (selected song) : {score}  ({chances})"
 msgstr "例 (選択楽曲) : {score}  ({chances})"
 
+#: gmusicbrowser_list.pm:734
+msgid "example :"
+msgstr ""
+
+#: plugins/albuminfo.pm:93 plugins/artistinfo.pm:317 plugins/karaoke.pm:68
+#: plugins/lyrics.pm:231
 msgid "example : "
 msgstr "例 : "
 
+#: gmusicbrowser.pl:6873 plugins/webcontext.pm:539
 #, perl-format
 msgid "example : %s"
 msgstr "例 : %s"
 
+#: gmusicbrowser.pl:6866
 msgid "examples :"
 msgstr "例 :"
 
+#: gmusicbrowser.pl:6813
 #, perl-format
 msgid "fallback-gain : %d dB"
 msgstr "フォールバックゲイン : %d dB"
 
+#: gmusicbrowser_songs.pm:5754
 msgid "false"
 msgstr "偽"
 
+#: gmusicbrowser_songs.pm:1148
 msgid "favorite"
 msgstr "お気に入り"
 
+#: gmusicbrowser.pl:10231
+msgid "file $current/$end"
+msgstr ""
+
+#: plugins/lyrics.pm:218
 msgid "file tag"
 msgstr "ファイルタグ"
 
+#: gmusicbrowser.pl:10370 plugins/export.pm:153 plugins/export.pm:167
+#, perl-brace-format
+msgid "file: {filename}"
+msgstr ""
+
+#: gmusicbrowser.pl:8324
 msgid "filters"
 msgstr "フィルタ"
 
+#: gmusicbrowser_songs.pm:1568
 msgid "flags"
 msgstr "フラグ"
 
+#: gmusicbrowser_songs.pm:1566
 msgid "float"
 msgstr "fkoat型"
 
+#: gmusicbrowser_list.pm:1668
+msgid "font size depends on"
+msgstr ""
+
+#: gmusicbrowser.pl:1205
 msgid "for files without a VBR header"
 msgstr "VBRヘッダ無しのファイルで"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "front cover"
 msgstr "フロントカバー"
 
+#: gmusicbrowser_songs.pm:56 gmusicbrowser_songs.pm:197
+#: gmusicbrowser_songs.pm:265
+msgid "fuzzy match"
+msgstr ""
+
+#: layouts/makeitlooklike.layout:262
+msgid "gmusicbrowser"
+msgstr ""
+
+#: layouts/contrib.layout:502
 #, perl-format
 msgid "gmusicbrowser is playing %t from %l (%Y) by %a"
 msgstr "gmusicbrowser は %t / %l (%Y) アルバム %a を再生中"
 
+#: plugins/fetch_cover.pm:31 plugins/fetch_cover.pm:39
 msgid "google images"
 msgstr "Googleイメージ"
 
+#: plugins/fetch_cover.pm:40
 msgid "google images (hi-res)"
 msgstr "Googleイメージ(高解像度)"
 
+#: gmusicbrowser_list.pm:1682
+msgid "group by"
+msgstr ""
+
+#: gmusicbrowser.pl:9042
+msgid "half-life : "
+msgstr ""
+
+#: gmusicbrowser_songs.pm:297 gmusicbrowser_songs.pm:329
 msgid "has a picture"
 msgstr "画像がある"
 
+#: gmusicbrowser_songs.pm:188
+msgid "has at least one"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1229 gmusicbrowser_songs.pm:1237
 msgid "has been played"
 msgstr "再生済"
 
+#: gmusicbrowser_songs.pm:1247 gmusicbrowser_songs.pm:1255
+msgid "has been skipped"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:187
+msgid "has none"
+msgstr ""
+
+#: gmusicbrowser.pl:1064
 msgid "hours"
 msgstr "時"
 
+#: gmusicbrowser_list.pm:1611
 msgid "huge size"
 msgstr "特大サイズ"
 
+#: gmusicbrowser.pl:6671
 msgid "icecast server"
 msgstr "icecast サーバ"
 
+#: gmusicbrowser_tags.pm:2174
 msgid "id3v1 tag"
 msgstr "id3v1 タグ"
 
+#: gmusicbrowser_list.pm:1700
+msgid "ignore the 'none' row for histogram"
+msgstr ""
+
+#: gmusicbrowser.pl:6856
 msgid "ignore title"
 msgstr "タイトルを無視"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "illustration"
 msgstr "イラストレーション"
 
+#: gmusicbrowser.pl:6013
 msgid "imported list"
 msgstr "インポート済リスト"
 
+#: gmusicbrowser_layout.pm:4752
+#, perl-format
+msgid "in %d/%d files"
+msgstr ""
+
+#: layouts/contrib.layout:210
+#, perl-format
+msgid "in %l"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:503
 msgid "in the bottom"
 msgstr "最下部に"
 
+#: gmusicbrowser_songs.pm:503
 #, perl-format
 msgid "in the bottom %s"
 msgstr "%s を最下部に"
 
+#: gmusicbrowser_songs.pm:502
 msgid "in the top"
 msgstr "最上部に"
 
+#: gmusicbrowser_songs.pm:502
 #, perl-format
 msgid "in the top %s"
 msgstr "%s を最上部に"
 
+#: gmusicbrowser_songs.pm:185
 msgid "includes"
 msgstr "含む"
 
+#: gmusicbrowser_songs.pm:185
 #, perl-format
 msgid "includes %s"
 msgstr "%s を含む"
 
+#: gmusicbrowser_songs.pm:255
 msgid "includes artist"
 msgstr "アーティストを含む"
 
+#: gmusicbrowser_songs.pm:255
 #, perl-format
 msgid "includes artist %s"
 msgstr "アーティスト %s を含む"
 
+#: gmusicbrowser_songs.pm:1572
 msgid "integer"
 msgstr "integer型"
 
+#: gmusicbrowser_songs.pm:1148
 msgid "interview"
 msgstr "インタビュー"
 
+#: plugins/albuminfo.pm:93 plugins/artistinfo.pm:317 plugins/karaoke.pm:68
+#: plugins/lyrics.pm:231
 msgid "invalid pattern"
 msgstr "無効なパターン"
 
+#: gmusicbrowser.pl:8990
 msgid "inverse"
 msgstr "逆の"
 
+#: gmusicbrowser_songs.pm:462
+msgid "is"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:462
+#, perl-format
+msgid "is %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1364
+msgid "is 44.1kHz"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1377
 msgid "is a flac file"
 msgstr "flacファイル"
 
+#: gmusicbrowser_songs.pm:1381
+msgid "is a lossless file"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1382
+msgid "is a lossy file"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1371
 msgid "is a mp3 file"
 msgstr "mp3ファイル"
 
+#: gmusicbrowser_songs.pm:1378
 msgid "is a musepack file"
 msgstr "musepackファイル"
 
+#: gmusicbrowser_songs.pm:1376
+msgid "is a vorbis file"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1379
 msgid "is a wavepack file"
 msgstr "wavepackファイル"
 
+#: gmusicbrowser_songs.pm:1372
+msgid "is an aac file"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1373
+msgid "is an alac file"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1380
 msgid "is an ape file"
 msgstr "apeファイル"
 
+#: gmusicbrowser_songs.pm:1374
+msgid "is an mp4/m4a file"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1375
+msgid "is an opus file"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:580
+msgid "is defined"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:60
 msgid "is equal to"
 msgstr "同じ"
 
+#: gmusicbrowser_songs.pm:60
 #, perl-format
 msgid "is equal to %s"
 msgstr "%s と同じ"
 
+#: gmusicbrowser_songs.pm:863 gmusicbrowser_songs.pm:866
+msgid "is false"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:902
+msgid "is in"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:902
+#, perl-format
+msgid "is in %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1339
 msgid "is mono"
 msgstr "モノラル"
 
+#: gmusicbrowser_songs.pm:581
+msgid "is not defined"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:937
+msgid "is smart equal"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:937
+#, perl-format
+msgid "is smart equal to %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1341
 msgid "is stereo"
 msgstr "ステレオ"
 
+#: gmusicbrowser_songs.pm:864 gmusicbrowser_songs.pm:865
+msgid "is true"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:463
+#, perl-format
+msgid "isn't %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:67
+#, perl-format
+msgid "isn't equal to %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:903
+#, perl-format
+msgid "isn't in %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1340
 msgid "isn't mono"
 msgstr "非モノラル"
 
+#: gmusicbrowser_songs.pm:1342
 msgid "isn't stereo"
 msgstr "非ステレオ"
 
-msgid ""
-"itunes doesn't support unsynchronised tags last time I checked, mostly "
-"affect tags with pictures"
+#: plugins/audioscrobbler.pm:9
+msgid "last.fm"
 msgstr ""
-"itunesは前回起動時に確認した非同期タグ(主に画像に影響を及ぼす)ををサポートし"
-"ません"
 
+#: plugins/audioscrobbler.pm:10
 msgid "last.fm plugin"
 msgstr "last.fm プラグイン"
 
+#: plugins/artistinfo.pm:296
+msgid ""
+"last.fm's similarity categories:\n"
+">90 super\n"
+">70 very high\n"
+">50 high\n"
+">30 medium\n"
+">10 lower"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:2359
 msgid "lead artist"
 msgstr "アーティストをリード"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "leaflet page"
 msgstr "リーフレットページ"
 
+#: layouts/browser.layout:41
 msgid "left-side filter panes"
 msgstr "フィルタペインの左側"
 
+#: gmusicbrowser_list.pm:1625
 msgid "length of songs"
 msgstr "曲長"
 
+#: gmusicbrowser_songs.pm:679 gmusicbrowser_songs.pm:804
 msgid "less than"
 msgstr "以前"
 
+#: gmusicbrowser_songs.pm:679 gmusicbrowser_songs.pm:684
+#: gmusicbrowser_songs.pm:804
 #, perl-format
 msgid "less than %s ago"
 msgstr "%s 以前"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "lyricist"
 msgstr "作詞家"
 
+#: plugins/lyrics.pm:218
 msgid "lyrics file"
 msgstr "歌詞ファイル"
 
+#: gmusicbrowser_songs.pm:58 gmusicbrowser_songs.pm:189
+#: gmusicbrowser_songs.pm:257
 msgid "matches regexp"
 msgstr "正規表現マッチ"
 
+#: gmusicbrowser_songs.pm:58 gmusicbrowser_songs.pm:189
+#: gmusicbrowser_songs.pm:257
 #, perl-format
 msgid "matches regexp %s"
 msgstr "正規表現マッチ %s"
 
+#: gmusicbrowser_songs.pm:61 gmusicbrowser_songs.pm:191
+#: gmusicbrowser_songs.pm:259
 #, perl-format
 msgid "matches regexp %s (case sensitive)"
 msgstr "正規表現マッチ %s (大文字と小文字を区別)"
 
+#: gmusicbrowser_list.pm:1674
 msgid "maximum font size"
 msgstr "最大フォントサイズ"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "media"
 msgstr "メディア"
 
+#: gmusicbrowser_list.pm:1604 gmusicbrowser_list.pm:1609
 msgid "medium size"
 msgstr "中"
 
+#: layouts/main.layout:101
 msgid "minimal"
 msgstr "最小"
 
+#: gmusicbrowser_list.pm:1671
 msgid "minimum font size"
 msgstr "最小フォントサイズ"
 
+#: gmusicbrowser.pl:1063
 msgid "minutes"
 msgstr "分"
 
+#: gmusicbrowser_songs.pm:24
 msgid "month"
 msgstr "月"
 
+#: gmusicbrowser.pl:1067
 msgid "months"
 msgstr "月"
 
+#: gmusicbrowser_songs.pm:678 gmusicbrowser_songs.pm:803
+msgid "more than"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:678 gmusicbrowser_songs.pm:685
+#: gmusicbrowser_songs.pm:803
+#, perl-format
+msgid "more than %s ago"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1692
 msgid "mosaic mode"
 msgstr "mosaicモード"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "movie/video screen capture"
 msgstr "映画/ビデオ スクリーンキャプチャー"
 
+#: gmusicbrowser.pl:7210
 msgid ""
 "mp3 files without a VBR header requires a full scan to check its real length "
 "and bitrate"
@@ -3528,281 +6459,634 @@ msgstr ""
 "ＶＢＲヘッダの無いMP3ファイルは曲長とビットレートの確認のためにフルスキャンが"
 "必要です。"
 
+#: gmusicbrowser_mplayer.pm:210
 msgid "mplayer executable :"
 msgstr "mplayer のパス :"
 
+#: gmusicbrowser_mplayer.pm:209
 msgid "mplayer options :"
 msgstr "mplayer オプション :"
 
+#: gmusicbrowser_mpv.pm:284
+msgid "mpv options :"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1565
 msgid "multi-lines string"
 msgstr "複数行文字列"
 
+#: gmusicbrowser.pl:8148
 msgid "name of the new filter"
 msgstr "新しいフィルタの名前"
 
+#: gmusicbrowser.pl:8154
 msgid "name of the new grouping"
 msgstr "新しいグルーピングの名前"
 
+#: gmusicbrowser.pl:8152
 msgid "name of the new random mode"
 msgstr "新しいランダムモードの名前"
 
+#: gmusicbrowser.pl:8150
 msgid "name of the new sort mode"
 msgstr "新しいソートモードの名前"
 
+#: gmusicbrowser_layout.pm:4169 gmusicbrowser_songs.pm:717
+#: gmusicbrowser_songs.pm:722 gmusicbrowser_songs.pm:727
+#: gmusicbrowser_songs.pm:845 gmusicbrowser_songs.pm:850
+#: gmusicbrowser_songs.pm:855 gmusicbrowser_songs.pm:1228
+#: gmusicbrowser_songs.pm:1236 gmusicbrowser_songs.pm:1246
+#: gmusicbrowser_songs.pm:1254 gmusicbrowser_songs.pm:2567
+msgid "never"
+msgstr ""
+
+#: gmusicbrowser.pl:2363
 msgid "never played"
 msgstr "未再生"
 
+#: gmusicbrowser_songs.pm:57 gmusicbrowser_songs.pm:198
+#: gmusicbrowser_songs.pm:266
+#, perl-format
+msgid "no %s fuzzy match with %s"
+msgstr ""
+
+#: plugins/fetch_cover.pm:423
 msgid "no matches found, you might want to remove some search terms."
 msgstr "検索結果がありません。検索対象をいくつか削除してください。"
 
+#: gmusicbrowser.pl:3704
 msgid "no order"
 msgstr "順番なし"
 
+#: gmusicbrowser.pl:5153
 msgid "no picture"
 msgstr "画像なし"
 
+#: gmusicbrowser_list.pm:1601
 msgid "no pictures"
 msgstr "画像なし"
 
+#: gmusicbrowser.pl:6535
 msgid "no plugins found"
 msgstr "プラグインなし"
 
+#: gmusicbrowser.pl:7289
 msgid "no songs needs checking"
 msgstr "チェックの必要な楽曲なし"
 
+#: gmusicbrowser.pl:6852
 msgid "no splitting"
 msgstr "分割なし"
 
+#: gmusicbrowser.pl:5270
+msgid "no to all"
+msgstr ""
+
+#: gmusicbrowser.pl:8183
 msgid "noname"
 msgstr "名前なし"
 
+#: gmusicbrowser.pl:595
 msgid "normal"
 msgstr "通常"
 
+#: gmusicbrowser_songs.pm:811
+#, perl-format
+msgid "not after %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:812
+#, perl-format
+msgid "not before %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:689 gmusicbrowser_songs.pm:814
+#, perl-format
+msgid "not between %s ago and %s ago"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:500 gmusicbrowser_songs.pm:688
+#: gmusicbrowser_songs.pm:813
+#, perl-format
+msgid "not between %s and %s"
+msgstr ""
+
+#: gmusicbrowser.pl:2370
+msgid "not bootleg"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:590
+msgid "not defined"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:505
+#, perl-format
+msgid "not in the bottom %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:504
+#, perl-format
+msgid "not in the top %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:810
+#, perl-format
+msgid "not less than %s ago"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:809
+#, perl-format
+msgid "not more than %s ago"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1552
+#, perl-format
+msgid "not present in %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:653
+#, perl-format
+msgid "not set to %s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:693 gmusicbrowser_songs.pm:818
+#, perl-format
+msgid "not the %s least recent"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:692 gmusicbrowser_songs.pm:817
+#, perl-format
+msgid "not the %s most recent"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1614
 msgid "number of songs"
 msgstr "楽曲数"
 
+#: gmusicbrowser_list.pm:1624
 msgid "number of songs in filter"
 msgstr "フィルタ内の楽曲数"
 
+#: gmusicbrowser_list.pm:1806
 msgid "only show entries with at least n songs"
 msgstr "最低 n 楽曲分のエントリを表示"
 
+#: plugins/artistinfo.pm:281
 msgid "only works when the artist-info tab is displayed"
 msgstr "アーティスト情報タグが表示状態の時のみ動作"
 
+#: plugins/lyrics.pm:217
 msgid "only works with some lyrics source and when the lyrics tab is active"
 msgstr "歌詞タブがアクティブの時のみいくつかの歌詞ソースで動作"
 
+#: plugins/lyrics.pm:221 plugins/webcontext.pm:276
 msgid "open context window"
 msgstr "コンテキストウィンドウを開く"
 
+#: gmusicbrowser_list.pm:1807 gmusicbrowser_list.pm:5407
 msgid "options"
 msgstr "オプション"
 
+#: gmusicbrowser.pl:6890
+#, perl-format
+msgid "or %d seconds"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:2359
 msgid "other"
 msgstr "その他"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "other file icon"
 msgstr "他のファイルアイコン"
 
+#: gmusicbrowser.pl:6688
 msgid "output device :"
 msgstr "出力デバイス :"
 
+#: gmusicbrowser_layout.pm:4881
+#, perl-format
+msgid "page %d"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4673
+#, perl-brace-format
+msgid "page {number}"
+msgstr ""
+
+#: plugins/audioscrobbler.pm:60
 msgid "password :"
 msgstr "パスワード :"
 
+#: gmusicbrowser.pl:1669
 msgid "perl code"
 msgstr "perl コード"
 
+#: gmusicbrowser_list.pm:1664
 msgid "picture size"
 msgstr "画像サイズ"
 
+#: gmusicbrowser_list.pm:1616
 msgid "play count average"
 msgstr "平均再生数"
 
+#: gmusicbrowser.pl:2369
+msgid "played>4"
+msgstr ""
+
+#: gmusicbrowser.pl:6703 gmusicbrowser.pl:6839
 msgid "port :"
 msgstr "ポート :"
 
+#: gmusicbrowser_layout.pm:5629
 msgid "pre-amp"
 msgstr "プリアンプ"
 
+#: gmusicbrowser.pl:6812
 #, perl-format
 msgid "pre-amp : %d dB"
 msgstr "プリアンプ : %d dB"
 
+#: gmusicbrowser.pl:1705
+msgid ""
+"pre-set name or 10 numbers between 12 and -12 (-24 for gstreamer) separated "
+"by ':', or 0 (for off), or 1 (for on)"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:1551
 #, perl-format
 msgid "present in %s"
 msgstr "%s 内に存在"
 
+#: gmusicbrowser_songs.pm:1551
 msgid "present in list"
 msgstr "リスト内に存在"
 
+#: gmusicbrowser.pl:600
 msgid "quit"
 msgstr "終了"
 
+#: gmusicbrowser_songs.pm:1573
 msgid "rating"
 msgstr "レーティング"
 
+#: gmusicbrowser_list.pm:1615
 msgid "rating average"
 msgstr "レーティングの平均"
 
+#: gmusicbrowser_tags.pm:2359
 msgid "recording location"
 msgstr "記録場所"
 
+#: gmusicbrowser.pl:6844
 msgid "requires xdg-screensaver"
 msgstr "xdg-screensaver が必要"
 
+#: gmusicbrowser_list.pm:1802
 #, perl-brace-format
 msgid "reset filter {nb}"
 msgstr "書式のリセット {nb}"
 
+#: plugins/artistinfo.pm:286
 msgid "reset format"
 msgstr "書式のリセット"
 
+#: gmusicbrowser_list.pm:1800
 msgid "reset primary filter"
 msgstr "プライマリフィルタをリセット"
 
+#: gmusicbrowser_list.pm:1801
 msgid "reset secondary filter"
 msgstr "セカンダリフィルタをリセット"
 
+#: plugins/artistinfo.pm:517 plugins/lyrics.pm:435
 msgid "retry"
 msgstr "再試行"
 
+#: plugins/audioscrobbler.pm:155
 #, perl-brace-format
 msgid "retry in {seconds} s"
 msgstr "{seconds} 秒以内に再試行"
 
+#: gmusicbrowser_list.pm:1633
 msgid "reverse order"
 msgstr "逆順"
 
+#: gmusicbrowser.pl:8165
 #, perl-brace-format
 msgid "save as '{name}'"
 msgstr "'{name}' として保存"
 
+#: gmusicbrowser.pl:8148
 msgid "save filter as"
 msgstr "フィルタを保存"
 
+#: gmusicbrowser.pl:8154
 msgid "save grouping as"
 msgstr "グループを保存"
 
+#: gmusicbrowser.pl:8152
 msgid "save random mode as"
 msgstr "ランダムモードを保存"
 
+#: gmusicbrowser.pl:8150
 msgid "save sort mode as"
 msgstr "ソートモードを保存"
 
+#: gmusicbrowser.pl:8147
 msgid "saved filters"
 msgstr "保存済フィルタ"
 
+#: gmusicbrowser.pl:8153
 msgid "saved groupings"
 msgstr "保存済グルーピング"
 
+#: gmusicbrowser.pl:8151
 msgid "saved random modes"
 msgstr "保存済ランダムモード"
 
+#: gmusicbrowser.pl:8149
 msgid "saved sort modes"
 msgstr "保存済ソートモード"
 
+#: gmusicbrowser.pl:7196 layouts/contrib.layout:263 layouts/contrib.layout:419
 msgid "scan now"
 msgstr "直ちにスキャン"
 
+#: gmusicbrowser.pl:1062
 msgid "seconds"
 msgstr "秒"
 
+#: gmusicbrowser_songs.pm:652
+msgid "set to"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:652
+#, perl-format
+msgid "set to %s"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1698
+msgid "show histogram background"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1651
 msgid "show pictures"
 msgstr "画像を表示"
 
+#: gmusicbrowser_list.pm:1696
 msgid "show the 'All' row"
 msgstr "'全て'の行を表示"
 
+#: plugins/artistinfo.pm:54
 msgid "similar-artists"
 msgstr "類似アーティスト"
 
+#: gmusicbrowser_list.pm:7765
 msgid "skin options"
 msgstr "スキンオプション"
 
+#: gmusicbrowser_list.pm:1617
+msgid "skip count average"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1603 gmusicbrowser_list.pm:1608
+msgid "small size"
+msgstr ""
+
+#: gmusicbrowser.pl:6969
+msgid ""
+"some programs may not like unsynchronised tags, mostly affect tags with "
+"pictures"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1678
+msgid "sort by"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:193 gmusicbrowser_layout.pm:196
 msgid "static list"
 msgstr "スタティックリスト"
 
+#: gmusicbrowser.pl:598
 msgid "stop"
 msgstr "停止"
 
+#: gmusicbrowser_songs.pm:1564
 msgid "string"
 msgstr "文字列"
 
+#: gmusicbrowser.pl:6776
 msgid "supports : "
 msgstr "サポート :"
 
+#: gmusicbrowser_list.pm:1654
 msgid "text format"
 msgstr "テキスト書式"
 
+#: gmusicbrowser_list.pm:1661
 msgid "text mode"
 msgstr "テキストモード"
 
+#: gmusicbrowser_songs.pm:691 gmusicbrowser_songs.pm:816
+#, perl-format
+msgid "the %s least recent"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:690 gmusicbrowser_songs.pm:815
+#, perl-format
+msgid "the %s most recent"
+msgstr ""
+
+#: gmusicbrowser.pl:2234
+#, perl-brace-format
+msgid "the GObject introspection data for {name}"
+msgstr ""
+
+#: gmusicbrowser.pl:2241
+#, perl-brace-format
+msgid "the command {name}"
+msgstr ""
+
+#: gmusicbrowser.pl:6968
 msgid "the default is utf16 for ID3v2.3 and utf8 for ID3v2.4"
 msgstr "既定はID3v2.3の場合utf16、ID3v2.4の場合utf8です。"
 
-#. comma-separated list of field aliases for title, these are in addition to
-#. english aliases
+#: gmusicbrowser.pl:2248
+#, perl-brace-format
+msgid "the file {name}"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:691 gmusicbrowser_songs.pm:816
+msgid "the least recent"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:690 gmusicbrowser_songs.pm:815
+msgid "the most recent"
+msgstr ""
+
+#: gmusicbrowser.pl:2226
+#, perl-brace-format
+msgid "the {name} perl module"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:216
+#, perl-brace-format
+msgid "then {action}"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:5497 gmusicbrowser_songs.pm:5502
+msgid "times"
+msgstr ""
+
+#. comma-separated list of field aliases for title, these are in addition to english aliases
+#: gmusicbrowser_songs.pm:942
 msgctxt "Field_aliases"
 msgid "title"
 msgstr "タイトル"
 
+#: gmusicbrowser_list.pm:1804
+msgid "toggle Intersection mode"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1805
+msgid "toggle Invert mode"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:518
 msgid "tools"
 msgstr "ツール"
 
+#: gmusicbrowser_songs.pm:5754
 msgid "true"
 msgstr "真"
 
+#: gmusicbrowser.pl:602
+msgid "turn off"
+msgstr ""
+
+#: gmusicbrowser_tags.pm:2429
 msgid "unknown"
 msgstr "不明"
 
+#: plugins/audioscrobbler.pm:148 plugins/audioscrobbler.pm:216
 msgid "unknown error"
 msgstr "不明なエラー"
 
+#: gmusicbrowser.pl:3713 gmusicbrowser_layout.pm:1499
 msgid "unnamed random mode"
 msgstr "名前なしランダムモード"
 
+#: gmusicbrowser.pl:10316 gmusicbrowser.pl:10370 plugins/webcontext.pm:553
+msgid "url"
+msgstr ""
+
+#: gmusicbrowser.pl:1687
 msgid "url-encoded list of files"
 msgstr "ファイルのURLエンコード済リスト"
 
+#: gmusicbrowser.pl:1688 gmusicbrowser.pl:1689 gmusicbrowser.pl:1690
+#: gmusicbrowser.pl:1691
 msgid "url-encoded list of files/folders"
 msgstr "ファイル/フォルダのURLエンコード済リスト"
 
+#: plugins/fetch_cover.pm:79 plugins/fetch_cover.pm:80
 msgid "use :"
 msgstr "使用する :"
 
+#: plugins/fetch_cover.pm:80
 msgid "use album name"
 msgstr "アルバム名を使用する"
 
+#: gmusicbrowser_tags.pm:1212
 msgid "use default"
 msgstr "規定値を使用する"
 
-msgid "use gnome settings"
-msgstr "gnome 設定を使用する"
-
+#: plugins/fetch_cover.pm:79
 msgid "use song folder"
 msgstr "楽曲フォルダを使用する"
 
+#: gmusicbrowser.pl:6866
 msgid "use standard strftime variables"
 msgstr "標準の strftime 変数を使用する"
 
+#: plugins/audioscrobbler.pm:59
 msgid "username :"
 msgstr "ユーザ名 :"
 
+#: gmusicbrowser_list.pm:7742
 msgid "using skin :"
 msgstr "スキンを使用 :"
 
+#: gmusicbrowser.pl:597
+msgid "wait for more"
+msgstr ""
+
+#: gmusicbrowser.pl:1066
 msgid "weeks"
 msgstr "週"
 
+#: gmusicbrowser.pl:9052
 msgid "weight :"
 msgstr "ウェイト :"
 
+#: gmusicbrowser_layout.pm:4169
+msgid "when file changes"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:4169
+msgid "when folder changes"
+msgstr ""
+
+#: plugins/webcontext.pm:13
 msgid "wikipedia, lyrics, and custom webpages"
 msgstr "wikipedia, 歌詞, カスタムWebページ"
 
+#: layouts/main.layout:110
+msgid "with browser"
+msgstr ""
+
+#: layouts/main.layout:138
+msgid "with browser & queue"
+msgstr ""
+
+#: layouts/main.layout:134
+msgid "with browser (SongTree)"
+msgstr ""
+
+#: layouts/main.layout:76
+msgid "with lists"
+msgstr ""
+
+#: layouts/songtree.layout:5
+msgid "with picture"
+msgstr ""
+
+#: layouts/songtree.layout:112
+msgid "with picture as background"
+msgstr ""
+
+#: layouts/main.layout:68
+msgid "with playlist"
+msgstr ""
+
+#: layouts/main.layout:52
+msgid "with queue"
+msgstr ""
+
+#: layouts/main.layout:61
+msgid "with search"
+msgstr ""
+
+#: layouts/main.layout:82
+msgid "with search and lists"
+msgstr ""
+
+#: layouts/main.layout:92
+msgid "with search and lists 2"
+msgstr ""
+
+#: gmusicbrowser.pl:6702
 msgid ""
 "without gstreamer : one stream per file, one connection at a time\n"
 "with gstreamer : one continuous stream, multiple connection possible"
@@ -3811,24 +7095,144 @@ msgstr ""
 "み\n"
 "gstreamer経由 : 一つの連続ストリーム、可能ならば複数のコネクション"
 
+#: plugins/titlebar.pm:54
+msgid "x offset :"
+msgstr ""
+
+#: plugins/titlebar.pm:55
+msgid "y offset :"
+msgstr ""
+
+#: gmusicbrowser_list.pm:1621 gmusicbrowser_songs.pm:23
 msgid "year"
 msgstr "年"
 
+#: gmusicbrowser_list.pm:1622
+msgid "year (highest)"
+msgstr ""
+
+#: gmusicbrowser.pl:1068
 msgid "years"
 msgstr "年"
 
+#: gmusicbrowser.pl:5269
+msgid "yes to all"
+msgstr ""
+
+#: gmusicbrowser_layout.pm:624
+#, perl-brace-format
+msgid ""
+"{album}\n"
+"<small>by</small> {artist}"
+msgstr ""
+
+#: gmusicbrowser.pl:7049
 #, perl-brace-format
 msgid "{folder} already exists"
 msgstr "{folder} は既に存在します"
 
+#: gmusicbrowser.pl:3895
+#, perl-brace-format
+msgid "{hours} hours {min} min {sec} s"
+msgstr ""
+
+#: gmusicbrowser.pl:3899 gmusicbrowser.pl:3904 gmusicbrowser.pl:3908
+#, perl-brace-format
+msgid "{hours}h {min}m {sec}s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:3460
 #, perl-brace-format
 msgid "{hours}h{min}m{sec}s"
 msgstr "{hours}時{min}分{sec}秒"
 
+#: gmusicbrowser.pl:3895
+#, perl-brace-format
+msgid "{min} min {sec} s"
+msgstr ""
+
+#: gmusicbrowser.pl:3899 gmusicbrowser.pl:3904 gmusicbrowser.pl:3908
+#, perl-brace-format
+msgid "{min}m {sec}s"
+msgstr ""
+
+#: gmusicbrowser_songs.pm:3460
 #, perl-brace-format
 msgid "{min}m{sec}s"
 msgstr "{min}分{sec}秒"
 
+#: gmusicbrowser.pl:6790
 #, perl-brace-format
 msgid "{outputname} output settings"
 msgstr "{outputname} 出力設定"
+
+#: gmusicbrowser.pl:623
+#, perl-brace-format
+msgid "{songs} by {artists}"
+msgstr ""
+
+#: gmusicbrowser.pl:4036 gmusicbrowser_layout.pm:274 gmusicbrowser_list.pm:26
+#: plugins/audioscrobbler.pm:198 plugins/audioscrobbler.pm:204
+#, perl-brace-format
+msgid "{song} by {artist}"
+msgstr ""
+
+#: gmusicbrowser.pl:1693
+msgid "|-separated list of widget names"
+msgstr ""
+
+#~ msgid "Add a radio"
+#~ msgstr "ラジオを追加"
+
+#~ msgid "Add new label"
+#~ msgstr "新規ラベルの追加"
+
+#~ msgid "Add new radio"
+#~ msgstr "新規ラジオの追加"
+
+#~ msgid "Adding a radio"
+#~ msgstr "ラジオ追加中"
+
+#, perl-brace-format
+#~ msgid "Are you sure you want to delete the '{label}' label ?"
+#~ msgstr "本当に '{label}' ラベルを削除しますか?"
+
+#~ msgid "Bitrate"
+#~ msgstr "ビットレート"
+
+#~ msgid "Found but not working"
+#~ msgstr "見つけましたが動作しません"
+
+#~ msgid "Not found"
+#~ msgstr "見つからない"
+
+#~ msgid "Provides context views using MozEmbed or WebKit"
+#~ msgstr "MozEmbed もしくは Webkitを用いたコンテキストビューを提供"
+
+#~ msgid "Radio title"
+#~ msgstr "ラジオタイトル"
+
+#~ msgid "Radio url"
+#~ msgstr "ラジオ URL"
+
+#~ msgid "Remove header, footer and left column from wikipedia pages"
+#~ msgstr "wikipediaページからヘッダ,フッタ,左コラムを消去"
+
+#~ msgid "Remove label"
+#~ msgstr "ラベルの消去"
+
+#~ msgid "Use MozEmbed"
+#~ msgstr "MozEmbed を使用"
+
+#~ msgid "Use WebKit"
+#~ msgstr "WebKit を使用"
+
+#~ msgid ""
+#~ "itunes doesn't support unsynchronised tags last time I checked, mostly "
+#~ "affect tags with pictures"
+#~ msgstr ""
+#~ "itunesは前回起動時に確認した非同期タグ(主に画像に影響を及ぼす)ををサポート"
+#~ "しません"
+
+#~ msgid "use gnome settings"
+#~ msgstr "gnome 設定を使用する"

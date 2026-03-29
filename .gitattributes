@@ -1,0 +1,7 @@
+# Solve file changes showing up on *.po files with changed version headers.
+# Then add to .git/config:
+#
+# [diff "podiff"]
+#    textconv = /usr/local/bin/strippocomments
+*.po diff=podiff
+

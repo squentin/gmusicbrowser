@@ -693,7 +693,7 @@ unshift @SongCMenu,  #unshift instead of "=" because the replaygain submenu (and
 	  code  => sub { SearchSame($_[0]{field},$_[0]); },
 	  foreach=>sub { 'field', Songs::FieldList(true=>'samemenu',); },				mode => 'B',	notempty => 'IDs' },
 	{ label => _"Rename file",	code => sub { DialogRename(	@{ $_[0]{IDs} }); },	onlyone => 'IDs',	test => sub {!$CmdLine{ro}}, },
-	{ label => _"Mass Rename",	code => sub { DialogMassRename(	@{ $_[0]{IDs} }); },	onlymany=> 'IDs',	test => sub {!$CmdLine{ro}}, },
+	{ label => _"Mass Rename",	code => sub { DialogMassRename(	@{ $_[0]{IDs} }); },	notempty=> 'IDs',	test => sub {!$CmdLine{ro}}, },
 	{ label => _"Copy",	code => sub { CopyMoveFilesDialog($_[0]{IDs},TRUE); },
 		notempty => 'IDs',	stockicon => 'gtk-copy', notmode => 'P' },
 	{ label => _"Move",	code => sub { CopyMoveFilesDialog($_[0]{IDs},FALSE); },
