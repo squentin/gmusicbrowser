@@ -137,6 +137,7 @@ use Encode qw/_utf8_on _utf8_off/;
 }
 use List::Util qw/min max sum first/;
 use File::Copy;
+use Digest::MD5 ();
 use Fcntl qw/O_NONBLOCK O_WRONLY O_RDWR SEEK_SET/;
 use Scalar::Util qw/blessed weaken refaddr/;
 use Unicode::Normalize 'NFKD'; #for accent-insensitive sort and search, only used via superlc()
@@ -9640,6 +9641,7 @@ package GMB::Picture;
 our @ArraysOfFiles;	#array of filenames that needs updating in case a folder is renamed
 
 our $loaded_poppler;
+my $DiskCacheDir;
 sub pdf_ok
 {	return $loaded_poppler if defined $loaded_poppler;
 	$loaded_poppler= eval {Glib::Object::Introspection->setup( basename => 'Poppler', version => '0.18', package => 'Poppler'); 1; } || 0;
@@ -9655,11 +9657,58 @@ sub pixbuf
 {	my ($file,$size,$cacheonly,$anim_ok)=@_;
 	my $key= defined $size ? $size.':'.$file : $file;
 	my $pb= GMB::Cache::get($key);
+	if (!$pb && defined $size && !$anim_ok)
+	{	$pb= diskcache_get($file,$size);
+		GMB::Cache::add_pb($key,$pb) if $pb;
+	}
 	unless ($pb || $cacheonly)
 	{	$pb=load($file,size=>$size,anim_ok=>$anim_ok);
-		GMB::Cache::add_pb($key,$pb) if $pb && $pb->isa('Gtk3::Gdk::Pixbuf'); #don't bother caching animation
+		if ($pb && $pb->isa('Gtk3::Gdk::Pixbuf'))
+		{	GMB::Cache::add_pb($key,$pb); #don't bother caching animation
+			diskcache_add($file,$size,$pb) if defined $size;
+		}
 	}
 	return $pb;
+}
+
+sub diskcache_dir
+{	return $DiskCacheDir if defined $DiskCacheDir;
+	$DiskCacheDir= $::HomeDir.'thumbnails';
+	unless (-d $DiskCacheDir)
+	{	my $ok= eval { ::CreateDir($DiskCacheDir); };
+		return $DiskCacheDir=undef unless $ok;
+	}
+	return $DiskCacheDir;
+}
+
+sub diskcache_file
+{	my ($file,$size)=@_;
+	return unless defined $size && $size>0;
+	my $nb= $file=~s/:(\w+)$// ? $1 : '';
+	my @stat= stat $file;
+	return unless @stat;
+	my $key= join "\0",'v1',$size,$file,$nb,$stat[7],$stat[9];
+	my $dir= diskcache_dir();
+	return unless $dir;
+	return $dir.::SLASH.Digest::MD5::md5_hex($key).'.png';
+}
+
+sub diskcache_get
+{	my ($file,$size)=@_;
+	my $cachefile= diskcache_file($file,$size);
+	return unless $cachefile && -e $cachefile;
+	my $pb= eval { Gtk3::Gdk::Pixbuf->new_from_file($cachefile); };
+	return $pb if $pb;
+	unlink $cachefile;
+	return;
+}
+
+sub diskcache_add
+{	my ($file,$size,$pb)=@_;
+	my $cachefile= diskcache_file($file,$size);
+	return unless $cachefile;
+	eval { $pb->save($cachefile,'png'); };
+	unlink $cachefile if $@;
 }
 
 sub pdf_pages
